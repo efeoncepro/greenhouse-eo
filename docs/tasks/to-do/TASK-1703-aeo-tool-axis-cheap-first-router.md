@@ -29,12 +29,43 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-08-15 (2) — cifras corregidas por verificación adversarial
+
+Una verificación adversarial contra PG real corrigió los costos por observación que esta task
+heredó de la auditoría fuente. **Causa raíz única:** se promedió sobre
+`greenhouse_growth.provider_observations` sin excluir el tráfico de prueba — 102 observaciones de
+adapters `fake-*` con costo CERO (30 de ellas `fake-gemini`) inflaron los denominadores. Los
+**totales en dólares no estaban contaminados** (los fakes cuestan 0), pero **los promedios por
+observación sí**.
+
+| Métrica | Valor original | Valor verificado (PG, 2026-08-15) |
+|---|---|---|
+| gemini / observación | USD 0,0040 | **USD 0,005242** (`gemini-3-flash-preview`, n=115 succeeded) |
+| openai / observación | ~USD 0,0323 (implícito en el 7,4×) | **USD 0,038417** (`gpt-4.1`, n=159) |
+| anthropic / observación | USD 0,0845 | **USD 0,084487** ✅ correcto |
+| google_ai_overview / observación | ~USD 0,0026 | **USD 0,004000** (n=23) |
+| perplexity / observación | ~USD 0,0055 | **USD 0,000670** (`sonar`, n=87) |
+| gemini vs medición SERP DataForSEO | 0,9× "paridad" | **1,2×** — gemini queda **20% POR ENCIMA** de una medición SERP, no a la par |
+| gemini vs openai | — | **7,3× más barato** (la dirección sobrevive con holgura) |
+
+Método correcto: promedio sobre observaciones `status='succeeded'` con `model NOT LIKE 'fake-%'`.
+Nota adicional: bajo el provider `gemini` conviven **dos modelos reales** (`gemini-3-flash-preview`
+USD 0,005242 y `gemini-2.5-flash` USD 0,002500) más el `fake-gemini` de prueba — "el costo de
+gemini" no es un número único y hay que decir con qué modelo se midió.
+
+**Lo que NO cambia:** el 92% del gasto concentrado en OpenAI + Anthropic (USD 6,11 + USD 2,53 de
+USD 9,4222) se verificó y es correcto — los dólares totales no dependen de los denominadores. La
+tesis de la task (cheap-first en el eje herramienta, cobertura intocable) sobrevive con holgura.
+**Lo que sí cambia es el argumento de venta:** ya no es "paridad con el proveedor", es "7,3× más
+barato que el default actual, a 1,2× de una medición SERP".
+
 ## Summary
 
 El motor AEO usa LLMs para **dos cosas distintas** y esta task existe para grabar la diferencia
 antes de que alguien la borre optimizando. El eje **HERRAMIENTA** —extracción de prosa, autoría de
-prompts, juicio interno— **sí se abarata cambiando de modelo**: Gemini mide **USD 0,0040 por
-observación**, paridad (0,9×) con una medición SERP de DataForSEO. El eje **COBERTURA** —qué
+prompts, juicio interno— **sí se abarata cambiando de modelo**: Gemini mide **USD 0,005242 por
+observación** (`gemini-3-flash-preview`), **7,3× más barato que el default OpenAI actual** y a
+**1,2× del costo de una medición SERP de DataForSEO**. El eje **COBERTURA** —qué
 motores se observan: OpenAI, Anthropic, Perplexity, Gemini, Google AI Overview— **NO se abarata
 cambiando de modelo**, porque no se puede medir qué dice ChatGPT usando Gemini. Esta task alinea
 los **tres** surfaces del eje herramienta sobre el mismo patrón cheap-first con gate de eval, y
@@ -281,6 +312,15 @@ Reglas obligatorias:
     debe poder responder "con qué instrumento se midió esto".
   - El cost-cap del extractor (`_PROSE_EXTRACTION_MAX_COST_USD`) sigue siendo el circuit breaker;
     bajar el precio no autoriza subir el techo.
+  - 🔴 **Toda consulta de costo del grader excluye el tráfico de prueba y declara su ventana.**
+    Obligatorio: `model NOT LIKE 'fake-%'` (los adapters fake cuestan CERO y hunden cualquier
+    promedio por observación — hoy son 102 de 767 filas), y declarar explícitamente si el
+    resultado **incluye o excluye** `run_kind='smoke'` (28 de 45 runs). Un promedio por observación
+    se calcula además sobre `status='succeeded'`: `skipped`/`failed` valen 0 por diseño
+    (`cost.ts:50-53`) y meterlos en el denominador reporta un costo que nadie pagó ni pagará.
+    **Ésta es la causa raíz única de los cinco errores de cifras del lote 2026-08-15**; toda cifra
+    de costo nueva en esta task, en su PR o en cualquier doc derivado nace con estos filtros o no
+    se publica.
 - Tenant/space boundary: sin cambios — la selección de proveedor es global por runtime, no
   per-org. El gate de gasto per-org es responsabilidad de `TASK-1696`.
 - Idempotency/concurrency: sin cambios; la extracción es una llamada sin estado por observación.
@@ -432,20 +472,40 @@ DETERMINISTA (sin LLM, no aplica)
 
 **Aritmética que sostiene la decisión (medida, no estimada):**
 
+Todas las cifras salen de `provider_observations` con `status='succeeded'` y
+`model NOT LIKE 'fake-%'` (ver `## Delta 2026-08-15 (2)`; sin ese filtro los promedios se hunden
+hasta un 24%).
+
 | Comparación | Valor |
 |---|---|
-| 1 observación Gemini | USD 0,0040 |
+| 1 observación Gemini (`gemini-3-flash-preview`, n=115) | USD 0,005242 |
+| 1 observación Gemini (`gemini-2.5-flash`, n=12) | USD 0,002500 |
+| 1 observación OpenAI (`gpt-4.1`, n=159) | USD 0,038417 |
+| 1 observación Anthropic (`claude-sonnet-4-6`, n=30) | USD 0,084487 |
 | 1 medición SERP DataForSEO (rank capture) | USD 0,004364 |
-| Ratio | **0,9× — paridad** |
-| 1 observación OpenAI vs 1 medición SERP | 7,4× |
+| **Gemini vs OpenAI (el ahorro real de esta task)** | **7,3× más barato** |
+| Gemini vs 1 medición SERP | **1,2×** (20% por encima) |
+| 1 observación OpenAI vs 1 medición SERP | 8,8× |
 | 1 observación Anthropic vs 1 medición SERP | 19,4× |
 | `EXTRACTION_PRICING` anthropic (in/out por 1M) | 0,8 / 4 |
 | `EXTRACTION_PRICING` gemini (in/out por 1M) | 0,1 / 0,4 |
 
-La paridad con una medición SERP es el número que importa: significa que **usar el motor propio
-como herramienta cuesta lo mismo que comprar un dato al proveedor**. Ahí es donde el motor propio
-deja de ser un lujo y pasa a ser el default razonable — que es exactamente la regla de decisión
-adoptada en §4 de la auditoría.
+**Ahorro proyectado del eje herramienta** (sustituyendo el default por Gemini, a volumen constante):
+
+```
+por observación:   0,038417 − 0,005242 = USD 0,033175 ahorrados  (−86%)
+vs Anthropic:      0,084487 − 0,005242 = USD 0,079245 ahorrados  (−94%)
+sobre el gasto de vida completa del eje herramienta: los USD 8,64 concentrados
+hoy en OpenAI+Anthropic caerían a ~USD 1,2 al mismo volumen de observaciones.
+```
+
+El número que importa **no** es una paridad con el proveedor: gemini queda **1,2×, un 20% POR
+ENCIMA** de lo que cuesta comprarle una medición SERP a DataForSEO. Lo que sostiene la decisión es
+la comparación contra el **default actual**: usar el motor propio como herramienta cuesta **7,3×
+menos** de lo que cuesta hoy, y queda en el mismo orden de magnitud que comprar un dato al
+proveedor. Ahí es donde el motor propio deja de ser un lujo y pasa a ser el default razonable — que
+es exactamente la regla de decisión adoptada en §4 de la auditoría, con la corrección de que el
+argumento es "mismo orden de magnitud", no "paridad".
 
 **Forma del patrón (misma en los tres, sin módulo común):**
 
@@ -511,7 +571,9 @@ export const <SURFACE>_PRIORITY = ['gemini', 'openai', 'anthropic'] as const
 4. Si se adopta: flip en staging (Vercel + `deploy.sh` + `--update-env-vars`), verificar en la
    revisión activa del ops-worker y correr un `full` real.
 5. `SELECT` de solo lectura sobre las observaciones de staging: el modelo registrado corresponde a
-   Gemini y el costo estimado por observación cayó al rango esperado.
+   Gemini y el costo estimado por observación cayó al rango esperado. ⚠️ La consulta **debe** llevar
+   `model NOT LIKE 'fake-%'` + `status='succeeded'` y declarar si incluye `run_kind='smoke'`; sin
+   eso el número que se reporte es el mismo error que este lote corrigió.
 6. Producción con cooldown de 24 h. Monitorear 7 días el reparto de `providerId`, la tasa de
    `schema_invalid` y el costo por observación.
 
@@ -553,6 +615,9 @@ export const <SURFACE>_PRIORITY = ['gemini', 'openai', 'anthropic'] as const
       activa del ops-worker, aplicado en Vercel, y con la fila del ledger actualizada nombrando los
       dos runtimes.
 - [ ] Cero re-extracción de observaciones históricas.
+- [ ] 🔴 Toda cifra de costo del grader producida por esta task (task, PR, docs derivados) se
+      calculó con `model NOT LIKE 'fake-%'` + `status='succeeded'` y declara si incluye o excluye
+      `run_kind='smoke'`. El invariante quedó escrito en la spec del dominio, no sólo en esta task.
 
 ## Verification
 

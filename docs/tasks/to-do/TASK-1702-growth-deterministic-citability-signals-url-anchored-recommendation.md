@@ -24,7 +24,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo|aeo`
-- Blocked by: `TASK-1701`
+- Blocked by: `TASK-1701` · ⚠️ **coordinar con `TASK-1269` (in-progress, `Status real: Avanzada`)**: reclama los mismos `fix-it/{generators,contracts}.ts`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -121,6 +121,12 @@ Reglas obligatorias:
 
 - `TASK-1701` — `analyzeUrlContent` y el shape `{ fetch, structure, readable, prose? }`. **Bloqueante
   duro**: sin los hechos no hay señal que derivar.
+- 🔴 **`TASK-1269` (in-progress, `Status real: Avanzada`) — colisión de propiedad, detectada el
+  2026-08-15 por la verificación adversarial.** Declara como suyos y **nuevos** los mismos
+  `src/lib/growth/ai-visibility/fix-it/generators.ts` y `fix-it/contracts.ts` que esta task lista en
+  `Files owned`. Dos dueños del mismo archivo, uno **en vuelo**. Antes del Slice 1 hay que acordar
+  con su dueña quién los toca primero y en qué orden mergean — o esta task espera a que 1269 cierre.
+  Es exactamente el chequeo de impacto cruzado que CLAUDE.md exige y que el barrido inicial no hizo.
 - `src/lib/growth/ai-visibility/fix-it/generators.ts` — generadores de artefactos fix-it, donde vive
   la línea `URL destino: pendiente de definir` (verificado, `:207`) y el mecanismo de
   `pendingFields` (verificado, `contracts.ts:45`).

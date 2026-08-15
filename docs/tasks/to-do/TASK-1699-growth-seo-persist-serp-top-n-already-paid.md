@@ -29,6 +29,20 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-08-15 (2) — cifras corregidas por verificación adversarial
+
+Corrección **editorial**: no cambia el diseño, el alcance ni ninguna decisión de esta task.
+
+El "~98% de la factura variable" que esta task cita de la auditoría fuente está mal dividido. El
+valor correcto es **90,0%** con el modelo de proyección del propio documento (USD 4,06 de USD 4,51)
+y **76,7%** contra los dólares realmente medidos en `greenhouse_growth.seo_provider_spend_daily`
+(`serp` USD 1,3440 sobre USD 1,7525 totales, ventana 2026-08-06→15). El rank capture sigue siendo,
+por lejos, la parte dominante de la factura variable — y el argumento de esta task (el top-N ya
+está pagado y se descarta) no depende del porcentaje.
+
+Verificado en la misma pasada: **USD 0,004364 por llamada y 308 llamadas** son correctos
+(USD 1,3440 / 308 = 0,004364).
+
 ## Summary
 
 Cada corrida diaria de rank capture compra el SERP completo hasta la posición 20 —el multiplicador
@@ -198,8 +212,9 @@ Reglas obligatorias:
 
 - **La compra.** `depth: 20` + `load_async_ai_overview: true` en cada tarea SERP
   (`rank-capture.ts:234-239`), con el costo del multiplicador documentado en el propio archivo
-  (`:54`). Medido: USD 0,004364 por llamada, 308 llamadas en 10 días, ~98% de la factura variable
-  del stack.
+  (`:54`). Medido: USD 0,004364 por llamada, 308 llamadas en 10 días — **90,0% de la factura
+  variable** con el modelo de proyección de la auditoría y **76,7%** contra los dólares medidos en
+  el ledger (`serp` USD 1,3440 de USD 1,7525). La familia dominante del stack por lejos.
 - **El parser que ya recorre las filas.** `parseSerpRankObservation` (`:171-221`) itera
   `tasks[] → result[] → items[]`, junta `featureTypes` de todo lo que no es `organic`, y resuelve
   nuestra posición con `rank_group ?? rank_absolute`. **Toda la información del top-N pasa por ese

@@ -715,12 +715,16 @@ autorizados, el consumo real medido es **~USD 4,51 de DataForSEO + ~USD 3 de gra
 Pero entre el **15% y el 25%** de lo que sí se gasta **no se ve**.
 
 Y el balance del backlog contradice el propio Outcome de este epic ("el módulo no puede ser sólo un
-dashboard"). De las 28 tasks abiertas del dominio: **57% MEDIR · 21% MOSTRAR · 18% ACTUAR** — y de
-las cinco de ACTUAR, tres (`1667`→`1668`→`1669`) son `Effort: Alto` y forman **una cadena
-estrictamente serial que no entrega nada intermedio**, mientras las 16 de medir corren en paralelo.
-Había **siete tasks** para una segunda capa de medición (`1311`…`1317`, todas P3, todas
-`UI impact: none`, sin consumer visible declarado) y **cero** para las siete palancas de mejor
-retorno que la auditoría cuantificó.
+dashboard"). De las **25** tasks abiertas del dominio (*conteo corregido 2026-08-15: la primera versión decía 28,
+y sus partes sumaban 27 con porcentajes que daban 96%*): **56% MEDIR · 24% MOSTRAR · 20% ACTUAR**.
+De las cinco de ACTUAR, tres (`1667`→`1668`→`1669`) son `Effort: Alto` y forman **una cadena
+estrictamente serial que no entrega nada intermedio**, mientras las de medir corren en paralelo.
+El conjunto exacto: MEDIR = 1311·1312·1313·1314·1315·1316·1317·1426·1651·1655·1662·1670·1694·1695 ·
+MOSTRAR = 1658·1660·1672·1690·1691·1693 · ACTUAR = 1667·1668·1669·1673·1692.
+Había **siete tasks** para una segunda capa de medición (`1311`…`1317`, todas P3 y todas
+`UI impact: none` — *matiz corregido: sí declaran consumers entre ellas; lo que ninguna declara es un
+consumer **visible con ID de task**, todas dicen «follow-up ui-ux posterior» sin reservarlo*) y
+**cero** para las siete palancas de mejor retorno que la auditoría cuantificó.
 
 Síntoma concreto: el único lugar del producto donde le hablamos de acción al cliente —el bloque
 "Qué revisar ahora" de `/growth/seo`— son **tres frases fijas de copy** que no leen un solo dato de
@@ -796,6 +800,17 @@ abarata por cadencia y muestreo (`TASK-1704`).
 
 ### Tasks congeladas, con disparador nombrado (ninguna se mata)
 
+> **Corrección 2026-08-15:** el argumento hablaba de «7 tasks congeladas» incluyendo a `TASK-1311`.
+> **`TASK-1311` NO está congelada: fue ampliada** (alcance sube a URLs de terceros) y sigue P3 con
+> `Blocked by: none`. Las congeladas son **6** —`1312`-`1317`— más `TASK-1281`, que es de EPIC-020 y
+> entró al conteo por coincidencia numérica.
+>
+> 🔴 **Y el caso de `1311` es el opuesto al que contaba el argumento:** `TASK-1667` (P1) declara en su
+> contrato el campo **no-nullable** `categoryAnswerPages` producido por `1311`, la pone en Out of
+> Scope y **no la lista como blocker**. O `1667` entrega ese array siempre vacío —campo decorativo— o
+> está bloqueada de hecho por una P3. `1311` no necesita descongelarse: **necesita subir de prioridad,
+> o `1667` debe declarar ese campo degradable.** Lo mismo con `targetUrl`, producido por `TASK-1702`.
+
 | Tasks | Razón | Disparador para descongelar |
 |---|---|---|
 | `TASK-1281` | Su premisa está superada: Core Web Vitals se resuelve con CrUX gratis (campo) contra headless propio (lab, caro y peor) | Que la mitad **WebMCP**, que no tiene sustituto gratis, se demuestre necesaria sola |
@@ -825,5 +840,7 @@ precio de la práctica**.
 No cambia el estado `validation_only` del epic ni su `Non-goal` de venderlo como producto autónomo.
 No autoriza fusionar scores SEO y AEO en un número único: **la ortogonalidad es lo que se vende**
 —rankear #1 sin ser citado es la señal, no el ruido—. No autoriza prometer comparativa competitiva
-(`seo_competitors` sigue sin consumidores), tendencia de citación IA (el re-grade está pausado en
-producción), ni atribución de ingresos a citación en IA (no existe el modelo).
+(`seo_competitors` sigue sin consumidores), tendencia de citación IA (**no** porque el re-grade esté
+pausado —**no lo está**, `deploy.sh` lo declara `true` en ambos entornos— sino porque falta el
+command que inscribe perfiles: `recurring_regrade_enabled` no tiene writer), ni atribución de
+ingresos a citación en IA (no existe el modelo).

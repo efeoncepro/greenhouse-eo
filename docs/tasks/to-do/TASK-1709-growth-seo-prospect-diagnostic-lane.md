@@ -29,6 +29,17 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-08-15 (2) — cifras corregidas por verificación adversarial
+
+Corrección **editorial**: no cambia el diseño, el alcance ni ninguna decisión de esta task.
+
+El "~98% de la factura variable" que esta task cita de la auditoría fuente está mal dividido. El
+valor correcto es **90,0%** con el modelo de proyección del propio documento (USD 4,06 de USD 4,51)
+y **76,7%** contra los dólares realmente medidos en `greenhouse_growth.seo_provider_spend_daily`
+(`serp` USD 1,3440 sobre USD 1,7525 totales, ventana 2026-08-06→15). El rank capture sigue siendo,
+por lejos, la parte dominante de la factura variable, y la regla dura de esta task —cero captura
+recurrente sobre un prospecto— no depende del porcentaje.
+
 ## Summary
 
 El módulo SEO sólo sabe hablarle a un cliente que ya firmó: sus tres tiers
@@ -99,8 +110,9 @@ Reglas obligatorias:
 
 - **NUNCA captura recurrente sobre un prospecto.** Una corrida por diagnóstico y se acabó: cero
   rank capture diario, cero scheduler, cero re-corrida automática. Seguir a un no-cliente es gasto
-  perpetuo sin contrato que lo pague — y el rank capture es el ~98% de la factura variable del
-  módulo (auditoría §2.1). Una re-corrida siempre la pide un humano y vuelve a pasar por el tope.
+  perpetuo sin contrato que lo pague — y el rank capture es el **90,0%** de la factura variable
+  proyectada del módulo (**76,7%** contra dólares medidos en el ledger; auditoría §2.1, cifra
+  corregida). Una re-corrida siempre la pide un humano y vuelve a pasar por el tope.
 - **NUNCA una cifra de prospecto sin declarar la lente.** Todo dato de este carril es `◑ estimado`
   y lo dice, con su `capturedAt`. No hay Search Console, así que **no hay un solo dato medido del
   prospecto**: presentar un estimado sin marca es exactamente el defecto que `ISSUE-154` documentó

@@ -24,7 +24,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo`
-- Blocked by: `TASK-1694` (bloqueo DURO) · `TASK-1692` · `TASK-1699`
+- Blocked by: `TASK-1694` (bloqueo DURO) · `TASK-1692` · `TASK-1699` (sólo para el origen `competitor_gap`; los otros cuatro orígenes no la necesitan)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -44,9 +44,27 @@ la lente de oportunidades vigente pasa a leer la cola en la misma entrega.
 ## Why This Task Exists
 
 **No existe una cola priorizada única** (auditoría 2026-08-15, §3.1 brecha S1, tamaño `L`). Hay tres
-listas con tres criterios distintos: el mapa de oportunidades ordena por un score no versionado, el
-gap SEO↔AEO ordena por cuadrante, y discovery ordena por `captured_at DESC` —orden de llegada— sobre
-hasta 500 candidatos. El operador abre tres pantallas y ninguna le dice qué hacer primero.
+listas con **tres criterios de orden distintos y no comparables entre sí**: el mapa de oportunidades
+ordena por un score no versionado, el gap SEO↔AEO ordena por cuadrante, y discovery aplica su propio
+sort compuesto de 8 llaves. El operador abre tres pantallas y ninguna le dice qué hacer primero,
+porque los tres números no están en la misma escala.
+
+> ⚠️ **Corrección 2026-08-15 (verificación adversarial).** La primera versión de esta task decía que
+> *"discovery ordena por `captured_at DESC` — orden de llegada"*. **Es falso.** El `ORDER BY` de
+> `keyword-discovery/reader.ts:258` es sólo el fetch; el orden servido lo fija un sort compuesto en
+> memoria (`:395-434`) con 8 llaves —acción pendiente, `matchesSeed`, **● medido y no seguido**,
+> presencia de `coreKeyword`, volumen, barrera— donde `capturedAt` es el **séptimo desempate**. Ese
+> orden llegó en `522460b17` (2026-08-14, *"auditoría SEO — orden accionable"*), **un día antes** de
+> la auditoría que lo describió mal.
+>
+> **La brecha sigue siendo real y el argumento correcto es más fuerte:** discovery ya tiene un orden
+> gobernado y bien pensado, pero es un **cuarto criterio** que no se puede comparar con los otros
+> tres. El problema nunca fue que discovery ordenara mal; es que **cada superficie ordena bien según
+> su propia lógica y nadie puede decir cuál de los cuatro #1 va primero**.
+>
+> **Consecuencia dura para esta task:** el Slice que reapunta la lente de oportunidades debe incluir
+> un **test de paridad discovery↔cola** que hoy no estaba pedido — si la cola reordena candidatos que
+> discovery ya ordenó con criterio, hay que poder explicar por qué, y no descubrirlo en producción.
 
 Tres razones concretas por las que esto es un **aggregate persistido y no un reader en vivo**, en
 orden de peso (auditoría §5.2):
@@ -57,7 +75,7 @@ orden de peso (auditoría §5.2):
    *"es la violación más cara posible acá"* — son motores aislados con providers, cadencias y
    breakers distintos. Una VIEW queda descartada de entrada. El gap entra a la cola como filas con
    `origin='aeo_gap'` y una `evidence_ref` **opaca**: nunca FK, nunca JOIN cross-motor.
-2. **`TASK-1699` exige reproducibilidad** — `inputSnapshotHash`, `expiresAt` y detección de `stale`.
+2. **`TASK-1669` exige reproducibilidad** — `inputSnapshotHash`, `expiresAt` y detección de `stale`.
    Un reader que reordena en cada llamada hace que *"la recomendación #1 de la mañana"* sea
    inauditable a las 3 pm: el operador no puede demostrar qué vio cuando decidió, y el cliente
    tampoco.
@@ -69,7 +87,7 @@ orden de peso (auditoría §5.2):
    no tiene respuesta auditable.
 
 Y el modo de falla más probable **no es técnico** (auditoría §5.5): es que la cola se construya y
-`TASK-1699` la ignore. Esa task tiene su propio `context-reader` y su propio "Priority ordering V1"
+`TASK-1669` la ignore. Esa task tiene su propio `context-reader` y su propio "Priority ordering V1"
 entre sus archivos owned. Si avanzan en paralelo sin contrato firmado quedan **dos ordenamientos que
 discrepan** —uno por score versionado, otro por `reason_code`— y el operador ve un #1 en la pantalla
 y otro en el plan del día. Por eso la cola llega **antes** y por eso esta task no cierra sin un
@@ -167,7 +185,7 @@ Reglas obligatorias:
   viajó a un plan del día y es irreversible por diseño.
 - **`TASK-1692`** — writers del ledger de decisiones de discovery. La cola lee la última acción por
   candidato para no volver a proponer lo que ya se descartó; hoy sólo `dismissed` tiene writer.
-- **`TASK-1699`** — el contrato de reproducibilidad (`inputSnapshotHash`, `expiresAt`, `stale`) del
+- **`TASK-1669`** — el contrato de reproducibilidad (`inputSnapshotHash`, `expiresAt`, `stale`) del
   que esta task es la implementación persistida.
 - `greenhouse_growth.seo_gsc_daily` (TASK-1302) — demanda medida, insumo del score.
 - `greenhouse_growth.seo_keyword_set_members` (TASK-1299/1308) — objetivos declarados vigentes.
@@ -270,7 +288,7 @@ Archivos que esta task **modifica sin poseer** (hay que coordinar con su dueña 
   Consumers autorizados: la ruta app `/api/admin/growth/seo/work-queue`, el lane ecosystem
   `/api/platform/ecosystem/growth/seo/work-queue`, la tool MCP interna `get_seo_work_queue`, el
   server component de `/admin/growth/seo/keywords`, la superficie cliente y el orquestador de
-  `TASK-1699`. Ninguno reimplementa orden, score ni composición de orígenes.
+  `TASK-1669`. Ninguno reimplementa orden, score ni composición de orígenes.
 - Server/browser split: el módulo completo nace bajo `import 'server-only'`. El store Postgres, la
   resolución de tenant y la lectura del lado AEO nunca cruzan al browser; la UI recibe el DTO ya
   compuesto por el server component, y el DTO cliente sale por un redactor explícito.
@@ -293,7 +311,7 @@ Archivos que esta task **modifica sin poseer** (hay que coordinar con su dueña 
   del **orden de trabajo** del módulo SEO. Los motores de origen siguen siendo SSOT de su propia
   evidencia; la cola no duplica métrica, referencia procedencia.
 - Consumidores afectados: UI operador (`/admin/growth/seo/keywords`), Nexa, lane ecosystem/MCP
-  interno, portal cliente (DTO redactado), orquestador de `TASK-1699`.
+  interno, portal cliente (DTO redactado), orquestador de `TASK-1669`.
 - Runtime target: `local` + `staging` + `production` + `worker` + `cron`
 
 ### Contract surface
@@ -605,7 +623,7 @@ Archivos que esta task **modifica sin poseer** (hay que coordinar con su dueña 
   `docs/documentation/growth/cola-priorizada-trabajo-seo.md` y manual en
   `docs/manual-de-uso/growth/operar-cola-priorizada-seo.md` (cómo se lee una banda, qué significa
   `stale`, qué hacer cuando un origen está caído, cómo se bumpea una versión de score).
-- `## Delta` en `TASK-1699` con la reducción de su `context-reader` a envoltorio y el retiro de su
+- `## Delta` en `TASK-1669` con la reducción de su `context-reader` a envoltorio y el retiro de su
   ordenamiento propio.
 
 ## Out of Scope
@@ -770,7 +788,7 @@ Tres razones, y las tres son de oficio, no de implementación:
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| `TASK-1699` conserva su propio ordenamiento y quedan dos #1 distintos | UI / agentes | **high** | Contrato firmado antes de que ambas avancen: `TASK-1700` en su `Depends on`, su `context-reader` reducido a envoltorio, su "Priority ordering V1" convertido en config versionada, más test de paridad de orden | no signal — emerge como contradicción visible al operador; se detecta en review de la task |
+| `TASK-1669` conserva su propio ordenamiento y quedan dos #1 distintos | UI / agentes | **high** | Contrato firmado antes de que ambas avancen: `TASK-1700` en su `Depends on`, su `context-reader` reducido a envoltorio, su "Priority ordering V1" convertido en config versionada, más test de paridad de orden | no signal — emerge como contradicción visible al operador; se detecta en review de la task |
 | Un snapshot se escribe con duplicados o con la barrera engañosa y ya viajó a un plan | migration / cliente | medium | `TASK-1694` como bloqueo duro previo a Slice 3; corrida inicial en shadow sobre un solo target con inspección fila por fila | `growth.seo.work_queue.origin_degraded` + revisión manual del primer snapshot |
 | Alguien cambia un umbral del score sin bumpear la versión y el ranking histórico se mueve en silencio | reader / cliente | medium | Config completa dentro del objeto versionado + test que falla ante cambio sin bump + señal de drift | `growth.seo.work_queue.score_version_drift` |
 | El materializador se define como Vercel cron y la cola queda invisible en staging | cron | low | Prohibición explícita en Architecture Alignment + gate `vercel-cron-async-critical-gate` + el job vive en `deploy.sh` | falla del gate en CI |
@@ -840,7 +858,7 @@ Tres razones, y las tres son de oficio, no de implementación:
 - **Operador SEO**: aviso antes del flip del consumer. El orden que ve en pantalla cambia de dueño y
   aparecen filas de orígenes que antes no estaban en esa lista; conviene que sepa por qué antes de
   abrirla un lunes.
-- **Dueña de `TASK-1699`**: acuerdo explícito sobre la reducción de su `context-reader` a envoltorio
+- **Dueña de `TASK-1669`**: acuerdo explícito sobre la reducción de su `context-reader` a envoltorio
   **antes** de que ambas avancen en paralelo. Es la mitigación del modo de falla más probable del
   plan completo.
 
@@ -895,7 +913,7 @@ Tres razones, y las tres son de oficio, no de implementación:
 - [ ] Las tres señales de reliability existen, están registradas en el módulo `growth` y se ven en
       `/admin/operations` con steady 0.
 - [ ] Las tres capas documentales están cerradas: arquitectura, funcional y manual de uso.
-- [ ] `TASK-1699` tiene su `## Delta` con la reducción de su `context-reader` a envoltorio y
+- [ ] `TASK-1669` tiene su `## Delta` con la reducción de su `context-reader` a envoltorio y
       `TASK-1700` en su `Depends on`.
 
 ## Verification
@@ -921,7 +939,7 @@ Tres razones, y las tres son de oficio, no de implementación:
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] `TASK-1699`, `TASK-1667`, `TASK-1668`, `TASK-1690` y `TASK-1691` recibieron su `## Delta` con
+- [ ] `TASK-1669`, `TASK-1667`, `TASK-1668`, `TASK-1690` y `TASK-1691` recibieron su `## Delta` con
       el cambio de fuente de orden.
 - [ ] `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` §3.1 brecha S1
       queda marcada como cerrada con fecha.

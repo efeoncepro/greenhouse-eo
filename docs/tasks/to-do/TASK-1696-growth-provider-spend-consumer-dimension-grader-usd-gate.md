@@ -29,6 +29,22 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-08-15 (2) — cifras corregidas por verificación adversarial
+
+Una verificación adversarial contra PG real corrigió las cifras que esta task heredó del bloque
+económico de la auditoría fuente. **Causa raíz única:** se consultó
+`greenhouse_growth.provider_observations` sin filtrar el tráfico de prueba — 102 observaciones de
+adapters `fake-*` con costo CERO y 28 de 45 runs con `run_kind='smoke'` quedaron en los
+denominadores. **La necesidad de esta task queda CONFIRMADA y reforzada** — sólo cambian los
+números que la dimensionan.
+
+| Afirmación original | Estado | Valor verificado (PG, 2026-08-15) |
+|---|---|---|
+| "20 runs `full` × USD 0,8813 = USD 17,60/mes sin que nada lo mire" | ❌ sub-dimensiona el hueco | El peor caso **exigible** bajo el gate vigente es **USD 40,00/mes/org** (`contractedRunsPerMonth = 20`, `flags.ts:294`, × el techo de policy de USD 2,00 por run que sí es exigible). Con el **máximo observado** de USD 1,4565/run: **USD 29,13/mes/org**. El USD 17,60 es un promedio de 3 runs, no un tope. |
+| "~USD 3/mes de grader por cliente" y "el 15% del presupuesto" | ❌ **inventadas** | Medido: **USD 0,7025 histórico total** para la org cliente (`org-32333527…`, 3 runs) y **CERO desde 2026-07-17** — el último run del grader en toda la base es de esa fecha. El grader **está dormido**; no hay un "~USD 3/mes" que comparar contra USD 50. |
+| — | ✅ hallazgo nuevo que refuerza la task | **El 87,5% de los dólares del grader no tiene organización atribuida**: USD 8,2432 de USD 9,4222 en runs con `organization_id IS NULL` (81,2% si se excluyen los `smoke`; 40 de 45 runs por conteo). Es exactamente el hueco que esta task cierra. |
+| "242 de 767 observaciones `skipped`/`failed` (32%); `google_ai_overview` en 71% (84/119)" | ⚠️ diluido por los fakes | Excluyendo `model LIKE 'fake-%'`: **239 de 665 = 35,9%**, y `google_ai_overview` **84 de 107 = 78,5%**. El problema es **peor** que lo reportado. |
+
 ## Summary
 
 El ledger `seo_provider_spend_daily` está declarado como **fuente única de presupuesto** y hoy no
@@ -68,8 +84,12 @@ transporte.
 (`allowanceCap`/`allowanceUsed`) y su único tope en USD es un backstop **global y sólo del tier
 `trial`**: `globalTrialUsed × resolveProviderPolicy('light').costCeilingUsdPerRun`
 (`entitlement.ts:169-175`). Es decir: cuenta corridas de trial y las multiplica por el techo del
-modo `light`. Una organización **`contracted`** no tiene ningún gate de dinero — 20 runs `full` a
-USD 0,8813 promedio medido = **USD 17,60/mes sin que nada lo mire**. El espejo del lado SEO existe y
+modo `light`. Una organización **`contracted`** no tiene ningún gate de dinero: su único límite es un
+conteo de corridas (`contractedRunsPerMonth = 20`, `src/lib/growth/ai-visibility/flags.ts:294`), y
+un conteo de corridas no acota dólares. El peor caso **exigible** hoy son **20 runs × el techo por
+run del modo `full` (USD 2,00) = USD 40,00/mes/org sin que nada lo mire**; contra el run `full` más
+caro realmente observado (USD 1,4565, providers reales) son **USD 29,13/mes/org**. El espejo del
+lado SEO existe y
 funciona: `resolveSeoEntitlement` (`src/lib/growth/seo/entitlement.ts:212-300`) resuelve
 `budgetCapUsd` / `budgetUsedUsd` / `budgetRemainingUsd` por tier y bloquea con
 `blockedReason: 'budget_exhausted'`.
@@ -81,10 +101,11 @@ de dólar en una misma columna sin decir cuál es cuál es una mentira silencios
 responder después "¿esto lo facturó el proveedor o lo estimamos nosotros con una tabla de precios
 referencial?". De ahí que `cost_basis` y `price_table_version` sean **obligatorias**, no un extra.
 
-**Hecho 4 — un tercio de la matriz del grader no produce evidencia y no está en ningún tablero.**
-242 de 767 observaciones terminan `skipped` o `failed` (32%); `google_ai_overview` está en **71%**
-(84/119). Es la superficie que esta task acaba de instrumentar económicamente, y su rendimiento no
-se ve en `/admin/operations`.
+**Hecho 4 — más de un tercio de la matriz del grader no produce evidencia y no está en ningún
+tablero.** Excluyendo el tráfico de prueba (`model LIKE 'fake-%'`, 102 observaciones de costo cero):
+**239 de 665 observaciones terminan `skipped` o `failed` (35,9%)**, y `google_ai_overview` está en
+**78,5%** (84/107). Es la superficie que esta task acaba de instrumentar económicamente, y su
+rendimiento no se ve en `/admin/operations`.
 
 ## Goal
 
@@ -638,12 +659,24 @@ task no lo altera.
 
 ### Por qué el gate nace en shadow
 
-No sabemos cuál es el tope correcto. Los datos que tenemos: consumo real ~USD 4,51 (DataForSEO) +
-~USD 3 (grader) contra USD 50 autorizados —el 15%—, pero un run `full` cuesta USD 0,88 y la
-calibración pide N≥3 para las dimensiones intermitentes, lo que ya rompe el techo de USD 2 del modo
-`full`. Un tope elegido hoy sería un número inventado con consecuencia real: **el camino público del
+No sabemos cuál es el tope correcto, y los datos disponibles son **demasiado pocos y demasiado
+sesgados** para elegirlo hoy. Lo que está medido de verdad:
+
+- Lado comprado: **USD 1,7525 en el ledger** (2026-08-06→15, 4 familias) para 2 orgs; la proyección
+  mensual del cliente real es ~USD 4,51 contra USD 50 autorizados.
+- Lado grader, org cliente: **USD 0,7025 histórico total** y **cero desde 2026-07-17**. El grader
+  **está dormido** — no hay consumo corriente que dimensione un tope.
+- Lado grader, global: **USD 9,4222 de vida completa en 45 runs**, de los cuales **87,5% no tiene
+  organización atribuida** (USD 8,2432). O sea: el numerador de cualquier tope per-org que se
+  calcule hoy con estos datos sería, en su mayor parte, gasto que ni siquiera sabemos de quién es.
+- Techo por run del modo `full`: USD 2,00. Promedio de los 3 runs `full` medidos: USD 0,8812.
+  Máximo real observado: **USD 1,4565** (73% del techo, y terminó `partial`).
+
+Un tope elegido con eso sería un número inventado con consecuencia real: **el camino público del
 lead magnet comparte el motor**, así que un gate mal calibrado no degrada un dashboard interno,
-corta captación.
+corta captación. Y la calibración pide N≥3 para las dimensiones intermitentes (`TASK-1704`), lo que
+sube el consumo por medición sin que sepamos todavía en qué forma (runs separados vs pasadas
+intra-run).
 
 Por eso la secuencia es: schema y atribución primero (hacer visible), un ciclo mensual completo
 midiendo `wouldBlock` sin bloquear, y recién entonces una decisión de producto sobre el tope con

@@ -11,6 +11,40 @@
 
 ---
 
+> ## ⚠️ Estado de verificación — LEER ANTES DE TOMAR UNA TASK DERIVADA
+>
+> **2026-08-15:** este documento se escribió consolidando siete análisis y **se descubrió al menos
+> una afirmación falsa después de publicarlo** (el re-grade recurrente: decía "apagado en
+> producción, prenderlo es rollout" y la verdad es que `deploy.sh` lo declara `true` en ambos
+> ambientes y el blocker real es un command que no existe — ver §1.4, ya corregido).
+>
+> **La pasada de verificación adversarial terminó** (4 auditores, 58 afirmaciones). Balance:
+>
+> | Bloque | Resistió | Falló | Confianza |
+> |---|---|---|---|
+> | Código SEO | 9 de 15 | 2 refutadas, 4 mal encuadradas | **Alta** |
+> | Motor AEO | 8 de 15 | 1 refutada, 5 parciales, 1 hipótesis vendida como hecho | **Media** |
+> | **Economía** | **4 de 13** | **5 refutadas, 4 parciales** | 🔴 **Baja para el grader**, media-alta para el proveedor |
+>
+> **Las cifras del grader tenían una sola causa de error, repetida cinco veces:** se consultó
+> `provider_observations` **sin distinguir el tráfico de prueba del real** — 96 observaciones de
+> adapters `fake-*` con costo cero y 28 de 45 runs de tipo `smoke`, todos dentro de los
+> denominadores. Es la misma clase de fallo que el del re-grade: **leer una fuente sin verificar qué
+> representa**. Antes fue un ledger documental en vez del `deploy.sh`; acá, una tabla sin filtrar.
+>
+> Todo lo refutado está corregido en línea con su bloque `🔴 CORREGIDO`. Reglas que quedan:
+>
+> - **Ninguna cifra de acá se cita hacia afuera** (propuesta, SOW, reporte a cliente) sin
+>   re-verificarla contra el código o la base.
+> - **Toda task derivada verifica su propia premisa en Discovery** antes de escribir código. Si el
+>   código dice otra cosa que este documento, **manda el código** y se corrige el documento.
+> - Las afirmaciones marcadas explícitamente como *hipótesis* o *no verificado* nunca fueron
+>   hechos: no promoverlas por repetición.
+>
+> El origen del error importa para calibrar la confianza: nació de leer el
+> `FEATURE_FLAG_STATE_LEDGER` en vez del `deploy.sh`, o sea de **confiar en un documento en lugar
+> del runtime** — exactamente el anti-patrón que este repo ya tiene canonizado.
+
 ## Veredicto
 
 **El módulo mide muy bien y actúa poco, y el dinero está mal asignado.** Los siete análisis, desde
@@ -25,12 +59,24 @@ Lo que falta es **capacidad de acción** y **visibilidad del gasto propio**.
 
 **El presupuesto no es la restricción activa. La instrumentación sí.**
 
-Contra los USD 50/mes por cliente autorizados (`entitlement.ts`, tier `contracted`), el consumo real
-medido es **~USD 4,51 de DataForSEO + ~USD 3 de grader**. Se está usando el **15%**. Pero entre el
-**15% y el 25%** de lo que sí se gasta no se ve.
+> 🔴 **CIFRAS CORREGIDAS 2026-08-15 (verificación adversarial contra la base real).** La primera
+> versión de este párrafo decía *"~USD 4,51 de DataForSEO + ~USD 3 de grader; se usa el 15%; sobran
+> ~USD 42"*. **Los USD 3 del grader estaban inventados.** Lo medido:
+>
+> | | Medido | Lo que decía |
+> |---|---|---|
+> | DataForSEO, cliente `berel.com` | ~USD 4,51/mes (extrapolado de **9 días, 1 org**) | "10 días, 2 orgs" |
+> | Grader, esa misma org | **USD 0,70 histórico** y **cero desde 2026-07-17** | ~USD 3/mes |
+> | Gasto del grader sin org atribuida | **85% del total** | no mencionado |
+>
+> **El grader está dormido desde julio.** No hay costo mensual por cliente que reportar. El
+> consumo real es **~9%** del presupuesto, no 15%, y sobran ~USD 45.
+>
+> La conclusión cualitativa **se refuerza** (el presupuesto no es la restricción), pero el *sizing*
+> que alimentaba el tope de `TASK-1696` no valía y se corrigió allá.
 
-La pregunta correcta no es "¿cómo ahorramos?" sino "¿en qué invertimos los ~USD 42 que sobran, y
-cómo nos aseguramos de verlos?".
+La pregunta correcta no es "¿cómo ahorramos?" sino "¿en qué invertimos lo que sobra, y cómo nos
+aseguramos de verlo?".
 
 ---
 
@@ -111,7 +157,7 @@ deep import lo crea un commit, así que el detector es de CI.
 
 ### 1.4 Otros defectos menores confirmados
 
-- **`docs/context/06_glosario-metricas.md:77,224`** declara **Otterly.ai** como "fuente de verdad"
+- ✅ **RESUELTO 2026-08-15.** `docs/context/06_glosario-metricas.md:77,224` **y `13_icp-buyer-personas-jtbd.md:133`** (la auditoría vio 2 de 3) declaraban **Otterly.ai** como "fuente de verdad"
   del AEO Citation Rate. Es la herramienta de un competidor, no está integrada, y tenemos el Grader.
   Ese contrato de métricas viaja a propuestas y SOWs.
 - **El re-grade recurrente no corre, y el motivo NO es el flag.** *(Corregido 2026-08-15 durante la
@@ -127,13 +173,19 @@ deep import lo crea un commit, así que el detector es de CI.
   de Full API Parity. Por eso el scheduler corre y reporta `skipped=no_due_profiles`: no hay forma
   gobernada de inscribir un perfil. **Prender el flag es un no-evento; el entregable es el command
   que falta.**
-- **`seteamos validate_micromarkup: true`** —el enabler pagado del crawl OnPage— **y nunca se llama
-  al endpoint `/v3/on_page/microdata`** que ese flag habilita.
+- **`validate_micromarkup: true` se setea y `/v3/on_page/microdata` nunca se llama.** *Corregido
+  2026-08-15:* el flag **no tiene costo listado** (no está entre los multiplicadores de OnPage) y su
+  rollup `has_micromarkup_errors` **sí se consume** (`findings-map.ts:59` ← `collect.ts:48`). O sea:
+  sabemos *si hay* errores de schema por página y no *cuáles*. Es oportunidad gratis no capturada,
+  **no dinero tirado** — `TASK-1705` se scopea sobre el detalle faltante, no sobre un ahorro.
 - **`seo_competitors` existe en el schema y no tiene un solo consumidor** en `src/` (única aparición:
   `src/types/db.d.ts`).
-- **El 32% de las observaciones del grader terminan `skipped` o `failed`** (242 de 767). Por
-  provider: `google_ai_overview` **71%** (84/119), perplexity 43%, gemini 24%, openai 11%. Un tercio
-  de la matriz no produce evidencia y no está en ningún tablero.
+- **El 36% de las observaciones del grader terminan `skipped` o `failed`.** *Cifra corregida
+  2026-08-15: la primera versión decía «32% (242 de 767)» — mal por dos motivos, el conteo omitía los
+  3 `failed` de anthropic (son 245, no 242) y el denominador incluía **102 observaciones de adapters
+  `fake-*`**. Limpio de tráfico de prueba: **239 de 665 = 35,9%**, y `google_ai_overview`
+  **84/107 = 78,5%**, no 71%.* Más de un tercio de la matriz no produce evidencia y no está en ningún
+  tablero — misma causa raíz que los demás errores de esta sección.
 
 ---
 
@@ -164,7 +216,7 @@ keyword market data mensual    USD 0,17
 TOTAL                          USD 4,51 / mes / cliente
 ```
 
-**El rank capture es el ~98% de la factura variable.** Todo lo demás junto suma USD 0,45.
+**El rank capture es el ~90% de la factura variable** (*corregido: la primera versión decía 98%*; con el modelo del propio documento es 4,06/4,51 = **90,0%**, y contra dólares medidos en el ledger 1,3440/1,7525 = **76,7%**). Todo lo demás junto suma USD 0,45 — que sobre 4,51 es exactamente el 10% que el «98%» negaba. **Consecuencia:** las otras familias pesan el doble de lo que se creía, lo que aumenta el retorno relativo de `TASK-1705` (OnPage gratis) y `TASK-1708`.
 
 **Techo mal calibrado:** el tope de keywords seguidas es 200 por target. A 200 keywords la misma
 corrida diaria cuesta **USD 26,18/mes** a tarifa medida (USD 48/mes a tarifa de lista con los
@@ -188,7 +240,27 @@ Vida completa: **45 runs, 767 observaciones, USD 9,4222** de `estimated_cost_usd
 | `full` / `internal_audit` | 3 | 0,8813 |
 | `light` / `smoke` | 25 | 0,0673 |
 
-**Costo por observación, por motor** (tokens medidos × tabla de precios referencial):
+**Costo por observación, por motor.**
+
+> 🔴 **TABLA CORREGIDA 2026-08-15.** La primera versión dividía el gasto por un denominador que
+> incluía **96 observaciones de adapters `fake-*` con costo CERO**, y mezclaba los 28 de 45 runs que
+> son `run_kind='smoke'`. **Cuatro de las cinco filas estaban mal.** Los valores por llamada
+> realmente pagada son: openai **0,038417** (no 0,0323) · anthropic 0,084487 (correcto, es el único
+> sin fakes) · gemini **0,005242** (no 0,0040; y son tres modelos distintos, no uno) ·
+> google_ai_overview **0,004000** (no 0,0026) · perplexity **0,000670** (no ~0,0055 — ese número no
+> se reproduce desde ninguna cifra del repo; si viene del cargo de búsqueda de Perplexity, entonces
+> `cost.ts` **subcuenta ese proveedor ~10×** y sería un hallazgo mayor que este error de tabla).
+>
+> **Efecto en las conclusiones:** gemini deja de estar a la par de una medición SERP (0,9×) y queda
+> **1,2×**, o sea 20% por encima. La dirección del arbitraje sobrevive con holgura —gemini sigue
+> siendo 7,3× más barato que openai—, pero las comparaciones de §2.3 y la tabla comprar-vs-construir
+> se leen con estos números, no con los de abajo.
+>
+> **Causa raíz, y es la misma de otros cuatro errores de esta sección:** se consultó
+> `provider_observations` **sin filtrar el tráfico de prueba**. Regla que queda: toda consulta de
+> costo del grader excluye `model LIKE 'fake-%'` y declara si incluye `run_kind='smoke'`.
+
+(valores originales, conservados para trazabilidad — **no usar**):
 
 | provider | modelo real | obs OK | USD/obs |
 |---|---|---:|---:|
@@ -235,16 +307,16 @@ modelo por defecto sí cabe.
 
 | # | Brecha | Tamaño |
 |---|---|---|
-| S1 | **No existe una cola priorizada única.** Tres listas con tres criterios; discovery ordena por `captured_at DESC` (orden de llegada) sobre hasta 500 candidatos. Y `TASK-1669` se prohíbe explícitamente resolverlo, dejando el modelo huérfano. | L |
+| S1 | **No existe una cola priorizada única.** ~~discovery ordena por `captured_at DESC`~~ 🔴 **REFUTADO 2026-08-15:** discovery tiene un sort compuesto de 8 llaves (`reader.ts:395-434`, mergeado en `522460b17` el 2026-08-14, **un día antes de esta auditoría**) donde `capturedAt` es el 7.º desempate. **La brecha es real y el argumento correcto es más fuerte:** hay *cuatro* criterios de orden, cada uno bien pensado y **ninguno comparable con los otros** — nadie puede decir cuál de los cuatro #1 va primero. Y `TASK-1669` se prohíbe resolverlo, dejando el modelo huérfano. | L |
 | S2 | **El SERP completo se paga y se tira.** Costo marginal cero para persistir el top-N; **costo de oportunidad diario** porque no se recupera hacia atrás sin volver a comprarlo. Es sustrato de S3 y S4. | M |
 | S3 | **Estacionalidad.** La serie de 12 meses viene dentro del `keyword_info` que ya se compra; se guarda como escalar plano. Sin ella, "¿qué escribo en agosto para el pico de noviembre?" no se puede responder. | S |
-| S4 | **Clustering propio.** `coreKeyword` se persiste, se proyecta y **no agrupa nada**. Discovery devuelve 500 candidatos sin decir cuántas páginas son: el módulo fabrica la canibalización que la otra pantalla detecta. | M |
+| S4 | **Clustering propio.** `coreKeyword` **no agrupa nada** (cero `GROUP BY`), pero *corregido:* no es dato inerte — tiene 4 consumidores (llave #4 del orden de discovery, contexto del LLM autor, `coverageTokens` de la verificación determinista de TASK-1666, y UI). Una task que lo trate como campo muerto **rompe el orden del inbox y la cobertura de seeds**. Discovery devuelve 500 candidatos sin decir cuántas páginas son: el módulo fabrica la canibalización que la otra pantalla detecta. | M |
 | S5 | **SERP features capturadas y colapsadas a un booleano de AI Overview.** PAA, video, local pack, shopping: capturados, invisibles. Cambian el formato ganador, no sólo el CTR. | S–M |
-| S6 | **Valor comercial por keyword.** `cpc_usd` se captura y sólo se pinta en el drawer. `src/lib/growth/ga4/` existe y **no tiene un solo consumidor**. | M |
+| S6 | **Valor comercial por keyword.** `cpc_usd` se captura y sólo se pinta en el drawer. `src/lib/growth/ga4/` **sí tiene consumidores** (*corregido:* dos scripts en `scripts/ga4/`, con auth por impersonación **ya verificada**); lo que falta es consumer de runtime y superficie. El trabajo pendiente es menor de lo estimado. | M |
 | S7 | **Nada avisa.** El módulo es 100% pull. Las señales de reliability vigilan el pipeline, no al cliente. | M |
 | S8 | **Consolidación no es una acción del sistema.** La canibalización se detecta y se etiqueta; no hay camino para "estas dos URLs se fusionan, 301 de A a B". | S–M |
 | S9 | **Linking interno.** Única señal de estructura: `is_orphan_page`. El endpoint `links` es gratis post-crawl. | M |
-| S10 | **GSC en 2 de 4 dimensiones.** Falta `country` (crítico multi-mercado, caso Berel) y `device`. Cuota de filas, no dinero. | S |
+| S10 | **GSC en 2 de 5 dimensiones.** Falta `country` (crítico multi-mercado, caso Berel) y `device`. 🔴 **Sizing REFUTADO:** no es «cuota de filas, no dinero» ni tamaño `S`. `UNIQUE (organization_id, capture_date, query, page)` hace que las filas país×device **colapsen sobre la misma clave y el UPSERT sobrescriba en silencio**. Es migración + cambio de clave única + backfill. | **M/L** |
 
 ### 3.2 AEO / GEO
 
@@ -473,7 +545,7 @@ cero outbox, cero flags de dominio. Mismo patrón que `artifact-composer` ya tie
 ## 7. Lo que no se debe prometer todavía
 
 - **Comparativa competitiva** (`seo_competitors` sin consumidores).
-- **Tendencia de citación IA** (con el re-grade pausado no se está capturando).
+- **Tendencia de citación IA** — no porque el re-grade esté "pausado" (**no lo está**, ver §1.4) sino porque **nadie puede inscribir un perfil**: `recurring_regrade_enabled` no tiene writer. Sin inscripción no hay serie.
 - **"Tu sitio está sano"** apoyado en el audit (no detecta bloqueo a crawlers de IA:
   un sitio invisible para los motores puede puntuar 95/100).
 - **Atribución de ingresos a citación en IA** (no existe el modelo; los estudios se contradicen en
@@ -495,7 +567,7 @@ atribuibles): sirven para ordenar tácticas, no para prometer resultados.
 
 ## 8. Higiene documental pendiente
 
-- `docs/context/06_glosario-metricas.md:77,224` — retirar Otterly.ai como fuente de verdad.
+- ✅ `docs/context/06_glosario-metricas.md:77,224` + `13_icp-buyer-personas-jtbd.md:133` — Otterly.ai retirado el 2026-08-15, reemplazado por el motor propio con su cobertura real (5 motores, 2 superficies) y la advertencia de que la cadencia recurrente no está operativa.
 - `FEATURE_FLAG_STATE_LEDGER.md` — resolver el conflicto aparente de `REGRADE` y `FIX_IT`
   verificando con `vercel env ls` **y** con la revisión activa del ops-worker (son runtimes
   distintos; el flip del 2026-06-30 tocó Vercel, el flag se lee en el worker).

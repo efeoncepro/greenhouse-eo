@@ -29,6 +29,29 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-08-15 (2) — cifras corregidas por verificación adversarial
+
+Una verificación adversarial contra PG real encontró que el bloque económico de la auditoría fuente
+(`docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md`) tiene errores
+sistemáticos que se propagaron a esta task. **Causa raíz única:** se consultó
+`greenhouse_growth.provider_observations` sin filtrar el tráfico de prueba — hay 102 observaciones
+de adapters `fake-*` con costo CERO y 28 de los 45 runs son `run_kind='smoke'`, y todo eso quedó en
+los denominadores.
+
+| Afirmación original | Estado | Valor verificado (PG, 2026-08-15) |
+|---|---|---|
+| "N≥3 (USD 0,88 × 3 = USD 2,64) rompe el techo de USD 2 del modo `full`" | ❌ **error de categoría** | `costCeilingUsdPerRun` es **por run** (`policy.ts:63`) y el acumulador `let estimatedCostUsd = 0` nace **dentro** de cada ejecución (`run-engine.ts:253`, comparado en `:285`). Tres runs de 0,88 **nunca** se suman contra ese techo. Tampoco hay presupuesto mensual en USD para el AEO contra el que 2,64 pudiera chocar. |
+| "El engine aborta antes de correr" | ❌ falso | El guard corre **después** de cada observación persistida; al excederse hace `break outer` y finaliza el run con la evidencia ya escrita. No aborta, no lanza, no impide arrancar. |
+| "un run `full` cuesta USD 0,88 medido" | ⚠️ frágil | Promedio de **sólo 3 runs** `internal_audit`/`full` (0,9099 · 0,8862 · 0,8476 → 0,8812). El máximo observado en modo `full` con providers reales es **USD 1,4565** (2026-06-24, `claude-sonnet-4-6` + `gpt-4.1` + `gemini-3-flash-preview` + `sonar`) = **73% de su propio techo por run**. Ése es el argumento fuerte y verdadero. |
+| "el rank capture es el ~98% de la factura variable" | ❌ mal dividido | **90,0%** con el modelo del propio documento (4,06 / 4,51) y **76,7%** contra dólares medidos en el ledger (`serp` USD 1,3440 de USD 1,7525 totales). |
+
+Correcciones aplicadas en el cuerpo: la justificación del lado (b) se reescribió (ahora la task
+**debe declarar primero** si N=3 son tres runs separados o tres pasadas dentro de un run, porque el
+análisis es completamente distinto), el freno real intra-run pasó a ser `maxPromptsPerRun: 12`
+(`policy.ts:60`), toda mención de "abort por techo" se corrigió a corte con degradación, y el 98%
+se corrigió en los dos lugares donde aparecía. **El lado (a) — cadencia del AIO — no depende de
+ninguna de estas cifras erradas y queda intacto: sigue siendo la mayor palanca única del módulo.**
+
 ## Summary
 
 Hoy la cadencia y el muestreo del módulo son **implícitos**: el rank capture mide AI Overview en
@@ -54,24 +77,55 @@ El rank capture paga `base × 2 (load_async_ai_overview) × 2 (depth 20)`
   el desempeño del cliente. Se paga la observación 30 veces al mes para leer un booleano que se
   mueve pocas veces.
 
-Y el rank capture es **~98% de la factura variable del proveedor**: USD 4,06 de los USD 4,51/mes
-del cliente real (31 keywords); todo lo demás junto —backlinks, site audit, keyword market data—
-suma USD 0,45. **Es la mayor palanca única sobre el gasto del módulo**, y a 200 keywords (el techo
-por target) la misma corrida diaria cuesta USD 26,18/mes contra un budget `contracted` de USD 50.
+Y el rank capture es la parte dominante de la factura variable del proveedor: **90,0%** con el
+modelo de proyección del propio documento (USD 4,06 de los USD 4,51/mes del cliente real, 31
+keywords; todo lo demás junto —backlinks, site audit, keyword market data— suma USD 0,45) y
+**76,7%** contra los dólares ya medidos en `seo_provider_spend_daily` (`serp` USD 1,3440 sobre
+USD 1,7525 totales, ventana 2026-08-06→15). **Sigue siendo la mayor palanca única sobre el gasto
+del módulo** por un margen amplio, y a 200 keywords (el techo por target) la misma corrida diaria
+cuesta USD 26,18/mes contra un budget `contracted` de USD 50.
 
-**(b) Lado motor propio — el muestreo que su propia calibración exige y no cabe.**
+**(b) Lado motor propio — el muestreo que su propia calibración exige y hoy no existe.**
 
 `GREENHOUSE_AI_VISIBILITY_GRADER_CALIBRATION_V1.md` §5.bis midió que las señales intermitentes
-—colisión de entidad— aparecen **1/3 y 2/3 de las veces**, y recomienda **N≥3** para esas
-dimensiones. Hoy eso es estructuralmente imposible: un run `full` cuesta USD 0,88 medido, y
-USD 0,88 × 3 = **USD 2,64**, que rompe el techo de `costCeilingUsdPerRun: 2` del modo `full`
-(`src/lib/growth/ai-visibility/policy.ts:63`). El engine aborta antes de correr
-(`run-engine.ts:285`).
+—colisión de entidad `f11.es`— aparecen **1/3 (OpenAI) y 2/3 (Anthropic) de las veces**, y
+recomienda **N≥3 sólo para esas señales**. Para presencia/ausencia y narrativa core el mismo
+documento dice explícitamente que **N=1 es razonablemente confiable** (fueron estables 3/3 en los
+dos motores). Replicar toda la matriz ×3 sería triplicar el costo para estabilizar señales que ya
+son estables — y el documento no lo pide.
 
-O sea: **el motor recomienda un muestreo que su propio guard de costo prohíbe**. Con el eje
-herramienta ya en su costo bajo (`TASK-1703`), cabe. Y N≥3 **sólo** en las dimensiones que la
-calibración nombró — replicar toda la matriz ×3 sería triplicar el costo para estabilizar señales
-que ya son estables.
+Hoy ese muestreo simplemente **no existe**: `run-engine` ejecuta cada prompt × provider una vez y
+no hay noción de dimensión intermitente que merezca repetición. Construirlo es el trabajo.
+
+🔴 **Antes de dimensionar nada, esta task DEBE declarar qué es "N=3".** Hay dos lecturas y el
+análisis de costo, idempotencia y agregación es **completamente distinto** en cada una:
+
+| Lectura | Qué significa | Qué la restringe de verdad |
+|---|---|---|
+| **A — tres runs separados** | 3 filas en `grader_runs`, cada una con su propio `estimatedCostUsd` | **Nada del guard de costo.** `costCeilingUsdPerRun` es por run (`policy.ts:63`) y el acumulador nace dentro de cada ejecución (`run-engine.ts:253`), así que 3 × 0,88 nunca se suman contra el techo. Lo que restringe es el **allowance de runs/mes** (`contractedRunsPerMonth = 20`, `flags.ts:294`): 3 runs por medición consumen 3 de 20. La agregación tiene que cruzar runs. |
+| **B — tres pasadas dentro de un run** | 1 fila en `grader_runs`, N observaciones por prompt/provider | El freno que aparece **PRIMERO no es el costo, es `maxPromptsPerRun: 12`** (`policy.ts:60`). Y el techo de USD 2 sí aplica, pero se compara contra el acumulado de **ese** run. |
+
+La calibración §5.bis midió la varianza como *"misma pregunta repetida 3 veces por motor"*, lo que
+apunta a la lectura B para las dimensiones nombradas — pero **la task no puede asumirlo**: es la
+primera decisión de Discovery y hay que dejarla escrita antes de tocar `policy.ts`.
+
+**Y el techo de USD 2 por run sí está más apretado de lo que parece, por una razón verdadera.** El
+promedio de USD 0,88 sale de **sólo 3 runs** (0,9099 · 0,8862 · 0,8476). El máximo real observado
+en modo `full` con providers reales es **USD 1,4565** — **73% del techo de su propio run**, y ese
+run terminó `partial` (ni siquiera completó la matriz). O sea: bajo la lectura B, el headroom real
+para muestrear no es "2,00 − 0,88 = 1,12"; contra el peor run observado es **USD 0,54**. Ese es el
+número contra el que hay que dimensionar el muestreo, y por eso `TASK-1703` (bajar el costo del eje
+herramienta) sigue siendo dependencia dura de esta mitad.
+
+**Qué hace el guard cuando se excede, exactamente.** No aborta y no lanza: corre *después* de
+persistir cada observación, y al excederse hace `break outer` y finaliza el run con la evidencia ya
+escrita (`run-engine.ts:283-292`). El estado final lo resuelve `resolveRunStatusFromObservations`
+desde los statuses de las observaciones — ⚠️ lo que significa que **un run truncado por costo cuyas
+observaciones fueron todas `succeeded` se finaliza como `succeeded`**, sin que el truncamiento
+quede en el estado. `costGuardTripped` se devuelve al caller pero no se persiste. Si el muestreo se
+implementa bajo la lectura B, esto deja de ser un detalle: un run que muestreó 1 de 3 pasadas y se
+cortó por costo se vería idéntico a uno que muestreó las 3. **El corte por costo tiene que quedar
+registrado en la fila del run** — es la misma regla de honestidad del lado (a), aplicada al AEO.
 
 **El hilo común, y el riesgo que ordena el diseño.** Los dos cambios tocan **series vivas**: el
 rank capture lleva meses corriendo para un cliente real y el eje AEO alimenta reportes ya
@@ -92,8 +146,13 @@ regla dura no es una preferencia de UX: sin un tercer estado explícito de "no m
   en el request, y su default deja de ser diario-en-todas.
 - La serie de rank distingue tres estados: **AIO presente**, **AIO ausente (medido)** y **no
   medido**, con razón — en PG, en el espejo BigQuery y en el contrato del reader.
+- **La semántica de "N=3" queda declarada por escrito** (tres runs separados vs tres pasadas dentro
+  de un run) **antes** de tocar `policy.ts`, con su consecuencia sobre allowance, techo por run,
+  idempotencia y agregación.
 - El muestreo N≥3 existe para las dimensiones intermitentes nombradas por la calibración, y **sólo**
-  para ellas, dentro del techo de costo del modo.
+  para ellas, dentro del techo de costo **por run** del modo y del `maxPromptsPerRun` vigente.
+- Un run truncado por el guard de costo **queda marcado como truncado** en su fila; no se puede
+  confundir con un run completo.
 - Los dos cambios entran detrás de flag con corrida en shadow contra la serie viva antes de
   cualquier flip.
 - El ahorro y el gasto quedan **medidos** en el ledger, no estimados.
@@ -137,7 +196,9 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` (§2.1
-  multiplicadores silenciosos, §2.4 el N=3 no cabe en su propio techo)
+  multiplicadores silenciosos. ⚠️ **§2.4 "el N=3 no cabe en su propio techo" es FALSO** — ver
+  `## Delta 2026-08-15 (2)`: el techo es por run. No usar §2.4 como insumo; su bloque económico
+  tiene denominadores contaminados con tráfico `fake-*` y `run_kind='smoke'`.)
 - `docs/tasks/complete/TASK-1307-growth-seo-rank-url-performance-over-time-ui.md` (origen del flag
   `aiOverview` en la serie — el consumer que esta task debe no romper)
 - `docs/tasks/complete/TASK-1300-growth-seo-dataforseo-family-registry.md` (registry de familias +
@@ -159,8 +220,11 @@ Reglas obligatorias:
   snapshot donde esta task inserta el registro de las señales **pedidas**. Si esta task llega
   primero, 1699 reescribe el writer sobre un contrato a medio hacer; si llega 1699 primero, el
   tri-estado se apoya en un payload de SERP ya persistido y el trabajo se reduce.
-- **`TASK-1703` — router cheap-first del eje herramienta.** Bloqueante para la mitad (b): sin el
-  costo del extractor abajo, N≥3 no cabe en el techo de USD 2 del modo `full`.
+- **`TASK-1703` — router cheap-first del eje herramienta.** Bloqueante para la mitad (b) **bajo la
+  lectura B** (pasadas intra-run): contra el peor run `full` observado (USD 1,4565) el headroom bajo
+  el techo por run es de USD 0,54, y sin el costo del extractor abajo el muestreo se corta por
+  techo. Bajo la lectura A (runs separados) el techo por run no es el binding constraint y la
+  dependencia se vuelve de economía, no de factibilidad.
 - `greenhouse_growth.seo_rank_snapshots` + `src/lib/growth/seo/rank-capture.ts` +
   `rank-capture-batch.ts` + `rank-evolution-reader.ts` + `rank-history-bq-mirror.ts`.
 - `src/lib/growth/ai-visibility/{policy,run-engine,scoring}.ts` + `accuracy/detector.ts`
@@ -215,7 +279,13 @@ Reglas obligatorias:
   **presencia booleana, sin concepto de "no medido"**.
 - `policy.ts` con los tres modos y sus techos: `light` 0.5 / `full` 2 / `internal_audit` 5, y
   `maxPromptsPerRun` 6 / 12 / 16.
-- `run-engine.ts:285` aborta el run si `estimatedCostUsd > policy.costCeilingUsdPerRun`.
+- `run-engine.ts:283-292` **corta** el run (`break outer`) si `estimatedCostUsd >
+  policy.costCeilingUsdPerRun`, después de persistir la observación que cruzó el techo. No aborta ni
+  lanza: finaliza con la evidencia ya escrita. El acumulador `estimatedCostUsd` nace en `:253`
+  **dentro** de cada ejecución ⇒ el techo es **por run**, nunca acumulado entre runs.
+- El truncamiento **no se persiste**: `costGuardTripped` se devuelve al caller y el estado final lo
+  resuelve `resolveRunStatusFromObservations` desde los statuses de las observaciones, así que un
+  run cortado con todas sus observaciones `succeeded` se guarda como `succeeded`.
 - `accuracy/detector.ts`: determinista, produce `AccuracyFinding`; *"sólo `entity_collision` claro
   escala el gate"* — es la dimensión intermitente que la calibración nombró.
 - Ledger de gasto del proveedor: `seo_provider_spend_daily` +
@@ -234,7 +304,13 @@ Reglas obligatorias:
 - El reader no tiene tri-estado ni razón; el contrato expone `aiOverview?: boolean`.
 - No existe muestreo N>1 en ninguna parte del grader: `run-engine` ejecuta cada prompt × provider
   una vez, y no hay noción de dimensión intermitente que merezca repetición.
-- El techo de `full` (USD 2) fue calibrado contra un run de un solo pase; no contempla muestreo.
+- El techo de `full` (USD 2) es **por run** y fue calibrado contra un run de un solo pase; no
+  contempla muestreo, y su base empírica es una muestra de 3 runs cuyo máximo real (USD 1,4565) ya
+  consume el 73%.
+- **El corte por costo no deja rastro persistido.** `costGuardTripped` se devuelve al caller pero no
+  se escribe en `grader_runs`; el status lo resuelve `resolveRunStatusFromObservations` desde las
+  observaciones, así que un run truncado con observaciones sanas queda `succeeded`. Con muestreo
+  esto pasa de ser un detalle a ser un falseo de evidencia.
 
 ## Modular Placement Contract
 
@@ -306,7 +382,8 @@ Reglas obligatorias:
     completa está prohibido por esta task.
   - Las observaciones repetidas se persisten **todas** (append-only); la agregación decide, no el
     writer. Sobrescribir la observación anterior con "la buena" destruye la evidencia del muestreo.
-  - El techo de costo del modo sigue siendo un abort, no un warning.
+  - El techo de costo **por run** sigue siendo un corte efectivo, no un warning — y el corte queda
+    registrado en la fila del run, no sólo devuelto al caller.
   - `depth 20` intacto.
 - Tenant/space boundary: `seo_targets.organization_id` para el lado SEO;
   `grader_profiles.organization_id` para el AEO. La cadencia se resuelve por target/perfil, nunca
@@ -352,7 +429,7 @@ Reglas obligatorias:
 
 - Local checks: `pnpm vitest run src/lib/growth/seo src/lib/growth/ai-visibility` + tests nuevos
   (tri-estado, promoción de `not_measured`, cadencia determinista, N≥3 acotado a las dimensiones
-  nombradas, abort por techo).
+  nombradas, corte por techo **con el truncamiento persistido**).
 - DB/runtime checks: migración aplicada en staging + verificación de columnas; conteo del backfill
   antes y después; `SELECT` comparando una semana en shadow vs la serie real.
 - Integration checks: corrida real del batch en staging con el flag ON contra un target de prueba,
@@ -413,12 +490,19 @@ Reglas obligatorias:
 
 ### Slice 3 — Muestreo N≥3 acotado, del lado AEO
 
+- 🔴 **Primero, en la task: declarar la semántica de N=3** (lectura A = tres runs separados vs
+  lectura B = tres pasadas dentro de un run) con su consecuencia sobre allowance de runs/mes, techo
+  por run, `maxPromptsPerRun`, clave de idempotencia y dónde ocurre la agregación. Nada de
+  `policy.ts` se toca antes de eso.
+- Marcar el truncamiento por costo en la fila del run (hoy `costGuardTripped` sólo se devuelve al
+  caller): sin eso, un run muestreado a medias se lee como completo.
 - `samplingByDimension` en `policy.ts`: mapa cerrado dimensión → N, poblado **sólo** con las
   dimensiones que la calibración §5.bis nombró (colisión de entidad y las que ese documento liste;
   leerlo, no asumir).
 - `run-engine` ejecuta N muestras para los prompts/providers que alimentan esas dimensiones,
   persiste **todas** las observaciones (append-only) y agrega por mayoría/frecuencia en el scoring.
-- El costo estimado del run incluye el muestreo y sigue sujeto al abort por techo.
+- El costo estimado del run incluye el muestreo y sigue sujeto al corte por techo **por run**; el
+  run cortado queda marcado como truncado (hoy no lo está — ver Gap).
 - Flag `GROWTH_AI_VISIBILITY_DIMENSION_SAMPLING_ENABLED` (default OFF).
 
 ### Slice 4 — Señal de cobertura de medición + cierre económico
@@ -482,16 +566,35 @@ ledger; **verificar contra el ledger real en Discovery antes de comprometer el n
 
 **Aritmética del lado (b):**
 
+🔴 **La aritmética depende de qué es "N=3" (lectura A vs B, ver Why This Task Exists). No hay una
+sola cuenta.**
+
 ```
-hoy:            1 run full = USD 0,88 medido               (techo full = USD 2,00) ✔
-N=3 ingenuo:    USD 0,88 × 3 = USD 2,64                    (techo full = USD 2,00) ✘ abort
-N=3 acotado:    USD 0,88 + (muestras extra SOLO de los prompts/providers que
-                alimentan las dimensiones intermitentes)   → debe caber bajo USD 2,00
+Base medida (3 runs internal_audit/full):  0,9099 · 0,8862 · 0,8476  → promedio 0,8812
+Peor run full observado (providers reales):                            USD 1,4565  (partial)
+Techo POR RUN del modo full (policy.ts:63):                            USD 2,00
+
+Lectura A — tres runs separados
+  costo:      3 × ~0,88 = ~2,64 USD  → NO choca con ningún techo:
+              costCeilingUsdPerRun es por run y el acumulador nace dentro de
+              cada ejecución (run-engine.ts:253). Tampoco hay presupuesto
+              mensual en USD para el AEO.
+  restricción real: allowance de runs/mes (contractedRunsPerMonth = 20,
+              flags.ts:294) → cada medición N=3 consume 3 de 20.
+  costo real: entra al gate USD per-org que construye TASK-1696.
+
+Lectura B — tres pasadas dentro de un run
+  freno #1:   maxPromptsPerRun = 12 (policy.ts:60) — aparece ANTES que el costo.
+  freno #2:   techo por run USD 2,00. Headroom contra el promedio: 1,12.
+              Headroom contra el PEOR run observado (1,4565):        USD 0,54.
+  al excederse: corte (break outer) con la evidencia ya persistida, NO abort.
 ```
 
-El cálculo exacto de "muestras extra" depende de cuántos prompts alimentan las dimensiones
-nombradas y de si `TASK-1703` bajó el costo del extractor. Es lo primero que Discovery tiene que
-medir; si no cabe, el alcance del muestreo se reduce hasta que quepa — **nunca al revés**.
+Dimensionar contra USD 0,54 (peor caso observado), no contra USD 1,12 (promedio de 3 runs) — un
+techo calibrado contra el promedio de una muestra de 3 se cruza en producción. El cálculo exacto de
+"muestras extra" depende de cuántos prompts alimentan las dimensiones nombradas y de si
+`TASK-1703` bajó el costo del extractor. Es lo primero que Discovery tiene que medir; si no cabe,
+el alcance del muestreo se reduce hasta que quepa — **nunca al revés**.
 
 ## Rollout Plan & Risk Matrix
 
@@ -502,7 +605,8 @@ medir; si no cabe, el alcance del muestreo se reduce hasta que quepa — **nunca
   puntos no se pueden distinguir después. Es la puerta de una sola dirección de esta task.
 - Slice 2 corre en **shadow** por al menos un ciclo semanal completo antes de cualquier flip.
 - Slice 3 (AEO) es independiente de 1 y 2 y puede correr en paralelo, pero **no puede shippear
-  antes que `TASK-1703`**: sin el costo del extractor abajo, aborta por techo.
+  antes que `TASK-1703`**: contra el peor run `full` observado (USD 1,4565) el headroom bajo el
+  techo por run es de USD 0,54, y sin el costo del extractor abajo el muestreo se corta por techo.
 - `TASK-1699` y esta task tocan el mismo writer de snapshot: acordar orden de merge **antes** de
   empezar Slice 1, no durante el conflicto.
 - Slice 4 (señal + cierre económico) va al final, cuando hay cadencia real que medir.
@@ -515,7 +619,8 @@ medir; si no cabe, el alcance del muestreo se reduce hasta que quepa — **nunca
 | Backfill deja la serie histórica en `NULL` y un reader estricto la lee como `not_measured` | data quality | medium | Backfill explícito a `measured` con dry-run + conteo esperado; la serie previa al corte SÍ se midió siempre | Conteo de filas por estado antes/después |
 | Cambio de tipo de `aiOverview` rompe un consumer no barrido (PG y BQ tienen derivaciones separadas) | reader / pantalla ancla / mirror BQ | medium | Cambio de tipo deliberado para que el compilador encuentre los callsites; barrer PG **y** BQ (`rank-evolution-reader.ts:101` y `:130`) | `pnpm typecheck` + test del mirror |
 | N≥3 se aplica a toda la matriz y triplica el costo del run | costo AEO | medium | Mapa cerrado dimensión→N poblado desde la calibración; test que asserta que el mapa no contiene dimensiones fuera de la lista | Costo estimado por run vs techo |
-| El muestreo bypassea el techo de costo del modo | costo AEO | low | El costo del muestreo entra en `estimatedCostUsd` **antes** del check de `run-engine.ts:285` | Abort del run en staging con muestreo excesivo |
+| El muestreo bypassea el techo de costo por run | costo AEO | low | El costo del muestreo entra en `estimatedCostUsd` **antes** del check de `run-engine.ts:285` | Corte del run en staging con muestreo excesivo |
+| Un run truncado por costo se lee como completo (el corte no se persiste hoy) | evidencia AEO / score | **high** | Persistir el truncamiento en la fila del run + test que falla si un run cortado queda `succeeded` sin marca | Conteo de runs con corte por costo vs runs completos |
 | Flags prendidos en un runtime y no en el otro | cross-runtime | **high** | `deploy.sh` como SoT + `--update-env-vars` + verificación en la revisión activa + fila del ledger con los runtimes nombrados | Divergencia de estado de medición entre días |
 | Migración registrada sin ejecutar (pre-up-marker) | migration | low | `-- Up Migration` + bloque `DO` con `RAISE EXCEPTION` | La propia migración aborta |
 | Ahorro celebrado sin medir porque el ledger no distingue quién consumió | economía del módulo | medium | `TASK-1696` es bloqueante (dimensión `seo`/`aeo` + gate USD); el cierre económico de Slice 4 usa el ledger, no la estimación | Comparación ledger vs estimación |
@@ -556,8 +661,9 @@ medir; si no cabe, el alcance del muestreo se reduce hasta que quepa — **nunca
 6. Flip de `GROWTH_SEO_AIO_CADENCE_ENABLED` en staging; verificar que los días saltados aparecen
    como `not_measured` con `reason: 'cadence_skip'` en PG **y** en el mirror BQ.
 7. Verificar el gasto real en `seo_provider_spend_daily` contra la proyección.
-8. Slice 3 en staging: run `full` con muestreo, verificar costo bajo el techo y las observaciones
-   repetidas persistidas.
+8. Slice 3 en staging: run `full` con muestreo, verificar costo bajo el techo **por run**, las
+   observaciones repetidas persistidas y que un run forzado a cruzar el techo queda **marcado como
+   truncado** (no `succeeded` limpio).
 9. Producción con cooldown de **7 días** entre ambientes (es una serie viva de cliente, no una
    feature nueva). Monitorear 30 días la señal de cobertura de medición.
 
@@ -595,8 +701,14 @@ medir; si no cabe, el alcance del muestreo se reduce hasta que quepa — **nunca
       registrados en la task con números del ledger, no estimados.
 - [ ] `samplingByDimension` contiene **sólo** las dimensiones nombradas por la calibración §5.bis, y
       hay un test que lo asserta.
-- [ ] Un run `full` con muestreo tiene `estimatedCostUsd` bajo `costCeilingUsdPerRun = 2`; si no
-      cabe, el alcance del muestreo se redujo (y el techo NO se subió).
+- [ ] La semántica de N=3 (tres runs separados vs tres pasadas intra-run) quedó **declarada por
+      escrito en la task** antes del primer cambio a `policy.ts`, con su consecuencia sobre
+      allowance, techo por run, `maxPromptsPerRun`, idempotencia y agregación.
+- [ ] Un run `full` con muestreo tiene `estimatedCostUsd` bajo `costCeilingUsdPerRun = 2` (techo
+      **por run**), dimensionado contra el **peor run observado** (USD 1,4565), no contra el
+      promedio de 3; si no cabe, el alcance del muestreo se redujo (y el techo NO se subió).
+- [ ] Un run cortado por el guard de costo queda **marcado como truncado** en su fila y hay un test
+      que falla si se guarda como `succeeded` sin marca.
 - [ ] Las observaciones repetidas se persisten todas (append-only); la agregación ocurre en el
       scoring, no en el writer.
 - [ ] Los tres flags están en `flags.ts`, en `services/ops-worker/deploy.sh`, verificados en la

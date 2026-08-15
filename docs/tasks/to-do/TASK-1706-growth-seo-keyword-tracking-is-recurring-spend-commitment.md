@@ -29,6 +29,17 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-08-15 (2) — cifras corregidas por verificación adversarial
+
+Corrección **editorial**: no cambia el diseño, el alcance ni ninguna decisión de esta task.
+
+El "~98% de la factura variable" que esta task cita de la auditoría fuente está mal dividido. El
+valor correcto es **90,0%** con el modelo de proyección del propio documento (USD 4,06 de USD 4,51)
+y **76,7%** contra los dólares realmente medidos en `greenhouse_growth.seo_provider_spend_daily`
+(`serp` USD 1,3440 sobre USD 1,7525 totales, ventana 2026-08-06→15). El rank capture sigue siendo,
+por lejos, la parte dominante de la factura variable, y el compromiso de gasto recurrente que esta
+task hace explícito no depende del porcentaje.
+
 ## Summary
 
 `trackKeywords` compromete gasto recurrente del proveedor —el rank capture le paga a DataForSEO por
@@ -713,7 +724,8 @@ ató** (`boundBy`) y **cuánto margen queda** (`recurringHeadroomUsd`).
 
 - Persistir el envelope per-org (hoy se deriva de knobs por tier): requiere DDL y una superficie de
   administración comercial.
-- Bajar el costo del rank capture, que es el ~98% de la factura variable: cadencia del AI Overview
+- Bajar el costo del rank capture, que es el 90,0% de la factura variable proyectada (76,7% contra
+  los dólares medidos en el ledger): cadencia del AI Overview
   (la presencia de AI Overview no es señal diaria), revisión de `depth`, y aprovechar las filas del
   top-20 que hoy se pagan y se descartan (auditoría §2.1).
 - Anticipar el rechazo en la UI: mostrar holgura restante antes de que el operador arme el lote.

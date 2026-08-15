@@ -94,7 +94,7 @@ declara en `origin_health_json` y **no baja el score de los demás**; recomputar
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo|ai|nexa|data`
-- Blocked by: `TASK-1667`, `TASK-1668`
+- Blocked by: `TASK-1667`, `TASK-1668`, `TASK-1700` (la cola priorizada — **bloqueo de secuencia**: sin ella nacen dos ordenamientos que discrepan; su Slice ordering ya lo exigía en prosa y el campo no lo declaraba)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
