@@ -13,9 +13,12 @@ import SurfaceRecipe from '@/components/greenhouse/primitives/surface-system/Sur
 import { throwIfNotOk } from '@/lib/api/parse-error-response'
 import { GH_GROWTH_SEO_KEYWORDS } from '@/lib/copy/growth'
 import type { SeoDiscoveryMethod } from '@/lib/growth/seo/keyword-discovery/contracts'
+import type { SeoDiscoveryCandidateView, SeoDiscoveryRunView } from '@/lib/growth/seo/keyword-discovery/reader'
 
 import KeywordsSurfaceHeader from '../KeywordsSurfaceHeader'
 import KeywordDiscoveryBuilder from './KeywordDiscoveryBuilder'
+import KeywordDiscoveryResults from './KeywordDiscoveryResults'
+import KeywordDiscoveryRunStatus from './KeywordDiscoveryRunStatus'
 
 /**
  * TASK-1665 — Raíz de la lente `Descubrir`.
@@ -40,6 +43,9 @@ export interface KeywordDiscoveryWorkbenchProps {
   canExecute: boolean
   disabledReason: string | null
   budgetRemainingUsd: number | null
+  run: SeoDiscoveryRunView | null
+  candidates: SeoDiscoveryCandidateView[]
+  totalCandidates: number
 }
 
 const KeywordDiscoveryWorkbench = ({
@@ -49,7 +55,10 @@ const KeywordDiscoveryWorkbench = ({
   marketLabel,
   canExecute,
   disabledReason,
-  budgetRemainingUsd
+  budgetRemainingUsd,
+  run,
+  candidates,
+  totalCandidates
 }: KeywordDiscoveryWorkbenchProps) => {
   const copy = GH_GROWTH_SEO_KEYWORDS.discovery
   const router = useRouter()
@@ -114,16 +123,27 @@ const KeywordDiscoveryWorkbench = ({
         </CardContent>
       </Card>
 
-      {/* El canvas de candidatos y la banda de estado llegan en los slices siguientes. Hasta
-          entonces el estado vacío dice la verdad —todavía no hay corrida— en vez de fingir una
-          tabla vacía, que se leería como "no encontramos nada". */}
-      <Card data-capture='seo-keyword-discovery-results'>
+      {run ? (
+        <Card>
+          <CardContent>
+            <KeywordDiscoveryRunStatus run={run} />
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {/* Sin corrida se dice la verdad —todavía no hay ninguna— en vez de mostrar una tabla
+          vacía, que se leería como "buscamos y no encontramos nada". */}
+      <Card data-capture={candidates.length > 0 ? undefined : 'seo-keyword-discovery-results'}>
         <CardContent>
-          <EmptyState
-            icon='tabler-radar-2'
-            title={seoTargetId ? copy.empty.title : copy.empty.noTargetTitle}
-            description={seoTargetId ? copy.empty.description : copy.empty.noTargetDescription}
-          />
+          {candidates.length > 0 ? (
+            <KeywordDiscoveryResults candidates={candidates} totalCandidates={totalCandidates} />
+          ) : (
+            <EmptyState
+              icon='tabler-radar-2'
+              title={seoTargetId ? copy.empty.title : copy.empty.noTargetTitle}
+              description={seoTargetId ? copy.empty.description : copy.empty.noTargetDescription}
+            />
+          )}
         </CardContent>
       </Card>
     </Stack>

@@ -2452,6 +2452,74 @@ export const GH_GROWTH_SEO_KEYWORDS = {
         'Escribe una o más seeds arriba y elige cómo expandirlas. Vas a ver el costo estimado antes de confirmar.',
       noTargetTitle: 'Este Space no tiene un sitio configurado',
       noTargetDescription: 'Configura el sitio y su mercado para poder investigar keywords.'
+    },
+
+    /**
+     * Canvas de candidatos.
+     *
+     * 🔴 La columna se llama **"Barrera de enlaces"**, jamás "Dificultad" (ISSUE-152): el índice
+     * crudo del proveedor colapsa a 0 en SERPs es-LATAM y un "0" se lee como "trivial", que es
+     * falso. Se muestra el NIVEL de lo que la métrica realmente mide, y `unknown` es "Sin dato",
+     * nunca "Baja" — un hueco presentado como barrera baja afirma una oportunidad que nadie midió.
+     */
+    results: {
+      title: 'Candidatos',
+      ariaLabel: 'Candidatos de la corrida',
+      count: '{count} candidatos',
+
+      colKeyword: 'Keyword',
+      colSource: 'Procedencia',
+      colCluster: 'Agrupador',
+      colIntent: 'Intención',
+      colVolume: 'Volumen',
+      colBarrier: 'Barrera de enlaces',
+      colPresence: 'Presencia propia',
+      colState: 'Estado',
+
+      measuredMarker: '● Medido por Search Console',
+      estimatedMarker: '◑ Estimado de mercado · DataForSEO Labs',
+      legend: '● Medido por Search Console · ◑ Estimado de mercado. No se promedian.',
+
+      volumeUnit: '{value}/mes',
+      asOf: 'al {date}',
+
+      noMarketData: 'Sin dato de mercado',
+      noIntent: 'Sin dato de intención',
+      noCluster: 'Sin agrupador',
+      noPresence: 'Sin medición propia',
+      notInSeries: 'No aparece en la serie',
+      position: 'Posición {value}',
+
+      sourceManual: 'Seed manual',
+      sourceGsc: 'GSC medido',
+      sourceTracked: 'Keyword seguida',
+      sourceSuggestions: 'Sugerencias',
+      sourceRelated: 'Relacionadas',
+      sourceIdeas: 'Ideas',
+      sourceDomain: 'Dominio propio',
+
+      barrierLow: 'Baja',
+      barrierMedium: 'Media',
+      barrierHigh: 'Alta',
+      barrierUnknown: 'Sin dato',
+      barrierLowHint: 'Se compite con contenido y autoridad, no con enlaces. No significa fácil.',
+
+      intentInformational: 'Informativa',
+      intentNavigational: 'De navegación',
+      intentCommercial: 'Comercial',
+      intentTransactional: 'Transaccional',
+
+      stateNew: 'Nuevo',
+      stateTracked: 'Ya seguido',
+      stateDismissed: 'Descartado',
+      statePreparingAeo: 'Preparando AEO',
+      stateSelectedForTarget: 'Marcado como objetivo',
+
+      seedTrace: 'Seed: {seed}',
+      emptyFiltered: 'Ningún candidato coincide con los filtros.',
+
+      trackingCostNotice:
+        'Seguir cualquiera de estos términos compromete gasto recurrente: el rank capture diario le paga al proveedor por cada keyword vigente hasta que la dejes de seguir.'
     }
   },
 

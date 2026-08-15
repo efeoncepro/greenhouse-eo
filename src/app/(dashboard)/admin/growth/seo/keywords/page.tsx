@@ -5,6 +5,8 @@ import type { Metadata } from 'next'
 import { can } from '@/lib/entitlements/runtime'
 import { isSeoKeywordDiscoveryEnabled, isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { GH_GROWTH_SEO_KEYWORDS } from '@/lib/copy/growth'
+import { readKeywordDiscovery } from '@/lib/growth/seo/keyword-discovery/reader'
+import type { SeoDiscoveryCandidateView, SeoDiscoveryRunView } from '@/lib/growth/seo/keyword-discovery/reader'
 import { resolveUnambiguousSeoTarget } from '@/lib/growth/seo/resolve-target'
 import { readKeywordOpportunities } from '@/lib/growth/seo/keyword-opportunities-reader'
 import { listSeoEligibleSpaces } from '@/lib/growth/seo/overview/list-seo-spaces'
@@ -56,6 +58,7 @@ interface PageProps {
     action?: string
     position?: string
     view?: string
+    discoveryRun?: string
   }>
 }
 
@@ -141,6 +144,45 @@ export default async function Page({ searchParams }: PageProps) {
           ? GH_GROWTH_SEO_KEYWORDS.discovery.disabledReason.noTarget
           : null
 
+    // Lectura en DOS pasos a propósito: sin `runId` el reader devuelve sólo el historial de
+    // corridas (no candidatos), así que primero se resuelve CUÁL corrida mirar —la del enlace
+    // compartido o la última— y recién entonces se piden sus candidatos. Pedir todo de una haría
+    // que un deep-link a una corrida vieja trajera la nueva.
+    let discoveryRun: SeoDiscoveryRunView | null = null
+    let discoveryCandidates: SeoDiscoveryCandidateView[] = []
+    let discoveryTotal = 0
+
+    if (selectedSpace && market) {
+      const requestedRunId = (params.discoveryRun ?? '').trim() || undefined
+
+      const runs = await readKeywordDiscovery({
+        organizationId: selectedSpace.organizationId,
+        seoTargetId: market.seoTargetId,
+        runId: requestedRunId
+      })
+
+      if (runs.ok) {
+        discoveryRun = runs.run ?? runs.runs[0] ?? null
+
+        // Si el reader ya trajo candidatos (venía `runId`), no se vuelve a preguntar.
+        if (runs.candidates.length > 0 || requestedRunId) {
+          discoveryCandidates = runs.candidates
+          discoveryTotal = runs.totalCandidates
+        } else if (discoveryRun) {
+          const withCandidates = await readKeywordDiscovery({
+            organizationId: selectedSpace.organizationId,
+            seoTargetId: market.seoTargetId,
+            runId: discoveryRun.runId
+          })
+
+          if (withCandidates.ok) {
+            discoveryCandidates = withCandidates.candidates
+            discoveryTotal = withCandidates.totalCandidates
+          }
+        }
+      }
+    }
+
     return (
       <KeywordDiscoveryWorkbench
         organizationId={selectedSpace?.organizationId ?? null}
@@ -150,6 +192,9 @@ export default async function Page({ searchParams }: PageProps) {
         canExecute={discoveryEnabled && canTrackKeywords && Boolean(market)}
         disabledReason={discoveryDisabledReason}
         budgetRemainingUsd={null}
+        run={discoveryRun}
+        candidates={discoveryCandidates}
+        totalCandidates={discoveryTotal}
       />
     )
   }
