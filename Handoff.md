@@ -2,6 +2,50 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### Los documentos del candidato: un candado que no protegía nada (2026-08-15)
+
+El operador abrió la ficha de una postulante y encontró que para ver su CV había que "REVELAR" —y que
+ni siquiera había visor. Tenía razón dos veces, y la segunda era peor: **ese candado era decorativo**.
+`Application360View.tsx:1144` construía tres filas con literales, y el "Revelar" de `:355` era un
+`useState` local. El motivo que el operador escribía **se descartaba**, y el banner que prometía "deja
+una entrada de auditoría" mentía: no se escribía ninguna.
+
+**El sustrato existía desde `TASK-1362` y nadie lo enchufó.** Esa task cerró con `UI impact: none`
+declarando fuera de alcance "la UI de subir/ver documentos… desk `TASK-355`", y 355 ya estaba cerrada.
+El cable quedó en el aire, sin dueño, y ninguna task abierta lo recogía.
+
+**Lo que se cerró.** `TASK-1714` abrió el reveal auditado para candidatos —no existía: el de
+`TASK-784` se ancla a `memberId` y un candidato no tiene member hasta el handoff, así que el RUT salía
+por mail cuando People Ops preparaba el contrato, que es justo lo que el reveal existe para evitar—.
+`TASK-1715` cableó el panel al reader real. Ambas cerradas y pusheadas.
+
+**La decisión que el operador corrigió.** Mi contrato original decía "el CV se abre en pestaña nueva".
+Estaba mal: rompe el contexto de evaluación y delega los 12 estados al visor del sistema, donde no
+podemos decir nada honesto sobre un 403 o una cuarentena. El CV ahora se lee **dentro del portal**. Y
+mi método falló antes que la decisión: elegí "visor del browser" **sin buscar el primitive existente**
+—el repo ya tenía dos consumidores de `react-pdf`—, violando la regla de lookup-antes-de-construir.
+
+**`react-pdf` no se pudo usar, y el hallazgo es más grande que esta task.** No arranca bajo
+`pnpm dev` (= `next dev --webpack`): `pdfjs-dist` v5 es ESM y el interop de webpack lo rompe al
+evaluarlo, con el import dinámico **rechazando en silencio**. `transpilePackages` no alcanza.
+⚠️ **No está verificado bajo Turbopack, que es lo que usa `pnpm build`** — de eso depende si
+`CertificatePreviewDialog` y `ContractorSupportDocumentsPanel` están rotos **para los usuarios** o
+sólo para quien desarrolla. Es el Slice 1 de `TASK-1716`, junto con sus dos bugs de worker distintos
+(uno resuelve con `new URL` sobre un especificador de módulo, el otro desde un CDN público que saca
+bytes de documentos privados del perímetro).
+
+**Cuatro defectos que ni los tests ni el build veían, y sí la captura.** (1) PG entrega `Date` donde
+el tipo dice `string`: el sort del view-model reventaba en runtime **con los mocks en verde** — la
+clase de bug que CLAUDE.md advierte y que igual me comí. (2) `variant='tonal'` rinde 3.69:1, bajo AA.
+(3) **`sx` NO mapea `outlineColor` a la paleta**: emitía `primary.main` como CSS inválido y el anillo
+de foco no se dibujaba. (4) El diálogo mostraba **dos** "Abrir en pestaña nueva" — lo vio el árbol de
+accesibilidad, no la vista. GVC premium verde en ambos viewports al cierre (exit 0, rubric pass).
+
+**Y un aviso operativo:** una sesión concurrente de Codex corrió `git commit` mientras yo tenía
+cambios en staging y **se llevó parte de mi trabajo dentro de `1ed8ea36d`**, un commit titulado sobre
+growth-seo. El código está completo y pusheado; el mensaje de ese commit no describe lo que contiene.
+El índice de git es compartido: `git add` no es una reserva.
+
 ### Benchmark de suites AEO + `ISSUE-158` — el relevamiento terminó auditándonos (2026-08-15)
 
 El operador pidió dejar de afirmar ventajas competitivas sin verificarlas, después de corregirme dos
@@ -552,18 +596,3 @@ que responde 302 por su SSO; quedó apuntando al portal público. Dos ejecucione
 recibió eventos tras el rollout. Los dos tickets remotos siguen *unresolved* sólo porque la sesión de Sentry no está
 autenticada y el token API disponible es read-only (403 al resolver); hace falta una sesión/token con escritura para
 marcarlos en Sentry. El artefacto interno vive en `docs/issues/resolved/ISSUE-151-…`.
-
-### TASK-1378 CERRADA + ISSUE-150 RESUELTA — scanner LIVE en producción, verificado en 3 capas (2026-08-12 06:10Z)
-
-**Cierre completo, autorizado por el operador ("terminemos todo lo que falte"):** (1) redeploy
-`greenhouse-aivcug5f5` con el flag horneado; (2) diagnóstico post-flip EN producción: `flagEnabled=true`,
-`credentialPlan=service_account_key`, `mint.ok` (94 ms), `probe.ok` (147 ms); (3) **camino completo de upload
-productivo**: postulación de prueba por el formulario público REAL (`PRUEBA TASK-1378 / NO CONTACTAR`,
-`task-1378-postflip-prod@efeonce.org`, Turnstile real auto-verificado, CV inyectado vía DataTransfer) →
-`scan_id ascan-e6a62b39-de96-4279-87ba-172587040068`, `scanner=structural+clamav-http`, `verdict=clean`,
-asset `attached`, 129 ms. **HR descarta esa postulación en el Desk** (tercera de prueba identificada).
-
-ISSUE-150 movida a `resolved/` (índice actualizado); TASK-1378 movida a `complete/` con sección de cierre;
-flag ledger con Production ON en el snapshot; delta de impacto cruzado en TASK-1423. Gates de cierre (full
-test + build) corridos en el commit de cierre. El bloqueo del clasificador de permisos sobre
-`vercel env/redeploy` resultó transitorio.

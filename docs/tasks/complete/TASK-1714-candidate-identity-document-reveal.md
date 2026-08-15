@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -416,6 +416,32 @@ disponible en el portal, para retirar el canal informal actual.
 - Rate-limit / quota de revelaciones si el signal de anomalía levanta la mano (condición de retiro de la deuda declarada).
 - Reveal de direcciones de candidato, si alguna vez se capturan.
 - Evaluar unificación de las dos rutas de reveal cuando exista un tercer ancla — no antes.
+
+## Delta 2026-08-15 — cierre
+
+**Estado: code complete + seed verificado. El endpoint NO fue ejercitado end-to-end, por falta de
+datos, no por falta de implementación.** Ningún candidato del entorno tiene documento de identidad
+capturado (`resolveCandidateDocuments` devuelve `identityDocuments: []` en todos los que se probaron),
+y eso es correcto por diseño: `captureCandidateIdentityDocument` sólo escribe **después de una
+decisión favorable**. No se sembró uno sintético porque escribiría PII de prueba en el perfil legal de
+una persona real de la base compartida.
+
+Verificado:
+
+- Migración aplicada y **confirmada con SELECT** contra PG (no se confió en "Migrations complete!"):
+  1 fila activa de `hiring.candidate.reveal_identity` en `capabilities_registry`.
+- 11 tests del command, incluida la pertenencia cruzada (`404`, no `403`), el motivo corto rechazado
+  antes de tocar la fila, y que `includeArchived: true` se pasa para que TASK-784 pueda dar su `409`.
+- `capability-grant-coverage.test.ts` verde: la capability tiene grant a roles reales.
+- `pnpm lint` y `pnpm typecheck` limpios.
+
+Pendiente de ejercicio real (no bloquea el cierre, pero conviene hacerlo en la primera contratación
+que capture identidad):
+
+1. `POST` de reveal con la persona agente superadmin → `200` con valor.
+2. `SELECT` sobre `person_identity_document_audit_log` → fila `revealed_sensitive` con actor y motivo.
+3. `POST` con `agent-collaborator@greenhouse.efeonce.org` → `403`.
+4. `POST` con un `documentId` de otra persona → `404`.
 
 ## Open Questions
 

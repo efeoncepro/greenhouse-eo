@@ -47,9 +47,10 @@ viewport produce scroll horizontal de página; los nombres de archivo largos rom
 - Encabezado de grupo: `Typography variant='overline'` + `GreenhouseChip kind='status' variant='label' tone='warning'` para `Sensible`.
 - Estados: `GreenhouseChip` `tone='error'` (cuarentena), `tone='info'` (procesando), `tone='warning'` (sin escanear), `tone='success'` (revelado).
 - Icon-tile: `warning.lightOpacity` / `primary.lightOpacity` del tema, nunca HEX literal.
-- Acciones: `GreenhouseButton kind='secondaryAction'`; iconos Tabler (`tabler-external-link`, `tabler-download`, `tabler-lock`).
+- Acciones: MUI `Button` `variant='outlined'` (Ver / Abrir) y `variant='text'` (Descargar), con anillo de foco vía `var(--mui-palette-primary-main)`; iconos Tabler (`tabler-eye`, `tabler-download`, `tabler-external-link`, `tabler-lock`). **NO** `variant='tonal'`: rinde 3.69:1 y falla AA.
 - Copy: `hiringDesk.application.documents.*` en `src/lib/copy/dictionaries/{es-CL,en-US}`; cero literal en JSX.
 - Motion: solo la transición por defecto del `Dialog` MUI; sin animación sobre el dato sensible.
+- Visor: `Dialog maxWidth='lg'` a `90vh`, documento sobre blob same-origin; el motor es el del navegador, no una librería.
 
 ## Anti-patterns
 
@@ -59,5 +60,7 @@ viewport produce scroll horizontal de página; los nombres de archivo largos rom
   situaciones distintas y merecen cuatro mensajes distintos.
 - Botón deshabilitado sin causa adyacente.
 - Valor de identidad presente en el DOM antes del reveal, o persistido tras el remount.
+- Marco de documento EN BLANCO cuando el navegador no embebe PDF: hay que decirlo y ofrecer la salida.
+- Mandar el CV a otra pestaña como camino principal: rompe el contexto de evaluación y deja los estados fuera de nuestro control.
 - Card dentro de card, o un grupo que desaparece cuando está vacío (el vacío se dice en la
   fila, no borrando la sección).

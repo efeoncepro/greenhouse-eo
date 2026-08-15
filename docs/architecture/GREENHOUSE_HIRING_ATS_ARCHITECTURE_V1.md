@@ -1311,3 +1311,97 @@ El assessment agrega monitoreo de adverse impact sin convertir demografía en in
 - **Rollout:** migraciones `20260713165547000` + hardening `20260713173500000` aplicadas en la instancia Cloud SQL compartida por dev/staging. SHA `242f8a5d8` live en Vercel staging (`dpl_AuMv2KrDuMKXt5GUp91gr1QZhQLq`) con policy exclusivamente sintetica, retencion 30 dias y categorias `synthetic_cohort: group_a|group_b`; reader autenticado `HTTP 200` y smoke DB verde. La policy publica vigente no cubre categorias demograficas sensibles ni esta finalidad especifica, por lo que captura real y produccion permanecen bloqueadas; prod no tiene las variables. No hay backfill: la cohorte es prospectiva.
 
 Invariante duro para agentes: ningún consumer de decisión/scoring puede importar o consultar `hiring_demographic_selfid`; API/Nexa/People Ops consumen exclusivamente `getSelectionFairness` y su DTO agregado.
+
+## Delta 2026-08-15 — TASK-1714/1715: reveal de identidad del candidato + panel de Documentos real
+
+El tab **Documentos** de la Application 360 (nodo **N5** del master UI flow) era el único de sus cuatro
+tabs sin reader: renderizaba tres filas escritas a mano y un "Revelar" implementado como `useState`
+local. El motivo que el operador escribía se descartaba y la entrada de auditoría que el banner
+prometía nunca se escribía. TASK-1362 construyó el sustrato con `UI impact: none` y dejó fuera de
+alcance "la UI de subir/ver documentos… desk TASK-355"; TASK-355 ya estaba cerrada. El cable quedó
+sin dueño hasta acá.
+
+### El reveal de identidad de un candidato no existía (TASK-1714)
+
+El reveal auditado de TASK-784 se ancla a `memberId`, y un candidato no tiene member hasta el handoff.
+Resultado: el dominio podía **escribir** su RUT (`captureCandidateIdentityDocument`) y **mostrarlo
+enmascarado** (`resolveCandidateDocuments`), pero nadie podía leerlo legítimamente — así que el dato
+salía por un canal fuera del portal, sin capability, sin motivo y sin trail.
+
+- **Capability propia y estrecha:** `hiring.candidate.reveal_identity`, grant **role-only**
+  (`EFEONCE_ADMIN` ∪ `HR_MANAGER` ∪ `EFEONCE_OPERATIONS`), deliberadamente **sin** routeGroup
+  `internal` — ese routeGroup lo porta todo tenant interno, así que incluirlo convertiría el reveal de
+  PII en permiso de facto universal. **NO** se reusó `person.legal_profile.reveal_sensitive`: vive en
+  el módulo `hr`, sólo la portan `FINANCE_ADMIN`/`EFEONCE_ADMIN`, y granteársela al tier de Hiring
+  abriría el reveal sobre **toda** persona del módulo (colaboradores, ex-colaboradores, direcciones).
+- **Anti-IDOR:** `revealCandidateIdentityDocument` verifica que el `documentId` pertenezca al
+  `identity_profile_id` del `candidateFacetId` del path. Un documento ajeno responde **`404`, no
+  `403`** — un `403` confirmaría su existencia a quien sondea. Se consulta con `includeArchived: true`
+  a propósito, para que un documento archivado del propio candidato reciba el `409` que explica la
+  causa en vez de un `404` que afirmaría que no existe.
+- **Sin duplicar maquinaria:** el audit append-only y el evento de outbox los escribe
+  `revealPersonIdentityDocument` (TASK-784). No hay evento nuevo.
+- **No idempotente por diseño:** cada reveal es un acceso real y deja su propia entrada. El doble
+  disparo lo evita el cliente bloqueando el CTA, no el servidor deduplicando.
+
+### El panel: dos clases de dato, dos velocidades (TASK-1715)
+
+El modelo canónico de `src/lib/hiring/documents/types.ts` distingue `CandidateDocumentFile`
+(`downloadUrl`) de `CandidateIdentityDocument` (`displayMask`). El mockup las aplastó en una sola
+"cosa sensible con candado". La corrección: **un archivo se ABRE** —la capability de la pantalla
+(`hiring.application.read`) ya autorizó, y la ruta del asset re-verifica— y **la identidad se REVELA**.
+Un candado que no protege nada enseña al operador a ignorar los candados que sí protegen.
+
+- **`buildCandidateDocumentsViewModel`** (`src/lib/hiring/documents/view-model.ts`) traduce el paquete
+  del dominio a filas ya decididas. Eleva la **ausencia** a estado propio (`missing`) junto a los tres
+  del escáner: la UI antes mostraba "Enmascarado" para los cuatro, así que un archivo bloqueado por el
+  antivirus y un candidato que nunca adjuntó CV se veían idénticos —y el reclutador culpaba al
+  candidato por una falla del sistema.
+- **El reader se resuelve en la page**, no en el componente: es `server-only` y es un reader canónico
+  del 360, que no degrada en silencio. Su fallo viaja como `documentsFailed` y el panel lo dice; jamás
+  se muestra como "sin documentos".
+- **El affordance sigue a la capability:** sin `hiring.candidate.reveal_identity` el botón no se
+  dibuja. Un botón que siempre falla es peor que ningún botón.
+- **El valor revelado vive sólo en memoria del componente.** Un remount vuelve a enmascarado y exige
+  otro reveal, que escribe otra entrada: el trail refleja accesos reales, no sesiones abiertas.
+
+### El visor vive dentro del portal, sobre el motor del navegador
+
+`GreenhouseDocumentPreview` (`src/components/greenhouse/documents/`) muestra el documento en un diálogo
+sobre un blob same-origin traído con la sesión del usuario. No es una puerta nueva: la ruta del asset
+re-autoriza en cada request.
+
+- **NO usa `react-pdf`.** Se intentó primero —ya estaba en el repo con dos consumidores— y **no arranca
+  bajo `pnpm dev`**, que corre `next dev --webpack`: `pdfjs-dist` v5 es ESM y el interop de webpack lo
+  rompe al evaluarlo (`TypeError: Object.defineProperty called on non-object` en `pdf.mjs`), con el
+  import dinámico rechazando en silencio; `transpilePackages` no alcanza. **No está verificado bajo
+  Turbopack** (lo que usa `pnpm build`) — de eso depende si `CertificatePreviewDialog` y
+  `ContractorSupportDocumentsPanel` están rotos para los usuarios o sólo en desarrollo. Es la primera
+  pregunta de `TASK-1716`.
+- **Y aun sin ese bug, el motor nativo gana acá:** 0 KB de JS contra ~400 KB de pdf.js + worker, render
+  fuera del hilo principal, y zoom/búsqueda/impresión que el operador ya sabe usar. `react-pdf` sólo se
+  justifica cuando necesitemos algo que el navegador no da: anotar el CV, o render inline en móvil.
+- **El hueco de móvil se cierra por CAPACIDAD, no por viewport:** `navigator.pdfViewerEnabled === false`
+  es la respuesta del propio navegador a "¿sé pintar un PDF embebido?". Cuando dice que no, el diálogo
+  lo declara y ofrece Abrir/Descargar, y ni siquiera descarga los bytes. Un marco en blanco sería la
+  misma degradación silenciosa que esta task vino a eliminar.
+
+### Invariantes operativos para agentes — Candidate documents UI + reveal
+
+- **NUNCA** anclar el reveal de un candidato por `member_id` ni reusar la ruta member-scoped de
+  TASK-784. El ancla es `candidate_facet_id` → `identity_profile_id`.
+- **NUNCA** responder `403` cuando un `documentId` existe pero es de otra persona: es `404`, y la
+  distinción vive sólo en el log interno (sin PII).
+- **NUNCA** granteear `person.legal_profile.reveal_sensitive` al tier de Hiring para resolver un caso
+  de candidato — abre el reveal sobre todo el módulo HR. La capability correcta es
+  `hiring.candidate.reveal_identity`.
+- **NUNCA** resolver documentos de candidato dentro de un componente: el reader es `server-only` y se
+  consume en la page, que además captura su fallo como estado explícito.
+- **NUNCA** colapsar `quarantined`, `pending`, `legacy_unscanned` y la ausencia en un mismo mensaje.
+  Son cuatro situaciones con causas y acciones distintas.
+- **NUNCA** poner un candado sobre un archivo que la capability de la pantalla ya autorizó a leer.
+- **NUNCA** persistir el valor de identidad revelado fuera del estado del componente.
+- **NUNCA** mostrar un marco de documento vacío: si el navegador no embebe PDF, decirlo y ofrecer la
+  salida.
+- **SIEMPRE** que se agregue un consumidor del visor, pasar por `GreenhouseDocumentPreview` en vez de
+  recrear el fetch→blob→render (hoy hay tres implementaciones paralelas; `TASK-1716` las unifica).

@@ -119,6 +119,7 @@ pending            [⏳] Currículum (CV)  [chip Procesando]                    
 | 3 | Acción de archivo | abrir inline / descargar | `GreenhouseButton kind='secondaryAction'` + `component='a'` | `GET /api/assets/private/[assetId]?inline=1` |
 | 4 | Grupo Identidad | fila enmascarada + reveal | `Paper variant='outlined'` + `GreenhouseChip` | `documents.identityDocuments[]` |
 | 5 | Dialog de reveal | motivo + confirmación | `Dialog` + `CustomTextField` (patrón desk) | `POST …/identity-documents/[id]/reveal` (TASK-1714) |
+| 5b | Diálogo del visor | leer el CV sin salir del portal | `Dialog maxWidth='lg'` 90vh + `GreenhouseDocumentPreview` | blob same-origin desde `/api/assets/private/[assetId]?inline=1` |
 | 6 | Fila revelada | valor + copiar + ocultar | `Stack` + `GreenhouseButton` | respuesta del reveal (memoria) |
 | 7 | Estado de error | fallo del reader o del reveal | `Alert severity='error'` | `CanonicalApiError` |
 
@@ -163,9 +164,9 @@ viewport.
 
 | Nivel | Acción | Peso visual | Ubicación | Razón |
 |---|---|---|---|---|
-| 1 — primaria | **Abrir** (CV) | `GreenhouseButton kind='secondaryAction'` + `tabler-external-link` | primera acción de la primera fila | es el trabajo central del tab; debe ser lo primero que la mano encuentra |
-| 2 — secundaria | **Descargar** | mismo botón, sin énfasis adicional | junto a Abrir | alternativa del mismo dato, no una acción distinta |
-| 2 — secundaria | **Abrir** (enlaces) | idéntico a los archivos | filas de portafolio/LinkedIn | mismo verbo para el mismo resultado: se abre en otra pestaña |
+| 1 — primaria | **Ver** (CV) | MUI `Button variant='outlined'` + `tabler-eye` | primera acción de la primera fila | es el trabajo central del tab; abre el visor DENTRO del portal |
+| 2 — secundaria | **Descargar** | `Button variant='text'` | junto a Ver | alternativa del mismo dato, no una acción distinta |
+| 2 — secundaria | **Abrir** (enlaces) | `Button variant='outlined'` | filas de portafolio/LinkedIn | un enlace externo del candidato SÍ sale del portal: no es un documento nuestro |
 | 3 — excepcional | **Revelar (requiere motivo)** | `tabler-lock`, en el grupo inferior, con caption de consecuencia | única acción del grupo Identidad | la fricción es el mensaje; separarla del bloque de lectura es lo que le devuelve significado |
 | 4 — contextual | **Copiar** / **Ocultar** | aparecen solo tras un reveal exitoso | reemplazan a Revelar en la fila | no existen hasta que hay valor que copiar u ocultar |
 | 0 — sin acción | filas `quarantined` / `pending` / sin archivo | sin botón, con causa adyacente | en su fila | un botón que siempre falla es peor que ningún botón |
@@ -186,7 +187,8 @@ en el header de la Application 360 y no compite con el panel.
 | Chip `Revelado` | `GreenhouseChip … tone='success'` | animación de "desbloqueo" sobre el dato sensible |
 | Icon-tile de archivo | `display: grid; placeItems: center`, 44×44, `borderRadius: 2`, fondo `primary.lightOpacity` | HEX literal, PNG de ícono |
 | Icon-tile sensible / bloqueado | mismo tile con `warning.lightOpacity` / `error.lightOpacity` y color del token | dos sistemas de color paralelos |
-| Acción | `GreenhouseButton kind='secondaryAction'` con `component='a'` cuando navega | `<a>` desnudo sin estilos del sistema |
+| Acción de fila | MUI `Button` `variant='outlined'` (primaria) / `variant='text'` (secundaria) + anillo de foco explícito | `variant='tonal'` (3.69:1, falla AA) · `outlineColor: 'primary.main'` en `sx` (NO se mapea a la paleta: sale como CSS inválido y el anillo no se dibuja — usar `var(--mui-palette-primary-main)`) |
+| Diálogo del visor | `Dialog maxWidth='lg'` + `blockSize: 90vh`; documento sobre blob same-origin | `react-pdf`/pdf.js (roto bajo `next dev --webpack`, y ~400 KB para lo que el navegador ya hace) |
 | Meta del archivo | `body2` + `color='text.secondary'` + `overflowWrap: 'anywhere'` | truncado con `…` que esconde el nombre real |
 | Separador entre filas | `borderBlockEnd: 1` + `borderColor: 'divider'` | `<hr>` o border con color literal |
 | Espaciado | escala `4n` del tema (`p: 2.5`, `spacing={1|2}`) | píxeles arbitrarios |
@@ -202,7 +204,8 @@ en el header de la Application 360 y no compite con el panel.
 | `documents.filesGroup` | 2 | Archivos y enlaces | — | `overline` |
 | `documents.identityGroup` | 4 | Identidad | — | `overline` + chip `Sensible` |
 | `documents.sensitiveChip` | 4 | Sensible | — | `GreenhouseChip tone='warning'` |
-| `documents.open` | 3 | Abrir | — | `tabler-external-link`; abre en pestaña nueva |
+| `documents.view` | 3 | Ver | — | `tabler-eye`; abre el visor DENTRO del portal |
+| `documents.open` | 3 | Abrir | — | `tabler-external-link`; sólo para enlaces (portafolio/LinkedIn) |
 | `documents.download` | 3 | Descargar | — | `tabler-download`; solo archivos |
 | `documents.cvLabel` | 2 | Currículum (CV) | — | |
 | `documents.portfolioFileLabel` | 2 | Portafolio (archivo) | — | `kind='portfolio_file'` |
@@ -235,6 +238,14 @@ en el header de la Application 360 y no compite con el panel.
 | `documents.revealError` | 5 | No pudimos revelar el documento. Intenta de nuevo. | — | `actionable=true` |
 | `documents.loadError` | 7 | No pudimos cargar los documentos de este candidato. | — | reader falló; NUNCA se muestra como "sin documentos" |
 | `documents.retry` | 7 | Reintentar | — | reusa `common.retry` |
+| `documents.viewerTitle` | 5b | {document} de {name} | `document`,`name` | título del diálogo del visor |
+| `documents.viewerLoading` | 5b | Abriendo el documento… | — | `role='status'` |
+| `documents.viewerLoadError` | 5b | No pudimos mostrar este documento acá. | — | con salidas Abrir/Descargar |
+| `documents.viewerNoEmbed` | 5b | Tu navegador no muestra PDF dentro de la página. Ábrelo en una pestaña o descárgalo. | — | `navigator.pdfViewerEnabled === false` (móvil) — NUNCA un marco en blanco |
+| `documents.viewerUnsupported` | 5b | No podemos previsualizar {fileName} en el portal. | `fileName` | el TIPO no es previsualizable (≠ noEmbed) |
+| `documents.viewerOpenInNewTab` | 5b | Abrir en pestaña nueva | — | salida accesible + fallback |
+| `documents.viewerFrameTitle` | 5b | Documento {fileName} | `fileName` | nombre accesible del marco (axe `frame-title`) |
+| `documents.viewAriaLabel` | 3 | Ver {document} de {name} sin salir del portal | `document`,`name` | |
 
 (en-US mirror con las mismas keys.)
 

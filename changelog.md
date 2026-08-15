@@ -7,6 +7,31 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-15 — El CV del candidato se puede leer (y el candado se movió a donde protege)
+
+El tab **Documentos** de la Application 360 pasó de mockup a superficie real. Antes mostraba tres
+filas escritas a mano y un "Revelar" que sólo movía un `useState`: el motivo se descartaba y la
+auditoría prometida no se escribía. Ahora consume el reader canónico en servidor y separa las dos
+clases del modelo de dominio: **un archivo se abre** (la capability de la pantalla ya autorizó) y **la
+identidad se revela** (capability propia + motivo + audit append-only, `TASK-1714`).
+
+El CV se lee **dentro del portal**, en un diálogo sobre un blob same-origin. Se descartó `react-pdf`
+con evidencia —no arranca bajo `next dev --webpack` porque `pdfjs-dist` v5 rompe el interop ESM, y aun
+funcionando cuesta ~400 KB para hacer lo que el navegador ya hace— y el hueco de móvil se cierra por
+**capacidad** (`navigator.pdfViewerEnabled`), no por viewport: cuando el navegador no embebe PDF, el
+diálogo lo dice y ofrece salida, en vez de un marco en blanco.
+
+Además dejan de aplastarse en "Enmascarado" los cuatro estados que el escáner sí distingue: un archivo
+bloqueado por el antivirus y un candidato que nunca adjuntó CV se veían idénticos, así que el
+reclutador culpaba al candidato por una falla del sistema.
+
+Impacto operativo: quien opera Hiring ya no necesita pedir el CV por fuera del portal, y People Ops
+tiene un camino auditado para el documento de identidad — antes ese dato salía por mail, sin
+capability, sin motivo y sin trail.
+
+Follow-up abierto: `TASK-1716` mide si el fallo de `react-pdf` alcanza producción (hoy sólo verificado
+en desarrollo) y unifica las **tres** implementaciones de visor que conviven en el repo.
+
 ## 2026-08-15 — El portal dejó de mostrar el favicon de Vuexy antes del suyo
 
 Durante unas dos semanas, cada carga del portal pintaba primero el ícono morado del template Vuexy y
@@ -1204,22 +1229,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   de consent **falle**, en vez de registrar consentimiento inventado) y el destino de los leads ya capturados.
 - `TASK-1246` no puede declarar su sign-off legal cumplido mientras `ISSUE-142` siga `open`; queda cruzado en
   ambas direcciones. Bug class al motor: `EPIC-040` / `TASK-1255`.
-
-## 2026-08-05 — TASK-1327 `complete`: la landing pública del lead magnet está live y verificada en runtime
-
-- `TASK-1327` (landing `think.efeoncepro.com/brand-visibility` + embed del form gobernado) cerrada con
-  **verificación en runtime, no lectura de docs**: HTTP 200 con el `<greenhouse-form>` real
-  (`formKey 69cd5269…`, `surface=fhsf-ai-visibility-grader`), y `GET /api/public/growth/forms/<formKey>` contra
-  **producción** devolviendo 200 con los campos del intake, **Turnstile `required`** con site key real y
-  `consentPolicyVersion = ai-visibility-grader-consent-v1`. EPIC-020 queda en **49 childs: 33 `complete`,
-  16 abiertas**.
-- **Lo que NO se cerró con ella:** el smoke E2E productivo del loop completo sigue siendo de `TASK-1246` (gate de
-  readiness), y `TASK-1335`/`1336` siguen `in-progress` por mérito propio — se les agregó delta de impacto cruzado:
-  ya no bloquean una landing pendiente, sino su propio endurecimiento.
-- ⚠️ **Hallazgo para el sign-off legal:** la definición publicada del form trae `consent.checkboxes` **vacío** —
-  hay versión de política pero ningún checkbox renderizado. Puede ser por diseño o ser un hueco de cumplimiento;
-  queda anotado como input obligatorio de `TASK-1246`, sin asumir cuál de las dos.
-- **Corrección de una recomendación previa:** se había sugerido cerrar también `TASK-1321` por "superseded".
-  Es falso: `/aeo-2/` submit → grader → email con PDF + dedupe de HubSpot es una **capacidad propia** (segunda
-  superficie self-serve), con 8 criterios de aceptación sin cumplir y dos flags apagados
-  (`GROWTH_AEO_FORM_GRADER_INTAKE_ENABLED`, `GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED`). Sigue `in-progress`.

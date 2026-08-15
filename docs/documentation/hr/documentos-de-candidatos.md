@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 2.0
 > **Creado:** 2026-07-10 por Claude (TASK-1362)
-> **Ultima actualizacion:** 2026-08-12 por Claude (TASK-1378)
+> **Ultima actualizacion:** 2026-08-15 por Claude (TASK-1714/1715)
 > **Documentacion tecnica:** [GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md)
 
 # Documentos de Candidatos — Captura, Escaneo y Retencion
@@ -98,3 +98,69 @@ El candidato todavia no tiene una decision favorable. Primero se decide, despues
 
 **"Necesito ver el RUT completo."**
 Requiere el permiso de revelado y un motivo escrito. Queda auditado. Si tu rol no lo tiene, pidelo — no busques el dato por otra via.
+
+
+## Delta 2026-08-15 — Ver el CV desde el portal (TASK-1715) y revelar identidad (TASK-1714)
+
+Hasta esta fecha, la pestana **Documentos** de la ficha del candidato mostraba tres filas fijas y un
+boton "Revelar" que no hacia nada real: el motivo que escribias se descartaba y la anotacion de
+auditoria que el aviso prometia nunca se guardaba. Ademas no habia forma de leer el CV desde el
+portal. Eso cambio.
+
+### Lo que ves ahora
+
+La pestana muestra **dos grupos**, y la diferencia entre ellos es intencional:
+
+| Grupo | Que contiene | Como se accede |
+|---|---|---|
+| **Archivos y enlaces** | CV, portafolio (archivo o enlace), LinkedIn | Se abren directo con **Ver** o **Descargar**. Sin pedir motivo |
+| **Identidad** | RUT / pasaporte | Enmascarado. Ver el numero completo exige permiso y motivo, y queda auditado |
+
+**Por que el CV no pide motivo:** entrar a la ficha del candidato ya exige el permiso de Hiring. Un
+candado sobre el CV no protegeria nada — y un candado que no protege nada te ensena a ignorar los que
+si protegen. El candado queda donde importa: la identidad.
+
+### Ver el CV
+
+**Ver** abre el documento **dentro del portal**, en una ventana sobre la ficha. No te saca a otra
+pestana, asi que no pierdes el contexto de la persona que estas evaluando. Dentro de esa ventana
+siempre tienes **Descargar** y **Abrir en pestana nueva**.
+
+Si tu navegador no sabe mostrar PDF dentro de una pagina —tipicamente en el celular— la ventana te lo
+dice y te ofrece esas dos salidas, en vez de dejarte un recuadro en blanco.
+
+### Los cuatro estados de un archivo
+
+Antes todos decian "Enmascarado" y no se distinguian. Ahora cada situacion tiene su mensaje:
+
+| Lo que ves | Que significa | Que hacer |
+|---|---|---|
+| Nombre, peso y fecha, con **Ver** y **Descargar** | El archivo esta disponible | Leerlo |
+| Chip **Cuarentena** sin acciones | El escaner de seguridad lo bloqueo | Pedirle al candidato que lo reenvie. **No es culpa del candidato ni tuya** |
+| Chip **Procesando** sin acciones | Todavia se esta escaneando | Volver en unos minutos |
+| Chip **Sin escanear** con acciones | Se subio antes de que existiera el escaneo | Se puede abrir igual |
+| "El candidato no adjunto CV" | No hay archivo | Pedirselo si lo necesitas |
+
+Y si el sistema no logra cargar la lista, te dice que fallo y te ofrece reintentar. **Nunca te va a
+mostrar "sin documentos" cuando en realidad no pudo consultarlos** — eso te haria descartar a alguien
+por un problema tecnico.
+
+### Revelar el documento de identidad
+
+Ver el numero completo del RUT o pasaporte de un candidato exige el permiso
+`hiring.candidate.reveal_identity`, que hoy tienen Admin, HR Manager y Operaciones. Si no lo tienes,
+el boton **no aparece** y el texto te dice a quien pedirselo — no vas a encontrarte con un boton que
+siempre falla.
+
+Al revelar:
+
+1. Se te pide un **motivo** de al menos 5 caracteres. Es obligatorio de verdad.
+2. Queda registrado tu nombre, la hora y ese motivo en un historial que no se puede borrar.
+3. El numero aparece solo en tu pantalla, con opciones de **Copiar** y **Ocultar**.
+4. Si recargas la pagina, vuelve a estar enmascarado. Revelarlo de nuevo escribe otra anotacion — eso
+   es correcto: el historial refleja accesos reales, no ventanas que quedaron abiertas.
+
+**El grupo Identidad suele estar vacio**, y eso es normal: el documento de identidad solo se pide
+despues de una decision favorable. Antes de eso, la pantalla te explica por que no hay nada.
+
+> Detalle tecnico: [GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md) §Delta 2026-08-15 · commands en `src/lib/hiring/documents/` · UI en `src/views/greenhouse/hiring/CandidateDocumentsPanel.tsx`

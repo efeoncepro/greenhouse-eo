@@ -6,8 +6,8 @@
 - Owner task: `TASK-1715 — Application 360 documents panel: cablear el reader real, visor del CV y reveal auditado de identidad`
 - Related wireframe: [docs/ui/wireframes/TASK-1715-application-360-documents-panel.md](../wireframes/TASK-1715-application-360-documents-panel.md)
 - Master UI flow: [EPIC-011-hiring-ats-UI-FLOW.md](EPIC-011-hiring-ats-UI-FLOW.md) — este flujo **completa el nodo N5 (Ficha candidato)**, cuyo contrato declara `tabs (perfil/assessment/docs/decisión)`. El tab **docs** era el único de los cuatro sin reader real: N5 se declaró cubierto por TASK-355 cuando su pestaña de documentos todavía era mockup, y TASK-1362 construyó el sustrato con `UI impact: none`. Esta task cierra ese seam. No crea nodo nuevo.
-- Intended route / surface: `/agency/hiring/applications/[applicationId]` (tab `documents`, sin cambio de ruta) + dialog de reveal + pestaña nueva del browser para el visor.
-- Flow type: `single-surface + external-viewer` (panel server-rendered + dialog command-backed + apertura del PDF en pestaña nueva)
+- Intended route / surface: `/agency/hiring/applications/[applicationId]` (tab `documents`, sin cambio de ruta) + diálogo del visor + diálogo de reveal.
+- Flow type: `single-surface` (panel server-rendered + diálogo del visor + diálogo de reveal command-backed)
 - Primary primitives: `Paper variant='outlined'`, `Stack`, `GreenhouseChip`, `GreenhouseButton`, MUI `Dialog`/`Alert`/`Snackbar`, `CustomTextField`
 - Copy source: `hiringDesk.application.documents.*` (es-CL + en-US)
 
@@ -24,7 +24,7 @@
 | Surface | Role | Desktop behavior | Mobile / compact behavior | Primitive |
 |---|---|---|---|---|
 | Application 360 · tab Documentos | panel principal; dos grupos semánticos | grupos apilados, fila en una línea con acciones a la derecha | fila en columna; acciones full-width bajo el meta | `Paper` + `Stack` (patrón TASK-355) |
-| Visor de documento | lectura del CV/portafolio | pestaña nueva del browser (`target='_blank'`), render nativo de PDF | idem (visor del sistema) | `<a href>` a `/api/assets/private/[assetId]?inline=1` |
+| Diálogo del visor | lectura del CV/portafolio SIN salir del portal | `Dialog maxWidth='lg'`, alto 90vh, documento embebido sobre blob same-origin | mismo diálogo; si el navegador no embebe PDF, estado explícito + salidas | `GreenhouseDocumentPreview` |
 | Dialog "Revelar documento de identidad" | fricción + captura del motivo | `Dialog maxWidth='sm'` centrado | fullWidth con márgenes | MUI `Dialog` + `CustomTextField` |
 | Snackbar | feedback de "Copiado" y de errores recuperables | bottom-right | idem | `Snackbar` existente del view |
 
@@ -41,7 +41,7 @@
    [Abrir/Descargar]          [Revelar (requiere motivo)]
              │                       │
              ▼                       ▼
-   Pestaña nueva del browser   Dialog reveal (motivo ≥5)
+   Diálogo del visor (portal)  Dialog reveal (motivo ≥5)
    (PDF inline / descarga)              │
              │                    ┌─────┴──────┐
              │              Cancelar      Revelar y registrar
@@ -67,7 +67,7 @@
 | Trigger | Origen | Efecto | Guarda |
 |---|---|---|---|
 | Click tab "Documentos" | tabs del Application 360 | muestra el panel ya renderizado en servidor | ninguna (los datos vienen con la page) |
-| Click "Abrir" (archivo) | fila de `files[]` | abre `?inline=1` en pestaña nueva | solo si `status ∈ {available, legacy_unscanned}` |
+| Click "Ver" (archivo) | fila de `files[]` | abre el diálogo del visor dentro del portal | solo si `status ∈ {available, legacy_unscanned}` |
 | Click "Descargar" (archivo) | fila de `files[]` | descarga con `Content-Disposition: attachment` | idem |
 | Click "Abrir" (enlace) | fila de `links[]` | abre la URL del candidato en pestaña nueva | URL ya saneada https-only en el intake (TASK-1367) |
 | Click "Revelar (requiere motivo)" | fila de identidad | abre el dialog, foco al campo Motivo | solo si `canRevealIdentity === true` |
@@ -108,7 +108,7 @@ Estados del panel (independientes del reveal): `ready` · `reader-error` (Alert 
 ## Routing Contract
 
 - El tab Documentos **no cambia la ruta** — es estado local de tabs del `Application360View`, como los otros tres. No se agrega query param (consistente con TASK-355; el deep link por tab es follow-up de toda la vista, no de este panel).
-- El visor **sale del SPA**: `target='_blank' rel='noreferrer'`. No hay navegación interna que preservar ni foco que restaurar (la pestaña original queda intacta).
+- El visor **NO sale del SPA**: es un diálogo. `Esc` lo cierra y el foco vuelve al botón "Ver" que lo abrió. "Abrir en pestaña" sigue disponible como salida (accesibilidad + navegadores sin embed) y ésa sí sale, con `target='_blank' rel='noopener noreferrer'`.
 - El dialog no empuja historia; `Esc` lo cierra sin afectar el back del browser.
 - Sin deep link al reveal: revelar es un acto auditado, no un destino enlazable.
 
@@ -138,10 +138,11 @@ Estados del panel (independientes del reveal): `ready` · `reader-error` (Alert 
 
 | Falla | Detección | Comportamiento de UI | Recuperación |
 |---|---|---|---|
+| El navegador no embebe PDF (móvil) | `navigator.pdfViewerEnabled === false` | el diálogo dice "tu navegador no muestra PDF dentro de la página" + Abrir/Descargar; NO descarga los bytes | abrir en pestaña o descargar |
 | Reader falla (PG caído, facet inexistente) | excepción en la page | Alert `loadError` en el panel; el resto de la ficha sigue usable | Reintentar (reload del segmento) |
 | Archivo en cuarentena | `status='quarantined'` | fila con chip + causa; acción sin `href` | ninguna en esta superficie (triage es de storage) |
 | Archivo aún escaneando | `status='pending'` | chip Procesando + "vuelve en unos minutos" | reintentar más tarde |
-| Asset borrado entre render y clic | 404 de la ruta de asset | pestaña nueva muestra el error de la ruta | volver y recargar la ficha |
+| Asset borrado entre render y clic | el fetch del visor responde 404 | el diálogo muestra su estado de error con la salida "Abrir en pestaña" | cerrar y recargar la ficha |
 | Sin capability de reveal | prop `canRevealIdentity=false` | el botón "Revelar" **no se dibuja**; queda el caption explicativo | pedir el permiso (copy lo dice) |
 | Capability revocada entre render y POST | 403 canónico | Alert `revealDenied` en el dialog, **sin** botón Reintentar (`actionable=false`) | cerrar |
 | Documento archivado/expirado | 409 `reveal_disabled_for_status` | mensaje canónico del backend | cerrar |
@@ -162,7 +163,9 @@ Estados del panel (independientes del reveal): `ready` · `reader-error` (Alert 
 ## Design Decision Log
 
 - **DDL-1 — Abrir ≠ revelar.** El flujo tiene dos velocidades deliberadas: leer un CV es de un clic (es el trabajo), revelar una identidad cuesta un dialog y un motivo (es la excepción). El mockup les puso el mismo precio y por eso el precio dejó de significar algo.
-- **DDL-2 — El visor es el del browser.** `Content-Disposition: inline` ya está implementado en `/api/assets/private/[assetId]`; construir un visor propio agregaría superficie sin agregar capacidad. Si más adelante se necesita anotar el CV dentro del portal, ahí nace el visor —con su propia task.
+- **DDL-2 (corregido en implementación) — El CV se lee DENTRO del portal.** La versión original de este contrato decía "el visor es el del browser, en pestaña nueva". **Estaba mal, y el operador lo corrigió durante la implementación:** mandar el CV a otra pestaña rompe el contexto justo cuando se está evaluando a esa persona, y —peor— delegaba los 12 estados al visor del sistema, donde no podemos decir nada honesto sobre un 403, un archivo en cuarentena o una carga lenta. La decisión vigente es un **diálogo dentro del portal** que muestra el documento sobre un blob same-origin, con "Descargar" y "Abrir en pestaña" como salidas.
+- **DDL-2b — El motor es el del navegador, NO `react-pdf`.** Se intentó primero con `react-pdf` (ya estaba en el repo, con dos consumidores) y **no arranca bajo `pnpm dev`**, que corre `next dev --webpack`: `pdfjs-dist` v5 es ESM y el interop de webpack lo rompe al evaluarlo. Y aun sin ese bug, el motor nativo gana donde importa: 0 KB de JS contra ~400 KB, render fuera del hilo principal, y zoom/búsqueda/impresión ya conocidos. `react-pdf` sólo se justifica cuando necesitemos algo que el navegador no da —anotar el CV, o render inline en móvil.
+- **DDL-2c — El hueco de móvil se cierra por CAPACIDAD, no por viewport.** `navigator.pdfViewerEnabled === false` es la respuesta del propio navegador a "¿sé pintar un PDF embebido?". Los móviles dicen que no y muestran un marco EN BLANCO — la misma degradación silenciosa que esta task vino a eliminar del panel. Cuando la capacidad falta, el diálogo lo dice y ofrece la salida real, y ni siquiera descarga los bytes.
 - **DDL-3 — Los datos llegan del servidor, no de un fetch.** `resolveCandidateDocuments` es `server-only` y es un reader canónico del 360 (no degrada en silencio). Resolverlo en la page preserva ese invariante y evita un estado de carga extra en un tab que debe sentirse instantáneo.
 - **DDL-4 — El valor revelado no se persiste en cliente.** Vive en el estado del componente y muere con él. Que un reload exija revelar de nuevo (y escriba otra entrada de auditoría) es el comportamiento correcto: el trail refleja accesos reales, no una sesión que se quedó abierta.
 - **DDL-5 — El affordance sigue a la capability, no al revés.** Si el operador no puede revelar, no ve un candado que lo invite a intentarlo: ve la explicación de a quién pedírselo. Un botón que siempre falla es peor que ningún botón.

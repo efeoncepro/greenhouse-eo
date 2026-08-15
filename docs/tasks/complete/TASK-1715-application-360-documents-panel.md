@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -418,6 +418,44 @@ portal, para retirar el flujo manual actual.
 - Superficie de triage de cuarentena (dominio storage, no hiring).
 - Visor con anotaciones sobre el CV, si aparece la necesidad de comentar en el documento.
 - Deep link por tab en la Application 360.
+
+## Delta 2026-08-15 — cierre
+
+**Estado: complete.** El panel consume el reader real, el CV se lee dentro del portal y el copy que
+prometía una auditoría inexistente ya no está en el repo.
+
+Cambio de decisión respecto del contrato original, hecho durante la implementación y a pedido del
+operador: **DDL-2 decía "el visor es el del browser, en pestaña nueva" y estaba mal.** Mandar el CV
+fuera del portal rompe el contexto de evaluación y delega los 12 estados al visor del sistema. La
+decisión vigente es un diálogo dentro del portal; el wireframe, el flow y el contrato de dirección
+visual quedaron corregidos con la razón, no reescritos como si nunca hubiera pasado.
+
+Se descartó `react-pdf` con evidencia: no arranca bajo `pnpm dev` (`next dev --webpack`) porque
+`pdfjs-dist` v5 rompe el interop ESM de webpack, y aun funcionando cuesta ~400 KB para hacer lo que el
+navegador ya hace. El hueco de móvil se cierra por capacidad (`navigator.pdfViewerEnabled`), no por
+viewport. El alcance real de ese fallo —y la unificación de las tres implementaciones de visor que hay
+en el repo— viven en `TASK-1716`.
+
+Evidencia:
+
+- **GVC premium verde en desktop 1440 y mobile 390**: `exit 0`, cero findings de error, rubric `pass`.
+  Scorecard `docs/ui/reviews/TASK-1715-application-360-documents-panel.scorecard.json` (promedio 4.47,
+  piso 4.3).
+- Suite focal 330 verde (`src/lib/hiring`, `src/lib/copy`, `src/lib/entitlements`); `lint` y
+  `typecheck` limpios.
+- Verificado contra una postulación **real** con dos CV adjuntos, portafolio y LinkedIn.
+
+Cuatro defectos que destapó el loop de captura y que ni los tests ni el build veían:
+
+1. PG entrega `Date` donde el tipo dice `string`: el sort del view-model reventaba en runtime con los
+   mocks en verde. Normalizado en la frontera + test con fixture `Date`.
+2. `variant='tonal'` rendía 3.69:1 (axe), bajo el piso AA.
+3. `sx` no mapea `outlineColor` a la paleta: emitía CSS inválido y el anillo de foco no se dibujaba.
+4. El diálogo mostraba **dos** "Abrir en pestaña nueva" — lo vio el árbol de accesibilidad.
+
+Pendiente declarado: el Slice 4 (reveal de identidad en la UI) está implementado y cableado a
+`TASK-1714`, pero **no se pudo ejercitar** porque ningún candidato tiene documento de identidad
+capturado todavía — ver el Delta de cierre de `TASK-1714`.
 
 ## Open Questions
 
