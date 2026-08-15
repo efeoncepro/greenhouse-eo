@@ -5,9 +5,13 @@
 ### Benchmark de suites AEO + `ISSUE-158` — el relevamiento terminó auditándonos (2026-08-15)
 
 El operador pidió dejar de afirmar ventajas competitivas sin verificarlas, después de corregirme dos
-veces. El benchmark de ~30 suites vive ahora en
-`.claude/skills/seo-aeo-practice/references/BENCHMARK_SUITES_AEO_2026-08.md` (enlazado desde el
-router de `SKILL.md`) con convención de confianza `[V]`/`[I]`/`[C]`/`no verificado`.
+veces. El benchmark de ~30 suites vive ahora en `.claude/skills/seo-aeo-practice/references/` —
+**5 archivos, 1.231 líneas**, con convención de confianza `[V]`/`[I]`/`[C]`/`no verificado`. La puerta
+de entrada es `BENCHMARK_SUITES_AEO_2026-08.md` (índice + qué podemos y qué no podemos decir + qué
+descubrió sobre nosotros): **es el único que hay que abrir para vender**. Los otros cuatro —métodos y
+transparencia, pure-plays, incumbentes, precios y LatAm— se abren sólo si hace falta el detalle.
+⚠️ **La sección de Moz está marcada en rojo como borrador no verificado** (su sitio bloquea el
+fetcher): su claim más fuerte es un negativo y no debe salir a material comercial sin comprobarlo.
 
 **Lo que refutó de lo nuestro.** «Conectar Search Console» es table stakes. «Curva de CTR propia»
 tampoco diferencia: **seoClarity la documenta y la vende** y **Sistrix `CTR Potenziale` lee el GSC del
@@ -24,6 +28,15 @@ ubicación geográfica al LLM, y ese resultado se le reporta a Berel como su vis
 contra un KPI contratado de 15-25 citaciones/mes. Recaída de `ISSUE-152` una capa más arriba.
 ⚠️ **El delta no está medido**: Slice 1 es medirlo antes de tocar nada. Contexto que lo hace urgente:
 la ubicación sola movió 97% vs 51% de menciones en la misma pregunta según medición independiente.
+
+**La ironía que dejó la 2.ª tanda, y es la más incómoda:** medir con motor propio **tampoco**
+diferencia — Semrush, Ahrefs, Botify y Sistrix también consultan los motores ellos mismos, y varios
+declaran explícitamente que **NO usan la API** porque no representa lo que ve el usuario (le falta el
+system prompt de consumidor y la navegación por defecto). O sea: **ellos scrapean la interfaz y
+nosotros llamamos la API.** Es consenso de mercado en contra de nuestro método, no una opinión
+suelta. Y un corolario duro: **nuestro score no es comparable con el de otra herramienta** — en
+Gemini el solapamiento entre marcas mencionadas y dominios citados baja al 30%, y Evertune mide bajo
+conciencia no asistida. Miden objetos distintos.
 
 **Y el espejo incómodo:** corremos **N=1** donde Evertune corre **100 por prompt** con ±1pt, y
 nuestra propia calibración pidió N≥3 (`TASK-1704`). Medido por terceros: **56,9% de los dominios da
