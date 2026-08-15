@@ -83,7 +83,7 @@ Este delta **no** cambia `UI ready: no`.
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -93,7 +93,7 @@ Este delta **no** cambia `UI ready: no`.
 - UI ready: `no`
 - Wireframe: `docs/ui/wireframes/TASK-1665-growth-seo-keyword-discovery-workbench.md`
 - Flow: `docs/ui/flows/TASK-1665-growth-seo-keyword-discovery-workbench-flow.md`
-- Motion: `none`
+- Motion: `docs/ui/motion/TASK-1665-growth-seo-keyword-discovery-workbench-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-022`
 - Status real: `Diseno`
@@ -490,6 +490,67 @@ clientes o revenue.
 - **Decision:** no nueva primitive hasta que lookup pruebe que las existentes no soportan el caso. Si
   aparece repetición cross-domain, se abre una task de primitive con contrato propio, no se oculta en
   esta implementación.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 2 — PLAN MODE
+     No llenar al crear la task.
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 3 — EXECUTION SPEC
+     ═══════════════════════════════════════════════════════════ -->
+
+## Scope
+
+Orden estricto: nada de JSX antes del contrato de motion (hecho), y nada de estados antes de que el
+first fold esté visualmente aceptado.
+
+### Slice 0 — Contrato de motion + readiness ✅
+
+- `docs/ui/motion/TASK-1665-…-motion.md` autorado y declarado en `Motion`.
+- Markers `ZONE 2`/`ZONE 3` para que `task:lint` valide contra el template (`legacy=1` → `template=1`).
+
+### Slice 1 — Conmutador de lentes + shell
+
+- `KeywordLensTabs` clonando la forma de `SeoSearchVisibilityTabs` (`CustomTabsNav role='navigation'` +
+  `Tab component={Link}`; **nunca** el `TabList` de `@mui/lab`). Propaga `space` **y** `view`.
+- `page.tsx`: `view` allowlisted (`opportunities` default | `discovery`), resolución de flag,
+  capability de ejecución y `profileId` AEO. La lente Oportunidades queda byte-idéntica.
+- Copy en `GH_GROWTH_SEO_KEYWORDS.discovery`.
+
+### Slice 2 — Builder + preview de costo (first fold)
+
+- `KeywordDiscoveryBuilder`: seeds, fuentes, métodos, mercado heredado, alcance, banda de costo y CTA.
+- Preview optimista con `estimateDiscoveryCost` (puro, cliente) y autoritativo con el route
+  `intent: 'preview'`.
+- **CHECKPOINT: capturar y mirar el first fold 1440px antes de seguir.**
+
+### Slice 3 — Estado de corrida + resultados
+
+- `KeywordDiscoveryRunStatus` con los 8 estados y `role='status'`.
+- `KeywordDiscoveryResults` sobre `DataTableShell`; columna **Barrera de enlaces**, nunca KD.
+
+### Slice 4 — Drawer + acciones gobernadas
+
+- `KeywordDiscoveryCandidateDrawer` con `AdaptiveSidecarLayout` + `ContextualSidecar`.
+- Acciones con confirmación y outcome por candidato.
+
+### Slice 5 — GVC premium + scorecard + docs
+
+- Scenario, captura 1440/390, scorecard en `docs/ui/reviews/`, manual y cierre documental.
+
+## Out of Scope
+
+- La lente `Objetivos` (es `TASK-1660`) y su reader: el link "Ver en Objetivos" queda sin destino y por
+  eso no se renderiza como si lo tuviera.
+- El filtro `maxDifficulty` — retirado del contrato de URL por ISSUE-152.
+- Editorial (`TASK-1667`), QA/outcomes (`TASK-1668`) y plan agéntico (`TASK-1669`).
+
+## Detailed Spec
+
+El contrato de producto vive completo en el wireframe, el flow y la dirección visual declarados en
+`## Status`, más la auditoría del delta 2026-08-14. Esta sección no lo duplica: la ejecución sólo
+decide detalles de implementación que no cambien esa semántica.
 
 ## Rollout Plan & Risk Matrix
 
