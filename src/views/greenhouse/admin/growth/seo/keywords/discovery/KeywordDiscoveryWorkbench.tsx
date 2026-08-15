@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -14,8 +14,9 @@ import EmptyState from '@/components/greenhouse/EmptyState'
 import { AdaptiveSidecarLayout } from '@/components/greenhouse/primitives'
 import type { GreenhouseAsyncActionState } from '@/components/greenhouse/primitives'
 import SurfaceRecipe from '@/components/greenhouse/primitives/surface-system/SurfaceRecipe'
-import { throwIfNotOk } from '@/lib/api/parse-error-response'
+import { isCanonicalApiError, throwIfNotOk } from '@/lib/api/parse-error-response'
 import { GH_GROWTH_SEO_KEYWORDS } from '@/lib/copy/growth'
+import { isDiscoveryRunStale } from '@/lib/growth/seo/keyword-discovery/contracts'
 import type { SeoDiscoveryMethod } from '@/lib/growth/seo/keyword-discovery/contracts'
 import type { SeoDiscoveryCandidateView, SeoDiscoveryRunView } from '@/lib/growth/seo/keyword-discovery/reader'
 
@@ -86,11 +87,36 @@ const KeywordDiscoveryWorkbench = ({
 }: KeywordDiscoveryWorkbenchProps) => {
   const copy = GH_GROWTH_SEO_KEYWORDS.discovery
   const router = useRouter()
-  const [, setLastRunId] = useState<string | null>(null)
 
-  const [selectedCandidate, setSelectedCandidate] = useState<SeoDiscoveryCandidateView | null>(null)
+  /**
+   * 🔴 Se guarda el **id**, no el objeto candidato.
+   *
+   * Guardar el objeto lo congela en el instante de abrir: tras un track exitoso `router.refresh()`
+   * reproyecta la tabla con `alreadyTracked: true`, pero el drawer seguiría mostrando el candidato
+   * viejo —chip «Nuevo» y los dos CTAs de gasto habilitados sobre algo que YA se confirmó—. Dos
+   * proyecciones de la misma verdad divergiendo en pantalla es exactamente el segundo almacén que
+   * esta lente evita en todos lados; el id deriva siempre de las props frescas.
+   */
+  const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null)
   const [actionState, setActionState] = useState<Partial<Record<KeywordDiscoveryActionKind, GreenhouseAsyncActionState>>>({})
   const [feedback, setFeedback] = useState<KeywordDiscoveryActionFeedback | null>(null)
+
+  /**
+   * Acción en vuelo, a nivel workbench y no por-kind.
+   *
+   * Con estado por-kind cada botón sólo se apagaba a sí mismo: con «Declarar objetivo» en vuelo,
+   * «Seguir oportunidad» seguía clickeable. Dos `trackKeywords` concurrentes con intents distintos
+   * sobre la misma keyword cierran y reabren la membresía en orden no determinista (flip-flop de
+   * `intent_changed`), y el feedback es last-wins: el operador puede leer el resultado de la otra
+   * acción. No hay doble gasto —el techo y el `FOR UPDATE` del command lo impiden—, pero sí estado
+   * confuso en un camino de dinero, que es igual de inaceptable.
+   */
+  const [pendingAction, setPendingAction] = useState<KeywordDiscoveryActionKind | null>(null)
+
+  const selectedCandidate = useMemo(
+    () => candidates.find(candidate => candidate.candidateId === selectedCandidateId) ?? null,
+    [candidates, selectedCandidateId]
+  )
 
   // El trigger que abrió el drawer: `AdaptiveSidecarLayout` le devuelve el foco al cerrar, para
   // que quien navega por teclado no vuelva al inicio de la tabla en cada candidato revisado.
@@ -116,39 +142,84 @@ const KeywordDiscoveryWorkbench = ({
   }) => {
     if (!organizationId) return
 
-    const response = await fetch(DISCOVERY_ENDPOINT, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        intent: 'queue',
-        organizationId,
-        seoTargetId,
-        seedSource: 'manual',
-        manualSeeds: seeds,
-        methods: methods.map(method => ({ method, resultsPerCall }))
+    setFeedback(null)
+
+    try {
+      const response = await fetch(DISCOVERY_ENDPOINT, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          intent: 'queue',
+          organizationId,
+          seoTargetId,
+          seedSource: 'manual',
+          manualSeeds: seeds,
+          methods: methods.map(method => ({ method, resultsPerCall }))
+        })
       })
-    })
 
-    await throwIfNotOk(response, copy.run.providerErrorTitle)
+      await throwIfNotOk(response, copy.cost.submitErrorFallback)
 
-    const payload = (await response.json()) as { ok?: boolean; runId?: string }
+      const payload = (await response.json()) as { ok?: boolean; runId?: string }
 
-    // El `runId` sólo entra al estado/URL cuando el command CONFIRMÓ persistencia. Guardarlo
-    // antes dejaría un enlace compartible apuntando a una corrida que nunca existió.
-    if (payload.ok && payload.runId) {
-      setLastRunId(payload.runId)
-      router.refresh()
+      // El `runId` sólo entra al estado/URL cuando el command CONFIRMÓ persistencia. Guardarlo
+      // antes dejaría un enlace compartible apuntando a una corrida que nunca existió.
+      if (payload.ok && payload.runId) {
+        /*
+         * 🔴 La URL se reescribe ANTES de refrescar.
+         *
+         * `router.refresh()` re-ejecuta el server con los MISMOS `searchParams`. Si el operador
+         * llegó por un enlace con `?discoveryRun=<viejo>`, el refresh vuelve a proyectar la
+         * corrida vieja y la recién encolada queda invisible: acaba de confirmar un gasto y la
+         * pantalla le muestra otra corrida, así que puede reintentar creyendo que no pasó nada.
+         * `replace` y no `push`: encolar no es un paso de navegación que el botón «atrás» deba
+         * deshacer.
+         */
+        const url = new URL(window.location.href)
+
+        url.searchParams.set('discoveryRun', payload.runId)
+        window.history.replaceState(null, '', `${url.pathname}${url.search}`)
+
+        router.refresh()
+      }
+    } catch (error) {
+      /*
+       * 🔴 El error del camino de gasto se MUESTRA, no se traga.
+       *
+       * Cuando el queue rebota (`seo_budget_exhausted`, `limit_exceeded`, `provider_error`) NO se
+       * inserta ninguna corrida: la banda de estado sigue mostrando la anterior o nada. Sin este
+       * anuncio el operador ve un botón en rojo sin razón y no distingue «cupo agotado» (no
+       * reintentar) de «proveedor caído» (reintentar después). El servidor ya fabricó la prosa
+       * es-CL; `actionable` decide si tiene sentido ofrecer reintento.
+       */
+      const canonical = isCanonicalApiError(error) ? error : null
+
+      const hint = canonical
+        ? canonical.actionable
+          ? copy.cost.submitErrorRetryHint
+          : copy.cost.submitErrorStructuralHint
+        : copy.cost.submitErrorRetryHint
+
+      setFeedback({
+        severity: 'error',
+        message: `${canonical?.message ?? copy.cost.submitErrorFallback} ${hint}`,
+        tracked: false
+      })
+
+      // Se relanza para que el CTA del builder muestre su estado de error: el anuncio explica el
+      // porqué, el botón dice que ese intento terminó.
+      throw error
     }
   }
 
   const handleOpenCandidate = (candidate: SeoDiscoveryCandidateView, trigger: HTMLButtonElement | null) => {
     triggerRef.current = trigger
     setActionState({})
-    setSelectedCandidate(candidate)
+    setSelectedCandidateId(candidate.candidateId)
   }
 
   const handleCloseCandidate = () => {
-    setSelectedCandidate(null)
+    setSelectedCandidateId(null)
     // Con `preferredMode='temporary'` el cierre por `Escape`/backdrop ya restaura el foco vía el
     // primitive; este camino cubre el botón de cerrar del propio sidecar.
     window.setTimeout(() => triggerRef.current?.focus(), 0)
@@ -168,6 +239,10 @@ const KeywordDiscoveryWorkbench = ({
 
     if (!candidate || !organizationId || !seoTargetId || !run) return
 
+    // Exclusión mutua: una sola acción en vuelo por vez. El guard va acá y no sólo en el
+    // `disabled` de los botones porque el teclado y un doble evento pueden ganarle al render.
+    if (pendingAction) return
+
     const request = buildKeywordDiscoveryActionRequest(kind, {
       organizationId,
       seoTargetId,
@@ -179,6 +254,7 @@ const KeywordDiscoveryWorkbench = ({
 
     if (!request) return
 
+    setPendingAction(kind)
     setActionState(current => ({ ...current, [kind]: 'loading' }))
     setFeedback(null)
 
@@ -199,7 +275,10 @@ const KeywordDiscoveryWorkbench = ({
         kind === 'declareTarget' || kind === 'followOpportunity'
           ? resolveTrackFeedback(payload as { outcomes?: Array<{ keyword?: string; status?: string }> }, candidate.keyword, kind)
           : kind === 'prepareGrounded'
-            ? resolveGroundedFeedback(payload as { mode?: string }, candidate.keyword)
+            ? resolveGroundedFeedback(
+                payload as { mode?: string; coverageNotice?: string | null; deduped?: boolean },
+                candidate.keyword
+              )
             : resolveDismissFeedback(candidate.keyword)
 
       setFeedback(resolved)
@@ -215,8 +294,29 @@ const KeywordDiscoveryWorkbench = ({
 
       setFeedback(resolveActionErrorFeedback(candidate.keyword, message))
       setActionState(current => ({ ...current, [kind]: 'error' }))
+    } finally {
+      setPendingAction(null)
     }
   }
+
+  /**
+   * Una corrida `pending`/`running` converge sola.
+   *
+   * La barra indeterminada del estado se justifica como «lo único que distingue *sigue corriendo*
+   * de *quedó congelada*», y sin refresco esa distinción no era observable: el worker terminaba y
+   * la pantalla seguía diciendo «corriendo» hasta que alguien recargara a mano. El drain corre
+   * cada 10 min, así que 20 s es holgado y no golpea nada — `router.refresh()` re-ejecuta el
+   * server component, no dispara ninguna corrida ni gasta con el proveedor.
+   */
+  const runStatus = run?.status ?? null
+
+  useEffect(() => {
+    if (runStatus !== 'pending' && runStatus !== 'running') return
+
+    const timer = window.setInterval(() => router.refresh(), 20_000)
+
+    return () => window.clearInterval(timer)
+  }, [runStatus, router])
 
   const body = (
     <Stack spacing={6}>
@@ -235,7 +335,9 @@ const KeywordDiscoveryWorkbench = ({
       {run ? (
         <Card>
           <CardContent>
-            <KeywordDiscoveryRunStatus run={run} />
+            {/* La frescura la decide la política del dominio (`DISCOVERY_RUN_STALE_AFTER_DAYS`),
+                no un umbral inventado en la vista. */}
+            <KeywordDiscoveryRunStatus run={run} stale={isDiscoveryRunStale(run.completedAt)} />
           </CardContent>
         </Card>
       ) : null}
@@ -276,7 +378,7 @@ const KeywordDiscoveryWorkbench = ({
     <AdaptiveSidecarLayout
       open={selectedCandidate !== null}
       onOpenChange={open => {
-        if (!open) setSelectedCandidate(null)
+        if (!open) setSelectedCandidateId(null)
       }}
       kind='inspector'
       /*
@@ -302,6 +404,7 @@ const KeywordDiscoveryWorkbench = ({
               canExecute={canExecute}
               groundedDisabledReason={groundedDisabledReason}
               actionState={actionState}
+              busy={pendingAction !== null}
               onAction={handleAction}
               onClose={handleCloseCandidate}
             />

@@ -27,7 +27,7 @@ describe('frontend capture scenario DSL', () => {
    * el gate para siempre en ese archivo.
    */
   it('permite teclas que navegan o cierran sin declarar el scenario mutating', () => {
-    for (const key of ['Escape', 'Tab', 'Shift+Tab', 'ArrowDown', 'End']) {
+    for (const key of ['Escape', 'Esc', 'Tab', 'Shift+Tab']) {
       expect(() => validateScenario(baseScenario([{ kind: 'press', key }])), key).not.toThrow()
     }
   })
@@ -35,6 +35,21 @@ describe('frontend capture scenario DSL', () => {
   it('sigue gateando las teclas que ACTIVAN el control enfocado', () => {
     // Enter/Space sobre un botón con foco pueden enviar un formulario o confirmar un gasto.
     for (const key of ['Enter', 'Space', 'Control+Enter']) {
+      expect(() => validateScenario(baseScenario([{ kind: 'press', key }])), key).toThrow(
+        'requiere scenario.mutating:true'
+      )
+    }
+  })
+
+  /**
+   * 🔴 Las flechas y `Home`/`End` NO son navegación pura.
+   *
+   * Sobre un `RadioGroup`, un `Slider` o un `<select>` nativo enfocado CAMBIAN el valor y disparan
+   * `onChange`; si esa superficie persiste on-change, un scenario declarado no-mutante ejecuta un
+   * write real. La primera versión de la excepción las incluía afirmando lo contrario.
+   */
+  it('las teclas que cambian el valor de un control siguen gateadas', () => {
+    for (const key of ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End']) {
       expect(() => validateScenario(baseScenario([{ kind: 'press', key }])), key).toThrow(
         'requiere scenario.mutating:true'
       )

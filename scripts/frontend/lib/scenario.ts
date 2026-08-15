@@ -356,8 +356,17 @@ const QUALITY_PROFILES = new Set<CaptureQualityProfile>(['legacy', 'diagnostic',
  * 🔴 `Enter` y `Space` NO están acá y no deben agregarse: activan el control con foco, así que
  * una captura podría enviar un formulario o confirmar un gasto sin que el scenario se declare
  * `mutating`. Esa es exactamente la puerta que el gate existe para cerrar.
+ *
+ * 🔴 Las flechas y `Home`/`End` TAMPOCO están, y la razón no es obvia: sobre un `RadioGroup`, un
+ * `Slider` o un `<select>` nativo con foco, las flechas **cambian el valor** y disparan `onChange`
+ * (y `Home`/`End` en un slider saltan a min/max). En una superficie que persiste on-change —patrón
+ * que existe en el portal para filtros y preferencias— eso es un write real desde un scenario que
+ * se declaró no-mutante. La primera versión de esta lista las incluía afirmando que «no existe
+ * control que se active con ellas»; es falso, y el gate se apoyaba en esa afirmación.
+ *
+ * Lo que queda es lo que de verdad sólo navega o cierra: `Escape` y `Tab`.
  */
-const NON_ACTIVATING_KEYS = new Set(['Escape', 'Esc', 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End'])
+const NON_ACTIVATING_KEYS = new Set(['Escape', 'Esc', 'Tab'])
 
 /**
  * `true` si la tecla sólo navega/cierra. Acepta combinaciones con modificadores (`Shift+Tab`):

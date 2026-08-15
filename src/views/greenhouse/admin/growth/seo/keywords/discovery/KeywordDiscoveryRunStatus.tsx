@@ -117,7 +117,7 @@ const KeywordDiscoveryRunStatus = ({ run, stale = false }: Props) => {
 
           {stale ? (
             <Typography variant='caption' color='warning.main'>
-              {copy.staleDetail.replace('{date}', capturedAt ?? '—')}
+              {copy.staleDetail.replace('{date}', capturedAt ?? GH_GROWTH_SEO_KEYWORDS.discovery.drawer.dateUnknown)}
             </Typography>
           ) : null}
         </Stack>

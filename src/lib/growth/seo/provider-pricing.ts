@@ -23,5 +23,12 @@
 /** Costo fijo por request a un endpoint Labs, independiente de cuántas filas vuelvan. */
 export const LABS_TASK_SETUP_USD = 0.012
 
-/** Costo por fila devuelta. Se paga por lo SOLICITADO, así que el `limit` es la palanca real. */
+/**
+ * Costo por fila **devuelta** — no por fila solicitada.
+ *
+ * ⚠️ El matiz importa para quien lea esto como doctrina: si pides 100 y el proveedor devuelve 30,
+ * pagas 30. Por eso el `limit` es una COTA del gasto, no el gasto: el estimado que se muestra en
+ * la banda de costo es peor caso a propósito (asume que vuelven todas), y el monto real de la
+ * corrida sale del campo `cost` que devuelve el proveedor y queda en el ledger.
+ */
 export const LABS_RESULT_ROW_USD = 0.00012

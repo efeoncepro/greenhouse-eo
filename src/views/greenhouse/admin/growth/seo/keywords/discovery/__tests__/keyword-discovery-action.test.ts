@@ -125,6 +125,42 @@ describe('resolveGroundedFeedback', () => {
   it('ninguna acción grounded marca el candidato como seguido', () => {
     expect(resolveGroundedFeedback({ mode: 'grounded_llm' }, 'kw').tracked).toBe(false)
   })
+
+  /**
+   * 🔴 El contrato del bridge dice que `coverageNotice` viaja OBLIGATORIO y el consumer no puede
+   * omitirlo: un draft con huecos anunciado como éxito pleno es justo lo que prohíbe.
+   */
+  it('un draft con cobertura incompleta NO se anuncia como éxito pleno', () => {
+    const feedback = resolveGroundedFeedback(
+      { mode: 'grounded_llm', coverageNotice: '2 candidatos quedaron sin pregunta.' },
+      'pintura industrial'
+    )
+
+    expect(feedback.severity).toBe('info')
+    expect(feedback.message).toContain('cobertura incompleta')
+    expect(feedback.message).toContain('2 candidatos quedaron sin pregunta.')
+  })
+
+  it('un coverageNotice vacío o en blanco no degrada el éxito', () => {
+    expect(resolveGroundedFeedback({ mode: 'grounded_llm', coverageNotice: '   ' }, 'kw').severity).toBe('success')
+    expect(resolveGroundedFeedback({ mode: 'grounded_llm', coverageNotice: null }, 'kw').severity).toBe('success')
+  })
+
+  it('reutilizar un draft vigente no se anuncia como creación', () => {
+    const feedback = resolveGroundedFeedback({ mode: 'grounded_llm', deduped: true }, 'pintura industrial')
+
+    expect(feedback.severity).toBe('info')
+    expect(feedback.message).toContain('Ya existía')
+  })
+
+  it('el fallback manda sobre deduped y sobre la cobertura: cambia QUÉ hay que revisar', () => {
+    const feedback = resolveGroundedFeedback(
+      { mode: 'baseline_fallback', deduped: true, coverageNotice: 'hueco' },
+      'kw'
+    )
+
+    expect(feedback.message).toContain('sin el modelo')
+  })
 })
 
 describe('buildTrajectoryHref', () => {

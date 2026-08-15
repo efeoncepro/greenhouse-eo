@@ -115,7 +115,16 @@ const formatCapturedAt = (iso: string | null) => (iso ? formatDate(iso) : null)
  * proyectan EXACTAMENTE la misma verdad. Duplicar el render sería la forma más rápida de que a
  * 390px falte un `as-of` o un marcador y nadie lo note.
  */
-const VolumeValue = ({ candidate, capturedAt }: { candidate: SeoDiscoveryCandidateView; capturedAt: string | null }) => {
+const VolumeValue = ({
+  candidate,
+  asOfDate,
+  asOfIsProvider
+}: {
+  candidate: SeoDiscoveryCandidateView
+  asOfDate: string | null
+  /** `true` cuando la fecha es el as-of declarado por el proveedor; `false` = fecha de captura. */
+  asOfIsProvider: boolean
+}) => {
   const copy = GH_GROWTH_SEO_KEYWORDS.discovery.results
 
   if (candidate.searchVolume === null) return <Missing>{copy.noMarketData}</Missing>
@@ -126,9 +135,11 @@ const VolumeValue = ({ candidate, capturedAt }: { candidate: SeoDiscoveryCandida
         <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums' }}>
           ◑ {copy.volumeUnit.replace('{value}', formatNumber(candidate.searchVolume))}
         </Typography>
-        {capturedAt ? (
+        {asOfDate ? (
           <Typography variant='caption' color='text.secondary'>
-            {copy.asOf.replace('{date}', capturedAt)}
+            {/* Sin as-of del proveedor se dice «traído el …»: nuestra fecha de captura no es la
+                fecha del dato, y presentarlas con el mismo label las hace pasar por lo mismo. */}
+            {(asOfIsProvider ? copy.asOf : copy.asOfCaptured).replace('{date}', asOfDate)}
           </Typography>
         ) : null}
       </Box>
@@ -226,6 +237,17 @@ const DetailTrigger = ({
 const KeywordDiscoveryResults = ({ candidates, totalCandidates, openCandidateId, onOpenCandidate }: Props) => {
   const copy = GH_GROWTH_SEO_KEYWORDS.discovery.results
 
+  /*
+   * 🔴 El conteo afirma el universo; la tabla sirve UNA página (el reader pagina en 50, techo
+   * 200). Pintar «Candidatos (312)» sobre 50 filas sin decir nada es mentira por omisión, y en el
+   * canvas donde se decide el gasto eso pesa: el operador cree que revisó todo.
+   *
+   * El orden gobernado del reader pone primero lo que más importa (● medido y no seguido), así
+   * que los servidos son los buenos — pero no son todos, y se nombra. La paginación real
+   * (consumir `nextCursor`) es de TASK-1693.
+   */
+  const truncated = totalCandidates > candidates.length
+
   return (
     <Box data-capture='seo-keyword-discovery-results' data-ui-surface='discovery-results'>
       <Stack spacing={3}>
@@ -234,9 +256,21 @@ const KeywordDiscoveryResults = ({ candidates, totalCandidates, openCandidateId,
             {copy.title}
           </Typography>
           <Typography variant='body2' color='text.secondary' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-            {copy.count.replace('{count}', String(totalCandidates))}
+            {truncated
+              ? copy.countTruncated
+                  .replace('{shown}', String(candidates.length))
+                  .replace('{count}', String(totalCandidates))
+              : copy.count.replace('{count}', String(totalCandidates))}
           </Typography>
         </Stack>
+
+        {truncated ? (
+          <Typography variant='caption' color='text.secondary'>
+            {copy.truncatedNotice
+              .replace('{shown}', String(candidates.length))
+              .replace('{count}', String(totalCandidates))}
+          </Typography>
+        ) : null}
 
         {/* Leyenda PERSISTENTE de las dos lentes: sin ella, `◑` y `●` son decoración. */}
         <Typography variant='caption' color='text.secondary'>
@@ -268,7 +302,8 @@ const KeywordDiscoveryResults = ({ candidates, totalCandidates, openCandidateId,
             <TableBody>
               {candidates.map(candidate => {
                 const state = resolveState(candidate)
-                const capturedAt = formatCapturedAt(candidate.providerLastUpdatedAt ?? candidate.capturedAt)
+                const asOfIsProvider = candidate.providerLastUpdatedAt !== null
+                const asOfDate = formatCapturedAt(candidate.providerLastUpdatedAt ?? candidate.capturedAt)
                 const barrier = candidate.linkBarrier ?? 'unknown'
 
                 return (
@@ -305,7 +340,7 @@ const KeywordDiscoveryResults = ({ candidates, totalCandidates, openCandidateId,
                     </TableCell>
 
                     <TableCell align='right'>
-                      <VolumeValue candidate={candidate} capturedAt={capturedAt} />
+                      <VolumeValue candidate={candidate} asOfDate={asOfDate} asOfIsProvider={asOfIsProvider} />
                     </TableCell>
 
                     <TableCell>
@@ -344,7 +379,8 @@ const KeywordDiscoveryResults = ({ candidates, totalCandidates, openCandidateId,
         <Stack spacing={3} sx={{ display: { xs: 'flex', md: 'none' } }} aria-label={copy.ariaLabel}>
           {candidates.map(candidate => {
             const state = resolveState(candidate)
-            const capturedAt = formatCapturedAt(candidate.providerLastUpdatedAt ?? candidate.capturedAt)
+            const asOfIsProvider = candidate.providerLastUpdatedAt !== null
+            const asOfDate = formatCapturedAt(candidate.providerLastUpdatedAt ?? candidate.capturedAt)
             const barrier = candidate.linkBarrier ?? 'unknown'
 
             return (
@@ -375,7 +411,7 @@ const KeywordDiscoveryResults = ({ candidates, totalCandidates, openCandidateId,
                   </Typography>
 
                   <Stack direction='row' spacing={4} flexWrap='wrap' useFlexGap>
-                    <VolumeValue candidate={candidate} capturedAt={capturedAt} />
+                    <VolumeValue candidate={candidate} asOfDate={asOfDate} asOfIsProvider={asOfIsProvider} />
                     <BarrierValue barrier={barrier} />
                   </Stack>
 

@@ -161,6 +161,34 @@ export const MAX_DISCOVERY_OVERVIEW_CALLS = Math.ceil(
 /** Techo absoluto de llamadas Labs por corrida (peor caso V1 = 24; el margen es para retries). */
 export const MAX_DISCOVERY_PROVIDER_CALLS = 30
 
+/**
+ * Política de frescura de una corrida: a partir de acá lo que se ve deja de leerse como actual.
+ *
+ * Siete días y no treinta: esta lente es un workbench DIARIO, y su decisión de salida (declarar un
+ * objetivo, seguir una oportunidad) compromete gasto recurrente. El snapshot de volumen del
+ * proveedor se refresca mensual, pero el SERP y el interés se mueven antes; presentar candidatos de
+ * hace tres semanas sin decirlo invita a comprometer presupuesto contra una foto vieja.
+ *
+ * No es un bloqueo: la corrida sigue visible y sus candidatos siguen siendo accionables. Es un
+ * aviso — la diferencia entre «esto es lo que hay hoy» y «esto es lo que había».
+ */
+export const DISCOVERY_RUN_STALE_AFTER_DAYS = 7
+
+/**
+ * `true` cuando la corrida terminó hace más de {@link DISCOVERY_RUN_STALE_AFTER_DAYS} días.
+ * Una corrida sin fecha de término (aún corriendo, o fallida antes de terminar) NUNCA es stale:
+ * no hay foto vieja que advertir todavía.
+ */
+export const isDiscoveryRunStale = (completedAt: string | null, now: Date = new Date()): boolean => {
+  if (!completedAt) return false
+
+  const completed = new Date(completedAt).getTime()
+
+  if (!Number.isFinite(completed)) return false
+
+  return now.getTime() - completed > DISCOVERY_RUN_STALE_AFTER_DAYS * 24 * 60 * 60 * 1000
+}
+
 /** Límite Labs por keyword: 80 caracteres y 10 palabras. */
 export const MAX_SEED_CHARS = 80
 

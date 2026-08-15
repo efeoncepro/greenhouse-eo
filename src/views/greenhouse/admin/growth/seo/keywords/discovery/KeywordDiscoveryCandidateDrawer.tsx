@@ -95,6 +95,8 @@ export interface KeywordDiscoveryCandidateDrawerProps {
   /** Grounded exige capability AEO + perfil del Space + flag del grader. */
   groundedDisabledReason: string | null
   actionState: Partial<Record<KeywordDiscoveryActionKind, GreenhouseAsyncActionState>>
+  /** Hay una acción en vuelo (cualquiera): ninguna otra se puede disparar mientras tanto. */
+  busy?: boolean
   onAction: (kind: KeywordDiscoveryActionKind) => void
   onClose: () => void
 }
@@ -110,6 +112,7 @@ const KeywordDiscoveryCandidateDrawer = ({
   canExecute,
   groundedDisabledReason,
   actionState,
+  busy = false,
   onAction,
   onClose
 }: KeywordDiscoveryCandidateDrawerProps) => {
@@ -127,8 +130,19 @@ const KeywordDiscoveryCandidateDrawer = ({
    * que puede ser un no-op.
    */
   const trackActionsAvailable = canExecute && !candidate.alreadyTracked
-  const groundedAvailable = canExecute && groundedDisabledReason === null
-  const dismissAvailable = canExecute
+
+  /**
+   * 🔴 Un candidato DESCARTADO no ofrece «Preparar consultas».
+   *
+   * `createGroundedQueryDraft` sólo acepta candidatos con `latestAction` en `null` o
+   * `selected_for_grounded_query` — y hoy nadie escribe ese segundo valor, así que un descartado
+   * no tiene camino de vuelta. Ofrecer el botón sería prometer una acción que el command va a
+   * rechazar al confirmar, justo lo que esta lente resuelve server-side en todos los demás casos.
+   * Cuando exista re-selección explícita (TASK-1692), esta condición la incorpora.
+   */
+  const dismissed = candidate.latestAction?.kind === 'dismissed'
+  const groundedAvailable = canExecute && groundedDisabledReason === null && !dismissed
+  const dismissAvailable = canExecute && !dismissed
 
   const hasAnyAction = trackActionsAvailable || groundedAvailable || dismissAvailable
 
@@ -173,7 +187,7 @@ const KeywordDiscoveryCandidateDrawer = ({
   if (candidate.cpcUsd !== null) {
     marketRows.push({
       label: DRAWER.cpcLabel,
-      value: `◑ USD ${candidate.cpcUsd.toFixed(2)}`,
+      value: DRAWER.cpcValue.replace('{amount}', candidate.cpcUsd.toFixed(2)),
       hint: DRAWER.cpcHint
     })
   }
@@ -195,13 +209,16 @@ const KeywordDiscoveryCandidateDrawer = ({
         variant={kind === 'declareTarget' ? 'contained' : kind === 'dismiss' ? 'text' : 'outlined'}
         size='small'
         state={actionState[kind] ?? 'idle'}
+        // Con una acción en vuelo se apagan TODAS, no sólo la que está cargando: dos decisiones
+        // de gasto en paralelo sobre la misma keyword dejan el orden de escritura al azar.
+        disabled={busy && actionState[kind] !== 'loading'}
         loadingLabel={ACTIONS.pendingLabel}
         onClick={() => setPendingConfirm(kind)}
       >
         {KEYWORD_DISCOVERY_ACTION_LABEL[kind]}
       </GreenhouseAsyncActionButton>
       <Typography variant='caption' color='text.secondary'>
-        {KEYWORD_DISCOVERY_ACTION_HINT[kind]}
+        {busy && actionState[kind] !== 'loading' ? ACTIONS.busyHint : KEYWORD_DISCOVERY_ACTION_HINT[kind]}
       </Typography>
     </Stack>
   )
@@ -227,7 +244,7 @@ const KeywordDiscoveryCandidateDrawer = ({
                 {DRAWER.provenanceChain
                   .replace('{seed}', candidate.seedKeywords[0] ?? DRAWER.provenanceNoSeed)
                   .replace('{method}', SOURCE_LABEL[candidate.sourceEndpoint])
-                  .replace('{date}', runDate ?? '—')}
+                  .replace('{date}', runDate ?? DRAWER.dateUnknown)}
               </Typography>
 
               {candidate.sourceRank !== null ? (

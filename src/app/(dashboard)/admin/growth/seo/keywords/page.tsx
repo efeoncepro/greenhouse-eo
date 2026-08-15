@@ -5,6 +5,7 @@ import type { Metadata } from 'next'
 import { can } from '@/lib/entitlements/runtime'
 import { isGraderEnabled } from '@/lib/growth/ai-visibility/flags'
 import { getGraderProfileForOrganization } from '@/lib/growth/ai-visibility/store'
+import { enforceSeoRunEntitlement } from '@/lib/growth/seo/entitlement'
 import { isSeoKeywordDiscoveryEnabled, isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { GH_GROWTH_SEO_KEYWORDS } from '@/lib/copy/growth'
 import { readKeywordDiscovery } from '@/lib/growth/seo/keyword-discovery/reader'
@@ -185,6 +186,30 @@ export default async function Page({ searchParams }: PageProps) {
       }
     }
 
+    /*
+     * ── Cupo del período, resuelto server-side ───────────────────────────────────────────
+     *
+     * La banda de costo promete responder «¿me cabe?» y hasta acá siempre decía «Cupo no
+     * disponible»: el dato existía en el gate y nadie lo pedía, así que el operador descubría el
+     * bloqueo recién con el rebote del enqueue.
+     *
+     * Se consulta el MISMO chokepoint canónico que usan el preview y el enqueue
+     * (`enforceSeoRunEntitlement`) — no una lectura paralela del presupuesto. Sin
+     * `estimatedCostUsd` la llamada es una pregunta pura por el remanente: no reserva, no gasta y
+     * no consume allowance de audits (`consumesAuditAllowance: false`, igual que el rank capture,
+     * porque descubrir tampoco crea `seo_site_audit_runs`).
+     *
+     * ⚠️ Sigue siendo informativa, no autorizante: el command recalcula antes de persistir y
+     * puede bloquear con un cupo distinto si algo gastó en el intertanto.
+     */
+    let discoveryBudgetRemainingUsd: number | null = null
+
+    if (selectedSpace && market && discoveryEnabled && canTrackKeywords) {
+      const gate = await enforceSeoRunEntitlement(selectedSpace.organizationId, { consumesAuditAllowance: false })
+
+      discoveryBudgetRemainingUsd = gate.budgetRemainingUsd ?? null
+    }
+
     // ── TASK-1665 Slice 4 — puente grounded (TASK-1666) ──────────────────────────────────
     //
     // ⚠️ Son DOS planos de capability, no uno: leer candidatos SEO y gestionar prompts AEO. Y
@@ -214,7 +239,7 @@ export default async function Page({ searchParams }: PageProps) {
         marketLabel={market ? `${market.market ?? market.locationCode} · ${market.languageCode}` : null}
         canExecute={discoveryEnabled && canTrackKeywords && Boolean(market)}
         disabledReason={discoveryDisabledReason}
-        budgetRemainingUsd={null}
+        budgetRemainingUsd={discoveryBudgetRemainingUsd}
         graderProfileId={graderProfile?.profileId ?? null}
         groundedDisabledReason={groundedDisabledReason}
         run={discoveryRun}

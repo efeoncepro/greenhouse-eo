@@ -75,6 +75,20 @@ export type SeoMarketDataSourceEndpoint =
 
 export type SeoSearchIntent = 'informational' | 'navigational' | 'commercial' | 'transactional'
 
+/**
+ * Vocabulario cerrado del intent, exportado como VALOR y no sólo como tipo.
+ *
+ * Sin esto, un consumer que recibe el intent por query string sólo puede castear con `as` —el tipo
+ * se borra en runtime— y un valor inventado entra al reader como si fuera legítimo. Acá vive el
+ * SSOT para que las rutas validen contra la misma lista que tipa el dominio.
+ */
+export const SEO_SEARCH_INTENTS: readonly SeoSearchIntent[] = [
+  'informational',
+  'navigational',
+  'commercial',
+  'transactional'
+]
+
 export interface SeoKeywordMarketDatum {
   normalizedKeyword: string
   keyword: string

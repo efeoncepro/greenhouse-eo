@@ -233,8 +233,14 @@ const KeywordDiscoveryBuilder = ({
       await onSubmit({ seeds: parsed.seeds.slice(0, MAX_DISCOVERY_SEEDS), methods, resultsPerCall })
       setSubmitState('idle')
     } catch {
-      // El detalle del error lo cuenta la banda de estado de la corrida, que es donde el
-      // operador va a mirar. El botón sólo deja de estar pendiente.
+      /*
+       * El PORQUÉ del rebote lo anuncia el workbench en su live region, con la prosa es-CL del
+       * servidor y un hint que depende de `actionable`. Acá sólo queda el estado del botón.
+       *
+       * ⚠️ No delegar esto "a la banda de estado de la corrida": cuando el command rechaza, NO se
+       * inserta ninguna corrida — la banda sigue mostrando la anterior o nada. Un botón en rojo
+       * sin explicación deja al operador sin saber si reintentar.
+       */
       setSubmitState('error')
     }
   }

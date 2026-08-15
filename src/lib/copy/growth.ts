@@ -2389,11 +2389,34 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       heading: 'Antes de confirmar',
       calls: '{count} llamadas estimadas',
       rows: 'Hasta {count} filas solicitadas',
-      estimate: 'Costo máximo estimado ◑ US${amount}',
+      /*
+       * ⚠️ Sin `◑` en las cifras de costo, a propósito.
+       *
+       * `◑` está definido en la leyenda del canvas como «estimado de mercado · DataForSEO Labs»:
+       * es un marcador de PROCEDENCIA de un dato de mercado, no un genérico de «aproximado».
+       * Ponérselo a un monto en dólares —peor todavía al costo REAL que devolvió el proveedor—
+       * le enseña al operador que `◑` significa «número con incertidumbre», y ahí muere la
+       * distinción `◑` estimado / `●` medido que el resto del pipeline sostiene con rigor.
+       * Para el estimado basta la palabra: ya dice «estimado».
+       */
+      estimate: 'Costo máximo estimado US${amount}',
       estimateFree: 'Sin costo de proveedor',
       budget: 'Presupuesto disponible US${amount}',
       budgetUnavailable: 'Cupo no disponible',
       formula: 'Fórmula: {formula}',
+
+      /*
+       * 🔴 El rebote del enqueue se dice ACÁ, no «en la banda de estado».
+       *
+       * Cuando el command rechaza la corrida no se inserta NINGUNA fila: la banda de estado sigue
+       * mostrando la corrida anterior o nada. Si el error se traga, el operador ve un botón en
+       * rojo sin razón y no distingue «cupo agotado» (no reintentes) de «proveedor caído»
+       * (reintenta después). El servidor ya fabricó la prosa es-CL exacta; se muestra tal cual.
+       */
+      submitErrorFallback: 'No pudimos iniciar la corrida. Intenta de nuevo.',
+      submitErrorRetryHint: 'Puedes reintentar.',
+      submitErrorStructuralHint: 'Reintentar no lo resuelve: revisa el cupo o pide ayuda al equipo.',
+
       disclaimer:
         'Los datos de mercado son estimados y la corrida puede quedar parcial. Seguir una keyword después genera gasto recurrente y pide otra confirmación.',
       announce: 'Costo estimado actualizado: {calls} llamadas, hasta US${amount}.',
@@ -2422,7 +2445,9 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       runningAnnounce: 'La corrida está procesando.',
       runningIndicatorAria: 'La corrida sigue en curso',
       succeededTitle: 'Corrida completada',
-      succeededDetail: '{count} candidatos · costo real ◑ US${amount}',
+      // Sin `◑`: este monto es lo que el proveedor efectivamente cobró (campo `cost` de su
+      // respuesta). Marcarlo como «estimado de mercado» contradice su propio label.
+      succeededDetail: '{count} candidatos · costo real US${amount}',
       succeededAnnounce: 'La corrida terminó con {count} candidatos.',
       partialTitle: 'Corrida parcial',
       partialDetail: 'Una fuente no terminó. Lo que sí se materializó está abajo.',
@@ -2467,6 +2492,17 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       ariaLabel: 'Candidatos de la corrida',
       count: '{count} candidatos',
 
+      /*
+       * ⚠️ El conteo afirma el universo; la tabla sirve una página. Cuando no coinciden hay que
+       * DECIRLO: «Candidatos (312)» sobre 50 filas, sin aviso, es mentira por omisión justo en el
+       * canvas donde se decide. El orden gobernado del reader pone primero lo que más importa,
+       * así que la página servida es la buena — pero no es todo, y eso se nombra.
+       * La paginación real (consumir `nextCursor`) es de TASK-1693.
+       */
+      countTruncated: '{shown} de {count} candidatos',
+      truncatedNotice:
+        'Se muestran los {shown} candidatos de mayor prioridad de {count}. El resto queda en la corrida y se podrá recorrer cuando la lente tenga paginación.',
+
       colKeyword: 'Keyword',
       colSource: 'Procedencia',
       colCluster: 'Agrupador',
@@ -2481,7 +2517,17 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       legend: '● Medido por Search Console · ◑ Estimado de mercado. No se promedian.',
 
       volumeUnit: '{value}/mes',
+      /*
+       * ⚠️ DOS fechas distintas, dos frases distintas.
+       *
+       * `asOf` es el as-of del PROVEEDOR: cuándo actualizó su snapshot de volumen. `asOfCaptured`
+       * es cuándo lo trajimos nosotros. Cuando el proveedor no declara su fecha, decir «al
+       * {captura}» presenta nuestra fecha como si fuera la del dato — dos hechos distintos bajo el
+       * mismo label. El drawer ya los separa con labels propios; la tabla es donde se decide en
+       * volumen, así que acá también tienen que distinguirse.
+       */
       asOf: 'al {date}',
+      asOfCaptured: 'traído el {date}',
 
       noMarketData: 'Sin dato de mercado',
       noIntent: 'Sin dato de intención',
@@ -2556,7 +2602,11 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       intentLabel: 'Intención estimada',
       clusterLabel: 'Agrupador',
       cpcLabel: 'CPC de referencia',
+      /** Sí lleva `◑`: el CPC es un estimado de mercado del proveedor, no un monto que pagamos. */
+      cpcValue: '◑ USD {amount}',
       cpcHint: 'Precio publicitario, no costo de posicionarse.',
+      /** Ausencia de fecha en una fila del drawer: nunca un placeholder mudo. */
+      dateUnknown: 'Sin fecha',
 
       measuredTitle: 'Medición propia',
       measuredHint: 'Lo que Search Console midió para tu sitio en este término.',
@@ -2626,7 +2676,23 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       feedbackGroundedDraft: 'Se creó el borrador AEO con «{keyword}». Revísalo antes de activarlo.',
       feedbackGroundedFallback:
         'Se creó el borrador base con «{keyword}», sin el modelo: revísalo con más atención antes de activarlo.',
+
+      /*
+       * 🔴 `coverageNotice` viaja OBLIGATORIO desde el bridge (TASK-1666): un draft `grounded_llm`
+       * con huecos JAMÁS se presenta como cobertura total. Omitirlo acá anunciaría éxito pleno
+       * sobre un borrador que dejó candidatos afuera — exactamente lo que el primitive prohíbe.
+       */
+      feedbackGroundedPartial:
+        'Se creó el borrador AEO con «{keyword}», pero quedó con cobertura incompleta: {notice}',
+      /** Reutilizar un draft vigente NO es crear uno nuevo; decir «se creó» escondería el no-op. */
+      feedbackGroundedDeduped:
+        'Ya existía un borrador AEO vigente con «{keyword}». Se reutilizó, sin generar uno nuevo.',
+
       feedbackError: 'No se pudo completar la acción sobre «{keyword}».',
+
+      /** Una acción en vuelo bloquea las demás: dos decisiones de gasto en paralelo sobre la
+       *  misma keyword dejan el orden de escritura al azar. */
+      busyHint: 'Hay una acción en curso. Espera a que termine.',
 
       disabledGroundedNoProfile: 'Este Space todavía no tiene un perfil AEO configurado.',
       disabledGroundedNoPermission: 'No tienes permiso para gestionar consultas AEO.',

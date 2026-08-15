@@ -178,14 +178,44 @@ export const resolveTrackFeedback = (
  * `TASK-1666` distingue el borrador razonado por el modelo del que salió de la plantilla base.
  * El `baseline_fallback` NO es un éxito silencioso: el operador tiene que saber que lo que va a
  * revisar no se construyó con el contexto de su marca.
+ *
+ * 🔴 **Tres hechos del contrato del bridge que NO se pueden omitir**, y que este resolver leía
+ * sólo a medias cuando miraba únicamente `mode`:
+ *
+ *  1. `coverageNotice` viaja OBLIGATORIO: un draft `grounded_llm` con huecos jamás se presenta
+ *     como cobertura total. Anunciar «se creó el borrador» a secas sobre un borrador que dejó
+ *     candidatos afuera es exactamente lo que el primitive prohíbe.
+ *  2. `deduped: true` significa que se reutilizó un draft vigente — no hubo segunda llamada al
+ *     modelo ni borrador nuevo. Decir «se creó» escondería un no-op.
+ *  3. El fallback ya estaba cubierto y se mantiene.
+ *
+ * Orden de precedencia: fallback > deduped > cobertura parcial > éxito pleno. El fallback manda
+ * porque cambia la NATURALEZA de lo que hay que revisar; los otros dos matizan un draft real.
  */
 export const resolveGroundedFeedback = (
-  payload: { mode?: string; fallbackNotice?: string | null } | null,
+  payload: { mode?: string; fallbackNotice?: string | null; coverageNotice?: string | null; deduped?: boolean } | null,
   keyword: string
-): KeywordDiscoveryActionFeedback =>
-  payload?.mode === 'baseline_fallback'
-    ? { severity: 'info', message: fillKeyword(COPY.feedbackGroundedFallback, keyword), tracked: false }
-    : { severity: 'success', message: fillKeyword(COPY.feedbackGroundedDraft, keyword), tracked: false }
+): KeywordDiscoveryActionFeedback => {
+  if (payload?.mode === 'baseline_fallback') {
+    return { severity: 'info', message: fillKeyword(COPY.feedbackGroundedFallback, keyword), tracked: false }
+  }
+
+  if (payload?.deduped === true) {
+    return { severity: 'info', message: fillKeyword(COPY.feedbackGroundedDeduped, keyword), tracked: false }
+  }
+
+  const coverageNotice = typeof payload?.coverageNotice === 'string' ? payload.coverageNotice.trim() : ''
+
+  if (coverageNotice.length > 0) {
+    return {
+      severity: 'info',
+      message: fillKeyword(COPY.feedbackGroundedPartial, keyword).replace('{notice}', coverageNotice),
+      tracked: false
+    }
+  }
+
+  return { severity: 'success', message: fillKeyword(COPY.feedbackGroundedDraft, keyword), tracked: false }
+}
 
 export const resolveDismissFeedback = (keyword: string): KeywordDiscoveryActionFeedback => ({
   severity: 'info',

@@ -6,11 +6,12 @@ import { can } from '@/lib/entitlements/runtime'
 import type {
   SeoDiscoveryActionKind,
   SeoDiscoveryMethod,
-  SeoDiscoveryRunStatus,
   SeoDiscoverySourceKind
 } from '@/lib/growth/seo/keyword-discovery/contracts'
 import {
   SEO_DISCOVERY_ACTION_KINDS,
+  SEO_DISCOVERY_METHODS,
+  SEO_DISCOVERY_RUN_STATUSES,
   SEO_DISCOVERY_SOURCE_KINDS
 } from '@/lib/growth/seo/keyword-discovery/contracts'
 import {
@@ -19,7 +20,7 @@ import {
   recordKeywordDiscoveryAction
 } from '@/lib/growth/seo/keyword-discovery/queue'
 import { readKeywordDiscovery } from '@/lib/growth/seo/keyword-discovery/reader'
-import type { SeoSearchIntent } from '@/lib/growth/seo/keyword-market-data'
+import { SEO_SEARCH_INTENTS } from '@/lib/growth/seo/keyword-market-data'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { requireInternalTenantContext } from '@/lib/tenant/authorization'
 
@@ -247,15 +248,32 @@ export async function GET(request: Request) {
     return Number.isFinite(parsed) ? parsed : undefined
   }
 
+  /**
+   * Lee un query param contra su vocabulario cerrado.
+   *
+   * ⚠️ El `as SeoX` que había acá no validaba nada: el tipo se borra en runtime, así que
+   * `?intent=cualquier-cosa` entraba al reader como si fuera legítimo. Hoy no explota —viaja como
+   * parámetro `$n` y devuelve vacío—, pero «devuelve vacío» y «no hay candidatos con ese intent»
+   * se leen igual desde afuera, y este contrato lo consumen Nexa y el lane MCP. Un valor fuera del
+   * vocabulario se ignora (el filtro no se aplica) en vez de fingir un filtro que no existe.
+   */
+  const readEnumParam = <T extends string>(source: URL, name: string, allowed: readonly T[]): T | undefined => {
+    const raw = source.searchParams.get(name)?.trim()
+
+    if (!raw) return undefined
+
+    return allowed.includes(raw as T) ? (raw as T) : undefined
+  }
+
   try {
     const result = await readKeywordDiscovery({
       organizationId,
       seoTargetId: url.searchParams.get('seoTargetId')?.trim() || undefined,
       runId: url.searchParams.get('runId')?.trim() || undefined,
-      status: (url.searchParams.get('status')?.trim() || undefined) as SeoDiscoveryRunStatus | undefined,
-      sourceEndpoint: (url.searchParams.get('sourceEndpoint')?.trim() || undefined) as SeoDiscoveryMethod | undefined,
+      status: readEnumParam(url, 'status', SEO_DISCOVERY_RUN_STATUSES),
+      sourceEndpoint: readEnumParam(url, 'sourceEndpoint', SEO_DISCOVERY_METHODS),
       query: url.searchParams.get('query')?.trim() || undefined,
-      intent: (url.searchParams.get('intent')?.trim() || undefined) as SeoSearchIntent | undefined,
+      intent: readEnumParam(url, 'intent', SEO_SEARCH_INTENTS),
       minSearchVolume: parseNumber(url.searchParams.get('minSearchVolume')),
       maxDifficulty: parseNumber(url.searchParams.get('maxDifficulty')),
       excludeTracked: url.searchParams.get('excludeTracked') === 'true',
