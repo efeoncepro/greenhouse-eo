@@ -6,10 +6,37 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-15 — sube a `P1`: es la barrera de entrada de la cola priorizada (`TASK-1700`)
+
+Origen: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` (§3.1 brecha S1 y
+§5.2 "La cola priorizada: aggregate persistido, no reader en vivo").
+
+Qué cambia y por qué:
+
+- **`Blocks` += `TASK-1700` como BLOQUEO DURO.** La cola priorizada de trabajo SEO no es un reader en
+  vivo: es un **aggregate persistido append-only** (`seo_work_queue_{snapshots,items}`) que
+  **snapshotea** el conjunto de candidatos con su `priority_score` y su `score_breakdown_json`.
+  Recomputar es una fila nueva, jamás un `UPDATE`. Consecuencia dura: lo que la cola persista con el
+  contrato actual —**la misma keyword hasta cuatro veces**, cada copia con su propio score y su propio
+  CTA de gasto, filtrada por una barrera que en es-LATAM no filtra nada (ISSUE-152)— **queda escrito y
+  no se puede corregir después**. Un reader equivocado se arregla con un deploy; un snapshot
+  equivocado ya viajó a un plan del día y, en cuanto un cliente lo vea, es irreversible por diseño (el
+  propio ADR marca el `priority_score_version` como "lo único irreversible"). Por eso el colapso de
+  duplicados y la barrera correcta van **antes**, no en paralelo.
+- **Prioridad `P2` → `P1`.** No sube por tamaño ni por urgencia de superficie: sube porque es **la
+  única defensa** contra que la cola persista duplicados puntuados con una barrera engañosa. Todo lo
+  demás del programa de la cola es corregible hacia adelante; esto no.
+- **Invariante nuevo** en `### Data model and invariants`: el colapso por `normalizedKeyword` define
+  qué es "un candidato" **para la cola**, no sólo para el drawer — es la unidad de puntuación, de
+  `evidence_ref` y de decisión, en los cuatro consumers.
+
+Sin cambio de alcance ni de slices: los cinco slices ya especificados son exactamente lo que la cola
+necesita que exista antes de su primer snapshot.
+
 ## Status
 
 - Lifecycle: `to-do`
-- Priority: `P2`
+- Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
@@ -179,6 +206,14 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
+- 🔴 `TASK-1700` (cola priorizada de trabajo SEO) — **BLOQUEO DURO**. La cola es un aggregate
+  persistido append-only: sus filas snapshotean el candidato con su `priority_score`,
+  `priority_score_version` y `score_breakdown_json`, y recomputar es una fila nueva, nunca un
+  `UPDATE`. Sin el colapso de duplicados y sin la barrera de enlaces como filtro canónico, el primer
+  snapshot congela la misma keyword hasta cuatro veces —cada copia con su score y su CTA de gasto— y
+  ordenada bajo una dificultad que en es-LATAM no discrimina (ISSUE-152). Eso no se corrige después:
+  se corrige antes o queda en el historial. Esta task debe cerrar **antes** del primer slice de
+  `TASK-1700`.
 - `TASK-1660` (`to-do`) — la lente `Objetivos` declara keywords objetivo en lote; el conflicto de
   cluster es exactamente la advertencia que le falta antes de confirmar cupo.
 - `TASK-1666` (`complete`) — `grounded-query-bridge.ts` selecciona candidatos por `candidateIds`
@@ -327,6 +362,13 @@ Reglas obligatorias:
   - La procedencia se conserva íntegra en la fila: el colapso es de PRESENTACIÓN, y el constraint
     `seo_keyword_discovery_candidates_provenance_unique (run_id, source_endpoint,
     normalized_keyword)` no se toca ni se relaja.
+  - 🔴 **El colapso por `normalizedKeyword` define qué es "un candidato" PARA LA COLA, no sólo para
+    el drawer.** La keyword normalizada —no la fila de procedencia— es la unidad que se puntúa, la
+    que recibe una `evidence_ref` y la que un humano decide. Ningún consumer aguas abajo
+    (`TASK-1700`, Nexa, MCP, lane ecosystem) puede tratar una procedencia como candidato propio: en
+    un aggregate append-only eso persiste la misma decisión hasta cuatro veces, con cuatro scores y
+    cuatro compromisos de gasto sobre una sola intención. La cardinalidad es contrato del reader, no
+    convención de la UI.
   - `unknown` de barrera nunca satisface un filtro de barrera salvo `includeUnknownBarrier: true`
     explícito: "Sin dato" no es "Baja".
   - `alreadyTracked` (match exacto) y `clusterConflict` (misma intención) son señales SEPARADAS y
@@ -713,6 +755,9 @@ default. Revert = revert del PR + redeploy.
       del cursor coincide exactamente con ese total, sin repetidos ni faltantes.
 - [ ] Dos lecturas idénticas del mismo run devuelven el mismo representante y el mismo orden
       (colapso determinista).
+- [ ] El JSDoc del reader y el delta de arquitectura declaran que la unidad de decisión —y por lo
+      tanto la unidad puntuable por `TASK-1700`— es la keyword normalizada, no la fila de
+      procedencia.
 - [ ] `latestAction` de un candidato colapsado refleja la acción más reciente registrada sobre
       cualquiera de sus `candidateIds`.
 - [ ] `grounded-query-bridge.ts` sigue resolviendo una selección por `candidateIds` tras el

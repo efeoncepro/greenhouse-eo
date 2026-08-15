@@ -6,6 +6,30 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-15 — predecesora de la cola priorizada (`TASK-1700`): su principio es el que la cola obedece
+
+Origen: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` (§3.1 brecha S1
+y §5.2, contrato `recordSeoWorkQueueDecision`).
+
+Qué cambia:
+
+- **`Blocks` += `TASK-1700`.** La cola priorizada de trabajo SEO expone
+  `recordSeoWorkQueueDecision({ itemId, decision })` como **log append-only que NO ejecuta el
+  command**. Ese contrato sólo es coherente si el principio que esta task establece ya está vigente:
+  **el primitive que produce el outcome escribe su propia fila; la UI no reporta lo que ya pasó.** Si
+  la cola llega antes, hereda el hueco actual —tres `action_kind` sin writer— y su decision log
+  termina siendo un **segundo libro de decisiones sobre los mismos hechos**: uno que la cola escribe
+  cuando el operador hace click, y otro que el ledger de discovery debería tener y no tiene. Dos
+  libros del mismo hecho, sin transacción entre ellos, es exactamente la falla parcial que esta task
+  cierra.
+- **Sin cambio de alcance.** Los cinco slices quedan como están. Lo que cambia es su **prioridad
+  relativa dentro del programa SEO**: pasa a ser predecesora de la cola, no una mejora aislada del
+  workbench de discovery. Su `Priority: P1` ya lo refleja y no se mueve.
+
+Corolario para quien tome `TASK-1700`: la frontera que esta task fija es la que la cola reusa —
+`record_action` para lo que una persona decide sin que ningún command lo produzca; el primitive para
+lo que un command produce. La cola no inventa una tercera categoría.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -163,6 +187,12 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
+- `TASK-1700` (cola priorizada de trabajo SEO) — su `recordSeoWorkQueueDecision` es un log
+  append-only que **no ejecuta el command**, y esa frontera sólo se sostiene si el principio de esta
+  task —el hecho lo escribe el primitive que produce el outcome, jamás el consumer— ya está vigente.
+  Sin eso, la cola abre un segundo libro de decisiones sobre los mismos hechos que el ledger de
+  discovery debería registrar, sin transacción que los reconcilie. Esta task debe cerrar antes de que
+  la cola escriba su primera decisión.
 - `TASK-1660` (`to-do`, lente **Objetivos**) — es la dueña de la reclasificación de intención sobre
   membresías vigentes. Si esta task define provenance de discovery en el camino de tracking, la lente
   Objetivos debe poder declarar la suya (o declarar explícitamente que no la tiene) sin inventar un

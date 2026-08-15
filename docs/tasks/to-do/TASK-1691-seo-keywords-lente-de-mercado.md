@@ -4,6 +4,44 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-15 — las dos honestidades van juntas: `◑` tiene fecha, y el borde de `●` también se mueve
+
+Origen: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` (§3.1 brecha
+S10 y §5.2). **Sin cambio de alcance** — la task sigue siendo `ui-lite`, aditiva, sin migración y sin
+flag. Lo que cambia es que su declaración se amplía a las dos lentes, no sólo a la estimada.
+
+Qué se amplía:
+
+- **Declarar el `capturedAt` de la lente `◑` es la mitad del trabajo.** La otra mitad es declarar que
+  el **borde derecho de la lente `●` (Search Console) también se está moviendo**: GSC tiene un lag de
+  ingesta propio y su último día disponible no es hoy. Si la superficie sólo califica lo estimado, el
+  operador se lleva la lectura exactamente al revés de la realidad — **cree que lo medido es firme y
+  que lo estimado es lo viejo**, cuando ambos tienen su asterisco y son de distinta naturaleza: el
+  `◑` envejece por ciclo mensual del proveedor, el `●` por lag de ingesta diario. Las dos honestidades
+  van **en la misma superficie y en el mismo gesto de lectura**; separarlas en dos entregas produce
+  medio contrato, que es peor que ninguno porque parece completo.
+- **Concretamente:** junto a `marketAsOf` (lente `◑`), la superficie declara el borde de la lente `●`
+  —la última fecha con datos de Search Console para la selección leída— con la misma regla dura ya
+  escrita para el `◑`: **`null` es legítimo y jamás se rellena con hoy**. Si el reader de
+  oportunidades no lo trae, propagarlo entra en el Slice 1 con el mismo criterio (se propaga, no se
+  recalcula, y nunca por segunda consulta desde la vista). `[verificar]` durante Discovery de dónde
+  sale hoy ese borde en `keyword-opportunities-reader.ts` / `seo_gsc_daily`.
+- 🔴 **Las dos fechas se declaran, NUNCA se reconcilian.** Son lentes distintas: `◑` estimado de
+  mercado y `●` medido del propio sitio. Se muestran juntas para que el operador vea que ambas tienen
+  asterisco; no se promedian, no se combinan en un "dato al DD/MM" único, y ninguna hereda la
+  frescura de la otra. La invariante §1.1 vale también para las fechas.
+
+Qué hereda de acá el resto del programa:
+
+- 🔴 **Este es el encoding canónico de frescura del módulo, y es el que la cola priorizada
+  (`TASK-1700`) va a reusar. No se inventa un segundo.** Una cola que declare su propia antigüedad
+  con otro vocabulario le daría al operador dos formas de leer lo mismo en dos pantallas hermanas.
+  Cuando la cola exponga su `asOf` / `staleness`, se apoya en el copy y la forma que esta task fija.
+- **Serialización obligatoria del trío `1694 → 1691 → 1693`**: las tres tocan el mismo camino de
+  lectura y el mismo bloque de `src/lib/copy/growth.ts`. En paralelo producirían tres encodings de la
+  misma columna. Esta task va **segunda**: hereda la cardinalidad corregida de `TASK-1694` y le
+  entrega a `TASK-1693` un encoding de frescura ya resuelto.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -22,7 +60,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ui`
-- Blocked by: `none`
+- Blocked by: `TASK-1694` (serialización `1694 → 1691 → 1693`; Delta 2026-08-15)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -65,9 +103,13 @@ Dos consecuencias medibles:
 ## Goal
 
 - Con `market === 'available'`, la superficie declara la lente estimada y la fecha de captura.
+- La superficie declara **también** el borde derecho de la lente medida (`●`, Search Console): hasta
+  qué día hay datos. Las dos honestidades viven en la misma superficie; ninguna se muestra sola.
+- Las dos fechas se declaran juntas y **nunca se reconcilian** en un único "dato al DD/MM".
 - Con `market === 'unavailable'`, el comportamiento actual se conserva sin regresión.
 - El `capturedAt` viaja por el contrato del reader, no por una segunda consulta desde la vista.
-- Ningún consumer re-implementa la regla de qué lente es cuál.
+- Ningún consumer re-implementa la regla de qué lente es cuál — y el encoding de frescura que fija
+  esta task es el que reusan las superficies hermanas, incluida la cola priorizada (`TASK-1700`).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -99,12 +141,21 @@ Reglas obligatorias:
 
 ### Depends on
 
+- 🔴 `TASK-1694` (`to-do`, **orden duro**) — corrige la cardinalidad del candidato y el filtro
+  canónico de barrera. Va primero para que esta task declare la lente sobre el universo definitivo y
+  no sobre uno que va a cambiar. Serialización del trío: **`1694 → 1691 → 1693`**.
 - `TASK-1661` (**complete**) — `readKeywordMarketData` ya calcula `freshness.latestCaptureDate`; esta
   task lo propaga en vez de recalcularlo.
 - `TASK-1308` (**complete**) — dueña de la superficie y de la decisión de encoding.
 
 ### Blocks / Impacts
 
+- `TASK-1693` — la lente `Descubrir` hereda este encoding de frescura para sus candidatos; va
+  **después** (`1694 → 1691 → 1693`) para no producir un segundo vocabulario sobre la misma columna
+  y el mismo bloque de `src/lib/copy/growth.ts`.
+- `TASK-1700` (cola priorizada de trabajo SEO) — su `asOf` / `staleness` reusa **este** encoding de
+  frescura. Una cola que declare su antigüedad con otro vocabulario le daría al operador dos formas
+  de leer lo mismo en dos pantallas hermanas. No se inventa un segundo.
 - `TASK-1660` — la superficie de objetivos declarados renderiza las mismas columnas de mercado y
   hereda este contrato; que exista antes evita que nazca con el mismo hueco.
 - `TASK-1665` — el workbench de discovery mostrará candidatos con dato estimado y debe declararlo
@@ -345,25 +396,38 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — El contrato lleva la fecha
+### Slice 1 — El contrato lleva las dos fechas
 
 - Agregar `marketAsOf: string | null` a `KeywordOpportunitiesResult` (rama `ok: true`).
 - En `keyword-opportunities-reader.ts`, dejar de descartar `marketData.freshness` y proyectar
   `latestCaptureDate`.
-- Tests: con dato → fecha presente; sin dato → `null`; **nunca** la fecha de hoy como relleno.
+- Agregar el borde derecho de la lente medida (`●`) al mismo DTO: la última fecha con datos de
+  Search Console para la selección leída, `null` cuando no hay. `[verificar]` en Discovery de dónde
+  sale hoy (reader de oportunidades / `seo_gsc_daily`) y propagarlo, **nunca** recalcularlo en la
+  vista ni por una segunda consulta.
+- Tests: con dato → fecha presente; sin dato → `null`; **nunca** la fecha de hoy como relleno — para
+  las dos fechas, no sólo para la de mercado.
 
-### Slice 2 — Copy de la lente
+### Slice 2 — Copy de las dos lentes
 
 - Crear `marketLensLabel`, `marketLensAsOf` (con fecha interpolada) y `marketLensHint` en
   `src/lib/copy/growth.ts`, validados con `greenhouse-ux-writing`.
+- Crear el par equivalente para la lente medida: etiqueta y fecha del borde de Search Console, con
+  su propio hint que nombre la causa (lag de ingesta), distinta de la del `◑` (ciclo mensual del
+  proveedor). Dos causas distintas de envejecimiento, dos textos.
 - Reusar `source.measured`, `source.mixHint` y `freshnessUnknown`.
 - ⚠️ **NO reusar `source.estimatedHint`**: describe rank capture, no volumen de mercado.
+- 🔴 Cero copy que sugiera una fecha combinada, un "dato al DD/MM" único o que una lente hereda la
+  frescura de la otra.
 
-### Slice 3 — La superficie lo declara
+### Slice 3 — La superficie declara ambas
 
-- Footer de `KeywordOpportunityTable` con la declaración cuando `market === 'available'`.
-- `aria-describedby` desde los `<th>` de Volumen y Barrera; `◑` con `aria-hidden`.
-- Escenario GVC + capturas desktop y 390px, en los dos estados.
+- Footer de `KeywordOpportunityTable` con la declaración de la lente `◑` cuando
+  `market === 'available'`, **y** con la del borde de la lente `●`, en el mismo bloque de lectura.
+- `aria-describedby` desde los `<th>` de Volumen y Barrera hacia la declaración `◑`, y desde las
+  columnas medidas hacia la declaración `●`; `◑` y `●` con `aria-hidden`.
+- Escenario GVC + capturas desktop y 390px, en los dos estados, con las dos declaraciones visibles y
+  sin scroll horizontal a 390px (el footer suma una línea más).
 
 ## Out of Scope
 
@@ -433,7 +497,15 @@ Ninguna. Sin migración, sin flag, sin secretos, sin gasto de proveedor.
 - [ ] `KeywordOpportunitiesResult` expone `marketAsOf: string | null` y el reader lo proyecta desde
   `readKeywordMarketData`, sin recalcularlo.
 - [ ] Con dato de mercado, la superficie declara la lente estimada **y** la fecha de captura.
-- [ ] Sin fecha disponible, declara la lente **sin** inventar fecha (`freshnessUnknown`).
+- [ ] La superficie declara **también** el borde derecho de la lente medida (`●`): hasta qué día hay
+      datos de Search Console. Ninguna de las dos declaraciones se muestra sola.
+- [ ] Las dos fechas se presentan como hechos separados, con causas de envejecimiento distintas
+      (ciclo mensual del proveedor vs lag de ingesta de GSC); no existe copy que las combine, las
+      promedie ni sugiera que una hereda la frescura de la otra.
+- [ ] Sin fecha disponible, declara la lente **sin** inventar fecha (`freshnessUnknown`) — aplica a
+      las dos fechas por igual; `null` nunca se rellena con hoy.
+- [ ] El encoding de frescura queda documentado como el canónico del módulo, reusable por
+      `TASK-1693` y `TASK-1700` sin redefinirlo.
 - [ ] Con `market === 'unavailable'`, el comportamiento actual se conserva — sin regresión.
 - [ ] Una keyword sin dato sigue mostrando "Sin dato" y `unknown` sigue sin pintarse como "Baja".
 - [ ] Todo el copy sale de `src/lib/copy/growth.ts`; cero literales en JSX.

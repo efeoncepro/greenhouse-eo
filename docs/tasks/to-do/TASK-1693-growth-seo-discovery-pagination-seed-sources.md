@@ -6,6 +6,36 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-15 — `Blocked by: TASK-1694`, y la ambigüedad de `keyword-discovery-query.ts` queda cerrada: se CABLEA
+
+Origen: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` (§3.1 brecha S1
+y §5.2) + el propio `### Blocks / Impacts` de esta task, que ya pedía "verificar el estado de
+`TASK-1694` antes de decidir".
+
+Qué cambia:
+
+- **`Blocked by: none` → `TASK-1694`.** Esta task ya lo insinuaba: la decisión del Slice 3 dependía
+  del estado de esa task. Se hace explícito y duro. `TASK-1694` cambia la **cardinalidad** de
+  `candidates`/`totalCandidates` (una fila por keyword, no por procedencia) y agrega
+  `maxLinkBarrier` / `includeUnknownBarrier` / `ignoredFilters` al contrato de lectura. Paginar y
+  filtrar sobre un universo cuya cardinalidad está por cambiar produce un paginador que hay que
+  reescribir el mes siguiente.
+- **La ambigüedad del Slice 3 se resuelve por adelantado: `keyword-discovery-query.ts` se CABLEA, no
+  se retira.** Con `TASK-1694` aterrizando primero, el módulo gana el consumer legítimo que le
+  faltaba: los filtros del canvas —incluido el de barrera de enlaces, que es el filtro canónico del
+  dominio— viajan por URL y se aplican **server-side**. Retirarlo sería borrar el parse/serialize
+  justo antes de necesitarlo. El Slice 3 deja de ser una decisión abierta y pasa a ser
+  implementación; su rama "si se retira" queda muerta y su riesgo asociado, cerrado.
+- **Serialización obligatoria del trío: `1694 → 1691 → 1693`.** Las tres tocan el mismo camino de
+  lectura de candidatos/oportunidades y el mismo bloque de `src/lib/copy/growth.ts`. En paralelo
+  producirían **tres encodings distintos de la misma columna** —una declarando la lente `◑`
+  estimada, otra filtrando por barrera, otra paginando sobre el conteo— y el operador vería tres
+  vocabularios para el mismo dato. En serie, cada una hereda el encoding de la anterior en vez de
+  inventar el suyo.
+
+Sin cambio de alcance: los cuatro slices siguen siendo los mismos. Lo que cambia es cuándo se puede
+empezar y que el Slice 3 llega con la decisión ya tomada.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -24,7 +54,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo|ui`
-- Blocked by: `none`
+- Blocked by: `TASK-1694`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -127,6 +157,11 @@ Reglas obligatorias:
 
 ### Depends on
 
+- 🔴 `TASK-1694` (`to-do`, **bloqueo duro**) — corrige la cardinalidad del candidato (una fila por
+  keyword normalizada, no por procedencia) y agrega `maxLinkBarrier`, `includeUnknownBarrier` e
+  `ignoredFilters` al contrato de lectura. La paginación cuenta sobre ese universo y los filtros del
+  canvas se cablean contra ese vocabulario. Orden obligatorio del trío que comparte camino de
+  lectura y bloque de copy: **`1694 → 1691 → 1693`**.
 - `TASK-1664` (complete) — primitive `queueKeywordDiscovery` + `resolveSeeds` con los cinco
   `SeoDiscoverySourceKind`; nada de lo que esta task cablea requiere tocarlo.
 - `TASK-1665` (complete) — lente base: workbench, builder, run status, canvas, drawer, conmutador de
@@ -140,12 +175,13 @@ Reglas obligatorias:
 
 - `TASK-1660` (`Objetivos`) — reusa el conmutador de lentes de esta superficie; cualquier cambio al
   helper de navegación entre lentes se coordina con esa task.
-- `TASK-1691` — toca la misma tabla de candidatos/oportunidades para declarar la lente estimada y su
-  fecha de captura: coordinar si ambas modifican encabezados o celdas de la misma columna.
+- `TASK-1691` — declara la lente `◑` estimada y su fecha de captura sobre las mismas columnas de
+  mercado y el mismo bloque de copy. **Va antes que ésta** (`1694 → 1691 → 1693`): su encoding de
+  frescura es el que esta lente hereda, no uno paralelo.
 - `TASK-1692` — writers de los action kinds faltantes; comparte el drawer y el canvas de candidatos.
-- `TASK-1694` — filtro por barrera de enlaces en la API. Si esa task aterriza primero, el módulo
-  `keyword-discovery-query.ts` gana un consumer legítimo y la decisión del Slice 3 cambia de
-  «retirar» a «cablear». Verificar su estado antes de decidir.
+- `TASK-1694` — **bloquea a ésta** (ver `### Depends on`). Aterriza primero, así que el módulo
+  `keyword-discovery-query.ts` gana su consumer legítimo y la decisión del Slice 3 queda cerrada en
+  «cablear». Ya no hay nada que verificar antes de decidir.
 
 ### Files owned
 
@@ -364,8 +400,9 @@ Reglas obligatorias:
   (el universo llega a 500) y multiplica el trabajo de la primera pintada.
 - Reuse / extend / new primitive: `reuse` — la afordancia se arma con primitives existentes; si se
   demostrara que no alcanza, se declara antes de crear una nueva.
-- Open risks: si TASK-1694 aterriza filtros server-side, la afordancia debe recontar sobre el
-  universo filtrado y no sobre el total crudo; queda anotado como coordinación, no como bloqueo.
+- Open risks: TASK-1694 aterriza **antes** (bloqueo duro declarado en el Delta 2026-08-15), así que
+  la afordancia nace contando sobre el universo filtrado y sobre keywords distintas — no sobre el
+  total crudo ni sobre procedencias. Ya no es coordinación opcional: es la línea base.
 
 ### Visual verification
 
@@ -436,15 +473,22 @@ Reglas obligatorias:
 
 ### Slice 3 — Cero código y cero copy sin consumidor
 
-- Decisión explícita sobre `keyword-discovery-query.ts`: cablear los filtros del canvas contra lo
-  que el reader sostiene hoy (`query`, `sourceEndpoint`, `intent`, `minSearchVolume`,
-  `excludeTracked`, `status`) **o** retirar el módulo y sus tests. La decisión se escribe en el
-  Design decision log de esta task; no se deja «para después».
-- Si se cablea: los filtros viajan por URL con la allowlist existente y el filtrado ocurre
-  **server-side**, porque filtrar en cliente sobre un cursor paginado mentiría sobre el universo
-  filtrado — y con eso `results.emptyFiltered` gana consumidor.
-- Si se retira: se borra el módulo y sus tests, y se elimina también el copy que sólo existía para
-  esos filtros.
+- 🔴 **Decisión ya tomada (Delta 2026-08-15): `keyword-discovery-query.ts` se CABLEA, no se retira.**
+  Con `TASK-1694` cerrada antes que esta task, el módulo tiene consumer legítimo: los filtros del
+  canvas contra lo que el reader sostiene (`query`, `sourceEndpoint`, `intent`, `minSearchVolume`,
+  `excludeTracked`, `status`) **más el filtro canónico de barrera de enlaces**
+  (`maxLinkBarrier` / `includeUnknownBarrier`) que `TASK-1694` agrega al contrato. El Slice ya no
+  evalúa alternativas: implementa, y registra la decisión heredada en el Design decision log.
+- Los filtros viajan por URL con la allowlist existente y el filtrado ocurre **server-side**, porque
+  filtrar en cliente sobre un cursor paginado mentiría sobre el universo filtrado — y con eso
+  `results.emptyFiltered` gana consumidor.
+- 🔴 **`maxDifficulty` no se cablea a la URL.** `TASK-1694` lo declara no-op y lo reporta en
+  `ignoredFilters`; ofrecerlo como control visible sería devolverle al operador exactamente la
+  decisión errada que ISSUE-152 documenta. Si un filtro llega por URL y el contrato lo ignoró, la
+  superficie lo dice con el copy de la lente, nunca lo pinta como aplicado.
+- La paginación recuenta sobre el **universo filtrado**, no sobre el total crudo: `totalCandidates`
+  ya cuenta keywords distintas tras `TASK-1694`, y el conteo visible debe seguir a los filtros
+  activos.
 - Barrido final de claves de copy sin consumidor en `GH_GROWTH_SEO_KEYWORDS.discovery`: cada una se
   cablea o se borra, con la razón en el commit.
 - Se agrega un test o gate que falle si el bloque de copy de la lente vuelve a acumular claves sin
@@ -551,7 +595,8 @@ fuentes de seed que resuelven sin costo pero cuya expansión sí cuesta.
 | Habilitar fuentes medidas multiplica el volumen de corridas y con él el gasto de expansión | finance / provider budget | medium | la banda de costo estima por fuente antes de confirmar y `enforceSeoRunEntitlement` sigue siendo el único autorizador | cupo del período consumido antes de tiempo; rebote `seo_budget_exhausted` |
 | Una fuente sin insumo degrada a `manual` en silencio y el operador cree que corrió lo que pidió | UI / SEO | low | preflight server-side de disponibilidad + rechazo tipado mostrado con prosa es-CL | corrida con `sourceKind` distinto al elegido |
 | `target_domain` enviado con métodos de expansión rebota el enqueue | UI | medium | los métodos se restringen en la propia UI según la fuente | `invalid_seed` con reason `target_domain_requires_keywords_for_site` |
-| Retirar `keyword-discovery-query.ts` justo cuando TASK-1694 lo necesitaría | UI | low | verificar el estado de TASK-1694 antes de decidir; la decisión queda escrita en el decision log | conflicto de merge o re-creación del módulo |
+| Empezar antes de que TASK-1694 cierre y paginar sobre una cardinalidad que va a cambiar (procedencias hoy, keywords después) | UI | medium | `Blocked by: TASK-1694` es bloqueo duro; el conteo y el paginador se construyen contra el universo colapsado, no contra el actual | `totalCandidates` que no coincide con las filas visibles tras el merge de 1694 |
+| Tres encodings distintos de la misma columna de mercado si 1691 y 1693 avanzan en paralelo | UI / copy | medium | serialización declarada `1694 → 1691 → 1693`; esta lente hereda el encoding de frescura de TASK-1691 en vez de definir el suyo | dos claves de copy distintas para la misma afirmación en `GH_GROWTH_SEO_KEYWORDS` |
 
 ### Feature flags / cutover
 
@@ -614,8 +659,14 @@ en el proveedor.
 - [ ] La banda de costo muestra una estimación en los modos que no usan seeds manuales.
 - [ ] Los rechazos tipados del primitive se muestran con prosa es-CL canónica, sin string crudo en
       inglés.
-- [ ] `keyword-discovery-query.ts` quedó cableado o retirado, con la decisión escrita en el Design
-      decision log; no quedó sin consumidor.
+- [ ] `keyword-discovery-query.ts` quedó **cableado** (la decisión heredada del Delta 2026-08-15; no
+      se retira) y sus filtros se aplican server-side, incluido `maxLinkBarrier`.
+- [ ] `maxDifficulty` no se ofrece como filtro visible; si llega por URL, la superficie declara que
+      el contrato lo ignoró en vez de pintarlo como aplicado.
+- [ ] El conteo visible y la afordancia de paginación cuentan sobre el universo **filtrado** y sobre
+      keywords distintas (cardinalidad de `TASK-1694`), no sobre procedencias ni sobre el total crudo.
+- [ ] `TASK-1694` está `complete` antes de tomar esta task, y la declaración de la lente `◑` de
+      `TASK-1691` ya está en la superficie: esta lente la reusa, no la redefine.
 - [ ] Ninguna clave de `GH_GROWTH_SEO_KEYWORDS.discovery` quedó sin consumidor, y existe un test o
       gate que lo sostiene.
 - [ ] Ninguna capability, entitlement, ruta, reader, command ni migración nueva fue creada.
@@ -674,5 +725,5 @@ en el proveedor.
   log propone acumulativa por el contrato del cursor; confirmar con el operador antes del JSX.
 - ¿`mixed` se ofrece en V1 o se deja para cuando las fuentes simples estén rodadas? Ofrecer cinco
   opciones de golpe puede volver el builder más difícil de leer que el problema que resuelve.
-- ¿El Slice 3 cablea los filtros o retira el módulo? Depende del estado de TASK-1694 al momento de
-  tomar esta task.
+- ~~¿El Slice 3 cablea los filtros o retira el módulo?~~ **Resuelta en el Delta 2026-08-15: se
+  cablea.** `TASK-1694` aterriza primero y le da el consumer que le faltaba.
