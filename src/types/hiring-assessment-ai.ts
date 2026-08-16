@@ -5,7 +5,10 @@
 export const AI_PROPOSAL_KINDS = ['question_draft', 'response_score', 'opening_public_copy'] as const
 export type AiProposalKind = (typeof AI_PROPOSAL_KINDS)[number]
 
-export const AI_PROPOSAL_STATUSES = ['proposed', 'confirmed', 'rejected'] as const
+// `superseded_by_manual` (TASK-1734, ADR D3): terminal explícito para proposals huérfanas
+// superadas por el carril manual directo (recordHumanScore sin confirm) — la reconciliación
+// las cierra por transición auditada, nunca por DELETE.
+export const AI_PROPOSAL_STATUSES = ['proposed', 'confirmed', 'rejected', 'superseded_by_manual'] as const
 export type AiProposalStatus = (typeof AI_PROPOSAL_STATUSES)[number]
 
 export const AI_PROPOSAL_DECISIONS = ['confirm', 'reject'] as const

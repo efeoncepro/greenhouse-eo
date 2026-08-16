@@ -7837,6 +7837,52 @@ export interface GreenhouseHiringHiringAssessmentAiProposal {
   usage_json: Generated<Json>;
 }
 
+export interface GreenhouseHiringHiringAssessmentAiScoringRun {
+  application_id: string;
+  assessment_id: string;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  input_digest: string;
+  lease_expires_at: Timestamp | null;
+  lease_owner: string | null;
+  model: string;
+  policy_version: string;
+  prompt_version: string;
+  run_id: Generated<string>;
+  status: Generated<string>;
+  status_reason: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHiringHiringAssessmentAiScoringRunEvent {
+  actor_user_id: string | null;
+  created_at: Generated<Timestamp>;
+  detail_json: Generated<Json>;
+  event_type: string;
+  from_status: string | null;
+  reason_code: string | null;
+  run_event_id: Generated<string>;
+  run_id: string;
+  run_item_id: string | null;
+  to_status: string | null;
+}
+
+export interface GreenhouseHiringHiringAssessmentAiScoringRunItem {
+  application_id: string;
+  assessment_id: string;
+  attempt_count: Generated<number>;
+  created_at: Generated<Timestamp>;
+  input_digest: string | null;
+  proposal_id: string | null;
+  reason_code: string | null;
+  response_id: string;
+  risk_class: string | null;
+  run_id: string;
+  run_item_id: Generated<string>;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseHiringHiringAssessmentResponse {
   answer_json: Generated<Json>;
   assessment_id: string;
@@ -12491,6 +12537,9 @@ export interface DB {
   "greenhouse_hiring.hiring_application_note": GreenhouseHiringHiringApplicationNote;
   "greenhouse_hiring.hiring_assessment": GreenhouseHiringHiringAssessment;
   "greenhouse_hiring.hiring_assessment_ai_proposal": GreenhouseHiringHiringAssessmentAiProposal;
+  "greenhouse_hiring.hiring_assessment_ai_scoring_run": GreenhouseHiringHiringAssessmentAiScoringRun;
+  "greenhouse_hiring.hiring_assessment_ai_scoring_run_event": GreenhouseHiringHiringAssessmentAiScoringRunEvent;
+  "greenhouse_hiring.hiring_assessment_ai_scoring_run_item": GreenhouseHiringHiringAssessmentAiScoringRunItem;
   "greenhouse_hiring.hiring_assessment_response": GreenhouseHiringHiringAssessmentResponse;
   "greenhouse_hiring.hiring_assessment_template": GreenhouseHiringHiringAssessmentTemplate;
   "greenhouse_hiring.hiring_assessment_template_module": GreenhouseHiringHiringAssessmentTemplateModule;

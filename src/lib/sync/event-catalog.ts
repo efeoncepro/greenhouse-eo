@@ -259,6 +259,10 @@ export const AGGREGATE_TYPES = {
   // TASK-1361 — Assessment AI Assist. Identity: proposal_id ('aip-{uuid}').
   hiringAssessmentAiProposal: 'hiring_assessment_ai_proposal',
 
+  // TASK-1734 — Assessment AI Scoring Run. Identity: run_id ('asrun-{uuid}').
+  // Un run activo por (assessment_id, input_digest); el digest usa el modelo EFECTIVO.
+  hiringAssessmentAiScoringRun: 'hiring_assessment_ai_scoring_run',
+
   // TASK-1365 — aggregate-only evidence snapshot. Raw self-ID never enters the outbox.
   assessmentFairnessEvidence: 'assessment_fairness_evidence'
 } as const
@@ -1173,6 +1177,13 @@ export const EVENT_TYPES = {
   // TASK-1361 — Assessment AI Assist. propose→confirm (audit/observabilidad, sin consumer reactivo V1).
   hiringAssessmentAiProposed: 'hiring.assessment.ai_proposed',
   hiringAssessmentAiConfirmed: 'hiring.assessment.ai_confirmed',
+
+  // TASK-1734 — Assessment AI Scoring Run (Slice 1). Payloads IDs-only (runId/assessmentId/
+  // applicationId/counts/reason codes), NUNCA texto de respuesta, score ni PII. Sin consumer
+  // reactivo en Slice 1 (el wiring del ops-worker es Slice 2; audit/observabilidad).
+  hiringAssessmentAiRunCreated: 'hiring.assessment.ai_run_created',
+  hiringAssessmentAiRunCancelled: 'hiring.assessment.ai_run_cancelled',
+  hiringAssessmentAiRunReconciled: 'hiring.assessment.ai_run_reconciled',
 
   // TASK-1365 — payload contains only aggregate report scope/evidence references.
   hiringAssessmentFairnessAdverseImpactDetected: 'hiring.assessment.fairness.adverse_impact_detected'
