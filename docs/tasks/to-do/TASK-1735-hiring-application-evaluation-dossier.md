@@ -11,7 +11,7 @@
 - Lifecycle: `to-do`
 - Priority: `P1`
 - Impact: `Alto`
-- Effort: `Medio`
+- Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `backend-data`
 - UI impact: `none`
@@ -31,13 +31,17 @@
 
 ## Summary
 
-Crea el **Expediente de Evaluación** per-application en Hiring: tabla append-only
-`greenhouse_hiring.hiring_application_note` con notas tipadas (`cv_analysis`,
-`assessment_review`, `interview_note`, `general`), autor y cuerpo markdown, más su contrato
-programático gobernado (`GET/POST /api/hiring/applications/[id]/notes`, command + reader
-canónicos, capability nueva, evento outbox). Los análisis de evaluación (CV vs assessment,
-notas de entrevista) dejan de vivir en chats efímeros y quedan persistidos, auditados y
-disponibles para entrevista y decisión.
+Crea el **Expediente de Evaluación SMART** per-application en Hiring, en dos capas de la
+misma task: (1) la foundation append-only `greenhouse_hiring.hiring_application_note` con
+notas tipadas (`cv_analysis`, `assessment_review`, `interview_note`, `general`), autor y
+cuerpo markdown, más su contrato programático gobernado (`GET/POST
+/api/hiring/applications/[id]/notes`); y (2) la **generación agéntica del análisis**: un
+command `propose` que ingiere el CV (proyección minimizada de TASK-1718), el assessment
+completo (scorecard, respuestas, rationale) y el journey del postulante (stages, intake,
+decisión), llama el LLM canónico (Anthropic `claude-sonnet-5` vía `generateStructuredAnthropic`)
+y produce un borrador de expediente que **solo un humano confirma** (`propose → confirm →
+execute`). El análisis CV-vs-assessment deja de vivir en chats efímeros y deja de armarse a
+mano: el agente lo redacta, el operador lo valida, y queda persistido y auditado.
 
 ## Why This Task Exists
 
@@ -59,8 +63,16 @@ el análisis previo.
   con evento outbox sin PII, consumible por UI, Nexa y MCP por construcción (Full API Parity).
 - API interna `GET/POST /api/hiring/applications/[id]/notes` gateada por capability, con
   contrato de errores canónico.
+- **Generación agéntica gobernada del expediente**: command `proposeEvaluationDossier` que
+  ensambla el packet (CV redactado vía proyección TASK-1718 + resultados/rationale del
+  assessment + journey de stages), genera el borrador con el cliente LLM canónico de
+  `src/lib/ai/` (Anthropic, default `claude-sonnet-5`, override por env var) y lo persiste
+  como propuesta; `confirmEvaluationDossier` humano lo materializa como nota `source='agent'`
+  con provenance completo (modelo efectivo, prompt version, input digest). El LLM nunca
+  escribe una nota directo.
 - Boundaries de privacidad declarados y verificados: internal-only, nunca candidate-facing,
-  nunca dentro del review packet MCP de TASK-1718, sin atributos demográficos.
+  nunca dentro del review packet MCP de TASK-1718, sin atributos demográficos; el packet al
+  provider es minimizado (sin contacto, sin identidad legal, sin self-ID).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -91,6 +103,15 @@ Reglas obligatorias:
   (rollup de TASK-1360) ni duplican el rationale del proposal ledger de TASK-1361 (si una
   nota nace de una sugerencia IA, referencia el `proposal_id` en `context_json`).
 - Errores API vía `canonicalErrorResponse`/`toHiringErrorResponse`; nada de prose en inglés.
+- **Reglas del carril LLM** (espejo de TASK-1361/1734): cliente canónico de `src/lib/ai/`
+  (NUNCA SDK propio en el dominio); el CV y las respuestas del candidato son texto NO
+  confiable (prompt injection → el output se descarta o degrada, nunca eleva confianza);
+  el packet al provider es allowlisted y minimizado (sin nombre/contacto/CV crudo/identidad/
+  self-ID demográfico); el borrador cita evidencia de sus fuentes y declara qué NO pudo
+  verificar; flag default-OFF registrado en el ledger; el digest de la propuesta captura el
+  modelo EFECTIVO resuelto, no el default.
+- El borrador agéntico es advisory puro: no rankea, no decide, no mueve stage, no envía
+  email, y jamás se materializa como nota sin confirmación humana explícita.
 
 ## Normative Docs
 
@@ -105,6 +126,14 @@ Reglas obligatorias:
 - Patrón seed de capability: `migrations/20260815175034133_task-1714-candidate-identity-reveal-capability.sql`
 - Patrón tabla append-only del dominio: `migrations/20260816084127971_task-1726-talent-pool-access-audit.sql` (trigger guard + grants) y `migrations/20260816123000000_task-1718-candidate-review-packet.sql`
 - Catálogo de eventos: `src/lib/sync/event-catalog.ts` (bloque hiring)
+- **Input de CV para la capa smart**: proyección minimizada/redactada de TASK-1718
+  (`src/lib/hiring/candidate-review/readers.ts` → `getCandidateReviewPacket` /
+  `candidate_document_review_projection`) — el agente NUNCA lee el PDF crudo del bucket
+- **Cliente LLM canónico**: `generateStructuredAnthropic` (`src/lib/ai/`, mismo helper que
+  TASK-1361) + patrón de config/flag/prompt-contract de
+  `src/lib/hiring/assessment/ai/config.ts`
+- Inputs de assessment/journey: readers existentes de `src/lib/hiring/assessment/**`
+  (scorecard, responses, competency results) + stage/decision history de la application
 
 ### Blocks / Impacts
 
@@ -119,13 +148,17 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `migrations/` (nueva migración TASK-1735)
+- `migrations/` (nuevas migraciones TASK-1735: tabla de notas + tabla de propuestas de dossier)
 - `src/lib/hiring/application-notes.ts` (nuevo) + `src/lib/hiring/index.ts` (delta export)
+- `src/lib/hiring/dossier-ai/` (nuevo: packet assembler, prompt contract, config/flag,
+  propose/confirm commands)
 - `src/app/api/hiring/applications/[id]/notes/route.ts` (nuevo)
-- `src/types/hiring.ts` (delta: tipos de nota)
+- `src/app/api/hiring/applications/[id]/dossier/route.ts` (nuevo: propose GET/POST + confirm)
+- `src/types/hiring.ts` (delta: tipos de nota + dossier)
 - `src/config/entitlements-catalog.ts` (delta: capability nueva)
 - `src/lib/entitlements/runtime.ts` (delta: grant)
-- `src/lib/sync/event-catalog.ts` (delta: evento nuevo)
+- `src/lib/sync/event-catalog.ts` (delta: eventos nuevos)
+- `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` (fila del flag nuevo)
 - `docs/documentation/hr/` (delta funcional) + `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (delta §Expediente)
 
 ## Current Repo State
@@ -152,6 +185,14 @@ Reglas obligatorias:
   sintético sin persistencia — superficie natural del futuro consumer UI.
 - Review packet agent-safe TASK-1718: `src/lib/hiring/candidate-review/` + lane
   `src/app/api/platform/app/hiring/.../review-packet/route.ts` (excluye notas internas).
+  Su proyección `candidate_document_review_projection` entrega el TEXTO del CV ya extraído,
+  minimizado y redactado — el input exacto que la capa smart necesita, sin tocar el PDF.
+- Stack LLM del dominio ya probado: `generateStructuredAnthropic` + patrón
+  config/flag/prompt-contract/sanitizer de `src/lib/hiring/assessment/ai/`
+  (`config.ts`, `contracts.ts`, `prompt.ts`, `providers.ts`) — TASK-1361; default
+  `claude-sonnet-5` con override por env var. La capa dossier replica ese patrón, no lo bifurca.
+- Ledger de propuestas IA como patrón de referencia: `hiring_assessment_ai_proposal`
+  (proposed_json + provider/model/prompt_version/input_digest + status terminal-once).
 - Copy dictionaries del dominio: `src/lib/copy/dictionaries/es-CL/{hiringDesk,hiringAssessment}.ts`.
 
 ### Gap
@@ -165,7 +206,7 @@ Reglas obligatorias:
 - Topology impact: `portal`
 - Current home: `src/lib/hiring/** + src/app/api/hiring/** (runtime portal Vercel)`
 - Future candidate home: `domain-package`
-- Boundary: `command recordHiringApplicationNote + reader listHiringApplicationNotes; consumers autorizados: API interna hiring, futura UI Application 360 y lane MCP gobernado`
+- Boundary: `commands recordHiringApplicationNote + proposeEvaluationDossier + confirmEvaluationDossier, reader listHiringApplicationNotes; consumers autorizados: API interna hiring, futura UI Application 360 y lane MCP gobernado`
 - Server/browser split: `dominio y stores server-only ('server-only' en src/lib/hiring); el browser consume la API route`
 - Build impact: `none`
 - Extraction blocker: `transaccion PG compartida con hiring_application y outbox en la misma tx`
@@ -182,10 +223,10 @@ Reglas obligatorias:
 
 ### Contract surface
 
-- Contrato existente a respetar: `src/app/api/hiring/applications/[id]/route.ts` (auth/capability/error pattern) + `src/lib/hiring/error-response.ts`
-- Contrato nuevo o modificado: `GET/POST /api/hiring/applications/[id]/notes` + command `recordHiringApplicationNote` + reader `listHiringApplicationNotes` + evento `hiring.application.note_recorded`
+- Contrato existente a respetar: `src/app/api/hiring/applications/[id]/route.ts` (auth/capability/error pattern) + `src/lib/hiring/error-response.ts` + readers de TASK-1718 (CV projection) y `src/lib/hiring/assessment/**`
+- Contrato nuevo o modificado: `GET/POST /api/hiring/applications/[id]/notes` + command `recordHiringApplicationNote` + reader `listHiringApplicationNotes` + evento `hiring.application.note_recorded`; **capa smart**: commands `proposeEvaluationDossier`/`confirmEvaluationDossier` + tabla `hiring_application_dossier_proposal` + `GET/POST /api/hiring/applications/[id]/dossier` + eventos `hiring.application.dossier_proposed|dossier_confirmed`
 - Backward compatibility: `compatible` (aditivo; el campo escalar `notes` de TASK-353 no se toca)
-- Full API parity: `la lógica vive en src/lib/hiring/application-notes.ts; la ruta API es un consumer delgado; la futura UI y el lane MCP consumen el mismo primitive`
+- Full API parity: `la lógica vive en src/lib/hiring/application-notes.ts y src/lib/hiring/dossier-ai/; las rutas API son consumers delgados; la futura UI, Nexa y el lane MCP consumen los mismos primitives — el flujo agéntico ES el propose→confirm→execute del governed action runtime, no una integración Nexa-específica`
 
 ### Data model and invariants
 
@@ -204,24 +245,24 @@ Reglas obligatorias:
 
 ### Migration, backfill and rollout
 
-- Migration posture: `additive` (una tabla nueva + seed de capability; sin backfill)
-- Default state: `enabled con rationale: superficie interna gateada por capability; sin flag porque es aditiva y sin consumers previos`
-- Backfill plan: `none — tabla nace vacía`
-- Rollback path: `revert PR + down migration (DROP TABLE + deprecate capability)`
-- External coordination: `none — repo + Cloud SQL únicamente`
+- Migration posture: `additive` (dos tablas nuevas + seed de capability; sin backfill)
+- Default state: `notas: enabled (superficie interna capability-gated, aditiva). Capa smart: flag HIRING_EVALUATION_DOSSIER_AI_ENABLED default OFF, Vercel-only (el propose corre en request; sin consumer async en V1), fila en el ledger en el mismo PR`
+- Backfill plan: `none — tablas nacen vacías`
+- Rollback path: `capa smart: flag OFF (las propuestas quedan en el ledger, sin efecto). Foundation: revert PR + down migration (DROP TABLE + deprecate capability)`
+- External coordination: `flag en Vercel (staging + production) al momento del flip; sin secrets nuevos (reusa greenhouse-anthropic vía src/lib/ai); sin providers nuevos`
 
 ### Security and access
 
-- Auth/access gate: `lectura: capability hiring.application.read; escritura: capability nueva hiring.application.annotate (execute) granteada en el mismo PR al tier gobernanza (EFEONCE_ADMIN, HR_MANAGER, EFEONCE_OPERATIONS)`
-- Sensitive data posture: `las notas son datos personales de evaluación del candidato: internal-only, sin demográficos, sin exposición pública ni MCP; sin valores de identidad legal`
-- Error contract: `canonicalErrorResponse + toHiringErrorResponse; HiringValidationError con codes estables; captureWithDomain para fallas`
-- Abuse/rate-limit posture: `sin rate limit dedicado — superficie interna capability-gated de bajo volumen; CHECK de longitud acota el payload`
+- Auth/access gate: `lectura: capability hiring.application.read; escritura de notas Y propose/confirm del dossier: capability nueva hiring.application.annotate (execute) granteada en el mismo PR al tier gobernanza (EFEONCE_ADMIN, HR_MANAGER, EFEONCE_OPERATIONS); el propose además exige flag ON`
+- Sensitive data posture: `las notas son datos personales de evaluación del candidato: internal-only, sin demográficos, sin exposición pública ni MCP; sin valores de identidad legal. El packet al provider LLM es allowlisted y minimizado: texto redactado del CV (proyección 1718), respuestas/rúbricas/scores del assessment y journey de stages — NUNCA nombre completo/contacto/identidad legal/self-ID; el texto del candidato se trata como no confiable (prompt injection)`
+- Error contract: `canonicalErrorResponse + toHiringErrorResponse; HiringValidationError con codes estables; captureWithDomain para fallas; errores del provider nunca exponen payload crudo`
+- Abuse/rate-limit posture: `notas: sin rate limit dedicado (superficie interna capability-gated, CHECK de longitud). Dossier propose: bounded — un propose activo por application+input digest (idempotente), timeout de provider, retry acotado, costo por llamada observable`
 
 ### Runtime evidence
 
-- Local checks: `vitest focal de application-notes (command/reader/validaciones) + capability-grant-coverage.test.ts verde`
-- DB/runtime checks: `bloque DO anti pre-up-marker en la migración + SELECT post-migrate contra information_schema + pnpm db:generate-types`
-- Integration checks: `pnpm staging:request POST /api/hiring/applications/<id>/notes + GET de vuelta con la persona agente superadmin`
+- Local checks: `vitest focal de application-notes y dossier-ai (packet allowlist, sanitizer, idempotencia por digest, confirm terminal-once, prompt-injection sintético) + capability-grant-coverage.test.ts verde`
+- DB/runtime checks: `bloques DO anti pre-up-marker en ambas migraciones + SELECT post-migrate contra information_schema + pnpm db:generate-types`
+- Integration checks: `pnpm staging:request POST /api/hiring/applications/<id>/notes + GET de vuelta; propose/confirm de dossier sobre application sintética con flag ON en staging (provider smoke real acotado)`
 - Reliability signals/logs: `sin signal nuevo — el evento outbox queda observable vía sync.outbox.* existentes; rationale: superficie interna sin SLA propio`
 - Production verification sequence: `ver Rollout Plan`
 
@@ -293,7 +334,43 @@ Reglas obligatorias:
 - Test del route handler + verificación de que el review packet de TASK-1718 sigue sin
   exponer notas (su test de allowlist permanece verde sin modificación).
 
-### Slice 4 — Documentación y cierre
+### Slice 4 — Smart dossier: propuesta agéntica (packet + LLM + ledger)
+
+- Migración segunda tabla `greenhouse_hiring.hiring_application_dossier_proposal` (espejo del
+  patrón TASK-1361: `proposal_id` `'hdsp-'`, `application_id` FK, `proposed_json`,
+  `provider`, `model` (efectivo resuelto), `prompt_version`, `input_digest`, `status`
+  CHECK `('proposed','confirmed','rejected')` terminal-once, `decision_note`, `confirmed_by/at`).
+- `src/lib/hiring/dossier-ai/packet.ts`: assembler que reúne (a) texto redactado del CV desde
+  la proyección TASK-1718 (si `status != 'ready'` → propose falla honesto con code estable),
+  (b) assessment: competency results, respuestas con scores efectivos y rationale IA
+  existente (referenciado por id), (c) journey: stages con timestamps, fuente, intake events
+  y decisión si existe. Allowlist explícita; sin contacto/identidad/self-ID.
+- `src/lib/hiring/dossier-ai/generate.ts`: prompt contract `hiring_evaluation_dossier.v1` +
+  llamada vía `generateStructuredAnthropic` (default `claude-sonnet-5`, override env
+  `HIRING_DOSSIER_AI_MODEL`); output estructurado: resumen ejecutivo, coherencias
+  CV↔assessment con evidencia citada, gaps/red flags con evidencia, focos de entrevista
+  sugeridos, y sección explícita "no verificable con las fuentes". Sanitizer estricto.
+- Command `proposeEvaluationDossier(applicationId, actorUserId)`: flag-gated + capability
+  `hiring.application.annotate`; idempotente por `applicationId + input_digest` (mismo
+  estado de fuentes → misma propuesta, sin segunda llamada al provider); persiste propuesta
+  + outbox `hiring.application.dossier_proposed` (IDs only).
+
+### Slice 5 — Smart dossier: confirmación humana + API
+
+- Command `confirmEvaluationDossier(proposalId, decision, editedBodyMd?, decisionNote?)`:
+  atómico — marca la propuesta `confirmed|rejected` (terminal-once, FOR UPDATE) y, si
+  confirma, materializa la nota vía `recordHiringApplicationNote` con `source='agent'`,
+  `kind` derivado del contenido (`cv_analysis`/`assessment_review`) y
+  `context_json.{dossierProposalId, inputDigest, model, promptVersion}` en la MISMA tx.
+  El humano puede editar el cuerpo antes de confirmar (el editado es lo que se persiste;
+  la propuesta original queda inmutable en el ledger).
+- `GET/POST /api/hiring/applications/[id]/dossier`: POST propose, GET estado/propuesta
+  vigente, POST confirm/reject — mismo patrón auth/error que notes.
+- Tests: propose idempotente (digest), stale digest fuerza nueva propuesta, confirm
+  terminal-once, packet sin campos prohibidos (test de allowlist del provider packet),
+  prompt-injection en CV sintético → output degradado/rechazado, flag OFF → 409 estable.
+
+### Slice 6 — Documentación y cierre
 
 - Delta §Expediente de Evaluación en `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`;
   delta funcional en `docs/documentation/hr/`; nota de manual breve (cómo registrar/leer
@@ -303,15 +380,19 @@ Reglas obligatorias:
 
 ## Out of Scope
 
-- La UI del expediente (tab/sección en Application 360) — task consumer `ui-ux` follow-up
-  con su wireframe robusto y dirección de diseño.
+- La UI del expediente (tab/sección en Application 360, incluida la superficie de revisar/
+  confirmar el borrador agéntico) — task consumer `ui-ux` follow-up con su wireframe robusto;
+  mientras tanto el flujo opera por API (`staging:request`/Nexa/MCP futuro).
 - Exponer notas en el review packet MCP de TASK-1718 o en cualquier lane
   `api/platform/app|ecosystem` — decisión futura con audit content-free propio.
 - Edición o borrado de notas (append-only; corrección = nota nueva).
-- Cualquier superficie candidate-facing, email o notificación derivada de notas.
+- Cualquier superficie candidate-facing, email o notificación derivada de notas o del dossier.
 - Migrar o deprecar el campo escalar `hiring_application.notes` de TASK-353.
-- Generación automática de notas por IA (el command acepta `source='agent'`, pero el flujo
-  agéntico gobernado es follow-up).
+- Auto-confirmación del borrador agéntico o cualquier bypass del confirm humano; scoring de
+  respuestas (dueño: TASK-1361/1734 — el dossier LEE scores, jamás los produce); trigger
+  automático del propose por evento (V1 es on-demand por operador; el enqueue reactivo
+  post-assessment es follow-up).
+- Leer el PDF crudo del CV desde el bucket (el input es la proyección redactada de TASK-1718).
 
 ## Detailed Spec
 
@@ -349,9 +430,14 @@ Relación con superficies vecinas (sinergias EPIC-011):
 
 ### Slice ordering hard rule
 
-- Slice 1 (migración + capability) → Slice 2 (primitive + evento) → Slice 3 (API) → Slice 4 (docs/cierre).
+- Slice 1 (migración + capability) → Slice 2 (primitive + evento) → Slice 3 (API notes) →
+  Slice 4 (dossier propose) → Slice 5 (dossier confirm + API) → Slice 6 (docs/cierre).
 - Slice 3 no puede mergearse sin el coverage test de capability verde de Slice 1 (una ruta
   gateada por capability sin grant es una ruta muerta).
+- Slice 4/5 no pueden mergearse sin Slice 2 (el confirm materializa vía
+  `recordHiringApplicationNote`; sin el primitive de notas no hay execute).
+- El flag del dossier permanece OFF hasta que los tests de packet-allowlist y
+  prompt-injection de Slice 5 estén verdes.
 
 ### Risk matrix
 
@@ -362,12 +448,22 @@ Relación con superficies vecinas (sinergias EPIC-011):
 | Capability sin grant (ruta muerta) o grant demasiado amplio | identity | low | `capability-grant-coverage.test.ts` + grant tier gobernanza explícito en el PR | test rojo en CI |
 | Nota `interview_note` debilita anti-anclaje del scorecard | UI | medium | Notas no renderizan ratings ajenos; Open Question para el consumer UI antes de exponer notas cross-evaluador pre-submit | no signal — gate documental en la task UI |
 | Migración registrada sin ejecutar (pre-up-marker bug) | migration | low | Bloque DO con RAISE EXCEPTION + SELECT post-migrate | migración falla loud en apply |
+| PII del candidato en el packet al provider (nombre/contacto/identidad/self-ID) | AI / privacy | medium | Packet allowlisted desde la proyección redactada 1718 + test de campos prohibidos + errores provider sin payload crudo | test de allowlist rojo |
+| Prompt injection en el CV manipula el borrador | AI | medium | CV = texto no confiable; sanitizer estricto del output; suite adversarial sintética; humano confirma SIEMPRE | output degradado/rechazado observable en el ledger |
+| Borrador con afirmaciones no soportadas (alucinación sobre el candidato) | hiring / derechos | high | Output exige evidencia citada por afirmación + sección "no verificable"; el humano edita antes de confirmar; propuesta original inmutable en el ledger para auditar drift | delta edición-humana alto (propuesta vs nota confirmada) |
+| Doble llamada al provider por reintento (costo) | provider | low | Idempotencia por `applicationId + input_digest`; propose activo único | segunda fila `proposed` mismo digest |
 
 ### Feature flags / cutover
 
-Sin flag — additive, immediate cutover: tabla nueva sin consumers previos, superficie
-interna gateada por capability. El "flag" efectivo es el grant de la capability
-`hiring.application.annotate` (revocable vía entitlements governance sin deploy).
+- Foundation de notas: sin flag — additive, immediate cutover; el "flag" efectivo es el
+  grant de la capability `hiring.application.annotate` (revocable vía entitlements
+  governance sin deploy).
+- Capa smart: `HIRING_EVALUATION_DOSSIER_AI_ENABLED` default **OFF**, Vercel-only (staging +
+  production; sin lectura en workers en V1), registrada en
+  `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` en el mismo PR que la declara. OFF → el
+  propose retorna 409 estable; notas manuales y confirm de propuestas existentes siguen
+  operables. Modelo por `HIRING_DOSSIER_AI_MODEL` (default `claude-sonnet-5`); el digest
+  captura el modelo efectivo.
 
 ### Rollback plan per slice
 
@@ -376,7 +472,9 @@ interna gateada por capability. El "flag" efectivo es el grant de la capability
 | Slice 1 | `pnpm migrate:down` (DROP TABLE) + revert PR + deprecate capability en registry | <15 min | si |
 | Slice 2 | revert PR (primitive sin consumers aún) | <10 min | si |
 | Slice 3 | revert PR (ruta aditiva gateada) | <10 min | si |
-| Slice 4 | revert de docs | <5 min | si |
+| Slice 4 | flag OFF (propuestas quedan inertes en el ledger) + revert PR si aplica | <10 min | si |
+| Slice 5 | flag OFF + revert PR; notas ya confirmadas permanecen (append-only, decisión humana registrada) | <10 min | si (propuestas), notas confirmadas se preservan por diseño |
+| Slice 6 | revert de docs | <5 min | si |
 
 ### Production verification sequence
 
@@ -387,9 +485,15 @@ interna gateada por capability. El "flag" efectivo es el grant de la capability
    directo por SQL (sesión ops) → rechazado por trigger.
 3. Verificar con la persona `agent-collaborator` (sin capability) → 403 canónico.
 4. Verificar que `GET /api/platform/app/hiring/applications/[id]/review-packet` NO incluye
-   notas (allowlist TASK-1718 intacta).
-5. Promoción a producción vía release control plane; repetir smoke 2-4 en prod con una
-   application de prueba.
+   notas ni propuestas de dossier (allowlist TASK-1718 intacta).
+5. Capa smart en staging: flag ON en staging → `POST .../dossier` (propose) sobre una
+   application sintética con CV y assessment reales de prueba → inspeccionar el borrador
+   (evidencia citada, sección no-verificable, cero campos prohibidos en el packet loggeado
+   de test) → confirm con edición → la nota `source='agent'` aparece en `GET .../notes` con
+   provenance completo. Repetir propose → verifica idempotencia (mismo digest, sin segunda
+   llamada al provider).
+6. Promoción a producción vía release control plane; flag prod OFF inicialmente; repetir
+   smoke 2-5 en prod con una application de prueba antes de prender el flag prod.
 
 ### Out-of-band coordination required
 
@@ -411,7 +515,12 @@ sin providers externos, sin coordinación de operadores más allá del manual nu
 - [ ] `POST /api/hiring/applications/[id]/notes` retorna 403 canónico sin capability, 400 canónico con body inválido, 200 con nota creada; `GET` lista ordenada `created_at DESC`.
 - [ ] El review packet de TASK-1718 sigue sin exponer notas (test de allowlist verde sin modificación).
 - [ ] Smoke staging ejecutado con evidencia (`staging:request` POST + GET + 403 de persona sin capability).
-- [ ] Documentación triple proporcional actualizada (delta arquitectura + funcional + manual).
+- [ ] `proposeEvaluationDossier` genera un borrador estructurado desde CV redactado (proyección 1718) + assessment + journey, con evidencia citada y sección "no verificable"; el packet al provider pasa el test de campos prohibidos (sin nombre/contacto/identidad/self-ID).
+- [ ] El propose es idempotente por `applicationId + input_digest` (mismo estado de fuentes = cero llamadas adicionales al provider) y un cambio en las fuentes invalida el digest.
+- [ ] Ningún borrador se materializa como nota sin `confirmEvaluationDossier` humano (terminal-once); la nota confirmada lleva `source='agent'` + `context_json` con proposalId/digest/modelo efectivo/prompt version, y la propuesta original queda inmutable.
+- [ ] Suite adversarial mínima verde: prompt injection en CV sintético produce output degradado/rechazado, nunca un borrador confiado; flag OFF produce 409 estable y deja operables notas manuales y confirms pendientes.
+- [ ] `HIRING_EVALUATION_DOSSIER_AI_ENABLED` registrado en el Feature Flag State Ledger con runtime ownership (Vercel-only) en el mismo PR.
+- [ ] Documentación triple proporcional actualizada (delta arquitectura + funcional + manual, incluido cómo operar propose/confirm por API).
 
 ## Verification
 
@@ -434,12 +543,29 @@ sin providers externos, sin coordinación de operadores más allá del manual nu
 
 ## Follow-ups
 
-- Task consumer `ui-ux`: tab/sección "Expediente" en Application 360 (wireframe robusto +
-  dirección de diseño + GVC; el tab `activity` sintético existente es el punto de anclaje).
+- Task consumer `ui-ux`: tab/sección "Expediente" en Application 360 con la superficie de
+  revisar/editar/confirmar el borrador agéntico (wireframe robusto + dirección de diseño +
+  GVC; el tab `activity` sintético existente es el punto de anclaje).
+- Trigger reactivo del propose (encolar borrador automáticamente al `hiring.assessment.scored`
+  vía outbox/ops-worker) — V1 es on-demand; el enqueue async hereda el patrón de TASK-1734 y
+  se coordina con su run aggregate.
 - Decisión gobernada sobre exponer notas read-only en lane `api/platform/app`/MCP con audit
   content-free (hoy excluido por diseño).
-- Flujo agéntico `propose → confirm → execute` para notas generadas por Nexa/agentes
-  (`source='agent'` ya soportado por el command).
+- Métrica de calidad del borrador: medir el delta de edición humana (propuesta vs nota
+  confirmada) como señal de drift del prompt/modelo.
+
+## Delta 2026-08-16 (2) — re-scope CEO: el expediente nace SMART
+
+Por directiva del CEO (2026-08-16, sesión de operador): la generación agéntica del análisis
+**entra al alcance de esta task** — deja de ser follow-up. El agente ingiere CV (proyección
+redactada TASK-1718) + assessment completo + journey del postulante y arma el borrador; la
+validación es humana (`propose → confirm → execute`), el LLM nunca escribe la nota directo.
+Motor: cliente canónico de `src/lib/ai/` (`generateStructuredAnthropic`), modelo default
+**`claude-sonnet-5`** con override `HIRING_DOSSIER_AI_MODEL`; flag
+`HIRING_EVALUATION_DOSSIER_AI_ENABLED` default OFF. Effort sube de `Medio` a `Alto`;
+se agregaron Slices 4-5 (propose/confirm), tabla `hiring_application_dossier_proposal`,
+riesgos AI en la matriz y criterios de aceptación de la capa smart. Caso fuente: el análisis
+CV-vs-assessment de EO-APP-0078 hecho a mano en esta misma sesión.
 
 ## Delta 2026-08-16
 
