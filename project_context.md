@@ -157,12 +157,14 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   El Banco de Talento person-first (`TASK-1723`–`TASK-1726`) está operativo en producción interna: projection,
   búsqueda/Desk del operador, App API y los readers MCP `hiring.talent_pool.search`/`.profile.get` comparten policy,
   capability, purpose/audit y DTO allowlisted. La cohorte tiene 52 memberships (50 `active_process`, 2
-  `needs_reconsent`) sin consentimiento futuro inventado; invite y self-service externos siguen OFF hasta aprobación
-  Privacy/People. Canary OAuth real: allow search/profile `200`, deny con cliente base-only `403`. `TASK-1718` está
-  desplegada en producción por release `6b78b040252d` y continúa en rollout controlado con
-  reader/proyección/provider de CV OFF, sin backfill ni lectura real; `TASK-1719`–`TASK-1722`
-  permanecen `to-do`. Talent Assurance (`EPIC-038`, `TASK-1602`–`TASK-1611`) permanece en fase de
-  decisión/discovery mientras sus ADR y contratos base sigan `Proposed`.
+  `needs_reconsent`) sin consentimiento futuro inventado. Invite y self-service están habilitados detrás de flags
+  independientes desde el 2026-08-16 por autorización operativa del CEO; el contacto futuro sigue requiriendo
+  consentimiento explícito, tokenizado, vigente y reversible, y no hay backfill ni outreach automático. Canary OAuth
+  real: allow search/profile `200`, deny con cliente base-only `403`. `TASK-1718` está desplegada en producción por
+  release `6b78b040252d` pero continúa en rollout controlado: reader/proyección/provider de CV OFF, sin backfill ni
+  lectura de CV real. `TASK-1719`–`TASK-1722` permanecen `to-do` (asignación de tests, selección y writes MCP no
+  están activos). Talent Assurance (`EPIC-038`, `TASK-1602`–`TASK-1611`) permanece en fase de decisión/discovery
+  mientras sus ADR y contratos base sigan `Proposed`.
 - La dirección aceptada para autoservicio candidato es **una cuenta y un `/my` longitudinal** (`TASK-1727`–`TASK-1733`,
   EPIC-011): mismo `identity_profile_id` y principal/login; `candidate_facet` y `member` son facetas aditivas;
   perfil profesional person-scoped; CV/respuestas/expectativa conservan snapshot por aplicación; activation suma

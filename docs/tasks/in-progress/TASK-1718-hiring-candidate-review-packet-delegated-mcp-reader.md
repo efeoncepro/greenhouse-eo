@@ -655,14 +655,15 @@ Evidencia local 2026-08-16:
 - tests focales de provider/auth/discovery en `../efeonce-mcp`
 - `pnpm worker:build-contract-gate`
 - `pnpm worker:runtime-deps-gate`
-- migration smoke + grants/access negatives con rol runtime real
+- smoke de migración ya aplicada + grants/access negatives con rol runtime real
 - MCP initialize/list/call allow/deny/fault desde dos hosts reales
 - `pnpm docs:closure-check`
 - `pnpm docs:context-check:strict` como último gate documental
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] `Lifecycle` del markdown queda sincronizado con el estado real (`in-progress` durante implementación; rollout real de
+  CV/provider permanece OFF hasta los gates documentados)
 - [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes

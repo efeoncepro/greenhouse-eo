@@ -166,6 +166,18 @@ The `Documentos` tab of Application 360 is now backed by a real reader, and reve
 
 Docs: architecture `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-15 (the 8 full invariants) · functional `docs/documentation/hr/documentos-de-candidatos.md` · manual `docs/manual-de-uso/hr/ver-documentos-de-un-candidato.md` · runtime detail in `references/greenhouse-runtime.md` §Candidate documents.
 
+## Talent Pool operating status (TASK-1723–1726 — production 2026-08-16)
+
+The Banco de Talento is operational, but it is purpose- and consent-scoped. The operator desk and the read-only MCP
+provider can search structured, job-related evidence; they never expose contact data, raw CVs or notes and never rank,
+invite, move stages or assign assessments. Public self-service and operator invitation are enabled behind independent
+flags. A candidate's optional `future_opportunities` checkbox only starts the tokenized confirmation flow; it does not
+grant future contact until the candidate confirms. Invitation requires a valid current grant, an exact opening and
+human confirmation, and does not itself send a message, move a stage or assign a test. Existing process consent is
+never upgraded by backfill; withdrawal wins. Exact CV review for delegated agents remains the separate `TASK-1718`
+contract and is still OFF in production pending its named-owner approvals and synthetic canary. Read the full runtime
+binding, evidence and rollback facts in `references/greenhouse-runtime.md` §Talent Pool / Banco de Talento.
+
 ## First reads (before acting inside Greenhouse)
 
 - `CLAUDE.md`, `AGENTS.md`, `project_context.md`, `Handoff.md`

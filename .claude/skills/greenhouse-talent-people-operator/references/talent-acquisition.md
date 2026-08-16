@@ -42,7 +42,7 @@ delight (candidate experience → referrals + brand)
 
 - **Employer brand is GTM for talent.** Authentic content (real team, real work, real values) beats corporate-speak — especially for Gen Z, who distrust it (see `generations-trends-2026.md`).
 - **Candidate experience is a differentiator** in a candidate-driven market: transparent, respectful, fast journeys raise offer-acceptance and protect the brand ([AMS 2026](https://www.weareams.com/knowledge-base/what-are-the-top-talent-acquisition-trends-in-2026/)). Ghosting candidates is brand damage.
-- **Talent pool**: keep warm relationships with silver-medalists and inbound interest even when no role is open. In Greenhouse this maps to `candidate_facet` on a Person + a future Talent Pool surface.
+- **Talent pool**: keep warm relationships with silver-medalists and inbound interest even when no role is open. In Greenhouse this maps to `candidate_facet` on a Person plus a governed `talent_pool_membership`; the operator desk, tokenized candidate self-service and consent-gated invitation flow are live in production (TASK-1723–1726). Never infer future-contact consent from current-application consent.
 - **Careers surface** = the Greenhouse public careers landing (TASK-354). Same tokenized/public pattern serves the assessment (TASK-1363).
 
 ### Public vacancy recipe (offer as inbound asset)

@@ -105,6 +105,13 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   headers and strict allowlisted DTOs. Production allow search/profile `200` and base-only deny `403` passed on
   2026-08-16. Application 360/CV, assessment tokens and every Hiring write remain outside this provider and keep
   the independent `TASK-1718`–`TASK-1722` / `TASK-1631` gates.
+- The related Greenhouse public consent flow and operator invitation flow are enabled independently in production
+  (`HIRING_TALENT_POOL_SELF_SERVICE_ENABLED=true`, `HIRING_TALENT_POOL_INVITE_ENABLED=true`). They are not MCP
+  writes: future-opportunity consent requires the candidate's tokenized confirmation, and invitation is a human-
+  confirmed, exact-opening command that never advances a stage or assigns an assessment on its own. The MCP provider
+  remains read-only and must not be expanded to expose CV/contact data or execute invitation, assessment or selection
+  actions. Activation evidence: orchestrator `31953851353` released, Vercel deployment
+  `dpl_CTxG3tx66S159tazMSyNiGSmqzHJ` READY, `ops-worker-00563-ghv` Ready, and watchdog `ok`/`drift_count=0`.
 - Do not call a product deployment successful because its MCP adapter compiled. Require provider allow/deny/fault
   evidence and a public gateway smoke.
 - Keep the Codex and Claude bundles byte-identical. Update both in the same change and verify the diff.

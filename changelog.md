@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-16 — Sincronización documental y de skills del Talent Pool
+
+Después del rollout productivo se auditó todo el contrato construido en la sesión: arquitectura Hiring, API reference,
+manual operativo, EPIC-011/038, TASK-1718/1723/1724/1725, ledgers de flags/releases, `project_context` y README/registry.
+Las skills espejo `.codex`/`.claude` de Talent, MCP y release quedaron alineadas con el runtime real. Se preservaron los
+límites: CV/review por MCP y automatización de tests continúan OFF; invite/self-service sólo operan mediante consentimiento
+explícito, confirmación tokenizada y rollback por flags. Sin cambios de código ni schema en este barrido.
+
 ## 2026-08-16 — Talent Pool self-service e invitación gobernada habilitados en producción
 
 Por autorización explícita del CEO, los flags `HIRING_TALENT_POOL_SELF_SERVICE_ENABLED` y
@@ -1220,28 +1228,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   `docs/manual-de-uso/growth/operar-captura-rankings-seo.md`).
 - Parity MCP-first: tool `get_seo_rank_evolution` + lane
   `/api/platform/ecosystem/growth/seo/rank-evolution` en el mismo PR (patrón TASK-1645).
-
-## 2026-08-06 — Efeonce deja de ser cliente de sí misma: rol comercial corregido
-
-- **`EO-ORG-0007` (la entidad legal operadora) tenía `organization_type='client'`**, herencia del
-  space de cliente de marzo 2026. La exponía en 5 readers que filtran `IN ('client','both')` sin
-  consultar `is_operating_entity` — salía primera de 17 en `/finance/clients` — y
-  `resolveFinanceClientContext` la aceptaba como cliente facturable, con la misma org como emisor
-  fiscal. Daño consumado: 0 income, 0 contratos, 0 usuarios de portal.
-- **Nueva puerta canónica `scripts/commercial/reset-organization-commercial-role.ts`**: baja el rol
-  a `'other'` vía `upsertCanonicalOrganization`, nunca SQL directo. Existe porque
-  `deriveOrganizationType` es **monótona** (nunca degrada un rol adquirido), así que ninguna
-  llamada normal puede bajar el tipo; el script declara `currentType='other'` explícitamente y
-  aborta si el lifecycle implica rol real o si hay income. `remediate-half-baked-orgs.ts` no
-  servía: sólo cubre el drift contrario.
-- **Verificado tras el cambio**: `is_operating_entity` y los 2 `module_assignments` intactos, y el
-  canary SEO contra producción sigue dando `hasModule=true tier=contracted`. El dogfooding no
-  dependía del tipo.
-- **Contrato semántico escrito** en `GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md` §Organization
-  Types: `organization_type` es un **rol comercial**, `'other'` significa **sin rol comercial**
-  (no "sin clasificar"), los tres ejes son ortogonales (identidad legal / rol comercial /
-  capabilities), y **NUNCA** se agrega un valor de identidad al enum — ya se intentó y quedó una
-  rama muerta contra `'efeonce_internal'`, que es un `tenant_type` de usuarios.
-- **Follow-ups creados**: `TASK-1648` (guard por flag en los 5 readers), `TASK-1649` (el `space` y
-  `client_profile` heredados, con inventario antes de tocar), `TASK-1650` (emisor legal de
-  cotizaciones compartidas: query a columnas inexistentes tapada por un `catch` mudo).

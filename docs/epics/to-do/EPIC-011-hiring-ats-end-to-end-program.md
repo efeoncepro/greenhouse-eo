@@ -262,7 +262,7 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - [ ] `TASK-770` delivered selected candidate -> collaborator active closure for `internal_hire`.
 - [ ] People 360 shows the journey from candidate/application to member/onboarding/active without duplicate identities.
 - [ ] Event catalog, architecture docs, functional docs and user manuals are updated where behavior changed.
-- [ ] `TASK-1723`–`TASK-1726` entregan Talent Pool person-first, consentimiento/withdrawal, Desk y MCP read-only con
+- [x] `TASK-1723`–`TASK-1726` entregan Talent Pool person-first, consentimiento/withdrawal, Desk y MCP read-only con
       Full API Parity, sin duplicar identidad, policy, documentos ni lógica entre consumers.
 - [ ] `TASK-1727`–`TASK-1730` entregan cuenta candidata, perfil profesional person-scoped, application self-service y
       `/my` longitudinal sin abrir superficies workforce ni copiar datos al contratar.

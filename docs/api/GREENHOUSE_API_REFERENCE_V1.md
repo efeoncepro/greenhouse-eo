@@ -80,9 +80,11 @@ Key rules:
 - app clients must use `api/platform/app/*`, not web routes or `AGENT_AUTH`
 - event retry schedules work for the dispatcher; it does not deliver inline
 - general ecosystem writes and cross-lane idempotency remain follow-ups
-- Talent Pool es read-only en App API: búsqueda/perfil requieren `hiring.talent_pool.read`; el bearer MCP delegado
-  agrega client/scope/purpose/agent-host exactos y conserva audit sin query, resultado ni PII. Provider/tools están
-  activos para uso interno desde 2026-08-16 con allow `200` y deny base-only `403` verificados.
+- Talent Pool comparte readers y commands gobernados en App API: búsqueda/perfil requieren `hiring.talent_pool.read`;
+  availability, consentimiento e invitación usan commands idempotentes y auditados. El bearer MCP delegado agrega
+  client/scope/purpose/agent-host exactos y conserva audit sin query, resultado ni PII. Provider/tools read-only están
+  activos para uso interno desde 2026-08-16 con allow `200` y deny base-only `403` verificados; MCP no expone los
+  commands ni CV/contacto.
 
 ### 2. Integrations API
 

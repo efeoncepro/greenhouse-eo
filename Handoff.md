@@ -46,6 +46,10 @@ detrás de flags independientes. La confirmación futura es explícita, tokeniza
 contacto automático ni acceso externo/B2B. La revisión jurídica formal de copy, policy, TTL y retención queda como
 sign-off residual si la política interna la exige.
 
+El barrido documental posterior a la activación sincronizó arquitectura Hiring, API reference, manual del Banco,
+EPIC-011/038, TASK-1718/1723/1724/1725, feature/release ledgers y las skills espejo de Talent, MCP y release en
+`.codex/skills` y `.claude/skills`. No se modificó runtime; el estado anterior sigue siendo la evidencia operativa.
+
 La auditoría `greenhouse-talent-people-operator` confirmó person-first, cero ranking/decisión adversa, DTO MCP sin
 contacto/CV, invitación mediante `HiringApplication` canónica y tests sólo por application. Detectó un fail-open
 latente en el rate guard público; quedó corregido para usar bucket compartido sin IP y negar cuando falla el store.

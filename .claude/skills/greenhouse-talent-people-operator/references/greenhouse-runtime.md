@@ -201,13 +201,20 @@ A padlock that protects nothing teaches the operator to ignore the padlocks that
   open URLs, rank, recommend, invite, move stages or assign a test from these readers.
 - Live evidence: OAuth canary search/profile returned `200`; a separate base-only client returned `403`. Do not infer
   availability in another environment from this statement: recheck its flags/provider and allow/deny canary.
+- Public candidate self-service and the operator invitation flow are enabled in production since 2026-08-16 behind
+  independent flags (`HIRING_TALENT_POOL_SELF_SERVICE_ENABLED` and `HIRING_TALENT_POOL_INVITE_ENABLED`). The public
+  checkbox only requests `future_opportunities` consent: the candidate must confirm through the expiring,
+  membership-bound email link before becoming `pool_eligible`. Invitation requires an exact opening, an existing
+  valid grant, human confirmation and idempotency; it does not contact a candidate, move a stage, assign a test,
+  score, reject or hire by itself. The activation run `31953851353` is `released`; Vercel production deployment
+  `dpl_CTxG3tx66S159tazMSyNiGSmqzHJ`, `/api/auth/health` HTTP 200, and `ops-worker-00563-ghv` were verified. No real
+  candidate email was sent during the flag flip, so delivery still needs a controlled candidate smoke.
   `TASK-1718` separately owns exact-application CV/document review for delegated agents. Its strict readers are
   `hiring.applications.review.list` and `hiring.application.review_packet.get`; they expose only redacted, bounded CV
   chunks plus governed assessment summaries, require an explicit review purpose and preserve an append-only access
   audit. Code, schema and MCP adapters exist, but real-CV projection/reader/tool flags remain OFF until the named
   Talent, Privacy, Security, Identity and MCP owners approve the activation and a synthetic canary passes. Candidate
-  self-service and invitation remain OFF in production pending People + Legal/Privacy approval; the public rate guard
-  fails closed if its store is unavailable.
+  CV review remains separate and OFF in production; the public rate guard fails closed if its store is unavailable.
 - Command `revealCandidateIdentityDocument` (`src/lib/hiring/documents/reveal-identity-document.ts`) verifies the document belongs to the `identity_profile_id` of the path's `candidateFacetId`. **Anti-IDOR: a foreign `documentId` answers `404`, not `403`** — a `403` would confirm its existence to a prober. The lookup runs with `includeArchived: true` on purpose, so an *archived* document of the candidate's own gets the `409` that names the cause instead of a `404` that would assert it does not exist.
 - Route `POST /api/hiring/candidate-facets/[candidateFacetId]/identity-documents/[documentId]/reveal`.
 - **No machinery duplicated**: the append-only audit and the outbox event are written by `revealPersonIdentityDocument` (784). No new event.

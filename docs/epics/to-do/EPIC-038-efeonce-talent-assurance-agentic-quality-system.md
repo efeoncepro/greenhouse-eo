@@ -84,7 +84,9 @@ La ejecución debe seguir este orden:
 5. Publicar read models/API parity `TASK-1610` antes de adapters `TASK-1608` y consumers cockpit `TASK-1611`;
    `TASK-1609` gobierna cualquier promoción más allá de observe.
 
-`TASK-1718` puede aportar más adelante un reader de candidate-review acotado y redactado para agents/read models.
+`TASK-1718` ya aporta la fundación desplegada para un reader de candidate-review acotado y redactado para agents/read
+models, pero sus flags/provider permanecen OFF hasta completar los gates de Security/Privacy/Talent/Identity/MCP y un
+canary controlado. No cambia los gates de Talent Assurance ni habilita claims o decisiones automatizadas.
 No emite claims Talent Assurance ni reemplaza los gates de policy, outcome, acceso o autonomía anteriores.
 
 ## Program phases

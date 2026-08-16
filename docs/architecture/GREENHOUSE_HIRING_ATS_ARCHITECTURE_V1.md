@@ -985,8 +985,10 @@ protegidos. No produce fit score, ranking ni decisión adversa. `active_process`
 pero sólo un consentimiento `future_opportunities` vigente permite recontactar o invitar a otra opening.
 
 Canon y rollout: `GREENHOUSE_TALENT_POOL_FULL_API_PARITY_DECISION_V1.md`; tasks `TASK-1723`–`TASK-1726`; flags
-separados projection/search/self-service/invite/MCP. Producción mantiene projection/search/MCP internos ON e
-invite/self-service externos OFF. La V1 no autoriza todavía
+separados projection/search/self-service/invite/MCP. Producción mantiene los cinco flags internos ON desde
+2026-08-16 (`projection`, `search`, `MCP`, `self-service` e `invite`) por autorización operativa del CEO. El
+self-service y la invitación siguen consent-gated, tokenizados/reversibles y no producen contacto automático,
+movimiento de etapa ni asignación de test. La V1 no autoriza todavía
 adapters de bench, internos, freelancers o partners: requieren su propio source adapter y policy.
 
 ### 3. Pipeline Board

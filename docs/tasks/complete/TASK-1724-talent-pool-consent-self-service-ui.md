@@ -326,7 +326,8 @@ muestra email, application status, assessment result o razones internas; el rece
 
 ### Slice ordering hard rule
 
-- TASK-1723 policy/DTO → Slice 1 copy/opt-in con flag OFF → Slice 2 self-service → Slice 3 evidence → rollout.
+- TASK-1723 policy/DTO → Slice 1 copy/opt-in con flag OFF → Slice 2 self-service → Slice 3 evidence → rollout ON
+  gobernado (completado el 2026-08-16).
 - No habilitar opt-in ni enviar links hasta que privacy/purpose/TTL y URL pública estén aprobados.
 
 ### Risk matrix
@@ -340,7 +341,8 @@ muestra email, application status, assessment result o razones internas; el rece
 
 ### Feature flags / cutover
 
-- Usa flag público de Talent Pool definido en TASK-1723, default OFF. El link de privacidad correcto puede shippear antes.
+- Usa el flag público de Talent Pool definido en TASK-1723; el estado live es ON desde 2026-08-16 y se revierte a OFF
+  de forma independiente. El link de privacidad correcto puede shippear antes.
 - Rollback: flag OFF oculta opt-in/self-service sin alterar memberships/audit existentes.
 
 ### Rollback plan per slice
@@ -354,8 +356,8 @@ muestra email, application status, assessment result o razones internas; el rece
 ### Production verification sequence
 
 1. Verificar policy/commands TASK-1723 en staging y URL de privacidad 200.
-2. Deploy flag OFF; confirmar apply legacy sin cambios y self-service inaccesible.
-3. Flag ON para fixture/cohorte allowlisted; ejecutar GVC/axe/keyboard/anti-oracle desktop+390.
+2. El rollout productivo actual ya tiene flag ON; para rollback deploy flag OFF y confirma apply legacy sin cambios.
+3. Ejecutar GVC/axe/keyboard/anti-oracle desktop+390 con fixture/cohorte allowlisted.
 4. Ejercitar opt-in, readback, update, withdrawal y token replay con cuenta sintética.
 5. Activar gradualmente; monitorear errors/consent violations antes de ampliar.
 
