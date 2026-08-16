@@ -43,4 +43,19 @@ describe('deriveTalentPoolAccess', () => {
     expect(result.reasonCodes).toEqual(['future_consent_expired'])
     expect(result.contactable).toBe(false)
   })
+
+  it('keeps an active application readable when a separate future-opportunity lease is stale', () => {
+    const result = deriveTalentPoolAccess({
+      lifecycleStatus: 'active_process',
+      futureConsentExpiresAt: '2026-01-01T00:00:00.000Z',
+      now
+    })
+
+    expect(result).toEqual({
+      discoverable: true,
+      contactable: false,
+      allowedActions: ['read', 'update_availability'],
+      reasonCodes: ['active_application_only']
+    })
+  })
 })

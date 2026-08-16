@@ -104,8 +104,12 @@ export const recordTalentPoolConsent = async (input: {
 
     const policyVersion = required(input.policyVersion ?? TALENT_POOL_POLICY_VERSION, 'policyVersion')
 
+    const hasCurrentFutureLease = Boolean(
+      membership.future_consent_expires_at && new Date(membership.future_consent_expires_at).getTime() > now.getTime()
+    )
+
     const nextLifecycle: TalentPoolLifecycle =
-      input.purpose === 'future_opportunities' ? 'pool_eligible' : 'active_process'
+      input.purpose === 'future_opportunities' || hasCurrentFutureLease ? 'pool_eligible' : 'active_process'
 
     const event = await client.query<{ consent_event_id: string; receipt_public_id: string }>(
       `INSERT INTO greenhouse_hiring.talent_pool_consent_event
@@ -262,14 +266,31 @@ export const withdrawTalentPoolConsent = async (input: {
       }
     }
 
-    await client.query(
-      `UPDATE greenhouse_hiring.talent_pool_membership SET lifecycle_status='withdrawn', withdrawn_at=NOW(),
-    future_consent_expires_at=NULL, aggregate_version=aggregate_version+1 WHERE membership_id=$1`,
-      [membership.membership_id]
+    const activeApplication = await client.query<{ active: boolean }>(
+      `SELECT EXISTS (
+        SELECT 1 FROM greenhouse_hiring.hiring_application
+        WHERE candidate_facet_id=$1 AND stage NOT IN ('rejected','withdrawn','closed')
+      ) AS active`,
+      [membership.candidate_facet_id]
     )
-    await client.query(`DELETE FROM greenhouse_hiring.talent_pool_evidence_projection WHERE membership_id=$1`, [
-      membership.membership_id
-    ])
+
+    const preservesActivePurpose = purpose === 'future_opportunities' && activeApplication.rows[0]?.active === true
+    const nextLifecycle: TalentPoolLifecycle = preservesActivePurpose ? 'active_process' : 'withdrawn'
+
+    await client.query(
+      `UPDATE greenhouse_hiring.talent_pool_membership SET lifecycle_status=$2,
+       withdrawn_at=CASE WHEN $2='withdrawn' THEN NOW() ELSE NULL END,
+       future_consent_expires_at=CASE WHEN $3='future_opportunities' THEN NULL ELSE future_consent_expires_at END,
+       aggregate_version=aggregate_version+1 WHERE membership_id=$1`,
+      [membership.membership_id, nextLifecycle, purpose]
+    )
+
+    if (!preservesActivePurpose) {
+      await client.query(`DELETE FROM greenhouse_hiring.talent_pool_evidence_projection WHERE membership_id=$1`, [
+        membership.membership_id
+      ])
+    }
+
     await publishOutboxEvent(
       {
         aggregateType: AGGREGATE_TYPES.talentPoolMembership,
@@ -282,7 +303,7 @@ export const withdrawTalentPoolConsent = async (input: {
 
     return {
       talentProfileId: membership.public_id,
-      lifecycleStatus: 'withdrawn' as const,
+      lifecycleStatus: nextLifecycle,
       receiptId: inserted.rows[0].receipt_public_id,
       idempotent: false
     }

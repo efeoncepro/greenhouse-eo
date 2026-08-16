@@ -14,6 +14,17 @@ export const deriveTalentPoolAccess = ({
 }): TalentPoolAccessDecision => {
   const expired = Boolean(futureConsentExpiresAt && new Date(futureConsentExpiresAt).getTime() <= now.getTime())
 
+  // An active application is its own purpose. A stale/withdrawn future-opportunity
+  // lease must never hide the application the candidate is currently pursuing.
+  if (lifecycleStatus === 'active_process') {
+    return {
+      discoverable: true,
+      contactable: false,
+      allowedActions: ['read', 'update_availability'],
+      reasonCodes: ['active_application_only']
+    }
+  }
+
   if (lifecycleStatus === 'withdrawn') {
     return { discoverable: false, contactable: false, allowedActions: [], reasonCodes: ['consent_withdrawn'] }
   }
@@ -39,6 +50,6 @@ export const deriveTalentPoolAccess = ({
     discoverable: true,
     contactable: false,
     allowedActions: ['read', 'update_availability'],
-    reasonCodes: lifecycleStatus === 'active_process' ? ['active_application_only'] : ['future_consent_missing']
+    reasonCodes: ['future_consent_missing']
   }
 }

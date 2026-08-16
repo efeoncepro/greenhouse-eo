@@ -169,7 +169,7 @@ const baseSelect = `SELECT m.public_id, m.lifecycle_status, m.aggregate_version,
 
 export const searchTalentPool = async (input: SearchTalentPoolInput = {}): Promise<SearchTalentPoolResult> => {
   const values: unknown[] = []
-  const where = [`m.lifecycle_status NOT IN ('withdrawn', 'expired')`]
+  const where = [`m.lifecycle_status IN ('active_process', 'pool_eligible', 'paused')`]
 
   const add = (clause: string, value: unknown) => {
     values.push(value)
@@ -234,7 +234,12 @@ export const searchTalentPool = async (input: SearchTalentPoolInput = {}): Promi
 
 export const getTalentPoolProfile = async (talentProfileId: string): Promise<TalentPoolProfileDto> => {
   const id = safeFilter(talentProfileId, 'talentProfileId')
-  const rows = await runGreenhousePostgresQuery<ProfileRow>(`${baseSelect} WHERE m.public_id = $1 LIMIT 1`, [id])
+
+  const rows = await runGreenhousePostgresQuery<ProfileRow>(
+    `${baseSelect} WHERE m.public_id = $1
+      AND m.lifecycle_status IN ('active_process', 'pool_eligible', 'paused') LIMIT 1`,
+    [id]
+  )
 
   if (!rows[0]) throw new HiringNotFoundError('El perfil de talento no existe.', 'talent_pool_profile_not_found')
   const evidence = await loadEvidence([id])
