@@ -116,6 +116,15 @@ redaction. A provider is disabled until allow/deny/redaction/fault tests and a g
 - People gets a reusable bank with Full API Parity and reversible rollout.
 - Legal/Privacy must approve public copy, policy version, TTL and retention before external recontact is enabled.
 
+## Runtime status — 2026-08-16
+
+- Producción interna: projection/search/Desk/App API/MCP read-only activos; invite y self-service externos siguen OFF.
+- Cohorte reconciliada: 52 memberships, 50 `active_process`, 2 `needs_reconsent`; ninguna persona recibió
+  consentimiento futuro por backfill.
+- MCP: `hiring.talent_pool.search` y `hiring.talent_pool.profile.get` están federadas para identidad interna
+  delegada. Canary OAuth real: allow search/profile `200`; cliente base-only separado: deny Hiring `403`.
+- Recontacto: continúa bloqueado hasta aprobación People + Legal/Privacy del copy, policy version, TTL y retención.
+
 ## Rejected alternatives
 
 - Reusing `candidate_facet.consent_status` as universal opt-in: rejects purpose limitation and history.
@@ -139,5 +148,4 @@ semantic document search is added, or a new identity root replaces `identity_pro
 - `GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
 - `EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md`
 - `docs/operations/hiring/2026-08-12-revision-privacidad-contacto-careers.md`
-- `docs/tasks/in-progress/TASK-1723-talent-pool-canonical-foundation-full-api-parity.md`
-
+- `docs/tasks/complete/TASK-1723-talent-pool-canonical-foundation-full-api-parity.md`

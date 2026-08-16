@@ -9,7 +9,7 @@
 
 ## 2026-08-16 — Banco de Talento person-first con autoservicio, Desk y paridad para agentes
 
-Greenhouse ya tiene en `develop` la fundación canónica del Banco de Talento: una sola ficha por persona,
+Greenhouse ya tiene operativa en producción interna la fundación canónica del Banco de Talento: una sola ficha por persona,
 consentimiento/purpose versionado, evidencia estructurada con lineage, disponibilidad, retiro, búsqueda y una
 invitación gobernada `propose → confirm`. El backfill de desarrollo incorporó 52 perfiles históricos sin inventar
 permiso futuro: 50 permanecen limitados a su proceso vigente y 2 requieren nuevo consentimiento.
@@ -19,10 +19,14 @@ retirarse mediante un enlace acotado; People opera un workspace propio en Hiring
 freshness, ficha lateral y acceso exacto a Application 360. Ninguna de las dos superficies rankea, decide, mueve
 etapas, asigna tests ni copia CV/contacto al índice.
 
-La misma lectura existe como App API y como provider read-only code-ready para `mcp.efeonce.org`, con identidad
-humana delegada, capability, propósito fijo, DTO allowlisted y audit sin contenido. El cambio aún no está disponible
-en producción: flags, provider y recontacto externo permanecen OFF hasta promoción, grants/canaries y aprobación
-People + Legal/Privacy.
+La misma lectura existe como App API y como provider read-only live para `mcp.efeonce.org`, con identidad humana
+delegada, capability, propósito fijo, DTO allowlisted y audit sin contenido. El canary OAuth obtuvo `200` en search y
+profile; un cliente separado sin scope Hiring obtuvo `403`. Projection/search/MCP están ON. El recontacto y el
+autoservicio externos permanecen OFF hasta aprobación People + Legal/Privacy de copy, propósito, TTL y retención.
+
+El release `a369165dfb2d`/run `31941320983` quedó `success`; Vercel, el worker reconciler y su scheduler están live.
+Durante el canary se detectó que la policy OAuth persistía `revalidateAfterSeconds=0` aunque el parser exige mínimo
+`15`; una migración aditiva lo corrigió y agregó una prueba sobre el parser real antes de la promoción final.
 
 ## 2026-08-15 — People queda avisado cuando un candidato termina su test
 

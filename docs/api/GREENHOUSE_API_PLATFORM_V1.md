@@ -125,8 +125,8 @@ devuelve la misma identidad opaca, lifecycle, allowed actions, availability y ev
 No entrega email, teléfono, CV/texto crudo, URLs, notas, economics, respuestas, answer keys ni atributos protegidos.
 La App API exige `hiring.talent_pool.read`. Cuando el bearer proviene de Efeonce MCP, Greenhouse reautoriza además
 client/scope delegados, propósito fijo `talent_pool_candidate_review` y `x-greenhouse-agent-host`; cada allow/deny
-queda auditado sin contenido. Los endpoints están code-ready en `develop`, pero no son una capacidad productiva
-anunciada hasta completar TASK-1726 y habilitar sus flags.
+queda auditado sin contenido. Los endpoints y las dos tools MCP read-only están activos para personas internas
+autorizadas desde 2026-08-16; acceso externo/B2B y cualquier write continúan bloqueados.
 
 #### Organization Compact Signals
 

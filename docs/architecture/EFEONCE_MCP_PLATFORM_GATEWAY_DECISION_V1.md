@@ -39,11 +39,13 @@ duplica lógica de negocio.
    audience, expiración y scopes, y responde con challenges estándar. Microsoft Entra ID del tenant Efeonce
    es el authorization server inicial. El resource parameter canónico es `https://mcp.efeonce.org/mcp`; Entra
    v2 representa ese recurso en el claim `aud` mediante el App ID exacto de la aplicación recurso. Si la
-   configuración falta o no pasa el canary, `/mcp` falla cerrado. El gateway declara **cuatro** scopes: el
+   configuración falta o no pasa el canary, `/mcp` falla cerrado. El gateway declara **cinco** scopes cuando los
+   providers correspondientes están activos: el
    base `efeonce.mcp.read`, el reader Globe `efeonce.mcp.globe.read`, el write interno
    `efeonce.mcp.globe.credits.funding.ensure` del punto 12, que sólo aparece en `scopes_supported` cuando su flag
    `globeCreditFunding.enabled` está en ON, y el write SEO `efeonce.mcp.seo.write` (TASK-1308), que sólo aparece
-   cuando `greenhouseSeo.enabled` está en ON.
+   cuando `greenhouseSeo.enabled` está en ON, y el reader Hiring `efeonce.mcp.hiring.read`, que sólo aparece cuando
+   `greenhouseHiring.enabled` está en ON. Hiring conserva capability/purpose/audit downstream en Greenhouse.
 
    🔴 **Granularidad canónica: un scope por CLASE DE BLAST-RADIUS, nunca uno por capability.** Un scope por
    capability convierte esta lista en un **espejo del `capabilities_registry` de Greenhouse** — un registry

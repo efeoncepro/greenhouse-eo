@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-1725-talent-pool-desk-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-011`
-- Status real: `Code complete y GVC premium verificado en develop; workspace del operador y flujo de invitación canónico listos, rollout pendiente`
+- Status real: `Complete y operativa en producción interna; Desk read-only ON y verificado, invitación externa OFF hasta el gate People + Legal/Privacy`
 - Rank: `TBD`
 - Domain: `hr|ui|agency`
 - Blocked by: `none`
@@ -371,7 +371,7 @@ history into one claim. Invite chooses from openings returned by server policy; 
 - [x] Keyboard/focus/sidecar/dialog/mobile Back/reduced-motion pass WCAG 2.2 AA locally.
 - [x] GVC premium 1440/390 has no horizontal scroll, console or axe findings.
 - [x] Scorecard average ≥4.5 with required floors and final enterprise verdict not BLOCK.
-- [ ] Read-only and invite flags/rollback were exercised separately before production expansion.
+- [x] Read-only and invite flags/rollback were exercised separately; production read-only is ON and invite remains OFF.
 
 ## Verification
 
@@ -389,13 +389,13 @@ history into one claim. Invite chooses from openings returned by server policy; 
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] Hiring architecture, functional docs and People manual reflect the live route/flags/capabilities.
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] Hiring architecture, functional docs and People manual reflect the live route/flags/capabilities.
 
 ## Follow-ups
 

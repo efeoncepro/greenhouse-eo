@@ -5,6 +5,9 @@
 Verifica que el entorno tenga `HIRING_TALENT_POOL_SEARCH_ENABLED=true` y que tu sesión porte
 `hiring.talent_pool.read`. Si el flag está apagado, la API responde fail-closed y no entrega resultados.
 
+Estado productivo 2026-08-16: búsqueda interna, Desk y MCP read-only están activos; invitación y autoservicio
+externos permanecen apagados hasta el gate Legal/Privacy.
+
 La superficie del operador está en **Hiring → Banco de Talento** (`/agency/hiring/talent-pool`). La superficie del
 candidato es distinta y sólo abre con su enlace tokenizado; nunca entregues un link de preview o un ID interno.
 
@@ -57,7 +60,7 @@ evidencia servible y candidate facets sin membership después de una reconciliac
 
 ## Acceso desde un agente
 
-Usa sólo las tools MCP cuando el provider esté publicado y el host complete OAuth delegado. El propósito permitido es
+Usa `hiring.talent_pool.search` y `hiring.talent_pool.profile.get` sólo cuando el host complete OAuth delegado. El propósito permitido es
 `talent_pool_candidate_review`; no reutilices el reader para contacto, stage move, test assignment o invitación. Si la
 tool no aparece, el provider está apagado o el principal no tiene grant: no sustituyas ese gate con SQL, Vercel bypass,
 cookie, bearer copiado ni acceso directo a la base.

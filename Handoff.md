@@ -2,26 +2,25 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-### Banco de Talento — code complete en develop; rollout pendiente (2026-08-16)
+### Banco de Talento — producción interna operativa; recontacto externo gated (2026-08-16)
 
-`TASK-1723`–`TASK-1726` están `in-progress` con código, schema y documentación materializados. PostgreSQL de
-desarrollo tiene seis migraciones aplicadas y cero pendientes; el backfill idempotente dejó 52 memberships
-(50 `active_process`, 2 `needs_reconsent`), 360 evidence refs y cero contactables inventados. Product API y App
-API comparten readers/commands; 46 tests focales, TypeScript, lint global, build de producción, reachability
-(233 rutas, 0 huérfanas), nav budget y task/UI gates pasan.
+`TASK-1723`–`TASK-1726` quedaron implementadas end-to-end. Release Greenhouse `a369165dfb2d` / run
+`31941320983` terminó `success`; Vercel productivo `dpl_AbdEkmeQTu6ErXD2mDzekfiaG3Ef` está `READY`. PostgreSQL
+tiene siete migraciones aplicadas y cero pendientes. El backfill/reconciler conserva 52 memberships (50
+`active_process`, 2 `needs_reconsent`) y no crea consentimiento futuro; scheduler
+`ops-hiring-talent-pool-reconcile` corre cada cinco minutos sobre `ops-worker-00560-zsk`.
 
-Existen dos superficies separadas y verificadas por GVC: autoservicio candidato 1440/390
-(`.captures/2026-08-16T08-52-56_hiring-talent-pool-self-service`) y Banco de Talento del operador en Hiring Desk
-(`.captures/2026-08-16T08-27-35_hiring-talent-pool-desk`). El operador puede buscar/filtrar, abrir ficha con
-coverage/freshness y proponer→confirmar invitación canónica; el candidato sólo confirma interés futuro, actualiza
-disponibilidad o se retira. Ninguna superficie decide, rankea, mueve etapa, asigna test ni expone contacto/CV.
+Dos superficies quedaron verificadas: candidato 1440/390 en
+`.captures/2026-08-16T08-52-56_hiring-talent-pool-self-service` (desplegada fail-closed) y operador live 1440/390
+en `.captures/2026-08-16T10-24-10_hiring-talent-pool-desk`. Hiring Desk permite buscar/filtrar, abrir ficha y leer
+evidencia/availability con person-first semantics. No rankea, decide, mueve etapa, asigna test ni expone contacto/CV.
 
-El repo hermano `efeonce-mcp` tiene provider y tools read-only `hiring.talent_pool.search` /
-`hiring.talent_pool.profile.get` con 53 tests, typecheck y build verdes; Greenhouse tiene OAuth client/scope exactos
-y access audit append-only. Todo sigue OFF/no desplegado: faltan promoción Greenhouse, scope/grant Entra, deploy del
-gateway, flags/env por entorno y canaries reales Codex/Claude/MCP Inspector. El recontacto/autoservicio externo
-requiere además aprobación documentada People + Legal/Privacy y validación con abogado habilitado; hasta entonces
-los flags projection/search/self-service/invite/MCP permanecen OFF. Acceso MCP externo/B2B espera TASK-1631.
+Efeonce MCP publica `hiring.talent_pool.search` y `hiring.talent_pool.profile.get` para persona interna delegada.
+Canary OAuth real: search/profile `200`; cliente base-only `66985833-14e9-438e-add4-b740e84e9a64` obtuvo `403`
+sin Hiring. Durante el rollout se detectaron y corrigieron dos fallos fail-closed: host inválido del canary y policy
+persistida con revalidación `0` en vez del mínimo `15`. Projection/search/MCP están ON; invite/self-service externos
+siguen OFF hasta aprobación People + Legal/Privacy de copy, policy, TTL y retención. Acceso externo/B2B y writes
+esperan TASK-1631.
 
 ### Aviso interno al completar test — LIVE, primera entrega real pendiente (2026-08-15)
 

@@ -74,8 +74,8 @@ Key rules:
 - event retry schedules work for the dispatcher; it does not deliver inline
 - general ecosystem writes and cross-lane idempotency remain follow-ups
 - Talent Pool es read-only en App API: búsqueda/perfil requieren `hiring.talent_pool.read`; el bearer MCP delegado
-  agrega client/scope/purpose/agent-host exactos y conserva audit sin query, resultado ni PII. Provider/tools siguen
-  OFF hasta canary productivo de TASK-1726.
+  agrega client/scope/purpose/agent-host exactos y conserva audit sin query, resultado ni PII. Provider/tools están
+  activos para uso interno desde 2026-08-16 con allow `200` y deny base-only `403` verificados.
 
 ### 2. Integrations API
 

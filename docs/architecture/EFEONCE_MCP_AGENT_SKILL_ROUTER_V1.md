@@ -42,7 +42,7 @@ surface.
 | Shared boundary, tool contract, API parity or new public surface | `software-architect-2026` | Architecture/ADR and product contract |
 | Cloud Run, WIF, service identity, OAuth, ALB, DNS, TLS or secret | applicable cloud skill + `greenhouse-secret-hygiene` | Gateway IaC/runbook |
 | Globe provider or creative capability | `greenhouse-globe` + creative-rights governance when applicable | Globe API/SDK/policy; `TASK-1473` gates federation |
-| Hiring/ATS, Talent Pool, candidate review, assessment assignment or selection journey | `greenhouse-talent-people-operator` + identity/integrations owners | `TASK-1726` implements the read-only Talent Pool adapter but keeps it OFF pending live canary; `TASK-1718`–`TASK-1722` remain separately gated |
+| Hiring/ATS, Talent Pool, candidate review, assessment assignment or selection journey | `greenhouse-talent-people-operator` + identity/integrations owners | `TASK-1726` tiene live sólo los readers internos `hiring.talent_pool.search` y `.profile.get`; `TASK-1718`–`TASK-1722` permanecen separadamente gated |
 | HubSpot/CRM or Teams provider | owning HubSpot or Teams skill | provider contract, consent and tenancy |
 | Release, rollback or live evidence | `greenhouse-production-release` and `greenhouse-qa-release-auditor` | release/runbook and evidence |
 | Task/ADR split, docs, skill evolution | `greenhouse-task-planner` and `greenhouse-documentation-governor` | Greenhouse control plane |
@@ -50,10 +50,10 @@ surface.
 The router only translates verified identity and MCP transport into a narrow provider call. It never acquires direct
 database, storage or upstream-provider access, chooses domain policy, or substitutes UI/API/SDK parity.
 
-**Hiring no está federado en el runtime live.** `TASK-1726` ya implementa en código el provider
-`greenhouse-hiring` y únicamente los readers `hiring.talent_pool.search` y
-`hiring.talent_pool.profile.get`; ambos permanecen OFF hasta Greenhouse production, scope/grant Entra y canary
-allow/deny/redaction multi-host. No incluyen contacto, CV, documentos, URLs, notas ni acciones. El reader de
+**Hiring está federado en el runtime live sólo para lectura interna del Talent Pool.** `TASK-1726` publica el
+provider `greenhouse-hiring` y únicamente los readers `hiring.talent_pool.search` y
+`hiring.talent_pool.profile.get`; allow search/profile `200` y deny base-only `403` fueron verificados el
+2026-08-16. No incluyen contacto, CV, documentos, URLs, notas ni acciones. El reader de
 Application 360 y el token one-shot de assessment siguen siendo contratos privados: `TASK-1718`–`TASK-1722`
 conservan sus propios gates y `TASK-1631` sigue bloqueando writes y acceso externo/B2B.
 
@@ -71,10 +71,9 @@ conservan sus propios gates y `TASK-1631` sigue bloqueando writes y acceso exter
    ADR/task work.
 6. Before calling a public runtime operational, require DNS/TLS, discovery, unauthenticated denial and authenticated
    MCP client evidence. Para acceso externo, además prueba una identidad que reciba sólo los scopes/entitlements
-   concedidos; el cliente Entra interno actual recibe base + reader (`efeonce.mcp.read` y `efeonce.mcp.globe.read`)
-   aunque solicite sólo el base, y no demuestra ese deny por persona. El gateway declara tres scopes —esos dos más
-   el write interno `efeonce.mcp.globe.credits.funding.ensure`, gateado por `globeCreditFunding.enabled`—; que el
-   mismo cliente reciba además el de write no está verificado y depende de su propio consentimiento/asignación.
+   concedidos. El cliente compartido recibe base + Globe read + Hiring read; el cliente canario base-only
+   `66985833-14e9-438e-add4-b740e84e9a64` demostró `403` en Hiring sin ese scope. Los scopes de escritura siguen
+   deliberadamente ausentes de ambos clientes públicos y dependen de su propio consentimiento/asignación.
    A compiled adapter is not rollout evidence.
 
 ## Maintenance

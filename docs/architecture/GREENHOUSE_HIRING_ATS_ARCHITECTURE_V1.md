@@ -951,7 +951,8 @@ Debe mezclar:
 
 #### V1 person-first — TASK-1723 a TASK-1726
 
-La V1 materializada en `develop` cubre candidatos externos e históricos y conserva una sola persona canónica.
+La V1 está operativa en producción para búsqueda interna y cubre candidatos externos e históricos conservando una
+sola persona canónica.
 `greenhouse_hiring.talent_pool_membership` gobierna lifecycle/purpose; consentimientos, actividad y evidencia son
 append-only o proyecciones con lineage. Aplicaciones, assessments, documentos y contacto permanecen en sus fuentes.
 
@@ -960,8 +961,8 @@ Superficies consumidoras del mismo contrato:
 - candidato: `/public/careers/talent-profile/[token]`, limitado a consentimiento futuro, disponibilidad y retiro;
 - operador: `/agency/hiring/talent-pool`, búsqueda person-first + profile + invitación `propose → confirm`;
 - App API: `GET /api/platform/app/hiring/talent-pool` y `GET /api/platform/app/hiring/talent-pool/{id}`;
-- agentes: adapter read-only `greenhouse-hiring` en Efeonce MCP, siempre delegado a una persona interna y apagado
-  hasta scope/grant, deploy y canary live.
+- agentes: adapter read-only `greenhouse-hiring` en Efeonce MCP, siempre delegado a una persona interna; canary
+  productivo allow search/profile `200` y deny base-only `403` verificados el 2026-08-16.
 
 La búsqueda sólo sirve DTOs allowlisted: identidad visible mínima, lifecycle, disponibilidad, coverage/freshness y
 evidencia estructurada. Excluye correo, teléfono, CV/raw text, notas, economics, respuestas, answer keys y atributos
@@ -969,7 +970,8 @@ protegidos. No produce fit score, ranking ni decisión adversa. `active_process`
 pero sólo un consentimiento `future_opportunities` vigente permite recontactar o invitar a otra opening.
 
 Canon y rollout: `GREENHOUSE_TALENT_POOL_FULL_API_PARITY_DECISION_V1.md`; tasks `TASK-1723`–`TASK-1726`; flags
-separados projection/search/self-service/invite/MCP, default OFF y habilitación progresiva. La V1 no autoriza todavía
+separados projection/search/self-service/invite/MCP. Producción mantiene projection/search/MCP internos ON e
+invite/self-service externos OFF. La V1 no autoriza todavía
 adapters de bench, internos, freelancers o partners: requieren su propio source adapter y policy.
 
 ### 3. Pipeline Board

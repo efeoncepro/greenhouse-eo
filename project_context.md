@@ -154,10 +154,12 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   identidad con capability, motivo y auditoría append-only (`TASK-1714`/`TASK-1715`). El evento
   `hiring.assessment.submitted` ya tiene en producción un consumer interno para People, con configuración
   `hiring_assessment_submitted_internal` habilitada; la primera entrega real todavía requiere smoke operativo.
-  El Banco de Talento person-first (`TASK-1723`–`TASK-1726`) está code-ready en `develop`: schema/backfill de
-  desarrollo, autoservicio del candidato, Desk del operador, App API y adapter MCP read-only comparten policy y
-  DTO allowlisted. Sus flags y provider MCP siguen OFF hasta rollout, aprobación Privacy/People y canaries live;
-  no se deben anunciar como capacidades productivas. Las otras surfaces Hiring MCP `TASK-1718`–`TASK-1722`
+  El Banco de Talento person-first (`TASK-1723`–`TASK-1726`) está operativo en producción interna: projection,
+  búsqueda/Desk del operador, App API y los readers MCP `hiring.talent_pool.search`/`.profile.get` comparten policy,
+  capability, purpose/audit y DTO allowlisted. La cohorte tiene 52 memberships (50 `active_process`, 2
+  `needs_reconsent`) sin consentimiento futuro inventado; invite y self-service externos siguen OFF hasta aprobación
+  Privacy/People. Canary OAuth real: allow search/profile `200`, deny con cliente base-only `403`. Las otras surfaces
+  Hiring MCP `TASK-1718`–`TASK-1722`
   permanecen `to-do`. Talent Assurance (`EPIC-038`, `TASK-1602`–`TASK-1611`) permanece en fase de
   decisión/discovery mientras sus ADR y contratos base sigan `Proposed`.
 - Wave es una product house hermana para la capa de producto de sus Product Services; sus runtimes y plataformas no se crean dentro de Greenhouse. Greenhouse administra transversalmente las plataformas Efeonce mediante contratos de sister platform. Los productos nuevos nacen Agent Native y con Full API Parity. Canon: [`EFEONCE_WAVE_PRODUCT_PLATFORM_GREENHOUSE_ADMINISTRATION_DECISION_V1.md`](docs/architecture/EFEONCE_WAVE_PRODUCT_PLATFORM_GREENHOUSE_ADMINISTRATION_DECISION_V1.md).

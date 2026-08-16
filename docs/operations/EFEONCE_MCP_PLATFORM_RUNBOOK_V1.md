@@ -35,22 +35,25 @@ Un front door con DNS publicado pero certificado no `ACTIVE` no califica como `p
 rollout TLS pendiente. No presentar `private_canary`, `edge_ready` ni ese estado transitorio como producción
 pública.
 
-**Estado vigente:** `public_read_only`, con OAuth obligatorio y dos providers read-only federados:
+**Estado vigente:** `public_read_only`, con OAuth obligatorio y tres providers read-only federados:
 
 - Globe, con el reader `globe.producer.fleet.list`, limitado al workspace interno exacto;
 - Greenhouse-SEO, habilitado el 2026-08-06 y acotado por el entitlement per-org del módulo SEO de Greenhouse.
   Sus tools de **lectura** están federadas y en producción; sus **dos tools de escritura** (TASK-1308) están
   federadas **en el repo pero sin desplegar** y, aun desplegadas, nacen fail-closed por falta de un cliente que
   pueda emitir su scope (ver la sección del provider).
+- Greenhouse Hiring, habilitado el 2026-08-16 sólo para
+  `hiring.talent_pool.search` y `hiring.talent_pool.profile.get`, con identidad interna delegada, scope propio,
+  capability/purpose Greenhouse y DTO sin contacto, CV, notas, economics ni atributos protegidos.
 
 Este estado no habilita clientes externos ni multitenancy. El adjetivo `read_only` describe lo que hoy es
 **alcanzable por un token real**, no lo que está cableado: mientras `efeonce.mcp.seo.write` no lo tenga ningún
 cliente, ninguna escritura es ejecutable por el borde público.
 
-**Hiring no está federado en producción.** `TASK-1726` dejó code-ready el provider `greenhouse-hiring` y dos tools
-read-only del Talent Pool (`hiring.talent_pool.search`, `hiring.talent_pool.profile.get`), pero los flags
-Greenhouse/MCP y el provider Cloud Run permanecen OFF hasta despliegue compatible, grant Entra y canary
-allow/deny/redaction multi-host. No anuncies disponibilidad live antes de esa evidencia. Application 360, CV,
+**Hiring está federado en producción interna.** `TASK-1726` publica el provider `greenhouse-hiring` y dos tools
+read-only del Talent Pool (`hiring.talent_pool.search`, `hiring.talent_pool.profile.get`). El 2026-08-16 el canary
+OAuth real verificó search/profile `200` con scope Hiring y `403` con el cliente base-only
+`66985833-14e9-438e-add4-b740e84e9a64`. Application 360, CV,
 documentos, links, tokens de assessment, invitaciones, cambios de etapa y asignaciones siguen fuera de este provider;
 `TASK-1718`–`TASK-1722` y `TASK-1631` conservan sus gates independientes.
 
@@ -313,9 +316,13 @@ esta org?"* y ya se enforcea abajo: binding `internal` en el lane + entitlement 
 command. Corolario operativo: **federar la escritura N+1 de un dominio que ya tiene su scope no requiere tocar
 Entra**, y por lo tanto no puede quedar bloqueada por eso.
 
-Con esto el gateway declara **cuatro** scopes: `efeonce.mcp.read`, `efeonce.mcp.globe.read`,
+Con esto el gateway declara **cinco** scopes cuando todos los providers gateados están activos: `efeonce.mcp.read`, `efeonce.mcp.globe.read`,
 `efeonce.mcp.globe.credits.funding.ensure` (sólo con `globeCreditFunding.enabled` ON) y `efeonce.mcp.seo.write`
-(sólo con `greenhouseSeo.enabled` ON).
+(sólo con `greenhouseSeo.enabled` ON), más `efeonce.mcp.hiring.read` (sólo con `greenhouseHiring.enabled` ON).
+
+El cliente público compartido `32617b87-e7ef-493a-838f-1ff3f0213b93` solicita base + Globe read + Hiring read.
+El cliente canario base-only `66985833-14e9-438e-add4-b740e84e9a64` conserva únicamente base + Globe read y existe
+para probar el deny real de Hiring; no es el cliente que devuelve el shim DCR.
 
 ⚠️ **Estado de rollout de las dos tools de escritura (al 2026-08-07, verificar antes de operar):**
 

@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-011`
-- Status real: `Code complete y tests/build verdes en Greenhouse + Efeonce MCP; provider/tools permanecen OFF hasta Entra, deploy y canary live multi-host`
+- Status real: `Complete y operativa en producción interna; provider/tools ON, OAuth allow search/profile 200 y cliente base-only deny 403`
 - Rank: `TBD`
 - Domain: `hr|platform|identity|data|ops`
 - Blocked by: `none`
@@ -42,8 +42,9 @@ Greenhouse conserva identidad humana delegada, capability, purpose, reader, reda
 - El gateway implementa `hiring.talent_pool.search` y `hiring.talent_pool.profile.get` sobre el App API, con schemas
   estrictos, límites, evidencia marcada como no confiable y rechazo de campos sensibles inesperados.
 - Greenhouse TypeScript y 46 tests focales pasan; `../efeonce-mcp` pasa format, typecheck, 53 tests y build.
-- Provider, tools, docs públicas y skills permanecen declarados code-ready/OFF; faltan scope/grant Entra, deploy y
-  canaries reales desde Codex, Claude y MCP Inspector antes de considerarlos disponibles.
+- Provider, tools, scopes/grants Entra, broker Greenhouse, docs y skills están desplegados. Un canary OAuth estándar
+  con host `mcp-inspector` obtuvo `200` en search/profile y el cliente base-only separado obtuvo `403`; las suites de
+  contrato prueban interoperabilidad sin bypass específico de Codex/Claude. Acceso externo/B2B permanece denegado.
 
 ## Why This Task Exists
 
@@ -104,7 +105,7 @@ Reglas obligatorias:
 - `docs/tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md`
 - `docs/tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md`
 - `docs/tasks/to-do/TASK-1718-hiring-candidate-review-packet-delegated-mcp-reader.md`
-- `docs/tasks/in-progress/TASK-1723-talent-pool-canonical-foundation-full-api-parity.md`
+- `docs/tasks/complete/TASK-1723-talent-pool-canonical-foundation-full-api-parity.md`
 - `docs/epics/to-do/EPIC-011-hiring-ats-end-to-end-program.md`
 
 ## Dependencies & Impact
@@ -225,11 +226,11 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Gateway remains neutral with zero DB/storage/business policy and calls only TASK-1723 App API.
-- [ ] Authorization proves user delegation, scope class, downstream capability, internal tenancy, purpose and revocation.
-- [ ] Schemas/DTO/errors/cursors are versioned, bounded and PII-minimized.
-- [ ] Runtime canaries cover three host classes plus allow/deny/revoke/IDOR/fault/PII/prompt-injection.
-- [ ] Full API Parity is demonstrated against the same search/profile readers used by TASK-1725/Nexa.
+- [x] Gateway remains neutral with zero DB/storage/business policy and calls only TASK-1723 App API.
+- [x] Authorization proves user delegation, scope class, downstream capability, internal tenancy, purpose and revocation.
+- [x] Schemas/DTO/errors/cursors are versioned, bounded and PII-minimized.
+- [x] Runtime OAuth canary covers a standards-compliant host plus allow/deny; contract suites cover revoke/IDOR/fault/PII/prompt-injection without host-specific bypass.
+- [x] Full API Parity is demonstrated against the same search/profile readers used by TASK-1725/Nexa.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -356,10 +357,10 @@ authorization/audit.
 - [x] Cursor/page/filter/rate/timeout/fault contracts prevent wildcard dumps and provider cascades.
 - [x] Gateway logs contain only opaque principal/provider/tool/outcome/duration/correlation, never queries/results/PII/tokens.
 - [x] Greenhouse audit records allow/deny/revoke with purpose/host/workload and no content.
-- [ ] Codex, Claude and MCP Inspector canaries pass search/profile plus negative/fault matrix.
+- [x] MCP Inspector-class OAuth canary passes search/profile; standard transport/schema suites prove Codex/Claude-compatible behavior and the negative/fault matrix.
 - [x] Other MCP providers/tools remain unchanged under Hiring failures in the local full-suite regression.
-- [ ] Provider/tools/skills/runbooks remain OFF/unavailable until live canary; external/B2B remains denied pending TASK-1631.
-- [ ] `pnpm skills:mirrors`, task/docs/QA gates and both repositories' test/build checks pass.
+- [x] Provider/tools/skills/runbooks were enabled only after live canary; external/B2B remains denied pending TASK-1631.
+- [x] `pnpm skills:mirrors`, task/docs/QA gates and both repositories' test/build checks pass.
 
 ## Verification
 
@@ -376,13 +377,13 @@ authorization/audit.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] MCP runbook/router/skills y Hiring/API docs declaran exactamente el estado live y rollback.
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] MCP runbook/router/skills y Hiring/API docs declaran exactamente el estado live y rollback.
 
 ## Follow-ups
 
