@@ -58,8 +58,10 @@ task completa los gates y activa el carril masivo sin convertir IA en decisión 
   el command de run nunca decide, rankea, mueve etapa, asigna otro test ni envía correo.
 - Garantizar por contrato y tests negativos que el postulante solo ve estados de rendición/confirmación de envío;
   nunca ve puntaje, bandas, rationale, confianza, cola, override ni resultado del test.
-- Promover la capacidad únicamente después de eval suficiente, canary controlado y sign-offs de Talent, Legal,
-  Privacy, Security, Identity y AI Platform, con flags independientes y rollback a la cola manual.
+- Promover la capacidad únicamente después de eval suficiente y canary controlado, con flags independientes y
+  rollback a la cola manual. La matriz de sign-offs (Talent/Legal/Privacy/Security/Identity/AI Platform) quedó
+  **resuelta por autorización ejecutiva del CEO el 2026-08-16** (ver `## Delta 2026-08-16`): el ADR de Slice 0 la
+  registra como autorización otorgada, no la recolecta. Los gates técnicos (eval, shadow, canary) no se rebajan.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -113,6 +115,10 @@ Reglas obligatorias:
 - `docs/tasks/to-do/TASK-1603-hiring-quality-gate-opening-binding.md`
 - `docs/tasks/to-do/TASK-1604-role-scorecard-assessment-template-pack.md`
 - `docs/tasks/to-do/TASK-1729-candidate-application-self-service-contract.md`
+- `docs/tasks/complete/TASK-1383-assessment-engine-hardening-pre-1363.md` (dedupe por `input_digest` en el proposal
+  ledger — la semántica de digests de esta task depende de ese hardening)
+- `docs/tasks/to-do/TASK-1735-hiring-application-evaluation-dossier.md` (expediente de notas; frontera de rationale
+  declarada en `## Delta 2026-08-16`)
 - `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`
 
 ## Dependencies & Impact
@@ -134,13 +140,18 @@ Reglas obligatorias:
   candidate result surface.
 - A later UI task may replace the existing per-response drawer with an operator workbench over the run reader. That
   visible redesign is deliberately outside this backend-critical foundation.
+- `TASK-1735` (Evaluation Dossier): el manifest/audit del run registra HECHOS estructurados (IDs, digests, reason
+  codes, actor); la narrativa opcional del revisor vive como nota `kind=assessment_review` del expediente de 1735
+  referenciando `runId`/`proposalId` en `context_json`. Un solo hábitat por tipo de contenido; sin duplicación.
 
 ### Files owned
 
 - `src/lib/hiring/assessment/ai/**`
 - `src/lib/hiring/assessment/scoring.ts`
 - `src/lib/hiring/assessment/review.ts`
-- `src/lib/sync/projections/**` for the bounded assessment-scoring trigger/adapter
+- `src/lib/sync/projections/hiring-assessment-ai-scoring.ts` (nuevo, único archivo de projection de esta task) más
+  su registro en `src/lib/sync/projections/index.ts` — NO el glob completo: `index.ts` y
+  `hiring-stage-assessment-assignment.ts` son Files owned de `TASK-1719`; coordinar el registro si ambas avanzan
 - `services/ops-worker/**` only if Slice 0 confirms this existing runtime as the correct workload home
 - `src/app/api/hiring/assessments/ai/**`
 - `src/app/api/public/assessment/**` negative boundary tests only; no result endpoint or candidate UI
@@ -240,7 +251,8 @@ Reglas obligatorias:
 - Rollback path: disable async enqueue first, drain/cancel in-flight runs, disable run confirm, preserve proposals/audit,
   and return every unresolved item to the existing manual queue; reverse migration only before any retained evidence
 - External coordination: provider retention/training/data residency review; env/secrets in every actual runtime;
-  Talent/Legal/Privacy/Security/Identity/AI Platform sign-offs and named canary owner
+  autorización ejecutiva del CEO registrada (2026-08-16, ver Delta) en lugar de la matriz de sign-offs, más named
+  canary owner
 
 ### Security and access
 
@@ -308,8 +320,9 @@ Reglas obligatorias:
   score provenance, contestability, retention and rollback without weakening no-auto-decision.
 - Verify actual flag/provider/runtime state rather than trusting docs; choose the existing approved async workload
   placement. No LLM fan-out inline in Vercel and no new service before the placement decision.
-- Define named owners and sign-off matrix: Talent, Legal, Privacy, Security, Identity, AI Platform and MCP only if an
-  MCP adapter is later requested.
+- Registrar en el ADR la autorización ejecutiva del CEO (2026-08-16, ver Delta) como resolución de la matriz de
+  sign-offs, y definir los owners operativos que sí siguen pendientes (canary owner nombrado, rubric owners, rater
+  training). MCP solo entra si un adapter se solicita después vía task nueva.
 
 ### Slice 1 — Durable exact-assessment scoring run
 
@@ -335,6 +348,9 @@ Reglas obligatorias:
   calibrated tolerance/abstention, band confusion, repeat stability, question-level failures and confidence bounds.
 - Define thresholds and minimum evidence in the accepted policy; do not invent a universal sample size or rely on
   Pearson alone. Protected-group analysis uses `TASK-1365` only when lawful, consented and sufficiently aggregated.
+- Cláusula explícita de (no-)dependencia: `TASK-1365` está code-complete con prod OFF y cero data demográfica real
+  hoy — el fairness check es best-effort con lo que 1365 tenga disponible y su ausencia NO bloquea el resto de los
+  gates de promoción de esta task (si Legal exige lo contrario al ejecutar, se registra en el ADR y se re-secuencia).
 
 ### Slice 4 — Operator-only exception and batch confirmation contract
 
@@ -414,7 +430,8 @@ Legal/Privacy, is separate from result disclosure and contains no individualized
 - Slice 0 MUST close before migrations, async wiring or policy implementation.
 - Slice 1 → Slice 2 → Slice 3. No exception-review activation before promotion-grade eval.
 - Slice 4 depends on Slices 1–3; Slice 5 negative boundaries must close before any non-synthetic canary.
-- Slice 6 starts shadow-only; run confirmation remains OFF until all sign-offs and prior gates are evidenced.
+- Slice 6 starts shadow-only; run confirmation remains OFF until the prior technical gates (eval, shadow, canary)
+  are evidenced. La autorización ejecutiva ya está registrada (Delta 2026-08-16); los gates técnicos no se rebajan.
 
 ### Risk matrix
 
@@ -452,25 +469,31 @@ Legal/Privacy, is separate from result disclosure and contains no individualized
 
 ### Production verification sequence
 
-1. Accept ADR/policy and named sign-offs; verify provider terms, flags and actual workload runtime.
+1. Accept ADR/policy registrando la autorización ejecutiva del CEO (2026-08-16); verify provider terms, flags and
+   actual workload runtime.
 2. Apply additive migration in staging; deploy with all new flags OFF; verify manual path bit-for-bit.
 3. Run promotion-grade eval and adversarial suite; publish versioned evidence and explicit pass/fail.
 4. Enable shadow enqueue/scoring for synthetic assessments only; verify exact packet, run/retry/readback and no score
    mutation.
 5. Exercise mandatory review, blind sample, batch confirm and rollback with synthetic applications; probe every
    candidate/public/email surface for absence of results.
-6. Canary one allowlisted template/opening only after sign-offs; no stage/decision/email automation. Cooldown and
-   review all items during the canary.
+6. Canary one allowlisted template/opening only after the prior technical gates (la autorización ejecutiva ya está
+   registrada); no stage/decision/email automation. Cooldown and review all items during the canary.
 7. Promote exception policy gradually only if override/sample/drift/backlog/error/cost gates remain green; otherwise
    revert to full manual confirmation.
 
 ### Out-of-band coordination required
 
+**La AUTORIDAD de aprobación de todas estas áreas quedó resuelta por autorización ejecutiva del CEO (2026-08-16,
+ver Delta) — no hay que recolectar firmas.** Las ACTIVIDADES operativas listadas siguen siendo trabajo real a
+ejecutar dentro de la task (ya autorizado):
+
 - Talent: rubric owners, rater training, gold-set adjudication and canary ownership.
-- Legal/Privacy: lawful purpose, provider terms/DPA, retention, candidate transparency notice and contestability.
+- Legal/Privacy: provider terms/DPA, retention y candidate transparency notice (la obligación regulatoria de
+  transparencia hacia el candidato NO desaparece con la autorización interna; el aviso nunca revela el score).
 - Security/Identity: threat model, resource/purpose capabilities, service identity, revocation and audit review.
 - AI Platform/Ops: provider/model approval, secrets, runtime placement, quotas, monitoring and rollback rehearsal.
-- MCP is not required for V1 and receives no sign-off scope unless a separate adapter task is approved.
+- MCP is not required for V1 unless a separate adapter task is approved.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -509,8 +532,9 @@ Legal/Privacy, is separate from result disclosure and contains no individualized
   no orphan/in-flight run after drain/reconciliation.
 - [ ] Reliability signals cover backlog/stuck, provider/schema failure, abstention, override/sample disagreement,
   question/template drift, latency/cost and reconciliation without PII.
-- [ ] Talent, Legal, Privacy, Security, Identity and AI Platform sign-offs are recorded before any real-candidate
-  exception-review cutover; MCP/B2B remain out of scope.
+- [ ] La autorización ejecutiva del CEO (2026-08-16, ver `## Delta 2026-08-16`) está registrada en el ADR de Slice 0
+  como resolución de la matriz de sign-offs antes de cualquier cutover con candidatos reales; MCP/B2B remain out of
+  scope.
 - [ ] Source of truth, contract surface and consumers are named with real paths or objects.
 - [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
 - [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
@@ -552,6 +576,48 @@ Legal/Privacy, is separate from result disclosure and contains no individualized
   client grant by default.
 - Extend promotion datasets as `TASK-1604` activates each new role/template; no template inherits approval from
   another template or model/prompt version.
+
+## Delta 2026-08-16
+
+Auditoría spec↔runtime + coherencia cross-task (dos subagentes, sesión operador 2026-08-16). El agente que tome
+esta task DEBE leer este delta antes de Discovery — corrige supuestos de la spec contra el estado real:
+
+1. **Autorización ejecutiva (CEO):** la matriz de sign-offs Talent/Legal/Privacy/Security/Identity/AI Platform quedó
+   **resuelta por autorización explícita del CEO el 2026-08-16** en sesión de operador. Slice 0 la registra en el
+   ADR como autorización otorgada; ninguna firma adicional bloquea el avance. Los gates TÉCNICOS (promotion-grade
+   eval, shadow, canary, anti-leak tests, flags default-OFF) permanecen intactos y NO se rebajan. La obligación
+   regulatoria de transparencia hacia el candidato (aviso de uso de IA, sin revelar score) sigue vigente como
+   actividad de la task.
+2. **El master gate ya está ON en Production:** `HIRING_ASSESSMENT_AI_ENABLED` fue prendido en Vercel Production el
+   2026-07-16 con autorización del operador (ledger Delta línea ~18) — la spec fue escrita como si siguiera
+   bloqueado. Las filas per-flag del ledger están stale (dicen Prod OFF) y contradicen su propia Delta: verificar
+   live con `vercel env pull` como manda la spec, y corregir el ledger de paso. El shadow-first de los flags NUEVOS
+   es aún más crítico partiendo de un master gate abierto.
+3. **Backlog de proposals huérfanas ya existe:** cuando un score se aplica por el carril manual directo
+   (`recordHumanScore` + `finalizeAssessment` sin pasar por confirm — caso real EO-ASM-0050, 2026-08-16), las
+   proposals `proposed` quedan huérfanas para siempre: ni expiración ni reconciliación, y el confirm posterior al
+   finalize falla 409 sin transicionarlas. El run aggregate de Slice 1 debe reconciliar también el backlog huérfano
+   pre-existente, no solo el flujo nuevo.
+4. **El flag NO gatea confirm/reject** (por diseño, `ai/config.ts:5-7`): apagar el master flag no drena ni bloquea
+   la cola — el plan de rollback (drain/cancel) debe operar por los flags nuevos y comandos de run, no por el master.
+5. **El digest del run captura el modelo EFECTIVO:** `HIRING_ASSESSMENT_AI_SCORING_MODEL` (env var) puede divergir
+   del default `claude-sonnet-5` por runtime; el input/policy digest usa el modelo resuelto, nunca el default.
+6. **Slice 5 parte de cobertura cero, no "expande":** no existe ningún test de `PublicAssessmentView` ni del route
+   público `/api/public/assessment/[token]`; el anti-leak actual es estructural (hardening.test.ts cubre solo
+   `buildPublicQuestion`). Presupuestar la suite completa.
+7. **Claims verificados exactos** (evidencia en la sesión de auditoría): reader de proposals global con LIMIT 50 y
+   filtro client-side en Application 360 (`listAiProposals`, `proposal-store.ts:240-272`); el score IA precarga el
+   input humano (`Application360View.tsx:459` — anclaje real hoy); el output contract ya trae `rationale` +
+   `perCriterion` opcional (`ai/contracts.ts:118-140`) — lo que falta es evidencia citada VALIDADA contra el texto
+   y señales de routing.
+8. **Frontera con TASK-1735 (Evaluation Dossier):** manifest/audit del run = hechos estructurados; narrativa del
+   revisor = nota `kind=assessment_review` de 1735 con `context_json.{runId,proposalId}`. Referencia mutua declarada
+   en ambas tasks; no duplicar rationale en dos hábitats.
+9. **Anti-anclaje en `mandatory_review`:** la quality sample es blind, pero el carril mandatory expone la propuesta
+   antes del juicio humano. Mientras el workbench UI llega (follow-up), el manifest DEBE registrar si el revisor vio
+   la propuesta antes de emitir su score — costo marginal, preserva la evidencia de supervisión honesta.
+10. **Secuenciación:** esta task es paralelizable con TASK-1719/1721 (`Blocked by: none` es correcto — el scoring
+    corre sobre `hiring.assessment.submitted` exista o no la policy de asignación); declarado también en EPIC-011.
 
 ## Open Questions
 

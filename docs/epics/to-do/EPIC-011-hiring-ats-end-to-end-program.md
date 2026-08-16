@@ -332,6 +332,20 @@ Operator requirement: el dominio necesita (1) **tests que rinde el candidato** �
 
 `353 (✓) → 354 + 355 + 1360 + 1362 (paralelo tras foundation) → 1361 (tras 1360) → 1363 (tras 1360 + product-design) → 356 → 770`
 
+#### Delta 2026-08-16 — secuencia de las extensiones 2026-08-15/16
+
+Las extensiones no viven en las fases numeradas originales; su orden real es por cadena de blockers:
+
+- Carril assignment/selection: `1719 → 1603 (EPIC-038, consume la policy de 1719) → 1721`; `1720`/`1722` son
+  adapters MCP de sus dueñas y viajan después de cada foundation.
+- Carril scoring: **`1734` es paralelizable con `1719`/`1721`** — corre sobre `hiring.assessment.submitted` exista o
+  no la policy de asignación (`Blocked by: none` es correcto, no significa "última"). Su matriz de sign-offs quedó
+  resuelta por autorización ejecutiva del CEO (2026-08-16, ver Delta en la task); los gates técnicos (eval de
+  promoción, shadow, canary) se mantienen.
+- Carril expediente: `1735` (foundation backend del Evaluation Dossier) es independiente y paralelizable; su
+  consumer UI es follow-up. Frontera 1734↔1735: manifest estructurado vs nota narrativa (declarada en ambas).
+- Carril cuenta candidata: `1727 → 1728/1729 → 1730 → 1731 → 1732 → 1733` según sus blockers declarados.
+
 ### Supersede de non-goal
 
 El non-goal "No AI scoring/evaluation automation in the first pass" se **refina**: la evaluación (assessment) entra como capability propia; el scoring IA es gobernado (propose→confirm + eval), no automatización que decide. No se relaja el boundary de "no auto-reject".

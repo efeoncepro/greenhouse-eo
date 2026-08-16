@@ -441,6 +441,14 @@ sin providers externos, sin coordinación de operadores más allá del manual nu
 - Flujo agéntico `propose → confirm → execute` para notas generadas por Nexa/agentes
   (`source='agent'` ya soportado por el command).
 
+## Delta 2026-08-16
+
+- Frontera con `TASK-1734` (AI Scoring at Scale) declarada en ambas direcciones tras su auditoría cross-task: el
+  manifest/audit del run de 1734 registra HECHOS estructurados (IDs, digests, reason codes, actor); la narrativa del
+  revisor al resolver un `mandatory_review` vive como nota `kind=assessment_review` de ESTE expediente con
+  `context_json.{runId,proposalId}`. Un solo hábitat por tipo de contenido — el expediente no duplica el manifest y
+  el manifest no acumula prosa. 1734 referencia esta task en sus Normative Docs y Blocks/Impacts.
+
 ## Open Questions
 
 - Visibilidad de `interview_note` entre evaluadores antes del submit del scorecard propio:
