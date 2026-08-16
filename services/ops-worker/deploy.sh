@@ -404,6 +404,14 @@ ENV_VARS="${ENV_VARS},GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED=${GROWTH_EBOOK_EMAIL_D
 HIRING_LIFECYCLE_EMAILS_ENABLED="${HIRING_LIFECYCLE_EMAILS_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},HIRING_LIFECYCLE_EMAILS_ENABLED=${HIRING_LIFECYCLE_EMAILS_ENABLED}"
 
+# TASK-1723 — Banco de Talento person-first. El reconciliador es read/write sólo
+# sobre la proyección minimizada, idempotente y sin contacto al candidato. El
+# scheduler puede permanecer activo: este flag es el kill switch sin consultas.
+# Activado para el rollout interno read-only autorizado 2026-08-16. Rollback:
+# `gcloud run services update ops-worker --update-env-vars HIRING_TALENT_POOL_PROJECTION_ENABLED=false`.
+HIRING_TALENT_POOL_PROJECTION_ENABLED="${HIRING_TALENT_POOL_PROJECTION_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},HIRING_TALENT_POOL_PROJECTION_ENABLED=${HIRING_TALENT_POOL_PROJECTION_ENABLED}"
+
 # Buzón interno de People para el aviso de postulación nueva (configurable; default en código).
 HIRING_INTERNAL_NOTIFICATIONS_EMAIL="${HIRING_INTERNAL_NOTIFICATIONS_EMAIL:-people@efeoncepro.com}"
 ENV_VARS="${ENV_VARS},HIRING_INTERNAL_NOTIFICATIONS_EMAIL=${HIRING_INTERNAL_NOTIFICATIONS_EMAIL}"
@@ -1004,6 +1012,16 @@ upsert_scheduler_job \
   "/globe/tenancy/reconcile" \
   '{}'
 echo "  -> ops-globe-tenancy-reconcile: */5 * * * * (Greenhouse → Globe full-workspace tenancy V2)"
+
+# TASK-1723 — Incremental safety-net over the canonical Hiring sources. The
+# handler is idempotent and flag-gated; five minutes bounds projection staleness
+# without introducing another event store or mutating source aggregates.
+upsert_scheduler_job \
+  "ops-hiring-talent-pool-reconcile" \
+  "*/5 * * * *" \
+  "/hiring/talent-pool/reconcile" \
+  '{}'
+echo "  -> ops-hiring-talent-pool-reconcile: */5 * * * * (Talent Pool projection, TASK-1723)"
 
 upsert_scheduler_job \
   "ops-reactive-organization" \

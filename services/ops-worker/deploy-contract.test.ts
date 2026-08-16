@@ -38,6 +38,20 @@ describe('ops-worker deploy identity smoke contract', () => {
   })
 })
 
+describe('ops-worker Talent Pool projection contract', () => {
+  it('persists the projection kill switch and schedules the idempotent reconciler', () => {
+    const script = deployScript()
+    const jobIndex = script.indexOf('"ops-hiring-talent-pool-reconcile"')
+
+    expect(script).toContain(
+      'ENV_VARS="${ENV_VARS},HIRING_TALENT_POOL_PROJECTION_ENABLED=${HIRING_TALENT_POOL_PROJECTION_ENABLED}"'
+    )
+    expect(jobIndex).toBeGreaterThan(0)
+    expect(script.slice(jobIndex, jobIndex + 260)).toContain('"*/5 * * * *"')
+    expect(script.slice(jobIndex, jobIndex + 260)).toContain('"/hiring/talent-pool/reconcile"')
+  })
+})
+
 describe('ops-worker deploy Notion status-transition contract', () => {
   it('requires the productive Notion token secret before deploy can continue', () => {
     const script = deployScript()

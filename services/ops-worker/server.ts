@@ -149,6 +149,7 @@ import { computeRollingRematerializationWindow } from './finance-rematerialize-s
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
 import { runProductCatalogDriftDetectJob } from './product-catalog-drift-detect'
 import { runProductCatalogReconcileV2Job } from './product-catalog-reconcile-v2'
+import { runTalentPoolReconcile } from './talent-pool-reconcile'
 import { wrapCronHandler } from './cron-handler-wrapper'
 
 // ─── Sentry init (TASK-844) ─────────────────────────────────────────────────
@@ -2189,6 +2190,18 @@ const handleEmailDeliverabilityMonitor = wrapCronHandler({
   }
 })
 
+// ─── /hiring/talent-pool/reconcile ─────────────────────────────────────────
+//
+// TASK-1723 — Safety-net incremental reconciliation for the person-first Talent
+// Pool. The canonical Hiring writers remain the source of truth; this job only
+// rebuilds the minimized evidence projection and is safe at-least-once. The
+// worker flag is a hard no-query kill switch so deploys can ship before rollout.
+const handleTalentPoolReconcile = wrapCronHandler({
+  name: 'hiring-talent-pool-reconcile',
+  domain: 'hiring',
+  run: async (): Promise<Record<string, unknown>> => runTalentPoolReconcile()
+})
+
 // ─── /nubox/* ───────────────────────────────────────────────────────────────
 //
 // TASK-775 Slice 3 — Nubox sync crons migrados de Vercel a Cloud Scheduler.
@@ -2820,6 +2833,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/email-deliverability-monitor') {
       await handleEmailDeliverabilityMonitor(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/hiring/talent-pool/reconcile') {
+      await handleTalentPoolReconcile(req, res)
 
       return
     }
