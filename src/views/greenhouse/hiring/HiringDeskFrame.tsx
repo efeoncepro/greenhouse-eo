@@ -7,6 +7,7 @@ import NextLink from 'next/link'
 import Box from '@mui/material/Box'
 import ButtonBase from '@mui/material/ButtonBase'
 import Stack from '@mui/material/Stack'
+import { alpha } from '@mui/material/styles'
 
 import {
   GreenhouseBreadcrumbs,
@@ -25,6 +26,8 @@ interface HiringDeskFrameProps {
   lead?: ReactNode
   aside?: ReactNode
   action?: ReactNode
+  secondaryActions?: ReactNode
+  meta?: ReactNode
 }
 
 const NAV_ITEMS = [
@@ -34,7 +37,7 @@ const NAV_ITEMS = [
   { key: 'talentPool', href: '/agency/hiring/talent-pool', icon: 'tabler-user-search' }
 ] as const
 
-const HiringDeskFrame = ({ surface, copy, primary, lead, aside, action }: HiringDeskFrameProps) => {
+const HiringDeskFrame = ({ surface, copy, primary, lead, aside, action, secondaryActions, meta }: HiringDeskFrameProps) => {
   const isApplication = surface === 'application'
   const activeSurface = (isApplication ? 'pipeline' : surface) as keyof typeof copy.navigation
 
@@ -75,14 +78,14 @@ const HiringDeskFrame = ({ surface, copy, primary, lead, aside, action }: Hiring
               px: 2,
               borderRadius: `${theme.shape.customBorderRadius.sm}px`,
               color: active ? theme.palette.primary.dark : theme.palette.text.secondary,
-              backgroundColor: active ? theme.palette.primary.lightOpacity : 'transparent',
+              backgroundColor: active ? alpha(theme.palette.primary.main, 0.08) : 'transparent',
               fontWeight: active ? theme.typography.fontWeightBold : theme.typography.fontWeightMedium,
               whiteSpace: 'nowrap',
               transition: theme.transitions.create(['background-color', 'color'], {
                 duration: theme.transitions.duration.shorter,
               }),
               '&:hover': {
-                backgroundColor: active ? theme.palette.primary.lightOpacity : theme.palette.action.hover,
+                backgroundColor: active ? alpha(theme.palette.primary.main, 0.08) : theme.palette.action.hover,
                 color: active ? theme.palette.primary.dark : theme.palette.text.primary,
               },
               '&:focus-visible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 },
@@ -110,7 +113,9 @@ const HiringDeskFrame = ({ surface, copy, primary, lead, aside, action }: Hiring
         titleComponent='h1'
         title={copy.title}
         description={copy.subtitle}
+        meta={meta}
         primaryAction={action}
+        secondaryActions={secondaryActions}
         supporting={navigation}
         dataCapture='hiring-workbench-header'
       />

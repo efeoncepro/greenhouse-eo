@@ -23,6 +23,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-16 — Pipeline Hiring contenido en un plano operacional
+
+- El selector de vacante y el conteo se integran al encabezado canónico; búsqueda, ayuda y Kanban comparten una
+  sola superficie blanca, con lanes tonales internas y tarjetas como elementos dominantes.
+- El selector conserva títulos completos en 390 px; se corrigieron nombres accesibles y contraste del scope.
+- Evidencia local desktop/mobile: `.captures/2026-08-16T22-13-39_task355-hiring-pipeline-board` (0 findings GVC).
+
 ## 2026-08-16 — Radar de assessment legible y honesto
 
 - Application 360 reemplaza el radar SVG manual por Recharts sobre el wrapper tipográfico canónico.
@@ -1127,34 +1134,3 @@ paga. Y una decisión deliberada: no hay valores por defecto por modelo. Cada ac
 declara explícitamente sus responsabilidades, y la ausencia de declaración es un estado cerrado, no
 una suposición. Un default parece cómodo y es justamente lo que hace que nadie revise el reparto
 real — que en el modelo co-operado es distinto para cada cliente.
-
-## 2026-08-07 — Growth SEO: el módulo responde tres preguntas, no una (TASK-1659…1662)
-
-Cuestionar por qué la pantalla de keywords no se construyó como estaba especificada destapó algo
-más grande que un desacuerdo de diseño: el módulo tiene **tres preguntas distintas** y sólo una
-tenía superficie.
-
-La construida contesta "de lo que ya tengo, ¿qué empujo?". Faltaban "¿dónde quiere estar el
-cliente?" y "¿qué me estoy perdiendo entero?". Y no es que estuvieran postergadas: de las doce
-tareas abiertas del programa SEO, ninguna las cubría.
-
-La razón de fondo es que **Search Console es ciego por construcción a las dos últimas**. Si el
-cliente no aparece en las primeras cien posiciones no hay impresiones, así que esa búsqueda
-sencillamente no existe en sus datos. Ninguna pantalla construida sobre esa fuente va a poder
-contestarlas nunca, por buena que sea.
-
-Eso corrige algo que veníamos diciendo mal. Para una búsqueda donde el cliente ya aparece, el
-volumen de mercado es un complemento y la medición propia es mejor insumo. Pero para una donde no
-aparece, la medición propia no entrega nada, y el volumen y la dificultad pasan a ser la única
-forma de contestar si vale la pena perseguirla y cuánto va a costar. Dejan de ser opcionales.
-
-También apareció que media capacidad ya existía sin que nadie lo notara: el comando acepta
-cualquier búsqueda, incluidas las que el cliente no rankea, y la captura diaria las mide igual. Lo
-que faltaba era dónde declararlas. La capacidad estaba disponible desde un asistente y no desde la
-pantalla — justo al revés del error habitual, y justo donde nadie ve el cupo ni el gasto que
-compromete.
-
-Cuatro tareas nuevas, en orden de dependencia: distinguir un objetivo declarado de una oportunidad
-detectada, la pantalla para declararlos y seguir su avance, los datos de mercado, y finalmente qué
-gana la competencia donde el cliente es invisible. Esta última es la de más valor comercial: es lo
-que se le muestra a un prospecto en la primera reunión.

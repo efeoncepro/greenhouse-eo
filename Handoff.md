@@ -2,6 +2,14 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-16 — Pipeline Hiring contenido y accesible
+
+El scope de vacante y el conteo de postulantes se integraron al `WorkbenchHeader`; búsqueda, ayuda y Kanban
+quedaron dentro de un solo plano operacional, con lanes tonales y tarjetas como superficies primarias. El título
+de la vacante no se trunca a 390 px y el fallo simulado queda solo en el harness. GVC desktop/mobile, teclado,
+rollback, reduced-motion y axe están verdes sin findings en
+`.captures/2026-08-16T22-13-39_task355-hiring-pipeline-board`. Cambio local, sin commit/push/deploy.
+
 ## 2026-08-16 — TASK-1736 complete (code complete, rollout gated) — cierre del trío del día
 
 TASK-1736 cerró sus 5 slices (0-4): ADR de canonicalización, primitive de normalización

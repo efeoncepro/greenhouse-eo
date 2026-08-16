@@ -15,7 +15,7 @@ export const scenario: CaptureScenario = {
   readiness: { selector: '[data-capture="hiring-pipeline-board"]', absentSelectors: ['[data-testid="login-card"]'], waitForFonts: true, postReadyDelayMs: 400, timeout: 15000 },
   assertions: [{ kind: 'noLoginRedirect' }, { kind: 'noErrorBoundary' }],
   quality: {
-    layout: { enabled: true, includeSelector: 'body', ignoreSelectors: ['.ts-vertical-nav-root', '.ts-vertical-nav-container', '.ts-vertical-nav-bg-color-container', '.bs-full'], allowHorizontalScrollSelectors: ['[data-capture="hiring-pipeline-board"]'], minTargetSize: 20, failOnViolations: true },
+    layout: { enabled: true, includeSelector: 'body', ignoreSelectors: ['.ts-vertical-nav-root', '.ts-vertical-nav-container', '.ts-vertical-nav-bg-color-container', '.bs-full'], allowHorizontalScrollSelectors: ['[data-capture="hiring-tabs"]', '[data-capture="hiring-pipeline-board"]'], minTargetSize: 20, failOnViolations: true },
     accessibility: { enabled: true, includeSelector: 'body', failOnViolations: false },
     runtime: { failOnConsoleError: true, failOnPageError: true, failOnHydrationWarning: false },
     enterpriseRubric: { enabled: true, includeSelector: '[data-capture="hiring-pipeline"]' },
@@ -41,7 +41,7 @@ export const scenario: CaptureScenario = {
         reducedMotion: 'capture',
       },
     },
-    { kind: 'click', selector: '[data-capture="hiring-card-stage-menu"]' },
+    { kind: 'click', selector: 'button[data-capture="hiring-card-stage-menu"]:visible' },
     { kind: 'wait', selector: '[role="menu"]' },
     { kind: 'mark', label: 'pipeline-keyboard-menu', clipSelector: '[role="menu"]', note: 'Alternativa de etapa operable por teclado.' },
     { kind: 'click', selector: '[role="menu"] li:has-text("Screening")' },

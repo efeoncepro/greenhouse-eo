@@ -1,5 +1,14 @@
 # TASK-355 — Hiring Desk Wireframe
 
+## Delta 2026-08-16 — Scope de vacante y plano operacional del Pipeline
+
+- El selector de vacante deja de flotar sobre `background.default`: pasa al slot `secondaryActions` del `WorkbenchHeader` compartido, con label visible, valor completo adaptable y metadata de código/área.
+- El conteo de postulantes pasa al slot `meta` del mismo header y se actualiza con el scope y la búsqueda activos.
+- Búsqueda, ayuda de teclado, estados y Kanban viven dentro de una única superficie operacional blanca; el área de carriles usa una banda tonal interna y scroll horizontal propio.
+- Los carriles dejan de competir como cards elevadas: son drop-zones tonales con borde; las tarjetas de candidatos conservan el nivel interactivo principal.
+- `Simular fallo de red` no es un control de producto. La inyección de rollback queda disponible sólo mediante el parámetro gobernado del escenario GVC y no aparece en la UI del operador.
+- Decisión: `reuse + extend` (`HiringDeskFrame` expone `secondaryActions/meta`; MUI `Select` y `Paper` route-local). No nace una primitive nueva ni cambia el contrato de datos.
+
 ## Delta 2026-07-16 — Publication Desk (TASK-1422)
 
 - La Surface 4 (Publication Desk) ganó: (1) **selector de vacante** en el header card (antes la vista fijaba `openings[0]`); (2) CTA **"Redactar con IA"** en el header de la columna pública del diff → drawer propose→confirm del copy público (contratos en `docs/ui/wireframes/TASK-1422-vacancy-ai-draft-drawer.md` + flow + motion). El diff anti-leak y las acciones de publish quedaron intactos.
@@ -52,7 +61,12 @@ El "control room" del ATS: un reclutador/hiring manager opera el pipeline de pun
 
 ```
 ┌───────────────────────────────────────────────────────────────────┐
-│  [opening ▾]   Postulantes de: Account Manager        [buscar]     │
+│ Hiring Desk                                      Vacante [opening ▾]│
+│ 30 postulantes                                                    │
+│ Demanda · Pipeline · Publicación · Banco de talento               │
+└───────────────────────────────────────────────────────────────────┘
+┌──────────────────────── Plano operacional ─────────────────────────┐
+│ [buscar postulante…]                         [ayuda de teclado]     │
 ├──────────┬──────────┬───────────┬────────────┬──────────┬─────────┤
 │ Sourced  │ Screening│ Assessment│ Entrevista │ Decisión │ Cerrado │  columnas = etapas canónicas
 │ ┌──────┐ │ ┌──────┐ │  ┌──────┐ │            │          │         │
@@ -160,6 +174,7 @@ Copy `getMicrocopy(locale).hiringDesk`; tokens AXIS; charts (KPIs) ECharts→Ape
 - Evidencia local final 2026-07-10: `task355-hiring-pipeline-board` PASS en `.captures/2026-07-10T08-19-55_task355-hiring-pipeline-board` (mobile-first + desktop; card hover/focus/reduced-motion; rollback) y `task355-hiring-tabs-transition` PASS en `.captures/2026-07-10T08-16-47_task355-hiring-tabs-transition`.
 - Evidencia posterior por feedback visual 2026-07-10: `task355-hiring-pipeline-board` PASS en `.captures/2026-07-10T09-05-35_task355-hiring-pipeline-board` (toolbar alineado, search derecho, placeholder fiel, lanes/cards con mayor profundidad) y `task355-hiring-tabs-transition` PASS en `.captures/2026-07-10T09-07-55_task355-hiring-tabs-transition` (Demand → Pipeline → Publicación con navegación robusta y panel transition).
 - Evidencia posterior Demanda 2026-07-10: `task355-hiring-demand-desk` PASS desktop/mobile en `.captures/2026-07-10T09-35-01_task355-hiring-demand-desk` (KPIs con profundidad, toolbar izquierda/derecha alineado, tabla enterprise, responsive sin overflow de página).
+- Evidencia de recomposición Pipeline 2026-08-16: `task355-hiring-pipeline-board` PASS desktop/390 px en `.captures/2026-08-16T22-13-39_task355-hiring-pipeline-board` (scope de vacante contenido, toolbar y Kanban en un plano operacional, labels completos, teclado, rollback, reduced-motion y axe sin findings).
 - Auditoría de fidelidad canvas-only 2026-07-10: `.captures/task355-hiring-reference-canvas-2026-07-10T08-18-26-140Z/index.html` compara el `main` del HTML aprobado contra runtime Demand/Pipeline/Publication, excluyendo el chrome global Greenhouse por contrato.
 
 ## Design Decision Log
@@ -169,7 +184,7 @@ Copy `getMicrocopy(locale).hiringDesk`; tokens AXIS; charts (KPIs) ECharts→Ape
 - **Kanban canónico route-local para Hiring**: se prioriza fidelidad al HTML aprobado sobre wrappers genéricos cuando estos agregan artefactos visuales; drag/drop nativo + menú teclado obligatorio (a11y), NO demo full-version.
 - **Pipeline sparse real-data polish:** el HTML demo tiene muchas postulaciones; runtime real puede tener 1. En baja densidad no se inventan cards demo: se compactan drop-zones, se usa motion de entrada de lanes/cards, se conservan lanes de 264px y el scroll queda interno al board con affordance de borde, nunca como scroll de página.
 - **Demand enterprise polish:** la vista Demanda debe evitar el plano "tabla + filtros" cuando hay pocos datos reales. Los KPIs llevan acento/gradiente/glow sutil, el toolbar se agrupa izquierda/derecha como superficie premium, los filtros usan labels compactos/responsive y la tabla traduce estados raw a labels canónicos visibles (`Abierta`, `Publicada`) sin inventar métricas ni alterar el reader.
-- **Toolbar Pipeline:** selector/count quedan anclados a la izquierda y search/toggle a la derecha; no permitir solape entre `Select` y `TextField`. Placeholder específico de Pipeline: `Buscar postulante…`.
+- **Scope + toolbar Pipeline:** selector/count viven en `WorkbenchHeader.secondaryActions/meta`; búsqueda y ayuda pertenecen al plano operacional del Kanban. No permitir truncamiento del valor activo a 390 px. El fallo de red es harness GVC, no toggle visible. Placeholder específico: `Buscar postulante…`.
 - **Transición tabs:** las tabs son navegación real (`href`) para no perder robustez; el panel aplica entrada `ghHiringPanel` y `viewTransitionName='hiring-desk-panel'`, con reduced-motion sin animación.
 - **360 = hub** que embebe assessment (1363) + docs (1362) + decisión; IA propone→humano confirma; anti-anclaje.
 - **Decisión estructurada/contestable** (reason obligatorio) — fairness/AI-Act; scorecard advisory, nunca gate.
