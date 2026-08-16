@@ -159,7 +159,8 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   capability, purpose/audit y DTO allowlisted. La cohorte tiene 52 memberships (50 `active_process`, 2
   `needs_reconsent`) sin consentimiento futuro inventado; invite y self-service externos siguen OFF hasta aprobación
   Privacy/People. Canary OAuth real: allow search/profile `200`, deny con cliente base-only `403`. `TASK-1718` está
-  code-complete y en rollout controlado con reader/proyección/provider de CV todavía OFF; `TASK-1719`–`TASK-1722`
+  desplegada en producción por release `6b78b040252d` y continúa en rollout controlado con
+  reader/proyección/provider de CV OFF, sin backfill ni lectura real; `TASK-1719`–`TASK-1722`
   permanecen `to-do`. Talent Assurance (`EPIC-038`, `TASK-1602`–`TASK-1611`) permanece en fase de
   decisión/discovery mientras sus ADR y contratos base sigan `Proposed`.
 - La dirección aceptada para autoservicio candidato es **una cuenta y un `/my` longitudinal** (`TASK-1727`–`TASK-1733`,

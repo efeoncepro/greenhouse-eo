@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-011`
-- Status real: `Code complete en checkout compartido: reader exacto, visor directo, proyección minimizada, App API, OAuth separado, audit y dos tools MCP implementados. Build, 197 pruebas focales Greenhouse, 56 pruebas MCP y GVC sintético desktop/mobile están verdes. La migración aditiva fue aplicada al Cloud SQL compartido sin backfill; deploy y canary siguen pendientes. Los flags de reader/projection/provider documental permanecen OFF y el uso de CV real exige gate Privacy/Security/Talent/Identity/MCP.`
+- Status real: `Código desplegado en producción: reader exacto, visor directo, proyección minimizada, App API, OAuth separado, audit y dos tools MCP implementados. Release 6b78b040252d-d0d36c25-3634-4567-8be5-a807272e0ccb / run 31949566099 terminó released; CI, Deep, build, smoke E2E, watchdog, 197 pruebas focales Greenhouse, 56 pruebas MCP y GVC sintético desktop/mobile están verdes. La migración aditiva está aplicada al Cloud SQL compartido sin backfill. Los flags de reader/projection/provider documental permanecen OFF y faltan sign-offs Privacy/Security/Talent/Identity/MCP más canary sintético antes de cualquier CV real.`
 - Rank: `TBD`
 - Domain: `hr|platform|identity|data`
 - Blocked by: `none`

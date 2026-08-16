@@ -24,16 +24,18 @@ y session/magic-link hardening; TASK-1731/1727 deben verificarlas contra runtime
 
 ### Banco de Talento — producción interna operativa; recontacto externo gated (2026-08-16)
 
-`TASK-1723`–`TASK-1726` quedaron implementadas end-to-end. Release Greenhouse `a369165dfb2d` / run
-`31941320983` terminó `success`; Vercel productivo `dpl_AbdEkmeQTu6ErXD2mDzekfiaG3Ef` está `READY`. PostgreSQL
-tiene siete migraciones aplicadas y cero pendientes. El backfill/reconciler conserva 52 memberships (50
+`TASK-1723`–`TASK-1726` quedaron implementadas end-to-end. La promoción ampliada Greenhouse
+`6b78b040252d` / release `6b78b040252d-d0d36c25-3634-4567-8be5-a807272e0ccb` / run `31949566099`
+terminó `released`; Vercel productivo `dpl_3CXgsmvfCWxtfDj35QWcWsJgitTn` está `READY`. PostgreSQL
+tiene cero migraciones pendientes. El backfill/reconciler conserva 52 memberships (50
 `active_process`, 2 `needs_reconsent`) y no crea consentimiento futuro; scheduler
-`ops-hiring-talent-pool-reconcile` corre cada cinco minutos sobre `ops-worker-00560-zsk`.
+`ops-hiring-talent-pool-reconcile` corre cada cinco minutos sobre `ops-worker-00562-npr`.
 
 Dos superficies quedaron verificadas: candidato 1440/390 en
-`.captures/2026-08-16T08-52-56_hiring-talent-pool-self-service` (desplegada fail-closed) y operador live 1440/390
-en `.captures/2026-08-16T10-24-10_hiring-talent-pool-desk`. Hiring Desk permite buscar/filtrar, abrir ficha y leer
-evidencia/availability con person-first semantics. No rankea, decide, mueve etapa, asigna test ni expone contacto/CV.
+`.captures/2026-08-16T08-52-56_hiring-talent-pool-self-service` (desplegada fail-closed) y operador 1440/390
+con fixtures sintéticos en `.captures/2026-08-16T12-22-58_hiring-talent-pool-desk`. Hiring Desk permite
+buscar/filtrar, abrir ficha, leer evidencia/availability y abrir el CV exacto de la postulación dentro del Banco.
+No rankea, decide, mueve etapa, asigna test ni copia contacto/CV al índice de búsqueda.
 
 Efeonce MCP publica `hiring.talent_pool.search` y `hiring.talent_pool.profile.get` para persona interna delegada.
 Canary OAuth real: search/profile `200`; cliente base-only `66985833-14e9-438e-add4-b740e84e9a64` obtuvo `403`
@@ -46,11 +48,12 @@ La auditoría `greenhouse-talent-people-operator` confirmó person-first, cero r
 contacto/CV, invitación mediante `HiringApplication` canónica y tests sólo por application. Detectó un fail-open
 latente en el rate guard público; quedó corregido para usar bucket compartido sin IP y negar cuando falla el store.
 
-Extensión en release candidate: el operador ya no debe salir del Banco para leer el CV; el sidecar usa un reader
-exacto `applicationId → assetId` y el visor privado, sin mezclar documentos de otras postulaciones. Para agentes,
-TASK-1718 agregó App API, proyección minimizada, OAuth/capability separados y dos tools MCP read-only, pero sus tres
-flags permanecen OFF y no hubo backfill ni lectura de CV real. Build, 197/197 pruebas Greenhouse, 56/56 MCP y GVC
-sintético desktop/390 están verdes. El escenario visual ahora usa un harness que responde 404 en producción porque
+La promoción ampliada puso en producción el reader exacto `applicationId → assetId` y el visor privado del sidecar,
+sin mezclar documentos de otras postulaciones. Para agentes, TASK-1718 desplegó App API, proyección minimizada,
+OAuth/capability separados y dos tools MCP read-only, pero `HIRING_CANDIDATE_REVIEW_READER_ENABLED`,
+`HIRING_CANDIDATE_REVIEW_PROJECTION_ENABLED` y `GREENHOUSE_HIRING_CANDIDATE_REVIEW_ENABLED` permanecen OFF;
+no hubo backfill ni lectura de CV real. Build, CI/Deep, smoke E2E, 197/197 pruebas focales Greenhouse, 56/56 MCP,
+watchdog y GVC sintético desktop/390 están verdes. El escenario visual usa un harness que responde 404 en producción porque
 las máscaras de diff no borraban PII de los PNG/ARIA; la evidencia previa con datos reales fue retirada a Papelera.
 El theme dejó de importar el fallback residual Public Sans: títulos y texto usan únicamente Poppins + Geist.
 
