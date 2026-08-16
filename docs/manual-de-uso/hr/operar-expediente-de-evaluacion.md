@@ -50,6 +50,9 @@ pnpm staging:request POST /api/hiring/applications/<happ-id>/dossier '{"action":
 
 ## Qué no hacer
 
+- No escribir atributos demográficos del candidato (edad, género, origen, religión) en
+  ninguna nota — regla de fairness del proceso de selección.
+
 - No pedir el borrador "por fuera" (chat) y pegarlo a mano: se pierde el provenance.
 - No intentar editar/borrar notas por SQL — el trigger y los grants lo bloquean a propósito.
 - No exponer contenido del expediente al candidato por ningún canal.

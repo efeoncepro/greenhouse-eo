@@ -30,8 +30,13 @@ puede reconstruirse.
 
 - El candidato **jamás** ve el expediente: ni en el portal, ni por email, ni por las
   herramientas de agentes (MCP).
-- La IA **nunca** recibe nombre, contacto, identidad legal ni datos demográficos del
-  candidato — solo el texto del CV redactado, las respuestas del test y las etapas.
+- La IA **nunca** recibe campos de identidad estructurados (contacto, documento legal,
+  self-ID demográfico) — el sistema ni siquiera los consulta. El texto del CV y las
+  respuestas pasan por un redactor que elimina emails, teléfonos y RUT **por patrón**;
+  el nombre puede aparecer en la prosa libre del CV (límite declarado de la redacción
+  actual — el expediente completo es internal-only en todo caso).
+- Las notas del expediente **no deben capturar atributos demográficos** del candidato
+  (edad, género, origen, religión, etc.) — regla de fairness del proceso (TASK-1365).
 - Las notas son narrativa: **no cambian puntajes** ni mueven etapas ni deciden nada.
 - Solo el tier de gobernanza de Hiring (admin, HR manager, operations) puede escribir o
   confirmar; cualquiera con acceso de lectura de Hiring puede leer.

@@ -581,6 +581,20 @@ sin providers externos, sin coordinación de operadores más allá del manual nu
 - Métrica de calidad del borrador: medir el delta de edición humana (propuesta vs nota
   confirmada) como señal de drift del prompt/modelo.
 
+## Delta 2026-08-16 (3) — auditoría post-implementación (arch PASS + talent CONDITIONAL→resuelto)
+
+Correcciones aplicadas tras doble auditoría: (1) `answerText` del packet pasa por
+`redactCandidateContactText` (las respuestas también son texto libre con posible contacto);
+(2) claim de privacidad alineada al código: sin campos de identidad ESTRUCTURADOS; contacto/RUT
+redactados por patrón; el nombre puede aparecer en la prosa del CV (límite heredado de
+`contact-minimization-v1` de TASK-1718); (3) `POST /notes` fuerza `source='human'` — `agent` es
+exclusivo del confirm gobernado; (4) grant UPDATE por columnas en el ledger de propuestas
+(inmutabilidad estructural de `proposed_json`); (5) prohibición de demográficos en notas escrita
+en manual + doc funcional. **Gate BLOQUEANTE para la task UI consumer:** resolver el anti-anclaje
+(un entrevistador con `hiring.application.read` puede leer el dossier con scores antes de rendir
+su scorecard — decidir ocultamiento pre-submit en la superficie). Mitigación futura opcional M3:
+advisory lock en el propose para carrera simultánea (hoy solo duplica costo LLM, no corrección).
+
 ## Delta 2026-08-16 (2) — re-scope CEO: el expediente nace SMART
 
 Por directiva del CEO (2026-08-16, sesión de operador): la generación agéntica del análisis

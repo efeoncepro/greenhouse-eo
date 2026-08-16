@@ -6,8 +6,7 @@ import { hiringInvalidBodyResponse, toHiringErrorResponse } from '@/lib/hiring'
 import {
   listHiringApplicationNotes,
   recordHiringApplicationNote,
-  type HiringApplicationNoteKind,
-  type HiringApplicationNoteSource
+  type HiringApplicationNoteKind
 } from '@/lib/hiring/application-notes'
 import { requireInternalTenantContext } from '@/lib/tenant/authorization'
 
@@ -22,7 +21,6 @@ export const dynamic = 'force-dynamic'
 interface NoteBody {
   kind?: HiringApplicationNoteKind
   bodyMd?: string
-  source?: HiringApplicationNoteSource
   contextJson?: Record<string, unknown>
 }
 
@@ -70,7 +68,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       kind: body.kind as HiringApplicationNoteKind,
       bodyMd: body.bodyMd ?? '',
       authorUserId: tenant.userId,
-      source: body.source,
+      // Auditoría 2026-08-16: source='agent' es exclusivo del confirm del dossier
+      // (provenance gobernado); la ruta manual siempre registra 'human'.
+      source: 'human',
       contextJson: body.contextJson
     })
 

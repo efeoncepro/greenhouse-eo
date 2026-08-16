@@ -2,6 +2,8 @@ import 'server-only'
 
 import { createHash } from 'node:crypto'
 
+import { redactCandidateContactText } from '@/lib/hiring/candidate-review/parser'
+
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import type {
   DossierPacketCompetencyResult,
@@ -31,10 +33,16 @@ const MAX_PROMPT_CHARS = 2000
  * `answer.value` si son string; si no, serialización acotada. Texto NO confiable.
  */
 const extractAnswerText = (answer: Record<string, unknown>): string => {
-  if (typeof answer.text === 'string') return answer.text.slice(0, MAX_ANSWER_CHARS)
-  if (typeof answer.value === 'string') return answer.value.slice(0, MAX_ANSWER_CHARS)
+  // Auditoría talent 2026-08-16: la respuesta del candidato es texto libre y puede
+  // contener su email/teléfono — pasa por el mismo redactor de contacto que el CV.
+  const raw =
+    typeof answer.text === 'string'
+      ? answer.text
+      : typeof answer.value === 'string'
+        ? answer.value
+        : JSON.stringify(answer ?? {})
 
-  return JSON.stringify(answer ?? {}).slice(0, MAX_ANSWER_CHARS)
+  return redactCandidateContactText(raw).slice(0, MAX_ANSWER_CHARS)
 }
 
 const num = (value: unknown): number | null => {
