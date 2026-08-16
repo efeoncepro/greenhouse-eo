@@ -203,6 +203,22 @@ const toNumber = (value: number | string | null | undefined) => {
   return Number.isFinite(parsed) ? parsed : 0
 }
 
+// ISSUE detectado en el primer uso real del materializer de TASK-1718 (2026-08-16):
+// pg retorna Date para timestamptz y normalizeNullableString los anulaba, así que
+// createdAt/uploadedAt/attachedAt llegaban SIEMPRE null (violaba el NOT NULL de
+// candidate_document_review_projection.source_updated_at). Normalizador date-aware.
+const normalizeNullableTimestamp = (value: unknown): string | null => {
+  if (value instanceof Date) {
+    return value.toISOString()
+  }
+
+  if (typeof value === 'string' && value.trim().length > 0) {
+    return value
+  }
+
+  return null
+}
+
 const normalizeNullableString = (value: unknown) => {
   if (typeof value !== 'string') {
     return null
@@ -359,11 +375,11 @@ const mapAssetRow = (row: AssetRow): GreenhouseAssetRecord => ({
   downloadCount: toNumber(row.download_count),
   metadata: normalizeRecord(row.metadata_json),
   contentHash: normalizeNullableString(row.content_hash),
-  createdAt: normalizeNullableString(row.created_at),
-  uploadedAt: normalizeNullableString(row.uploaded_at),
-  attachedAt: normalizeNullableString(row.attached_at),
-  deletedAt: normalizeNullableString(row.deleted_at),
-  lastDownloadedAt: normalizeNullableString(row.last_downloaded_at)
+  createdAt: normalizeNullableTimestamp(row.created_at),
+  uploadedAt: normalizeNullableTimestamp(row.uploaded_at),
+  attachedAt: normalizeNullableTimestamp(row.attached_at),
+  deletedAt: normalizeNullableTimestamp(row.deleted_at),
+  lastDownloadedAt: normalizeNullableTimestamp(row.last_downloaded_at)
 })
 
 const assertPrivateAssetUpload = ({
