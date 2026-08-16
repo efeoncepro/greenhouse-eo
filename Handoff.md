@@ -2,6 +2,15 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### TASK-1736 — canonicalización del intake candidato registrada, sin implementación (2026-08-16)
+
+Se creó `TASK-1736` y se agregó a `EPIC-011` como follow-up backend-critical de TASK-1367/1688. La task separa
+evidencia submitted por aplicación, display person-first normalizado/corregible y search key versionada; exige
+parity Careers/Growth Forms, ADR previa y remediación histórica `dry-run → allowlist → apply → rollback` con CAS,
+audit y flag OFF. Prohíbe Title Case ciego, inferencia por nombre y reescritura de mensajes/respuestas abiertas.
+No se modificó código, schema, datos, flags ni runtime. Próximo paso: Slice 0 — ADR + field policy matrix y
+sign-offs Talent/Identity/Privacy/Security/Data antes de cualquier writer o backfill.
+
 ### Assessment IA a escala — task registrada, sin implementación (2026-08-16)
 
 Se creó `TASK-1734` y se agregó a `EPIC-011` como follow-up backend-critical de `TASK-1361`. La task propone

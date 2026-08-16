@@ -116,6 +116,15 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   confianza y estado de revisión nunca se exponen al postulante, que solo recibe confirmación de envío.
 - Boundary: no rankea candidatos, no decide contratación, no mueve etapas, no asigna tests y no envía correos.
 
+### Phase 10 — Candidate Identity Intake Canonicalization
+
+- `TASK-1736` separa evidencia submitted por aplicación, display person-first normalizado/corregible y search key
+  versionada; ambas entradas públicas ejecutan la misma policy antes de Person/Hiring.
+- Gate: ninguna corrección culturalmente ambigua muta identidad; el histórico sólo cambia mediante dry-run,
+  allowlist humana, compare-and-set, audit y rollback ensayado. Mensajes y respuestas abiertas se preservan.
+- Boundary: no crea perfil profesional paralelo, no fusiona por nombre, no rankea, puntúa, mueve etapas, asigna
+  tests, envía email ni muestra resultados internos al postulante.
+
 ## Child Tasks
 
 - `TASK-352` — Program umbrella and coordination for Hiring / ATS.
@@ -164,6 +173,8 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `TASK-1735` — Hiring Application Evaluation Dossier: expediente de evaluación append-only per-application
   (`hiring_application_note` tipada + command/reader + API + capability `hiring.application.annotate`),
   internal-only y fuera del review packet MCP; el consumer UI de Application 360 es follow-up.
+- `TASK-1736` — Candidate Identity Intake Canonicalization + Governed Remediation: raw/display/search person-first,
+  parity Careers/Growth Forms, reconciliación identity-safe y remediación histórica allowlisted/reversible.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
 
@@ -188,6 +199,17 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 ### Contact completeness correction (Delta 2026-08-11)
 
 - `TASK-1688` — corrección del contrato que detectó la auditoría de postulaciones reales: teléfono y mensaje alcanzaban el schema pero el command no los persistía, y país de residencia no existía. Exige ADR antes de migrar, no permite inferencia/backfill histórico y gobierna ambas entradas públicas hacia el mismo command/reader.
+
+### Candidate identity intake canonicalization (Delta 2026-08-16)
+
+- `TASK-1736` continúa TASK-1367/1688 sin duplicarlas: conserva la Person canónica y agrega un contrato
+  raw/display/search versionado para nombres, parity de las dos entradas públicas y reconciliación conflict-safe
+  cuando el email ya resolvió una identidad existente.
+- La remediación histórica es backend-critical: ADR y sign-offs previos, detector read-only, dry-run vigente,
+  allowlist humana, compare-and-set, lotes de uno, audit sin PII y rollback exacto ensayado en staging.
+- La policy nunca aplica Title Case global ni reescribe mensajes/respuestas abiertas; phone calling-country es
+  explícito y distinto de residencia. UI de corrección, hardening genérico Growth Forms, assessment IDs y
+  filename CV quedan fuera.
 
 ### Agent-safe candidate review extension (Delta 2026-08-15)
 
