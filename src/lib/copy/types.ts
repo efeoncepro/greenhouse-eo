@@ -149,12 +149,16 @@ export interface HiringAssessmentCopy {
     cancel: string
     confirmed: string
     finalize: string
+    /** ISSUE-159 — progreso honesto mientras el scorecard está parcial: '{scored} de {total}…' */
+    partialProgress: string
     statuses: {
       optimal: string
       attention: string
       critical: string
       pending: string
       corrected: string
+      /** ISSUE-159 — global con competencias aún por corregir; nunca se muestra promedio parcial. */
+      partial: string
     }
   }
 }

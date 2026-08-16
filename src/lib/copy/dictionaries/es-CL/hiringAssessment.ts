@@ -68,12 +68,14 @@ export const hiringAssessment: HiringAssessmentCopy = {
     cancel: 'Cancelar',
     confirmed: 'Puntaje confirmado. El scorecard se actualizó.',
     finalize: 'Finalizar scorecard',
+    partialProgress: '{scored} de {total} competencias corregidas',
     statuses: {
       optimal: 'Óptimo',
       attention: 'Atención',
       critical: 'Crítico',
       pending: 'Por corregir',
       corrected: 'Corregido',
+      partial: 'Parcial',
     },
   },
 }

@@ -65,12 +65,14 @@ export const hiringAssessment: HiringAssessmentCopy = {
     cancel: 'Cancel',
     confirmed: 'Score confirmed. The scorecard was updated.',
     finalize: 'Finalize scorecard',
+    partialProgress: '{scored} of {total} competencies reviewed',
     statuses: {
       optimal: 'Optimal',
       attention: 'Attention',
       critical: 'Critical',
       pending: 'Pending review',
       corrected: 'Corrected',
+      partial: 'Partial',
     },
   },
 }

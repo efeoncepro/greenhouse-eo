@@ -58,6 +58,7 @@ import type { AiProposal } from '@/types/hiring-assessment-ai'
 import HiringDeskFrame from './HiringDeskFrame'
 import CandidateDocumentsPanel from './CandidateDocumentsPanel'
 import { hiringRequest } from './hiring-client'
+import { computeScorecardSummary } from './scorecard-summary'
 
 type TabKey = 'overview' | 'assessment' | 'documents' | 'decision' | 'activity'
 const TAB_KEYS: TabKey[] = ['overview', 'assessment', 'documents', 'decision', 'activity']
@@ -737,14 +738,11 @@ const Application360View = ({
           return { ...module, responses, score, target, pending }
         })
 
-        const scoredRows = scoreRows.filter((row) => row.score != null)
-        const totalWeight = scoredRows.reduce((sum, row) => sum + row.weight, 0)
-
-        const overall = scoredRows.length === 0
-          ? null
-          : totalWeight > 0
-            ? Math.round(scoredRows.reduce((sum, row) => sum + (row.score ?? 0) * row.weight, 0) / totalWeight)
-            : Math.round(scoredRows.reduce((sum, row) => sum + (row.score ?? 0), 0) / scoredRows.length)
+        // ISSUE-159: el global SOLO existe con el scorecard completo. Un promedio parcial
+        // (p.ej. 2 competencias objetivas perfectas + 7 pendientes) mostraba "100/100
+        // Óptimo" como si fuera resultado final. El estado partial muestra progreso, no nota.
+        const scorecardSummary = computeScorecardSummary(scoreRows)
+        const overall = scorecardSummary.overall
 
         const radarPoints = scoreRows.map((row, index) => {
           const angle = -Math.PI / 2 + (index / Math.max(scoreRows.length, 1)) * Math.PI * 2
@@ -837,12 +835,30 @@ const Application360View = ({
                                 <Typography variant='h2' sx={{ fontVariantNumeric: 'tabular-nums' }}>{overall ?? '—'}</Typography>
                                 <Typography color='text.secondary'>/100</Typography>
                               </Stack>
+                              {scorecardSummary.state === 'partial' ? (
+                                <Typography variant='caption' color='text.secondary'>
+                                  {formatTemplate(assessmentCopy.review.partialProgress, {
+                                    scored: scorecardSummary.scoredCount,
+                                    total: scorecardSummary.totalCount
+                                  })}
+                                </Typography>
+                              ) : null}
                             </Box>
                             <GreenhouseChip
                               kind='status'
                               variant='label'
-                              tone={scoreTone(overall)}
-                              label={overall == null ? assessmentCopy.review.statuses.pending : overall >= 75 ? assessmentCopy.review.statuses.optimal : overall >= 60 ? assessmentCopy.review.statuses.attention : assessmentCopy.review.statuses.critical}
+                              tone={scorecardSummary.state === 'complete' ? scoreTone(overall) : 'info'}
+                              label={
+                                scorecardSummary.state === 'complete' && overall != null
+                                  ? overall >= 75
+                                    ? assessmentCopy.review.statuses.optimal
+                                    : overall >= 60
+                                      ? assessmentCopy.review.statuses.attention
+                                      : assessmentCopy.review.statuses.critical
+                                  : scorecardSummary.state === 'partial'
+                                    ? assessmentCopy.review.statuses.partial
+                                    : assessmentCopy.review.statuses.pending
+                              }
                             />
                           </Stack>
 
