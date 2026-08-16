@@ -34,6 +34,7 @@ import {
   RFC8693_ACCESS_TOKEN_TYPE,
   RFC8693_TOKEN_EXCHANGE_GRANT
 } from './mcp-token-exchange'
+import { parseSisterPlatformOAuthPolicy } from './oauth-policy'
 
 const env = {
   NODE_ENV: 'test',
@@ -157,7 +158,7 @@ describe('MCP RFC8693 token exchange', () => {
         ...client.policy,
         requiredScopes: [MCP_TALENT_POOL_GREENHOUSE_SCOPE],
         capabilityScopes: [MCP_TALENT_POOL_GREENHOUSE_SCOPE],
-        revocation: { ...client.policy.revocation, revalidateAfterSeconds: 0 }
+        revocation: { ...client.policy.revocation, revalidateAfterSeconds: 15 }
       },
       metadata: { resourceFamily: 'hiring' }
     }
@@ -184,6 +185,8 @@ describe('MCP RFC8693 token exchange', () => {
       ...env,
       GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS: `${MCP_GATEWAY_OAUTH_CLIENT_ID},${MCP_HIRING_OAUTH_CLIENT_ID}`
     }
+
+    expect(() => parseSisterPlatformOAuthPolicy(hiringClient.policy)).not.toThrow()
 
     await expect(exchangeMcpGatewayToken(hiringRequest, dependencies, hiringEnv)).resolves.toMatchObject({
       scope: MCP_TALENT_POOL_GREENHOUSE_SCOPE,
