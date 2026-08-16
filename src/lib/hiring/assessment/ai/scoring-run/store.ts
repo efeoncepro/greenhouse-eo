@@ -100,6 +100,7 @@ type RunItemRow = {
   status: unknown
   risk_class: unknown
   reason_code: unknown
+  routing_reasons: unknown
   attempt_count: unknown
   created_at: unknown
   updated_at: unknown
@@ -107,7 +108,13 @@ type RunItemRow = {
 
 const RUN_ITEM_COLS = `
   run_item_id, run_id, assessment_id, application_id, response_id, proposal_id,
-  input_digest, status, risk_class, reason_code, attempt_count, created_at, updated_at`
+  input_digest, status, risk_class, reason_code, routing_reasons, attempt_count, created_at, updated_at`
+
+const strArray = (v: unknown): string[] => {
+  const parsed = typeof v === 'string' ? (() => { try { return JSON.parse(v) } catch { return [] } })() : v
+
+  return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === 'string') : []
+}
 
 const normalizeRunItem = (row: RunItemRow): AiScoringRunItem => ({
   runItemId: str(row.run_item_id),
@@ -120,6 +127,7 @@ const normalizeRunItem = (row: RunItemRow): AiScoringRunItem => ({
   status: assertEnum(row.status, AI_SCORING_RUN_ITEM_STATUSES, 'status'),
   riskClass: row.risk_class == null ? null : assertEnum(row.risk_class, AI_SCORING_RISK_CLASSES, 'risk_class'),
   reasonCode: nstr(row.reason_code),
+  routingReasons: strArray(row.routing_reasons),
   attemptCount: int(row.attempt_count),
   createdAt: ts(row.created_at) ?? '',
   updatedAt: ts(row.updated_at) ?? '',
@@ -355,7 +363,16 @@ export const transitionRunItem = async (
   client: PoolClient,
   item: AiScoringRunItem,
   target: AiScoringRunItemStatus,
-  opts: { reasonCode?: string | null; actorUserId?: string | null; proposalId?: string | null; riskClass?: AiScoringRiskClass | null } = {},
+  opts: {
+    reasonCode?: string | null
+    actorUserId?: string | null
+    proposalId?: string | null
+    riskClass?: AiScoringRiskClass | null
+    /** Reason codes estables del risk router (Slice 2); null = conservar los existentes. */
+    routingReasons?: string[] | null
+    /** Intentos de provider consumidos por esta transición (suma a attempt_count). */
+    attemptDelta?: number
+  } = {},
 ): Promise<AiScoringRunItem> => {
   const transition = resolveItemTransition(item.status, target)
 
@@ -367,10 +384,20 @@ export const transitionRunItem = async (
        SET status = $2, reason_code = $3,
            proposal_id = COALESCE($4, proposal_id),
            risk_class = COALESCE($5, risk_class),
+           routing_reasons = COALESCE($6::jsonb, routing_reasons),
+           attempt_count = attempt_count + $7,
            updated_at = NOW()
      WHERE run_item_id = $1
      RETURNING ${RUN_ITEM_COLS}`,
-    [item.runItemId, transition.next, opts.reasonCode ?? null, opts.proposalId ?? null, opts.riskClass ?? null],
+    [
+      item.runItemId,
+      transition.next,
+      opts.reasonCode ?? null,
+      opts.proposalId ?? null,
+      opts.riskClass ?? null,
+      opts.routingReasons ? JSON.stringify(opts.routingReasons) : null,
+      Math.max(0, Math.floor(opts.attemptDelta ?? 0)),
+    ],
   )
 
   await insertRunEvent(client, {
@@ -381,7 +408,63 @@ export const transitionRunItem = async (
     toStatus: transition.next,
     reasonCode: opts.reasonCode ?? null,
     actorUserId: opts.actorUserId ?? null,
+    detail: opts.routingReasons ? { routingReasons: opts.routingReasons } : undefined,
   })
 
   return normalizeRunItem(rows[0])
+}
+
+// ── Lease del run (drain claim atómico — patrón conditional-UPDATE TASK-1664) ──
+
+/** Run IDs reclamables por el drain: no terminales de scoring con lease libre o vencida. */
+export const listClaimableScoringRunIds = async (limit: number): Promise<string[]> => {
+  const rows = await runGreenhousePostgresQuery<{ run_id: unknown }>(
+    `SELECT run_id FROM greenhouse_hiring.hiring_assessment_ai_scoring_run
+     WHERE status IN ('enumerating', 'scoring')
+       AND (lease_owner IS NULL OR lease_expires_at IS NULL OR lease_expires_at < NOW())
+     ORDER BY created_at
+     LIMIT $1`,
+    [Math.max(1, Math.floor(limit))],
+  )
+
+  return rows.map(r => str(r.run_id))
+}
+
+/**
+ * Claim atómico del run por lease: UN UPDATE condicional es el lock (el segundo drain
+ * concurrente matchea cero filas y recibe `null` — nunca dos drains sobre el mismo run).
+ */
+export const claimScoringRunLease = async (
+  runId: string,
+  leaseOwner: string,
+  leaseSeconds: number,
+): Promise<AiScoringRun | null> => {
+  const rows = await runGreenhousePostgresQuery<RunRow>(
+    `UPDATE greenhouse_hiring.hiring_assessment_ai_scoring_run
+       SET lease_owner = $2,
+           lease_expires_at = NOW() + make_interval(secs => $3),
+           updated_at = NOW()
+     WHERE run_id = $1
+       AND status IN ('enumerating', 'scoring')
+       AND (lease_owner IS NULL OR lease_expires_at IS NULL OR lease_expires_at < NOW())
+     RETURNING ${RUN_COLS}`,
+    [runId, leaseOwner, Math.max(1, Math.floor(leaseSeconds))],
+  )
+
+  return rows[0] ? normalizeRun(rows[0]) : null
+}
+
+/** Libera la lease SOLO si sigue siendo del owner (un drain nunca pisa la lease ajena). */
+export const releaseScoringRunLease = async (
+  runId: string,
+  leaseOwner: string,
+  client: PoolClient | null = null,
+): Promise<void> => {
+  await runQuery(
+    client,
+    `UPDATE greenhouse_hiring.hiring_assessment_ai_scoring_run
+       SET lease_owner = NULL, lease_expires_at = NULL, updated_at = NOW()
+     WHERE run_id = $1 AND lease_owner = $2`,
+    [runId, leaseOwner],
+  )
 }

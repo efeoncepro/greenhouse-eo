@@ -7877,6 +7877,7 @@ export interface GreenhouseHiringHiringAssessmentAiScoringRunItem {
   reason_code: string | null;
   response_id: string;
   risk_class: string | null;
+  routing_reasons: Generated<Json>;
   run_id: string;
   run_item_id: Generated<string>;
   status: Generated<string>;

@@ -78,6 +78,8 @@ export interface AiScoringRunItem {
   status: AiScoringRunItemStatus
   riskClass: AiScoringRiskClass | null
   reasonCode: string | null
+  /** Reason codes estables de la policy de routing (evidencia auditable, Slice 2). */
+  routingReasons: string[]
   attemptCount: number
   createdAt: string
   updatedAt: string

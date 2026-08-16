@@ -420,6 +420,21 @@ ENV_VARS="${ENV_VARS},HIRING_TALENT_POOL_PROJECTION_ENABLED=${HIRING_TALENT_POOL
 HIRING_TALENT_POOL_SELF_SERVICE_ENABLED="${HIRING_TALENT_POOL_SELF_SERVICE_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},HIRING_TALENT_POOL_SELF_SERVICE_ENABLED=${HIRING_TALENT_POOL_SELF_SERVICE_ENABLED}"
 
+# TASK-1734 — Run asíncrono de scoring IA por assessment (ADR
+# GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1, D6). Este deploy.sh es el SoT de los
+# flags cuyo runtime owner es el ops-worker: la proyección reactiva
+# (hiring_assessment_ai_scoring_run_enqueue) y el drain POST /assessment-ai/drain-scoring-runs
+# los leen SOLO acá — prenderlos en Vercel no hace nada. Declarados con default OFF para que
+# `--set-env-vars` (destructivo) no los borre en cada redeploy. NO prenderlos hasta que los
+# gates técnicos del ADR estén evidenciados (promotion-grade eval Slice 3, staging shadow,
+# canary sintético — Slice 6); el drain además exige el master HIRING_ASSESSMENT_AI_ENABLED
+# en ESTE runtime. Rollback SIEMPRE por estos flags + commands de run (confirm OFF →
+# enqueue OFF → drain/cancel/reconcile → cola manual), nunca "apagando el master".
+HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED="${HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED=${HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED}"
+HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED="${HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED=${HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED}"
+
 # Buzón interno de People para el aviso de postulación nueva (configurable; default en código).
 HIRING_INTERNAL_NOTIFICATIONS_EMAIL="${HIRING_INTERNAL_NOTIFICATIONS_EMAIL:-people@efeoncepro.com}"
 ENV_VARS="${ENV_VARS},HIRING_INTERNAL_NOTIFICATIONS_EMAIL=${HIRING_INTERNAL_NOTIFICATIONS_EMAIL}"

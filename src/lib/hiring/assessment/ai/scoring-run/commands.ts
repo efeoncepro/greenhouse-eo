@@ -44,7 +44,7 @@ const extractAnswerText = (answer: Record<string, unknown>): string => {
   return JSON.stringify(answer).slice(0, MAX_ANSWER_CHARS)
 }
 
-interface EligibleResponseRow extends Record<string, unknown> {
+export interface EligibleResponseRow extends Record<string, unknown> {
   response_id: unknown
   answer_json: unknown
   question_prompt: unknown
@@ -76,19 +76,34 @@ export const computeScoringRunInputDigest = (
     .digest('hex')
 }
 
-/** Respuestas elegibles: human-rated (`open_text|situational`) pendientes de score humano. */
-const listEligibleResponses = async (assessmentId: string): Promise<EligibleResponseRow[]> =>
-  runGreenhousePostgresQuery<EligibleResponseRow>(
-    `SELECT r.response_id, r.answer_json, q.prompt AS question_prompt, q.rubric_json
+/**
+ * Respuestas elegibles: human-rated (`open_text|situational`) pendientes de score humano,
+ * SOLO del assessment exacto. Exportada para el self-heal de enumeración del drain
+ * (`execute.ts`); `client` opcional para correr dentro de la tx del caller.
+ */
+export const listEligibleResponses = async (
+  assessmentId: string,
+  client: PoolClient | null = null,
+): Promise<EligibleResponseRow[]> => {
+  const text = `SELECT r.response_id, r.answer_json, q.prompt AS question_prompt, q.rubric_json
        FROM greenhouse_hiring.hiring_assessment_response r
        JOIN greenhouse_hiring.hiring_question q ON q.question_id = r.question_id
       WHERE r.assessment_id = $1
         AND r.needs_human_rating = TRUE
         AND r.human_score IS NULL
         AND q.type = ANY($2::text[])
-      ORDER BY r.response_id`,
-    [assessmentId, [...HUMAN_RATED_QUESTION_TYPES]],
-  )
+      ORDER BY r.response_id`
+
+  const values = [assessmentId, [...HUMAN_RATED_QUESTION_TYPES]]
+
+  if (client) {
+    const result = await client.query(text, values)
+
+    return result.rows as EligibleResponseRow[]
+  }
+
+  return runGreenhousePostgresQuery<EligibleResponseRow>(text, values)
+}
 
 interface AssessmentRow extends Record<string, unknown> {
   assessment_id: unknown

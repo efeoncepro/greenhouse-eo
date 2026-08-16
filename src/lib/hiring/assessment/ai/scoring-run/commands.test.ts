@@ -49,6 +49,7 @@ const { resolveRunTransition } = await import('./state')
 const {
   cancelAssessmentAiScoringRun,
   computeScoringRunInputDigest,
+  listEligibleResponses,
   reconcileAssessmentAiScoringRuns,
   startAssessmentAiScoringRun,
 } = await import('./commands')
@@ -83,6 +84,7 @@ const itemFixture = {
   status: 'pending' as const,
   riskClass: null,
   reasonCode: null,
+  routingReasons: [] as string[],
   attemptCount: 0,
   createdAt: '2026-08-16T12:00:00.000Z',
   updatedAt: '2026-08-16T12:00:00.000Z',
@@ -153,6 +155,24 @@ describe('computeScoringRunInputDigest', () => {
         { ...parts[1], answerText: 'B editada' },
       ]),
     ).not.toBe(base)
+  })
+})
+
+// ── Enumeración exacta (Slice 2 la reusa desde el drain) ──
+
+describe('listEligibleResponses', () => {
+  it('filtra por assessment EXACTO + needs_human_rating pendiente + tipos human-rated', async () => {
+    const client = { query: vi.fn().mockResolvedValue({ rows: [] }) }
+
+    await listEligibleResponses('asmt-9', client as never)
+
+    const [text, values] = client.query.mock.calls[0]
+
+    expect(text).toContain('r.assessment_id = $1')
+    expect(text).toContain('needs_human_rating = TRUE')
+    expect(text).toContain('human_score IS NULL')
+    expect(values[0]).toBe('asmt-9')
+    expect(values[1]).toEqual(['situational', 'open_text'])
   })
 })
 
