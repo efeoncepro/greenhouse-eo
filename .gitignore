@@ -10,6 +10,9 @@
 /artifacts/
 /.auth/
 /.captures/
+
+# TASK-1736 — allowlists de remediación de display names (contienen PII; jamás se commitean)
+*.candidate-remediation-allowlist.json
 /.eval-reports/
 /test-results/
 /playwright-report/
