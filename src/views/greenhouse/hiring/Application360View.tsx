@@ -57,6 +57,7 @@ import type { AiProposal } from '@/types/hiring-assessment-ai'
 
 import HiringDeskFrame from './HiringDeskFrame'
 import CandidateDocumentsPanel from './CandidateDocumentsPanel'
+import AssessmentCompetencyRadar from './AssessmentCompetencyRadar'
 import { hiringRequest } from './hiring-client'
 import { computeScorecardSummary } from './scorecard-summary'
 
@@ -744,20 +745,6 @@ const Application360View = ({
         const scorecardSummary = computeScorecardSummary(scoreRows)
         const overall = scorecardSummary.overall
 
-        const radarPoints = scoreRows.map((row, index) => {
-          const angle = -Math.PI / 2 + (index / Math.max(scoreRows.length, 1)) * Math.PI * 2
-          const radius = ((row.score ?? 0) / 100) * 72
-
-          return `${100 + Math.cos(angle) * radius},${100 + Math.sin(angle) * radius}`
-        }).join(' ')
-
-        const targetPoints = scoreRows.map((row, index) => {
-          const angle = -Math.PI / 2 + (index / Math.max(scoreRows.length, 1)) * Math.PI * 2
-          const radius = (row.target / 100) * 72
-
-          return `${100 + Math.cos(angle) * radius},${100 + Math.sin(angle) * radius}`
-        }).join(' ')
-
         return (
           <Paper
             key={entry.assessmentId}
@@ -773,12 +760,14 @@ const Application360View = ({
               <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' alignItems={{ xs: 'stretch', sm: 'center' }} spacing={2}>
                 <Box>
                   <Stack direction='row' spacing={1.25} alignItems='center' flexWrap='wrap' useFlexGap>
-                    <Typography variant='h6'>{entry.method === 'candidate_test' ? 'Candidate test' : 'Scorecard de entrevista'}</Typography>
+                    <Typography variant='h6'>
+                      {entry.method === 'candidate_test' ? assessmentCopy.review.candidateTest : assessmentCopy.review.interviewerScorecard}
+                    </Typography>
                     <GreenhouseChip
                       kind='status'
                       variant='label'
                       tone={entry.status === 'scored' ? 'success' : entry.status === 'submitted' ? 'warning' : entry.status === 'expired' ? 'error' : 'info'}
-                      label={entry.status}
+                      label={assessmentCopy.review.assessmentStatuses[entry.status]}
                     />
                   </Stack>
                   <Typography variant='caption' color='text.secondary'>{entry.publicId}{entry.timeLimitMinutes ? ` · ${entry.timeLimitMinutes} minutos` : ''}</Typography>
@@ -809,13 +798,13 @@ const Application360View = ({
               {!review ? (
                 <Alert severity='info'>
                   {entry.status === 'assigned' || entry.status === 'sent' || entry.status === 'in_progress'
-                    ? 'El candidato aún no completa la evaluación.'
-                    : 'Carga la revisión para ver respuestas, rúbricas y scorecard por competencia.'}
+                    ? assessmentCopy.review.candidateIncomplete
+                    : assessmentCopy.review.loadReviewPrompt}
                 </Alert>
               ) : (
                 <>
                   <Grid container spacing={3} sx={{ '& > *': { minWidth: 0 } }}>
-                    <Grid size={{ xs: 12, md: 7 }}>
+                    <Grid size={{ xs: 12, md: pendingHumanResponses.length === 0 ? 8 : 7 }}>
                       <Paper
                         variant='outlined'
                         sx={(theme) => ({
@@ -863,28 +852,21 @@ const Application360View = ({
                           </Stack>
 
                           {scoreRows.length === 0 ? (
-                            <Alert severity='info'>Aún no hay módulos de competencia para esta evaluación.</Alert>
+                            <Alert severity='info'>{assessmentCopy.review.noModules}</Alert>
                           ) : scorecardMode === 'radar' ? (
-                            <Box
-                              role='img'
-                              aria-label={assessmentCopy.review.title}
-                              sx={{ display: 'grid', placeItems: 'center', minBlockSize: 280, overflowX: 'clip' }}
-                            >
-                              <svg viewBox='0 0 200 200' width='100%' height='280' aria-hidden='true' focusable='false'>
-                                <circle cx='100' cy='100' r='72' fill='none' stroke='var(--mui-palette-divider)' strokeWidth='1' />
-                                <circle cx='100' cy='100' r='48' fill='none' stroke='var(--mui-palette-divider)' strokeWidth='1' opacity='0.7' />
-                                <circle cx='100' cy='100' r='24' fill='none' stroke='var(--mui-palette-divider)' strokeWidth='1' opacity='0.45' />
-                                {targetPoints ? <polygon points={targetPoints} fill='none' stroke='var(--mui-palette-warning-main)' strokeDasharray='4 5' strokeWidth='2' /> : null}
-                                {radarPoints ? <polygon points={radarPoints} fill='rgb(var(--mui-palette-primary-mainChannel) / 0.18)' stroke='var(--mui-palette-primary-main)' strokeWidth='2.5' /> : null}
-                                {scoreRows.map((row, index) => {
-                                  const angle = -Math.PI / 2 + (index / Math.max(scoreRows.length, 1)) * Math.PI * 2
-                                  const x = 100 + Math.cos(angle) * 86
-                                  const y = 100 + Math.sin(angle) * 86
-
-                                  return <text key={row.competencyId} x={x} y={y} fontSize='7' textAnchor='middle' fill='currentColor'>{row.competencyKey.slice(0, 7)}</text>
-                                })}
-                              </svg>
-                            </Box>
+                            <AssessmentCompetencyRadar
+                              rows={scoreRows}
+                              ariaLabel={assessmentCopy.review.title}
+                              copy={{
+                                scoreLegend: assessmentCopy.review.radarScoreLegend,
+                                targetLegend: assessmentCopy.review.radarTargetLegend,
+                                partialTitle: assessmentCopy.review.radarPartialTitle,
+                                partialBody: assessmentCopy.review.radarPartialBody,
+                                score: assessmentCopy.review.radarMetricScore,
+                                objective: assessmentCopy.review.objective,
+                                pending: assessmentCopy.review.pending,
+                              }}
+                            />
                           ) : (
                             <Stack spacing={2.25}>
                               {scoreRows.map((row) => (
@@ -967,7 +949,7 @@ const Application360View = ({
                       </Paper>
                     </Grid>
 
-                    <Grid size={{ xs: 12, md: 5 }}>
+                    <Grid size={{ xs: 12, md: pendingHumanResponses.length === 0 ? 4 : 5 }}>
                       <Paper
                         variant='outlined'
                         data-capture='assessment-review-queue'

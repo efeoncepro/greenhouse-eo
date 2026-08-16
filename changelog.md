@@ -2,6 +2,18 @@
 
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
+> inicio ni usar una entrada histórica como contrato vigente sin contrastarla.
+>
+> Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
+> `pnpm docs:context-rotate --apply`.
+
+## 2026-08-16 — Radar de assessment legible y honesto
+
+- Application 360 reemplaza el radar SVG manual por Recharts sobre el wrapper tipográfico canónico.
+- Los ejes muestran etiquetas humanas sin cortar palabras; una guía visible conserva los nombres completos,
+  puntajes y objetivos, con leyenda explícita y adaptación a 390 px.
+- Un scorecard parcial ya no convierte competencias pendientes en cero ni dibuja un perfil engañoso.
+- Evidencia local desktop/mobile: `.captures/2026-08-16T19-02-20_task1363-assessment-radar-runtime`.
 
 ## 2026-08-16 — Expediente de Evaluación SMART (TASK-1735) + fix scorecard parcial (ISSUE-159)
 
@@ -14,10 +26,6 @@
 - Storage: timestamps del asset mapper corregidos (bug latente TASK-1718).
 - TASK-1734: ADR del scoring IA a escala aceptado como Proposed (Slice 0), con autorización
   ejecutiva del CEO registrada.
-> inicio ni usar una entrada histórica como contrato vigente sin contrastarla.
->
-> Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
-> `pnpm docs:context-rotate --apply`.
 
 ## 2026-08-16 — TASK-1736 registrada para canonicalizar el intake de candidatos
 
@@ -1192,20 +1200,3 @@ Se alineó el deck de 26 láminas con la pauta recibida por Outlook y el caso ca
 asociaciones, Growth/Renovación, Service/Ticket, dashboards, estados de madurez, Breeze, Meeting Notetaker,
 handoff de los tres intents y ejercicio integrado. Se dejaron el PDF/PNG derivado en `.captures/` y el
 runbook/handout como fuentes operativas; no se modificó la configuración live de HubSpot.
-
-## 2026-08-06 — Cockpit SEO Overview (TASK-1306)
-
-Nueva superficie operador `/admin/growth/seo`: la puerta de entrada del módulo SEO y la casa de
-la sección "Search Visibility". Muestra los 4 KPIs medidos de Search Console (con la posición en
-semántica invertida: bajar de número es mejorar), la evolución de visibilidad, la salud técnica
-del sitio, los movimientos de la semana y el cruce honesto con el AEO Grader.
-
-Codifica el contrato de honestidad del módulo: sin Search Console no hay panel (aviso accionable,
-nunca ceros), medido y estimado se marcan distinto y jamás se promedian, cada región del panel
-degrada por separado diciendo "Pendiente: {razón}", y sin ventana anterior comparable no se dibuja
-variación en vez de inventar un 100%.
-
-Se expone la MCP tool `get_seo_overview_kpis` en el mismo cambio, así que Nexa y el lane ecosystem
-consumen exactamente el mismo cálculo que la pantalla.
-
-Code complete; el despliegue y la migración del viewCode en staging/producción quedan pendientes.

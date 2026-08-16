@@ -1,4 +1,4 @@
-// TASK-1363 — Assessment review runtime fidelity (operator surface).
+// TASK-1363 — Focused assessment radar regression.
 // Requires TASK1363_REVIEW_APP_ID to point to a disposable application with a submitted candidate_test.
 
 import type { CaptureScenario } from '../lib/scenario'
@@ -6,9 +6,9 @@ import type { CaptureScenario } from '../lib/scenario'
 const applicationId = process.env.TASK1363_REVIEW_APP_ID ?? 'missing-task1363-review-application'
 
 export const scenario: CaptureScenario = {
-  name: 'task1363-assessment-review-runtime',
+  name: 'task1363-assessment-radar-runtime',
   route: `/agency/hiring/applications/${applicationId}`,
-  mutating: true,
+  mutating: false,
   safeForCapture: true,
   viewport: { width: 1440, height: 980 },
   viewports: [
@@ -51,46 +51,15 @@ export const scenario: CaptureScenario = {
     { kind: 'press', key: 'Escape' },
     { kind: 'click', selector: 'button[role="tab"]:has-text("Evaluación")' },
     { kind: 'wait', selector: '[data-capture="hiring-application-panel-assessment"]', timeout: 12000 },
-    {
-      kind: 'mark',
-      label: 'operator-assessment-tab-before-load',
-      clipSelector: '[data-capture="hiring-application-panel-assessment"]',
-      note: 'Tab Evaluación antes de cargar detalle: tarjeta de assessment y CTA de revisión.',
-    },
     { kind: 'click', selector: 'button:has-text("Revisar evaluación")' },
-    {
-      kind: 'mark',
-      label: 'operator-load-review-transition',
-      clipSelector: '[data-capture="hiring-application-panel-assessment"]',
-      note: 'Transición de carga hacia scorecard; no debe adelantar sugerencia IA antes de la rúbrica.',
-    },
     { kind: 'wait', selector: '[data-capture="assessment-mode-radar"]', timeout: 15000 },
-    {
-      kind: 'mark',
-      label: 'operator-scorecard-bars',
-      clipSelector: '[data-capture="assessment-scorecard"]',
-      note: 'Scorecard advisory con barras, objetivo, pesos y estado por competencia.',
-    },
     { kind: 'click', selector: '[data-capture="assessment-mode-radar"]' },
+    { kind: 'wait', selector: '[data-capture="assessment-competency-radar"]', timeout: 8000 },
     {
       kind: 'mark',
-      label: 'operator-scorecard-radar',
+      label: 'operator-assessment-radar',
       clipSelector: '[data-capture="assessment-scorecard"]',
-      note: 'Radar Recharts con etiquetas humanas completas, leyenda de puntaje/objetivo y guía textual; nunca convierte pendientes en cero.',
-    },
-    {
-      kind: 'mark',
-      label: 'operator-review-queue',
-      clipSelector: '[data-capture="assessment-review-queue"]',
-      note: 'Cola humana: respuestas abiertas pendientes de corrección.',
-    },
-    { kind: 'click', selector: '[data-capture="assessment-review-row"]' },
-    { kind: 'wait', selector: '[data-capture="assessment-review-drawer"]', timeout: 8000 },
-    {
-      kind: 'mark',
-      label: 'operator-review-drawer',
-      clipSelector: '[data-capture="assessment-review-drawer"]',
-      note: 'Drawer de corrección: pregunta, respuesta, rúbrica antes de IA, score manual y confirmación.',
+      note: 'Radar Recharts completo con nombres humanos, leyenda, guía textual y cola compacta.',
     },
   ],
 }

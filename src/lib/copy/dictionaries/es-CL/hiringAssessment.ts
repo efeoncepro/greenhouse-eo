@@ -7,15 +7,15 @@ export const hiringAssessment: HiringAssessmentCopy = {
     loadingTitle: 'Preparando tu evaluación',
     loadingBody: 'Estamos cargando las preguntas y el estado de tu rendición.',
     invalidTitle: 'Este enlace no está disponible',
-    invalidBody: 'Puede haber expirado o ya haberse usado. Escríbele a quien te contactó para revisar el siguiente paso.',
+    invalidBody:
+      'Puede haber expirado o ya haberse usado. Escríbele a quien te contactó para revisar el siguiente paso.',
     errorTitle: 'No pudimos cargar la evaluación',
     errorBody: 'Prueba de nuevo en unos minutos. Si el problema sigue, avisa a quien te contactó.',
     retry: 'Reintentar',
     instructionsTitle: 'Antes de empezar',
     instructionsBody:
       'Vas a responder {sections} secciones, una competencia a la vez. Tienes {minutes} minutos en total. Una vez que envíes, no vas a poder editar tus respuestas.',
-    accommodation:
-      'Tiempo extendido aplicado (+{minutes} min). Ajustamos tu evaluación según la adaptación acordada.',
+    accommodation: 'Tiempo extendido aplicado (+{minutes} min). Ajustamos tu evaluación según la adaptación acordada.',
     sectionsTitle: 'Secciones de la evaluación',
     consent:
       'Autorizo el tratamiento de mis respuestas para este proceso de selección. Tus respuestas se usan solo para esta postulación.',
@@ -41,7 +41,7 @@ export const hiringAssessment: HiringAssessmentCopy = {
     textareaPlaceholder: 'Escribe tu respuesta con el mayor contexto útil posible…',
     characterCount: '{count}/{max}',
     noQuestionsTitle: 'Esta evaluación aún no tiene preguntas disponibles',
-    noQuestionsBody: 'El equipo de Hiring debe revisar la plantilla antes de enviarte este enlace.',
+    noQuestionsBody: 'El equipo de Hiring debe revisar la plantilla antes de enviarte este enlace.'
   },
   review: {
     title: 'Evaluación por competencia',
@@ -49,8 +49,27 @@ export const hiringAssessment: HiringAssessmentCopy = {
     overall: 'Global (referencia)',
     bars: 'Barras',
     radar: 'Radar',
+    candidateTest: 'Test del candidato',
+    interviewerScorecard: 'Scorecard de entrevista',
+    assessmentStatuses: {
+      assigned: 'Asignado',
+      sent: 'Enviado',
+      in_progress: 'En curso',
+      submitted: 'Enviado por el candidato',
+      scored: 'Corregido',
+      expired: 'Vencido'
+    },
+    candidateIncomplete: 'El candidato aún no completa la evaluación.',
+    loadReviewPrompt: 'Carga la revisión para ver respuestas, rúbricas y el scorecard por competencia.',
+    noModules: 'Aún no hay módulos de competencia para esta evaluación.',
     objective: 'Objetivo',
     pending: 'Pendiente',
+    radarScoreLegend: 'Puntaje obtenido',
+    radarTargetLegend: 'Objetivo esperado',
+    radarMetricScore: 'Puntaje',
+    radarPartialTitle: 'Radar pendiente de completar',
+    radarPartialBody:
+      'Faltan {count} competencias por corregir. Mostramos el objetivo, pero no dibujamos un perfil parcial como si las respuestas pendientes fueran cero.',
     advisory:
       'El scorecard es una referencia advisory. La decisión de avanzar al candidato es tuya; el sistema no aprueba ni rechaza por sí solo.',
     queueTitle: 'Respuestas por corregir ({count})',
@@ -75,7 +94,7 @@ export const hiringAssessment: HiringAssessmentCopy = {
       critical: 'Crítico',
       pending: 'Por corregir',
       corrected: 'Corregido',
-      partial: 'Parcial',
-    },
-  },
+      partial: 'Parcial'
+    }
+  }
 }

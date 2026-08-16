@@ -2,6 +2,15 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-16 — Radar de assessment corregido localmente
+
+Application 360 ya usa Recharts para el radar de competencias: eliminó `competencyKey.slice(0, 7)`, muestra
+etiquetas humanas sin cortar palabras, leyenda puntaje/objetivo y una guía visible con nombres completos. El
+perfil azul sólo se dibuja con el scorecard completo; pendientes nunca se convierten en cero. La cola vacía
+cede ancho al scorecard y el copy técnico cercano quedó localizado. Tests focalizados, ESLint, typecheck y
+captura GVC desktop/mobile verdes en `.captures/2026-08-16T19-02-20_task1363-assessment-radar-runtime`.
+Rollout remoto pendiente de push/deploy.
+
 ## 2026-08-16 — TASK-1735 complete (code complete, rollout pendiente) + TASK-1734 Slice 0 + ISSUE-159
 
 TASK-1735 (Expediente de Evaluación SMART) quedó `complete` con los 6 slices: tabla append-only
@@ -588,7 +597,3 @@ vive en `catalogs/deck-axis/assets/partners/` y el slot resuelve por clave cerra
    el SVG copiado, `back-cover-full.html`, `back-cover-full.slots.json` y `resolvers.ts`.
 3. **Queda una duplicación de asset por decidir:** el badge existe ahora en `public/branding/partners/…`,
    en `src/lib/brand-assets/` (módulo TS, untracked) y dentro del catálogo. Tres hogares para un SVG.
-
-### Sika México LIC-1120 — paquete de bid preparado, sin precio ni envío (2026-08-12)
-
-Se creó [`docs/commercial/tenders/sika-lic-1120/`](docs/commercial/tenders/sika-lic-1120/): originales en OneDrive, evidencia Wherex, admisibilidad, blueprint interno, técnica, estructura económica y deck de taller. La propuesta se enfoca en continuidad comercial: Search por intención y ubicación → landing/ficha de destino → canal de atención → medición y optimización; **no** promete transferir 50% de ventas. El deck técnico de ocho láminas pasó slots y revisión visual local, pero sigue siendo taller (sin `Proposal`/render gobernado). La pregunta propia continúa en **0/1 respondidas** al 12-08 11:14: faltan fecha/destino/stock por cierre, línea base/fuente de ventas y canal autorizado. **Corrección 2026-08-13:** el brief confirma MXN 100–150 mil para desarrollo y ejecución, pero no dice explícitamente que incluya pauta; una lectura anterior atribuye creatividad/pauta/fee a la respuesta del comprador, y debe revalidarse antes de fijar precio. No existe cotización aprobada. Wherex muestra 45 días, pero también condiciona el crédito a lo convenido con Sika: no asumirlo como término cerrado. La oferta Wherex sigue en edición, sin adjuntos, términos aceptados ni envío; tab queda en handoff.

@@ -14,9 +14,11 @@ export const hiringAssessment: HiringAssessmentCopy = {
     instructionsTitle: 'Before you start',
     instructionsBody:
       'You will answer {sections} sections, one competency at a time. You have {minutes} minutes in total. Once submitted, your answers cannot be edited.',
-    accommodation: 'Extended time applied (+{minutes} min). We adjusted your assessment according to the agreed accommodation.',
+    accommodation:
+      'Extended time applied (+{minutes} min). We adjusted your assessment according to the agreed accommodation.',
     sectionsTitle: 'Assessment sections',
-    consent: 'I authorize my answers to be processed for this selection process. Your answers are only used for this application.',
+    consent:
+      'I authorize my answers to be processed for this selection process. Your answers are only used for this application.',
     start: 'Start assessment',
     progressLabel: 'Section {current} of {total}: {competency}',
     saved: 'Answer saved',
@@ -39,7 +41,7 @@ export const hiringAssessment: HiringAssessmentCopy = {
     textareaPlaceholder: 'Write your answer with as much useful context as possible…',
     characterCount: '{count}/{max}',
     noQuestionsTitle: 'This assessment has no available questions yet',
-    noQuestionsBody: 'The Hiring team must review the template before sending this link.',
+    noQuestionsBody: 'The Hiring team must review the template before sending this link.'
   },
   review: {
     title: 'Competency assessment',
@@ -47,9 +49,29 @@ export const hiringAssessment: HiringAssessmentCopy = {
     overall: 'Overall (reference)',
     bars: 'Bars',
     radar: 'Radar',
+    candidateTest: 'Candidate test',
+    interviewerScorecard: 'Interview scorecard',
+    assessmentStatuses: {
+      assigned: 'Assigned',
+      sent: 'Sent',
+      in_progress: 'In progress',
+      submitted: 'Submitted by candidate',
+      scored: 'Scored',
+      expired: 'Expired'
+    },
+    candidateIncomplete: 'The candidate has not completed the assessment yet.',
+    loadReviewPrompt: 'Load the review to see answers, rubrics, and the competency scorecard.',
+    noModules: 'This assessment does not have competency modules yet.',
     objective: 'Target',
     pending: 'Pending',
-    advisory: 'The scorecard is advisory. The decision to move the candidate forward is yours; the system never approves or rejects by itself.',
+    radarScoreLegend: 'Candidate score',
+    radarTargetLegend: 'Expected target',
+    radarMetricScore: 'Score',
+    radarPartialTitle: 'Radar awaiting completion',
+    radarPartialBody:
+      '{count} competencies still need review. We show the target, but do not draw a partial profile as though pending answers were zero.',
+    advisory:
+      'The scorecard is advisory. The decision to move the candidate forward is yours; the system never approves or rejects by itself.',
     queueTitle: 'Answers to review ({count})',
     queueEmptyTitle: 'No pending answers',
     queueEmptyBody: 'When the candidate submits open answers, they will appear here for review.',
@@ -72,7 +94,7 @@ export const hiringAssessment: HiringAssessmentCopy = {
       critical: 'Critical',
       pending: 'Pending review',
       corrected: 'Corrected',
-      partial: 'Partial',
-    },
-  },
+      partial: 'Partial'
+    }
+  }
 }

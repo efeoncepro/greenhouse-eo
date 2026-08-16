@@ -131,8 +131,26 @@ export interface HiringAssessmentCopy {
     overall: string
     bars: string
     radar: string
+    candidateTest: string
+    interviewerScorecard: string
+    assessmentStatuses: {
+      assigned: string
+      sent: string
+      in_progress: string
+      submitted: string
+      scored: string
+      expired: string
+    }
+    candidateIncomplete: string
+    loadReviewPrompt: string
+    noModules: string
     objective: string
     pending: string
+    radarScoreLegend: string
+    radarTargetLegend: string
+    radarMetricScore: string
+    radarPartialTitle: string
+    radarPartialBody: string
     advisory: string
     queueTitle: string
     queueEmptyTitle: string
