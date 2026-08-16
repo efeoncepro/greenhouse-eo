@@ -42,7 +42,8 @@ vi.mock('./get-organization-operational-serving', () => ({
   getOrganizationOperationalServing: vi.fn()
 }))
 
-const { getOrganizationMemberships, ensureOrganizationContactMembership } = await import('./organization-store')
+const { getOrganizationMemberships, ensureOrganizationContactMembership, createIdentityProfile } =
+  await import('./organization-store')
 
 describe('getOrganizationMemberships', () => {
   beforeEach(() => {
@@ -162,5 +163,50 @@ describe('ensureOrganizationContactMembership', () => {
     expect(String(mockQuery.mock.calls[0][0])).toContain('INSERT INTO greenhouse_core.identity_profiles')
     expect(mockQuery.mock.calls[0][1][2]).toBeNull()
     expect(String(mockQuery.mock.calls[2][0])).toContain('INSERT INTO greenhouse_core.person_memberships')
+  })
+})
+
+describe('createIdentityProfile — semántica de full_name (TASK-1736 Slice 2)', () => {
+  beforeEach(() => {
+    mockQuery.mockReset()
+  })
+
+  it('el ON CONFLICT ya NO sobreescribe full_name: preserva el existente (COALESCE, jamás last-write-wins)', async () => {
+    mockQuery
+      .mockResolvedValueOnce([]) // findProfileByEmail — no existe
+      .mockResolvedValueOnce([]) // upsert
+
+    await createIdentityProfile({
+      sourceSystem: 'public_careers',
+      sourceObjectType: 'candidate',
+      sourceObjectId: 'valentina@example.com',
+      fullName: 'valentina villa',
+      canonicalEmail: 'valentina@example.com'
+    })
+
+    const upsertSql = String(mockQuery.mock.calls[1][0])
+
+    expect(upsertSql).toContain('ON CONFLICT (profile_id) DO UPDATE')
+    expect(upsertSql).toContain('COALESCE(greenhouse_core.identity_profiles.full_name, EXCLUDED.full_name)')
+    // El refresh legítimo del display vive en reconcileCandidateIdentityDisplayName (ADR D3),
+    // nunca en este upsert.
+    expect(upsertSql).not.toContain('full_name = EXCLUDED.full_name')
+  })
+
+  it('la rama email-first devuelve el perfil previo SIN escribir (el display no se toca acá)', async () => {
+    mockQuery.mockResolvedValueOnce([
+      { profile_id: 'prof-existing', full_name: 'Nombre Vigente', canonical_email: 'valentina@example.com' }
+    ])
+
+    const profileId = await createIdentityProfile({
+      sourceSystem: 'public_careers',
+      sourceObjectType: 'candidate',
+      sourceObjectId: 'valentina@example.com',
+      fullName: 'otro nombre',
+      canonicalEmail: 'valentina@example.com'
+    })
+
+    expect(profileId).toBe('prof-existing')
+    expect(mockQuery).toHaveBeenCalledTimes(1)
   })
 })

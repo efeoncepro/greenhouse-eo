@@ -2236,6 +2236,12 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // el reveal sobre TODA persona del módulo (colaboradores, ex-colaboradores, direcciones).
   // El radio de ésta es exacto: la identidad de un candidato, que sólo existe post-decisión.
   { key: 'hiring.candidate.reveal_identity', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
+  // TASK-1736 — corregir el display name de la identidad de un candidato (before-value + actor +
+  // reason + audit append-only; la evidencia submitted jamás se toca). Capability propia porque es
+  // un WRITE sobre `identity_profiles` — verbo y radio distintos del reveal (read de PII) y del
+  // annotate (narrativa del expediente). Una corrección humana siempre gana sobre el automatismo
+  // de reconciliación (ADR D3). Grant tier gobernanza role-only, NUNCA client_*.
+  { key: 'hiring.candidate.correct_display', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
   // TASK-1735 — Expediente de Evaluación: escribir notas append-only y proponer/confirmar
   // borradores agénticos del dossier. Grant tier gobernanza (role-only), internal-only.
   { key: 'hiring.application.annotate', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },

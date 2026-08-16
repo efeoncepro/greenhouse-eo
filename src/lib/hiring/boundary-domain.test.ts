@@ -64,6 +64,14 @@ const ALLOWED_WRITE_TARGETS = new Set([
   // TASK-1735 — Expediente de Evaluación: notas append-only + ledger propose/confirm del dossier.
   'greenhouse_hiring.hiring_application_note',
   'greenhouse_hiring.hiring_application_dossier_proposal',
+  // TASK-1736 — evidencia de identidad del intake (append-only) + audit de display (append-only).
+  'greenhouse_hiring.candidate_identity_intake_evidence',
+  'greenhouse_hiring.candidate_identity_display_audit',
+  // TASK-1736 (ADR D3) — excepción DELIBERADA y acotada: los ÚNICOS writes del dominio sobre la
+  // Person canónica son el refresh CAS del display (`reconcile-display.ts`) y la corrección
+  // humana capability-gated (`correct-display.ts`), ambos sólo `full_name` + audit append-only.
+  // Cualquier otro write hiring→identity_profiles sigue prohibido.
+  'greenhouse_core.identity_profiles',
   // TASK-1365 — self-ID sensitive source + append-only audit, physically separate from decision.
   'greenhouse_hiring.hiring_demographic_selfid',
   'greenhouse_hiring.hiring_demographic_selfid_audit',

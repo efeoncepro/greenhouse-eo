@@ -7712,6 +7712,36 @@ export interface GreenhouseHiringCandidateFacet {
   verification_signals_json: Generated<Json>;
 }
 
+export interface GreenhouseHiringCandidateIdentityDisplayAudit {
+  actor_user_id: string | null;
+  after_full_name: string | null;
+  application_id: string | null;
+  audit_id: Generated<string>;
+  before_full_name: string | null;
+  created_at: Generated<Timestamp>;
+  identity_profile_id: string;
+  normalization_version: string;
+  outcome: string;
+  proposed_full_name: string | null;
+  reason: string;
+  source: string;
+}
+
+export interface GreenhouseHiringCandidateIdentityIntakeEvidence {
+  application_id: string;
+  casing_classification: string;
+  created_at: Generated<Timestamp>;
+  evidence_id: Generated<string>;
+  identity_profile_id: string;
+  input_digest: string;
+  normalization_version: string;
+  normalized_structural: string;
+  proposed_display_name: string | null;
+  search_key: string;
+  search_key_version: string;
+  submitted_full_name: string;
+}
+
 export interface GreenhouseHiringCandidateReviewAccessAudit {
   access_audit_id: Generated<string>;
   actor_user_id: string;
@@ -12535,6 +12565,8 @@ export interface DB {
   "greenhouse_hiring.assessment_fairness": GreenhouseHiringAssessmentFairness;
   "greenhouse_hiring.candidate_document_review_projection": GreenhouseHiringCandidateDocumentReviewProjection;
   "greenhouse_hiring.candidate_facet": GreenhouseHiringCandidateFacet;
+  "greenhouse_hiring.candidate_identity_display_audit": GreenhouseHiringCandidateIdentityDisplayAudit;
+  "greenhouse_hiring.candidate_identity_intake_evidence": GreenhouseHiringCandidateIdentityIntakeEvidence;
   "greenhouse_hiring.candidate_review_access_audit": GreenhouseHiringCandidateReviewAccessAudit;
   "greenhouse_hiring.hiring_application": GreenhouseHiringHiringApplication;
   "greenhouse_hiring.hiring_application_dossier_proposal": GreenhouseHiringHiringApplicationDossierProposal;

@@ -3,8 +3,12 @@ import 'server-only'
 import { createHash } from 'node:crypto'
 
 import { createIdentityProfile } from '@/lib/account-360/organization-store'
-import { normalizeCandidateIdentityInput } from '@/lib/hiring/candidate-intake'
+import { normalizeCandidateIdentityInput, type CandidateIdentityIntake } from '@/lib/hiring/candidate-intake'
+import { isCandidateIdentityNormalizationEnabled } from '@/lib/hiring/candidate-intake/config'
+import { persistCandidateIdentityIntakeEvidence } from '@/lib/hiring/candidate-intake/evidence'
+import { reconcileCandidateIdentityDisplayName } from '@/lib/hiring/candidate-intake/reconcile-display'
 import { createHiringApplication, reconcileCandidateFacet } from '@/lib/hiring/store'
+import { captureWithDomain } from '@/lib/observability/capture'
 import { resolvePublishedOpeningIdByPublicId } from '@/lib/hiring/publication'
 import { isHiringError } from '@/lib/hiring/errors'
 import { requestTalentPoolFutureConsent } from '@/lib/hiring/talent-pool/commands'
@@ -30,6 +34,39 @@ export interface SubmitApplicationResult {
 type SubmitPublicHiringApplicationOptions = {
   cvFile?: File | null
   cvAsset?: ScannedPublicCareersCvAssetReference | null
+}
+
+/**
+ * TASK-1736 Slice 2 — Capa de gobernanza de identidad del intake (flag-gated, degrade-only).
+ * Con `HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED` ON persiste la evidencia application-scoped
+ * (append-only, idempotente) y reconcilia el display de la Person vía CAS (ADR D3). OFF ⇒ no-op
+ * exacto (cero filas nuevas). El submit público JAMÁS falla por esta capa: cualquier error degrada
+ * a `captureWithDomain` (IDs-only, sin PII) y la application sigue su curso (ADR §Resilience).
+ */
+const persistCandidateIdentityGovernance = async (params: {
+  applicationId: string | null
+  identityProfileId: string
+  intake: CandidateIdentityIntake
+}): Promise<void> => {
+  if (!isCandidateIdentityNormalizationEnabled()) return
+
+  try {
+    if (params.applicationId) {
+      await persistCandidateIdentityIntakeEvidence({
+        applicationId: params.applicationId,
+        identityProfileId: params.identityProfileId,
+        intake: params.intake
+      })
+    }
+
+    await reconcileCandidateIdentityDisplayName({
+      identityProfileId: params.identityProfileId,
+      applicationId: params.applicationId,
+      intake: params.intake
+    })
+  } catch (error) {
+    captureWithDomain(error, 'hiring', { tags: { source: 'hiring:candidate-identity-intake-governance' } })
+  }
 }
 
 const getDuplicateApplicationId = (error: unknown): string | null => {
@@ -72,11 +109,10 @@ export const submitPublicHiringApplication = async (
   const identityIntake = normalizeCandidateIdentityInput({ firstName: input.firstName, lastName: input.lastName })
 
   // 1. Person (email-first reconcile; idempotente — devuelve el profile existente si el email ya existe).
-  // ⚠️ TASK-1736 (sticky name, ADR D3 — comportamiento NO cambiado en Slice 1): si el email ya
-  // existe, `createIdentityProfile` devuelve el perfil previo SIN reconciliar `full_name` (una
-  // primera entrada defectuosa queda pegada); y su rama `ON CONFLICT (profile_id)` SÍ sobreescribe
-  // `full_name` verbatim. Ambos caminos se estrangulan en Slice 2 con
-  // `reconcileCandidateIdentityDisplayName` (compare-and-set + precondiciones D3).
+  // TASK-1736 Slice 2 (sticky name, ADR D3): `createIdentityProfile` NUNCA refresca `full_name`
+  // de una identidad existente (su ON CONFLICT ahora PRESERVA el vigente). El refresh legítimo
+  // pasa por `reconcileCandidateIdentityDisplayName` (CAS + precondiciones D3), invocado más
+  // abajo detrás del flag junto a la evidencia application-scoped.
   const identityProfileId = await createIdentityProfile({
     sourceSystem: 'public_careers',
     sourceObjectType: 'candidate',
@@ -162,6 +198,11 @@ export const submitPublicHiringApplication = async (
 
     await attachCv(application.applicationId)
     await requestFutureConsent(application.applicationId)
+    await persistCandidateIdentityGovernance({
+      applicationId: application.applicationId,
+      identityProfileId,
+      intake: identityIntake
+    })
 
     return { outcome: 'accepted', applicationPublicId: application.publicId, applicationId: application.applicationId }
   } catch (error) {
@@ -173,6 +214,10 @@ export const submitPublicHiringApplication = async (
         await attachCv(applicationId)
         await requestFutureConsent(applicationId)
       }
+
+      // El re-apply de la misma persona ES el caso sticky-name por excelencia: la evidencia queda
+      // idempotente (dedupe por digest) y el display puede refrescarse vía D3.
+      await persistCandidateIdentityGovernance({ applicationId, identityProfileId, intake: identityIntake })
 
       return { outcome: 'accepted', applicationPublicId: null, applicationId }
     }

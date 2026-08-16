@@ -606,7 +606,12 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       // TASK-1735 — anotar el Expediente de Evaluación (notas append-only + propose/confirm
       // del dossier agéntico). Mismo tier que decide/score: quien gobierna la evaluación
       // gobierna su narrativa. Role-only a propósito (sin routeGroup internal).
-      'hiring.application.annotate'
+      'hiring.application.annotate',
+      // TASK-1736 — corregir el display name de la identidad de un candidato (write sobre
+      // identity_profiles con audit append-only fuente `human`). Mismo tier de gobernanza que
+      // reveal_identity y por la misma razón role-only: el routeGroup `internal` lo portaría
+      // TODO tenant interno (collaborator/designer/people_viewer incluidos).
+      'hiring.candidate.correct_display'
     ] as const) {
       addEntitlement(entries, { module: 'hiring', capability, action: 'execute', scope: 'tenant', source: 'role' })
     }
