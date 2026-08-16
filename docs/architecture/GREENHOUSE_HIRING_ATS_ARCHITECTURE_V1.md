@@ -1461,3 +1461,39 @@ re-autoriza en cada request.
   salida.
 - **SIEMPRE** que se agregue un consumidor del visor, pasar por `GreenhouseDocumentPreview` en vez de
   recrear el fetch→blob→render (hoy hay tres implementaciones paralelas; `TASK-1716` las unifica).
+
+## Delta 2026-08-16 — Expediente de Evaluación (TASK-1735, code complete)
+
+Nueva capa per-application de narrativa de evaluación, en dos piezas:
+
+**1. Notas append-only** — `greenhouse_hiring.hiring_application_note` (`hnote-*`): `kind`
+CHECK (`cv_analysis|assessment_review|interview_note|general`), `body_md` ≤8000, `author_user_id`,
+`source` (`human|agent`), `context_json` (referencias: `proposalId`/`assessmentId`/`supersedesNoteId` —
+nunca cuerpos duplicados). Trigger `prevent_hiring_note_mutation` + grants sin UPDATE/DELETE
+(verificado live). Primitive: `src/lib/hiring/application-notes.ts` (`recordHiringApplicationNote`
+acepta tx participante; `listHiringApplicationNotes`). API: `GET/POST /api/hiring/applications/[id]/notes`.
+Evento `hiring.application.note_recorded` (payload IDs-only, sin consumers reactivos V1).
+
+**2. Dossier agéntico propose→confirm** — `greenhouse_hiring.hiring_application_dossier_proposal`
+(`hdsp-*`, terminal-once `proposed→confirmed|rejected`, único `proposed` activo por
+`application_id+input_digest`). `src/lib/hiring/dossier-ai/`: packet assembler con **allowlist
+explícita** (CV = texto redactado de la proyección TASK-1718, nunca el PDF; assessment: respuestas +
+scores efectivos + rationale referenciado; journey de stages. PROHIBIDO nombre/contacto/identidad
+legal/self-ID — el assembler ni los consulta), generación vía `generateStructuredAnthropic` (default
+`claude-sonnet-5`, override `HIRING_DOSSIER_AI_MODEL`, prompt `hiring_evaluation_dossier.v1`), output
+con evidencia citada + sección `noVerificable`. `proposeEvaluationDossier` idempotente por digest
+(modelo efectivo incluido); `confirmEvaluationDossier` materializa la nota `source='agent'`
+ATÓMICAMENTE (misma tx que la marca de la propuesta) con provenance completo en `context_json`.
+API: `GET/POST /api/hiring/applications/[id]/dossier`. Flag `HIRING_EVALUATION_DOSSIER_AI_ENABLED`
+default OFF (Vercel-only, gatea SOLO el propose; ledger actualizado).
+
+**Autorización:** lectura `hiring.application.read`; escritura/propose/confirm capability
+`hiring.application.annotate` (tier gobernanza role-only: EFEONCE_ADMIN + HR_MANAGER +
+EFEONCE_OPERATIONS).
+
+**Invariantes duros:** **NUNCA** candidate-facing ni en el review packet MCP de TASK-1718 (allowlist
+intacta); **NUNCA** el LLM escribe una nota directo (confirm humano SIEMPRE); **NUNCA** tocar
+score/match_score/explainability_json (la nota es narrativa, no score); **NUNCA** demográficos en
+notas (boundary TASK-1365). El scorecard display fix relacionado (global "Parcial" mientras haya
+competencias pendientes) es ISSUE-159 / `scorecard-summary.ts`. UI del expediente: task consumer
+ui-ux follow-up (placement contractado en la spec de TASK-1735 §Superficie UI).
