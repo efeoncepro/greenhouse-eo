@@ -208,6 +208,7 @@ import { getKnowledgeNotionIngestDeadLetterSignal } from './queries/knowledge-no
 import { getAssetScanOpenQuarantineSignal } from './queries/asset-scan-open-quarantine'
 import { getAssetScanSignatureFreshnessSignal } from './queries/asset-scan-signature-freshness'
 import { getHiringCandidateRetentionOverdueSignal } from './queries/hiring-candidate-retention-overdue'
+import { getHiringTalentPoolIntegritySignal } from './queries/hiring-talent-pool-integrity'
 // TASK-356 — Hiring handoff workflow signals (moduleKey 'hiring').
 import { getHiringHandoffBlockedStaleSignal } from './queries/hiring-handoff-blocked-stale'
 import { getHiringInternalHireAwaitingOnboardingSignal } from './queries/hiring-internal-hire-awaiting-onboarding'
@@ -704,6 +705,7 @@ interface ReliabilityOverviewSources {
   assetScanOpenQuarantine?: ReliabilitySignal | null
   assetScanSignatureFreshness?: ReliabilitySignal | null
   hiringCandidateRetentionOverdue?: ReliabilitySignal | null
+  hiringTalentPoolIntegrity?: ReliabilitySignal | null
   hiringHandoffBlockedStale?: ReliabilitySignal | null
   hiringInternalHireAwaitingOnboarding?: ReliabilitySignal | null
   workforceHiringActivationStuck?: ReliabilitySignal | null
@@ -1193,6 +1195,7 @@ export const buildReliabilityOverview = (
     ...(sources.assetScanOpenQuarantine ? [sources.assetScanOpenQuarantine] : []),
     ...(sources.assetScanSignatureFreshness ? [sources.assetScanSignatureFreshness] : []),
     ...(sources.hiringCandidateRetentionOverdue ? [sources.hiringCandidateRetentionOverdue] : []),
+    ...(sources.hiringTalentPoolIntegrity ? [sources.hiringTalentPoolIntegrity] : []),
     ...(sources.hiringHandoffBlockedStale ? [sources.hiringHandoffBlockedStale] : []),
     ...(sources.hiringInternalHireAwaitingOnboarding ? [sources.hiringInternalHireAwaitingOnboarding] : []),
     ...(sources.workforceHiringActivationStuck ? [sources.workforceHiringActivationStuck] : []),
@@ -1830,6 +1833,11 @@ export const getReliabilityOverview = async (
     preloadedSources.hiringCandidateRetentionOverdue !== undefined
       ? preloadedSources.hiringCandidateRetentionOverdue
       : await getHiringCandidateRetentionOverdueSignal().catch(() => null)
+
+  const hiringTalentPoolIntegrity =
+    preloadedSources.hiringTalentPoolIntegrity !== undefined
+      ? preloadedSources.hiringTalentPoolIntegrity
+      : await getHiringTalentPoolIntegritySignal().catch(() => null)
 
   // TASK-356 — Handoffs bloqueados sin resolución humana (workflow atascado, steady=0).
   const hiringHandoffBlockedStale =
@@ -2682,6 +2690,7 @@ export const getReliabilityOverview = async (
     assetScanOpenQuarantine,
     assetScanSignatureFreshness,
     hiringCandidateRetentionOverdue,
+    hiringTalentPoolIntegrity,
     hiringHandoffBlockedStale,
     hiringInternalHireAwaitingOnboarding,
     workforceHiringActivationStuck,

@@ -6,11 +6,13 @@ import { createIdentityProfile } from '@/lib/account-360/organization-store'
 import { createHiringApplication, reconcileCandidateFacet } from '@/lib/hiring/store'
 import { resolvePublishedOpeningIdByPublicId } from '@/lib/hiring/publication'
 import { isHiringError } from '@/lib/hiring/errors'
+import { requestTalentPoolFutureConsent } from '@/lib/hiring/talent-pool/commands'
+import { ensureTalentPoolMembership } from '@/lib/hiring/talent-pool/self-service'
 
 import {
   attachPublicCareersCvToApplication,
   attachScannedPublicCareersCvAssetToApplication,
-  type ScannedPublicCareersCvAssetReference,
+  type ScannedPublicCareersCvAssetReference
 } from './cv-upload'
 import type { NormalizedApplicationInput } from './schema'
 
@@ -53,7 +55,7 @@ const getDuplicateApplicationId = (error: unknown): string | null => {
  */
 export const submitPublicHiringApplication = async (
   input: NormalizedApplicationInput,
-  options: SubmitPublicHiringApplicationOptions = {},
+  options: SubmitPublicHiringApplicationOptions = {}
 ): Promise<SubmitApplicationResult> => {
   const openingId = await resolvePublishedOpeningIdByPublicId(input.openingPublicId)
 
@@ -67,7 +69,7 @@ export const submitPublicHiringApplication = async (
     sourceObjectType: 'candidate',
     sourceObjectId: input.email,
     fullName: input.fullName,
-    canonicalEmail: input.email,
+    canonicalEmail: input.email
   })
 
   // 2. candidate_facet (upsert por identity_profile_id; consent granted + attribution + links).
@@ -84,10 +86,12 @@ export const submitPublicHiringApplication = async (
       linkedinUrl: input.linkedinUrl ?? undefined,
       // TASK-1688 — contacto durable person-first; omitir preserva el valor existente (anti-wipe).
       phoneE164: input.phone ?? undefined,
-      residenceCountryCode: input.residenceCountryCode ?? undefined,
+      residenceCountryCode: input.residenceCountryCode ?? undefined
     },
-    null,
+    null
   )
+
+  const membership = await ensureTalentPoolMembership({ candidateFacetId: facet.candidateFacetId })
 
   // 3. hiring_application (dedupe estructural UNIQUE(opening_id, identity_profile_id)).
   // Idempotency key para audit/traza; el enforcement real es el UNIQUE del store.
@@ -101,7 +105,7 @@ export const submitPublicHiringApplication = async (
         openingId,
         openingPublicId: input.openingPublicId,
         identityProfileId,
-        candidateFacetId: facet.candidateFacetId,
+        candidateFacetId: facet.candidateFacetId
       })
 
       return
@@ -115,7 +119,17 @@ export const submitPublicHiringApplication = async (
       openingId,
       openingPublicId: input.openingPublicId,
       identityProfileId,
-      candidateFacetId: facet.candidateFacetId,
+      candidateFacetId: facet.candidateFacetId
+    })
+  }
+
+  const requestFutureConsent = async (applicationId: string) => {
+    if (!input.futureOpportunitiesConsent) return
+    await requestTalentPoolFutureConsent({
+      talentProfileId: membership.public_id,
+      source: 'public_application',
+      evidenceRef: `hiring_application:${applicationId}`,
+      idempotencyKey: `public-apply:${dedupeFingerprint}`
     })
   }
 
@@ -128,12 +142,13 @@ export const submitPublicHiringApplication = async (
         source: 'public_careers',
         // TASK-1688 — el mensaje es contexto de ESTA postulación, nunca del perfil.
         candidateMessage: input.message ?? null,
-        dedupeFingerprint,
+        dedupeFingerprint
       },
-      null,
+      null
     )
 
     await attachCv(application.applicationId)
+    await requestFutureConsent(application.applicationId)
 
     return { outcome: 'accepted', applicationPublicId: application.publicId, applicationId: application.applicationId }
   } catch (error) {
@@ -143,6 +158,7 @@ export const submitPublicHiringApplication = async (
 
       if (applicationId) {
         await attachCv(applicationId)
+        await requestFutureConsent(applicationId)
       }
 
       return { outcome: 'accepted', applicationPublicId: null, applicationId }

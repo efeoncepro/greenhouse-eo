@@ -47,10 +47,12 @@ Este estado no habilita clientes externos ni multitenancy. El adjetivo `read_onl
 **alcanzable por un token real**, no lo que está cableado: mientras `efeonce.mcp.seo.write` no lo tenga ningún
 cliente, ninguna escritura es ejecutable por el borde público.
 
-**Hiring no está federado.** `TASK-1718`–`TASK-1722` son diseño: el panel Application 360 y los commands directos
-de Hiring no son endpoints del gateway. No registres `greenhouse-hiring`, tools de candidate review, assignment ni
-selection journey, y no expongas CV, documentos, links ni tokens de assessment hasta que su reader/command
-canónico, redacción, delegated grant revocable (`TASK-1631`) y canary allow/deny estén implementados y aprobados.
+**Hiring no está federado en producción.** `TASK-1726` dejó code-ready el provider `greenhouse-hiring` y dos tools
+read-only del Talent Pool (`hiring.talent_pool.search`, `hiring.talent_pool.profile.get`), pero los flags
+Greenhouse/MCP y el provider Cloud Run permanecen OFF hasta despliegue compatible, grant Entra y canary
+allow/deny/redaction multi-host. No anuncies disponibilidad live antes de esa evidencia. Application 360, CV,
+documentos, links, tokens de assessment, invitaciones, cambios de etapa y asignaciones siguen fuera de este provider;
+`TASK-1718`–`TASK-1722` y `TASK-1631` conservan sus gates independientes.
 
 ## Preflight
 
@@ -90,6 +92,10 @@ canónico, redacción, delegated grant revocable (`TASK-1631`) y canary allow/de
 | `GREENHOUSE_SEO_PROVIDER_ENABLED` | no | default `false`; `true` sólo con lane Greenhouse verde y canary aprobado |
 | `GREENHOUSE_ECOSYSTEM_API_URL` | no | origin Greenhouse exacto del lane ecosystem; en producción `https://greenhouse.efeoncepro.com` |
 | `GREENHOUSE_ECOSYSTEM_TOKEN` | sí | inyectado desde `efeonce-mcp-gateway-greenhouse-token` en GCP Secret Manager; nunca valor plano en `vars`, workflow ni env file |
+| `GREENHOUSE_HIRING_PROVIDER_ENABLED` | no | default `false`; sólo `true` después de Greenhouse `HIRING_TALENT_POOL_SEARCH_ENABLED` + `HIRING_TALENT_POOL_MCP_ENABLED`, grant Entra y canary aprobados |
+| `GREENHOUSE_HIRING_API_URL` | no | origin Greenhouse exacto; el adapter sólo llama `/api/platform/app/hiring/talent-pool` y su profile por ID opaco |
+| `GREENHOUSE_HIRING_TOKEN_EXCHANGE_URL` | no | endpoint RFC 8693 exacto para el cliente Greenhouse `efeonce-mcp-hiring` |
+| `GREENHOUSE_HIRING_VERCEL_BYPASS_SECRET` | sí | mismo secret ref system-managed de Vercel, enviado sólo al token exchange y a las dos rutas Hiring exactas; nunca identidad ni autorización |
 
 Si falta configuración OAuth, `/health` responde pero `/mcp` devuelve `503 oauth_not_configured`. Esto es el
 comportamiento seguro esperado, no una razón para habilitar acceso anónimo.

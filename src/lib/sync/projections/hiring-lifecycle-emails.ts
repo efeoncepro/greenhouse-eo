@@ -19,8 +19,9 @@ import {
   sendHiringAssessmentAssignedEmail,
   sendHiringAssessmentSubmittedInternalEmail,
   sendHiringDecisionEmail,
-  sendHiringStageAdvancedEmail,
+  sendHiringStageAdvancedEmail
 } from '@/lib/hiring/notifications'
+import { sendTalentPoolVerificationEmail } from '@/lib/hiring/talent-pool'
 import { EVENT_TYPES } from '@/lib/sync/event-catalog'
 
 import type { ProjectionDefinition } from '../projection-registry'
@@ -41,7 +42,7 @@ export const hiringApplicationCreatedEmailsProjection: ProjectionDefinition = {
   triggerEvents: [EVENT_TYPES.hiringApplicationCreated],
   extractScope: applicationScope,
   refresh: async (scope, payload) => sendHiringApplicationCreatedEmails(scope.entityId, payload),
-  maxRetries: 3,
+  maxRetries: 3
 }
 
 export const hiringAssessmentAssignedEmailProjection: ProjectionDefinition = {
@@ -58,7 +59,7 @@ export const hiringAssessmentAssignedEmailProjection: ProjectionDefinition = {
     return { entityType: 'hiring_assessment', entityId: assessmentId }
   },
   refresh: async (scope, payload) => sendHiringAssessmentAssignedEmail(scope.entityId, payload),
-  maxRetries: 3,
+  maxRetries: 3
 }
 
 export const hiringAssessmentSubmittedInternalEmailProjection: ProjectionDefinition = {
@@ -75,7 +76,7 @@ export const hiringAssessmentSubmittedInternalEmailProjection: ProjectionDefinit
     return { entityType: 'hiring_assessment', entityId: assessmentId }
   },
   refresh: async (scope, payload) => sendHiringAssessmentSubmittedInternalEmail(scope.entityId, payload),
-  maxRetries: 3,
+  maxRetries: 3
 }
 
 export const hiringStageChangedEmailProjection: ProjectionDefinition = {
@@ -86,7 +87,7 @@ export const hiringStageChangedEmailProjection: ProjectionDefinition = {
   triggerEvents: [EVENT_TYPES.hiringApplicationStageChanged],
   extractScope: applicationScope,
   refresh: async (scope, payload) => sendHiringStageAdvancedEmail(scope.entityId, payload),
-  maxRetries: 3,
+  maxRetries: 3
 }
 
 export const hiringApplicationDecidedEmailProjection: ProjectionDefinition = {
@@ -97,5 +98,22 @@ export const hiringApplicationDecidedEmailProjection: ProjectionDefinition = {
   triggerEvents: [EVENT_TYPES.hiringApplicationDecided],
   extractScope: applicationScope,
   refresh: async (scope, payload) => sendHiringDecisionEmail(scope.entityId, payload),
-  maxRetries: 3,
+  maxRetries: 3
+}
+
+export const talentPoolVerificationEmailProjection: ProjectionDefinition = {
+  name: 'talent_pool_verification_email',
+  description:
+    'TASK-1724 — talent_pool.consent_requested → email verificable con token re-emitido; PII y token nunca viajan por outbox.',
+  domain: 'notifications',
+  triggerEvents: [EVENT_TYPES.talentPoolConsentRequested],
+  extractScope: payload => {
+    const consentEventId = typeof payload.consentEventId === 'string' ? payload.consentEventId.trim() : ''
+
+    if (!consentEventId) return null
+
+    return { entityType: 'talent_pool_consent_event', entityId: consentEventId }
+  },
+  refresh: async (scope, payload) => sendTalentPoolVerificationEmail(scope.entityId, payload),
+  maxRetries: 3
 }

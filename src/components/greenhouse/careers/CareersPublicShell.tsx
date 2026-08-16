@@ -59,7 +59,7 @@ export const CareersPublicShell = ({ backHref, backLabel, children, copy, locale
               </span>
             </div>
             <nav className={styles.footerLinks} aria-label={copy.header.logoAlt}>
-              <Link href={`${EFEONCE_URL_HTTPS}/privacy`}>{copy.footer.privacy}</Link>
+              <Link href={`${EFEONCE_URL_HTTPS}/politica-de-privacidad/`}>{copy.footer.privacy}</Link>
               <Link href={`${EFEONCE_URL_HTTPS}/terms`}>{copy.footer.terms}</Link>
               <Link href={EFEONCE_URL_HTTPS}>{copy.footer.website}</Link>
             </nav>

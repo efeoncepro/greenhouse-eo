@@ -2235,7 +2235,10 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // sólo la portan FINANCE_ADMIN/EFEONCE_ADMIN, y granteársela al tier que opera Hiring abriría
   // el reveal sobre TODA persona del módulo (colaboradores, ex-colaboradores, direcciones).
   // El radio de ésta es exacto: la identidad de un candidato, que sólo existe post-decisión.
-  { key: 'hiring.candidate.reveal_identity', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' }
+  { key: 'hiring.candidate.reveal_identity', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
+  { key: 'hiring.talent_pool.read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
+  { key: 'hiring.talent_pool.manage', module: 'hiring', actions: ['update'] as const, defaultScope: 'tenant' },
+  { key: 'hiring.talent_pool.invite', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' }
 ] as const
 
 export type EntitlementCapabilityDefinition = (typeof ENTITLEMENT_CAPABILITY_CATALOG)[number]

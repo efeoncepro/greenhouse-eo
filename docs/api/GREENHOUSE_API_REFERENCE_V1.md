@@ -59,6 +59,8 @@ Routes:
 - `GET /api/platform/app/notifications`
 - `POST /api/platform/app/notifications/:id/read`
 - `POST /api/platform/app/notifications/mark-all-read`
+- `GET /api/platform/app/hiring/talent-pool`
+- `GET /api/platform/app/hiring/talent-pool/:id`
 
 Read next:
 - `docs/api/GREENHOUSE_API_PLATFORM_V1.md`
@@ -71,6 +73,9 @@ Key rules:
 - app clients must use `api/platform/app/*`, not web routes or `AGENT_AUTH`
 - event retry schedules work for the dispatcher; it does not deliver inline
 - general ecosystem writes and cross-lane idempotency remain follow-ups
+- Talent Pool es read-only en App API: búsqueda/perfil requieren `hiring.talent_pool.read`; el bearer MCP delegado
+  agrega client/scope/purpose/agent-host exactos y conserva audit sin query, resultado ni PII. Provider/tools siguen
+  OFF hasta canary productivo de TASK-1726.
 
 ### 2. Integrations API
 

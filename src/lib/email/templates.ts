@@ -1,6 +1,8 @@
 import 'server-only'
 
-import AiVisibilityGraderReportEmail, { type AiVisibilityReportEmailInsight } from '@/emails/AiVisibilityGraderReportEmail'
+import AiVisibilityGraderReportEmail, {
+  type AiVisibilityReportEmailInsight
+} from '@/emails/AiVisibilityGraderReportEmail'
 import EbookDeliveryEmail from '@/emails/EbookDeliveryEmail'
 import InvitationEmail from '@/emails/InvitationEmail'
 import LeaveRequestDecisionEmail from '@/emails/LeaveRequestDecisionEmail'
@@ -25,6 +27,7 @@ import HiringAssessmentAssignedEmail from '@/emails/HiringAssessmentAssignedEmai
 import HiringAssessmentSubmittedInternalEmail from '@/emails/HiringAssessmentSubmittedInternalEmail'
 import HiringDecisionEmail from '@/emails/HiringDecisionEmail'
 import HiringStageAdvancedEmail from '@/emails/HiringStageAdvancedEmail'
+import HiringTalentPoolVerificationEmail from '@/emails/HiringTalentPoolVerificationEmail'
 import QuoteSharePromptEmail from '@/emails/QuoteSharePromptEmail'
 import WeeklyExecutiveDigestEmail from '@/emails/WeeklyExecutiveDigestEmail'
 import { getMicrocopy } from '@/lib/copy'
@@ -47,14 +50,22 @@ const EMAIL_TEMPLATES: ResolverMap = new Map()
 const EMAIL_PREVIEW_META: PreviewMetaMap = new Map()
 
 const MONTH_NAMES = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre'
 ]
 
 const formatMoney = (value: number, currency: string) =>
-  currency === 'CLP'
-    ? `$${Math.round(value).toLocaleString('es-CL')}`
-    : `US$${value.toFixed(2)}`
+  currency === 'CLP' ? `$${Math.round(value).toLocaleString('es-CL')}` : `US$${value.toFixed(2)}`
 
 const formatShortDateTime = (value: string | null | undefined) => {
   if (!value) return null
@@ -104,7 +115,9 @@ const buildPayrollExportPlainText = (context: {
     `  ${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/hr/payroll`,
     '',
     getMicrocopy().emails.common.brandSignature
-  ].filter(Boolean).join('\n')
+  ]
+    .filter(Boolean)
+    .join('\n')
 }
 
 const buildPayrollReceiptPlainText = (context: {
@@ -171,7 +184,8 @@ const buildPayrollLiquidacionV2PlainText = (context: {
         ? `-${formatMoney(Math.abs(delta), context.currency)}`
         : 'Sin cambios netos'
 
-  const link = context.receiptUrl ?? `${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/my/payroll`
+  const link =
+    context.receiptUrl ?? `${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/my/payroll`
 
   return [
     `Hola ${firstName},`,
@@ -198,9 +212,14 @@ const buildNotificationPlainText = (context: {
 }) => {
   const locale = context.locale || 'es'
 
-  const greeting = locale === 'en'
-    ? (context.recipientName ? `Hi ${context.recipientName},` : 'Hi,')
-    : (context.recipientName ? `Hola ${context.recipientName.split(' ')[0]},` : 'Hola,')
+  const greeting =
+    locale === 'en'
+      ? context.recipientName
+        ? `Hi ${context.recipientName},`
+        : 'Hi,'
+      : context.recipientName
+        ? `Hola ${context.recipientName.split(' ')[0]},`
+        : 'Hola,'
 
   const actionPrefix = locale === 'en' ? 'View more:' : 'Ver m\u00e1s:'
 
@@ -213,7 +232,9 @@ const buildNotificationPlainText = (context: {
     context.actionUrl ? `${actionPrefix} ${context.actionUrl}` : '',
     '',
     '\u2014 Greenhouse by Efeonce Group'
-  ].filter(Boolean).join('\n')
+  ]
+    .filter(Boolean)
+    .join('\n')
 }
 
 export function registerTemplate<TContext extends EmailTemplateContext>(
@@ -253,277 +274,309 @@ export function getPreviewCatalog(): Array<{ emailType: EmailType } & EmailPrevi
   }))
 }
 
-registerTemplate('password_reset', (context: {
-  resetUrl: string
-  userName?: string
-  locale?: 'es' | 'en'
-}) => {
+registerTemplate('password_reset', (context: { resetUrl: string; userName?: string; locale?: 'es' | 'en' }) => {
   const locale = context.locale || 'es'
 
   return {
-    subject: locale === 'en'
-      ? 'Reset your password \u2014 Greenhouse'
-      : 'Restablece tu contrase\u00f1a \u2014 Greenhouse',
+    subject:
+      locale === 'en' ? 'Reset your password \u2014 Greenhouse' : 'Restablece tu contrase\u00f1a \u2014 Greenhouse',
     react: PasswordResetEmail({ resetUrl: context.resetUrl, userName: context.userName, locale }),
-    text: locale === 'en'
-      ? ['Reset your Greenhouse password.', '', `Link: ${context.resetUrl}`].join('\n')
-      : ['Restablece tu contrase\u00f1a en Greenhouse.', '', `Enlace: ${context.resetUrl}`].join('\n')
+    text:
+      locale === 'en'
+        ? ['Reset your Greenhouse password.', '', `Link: ${context.resetUrl}`].join('\n')
+        : ['Restablece tu contrase\u00f1a en Greenhouse.', '', `Enlace: ${context.resetUrl}`].join('\n')
   }
 })
 
 // TASK-742 Capa 5 \u2014 Magic-link self-recovery
-registerTemplate('magic_link', (context: {
-  magicLinkUrl: string
-  userName?: string
-  locale?: 'es' | 'en'
-  expiresInMinutes?: number
-}) => {
-  const locale = context.locale || 'es'
-  const minutes = context.expiresInMinutes ?? 15
+registerTemplate(
+  'magic_link',
+  (context: { magicLinkUrl: string; userName?: string; locale?: 'es' | 'en'; expiresInMinutes?: number }) => {
+    const locale = context.locale || 'es'
+    const minutes = context.expiresInMinutes ?? 15
 
-  return {
-    subject: locale === 'en'
-      ? `Sign in to Greenhouse \u2014 link valid ${minutes} min`
-      : `Acceso a Greenhouse \u2014 enlace v\u00e1lido ${minutes} min`,
-    react: MagicLinkEmail({
-      magicLinkUrl: context.magicLinkUrl,
-      userName: context.userName,
-      locale,
-      expiresInMinutes: minutes
-    }),
-    text: locale === 'en'
-      ? [`Sign in to Greenhouse. Valid ${minutes} minutes.`, '', `Link: ${context.magicLinkUrl}`].join('\n')
-      : [`Entra a Greenhouse. V\u00e1lido por ${minutes} minutos.`, '', `Enlace: ${context.magicLinkUrl}`].join('\n')
+    return {
+      subject:
+        locale === 'en'
+          ? `Sign in to Greenhouse \u2014 link valid ${minutes} min`
+          : `Acceso a Greenhouse \u2014 enlace v\u00e1lido ${minutes} min`,
+      react: MagicLinkEmail({
+        magicLinkUrl: context.magicLinkUrl,
+        userName: context.userName,
+        locale,
+        expiresInMinutes: minutes
+      }),
+      text:
+        locale === 'en'
+          ? [`Sign in to Greenhouse. Valid ${minutes} minutes.`, '', `Link: ${context.magicLinkUrl}`].join('\n')
+          : [`Entra a Greenhouse. V\u00e1lido por ${minutes} minutos.`, '', `Enlace: ${context.magicLinkUrl}`].join(
+              '\n'
+            )
+    }
   }
-})
+)
 
-registerTemplate('invitation', (context: {
-  inviteUrl: string
-  inviterName: string
-  clientName: string
-  userName?: string
-  locale?: 'es' | 'en'
-}) => {
-  const locale = context.locale || 'es'
+registerTemplate(
+  'invitation',
+  (context: {
+    inviteUrl: string
+    inviterName: string
+    clientName: string
+    userName?: string
+    locale?: 'es' | 'en'
+  }) => {
+    const locale = context.locale || 'es'
 
-  return {
-    subject: locale === 'en'
-      ? 'You were invited to Greenhouse \u2014 Efeonce'
-      : 'Te invitaron a Greenhouse \u2014 Efeonce',
-    react: InvitationEmail({ ...context, locale }),
-    text: locale === 'en'
-      ? [`${context.inviterName} invited you to ${context.clientName} on Greenhouse.`, '', `Activate your account: ${context.inviteUrl}`].join('\n')
-      : [`${context.inviterName} te invit\u00f3 a ${context.clientName} en Greenhouse.`, '', `Activa tu cuenta: ${context.inviteUrl}`].join('\n')
+    return {
+      subject:
+        locale === 'en' ? 'You were invited to Greenhouse \u2014 Efeonce' : 'Te invitaron a Greenhouse \u2014 Efeonce',
+      react: InvitationEmail({ ...context, locale }),
+      text:
+        locale === 'en'
+          ? [
+              `${context.inviterName} invited you to ${context.clientName} on Greenhouse.`,
+              '',
+              `Activate your account: ${context.inviteUrl}`
+            ].join('\n')
+          : [
+              `${context.inviterName} te invit\u00f3 a ${context.clientName} en Greenhouse.`,
+              '',
+              `Activa tu cuenta: ${context.inviteUrl}`
+            ].join('\n')
+    }
   }
-})
+)
 
-registerTemplate('verify_email', (context: {
-  verifyUrl: string
-  userName?: string
-  locale?: 'es' | 'en'
-}) => {
+registerTemplate('verify_email', (context: { verifyUrl: string; userName?: string; locale?: 'es' | 'en' }) => {
   const locale = context.locale || 'es'
 
   return {
-    subject: locale === 'en'
-      ? 'Confirm your email \u2014 Greenhouse'
-      : 'Confirma tu correo \u2014 Greenhouse',
+    subject: locale === 'en' ? 'Confirm your email \u2014 Greenhouse' : 'Confirma tu correo \u2014 Greenhouse',
     react: VerifyEmail({ verifyUrl: context.verifyUrl, userName: context.userName, locale }),
-    text: locale === 'en'
-      ? ['Confirm your Greenhouse email.', '', `Link: ${context.verifyUrl}`].join('\n')
-      : ['Confirma tu correo en Greenhouse.', '', `Enlace: ${context.verifyUrl}`].join('\n')
+    text:
+      locale === 'en'
+        ? ['Confirm your Greenhouse email.', '', `Link: ${context.verifyUrl}`].join('\n')
+        : ['Confirma tu correo en Greenhouse.', '', `Enlace: ${context.verifyUrl}`].join('\n')
   }
 })
 
-registerTemplate('notification', (context: {
-  title: string
-  body?: string
-  actionUrl?: string
-  actionLabel?: string
-  recipientName?: string
-  locale?: 'es' | 'en'
-  unsubscribeUrl?: string
-}) => {
-  const locale = context.locale || 'es'
+registerTemplate(
+  'notification',
+  (context: {
+    title: string
+    body?: string
+    actionUrl?: string
+    actionLabel?: string
+    recipientName?: string
+    locale?: 'es' | 'en'
+    unsubscribeUrl?: string
+  }) => {
+    const locale = context.locale || 'es'
 
-  return {
-    subject: context.title,
-    react: NotificationEmail({
-      title: context.title,
-      body: context.body,
-      actionUrl: context.actionUrl,
-      actionLabel: context.actionLabel,
-      recipientName: context.recipientName,
-      locale,
+    return {
+      subject: context.title,
+      react: NotificationEmail({
+        title: context.title,
+        body: context.body,
+        actionUrl: context.actionUrl,
+        actionLabel: context.actionLabel,
+        recipientName: context.recipientName,
+        locale,
+        unsubscribeUrl: context.unsubscribeUrl
+      }),
+      text: buildNotificationPlainText({ ...context, locale })
+    }
+  }
+)
+
+registerTemplate(
+  'payroll_export',
+  (context: {
+    periodLabel: string
+    entryCount: number
+    breakdowns: CurrencyBreakdown[]
+    netTotalDisplay: string
+    exportedBy?: string | null
+    exportedAt?: string | null
+    attachments?: EmailAttachment[]
+    unsubscribeUrl?: string
+  }) => ({
+    subject: getMicrocopy().emails.subjects.payrollExport(context.periodLabel, context.entryCount),
+    react: PayrollExportReadyEmail({
+      periodLabel: context.periodLabel,
+      entryCount: context.entryCount,
+      breakdowns: context.breakdowns,
+      netTotalDisplay: context.netTotalDisplay,
+      exportedBy: context.exportedBy ?? undefined,
+      exportedAt: formatShortDateTime(context.exportedAt) ?? undefined,
       unsubscribeUrl: context.unsubscribeUrl
     }),
-    text: buildNotificationPlainText({ ...context, locale })
-  }
-})
+    text: buildPayrollExportPlainText(context),
+    attachments: context.attachments
+  })
+)
 
-registerTemplate('payroll_export', (context: {
-  periodLabel: string
-  entryCount: number
-  breakdowns: CurrencyBreakdown[]
-  netTotalDisplay: string
-  exportedBy?: string | null
-  exportedAt?: string | null
-  attachments?: EmailAttachment[]
-  unsubscribeUrl?: string
-}) => ({
-  subject: getMicrocopy().emails.subjects.payrollExport(context.periodLabel, context.entryCount),
-  react: PayrollExportReadyEmail({
-    periodLabel: context.periodLabel,
-    entryCount: context.entryCount,
-    breakdowns: context.breakdowns,
-    netTotalDisplay: context.netTotalDisplay,
-    exportedBy: context.exportedBy ?? undefined,
-    exportedAt: formatShortDateTime(context.exportedAt) ?? undefined,
-    unsubscribeUrl: context.unsubscribeUrl
-  }),
-  text: buildPayrollExportPlainText(context),
-  attachments: context.attachments
-}))
-
-registerTemplate('payroll_receipt', (context: {
-  fullName: string
-  periodYear: number
-  periodMonth: number
-  entryCurrency: 'CLP' | 'USD'
-  grossTotal: number
-  totalDeductions: number | null
-  netTotal: number
-  payRegime: 'chile' | 'international'
-  receiptFilename: string
-  pdfBuffer: Buffer
-}) => ({
-  subject: context.payRegime === 'chile'
-    ? `Tu recibo de nómina — ${MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)} ${context.periodYear}`
-    : `Your payment statement — ${MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)} ${context.periodYear}`,
-  react: PayrollReceiptEmail({
-    fullName: context.fullName,
-    periodYear: context.periodYear,
-    periodMonth: context.periodMonth,
-    entryCurrency: context.entryCurrency,
-    grossTotal: context.grossTotal,
-    totalDeductions: context.totalDeductions,
-    netTotal: context.netTotal,
-    payRegime: context.payRegime
-  }),
-  text: buildPayrollReceiptPlainText(context),
-  attachments: [{
-    filename: context.receiptFilename,
-    content: context.pdfBuffer,
-    contentType: 'application/pdf'
-  }]
-}))
+registerTemplate(
+  'payroll_receipt',
+  (context: {
+    fullName: string
+    periodYear: number
+    periodMonth: number
+    entryCurrency: 'CLP' | 'USD'
+    grossTotal: number
+    totalDeductions: number | null
+    netTotal: number
+    payRegime: 'chile' | 'international'
+    receiptFilename: string
+    pdfBuffer: Buffer
+  }) => ({
+    subject:
+      context.payRegime === 'chile'
+        ? `Tu recibo de nómina — ${MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)} ${context.periodYear}`
+        : `Your payment statement — ${MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)} ${context.periodYear}`,
+    react: PayrollReceiptEmail({
+      fullName: context.fullName,
+      periodYear: context.periodYear,
+      periodMonth: context.periodMonth,
+      entryCurrency: context.entryCurrency,
+      grossTotal: context.grossTotal,
+      totalDeductions: context.totalDeductions,
+      netTotal: context.netTotal,
+      payRegime: context.payRegime
+    }),
+    text: buildPayrollReceiptPlainText(context),
+    attachments: [
+      {
+        filename: context.receiptFilename,
+        content: context.pdfBuffer,
+        contentType: 'application/pdf'
+      }
+    ]
+  })
+)
 
 // TASK-759b — Promesa pre-pago (sin PDF)
-registerTemplate('payroll_payment_committed', (context: {
-  fullName: string
-  periodYear: number
-  periodMonth: number
-  entryCurrency: 'CLP' | 'USD'
-  netTotal: number
-  payRegime: 'chile' | 'international'
-  scheduledFor: string | null
-  processorLabel: string | null
-}) => ({
-  subject: context.payRegime === 'chile'
-    ? `Tu pago de ${MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)} ${context.periodYear} está programado`
-    : `Your ${MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)} ${context.periodYear} payment is scheduled`,
-  react: PayrollPaymentCommittedEmail({
-    fullName: context.fullName,
-    periodYear: context.periodYear,
-    periodMonth: context.periodMonth,
-    entryCurrency: context.entryCurrency,
-    netTotal: context.netTotal,
-    payRegime: context.payRegime,
-    scheduledFor: context.scheduledFor,
-    processorLabel: context.processorLabel
-  }),
-  text: context.payRegime === 'chile'
-    ? `Hola ${context.fullName.split(' ')[0]}, tu pago de ${MONTH_NAMES[context.periodMonth - 1]} ${context.periodYear} (${formatMoney(context.netTotal, context.entryCurrency)}) fue aprobado y está programado. Te enviaremos el recibo apenas se ejecute.`
-    : `Hi ${context.fullName.split(' ')[0]}, your ${MONTH_NAMES[context.periodMonth - 1]} ${context.periodYear} payment (${formatMoney(context.netTotal, context.entryCurrency)}) has been approved and is scheduled. We will send the receipt once executed.`
-}))
-
-registerTemplate('beneficiary_payment_profile_changed', (context: {
-  fullName: string
-  kind: PaymentProfileEmailKind
-  bankName: string | null
-  accountNumberMasked: string | null
-  currency: 'CLP' | 'USD'
-  effectiveAt: string | null
-  reason: string | null
-  requestedByMember: boolean
-}) => {
-  const t = getMicrocopy().emails.beneficiaryPaymentProfileChanged
-  const firstName = context.fullName.split(' ')[0] || context.fullName
-
-  return {
-    subject: getMicrocopy().emails.subjects.beneficiaryPaymentProfileChanged[context.kind],
-    react: BeneficiaryPaymentProfileChangedEmail({
+registerTemplate(
+  'payroll_payment_committed',
+  (context: {
+    fullName: string
+    periodYear: number
+    periodMonth: number
+    entryCurrency: 'CLP' | 'USD'
+    netTotal: number
+    payRegime: 'chile' | 'international'
+    scheduledFor: string | null
+    processorLabel: string | null
+  }) => ({
+    subject:
+      context.payRegime === 'chile'
+        ? `Tu pago de ${MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)} ${context.periodYear} está programado`
+        : `Your ${MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)} ${context.periodYear} payment is scheduled`,
+    react: PayrollPaymentCommittedEmail({
       fullName: context.fullName,
-      kind: context.kind,
-      bankName: context.bankName,
-      accountNumberMasked: context.accountNumberMasked,
-      currency: context.currency,
-      effectiveAt: context.effectiveAt,
-      reason: context.reason,
-      requestedByMember: context.requestedByMember
+      periodYear: context.periodYear,
+      periodMonth: context.periodMonth,
+      entryCurrency: context.entryCurrency,
+      netTotal: context.netTotal,
+      payRegime: context.payRegime,
+      scheduledFor: context.scheduledFor,
+      processorLabel: context.processorLabel
     }),
-    text: t.plainText[context.kind](firstName, context.accountNumberMasked ?? '••••')
+    text:
+      context.payRegime === 'chile'
+        ? `Hola ${context.fullName.split(' ')[0]}, tu pago de ${MONTH_NAMES[context.periodMonth - 1]} ${context.periodYear} (${formatMoney(context.netTotal, context.entryCurrency)}) fue aprobado y está programado. Te enviaremos el recibo apenas se ejecute.`
+        : `Hi ${context.fullName.split(' ')[0]}, your ${MONTH_NAMES[context.periodMonth - 1]} ${context.periodYear} payment (${formatMoney(context.netTotal, context.entryCurrency)}) has been approved and is scheduled. We will send the receipt once executed.`
+  })
+)
+
+registerTemplate(
+  'beneficiary_payment_profile_changed',
+  (context: {
+    fullName: string
+    kind: PaymentProfileEmailKind
+    bankName: string | null
+    accountNumberMasked: string | null
+    currency: 'CLP' | 'USD'
+    effectiveAt: string | null
+    reason: string | null
+    requestedByMember: boolean
+  }) => {
+    const t = getMicrocopy().emails.beneficiaryPaymentProfileChanged
+    const firstName = context.fullName.split(' ')[0] || context.fullName
+
+    return {
+      subject: getMicrocopy().emails.subjects.beneficiaryPaymentProfileChanged[context.kind],
+      react: BeneficiaryPaymentProfileChangedEmail({
+        fullName: context.fullName,
+        kind: context.kind,
+        bankName: context.bankName,
+        accountNumberMasked: context.accountNumberMasked,
+        currency: context.currency,
+        effectiveAt: context.effectiveAt,
+        reason: context.reason,
+        requestedByMember: context.requestedByMember
+      }),
+      text: t.plainText[context.kind](firstName, context.accountNumberMasked ?? '••••')
+    }
   }
-})
+)
 
 // TASK-759c — Compensación cancelación (sin PDF)
-registerTemplate('payroll_payment_cancelled', (context: {
-  fullName: string
-  periodYear: number
-  periodMonth: number
-  entryCurrency: 'CLP' | 'USD'
-  netTotal: number
-  payRegime: 'chile' | 'international'
-  cancellationReason: string | null
-}) => ({
-  subject: context.payRegime === 'chile'
-    ? `Actualización sobre tu pago de ${MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)} ${context.periodYear}`
-    : `Update on your ${MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)} ${context.periodYear} payment`,
-  react: PayrollPaymentCancelledEmail({
-    fullName: context.fullName,
-    periodYear: context.periodYear,
-    periodMonth: context.periodMonth,
-    entryCurrency: context.entryCurrency,
-    netTotal: context.netTotal,
-    payRegime: context.payRegime,
-    cancellationReason: context.cancellationReason
-  }),
-  text: context.payRegime === 'chile'
-    ? `Hola ${context.fullName.split(' ')[0]}, detectamos un problema con el pago programado de ${MONTH_NAMES[context.periodMonth - 1]} ${context.periodYear} (${formatMoney(context.netTotal, context.entryCurrency)}). Lo estamos resolviendo.`
-    : `Hi ${context.fullName.split(' ')[0]}, we detected an issue with the scheduled payment for ${MONTH_NAMES[context.periodMonth - 1]} ${context.periodYear} (${formatMoney(context.netTotal, context.entryCurrency)}). We are resolving it.`
-}))
+registerTemplate(
+  'payroll_payment_cancelled',
+  (context: {
+    fullName: string
+    periodYear: number
+    periodMonth: number
+    entryCurrency: 'CLP' | 'USD'
+    netTotal: number
+    payRegime: 'chile' | 'international'
+    cancellationReason: string | null
+  }) => ({
+    subject:
+      context.payRegime === 'chile'
+        ? `Actualización sobre tu pago de ${MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)} ${context.periodYear}`
+        : `Update on your ${MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)} ${context.periodYear} payment`,
+    react: PayrollPaymentCancelledEmail({
+      fullName: context.fullName,
+      periodYear: context.periodYear,
+      periodMonth: context.periodMonth,
+      entryCurrency: context.entryCurrency,
+      netTotal: context.netTotal,
+      payRegime: context.payRegime,
+      cancellationReason: context.cancellationReason
+    }),
+    text:
+      context.payRegime === 'chile'
+        ? `Hola ${context.fullName.split(' ')[0]}, detectamos un problema con el pago programado de ${MONTH_NAMES[context.periodMonth - 1]} ${context.periodYear} (${formatMoney(context.netTotal, context.entryCurrency)}). Lo estamos resolviendo.`
+        : `Hi ${context.fullName.split(' ')[0]}, we detected an issue with the scheduled payment for ${MONTH_NAMES[context.periodMonth - 1]} ${context.periodYear} (${formatMoney(context.netTotal, context.entryCurrency)}). We are resolving it.`
+  })
+)
 
-registerTemplate('payroll_liquidacion_v2', (context: {
-  fullName: string
-  periodYear: number
-  periodMonth: number
-  previousNetTotal: number
-  newNetTotal: number
-  currency: 'CLP' | 'USD'
-  receiptUrl?: string
-}) => ({
-  subject: `Tu liquidación de ${MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)} ${context.periodYear} fue actualizada`,
-  react: PayrollLiquidacionV2Email({
-    fullName: context.fullName,
-    periodYear: context.periodYear,
-    periodMonth: context.periodMonth,
-    previousNetTotal: context.previousNetTotal,
-    newNetTotal: context.newNetTotal,
-    currency: context.currency,
-    receiptUrl: context.receiptUrl
-  }),
-  text: buildPayrollLiquidacionV2PlainText(context)
-}))
+registerTemplate(
+  'payroll_liquidacion_v2',
+  (context: {
+    fullName: string
+    periodYear: number
+    periodMonth: number
+    previousNetTotal: number
+    newNetTotal: number
+    currency: 'CLP' | 'USD'
+    receiptUrl?: string
+  }) => ({
+    subject: `Tu liquidación de ${MONTH_NAMES[context.periodMonth - 1] ?? String(context.periodMonth)} ${context.periodYear} fue actualizada`,
+    react: PayrollLiquidacionV2Email({
+      fullName: context.fullName,
+      periodYear: context.periodYear,
+      periodMonth: context.periodMonth,
+      previousNetTotal: context.previousNetTotal,
+      newNetTotal: context.newNetTotal,
+      currency: context.currency,
+      receiptUrl: context.receiptUrl
+    }),
+    text: buildPayrollLiquidacionV2PlainText(context)
+  })
+)
 
 // ── Leave Request Decision (to the requester) ──
 
@@ -576,41 +629,49 @@ const buildLeaveDecisionPlainText = (context: {
     `→ ${isEn ? 'View my leave' : 'Ver mis permisos'}: ${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/my/leave`,
     '',
     '— Greenhouse by Efeonce Group'
-  ].filter(line => line !== undefined).join('\n')
+  ]
+    .filter(line => line !== undefined)
+    .join('\n')
 }
 
-registerTemplate('leave_request_decision', (context: {
-  memberFirstName: string
-  actorName: string
-  leaveTypeName: string
-  startDate: string
-  endDate: string
-  requestedDays: number
-  status: LeaveDecisionStatus
-  notes?: string | null
-  locale?: 'es' | 'en'
-}) => {
-  const locale = context.locale || 'es'
-  const statusLabel = locale === 'en' ? LEAVE_STATUS_LABELS_EN[context.status] : LEAVE_STATUS_LABELS_ES[context.status]
+registerTemplate(
+  'leave_request_decision',
+  (context: {
+    memberFirstName: string
+    actorName: string
+    leaveTypeName: string
+    startDate: string
+    endDate: string
+    requestedDays: number
+    status: LeaveDecisionStatus
+    notes?: string | null
+    locale?: 'es' | 'en'
+  }) => {
+    const locale = context.locale || 'es'
 
-  return {
-    subject: locale === 'en'
-      ? `Your ${context.leaveTypeName} request was ${statusLabel} — Greenhouse`
-      : `Tu solicitud de ${context.leaveTypeName} fue ${statusLabel} — Greenhouse`,
-    react: LeaveRequestDecisionEmail({
-      memberFirstName: context.memberFirstName,
-      actorName: context.actorName,
-      leaveTypeName: context.leaveTypeName,
-      startDate: context.startDate,
-      endDate: context.endDate,
-      requestedDays: context.requestedDays,
-      status: context.status,
-      notes: context.notes,
-      locale
-    }),
-    text: buildLeaveDecisionPlainText(context)
+    const statusLabel =
+      locale === 'en' ? LEAVE_STATUS_LABELS_EN[context.status] : LEAVE_STATUS_LABELS_ES[context.status]
+
+    return {
+      subject:
+        locale === 'en'
+          ? `Your ${context.leaveTypeName} request was ${statusLabel} — Greenhouse`
+          : `Tu solicitud de ${context.leaveTypeName} fue ${statusLabel} — Greenhouse`,
+      react: LeaveRequestDecisionEmail({
+        memberFirstName: context.memberFirstName,
+        actorName: context.actorName,
+        leaveTypeName: context.leaveTypeName,
+        startDate: context.startDate,
+        endDate: context.endDate,
+        requestedDays: context.requestedDays,
+        status: context.status,
+        notes: context.notes,
+        locale
+      }),
+      text: buildLeaveDecisionPlainText(context)
+    }
   }
-})
+)
 
 // ── Leave Review Confirmation (to the reviewer) ──
 
@@ -655,46 +716,53 @@ const buildLeaveReviewPlainText = (context: {
     `→ ${isEn ? 'View team leave' : 'Ver permisos del equipo'}: ${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/hr/leave`,
     '',
     '— Greenhouse by Efeonce Group'
-  ].filter(line => line !== undefined).join('\n')
+  ]
+    .filter(line => line !== undefined)
+    .join('\n')
 }
 
-registerTemplate('leave_review_confirmation', (context: {
-  actorFirstName: string
-  memberName: string
-  leaveTypeName: string
-  startDate: string
-  endDate: string
-  requestedDays: number
-  status: LeaveDecisionStatus
-  notes?: string | null
-  reason?: string | null
-  locale?: 'es' | 'en'
-}) => {
-  const locale = context.locale || 'es'
+registerTemplate(
+  'leave_review_confirmation',
+  (context: {
+    actorFirstName: string
+    memberName: string
+    leaveTypeName: string
+    startDate: string
+    endDate: string
+    requestedDays: number
+    status: LeaveDecisionStatus
+    notes?: string | null
+    reason?: string | null
+    locale?: 'es' | 'en'
+  }) => {
+    const locale = context.locale || 'es'
 
-  const statusLabel = locale === 'en'
-    ? { approved: 'approved', rejected: 'rejected', cancelled: 'cancelled' }[context.status]
-    : { approved: 'aprobado', rejected: 'rechazado', cancelled: 'cancelado' }[context.status]
+    const statusLabel =
+      locale === 'en'
+        ? { approved: 'approved', rejected: 'rejected', cancelled: 'cancelled' }[context.status]
+        : { approved: 'aprobado', rejected: 'rechazado', cancelled: 'cancelado' }[context.status]
 
-  return {
-    subject: locale === 'en'
-      ? `Leave ${statusLabel} for ${context.memberName} — Greenhouse`
-      : `Permiso ${statusLabel} para ${context.memberName} — Greenhouse`,
-    react: LeaveReviewConfirmationEmail({
-      actorFirstName: context.actorFirstName,
-      memberName: context.memberName,
-      leaveTypeName: context.leaveTypeName,
-      startDate: context.startDate,
-      endDate: context.endDate,
-      requestedDays: context.requestedDays,
-      status: context.status,
-      notes: context.notes,
-      reason: context.reason,
-      locale
-    }),
-    text: buildLeaveReviewPlainText(context)
+    return {
+      subject:
+        locale === 'en'
+          ? `Leave ${statusLabel} for ${context.memberName} — Greenhouse`
+          : `Permiso ${statusLabel} para ${context.memberName} — Greenhouse`,
+      react: LeaveReviewConfirmationEmail({
+        actorFirstName: context.actorFirstName,
+        memberName: context.memberName,
+        leaveTypeName: context.leaveTypeName,
+        startDate: context.startDate,
+        endDate: context.endDate,
+        requestedDays: context.requestedDays,
+        status: context.status,
+        notes: context.notes,
+        reason: context.reason,
+        locale
+      }),
+      text: buildLeaveReviewPlainText(context)
+    }
   }
-})
+)
 
 // ── Leave Request Submitted (to the requester) ──
 
@@ -730,36 +798,42 @@ const buildLeaveSubmittedPlainText = (context: {
     `→ ${isEn ? 'View my leave' : 'Ver mis permisos'}: ${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/my/leave`,
     '',
     '— Greenhouse by Efeonce Group'
-  ].filter(line => line !== undefined).join('\n')
+  ]
+    .filter(line => line !== undefined)
+    .join('\n')
 }
 
-registerTemplate('leave_request_submitted', (context: {
-  memberFirstName: string
-  leaveTypeName: string
-  startDate: string
-  endDate: string
-  requestedDays: number
-  reason?: string | null
-  locale?: 'es' | 'en'
-}) => {
-  const locale = context.locale || 'es'
+registerTemplate(
+  'leave_request_submitted',
+  (context: {
+    memberFirstName: string
+    leaveTypeName: string
+    startDate: string
+    endDate: string
+    requestedDays: number
+    reason?: string | null
+    locale?: 'es' | 'en'
+  }) => {
+    const locale = context.locale || 'es'
 
-  return {
-    subject: locale === 'en'
-      ? `Your ${context.leaveTypeName} request was submitted — Greenhouse`
-      : `Tu solicitud de ${context.leaveTypeName} fue enviada — Greenhouse`,
-    react: LeaveRequestSubmittedEmail({
-      memberFirstName: context.memberFirstName,
-      leaveTypeName: context.leaveTypeName,
-      startDate: context.startDate,
-      endDate: context.endDate,
-      requestedDays: context.requestedDays,
-      reason: context.reason,
-      locale
-    }),
-    text: buildLeaveSubmittedPlainText(context)
+    return {
+      subject:
+        locale === 'en'
+          ? `Your ${context.leaveTypeName} request was submitted — Greenhouse`
+          : `Tu solicitud de ${context.leaveTypeName} fue enviada — Greenhouse`,
+      react: LeaveRequestSubmittedEmail({
+        memberFirstName: context.memberFirstName,
+        leaveTypeName: context.leaveTypeName,
+        startDate: context.startDate,
+        endDate: context.endDate,
+        requestedDays: context.requestedDays,
+        reason: context.reason,
+        locale
+      }),
+      text: buildLeaveSubmittedPlainText(context)
+    }
   }
-})
+)
 
 // ── Leave Request Pending Review (to the reviewer) ──
 
@@ -797,38 +871,44 @@ const buildLeavePendingReviewPlainText = (context: {
     `→ ${isEn ? 'Review request' : 'Revisar solicitud'}: ${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/hr/leave`,
     '',
     '— Greenhouse by Efeonce Group'
-  ].filter(line => line !== undefined).join('\n')
+  ]
+    .filter(line => line !== undefined)
+    .join('\n')
 }
 
-registerTemplate('leave_request_pending_review', (context: {
-  reviewerFirstName: string
-  memberName: string
-  leaveTypeName: string
-  startDate: string
-  endDate: string
-  requestedDays: number
-  reason?: string | null
-  locale?: 'es' | 'en'
-}) => {
-  const locale = context.locale || 'es'
+registerTemplate(
+  'leave_request_pending_review',
+  (context: {
+    reviewerFirstName: string
+    memberName: string
+    leaveTypeName: string
+    startDate: string
+    endDate: string
+    requestedDays: number
+    reason?: string | null
+    locale?: 'es' | 'en'
+  }) => {
+    const locale = context.locale || 'es'
 
-  return {
-    subject: locale === 'en'
-      ? `${context.memberName} requested ${context.leaveTypeName} — Greenhouse`
-      : `${context.memberName} solicitó ${context.leaveTypeName} — Greenhouse`,
-    react: LeaveRequestPendingReviewEmail({
-      reviewerFirstName: context.reviewerFirstName,
-      memberName: context.memberName,
-      leaveTypeName: context.leaveTypeName,
-      startDate: context.startDate,
-      endDate: context.endDate,
-      requestedDays: context.requestedDays,
-      reason: context.reason,
-      locale
-    }),
-    text: buildLeavePendingReviewPlainText(context)
+    return {
+      subject:
+        locale === 'en'
+          ? `${context.memberName} requested ${context.leaveTypeName} — Greenhouse`
+          : `${context.memberName} solicitó ${context.leaveTypeName} — Greenhouse`,
+      react: LeaveRequestPendingReviewEmail({
+        reviewerFirstName: context.reviewerFirstName,
+        memberName: context.memberName,
+        leaveTypeName: context.leaveTypeName,
+        startDate: context.startDate,
+        endDate: context.endDate,
+        requestedDays: context.requestedDays,
+        reason: context.reason,
+        locale
+      }),
+      text: buildLeavePendingReviewPlainText(context)
+    }
   }
-})
+)
 
 registerTemplate('weekly_executive_digest', (context: WeeklyDigestEmailContext) => {
   const previewPeriodLabel = context.periodLabel || 'Semana del 8 al 14 de abril de 2026'
@@ -849,59 +929,59 @@ registerTemplate('weekly_executive_digest', (context: WeeklyDigestEmailContext) 
       closingNote: context.closingNote,
       unsubscribeUrl: context.unsubscribeUrl
     }),
-    text: [
-      subject,
-      '',
-      `Período: ${previewPeriodLabel}`,
-      '',
-      t.plainTextOpenPortal
-    ].join('\n')
+    text: [subject, '', `Período: ${previewPeriodLabel}`, '', t.plainTextOpenPortal].join('\n')
   }
 })
 
 // TASK-981 — Contractor remittance ("Comprobante de Pago") paid notification.
 // Lean summary + the full TASK-960 PDF attached. Transactional, jurisdiction-neutral.
-registerTemplate('contractor_remittance_paid', (context: {
-  beneficiaryName: string
-  remittanceNumber: string
-  netLabel: string
-  netAmount: number
-  netCurrency: string
-  paymentDateLabel: string
-  paymentDateValue: string
-  locale: 'es' | 'en'
-  attachmentFilename: string
-  pdfBuffer: Buffer
-}) => ({
-  subject: context.locale === 'en'
-    ? `Payment confirmation ${context.remittanceNumber}`
-    : `Comprobante de pago ${context.remittanceNumber}`,
-  react: ContractorRemittanceEmail({
-    beneficiaryName: context.beneficiaryName,
-    remittanceNumber: context.remittanceNumber,
-    netLabel: context.netLabel,
-    netAmount: context.netAmount,
-    netCurrency: context.netCurrency,
-    paymentDateLabel: context.paymentDateLabel,
-    paymentDateValue: context.paymentDateValue,
-    locale: context.locale
-  }),
-  text: [
-    context.locale === 'en' ? 'Payment confirmation' : 'Comprobante de pago',
-    `${context.remittanceNumber}`,
-    `${context.paymentDateLabel}: ${context.paymentDateValue}`,
-    `${context.netLabel}: ${formatMoney(context.netAmount, context.netCurrency)}`,
-    '',
-    context.locale === 'en'
-      ? 'The PDF confirmation is attached for your records.'
-      : 'Adjuntamos el comprobante en PDF para tus registros.'
-  ].join('\n'),
-  attachments: [{
-    filename: context.attachmentFilename,
-    content: context.pdfBuffer,
-    contentType: 'application/pdf'
-  }]
-}))
+registerTemplate(
+  'contractor_remittance_paid',
+  (context: {
+    beneficiaryName: string
+    remittanceNumber: string
+    netLabel: string
+    netAmount: number
+    netCurrency: string
+    paymentDateLabel: string
+    paymentDateValue: string
+    locale: 'es' | 'en'
+    attachmentFilename: string
+    pdfBuffer: Buffer
+  }) => ({
+    subject:
+      context.locale === 'en'
+        ? `Payment confirmation ${context.remittanceNumber}`
+        : `Comprobante de pago ${context.remittanceNumber}`,
+    react: ContractorRemittanceEmail({
+      beneficiaryName: context.beneficiaryName,
+      remittanceNumber: context.remittanceNumber,
+      netLabel: context.netLabel,
+      netAmount: context.netAmount,
+      netCurrency: context.netCurrency,
+      paymentDateLabel: context.paymentDateLabel,
+      paymentDateValue: context.paymentDateValue,
+      locale: context.locale
+    }),
+    text: [
+      context.locale === 'en' ? 'Payment confirmation' : 'Comprobante de pago',
+      `${context.remittanceNumber}`,
+      `${context.paymentDateLabel}: ${context.paymentDateValue}`,
+      `${context.netLabel}: ${formatMoney(context.netAmount, context.netCurrency)}`,
+      '',
+      context.locale === 'en'
+        ? 'The PDF confirmation is attached for your records.'
+        : 'Adjuntamos el comprobante en PDF para tus registros.'
+    ].join('\n'),
+    attachments: [
+      {
+        filename: context.attachmentFilename,
+        content: context.pdfBuffer,
+        contentType: 'application/pdf'
+      }
+    ]
+  })
+)
 
 registerPreviewMeta('contractor_remittance_paid', {
   label: 'Comprobante de pago (contractor)',
@@ -1017,7 +1097,13 @@ registerPreviewMeta('payroll_export', {
     entryCount: 11,
     breakdowns: [
       { currency: 'CLP', regimeLabel: 'Chile', grossTotal: '$12.450.000', netTotal: '$9.280.000', entryCount: 8 },
-      { currency: 'USD', regimeLabel: 'Internacional', grossTotal: 'US$8,500.00', netTotal: 'US$7,200.00', entryCount: 3 }
+      {
+        currency: 'USD',
+        regimeLabel: 'Internacional',
+        grossTotal: 'US$8,500.00',
+        netTotal: 'US$7,200.00',
+        entryCount: 3
+      }
     ],
     netTotalDisplay: '$9.280.000 + US$7,200.00'
   },
@@ -1275,7 +1361,8 @@ registerPreviewMeta('weekly_executive_digest', {
     infoCount: 1,
     spacesAffected: 3,
     portalUrl: 'https://greenhouse.efeoncepro.com',
-    closingNote: 'Resumen automático basado en los insights materializados del período. Abre Greenhouse para ver el detalle completo.',
+    closingNote:
+      'Resumen automático basado en los insights materializados del período. Abre Greenhouse para ver el detalle completo.',
     spaces: [
       {
         name: 'Space Operaciones',
@@ -1286,9 +1373,17 @@ registerPreviewMeta('weekly_executive_digest', {
             headline: 'Retraso crítico en una ruta operativa clave',
             narrative: [
               { type: 'text', value: 'El Space ' },
-              { type: 'link', value: 'Operaciones', href: 'https://greenhouse.efeoncepro.com/agency/spaces/operaciones' },
+              {
+                type: 'link',
+                value: 'Operaciones',
+                href: 'https://greenhouse.efeoncepro.com/agency/spaces/operaciones'
+              },
               { type: 'text', value: ' muestra un retraso que afecta a ' },
-              { type: 'link', value: 'Valentina Hoyos', href: 'https://greenhouse.efeoncepro.com/people/valentina-hoyos' },
+              {
+                type: 'link',
+                value: 'Valentina Hoyos',
+                href: 'https://greenhouse.efeoncepro.com/people/valentina-hoyos'
+              },
               { type: 'text', value: ' y requiere revisión antes del cierre semanal.' }
             ],
             actionLabel: 'Abrir Space',
@@ -1299,7 +1394,11 @@ registerPreviewMeta('weekly_executive_digest', {
             headline: 'Carga de trabajo por encima del promedio',
             narrative: [
               { type: 'text', value: 'La actividad en ' },
-              { type: 'link', value: 'Operaciones Norte', href: 'https://greenhouse.efeoncepro.com/agency/spaces/operaciones-norte' },
+              {
+                type: 'link',
+                value: 'Operaciones Norte',
+                href: 'https://greenhouse.efeoncepro.com/agency/spaces/operaciones-norte'
+              },
               { type: 'text', value: ' se mantuvo por encima del umbral esperado durante tres días hábiles.' }
             ]
           }
@@ -1335,7 +1434,11 @@ registerPreviewMeta('weekly_executive_digest', {
               { type: 'text', value: 'La rotación reciente en ' },
               { type: 'link', value: 'People Ops', href: 'https://greenhouse.efeoncepro.com/people?team=people-ops' },
               { type: 'text', value: ' y ' },
-              { type: 'link', value: 'Customer Success', href: 'https://greenhouse.efeoncepro.com/people?team=customer-success' },
+              {
+                type: 'link',
+                value: 'Customer Success',
+                href: 'https://greenhouse.efeoncepro.com/people?team=customer-success'
+              },
               { type: 'text', value: ' no requiere acción inmediata, pero conviene seguirla en el próximo corte.' }
             ]
           }
@@ -1381,8 +1484,8 @@ registerTemplate<QuoteShareContext>('quote_share', context => {
 
   return {
     subject:
-      context.subject
-      ?? getMicrocopy().emails.subjects.quoteShare(context.quotationNumber, context.versionNumber, context.clientName),
+      context.subject ??
+      getMicrocopy().emails.subjects.quoteShare(context.quotationNumber, context.versionNumber, context.clientName),
     react: QuoteSharePromptEmail({
       shareUrl: context.shareUrl,
       quotationNumber: context.quotationNumber,
@@ -1409,9 +1512,7 @@ registerTemplate<QuoteShareContext>('quote_share', context => {
       context.customMessage ? '' : null,
       t.plainTextBody(context.clientName),
       '',
-      context.hasPdfAttached && context.pdfFileName
-        ? `${t.plainTextAttachmentPrefix}${context.pdfFileName}`
-        : null,
+      context.hasPdfAttached && context.pdfFileName ? `${t.plainTextAttachmentPrefix}${context.pdfFileName}` : null,
       context.hasPdfAttached ? '' : null,
       `${t.plainTextTotalPrefix}${context.totalLabel}`,
       context.validUntilLabel ? `${t.plainTextValidUntilPrefix}${context.validUntilLabel}` : null,
@@ -1502,9 +1603,14 @@ interface AiVisibilityReportEmailContext extends EmailTemplateContext {
 const buildAiVisibilityReportPlainText = (context: AiVisibilityReportEmailContext) => {
   const isEn = context.locale === 'en'
 
-  const scoreLine = context.scoreValue === null
-    ? (isEn ? 'Estimated visibility: no data' : 'Visibilidad estimada: sin dato')
-    : (isEn ? `Estimated visibility: ${context.scoreValue} / 100` : `Visibilidad estimada: ${context.scoreValue} / 100`)
+  const scoreLine =
+    context.scoreValue === null
+      ? isEn
+        ? 'Estimated visibility: no data'
+        : 'Visibilidad estimada: sin dato'
+      : isEn
+        ? `Estimated visibility: ${context.scoreValue} / 100`
+        : `Visibilidad estimada: ${context.scoreValue} / 100`
 
   const partialLine = isEn
     ? 'Partial delivery: some engines did not respond in time.'
@@ -1519,7 +1625,11 @@ const buildAiVisibilityReportPlainText = (context: AiVisibilityReportEmailContex
     context.isPartial ? partialLine : '',
     '',
     scoreLine,
-    context.primaryGapTitle ? (isEn ? `Main gap: ${context.primaryGapTitle}` : `Brecha principal: ${context.primaryGapTitle}`) : '',
+    context.primaryGapTitle
+      ? isEn
+        ? `Main gap: ${context.primaryGapTitle}`
+        : `Brecha principal: ${context.primaryGapTitle}`
+      : '',
     '',
     isEn ? `Open your secure report: ${context.reportUrl}` : `Abre tu informe seguro: ${context.reportUrl}`,
     isEn
@@ -1527,7 +1637,9 @@ const buildAiVisibilityReportPlainText = (context: AiVisibilityReportEmailContex
       : `El informe completo va adjunto en PDF (${context.attachmentFilename}).`,
     '',
     '— Efeonce · efeoncepro.com'
-  ].filter(Boolean).join('\n')
+  ]
+    .filter(Boolean)
+    .join('\n')
 }
 
 registerTemplate('ai_visibility_grader_report', (context: AiVisibilityReportEmailContext) => {
@@ -1535,9 +1647,9 @@ registerTemplate('ai_visibility_grader_report', (context: AiVisibilityReportEmai
 
   return {
     subject: isEn
-      ? (context.isPartial
+      ? context.isPartial
         ? 'Your AI visibility report is ready (partial delivery) — Efeonce'
-        : 'Your AI visibility report is ready — Efeonce')
+        : 'Your AI visibility report is ready — Efeonce'
       : getMicrocopy().emails.subjects.aiVisibilityGraderReport(context.isPartial),
     react: AiVisibilityGraderReportEmail({
       organizationName: context.organizationName,
@@ -1554,19 +1666,22 @@ registerTemplate('ai_visibility_grader_report', (context: AiVisibilityReportEmai
     text: buildAiVisibilityReportPlainText(context),
     ...(context.pdfBuffer
       ? {
-        attachments: [{
-          filename: context.attachmentFilename,
-          content: context.pdfBuffer,
-          contentType: 'application/pdf'
-        }]
-      }
+          attachments: [
+            {
+              filename: context.attachmentFilename,
+              content: context.pdfBuffer,
+              contentType: 'application/pdf'
+            }
+          ]
+        }
       : {})
   }
 })
 
 registerPreviewMeta('ai_visibility_grader_report', {
   label: 'Informe de visibilidad en IA (lead magnet Efeonce)',
-  description: 'Entrega del informe del AI Visibility Grader al lead: resumen + insight prioritario + link tokenizado + PDF adjunto público-safe. Marca Efeonce (agencia), no el portal.',
+  description:
+    'Entrega del informe del AI Visibility Grader al lead: resumen + insight prioritario + link tokenizado + PDF adjunto público-safe. Marca Efeonce (agencia), no el portal.',
   domain: 'growth',
   supportsLocale: true,
   defaultProps: {
@@ -1623,10 +1738,14 @@ const buildEbookDeliveryPlainText = (context: EbookDeliveryEmailContext) => {
       : `Gracias por descargar «${context.ebookTitle}». Descárgalo aquí:`,
     context.downloadUrl,
     ...(context.bridgeUrl
-      ? ['', isEn ? `${context.bridgeLabel ?? 'Next step'}:` : `${context.bridgeLabel ?? 'El siguiente paso'}:`, context.bridgeUrl]
+      ? [
+          '',
+          isEn ? `${context.bridgeLabel ?? 'Next step'}:` : `${context.bridgeLabel ?? 'El siguiente paso'}:`,
+          context.bridgeUrl
+        ]
       : []),
     '',
-    '— Efeonce · efeoncepro.com',
+    '— Efeonce · efeoncepro.com'
   ]
     .filter(Boolean)
     .join('\n')
@@ -1644,9 +1763,9 @@ registerTemplate('growth_ebook_delivery', (context: EbookDeliveryEmailContext) =
       downloadUrl: context.downloadUrl,
       bridgeLabel: context.bridgeLabel,
       bridgeUrl: context.bridgeUrl,
-      locale: context.locale ?? 'es',
+      locale: context.locale ?? 'es'
     }),
-    text: buildEbookDeliveryPlainText(context),
+    text: buildEbookDeliveryPlainText(context)
   }
 })
 
@@ -1660,10 +1779,11 @@ registerPreviewMeta('growth_ebook_delivery', {
     recipientName: 'María González',
     ebookTitle: 'El fin de la web',
     ebookTagline: 'Marketing digital + IA. Léelo en 20 minutos, aplícalo esta semana.',
-    downloadUrl: 'https://greenhouse.efeoncepro.com/api/public/growth/forms/efeonce-web-agentica-ebook/asset/fsub-preview',
+    downloadUrl:
+      'https://greenhouse.efeoncepro.com/api/public/growth/forms/efeonce-web-agentica-ebook/asset/fsub-preview',
     bridgeLabel: 'Medir mi visibilidad',
     bridgeUrl: 'https://think.efeoncepro.com/brand-visibility',
-    locale: 'es',
+    locale: 'es'
   },
   propsSchema: [
     { key: 'recipientName', label: 'Nombre del destinatario', type: 'text' },
@@ -1672,8 +1792,8 @@ registerPreviewMeta('growth_ebook_delivery', {
     { key: 'downloadUrl', label: 'URL de descarga (gated)', type: 'text' },
     { key: 'bridgeLabel', label: 'Texto del puente', type: 'text' },
     { key: 'bridgeUrl', label: 'URL del puente', type: 'text' },
-    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] },
-  ],
+    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] }
+  ]
 })
 
 // ═══════════════════════════════════════════════════════════
@@ -1708,7 +1828,7 @@ registerTemplate('hiring_application_received_internal', (context: HiringInterna
     openingTitle: context.openingTitle,
     applicationPublicId: context.applicationPublicId,
     source: context.source,
-    applicationUrl: context.applicationUrl,
+    applicationUrl: context.applicationUrl
   }),
   text: [
     `${context.candidateName} postuló a ${context.openingTitle}`,
@@ -1722,8 +1842,8 @@ registerTemplate('hiring_application_received_internal', (context: HiringInterna
     `Origen: ${context.source}`,
     ...(context.candidateMessage ? ['', `Mensaje del candidato:`, context.candidateMessage] : []),
     '',
-    `Revisar: ${context.applicationUrl}`,
-  ].join('\n'),
+    `Revisar: ${context.applicationUrl}`
+  ].join('\n')
 }))
 
 interface HiringConfirmationContext extends EmailTemplateContext {
@@ -1746,7 +1866,7 @@ registerTemplate('hiring_application_confirmation', (context: HiringConfirmation
       recipientName: context.recipientName,
       openingTitle: context.openingTitle,
       openingUrl: context.openingUrl,
-      locale: context.locale ?? 'es',
+      locale: context.locale ?? 'es'
     }),
     text: [
       isEn ? 'We received your application' : 'Recibimos tu postulación',
@@ -1755,8 +1875,8 @@ registerTemplate('hiring_application_confirmation', (context: HiringConfirmation
         ? `Thanks for applying to «${context.openingTitle}» at Efeonce. Our team reviews every application; if your profile matches, we will contact you by email.`
         : `Gracias por postular a «${context.openingTitle}» en Efeonce. Nuestro equipo revisa cada postulación; si tu perfil calza, te contactaremos por correo.`,
       '',
-      '— Efeonce · efeoncepro.com',
-    ].join('\n'),
+      '— Efeonce · efeoncepro.com'
+    ].join('\n')
   }
 })
 
@@ -1768,6 +1888,27 @@ interface HiringAssessmentAssignedContext extends EmailTemplateContext {
   tokenTtlDays?: number
   locale?: 'es' | 'en'
 }
+
+interface HiringTalentPoolVerificationContext extends EmailTemplateContext {
+  recipientName?: string
+  profileUrl: string
+  tokenTtlDays?: number
+  locale?: 'es' | 'en'
+}
+
+registerTemplate('hiring_talent_pool_verification', (context: HiringTalentPoolVerificationContext) => ({
+  subject:
+    context.locale === 'en'
+      ? 'Confirm your Efeonce Talent Pool preference'
+      : 'Confirma tu preferencia del Banco de Talento Efeonce',
+  react: HiringTalentPoolVerificationEmail({
+    recipientName: context.recipientName,
+    profileUrl: context.profileUrl,
+    tokenTtlDays: context.tokenTtlDays,
+    locale: context.locale ?? 'es'
+  }),
+  text: `${context.locale === 'en' ? 'Review and confirm your Talent Pool preference' : 'Revisa y confirma tu preferencia del Banco de Talento'}\n\n${context.profileUrl}`
+}))
 
 registerTemplate('hiring_assessment_assigned', (context: HiringAssessmentAssignedContext) => {
   const isEn = context.locale === 'en'
@@ -1784,7 +1925,7 @@ registerTemplate('hiring_assessment_assigned', (context: HiringAssessmentAssigne
       assessmentUrl: context.assessmentUrl,
       timeLimitMinutes: context.timeLimitMinutes ?? null,
       tokenTtlDays: context.tokenTtlDays,
-      locale: context.locale ?? 'es',
+      locale: context.locale ?? 'es'
     }),
     text: [
       isEn ? 'You have a pending assessment' : 'Tienes una evaluación pendiente',
@@ -1794,8 +1935,8 @@ registerTemplate('hiring_assessment_assigned', (context: HiringAssessmentAssigne
         : `Como parte de tu postulación a «${context.openingTitle}» en Efeonce, te asignamos una evaluación. Comiénzala aquí:`,
       context.assessmentUrl,
       '',
-      '— Efeonce · efeoncepro.com',
-    ].join('\n'),
+      '— Efeonce · efeoncepro.com'
+    ].join('\n')
   }
 })
 
@@ -1819,7 +1960,7 @@ registerTemplate('hiring_assessment_submitted_internal', (context: HiringAssessm
       applicationPublicId: context.applicationPublicId,
       submittedAtLabel,
       timeLimitMinutes: context.timeLimitMinutes ?? null,
-      applicationUrl: context.applicationUrl,
+      applicationUrl: context.applicationUrl
     }),
     text: [
       `${context.candidateName} completó el test`,
@@ -1831,8 +1972,8 @@ registerTemplate('hiring_assessment_submitted_internal', (context: HiringAssessm
       '',
       'Las respuestas quedaron listas para revisión. Este resultado no toma decisiones automáticamente.',
       '',
-      `Revisar evaluación: ${context.applicationUrl}`,
-    ].join('\n'),
+      `Revisar evaluación: ${context.applicationUrl}`
+    ].join('\n')
   }
 })
 
@@ -1856,7 +1997,7 @@ registerTemplate('hiring_stage_advanced', (context: HiringStageAdvancedContext) 
       recipientName: context.recipientName,
       openingTitle: context.openingTitle,
       stageLabel: context.stageLabel,
-      locale: context.locale ?? 'es',
+      locale: context.locale ?? 'es'
     }),
     text: [
       isEn ? 'Your application moved forward' : 'Tu postulación avanzó',
@@ -1865,8 +2006,8 @@ registerTemplate('hiring_stage_advanced', (context: HiringStageAdvancedContext) 
         ? `Good news: your application to «${context.openingTitle}» at Efeonce moved to the stage «${context.stageLabel}». Our team will contact you with the details.`
         : `Buenas noticias: tu postulación a «${context.openingTitle}» en Efeonce avanzó a la etapa «${context.stageLabel}». Nuestro equipo te contactará con los detalles.`,
       '',
-      '— Efeonce · efeoncepro.com',
-    ].join('\n'),
+      '— Efeonce · efeoncepro.com'
+    ].join('\n')
   }
 })
 
@@ -1889,7 +2030,7 @@ registerTemplate('hiring_decision_selected', (context: HiringDecisionContext) =>
       recipientName: context.recipientName,
       openingTitle: context.openingTitle,
       variant: 'selected',
-      locale: context.locale ?? 'es',
+      locale: context.locale ?? 'es'
     }),
     text: [
       isEn ? 'We chose you' : '¡Te elegimos!',
@@ -1898,8 +2039,8 @@ registerTemplate('hiring_decision_selected', (context: HiringDecisionContext) =>
         ? `We have good news: we chose you for «${context.openingTitle}» at Efeonce. Our team will contact you with the next steps.`
         : `Tenemos buenas noticias: te elegimos para «${context.openingTitle}» en Efeonce. Nuestro equipo te contactará con los próximos pasos.`,
       '',
-      '— Efeonce · efeoncepro.com',
-    ].join('\n'),
+      '— Efeonce · efeoncepro.com'
+    ].join('\n')
   }
 })
 
@@ -1916,7 +2057,7 @@ registerTemplate('hiring_decision_rejected', (context: HiringDecisionContext) =>
       recipientName: context.recipientName,
       openingTitle: context.openingTitle,
       variant: 'rejected',
-      locale: context.locale ?? 'es',
+      locale: context.locale ?? 'es'
     }),
     text: [
       isEn ? 'About your application' : 'Sobre tu postulación',
@@ -1925,8 +2066,8 @@ registerTemplate('hiring_decision_rejected', (context: HiringDecisionContext) =>
         ? `Thank you for the time you put into your application to «${context.openingTitle}» at Efeonce. After completing the process, we decided not to move forward on this occasion. We would be glad to see you apply to future openings closer to your profile.`
         : `Gracias por el tiempo que pusiste en tu postulación a «${context.openingTitle}» en Efeonce. Después de completar el proceso, decidimos no avanzar en esta oportunidad. Nos encantaría verte postular a futuras vacantes que se acerquen más a tu perfil.`,
       '',
-      '— Efeonce · efeoncepro.com',
-    ].join('\n'),
+      '— Efeonce · efeoncepro.com'
+    ].join('\n')
   }
 })
 
@@ -1945,7 +2086,7 @@ registerPreviewMeta('hiring_application_received_internal', {
     openingTitle: 'Content Creator',
     applicationPublicId: 'EO-APP-0001',
     source: 'public_careers',
-    applicationUrl: 'https://greenhouse.efeoncepro.com/agency/hiring',
+    applicationUrl: 'https://greenhouse.efeoncepro.com/agency/hiring'
   },
   propsSchema: [
     { key: 'candidateName', label: 'Nombre del postulante', type: 'text' },
@@ -1957,8 +2098,8 @@ registerPreviewMeta('hiring_application_received_internal', {
     { key: 'openingTitle', label: 'Vacante', type: 'text' },
     { key: 'applicationPublicId', label: 'ID público de la postulación', type: 'text' },
     { key: 'source', label: 'Origen', type: 'text' },
-    { key: 'applicationUrl', label: 'URL del Hiring Desk', type: 'text' },
-  ],
+    { key: 'applicationUrl', label: 'URL del Hiring Desk', type: 'text' }
+  ]
 })
 
 registerPreviewMeta('hiring_application_confirmation', {
@@ -1970,14 +2111,33 @@ registerPreviewMeta('hiring_application_confirmation', {
     recipientName: 'María González',
     openingTitle: 'Content Creator',
     openingUrl: 'https://greenhouse.efeoncepro.com/public/careers/EO-OPN-0061',
-    locale: 'es',
+    locale: 'es'
   },
   propsSchema: [
     { key: 'recipientName', label: 'Nombre del candidato', type: 'text' },
     { key: 'openingTitle', label: 'Vacante', type: 'text' },
     { key: 'openingUrl', label: 'URL de la vacante', type: 'text' },
-    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] },
-  ],
+    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] }
+  ]
+})
+
+registerPreviewMeta('hiring_talent_pool_verification', {
+  label: 'Hiring — verificación del Banco de Talento',
+  description: 'Enlace privado para confirmar y administrar el consentimiento de futuras oportunidades',
+  domain: 'hr',
+  supportsLocale: true,
+  defaultProps: {
+    recipientName: 'María González',
+    profileUrl: 'https://greenhouse.efeoncepro.com/public/careers/talent-profile/preview-token',
+    tokenTtlDays: 30,
+    locale: 'es'
+  },
+  propsSchema: [
+    { key: 'recipientName', label: 'Nombre del candidato', type: 'text' },
+    { key: 'profileUrl', label: 'URL privada del perfil', type: 'text' },
+    { key: 'tokenTtlDays', label: 'Vigencia del enlace (días)', type: 'number' },
+    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] }
+  ]
 })
 
 registerPreviewMeta('hiring_assessment_assigned', {
@@ -1991,7 +2151,7 @@ registerPreviewMeta('hiring_assessment_assigned', {
     assessmentUrl: 'https://greenhouse.efeoncepro.com/public/assessment/preview-token',
     timeLimitMinutes: 45,
     tokenTtlDays: 7,
-    locale: 'es',
+    locale: 'es'
   },
   propsSchema: [
     { key: 'recipientName', label: 'Nombre del candidato', type: 'text' },
@@ -1999,8 +2159,8 @@ registerPreviewMeta('hiring_assessment_assigned', {
     { key: 'assessmentUrl', label: 'URL de la evaluación', type: 'text' },
     { key: 'timeLimitMinutes', label: 'Tiempo límite (min)', type: 'number' },
     { key: 'tokenTtlDays', label: 'Vigencia del link (días)', type: 'number' },
-    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] },
-  ],
+    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] }
+  ]
 })
 
 registerPreviewMeta('hiring_assessment_submitted_internal', {
@@ -2014,7 +2174,7 @@ registerPreviewMeta('hiring_assessment_submitted_internal', {
     applicationPublicId: 'EO-APP-0001',
     submittedAt: '2026-08-15T21:30:00.000Z',
     timeLimitMinutes: 90,
-    applicationUrl: 'https://greenhouse.efeoncepro.com/agency/hiring/applications/happ-preview',
+    applicationUrl: 'https://greenhouse.efeoncepro.com/agency/hiring/applications/happ-preview'
   },
   propsSchema: [
     { key: 'candidateName', label: 'Nombre del candidato', type: 'text' },
@@ -2022,8 +2182,8 @@ registerPreviewMeta('hiring_assessment_submitted_internal', {
     { key: 'applicationPublicId', label: 'ID público de la postulación', type: 'text' },
     { key: 'submittedAt', label: 'Fecha de envío (ISO)', type: 'text' },
     { key: 'timeLimitMinutes', label: 'Tiempo asignado (min)', type: 'number' },
-    { key: 'applicationUrl', label: 'URL de Application 360', type: 'text' },
-  ],
+    { key: 'applicationUrl', label: 'URL de Application 360', type: 'text' }
+  ]
 })
 
 registerPreviewMeta('hiring_stage_advanced', {
@@ -2035,14 +2195,14 @@ registerPreviewMeta('hiring_stage_advanced', {
     recipientName: 'María González',
     openingTitle: 'Content Creator',
     stageLabel: 'Entrevista',
-    locale: 'es',
+    locale: 'es'
   },
   propsSchema: [
     { key: 'recipientName', label: 'Nombre del candidato', type: 'text' },
     { key: 'openingTitle', label: 'Vacante', type: 'text' },
     { key: 'stageLabel', label: 'Etapa (nombre público)', type: 'text' },
-    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] },
-  ],
+    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] }
+  ]
 })
 
 registerPreviewMeta('hiring_decision_selected', {
@@ -2053,13 +2213,13 @@ registerPreviewMeta('hiring_decision_selected', {
   defaultProps: {
     recipientName: 'María González',
     openingTitle: 'Content Creator',
-    locale: 'es',
+    locale: 'es'
   },
   propsSchema: [
     { key: 'recipientName', label: 'Nombre del candidato', type: 'text' },
     { key: 'openingTitle', label: 'Vacante', type: 'text' },
-    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] },
-  ],
+    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] }
+  ]
 })
 
 registerPreviewMeta('hiring_decision_rejected', {
@@ -2070,11 +2230,11 @@ registerPreviewMeta('hiring_decision_rejected', {
   defaultProps: {
     recipientName: 'María González',
     openingTitle: 'Content Creator',
-    locale: 'es',
+    locale: 'es'
   },
   propsSchema: [
     { key: 'recipientName', label: 'Nombre del candidato', type: 'text' },
     { key: 'openingTitle', label: 'Vacante', type: 'text' },
-    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] },
-  ],
+    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] }
+  ]
 })

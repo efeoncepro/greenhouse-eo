@@ -27,12 +27,16 @@ export default async function AgencyLayout({ children }: { children: ReactNode }
       'gestion.hiring_pipeline',
       'gestion.hiring_publication',
       'gestion.hiring_application_detail',
+      'gestion.hiring_talent_pool',
       'gestion.servicios',
       'gestion.sample_sprints',
       'gestion.operaciones',
       'gestion.organizaciones'
     ],
-    fallback: tenant.routeGroups.includes('internal') || tenant.routeGroups.includes('admin') || tenant.routeGroups.includes('commercial')
+    fallback:
+      tenant.routeGroups.includes('internal') ||
+      tenant.routeGroups.includes('admin') ||
+      tenant.routeGroups.includes('commercial')
   })
 
   if (!hasAccess) {

@@ -7,6 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-16 — Banco de Talento person-first con autoservicio, Desk y paridad para agentes
+
+Greenhouse ya tiene en `develop` la fundación canónica del Banco de Talento: una sola ficha por persona,
+consentimiento/purpose versionado, evidencia estructurada con lineage, disponibilidad, retiro, búsqueda y una
+invitación gobernada `propose → confirm`. El backfill de desarrollo incorporó 52 perfiles históricos sin inventar
+permiso futuro: 50 permanecen limitados a su proceso vigente y 2 requieren nuevo consentimiento.
+
+La experiencia tiene dos caras separadas. El candidato puede confirmar interés futuro, actualizar disponibilidad o
+retirarse mediante un enlace acotado; People opera un workspace propio en Hiring Desk con filtros, coverage,
+freshness, ficha lateral y acceso exacto a Application 360. Ninguna de las dos superficies rankea, decide, mueve
+etapas, asigna tests ni copia CV/contacto al índice.
+
+La misma lectura existe como App API y como provider read-only code-ready para `mcp.efeonce.org`, con identidad
+humana delegada, capability, propósito fijo, DTO allowlisted y audit sin contenido. El cambio aún no está disponible
+en producción: flags, provider y recontacto externo permanecen OFF hasta promoción, grants/canaries y aprobación
+People + Legal/Privacy.
+
 ## 2026-08-15 — People queda avisado cuando un candidato termina su test
 
 El evento canónico `hiring.assessment.submitted` ahora tiene un consumer idempotente que prepara un
@@ -1217,14 +1234,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
 - **Enable en `mcp.efeonce.org` gated por el release prod:** greenhouse PROD aún no tiene el lane; la secuencia
   de cierre (release develop→main → flag Vercel prod → env del provider en el gateway Cloud Run + deploy
   dispatch → smoke por `mcp.efeonce.org`) queda documentada en TASK-1647.
-
-## 2026-08-05 — Efeonce provisionada como org own-brand del 360 (dogfooding)
-
-- **Decisión de modelado:** la agencia se trackea como su propio cliente sobre la org canónica `EO-ORG-0007`
-  (Efeonce Group SpA, `is_operating_entity=true`) — sin org especial paralela.
-- **Quedó provisionado:** assignment `cpma-efeonce-seo-own-brand` (`seo_v1`, `contracted`, nota `own_brand`),
-  target `seot-efeonce-own-brand` (`efeoncepro.com`, CL/es) y los 4 perfiles del grader ligados. Script
-  idempotente committeado `scripts/growth/provision-efeonce-own-brand-seo.ts` (patrón commit + verificación con
-  chokepoint) como plantilla para provisionar otras orgs.
-- **Pendientes:** conectar la propiedad de Google Search Console (segunda lente del 360) y el merge/dedupe del
-  registro en HubSpot.

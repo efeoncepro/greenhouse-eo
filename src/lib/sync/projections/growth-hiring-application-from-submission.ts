@@ -16,7 +16,12 @@ import 'server-only'
  */
 
 import { FORM_SUBMISSION_ACCEPTED_EVENT } from '@/lib/growth/forms/contracts'
-import { getFormDefinitionById, getFormVersionById, getSubmissionById } from '@/lib/growth/forms/store'
+import {
+  getConsentSnapshot,
+  getFormDefinitionById,
+  getFormVersionById,
+  getSubmissionById
+} from '@/lib/growth/forms/store'
 import { submitPublicHiringApplication } from '@/lib/hiring/public-careers/submit-application'
 import { parsePublicHiringApplication } from '@/lib/hiring/public-careers/schema'
 import type { ScannedPublicCareersCvAssetReference } from '@/lib/hiring/public-careers/cv-upload'
@@ -81,9 +86,16 @@ export const growthHiringApplicationFromSubmissionProjection: ProjectionDefiniti
     const fields = isRecord(submission.normalized_fields_json) ? submission.normalized_fields_json : {}
     const version = await getFormVersionById(submission.form_version_id)
 
+    const consentSnapshot = await getConsentSnapshot(submissionId)
+
+    const consentKeys = Array.isArray(consentSnapshot?.checkboxes_json)
+      ? consentSnapshot.checkboxes_json.filter((value): value is string => typeof value === 'string')
+      : []
+
     const parsed = parsePublicHiringApplication({
       ...fields,
       consent: true,
+      futureOpportunitiesConsent: consentKeys.includes('future_opportunities'),
       consentPolicyVersion: version?.consent_policy_version ?? null
     })
 

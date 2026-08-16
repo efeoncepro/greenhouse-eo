@@ -113,6 +113,20 @@ Endpoints:
 - `GET /api/platform/app/notifications`
 - `POST /api/platform/app/notifications/:id/read`
 - `POST /api/platform/app/notifications/mark-all-read`
+- `GET /api/platform/app/hiring/talent-pool`
+- `GET /api/platform/app/hiring/talent-pool/:id`
+
+#### Hiring Talent Pool
+
+Reader person-first y minimizado para clientes internos autorizados. La lista acepta `query`, `capability`,
+`seniority`, `language`, `country`, `availability`, `cursor` y `limit` (máximo 25 para el adapter MCP). El profile
+devuelve la misma identidad opaca, lifecycle, allowed actions, availability y evidencia con coverage/freshness.
+
+No entrega email, teléfono, CV/texto crudo, URLs, notas, economics, respuestas, answer keys ni atributos protegidos.
+La App API exige `hiring.talent_pool.read`. Cuando el bearer proviene de Efeonce MCP, Greenhouse reautoriza además
+client/scope delegados, propósito fijo `talent_pool_candidate_review` y `x-greenhouse-agent-host`; cada allow/deny
+queda auditado sin contenido. Los endpoints están code-ready en `develop`, pero no son una capacidad productiva
+anunciada hasta completar TASK-1726 y habilitar sus flags.
 
 #### Organization Compact Signals
 

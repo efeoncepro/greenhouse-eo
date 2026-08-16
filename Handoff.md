@@ -2,6 +2,27 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### Banco de Talento — code complete en develop; rollout pendiente (2026-08-16)
+
+`TASK-1723`–`TASK-1726` están `in-progress` con código, schema y documentación materializados. PostgreSQL de
+desarrollo tiene seis migraciones aplicadas y cero pendientes; el backfill idempotente dejó 52 memberships
+(50 `active_process`, 2 `needs_reconsent`), 360 evidence refs y cero contactables inventados. Product API y App
+API comparten readers/commands; 46 tests focales, TypeScript, lint global, build de producción, reachability
+(233 rutas, 0 huérfanas), nav budget y task/UI gates pasan.
+
+Existen dos superficies separadas y verificadas por GVC: autoservicio candidato 1440/390
+(`.captures/2026-08-16T08-52-56_hiring-talent-pool-self-service`) y Banco de Talento del operador en Hiring Desk
+(`.captures/2026-08-16T08-27-35_hiring-talent-pool-desk`). El operador puede buscar/filtrar, abrir ficha con
+coverage/freshness y proponer→confirmar invitación canónica; el candidato sólo confirma interés futuro, actualiza
+disponibilidad o se retira. Ninguna superficie decide, rankea, mueve etapa, asigna test ni expone contacto/CV.
+
+El repo hermano `efeonce-mcp` tiene provider y tools read-only `hiring.talent_pool.search` /
+`hiring.talent_pool.profile.get` con 53 tests, typecheck y build verdes; Greenhouse tiene OAuth client/scope exactos
+y access audit append-only. Todo sigue OFF/no desplegado: faltan promoción Greenhouse, scope/grant Entra, deploy del
+gateway, flags/env por entorno y canaries reales Codex/Claude/MCP Inspector. El recontacto/autoservicio externo
+requiere además aprobación documentada People + Legal/Privacy y validación con abogado habilitado; hasta entonces
+los flags projection/search/self-service/invite/MCP permanecen OFF. Acceso MCP externo/B2B espera TASK-1631.
+
 ### Aviso interno al completar test — LIVE, primera entrega real pendiente (2026-08-15)
 
 Se extendió el pipeline reactivo de Hiring para que `hiring.assessment.submitted` envíe una sola
@@ -566,34 +587,3 @@ primera postulación real con emails verificados.
 ### Sika México LIC-1120 — paquete de bid preparado, sin precio ni envío (2026-08-12)
 
 Se creó [`docs/commercial/tenders/sika-lic-1120/`](docs/commercial/tenders/sika-lic-1120/): originales en OneDrive, evidencia Wherex, admisibilidad, blueprint interno, técnica, estructura económica y deck de taller. La propuesta se enfoca en continuidad comercial: Search por intención y ubicación → landing/ficha de destino → canal de atención → medición y optimización; **no** promete transferir 50% de ventas. El deck técnico de ocho láminas pasó slots y revisión visual local, pero sigue siendo taller (sin `Proposal`/render gobernado). La pregunta propia continúa en **0/1 respondidas** al 12-08 11:14: faltan fecha/destino/stock por cierre, línea base/fuente de ventas y canal autorizado. **Corrección 2026-08-13:** el brief confirma MXN 100–150 mil para desarrollo y ejecución, pero no dice explícitamente que incluya pauta; una lectura anterior atribuye creatividad/pauta/fee a la respuesta del comprador, y debe revalidarse antes de fijar precio. No existe cotización aprobada. Wherex muestra 45 días, pero también condiciona el crédito a lo convenido con Sika: no asumirlo como término cerrado. La oferta Wherex sigue en edición, sin adjuntos, términos aceptados ni envío; tab queda en handoff.
-
-### TASK-1688 CERRADA — contacto completo en postulaciones Careers: code complete, rollout pendiente (2026-08-12)
-
-ADR aceptado y registrado (Delta en la arquitectura Hiring + `DECISIONS_INDEX`): `phone_e164` y
-`residence_country_code` (autodeclarado, ISO, CHECK) viven en `candidate_facet` con upsert anti-wipe;
-`candidate_message` (≤4000) en `hiring_application`. Migración `20260812094000000` aditiva aplicada y verificada
-contra PG real — su timestamp es 09:40 porque la migración de ISSUE-151 (nombrada a mano con hora futura 09:30) ya
-estaba aplicada y node-pg-migrate rechaza timestamps anteriores. El parser único valida el país contra el SSOT
-`countries.ts` SIN truncar (`'Chile'`→`'CH'` habría sido Suiza — atrapado por test) y lo usa sólo como hint de
-formato del teléfono; el command persiste los tres campos (test anti-regresión del bug class "el form acepta y el
-command descarta"). Paridad: select de país requerido en `CareersApplyClient` + contrato del native Growth Form,
-copy es-CL/en-US tokenizado; Application 360 muestra Teléfono completo / País (nombre textual) / Mensaje, con "No
-informado" para legacy. Suite completa 10.585 tests + lint/typecheck 0; `design-contract:lint` y `ui:code-lint`
-PASS. **Rollout pendiente:** ejercicio en staging + GVC premium 1440/390 (el preview harness local no levantó el
-dev server esta sesión), revisión Legal/Privacy de retención/aviso, y el flip expand→contract que hace el país
-requerido a nivel parser tras verificar ambas superficies en producción.
-
-### ISSUE-151 RESUELTA — bridge Facebook, grant Globe y smoke de identidad verificados (2026-08-12)
-
-`d139726ff` llegó a `main` por PR #189 y el release de producción terminó correctamente. El filtro Sentry para
-`JAVASCRIPT-NEXTJS-8W` descarta sólo el bridge Facebook Android `Java object is gone`; Careers siguió respondiendo
-200 con `<greenhouse-form>` y sin `postMessage`/iframe. La migration
-`20260812093000000_issue-151-seed-globe-credits-view-access.sql` quedó aplicada en Cloud SQL: registry activo y
-único grant `efeonce_admin → administracion.globe_credits` con `granted=true`.
-
-Se cerró además el falso positivo `JAVASCRIPT-NEXTJS-4S`: el `ops-worker` compartido consultaba el portal staging,
-que responde 302 por su SSO; quedó apuntando al portal público. Dos ejecuciones consecutivas de
-`ops-identity-auth-smoke` pasaron 5/5, incluido `portal_auth_health`, y la health pública devolvió `ready`. 8W no
-recibió eventos tras el rollout. Los dos tickets remotos siguen *unresolved* sólo porque la sesión de Sentry no está
-autenticada y el token API disponible es read-only (403 al resolver); hace falta una sesión/token con escritura para
-marcarlos en Sentry. El artefacto interno vive en `docs/issues/resolved/ISSUE-151-…`.

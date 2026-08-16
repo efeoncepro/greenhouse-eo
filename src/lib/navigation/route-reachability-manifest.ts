@@ -95,8 +95,7 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     route: '/agency/hiring/pipeline',
     parent: '/agency/hiring',
     via: 'tab',
-    reason:
-      'Pipeline de Hiring Desk (TASK-355), alcanzable desde la navegación local persistente del workspace.'
+    reason: 'Pipeline de Hiring Desk (TASK-355), alcanzable desde la navegación local persistente del workspace.'
   },
   {
     route: '/agency/hiring/publication',
@@ -104,6 +103,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'tab',
     reason:
       'Gobierno de publicación de Hiring Desk (TASK-355), alcanzable desde la navegación local persistente del workspace.'
+  },
+  {
+    route: '/agency/hiring/talent-pool',
+    parent: '/agency/hiring',
+    via: 'tab',
+    reason:
+      'Banco de talento person-first (TASK-1725), alcanzable una sola vez desde la navegación local persistente de Hiring Desk.'
   },
   {
     route: '/hr/contractors/new',
@@ -473,19 +479,49 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
   // de VerticalMenu (el colaborador puro conserva su sección "Mi Ficha"), así
   // que el gate no las marcaría huérfanas — estas declaraciones documentan la
   // superficie interna vigente, que es el contrato que el gate protege.
-  { route: '/my/assignments', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
-  { route: '/my/performance', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  {
+    route: '/my/assignments',
+    parent: '/home',
+    via: 'avatar-dropdown',
+    surface: 'avatar',
+    reason: AVATAR_REHOME_REASON
+  },
+  {
+    route: '/my/performance',
+    parent: '/home',
+    via: 'avatar-dropdown',
+    surface: 'avatar',
+    reason: AVATAR_REHOME_REASON
+  },
   { route: '/my/delivery', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
   { route: '/my/profile', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
   { route: '/my/payroll', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
   { route: '/my/contractor', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
   { route: '/my/offers', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
   { route: '/my/contracts', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
-  { route: '/my/payment-profile', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
+  {
+    route: '/my/payment-profile',
+    parent: '/home',
+    via: 'avatar-dropdown',
+    surface: 'avatar',
+    reason: AVATAR_REHOME_REASON
+  },
   { route: '/my/leave', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
   { route: '/my/goals', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
-  { route: '/my/evaluations', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON },
-  { route: '/my/organization', parent: '/home', via: 'avatar-dropdown', surface: 'avatar', reason: AVATAR_REHOME_REASON }
+  {
+    route: '/my/evaluations',
+    parent: '/home',
+    via: 'avatar-dropdown',
+    surface: 'avatar',
+    reason: AVATAR_REHOME_REASON
+  },
+  {
+    route: '/my/organization',
+    parent: '/home',
+    via: 'avatar-dropdown',
+    surface: 'avatar',
+    reason: AVATAR_REHOME_REASON
+  }
 ]
 
 export const DECLARED_CHILD_ROUTE_PATHS: readonly string[] = DECLARED_CHILD_ROUTES.map(d => d.route)

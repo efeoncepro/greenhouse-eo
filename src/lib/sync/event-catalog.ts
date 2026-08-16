@@ -253,6 +253,8 @@ export const AGGREGATE_TYPES = {
   // assessment_id ('asmt-{uuid}').
   hiringAssessmentTemplate: 'hiring_assessment_template',
   hiringAssessment: 'hiring_assessment',
+  talentPoolMembership: 'talent_pool_membership',
+  talentPoolInvitation: 'talent_pool_invitation',
 
   // TASK-1361 — Assessment AI Assist. Identity: proposal_id ('aip-{uuid}').
   hiringAssessmentAiProposal: 'hiring_assessment_ai_proposal',
@@ -1152,6 +1154,15 @@ export const EVENT_TYPES = {
   hiringAssessmentSubmitted: 'hiring.assessment.submitted',
   hiringAssessmentScored: 'hiring.assessment.scored',
   hiringCompetencyResultUpdated: 'hiring.competency_result.updated',
+
+  // TASK-1723 — Talent Pool; payloads only contain opaque IDs/reason codes, never candidate PII.
+  talentPoolMembershipCreated: 'hiring.talent_pool.membership_created',
+  talentPoolConsentRecorded: 'hiring.talent_pool.consent_recorded',
+  talentPoolConsentRequested: 'hiring.talent_pool.consent_requested',
+  talentPoolConsentWithdrawn: 'hiring.talent_pool.consent_withdrawn',
+  talentPoolAvailabilityUpdated: 'hiring.talent_pool.availability_updated',
+  talentPoolInvitationExecuted: 'hiring.talent_pool.invitation_executed',
+  talentPoolProjectionReconciled: 'hiring.talent_pool.projection_reconciled',
 
   // TASK-1361 — Assessment AI Assist. propose→confirm (audit/observabilidad, sin consumer reactivo V1).
   hiringAssessmentAiProposed: 'hiring.assessment.ai_proposed',

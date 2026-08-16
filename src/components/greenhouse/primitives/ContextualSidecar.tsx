@@ -195,6 +195,9 @@ const ContextualSidecar = ({
         </Box>
       ) : null}
       <Box
+        role='region'
+        aria-labelledby={headingId}
+        tabIndex={0}
         sx={theme => ({
           flex: 1,
           minHeight: 0,
@@ -252,7 +255,7 @@ const ContextualSidecar = ({
                       ? alpha(theme.palette.error.main, theme.palette.mode === 'dark' ? 0.062 : 0.014)
                       : resolvedVariant === 'runbook'
                         ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.064 : 0.014)
-                  : alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.92 : 0.98),
+                        : alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.92 : 0.98),
               backdropFilter: 'saturate(180%) blur(8px)'
             })}
           >

@@ -306,9 +306,7 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS) ||
     hasRole(subject, ROLE_CODES.AI_TOOLING_ADMIN)
   ) {
-    const operatorSource: TenantEntitlementSource = hasRouteGroup(subject, 'internal')
-      ? 'route_group'
-      : 'role'
+    const operatorSource: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
 
     addEntitlement(entries, {
       module: 'growth',
@@ -365,10 +363,7 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
 
     // TASK-1286 — entitlement.manage: el set operador completo NO recibe esta mutación.
     // Sólo AM (`efeonce_account`) y admin pueden asignar/cambiar/superseder tiers AEO.
-    if (
-      hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
-      hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT)
-    ) {
+    if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT)) {
       addEntitlement(entries, {
         module: 'growth',
         capability: 'growth.ai_visibility.entitlement.manage',
@@ -435,10 +430,7 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     // TASK-1301 — growth.seo.entitlement.manage: espejo exacto de TASK-1286 (AEO) — el
     // set operador completo NO recibe esta mutación; sólo AM (`efeonce_account`) y admin
     // asignan/cambian/revocan el módulo `seo_v2` per-org.
-    if (
-      hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
-      hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT)
-    ) {
+    if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT)) {
       addEntitlement(entries, {
         module: 'growth',
         capability: 'growth.seo.entitlement.manage',
@@ -475,7 +467,7 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       'growth.forms.publish',
       'growth.forms.destinations.manage',
       'growth.forms.retry_delivery',
-      'growth.forms.surfaces.manage',
+      'growth.forms.surfaces.manage'
     ] as const
 
     for (const capability of FORMS_EXECUTE_CAPS) {
@@ -496,7 +488,13 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
   ) {
     const ctaSource: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
 
-    addEntitlement(entries, { module: 'growth', capability: 'growth.cta.read', action: 'read', scope: 'tenant', source: ctaSource })
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.cta.read',
+      action: 'read',
+      scope: 'tenant',
+      source: ctaSource
+    })
 
     const CTA_EXECUTE_CAPS = ['growth.cta.author', 'growth.cta.publish', 'growth.cta.pause'] as const
 
@@ -508,16 +506,13 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
   // TASK-1255 — Reveal de PII de leads (cédula/email/teléfono): MÁS restringido que el
   // read masked. Least-privilege: solo admin internos y operaciones (NO efeonce_account,
   // que vende pero no necesita ver cédulas crudas). reason + audit obligatorios en runtime.
-  if (
-    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
-    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)
-  ) {
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)) {
     addEntitlement(entries, {
       module: 'growth',
       capability: 'growth.forms.lead_pii.reveal',
       action: 'read',
       scope: 'tenant',
-      source: 'role',
+      source: 'role'
     })
   }
 
@@ -552,19 +547,43 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
 
     // TASK-1360 — Assessment: read (catálogo/plantillas/scorecard) + author (crear preguntas/
     // plantillas + asignar instancias) al mismo tier operador.
-    addEntitlement(entries, { module: 'hiring', capability: 'hiring.assessment.read', action: 'read', scope: 'tenant', source: hiringSource })
+    addEntitlement(entries, {
+      module: 'hiring',
+      capability: 'hiring.assessment.read',
+      action: 'read',
+      scope: 'tenant',
+      source: hiringSource
+    })
 
     for (const action of ['create', 'update'] as const) {
-      addEntitlement(entries, { module: 'hiring', capability: 'hiring.assessment.author', action, scope: 'tenant', source: hiringSource })
+      addEntitlement(entries, {
+        module: 'hiring',
+        capability: 'hiring.assessment.author',
+        action,
+        scope: 'tenant',
+        source: hiringSource
+      })
     }
 
     // TASK-1361 — AI assist (proponer borradores/sugerencias) al mismo tier operador; el confirm
     // reusa author/score, así que quien puede autorar el banco puede pedir propuestas IA.
-    addEntitlement(entries, { module: 'hiring', capability: 'hiring.assessment.ai_assist', action: 'execute', scope: 'tenant', source: hiringSource })
+    addEntitlement(entries, {
+      module: 'hiring',
+      capability: 'hiring.assessment.ai_assist',
+      action: 'execute',
+      scope: 'tenant',
+      source: hiringSource
+    })
 
     // TASK-1385 — AI assist del copy público de una vacante al mismo tier operador; el confirm
     // reusa opening.write, así que quien puede editar el opening puede pedir el borrador IA.
-    addEntitlement(entries, { module: 'hiring', capability: 'hiring.opening.ai_assist', action: 'execute', scope: 'tenant', source: hiringSource })
+    addEntitlement(entries, {
+      module: 'hiring',
+      capability: 'hiring.opening.ai_assist',
+      action: 'execute',
+      scope: 'tenant',
+      source: hiringSource
+    })
   }
 
   // TASK-353 — publish/decide: verbos de gobernanza consecuentes (execute). Least-privilege
@@ -579,7 +598,12 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
   ) {
     // TASK-356 — handoff.approve entra al mismo tier de gobernanza: quien decide la
     // contratación gobierna el handoff downstream (approve/setup/complete/cancel).
-    for (const capability of ['hiring.opening.publish', 'hiring.application.decide', 'hiring.assessment.score', 'hiring.handoff.approve'] as const) {
+    for (const capability of [
+      'hiring.opening.publish',
+      'hiring.application.decide',
+      'hiring.assessment.score',
+      'hiring.handoff.approve'
+    ] as const) {
       addEntitlement(entries, { module: 'hiring', capability, action: 'execute', scope: 'tenant', source: 'role' })
     }
 
@@ -590,7 +614,7 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       capability: 'hiring.assessment.fairness_read',
       action: 'read',
       scope: 'tenant',
-      source: 'role',
+      source: 'role'
     })
 
     // TASK-1714 — reveal del documento de identidad de un candidato. Entra a este tier
@@ -603,7 +627,29 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       capability: 'hiring.candidate.reveal_identity',
       action: 'read',
       scope: 'tenant',
-      source: 'role',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'hiring',
+      capability: 'hiring.talent_pool.read',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'hiring',
+      capability: 'hiring.talent_pool.manage',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'hiring',
+      capability: 'hiring.talent_pool.invite',
+      action: 'execute',
+      scope: 'tenant',
+      source: 'role'
     })
   }
 
@@ -1404,9 +1450,7 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     hasRole(subject, ROLE_CODES.FINANCE_ANALYST) ||
     hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
   ) {
-    const readinessSource: TenantEntitlementSource = hasRouteGroup(subject, 'finance')
-      ? 'route_group'
-      : 'role'
+    const readinessSource: TenantEntitlementSource = hasRouteGroup(subject, 'finance') ? 'route_group' : 'role'
 
     addEntitlement(entries, {
       module: 'finance',
@@ -1614,10 +1658,7 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     // ── TASK-1202 — quote price-affecting actions admin-only (Wave 3 F9) ──
     // FINANCE_ADMIN + EFEONCE_ADMIN (este bloque). El resto del lifecycle del cotizador
     // usa commercial.quotation (roles comerciales, granteada aparte).
-    for (const capability of [
-      'commercial.quotation.cost_override',
-      'commercial.quotation.pricing_config'
-    ] as const) {
+    for (const capability of ['commercial.quotation.cost_override', 'commercial.quotation.pricing_config'] as const) {
       addEntitlement(entries, { module: 'commercial', capability, action: 'update', scope: 'tenant', source })
     }
 

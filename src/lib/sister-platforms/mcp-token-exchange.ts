@@ -18,8 +18,11 @@ import {
 } from './oauth-broker'
 
 export const MCP_GATEWAY_OAUTH_CLIENT_ID = 'efeonce-mcp-gateway'
+export const MCP_HIRING_OAUTH_CLIENT_ID = 'efeonce-mcp-hiring'
 export const MCP_FUNDING_INPUT_SCOPE = 'efeonce.mcp.globe.credits.funding.ensure'
 export const MCP_FUNDING_GREENHOUSE_SCOPE = 'globe.credits.funding.ensure'
+export const MCP_HIRING_INPUT_SCOPE = 'efeonce.mcp.hiring.read'
+export const MCP_TALENT_POOL_GREENHOUSE_SCOPE = 'hiring.talent_pool.read'
 export const RFC8693_TOKEN_EXCHANGE_GRANT = 'urn:ietf:params:oauth:grant-type:token-exchange'
 export const RFC8693_ACCESS_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:access_token'
 export const MCP_EXCHANGED_TOKEN_TTL_SECONDS = 300
@@ -57,6 +60,7 @@ type McpTokenExchangeDependencies = Readonly<{
   resolveUser?: (tenantId: string, objectId: string) => Promise<TenantAccessRecord | null>
   loadClient?: (clientId: string) => Promise<SisterPlatformOAuthClient | null>
   authorizeFunding?: (tenant: TenantAccessRecord) => boolean
+  authorizeTalentPool?: (tenant: TenantAccessRecord) => boolean
   issueToken?: (input: IssueTokenInput) => Promise<IssuedToken>
   now?: () => Date
 }>
@@ -69,6 +73,8 @@ type IssueTokenInput = Readonly<{
   workloadSubject: string
   entraTenantId: string
   entraObjectId: string
+  requestedScope: string
+  requireWorkspaceBinding: boolean
 }>
 
 type IssuedToken = Readonly<{
@@ -93,7 +99,15 @@ export type McpTokenExchangeResult = Readonly<{
   accessToken: string
   correlationId: string
   expiresIn: typeof MCP_EXCHANGED_TOKEN_TTL_SECONDS
-  scope: typeof MCP_FUNDING_GREENHOUSE_SCOPE
+  scope: typeof MCP_FUNDING_GREENHOUSE_SCOPE | typeof MCP_TALENT_POOL_GREENHOUSE_SCOPE
+}>
+
+type ExchangeScopeContract = Readonly<{
+  inputScope: string
+  greenhouseScope: McpTokenExchangeResult['scope']
+  clientId: string
+  resourceFamily: 'globe' | 'hiring'
+  requireWorkspaceBinding: boolean
 }>
 
 export class McpTokenExchangeError extends Error {
@@ -120,8 +134,9 @@ export async function exchangeMcpGatewayToken(
   env: NodeJS.ProcessEnv = process.env
 ): Promise<McpTokenExchangeResult> {
   const config = readConfiguration(env)
+  const scopeContract = resolveScopeContract(input.requestedScope)
 
-  assertRequest(input, config)
+  assertRequest(input, config, scopeContract)
 
   const workload = await (dependencies.verifyGoogleIdToken ?? verifyGoogleIdToken)(
     boundedToken(input.workloadToken),
@@ -150,14 +165,14 @@ export async function exchangeMcpGatewayToken(
     entra.tenantId !== config.entraTenantId ||
     entra.authorizedParty !== config.entraAuthorizedParty ||
     !entra.objectId ||
-    !entra.scopes.includes(MCP_FUNDING_INPUT_SCOPE)
+    !entra.scopes.includes(scopeContract.inputScope)
   ) {
     throw new McpTokenExchangeError('invalid_grant', 400)
   }
 
-  const client = await (dependencies.loadClient ?? loadSisterPlatformOAuthClient)(MCP_GATEWAY_OAUTH_CLIENT_ID)
+  const client = await (dependencies.loadClient ?? loadSisterPlatformOAuthClient)(scopeContract.clientId)
 
-  assertFederatedClient(client, env)
+  assertFederatedClient(client, scopeContract, env)
 
   const tenant = await (dependencies.resolveUser ?? resolveExactEntraUser)(entra.tenantId, entra.objectId)
 
@@ -167,7 +182,12 @@ export async function exchangeMcpGatewayToken(
     throw new McpTokenExchangeError('user_not_eligible', 403)
   }
 
-  if (!(dependencies.authorizeFunding ?? authorizeFunding)(tenant)) {
+  const authorized =
+    scopeContract.resourceFamily === 'globe'
+      ? (dependencies.authorizeFunding ?? authorizeFunding)(tenant)
+      : (dependencies.authorizeTalentPool ?? authorizeTalentPool)(tenant)
+
+  if (!authorized) {
     throw new McpTokenExchangeError('user_not_eligible', 403)
   }
 
@@ -181,7 +201,9 @@ export async function exchangeMcpGatewayToken(
     expiresAt,
     workloadSubject: workload.subject,
     entraTenantId: entra.tenantId,
-    entraObjectId: entra.objectId
+    entraObjectId: entra.objectId,
+    requestedScope: scopeContract.greenhouseScope,
+    requireWorkspaceBinding: scopeContract.requireWorkspaceBinding
   })
 
   await recordSisterPlatformOAuthAuditEvent({
@@ -191,7 +213,7 @@ export async function exchangeMcpGatewayToken(
     identityProfileId: tenant.identityProfileId,
     eventType: 'token_success',
     outcome: 'success',
-    requestedScopes: [MCP_FUNDING_GREENHOUSE_SCOPE],
+    requestedScopes: [scopeContract.greenhouseScope],
     responseStatus: 200,
     correlationId: input.auditMetadata.correlationId,
     auditMetadata: input.auditMetadata,
@@ -207,8 +229,32 @@ export async function exchangeMcpGatewayToken(
     accessToken: issued.accessToken,
     correlationId: input.auditMetadata.correlationId,
     expiresIn: MCP_EXCHANGED_TOKEN_TTL_SECONDS,
-    scope: MCP_FUNDING_GREENHOUSE_SCOPE
+    scope: scopeContract.greenhouseScope
   }
+}
+
+function resolveScopeContract(requestedScope: string): ExchangeScopeContract {
+  if (requestedScope === MCP_FUNDING_GREENHOUSE_SCOPE) {
+    return {
+      inputScope: MCP_FUNDING_INPUT_SCOPE,
+      greenhouseScope: MCP_FUNDING_GREENHOUSE_SCOPE,
+      clientId: MCP_GATEWAY_OAUTH_CLIENT_ID,
+      resourceFamily: 'globe',
+      requireWorkspaceBinding: true
+    }
+  }
+
+  if (requestedScope === MCP_TALENT_POOL_GREENHOUSE_SCOPE) {
+    return {
+      inputScope: MCP_HIRING_INPUT_SCOPE,
+      greenhouseScope: MCP_TALENT_POOL_GREENHOUSE_SCOPE,
+      clientId: MCP_HIRING_OAUTH_CLIENT_ID,
+      resourceFamily: 'hiring',
+      requireWorkspaceBinding: false
+    }
+  }
+
+  throw new McpTokenExchangeError('scope_not_allowed', 403)
 }
 
 function readConfiguration(env: NodeJS.ProcessEnv): ExchangeConfiguration {
@@ -218,9 +264,7 @@ function readConfiguration(env: NodeJS.ProcessEnv): ExchangeConfiguration {
 
   const audience = env.GREENHOUSE_MCP_TOKEN_EXCHANGE_AUDIENCE?.trim() ?? ''
 
-  const serviceAccountEmails = list(env.GREENHOUSE_MCP_GATEWAY_SERVICE_ACCOUNT_EMAILS).map(value =>
-    value.toLowerCase()
-  )
+  const serviceAccountEmails = list(env.GREENHOUSE_MCP_GATEWAY_SERVICE_ACCOUNT_EMAILS).map(value => value.toLowerCase())
 
   const entraTenantId = env.GREENHOUSE_MCP_ENTRA_TENANT_ID?.trim().toLowerCase() ?? ''
   const entraAudience = env.GREENHOUSE_MCP_ENTRA_AUDIENCE?.trim() ?? ''
@@ -248,23 +292,27 @@ function readConfiguration(env: NodeJS.ProcessEnv): ExchangeConfiguration {
   }
 }
 
-function assertRequest(input: McpTokenExchangeRequest, config: ExchangeConfiguration) {
+function assertRequest(
+  input: McpTokenExchangeRequest,
+  config: ExchangeConfiguration,
+  scopeContract: ExchangeScopeContract
+) {
   if (
     input.requestUrl !== config.audience ||
     input.grantType !== RFC8693_TOKEN_EXCHANGE_GRANT ||
-    input.clientId !== MCP_GATEWAY_OAUTH_CLIENT_ID ||
+    input.clientId !== scopeContract.clientId ||
     input.subjectTokenType !== RFC8693_ACCESS_TOKEN_TYPE ||
     (input.requestedTokenType !== undefined && input.requestedTokenType !== RFC8693_ACCESS_TOKEN_TYPE)
   ) {
     throw new McpTokenExchangeError('invalid_request')
   }
-
-  if (input.requestedScope !== MCP_FUNDING_GREENHOUSE_SCOPE) {
-    throw new McpTokenExchangeError('scope_not_allowed', 403)
-  }
 }
 
-function assertFederatedClient(client: SisterPlatformOAuthClient | null, env: NodeJS.ProcessEnv): asserts client {
+function assertFederatedClient(
+  client: SisterPlatformOAuthClient | null,
+  scopeContract: ExchangeScopeContract,
+  env: NodeJS.ProcessEnv
+): asserts client {
   const allowedConsumers = list(env.GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS).map(value =>
     value.toLowerCase()
   )
@@ -272,22 +320,24 @@ function assertFederatedClient(client: SisterPlatformOAuthClient | null, env: No
   if (
     !client ||
     allowedConsumers.length === 0 ||
-    !allowedConsumers.includes(MCP_GATEWAY_OAUTH_CLIENT_ID) ||
-    client.clientId !== MCP_GATEWAY_OAUTH_CLIENT_ID ||
+    !allowedConsumers.includes(scopeContract.clientId) ||
+    client.clientId !== scopeContract.clientId ||
     client.clientStatus !== 'active' ||
     client.consumerStatus !== 'active' ||
     (client.consumerExpiresAt !== null && Date.parse(client.consumerExpiresAt) <= Date.now()) ||
     client.clientType !== 'confidential' ||
     client.sisterPlatformKey !== 'mcp' ||
     client.allowedScopes.length !== 1 ||
-    client.allowedScopes[0] !== MCP_FUNDING_GREENHOUSE_SCOPE ||
+    client.allowedScopes[0] !== scopeContract.greenhouseScope ||
     client.policy.requiredScopes.length !== 1 ||
-    client.policy.requiredScopes[0] !== MCP_FUNDING_GREENHOUSE_SCOPE ||
+    client.policy.requiredScopes[0] !== scopeContract.greenhouseScope ||
     client.policy.capabilityScopes.length !== 1 ||
-    client.policy.capabilityScopes[0] !== MCP_FUNDING_GREENHOUSE_SCOPE ||
+    client.policy.capabilityScopes[0] !== scopeContract.greenhouseScope ||
     client.policy.audience.tenantTypes.length !== 1 ||
     client.policy.audience.tenantTypes[0] !== 'efeonce_internal' ||
-    client.metadata?.workspaceBindingProvider !== 'globe'
+    (scopeContract.requireWorkspaceBinding
+      ? client.metadata?.workspaceBindingProvider !== 'globe'
+      : client.metadata?.resourceFamily !== 'hiring')
   ) {
     throw new McpTokenExchangeError('invalid_client', 401)
   }
@@ -328,7 +378,11 @@ async function verifyEntraSubjectToken(token: string, config: ExchangeConfigurat
     tenantId: claims.tid?.trim().toLowerCase() ?? '',
     objectId: claims.oid?.trim().toLowerCase() ?? '',
     authorizedParty: claims.azp?.trim() ?? '',
-    scopes: claims.scp?.split(/\s+/).map(value => value.trim()).filter(Boolean) ?? []
+    scopes:
+      claims.scp
+        ?.split(/\s+/)
+        .map(value => value.trim())
+        .filter(Boolean) ?? []
   }
 }
 
@@ -354,12 +408,12 @@ async function issueOpaqueToken(input: IssueTokenInput): Promise<IssuedToken> {
   const identity = await buildBrokerSisterPlatformOAuthIdentityPayload({
     tenant: input.tenant,
     client: input.client,
-    requestedScopes: [MCP_FUNDING_GREENHOUSE_SCOPE],
+    requestedScopes: [input.requestedScope],
     expiresAt: input.expiresAt,
     authMode: 'agent'
   })
 
-  if (!identity.workspaceBindings?.length) {
+  if (input.requireWorkspaceBinding && !identity.workspaceBindings?.length) {
     throw new McpTokenExchangeError('identity_not_bound', 403)
   }
 
@@ -390,7 +444,7 @@ async function issueOpaqueToken(input: IssueTokenInput): Promise<IssuedToken> {
       input.tenant.identityProfileId,
       tokenHash.slice(0, TOKEN_PREFIX_LENGTH),
       tokenHash,
-      [MCP_FUNDING_GREENHOUSE_SCOPE],
+      [input.requestedScope],
       input.correlationId,
       input.expiresAt,
       JSON.stringify({
@@ -424,6 +478,28 @@ function authorizeFunding(tenant: TenantAccessRecord) {
     'platform.globe_credit_funding.ensure',
     'execute',
     'all'
+  )
+}
+
+function authorizeTalentPool(tenant: TenantAccessRecord) {
+  return can(
+    {
+      userId: tenant.userId,
+      tenantType: tenant.tenantType,
+      roleCodes: tenant.roleCodes,
+      primaryRoleCode: tenant.primaryRoleCode,
+      routeGroups: tenant.routeGroups,
+      authorizedViews: tenant.authorizedViews,
+      projectScopes: tenant.projectScopes,
+      campaignScopes: tenant.campaignScopes,
+      businessLines: tenant.businessLines,
+      serviceModules: tenant.serviceModules,
+      portalHomePath: tenant.portalHomePath,
+      ...(tenant.memberId ? { memberId: tenant.memberId } : {})
+    },
+    'hiring.talent_pool.read',
+    'read',
+    'tenant'
   )
 }
 

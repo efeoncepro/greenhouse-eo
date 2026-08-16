@@ -94,6 +94,10 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   decisión atómica con handoff, email y activation sin saltarse gates ni duplicar commands.
 - `TASK-1722` — Delegated MCP Candidate Selection Journey: tools start/status/advance/cancel sobre TASK-1721, con
   authority por step y write fail-closed hasta grant revocable TASK-1631.
+- `TASK-1723` — Talent Pool Canonical Foundation + Full API Parity: membership/purpose/evidence/search/commands/API.
+- `TASK-1724` — Talent Pool Consent + Candidate Self-Service: opt-in independiente, status/renew/withdrawal público.
+- `TASK-1725` — Talent Pool Desk: workbench interno person-first y invitation proposal/confirm.
+- `TASK-1726` — Delegated MCP Talent Pool Search/Profile: reader interno multi-host sobre App API.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
 
@@ -147,6 +151,17 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - Gate: TASK-1603 debe gobernar evidence completeness antes del confirm productivo; MCP permanece fail-closed hasta
   TASK-1631 y nunca agrega write scope al cliente PKCE público compartido.
 
+### Talent Pool Full API Parity extension (Delta 2026-08-16)
+
+- `TASK-1723` convierte el follow-up histórico de búsqueda global en un recurso person-first sin identidad paralela:
+  separa discoverability/contactability, importa cohortes existentes fail-closed y entrega readers/commands/API únicos.
+- `TASK-1724` obtiene consentimiento futuro independiente y withdrawal self-service; el consentimiento actual del apply
+  sigue limitado al proceso y no se reinterpreta. Corrige además el enlace público de privacidad.
+- `TASK-1725` entrega el consumer humano como evidence workbench; `TASK-1726` entrega el mismo read contract a cualquier
+  host MCP estándar autorizado mediante el provider Hiring de TASK-1718. El gateway no posee datos ni policy.
+- V1 cubre candidatos externos/históricos. Internal bench/freelancers/partners requieren adapters posteriores; no se
+  representan como implementados. Ningún slice rankea, auto-decide, expone contacto/CV en búsqueda o habilita B2B.
+
 ## Existing Related Work
 
 - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
@@ -178,11 +193,13 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - [ ] `TASK-770` delivered selected candidate -> collaborator active closure for `internal_hire`.
 - [ ] People 360 shows the journey from candidate/application to member/onboarding/active without duplicate identities.
 - [ ] Event catalog, architecture docs, functional docs and user manuals are updated where behavior changed.
+- [ ] `TASK-1723`–`TASK-1726` entregan Talent Pool person-first, consentimiento/withdrawal, Desk y MCP read-only con
+      Full API Parity, sin duplicar identidad, policy, documentos ni lógica entre consumers.
 
 ## Non-goals
 
 - No AI scoring/evaluation automation in the first pass.
-- No Talent Pool global search in V1; it remains a follow-up after foundation + handoff.
+- No semantic/embedding search, opaque fit ranking, automated shortlist or Talent Pool access for external clients in V1.
 - No client-branded microsites in V1.
 - No automatic member/placement/payroll/access creation directly from Hiring.
 - No replacement of HRIS onboarding runtime in this epic.
