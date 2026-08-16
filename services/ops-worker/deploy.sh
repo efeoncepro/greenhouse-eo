@@ -412,6 +412,14 @@ ENV_VARS="${ENV_VARS},HIRING_LIFECYCLE_EMAILS_ENABLED=${HIRING_LIFECYCLE_EMAILS_
 HIRING_TALENT_POOL_PROJECTION_ENABLED="${HIRING_TALENT_POOL_PROJECTION_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},HIRING_TALENT_POOL_PROJECTION_ENABLED=${HIRING_TALENT_POOL_PROJECTION_ENABLED}"
 
+# TASK-1724 — Candidate self-service for the Talent Pool. The reactive
+# `hiring.talent_pool.consent_requested` consumer runs in this shared worker,
+# not in Vercel, so the flag must be declared here or a later `--set-env-vars`
+# deploy would silently remove it. The CEO authorized the production rollout
+# on 2026-08-16; rollback is `HIRING_TALENT_POOL_SELF_SERVICE_ENABLED=false`.
+HIRING_TALENT_POOL_SELF_SERVICE_ENABLED="${HIRING_TALENT_POOL_SELF_SERVICE_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},HIRING_TALENT_POOL_SELF_SERVICE_ENABLED=${HIRING_TALENT_POOL_SELF_SERVICE_ENABLED}"
+
 # Buzón interno de People para el aviso de postulación nueva (configurable; default en código).
 HIRING_INTERNAL_NOTIFICATIONS_EMAIL="${HIRING_INTERNAL_NOTIFICATIONS_EMAIL:-people@efeoncepro.com}"
 ENV_VARS="${ENV_VARS},HIRING_INTERNAL_NOTIFICATIONS_EMAIL=${HIRING_INTERNAL_NOTIFICATIONS_EMAIL}"
