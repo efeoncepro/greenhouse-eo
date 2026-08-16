@@ -43,7 +43,8 @@ retirarse. No crea una cuenta nueva ni muestra notas, evaluaciones internas u ot
 
 `/agency/hiring/talent-pool` vive dentro de Hiring Desk. Permite buscar por texto/evidencia estructurada, capability,
 seniority, idioma, país autodeclarado y disponibilidad; muestra reason codes, coverage, freshness y una ficha lateral
-person-first. Los documentos se revisan mediante el Application 360 exacto, no se copian al Banco de Talento.
+person-first. Cada postulación expone su CV directamente en el sidecar con el visor privado canónico; el reader es
+exacto por `applicationId` y no mezcla documentos de otras postulaciones de la misma persona.
 
 Una invitación se propone y después se confirma contra una opening. El servidor vuelve a validar consentimiento,
 contactabilidad, duplicate/conflict e idempotencia antes de crear o reutilizar la application.
@@ -54,6 +55,10 @@ contactabilidad, duplicate/conflict e idempotencia antes de crear o reutilizar l
 Un host MCP compatible no recibe acceso por ser Codex o Claude: necesita una persona interna autenticada, grant
 revocable, capability, propósito fijo y provider habilitado. Los dos readers están activos en producción interna;
 el canary real comprobó search/profile `200` y un cliente base-only comprobó `403` sin el scope Hiring.
+
+La revisión agent-safe del CV usa otras dos tools, independientes y apagadas hasta su rollout:
+`hiring.applications.review.list` y `hiring.application.review_packet.get`. Devuelven texto minimizado por chunks,
+marcado como contenido no confiable, y nunca contacto, identidad, respuestas del test o notas libres.
 
 ## Privacidad y límites
 

@@ -104,7 +104,7 @@ Reglas obligatorias:
 - `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md`
 - `docs/tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md`
 - `docs/tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md`
-- `docs/tasks/to-do/TASK-1718-hiring-candidate-review-packet-delegated-mcp-reader.md`
+- `docs/tasks/in-progress/TASK-1718-hiring-candidate-review-packet-delegated-mcp-reader.md`
 - `docs/tasks/complete/TASK-1723-talent-pool-canonical-foundation-full-api-parity.md`
 - `docs/epics/to-do/EPIC-011-hiring-ats-end-to-end-program.md`
 
@@ -147,16 +147,20 @@ Reglas obligatorias:
 
 ## Current Repo State
 
+> Baseline de discovery preservado para explicar el gap original. El estado vigente está en `## Status` y en
+> el delta de cierre; esta sección no debe interpretarse como readback del runtime actual.
+
 ### Already exists
 
 - `mcp.efeonce.org` opera OAuth/Streamable HTTP y providers read-only federados, con gateway neutral y flags.
 - El shim DCR permite conectar clientes MCP estándar al cliente PKCE público interno.
-- TASK-1718 especifica provider Hiring y candidate review packet, pero sigue `to-do`; Hiring no está live/federado.
+- TASK-1718 especificaba el provider Hiring y candidate review packet; este era el baseline antes de iniciar
+  TASK-1726. El estado vigente de TASK-1718 está en su spec `in-progress` y no debe inferirse desde esta sección.
 - TASK-1723 especifica readers/App API del banco y mantiene contacto/CV fuera de sus DTOs.
 
 ### Gap
 
-- No existen tools/schemas de Talent Pool, binding de App API ni provider methods.
+- No existían tools/schemas de Talent Pool, binding de App API ni provider methods al iniciar esta task.
 - No existe canary multi-host que pruebe búsqueda/profile con identidad/capability revocable.
 - No existen guards específicos de bulk discovery, PII sentinel, untrusted evidence y paginación cross-runtime.
 - Skills/runbooks no pueden anunciar el banco como capacidad disponible.

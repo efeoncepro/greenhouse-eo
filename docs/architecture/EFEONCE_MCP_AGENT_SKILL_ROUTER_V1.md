@@ -42,7 +42,7 @@ surface.
 | Shared boundary, tool contract, API parity or new public surface | `software-architect-2026` | Architecture/ADR and product contract |
 | Cloud Run, WIF, service identity, OAuth, ALB, DNS, TLS or secret | applicable cloud skill + `greenhouse-secret-hygiene` | Gateway IaC/runbook |
 | Globe provider or creative capability | `greenhouse-globe` + creative-rights governance when applicable | Globe API/SDK/policy; `TASK-1473` gates federation |
-| Hiring/ATS, Talent Pool, candidate review, assessment assignment or selection journey | `greenhouse-talent-people-operator` + identity/integrations owners | `TASK-1726` tiene live sólo los readers internos `hiring.talent_pool.search` y `.profile.get`; `TASK-1718`–`TASK-1722` permanecen separadamente gated |
+| Hiring/ATS, Talent Pool, candidate review, assessment assignment or selection journey | `greenhouse-talent-people-operator` + identity/integrations owners | `TASK-1726` tiene live los readers internos `hiring.talent_pool.search` y `.profile.get`; TASK-1718 implementa `.review.list`/`.review_packet.get` pero permanece OFF hasta gate Privacy/Security; TASK-1719–1722 siguen separados |
 | HubSpot/CRM or Teams provider | owning HubSpot or Teams skill | provider contract, consent and tenancy |
 | Release, rollback or live evidence | `greenhouse-production-release` and `greenhouse-qa-release-auditor` | release/runbook and evidence |
 | Task/ADR split, docs, skill evolution | `greenhouse-task-planner` and `greenhouse-documentation-governor` | Greenhouse control plane |
@@ -56,6 +56,12 @@ provider `greenhouse-hiring` y únicamente los readers `hiring.talent_pool.searc
 2026-08-16. No incluyen contacto, CV, documentos, URLs, notas ni acciones. El reader de
 Application 360 y el token one-shot de assessment siguen siendo contratos privados: `TASK-1718`–`TASK-1722`
 conservan sus propios gates y `TASK-1631` sigue bloqueando writes y acceso externo/B2B.
+
+El código de TASK-1718 agrega `hiring.applications.review.list` y
+`hiring.application.review_packet.get` con OAuth interno separado, purpose cerrado y packet exacto por postulación.
+No se consideran live ni disponibles hasta que Greenhouse habilite reader/projection y el gateway habilite
+`GREENHOUSE_HIRING_CANDIDATE_REVIEW_ENABLED` después de los gates trazables. La ausencia de la tool es un deny de
+rollout, no una invitación a usar browser, SQL o buckets.
 
 ## Mandatory gates
 

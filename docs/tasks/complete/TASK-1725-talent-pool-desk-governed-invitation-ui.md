@@ -41,11 +41,13 @@ contactability, dedupe ni creación de aplicaciones en componentes.
 
 - Workspace `/agency/hiring/talent-pool` integrado una sola vez a Hiring Desk con search/filter/cursor restaurables,
   ficha lateral person-first, coverage/freshness, disponibilidad y deep links por application ID exacto.
-- La UI consume Product API y commands TASK-1723; no muestra contacto, CV, notas, economics, fit score ni atributos
+- La UI consume Product API y commands TASK-1723; no muestra contacto, notas, economics, fit score ni atributos
   protegidos, y separa propuesta de confirmación para invitaciones.
-- GVC premium pasó desktop/mobile, teclado y reduced motion en
-  `.captures/2026-08-16T08-27-35_hiring-talent-pool-desk`, sin overflow, errores de consola ni findings de contraste.
-- Flags/capabilities productivos y el smoke de invitación sobre una opening sintética siguen pendientes de rollout.
+- GVC premium del Desk con visor exacto pasó desktop/mobile, teclado y reduced motion en el harness sintético
+  production-disabled `.captures/2026-08-16T12-22-58_hiring-talent-pool-desk`: siete frames, sin PII real, overflow,
+  errores de consola/hydration/red ni findings axe.
+- Search/projection/MCP están activos en producción interna; invite/self-service siguen apagados hasta su gate.
+  El acceso directo al CV desde el sidecar está code-complete y espera promoción junto con TASK-1718.
 
 ## Why This Task Exists
 
@@ -57,7 +59,7 @@ evidencia con acción permitida visible.
 ## Goal
 
 - Permitir búsqueda/filtros restaurables por evidencia, rol, seniority, idioma, país autodeclarado y disponibilidad.
-- Mostrar un perfil único con razones, lineage, coverage, freshness, aplicaciones y allowedActions sin contacto/CV crudo.
+- Mostrar un perfil único con razones, lineage, coverage, freshness, aplicaciones y allowedActions sin contacto; el CV sólo aparece en el visor privado exacto por postulación.
 - Proponer y confirmar invitación a una opening mediante el command canónico, con duplicate/conflict/readback honestos.
 - Entregar experiencia premium accesible desktop/390px, sin card soup, fit score ni otro pipeline.
 
@@ -84,7 +86,7 @@ Reglas obligatorias:
 
 - La unidad visual es una persona; cada evidencia/acción conserva aplicación/opening exacta.
 - Search/profile/allowedActions vienen de TASK-1723. La UI no puntúa, infiere, contacta ni muta estado directamente.
-- No mostrar email, teléfono, domicilio, expectativa económica, notas libres, raw CV, answer keys ni atributos protegidos.
+- No mostrar email, teléfono, domicilio, expectativa económica, notas libres, answer keys ni atributos protegidos. El CV se abre sólo en el visor privado gobernado.
 - `unknown`, partial y stale permanecen visibles; no se traducen a bajo fit.
 - Invite empieza como proposal y sólo confirma mediante dialog/authority; click-away, drag o row click nunca escriben.
 - El destino se ubica una sola vez dentro de la zona Hiring del sidebar; no consume un slot top-level nuevo.
@@ -108,7 +110,7 @@ Reglas obligatorias:
 
 - `TASK-1723` search/profile/invite DTOs, capabilities, canonical errors and receipts.
 - Hiring shell/navigation, Application 360 route and existing internal role/view/capability gates.
-- `TASK-1718` sólo como futuro deep evidence packet para agentes; la UI humana puede abrir Application 360 existente.
+- `TASK-1718` aporta el reader documental exacto reutilizado por el sidecar; la UI humana abre el CV directamente y conserva Application 360 como contexto adicional.
 
 ### Blocks / Impacts
 
@@ -298,7 +300,7 @@ Reglas obligatorias:
 ## Out of Scope
 
 - Schema/readers/commands/backfill/capabilities (TASK-1723), candidate self-service (TASK-1724) y MCP (TASK-1726).
-- CV/document renderer nuevo; se abre Application 360/TASK-1718 con application exacta.
+- El sidecar reutiliza el renderer privado canónico sobre un reader exacto por application; nunca agrega CVs por identidad/facet.
 - Career Alerts, sourcing externo, contact CRM, mass email, assessment assignment, stage/decision/handoff/activation.
 - Fit score, auto-ranking, auto-shortlist, inferred protected attributes o candidate photos.
 
@@ -362,8 +364,8 @@ history into one claim. Invite chooses from openings returned by server policy; 
 - [x] Route is reachable once under Hiring sidebar and passes the applicable reachability/access gates locally.
 - [x] Search/filter/cursor/detail use TASK-1723 only; no store/API/business rule duplication in UI.
 - [x] Results are person-first and show reason, coverage, freshness, availability and allowed action without fit score.
-- [x] Email/phone/CV/notes/economics/protected attributes are absent from DOM/network/cache/error evidence.
-- [x] Application/CV deep links carry exact application ID; no identity-level document fallback.
+- [x] Email/phone/notes/economics/protected attributes remain absent from list/search/cache/error evidence; CV bytes sólo salen por la ruta privada gobernada.
+- [x] El visor y los deep links usan application ID exacto; no existe fallback documental por identidad/facet.
 - [x] Invite proposal/confirm handles needs-reconsent, withdrawn, duplicate, conflict, timeout and receipt honestly.
 - [x] Wireframe/flow/motion/direction exist and UI readiness checks pass.
 - [x] Primitive decision remains reuse; no new pipeline, card primitive or platform pattern.
@@ -400,6 +402,8 @@ history into one claim. Invite chooses from openings returned by server policy; 
 ## Follow-ups
 
 - Add internal/bench/freelancer source adapters only after TASK-1723 V1 external-candidate evidence is stable.
+- Habilitar el packet CV por MCP sólo después de los sign-offs Security/Privacy/Talent/Identity/MCP de TASK-1718;
+  el visor humano del Banco no depende de ese rollout agentic.
 
 ## Open Questions
 

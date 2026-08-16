@@ -27,8 +27,10 @@ import {
   MCP_FUNDING_GREENHOUSE_SCOPE,
   MCP_FUNDING_INPUT_SCOPE,
   MCP_GATEWAY_OAUTH_CLIENT_ID,
+  MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE,
   MCP_HIRING_INPUT_SCOPE,
   MCP_HIRING_OAUTH_CLIENT_ID,
+  MCP_HIRING_REVIEW_OAUTH_CLIENT_ID,
   MCP_TALENT_POOL_GREENHOUSE_SCOPE,
   McpTokenExchangeError,
   RFC8693_ACCESS_TOKEN_TYPE,
@@ -199,6 +201,58 @@ describe('MCP RFC8693 token exchange', () => {
         requestedScope: MCP_TALENT_POOL_GREENHOUSE_SCOPE,
         requireWorkspaceBinding: false
       })
+    )
+  })
+
+  it('mints candidate review through a distinct exact client and never substitutes Talent Pool authorization', async () => {
+    const reviewClient = {
+      ...client,
+      oauthClientId: 'spoauth-client-mcp-hiring-review',
+      clientId: MCP_HIRING_REVIEW_OAUTH_CLIENT_ID,
+      allowedScopes: [MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE],
+      policy: {
+        ...client.policy,
+        requiredScopes: [MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE],
+        capabilityScopes: [MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE],
+        revocation: { ...client.policy.revocation, revalidateAfterSeconds: 15 }
+      },
+      metadata: { resourceFamily: 'hiring' }
+    }
+
+    const dependencies = {
+      ...baseDependencies(),
+      verifyEntraToken: vi.fn(async () => ({
+        tenantId: 'tenant-1',
+        objectId: 'oid-1',
+        authorizedParty: 'mcp-client-app-id',
+        scopes: [MCP_HIRING_INPUT_SCOPE]
+      })),
+      loadClient: vi.fn(async (): Promise<any> => reviewClient),
+      authorizeTalentPool: vi.fn(() => true),
+      authorizeCandidateReview: vi.fn(() => true)
+    }
+
+    const reviewEnv = {
+      ...env,
+      GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS:
+        `${MCP_GATEWAY_OAUTH_CLIENT_ID},${MCP_HIRING_REVIEW_OAUTH_CLIENT_ID}`
+    }
+
+    await expect(
+      exchangeMcpGatewayToken(
+        {
+          ...request,
+          clientId: MCP_HIRING_REVIEW_OAUTH_CLIENT_ID,
+          requestedScope: MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE
+        },
+        dependencies,
+        reviewEnv
+      )
+    ).resolves.toMatchObject({ scope: MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE })
+    expect(dependencies.authorizeCandidateReview).toHaveBeenCalledOnce()
+    expect(dependencies.authorizeTalentPool).not.toHaveBeenCalled()
+    expect(dependencies.issueToken).toHaveBeenCalledWith(
+      expect.objectContaining({ requestedScope: MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE })
     )
   })
 

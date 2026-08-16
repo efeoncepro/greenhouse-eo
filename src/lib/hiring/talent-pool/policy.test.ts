@@ -9,7 +9,7 @@ describe('deriveTalentPoolAccess', () => {
     expect(deriveTalentPoolAccess({ lifecycleStatus: 'active_process', futureConsentExpiresAt: null, now })).toEqual({
       discoverable: true,
       contactable: false,
-      allowedActions: ['read', 'update_availability'],
+      allowedActions: ['read', 'update_availability', 'grant_future_consent'],
       reasonCodes: ['active_application_only']
     })
   })
@@ -54,7 +54,7 @@ describe('deriveTalentPoolAccess', () => {
     expect(result).toEqual({
       discoverable: true,
       contactable: false,
-      allowedActions: ['read', 'update_availability'],
+      allowedActions: ['read', 'update_availability', 'grant_future_consent'],
       reasonCodes: ['active_application_only']
     })
   })

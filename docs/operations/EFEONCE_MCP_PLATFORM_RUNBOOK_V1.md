@@ -96,8 +96,9 @@ documentos, links, tokens de assessment, invitaciones, cambios de etapa y asigna
 | `GREENHOUSE_ECOSYSTEM_API_URL` | no | origin Greenhouse exacto del lane ecosystem; en producción `https://greenhouse.efeoncepro.com` |
 | `GREENHOUSE_ECOSYSTEM_TOKEN` | sí | inyectado desde `efeonce-mcp-gateway-greenhouse-token` en GCP Secret Manager; nunca valor plano en `vars`, workflow ni env file |
 | `GREENHOUSE_HIRING_PROVIDER_ENABLED` | no | default `false`; sólo `true` después de Greenhouse `HIRING_TALENT_POOL_SEARCH_ENABLED` + `HIRING_TALENT_POOL_MCP_ENABLED`, grant Entra y canary aprobados |
-| `GREENHOUSE_HIRING_API_URL` | no | origin Greenhouse exacto; el adapter sólo llama `/api/platform/app/hiring/talent-pool` y su profile por ID opaco |
-| `GREENHOUSE_HIRING_TOKEN_EXCHANGE_URL` | no | endpoint RFC 8693 exacto para el cliente Greenhouse `efeonce-mcp-hiring` |
+| `GREENHOUSE_HIRING_CANDIDATE_REVIEW_ENABLED` | no | default `false`; registra las dos tools TASK-1718 sólo después de migration/backfill sintético, flags Greenhouse y sign-off Security/Privacy/Talent/Identity/MCP |
+| `GREENHOUSE_HIRING_API_URL` | no | origin Greenhouse exacto; search/profile llaman Talent Pool y las tools TASK-1718, cuando están habilitadas, sólo las rutas App API review exactas |
+| `GREENHOUSE_HIRING_TOKEN_EXCHANGE_URL` | no | endpoint RFC 8693 exacto para clientes separados `efeonce-mcp-hiring` y `efeonce-mcp-hiring-review` |
 | `GREENHOUSE_HIRING_VERCEL_BYPASS_SECRET` | sí | mismo secret ref system-managed de Vercel, enviado sólo al token exchange y a las dos rutas Hiring exactas; nunca identidad ni autorización |
 
 Si falta configuración OAuth, `/health` responde pero `/mcp` devuelve `503 oauth_not_configured`. Esto es el

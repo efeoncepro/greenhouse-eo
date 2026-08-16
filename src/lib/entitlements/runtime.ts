@@ -639,6 +639,13 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
     addEntitlement(entries, {
       module: 'hiring',
+      capability: 'hiring.candidate.review.read',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'hiring',
       capability: 'hiring.talent_pool.manage',
       action: 'update',
       scope: 'tenant',

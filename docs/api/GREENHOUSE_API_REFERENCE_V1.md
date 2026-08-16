@@ -61,6 +61,13 @@ Routes:
 - `POST /api/platform/app/notifications/mark-all-read`
 - `GET /api/platform/app/hiring/talent-pool`
 - `GET /api/platform/app/hiring/talent-pool/:id`
+- `POST /api/platform/app/hiring/talent-pool/:id/availability`
+- `POST /api/platform/app/hiring/talent-pool/:id/consent/request`
+- `POST /api/platform/app/hiring/talent-pool/:id/consent/withdraw`
+- `POST /api/platform/app/hiring/talent-pool/:id/invite/propose`
+- `POST /api/platform/app/hiring/talent-pool/:id/invite/confirm`
+- `GET /api/platform/app/hiring/applications/review` *(TASK-1718, OFF hasta rollout)*
+- `GET /api/platform/app/hiring/applications/:applicationId/review-packet` *(TASK-1718, OFF hasta rollout)*
 
 Read next:
 - `docs/api/GREENHOUSE_API_PLATFORM_V1.md`

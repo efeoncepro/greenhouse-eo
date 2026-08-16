@@ -19,10 +19,12 @@ import {
 
 export const MCP_GATEWAY_OAUTH_CLIENT_ID = 'efeonce-mcp-gateway'
 export const MCP_HIRING_OAUTH_CLIENT_ID = 'efeonce-mcp-hiring'
+export const MCP_HIRING_REVIEW_OAUTH_CLIENT_ID = 'efeonce-mcp-hiring-review'
 export const MCP_FUNDING_INPUT_SCOPE = 'efeonce.mcp.globe.credits.funding.ensure'
 export const MCP_FUNDING_GREENHOUSE_SCOPE = 'globe.credits.funding.ensure'
 export const MCP_HIRING_INPUT_SCOPE = 'efeonce.mcp.hiring.read'
 export const MCP_TALENT_POOL_GREENHOUSE_SCOPE = 'hiring.talent_pool.read'
+export const MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE = 'hiring.candidate.review.read'
 export const RFC8693_TOKEN_EXCHANGE_GRANT = 'urn:ietf:params:oauth:grant-type:token-exchange'
 export const RFC8693_ACCESS_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:access_token'
 export const MCP_EXCHANGED_TOKEN_TTL_SECONDS = 300
@@ -61,6 +63,7 @@ type McpTokenExchangeDependencies = Readonly<{
   loadClient?: (clientId: string) => Promise<SisterPlatformOAuthClient | null>
   authorizeFunding?: (tenant: TenantAccessRecord) => boolean
   authorizeTalentPool?: (tenant: TenantAccessRecord) => boolean
+  authorizeCandidateReview?: (tenant: TenantAccessRecord) => boolean
   issueToken?: (input: IssueTokenInput) => Promise<IssuedToken>
   now?: () => Date
 }>
@@ -99,7 +102,10 @@ export type McpTokenExchangeResult = Readonly<{
   accessToken: string
   correlationId: string
   expiresIn: typeof MCP_EXCHANGED_TOKEN_TTL_SECONDS
-  scope: typeof MCP_FUNDING_GREENHOUSE_SCOPE | typeof MCP_TALENT_POOL_GREENHOUSE_SCOPE
+  scope:
+    | typeof MCP_FUNDING_GREENHOUSE_SCOPE
+    | typeof MCP_TALENT_POOL_GREENHOUSE_SCOPE
+    | typeof MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE
 }>
 
 type ExchangeScopeContract = Readonly<{
@@ -185,7 +191,9 @@ export async function exchangeMcpGatewayToken(
   const authorized =
     scopeContract.resourceFamily === 'globe'
       ? (dependencies.authorizeFunding ?? authorizeFunding)(tenant)
-      : (dependencies.authorizeTalentPool ?? authorizeTalentPool)(tenant)
+      : scopeContract.greenhouseScope === MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE
+        ? (dependencies.authorizeCandidateReview ?? authorizeCandidateReview)(tenant)
+        : (dependencies.authorizeTalentPool ?? authorizeTalentPool)(tenant)
 
   if (!authorized) {
     throw new McpTokenExchangeError('user_not_eligible', 403)
@@ -249,6 +257,16 @@ function resolveScopeContract(requestedScope: string): ExchangeScopeContract {
       inputScope: MCP_HIRING_INPUT_SCOPE,
       greenhouseScope: MCP_TALENT_POOL_GREENHOUSE_SCOPE,
       clientId: MCP_HIRING_OAUTH_CLIENT_ID,
+      resourceFamily: 'hiring',
+      requireWorkspaceBinding: false
+    }
+  }
+
+  if (requestedScope === MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE) {
+    return {
+      inputScope: MCP_HIRING_INPUT_SCOPE,
+      greenhouseScope: MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE,
+      clientId: MCP_HIRING_REVIEW_OAUTH_CLIENT_ID,
       resourceFamily: 'hiring',
       requireWorkspaceBinding: false
     }
@@ -498,6 +516,28 @@ function authorizeTalentPool(tenant: TenantAccessRecord) {
       ...(tenant.memberId ? { memberId: tenant.memberId } : {})
     },
     'hiring.talent_pool.read',
+    'read',
+    'tenant'
+  )
+}
+
+function authorizeCandidateReview(tenant: TenantAccessRecord) {
+  return can(
+    {
+      userId: tenant.userId,
+      tenantType: tenant.tenantType,
+      roleCodes: tenant.roleCodes,
+      primaryRoleCode: tenant.primaryRoleCode,
+      routeGroups: tenant.routeGroups,
+      authorizedViews: tenant.authorizedViews,
+      projectScopes: tenant.projectScopes,
+      campaignScopes: tenant.campaignScopes,
+      businessLines: tenant.businessLines,
+      serviceModules: tenant.serviceModules,
+      portalHomePath: tenant.portalHomePath,
+      ...(tenant.memberId ? { memberId: tenant.memberId } : {})
+    },
+    MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE,
     'read',
     'tenant'
   )

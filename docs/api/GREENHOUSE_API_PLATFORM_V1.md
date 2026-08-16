@@ -115,6 +115,11 @@ Endpoints:
 - `POST /api/platform/app/notifications/mark-all-read`
 - `GET /api/platform/app/hiring/talent-pool`
 - `GET /api/platform/app/hiring/talent-pool/:id`
+- `POST /api/platform/app/hiring/talent-pool/:id/availability`
+- `POST /api/platform/app/hiring/talent-pool/:id/consent/request|withdraw`
+- `POST /api/platform/app/hiring/talent-pool/:id/invite/propose|confirm`
+- `GET /api/platform/app/hiring/applications/review`
+- `GET /api/platform/app/hiring/applications/:applicationId/review-packet`
 
 #### Hiring Talent Pool
 
@@ -126,7 +131,15 @@ No entrega email, teléfono, CV/texto crudo, URLs, notas, economics, respuestas,
 La App API exige `hiring.talent_pool.read`. Cuando el bearer proviene de Efeonce MCP, Greenhouse reautoriza además
 client/scope delegados, propósito fijo `talent_pool_candidate_review` y `x-greenhouse-agent-host`; cada allow/deny
 queda auditado sin contenido. Los endpoints y las dos tools MCP read-only están activos para personas internas
-autorizadas desde 2026-08-16; acceso externo/B2B y cualquier write continúan bloqueados.
+autorizadas desde 2026-08-16; acceso externo/B2B y cualquier write MCP continúan bloqueados.
+
+Los commands App API de availability, consentimiento e invitación delegan a los mismos primitives transaccionales
+que Product/Public API y conservan capability, flag, idempotencia y audit. No están federados como tools MCP.
+
+TASK-1718 agrega un carril delegado separado para revisar una application exacta: lista acotada y packet con un
+chunk de CV minimizado, hash y trust boundary. Exige `hiring.application.read` +
+`hiring.candidate.review.read`, purpose cerrado y OAuth client independiente. Sus rutas existen pero permanecen OFF
+hasta el rollout Privacy/Security; nunca amplían search/profile ni entregan contacto o respuestas del test.
 
 #### Organization Compact Signals
 

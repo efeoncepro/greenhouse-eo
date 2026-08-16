@@ -110,7 +110,7 @@ Reglas obligatorias:
 - `docs/tasks/complete/TASK-355-hiring-desk-internal-workspaces-publication-governance.md`
 - `docs/tasks/complete/TASK-356-hiring-handoff-reactive-signals-downstream-bridges.md`
 - `docs/tasks/complete/TASK-1362-candidate-document-capture.md`
-- `docs/tasks/to-do/TASK-1718-hiring-candidate-review-packet-delegated-mcp-reader.md`
+- `docs/tasks/in-progress/TASK-1718-hiring-candidate-review-packet-delegated-mcp-reader.md`
 - `docs/tasks/to-do/TASK-1719-hiring-opening-assessment-policy-stage-triggered-assignment.md`
 - `docs/epics/to-do/EPIC-011-hiring-ats-end-to-end-program.md`
 - `https://efeoncepro.com/politica-de-privacidad/`
@@ -421,6 +421,14 @@ e idempotency; email, template, stage y assessment se derivan server-side.
 - [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 - [x] Arquitectura Hiring, API reference, manuales People y flag ledger reflejan runtime real.
+
+## Delta 2026-08-16 — auditoría de paridad
+
+La auditoría de implementación detectó que search/profile sí tenían App API, pero availability, consentimiento e
+invite sólo estaban expuestos por Product/Public API. Se cerró la brecha con rutas App API idempotentes que delegan
+a los mismos cinco commands canónicos; no se agregaron writers al gateway MCP. También se firmó y ligó el cursor de
+búsqueda a actor/cliente, filtros, policy y snapshot, y la reconciliación ahora remueve evidencia derivada antes de
+reconstruirla para no conservar skills/competencias retiradas.
 
 ## Follow-ups
 

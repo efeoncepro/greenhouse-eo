@@ -42,6 +42,8 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `docs/architecture/GREENHOUSE_WORKFORCE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+- `docs/architecture/GREENHOUSE_CANDIDATE_ACCOUNT_LONGITUDINAL_MY_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_CANDIDATE_SELF_SERVICE_LONGITUDINAL_MY_ARCHITECTURE_V1.md`
 
 ## Execution Sequence
 
@@ -76,6 +78,36 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - Debe ejecutarse después de `TASK-356` y requiere `TASK-030`.
 - Gate final: selected candidate puede terminar como collaborator active sin duplicar persona, saltarse onboarding ni activar payroll/access prematuramente.
 
+### Phase 5 — Candidate Identity and Professional Profile
+
+- `TASK-1727` crea el principal/login candidato longitudinal, account claim y sesión/capabilities own-resource.
+- `TASK-1728` migra el perfil profesional desde owner `member` hacia owner persona con provenance/versiones y
+  projections legacy.
+- Gate: un candidato autenticado existe sin `member`, sin tenant/rol cliente inventado y puede mantener el mismo
+  perfil que leerá después de una activación laboral.
+
+### Phase 6 — Candidate Application Self-Service + `/my`
+
+- `TASK-1729` crea status candidato, actions, CV snapshots, role answers, economic expectation y withdrawal por
+  aplicación exacta.
+- `TASK-1730` entrega `/my` como workbench personal capability-composed sobre los contratos 1728/1729.
+- Gate: una persona con dos aplicaciones ve y edita sólo los recursos permitidos de cada una; estado público no
+  filtra stages, notas, scores ni decisiones no comunicadas.
+
+### Phase 7 — Account Continuity at Workforce Activation
+
+- `TASK-1731` extiende TASK-770 para vincular el `member` al mismo principal, refrescar audiences/capabilities y
+  reconciliar parciales sin conceder workforce desde la decisión Hiring.
+- Gate: selected→activated conserva `user_id` e `identity_profile_id`; session refresh/revocation y retries no crean
+  una segunda cuenta o member.
+
+### Phase 8 — Longitudinal People 360 Closure
+
+- `TASK-1732` entrega el reader identity-first pre/post-member con historia completa y DTOs por audiencia.
+- `TASK-1733` hace visible esa historia en People 360 con timeline/detail capability-aware.
+- Gate final longitudinal: `/my` candidato y People 360 consumen proyecciones distintas sobre los mismos hechos;
+  ninguna copia CV, perfil o aplicaciones hacia una ficha paralela.
+
 ## Child Tasks
 
 - `TASK-352` — Program umbrella and coordination for Hiring / ATS.
@@ -98,6 +130,27 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `TASK-1724` — Talent Pool Consent + Candidate Self-Service: opt-in independiente, status/renew/withdrawal público.
 - `TASK-1725` — Talent Pool Desk: workbench interno person-first y invitation proposal/confirm.
 - `TASK-1726` — Delegated MCP Talent Pool Search/Profile: reader interno multi-host sobre App API.
+- `TASK-1367` — Careers Apply Intake Service: unifica el submit público hacia el command canónico. **✓ complete.**
+- `TASK-1368` — Hiring Activation Lane UI: consumer de cola/readiness de activación. **✓ complete.**
+- `TASK-1383` — Assessment Engine hardening previo a la taking surface. **✓ complete.**
+- `TASK-1384` — Assessment Question Bank SME V1. **✓ complete.**
+- `TASK-1385` — AI-assisted vacancy public copy sobre propose→confirm. **✓ complete.**
+- `TASK-1397` — Careers Talent Alerts Foundation.
+- `TASK-1398` — Careers Talent Alerts UI.
+- `TASK-1400` — Hiring Activation Blocker Resolution API. **✓ complete.**
+- `TASK-1422` — Vacancy AI Draft UI. **✓ complete.**
+- `TASK-1727` — Candidate Portal Principal + Session Foundation: claim post-apply, audiencia/capabilities propias,
+  anti-IDOR/anti-oracle y principal longitudinal sin `member` ficticio.
+- `TASK-1728` — Person-Scoped Professional Profile: skills/tools/languages/certifications/links/CV versions con
+  provenance y migración/projections desde `member_*`.
+- `TASK-1729` — Candidate Application Self-Service Contract: status publicado, acciones, CV snapshot, preguntas,
+  expectativa económica y retiro por aplicación exacta.
+- `TASK-1730` — Longitudinal `/my` Candidate Experience: workbench candidato→preboarding→workforce compuesto por
+  capabilities y consumidores canónicos.
+- `TASK-1731` — Selection-to-Workforce Account Continuity Bridge: mismo principal/persona, member additive,
+  sessionVersion y reconciliation sobre TASK-770.
+- `TASK-1732` — Identity-First People 360 Hiring Journey Reader: historia pre/post-member, paginada y allowlisted.
+- `TASK-1733` — People 360 Longitudinal Hiring History UI: timeline/detail interno sobre TASK-1732.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
 
@@ -162,6 +215,17 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - V1 cubre candidatos externos/históricos. Internal bench/freelancers/partners requieren adapters posteriores; no se
   representan como implementados. Ningún slice rankea, auto-decide, expone contacto/CV en búsqueda o habilita B2B.
 
+### Candidate account + longitudinal `/my` extension (Delta 2026-08-16)
+
+- ADR y arquitectura aceptan una sola persona y un solo principal durante candidatura, selección y workforce.
+- El apply inicial permanece público; el login se reclama después mediante verificación. `/my` deja de significar
+  “member workspace” y se compone por audiences/capabilities sin abrir endpoints laborales al candidato.
+- El perfil profesional reusable pasa a ser person-scoped. Cada aplicación conserva status publicado, CV snapshot,
+  role answers y expectativa económica propios; actualizar el perfil nunca reescribe evidencia histórica.
+- TASK-1727–1733 separan identidad, data migration, Hiring API, UI candidata, activation bridge, reader People 360 y
+  UI People 360. Esta partición evita tasks híbridas y copy-on-hire.
+- Referencias/recomendaciones, agenda y passkeys quedan post-MVP; no bloquean status/CV/perfil/preguntas.
+
 ## Existing Related Work
 
 - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
@@ -183,6 +247,11 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - The public apply flow must be rate-limited, consent-gated, sanitized, idempotent and must not leak dedupe/internal status.
 - The pipeline board moves `HiringApplication`, not `Person` and not `HiringOpening`.
 - `TASK-770` is the only child task that closes `internal_hire` as collaborator active, and it does so under HRIS/People ownership.
+- Candidate login never creates `member`; TASK-1731 only extends the downstream TASK-770 activation boundary.
+- `/my` access is capability-composed. Never grant the whole existing `my` route group or member-scoped APIs to a
+  candidate principal.
+- Professional profile completeness, economic expectation and optional answers never become automated ranking or
+  adverse-decision inputs.
 
 ## Exit Criteria
 
@@ -195,6 +264,11 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - [ ] Event catalog, architecture docs, functional docs and user manuals are updated where behavior changed.
 - [ ] `TASK-1723`–`TASK-1726` entregan Talent Pool person-first, consentimiento/withdrawal, Desk y MCP read-only con
       Full API Parity, sin duplicar identidad, policy, documentos ni lógica entre consumers.
+- [ ] `TASK-1727`–`TASK-1730` entregan cuenta candidata, perfil profesional person-scoped, application self-service y
+      `/my` longitudinal sin abrir superficies workforce ni copiar datos al contratar.
+- [ ] `TASK-1731` demuestra selección→activación con el mismo principal/persona y revocación/refresh de sesión.
+- [ ] `TASK-1732`–`TASK-1733` muestran People 360 identity-first antes/después de member, con todas las aplicaciones
+      autorizadas y sin mezclar evidencia entre procesos.
 
 ## Non-goals
 

@@ -187,8 +187,9 @@ A padlock that protects nothing teaches the operator to ignore the padlocks that
 - Person-first: `identity_profile` → unique `candidate_facet` → one `talent_pool_membership`; applications and
   assessment evidence are referenced, never copied as raw CV/open answers.
 - Operator surface: `/agency/hiring/talent-pool`; canonical Product/App readers are `searchTalentPool` and
-  `getTalentPoolProfile`. Search has no fit score or default ranking and exposes no email, phone, CV, URLs, notes,
-  economics or protected attributes.
+  `getTalentPoolProfile`. Search has no fit score or default ranking and exposes no email, phone, raw CV, notes,
+  economics or protected attributes. The profile sidecar may open the CV of one exact `applicationId` through the
+  same private-asset authorization used by Application 360; it must never resolve documents by person-wide fallback.
 - Candidate surface: `/public/careers/talent-profile/[token]`; token is hashed, expiring and bound to one membership.
   Consent for `future_opportunities` is explicit and append-only; historical process consent is never upgraded by
   backfill. Withdrawal wins and recontact remains policy/flag gated.
@@ -200,8 +201,13 @@ A padlock that protects nothing teaches the operator to ignore the padlocks that
   open URLs, rank, recommend, invite, move stages or assign a test from these readers.
 - Live evidence: OAuth canary search/profile returned `200`; a separate base-only client returned `403`. Do not infer
   availability in another environment from this statement: recheck its flags/provider and allow/deny canary.
-  `TASK-1718` separately owns exact-application CV/document review. Candidate self-service and invitation remain OFF
-  in production pending People + Legal/Privacy approval; the public rate guard fails closed if its store is unavailable.
+  `TASK-1718` separately owns exact-application CV/document review for delegated agents. Its strict readers are
+  `hiring.applications.review.list` and `hiring.application.review_packet.get`; they expose only redacted, bounded CV
+  chunks plus governed assessment summaries, require an explicit review purpose and preserve an append-only access
+  audit. Code, schema and MCP adapters exist, but real-CV projection/reader/tool flags remain OFF until the named
+  Talent, Privacy, Security, Identity and MCP owners approve the activation and a synthetic canary passes. Candidate
+  self-service and invitation remain OFF in production pending People + Legal/Privacy approval; the public rate guard
+  fails closed if its store is unavailable.
 - Command `revealCandidateIdentityDocument` (`src/lib/hiring/documents/reveal-identity-document.ts`) verifies the document belongs to the `identity_profile_id` of the path's `candidateFacetId`. **Anti-IDOR: a foreign `documentId` answers `404`, not `403`** — a `403` would confirm its existence to a prober. The lookup runs with `includeArchived: true` on purpose, so an *archived* document of the candidate's own gets the `409` that names the cause instead of a `404` that would assert it does not exist.
 - Route `POST /api/hiring/candidate-facets/[candidateFacetId]/identity-documents/[documentId]/reveal`.
 - **No machinery duplicated**: the append-only audit and the outbox event are written by `revealPersonIdentityDocument` (784). No new event.

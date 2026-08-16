@@ -20,7 +20,7 @@ export const deriveTalentPoolAccess = ({
     return {
       discoverable: true,
       contactable: false,
-      allowedActions: ['read', 'update_availability'],
+      allowedActions: ['read', 'update_availability', 'grant_future_consent'],
       reasonCodes: ['active_application_only']
     }
   }
@@ -49,7 +49,7 @@ export const deriveTalentPoolAccess = ({
   return {
     discoverable: true,
     contactable: false,
-    allowedActions: ['read', 'update_availability'],
+    allowedActions: ['read', 'update_availability', 'grant_future_consent'],
     reasonCodes: ['future_consent_missing']
   }
 }

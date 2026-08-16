@@ -7662,6 +7662,21 @@ export interface GreenhouseHiringAssessmentFairness {
   template_id: string | null;
 }
 
+export interface GreenhouseHiringCandidateDocumentReviewProjection {
+  application_id: string;
+  asset_id: string;
+  content_hash: string;
+  extracted_at: Generated<Timestamp>;
+  extraction_version: string;
+  page_count: number | null;
+  projection_id: Generated<string>;
+  redaction_policy_version: string;
+  source_updated_at: Timestamp;
+  status: string;
+  text_content: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseHiringCandidateFacet {
   availability: string | null;
   candidate_facet_id: Generated<string>;
@@ -7695,6 +7710,22 @@ export interface GreenhouseHiringCandidateFacet {
   status: Generated<string>;
   updated_at: Generated<Timestamp>;
   verification_signals_json: Generated<Json>;
+}
+
+export interface GreenhouseHiringCandidateReviewAccessAudit {
+  access_audit_id: Generated<string>;
+  actor_user_id: string;
+  agent_host: string | null;
+  application_id: string | null;
+  correlation_id: string | null;
+  field_classes: Generated<string[]>;
+  oauth_access_token_id: string | null;
+  oauth_client_id: string;
+  occurred_at: Generated<Timestamp>;
+  outcome: string;
+  purpose: string | null;
+  reason_code: string;
+  route_kind: string;
 }
 
 export interface GreenhouseHiringHiringApplication {
@@ -12423,7 +12454,9 @@ export interface DB {
   "greenhouse_growth.seo_site_audit_runs": GreenhouseGrowthSeoSiteAuditRuns;
   "greenhouse_growth.seo_targets": GreenhouseGrowthSeoTargets;
   "greenhouse_hiring.assessment_fairness": GreenhouseHiringAssessmentFairness;
+  "greenhouse_hiring.candidate_document_review_projection": GreenhouseHiringCandidateDocumentReviewProjection;
   "greenhouse_hiring.candidate_facet": GreenhouseHiringCandidateFacet;
+  "greenhouse_hiring.candidate_review_access_audit": GreenhouseHiringCandidateReviewAccessAudit;
   "greenhouse_hiring.hiring_application": GreenhouseHiringHiringApplication;
   "greenhouse_hiring.hiring_application_intake_events": GreenhouseHiringHiringApplicationIntakeEvents;
   "greenhouse_hiring.hiring_assessment": GreenhouseHiringHiringAssessment;

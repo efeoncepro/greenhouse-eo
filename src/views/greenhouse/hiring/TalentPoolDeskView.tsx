@@ -1,13 +1,15 @@
 'use client'
 
-import { useMemo, useRef, useState, useTransition } from 'react'
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 
 import NextLink from 'next/link'
 import { useRouter } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import ButtonBase from '@mui/material/ButtonBase'
+import CircularProgress from '@mui/material/CircularProgress'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
@@ -38,6 +40,7 @@ import {
   GreenhouseDisclosureTrigger
 } from '@/components/greenhouse/primitives'
 import EmptyState from '@/components/greenhouse/EmptyState'
+import GreenhouseDocumentPreview from '@/components/greenhouse/documents/GreenhouseDocumentPreview'
 import type { HiringDeskCopy } from '@/lib/copy'
 import { formatDate } from '@/lib/format'
 import type {
@@ -46,6 +49,7 @@ import type {
   TalentPoolProfileDto,
   TalentPoolReasonCode
 } from '@/lib/hiring/talent-pool'
+import type { CandidateDocumentFileRow, HiringApplicationDocumentsViewModel } from '@/lib/hiring/documents'
 
 import HiringDeskFrame from './HiringDeskFrame'
 
@@ -67,6 +71,8 @@ interface TalentPoolDeskViewProps {
   readEnabled: boolean
   inviteEnabled: boolean
   canInvite: boolean
+  /** Synthetic, non-production fixture used only by the governed visual-evidence route. */
+  previewDocuments?: Record<string, HiringApplicationDocumentsViewModel>
 }
 
 const EMPTY_FILTERS: Filters = { query: '', capability: '', seniority: '', language: '', country: '', availability: '' }
@@ -135,18 +141,188 @@ const TalentEvidence = ({
   </Box>
 )
 
+const TalentApplicationDocuments = ({
+  applicationId,
+  candidateName,
+  documentCopy,
+  profileId,
+  closeLabel,
+  previewDocument
+}: {
+  applicationId: string
+  candidateName: string
+  documentCopy: HiringDeskCopy['application']['documentsPanel']
+  profileId: string
+  closeLabel: string
+  previewDocument?: HiringApplicationDocumentsViewModel
+}) => {
+  const [documents, setDocuments] = useState<HiringApplicationDocumentsViewModel | null>(previewDocument ?? null)
+  const [loading, setLoading] = useState(!previewDocument)
+  const [failed, setFailed] = useState(false)
+  const [viewer, setViewer] = useState<CandidateDocumentFileRow | null>(null)
+
+  useEffect(() => {
+    if (previewDocument) {
+      setDocuments(previewDocument)
+      setLoading(false)
+      setFailed(false)
+
+      return
+    }
+
+    let active = true
+
+    setLoading(true)
+    setFailed(false)
+    void fetch(
+      `/api/hiring/talent-pool/${encodeURIComponent(profileId)}/applications/${encodeURIComponent(applicationId)}/documents`,
+      { cache: 'no-store' }
+    )
+      .then(async response => {
+        if (!response.ok) throw new Error('talent_pool_documents_unavailable')
+
+        return (await response.json()) as HiringApplicationDocumentsViewModel
+      })
+      .then(result => {
+        if (active) setDocuments(result)
+      })
+      .catch(() => {
+        if (active) setFailed(true)
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [applicationId, previewDocument, profileId])
+
+  const cv = documents?.files.find(file => file.kind === 'cv') ?? null
+
+  const detail =
+    cv?.status === 'quarantined'
+      ? documentCopy.quarantinedBody
+      : cv?.status === 'pending'
+        ? documentCopy.pendingBody
+        : cv?.status === 'legacy_unscanned'
+          ? documentCopy.legacyBody
+          : cv?.status === 'missing'
+            ? documentCopy.noCv
+            : (cv?.fileName ?? documentCopy.noCv)
+
+  return (
+    <Paper variant='outlined' data-capture='talent-pool-application-document' sx={{ p: 2, borderRadius: 2 }}>
+      {loading ? (
+        <Stack direction='row' spacing={1.5} alignItems='center' role='status' aria-live='polite'>
+          <CircularProgress size={18} aria-label={documentCopy.viewerLoading} />
+          <Typography variant='body2' color='text.secondary'>
+            {documentCopy.viewerLoading}
+          </Typography>
+        </Stack>
+      ) : failed ? (
+        <Alert severity='error'>{documentCopy.loadError}</Alert>
+      ) : (
+        <Stack spacing={1.5}>
+          <Stack direction='row' alignItems='flex-start' justifyContent='space-between' gap={2}>
+            <Box sx={{ minWidth: 0 }}>
+              <Typography variant='subtitle2' color='text.primary'>
+                {documentCopy.cvLabel}
+              </Typography>
+              <Typography variant='caption' color='text.secondary' sx={{ overflowWrap: 'anywhere' }}>
+                {detail}
+              </Typography>
+            </Box>
+            {cv?.openHref ? (
+              <GreenhouseButton
+                kind='secondaryAction'
+                size='small'
+                leadingIconClassName='tabler-eye'
+                onClick={() => setViewer(cv)}
+              >
+                {documentCopy.view}
+              </GreenhouseButton>
+            ) : null}
+          </Stack>
+        </Stack>
+      )}
+
+      <Dialog
+        open={Boolean(viewer)}
+        onClose={() => setViewer(null)}
+        maxWidth='lg'
+        fullWidth
+        aria-labelledby={`talent-pool-document-${applicationId}`}
+        PaperProps={{ 'data-capture': 'talent-pool-document-viewer', sx: { blockSize: '90vh' } }}
+      >
+        <DialogTitle id={`talent-pool-document-${applicationId}`}>
+          {documentCopy.viewerTitle.replace('{document}', documentCopy.cvLabel).replace('{name}', candidateName)}
+        </DialogTitle>
+        <DialogContent dividers sx={{ display: 'flex', justifyContent: 'center', backgroundColor: 'action.hover' }}>
+          {viewer?.openHref ? (
+            <GreenhouseDocumentPreview
+              url={viewer.openHref}
+              mimeType={viewer.mimeType ?? 'application/octet-stream'}
+              fileName={viewer.fileName ?? ''}
+              renderEscapeHatch={false}
+              copy={{
+                loading: documentCopy.viewerLoading,
+                loadError: documentCopy.viewerLoadError,
+                unsupported: documentCopy.viewerUnsupported,
+                noEmbed: documentCopy.viewerNoEmbed,
+                openInNewTab: documentCopy.viewerOpenInNewTab,
+                frameTitle: documentCopy.viewerFrameTitle
+              }}
+            />
+          ) : null}
+        </DialogContent>
+        <DialogActions>
+          {viewer?.openHref ? (
+            <Button
+              component='a'
+              href={viewer.openHref}
+              target='_blank'
+              rel='noopener noreferrer'
+              startIcon={<i className='tabler-external-link' />}
+            >
+              {documentCopy.viewerOpenInNewTab}
+            </Button>
+          ) : null}
+          {viewer?.downloadHref ? (
+            <Button
+              component='a'
+              href={viewer.downloadHref}
+              variant='outlined'
+              startIcon={<i className='tabler-download' />}
+            >
+              {documentCopy.download}
+            </Button>
+          ) : null}
+          <Button onClick={() => setViewer(null)}>{closeLabel}</Button>
+        </DialogActions>
+      </Dialog>
+    </Paper>
+  )
+}
+
 const TalentProfilePanel = ({
   profile,
   copy,
   onClose,
   onInvite,
-  canInvite
+  canInvite,
+  documentCopy,
+  commonClose,
+  previewDocuments
 }: {
   profile: TalentPoolProfileDto
   copy: HiringDeskCopy['talentPool']
   onClose: () => void
   onInvite: () => void
   canInvite: boolean
+  documentCopy: HiringDeskCopy['application']['documentsPanel']
+  commonClose: string
+  previewDocuments?: Record<string, HiringApplicationDocumentsViewModel>
 }) => {
   const applications = uniqueApplications(profile.evidence)
 
@@ -229,16 +405,25 @@ const TalentProfilePanel = ({
           <Typography variant='h6'>{copy.applications}</Typography>
           <Stack spacing={1.5} sx={{ mt: 1.5 }}>
             {applications.map(applicationId => (
-              <GreenhouseButton
-                key={applicationId}
-                component={NextLink}
-                href={`/agency/hiring/applications/${encodeURIComponent(applicationId)}`}
-                kind='secondaryAction'
-                size='small'
-                leadingIconClassName='tabler-external-link'
-              >
-                {copy.openApplication}
-              </GreenhouseButton>
+              <Stack key={applicationId} spacing={1}>
+                <TalentApplicationDocuments
+                  applicationId={applicationId}
+                  candidateName={profile.displayName}
+                  documentCopy={documentCopy}
+                  profileId={profile.talentProfileId}
+                  closeLabel={commonClose}
+                  previewDocument={previewDocuments?.[applicationId]}
+                />
+                <GreenhouseButton
+                  component={NextLink}
+                  href={`/agency/hiring/applications/${encodeURIComponent(applicationId)}?tab=documents`}
+                  kind='inlineAction'
+                  size='small'
+                  leadingIconClassName='tabler-external-link'
+                >
+                  {copy.openApplication}
+                </GreenhouseButton>
+              </Stack>
             ))}
           </Stack>
         </>
@@ -254,7 +439,8 @@ const TalentPoolDeskView = ({
   openings,
   readEnabled,
   inviteEnabled,
-  canInvite
+  canInvite,
+  previewDocuments
 }: TalentPoolDeskViewProps) => {
   const t = copy.talentPool
   const router = useRouter()
@@ -279,9 +465,9 @@ const TalentPoolDeskView = ({
 
   const asOf = useMemo(
     () =>
-      result.items.reduce(
-        (latest, item) => (item.updatedAt > latest ? item.updatedAt : latest),
-        result.items[0]?.updatedAt ?? new Date().toISOString()
+      result.items.reduce<string | null>(
+        (latest, item) => (!latest || item.updatedAt > latest ? item.updatedAt : latest),
+        null
       ),
     [result.items]
   )
@@ -319,6 +505,8 @@ const TalentPoolDeskView = ({
   const selectProfile = async (profile: TalentPoolProfileDto, trigger: HTMLElement) => {
     restoreFocusRef.current = trigger
     setSelected(profile)
+
+    if (previewDocuments) return
 
     try {
       const response = await fetch(`/api/hiring/talent-pool/${encodeURIComponent(profile.talentProfileId)}`, {
@@ -415,7 +603,7 @@ const TalentPoolDeskView = ({
           {interpolate(t.results, { count: result.items.length })}
         </Typography>
         <Typography variant='caption' color='text.secondary'>
-          {interpolate(t.updated, { date: formatDate(asOf) })}
+          {interpolate(t.updated, { date: asOf ? formatDate(asOf) : t.unknown })}
         </Typography>
       </Stack>
 
@@ -479,7 +667,10 @@ const TalentPoolDeskView = ({
                           display: 'block',
                           textAlign: 'start',
                           borderRadius: 0,
-                          '&:focus-visible': { outline: 2, outlineColor: 'primary.main', outlineOffset: 2 }
+                          '&:focus-visible': {
+                            outline: '2px solid var(--mui-palette-primary-main)',
+                            outlineOffset: 2
+                          }
                         }}
                       >
                         <Typography variant='subtitle2' color='text.primary'>
@@ -540,7 +731,10 @@ const TalentPoolDeskView = ({
                   textAlign: 'start',
                   p: 2,
                   cursor: 'pointer',
-                  '&:focus-visible': { outline: 2, outlineColor: 'primary.main', outlineOffset: -2 }
+                  '&:focus-visible': {
+                    outline: '2px solid var(--mui-palette-primary-main)',
+                    outlineOffset: -2
+                  }
                 }}
               >
                 <Stack direction='row' justifyContent='space-between' gap={2}>
@@ -747,6 +941,9 @@ const TalentPoolDeskView = ({
                       onClose={() => setSelected(null)}
                       onInvite={openInvite}
                       canInvite={canInvite && inviteEnabled}
+                      documentCopy={copy.application.documentsPanel}
+                      commonClose={copy.common.close}
+                      previewDocuments={previewDocuments}
                     />
                   ) : null
                 }
