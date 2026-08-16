@@ -426,6 +426,33 @@ Relación con superficies vecinas (sinergias EPIC-011):
 | Fairness (TASK-1365) | Prohibido capturar atributos demográficos en notas (regla documental + manual). |
 | Cuenta candidata (TASK-1729/1730) | El estado público nunca filtra notas — la tabla nace internal-only. |
 
+### Superficie UI del consumer (contrato de placement para la task follow-up)
+
+El expediente vive en la **Application 360** (`/agency/hiring/applications/[applicationId]`,
+`src/views/greenhouse/hiring/Application360View.tsx`, view code
+`gestion.hiring_application_detail`) — NO en un perfil de persona/usuario. Racional: la nota
+es un juicio sobre ESA candidatura (application-scoped por FK), no un atributo permanente de
+la persona; una postulación futura de la misma persona arranca con expediente propio.
+
+- **Anclaje**: la vista hoy tiene tabs `overview | assessment | documents | decision |
+  activity`; el tab `activity` es un timeline SINTÉTICO sin persistencia (derivado de
+  createdAt/stage/decisionHistory). La task `ui-ux` decide entre (a) tab nuevo "Expediente"
+  o (b) convertir `activity` en el expediente real (notas persistidas intercaladas con los
+  eventos de etapa) — decisión de diseño con wireframe robusto, no se resuelve aquí.
+- **Momento smart en la UI**: con el assessment corregido, el operador dispara "Generar
+  análisis" (propose), revisa el borrador con su evidencia citada y la sección "no
+  verificable", edita si corresponde y confirma — la nota queda en el expediente y se
+  consulta durante entrevista y decisión.
+- **Visibilidad**: solo operadores internos con capability (`hiring.application.read` para
+  leer; `hiring.application.annotate` para escribir/proponer/confirmar — tier gobernanza).
+  El candidato JAMÁS: ni portal candidato (TASK-1729/1730), ni email, ni review packet MCP.
+- **Puente persona**: la historia longitudinal per-persona es de People 360
+  (TASK-1732/1733) — podrá ENLAZAR a los expedientes de cada application, pero las notas
+  siguen viviendo en su candidatura (sin proyección person-scoped en esta task).
+- **Interim sin UI**: el flujo completo es operable por API desde el día uno del backend
+  (Full API Parity) — Nexa o un agente en sesión pueden proponer/confirmar expedientes vía
+  `/api/hiring/applications/[id]/dossier` y `/notes` antes de que exista la superficie.
+
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
