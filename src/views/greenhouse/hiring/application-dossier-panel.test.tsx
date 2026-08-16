@@ -217,4 +217,47 @@ describe('ApplicationDossierPanel — render estructurado del borrador (TASK-173
     expect(screen.queryByText('Domina Coordinación de delivery')).toBeNull()
     expect(screen.getByRole('heading', { name: 'Análisis ajustado' })).toBeTruthy()
   })
+
+  it('respuesta del GET traducida (propuesta v1, TASK-1737) → el panel conserva el render estructurado', async () => {
+    // El server tradujo key→nombre humano AMBOS lados con el mismo replacer: el dossier
+    // de la propuesta, el bodyMd canónico y el bodyMd de la nota agent (reader). La
+    // igualdad nota ≡ render canónico se preserva y la rama estructurada sigue eligiéndose.
+    const translatedDraft: EvaluationDossierDraft = {
+      ...draftFixture,
+      resumenEjecutivo: 'Fuerte en Coordinación de entrega; brecha en Comunicación con clientes.',
+      gaps: [
+        {
+          afirmacion: 'Brecha en Comunicación con clientes',
+          evidencia: 'Comunicación con clientes con score efectivo: 55'
+        }
+      ]
+    }
+
+    const translatedBodyMd =
+      '## Resumen ejecutivo\n\nFuerte en Coordinación de entrega; brecha en Comunicación con clientes.'
+
+    const proposal = proposalFixture('confirmed')
+
+    mockDossierGet({
+      aiEnabled: true,
+      proposal: { ...proposal, proposed: { ...proposal.proposed, dossier: translatedDraft } },
+      proposalBodyMd: translatedBodyMd,
+      proposalStale: null,
+      viewerBlindUntilScorecardSubmitted: false
+    })
+
+    renderPanel({ initialNotes: [agentNote(translatedBodyMd)] })
+
+    // Rama estructurada con los NOMBRES humanos (nada de snake_case en pantalla).
+    await waitFor(() => {
+      expect(screen.getByText(translatedDraft.resumenEjecutivo)).toBeTruthy()
+    })
+
+    expect(screen.getByText('Brecha en Comunicación con clientes')).toBeTruthy()
+    expect(screen.getAllByText(expediente.evidenceTitle).length).toBeGreaterThan(0)
+    expect(screen.queryByText(/delivery_coordination|client_relationship_comm/)).toBeNull()
+
+    // Nada de markdown crudo: la nota NO cayó al fallback.
+    expect(screen.queryByText(/## /)).toBeNull()
+  })
 })

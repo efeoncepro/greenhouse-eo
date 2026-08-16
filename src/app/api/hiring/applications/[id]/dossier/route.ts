@@ -10,12 +10,15 @@ import {
   assembleEvaluationDossierPacket,
   computeDossierInputDigest,
   confirmEvaluationDossier,
+  getCompetencyNameMapForApplication,
   getCurrentDossierProposalForApplication,
   getDossierProposalById,
   getHiringDossierModel,
   isHiringDossierAiEnabled,
   proposeEvaluationDossier,
-  renderEvaluationDossierMarkdown
+  renderEvaluationDossierMarkdown,
+  translateCompetencyKeys,
+  translateDossierProposalForDisplay
 } from '@/lib/hiring/dossier-ai'
 import type { DossierProposalDecision, EvaluationDossierDraft } from '@/types/hiring-dossier-ai'
 import { requireInternalTenantContext } from '@/lib/tenant/authorization'
@@ -64,21 +67,34 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       })
     }
 
-    const proposal = await getCurrentDossierProposalForApplication(id)
+    const stored = await getCurrentDossierProposalForApplication(id)
 
     // Precarga del modo edición (el render vive server-side; `renderEvaluationDossierMarkdown`
     // es server-only) + señal de staleness: digest vigente ≠ digest de la propuesta.
     // TASK-1737: el bodyMd se expone también para propuestas decididas — el panel compara
     // nota confirmada vs render canónico para preferir el render estructurado SOLO cuando
     // el humano no editó el cuerpo (lo editado siempre gana como fuente de la nota).
+    //
+    // Capa de display al servir: las propuestas v1 ya almacenadas conservan keys
+    // snake_case en `proposed_json` (ledger inmutable — NUNCA se muta la fila); acá se
+    // traducen key→nombre humano en lectura. INVARIANTE: `proposalBodyMd` se traduce
+    // aplicando el replacer sobre el render del dossier ALMACENADO — la misma operación
+    // que el reader de notas aplica al bodyMd almacenado — para que la igualdad
+    // nota-sin-editar ≡ render canónico se preserve byte a byte y el panel conserve la
+    // rama estructurada.
+    let proposal = stored
     let proposalBodyMd: string | null = null
     let proposalStale: boolean | null = null
 
-    if (proposal) {
-      const dossier = proposal.proposed.dossier as EvaluationDossierDraft | undefined
+    if (stored) {
+      const nameByKey = await getCompetencyNameMapForApplication(id)
 
-      if (dossier && typeof dossier.resumenEjecutivo === 'string') {
-        proposalBodyMd = renderEvaluationDossierMarkdown(dossier)
+      proposal = translateDossierProposalForDisplay(stored, nameByKey)
+
+      const storedDossier = stored.proposed.dossier as EvaluationDossierDraft | undefined
+
+      if (storedDossier && typeof storedDossier.resumenEjecutivo === 'string') {
+        proposalBodyMd = translateCompetencyKeys(renderEvaluationDossierMarkdown(storedDossier), nameByKey)
       }
     }
 

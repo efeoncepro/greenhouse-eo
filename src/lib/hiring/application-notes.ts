@@ -18,6 +18,9 @@ import {
 } from '@/types/hiring-application-notes'
 
 import { isViewerBlindForApplicationEvaluation } from './assessment/instances'
+// Import directo del módulo display (NO el barrel de dossier-ai): el barrel arrastra
+// confirm.ts, que importa este módulo — sería un ciclo. display.ts no importa de acá.
+import { getCompetencyNameMapForApplication, translateAgentNoteBodiesForDisplay } from './dossier-ai/display'
 import { HiringNotFoundError, HiringValidationError } from './errors'
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -197,7 +200,15 @@ export const listHiringApplicationNotes = async (
     [applicationId]
   )
 
-  const all = rows.map(normalizeNote)
+  const normalized = rows.map(normalizeNote)
+
+  // TASK-1737 — display al servir: notas source='agent' materializadas desde propuestas
+  // v1 pueden traer keys snake_case en el bodyMd almacenado (append-only — la fila NUNCA
+  // se muta); se traducen key→nombre humano acá, en el reader canónico, para que TODOS
+  // los consumers (GET de notas, página server-fed del 360) sirvan texto humano.
+  const all = normalized.some(note => note.source === 'agent')
+    ? translateAgentNoteBodiesForDisplay(normalized, await getCompetencyNameMapForApplication(applicationId))
+    : normalized
 
   const blind = viewerUserId ? await isViewerBlindForApplicationEvaluation(applicationId, viewerUserId) : false
 

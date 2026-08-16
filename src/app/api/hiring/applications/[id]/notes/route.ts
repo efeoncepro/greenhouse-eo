@@ -43,6 +43,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       tenant.userId
     )
 
+    // TASK-1737 — la traducción key→nombre de notas source='agent' (propuestas v1) vive
+    // en el reader canónico `listHiringApplicationNotes`, no acá: la ruta queda delgada.
     return NextResponse.json({ notes, hiddenNoteCount, viewerBlindUntilScorecardSubmitted })
   } catch (error) {
     return toHiringErrorResponse(error, 'application_notes_list')

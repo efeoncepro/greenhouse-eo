@@ -35,8 +35,11 @@ const escapeRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\
  * Defensa post-proceso (TASK-1737): traduce toda key técnica conocida del packet a su
  * nombre humano dentro de los strings del output. Keys más largas primero para que una
  * key que contiene a otra (p. ej. `seo_tecnico` vs `seo`) no se traduzca parcialmente.
+ * Exportada porque también es la capa de display-al-servir (display.ts): las propuestas
+ * v1 ya almacenadas conservan keys en `proposed_json` (ledger inmutable) y se traducen
+ * al leer, con la MISMA mecánica (word boundary + orden por longitud).
  */
-const buildCompetencyKeyReplacer = (keyToName: Record<string, string>): ((text: string) => string) => {
+export const buildCompetencyKeyReplacer = (keyToName: Record<string, string>): ((text: string) => string) => {
   const entries = Object.entries(keyToName)
     .filter(([key, name]) => key.length > 0 && name.length > 0 && key !== name)
     .sort(([a], [b]) => b.length - a.length)
@@ -49,6 +52,10 @@ const buildCompetencyKeyReplacer = (keyToName: Record<string, string>): ((text: 
       text
     )
 }
+
+/** Conveniencia one-shot sobre el replacer: traduce keys conocidas en un solo string. */
+export const translateCompetencyKeys = (text: string, keyToName: Record<string, string>): string =>
+  buildCompetencyKeyReplacer(keyToName)(text)
 
 /** JSON Schema forzado en el structured call (Anthropic inputSchema). */
 export const EVALUATION_DOSSIER_JSON_SCHEMA = {

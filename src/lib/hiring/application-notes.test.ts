@@ -21,6 +21,22 @@ vi.mock('./assessment/instances', () => ({
   isViewerBlindForApplicationEvaluation: (...args: unknown[]) => isViewerBlindMock(...args)
 }))
 
+// TASK-1737 — la traducción key→nombre en lectura vive en display.ts (testeada en
+// display.test.ts); acá se mockea para aislar el reader y probar solo el WIRING:
+// se traduce únicamente cuando hay notas agent, con el mapa de la application.
+const nameMapMock = vi.fn(async (...args: [string]): Promise<Record<string, string>> => {
+  void args
+
+  return {}
+})
+
+const translateNotesMock = vi.fn((...args: [unknown[], Record<string, string>]) => args[0])
+
+vi.mock('./dossier-ai/display', () => ({
+  getCompetencyNameMapForApplication: (...args: [string]) => nameMapMock(...args),
+  translateAgentNoteBodiesForDisplay: (...args: [unknown[], Record<string, string>]) => translateNotesMock(...args)
+}))
+
 const { recordHiringApplicationNote, listHiringApplicationNotes } = await import('./application-notes')
 
 const noteRow = {
@@ -202,5 +218,27 @@ describe('listHiringApplicationNotes', () => {
     expect(result.notes).toHaveLength(4)
     expect(result.hiddenNoteCount).toBe(0)
     expect(result.viewerBlindUntilScorecardSubmitted).toBe(false)
+  })
+
+  it('con notas agent: traduce en lectura con el mapa de la application (TASK-1737)', async () => {
+    runQueryMock.mockResolvedValueOnce(expedienteRows)
+    nameMapMock.mockResolvedValueOnce({ delivery_coordination: 'Coordinación de entrega' })
+
+    await listHiringApplicationNotes('happ-1')
+
+    expect(nameMapMock).toHaveBeenCalledWith('happ-1')
+    expect(translateNotesMock).toHaveBeenCalledTimes(1)
+    expect(translateNotesMock.mock.calls[0][1]).toEqual({ delivery_coordination: 'Coordinación de entrega' })
+  })
+
+  it('sin notas agent: NO consulta el mapa de competencias (query liviana solo si aplica)', async () => {
+    runQueryMock.mockResolvedValueOnce([
+      makeRow({ note_id: 'hnote-humana', kind: 'general', source: 'human', author_user_id: 'user-otro' })
+    ])
+
+    await listHiringApplicationNotes('happ-1')
+
+    expect(nameMapMock).not.toHaveBeenCalled()
+    expect(translateNotesMock).not.toHaveBeenCalled()
   })
 })
