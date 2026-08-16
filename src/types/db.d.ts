@@ -7761,6 +7761,23 @@ export interface GreenhouseHiringHiringApplication {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseHiringHiringApplicationDossierProposal {
+  application_id: string;
+  confirmed_at: Timestamp | null;
+  confirmed_by: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  decision_note: string | null;
+  input_digest: string;
+  model: string;
+  prompt_version: string;
+  proposal_id: Generated<string>;
+  proposed_json: Generated<Json>;
+  provider: string;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseHiringHiringApplicationIntakeEvents {
   created_at: Generated<Timestamp>;
   email_hash: string | null;
@@ -12469,6 +12486,7 @@ export interface DB {
   "greenhouse_hiring.candidate_facet": GreenhouseHiringCandidateFacet;
   "greenhouse_hiring.candidate_review_access_audit": GreenhouseHiringCandidateReviewAccessAudit;
   "greenhouse_hiring.hiring_application": GreenhouseHiringHiringApplication;
+  "greenhouse_hiring.hiring_application_dossier_proposal": GreenhouseHiringHiringApplicationDossierProposal;
   "greenhouse_hiring.hiring_application_intake_events": GreenhouseHiringHiringApplicationIntakeEvents;
   "greenhouse_hiring.hiring_application_note": GreenhouseHiringHiringApplicationNote;
   "greenhouse_hiring.hiring_assessment": GreenhouseHiringHiringAssessment;
