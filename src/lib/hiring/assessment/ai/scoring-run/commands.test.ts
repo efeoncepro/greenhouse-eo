@@ -47,6 +47,13 @@ vi.mock('./store', () => ({
 const { resolveRunTransition } = await import('./state')
 
 const {
+  AI_SCORING_RUN_ITEM_STATUSES,
+  AI_SCORING_RUN_ITEM_TERMINAL_STATUSES,
+  AI_SCORING_RUN_STATUSES,
+  AI_SCORING_RUN_TERMINAL_STATUSES,
+} = await import('@/types/hiring-assessment-ai-run')
+
+const {
   cancelAssessmentAiScoringRun,
   computeScoringRunInputDigest,
   listEligibleResponses,
@@ -377,5 +384,48 @@ describe('reconcileAssessmentAiScoringRuns', () => {
     txClient.query.mockResolvedValue({ rows: [] })
 
     await expect(reconcileAssessmentAiScoringRuns(null)).resolves.toBeTruthy()
+  })
+
+  it('paridad SQL↔TS: los filtros terminales del reconcile derivan del enum canónico (incluye rejected_to_manual)', async () => {
+    // Auditoría 2026-08-16: la versión hardcodeada omitía `rejected_to_manual` — el
+    // reconcile podía re-transicionar items terminales y tratar rejected_to_manual como
+    // pendiente (runs que jamás cerraban). Este test rompe si la SQL diverge del enum.
+    supersedeOrphansMock.mockResolvedValue([])
+    txClient.query.mockResolvedValue({ rows: [] })
+
+    await reconcileAssessmentAiScoringRuns(null)
+
+    const sqlTexts = txClient.query.mock.calls.map(([text]) => String(text))
+    const itemUpdate = sqlTexts.find(t => t.includes('hiring_assessment_ai_scoring_run_item i'))
+    const runUpdate = sqlTexts.find(t => t.includes('hiring_assessment_ai_scoring_run u'))
+
+    expect(itemUpdate).toBeDefined()
+    expect(runUpdate).toBeDefined()
+
+    // TODO status terminal de item aparece en el NOT IN (item filter + guard del run close).
+    for (const status of AI_SCORING_RUN_ITEM_TERMINAL_STATUSES) {
+      expect(itemUpdate).toContain(`'${status}'`)
+      expect(runUpdate).toContain(`'${status}'`)
+    }
+
+    // Ningún status NO-terminal de item se cuela al filtro terminal.
+    for (const status of AI_SCORING_RUN_ITEM_STATUSES) {
+      if ((AI_SCORING_RUN_ITEM_TERMINAL_STATUSES as readonly string[]).includes(status)) continue
+
+      expect(itemUpdate).not.toContain(`'${status}'`)
+    }
+
+    // El filtro terminal de runs también deriva del enum de runs.
+    for (const status of AI_SCORING_RUN_TERMINAL_STATUSES) {
+      expect(runUpdate).toContain(`u.status NOT IN`)
+      expect(runUpdate).toContain(`'${status}'`)
+    }
+
+    for (const status of AI_SCORING_RUN_STATUSES) {
+      if ((AI_SCORING_RUN_TERMINAL_STATUSES as readonly string[]).includes(status)) continue
+      if ((AI_SCORING_RUN_ITEM_TERMINAL_STATUSES as readonly string[]).includes(status)) continue
+
+      expect(runUpdate).not.toContain(`'${status}'`)
+    }
   })
 })

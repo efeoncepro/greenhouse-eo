@@ -331,6 +331,30 @@ almacena narrativa duplicada; el dossier nunca almacena los hechos del manifest.
    `hiring.assessment.score`: la implementación de Slice 1/4 la confirma con el catálogo de
    entitlements real (coverage test en el mismo PR).
 
+## Delta 2026-08-16 — Correcciones de auditoría doble + riesgo residual
+
+Cierre de la auditoría doble sobre `src/lib/hiring/assessment/ai/scoring-run/**` (mismo día del ADR):
+
+- **Muestra ciega ahora ESTRUCTURAL en el reader** (fix de auditoría 2026-08-16): `review-reader.ts`
+  omite el bloque `proposal` del DTO mientras un item `quality_sample` no tenga resolución humana —
+  la ceguera de D2 la garantiza el reader, no la disciplina de una UI futura (procedural). Tras la
+  resolución, el proposal aparece para contraste/auditoría; `saw_proposal_before_scoring` sigue
+  siendo la evidencia anti-anclaje por item. Fixes hermanos del mismo pase: el filtro terminal de
+  items del reconcile (`commands.ts`) ahora se DERIVA del enum canónico (el literal hardcodeado
+  omitía `rejected_to_manual` — runs que jamás cerraban) con test de paridad SQL↔TS, y el loop del
+  drain ya no aborta el tick ante un run venenoso (head-of-line starvation): observa vía
+  `captureWithDomain`, registra `failedRuns` en el summary y continúa.
+- **Riesgo residual — flip de `EXCEPTION_POLICY` sigue procedural**: prender
+  `HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED` depende del runbook + ledger (humano verifica la
+  evidencia del promotion gate antes del flip); nada mecánico impide un flip sin evidencia.
+  Follow-up declarado en `TASK-1734` para atarlo a una policy row con evidencia de eval que el
+  drain verifique en runtime.
+- **Replay post-terminal crea runs vacíos benignos** (documentado, no bug): un
+  `hiring.assessment.submitted` re-entregado después de que el run original quedó terminal crea un
+  run nuevo que enumera 0 respuestas elegibles (todas ya con score humano) y queda
+  `awaiting_review` con reason `no_eligible_items` — sin doble scoring, sin gasto de provider,
+  cerrable por reconcile. Es la evidencia honesta del replay, no trabajo fantasma.
+
 ## Referencias
 
 - [`TASK-1734`](../tasks/in-progress/TASK-1734-assessment-ai-scale-operator-exception-review.md) — spec + `## Delta 2026-08-16` (runtime-verificado)

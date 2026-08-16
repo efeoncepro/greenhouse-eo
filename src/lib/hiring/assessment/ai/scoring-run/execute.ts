@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import type { AiScoringRun, AiScoringRunItem, AiScoringRunStatus } from '@/types/hiring-assessment-ai-run'
 import type { ResponseScoreProposal } from '@/types/hiring-assessment-ai'
@@ -56,6 +57,11 @@ export interface DrainAssessmentAiScoringRunsSummary {
   claimed: number
   busy: number
   runs: ExecuteScoringRunSummary[]
+  /**
+   * Runs reclamados cuya ejecución explotó en ESTE tick (observados vía Sentry, lease
+   * liberada). El drain sigue con los demás — un run venenoso jamás bloquea el tick.
+   */
+  failedRuns: string[]
 }
 
 // ── Helpers puros ──
@@ -511,6 +517,7 @@ export const drainAssessmentAiScoringRuns = async (
     claimed: 0,
     busy: 0,
     runs: [],
+    failedRuns: [],
   }
 
   for (const runId of candidates) {
@@ -526,10 +533,17 @@ export const drainAssessmentAiScoringRuns = async (
     try {
       summary.runs.push(await executeClaimedScoringRun(claimed))
     } catch (error) {
-      // Un run que explota no bloquea el resto del drain; la lease se libera para que el
-      // próximo tick lo retome (los items claimed se recuperan vía reclaimed_after_lease_expiry).
+      // Anti head-of-line blocking (auditoría 2026-08-16): un run que explota NO aborta el
+      // tick — se observa en Sentry, se registra como fallido en el summary y el loop
+      // CONTINÚA con los demás runs. Antes acá había un `throw` que convertía al run
+      // venenoso (primero por created_at ASC) en starvation determinista de todo el drain.
+      // La lease se libera para que el próximo tick lo retome (los items claimed se
+      // recuperan vía reclaimed_after_lease_expiry).
+      captureWithDomain(error, 'hiring', {
+        tags: { source: 'assessment_ai_scoring_drain', run_id: runId },
+      })
+      summary.failedRuns.push(runId)
       await releaseScoringRunLease(runId, drainOwner).catch(() => undefined)
-      throw error
     }
   }
 

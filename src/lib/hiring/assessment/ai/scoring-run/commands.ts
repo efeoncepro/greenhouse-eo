@@ -7,10 +7,12 @@ import type { PoolClient } from 'pg'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
-import type {
-  AiScoringRunWithItems,
-  ReconcileAiScoringRunsResult,
-  StartAiScoringRunResult,
+import {
+  AI_SCORING_RUN_ITEM_TERMINAL_STATUSES,
+  AI_SCORING_RUN_TERMINAL_STATUSES,
+  type AiScoringRunWithItems,
+  type ReconcileAiScoringRunsResult,
+  type StartAiScoringRunResult,
 } from '@/types/hiring-assessment-ai-run'
 import { HUMAN_RATED_QUESTION_TYPES } from '@/types/hiring-assessment'
 
@@ -344,7 +346,13 @@ export const cancelAssessmentAiScoringRun = async (
   })
 }
 
-const ITEM_TERMINAL_SQL = `('abstained', 'failed', 'stale', 'superseded_by_manual', 'cancelled', 'confirmed')`
+// Paridad SQL↔TS (auditoría 2026-08-16): los filtros terminales se DERIVAN del enum
+// canónico (`src/types/hiring-assessment-ai-run.ts`), igual que `rollback.ts` y los
+// reliability signals. NUNCA volver a un literal hardcodeado: la versión anterior omitía
+// `rejected_to_manual` (Slice 4) y el reconcile podía re-transicionar items terminales
+// y tratar `rejected_to_manual` como pendiente (runs que jamás cerraban).
+const ITEM_TERMINAL_SQL = `(${AI_SCORING_RUN_ITEM_TERMINAL_STATUSES.map(s => `'${s}'`).join(', ')})`
+const RUN_TERMINAL_SQL = `(${AI_SCORING_RUN_TERMINAL_STATUSES.map(s => `'${s}'`).join(', ')})`
 
 interface SupersededItemRow extends Record<string, unknown> {
   run_item_id: unknown
@@ -409,7 +417,7 @@ export const reconcileAssessmentAiScoringRuns = async (
          SET status = 'cancelled', status_reason = 'superseded_by_manual', updated_at = NOW()
        FROM greenhouse_hiring.hiring_assessment a
        WHERE a.assessment_id = u.assessment_id
-         AND u.status NOT IN ('confirmed', 'cancelled', 'failed')
+         AND u.status NOT IN ${RUN_TERMINAL_SQL}
          AND a.status = 'scored'
          AND NOT EXISTS (
            SELECT 1 FROM greenhouse_hiring.hiring_assessment_ai_scoring_run_item i

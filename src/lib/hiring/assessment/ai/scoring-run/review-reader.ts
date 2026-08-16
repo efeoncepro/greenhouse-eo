@@ -87,6 +87,15 @@ const normalizeReviewItem = (row: ReviewItemRow): AssessmentAiReviewItem => {
   const proposalId = nstr(row.proposal_id)
   const proposed = jsonVal(row.proposed_json)
 
+  // Ceguera ESTRUCTURAL de la muestra de calidad (auditoría 2026-08-16, ADR D2): mientras
+  // un item `quality_sample` no tenga resolución humana, el DTO OMITE el bloque `proposal`
+  // completo — la ceguera la garantiza el reader, no la disciplina de una UI futura
+  // (procedural). El revisor puntúa a ciegas vía `resolveScoringRunItem` (override con su
+  // propio `finalScore`) o confirma DESPUÉS; una vez resuelto, el proposal aparece para
+  // contraste y auditoría del manifest (`saw_proposal_before_scoring` sigue siendo la
+  // evidencia anti-anclaje por item).
+  const blindQualitySample = nstr(row.risk_class) === 'quality_sample' && row.resolution == null
+
   const perCriterion = Array.isArray(proposed.perCriterion)
     ? proposed.perCriterion.flatMap(entry => {
         if (!entry || typeof entry !== 'object') return []
@@ -114,7 +123,7 @@ const normalizeReviewItem = (row: ReviewItemRow): AssessmentAiReviewItem => {
     questionPrompt: str(row.question_prompt),
     questionType: str(row.question_type),
     answerText: reviewAnswerText(row.answer_json),
-    proposal: proposalId
+    proposal: proposalId && !blindQualitySample
       ? {
           proposalId,
           status: str(row.proposal_status),
@@ -155,6 +164,8 @@ export const buildAssessmentAiRunReviewCoverage = (
  *   se sirve silencioso).
  * - `coverage.digestStale` recomputa el digest HOY (modelo/prompt/policy efectivos +
  *   answers/rubric actuales) contra el digest inmutable del run.
+ * - Muestra ciega estructural: los items `quality_sample` SIN resolución llegan sin el
+ *   bloque `proposal` (el reader lo omite; no depende de que la UI lo oculte).
  */
 export const listAssessmentAiReviewItems = async (runId: string): Promise<AssessmentAiRunReview> => {
   const run = await getScoringRunById(runId)

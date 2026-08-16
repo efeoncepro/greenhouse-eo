@@ -142,7 +142,11 @@ export interface AssessmentAiReviewItem {
   questionType: string
   /** Texto de la respuesta (allowlist `text|value`; '' si malformada). */
   answerText: string
-  /** Evidencia del proposal (score sugerido + perCriterion + rationale) o null si no hay proposal. */
+  /**
+   * Evidencia del proposal (score sugerido + perCriterion + rationale). `null` si no hay
+   * proposal — y TAMBIÉN mientras un item `quality_sample` no tenga resolución humana:
+   * la muestra ciega es estructural en el reader (auditoría 2026-08-16), no procedural.
+   */
   proposal: {
     proposalId: string
     status: string

@@ -576,6 +576,17 @@ ejecutar dentro de la task (ya autorizado):
   client grant by default.
 - Extend promotion datasets as `TASK-1604` activates each new role/template; no template inherits approval from
   another template or model/prompt version.
+- Atadura mecánica flag↔promotion-gate (auditoría 2026-08-16): hoy el flip de
+  `HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED` es procedural (runbook + ledger). Follow-up: una policy row
+  con evidencia del promotion gate (reporte de eval aprobado, versionado) que el drain verifique en runtime
+  antes de honrar la policy — un flip sin evidencia degrada a `mandatory_review` para todo.
+- Parity de adapters para `start`/`reconcile` manual vía App API (`api/platform/app/*`): hoy los commands
+  existen como primitive canónica pero solo el evento de outbox / CLI los invoca; falta el contrato
+  programático gobernado para operador/Nexa/MCP (Full API Parity a nivel capability).
+- Asimetría del carril individual `TASK-1361` (auditoría 2026-08-16): `score-response.ts` hace fallback
+  `JSON.stringify(answer)` hacia el provider cuando la respuesta no matchea la allowlist `text|value`,
+  mientras el drain ABSTIENE (`answer_malformed`) sin gasto. Alinear el carril individual al abstain del
+  drain (misma allowlist, cero payload no-allowlisted al provider).
 
 ## Delta 2026-08-16 — Slice 3 harness code-complete
 

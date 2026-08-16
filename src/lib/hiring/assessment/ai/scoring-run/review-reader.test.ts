@@ -147,6 +147,59 @@ describe('listAssessmentAiReviewItems', () => {
     expect(review.items[0].answerText).toBe('')
   })
 
+  it('muestra ciega ESTRUCTURAL: un quality_sample sin resolver llega SIN bloque proposal', async () => {
+    // Auditoría 2026-08-16: la ceguera no puede depender de que una UI futura oculte el
+    // proposal (procedural) — el reader lo OMITE del DTO hasta que exista resolución humana.
+    runQueryMock.mockImplementation(async (text: string) => {
+      if (text.includes('FROM greenhouse_hiring.hiring_assessment ')) return [{ application_id: 'happ-1' }]
+
+      return [itemRow({ risk_class: 'quality_sample', resolution: null })]
+    })
+
+    const review = await listAssessmentAiReviewItems('asrun-1')
+    const item = review.items[0]
+
+    expect(item.riskClass).toBe('quality_sample')
+    expect(item.proposal).toBeNull()
+
+    // Ni el score ni el rationale de la propuesta se filtran por ningún otro campo del DTO.
+    expect(JSON.stringify(item)).not.toContain('62')
+    expect(JSON.stringify(item)).not.toContain('Cubre priorización')
+
+    // La cobertura del gate sigue contando la muestra pendiente (el confirm sigue bloqueado).
+    expect(review.coverage).toMatchObject({ samplePending: 1, mandatoryPending: 0 })
+  })
+
+  it('muestra ciega: DESPUÉS de resolver, el proposal del quality_sample sí aparece (contraste/auditoría)', async () => {
+    runQueryMock.mockImplementation(async (text: string) => {
+      if (text.includes('FROM greenhouse_hiring.hiring_assessment ')) return [{ application_id: 'happ-1' }]
+
+      return [
+        itemRow({
+          risk_class: 'quality_sample',
+          status: 'confirmed',
+          resolution: 'overridden',
+          saw_proposal_before_scoring: false,
+          resolved_by: 'user-2',
+          resolved_at: '2026-08-16T13:00:00.000Z',
+        }),
+      ]
+    })
+
+    const review = await listAssessmentAiReviewItems('asrun-1')
+    const item = review.items[0]
+
+    expect(item.resolution).toBe('overridden')
+    expect(item.proposal).toMatchObject({ proposalId: 'aiprop-1', score: 62 })
+  })
+
+  it('la ceguera NO aplica a mandatory_review: la excepción se revisa CON la evidencia del proposal', async () => {
+    const review = await listAssessmentAiReviewItems('asrun-1')
+
+    expect(review.items[0].riskClass).toBe('mandatory_review')
+    expect(review.items[0].proposal).not.toBeNull()
+  })
+
   it('marca digestStale cuando el digest recomputado difiere del digest del run', async () => {
     computeCurrentScoringRunDigestMock.mockResolvedValue('run-digest-CHANGED')
 

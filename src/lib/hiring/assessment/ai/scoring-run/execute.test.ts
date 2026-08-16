@@ -9,6 +9,7 @@ const runQueryMock = vi.fn()
 const withTransactionMock = vi.fn()
 const proposeScoreMock = vi.fn()
 const listEligibleResponsesMock = vi.fn()
+const captureWithDomainMock = vi.fn()
 
 const claimScoringRunLeaseMock = vi.fn()
 const insertRunItemsMock = vi.fn()
@@ -22,6 +23,10 @@ const transitionScoringRunMock = vi.fn()
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: (...args: unknown[]) => runQueryMock(...args),
   withGreenhousePostgresTransaction: (...args: unknown[]) => withTransactionMock(...args),
+}))
+
+vi.mock('@/lib/observability/capture', () => ({
+  captureWithDomain: (...args: unknown[]) => captureWithDomainMock(...args),
 }))
 
 vi.mock('../score-response', () => ({
@@ -393,12 +398,51 @@ describe('drainAssessmentAiScoringRuns — gates + claim atómico', () => {
     expect(claimScoringRunLeaseMock).toHaveBeenCalledTimes(2)
   })
 
-  it('un run que explota libera la lease y no queda tomado para siempre', async () => {
+  it('un run que explota libera la lease, se observa y NO aborta el tick', async () => {
     listClaimableScoringRunIdsMock.mockResolvedValue(['asrun-1'])
     claimScoringRunLeaseMock.mockResolvedValue({ ...runFixture })
     lockScoringRunForUpdateMock.mockRejectedValue(new Error('conexión perdida'))
 
-    await expect(drainAssessmentAiScoringRuns({ drainOwner: 'drain-a' })).rejects.toThrow('conexión perdida')
+    const summary = await drainAssessmentAiScoringRuns({ drainOwner: 'drain-a' })
+
+    expect(summary.failedRuns).toEqual(['asrun-1'])
+    expect(summary.runs).toHaveLength(0)
     expect(releaseScoringRunLeaseMock).toHaveBeenCalledWith('asrun-1', 'drain-a')
+    expect(captureWithDomainMock).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'conexión perdida' }),
+      'hiring',
+      expect.objectContaining({ tags: expect.objectContaining({ source: 'assessment_ai_scoring_drain', run_id: 'asrun-1' }) }),
+    )
+  })
+
+  it('anti head-of-line: el primer run venenoso NO bloquea al segundo — el drain lo procesa igual', async () => {
+    // Auditoría 2026-08-16: antes el catch hacía `throw` y el run venenoso (primero por
+    // created_at ASC) mataba TODOS los ticks (starvation determinista del resto de la cola).
+    listClaimableScoringRunIdsMock.mockResolvedValue(['asrun-veneno', 'asrun-2'])
+    claimScoringRunLeaseMock.mockImplementation(async (runId: string) => ({ ...runFixture, runId }))
+
+    // El run venenoso explota en el lock; el segundo ejecuta normal con 1 item propuesto.
+    lockScoringRunForUpdateMock.mockImplementation(async (_c: unknown, runId: string) => {
+      if (runId === 'asrun-veneno') throw new Error('payload venenoso')
+
+      return { ...runFixture, runId }
+    })
+
+    const items = [makeItem(1)]
+
+    primeItems(items, [{ ...items[0], status: 'proposed' }])
+    runQueryMock.mockResolvedValue([makeContextRow(1)])
+    proposeScoreMock.mockResolvedValue(okProposal(1))
+
+    const summary = await drainAssessmentAiScoringRuns({ drainOwner: 'drain-a' })
+
+    expect(summary.claimed).toBe(2)
+    expect(summary.failedRuns).toEqual(['asrun-veneno'])
+    expect(summary.runs).toHaveLength(1)
+    expect(summary.runs[0]).toMatchObject({ runId: 'asrun-2', proposed: 1 })
+
+    // La lease del venenoso se liberó para que el próximo tick lo retome.
+    expect(releaseScoringRunLeaseMock).toHaveBeenCalledWith('asrun-veneno', 'drain-a')
+    expect(captureWithDomainMock).toHaveBeenCalledTimes(1)
   })
 })
