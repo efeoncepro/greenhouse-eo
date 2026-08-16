@@ -6,6 +6,9 @@ import { describe, expect, it } from 'vitest'
 const deployScript = () =>
   readFileSync(resolve(process.cwd(), 'services/ops-worker/deploy.sh'), 'utf8')
 
+const deployWorkflow = () =>
+  readFileSync(resolve(process.cwd(), '.github/workflows/ops-worker-deploy.yml'), 'utf8')
+
 describe('ops-worker deploy Nubox contract', () => {
   it('declares Nubox env vars because deploy.sh uses destructive --set-env-vars', () => {
     const script = deployScript()
@@ -49,6 +52,12 @@ describe('ops-worker Talent Pool projection contract', () => {
     expect(jobIndex).toBeGreaterThan(0)
     expect(script.slice(jobIndex, jobIndex + 260)).toContain('"*/5 * * * *"')
     expect(script.slice(jobIndex, jobIndex + 260)).toContain('"/hiring/talent-pool/reconcile"')
+  })
+
+  it('treats Talent Pool sources as worker runtime inputs for triggers, resolution and drift checks', () => {
+    const workflow = deployWorkflow()
+
+    expect(workflow.match(/src\/lib\/hiring\/talent-pool/g)).toHaveLength(3)
   })
 })
 

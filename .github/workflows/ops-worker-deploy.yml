@@ -41,6 +41,10 @@ on:
       - 'src/lib/email/**'
       - 'src/lib/integrations/**'
       - 'src/lib/globe/**'
+      # TASK-1723 — the worker owns the incremental Talent Pool reconciler and
+      # bundles this projection/policy code. Omitting it leaves privacy fixes
+      # stranded even when services/ops-worker itself is unchanged.
+      - 'src/lib/hiring/talent-pool/**'
       - 'src/lib/google-credentials.ts'
       - 'src/lib/space-notion/**'
       # TASK-742 — ops-worker hosts the auth-providers smoke lane and consumes
@@ -211,6 +215,7 @@ jobs:
               src/lib/email \
               src/lib/integrations \
               src/lib/globe \
+              src/lib/hiring/talent-pool \
               src/lib/google-credentials.ts \
               src/lib/space-notion \
               src/lib/auth \
@@ -276,6 +281,7 @@ jobs:
             src/lib/finance/apply-payroll-reliquidation-delta.ts
             src/lib/email
             src/lib/integrations
+            src/lib/hiring/talent-pool
             src/lib/space-notion
             src/lib/auth
             src/lib/auth-secrets.ts
