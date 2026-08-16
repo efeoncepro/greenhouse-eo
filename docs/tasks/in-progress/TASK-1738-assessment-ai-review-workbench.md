@@ -1,5 +1,42 @@
 # TASK-1738 — Workbench de revisión del scoring IA (consumer UI del run aggregate)
 
+## Delta 2026-08-16
+
+Slices 1–5 implementados + scenario GVC listo (commits `98fc1f789`, `1b7773a97`, `871217d72`, `856adc201`):
+
+- **Slice 1** — `GET /api/hiring/assessments/ai/scoring-runs?assessmentId=` (adapter fino sobre
+  `listAssessmentAiScoringRuns`, capability `hiring.assessment.score`, `assessmentId` obligatorio).
+  El envelope incluye `confirmEnabled` (estado del flag `HIRING_ASSESSMENT_AI_RUN_CONFIRM_ENABLED`
+  en el runtime) para el estado flag-off HONESTO proactivo del wireframe — metadata del envelope
+  de la ruta, no un campo nuevo en los DTOs del primitive. Tests allow/deny/400/vacío/error.
+- **Slice 2** — namespace `hiringAssessment.scoringRun.*` es-CL + en-US con parity por type;
+  mapa de reason codes alineado al inventario REAL de `AI_RISK_ROUTING_REASONS` (11 codes de
+  `risk-router.ts`; resuelve la Open Question) con fallback legible al code crudo.
+- **Slices 3–5** — `AssessmentAiRunWorkbench` + `AssessmentAiRunEntry` en
+  `src/views/greenhouse/hiring/AssessmentAiRunWorkbench.tsx`: cobertura honesta + banner stale,
+  cola mandatory → sample → batch, muestra ciega sobre el DTO estructural, propuesta colapsada con
+  `unmountOnExit` (la propuesta NO existe en el DOM hasta el gesto real — el test lo atrapó como
+  hallazgo: un `Collapse` default la dejaba oculta por CSS), `sawProposalBeforeScoring` veraz,
+  resoluciones terminal-once con re-fetch en 409, confirm con causas por gate (`aria-describedby`),
+  flag-off honesto, cancel NUNCA flag-gated, terminales read-only. 11 tests focales de contratos.
+- **Slice 6 (parcial)** — scenario `task1738-assessment-run-workbench.scenario.ts` (premium,
+  desktop 1440 + mobile 390, 5 markers, assertion de ceguera sobre DOM).
+
+**Pendiente (la task sigue `in-progress`):**
+
+- **Integración con `Application360View.tsx`**: el archivo lo posee TASK-1737 (en vuelo en la
+  misma sesión); la entrada NO está montada. Integración declarada: en la card del assessment del
+  tab Evaluación, renderizar `<AssessmentAiRunEntry assessmentId={…} copy={assessmentCopy.scoringRun}
+  canScore={…} />` con `canScore = can(tenant,'hiring.assessment.score','execute','tenant')`
+  resuelto en `page.tsx` y pasado como prop.
+- **Dirección visual** del design studio (`greenhouse-ai-design-studio`) sin persistir →
+  `UI ready: no` se mantiene.
+- **Evidencia GVC**: PENDIENTE DE REVISIÓN HUMANA — requiere la integración anterior + seed
+  determinista del run en el ambiente target (IDs placeholder en el scenario).
+- Smoke staging (Rollout Plan) + docs funcional/manual + terminalConfirmed con nombre del
+  confirmador (el DTO del run no expone el actor del confirm; el estado terminal confirmado
+  renderiza hoy chip + toast copy sin el nombre).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
