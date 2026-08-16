@@ -30,7 +30,8 @@ export const scenario: CaptureScenario = {
     { kind: 'mark', label: 'application-documents', clipSelector: '[data-capture="hiring-application-panel-documents"]', note: 'Documentos con PII masked y dependencia 1362 explícita.' },
     { kind: 'click', selector: 'button[role="tab"]:has-text("Decisión")' },
     { kind: 'mark', label: 'application-decision', clipSelector: '[data-capture="hiring-application-panel-decision"]', note: 'Decisión estructurada, humana y defendible.' },
-    { kind: 'click', selector: 'button[role="tab"]:has-text("Actividad")' },
-    { kind: 'mark', label: 'application-activity', clipSelector: '[data-capture="hiring-application-panel-activity"]', note: 'Timeline append-only.' },
+    // TASK-1737 — el tab "Actividad" se convirtió en el Expediente real (timeline persistido).
+    { kind: 'click', selector: 'button[role="tab"]:has-text("Expediente")' },
+    { kind: 'mark', label: 'application-expediente', clipSelector: '[data-capture="hiring-application-panel-expediente"]', note: 'Expediente: timeline append-only de notas + eventos.' },
   ],
 }

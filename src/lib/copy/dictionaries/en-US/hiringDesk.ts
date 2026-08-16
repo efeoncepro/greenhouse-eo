@@ -77,7 +77,6 @@ export const hiringDesk: HiringDeskCopy = {
     documents: 'Documents',
     decision: 'Decision',
     decideAction: 'Decide',
-    activity: 'Activity',
     candidate: 'Candidate',
     contact: 'Protected contact',
     opening: 'Opening',

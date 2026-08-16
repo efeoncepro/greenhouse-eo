@@ -6,6 +6,17 @@ import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
+import {
+  HIRING_APPLICATION_NOTE_BODY_MAX,
+  HIRING_APPLICATION_NOTE_KINDS,
+  HIRING_APPLICATION_NOTE_SOURCES,
+  HIRING_SCORE_BEARING_NOTE_KINDS,
+  type HiringApplicationNote,
+  type HiringApplicationNoteKind,
+  type HiringApplicationNoteSource,
+  type HiringApplicationNotesView
+} from '@/types/hiring-application-notes'
+
 import { isViewerBlindForApplicationEvaluation } from './assessment/instances'
 import { HiringNotFoundError, HiringValidationError } from './errors'
 
@@ -14,25 +25,21 @@ import { HiringNotFoundError, HiringValidationError } from './errors'
 // La nota es narrativa de evaluación (no score): nunca toca score/match_score/
 // explainability_json ni el proposal ledger de TASK-1361 — los referencia via
 // context_json. Internal-only: jamás candidate-facing ni en el review packet MCP.
+// Contrato puro (enums/límites/shapes) en `@/types/hiring-application-notes`
+// (client-safe); este módulo server-only lo re-exporta para sus consumers.
 // ══════════════════════════════════════════════════════════════════════════
 
-export const HIRING_APPLICATION_NOTE_KINDS = ['cv_analysis', 'assessment_review', 'interview_note', 'general'] as const
-export type HiringApplicationNoteKind = (typeof HIRING_APPLICATION_NOTE_KINDS)[number]
-
-export const HIRING_APPLICATION_NOTE_SOURCES = ['human', 'agent'] as const
-export type HiringApplicationNoteSource = (typeof HIRING_APPLICATION_NOTE_SOURCES)[number]
-
-export const HIRING_APPLICATION_NOTE_BODY_MAX = 8000
-
-export interface HiringApplicationNote {
-  noteId: string
-  applicationId: string
-  kind: HiringApplicationNoteKind
-  bodyMd: string
-  authorUserId: string
-  source: HiringApplicationNoteSource
-  contextJson: Record<string, unknown>
-  createdAt: string
+export {
+  HIRING_APPLICATION_NOTE_BODY_MAX,
+  HIRING_APPLICATION_NOTE_KINDS,
+  HIRING_APPLICATION_NOTE_SOURCES,
+  HIRING_SCORE_BEARING_NOTE_KINDS
+}
+export type {
+  HiringApplicationNote,
+  HiringApplicationNoteKind,
+  HiringApplicationNoteSource,
+  HiringApplicationNotesView
 }
 
 export interface RecordHiringApplicationNoteInput {
@@ -155,16 +162,6 @@ export const recordHiringApplicationNote = async (
 }
 
 // ── Gate anti-anclaje del expediente (TASK-1737, Delta (3) de TASK-1735) ──
-// Kinds que cargan juicio evaluativo: bajo el predicado, las AJENAS se omiten del payload.
-export const HIRING_SCORE_BEARING_NOTE_KINDS = ['cv_analysis', 'assessment_review', 'interview_note'] as const
-
-export interface HiringApplicationNotesView {
-  notes: HiringApplicationNote[]
-  /** Notas omitidas por el gate anti-anclaje para ESTE viewer (0 si no hay bloqueo). */
-  hiddenNoteCount: number
-  /** true = el viewer tiene scorecard propio abierto y el payload viene filtrado. */
-  viewerBlindUntilScorecardSubmitted: boolean
-}
 
 const isNoteHiddenForBlindViewer = (note: HiringApplicationNote, viewerUserId: string): boolean => {
   // Todo lo `agent` espera el scorecard propio (el análisis IA lee scores por construcción).

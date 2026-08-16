@@ -520,7 +520,6 @@ export interface HiringDeskCopy {
     documents: string
     decision: string
     decideAction: string
-    activity: string
     candidate: string
     contact: string
     opening: string
@@ -636,7 +635,6 @@ export interface HiringDeskCopy {
     handoffApproved: string
     handoffApproveError: string
     history: string
-    activityTitle: string
     /**
      * TASK-1737 — tab Expediente de la Application 360: timeline de notas tipadas
      * (TASK-1735) + flujo propose→confirm del dossier agéntico + gate anti-anclaje.

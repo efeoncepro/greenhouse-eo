@@ -114,7 +114,6 @@ export const hiringDesk: HiringDeskCopy = {
     documents: 'Documentos',
     decision: 'Decisión',
     decideAction: 'Decidir',
-    activity: 'Actividad',
     candidate: 'Candidato',
     contact: 'Contacto protegido',
     opening: 'Vacante',
@@ -226,7 +225,6 @@ export const hiringDesk: HiringDeskCopy = {
     handoffApproved: 'Handoff aprobado. Ya puede entrar a Contrataciones listas.',
     handoffApproveError: 'No se pudo aprobar el handoff.',
     history: 'Historial de decisiones',
-    activityTitle: 'Actividad de la postulación',
     expediente: {
       tabLabel: 'Expediente',
       title: 'Expediente de evaluación',

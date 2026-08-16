@@ -59,22 +59,28 @@ import type {
   AssessmentReviewItem,
 } from '@/lib/hiring/assessment/review'
 import type { AiProposal } from '@/types/hiring-assessment-ai'
+import type { HiringApplicationNote } from '@/types/hiring-application-notes'
 
 import HiringDeskFrame from './HiringDeskFrame'
+import ApplicationDossierPanel from './ApplicationDossierPanel'
 import CandidateDocumentsPanel from './CandidateDocumentsPanel'
 import AssessmentCompetencyRadar from './AssessmentCompetencyRadar'
 import { hiringRequest } from './hiring-client'
 import { computeScorecardSummary } from './scorecard-summary'
 
-type TabKey = 'overview' | 'assessment' | 'documents' | 'decision' | 'activity'
-const TAB_KEYS: TabKey[] = ['overview', 'assessment', 'documents', 'decision', 'activity']
+type TabKey = 'overview' | 'assessment' | 'documents' | 'decision' | 'expediente'
+const TAB_KEYS: TabKey[] = ['overview', 'assessment', 'documents', 'decision', 'expediente']
+
+// TASK-1737 — `activity` se convirtió en el Expediente real; el alias preserva
+// los deep-links guardados (`?tab=activity` sigue resolviendo al mismo tab).
+const TAB_ALIASES: Record<string, TabKey> = { activity: 'expediente' }
 
 const TAB_ICONS: Record<TabKey, string> = {
   overview: 'tabler-layout-dashboard',
   assessment: 'tabler-checkup-list',
   documents: 'tabler-files',
   decision: 'tabler-gavel',
-  activity: 'tabler-activity-heartbeat',
+  expediente: 'tabler-notes',
 }
 
 const DECISION_OPTIONS: Array<{ value: HiringDecision; label: string }> = [
@@ -234,6 +240,14 @@ interface Application360ViewProps {
   /** El reader falló (≠ candidato sin documentos): el panel degrada honesto. */
   documentsFailed: boolean
   canRevealIdentity: boolean
+  /** TASK-1737 — notas del expediente server-fed (viewer-aware). `null` = el reader FALLÓ. */
+  notes: HiringApplicationNote[] | null
+  notesFailed: boolean
+  hiddenNoteCount: number
+  /** Gate anti-anclaje server-enforced: el payload ya viene filtrado para este viewer. */
+  viewerBlind: boolean
+  canAnnotate: boolean
+  noteAuthorNames: Record<string, string>
 }
 
 const handoffTone = (handoff: HiringHandoff | null) => {
@@ -348,9 +362,16 @@ const Application360View = ({
   initialAssessments,
   templates,
   initialHandoff,
+  notes,
+  notesFailed,
+  hiddenNoteCount,
+  viewerBlind,
+  canAnnotate,
+  noteAuthorNames,
 }: Application360ViewProps) => {
   const searchParams = useSearchParams()
-  const requestedTab = searchParams.get('tab')
+  const rawRequestedTab = searchParams.get('tab')
+  const requestedTab = rawRequestedTab ? TAB_ALIASES[rawRequestedTab] ?? rawRequestedTab : null
   const initialTab: TabKey = TAB_KEYS.includes(requestedTab as TabKey) ? (requestedTab as TabKey) : 'overview'
   const [item, setItem] = useState(initialItem)
   const [handoff, setHandoff] = useState(initialHandoff)
@@ -1286,31 +1307,34 @@ const Application360View = ({
     </Stack>
   )
 
-  const activity = (
-    <Stack spacing={3}>
-      <Typography variant='h5'>{copy.application.activityTitle}</Typography>
-      <Stack spacing={0}>
-        {[
-          { title: 'Postulación creada', at: item.application.createdAt, icon: 'tabler-user-plus' },
-          { title: `Etapa actual: ${copy.pipeline.stages[item.application.stage]}`, at: item.application.updatedAt, icon: 'tabler-layout-kanban' },
-          ...decisionHistory.map((entry) => ({ title: `Decisión: ${entry.decision}`, at: entry.decidedAt, icon: 'tabler-gavel' })),
-        ].sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime()).map((event, index, events) => (
-          <Stack key={`${event.title}-${event.at}`} direction='row' spacing={2.5}>
-            <Stack alignItems='center'><Box sx={{ display: 'grid', placeItems: 'center', inlineSize: 40, blockSize: 40, borderRadius: '50%', color: 'primary.main', backgroundColor: 'primary.lightOpacity' }}><i className={event.icon} /></Box>{index < events.length - 1 ? <Box sx={{ inlineSize: 2, flex: 1, minBlockSize: 32, backgroundColor: 'divider' }} /> : null}</Stack>
-            <Box sx={{ pb: 3 }}><Typography color='text.primary' fontWeight={650}>{event.title}</Typography><Typography variant='caption' color='text.primary'>{formatDateTime(event.at, { dateStyle: 'medium', timeStyle: 'short' }, 'es-CL')}</Typography></Box>
-          </Stack>
-        ))}
-      </Stack>
-    </Stack>
-  )
-
-  const panels: Record<TabKey, React.ReactNode> = { overview, assessment, documents, decision: decisionPanel, activity }
-  const orderedTabs = Object.keys(TAB_ICONS) as TabKey[]
-
   const setApplicationTab = (nextTab: TabKey) => {
     setError(null)
     setTab(nextTab)
   }
+
+  // TASK-1737 — el tab sintético `activity` se convirtió en el Expediente real:
+  // notas persistidas (TASK-1735, viewer-aware) + eventos de etapa como contexto +
+  // flujo propose→confirm del dossier. Panel route-local (patrón TASK-1715).
+  const expediente = (
+    <ApplicationDossierPanel
+      copy={copy}
+      applicationId={item.application.applicationId}
+      stageLabel={copy.pipeline.stages[item.application.stage]}
+      appliedAt={item.application.createdAt}
+      stageUpdatedAt={item.application.updatedAt}
+      decisionHistory={decisionHistory}
+      initialNotes={notesFailed ? null : notes}
+      initialHiddenNoteCount={hiddenNoteCount}
+      initialViewerBlind={viewerBlind}
+      canAnnotate={canAnnotate}
+      noteAuthorNames={noteAuthorNames}
+      onGoToScorecard={() => setApplicationTab('assessment')}
+      onToast={setToast}
+    />
+  )
+
+  const panels: Record<TabKey, React.ReactNode> = { overview, assessment, documents, decision: decisionPanel, expediente }
+  const orderedTabs = Object.keys(TAB_ICONS) as TabKey[]
 
   const applicationNavigation = (
     <Tabs
@@ -1340,7 +1364,7 @@ const Application360View = ({
           key={key}
           id={`hiring-application-tab-${key}`}
           value={key}
-          label={copy.application[key]}
+          label={key === 'expediente' ? copy.application.expediente.tabLabel : copy.application[key]}
           aria-controls={`hiring-application-panel-${key}`}
           data-application-tab={key}
         />
