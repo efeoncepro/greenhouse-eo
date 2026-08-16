@@ -4,6 +4,7 @@ const state = {
   submission: null as Record<string, unknown> | null,
   definition: { form_kind: 'application' } as Record<string, unknown> | null,
   version: { consent_policy_version: 'careers-v1' } as Record<string, unknown> | null,
+  consentSnapshot: { checkboxes_json: [] as string[] } as Record<string, unknown> | null,
   submitOutcome: 'accepted' as 'accepted' | 'not_open'
 }
 
@@ -14,7 +15,8 @@ const spies = {
 vi.mock('@/lib/growth/forms/store', () => ({
   getSubmissionById: async () => state.submission,
   getFormDefinitionById: async () => state.definition,
-  getFormVersionById: async () => state.version
+  getFormVersionById: async () => state.version,
+  getConsentSnapshot: async () => state.consentSnapshot
 }))
 
 vi.mock('@/lib/hiring/public-careers/submit-application', () => ({
@@ -69,6 +71,7 @@ beforeEach(() => {
   state.submission = applicationSubmission()
   state.definition = { form_kind: 'application' }
   state.version = { consent_policy_version: 'careers-v1' }
+  state.consentSnapshot = { checkboxes_json: [] }
   state.submitOutcome = 'accepted'
   spies.submit.mockClear()
 })

@@ -24,7 +24,11 @@ export const GOVERNANCE_SECTIONS = [
   { key: 'comercial', label: 'Comercial', description: 'Pipeline, propuestas, contratos y catálogo vendible.' },
   { key: 'finanzas', label: 'Finanzas', description: 'Resumen financiero, ingresos, egresos y conciliación.' },
   { key: 'ia', label: 'IA', description: 'Gobernanza de herramientas, licencias y créditos.' },
-  { key: 'administracion', label: 'Administración', description: 'Admin Center, Spaces, usuarios y gobierno del portal.' },
+  {
+    key: 'administracion',
+    label: 'Administración',
+    description: 'Admin Center, Spaces, usuarios y gobierno del portal.'
+  },
   { key: 'plataforma', label: 'Plataforma', description: 'Recursos internos transversales (Design System).' },
   { key: 'mi_ficha', label: 'Mi Ficha', description: 'Experiencia personal del colaborador interno.' },
   { key: 'cliente', label: 'Portal cliente', description: 'Pulse, proyectos, ciclos y settings del cliente.' }
@@ -113,6 +117,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     label: 'Hiring — Postulación 360',
     description: 'Detalle integral, assessment, documentos, decisión y actividad de una postulación.',
     routePath: '/agency/hiring/applications/[applicationId]',
+    routeGroup: 'internal'
+  },
+  {
+    viewCode: 'gestion.hiring_talent_pool',
+    section: 'gestion',
+    label: 'Hiring — Banco de talento',
+    description: 'Búsqueda person-first de talento evaluado con evidencia, vigencia y contacto gobernado.',
+    routePath: '/agency/hiring/talent-pool',
     routeGroup: 'internal'
   },
   {
@@ -263,7 +275,8 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     viewCode: 'equipo.workforce_contracting',
     section: 'equipo',
     label: 'Contratos laborales',
-    description: 'Workbench HR de cartas oferta y contratos laborales bilingües: cola, riesgo, paridad ES+EN y validación.',
+    description:
+      'Workbench HR de cartas oferta y contratos laborales bilingües: cola, riesgo, paridad ES+EN y validación.',
     routePath: '/hr/workforce/contracts',
     routeGroup: 'hr'
   },
@@ -375,7 +388,8 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     viewCode: 'finanzas.contractor_payables',
     section: 'finanzas',
     label: 'Pagos a contractors',
-    description: 'Prepara, revisa y autoriza los pagos a contractors antes de la orden de pago (readiness, override, waiver).',
+    description:
+      'Prepara, revisa y autoriza los pagos a contractors antes de la orden de pago (readiness, override, waiver).',
     routePath: '/finance/contractor-payments',
     routeGroup: 'finance'
   },
@@ -633,7 +647,8 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     viewCode: 'gestion.growth_ctas',
     section: 'gestion',
     label: 'CTAs',
-    description: 'Gobernanza del motor de CTAs/popups: inventario con estado, lifecycle y preview del renderer portable.',
+    description:
+      'Gobernanza del motor de CTAs/popups: inventario con estado, lifecycle y preview del renderer portable.',
     routePath: '/growth/ctas',
     routeGroup: 'internal'
   },
@@ -658,7 +673,8 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     viewCode: 'administracion.workforce_activation',
     section: 'administracion',
     label: 'Workforce Activation',
-    description: 'Surface admin governance / transitional. Cola de colaboradores con ficha laboral pendiente. Surface primario HR-facing ships in TASK-874.',
+    description:
+      'Surface admin governance / transitional. Cola de colaboradores con ficha laboral pendiente. Surface primario HR-facing ships in TASK-874.',
     routePath: '/admin/workforce/activation',
     routeGroup: 'admin'
   },
@@ -706,7 +722,8 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     viewCode: 'plataforma.design_system',
     section: 'plataforma',
     label: 'Design System',
-    description: 'Catálogo interno de AXIS: tokens, primitives, patrones y labs. Recurso interno transversal — clientes no acceden.',
+    description:
+      'Catálogo interno de AXIS: tokens, primitives, patrones y labs. Recurso interno transversal — clientes no acceden.',
     routePath: '/design-system',
     routeGroup: 'internal'
   },
@@ -714,7 +731,8 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     viewCode: 'plataforma.knowledge',
     section: 'plataforma',
     label: 'Knowledge',
-    description: 'Centro interno para buscar, leer y corregir conocimiento publicado con fuentes, freshness y feedback.',
+    description:
+      'Centro interno para buscar, leer y corregir conocimiento publicado con fuentes, freshness y feedback.',
     routePath: '/knowledge',
     routeGroup: 'internal'
   },
@@ -746,7 +764,8 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     viewCode: 'mi_ficha.mis_contratos',
     section: 'mi_ficha',
     label: 'Mis contratos y ofertas',
-    description: 'Vista del colaborador de sus cartas oferta y contratos laborales bilingües (estado honesto, sin edición legal).',
+    description:
+      'Vista del colaborador de sus cartas oferta y contratos laborales bilingües (estado honesto, sin edición legal).',
     routePath: '/my/contracts',
     routeGroup: 'my'
   },
@@ -938,7 +957,8 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     viewCode: 'cliente.home',
     section: 'cliente',
     label: 'Inicio',
-    description: 'Home terminator del client tenant — siempre accesible, renderiza 5-state contract (zero/denied/error/normal).',
+    description:
+      'Home terminator del client tenant — siempre accesible, renderiza 5-state contract (zero/denied/error/normal).',
     routePath: '/home',
     routeGroup: 'client'
   },
@@ -954,7 +974,8 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     viewCode: 'cliente.reviews',
     section: 'cliente',
     label: 'Revisiones (canonical)',
-    description: 'Queue de revisiones con naming canonical seed TASK-824. Coexiste con cliente.revisiones legacy apuntando a /reviews.',
+    description:
+      'Queue de revisiones con naming canonical seed TASK-824. Coexiste con cliente.revisiones legacy apuntando a /reviews.',
     routePath: '/reviews',
     routeGroup: 'client'
   },

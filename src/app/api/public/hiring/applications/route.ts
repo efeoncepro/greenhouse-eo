@@ -6,12 +6,12 @@ import {
   hashHiringEmail,
   hashHiringIp,
   recordHiringIntakeEvent,
-  type HiringIntakeOutcome,
+  type HiringIntakeOutcome
 } from '@/lib/hiring/public-careers/abuse-guard'
 import { isHiringPublicApplicationsEnabled } from '@/lib/hiring/public-careers/config'
 import {
   PUBLIC_CAREERS_CV_MAX_BYTES,
-  validatePublicCareersCvUpload,
+  validatePublicCareersCvUpload
 } from '@/lib/hiring/public-careers/cv-upload-contract'
 import { PublicCareersCvUploadError } from '@/lib/hiring/public-careers/cv-upload'
 import { parsePublicHiringApplication } from '@/lib/hiring/public-careers/schema'
@@ -35,7 +35,7 @@ const MESSAGES: Record<HiringIntakeOutcome | 'disabled' | 'error', string> = {
   invalid: 'Revisa los datos del formulario e intenta de nuevo.',
   spam_rejected: '¡Gracias! Recibimos tu postulación. Si tu perfil avanza, te contactamos.',
   disabled: 'No encontrado.',
-  error: 'No pudimos enviar tu postulación. Intenta de nuevo.',
+  error: 'No pudimos enviar tu postulación. Intenta de nuevo.'
 }
 
 const STATUS: Record<HiringIntakeOutcome, number> = {
@@ -44,7 +44,7 @@ const STATUS: Record<HiringIntakeOutcome, number> = {
   not_open: 404,
   rate_limited: 429,
   captcha_failed: 403,
-  invalid: 422,
+  invalid: 422
 }
 
 const MAX_PUBLIC_APPLY_BODY_BYTES = PUBLIC_CAREERS_CV_MAX_BYTES + 256 * 1024
@@ -68,7 +68,7 @@ const parseBooleanFormValue = (value: FormDataEntryValue | null): boolean =>
   typeof value === 'string' && ['true', '1', 'on', 'yes'].includes(value.trim().toLowerCase())
 
 const parsePublicApplyRequest = async (
-  request: Request,
+  request: Request
 ): Promise<{ body: Record<string, unknown>; cvFile: File | null } | null> => {
   const contentType = request.headers.get('content-type')?.toLowerCase() ?? ''
 
@@ -92,12 +92,13 @@ const parsePublicApplyRequest = async (
   }
 
   body.consent = parseBooleanFormValue(formData.get('consent'))
+  body.futureOpportunitiesConsent = parseBooleanFormValue(formData.get('futureOpportunitiesConsent'))
 
   const cvCandidate = formData.get('cvFile')
 
   return {
     body,
-    cvFile: cvCandidate instanceof File ? cvCandidate : null,
+    cvFile: cvCandidate instanceof File ? cvCandidate : null
   }
 }
 

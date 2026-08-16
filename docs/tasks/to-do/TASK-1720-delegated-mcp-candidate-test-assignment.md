@@ -171,6 +171,11 @@ Reglas obligatorias:
 - App API lane que revalida identidad/capability humana, distinto del ecosystem lane de token fijo.
 - TASK-1718 especifica provider/read packet Hiring internal-only y el contrato de subject humano delegado.
 - TASK-1719 especifica proposal/confirm/cancel, typed outcomes y email-only delivery.
+- El command directo actual `assignCandidateTest` usa `applicationId` + `templateId`, requiere
+  `hiring.assessment.author` y sólo devuelve el token raw una vez para el flujo interno. No es App API ni contrato
+  MCP: nunca se reexpone ese token/link al host, ni se usa el `templateId` libre como input de esta task.
+- La alerta interna de assessment submitted está en production mediante `0fe2420ed894`, pero no se ejecutó una
+  entrega candidata real; cualquier delivery status sigue siendo readback del ledger, nunca una inferencia del deploy.
 
 ### Gap
 

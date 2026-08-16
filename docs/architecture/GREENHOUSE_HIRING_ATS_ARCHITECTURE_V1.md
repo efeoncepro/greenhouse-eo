@@ -102,10 +102,14 @@ independiente):
   primer uso real) y release `393144e9f` a producción. Quedan abiertos: revisión Legal/Privacy de
   retención/aviso, flip del país a requerido-en-parser y scorecard GVC formal.
 
-**Extensión 2026-08-15:** el consumer de `hiring.assessment.submitted` y su tipo
-`hiring_assessment_submitted_internal` están code-complete, con migración aditiva de kill-switch y
-tests focales. Su rollout requiere desplegar el ops-worker y aplicar la migración; hasta entonces no
-se debe describir como correo vivo en producción.
+**Extensión 2026-08-15:** el consumer de `hiring.assessment.submitted`, el tipo
+`hiring_assessment_submitted_internal` y su migración aditiva de kill-switch están desplegados en la
+revisión activa `ops-worker-00557-hfp`; el flag general y los siete tipos están habilitados, incluido
+el destinatario interno `people@efeoncepro.com`. La evidencia de configuración no sustituye el smoke:
+el único evento `submitted` previo a este consumer quedó publicado sin reacción y, por política de no
+backfill, no se reenvía. Owner People/Operations debe verificar la primera entrega real al completar un
+`candidate_test` nuevo y revisar `email_deliveries` + `outbox_reactive_log`. Hasta entonces este séptimo
+correo está operativo pero sin evidencia de entrega productiva; no cambia score, etapa ni decisión.
 
 ## Delta 2026-07-16 — TASK-1385: AI-assisted vacancy public copy (propose→confirm)
 
@@ -945,6 +949,29 @@ Debe mezclar:
 - históricos verificados
 - partners cuando aplique
 
+#### V1 person-first — TASK-1723 a TASK-1726
+
+La V1 materializada en `develop` cubre candidatos externos e históricos y conserva una sola persona canónica.
+`greenhouse_hiring.talent_pool_membership` gobierna lifecycle/purpose; consentimientos, actividad y evidencia son
+append-only o proyecciones con lineage. Aplicaciones, assessments, documentos y contacto permanecen en sus fuentes.
+
+Superficies consumidoras del mismo contrato:
+
+- candidato: `/public/careers/talent-profile/[token]`, limitado a consentimiento futuro, disponibilidad y retiro;
+- operador: `/agency/hiring/talent-pool`, búsqueda person-first + profile + invitación `propose → confirm`;
+- App API: `GET /api/platform/app/hiring/talent-pool` y `GET /api/platform/app/hiring/talent-pool/{id}`;
+- agentes: adapter read-only `greenhouse-hiring` en Efeonce MCP, siempre delegado a una persona interna y apagado
+  hasta scope/grant, deploy y canary live.
+
+La búsqueda sólo sirve DTOs allowlisted: identidad visible mínima, lifecycle, disponibilidad, coverage/freshness y
+evidencia estructurada. Excluye correo, teléfono, CV/raw text, notas, economics, respuestas, answer keys y atributos
+protegidos. No produce fit score, ranking ni decisión adversa. `active_process` permite operar la postulación vigente,
+pero sólo un consentimiento `future_opportunities` vigente permite recontactar o invitar a otra opening.
+
+Canon y rollout: `GREENHOUSE_TALENT_POOL_FULL_API_PARITY_DECISION_V1.md`; tasks `TASK-1723`–`TASK-1726`; flags
+separados projection/search/self-service/invite/MCP, default OFF y habilitación progresiva. La V1 no autoriza todavía
+adapters de bench, internos, freelancers o partners: requieren su propio source adapter y policy.
+
 ### 3. Pipeline Board
 
 Vista kanban de `applications`.
@@ -1213,7 +1240,7 @@ La foundation transaccional del dominio quedó materializada (local-first, verif
 
 **Views (TASK-355, implementadas en dev):** `gestion.hiring`, `gestion.hiring_demand`, `gestion.hiring_pipeline`, `gestion.hiring_publication` y `gestion.hiring_application_detail` viven en `VIEW_REGISTRY`, `role_view_assignments` y el manifest de reachability junto con las rutas `/agency/hiring/**`. Los viewCodes mantienen namespace de navegación `gestion.*`; la ruta conserva ownership de producto bajo `agency`. El acceso visible no reemplaza las capabilities finas de cada reader/command.
 
-**Desk interno (TASK-355, code complete / rollout pendiente):** Demand, Pipeline, Application 360 y Publication comparten `CompositionShell` y consumen el dominio `src/lib/hiring/**`; el Kanban representa `HiringApplication`, ofrece drag más menú operable por teclado y persiste con rollback. `decideHiringApplication` bloquea la fila, exige reason humana estructurada, actualiza el snapshot vigente, agrega `explainability_json.decisionHistory[]` append-only y publica `hiring.application.decided` v1 en la misma transacción. El review de assessment consume TASK-1360/1361; documentos mantiene PII masked y declara degradación hasta el resolver/reveal de TASK-1362. Documentación funcional: `docs/documentation/hr/hiring-desk.md`; manual: `docs/manual-de-uso/hr/operar-hiring-desk.md`.
+**Desk interno (TASK-355, complete):** Demand, Pipeline, Application 360 y Publication comparten `CompositionShell` y consumen el dominio `src/lib/hiring/**`; el Kanban representa `HiringApplication`, ofrece drag más menú operable por teclado y persiste con rollback. `decideHiringApplication` bloquea la fila, exige reason humana estructurada, actualiza el snapshot vigente, agrega `explainability_json.decisionHistory[]` append-only y publica `hiring.application.decided` v1 en la misma transacción. El review de assessment consume TASK-1360/1361; Documentos mantiene PII enmascarada por defecto, abre CV/portafolio mediante el reader de TASK-1362 y reserva el reveal auditado de identidad para TASK-1714/1715. Documentación funcional: `docs/documentation/hr/hiring-desk.md`; manual: `docs/manual-de-uso/hr/operar-hiring-desk.md`.
 
 ### Invariantes operativos para agentes — Hiring / ATS foundation
 

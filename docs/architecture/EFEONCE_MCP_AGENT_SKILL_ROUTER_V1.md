@@ -42,12 +42,20 @@ surface.
 | Shared boundary, tool contract, API parity or new public surface | `software-architect-2026` | Architecture/ADR and product contract |
 | Cloud Run, WIF, service identity, OAuth, ALB, DNS, TLS or secret | applicable cloud skill + `greenhouse-secret-hygiene` | Gateway IaC/runbook |
 | Globe provider or creative capability | `greenhouse-globe` + creative-rights governance when applicable | Globe API/SDK/policy; `TASK-1473` gates federation |
+| Hiring/ATS, Talent Pool, candidate review, assessment assignment or selection journey | `greenhouse-talent-people-operator` + identity/integrations owners | `TASK-1726` implements the read-only Talent Pool adapter but keeps it OFF pending live canary; `TASK-1718`–`TASK-1722` remain separately gated |
 | HubSpot/CRM or Teams provider | owning HubSpot or Teams skill | provider contract, consent and tenancy |
 | Release, rollback or live evidence | `greenhouse-production-release` and `greenhouse-qa-release-auditor` | release/runbook and evidence |
 | Task/ADR split, docs, skill evolution | `greenhouse-task-planner` and `greenhouse-documentation-governor` | Greenhouse control plane |
 
 The router only translates verified identity and MCP transport into a narrow provider call. It never acquires direct
 database, storage or upstream-provider access, chooses domain policy, or substitutes UI/API/SDK parity.
+
+**Hiring no está federado en el runtime live.** `TASK-1726` ya implementa en código el provider
+`greenhouse-hiring` y únicamente los readers `hiring.talent_pool.search` y
+`hiring.talent_pool.profile.get`; ambos permanecen OFF hasta Greenhouse production, scope/grant Entra y canary
+allow/deny/redaction multi-host. No incluyen contacto, CV, documentos, URLs, notas ni acciones. El reader de
+Application 360 y el token one-shot de assessment siguen siendo contratos privados: `TASK-1718`–`TASK-1722`
+conservan sus propios gates y `TASK-1631` sigue bloqueando writes y acceso externo/B2B.
 
 ## Mandatory gates
 

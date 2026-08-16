@@ -6,20 +6,28 @@ const mockResolveOpening = vi.fn()
 const mockCreateIdentityProfile = vi.fn()
 const mockReconcileFacet = vi.fn()
 const mockCreateApplication = vi.fn()
+const mockEnsureTalentPoolMembership = vi.fn()
+const mockRequestTalentPoolFutureConsent = vi.fn()
 
 vi.mock('@/lib/hiring/publication', () => ({
-  resolvePublishedOpeningIdByPublicId: (...args: unknown[]) => mockResolveOpening(...args),
+  resolvePublishedOpeningIdByPublicId: (...args: unknown[]) => mockResolveOpening(...args)
 }))
 vi.mock('@/lib/account-360/organization-store', () => ({
-  createIdentityProfile: (...args: unknown[]) => mockCreateIdentityProfile(...args),
+  createIdentityProfile: (...args: unknown[]) => mockCreateIdentityProfile(...args)
 }))
 vi.mock('@/lib/hiring/store', () => ({
   reconcileCandidateFacet: (...args: unknown[]) => mockReconcileFacet(...args),
-  createHiringApplication: (...args: unknown[]) => mockCreateApplication(...args),
+  createHiringApplication: (...args: unknown[]) => mockCreateApplication(...args)
+}))
+vi.mock('@/lib/hiring/talent-pool/self-service', () => ({
+  ensureTalentPoolMembership: (...args: unknown[]) => mockEnsureTalentPoolMembership(...args)
+}))
+vi.mock('@/lib/hiring/talent-pool/commands', () => ({
+  requestTalentPoolFutureConsent: (...args: unknown[]) => mockRequestTalentPoolFutureConsent(...args)
 }))
 vi.mock('./cv-upload', () => ({
   attachPublicCareersCvToApplication: vi.fn(),
-  attachScannedPublicCareersCvAssetToApplication: vi.fn(),
+  attachScannedPublicCareersCvAssetToApplication: vi.fn()
 }))
 
 import { submitPublicHiringApplication } from './submit-application'
@@ -38,6 +46,7 @@ const input: NormalizedApplicationInput = {
   availability: null,
   message: 'Me interesa el rol por X e Y.',
   consentPolicyVersion: 'efeonce-careers-2026-07',
+  futureOpportunitiesConsent: false
 }
 
 describe('submitPublicHiringApplication — completitud de contacto (TASK-1688)', () => {
@@ -47,6 +56,8 @@ describe('submitPublicHiringApplication — completitud de contacto (TASK-1688)'
     mockCreateIdentityProfile.mockResolvedValue('prof-1')
     mockReconcileFacet.mockResolvedValue({ candidateFacetId: 'cndf-1' })
     mockCreateApplication.mockResolvedValue({ applicationId: 'happ-1', publicId: 'EO-APP-0001' })
+    mockEnsureTalentPoolMembership.mockResolvedValue({ membership_id: 'tlpm-1', public_id: 'EO-TLP-00001' })
+    mockRequestTalentPoolFutureConsent.mockResolvedValue({ receiptId: 'EO-TPR-00001' })
   })
 
   it('persiste teléfono y país de residencia en el facet person-first (anti "el form acepta y el command descarta")', async () => {
@@ -79,5 +90,25 @@ describe('submitPublicHiringApplication — completitud de contacto (TASK-1688)'
     expect(facetInput.phoneE164).toBeUndefined()
     expect(facetInput.residenceCountryCode).toBeUndefined()
     expect(mockCreateApplication.mock.calls[0][0].candidateMessage).toBeNull()
+  })
+
+  it('crea una solicitud verificable, no un grant, cuando la persona marca futuras oportunidades', async () => {
+    await submitPublicHiringApplication({ ...input, futureOpportunitiesConsent: true })
+
+    expect(mockEnsureTalentPoolMembership).toHaveBeenCalledWith({ candidateFacetId: 'cndf-1' })
+    expect(mockRequestTalentPoolFutureConsent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        talentProfileId: 'EO-TLP-00001',
+        source: 'public_application',
+        evidenceRef: 'hiring_application:happ-1'
+      })
+    )
+  })
+
+  it('no crea una solicitud de recontacto cuando el consentimiento opcional está ausente', async () => {
+    await submitPublicHiringApplication(input)
+
+    expect(mockEnsureTalentPoolMembership).toHaveBeenCalledOnce()
+    expect(mockRequestTalentPoolFutureConsent).not.toHaveBeenCalled()
   })
 })

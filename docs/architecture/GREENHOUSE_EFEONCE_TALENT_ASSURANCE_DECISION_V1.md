@@ -8,7 +8,7 @@
 - Scope: Workforce, Hiring/ATS, assessment, talent profiles, onboarding, performance, client experience y capacity pricing
 - Reversibility: `two-way-but-slow`
 - Confidence: `medium`
-- Validated as of: 2026-07-30
+- Validated as of: 2026-08-15 (runtime-baseline review; decision remains Proposed)
 - Evidence: [Hiring Quality Assurance Audit 2026-07-30](../audits/hiring/GREENHOUSE_HIRING_QUALITY_ASSURANCE_AUDIT_2026-07-30.md)
 - Economic companion: [Talent Assurance Economic Guardrails V1](../business-models/EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1.md)
 - Architecture companion: [Talent Assurance Architecture V1](GREENHOUSE_EFEONCE_TALENT_ASSURANCE_ARCHITECTURE_V1.md)
@@ -34,6 +34,24 @@ Efeonce debe operar una capa transversal `Talent Assurance` que:
 7. impide que una oportunidad comercial prometa una capacidad que sus economics no pueden sostener.
 
 `Hiring Quality Assurance` será el subsistema que gobierna la entrada de talento. No reemplaza Hiring, HRIS, Performance, Client Experience ni Finance.
+
+## Delta 2026-08-15 — Revisión de baseline y frontera de ejecución
+
+La revisión confirmó primitives reutilizables de Hiring/Workforce/Finance, pero no aceptó esta decisión ni creó
+runtime de Talent Assurance. `HiringHandoff` más `greenhouse_hr.hiring_activation_request` es el lineage durable
+application↔member; `TASK-1364` es un reader read-only de validez sobre ese lineage y outcomes tempranos canónicos
+de desempeño. No es una taxonomía 30/60/90 ni puede etiquetar una falla de selección.
+
+La policy y asignación opening→assessment-template pertenecen a Hiring/EPIC-011 `TASK-1719`. Talent Assurance
+`TASK-1603` puede consumir esa policy sólo para completeness determinística y override humano; no debe crear un
+segundo binding. Los readers cost-basis/pricing de Team Capacity y Finance son inputs reutilizables, pero los
+contratos propuestos de quotation agentic (`ProfileResolution`, `CostCard`) aún no son un gate Talent Assurance
+aceptado.
+
+Por ello, hasta que los owners cross-domain acepten `TASK-1602`, el trabajo puede inventariar y probar fuentes
+read-only, pero no emitir un claim, enforcear un bloqueo de factibilidad, exponer continuidad al cliente ni
+promover un agente más allá del runtime gobernado existente. Los gates humanos de esta decisión siguen siendo
+obligatorios.
 
 ## Reuse-first / no parallel system constraint
 

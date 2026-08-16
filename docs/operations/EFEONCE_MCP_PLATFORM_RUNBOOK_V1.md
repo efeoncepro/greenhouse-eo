@@ -47,6 +47,13 @@ Este estado no habilita clientes externos ni multitenancy. El adjetivo `read_onl
 **alcanzable por un token real**, no lo que está cableado: mientras `efeonce.mcp.seo.write` no lo tenga ningún
 cliente, ninguna escritura es ejecutable por el borde público.
 
+**Hiring no está federado en producción.** `TASK-1726` dejó code-ready el provider `greenhouse-hiring` y dos tools
+read-only del Talent Pool (`hiring.talent_pool.search`, `hiring.talent_pool.profile.get`), pero los flags
+Greenhouse/MCP y el provider Cloud Run permanecen OFF hasta despliegue compatible, grant Entra y canary
+allow/deny/redaction multi-host. No anuncies disponibilidad live antes de esa evidencia. Application 360, CV,
+documentos, links, tokens de assessment, invitaciones, cambios de etapa y asignaciones siguen fuera de este provider;
+`TASK-1718`–`TASK-1722` y `TASK-1631` conservan sus gates independientes.
+
 ## Preflight
 
 1. Verifica `git status --short` en `efeonce-mcp` y no despliega cambios no versionados.
@@ -81,10 +88,14 @@ cliente, ninguna escritura es ejecutable por el borde público.
 | `GLOBE_CREDIT_FUNDING_WRITE_ENABLED` | no | default `false`; habilita sólo la tool one-shot certificada |
 | `GREENHOUSE_API_URL` | no | origin Greenhouse exacto para el command de funding |
 | `GREENHOUSE_TOKEN_EXCHANGE_URL` | no | endpoint RFC 8693 exacto y audience del ID token WIF |
-| `GREENHOUSE_VERCEL_BYPASS_SECRET` | sí | inyectado desde `greenhouse-vercel-automation-bypass` en GCP Secret Manager; nunca GitHub var/env file |
+| `GREENHOUSE_VERCEL_BYPASS_SECRET` | sí | inyectado desde `greenhouse-vercel-automation-bypass` en GCP Secret Manager; nunca GitHub var/env file. Es sólo bypass de transporte para el hop interno exacto token-exchange/command; nunca identidad/autorización, discovery, respuesta MCP, cliente o provider externo. |
 | `GREENHOUSE_SEO_PROVIDER_ENABLED` | no | default `false`; `true` sólo con lane Greenhouse verde y canary aprobado |
 | `GREENHOUSE_ECOSYSTEM_API_URL` | no | origin Greenhouse exacto del lane ecosystem; en producción `https://greenhouse.efeoncepro.com` |
 | `GREENHOUSE_ECOSYSTEM_TOKEN` | sí | inyectado desde `efeonce-mcp-gateway-greenhouse-token` en GCP Secret Manager; nunca valor plano en `vars`, workflow ni env file |
+| `GREENHOUSE_HIRING_PROVIDER_ENABLED` | no | default `false`; sólo `true` después de Greenhouse `HIRING_TALENT_POOL_SEARCH_ENABLED` + `HIRING_TALENT_POOL_MCP_ENABLED`, grant Entra y canary aprobados |
+| `GREENHOUSE_HIRING_API_URL` | no | origin Greenhouse exacto; el adapter sólo llama `/api/platform/app/hiring/talent-pool` y su profile por ID opaco |
+| `GREENHOUSE_HIRING_TOKEN_EXCHANGE_URL` | no | endpoint RFC 8693 exacto para el cliente Greenhouse `efeonce-mcp-hiring` |
+| `GREENHOUSE_HIRING_VERCEL_BYPASS_SECRET` | sí | mismo secret ref system-managed de Vercel, enviado sólo al token exchange y a las dos rutas Hiring exactas; nunca identidad ni autorización |
 
 Si falta configuración OAuth, `/health` responde pero `/mcp` devuelve `503 oauth_not_configured`. Esto es el
 comportamiento seguro esperado, no una razón para habilitar acceso anónimo.
@@ -248,7 +259,8 @@ el scope básico de un tenant único en una autorización comercial o multi-tena
 - Verifica `initialize`, reader Globe y `globe.credits.funding.ensure`; éxito terminal es `completed|no_effect`.
 - Confirma por readback que la authority execution queda terminal y que un replay no produce un segundo delta.
 - Si Greenhouse staging tiene Vercel Deployment Protection, el gateway recibe el bypass desde Secret Manager y
-  lo envía sólo al token exchange y command exactos. Nunca lo envíes a Globe, logs o respuestas MCP.
+  lo envía sólo al token exchange y command exactos. Nunca lo envíes a Globe, discovery, clientes, logs o
+  respuestas MCP; tampoco lo uses para suplir identidad, capability, tenant o autorización.
 - Canary certificado 2026-08-01: gateway `3add7b2`, workflow `30723992263`, authority
   `df166eab-2c22-4009-a674-b83c8df307e4`, outcome `completed/no_effect`, operación Globe
   `b69ecd23-6e41-4a5c-9bdf-c3f212e8bbeb` y capacidad efectiva sin cambio en 800.

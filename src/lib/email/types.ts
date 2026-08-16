@@ -30,8 +30,16 @@ export type EmailType =
   | 'hiring_stage_advanced'
   | 'hiring_decision_selected'
   | 'hiring_decision_rejected'
+  | 'hiring_talent_pool_verification'
 
-export type EmailDeliveryStatus = 'pending' | 'sent' | 'failed' | 'skipped' | 'rate_limited' | 'delivered' | 'dead_letter'
+export type EmailDeliveryStatus =
+  | 'pending'
+  | 'sent'
+  | 'failed'
+  | 'skipped'
+  | 'rate_limited'
+  | 'delivered'
+  | 'dead_letter'
 
 export type EmailPriority = 'critical' | 'transactional' | 'broadcast'
 
@@ -41,34 +49,35 @@ export type EmailPriority = 'critical' | 'transactional' | 'broadcast'
  * broadcast respeta rate limits y usa Batch API para multi-recipient.
  */
 export const EMAIL_PRIORITY_MAP: Record<string, EmailPriority> = {
-  password_reset:               'critical',
-  magic_link:                   'critical',
-  verify_email:                 'critical',
-  invitation:                   'transactional',
-  leave_request_decision:       'transactional',
-  leave_request_submitted:      'transactional',
+  password_reset: 'critical',
+  magic_link: 'critical',
+  verify_email: 'critical',
+  invitation: 'transactional',
+  leave_request_decision: 'transactional',
+  leave_request_submitted: 'transactional',
   leave_request_pending_review: 'transactional',
-  leave_review_confirmation:    'transactional',
-  notification:                 'broadcast',
-  payroll_export:               'broadcast',
-  payroll_receipt:              'broadcast',
-  payroll_liquidacion_v2:       'transactional',
-  payroll_payment_committed:    'transactional',
-  payroll_payment_cancelled:    'transactional',
+  leave_review_confirmation: 'transactional',
+  notification: 'broadcast',
+  payroll_export: 'broadcast',
+  payroll_receipt: 'broadcast',
+  payroll_liquidacion_v2: 'transactional',
+  payroll_payment_committed: 'transactional',
+  payroll_payment_cancelled: 'transactional',
   beneficiary_payment_profile_changed: 'transactional',
-  weekly_executive_digest:      'broadcast',
-  quote_share:                  'transactional',
-  contractor_remittance_paid:   'transactional',
-  ai_visibility_grader_report:  'transactional',
-  growth_ebook_delivery:        'transactional',
+  weekly_executive_digest: 'broadcast',
+  quote_share: 'transactional',
+  contractor_remittance_paid: 'transactional',
+  ai_visibility_grader_report: 'transactional',
+  growth_ebook_delivery: 'transactional',
   // TASK-1689 — ciclo de vida de Hiring (consumers reactivos en ops-worker)
   hiring_application_received_internal: 'transactional',
-  hiring_application_confirmation:      'transactional',
-  hiring_assessment_assigned:           'transactional',
+  hiring_application_confirmation: 'transactional',
+  hiring_assessment_assigned: 'transactional',
   hiring_assessment_submitted_internal: 'transactional',
-  hiring_stage_advanced:                'transactional',
-  hiring_decision_selected:             'transactional',
-  hiring_decision_rejected:             'transactional',
+  hiring_stage_advanced: 'transactional',
+  hiring_decision_selected: 'transactional',
+  hiring_decision_rejected: 'transactional',
+  hiring_talent_pool_verification: 'transactional'
 }
 
 export interface EmailRecipient {
@@ -102,8 +111,9 @@ export interface EmailTemplateContext extends Record<string, unknown> {
   recipientUserId?: string
 }
 
-export type EmailTemplateResolver<TContext extends EmailTemplateContext = EmailTemplateContext> =
-  (context: TContext) => EmailTemplateRenderResult
+export type EmailTemplateResolver<TContext extends EmailTemplateContext = EmailTemplateContext> = (
+  context: TContext
+) => EmailTemplateRenderResult
 
 export interface EmailPreviewMeta {
   label: string
@@ -151,7 +161,8 @@ export const AGENCY_BRANDED_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<EmailT
   'hiring_assessment_assigned',
   'hiring_stage_advanced',
   'hiring_decision_selected',
-  'hiring_decision_rejected'
+  'hiring_decision_rejected',
+  'hiring_talent_pool_verification'
 ])
 
 export interface SendEmailResult {

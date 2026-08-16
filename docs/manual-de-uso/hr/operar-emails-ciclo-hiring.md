@@ -52,9 +52,9 @@ Para reanudar: `enabled = TRUE, paused_reason = NULL`. Tipos disponibles:
 `hiring_stage_advanced`, `hiring_decision_selected`,
 `hiring_decision_rejected`.
 
-El tipo `hiring_assessment_submitted_internal` queda disponible después de aplicar su migración y
-desplegar el ops-worker que registra el consumer. Antes de ese rollout, una fila habilitada por sí
-sola no crea el envío.
+El tipo `hiring_assessment_submitted_internal` ya está disponible en el ops-worker activo. No envía
+resultado, respuestas ni cambia una etapa: sólo avisa a People que existe un test listo para revisar.
+Su primer envío productivo sigue como smoke pendiente; no re-proceses un evento histórico para obtenerlo.
 
 ## Qué significan las señales
 
@@ -70,8 +70,9 @@ sola no crea el envío.
 - No enviar estos correos "a mano" por fuera de la plataforma para el mismo hito — genera dobles.
 - No editar el copy directo en producción: el copy vive en `src/emails/Hiring*.tsx` y pasa por
   revisión (`greenhouse-ux-writing`).
-- No reenviar un test compartiendo el link viejo: si el candidato perdió el correo, re-asignar
-  desde el Hiring Desk genera un evento nuevo (el link anterior se invalida al rotar el token).
+- No reenviar un test compartiendo el link viejo. Mientras exista una instancia abierta, re-asignar la
+  misma plantilla falla con `assessment_already_open`; revisa el consumer y su delivery en vez de
+  inventar un segundo test o intentar recuperar el token desde SQL/logs.
 
 ## Problemas comunes
 
@@ -79,9 +80,9 @@ sola no crea el envío.
 |---|---|---|
 | No llega ningún correo | Flag OFF en el ops-worker (o borrado por un deploy) | Verificar env de la revisión activa + `deploy.sh` |
 | No llega un tipo puntual | Kill-switch pausado | Revisar `email_type_config` |
-| Candidato dice que el link del test no funciona | Token rotado por re-asignación o expirado (14 días) | Re-asignar el test desde el Desk |
+| Candidato dice que el link del test no funciona | Token rotado, expirado (14 días) o instancia ya iniciada | Revisa la instancia y el delivery; no re-asignes mientras siga abierta ni intentes recuperar el token |
 | Correo interno no llega | Buzón mal configurado | Revisar `HIRING_INTERNAL_NOTIFICATIONS_EMAIL` |
-| No llega el aviso de test completado | Worker sin el consumer nuevo, migración pendiente o evento aún no drenado | Verificar revisión activa del ops-worker, fila `hiring_assessment_submitted_internal` y reactive log |
+| No llega el aviso de test completado | Evento publicado antes del consumer, kill-switch pausado o evento aún no drenado | No hay backfill: verifica revisión activa, fila `hiring_assessment_submitted_internal`, `email_deliveries` y reactive log para el test nuevo |
 
 ## Referencias técnicas
 

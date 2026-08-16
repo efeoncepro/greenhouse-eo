@@ -79,6 +79,13 @@ sin apropiarse del lifecycle de asignación.
 - Falta el reader de completeness por rol/opening/application, reason codes y enforcement/override de decisión.
   El binding operativo faltante queda resuelto upstream por `TASK-1719`.
 
+### Baseline verified 2026-08-15
+
+- `TASK-1719` sigue `to-do`; por tanto su policy/binding no existe aún en runtime. Esta task tampoco tiene reader,
+  reason codes, override ni enforcement implementados.
+- Existen assessment, decision humana, `HiringHandoff` y el snapshot de assessment al decidir. El quality gate debe
+  integrar esos contracts sin tratar el score advisory como una decisión ni duplicar la policy de `TASK-1719`.
+
 ## Modular Placement Contract
 
 - Topology impact: `api`

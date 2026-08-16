@@ -27,6 +27,9 @@ import {
   MCP_FUNDING_GREENHOUSE_SCOPE,
   MCP_FUNDING_INPUT_SCOPE,
   MCP_GATEWAY_OAUTH_CLIENT_ID,
+  MCP_HIRING_INPUT_SCOPE,
+  MCP_HIRING_OAUTH_CLIENT_ID,
+  MCP_TALENT_POOL_GREENHOUSE_SCOPE,
   McpTokenExchangeError,
   RFC8693_ACCESS_TOKEN_TYPE,
   RFC8693_TOKEN_EXCHANGE_GRANT
@@ -143,6 +146,59 @@ describe('MCP RFC8693 token exchange', () => {
     )
   })
 
+  it('mints an independent delegated Talent Pool read token without requiring a Globe workspace', async () => {
+    const hiringClient = {
+      ...client,
+      oauthClientId: 'spoauth-client-mcp-hiring',
+      clientId: MCP_HIRING_OAUTH_CLIENT_ID,
+      clientName: 'Efeonce MCP Hiring reader',
+      allowedScopes: [MCP_TALENT_POOL_GREENHOUSE_SCOPE],
+      policy: {
+        ...client.policy,
+        requiredScopes: [MCP_TALENT_POOL_GREENHOUSE_SCOPE],
+        capabilityScopes: [MCP_TALENT_POOL_GREENHOUSE_SCOPE],
+        revocation: { ...client.policy.revocation, revalidateAfterSeconds: 0 }
+      },
+      metadata: { resourceFamily: 'hiring' }
+    }
+
+    const dependencies = {
+      ...baseDependencies(),
+      verifyEntraToken: vi.fn(async () => ({
+        tenantId: 'tenant-1',
+        objectId: 'oid-1',
+        authorizedParty: 'mcp-client-app-id',
+        scopes: [MCP_HIRING_INPUT_SCOPE]
+      })),
+      loadClient: vi.fn(async (): Promise<any> => hiringClient),
+      authorizeTalentPool: vi.fn(() => true)
+    }
+
+    const hiringRequest = {
+      ...request,
+      clientId: MCP_HIRING_OAUTH_CLIENT_ID,
+      requestedScope: MCP_TALENT_POOL_GREENHOUSE_SCOPE
+    }
+
+    const hiringEnv = {
+      ...env,
+      GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS: `${MCP_GATEWAY_OAUTH_CLIENT_ID},${MCP_HIRING_OAUTH_CLIENT_ID}`
+    }
+
+    await expect(exchangeMcpGatewayToken(hiringRequest, dependencies, hiringEnv)).resolves.toMatchObject({
+      scope: MCP_TALENT_POOL_GREENHOUSE_SCOPE,
+      expiresIn: MCP_EXCHANGED_TOKEN_TTL_SECONDS
+    })
+    expect(dependencies.authorizeFunding).not.toHaveBeenCalled()
+    expect(dependencies.authorizeTalentPool).toHaveBeenCalledOnce()
+    expect(dependencies.issueToken).toHaveBeenCalledWith(
+      expect.objectContaining({
+        requestedScope: MCP_TALENT_POOL_GREENHOUSE_SCOPE,
+        requireWorkspaceBinding: false
+      })
+    )
+  })
+
   it('persists only a hash, the exact scope, agent provenance and a five-minute expiry', async () => {
     const dependencies = baseDependencies()
     const productionIssuerDependencies = { ...dependencies, issueToken: undefined }
@@ -152,11 +208,7 @@ describe('MCP RFC8693 token exchange', () => {
 
     expect(insert).toBeDefined()
     expect(insert?.[1]).toEqual(
-      expect.arrayContaining([
-        ['globe.credits.funding.ensure'],
-        'correlation-1',
-        '2026-08-01T12:05:00.000Z'
-      ])
+      expect.arrayContaining([['globe.credits.funding.ensure'], 'correlation-1', '2026-08-01T12:05:00.000Z'])
     )
     expect(String(insert?.[1]?.[10])).toContain('"sessionAuthMode":"agent"')
     expect(String(insert?.[1])).not.toContain(result.accessToken)
@@ -206,15 +258,18 @@ describe('MCP RFC8693 token exchange', () => {
     })
   })
 
-  it.each(['issuer', 'audience', 'expiry'])('denies an Entra token when signature verification rejects %s', async () => {
-    const dependencies = baseDependencies()
+  it.each(['issuer', 'audience', 'expiry'])(
+    'denies an Entra token when signature verification rejects %s',
+    async () => {
+      const dependencies = baseDependencies()
 
-    dependencies.verifyEntraToken.mockRejectedValue(new Error('jwt verification rejected'))
+      dependencies.verifyEntraToken.mockRejectedValue(new Error('jwt verification rejected'))
 
-    await expect(exchangeMcpGatewayToken(request, dependencies, env)).rejects.toMatchObject({
-      code: 'invalid_grant'
-    })
-  })
+      await expect(exchangeMcpGatewayToken(request, dependencies, env)).rejects.toMatchObject({
+        code: 'invalid_grant'
+      })
+    }
+  )
 
   it('fails closed for an inactive actor or missing exact oid binding without email fallback', async () => {
     const inactive = baseDependencies()
@@ -257,7 +312,11 @@ describe('MCP RFC8693 token exchange', () => {
       exchangeMcpGatewayToken({ ...request, requestUrl: 'https://greenhouse.example.test/wrong' }, dependencies, env)
     ).rejects.toMatchObject({ code: 'invalid_request' })
     await expect(
-      exchangeMcpGatewayToken({ ...request, requestedScope: `${MCP_FUNDING_GREENHOUSE_SCOPE} other.scope` }, dependencies, env)
+      exchangeMcpGatewayToken(
+        { ...request, requestedScope: `${MCP_FUNDING_GREENHOUSE_SCOPE} other.scope` },
+        dependencies,
+        env
+      )
     ).rejects.toMatchObject({ code: 'scope_not_allowed' })
   })
 

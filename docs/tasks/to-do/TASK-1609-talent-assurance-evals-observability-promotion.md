@@ -15,7 +15,7 @@
 - Motion: `none`
 - Backend impact: `reader|integration`
 - Epic: `EPIC-038`
-- Status real: `Diseño`
+- Status real: `Validity reader existe; eval/promotion contract Talent Assurance no implementado`
 - Rank: `EPIC-038-phase-2`
 - Domain: `agents|data|ops|hiring|workforce`
 - Blocked by: `TASK-1602`, `TASK-1608`
@@ -55,6 +55,20 @@ La autonomía no puede promoverse por intuición. Talent Assurance necesita evid
 ### Files owned
 
 - `evals/**`, `src/lib/agents/**`, observability/reliability docs y fixtures
+
+## Current Repo State
+
+### Already exists
+
+- `TASK-1364` aporta evidencia agregada y auditable de assessment-validity con comportamiento honesto ante muestra
+  insuficiente; no es una suite de evals agentic ni una aprobación de autonomía.
+
+### Gap / start blockers
+
+- No existen datasets Talent Assurance representative/holdout/adversarial, labels ciegos, policy de promoción,
+  estado de democión, métricas override/abstention ni evidencia presupuestaria.
+- Esta task comienza sólo después de que `TASK-1608` defina la superficie agent/run real y `TASK-1605` aporte
+  outcomes gobernados. Ninguna acción productiva puede ejercerse desde un eval fixture.
 
 ## Modular Placement Contract
 

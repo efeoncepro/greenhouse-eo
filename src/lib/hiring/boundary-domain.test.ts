@@ -44,6 +44,15 @@ const ALLOWED_WRITE_TARGETS = new Set([
   'greenhouse_hiring.hiring_assessment_response',
   'greenhouse_hiring.hiring_competency_result',
   'greenhouse_hiring.hiring_assessment_ai_proposal',
+  // TASK-1723–1726 — Talent Pool aggregate, append-only ledgers, projection and public/MCP audit.
+  'greenhouse_hiring.talent_pool_membership',
+  'greenhouse_hiring.talent_pool_consent_event',
+  'greenhouse_hiring.talent_pool_activity',
+  'greenhouse_hiring.talent_pool_evidence_projection',
+  'greenhouse_hiring.talent_pool_invitation',
+  'greenhouse_hiring.talent_pool_self_service_token',
+  'greenhouse_hiring.talent_pool_public_rate_bucket',
+  'greenhouse_hiring.talent_pool_access_audit',
   // TASK-1365 — self-ID sensitive source + append-only audit, physically separate from decision.
   'greenhouse_hiring.hiring_demographic_selfid',
   'greenhouse_hiring.hiring_demographic_selfid_audit',

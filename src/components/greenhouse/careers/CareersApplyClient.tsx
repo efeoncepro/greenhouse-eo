@@ -10,7 +10,7 @@ import {
   type DragEvent,
   type FormEvent,
   type HTMLAttributes,
-  type ReactNode,
+  type ReactNode
 } from 'react'
 
 import Link from 'next/link'
@@ -23,7 +23,7 @@ import {
   parseE164,
   PHONE_COUNTRIES,
   stripNationalDigits,
-  toE164,
+  toE164
 } from '@/growth-forms-renderer/mask'
 import { createTelemetryEmitter, type TelemetryEmitter } from '@/growth-forms-renderer/telemetry'
 import { TurnstileTokenClient } from '@/growth-forms-renderer/turnstile'
@@ -35,7 +35,7 @@ import {
   PUBLIC_CAREERS_CV_ACCEPTED_MIME_TYPES,
   formatPublicCareersCvFileSize,
   validatePublicCareersCvUpload,
-  type PublicCareersCvValidationError,
+  type PublicCareersCvValidationError
 } from '@/lib/hiring/public-careers/cv-upload-contract'
 import { formatCareersTemplate, type CareersOpeningViewModel } from '@/lib/hiring/public-careers/view-model'
 
@@ -61,6 +61,7 @@ interface ApplicationFormValues {
   availability: string
   message: string
   consent: boolean
+  futureOpportunitiesConsent: boolean
 }
 
 type ApplicationField = keyof ApplicationFormValues
@@ -78,6 +79,7 @@ const INITIAL_VALUES: ApplicationFormValues = {
   availability: '',
   message: '',
   consent: false,
+  futureOpportunitiesConsent: false
 }
 
 const FIELD_ORDER: Array<ApplicationField | 'captcha'> = [
@@ -89,7 +91,7 @@ const FIELD_ORDER: Array<ApplicationField | 'captcha'> = [
   'portfolioUrl',
   'linkedinUrl',
   'consent',
-  'captcha',
+  'captcha'
 ]
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -98,8 +100,7 @@ const DEFAULT_PHONE_COUNTRY = 'CL'
 
 const resolvePhoneCountry = (contract: RenderContract): string =>
   (
-    contract.fields.find(field => field.key === 'phone')?.validatorParams?.country ??
-    DEFAULT_PHONE_COUNTRY
+    contract.fields.find(field => field.key === 'phone')?.validatorParams?.country ?? DEFAULT_PHONE_COUNTRY
   ).toUpperCase()
 
 const isHttpsUrl = (value: string): boolean => {
@@ -163,7 +164,7 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
       page_uri: window.location.href,
       page_name: document.title,
       referrer: document.referrer,
-      locale: formContract.form.locale,
+      locale: formContract.form.locale
     })
 
     telemetryRef.current = emitter
@@ -190,7 +191,7 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
       EMAIL_RE.test(values.email.trim()),
       values.portfolioUrl.trim() || values.linkedinUrl.trim(),
       values.availability.trim() || values.message.trim(),
-      values.consent,
+      values.consent
     ]
 
     return Math.max(12, Math.round((checkpoints.filter(Boolean).length / checkpoints.length) * 100))
@@ -335,7 +336,7 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
         required: true,
         mode: 'invisible',
         siteKey: turnstileSiteKey,
-        execution: 'submit',
+        execution: 'submit'
       })
 
       const token = await turnstileRef.current.execute()
@@ -400,8 +401,9 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
         availability: values.availability.trim() || null,
         message: values.message.trim() || null,
         consent: values.consent,
+        futureOpportunitiesConsent: values.futureOpportunitiesConsent,
         consentPolicyVersion: formContract.consent?.consentPolicyVersion ?? 'efeonce-careers-2026-07',
-        captchaToken,
+        captchaToken
       }
 
       const requestInit: RequestInit = cvFile
@@ -413,12 +415,12 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
               }
 
               return formData
-            }, new FormData()),
+            }, new FormData())
           }
         : {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(applicationPayload),
+            body: JSON.stringify(applicationPayload)
           }
 
       if (cvFile && requestInit.body instanceof FormData) {
@@ -426,7 +428,7 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
       }
 
       const response = await fetch('/api/public/hiring/applications', {
-        ...requestInit,
+        ...requestInit
       })
 
       const body = (await response.json().catch(() => null)) as { outcome?: string } | null
@@ -435,7 +437,9 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
       if (response.ok && (outcome === 'accepted' || outcome === 'spam_rejected')) {
         setErrors({})
         setSubmitState('success')
-        telemetryRef.current?.emit('gh_form_submission_accepted', { success_behavior: formContract.successBehavior.kind })
+        telemetryRef.current?.emit('gh_form_submission_accepted', {
+          success_behavior: formContract.successBehavior.kind
+        })
         telemetryRef.current?.emit('gh_form_success_viewed', { success_behavior: formContract.successBehavior.kind })
 
         return
@@ -676,7 +680,9 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
               </span>
               <span className={styles.cvText}>
                 <strong>{cvFile ? copy.apply.cv.selectedTitle : copy.apply.cv.title}</strong>
-                <span>{cvFile ? `${cvFile.name} - ${formatPublicCareersCvFileSize(cvFile.size)}` : copy.apply.cv.body}</span>
+                <span>
+                  {cvFile ? `${cvFile.name} - ${formatPublicCareersCvFileSize(cvFile.size)}` : copy.apply.cv.body}
+                </span>
                 <span className={styles.cvHint}>{copy.apply.cv.hint}</span>
               </span>
               <span className={styles.cvActions}>
@@ -729,7 +735,7 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
               <strong>{copy.apply.consent.title}</strong>
               <span>
                 {copy.apply.consent.bodyPrefix}{' '}
-                <a href={`${EFEONCE_URL_HTTPS}/privacy`} target='_blank' rel='noreferrer'>
+                <a href={`${EFEONCE_URL_HTTPS}/politica-de-privacidad/`} target='_blank' rel='noreferrer'>
                   {copy.apply.consent.link}
                 </a>{' '}
                 {copy.apply.consent.bodySuffix}
@@ -742,11 +748,36 @@ export const CareersApplyClient = ({ copy, formContract, opening }: CareersApply
               ) : null}
             </span>
           </label>
+          <div className={styles.field} data-capture='talent-pool-opt-in'>
+            <span className={styles.label}>{copy.apply.talentPoolConsent.sectionLabel}</span>
+            <label className={styles.consentCard} htmlFor={fieldId('futureOpportunitiesConsent')}>
+              <input
+                className={styles.consentInput}
+                id={fieldId('futureOpportunitiesConsent')}
+                name='futureOpportunitiesConsent'
+                type='checkbox'
+                checked={values.futureOpportunitiesConsent}
+                aria-describedby='careers-apply-futureOpportunitiesConsent-help'
+                onChange={event => setValue('futureOpportunitiesConsent', event.target.checked)}
+              />
+              <span className={styles.consentBox} aria-hidden='true'>
+                {values.futureOpportunitiesConsent ? <i className='tabler-check' aria-hidden='true' /> : null}
+              </span>
+              <span className={styles.consentText}>
+                <strong>{copy.apply.talentPoolConsent.title}</strong>
+                <span id='careers-apply-futureOpportunitiesConsent-help'>{copy.apply.talentPoolConsent.body}</span>
+              </span>
+            </label>
+          </div>
         </FormSection>
 
         <div className={styles.formFooter}>
           <CaptchaStatus copy={copy} state={captchaState} error={errors.captcha} />
-          <button className={`${styles.button} ${styles.buttonPrimary} ${styles.buttonFull} ${styles.buttonLarge}`} type='submit' disabled={submitState === 'submitting'}>
+          <button
+            className={`${styles.button} ${styles.buttonPrimary} ${styles.buttonFull} ${styles.buttonLarge}`}
+            type='submit'
+            disabled={submitState === 'submitting'}
+          >
             {submitState === 'submitting' ? copy.apply.submitting : copy.apply.submit}
             <i className={submitState === 'submitting' ? 'tabler-loader-2' : 'tabler-send'} aria-hidden='true' />
           </button>
@@ -787,7 +818,7 @@ const TextField = ({
   placeholder,
   requiredLabel,
   type = 'text',
-  value,
+  value
 }: {
   autoComplete?: string
   error?: string
@@ -839,7 +870,7 @@ const PhoneField = ({
   onChange,
   onCountryChange,
   placeholder,
-  value,
+  value
 }: {
   country: string
   countryAriaLabel: string
@@ -923,7 +954,7 @@ const TextAreaField = ({
   label,
   onChange,
   placeholder,
-  value,
+  value
 }: {
   field: ApplicationField
   label: string
@@ -949,8 +980,18 @@ const TextAreaField = ({
 const CaptchaStatus = ({ copy, error, state }: { copy: CareersCopy; error?: string; state: CaptchaState }) => {
   const isError = state === 'error' || Boolean(error)
   const isVerified = state === 'verified' && !isError
-  const title = isError ? copy.apply.captcha.failedTitle : isVerified ? copy.apply.captcha.verifiedTitle : copy.apply.captcha.pendingTitle
-  const body = isError ? error ?? copy.apply.captcha.failedBody : isVerified ? copy.apply.captcha.verifiedBody : copy.apply.captcha.brand
+
+  const title = isError
+    ? copy.apply.captcha.failedTitle
+    : isVerified
+      ? copy.apply.captcha.verifiedTitle
+      : copy.apply.captcha.pendingTitle
+
+  const body = isError
+    ? (error ?? copy.apply.captcha.failedBody)
+    : isVerified
+      ? copy.apply.captcha.verifiedBody
+      : copy.apply.captcha.brand
 
   return (
     <div

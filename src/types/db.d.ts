@@ -8014,6 +8014,122 @@ export interface GreenhouseHiringTalentDemand {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseHiringTalentPoolAccessAudit {
+  access_audit_id: Generated<string>;
+  actor_user_id: string;
+  agent_host: string | null;
+  correlation_id: string | null;
+  oauth_access_token_id: string | null;
+  oauth_client_id: string;
+  occurred_at: Generated<Timestamp>;
+  outcome: string;
+  purpose: string | null;
+  reason_code: string;
+  route_kind: string;
+  talent_profile_public_id: string | null;
+}
+
+export interface GreenhouseHiringTalentPoolActivity {
+  activity_id: Generated<string>;
+  activity_type: string;
+  actor_user_id: string | null;
+  correlation_id: string | null;
+  details_json: Generated<Json>;
+  idempotency_key: string | null;
+  membership_id: string;
+  occurred_at: Generated<Timestamp>;
+  source_ref: string | null;
+}
+
+export interface GreenhouseHiringTalentPoolConsentEvent {
+  action: string;
+  actor_type: string;
+  actor_user_id: string | null;
+  consent_event_id: Generated<string>;
+  correlation_id: string | null;
+  effective_at: Generated<Timestamp>;
+  evidence_ref: string | null;
+  expires_at: Timestamp | null;
+  idempotency_key: string;
+  membership_id: string;
+  metadata_json: Generated<Json>;
+  occurred_at: Generated<Timestamp>;
+  policy_version: string | null;
+  purpose: string;
+  receipt_public_id: Generated<string>;
+  source: string;
+}
+
+export interface GreenhouseHiringTalentPoolEvidenceProjection {
+  application_id: string | null;
+  availability: string | null;
+  capability_key: Generated<string>;
+  country_code: string | null;
+  evidence_id: Generated<string>;
+  evidence_state: Generated<string>;
+  fresh_until: Timestamp | null;
+  language_code: string | null;
+  membership_id: string;
+  observed_at: Timestamp;
+  projected_at: Generated<Timestamp>;
+  projection_version: Generated<number>;
+  result_band: string | null;
+  seniority: string | null;
+  source_id: string;
+  source_type: string;
+  source_version: Generated<string>;
+}
+
+export interface GreenhouseHiringTalentPoolInvitation {
+  application_id: string | null;
+  confirmed_by: string | null;
+  created_at: Generated<Timestamp>;
+  executed_at: Timestamp | null;
+  idempotency_key: string;
+  invitation_id: Generated<string>;
+  membership_id: string;
+  opening_id: string;
+  proposal_ref: string;
+  purpose: Generated<string>;
+  reason_code: string | null;
+  requested_by: string;
+  state: string;
+}
+
+export interface GreenhouseHiringTalentPoolMembership {
+  aggregate_version: Generated<number>;
+  backfill_classification: string | null;
+  candidate_facet_id: string;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  future_consent_expires_at: Timestamp | null;
+  lifecycle_status: string;
+  membership_id: Generated<string>;
+  public_id: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  withdrawn_at: Timestamp | null;
+}
+
+export interface GreenhouseHiringTalentPoolPublicRateBucket {
+  action: string;
+  hit_count: Generated<number>;
+  ip_hash: string;
+  updated_at: Generated<Timestamp>;
+  window_started_at: Timestamp;
+}
+
+export interface GreenhouseHiringTalentPoolSelfServiceToken {
+  access_token_hash: string;
+  expires_at: Timestamp;
+  issued_at: Generated<Timestamp>;
+  issued_by: string | null;
+  last_used_at: Timestamp | null;
+  membership_id: string;
+  purpose: Generated<string>;
+  revoked_at: Timestamp | null;
+  token_id: Generated<string>;
+}
+
 export interface GreenhouseHrAssessmentFairnessEvidence {
   computed_at: Generated<Timestamp>;
   computed_by: string | null;
@@ -12324,6 +12440,14 @@ export interface DB {
   "greenhouse_hiring.hiring_opening": GreenhouseHiringHiringOpening;
   "greenhouse_hiring.hiring_question": GreenhouseHiringHiringQuestion;
   "greenhouse_hiring.talent_demand": GreenhouseHiringTalentDemand;
+  "greenhouse_hiring.talent_pool_access_audit": GreenhouseHiringTalentPoolAccessAudit;
+  "greenhouse_hiring.talent_pool_activity": GreenhouseHiringTalentPoolActivity;
+  "greenhouse_hiring.talent_pool_consent_event": GreenhouseHiringTalentPoolConsentEvent;
+  "greenhouse_hiring.talent_pool_evidence_projection": GreenhouseHiringTalentPoolEvidenceProjection;
+  "greenhouse_hiring.talent_pool_invitation": GreenhouseHiringTalentPoolInvitation;
+  "greenhouse_hiring.talent_pool_membership": GreenhouseHiringTalentPoolMembership;
+  "greenhouse_hiring.talent_pool_public_rate_bucket": GreenhouseHiringTalentPoolPublicRateBucket;
+  "greenhouse_hiring.talent_pool_self_service_token": GreenhouseHiringTalentPoolSelfServiceToken;
   "greenhouse_hr.assessment_fairness_evidence": GreenhouseHrAssessmentFairnessEvidence;
   "greenhouse_hr.assessment_validity_evidence": GreenhouseHrAssessmentValidityEvidence;
   "greenhouse_hr.contractor_engagement_events": GreenhouseHrContractorEngagementEvents;

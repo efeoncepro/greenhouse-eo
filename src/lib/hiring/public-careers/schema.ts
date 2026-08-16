@@ -19,6 +19,7 @@ export interface PublicHiringApplicationInput {
   message?: string | null
   consent: boolean
   consentPolicyVersion?: string | null
+  futureOpportunitiesConsent?: boolean
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -37,8 +38,7 @@ export const isSafeHttpUrl = (value: string): boolean => {
   try {
     const url = new URL(value)
 
-
-return url.protocol === 'https:'
+    return url.protocol === 'https:'
   } catch {
     return false
   }
@@ -57,6 +57,7 @@ export interface NormalizedApplicationInput {
   availability: string | null
   message: string | null
   consentPolicyVersion: string | null
+  futureOpportunitiesConsent: boolean
 }
 
 /**
@@ -97,9 +98,7 @@ export const parsePublicHiringApplication = (raw: unknown): NormalizedApplicatio
 
   // El país de residencia SÓLO sirve como hint de formato local del teléfono cuando el
   // candidato no escribe el prefijo internacional — nunca al revés (residencia no se infiere).
-  const phoneResult = phoneRaw
-    ? validateE164PhoneValue(phoneRaw, { country: residenceRaw || 'CL' })
-    : null
+  const phoneResult = phoneRaw ? validateE164PhoneValue(phoneRaw, { country: residenceRaw || 'CL' }) : null
 
   if (phoneResult && !phoneResult.valid) return null
 
@@ -116,5 +115,6 @@ export const parsePublicHiringApplication = (raw: unknown): NormalizedApplicatio
     availability: asTrimmed(body.availability, MAX_NAME) || null,
     message: asTrimmed(body.message, MAX_MESSAGE) || null,
     consentPolicyVersion: asTrimmed(body.consentPolicyVersion, MAX_NAME) || null,
+    futureOpportunitiesConsent: body.futureOpportunitiesConsent === true
   }
 }

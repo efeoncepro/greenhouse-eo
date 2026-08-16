@@ -4,10 +4,7 @@ import { COUNTRIES_SORTED } from '@/lib/locale/countries'
 import type { CareersOpeningViewModel } from '@/lib/hiring/public-careers/view-model'
 import type { RenderContract } from '@/growth-forms-renderer/contract'
 import { RENDERER_CONTRACT_VERSION } from '@/growth-forms-renderer/version'
-import {
-  PUBLIC_CAREERS_CV_ACCEPTED_MIME_TYPES,
-  PUBLIC_CAREERS_CV_MAX_BYTES,
-} from './cv-upload-contract'
+import { PUBLIC_CAREERS_CV_ACCEPTED_MIME_TYPES, PUBLIC_CAREERS_CV_MAX_BYTES } from './cv-upload-contract'
 
 export const CAREERS_APPLICATION_FORM_SLUG = 'efeonce-careers-application'
 export const CAREERS_APPLICATION_FORM_KEY = '9f7a8fc0-6fa7-4670-8e2d-efe0ce354001'
@@ -25,7 +22,7 @@ export const buildCareersApplicationFormContract = ({
   copy,
   locale,
   opening,
-  turnstileSiteKey,
+  turnstileSiteKey
 }: {
   copy: CareersCopy
   locale: Locale
@@ -40,7 +37,7 @@ export const buildCareersApplicationFormContract = ({
     formVersionId: CAREERS_APPLICATION_FORM_VERSION_ID,
     version: 1,
     locale,
-    formKind: 'application',
+    formKind: 'application'
   },
   composition: 'static',
   fields: [
@@ -49,7 +46,7 @@ export const buildCareersApplicationFormContract = ({
       type: 'hidden',
       label: 'Opening public id',
       required: true,
-      dataClass: 'public',
+      dataClass: 'public'
     },
     {
       key: 'firstName',
@@ -60,7 +57,7 @@ export const buildCareersApplicationFormContract = ({
       presentation: { icon: 'user' },
       autocomplete: 'given-name',
       validator: 'text',
-      maxLength: 200,
+      maxLength: 200
     },
     {
       key: 'lastName',
@@ -71,7 +68,7 @@ export const buildCareersApplicationFormContract = ({
       presentation: { icon: 'user' },
       autocomplete: 'family-name',
       validator: 'text',
-      maxLength: 200,
+      maxLength: 200
     },
     {
       key: 'email',
@@ -84,7 +81,7 @@ export const buildCareersApplicationFormContract = ({
       autocomplete: 'email',
       inputMode: 'email',
       validator: 'email_syntax',
-      maxLength: 200,
+      maxLength: 200
     },
     {
       // TASK-1688 — país de residencia AUTODECLARADO (requerido). Select textual desde el
@@ -97,7 +94,7 @@ export const buildCareersApplicationFormContract = ({
       dataClass: 'contact_pii',
       presentation: { icon: 'globe' },
       options: COUNTRIES_SORTED.map(country => ({ value: country.code, label: country.name })),
-      maxLength: 2,
+      maxLength: 2
     },
     {
       key: 'phone',
@@ -110,7 +107,7 @@ export const buildCareersApplicationFormContract = ({
       inputMode: 'tel',
       validator: 'e164_phone',
       validatorParams: { country: 'CL' },
-      maxLength: 200,
+      maxLength: 200
     },
     {
       key: 'portfolioUrl',
@@ -122,7 +119,7 @@ export const buildCareersApplicationFormContract = ({
       autocomplete: 'url',
       inputMode: 'url',
       validator: 'url',
-      maxLength: 2000,
+      maxLength: 2000
     },
     {
       key: 'linkedinUrl',
@@ -134,7 +131,7 @@ export const buildCareersApplicationFormContract = ({
       autocomplete: 'url',
       inputMode: 'url',
       validator: 'url',
-      maxLength: 2000,
+      maxLength: 2000
     },
     {
       key: 'availability',
@@ -144,7 +141,7 @@ export const buildCareersApplicationFormContract = ({
       dataClass: 'company',
       presentation: { icon: 'calendar' },
       options: copy.apply.availabilityOptions.map(option => ({ value: option, label: option })),
-      maxLength: 200,
+      maxLength: 200
     },
     {
       key: 'cvFile',
@@ -158,8 +155,8 @@ export const buildCareersApplicationFormContract = ({
         maxBytes: PUBLIC_CAREERS_CV_MAX_BYTES,
         multiple: false,
         storageContext: 'hiring_application_cv_draft',
-        scanPolicy: 'scan_required',
-      },
+        scanPolicy: 'scan_required'
+      }
     },
     {
       key: 'message',
@@ -169,8 +166,8 @@ export const buildCareersApplicationFormContract = ({
       dataClass: 'free_text',
       presentation: { icon: 'message' },
       validator: 'text',
-      maxLength: 4000,
-    },
+      maxLength: 4000
+    }
   ],
   copy: {
     title: copy.apply.titleTemplate.replace('{role}', opening.title),
@@ -178,31 +175,38 @@ export const buildCareersApplicationFormContract = ({
     successTitle: copy.apply.successTitle,
     successBody: copy.apply.successBody,
     // TASK-1688 — ayuda del país (el renderer la lee como `<key>.help`).
-    'residenceCountryCode.help': copy.apply.residenceCountryHelp,
+    'residenceCountryCode.help': copy.apply.residenceCountryHelp
   },
   consent: {
     consentPolicyVersion: 'efeonce-careers-2026-07',
-    privacyUrl: `${EFEONCE_URL_HTTPS}/privacy`,
+    privacyUrl: `${EFEONCE_URL_HTTPS}/politica-de-privacidad/`,
     checkboxes: [
       {
         key: 'careers_data_processing',
         label: copy.apply.consent.title,
-        required: true,
+        required: true
       },
-    ],
+      {
+        key: 'future_opportunities',
+        label: copy.apply.talentPoolConsent.title,
+        required: false
+      }
+    ]
   },
   successBehavior: {
     kind: 'review_pending',
     presentation: 'success_card',
     title: copy.apply.successTitle,
     body: copy.apply.successBody,
-    actions: [{ kind: 'external_link', label: copy.apply.moreJobs, href: '/public/careers#gh-listing', target: '_self' }],
+    actions: [
+      { kind: 'external_link', label: copy.apply.moreJobs, href: '/public/careers#gh-listing', target: '_self' }
+    ]
   },
   styleVariant: 'careers-html-fidelity',
   surfacePolicy: {
     surfaceId: CAREERS_APPLICATION_SURFACE_ID,
     allowedOrigins: [],
-    rendererChannel: 'stable',
+    rendererChannel: 'stable'
   },
   security: turnstileSiteKey
     ? {
@@ -211,8 +215,8 @@ export const buildCareersApplicationFormContract = ({
           required: true,
           mode: 'invisible',
           siteKey: turnstileSiteKey,
-          execution: 'submit',
-        },
+          execution: 'submit'
+        }
       }
     : undefined,
   telemetryPolicy: {
@@ -223,9 +227,9 @@ export const buildCareersApplicationFormContract = ({
       'field_validation_failed',
       'form_submitted',
       'submission_accepted',
-      'submission_rejected',
+      'submission_rejected'
     ],
     gtmDataLayer: true,
-    fieldLevelAnalyticsDisabled: true,
-  },
+    fieldLevelAnalyticsDisabled: true
+  }
 })

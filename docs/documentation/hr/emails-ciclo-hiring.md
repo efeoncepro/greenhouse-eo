@@ -42,9 +42,11 @@ tenga que acordarse de escribirlos:
   prendido en producción desde el 2026-08-12; el interruptor y los kill-switch por tipo siguen
   disponibles para pausar el sistema completo o un correo específico.
 
-> Estado de rollout: el aviso interno de test completado está code-complete desde 2026-08-15,
-> pero requiere migración + deploy del ops-worker antes de quedar vivo en producción. Los otros seis
-> correos continúan operativos.
+> Estado de rollout: el aviso interno de test completado está desplegado y configurado en el
+> ops-worker desde 2026-08-15, igual que los otros seis correos. Aún falta confirmar su primera
+> entrega real: el único test completado antes del despliegue no se reenvía por diseño. People/Operations
+> debe comprobar la siguiente entrega en el correo y en el registro de envíos; no se reintenta ese
+> evento histórico ni se altera la postulación para forzarlo.
 
 > Detalle técnico: consumers en `src/lib/sync/projections/hiring-lifecycle-emails.ts`, política en
 > `src/lib/hiring/notifications/`, templates en `src/emails/Hiring*.tsx`.

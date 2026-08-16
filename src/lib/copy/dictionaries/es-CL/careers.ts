@@ -3,14 +3,14 @@ import type { CareersCopy } from '../../types'
 export const careers: CareersCopy = {
   metadata: {
     title: 'Trabaja con Efeonce',
-    description: 'Vacantes públicas de Efeonce: roles reales, proceso claro y postulación protegida.',
+    description: 'Vacantes públicas de Efeonce: roles reales, proceso claro y postulación protegida.'
   },
   header: {
     logoAlt: 'Efeonce',
     tagline: 'Trabaja con nosotros',
     backToJobs: 'Volver a vacantes',
     backToDetail: 'Volver al detalle',
-    localeTitle: 'Página bilingüe: es-CL y en-US',
+    localeTitle: 'Página bilingüe: es-CL y en-US'
   },
   hero: {
     hiringBadgePrefix: 'Estamos contratando',
@@ -21,7 +21,7 @@ export const careers: CareersCopy = {
     subtitle: 'Construimos crecimiento con marcas y con las personas que lo hacen posible.',
     primaryCta: 'Ver vacantes',
     processCta: 'Ver el proceso',
-    proof: 'Postula en menos de 2 minutos · evaluamos habilidades reales',
+    proof: 'Postula en menos de 2 minutos · evaluamos habilidades reales'
   },
   marquee: ['Diseño', 'Tecnología', 'Marketing', 'Medios', 'Operaciones', 'Data'],
   manifesto: {
@@ -35,7 +35,7 @@ export const careers: CareersCopy = {
     bodyPrefix: 'Por eso buscamos',
     bodyStrong: 'personas inquietas',
     bodySuffix: 'que quieran cuestionar lo obvio y construir mejor.',
-    cta: 'Ver vacantes abiertas',
+    cta: 'Ver vacantes abiertas'
   },
   pillars: {
     eyebrow: 'Nuestro lado del trato',
@@ -45,19 +45,19 @@ export const careers: CareersCopy = {
       {
         title: 'Crecimiento real',
         body: 'Proyectos con impacto visible para marcas que crecen en serio. Aquí las ideas se ejecutan, no se archivan.',
-        icon: 'tabler-trending-up',
+        icon: 'tabler-trending-up'
       },
       {
         title: 'Trabajo con impacto',
         body: 'Tu trabajo se ve, se mide y se nota. Con libertad para proponer y espacio para dejar huella.',
-        icon: 'tabler-target-arrow',
+        icon: 'tabler-target-arrow'
       },
       {
         title: 'Globales por diseño',
         body: 'Talento en Chile, LatAm y el mundo, en remoto o híbrido. Trabajas donde rindes mejor: cuentan los resultados, no el reloj.',
-        icon: 'tabler-world',
-      },
-    ],
+        icon: 'tabler-world'
+      }
+    ]
   },
   listing: {
     eyebrow: 'Únete al equipo',
@@ -77,7 +77,7 @@ export const careers: CareersCopy = {
     emptyZeroBody: 'Seguimos creciendo. Déjanos tu correo y te avisamos cuando abramos un rol que calce contigo.',
     emptyFilteredTitle: 'No hay roles para esta búsqueda',
     emptyFilteredBody: 'Prueba con otros términos o limpia los filtros para volver al listado completo.',
-    cardCta: 'Ver y postular',
+    cardCta: 'Ver y postular'
   },
   process: {
     eyebrow: 'Proceso de selección',
@@ -85,14 +85,22 @@ export const careers: CareersCopy = {
     subtitle: 'Encontraste tu rol. Esto es lo que sigue: de la postulación a la decisión, con pasos y respuesta clara.',
     steps: [
       { title: 'Postulas', body: 'Envías tu postulación en minutos.', icon: 'tabler-send' },
-      { title: 'Conversamos', body: 'Una primera conversación para entender tu experiencia y resolver dudas.', icon: 'tabler-message-2' },
+      {
+        title: 'Conversamos',
+        body: 'Una primera conversación para entender tu experiencia y resolver dudas.',
+        icon: 'tabler-message-2'
+      },
       {
         title: 'Evaluación por competencias',
         body: 'Miramos lo que sabes hacer, no las etiquetas.',
-        icon: 'tabler-checklist',
+        icon: 'tabler-checklist'
       },
-      { title: 'Decisión', body: 'Te contamos cómo sigue, avances o no. Siempre con respuesta.', icon: 'tabler-circle-check' },
-    ],
+      {
+        title: 'Decisión',
+        body: 'Te contamos cómo sigue, avances o no. Siempre con respuesta.',
+        icon: 'tabler-circle-check'
+      }
+    ]
   },
   talentPool: {
     eyebrow: 'Banco de talento',
@@ -103,7 +111,78 @@ export const careers: CareersCopy = {
     cta: 'Sumarme al banco de talento',
     successPrefix: 'Listo',
     successSuffix: 'Quedaste en nuestro radar. Te escribimos cuando se abra un rol real para ti.',
-    privacy: 'Sin spam. Solo te escribimos cuando haya un rol real para ti.',
+    privacy: 'Sin spam. Solo te escribimos cuando haya un rol real para ti.'
+  },
+  talentPoolSelfService: {
+    metadataTitle: 'Tu perfil para futuras oportunidades | Efeonce',
+    eyebrow: 'Banco de talento Efeonce',
+    title: 'Tú decides cómo usamos tu perfil',
+    intro: 'Revisa qué autorizaste, actualiza tu disponibilidad o retira el permiso desde este enlace privado.',
+    status: {
+      active: 'Disponible para futuras oportunidades',
+      processOnly: 'Sólo para tu proceso actual',
+      needsReconsent: 'Necesitamos tu confirmación',
+      withdrawn: 'Permiso retirado',
+      expired: 'Permiso vencido',
+      paused: 'Contacto en pausa'
+    },
+    purposeTitle: 'Qué significa estar en el banco',
+    purposeBody:
+      'People puede encontrar tu perfil cuando una vacante real se relaciona con tu experiencia. No implica selección, contacto asegurado ni una decisión automática.',
+    ledger: [
+      {
+        title: 'Finalidad acotada',
+        body: 'Sólo futuras oportunidades laborales de Efeonce.',
+        icon: 'tabler-target-arrow'
+      },
+      {
+        title: 'Evidencia gobernada',
+        body: 'Experiencia, disponibilidad y evidencia del proceso; nunca notas internas abiertas al público.',
+        icon: 'tabler-shield-lock'
+      },
+      {
+        title: 'Control en tus manos',
+        body: 'Puedes actualizar tu disponibilidad o retirar el permiso cuando quieras.',
+        icon: 'tabler-adjustments-horizontal'
+      }
+    ],
+    expiryLabel: 'Vigencia del permiso',
+    noExpiry: 'Aún no hay permiso futuro vigente',
+    availabilityTitle: 'Tu disponibilidad',
+    availabilityBody: 'Indica cuándo tendría sentido conversar. Esto no compromete tu agenda ni garantiza contacto.',
+    availabilityOptions: [
+      { value: 'immediate', label: 'Ahora', description: 'Podría conversar en estos días.' },
+      {
+        value: 'within_30_days',
+        label: 'Dentro de 30 días',
+        description: 'Estaría disponible durante el próximo mes.'
+      },
+      { value: 'within_60_days', label: 'En 60 días o más', description: 'Prefiero una conversación más adelante.' },
+      {
+        value: 'not_available',
+        label: 'No disponible',
+        description: 'Mantén mi perfil, pero no me contactes por ahora.'
+      }
+    ],
+    confirm: 'Confirmar futuras oportunidades',
+    update: 'Guardar disponibilidad',
+    updating: 'Guardando…',
+    withdraw: 'Retirar mi perfil',
+    withdrawTitle: '¿Retirar tu perfil del banco?',
+    withdrawBody:
+      'People dejará de encontrarlo para futuras oportunidades. Conservaremos sólo la evidencia de auditoría exigida y los datos que todavía correspondan a un proceso activo.',
+    withdrawConfirm: 'Sí, retirar mi perfil',
+    cancel: 'Mantener mi perfil',
+    receiptPrefix: 'Comprobante',
+    privacy: 'Puedes revisar la finalidad, vigencia y tus derechos en el aviso de privacidad de Efeonce.',
+    unavailableTitle: 'Este enlace ya no está disponible',
+    unavailableBody:
+      'Puede haber vencido o haber sido reemplazado. No compartimos si existe un perfil asociado a este enlace.',
+    retry: 'Intentar nuevamente',
+    loading: 'Consultando el estado de tu perfil…',
+    error: 'No pudimos completar la operación. Tu estado anterior se mantiene.',
+    conflict: 'El estado cambió mientras estabas aquí. Actualiza la información antes de continuar.',
+    rateLimited: 'Hubo demasiados intentos. Espera un momento e intenta nuevamente.'
   },
   detail: {
     applyCta: 'Postular a esta vacante',
@@ -123,11 +202,12 @@ export const careers: CareersCopy = {
       location: 'Ubicación',
       modality: 'Modalidad',
       seniority: 'Seniority',
-      employment: 'Jornada',
+      employment: 'Jornada'
     },
     unavailableTitle: 'Esta vacante ya no está disponible',
-    unavailableBody: 'Puede que la hayamos cerrado o que el enlace haya cambiado. Revisa el resto de nuestras vacantes abiertas.',
-    unavailableCta: 'Ver vacantes abiertas',
+    unavailableBody:
+      'Puede que la hayamos cerrado o que el enlace haya cambiado. Revisa el resto de nuestras vacantes abiertas.',
+    unavailableCta: 'Ver vacantes abiertas'
   },
   apply: {
     eyebrow: 'Falta poco: cuéntanos de ti',
@@ -143,7 +223,7 @@ export const careers: CareersCopy = {
     sections: {
       personal: 'Tus datos',
       profile: 'Tu perfil',
-      message: 'Cuéntanos más',
+      message: 'Cuéntanos más'
     },
     fields: {
       firstName: 'Nombre',
@@ -154,7 +234,7 @@ export const careers: CareersCopy = {
       portfolio: 'Portafolio (opcional)',
       linkedin: 'LinkedIn (opcional)',
       availability: 'Disponibilidad (opcional)',
-      message: 'Mensaje (opcional)',
+      message: 'Mensaje (opcional)'
     },
     placeholders: {
       email: 'tu@correo.com',
@@ -163,7 +243,7 @@ export const careers: CareersCopy = {
       portfolio: 'https://tu-portafolio.com',
       linkedin: 'https://linkedin.com/in/tu-perfil',
       availability: 'Selecciona una opción',
-      message: 'Cuéntanos brevemente por qué te interesa este rol.',
+      message: 'Cuéntanos brevemente por qué te interesa este rol.'
     },
     availabilityOptions: ['Inmediata', '2 a 4 semanas', '1 a 2 meses', 'Estoy explorando'],
     cv: {
@@ -177,13 +257,18 @@ export const careers: CareersCopy = {
       removeCta: 'Quitar',
       invalidType: 'Sube un PDF. Por seguridad no aceptamos DOC, DOCX ni ZIP en este formulario.',
       tooLarge: 'El PDF supera el máximo de 10 MB.',
-      empty: 'El archivo está vacío. Elige otro PDF.',
+      empty: 'El archivo está vacío. Elige otro PDF.'
     },
     consent: {
       title: 'Acepto que Efeonce trate mis datos para este proceso de selección.',
       bodyPrefix: 'Conforme al',
       link: 'aviso de privacidad',
-      bodySuffix: '(Ley 21.719). Puedes revocarlo cuando quieras.',
+      bodySuffix: '(Ley 21.719). Puedes revocarlo cuando quieras.'
+    },
+    talentPoolConsent: {
+      sectionLabel: 'Mantener mi perfil para futuras oportunidades (opcional)',
+      title: 'Quiero que Efeonce considere mi perfil para futuras oportunidades.',
+      body: 'Es opcional y no afecta esta postulación. Confirmaremos tu correo antes de activar el Banco de Talento; podrás pausar o retirar el permiso.'
     },
     captcha: {
       verifiedTitle: 'Verificado',
@@ -191,7 +276,7 @@ export const careers: CareersCopy = {
       failedTitle: 'No pudimos verificarte',
       failedBody: 'Recarga la página e intenta de nuevo.',
       brand: 'Turnstile',
-      pendingTitle: 'Verificación pendiente',
+      pendingTitle: 'Verificación pendiente'
     },
     phoneCountryAria: 'País del teléfono',
     residenceCountryHelp: 'Indica dónde resides. No se deduce del prefijo telefónico.',
@@ -215,13 +300,13 @@ export const careers: CareersCopy = {
       rateLimited: 'Estás enviando demasiadas veces. Intenta de nuevo en unos minutos.',
       captchaFailed: 'No pudimos verificar que no eres un robot. Recarga la página e intenta de nuevo.',
       notOpen: 'Esta vacante ya no está disponible.',
-      server: 'No pudimos enviar tu postulación. Intenta de nuevo en unos minutos; tus datos no se enviaron.',
-    },
+      server: 'No pudimos enviar tu postulación. Intenta de nuevo en unos minutos; tus datos no se enviaron.'
+    }
   },
   footer: {
     privacy: 'Aviso de privacidad',
     terms: 'Términos',
-    website: 'efeoncepro.com',
+    website: 'efeoncepro.com'
   },
   aria: {
     skipToContent: 'Saltar al contenido',
@@ -229,7 +314,7 @@ export const careers: CareersCopy = {
     listingRegion: 'Listado de vacantes abiertas',
     talentPool: 'Banco de talento Efeonce',
     formStatus: 'Estado del formulario de postulación',
-    required: 'requerido',
+    required: 'requerido'
   },
   fallbacks: {
     area: 'Efeonce',
@@ -240,6 +325,6 @@ export const careers: CareersCopy = {
     summary: 'Rol publicado por Efeonce. Revisa el detalle y postula en minutos.',
     skill: 'Competencias del rol',
     responsibility: 'Contribuir al crecimiento de marcas con método, datos y creatividad.',
-    requirement: 'Experiencia relevante para el rol y ganas de construir con el equipo.',
-  },
+    requirement: 'Experiencia relevante para el rol y ganas de construir con el equipo.'
+  }
 }

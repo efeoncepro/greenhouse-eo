@@ -88,6 +88,7 @@ import {
   hiringAssessmentAssignedEmailProjection,
   hiringAssessmentSubmittedInternalEmailProjection,
   hiringStageChangedEmailProjection,
+  talentPoolVerificationEmailProjection
 } from './hiring-lifecycle-emails'
 import { growthGraderRunFromSubmissionProjection } from './growth-grader-run-from-submission'
 import { growthHiringApplicationFromSubmissionProjection } from './growth-hiring-application-from-submission'
@@ -131,8 +132,8 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(providerToolingProjection)
   registerProjection(financeExpenseReactiveIntakeProjection)
   registerProjection(paymentObligationsFromPayrollProjection)
-registerProjection(contractorPayableFinanceObligationProjection)
-registerProjection(contractorPayableExpenseMaterializeProjection)
+  registerProjection(contractorPayableFinanceObligationProjection)
+  registerProjection(contractorPayableExpenseMaterializeProjection)
   registerProjection(contractorPayablePaidCascadeProjection) // TASK-981 Slice 1 — finance.payment_order.paid → mark linked contractor payables paid + emit workforce.contractor_payable.paid
   registerProjection(contractorPayablePaidEmailProjection) // TASK-981 Slice 2 — workforce.contractor_payable.paid → email TASK-960 remittance PDF to the contractor
   registerProjection(contractingSignatureBridgeProjection) // TASK-1024 — signature.request.* → advance contracting case + link signed PDF
@@ -195,6 +196,7 @@ registerProjection(contractorPayableExpenseMaterializeProjection)
   registerProjection(hiringAssessmentSubmittedInternalEmailProjection) // hiring.assessment.submitted (candidate_test) → aviso interno a People con CTA a Application 360
   registerProjection(hiringStageChangedEmailProjection) // TASK-1689 — hiring.application.stage_changed → avance de etapa candidate-facing (allowlist)
   registerProjection(hiringApplicationDecidedEmailProjection) // TASK-1689 — hiring.application.decided → selected/rejected (rejected pausable via email_type_config)
+  registerProjection(talentPoolVerificationEmailProjection) // TASK-1724 — consentimiento futuro solicitado → email de verificación/token self-service
   registerProjection(growthHiringApplicationFromSubmissionProjection) // TASK-1372 — growth.forms.submission_accepted (application forms) → ATS application + scanned private CV asset; sin destination interno; drenado por ops-reactive-growth
   registerProjection(growthAeoDiagnosticGraderRunProjection) // TASK-1321 — growth.forms.submission_accepted (/aeo-2/ efeonce-aeo-diagnostic) → remap + brand-intelligence category + cost-cap → enqueue grader run + materialize lead (kill-switch GROWTH_AEO_FORM_GRADER_INTAKE_ENABLED default-ON); drenado por ops-reactive-growth
   registerProjection(growthAiVisibilityLeadHandoffProjection) // TASK-1242 — growth.ai_visibility.lead_handoff_requested → upsert contact/company en HubSpot (in-app directo, idempotente, consent+score gated); drenado por ops-reactive-growth

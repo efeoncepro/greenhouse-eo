@@ -59,7 +59,6 @@ export type MicrocopyNamespace =
   | 'hiringDesk' // TASK-355: workspace interno de Hiring
   | 'hiringAssessment' // TASK-1363: rendición pública + review interno del assessment
   | 'hiringActivation' // TASK-1368: lane People Ops para activar hires seleccionados
-;
 
 /**
  * Estructura raíz de un dictionary completo por locale.
@@ -299,6 +298,7 @@ export interface HiringDeskCopy {
     demand: string
     pipeline: string
     publication: string
+    talentPool: string
   }
   common: {
     search: string
@@ -575,6 +575,80 @@ export interface HiringDeskCopy {
       retry: string
     }
   }
+  talentPool: {
+    title: string
+    subtitle: string
+    eyebrow: string
+    searchLabel: string
+    searchPlaceholder: string
+    capabilityLabel: string
+    capabilityPlaceholder: string
+    seniorityLabel: string
+    languageLabel: string
+    countryLabel: string
+    availabilityLabel: string
+    personLabel: string
+    allowedActionLabel: string
+    filtersLabel: string
+    filtersShow: string
+    filtersHide: string
+    activeFilters: string
+    all: string
+    clearFilters: string
+    results: string
+    updated: string
+    loadMore: string
+    loading: string
+    emptyTitle: string
+    emptyBody: string
+    errorTitle: string
+    retry: string
+    profileTitle: string
+    closeDetail: string
+    mobileBack: string
+    why: string
+    evidence: string
+    applications: string
+    unknown: string
+    observed: string
+    freshUntil: string
+    openApplication: string
+    coverage: Record<'none' | 'partial' | 'structured', string>
+    freshness: Record<'none' | 'stale' | 'current', string>
+    lifecycle: Record<
+      'active_process' | 'pool_eligible' | 'needs_reconsent' | 'paused' | 'withdrawn' | 'expired',
+      string
+    >
+    reason: Record<
+      | 'active_application_only'
+      | 'future_consent_current'
+      | 'future_consent_missing'
+      | 'future_consent_expired'
+      | 'consent_withdrawn'
+      | 'contact_paused'
+      | 'evidence_missing'
+      | 'evidence_stale',
+      string
+    >
+    source: Record<'application' | 'opening' | 'assessment_competency', string>
+    actionInvite: string
+    actionNoContact: string
+    inviteTitle: string
+    inviteBody: string
+    openingLabel: string
+    openingPlaceholder: string
+    propose: string
+    proposing: string
+    confirmTitle: string
+    confirmBody: string
+    confirm: string
+    confirming: string
+    cancel: string
+    inviteReceipt: string
+    inviteConflict: string
+    inviteError: string
+    inviteDisabled: string
+  }
 }
 
 export interface CareersCopy {
@@ -665,6 +739,45 @@ export interface CareersCopy {
     successSuffix: string
     privacy: string
   }
+  talentPoolSelfService: {
+    metadataTitle: string
+    eyebrow: string
+    title: string
+    intro: string
+    status: {
+      active: string
+      processOnly: string
+      needsReconsent: string
+      withdrawn: string
+      expired: string
+      paused: string
+    }
+    purposeTitle: string
+    purposeBody: string
+    ledger: Array<{ title: string; body: string; icon: string }>
+    expiryLabel: string
+    noExpiry: string
+    availabilityTitle: string
+    availabilityBody: string
+    availabilityOptions: Array<{ value: string; label: string; description: string }>
+    confirm: string
+    update: string
+    updating: string
+    withdraw: string
+    withdrawTitle: string
+    withdrawBody: string
+    withdrawConfirm: string
+    cancel: string
+    receiptPrefix: string
+    privacy: string
+    unavailableTitle: string
+    unavailableBody: string
+    retry: string
+    loading: string
+    error: string
+    conflict: string
+    rateLimited: string
+  }
   detail: {
     applyCta: string
     timeHint: string
@@ -743,6 +856,11 @@ export interface CareersCopy {
       bodyPrefix: string
       link: string
       bodySuffix: string
+    }
+    talentPoolConsent: {
+      sectionLabel: string
+      title: string
+      body: string
     }
     captcha: {
       verifiedTitle: string

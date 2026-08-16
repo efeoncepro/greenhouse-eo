@@ -6,6 +6,9 @@ import { describe, expect, it } from 'vitest'
 const deployScript = () =>
   readFileSync(resolve(process.cwd(), 'services/ops-worker/deploy.sh'), 'utf8')
 
+const deployWorkflow = () =>
+  readFileSync(resolve(process.cwd(), '.github/workflows/ops-worker-deploy.yml'), 'utf8')
+
 describe('ops-worker deploy Nubox contract', () => {
   it('declares Nubox env vars because deploy.sh uses destructive --set-env-vars', () => {
     const script = deployScript()
@@ -35,6 +38,26 @@ describe('ops-worker deploy identity smoke contract', () => {
     expect(script).toContain('DEFAULT_GREENHOUSE_PORTAL_BASE_URL="https://greenhouse.efeoncepro.com"')
     expect(script).not.toContain('DEFAULT_GREENHOUSE_PORTAL_BASE_URL="https://dev-greenhouse.efeoncepro.com"')
     expect(script).toContain('staging is protected by Vercel SSO')
+  })
+})
+
+describe('ops-worker Talent Pool projection contract', () => {
+  it('persists the projection kill switch and schedules the idempotent reconciler', () => {
+    const script = deployScript()
+    const jobIndex = script.indexOf('"ops-hiring-talent-pool-reconcile"')
+
+    expect(script).toContain(
+      'ENV_VARS="${ENV_VARS},HIRING_TALENT_POOL_PROJECTION_ENABLED=${HIRING_TALENT_POOL_PROJECTION_ENABLED}"'
+    )
+    expect(jobIndex).toBeGreaterThan(0)
+    expect(script.slice(jobIndex, jobIndex + 260)).toContain('"*/5 * * * *"')
+    expect(script.slice(jobIndex, jobIndex + 260)).toContain('"/hiring/talent-pool/reconcile"')
+  })
+
+  it('treats Talent Pool sources as worker runtime inputs for triggers, resolution and drift checks', () => {
+    const workflow = deployWorkflow()
+
+    expect(workflow.match(/src\/lib\/hiring\/talent-pool/g)).toHaveLength(3)
   })
 })
 

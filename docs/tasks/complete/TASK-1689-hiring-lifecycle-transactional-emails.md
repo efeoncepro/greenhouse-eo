@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `sync`
 - Epic: `EPIC-011`
-- Status real: `LIVE en producción (2026-08-12): flag ON, E2E real con LOS 6 tipos sent, releases 393144e9f + 950f5bdb4`
+- Status real: `LIVE en producción: los 6 tipos originales tienen E2E sent; el séptimo aviso interno de test completado está desplegado/configurado (2026-08-15) y espera su primer smoke de entrega real`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -29,7 +29,10 @@
 
 ## Summary
 
-El pipeline de Hiring ya emite eventos outbox en cada hito (`hiring.application.created`, `hiring.assessment.assigned`, `hiring.application.stage_changed`, `hiring.application.decided`) pero ningún consumer los convierte en comunicación: ni el equipo de People se entera de una postulación nueva ni el candidato recibe acuse, aviso de test, avance de etapa o decisión. Esta task cablea 6 emails transaccionales sobre la plataforma de email canónica (Resend + templates + kill-switch + email log) vía consumers reactivos en el ops-worker, detrás de flag default-OFF.
+El alcance original de esta task cableó 6 emails transaccionales sobre la plataforma canónica. La
+extensión de 2026-08-15 añade un séptimo: `hiring.assessment.submitted` avisa internamente a People
+cuando un `candidate_test` queda listo para revisión. Los consumers siguen siendo reactivos en el
+ops-worker, con Resend, kill-switch, email log y flag general; no hay envío inline ni decisión automática.
 
 ## Why This Task Exists
 
@@ -39,6 +42,8 @@ Hoy el único canal de awareness de una postulación nueva es entrar al Hiring D
 
 - El buzón interno de People (`people@efeoncepro.com`, configurable) recibe un email con los datos del postulante en cada postulación nueva, venga del apply estándar o del native Growth Form.
 - El candidato recibe: acuse de recibo al postular, aviso cuando se le asigna un test, aviso cuando avanza a una etapa candidate-facing, y el email de decisión (seleccionado, o agradecimiento si no fue seleccionado).
+- People recibe además un aviso de test completado con CTA a Application 360, sin respuestas, score,
+  cambio de etapa ni decisión.
 - Todo el envío es asíncrono (outbox → consumer reactivo en ops-worker), idempotente (sin double-send en retries), gobernado por flag default-OFF + kill-switch por tipo de email, y sin PII en payloads de eventos, logs ni señales.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -63,6 +68,9 @@ Reglas obligatorias:
 - Todo envío pasa por `sendEmail` de `src/lib/email/delivery.ts` (kill-switch `greenhouse_notifications.email_type_config`, email log, dedupe `sourceEventId + sourceEntity + recipientEmail`, rate limit). No crear un sender paralelo.
 - `hiring.assessment.assigned` se emite tanto para tests de candidato como para scorecards de entrevistador (`instances.ts:300` y `:337`): el consumer DEBE re-leer el assessment y notificar únicamente los candidate-facing. `[verificar]` el campo discriminador en el payload/entidad.
 - `hiring.application.stage_changed` no implica email: sólo etapas candidate-facing configuradas explícitamente notifican, con nombre de etapa traducido a copy público — nunca exponer nombres de etapas internas de triage.
+- `hiring.assessment.submitted` sólo notifica internamente cuando el re-read confirma
+  `method=candidate_test`, estado `submitted|scored` y `submitted_at`; un scorecard, un estado previo
+  o uno expirado nunca producen ese correo.
 - Copy visible de los emails valida con `greenhouse-ux-writing` (es-CL primario; en-US si el locale del candidato lo indica vía `locale-resolver`).
 - Flag default-OFF registrada en el Feature Flag State Ledger en el mismo PR; al prenderla, aplicar el protocolo multi-runtime (declarar en `services/ops-worker/deploy.sh` + `--update-env-vars` en vivo).
 
@@ -70,14 +78,14 @@ Reglas obligatorias:
 
 - `docs/tasks/complete/TASK-981-contractor-payable-paid-lifecycle.md` — precedente del consumer reactivo de email (patrón a replicar).
 - `docs/tasks/complete/TASK-1367-careers-apply-intake-service.md` — intake público que emite `hiring.application.created`.
-- `docs/tasks/complete/TASK-1360-hiring-assessment-engine.md` `[verificar]` — engine de assessments y evento `assigned`.
+- `docs/tasks/complete/TASK-1360-assessment-engine-foundation.md` — engine de assessments y eventos `assigned`/`submitted`.
 - `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md`
 
 ## Dependencies & Impact
 
 ### Depends on
 
-- `TASK-353` / `TASK-1367` — aggregates Hiring + intake público ya emiten los 4 eventos trigger (verificado en `store.ts:1165`, `store.ts:1229`, `decide.ts:275`, `assessment/instances.ts:300/337`).
+- `TASK-353` / `TASK-1367` — aggregates Hiring + intake público ya emiten los triggers de aplicación/etapa/decisión; el engine de TASK-1360 emite `hiring.assessment.assigned` y `hiring.assessment.submitted`.
 - Plataforma de email canónica (`src/lib/email/**`, `src/emails/**`, `src/lib/email-log.ts`) — operativa.
 - Registry de projections reactivas (`src/lib/sync/projections/index.ts`) + ops-worker — operativos.
 
@@ -94,12 +102,10 @@ Reglas obligatorias:
 - `src/emails/HiringApplicationReceivedInternalEmail.tsx`
 - `src/emails/HiringApplicationConfirmationEmail.tsx`
 - `src/emails/HiringAssessmentAssignedEmail.tsx`
+- `src/emails/HiringAssessmentSubmittedInternalEmail.tsx`
 - `src/emails/HiringStageAdvancedEmail.tsx`
 - `src/emails/HiringDecisionEmail.tsx` (variantes selected/rejected)
-- `src/lib/sync/projections/hiring-application-created-emails.ts`
-- `src/lib/sync/projections/hiring-assessment-assigned-email.ts`
-- `src/lib/sync/projections/hiring-stage-changed-email.ts`
-- `src/lib/sync/projections/hiring-application-decided-email.ts`
+- `src/lib/sync/projections/hiring-lifecycle-emails.ts` (cinco projections de ciclo, incluido test completado)
 - `src/lib/sync/projections/index.ts` (registro)
 - `src/lib/hiring/notifications/` (flags, config de destinatario interno, mapping de etapas candidate-facing, resolver de recipient)
 - migración seed de filas `greenhouse_notifications.email_type_config` para los tipos nuevos
@@ -148,7 +154,7 @@ Reglas obligatorias:
 ### Contract surface
 
 - Contrato existente a respetar: `sendEmail` (`src/lib/email/delivery.ts`), `ProjectionDefinition` (`src/lib/sync/projection-registry.ts` `[verificar]` path exacto), eventos del catálogo `EVENT_TYPES.hiring*`.
-- Contrato nuevo: 5-6 `EmailType` nuevos (`hiring_application_received_internal`, `hiring_application_confirmation`, `hiring_assessment_assigned`, `hiring_stage_advanced`, `hiring_decision_selected`, `hiring_decision_rejected`) con prioridad `transactional`; 4 projections nuevas; módulo `src/lib/hiring/notifications/` con flag + política.
+- Contrato nuevo: 7 `EmailType` (`hiring_application_received_internal`, `hiring_application_confirmation`, `hiring_assessment_assigned`, `hiring_assessment_submitted_internal`, `hiring_stage_advanced`, `hiring_decision_selected`, `hiring_decision_rejected`) con prioridad `transactional`; cinco projections en el módulo de ciclo y política en `src/lib/hiring/notifications/`.
 - Backward compatibility: `compatible` — todo aditivo; con flag OFF el comportamiento actual no cambia en nada.
 - Full API parity: N/A — no nace capability operable nueva; es un side effect de notificación sobre commands existentes. El control operativo (pausar un tipo) ya existe vía `email_type_config`.
 
@@ -158,6 +164,8 @@ Reglas obligatorias:
 - Invariantes que no se pueden romper:
   - Un retry del dispatcher NUNCA duplica un email: `sourceEventId` = event id del outbox + `sourceEntity` = application/assessment id, dedupeados por el email log (patrón TASK-981).
   - El consumer de `assessment.assigned` sólo notifica assessments candidate-facing; un scorecard de entrevistador jamás genera email al candidato.
+  - El consumer de `assessment.submitted` sólo avisa al buzón interno tras re-leer un `candidate_test`
+    durablemente completado; jamás expone respuestas o score ni cambia una etapa/decisión.
   - El consumer de `stage_changed` sólo notifica transiciones hacia etapas del allowlist candidate-facing; etapas internas nunca aparecen en copy.
   - El email de rechazo sólo se envía cuando la decisión quedó persistida como `rejected` re-leída de PG; su tipo tiene kill-switch propio para que Talent pueda pausarlo sin apagar el resto.
   - Skip honesto: candidato sin email resoluble, aplicación no encontrada o estado inconsistente → skip con mensaje + `captureWithDomain('hr'|'hiring')` sanitizado, nunca fallar el batch completo.
@@ -183,7 +191,7 @@ Reglas obligatorias:
 
 ### Runtime evidence
 
-- Local checks: tests focales por consumer (trigger → recipient correcto, dedupe en replay, skip sin email, scorecard no notifica, etapa no-allowlisted no notifica, rejected vs selected) + render de los 5 templates.
+- Local checks: tests focales por consumer (trigger → recipient correcto, dedupe en replay, skip sin email, scorecard no notifica, etapa no-allowlisted no notifica, rejected vs selected) + render de los 6 templates.
 - DB/runtime checks: migración seed aplicada y verificada con SELECT; email log con filas `sent` tras ejercicio en staging.
 - Integration checks: en staging con flag ON en ops-worker: postulación de prueba end-to-end (apply → email interno + acuse), asignar test, avanzar etapa, decidir selected y rejected — verificando recepción real y contenido.
 - Reliability signals/logs: `sync.outbox.dead_letter` y `sync.outbox.unpublished_lag` en 0 tras el ejercicio; búsqueda de PII en logs del worker en 0 hallazgos.
@@ -211,7 +219,7 @@ Reglas obligatorias:
 ### Slice 1 — Tipos, templates y seed
 
 - Agregar los `EmailType` nuevos + priority map `transactional` + registro en `templates.ts` con preview meta.
-- Crear los 5 templates React Email (interno, acuse, test asignado, avance de etapa, decisión con variantes) con copy es-CL validado por `greenhouse-ux-writing` y soporte en-US vía locale resolver.
+- Crear los templates React Email de postulación, acuse, test asignado, test completado interno, avance de etapa y decisión (con variantes) con copy es-CL validado por `greenhouse-ux-writing` y soporte en-US vía locale resolver.
 - Migración seed idempotente de `email_type_config`.
 
 ### Slice 2 — Política de dominio + consumer de postulación nueva
@@ -248,9 +256,10 @@ Mapa evento → email:
 | 1 | Postulación nueva (datos del postulante) | `hiring.application.created` | buzón People interno | `hiring_application_received_internal` |
 | 2 | Acuse de recibo | `hiring.application.created` | candidato | `hiring_application_confirmation` |
 | 3 | Test asignado | `hiring.assessment.assigned` (sólo candidate-facing) | candidato | `hiring_assessment_assigned` |
-| 4 | Avance de etapa | `hiring.application.stage_changed` (sólo allowlist) | candidato | `hiring_stage_advanced` |
-| 5 | Seleccionado | `hiring.application.decided` (selected) | candidato | `hiring_decision_selected` |
-| 6 | No seleccionado (agradecimiento) | `hiring.application.decided` (rejected) | candidato | `hiring_decision_rejected` |
+| 4 | Test completado | `hiring.assessment.submitted` (sólo `candidate_test` durable) | buzón People interno | `hiring_assessment_submitted_internal` |
+| 5 | Avance de etapa | `hiring.application.stage_changed` (sólo allowlist) | candidato | `hiring_stage_advanced` |
+| 6 | Seleccionado | `hiring.application.decided` (selected) | candidato | `hiring_decision_selected` |
+| 7 | No seleccionado (agradecimiento) | `hiring.application.decided` (rejected) | candidato | `hiring_decision_rejected` |
 
 Cada consumer replica el patrón de `contractor-payable-paid-email.ts`: `extractScope` desde IDs del payload → `refresh` re-lee PG → resuelve recipient → `sendEmail` con `sourceEventId`/`sourceEntity` → retorna mensaje sin PII. La política de qué notificar vive en `src/lib/hiring/notifications/`, no en el consumer.
 
@@ -301,7 +310,7 @@ Decisiones que el agente ejecutor debe cerrar en plan mode (Zone 2): (a) allowli
 ### Out-of-band coordination required
 
 - Confirmar con People/Talent el buzón destino (`people@efeoncepro.com`) y que está monitoreado en Outlook/M365.
-- Revisión humana de Talent del copy de los 5 templates ANTES de prender en producción (especialmente el de rechazo).
+- Revisión humana de Talent del copy de los 6 templates ANTES de prender en producción (especialmente el de rechazo).
 - Decisión operativa: rechazo inmediato al decidir vs pausado para envío controlado.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -310,7 +319,8 @@ Decisiones que el agente ejecutor debe cerrar en plan mode (Zone 2): (a) allowli
 
 ## Acceptance Criteria
 
-- [ ] Cada uno de los 6 emails se envía ante su trigger real en staging, verificado con recepción efectiva (no sólo email log).
+- [x] Los 6 emails originales se enviaron ante su trigger real y tienen evidencia live (Delta 2026-08-12).
+- [ ] El séptimo aviso de test completado tiene primera entrega real confirmada después de su despliegue; no se usa backfill ni se re-procesa un evento histórico para satisfacer este smoke.
 - [ ] Ambas entradas públicas (apply estándar y native Growth Form) producen el email interno + acuse, sin cableado duplicado.
 - [ ] Re-procesar el mismo evento no duplica ningún email (dedupe por sourceEventId probado con test + ejercicio real).
 - [ ] Un scorecard de entrevistador no genera email al candidato (test negativo).
@@ -325,7 +335,7 @@ Decisiones que el agente ejecutor debe cerrar en plan mode (Zone 2): (a) allowli
 ## Verification
 
 - `pnpm task:lint --task TASK-1689`
-- tests focales de los 4 consumers (trigger, recipient, dedupe/replay, skips, filtros negativos) + render de templates.
+- tests focales de los cinco consumers (trigger, recipient, dedupe/replay, skips, filtros negativos) + render de templates.
 - `pnpm test src/lib/hiring src/lib/sync/projections` focal + `pnpm local:check`.
 - migración seed en local/staging + SELECT read-only de `email_type_config`.
 - ejercicio end-to-end en staging con flag ON según Production verification sequence (pasos 1-4).
@@ -347,6 +357,20 @@ Decisiones que el agente ejecutor debe cerrar en plan mode (Zone 2): (a) allowli
 - `hiring_decision_selected` ejercitado EN VIVO por supersede controlado sobre EO-APP-0090
   (`sent` verificado en `email_deliveries`, asunto personalizado); la postulación de prueba
   quedó re-decidida `rejected` (descartada). Los 6 tipos tienen ya evidencia live.
+
+## Delta 2026-08-15 — aviso interno al completar candidate test
+
+- Se agregó `hiring_assessment_submitted_internal`: el consumer re-lee el assessment, acepta sólo
+  `candidate_test` en `submitted|scored` con `submitted_at`, y deduplica por evento + assessment +
+  buzón People antes de enviar la CTA a Application 360. No revela respuestas ni score y no altera
+  etapa ni decisión.
+- Runtime verificado: migración aplicada, fila de kill-switch habilitada, flag general y destinatario
+  interno activos en `ops-worker-00557-hfp`. El único `hiring.assessment.submitted` existente fue
+  publicado antes del consumer y no aparece en el reactive log ni en `email_deliveries`; es el
+  comportamiento esperado de no-backfill, no un reintento pendiente.
+- Pendiente operativo: People/Operations confirma la primera entrega de un test nuevo contra el buzón,
+  `greenhouse_notifications.email_deliveries` y `greenhouse_sync.outbox_reactive_log`. Si hay un
+  problema, pausar primero `hiring_assessment_submitted_internal` y conservar los otros seis tipos.
 
 ## Delta 2026-08-12 (rollout LIVE)
 

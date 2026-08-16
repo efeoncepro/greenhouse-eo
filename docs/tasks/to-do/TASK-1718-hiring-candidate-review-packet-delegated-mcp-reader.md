@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-011`
-- Status real: `Diseno; sin reader agent-safe ni provider MCP de Hiring`
+- Status real: `Diseño; portal documents reader existe y fue promovido, pero no hay reader agent-safe ni provider MCP de Hiring`
 - Rank: `TBD`
 - Domain: `hr|platform|identity|data`
 - Blocked by: `none`
@@ -188,6 +188,12 @@ Reglas obligatorias:
 - El upload público de CV acepta PDF, máximo 10 MB, y la plataforma de assets bloquea descargas mientras
   el archivo está pendiente o en cuarentena.
 - Application 360 ya compone postulación, assessments, scorecards y documentos con lectores server-side.
+- `GET /api/hiring/candidate-facets/[candidateFacetId]/documents` es un reader interno de portal, protegido por
+  `hiring.application.read`; devuelve archivos/links y la identidad documental enmascarada. No extrae texto de CV,
+  no es App API y no puede federarse.
+- La revelación de documento de identidad usa un command separado, auditado, con
+  `hiring.candidate.reveal_identity`; un provider no hereda esa capacidad. El panel/document reader de
+  `TASK-1714`/`TASK-1715` fue incluido en production por `0fe2420ed894`, sin convertirlo en superficie agentic.
 - El gateway MCP ya implementa OAuth/Streamable HTTP y providers read-only, pero no tiene provider Hiring.
 - Greenhouse ya intercambia el token Entra de un usuario por un grant acotado para una sister platform. Ese
   código está estrechamente ligado al scope de fondeo de Globe y debe ampliarse sin romperlo ni generalizar

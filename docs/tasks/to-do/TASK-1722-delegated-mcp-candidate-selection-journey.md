@@ -160,6 +160,9 @@ Reglas obligatorias:
 - TASK-1720 especifica el primer write Hiring, scope por blast-radius, App API delegada y fail-closed policy.
 - Token exchange sister-platform preserva separación entre subject humano y downstream service identity.
 - TASK-1721 define la única business primitive autorizada para este journey.
+- No existe provider `greenhouse-hiring`, catálogo OAuth, scope Hiring write ni tool de selección registrados en
+  `mcp.efeonce.org`. Las routes directas de decisión/handoff y el panel portal no deben exponerse mientras
+  `TASK-1721` y el grant revocable `TASK-1631` sigan pendientes.
 
 ### Gap
 

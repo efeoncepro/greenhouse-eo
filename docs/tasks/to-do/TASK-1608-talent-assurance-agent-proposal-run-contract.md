@@ -15,7 +15,7 @@
 - Motion: `none`
 - Backend impact: `command|reader|integration`
 - Epic: `EPIC-038`
-- Status real: `Diseño agentic; no runtime autorizado`
+- Status real: `Runtime compartido reutilizable verificado; adapter/proposal Talent Assurance no autorizado ni implementado`
 - Rank: `EPIC-038-phase-2`
 - Domain: `agents|hiring|workforce|delivery|finance`
 - Blocked by: `TASK-1602`, `TASK-1603`, `TASK-1607`
@@ -56,6 +56,20 @@ El epic requiere agentes que observen, recomienden, propongan y ejecuten accione
 ### Files owned
 
 - `src/lib/nexa/**`, `src/lib/agents/**`, capabilities, proposals, audit y docs
+
+## Current Repo State
+
+### Already exists
+
+- Nexa/agent runtime, capabilities y domain readers son foundations compartidas. `TASK-1718` es un input planeado,
+  acotado y read-only de candidate review Hiring; no emite un claim ni una propuesta Talent Assurance.
+
+### Gap / start blockers
+
+- No existen role adapter Talent Assurance, binding de run/proposal ledger, chequeo de expiración de aprobación,
+  allowlist, reconciliación de efectos ni drill de kill switch. Un runtime genérico no es evidencia de implementación.
+- Bloqueada por semántica aceptada de claim/quality/economics de `TASK-1602`, `TASK-1603`/`TASK-1719` y `TASK-1607`.
+  No puede promover ningún rol más allá de capabilities gobernadas existentes antes de evidencia `TASK-1609`.
 
 ## Modular Placement Contract
 

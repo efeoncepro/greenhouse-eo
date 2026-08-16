@@ -10,6 +10,7 @@ export type ApiPlatformErrorCode =
   | 'idempotency_in_progress'
   | 'internal_error'
   | 'invalid_identifier'
+  | 'invalid_delegated_context'
   | 'invalid_integration_keys'
   | 'invalid_refresh_token'
   | 'invalid_session'
@@ -47,6 +48,7 @@ export type ApiPlatformErrorCode =
   | 'rate_limited'
   | 'scope_not_allowed'
   | 'session_revoked'
+  | 'service_unavailable'
   | 'unsupported_api_version'
 
 export class ApiPlatformError extends Error {
