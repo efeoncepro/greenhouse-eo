@@ -63,8 +63,10 @@ marcado como contenido no confiable, y nunca contacto, identidad, respuestas del
 ## Privacidad y límites
 
 El consentimiento de una postulación actual cubre ese proceso; no se reutiliza silenciosamente para contacto futuro.
-El opt-in `future_opportunities`, su copy, TTL y retención requieren aprobación Legal/Privacy antes del rollout
-externo. Por eso el self-service y la invitación permanecen apagados en producción. El diseño técnico no sustituye
-asesoría legal calificada.
+El opt-in `future_opportunities` es explícito, tokenizado, versionado, con TTL y retiro. El self-service y la
+invitación ya están habilitados en producción por autorización operativa del CEO (2026-08-16), pero no constituyen
+contacto automático: la persona debe confirmar el propósito futuro y el operador debe iniciar/confirmar la invitación.
+La revisión jurídica formal de copy, TTL y retención permanece como sign-off residual si la política interna la exige;
+el diseño técnico no sustituye asesoría legal calificada.
 
 Canon: `docs/architecture/GREENHOUSE_TALENT_POOL_FULL_API_PARITY_DECISION_V1.md`.

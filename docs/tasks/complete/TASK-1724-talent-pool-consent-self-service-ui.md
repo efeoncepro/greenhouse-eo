@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-1724-talent-pool-consent-self-service-motion.md`
 - Backend impact: `migration|command|api`
 - Epic: `EPIC-011`
-- Status real: `Complete y desplegada fail-closed en producción; autoservicio/token/receipt verificados, activación externa gated por People + Legal/Privacy`
+- Status real: `Complete y desplegada en producción; self-service habilitado por CEO el 2026-08-16, con flags Vercel/worker en true, token/receipt verificados y rollback documentado`
 - Rank: `TBD`
 - Domain: `hr|ui|content`
 - Blocked by: `none`
@@ -43,9 +43,9 @@ TASK-1723: no guarda consentimiento en componentes ni crea una cuenta paralela d
   el ledger append-only para soportar `requested` sin reescribir historia.
 - GVC premium pasó en 1440×1000 y 390×844 con teclado y reduced motion en
   `.captures/2026-08-16T08-52-56_hiring-talent-pool-self-service`.
-- La superficie está desplegada en producción pero responde `404 talent_pool_link_unavailable` mientras
-  `HIRING_TALENT_POOL_SELF_SERVICE_ENABLED=false`; activación y smoke con persona real esperan sign-off People +
-  Legal/Privacy. GVC 1440/390, teclado y reduced motion prueban la experiencia sin abrir el purpose externamente.
+- La superficie quedó habilitada tras release `20245888625b8dc979cf2f747f5ef9d7999df6e5` / run `31953851353`, con
+  `HIRING_TALENT_POOL_SELF_SERVICE_ENABLED=true` en Vercel y worker. Smoke read-only de token inválido conserva el
+  anti-oracle `404 talent_pool_link_unavailable`; no se envió correo a una persona real durante el flip.
 - La auditoría Talent posterior al rollout cerró el último borde anti-abuse: si falta IP se usa un bucket opaco
   compartido y si PostgreSQL no puede aplicar el rate limit la solicitud se niega, nunca queda ilimitada.
 

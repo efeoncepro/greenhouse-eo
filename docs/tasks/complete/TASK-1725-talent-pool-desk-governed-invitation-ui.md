@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-1725-talent-pool-desk-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-011`
-- Status real: `Complete y operativa en producción interna; Desk read-only ON y verificado, invitación externa OFF hasta el gate People + Legal/Privacy`
+- Status real: `Complete y operativa en producción; Desk read-only e invitación gobernada ON desde 2026-08-16 por autorización CEO; contacto sigue consent-gated`
 - Rank: `TBD`
 - Domain: `hr|ui|agency`
 - Blocked by: `none`
@@ -46,7 +46,9 @@ contactability, dedupe ni creación de aplicaciones en componentes.
 - GVC premium del Desk con visor exacto pasó desktop/mobile, teclado y reduced motion en el harness sintético
   production-disabled `.captures/2026-08-16T12-22-58_hiring-talent-pool-desk`: siete frames, sin PII real, overflow,
   errores de consola/hydration/red ni findings axe.
-- Search/projection/MCP están activos en producción interna; invite/self-service siguen apagados hasta su gate.
+- Search/projection/MCP están activos en producción; invite/self-service están habilitados detrás de flags independientes.
+  La invitación sigue siendo proposal→confirm, idempotente y consent-gated; no mueve etapas, asigna tests ni envía
+  correo por sí sola.
   El acceso directo al CV desde el sidecar está code-complete y espera promoción junto con TASK-1718.
 
 ## Why This Task Exists

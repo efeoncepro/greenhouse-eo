@@ -118,12 +118,16 @@ redaction. A provider is disabled until allow/deny/redaction/fault tests and a g
 
 ## Runtime status — 2026-08-16
 
-- Producción interna: projection/search/Desk/App API/MCP read-only activos; invite y self-service externos siguen OFF.
+- Producción: projection/search/Desk/App API/MCP read-only activos; invite y self-service están habilitados detrás de
+  sus flags independientes. El enlace de confirmación sigue siendo opt-in explícito, tokenizado y reversible; no
+  existe contacto automático ni backfill de consentimiento futuro.
 - Cohorte reconciliada: 52 memberships, 50 `active_process`, 2 `needs_reconsent`; ninguna persona recibió
   consentimiento futuro por backfill.
 - MCP: `hiring.talent_pool.search` y `hiring.talent_pool.profile.get` están federadas para identidad interna
   delegada. Canary OAuth real: allow search/profile `200`; cliente base-only separado: deny Hiring `403`.
-- Recontacto: continúa bloqueado hasta aprobación People + Legal/Privacy del copy, policy version, TTL y retención.
+- Recontacto: el encendido operativo fue autorizado por el CEO el 2026-08-16 y el rollout quedó `released`; la
+  revisión jurídica formal de copy, policy version, TTL y retención permanece como sign-off residual si la política
+  interna la exige. El sistema no contacta a nadie sin grant explícito vigente.
 
 ## Rejected alternatives
 
