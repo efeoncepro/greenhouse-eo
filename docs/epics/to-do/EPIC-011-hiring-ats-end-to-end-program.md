@@ -161,6 +161,9 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `TASK-1733` — People 360 Longitudinal Hiring History UI: timeline/detail interno sobre TASK-1732.
 - `TASK-1734` — Assessment AI Scoring at Scale + Operator-Only Exception Review: run asíncrono por assessment,
   revisión humana gobernada y resultado exclusivamente interno; el postulante no ve score ni resultado.
+- `TASK-1735` — Hiring Application Evaluation Dossier: expediente de evaluación append-only per-application
+  (`hiring_application_note` tipada + command/reader + API + capability `hiring.application.annotate`),
+  internal-only y fuera del review packet MCP; el consumer UI de Application 360 es follow-up.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
 
