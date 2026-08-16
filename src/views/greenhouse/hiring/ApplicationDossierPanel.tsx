@@ -528,7 +528,7 @@ const ApplicationDossierPanel = ({
 
     return (
       <Box>
-        <Typography variant='subtitle2' component='h6'>{title}</Typography>
+        <Typography variant='subtitle2' component='h6' color='text.primary'>{title}</Typography>
         <Stack component='ul' spacing={1.5} sx={{ m: 0, mt: 1, ps: 5 }}>
           {claims.map(claim => (
             <Box component='li' key={claim.afirmacion}>
@@ -548,7 +548,7 @@ const ApplicationDossierPanel = ({
 
     return (
       <Box>
-        <Typography variant='subtitle2' component='h6'>{title}</Typography>
+        <Typography variant='subtitle2' component='h6' color='text.primary'>{title}</Typography>
         <Stack component='ul' spacing={1} sx={{ m: 0, mt: 1, ps: 5 }}>
           {items.map(item => (
             <Box component='li' key={item}>
@@ -618,7 +618,7 @@ const ApplicationDossierPanel = ({
         ) : (
           <Stack spacing={3}>
             <Box>
-              <Typography variant='subtitle2' component='h6'>{expediente.sectionSummary}</Typography>
+              <Typography variant='subtitle2' component='h6' color='text.primary'>{expediente.sectionSummary}</Typography>
               <Typography variant='body2' sx={{ mt: 1, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
                 {draft.resumenEjecutivo}
               </Typography>
@@ -684,7 +684,15 @@ const ApplicationDossierPanel = ({
       sx={theme => ({ p: { xs: 3, md: 4 }, minWidth: 0, borderRadius: `${theme.shape.customBorderRadius.lg}px` })}
     >
       <Stack spacing={2.5}>
-        <Typography variant='subtitle2' component='label' htmlFor='expediente-composer-body'>
+        {/* Visible solo con los toggles (el Select mobile trae su propio label).
+            text.primary explícito: subtitle2 hereda un gris que no pasa 4.5:1 a 13px (axe). */}
+        <Typography
+          id='expediente-composer-kind-label'
+          variant='subtitle2'
+          component='span'
+          color='text.primary'
+          sx={{ display: { xs: 'none', sm: 'block' } }}
+        >
           {expediente.composerKindLabel}
         </Typography>
 
@@ -693,7 +701,7 @@ const ApplicationDossierPanel = ({
           exclusive
           size='small'
           value={composerKind}
-          aria-label={expediente.composerKindLabel}
+          aria-labelledby='expediente-composer-kind-label'
           onChange={(_, next: HiringApplicationNoteKind | null) => {
             if (next) setComposerKind(next)
           }}
@@ -730,7 +738,10 @@ const ApplicationDossierPanel = ({
           onChange={event => setComposerBody(event.target.value)}
           error={composerLength > HIRING_APPLICATION_NOTE_BODY_MAX}
           slotProps={{
-            htmlInput: { 'aria-describedby': 'expediente-composer-count' }
+            htmlInput: {
+              'aria-label': expediente.composerPlaceholder,
+              'aria-describedby': 'expediente-composer-count'
+            }
           }}
         />
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }} justifyContent='space-between'>
@@ -820,7 +831,8 @@ const ApplicationDossierPanel = ({
       {/* REGION 0 — header del tab */}
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2.5} justifyContent='space-between' alignItems={{ xs: 'stretch', sm: 'flex-start' }}>
         <Box>
-          <Typography variant='h5' component='h2'>{expediente.title}</Typography>
+          {/* h4 (page-title 20px): el gate premium exige ratio heading/body >= 1.35 dentro del tab. */}
+          <Typography variant='h4' component='h2'>{expediente.title}</Typography>
           <Typography variant='body2' color='text.secondary'>{expediente.subtitle}</Typography>
           {aiEnabled === false ? (
             <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1 }}>
