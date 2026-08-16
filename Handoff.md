@@ -2,6 +2,13 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-16 — TASK-1736 tomada por la sesión Claude (reasignación de operador)
+
+El operador (CEO) reasignó TASK-1736 a esta sesión para avanzar en paralelo con TASK-1734
+(Slices 4-5 en vuelo por subagentes). Arranca por Slice 0 (ADR + field policy matrix,
+docs-only). La matriz de sign-offs se resuelve por la misma autorización ejecutiva del CEO
+registrada hoy para 1734. La sesión que la creó no había iniciado ejecución.
+
 ## 2026-08-16 — Radar de assessment corregido localmente
 
 Application 360 ya usa Recharts para el radar de competencias: eliminó `competencyKey.slice(0, 7)`, muestra
