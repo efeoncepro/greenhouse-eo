@@ -1,5 +1,7 @@
 import 'server-only'
 
+import type { PoolClient } from 'pg'
+
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
@@ -97,13 +99,16 @@ const assertNoteInput = (input: RecordHiringApplicationNoteInput): void => {
  * Command canónico: registra una nota append-only del expediente y publica el evento
  * outbox (payload IDs-only) en la MISMA transacción. Corrección = nota nueva que
  * referencia la anterior via context_json.supersedesNoteId; nunca UPDATE/DELETE.
+ * `client` opcional para participar en la tx del caller (TASK-1735: el confirm del
+ * dossier materializa la nota ATÓMICAMENTE con la marca de la propuesta).
  */
 export const recordHiringApplicationNote = async (
-  input: RecordHiringApplicationNoteInput
+  input: RecordHiringApplicationNoteInput,
+  txClient: PoolClient | null = null
 ): Promise<HiringApplicationNote> => {
   assertNoteInput(input)
 
-  return withGreenhousePostgresTransaction(async (client) => {
+  const execute = async (client: PoolClient) => {
     const app = await client.query(
       `SELECT application_id FROM greenhouse_hiring.hiring_application WHERE application_id = $1`,
       [input.applicationId]
@@ -141,7 +146,11 @@ export const recordHiringApplicationNote = async (
     )
 
     return note
-  })
+  }
+
+  if (txClient) return execute(txClient)
+
+  return withGreenhousePostgresTransaction(execute)
 }
 
 /** Reader canónico: notas del expediente de una application, más reciente primero. */
