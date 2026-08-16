@@ -41,7 +41,7 @@ export interface RecordHiringApplicationNoteInput {
   contextJson?: Record<string, unknown>
 }
 
-interface NoteRow {
+interface NoteRow extends Record<string, unknown> {
   note_id: string
   application_id: string
   kind: string
