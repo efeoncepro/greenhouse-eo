@@ -113,7 +113,13 @@ describe('proposeEvaluationDossier', () => {
     expect(proposal.proposalId).toBe('hdsp-1')
     expect(runGenerationMock).toHaveBeenCalledTimes(1)
 
+    // TASK-1737: el digest se computa con el prompt contract vigente (v2) — las
+    // propuestas v1 quedan stale por diseño al cambiar la versión.
+    expect(computeDigestMock).toHaveBeenCalledWith(packetFixture, 'claude-sonnet-5', 'hiring_evaluation_dossier.v2')
+
     const createInput = createProposalMock.mock.calls[0][1]
+
+    expect(createInput.promptVersion).toBe('hiring_evaluation_dossier.v2')
 
     expect(createInput.inputDigest).toBe('digest-1')
     expect(createInput.model).toBe('claude-sonnet-5-20260101')

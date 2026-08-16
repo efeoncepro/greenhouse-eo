@@ -65,7 +65,7 @@ import HiringDeskFrame from './HiringDeskFrame'
 import ApplicationDossierPanel from './ApplicationDossierPanel'
 import CandidateDocumentsPanel from './CandidateDocumentsPanel'
 import AssessmentCompetencyRadar from './AssessmentCompetencyRadar'
-import { hiringRequest } from './hiring-client'
+import { hiringRequest, scoreTone } from './hiring-client'
 import { computeScorecardSummary } from './scorecard-summary'
 import { AssessmentAiRunEntry } from './AssessmentAiRunWorkbench'
 
@@ -142,14 +142,6 @@ const targetScoreForLevel = (level: string | null): number => {
   if (level === 'nociones') return 62
 
   return 72
-}
-
-const scoreTone = (score: number | null): 'success' | 'warning' | 'error' | 'info' => {
-  if (score == null) return 'info'
-  if (score >= 75) return 'success'
-  if (score >= 60) return 'warning'
-
-  return 'error'
 }
 
 const rubricLinesFrom = (rubric: Record<string, unknown>): string[] => {

@@ -15,6 +15,12 @@ vi.mock('@/lib/observability/capture', () => ({
   captureWithDomain: (...args: unknown[]) => captureMock(...args)
 }))
 
+// El mapa key→nombre real se deriva del packet (packet.ts arrastra la cadena del store);
+// acá se mockea para aislar la generación. Su derivación se testea en packet.test.ts.
+vi.mock('./packet', () => ({
+  buildCompetencyNameMap: () => ({ delivery_coordination: 'Coordinación de delivery' })
+}))
+
 const { buildEvaluationDossierPrompt, runDossierGeneration, sanitizeEvaluationDossier } = await import('./generate')
 
 const packetFixture = {
@@ -22,11 +28,12 @@ const packetFixture = {
   applicationId: 'happ-1',
   cv: { contentHash: 'hash-cv-1', text: 'Experiencia liderando equipos de marketing.' },
   assessment: {
-    competencyResults: [{ competencyKey: 'seo', score: 82 }],
+    competencyResults: [{ competencyKey: 'delivery_coordination', competencyName: 'Coordinación de delivery', score: 82 }],
     responses: [
       {
         responseId: 'resp-1',
-        competencyKey: 'seo',
+        competencyKey: 'delivery_coordination',
+        competencyName: 'Coordinación de delivery',
         prompt: '¿Cómo auditas un sitio?',
         answerText: 'Reviso crawl y logs.',
         effectiveScore: 82,
@@ -73,6 +80,49 @@ describe('sanitizeEvaluationDossier (frontera anti prompt-injection)', () => {
     expect(sanitizeEvaluationDossier('texto plano')).toBeNull()
     expect(sanitizeEvaluationDossier({ resumenEjecutivo: '   ' })).toBeNull()
   })
+
+  it('traduce keys técnicas eco-eadas a nombres humanos en TODOS los strings (TASK-1737)', () => {
+    const keyToName = { delivery_coordination: 'Coordinación de delivery', seo: 'SEO técnico' }
+
+    const dossier = sanitizeEvaluationDossier(
+      {
+        resumenEjecutivo: 'Fortaleza en delivery_coordination (82) y en seo.',
+        coherencias: [
+          { afirmacion: 'Domina delivery_coordination', evidencia: 'delivery_coordination (82 promedio)' }
+        ],
+        gaps: [{ afirmacion: 'Brecha en seo', evidencia: 'seo con score 40' }],
+        focosEntrevista: ['Profundizar delivery_coordination'],
+        noVerificable: ['Certificación de seo declarada']
+      },
+      keyToName
+    )
+
+    expect(dossier).not.toBeNull()
+    expect(dossier!.resumenEjecutivo).toBe('Fortaleza en Coordinación de delivery (82) y en SEO técnico.')
+    expect(dossier!.coherencias[0]).toEqual({
+      afirmacion: 'Domina Coordinación de delivery',
+      evidencia: 'Coordinación de delivery (82 promedio)'
+    })
+    expect(dossier!.gaps[0].evidencia).toBe('SEO técnico con score 40')
+    expect(dossier!.focosEntrevista[0]).toBe('Profundizar Coordinación de delivery')
+    expect(dossier!.noVerificable[0]).toBe('Certificación de SEO técnico declarada')
+    expect(JSON.stringify(dossier)).not.toContain('delivery_coordination')
+  })
+
+  it('no traduce parcialmente: respeta fronteras de palabra y keys contenidas en otras', () => {
+    const dossier = sanitizeEvaluationDossier(
+      {
+        resumenEjecutivo: 'seo_tecnico fuerte; el seo base también; xseo no es una key.',
+        coherencias: [],
+        gaps: [],
+        focosEntrevista: [],
+        noVerificable: []
+      },
+      { seo: 'SEO', seo_tecnico: 'SEO técnico' }
+    )
+
+    expect(dossier!.resumenEjecutivo).toBe('SEO técnico fuerte; el SEO base también; xseo no es una key.')
+  })
 })
 
 describe('buildEvaluationDossierPrompt', () => {
@@ -83,6 +133,15 @@ describe('buildEvaluationDossierPrompt', () => {
     expect(prompt).toContain('--- Texto redactado del CV')
     expect(prompt).toContain('--- fin del CV ---')
     expect(prompt).toContain('Experiencia liderando equipos de marketing.')
+  })
+
+  it('presenta competencias SOLO por nombre humano — cero keys snake_case en el prompt (TASK-1737)', () => {
+    const prompt = buildEvaluationDossierPrompt(packetFixture)
+
+    expect(prompt).toContain('[Coordinación de delivery]')
+    expect(prompt).toContain('"competencia":"Coordinación de delivery"')
+    expect(prompt).not.toContain('delivery_coordination')
+    expect(prompt).not.toContain('competencyKey')
   })
 })
 
@@ -115,6 +174,25 @@ describe('runDossierGeneration', () => {
     expect(result.status).toBe('ok')
     expect(result.model).toBe('claude-sonnet-5-20260101')
     expect(result.dossier?.resumenEjecutivo).toBe('Resumen')
+  })
+
+  it('aplica el mapa key→nombre del packet sobre la salida del provider (defensa 3, TASK-1737)', async () => {
+    generateMock.mockResolvedValue({
+      data: {
+        resumenEjecutivo: 'Sólido en delivery_coordination.',
+        coherencias: [],
+        gaps: [],
+        focosEntrevista: [],
+        noVerificable: []
+      },
+      model: 'claude-sonnet-5-20260101',
+      stopReason: 'tool_use',
+      usage: { inputTokens: 100, outputTokens: 200 }
+    })
+
+    const result = await runDossierGeneration(packetFixture)
+
+    expect(result.dossier?.resumenEjecutivo).toBe('Sólido en Coordinación de delivery.')
   })
 
   it('salida malformada → schema_invalid; excepción del provider → provider_error (nunca throwea)', async () => {

@@ -13,6 +13,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
@@ -36,6 +37,7 @@ import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
 import { GreenhouseButton, GreenhouseChip } from '@/components/greenhouse/primitives'
+import { motionCss } from '@/components/greenhouse/motion/core/tokens'
 import { CanonicalApiError, parseApiErrorPayload, type ParsedApiError } from '@/lib/api/parse-error-response'
 import type { HiringDeskCopy } from '@/lib/copy'
 import { formatDateTime } from '@/lib/format'
@@ -47,6 +49,8 @@ import {
 } from '@/types/hiring-application-notes'
 import type { HiringDecisionHistoryEntry } from '@/types/hiring'
 import type { DossierProposal, EvaluationDossierDraft } from '@/types/hiring-dossier-ai'
+
+import { scoreTone } from './hiring-client'
 
 // ── Contratos locales ──
 
@@ -167,6 +171,242 @@ const NoteMarkdown = ({ text }: { text: string }) => (
   >
     <Markdown remarkPlugins={[remarkGfm]}>{text}</Markdown>
   </Box>
+)
+
+// ── Render estructurado del borrador (TASK-1737) ──
+// El `proposedJson` ya trae secciones tipadas: se renderiza como composición diseñada
+// (lead + claims con evidencia citada + focos numerados + disclosure muted), no como
+// prosa markdown. La nota confirmada con edición humana conserva el fallback markdown.
+
+const SCORE_IN_TEXT_SOURCE =
+  '\\b(?:score(?:\\s+efectivo)?|puntaje|promedio|nota)\\s*(?:de\\s+|:\\s*)?(\\d{1,3}(?:[.,]\\d{1,2})?)\\b|\\b(\\d{1,3}(?:[.,]\\d{1,2})?)(?=\\s*(?:\\/\\s*100\\b|\\s+(?:promedio|puntos|pts)\\b))'
+
+const parseScoreValue = (raw: string): number | null => {
+  const parsed = Number(raw.replace(',', '.'))
+
+  return Number.isFinite(parsed) && parsed >= 0 && parsed <= 100 ? parsed : null
+}
+
+/**
+ * Resalta menciones de score (0–100 ancladas a vocabulario de puntaje) como chips
+ * tonales del semáforo canónico de hiring. Conservador a propósito: un número sin
+ * vocabulario de score alrededor se queda como texto.
+ */
+const renderTextWithScoreChips = (text: string): ReactNode => {
+  const regex = new RegExp(SCORE_IN_TEXT_SOURCE, 'gi')
+  const nodes: ReactNode[] = []
+  let cursor = 0
+  let match: RegExpExecArray | null = null
+
+  while ((match = regex.exec(text)) !== null) {
+    const numberText = match[1] ?? match[2] ?? ''
+    const value = parseScoreValue(numberText)
+
+    if (numberText.length === 0 || value === null) continue
+
+    const numberStart = match.index + match[0].lastIndexOf(numberText)
+
+    nodes.push(text.slice(cursor, numberStart))
+    nodes.push(
+      <GreenhouseChip
+        key={`score-${numberStart}`}
+        size='small'
+        kind='metric'
+        variant='label'
+        tone={scoreTone(value)}
+        label={numberText}
+        sx={{ mx: 0.5, verticalAlign: 'baseline' }}
+      />
+    )
+    cursor = numberStart + numberText.length
+  }
+
+  if (nodes.length === 0) return text
+
+  nodes.push(text.slice(cursor))
+
+  return nodes
+}
+
+const DossierSectionLabel = ({ icon, iconColor, title }: { icon: string; iconColor: string; title: string }) => (
+  <Stack direction='row' spacing={1.5} alignItems='center'>
+    <Box component='i' aria-hidden='true' className={icon} sx={{ color: iconColor, fontSize: 18 }} />
+    <Typography variant='overline' component='h6' color='text.secondary'>
+      {title}
+    </Typography>
+  </Stack>
+)
+
+interface DossierClaim {
+  afirmacion: string
+  evidencia: string
+}
+
+/** Coherencias/gaps: afirmación como texto principal + evidencia como bloque citado. */
+const DossierClaimList = ({
+  title,
+  icon,
+  tone,
+  claims,
+  expediente
+}: {
+  title: string
+  icon: string
+  tone: 'success' | 'warning'
+  claims: DossierClaim[]
+  expediente: ExpedienteCopy
+}) => {
+  if (claims.length === 0) return null
+
+  return (
+    <Box component='section'>
+      <DossierSectionLabel icon={icon} iconColor={`${tone}.main`} title={title} />
+      <Stack component='ul' role='list' spacing={3} sx={{ m: 0, mt: 2, p: 0, listStyle: 'none' }}>
+        {claims.map(claim => (
+          <Stack component='li' key={claim.afirmacion} spacing={1.5} sx={{ minWidth: 0 }}>
+            <Typography variant='body2' color='text.primary' sx={{ fontWeight: 500, overflowWrap: 'anywhere', maxWidth: '72ch' }}>
+              {claim.afirmacion}
+            </Typography>
+            <Box
+              sx={theme => ({
+                ps: 3,
+                pe: 3,
+                py: 2,
+                maxWidth: '72ch',
+                bgcolor: 'action.hover',
+                borderInlineStart: '2px solid',
+                borderColor: `${tone}.main`,
+                borderStartEndRadius: `${theme.shape.customBorderRadius.sm}px`,
+                borderEndEndRadius: `${theme.shape.customBorderRadius.sm}px`
+              })}
+            >
+              <Typography variant='overline' component='p' color='text.secondary' sx={{ display: 'block', mb: 0.5 }}>
+                {expediente.evidenceTitle}
+              </Typography>
+              <Typography variant='body2' color='text.secondary' sx={{ overflowWrap: 'anywhere' }}>
+                {renderTextWithScoreChips(claim.evidencia)}
+              </Typography>
+            </Box>
+          </Stack>
+        ))}
+      </Stack>
+    </Box>
+  )
+}
+
+/** Focos de entrevista: lista accionable con numeración visible. */
+const DossierFocusList = ({ title, items }: { title: string; items: string[] }) => {
+  if (items.length === 0) return null
+
+  return (
+    <Box component='section'>
+      <DossierSectionLabel icon='tabler-target-arrow' iconColor='primary.main' title={title} />
+      <Stack component='ol' role='list' spacing={2} sx={{ m: 0, mt: 2, p: 0, listStyle: 'none' }}>
+        {items.map((item, index) => (
+          <Stack component='li' key={item} direction='row' spacing={2} alignItems='flex-start' sx={{ minWidth: 0 }}>
+            <Box
+              sx={{
+                inlineSize: 24,
+                blockSize: 24,
+                borderRadius: '50%',
+                flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bgcolor: 'primary.lightOpacity'
+              }}
+            >
+              <Typography variant='caption' color='primary.main' sx={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+                {index + 1}
+              </Typography>
+            </Box>
+            <Typography variant='body2' sx={{ pt: 0.5, overflowWrap: 'anywhere', maxWidth: '72ch' }}>
+              {item}
+            </Typography>
+          </Stack>
+        ))}
+      </Stack>
+    </Box>
+  )
+}
+
+/** No verificable: disclosure colapsable de tono muted (nativo `<details>`, foco incluido). */
+const DossierUnverifiable = ({ items, expediente }: { items: string[]; expediente: ExpedienteCopy }) => {
+  if (items.length === 0) return null
+
+  return (
+    <Box
+      component='details'
+      sx={theme => ({
+        border: '1px dashed',
+        borderColor: 'divider',
+        borderRadius: `${theme.shape.customBorderRadius.md}px`,
+        '& > summary': {
+          listStyle: 'none',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: theme.spacing(1.5),
+          padding: theme.spacing(2, 3),
+          '&::-webkit-details-marker': { display: 'none' },
+          '&:focus-visible': {
+            outline: `2px solid ${theme.palette.primary.main}`,
+            outlineOffset: 2,
+            borderRadius: `${theme.shape.customBorderRadius.md}px`
+          }
+        },
+        '& .expediente-unverifiable-chevron': {
+          marginInlineStart: 'auto',
+          transition: `transform ${motionCss.duration.standard} ${motionCss.ease.standard}`,
+          '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
+        },
+        '&[open] .expediente-unverifiable-chevron': { transform: 'rotate(180deg)' }
+      })}
+    >
+      <Box component='summary'>
+        <Box component='i' aria-hidden='true' className='tabler-eye-off' sx={{ color: 'text.secondary', fontSize: 18 }} />
+        <Typography variant='body2' color='text.secondary' sx={{ fontWeight: 500 }}>
+          {formatCopy(expediente.unverifiableSummary, { count: items.length })}
+        </Typography>
+        <Box
+          component='i'
+          aria-hidden='true'
+          className='tabler-chevron-down expediente-unverifiable-chevron'
+          sx={{ color: 'text.secondary', fontSize: 18 }}
+        />
+      </Box>
+      <Stack component='ul' spacing={1} sx={{ m: 0, ps: 9, pe: 3, pb: 3, pt: 0 }}>
+        {items.map(item => (
+          <Typography key={item} component='li' variant='body2' color='text.secondary' sx={{ overflowWrap: 'anywhere', maxWidth: '72ch' }}>
+            {item}
+          </Typography>
+        ))}
+      </Stack>
+    </Box>
+  )
+}
+
+/** Composición completa del borrador estructurado (proposal vigente y nota confirmada sin editar). */
+const DossierStructuredContent = ({ draft, expediente }: { draft: EvaluationDossierDraft; expediente: ExpedienteCopy }) => (
+  <Stack spacing={5} sx={{ minWidth: 0 }}>
+    <Box component='section'>
+      <DossierSectionLabel icon='tabler-file-description' iconColor='text.secondary' title={expediente.sectionSummary} />
+      {/* Lead destacado: body1 (16px) sobre el body2 del resto — jerarquía por tamaño, no por decoración. */}
+      <Typography variant='body1' color='text.primary' sx={{ mt: 2, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', maxWidth: '72ch' }}>
+        {draft.resumenEjecutivo}
+      </Typography>
+    </Box>
+    <DossierClaimList
+      title={expediente.sectionCoherences}
+      icon='tabler-circle-check'
+      tone='success'
+      claims={draft.coherencias}
+      expediente={expediente}
+    />
+    <DossierClaimList title={expediente.sectionGaps} icon='tabler-alert-triangle' tone='warning' claims={draft.gaps} expediente={expediente} />
+    <DossierFocusList title={expediente.sectionInterviewFocus} items={draft.focosEntrevista} />
+    <DossierUnverifiable items={draft.noVerificable} expediente={expediente} />
+  </Stack>
 )
 
 // ── Timeline entries (notas + eventos sintéticos) ──
@@ -436,6 +676,27 @@ const ApplicationDossierPanel = ({
     return candidate && typeof candidate.resumenEjecutivo === 'string' ? candidate : null
   }, [proposal])
 
+  /**
+   * Borrador estructurado para una nota confirmada (TASK-1737): solo si su context_json
+   * referencia la propuesta cargada con `proposedJson` válido Y el humano confirmó SIN
+   * editar (bodyMd ≡ render canónico del server). Lo editado siempre gana como fuente →
+   * fallback markdown.
+   */
+  const structuredNoteDraft = useCallback(
+    (note: HiringApplicationNote): EvaluationDossierDraft | null => {
+      if (note.source !== 'agent' || !proposal) return null
+      if (note.contextJson.dossierProposalId !== proposal.proposalId) return null
+
+      const candidate = proposal.proposed.dossier as EvaluationDossierDraft | undefined
+
+      if (!candidate || typeof candidate.resumenEjecutivo !== 'string') return null
+      if (!proposalBodyMd || note.bodyMd !== proposalBodyMd) return null
+
+      return candidate
+    },
+    [proposal, proposalBodyMd]
+  )
+
   const showProposalPanel = !viewerBlind && draft !== null
   const showGenerateCta = canAnnotate && !viewerBlind && aiEnabled === true && !showProposalPanel
 
@@ -443,7 +704,8 @@ const ApplicationDossierPanel = ({
 
   const renderNote = (note: HiringApplicationNote) => {
     const isAgent = note.source === 'agent'
-    const isLong = note.bodyMd.length > NOTE_COLLAPSE_THRESHOLD
+    const structuredDraft = isAgent ? structuredNoteDraft(note) : null
+    const isLong = structuredDraft === null && note.bodyMd.length > NOTE_COLLAPSE_THRESHOLD
     const expanded = expandedNotes[note.noteId] ?? false
     const collapsed = isLong && !expanded
     const bodyRegionId = `expediente-note-body-${note.noteId}`
@@ -489,7 +751,9 @@ const ApplicationDossierPanel = ({
           </Stack>
 
           <Box id={bodyRegionId}>
-            {collapsed ? (
+            {structuredDraft ? (
+              <DossierStructuredContent draft={structuredDraft} expediente={expediente} />
+            ) : collapsed ? (
               <Typography variant='body2' sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
                 {`${note.bodyMd.slice(0, NOTE_COLLAPSE_THRESHOLD).trimEnd()}…`}
               </Typography>
@@ -522,43 +786,6 @@ const ApplicationDossierPanel = ({
   }
 
   // ── Render del panel de propuesta (REGION 1) ──
-
-  const renderClaimList = (title: string, claims: Array<{ afirmacion: string; evidencia: string }>) => {
-    if (claims.length === 0) return null
-
-    return (
-      <Box>
-        <Typography variant='subtitle2' component='h6' color='text.primary'>{title}</Typography>
-        <Stack component='ul' spacing={1.5} sx={{ m: 0, mt: 1, ps: 5 }}>
-          {claims.map(claim => (
-            <Box component='li' key={claim.afirmacion}>
-              <Typography variant='body2'>{claim.afirmacion}</Typography>
-              <Typography variant='caption' color='text.secondary'>
-                {formatCopy(expediente.evidenceLabel, { quote: claim.evidencia })}
-              </Typography>
-            </Box>
-          ))}
-        </Stack>
-      </Box>
-    )
-  }
-
-  const renderStringList = (title: string, items: string[]) => {
-    if (items.length === 0) return null
-
-    return (
-      <Box>
-        <Typography variant='subtitle2' component='h6' color='text.primary'>{title}</Typography>
-        <Stack component='ul' spacing={1} sx={{ m: 0, mt: 1, ps: 5 }}>
-          {items.map(item => (
-            <Box component='li' key={item}>
-              <Typography variant='body2'>{item}</Typography>
-            </Box>
-          ))}
-        </Stack>
-      </Box>
-    )
-  }
 
   const proposalPanel = showProposalPanel && draft && proposal ? (
     <Paper
@@ -616,18 +843,7 @@ const ApplicationDossierPanel = ({
             <Typography variant='caption' color='text.secondary'>{expediente.editCaption}</Typography>
           </Stack>
         ) : (
-          <Stack spacing={3}>
-            <Box>
-              <Typography variant='subtitle2' component='h6' color='text.primary'>{expediente.sectionSummary}</Typography>
-              <Typography variant='body2' sx={{ mt: 1, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
-                {draft.resumenEjecutivo}
-              </Typography>
-            </Box>
-            {renderClaimList(expediente.sectionCoherences, draft.coherencias)}
-            {renderClaimList(expediente.sectionGaps, draft.gaps)}
-            {renderStringList(expediente.sectionInterviewFocus, draft.focosEntrevista)}
-            {renderStringList(expediente.sectionUnverifiable, draft.noVerificable)}
-          </Stack>
+          <DossierStructuredContent draft={draft} expediente={expediente} />
         )}
 
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent='flex-end'>

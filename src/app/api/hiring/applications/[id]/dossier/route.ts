@@ -68,16 +68,21 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
     // Precarga del modo edición (el render vive server-side; `renderEvaluationDossierMarkdown`
     // es server-only) + señal de staleness: digest vigente ≠ digest de la propuesta.
+    // TASK-1737: el bodyMd se expone también para propuestas decididas — el panel compara
+    // nota confirmada vs render canónico para preferir el render estructurado SOLO cuando
+    // el humano no editó el cuerpo (lo editado siempre gana como fuente de la nota).
     let proposalBodyMd: string | null = null
     let proposalStale: boolean | null = null
 
-    if (proposal?.status === 'proposed') {
+    if (proposal) {
       const dossier = proposal.proposed.dossier as EvaluationDossierDraft | undefined
 
       if (dossier && typeof dossier.resumenEjecutivo === 'string') {
         proposalBodyMd = renderEvaluationDossierMarkdown(dossier)
       }
+    }
 
+    if (proposal?.status === 'proposed') {
       try {
         const packet = await assembleEvaluationDossierPacket(id)
         const currentDigest = computeDossierInputDigest(packet, getHiringDossierModel(), HIRING_DOSSIER_PROMPT_VERSION)

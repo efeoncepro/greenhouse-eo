@@ -61,6 +61,7 @@ type ProjectionRow = {
 type ResponseRow = {
   response_id: string
   competency_key: string
+  competency_name: string | null
   question_prompt: string | null
   answer_json: unknown
   effective_score: unknown
@@ -69,6 +70,7 @@ type ResponseRow = {
 
 type CompetencyResultRow = {
   competency_key: string
+  competency_name: string | null
   score: unknown
 }
 
@@ -124,6 +126,7 @@ export const assembleEvaluationDossierPacket = async (applicationId: string): Pr
   const responseRows = await runGreenhousePostgresQuery<ResponseRow>(
     `SELECT r.response_id,
             c.key AS competency_key,
+            c.name AS competency_name,
             q.prompt AS question_prompt,
             r.answer_json,
             COALESCE(r.human_score, r.auto_score) AS effective_score,
@@ -145,6 +148,8 @@ export const assembleEvaluationDossierPacket = async (applicationId: string): Pr
   const responses: DossierPacketResponse[] = responseRows.map(row => ({
     responseId: row.response_id,
     competencyKey: row.competency_key,
+    // Fallback honesto a la key si el catálogo no trae nombre (name es NOT NULL, pero defensivo).
+    competencyName: (row.competency_name ?? '').trim() || row.competency_key,
     prompt: (row.question_prompt ?? '').slice(0, MAX_PROMPT_CHARS),
     answerText: extractAnswerText((row.answer_json ?? {}) as Record<string, unknown>),
     effectiveScore: num(row.effective_score),
@@ -152,18 +157,19 @@ export const assembleEvaluationDossierPacket = async (applicationId: string): Pr
   }))
 
   const competencyRows = await runGreenhousePostgresQuery<CompetencyResultRow>(
-    `SELECT c.key AS competency_key, ROUND(AVG(cr.score)::numeric, 2) AS score
+    `SELECT c.key AS competency_key, c.name AS competency_name, ROUND(AVG(cr.score)::numeric, 2) AS score
        FROM greenhouse_hiring.hiring_competency_result cr
        JOIN greenhouse_hiring.hiring_assessment a ON a.assessment_id = cr.assessment_id
        JOIN greenhouse_hiring.hiring_competency c ON c.competency_id = cr.competency_id
       WHERE a.application_id = $1 AND a.status = 'scored'
-      GROUP BY c.key
+      GROUP BY c.key, c.name
       ORDER BY c.key`,
     [applicationId]
   )
 
   const competencyResults: DossierPacketCompetencyResult[] = competencyRows.map(row => ({
     competencyKey: row.competency_key,
+    competencyName: (row.competency_name ?? '').trim() || row.competency_key,
     score: num(row.score) ?? 0
   }))
 
@@ -196,6 +202,29 @@ export const assembleEvaluationDossierPacket = async (applicationId: string): Pr
         : null
     }
   }
+}
+
+/**
+ * Mapa key técnica → nombre humano de competencia, derivado del propio packet.
+ * Es la fuente del sanitizer post-proceso (defensa 3 del fix TASK-1737): toda key
+ * snake_case que el modelo eco-ee en su salida se traduce a su nombre visible.
+ */
+export const buildCompetencyNameMap = (packet: EvaluationDossierPacket): Record<string, string> => {
+  const map: Record<string, string> = {}
+
+  for (const result of packet.assessment.competencyResults) {
+    if (result.competencyName && result.competencyName !== result.competencyKey) {
+      map[result.competencyKey] = result.competencyName
+    }
+  }
+
+  for (const response of packet.assessment.responses) {
+    if (!map[response.competencyKey] && response.competencyName && response.competencyName !== response.competencyKey) {
+      map[response.competencyKey] = response.competencyName
+    }
+  }
+
+  return map
 }
 
 /**

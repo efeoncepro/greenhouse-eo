@@ -18,7 +18,7 @@ vi.mock('../store', () => ({
   getHiringApplicationById: (...args: unknown[]) => getApplicationMock(...args)
 }))
 
-const { assembleEvaluationDossierPacket, computeDossierInputDigest } = await import('./packet')
+const { assembleEvaluationDossierPacket, buildCompetencyNameMap, computeDossierInputDigest } = await import('./packet')
 
 // Fixture sintética: la application y sus vecinos SÍ contienen PII prohibida en campos
 // fuera de la allowlist — el test demuestra que el packet no la transporta.
@@ -55,6 +55,7 @@ const dispatchQueries = () => {
         {
           response_id: 'resp-1',
           competency_key: 'seo',
+          competency_name: 'SEO técnico',
           question_prompt: '¿Cómo estructuras una auditoría SEO?',
           answer_json: { text: 'Primero reviso el crawl y los logs del sitio.' },
           effective_score: 82,
@@ -64,7 +65,7 @@ const dispatchQueries = () => {
     }
 
     if (sql.includes('hiring_competency_result')) {
-      return [{ competency_key: 'seo', score: '82.00' }]
+      return [{ competency_key: 'seo', competency_name: 'SEO técnico', score: '82.00' }]
     }
 
     return []
@@ -93,13 +94,16 @@ describe('assembleEvaluationDossierPacket', () => {
       {
         responseId: 'resp-1',
         competencyKey: 'seo',
+        competencyName: 'SEO técnico',
         prompt: '¿Cómo estructuras una auditoría SEO?',
         answerText: 'Primero reviso el crawl y los logs del sitio.',
         effectiveScore: 82,
         rationaleRef: 'aip-9'
       }
     ])
-    expect(packet.assessment.competencyResults).toEqual([{ competencyKey: 'seo', score: 82 }])
+    expect(packet.assessment.competencyResults).toEqual([
+      { competencyKey: 'seo', competencyName: 'SEO técnico', score: 82 }
+    ])
     expect(packet.journey.currentStage).toBe('assessment')
     expect(packet.journey.stages).toEqual([
       { stage: 'applied', at: '2026-08-01T12:00:00.000Z' },
@@ -152,6 +156,33 @@ describe('assembleEvaluationDossierPacket', () => {
     await expect(assembleEvaluationDossierPacket('happ-1')).rejects.toMatchObject({
       code: 'hiring_dossier_cv_not_ready'
     })
+  })
+})
+
+describe('buildCompetencyNameMap', () => {
+  it('deriva el mapa key→nombre humano desde el packet (TASK-1737)', async () => {
+    const packet = await assembleEvaluationDossierPacket('happ-1')
+
+    expect(buildCompetencyNameMap(packet)).toEqual({ seo: 'SEO técnico' })
+  })
+
+  it('omite entradas cuyo nombre cayó al fallback de la key (sin traducción útil)', async () => {
+    runQueryMock.mockImplementation(async (sql: string) => {
+      if (sql.includes('candidate_document_review_projection')) {
+        return [{ content_hash: 'hash-cv-1', status: 'ready', text_content: 'CV' }]
+      }
+
+      if (sql.includes('hiring_competency_result')) {
+        return [{ competency_key: 'seo', competency_name: null, score: '82.00' }]
+      }
+
+      return []
+    })
+
+    const packet = await assembleEvaluationDossierPacket('happ-1')
+
+    expect(packet.assessment.competencyResults[0].competencyName).toBe('seo')
+    expect(buildCompetencyNameMap(packet)).toEqual({})
   })
 })
 

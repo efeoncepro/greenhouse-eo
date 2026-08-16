@@ -28,6 +28,8 @@ export interface EvaluationDossierDraft {
 export interface DossierPacketResponse {
   responseId: string
   competencyKey: string
+  /** Nombre humano de la competencia (`hiring_competency.name`) — lo que el LLM DEBE usar en el texto. */
+  competencyName: string
   prompt: string
   answerText: string
   effectiveScore: number | null
@@ -37,6 +39,8 @@ export interface DossierPacketResponse {
 
 export interface DossierPacketCompetencyResult {
   competencyKey: string
+  /** Nombre humano de la competencia (`hiring_competency.name`) — lo que el LLM DEBE usar en el texto. */
+  competencyName: string
   score: number
 }
 

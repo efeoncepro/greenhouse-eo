@@ -20,4 +20,9 @@ export const HIRING_DOSSIER_PROVIDER = 'anthropic' as const
 export const getHiringDossierModel = (): string =>
   process.env.HIRING_DOSSIER_AI_MODEL?.trim() || 'claude-sonnet-5'
 
-export const HIRING_DOSSIER_PROMPT_VERSION = 'hiring_evaluation_dossier.v1'
+/**
+ * v2 (TASK-1737): el packet lleva el nombre humano de cada competencia, el prompt exige
+ * nombrarlas por su nombre visible (nunca claves snake_case) y el sanitizer traduce toda
+ * key eco-eada. Subir la versión cambia el digest → las propuestas v1 quedan stale por diseño.
+ */
+export const HIRING_DOSSIER_PROMPT_VERSION = 'hiring_evaluation_dossier.v2'

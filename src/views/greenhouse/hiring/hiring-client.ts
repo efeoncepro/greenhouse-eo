@@ -25,3 +25,16 @@ export const hiringRequest = async <T>(input: RequestInfo | URL, init?: RequestI
 
   return payload as T
 }
+
+/**
+ * Semáforo canónico de scores de hiring (0–100) → tono semántico Greenhouse.
+ * Única fuente para chips/etiquetas de score en Application 360 y el Expediente
+ * (TASK-1737): no duplicar umbrales por pantalla.
+ */
+export const scoreTone = (score: number | null): 'success' | 'warning' | 'error' | 'info' => {
+  if (score == null) return 'info'
+  if (score >= 75) return 'success'
+  if (score >= 60) return 'warning'
+
+  return 'error'
+}

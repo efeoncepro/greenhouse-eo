@@ -655,7 +655,8 @@ export interface HiringDeskCopy {
       sectionGaps: string
       sectionInterviewFocus: string
       sectionUnverifiable: string
-      evidenceLabel: string
+      unverifiableSummary: string
+      evidenceTitle: string
       edit: string
       editCaption: string
       cancelEdit: string
