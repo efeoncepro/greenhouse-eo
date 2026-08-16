@@ -2,6 +2,14 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+### Assessment IA a escala — task registrada, sin implementación (2026-08-16)
+
+Se creó `TASK-1734` y se agregó a `EPIC-011` como follow-up backend-critical de `TASK-1361`. La task propone
+un run asíncrono exacto por assessment, routing por riesgo, muestra de calidad y confirmación humana gobernada;
+no se modificó código, schema, flags ni runtime. Contrato no negociable: puntaje, resultado, rationale, confianza
+y estado de revisión son exclusivamente internos para operadores autorizados. El postulante solo recibe
+confirmación de envío y nunca una superficie de resultados. Próximo paso: ejecutar Slice 0/ADR antes de código.
+
 ### Cuenta candidata + `/my` longitudinal — ADR/arquitectura aceptados, runtime pendiente (2026-08-16)
 
 Se formalizó bajo `EPIC-011` la continuidad candidato→colaborador: una persona conserva el mismo
@@ -555,43 +563,6 @@ vive en `catalogs/deck-axis/assets/partners/` y el slot resuelve por clave cerra
    el SVG copiado, `back-cover-full.html`, `back-cover-full.slots.json` y `resolvers.ts`.
 3. **Queda una duplicación de asset por decidir:** el badge existe ahora en `public/branding/partners/…`,
    en `src/lib/brand-assets/` (módulo TS, untracked) y dentro del catálogo. Tres hogares para un SVG.
-
-### TASK-1310 CERRADA — portal SEO del cliente completo; su propio scorecard estaba equivocado (2026-08-12)
-
-**`complete`, promoción `develop → main` pendiente.** Con ella el módulo SEO tiene sus dos caras
-(4 tabs de operador + portal cliente) y la pata visible del exit criterion de parity queda cubierta.
-Los 4 gates UI en verde: `design-contract:lint` · `ui:code-lint` · `ui:visual-gate` · `ui:quality`
-**PASS 4.52**. Verificado con **sesión de cliente real de la organización contratada**: 3 superficies
-× 2 viewports, `qualityFindings` **vacío** en las seis corridas.
-
-**Lo que necesita quien siga:**
-
-1. 🔴 **Un scorecard es una foto con fecha, no un estado.** El de esta task bloqueaba con 2.29 sobre
-   capturas de las 10:25 del 08-08, y el commit `5f622386d` de las 19:29 ya había ejecutado los 7
-   lotes premium. Cuatro días el veredicto vigente describió una UI inexistente. **Ante una task con
-   auditoría abierta: medir antes de rehacer.** Acá casi rehago trabajo terminado.
-2. **Los gates no ven contradicciones de contenido.** El informe anunciaba "Aún no hay una posición
-   media para leer" con `#13.3` al lado, con `exitCode 0` y axe limpio. Causa: tres renders del mismo
-   modelo derivando cada uno su regla. Ahora se deriva una vez (`resolveSeoLeadTitle`) con test de
-   regresión. **Mirar el frame no es opcional.**
-3. **Para verificar una superficie client-gated hace falta la persona de ESA organización.** La
-   genérica `agent-client@…` recibe la card de bloqueo y se lee como defecto de producto. La de Berel
-   ya existía: `agent-berel-client@greenhouse.efeonce.org`. El mapeo usuario↔organización **no** está
-   en `client_users`/`clients`/`organizations` — está en `greenhouse_serving.session_360`, que es
-   donde el runtime mismo lo resuelve. La sonda `scripts/growth/_sanity-seo-client-population.ts`
-   deja esa consulta lista.
-4. **Fix global de paso:** el FAB "volver arriba" del layout `(dashboard)` no tenía nombre accesible
-   (`button-name`, *critical*) en **todas** las rutas del portal. Cerrado con label del namespace
-   `aria` canónico (`756d9970d`).
-5. 🔴 **`pnpm test` está rojo en el árbol por trabajo AJENO:** `catalog-portability.test.ts` falla por
-   un `../../../../../public/branding/...` en `deck-axis/back-cover-full.html`, WIP no commiteado del
-   deck ANAM/HubSpot (en HEAD hay cero ocurrencias). El guardrail hace su trabajo: ese path escapa del
-   catálogo. 10.588 tests pasan. No lo toqué — no es mío, y quien lo tenga en curso debe verlo.
-6. **Follow-up con dato, sin task todavía:** la superficie cliente tiene **una sola organización**
-   (Efeonce tiene assignment pero es tenant interno y `requireClientTenantContext()` lo excluye). Con
-   N=1 nadie delata que `connection.state` se decide con **GSC** mientras el Resumen deriva de **rank
-   snapshots**: un cliente con Search Console conectado y captura de rank sin correr —**el día 1 de
-   todo cliente nuevo**— ve el KPI principal en "sin dato" con el Quadrant poblado debajo.
 
 ### Sika México LIC-1120 — paquete de bid preparado, sin precio ni envío (2026-08-12)
 

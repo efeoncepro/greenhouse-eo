@@ -108,6 +108,14 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - Gate final longitudinal: `/my` candidato y People 360 consumen proyecciones distintas sobre los mismos hechos;
   ninguna copia CV, perfil o aplicaciones hacia una ficha paralela.
 
+### Phase 9 — Assessment AI Scoring at Scale
+
+- `TASK-1734` extiende la propuesta individual de TASK-1361 con un run asíncrono exacto por assessment,
+  abstención/routing por riesgo, muestra de calidad y confirmación humana gobernada del conjunto elegible.
+- Gate: la IA solo propone; un operador autorizado confirma antes del rollup. Puntaje, resultado, rationale,
+  confianza y estado de revisión nunca se exponen al postulante, que solo recibe confirmación de envío.
+- Boundary: no rankea candidatos, no decide contratación, no mueve etapas, no asigna tests y no envía correos.
+
 ## Child Tasks
 
 - `TASK-352` — Program umbrella and coordination for Hiring / ATS.
@@ -151,6 +159,8 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   sessionVersion y reconciliation sobre TASK-770.
 - `TASK-1732` — Identity-First People 360 Hiring Journey Reader: historia pre/post-member, paginada y allowlisted.
 - `TASK-1733` — People 360 Longitudinal Hiring History UI: timeline/detail interno sobre TASK-1732.
+- `TASK-1734` — Assessment AI Scoring at Scale + Operator-Only Exception Review: run asíncrono por assessment,
+  revisión humana gobernada y resultado exclusivamente interno; el postulante no ve score ni resultado.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
 
@@ -162,6 +172,9 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `TASK-1363` — **Assessment Taking + Review Surface**: candidate-facing remote tokenized test-taking + internal rating/review surface in the desk. `ui-ux`. Blocked by `TASK-1360` (+ product-design loop).
 - `TASK-1364` — **Assessment Validity Feedback Loop**: link assessment score → real hire outcome (quality-of-hire 90d/6m) to measure predictive validity; read-only, advisory, feeds EU AI-Act technical documentation. `backend-data`. Blocked by `TASK-1360`. (From the `greenhouse-talent-people-operator` review of TASK-1360 — validity gap.)
 - `TASK-1365` — **Adverse-Impact & Fairness Monitoring**: privacy-safe aggregate monitoring of selection rates across groups (4/5ths) + drift; voluntary self-ID separated from the decision; observes, never adjusts; required for EU AI-Act bias testing. `backend-data`. Blocked by `TASK-1360`. (From the `greenhouse-talent-people-operator` review — fairness gap.)
+- `TASK-1734` — **Assessment AI Scoring at Scale + Operator-Only Exception Review**: completa el follow-up de
+  TASK-1361 con run durable/asíncrono, policy calibrada de abstención y riesgo, muestra de calidad y confirmación
+  humana del conjunto. Todo score/resultado/rationale/revisión es interno y candidate-facing permanece sin resultados.
 
 ### Publication + Growth Forms apply extension (Delta 2026-07-09)
 
