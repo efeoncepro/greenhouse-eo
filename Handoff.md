@@ -2,6 +2,19 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-16 — TASK-1734 complete (code complete, rollout gated) + TASK-1736 Slices 0-2
+
+TASK-1734 cerró sus 7 slices: ADR aceptado, run aggregate durable, fan-out con risk router,
+eval harness con gate de promoción BLOQUEANTE (dataset humano de Talent pendiente, owner por
+asignar), exception review + batch confirm con manifest anti-anclaje, suite anti-leak (37 tests,
+cero leaks reales), señales de reliability + rollback CLI + runbook. Auditoría doble CONDITIONAL
+→ resuelta (terminal SQL del enum, drain sin head-of-line, muestra ciega ESTRUCTURAL en el
+reader). Gates: suite full 11.157+ y build verdes. Rollout gated al runbook
+`docs/operations/runbooks/assessment-ai-scoring-rollout.md`: flags OFF en todos los runtimes,
+scheduler `ops-assessment-ai-drain` declarado nacido en pausa (se crea en el próximo deploy del
+ops-worker). TASK-1736 avanza: S0 ADR + S1 primitive de normalización + S2 evidencia/reconcile/
+corrección humana (flag OFF); quedan S3 (detector + remediación histórica) y S4 (canary/cierre).
+
 ## 2026-08-16 — TASK-1736 tomada por la sesión Claude (reasignación de operador)
 
 El operador (CEO) reasignó TASK-1736 a esta sesión para avanzar en paralelo con TASK-1734
@@ -583,24 +596,3 @@ de diagnóstico + la corrida con el defecto que se corrigió).
 **Desbloqueadas por este cierre:** `TASK-1662` y `TASK-1664` pasaron a `Blocked by: none`. 1664 tiene
 además su spec recalibrada (commit `a98aaf4c7`): entitlement `seo_v2`, IDs `TEXT`, despertador por
 Cloud Scheduler y el boundary de ownership del dato de mercado.
-
-### Credencial de partner en el deck + los aprendizajes documentados (2026-08-13)
-
-**Sin commitear todavía: conviven con el WIP del deck ANAM/HubSpot en el árbol.** El badge de HubSpot
-rompía `catalog-portability.test.ts` (apuntaba a `public/` con `../../../../../`). Corregido: el asset
-vive en `catalogs/deck-axis/assets/partners/` y el slot resuelve por clave cerrada
-(`partner-badge-asset`, espejo de `client-logo-asset`). Suite del composer verde: 18 archivos, 223 tests.
-
-**Lo que necesita quien siga:**
-
-1. 🔴 **`pnpm composer:visual-gate` sigue rojo en DOS láminas, y ninguna es regresión.**
-   `BackCoverFull` (1.787 px) driftea porque **declarar un slot mueve el frame del probe**: el gate
-   compone con slots sintéticos y para cualquier `asset` usa `assets/url-lum.svg` — por eso aparece una
-   burbuja de URL dentro de la caja del badge. Es delta intencional del carril ANAM, a declarar en
-   `BASELINE_DELTAS.md`. `NarrativeSplit` (58.846 px) es **baseline viejo en `HEAD`**: su plantilla está
-   commiteada desde `f7761988f` y limpia en el árbol. **No congelé**: el runbook prohíbe `--freeze` con
-   el composer sucio por otro agente, y lo está.
-2. **El dueño del carril ANAM decide si mis cambios viajan con su commit o van aparte.** Son 4 archivos:
-   el SVG copiado, `back-cover-full.html`, `back-cover-full.slots.json` y `resolvers.ts`.
-3. **Queda una duplicación de asset por decidir:** el badge existe ahora en `public/branding/partners/…`,
-   en `src/lib/brand-assets/` (módulo TS, untracked) y dentro del catálogo. Tres hogares para un SVG.

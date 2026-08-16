@@ -2,6 +2,16 @@
 
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
+
+## 2026-08-16 — Scoring IA de assessments a escala (TASK-1734) + intake de identidad (TASK-1736 S0-S2)
+
+- Hiring: run asíncrono gobernado de scoring IA por assessment — propone todos los scores
+  abiertos, enruta por riesgo (mandatory/muestra ciega estructural/batch), confirmación humana
+  por lote con manifest auditable; gate de promoción bloqueante hasta gold set humano. Flags
+  OFF; rollout por runbook.
+- Hiring: intake de identidad — normalización culturalmente segura del nombre (evidencia raw
+  inmutable + display corregible + searchKey), reconciliación CAS del sticky name y corrección
+  humana capability-gated. Flag OFF.
 > inicio ni usar una entrada histórica como contrato vigente sin contrastarla.
 >
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
@@ -1193,10 +1203,3 @@ Se agregó `pnpm gcloud:auth:playwright` y la skill espejo `greenhouse-gcloud-au
 (`gcloud auth login` y ADC) usando Playwright como navegador visible, con verificación final mediante el
 preflight canónico. La credencial local se configura con `pnpm gcloud:auth:playwright:setup` en `.auth/`
 ignorado por Git y protegido con permisos `0600`; no se habilitó scheduler ni ejecución automática.
-
-## 2026-08-07 — Capacitación HubSpot ANAM · deck y material operativo
-
-Se alineó el deck de 26 láminas con la pauta recibida por Outlook y el caso canónico de ANAM: objetos y
-asociaciones, Growth/Renovación, Service/Ticket, dashboards, estados de madurez, Breeze, Meeting Notetaker,
-handoff de los tres intents y ejercicio integrado. Se dejaron el PDF/PNG derivado en `.captures/` y el
-runbook/handout como fuentes operativas; no se modificó la configuración live de HubSpot.
