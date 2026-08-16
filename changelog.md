@@ -3,6 +3,12 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-16 — Identidad de intake canonicalizada completa (TASK-1736)
+
+- Hiring: cierre del trío del día — TASK-1736 complete con remediación gobernada
+  (dry-run → allowlist humana → apply CAS → rollback real), señales de reliability y
+  runbook. Flag OFF; 4 nombres históricos esperan la allowlist del operador.
+
 ## 2026-08-16 — Scoring IA de assessments a escala (TASK-1734) + intake de identidad (TASK-1736 S0-S2)
 
 - Hiring: run asíncrono gobernado de scoring IA por assessment — propone todos los scores
@@ -1152,53 +1158,3 @@ Cuatro tareas nuevas, en orden de dependencia: distinguir un objetivo declarado 
 detectada, la pantalla para declararlos y seguir su avance, los datos de mercado, y finalmente qué
 gana la competencia donde el cliente es invisible. Esta última es la de más valor comercial: es lo
 que se le muestra a un prospecto en la primera reunión.
-
-## 2026-08-07 — Growth SEO: Oportunidades de keywords, completa (TASK-1308)
-
-La ruta `/admin/growth/seo/keywords` quedó cerrada. Nació declarada como superficie de UI
-pura y terminó con backend propio, contrato programático y dos herramientas federadas al
-gateway MCP, porque el command que la especificación daba por construido no existía.
-
-Lo que ordenó todas las decisiones fue entender que **seguir una keyword no es guardar un
-dato: es comprometer gasto que se repite**. La captura diaria de posiciones le paga al
-proveedor por cada keyword vigente, en cada ciclo, hasta que alguien la saque. De ahí un
-techo por sitio con rechazo explícito, el permiso separado del de mirar, el resultado
-detallado keyword por keyword en vez de un "listo", y sobre todo la contraparte para dejar
-de seguir — sin la cual el compromiso era permanente y el tope del set, un callejón sin
-salida. Dejar de seguir no borra: cierra la ventana y conserva la medición histórica, que es
-lo que después permite explicar una factura.
-
-El mapa de oportunidad no usa los ejes que pedían el wireframe y la arquitectura. Volumen,
-dificultad e intención de mercado no tienen fuente hoy, y priorizar por un volumen estimado
-teniendo el Search Console propio es un error de método: la demanda ya está medida en la
-búsqueda del propio cliente. Los ejes son posición y demanda medida, y el dato de mercado —
-cuando llegue— será una columna y un filtro, nunca un eje.
-
-La pantalla pasó por tres rondas de crítica de producto con todos los gates automáticos en
-verde desde la primera versión. Lo que se corrigió salió de mirar el resultado real: no
-servía en un teléfono, la selección múltiple podía gastar sobre keywords que ya no estaban a
-la vista, la zona destacada del mapa se contradecía con su propia leyenda, y la fecha de
-corte de los datos había desaparecido en un rediseño intermedio.
-
-El permiso del gateway obligó a decidir algo que va más allá de esta pantalla. Se había
-declarado un permiso por cada acción; se cambió a uno por dominio de escritura, porque una
-lista de permisos por acción termina siendo una copia mal mantenida —editada a mano en el
-directorio de identidad— del registro de permisos que ya vive dentro del producto, y las dos
-listas divergen. La regla quedó escrita: un permiso por clase de riesgo, no por acción. Su
-consecuencia práctica es que la próxima escritura de este dominio ya no toca el directorio de
-identidad, que era justo la fricción que hace que una herramienta se quede sin publicar.
-
-Al ir a entregarle ese permiso al llavero que usan los asistentes apareció lo que de verdad
-importaba: por ese camino el actor es la máquina, no la persona, así que el permiso del
-directorio de identidad es la **única puerta de toda la cadena que depende de quién eres tú**.
-Entregarlo al llavero compartido —que tiene cualquiera del equipo que se conecte— habría dado
-poder de comprometer gasto a todo el tenant, incluido quien en el portal no puede hacerlo, y
-sin que nada fallara: simplemente habría empezado a funcionar para todos. No se hizo, y quedó
-escrito como prohibición explícita, porque el día que alguien vea el error de permiso la
-tentación va a ser exactamente esa. La única otra herramienta que gasta dinero tampoco está en
-ese llavero.
-
-Estado: código completo y verificado, permiso creado en el directorio de identidad con
-verificación de que ningún permiso vecino se perdió. Las dos herramientas quedan publicadas y
-cerradas con llave a propósito: abrirlas necesita un llavero con entrega revocable por persona,
-que es trabajo ya planificado aparte. Queda publicar el despliegue del gateway.

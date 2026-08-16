@@ -2,6 +2,19 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-16 — TASK-1736 complete (code complete, rollout gated) — cierre del trío del día
+
+TASK-1736 cerró sus 5 slices (0-4): ADR de canonicalización, primitive de normalización
+culturalmente segura (62 tests multiculturales), evidencia append-only + reconcile CAS +
+corrección humana capability-gated, detector live (51 perfiles: 4 remediables — 2 humanos +
+2 QA a podar) + remediación dry-run→allowlist→apply→rollback, 2 señales reliability, runbook.
+Auditoría doble: talent PASS, arch CONDITIONAL → resuelta (actor/razón al audit, rollback real
+con CAS del before-value, PII edge 401 chars, placeholder anti display-invisible, retry
+idempotente, nota A3 del COALESCE cross-dominio). Gates: suite full + build verdes. Rollout
+gated al runbook candidate-identity-rollout.md: flag OFF; remediación histórica requiere
+allowlist humana del operador. Con esto las 3 tasks del día (1735, 1734, 1736) están complete.
+Siguiente: /implement-task TASK-1737 (tab Expediente) + TASK-1738 (workbench scoring IA).
+
 ## 2026-08-16 — Hiring Desk/Application 360 migrada a superficies canónicas
 
 El frame compartido de Hiring Desk y la Application 360 dejaron de montar título, navegación, identidad y tabs
