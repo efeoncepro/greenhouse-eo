@@ -88,6 +88,29 @@ describe('parsePublicHiringApplication', () => {
     expect(intl?.residenceCountryCode).toBe('VE')
   })
 
+  // TASK-1736 — el parser conserva el nombre RAW como evidencia (sólo trim exterior + cap).
+  it('conserva el nombre RAW exacto: sin NFC, sin colapso interno, sin tocar casing', () => {
+    const out = parsePublicHiringApplication({ ...valid, firstName: ' vAlEnTiNa ', lastName: 'villa  soto' })
+
+    expect(out?.firstName).toBe('vAlEnTiNa')
+    expect(out?.lastName).toBe('villa  soto')
+    expect(out?.fullName).toBe('vAlEnTiNa villa  soto')
+  })
+
+  // TASK-1736 — availability contra el catálogo estable del Growth Form (fallback tolerante).
+  it('canonicaliza availability en catálogo (match mecánico-seguro) y conserva el resto', () => {
+    expect(parsePublicHiringApplication({ ...valid, availability: 'Inmediata' })?.availability).toBe('Inmediata')
+    expect(parsePublicHiringApplication({ ...valid, availability: 'inmediata' })?.availability).toBe('Inmediata')
+    expect(parsePublicHiringApplication({ ...valid, availability: '2 to 4 weeks' })?.availability).toBe('2 to 4 weeks')
+
+    // Fuera de catálogo: se conserva como texto acotado, JAMÁS invalida la postulación.
+    const out = parsePublicHiringApplication({ ...valid, availability: 'Depende del proyecto' })
+
+    expect(out).not.toBeNull()
+    expect(out?.availability).toBe('Depende del proyecto')
+    expect(parsePublicHiringApplication({ ...valid, availability: '  ' })?.availability).toBeNull()
+  })
+
   it('conserva el mensaje application-scoped hasta 4000 caracteres', () => {
     const out = parsePublicHiringApplication({ ...valid, message: 'Hola equipo, me interesa la vacante.' })
 

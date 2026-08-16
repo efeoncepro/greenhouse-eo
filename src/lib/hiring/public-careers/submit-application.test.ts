@@ -112,3 +112,44 @@ describe('submitPublicHiringApplication — completitud de contacto (TASK-1688)'
     expect(mockRequestTalentPoolFutureConsent).not.toHaveBeenCalled()
   })
 })
+
+describe('submitPublicHiringApplication — intake de identidad canónico (TASK-1736 Slice 1)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockResolveOpening.mockResolvedValue('hopn-1')
+    mockCreateIdentityProfile.mockResolvedValue('prof-1')
+    mockReconcileFacet.mockResolvedValue({ candidateFacetId: 'cndf-1' })
+    mockCreateApplication.mockResolvedValue({ applicationId: 'happ-1', publicId: 'EO-APP-0001' })
+    mockEnsureTalentPoolMembership.mockResolvedValue({ membership_id: 'tlpm-1', public_id: 'EO-TLP-00001' })
+  })
+
+  it('Person recibe el display ESTRUCTURAL (NFC + whitespace colapsado), nunca el verbatim', async () => {
+    // lastName con ñ descompuesta (n + U+0303) y doble espacio interno.
+    await submitPublicHiringApplication({
+      ...input,
+      firstName: 'valentina',
+      lastName: 'peña  soto',
+      fullName: 'valentina peña  soto'
+    })
+
+    expect(mockCreateIdentityProfile.mock.calls[0][0].fullName).toBe('valentina peña soto')
+  })
+
+  it('el casing NO se toca en el intake (materializar casing = Slice 2, no acá)', async () => {
+    await submitPublicHiringApplication({
+      ...input,
+      firstName: 'valentina',
+      lastName: 'villa',
+      fullName: 'valentina villa'
+    })
+
+    // Sigue en minúsculas: la propuesta "Valentina Villa" existe pero NO se aplica en el intake.
+    expect(mockCreateIdentityProfile.mock.calls[0][0].fullName).toBe('valentina villa')
+  })
+
+  it('un nombre ya bien formado pasa idéntico (la estructural es no-op sobre input limpio)', async () => {
+    await submitPublicHiringApplication(input)
+
+    expect(mockCreateIdentityProfile.mock.calls[0][0].fullName).toBe('Ada Lovelace')
+  })
+})

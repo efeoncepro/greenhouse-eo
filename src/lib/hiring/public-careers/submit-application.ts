@@ -3,6 +3,7 @@ import 'server-only'
 import { createHash } from 'node:crypto'
 
 import { createIdentityProfile } from '@/lib/account-360/organization-store'
+import { normalizeCandidateIdentityInput } from '@/lib/hiring/candidate-intake'
 import { createHiringApplication, reconcileCandidateFacet } from '@/lib/hiring/store'
 import { resolvePublishedOpeningIdByPublicId } from '@/lib/hiring/publication'
 import { isHiringError } from '@/lib/hiring/errors'
@@ -63,12 +64,24 @@ export const submitPublicHiringApplication = async (
     return { outcome: 'not_open', applicationPublicId: null, applicationId: null }
   }
 
+  // TASK-1736 Slice 1 — primitive canónico de intake de identidad (mismo para AMBAS entradas
+  // públicas: Careers custom y Growth Forms convergen acá). Person recibe el display ESTRUCTURAL
+  // (NFC + controles fuera + whitespace colapsado — cambios mecánicos seguros por ADR D2); el
+  // CASING no se toca en el intake (reconciliación de display gobernada = Slice 2). El raw exacto
+  // (`input.firstName/lastName/fullName`) queda intacto como evidencia del postulante.
+  const identityIntake = normalizeCandidateIdentityInput({ firstName: input.firstName, lastName: input.lastName })
+
   // 1. Person (email-first reconcile; idempotente — devuelve el profile existente si el email ya existe).
+  // ⚠️ TASK-1736 (sticky name, ADR D3 — comportamiento NO cambiado en Slice 1): si el email ya
+  // existe, `createIdentityProfile` devuelve el perfil previo SIN reconciliar `full_name` (una
+  // primera entrada defectuosa queda pegada); y su rama `ON CONFLICT (profile_id)` SÍ sobreescribe
+  // `full_name` verbatim. Ambos caminos se estrangulan en Slice 2 con
+  // `reconcileCandidateIdentityDisplayName` (compare-and-set + precondiciones D3).
   const identityProfileId = await createIdentityProfile({
     sourceSystem: 'public_careers',
     sourceObjectType: 'candidate',
     sourceObjectId: input.email,
-    fullName: input.fullName,
+    fullName: identityIntake.display.fullName,
     canonicalEmail: input.email
   })
 

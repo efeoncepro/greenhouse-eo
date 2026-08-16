@@ -725,6 +725,14 @@ const normalizeToken = (v: string) => v.trim().toLowerCase().replace(/[^a-z0-9]+
 const buildIdentityProfileId = (source: { sourceSystem: string; sourceObjectType: string; sourceObjectId: string }) =>
   `identity-${normalizeToken(source.sourceSystem)}-${normalizeToken(source.sourceObjectType)}-${normalizeToken(source.sourceObjectId)}`
 
+// ⚠️ TASK-1736 (ADR GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1 §D3) —
+// dos matices de `full_name` que Slice 2 gobierna (comportamiento intacto en Slice 1):
+// 1. Rama email-first: si el email ya existe, devuelve el perfil previo SIN reconciliar
+//    `full_name` — el primer nombre queda "sticky" aunque un intake posterior traiga uno mejor.
+// 2. Rama `ON CONFLICT (profile_id)`: SÍ sobreescribe `full_name` verbatim (last-write-wins).
+// El único camino futuro para refrescar el display de una identidad existente es
+// `reconcileCandidateIdentityDisplayName` (compare-and-set + precondiciones D3); no agregar acá
+// reconciliación ad-hoc ni cambiar estas ramas fuera de esa task.
 export const createIdentityProfile = async (data: {
   sourceSystem: string
   sourceObjectType: string
