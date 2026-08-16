@@ -42,16 +42,18 @@ delegada, capability, propósito fijo, DTO allowlisted y audit sin contenido. El
 profile; un cliente separado sin scope Hiring obtuvo `403`. Projection/search/MCP están ON. El recontacto y el
 autoservicio externos permanecen OFF hasta aprobación People + Legal/Privacy de copy, propósito, TTL y retención.
 
-El release `a369165dfb2d`/run `31941320983` quedó `success`; Vercel, el worker reconciler y su scheduler están live.
+El release inicial `a369165dfb2d`/run `31941320983` dejó búsqueda, proyección y MCP operativos. La promoción ampliada
+`6b78b040252d`/release `6b78b040252d-d0d36c25-3634-4567-8be5-a807272e0ccb`/run `31949566099` terminó
+`released`; Vercel, health, los cuatro workers y el watchdog quedaron verdes, con cero migraciones pendientes.
 Durante el canary se detectó que la policy OAuth persistía `revalidateAfterSeconds=0` aunque el parser exige mínimo
 `15`; una migración aditiva lo corrigió y agregó una prueba sobre el parser real antes de la promoción final. La
 auditoría Talent posterior endureció además el rate guard público: IP ausente usa un bucket opaco compartido y una
 caída del store niega la solicitud, en vez de abrir ilimitadamente el autoservicio futuro.
 
-El siguiente slice deja listo el acceso exacto al CV desde el sidecar del Banco y el packet agent-safe de TASK-1718:
-reader por postulación, proyección PDF minimizada, App API, OAuth/capability separados, auditoría y dos tools MCP
-read-only. El contrato documental nace completamente apagado, sin backfill ni lectura de CV real hasta completar
-sign-offs Security/Privacy/Talent/Identity/MCP. La evidencia visual se rehízo sobre un harness sintético que no existe
+El operador ya puede abrir el CV exacto desde el sidecar del Banco. El packet agent-safe de TASK-1718 —reader por
+postulación, proyección PDF minimizada, App API, OAuth/capability separados, auditoría y dos tools MCP read-only—
+está desplegado pero completamente apagado, sin backfill ni lectura de CV real hasta completar sign-offs
+Security/Privacy/Talent/Identity/MCP. La evidencia visual se rehízo sobre un harness sintético que no existe
 en producción, después de comprobar que una máscara de diff no anonimiza los píxeles ni el árbol de accesibilidad.
 También se retiró del theme la importación residual de Public Sans; el runtime conserva Poppins + Geist como familias
 canónicas.
