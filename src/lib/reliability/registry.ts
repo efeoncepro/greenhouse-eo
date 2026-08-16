@@ -582,7 +582,10 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'src/lib/reliability/queries/hiring-*.ts',
       'src/lib/reliability/queries/asset-scan-*.ts'
     ],
-    expectedSignalKinds: ['lag', 'data_quality', 'incident'],
+    // TASK-1734 Slice 6 — `dead_letter` (items failed del fan-out IA vuelven fail-closed
+    // a la cola manual) y `drift` (override delta humano vs propuesta IA) entran con las
+    // 5 señales del scoring run (queries/hiring-assessment-ai-run-signals.ts).
+    expectedSignalKinds: ['lag', 'data_quality', 'incident', 'dead_letter', 'drift'],
     incidentDomainTag: 'hiring'
   },
   {

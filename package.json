@@ -193,6 +193,7 @@
     "hiring:growth-forms-application-smoke": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/verify-growth-forms-application-smoke.ts",
     "hiring:ai:promotion-eval": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/assessment-ai-promotion-eval.ts",
     "hiring:ai:promotion-gate": "node scripts/hiring/assessment-ai-promotion-gate.mjs",
+    "hiring:ai:run-rollback": "node scripts/hiring/assessment-ai-run-rollback.mjs",
     "pg:doctor": "bash scripts/gcloud-auth-preflight.sh && tsx --require ./scripts/lib/server-only-shim.cjs scripts/pg-doctor.ts",
     "gcp:doctor": "tsx scripts/gcp-auth-doctor.ts",
     "sync:outbox": "tsx scripts/run-outbox-consumer.ts",
