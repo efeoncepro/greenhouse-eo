@@ -168,13 +168,13 @@ const NoteMarkdown = ({ text }: { text: string }) => (
         mb: 1
       }),
       '& p': theme => ({ ...theme.typography.body2, color: 'text.primary', my: 1 }),
-      '& ul, & ol': theme => ({ ...theme.typography.body2, color: 'text.primary', my: 1, ps: 5 }),
+      '& ul, & ol': theme => ({ ...theme.typography.body2, color: 'text.primary', my: 1, pl: 5 }),
       '& li': { my: 0.5 },
       '& a': { color: 'primary.main' },
       '& blockquote': {
         my: 1,
-        ms: 0,
-        ps: 3,
+        ml: 0,
+        pl: 3,
         borderInlineStart: '3px solid',
         borderColor: 'divider',
         color: 'text.secondary'
@@ -242,7 +242,7 @@ const renderTextWithScoreChips = (text: string): ReactNode => {
         // (≈19px) con `middle`, así el número no infla el interlineado ni abre huecos en
         // la cita. Margen asimétrico para que la puntuación siguiente quede pegada al dato.
         sx={{
-          ms: 0.5,
+          ml: 0.5,
           me: 0.25,
           blockSize: 20,
           verticalAlign: 'middle',
@@ -353,7 +353,9 @@ const DossierClaimList = ({
             </Typography>
             <Box
               sx={{
-                ps: { xs: 2.5, sm: 3 },
+                // MUI no reconoce `ps` (no existe en su sistema de spacing): el padding
+                // quedaba sin aplicar y el texto pegado al filete. `pl` sí lo multiplica.
+                pl: { xs: 2.5, sm: 3 },
                 py: 1,
                 minWidth: 0,
                 borderInlineStart: '2px solid',
@@ -471,7 +473,7 @@ const DossierUnverifiable = ({ items, expediente }: { items: string[]; expedient
         />
       </Box>
       {/* Sangría alineada con el TEXTO del summary (24 padding + 18 ícono + 12 gap ≈ 56). */}
-      <Stack component='ul' spacing={1.25} sx={{ m: 0, ps: { xs: 3, sm: 7 }, pe: 3, pb: 3, pt: 0 }}>
+      <Stack component='ul' spacing={1.25} sx={{ m: 0, pl: { xs: 3, sm: 7 }, pr: 3, pb: 3, pt: 0 }}>
         {items.map(item => (
           <Typography key={item} component='li' variant='body2' color='text.secondary' sx={{ overflowWrap: 'anywhere' }}>
             {item}
