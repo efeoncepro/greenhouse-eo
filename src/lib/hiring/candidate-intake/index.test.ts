@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { normalizeCandidateIdentityInput } from './index'
+import { CANDIDATE_DISPLAY_FALLBACK_PLACEHOLDER, normalizeCandidateIdentityInput } from './index'
 
 // TASK-1736 Slice 1 — primitive canónico: evidencia intacta, display estructural SIN casing.
 
@@ -47,12 +47,30 @@ describe('normalizeCandidateIdentityInput', () => {
     expect(out.searchKey.value).toBe('李 小龙')
   })
 
-  it('edge degenerado (sólo zero-width): el display cae al submitted y queda needs_review', () => {
+  it('edge degenerado (sólo zero-width): display = placeholder neutro y needs_review (A5)', () => {
     const out = normalizeCandidateIdentityInput({ firstName: '\u200b', lastName: '\u200b' })
 
-    expect(out.display.fullName).toBe(out.submitted.fullName)
+    // A5 — el display JAMÁS nace invisible: cae al placeholder NEUTRO del dominio, no al raw
+    // con controles/zero-width.
+    expect(out.display.fullName).toBe(CANDIDATE_DISPLAY_FALLBACK_PLACEHOLDER)
+    expect(out.display.fullName).not.toBe(out.submitted.fullName)
+
+    // La evidencia submitted conserva el raw exacto (inmutable, ADR D1).
+    expect(out.submitted.fullName).toBe('\u200b \u200b')
+
+    // Clasificación fail-closed a humano, sin propuesta; search key vacía (sin señal — nunca
+    // matchea otro placeholder).
+    expect(out.casing.classification).toBe('mixed_ambiguous')
     expect(out.casing.confidence).toBe('needs_review')
     expect(out.casing.proposedDisplayName).toBeNull()
+    expect(out.searchKey.value).toBe('')
+  })
+
+  it('edge degenerado con controles bidi/BOM: mismo placeholder neutro y needs_review (A5)', () => {
+    const out = normalizeCandidateIdentityInput({ firstName: '\u202e\u200d', lastName: '\ufeff' })
+
+    expect(out.display.fullName).toBe(CANDIDATE_DISPLAY_FALLBACK_PLACEHOLDER)
+    expect(out.casing.confidence).toBe('needs_review')
   })
 
   it('es determinista/idempotente: mismo input ⇒ mismo output', () => {

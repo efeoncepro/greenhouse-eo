@@ -43,6 +43,31 @@ type SubmitPublicHiringApplicationOptions = {
  * exacto (cero filas nuevas). El submit público JAMÁS falla por esta capa: cualquier error degrada
  * a `captureWithDomain` (IDs-only, sin PII) y la application sigue su curso (ADR §Resilience).
  */
+/**
+ * TASK-1736 A4 — Sanitiza el error de la capa de gobernanza ANTES de emitirlo a Sentry. Un error
+ * PG (p. ej. CHECK violation en el INSERT de evidencia) lleva el NOMBRE del candidato en
+ * `message`/`detail` — PII prohibida en observabilidad (hard rule del ADR). Se emite un error
+ * SINTÉTICO que conserva SOLO code/constraint/table PG (diagnóstico suficiente), jamás
+ * message/detail crudos.
+ */
+const toSanitizedGovernanceError = (error: unknown): Error => {
+  const pg = error as { code?: unknown; constraint?: unknown; table?: unknown }
+  const code = typeof pg?.code === 'string' ? pg.code : null
+  const constraint = typeof pg?.constraint === 'string' ? pg.constraint : null
+  const table = typeof pg?.table === 'string' ? pg.table : null
+  const name = error instanceof Error ? error.name : typeof error
+
+  const parts = [
+    code ? `code=${code}` : null,
+    constraint ? `constraint=${constraint}` : null,
+    table ? `table=${table}` : null
+  ].filter(Boolean)
+
+  return new Error(
+    `candidate identity governance failed (${name}${parts.length > 0 ? `; ${parts.join(' ')}` : ''})`
+  )
+}
+
 const persistCandidateIdentityGovernance = async (params: {
   applicationId: string | null
   identityProfileId: string
@@ -65,7 +90,9 @@ const persistCandidateIdentityGovernance = async (params: {
       intake: params.intake
     })
   } catch (error) {
-    captureWithDomain(error, 'hiring', { tags: { source: 'hiring:candidate-identity-intake-governance' } })
+    captureWithDomain(toSanitizedGovernanceError(error), 'hiring', {
+      tags: { source: 'hiring:candidate-identity-intake-governance' }
+    })
   }
 }
 

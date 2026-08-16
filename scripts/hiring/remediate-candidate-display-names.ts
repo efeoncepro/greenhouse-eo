@@ -22,6 +22,10 @@
  *     --allowlist ./task-1736.candidate-remediation-allowlist.json \
  *     --actor <user-id> --reason "TASK-1736 remediación casing histórico"
  *
+ *   # 4. ROLLBACK per-record de un apply (CAS del before-value del audit reconcile/applied):
+ *   pnpm hiring:candidates:remediate-display --rollback <auditId> \
+ *     --actor <user-id> --reason "TASK-1736 rollback: <motivo>"
+ *
  * Salida con PII (nombres before/proposed): SOLO stdout local del operador y el archivo
  * gitignoreado de allowlist. Jamás pegar este output en logs compartidos, issues ni chat.
  */
@@ -31,6 +35,7 @@ import { closeGreenhousePostgres } from '../../src/lib/postgres/client'
 import {
   applyCandidateIdentityRemediation,
   planCandidateIdentityRemediation,
+  rollbackCandidateIdentityRemediation,
   CANDIDATE_REMEDIATION_REASON_MIN,
   type CandidateIdentityRemediationAllowlistEntry
 } from '../../src/lib/hiring/candidate-intake/remediate'
@@ -135,6 +140,16 @@ const runApply = async () => {
   const reason = arg('--reason')
 
   if (!allowlistPath) fail('--apply requiere --allowlist <file>.')
+
+  // El apply exige el MISMO sufijo gitignoreado que el emit: si el archivo no lo lleva, no vino
+  // del flujo canónico (o quedó en riesgo de commitearse con PII) — no se procesa.
+  if (!(allowlistPath as string).endsWith(ALLOWLIST_SUFFIX)) {
+    fail(
+      `la allowlist del --apply debe terminar en "${ALLOWLIST_SUFFIX}" ` +
+        '(patrón gitignoreado — el archivo contiene PII y jamás se commitea).'
+    )
+  }
+
   if (!actor) fail('--apply requiere --actor <user-id>.')
 
   if (!reason || reason.trim().length < CANDIDATE_REMEDIATION_REASON_MIN) {
@@ -172,12 +187,13 @@ const runApply = async () => {
 
   console.log(
     `\nresumen: expected=${summary.expected} applied=${summary.applied} ` +
-      `skipped=${summary.skipped} needs_review=${summary.needsReview}`
+      `skipped=${summary.skipped} (already_canonical=${summary.skippedAlreadyCanonical}) ` +
+      `needs_review=${summary.needsReview}`
   )
 
   if (!summary.countMatchesExpected) {
     console.error(
-      `\nABORT: applied (${summary.applied}) != esperado (${summary.expected}). ` +
+      `\nABORT: applied+already_canonical (${summary.applied + summary.skippedAlreadyCanonical}) != esperado (${summary.expected}). ` +
         'El estado en DB cambió desde el dry-run (CAS/searchKey lo detectó) o hay corrección humana nueva. ' +
         'Regenera el dry-run + allowlist y revisa los needs_review/skipped uno a uno.'
     )
@@ -186,7 +202,45 @@ const runApply = async () => {
     return
   }
 
-  console.log(`✓ remediados ${summary.applied}/${summary.expected} display names.`)
+  // Retry idempotente (A6): un skipped already_canonical ES el estado prometido por la allowlist.
+  console.log(
+    `✓ estado prometido alcanzado: ${summary.applied} aplicados + ${summary.skippedAlreadyCanonical} ya canónicos ` +
+      `de ${summary.expected}.`
+  )
+}
+
+const runRollback = async (auditId: string) => {
+  const actor = arg('--actor')
+  const reason = arg('--reason')
+
+  if (!actor) fail('--rollback requiere --actor <user-id>.')
+
+  if (!reason || reason.trim().length < CANDIDATE_REMEDIATION_REASON_MIN) {
+    fail(`--rollback requiere --reason "<≥${CANDIDATE_REMEDIATION_REASON_MIN} chars>".`)
+  }
+
+  console.log('\n=== TASK-1736 remediación display names — modo ROLLBACK (per-record) ===')
+  console.log(`audit: ${auditId} | actor: ${actor} | reason: "${reason}"`)
+
+  const result = await rollbackCandidateIdentityRemediation({
+    auditId,
+    actorUserId: actor as string,
+    reason: reason as string
+  })
+
+  console.log(`  ${result.profileId}: ${result.outcome} (${result.reasonCode})`)
+
+  if (result.outcome !== 'applied') {
+    console.error(
+      '\nROLLBACK NO APLICADO: el full_name vigente ya no es el after de ese apply (o el before no es ' +
+        'restaurable). Nada se mutó; resuelve caso a caso con el command de corrección humana.'
+    )
+    process.exitCode = 1
+
+    return
+  }
+
+  console.log('✓ display restaurado al before-value exacto del audit (queda registrado como corrección humana).')
 }
 
 const main = async () => {
@@ -194,14 +248,17 @@ const main = async () => {
   applyGreenhousePostgresProfile('runtime')
 
   const apply = process.argv.includes('--apply')
+  const rollbackAuditId = arg('--rollback')
   const emitAllowlistPath = arg('--emit-allowlist')
 
-  if (apply && emitAllowlistPath) {
-    fail('--apply y --emit-allowlist son mutuamente excluyentes: el apply consume una allowlist ya revisada.')
+  if ([apply, Boolean(rollbackAuditId), Boolean(emitAllowlistPath)].filter(Boolean).length > 1) {
+    fail('--apply, --rollback y --emit-allowlist son mutuamente excluyentes.')
   }
 
   try {
-    if (apply) {
+    if (rollbackAuditId) {
+      await runRollback(rollbackAuditId)
+    } else if (apply) {
       await runApply()
     } else {
       await runDryRun(emitAllowlistPath)

@@ -168,15 +168,34 @@ describe('reconcileCandidateIdentityDisplayName — precondiciones D3', () => {
   })
 
   it('TODAS las ramas escriben audit fuente reconcile (invariante ADR D3)', async () => {
-    // La fila de audit lleva source='reconcile' inline en el SQL y actor NULL.
+    // La fila de audit lleva source='reconcile' inline en el SQL; sin actor ⇒ actor_user_id NULL.
     setupDb({ currentFullName: 'valentina villa' })
     await run(intakeFor('valentina', 'villa'))
 
     const [sql, params] = auditCalls()[0]
 
     expect(String(sql)).toContain("'reconcile'")
-    expect(String(sql)).toContain('NULL')
-    // application_id viaja para el lineage exacto.
+    // application_id viaja para el lineage exacto; automatismo puro ⇒ actor NULL + reason = code.
     expect(params[1]).toBe('happ-1')
+    expect(params[6]).toBe('display_refreshed')
+    expect(params[7]).toBeNull()
+  })
+
+  it('A1 — actor y reason del caller (apply histórico) se PERSISTEN en la fila de audit', async () => {
+    setupDb({ currentFullName: 'valentina villa' })
+
+    await reconcileCandidateIdentityDisplayName({
+      identityProfileId: 'prof-1',
+      applicationId: 'happ-1',
+      intake: intakeFor('valentina', 'villa'),
+      actorUserId: 'user-operator-1',
+      reasonNote: 'TASK-1736 remediación casing histórico'
+    })
+
+    const [, params] = auditCalls()[0]
+
+    // reason = code mecánico + motivo humano; actor_user_id = quien autorizó el apply.
+    expect(params[6]).toBe('display_refreshed — TASK-1736 remediación casing histórico')
+    expect(params[7]).toBe('user-operator-1')
   })
 })

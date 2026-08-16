@@ -10,10 +10,11 @@ vi.mock('@/lib/postgres/client', () => ({
   withGreenhousePostgresTransaction: (cb: (client: unknown) => unknown) => cb({ query: clientQuery })
 }))
 
-import { HiringValidationError } from '../errors'
+import { HiringNotFoundError, HiringValidationError } from '../errors'
 import {
   applyCandidateIdentityRemediation,
   planCandidateIdentityRemediation,
+  rollbackCandidateIdentityRemediation,
   type CandidateIdentityRemediationAllowlistEntry
 } from './remediate'
 
@@ -207,6 +208,28 @@ describe('applyCandidateIdentityRemediation — apply allowlisted (lotes de 1, C
     expect(mutationCalls()).toHaveLength(0)
   })
 
+  it('A1 — el audit del apply lleva actor y razón (no sólo los valida)', async () => {
+    setupReconcileDb({ 'prof-1': { fullName: 'valentina villa' } })
+
+    await applyCandidateIdentityRemediation({
+      entries: [entryFor('prof-1', 'valentina villa', 'Valentina Villa')],
+      ...applyDefaults
+    })
+
+    const auditCall = clientQuery.mock.calls.find(([sql]) =>
+      String(sql).includes('INSERT INTO greenhouse_hiring.candidate_identity_display_audit')
+    )
+
+    expect(auditCall).toBeDefined()
+
+    const params = auditCall?.[1] as unknown[]
+
+    // [6]=reason (code + motivo del apply), [7]=actor_user_id — la mutación histórica queda
+    // atribuida al humano que la autorizó, no como automatismo anónimo.
+    expect(params[6]).toBe('display_refreshed — TASK-1736 remediación casing histórico')
+    expect(params[7]).toBe('user-operator-1')
+  })
+
   it('si el nombre ya fue corregido a la forma canónica entre dry-run y apply → skipped sin mutar', async () => {
     setupReconcileDb({ 'prof-1': { fullName: 'Valentina Villa' } })
 
@@ -217,6 +240,49 @@ describe('applyCandidateIdentityRemediation — apply allowlisted (lotes de 1, C
 
     expect(summary.results[0]).toMatchObject({ outcome: 'skipped', reasonCode: 'already_canonical' })
     expect(mutationCalls()).toHaveLength(0)
+  })
+
+  it('A6 — retry de un apply exitoso es idempotente: already_canonical cuenta como éxito (exit 0)', async () => {
+    // Todo el universo ya quedó en la propuesta (primer apply exitoso); el retry no aborta.
+    setupReconcileDb({
+      'prof-1': { fullName: 'Valentina Villa' },
+      'prof-2': { fullName: 'Ana Mora' }
+    })
+
+    const summary = await applyCandidateIdentityRemediation({
+      entries: [
+        entryFor('prof-1', 'valentina villa', 'Valentina Villa'),
+        entryFor('prof-2', 'ANA MORA', 'Ana Mora', { classification: 'degenerate_upper' })
+      ],
+      ...applyDefaults
+    })
+
+    expect(summary).toMatchObject({
+      expected: 2,
+      applied: 0,
+      skipped: 2,
+      skippedAlreadyCanonical: 2,
+      needsReview: 0,
+      countMatchesExpected: true
+    })
+    expect(mutationCalls()).toHaveLength(0)
+  })
+
+  it('A6 — mezcla applied + already_canonical alcanza el estado prometido (no aborta)', async () => {
+    setupReconcileDb({
+      'prof-1': { fullName: 'valentina villa' },
+      'prof-2': { fullName: 'Ana Mora' }
+    })
+
+    const summary = await applyCandidateIdentityRemediation({
+      entries: [
+        entryFor('prof-1', 'valentina villa', 'Valentina Villa'),
+        entryFor('prof-2', 'ANA MORA', 'Ana Mora', { classification: 'degenerate_upper' })
+      ],
+      ...applyDefaults
+    })
+
+    expect(summary).toMatchObject({ applied: 1, skippedAlreadyCanonical: 1, countMatchesExpected: true })
   })
 
   it('conflicto concurrente del CAS (rowCount 0) → needs_review, jamás last-write-wins', async () => {
@@ -283,5 +349,139 @@ describe('applyCandidateIdentityRemediation — apply allowlisted (lotes de 1, C
 
     expect(summary.results[0]).toMatchObject({ outcome: 'needs_review', reasonCode: 'allowlist_version_drift' })
     expect(clientQuery).not.toHaveBeenCalled()
+  })
+})
+
+// ── Rollback per-record (A2 — CAS del before-value del audit) ────────────────────────────────────
+
+type RollbackDbState = {
+  audit?: {
+    audit_id: string
+    identity_profile_id: string
+    application_id: string | null
+    before_full_name: string | null
+    after_full_name: string | null
+    normalization_version: string
+  } | null
+  currentFullName?: string | null
+  profileExists?: boolean
+  casRowCount?: number
+}
+
+const setupRollbackDb = ({ audit = null, currentFullName = null, profileExists = true, casRowCount = 1 }: RollbackDbState) => {
+  clientQuery.mockImplementation(async (sql: string) => {
+    if (sql.includes('FROM greenhouse_hiring.candidate_identity_display_audit') && sql.includes("source = 'reconcile'")) {
+      return audit ? { rows: [audit], rowCount: 1 } : { rows: [], rowCount: 0 }
+    }
+
+    if (sql.includes('FROM greenhouse_core.identity_profiles') && sql.includes('FOR UPDATE')) {
+      return { rows: profileExists ? [{ full_name: currentFullName }] : [], rowCount: profileExists ? 1 : 0 }
+    }
+
+    if (sql.includes('UPDATE greenhouse_core.identity_profiles')) {
+      return { rows: [], rowCount: casRowCount }
+    }
+
+    if (sql.includes('INSERT INTO greenhouse_hiring.candidate_identity_display_audit')) {
+      return { rows: [], rowCount: 1 }
+    }
+
+    throw new Error(`query inesperada: ${sql}`)
+  })
+}
+
+const rollbackAuditRow = (overrides: Partial<NonNullable<RollbackDbState['audit']>> = {}) => ({
+  audit_id: 'cida-1',
+  identity_profile_id: 'prof-1',
+  application_id: 'happ-1',
+  before_full_name: 'valentina villa',
+  after_full_name: 'Valentina Villa',
+  normalization_version: 'v1',
+  ...overrides
+})
+
+const rollbackDefaults = { auditId: 'cida-1', actorUserId: 'user-operator-1', reason: 'TASK-1736 rollback ensayo' }
+
+const rollbackAuditInsertCalls = () =>
+  clientQuery.mock.calls.filter(([sql]) => String(sql).includes('INSERT INTO greenhouse_hiring.candidate_identity_display_audit'))
+
+describe('rollbackCandidateIdentityRemediation — reversión per-record (A2)', () => {
+  it('exige auditId, actor y reason ≥10 chars', async () => {
+    await expect(
+      rollbackCandidateIdentityRemediation({ ...rollbackDefaults, auditId: '' })
+    ).rejects.toBeInstanceOf(HiringValidationError)
+    await expect(
+      rollbackCandidateIdentityRemediation({ ...rollbackDefaults, actorUserId: '' })
+    ).rejects.toBeInstanceOf(HiringValidationError)
+    await expect(
+      rollbackCandidateIdentityRemediation({ ...rollbackDefaults, reason: 'corto' })
+    ).rejects.toBeInstanceOf(HiringValidationError)
+  })
+
+  it('audit inexistente (o no reconcile/applied) → HiringNotFoundError sin mutar', async () => {
+    setupRollbackDb({ audit: null })
+
+    await expect(rollbackCandidateIdentityRemediation(rollbackDefaults)).rejects.toBeInstanceOf(HiringNotFoundError)
+    expect(mutationCalls()).toHaveLength(0)
+  })
+
+  it('CAS OK: el vigente sigue siendo el after del apply → restaura el before-value exacto', async () => {
+    setupRollbackDb({ audit: rollbackAuditRow(), currentFullName: 'Valentina Villa' })
+
+    const result = await rollbackCandidateIdentityRemediation(rollbackDefaults)
+
+    expect(result).toEqual({
+      auditId: 'cida-1',
+      profileId: 'prof-1',
+      outcome: 'applied',
+      reasonCode: 'rollback_applied',
+      restoredFullName: 'valentina villa'
+    })
+
+    // El UPDATE es CAS: restaura el before del audit condicionado al vigente exacto.
+    const [sql, params] = mutationCalls()[0]
+
+    expect(String(sql)).toContain('full_name IS NOT DISTINCT FROM $3')
+    expect(params).toEqual(['prof-1', 'valentina villa', 'Valentina Villa'])
+
+    // La reversión queda registrada como corrección HUMANA con actor + razón (bloquea automatismos).
+    const [auditSql, auditParams] = rollbackAuditInsertCalls()[0]
+
+    expect(String(auditSql)).toContain("'human'")
+    expect(auditParams[2]).toBe('applied')
+    expect(auditParams[4]).toBe('valentina villa') // after de la fila nueva = valor restaurado
+    expect(String(auditParams[5])).toContain('TASK-1736 rollback ensayo')
+    expect(auditParams[6]).toBe('user-operator-1')
+  })
+
+  it('el vigente YA NO es el after del apply → needs_review SIN mutar (jamás last-write-wins)', async () => {
+    setupRollbackDb({ audit: rollbackAuditRow(), currentFullName: 'Valentina Villa Soto' })
+
+    const result = await rollbackCandidateIdentityRemediation(rollbackDefaults)
+
+    expect(result).toMatchObject({ outcome: 'needs_review', reasonCode: 'rollback_cas_mismatch', restoredFullName: null })
+    expect(mutationCalls()).toHaveLength(0)
+    // La rama sin mutación TAMBIÉN escribe audit (trazabilidad del intento).
+    expect(rollbackAuditInsertCalls()).toHaveLength(1)
+  })
+
+  it('before-value vacío (empty_display_filled) → needs_review sin materializar display invisible', async () => {
+    setupRollbackDb({
+      audit: rollbackAuditRow({ before_full_name: null }),
+      currentFullName: 'Valentina Villa'
+    })
+
+    const result = await rollbackCandidateIdentityRemediation(rollbackDefaults)
+
+    expect(result).toMatchObject({ outcome: 'needs_review', reasonCode: 'rollback_before_value_unavailable' })
+    expect(mutationCalls()).toHaveLength(0)
+  })
+
+  it('carrera del CAS (rowCount 0 pese al FOR UPDATE) → needs_review', async () => {
+    setupRollbackDb({ audit: rollbackAuditRow(), currentFullName: 'Valentina Villa', casRowCount: 0 })
+
+    const result = await rollbackCandidateIdentityRemediation(rollbackDefaults)
+
+    expect(result).toMatchObject({ outcome: 'needs_review', reasonCode: 'rollback_cas_mismatch' })
   })
 })

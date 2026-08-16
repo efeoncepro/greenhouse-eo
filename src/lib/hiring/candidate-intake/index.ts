@@ -42,6 +42,15 @@ export interface CandidateIdentityIntakeInput {
   lastName: string
 }
 
+/**
+ * TASK-1736 A5 — Placeholder neutro del dominio para el edge degenerado en que la normalización
+ * estructural deja el nombre VACÍO (input compuesto sólo por controles/zero-width). Espejo del
+ * fallback de desk.ts (`Candidato ${publicId}` — acá sin publicId: el primitive es puro). Un
+ * display JAMÁS nace invisible: materializar el submitted crudo re-introduciría los caracteres
+ * de control que la estructural acaba de remover.
+ */
+export const CANDIDATE_DISPLAY_FALLBACK_PLACEHOLDER = 'Candidato'
+
 export interface CandidateIdentityIntake {
   /** Evidencia: EXACTAMENTE lo que entregó el caller (post parser: trim exterior + cap). Inmutable acá. */
   submitted: {
@@ -73,9 +82,14 @@ export const normalizeCandidateIdentityInput = (input: CandidateIdentityIntakeIn
   const submittedFullName = `${input.firstName} ${input.lastName}`.trim()
   const structuralFullName = normalizeNameStructural(submittedFullName)
 
-  // Edge degenerado (nombre compuesto sólo por controles/zero-width): la representación cae al
-  // submitted para no entregar un display vacío; la clasificación queda `needs_review` aguas abajo.
-  const displayFullName = structuralFullName || submittedFullName
+  // Edge degenerado (A5 — nombre compuesto sólo por controles/zero-width): el display cae al
+  // placeholder NEUTRO del dominio, JAMÁS al submitted crudo (materializaría un display invisible
+  // con los caracteres de control que la estructural removió). La clasificación se computa sobre
+  // la estructural VACÍA ⇒ `mixed_ambiguous`/`needs_review` sin propuesta (decide un humano), y
+  // la search key queda vacía (sin señal — nunca matchea otro placeholder).
+  const structuralIsEmpty = structuralFullName.length === 0
+  const displayFullName = structuralIsEmpty ? CANDIDATE_DISPLAY_FALLBACK_PLACEHOLDER : structuralFullName
+  const representationSource = structuralIsEmpty ? structuralFullName : displayFullName
 
   return {
     submitted: {
@@ -84,8 +98,8 @@ export const normalizeCandidateIdentityInput = (input: CandidateIdentityIntakeIn
       fullName: submittedFullName
     },
     display: { fullName: displayFullName },
-    casing: proposeDisplayName(displayFullName),
-    searchKey: buildCandidateSearchKey(displayFullName),
+    casing: proposeDisplayName(representationSource),
+    searchKey: buildCandidateSearchKey(representationSource),
     normalizationVersion: CANDIDATE_NAME_NORMALIZATION_VERSION
   }
 }

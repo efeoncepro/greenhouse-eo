@@ -59,6 +59,29 @@ describe('persistCandidateIdentityIntakeEvidence', () => {
     expect(a).toMatch(/^[0-9a-f]{64}$/)
   })
 
+  it('edge 401 (200+espacio+200): trunca defensivamente a 400 ANTES del INSERT (A4 — CHECK 400)', async () => {
+    // El parser acota first/last a 200 c/u; el fullName concatenado llega a 401 y violaría el
+    // CHECK `length BETWEEN 1 AND 400` — el error PG llevaría el nombre en DETAIL hacia Sentry.
+    const firstName = 'a'.repeat(200)
+    const lastName = 'b'.repeat(200)
+    const intake = normalizeCandidateIdentityInput({ firstName, lastName })
+
+    expect(intake.submitted.fullName).toHaveLength(401)
+
+    await persistCandidateIdentityIntakeEvidence({ applicationId: 'happ-1', identityProfileId: 'prof-1', intake })
+
+    const [, params] = mockQuery.mock.calls[0]
+
+    // submitted / estructural / propuesta viajan capadas a 400 (el raw completo ya viene acotado
+    // por el parser; acá solo se garantiza que el INSERT jamás revienta el CHECK).
+    expect((params[2] as string).length).toBe(400)
+    expect((params[3] as string).length).toBeLessThanOrEqual(400)
+    expect(params[5] === null || (params[5] as string).length <= 400).toBe(true)
+
+    // El digest sigue siendo del input RAW completo (idempotencia estable, no del truncado).
+    expect(params[9]).toBe(buildCandidateIdentityInputDigest({ firstName, lastName }))
+  })
+
   it('la propuesta viaja NULL cuando la clasificación no es degenerada evidente', async () => {
     const intake = normalizeCandidateIdentityInput({ firstName: 'Ada', lastName: 'Lovelace' })
 

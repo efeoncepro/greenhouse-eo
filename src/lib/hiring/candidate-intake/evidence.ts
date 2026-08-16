@@ -20,6 +20,19 @@ import type { CandidateIdentityIntake } from './index'
 export const buildCandidateIdentityInputDigest = (submitted: { firstName: string; lastName: string }): string =>
   createHash('sha256').update(JSON.stringify([submitted.firstName, submitted.lastName])).digest('hex')
 
+/**
+ * TASK-1736 A4 — Cap defensivo alineado al CHECK de la migración (`length BETWEEN 1 AND 400`).
+ * El parser acota first/last a 200 c/u, pero el fullName concatenado puede llegar a 401 (200 +
+ * espacio + 200) y reventar el CHECK en el INSERT — y el error PG llevaría el nombre en DETAIL.
+ * El raw completo ya viaja acotado por el parser; truncar acá a 400 pierde a lo sumo el último
+ * carácter de un edge extremo y jamás un dato authored significativo.
+ */
+export const EVIDENCE_NAME_MAX = 400
+
+const capName = (value: string): string => value.slice(0, EVIDENCE_NAME_MAX)
+
+const capNullableName = (value: string | null): string | null => (value === null ? null : capName(value))
+
 export interface PersistCandidateIdentityIntakeEvidenceInput {
   applicationId: string
   identityProfileId: string
@@ -46,10 +59,10 @@ export const persistCandidateIdentityIntakeEvidence = async (
     [
       input.applicationId,
       input.identityProfileId,
-      intake.submitted.fullName,
-      intake.display.fullName,
+      capName(intake.submitted.fullName),
+      capName(intake.display.fullName),
       intake.casing.classification,
-      intake.casing.proposedDisplayName,
+      capNullableName(intake.casing.proposedDisplayName),
       intake.searchKey.value,
       intake.searchKey.version,
       intake.normalizationVersion,

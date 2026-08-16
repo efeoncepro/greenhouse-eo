@@ -1,9 +1,9 @@
 # Operar la Remediación de Nombres de Candidatos
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-16 por Claude (TASK-1736 Slice 4)
-> **Ultima actualizacion:** 2026-08-16 por Claude
+> **Ultima actualizacion:** 2026-08-16 por Claude (auditoría doble: rollback real `--rollback`, retry idempotente, audit con actor/razón)
 > **Documentacion tecnica:** [identidad-de-candidatos-intake](../../documentation/hr/identidad-de-candidatos-intake.md) · runbook [candidate-identity-rollout](../../operations/runbooks/candidate-identity-rollout.md)
 
 ## Para qué sirve
@@ -67,26 +67,49 @@ pnpm hiring:candidates:remediate-display --apply \
 ```
 
 - El motivo exige mínimo 10 caracteres.
+- El archivo debe terminar en `.candidate-remediation-allowlist.json` (el comando lo verifica
+  también en el apply — protege contra archivos fuera del flujo canónico o commiteables con PII).
 - Aplica de a **un registro por vez**, cada uno con compare-and-set sobre el valor anterior exacto
-  y una fila de auditoría permanente.
-- Si el resumen final muestra `applied != expected`, el comando marca ABORT: el estado en la base
-  cambió desde el dry-run (o alguien corrigió a mano). Regenera el dry-run y la allowlist; no
-  reintentes con el archivo viejo.
+  y una fila de auditoría permanente **que registra tu `--actor` y tu `--reason`**.
+- Si el resumen final muestra `applied + already_canonical != expected`, el comando marca ABORT: el
+  estado en la base cambió desde el dry-run (o alguien corrigió a mano). Regenera el dry-run y la
+  allowlist; no reintentes con el archivo viejo.
+- **Repetir un apply exitoso es seguro**: los registros ya corregidos salen
+  `skipped (already_canonical)`, cuentan como éxito y el comando termina bien (exit 0).
 
 ### 5. Verificación
 
 - Readback: consulta el `full_name` de cada identidad remediada (debe ser la propuesta aprobada).
 - Auditoría: cada caso tiene su fila `source='reconcile'`, `outcome='applied'` en
-  `greenhouse_hiring.candidate_identity_display_audit`.
+  `greenhouse_hiring.candidate_identity_display_audit`, con tu `actor_user_id` y el motivo del
+  apply en `reason`.
 - Señales: en `/admin/operations`, `hiring.candidate_identity.needs_review_backlog` no debe crecer
   por el apply.
+
+### 6. Rollback de un registro (si un apply debe revertirse)
+
+```bash
+pnpm hiring:candidates:remediate-display --rollback <auditId> \
+  --actor <tu-user-id> --reason "TASK-1736 rollback: <motivo>"
+```
+
+- El `<auditId>` es el `audit_id` de la fila `source='reconcile'` + `outcome='applied'` del apply
+  que quieres revertir (búscalo por identidad en la tabla de auditoría).
+- Restaura el valor anterior exacto **solo si** el nombre vigente sigue siendo el que dejó ese
+  apply (compare-and-set). Si alguien lo cambió después, reporta
+  `needs_review (rollback_cas_mismatch)` sin tocar nada — resuélvelo con corrección manual.
+- La reversión queda registrada como **corrección humana**: desde ahí ningún automatismo vuelve a
+  tocar ese nombre (deliberado).
 
 ## Qué significan los resultados por registro
 
 | Resultado | Significa | Qué hacer |
 |---|---|---|
 | `applied (display_refreshed)` | Corregido con éxito | Nada |
-| `skipped (already_canonical)` | Ya estaba bien (alguien lo arregló antes) | Nada |
+| `skipped (already_canonical)` | Ya estaba en la forma propuesta (p. ej. retry de un apply exitoso) — cuenta como éxito | Nada |
+| `applied (rollback_applied)` | Rollback: el display volvió al valor previo al apply | Nada |
+| `needs_review (rollback_cas_mismatch)` | Rollback: el nombre vigente ya no es el que dejó ese apply | Corrección manual caso a caso |
+| `needs_review (rollback_before_value_unavailable)` | Rollback: el apply llenó un display vacío; no se restaura a vacío | Corrección manual caso a caso |
 | `skipped (human_correction_present)` | Hay corrección humana previa — siempre gana | Nada; no insistir |
 | `needs_review (cas_conflict)` | El nombre cambió en la base entre dry-run y apply | Regenerar dry-run |
 | `needs_review (substantive_name_discrepancy)` | El nombre actual difiere de verdad del revisado | Revisión humana caso a caso |

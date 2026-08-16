@@ -44,6 +44,18 @@ export interface ReconcileCandidateIdentityDisplayNameInput {
   /** Application origen del intake; null cuando el contexto no tiene application resuelta. */
   applicationId: string | null
   intake: CandidateIdentityIntake
+  /**
+   * Actor humano que autorizó este reconcile (apply de remediación histórica, TASK-1736 A1).
+   * Cuando está presente se persiste en `actor_user_id` del audit (el CHECK lo permite para
+   * `source='reconcile'`); ausente = automatismo del intake (actor NULL).
+   */
+  actorUserId?: string
+  /**
+   * Motivo operativo del caller (p. ej. el `--reason` del apply). Cuando está presente se anexa
+   * al reason code en la columna `reason` del audit — el "por qué" humano queda auditado junto
+   * al "qué" mecánico. Nunca va a logs/eventos (el audit es DB restringida, no observabilidad).
+   */
+  reasonNote?: string
 }
 
 export interface ReconcileCandidateIdentityDisplayNameResult {
@@ -55,6 +67,9 @@ export interface ReconcileCandidateIdentityDisplayNameResult {
 
 const isEmptyDisplay = (value: string | null): boolean => !value || value.trim().length === 0
 
+/** Cap de la columna `reason` del audit (CHECK length BETWEEN 1 AND 1000). */
+const AUDIT_REASON_MAX = 1000
+
 const writeReconcileAudit = async (
   client: PoolClient,
   input: ReconcileCandidateIdentityDisplayNameInput,
@@ -63,11 +78,19 @@ const writeReconcileAudit = async (
   beforeFullName: string | null,
   afterFullName: string | null
 ): Promise<void> => {
+  // TASK-1736 A1 — reason code mecánico + motivo humano opcional (apply de remediación), acotado
+  // al CHECK de la columna. El actor humano (si existe) se persiste; automatismo puro = NULL.
+  const reasonNote = typeof input.reasonNote === 'string' ? input.reasonNote.trim() : ''
+  const reason = (reasonNote ? `${reasonCode} — ${reasonNote}` : reasonCode).slice(0, AUDIT_REASON_MAX)
+
+  const actorUserId =
+    typeof input.actorUserId === 'string' && input.actorUserId.trim().length > 0 ? input.actorUserId.trim() : null
+
   await client.query(
     `INSERT INTO greenhouse_hiring.candidate_identity_display_audit
        (identity_profile_id, application_id, source, outcome, before_full_name, after_full_name,
         proposed_full_name, reason, actor_user_id, normalization_version)
-     VALUES ($1, $2, 'reconcile', $3, $4, $5, $6, $7, NULL, $8)`,
+     VALUES ($1, $2, 'reconcile', $3, $4, $5, $6, $7, $8, $9)`,
     [
       input.identityProfileId,
       input.applicationId,
@@ -75,7 +98,8 @@ const writeReconcileAudit = async (
       beforeFullName,
       afterFullName,
       input.intake.casing.proposedDisplayName,
-      reasonCode,
+      reason,
+      actorUserId,
       input.intake.normalizationVersion
     ]
   )

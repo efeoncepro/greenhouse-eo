@@ -311,6 +311,58 @@ y la D5 del ADR `GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md`). Este ADR
 
 ---
 
+## Delta 2026-08-16 — Enmiendas por auditoría doble (TASK-1736)
+
+Correcciones y notas registradas tras la auditoría doble del código de Slices 1-4; ninguna cambia las
+sub-decisiones D1-D6, sólo las precisan contra el runtime real:
+
+1. **D5 `availability` — enmienda (fallback tolerante implementado, rechazo duro diferido).** La matriz
+   D5 declara `unknown → reject con code canónico`, pero la implementación de Slice 1
+   (`src/lib/hiring/candidate-intake/availability.ts`) aplica deliberadamente un **fallback tolerante
+   documentado en el propio código**: "un valor fuera del catálogo se CONSERVA como texto acotado y NO
+   rechaza la postulación — el intake público jamás pierde una application por esto. El rechazo duro
+   queda diferido a cuando exista la evidencia application-scoped (Slice 2) para no perder el dato
+   authored". Este delta es la posture vigente; promover el `reject` duro es un follow-up explícito, no
+   un default.
+
+2. **Semántica del primitive 360 `createIdentityProfile` — cambio para TODOS los consumers (A3).** El
+   estrangulamiento del sticky name cambió el `ON CONFLICT (profile_id) DO UPDATE` a
+   `full_name = COALESCE(full_name existente, EXCLUDED.full_name)`: **preserva** el nombre vigente y
+   sólo llena vacíos. Esto aplica a **todos** los consumers del primitive — HubSpot contacts, finance
+   suppliers, org memberships, no sólo Hiring: un rename en el sistema externo **ya no refresca**
+   `full_name` por esa vía. El refresh legítimo requiere un camino de reconcile propio por dominio
+   (hoy sólo existe el de Hiring, `reconcileCandidateIdentityDisplayName`); extenderlo a los demás
+   dominios queda declarado como follow-up.
+
+3. **Riesgo residual aceptado (procedimental): `plan → apply` encadenable sin revisión.** El contrato
+   programático no impide que un operador encadene el output del dry-run directo al apply sin podar la
+   allowlist: la revisión humana línea a línea es un **gate procedimental** (runbook + manual), no un
+   gate mecánico. Mitigado por: apply exige actor + reason persistidos en el audit, lotes de 1, CAS,
+   re-derivación de la propuesta (drift ⇒ `needs_review`) y rollback per-record. Aceptado como riesgo
+   procedimental; un gate mecánico (p. ej. firma humana del archivo) sería follow-up si el volumen crece.
+
+4. **Nota A7 — qué compara realmente el CAS del apply.** El compare-and-set del reconcile compara
+   contra el `full_name` **vigente en DB bajo `FOR UPDATE`**, no contra el `beforeFullName` del
+   dry-run: si el nombre cambió entre dry-run y apply hacia otra forma del MISMO nombre (mismos tokens
+   bajo searchKey), el guard de discrepancia sustantiva no dispara y el apply puede materializar la
+   propuesta re-derivada. El riesgo queda acotado por el searchKey guard (tokens distintos ⇒
+   `needs_review`), por la re-derivación de la propuesta desde el before aprobado
+   (`allowlist_proposal_drift`) y porque una corrección humana intermedia siempre gana.
+
+5. **Remediación — contrato completado (A1/A2/A6).** (a) El apply persiste `actor_user_id` y el motivo
+   operativo en la fila de audit del reconcile (fuente `reconcile`; el CHECK lo permite) — el "quién/por
+   qué" del backfill histórico queda auditado, no sólo validado. (b) Existe
+   `rollbackCandidateIdentityRemediation({auditId, actorUserId, reason})` (CLI `--rollback <auditId>`):
+   CAS que restaura el `before_full_name` del audit `reconcile`+`applied` SOLO si el vigente sigue
+   siendo su `after_full_name`; la reversión se registra como corrección humana (`source='human'`) y
+   una discrepancia deriva `needs_review` sin mutar. (c) El retry de un apply exitoso es idempotente:
+   `skipped (already_canonical)` cuenta como estado prometido y no aborta.
+
+6. **Edge del display vacío (A5).** Si la normalización estructural deja el nombre vacío (input sólo
+   controles/zero-width), el display materializa el placeholder neutro del dominio (`Candidato`) con
+   clasificación `needs_review` — jamás el submitted crudo (display invisible). La evidencia raw se
+   conserva intacta.
+
 ## Open Questions (deliberadamente no decidido)
 
 1. **Capability de corrección operador**: si la corrección manual reusa una capability existente de

@@ -1,5 +1,24 @@
 # TASK-1736 — Candidate Identity Intake Canonicalization + Governed Remediation
 
+## Delta 2026-08-16 (2) — Correcciones de auditoría doble aplicadas
+
+- **A1 (PASS):** el apply histórico persiste actor + motivo en el audit del reconcile
+  (`reconcileCandidateIdentityDisplayName` acepta `{actorUserId?, reasonNote?}`; el apply los pasa siempre).
+- **A2 (PASS):** `rollbackCandidateIdentityRemediation({auditId, actorUserId, reason})` implementado
+  (CAS del before-value del audit `reconcile/applied`; mismatch ⇒ `needs_review` sin mutar; reversión
+  registrada como corrección humana) + subcomando CLI `--rollback <auditId>`; runbook y manual actualizados.
+- **A4:** evidencia trunca a 400 pre-INSERT (edge 401 del parser 200+200) y el capture a Sentry de la capa
+  de gobernanza viaja sanitizado (code/constraint PG, jamás DETAIL con PII).
+- **A5:** display vacío post-estructural ⇒ placeholder neutro `Candidato` + `needs_review` (jamás display
+  invisible desde el submitted crudo).
+- **A6:** `countMatchesExpected = (applied + skippedAlreadyCanonical) === expected` — retry de apply
+  exitoso idempotente (exit 0); CLI reporta el desglose.
+- **A7/A8/A3 (docs):** delta de enmiendas en el ADR (D5 availability tolerante, residual plan→apply
+  procedimental, nota CAS-vs-dry-run) + nota en `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` del cambio de
+  semántica `COALESCE` de `createIdentityProfile` para TODOS los consumers 360; `--apply` valida el sufijo
+  gitignoreado de la allowlist.
+- Suite `pnpm vitest run src/lib/hiring/candidate-intake` verde con los tests nuevos de cada fix.
+
 ## Delta 2026-08-16
 
 - Slice 0 ejecutado — ADR **Proposed** en

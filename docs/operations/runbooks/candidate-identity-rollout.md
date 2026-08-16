@@ -91,9 +91,12 @@ pnpm hiring:candidates:remediate-display --apply \
   --actor <user-id> --reason "TASK-1736 remediación casing histórico"
 ```
 
-El apply aborta solo si `applied != expected` (CAS/searchKey detectó cambios en DB o corrección
-humana nueva). Verificación post-apply: readback de `full_name` de cada identidad remediada + filas
-`reconcile/applied` en el audit + `needs_review_backlog` sin crecer.
+El apply aborta solo si `applied + already_canonical != expected` (CAS/searchKey detectó cambios en
+DB o corrección humana nueva). El **retry de un apply exitoso es idempotente**: los
+`skipped (already_canonical)` cuentan como estado prometido y el comando sale con exit 0.
+Verificación post-apply: readback de `full_name` de cada identidad remediada + filas
+`reconcile/applied` en el audit (con `actor_user_id` y el motivo del apply persistidos) +
+`needs_review_backlog` sin crecer.
 
 ## Verificación por señales
 
@@ -111,8 +114,27 @@ Dashboard: `/admin/operations` (módulo **Hiring / ATS**). Readers:
   <15 min; las filas de evidencia/audit quedan **inertes y auditables** (aditivas, jamás se borran).
 - **Las correcciones ya aplicadas se CONSERVAN por diseño**: el modelo es append-only y la
   evidencia raw de cada aplicación permite reconstruir todo. Si un display remediado debe volver a
-  su valor anterior, se revierte **por registro** con el mismo CAS (before-value exacto del audit) —
-  nunca un UPDATE masivo.
+  su valor anterior, se revierte **por registro** con el subcomando real del CLI (CAS del
+  before-value exacto del audit `reconcile/applied`) — nunca un UPDATE masivo:
+
+  ```bash
+  # 1. Ubicar el audit_id del apply a revertir (read-only, pnpm pg:connect:shell):
+  #    SELECT audit_id, before_full_name, after_full_name, created_at
+  #      FROM greenhouse_hiring.candidate_identity_display_audit
+  #     WHERE identity_profile_id = '<profile-id>' AND source='reconcile' AND outcome='applied'
+  #     ORDER BY created_at DESC;
+
+  # 2. Rollback per-record (CAS: sólo si el full_name vigente sigue siendo el after de ese apply)
+  pnpm hiring:candidates:remediate-display --rollback <auditId> \
+    --actor <user-id> --reason "TASK-1736 rollback: <motivo>"
+  ```
+
+  El rollback queda registrado como **corrección humana** (`source='human'` en el audit) — bloquea
+  automatismos futuros sobre esa identidad, deliberado. Si el `full_name` vigente ya no es el
+  `after` de ese apply (re-submit o corrección posterior), el comando reporta
+  `needs_review (rollback_cas_mismatch)` **sin mutar** y sale con exit 1: resolver caso a caso con
+  el command de corrección humana. Un apply nacido de display vacío (`empty_display_filled`) no es
+  restaurable a vacío (`rollback_before_value_unavailable`): también va a corrección humana.
 - La remediación en curso se detiene sola ante cualquier drift (`countMatchesExpected=false` aborta).
 
 ## Qué NO hacer

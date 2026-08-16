@@ -1555,3 +1555,23 @@ intake). Primitives: `src/lib/hiring/candidate-intake/**`. Señales `hiring.cand
 steady=0) · runbook `docs/operations/runbooks/candidate-identity-rollout.md` · funcional
 `docs/documentation/hr/identidad-de-candidatos-intake.md` · manual
 `docs/manual-de-uso/hr/operar-remediacion-nombres-candidatos.md`.
+
+**⚠️ Cambio de semántica del primitive 360 `createIdentityProfile` — afecta a TODOS los consumers
+(A3, auditoría 2026-08-16).** El fix del sticky name cambió el `ON CONFLICT (profile_id) DO UPDATE`
+de `organization-store.ts` a `full_name = COALESCE(full_name existente, EXCLUDED.full_name)`: el
+primitive ahora **preserva** el `full_name` vigente y sólo llena vacíos. Esto rige para **todo**
+consumer del primitive — HubSpot contacts, finance suppliers, org memberships, no sólo Hiring: un
+rename en el sistema externo **ya no refresca** `full_name` vía `ON CONFLICT`. El refresh legítimo
+exige un camino de reconcile propio del dominio (hoy sólo Hiring lo tiene:
+`reconcileCandidateIdentityDisplayName`, CAS + audit); dotar de reconcile a los demás dominios es un
+follow-up declarado (ver Delta de enmiendas del ADR
+`GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1.md`).
+
+**Auditoría doble 2026-08-16 — remediación completada:** el apply histórico persiste actor + motivo
+en el audit del reconcile (no sólo los valida); existe rollback per-record real
+(`rollbackCandidateIdentityRemediation` / CLI `--rollback <auditId>`: CAS del before-value del audit
+`reconcile/applied`, registrado como corrección humana; discrepancia ⇒ `needs_review` sin mutar); el
+retry de un apply exitoso es idempotente (`already_canonical` cuenta como éxito); el edge de display
+vacío materializa el placeholder neutro `Candidato` + `needs_review` (jamás un display invisible); la
+evidencia trunca defensivamente a 400 chars pre-INSERT y el capture a Sentry de esa capa viaja
+sanitizado (code/constraint PG, jamás DETAIL con PII).
