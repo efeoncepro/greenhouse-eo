@@ -1536,3 +1536,22 @@ doble rating + adjudicación. 3 flags default-OFF en el ledger, scheduler `ops-a
 rollback por `pnpm hiring:ai:run-rollback` + flags nuevos (nunca el master). Detalle completo: ADR
 `GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md` · runbook
 `docs/operations/runbooks/assessment-ai-scoring-rollout.md` · señales `hiring.assessment_ai.*` (5, steady=0).
+
+## Delta 2026-08-16 (3) — Identidad de intake canonicalizada (TASK-1736, code complete / rollout gated)
+
+La identidad del candidato en el intake se separa en **tres capas** (ADR
+`GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1.md`): **evidencia submitted**
+application-scoped e inmutable (`greenhouse_hiring.candidate_identity_intake_evidence`, append-only con
+trigger anti-mutación), **display person-first** corregible (`identity_profiles.full_name`) y **search key**
+derivada/versionada que jamás fusiona personas. Normalización estructural determinista (NFC + whitespace +
+controles/bidi) + casing SOLO `high_confidence` (degenerado evidente, reglas culturales conservadoras);
+todo lo ambiguo deriva `needs_review`. El sticky name se cierra con `reconcileCandidateIdentityDisplayName`
+(compare-and-set + audit `candidate_identity_display_audit`; una corrección humana SIEMPRE gana). La
+corrección manual es la capability nueva `hiring.candidate.correct_display` (role-only: EFEONCE_ADMIN +
+HR_MANAGER + EFEONCE_OPERATIONS). La remediación histórica es `dry-run → allowlist humana → apply CAS en
+lotes de 1 → rollback` vía `pnpm hiring:candidates:remediate-display`, independiente del flag
+`HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED` (Vercel-only, default OFF — gatea solo el writer del
+intake). Primitives: `src/lib/hiring/candidate-intake/**`. Señales `hiring.candidate_identity.*` (2,
+steady=0) · runbook `docs/operations/runbooks/candidate-identity-rollout.md` · funcional
+`docs/documentation/hr/identidad-de-candidatos-intake.md` · manual
+`docs/manual-de-uso/hr/operar-remediacion-nombres-candidatos.md`.

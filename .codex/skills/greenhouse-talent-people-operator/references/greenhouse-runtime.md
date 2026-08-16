@@ -318,6 +318,34 @@ Docs: ADR `GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md` · runbook
 `docs/documentation/hr/scoring-ia-de-assessments.md` · manual
 `docs/manual-de-uso/hr/operar-scoring-ia-assessments.md`.
 
+## Candidate identity intake (TASK-1736, code complete 2026-08-16 — rollout gated)
+
+- **Primitives**: `src/lib/hiring/candidate-intake/**` — `normalizeCandidateIdentityInput` (NFC + Unicode
+  whitespace + control/bidi stripping + versioned casing classifier), `persistCandidateIdentityIntakeEvidence`
+  (append-only, idempotent by application+identity+version+digest), `reconcileCandidateIdentityDisplayName`
+  (the ONLY mutation gate for `identity_profiles.full_name`: CAS + audit on every branch),
+  `correctCandidateIdentityDisplayName` (human, capability `hiring.candidate.correct_display`),
+  `detectDegenerateCandidateNames` (read-only) + `plan/applyCandidateIdentityRemediation`.
+- **Tables**: `greenhouse_hiring.candidate_identity_intake_evidence` + `candidate_identity_display_audit`
+  (both append-only with anti-mutation triggers; they DO contain names — restricted DB, never logs/metrics).
+- **Flag**: `HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED` (Vercel-only, default OFF) gates the intake
+  writer ONLY; the historical remediation runs by human allowlist independent of the flag (ADR D4).
+- **CLI**: `pnpm hiring:candidates:remediate-display` — dry-run → `--emit-allowlist` (gitignored, contains
+  PII) → human prune (drop QA/synthetic profiles) → `--apply --actor --reason`. Aborts on any drift.
+- **Signals**: `hiring.candidate_identity.needs_review_backlog` (steady=0; warning 1-5, error >5) +
+  `hiring.candidate_identity.evidence_coverage_gap` (flag ON: applications without evidence row = silent-skip;
+  flag OFF: ok with note). Reader: `src/lib/reliability/queries/hiring-candidate-identity-signals.ts`.
+- **Hard rules**: never mutate submitted evidence; never blind Title Case; ambiguity ⇒ `needs_review`
+  (fail-closed to human, never blocking the public submit); a human correction always wins; search key never
+  resolves/merges a Person (email/`identity_profile_id` are the only authoritative keys); no candidate PII in
+  logs/events/metrics (IDs/hashes/counts only).
+
+Docs: ADR `GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1.md` · runbook
+`docs/operations/runbooks/candidate-identity-rollout.md` · architecture
+`GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-16 (3) · functional
+`docs/documentation/hr/identidad-de-candidatos-intake.md` · manual
+`docs/manual-de-uso/hr/operar-remediacion-nombres-candidatos.md`.
+
 ## Person model (never duplicate a human)
 
 - Root: `greenhouse_core.identity_profiles` (`profile_id`). A candidate is a **Person with a `candidate_facet`**, not a separate record. Reconcile with `resolvePersonIdentifier`.

@@ -216,6 +216,8 @@ import { getHiringInternalHireAwaitingOnboardingSignal } from './queries/hiring-
 import { getWorkforceHiringActivationStuckSignal } from './queries/workforce-hiring-activation-stuck'
 // TASK-1734 Slice 6 — Assessment AI scoring run signals (moduleKey 'hiring').
 import { getHiringAssessmentAiRunSignals } from './queries/hiring-assessment-ai-run-signals'
+// TASK-1736 Slice 4 — Candidate identity intake signals (moduleKey 'hiring').
+import { getHiringCandidateIdentitySignals } from './queries/hiring-candidate-identity-signals'
 import { getKnowledgeQuarantineCountSignal } from './queries/knowledge-quarantine-count'
 import { getKnowledgeSyncFailedSourceSignal } from './queries/knowledge-sync-failed-source'
 // TASK-1085 — Nexa knowledge retrieval observability (moduleKey 'knowledge').
@@ -712,6 +714,8 @@ interface ReliabilityOverviewSources {
   hiringInternalHireAwaitingOnboarding?: ReliabilitySignal | null
   /** TASK-1734 — Assessment AI scoring run (backlog/provider/abstention/override/orphans). */
   hiringAssessmentAiRun?: ReliabilitySignal[] | null
+  /** TASK-1736 — Candidate identity intake (needs_review backlog + evidence coverage gap). */
+  hiringCandidateIdentity?: ReliabilitySignal[] | null
   workforceHiringActivationStuck?: ReliabilitySignal | null
   knowledgeSyncFailedSource?: ReliabilitySignal | null
   knowledgeNotionIngestDeadLetter?: ReliabilitySignal | null
@@ -1204,6 +1208,8 @@ export const buildReliabilityOverview = (
     ...(sources.hiringInternalHireAwaitingOnboarding ? [sources.hiringInternalHireAwaitingOnboarding] : []),
     // TASK-1734 — Assessment AI scoring run (5 señales, steady=0 con flags OFF).
     ...(sources.hiringAssessmentAiRun ?? []),
+    // TASK-1736 — Identidad del intake de candidatos (2 señales, steady=0; flag OFF ⇒ ok).
+    ...(sources.hiringCandidateIdentity ?? []),
     ...(sources.workforceHiringActivationStuck ? [sources.workforceHiringActivationStuck] : []),
     ...(sources.knowledgeSyncFailedSource ? [sources.knowledgeSyncFailedSource] : []),
     ...(sources.knowledgeNotionIngestDeadLetter ? [sources.knowledgeNotionIngestDeadLetter] : []),
@@ -1869,6 +1875,13 @@ export const getReliabilityOverview = async (
     preloadedSources.hiringAssessmentAiRun !== undefined
       ? preloadedSources.hiringAssessmentAiRun
       : await getHiringAssessmentAiRunSignals().catch(() => null)
+
+  // TASK-1736 Slice 4 — identidad del intake de candidatos (2 señales PII-free;
+  // cada getter degrada honesto por su cuenta, este catch es solo defensa del wiring).
+  const hiringCandidateIdentity =
+    preloadedSources.hiringCandidateIdentity !== undefined
+      ? preloadedSources.hiringCandidateIdentity
+      : await getHiringCandidateIdentitySignals().catch(() => null)
 
   const knowledgeSyncFailedSource =
     preloadedSources.knowledgeSyncFailedSource !== undefined
@@ -2707,6 +2720,7 @@ export const getReliabilityOverview = async (
     hiringHandoffBlockedStale,
     hiringInternalHireAwaitingOnboarding,
     hiringAssessmentAiRun,
+    hiringCandidateIdentity,
     workforceHiringActivationStuck,
     knowledgeSyncFailedSource,
     knowledgeNotionIngestDeadLetter,

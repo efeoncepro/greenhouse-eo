@@ -573,6 +573,8 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'greenhouse_hiring.hiring_application',
       'greenhouse_hiring.candidate_facet',
       'greenhouse_core.asset_scan_results (candidate docs, TASK-1362)',
+      'greenhouse_hiring.candidate_identity_intake_evidence (identidad intake, TASK-1736)',
+      'greenhouse_hiring.candidate_identity_display_audit (identidad intake, TASK-1736)',
       'greenhouse_sync.outbox_events (hiring.application.decided → hiring_handoff_materialize)'
     ],
     smokeTests: [],
@@ -585,6 +587,8 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     // TASK-1734 Slice 6 — `dead_letter` (items failed del fan-out IA vuelven fail-closed
     // a la cola manual) y `drift` (override delta humano vs propuesta IA) entran con las
     // 5 señales del scoring run (queries/hiring-assessment-ai-run-signals.ts).
+    // TASK-1736 Slice 4 — 2 señales `data_quality` de identidad del intake (needs_review
+    // backlog + evidence coverage gap; queries/hiring-candidate-identity-signals.ts).
     expectedSignalKinds: ['lag', 'data_quality', 'incident', 'dead_letter', 'drift'],
     incidentDomainTag: 'hiring'
   },

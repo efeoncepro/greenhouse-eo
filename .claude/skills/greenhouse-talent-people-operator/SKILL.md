@@ -218,6 +218,29 @@ scheduler `ops-assessment-ai-drain` is declared paused, and rollback runs by the
 `docs/architecture/GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md`. Full runtime binding:
 `references/greenhouse-runtime.md` §Assessment AI Scoring Run.
 
+## Candidate identity intake (TASK-1736 — code complete 2026-08-16)
+
+Candidate identity now lives in **three layers** (ADR
+`GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1.md`): immutable **submitted evidence** per
+application (`candidate_identity_intake_evidence`, append-only), a correctable **person-first display**
+(`identity_profiles.full_name`) and a derived **search key** that NEVER merges persons on its own. Mechanical
+casing applies ONLY to the evident degenerate pattern (`valentina villa` → `Valentina Villa`, culturally
+conservative particle rules — never blind Title Case); everything ambiguous derives `needs_review` for a human.
+The sticky name is closed by `reconcileCandidateIdentityDisplayName` (compare-and-set + append-only audit; a
+human correction ALWAYS wins over automation). Manual correction requires the new fine capability
+`hiring.candidate.correct_display` (EFEONCE_ADMIN + HR_MANAGER + EFEONCE_OPERATIONS). Historical remediation is
+governed: `pnpm hiring:candidates:remediate-display` (dry-run → human allowlist reviewed line by line — the real
+2026-08-16 case: 4 proposals = 2 humans + 2 QA test profiles that get PRUNED — → apply with actor/reason, CAS,
+batch of 1), independent of the flag. Estado: **code complete Slices 1-4, rollout gated a señal del operador** —
+`HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED` OFF everywhere (Vercel-only); 2 reliability signals
+`hiring.candidate_identity.*` (steady=0; flag OFF ⇒ ok with note). Runbook:
+`docs/operations/runbooks/candidate-identity-rollout.md`. Runtime binding: `references/greenhouse-runtime.md`
+§Candidate identity intake.
+
+Docs: architecture `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-16 (3) · functional
+`docs/documentation/hr/identidad-de-candidatos-intake.md` · manual
+`docs/manual-de-uso/hr/operar-remediacion-nombres-candidatos.md`.
+
 ## First reads (before acting inside Greenhouse)
 
 - `CLAUDE.md`, `AGENTS.md`, `project_context.md`, `Handoff.md`
