@@ -173,6 +173,7 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `TASK-1735` — Hiring Application Evaluation Dossier: expediente de evaluación append-only per-application
   (`hiring_application_note` tipada + command/reader + API + capability `hiring.application.annotate`),
   internal-only y fuera del review packet MCP; el consumer UI de Application 360 es follow-up.
+  **✓ complete (code complete, rollout pendiente 2026-08-16).**
 - `TASK-1736` — Candidate Identity Intake Canonicalization + Governed Remediation: raw/display/search person-first,
   parity Careers/Growth Forms, reconciliación identity-safe y remediación histórica allowlisted/reversible.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.

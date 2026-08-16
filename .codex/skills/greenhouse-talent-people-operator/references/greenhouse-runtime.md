@@ -231,6 +231,39 @@ A padlock that protects nothing teaches the operator to ignore the padlocks that
 
 Docs: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-15 (8 invariants) · functional `docs/documentation/hr/documentos-de-candidatos.md` · manual `docs/manual-de-uso/hr/ver-documentos-de-un-candidato.md`.
 
+## Evaluation Dossier / Expediente de Evaluación (TASK-1735, code complete 2026-08-16)
+
+- **Notes (append-only)**: `greenhouse_hiring.hiring_application_note` (`hnote-*`) — `kind` CHECK
+  (`cv_analysis|assessment_review|interview_note|general`), `body_md` ≤8000, `source` (`human|agent`),
+  `context_json` carries references only (`proposalId`/`assessmentId`/`supersedesNoteId`), never duplicated bodies.
+  Trigger `prevent_hiring_note_mutation` + grants without UPDATE/DELETE (verified live). Primitive
+  `src/lib/hiring/application-notes.ts` (`recordHiringApplicationNote` accepts a participant tx;
+  `listHiringApplicationNotes`). API `GET/POST /api/hiring/applications/[id]/notes`. Outbox event
+  `hiring.application.note_recorded` (IDs-only payload, no reactive consumers V1).
+- **Agentic dossier (propose→confirm)**: `greenhouse_hiring.hiring_application_dossier_proposal` (`hdsp-*`,
+  terminal-once `proposed→confirmed|rejected`, single active `proposed` per `application_id+input_digest`).
+  Module `src/lib/hiring/dossier-ai/`: packet assembler with an **explicit allowlist** — redacted CV text from the
+  TASK-1718 projection (never the PDF), assessment answers + effective scores + referenced rationale, stage journey;
+  **PROHIBITED** name/contact/legal identity/self-ID (the assembler does not query them). Generation via
+  `generateStructuredAnthropic` (default `claude-sonnet-5`, override `HIRING_DOSSIER_AI_MODEL`, prompt
+  `hiring_evaluation_dossier.v1`); output cites evidence + `noVerificable` section. `proposeEvaluationDossier` is
+  idempotent by digest (effective model included); `confirmEvaluationDossier` materializes the `source='agent'` note
+  **atomically** (same tx as the proposal mark) with full provenance in `context_json`.
+  API `GET/POST /api/hiring/applications/[id]/dossier`.
+- **Authorization**: read = `hiring.application.read`; write/propose/confirm = capability
+  `hiring.application.annotate` (governance tier, role-only: `EFEONCE_ADMIN` ∪ `HR_MANAGER` ∪ `EFEONCE_OPERATIONS`).
+- **Flag**: `HIRING_EVALUATION_DOSSIER_AI_ENABLED` default OFF, Vercel-only, gates ONLY the propose (ledger updated).
+- **Hard invariants**: NEVER candidate-facing nor in the TASK-1718 MCP review packet (allowlist intact); NEVER does
+  the LLM write a note directly (human confirm ALWAYS); NEVER touch `score`/`match_score`/`explainability_json`
+  (a note is narrative, not score); NEVER demographics in notes (TASK-1365 boundary).
+- Related: scorecard display fix ISSUE-159 (`src/views/greenhouse/hiring/scorecard-summary.ts` — global "Parcial"
+  while competencies remain pending, never a partial average as final result). Application 360 consumer UI is a
+  ui-ux follow-up (placement contracted in TASK-1735 §Superficie UI).
+- **Estado operativo honesto**: code complete, E2E real local con EO-APP-0078; rollout pendiente (flag OFF).
+
+Docs: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-16 · functional
+`docs/documentation/hr/expediente-de-evaluacion.md` · manual `docs/manual-de-uso/hr/operar-expediente-de-evaluacion.md`.
+
 ## Person model (never duplicate a human)
 
 - Root: `greenhouse_core.identity_profiles` (`profile_id`). A candidate is a **Person with a `candidate_facet`**, not a separate record. Reconcile with `resolvePersonIdentifier`.

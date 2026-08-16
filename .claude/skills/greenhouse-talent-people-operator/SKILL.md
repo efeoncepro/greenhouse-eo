@@ -178,6 +178,26 @@ never upgraded by backfill; withdrawal wins. Exact CV review for delegated agent
 contract and is still OFF in production pending its named-owner approvals and synthetic canary. Read the full runtime
 binding, evidence and rollback facts in `references/greenhouse-runtime.md` §Talent Pool / Banco de Talento.
 
+## Evaluation Dossier (TASK-1735 — code complete 2026-08-16)
+
+Every `hiring_application` now carries an **expediente de evaluación**: an append-only note log
+(`greenhouse_hiring.hiring_application_note`, kinds `cv_analysis`/`assessment_review`/`interview_note`/`general`,
+source `human|agent`) plus a governed agentic dossier that drafts a CV-vs-assessment narrative on propose→confirm.
+Two layers, one discipline: notes are never edited or deleted (supersede by reference), and the AI **never writes a
+note directly** — `proposeEvaluationDossier` only creates a proposal; a human `confirm` (terminal-once) materializes
+the `source='agent'` note atomically with full provenance. The AI packet is **allowlisted without PII**: redacted CV
+text from the TASK-1718 projection (never the PDF), effective assessment scores + rationale, stage journey — never
+name/contact/legal identity/self-ID (the assembler does not even query them). The candidate **never sees the
+expediente**, and it stays out of the TASK-1718 MCP review packet. Notes are narrative, never scores: they never touch
+`score`/`match_score`/`explainability_json`. Writes require capability `hiring.application.annotate` (role-only tier:
+`EFEONCE_ADMIN` ∪ `HR_MANAGER` ∪ `EFEONCE_OPERATIONS`); the propose lane is gated by
+`HIRING_EVALUATION_DOSSIER_AI_ENABLED` (default OFF, Vercel-only). E2E exercised locally (EO-APP-0078); the
+Application 360 consumer UI is a follow-up task. Runtime binding: `references/greenhouse-runtime.md`
+§Evaluation Dossier.
+
+Docs: architecture `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-16 · functional
+`docs/documentation/hr/expediente-de-evaluacion.md` · manual `docs/manual-de-uso/hr/operar-expediente-de-evaluacion.md`.
+
 ## First reads (before acting inside Greenhouse)
 
 - `CLAUDE.md`, `AGENTS.md`, `project_context.md`, `Handoff.md`
