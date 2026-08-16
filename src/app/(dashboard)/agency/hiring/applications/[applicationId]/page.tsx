@@ -60,6 +60,7 @@ export default async function HiringApplicationPage({ params }: Props) {
   // TASK-1737 — capability de escritura del expediente resuelta server-side; la UI solo
   // decide si dibuja affordances (composer / CTAs del dossier).
   const canAnnotate = can(tenant, 'hiring.application.annotate', 'execute', 'tenant')
+  const canScore = can(tenant, 'hiring.assessment.score', 'execute', 'tenant')
 
   const [locale, snapshot, assessments, templates, handoff, documents, notesView] = await Promise.all([
     getLocale(),
@@ -118,6 +119,7 @@ export default async function HiringApplicationPage({ params }: Props) {
       hiddenNoteCount={notesView?.hiddenNoteCount ?? 0}
       viewerBlind={notesView?.viewerBlindUntilScorecardSubmitted ?? false}
       canAnnotate={canAnnotate}
+      canScore={canScore}
       noteAuthorNames={noteAuthorNames}
     />
   )

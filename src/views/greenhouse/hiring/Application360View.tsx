@@ -67,6 +67,7 @@ import CandidateDocumentsPanel from './CandidateDocumentsPanel'
 import AssessmentCompetencyRadar from './AssessmentCompetencyRadar'
 import { hiringRequest } from './hiring-client'
 import { computeScorecardSummary } from './scorecard-summary'
+import { AssessmentAiRunEntry } from './AssessmentAiRunWorkbench'
 
 type TabKey = 'overview' | 'assessment' | 'documents' | 'decision' | 'expediente'
 const TAB_KEYS: TabKey[] = ['overview', 'assessment', 'documents', 'decision', 'expediente']
@@ -247,6 +248,7 @@ interface Application360ViewProps {
   /** Gate anti-anclaje server-enforced: el payload ya viene filtrado para este viewer. */
   viewerBlind: boolean
   canAnnotate: boolean
+  canScore: boolean
   noteAuthorNames: Record<string, string>
 }
 
@@ -367,6 +369,7 @@ const Application360View = ({
   hiddenNoteCount,
   viewerBlind,
   canAnnotate,
+  canScore,
   noteAuthorNames,
 }: Application360ViewProps) => {
   const searchParams = useSearchParams()
@@ -894,7 +897,9 @@ const Application360View = ({
                             />
                           </Stack>
 
-                          {scoreRows.length === 0 ? (
+                          <AssessmentAiRunEntry assessmentId={entry.assessmentId} copy={assessmentCopy.scoringRun} canScore={canScore} />
+
+                {scoreRows.length === 0 ? (
                             <Alert severity='info'>{assessmentCopy.review.noModules}</Alert>
                           ) : scorecardMode === 'radar' ? (
                             <AssessmentCompetencyRadar
