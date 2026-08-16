@@ -179,6 +179,109 @@ export interface HiringAssessmentCopy {
       partial: string
     }
   }
+  /**
+   * TASK-1738 — Workbench operator-only de revisión del run de scoring IA (TASK-1734).
+   * CERO strings candidate-facing en este namespace (contrato anti-leak): todo lo que
+   * vive acá se renderiza solo para operadores con `hiring.assessment.score`.
+   */
+  scoringRun: {
+    entryChip: string
+    entryExceptions: string
+    entryError: string
+    open: string
+    title: string
+    provenance: string
+    refresh: string
+    close: string
+    statuses: {
+      created: string
+      enumerating: string
+      scoring: string
+      awaiting_review: string
+      confirmable: string
+      confirmed: string
+      cancelled: string
+      failed: string
+    }
+    coverageLabel: string
+    coverPending: string
+    coverMandatory: string
+    coverSample: string
+    coverBatch: string
+    coverManual: string
+    coverClosed: string
+    /** ISSUE-159 heredado vía TASK-1734: el stale bloquea el confirm, nunca se esconde. */
+    staleBanner: string
+    mandatoryChip: string
+    sampleChip: string
+    sampleResolvedChip: string
+    batchGroup: string
+    sampleHint: string
+    sampleContrast: string
+    resolutionLabels: {
+      confirmed: string
+      overridden: string
+      rejected_to_manual: string
+    }
+    questionLabel: string
+    answerLabel: string
+    showMore: string
+    showLess: string
+    /** El label lleva la consecuencia (expandir queda registrado) — DDL-3 del flow. */
+    revealProposal: string
+    proposalSeen: string
+    proposalScore: string
+    proposalProvenance: string
+    perCriterion: string
+    routingReasons: string
+    /** Mapa de reason codes del risk router (`AI_RISK_ROUTING_REASONS`); fallback al code. */
+    reasons: {
+      answer_empty: string
+      answer_too_short: string
+      answer_malformed: string
+      rubric_missing: string
+      per_criterion_missing: string
+      per_criterion_contradictory: string
+      score_decision_near_band: string
+      high_weight_competency: string
+      exception_policy_disabled: string
+      blind_quality_sample: string
+      no_risk_signals: string
+    }
+    myScoreLabel: string
+    scoreRangeError: string
+    noteLabel: string
+    resolveConfirm: string
+    resolveOverride: string
+    resolveReject: string
+    resolveSample: string
+    resolving: string
+    resolved: string
+    confirmTitle: string
+    manifestSummary: string
+    gateOpenMandatory: string
+    gateOpenSample: string
+    gateOpenScoring: string
+    gateStale: string
+    confirmFlagOff: string
+    confirmRun: string
+    confirming: string
+    confirmed: string
+    cancelRun: string
+    cancelDialogTitle: string
+    cancelDialogBody: string
+    cancelConfirm: string
+    cancelKeep: string
+    cancelling: string
+    cancelled: string
+    terminalConfirmed: string
+    terminalCancelled: string
+    terminalFailed: string
+    loadError: string
+    retry: string
+    permissionDenied: string
+    lineageError: string
+  }
 }
 
 export interface HiringActivationCopy {
