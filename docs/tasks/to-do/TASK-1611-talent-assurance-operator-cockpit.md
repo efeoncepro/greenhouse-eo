@@ -15,7 +15,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-038`
-- Status real: `Diseño de flujo; backend pendiente`
+- Status real: `Wireframe/flow discovery existen; cockpit y backend readers siguen pendientes`
 - Rank: `EPIC-038-phase-1`
 - Domain: `ui|hiring|workforce|client|delivery`
 - Blocked by: `TASK-1610`
@@ -69,6 +69,13 @@ Los operadores necesitan una vista común para decidir y corregir; hoy la eviden
 ### Gap
 
 - No assurance cockpit composes those projections with explicit human gates and client/collaborator boundaries.
+
+### Baseline verified 2026-08-15
+
+- El wireframe y el flow son sólo artefactos discovery. Las superficies existentes Application 360, Talent Ops,
+  Workforce y Finance no son un cockpit Talent Assurance ni prueban un contrato común de autorización o proyección.
+- `TASK-1610` aún no tiene reader runtime, por lo que no se autorizan ruta, JSX, escenario GVC ni acción de
+  propuesta. El trabajo UI comienza tras aprobar los contratos read-only, un checkpoint de diseño y la matriz acceso.
 
 ## Modular Placement Contract
 

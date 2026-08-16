@@ -15,7 +15,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-038`
-- Status real: `Decision propuesta; pendiente de aceptación`
+- Status real: `Baseline documental verificado; decisión y policy siguen Proposed, sin runtime autorizado`
 - Rank: `EPIC-038-phase-0`
 - Domain: `agency|hr|workforce|delivery`
 - Blocked by: `none`
@@ -71,6 +71,15 @@ Reglas: el claim es acotado; la evidencia se distingue de inferencias; una infer
 ### Gap
 
 - Falta aceptación formal, catálogo V1 de claims y policy versionada para vigencia, apelación y revocación.
+
+### Baseline verified 2026-08-15
+
+- `HiringHandoff`/activación, validity, capacity y pricing son evidencia o inputs de dominios dueños; ninguno
+  constituye hoy un claim `Verificado por Efeonce` ni autoriza emitirlo, suspenderlo o revocarlo.
+- La policy opening→assessment pertenece a `TASK-1719` (EPIC-011). No resuelve por sí misma taxonomía de claim,
+  verificador, vigencia, apelación, retención o comunicación client/collaborator.
+- Bloqueo real para las tasks runtime: falta aceptación explícita y ownership firmado por Talent, Workforce,
+  Delivery, Client Experience, Finance/Commercial y Legal/Privacy. Discovery read-only sí puede continuar.
 
 ## Modular Placement Contract
 

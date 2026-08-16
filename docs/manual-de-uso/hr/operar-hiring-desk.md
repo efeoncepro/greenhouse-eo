@@ -45,11 +45,17 @@ Esta separación permite que dos candidatos de la misma vacante tengan tokens, t
 ## Revisar una postulación
 
 1. En `Resumen`, confirma opening, etapa, contacto enmascarado y señales advisory.
-2. En `Evaluación`, asigna un test si hay plantilla activa. El token se muestra una sola vez. Comparte la URL limpia `/assessment/<token>` con el candidato por el canal autorizado.
+2. En `Evaluación`, asigna un test si hay plantilla activa. El command canónico crea la instancia para
+   esa postulación y emite `hiring.assessment.assigned`; el ops-worker reemite el token justo antes de
+   enviar el enlace al candidato. No copies ni envíes manualmente el token inicial si el correo de ciclo
+   está habilitado: su rotación posterior invalidaría ese enlace.
 3. En una evaluación respondida, abre `Revisar evaluación`, edita/confirma cada score humano o sugerencia IA y finaliza el scorecard cuando no queden respuestas pendientes.
 4. En el scorecard, trata el resultado como señal advisory: usa barras/radar para leer competencias, pero la decisión final se registra en `Decisión`, no en el score.
 5. En el drawer de corrección, lee primero pregunta, respuesta y rúbrica. La sugerencia IA aparece como apoyo posterior para evitar anclaje; nunca confirma sola.
-6. En `Documentos`, usa enlaces públicos permitidos. No intentes revelar identidad hasta que TASK-1362 entregue resolver, capability, motivo y auditoría; el botón deshabilitado es intencional.
+6. En `Documentos`, abre CV o portafolio dentro del portal cuando el archivo está disponible. Para
+   identidad, usa **Revelar** sólo si tienes `hiring.candidate.reveal_identity`, entrega un motivo y
+   necesitas el dato para el proceso: queda auditado. Un estado de error no significa que el candidato
+   no tenga documentos; sigue el manual `ver-documentos-de-un-candidato.md`.
 7. En `Decisión`, elige avanzar, rechazar o esperar; completa destino cuando aplique, razón y evidencia. Revisa el diálogo antes de confirmar.
 8. Si seleccionas (`selected`) con destino `internal_hire`, revisa el bridge de handoff que aparece en la misma pestaña. Cuando el handoff esté pendiente y tengas `hiring.handoff.approve`, usa **Aprobar handoff**; cuando esté aprobado, usa **Abrir Activation Lane** para continuar en `HR → Onboarding & Offboarding → Contrataciones listas`.
 9. Usa `Actividad` e `Historial de decisiones` para verificar la trazabilidad append-only.
@@ -65,11 +71,19 @@ Usa este flujo para la vacante real publicada o cualquier opening activo:
 5. Selecciona la plantilla activa del rol. Para Account Manager, la plantilla vigente es `Account Manager L2`.
 6. Define el tiempo límite si la UI lo permite; si no, conserva el default de la plantilla.
 7. Confirma. Greenhouse crea la instancia `candidate_test`, genera token y deja la evaluación en estado asignado/enviable.
-8. Copia inmediatamente el link `/assessment/<token>`. El token crudo se muestra una sola vez por seguridad; el backend guarda hash, no el token recuperable.
-9. Envía el link por el canal autorizado con contexto mínimo: rol, fecha esperada, duración y soporte si necesita accommodation.
-10. Vuelve a Application 360 para monitorear estado: asignado, en progreso, enviado, expirado o scored.
+8. El evento `hiring.assessment.assigned` activa el correo transaccional: el consumer rota el token
+   canónico y envía el enlace público al candidato. Verifica en Actividad/correo antes de intervenir;
+   el token crudo no es recuperable desde SQL ni logs.
+9. Si el correo no llega, no reutilices un token que hayas visto: revisa el estado de la instancia, el
+   reactive log y el kill-switch con el runbook `operar-emails-ciclo-hiring.md`.
+10. Vuelve a Application 360 para monitorear estado: asignado, enviado, en progreso, submitted,
+    expirado o scored. Al completarse un `candidate_test`, People recibe un aviso interno de revisión;
+    esto no decide ni cambia la etapa de la postulación.
 
-Si se perdió el token antes de enviarlo, no intentes recuperarlo desde SQL ni logs. Como el token crudo no es recuperable, la operación correcta es cancelar/reemitir cuando exista el command de reissue gobernado; hasta entonces, documenta el caso y coordina con quien tenga ownership del assessment runtime.
+Si el correo falló o se perdió el enlace, no intentes recuperar ningún token desde SQL ni logs. El
+consumer de correo es el único camino que puede reemitirlo de forma segura; si el test ya comenzó,
+está enviado, completado o expiró, el consumer hace skip y People debe resolver el caso sin alterar
+respuestas ni estado terminal.
 
 ## Operar una evaluación de candidato
 
@@ -150,7 +164,9 @@ Para pausar un tipo de correo, diagnosticar por qué no llegó o revisar el hist
 - **El candidato no puede enviar:** falta una respuesta guardada o el token no está `in_progress`; no fuerces submit desde SQL.
 - **El token no abre:** pudo expirar, ya haberse usado o no estar disponible. La UI pública no revela el motivo exacto por seguridad.
 - **El scorecard muestra pendientes:** hay respuestas abiertas sin corrección humana; no lo trates como final.
-- **No puedes revelar un documento:** TASK-1362 sigue pendiente; no se debe bypassar el control.
+- **No puedes revelar un documento de identidad:** confirma que tu rol tenga
+  `hiring.candidate.reveal_identity` y registra un motivo. Si no tienes esa capability, no hay bypass;
+  para CV/portafolio revisa el estado del reader, que es una operación distinta.
 - **No ves "Abrir Activation Lane":** la postulación debe estar decidida como `selected`, con destino `internal_hire`, y el handoff N10 debe existir/aprobarse. Si todavía no aparece en N11, espera la materialización reactiva o revisa el estado del handoff.
 
 ## Verificación operativa

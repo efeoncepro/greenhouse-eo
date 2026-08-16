@@ -100,7 +100,7 @@ Reglas obligatorias:
 - `docs/ui/wireframes/TASK-1715-application-360-documents-panel.md`
 - `docs/ui/flows/TASK-1715-application-360-documents-flow.md`
 - `docs/tasks/complete/TASK-1362-candidate-document-capture.md`
-- `docs/tasks/to-do/TASK-1714-candidate-identity-document-reveal.md`
+- `docs/tasks/complete/TASK-1714-candidate-identity-document-reveal.md`
 
 ## Dependencies & Impact
 

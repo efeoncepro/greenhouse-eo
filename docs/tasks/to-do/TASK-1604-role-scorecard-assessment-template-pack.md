@@ -69,6 +69,13 @@ El motor de assessment existe, pero los estándares por rol, work samples, softw
 
 - Falta un pack formal por rol con coverage matrix, interview scorecard, evidence policy y aprobación SME trazable.
 
+### Baseline verified 2026-08-15
+
+- El motor, templates/versionado, competencias y Content Creator v2 son reutilizables; no prueban que exista un
+  pack de roles críticos aprobado bajo la policy de claims de `TASK-1602`.
+- Ningún seed, coverage matrix ni gate SME de esta task fue aplicado. El pack debe esperar la policy de claims y
+  consumir el binding de opening que `TASK-1719` implementará para `TASK-1603`.
+
 ## Modular Placement Contract
 
 - Topology impact: `domain-package`

@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command|sync`
 - Epic: `EPIC-011`
-- Status real: `Diseno; command base y correo existen, falta policy vacante-test y automatizacion`
+- Status real: `Diseño; command base y correo existen, falta policy vacante-test y automatización`
 - Rank: `TBD`
 - Domain: `hr|data|ops`
 - Blocked by: `none`
@@ -177,6 +177,9 @@ Reglas obligatorias:
   público mediante la plataforma de email canónica.
 - `updateHiringApplicationStage` impide estados terminales y publica `hiring.application.stage_changed`.
 - El ops-worker ya ejecuta consumers reactivos con retry/dead-letter y el flag de emails Hiring está declarado.
+- El evento `hiring.assessment.submitted` tiene alerta interna a People (`hiring_assessment_submitted_internal`):
+  sólo para `candidate_test` submitted/scored, sin score ni decisión; fue promovido por `0fe2420ed894` y su
+  migración quedó habilitada. Es una notificación reactiva, no prueba de entrega real ni reemplazo de la policy.
 
 ### Gap
 

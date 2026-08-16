@@ -42,12 +42,19 @@ surface.
 | Shared boundary, tool contract, API parity or new public surface | `software-architect-2026` | Architecture/ADR and product contract |
 | Cloud Run, WIF, service identity, OAuth, ALB, DNS, TLS or secret | applicable cloud skill + `greenhouse-secret-hygiene` | Gateway IaC/runbook |
 | Globe provider or creative capability | `greenhouse-globe` + creative-rights governance when applicable | Globe API/SDK/policy; `TASK-1473` gates federation |
+| Hiring/ATS candidate review, candidate-test assignment or selection journey | `greenhouse-talent-people-operator` + identity/integrations owners | Hiring reader/command/policy; `TASK-1718`–`TASK-1722` remain disabled design work |
 | HubSpot/CRM or Teams provider | owning HubSpot or Teams skill | provider contract, consent and tenancy |
 | Release, rollback or live evidence | `greenhouse-production-release` and `greenhouse-qa-release-auditor` | release/runbook and evidence |
 | Task/ADR split, docs, skill evolution | `greenhouse-task-planner` and `greenhouse-documentation-governor` | Greenhouse control plane |
 
 The router only translates verified identity and MCP transport into a narrow provider call. It never acquires direct
 database, storage or upstream-provider access, chooses domain policy, or substitutes UI/API/SDK parity.
+
+**Hiring is not a provider today.** The internal Application 360 documents reader and direct Hiring routes are
+portal contracts, not MCP/App API contracts. In particular, do not forward the current document reader or the
+one-shot assessment-token response through a provider. `TASK-1718` introduces the separately redacted candidate
+review packet; `TASK-1719` owns policy and canonical proposal/confirm; `TASK-1720` and `TASK-1722` stay
+fail-closed pending their respective Greenhouse commands and the revocable delegated-write grant in `TASK-1631`.
 
 ## Mandatory gates
 

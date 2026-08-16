@@ -15,7 +15,7 @@
 - Motion: `none`
 - Backend impact: `reader|api`
 - Epic: `EPIC-038`
-- Status real: `Diseño`
+- Status real: `Readers de dominio existen; proyección compuesta/API parity Talent Assurance no implementada`
 - Rank: `EPIC-038-phase-1`
 - Domain: `hiring|workforce|delivery|client|data`
 - Blocked by: `TASK-1602`, `TASK-1603`, `TASK-1605`, `TASK-1606`, `TASK-1607`
@@ -57,6 +57,21 @@ Los consumidores necesitan una lectura coherente de assurance sin consultar tabl
 - `src/lib/talent-assurance/**`
 - `src/app/api/**`
 - capability registry/tests y docs
+
+## Current Repo State
+
+### Already exists
+
+- Los readers de Hiring validity, handoff/activation, Workforce capacity y Finance pricing permanecen como fuentes
+  de sus dominios. `TASK-1718` puede añadir después un reader candidate-review acotado; no es DTO assurance
+  cross-domain ni superficie de claim.
+
+### Gap / start blockers
+
+- No existen `src/lib/talent-assurance/**`, contrato compuesto, capability/grant de proyección, paridad Nexa/MCP ni
+  señales unificadas freshness/reconciliation. UI y agentes no deben componer tablas raw ni joins browser-side.
+- Comienza sólo a medida que cada contrato upstream esté aceptado e implementado: claims (`1602`), completeness
+  (`1603` más `1719`), outcomes (`1605`), continuity (`1606`) y feasibility (`1607`).
 
 ## Modular Placement Contract
 

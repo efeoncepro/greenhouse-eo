@@ -21,7 +21,7 @@ no estima salarios, no crea role costs ni decide pricing por su cuenta.
 - Motion: `none`
 - Backend impact: `reader|command`
 - Epic: `EPIC-038`
-- Status real: `Diseño económico pendiente de aceptación`
+- Status real: `Inputs Finance/Capacity verificados; contrato de feasibility y gate siguen Proposed/no implementados`
 - Rank: `EPIC-038-phase-0`
 - Domain: `workforce|finance|commercial|hiring`
 - Blocked by: `TASK-1602`
@@ -65,6 +65,23 @@ La presión competitiva puede reducir el presupuesto hasta hacer inviable reclut
 ### Files owned
 
 - `src/lib/workforce/**`, `src/lib/finance/**`, `src/lib/hiring/**`, API/readers y docs
+
+## Current Repo State
+
+### Already exists
+
+- Team Capacity publica snapshots fechados de capacidad y loaded cost por member/período. Finance ya dispone de
+  cost-basis `member_actual`, `role_blended` y `role_modeled`, más pricing con provenance/freshness en sus dueños.
+- `TalentDemand` y sus commands canónicos existen; el pricing vigente conserva sus propios accesos y redacción.
+
+### Gap / start blockers
+
+- No existe un `ProfileResolution`/`CostCard` versionado y aprobado para este consumo, ni reader/proposal de
+  recruitability, opciones `go|re-scope|re-price|borrow|no-go`, confirmación Finance/Commercial o publish gate.
+- El ADR de Agentic Quotation y Finance Core que describen el contrato de `CostCard` siguen Proposed. Los readers
+  actuales son inputs reutilizables, no autorización para reconstruir costos, salario, FX, margen o pricing local.
+- Sigue bloqueada por `TASK-1602` y por la aceptación de esas interfaces Finance/Commercial; hasta entonces solo
+  corresponde discovery/read-only y definición de freshness, coverage, approval y redaction.
 
 ## Modular Placement Contract
 

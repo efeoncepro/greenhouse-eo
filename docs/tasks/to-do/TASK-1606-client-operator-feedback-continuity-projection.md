@@ -15,7 +15,7 @@
 - Motion: `none`
 - Backend impact: `reader|command|sync`
 - Epic: `EPIC-038`
-- Status real: `Diseño`
+- Status real: `Inputs de assignment/capacity verificados; feedback y continuity projection no implementados`
 - Rank: `EPIC-038-phase-5`
 - Domain: `client|delivery|workforce|agency`
 - Blocked by: `TASK-1602`, `TASK-1605`
@@ -55,6 +55,24 @@ El cliente interactúa con personas y necesita continuidad, pero el feedback no 
 ### Files owned
 
 - `src/lib/client/**`, `src/lib/workforce/**`, readers/commands y docs
+
+## Current Repo State
+
+### Already exists
+
+- Assignment/capacity inputs de Workforce y Team Capacity, incluidos `member_capacity_economics`, son reutilizables
+  para concentración y disponibilidad interna.
+- El contrato de experiencia cliente exige transparencia sobre lo contratado, no acceso a roster o datos laborales
+  ajenos.
+
+### Gap / start blockers
+
+- No existe command de feedback del operador, ciclo/corrección lineage, owner/backup/memory projection ni reader
+  client-safe de continuidad. La capacidad interna no autoriza por sí sola publicar esos datos al cliente.
+- Antes de schema se debe inventariar el owner/backup/memory source y aceptar con Client Experience, Delivery,
+  Identity y Privacy qué evidencia es compartible por account/operator.
+- Sigue bloqueada por `TASK-1602` y `TASK-1605`: el feedback puede ser evidencia contextual, no reemplaza outcome
+  People ni habilita una acción adversa o reemplazo autónomo.
 
 ## Modular Placement Contract
 

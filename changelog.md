@@ -12,8 +12,11 @@
 El evento canónico `hiring.assessment.submitted` ahora tiene un consumer idempotente que prepara un
 correo interno a `people@efeoncepro.com` con candidato, vacante, hora de envío y acceso directo a la
 postulación. Sólo acepta `candidate_test` realmente completados, nunca scorecards, y no interpreta
-el resultado ni mueve al candidato de etapa. La extensión está code-complete y probada; queda
-pendiente aplicar la migración y desplegar el ops-worker para activarla en producción.
+el resultado ni mueve al candidato de etapa. La migración quedó aplicada en Cloud SQL, la configuración
+`hiring_assessment_submitted_internal` está habilitada y el release `0fe2420ed894` terminó en el
+manifest `released` (run `31915501771`), con Vercel y watchdog verdes. No se ejercitó una entrega real
+de candidato en este release; People/Operations debe verificar la primera entrega futura sin hacer
+backfill del evento histórico.
 
 La revisión read-only del test vigente de Content Creator confirmó 11 preguntas sobre 8
 competencias, pesos que suman 100, límite de 90 minutos, cero prompts vacíos o duplicados, opciones

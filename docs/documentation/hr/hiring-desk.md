@@ -54,7 +54,10 @@ No crear instancias por SQL, no leer tokens desde logs y no exponer rúbricas/an
 - La decisión exige motivo humano estructurado, soporta re-decisión con supersede y conserva historial append-only.
 - Publicación solo expone `buildPublicOpeningPayload()`; compensación, notas y riesgo internos no se publican.
 - La difusión en grupos externos usa únicamente el copy público aprobado y requiere confirmación humana. Un resultado `enviada a aprobación` no equivale a una publicación visible; cada destino se registra y se verifica antes de reintentar. Manual: `docs/manual-de-uso/hr/operar-careers-publicas.md` §Difundir una vacante publicada.
-- El correo agregado está enmascarado. El reveal de identidad/documentos requiere el resolver, capability, motivo y auditoría de TASK-1362; mientras no esté disponible, la interfaz lo comunica como degradación real.
+- El correo agregado permanece enmascarado. Los archivos de CV/portafolio se abren desde el panel
+  **Documentos** dentro del portal; un documento de identidad sí exige el reveal auditado de
+  `TASK-1714` (`hiring.candidate.reveal_identity`, motivo y trazabilidad). Un error del reader no
+  equivale a “sin documentos”.
 - Los outcomes terminales no se alcanzan arrastrando una tarjeta: selección/rechazo/espera pasan por la decisión estructurada.
 
 ## Acceso
@@ -63,7 +66,7 @@ Las vistas `gestion.hiring*` controlan visibilidad de rutas. Cada reader y comma
 
 ## Estados y límites
 
-La interfaz diferencia loading, vacío inicial, filtros sin resultados, error recuperable, write optimista/rollback y dependencia degradada. La UI candidate-facing para rendir tests quedó implementada en TASK-1363; captura/reveal documental completo sigue en TASK-1362.
+La interfaz diferencia loading, vacío inicial, filtros sin resultados, error recuperable, write optimista/rollback y dependencia degradada. La UI candidate-facing para rendir tests quedó implementada en TASK-1363; el panel documental real y el reveal de identidad del candidato corresponden a TASK-1715 y TASK-1714, respectivamente.
 
 ## Handoff downstream (TASK-356)
 
@@ -99,5 +102,5 @@ portales de cliente, analítica ni exportaciones.
 ## Referencias
 
 - Arquitectura: `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
-- Task: `docs/tasks/in-progress/TASK-355-hiring-desk-internal-workspaces-publication-governance.md`
+- Task: `docs/tasks/complete/TASK-355-hiring-desk-internal-workspaces-publication-governance.md`
 - Manual: `docs/manual-de-uso/hr/operar-hiring-desk.md`

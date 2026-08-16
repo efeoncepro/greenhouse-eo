@@ -15,7 +15,7 @@
 - Motion: `none`
 - Backend impact: `db|reader|command`
 - Epic: `EPIC-038`
-- Status real: `Diseño`
+- Status real: `Baseline de lineage/validity verificado; outcome 30/60/90 y taxonomy siguen en diseño`
 - Rank: `EPIC-038-phase-5`
 - Domain: `hiring|hr|workforce|data`
 - Blocked by: `TASK-1602`, `TASK-1603`
@@ -58,6 +58,23 @@ Las salidas por falta de capacidad se observan después, pero no retroalimentan 
 - `src/lib/workforce/**`
 - `migrations/**`
 - validity readers y documentation HR
+
+## Current Repo State
+
+### Already exists
+
+- `HiringHandoff`, onboarding/activation y el mapping durable
+  `greenhouse_hr.hiring_activation_request` que enlaza exactamente application↔member.
+- El reader `TASK-1364` de validity: usa ese mapping, toma ICO como outcome primario y `eval_summaries` como
+  secundario, conserva el score al decidir y degrada a `insufficient_sample` cuando corresponde.
+
+### Gap / start blockers
+
+- No existe un contrato 30/60/90, taxonomía de selection failure, proyección quality-of-hire ni writer/audit de
+  outcomes. No se debe inferirlos del estado de onboarding, ICO o una salida.
+- El join debe usar activation request, no `identity_profile_id`, que es ambiguo con múltiples aplicaciones.
+- Sigue bloqueada por `TASK-1602` y `TASK-1603` (que a su vez consume la policy aún pendiente de `TASK-1719`),
+  además de definir Privacy/People la evidencia mínima y las fuentes autorizadas por período.
 
 ## Modular Placement Contract
 

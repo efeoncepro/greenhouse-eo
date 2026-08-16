@@ -11,6 +11,24 @@
 - Confidence: `medium`
 - Runtime state: design only; no schema, capability, agent or autonomous write is authorized by this document
 
+## Baseline runtime verificado 2026-08-15
+
+Esta verificación separa runtime reutilizable de runtime de Talent Assurance. No acepta esta arquitectura ni
+autoriza un schema, reader, command, agente, badge o rollout nuevo.
+
+| Preocupación | Runtime reutilizable verificado | Aún ausente / task dueña |
+| --- | --- | --- |
+| Selección y handoff | `TalentDemand`, `HiringOpening`, `HiringApplication`, instancias de assessment, snapshots inmutables de decisión, `HiringHandoff` y el mapping durable `hiring_activation_request` application↔member | claim policy (`TASK-1602`), completeness/override del opening (`TASK-1603`) y policy opening→template de EPIC-011 (`TASK-1719`) |
+| Outcome y validez | el reader `TASK-1364` une el mapping durable de activación con ICO (primario) o resúmenes de evaluación HR (secundario), conserva los scores advisory y degrada honestamente con muestra pequeña | contrato de revisión 30/60/90, taxonomía selection-failure y proyección outcome (`TASK-1605`) |
+| Continuidad cliente | assignments y `member_capacity_economics` aportan inputs de capacidad | no hay command de feedback cliente ni proyección client-safe de owner, backup, memoria y transición (`TASK-1606`) |
+| Economía | Team Capacity, snapshots cost-basis member/role-blended/role-modeled y pricing Finance aportan inputs gobernados | no hay contrato cross-domain aprobado `ProfileResolution`/`CostCard` ni gate de factibilidad Talent Assurance (`TASK-1607`) |
+| Agentes, API y cockpit | existen Nexa/API/runtime compartidos y readers de Hiring, Workforce y Finance; `TASK-1718` está planeada como foundation acotada de candidate review | no hay adapter/run contract Talent Assurance, eval set, proyección compuesta/API parity ni cockpit (`TASK-1608`–`TASK-1611`) |
+
+Las fuentes existentes siguen siendo autoritativas. En particular, el join application→member es la solicitud de
+activación, no `identity_profile_id`; una persona puede tener múltiples aplicaciones. `TASK-1603` consume la
+policy de opening assessment de `TASK-1719` y no debe recrearla. Los snapshots Finance son inputs, no permiso para
+que Talent Assurance infiera salario, FX, costo, precio o margen.
+
 ## 1. Purpose
 
 Efeonce vende capacidades operadas y gobernadas que se expresan parcialmente en personas. El cliente confía en Efeonce para contratar, asignar, entregar, desarrollar, retener y reemplazar capacidad calificada.

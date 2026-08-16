@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command|migration|sync`
 - Epic: `EPIC-011`
-- Status real: `Diseno; orchestration contract y ADR pendientes de aceptación`
+- Status real: `Diseño; existen decisión/handoff/activation manuales, pero orchestration contract y ADR siguen pendientes de aceptación`
 - Rank: `TBD`
 - Domain: `hr|agency|identity|data|ops`
 - Blocked by: `TASK-1603`
@@ -162,6 +162,9 @@ Reglas obligatorias:
 - Hiring Activation tiene estados, commands y blockers explícitos; conflictos de identidad fallan cerrados.
 - El email `hiring_decision_selected` consume el evento y deduplica por delivery ledger.
 - Application 360 y Activation Lane permiten operar manualmente los pasos existentes.
+- Estos primitives no forman un journey: ninguna ruta/provider MCP coordina la cadena, y el consumer email sólo
+  acredita delivery por ledger. El release `0fe2420ed894` añadió la alerta interna de assessment submitted, no un
+  selector automático ni evidencia de recorrido real candidato-a-activación.
 
 ### Gap
 

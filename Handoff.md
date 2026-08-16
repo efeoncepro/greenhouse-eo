@@ -2,40 +2,40 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-### Aviso interno al completar test — code complete, rollout pendiente (2026-08-15)
+### Aviso interno al completar test — LIVE, primera entrega real pendiente (2026-08-15)
 
 Se extendió el pipeline reactivo de Hiring para que `hiring.assessment.submitted` envíe una sola
-notificación interna al buzón configurado de People (default `people@efeoncepro.com`). El consumer
-re-lee PG, acepta sólo `candidate_test` en `submitted|scored` con `submitted_at`, deduplica antes de
-enviar y lleva a Application 360; no incluye score ni cambia la etapa. Incluye template de email,
-preview, tipo transaccional, kill-switch aditivo, tests y las tres capas documentales.
+notificación interna al buzón configurado de People (default `people@efeoncepro.com`). El consumer re-lee PG,
+acepta sólo `candidate_test` en `submitted|scored` con `submitted_at`, deduplica antes de
+enviar y lleva a Application 360; no incluye score ni cambia la etapa. Incluye template, preview,
+tipo transaccional, kill-switch aditivo, tests y las tres capas documentales.
 
 Validación: 34/34 tests focales, registry de templates, ESLint focal y `pnpm typecheck` verdes.
-Auditoría read-only del pack actual de Content Creator: 11 preguntas, 8
-competencias, 90 minutos, pesos=100, sin prompts vacíos/duplicados, sin opciones inválidas y sin
+Auditoría read-only del pack actual de Content Creator: 11 preguntas, 8 competencias, 90 minutos,
+pesos=100, sin prompts vacíos/duplicados, sin opciones inválidas y sin
 leak de answer key/rúbrica. El smoke sintético completó `assigned → in_progress → submitted`,
 rechazó el submit incompleto, persistió 11/11 respuestas, auto-scoreó 1, encoló 10 para revisión y
-emitió un solo evento; cleanup verificado en cero. No se tocaron tests ni estados de candidatos
-reales. `pnpm pg:connect:status` validó la migración en dry-run, aún pendiente. Falta migración +
-deploy del ops-worker para que el nuevo séptimo correo quede vivo en producción.
+emitió un solo evento; cleanup verificado en cero. No se tocaron tests ni estados de candidatos reales.
+La migración quedó aplicada en Cloud SQL y la configuración `hiring_assessment_submitted_internal` está habilitada;
+el release `0fe2420ed894` terminó en el manifest `released` (run `31915501771`), con Vercel y watchdog verdes.
+El séptimo correo está vivo,
+pero no se ejercitó una entrega real de candidato: People/Operations debe verificar la primera entrega
+futura (delivery + `outbox_reactive_log`) sin reprocesar el evento histórico; si falla, debe pausar sólo
+ese tipo de correo.
 
 ### Los documentos del candidato: un candado que no protegía nada (2026-08-15)
-
 El operador abrió la ficha de una postulante y encontró que para ver su CV había que "REVELAR" —y que
 ni siquiera había visor. Tenía razón dos veces, y la segunda era peor: **ese candado era decorativo**.
 `Application360View.tsx:1144` construía tres filas con literales, y el "Revelar" de `:355` era un
 `useState` local. El motivo que el operador escribía **se descartaba**, y el banner que prometía "deja
 una entrada de auditoría" mentía: no se escribía ninguna.
-
 **El sustrato existía desde `TASK-1362` y nadie lo enchufó.** Esa task cerró con `UI impact: none`
 declarando fuera de alcance "la UI de subir/ver documentos… desk `TASK-355`", y 355 ya estaba cerrada.
 El cable quedó en el aire, sin dueño, y ninguna task abierta lo recogía.
-
 **Lo que se cerró.** `TASK-1714` abrió el reveal auditado para candidatos —no existía: el de
 `TASK-784` se ancla a `memberId` y un candidato no tiene member hasta el handoff, así que el RUT salía
 por mail cuando People Ops preparaba el contrato, que es justo lo que el reveal existe para evitar—.
 `TASK-1715` cableó el panel al reader real. Ambas cerradas y pusheadas.
-
 **La decisión que el operador corrigió.** Mi contrato original decía "el CV se abre en pestaña nueva".
 Estaba mal: rompe el contexto de evaluación y delega los 12 estados al visor del sistema, donde no
 podemos decir nada honesto sobre un 403 o una cuarentena. El CV ahora se lee **dentro del portal**. Y

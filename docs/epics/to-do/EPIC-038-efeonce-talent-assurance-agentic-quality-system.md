@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Research/ADR proposed`
+- Status real: `Baseline verificado; ADR/claim policy Proposed; sin runtime Talent Assurance autorizado`
 - Rank: `TBD`
 - Domain: `cross-domain` (workforce + hiring + people + client experience + delivery + finance + agents)
 - Owner: `unassigned`
@@ -62,6 +62,30 @@ autoriza por defecto.
 - [Team Capacity Architecture V1](../../architecture/GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1.md)
 - [Nexa Core Agentic Platform Decision V1](../../architecture/GREENHOUSE_NEXA_CORE_AGENTIC_PLATFORM_DECISION_V1.md)
 - [Talent Assurance Economic Guardrails V1](../../business-models/EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1.md)
+
+## Baseline y orden de ejecución verificados 2026-08-15
+
+Ninguna task hija fue implementada por esta verificación. El runtime existente sólo es reutilizable: Hiring tiene
+assessment, decisión, handoff y lineage durable de activación; `TASK-1364` aporta un reader read-only de validez;
+Team Capacity y Finance aportan inputs fechados de costo/capacidad. No hay claim store Talent Assurance, proyección
+outcome 30/60/90, proyección feedback/continuity de cliente, propuesta de factibilidad económica, adapter de
+agente, API compuesta ni cockpit.
+
+La ejecución debe seguir este orden:
+
+1. Aceptar o rechazar/revisar explícitamente `TASK-1602` con Talent, Workforce, Delivery, Client Experience,
+   Finance/Commercial and Legal/Privacy owners.
+2. Completar la foundation Hiring: `TASK-1719` posee policy/asignación opening→assessment; `TASK-1603` la consume
+   para completeness y override humano, y después `TASK-1604` entrega packs de roles críticos.
+3. En paralelo sólo tras el gate de policy, contratar inputs Finance/Commercial para `TASK-1607`; usar readers
+   fechados cost-basis/capacity existentes, sin inventar semántica de `ProfileResolution` o `CostCard`.
+4. Construir taxonomía/proyección outcome de `TASK-1605` sobre el mapping de activación y `TASK-1606` sólo después,
+   sobre un contrato de continuidad cliente aprobado por Privacy.
+5. Publicar read models/API parity `TASK-1610` antes de adapters `TASK-1608` y consumers cockpit `TASK-1611`;
+   `TASK-1609` gobierna cualquier promoción más allá de observe.
+
+`TASK-1718` puede aportar más adelante un reader de candidate-review acotado y redactado para agents/read models.
+No emite claims Talent Assurance ni reemplaza los gates de policy, outcome, acceso o autonomía anteriores.
 
 ## Program phases
 

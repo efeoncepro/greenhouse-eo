@@ -26,6 +26,13 @@ Condiciones comunes que se deben reconocer sin abrir bucles exploratorios:
 - `transition-released` esperando runner después de que runtime y health ya
   están verdes.
 
+Un Vercel Production `READY` prueba sólo el despliegue Next.js. Si el batch agrega o cambia un consumer reactivo
+del `ops-worker`, verifica además la migración/flag, la revisión activa del worker (o su equivalencia documentada
+por change-gate) y el readback del efecto. No declares envío real de correo porque el consumer quedó desplegado.
+Ejemplo registrado: el release `0fe2420ed894` (orchestrator `31915501771`) dejó manifest `released`, Vercel,
+workers y watchdog verdes, y habilitó `hiring_assessment_submitted_internal`; no ejerció una entrega a candidato
+real.
+
 Si el operador pide medir tiempos, medirlos como telemetría de operación:
 preflight, PR/merge, dispatch, approval, workers, Vercel READY, health,
 transition final, watchdog y flags. Medir no autoriza perseguir cada latencia
