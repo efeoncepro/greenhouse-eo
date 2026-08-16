@@ -22,14 +22,15 @@ Primer paso recomendado: ejecutar `TASK-1727` con auditoría live de schema/auth
 auditoría detectó hipótesis brownfield sobre `handoff_id|hiring_handoff_id`, linkage de `candidate_facet.member_id`
 y session/magic-link hardening; TASK-1731/1727 deben verificarlas contra runtime antes de afirmar o corregir.
 
-### Banco de Talento — producción interna operativa; recontacto externo gated (2026-08-16)
+### Banco de Talento — producción operativa; contacto explícito y reversible (2026-08-16)
 
-`TASK-1723`–`TASK-1726` quedaron implementadas end-to-end. La promoción ampliada Greenhouse
-`6b78b040252d` / release `6b78b040252d-d0d36c25-3634-4567-8be5-a807272e0ccb` / run `31949566099`
-terminó `released`; Vercel productivo `dpl_3CXgsmvfCWxtfDj35QWcWsJgitTn` está `READY`. PostgreSQL
-tiene cero migraciones pendientes. El backfill/reconciler conserva 52 memberships (50
-`active_process`, 2 `needs_reconsent`) y no crea consentimiento futuro; scheduler
-`ops-hiring-talent-pool-reconcile` corre cada cinco minutos sobre `ops-worker-00562-npr`.
+`TASK-1723`–`TASK-1726` quedaron implementadas end-to-end. El encendido operativo autorizado por el CEO se promovió
+con `20245888625b8dc979cf2f747f5ef9d7999df6e5` / run `31953851353`, que terminó `released`; Vercel productivo
+`dpl_CTxG3tx66S159tazMSyNiGSmqzHJ` está `READY` y `/api/auth/health` devolvió 200. PostgreSQL tiene cero
+migraciones pendientes. El backfill/reconciler conserva 52 memberships (50 `active_process`, 2 `needs_reconsent`)
+y no crea consentimiento futuro. Los flags Vercel de invite/self-service están en `true`; el worker declara
+self-service en `ops-worker-00563-ghv` (Ready=True, change-gated porque las rutas runtime no cambiaron). Watchdog:
+`aggregateSeverity=ok`, `drift_count=0`.
 
 Dos superficies quedaron verificadas: candidato 1440/390 en
 `.captures/2026-08-16T08-52-56_hiring-talent-pool-self-service` (desplegada fail-closed) y operador 1440/390
@@ -40,9 +41,10 @@ No rankea, decide, mueve etapa, asigna test ni copia contacto/CV al índice de b
 Efeonce MCP publica `hiring.talent_pool.search` y `hiring.talent_pool.profile.get` para persona interna delegada.
 Canary OAuth real: search/profile `200`; cliente base-only `66985833-14e9-438e-add4-b740e84e9a64` obtuvo `403`
 sin Hiring. Durante el rollout se detectaron y corrigieron dos fallos fail-closed: host inválido del canary y policy
-persistida con revalidación `0` en vez del mínimo `15`. Projection/search/MCP están ON; invite/self-service externos
-siguen OFF hasta aprobación People + Legal/Privacy de copy, policy, TTL y retención. Acceso externo/B2B y writes
-esperan TASK-1631.
+persistida con revalidación `0` en vez del mínimo `15`. Projection/search/MCP están ON; invite/self-service están ON
+detrás de flags independientes. La confirmación futura es explícita, tokenizada y reversible; no hay backfill,
+contacto automático ni acceso externo/B2B. La revisión jurídica formal de copy, policy, TTL y retención queda como
+sign-off residual si la política interna la exige.
 
 La auditoría `greenhouse-talent-people-operator` confirmó person-first, cero ranking/decisión adversa, DTO MCP sin
 contacto/CV, invitación mediante `HiringApplication` canónica y tests sólo por application. Detectó un fail-open
