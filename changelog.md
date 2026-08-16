@@ -2,6 +2,18 @@
 
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
+
+## 2026-08-16 — Expediente de Evaluación SMART (TASK-1735) + fix scorecard parcial (ISSUE-159)
+
+- Hiring: nueva capa de expediente per-application — notas append-only tipadas + borrador de
+  análisis CV↔assessment generado por IA (claude-sonnet-5) con confirmación humana obligatoria.
+  APIs `/api/hiring/applications/[id]/notes` y `/dossier`; capability `hiring.application.annotate`;
+  flag `HIRING_EVALUATION_DOSSIER_AI_ENABLED` OFF (rollout pendiente).
+- Application 360: el scorecard ya no muestra un promedio parcial como resultado final — estado
+  "Parcial · X de Y competencias corregidas" mientras haya respuestas por corregir (ISSUE-159).
+- Storage: timestamps del asset mapper corregidos (bug latente TASK-1718).
+- TASK-1734: ADR del scoring IA a escala aceptado como Proposed (Slice 0), con autorización
+  ejecutiva del CEO registrada.
 > inicio ni usar una entrada histórica como contrato vigente sin contrastarla.
 >
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
@@ -1197,24 +1209,3 @@ Se expone la MCP tool `get_seo_overview_kpis` en el mismo cambio, así que Nexa 
 consumen exactamente el mismo cálculo que la pantalla.
 
 Code complete; el despliegue y la migración del viewCode en staging/producción quedan pendientes.
-
-## 2026-08-06 — TASK-1304: site audit OnPage (queue+poll) + backlink snapshot (code complete, schedulers pausados)
-
-- **Ciclo async OnPage en 2 fases**: `queueSiteAudit` (gate de costo que SÍ consume el cupo
-  mensual de audits + guard anti doble-encolado sin gasto) crea la task y persiste el run
-  `running`; `collectSiteAuditRuns` poll-ea con claim `FOR UPDATE SKIP LOCKED` y materializa
-  run + findings + outbox **en la misma transacción** (exactly-once por construcción). Mapeo
-  honesto: 0 findings = `succeeded` (sitio limpio) ≠ `degraded` (parcial) ≠ `failed` (0 páginas
-  o task colgada >24h). Findings desde un **allowlist curado** de checks OnPage (true=problema).
-- **Backlink snapshot semanal**: `summary/live` (rank 0–100) + `bulk_new_lost`; idempotente por
-  `(target, capture_date)`; `partial` honesto si el delta falla. `toxic_share` = spam score del
-  perfil entrante / 100 (proxy documentado).
-- **Parity en el mismo PR**: readers `readSiteAuditReport`/`readBacklinkProfile` + lanes ecosystem
-  + MCP tools `get_seo_site_audit_report`/`get_seo_backlink_profile`; signal
-  `seo.audit.stuck_tasks` (6h warn / 30h error = el collect no corre); mirrors BQ
-  `seo_site_audit_history`/`seo_backlink_history` (tablas creadas).
-- **Smoke E2E con dinero real** (~USD 0.05, efeoncepro.com): crawl 10 págs → health 93.41,
-  60 findings; backlinks 15 ref domains / 455 links / rank 44. **Gotcha cazado en vivo**: el poll
-  `summary` es POST con id en el BODY — la variante por path responde 200 sin tasks (fix + guard).
-- **Rollout pendiente**: 3 Cloud Scheduler (`ops-seo-audit-enqueue`/`-collect`/`ops-seo-backlink-capture`)
-  nacen PAUSADOS en `deploy.sh`; falta push + deploy del worker + despausar (enqueue antes que collect).

@@ -2,6 +2,22 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-16 — TASK-1735 complete (code complete, rollout pendiente) + TASK-1734 Slice 0 + ISSUE-159
+
+TASK-1735 (Expediente de Evaluación SMART) quedó `complete` con los 6 slices: tabla append-only
+`hiring_application_note` + capability `hiring.application.annotate` (tier gobernanza), primitives
+notas + dossier-ai (packet allowlisted, `claude-sonnet-5`, propose idempotente por digest, confirm
+humano terminal-once), APIs `/notes` y `/dossier`, docs triple. Gates: suite full 10.917 verde,
+`pnpm build` verde, migraciones verificadas contra PG real. E2E real local: proyección CV de
+EO-APP-0078 materializada + borrador generado por el LLM (proposal `hdsp-384b740a`, `proposed`,
+pendiente de confirm humano). La prueba destapó y cerró bug latente de TASK-1718 (timestamps del
+asset mapper anulados → fix date-aware en `greenhouse-assets.ts`). ISSUE-159 resuelto (scorecard
+parcial ya no muestra promedio como resultado final). TASK-1734 en `in-progress` con Slice 0
+cerrado: ADR GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1 (Proposed) + Delta con autorización
+ejecutiva CEO + hallazgos runtime. Rollout pendiente 1735: flag HIRING_EVALUATION_DOSSIER_AI_ENABLED
+OFF en todos los ambientes; flip staging + smoke staging:request post-deploy. Próximo paso:
+auditoría arch+talent, luego TASK-1734 Slices 1-6.
+
 ### TASK-1736 — canonicalización del intake candidato registrada, sin implementación (2026-08-16)
 
 Se creó `TASK-1736` y se agregó a `EPIC-011` como follow-up backend-critical de TASK-1367/1688. La task separa
