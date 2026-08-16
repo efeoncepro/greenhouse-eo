@@ -534,6 +534,68 @@ export interface HiringDeskCopy {
     handoffApproveError: string
     history: string
     activityTitle: string
+    /**
+     * TASK-1737 — tab Expediente de la Application 360: timeline de notas tipadas
+     * (TASK-1735) + flujo propose→confirm del dossier agéntico + gate anti-anclaje.
+     * Ledger completo en docs/ui/wireframes/TASK-1737-application-360-expediente-tab.md.
+     */
+    expediente: {
+      tabLabel: string
+      title: string
+      subtitle: string
+      generate: string
+      generating: string
+      aiDisabled: string
+      cvNotReady: string
+      proposalTitle: string
+      proposalProvenance: string
+      sectionSummary: string
+      sectionCoherences: string
+      sectionGaps: string
+      sectionInterviewFocus: string
+      sectionUnverifiable: string
+      evidenceLabel: string
+      edit: string
+      editCaption: string
+      cancelEdit: string
+      confirm: string
+      confirming: string
+      confirmed: string
+      reject: string
+      rejectDialogTitle: string
+      rejectDialogBody: string
+      rejectReasonLabel: string
+      rejectConfirm: string
+      rejected: string
+      decisionApplied: string
+      composerKindLabel: string
+      kindCvAnalysis: string
+      kindAssessmentReview: string
+      kindInterviewNote: string
+      kindGeneral: string
+      composerPlaceholder: string
+      composerCount: string
+      addNote: string
+      addingNote: string
+      noteAdded: string
+      agentBadge: string
+      agentProvenance: string
+      stageEvent: string
+      receivedEvent: string
+      decisionEvent: string
+      empty: string
+      emptyReadOnly: string
+      showMore: string
+      showLess: string
+      blindTitle: string
+      blindBody: string
+      blindCount: string
+      blindCta: string
+      loadError: string
+      permissionDenied: string
+      staleProposal: string
+      noteAriaLabel: string
+    }
   }
   publication: {
     title: string
