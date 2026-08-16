@@ -5,11 +5,13 @@ import type { PoolClient } from 'pg'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
   AI_SCORING_RISK_CLASSES,
+  AI_SCORING_RUN_ITEM_RESOLUTIONS,
   AI_SCORING_RUN_ITEM_STATUSES,
   AI_SCORING_RUN_STATUSES,
   type AiScoringRiskClass,
   type AiScoringRun,
   type AiScoringRunItem,
+  type AiScoringRunItemResolution,
   type AiScoringRunItemStatus,
   type AiScoringRunStatus,
 } from '@/types/hiring-assessment-ai-run'
@@ -102,13 +104,18 @@ type RunItemRow = {
   reason_code: unknown
   routing_reasons: unknown
   attempt_count: unknown
+  resolution: unknown
+  saw_proposal_before_scoring: unknown
+  resolved_by: unknown
+  resolved_at: unknown
   created_at: unknown
   updated_at: unknown
 }
 
 const RUN_ITEM_COLS = `
   run_item_id, run_id, assessment_id, application_id, response_id, proposal_id,
-  input_digest, status, risk_class, reason_code, routing_reasons, attempt_count, created_at, updated_at`
+  input_digest, status, risk_class, reason_code, routing_reasons, attempt_count,
+  resolution, saw_proposal_before_scoring, resolved_by, resolved_at, created_at, updated_at`
 
 const strArray = (v: unknown): string[] => {
   const parsed = typeof v === 'string' ? (() => { try { return JSON.parse(v) } catch { return [] } })() : v
@@ -129,6 +136,12 @@ const normalizeRunItem = (row: RunItemRow): AiScoringRunItem => ({
   reasonCode: nstr(row.reason_code),
   routingReasons: strArray(row.routing_reasons),
   attemptCount: int(row.attempt_count),
+  resolution:
+    row.resolution == null ? null : assertEnum(row.resolution, AI_SCORING_RUN_ITEM_RESOLUTIONS, 'resolution'),
+  sawProposalBeforeScoring:
+    row.saw_proposal_before_scoring == null ? null : Boolean(row.saw_proposal_before_scoring),
+  resolvedBy: nstr(row.resolved_by),
+  resolvedAt: ts(row.resolved_at),
   createdAt: ts(row.created_at) ?? '',
   updatedAt: ts(row.updated_at) ?? '',
 })
@@ -140,7 +153,7 @@ export const insertRunEvent = async (
   input: {
     runId: string
     runItemId?: string | null
-    eventType: 'run_transition' | 'item_transition' | 'reconciliation'
+    eventType: 'run_transition' | 'item_transition' | 'reconciliation' | 'item_resolved' | 'run_confirm_manifest'
     fromStatus?: string | null
     toStatus?: string | null
     reasonCode?: string | null
@@ -372,6 +385,13 @@ export const transitionRunItem = async (
     routingReasons?: string[] | null
     /** Intentos de provider consumidos por esta transición (suma a attempt_count). */
     attemptDelta?: number
+    /**
+     * Resolución humana (Slice 4): al setearla se registran también resolved_by (= actor)
+     * y resolved_at, y el evento de historia sale como `item_resolved` con la evidencia
+     * anti-anclaje `sawProposalBeforeScoring` en el detail.
+     */
+    resolution?: AiScoringRunItemResolution | null
+    sawProposalBeforeScoring?: boolean | null
   } = {},
 ): Promise<AiScoringRunItem> => {
   const transition = resolveItemTransition(item.status, target)
@@ -386,6 +406,10 @@ export const transitionRunItem = async (
            risk_class = COALESCE($5, risk_class),
            routing_reasons = COALESCE($6::jsonb, routing_reasons),
            attempt_count = attempt_count + $7,
+           resolution = COALESCE($8, resolution),
+           saw_proposal_before_scoring = COALESCE($9, saw_proposal_before_scoring),
+           resolved_by = CASE WHEN $8 IS NOT NULL THEN $10 ELSE resolved_by END,
+           resolved_at = CASE WHEN $8 IS NOT NULL THEN NOW() ELSE resolved_at END,
            updated_at = NOW()
      WHERE run_item_id = $1
      RETURNING ${RUN_ITEM_COLS}`,
@@ -397,19 +421,50 @@ export const transitionRunItem = async (
       opts.riskClass ?? null,
       opts.routingReasons ? JSON.stringify(opts.routingReasons) : null,
       Math.max(0, Math.floor(opts.attemptDelta ?? 0)),
+      opts.resolution ?? null,
+      opts.sawProposalBeforeScoring ?? null,
+      opts.actorUserId ?? null,
     ],
   )
 
   await insertRunEvent(client, {
     runId: item.runId,
     runItemId: item.runItemId,
-    eventType: 'item_transition',
+    eventType: opts.resolution ? 'item_resolved' : 'item_transition',
     fromStatus: item.status,
     toStatus: transition.next,
     reasonCode: opts.reasonCode ?? null,
     actorUserId: opts.actorUserId ?? null,
-    detail: opts.routingReasons ? { routingReasons: opts.routingReasons } : undefined,
+    detail: {
+      ...(opts.routingReasons ? { routingReasons: opts.routingReasons } : {}),
+      ...(opts.resolution
+        ? {
+            resolution: opts.resolution,
+            sawProposalBeforeScoring: opts.sawProposalBeforeScoring ?? null,
+          }
+        : {}),
+    },
   })
+
+  return normalizeRunItem(rows[0])
+}
+
+/** Item del run leído DENTRO de la tx del command (el lock canónico es el del run). */
+export const getRunItemInRun = async (
+  client: PoolClient,
+  runId: string,
+  runItemId: string,
+): Promise<AiScoringRunItem> => {
+  const rows = await runQuery<RunItemRow>(
+    client,
+    `SELECT ${RUN_ITEM_COLS} FROM greenhouse_hiring.hiring_assessment_ai_scoring_run_item
+     WHERE run_item_id = $1 AND run_id = $2`,
+    [runItemId, runId],
+  )
+
+  if (!rows[0]) {
+    throw new HiringNotFoundError('El item del run no existe.', 'assessment_ai_run_item_not_found')
+  }
 
   return normalizeRunItem(rows[0])
 }

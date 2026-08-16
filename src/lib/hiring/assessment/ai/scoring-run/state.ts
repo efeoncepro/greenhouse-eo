@@ -68,18 +68,21 @@ export const resolveRunTransition = (
 /**
  * Matriz de transiciones del item. `pending → claimed → proposed` es el camino del drain
  * (Slice 2); todo item no terminal puede caer a `superseded_by_manual` (reconciliación),
- * `stale` (digest cambió) o `cancelled` (cancel del run). `proposed → confirmed` es Slice 4.
+ * `stale` (digest cambió) o `cancelled` (cancel del run). Slice 4: `proposed → confirmed`
+ * (resolución humana confirmed/overridden o batch confirm) y `proposed → rejected_to_manual`
+ * (la propuesta se rechaza y la respuesta vuelve a la cola manual).
  */
 const ITEM_TRANSITIONS: Record<AiScoringRunItemStatus, readonly AiScoringRunItemStatus[]> = {
   pending: ['claimed', 'stale', 'superseded_by_manual', 'cancelled', 'failed'],
   claimed: ['proposed', 'abstained', 'failed', 'pending', 'stale', 'superseded_by_manual', 'cancelled'],
-  proposed: ['confirmed', 'stale', 'superseded_by_manual', 'cancelled'],
+  proposed: ['confirmed', 'rejected_to_manual', 'stale', 'superseded_by_manual', 'cancelled'],
   abstained: [],
   failed: [],
   stale: [],
   superseded_by_manual: [],
   cancelled: [],
   confirmed: [],
+  rejected_to_manual: [],
 }
 
 export const isTerminalItemStatus = (status: AiScoringRunItemStatus): boolean =>

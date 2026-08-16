@@ -105,6 +105,44 @@ export const listEligibleResponses = async (
   return runGreenhousePostgresQuery<EligibleResponseRow>(text, values)
 }
 
+/**
+ * Recomputa el digest del run HOY sobre el conjunto exacto de respuestas de sus items,
+ * con el modelo/prompt/policy EFECTIVOS del runtime actual (Slice 4, gate de vigencia
+ * del confirm — ADR D1: un digest stale exige nueva propuesta/revisión, nunca confirm).
+ * El conjunto es el de los items del run (no `listEligibleResponses`, que ya excluye las
+ * respuestas resueltas una a una): mismos inputs ⇒ mismo digest; answer/rubric/modelo/
+ * prompt/policy cambiados ⇒ digest distinto ⇒ `run_stale`.
+ */
+export const computeCurrentScoringRunDigest = async (
+  assessmentId: string,
+  responseIds: string[],
+  client: PoolClient | null = null,
+): Promise<string> => {
+  const text = `SELECT r.response_id, r.answer_json, q.prompt AS question_prompt, q.rubric_json
+       FROM greenhouse_hiring.hiring_assessment_response r
+       JOIN greenhouse_hiring.hiring_question q ON q.question_id = r.question_id
+      WHERE r.response_id = ANY($1::text[])`
+
+  const values = [responseIds]
+
+  const rows: EligibleResponseRow[] = client
+    ? ((await client.query(text, values)).rows as EligibleResponseRow[])
+    : await runGreenhousePostgresQuery<EligibleResponseRow>(text, values)
+
+  return computeScoringRunInputDigest(
+    assessmentId,
+    getHiringAssessmentScoringModel(),
+    HIRING_ASSESSMENT_SCORING_PROMPT_VERSION,
+    HIRING_ASSESSMENT_AI_RUN_POLICY_VERSION,
+    rows.map(r => ({
+      responseId: String(r.response_id),
+      questionPrompt: String(r.question_prompt),
+      rubricJson: r.rubric_json,
+      answerText: extractAnswerText((r.answer_json ?? {}) as Record<string, unknown>),
+    })),
+  )
+}
+
 interface AssessmentRow extends Record<string, unknown> {
   assessment_id: unknown
   application_id: unknown

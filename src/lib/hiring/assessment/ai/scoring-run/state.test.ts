@@ -77,6 +77,17 @@ describe('resolveItemTransition', () => {
     expect(resolveItemTransition('claimed', 'pending').apply).toBe(true)
   })
 
+  it('Slice 4: proposed → rejected_to_manual (rechazo humano a cola manual) y su terminal-once', () => {
+    expect(resolveItemTransition('proposed', 'rejected_to_manual').apply).toBe(true)
+    expect(resolveItemTransition('rejected_to_manual', 'rejected_to_manual').apply).toBe(false)
+    expect(isTerminalItemStatus('rejected_to_manual')).toBe(true)
+    expect(() => resolveItemTransition('rejected_to_manual', 'confirmed')).toThrowError(
+      expect.objectContaining({ code: 'assessment_ai_run_item_invalid_transition', statusCode: 409 }),
+    )
+    // Solo un item con proposal puede rechazarse: pending/claimed no llegan ahí.
+    expect(() => resolveItemTransition('pending', 'rejected_to_manual')).toThrow()
+  })
+
   it('todo item no terminal puede caer a superseded_by_manual (reconciliación D3)', () => {
     for (const from of ['pending', 'claimed', 'proposed'] as const) {
       expect(resolveItemTransition(from, 'superseded_by_manual').apply).toBe(true)

@@ -1185,6 +1185,12 @@ export const EVENT_TYPES = {
   hiringAssessmentAiRunCancelled: 'hiring.assessment.ai_run_cancelled',
   hiringAssessmentAiRunReconciled: 'hiring.assessment.ai_run_reconciled',
 
+  // TASK-1734 Slice 4 — Revisión por excepción + confirmación de run por lote. Payloads
+  // IDs-only (runId/runItemId/resolution/counts/reason codes), NUNCA score, texto de
+  // respuesta ni PII (el manifest estructurado vive en la historia append-only del run).
+  hiringAssessmentAiRunItemResolved: 'hiring.assessment.ai_run_item_resolved',
+  hiringAssessmentAiRunConfirmed: 'hiring.assessment.ai_run_confirmed',
+
   // TASK-1365 — payload contains only aggregate report scope/evidence references.
   hiringAssessmentFairnessAdverseImpactDetected: 'hiring.assessment.fairness.adverse_impact_detected'
 } as const

@@ -7875,11 +7875,15 @@ export interface GreenhouseHiringHiringAssessmentAiScoringRunItem {
   input_digest: string | null;
   proposal_id: string | null;
   reason_code: string | null;
+  resolution: string | null;
+  resolved_at: Timestamp | null;
+  resolved_by: string | null;
   response_id: string;
   risk_class: string | null;
   routing_reasons: Generated<Json>;
   run_id: string;
   run_item_id: Generated<string>;
+  saw_proposal_before_scoring: boolean | null;
   status: Generated<string>;
   updated_at: Generated<Timestamp>;
 }
