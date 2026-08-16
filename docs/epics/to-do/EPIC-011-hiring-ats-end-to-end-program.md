@@ -177,6 +177,16 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   **✓ complete (code complete, rollout pendiente 2026-08-16).**
 - `TASK-1736` — Candidate Identity Intake Canonicalization + Governed Remediation: raw/display/search person-first,
   parity Careers/Growth Forms, reconciliación identity-safe y remediación histórica allowlisted/reversible.
+- `TASK-1737` — Application 360: tab Expediente — **consumer UI de `TASK-1735`** (su follow-up declarado): el tab
+  `activity` sintético se convierte en el Expediente real (timeline de notas + eventos de etapa, composer, flujo
+  propose → editar → confirmar/rechazar) y resuelve el gate BLOQUEANTE anti-anclaje del Delta (3) de 1735 con
+  ceguera server-enforced en el reader (viewer con scorecard propio abierto no ve análisis con scores). `ui-ux`
+  con híbrido justificado (`reader`); sin bloqueo técnico (backend listo).
+- `TASK-1738` — Workbench de revisión del scoring IA — **consumer UI de `TASK-1734`** (su follow-up declarado:
+  workbench con anti-anchoring + honest provisional coverage): cobertura honesta del run, cola de excepciones con
+  evidencia, muestra ciega estructural verificada sobre el DOM, `sawProposalBeforeScoring` por gesto real y
+  confirm/cancel con manifest. Convive con el drawer per-response; cero superficie candidate-facing; el rollout de
+  flags de 1734 sigue su runbook aparte. `ui-ux` con híbrido justificado (`api`); sin bloqueo técnico.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
 
@@ -368,6 +378,10 @@ Las extensiones no viven en las fases numeradas originales; su orden real es por
   promoción, shadow, canary) se mantienen.
 - Carril expediente: `1735` (foundation backend del Evaluation Dossier) es independiente y paralelizable; su
   consumer UI es follow-up. Frontera 1734↔1735: manifest estructurado vs nota narrativa (declarada en ambas).
+- Carril consumers UI (delta 2026-08-16): los dos follow-ups declarados ya tienen dueño — `1737` (tab Expediente,
+  consumer de 1735, incluye el gate anti-anclaje BLOQUEANTE) y `1738` (workbench del run, consumer de 1734).
+  Ambos sin bloqueo técnico: el backend está complete y el rollout de flags corre por sus runbooks; son
+  paralelizables entre sí y con el resto de los carriles.
 - Carril cuenta candidata: `1727 → 1728/1729 → 1730 → 1731 → 1732 → 1733` según sus blockers declarados.
 
 ### Supersede de non-goal
