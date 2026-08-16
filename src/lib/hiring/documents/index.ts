@@ -9,14 +9,15 @@
 export { canAccessHiringCandidateDocument } from './access'
 export { captureCandidateIdentityDocument } from './capture-identity-document'
 export type { CaptureCandidateIdentityDocumentInput } from './capture-identity-document'
-export { resolveCandidateDocuments } from './resolve'
-export { buildCandidateDocumentsViewModel } from './view-model'
+export { resolveCandidateDocuments, resolveHiringApplicationDocuments } from './resolve'
+export { buildCandidateDocumentsViewModel, buildHiringApplicationDocumentsViewModel } from './view-model'
 export type {
   CandidateDocumentFileRow,
   CandidateDocumentLinkRow,
   CandidateDocumentRowStatus,
   CandidateDocumentsViewModel,
   CandidateIdentityRow,
+  HiringApplicationDocumentsViewModel,
 } from './view-model'
 export { revealCandidateIdentityDocument } from './reveal-identity-document'
 export type {
@@ -38,4 +39,5 @@ export type {
   CandidateDocumentStatus,
   CandidateDocuments,
   CandidateIdentityDocument,
+  HiringApplicationDocuments,
 } from './types'

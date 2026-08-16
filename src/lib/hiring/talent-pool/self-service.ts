@@ -152,9 +152,9 @@ export const checkTalentPoolPublicRequestAllowed = async (
   ip: string | null,
   action: TalentPoolPublicRateAction
 ): Promise<boolean> => {
-  if (!ip?.trim()) return true
   const salt = process.env.HIRING_TALENT_POOL_PUBLIC_RATE_SALT?.trim() || 'talent-pool-public-v1'
-  const ipHash = createHash('sha256').update(`${salt}:${ip.trim().toLowerCase()}`).digest('hex')
+  const rateSubject = ip?.trim().toLowerCase() || 'unknown-proxy-subject'
+  const ipHash = createHash('sha256').update(`${salt}:${rateSubject}`).digest('hex')
 
   try {
     const rows = await runGreenhousePostgresQuery<{ hit_count: number }>(
@@ -182,6 +182,6 @@ export const checkTalentPoolPublicRequestAllowed = async (
   } catch (error) {
     captureWithDomain(error, 'hiring', { tags: { source: 'talent_pool_public_rate_guard', action } })
 
-    return true
+    return false
   }
 }

@@ -56,6 +56,7 @@ export default async function TalentPoolPage({ searchParams }: { searchParams?: 
           languageCode: initialFilters.language || undefined,
           countryCode: initialFilters.country || undefined,
           availability: initialFilters.availability || undefined,
+          cursorBinding: tenant.userId,
           limit: 25
         })
       : Promise.resolve({ items: [], nextCursor: null }),

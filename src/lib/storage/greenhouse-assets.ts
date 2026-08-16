@@ -12,6 +12,7 @@ import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { getLatestScanResultsForAssets } from '@/lib/storage/asset-scan/store'
 import { deleteGreenhouseStorageObject, downloadGreenhouseStorageObject, uploadGreenhouseStorageObject } from './greenhouse-media'
 import { normalizeGreenhouseAssetOwnershipScope } from './greenhouse-assets-shared'
 import type {
@@ -1353,4 +1354,41 @@ export const downloadPrivateAsset = async ({
     asset,
     file
   }
+}
+
+/**
+ * System-only byte reader for derived projections.
+ *
+ * It is intentionally narrower than `downloadPrivateAsset`: only an attached,
+ * private, application-owned PDF CV with a latest clean scan can be read. It
+ * does not increment the human download counter or emit a candidate-facing
+ * access event; the derived projection and every delegated read have their own
+ * append-only evidence.
+ */
+export const readCleanHiringApplicationCvForProjection = async (assetId: string) => {
+  const asset = await getAssetById(assetId)
+
+  if (
+    !asset ||
+    asset.visibility !== 'private' ||
+    asset.status !== 'attached' ||
+    asset.ownerAggregateType !== 'hiring_application_cv' ||
+    !asset.ownerAggregateId ||
+    asset.mimeType !== 'application/pdf'
+  ) {
+    throw new Error('candidate_review_asset_not_eligible')
+  }
+
+  const scans = await getLatestScanResultsForAssets([assetId])
+
+  if (scans.get(assetId)?.verdict !== 'clean') {
+    throw new Error('candidate_review_asset_not_clean')
+  }
+
+  const file = await downloadGreenhouseStorageObject({
+    bucketName: asset.bucketName,
+    objectName: asset.objectPath
+  })
+
+  return { asset, file }
 }

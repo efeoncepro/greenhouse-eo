@@ -7,9 +7,27 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-16 — Cuenta candidata y `/my` longitudinal quedan formalizados en EPIC-011
+
+Se aceptó la arquitectura para que una persona postule, reclame una cuenta y use `/my` antes de ser colaborador,
+sin recrear su identidad ni copiar su ficha al ser seleccionada. El mismo principal y `identity_profile_id`
+persisten; `candidate_facet` y `member` pueden coexistir y la activación laboral agrega capabilities sobre la misma
+cuenta. `/my` pasa conceptualmente de “workspace de member” a espacio personal compuesto por capabilities, pero el
+runtime actual permanece sin cambios hasta implementar las tasks.
+
+El perfil profesional reusable será person-scoped —skills, herramientas, idiomas, certificaciones, links,
+portfolio, evidencia y CV versionado— mientras cada `hiring_application` conserva su propio status publicado, CV
+snapshot, respuestas del rol y expectativa económica. El estado candidato nunca deriva stages/notas/scores crudos
+y una actualización del perfil no reescribe evidencia histórica.
+
+Se agregaron el ADR y la arquitectura canónica, se actualizó `EPIC-011` y se registró el grafo `TASK-1727`–
+`TASK-1733`: identidad/sesión, professional profile, application self-service, `/my` UI, activation continuity,
+People 360 reader y People 360 UI. Las tasks UI tienen direction/wireframe/flow/motion iniciales y permanecen
+`UI ready: no`; no se implementó código, schema, migración, flag ni rollout.
+
 ## 2026-08-16 — Banco de Talento person-first con autoservicio, Desk y paridad para agentes
 
-Greenhouse ya tiene en `develop` la fundación canónica del Banco de Talento: una sola ficha por persona,
+Greenhouse ya tiene operativa en producción interna la fundación canónica del Banco de Talento: una sola ficha por persona,
 consentimiento/purpose versionado, evidencia estructurada con lineage, disponibilidad, retiro, búsqueda y una
 invitación gobernada `propose → confirm`. El backfill de desarrollo incorporó 52 perfiles históricos sin inventar
 permiso futuro: 50 permanecen limitados a su proceso vigente y 2 requieren nuevo consentimiento.
@@ -19,10 +37,24 @@ retirarse mediante un enlace acotado; People opera un workspace propio en Hiring
 freshness, ficha lateral y acceso exacto a Application 360. Ninguna de las dos superficies rankea, decide, mueve
 etapas, asigna tests ni copia CV/contacto al índice.
 
-La misma lectura existe como App API y como provider read-only code-ready para `mcp.efeonce.org`, con identidad
-humana delegada, capability, propósito fijo, DTO allowlisted y audit sin contenido. El cambio aún no está disponible
-en producción: flags, provider y recontacto externo permanecen OFF hasta promoción, grants/canaries y aprobación
-People + Legal/Privacy.
+La misma lectura existe como App API y como provider read-only live para `mcp.efeonce.org`, con identidad humana
+delegada, capability, propósito fijo, DTO allowlisted y audit sin contenido. El canary OAuth obtuvo `200` en search y
+profile; un cliente separado sin scope Hiring obtuvo `403`. Projection/search/MCP están ON. El recontacto y el
+autoservicio externos permanecen OFF hasta aprobación People + Legal/Privacy de copy, propósito, TTL y retención.
+
+El release `a369165dfb2d`/run `31941320983` quedó `success`; Vercel, el worker reconciler y su scheduler están live.
+Durante el canary se detectó que la policy OAuth persistía `revalidateAfterSeconds=0` aunque el parser exige mínimo
+`15`; una migración aditiva lo corrigió y agregó una prueba sobre el parser real antes de la promoción final. La
+auditoría Talent posterior endureció además el rate guard público: IP ausente usa un bucket opaco compartido y una
+caída del store niega la solicitud, en vez de abrir ilimitadamente el autoservicio futuro.
+
+El siguiente slice deja listo el acceso exacto al CV desde el sidecar del Banco y el packet agent-safe de TASK-1718:
+reader por postulación, proyección PDF minimizada, App API, OAuth/capability separados, auditoría y dos tools MCP
+read-only. El contrato documental nace completamente apagado, sin backfill ni lectura de CV real hasta completar
+sign-offs Security/Privacy/Talent/Identity/MCP. La evidencia visual se rehízo sobre un harness sintético que no existe
+en producción, después de comprobar que una máscara de diff no anonimiza los píxeles ni el árbol de accesibilidad.
+También se retiró del theme la importación residual de Public Sans; el runtime conserva Poppins + Geist como familias
+canónicas.
 
 ## 2026-08-15 — People queda avisado cuando un candidato termina su test
 
@@ -1220,17 +1252,3 @@ Code complete; el despliegue y la migración del viewCode en staging/producción
   `seoEntitlementStatus 200`, `seoVisibility360Status 200`, **`seoDomainQuadrant: "riesgo"`** (el quadrant
   real de Berel por el front door público) y `seoDenyFailedClosed: true`. Exige login interactivo → paso
   asistido por humano, no automatizable en CI.
-
-## 2026-08-05 — Provider Greenhouse-SEO federado en el gateway MCP (TASK-1647, code complete)
-
-- **Provider `greenhouse-seo` + 3 tools federados en el repo `efeonce-mcp`** (main, commits `a53b77f`+`4870e90`):
-  adapter delgado fail-closed default OFF, scope base `efeonce.mcp.read`, 6 tests + canary e2e committeado.
-  Consumer sister-platform `EO-SPK-0004` + binding `EO-SPB-0004` provisionados en greenhouse
-  (`scripts/api-platform/provision-mcp-gateway-seo-consumer.ts`; token en Secret Manager
-  `efeonce-mcp-gateway-greenhouse-token`). `GROWTH_SEO_ENABLED=true` aplicado en Vercel staging + redeploy.
-- **Canary e2e verificado por HTTPS real** (provider del gateway → lane staging → readers → PG): Berel con su
-  quadrant real `domainQuadrant=riesgo` + 50 keywords + AEO 44.5 · entitlement Efeonce `contracted` 8/$50 +
-  `no_seo_data` honesto · deny anti-oracle 404 por la cadena completa.
-- **Enable en `mcp.efeonce.org` gated por el release prod:** greenhouse PROD aún no tiene el lane; la secuencia
-  de cierre (release develop→main → flag Vercel prod → env del provider en el gateway Cloud Run + deploy
-  dispatch → smoke por `mcp.efeonce.org`) queda documentada en TASK-1647.

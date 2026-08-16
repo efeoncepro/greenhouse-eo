@@ -184,7 +184,7 @@ export const hiringDesk: HiringDeskCopy = {
     activeFilters: '{count} active filters',
     all: 'All',
     clearFilters: 'Clear filters',
-    results: '{count} profiles found',
+    results: '{count} profiles shown',
     updated: 'Updated {date}',
     loadMore: 'Load more',
     loading: 'Searching talent…',

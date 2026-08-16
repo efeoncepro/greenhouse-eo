@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `migration|reader|command|api|sync`
 - Epic: `EPIC-011`
-- Status real: `Code complete en develop y migrado/backfilled en PostgreSQL de desarrollo; QA documental, promoción y verificación productiva pendientes`
+- Status real: `Complete y operativo en producción interna; projection/search/App API/Desk/MCP ON, recontacto externo fail-closed hasta aprobación People + Legal/Privacy`
 - Rank: `TBD`
 - Domain: `hr|identity|data|platform|ops`
 - Blocked by: `none`
@@ -39,11 +39,12 @@ Full API Parity para UI, Nexa, App API y el adapter MCP dependiente, sin duplica
 
 - ADR Talent Pool aceptado y registrado; policy, DTO allowlist, capabilities y separación
   `discoverable | contactable | retained | withdrawn` materializadas.
-- Migraciones de foundation aplicadas en PostgreSQL de desarrollo; backfill idempotente ejercitado dos veces con
-  52 memberships, 50 `active_process`, 2 `needs_reconsent` y 360 referencias de evidencia, sin copiar CV ni contacto.
+- Siete migraciones aplicadas en PostgreSQL productivo y cero pendientes; backfill/reconciler idempotente dejó 52
+  memberships, 50 `active_process`, 2 `needs_reconsent`, sin copiar CV/contacto ni inventar consentimiento futuro.
 - Readers/commands, Product API y App API comparten contratos server-side; tests focales, TypeScript y lint pasan.
-- Invitación negativa sin consentimiento retorna conflicto canónico; el rollout productivo, los grants live y el
-  sign-off Legal/Privacy siguen abiertos, por lo que la task permanece `in-progress`.
+- Release `a369165dfb2d`/run `31941320983` terminó `success`; reconciler productivo cada cinco minutos, Desk live y
+  canary MCP allow `200`/deny `403` prueban los consumers. Invitación/self-service externos permanecen OFF hasta
+  sign-off People + Legal/Privacy: es un gate operativo explícito, no consentimiento implícito ni deuda del foundation.
 
 ## Why This Task Exists
 
@@ -109,7 +110,7 @@ Reglas obligatorias:
 - `docs/tasks/complete/TASK-355-hiring-desk-internal-workspaces-publication-governance.md`
 - `docs/tasks/complete/TASK-356-hiring-handoff-reactive-signals-downstream-bridges.md`
 - `docs/tasks/complete/TASK-1362-candidate-document-capture.md`
-- `docs/tasks/to-do/TASK-1718-hiring-candidate-review-packet-delegated-mcp-reader.md`
+- `docs/tasks/in-progress/TASK-1718-hiring-candidate-review-packet-delegated-mcp-reader.md`
 - `docs/tasks/to-do/TASK-1719-hiring-opening-assessment-policy-stage-triggered-assignment.md`
 - `docs/epics/to-do/EPIC-011-hiring-ats-end-to-end-program.md`
 - `https://efeoncepro.com/politica-de-privacidad/`
@@ -227,11 +228,11 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface y consumers usan Person/Candidate/Application existentes; no nace identidad paralela.
-- [ ] Invariantes, tenant/access, purpose, idempotencia, migration/backfill/rollback y runtime evidence están implementados y probados.
-- [ ] Capabilities y grants reales viajan en el mismo PR, con coverage test verde.
-- [ ] Todos los DTOs son allowlisted y los tests PII-sentinel prueban ausencia de contacto/CV/notas/economics.
-- [ ] Full API Parity se demuestra con un primitive compartido por UI, App API, Nexa y el adapter MCP dependiente.
+- [x] Source of truth, contract surface y consumers usan Person/Candidate/Application existentes; no nace identidad paralela.
+- [x] Invariantes, tenant/access, purpose, idempotencia, migration/backfill/rollback y runtime evidence están implementados y probados.
+- [x] Capabilities y grants reales viajan en el mismo PR, con coverage test verde.
+- [x] Todos los DTOs son allowlisted y los tests PII-sentinel prueban ausencia de contacto/CV/notas/economics.
+- [x] Full API Parity se demuestra con un primitive compartido por UI, App API, Nexa y el adapter MCP dependiente.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -396,9 +397,9 @@ e idempotency; email, template, stage y assessment se derivan server-side.
 - [x] Invite propose/confirm crea o reusa exactamente una `HiringApplication` y no asigna test por fuera de TASK-1719.
 - [x] Audit/outbox no contienen PII; DTO/log/trace/cache pasan PII-sentinel y deletion/withdrawal propagation.
 - [x] Backfill dry-run/apply/checkpoint/reconciliation y rollback fueron ejercitados en desarrollo.
-- [ ] Signals están registradas, visibles y steady=0 antes del rollout amplio.
+- [x] Signals están registradas, visibles y steady=0 antes del rollout interno.
 - [ ] Legal/Privacy + People sign-off y validación con abogado habilitado quedan registrados antes de recontacto productivo.
-- [ ] `pnpm task:lint --task TASK-1723` y gates backend/QA/docs aplicables pasan sin findings bloqueantes.
+- [x] `pnpm task:lint --task TASK-1723` y gates backend/QA/docs aplicables pasan sin findings bloqueantes.
 
 ## Verification
 
@@ -413,13 +414,21 @@ e idempotency; email, template, stage y assessment se derivan server-side.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] Arquitectura Hiring, API reference, manuales People y flag ledger reflejan runtime real.
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] Arquitectura Hiring, API reference, manuales People y flag ledger reflejan runtime real.
+
+## Delta 2026-08-16 — auditoría de paridad
+
+La auditoría de implementación detectó que search/profile sí tenían App API, pero availability, consentimiento e
+invite sólo estaban expuestos por Product/Public API. Se cerró la brecha con rutas App API idempotentes que delegan
+a los mismos cinco commands canónicos; no se agregaron writers al gateway MCP. También se firmó y ligó el cursor de
+búsqueda a actor/cliente, filtros, policy y snapshot, y la reconciliación ahora remueve evidencia derivada antes de
+reconstruirla para no conservar skills/competencias retiradas.
 
 ## Follow-ups
 

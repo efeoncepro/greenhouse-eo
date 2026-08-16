@@ -142,7 +142,7 @@ components:
         contactable: { type: boolean }
         allowedActions:
           type: array
-          items: { type: string, enum: [read, update_availability, invite, withdraw] }
+          items: { type: string, enum: [read, update_availability, grant_future_consent, invite, withdraw] }
         reasonCodes:
           type: array
           items:
@@ -231,6 +231,117 @@ components:
           type: array
           items: { $ref: '#/components/schemas/TalentPoolProfile' }
         nextCursor: { type: [string, 'null'] }
+    TalentPoolAvailabilityCommand:
+      type: object
+      additionalProperties: false
+      required: [availability]
+      properties:
+        availability: { type: string, minLength: 1, maxLength: 80 }
+        idempotencyKey: { type: string, minLength: 8 }
+    TalentPoolConsentRequestCommand:
+      type: object
+      additionalProperties: false
+      properties:
+        evidenceRef: { type: string, maxLength: 256 }
+        idempotencyKey: { type: string, minLength: 8 }
+    TalentPoolInviteCommand:
+      type: object
+      additionalProperties: false
+      required: [openingId]
+      properties:
+        openingId: { type: string, minLength: 1 }
+        proposalRef: { type: string, minLength: 4 }
+        idempotencyKey: { type: string, minLength: 8 }
+    CandidateReviewApplicationList:
+      type: object
+      additionalProperties: false
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          maxItems: 50
+          items:
+            type: object
+            additionalProperties: false
+            required: [applicationId, openingId, openingTitle, stage, appliedAt, candidate, cvStatus]
+            properties:
+              applicationId: { type: string }
+              openingId: { type: string }
+              openingTitle: { type: string }
+              stage: { type: string }
+              appliedAt: { type: string, format: date-time }
+              candidate:
+                type: object
+                additionalProperties: false
+                required: [displayName]
+                properties: { displayName: { type: string } }
+              cvStatus: { type: string, enum: [pending, ready, unavailable, blocked, stale, ocr_required] }
+        nextCursor: { type: [string, 'null'], maxLength: 2048 }
+    CandidateReviewPacket:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, application, candidate, portfolioLinks, assessments, cv, freshness]
+      properties:
+        schemaVersion: { type: string, enum: [candidate-review-packet.v1] }
+        application:
+          type: object
+          additionalProperties: false
+          required: [applicationId, openingId, openingTitle, stage, appliedAt]
+          properties:
+            applicationId: { type: string }
+            openingId: { type: string }
+            openingTitle: { type: string }
+            stage: { type: string }
+            appliedAt: { type: string, format: date-time }
+        candidate:
+          type: object
+          additionalProperties: false
+          required: [displayName]
+          properties: { displayName: { type: string } }
+        portfolioLinks:
+          type: array
+          maxItems: 10
+          items:
+            type: object
+            additionalProperties: false
+            required: [kind, url, trust]
+            properties:
+              kind: { type: string, enum: [portfolio, linkedin] }
+              url: { type: string, format: uri }
+              trust: { type: string, enum: [untrusted_candidate_supplied] }
+        assessments:
+          type: array
+          maxItems: 100
+          items:
+            type: object
+            additionalProperties: false
+            required: [assessmentId, method, status, submittedAt, updatedAt]
+            properties:
+              assessmentId: { type: string }
+              method: { type: string }
+              status: { type: string }
+              submittedAt: { type: [string, 'null'], format: date-time }
+              updatedAt: { type: string, format: date-time }
+        cv:
+          type: object
+          additionalProperties: false
+          required: [status, trust, contentHash, chunkIndex, chunkCount, text]
+          properties:
+            status: { type: string, enum: [pending, ready, unavailable, blocked, stale, ocr_required] }
+            trust: { type: string, enum: [untrusted_candidate_supplied] }
+            contentHash: { type: [string, 'null'], pattern: '^[a-f0-9]{64}$' }
+            chunkIndex: { type: [integer, 'null'], minimum: 0 }
+            chunkCount: { type: integer, minimum: 0, maximum: 100 }
+            text: { type: [string, 'null'], maxLength: 6000 }
+        freshness:
+          type: object
+          additionalProperties: false
+          required: [sourceUpdatedAt, projectedAt, extractionVersion, redactionPolicyVersion]
+          properties:
+            sourceUpdatedAt: { type: string, format: date-time }
+            projectedAt: { type: [string, 'null'], format: date-time }
+            extractionVersion: { type: [string, 'null'] }
+            redactionPolicyVersion: { type: [string, 'null'] }
     PlatformHealthV1:
       type: object
       required:
@@ -817,6 +928,110 @@ paths:
         '404': { description: Talent Pool profile not found }
         '429': { description: Rate limit exceeded }
         '503': { description: Talent Pool search or MCP flag is disabled }
+  /api/platform/app/hiring/talent-pool/{id}/availability:
+    post:
+      summary: Update Talent Pool availability through the canonical command
+      security: [{ appBearer: [] }]
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/TalentPoolAvailabilityCommand' } } }
+      responses:
+        '200': { description: Availability updated or idempotently replayed }
+        '403': { description: Internal manage capability denied }
+  /api/platform/app/hiring/talent-pool/{id}/consent/request:
+    post:
+      summary: Request future-opportunities consent through the canonical command
+      security: [{ appBearer: [] }]
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        content: { application/json: { schema: { $ref: '#/components/schemas/TalentPoolConsentRequestCommand' } } }
+      responses:
+        '200': { description: Consent verification request recorded }
+        '503': { description: Candidate self-service rollout is disabled }
+  /api/platform/app/hiring/talent-pool/{id}/consent/withdraw:
+    post:
+      summary: Withdraw future-opportunities consent through the canonical command
+      security: [{ appBearer: [] }]
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        content: { application/json: { schema: { $ref: '#/components/schemas/TalentPoolConsentRequestCommand' } } }
+      responses:
+        '200': { description: Withdrawal recorded; active process is preserved when applicable }
+  /api/platform/app/hiring/talent-pool/{id}/invite/propose:
+    post:
+      summary: Propose a governed invitation
+      security: [{ appBearer: [] }]
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/TalentPoolInviteCommand' } } }
+      responses:
+        '200': { description: Proposal created or reused }
+        '503': { description: Invitation rollout is disabled }
+  /api/platform/app/hiring/talent-pool/{id}/invite/confirm:
+    post:
+      summary: Confirm a governed invitation
+      security: [{ appBearer: [] }]
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/TalentPoolInviteCommand' } } }
+      responses:
+        '200': { description: Canonical HiringApplication created or reused }
+        '503': { description: Invitation rollout is disabled }
+  /api/platform/app/hiring/applications/review:
+    get:
+      summary: List exact applications available for delegated review
+      description: Internal delegated OAuth only. Reader remains OFF until TASK-1718 privacy/security rollout.
+      security: [{ appBearer: [] }]
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - { in: header, name: x-greenhouse-purpose, required: true, schema: { type: string, enum: [screening_review, interview_preparation, evidence_comparison, audit_review] } }
+        - { in: header, name: x-greenhouse-agent-host, required: true, schema: { type: string, pattern: '^[a-z0-9][a-z0-9._-]{1,63}$' } }
+        - { in: query, name: openingId, required: true, schema: { type: string } }
+        - { in: query, name: stage, schema: { type: string } }
+        - { in: query, name: limit, schema: { type: integer, minimum: 1, maximum: 50 } }
+        - { in: query, name: cursor, schema: { type: string, maxLength: 2048 } }
+      responses:
+        '200':
+          description: Minimized application list
+          content: { application/json: { schema: { allOf: [{ $ref: '#/components/schemas/PlatformEnvelope' }, { type: object, properties: { data: { $ref: '#/components/schemas/CandidateReviewApplicationList' } } }] } } }
+        '403': { description: Delegated scope/capability denied }
+        '503': { description: Candidate review reader disabled }
+  /api/platform/app/hiring/applications/{applicationId}/review-packet:
+    get:
+      summary: Get one exact minimized candidate review packet
+      description: Returns at most one redacted CV text chunk and never contact, legal identity, answers or notes.
+      security: [{ appBearer: [] }]
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - { in: path, name: applicationId, required: true, schema: { type: string } }
+        - { in: header, name: x-greenhouse-purpose, required: true, schema: { type: string, enum: [screening_review, interview_preparation, evidence_comparison, audit_review] } }
+        - { in: header, name: x-greenhouse-agent-host, required: true, schema: { type: string, pattern: '^[a-z0-9][a-z0-9._-]{1,63}$' } }
+        - { in: query, name: chunkIndex, schema: { type: integer, minimum: 0, maximum: 99 } }
+        - { in: query, name: expectedContentHash, schema: { type: string, pattern: '^[a-f0-9]{64}$' } }
+      responses:
+        '200':
+          description: Exact allowlisted packet
+          content: { application/json: { schema: { allOf: [{ $ref: '#/components/schemas/PlatformEnvelope' }, { type: object, properties: { data: { $ref: '#/components/schemas/CandidateReviewPacket' } } }] } } }
+        '409': { description: Content hash changed; restart packet read }
+        '503': { description: Candidate review reader disabled }
   /api/platform/app/sessions/current:
     delete:
       summary: Revoke the current first-party app session

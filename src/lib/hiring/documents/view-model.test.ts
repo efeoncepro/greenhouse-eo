@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import type { CandidateDocumentFile, CandidateDocuments } from './types'
-import { buildCandidateDocumentsViewModel } from './view-model'
+import type { CandidateDocumentFile, CandidateDocuments, HiringApplicationDocuments } from './types'
+import { buildCandidateDocumentsViewModel, buildHiringApplicationDocumentsViewModel } from './view-model'
 
 const file = (overrides: Partial<CandidateDocumentFile> = {}): CandidateDocumentFile => ({
   assetId: 'asset-1',
@@ -187,6 +187,31 @@ describe('buildCandidateDocumentsViewModel', () => {
     expect(vm.links).toEqual([
       { kind: 'portfolio', url: 'https://behance.net/luisina' },
       { kind: 'linkedin', url: 'https://linkedin.com/in/luisina' },
+    ])
+  })
+})
+
+describe('buildHiringApplicationDocumentsViewModel', () => {
+  const exact = (files: CandidateDocumentFile[]): HiringApplicationDocuments => ({
+    applicationId: 'happ-1',
+    candidateFacetId: 'cndf-1',
+    files,
+    links: [],
+    quarantinedCount: 0,
+  })
+
+  it('preserva únicamente el paquete exacto y deriva el visor privado', () => {
+    const result = buildHiringApplicationDocumentsViewModel(exact([file()]))
+
+    expect(result.applicationId).toBe('happ-1')
+    expect(result.files).toEqual([
+      expect.objectContaining({ rowKey: 'asset-1', openHref: '/api/assets/private/asset-1?inline=1' }),
+    ])
+  })
+
+  it('representa explícitamente un CV ausente', () => {
+    expect(buildHiringApplicationDocumentsViewModel(exact([])).files).toEqual([
+      expect.objectContaining({ kind: 'cv', status: 'missing', openHref: null }),
     ])
   })
 })

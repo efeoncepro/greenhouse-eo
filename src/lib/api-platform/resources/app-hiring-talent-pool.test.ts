@@ -108,6 +108,7 @@ describe('API Platform delegated Talent Pool reader', () => {
       countryCode: 'CL',
       availability: 'immediate',
       cursor: 'next-1',
+      cursorBinding: 'user-1:efeonce-mcp-hiring',
       limit: 25
     })
     expect(audit.record).toHaveBeenCalledWith(

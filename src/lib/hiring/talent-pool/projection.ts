@@ -114,8 +114,7 @@ export const reconcileTalentPoolProjection = async ({
     const removed = await client.query(
       `DELETE FROM greenhouse_hiring.talent_pool_evidence_projection e
        USING greenhouse_hiring.talent_pool_membership m
-       WHERE e.membership_id=m.membership_id
-         AND m.lifecycle_status NOT IN ('active_process','pool_eligible','paused')`
+       WHERE e.membership_id=m.membership_id`
     )
 
     const applications = await client.query(

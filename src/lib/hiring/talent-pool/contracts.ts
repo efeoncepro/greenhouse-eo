@@ -24,7 +24,7 @@ export type TalentPoolReasonCode =
 export interface TalentPoolAccessDecision {
   discoverable: boolean
   contactable: boolean
-  allowedActions: Array<'read' | 'update_availability' | 'invite' | 'withdraw'>
+  allowedActions: Array<'read' | 'update_availability' | 'grant_future_consent' | 'invite' | 'withdraw'>
   reasonCodes: TalentPoolReasonCode[]
 }
 
@@ -69,6 +69,8 @@ export interface SearchTalentPoolInput {
   availability?: string
   lifecycle?: TalentPoolLifecycle[]
   cursor?: string
+  /** Server-only actor/workload binding. Never accepted from an untrusted query parameter. */
+  cursorBinding?: string
   limit?: number
 }
 

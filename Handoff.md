@@ -2,26 +2,57 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-### Banco de Talento — code complete en develop; rollout pendiente (2026-08-16)
+### Cuenta candidata + `/my` longitudinal — ADR/arquitectura aceptados, runtime pendiente (2026-08-16)
 
-`TASK-1723`–`TASK-1726` están `in-progress` con código, schema y documentación materializados. PostgreSQL de
-desarrollo tiene seis migraciones aplicadas y cero pendientes; el backfill idempotente dejó 52 memberships
-(50 `active_process`, 2 `needs_reconsent`), 360 evidence refs y cero contactables inventados. Product API y App
-API comparten readers/commands; 46 tests focales, TypeScript, lint global, build de producción, reachability
-(233 rutas, 0 huérfanas), nav budget y task/UI gates pasan.
+Se formalizó bajo `EPIC-011` la continuidad candidato→colaborador: una persona conserva el mismo
+`identity_profile_id`, principal/login, perfil profesional e historia; `candidate_facet` y `member` son facetas
+aditivas y `/my` se compone por capabilities. Selección no crea cuenta ni `member`; TASK-770/activation agrega la
+faceta laboral y refresca la sesión. El perfil profesional pasa a ser person-scoped y cada application conserva
+status publicado, CV snapshot, preguntas y expectativa económica propios.
 
-Existen dos superficies separadas y verificadas por GVC: autoservicio candidato 1440/390
-(`.captures/2026-08-16T08-52-56_hiring-talent-pool-self-service`) y Banco de Talento del operador en Hiring Desk
-(`.captures/2026-08-16T08-27-35_hiring-talent-pool-desk`). El operador puede buscar/filtrar, abrir ficha con
-coverage/freshness y proponer→confirmar invitación canónica; el candidato sólo confirma interés futuro, actualiza
-disponibilidad o se retira. Ninguna superficie decide, rankea, mueve etapa, asigna test ni expone contacto/CV.
+Canon nuevo: ADR `GREENHOUSE_CANDIDATE_ACCOUNT_LONGITUDINAL_MY_DECISION_V1.md` + arquitectura
+`GREENHOUSE_CANDIDATE_SELF_SERVICE_LONGITUDINAL_MY_ARCHITECTURE_V1.md`, indexados en DECISIONS_INDEX. Backlog
+registrado y lint verde: `TASK-1727` identity/session → `1728` professional profile + `1729` application contract
+→ `1730` `/my` UI; `1731` activation continuity → `1732` People 360 reader → `1733` People 360 UI. Las dos tasks UI
+tienen direction, wireframe, flow y motion contract, pero `UI ready: no`; no existe JSX, schema, flag, migración ni
+rollout de esta iniciativa todavía.
 
-El repo hermano `efeonce-mcp` tiene provider y tools read-only `hiring.talent_pool.search` /
-`hiring.talent_pool.profile.get` con 53 tests, typecheck y build verdes; Greenhouse tiene OAuth client/scope exactos
-y access audit append-only. Todo sigue OFF/no desplegado: faltan promoción Greenhouse, scope/grant Entra, deploy del
-gateway, flags/env por entorno y canaries reales Codex/Claude/MCP Inspector. El recontacto/autoservicio externo
-requiere además aprobación documentada People + Legal/Privacy y validación con abogado habilitado; hasta entonces
-los flags projection/search/self-service/invite/MCP permanecen OFF. Acceso MCP externo/B2B espera TASK-1631.
+Primer paso recomendado: ejecutar `TASK-1727` con auditoría live de schema/auth y threat model. No abrir
+`/api/my/*` actual a candidatos, no crear `member` al aplicar y no iniciar `TASK-1730` antes de 1728/1729. La
+auditoría detectó hipótesis brownfield sobre `handoff_id|hiring_handoff_id`, linkage de `candidate_facet.member_id`
+y session/magic-link hardening; TASK-1731/1727 deben verificarlas contra runtime antes de afirmar o corregir.
+
+### Banco de Talento — producción interna operativa; recontacto externo gated (2026-08-16)
+
+`TASK-1723`–`TASK-1726` quedaron implementadas end-to-end. Release Greenhouse `a369165dfb2d` / run
+`31941320983` terminó `success`; Vercel productivo `dpl_AbdEkmeQTu6ErXD2mDzekfiaG3Ef` está `READY`. PostgreSQL
+tiene siete migraciones aplicadas y cero pendientes. El backfill/reconciler conserva 52 memberships (50
+`active_process`, 2 `needs_reconsent`) y no crea consentimiento futuro; scheduler
+`ops-hiring-talent-pool-reconcile` corre cada cinco minutos sobre `ops-worker-00560-zsk`.
+
+Dos superficies quedaron verificadas: candidato 1440/390 en
+`.captures/2026-08-16T08-52-56_hiring-talent-pool-self-service` (desplegada fail-closed) y operador live 1440/390
+en `.captures/2026-08-16T10-24-10_hiring-talent-pool-desk`. Hiring Desk permite buscar/filtrar, abrir ficha y leer
+evidencia/availability con person-first semantics. No rankea, decide, mueve etapa, asigna test ni expone contacto/CV.
+
+Efeonce MCP publica `hiring.talent_pool.search` y `hiring.talent_pool.profile.get` para persona interna delegada.
+Canary OAuth real: search/profile `200`; cliente base-only `66985833-14e9-438e-add4-b740e84e9a64` obtuvo `403`
+sin Hiring. Durante el rollout se detectaron y corrigieron dos fallos fail-closed: host inválido del canary y policy
+persistida con revalidación `0` en vez del mínimo `15`. Projection/search/MCP están ON; invite/self-service externos
+siguen OFF hasta aprobación People + Legal/Privacy de copy, policy, TTL y retención. Acceso externo/B2B y writes
+esperan TASK-1631.
+
+La auditoría `greenhouse-talent-people-operator` confirmó person-first, cero ranking/decisión adversa, DTO MCP sin
+contacto/CV, invitación mediante `HiringApplication` canónica y tests sólo por application. Detectó un fail-open
+latente en el rate guard público; quedó corregido para usar bucket compartido sin IP y negar cuando falla el store.
+
+Extensión en release candidate: el operador ya no debe salir del Banco para leer el CV; el sidecar usa un reader
+exacto `applicationId → assetId` y el visor privado, sin mezclar documentos de otras postulaciones. Para agentes,
+TASK-1718 agregó App API, proyección minimizada, OAuth/capability separados y dos tools MCP read-only, pero sus tres
+flags permanecen OFF y no hubo backfill ni lectura de CV real. Build, 197/197 pruebas Greenhouse, 56/56 MCP y GVC
+sintético desktop/390 están verdes. El escenario visual ahora usa un harness que responde 404 en producción porque
+las máscaras de diff no borraban PII de los PNG/ARIA; la evidencia previa con datos reales fue retirada a Papelera.
+El theme dejó de importar el fallback residual Public Sans: títulos y texto usan únicamente Poppins + Geist.
 
 ### Aviso interno al completar test — LIVE, primera entrega real pendiente (2026-08-15)
 
@@ -552,37 +583,6 @@ Los 4 gates UI en verde: `design-contract:lint` · `ui:code-lint` · `ui:visual-
    N=1 nadie delata que `connection.state` se decide con **GSC** mientras el Resumen deriva de **rank
    snapshots**: un cliente con Search Console conectado y captura de rank sin correr —**el día 1 de
    todo cliente nuevo**— ve el KPI principal en "sin dato" con el Quadrant poblado debajo.
-
-### CIERRE END-TO-END TASK-1688/1689 — segundo release del día, cero pendientes (2026-08-12)
-
-Release `950f5bdb4` (PR #191) → manifest `950f5bdb4043-71cc7e1a-…` en **`released`** (run `31639297861`, sin
-bypass: batch sin migraciones). Cierra TODO lo que quedaba: **flip expand→contract** del país (requerido en
-parser; verificado en staging con POST sin país → `invalid`), país en «01 Tus datos» del form nativo, **fix del
-select premium** (placeholder real — mostraba la primera opción como elegida con valor vacío), **email
-`selected` ejercitado live** (supersede controlado sobre EO-APP-0090, `sent`; re-decidida rejected), **scorecard
-GVC PASS** (avg 4.6, capturas 1440+390 de ambas superficies), **revisión de privacidad documentada**
-(`docs/operations/hiring/2026-08-12-revision-privacidad-contacto-careers.md`; 2 recomendaciones no bloqueantes:
-completitud del aviso público en efeoncepro.com/privacy + purga del mensaje en la política de retención) y fila
-del flag movida a §Snapshot (los 6 tipos con evidencia live). **Hallazgo de CI:** el run de `main` quedó rojo con
-10.582 tests verdes por un flake pre-existente (timer del email-verify del renderer dispara post-teardown sin el
-global `CSS` → unhandled rejection); rerun verde + guard commiteado en develop (`a349d0088`, viaja en el próximo
-release). `ops-worker` en `63625ccdd` = residual change-gated (diff runtime 0). Único follow-up humano restante:
-las 2 recomendaciones de la revisión de privacidad.
-
-### ROLLOUT COMPLETO TASK-1688/1689 — emails de hiring LIVE + contacto Careers en producción (2026-08-12)
-
-Release `393144e9f` (PR #190) → manifest `393144e9fb3b-8d17b9bc-…` en **`released`** (run `31593198609`,
-workflow 9m54s, ambos gates `production` aprobados por loop, bypass forense por `db_migrations` ya aplicadas en
-la instancia única + `cloud_release` ya aplicado en vivo). Verificación: health 3 providers `ready`, watchdog
-`ok`, 3 workers en target + `ops-worker` residual change-gated con diff runtime 0 (su SHA `e8078fe08` ya contiene
-los consumers). **Emails LIVE**: flag ON (rev `ops-worker-00548-x52` + default true en deploy.sh), ejercicio E2E
-real EO-APP-0090 con 5 tipos `sent` (interno a people@efeoncepro.com con contacto completo + acuse + Preselección
-+ evaluación + rechazo, asuntos personalizados). **Contacto Careers LIVE**: campo país en el form custom de prod
-(curl verificado) y Growth Form v4 publicado (paridad nativa; el campo cae en «Datos adicionales» del renderer —
-deuda visual menor). La postulación de prueba `EO-APP-0090` (Prueba TASK-1689 NO CONTACTAR) queda en el Desk para
-descarte de HR. **Pendientes menores:** revisión Legal/Privacy de los 3 campos; flip país→requerido-en-parser
-tras ventana de observación; scorecard GVC formal; sacar la fila del flag de §Pendientes del ledger tras la
-primera postulación real con emails verificados.
 
 ### Sika México LIC-1120 — paquete de bid preparado, sin precio ni envío (2026-08-12)
 

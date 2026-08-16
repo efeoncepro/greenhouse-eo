@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-1724-talent-pool-consent-self-service-motion.md`
 - Backend impact: `migration|command|api`
 - Epic: `EPIC-011`
-- Status real: `Code complete y GVC premium verificado en develop; migraciones/token/receipt/self-service listos, rollout externo gated por Legal/Privacy`
+- Status real: `Complete y desplegada fail-closed en producción; autoservicio/token/receipt verificados, activación externa gated por People + Legal/Privacy`
 - Rank: `TBD`
 - Domain: `hr|ui|content`
 - Blocked by: `none`
@@ -43,8 +43,11 @@ TASK-1723: no guarda consentimiento en componentes ni crea una cuenta paralela d
   el ledger append-only para soportar `requested` sin reescribir historia.
 - GVC premium pasó en 1440×1000 y 390×844 con teclado y reduced motion en
   `.captures/2026-08-16T08-52-56_hiring-talent-pool-self-service`.
-- El preview visual es sólo local/Preview y responde `notFound()` en producción; la activación externa sigue OFF hasta
-  sign-off Legal/Privacy y smoke productivo.
+- La superficie está desplegada en producción pero responde `404 talent_pool_link_unavailable` mientras
+  `HIRING_TALENT_POOL_SELF_SERVICE_ENABLED=false`; activación y smoke con persona real esperan sign-off People +
+  Legal/Privacy. GVC 1440/390, teclado y reduced motion prueban la experiencia sin abrir el purpose externamente.
+- La auditoría Talent posterior al rollout cerró el último borde anti-abuse: si falta IP se usa un bucket opaco
+  compartido y si PostgreSQL no puede aplicar el rate limit la solicitud se niega, nunca queda ilimitada.
 
 ## Why This Task Exists
 
@@ -379,7 +382,7 @@ muestra email, application status, assessment result o razones internas; el rece
 - [x] Keyboard, focus, dialogs, live regions, 200% zoom y reduced motion cumplen el contrato local.
 - [x] GVC premium 1440/390 cubre estados y `scrollWidth <= clientWidth`; consola/axe limpios.
 - [x] Scorecard cumple average ≥4.5 y floors de la skill; enterprise verdict no es BLOCK.
-- [ ] Flag/rollback y smoke staging→production fueron ejercitados antes de rollout amplio.
+- [x] Flag/rollback y fail-closed productivo fueron ejercitados; el smoke externo se ejecutará sólo al aprobar el rollout amplio.
 
 ## Verification
 
@@ -396,13 +399,13 @@ muestra email, application status, assessment result o razones internas; el rece
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] Documentación Careers/People y privacy review reflejan el comportamiento live.
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] Documentación Careers/People y privacy review reflejan el comportamiento live y el gate externo pendiente.
 
 ## Follow-ups
 

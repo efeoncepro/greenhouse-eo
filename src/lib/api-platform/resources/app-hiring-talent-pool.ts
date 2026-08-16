@@ -112,6 +112,7 @@ export const searchAppTalentPool = async ({
     countryCode: query.get('country') ?? undefined,
     availability: query.get('availability') ?? undefined,
     cursor: query.get('cursor') ?? undefined,
+    cursorBinding: `${context.tenant.userId}:${context.oauthClientId ?? context.authSource}`,
     limit: Number.isFinite(limit) ? limit : undefined
   })
 }

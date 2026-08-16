@@ -2,7 +2,8 @@ import type { CaptureScenario } from '../lib/scenario'
 
 export const scenario: CaptureScenario = {
   name: 'hiring-talent-pool-desk',
-  route: '/agency/hiring/talent-pool',
+  // Synthetic, production-disabled harness: visual evidence must never persist candidate PII.
+  route: '/agency/hiring/talent-pool/mockup',
   viewport: { width: 1440, height: 1000 },
   viewports: [
     { name: 'desktop', width: 1440, height: 1000 },

@@ -8,20 +8,20 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `backend-data`
-- UI impact: `none`
-- UI ready: `n/a`
+- UI impact: `targeted`
+- UI ready: `no`
 - Wireframe: `none`
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-011`
-- Status real: `Diseño; portal documents reader existe y fue promovido, pero no hay reader agent-safe ni provider MCP de Hiring`
+- Status real: `Code complete en checkout compartido: reader exacto, visor directo, proyección minimizada, App API, OAuth separado, audit y dos tools MCP implementados. Build, 197 pruebas focales Greenhouse, 56 pruebas MCP y GVC sintético desktop/mobile están verdes. La migración aditiva fue aplicada al Cloud SQL compartido sin backfill; deploy y canary siguen pendientes. Los flags de reader/projection/provider documental permanecen OFF y el uso de CV real exige gate Privacy/Security/Talent/Identity/MCP.`
 - Rank: `TBD`
 - Domain: `hr|platform|identity|data`
 - Blocked by: `none`
@@ -180,6 +180,9 @@ Reglas obligatorias:
 
 ## Current Repo State
 
+> Baseline de discovery preservado para explicar el gap original. El estado vigente de implementación está en
+> `## Status` y `## Verification`; este bloque no debe usarse como readback de runtime.
+
 ### Already exists
 
 - `resolveCandidateDocuments` compone archivos, links e identidad documental de un candidato, y
@@ -325,6 +328,17 @@ Reglas obligatorias:
   fallan por diseño.
 - [ ] Un mismo primitive sirve Application/API parity, Nexa futuro y MCP sin duplicar reglas por consumer.
 - [ ] `Parity check = SI`: el contrato gobernado incluye auth fina, purpose, audit, errores, límites y lifecycle.
+
+## Hybrid Execution Justification
+
+- Why not split: el cambio UI es una integración acotada del visor privado ya existente dentro del sidecar del
+  Banco; separarlo dejaría el reader exacto implementado pero mantendría el defecto funcional que originó la
+  auditoría —obligar al operador a abandonar el banco para comprobar el CV— y duplicaría el gate anti-mezcla.
+- Primary execution profile: `backend-data`.
+- Contract boundary: el portal sólo consume el reader exacto por `applicationId`; no interpreta assets, no extrae
+  texto y no comparte el DTO agent-safe. App API/MCP permanecen como carril separado y minimizado.
+- Risk controls: autorización server-side en cada lectura, anti-oracle, viewer privado reutilizado, flags MCP OFF,
+  tests multi-application y GVC sin capturar texto ni PII de un CV real.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -599,24 +613,38 @@ selector sensible es `applicationId`, y Greenhouse resuelve todas sus relaciones
 
 ## Acceptance Criteria
 
-- [ ] ADR aceptada define source of truth, trust boundaries, identidad delegada, owners y acceso internal-only.
-- [ ] Reader lista sólo dentro de una opening exacta y entrega packet por application exacta, con DTO allowlisted.
-- [ ] CV de otra aplicación del mismo candidato nunca se sirve; existe test de regresión multi-application.
-- [ ] Proyección sólo procesa assets limpios, conserva lineage/versiones y propaga reemplazo/eliminación.
-- [ ] Packet se pagina por chunks/hash y no puede concatenar versiones distintas.
-- [ ] App API exige purpose, usuario interno activo, scope exacto y `hiring.application.read` en cada request.
-- [ ] Audit allow/deny registra actor/workload/purpose/field classes sin CV, PII, tokens ni prompts.
-- [ ] Gateway expone exactamente dos tools read-only y no accede a DB, storage ni URLs del candidato.
+- [x] ADR aceptada define source of truth, trust boundaries, identidad delegada, owners y acceso internal-only.
+- [x] Reader lista sólo dentro de una opening exacta y entrega packet por application exacta, con DTO allowlisted.
+- [x] CV de otra aplicación del mismo candidato nunca se sirve; existe test de regresión multi-application.
+- [x] Proyección sólo procesa assets limpios, conserva lineage/versiones y propaga reemplazo/eliminación.
+- [x] Packet se pagina por chunks/hash y no puede concatenar versiones distintas.
+- [x] App API exige purpose, usuario interno activo, scope exacto, `hiring.application.read` y `hiring.candidate.review.read` en cada request.
+- [x] Audit allow/deny registra actor/workload/purpose/field classes sin CV, PII, tokens ni prompts.
+- [x] Gateway expone exactamente dos tools read-only y no accede a DB, storage ni URLs del candidato.
 - [ ] Provider y reader nacen OFF; rollback y revocación fueron ejercitados, no sólo documentados.
 - [ ] Allow/deny/revoked/base-only se prueban con identidades reales en staging.
 - [ ] Fixtures adversariales prueban IDOR, prompt injection, PII sentinel, parser limits, quarantine y stale hash.
 - [ ] Codex y Claude leen todos los chunks de un packet sintético y abstienen si falta evidencia.
-- [ ] Ningún análisis produce write-back, ranking, decisión, stage move, assessment assignment o email.
-- [ ] Manuales, OpenAPI/contracts, runbooks, architecture, feature flag ledger y provider catalog quedan alineados.
+- [x] Ningún análisis produce write-back, ranking, decisión, stage move, assessment assignment o email.
+- [x] Manuales, OpenAPI/contracts, runbooks, architecture, feature flag ledger y provider catalog quedan alineados.
 - [ ] Security/Privacy, Talent, Identity y MCP Platform dejan sign-off trazable; la postura jurídica aplicable es
   validada por abogado habilitado antes del canary con CV real.
 
 ## Verification
+
+Evidencia local 2026-08-16:
+
+- Greenhouse: build y TypeScript verdes; 197/197 pruebas focales de documentos exactos, parser/redacción, packet,
+  App API, OAuth, cursor firmado, policy, self-service y tipografía.
+- Gateway MCP: `pnpm test` verde, 56/56; schemas estrictos, cliente OAuth separado, purpose cerrado y tools MCP.
+- `pnpm pg:connect:migrate` aplicó `20260816123000000_task-1718-candidate-review-packet.sql` al Cloud SQL
+  compartido; no ejecutó backfill ni materializó texto de CV.
+- El Banco reutiliza `GreenhouseDocumentPreview`; el deep-link secundario abre `?tab=documents`.
+- GVC premium desktop/390 pasó sobre `/agency/hiring/talent-pool/mockup`, harness sintético que responde 404 en
+  producción: siete frames, cero PII real, cero errores de consola/hydration/red, cero findings axe y teclado/reduced
+  motion verdes. Evidencia: `.captures/2026-08-16T12-22-58_hiring-talent-pool-desk`.
+- No se ejecutó backfill ni lectura de CV real por MCP. Esta ausencia es intencional hasta completar los gates
+  restantes, no evidencia de rollout.
 
 - `pnpm task:lint --task TASK-1718`
 - `pnpm ops:lint --changed`

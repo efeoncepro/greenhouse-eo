@@ -74,6 +74,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ tok
     const resolved = await resolveTalentPoolSelfServiceToken(token)
 
     if (body.action === 'confirm') {
+      if (!resolved.profile.access.allowedActions.includes('grant_future_consent')) {
+        throw new HiringValidationError(
+          'El perfil no admite esta acción.',
+          'talent_pool_consent_action_not_allowed',
+          409
+        )
+      }
+
       const currentExpiry = resolved.profile.futureConsentExpiresAt
 
       if (
@@ -106,6 +114,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ tok
     }
 
     if (body.action === 'availability') {
+      if (!resolved.profile.access.allowedActions.includes('update_availability')) {
+        throw new HiringValidationError(
+          'El perfil no admite esta acción.',
+          'talent_pool_availability_not_allowed',
+          409
+        )
+      }
+
       const result = await updateTalentAvailability({
         talentProfileId: resolved.profile.talentProfileId,
         availability: body.availability ?? '',
@@ -121,6 +137,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ tok
     }
 
     if (body.action === 'withdraw') {
+      if (!resolved.profile.access.allowedActions.includes('withdraw')) {
+        throw new HiringValidationError(
+          'El perfil no admite esta acción.',
+          'talent_pool_withdraw_not_allowed',
+          409
+        )
+      }
+
       const result = await withdrawTalentPoolConsent({
         talentProfileId: resolved.profile.talentProfileId,
         source: 'candidate_self_service',
@@ -128,23 +152,28 @@ export async function POST(request: Request, { params }: { params: Promise<{ tok
         idempotencyKey: key
       })
 
-      await revokeTalentPoolSelfServiceTokens(resolved.membershipId)
+      const profile =
+        result.lifecycleStatus === 'active_process'
+          ? (await resolveTalentPoolSelfServiceToken(token)).profile
+          : {
+              ...resolved.profile,
+              lifecycleStatus: result.lifecycleStatus,
+              futureConsentExpiresAt: null,
+              access: deriveTalentPoolAccess({ lifecycleStatus: result.lifecycleStatus, futureConsentExpiresAt: null }),
+              receipts: [
+                {
+                  receiptId: result.receiptId,
+                  purpose: 'future_opportunities',
+                  action: 'withdrawn',
+                  occurredAt: new Date().toISOString(),
+                  expiresAt: null
+                },
+                ...resolved.profile.receipts
+              ]
+            }
 
-      const profile = {
-        ...resolved.profile,
-        lifecycleStatus: 'withdrawn' as const,
-        futureConsentExpiresAt: null,
-        access: deriveTalentPoolAccess({ lifecycleStatus: 'withdrawn', futureConsentExpiresAt: null }),
-        receipts: [
-          {
-            receiptId: result.receiptId,
-            purpose: 'future_opportunities',
-            action: 'withdrawn',
-            occurredAt: new Date().toISOString(),
-            expiresAt: null
-          },
-          ...resolved.profile.receipts
-        ]
+      if (result.lifecycleStatus === 'withdrawn') {
+        await revokeTalentPoolSelfServiceTokens(resolved.membershipId)
       }
 
       return NextResponse.json(

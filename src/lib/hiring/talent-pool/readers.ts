@@ -1,7 +1,9 @@
 import 'server-only'
 
 import { Buffer } from 'node:buffer'
+import { createHash, createHmac, timingSafeEqual } from 'node:crypto'
 
+import { getNextAuthSecret } from '@/lib/auth-secrets'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { HiringNotFoundError, HiringValidationError } from '@/lib/hiring/errors'
 
@@ -66,19 +68,67 @@ const safeQuery = (value: string) => {
   return normalized
 }
 
-const encodeCursor = (updatedAt: string, publicId: string) =>
-  Buffer.from(JSON.stringify([updatedAt, publicId])).toString('base64url')
+const CURSOR_POLICY_VERSION = 'talent-pool-search-v2'
+const CURSOR_MAX_AGE_MS = 15 * 60 * 1000
 
-const decodeCursor = (cursor?: string): [string, string] | null => {
+type CursorPayload = {
+  v: typeof CURSOR_POLICY_VERSION
+  updatedAt: string
+  publicId: string
+  snapshotAt: string
+  filterHash: string
+  bindingHash: string
+}
+
+const digest = (value: string) => createHash('sha256').update(value).digest('hex')
+
+const filterFingerprint = (input: SearchTalentPoolInput) =>
+  digest(
+    JSON.stringify({
+      query: input.query?.trim() || null,
+      capabilityKeys: [...(input.capabilityKeys ?? [])].sort(),
+      seniority: input.seniority ?? null,
+      languageCode: input.languageCode ?? null,
+      countryCode: input.countryCode?.toUpperCase() ?? null,
+      availability: input.availability ?? null,
+      lifecycle: [...(input.lifecycle ?? [])].sort()
+    })
+  )
+
+const encodeCursor = (payload: CursorPayload) => {
+  const body = Buffer.from(JSON.stringify(payload)).toString('base64url')
+  const signature = createHmac('sha256', getNextAuthSecret()).update(body).digest('base64url')
+
+  return `${body}.${signature}`
+}
+
+const decodeCursor = (cursor: string | undefined, input: SearchTalentPoolInput): CursorPayload | null => {
   if (!cursor) return null
 
   try {
-    const parsed = JSON.parse(Buffer.from(cursor, 'base64url').toString('utf8')) as unknown
+    const [body, signature, extra] = cursor.split('.')
 
-    if (!Array.isArray(parsed) || parsed.length !== 2 || parsed.some(value => typeof value !== 'string'))
-      throw new Error('shape')
+    if (!body || !signature || extra) throw new Error('shape')
+    const expected = createHmac('sha256', getNextAuthSecret()).update(body).digest()
+    const supplied = Buffer.from(signature, 'base64url')
 
-    return parsed as [string, string]
+    if (supplied.length !== expected.length || !timingSafeEqual(supplied, expected)) throw new Error('signature')
+    const parsed = JSON.parse(Buffer.from(body, 'base64url').toString('utf8')) as Partial<CursorPayload>
+
+    if (
+      parsed.v !== CURSOR_POLICY_VERSION ||
+      typeof parsed.updatedAt !== 'string' ||
+      typeof parsed.publicId !== 'string' ||
+      typeof parsed.snapshotAt !== 'string' ||
+      parsed.filterHash !== filterFingerprint(input) ||
+      parsed.bindingHash !== digest(input.cursorBinding ?? 'unbound') ||
+      !Number.isFinite(Date.parse(parsed.snapshotAt)) ||
+      Date.now() - Date.parse(parsed.snapshotAt) > CURSOR_MAX_AGE_MS
+    ) {
+      throw new Error('binding')
+    }
+
+    return parsed as CursorPayload
   } catch {
     throw new HiringValidationError('El cursor no es válido.', 'talent_pool_invalid_cursor')
   }
@@ -183,6 +233,7 @@ export const searchTalentPool = async (input: SearchTalentPoolInput = {}): Promi
     where.push(`(ip.full_name ILIKE ('%' || $${values.length} || '%') OR EXISTS (
       SELECT 1 FROM greenhouse_hiring.talent_pool_evidence_projection ef
        WHERE ef.membership_id = m.membership_id
+         AND (ef.fresh_until IS NULL OR ef.fresh_until > NOW())
          AND (ef.capability_key ILIKE ('%' || $${values.length} || '%')
            OR ef.seniority ILIKE ('%' || $${values.length} || '%'))
     ))`)
@@ -196,19 +247,26 @@ export const searchTalentPool = async (input: SearchTalentPoolInput = {}): Promi
   if (input.capabilityKeys?.length)
     add(
       `EXISTS (SELECT 1 FROM greenhouse_hiring.talent_pool_evidence_projection ef
-    WHERE ef.membership_id = m.membership_id AND ef.capability_key = ANY(?::text[]))`,
+    WHERE ef.membership_id = m.membership_id
+      AND (ef.fresh_until IS NULL OR ef.fresh_until > NOW())
+      AND ef.capability_key = ANY(?::text[]))`,
       input.capabilityKeys.map(value => safeFilter(value, 'capabilityKeys'))
     )
   if (input.languageCode)
     add(
       `EXISTS (SELECT 1 FROM greenhouse_hiring.talent_pool_evidence_projection ef
-    WHERE ef.membership_id = m.membership_id AND ef.language_code = ?)`,
+    WHERE ef.membership_id = m.membership_id
+      AND (ef.fresh_until IS NULL OR ef.fresh_until > NOW()) AND ef.language_code = ?)`,
       safeFilter(input.languageCode, 'languageCode')
     )
-  const cursor = decodeCursor(input.cursor)
+  const cursor = decodeCursor(input.cursor, input)
+  const snapshotAt = cursor?.snapshotAt ?? new Date().toISOString()
+
+  values.push(snapshotAt)
+  where.push(`m.updated_at <= $${values.length}::timestamptz`)
 
   if (cursor) {
-    values.push(cursor[0], cursor[1])
+    values.push(cursor.updatedAt, cursor.publicId)
     where.push(`(m.updated_at, m.public_id) < ($${values.length - 1}::timestamptz, $${values.length})`)
   }
 
@@ -228,7 +286,16 @@ export const searchTalentPool = async (input: SearchTalentPoolInput = {}): Promi
   return {
     items: page.map(row => mapProfile(row, evidence.get(row.public_id) ?? [])),
     nextCursor:
-      rows.length > limit && page.length ? encodeCursor(iso(page.at(-1)!.updated_at), page.at(-1)!.public_id) : null
+      rows.length > limit && page.length
+        ? encodeCursor({
+            v: CURSOR_POLICY_VERSION,
+            updatedAt: iso(page.at(-1)!.updated_at),
+            publicId: page.at(-1)!.public_id,
+            snapshotAt,
+            filterHash: filterFingerprint(input),
+            bindingHash: digest(input.cursorBinding ?? 'unbound')
+          })
+        : null
   }
 }
 

@@ -5,13 +5,19 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getLatestScanResultsForAssets } from '@/lib/storage/asset-scan/store'
 
 import { HiringNotFoundError, HiringValidationError } from '../errors'
-import { getCandidateFacetById, getCandidateFacetByProfile, listHiringApplications } from '../store'
+import {
+  getCandidateFacetById,
+  getCandidateFacetByProfile,
+  getHiringApplicationById,
+  listHiringApplications,
+} from '../store'
 import type {
   CandidateDocumentFile,
   CandidateDocumentKind,
   CandidateDocumentLink,
   CandidateDocumentStatus,
   CandidateDocuments,
+  HiringApplicationDocuments,
 } from './types'
 
 type AssetRow = {
@@ -57,6 +63,25 @@ const ASSETS_SQL = `
 `
 
 const CANDIDATE_ASSET_CONTEXTS = Object.keys(KIND_BY_CONTEXT)
+const APPLICATION_CV_CONTEXTS = ['hiring_application_cv', 'hiring_application_cv_draft']
+
+const APPLICATION_ASSETS_SQL = `
+  SELECT
+    asset_id, public_id, owner_aggregate_type, owner_aggregate_id, status,
+    filename, mime_type, size_bytes, metadata_json, uploaded_at
+  FROM greenhouse_core.assets
+  WHERE owner_aggregate_type = ANY($1::text[])
+    AND status <> 'deleted'
+    AND (
+      owner_aggregate_id = $2
+      OR (
+        owner_aggregate_id IS NULL
+        AND metadata_json->>'applicationId' = $2
+        AND metadata_json->>'candidateFacetId' = $3
+      )
+    )
+  ORDER BY uploaded_at DESC NULLS LAST, asset_id DESC
+`
 
 const resolveStatus = (assetStatus: string, scanVerdict: string | undefined): CandidateDocumentStatus => {
   if (assetStatus === 'quarantined') return 'quarantined'
@@ -89,6 +114,72 @@ const buildLinks = ({
   if (linkedinUrl) links.push({ kind: 'linkedin', url: linkedinUrl })
 
   return links
+}
+
+const mapAssetRows = async (rows: AssetRow[]): Promise<CandidateDocumentFile[]> => {
+  const scans = await getLatestScanResultsForAssets(rows.map(row => row.asset_id))
+
+  return rows.map(row => {
+    const scan = scans.get(row.asset_id)
+    const status = resolveStatus(row.status, scan?.verdict)
+
+    return {
+      assetId: row.asset_id,
+      publicId: row.public_id,
+      kind: KIND_BY_CONTEXT[row.owner_aggregate_type] ?? 'cv',
+      fileName: row.filename,
+      mimeType: row.mime_type,
+      sizeBytes: toNumber(row.size_bytes),
+      applicationId: row.owner_aggregate_id ?? readString(row.metadata_json, 'applicationId'),
+      uploadedAt: row.uploaded_at,
+      status,
+      scan: scan
+        ? {
+            verdict: scan.verdict,
+            scanner: scan.scanner,
+            findingCodes: scan.findings.map(finding => finding.code),
+            scannedAt: scan.scannedAt,
+          }
+        : null,
+      downloadUrl: isDownloadable(status) ? `/api/assets/private/${row.asset_id}` : null,
+    }
+  })
+}
+
+/**
+ * TASK-1718 — reader documental exacto por `applicationId`.
+ *
+ * El vínculo se resuelve desde la aplicación y los assets se filtran por su
+ * owner exacto. No existe fallback por persona o facet.
+ */
+export const resolveHiringApplicationDocuments = async ({
+  applicationId,
+}: {
+  applicationId: string
+}): Promise<HiringApplicationDocuments> => {
+  const application = await getHiringApplicationById(applicationId)
+
+  if (!application) throw new HiringNotFoundError('La postulación no existe.')
+
+  const facet = await getCandidateFacetById(application.candidateFacetId)
+
+  if (!facet) throw new HiringNotFoundError('La ficha de candidato no existe para la postulación.')
+
+  const rows = await runGreenhousePostgresQuery<AssetRow>(APPLICATION_ASSETS_SQL, [
+    APPLICATION_CV_CONTEXTS,
+    application.applicationId,
+    application.candidateFacetId,
+  ])
+
+  const files = await mapAssetRows(rows)
+
+  return {
+    applicationId: application.applicationId,
+    candidateFacetId: application.candidateFacetId,
+    files,
+    links: buildLinks(facet),
+    quarantinedCount: files.filter(file => file.status === 'quarantined').length,
+  }
 }
 
 /**
@@ -143,33 +234,7 @@ export const resolveCandidateDocuments = async ({
     facet.candidateFacetId,
   ])
 
-  const scans = await getLatestScanResultsForAssets(rows.map(row => row.asset_id))
-
-  const files: CandidateDocumentFile[] = rows.map(row => {
-    const scan = scans.get(row.asset_id)
-    const status = resolveStatus(row.status, scan?.verdict)
-
-    return {
-      assetId: row.asset_id,
-      publicId: row.public_id,
-      kind: KIND_BY_CONTEXT[row.owner_aggregate_type] ?? 'cv',
-      fileName: row.filename,
-      mimeType: row.mime_type,
-      sizeBytes: toNumber(row.size_bytes),
-      applicationId: row.owner_aggregate_id ?? readString(row.metadata_json, 'applicationId'),
-      uploadedAt: row.uploaded_at,
-      status,
-      scan: scan
-        ? {
-            verdict: scan.verdict,
-            scanner: scan.scanner,
-            findingCodes: scan.findings.map(finding => finding.code),
-            scannedAt: scan.scannedAt,
-          }
-        : null,
-      downloadUrl: isDownloadable(status) ? `/api/assets/private/${row.asset_id}` : null,
-    }
-  })
+  const files = await mapAssetRows(rows)
 
   const identityDocuments = await listIdentityDocumentsForProfileMasked(facet.identityProfileId)
 

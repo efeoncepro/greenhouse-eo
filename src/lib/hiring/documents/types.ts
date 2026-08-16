@@ -62,3 +62,12 @@ export type CandidateDocuments = {
   identityDocuments: CandidateIdentityDocument[]
   quarantinedCount: number
 }
+
+/** Paquete documental acotado a una postulación; nunca agrega CVs de otra aplicación ni identidad legal. */
+export type HiringApplicationDocuments = {
+  applicationId: string
+  candidateFacetId: string
+  files: CandidateDocumentFile[]
+  links: CandidateDocumentLink[]
+  quarantinedCount: number
+}

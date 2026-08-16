@@ -40,7 +40,7 @@ const profile = {
   access: {
     discoverable: false,
     contactable: false,
-    allowedActions: ['read'],
+    allowedActions: ['read', 'grant_future_consent', 'withdraw'],
     reasonCodes: ['future_consent_required']
   },
   receipts: []
@@ -108,7 +108,11 @@ describe('/api/public/hiring/talent-profile/[token]', () => {
   })
 
   it('withdraws first and revokes every active private link for that membership', async () => {
-    mockWithdrawConsent.mockResolvedValue({ receiptId: 'EO-TLPR-WITHDRAWN', idempotent: false })
+    mockWithdrawConsent.mockResolvedValue({
+      receiptId: 'EO-TLPR-WITHDRAWN',
+      idempotent: false,
+      lifecycleStatus: 'withdrawn'
+    })
 
     const response = await POST(
       new Request(`https://greenhouse.local/${token}`, {
@@ -124,6 +128,51 @@ describe('/api/public/hiring/talent-profile/[token]', () => {
     expect(body.profile.lifecycleStatus).toBe('withdrawn')
     expect(mockWithdrawConsent).toHaveBeenCalledOnce()
     expect(mockRevokeTokens).toHaveBeenCalledWith('membership-private-1')
+  })
+
+  it('preserves an active process and its token when future contact is withdrawn', async () => {
+    const activeProfile = { ...profile, lifecycleStatus: 'active_process' }
+
+    mockResolve
+      .mockResolvedValueOnce({ membershipId: 'membership-private-1', profile: activeProfile })
+      .mockResolvedValueOnce({ membershipId: 'membership-private-1', profile: activeProfile })
+    mockWithdrawConsent.mockResolvedValue({
+      receiptId: 'EO-TLPR-ACTIVE',
+      idempotent: false,
+      lifecycleStatus: 'active_process'
+    })
+
+    const response = await POST(
+      new Request(`https://greenhouse.local/${token}`, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'withdraw', idempotencyKey: 'withdraw_active_12345678' })
+      }),
+      params
+    )
+
+    const body = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(body.profile.lifecycleStatus).toBe('active_process')
+    expect(mockRevokeTokens).not.toHaveBeenCalled()
+  })
+
+  it('does not let a paused read-only profile reactivate itself through confirm', async () => {
+    mockResolve.mockResolvedValue({
+      membershipId: 'membership-private-1',
+      profile: { ...profile, lifecycleStatus: 'paused', access: { ...profile.access, allowedActions: ['read'] } }
+    })
+
+    const response = await POST(
+      new Request(`https://greenhouse.local/${token}`, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'confirm', idempotencyKey: 'confirm_paused_12345678' })
+      }),
+      params
+    )
+
+    expect(response.status).toBe(409)
+    expect(mockRecordConsent).not.toHaveBeenCalled()
   })
 
   it('rate-limits before resolving a token', async () => {

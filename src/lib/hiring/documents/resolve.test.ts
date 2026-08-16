@@ -2,17 +2,23 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const getCandidateFacetById = vi.fn()
 const getCandidateFacetByProfile = vi.fn()
+const getHiringApplicationById = vi.fn()
 const listHiringApplications = vi.fn()
 const runGreenhousePostgresQuery = vi.fn()
 const getLatestScanResultsForAssets = vi.fn()
 const listIdentityDocumentsForProfileMasked = vi.fn()
 
-vi.mock('../store', () => ({ getCandidateFacetById, getCandidateFacetByProfile, listHiringApplications }))
+vi.mock('../store', () => ({
+  getCandidateFacetById,
+  getCandidateFacetByProfile,
+  getHiringApplicationById,
+  listHiringApplications,
+}))
 vi.mock('@/lib/postgres/client', () => ({ runGreenhousePostgresQuery }))
 vi.mock('@/lib/storage/asset-scan/store', () => ({ getLatestScanResultsForAssets }))
 vi.mock('@/lib/person-legal-profile', () => ({ listIdentityDocumentsForProfileMasked }))
 
-const { resolveCandidateDocuments } = await import('./resolve')
+const { resolveCandidateDocuments, resolveHiringApplicationDocuments } = await import('./resolve')
 
 const FACET_ID = 'cndf-1'
 const PROFILE_ID = 'identity-1'
@@ -42,10 +48,49 @@ beforeEach(() => {
   vi.clearAllMocks()
   getCandidateFacetById.mockResolvedValue(facet)
   getCandidateFacetByProfile.mockResolvedValue(facet)
+  getHiringApplicationById.mockResolvedValue({
+    applicationId: 'happ-1',
+    candidateFacetId: FACET_ID,
+  })
   listHiringApplications.mockResolvedValue([{ applicationId: 'happ-1' }])
   runGreenhousePostgresQuery.mockResolvedValue([])
   getLatestScanResultsForAssets.mockResolvedValue(new Map())
   listIdentityDocumentsForProfileMasked.mockResolvedValue([])
+})
+
+describe('resolveHiringApplicationDocuments', () => {
+  it('filtra los assets por la postulación exacta y no lista otras aplicaciones de la persona', async () => {
+    await resolveHiringApplicationDocuments({ applicationId: 'happ-1' })
+
+    expect(getHiringApplicationById).toHaveBeenCalledWith('happ-1')
+    expect(listHiringApplications).not.toHaveBeenCalled()
+    const [, values] = runGreenhousePostgresQuery.mock.calls[0]
+
+    expect(values).toEqual([
+      ['hiring_application_cv', 'hiring_application_cv_draft'],
+      'happ-1',
+      FACET_ID,
+    ])
+  })
+
+  it('no devuelve identidad legal ni CVs de otra postulación', async () => {
+    runGreenhousePostgresQuery.mockResolvedValue([assetRow()])
+
+    const result = await resolveHiringApplicationDocuments({ applicationId: 'happ-1' })
+
+    expect(result.files).toHaveLength(1)
+    expect(result.files[0]?.applicationId).toBe('happ-1')
+    expect(result).not.toHaveProperty('identityDocuments')
+    expect(listIdentityDocumentsForProfileMasked).not.toHaveBeenCalled()
+  })
+
+  it('falla cuando la postulación no existe', async () => {
+    getHiringApplicationById.mockResolvedValue(null)
+
+    await expect(resolveHiringApplicationDocuments({ applicationId: 'happ-missing' })).rejects.toThrow(
+      /postulación no existe/,
+    )
+  })
 })
 
 describe('resolveCandidateDocuments', () => {

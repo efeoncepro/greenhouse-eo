@@ -1,6 +1,11 @@
 import 'server-only'
 
-import type { CandidateDocumentKind, CandidateDocumentLinkKind, CandidateDocuments } from './types'
+import type {
+  CandidateDocumentKind,
+  CandidateDocumentLinkKind,
+  CandidateDocuments,
+  HiringApplicationDocuments,
+} from './types'
 
 /**
  * `missing` NO viene del reader: es la ausencia, elevada a estado de primera clase.
@@ -44,6 +49,14 @@ export type CandidateDocumentsViewModel = {
   files: CandidateDocumentFileRow[]
   links: CandidateDocumentLinkRow[]
   identityDocuments: CandidateIdentityRow[]
+  quarantinedCount: number
+}
+
+export type HiringApplicationDocumentsViewModel = {
+  applicationId: string
+  candidateFacetId: string
+  files: CandidateDocumentFileRow[]
+  links: CandidateDocumentLinkRow[]
   quarantinedCount: number
 }
 
@@ -135,6 +148,22 @@ export const buildCandidateDocumentsViewModel = (documents: CandidateDocuments):
       displayMask: document.displayMask,
       verificationStatus: document.verificationStatus,
     })),
+    quarantinedCount: documents.quarantinedCount,
+  }
+}
+
+export const buildHiringApplicationDocumentsViewModel = (
+  documents: HiringApplicationDocuments,
+): HiringApplicationDocumentsViewModel => {
+  const rows = documents.files.map(toRow).sort((left, right) => toEpoch(right.uploadedAt) - toEpoch(left.uploadedAt))
+
+  if (!rows.length) rows.push(missingRow('cv'))
+
+  return {
+    applicationId: documents.applicationId,
+    candidateFacetId: documents.candidateFacetId,
+    files: rows,
+    links: documents.links.map(link => ({ kind: link.kind, url: link.url })),
     quarantinedCount: documents.quarantinedCount,
   }
 }

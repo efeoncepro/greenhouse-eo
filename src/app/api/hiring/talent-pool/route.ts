@@ -35,6 +35,7 @@ export async function GET(request: Request) {
       countryCode: query.get('country') ?? undefined,
       availability: query.get('availability') ?? undefined,
       cursor: query.get('cursor') ?? undefined,
+      cursorBinding: tenant.userId,
       limit: Number.isFinite(limit) ? limit : undefined
     })
 

@@ -98,6 +98,7 @@ import { seoRankHistoryBqSyncProjection } from './seo-rank-history-bq-sync'
 import { seoSiteAuditHistoryBqSyncProjection } from './seo-site-audit-history-bq-sync'
 import { seoBacklinkHistoryBqSyncProjection } from './seo-backlink-history-bq-sync'
 import { growthAiVisibilityReportEmailProjection } from './growth-ai-visibility-report-email'
+import { hiringCandidateReviewProjection } from './hiring-candidate-review'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -197,6 +198,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(hiringStageChangedEmailProjection) // TASK-1689 — hiring.application.stage_changed → avance de etapa candidate-facing (allowlist)
   registerProjection(hiringApplicationDecidedEmailProjection) // TASK-1689 — hiring.application.decided → selected/rejected (rejected pausable via email_type_config)
   registerProjection(talentPoolVerificationEmailProjection) // TASK-1724 — consentimiento futuro solicitado → email de verificación/token self-service
+  registerProjection(hiringCandidateReviewProjection) // TASK-1718 — clean CV asset → minimized/redacted exact-application review packet projection
   registerProjection(growthHiringApplicationFromSubmissionProjection) // TASK-1372 — growth.forms.submission_accepted (application forms) → ATS application + scanned private CV asset; sin destination interno; drenado por ops-reactive-growth
   registerProjection(growthAeoDiagnosticGraderRunProjection) // TASK-1321 — growth.forms.submission_accepted (/aeo-2/ efeonce-aeo-diagnostic) → remap + brand-intelligence category + cost-cap → enqueue grader run + materialize lead (kill-switch GROWTH_AEO_FORM_GRADER_INTAKE_ENABLED default-ON); drenado por ops-reactive-growth
   registerProjection(growthAiVisibilityLeadHandoffProjection) // TASK-1242 — growth.ai_visibility.lead_handoff_requested → upsert contact/company en HubSpot (in-app directo, idempotente, consent+score gated); drenado por ops-reactive-growth

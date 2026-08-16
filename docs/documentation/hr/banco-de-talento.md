@@ -15,8 +15,8 @@ evaluaciones y documentos continúan en sus fuentes canónicas.
 - `withdrawn`: consentimiento retirado; el perfil deja de servirse y su proyección buscable se invalida.
 - `expired`: venció el propósito o la retención aplicable.
 
-`descubrible` y `contactable` son decisiones distintas. La cohorte histórica de 52 personas se incorporó en
-development como 50 `active_process` y 2 `needs_reconsent`; ninguna fue convertida en opt-in futuro.
+`descubrible` y `contactable` son decisiones distintas. La cohorte de producción contiene 52 memberships: 50
+`active_process` y 2 `needs_reconsent`; ninguna fue convertida en opt-in futuro.
 
 ## Qué busca
 
@@ -43,7 +43,8 @@ retirarse. No crea una cuenta nueva ni muestra notas, evaluaciones internas u ot
 
 `/agency/hiring/talent-pool` vive dentro de Hiring Desk. Permite buscar por texto/evidencia estructurada, capability,
 seniority, idioma, país autodeclarado y disponibilidad; muestra reason codes, coverage, freshness y una ficha lateral
-person-first. Los documentos se revisan mediante el Application 360 exacto, no se copian al Banco de Talento.
+person-first. Cada postulación expone su CV directamente en el sidecar con el visor privado canónico; el reader es
+exacto por `applicationId` y no mezcla documentos de otras postulaciones de la misma persona.
 
 Una invitación se propone y después se confirma contra una opening. El servidor vuelve a validar consentimiento,
 contactabilidad, duplicate/conflict e idempotencia antes de crear o reutilizar la application.
@@ -52,13 +53,18 @@ contactabilidad, duplicate/conflict e idempotencia antes de crear o reutilizar l
 
 `hiring.talent_pool.search` y `hiring.talent_pool.profile.get` son readers internos delegados sobre el mismo App API.
 Un host MCP compatible no recibe acceso por ser Codex o Claude: necesita una persona interna autenticada, grant
-revocable, capability, propósito fijo y provider habilitado. En el estado actual están code-ready pero OFF hasta
-deploy y canaries reales; no deben anunciarse como capacidad productiva.
+revocable, capability, propósito fijo y provider habilitado. Los dos readers están activos en producción interna;
+el canary real comprobó search/profile `200` y un cliente base-only comprobó `403` sin el scope Hiring.
+
+La revisión agent-safe del CV usa otras dos tools, independientes y apagadas hasta su rollout:
+`hiring.applications.review.list` y `hiring.application.review_packet.get`. Devuelven texto minimizado por chunks,
+marcado como contenido no confiable, y nunca contacto, identidad, respuestas del test o notas libres.
 
 ## Privacidad y límites
 
 El consentimiento de una postulación actual cubre ese proceso; no se reutiliza silenciosamente para contacto futuro.
 El opt-in `future_opportunities`, su copy, TTL y retención requieren aprobación Legal/Privacy antes del rollout
-externo. El diseño técnico no sustituye asesoría legal calificada.
+externo. Por eso el self-service y la invitación permanecen apagados en producción. El diseño técnico no sustituye
+asesoría legal calificada.
 
 Canon: `docs/architecture/GREENHOUSE_TALENT_POOL_FULL_API_PARITY_DECISION_V1.md`.

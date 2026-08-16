@@ -33,15 +33,17 @@ describe('reconcileTalentPoolProjection privacy boundary', () => {
     mocks.publish.mockResolvedValue(undefined)
   })
 
-  it('keeps active applications separate from future consent and purges non-discoverable evidence', async () => {
+  it('keeps active applications separate from future consent and rebuilds discoverable evidence exactly', async () => {
     const result = await reconcileTalentPoolProjection({ apply: true, actorUserId: 'privacy-test' })
     const statements = mocks.query.mock.calls.map(call => String(call[0]))
 
     expect(statements.some(sql => sql.includes("purpose='future_opportunities'"))).toBe(true)
     expect(statements.some(sql => sql.includes("stage NOT IN ('rejected','withdrawn','closed')"))).toBe(true)
     expect(
-      statements.some(sql =>
-        sql.includes("lifecycle_status NOT IN ('active_process','pool_eligible','paused')")
+      statements.some(
+        sql =>
+          sql.includes('DELETE FROM greenhouse_hiring.talent_pool_evidence_projection') &&
+          sql.includes('WHERE e.membership_id=m.membership_id')
       )
     ).toBe(true)
     expect(

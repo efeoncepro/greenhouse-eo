@@ -177,8 +177,9 @@ export const TalentPoolSelfServiceClient = ({
     value ? formatDate(value, { dateStyle: 'long', timeZone: 'UTC' }, locale) : t.noExpiry
 
   const latestReceipt = receipt
-  const active = profile?.lifecycleStatus === 'pool_eligible'
-  const canWithdraw = active || profile?.lifecycleStatus === 'paused'
+  const canUpdateAvailability = profile?.access.allowedActions.includes('update_availability') ?? false
+  const canConfirm = profile?.access.allowedActions.includes('grant_future_consent') ?? false
+  const canWithdraw = profile?.access.allowedActions.includes('withdraw') ?? false
   const status = profile ? statusPresentation(profile, copy) : null
 
   return (
@@ -312,7 +313,7 @@ export const TalentPoolSelfServiceClient = ({
               <Divider />
 
               <Box sx={{ p: { xs: 4, md: 7 } }}>
-                <FormControl component='fieldset' fullWidth disabled={!active || pending !== null}>
+                <FormControl component='fieldset' fullWidth disabled={!canUpdateAvailability || pending !== null}>
                   <FormLabel component='legend'>
                     <Typography component='span' variant='h5'>
                       {t.availabilityTitle}
@@ -359,7 +360,7 @@ export const TalentPoolSelfServiceClient = ({
                   </Alert>
                 ) : null}
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }}>
-                  {active ? (
+                  {canUpdateAvailability ? (
                     <GreenhouseButton
                       kind='primaryAction'
                       size='large'
@@ -369,7 +370,7 @@ export const TalentPoolSelfServiceClient = ({
                     >
                       {pending === 'availability' ? t.updating : t.update}
                     </GreenhouseButton>
-                  ) : profile.lifecycleStatus !== 'withdrawn' ? (
+                  ) : canConfirm ? (
                     <GreenhouseButton
                       kind='primaryAction'
                       size='large'

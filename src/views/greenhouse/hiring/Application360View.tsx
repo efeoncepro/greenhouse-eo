@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 
 import NextLink from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
@@ -59,6 +60,7 @@ import CandidateDocumentsPanel from './CandidateDocumentsPanel'
 import { hiringRequest } from './hiring-client'
 
 type TabKey = 'overview' | 'assessment' | 'documents' | 'decision' | 'activity'
+const TAB_KEYS: TabKey[] = ['overview', 'assessment', 'documents', 'decision', 'activity']
 
 const TAB_ICONS: Record<TabKey, string> = {
   overview: 'tabler-layout-dashboard',
@@ -340,9 +342,12 @@ const Application360View = ({
   templates,
   initialHandoff,
 }: Application360ViewProps) => {
+  const searchParams = useSearchParams()
+  const requestedTab = searchParams.get('tab')
+  const initialTab: TabKey = TAB_KEYS.includes(requestedTab as TabKey) ? (requestedTab as TabKey) : 'overview'
   const [item, setItem] = useState(initialItem)
   const [handoff, setHandoff] = useState(initialHandoff)
-  const [tab, setTab] = useState<TabKey>('overview')
+  const [tab, setTab] = useState<TabKey>(initialTab)
   const [assessments, setAssessments] = useState(initialAssessments)
   const [assignOpen, setAssignOpen] = useState(false)
   const [templateId, setTemplateId] = useState(templates[0]?.templateId ?? '')

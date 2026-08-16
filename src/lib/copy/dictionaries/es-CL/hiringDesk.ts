@@ -310,7 +310,7 @@ export const hiringDesk: HiringDeskCopy = {
     activeFilters: '{count} filtros activos',
     all: 'Todos',
     clearFilters: 'Limpiar filtros',
-    results: '{count} perfiles encontrados',
+    results: '{count} perfiles mostrados',
     updated: 'Actualizado {date}',
     loadMore: 'Cargar más',
     loading: 'Buscando talento…',
