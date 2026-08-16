@@ -602,7 +602,11 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       'hiring.opening.publish',
       'hiring.application.decide',
       'hiring.assessment.score',
-      'hiring.handoff.approve'
+      'hiring.handoff.approve',
+      // TASK-1735 — anotar el Expediente de Evaluación (notas append-only + propose/confirm
+      // del dossier agéntico). Mismo tier que decide/score: quien gobierna la evaluación
+      // gobierna su narrativa. Role-only a propósito (sin routeGroup internal).
+      'hiring.application.annotate'
     ] as const) {
       addEntitlement(entries, { module: 'hiring', capability, action: 'execute', scope: 'tenant', source: 'role' })
     }

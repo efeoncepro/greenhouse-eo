@@ -7770,6 +7770,17 @@ export interface GreenhouseHiringHiringApplicationIntakeEvents {
   outcome: string;
 }
 
+export interface GreenhouseHiringHiringApplicationNote {
+  application_id: string;
+  author_user_id: string;
+  body_md: string;
+  context_json: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  kind: string;
+  note_id: Generated<string>;
+  source: Generated<string>;
+}
+
 export interface GreenhouseHiringHiringAssessment {
   access_token_hash: string | null;
   accommodations_json: Generated<Json>;
@@ -12459,6 +12470,7 @@ export interface DB {
   "greenhouse_hiring.candidate_review_access_audit": GreenhouseHiringCandidateReviewAccessAudit;
   "greenhouse_hiring.hiring_application": GreenhouseHiringHiringApplication;
   "greenhouse_hiring.hiring_application_intake_events": GreenhouseHiringHiringApplicationIntakeEvents;
+  "greenhouse_hiring.hiring_application_note": GreenhouseHiringHiringApplicationNote;
   "greenhouse_hiring.hiring_assessment": GreenhouseHiringHiringAssessment;
   "greenhouse_hiring.hiring_assessment_ai_proposal": GreenhouseHiringHiringAssessmentAiProposal;
   "greenhouse_hiring.hiring_assessment_response": GreenhouseHiringHiringAssessmentResponse;
