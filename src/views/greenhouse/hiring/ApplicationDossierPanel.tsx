@@ -92,6 +92,25 @@ export interface ApplicationDossierPanelProps {
 
 const NOTE_COLLAPSE_THRESHOLD = 600
 
+/**
+ * Medida de lectura del borrador. El expediente es un DOCUMENTO DE DECISIÓN, no una
+ * grilla: la columna se corta para no pasar el rango legible aunque el canvas crezca.
+ * 64ch resueltos a 16px dejan el lead en ~60 caracteres, la afirmación (14px) en ~70 y la
+ * evidencia (13px) en ~75 — los tres dentro del rango cómodo. Se aplica a nivel de
+ * `<section>` para que la regla del encabezado y el texto compartan el mismo ancho.
+ */
+const READING_MEASURE = '64ch'
+
+/** Patrón visually-hidden del repo (live region + headings de estructura). */
+const VISUALLY_HIDDEN_SX = {
+  position: 'absolute',
+  inlineSize: 1,
+  blockSize: 1,
+  overflow: 'hidden',
+  clip: 'rect(0 0 0 0)',
+  whiteSpace: 'nowrap'
+} as const
+
 const formatCopy = (template: string, values: Record<string, string | number>) =>
   Object.entries(values).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, String(value)), template)
 
@@ -210,12 +229,25 @@ const renderTextWithScoreChips = (text: string): ReactNode => {
     nodes.push(
       <GreenhouseChip
         key={`score-${numberStart}`}
+        // `span`, no el `div` por defecto de Chip: el chip vive DENTRO del párrafo de la
+        // evidencia y un `<div>` anidado en `<p>` es HTML inválido — el navegador cerraba
+        // el párrafo y React lo reportaba como error de hidratación.
+        component='span'
         size='small'
         kind='metric'
         variant='label'
         tone={scoreTone(value)}
         label={numberText}
-        sx={{ mx: 0.5, verticalAlign: 'baseline' }}
+        // Anotación EN LÍNEA, no chip de fila: 20px cabe dentro del line-box de 13px/1.45
+        // (≈19px) con `middle`, así el número no infla el interlineado ni abre huecos en
+        // la cita. Margen asimétrico para que la puntuación siguiente quede pegada al dato.
+        sx={{
+          ms: 0.5,
+          me: 0.25,
+          blockSize: 20,
+          verticalAlign: 'middle',
+          '& .MuiChip-label': { px: 1.25 }
+        }}
       />
     )
     cursor = numberStart + numberText.length
@@ -228,12 +260,45 @@ const renderTextWithScoreChips = (text: string): ReactNode => {
   return nodes
 }
 
-const DossierSectionLabel = ({ icon, iconColor, title }: { icon: string; iconColor: string; title: string }) => (
-  <Stack direction='row' spacing={1.5} alignItems='center'>
-    <Box component='i' aria-hidden='true' className={icon} sx={{ color: iconColor, fontSize: 18 }} />
-    <Typography variant='overline' component='h6' color='text.secondary'>
+type DossierHeadingLevel = 'h3' | 'h4'
+
+/**
+ * Encabezado de sección como REGLA EDITORIAL: ícono tonal + label + conteo + filete que
+ * corre hasta el fin de la medida. Da límite visible a la sección SIN abrir otra tarjeta
+ * (el borrador ya vive dentro de un Paper; una caja más sería card-on-card).
+ *
+ * El conteo va como hermano del heading, no dentro: el nombre accesible del heading sigue
+ * siendo el título limpio, y el número queda anunciado como dato aparte.
+ */
+const DossierSectionLabel = ({
+  icon,
+  iconColor,
+  title,
+  count,
+  headingLevel = 'h4'
+}: {
+  icon: string
+  iconColor: string
+  title: string
+  count?: number
+  headingLevel?: DossierHeadingLevel
+}) => (
+  <Stack direction='row' spacing={1.5} alignItems='center' sx={{ mb: 2.5 }}>
+    <Box component='i' aria-hidden='true' className={icon} sx={{ color: iconColor, fontSize: 18, flexShrink: 0 }} />
+    <Typography variant='overline' component={headingLevel} color='text.secondary' sx={{ flexShrink: 0 }}>
       {title}
     </Typography>
+    {typeof count === 'number' ? (
+      <Typography
+        variant='overline'
+        component='span'
+        color='text.secondary'
+        sx={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums', opacity: 0.72 }}
+      >
+        {count}
+      </Typography>
+    ) : null}
+    <Box aria-hidden='true' sx={{ flex: 1, blockSize: '1px', minInlineSize: 16, bgcolor: 'divider' }} />
   </Stack>
 )
 
@@ -242,48 +307,63 @@ interface DossierClaim {
   evidencia: string
 }
 
-/** Coherencias/gaps: afirmación como texto principal + evidencia como bloque citado. */
+/**
+ * Coherencias/gaps: afirmación (la tesis) + evidencia como CITA tipográfica.
+ *
+ * La evidencia NO usa relleno gris. Once claims en una nota real producían once
+ * rectángulos grises idénticos dentro del Paper de la nota — card-on-card y muro
+ * monótono, además de texto secundario sobre fondo secundario. La cita se resuelve con
+ * filete tonal + sangría + bajada de tamaño, que es lo que separa tesis de respaldo en
+ * un documento: escalera 16 (lead) → 14/600 (afirmación) → 13/400 (evidencia).
+ *
+ * Ritmo: 12px afirmación↔su evidencia vs 32px entre claims (≈1:2,7). La proximidad —no
+ * una caja— es la que agrupa cada par.
+ */
 const DossierClaimList = ({
   title,
   icon,
   tone,
   claims,
-  expediente
+  expediente,
+  headingLevel
 }: {
   title: string
   icon: string
   tone: 'success' | 'warning'
   claims: DossierClaim[]
   expediente: ExpedienteCopy
+  headingLevel?: DossierHeadingLevel
 }) => {
   if (claims.length === 0) return null
 
   return (
-    <Box component='section'>
-      <DossierSectionLabel icon={icon} iconColor={`${tone}.main`} title={title} />
-      <Stack component='ul' role='list' spacing={3} sx={{ m: 0, mt: 2, p: 0, listStyle: 'none' }}>
+    <Box component='section' sx={{ minWidth: 0, maxWidth: READING_MEASURE }}>
+      <DossierSectionLabel
+        icon={icon}
+        iconColor={`${tone}.main`}
+        title={title}
+        count={claims.length}
+        headingLevel={headingLevel}
+      />
+      <Stack component='ul' role='list' spacing={4} sx={{ m: 0, p: 0, listStyle: 'none' }}>
         {claims.map(claim => (
           <Stack component='li' key={claim.afirmacion} spacing={1.5} sx={{ minWidth: 0 }}>
-            <Typography variant='body2' color='text.primary' sx={{ fontWeight: 500, overflowWrap: 'anywhere', maxWidth: '72ch' }}>
+            <Typography variant='body2' color='text.primary' sx={{ fontWeight: 600, overflowWrap: 'anywhere' }}>
               {claim.afirmacion}
             </Typography>
             <Box
-              sx={theme => ({
-                ps: 3,
-                pe: 3,
-                py: 2,
-                maxWidth: '72ch',
-                bgcolor: 'action.hover',
+              sx={{
+                ps: { xs: 2.5, sm: 3 },
+                py: 1,
+                minWidth: 0,
                 borderInlineStart: '2px solid',
-                borderColor: `${tone}.main`,
-                borderStartEndRadius: `${theme.shape.customBorderRadius.sm}px`,
-                borderEndEndRadius: `${theme.shape.customBorderRadius.sm}px`
-              })}
+                borderColor: `${tone}.main`
+              }}
             >
-              <Typography variant='overline' component='p' color='text.secondary' sx={{ display: 'block', mb: 0.5 }}>
+              <Typography variant='overline' component='p' color='text.secondary' sx={{ display: 'block', mb: 1.5 }}>
                 {expediente.evidenceTitle}
               </Typography>
-              <Typography variant='body2' color='text.secondary' sx={{ overflowWrap: 'anywhere' }}>
+              <Typography variant='caption' component='p' color='text.secondary' sx={{ overflowWrap: 'anywhere' }}>
                 {renderTextWithScoreChips(claim.evidencia)}
               </Typography>
             </Box>
@@ -295,13 +375,27 @@ const DossierClaimList = ({
 }
 
 /** Focos de entrevista: lista accionable con numeración visible. */
-const DossierFocusList = ({ title, items }: { title: string; items: string[] }) => {
+const DossierFocusList = ({
+  title,
+  items,
+  headingLevel
+}: {
+  title: string
+  items: string[]
+  headingLevel?: DossierHeadingLevel
+}) => {
   if (items.length === 0) return null
 
   return (
-    <Box component='section'>
-      <DossierSectionLabel icon='tabler-target-arrow' iconColor='primary.main' title={title} />
-      <Stack component='ol' role='list' spacing={2} sx={{ m: 0, mt: 2, p: 0, listStyle: 'none' }}>
+    <Box component='section' sx={{ minWidth: 0, maxWidth: READING_MEASURE }}>
+      <DossierSectionLabel
+        icon='tabler-target-arrow'
+        iconColor='primary.main'
+        title={title}
+        count={items.length}
+        headingLevel={headingLevel}
+      />
+      <Stack component='ol' role='list' spacing={2.5} sx={{ m: 0, p: 0, listStyle: 'none' }}>
         {items.map((item, index) => (
           <Stack component='li' key={item} direction='row' spacing={2} alignItems='flex-start' sx={{ minWidth: 0 }}>
             <Box
@@ -320,7 +414,7 @@ const DossierFocusList = ({ title, items }: { title: string; items: string[] }) 
                 {index + 1}
               </Typography>
             </Box>
-            <Typography variant='body2' sx={{ pt: 0.5, overflowWrap: 'anywhere', maxWidth: '72ch' }}>
+            <Typography variant='body2' sx={{ pt: 0.25, overflowWrap: 'anywhere' }}>
               {item}
             </Typography>
           </Stack>
@@ -338,6 +432,7 @@ const DossierUnverifiable = ({ items, expediente }: { items: string[]; expedient
     <Box
       component='details'
       sx={theme => ({
+        maxWidth: READING_MEASURE,
         border: '1px dashed',
         borderColor: 'divider',
         borderRadius: `${theme.shape.customBorderRadius.md}px`,
@@ -365,7 +460,7 @@ const DossierUnverifiable = ({ items, expediente }: { items: string[]; expedient
     >
       <Box component='summary'>
         <Box component='i' aria-hidden='true' className='tabler-eye-off' sx={{ color: 'text.secondary', fontSize: 18 }} />
-        <Typography variant='body2' color='text.secondary' sx={{ fontWeight: 500 }}>
+        <Typography variant='body2' color='text.secondary' sx={{ fontWeight: 600 }}>
           {formatCopy(expediente.unverifiableSummary, { count: items.length })}
         </Typography>
         <Box
@@ -375,9 +470,10 @@ const DossierUnverifiable = ({ items, expediente }: { items: string[]; expedient
           sx={{ color: 'text.secondary', fontSize: 18 }}
         />
       </Box>
-      <Stack component='ul' spacing={1} sx={{ m: 0, ps: 9, pe: 3, pb: 3, pt: 0 }}>
+      {/* Sangría alineada con el TEXTO del summary (24 padding + 18 ícono + 12 gap ≈ 56). */}
+      <Stack component='ul' spacing={1.25} sx={{ m: 0, ps: { xs: 3, sm: 7 }, pe: 3, pb: 3, pt: 0 }}>
         {items.map(item => (
-          <Typography key={item} component='li' variant='body2' color='text.secondary' sx={{ overflowWrap: 'anywhere', maxWidth: '72ch' }}>
+          <Typography key={item} component='li' variant='body2' color='text.secondary' sx={{ overflowWrap: 'anywhere' }}>
             {item}
           </Typography>
         ))}
@@ -386,13 +482,31 @@ const DossierUnverifiable = ({ items, expediente }: { items: string[]; expedient
   )
 }
 
-/** Composición completa del borrador estructurado (proposal vigente y nota confirmada sin editar). */
-const DossierStructuredContent = ({ draft, expediente }: { draft: EvaluationDossierDraft; expediente: ExpedienteCopy }) => (
-  <Stack spacing={5} sx={{ minWidth: 0 }}>
-    <Box component='section'>
-      <DossierSectionLabel icon='tabler-file-description' iconColor='text.secondary' title={expediente.sectionSummary} />
+/**
+ * Composición completa del borrador estructurado (proposal vigente y nota confirmada sin
+ * editar). `headingLevel` lo fija el host para no saltar niveles: en el panel de propuesta
+ * el título es `h3` y las secciones `h4`; en una nota del timeline el título accesible de
+ * la nota es `h3` y las secciones también bajan a `h4`.
+ */
+const DossierStructuredContent = ({
+  draft,
+  expediente,
+  headingLevel = 'h4'
+}: {
+  draft: EvaluationDossierDraft
+  expediente: ExpedienteCopy
+  headingLevel?: DossierHeadingLevel
+}) => (
+  <Stack spacing={6} sx={{ minWidth: 0 }}>
+    <Box component='section' sx={{ minWidth: 0, maxWidth: READING_MEASURE }}>
+      <DossierSectionLabel
+        icon='tabler-file-description'
+        iconColor='text.secondary'
+        title={expediente.sectionSummary}
+        headingLevel={headingLevel}
+      />
       {/* Lead destacado: body1 (16px) sobre el body2 del resto — jerarquía por tamaño, no por decoración. */}
-      <Typography variant='body1' color='text.primary' sx={{ mt: 2, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', maxWidth: '72ch' }}>
+      <Typography variant='body1' color='text.primary' sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
         {draft.resumenEjecutivo}
       </Typography>
     </Box>
@@ -402,9 +516,17 @@ const DossierStructuredContent = ({ draft, expediente }: { draft: EvaluationDoss
       tone='success'
       claims={draft.coherencias}
       expediente={expediente}
+      headingLevel={headingLevel}
     />
-    <DossierClaimList title={expediente.sectionGaps} icon='tabler-alert-triangle' tone='warning' claims={draft.gaps} expediente={expediente} />
-    <DossierFocusList title={expediente.sectionInterviewFocus} items={draft.focosEntrevista} />
+    <DossierClaimList
+      title={expediente.sectionGaps}
+      icon='tabler-alert-triangle'
+      tone='warning'
+      claims={draft.gaps}
+      expediente={expediente}
+      headingLevel={headingLevel}
+    />
+    <DossierFocusList title={expediente.sectionInterviewFocus} items={draft.focosEntrevista} headingLevel={headingLevel} />
     <DossierUnverifiable items={draft.noVerificable} expediente={expediente} />
   </Stack>
 )
@@ -709,6 +831,7 @@ const ApplicationDossierPanel = ({
     const expanded = expandedNotes[note.noteId] ?? false
     const collapsed = isLong && !expanded
     const bodyRegionId = `expediente-note-body-${note.noteId}`
+    const headingId = `expediente-note-heading-${note.noteId}`
     const author = authorName(note.authorUserId)
     const noteDate = formatDateTime(note.createdAt, { dateStyle: 'medium', timeStyle: 'short' }, 'es-CL')
     const model = typeof note.contextJson.model === 'string' ? note.contextJson.model : null
@@ -716,15 +839,25 @@ const ApplicationDossierPanel = ({
 
     return (
       <Paper
+        component='article'
         variant='outlined'
-        aria-label={formatCopy(expediente.noteAriaLabel, {
-          kind: kindLabel(expediente, note.kind),
-          author,
-          date: noteDate
+        // El nombre accesible sale de un `h3` real (no de un aria-label suelto): así la nota
+        // entra en el árbol de encabezados y las secciones del borrador (`h4`) no saltan nivel.
+        aria-labelledby={headingId}
+        sx={theme => ({
+          p: { xs: 2.5, md: 3 },
+          minWidth: 0,
+          borderRadius: `${theme.shape.customBorderRadius.md}px`
         })}
-        sx={theme => ({ p: 3, minWidth: 0, borderRadius: `${theme.shape.customBorderRadius.md}px` })}
       >
-        <Stack spacing={2}>
+        <Typography id={headingId} component='h3' variant='caption' sx={VISUALLY_HIDDEN_SX}>
+          {formatCopy(expediente.noteAriaLabel, {
+            kind: kindLabel(expediente, note.kind),
+            author,
+            date: noteDate
+          })}
+        </Typography>
+        <Stack spacing={2.5}>
           <Stack spacing={1}>
             <Stack direction='row' spacing={1.25} useFlexGap flexWrap='wrap' alignItems='center'>
               <GreenhouseChip
@@ -750,7 +883,16 @@ const ApplicationDossierPanel = ({
             </Typography>
           </Stack>
 
-          <Box id={bodyRegionId}>
+          <Box
+            id={bodyRegionId}
+            sx={
+              structuredDraft
+                ? // Un borrador confirmado es un documento: filete de cabecera que separa la
+                  // identificación de la nota del cuerpo. Una nota corriente no lo necesita.
+                  { borderBlockStart: '1px solid', borderColor: 'divider', pt: 3 }
+                : undefined
+            }
+          >
             {structuredDraft ? (
               <DossierStructuredContent draft={structuredDraft} expediente={expediente} />
             ) : collapsed ? (
@@ -775,7 +917,11 @@ const ApplicationDossierPanel = ({
           ) : null}
 
           {isAgent && model ? (
-            <Typography variant='caption' color='text.secondary'>
+            <Typography
+              variant='caption'
+              color='text.secondary'
+              sx={{ borderBlockStart: '1px solid', borderColor: 'divider', pt: 2 }}
+            >
               <i aria-hidden='true' className='tabler-info-circle' style={{ verticalAlign: 'text-bottom' }} />{' '}
               {formatCopy(expediente.agentProvenance, { model, name: author, digest: digest ?? '—' })}
             </Typography>
@@ -791,14 +937,17 @@ const ApplicationDossierPanel = ({
     <Paper
       variant='outlined'
       data-capture='hiring-expediente-proposal'
+      /* Estado "pendiente de tu decisión" en TODO el perímetro, no como riel de color: el
+         borrador ya usa filetes tonales para citar evidencia y otro riel competiría con
+         ellos. El perímetro marca la superficie que reclama acción. */
       sx={theme => ({
         p: { xs: 3, md: 4 },
         minWidth: 0,
         borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-        borderInlineStart: `3px solid ${theme.palette.primary.main}`
+        borderColor: 'primary.main'
       })}
     >
-      <Stack spacing={3}>
+      <Stack spacing={4}>
         <Stack spacing={1}>
           <Stack direction='row' spacing={1.25} useFlexGap flexWrap='wrap' alignItems='center'>
             <GreenhouseChip
@@ -809,7 +958,9 @@ const ApplicationDossierPanel = ({
               iconClassName='tabler-sparkles'
               label={expediente.agentBadge.split(' · ')[0] ?? 'IA'}
             />
-            <Typography fontWeight={700}>{expediente.proposalTitle}</Typography>
+            <Typography variant='h5' component='h3'>
+              {expediente.proposalTitle}
+            </Typography>
           </Stack>
           <Typography variant='caption' color='text.secondary'>
             {formatCopy(expediente.proposalProvenance, {
@@ -843,10 +994,19 @@ const ApplicationDossierPanel = ({
             <Typography variant='caption' color='text.secondary'>{expediente.editCaption}</Typography>
           </Stack>
         ) : (
-          <DossierStructuredContent draft={draft} expediente={expediente} />
+          <Box sx={{ borderBlockStart: '1px solid', borderColor: 'divider', pt: 4 }}>
+            <DossierStructuredContent draft={draft} expediente={expediente} />
+          </Box>
         )}
 
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent='flex-end'>
+        {/* Barra de decisión: separada del documento por un filete — la acción no flota
+            sobre el contenido, cierra la superficie. */}
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={2}
+          justifyContent='flex-end'
+          sx={{ borderBlockStart: '1px solid', borderColor: 'divider', pt: 3 }}
+        >
           {editing ? (
             <Button
               disabled={deciding !== null}
@@ -1007,7 +1167,8 @@ const ApplicationDossierPanel = ({
             component='li'
             key={entry.type === 'note' ? entry.note.noteId : entry.id}
             direction='row'
-            spacing={3}
+            /* A 390px el riel a 24px le comía medida a la cita; 16px basta para leer el hilo. */
+            spacing={{ xs: 2, sm: 3 }}
             sx={{ minWidth: 0 }}
           >
             <Stack alignItems='center' aria-hidden='true' sx={{ pt: entry.type === 'note' ? 3 : 1 }}>
@@ -1040,7 +1201,7 @@ const ApplicationDossierPanel = ({
   return (
     <Stack spacing={4} data-capture='hiring-expediente-tab' sx={{ minWidth: 0 }}>
       {/* Anuncios accesibles del carril propose/confirm (aria-live). */}
-      <Box role='status' aria-live='polite' sx={{ position: 'absolute', inlineSize: 1, blockSize: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' }}>
+      <Box role='status' aria-live='polite' sx={VISUALLY_HIDDEN_SX}>
         {statusMessage}
       </Box>
 

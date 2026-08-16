@@ -12,7 +12,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { cleanup, screen, waitFor } from '@testing-library/react'
+import { cleanup, screen, waitFor, within } from '@testing-library/react'
 
 import { renderWithTheme } from '@/test/render'
 import { hiringDesk } from '@/lib/copy/dictionaries/es-CL/hiringDesk'
@@ -137,19 +137,31 @@ describe('ApplicationDossierPanel — render estructurado del borrador (TASK-173
       expect(screen.getByText(draftFixture.resumenEjecutivo)).toBeTruthy()
     })
 
-    expect(screen.getByRole('heading', { name: expediente.sectionSummary })).toBeTruthy()
-    expect(screen.getByRole('heading', { name: expediente.sectionCoherences })).toBeTruthy()
-    expect(screen.getByRole('heading', { name: expediente.sectionGaps })).toBeTruthy()
-    expect(screen.getByRole('heading', { name: expediente.sectionInterviewFocus })).toBeTruthy()
+    // El título del panel es `h3` y las secciones bajan a `h4`: el árbol de encabezados no
+    // salta niveles (el tab ya aporta el `h2`).
+    expect(screen.getByRole('heading', { level: 3, name: expediente.proposalTitle })).toBeTruthy()
+    expect(screen.getByRole('heading', { level: 4, name: expediente.sectionSummary })).toBeTruthy()
+    expect(screen.getByRole('heading', { level: 4, name: expediente.sectionCoherences })).toBeTruthy()
+    expect(screen.getByRole('heading', { level: 4, name: expediente.sectionGaps })).toBeTruthy()
+    expect(screen.getByRole('heading', { level: 4, name: expediente.sectionInterviewFocus })).toBeTruthy()
 
     // Claims: afirmación como texto principal + bloque de evidencia etiquetado.
     expect(screen.getByText('Domina Coordinación de delivery')).toBeTruthy()
     expect(screen.getAllByText(expediente.evidenceTitle).length).toBe(2)
 
-    // Focos como lista accionable numerada (1 y 2 visibles).
+    // Focos como lista accionable numerada (1 y 2 visibles). La numeración se consulta
+    // DENTRO de su propia lista: los encabezados de sección también rinden un conteo, así
+    // que un `getByText('1')` global sería ambiguo por diseño.
     expect(screen.getByText('Profundizar en gestión de proveedores')).toBeTruthy()
-    expect(screen.getByText('1')).toBeTruthy()
-    expect(screen.getByText('2')).toBeTruthy()
+
+    const focusList = screen
+      .getByRole('heading', { name: expediente.sectionInterviewFocus })
+      .closest('section')
+      ?.querySelector('ol')
+
+    expect(focusList).toBeTruthy()
+    expect(within(focusList as HTMLElement).getByText('1')).toBeTruthy()
+    expect(within(focusList as HTMLElement).getByText('2')).toBeTruthy()
 
     // No verificable como disclosure colapsable con conteo.
     expect(screen.getByText('No verificable con las fuentes (2)')).toBeTruthy()
