@@ -53,6 +53,9 @@ const ALLOWED_WRITE_TARGETS = new Set([
   'greenhouse_hiring.talent_pool_self_service_token',
   'greenhouse_hiring.talent_pool_public_rate_bucket',
   'greenhouse_hiring.talent_pool_access_audit',
+  // TASK-1718 — exact-application CV projection and append-only delegated access audit.
+  'greenhouse_hiring.candidate_document_review_projection',
+  'greenhouse_hiring.candidate_review_access_audit',
   // TASK-1365 — self-ID sensitive source + append-only audit, physically separate from decision.
   'greenhouse_hiring.hiring_demographic_selfid',
   'greenhouse_hiring.hiring_demographic_selfid_audit',
