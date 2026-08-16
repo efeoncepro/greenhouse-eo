@@ -26,7 +26,9 @@ autoservicio externos permanecen OFF hasta aprobación People + Legal/Privacy de
 
 El release `a369165dfb2d`/run `31941320983` quedó `success`; Vercel, el worker reconciler y su scheduler están live.
 Durante el canary se detectó que la policy OAuth persistía `revalidateAfterSeconds=0` aunque el parser exige mínimo
-`15`; una migración aditiva lo corrigió y agregó una prueba sobre el parser real antes de la promoción final.
+`15`; una migración aditiva lo corrigió y agregó una prueba sobre el parser real antes de la promoción final. La
+auditoría Talent posterior endureció además el rate guard público: IP ausente usa un bucket opaco compartido y una
+caída del store niega la solicitud, en vez de abrir ilimitadamente el autoservicio futuro.
 
 ## 2026-08-15 — People queda avisado cuando un candidato termina su test
 

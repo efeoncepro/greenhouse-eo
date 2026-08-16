@@ -46,6 +46,8 @@ TASK-1723: no guarda consentimiento en componentes ni crea una cuenta paralela d
 - La superficie está desplegada en producción pero responde `404 talent_pool_link_unavailable` mientras
   `HIRING_TALENT_POOL_SELF_SERVICE_ENABLED=false`; activación y smoke con persona real esperan sign-off People +
   Legal/Privacy. GVC 1440/390, teclado y reduced motion prueban la experiencia sin abrir el purpose externamente.
+- La auditoría Talent posterior al rollout cerró el último borde anti-abuse: si falta IP se usa un bucket opaco
+  compartido y si PostgreSQL no puede aplicar el rate limit la solicitud se niega, nunca queda ilimitada.
 
 ## Why This Task Exists
 

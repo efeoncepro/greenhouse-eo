@@ -22,6 +22,10 @@ persistida con revalidación `0` en vez del mínimo `15`. Projection/search/MCP 
 siguen OFF hasta aprobación People + Legal/Privacy de copy, policy, TTL y retención. Acceso externo/B2B y writes
 esperan TASK-1631.
 
+La auditoría `greenhouse-talent-people-operator` confirmó person-first, cero ranking/decisión adversa, DTO MCP sin
+contacto/CV, invitación mediante `HiringApplication` canónica y tests sólo por application. Detectó un fail-open
+latente en el rate guard público; quedó corregido para usar bucket compartido sin IP y negar cuando falla el store.
+
 ### Aviso interno al completar test — LIVE, primera entrega real pendiente (2026-08-15)
 
 Se extendió el pipeline reactivo de Hiring para que `hiring.assessment.submitted` envíe una sola
