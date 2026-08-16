@@ -1155,6 +1155,12 @@ export const EVENT_TYPES = {
   hiringAssessmentScored: 'hiring.assessment.scored',
   hiringCompetencyResultUpdated: 'hiring.competency_result.updated',
 
+  // TASK-1735 — Expediente de Evaluación; payloads IDs-only (noteId/applicationId/kind/actor),
+  // nunca el cuerpo de la nota ni PII. Sin consumers reactivos en V1 (audit/observabilidad).
+  hiringApplicationNoteRecorded: 'hiring.application.note_recorded',
+  hiringApplicationDossierProposed: 'hiring.application.dossier_proposed',
+  hiringApplicationDossierConfirmed: 'hiring.application.dossier_confirmed',
+
   // TASK-1723 — Talent Pool; payloads only contain opaque IDs/reason codes, never candidate PII.
   talentPoolMembershipCreated: 'hiring.talent_pool.membership_created',
   talentPoolConsentRecorded: 'hiring.talent_pool.consent_recorded',
