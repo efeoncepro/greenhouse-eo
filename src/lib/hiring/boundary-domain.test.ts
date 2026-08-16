@@ -56,6 +56,9 @@ const ALLOWED_WRITE_TARGETS = new Set([
   // TASK-1718 — exact-application CV projection and append-only delegated access audit.
   'greenhouse_hiring.candidate_document_review_projection',
   'greenhouse_hiring.candidate_review_access_audit',
+  // TASK-1735 — Expediente de Evaluación: notas append-only + ledger propose/confirm del dossier.
+  'greenhouse_hiring.hiring_application_note',
+  'greenhouse_hiring.hiring_application_dossier_proposal',
   // TASK-1365 — self-ID sensitive source + append-only audit, physically separate from decision.
   'greenhouse_hiring.hiring_demographic_selfid',
   'greenhouse_hiring.hiring_demographic_selfid_audit',
