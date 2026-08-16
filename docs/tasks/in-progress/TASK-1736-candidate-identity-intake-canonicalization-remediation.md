@@ -1,5 +1,17 @@
 # TASK-1736 — Candidate Identity Intake Canonicalization + Governed Remediation
 
+## Delta 2026-08-16
+
+- Slice 0 ejecutado — ADR **Proposed** en
+  `docs/architecture/GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1.md`
+  (modelo de 3 capas evidencia/display/search, policy de casing culturalmente segura, fix del sticky
+  name vía `reconcileCandidateIdentityDisplayName`, remediación histórica dry-run → allowlist → apply
+  CAS → rollback, field policy matrix §D5) + fila en `docs/architecture/DECISIONS_INDEX.md`.
+- Sign-offs Talent/Identity/Privacy/Security/Data **resueltos por autorización ejecutiva del CEO
+  2026-08-16** (misma figura que `TASK-1734`; ver ADR §D6): ninguna firma adicional bloquea; los gates
+  técnicos no se rebajan y las obligaciones regulatorias de privacidad siguen intactas como actividades.
+- Siguiente: Slice 1 según spec (primitive canónico de intake + entry parity).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
