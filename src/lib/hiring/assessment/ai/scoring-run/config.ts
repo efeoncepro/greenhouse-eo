@@ -1,5 +1,9 @@
 import 'server-only'
 
+import {
+  DEFAULT_AI_RUN_PROMOTION_THRESHOLDS,
+  type AiRunPromotionThresholds,
+} from '../eval/promotion-eval'
 import { DEFAULT_AI_RUN_RISK_POLICY, type AiRunRiskPolicyConfig } from './risk-router'
 
 // TASK-1734 — Assessment AI Scoring Run config (ADR D6): TRES flags independientes,
@@ -72,6 +76,80 @@ export const getAiRunFanOutConfig = (): AiRunFanOutConfig => ({
  * override acotado por env (la banda decision-near es configurable — spec §Risk-routing).
  * Cambiar un default DEBE ir acompañado de bump de `HIRING_ASSESSMENT_AI_RUN_POLICY_VERSION`.
  */
+const floatEnv = (name: string, fallback: number, min: number, max: number): number => {
+  const raw = Number(process.env[name])
+
+  if (!Number.isFinite(raw)) return fallback
+
+  return Math.max(min, Math.min(max, raw))
+}
+
+/**
+ * Thresholds de PROMOCIÓN del eval de Slice 3 (ADR D2): banda de tolerancia por banda,
+ * acuerdo IA-humano RELATIVO al humano-humano (nunca un absoluto universal), CERO confusión
+ * entre bandas no adyacentes (hard rule sin override), abstención, repeat stability y
+ * mínimos por estrato.
+ *
+ * ⚠️ Los VALORES DEFINITIVOS los fija la policy aceptada JUNTO con el dataset de promoción
+ * humano real (doble rating independiente + adjudicación — trabajo de Talent en curso). Los
+ * defaults de `DEFAULT_AI_RUN_PROMOTION_THRESHOLDS` y los overrides por env son el piso
+ * mecánico del harness, no evidencia de promoción. El gate
+ * (`pnpm hiring:ai:promotion-gate`) consume estos valores vía el reporte que emite el CLI
+ * `hiring:ai:promotion-eval` (una sola computación; el .mjs no re-parsea env).
+ */
+export const getAiRunPromotionThresholds = (): AiRunPromotionThresholds => ({
+  ...DEFAULT_AI_RUN_PROMOTION_THRESHOLDS,
+  toleranceBandDefault: intEnv(
+    'HIRING_ASSESSMENT_AI_PROMOTION_TOLERANCE',
+    DEFAULT_AI_RUN_PROMOTION_THRESHOLDS.toleranceBandDefault,
+    1,
+    50,
+  ),
+  maxAiHumanMaeRatio: floatEnv(
+    'HIRING_ASSESSMENT_AI_PROMOTION_MAX_MAE_RATIO',
+    DEFAULT_AI_RUN_PROMOTION_THRESHOLDS.maxAiHumanMaeRatio,
+    0.1,
+    2,
+  ),
+  minWithinToleranceRate: floatEnv(
+    'HIRING_ASSESSMENT_AI_PROMOTION_MIN_WITHIN_TOLERANCE',
+    DEFAULT_AI_RUN_PROMOTION_THRESHOLDS.minWithinToleranceRate,
+    0.5,
+    1,
+  ),
+  maxAbstentionRate: floatEnv(
+    'HIRING_ASSESSMENT_AI_PROMOTION_MAX_ABSTENTION',
+    DEFAULT_AI_RUN_PROMOTION_THRESHOLDS.maxAbstentionRate,
+    0,
+    1,
+  ),
+  repeatRuns: intEnv(
+    'HIRING_ASSESSMENT_AI_PROMOTION_REPEAT_RUNS',
+    DEFAULT_AI_RUN_PROMOTION_THRESHOLDS.repeatRuns,
+    1,
+    10,
+  ),
+  maxRepeatStddev: floatEnv(
+    'HIRING_ASSESSMENT_AI_PROMOTION_MAX_REPEAT_STDDEV',
+    DEFAULT_AI_RUN_PROMOTION_THRESHOLDS.maxRepeatStddev,
+    0,
+    30,
+  ),
+  minCasesPerStratum: intEnv(
+    'HIRING_ASSESSMENT_AI_PROMOTION_MIN_PER_STRATUM',
+    DEFAULT_AI_RUN_PROMOTION_THRESHOLDS.minCasesPerStratum,
+    1,
+    100,
+  ),
+  minAdversarialCases: intEnv(
+    'HIRING_ASSESSMENT_AI_PROMOTION_MIN_ADVERSARIAL',
+    DEFAULT_AI_RUN_PROMOTION_THRESHOLDS.minAdversarialCases,
+    1,
+    100,
+  ),
+  // maxNonAdjacentBandConfusions NO tiene override: hard rule = 0 (entregable de la task).
+})
+
 export const getAiRunRiskPolicyConfig = (): AiRunRiskPolicyConfig => ({
   minAnswerChars: intEnv('HIRING_ASSESSMENT_AI_RISK_MIN_ANSWER_CHARS', DEFAULT_AI_RUN_RISK_POLICY.minAnswerChars, 1, 2000),
   decisionNearBandLow: intEnv('HIRING_ASSESSMENT_AI_RISK_BAND_LOW', DEFAULT_AI_RUN_RISK_POLICY.decisionNearBandLow, 0, 100),

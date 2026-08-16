@@ -577,6 +577,34 @@ ejecutar dentro de la task (ya autorizado):
 - Extend promotion datasets as `TASK-1604` activates each new role/template; no template inherits approval from
   another template or model/prompt version.
 
+## Delta 2026-08-16 — Slice 3 harness code-complete
+
+Slice 3 queda **code-complete como HARNESS + gate bloqueante**; la evidencia de promoción NO existe aún y el
+gate lo hace explícito:
+
+- `src/lib/hiring/assessment/ai/eval/promotion-eval.ts` — runner puro de eval de promoción (runOne inyectable):
+  MAE + Pearson IA-humano (adjudicado), acuerdo humano-humano (MAE/Pearson entre raters A/B) como piso, acuerdo
+  relativo (ratio IA-humano / humano-humano), tolerancia calibrada por banda, matriz de confusión por banda con
+  no-adyacentes = 0 duro, repeat stability (N corridas → stddev), abstención estándar vs adversarial separadas,
+  fallos por pregunta/template con IC 95% bootstrap determinístico, reporte JSON + markdown y blockers con código
+  estable (incluye guard `human_human_agreement_implausible` cuando MAE humano-humano = 0 — anti ratings copiados).
+- Formato de dataset documentado en `eval/__fixtures__/promotion-dataset.schema.md`; fixture
+  `promotion-dataset.synthetic.v1.json` (16 casos, 12 estándar estratificados 2 templates × 3 bandas + 4
+  adversariales) marcado `synthetic: true` — SOLO prueba el harness, jamás promueve.
+- Gate mecánico `scripts/hiring/assessment-ai-promotion-gate.mjs` (`pnpm hiring:ai:promotion-gate`): exit 1 con
+  dataset sintético / sin doble-rating+adjudicación / estratos bajo mínimo / cualquier blocker métrico; verificado
+  end-to-end con `pnpm hiring:ai:promotion-eval -- --mock` (reportes en `.eval-reports/`, gitignored). CLI
+  `hiring:ai:promotion-eval` corre provider real o `--mock` determinístico.
+- Thresholds en la policy: `getAiRunPromotionThresholds()` en `scoring-run/config.ts` (tolerancia por banda,
+  ratio máximo de MAE IA-humano vs humano-humano, confusión no adyacente = 0 SIN override, abstención, repeat
+  stability, mínimos por estrato). **Valores provisionales del harness: los definitivos los fija la policy
+  aceptada con el dataset humano real** (documentado en código; los mínimos por estrato NO son un N universal).
+- Protected-group (TASK-1365): hook DECLARADO como interface (`PromotionFairnessHook`) sin implementación —
+  best-effort, su ausencia no bloquea (cláusula de la spec).
+- **Pendiente explícitamente HUMANO (Talent, en curso)**: gold set con doble rating independiente + rater
+  training + adjudicación — owner nombrado pendiente de asignación por el CEO. Ningún agente puede fabricar esos
+  ratings; el gate bloquea la promoción hasta que ese dataset exista y pase.
+
 ## Delta 2026-08-16
 
 Auditoría spec↔runtime + coherencia cross-task (dos subagentes, sesión operador 2026-08-16). El agente que tome
