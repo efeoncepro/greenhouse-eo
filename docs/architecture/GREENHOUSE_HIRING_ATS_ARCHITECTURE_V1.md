@@ -1497,3 +1497,21 @@ score/match_score/explainability_json (la nota es narrativa, no score); **NUNCA*
 notas (boundary TASK-1365). El scorecard display fix relacionado (global "Parcial" mientras haya
 competencias pendientes) es ISSUE-159 / `scorecard-summary.ts`. UI del expediente: task consumer
 ui-ux follow-up (placement contractado en la spec de TASK-1735 §Superficie UI).
+
+### Contrato candidate-facing del scoring IA (TASK-1734 Slice 5)
+
+El candidato **solo ve rendición y confirmación de envío**: preguntas públicas (`buildPublicQuestion`),
+sus propias respuestas, timing/accommodations y el `status` del assessment. **NUNCA** ve score
+(auto/humano/efectivo), resultados por competencia, propuestas IA, rationale, confidence, clase de
+riesgo, estado de revisión, answer key ni rubric — ni por la vista pública, ni por el route
+`/api/public/assessment/[token]` (errores genéricos `PUBLIC_MESSAGES`, 404 anti-oracle), ni por los
+emails del ciclo (el interno `hiring_assessment_submitted_internal` existe pero sin score), ni por los
+DTOs candidate/client (careers público, talent pool self-service, review packet MCP de TASK-1718).
+
+La **denylist de campos prohibidos vive como contrato ejecutable** en
+`src/lib/hiring/assessment/public-boundary.test.ts` (constante compartida en
+`public-boundary.contract.ts`, deep-scan de keys + sentinels): un campo nuevo de resultado/scoring se
+agrega a esa constante y las suites del boundary (vista pública, route público,
+`hiring-lifecycle-emails-antileak`, `candidate-boundary`, `proposal-authz-boundary`) lo cubren solas.
+El reader interno `listAiProposals` sigue global (authz en el route vía `hiring.assessment.read`);
+el reader run-scoped con resource+purpose exacto es del Slice 4.
