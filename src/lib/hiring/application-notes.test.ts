@@ -15,6 +15,12 @@ vi.mock('@/lib/sync/publish-event', () => ({
   publishOutboxEvent: (...args: unknown[]) => publishOutboxEventMock(...args)
 }))
 
+const isViewerBlindMock = vi.fn()
+
+vi.mock('./assessment/instances', () => ({
+  isViewerBlindForApplicationEvaluation: (...args: unknown[]) => isViewerBlindMock(...args)
+}))
+
 const { recordHiringApplicationNote, listHiringApplicationNotes } = await import('./application-notes')
 
 const noteRow = {
@@ -115,14 +121,86 @@ describe('recordHiringApplicationNote', () => {
 describe('listHiringApplicationNotes', () => {
   beforeEach(() => vi.clearAllMocks())
 
+  const makeRow = (overrides: Partial<typeof noteRow>) => ({ ...noteRow, ...overrides })
+
+  // Expediente de ejemplo: nota agent + score-bearing ajena + score-bearing propia +
+  // general ajena. El gate anti-anclaje decide qué recibe cada viewer.
+  const expedienteRows = [
+    makeRow({ note_id: 'hnote-agent', kind: 'assessment_review', source: 'agent', author_user_id: 'user-recruiter' }),
+    makeRow({ note_id: 'hnote-ajena', kind: 'interview_note', source: 'human', author_user_id: 'user-otro' }),
+    makeRow({ note_id: 'hnote-propia', kind: 'interview_note', source: 'human', author_user_id: 'user-viewer' }),
+    makeRow({ note_id: 'hnote-general', kind: 'general', source: 'human', author_user_id: 'user-otro' })
+  ]
+
   it('normaliza filas y ordena por el SQL (created_at DESC)', async () => {
     runQueryMock.mockResolvedValueOnce([noteRow])
 
-    const notes = await listHiringApplicationNotes('happ-1')
+    const result = await listHiringApplicationNotes('happ-1')
 
-    expect(notes).toHaveLength(1)
-    expect(notes[0].createdAt).toBe('2026-08-16T12:00:00.000Z')
-    expect(notes[0].contextJson).toEqual({ dossierProposalId: 'hdsp-1' })
+    expect(result.notes).toHaveLength(1)
+    expect(result.hiddenNoteCount).toBe(0)
+    expect(result.viewerBlindUntilScorecardSubmitted).toBe(false)
+    expect(result.notes[0].createdAt).toBe('2026-08-16T12:00:00.000Z')
+    expect(result.notes[0].contextJson).toEqual({ dossierProposalId: 'hdsp-1' })
     expect(String(runQueryMock.mock.calls[0][0])).toContain('ORDER BY created_at DESC')
+  })
+
+  it('server-internal (sin viewerUserId): NO consulta el predicado ni filtra', async () => {
+    runQueryMock.mockResolvedValueOnce(expedienteRows)
+
+    const result = await listHiringApplicationNotes('happ-1')
+
+    expect(result.notes).toHaveLength(4)
+    expect(result.hiddenNoteCount).toBe(0)
+    expect(result.viewerBlindUntilScorecardSubmitted).toBe(false)
+    expect(isViewerBlindMock).not.toHaveBeenCalled()
+  })
+
+  it('viewer BLOQUEADO: omite score-bearing ajenas y toda nota agent; cuenta las ocultas', async () => {
+    runQueryMock.mockResolvedValueOnce(expedienteRows)
+    isViewerBlindMock.mockResolvedValueOnce(true)
+
+    const result = await listHiringApplicationNotes('happ-1', 'user-viewer')
+
+    expect(isViewerBlindMock).toHaveBeenCalledWith('happ-1', 'user-viewer')
+    expect(result.viewerBlindUntilScorecardSubmitted).toBe(true)
+    expect(result.hiddenNoteCount).toBe(2)
+    expect(result.notes.map(note => note.noteId)).toEqual(['hnote-propia', 'hnote-general'])
+  })
+
+  it('viewer bloqueado: sus notas propias score-bearing SIEMPRE pasan', async () => {
+    runQueryMock.mockResolvedValueOnce([
+      makeRow({ note_id: 'hnote-propia-cv', kind: 'cv_analysis', source: 'human', author_user_id: 'user-viewer' })
+    ])
+    isViewerBlindMock.mockResolvedValueOnce(true)
+
+    const result = await listHiringApplicationNotes('happ-1', 'user-viewer')
+
+    expect(result.notes.map(note => note.noteId)).toEqual(['hnote-propia-cv'])
+    expect(result.hiddenNoteCount).toBe(0)
+  })
+
+  it('viewer bloqueado: las `general` ajenas pasan, pero una agent del propio viewer NO', async () => {
+    runQueryMock.mockResolvedValueOnce([
+      makeRow({ note_id: 'hnote-general-ajena', kind: 'general', source: 'human', author_user_id: 'user-otro' }),
+      makeRow({ note_id: 'hnote-agent-propia', kind: 'cv_analysis', source: 'agent', author_user_id: 'user-viewer' })
+    ])
+    isViewerBlindMock.mockResolvedValueOnce(true)
+
+    const result = await listHiringApplicationNotes('happ-1', 'user-viewer')
+
+    expect(result.notes.map(note => note.noteId)).toEqual(['hnote-general-ajena'])
+    expect(result.hiddenNoteCount).toBe(1)
+  })
+
+  it('viewer LIBRE (scorecard propio cerrado o sin scorecard): recibe todo sin filtrar', async () => {
+    runQueryMock.mockResolvedValueOnce(expedienteRows)
+    isViewerBlindMock.mockResolvedValueOnce(false)
+
+    const result = await listHiringApplicationNotes('happ-1', 'user-viewer')
+
+    expect(result.notes).toHaveLength(4)
+    expect(result.hiddenNoteCount).toBe(0)
+    expect(result.viewerBlindUntilScorecardSubmitted).toBe(false)
   })
 })

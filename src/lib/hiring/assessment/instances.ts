@@ -482,6 +482,52 @@ return normalizeResponse(rows[0])
   })
 }
 
+// ── Predicado anti-anclaje compartido (TASK-1383 · TASK-1737) ──
+// UN solo lugar decide "¿el scorecard PROPIO del viewer en esta application está cerrado?".
+// Lo consumen listResponses / listPeerScorecardResults (ratings) y el filtro del
+// Expediente de Evaluación (`listHiringApplicationNotes`, TASK-1737). No duplicar el SQL.
+
+const CLOSED_SCORECARD_STATUSES = ['submitted', 'scored'] as const
+
+export interface OwnScorecardState {
+  /** El viewer tiene un interviewer_scorecard propio asignado en la application. */
+  hasOwn: boolean
+  /** Ese scorecard propio ya está `submitted`/`scored`. */
+  ownClosed: boolean
+}
+
+/** Estado del scorecard PROPIO del viewer para una application (fuente única del predicado). */
+export const getOwnScorecardStateForApplication = async (
+  applicationId: string,
+  viewerUserId: string,
+): Promise<OwnScorecardState> => {
+  const own = await runGreenhousePostgresQuery<{ status: string }>(
+    `SELECT status FROM greenhouse_hiring.hiring_assessment
+     WHERE application_id = $1 AND method = 'interviewer_scorecard' AND evaluator_user_id = $2
+     LIMIT 1`,
+    [applicationId, viewerUserId],
+  )
+
+  return {
+    hasOwn: Boolean(own[0]),
+    ownClosed: Boolean(own[0] && CLOSED_SCORECARD_STATUSES.includes(own[0].status as (typeof CLOSED_SCORECARD_STATUSES)[number])),
+  }
+}
+
+/**
+ * Gate anti-anclaje del Expediente de Evaluación (TASK-1737): el viewer queda "blind"
+ * SOLO cuando tiene scorecard propio abierto (asignado y aún no submitted/scored).
+ * Un operador sin scorecard asignado (reclutador/People Ops) NO activa el predicado.
+ */
+export const isViewerBlindForApplicationEvaluation = async (
+  applicationId: string,
+  viewerUserId: string,
+): Promise<boolean> => {
+  const { hasOwn, ownClosed } = await getOwnScorecardStateForApplication(applicationId, viewerUserId)
+
+  return hasOwn && !ownClosed
+}
+
 /**
  * Respuestas de una instancia. Anti-anclaje (independent-before-debrief, TASK-1383): para un
  * interviewer_scorecard AJENO, el evaluador que mira NO recibe los ratings hasta que su
@@ -510,14 +556,7 @@ export const listResponses = async (
       instance.method === 'interviewer_scorecard' &&
       instance.evaluator_user_id !== viewerUserId
     ) {
-      const own = await runGreenhousePostgresQuery<{ status: string }>(
-        `SELECT status FROM greenhouse_hiring.hiring_assessment
-         WHERE application_id = $1 AND method = 'interviewer_scorecard' AND evaluator_user_id = $2
-         LIMIT 1`,
-        [instance.application_id, viewerUserId],
-      )
-
-      const ownClosed = own[0] && ['submitted', 'scored'].includes(own[0].status)
+      const { ownClosed } = await getOwnScorecardStateForApplication(instance.application_id, viewerUserId)
 
       // Anti-anclaje: el evaluador con scorecard abierto no ve ratings ajenos.
       if (!ownClosed) return []
@@ -541,13 +580,7 @@ export const listPeerScorecardResults = async (
   applicationId: string,
   viewerEvaluatorUserId: string,
 ): Promise<AssessmentResponse[]> => {
-  const own = await runGreenhousePostgresQuery<{ status: string }>(
-    `SELECT status FROM greenhouse_hiring.hiring_assessment
-     WHERE application_id = $1 AND method = 'interviewer_scorecard' AND evaluator_user_id = $2 LIMIT 1`,
-    [applicationId, viewerEvaluatorUserId],
-  )
-
-  const ownClosed = own[0] && ['submitted', 'scored'].includes(own[0].status)
+  const { ownClosed } = await getOwnScorecardStateForApplication(applicationId, viewerEvaluatorUserId)
 
   if (!ownClosed) return [] // anti-anclaje: no ves ratings ajenos hasta cerrar el propio
 

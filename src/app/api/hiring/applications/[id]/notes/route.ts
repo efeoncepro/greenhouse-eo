@@ -35,9 +35,15 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   try {
     const { id } = await params
-    const notes = await listHiringApplicationNotes(id)
 
-    return NextResponse.json({ notes })
+    // TASK-1737 — viewer-aware: el gate anti-anclaje vive en el reader (server).
+    // Un evaluador con scorecard propio abierto recibe el payload YA filtrado.
+    const { notes, hiddenNoteCount, viewerBlindUntilScorecardSubmitted } = await listHiringApplicationNotes(
+      id,
+      tenant.userId
+    )
+
+    return NextResponse.json({ notes, hiddenNoteCount, viewerBlindUntilScorecardSubmitted })
   } catch (error) {
     return toHiringErrorResponse(error, 'application_notes_list')
   }

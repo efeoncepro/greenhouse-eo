@@ -6,6 +6,7 @@ import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
+import { isViewerBlindForApplicationEvaluation } from './assessment/instances'
 import { HiringNotFoundError, HiringValidationError } from './errors'
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -153,8 +154,41 @@ export const recordHiringApplicationNote = async (
   return withGreenhousePostgresTransaction(execute)
 }
 
-/** Reader canónico: notas del expediente de una application, más reciente primero. */
-export const listHiringApplicationNotes = async (applicationId: string): Promise<HiringApplicationNote[]> => {
+// ── Gate anti-anclaje del expediente (TASK-1737, Delta (3) de TASK-1735) ──
+// Kinds que cargan juicio evaluativo: bajo el predicado, las AJENAS se omiten del payload.
+export const HIRING_SCORE_BEARING_NOTE_KINDS = ['cv_analysis', 'assessment_review', 'interview_note'] as const
+
+export interface HiringApplicationNotesView {
+  notes: HiringApplicationNote[]
+  /** Notas omitidas por el gate anti-anclaje para ESTE viewer (0 si no hay bloqueo). */
+  hiddenNoteCount: number
+  /** true = el viewer tiene scorecard propio abierto y el payload viene filtrado. */
+  viewerBlindUntilScorecardSubmitted: boolean
+}
+
+const isNoteHiddenForBlindViewer = (note: HiringApplicationNote, viewerUserId: string): boolean => {
+  // Todo lo `agent` espera el scorecard propio (el análisis IA lee scores por construcción).
+  if (note.source === 'agent') return true
+
+  // Juicio evaluativo AJENO se oculta; las notas propias y las `general` ajenas pasan.
+  return (
+    (HIRING_SCORE_BEARING_NOTE_KINDS as readonly string[]).includes(note.kind) &&
+    note.authorUserId !== viewerUserId
+  )
+}
+
+/**
+ * Reader canónico: notas del expediente de una application, más reciente primero.
+ *
+ * Anti-anclaje (TASK-1737, mismo predicado que `listResponses`/`listPeerScorecardResults`):
+ * con `viewerUserId` y scorecard propio ABIERTO, el payload omite las notas score-bearing
+ * de OTROS autores y toda nota `source='agent'` — la ceguera la garantiza este reader,
+ * no la UI. Sin `viewerUserId` (llamadas server-internas) NO se filtra.
+ */
+export const listHiringApplicationNotes = async (
+  applicationId: string,
+  viewerUserId?: string | null
+): Promise<HiringApplicationNotesView> => {
   if (!applicationId || typeof applicationId !== 'string') {
     throw new HiringValidationError('Falta el identificador de la postulación.', 'hiring_invalid_input', 400)
   }
@@ -166,5 +200,19 @@ export const listHiringApplicationNotes = async (applicationId: string): Promise
     [applicationId]
   )
 
-  return rows.map(normalizeNote)
+  const all = rows.map(normalizeNote)
+
+  const blind = viewerUserId ? await isViewerBlindForApplicationEvaluation(applicationId, viewerUserId) : false
+
+  if (!blind || !viewerUserId) {
+    return { notes: all, hiddenNoteCount: 0, viewerBlindUntilScorecardSubmitted: false }
+  }
+
+  const visible = all.filter(note => !isNoteHiddenForBlindViewer(note, viewerUserId))
+
+  return {
+    notes: visible,
+    hiddenNoteCount: all.length - visible.length,
+    viewerBlindUntilScorecardSubmitted: true
+  }
 }

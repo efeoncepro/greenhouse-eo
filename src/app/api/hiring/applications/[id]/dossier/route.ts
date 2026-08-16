@@ -3,14 +3,21 @@ import { NextResponse } from 'next/server'
 import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { can } from '@/lib/entitlements/runtime'
 import { hiringInvalidBodyResponse, hiringNotFoundResponse, toHiringErrorResponse } from '@/lib/hiring'
+import { listHiringApplicationNotes } from '@/lib/hiring/application-notes'
+import { isViewerBlindForApplicationEvaluation } from '@/lib/hiring/assessment/instances'
 import {
+  HIRING_DOSSIER_PROMPT_VERSION,
+  assembleEvaluationDossierPacket,
+  computeDossierInputDigest,
   confirmEvaluationDossier,
   getCurrentDossierProposalForApplication,
   getDossierProposalById,
+  getHiringDossierModel,
   isHiringDossierAiEnabled,
-  proposeEvaluationDossier
+  proposeEvaluationDossier,
+  renderEvaluationDossierMarkdown
 } from '@/lib/hiring/dossier-ai'
-import type { DossierProposalDecision } from '@/types/hiring-dossier-ai'
+import type { DossierProposalDecision, EvaluationDossierDraft } from '@/types/hiring-dossier-ai'
 import { requireInternalTenantContext } from '@/lib/tenant/authorization'
 
 /**
@@ -42,9 +49,54 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   try {
     const { id } = await params
+
+    // TASK-1737 — gate anti-anclaje server-enforced: un evaluador con scorecard propio
+    // ABIERTO no recibe el bloque proposal (juicio evaluativo lee scores por construcción).
+    // La UI solo renderiza el estado honesto; la ceguera vive acá, no en la pantalla.
+    if (await isViewerBlindForApplicationEvaluation(id, tenant.userId)) {
+      const { hiddenNoteCount } = await listHiringApplicationNotes(id, tenant.userId)
+
+      return NextResponse.json({
+        aiEnabled: isHiringDossierAiEnabled(),
+        proposal: null,
+        viewerBlindUntilScorecardSubmitted: true,
+        hiddenNoteCount
+      })
+    }
+
     const proposal = await getCurrentDossierProposalForApplication(id)
 
-    return NextResponse.json({ aiEnabled: isHiringDossierAiEnabled(), proposal })
+    // Precarga del modo edición (el render vive server-side; `renderEvaluationDossierMarkdown`
+    // es server-only) + señal de staleness: digest vigente ≠ digest de la propuesta.
+    let proposalBodyMd: string | null = null
+    let proposalStale: boolean | null = null
+
+    if (proposal?.status === 'proposed') {
+      const dossier = proposal.proposed.dossier as EvaluationDossierDraft | undefined
+
+      if (dossier && typeof dossier.resumenEjecutivo === 'string') {
+        proposalBodyMd = renderEvaluationDossierMarkdown(dossier)
+      }
+
+      try {
+        const packet = await assembleEvaluationDossierPacket(id)
+        const currentDigest = computeDossierInputDigest(packet, getHiringDossierModel(), HIRING_DOSSIER_PROMPT_VERSION)
+
+        proposalStale = currentDigest !== proposal.inputDigest
+      } catch {
+        // Fuentes no reconstruibles (p. ej. CV en proceso): staleness desconocida — la UI
+        // no muestra el banner con una suposición. Nunca romper el GET por esta señal.
+        proposalStale = null
+      }
+    }
+
+    return NextResponse.json({
+      aiEnabled: isHiringDossierAiEnabled(),
+      proposal,
+      proposalBodyMd,
+      proposalStale,
+      viewerBlindUntilScorecardSubmitted: false
+    })
   } catch (error) {
     return toHiringErrorResponse(error, 'application_dossier_get')
   }
