@@ -198,6 +198,26 @@ Application 360 consumer UI is a follow-up task. Runtime binding: `references/gr
 Docs: architecture `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-16 · functional
 `docs/documentation/hr/expediente-de-evaluacion.md` · manual `docs/manual-de-uso/hr/operar-expediente-de-evaluacion.md`.
 
+## Assessment AI Scoring at Scale (TASK-1734 — code complete 2026-08-16)
+
+The individual propose→confirm of TASK-1361 now scales through an **async, durable, idempotent scoring run per
+exact `hiring_assessment`** (aggregate `hiring_assessment_ai_scoring_run` + items + append-only events), executed
+in the existing ops-worker after `hiring.assessment.submitted`. A versioned risk router classifies every proposal
+as `mandatory_review`, `quality_sample` (blind, **structural** — the reviewer scores without seeing the AI
+proposal) or `batch_eligible`. The discipline holds: **the AI proposes; a human confirms per batch**, and the run
+confirmation only closes when mandatory exceptions and the blind sample are resolved, recording an append-only
+manifest (covered proposals, sample, exceptions, actor, digests, and `sawProposalBeforeScoring` per human
+resolution — anti-anchoring evidence). **The candidate never sees anything**: no score, band, rationale,
+confidence or review state, guarded by an executable denylist (`public-boundary.contract.ts`) across public
+view/route/emails/DTOs. **The promotion gate is blocking**: `pnpm hiring:ai:promotion-gate` exits 1 until a real
+Talent gold set with double independent human rating + adjudication passes — no agent may fabricate those ratings.
+Estado: **code complete, rollout gated a señal del operador** — the 3 new flags are OFF in every runtime, the
+scheduler `ops-assessment-ai-drain` is declared paused, and rollback runs by the new flags + run commands
+(`pnpm hiring:ai:run-rollback`), never by the master flag. Runbook:
+`docs/operations/runbooks/assessment-ai-scoring-rollout.md` · ADR
+`docs/architecture/GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md`. Full runtime binding:
+`references/greenhouse-runtime.md` §Assessment AI Scoring Run.
+
 ## First reads (before acting inside Greenhouse)
 
 - `CLAUDE.md`, `AGENTS.md`, `project_context.md`, `Handoff.md`

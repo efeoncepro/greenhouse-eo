@@ -4,7 +4,7 @@
 - **Date**: 2026-08-16
 - **Deciders**: CEO (autorización ejecutiva 2026-08-16, sesión de operador) · agente ejecutor Slice 0 `TASK-1734` (skill `arch-architect`)
 - **Tags**: hiring, ats, ai, ops-worker, governance, privacy
-- **Task owner**: [`TASK-1734`](../tasks/in-progress/TASK-1734-assessment-ai-scale-operator-exception-review.md) (EPIC-011)
+- **Task owner**: [`TASK-1734`](../tasks/complete/TASK-1734-assessment-ai-scale-operator-exception-review.md) (EPIC-011)
 - **Extiende**: `TASK-1361` (proposal ledger + propose/confirm individual) · `TASK-1360` (rollup canónico) · `TASK-1383` (dedupe por `input_digest`)
 
 ---

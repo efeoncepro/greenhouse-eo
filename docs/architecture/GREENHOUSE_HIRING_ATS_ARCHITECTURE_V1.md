@@ -1515,3 +1515,24 @@ agrega a esa constante y las suites del boundary (vista pública, route público
 `hiring-lifecycle-emails-antileak`, `candidate-boundary`, `proposal-authz-boundary`) lo cubren solas.
 El reader interno `listAiProposals` sigue global (authz en el route vía `hiring.assessment.read`);
 el reader run-scoped con resource+purpose exacto es del Slice 4.
+
+## Delta 2026-08-16 (2) — Scoring IA a escala (TASK-1734, code complete / rollout gated)
+
+El propose→confirm individual de TASK-1361 escala a un **run asíncrono, durable e idempotente por
+`hiring_assessment` exacto**: aggregate `greenhouse_hiring.hiring_assessment_ai_scoring_run` (+ `_item`,
+`_event` append-only), a lo más un run activo por assessment + digest inmutable de inputs/policy/**modelo
+EFECTIVO**. El wiring vive en el **ops-worker existente** (ADR D4): proyección reactiva
+`hiring_assessment_ai_scoring_run_enqueue` sobre `hiring.assessment.submitted` + drain con claim atómico y
+fan-out acotado **reutilizando el scorer canónico de 1361** (nunca un segundo scorer). El **risk router**
+versionado clasifica cada propuesta como `mandatory_review` / `quality_sample` (muestra **CIEGA
+ESTRUCTURAL**: el revisor puntúa sin ver la propuesta) / `batch_eligible`; policy OFF ⇒ todo es
+`mandatory_review`. La confirmación de run (`confirm_run` vía
+`POST /api/hiring/assessments/ai/scoring-runs/[runId]`, capability `hiring.assessment.score`) exige
+excepciones y muestra cerradas y escribe un **manifest append-only** con `sawProposalBeforeScoring` por
+resolución humana (anti-anclaje); los scores confirmados aplican por el camino canónico 1361/1360. El
+candidato jamás ve nada (denylist ejecutable `public-boundary.contract.ts`, sin flag — prohibido por
+contrato). Promoción **bloqueada** por `pnpm hiring:ai:promotion-gate` hasta gold set humano de Talent con
+doble rating + adjudicación. 3 flags default-OFF en el ledger, scheduler `ops-assessment-ai-drain` pausado,
+rollback por `pnpm hiring:ai:run-rollback` + flags nuevos (nunca el master). Detalle completo: ADR
+`GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md` · runbook
+`docs/operations/runbooks/assessment-ai-scoring-rollout.md` · señales `hiring.assessment_ai.*` (5, steady=0).

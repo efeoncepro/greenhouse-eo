@@ -264,6 +264,60 @@ Docs: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-15 (8 invariant
 Docs: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-16 · functional
 `docs/documentation/hr/expediente-de-evaluacion.md` · manual `docs/manual-de-uso/hr/operar-expediente-de-evaluacion.md`.
 
+## Assessment AI Scoring Run (TASK-1734, code complete 2026-08-16 — rollout gated)
+
+Async scoring at scale over the TASK-1361 scorer. **One run per exact `hiring_assessment` + immutable
+input/policy digest (answers + rubric + prompt + policy + EFFECTIVE resolved model — env override included).**
+
+- **Aggregate**: `greenhouse_hiring.hiring_assessment_ai_scoring_run` (+ `_item`, `_event` append-only).
+  Module `src/lib/hiring/assessment/ai/scoring-run/` (state machine, store, commands start/get/cancel/reconcile,
+  risk router, review reader, confirm, rollback, config). Reconciles the pre-existing orphan proposal backlog
+  (`superseded_by_manual`) — a manual `recordHumanScore`+`finalizeAssessment` no longer strands proposals forever.
+- **Async wiring (ops-worker, no new service — ADR D4)**: reactive projection
+  `hiring_assessment_ai_scoring_run_enqueue` (`src/lib/sync/projections/hiring-assessment-ai-scoring.ts`) creates
+  the run on `hiring.assessment.submitted`; drain `POST /assessment-ai/drain-scoring-runs` claims by atomic lease
+  and fans out through the **canonical TASK-1361 scorer** (bounded concurrency/timeout/retry/cost-cap; malformed
+  answers ABSTAIN — `answer_malformed` — with zero provider spend). Scheduler `ops-assessment-ai-drain` is declared
+  in `services/ops-worker/deploy.sh` and **born PAUSED**; the enqueue-flag flip resumes it.
+- **Risk router** (`risk-router.ts`, versioned policy): `mandatory_review` / `quality_sample` (blind + STRUCTURAL —
+  deterministic sample whose reviewer scores without seeing the proposal) / `batch_eligible`. Self-reported model
+  confidence never decides alone; with `HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED` OFF, **everything** is
+  `mandatory_review` by design.
+- **Operator API**: `GET/POST /api/hiring/assessments/ai/scoring-runs/[runId]` — capability
+  `hiring.assessment.score` (the score authority reviews the queue). `GET` = exact-scoped review reader
+  (`listAssessmentAiReviewItems`: risk class, stable reason codes, evidence, provenance, gate coverage — never
+  candidate identity fields). `POST` actions: `resolve_item` (one-by-one human resolution; requires
+  `sawProposalBeforeScoring` — anti-anchoring evidence), `confirm_run` (batch confirm: mandatory + blind-sample +
+  digest gates, then append-only `run_confirm_manifest`; flag-gated), `cancel_run` (NOT flag-gated — rollback path).
+  Confirmed scores apply through the canonical 1361/1360 path; nothing enters the rollup without human confirm.
+- **Promotion gate (BLOCKING)**: `pnpm hiring:ai:promotion-eval` (+ `--mock`) → `pnpm hiring:ai:promotion-gate`
+  exits 1 with a synthetic dataset, without double independent human rating + adjudication, or on any metric
+  blocker. The gold set is Talent human work in progress; **no agent fabricates ratings**. Thresholds:
+  `getAiRunPromotionThresholds()` (`scoring-run/config.ts`, provisional until the accepted policy fixes them).
+- **Flags (all default OFF; ledger updated)**: `HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED` (ops-worker; `deploy.sh`
+  is the SoT), `HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED` (ops-worker + Vercel),
+  `HIRING_ASSESSMENT_AI_RUN_CONFIRM_ENABLED` (Vercel). The master `HIRING_ASSESSMENT_AI_ENABLED` is already ON in
+  Vercel Production but does NOT gate confirm/reject — **rollback always runs by the new flags + run commands**
+  (`pnpm hiring:ai:run-rollback`, dry-run default / `--apply`), never by flipping the master.
+- **Reliability**: 5 signals `hiring.assessment_ai.*` (run_backlog_stuck, provider_failure_rate, abstention_rate,
+  override_delta, orphan_reconciliation — `src/lib/reliability/queries/hiring-assessment-ai-run-signals.ts`,
+  PII-free, steady=0 with flags OFF).
+- **Anti-leak**: the denylist of prohibited result fields is an **executable contract**
+  (`src/lib/hiring/assessment/public-boundary.contract.ts` + boundary suites over public view, public route,
+  lifecycle emails, candidate/client DTOs). The candidate only ever sees the generic submitted confirmation;
+  result visibility has NO flag — prohibited by contract in every state.
+- **TASK-1735 boundary**: the run manifest/audit records structured FACTS (IDs, digests, reason codes, actor);
+  reviewer narrative lives as a 1735 `assessment_review` note with `context_json.{runId,proposalId}`. One habitat
+  per content type.
+- **Estado operativo honesto**: code complete Slices 0–6; migración aplicada y verificada contra PG real; el
+  rollout real (flips, shadow, canary) NO se ejecutó — gated a señal del operador vía el runbook.
+
+Docs: ADR `GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md` · runbook
+`docs/operations/runbooks/assessment-ai-scoring-rollout.md` · architecture
+`GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-16 (2) · functional
+`docs/documentation/hr/scoring-ia-de-assessments.md` · manual
+`docs/manual-de-uso/hr/operar-scoring-ia-assessments.md`.
+
 ## Person model (never duplicate a human)
 
 - Root: `greenhouse_core.identity_profiles` (`profile_id`). A candidate is a **Person with a `candidate_facet`**, not a separate record. Reconcile with `resolvePersonIdentifier`.
