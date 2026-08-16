@@ -284,6 +284,8 @@ Primitives oficiales:
 - `SignalStrip`: hasta tres señales explicadas; variants `operational`, `narrative`, `exception`, `integrated`. `integrated` elimina la KPI card separada y condensa honestamente en mobile.
 - `InventoryList` + `SelectionRow`: navegación/selección con estado, foco y densidad adaptativa. `InventoryList variant='rail'` crea navegación abierta sin card exterior; sólo la selección activa puede elevarse.
 - `DetailHero`: identidad y estado del objeto activo; variants `entity`, `evidence`, `report`.
+  - `supporting` integra navegación o contexto subordinado que pertenece a la misma entidad, separado por el divisor canónico; no debe usarse para contenido independiente.
+  - `kind='report'` siempre materializa un plano `background.paper` contenido. `titleId` y `titleTabIndex` permiten restaurar foco en rutas de detalle sin envolver el título ni forzar `noWrap`.
 - `ContextCommandBar`: decisión contextual; variants `contextual`, `review`, `settings`.
 - `OperationalSection`: sección adaptable con jerarquía estable; variants `standard`, `quiet`, `emphasized`, `open`, `band`. `open` agrupa con tipografía/divisores sin chrome y `band` separa una zona transversal; `standard` no es wrapper universal.
 - `PreviewStage`: chrome gobernado para artefacto, evidencia o runtime live.

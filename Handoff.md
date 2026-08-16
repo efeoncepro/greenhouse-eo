@@ -2,6 +2,14 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-16 — Hiring Desk/Application 360 migrada a superficies canónicas
+
+El frame compartido de Hiring Desk y la Application 360 dejaron de montar título, navegación, identidad y tabs
+directamente sobre el canvas gris. Ahora usan `SurfaceRecipe`, `WorkbenchHeader`, `GreenhouseBreadcrumbs` y
+`DetailHero`; la evaluación quedó en una sola superficie y la cola vacía se compacta. ESLint focal, typecheck,
+8 tests y GVC desktop/390 px están verdes en
+`.captures/2026-08-16T21-30-17_task1363-assessment-radar-runtime`. Cambio local, sin push/deploy.
+
 ## 2026-08-16 — TASK-1734 complete (code complete, rollout gated) + TASK-1736 Slices 0-2
 
 TASK-1734 cerró sus 7 slices: ADR aceptado, run aggregate durable, fan-out con risk router,
@@ -568,31 +576,3 @@ próximo ciclo (itera targets `active`).
   (`src/lib/growth/seo/keyword-market-data.ts`) desde el perfil de enlaces del top-10 real
   (`avg_backlinks_info`), ponderando **diversidad de dominios referentes + page rank, nunca el
   conteo de enlaces** — explícitamente NO la KD. `classifyLinkBarrier` fue eliminada.
-
-### TASK-1661 — datos de mercado por keyword: code complete, rollout PENDIENTE (2026-08-13)
-
-`greenhouse_growth.seo_keyword_market_data` **ya existe en la base** (migración `20260813171143226`
-aplicada; base compartida dev/staging/prod). `readKeywordOpportunities` ya no cablea
-`market: 'unavailable'`. Commits: `261b2919a` (schema) · `739734512` (fetch) · `efc76b8b0` (reader,
-worker, MCP, señal + fix). Suite completa 10.616 verde; sanity PG 13/13.
-
-**Rollout EJECUTADO Y VERIFICADO EN RUNTIME (2026-08-13 noche):** push de develop (14 commits) →
-8 workflows verdes incl. Ops Worker Deploy; revisión `ops-worker-00551-pc2` con el flag `true`;
-scheduler `ops-seo-keyword-market-data` **ENABLED** (`0 8 15 * *`). **Canary del gateway contra
-staging: COMPLETO VERDE** — la tool federada respondió `market=available found=2/2 asOf=2026-08-13
-servedMarket=2484/es` (México, el mercado corregido) + deny anti-oracle OK. Gateway pusheado
-(`efeonce-mcp@c4e0fcd`; su deploy es `workflow_dispatch`, NO automático). **Pendientes:** (1) el
-próximo release develop→main lleva el lane a producción → recién entonces **dispatch del deploy
-del gateway** para que la tool federada viva en `mcp.efeonce.org` sin 404 upstream; (2) verificar
-el primer run del scheduler el día 15 (esperado: `already_fresh`, costo ~0).
-
-**Riesgo de la KD 0: CERRADO por `fc0019e43`.** La KD dejó de gobernar la presentación: se persiste
-verbatim, pero la barrera se deriva del perfil de enlaces del top-10, no de ella. Verificado contra el
-proveedor: `pintura` y `pintura para piso` (ambas KD=0) ahora separan en `high` y `low`.
-
-**Gasto real ya incurrido en verificación: USD ~0.05** (dry-run gratis + corrida real + una llamada
-de diagnóstico + la corrida con el defecto que se corrigió).
-
-**Desbloqueadas por este cierre:** `TASK-1662` y `TASK-1664` pasaron a `Blocked by: none`. 1664 tiene
-además su spec recalibrada (commit `a98aaf4c7`): entitlement `seo_v2`, IDs `TEXT`, despertador por
-Cloud Scheduler y el boundary de ownership del dato de mercado.

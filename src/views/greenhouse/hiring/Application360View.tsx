@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import NextLink from 'next/link'
 import { useSearchParams } from 'next/navigation'
@@ -27,12 +27,17 @@ import Select from '@mui/material/Select'
 import Snackbar from '@mui/material/Snackbar'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
+import ToggleButton from '@mui/material/ToggleButton'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
 import type { Theme } from '@mui/material/styles'
 
 import {
   GreenhouseButton,
   GreenhouseChip,
+  DetailHero,
   isCardDensityAtLeast,
   useContainerDensity,
 } from '@/components/greenhouse/primitives'
@@ -668,7 +673,16 @@ const Application360View = ({
   )
 
   const assessment = (
-    <Stack spacing={3}>
+    <Paper
+      variant='outlined'
+      data-capture='assessment-work-surface'
+      sx={theme => ({
+        p: { xs: 2.5, md: 4 },
+        borderRadius: `${theme.shape.customBorderRadius.xl}px`,
+        overflowX: 'clip',
+      })}
+    >
+      <Stack spacing={3}>
       <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' alignItems={{ xs: 'stretch', sm: 'center' }} spacing={2}>
         <Box>
           <Typography variant='h5'>{assessmentCopy.review.title}</Typography>
@@ -705,7 +719,7 @@ const Application360View = ({
       ) : null}
 
       {assessments.length === 0 ? (
-        <Paper variant='outlined' sx={(theme) => ({ p: 5, borderRadius: `${theme.shape.customBorderRadius.lg}px`, textAlign: 'center' })}>
+        <Box sx={{ p: 5, textAlign: 'center' }}>
           <Stack alignItems='center' spacing={2}>
             <Box sx={{ display: 'grid', placeItems: 'center', inlineSize: 58, blockSize: 58, borderRadius: '50%', color: 'primary.main', bgcolor: 'primary.lightOpacity' }}>
               <i aria-hidden='true' className='tabler-clipboard-off' />
@@ -713,7 +727,7 @@ const Application360View = ({
             <Typography variant='h6'>{copy.application.assessmentPending}</Typography>
             <Typography color='text.secondary'>Asigna un test para generar el link tokenizado de un solo uso del candidato.</Typography>
           </Stack>
-        </Paper>
+        </Box>
       ) : assessments.map((entry) => {
         const review = assessmentReviews[entry.assessmentId]
         const pendingHumanResponses = review?.responses.filter((response) => response.needsHumanRating && response.humanScore == null) ?? []
@@ -746,15 +760,15 @@ const Application360View = ({
         const overall = scorecardSummary.overall
 
         return (
-          <Paper
+          <Box
             key={entry.assessmentId}
-            variant='outlined'
             data-capture='assessment-scorecard'
-            sx={(theme) => ({
-              p: { xs: 2.5, md: 4 },
-              borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+            sx={{
+              pt: 3,
+              borderBlockStart: '1px solid',
+              borderColor: 'divider',
               overflowX: 'clip',
-            })}
+            }}
           >
             <Stack spacing={3}>
               <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' alignItems={{ xs: 'stretch', sm: 'center' }} spacing={2}>
@@ -784,14 +798,25 @@ const Application360View = ({
                     {copy.application.reviewAssessment}
                   </GreenhouseButton>
                 ) : (
-                  <Stack direction='row' spacing={1} justifyContent={{ xs: 'stretch', sm: 'flex-end' }}>
-                    <Button data-capture='assessment-mode-bars' variant={scorecardMode === 'bars' ? 'contained' : 'tonal'} size='small' onClick={() => setScorecardMode('bars')}>
-                      {assessmentCopy.review.bars}
-                    </Button>
-                    <Button data-capture='assessment-mode-radar' variant={scorecardMode === 'radar' ? 'contained' : 'tonal'} size='small' onClick={() => setScorecardMode('radar')}>
-                      {assessmentCopy.review.radar}
-                    </Button>
-                  </Stack>
+                  <ToggleButtonGroup
+                    exclusive
+                    size='small'
+                    value={scorecardMode}
+                    aria-label={assessmentCopy.review.title}
+                    onChange={(_, nextMode: 'bars' | 'radar' | null) => {
+                      if (nextMode) setScorecardMode(nextMode)
+                    }}
+                    sx={{ alignSelf: { xs: 'stretch', sm: 'center' } }}
+                  >
+                    <ToggleButton value='bars' data-capture='assessment-mode-bars' aria-label={assessmentCopy.review.bars}>
+                      <i aria-hidden='true' className='tabler-chart-bar' />
+                      <Box component='span' sx={{ ms: 1 }}>{assessmentCopy.review.bars}</Box>
+                    </ToggleButton>
+                    <ToggleButton value='radar' data-capture='assessment-mode-radar' aria-label={assessmentCopy.review.radar}>
+                      <i aria-hidden='true' className='tabler-chart-radar' />
+                      <Box component='span' sx={{ ms: 1 }}>{assessmentCopy.review.radar}</Box>
+                    </ToggleButton>
+                  </ToggleButtonGroup>
                 )}
               </Stack>
 
@@ -804,15 +829,12 @@ const Application360View = ({
               ) : (
                 <>
                   <Grid container spacing={3} sx={{ '& > *': { minWidth: 0 } }}>
-                    <Grid size={{ xs: 12, md: pendingHumanResponses.length === 0 ? 8 : 7 }}>
-                      <Paper
-                        variant='outlined'
-                        sx={(theme) => ({
+                    <Grid size={{ xs: 12, md: pendingHumanResponses.length === 0 ? 12 : 7 }}>
+                      <Box
+                        sx={{
                           position: 'relative',
-                          p: { xs: 2.5, md: 3 },
-                          borderRadius: `${theme.shape.customBorderRadius.lg}px`,
                           overflowX: 'clip',
-                        })}
+                        }}
                       >
                         <Stack spacing={3}>
                           <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={2}>
@@ -877,7 +899,7 @@ const Application360View = ({
                                         <i className={row.competencyCategory === 'attitudinal' ? 'tabler-heart-handshake' : 'tabler-target-arrow'} />
                                       </Box>
                                       <Box sx={{ minWidth: 0 }}>
-                                        <Typography fontWeight={700} noWrap>{row.competencyName}</Typography>
+                                        <Typography fontWeight='fontWeightBold' sx={{ overflowWrap: 'anywhere' }}>{row.competencyName}</Typography>
                                         <Typography variant='caption' color='text.secondary'>{assessmentCopy.review.objective} {row.target}% · peso {row.weight}%</Typography>
                                       </Box>
                                     </Stack>
@@ -946,26 +968,25 @@ const Application360View = ({
                             </tbody>
                           </Box>
                         </Stack>
-                      </Paper>
+                      </Box>
                     </Grid>
 
-                    <Grid size={{ xs: 12, md: pendingHumanResponses.length === 0 ? 4 : 5 }}>
-                      <Paper
-                        variant='outlined'
+                    {pendingHumanResponses.length > 0 ? (
+                    <Grid size={{ xs: 12, md: 5 }}>
+                      <Box
                         data-capture='assessment-review-queue'
-                        sx={(theme) => ({ p: { xs: 2.5, md: 3 }, borderRadius: `${theme.shape.customBorderRadius.lg}px` })}
+                        sx={{
+                          ps: { xs: 0, md: 3 },
+                          borderInlineStart: { xs: 0, md: '1px solid' },
+                          borderColor: 'divider',
+                        }}
                       >
                         <Stack spacing={2.25}>
                           <Box>
                             <Typography variant='h6'>{formatTemplate(assessmentCopy.review.queueTitle, { count: pendingHumanResponses.length })}</Typography>
                             <Typography variant='body2' color='text.secondary'>{assessmentCopy.review.subtitle}</Typography>
                           </Box>
-                          {pendingHumanResponses.length === 0 ? (
-                            <Alert severity='success' icon={<i className='tabler-circle-check' />}>
-                              <Typography fontWeight={700}>{assessmentCopy.review.queueEmptyTitle}</Typography>
-                              <Typography variant='body2'>{assessmentCopy.review.queueEmptyBody}</Typography>
-                            </Alert>
-                          ) : pendingHumanResponses.map((response) => {
+                          {pendingHumanResponses.map((response) => {
                             const item = review.reviewItems.find((entryItem) => entryItem.responseId === response.responseId)
 
                             return (
@@ -1005,9 +1026,23 @@ const Application360View = ({
                             )
                           })}
                         </Stack>
-                      </Paper>
+                      </Box>
                     </Grid>
+                    ) : null}
                   </Grid>
+
+                  {pendingHumanResponses.length === 0 ? (
+                    <Alert
+                      severity='success'
+                      icon={<i className='tabler-circle-check' />}
+                      data-capture='assessment-review-queue'
+                    >
+                      <Typography component='span' fontWeight='fontWeightBold'>
+                        {assessmentCopy.review.queueEmptyTitle}
+                      </Typography>
+                      <Typography component='span' variant='body2'> · 0 respuestas pendientes</Typography>
+                    </Alert>
+                  ) : null}
 
                   {review.responses.length > 0 && entry.status !== 'scored' ? (
                     <GreenhouseButton
@@ -1137,10 +1172,11 @@ const Application360View = ({
                 </>
               )}
             </Stack>
-          </Paper>
+          </Box>
         )
       })}
-    </Stack>
+      </Stack>
+    </Paper>
   )
 
   // TASK-1715 — el panel consume el reader canónico resuelto en servidor. Antes de esto
@@ -1276,49 +1312,90 @@ const Application360View = ({
     setTab(nextTab)
   }
 
-  const handleApplicationTabsKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
-
-    event.preventDefault()
-    const currentIndex = orderedTabs.indexOf(tab)
-    const offset = event.key === 'ArrowRight' ? 1 : -1
-    const nextTab = orderedTabs[(currentIndex + offset + orderedTabs.length) % orderedTabs.length]
-
-    setApplicationTab(nextTab)
-    window.requestAnimationFrame(() => {
-      document.querySelector<HTMLButtonElement>(`[data-application-tab="${nextTab}"]`)?.focus()
-    })
-  }
+  const applicationNavigation = (
+    <Tabs
+      value={tab}
+      onChange={(_, nextTab: TabKey) => setApplicationTab(nextTab)}
+      variant='scrollable'
+      scrollButtons='auto'
+      allowScrollButtonsMobile
+      aria-label={`${item.candidateName} 360`}
+      data-capture='hiring-application-tabs'
+      sx={{
+        minBlockSize: 44,
+        '& .MuiTabs-flexContainer': { gap: 0.5 },
+        '& .MuiTab-root': {
+          minBlockSize: 44,
+          minInlineSize: 'auto',
+          px: 2,
+          py: 1.5,
+          alignItems: 'center',
+          fontWeight: 'fontWeightMedium',
+          textTransform: 'none',
+        },
+      }}
+    >
+      {orderedTabs.map(key => (
+        <Tab
+          key={key}
+          id={`hiring-application-tab-${key}`}
+          value={key}
+          label={copy.application[key]}
+          aria-controls={`hiring-application-panel-${key}`}
+          data-application-tab={key}
+        />
+      ))}
+    </Tabs>
+  )
 
   const lead = (
-    <Stack direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'stretch', md: 'center' }} spacing={3.5}>
-      <Button component={NextLink} href='/agency/hiring/pipeline' startIcon={<i className='tabler-arrow-left' />} sx={{ alignSelf: { xs: 'flex-start', md: 'center' }, color: 'text.secondary', fontWeight: 650 }}>{copy.application.back}</Button>
-      <Box sx={{ display: { xs: 'none', md: 'block' }, inlineSize: 1, blockSize: 26, backgroundColor: 'divider' }} />
-      <Stack direction='row' alignItems='center' spacing={3} sx={{ minWidth: 0, flex: 1 }}>
-        <Avatar sx={{ inlineSize: 42, blockSize: 42, bgcolor: 'primary.lightOpacity', color: 'primary.dark', fontWeight: 750 }}>{item.candidateInitials}</Avatar>
-        <Box sx={{ minWidth: 0 }}>
-          <Typography id='hiring-application-title' tabIndex={-1} variant='h3' noWrap sx={{ outline: 'none', lineHeight: 1.2 }}>{item.candidateName}</Typography>
-          <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap sx={{ mt: 0.75 }}>
-            <Typography variant='body2' color='text.secondary'>{item.openingTitle}{item.area ? ` · ${item.area}` : ''} · Etapa:</Typography>
-            <GreenhouseChip size='small' kind='status' variant='label' tone='info' label={copy.pipeline.stages[item.application.stage]} />
-          </Stack>
-        </Box>
-      </Stack>
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ alignItems: { xs: 'stretch', sm: 'center' } }}>
-        {isInternalHireDecision ? (
-          <Button
-            component={NextLink}
-            href={activationHref}
-            variant='tonal'
-            color='success'
-            startIcon={<i className='tabler-users-plus' />}
+    <DetailHero
+      kind='report'
+      dataCapture='hiring-application-hero'
+      title={item.candidateName}
+      titleId='hiring-application-title'
+      titleTabIndex={-1}
+      description={`${item.openingTitle}${item.area ? ` · ${item.area}` : ''}`}
+      statusLabel={copy.pipeline.stages[item.application.stage]}
+      statusTone='info'
+      leading={
+        <Avatar
+          sx={{
+            inlineSize: { xs: 48, sm: 56 },
+            blockSize: { xs: 48, sm: 56 },
+            bgcolor: 'primary.lightOpacity',
+            color: 'primary.dark',
+            fontWeight: 'fontWeightBold',
+          }}
+        >
+          {item.candidateInitials}
+        </Avatar>
+      }
+      actions={
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ inlineSize: { xs: '100%', sm: 'auto' } }}>
+          {isInternalHireDecision ? (
+            <Button
+              component={NextLink}
+              href={activationHref}
+              variant='tonal'
+              color='success'
+              startIcon={<i className='tabler-users-plus' />}
+            >
+              {copy.application.openActivationLane}
+            </Button>
+          ) : null}
+          <GreenhouseButton
+            kind='primaryAction'
+            reserveInlineSize={130}
+            leadingIconClassName='tabler-gavel'
+            onClick={() => { setShowDecisionForm(true); setTab('decision') }}
           >
-            {copy.application.openActivationLane}
-          </Button>
-        ) : null}
-        <GreenhouseButton kind='primaryAction' reserveInlineSize={130} leadingIconClassName='tabler-gavel' onClick={() => { setShowDecisionForm(true); setTab('decision') }}>{copy.application.decideAction}</GreenhouseButton>
-      </Stack>
-    </Stack>
+            {copy.application.decideAction}
+          </GreenhouseButton>
+        </Stack>
+      }
+      supporting={applicationNavigation}
+    />
   )
 
   const dialogMotionProps = {
@@ -1339,75 +1416,16 @@ const Application360View = ({
   } as const
 
   const primary = (
-    <Stack spacing={4} sx={{ minWidth: 0, animation: 'ghHiringFade 240ms cubic-bezier(.2,0,0,1)' }}>
-      <Box
-        data-capture='hiring-application-tabs'
-        role='tablist'
-        aria-label={`${item.candidateName} 360`}
-        onKeyDown={handleApplicationTabsKeyDown}
-        sx={{
-          display: 'flex',
-          gap: 0.5,
-          minBlockSize: 44,
-          overflowX: { xs: 'auto', md: 'visible' },
-          overflowY: 'hidden',
-          scrollbarWidth: 'none',
-          WebkitOverflowScrolling: 'touch',
-          borderBlockEnd: 1,
-          borderColor: 'divider',
-          '&::-webkit-scrollbar': { display: 'none' },
-        }}
-      >
-        {orderedTabs.map((key) => {
-          const active = key === tab
-
-          return (
-            <Box
-              key={key}
-              component='button'
-              type='button'
-              role='tab'
-              data-application-tab={key}
-              aria-selected={active}
-              tabIndex={active ? 0 : -1}
-              onClick={() => setApplicationTab(key)}
-              sx={(theme) => ({
-                minBlockSize: 42,
-                px: 3.5,
-                py: 2.5,
-                border: 0,
-                borderBlockEnd: '2px solid',
-                borderColor: active ? 'primary.main' : 'transparent',
-                marginBlockEnd: '-1px',
-                backgroundColor: 'transparent',
-                color: active ? 'primary.dark' : 'text.secondary',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                fontSize: theme.typography.body2.fontSize,
-                fontWeight: active ? 700 : 650,
-                textTransform: 'none',
-                whiteSpace: 'nowrap',
-                transition: theme.transitions.create(['color', 'background-color', 'border-color'], { duration: theme.transitions.duration.shorter }),
-                '&:hover': { backgroundColor: 'action.hover', color: active ? 'primary.dark' : 'text.primary' },
-                '&:focus-visible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: -2 },
-                '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
-              })}
-            >
-              {copy.application[key]}
-            </Box>
-          )
-        })}
-      </Box>
-      <Box
-        key={tab}
-        data-capture={`hiring-application-panel-${tab}`}
-        role='tabpanel'
-        aria-label={copy.application[tab]}
-        sx={{ minWidth: 0, animation: 'ghHiringFade 240ms cubic-bezier(.2,0,0,1)' }}
-      >
-        {panels[tab]}
-      </Box>
-    </Stack>
+    <Box
+      key={tab}
+      id={`hiring-application-panel-${tab}`}
+      data-capture={`hiring-application-panel-${tab}`}
+      role='tabpanel'
+      aria-labelledby={`hiring-application-tab-${tab}`}
+      sx={{ minWidth: 0, animation: 'ghHiringFade 240ms cubic-bezier(.2,0,0,1)' }}
+    >
+      {panels[tab]}
+    </Box>
   )
 
   return (

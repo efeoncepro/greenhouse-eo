@@ -61,5 +61,11 @@ export const scenario: CaptureScenario = {
       clipSelector: '[data-capture="assessment-scorecard"]',
       note: 'Radar Recharts completo con nombres humanos, leyenda, guía textual y cola compacta.',
     },
+    {
+      kind: 'mark',
+      label: 'operator-application-workspace',
+      clipSelector: '[data-capture="hiring-application"]',
+      note: 'Workspace completo: header global contenido, hero de candidata con navegación local y superficie de evaluación.',
+    },
   ],
 }

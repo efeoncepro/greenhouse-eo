@@ -25,6 +25,12 @@
 - Un scorecard parcial ya no convierte competencias pendientes en cero ni dibuja un perfil engañoso.
 - Evidencia local desktop/mobile: `.captures/2026-08-16T19-02-20_task1363-assessment-radar-runtime`.
 
+## 2026-08-16 — Hiring Desk contenido en planos canónicos
+
+- Hiring Desk y Application 360 migran su chrome compartido a `SurfaceRecipe`, `WorkbenchHeader`, breadcrumbs y `DetailHero`; el gris queda reservado como gutter.
+- Navegación global y tabs locales corrigen su semántica y teclado; la evaluación elimina card-on-card y compacta la cola sin pendientes.
+- Evidencia local desktop/mobile: `.captures/2026-08-16T21-30-17_task1363-assessment-radar-runtime`.
+
 ## 2026-08-16 — Expediente de Evaluación SMART (TASK-1735) + fix scorecard parcial (ISSUE-159)
 
 - Hiring: nueva capa de expediente per-application — notas append-only tipadas + borrador de
@@ -1196,10 +1202,3 @@ Estado: código completo y verificado, permiso creado en el directorio de identi
 verificación de que ningún permiso vecino se perdió. Las dos herramientas quedan publicadas y
 cerradas con llave a propósito: abrirlas necesita un llavero con entrega revocable por persona,
 que es trabajo ya planificado aparte. Queda publicar el despliegue del gateway.
-
-## 2026-08-07 — Autenticación local Gcloud con Playwright
-
-Se agregó `pnpm gcloud:auth:playwright` y la skill espejo `greenhouse-gcloud-auth-playwright` para renovar bajo solicitud los dos carriles de Google Cloud
-(`gcloud auth login` y ADC) usando Playwright como navegador visible, con verificación final mediante el
-preflight canónico. La credencial local se configura con `pnpm gcloud:auth:playwright:setup` en `.auth/`
-ignorado por Git y protegido con permisos `0600`; no se habilitó scheduler ni ejecución automática.
