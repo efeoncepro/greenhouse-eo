@@ -1,0 +1,94 @@
+{
+  "taskId": "TASK-1741",
+  "scenario": "task1741-careers-editorial-detail",
+  "reviewedAt": "2026-08-17",
+  "reviewer": "Codex — revisión visual de baseline legacy, fixture estructurada completa y vacante real parcial en GVC premium",
+  "evidence": {
+    "desktop": ".captures/2026-08-17T16-19-21_task1741-careers-editorial-detail/01-desktop1440/frames/02-detail-full.png",
+    "mobile": ".captures/2026-08-17T16-19-21_task1741-careers-editorial-detail/02-mobile390/frames/02-detail-full.png",
+    "dossier": "docs/ui/reviews/TASK-1741-public-careers-editorial-detail-renderer.review.md",
+    "completeFixture": ".captures/2026-08-17T16-19-21_task1741-careers-editorial-detail/01-desktop1440/frames/02-detail-full.png",
+    "partialRealOpening": ".captures/2026-08-17T15-51-54_task1741-careers-editorial-detail/",
+    "baseline": ".captures/2026-08-17T12-25-12_task354-careers-runtime-audit/"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.8,
+      "rationale": "El primer fold responde rol, promesa, modalidad, nivel, jornada y postulación; el cuerpo avanza de misión a resultados, trabajo, encaje, condiciones, proceso y compensación con un rail estable.",
+      "evidence": "desktop, mobile, completeFixture"
+    },
+    "proportions": {
+      "score": 4.6,
+      "rationale": "El ancho de lectura, el rail y las bandas guardan una proporción editorial clara; el título domina sin desplazar la información decisoria y el contenido largo conserva respiración.",
+      "evidence": "desktop, completeFixture"
+    },
+    "rhythm": {
+      "score": 4.7,
+      "rationale": "Secciones abiertas, separadores de lista y bloques de énfasis alternan un ritmo reconocible sin repetir la misma card; la secuencia móvil conserva el orden semántico completo.",
+      "evidence": "desktop, mobile"
+    },
+    "density": {
+      "score": 4.6,
+      "rationale": "La vacante real soporta ocho responsabilidades, nueve esenciales y cuatro deseables sin colapsar la lectura; chips y facts se reservan para metadatos compactos.",
+      "evidence": "desktop, mobile"
+    },
+    "depth": {
+      "score": 4.6,
+      "rationale": "La profundidad se limita al rail, panel remoto, evidencia, beneficios y compensación; el cuerpo principal permanece abierto y no introduce card-on-card ni elevación decorativa.",
+      "evidence": "desktop, completeFixture, enterprise rubric pass"
+    },
+    "surfaceEconomy": {
+      "score": 4.8,
+      "rationale": "Cada superficie tiene una función distinta y no duplica el contenido. Outcomes y trabajo evitan cards, beneficios usa una sola banda y los dos CTA existentes permanecen en hero y resumen.",
+      "evidence": "desktop, completeFixture, component tests"
+    },
+    "visualImpact": {
+      "score": 4.6,
+      "rationale": "El hero navy, el gradiente sobrio y los acentos verde/azul crean una entrada distintiva; outcomes, panel remoto y banda de beneficios sostienen impacto sin imágenes ni motion ornamental.",
+      "evidence": "desktop first fold, completeFixture"
+    },
+    "typography": {
+      "score": 4.7,
+      "rationale": "Poppins y Geist existentes construyen una escalera clara de eyebrow, h1, títulos, cuerpos y metadata. El ancho de línea y los pesos permiten escanear contenido largo en ambos viewports.",
+      "evidence": "desktop, mobile"
+    },
+    "color": {
+      "score": 4.6,
+      "rationale": "La paleta usa únicamente tokens existentes de Careers; navy, verde, azul claro y magenta mantienen identidad y contraste, mientras el significado siempre viaja también en texto o icono.",
+      "evidence": "desktop, mobile, axe pass"
+    },
+    "iconography": {
+      "score": 4.5,
+      "rationale": "Los iconos Tabler acompañan modalidad, jornada, trabajo, beneficios y CTA sin sustituir labels. La numeración explícita gobierna outcomes y proceso, donde un pictograma sería menos preciso.",
+      "evidence": "desktop, mobile"
+    },
+    "responsive": {
+      "score": 4.7,
+      "rationale": "A 390 px el hero, skills, países, proceso y compensación se recomponen linealmente; el rail queda al final, ambos CTA siguen accesibles y GVC confirma ausencia de overflow de documento.",
+      "evidence": "mobile, GVC layout pass"
+    },
+    "motion": {
+      "score": 4.5,
+      "rationale": "La decisión consciente es no añadir movimiento a una página de lectura. Los estados de foco y enlace conservan feedback y el probe con prefers-reduced-motion mantiene toda la información.",
+      "evidence": "GVC keyboard and reduced-motion pass"
+    },
+    "fidelity": {
+      "score": 4.8,
+      "rationale": "La implementación materializa la dirección Editorial dossier, el orden del wireframe, el rail sticky, los dos CTA y los fallbacks completo/parcial/legacy sin reinterpretar el contrato público.",
+      "evidence": "completeFixture, direction doc, view-model and component tests"
+    },
+    "genericTemplateResistance": {
+      "score": 4.7,
+      "rationale": "La combinación de promesa, outcomes observables, evidencia, modalidad contractual, beneficios y proceso lee como instrumento de decisión de Efeonce; no como un job board intercambiable.",
+      "evidence": "completeFixture, desktop, enterprise rubric pass"
+    }
+  },
+  "average": 4.66,
+  "floor": 4.5,
+  "threshold": "average >= 4.5; floor >= 4; hierarchy/surfaceEconomy/visualImpact/fidelity/genericTemplateResistance >= 4.5",
+  "verdict": "PASS_LOCAL_ROLLOUT_PENDING",
+  "knownDebt": [
+    "La vacante real EO-OPN-0061 aún no tiene outcomes, evidenceAsk ni learnables aprobados en su content v1; el contexto y los beneficios centrales sí se resuelven para todas las vacantes, mientras la fixture v2 cubre las regiones específicas sin inventar contenido real.",
+    "La medición GVC local incluye el bundle de desarrollo de Next y reporta transferencia sobre budget como warning; debe repetirse sobre el build de staging antes del flip."
+  ]
+}

@@ -196,12 +196,41 @@ export const careers: CareersCopy = {
     processTitle: 'Cómo es el proceso',
     compensationTitle: 'Compensación',
     compensationFallback: 'La compensación se conversa con transparencia durante el proceso.',
+    outcomesTitle: 'Cómo se ve un buen primer año',
+    workTitle: 'El trabajo',
+    essentialsTitle: 'Lo esencial',
+    preferredTitle: 'Deseable, no excluyente',
+    learnablesTitle: 'Lo que puedes aprender aquí',
+    evidenceTitle: 'La evidencia que queremos ver',
+    companyTitle: 'Efeonce en breve',
+    remoteTitle: 'Cómo trabajamos',
+    eligibleCountriesTitle: 'Países elegibles',
+    collaborationLabels: {
+      team: 'Equipo',
+      reportsTo: 'Reporta a',
+      language: 'Idioma',
+      timezoneOverlap: 'Solapamiento horario',
+      workingRhythm: 'Ritmo de trabajo'
+    },
+    benefitsTitle: 'Lo que recibes',
+    processMetaLabels: {
+      expectedTiming: 'Duración estimada',
+      responseCommitment: 'Nuestro compromiso',
+      accommodationPath: 'Adaptaciones'
+    },
+    compensationUnits: {
+      HOUR: 'por hora',
+      DAY: 'por día',
+      WEEK: 'por semana',
+      MONTH: 'por mes',
+      YEAR: 'por año'
+    },
     summaryTitle: 'Resumen del rol',
     labels: {
       area: 'Área',
       location: 'Ubicación',
       modality: 'Modalidad',
-      seniority: 'Seniority',
+      seniority: 'Nivel del rol',
       employment: 'Jornada'
     },
     unavailableTitle: 'Esta vacante ya no está disponible',

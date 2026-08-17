@@ -17,6 +17,36 @@ Before writing, read `../references/inbound-recruiting-job-ad-research.md` and f
 
 If a fact cannot be resolved, carry `needs confirmation` into the brief and stop before publication. Never let attractive prose conceal missing role truth.
 
+## 0.1 Canonical public structure — mandatory v2
+
+Every Efeonce vacancy uses the same candidate-facing information architecture. Role complexity changes the
+content, never the core order:
+
+1. Hero: searchable title, public seniority, modality/location and the existing apply CTA.
+2. About the role: candidate promise and concrete mission/problem.
+3. Efeonce at a glance: centrally governed company context; never open the vacancy with generic company copy.
+4. What success looks like: 3–5 observable first-year outcomes.
+5. The work: 4–8 real responsibilities/deliverables.
+6. Optional role depth: 0–3 additional sections, immediately after the work.
+7. Fit: 4–8 essentials, up to 4 preferred capabilities and up to 4 learnables.
+8. Evidence: the smallest fair portfolio/case evidence request.
+9. How we work: work model, team, manager, language, timezone overlap, working rhythm and exact eligible countries.
+10. What you receive: centrally governed Efeonce benefits plus up to 6 genuinely role-specific additions.
+11. Selection process: 3–5 stages with purpose, timing, response commitment and accommodation path.
+12. Compensation: approved structured range or the neutral transparency fallback.
+13. Summary rail and the second existing apply CTA.
+
+The extension zone accepts only `narrative`, `bullets` or `milestones`. Each block needs a title and intro or
+items. Maximum three blocks and six items per block. It cannot carry HTML, a CTA, colors, layout choices,
+tracking, benefits, compensation, requirements or a second process. If the role needs more than three,
+rewrite/group the information or review the canonical recipe; do not turn one vacancy into a bespoke page.
+
+Publication binding: new writes and re-publications require `PublicOpeningContent.version = 2` complete.
+Persisted v1 vacancies remain readable through section-level legacy fallback, but v1 is read-only and cannot
+be newly authored. The publication command derives summary, description, responsibilities, requirements,
+preferred capabilities and public process notes from v2; agents and humans must not maintain two editable
+versions of the same claim. Remote v2 also requires at least one exact ISO alpha-2 eligible country.
+
 ## 1. Candidate promise
 
 - Lead with why the role exists and what the person will help build.
@@ -77,6 +107,9 @@ Publish the candidate-facing process, not internal template names.
 4. Decisión: clear response, with respectful closure whether the candidate advances or not.
 
 Never expose internal labels such as assessment template IDs, levels like `L2`, scorecard IDs or private hiring notes.
+For Efeonce/Greenhouse, public role seniority uses exactly `Junior`, `Semi-senior`, `Senior` or `Lead`. `Intermedio`
+describes skill proficiency, not the role level; `L1/L2/L3` belong only to internal assessment taxonomy. If the public
+title explicitly says Junior, Semi-senior, Senior or Lead, the structured public seniority must match it exactly.
 State likely timing, what each stage evaluates and how a candidate requests an accommodation. If a work sample is required, it must be job-related and paid or replaceable by an equivalent existing case.
 
 ## 8. Compensation and location transparency
@@ -129,7 +162,8 @@ Inbound checklist:
 For Greenhouse public careers, the offer should become:
 
 - `TalentDemand`: internal demand, owner, fulfillment mode, role context.
-- `HiringOpening`: public title, summary, description, requirements, nice-to-have, location, modality, employment, seniority.
+- `HiringOpening`: canonical `PublicOpeningContent` v2, exact eligible countries, public title, location,
+  modality, employment and seniority; legacy prose fields are derived projections, not a second authoring surface.
 - Public listing: short summary + short competency chips.
 - Detail page: mission, responsibilities, requirements, competencies, candidate-facing process, compensation signal.
 - Apply: `POST /api/public/hiring/applications` via the public careers form.

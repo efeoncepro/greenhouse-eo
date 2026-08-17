@@ -48,7 +48,8 @@ existentes (cero endpoints nuevos, cero capabilities nuevas, cero eventos nuevos
   el retiro es el 404 del unpublish). `employmentType` por mapeo exacto conservador
   ("Jornada completa"→FULL_TIME; "Contrato indefinido" se omite). `hiringOrganization` = marca
   Efeonce desde el brand SSOT (`EFEONCE_BRAND_NAME`/`EFEONCE_URL_HTTPS`), no la razón social.
-  Emisión gated por `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` (Vercel-only, default OFF, ledger);
+  Emisión gated por `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` **y**
+  `CAREERS_DETAIL_EDITORIAL_V2_ENABLED` (Vercel-only, default OFF, ledger);
   el canonical explícito de la leaf publicada NO depende del flag.
 
 **Invariantes:**
@@ -64,20 +65,20 @@ existentes (cero endpoints nuevos, cero capabilities nuevas, cero eventos nuevos
   "dejar claro el anclaje contractual": `jobLocation` significa dónde se realiza físicamente el
   trabajo, así que Google dejaría de clasificarla como remota y la mostraría como empleo presencial
   en esa ciudad. El anclaje contractual se declara en el contenido visible (`content.remoteModel`);
-  la elegibilidad, en `applicantLocationRequirements` — que admite **un solo país** y sigue siendo
+  la elegibilidad, en `applicantLocationRequirements` — que admite uno o varios países y sigue siendo
   `TELECOMMUTE` válido.
-- **NUNCA** prender `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` antes de que el renderer (TASK-1741)
+- **NUNCA** prender `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` sin que el renderer (TASK-1741)
   muestre el bloque estructurado en la página visible. **El orden es renderer primero, schema
   después**: el builder de JSON-LD ya consume `content`, pero `view-model.ts` y
-  `components/greenhouse/careers/**` todavía NO (verificado 2026-08-17), así que prender el schema
-  antes emitiría a Google un párrafo — el `remoteModel` con la vía contractual, ya poblado en las 2
-  vacantes publicadas — que el candidato no ve en la página. Eso viola las guías de Google (el
-  structured data debe reflejar contenido visible) y el invariante propio de este dominio. Los dos
-  flags son **técnicamente independientes** (TASK-1741 no necesita el de schema para desarrollarse:
-  `content` y `remoteEligibleCountries` viajan en el payload público SIEMPRE, sin flag), pero su
+  `components/greenhouse/careers/**` no lo consumían antes de TASK-1741, así que el schema habría
+  emitido a Google un párrafo — el `remoteModel` ya poblado — que el candidato no veía. El config
+  ahora aplica un **interlock técnico**: schema ON sólo es efectivo cuando el renderer editorial
+  también está ON. Eso protege la paridad aun ante una combinación de env vars equivocada. TASK-1741
+  no necesita el flag de schema para desarrollarse:
+  `content` y `remoteEligibleCountries` viajan en el payload público SIEMPRE, sin flag, pero su
   **orden de encendido no es libre**.
 - **NUNCA** dejar que un bloque estructurado PARCIAL reemplace la prosa legacy en la descripción del
-  schema. Sólo un bloque con **narrativa núcleo** (`promise`/`intro`/`outcomes`/`workItems`) la
+  schema. Sólo un bloque con **narrativa núcleo completa** (`promise` + `intro` + `outcomes` + `workItems`) la
   reemplaza; un bloque parcial (el estado normal mientras el contenido editorial no se autora) la
   **complementa**. Reemplazarla degradaba la descripción a un fragmento del rol — bug cazado con el
   primer artefacto real, 2026-08-17.
@@ -94,11 +95,11 @@ runbook de decisión en `docs/manual-de-uso/hr/operar-careers-publicas.md`).
 **Decisión (Accepted 2026-08-12).** Los tres datos que el apply público aceptaba pero el command
 descartaba quedan persistidos así:
 
-| Dato | Ubicación física | Semántica |
-|---|---|---|
-| Teléfono | `greenhouse_hiring.candidate_facet.phone_e164` (TEXT NULL) | Contacto durable **person-first**, normalizado E.164; opcional |
+| Dato               | Ubicación física                                                                           | Semántica                                                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| Teléfono           | `greenhouse_hiring.candidate_facet.phone_e164` (TEXT NULL)                                 | Contacto durable **person-first**, normalizado E.164; opcional                                                |
 | País de residencia | `greenhouse_hiring.candidate_facet.residence_country_code` (TEXT NULL, CHECK `^[A-Z]{2}$`) | **Autodeclarado** ISO 3166-1 alpha-2; requerido en UI para postulaciones nuevas; NULL = legacy "No informado" |
-| Mensaje | `greenhouse_hiring.hiring_application.candidate_message` (TEXT NULL, CHECK ≤4000) | Contexto de **esa** postulación; nunca se copia al facet |
+| Mensaje            | `greenhouse_hiring.hiring_application.candidate_message` (TEXT NULL, CHECK ≤4000)          | Contexto de **esa** postulación; nunca se copia al facet                                                      |
 
 **Alternativas rechazadas:** inferir país desde prefijo telefónico/IP/CV (dato insuficiente y
 engañoso — prohibido); guardar todo en la aplicación (el contacto es de la persona, no de una
@@ -138,13 +139,13 @@ Rollout abajo; vive SOLO en el worker) + kill-switch por tipo en
 `greenhouse_notifications.email_type_config` (seed aplicado; `hiring_decision_rejected` pausable
 independiente):
 
-| Evento | Consumer | Email |
-|---|---|---|
-| `hiring.application.created` | `hiring_application_created_emails` | aviso interno a People (buzón `HIRING_INTERNAL_NOTIFICATIONS_EMAIL`, default `people@efeoncepro.com`) + acuse al candidato |
-| `hiring.assessment.assigned` | `hiring_assessment_assigned_email` | link de evaluación al candidato — SOLO `method=candidate_test` (un scorecard de entrevistador JAMÁS emailea al candidato) |
-| `hiring.assessment.submitted` | `hiring_assessment_submitted_internal_email` | aviso al buzón interno de People cuando un `candidate_test` queda completado y listo para revisión; incluye CTA a Application 360, nunca score ni decisión automática |
-| `hiring.application.stage_changed` | `hiring_stage_changed_email` | avance de etapa — SOLO allowlist candidate-facing (`shortlisted`→"Preselección", `interview`→"Entrevista"); etapas internas nunca llegan a copy |
-| `hiring.application.decided` | `hiring_application_decided_email` | `selected` (felicitación) / `rejected` (agradecimiento); anti-stale: re-verifica la decisión vigente en PG antes de enviar |
+| Evento                             | Consumer                                     | Email                                                                                                                                                                 |
+| ---------------------------------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `hiring.application.created`       | `hiring_application_created_emails`          | aviso interno a People (buzón `HIRING_INTERNAL_NOTIFICATIONS_EMAIL`, default `people@efeoncepro.com`) + acuse al candidato                                            |
+| `hiring.assessment.assigned`       | `hiring_assessment_assigned_email`           | link de evaluación al candidato — SOLO `method=candidate_test` (un scorecard de entrevistador JAMÁS emailea al candidato)                                             |
+| `hiring.assessment.submitted`      | `hiring_assessment_submitted_internal_email` | aviso al buzón interno de People cuando un `candidate_test` queda completado y listo para revisión; incluye CTA a Application 360, nunca score ni decisión automática |
+| `hiring.application.stage_changed` | `hiring_stage_changed_email`                 | avance de etapa — SOLO allowlist candidate-facing (`shortlisted`→"Preselección", `interview`→"Entrevista"); etapas internas nunca llegan a copy                       |
+| `hiring.application.decided`       | `hiring_application_decided_email`           | `selected` (felicitación) / `rejected` (agradecimiento); anti-stale: re-verifica la decisión vigente en PG antes de enviar                                            |
 
 **Invariantes:**
 
@@ -341,7 +342,7 @@ escalan a error).
 
 El adapter `clamav-http` dejó de ser código latente: existe el servicio Cloud Run `services/clamav/` y el adapter se
 ejerció contra él. **El flag `ASSET_MALWARE_SCAN_ENABLED` sigue OFF en Vercel** — el flip es rollout pendiente.
-*(Superado por el Delta 2026-08-12: el flag está ON en staging y producción.)*
+_(Superado por el Delta 2026-08-12: el flag está ON en staging y producción.)_
 
 **El puerto de escaneo NO es de Hiring.** `scanAssetBytes` recibe bytes y devuelve un veredicto; no sabe de vacantes.
 Hoy lo consumen `hiring/public-careers/cv-upload.ts` y `growth/forms/file-uploads.ts`, y el guard del attach exige
@@ -510,12 +511,12 @@ En una frase:
 
 La demanda debe poder expresarse sobre cuatro cuadrantes sin cambiar de modelo:
 
-| Stakeholder | Engagement | Ejemplo | Destino probable |
-|---|---|---|---|
-| `internal` | `on_demand` | refuerzo temporal para un delivery o iniciativa interna | reassignment, contractor, partner |
-| `internal` | `on_going` | contratación estable o capacidad estructural | internal hire, internal reassignment |
-| `client` | `on_demand` | cobertura puntual para un cliente o proyecto acotado | contractor, staff augmentation, partner |
-| `client` | `on_going` | servicio continuo o squad estable | staff augmentation, internal hire, partner |
+| Stakeholder | Engagement  | Ejemplo                                                 | Destino probable                           |
+| ----------- | ----------- | ------------------------------------------------------- | ------------------------------------------ |
+| `internal`  | `on_demand` | refuerzo temporal para un delivery o iniciativa interna | reassignment, contractor, partner          |
+| `internal`  | `on_going`  | contratación estable o capacidad estructural            | internal hire, internal reassignment       |
+| `client`    | `on_demand` | cobertura puntual para un cliente o proyecto acotado    | contractor, staff augmentation, partner    |
+| `client`    | `on_going`  | servicio continuo o squad estable                       | staff augmentation, internal hire, partner |
 
 ## Canonical Objects Involved
 
@@ -1333,7 +1334,7 @@ La foundation transaccional del dominio quedó materializada (local-first, verif
 
 **API baseline interna:** `/api/hiring/{demands,openings,candidate-facets,applications}` (+ `openings/[id]/publish`), dual-gate `requireInternalTenantContext` + `can()`.
 
-**Capabilities V1 (8, seedeadas en `capabilities_registry` + grants en `runtime.ts`):** `hiring.demand.{read,write}`, `hiring.opening.{read,write,publish}`, `hiring.application.{read,write,decide}`. Grant: internal ∪ EFEONCE_ADMIN ∪ HR_MANAGER ∪ EFEONCE_OPERATIONS (∪ EFEONCE_ACCOUNT en read/write; publish/decide least-privilege sin comercial). NUNCA `client_*`. `hiring.application.decide` queda seedeada/grantada ahora y su endpoint dedicado llega con el desk interno (TASK-355).
+**Capabilities V1 (8, seedeadas en `capabilities_registry` + grants en `runtime.ts`):** `hiring.demand.{read,write}`, `hiring.opening.{read,write,publish}`, `hiring.application.{read,write,decide}`. Grant: internal ∪ EFEONCE*ADMIN ∪ HR_MANAGER ∪ EFEONCE_OPERATIONS (∪ EFEONCE_ACCOUNT en read/write; publish/decide least-privilege sin comercial). NUNCA `client*\*`. `hiring.application.decide` queda seedeada/grantada ahora y su endpoint dedicado llega con el desk interno (TASK-355).
 
 **Views (TASK-355, implementadas en dev):** `gestion.hiring`, `gestion.hiring_demand`, `gestion.hiring_pipeline`, `gestion.hiring_publication` y `gestion.hiring_application_detail` viven en `VIEW_REGISTRY`, `role_view_assignments` y el manifest de reachability junto con las rutas `/agency/hiring/**`. Los viewCodes mantienen namespace de navegación `gestion.*`; la ruta conserva ownership de producto bajo `agency`. El acceso visible no reemplaza las capabilities finas de cada reader/command.
 
@@ -1753,7 +1754,7 @@ contradictoria se veía. Efecto: `batch_eligible` muerto y el operador revisando
 subsistema perdía su razón de ser.
 
 La causa no fue un `mean` mal tipeado: fue un **contrato implícito**. El prompt v1 pedía "el puntaje
-por criterio" y el schema declaraba 0–100 por criterio; *aporte ponderado* y *nota independiente*
+por criterio" y el schema declaraba 0–100 por criterio; _aporte ponderado_ y _nota independiente_
 eran lecturas igual de válidas, y el modelo alternaba entre ambas según la calidad de la respuesta.
 
 - **Contrato**: escala declarada `weighted_contribution` (`weight` + `score` ≤ `weight`); el schema
@@ -1805,3 +1806,45 @@ Funcional `docs/documentation/hr/expediente-de-evaluacion.md` +
 manual `docs/manual-de-uso/hr/operar-expediente-de-evaluacion.md` +
 `docs/manual-de-uso/hr/operar-scoring-ia-assessments.md` +
 `docs/manual-de-uso/hr/calificar-gold-set-de-referencia.md`.
+
+## Delta 2026-08-17 (2) — Seniority público canónico y separado de assessments (TASK-1741)
+
+- **Status:** `Accepted` · **Owner:** Talent/Hiring · **Scope:** `hiring_opening.public_seniority`,
+  publicación canónica, AI vacancy copy y Careers · **Reversibility:** `two-way` · **Confidence:** `high`
+  · **Validated as of:** `2026-08-17`.
+- **Decisión:** el seniority candidate-facing usa exactamente `Junior`, `Semi-senior`, `Senior` o
+  `Lead`. El nivel interno de assessment (`L1/L2/L3`) permanece en `hiring_opening.seniority` y en
+  templates; nunca cruza a `public_seniority`. `Intermedio` queda reservado para proficiency de una
+  habilidad, no para el nivel del rol. Si `public_title` declara explícitamente un nivel, debe coincidir.
+- **Enforcement:** `src/lib/hiring/public-seniority.ts` es la regla browser/server-safe; selector humano,
+  JSON Schema + sanitizer de IA, `updateHiringOpening`, `publishOpening`, readers públicos fail-closed y
+  CHECK `hiring_opening_public_seniority_check` la consumen o espejan. La migración gobernada calibra los
+  valores legacy conocidos `L2` e `Intermedio` a `Semi-senior` y aborta ante cualquier valor desconocido.
+- **Alternativas rechazadas:** mostrar texto libre (permitió el leak `L2`); traducir en el renderer
+  (oculta corrupción y deja API/schema divergentes); reutilizar el nivel de assessment (mezcla una rúbrica
+  interna con lenguaje de mercado).
+- **Consecuencia:** una vacante inválida falla en escritura/publicación y una fila corrupta no aparece ni
+  acepta postulaciones por el reader público. El renderer conserva el valor exacto, sin reinterpretarlo.
+- **Revisit when:** Efeonce necesite un nivel público adicional sustentado por arquitectura de carrera y
+  benchmarking; debe agregarse de forma atómica a contrato, UI, IA, CHECK, docs y migración.
+
+## Delta 2026-08-17 (3) — Arquitectura editorial canónica de vacantes v2 (TASK-1740/1741)
+
+- **Status:** `Accepted` · **Owner:** Talent/Hiring + Public Careers · **Scope:** contenido público,
+  publicación, renderer y JobPosting · **Reversibility:** `two-way` para renderer, `expand-only` para writes
+  · **Confidence:** `high` · **Validated as of:** `2026-08-17`.
+- **Decisión:** todas las vacantes nuevas usan la misma arquitectura de información mediante
+  `PublicOpeningContent.version=2`. El contrato exige promesa, misión, 3–5 outcomes, 4–8 work items,
+  essentials, evidencia, modelo de trabajo, colaboración y proceso. Puede añadir máximo tres secciones
+  tipadas (`narrative|bullets|milestones`) después del trabajo. Contexto corporativo y beneficios globales
+  se resuelven desde `standard-content.ts`; el opening guarda sólo adiciones del rol.
+- **Enforcement:** el parser acepta sólo v2 en writes; `publishOpening` exige v2 completo y países ISO en
+  remoto; el vacancy publication operator deriva las proyecciones legacy; renderer y JobPosting consumen
+  la misma evidencia resuelta. V1 es read-only y conserva fallback por sección para filas publicadas.
+- **Alternativas rechazadas:** plantilla libre por vacante (drift y regresión visual); bloques HTML/CTA
+  arbitrarios (superficie insegura e imposible de comparar); duplicar beneficios y texto corporativo en
+  cada opening (desactualización); mantener v2 y prosa como dos superficies editables (claims divergentes).
+- **Consecuencia:** la complejidad del rol cambia el contenido y hasta tres bloques de profundidad, no la
+  arquitectura ni los CTA. Un humano o agente recibe 422 antes de publicar una vacante incompleta.
+- **Revisit when:** datos reales demuestren que tres bloques o los tres formatos no cubren una familia de
+  roles; el cambio debe versionar el contrato y preservar paridad HTML/JobPosting.

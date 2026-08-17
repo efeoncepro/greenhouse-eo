@@ -45,12 +45,23 @@ const internalOpening: HiringOpening = {
     outcomes: ['Entregar 2 identidades completas por trimestre'],
     workItems: [],
     essentials: ['Figma avanzado'],
+    preferred: [],
     learnables: [],
     evidenceAsk: 'Portafolio con decisiones explicadas.',
-    remoteModel: '100% remoto con overlap GMT-4.',
-    processSteps: ['Screening', 'Muestra de trabajo pagada'],
+    workModel: '100% remoto con overlap GMT-4.',
+    collaboration: null,
+    process: {
+      steps: [
+        { title: 'Screening', body: null },
+        { title: 'Muestra de trabajo pagada', body: null }
+      ],
+      expectedTiming: null,
+      responseCommitment: null,
+      accommodationPath: null
+    },
     benefits: ['15 días hábiles de vacaciones'],
-    compensation: null
+    compensation: null,
+    additionalSections: []
   },
   publicRemoteEligibleCountries: ['CL', 'CO'],
   applyUrl: null,
@@ -153,5 +164,21 @@ describe('buildPublicOpeningPayload — allowlist de proyección pública', () =
     expect(() => buildPublicOpeningPayload({ ...internalOpening, publicTitle: null })).toThrowError(
       expect.objectContaining({ code: 'hiring_opening_public_title_required' })
     )
+  })
+
+  it.each(['L2', 'Intermedio', 'senior'])('falla cerrado ante seniority público no canónico: %s', publicSeniority => {
+    expect(() => buildPublicOpeningPayload({ ...internalOpening, publicSeniority })).toThrowError(
+      expect.objectContaining({ code: 'hiring_opening_public_seniority_invalid' })
+    )
+  })
+
+  it('falla cerrado si un título Senior se contradice con el nivel público', () => {
+    expect(() =>
+      buildPublicOpeningPayload({
+        ...internalOpening,
+        publicTitle: 'Senior Visual Designer',
+        publicSeniority: 'Semi-senior'
+      })
+    ).toThrowError(expect.objectContaining({ code: 'hiring_opening_public_seniority_title_mismatch' }))
   })
 })

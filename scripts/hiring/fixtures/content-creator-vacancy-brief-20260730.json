@@ -3,49 +3,12 @@
   "sourceReference": "efeonce-talent-assurance-content-creator-20260730",
   "requestedRole": "Content Creator — Editorial, SEO/AEO & Social",
   "publicTitle": "Content Creator — Editorial, SEO/AEO & Social",
-  "publicSummary": "Convierte investigación, briefs e ideas complejas en contenido editorial y social que las personas quieran leer, guardar y compartir.",
-  "publicDescription": "Hay ideas valiosas atrapadas en una entrevista, un brief o una conversación de negocio. El trabajo de este rol es encontrarlas y darles una forma que funcione: un artículo que responde una pregunta real, una página que ordena una decisión, un carrusel que cambia una perspectiva, un caption que abre conversación o un guion que merece verse hasta el final. Buscamos una persona de nivel intermedio para hacer ese trabajo dentro de Efeonce, junto a estrategia, cuentas, diseño y especialistas de marketing. No buscamos llenar un calendario: buscamos construir piezas con una idea defendible y una razón para existir. ✨",
-  "responsibilities": [
-    "🧭 Partir de una pregunta, entrevista o brief y encontrar la idea que merece convertirse en contenido.",
-    "Investigar fuentes, lenguaje de audiencia y contexto para sostener cada pieza con evidencia.",
-    "🧩 Convertir una idea en un pequeño sistema de contenido: artículo, página, carrusel, caption o guion, según corresponda.",
-    "📱 Adaptar la tesis a cada plataforma sin repetir el mismo texto ni perder su intención.",
-    "📈 Aplicar fundamentos de SEO, AEO y social search para que el contenido sea encontrable y entendible.",
-    "Defender decisiones editoriales, recibir feedback y mejorar una pieza sin diluir su idea central.",
-    "Trabajar con estrategia, cuentas, diseño y especialistas de marketing según cada proyecto.",
-    "🗂️ Dejar documentados los aprendizajes, criterios y recursos que hagan mejor la siguiente entrega."
-  ],
-  "requirements": [
-    "Portafolio verificable donde puedas explicar qué problema resolvía cada pieza y qué decisión tomaste.",
-    "Experiencia práctica investigando, escribiendo y editando contenido editorial o comercial.",
-    "Experiencia creando contenido social: captions, conceptos, carruseles, guiones o series.",
-    "Capacidad para pasar de una idea a una estructura, una primera versión y una mejora concreta.",
-    "Conocimientos aplicados de SEO y capacidad para estructurar contenido para búsqueda, asistentes de IA y social search; no buscamos un perfil técnico de desarrollo.",
-    "Experiencia práctica usando herramientas de producción y operación de contenido, como CMS, gestores de proyectos, analítica, publicación social o IA; no exigimos una marca específica.",
-    "Capacidad para leer señales básicas de contenido —alcance, interacción, clics y conversión— y proponer una mejora comprobable.",
-    "Criterio para reconocer cuándo un brief está incompleto y qué preguntas hacer antes de producir.",
-    "Comunicación escrita sólida en español y organización para cumplir compromisos."
-  ],
-  "niceToHave": [
-    "Experiencia en agencia, consultora o equipos con múltiples marcas.",
-    "Experiencia convirtiendo una fuente experta, entrevista o investigación en varias piezas de contenido.",
-    "Experiencia con herramientas adicionales de investigación, automatización o producción visual.",
-    "Inglés profesional para leer fuentes o trabajar con referencias internacionales."
-  ],
-  "skillTags": [
-    "Copywriting",
-    "Social media content",
-    "SEO",
-    "AEO",
-    "Investigación",
-    "Analítica de contenido",
-    "Herramientas de contenido",
-    "Estrategia de canales"
-  ],
+  "skillTags": ["Copywriting", "Social media content", "SEO", "AEO", "Investigación", "Analítica de contenido"],
   "publicArea": "Creative",
   "workMode": "remote",
-  "hiringRegion": "LATAM",
-  "seniority": "Intermedio",
+  "hiringRegion": "Global",
+  "publicRemoteEligibleCountries": ["CL", "CO", "MX", "PE"],
+  "seniority": "Semi-senior",
   "employmentMode": "Contrato indefinido",
   "engagementType": "on_going",
   "fulfillmentMode": "internal_hire",
@@ -53,6 +16,67 @@
   "requestedSeats": 1,
   "priority": "high",
   "ownerUserId": "user-efeonce-admin-julio-reyes",
-  "publicProcessNotes": "🚀 Postulación, revisión de portafolio, assessment práctico de aproximadamente 90 minutos y entrevista estructurada. El assessment usa un brief ficticio y revisa criterio editorial, CTA, elección de canales, SEO/AEO, herramientas, analítica e investigación; no es trabajo para un cliente. La entrevista incluye una conversación sobre tus decisiones y una revisión práctica de las herramientas que realmente dominas. La posición pertenece al equipo Efeonce y la asignación de proyectos se define según demanda, fortalezas y desarrollo.",
-  "publicCompensationBand": "USD 1.100–1.300 mensuales, según experiencia y país de contratación"
+  "publicCompensationBand": "USD 1.100–1.300 mensuales, según experiencia y país de contratación",
+  "publicContent": {
+    "version": 2,
+    "promise": "Convierte investigación, briefs e ideas complejas en contenido editorial y social que las personas quieran leer, guardar y compartir.",
+    "intro": "Hay ideas valiosas atrapadas en entrevistas, briefs y conversaciones de negocio. Tu trabajo será encontrarlas, sostenerlas con evidencia y darles la forma adecuada para cada canal.",
+    "outcomes": [
+      "Publicar contenido con una tesis defendible y QA editorial consistente.",
+      "Mejorar la encontrabilidad y citabilidad orgánica de las piezas asignadas.",
+      "Dejar criterios y recursos reutilizables que hagan mejor la siguiente entrega."
+    ],
+    "workItems": [
+      "Investigar fuentes, lenguaje de audiencia y contexto para sostener cada pieza.",
+      "Convertir una idea en artículos, páginas, carruseles, captions o guiones según el canal.",
+      "Aplicar fundamentos de SEO, AEO y social search sin perder la intención editorial.",
+      "Defender decisiones, incorporar feedback y documentar aprendizajes."
+    ],
+    "essentials": [
+      "Portafolio verificable con contexto y decisiones explicadas.",
+      "Experiencia práctica investigando, escribiendo y editando contenido.",
+      "Conocimientos aplicados de SEO y estructuración para búsqueda y asistentes de IA.",
+      "Comunicación escrita sólida en español y organización para cumplir compromisos."
+    ],
+    "preferred": [
+      "Experiencia en agencia, consultora o equipos con múltiples marcas.",
+      "Inglés profesional para leer fuentes o trabajar con referencias internacionales."
+    ],
+    "learnables": ["AEO/GEO", "Atomización multicanal", "Analítica editorial avanzada"],
+    "evidenceAsk": "Comparte tres piezas publicadas e indica qué problema resolvía cada una, qué decisión tomaste y qué aprendiste.",
+    "workModel": "Trabajo 100% remoto, con documentación asíncrona y solapamiento planificado con GMT-4.",
+    "collaboration": {
+      "team": "Creative, estrategia, cuentas y SEO/AEO",
+      "reportsTo": "Content Lead",
+      "language": "Español; inglés profesional para fuentes",
+      "timezoneOverlap": "Al menos 4 horas con GMT-4",
+      "workingRhythm": "Asíncrono con revisiones editoriales y sincronizaciones semanales"
+    },
+    "process": {
+      "steps": [
+        { "title": "Revisión de portafolio", "body": "Revisamos experiencia, disponibilidad y evidencia existente." },
+        {
+          "title": "Assessment pagado",
+          "body": "Resuelves un brief ficticio y acotado; no produce trabajo para un cliente."
+        },
+        {
+          "title": "Entrevista estructurada",
+          "body": "Conversamos sobre decisiones, herramientas, colaboración y expectativas."
+        }
+      ],
+      "expectedTiming": "El proceso completo suele tomar entre 2 y 3 semanas.",
+      "responseCommitment": "Te comunicamos la decisión final, avances o no.",
+      "accommodationPath": "Puedes solicitar una adaptación del proceso en cualquier etapa."
+    },
+    "benefits": [],
+    "compensation": { "currency": "USD", "minValue": 1100, "maxValue": 1300, "unitText": "MONTH" },
+    "additionalSections": [
+      {
+        "title": "Qué no es este rol",
+        "format": "narrative",
+        "intro": "No buscamos llenar un calendario ni repetir el mismo texto en todos los canales; buscamos piezas con una idea defendible y una razón para existir.",
+        "items": []
+      }
+    ]
+  }
 }

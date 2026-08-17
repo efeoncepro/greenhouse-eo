@@ -32,7 +32,7 @@ import Typography from '@mui/material/Typography'
 
 import { GreenhouseButton, GreenhouseChip } from '@/components/greenhouse/primitives'
 import type { HiringDeskCopy } from '@/lib/copy'
-import type { HiringOpening, TalentDemand } from '@/types/hiring'
+import { HIRING_PUBLIC_SENIORITIES, type HiringOpening, type TalentDemand } from '@/types/hiring'
 import type { AssessmentTemplate } from '@/types/hiring-assessment'
 
 import { HiringClientError, hiringRequest } from './hiring-client'
@@ -72,7 +72,7 @@ const emptyForm: DraftForm = {
   publicArea: '',
   publicSeniority: '',
   publicSkillTags: [],
-  publicProcessNotes: '',
+  publicProcessNotes: ''
 }
 
 const str = (value: unknown): string => (typeof value === 'string' ? value : '')
@@ -89,7 +89,7 @@ const formFromProposal = (proposed: Record<string, unknown>): DraftForm => ({
   publicArea: str(proposed.publicArea),
   publicSeniority: str(proposed.publicSeniority),
   publicSkillTags: strArr(proposed.publicSkillTags),
-  publicProcessNotes: str(proposed.publicProcessNotes),
+  publicProcessNotes: str(proposed.publicProcessNotes)
 })
 
 type DrawerStep = 'generate' | 'proposing' | 'review'
@@ -117,7 +117,7 @@ const VacancyAiDraftDrawer = ({
   onClose,
   onApplied,
   onDiscarded,
-  onPendingChange,
+  onPendingChange
 }: VacancyAiDraftDrawerProps) => {
   const vacancyCopy = copy.publication.vacancyAi
 
@@ -174,20 +174,29 @@ const VacancyAiDraftDrawer = ({
     let cancelled = false
 
     hiringRequest<{ items: AssessmentTemplate[] }>('/api/hiring/assessments/templates')
-      .then((payload) => { if (!cancelled) setTemplates(payload.items ?? []) })
-      .catch(() => { if (!cancelled) setTemplates([]) })
+      .then(payload => {
+        if (!cancelled) setTemplates(payload.items ?? [])
+      })
+      .catch(() => {
+        if (!cancelled) setTemplates([])
+      })
 
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [open, step, templates])
 
   const updateForm = <K extends keyof DraftForm>(field: K, value: DraftForm[K]) => {
-    setForm((current) => ({ ...current, [field]: value }))
+    setForm(current => ({ ...current, [field]: value }))
 
     if (requiredError) setRequiredError(false)
   }
 
   const commitSkillsInput = () => {
-    const tokens = skillsInput.split(',').map((token) => token.trim()).filter(Boolean)
+    const tokens = skillsInput
+      .split(',')
+      .map(token => token.trim())
+      .filter(Boolean)
 
     if (tokens.length === 0) return
 
@@ -210,7 +219,7 @@ const VacancyAiDraftDrawer = ({
         model: string
       }>(`/api/hiring/openings/${requestedOpeningId}/ai/propose-public-copy`, {
         method: 'POST',
-        body: JSON.stringify(templateId ? { templateId } : {}),
+        body: JSON.stringify(templateId ? { templateId } : {})
       })
 
       inFlightOpeningId.current = null
@@ -219,7 +228,7 @@ const VacancyAiDraftDrawer = ({
         const pending: VacancyAiPendingProposal = {
           proposalId: result.proposal.proposalId,
           model: result.proposal.model,
-          proposed: result.proposal.proposed,
+          proposed: result.proposal.proposed
         }
 
         onPendingChange(requestedOpeningId, pending)
@@ -265,13 +274,13 @@ const VacancyAiDraftDrawer = ({
             publicArea: form.publicArea.trim() || undefined,
             publicSeniority: form.publicSeniority.trim() || undefined,
             publicSkillTags: form.publicSkillTags.length > 0 ? form.publicSkillTags : undefined,
-            publicProcessNotes: form.publicProcessNotes.trim() || undefined,
-          },
-        }),
+            publicProcessNotes: form.publicProcessNotes.trim() || undefined
+          }
+        })
       })
 
       const refreshed = await hiringRequest<{ opening: HiringOpening } | HiringOpening>(
-        `/api/hiring/openings/${opening.openingId}`,
+        `/api/hiring/openings/${opening.openingId}`
       )
 
       onPendingChange(opening.openingId, null)
@@ -295,7 +304,7 @@ const VacancyAiDraftDrawer = ({
     try {
       await hiringRequest(`/api/hiring/assessments/ai/proposals/${proposal.proposalId}/confirm`, {
         method: 'POST',
-        body: JSON.stringify({ decision: 'reject' }),
+        body: JSON.stringify({ decision: 'reject' })
       })
 
       onPendingChange(opening.openingId, null)
@@ -323,7 +332,7 @@ const VacancyAiDraftDrawer = ({
     { field: 'publicSummary', label: vacancyCopy.fieldSummary, rows: 3, required: true },
     { field: 'publicDescription', label: vacancyCopy.fieldDescription, rows: 8, required: true },
     { field: 'publicRequirements', label: vacancyCopy.fieldRequirements, rows: 5 },
-    { field: 'publicNiceToHave', label: vacancyCopy.fieldNiceToHave, rows: 3 },
+    { field: 'publicNiceToHave', label: vacancyCopy.fieldNiceToHave, rows: 3 }
   ]
 
   return (
@@ -336,23 +345,33 @@ const VacancyAiDraftDrawer = ({
         PaperProps={{
           'data-capture': 'hiring-vacancy-ai-drawer',
           'aria-labelledby': 'vacancy-ai-drawer-title',
-          sx: (theme) => ({
+          sx: theme => ({
             inlineSize: 'min(520px, 100vw)',
             maxInlineSize: '100%',
             boxShadow: theme.shadows[16],
             animation: 'ghHiringDrawer 280ms cubic-bezier(.2,0,0,1)',
-            '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-          }),
+            '@media (prefers-reduced-motion: reduce)': { animation: 'none' }
+          })
         }}
       >
         <Stack sx={{ minBlockSize: '100%' }}>
-          <Stack direction='row' alignItems='flex-start' justifyContent='space-between' spacing={3} sx={{ px: 6, py: 4.5 }}>
+          <Stack
+            direction='row'
+            alignItems='flex-start'
+            justifyContent='space-between'
+            spacing={3}
+            sx={{ px: 6, py: 4.5 }}
+          >
             <Box>
               <Stack direction='row' alignItems='center' spacing={2}>
                 <i aria-hidden='true' className='tabler-sparkles text-primary' style={{ fontSize: 20 }} />
-                <Typography id='vacancy-ai-drawer-title' variant='h4'>{vacancyCopy.drawerTitle}</Typography>
+                <Typography id='vacancy-ai-drawer-title' variant='h4'>
+                  {vacancyCopy.drawerTitle}
+                </Typography>
               </Stack>
-              <Typography color='text.secondary' sx={{ mt: 0.5 }}>{vacancyCopy.drawerSubtitle}</Typography>
+              <Typography color='text.secondary' sx={{ mt: 0.5 }}>
+                {vacancyCopy.drawerSubtitle}
+              </Typography>
             </Box>
             <IconButton aria-label={copy.common.close} onClick={requestClose} disabled={busy}>
               <i aria-hidden='true' className='tabler-x' />
@@ -368,50 +387,82 @@ const VacancyAiDraftDrawer = ({
             spacing={4.5}
             sx={{ flex: 1, px: 6, py: 4.5, overflowY: 'auto' }}
           >
-            {error ? <Alert severity='error' role='alert'>{error}</Alert> : null}
+            {error ? (
+              <Alert severity='error' role='alert'>
+                {error}
+              </Alert>
+            ) : null}
             {degraded ? (
               <Alert
                 severity='warning'
                 role='alert'
-                action={<Button color='inherit' size='small' onClick={() => void generate()}>{vacancyCopy.retry}</Button>}
+                action={
+                  <Button color='inherit' size='small' onClick={() => void generate()}>
+                    {vacancyCopy.retry}
+                  </Button>
+                }
               >
                 {vacancyCopy.degraded}
               </Alert>
             ) : null}
 
             {step === 'generate' ? (
-              <Stack spacing={4} sx={{ animation: 'ghHiringUp 260ms cubic-bezier(.2,0,0,1)', '@media (prefers-reduced-motion: reduce)': { animation: 'none' } }}>
+              <Stack
+                spacing={4}
+                sx={{
+                  animation: 'ghHiringUp 260ms cubic-bezier(.2,0,0,1)',
+                  '@media (prefers-reduced-motion: reduce)': { animation: 'none' }
+                }}
+              >
                 <Box
-                  sx={(theme) => ({
+                  sx={theme => ({
                     p: 4,
                     borderRadius: `${theme.shape.customBorderRadius.md}px`,
                     border: `1px solid ${theme.palette.divider}`,
-                    backgroundColor: theme.palette.action.hover,
+                    backgroundColor: theme.palette.action.hover
                   })}
                 >
                   <Typography variant='overline' color='text.secondary' sx={{ letterSpacing: '0.08em' }}>
                     {vacancyCopy.contextTitle}
                   </Typography>
-                  <Typography variant='h6' sx={{ mt: 1 }}>{opening.internalTitle}</Typography>
+                  <Typography variant='h6' sx={{ mt: 1 }}>
+                    {opening.internalTitle}
+                  </Typography>
                   <Stack direction='row' spacing={1.5} flexWrap='wrap' useFlexGap sx={{ mt: 2.5 }}>
                     {[
                       opening.publicSeniority ?? opening.seniority,
                       opening.publicWorkMode,
                       opening.publicHiringRegion,
                       demand?.language ?? null,
-                      demand?.timezone ?? null,
+                      demand?.timezone ?? null
                     ]
                       .filter((value): value is string => Boolean(value))
-                      .map((value) => (
-                        <GreenhouseChip key={value} size='small' kind='status' variant='outlined' tone='default' label={value} />
+                      .map(value => (
+                        <GreenhouseChip
+                          key={value}
+                          size='small'
+                          kind='status'
+                          variant='outlined'
+                          tone='default'
+                          label={value}
+                        />
                       ))}
-                    {(demand?.requestedSkills ?? []).map((skill) => (
-                      <GreenhouseChip key={skill} size='small' kind='status' variant='label' tone='primary' label={skill} />
+                    {(demand?.requestedSkills ?? []).map(skill => (
+                      <GreenhouseChip
+                        key={skill}
+                        size='small'
+                        kind='status'
+                        variant='label'
+                        tone='primary'
+                        label={skill}
+                      />
                     ))}
                   </Stack>
                   <Stack direction='row' alignItems='center' spacing={1.5} sx={{ mt: 3, color: 'text.secondary' }}>
                     <i aria-hidden='true' className='tabler-lock' style={{ fontSize: 15 }} />
-                    <Typography variant='caption' color='text.secondary'>{vacancyCopy.contextExcluded}</Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      {vacancyCopy.contextExcluded}
+                    </Typography>
                   </Stack>
                 </Box>
 
@@ -422,16 +473,20 @@ const VacancyAiDraftDrawer = ({
                     label={vacancyCopy.templateLabel}
                     value={templateId}
                     displayEmpty={false}
-                    onChange={(event) => setTemplateId(event.target.value)}
+                    onChange={event => setTemplateId(event.target.value)}
                     disabled={templates === null}
                   >
                     <MenuItem value=''>{vacancyCopy.templatePlaceholder}</MenuItem>
-                    {(templates ?? []).map((template) => (
-                      <MenuItem key={template.templateId} value={template.templateId}>{template.name}</MenuItem>
+                    {(templates ?? []).map(template => (
+                      <MenuItem key={template.templateId} value={template.templateId}>
+                        {template.name}
+                      </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
-                <Typography variant='caption' color='text.secondary' sx={{ mt: -2.5 }}>{vacancyCopy.templateHint}</Typography>
+                <Typography variant='caption' color='text.secondary' sx={{ mt: -2.5 }}>
+                  {vacancyCopy.templateHint}
+                </Typography>
 
                 <Stack direction='row' justifyContent='flex-end'>
                   <GreenhouseButton
@@ -446,7 +501,15 @@ const VacancyAiDraftDrawer = ({
             ) : null}
 
             {step === 'proposing' ? (
-              <Stack spacing={4} role='status' aria-live='polite' sx={{ animation: 'ghHiringUp 260ms cubic-bezier(.2,0,0,1)', '@media (prefers-reduced-motion: reduce)': { animation: 'none' } }}>
+              <Stack
+                spacing={4}
+                role='status'
+                aria-live='polite'
+                sx={{
+                  animation: 'ghHiringUp 260ms cubic-bezier(.2,0,0,1)',
+                  '@media (prefers-reduced-motion: reduce)': { animation: 'none' }
+                }}
+              >
                 <LinearProgress aria-hidden='true' />
                 <Typography color='text.secondary'>{vacancyCopy.proposing}</Typography>
                 <Stack spacing={2.5} aria-hidden='true'>
@@ -456,7 +519,9 @@ const VacancyAiDraftDrawer = ({
                   <Skeleton variant='rounded' height={120} />
                 </Stack>
                 <Box>
-                  <Button variant='text' onClick={onClose}>{vacancyCopy.background}</Button>
+                  <Button variant='text' onClick={onClose}>
+                    {vacancyCopy.background}
+                  </Button>
                   <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 0.5 }}>
                     {vacancyCopy.backgroundHint}
                   </Typography>
@@ -465,7 +530,13 @@ const VacancyAiDraftDrawer = ({
             ) : null}
 
             {step === 'review' && proposal ? (
-              <Stack spacing={4} sx={{ animation: 'ghHiringUp 320ms cubic-bezier(.2,0,0,1)', '@media (prefers-reduced-motion: reduce)': { animation: 'none' } }}>
+              <Stack
+                spacing={4}
+                sx={{
+                  animation: 'ghHiringUp 320ms cubic-bezier(.2,0,0,1)',
+                  '@media (prefers-reduced-motion: reduce)': { animation: 'none' }
+                }}
+              >
                 <Alert severity='info' icon={<i aria-hidden='true' className='tabler-sparkles' />} role='status'>
                   <AlertTitle sx={{ fontWeight: 700 }}>
                     {vacancyCopy.reviewBanner.replace('{model}', proposal.model)}
@@ -483,20 +554,42 @@ const VacancyAiDraftDrawer = ({
                     label={label}
                     value={form[field]}
                     error={requiredError && required && !String(form[field]).trim()}
-                    onChange={(event) => updateForm(field, event.target.value as DraftForm[typeof field])}
+                    onChange={event => updateForm(field, event.target.value as DraftForm[typeof field])}
                     disabled={busy}
                   />
                 ))}
 
                 <Stack direction='row' spacing={3.5} sx={{ '& > *': { flex: 1 } }}>
-                  <TextField label={vacancyCopy.fieldArea} value={form.publicArea} onChange={(event) => updateForm('publicArea', event.target.value)} disabled={busy} />
-                  <TextField label={vacancyCopy.fieldSeniority} value={form.publicSeniority} onChange={(event) => updateForm('publicSeniority', event.target.value)} disabled={busy} />
+                  <TextField
+                    label={vacancyCopy.fieldArea}
+                    value={form.publicArea}
+                    onChange={event => updateForm('publicArea', event.target.value)}
+                    disabled={busy}
+                  />
+                  <FormControl disabled={busy}>
+                    <InputLabel id='vacancy-public-seniority-label'>{vacancyCopy.fieldSeniority}</InputLabel>
+                    <Select
+                      labelId='vacancy-public-seniority-label'
+                      label={vacancyCopy.fieldSeniority}
+                      value={form.publicSeniority}
+                      onChange={event => updateForm('publicSeniority', event.target.value)}
+                    >
+                      <MenuItem value='' disabled>
+                        {vacancyCopy.fieldSeniorityPlaceholder}
+                      </MenuItem>
+                      {HIRING_PUBLIC_SENIORITIES.map(seniority => (
+                        <MenuItem key={seniority} value={seniority}>
+                          {seniority}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Stack>
 
                 <Box>
                   {form.publicSkillTags.length > 0 ? (
                     <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 1.5 }}>
-                      {form.publicSkillTags.map((skill) => (
+                      {form.publicSkillTags.map(skill => (
                         <GreenhouseChip
                           key={skill}
                           size='small'
@@ -506,7 +599,12 @@ const VacancyAiDraftDrawer = ({
                           label={skill}
                           closable
                           closeLabel={`${copy.common.close} ${skill}`}
-                          onDelete={() => updateForm('publicSkillTags', form.publicSkillTags.filter((item) => item !== skill))}
+                          onDelete={() =>
+                            updateForm(
+                              'publicSkillTags',
+                              form.publicSkillTags.filter(item => item !== skill)
+                            )
+                          }
                         />
                       ))}
                     </Stack>
@@ -515,9 +613,9 @@ const VacancyAiDraftDrawer = ({
                     fullWidth
                     label={vacancyCopy.fieldSkillTags}
                     value={skillsInput}
-                    onChange={(event) => setSkillsInput(event.target.value)}
+                    onChange={event => setSkillsInput(event.target.value)}
                     onBlur={commitSkillsInput}
-                    onKeyDown={(event) => {
+                    onKeyDown={event => {
                       if (event.key === 'Enter') {
                         event.preventDefault()
                         commitSkillsInput()
@@ -533,16 +631,22 @@ const VacancyAiDraftDrawer = ({
                   minRows={2}
                   label={vacancyCopy.fieldProcessNotes}
                   value={form.publicProcessNotes}
-                  onChange={(event) => updateForm('publicProcessNotes', event.target.value)}
+                  onChange={event => updateForm('publicProcessNotes', event.target.value)}
                   disabled={busy}
                 />
 
                 {requiredError ? (
-                  <Alert severity='error' role='alert'>{vacancyCopy.requiredHint}</Alert>
+                  <Alert severity='error' role='alert'>
+                    {vacancyCopy.requiredHint}
+                  </Alert>
                 ) : null}
 
                 <Typography variant='caption' color='text.secondary'>
-                  <i aria-hidden='true' className='tabler-scale' style={{ fontSize: 14, marginInlineEnd: 6, verticalAlign: 'text-bottom' }} />
+                  <i
+                    aria-hidden='true'
+                    className='tabler-scale'
+                    style={{ fontSize: 14, marginInlineEnd: 6, verticalAlign: 'text-bottom' }}
+                  />
                   {vacancyCopy.biasReminder}
                 </Typography>
               </Stack>
@@ -552,13 +656,25 @@ const VacancyAiDraftDrawer = ({
           {step === 'review' && proposal ? (
             <>
               <Divider />
-              <Stack direction='row' justifyContent='space-between' alignItems='center' spacing={3} sx={{ px: 6, py: 4 }}>
+              <Stack
+                direction='row'
+                justifyContent='space-between'
+                alignItems='center'
+                spacing={3}
+                sx={{ px: 6, py: 4 }}
+              >
                 <Button
                   variant='outlined'
                   color='inherit'
                   onClick={() => setDiscardOpen(true)}
                   disabled={busy}
-                  startIcon={rejecting ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : <i aria-hidden='true' className='tabler-trash' />}
+                  startIcon={
+                    rejecting ? (
+                      <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} />
+                    ) : (
+                      <i aria-hidden='true' className='tabler-trash' />
+                    )
+                  }
                 >
                   {vacancyCopy.discard}
                 </Button>
@@ -566,7 +682,11 @@ const VacancyAiDraftDrawer = ({
                   <GreenhouseButton
                     kind='primaryAction'
                     disabled={busy || !canConfirm}
-                    leadingIcon={confirming ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}
+                    leadingIcon={
+                      confirming ? (
+                        <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} />
+                      ) : undefined
+                    }
                     leadingIconClassName={confirming ? undefined : 'tabler-check'}
                     onClick={() => void apply()}
                   >
@@ -586,21 +706,27 @@ const VacancyAiDraftDrawer = ({
         maxWidth='sm'
         slotProps={{ backdrop: { sx: { animation: 'ghHiringFade 160ms cubic-bezier(.2,0,0,1)' } } }}
         PaperProps={{
-          sx: (theme) => ({
+          sx: theme => ({
             borderRadius: `${theme.shape.customBorderRadius.lg}px`,
             animation: 'ghHiringPop 240ms cubic-bezier(.2,0,0,1)',
-            '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-          }),
+            '@media (prefers-reduced-motion: reduce)': { animation: 'none' }
+          })
         }}
       >
         <DialogTitle>{vacancyCopy.discardTitle}</DialogTitle>
-        <DialogContent><Typography color='text.primary'>{vacancyCopy.discardBody}</Typography></DialogContent>
+        <DialogContent>
+          <Typography color='text.primary'>{vacancyCopy.discardBody}</Typography>
+        </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDiscardOpen(false)} disabled={rejecting} sx={{ color: 'text.primary' }}>{copy.common.cancel}</Button>
+          <Button onClick={() => setDiscardOpen(false)} disabled={rejecting} sx={{ color: 'text.primary' }}>
+            {copy.common.cancel}
+          </Button>
           <GreenhouseButton
             tone='error'
             disabled={rejecting}
-            leadingIcon={rejecting ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}
+            leadingIcon={
+              rejecting ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined
+            }
             onClick={() => void discard()}
           >
             {vacancyCopy.discard}

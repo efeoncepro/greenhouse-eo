@@ -3,11 +3,12 @@ import 'server-only'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
-import type { HiringOpening, PublicOpeningPayload } from '@/types/hiring'
+import { HIRING_PUBLIC_SENIORITIES, type HiringOpening, type PublicOpeningPayload } from '@/types/hiring'
 
 import { HiringNotFoundError, HiringValidationError } from './errors'
-import { normalizePublicOpeningContent } from './public-careers/public-content'
+import { normalizePublicOpeningContent, parseRemoteEligibleCountries } from './public-careers/public-content'
 import { assertPublishableOpening } from './public-careers/publishability'
+import { assertPublicTitleSeniorityConsistency, parseHiringPublicSeniority } from './public-seniority'
 
 /**
  * Contrato de publicación pública del opening (TASK-353 Slice 3).
@@ -27,6 +28,10 @@ export const buildPublicOpeningPayload = (opening: HiringOpening): PublicOpening
     )
   }
 
+  const publicSeniority = parseHiringPublicSeniority(opening.publicSeniority)
+
+  assertPublicTitleSeniorityConsistency(opening.publicTitle, publicSeniority)
+
   return {
     publicId: opening.publicId,
     title: opening.publicTitle.trim(),
@@ -44,7 +49,7 @@ export const buildPublicOpeningPayload = (opening: HiringOpening): PublicOpening
     skillTags: opening.publicSkillTags,
     compensationBand: opening.publicCompensationBand,
     employmentMode: opening.publicEmploymentMode,
-    seniority: opening.publicSeniority,
+    seniority: publicSeniority,
     processNotes: opening.publicProcessNotes,
     applyUrl: opening.applyUrl,
     publishedAt: opening.publishedAt,
@@ -91,30 +96,44 @@ const nstr = (v: unknown): string | null => (v == null ? null : String(v))
 const ts = (v: unknown): string | null => (v == null ? null : v instanceof Date ? v.toISOString() : String(v))
 const arr = (v: unknown): string[] => (Array.isArray(v) ? v.map(item => String(item)).filter(Boolean) : [])
 
-const normalizePublicOpeningRow = (row: PublicOpeningRow): PublicOpeningPayload => ({
-  publicId: str(row.public_id),
-  title: str(row.public_title),
-  summary: nstr(row.public_summary),
-  description: nstr(row.public_description),
-  requirements: nstr(row.public_requirements),
-  niceToHave: nstr(row.public_nice_to_have),
-  locationMode: nstr(row.public_location_mode),
-  workMode: (nstr(row.public_work_mode) as PublicOpeningPayload['workMode']) ?? null,
-  hiringRegion: nstr(row.public_hiring_region),
-  city: nstr(row.public_city),
-  country: nstr(row.public_country),
-  officeLocation: nstr(row.public_office_location),
-  area: nstr(row.public_area),
-  skillTags: arr(row.public_skill_tags),
-  compensationBand: nstr(row.public_compensation_band),
-  employmentMode: nstr(row.public_employment_mode),
-  seniority: nstr(row.public_seniority),
-  processNotes: nstr(row.public_process_notes),
-  applyUrl: nstr(row.apply_url),
-  publishedAt: ts(row.published_at),
-  content: normalizePublicOpeningContent(row.public_content_json),
-  remoteEligibleCountries: arr(row.public_remote_eligible_countries)
-})
+const normalizePublicOpeningRow = (row: PublicOpeningRow): PublicOpeningPayload | null => {
+  const title = str(row.public_title).trim()
+
+  try {
+    const seniority = parseHiringPublicSeniority(row.public_seniority)
+
+    assertPublicTitleSeniorityConsistency(title, seniority)
+
+    return {
+      publicId: str(row.public_id),
+      title,
+      summary: nstr(row.public_summary),
+      description: nstr(row.public_description),
+      requirements: nstr(row.public_requirements),
+      niceToHave: nstr(row.public_nice_to_have),
+      locationMode: nstr(row.public_location_mode),
+      workMode: (nstr(row.public_work_mode) as PublicOpeningPayload['workMode']) ?? null,
+      hiringRegion: nstr(row.public_hiring_region),
+      city: nstr(row.public_city),
+      country: nstr(row.public_country),
+      officeLocation: nstr(row.public_office_location),
+      area: nstr(row.public_area),
+      skillTags: arr(row.public_skill_tags),
+      compensationBand: nstr(row.public_compensation_band),
+      employmentMode: nstr(row.public_employment_mode),
+      seniority,
+      processNotes: nstr(row.public_process_notes),
+      applyUrl: nstr(row.apply_url),
+      publishedAt: ts(row.published_at),
+      content: normalizePublicOpeningContent(row.public_content_json),
+      remoteEligibleCountries: arr(row.public_remote_eligible_countries)
+    }
+  } catch (error) {
+    if (error instanceof HiringValidationError) return null
+
+    throw error
+  }
+}
 
 /**
  * Listado público de vacantes: SOLO openings con `publication_status = 'published'` y
@@ -128,12 +147,12 @@ export const listPublicOpenings = async (limit = 50, offset = 0): Promise<Public
     `SELECT ${PUBLIC_OPENING_SELECT} FROM greenhouse_hiring.hiring_opening
      WHERE publication_status = 'published' AND visibility = 'public_listed'
        AND public_title IS NOT NULL AND btrim(public_title) <> ''
-       AND public_seniority IS NOT NULL AND btrim(public_seniority) <> ''
+       AND public_seniority = ANY($3::text[])
      ORDER BY published_at DESC NULLS LAST LIMIT $1 OFFSET $2`,
-    [safeLimit, safeOffset]
+    [safeLimit, safeOffset, HIRING_PUBLIC_SENIORITIES]
   )
 
-  return rows.map(normalizePublicOpeningRow)
+  return rows.map(normalizePublicOpeningRow).filter((opening): opening is PublicOpeningPayload => opening != null)
 }
 
 /** Detalle público de una vacante por su public_id; null si no está publicada. */
@@ -142,8 +161,8 @@ export const getPublicOpeningByPublicId = async (publicId: string): Promise<Publ
     `SELECT ${PUBLIC_OPENING_SELECT} FROM greenhouse_hiring.hiring_opening
      WHERE public_id = $1 AND publication_status = 'published' AND visibility = 'public_listed'
        AND public_title IS NOT NULL AND btrim(public_title) <> ''
-       AND public_seniority IS NOT NULL AND btrim(public_seniority) <> '' LIMIT 1`,
-    [publicId]
+       AND public_seniority = ANY($2::text[]) LIMIT 1`,
+    [publicId, HIRING_PUBLIC_SENIORITIES]
   )
 
   return rows[0] ? normalizePublicOpeningRow(rows[0]) : null
@@ -156,13 +175,32 @@ export const getPublicOpeningByPublicId = async (publicId: string): Promise<Publ
  * (el caller lo trata como 404 "vacante no disponible"). No expone nada más del opening.
  */
 export const resolvePublishedOpeningIdByPublicId = async (publicId: string): Promise<string | null> => {
-  const rows = await runGreenhousePostgresQuery<{ opening_id: string }>(
-    `SELECT opening_id FROM greenhouse_hiring.hiring_opening
-     WHERE public_id = $1 AND publication_status = 'published' AND visibility = 'public_listed' LIMIT 1`,
-    [publicId]
+  const rows = await runGreenhousePostgresQuery<{
+    opening_id: string
+    public_title: string | null
+    public_seniority: string | null
+  }>(
+    `SELECT opening_id, public_title, public_seniority FROM greenhouse_hiring.hiring_opening
+     WHERE public_id = $1 AND publication_status = 'published' AND visibility = 'public_listed'
+       AND public_seniority = ANY($2::text[]) LIMIT 1`,
+    [publicId, HIRING_PUBLIC_SENIORITIES]
   )
 
-  return rows[0]?.opening_id ?? null
+  const row = rows[0]
+
+  if (!row) return null
+
+  try {
+    const seniority = parseHiringPublicSeniority(row.public_seniority)
+
+    assertPublicTitleSeniorityConsistency(row.public_title, seniority)
+
+    return row.opening_id
+  } catch (error) {
+    if (error instanceof HiringValidationError) return null
+
+    throw error
+  }
 }
 
 const RETURN_OPENING = `opening_id, public_id, publication_status, visibility, status, published_at, public_title`
@@ -180,7 +218,7 @@ export const publishOpening = async (
     const current = await client.query(
       `SELECT public_title, public_summary, public_description, public_work_mode, public_hiring_region,
               public_city, public_country, public_office_location, public_area, public_skill_tags,
-              public_seniority, publication_status
+              public_seniority, public_content_json, public_remote_eligible_countries, publication_status
        FROM greenhouse_hiring.hiring_opening WHERE opening_id = $1 LIMIT 1`,
       [openingId]
     )
@@ -198,24 +236,31 @@ export const publishOpening = async (
           public_area: string | null
           public_skill_tags: string[] | null
           public_seniority: string | null
+          public_content_json: unknown
+          public_remote_eligible_countries: unknown
           publication_status: string
         }
       | undefined
 
     if (!row) throw new HiringNotFoundError('El opening no existe.', 'hiring_opening_not_found')
-    assertPublishableOpening({
-      publicTitle: row.public_title,
-      publicSummary: row.public_summary,
-      publicDescription: row.public_description,
-      publicWorkMode: row.public_work_mode as HiringOpening['publicWorkMode'],
-      publicHiringRegion: row.public_hiring_region,
-      publicCity: row.public_city,
-      publicCountry: row.public_country,
-      publicOfficeLocation: row.public_office_location,
-      publicArea: row.public_area,
-      publicSkillTags: row.public_skill_tags ?? [],
-      publicSeniority: row.public_seniority
-    })
+    assertPublishableOpening(
+      {
+        publicTitle: row.public_title,
+        publicSummary: row.public_summary,
+        publicDescription: row.public_description,
+        publicWorkMode: row.public_work_mode as HiringOpening['publicWorkMode'],
+        publicHiringRegion: row.public_hiring_region,
+        publicCity: row.public_city,
+        publicCountry: row.public_country,
+        publicOfficeLocation: row.public_office_location,
+        publicArea: row.public_area,
+        publicSkillTags: row.public_skill_tags ?? [],
+        publicSeniority: row.public_seniority,
+        publicContent: normalizePublicOpeningContent(row.public_content_json),
+        publicRemoteEligibleCountries: parseRemoteEligibleCountries(row.public_remote_eligible_countries)
+      },
+      { requireEditorialV2: true }
+    )
 
     const updated = await client.query(
       `UPDATE greenhouse_hiring.hiring_opening

@@ -1,5 +1,10 @@
 # TASK-1741 — Public Careers Editorial Detail Renderer
 
+## Meta
+
+- Product Design asset: `docs/ui/visual-directions/TASK-1741-public-careers-editorial-detail-renderer.md`
+- Visual direction mode: `repo-native-benchmark`
+
 ## Visual Direction Contract
 
 - Source: `repo-native-benchmark` — renderer actual de Careers, tokens/primitives vigentes y captura staging `.captures/2026-08-17T12-25-12_task354-careers-runtime-audit/`.
@@ -17,9 +22,7 @@
 | Data-dense marketplace | Ficha con muchas filas, chips y cards equivalentes | Rechazada: parece job board intercambiable y aplana la oportunidad |
 | Cinematic agency | Imágenes grandes, motion y manifiesto de marca | Rechazada: peso/fragilidad altos y el rol queda en segundo plano |
 
-## Wireframe
-
-### Desktop — 1440 px
+## Desktop Target — 1440×1200
 
 ```text
 ┌──────────────────────────────────────────────────────────────────────────────┐
@@ -59,7 +62,7 @@
 └───────────────────────────────────────────┴──────────────────────────────────┘
 ```
 
-### Mobile — 390 px
+## Mobile Target — 390×844
 
 ```text
 ┌──────────────────────────────────────┐
@@ -82,6 +85,54 @@
 └──────────────────────────────────────┘
 ```
 
+## Action Hierarchy
+
+1. CTA verde del hero existente: acción primaria temprana, especialmente en móvil.
+2. CTA azul del resumen existente: refuerzo contextual en rail desktop y al final en móvil.
+3. `Volver a vacantes`: navegación secundaria. No existe un CTA final ni un tercer enlace hacia apply.
+
+## Visual Fidelity Mapping
+
+- Hero navy y acento verde preservan la identidad actual; no se cambia la marca ni la paleta.
+- Poppins mantiene título/display y Geist el cuerpo mediante variables existentes.
+- Outcomes usan ritmo editorial y numeración, no cards repetidas.
+- Benefits usa una banda tipográfica; rail conserva superficie contenida y el cuerpo permanece abierto.
+- En 390 px el grid se transforma en flujo lineal sin alterar el orden semántico.
+
+## Copy Ledger
+
+| id | región | fuente |
+|---|---|---|
+| `detail.outcomesTitle` | resultados | `src/lib/copy/*` |
+| `detail.workTitle` | trabajo | `src/lib/copy/*` |
+| `detail.essentialsTitle` | esenciales | `src/lib/copy/*` |
+| `detail.learnablesTitle` | aprendible | `src/lib/copy/*` |
+| `detail.evidenceTitle` | evidencia | `src/lib/copy/*` |
+| `detail.remoteTitle` | remoto | `src/lib/copy/*` |
+| `detail.eligibleCountriesTitle` | países | `src/lib/copy/*` |
+| `detail.compensationTitle` | compensación | `src/lib/copy/*` |
+| `detail.benefitsTitle` | beneficios | `src/lib/copy/*` |
+| `detail.processTitle` | proceso | `src/lib/copy/*` |
+
+## State Copy
+
+| state | visible copy | recovery behavior |
+|---|---|---|
+| ready | título, promesa y secciones aprobadas de la vacante | continuar a uno de los dos CTA existentes |
+| loading | sin copy nuevo: el detalle es SSR y el navegador conserva la navegación | reintentar la carga normal de la página si falla la red |
+| empty | se omite únicamente la sección sin datos; nunca aparece una banda vacía | leer las demás secciones disponibles |
+| partial | contenido estructurado disponible más prosa legacy de fallback | continuar con toda la evidencia pública disponible |
+| error | estado `notFound` público existente, sin causa interna | volver al listado de vacantes |
+| denied | mismo `notFound` público para opening no publicado; sin filtrar existencia | volver al listado de vacantes |
+
+## Accessibility Contract
+
+- Un `h1`; títulos de sección `h2`; outcomes, trabajo, skills, beneficios y proceso son listas semánticas.
+- Orden DOM hero → contenido → resumen; el grid no cambia el orden de foco.
+- Ambos CTA tienen nombre accesible, foco visible y el mismo `applyHref`.
+- Esencial/aprendible no se diferencia sólo por color; contraste AA y sin dependencia de motion.
+- En 390 px no hay scroll horizontal; reduced motion conserva el mismo estado final.
+
 ## Implementation Mapping
 
 - Route: `src/app/public/careers/[publicId]/page.tsx`.
@@ -99,6 +150,7 @@
 - Baseline: capture current flag-OFF renderer before changes at 1440 and 390, first fold and full page.
 - Runtime: `pnpm fe:capture <careers-detail-editorial-scenario> --env=staging`.
 - Quality profile: `premium`.
+- Review dossier: se crea bajo `.captures/` con before/after, findings y decisión de aceptación.
 - Required evidence:
   - 1440 and 390, first fold and full-page.
   - hero CTA and summary CTA focus states; both preserve the identical `applyUrl`.

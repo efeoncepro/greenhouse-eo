@@ -1,5 +1,13 @@
 import type { CareersCopy } from '@/lib/copy'
-import type { PublicOpeningPayload } from '@/types/hiring'
+import type {
+  PublicCompensationUnit,
+  PublicOpeningAdditionalSection,
+  PublicOpeningCollaboration,
+  PublicOpeningPayload
+} from '@/types/hiring'
+
+import { isCanonicalPublicOpeningContent } from './public-content'
+import { EFEONCE_CAREERS_COMPANY_CONTEXT, resolveEfeonceCareersBenefits } from './standard-content'
 
 export type CareersModalityKind = 'remote' | 'hybrid' | 'onsite' | 'flexible'
 
@@ -23,6 +31,33 @@ export interface CareersOpeningViewModel {
   skillChips: string[]
   processNotes: string[]
   publishedAt: string | null
+  editorial: {
+    lead: string
+    introParagraphs: string[]
+    companyContext: string
+    outcomes: string[]
+    workItems: string[]
+    additionalSections: PublicOpeningAdditionalSection[]
+    essentials: string[]
+    preferred: string[]
+    learnables: string[]
+    evidenceAsk: string | null
+    workModel: string | null
+    collaboration: PublicOpeningCollaboration | null
+    eligibleCountries: string[]
+    benefits: string[]
+    processSteps: Array<{ title: string; body: string | null }>
+    expectedTiming: string | null
+    responseCommitment: string | null
+    accommodationPath: string | null
+    compensation: {
+      currency: string
+      minValue: number
+      maxValue: number
+      unitText: PublicCompensationUnit
+    } | null
+    compensationBand: string | null
+  }
 }
 
 export interface CareersOpeningFilters {
@@ -32,7 +67,6 @@ export interface CareersOpeningFilters {
 }
 
 const MAX_CHIPS = 4
-const MAX_LIST_ITEMS = 6
 const MAX_CHIP_LENGTH = 30
 
 const normalizeText = (value: string): string =>
@@ -76,7 +110,7 @@ const isLegacyRemoteRegionLabel = (normalized: string): boolean => {
     'colombia',
     'mexico',
     'peru',
-    'argentina',
+    'argentina'
   ].includes(token)
 }
 
@@ -101,13 +135,12 @@ const splitList = (value: string | null | undefined): string[] => {
     .map(cleanText)
     .filter(Boolean)
 
-  if (byLines.length > 1) return byLines.slice(0, MAX_LIST_ITEMS)
+  if (byLines.length > 1) return byLines
 
   return value
     .split(/;|\.\s+(?=[A-ZÁÉÍÓÚÑa-záéíóúñ])/g)
     .map(cleanText)
     .filter(item => item.length > 0)
-    .slice(0, MAX_LIST_ITEMS)
 }
 
 const isInternalProcessNote = (value: string): boolean => {
@@ -122,14 +155,12 @@ const isInternalProcessNote = (value: string): boolean => {
     'l2',
     'l3',
     'l4',
-    'scorecard',
+    'scorecard'
   ].some(term => containsAreaTerm(normalized, term))
 }
 
 const publicProcessNotes = (value: string | null | undefined): string[] => {
-  const notes = splitParagraphs(value, '')
-    .map(cleanText)
-    .filter(Boolean)
+  const notes = splitParagraphs(value, '').map(cleanText).filter(Boolean)
 
   if (!notes.length || notes.some(isInternalProcessNote)) return []
 
@@ -147,7 +178,7 @@ const RESPONSIBILITY_BOUNDARY_HEADINGS = [
   'skills',
   'como es el proceso',
   'proceso',
-  'compensacion',
+  'compensacion'
 ] as const
 
 const RESPONSIBILITY_ITEM_PREFIX = /^(?:[\s\-*•·–—]+|\d+[.)])\s*/
@@ -172,24 +203,35 @@ const extractResponsibilityItems = (value: string | null | undefined): string[] 
   const headingIndex = lines.findIndex(line => normalizeText(cleanText(line)).startsWith('responsabilidades'))
   const scopedLinesWithoutBoundary = headingIndex >= 0 ? lines.slice(headingIndex + 1) : lines
 
-  const nextBoundaryIndex = headingIndex >= 0
-    ? scopedLinesWithoutBoundary.findIndex(isResponsibilityBoundaryHeading)
-    : -1
+  const nextBoundaryIndex =
+    headingIndex >= 0 ? scopedLinesWithoutBoundary.findIndex(isResponsibilityBoundaryHeading) : -1
 
-  const scopedLines = nextBoundaryIndex >= 0
-    ? scopedLinesWithoutBoundary.slice(0, nextBoundaryIndex)
-    : scopedLinesWithoutBoundary
+  const scopedLines =
+    nextBoundaryIndex >= 0 ? scopedLinesWithoutBoundary.slice(0, nextBoundaryIndex) : scopedLinesWithoutBoundary
 
   const bulletItems = scopedLines
     .filter(line => RESPONSIBILITY_ITEM_PREFIX.test(line))
     .map(cleanResponsibilityItem)
     .filter(Boolean)
 
-  if (bulletItems.length) return bulletItems.slice(0, 4)
+  if (bulletItems.length) return bulletItems
 
-  if (headingIndex >= 0) return scopedLines.map(cleanResponsibilityItem).filter(Boolean).slice(0, 4)
+  if (headingIndex >= 0) return scopedLines.map(cleanResponsibilityItem).filter(Boolean)
 
-  return splitList(value).slice(0, 4)
+  return splitList(value)
+}
+
+const mergeUnique = (...groups: string[][]): string[] => {
+  const seen = new Set<string>()
+
+  return groups.flat().filter(item => {
+    const key = normalizeText(cleanText(item))
+
+    if (!key || seen.has(key)) return false
+    seen.add(key)
+
+    return true
+  })
 }
 
 const extractDescriptionBody = (value: string | null | undefined): string | null => {
@@ -200,11 +242,8 @@ const extractDescriptionBody = (value: string | null | undefined): string | null
   const responsibilityHeadingIndex = normalizedLines.findIndex(line => line.startsWith('responsabilidades'))
   const firstBulletIndex = lines.findIndex(line => RESPONSIBILITY_ITEM_PREFIX.test(line.trim()))
 
-  const boundaryIndex = responsibilityHeadingIndex >= 0
-    ? responsibilityHeadingIndex
-    : firstBulletIndex >= 0
-      ? firstBulletIndex
-      : -1
+  const boundaryIndex =
+    responsibilityHeadingIndex >= 0 ? responsibilityHeadingIndex : firstBulletIndex >= 0 ? firstBulletIndex : -1
 
   const bodyLines = boundaryIndex >= 0 ? lines.slice(0, boundaryIndex) : lines
   const body = bodyLines.join('\n').trim()
@@ -225,25 +264,31 @@ const weightedSourceText = (opening: PublicOpeningPayload): Array<{ text: string
   { text: opening.summary ?? '', weight: 6 },
   { text: opening.requirements ?? '', weight: 4 },
   { text: opening.description ?? '', weight: 3 },
-  { text: opening.niceToHave ?? '', weight: 1 },
+  { text: opening.niceToHave ?? '', weight: 1 }
 ]
 
 const inferArea = (opening: PublicOpeningPayload, copy: CareersCopy): string => {
   const sources = weightedSourceText(opening).map(source => ({
     ...source,
-    text: normalizeText(source.text),
+    text: normalizeText(source.text)
   }))
 
   const rules = [
     { label: copy.marquee[0] ?? copy.fallbacks.area, terms: ['disen', 'design', 'figma', 'ux', 'ui', 'producto'] },
     {
       label: copy.marquee[1] ?? copy.fallbacks.area,
-      terms: ['software', 'fullstack', 'frontend', 'backend', 'typescript', 'react', 'node', 'data engineer'],
+      terms: ['software', 'fullstack', 'frontend', 'backend', 'typescript', 'react', 'node', 'data engineer']
     },
     { label: copy.marquee[2] ?? copy.fallbacks.area, terms: ['growth', 'marketing', 'estrateg', 'cro', 'contenido'] },
     { label: copy.marquee[3] ?? copy.fallbacks.area, terms: ['media', 'medios', 'ads', 'performance', 'paid'] },
-    { label: copy.marquee[4] ?? copy.fallbacks.area, terms: ['operacion', 'operations', 'cuentas', 'account', 'project'] },
-    { label: copy.marquee[5] ?? copy.fallbacks.area, terms: ['data', 'datos', 'analytics', 'sql', 'bigquery', 'analista'] },
+    {
+      label: copy.marquee[4] ?? copy.fallbacks.area,
+      terms: ['operacion', 'operations', 'cuentas', 'account', 'project']
+    },
+    {
+      label: copy.marquee[5] ?? copy.fallbacks.area,
+      terms: ['data', 'datos', 'analytics', 'sql', 'bigquery', 'analista']
+    }
   ]
 
   let winner: { label: string; score: number } | null = null
@@ -265,7 +310,7 @@ const inferArea = (opening: PublicOpeningPayload, copy: CareersCopy): string => 
 
 const resolveModality = (
   opening: PublicOpeningPayload,
-  fallback: string,
+  fallback: string
 ): { label: string; kind: CareersModalityKind; icon: string } => {
   if (opening.workMode === 'remote') return { label: 'Remoto', kind: 'remote', icon: 'tabler-world' }
   if (opening.workMode === 'hybrid') return { label: 'Híbrido', kind: 'hybrid', icon: 'tabler-building-community' }
@@ -282,11 +327,19 @@ const resolveModality = (
   }
 
   if (hybridIndex >= 0) {
-    return { label: normalized.includes('hybrid') ? 'Hybrid' : 'Híbrido', kind: 'hybrid', icon: 'tabler-building-community' }
+    return {
+      label: normalized.includes('hybrid') ? 'Hybrid' : 'Híbrido',
+      kind: 'hybrid',
+      icon: 'tabler-building-community'
+    }
   }
 
   if (normalized.includes('presencial') || normalized.includes('onsite') || normalized.includes('office')) {
-    return { label: normalized.includes('onsite') || normalized.includes('office') ? 'Onsite' : 'Presencial', kind: 'onsite', icon: 'tabler-building' }
+    return {
+      label: normalized.includes('onsite') || normalized.includes('office') ? 'Onsite' : 'Presencial',
+      kind: 'onsite',
+      icon: 'tabler-building'
+    }
   }
 
   if (isLegacyRemoteRegionLabel(normalized)) {
@@ -299,7 +352,7 @@ const resolveModality = (
 const resolveLocation = (
   opening: PublicOpeningPayload,
   modality: { label: string; kind: CareersModalityKind },
-  fallback: string,
+  fallback: string
 ): string => {
   if (opening.workMode === 'remote' && opening.hiringRegion?.trim()) return cleanText(opening.hiringRegion)
 
@@ -307,7 +360,11 @@ const resolveLocation = (
     return cleanText(opening.officeLocation)
   }
 
-  if ((opening.workMode === 'hybrid' || opening.workMode === 'onsite') && opening.city?.trim() && opening.country?.trim()) {
+  if (
+    (opening.workMode === 'hybrid' || opening.workMode === 'onsite') &&
+    opening.city?.trim() &&
+    opening.country?.trim()
+  ) {
     return `${cleanText(opening.city)}, ${cleanText(opening.country)}`
   }
 
@@ -323,7 +380,7 @@ const resolveLocation = (
     { label: 'Colombia', terms: ['colombia'] },
     { label: 'Mexico', terms: ['mexico'] },
     { label: 'Peru', terms: ['peru'] },
-    { label: 'Argentina', terms: ['argentina'] },
+    { label: 'Argentina', terms: ['argentina'] }
   ]
 
   const explicitLocation = locationRules.find(rule => rule.terms.some(term => containsAreaTerm(normalized, term)))
@@ -333,7 +390,7 @@ const resolveLocation = (
   if (modality.kind === 'remote') return fallback
 
   const cleanedWithoutModality = cleanText(
-    source.replace(/remoto|remote|híbrido|hibrido|hybrid|presencial|onsite|office/gi, '').replace(/[\/·|,-]+/g, ' '),
+    source.replace(/remoto|remote|híbrido|hibrido|hybrid|presencial|onsite|office/gi, '').replace(/[\/·|,-]+/g, ' ')
   )
 
   if (cleanedWithoutModality && cleanedWithoutModality.length > 3) return cleanedWithoutModality
@@ -342,17 +399,14 @@ const resolveLocation = (
 }
 
 const deriveSkillChips = (opening: PublicOpeningPayload, copy: CareersCopy): string[] => {
-  const structuredChips = opening.skillTags
-    .map(cleanText)
-    .filter(Boolean)
-    .slice(0, MAX_CHIPS)
+  const structuredChips = opening.skillTags.map(cleanText).filter(Boolean).slice(0, MAX_CHIPS)
 
   if (structuredChips.length) return structuredChips
 
   const candidates = [
     ...splitList(opening.requirements),
     ...splitList(opening.niceToHave),
-    ...splitList(opening.summary),
+    ...splitList(opening.summary)
   ]
 
   const chips: string[] = []
@@ -360,11 +414,23 @@ const deriveSkillChips = (opening: PublicOpeningPayload, copy: CareersCopy): str
 
   const canonicalRules: Array<{ label: string; terms: string[] }> = [
     { label: 'SEO', terms: ['seo', 'organic', 'organico', 'keywords', 'on-page', 'search'] },
-    { label: 'Account management', terms: ['account management', 'cuentas', 'account manager', 'relacion diaria con clientes'] },
-    { label: 'Marketing generalista', terms: ['marketing generalista', 'marketing digital', 'marketing', 'campaign', 'campana', 'funnel'] },
+    {
+      label: 'Account management',
+      terms: ['account management', 'cuentas', 'account manager', 'relacion diaria con clientes']
+    },
+    {
+      label: 'Marketing generalista',
+      terms: ['marketing generalista', 'marketing digital', 'marketing', 'campaign', 'campana', 'funnel']
+    },
     { label: 'Vendor management', terms: ['vendor', 'proveedor', 'proveedores', 'especialistas externos'] },
-    { label: 'Comunicación con clientes', terms: ['cliente', 'clientes', 'stakeholder', 'stakeholders', 'comunicacion'] },
-    { label: 'Liderazgo operativo', terms: ['liderazgo', 'ownership', 'priorizar', 'prioridades', 'riesgos', 'coordinar especialistas', 'operativo'] },
+    {
+      label: 'Comunicación con clientes',
+      terms: ['cliente', 'clientes', 'stakeholder', 'stakeholders', 'comunicacion']
+    },
+    {
+      label: 'Liderazgo operativo',
+      terms: ['liderazgo', 'ownership', 'priorizar', 'prioridades', 'riesgos', 'coordinar especialistas', 'operativo']
+    },
     { label: 'Growth', terms: ['growth', 'crecimiento', 'cro'] },
     { label: 'Performance marketing', terms: ['performance', 'paid media', 'ads', 'medios'] },
     { label: 'Contenido', terms: ['contenido', 'content'] },
@@ -372,7 +438,7 @@ const deriveSkillChips = (opening: PublicOpeningPayload, copy: CareersCopy): str
     { label: 'Automatización', terms: ['automatizacion', 'automation'] },
     { label: 'TypeScript', terms: ['typescript'] },
     { label: 'React', terms: ['react'] },
-    { label: 'PostgreSQL', terms: ['postgresql', 'postgres'] },
+    { label: 'PostgreSQL', terms: ['postgresql', 'postgres'] }
   ]
 
   const addChip = (rawChip: string): void => {
@@ -402,7 +468,11 @@ const deriveSkillChips = (opening: PublicOpeningPayload, copy: CareersCopy): str
 
     const normalizedShortened = normalizeText(shortened)
 
-    if (/^(experiencia|experience|nociones|capacidad|familiaridad|conocimiento|dominio|manejo)\b/.test(normalizedShortened)) {
+    if (
+      /^(experiencia|experience|nociones|capacidad|familiaridad|conocimiento|dominio|manejo)\b/.test(
+        normalizedShortened
+      )
+    ) {
       continue
     }
 
@@ -428,18 +498,39 @@ export const formatCareersTemplate = (template: string, values: Record<string, s
 
 export const buildCareersOpeningViewModel = (
   opening: PublicOpeningPayload,
-  copy: CareersCopy,
+  copy: CareersCopy
 ): CareersOpeningViewModel => {
   const modality = resolveModality(opening, copy.fallbacks.modality)
   const location = resolveLocation(opening, modality, copy.fallbacks.location)
 
   const descriptionParagraphs = splitParagraphs(
     extractDescriptionBody(opening.description),
-    opening.summary ?? copy.fallbacks.summary,
+    opening.summary ?? copy.fallbacks.summary
   )
 
   const responsibilityItems = extractResponsibilityItems(opening.description)
   const requirementItems = splitList(opening.requirements)
+  const niceToHaveItems = splitList(opening.niceToHave)
+  const content = opening.content
+
+  const hasCompleteNarrative = isCanonicalPublicOpeningContent(content)
+
+  const hasCompleteSkills = isCanonicalPublicOpeningContent(content)
+  const processNotes = publicProcessNotes(opening.processNotes)
+  const legacyResponsibilities = responsibilityItems.length ? responsibilityItems : [copy.fallbacks.responsibility]
+  const legacyRequirements = requirementItems.length ? requirementItems : [copy.fallbacks.requirement]
+
+  const editorialIntroParagraphs = hasCompleteNarrative
+    ? [content!.intro!]
+    : mergeUnique(
+        content?.promise ? [content.promise] : [],
+        content?.intro ? [content.intro] : [],
+        descriptionParagraphs
+      )
+
+  const editorialProcessSteps = content?.process?.steps.length
+    ? content.process.steps
+    : copy.process.steps.map((step, index) => ({ title: step.title, body: processNotes[index] ?? step.body }))
 
   return {
     publicId: opening.publicId,
@@ -455,23 +546,45 @@ export const buildCareersOpeningViewModel = (
     detailHref: `/public/careers/${encodeURIComponent(opening.publicId)}`,
     applyHref: `/public/careers/${encodeURIComponent(opening.publicId)}/apply`,
     descriptionParagraphs,
-    responsibilityItems: responsibilityItems.length ? responsibilityItems : [copy.fallbacks.responsibility],
-    requirementItems: requirementItems.length ? requirementItems : [copy.fallbacks.requirement],
-    niceToHaveItems: splitList(opening.niceToHave),
+    responsibilityItems: legacyResponsibilities,
+    requirementItems: legacyRequirements,
+    niceToHaveItems,
     skillChips: deriveSkillChips(opening, copy),
-    processNotes: publicProcessNotes(opening.processNotes),
+    processNotes,
     publishedAt: opening.publishedAt,
+    editorial: {
+      lead: hasCompleteNarrative ? content!.promise! : cleanText(opening.summary ?? '') || copy.fallbacks.summary,
+      introParagraphs: editorialIntroParagraphs,
+      companyContext: EFEONCE_CAREERS_COMPANY_CONTEXT,
+      outcomes: content?.outcomes ?? [],
+      workItems: content?.workItems.length ? content.workItems : legacyResponsibilities,
+      additionalSections: content?.additionalSections ?? [],
+      essentials: hasCompleteSkills ? content!.essentials : mergeUnique(legacyRequirements, content?.essentials ?? []),
+      preferred: hasCompleteSkills ? content!.preferred : niceToHaveItems,
+      learnables: content?.learnables ?? [],
+      evidenceAsk: content?.evidenceAsk ?? null,
+      workModel: content?.workModel ?? null,
+      collaboration: content?.collaboration ?? null,
+      eligibleCountries: opening.remoteEligibleCountries,
+      benefits: resolveEfeonceCareersBenefits(content?.benefits ?? []),
+      processSteps: editorialProcessSteps,
+      expectedTiming: content?.process?.expectedTiming ?? null,
+      responseCommitment: content?.process?.responseCommitment ?? null,
+      accommodationPath: content?.process?.accommodationPath ?? null,
+      compensation: content?.compensation ?? null,
+      compensationBand: cleanText(opening.compensationBand ?? '') || null
+    }
   }
 }
 
 export const buildCareersOpeningViewModels = (
   openings: PublicOpeningPayload[],
-  copy: CareersCopy,
+  copy: CareersCopy
 ): CareersOpeningViewModel[] => openings.map(opening => buildCareersOpeningViewModel(opening, copy))
 
 export const filterCareersOpenings = (
   openings: CareersOpeningViewModel[],
-  filters: CareersOpeningFilters,
+  filters: CareersOpeningFilters
 ): CareersOpeningViewModel[] => {
   const query = normalizeText(filters.query?.trim() ?? '')
   const area = filters.area?.trim()
@@ -492,8 +605,8 @@ export const filterCareersOpenings = (
         opening.modality,
         opening.seniority,
         opening.employment,
-        ...opening.skillChips,
-      ].join(' '),
+        ...opening.skillChips
+      ].join(' ')
     )
 
     return haystack.includes(query)

@@ -3,11 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { getMicrocopy } from '@/lib/copy'
 import type { PublicOpeningPayload } from '@/types/hiring'
 
-import {
-  buildCareersOpeningViewModel,
-  filterCareersOpenings,
-  formatCareersTemplate,
-} from './view-model'
+import { editorialOpeningFixture, legacyOpeningFixture } from './editorial-opening.fixture'
+import { buildCareersOpeningViewModel, filterCareersOpenings, formatCareersTemplate } from './view-model'
 
 const copy = getMicrocopy('es-CL').careers
 
@@ -33,10 +30,80 @@ const opening: PublicOpeningPayload = {
   applyUrl: null,
   publishedAt: '2026-07-08T00:00:00.000Z',
   content: null,
-  remoteEligibleCountries: [],
+  remoteEligibleCountries: []
 }
 
 describe('careers public view model', () => {
+  it('projects every structured editorial field without semantic truncation', () => {
+    const vm = buildCareersOpeningViewModel(editorialOpeningFixture, copy)
+
+    expect(vm.editorial.lead).toBe(editorialOpeningFixture.content!.promise)
+    expect(vm.editorial.introParagraphs).toEqual([editorialOpeningFixture.content!.intro])
+    expect(vm.editorial.outcomes).toEqual(editorialOpeningFixture.content!.outcomes)
+    expect(vm.editorial.workItems).toEqual(editorialOpeningFixture.content!.workItems)
+    expect(vm.editorial.essentials).toEqual(editorialOpeningFixture.content!.essentials)
+    expect(vm.editorial.preferred).toEqual(editorialOpeningFixture.content!.preferred)
+    expect(vm.editorial.learnables).toEqual(editorialOpeningFixture.content!.learnables)
+    expect(vm.editorial.workModel).toBe(editorialOpeningFixture.content!.workModel)
+    expect(vm.editorial.companyContext).toContain('Efeonce')
+    expect(vm.editorial.additionalSections).toEqual(editorialOpeningFixture.content!.additionalSections)
+    expect(vm.editorial.eligibleCountries).toEqual(['CL', 'CO', 'MX', 'PE'])
+    expect(vm.editorial.compensation).toEqual(editorialOpeningFixture.content!.compensation)
+  })
+
+  it('merges a partial structured block with complete legacy evidence', () => {
+    const vm = buildCareersOpeningViewModel(
+      {
+        ...legacyOpeningFixture,
+        content: {
+          version: 1,
+          promise: 'Una promesa parcial que todavía no reemplaza el rol.',
+          intro: null,
+          outcomes: [],
+          workItems: [],
+          essentials: ['Criterio editorial'],
+          preferred: [],
+          learnables: [],
+          evidenceAsk: null,
+          workModel: '100% remoto con coordinación asíncrona.',
+          collaboration: null,
+          process: null,
+          benefits: [],
+          compensation: null,
+          additionalSections: []
+        }
+      },
+      copy
+    )
+
+    expect(vm.editorial.lead).toBe(legacyOpeningFixture.summary)
+    expect(vm.editorial.introParagraphs).toContain('Una promesa parcial que todavía no reemplaza el rol.')
+    expect(vm.editorial.introParagraphs).toContain('Producir piezas pillar con QA editorial.')
+    expect(vm.editorial.essentials).toEqual(['Redacción nativa en español', 'SEO on-page', 'Criterio editorial'])
+    expect(vm.editorial.preferred).toEqual(['AEO/GEO'])
+    expect(vm.editorial.learnables).toEqual([])
+    expect(vm.editorial.workModel).toContain('coordinación asíncrona')
+  })
+
+  it('keeps every legacy responsibility and requirement on the detail view', () => {
+    const responsibilities = Array.from({ length: 8 }, (_, index) => `- Responsabilidad ${index + 1}`).join('\n')
+    const requirements = Array.from({ length: 9 }, (_, index) => `Requisito ${index + 1}`).join('\n')
+
+    const vm = buildCareersOpeningViewModel(
+      {
+        ...legacyOpeningFixture,
+        description: `Sobre el rol\n\nContexto completo.\n\nResponsabilidades\n${responsibilities}`,
+        requirements
+      },
+      copy
+    )
+
+    expect(vm.responsibilityItems).toHaveLength(8)
+    expect(vm.requirementItems).toHaveLength(9)
+    expect(vm.editorial.workItems).toHaveLength(8)
+    expect(vm.editorial.essentials).toHaveLength(9)
+  })
+
   it('maps PublicOpeningPayload into a careers view model without internal ids', () => {
     const vm = buildCareersOpeningViewModel(opening, copy)
 
@@ -48,6 +115,8 @@ describe('careers public view model', () => {
     expect(vm.modality).toBe('Remoto')
     expect(vm.modalityKind).toBe('remote')
     expect(vm.skillChips).toContain('TypeScript')
+    expect(vm.editorial.preferred).toEqual(['Node.js', 'Testing'])
+    expect(vm.editorial.learnables).toEqual([])
     expect(JSON.stringify(vm)).not.toContain('openingId')
     expect(JSON.stringify(vm)).not.toContain('ownerUserId')
   })
@@ -70,9 +139,9 @@ describe('careers public view model', () => {
         description:
           'Acompañar cuentas en crecimiento.\n\nResponsabilidades principales:\n\n- Coordinar campañas, contenidos, SEO, growth tasks y próximos pasos comerciales.\n- Gestionar la relación diaria con clientes.\n- Preparar actualizaciones ejecutivas.',
         requirements: 'Marketing generalista\nNociones de SEO\nVendor management\nLiderazgo operativo',
-        niceToHave: 'Coordinación de SEO, contenido, paid media, diseño, web o automatización.',
+        niceToHave: 'Coordinación de SEO, contenido, paid media, diseño, web o automatización.'
       },
-      copy,
+      copy
     )
 
     expect(vm.area).toBe('Marketing')
@@ -80,7 +149,7 @@ describe('careers public view model', () => {
     expect(vm.responsibilityItems).toEqual([
       'Coordinar campañas, contenidos, SEO, growth tasks y próximos pasos comerciales.',
       'Gestionar la relación diaria con clientes.',
-      'Preparar actualizaciones ejecutivas.',
+      'Preparar actualizaciones ejecutivas.'
     ])
   })
 
@@ -89,9 +158,9 @@ describe('careers public view model', () => {
       {
         ...opening,
         description:
-          'Hay ideas valiosas atrapadas en un brief.\n\n- Investigar el contexto.\n- Convertir la idea en contenido.',
+          'Hay ideas valiosas atrapadas en un brief.\n\n- Investigar el contexto.\n- Convertir la idea en contenido.'
       },
-      copy,
+      copy
     )
 
     expect(vm.descriptionParagraphs).toEqual(['Hay ideas valiosas atrapadas en un brief.'])
@@ -102,10 +171,9 @@ describe('careers public view model', () => {
     const vm = buildCareersOpeningViewModel(
       {
         ...opening,
-        description:
-          'Sobre el rol\n\nUna introducción breve.\n\nResponsabilidades:\n- Investigar el contexto.',
+        description: 'Sobre el rol\n\nUna introducción breve.\n\nResponsabilidades:\n- Investigar el contexto.'
       },
-      copy,
+      copy
     )
 
     expect(vm.descriptionParagraphs).toEqual(['Una introducción breve.'])
@@ -120,9 +188,9 @@ describe('careers public view model', () => {
         workMode: 'remote',
         hiringRegion: 'Global',
         area: 'Operations',
-        skillTags: ['Account management', 'SEO técnico'],
+        skillTags: ['Account management', 'SEO técnico']
       },
-      copy,
+      copy
     )
 
     expect(vm.area).toBe('Operations')
@@ -136,14 +204,14 @@ describe('careers public view model', () => {
       {
         ...opening,
         description:
-          'Sobre el rol\n\nResponsabilidades principales:\n\nGestionar la relación diaria con clientes.\nCoordinar proveedores externos.\n\nRequisitos:\nExperiencia en marketing.',
+          'Sobre el rol\n\nResponsabilidades principales:\n\nGestionar la relación diaria con clientes.\nCoordinar proveedores externos.\n\nRequisitos:\nExperiencia en marketing.'
       },
-      copy,
+      copy
     )
 
     expect(vm.responsibilityItems).toEqual([
       'Gestionar la relación diaria con clientes.',
-      'Coordinar proveedores externos.',
+      'Coordinar proveedores externos.'
     ])
     expect(vm.responsibilityItems.join(' ')).not.toContain('Responsabilidades')
     expect(vm.responsibilityItems.join(' ')).not.toContain('Requisitos')
@@ -154,15 +222,15 @@ describe('careers public view model', () => {
       {
         ...opening,
         description:
-          'Responsabilidades:\n1. Preparar actualizaciones ejecutivas.\n– Detectar riesgos temprano.\n2) Liderar reuniones con claridad.',
+          'Responsabilidades:\n1. Preparar actualizaciones ejecutivas.\n– Detectar riesgos temprano.\n2) Liderar reuniones con claridad.'
       },
-      copy,
+      copy
     )
 
     expect(vm.responsibilityItems).toEqual([
       'Preparar actualizaciones ejecutivas.',
       'Detectar riesgos temprano.',
-      'Liderar reuniones con claridad.',
+      'Liderar reuniones con claridad.'
     ])
   })
 
@@ -170,9 +238,9 @@ describe('careers public view model', () => {
     const vm = buildCareersOpeningViewModel(
       {
         ...opening,
-        locationMode: 'Remoto / híbrido según país y acuerdo',
+        locationMode: 'Remoto / híbrido según país y acuerdo'
       },
-      copy,
+      copy
     )
 
     expect(vm.modality).toBe('Remoto')
@@ -188,9 +256,9 @@ describe('careers public view model', () => {
         ...opening,
         locationMode: 'LATAM',
         workMode: null,
-        hiringRegion: null,
+        hiringRegion: null
       },
-      copy,
+      copy
     )
 
     expect(vm.location).toBe('LATAM')
@@ -204,7 +272,8 @@ describe('careers public view model', () => {
       {
         ...opening,
         title: 'Account Manager / Especialista en Marketing',
-        summary: 'Lidera cuentas de crecimiento combinando criterio operativo, marketing generalista y coordinación de especialistas.',
+        summary:
+          'Lidera cuentas de crecimiento combinando criterio operativo, marketing generalista y coordinación de especialistas.',
         locationMode: 'LATAM',
         workMode: null,
         hiringRegion: null,
@@ -212,9 +281,9 @@ describe('careers public view model', () => {
         requirements:
           'Experiencia operando cuentas, proyectos o clientes de marketing digital.\nNociones prácticas de SEO, contenido, performance o growth.\nCapacidad de ordenar prioridades, levantar riesgos y coordinar especialistas.',
         niceToHave:
-          'Experiencia en agencia, consultora o equipos de crecimiento.\nFamiliaridad con HubSpot, analytics, paid media o automatización.',
+          'Experiencia en agencia, consultora o equipos de crecimiento.\nFamiliaridad con HubSpot, analytics, paid media o automatización.'
       },
-      copy,
+      copy
     )
 
     expect(vm.modality).toBe('Remoto')
@@ -229,9 +298,9 @@ describe('careers public view model', () => {
     const vm = buildCareersOpeningViewModel(
       {
         ...opening,
-        locationMode: 'Híbrido · Santiago, Chile',
+        locationMode: 'Híbrido · Santiago, Chile'
       },
-      copy,
+      copy
     )
 
     expect(vm.modality).toBe('Híbrido')
@@ -243,9 +312,9 @@ describe('careers public view model', () => {
     const vm = buildCareersOpeningViewModel(
       {
         ...opening,
-        processNotes: 'Esta vacante está alineada internamente al assessment template Account Manager L2.',
+        processNotes: 'Esta vacante está alineada internamente al assessment template Account Manager L2.'
       },
-      copy,
+      copy
     )
 
     expect(vm.processNotes).toEqual([])

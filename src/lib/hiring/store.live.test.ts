@@ -1,6 +1,7 @@
 import { afterAll, describe, expect, it } from 'vitest'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { editorialOpeningFixture } from '@/lib/hiring/public-careers/editorial-opening.fixture'
 
 import {
   createHiringApplication,
@@ -151,7 +152,9 @@ describe.skipIf(!hasPgConfig)('hiring store — live PG (TASK-353)', () => {
         publicSeniority: 'Senior',
         publicWorkMode: 'remote',
         publicHiringRegion: 'Chile',
-        publicSkillTags: ['figma', 'design-systems']
+        publicSkillTags: ['figma', 'design-systems'],
+        publicContent: editorialOpeningFixture.content,
+        publicRemoteEligibleCountries: ['CL']
       },
       'user-live-test'
     )

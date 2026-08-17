@@ -1,5 +1,24 @@
 # TASK-1740 — Public Vacancy Content and Google JobPosting Foundation
 
+## Delta 2026-08-17 (2) — Canon editorial v2 para todas las vacantes
+
+El operador aprobó que la variación entre cargos viva en el contenido y no en la arquitectura de la página.
+Esta task conserva ownership del contrato y evoluciona `PublicOpeningContent` a v2:
+
+- diez regiones canónicas en orden estable: promesa/hero, rol, resultados, trabajo, encaje, evidencia, forma
+  de trabajo, beneficios, proceso y compensación;
+- `preferred` separado de `learnables`, colaboración operativa y proceso con propósito/timing/respuesta/
+  accommodations como datos estructurados;
+- contexto corporativo y beneficios globales de Efeonce resueltos desde una fuente central versionada, no
+  copiados manualmente en cada opening;
+- `additionalSections` limitado a tres bloques, con formatos `narrative|bullets|milestones`, sin HTML, CTA,
+  layout, color ni posición arbitrarios;
+- writes nuevos aceptan sólo v2 completo; el read path sigue entendiendo v1 y legacy. Un opening ya publicado
+  con v1 queda grandfathered hasta su siguiente publicación, pero un publish/re-publish exige v2 y, para
+  remoto, países elegibles explícitos;
+- el operator/CLI deriva la prosa legacy desde v2 para que exista una sola verdad y el JSON-LD se construye
+  desde el mismo contenido resuelto que aparece en HTML.
+
 ## Delta 2026-08-17 — Slices 1-4 code complete; rollout pendiente
 
 **Estado: `code complete, rollout pendiente`.** Implementado local-first en `develop` (4 commits, sin push):
@@ -252,9 +271,9 @@ Reglas obligatorias:
 
 - [x] Source of truth, contract surface and consumers are named with real paths or objects.
 - [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [x] Migration/backfill/rollback posture is explicit and proportional to risk. *(aditiva, sin backfill de copy, Down completo)*
-- [x] Runtime or DB evidence is listed for any change beyond docs/tooling. *(information_schema + write→read vivo + curl local)*
-- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks. *(422 canónico + anti-leak sentinels)*
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk. _(aditiva, sin backfill de copy, Down completo)_
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling. _(information_schema + write→read vivo + curl local)_
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks. _(422 canónico + anti-leak sentinels)_
 
 ## Capability Definition of Done — Full API Parity gate
 
@@ -319,13 +338,13 @@ Para JSON-LD, implementar un builder server-only y testeado. Debe usar el `title
 
 ### Risk matrix
 
-| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
-|---|---|---|---|---|
-| Fuga de datos internos por extensión de DTO | API / UI pública | medium | allowlist campo a campo + sentinels negativos + revisión de HTML SSR | test de leakage o propiedad no esperada |
-| Schema inválido o contradictorio | SEO / UI pública | medium | builder puro desde payload visible + fixtures Google + Rich Results Test | error de Rich Results / mismatch HTML |
-| Remote global sin país elegible | publicación / SEO | high | validación explícita y bloqueo/omisión documentada; confirmación People/Legal | fallo de publicación o campo remote omitido |
-| Regresión de opening legado | Careers | medium | fields opcionales + fallback probado + feature flag del consumer UI | snapshot/GVC o reader vacío |
-| URL cerrada aún indexable con schema | SEO | low | prueba lifecycle published/paused/closed y 404 | HTML/schema accesible tras unpublish |
+| Riesgo                                      | Sistema           | Probabilidad | Mitigation                                                                    | Signal de alerta                            |
+| ------------------------------------------- | ----------------- | ------------ | ----------------------------------------------------------------------------- | ------------------------------------------- |
+| Fuga de datos internos por extensión de DTO | API / UI pública  | medium       | allowlist campo a campo + sentinels negativos + revisión de HTML SSR          | test de leakage o propiedad no esperada     |
+| Schema inválido o contradictorio            | SEO / UI pública  | medium       | builder puro desde payload visible + fixtures Google + Rich Results Test      | error de Rich Results / mismatch HTML       |
+| Remote global sin país elegible             | publicación / SEO | high         | validación explícita y bloqueo/omisión documentada; confirmación People/Legal | fallo de publicación o campo remote omitido |
+| Regresión de opening legado                 | Careers           | medium       | fields opcionales + fallback probado + feature flag del consumer UI           | snapshot/GVC o reader vacío                 |
+| URL cerrada aún indexable con schema        | SEO               | low          | prueba lifecycle published/paused/closed y 404                                | HTML/schema accesible tras unpublish        |
 
 ### Feature flags / cutover
 
@@ -334,12 +353,12 @@ Para JSON-LD, implementar un builder server-only y testeado. Debe usar el `title
 
 ### Rollback plan per slice
 
-| Slice | Rollback | Tiempo | Reversible? |
-|---|---|---|---|
-| 1 | Abandonar el draft de contrato sin migration; conservar evidencia de discovery | inmediato | sí |
-| 2 | Revertir reader/command consumer y dejar estructura aditiva sin lectura pública | < 15 min + deploy | sí |
-| 3 | Desactivar emisión de JSON-LD/canonical nuevo por flag o revert puntual; la URL y apply siguen operando | < 15 min + deploy | sí |
-| 4 | Revertir documentación/operación sin efecto runtime | inmediato | sí |
+| Slice | Rollback                                                                                                | Tiempo            | Reversible? |
+| ----- | ------------------------------------------------------------------------------------------------------- | ----------------- | ----------- |
+| 1     | Abandonar el draft de contrato sin migration; conservar evidencia de discovery                          | inmediato         | sí          |
+| 2     | Revertir reader/command consumer y dejar estructura aditiva sin lectura pública                         | < 15 min + deploy | sí          |
+| 3     | Desactivar emisión de JSON-LD/canonical nuevo por flag o revert puntual; la URL y apply siguen operando | < 15 min + deploy | sí          |
+| 4     | Revertir documentación/operación sin efecto runtime                                                     | inmediato         | sí          |
 
 ### Production verification sequence
 
@@ -363,11 +382,15 @@ Para JSON-LD, implementar un builder server-only y testeado. Debe usar el `title
 
 ## Acceptance Criteria
 
-- [x] El contenido público estructurado tiene owner, validación, fallback y pruebas de no leakage; no depende de heurísticas como única fuente. *(public-content.ts + anti-leak test extendido)*
-- [x] Una vacante publicada genera canonical y JSON-LD válido desde el mismo contenido visible; vacantes legacy y sin datos remotos completos degradan sin schema falso ni páginas vacías. *(canonical verificado en runtime local; JSON-LD por tests — Rich Results en staging/prod pendiente de rollout)*
-- [x] `JobPosting` remoto sólo se emite con países elegibles explícitos y no declara salario/directApply/beneficios como hechos cuando no existe aprobación estructurada. *(job-posting.test.ts 14 casos)*
-- [x] Pausar/cerrar deja la vacancy fuera del reader público y sin schema; la aplicación y el formulario no fueron modificados. *(EO-OPN-0050 cerrada → 404 verificado; cero cambios en apply)*
-- [x] TASK-1741 recibe contrato, fixture y fallback suficientes para implementar una UI sin tocar DB/publication. *(editorial-opening.fixture.ts + delta en su spec)*
+- [x] El contenido público estructurado tiene owner, validación, fallback y pruebas de no leakage; no depende de heurísticas como única fuente. _(public-content.ts + anti-leak test extendido)_
+- [x] Una vacante publicada genera canonical y JSON-LD válido desde el mismo contenido visible; vacantes legacy y sin datos remotos completos degradan sin schema falso ni páginas vacías. _(canonical verificado en runtime local; JSON-LD por tests — Rich Results en staging/prod pendiente de rollout)_
+- [x] `JobPosting` remoto sólo se emite con países elegibles explícitos y no declara salario/directApply/beneficios como hechos cuando no existe aprobación estructurada. _(job-posting.test.ts 14 casos)_
+- [x] Pausar/cerrar deja la vacancy fuera del reader público y sin schema; la aplicación y el formulario no fueron modificados. _(EO-OPN-0050 cerrada → 404 verificado; cero cambios en apply)_
+- [x] TASK-1741 recibe contrato, fixture y fallback suficientes para implementar una UI sin tocar DB/publication. _(editorial-opening.fixture.ts + delta en su spec)_
+- [x] `PublicOpeningContent` v2 exige el esqueleto editorial completo, acepta máximo tres extensiones tipadas y conserva lectura leniente de v1/legacy sin reinterpretar una versión desconocida.
+- [x] El contexto corporativo y los beneficios estándar provienen de una fuente pública central; el monto de equipo permanece excluido y cada opening sólo puede añadir beneficios específicos aprobados.
+- [x] El command de publicación rechaza publish/re-publish sin v2 completo y deriva summary/description/requirements/preferred/process legacy desde el mismo bloque, sin dos verdades editables.
+- [x] Una vacante remota v2 no publica sin países elegibles ISO y el HTML/JobPosting incluyen la misma evidencia visible, incluidos bloques adicionales y beneficios resueltos.
 
 ## Verification
 

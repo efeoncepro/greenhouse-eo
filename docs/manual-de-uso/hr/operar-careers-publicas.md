@@ -8,6 +8,8 @@ Confirma:
 - `HIRING_PUBLIC_APPLICATIONS_ENABLED` está en el estado esperado del ambiente;
 - `CAREERS_NATIVE_GROWTH_FORM_ENABLED` está en el estado esperado del ambiente
   si quieres probar el apply con el renderer nativo de Growth Forms;
+- `CAREERS_DETAIL_EDITORIAL_V2_ENABLED` está en el estado esperado si vas a
+  validar la hoja editorial; permanece OFF por defecto hasta rollout;
 - Turnstile y consentimiento están aprobados para el ambiente objetivo;
 - la ruta pública que vas a probar corresponde al ambiente correcto.
 
@@ -54,6 +56,9 @@ no como frase libre escrita por un agente. Regla operativa:
 - `publicCompensationBand` existe como campo estructurado opcional. No es
   obligatorio para publish hasta que finance/payroll/legal definan bandas
   aprobadas y su governance.
+- `publicSeniority` acepta exclusivamente `Junior`, `Semi-senior`, `Senior` o
+  `Lead`. No uses `Intermedio`, `L1`, `L2` ni `L3`. Si el título dice `Senior`,
+  el campo debe decir exactamente `Senior`; el writer rechaza contradicciones.
 
 Voz y copy publico:
 
@@ -156,23 +161,24 @@ Conserva el registro de campaña bajo `docs/operations/hiring/` con opening, URL
 
 ## Contenido estructurado y schema de Google (TASK-1740)
 
-Una vacante puede llevar, además de la prosa, un bloque estructurado que el
-renderer editorial y el JSON-LD `JobPosting` consumen desde la misma fuente.
+Toda vacante nueva lleva un bloque v2 que el renderer editorial, las proyecciones
+legacy y el JSON-LD `JobPosting` consumen desde la misma fuente.
 
 ### Autorar el bloque estructurado
 
-1. Prepara el paquete de evidencia (skill de Talent): promesa, resultados,
-   trabajo real, essentials/learnables, evidencia pedida, modelo remoto,
-   proceso y beneficios aprobados. No inventes beneficios ni compensación.
-2. Escribe el bloque por API con el command canónico:
+1. Prepara el paquete de evidencia con la skill de Talent y su Job Offer Recipe.
+   Completa la estructura v2 fija; separa essentials, preferred y learnables.
+2. Para un cargo complejo, usa 0–3 `additionalSections` después de `workItems`.
+   Sólo se permiten `narrative`, `bullets` o `milestones`; nunca HTML o CTA.
+3. Escribe el bloque por el operador canónico. El operador deriva summary,
+   description, responsabilidades, requisitos, deseables y proceso legacy:
 
 ```bash
-pnpm staging:request PATCH /api/hiring/openings/<openingId> '{"publicContent":{"version":1,"promise":"…","outcomes":["…"],"processSteps":["…"]}}'
+pnpm hiring:publish-vacancy -- --file scripts/hiring/fixtures/account-manager-vacancy-brief.example.json --mode dryRun
 ```
 
-3. Un bloque inválido responde 422 `hiring_opening_public_content_invalid`;
-   corrige y reintenta. `publicContent: null` limpia el bloque (vuelve el
-   fallback de prosa).
+4. Un bloque inválido responde 422 `hiring_opening_public_content_invalid`.
+   V1 no acepta writes. `publicContent: null` no puede degradar una publicación v2.
 
 ### Declarar países elegibles (solo remoto)
 
@@ -183,40 +189,46 @@ pnpm staging:request PATCH /api/hiring/openings/<openingId> '{"publicContent":{"
    (contract type `international_internal`, sin EOR).
 2. Decláralos como ISO alpha-2: `{"publicRemoteEligibleCountries":["CL","CO"]}`.
    `LATAM`/`Global` son display, no países: el API los rechaza.
-3. Sin países declarados la vacante sigue publicable, pero **no emite schema**
-   (comportamiento correcto, no un bug).
+3. Una vacante remota v2 no puede publicarse sin países declarados. Una fila
+   legacy sin países puede seguir visible, pero no emite schema.
 
 **El país de la entidad empleadora NO va como ubicación del puesto.** Es
 tentador poner "Santiago, Chile" en una vacante remota para dejar claro el
 anclaje contractual, pero `jobLocation` significa "dónde se realiza
 físicamente el trabajo": Google dejaría de tratarla como remota y la mostraría
-a quien busca empleo *en* Santiago. La forma correcta es la que ya opera:
+a quien busca empleo _en_ Santiago. La forma correcta es la que ya opera:
 `TELECOMMUTE` + países elegibles en la elegibilidad, y el anclaje contractual
-declarado en el contenido visible (`content.remoteModel`). Una lista de un solo
+declarado en el contenido visible (`content.workModel`). Una lista de un solo
 país (`["CL"]`) también es válida y honesta: "remoto, elegible en Chile".
 
-### Prender el schema JobPosting
+### Activar renderer y schema JobPosting
 
 > ⚠️ **Precondición de secuencia (no negociable): el renderer va primero.**
-> El JSON-LD ya lee el bloque estructurado, pero la página visible todavía no
-> (eso llega con TASK-1741). Si prendes el schema antes, Google recibiría
-> contenido —por ejemplo el modelo remoto con la vía contractual, ya cargado en
-> las dos vacantes— que el candidato no ve en pantalla. Google exige que el
-> structured data refleje el contenido visible, y este dominio lo prohíbe
-> explícitamente. **Orden correcto: renderer de TASK-1741 → contenido autorado
-> → recién entonces este flag.** Al revés no es "adelantarse": es publicar una
-> promesa que la página no respalda.
+> El código del renderer ya consume el bloque estructurado, pero permanece OFF
+> hasta el rollout. **Orden correcto: renderer de TASK-1741 → contenido autorado
+> y revisado → recién entonces schema.** Existe un interlock técnico: aunque la
+> env del schema diga `true`, no se emite `JobPosting` mientras
+> `CAREERS_DETAIL_EDITORIAL_V2_ENABLED` esté OFF.
 
-1. El flag `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` vive **solo en Vercel**
+1. Prende `CAREERS_DETAIL_EDITORIAL_V2_ENABLED` en staging y redespliega.
+2. Verifica la hoja completa en 1440 y 390: navegación, hero, seniority,
+   metadatos, prosa, requisitos/deseables, remoto, proceso, compensación, rail,
+   footer y exactamente dos enlaces de postulación al mismo destino.
+3. Confirma que los campos estructurados aprobados aparecen también en el HTML
+   visible. Un bloque parcial debe conservar el fallback legacy; no publiques
+   contenido ficticio para completar secciones. En una publicación v2 incompleta,
+   corrige el paquete antes de publicar.
+4. El flag `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` vive **solo en Vercel**
    (SSR del detalle público). Default OFF.
-2. Prende primero staging (`vercel env add … preview` + redeploy), abre el
+5. Préndelo en staging (`vercel env add … preview` + redeploy), abre el
    detalle de una vacante con países/ciudad declarados y valida el HTML con
    el [Rich Results Test](https://search.google.com/test/rich-results).
-3. Verifica el lifecycle: pausa la vacante (`DELETE
-   /api/hiring/openings/{id}/publish?mode=paused`) y confirma que la URL
+6. Verifica el lifecycle: pausa la vacante (`DELETE
+/api/hiring/openings/{id}/publish?mode=paused`) y confirma que la URL
    responde 404 sin schema; restaura solo con el command de publish.
-4. Producción: mismo procedimiento tras evidencia en staging. Rollback:
-   `vercel env rm` + redeploy (la página y el canonical no cambian).
+7. Producción: mismo procedimiento tras evidencia en staging. Rollback:
+   apaga primero el schema y redespliega; después apaga el renderer y vuelve a
+   desplegar. La URL, el canonical, el payload y el formulario no cambian.
 
 ### Qué no hacer
 
@@ -245,8 +257,10 @@ dos, el owner de Growth/SEO debe decidir y autorizar:
 1. Abre `/public/careers`.
 2. Confirma que la página carga marca Efeonce, hero, filtros, proceso y vacantes.
 3. Abre una vacante desde el card.
-4. Confirma que `/public/careers/[publicId]` muestra detalle, competencias,
-   proceso y CTA de postulación.
+4. Confirma que `/public/careers/[publicId]` preserva la hoja completa: hero,
+   seniority, modalidad, prosa, trabajo, encaje, remoto, proceso, compensación,
+   resumen y los dos enlaces existentes de postulación. Outcomes, evidencia y
+   beneficios aparecen cuando están aprobados en `publicContent`.
 5. Abre `/public/careers/[publicId]/apply`.
 6. Confirma que el formulario muestra el contrato `application` y el slug
    `efeonce-careers-application`.

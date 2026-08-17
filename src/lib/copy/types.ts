@@ -751,6 +751,7 @@ export interface HiringDeskCopy {
       fieldNiceToHave: string
       fieldArea: string
       fieldSeniority: string
+      fieldSeniorityPlaceholder: string
       fieldSkillTags: string
       fieldProcessNotes: string
       biasReminder: string
@@ -980,6 +981,29 @@ export interface CareersCopy {
     processTitle: string
     compensationTitle: string
     compensationFallback: string
+    outcomesTitle: string
+    workTitle: string
+    essentialsTitle: string
+    preferredTitle: string
+    learnablesTitle: string
+    evidenceTitle: string
+    companyTitle: string
+    remoteTitle: string
+    eligibleCountriesTitle: string
+    collaborationLabels: {
+      team: string
+      reportsTo: string
+      language: string
+      timezoneOverlap: string
+      workingRhythm: string
+    }
+    benefitsTitle: string
+    processMetaLabels: {
+      expectedTiming: string
+      responseCommitment: string
+      accommodationPath: string
+    }
+    compensationUnits: Record<'HOUR' | 'DAY' | 'WEEK' | 'MONTH' | 'YEAR', string>
     summaryTitle: string
     labels: {
       area: string

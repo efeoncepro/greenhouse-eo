@@ -1,6 +1,6 @@
 # Greenhouse runtime binding (domain, code paths, invariants)
 
-Load whenever the work happens *inside* the Greenhouse repo (not pure advisory). This is what makes the skill an operator, not a consultant. Read the current specs before acting — the domain is young and moving.
+Load whenever the work happens _inside_ the Greenhouse repo (not pure advisory). This is what makes the skill an operator, not a consultant. Read the current specs before acting — the domain is young and moving.
 
 ## The Hiring / ATS domain (canonical)
 
@@ -19,7 +19,7 @@ Load whenever the work happens *inside* the Greenhouse repo (not pure advisory).
 
 - `TASK-1360` Assessment Engine — competency catalog (category × level), question bank (**answer_key sensitive, separate, never candidate-facing**), templates (compose per role; Account Manager seed), instances, objective + human scoring, competency-result rollup into `hiring_application` (**advisory**).
 - `TASK-1361` Assessment AI Assist — AI **proposes** questions + open-answer scores; **human confirms**; eval baseline; flag OFF default. (This is the AI-Act-safe pattern — see `assessment-interviewing.md`.)
-- `TASK-1362` Candidate Document Capture — CV/portfolio on the **private assets platform** (reuse, don't build buckets); **identity docs reuse the `person_identity_documents` table** (masked storage + append-only audit), captured **post-decision**; quarantine/scan for public uploads. ⚠️ The *reveal* of a candidate's identity document does **not** use `person.legal_profile.reveal_sensitive` — that is the member-scoped path of TASK-784. The candidate path is `hiring.candidate.reveal_identity` (TASK-1714) — see §Candidate documents below.
+- `TASK-1362` Candidate Document Capture — CV/portfolio on the **private assets platform** (reuse, don't build buckets); **identity docs reuse the `person_identity_documents` table** (masked storage + append-only audit), captured **post-decision**; quarantine/scan for public uploads. ⚠️ The _reveal_ of a candidate's identity document does **not** use `person.legal_profile.reveal_sensitive` — that is the member-scoped path of TASK-784. The candidate path is `hiring.candidate.reveal_identity` (TASK-1714) — see §Candidate documents below.
 - `TASK-1363` Assessment Taking + Review Surface — candidate takes the test via a **public tokenized Greenhouse link** (`/assessment/[token]`, single-use, time-limited); internal review in Application 360 with advisory scorecard, queue and correction drawer. Complete local on 2026-07-13; rollout depends on push/deploy.
 
 ### Assessment operating flow (humans + agents)
@@ -152,25 +152,31 @@ with `greenhouse-production-release` only when the request changes code,
 schema/migrations, flags/env vars, infrastructure, public renderer, apply
 contract, or initial cutover smoke.
 
-### Public structured content + JobPosting schema (TASK-1740 — code complete, rollout gated a TASK-1741)
+### Canonical public vacancy content + JobPosting (TASK-1740/1741)
 
 The public vacancy carries a versioned structured content block and a technical-SEO
 foundation. Rollout is honest: the flag is OFF everywhere and the production release
 is deliberately held until TASK-1741 (editorial renderer) lands.
 
-- **`PublicOpeningContent` v1** lives in
+- **`PublicOpeningContent` v2** lives in
   `greenhouse_hiring.hiring_opening.public_content_json` (JSONB): promise, intro,
-  outcomes[], workItems[], essentials[], learnables[], evidenceAsk, remoteModel,
-  processSteps[], benefits[], optional `compensation`
+  outcomes[], workItems[], essentials[], preferred[], learnables[], evidenceAsk,
+  workModel, collaboration{}, process{}, role-specific benefits[], 0–3 typed
+  additionalSections, optional `compensation`
   (`{currency ISO 4217, minValue, maxValue, unitText HOUR|DAY|WEEK|MONTH|YEAR}`).
 - **Validator** `src/lib/hiring/public-careers/public-content.ts`: write path is
   strict (422 `hiring_opening_public_content_invalid`, ALWAYS re-validated in the
-  store `updateHiringOpening`); read path is lenient (a corrupt block or unknown
-  version degrades to null = legacy prose fallback — the public page never breaks).
+  store `updateHiringOpening`); v1 is read-only and its sections degrade through
+  legacy fallback. New publication/re-publication requires complete v2. The vacancy
+  publication operator derives legacy public text projections from v2.
+- **Public seniority** is a separate candidate-facing contract from internal assessment level:
+  exactly `Junior | Semi-senior | Senior | Lead`. `src/lib/hiring/public-seniority.ts`, the
+  canonical writer, AI schema/sanitizer and `hiring_opening_public_seniority_check` all enforce
+  it; an explicit level in `public_title` must match. `L1/L2/L3` remain internal only.
 - **Remote eligibility**: `hiring_opening.public_remote_eligible_countries` TEXT[]
   of real ISO 3166-1 alpha-2 codes (`isValidCountryCode`; `LATAM`/`Global` are
   REJECTED as countries). It is the ONLY enabler of the remote schema; missing
-  countries never block publication — the schema is simply omitted.
+  countries block new remote v2 publication; legacy rows remain readable and schema fail-closed.
 - **SEO**: the leaf `/public/careers/[publicId]` always emits an explicit canonical
   (published vacancy) and JSON-LD `JobPosting` behind
   `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` (Vercel-only, default OFF, registered
@@ -189,21 +195,21 @@ is deliberately held until TASK-1741 (editorial renderer) lands.
   entity's country into `jobLocation` of a remote vacancy "to make the contractual
   anchor explicit". `jobLocation` means where the work is performed PHYSICALLY:
   Google would stop classifying it as remote and would show it to people searching
-  for a job *in* that city. The contractual anchor is declared in the visible
-  content (`content.remoteModel`); eligibility goes in
+  for a job _in_ that city. The contractual anchor is declared in the visible
+  content (`content.workModel`); eligibility goes in
   `applicantLocationRequirements`, which accepts a SINGLE country and is still a
   valid `TELECOMMUTE` (`["CL"]` = "remote, eligible in Chile" — honest and correct).
-- **A partial block complements, it does not replace**: **NEVER** let a PARTIAL
+- **A legacy partial block complements, it does not replace**: **NEVER** let a PARTIAL
   structured block replace the legacy prose in the JSON-LD description. Only a block
   with core narrative (`promise`/`intro`/`outcomes`/`workItems`) replaces it; a
-  partial block — the NORMAL state while the editorial content is not authored —
+  persisted v1 block — a migration state while the editorial content is not authored —
   complements it. Replacing it degraded the schema description to a fragment of the
   role; bug caught with the first real artifact (2026-08-17), not by the unit tests.
 - **Flip order — renderer first, schema second**: **NEVER** flip
   `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` before the renderer (TASK-1741) shows
-  the structured block on the visible page. The JSON-LD builder already consumes
-  `content`, but the renderer does NOT yet, so flipping the schema first would emit
-  to Google content (e.g. `remoteModel` with the contractual route) that the
+  the structured block on the visible page. Both consume the same resolved content;
+  the interlock prevents a schema-only state that would emit to Google content (e.g.
+  `workModel` with the contractual route) that the
   candidate cannot see — the exact misalignment this domain forbids. The two flags
   are independent in terms of technical dependency (TASK-1741 does NOT need the
   schema flag to be developed: `content` and `remoteEligibleCountries` ALWAYS
@@ -219,7 +225,7 @@ is deliberately held until TASK-1741 (editorial renderer) lands.
   via the canonical command on the 2 published vacancies (EO-OPN-0009 and
   EO-OPN-0061): all of Latin America EXCEPT Cuba + US + ES — AR BO BR CL CO CR DO
   EC SV GT HN MX NI PA PY PE UY VE + US + ES (20 countries). The contractual route
-  is declared in `content.remoteModel`: Chile with a local labor contract; outside
+  is declared in `content.workModel`: Chile with a local labor contract; outside
   Chile, the international route with direct payment by Efeonce (contract type
   `international_internal`, no EOR). Both produce a valid JobPosting when the flag
   flips — the rendered JSON-LD was validated for real in local (flag flipped ON
@@ -249,10 +255,10 @@ There is a real malware scanner behind files uploaded from outside (Cloud Run `s
 
 Canonical model: `src/lib/hiring/documents/types.ts`. **Two classes of datum, two treatments.**
 
-| Class | Type | Key field | Treatment |
-|---|---|---|---|
-| File (CV, portfolio) | `CandidateDocumentFile` | `downloadUrl` | **Opened.** `hiring.application.read` (the screen's capability) already authorized; the asset route re-verifies per request. No extra padlock. |
-| Identity (RUT/passport) | `CandidateIdentityDocument` | `displayMask` — never the full value | **Revealed.** Own capability + reason + audit entry. |
+| Class                   | Type                        | Key field                            | Treatment                                                                                                                                      |
+| ----------------------- | --------------------------- | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| File (CV, portfolio)    | `CandidateDocumentFile`     | `downloadUrl`                        | **Opened.** `hiring.application.read` (the screen's capability) already authorized; the asset route re-verifies per request. No extra padlock. |
+| Identity (RUT/passport) | `CandidateIdentityDocument` | `displayMask` — never the full value | **Revealed.** Own capability + reason + audit entry.                                                                                           |
 
 A padlock that protects nothing teaches the operator to ignore the padlocks that do. Do not "harden" the file group by adding one.
 
@@ -294,7 +300,7 @@ A padlock that protects nothing teaches the operator to ignore the padlocks that
   audit. Code, schema and MCP adapters exist, but real-CV projection/reader/tool flags remain OFF until the named
   Talent, Privacy, Security, Identity and MCP owners approve the activation and a synthetic canary passes. Candidate
   CV review remains separate and OFF in production; the public rate guard fails closed if its store is unavailable.
-- Command `revealCandidateIdentityDocument` (`src/lib/hiring/documents/reveal-identity-document.ts`) verifies the document belongs to the `identity_profile_id` of the path's `candidateFacetId`. **Anti-IDOR: a foreign `documentId` answers `404`, not `403`** — a `403` would confirm its existence to a prober. The lookup runs with `includeArchived: true` on purpose, so an *archived* document of the candidate's own gets the `409` that names the cause instead of a `404` that would assert it does not exist.
+- Command `revealCandidateIdentityDocument` (`src/lib/hiring/documents/reveal-identity-document.ts`) verifies the document belongs to the `identity_profile_id` of the path's `candidateFacetId`. **Anti-IDOR: a foreign `documentId` answers `404`, not `403`** — a `403` would confirm its existence to a prober. The lookup runs with `includeArchived: true` on purpose, so an _archived_ document of the candidate's own gets the `409` that names the cause instead of a `404` that would assert it does not exist.
 - Route `POST /api/hiring/candidate-facets/[candidateFacetId]/identity-documents/[documentId]/reveal`.
 - **No machinery duplicated**: the append-only audit and the outbox event are written by `revealPersonIdentityDocument` (784). No new event.
 - **Not idempotent by design**: each reveal is a real access and leaves its own entry. Double-fire is prevented by the client disabling the CTA, never by the server deduplicating.
@@ -348,7 +354,7 @@ Docs: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-15 (8 invariant
 - **Consumer UI (TASK-1737)**: tab `expediente` of `/agency/hiring/applications/[applicationId]` (rename of
   `activity`, `?tab=activity` alias preserved). Reader contract
   `listHiringApplicationNotes(applicationId, viewerUserId?)` → `{ notes, hiddenNoteCount,
-  viewerBlindUntilScorecardSubmitted }`; the anti-anchoring predicate is the SINGLE
+viewerBlindUntilScorecardSubmitted }`; the anti-anchoring predicate is the SINGLE
   `getOwnScorecardStateForApplication` shared with `listResponses` + `listPeerScorecardResults`. Without
   `viewerUserId` it does NOT filter (server-internal calls). `GET /dossier` under blindness returns
   `proposal: null`. View `src/views/greenhouse/hiring/ApplicationDossierPanel.tsx` is a thin client.
@@ -473,7 +479,7 @@ manual `docs/manual-de-uso/hr/operar-scoring-ia-assessments.md` +
   `valentina villa`→`Valentina Villa` (`happ-2646fea0…`), `stana medina`→`Stana Medina` (`happ-df7226d0…`),
   `aldo romano`→`Aldo Romano` (`happ-cb4d9144…`) — each `source='reconcile'`, `outcome='applied'`,
   `normalization_version='v1'`, `actor_user_id='user-efeonce-admin-julio-reyes'`, reason `"display_refreshed —
-  Remediacion autorizada por CEO 2026-08-16: casing degenerado del intake publico"`. **2 QA profiles were
+Remediacion autorizada por CEO 2026-08-16: casing degenerado del intake publico"`. **2 QA profiles were
   deliberately pruned from the allowlist** — that pruning IS the protocol working, not an omission. Any doc
   citing "4 proposals = 2 humans" is stale.
 - **Signals**: `hiring.candidate_identity.needs_review_backlog` (steady=0; warning 1-5, error >5) +
@@ -493,7 +499,7 @@ Docs: ADR `GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1.md`
 ## Person model (never duplicate a human)
 
 - Root: `greenhouse_core.identity_profiles` (`profile_id`). A candidate is a **Person with a `candidate_facet`**, not a separate record. Reconcile with `resolvePersonIdentifier`.
-- The same Person becomes a `member` (employee) via HRIS/People (TASK-770), on the *same* `identity_profile_id`. Candidate → colaborador is a facet promotion, not a new identity.
+- The same Person becomes a `member` (employee) via HRIS/People (TASK-770), on the _same_ `identity_profile_id`. Candidate → colaborador is a facet promotion, not a new identity.
 
 ## Contract types (the global/national fork)
 

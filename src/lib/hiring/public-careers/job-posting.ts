@@ -21,6 +21,9 @@ import 'server-only'
 import { EFEONCE_BRAND_NAME, EFEONCE_URL_HTTPS } from '@/config/efeonce-brand'
 import type { PublicOpeningPayload } from '@/types/hiring'
 
+import { isCanonicalPublicOpeningContent } from './public-content'
+import { EFEONCE_CAREERS_COMPANY_CONTEXT, resolveEfeonceCareersBenefits } from './standard-content'
+
 const escapeHtml = (value: string): string =>
   value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
@@ -40,10 +43,10 @@ const listToHtml = (items: string[]): string =>
  * legacy sin perder la descripción del rol.
  */
 const hasCompleteCoreNarrative = (content: NonNullable<PublicOpeningPayload['content']>): boolean =>
-  Boolean(content.promise && content.intro && content.outcomes.length && content.workItems.length)
+  isCanonicalPublicOpeningContent(content)
 
 const hasCompleteSkillsBlock = (content: NonNullable<PublicOpeningPayload['content']>): boolean =>
-  Boolean(content.essentials.length && content.learnables.length)
+  isCanonicalPublicOpeningContent(content)
 
 /**
  * Descripción HTML segura construida desde el MISMO contenido visible del payload.
@@ -78,13 +81,33 @@ const buildDescriptionHtml = (opening: PublicOpeningPayload): string => {
     parts.push(listToHtml(content.outcomes))
     parts.push(listToHtml(content.workItems))
 
+    for (const section of content.additionalSections) {
+      parts.push(paragraphsToHtml(section.title))
+      if (section.intro) parts.push(paragraphsToHtml(section.intro))
+      parts.push(listToHtml(section.items))
+    }
+
     parts.push(listToHtml(content.essentials))
+    parts.push(listToHtml(content.preferred))
     parts.push(listToHtml(content.learnables))
     if (content.evidenceAsk) parts.push(paragraphsToHtml(content.evidenceAsk))
-    if (content.remoteModel) parts.push(paragraphsToHtml(content.remoteModel))
-    parts.push(listToHtml(content.processSteps))
-    parts.push(listToHtml(content.benefits))
+    if (content.workModel) parts.push(paragraphsToHtml(content.workModel))
+    if (content.collaboration) parts.push(listToHtml(Object.values(content.collaboration)))
+
+    if (content.process) {
+      for (const step of content.process.steps) {
+        parts.push(paragraphsToHtml(step.title))
+        if (step.body) parts.push(paragraphsToHtml(step.body))
+      }
+
+      if (content.process.expectedTiming) parts.push(paragraphsToHtml(content.process.expectedTiming))
+      if (content.process.responseCommitment) parts.push(paragraphsToHtml(content.process.responseCommitment))
+      if (content.process.accommodationPath) parts.push(paragraphsToHtml(content.process.accommodationPath))
+    }
   }
+
+  parts.push(paragraphsToHtml(EFEONCE_CAREERS_COMPANY_CONTEXT))
+  parts.push(listToHtml(resolveEfeonceCareersBenefits(content?.benefits ?? [])))
 
   return parts.filter(Boolean).join('')
 }

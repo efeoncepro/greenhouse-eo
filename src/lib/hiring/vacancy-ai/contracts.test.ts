@@ -13,9 +13,9 @@ const validRaw = {
   publicNiceToHave: '- Search Console API',
   publicArea: 'Growth',
   publicSkillTags: ['SEO técnico', '', 'GA4', 42, 'Search Console'],
-  publicSeniority: 'senior',
+  publicSeniority: 'Senior',
   publicProcessNotes: 'El proceso evalúa SEO y comunicación.',
-  note: 'Basado en las competencias del template.',
+  note: 'Basado en las competencias del template.'
 }
 
 describe('sanitizeOpeningPublicCopy (TASK-1385)', () => {
@@ -52,10 +52,20 @@ describe('sanitizeOpeningPublicCopy (TASK-1385)', () => {
       publicSummary: 'S',
       publicDescription: 'D',
       publicRequirements: '   ',
-      publicSkillTags: [],
+      publicSkillTags: []
     })
 
     expect(copy?.publicRequirements).toBeUndefined()
     expect(copy?.publicSkillTags).toBeUndefined()
+  })
+
+  it.each(['L2', 'Intermedio', 'senior'])('rejects non-canonical public seniority %s from the model', value => {
+    expect(sanitizeOpeningPublicCopy({ ...validRaw, publicSeniority: value })).toBeNull()
+  })
+
+  it('rejects a title and seniority contradiction from the model', () => {
+    expect(
+      sanitizeOpeningPublicCopy({ ...validRaw, publicTitle: 'Senior Visual Designer', publicSeniority: 'Semi-senior' })
+    ).toBeNull()
   })
 })

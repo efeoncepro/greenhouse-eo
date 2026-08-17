@@ -3,6 +3,9 @@
 // malformado (espeja assessment/ai/contracts.ts). Devuelve null si el borrador es inservible.
 
 import type { OpeningPublicCopyProposal } from '@/types/hiring-assessment-ai'
+import { HIRING_PUBLIC_SENIORITIES } from '@/types/hiring'
+
+import { inferExplicitSeniorityFromPublicTitle, isHiringPublicSeniority } from '../public-seniority'
 
 const MAX_TITLE_LEN = 160
 const MAX_SUMMARY_LEN = 800
@@ -45,10 +48,10 @@ export const OPENING_PUBLIC_COPY_JSON_SCHEMA = {
     publicNiceToHave: { type: 'string' },
     publicArea: { type: 'string' },
     publicSkillTags: { type: 'array', maxItems: MAX_SKILL_TAGS, items: { type: 'string' } },
-    publicSeniority: { type: 'string' },
+    publicSeniority: { type: 'string', enum: HIRING_PUBLIC_SENIORITIES },
     publicProcessNotes: { type: 'string' },
-    note: { type: 'string' },
-  },
+    note: { type: 'string' }
+  }
 } as const
 
 /**
@@ -62,14 +65,20 @@ export const sanitizeOpeningPublicCopy = (raw: unknown): OpeningPublicCopyPropos
   const publicTitle = clampStr(r.publicTitle, MAX_TITLE_LEN)
   const publicSummary = clampStr(r.publicSummary, MAX_SUMMARY_LEN)
   const publicDescription = clampStr(r.publicDescription, MAX_DESCRIPTION_LEN)
+  const rawPublicSeniority = clampStr(r.publicSeniority, MAX_SENIORITY_LEN)
 
   if (!publicTitle || !publicSummary || !publicDescription) return null
+  if (rawPublicSeniority && !isHiringPublicSeniority(rawPublicSeniority)) return null
+
+  const titleSeniority = inferExplicitSeniorityFromPublicTitle(publicTitle)
+
+  if (titleSeniority && rawPublicSeniority && titleSeniority !== rawPublicSeniority) return null
 
   const skillTags = Array.isArray(r.publicSkillTags)
     ? r.publicSkillTags
         .slice(0, MAX_SKILL_TAGS)
-        .map((t) => clampStr(t, MAX_SKILL_TAG_LEN))
-        .filter((t) => t.length > 0)
+        .map(t => clampStr(t, MAX_SKILL_TAG_LEN))
+        .filter(t => t.length > 0)
     : undefined
 
   return {
@@ -80,8 +89,8 @@ export const sanitizeOpeningPublicCopy = (raw: unknown): OpeningPublicCopyPropos
     publicNiceToHave: clampStr(r.publicNiceToHave, MAX_NICE_TO_HAVE_LEN) || undefined,
     publicArea: clampStr(r.publicArea, MAX_AREA_LEN) || undefined,
     publicSkillTags: skillTags && skillTags.length > 0 ? skillTags : undefined,
-    publicSeniority: clampStr(r.publicSeniority, MAX_SENIORITY_LEN) || undefined,
+    publicSeniority: rawPublicSeniority || undefined,
     publicProcessNotes: clampStr(r.publicProcessNotes, MAX_PROCESS_NOTES_LEN) || undefined,
-    note: clampStr(r.note, MAX_NOTE_LEN) || undefined,
+    note: clampStr(r.note, MAX_NOTE_LEN) || undefined
   }
 }

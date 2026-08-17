@@ -1,6 +1,8 @@
-import type { HiringOpeningVisibility, HiringPublicWorkMode } from '@/types/hiring'
+import type { HiringOpeningVisibility, HiringPublicWorkMode, PublicOpeningContent } from '@/types/hiring'
 
 import { HiringValidationError } from '../errors'
+import { assertPublicTitleSeniorityConsistency, parseHiringPublicSeniority } from '../public-seniority'
+import { isCanonicalPublicOpeningContent } from './public-content'
 
 export type PublishableOpeningFields = {
   publicTitle: string | null
@@ -14,6 +16,8 @@ export type PublishableOpeningFields = {
   publicArea: string | null
   publicSkillTags: string[]
   publicSeniority: string | null
+  publicContent?: PublicOpeningContent | null
+  publicRemoteEligibleCountries?: string[]
   visibility?: HiringOpeningVisibility
 }
 
@@ -21,7 +25,10 @@ export type PublishableOpeningFields = {
  * Invariante compartida por publish y update: una fila que permanece publicada
  * nunca puede degradarse a un estado que el reader público no habría aceptado.
  */
-export const assertPublishableOpening = (opening: PublishableOpeningFields): void => {
+export const assertPublishableOpening = (
+  opening: PublishableOpeningFields,
+  { requireEditorialV2 = false }: { requireEditorialV2?: boolean } = {}
+): void => {
   const missing: string[] = []
 
   if (!opening.publicTitle?.trim()) missing.push('publicTitle')
@@ -34,6 +41,14 @@ export const assertPublishableOpening = (opening: PublishableOpeningFields): voi
 
   if (opening.publicWorkMode === 'remote' && !opening.publicHiringRegion?.trim()) {
     missing.push('publicHiringRegion')
+  }
+
+  if (requireEditorialV2 && !isCanonicalPublicOpeningContent(opening.publicContent)) {
+    missing.push('publicContent.version=2')
+  }
+
+  if (requireEditorialV2 && opening.publicWorkMode === 'remote' && !opening.publicRemoteEligibleCountries?.length) {
+    missing.push('publicRemoteEligibleCountries')
   }
 
   if (
@@ -56,4 +71,7 @@ export const assertPublishableOpening = (opening: PublishableOpeningFields): voi
       { missing }
     )
   }
+
+  parseHiringPublicSeniority(opening.publicSeniority)
+  assertPublicTitleSeniorityConsistency(opening.publicTitle, opening.publicSeniority)
 }

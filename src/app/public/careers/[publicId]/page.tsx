@@ -7,9 +7,10 @@ import { getLocale } from 'next-intl/server'
 import { CareersDetailView, CareersPublicShell } from '@/components/greenhouse/careers'
 import { getMicrocopy, type Locale } from '@/lib/copy'
 import {
+  isCareersEditorialDetailEnabled,
   isHiringPublicApplicationsEnabled,
   isHiringPublicJobPostingSchemaEnabled,
-  resolvePublicCareersBaseUrl,
+  resolvePublicCareersBaseUrl
 } from '@/lib/hiring/public-careers/config'
 import { buildJobPostingJsonLd, serializeJsonLd } from '@/lib/hiring/public-careers/job-posting'
 import { buildCareersOpeningViewModel } from '@/lib/hiring/public-careers/view-model'
@@ -55,10 +56,10 @@ export const generateMetadata = async ({ params }: PageProps): Promise<Metadata>
     ...(opening
       ? {
           alternates: {
-            canonical: `${resolvePublicCareersBaseUrl()}/public/careers/${encodeURIComponent(opening.publicId)}`,
-          },
+            canonical: `${resolvePublicCareersBaseUrl()}/public/careers/${encodeURIComponent(opening.publicId)}`
+          }
         }
-      : {}),
+      : {})
   }
 }
 
@@ -70,6 +71,7 @@ export default async function PublicCareersDetailPage({ params }: PageProps) {
   if (!opening) notFound()
 
   const viewModel = buildCareersOpeningViewModel(opening, copy)
+  const editorialEnabled = isCareersEditorialDetailEnabled()
 
   // TASK-1740 — JSON-LD JobPosting desde el MISMO payload visible. Fail-closed: si la
   // vacante no produce schema válido (remota sin países elegibles, etc.) no se emite.
@@ -82,7 +84,7 @@ export default async function PublicCareersDetailPage({ params }: PageProps) {
       {jobPosting ? (
         <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: serializeJsonLd(jobPosting) }} />
       ) : null}
-      <CareersDetailView copy={copy} opening={viewModel} />
+      <CareersDetailView copy={copy} opening={viewModel} editorialEnabled={editorialEnabled} />
     </CareersPublicShell>
   )
 }

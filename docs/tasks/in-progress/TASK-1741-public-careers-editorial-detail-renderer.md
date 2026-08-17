@@ -1,15 +1,25 @@
 # TASK-1741 — Public Careers Editorial Detail Renderer
 
+## Delta 2026-08-17 (2) — Misma arquitectura para todas las vacantes
+
+El renderer deja de decidir su arquitectura por cantidad de texto: toda vacante v2 sigue el mismo orden fijo y
+los datos variables llenan esas regiones. `Efeonce en breve` y el charter global de beneficios son bloques
+centrales heredados. Los cargos complejos pueden insertar, después de `El trabajo`, entre cero y tres bloques
+tipados (`narrative|bullets|milestones`); nunca pueden mover secciones, crear componentes, elegir color o añadir
+CTA. V1/legacy conserva fallback completo durante la migración. Este delta no toca el formulario.
+
 ## Delta 2026-08-17
 
-- `TASK-1740` quedó code complete: el contrato está disponible — `PublicOpeningPayload.content`
-  (`PublicOpeningContent` v1: promise/intro/outcomes/workItems/essentials/learnables/evidenceAsk/
-  remoteModel/processSteps/benefits/compensation) + `remoteEligibleCountries`, con fallback legacy
-  (`content: null` en todos los openings actuales). Fixture canónica para el renderer:
+- `TASK-1740` entrega `PublicOpeningContent` v2 completo: promise/intro/outcomes/workItems,
+  essentials/preferred/learnables, evidenceAsk, workModel, collaboration, process, adiciones de beneficios,
+  compensation y hasta tres additionalSections, más `remoteEligibleCountries`. V1 queda read-only con
+  fallback legacy por sección. Fixture canónica para el renderer:
   `src/lib/hiring/public-careers/editorial-opening.fixture.ts` (`editorialOpeningFixture` +
   `legacyOpeningFixture`). Canonical + JSON-LD ya se emiten desde la page (schema detrás de
   `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED`, OFF); el renderer NO escribe schema ni metadata.
-  El bloqueo `Blocked by: TASK-1740` queda levantado en cuanto 1740 cierre lifecycle.
+  La dependencia técnica quedó satisfecha con los Slices 1–3 de TASK-1740 y su auditoría
+  independiente; el rollout de ambos trabajos sigue coordinado y TASK-1740 conserva lifecycle
+  `in-progress` hasta esa evidencia conjunta.
 - **Esta task NO necesita el flag de schema de TASK-1740 para desarrollarse**: `content` y
   `remoteEligibleCountries` viajan en el payload público SIEMPRE, sin flag. Pero sí hay una
   **precondición inversa que esta task desbloquea**: `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` no
@@ -17,10 +27,15 @@
   el builder de JSON-LD ya consume `content` y el renderer todavía no, así que prender el schema
   antes emitiría a Google contenido no visible (guías de Google + invariante del dominio).
 - **Dato ya en la base que este renderer debe mostrar**: las 2 vacantes publicadas
-  (`EO-OPN-0009`, `EO-OPN-0061`) tienen `content.remoteModel` poblado con la vía contractual
+  (`EO-OPN-0009`, `EO-OPN-0061`) tienen contenido v1 con `remoteModel` poblado con la vía contractual
   (Chile contrato local / fuera de Chile internacional con pago directo de Efeonce). El resto de los
   campos del bloque está vacío: el renderer debe degradar esas secciones al fallback de prosa, y el
   contenido editorial completo se autora aparte (no lo inventa el renderer).
+- **Corrección de contrato solicitada por el operador**: el seniority público deja de ser texto libre.
+  El vocabulario candidate-facing es `Junior | Semi-senior | Senior | Lead`; `Intermedio` describe
+  proficiency y `L1/L2/L3` permanecen internos. Título y nivel explícito deben coincidir. El guard
+  vive en UI, IA, writer, reader fail-closed y CHECK de PostgreSQL; la migración calibra los dos
+  valores legacy conocidos (`L2`/`Intermedio` → `Semi-senior`) sin alterar el nivel interno.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -30,23 +45,23 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `layout`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1741-public-careers-editorial-detail-renderer.md`
-- Flow: `none`
+- Flow: `docs/ui/flows/TASK-1741-public-careers-apply-continuity.md`
 - Motion: `none`
-- Backend impact: `none`
+- Backend impact: `schema|validation`
 - Epic: `EPIC-011`
-- Status real: `Diseno`
+- Status real: `Implementacion en curso; rollout pendiente`
 - Rank: `TBD`
 - Domain: `hr|ui|content`
-- Blocked by: `TASK-1740`
+- Blocked by: `none`
 - Branch: `develop (checkout compartido; sin worktrees)`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -64,6 +79,7 @@ El renderer actual muestra correctamente el contenido pero lo aplana en listas y
 - Construir una experiencia editorial de detalle para una vacante que permita a la persona autoevaluar encaje antes de postular.
 - Conservar URL, formulario, recorrido de aplicación y los dos CTA actuales: uno en hero y uno en el resumen lateral; no añadir un CTA final ni otro botón de postulación.
 - Mantener compatibilidad visual y semántica con openings legacy mientras se adopta el contrato de TASK-1740.
+- Preservar el seniority público literalmente y bloquear códigos internos o contradicciones entre título y nivel.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -93,11 +109,11 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/ui/GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`
-- `docs/ui/DESIGN.md`
+- `DESIGN.md`
 - `docs/context/05_voz-tono-estilo.md`
 - `src/lib/copy/*`
 - `docs/tasks/complete/TASK-354-public-careers-portal.md`
-- `docs/tasks/to-do/TASK-1740-public-vacancy-jobposting-foundation.md`
+- `docs/tasks/in-progress/TASK-1740-public-vacancy-jobposting-foundation.md`
 
 ## Dependencies & Impact
 
@@ -143,6 +159,17 @@ Reglas obligatorias:
 - Server/browser split: el route resuelve payload/metadata en servidor; el renderer no usa stores, DB, secretos ni SDKs externos en Client Components.
 - Build impact: `none` — CSS/React y primitives existentes, sin paquetes visuales pesados.
 - Extraction blocker: la vista está acoplada a la taxonomía y shell de Careers existente; no hay frontera reusable demostrada que justifique un paquete nuevo.
+
+## Hybrid Execution Justification
+
+El perfil principal sigue siendo `ui-ux`: TASK-1740 posee el contrato público y TASK-1741 lo consume. El
+backend impact apareció por una corrección explícita del operador durante la ejecución: impedir que
+`Intermedio` o `L1/L2/L3` vuelvan a cruzar como seniority público. Separarlo dejaría temporalmente una UI
+capaz de seleccionar el vocabulario correcto sobre un writer/reader/DB que todavía aceptarían datos
+contradictorios. Por eso esta task incorpora un delta acotado y atómico: helper canónico, guards del writer y
+reader, enum de IA/UI y un CHECK/backfill gobernado. No modifica el modelo de assessment ni amplía el payload
+editorial. Orden: validación y migración primero → renderer consumidor → rollout conjunto. Si el vocabulario
+crece o nace una taxonomía de carrera, deberá tener una task backend-data y ADR propias.
 
 ## UI/UX Contract
 
@@ -205,7 +232,8 @@ Reglas obligatorias:
 - Primitive / variant / kind: hero editorial + datos rápidos/tag primitives existentes + composición de rail/sections; decidir clases/tokens canónicos durante discovery UI.
 - Component candidates: extender `CareersDetailView` y extraer secciones presentacionales locales sólo si reducen complejidad sin ocultar la semántica del payload.
 - Copy source: labels estables a `src/lib/copy/`; texto de vacante y beneficios sólo desde `PublicOpeningPayload` de TASK-1740.
-- Data reader / command: `src/lib/hiring/public-careers/view-model.ts`; ningún command desde la página.
+- Data reader / command: `src/lib/hiring/public-careers/view-model.ts`; proyecta compensación,
+  `workModel`, colaboración, proceso, bloques adicionales y países elegibles; ningún command desde la página.
 - API parity: no expone acción de negocio nueva; `applyUrl` reutiliza el journey existente.
 - Access / capability: el reader público conserva publicación/visibilidad; no hay capacidad nueva.
 - States to implement: structured complete, legacy fallback, partial sections, long content, 1440 desktop y 390 mobile, 404 existente.
@@ -244,7 +272,7 @@ Reglas obligatorias:
 - Before/after evidence: baseline `.captures/2026-08-17T12-25-12_task354-careers-runtime-audit/` y captura nueva versionada por task.
 - Known visual debt: medición real de performance y copy final depende de fixture; no prometer mejora de FCP sin medición comparable.
 - Visual scorecard: `docs/ui/reviews/TASK-1741-public-careers-editorial-detail-renderer.scorecard.json`
-- Quality threshold: `average >= 4.2; floor >= 3; fidelity/template resistance >= 4`
+- Quality threshold: `average >= 4.5; no dimension < 4; hierarchy/surface economy/visual impact/fidelity/template resistance >= 4.5`
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -275,6 +303,8 @@ Reglas obligatorias:
 
 - Resolver long content, partial/legacy data, 390 px, keyboard/focus, contraste, preferencia de reducir movimiento y scroll width.
 - Añadir pruebas de paridad de contenido y GVC premium before/after; validar JSON-LD/canonical sólo como consumer de TASK-1740, sin editarlo.
+- Cerrar el seniority público con vocabulario canónico, selector humano, schema/sanitizer de IA,
+  writer/reader fail-closed, coherencia con el título y constraint/backfill gobernado.
 
 ### Slice 4 — Staged rollout and evidence
 
@@ -285,7 +315,8 @@ Reglas obligatorias:
 
 - Cambiar o rediseñar el formulario de postulación, su CTA o su ruta.
 - Añadir un tercer CTA, CTA al final de la vacante, formulario embebido, talent-pool opt-in o contacto alternativo.
-- Nuevo schema, migración, `JobPosting`, canonical, sitemap o Indexing API (TASK-1740).
+- Cambios a `JobPosting`, canonical, sitemap o Indexing API (TASK-1740). La única migración incorporada
+  es el constraint/backfill de seniority público aprobado durante la ejecución.
 - Un rebrand de Careers, nueva navegación global, efectos temporales no triviales, imágenes/vídeo decorativos o dependencia pesada.
 - Cambiar beneficios o condiciones de empleo: sólo se muestran datos aprobados por el contrato público de TASK-1740.
 
@@ -305,27 +336,30 @@ La variante se activa sólo tras revisar el mecanismo de flags existente. El lay
 
 ### Risk matrix
 
-| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
-|---|---|---|---|---|
-| Regresión de lectura/apply | UI pública | medium | conservar DOM/action links, paridad de datos, GVC y revisión keyboard | CTA href cambia, tercer CTA o contenido ausente |
-| Overflow/mala jerarquía mobile | UI pública | medium | wireframe 390, CSS responsive, `scrollWidth` y screen review | overflow, headings/focus fallan |
-| Contenido nuevo incompleto rompe layout | UI / data | high | secciones opcionales + fallback legacy sin bandas vacías | GVC partial/legacy defect |
-| Regresión visual de Careers | UX/brand | medium | baseline, flag, revisión desktop/full-page y scorecard | diferencia no intencional o score bajo |
-| Peso/performance excesivo | public runtime | low | CSS/React existente, cero assets/dependencias pesadas | cambio material de requests/transfer/FCP comparables |
+| Riesgo                                             | Sistema        | Probabilidad | Mitigation                                                            | Signal de alerta                                     |
+| -------------------------------------------------- | -------------- | ------------ | --------------------------------------------------------------------- | ---------------------------------------------------- |
+| Regresión de lectura/apply                         | UI pública     | medium       | conservar DOM/action links, paridad de datos, GVC y revisión keyboard | CTA href cambia, tercer CTA o contenido ausente      |
+| Overflow/mala jerarquía mobile                     | UI pública     | medium       | wireframe 390, CSS responsive, `scrollWidth` y screen review          | overflow, headings/focus fallan                      |
+| Contenido nuevo incompleto rompe layout            | UI / data      | high         | secciones opcionales + fallback legacy sin bandas vacías              | GVC partial/legacy defect                            |
+| Seniority interno o contradictorio llega a Careers | Hiring / trust | medium       | vocabulario único en UI+IA+writer+DB; reader fail-closed              | `L2`, `Intermedio` o título/nivel discordante        |
+| Regresión visual de Careers                        | UX/brand       | medium       | baseline, flag, revisión desktop/full-page y scorecard                | diferencia no intencional o score bajo               |
+| Peso/performance excesivo                          | public runtime | low          | CSS/React existente, cero assets/dependencias pesadas                 | cambio material de requests/transfer/FCP comparables |
 
 ### Feature flags / cutover
 
 - Usar un flag server-side de variante editorial, con default OFF, nombre y owner definidos en Discovery siguiendo el registro existente (candidato: `CAREERS_DETAIL_EDITORIAL_V2_ENABLED`, no crear sin confirmar patrón).
-- Rollout: local/fixture → staging ON → evidencia GVC/HTML → producción ON. Revert: flag OFF + redeploy; el renderer legacy y `applyUrl` continúan disponibles.
+- Rollout: local/fixture → staging ON → evidencia GVC/HTML → producción ON. El schema requiere
+  técnicamente ambos flags ON. Revert: apagar primero `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED`,
+  luego `CAREERS_DETAIL_EDITORIAL_V2_ENABLED`, y redesplegar; el renderer legacy y `applyUrl` continúan disponibles.
 
 ### Rollback plan per slice
 
-| Slice | Rollback | Tiempo | Reversible? |
-|---|---|---|---|
-| 1 | Sólo evidencia/doc; no cambia runtime | inmediato | sí |
-| 2 | Flag OFF y revert del componente si hace falta; payload/forma intactos | < 15 min + deploy | sí |
-| 3 | Revert de CSS/markup específico o flag OFF; conservar tests/capturas | < 15 min + deploy | sí |
-| 4 | Flag OFF en staging/producción y registrar defecto; no toca formulario ni datos | < 5 min + redeploy | sí |
+| Slice | Rollback                                                                                                    | Tiempo             | Reversible? |
+| ----- | ----------------------------------------------------------------------------------------------------------- | ------------------ | ----------- |
+| 1     | Sólo evidencia/doc; no cambia runtime                                                                       | inmediato          | sí          |
+| 2     | Flag OFF y revert del componente si hace falta; payload/forma intactos                                      | < 15 min + deploy  | sí          |
+| 3     | Revert de CSS/markup específico o flag OFF; conservar tests/capturas                                        | < 15 min + deploy  | sí          |
+| 4     | Schema flag OFF → renderer flag OFF en staging/producción; registrar defecto, sin tocar formulario ni datos | < 5 min + redeploy | sí          |
 
 ### Production verification sequence
 
@@ -350,11 +384,17 @@ La variante se activa sólo tras revisar el mecanismo de flags existente. El lay
 ## Acceptance Criteria
 
 - [ ] La página de detalle adopta el patrón editorial acordado y mejora la jerarquía de rol, outcomes, trabajo, encaje, condiciones y beneficios sin una introducción corporativa genérica como primer bloque.
-- [ ] Se conservan URL, formulario, apply journey y exactamente los dos CTA de aplicación actuales; no hay CTA final/adicional ni cambio de `href`/parámetros.
+- [ ] La hoja completa conserva navegación, header/footer, seniority, metadatos, contenido público, rail, responsive y exactamente los dos CTA actuales; no hay pérdida de datos ni tercer CTA.
+- [ ] El formulario y su ruta quedan fuera del cambio funcional; sólo se comprueba que ningún selector CSS compartido los afectó accidentalmente.
+- [ ] `publicSeniority` sólo acepta `Junior | Semi-senior | Senior | Lead`; UI e IA no admiten texto libre, el writer/DB bloquean otros valores, título/nivel coinciden y el renderer muestra `Senior` literalmente.
 - [ ] Una vacante legacy o parcial muestra todos los datos disponibles mediante fallback legible, sin huecos, overflow ni pérdida de requisitos/proceso.
 - [ ] El renderer cumple 1440/390, teclado, foco visible, landmarks/headings, contraste, preferencia de reducir movimiento y `scrollWidth === clientWidth`.
 - [ ] GVC premium before/after y scorecard documentan que el cambio es una mejora incremental y no una regresión visual.
 - [ ] El renderer sólo consume el payload público de TASK-1740 y no modifica el formulario, JSON-LD, canonical ni el comando de publicación.
+- [x] Todas las vacantes v2 muestran el mismo orden de regiones y los bloques corporativo/beneficios centrales; ausencia de datos obligatorios se bloquea antes del publish, no se disfraza con placeholder.
+- [x] Se renderizan como máximo tres `additionalSections` en la única zona reservada después de `El trabajo`, con semántica narrativa/lista/hitos y sin HTML, CTA ni estilos arbitrarios.
+- [x] `preferred` se muestra como `Deseable, no excluyente`, `learnables` sólo como aprendizaje real y la colaboración explicita equipo, reporte, idioma, solapamiento y ritmo.
+- [ ] Tests y GVC cubren v2 completo, v1 parcial, legacy y contenido largo en 1440/390 sin cambiar los dos enlaces de postulación.
 
 ## Verification
 

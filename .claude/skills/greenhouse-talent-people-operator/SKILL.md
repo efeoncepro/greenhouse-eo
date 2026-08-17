@@ -15,22 +15,22 @@ This skill is a **decision aid, not legal advice**. For statutory pay, contract 
 
 ## When to invoke
 
-| Trigger | Lane |
-|---|---|
-| "open a vacancy / define the role / job brief" | Talent acquisition — intake + scorecard |
-| "redact a public vacancy / oferta laboral / job posting" | Evidence-led job-offer recipe + inbound recruiting; load `references/inbound-recruiting-job-ad-research.md` before drafting. Inside Greenhouse prefer the AI-assisted propose→confirm path (TASK-1385/1422 — see `references/greenhouse-runtime.md` §AI-assisted vacancy copy) |
-| "source candidates / head hunt / find a senior X" | Sourcing + executive search |
-| "inbound recruiting / careers / employer brand / talent pool" | Inbound + candidate experience; load `references/inbound-recruiting-job-ad-research.md` for the evidence-led full-funnel playbook before recommending a campaign, nurture or conversion change. |
-| "design the test / interview / competency assessment / rubric" | Assessment + structured interviewing |
-| "analyze this interview / evaluate this candidate by competencies" | Assessment analysis (structured, bias-aware) |
-| "ver el CV / documentos del candidato / revelar el RUT de un candidato" | Candidate documents — file vs identity (TASK-1714/1715; see the section below + `references/greenhouse-runtime.md` §Candidate documents) |
-| "hire abroad / remote / contractor vs EOR / which country" | Global hiring (with payroll/legal boundary) |
-| "onboarding / ramp / development / career path" | People development |
-| "engagement / burnout / wellbeing / retention / flight risk" | Engagement + wellbeing |
-| "cultura / operating code / performance review / valores en equipo" | Efeonce Operating Code + People development |
-| "headcount / capacity gap / build vs buy vs borrow / org design" | Workforce planning |
-| "design a squad / delivery pod for a client / RFP team section / staff augmentation / who staffs this engagement" | Client squad design (Talent-as-a-Service) |
-| any of the above **inside Greenhouse** (Hiring/ATS, assessment engine) | + load `references/greenhouse-runtime.md` |
+| Trigger                                                                                                           | Lane                                                                                                                                                                                                                                                                           |
+| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| "open a vacancy / define the role / job brief"                                                                    | Talent acquisition — intake + scorecard                                                                                                                                                                                                                                        |
+| "redact a public vacancy / oferta laboral / job posting"                                                          | Evidence-led job-offer recipe + inbound recruiting; load `references/inbound-recruiting-job-ad-research.md` before drafting. Inside Greenhouse prefer the AI-assisted propose→confirm path (TASK-1385/1422 — see `references/greenhouse-runtime.md` §AI-assisted vacancy copy) |
+| "source candidates / head hunt / find a senior X"                                                                 | Sourcing + executive search                                                                                                                                                                                                                                                    |
+| "inbound recruiting / careers / employer brand / talent pool"                                                     | Inbound + candidate experience; load `references/inbound-recruiting-job-ad-research.md` for the evidence-led full-funnel playbook before recommending a campaign, nurture or conversion change.                                                                                |
+| "design the test / interview / competency assessment / rubric"                                                    | Assessment + structured interviewing                                                                                                                                                                                                                                           |
+| "analyze this interview / evaluate this candidate by competencies"                                                | Assessment analysis (structured, bias-aware)                                                                                                                                                                                                                                   |
+| "ver el CV / documentos del candidato / revelar el RUT de un candidato"                                           | Candidate documents — file vs identity (TASK-1714/1715; see the section below + `references/greenhouse-runtime.md` §Candidate documents)                                                                                                                                       |
+| "hire abroad / remote / contractor vs EOR / which country"                                                        | Global hiring (with payroll/legal boundary)                                                                                                                                                                                                                                    |
+| "onboarding / ramp / development / career path"                                                                   | People development                                                                                                                                                                                                                                                             |
+| "engagement / burnout / wellbeing / retention / flight risk"                                                      | Engagement + wellbeing                                                                                                                                                                                                                                                         |
+| "cultura / operating code / performance review / valores en equipo"                                               | Efeonce Operating Code + People development                                                                                                                                                                                                                                    |
+| "headcount / capacity gap / build vs buy vs borrow / org design"                                                  | Workforce planning                                                                                                                                                                                                                                                             |
+| "design a squad / delivery pod for a client / RFP team section / staff augmentation / who staffs this engagement" | Client squad design (Talent-as-a-Service)                                                                                                                                                                                                                                      |
+| any of the above **inside Greenhouse** (Hiring/ATS, assessment engine)                                            | + load `references/greenhouse-runtime.md`                                                                                                                                                                                                                                      |
 
 **Do NOT use for**: payroll amounts / tax / previsional (→ `greenhouse-payroll-auditor`), offer letters / employment contracts drafting (→ Workforce Contracting Studio + legal), cost/margin of a hire (→ `greenhouse-finance-accounting-operator`), the visual build of careers/assessment UI (→ product-design skills).
 
@@ -87,19 +87,19 @@ Apply this workflow whenever the output will attract candidates externally: a Ca
 
 ## Synergies (compose, don't duplicate)
 
-| Skill | Synergy |
-|---|---|
-| `greenhouse-payroll-auditor` | Hard boundary: this skill hands over the selected hire + recommended engagement model; payroll owns amounts, tax, previsional. Never compute pay here. |
-| Workforce Contracting Studio / legal | This skill decides *who* and *how to assess*; contracting drafts the offer/contract. |
-| `greenhouse-finance-accounting-operator` | Cost/margin of a hire, loaded cost, budget band. This skill consumes bands, never recomputes economics. For a **client squad**, hand the % dedication × role so finance attaches loaded cost from `greenhouse_payroll`. |
-| `greenhouse-public-private-tenders` + `commercial-expert` | When designing a **client squad for a bid/retainer** (`references/client-squad-design.md`): this skill owns the squad *shape* (roles, seniority, % dedication, hierarchy, RACI, synergies); the tender skill wires the proposal's team section; commercial sets margin/packaging. Never price here. |
-| `greenhouse-ico` | Capacity gap + delivery load → open demand; overload as a burnout/flight-risk signal. |
-| `arch-architect` | Model new talent domains (assessment, wellbeing) with the 4 pillars + canonical primitives. |
-| product-design (`info-architecture`, `forms-ux`, `state-design`, `a11y-architect`, `dataviz-design`, `greenhouse-ux-writing`) | Careers public funnel + assessment taking/review surfaces. |
-| `seo-aeo` / `commercial-expert` | Inbound recruiting = careers attracts + ranks; employer brand = GTM for talent. |
-| `greenhouse-nexa-conversational` | Operate hiring/assessment from conversation via Full API Parity (propose→confirm). |
-| `efeonce-agency` + `docs/context/` | Real agency roles (Account, Design, Media, Strategy, Dev), ASaaS model, Globe clients. |
-| `greenhouse-production-release` | Public careers runtime rollout, flags, production smoke and release closure when code/config changes. Talent owns normal vacancy creation/publication as Hiring data; release is not required for each new vacancy. |
+| Skill                                                                                                                         | Synergy                                                                                                                                                                                                                                                                                             |
+| ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `greenhouse-payroll-auditor`                                                                                                  | Hard boundary: this skill hands over the selected hire + recommended engagement model; payroll owns amounts, tax, previsional. Never compute pay here.                                                                                                                                              |
+| Workforce Contracting Studio / legal                                                                                          | This skill decides _who_ and _how to assess_; contracting drafts the offer/contract.                                                                                                                                                                                                                |
+| `greenhouse-finance-accounting-operator`                                                                                      | Cost/margin of a hire, loaded cost, budget band. This skill consumes bands, never recomputes economics. For a **client squad**, hand the % dedication × role so finance attaches loaded cost from `greenhouse_payroll`.                                                                             |
+| `greenhouse-public-private-tenders` + `commercial-expert`                                                                     | When designing a **client squad for a bid/retainer** (`references/client-squad-design.md`): this skill owns the squad _shape_ (roles, seniority, % dedication, hierarchy, RACI, synergies); the tender skill wires the proposal's team section; commercial sets margin/packaging. Never price here. |
+| `greenhouse-ico`                                                                                                              | Capacity gap + delivery load → open demand; overload as a burnout/flight-risk signal.                                                                                                                                                                                                               |
+| `arch-architect`                                                                                                              | Model new talent domains (assessment, wellbeing) with the 4 pillars + canonical primitives.                                                                                                                                                                                                         |
+| product-design (`info-architecture`, `forms-ux`, `state-design`, `a11y-architect`, `dataviz-design`, `greenhouse-ux-writing`) | Careers public funnel + assessment taking/review surfaces.                                                                                                                                                                                                                                          |
+| `seo-aeo` / `commercial-expert`                                                                                               | Inbound recruiting = careers attracts + ranks; employer brand = GTM for talent.                                                                                                                                                                                                                     |
+| `greenhouse-nexa-conversational`                                                                                              | Operate hiring/assessment from conversation via Full API Parity (propose→confirm).                                                                                                                                                                                                                  |
+| `efeonce-agency` + `docs/context/`                                                                                            | Real agency roles (Account, Design, Media, Strategy, Dev), ASaaS model, Globe clients.                                                                                                                                                                                                              |
+| `greenhouse-production-release`                                                                                               | Public careers runtime rollout, flags, production smoke and release closure when code/config changes. Talent owns normal vacancy creation/publication as Hiring data; release is not required for each new vacancy.                                                                                 |
 
 ## Efeonce Operating Code (culture is evidence, not vibes)
 
@@ -137,10 +137,13 @@ Use the People guide at `docs/documentation/hr/efeonce-operating-code-hiring-onb
 - **NEVER** collapse `quarantined`, `pending`, `legacy_unscanned` and absence into one message, and **NEVER** render a reader failure as "sin documentos" — say it failed and offer Reintentar.
 - **SIEMPRE** keep a revealed identity value in component memory only: a remount re-masks and demands a new reveal, which writes another audit entry, so the trail reflects real accesses instead of open sessions.
 - **NEVER** create/open/publish a Greenhouse vacancy by SQL or ad hoc UI state. Use Hiring writers (`createTalentDemand` → `createHiringOpening` → `updateHiringOpening` → `publishOpening`) and record `public_id`, public URL and apply URL.
+- **NEVER** improvise public role seniority. Efeonce publishes exactly `Junior`, `Semi-senior`, `Senior` or `Lead`;
+  `Intermedio` is skill proficiency and `L1/L2/L3` remain internal assessment vocabulary. An explicit level in the
+  public title must match the structured public seniority exactly.
 - **NEVER** escalate normal vacancy publication to a production release when careers runtime is already live and flags are configured. Release only for code, schema, flags/env, infra, renderer or apply-contract changes.
 - **NEVER** leave a Talent Pool / Banco de Talento surface decorative if it captures leads. It must be backed by Growth Forms or a Hiring command, with consent, captcha/rate-limit and generic success state.
 - **NEVER** reason from a pre-2024 base for trends/law/validity — cite the 2026 landscape and the 2022 validity revision.
-- **NEVER** present a **client squad** without a single accountable **Account Lead**, a **Senior/Lead owner per lane**, and per-member **role + seniority + % dedication + reporting line**. A *service* bid (nobody naming embedded bodies) is a **Managed Squad**, not staff-aug. Never over-allocate a person across pods (ICO burnout/flight-risk signal) or name real individuals to a client without consent — default to **role + seniority** (`references/client-squad-design.md`).
+- **NEVER** present a **client squad** without a single accountable **Account Lead**, a **Senior/Lead owner per lane**, and per-member **role + seniority + % dedication + reporting line**. A _service_ bid (nobody naming embedded bodies) is a **Managed Squad**, not staff-aug. Never over-allocate a person across pods (ICO burnout/flight-risk signal) or name real individuals to a client without consent — default to **role + seniority** (`references/client-squad-design.md`).
 - **SIEMPRE** design for a **multigenerational** workforce (don't optimize a process only for one cohort).
 - **SIEMPRE** make selection **structured, documented, and contestable** (a candidate can be told why; a recruiter can override AI).
 - **SIEMPRE** keep the human recruiter–candidate relationship central; AI removes toil, not judgment.
@@ -171,29 +174,30 @@ Public Careers applications now capture durable candidate contact, person-first.
 
 Docs: ADR Delta 2026-08-12 in `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (+ row in `DECISIONS_INDEX.md`) · functional `docs/documentation/hr/hiring-desk.md` §Datos de contacto del candidato · manual `docs/manual-de-uso/hr/operar-careers-publicas.md` §Datos de contacto en el formulario.
 
-## Public vacancy structured content + JobPosting foundation (TASK-1740 — code complete, rollout gated a TASK-1741)
+## Public vacancy canonical content + JobPosting (TASK-1740/1741)
 
-The public vacancy now carries a versioned structured block **`PublicOpeningContent` v1**
+The public vacancy carries a versioned structured block **`PublicOpeningContent` v2**
 (`greenhouse_hiring.hiring_opening.public_content_json`, JSONB: promise, intro, outcomes[], workItems[],
-essentials[], learnables[], evidenceAsk, remoteModel, processSteps[], benefits[], optional structured
-`compensation`), plus per-country remote eligibility (`public_remote_eligible_countries` TEXT[], real ISO
+essentials[], preferred[], learnables[], evidenceAsk, workModel, collaboration{}, process{}, role-specific
+benefits[], optional structured `compensation`, and 0–3 typed `additionalSections`), plus per-country remote eligibility (`public_remote_eligible_countries` TEXT[], real ISO
 3166-1 alpha-2 only) and technical SEO on the leaf `/public/careers/[publicId]`: explicit canonical always
 (published vacancy) + JSON-LD `JobPosting` behind `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` (Vercel-only,
-default OFF, in the flag ledger). Validator `src/lib/hiring/public-careers/public-content.ts`: **write path
-strict** (422 `hiring_opening_public_content_invalid`, always re-validated in the store), **read path
-lenient** (corrupt block or unknown version degrades to null = legacy prose fallback — the public page
-never breaks). Builder `src/lib/hiring/public-careers/job-posting.ts` is server-only, pure and fail-closed.
+default OFF, in the flag ledger). New publication and re-publication require complete v2; v1 is read-only
+and renders through section-level legacy fallback. The vacancy publication operator derives legacy public
+projections from v2, so no human or agent maintains duplicate truths. Shared company context and baseline
+benefits live in `standard-content.ts`; a role stores additions only. The fixed order and extension rules are
+load-bearing in `templates/job-offer-recipe.md`. Builder `job-posting.ts` consumes the same resolved evidence.
 
 - **NEVER** convert the free-text `public_compensation_band` into `baseSalary` — salary comes ONLY from
   `content.compensation` structured data (currency ISO 4217 + min/max + unitText).
 - **NEVER** emit `directApply` or `validThrough` (withdrawal is the unpublish 404); employmentType only by
   exact conservative mapping ("Jornada completa"→FULL_TIME; "Contrato indefinido" is omitted).
-- **NEVER** accept `LATAM`/`Global` as a country code — the countries array is the ONLY enabler of the
-  remote schema, and its absence omits the schema without ever blocking publication.
+- **NEVER** accept `LATAM`/`Global` as a country code — new remote v2 publication requires at least one
+  exact eligible country; the schema remains fail-closed for legacy rows without countries.
 - **NEVER** put the employing entity's country into `jobLocation` of a remote vacancy "to make the
   contractual anchor explicit". `jobLocation` means where the work is performed PHYSICALLY: Google would
-  stop classifying it as remote and would show it to people searching for a job *in* that city. The
-  contractual anchor is declared in the visible content (`content.remoteModel`); eligibility goes in
+  stop classifying it as remote and would show it to people searching for a job _in_ that city. The
+  contractual anchor is declared in the visible content (`content.workModel`); eligibility goes in
   `applicantLocationRequirements`, which accepts a SINGLE country and is still a valid `TELECOMMUTE`
   (`["CL"]` = "remote, eligible in Chile" — honest and correct).
 - **NEVER** let a PARTIAL structured block replace the legacy prose in the JSON-LD description. Only a
@@ -206,7 +210,7 @@ never breaks). Builder `src/lib/hiring/public-careers/job-posting.ts` is server-
 - **NEVER** flip `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` before the renderer (TASK-1741) shows the
   structured block on the visible page. The order is **renderer first, schema second**: the JSON-LD builder
   already consumes `content`, but the renderer does NOT yet, so flipping the schema first would emit to
-  Google content (e.g. `remoteModel` with the contractual route) that the candidate cannot see — the exact
+  Google content (e.g. `workModel` with the contractual route) that the candidate cannot see — the exact
   misalignment this domain forbids. The two flags are independent in terms of technical dependency
   (TASK-1741 does NOT need the schema flag to be developed: `content` and `remoteEligibleCountries` ALWAYS
   travel in the public payload, with no flag), but their FLIP ORDER is not free.
@@ -219,7 +223,7 @@ production release is deliberately held until TASK-1741 (editorial renderer) is 
 Eligible countries were approved by the CEO 2026-08-17 and are ALREADY SET on the 2 published vacancies
 (EO-OPN-0009, EO-OPN-0061): all of Latin America EXCEPT Cuba + US + ES (20 countries — AR BO BR CL CO CR DO
 EC SV GT HN MX NI PA PY PE UY VE + US + ES), with the contractual route made explicit in
-`content.remoteModel`: **Chile with a local labor contract; outside Chile, the international route with
+`content.workModel`: **Chile with a local labor contract; outside Chile, the international route with
 direct payment by Efeonce** (contract type `international_internal`, no EOR). Both produce a valid
 JobPosting the moment the flag flips: the rendered JSON-LD was validated for real in local (flag flipped ON
 temporarily and restored to OFF), with zero missing required fields. Renderer fixture:
@@ -282,6 +286,7 @@ score-bearing notes from others nor **any** `source='agent'` note. That blindnes
 construction. **NEVER** re-implement it client-side.
 
 **Two later fixes are part of the contract, not footnotes** (the first real human confirm exposed both):
+
 - the note body limit is **20000**, not 8000 — the first confirmed dossier persisted at exactly 8000 chars while
   the draft measured 8240 and the analysis was cut mid-sentence. The panel hid it because it renders from
   `proposedJson`, but every `bodyMd` consumer (API, export, Nexa, MCP) read a mutilated document. The write path

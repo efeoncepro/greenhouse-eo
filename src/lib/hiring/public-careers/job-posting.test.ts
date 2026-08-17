@@ -25,7 +25,7 @@ const baseOpening: PublicOpeningPayload = {
   skillTags: ['SEO', 'Contenido'],
   compensationBand: 'USD 1.100–1.300 mensuales, según experiencia y país de contratación',
   employmentMode: 'Jornada completa',
-  seniority: 'Intermedio',
+  seniority: 'Semi-senior',
   processNotes: null,
   applyUrl: null,
   publishedAt: '2026-07-30T04:00:00.000Z',
@@ -34,18 +34,36 @@ const baseOpening: PublicOpeningPayload = {
 }
 
 const structuredContent: NonNullable<PublicOpeningPayload['content']> = {
-  version: 1,
+  version: 2,
   promise: 'Vas a operar el motor editorial con autonomía.',
   intro: 'El problema: producir con evidencia, no volumen.',
-  outcomes: ['8 piezas/mes con QA'],
-  workItems: ['Redactar piezas pillar'],
-  essentials: ['Redacción nativa'],
+  outcomes: ['8 piezas/mes con QA', 'Tráfico calificado', 'Playbook reusable'],
+  workItems: ['Redactar piezas pillar', 'Operar el calendario', 'Colaborar con SEO', 'Documentar decisiones'],
+  essentials: ['Redacción nativa', 'SEO on-page', 'Research verificable', 'Criterio editorial'],
+  preferred: ['Experiencia en agencia'],
   learnables: ['AEO/GEO'],
   evidenceAsk: 'Portafolio con 3 piezas publicadas.',
-  remoteModel: '100% remoto con overlap GMT-4.',
-  processSteps: ['Screening', 'Muestra de trabajo pagada'],
+  workModel: '100% remoto con overlap GMT-4.',
+  collaboration: {
+    team: 'Content y SEO',
+    reportsTo: 'Content Lead',
+    language: 'Español',
+    timezoneOverlap: '4 horas con GMT-4',
+    workingRhythm: 'Asíncrono con una sync semanal'
+  },
+  process: {
+    steps: [
+      { title: 'Screening', body: 'Revisamos experiencia.' },
+      { title: 'Muestra de trabajo pagada', body: 'Resuelves un brief acotado.' },
+      { title: 'Entrevista final', body: 'Profundizamos en decisiones.' }
+    ],
+    expectedTiming: 'Dos a tres semanas.',
+    responseCommitment: 'Siempre comunicamos la decisión.',
+    accommodationPath: 'Puedes solicitar adaptaciones.'
+  },
   benefits: ['15 días hábiles de vacaciones'],
-  compensation: { currency: 'USD', minValue: 1100, maxValue: 1300, unitText: 'MONTH' }
+  compensation: { currency: 'USD', minValue: 1100, maxValue: 1300, unitText: 'MONTH' },
+  additionalSections: []
 }
 
 describe('buildJobPostingJsonLd — elegibilidad remota', () => {
@@ -171,12 +189,15 @@ describe('buildJobPostingJsonLd — descripción HTML segura desde el contenido 
           outcomes: [],
           workItems: [],
           essentials: [],
+          preferred: [],
           learnables: [],
           evidenceAsk: null,
-          remoteModel: 'Trabajo 100% remoto con pago directo de Efeonce fuera de Chile.',
-          processSteps: [],
+          workModel: 'Trabajo 100% remoto con pago directo de Efeonce fuera de Chile.',
+          collaboration: null,
+          process: null,
           benefits: [],
-          compensation: null
+          compensation: null,
+          additionalSections: []
         }
       },
       BASE_URL
@@ -194,7 +215,16 @@ describe('buildJobPostingJsonLd — descripción HTML segura desde el contenido 
       {
         ...baseOpening,
         remoteEligibleCountries: ['CL'],
-        content: { ...structuredContent, intro: null, outcomes: [], workItems: [], essentials: [], learnables: [] }
+        content: {
+          ...structuredContent,
+          version: 1,
+          intro: null,
+          outcomes: [],
+          workItems: [],
+          essentials: [],
+          preferred: [],
+          learnables: []
+        }
       },
       BASE_URL
     )
@@ -213,11 +243,13 @@ describe('buildJobPostingJsonLd — descripción HTML segura desde el contenido 
         remoteEligibleCountries: ['CL'],
         content: {
           ...structuredContent,
+          version: 1,
           promise: null,
           intro: null,
           outcomes: [],
           workItems: [],
           essentials: ['Criterio editorial'],
+          preferred: [],
           learnables: []
         }
       },

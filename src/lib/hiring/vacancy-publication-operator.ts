@@ -14,20 +14,18 @@ import {
   type HiringOpening,
   type HiringPublicArea,
   type HiringPublicWorkMode,
+  type PublicOpeningContent,
   type TalentDemand,
   type TalentDemandEngagementType,
   type TalentDemandOrigin,
-  type TalentDemandPriority,
+  type TalentDemandPriority
 } from '@/types/hiring'
 
 import { HiringValidationError } from './errors'
 import { publishOpening } from './publication'
-import {
-  createHiringOpening,
-  createTalentDemand,
-  getHiringOpeningById,
-  updateHiringOpening,
-} from './store'
+import { parsePublicOpeningContent, parseRemoteEligibleCountries } from './public-careers/public-content'
+import { assertPublicTitleSeniorityConsistency, parseHiringPublicSeniority } from './public-seniority'
+import { createHiringOpening, createTalentDemand, getHiringOpeningById, updateHiringOpening } from './store'
 
 export const HIRING_VACANCY_PUBLICATION_ROUTE_KEY = 'hiring.vacancy_publication.publish'
 
@@ -40,8 +38,9 @@ export type HiringVacancyBrief = {
   sourceReference?: string | null
   requestedRole: string
   publicTitle: string
-  publicSummary: string
-  publicDescription: string
+  /** Proyección legacy opcional; el operador la deriva de publicContent v2. */
+  publicSummary?: string
+  publicDescription?: string
   responsibilities?: string[]
   requirements?: string[]
   niceToHave?: string[]
@@ -64,6 +63,8 @@ export type HiringVacancyBrief = {
   publicProcessNotes?: string | null
   publicCompensationBand?: string | null
   sourceUrl?: string | null
+  publicContent: PublicOpeningContent | Record<string, unknown>
+  publicRemoteEligibleCountries?: string[]
 }
 
 export type HiringVacancyPublicationPreview = {
@@ -88,6 +89,8 @@ export type HiringVacancyPublicationPreview = {
     publicProcessNotes: string | null
     publicCompensationBand: string | null
     publicationSourceRef: string | null
+    publicContent: PublicOpeningContent
+    publicRemoteEligibleCountries: string[]
   }
 }
 
@@ -106,8 +109,15 @@ export type HiringVacancyPublicationResult = {
   preview?: HiringVacancyPublicationPreview
 }
 
-type NormalizedBrief = Required<Pick<HiringVacancyBrief, 'mode' | 'requestedRole' | 'publicTitle' | 'publicSummary' | 'publicDescription' | 'publicArea' | 'workMode'>> &
-  Omit<HiringVacancyBrief, 'mode' | 'requestedRole' | 'publicTitle' | 'publicSummary' | 'publicDescription' | 'publicArea' | 'workMode'> & {
+type NormalizedBrief = Required<
+  Pick<HiringVacancyBrief, 'mode' | 'requestedRole' | 'publicTitle' | 'publicArea' | 'workMode'>
+> &
+  Omit<
+    HiringVacancyBrief,
+    'mode' | 'requestedRole' | 'publicTitle' | 'publicSummary' | 'publicDescription' | 'publicArea' | 'workMode'
+  > & {
+    publicSummary: string
+    publicDescription: string
     publicArea: HiringPublicArea
     skillTags: string[]
     requirements: string[]
@@ -121,6 +131,8 @@ type NormalizedBrief = Required<Pick<HiringVacancyBrief, 'mode' | 'requestedRole
     requestedSeats: number
     priority: TalentDemandPriority
     warnings: string[]
+    publicContent: PublicOpeningContent
+    publicRemoteEligibleCountries: string[]
   }
 
 const PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') || 'https://greenhouse.efeoncepro.com'
@@ -150,7 +162,7 @@ const requireString = (value: unknown, field: string): string => {
       `El campo ${field} es obligatorio para publicar una vacante.`,
       'hiring_vacancy_publication_invalid_input',
       400,
-      { field },
+      { field }
     )
   }
 
@@ -165,7 +177,7 @@ const requireArea = (value: unknown): HiringPublicArea => {
       'El area publica de la vacante no esta aprobada.',
       'hiring_vacancy_publication_invalid_input',
       400,
-      { field: 'publicArea', allowed: HIRING_PUBLIC_AREAS },
+      { field: 'publicArea', allowed: HIRING_PUBLIC_AREAS }
     )
   }
 
@@ -180,7 +192,7 @@ const requireWorkMode = (value: unknown): HiringPublicWorkMode => {
       'La modalidad publica de la vacante debe ser unica y aprobada.',
       'hiring_vacancy_publication_invalid_input',
       400,
-      { field: 'workMode', allowed: HIRING_PUBLIC_WORK_MODES },
+      { field: 'workMode', allowed: HIRING_PUBLIC_WORK_MODES }
     )
   }
 
@@ -196,7 +208,7 @@ const readMode = (value: unknown): HiringVacancyPublicationMode => {
     'El modo de publicacion debe ser dryRun, execute o publish.',
     'hiring_vacancy_publication_invalid_input',
     400,
-    { field: 'mode' },
+    { field: 'mode' }
   )
 }
 
@@ -205,16 +217,13 @@ const normalizeBrief = (input: unknown): NormalizedBrief => {
     throw new HiringValidationError(
       'El brief de vacante debe ser un objeto JSON.',
       'hiring_vacancy_publication_invalid_input',
-      400,
+      400
     )
   }
 
   const mode = readMode(input.mode)
   const workMode = requireWorkMode(input.workMode)
   const publicArea = requireArea(input.publicArea ?? input.department ?? input.area)
-  const requirements = readStringArray(input.requirements)
-  const responsibilities = readStringArray(input.responsibilities)
-  const niceToHave = readStringArray(input.niceToHave)
   const skillTags = [...readStringArray(input.skillTags), ...readStringArray(input.competencyTags)]
   const uniqueSkillTags = Array.from(new Set(skillTags)).slice(0, 8)
   const hiringRegion = optionalClean(input.hiringRegion)
@@ -222,13 +231,28 @@ const normalizeBrief = (input: unknown): NormalizedBrief => {
   const country = optionalClean(input.country)
   const officeLocation = optionalClean(input.officeLocation)
   const warnings: string[] = []
+  const publicTitle = requireString(input.publicTitle, 'publicTitle')
+  const seniority = parseHiringPublicSeniority(input.seniority, { field: 'seniority' })
+  const publicContent = parsePublicOpeningContent(input.publicContent)
+  const publicRemoteEligibleCountries = parseRemoteEligibleCountries(input.publicRemoteEligibleCountries)
+
+  if (!publicContent) {
+    throw new HiringValidationError(
+      'La vacante debe declarar publicContent v2 completo.',
+      'hiring_vacancy_publication_invalid_input',
+      422,
+      { field: 'publicContent' }
+    )
+  }
+
+  assertPublicTitleSeniorityConsistency(publicTitle, seniority)
 
   if (!uniqueSkillTags.length) {
     throw new HiringValidationError(
       'La vacante debe declarar publicSkillTags/competencyTags estructurados.',
       'hiring_vacancy_publication_invalid_input',
       400,
-      { field: 'skillTags' },
+      { field: 'skillTags' }
     )
   }
 
@@ -237,7 +261,16 @@ const normalizeBrief = (input: unknown): NormalizedBrief => {
       'Una vacante remota debe declarar hiringRegion publico.',
       'hiring_vacancy_publication_publish_guard',
       422,
-      { field: 'hiringRegion' },
+      { field: 'hiringRegion' }
+    )
+  }
+
+  if (workMode === 'remote' && !publicRemoteEligibleCountries.length) {
+    throw new HiringValidationError(
+      'Una vacante remota debe declarar al menos un país elegible.',
+      'hiring_vacancy_publication_publish_guard',
+      422,
+      { field: 'publicRemoteEligibleCountries' }
     )
   }
 
@@ -246,7 +279,7 @@ const normalizeBrief = (input: unknown): NormalizedBrief => {
       'Una vacante hibrida/presencial debe declarar officeLocation o city+country publicos.',
       'hiring_vacancy_publication_publish_guard',
       422,
-      { field: 'officeLocation' },
+      { field: 'officeLocation' }
     )
   }
 
@@ -254,24 +287,23 @@ const normalizeBrief = (input: unknown): NormalizedBrief => {
     warnings.push('public_compensation_band_not_set')
   }
 
-  const publicLocationMode = workMode === 'remote'
-    ? hiringRegion ?? ''
-    : officeLocation ?? [city, country].filter(Boolean).join(', ')
+  const publicLocationMode =
+    workMode === 'remote' ? (hiringRegion ?? '') : (officeLocation ?? [city, country].filter(Boolean).join(', '))
 
   return {
     ...input,
     mode,
     requestedRole: requireString(input.requestedRole, 'requestedRole'),
-    publicTitle: requireString(input.publicTitle, 'publicTitle'),
-    publicSummary: requireString(input.publicSummary, 'publicSummary'),
-    publicDescription: requireString(input.publicDescription, 'publicDescription'),
+    publicTitle,
+    publicSummary: publicContent.promise!,
+    publicDescription: publicContent.intro!,
     publicArea,
     workMode,
     hiringRegion,
     city,
     country,
     officeLocation,
-    seniority: optionalClean(input.seniority),
+    seniority,
     employmentMode: optionalClean(input.employmentMode),
     engagementType: (clean(input.engagementType) || 'on_going') as TalentDemandEngagementType,
     fulfillmentMode: (clean(input.fulfillmentMode) || 'internal_hire') as CreateTalentDemandInput['fulfillmentMode'],
@@ -279,16 +311,25 @@ const normalizeBrief = (input: unknown): NormalizedBrief => {
     requestedSeats: Number.isInteger(Number(input.requestedSeats)) ? Number(input.requestedSeats) : 1,
     priority: (clean(input.priority) || 'high') as TalentDemandPriority,
     ownerUserId: optionalClean(input.ownerUserId),
-    publicProcessNotes: optionalClean(input.publicProcessNotes),
+    publicProcessNotes: [
+      ...publicContent.process!.steps.map(step => `${step.title}: ${step.body}`),
+      publicContent.process!.expectedTiming,
+      publicContent.process!.responseCommitment,
+      publicContent.process!.accommodationPath
+    ]
+      .filter(Boolean)
+      .join('\n'),
     publicCompensationBand: optionalClean(input.publicCompensationBand),
     sourceUrl: optionalClean(input.sourceUrl),
     sourceReference: optionalClean(input.sourceReference),
-    requirements,
-    responsibilities,
-    niceToHave,
+    requirements: publicContent.essentials,
+    responsibilities: publicContent.workItems,
+    niceToHave: publicContent.preferred,
     skillTags: uniqueSkillTags,
     publicLocationMode,
     warnings,
+    publicContent,
+    publicRemoteEligibleCountries
   }
 }
 
@@ -309,10 +350,13 @@ const buildPreview = (brief: NormalizedBrief): HiringVacancyPublicationPreview =
     requestedSkills: brief.skillTags,
     priority: brief.priority,
     ownerUserId: brief.ownerUserId,
-    notes: [
-      brief.sourceReference ? `publication_source_ref=${brief.sourceReference}` : null,
-      brief.sourceUrl ? `source_url=${brief.sourceUrl}` : null,
-    ].filter(Boolean).join('\n') || null,
+    notes:
+      [
+        brief.sourceReference ? `publication_source_ref=${brief.sourceReference}` : null,
+        brief.sourceUrl ? `source_url=${brief.sourceUrl}` : null
+      ]
+        .filter(Boolean)
+        .join('\n') || null
   }
 
   const opening: CreateHiringOpeningInput = {
@@ -320,7 +364,7 @@ const buildPreview = (brief: NormalizedBrief): HiringVacancyPublicationPreview =
     internalTitle: brief.requestedRole,
     seniority: brief.seniority,
     requestedSeats: brief.requestedSeats,
-    ownerUserId: brief.ownerUserId,
+    ownerUserId: brief.ownerUserId
   }
 
   return {
@@ -345,14 +389,16 @@ const buildPreview = (brief: NormalizedBrief): HiringVacancyPublicationPreview =
       publicProcessNotes: brief.publicProcessNotes ?? null,
       publicCompensationBand: brief.publicCompensationBand ?? null,
       publicationSourceRef: brief.sourceReference,
-    },
+      publicContent: brief.publicContent,
+      publicRemoteEligibleCountries: brief.publicRemoteEligibleCountries
+    }
   }
 }
 
 const withTiming = async <T>(
   timings: HiringVacancyPublicationResult['timings'],
   step: string,
-  run: () => Promise<T>,
+  run: () => Promise<T>
 ): Promise<T> => {
   const startedAt = performance.now()
 
@@ -368,7 +414,7 @@ const findOpeningBySourceReference = async (sourceReference: string | null): Pro
 
   const rows = await runGreenhousePostgresQuery<{ opening_id: string }>(
     `SELECT opening_id FROM greenhouse_hiring.hiring_opening WHERE publication_source_ref = $1 LIMIT 1`,
-    [sourceReference],
+    [sourceReference]
   )
 
   const openingId = rows[0]?.opening_id
@@ -378,12 +424,12 @@ const findOpeningBySourceReference = async (sourceReference: string | null): Pro
 
 const buildResultUrls = (publicId: string) => ({
   detailUrl: `${PUBLIC_BASE_URL}/public/careers/${encodeURIComponent(publicId)}`,
-  applyUrl: `${PUBLIC_BASE_URL}/public/careers/${encodeURIComponent(publicId)}/apply`,
+  applyUrl: `${PUBLIC_BASE_URL}/public/careers/${encodeURIComponent(publicId)}/apply`
 })
 
 export const publishHiringVacancyFromBrief = async (
   input: unknown,
-  actorUserId: string | null,
+  actorUserId: string | null
 ): Promise<HiringVacancyPublicationResult> => {
   const timings: HiringVacancyPublicationResult['timings'] = []
   const brief = normalizeBrief(input)
@@ -394,7 +440,7 @@ export const publishHiringVacancyFromBrief = async (
   }
 
   const existingOpening = await withTiming(timings, 'lookup_existing_opening', () =>
-    findOpeningBySourceReference(brief.sourceReference),
+    findOpeningBySourceReference(brief.sourceReference)
   )
 
   let demand: TalentDemand | null = null
@@ -402,12 +448,10 @@ export const publishHiringVacancyFromBrief = async (
   let outcome: HiringVacancyPublicationOutcome = opening ? 'reused_draft' : 'created'
 
   if (!opening) {
-    demand = await withTiming(timings, 'create_talent_demand', () =>
-      createTalentDemand(preview.demand, actorUserId),
-    )
+    demand = await withTiming(timings, 'create_talent_demand', () => createTalentDemand(preview.demand, actorUserId))
 
     opening = await withTiming(timings, 'create_hiring_opening', () =>
-      createHiringOpening({ ...preview.opening, demandId: demand!.demandId }, actorUserId),
+      createHiringOpening({ ...preview.opening, demandId: demand!.demandId }, actorUserId)
     )
   } else {
     demand = null
@@ -435,15 +479,24 @@ export const publishHiringVacancyFromBrief = async (
         publicProcessNotes: preview.publicOpening.publicProcessNotes,
         publicCompensationBand: preview.publicOpening.publicCompensationBand,
         publicationSourceRef: preview.publicOpening.publicationSourceRef,
+        publicContent: preview.publicOpening.publicContent,
+        publicRemoteEligibleCountries: preview.publicOpening.publicRemoteEligibleCountries
       },
-      actorUserId,
-    ),
+      actorUserId
+    )
   )
 
   if (brief.mode === 'publish') {
-    const published = await withTiming(timings, 'publish_opening', () => publishOpening(opening!.openingId, actorUserId))
+    const published = await withTiming(timings, 'publish_opening', () =>
+      publishOpening(opening!.openingId, actorUserId)
+    )
 
-    opening = { ...opening, publicationStatus: 'published', visibility: 'public_listed', publishedAt: published.publishedAt }
+    opening = {
+      ...opening,
+      publicationStatus: 'published',
+      visibility: 'public_listed',
+      publishedAt: published.publishedAt
+    }
     outcome = existingOpening?.publicationStatus === 'published' ? 'duplicate' : 'published'
   }
 
@@ -461,7 +514,7 @@ export const publishHiringVacancyFromBrief = async (
     applyUrl: urls.applyUrl,
     warnings: brief.warnings,
     timings,
-    preview,
+    preview
   }
 }
 
@@ -469,7 +522,7 @@ export const executeHiringVacancyPublicationCommand = async ({
   request,
   actorUserId,
   body,
-  scope = {},
+  scope = {}
 }: {
   request: Request
   actorUserId: string | null
@@ -490,7 +543,7 @@ export const executeHiringVacancyPublicationCommand = async ({
       'execute/publish requieren idempotencyKey o header Idempotency-Key.',
       'hiring_vacancy_publication_invalid_input',
       400,
-      { field: 'idempotencyKey' },
+      { field: 'idempotencyKey' }
     )
   }
 
@@ -499,13 +552,13 @@ export const executeHiringVacancyPublicationCommand = async ({
       lane: 'internal',
       principalKind: 'internal_actor',
       principalId: actorUserId ?? 'hiring-vacancy-publication-operator',
-      userId: actorUserId,
+      userId: actorUserId
     },
     scope,
     routeKey: HIRING_VACANCY_PUBLICATION_ROUTE_KEY,
     request,
     body,
     idempotencyKeyOverride: idempotencyKey,
-    run: async () => ({ data: await publishHiringVacancyFromBrief(body, actorUserId), status: 200 }),
+    run: async () => ({ data: await publishHiringVacancyFromBrief(body, actorUserId), status: 200 })
   })
 }

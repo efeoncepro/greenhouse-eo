@@ -36,6 +36,7 @@ import {
 } from '@/types/hiring'
 
 import { HiringNotFoundError, HiringValidationError } from './errors'
+import { assertPublicTitleSeniorityConsistency, parseHiringPublicSeniority } from './public-seniority'
 import {
   normalizePublicOpeningContent,
   parsePublicOpeningContent,
@@ -927,7 +928,16 @@ export const updateHiringOpening = async (
   if (input.publicCompensationBand !== undefined) push('public_compensation_band', input.publicCompensationBand)
   if (input.publicationSourceRef !== undefined) push('publication_source_ref', input.publicationSourceRef)
   if (input.publicEmploymentMode !== undefined) push('public_employment_mode', input.publicEmploymentMode)
-  if (input.publicSeniority !== undefined) push('public_seniority', input.publicSeniority)
+
+  if (input.publicSeniority !== undefined) {
+    push(
+      'public_seniority',
+      input.publicSeniority == null
+        ? null
+        : parseHiringPublicSeniority(input.publicSeniority, { field: 'publicSeniority' })
+    )
+  }
+
   if (input.publicProcessNotes !== undefined) push('public_process_notes', input.publicProcessNotes)
 
   if (input.publicContent !== undefined) {
@@ -965,21 +975,37 @@ export const updateHiringOpening = async (
     if (!rows[0]) throw new HiringNotFoundError('El opening no existe.', 'hiring_opening_not_found')
     const opening = normalizeHiringOpening(rows[0])
 
+    // También gobierna borradores: si ambos campos existen, la transacción revierte
+    // ante un código interno o una contradicción explícita en el título.
+    if (opening.publicSeniority != null) {
+      parseHiringPublicSeniority(opening.publicSeniority)
+      assertPublicTitleSeniorityConsistency(opening.publicTitle, opening.publicSeniority)
+    }
+
     if (opening.publicationStatus === 'published') {
-      assertPublishableOpening({
-        publicTitle: opening.publicTitle,
-        publicSummary: opening.publicSummary,
-        publicDescription: opening.publicDescription,
-        publicWorkMode: opening.publicWorkMode,
-        publicHiringRegion: opening.publicHiringRegion,
-        publicCity: opening.publicCity,
-        publicCountry: opening.publicCountry,
-        publicOfficeLocation: opening.publicOfficeLocation,
-        publicArea: opening.publicArea,
-        publicSkillTags: opening.publicSkillTags,
-        publicSeniority: opening.publicSeniority,
-        visibility: opening.visibility
-      })
+      // Las publicaciones v1 existentes siguen editables mientras no se toque el contrato
+      // editorial. En cuanto una edición introduce v2, no puede volver a degradarlo.
+      const requireEditorialV2 = input.publicContent !== undefined || opening.publicContent?.version === 2
+
+      assertPublishableOpening(
+        {
+          publicTitle: opening.publicTitle,
+          publicSummary: opening.publicSummary,
+          publicDescription: opening.publicDescription,
+          publicWorkMode: opening.publicWorkMode,
+          publicHiringRegion: opening.publicHiringRegion,
+          publicCity: opening.publicCity,
+          publicCountry: opening.publicCountry,
+          publicOfficeLocation: opening.publicOfficeLocation,
+          publicArea: opening.publicArea,
+          publicSkillTags: opening.publicSkillTags,
+          publicSeniority: opening.publicSeniority,
+          publicContent: opening.publicContent,
+          publicRemoteEligibleCountries: opening.publicRemoteEligibleCountries,
+          visibility: opening.visibility
+        },
+        { requireEditorialV2 }
+      )
     }
 
     await publishOutboxEvent(
