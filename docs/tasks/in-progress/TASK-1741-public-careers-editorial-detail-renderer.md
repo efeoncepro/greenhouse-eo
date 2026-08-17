@@ -419,6 +419,10 @@ La variante se activa sólo tras revisar el mecanismo de flags existente. El lay
 - Migración `20260817160000000_task-1741-public-seniority-canonical` aplicada en Cloud SQL dev/staging;
   `pnpm pg:connect:status` confirma `No migrations to run!` y el tipo Kysely regenerado conserva el comentario
   canónico de `public_seniority`.
+- Rollout Vercel no ejecutado desde el checkout actual: `develop` está 15 commits por delante de
+  `origin/develop` y el árbol compartido contiene cambios no committeados de TASK-1719 propiedad de Claude.
+  Desplegar localmente incluiría ese trabajo ajeno; crear un checkout/worktree aislado está prohibido. La
+  secuencia queda preparada en el ledger y debe comenzar con un SHA desplegable limpio.
 - Estado honesto: code complete; la activación de flags y GVC/smoke desplegado siguen pendientes.
 
 ## Closing Protocol

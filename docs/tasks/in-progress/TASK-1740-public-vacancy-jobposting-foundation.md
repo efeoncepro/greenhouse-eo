@@ -50,7 +50,7 @@ Esta task conserva ownership del contrato y evoluciona `PublicOpeningContent` a 
 schema, no bloquear publicación** (bloquear rompería re-publicar los 2 openings vivos, ambos `LATAM`);
 (3) `validThrough` → se omite (no existe expiración real; el retiro es el 404 del unpublish).
 
-**Rollout pendiente (no ejecutable sin push/deploy + coordinación humana):**
+**Rollout pendiente (requiere push/deploy y un checkout compartido sin cambios ajenos):**
 
 1. ~~Confirmar países elegibles~~ **CUMPLIDO 2026-08-17**: el CEO (máxima autoridad de decisión)
    aprobó **20 países** — toda Latinoamérica **excepto Cuba** (AR BO BR CL CO CR DO EC SV GT HN MX NI
@@ -72,18 +72,12 @@ schema, no bloquear publicación** (bloquear rompería re-publicar los 2 opening
    **complementa** la prosa y sólo un bloque con narrativa núcleo (`promise`/`intro`/`outcomes`/
    `workItems`) la reemplaza; si el bloque ya cubre habilidades, los requisitos legacy se omiten para
    no duplicar. Con test propio en ambas direcciones (descripciones reales: 1365 y 3296 caracteres).
-2. Push/release; prender `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` en staging → Rich Results Test →
-   producción (secuencia en el manual §Prender el schema JobPosting). ⚠️ **Retenido por decisión del
-   operador (2026-08-17): el release espera a que TASK-1741 esté lista y viajan juntos.**
-   ⚠️⚠️ **Precondición dura de secuencia descubierta al preguntarse si 1741 necesitaba el flag
-   (verificada 2026-08-17): el renderer va PRIMERO.** El builder de JSON-LD ya consume `content`,
-   pero `view-model.ts` y `components/greenhouse/careers/**` NO lo consumen todavía — así que prender
-   este flag antes de TASK-1741 emitiría a Google el `remoteModel` (ya poblado en las 2 vacantes) sin
-   que esté visible en la página: exactamente la desalineación HTML↔schema que esta task prohíbe, y
-   una desviación de las guías de Google. **Orden: renderer TASK-1741 → contenido autorado → flag.**
-   Los dos flags son técnicamente independientes (1741 no necesita este para desarrollarse: el
-   payload público expone `content` siempre, sin flag), pero su orden de encendido no es libre.
-   Con el flag OFF **no hay desalineación activa**: el dato espera a su consumidor, que es 1741.
+2. Push/release conjunto; prender primero `CAREERS_DETAIL_EDITORIAL_V2_ENABLED` en staging, verificar
+   HTML visible y después prender `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` → Rich Results Test →
+   producción (secuencia en el manual §Prender el schema JobPosting). **La precondición de código ya
+   quedó cumplida por TASK-1741:** el view model y el renderer consumen `publicContent` v2 y muestran
+   la misma evidencia usada por JSON-LD. El interlock técnico conserva el orden fail-closed: el schema
+   nunca retorna ON si el renderer editorial está OFF.
 3. Smoke lifecycle en runtime desplegado: validar HTML/schema/canonical → pausar → 404 sin schema.
 4. ~~`pnpm build` de producción~~ **autorizado y ejecutado 2026-08-17** (resultado en el delta de
    evidencia).
@@ -112,7 +106,7 @@ verde por slice; suite `public-careers` 71 passed.
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-011`
-- Status real: `Diseno`
+- Status real: `Code complete; migraciones aplicadas; rollout conjunto con TASK-1741 pendiente`
 - Rank: `TBD`
 - Domain: `hr|growth|data`
 - Blocked by: `none`
