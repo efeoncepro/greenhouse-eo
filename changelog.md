@@ -32,6 +32,21 @@
 - Sin cambio runtime: son tasks de diseño/ejecución futura. El contrato de contenido y el schema se
   implementan antes del render.
 
+## 2026-08-17 — Se pueden otorgar ajustes razonables en las evaluaciones
+
+- **Tiempo extra para quien lo necesita.** Hasta ahora el campo existía en el sistema pero **nadie
+  podía escribirlo**: 17 evaluaciones, las 17 sin ajuste, porque no había forma de concederlo. La
+  única salida era alargar el límite de la plantilla, que se lo alarga a todos. Ahora People puede
+  conceder entre 1 y 180 minutos a una persona concreta, **incluso mientras está rindiendo** — el
+  contador se le alarga en el momento.
+- **El motivo no se guarda, a propósito.** Un ajuste revela una condición de salud o discapacidad:
+  dato protegido. Guardarlo sería crear el registro con el que después se discrimina. Se guarda sólo
+  el arreglo. La constancia narrativa va al expediente de evaluación, que tiene su propio control.
+- **El correo de la prueba ahora invita a pedirlo**, en español e inglés, y dice explícitamente que
+  no hay que explicar por qué. Sin esa línea sólo preguntan quienes ya se sienten con derecho a
+  hacerlo, que es justo el sesgo que el ajuste existe para corregir.
+- Otorgarlo requiere ser People: no alcanza con poder autorar evaluaciones.
+
 ## 2026-08-17 — TASK-1719: la vacante declara su prueba y una sola pieza decide qué recibe el candidato
 
 - **La vacante declara su plantilla una vez y Greenhouse la resuelve sola.** Quien asigna ya no elige
@@ -1014,26 +1029,3 @@ lugares del repo y nunca registró como task. Llevaba meses sin tomarse en parte
 
 **Rollout gated por la promoción `develop → main`**: mientras el catálogo TS viva sólo en `develop`,
 `syncViewRegistryCatalog` apaga esos viewCodes desde cualquier runtime con código viejo.
-
-## 2026-08-09 — El batch policy del release preflight dejó de mentir (ISSUE-114)
-
-`release_batch_policy` computaba el diff con base three-dot (`origin/main...target`). Como la
-promoción es por squash-merge, la merge-base queda congelada antes del último squash y el check
-resucitaba archivos byte-idénticos a producción como cambios del release, fabricando dominios
-irreversibles falsos y empujando releases normales a `requires_break_glass`. Los 4 releases previos
-lo habían tapado con marker `[release-coupled: …]`, tres declarando explícitamente que la mezcla no
-era real. Ahora usa two-dot, y tanto el diff de archivos como los commit bodies resuelven su base por
-`buildReleaseDiffRange`. El hueco de cobertura estaba en que `checks/release-batch-policy.ts` no tenía
-archivo de tests; el guardrail nuevo fija el rango en el argv de git, verificado rojo antes y verde
-después.
-
-Una verificación adversarial del propio fix encontró cuatro defectos, todos corregidos: un docstring
-que sobre-prometía (compartir el rango no iguala `git diff` con `git log`), dos docstrings del
-contrato aún en three-dot, dos tests que eran teatro por un mock ciego al rango, y un byte NUL
-invisible en un fixture.
-
-Se abrieron `ISSUE-145` (alta: el batch policy del orquestador es decorativo post-merge, y el marker
-nunca se lee donde el runbook dice pero se dispara con prosa) e `ISSUE-144` (`vercel_readiness`
-confunde build saltado a propósito con fallido). Se desplegó además el batch SEO EPIC-022
-(TASK-1308/1309/1310, 322 archivos, 3 migraciones) y se corrigieron dos comandos documentados que las
-herramientas dejaron de aceptar.

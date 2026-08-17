@@ -2,6 +2,17 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-17 — TASK-1741 tomada en develop tras auditoría paralela
+
+El operador autorizó expresamente ejecutar en el checkout compartido `develop`, sin cambiar de rama,
+y usar subagentes. Tres auditorías read-only revisaron contrato público/SEO y readiness UI. Antes del
+renderer se corrigieron los blockers de TASK-1740: la proyección pública ya no selecciona ni usa
+`internal_title`/`seniority`, `publicSeniority` es obligatorio al publicar, un opening publicado no
+puede invalidarse mediante PATCH, los bloques parciales no borran la prosa legacy y la compensación
+rechaza monedas/tipos falsos. Tests focales (53) y TypeScript verdes. TASK-1741 está ahora
+`in-progress`, `UI ready: yes`, con dirección durable `Editorial dossier`; implementación secuencial
+por solapamiento causal entre view model, copy, renderer y CSS. El formulario queda fuera de alcance.
+
 ## 2026-08-17 — TASK-1740 code complete: contenido público estructurado + fundación JobPosting
 
 Slices 1-4 en `develop` local (4 commits, sin push). El opening gana `public_content_json`
@@ -58,6 +69,34 @@ de `/public/careers/[publicId]`, detrás de flag y con GVC 1440/390, que preserv
 exactamente los dos CTA existentes (hero verde y resumen azul; sin CTA final). Ambas exigen que
 remote/global use países elegibles reales y nunca invente salario, beneficios o condiciones de
 contrato. El wireframe es `docs/ui/wireframes/TASK-1741-public-careers-editorial-detail-renderer.md`.
+
+## 2026-08-17 — Ajustes razonables: ahora se pueden otorgar, y se pueden pedir
+
+Cierra la Open Question 7 del ADR de TASK-1719. `accommodations_json` estaba cableado end-to-end
+**en lectura** desde TASK-1360 —lector TS, predicado SQL de vencimiento, banner al candidato— pero
+**17 instancias, las 17 vacías**: nunca se le concedió un ajuste a nadie porque no se podía. La
+única palanca era alargar el límite de la plantilla, que se lo alarga a toda la cohorte. Pesa más
+desde que la prueba se manda en Preselección: se le pide trabajo a más gente.
+
+Decisiones que valen releer antes de tocar esto:
+
+- **El motivo NO se persiste, y es decisión, no omisión.** Un ajuste revela por naturaleza una
+  condición protegida; guardarlo crea el dato con el que después se discrimina. Se guarda sólo el
+  arreglo (minutos, quién, cuándo). La constancia narrativa va al expediente.
+- **Capability role-only (People), no la genérica de autorar.** En esta plataforma "usuario interno"
+  incluye diseñadores y colaboradores: con la genérica cualquiera concedería tiempo extra.
+- **Se cerró un contrato implícito**: la lectura aceptaba SEIS grafías del mismo hecho. Queda una.
+  Seguro de narrar porque 0 filas usaban ninguna.
+- **Divergencia latente encontrada al unificar**: el lector TS redondeaba y el SQL truncaba — un
+  valor fraccionario habría mostrado un contador y vencido con otro. Ambos truncan; hay test vivo.
+- **La otra mitad, que la doc daba por hecha sin serlo**: el correo NO invitaba a pedir el ajuste.
+  Uno que nadie sabe que puede pedir no es un ajuste, y quienes preguntan igual son los que ya se
+  sienten con derecho — el sesgo que esto corrige. Ahora lo invita en ambos idiomas y dice que no
+  hay que explicar por qué.
+
+Pendiente declarado: sin UI, sin aviso automático al candidato (avisar es acto humano, igual que en
+cancelación), y **sólo cubre tiempo extra** — formatos accesibles son trabajo de accesibilidad de la
+pantalla de rendición, no de este campo.
 
 ## 2026-08-17 — La etapa canónica del candidate test es `shortlisted`, no `interview`
 
