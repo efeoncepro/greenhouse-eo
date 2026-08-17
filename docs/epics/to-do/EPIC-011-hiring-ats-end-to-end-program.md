@@ -211,6 +211,14 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   superficie candidate-facing; el rollout de flags de 1734 sigue su runbook aparte. `UI ready: yes` (dirección
   visual versionada + scorecard 4,46). El GVC premium sobre un run REAL destapó `manifestSummary` mintiendo 100%
   y el bug del risk router cerrado en el delta 2026-08-17 de `TASK-1734`.
+- `TASK-1739` — **Procedencia de datos sintéticos en Hiring**: `data_origin`
+  (`real|synthetic_seed|smoke_test|demo`, default `real`) declarado en el nacimiento del dato, con dos
+  raíces (persona en `identity_profiles`, demanda en `talent_demand`/`hiring_opening`) y copia derivada
+  por trigger en `hiring_application`. Readers de desk/talent-pool filtran por defecto con opt-in
+  `includeSynthetic` detrás de flag; el sampler del gold set excluye **siempre y sin opt-in**. Backfill
+  con allowlist humana (nunca regex en producción), purga gobernada archive-first, gate que impide
+  crear datos sin declarar procedencia y señal `hiring.data_quality.synthetic_records_aging`.
+  `backend-data`/`backend-critical`. Paralelizable con todos los carriles; `Blocked by: none`.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
 
@@ -299,6 +307,32 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - TASK-1727–1733 separan identidad, data migration, Hiring API, UI candidata, activation bridge, reader People 360 y
   UI People 360. Esta partición evita tasks híbridas y copy-on-hire.
 - Referencias/recomendaciones, agenda y passkeys quedan post-MVP; no bloquean status/CV/perfil/preguntas.
+
+### Procedencia de datos sintéticos (Delta 2026-08-17)
+
+`TASK-1739` cierra un defecto transversal del programa: dev, staging y producción comparten una sola
+Cloud SQL, así que **cada task de este EPIC que crea un seed o un smoke deja candidatos y vacantes
+fantasma junto a los reales**, y hoy no existe ningún hecho en el modelo que diga "esto es sintético".
+La inferencia disponible —regex sobre el nombre— falla en los dos sentidos, con evidencia dura de
+ambos: un falso positivo demostrado en el gold set del 2026-08-16 (una respuesta real de 1206
+caracteres que menciona "pequeñas pruebas o pilotos") y un falso negativo estructural (cinco
+convenciones distintas de marcado repartidas en ocho scripts, ninguna compartida).
+
+- La procedencia (`data_origin`) es **ortogonal** a `source` (`public_careers|manual|referral|…`):
+  `source` responde por qué canal llegó, `data_origin` si el dato representa a alguien del mundo real.
+  **Nunca** se colapsan en una columna.
+- **Dos raíces**: `identity_profiles` para personas y `talent_demand`/`hiring_opening` para la demanda
+  (una vacante fantasma no tiene persona). `hiring_application` porta una copia derivada por trigger.
+- El sampler del gold set (`TASK-1734`) pasa a excluir sintéticos **siempre**, sin opt-in: la muestra
+  vigente salió limpia por suerte —los seeds no se califican a mano—, no por construcción.
+- La limpieza es **archive-first**: `hiring_assessment` cascadea desde `hiring_application`, así que
+  un DELETE se llevaría, en silencio, respuestas calificadas por personas.
+- **Obligación para todo carril activo del EPIC** (`1719/1720/1721/1722`, `1727…1733`): sus seeds,
+  smokes y scenarios declaran `dataOrigin` explícito. Un gate mecánico lo exige una vez que
+  `TASK-1739` cierre su Slice 6.
+
+Es paralelizable con todos los carriles: no bloquea ni es bloqueada por ninguno, y cuanto antes
+cierre, menos fantasmas hay que remediar después.
 
 ## Existing Related Work
 
