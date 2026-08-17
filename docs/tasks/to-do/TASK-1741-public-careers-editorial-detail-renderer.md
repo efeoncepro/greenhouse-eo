@@ -10,6 +10,17 @@
   `legacyOpeningFixture`). Canonical + JSON-LD ya se emiten desde la page (schema detrás de
   `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED`, OFF); el renderer NO escribe schema ni metadata.
   El bloqueo `Blocked by: TASK-1740` queda levantado en cuanto 1740 cierre lifecycle.
+- **Esta task NO necesita el flag de schema de TASK-1740 para desarrollarse**: `content` y
+  `remoteEligibleCountries` viajan en el payload público SIEMPRE, sin flag. Pero sí hay una
+  **precondición inversa que esta task desbloquea**: `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` no
+  puede prenderse hasta que este renderer muestre el bloque estructurado en la página visible —
+  el builder de JSON-LD ya consume `content` y el renderer todavía no, así que prender el schema
+  antes emitiría a Google contenido no visible (guías de Google + invariante del dominio).
+- **Dato ya en la base que este renderer debe mostrar**: las 2 vacantes publicadas
+  (`EO-OPN-0009`, `EO-OPN-0061`) tienen `content.remoteModel` poblado con la vía contractual
+  (Chile contrato local / fuera de Chile internacional con pago directo de Efeonce). El resto de los
+  campos del bloque está vacío: el renderer debe degradar esas secciones al fallback de prosa, y el
+  contenido editorial completo se autora aparte (no lo inventa el renderer).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE

@@ -197,6 +197,16 @@ país (`["CL"]`) también es válida y honesta: "remoto, elegible en Chile".
 
 ### Prender el schema JobPosting
 
+> ⚠️ **Precondición de secuencia (no negociable): el renderer va primero.**
+> El JSON-LD ya lee el bloque estructurado, pero la página visible todavía no
+> (eso llega con TASK-1741). Si prendes el schema antes, Google recibiría
+> contenido —por ejemplo el modelo remoto con la vía contractual, ya cargado en
+> las dos vacantes— que el candidato no ve en pantalla. Google exige que el
+> structured data refleje el contenido visible, y este dominio lo prohíbe
+> explícitamente. **Orden correcto: renderer de TASK-1741 → contenido autorado
+> → recién entonces este flag.** Al revés no es "adelantarse": es publicar una
+> promesa que la página no respalda.
+
 1. El flag `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` vive **solo en Vercel**
    (SSR del detalle público). Default OFF.
 2. Prende primero staging (`vercel env add … preview` + redeploy), abre el

@@ -56,6 +56,15 @@ schema, no bloquear publicación** (bloquear rompería re-publicar los 2 opening
 2. Push/release; prender `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` en staging → Rich Results Test →
    producción (secuencia en el manual §Prender el schema JobPosting). ⚠️ **Retenido por decisión del
    operador (2026-08-17): el release espera a que TASK-1741 esté lista y viajan juntos.**
+   ⚠️⚠️ **Precondición dura de secuencia descubierta al preguntarse si 1741 necesitaba el flag
+   (verificada 2026-08-17): el renderer va PRIMERO.** El builder de JSON-LD ya consume `content`,
+   pero `view-model.ts` y `components/greenhouse/careers/**` NO lo consumen todavía — así que prender
+   este flag antes de TASK-1741 emitiría a Google el `remoteModel` (ya poblado en las 2 vacantes) sin
+   que esté visible en la página: exactamente la desalineación HTML↔schema que esta task prohíbe, y
+   una desviación de las guías de Google. **Orden: renderer TASK-1741 → contenido autorado → flag.**
+   Los dos flags son técnicamente independientes (1741 no necesita este para desarrollarse: el
+   payload público expone `content` siempre, sin flag), pero su orden de encendido no es libre.
+   Con el flag OFF **no hay desalineación activa**: el dato espera a su consumidor, que es 1741.
 3. Smoke lifecycle en runtime desplegado: validar HTML/schema/canonical → pausar → 404 sin schema.
 4. ~~`pnpm build` de producción~~ **autorizado y ejecutado 2026-08-17** (resultado en el delta de
    evidencia).

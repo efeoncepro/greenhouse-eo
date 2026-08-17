@@ -199,6 +199,15 @@ is deliberately held until TASK-1741 (editorial renderer) lands.
   partial block — the NORMAL state while the editorial content is not authored —
   complements it. Replacing it degraded the schema description to a fragment of the
   role; bug caught with the first real artifact (2026-08-17), not by the unit tests.
+- **Flip order — renderer first, schema second**: **NEVER** flip
+  `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` before the renderer (TASK-1741) shows
+  the structured block on the visible page. The JSON-LD builder already consumes
+  `content`, but the renderer does NOT yet, so flipping the schema first would emit
+  to Google content (e.g. `remoteModel` with the contractual route) that the
+  candidate cannot see — the exact misalignment this domain forbids. The two flags
+  are independent in terms of technical dependency (TASK-1741 does NOT need the
+  schema flag to be developed: `content` and `remoteEligibleCountries` ALWAYS
+  travel in the public payload, with no flag), but their FLIP ORDER is not free.
 - **Write path**: the existing canonical command only — `updateHiringOpening` /
   `PATCH /api/hiring/openings/{id}` with `publicContent` and
   `publicRemoteEligibleCountries` (capability `hiring.opening.write`). Zero new

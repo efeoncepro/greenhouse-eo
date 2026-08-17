@@ -66,6 +66,16 @@ existentes (cero endpoints nuevos, cero capabilities nuevas, cero eventos nuevos
   en esa ciudad. El anclaje contractual se declara en el contenido visible (`content.remoteModel`);
   la elegibilidad, en `applicantLocationRequirements` — que admite **un solo país** y sigue siendo
   `TELECOMMUTE` válido.
+- **NUNCA** prender `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` antes de que el renderer (TASK-1741)
+  muestre el bloque estructurado en la página visible. **El orden es renderer primero, schema
+  después**: el builder de JSON-LD ya consume `content`, pero `view-model.ts` y
+  `components/greenhouse/careers/**` todavía NO (verificado 2026-08-17), así que prender el schema
+  antes emitiría a Google un párrafo — el `remoteModel` con la vía contractual, ya poblado en las 2
+  vacantes publicadas — que el candidato no ve en la página. Eso viola las guías de Google (el
+  structured data debe reflejar contenido visible) y el invariante propio de este dominio. Los dos
+  flags son **técnicamente independientes** (TASK-1741 no necesita el de schema para desarrollarse:
+  `content` y `remoteEligibleCountries` viajan en el payload público SIEMPRE, sin flag), pero su
+  **orden de encendido no es libre**.
 - **NUNCA** dejar que un bloque estructurado PARCIAL reemplace la prosa legacy en la descripción del
   schema. Sólo un bloque con **narrativa núcleo** (`promise`/`intro`/`outcomes`/`workItems`) la
   reemplaza; un bloque parcial (el estado normal mientras el contenido editorial no se autora) la

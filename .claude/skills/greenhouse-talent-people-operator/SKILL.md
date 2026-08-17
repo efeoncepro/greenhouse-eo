@@ -203,6 +203,13 @@ never breaks). Builder `src/lib/hiring/public-careers/job-posting.ts` is server-
   by the unit tests.
 - **NEVER** hardcode the brand: `hiringOrganization` comes from the brand SSOT (`EFEONCE_BRAND_NAME` +
   `EFEONCE_URL_HTTPS`, `src/config/efeonce-brand.ts`).
+- **NEVER** flip `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` before the renderer (TASK-1741) shows the
+  structured block on the visible page. The order is **renderer first, schema second**: the JSON-LD builder
+  already consumes `content`, but the renderer does NOT yet, so flipping the schema first would emit to
+  Google content (e.g. `remoteModel` with the contractual route) that the candidate cannot see — the exact
+  misalignment this domain forbids. The two flags are independent in terms of technical dependency
+  (TASK-1741 does NOT need the schema flag to be developed: `content` and `remoteEligibleCountries` ALWAYS
+  travel in the public payload, with no flag), but their FLIP ORDER is not free.
 - **SIEMPRE** write via the existing canonical command `updateHiringOpening` / `PATCH /api/hiring/openings/{id}`
   (fields `publicContent`, `publicRemoteEligibleCountries`; capability `hiring.opening.write`) — zero new
   endpoints/capabilities/events.

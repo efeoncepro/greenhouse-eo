@@ -26,6 +26,17 @@ la entidad **no va en `jobLocation`**: ponerlo ahí haría que Google dejara de 
 remota y la mostrara como empleo presencial en Santiago. El anclaje contractual se declara en el
 contenido; la elegibilidad, en `applicantLocationRequirements`.
 
+**Precondición de secuencia entre los dos flags (la pregunta "¿no hay que prender el flag para 1741?"
+tiene respuesta doble):** TASK-1741 **no** necesita el flag de schema para desarrollarse — `content` y
+`remoteEligibleCountries` viajan en el payload público siempre, sin flag. Pero el orden inverso sí es
+obligatorio: **el renderer va primero**. Verificado que `view-model.ts` y
+`components/greenhouse/careers/**` todavía NO consumen `content`, mientras el builder de JSON-LD sí; por
+lo tanto prender `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` antes de 1741 emitiría a Google el
+`remoteModel` (ya poblado en las 2 vacantes) sin estar visible en la página — la desalineación
+HTML↔schema que el propio dominio prohíbe, y una desviación de las guías de Google. Con el flag OFF no
+hay desalineación activa: el dato espera a su consumidor. Documentado como invariante duro en ADR,
+manual, ledger, ambas tasks y las skills.
+
 **El primer artefacto real destapó un bug del builder** (patrón real-artifact): un bloque estructurado
 PARCIAL —sólo `remoteModel`, que es exactamente el estado mientras el contenido editorial no se
 autora— hacía que la descripción del JSON-LD dejara de incluir la prosa del rol y quedara reducida a
