@@ -20,6 +20,54 @@ Este documento fija:
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
 
+## Delta 2026-08-17 — TASK-1740: contenido público estructurado + fundación JobPosting/canonical
+
+La proyección pública de una vacante deja de depender del parser heurístico de prosa como única
+fuente y gana su fundación SEO técnica. Tres piezas, todas sobre el command/reader canónicos
+existentes (cero endpoints nuevos, cero capabilities nuevas, cero eventos nuevos):
+
+- **Bloque de contenido estructurado versionado** (`hiring_opening.public_content_json`, JSONB):
+  `PublicOpeningContent` v1 — promesa, intro, outcomes, trabajo, essentials/learnables, evidencia,
+  modelo remoto, proceso, beneficios y compensación estructurada opcional (`currency` ISO 4217 +
+  min/max + unitText). Validador canónico `src/lib/hiring/public-careers/public-content.ts`: write
+  path estricto (422 `hiring_opening_public_content_invalid`, re-validado SIEMPRE en el store) y
+  read path leniente (bloque corrupto o versión desconocida degrada a `null` = fallback legacy de
+  prosa, nunca rompe la página pública). El write viaja por `updateHiringOpening` (el PATCH interno
+  ya lo transporta) bajo `hiring.opening.write`.
+- **Elegibilidad remota por país** (`hiring_opening.public_remote_eligible_countries`, TEXT[] con
+  CHECK de forma alpha-2): países ISO 3166-1 reales validados con `isValidCountryCode`. Es el
+  ÚNICO habilitador del schema remoto; `public_hiring_region` (texto libre: `LATAM`, `Global`)
+  jamás se convierte en país. La publicación NO se bloquea por falta de países (los 2 openings
+  vivos son `LATAM` y deben poder re-publicarse): el schema simplemente se omite.
+- **Canonical + JSON-LD `JobPosting`** (`src/lib/hiring/public-careers/job-posting.ts`,
+  server-only, puro): nace de EXACTAMENTE el mismo `PublicOpeningPayload` visible (no existe un
+  segundo texto SEO). Fail-closed: remota sin países elegibles, híbrida/presencial sin
+  `public_city`+`public_country`, o sin `publishedAt`/descripción → `null` (sin schema). Salario
+  sólo desde compensación estructurada (`compensationBand` texto libre nunca se emite);
+  `directApply` y `validThrough` NUNCA se emiten (flujo con paso intermedio; sin expiración real —
+  el retiro es el 404 del unpublish). `employmentType` por mapeo exacto conservador
+  ("Jornada completa"→FULL_TIME; "Contrato indefinido" se omite). `hiringOrganization` = marca
+  Efeonce desde el brand SSOT (`EFEONCE_BRAND_NAME`/`EFEONCE_URL_HTTPS`), no la razón social.
+  Emisión gated por `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` (Vercel-only, default OFF, ledger);
+  el canonical explícito de la leaf publicada NO depende del flag.
+
+**Invariantes:**
+
+- **NUNCA** exponer contenido nuevo fuera de `buildPublicOpeningPayload()` (allowlist con set
+  cerrado de llaves + sentinels internos en el test anti-leak).
+- **NUNCA** emitir `TELECOMMUTE` sin ≥1 país en `public_remote_eligible_countries`, ni convertir
+  región libre en país, ni bloquear publish por falta de países (omitir, no bloquear).
+- **NUNCA** derivar `baseSalary` de `public_compensation_band`; sólo `content.compensation`
+  estructurado y aprobado. Beneficios no son compensación.
+- **NUNCA** emitir `directApply` ni `validThrough`; el lifecycle honesto es published → 404.
+- **SIEMPRE** que el HTML de la descripción JSON-LD se genere, sale del mismo payload visible
+  (escape XSS + `serializeJsonLd` que neutraliza `</script>`).
+- El renderer (TASK-1741) consume `content` con fallback legacy; fixture canónica
+  `src/lib/hiring/public-careers/editorial-opening.fixture.ts`.
+
+Indexing API/sitemap quedan explícitamente FUERA (decisión + autorización + quota son follow-up;
+runbook de decisión en `docs/manual-de-uso/hr/operar-careers-publicas.md`).
+
 ## Delta 2026-08-12 — TASK-1688 (ADR): completitud de contacto del candidato — ubicación física y contrato
 
 **Decisión (Accepted 2026-08-12).** Los tres datos que el apply público aceptaba pero el command

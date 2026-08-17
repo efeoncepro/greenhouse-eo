@@ -1,5 +1,49 @@
 # TASK-1740 — Public Vacancy Content and Google JobPosting Foundation
 
+## Delta 2026-08-17 — Slices 1-4 code complete; rollout pendiente
+
+**Estado: `code complete, rollout pendiente`.** Implementado local-first en `develop` (4 commits, sin push):
+
+- **Slice 1** — `PublicOpeningContent` v1 (`src/lib/hiring/public-careers/public-content.ts`): write
+  path estricto (422 `hiring_opening_public_content_invalid`) + read path leniente (corrupto/versión
+  desconocida → `null` = fallback legacy). Compensación estructurada opcional (ISO 4217 + rango + unidad).
+- **Slice 2** — Migración `20260817141406137` aplicada y verificada contra PG
+  (`public_content_json` JSONB + `public_remote_eligible_countries` TEXT[] con CHECK alpha-2);
+  `updateHiringOpening` re-valida siempre (países vía `isValidCountryCode`: `LATAM`/`Global` rechazados —
+  verificado en vivo sobre draft `EO-OPN-0075` con cleanup); allowlist `buildPublicOpeningPayload`
+  extendida (`content`, `remoteEligibleCountries`) con anti-leak test de set cerrado + sentinels.
+  El `PATCH /api/hiring/openings/{id}` transporta los campos nuevos sin cambio de ruta (parity).
+- **Slice 3** — `job-posting.ts` (server-only, puro, fail-closed): remota exige países elegibles
+  (TELECOMMUTE + applicantLocationRequirements), híbrida/presencial exige city+country (jobLocation);
+  baseSalary sólo estructurado; sin `directApply`/`validThrough`; `employmentType` mapeo exacto
+  conservador; `hiringOrganization` desde brand SSOT (`EFEONCE_BRAND_NAME` nuevo). Canonical explícito
+  en la leaf publicada (sin flag); schema detrás de `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED`
+  (Vercel-only, default OFF, fila en ledger). Runtime local verificado: canonical presente, cero
+  `ld+json` con flag OFF, vacante cerrada → 404.
+- **Slice 4** — Fixture canónica para TASK-1741 (`editorial-opening.fixture.ts`, self-verificada por
+  test), ADR delta 2026-08-17 en `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`, doc funcional
+  `careers-publicas.md` §Contenido estructurado y SEO técnico, manual
+  `operar-careers-publicas.md` §Contenido estructurado y schema (incluye runbook de decisión
+  sitemap/Indexing API), delta en TASK-1741.
+
+**Open Questions resueltas:** (1) `hiringOrganization` = marca Efeonce (`EFEONCE_BRAND_NAME` +
+`EFEONCE_URL_HTTPS` del SSOT), no la razón social; (2) remota sin países normalizados → **omitir
+schema, no bloquear publicación** (bloquear rompería re-publicar los 2 openings vivos, ambos `LATAM`);
+(3) `validThrough` → se omite (no existe expiración real; el retiro es el 404 del unpublish).
+
+**Rollout pendiente (no ejecutable sin push/deploy + coordinación humana):**
+
+1. Confirmar con People/Legal países elegibles reales de las vacantes remotas y setearlos vía PATCH.
+2. Push/release; prender `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` en staging → Rich Results Test →
+   producción (secuencia en el manual §Prender el schema JobPosting).
+3. Smoke lifecycle en runtime desplegado: publicar fixture autorizada → validar HTML/schema/canonical →
+   pausar → 404 sin schema.
+4. `pnpm build` de producción como gate final (pendiente de autorización del operador — regla de
+   memoria: el build completo consume ~30GB).
+
+Evidencia local: `pnpm test` full **1522 files / 11498 tests verdes** (2026-08-17); `pnpm local:check`
+verde por slice; suite `public-careers` 71 passed.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -178,11 +222,11 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk. *(aditiva, sin backfill de copy, Down completo)*
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling. *(information_schema + write→read vivo + curl local)*
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks. *(422 canónico + anti-leak sentinels)*
 
 ## Capability Definition of Done — Full API Parity gate
 
@@ -291,11 +335,11 @@ Para JSON-LD, implementar un builder server-only y testeado. Debe usar el `title
 
 ## Acceptance Criteria
 
-- [ ] El contenido público estructurado tiene owner, validación, fallback y pruebas de no leakage; no depende de heurísticas como única fuente.
-- [ ] Una vacante publicada genera canonical y JSON-LD válido desde el mismo contenido visible; vacantes legacy y sin datos remotos completos degradan sin schema falso ni páginas vacías.
-- [ ] `JobPosting` remoto sólo se emite con países elegibles explícitos y no declara salario/directApply/beneficios como hechos cuando no existe aprobación estructurada.
-- [ ] Pausar/cerrar deja la vacancy fuera del reader público y sin schema; la aplicación y el formulario no fueron modificados.
-- [ ] TASK-1741 recibe contrato, fixture y fallback suficientes para implementar una UI sin tocar DB/publication.
+- [x] El contenido público estructurado tiene owner, validación, fallback y pruebas de no leakage; no depende de heurísticas como única fuente. *(public-content.ts + anti-leak test extendido)*
+- [x] Una vacante publicada genera canonical y JSON-LD válido desde el mismo contenido visible; vacantes legacy y sin datos remotos completos degradan sin schema falso ni páginas vacías. *(canonical verificado en runtime local; JSON-LD por tests — Rich Results en staging/prod pendiente de rollout)*
+- [x] `JobPosting` remoto sólo se emite con países elegibles explícitos y no declara salario/directApply/beneficios como hechos cuando no existe aprobación estructurada. *(job-posting.test.ts 14 casos)*
+- [x] Pausar/cerrar deja la vacancy fuera del reader público y sin schema; la aplicación y el formulario no fueron modificados. *(EO-OPN-0050 cerrada → 404 verificado; cero cambios en apply)*
+- [x] TASK-1741 recibe contrato, fixture y fallback suficientes para implementar una UI sin tocar DB/publication. *(editorial-opening.fixture.ts + delta en su spec)*
 
 ## Verification
 

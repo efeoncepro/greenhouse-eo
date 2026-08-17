@@ -1,5 +1,16 @@
 # TASK-1741 — Public Careers Editorial Detail Renderer
 
+## Delta 2026-08-17
+
+- `TASK-1740` quedó code complete: el contrato está disponible — `PublicOpeningPayload.content`
+  (`PublicOpeningContent` v1: promise/intro/outcomes/workItems/essentials/learnables/evidenceAsk/
+  remoteModel/processSteps/benefits/compensation) + `remoteEligibleCountries`, con fallback legacy
+  (`content: null` en todos los openings actuales). Fixture canónica para el renderer:
+  `src/lib/hiring/public-careers/editorial-opening.fixture.ts` (`editorialOpeningFixture` +
+  `legacyOpeningFixture`). Canonical + JSON-LD ya se emiten desde la page (schema detrás de
+  `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED`, OFF); el renderer NO escribe schema ni metadata.
+  El bloqueo `Blocked by: TASK-1740` queda levantado en cuanto 1740 cierre lifecycle.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

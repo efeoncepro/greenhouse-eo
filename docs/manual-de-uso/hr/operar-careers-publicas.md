@@ -154,6 +154,69 @@ La distribución en redes o grupos externos ocurre **después** de publicar y ve
 
 Conserva el registro de campaña bajo `docs/operations/hiring/` con opening, URL, copy aprobado, destinos, estado observado y moderaciones pendientes. Ejemplo: [distribución de Facebook del 2026-08-11](../../operations/hiring/2026-08-11-facebook-vacancy-distribution.md).
 
+## Contenido estructurado y schema de Google (TASK-1740)
+
+Una vacante puede llevar, además de la prosa, un bloque estructurado que el
+renderer editorial y el JSON-LD `JobPosting` consumen desde la misma fuente.
+
+### Autorar el bloque estructurado
+
+1. Prepara el paquete de evidencia (skill de Talent): promesa, resultados,
+   trabajo real, essentials/learnables, evidencia pedida, modelo remoto,
+   proceso y beneficios aprobados. No inventes beneficios ni compensación.
+2. Escribe el bloque por API con el command canónico:
+
+```bash
+pnpm staging:request PATCH /api/hiring/openings/<openingId> '{"publicContent":{"version":1,"promise":"…","outcomes":["…"],"processSteps":["…"]}}'
+```
+
+3. Un bloque inválido responde 422 `hiring_opening_public_content_invalid`;
+   corrige y reintenta. `publicContent: null` limpia el bloque (vuelve el
+   fallback de prosa).
+
+### Declarar países elegibles (solo remoto)
+
+1. Confirma con People/Legal los países donde realmente se puede contratar.
+2. Decláralos como ISO alpha-2: `{"publicRemoteEligibleCountries":["CL","CO"]}`.
+   `LATAM`/`Global` son display, no países: el API los rechaza.
+3. Sin países declarados la vacante sigue publicable, pero **no emite schema**
+   (comportamiento correcto, no un bug).
+
+### Prender el schema JobPosting
+
+1. El flag `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` vive **solo en Vercel**
+   (SSR del detalle público). Default OFF.
+2. Prende primero staging (`vercel env add … preview` + redeploy), abre el
+   detalle de una vacante con países/ciudad declarados y valida el HTML con
+   el [Rich Results Test](https://search.google.com/test/rich-results).
+3. Verifica el lifecycle: pausa la vacante (`DELETE
+   /api/hiring/openings/{id}/publish?mode=paused`) y confirma que la URL
+   responde 404 sin schema; restaura solo con el command de publish.
+4. Producción: mismo procedimiento tras evidencia en staging. Rollback:
+   `vercel env rm` + redeploy (la página y el canonical no cambian).
+
+### Qué no hacer
+
+- No conviertas texto regional (`LATAM`) en países para "destrabar" el schema.
+- No pegues compensación de texto libre en `compensation` estructurada sin
+  aprobación de Finance/People.
+- No prometas indexación: el Rich Results Test valida elegibilidad, Google
+  decide indexar.
+
+### Sitemap e Indexing API (runbook de decisión — follow-up)
+
+Hoy NO hay sitemap de vacantes ni notificación a Google; el descubrimiento es
+orgánico (enlaces desde el listing). Antes de implementar cualquiera de los
+dos, el owner de Growth/SEO debe decidir y autorizar:
+
+1. **Sitemap**: quién es dueño del sitemap del dominio
+   `greenhouse.efeoncepro.com`, y si las URLs `/public/careers/*` entran ahí o
+   en un sitemap propio. Sin decisión de propiedad, no crear uno paralelo.
+2. **Indexing API**: exige service account autorizada en Search Console del
+   dominio + quota + task propia. Su beneficio es acelerar alta/baja de
+   vacantes; su costo es credencial y mantenimiento. No se implementa sin esa
+   autorización explícita (queda como follow-up declarado en TASK-1740).
+
 ## Verificar rutas
 
 1. Abre `/public/careers`.

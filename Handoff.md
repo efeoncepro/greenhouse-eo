@@ -2,6 +2,27 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-17 — TASK-1740 code complete: contenido público estructurado + fundación JobPosting
+
+Slices 1-4 en `develop` local (4 commits, sin push). El opening gana `public_content_json`
+(`PublicOpeningContent` v1: promesa/outcomes/trabajo/essentials/learnables/evidencia/modelo
+remoto/proceso/beneficios/compensación estructurada; write 422 estricto, read leniente con fallback
+legacy de prosa) y `public_remote_eligible_countries` (ISO alpha-2 reales — `LATAM`/`Global` se
+rechazan, verificado en vivo contra PG). El detalle público emite canonical explícito siempre y
+`JobPosting` JSON-LD detrás de `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` (Vercel-only, OFF, en
+ledger), con builder fail-closed desde el MISMO payload visible: remota sin países o presencial sin
+city+country ⇒ sin schema (hoy NINGUNA vacante viva emite schema — ambas son `LATAM` sin país, y eso
+es lo correcto, no un bug). Sin directApply, sin validThrough, salario sólo estructurado; el retiro
+es el 404 del unpublish. Decisiones: omitir schema en vez de bloquear publish (bloquear rompería
+re-publicar los 2 openings vivos); `hiringOrganization` = marca Efeonce del brand SSOT
+(`EFEONCE_BRAND_NAME` nuevo). El PATCH interno transporta los campos sin cambio de ruta (parity).
+TASK-1741 quedó desbloqueada con fixture (`editorial-opening.fixture.ts`) y delta en su spec.
+
+**Pendiente de rollout (bloquea `complete`):** países elegibles confirmados por People/Legal +
+push/release + flag staging→Rich Results Test→producción + smoke lifecycle desplegado. `pnpm build`
+de cierre pendiente de autorización del operador. Runbook: manual `operar-careers-publicas.md`
+§Contenido estructurado y schema de Google.
+
 ## 2026-08-17 — Tasks creadas para vacantes públicas: contrato SEO primero, renderer después
 
 Se registraron `TASK-1740` y `TASK-1741` como una partición deliberada. `TASK-1740` es la base

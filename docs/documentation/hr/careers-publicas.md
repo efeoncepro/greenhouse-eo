@@ -103,6 +103,44 @@ La oferta debe separar `Ubicacion` y `Modalidad` como datos de dominio:
 - `public_compensation_band` queda disponible como campo estructurado opcional,
   no publish-required hasta cerrar governance de bandas.
 
+## Contenido estructurado y SEO técnico (TASK-1740)
+
+Desde 2026-08-17 una vacante puede declarar un bloque de contenido estructurado
+candidate-facing (`public_content_json`, versionado v1) además de la prosa
+legacy: promesa, intro, resultados esperados, trabajo real, habilidades
+esenciales y aprendibles, evidencia solicitada, modelo remoto operativo, etapas
+del proceso, beneficios aprobados y compensación estructurada opcional
+(moneda ISO + rango + unidad). Reglas:
+
+- El bloque se escribe por el command canónico (`PATCH
+  /api/hiring/openings/{id}` con `publicContent`) y se valida siempre en el
+  store; un bloque inválido responde 422 y nunca llega a la base.
+- Un opening sin bloque (todos los existentes) degrada al fallback de prosa;
+  el renderer no muestra huecos.
+- La compensación estructurada es un hecho aprobado; el texto libre
+  `public_compensation_band` sigue existiendo pero nunca se convierte en
+  salario para SEO.
+
+La elegibilidad remota por país vive en `public_remote_eligible_countries`
+(códigos ISO 3166-1 alpha-2 reales, ej. `["CL","CO"]`). `LATAM` o `Global`
+son regiones de display, no hechos legales: no habilitan schema remoto.
+
+El detalle público de una vacante publicada emite ahora `canonical` explícito
+y, detrás del flag `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` (default OFF),
+JSON-LD `JobPosting` construido desde el mismo contenido visible:
+
+- Remota: `TELECOMMUTE` + países elegibles; sin países no hay schema.
+- Híbrida/presencial: `jobLocation` con `public_city` + `public_country`;
+  sin ambos no hay schema.
+- Nunca se emite `directApply` (hay paso detail → formulario) ni
+  `validThrough` (no existe expiración real); pausar/cerrar la vacante la
+  saca del reader público (404), que es la señal de retiro para Google.
+
+> Detalle técnico: `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
+> §Delta 2026-08-17 (TASK-1740); builder en
+> `src/lib/hiring/public-careers/job-posting.ts`; contrato en
+> `src/lib/hiring/public-careers/public-content.ts`.
+
 ## Voz pública y UX writing
 
 Careers es una superficie pública de employer brand. El copy visible vive en

@@ -3,6 +3,23 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-17 — TASK-1740: una vacante pública tiene contenido estructurado y schema honesto
+
+- **El contenido candidate-facing deja de vivir sólo en prosa parseada.** Un opening puede declarar
+  el bloque versionado `PublicOpeningContent` v1 (promesa, resultados, trabajo, essentials/learnables,
+  evidencia, modelo remoto, proceso, beneficios y compensación estructurada opcional). Se escribe por
+  el command canónico con validación estricta (422); su ausencia degrada al fallback legacy de prosa,
+  nunca a huecos. La allowlist pública sigue siendo la única puerta al navegador (anti-leak extendido).
+- **El schema de Google nace del mismo contenido visible y es fail-closed.** Canonical explícito en
+  toda leaf publicada; `JobPosting` JSON-LD detrás de `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED`
+  (Vercel-only, nace OFF). Remoto exige países elegibles ISO reales
+  (`public_remote_eligible_countries` — `LATAM`/`Global` se rechazan como país); híbrido/presencial
+  exige ciudad+país; salario sólo desde compensación estructurada; nunca `directApply` ni
+  `validThrough`. Pausar/cerrar retira URL y schema (404). Hoy ninguna vacante viva emite schema
+  (ambas son remotas `LATAM` sin país declarado) — comportamiento correcto por diseño.
+- Estado: `code complete, rollout pendiente` (países por confirmar con People/Legal, flag
+  staging→Rich Results→prod). TASK-1741 (renderer editorial) queda desbloqueada con fixture.
+
 ## 2026-08-17 — Backlog de Careers: contenido público/JobPosting y renderer editorial separados
 
 - Se registran `TASK-1740` y `TASK-1741` para mejorar el detalle de una vacante sin una regresión de
@@ -1020,18 +1037,3 @@ nunca se lee donde el runbook dice pero se dispara con prosa) e `ISSUE-144` (`ve
 confunde build saltado a propósito con fallido). Se desplegó además el batch SEO EPIC-022
 (TASK-1308/1309/1310, 322 archivos, 3 migraciones) y se corrigieron dos comandos documentados que las
 herramientas dejaron de aceptar.
-
-## 2026-08-09 — El release desbloquea el contract del cutover SEO; queda TASK-1677
-
-- **Verificado, no supuesto.** Tras el release: `main` trae `SEO_MODULE_KEYS_READ`, el canary del
-  provider contra producción da **100% verde** —con `track`/`untrack` devolviendo `400` en vez de
-  `404`, o sea que esas rutas ya existen— y el `ops-worker` corre una revisión que es **ancestro de
-  `main`**. Los otros dos Cloud Run no consumen SEO. Con eso caen las dos condiciones que mantenían
-  abierta la ventana de `ISSUE-143`.
-- **`TASK-1677` creada** para la fase contract, separada de `TASK-1310`: es `backend-data` de bajo
-  riesgo y no debe quedar atada a un ciclo de diseño abierto. 🔴 **El código va antes que la
-  migración, y no es preferencia**: lo impone el guardrail que se escribió tras el incidente —
-  primero dejas de leer la clave, después la apagas.
-- Falsos positivos de `task:lint` detectados al escribirla, ambos anotados como deuda de tooling: la
-  regla de placeholder lee la palabra española **"todo"** como el marcador inglés `TODO`, y lee unos
-  corchetes de tipo TS como placeholder (éste ya estaba en `TASK-1675`).
