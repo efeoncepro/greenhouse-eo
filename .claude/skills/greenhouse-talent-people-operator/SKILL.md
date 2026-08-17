@@ -1,6 +1,6 @@
 ---
 name: greenhouse-talent-people-operator
-description: World-class Talent Acquisition + People Ops + Workforce strategist for Efeonce/Greenhouse. Use for recruiting, sourcing, head hunting / executive search, inbound recruiting + employer brand, careers funnel, competency-based interview + assessment design and analysis, candidate experience, hiring for national (Chile) and global/remote talent, onboarding, people development, engagement, wellbeing/wellness, retention, and workforce planning / org design. Grounds foundational selection science (Schmidt & Hunter → Sackett 2022) in the 2026 reality (agentic AI in hiring + EU AI Act high-risk rules, skills-based hiring, multigenerational workforce, pay transparency, EOR/global-remote). Binds to the real Greenhouse Hiring/ATS domain + assessment engine. Defers money/compliance to greenhouse-payroll-auditor and contracts to the Workforce Contracting Studio.
+description: World-class Talent Acquisition + People Ops + Workforce strategist for Efeonce/Greenhouse. Use for recruiting, sourcing, head hunting / executive search, evidence-led inbound recruiting and public vacancy writing, employer brand, careers funnel, competency-based interview + assessment design and analysis, candidate experience, hiring for national (Chile) and global/remote talent, onboarding, people development, engagement, wellbeing/wellness, retention, and workforce planning / org design. Grounds foundational selection science (Schmidt & Hunter → Sackett 2022) in the 2026 reality (agentic AI in hiring + EU AI Act high-risk rules, skills-based hiring, multigenerational workforce, pay transparency, EOR/global-remote). Binds to the real Greenhouse Hiring/ATS domain + assessment engine. Defers money/compliance to greenhouse-payroll-auditor and contracts to the Workforce Contracting Studio.
 ---
 
 # Greenhouse Talent & People Operator
@@ -18,9 +18,9 @@ This skill is a **decision aid, not legal advice**. For statutory pay, contract 
 | Trigger | Lane |
 |---|---|
 | "open a vacancy / define the role / job brief" | Talent acquisition — intake + scorecard |
-| "redact a public vacancy / oferta laboral / job posting" | Job offer recipe + inbound recruiting; inside Greenhouse prefer the AI-assisted propose→confirm path (TASK-1385/1422 — see `references/greenhouse-runtime.md` §AI-assisted vacancy copy) |
+| "redact a public vacancy / oferta laboral / job posting" | Evidence-led job-offer recipe + inbound recruiting; load `references/inbound-recruiting-job-ad-research.md` before drafting. Inside Greenhouse prefer the AI-assisted propose→confirm path (TASK-1385/1422 — see `references/greenhouse-runtime.md` §AI-assisted vacancy copy) |
 | "source candidates / head hunt / find a senior X" | Sourcing + executive search |
-| "inbound recruiting / careers / employer brand / talent pool" | Inbound + candidate experience |
+| "inbound recruiting / careers / employer brand / talent pool" | Inbound + candidate experience; load `references/inbound-recruiting-job-ad-research.md` for the evidence-led full-funnel playbook before recommending a campaign, nurture or conversion change. |
 | "design the test / interview / competency assessment / rubric" | Assessment + structured interviewing |
 | "analyze this interview / evaluate this candidate by competencies" | Assessment analysis (structured, bias-aware) |
 | "ver el CV / documentos del candidato / revelar el RUT de un candidato" | Candidate documents — file vs identity (TASK-1714/1715; see the section below + `references/greenhouse-runtime.md` §Candidate documents) |
@@ -64,7 +64,26 @@ Recruiting fashion changes; **selection validity** is measured. Teach the 2026-c
 8. **Generations & 2026 trends** → `references/generations-trends-2026.md`. Boomer→Gen Alpha profiles, how attraction/assessment/retention change per generation, and the transversal 2026 trends.
 9. **Client squad design & staff augmentation (Talent-as-a-Service)** → `references/client-squad-design.md`. Assemble the human delivery capacity for a client using the canonical delivery-model axis: **Managed Squad**, **Staff Augmentation**, **Studio Access**, or an explicit hybrid by lanes. Keep that axis separate from engagement form (On-Going / On-Demand / Sample Sprint) and Creative Studio operating mode (`efeonce-managed` / `co-operated` / `client-operated`). Own role taxonomy × seniority, % dedication/FTE math, hierarchy, RACI, synergy map, pod archetypes, and the hand-offs to finance (loaded cost) + commercial (price) + the bid. Artifact: `templates/squad-blueprint.md`.
 
-Greenhouse runtime binding (domain, code paths, invariants) → `references/greenhouse-runtime.md`. Templates (scorecard, job brief, job offer recipe with inbound recruiting, sourcing map, interview guide, **squad blueprint**) → `templates/`.
+Greenhouse runtime binding (domain, code paths, invariants) → `references/greenhouse-runtime.md`. Evidence-led public vacancy / inbound research → `references/inbound-recruiting-job-ad-research.md`. Templates (scorecard, job brief, job offer recipe with inbound recruiting, sourcing map, interview guide, **squad blueprint**) → `templates/`.
+
+## Evidence-led public vacancy and inbound recruiting
+
+Apply this workflow whenever the output will attract candidates externally: a Careers detail page, job-board post, social distribution copy or an employer-brand campaign around an opening. A public vacancy is a conversion asset, not a polished version of an internal brief.
+
+1. Read `references/inbound-recruiting-job-ad-research.md` and `templates/job-offer-recipe.md`.
+2. Build a compact **vacancy evidence packet** before writing: accountable manager; employment/engagement model; country eligibility; time-zone and language expectations; approved compensation/benefits; real work; 3–5 observable first-year outcomes; essential versus learnable skills; process stages and response commitment.
+3. For a material or scarce role, benchmark at least five current comparable postings and extract only reusable patterns: title/search terms, first-fold promise, operating model, proof, requirements, benefits, process and CTA. Do not copy their claims or prose.
+4. Create a claim ledger. Every benefit, client/brand, scale, certification, flexibility or compensation claim must cite an internal owner/source or be marked `needs confirmation`. Do not convert an assumption into attractive copy.
+5. Draft from candidate value and demonstrable work: concrete problem → work and outcomes → evidence sought → what the organization supplies → transparent process → low-friction CTA. A long requirements list is not a strategy.
+6. For remote/global roles, stop before publication unless country eligibility, engagement path, time-zone overlap, language and benefit applicability are explicit. `Global` is not a substitute for an operating model.
+7. Verify leave and benefit claims against `docs/documentation/hr/sistema-permisos-leave.md` and the applicable policy/runtime. A candidate brief is not a policy source; do not promise marriage, parental, study, personal or any other leave not explicitly active and paid for the candidate's engagement.
+
+### Senior creative IC calibration
+
+- Do not inflate a Senior Visual/Brand/Graphic Designer into an Art Director, strategist or people manager. Declare the real mandate, decision rights and hands-on outputs.
+- Prefer a portfolio of existing work plus structured discussion of decisions over unpaid speculative work. A practical exercise, if necessary, must be short, job-related and paid or explicitly replaceable by an equivalent existing case.
+- Describe craft as evidence: visual systems, campaigns, identities, editorial/digital assets, templates, files or production constraints that are genuinely in scope. Never list a channel merely because it sounds senior.
+- The role promise may be ambitious, but it must expose a real tension the candidate will solve. For Efeonce, connect craft to clearer work, lower rework, reusable memory or client capability only where the role can actually influence it.
 
 ## Synergies (compose, don't duplicate)
 

@@ -30,6 +30,8 @@ Two engines feed the pipeline: **inbound** (they come to you) and **outbound/hea
 
 ### Inbound recruiting (careers as a marketing funnel)
 
+For a public vacancy, employer-brand campaign, Careers conversion improvement or Talent Pool nurture plan, load `inbound-recruiting-job-ad-research.md` in addition to this section. It is the evidence-led playbook: full funnel, candidate-value/proof map, realistic preview, consent, pay/conditions, measurement and controlled experiments.
+
 Inbound recruiting mirrors inbound marketing — and for Efeonce the same team logic applies (`seo-aeo`, `commercial-expert`):
 
 ```
@@ -40,14 +42,17 @@ hire (structured assessment) →
 delight (candidate experience → referrals + brand)
 ```
 
-- **Employer brand is GTM for talent.** Authentic content (real team, real work, real values) beats corporate-speak — especially for Gen Z, who distrust it (see `generations-trends-2026.md`).
-- **Candidate experience is a differentiator** in a candidate-driven market: transparent, respectful, fast journeys raise offer-acceptance and protect the brand ([AMS 2026](https://www.weareams.com/knowledge-base/what-are-the-top-talent-acquisition-trends-in-2026/)). Ghosting candidates is brand damage.
+- **Employer brand is GTM for talent.** Build it from verified work, constraints, people and mechanisms rather than culture claims. Treat each role page, community contribution and process touchpoint as a trust signal.
+- **Candidate experience is a differentiator.** Make the next step, evidence sought, likely timing and accommodation route explicit; timely, respectful closure is part of acquisition, not an afterthought.
 - **Talent pool**: keep warm relationships with silver-medalists and inbound interest even when no role is open. In Greenhouse this maps to `candidate_facet` on a Person plus a governed `talent_pool_membership`; the operator desk, tokenized candidate self-service and consent-gated invitation flow are live in production (TASK-1723–1726). Never infer future-contact consent from current-application consent.
 - **Careers surface** = the Greenhouse public careers landing (TASK-354). Same tokenized/public pattern serves the assessment (TASK-1363).
+- **Learning loop**: attribute every distribution route to one canonical opening, compare qualified progression rather than raw applies, and change one proposition/friction variable at a time. Never experiment with eligibility, accessibility, core criteria or unapproved claims.
 
 ### Public vacancy recipe (offer as inbound asset)
 
 The public offer is a conversion asset, not the internal job brief. After intake, use `templates/job-offer-recipe.md` to structure the candidate-facing vacancy:
+
+- First build the vacancy evidence packet and run the research protocol in `inbound-recruiting-job-ad-research.md`. A fluent draft without validated role truth, market context and claims is not ready to publish.
 
 - candidate promise and role mission first;
 - 3-5 success outcomes;
@@ -57,6 +62,8 @@ The public offer is a conversion asset, not the internal job brief. After intake
 - candidate-facing process with no internal template IDs;
 - compensation/location transparency;
 - nurture path through Talent Pool/Growth Forms when the candidate is not a fit today.
+
+For senior creative roles, sell a real individual-contributor mandate and the concrete work rather than turning the opening into a generic art-director manifesto. Portfolio evidence and a structured conversation beat an unpaid speculative exercise.
 
 ### Distribución externa en grupos
 

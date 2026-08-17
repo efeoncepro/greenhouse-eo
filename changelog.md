@@ -3,6 +3,15 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-17 — Vacantes públicas e inbound recruiting reforzados en la skill de Talent
+
+- Las skills espejo de Talent para Claude/Codex ahora exigen evidence packet, benchmark actual,
+  claim ledger y condiciones explícitas para roles remotos/globales antes de redactar una vacante.
+  La nueva referencia documenta evidencia y límites para atracción, realistic preview, inclusividad,
+  roles creativos senior, aplicación de baja fricción, candidate experience, Talent Pool consentido,
+  compensación, distribución y experimentación por quality-of-hire. Sin cambio de runtime ni de
+  política de beneficios.
+
 ## 2026-08-17 — Cierre del programa Hiring: Expediente + Scoring IA + Identidad (TASK-1734/1735/1736/1737/1738)
 
 - Hiring: cierre documental del programa. Las 5 tasks quedan `complete` con estado honesto y las
@@ -1075,32 +1084,3 @@ herramientas dejaron de aceptar.
   existe todavía" del doc funcional, ganó su sección con el estado de rollout declarado y su manual
   (`docs/manual-de-uso/growth/habilitar-portal-seo-cliente.md`); README, EPIC-022 y el ledger de flags
   quedaron sincronizados.
-
-## 2026-08-08 — TASK-1309: Auditoría del sitio, y con eso el conmutador SEO queda completo
-
-- **`/admin/growth/seo/audit` (tab Auditoría) COMPLETA** — cuarta y última tab de Search Visibility:
-  con ella las 4 rutas del conmutador navegan. Cliente puro de `readSiteAuditReport` +
-  `queueSiteAudit`. Salud con freshness explícito, issues como **lista priorizada** (no tabla plana),
-  drill `?issueGroup=` con las URLs afectadas, y estados que no se mezclan: un crawl que terminó sin
-  hallazgos es buena noticia, no un error, y `healthScore` null dice "Pendiente", nunca 0/100.
-- **Dos desviaciones deliberadas de la spec, ambas por evidencia.** (a) El wireframe pedía radialBar
-  de ApexCharts; se descartó porque TASK-1306 ya había probado en GVC que mide 0 en contenedor fluido
-  y no dibuja — se extrajo su arco SVG a `shared/SeoHealthGauge` y ahora lo comparten las dos
-  pantallas hermanas, que era el riesgo real de duplicarlo. (b) El copy prometía orden "por impacto y
-  esfuerzo", pero el contrato de datos no trae señal de esfuerzo: se curó un tier por check junto al
-  label es-CL —declarado como estimación nuestra en la UI— y el orden quedó severidad ▸ páginas ÷
-  esfuerzo, con la severidad como corte absoluto para que 400 imágenes sin `alt` no entierren un 5xx.
-- **Catálogo es-CL de los 34 checks del allowlist** (`GH_GROWTH_SEO_AUDIT_ISSUES`): el reader entrega
-  ids de máquina. Un check sin ficha se NOMBRA en vez de esconderse, y hay test de drift en ambos
-  sentidos que obliga a escribirla cuando el backend sume uno.
-- **`POST /api/admin/growth/seo/audit/run`** gateado por `growth.seo.audit.run` (distinta de
-  `observation.read`: diagnosticar y gastarle al proveedor son permisos distintos). 202, no 200. 6
-  códigos canónicos nuevos con `actionable` deliberado — el guard de idempotencia y el cupo agotado
-  NO ofrecen reintento; sólo la caída del proveedor sí.
-- **Tres hallazgos salieron de mirar los frames, no de los gates:** el drill volcaba 91 URLs en un
-  muro de ~5000px sin scroll interno (expulsaba de pantalla la lista que el operador venía
-  recorriendo), su encabezado quedaba en 3.25:1 sobre el fondo de costura, y las cifras de salud
-  flotaban sin ritmo sobre el ancho completo. Los cuatro gates de UI pasan (`ui:quality` 4.58/4.5).
-- Se commiteó además un checkpoint de TASK-1310 (trabajo de Codex que estaba sin commitear) cerrando
-  10 errores de typecheck que dejaban el árbol rojo y bloqueaban el gate de cualquier trabajo
-  paralelo. Esa task **sigue `in-progress`**: el checkpoint no la declara cerrada.
