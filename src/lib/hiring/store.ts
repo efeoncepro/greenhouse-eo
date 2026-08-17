@@ -38,6 +38,7 @@ import {
 import { HiringNotFoundError, HiringValidationError } from './errors'
 import { assertPublicTitleSeniorityConsistency, parseHiringPublicSeniority } from './public-seniority'
 import {
+  assertCanonicalEditorialUpdate,
   normalizePublicOpeningContent,
   parsePublicOpeningContent,
   parseRemoteEligibleCountries
@@ -974,6 +975,11 @@ export const updateHiringOpening = async (
 
     if (!rows[0]) throw new HiringNotFoundError('El opening no existe.', 'hiring_opening_not_found')
     const opening = normalizeHiringOpening(rows[0])
+
+    // publicContent v2 es la única fuente editorial. Una UI o agente legacy no puede
+    // cambiar sus proyecciones de compatibilidad y afirmar que actualizó la vacante.
+    // El operador canónico envía publicContent y las proyecciones derivadas en el mismo command.
+    assertCanonicalEditorialUpdate(opening.publicContent, input)
 
     // También gobierna borradores: si ambos campos existen, la transacción revierte
     // ante un código interno o una contradicción explícita en el título.

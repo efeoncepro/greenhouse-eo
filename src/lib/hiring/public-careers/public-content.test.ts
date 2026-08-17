@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import { HiringValidationError } from '../errors'
 import {
+  assertCanonicalEditorialUpdate,
   normalizePublicOpeningContent,
   parsePublicOpeningContent,
   parseRemoteEligibleCountries,
@@ -148,6 +149,26 @@ describe('normalizePublicOpeningContent — read path leniente', () => {
     expect(normalizePublicOpeningContent({ version: 1, outcomes: 'no-lista' })).toBeNull()
     expect(normalizePublicOpeningContent(undefined)).toBeNull()
     expect(normalizePublicOpeningContent(null)).toBeNull()
+  })
+})
+
+describe('assertCanonicalEditorialUpdate — fuente editorial única', () => {
+  it('bloquea ediciones legacy sobre v2 si el comando no actualiza publicContent', () => {
+    const content = parsePublicOpeningContent(validInput)
+
+    expect(() => assertCanonicalEditorialUpdate(content, { publicSummary: 'Otra promesa' })).toThrowError(
+      expect.objectContaining({ code: 'hiring_opening_editorial_v2_requires_canonical_content', statusCode: 422 })
+    )
+  })
+
+  it('permite proyecciones derivadas junto a publicContent y mantiene v1 editable para migración', () => {
+    const content = parsePublicOpeningContent(validInput)
+    const legacy = normalizePublicOpeningContent({ version: 1, promise: 'Promesa legacy' })
+
+    expect(() =>
+      assertCanonicalEditorialUpdate(content, { publicContent: validInput, publicSummary: validInput.promise })
+    ).not.toThrow()
+    expect(() => assertCanonicalEditorialUpdate(legacy, { publicSummary: 'Resumen migrable' })).not.toThrow()
   })
 })
 

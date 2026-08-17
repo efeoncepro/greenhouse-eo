@@ -41,8 +41,7 @@ export const hiringDesk: HiringDeskCopy = {
     candidates: 'Candidates',
     targetDate: 'Target date',
     drawerTitle: 'New demand',
-    create: 'Create demand',
-    createAndPublish: 'Create and publish'
+    create: 'Create demand'
   },
   pipeline: {
     ...esCL.pipeline,

@@ -60,7 +60,6 @@ export const hiringDesk: HiringDeskCopy = {
     compensationHint: 'Visible solo para el equipo de Hiring.',
     previewTitle: 'Vista previa',
     create: 'Crear demanda',
-    createAndPublish: 'Crear y publicar',
     createAnother: 'Crear y agregar otra',
     discardTitle: '¿Descartar cambios?',
     discardBody: 'Tienes cambios sin guardar.',

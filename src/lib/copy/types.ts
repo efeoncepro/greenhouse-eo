@@ -482,7 +482,6 @@ export interface HiringDeskCopy {
     compensationHint: string
     previewTitle: string
     create: string
-    createAndPublish: string
     createAnother: string
     discardTitle: string
     discardBody: string

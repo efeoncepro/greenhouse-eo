@@ -9,7 +9,8 @@
 // - Todo campo es contenido candidate-facing aprobado por el Publication Desk. Nada aquí
 //   puede transportar datos internos (budget/rate/risk/owner/cliente); la allowlist de
 //   `buildPublicOpeningPayload` sigue siendo la única puerta al navegador.
-// - El bloque es versionado (`version: 1`). Un payload persistido con versión desconocida
+// - El bloque canónico es versionado (`version: 2`). V1 permanece sólo como fallback de lectura;
+//   un payload persistido con versión desconocida
 //   se trata como ausente en el read path (fallback legacy), nunca se reinterpreta.
 // - La compensación estructurada es OPCIONAL y sólo se persiste cuando existe un rango
 //   monetario aprobado; los beneficios NUNCA se convierten en compensación.
@@ -387,6 +388,46 @@ export const isCanonicalPublicOpeningContent = (
   content: PublicOpeningContent | null | undefined
 ): content is PublicOpeningContent & { version: typeof PUBLIC_OPENING_CONTENT_VERSION } =>
   content?.version === PUBLIC_OPENING_CONTENT_VERSION
+
+type PublicEditorialProjectionUpdate = {
+  publicContent?: unknown
+  publicSummary?: unknown
+  publicDescription?: unknown
+  publicRequirements?: unknown
+  publicNiceToHave?: unknown
+  publicProcessNotes?: unknown
+}
+
+/**
+ * Impide que un cliente legacy cambie proyecciones de compatibilidad de una vacante v2.
+ * El command canónico puede persistir `publicContent` y sus proyecciones derivadas juntos;
+ * cualquier otra edición produciría dos versiones públicas contradictorias.
+ */
+export const assertCanonicalEditorialUpdate = (
+  currentContent: PublicOpeningContent | null | undefined,
+  input: PublicEditorialProjectionUpdate
+): void => {
+  const editsLegacyEditorialProjection = [
+    input.publicSummary,
+    input.publicDescription,
+    input.publicRequirements,
+    input.publicNiceToHave,
+    input.publicProcessNotes
+  ].some(value => value !== undefined)
+
+  if (
+    isCanonicalPublicOpeningContent(currentContent) &&
+    input.publicContent === undefined &&
+    editsLegacyEditorialProjection
+  ) {
+    throw new HiringValidationError(
+      'La vacante usa contenido editorial v2; actualiza publicContent en el mismo comando.',
+      'hiring_opening_editorial_v2_requires_canonical_content',
+      422,
+      { field: 'publicContent' }
+    )
+  }
+}
 
 const safeJsonParse = (value: string): unknown => {
   try {

@@ -32,7 +32,7 @@ Esta separación permite que dos candidatos de la misma vacante tengan tokens, t
 
 1. Abre `/agency/hiring` y selecciona `Nueva demanda`.
 2. Parte en blanco o usa una plantilla; revisa rol, área, seniority, skills, cupos, modalidad, fecha y resumen.
-3. Usa `Crear demanda` para dejarla en borrador. Usa la opción dividida `Crear y publicar` solo cuando el contenido público esté completo.
+3. Usa `Crear demanda` para dejarla en borrador. La creación rápida no publica: toda vacante nueva debe completar primero `publicContent` v2 mediante el operador canónico descrito en `operar-careers-publicas.md`.
 4. Si intentas cerrar con cambios, elige `Seguir editando` o `Descartar`.
 
 ## Operar el pipeline

@@ -44,7 +44,7 @@ import {
 import HiringDeskFrame from './HiringDeskFrame'
 import { hiringRequest } from './hiring-client'
 
-type CreateMode = 'create' | 'publish' | 'another'
+type CreateMode = 'create' | 'another'
 
 type DemandForm = {
   role: string
@@ -521,8 +521,8 @@ const DemandDeskView = ({
       await hiringRequest(`/api/hiring/openings/${opening.openingId}`, {
         method: 'PATCH',
         body: JSON.stringify({
-          status: mode === 'publish' ? 'active' : 'draft',
-          visibility: mode === 'publish' ? 'public_listed' : 'private_sourcing',
+          status: 'draft',
+          visibility: 'private_sourcing',
           publicTitle: form.role.trim(),
           publicSummary: form.summary.trim(),
           publicDescription: form.summary.trim(),
@@ -535,14 +535,6 @@ const DemandDeskView = ({
             form.workMode === 'remote' ? 'Remoto' : form.workMode === 'hybrid' ? 'Híbrido' : 'Presencial'
         })
       })
-
-      if (mode === 'publish') {
-        await hiringRequest(`/api/hiring/demands/${demand.demandId}`, {
-          method: 'PATCH',
-          body: JSON.stringify({ status: 'open' })
-        })
-        await hiringRequest(`/api/hiring/openings/${opening.openingId}/publish`, { method: 'POST' })
-      }
 
       setToast(copy.demand.created)
       resetForm()
@@ -1448,15 +1440,6 @@ const DemandDeskView = ({
                     transformOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                     anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
                   >
-                    <MenuItem
-                      onClick={() => {
-                        setMenuAnchor(null)
-                        void createDemand('publish')
-                      }}
-                    >
-                      <i aria-hidden='true' className='tabler-world-upload mie-2 text-success' />{' '}
-                      {copy.demand.createAndPublish}
-                    </MenuItem>
                     <MenuItem
                       onClick={() => {
                         setMenuAnchor(null)

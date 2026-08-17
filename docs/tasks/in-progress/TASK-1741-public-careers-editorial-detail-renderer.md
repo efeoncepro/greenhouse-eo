@@ -383,18 +383,18 @@ La variante se activa sólo tras revisar el mecanismo de flags existente. El lay
 
 ## Acceptance Criteria
 
-- [ ] La página de detalle adopta el patrón editorial acordado y mejora la jerarquía de rol, outcomes, trabajo, encaje, condiciones y beneficios sin una introducción corporativa genérica como primer bloque.
-- [ ] La hoja completa conserva navegación, header/footer, seniority, metadatos, contenido público, rail, responsive y exactamente los dos CTA actuales; no hay pérdida de datos ni tercer CTA.
-- [ ] El formulario y su ruta quedan fuera del cambio funcional; sólo se comprueba que ningún selector CSS compartido los afectó accidentalmente.
-- [ ] `publicSeniority` sólo acepta `Junior | Semi-senior | Senior | Lead`; UI e IA no admiten texto libre, el writer/DB bloquean otros valores, título/nivel coinciden y el renderer muestra `Senior` literalmente.
-- [ ] Una vacante legacy o parcial muestra todos los datos disponibles mediante fallback legible, sin huecos, overflow ni pérdida de requisitos/proceso.
-- [ ] El renderer cumple 1440/390, teclado, foco visible, landmarks/headings, contraste, preferencia de reducir movimiento y `scrollWidth === clientWidth`.
-- [ ] GVC premium before/after y scorecard documentan que el cambio es una mejora incremental y no una regresión visual.
-- [ ] El renderer sólo consume el payload público de TASK-1740 y no modifica el formulario, JSON-LD, canonical ni el comando de publicación.
+- [x] La página de detalle adopta el patrón editorial acordado y mejora la jerarquía de rol, outcomes, trabajo, encaje, condiciones y beneficios sin una introducción corporativa genérica como primer bloque.
+- [x] La hoja completa conserva navegación, header/footer, seniority, metadatos, contenido público, rail, responsive y exactamente los dos CTA actuales; no hay pérdida de datos ni tercer CTA.
+- [x] El formulario y su ruta quedan fuera del cambio funcional; sólo se comprueba que ningún selector CSS compartido los afectó accidentalmente.
+- [x] `publicSeniority` sólo acepta `Junior | Semi-senior | Senior | Lead`; UI e IA no admiten texto libre, el writer/DB bloquean otros valores, título/nivel coinciden y el renderer muestra `Senior` literalmente.
+- [x] Una vacante legacy o parcial muestra todos los datos disponibles mediante fallback legible, sin huecos, overflow ni pérdida de requisitos/proceso.
+- [x] El renderer cumple 1440/390, teclado, foco visible, landmarks/headings, contraste, preferencia de reducir movimiento y `scrollWidth === clientWidth`.
+- [x] GVC premium before/after y scorecard documentan que el cambio es una mejora incremental y no una regresión visual.
+- [x] El renderer sólo consume el payload público de TASK-1740 y no modifica el formulario, JSON-LD, canonical ni el comando de publicación.
 - [x] Todas las vacantes v2 muestran el mismo orden de regiones y los bloques corporativo/beneficios centrales; ausencia de datos obligatorios se bloquea antes del publish, no se disfraza con placeholder.
 - [x] Se renderizan como máximo tres `additionalSections` en la única zona reservada después de `El trabajo`, con semántica narrativa/lista/hitos y sin HTML, CTA ni estilos arbitrarios.
 - [x] `preferred` se muestra como `Deseable, no excluyente`, `learnables` sólo como aprendizaje real y la colaboración explicita equipo, reporte, idioma, solapamiento y ritmo.
-- [ ] Tests y GVC cubren v2 completo, v1 parcial, legacy y contenido largo en 1440/390 sin cambiar los dos enlaces de postulación.
+- [x] Tests y GVC cubren v2 completo, v1 parcial, legacy y contenido largo en 1440/390 sin cambiar los dos enlaces de postulación.
 
 ## Verification
 
@@ -403,6 +403,20 @@ La variante se activa sólo tras revisar el mecanismo de flags existente. El lay
 - tests focales de `CareersDetailView`/view model y assertions de CTA/fallback
 - `pnpm fe:capture <scenario> --env=staging` para 1440 y 390 + revisión GVC premium
 - teclado, foco, preferencia de movimiento reducido, `scrollWidth`, console/hydration/HTTP y compare before/after
+
+### Evidencia local 2026-08-17
+
+- Build productivo y typecheck con heap de 8 GB: PASS.
+- Suite focal del contrato, renderer, schema, publicación y seniority: 88 tests PASS; refuerzo posterior de
+  fuente editorial única: 35 tests PASS.
+- GVC premium local completo: `.captures/2026-08-17T16-19-21_task1741-careers-editorial-detail/`,
+  1440 px + 390 px, cero errores de runtime y exactamente dos enlaces de postulación.
+- Scorecard: `docs/ui/reviews/TASK-1741-public-careers-editorial-detail-renderer.scorecard.json`, promedio
+  4,66 y piso 4,5.
+- El quick-create de Hiring queda sólo en borrador; el writer rechaza ediciones legacy sobre una vacante v2
+  si el command no incluye `publicContent`. El publish canónico sigue siendo
+  `pnpm hiring:publish-vacancy --file <brief.json>`/API compartida.
+- Estado honesto: code complete; la migración, activación de flags y GVC/smoke desplegado siguen pendientes.
 
 ## Closing Protocol
 
