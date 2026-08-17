@@ -1,6 +1,6 @@
 # GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1 — Canonicalización de identidad del intake de candidatos: evidencia inmutable, display person-first y remediación gobernada
 
-- **Status**: Proposed
+- **Status**: Accepted (2026-08-17 — decisión autorizada por el CEO el 2026-08-16 e **implementada**: Slices 1–4 mergeados, `HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED` creada ON en staging el 2026-08-16 y la remediación histórica **ejecutada** con 3 personas reales corregidas + 2 perfiles QA podados. Producción sigue OFF hasta el canary del runbook)
 - **Date**: 2026-08-16
 - **Deciders**: CEO (autorización ejecutiva 2026-08-16, sesión de operador — misma figura que `TASK-1734`; ver su `## Delta 2026-08-16`) · agente ejecutor Slice 0 `TASK-1736` (skill `arch-architect`)
 - **Tags**: hiring, ats, identity, privacy, data-quality, governance

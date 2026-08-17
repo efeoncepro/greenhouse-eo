@@ -1,6 +1,6 @@
 # GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1 — Run asíncrono de scoring IA por assessment + revisión por excepción gobernada
 
-- **Status**: Proposed
+- **Status**: Accepted (2026-08-17 — decisión autorizada por el CEO el 2026-08-16 e **implementada**: Slices 0–6 + workbench `TASK-1738` mergeados, migración aplicada y verificada contra PG real. **Aceptar ≠ prender**: los flags siguen OFF en todos los runtimes y el gate de promoción sigue bloqueante — hoy por VOLUMEN del gold set, 11 respuestas humanas calificadas contra un piso de 49)
 - **Date**: 2026-08-16
 - **Deciders**: CEO (autorización ejecutiva 2026-08-16, sesión de operador) · agente ejecutor Slice 0 `TASK-1734` (skill `arch-architect`)
 - **Tags**: hiring, ats, ai, ops-worker, governance, privacy

@@ -3,6 +3,25 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-17 — Cierre del programa Hiring: Expediente + Scoring IA + Identidad (TASK-1734/1735/1736/1737/1738)
+
+- Hiring: cierre documental del programa. Las 5 tasks quedan `complete` con estado honesto y las
+  dos ADRs pasan a **`Accepted`** — la decisión fue autorizada por el CEO e implementada.
+  **Aceptar no es prender:** el rollout de cada flag manda y vive en el ledger.
+- Hiring: **remediación de nombres EJECUTADA** el 2026-08-16 — 3 personas reales corregidas
+  (Valentina Villa, Stana Medina, Aldo Romano) con actor + razón en auditoría, 2 perfiles QA
+  podados a mano. Los docs que citaban "4 propuestas = 2 humanos" quedaron corregidos.
+- Hiring: `HIRING_EVALUATION_DOSSIER_AI_ENABLED` y
+  `HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED` quedan **ON en staging** (2026-08-16, CEO) y
+  **OFF en producción**. El ledger decía OFF en todos lados: corregido contra `vercel env ls`.
+- Hiring: **el gate del gold set ya no está bloqueado por instrumento, sino por volumen.** El
+  muestreo real encontró **11 respuestas humanas calificadas contra un piso de 49**: falta DATA,
+  no personas. El carril uno-a-uno es el modo correcto hoy porque es el que genera esa materia
+  prima; el instrumento (muestreo estratificado + rúbrica BARS + protocolo en ciego) se entrega
+  vacío y ningún agente puede llenarlo.
+- Hiring: el expediente ya no trunca en silencio (límite **20.000**, error explícito en vez de
+  recorte) y la nota reparada se lee como historia con chip **"Versión superada"**.
+
 ## 2026-08-17 — Workbench de scoring IA + escala explícita de criterios (TASK-1738, TASK-1734)
 
 - Hiring: el **workbench de revisión del scoring IA** queda operable desde la card del assessment
@@ -1085,16 +1104,3 @@ herramientas dejaron de aceptar.
 - Se commiteó además un checkpoint de TASK-1310 (trabajo de Codex que estaba sin commitear) cerrando
   10 errores de typecheck que dejaban el árbol rojo y bloqueaban el gate de cualquier trabajo
   paralelo. Esa task **sigue `in-progress`**: el checkpoint no la declara cerrada.
-
-## 2026-08-08 — TASK-1310: surfaces cliente SEO para Grupo Berel (code complete local)
-
-- Se construyeron las tres direcciones aprobadas como una familia: dashboard `masterDetail`
-  `/growth/seo`, quadrant 360 SEO×AEO y report artifact `/growth/seo/report` con render web + print.
-- El report agrega `modelFromSeoReport` sobre el mismo `ReportArtifactModel` del AEO; no duplica scoring,
-  no expone costos/provider snapshot y mantiene `clientPortal`/`attachment` público-safe.
-- Grupo Berel quedó verificable con assignment SEO activo y gate `growth.seo.report.read_client` scope `own`.
-  GVC local desktop + mobile pasó sin errores de consola, página, hidratación ni HTTP; el desktop no tiene
-  findings axe. Los warnings mobile del shell global y el rollout staging/prod quedan declarados en
-  `docs/tasks/in-progress/TASK-1310-growth-seo-client-dashboard-report-artifact.md`.
-- GCloud/ADC y proxy PostgreSQL renovados/verificados. Lint, 28 tests focales, task lint y reachability
-  pasan. No se ejecutó build completo para proteger recursos; no hubo push/deploy.

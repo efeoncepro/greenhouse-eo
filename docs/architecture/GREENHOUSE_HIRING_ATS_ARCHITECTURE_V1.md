@@ -1623,3 +1623,107 @@ Superficie: tab `expediente` de `/agency/hiring/applications/[applicationId]` (r
 `HIRING_EVALUATION_DOSSIER_AI_ENABLED` sigue OFF en producción (dueño TASK-1735; con el flag OFF
 la UI muestra el estado honesto `ai-off`) y la evidencia visual del panel de propuesta con datos
 reales queda pendiente de staging.
+
+## Delta 2026-08-17 — Contratos que el primer uso real corrigió (TASK-1735, TASK-1734, TASK-1738)
+
+Tres correcciones de contrato descubiertas al ejercer el dominio con datos reales, no por tests.
+Las tres comparten una misma lección: **un contrato implícito se rompe en silencio**, y lo hace
+justo donde nadie está mirando.
+
+### 1. La nota del expediente no se trunca en silencio (TASK-1735, límite 20000)
+
+El primer confirm humano de producción-local (propuesta `hdsp-384b740a`) persistió la nota en
+exactamente **8000 caracteres** — el techo del CHECK `hiring_application_note_body_md_check` —
+mientras el markdown del borrador medía 8240. `renderEvaluationDossierMarkdown` recortaba antes del
+insert y el análisis quedó cortado a mitad de frase. **El panel no lo delataba** porque renderiza
+desde `proposedJson`; todo consumer del `bodyMd` (API, export, Nexa, MCP) leía un documento
+incompleto.
+
+- **Migración aditiva**: CHECK del body a `1..20000` (widening puro — 8000 era conservador sin
+  fundamento para narrativa de evaluación con evidencia citada). Aplicada y verificada contra PG real.
+  `HIRING_APPLICATION_NOTE_BODY_MAX` es el espejo exacto del CHECK.
+- **El write path falla loud**: `assertDossierBodyWithinLimit` → 400 `hiring_dossier_body_too_long`
+  con el largo real en un mensaje es-CL. **Truncar sin avisar es justo el bug que produjo esto.**
+- **Reparación append-only**: `scripts/hiring/repair-truncated-dossier-notes.ts` reconstruye el texto
+  íntegro desde el `proposed_json` del ledger y registra una nota **NUEVA** vía
+  `recordHiringApplicationNote` con `context_json.supersedesNoteId` + `reason='truncation_repair'`.
+  Idempotente. La fila superada **no se muta** — el ledger sigue siendo append-only.
+
+**Invariante para agentes:** **NUNCA** recortar un cuerpo para que quepa en un CHECK. Si no cabe,
+el write falla con el largo real. Un documento mutilado que se ve entero en una pantalla es peor
+que un error.
+
+### 2. La nota superada se muestra como historia, no como vigente (TASK-1735)
+
+Reparar generó el problema derivado: dos notas, una correcta y una truncada, ambas visibles como
+vigentes. El reader deriva `supersededByNoteId` **desde la nota posterior**
+(`context_json.supersedesNoteId`), nunca mutando la fila superada, y el panel la marca con el chip
+**"Versión superada"** + tratamiento atenuado.
+
+**Invariante para agentes:** en un ledger append-only, el estado "superado" se **deriva en el
+reader** desde la referencia de la fila posterior. **NUNCA** agregar una columna mutable
+`superseded` a la fila vieja: eso convierte el append-only en un update disfrazado.
+
+### 3. La escala de `perCriterion` se declara, no se supone (TASK-1734, policy `v1_1`)
+
+`per_criterion_contradictory` disparaba en **11 de 14** items del primer run real — y disparaba
+justo en las respuestas **BUENAS**. El scorer devolvía **aportes ponderados que SUMAN el score
+global** (91 = 18+25+25+23, la escala que la rúbrica del banco declara en su propio texto) y el
+router los comparaba contra su **PROMEDIO**. Con 4 criterios de 25 puntos, un 91 sano tiene promedio
+22,75 → delta 68 ≫ 25 → contradicción falsa **por construcción**: cuanto mejor la respuesta, más
+contradictoria se veía. Efecto: `batch_eligible` muerto y el operador revisando todo a mano — el
+subsistema perdía su razón de ser.
+
+La causa no fue un `mean` mal tipeado: fue un **contrato implícito**. El prompt v1 pedía "el puntaje
+por criterio" y el schema declaraba 0–100 por criterio; *aporte ponderado* y *nota independiente*
+eran lecturas igual de válidas, y el modelo alternaba entre ambas según la calidad de la respuesta.
+
+- **Contrato**: escala declarada `weighted_contribution` (`weight` + `score` ≤ `weight`); el schema
+  exige `weight` y el sanitizer normaliza y acota el drift de escala propia.
+- **Prompt**: pide la escala explícitamente (`...scoring.v2`; las proposals v1 quedan stale).
+- **`summarizeCriterionContribution`**: única traducción aportes → score global implicado.
+- **Router**: compara contra el implicado, bajo policy `...risk_policy.v1_1`.
+- **Workbench**: el aporte se lee **sobre su peso** (`18 / 25`), no como nota suelta.
+
+Replay de los 14 proposals reales: **11/14 → 2/14**, y las 2 restantes son contradicciones reales
+del modelo (global 21 con aportes que implican 65).
+
+**Invariante para agentes:** **NUNCA** dejar que un consumer infiera la escala de un valor devuelto
+por un LLM. La escala se **declara en el contrato** (nombre del modo + `weight`), se valida en el
+schema y se traduce en UN solo helper. Un prompt ambiguo produce un dato ambiguo, y el modelo
+alterna entre lecturas sin avisar.
+
+### 4. Instrumento del gold set y su hallazgo de volumen (TASK-1734)
+
+El gate de promoción sigue **bloqueante**, pero ya no por falta de instrumento: `pnpm
+hiring:ai:gold-set-sample` entrega muestreo estratificado por competencia × banda sobre respuestas
+reales anonimizadas (semilla determinística, casos difíciles incluidos, **estratos incompletos
+declarados sin rellenar**), la rúbrica de anclaje conductual BARS derivada del banco real y el
+protocolo de rating en ciego con sus 3 rutas y su alcance honesto. El gate es consciente de ruta.
+
+**Hallazgo del muestreo real:** la DB tiene **11 respuestas humanas calificadas contra un piso de
+49**. La ruta A (doble rating independiente + adjudicación) **no es ejecutable hoy por falta de
+DATOS, no de personas**. El carril uno-a-uno es el modo correcto ahora mismo y es precisamente lo
+que genera esa materia prima.
+
+**Invariante para agentes:** **NINGÚN** rating humano puede ser generado por un agente. El
+instrumento se entrega **vacío**. Y **NUNCA** describir el gold set como "pendiente de personas"
+cuando está pendiente de **volumen**: son bloqueos distintos con planes de acción distintos.
+
+### 5. El frame real como evidencia (TASK-1738)
+
+Correr GVC sobre un run **REAL** con `claude-sonnet-5` destapó lo que ningún test verde atrapó:
+`manifestSummary` renderizaba `{a}/{a}` y por lo tanto **decía siempre 100%** mientras los gates
+debajo decían "faltan 10" — exactamente el bug class que esa superficie existe para impedir —,
+`warning.main` como texto daba 1,74:1 en las dos frases más load-bearing, la cobertura honesta se
+iba con el scroll y `sx={{ ms: 1 }}` no aplicaba margen alguno porque `ms` no existe en MUI.
+
+**Invariante para agentes:** una superficie cuyo propósito es **no mentir sobre cobertura** debe
+verificarse mirando el frame real con datos reales. Los tests verdes no vieron ninguno de estos
+cinco defectos.
+
+Funcional `docs/documentation/hr/expediente-de-evaluacion.md` +
+`docs/documentation/hr/scoring-ia-de-assessments.md` + `docs/documentation/hr/gold-set-rubrica-de-anclaje.md` ·
+manual `docs/manual-de-uso/hr/operar-expediente-de-evaluacion.md` +
+`docs/manual-de-uso/hr/operar-scoring-ia-assessments.md` +
+`docs/manual-de-uso/hr/calificar-gold-set-de-referencia.md`.

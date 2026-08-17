@@ -1,9 +1,9 @@
 # Operar el Expediente de Evaluación (pantalla + API)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-08-16 por Claude (TASK-1735)
-> **Ultima actualizacion:** 2026-08-16 por Claude (TASK-1737 — sección "Desde la pantalla")
+> **Ultima actualizacion:** 2026-08-17 por Claude (cierre del programa — chip "Version superada", limite 20.000, flag ON en staging)
 > **Documentacion funcional:** [expediente-de-evaluacion.md](../../documentation/hr/expediente-de-evaluacion.md)
 
 ## Para qué sirve
@@ -72,8 +72,23 @@ encuentras un error, escribes una nota nueva — el expediente es append-only po
 
 Abajo del todo: elige el tipo (Análisis de CV, Revisión de test, Nota de entrevista,
 General), escribe el cuerpo y pulsa **Agregar nota**. Hay un contador de caracteres (máximo
-8.000). La nota aparece en la línea de tiempo recién cuando el servidor confirma que quedó
+**20.000**). La nota aparece en la línea de tiempo recién cuando el servidor confirma que quedó
 guardada — si algo falla, verás el error, nunca una nota fantasma.
+
+Si un texto excede el límite, el servidor **responde con un error explícito**
+(`400 hiring_dossier_body_too_long`, con el largo real) y **no guarda nada**. Antes recortaba
+en silencio: el primer análisis confirmado de verdad quedó cortado a mitad de frase, y la
+pantalla no lo delataba porque muestra el borrador, no el texto guardado. Si ves ese error,
+acorta el texto o divídelo en dos notas — nunca asumas que "se guardó igual".
+
+### 7. Leer una nota marcada como "Versión superada"
+
+Como nada se edita ni se borra, corregir una nota es **agregar otra**. La reemplazada queda en
+la línea de tiempo con el chip **"Versión superada"** y tratamiento atenuado.
+
+Qué significa para ti: **esa no es la versión vigente.** Está ahí como historia (el registro es
+append-only por diseño), pero la buena es la nota nueva. No cites una nota con ese chip en una
+decisión de contratación.
 
 ### Si ves menos notas de las que esperabas
 
@@ -115,6 +130,10 @@ pnpm staging:request POST /api/hiring/applications/<happ-id>/dossier '{"action":
 ## Estados y señales
 
 - `409 hiring_dossier_ai_disabled`: el flag está OFF — las notas manuales siguen operando.
+  Hoy `HIRING_EVALUATION_DOSSIER_AI_ENABLED` está **ON en staging** (desde 2026-08-16) y **OFF en
+  producción**: en producción esta respuesta es la esperada, no una falla.
+- `400 hiring_dossier_body_too_long`: el cuerpo excede los 20.000 caracteres. El servidor no
+  guarda nada cortado — acorta o divide en dos notas.
 - `409 hiring_dossier_cv_not_ready`: la proyección del CV no está lista; reintenta cuando
   el review packet esté `ready`.
 - Propose repetido con las mismas fuentes devuelve la MISMA propuesta (idempotente, sin
@@ -129,6 +148,8 @@ pnpm staging:request POST /api/hiring/applications/<happ-id>/dossier '{"action":
 
 - No pedir el borrador "por fuera" (chat) y pegarlo a mano: se pierde el provenance.
 - No intentar editar/borrar notas por SQL — el trigger y los grants lo bloquean a propósito.
+- No leer ni citar una nota con chip **"Versión superada"** como si fuera la vigente: por
+  definición existe una nota posterior que la reemplaza.
 - No exponer contenido del expediente al candidato por ningún canal.
 
 ## Problemas comunes

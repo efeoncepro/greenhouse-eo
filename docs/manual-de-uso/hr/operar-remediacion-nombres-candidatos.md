@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso
 > **Version:** 1.1
 > **Creado:** 2026-08-16 por Claude (TASK-1736 Slice 4)
-> **Ultima actualizacion:** 2026-08-16 por Claude (auditoría doble: rollback real `--rollback`, retry idempotente, audit con actor/razón)
+> **Ultima actualizacion:** 2026-08-17 por Claude (cierre del programa — remediacion EJECUTADA 2026-08-16, 3 personas reales)
 > **Documentacion tecnica:** [identidad-de-candidatos-intake](../../documentation/hr/identidad-de-candidatos-intake.md) · runbook [candidate-identity-rollout](../../operations/runbooks/candidate-identity-rollout.md)
 
 ## Para qué sirve
@@ -52,9 +52,10 @@ Abre el archivo y revisa **cada** entrada. Elimina toda entrada que no apruebes.
 
 - ¿La propuesta es realmente el mismo nombre con el casing digno? Si dudas, elimínala (quedará
   para corrección manual caso a caso).
-- **Poda los perfiles sintéticos/QA**: en el caso real del 2026-08-16 el dry-run propuso 4 casos —
-  2 personas reales (que sí se remedian) y **2 perfiles de prueba QA que se podaron**: "arreglar"
-  un perfil de prueba es ruido en la auditoría, no valor.
+- **Poda los perfiles sintéticos/QA**: en la ejecución real del 2026-08-16 se aplicaron **3 personas
+  reales** (Valentina Villa, Stana Medina, Aldo Romano) y se **podaron a mano 2 perfiles de prueba
+  QA**: "arreglar" un perfil de prueba es ruido en la auditoría, no valor. Esa poda es el protocolo
+  funcionando, no una omisión.
 - No edites los valores `beforeFullName`/`proposedFullName` a mano: si la propuesta no te gusta,
   elimina la entrada (el apply detecta ediciones y las manda a `needs_review` sin tocar la DB).
 

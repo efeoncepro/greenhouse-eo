@@ -1,9 +1,9 @@
 # Identidad de Candidatos en el Intake — Evidencia, Display y Corrección Segura
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-16 por Claude (TASK-1736 Slice 4)
-> **Ultima actualizacion:** 2026-08-16 por Claude
+> **Ultima actualizacion:** 2026-08-17 por Claude (cierre del programa — remediacion ejecutada + flag ON en staging)
 > **Documentacion tecnica:** [GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1](../../architecture/GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1.md) · [GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md)
 
 ## Qué problema resuelve
@@ -53,19 +53,26 @@ masivo directo:
 
 1. **Dry-run**: un reporte de solo lectura lista los casos detectados y qué se propondría.
 2. **Allowlist humana**: un operador revisa el reporte línea a línea y aprueba (o poda) cada caso.
-   En la revisión real de 2026-08-16 se detectaron 4 casos: 2 personas reales y 2 perfiles de
-   prueba QA que se podaron de la lista.
+   En la revisión real de 2026-08-16 el operador aprobó a las personas reales y **podó los perfiles
+   de prueba QA** de la lista.
 3. **Apply**: se aplica de a un registro por vez, verificando que el nombre no haya cambiado desde
    el dry-run; cualquier sorpresa detiene el proceso sin tocar nada.
 4. **Reversible**: cada cambio guarda el valor anterior; se puede revertir registro por registro.
+
+**Este proceso ya se ejecutó.** El 2026-08-16, con autorización del CEO, se corrigieron **3 personas
+reales** — Valentina Villa, Stana Medina y Aldo Romano, que aparecían en minúsculas por el intake
+público — y se dejaron fuera **2 perfiles de prueba QA**. Cada corrección quedó registrada con quién
+la hizo y por qué; el nombre anterior se conserva. Ninguna de esas personas volverá a recibir un
+correo que la salude en minúsculas.
 
 Este proceso es independiente del interruptor (flag) del sistema nuevo: prender el flag no autoriza
 la remediación, y la remediación exige siempre la lista aprobada por un humano.
 
 ## Estado operativo
 
-El escritor nuevo (evidencia + corrección automática del caso evidente) está **apagado por defecto**
-(`HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED` OFF). Con el flag apagado, el intake se comporta
+El escritor nuevo (evidencia + corrección automática del caso evidente) está **encendido en staging**
+(desde el 2026-08-16, con autorización del CEO) y **apagado en producción**
+(`HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED`). Con el flag apagado, el intake se comporta
 exactamente como antes. El encendido sigue el runbook de rollout (staging → canary → producción) y
 dos señales en `/admin/operations` vigilan que nada quede pendiente ni silencioso.
 

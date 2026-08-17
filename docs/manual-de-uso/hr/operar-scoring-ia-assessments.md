@@ -1,9 +1,10 @@
 # Operar el Scoring IA de Assessments
 
 > **Tipo de documento:** Manual de uso / runbook operador
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-08-16 por Claude (TASK-1734)
-> **Ultima actualizacion:** 2026-08-17 por Claude (TASK-1738: revisar desde el workbench)
+> **Ultima actualizacion:** 2026-08-17 por Claude (cierre del programa — uno a uno vs lote y estado real del gold set)
+> **Protocolo del gold set:** [calificar-gold-set-de-referencia.md](calificar-gold-set-de-referencia.md) · **rúbrica:** [gold-set-rubrica-de-anclaje.md](../../documentation/hr/gold-set-rubrica-de-anclaje.md)
 > **Documentacion tecnica:** [GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md](../../architecture/GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md) · funcional [scoring-ia-de-assessments.md](../../documentation/hr/scoring-ia-de-assessments.md)
 
 ## Para qué sirve
@@ -21,6 +22,30 @@ completar la muestra ciega, confirmar el lote elegible, cancelar un run o revert
 - La revisión tiene **dos carriles equivalentes**: el workbench en pantalla (recomendado, ver la
   sección siguiente) y la API (para automatización, diagnóstico o scripts). Ambos usan los mismos
   comandos gobernados: lo que hagas en uno se ve en el otro.
+
+## Uno a uno vs lote: cuál corresponde hoy
+
+Son dos modos de resolver la cola, y **hoy sólo uno está disponible de verdad**.
+
+| Modo | Qué es | Estado hoy |
+|---|---|---|
+| **Uno a uno** | Resuelves cada item con tu criterio; en la muestra ciega puntúas antes de ver la propuesta | **Es el modo correcto ahora.** No depende del gate de promoción |
+| **Por lote** | Confirmas de una vez el conjunto `batch_eligible`, tras cerrar excepciones y muestra | **Bloqueado** hasta que el gate de promoción pase |
+
+Por qué el lote sigue bloqueado: el gate exige un **gold set** de respuestas reales calificadas por dos
+personas independientes. El instrumento para armarlo ya existe (`pnpm hiring:ai:gold-set-sample`, rúbrica
+BARS y protocolo en ciego), pero el muestreo real mostró que la base tiene **11 respuestas calificadas
+frente a un piso de 49**. O sea: **falta volumen de datos, no faltan personas**.
+
+Consecuencia práctica: **trabajar uno a uno no es un rodeo, es el camino.** Cada item que resuelves con
+criterio humano produce exactamente la materia prima que el gate necesita. Si quieres acelerarlo
+deliberadamente, sigue el protocolo de
+[calificar el gold set de referencia](calificar-gold-set-de-referencia.md).
+
+Un detalle de lectura que cambió el 2026-08-17: **cada criterio se lee como aporte sobre su peso**
+(`18 / 25`), no como una nota suelta. Los aportes suman el puntaje global. Antes el router comparaba esos
+aportes contra su promedio y marcaba como contradictorias 11 de 14 respuestas reales — justo las buenas —,
+lo que dejaba el carril por lote muerto aun cuando estuviera habilitado.
 
 ## Revisar desde el workbench (pantalla)
 
@@ -150,6 +175,10 @@ En `/admin/operations`, módulo hiring: `hiring.assessment_ai.run_backlog_stuck`
 - No mostrar ni comunicar puntajes/resultados al candidato por ningún canal — prohibido por contrato.
 - No prender flags fuera de la secuencia del runbook ni sin el gate de promoción verde
   (`pnpm hiring:ai:promotion-gate`).
+- No calificar tú mismo el gold set "para desbloquear el gate" saltándote el protocolo en ciego: un gold
+  set contaminado es peor que no tenerlo, porque valida a la IA contra su propia sugerencia.
+- No pedirle a un agente que complete calificaciones del gold set. Ninguna. El instrumento se entrega
+  vacío a propósito.
 
 ## Problemas comunes
 

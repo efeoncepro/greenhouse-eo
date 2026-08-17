@@ -170,13 +170,29 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `TASK-1733` — People 360 Longitudinal Hiring History UI: timeline/detail interno sobre TASK-1732.
 - `TASK-1734` — Assessment AI Scoring at Scale + Operator-Only Exception Review: run asíncrono por assessment,
   revisión humana gobernada y resultado exclusivamente interno; el postulante no ve score ni resultado.
-  **✓ complete (code complete, rollout gated 2026-08-16).**
+  **✓ complete (code complete, rollout gated 2026-08-16; delta correctivo 2026-08-17).** El delta cerró el
+  contrato de `perCriterion` (escala declarada `weighted_contribution` + prompt `...scoring.v2` + policy
+  `...risk_policy.v1_1`: `per_criterion_contradictory` bajó de 11/14 a 2/14 en el replay real, resucitando
+  `batch_eligible`) y entregó el **instrumento del gold set** (`pnpm hiring:ai:gold-set-sample` + rúbrica BARS
+  + protocolo en ciego + gate consciente de ruta). **Hallazgo que manda el plan:** la DB tiene 11 respuestas
+  humanas calificadas contra un piso de 49 — la ruta A no es ejecutable hoy **por falta de DATOS, no de
+  personas**, así que el carril uno-a-uno es el modo correcto y es el que genera esa materia prima. El
+  instrumento se entrega vacío: ningún agente fabrica ratings.
 - `TASK-1735` — Hiring Application Evaluation Dossier: expediente de evaluación append-only per-application
   (`hiring_application_note` tipada + command/reader + API + capability `hiring.application.annotate`),
-  internal-only y fuera del review packet MCP; el consumer UI de Application 360 es follow-up.
-  **✓ complete (code complete, rollout pendiente 2026-08-16).**
+  internal-only y fuera del review packet MCP; el consumer UI de Application 360 es follow-up (`TASK-1737`).
+  **✓ complete (code complete 2026-08-16; flag ON en staging 2026-08-16, OFF en producción).** Dos fixes
+  posteriores (2026-08-17) forman parte del contrato: el cuerpo de la nota pasó de 8000 a **20000** y el write
+  path **falla loud** en vez de truncar (el primer confirm real quedó cortado a mitad de frase sin que ningún
+  test lo viera, porque el panel renderiza desde `proposedJson`), y la nota reparada se muestra como historia
+  con chip **"Versión superada"**, derivando el supersede en el reader desde la nota posterior.
 - `TASK-1736` — Candidate Identity Intake Canonicalization + Governed Remediation: raw/display/search person-first,
   parity Careers/Growth Forms, reconciliación identity-safe y remediación histórica allowlisted/reversible.
+  **✓ complete (Slices 1-4 code complete 2026-08-16).** Flag `HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED`
+  creada **ON en staging** 2026-08-16 (OFF en producción hasta el canary del runbook). **Remediación histórica
+  EJECUTADA** el 2026-08-16 con autorización del CEO: 3 personas reales corregidas (Valentina Villa, Stana
+  Medina, Aldo Romano) con actor + razón en `candidate_identity_display_audit`, y 2 perfiles QA podados a mano
+  de la allowlist. La cifra "4 propuestas = 2 humanos" del Slice 0 quedó superada por el lote real.
 - `TASK-1737` — Application 360: tab Expediente — **consumer UI de `TASK-1735`** (su follow-up declarado): el tab
   `activity` sintético se convierte en el Expediente real (timeline de notas + eventos de etapa, composer, flujo
   propose → editar → confirmar/rechazar) y resuelve el gate BLOQUEANTE anti-anclaje del Delta (3) de 1735 con

@@ -231,10 +231,12 @@ A padlock that protects nothing teaches the operator to ignore the padlocks that
 
 Docs: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-15 (8 invariants) · functional `docs/documentation/hr/documentos-de-candidatos.md` · manual `docs/manual-de-uso/hr/ver-documentos-de-un-candidato.md`.
 
-## Evaluation Dossier / Expediente de Evaluación (TASK-1735, code complete 2026-08-16)
+## Evaluation Dossier / Expediente de Evaluación (TASK-1735 + UI TASK-1737, flag ON en staging 2026-08-16)
 
 - **Notes (append-only)**: `greenhouse_hiring.hiring_application_note` (`hnote-*`) — `kind` CHECK
-  (`cv_analysis|assessment_review|interview_note|general`), `body_md` ≤8000, `source` (`human|agent`),
+  (`cv_analysis|assessment_review|interview_note|general`), `body_md` **≤20000** (widened from 8000 on
+  2026-08-17, migration applied + verified against real PG; `HIRING_APPLICATION_NOTE_BODY_MAX` is the exact
+  mirror of the CHECK), `source` (`human|agent`),
   `context_json` carries references only (`proposalId`/`assessmentId`/`supersedesNoteId`), never duplicated bodies.
   Trigger `prevent_hiring_note_mutation` + grants without UPDATE/DELETE (verified live). Primitive
   `src/lib/hiring/application-notes.ts` (`recordHiringApplicationNote` accepts a participant tx;
@@ -252,16 +254,38 @@ Docs: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-15 (8 invariant
   API `GET/POST /api/hiring/applications/[id]/dossier`.
 - **Authorization**: read = `hiring.application.read`; write/propose/confirm = capability
   `hiring.application.annotate` (governance tier, role-only: `EFEONCE_ADMIN` ∪ `HR_MANAGER` ∪ `EFEONCE_OPERATIONS`).
-- **Flag**: `HIRING_EVALUATION_DOSSIER_AI_ENABLED` default OFF, Vercel-only, gates ONLY the propose (ledger updated).
+- **No silent truncation (fix 2026-08-17)**: `renderEvaluationDossierMarkdown` returns the FULL markdown and the
+  write path gains `assertDossierBodyWithinLimit` — 400 `hiring_dossier_body_too_long` with the real length in an
+  es-CL message. The first production-local confirm (`hdsp-384b740a`, Valentina) had persisted at exactly 8000
+  chars while the draft measured 8240; the panel hid it because it renders from `proposedJson`, but every
+  `bodyMd` consumer (API, export, Nexa, MCP) read a mutilated document. Repair:
+  `scripts/hiring/repair-truncated-dossier-notes.ts` rebuilds the full text from the ledger's `proposed_json` and
+  records a NEW note (append-only respected) with `context_json.supersedesNoteId` + `reason='truncation_repair'`;
+  idempotent.
+- **Supersede display (fix 2026-08-17)**: the reader derives `supersededByNoteId` from the LATER note's
+  `context_json.supersedesNoteId` — the superseded row itself is never mutated. `ApplicationDossierPanel` marks it
+  with the chip **"Versión superada"** + dimmed treatment (copy `hiringDesk`, parity es-CL/en-US), so an evaluator
+  never reads the truncated version as the live one.
+- **Consumer UI (TASK-1737)**: tab `expediente` of `/agency/hiring/applications/[applicationId]` (rename of
+  `activity`, `?tab=activity` alias preserved). Reader contract
+  `listHiringApplicationNotes(applicationId, viewerUserId?)` → `{ notes, hiddenNoteCount,
+  viewerBlindUntilScorecardSubmitted }`; the anti-anchoring predicate is the SINGLE
+  `getOwnScorecardStateForApplication` shared with `listResponses` + `listPeerScorecardResults`. Without
+  `viewerUserId` it does NOT filter (server-internal calls). `GET /dossier` under blindness returns
+  `proposal: null`. View `src/views/greenhouse/hiring/ApplicationDossierPanel.tsx` is a thin client.
+- **Flag**: `HIRING_EVALUATION_DOSSIER_AI_ENABLED` Vercel-only, gates ONLY the propose. **Created ON in staging
+  2026-08-16** (CEO authorization); OFF in Production. With the flag OFF the UI shows the honest `ai-off` state.
 - **Hard invariants**: NEVER candidate-facing nor in the TASK-1718 MCP review packet (allowlist intact); NEVER does
   the LLM write a note directly (human confirm ALWAYS); NEVER touch `score`/`match_score`/`explainability_json`
-  (a note is narrative, not score); NEVER demographics in notes (TASK-1365 boundary).
+  (a note is narrative, not score); NEVER demographics in notes (TASK-1365 boundary); NEVER trim a body to fit the
+  CHECK (fail loud); NEVER implement the anti-anchoring blindness client-side or duplicate the predicate SQL;
+  NEVER confuse `notes: null` (reader FAILED — honest degradation) with an empty expediente.
 - Related: scorecard display fix ISSUE-159 (`src/views/greenhouse/hiring/scorecard-summary.ts` — global "Parcial"
-  while competencies remain pending, never a partial average as final result). Application 360 consumer UI is a
-  ui-ux follow-up (placement contracted in TASK-1735 §Superficie UI).
-- **Estado operativo honesto**: code complete, E2E real local con EO-APP-0078; rollout pendiente (flag OFF).
+  while competencies remain pending, never a partial average as final result).
+- **Estado operativo honesto**: code complete + consumer UI complete; flag ON en staging, OFF en Production;
+  evidencia visual del panel de propuesta con datos reales pendiente de staging.
 
-Docs: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-16 · functional
+Docs: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-16, (4) y 2026-08-17 · functional
 `docs/documentation/hr/expediente-de-evaluacion.md` · manual `docs/manual-de-uso/hr/operar-expediente-de-evaluacion.md`.
 
 ## Assessment AI Scoring Run (TASK-1734, code complete 2026-08-16 — rollout gated)
@@ -290,10 +314,31 @@ input/policy digest (answers + rubric + prompt + policy + EFFECTIVE resolved mod
   `sawProposalBeforeScoring` — anti-anchoring evidence), `confirm_run` (batch confirm: mandatory + blind-sample +
   digest gates, then append-only `run_confirm_manifest`; flag-gated), `cancel_run` (NOT flag-gated — rollback path).
   Confirmed scores apply through the canonical 1361/1360 path; nothing enters the rollup without human confirm.
+- **`perCriterion` contract (fix 2026-08-17 — the scale is DECLARED, never inferred)**: the scorer returns
+  **weighted contributions that sum to the global score** (`weighted_contribution`: `weight` + `score` ≤ weight;
+  schema requires `weight`, sanitizer normalizes and bounds own-scale drift). Prompt `...scoring.v2` asks for the
+  scale explicitly (v1 proposals go stale). `summarizeCriterionContribution` is the ONLY
+  contributions→implied-global translation, and `risk-router.ts` compares against that implied value under policy
+  `...risk_policy.v1_1`. Before the fix the router compared contributions against their **average**, so
+  `per_criterion_contradictory` fired on **11/14** real items — precisely on the GOOD answers (91 = 18+25+25+23
+  has mean 22,75 → delta 68 ≫ 25) — killing `batch_eligible`. Replay of the 14 real proposals: **11/14 → 2/14**,
+  the 2 survivors being genuine model contradictions (global 21 with contributions implying 65). The workbench
+  reads a criterion as amount-over-weight (`18 / 25`). **NEVER** read `perCriterion` as an independent grade.
 - **Promotion gate (BLOCKING)**: `pnpm hiring:ai:promotion-eval` (+ `--mock`) → `pnpm hiring:ai:promotion-gate`
   exits 1 with a synthetic dataset, without double independent human rating + adjudication, or on any metric
-  blocker. The gold set is Talent human work in progress; **no agent fabricates ratings**. Thresholds:
+  blocker. The gate is **route-aware**. **No agent fabricates ratings**. Thresholds:
   `getAiRunPromotionThresholds()` (`scoring-run/config.ts`, provisional until the accepted policy fixes them).
+- **Gold set instrument (2026-08-17)**: `pnpm hiring:ai:gold-set-sample` →
+  `src/lib/hiring/assessment/ai/eval/gold-set-sampling.ts` + `scripts/hiring/build-gold-set-sample.ts` —
+  stratified sampling by competency × band over real anonymized answers, deterministic seed, hard cases included,
+  **incomplete strata declared rather than filled**. Behavioural anchors (BARS)
+  `docs/documentation/hr/gold-set-rubrica-de-anclaje.md`, blind rating protocol with its 3 routes (double
+  rating / test-retest / binary routing) and honest scope
+  `docs/manual-de-uso/hr/calificar-gold-set-de-referencia.md`. **Real finding, load-bearing: the DB holds 11
+  human-rated answers against a floor of 49 — route A is NOT executable today for lack of DATA, not of people.**
+  The one-by-one lane is the correct mode now and is what produces that raw material. The instrument ships EMPTY
+  and the gate keeps blocking `batch_eligible`. **NEVER** describe the gold set as pending-people when it is
+  pending-volume; **NEVER** let an agent populate a rating.
 - **Flags (all default OFF; ledger updated)**: `HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED` (ops-worker; `deploy.sh`
   is the SoT), `HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED` (ops-worker + Vercel),
   `HIRING_ASSESSMENT_AI_RUN_CONFIRM_ENABLED` (Vercel). The master `HIRING_ASSESSMENT_AI_ENABLED` is already ON in
@@ -309,16 +354,28 @@ input/policy digest (answers + rubric + prompt + policy + EFFECTIVE resolved mod
 - **TASK-1735 boundary**: the run manifest/audit records structured FACTS (IDs, digests, reason codes, actor);
   reviewer narrative lives as a 1735 `assessment_review` note with `context_json.{runId,proposalId}`. One habitat
   per content type.
-- **Estado operativo honesto**: code complete Slices 0–6; migración aplicada y verificada contra PG real; el
-  rollout real (flips, shadow, canary) NO se ejecutó — gated a señal del operador vía el runbook.
+- **Consumer UI (TASK-1738, complete 2026-08-17)**: workbench
+  `src/views/greenhouse/hiring/AssessmentAiRunWorkbench.tsx` mounted on the assessment card of Application 360
+  (`AssessmentAiRunEntry`), coexisting with the per-response drawer. Risk-ordered queue (mandatory → blind sample
+  → eligible batch, the last one collapsed), **structural** blind sample (the proposal is not in the DOM, verified
+  against the real DOM), `sawProposalBeforeScoring` set by a real gesture (verified both ways against the DB),
+  sticky honest coverage, confirm `disabled` with visible causes, zero horizontal scroll at 390. Zero
+  candidate-facing surface. Running GVC over a REAL run (`claude-sonnet-5`) is what exposed `manifestSummary`
+  rendering `{a}/{a}` — always 100% while the gates below said "faltan 10", exactly the bug class this surface
+  exists to prevent — plus `warning.main` as text at 1,74:1 and `sx={{ ms: 1 }}` applying no margin (`ms` is not
+  a MUI prop). **The frame is the evidence: green tests did not catch any of it.**
+- **Estado operativo honesto**: code complete Slices 0–6 + workbench; migración aplicada y verificada contra PG
+  real; el rollout real (flips, shadow, canary) NO se ejecutó — gated a señal del operador vía el runbook, y el
+  gate de promoción está bloqueado por VOLUMEN de gold set (11 vs 49), no por falta de instrumento.
 
 Docs: ADR `GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md` · runbook
 `docs/operations/runbooks/assessment-ai-scoring-rollout.md` · architecture
-`GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-16 (2) · functional
-`docs/documentation/hr/scoring-ia-de-assessments.md` · manual
-`docs/manual-de-uso/hr/operar-scoring-ia-assessments.md`.
+`GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-16 (2) y 2026-08-17 · functional
+`docs/documentation/hr/scoring-ia-de-assessments.md` + `docs/documentation/hr/gold-set-rubrica-de-anclaje.md` ·
+manual `docs/manual-de-uso/hr/operar-scoring-ia-assessments.md` +
+`docs/manual-de-uso/hr/calificar-gold-set-de-referencia.md`.
 
-## Candidate identity intake (TASK-1736, code complete 2026-08-16 — rollout gated)
+## Candidate identity intake (TASK-1736 — remediación EJECUTADA + flag ON en staging 2026-08-16)
 
 - **Primitives**: `src/lib/hiring/candidate-intake/**` — `normalizeCandidateIdentityInput` (NFC + Unicode
   whitespace + control/bidi stripping + versioned casing classifier), `persistCandidateIdentityIntakeEvidence`
@@ -330,8 +387,16 @@ Docs: ADR `GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md` · runbook
   (both append-only with anti-mutation triggers; they DO contain names — restricted DB, never logs/metrics).
 - **Flag**: `HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED` (Vercel-only, default OFF) gates the intake
   writer ONLY; the historical remediation runs by human allowlist independent of the flag (ADR D4).
+  **Created ON in staging 2026-08-16** (CEO authorization); OFF in Production.
 - **CLI**: `pnpm hiring:candidates:remediate-display` — dry-run → `--emit-allowlist` (gitignored, contains
   PII) → human prune (drop QA/synthetic profiles) → `--apply --actor --reason`. Aborts on any drift.
+- **Remediation EXECUTED 2026-08-16** (verified in `candidate_identity_display_audit`): **3 real people** —
+  `valentina villa`→`Valentina Villa` (`happ-2646fea0…`), `stana medina`→`Stana Medina` (`happ-df7226d0…`),
+  `aldo romano`→`Aldo Romano` (`happ-cb4d9144…`) — each `source='reconcile'`, `outcome='applied'`,
+  `normalization_version='v1'`, `actor_user_id='user-efeonce-admin-julio-reyes'`, reason `"display_refreshed —
+  Remediacion autorizada por CEO 2026-08-16: casing degenerado del intake publico"`. **2 QA profiles were
+  deliberately pruned from the allowlist** — that pruning IS the protocol working, not an omission. Any doc
+  citing "4 proposals = 2 humans" is stale.
 - **Signals**: `hiring.candidate_identity.needs_review_backlog` (steady=0; warning 1-5, error >5) +
   `hiring.candidate_identity.evidence_coverage_gap` (flag ON: applications without evidence row = silent-skip;
   flag OFF: ok with note). Reader: `src/lib/reliability/queries/hiring-candidate-identity-signals.ts`.

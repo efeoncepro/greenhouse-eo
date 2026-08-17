@@ -1,9 +1,9 @@
 # Expediente de Evaluación — notas de candidatura y borrador asistido por IA
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-08-16 por Claude (TASK-1735)
-> **Ultima actualizacion:** 2026-08-16 por Claude (TASK-1737 — ya hay pantalla)
+> **Ultima actualizacion:** 2026-08-17 por Claude (cierre del programa — chip "Version superada" + limite 20.000 sin recorte silencioso)
 > **Documentacion tecnica:** [GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md) (Delta 2026-08-16)
 
 ## Qué es
@@ -43,6 +43,31 @@ El expediente ya no vive solo en la API: tiene pantalla.
   borrador con su evidencia citada, editarlo y confirmarlo o rechazarlo.
 - **Nada se edita ni se borra.** Si una nota quedó mal, se escribe una nota nueva. La pantalla
   no ofrece botón de editar ni de eliminar, a propósito.
+
+## Cuando una nota queda reemplazada: el chip "Versión superada"
+
+Como nada se borra, corregir una nota significa **agregar otra**. Para que nadie confunda la
+vieja con la vigente, la pantalla marca la reemplazada con un chip **"Versión superada"** y la
+muestra atenuada: sigue ahí como historia, pero se lee de inmediato que ya no es la versión
+buena. La nota nueva es la que manda.
+
+Esto no es teórico: pasó de verdad. El primer análisis confirmado por una persona se había
+guardado **cortado a mitad de frase** (ver abajo), y hubo que registrar la versión completa como
+nota nueva. Sin el chip, alguien podía leer la versión mutilada creyendo que era el análisis
+final.
+
+## Por qué el análisis ya no se corta
+
+Al principio el cuerpo de una nota admitía hasta 8.000 caracteres y el sistema **recortaba en
+silencio** lo que sobrara. El primer análisis real medía 8.240 y se guardó cortado. Peor: la
+pantalla no lo delataba, porque muestra el borrador y no el texto guardado — el recorte solo
+aparecía para quien leyera la nota por otra vía (API, exportación, agentes).
+
+Ahora:
+
+- el límite es **20.000 caracteres**, holgado para un análisis con evidencia citada;
+- si aun así un texto no cabe, **el sistema avisa con un error explícito** y no guarda nada
+  cortado. Recortar sin decirlo era exactamente el problema.
 
 ## Por qué a veces ves menos notas que un compañero
 
@@ -88,7 +113,8 @@ Dos aclaraciones importantes:
 - Las notas son narrativa: **no cambian puntajes** ni mueven etapas ni deciden nada.
 - Solo el tier de gobernanza de Hiring (admin, HR manager, operations) puede escribir o
   confirmar; cualquiera con acceso de lectura de Hiring puede leer.
-- La generación por IA está apagada por defecto (flag) hasta completar el smoke en staging.
+- La generación por IA está encendida **solo en staging** (desde el 2026-08-16, con autorización
+  del CEO) y sigue **apagada en producción** hasta revisar el primer expediente real.
   Con el flag apagado el tab Expediente funciona igual para notas manuales y avisa, sin
   inventar, que el análisis asistido no está disponible.
 

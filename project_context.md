@@ -165,6 +165,19 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   lectura de CV real. `TASK-1719`–`TASK-1722` permanecen `to-do` (asignación de tests, selección y writes MCP no
   están activos). Talent Assurance (`EPIC-038`, `TASK-1602`–`TASK-1611`) permanece en fase de decisión/discovery
   mientras sus ADR y contratos base sigan `Proposed`.
+- La **evaluación del candidato** tiene tres contratos durables desde 2026-08-16/17 (`TASK-1734`–`TASK-1738`, EPIC-011;
+  ADR [scoring run](docs/architecture/GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md) e
+  [identidad de intake](docs/architecture/GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1.md), ambas
+  `Accepted`): (1) el **expediente** es append-only — corregir es agregar una nota que supersede, el supersede se
+  **deriva en el reader** desde la nota posterior y nada se trunca en silencio (el write path falla loud); (2) la
+  **ceguera anti-anclaje** vive en el reader con un predicado único compartido con `listResponses`, así que Nexa/MCP y
+  cualquier consumer futuro la heredan — nunca es un filtro de pantalla; (3) la **escala de un valor devuelto por un
+  LLM se declara en el contrato**, no se infiere en el consumer (`weighted_contribution` + policy `...risk_policy.v1_1`
+  tras el falso positivo 11/14). El candidato **jamás** ve score, banda, rationale ni estado de revisión — prohibido
+  por contrato ejecutable en todo estado, sin flag. Estado: flags de expediente e identidad **ON en staging, OFF en
+  producción**; los 3 flags del run OFF en todos los runtimes, con el gate de promoción bloqueado **por volumen del
+  gold set** (11 respuestas humanas calificadas contra un piso de 49): falta DATA, no personas, y el carril uno-a-uno es
+  el modo correcto porque es el que la genera. Ningún agente fabrica ratings del gold set.
 - La dirección aceptada para autoservicio candidato es **una cuenta y un `/my` longitudinal** (`TASK-1727`–`TASK-1733`,
   EPIC-011): mismo `identity_profile_id` y principal/login; `candidate_facet` y `member` son facetas aditivas;
   perfil profesional person-scoped; CV/respuestas/expectativa conservan snapshot por aplicación; activation suma

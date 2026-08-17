@@ -2,6 +2,57 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-17 — Cierre del programa Hiring: Expediente + Scoring IA + Identidad (TASK-1734/1735/1736/1737/1738)
+
+Cierre documental de dos días de trabajo en el dominio Hiring. Las 5 tasks están `complete` y
+mergeadas en `develop`; ISSUE-159 resuelta. Esto es lo que quedó **operativo**, lo que quedó
+**gated** y lo que le toca al operador.
+
+**Operativo hoy (staging).** El **tab Expediente** de la Application 360 (`TASK-1737`) y el
+**workbench de scoring** montado en la card del assessment (`TASK-1738`) son superficies reales.
+Los flags `HIRING_EVALUATION_DOSSIER_AI_ENABLED` y
+`HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED` fueron **creados ON en staging el 2026-08-16**
+con autorización explícita del CEO (verdad live: `vercel env ls`); ambos siguen **OFF en
+producción**. La **remediación histórica de nombres se EJECUTÓ**: 3 personas reales corregidas
+(Valentina Villa, Stana Medina, Aldo Romano), con actor y razón en
+`candidate_identity_display_audit`, y 2 perfiles QA podados a mano de la allowlist. Verificado
+contra la DB real durante este cierre.
+
+**Gated (y por qué).** Los 3 flags del run de scoring (`..._RUN_ENQUEUE_`, `..._EXCEPTION_POLICY_`,
+`..._RUN_CONFIRM_`) siguen OFF en todos los runtimes y el scheduler `ops-assessment-ai-drain` nace
+pausado. El gate de promoción sigue bloqueante — pero **el bloqueo ya no es de instrumento, es de
+volumen**: `pnpm hiring:ai:gold-set-sample`, la rúbrica BARS y el protocolo en ciego existen y se
+entregan **vacíos**, y el muestreo real mostró **11 respuestas humanas calificadas contra un piso
+de 49**. La ruta A (doble rating + adjudicación) **no es ejecutable hoy por falta de DATOS, no de
+personas**. Consecuencia operativa que conviene no perder: **el carril uno-a-uno es el modo
+correcto ahora, y es el que genera esa materia prima.**
+
+**Lo que el primer uso real corrigió** (ninguno lo atrapó un test verde):
+
+- El primer expediente confirmado se guardó **cortado a mitad de frase** en exactamente 8000
+  caracteres. El panel no lo delataba porque renderiza desde `proposedJson`. Límite a **20000**,
+  write path que **falla loud**, y la versión completa registrada como nota nueva con chip
+  **"Versión superada"** sobre la truncada.
+- `per_criterion_contradictory` disparaba en **11 de 14** items reales, justo en las respuestas
+  buenas: el scorer devolvía aportes ponderados que suman el global y el router los comparaba
+  contra su promedio. La escala ahora se **declara** (`weighted_contribution`, prompt
+  `...scoring.v2`, policy `...risk_policy.v1_1`) → **2/14**, y las 2 son contradicciones reales.
+- `manifestSummary` renderizaba `{a}/{a}` y **decía siempre 100%** mientras los gates debajo decían
+  "faltan 10" — en la superficie cuyo propósito es no mentir sobre cobertura.
+
+**Próximos pasos del operador**, en orden:
+
+1. Smoke en staging del propose/confirm del expediente + evidencia visual del panel de propuesta
+   con datos reales (es lo único que separa a `TASK-1735`/`1737` de producción).
+2. Canary de identidad en staging por el runbook `candidate-identity-rollout.md`; luego flip de
+   producción.
+3. Acumular gold set por el carril uno-a-uno hasta el piso de 49 (protocolo
+   `docs/manual-de-uso/hr/calificar-gold-set-de-referencia.md`). Recién ahí corre
+   `pnpm hiring:ai:promotion-gate` y se abre la secuencia shadow → canary → promoción del run.
+
+Ambas ADRs pasaron a **`Accepted`** en este cierre: la decisión fue autorizada e implementada.
+**Aceptar no es prender** — el estado de rollout de cada flag manda y vive en el ledger.
+
 ## 2026-08-17 — Workbench de scoring IA (TASK-1738 complete) + escala de perCriterion (TASK-1734 delta)
 
 Dos trabajos encadenados: cerrar el workbench de revisión y arreglar el bug de dominio que el
@@ -509,63 +560,6 @@ sólo se ven mirando el frame.
 Verde: `pnpm local:check`, 382 tests de `growth/seo` + DSL de captura, suite completa 10.768. El
 detalle completo, con evidencia por hallazgo, quedó en el delta 2026-08-15 de la spec en
 `complete/`.
-
-### TASK-1659 COMPLETE — intención declarada de una keyword (2026-08-14)
-
-Salió de intentar tomar **TASK-1665** (workbench `Descubrir`): la auditoría destapó que dos de
-sus cinco acciones de candidato — `Declarar objetivo` / `Seguir oportunidad` — citaban
-`trackKeywords(intent=...)` **que no existía**. El operador eligió parar 1665 e implementar 1659
-primero, así que el workbench queda con su contrato completo cuando se retome.
-
-Los 3 slices en `develop` (SIN push): migración `20260814221022082` (aplicada — base compartida,
-migrar desde local ES el cambio productivo), command y las 3 lanes. **16/16 contra PG real**
-(incluido el invariante de las DOS filas tras un cambio de intención) + suite **10.747 verde**.
-
-**Diseño load-bearing:** `intent` (`target|opportunity`, CHECK cerrado) es ortogonal a `source`
-(procedencia del write) y va en columna propia con autoría separada — `intent_declared_by` ≠
-`created_by` porque un agente puede declarar por encargo, y un CHECK acopla ambas a la existencia
-de `intent`. **Sin backfill y sin default**: la ausencia se propaga hasta la UI, y es el *caller*
-quien declara (la lente Oportunidades manda `intent: 'opportunity'` explícito). **Cambiar la
-intención cierra la membresía y abre otra** con `clock_timestamp()` — el dato de reporte es "es
-objetivo desde marzo, y en marzo estaba en la 45" —, **no consume cupo** y emite outbox aunque
-`activeKeywordCount` no se mueva. Outcome propio `intent_changed`. `[verificar]` de capability
-resuelto: reusa `growth.seo.target.configure`. Sin flags, sin scope nuevo en Entra.
-
-**Desbloquea TASK-1660** (lente Objetivos) — `Blocked by: none`, con delta de lo que puede dar por
-sentado.
-
-**TASK-1665 queda con su auditoría escrita en el archivo** (cinco supuestos que no resistieron el
-repo). Los tres que más cuestan si se descubren tarde: no existe ningún `?view=` en el dashboard,
-así que el conmutador de lentes hay que **crearlo**; "Dificultad ◑ N/100" está **superseded por
-ISSUE-152** (va "Barrera de enlaces" en niveles, y el filtro `maxDifficulty` sale del contrato de
-URL); y `Objetivos` sigue en `to-do`, así que `Descubrir` es la **segunda** lente y el link "Ver en
-Objetivos" no tiene destino. Además `Motion: none` es incorrecto: falta el contrato de motion.
-
-**Rollout cerrado:** `pnpm build` verde, push a `develop` hecho y **CI 8/8 en verde**. No hay flags
-que prender.
-
-**Propagación documental (3 subagentes):** regla auto-load `growth-seo.md` (4.ª cláusula del write),
-skills `dataforseo-operator` + `efeonce-mcp-platform` (con sus espejos Codex, `skills:mirrors` verde),
-arquitectura §7, API Platform, master flow EPIC-022 §5/§6, epic file, doc funcional y manual del MCP.
-
-**Impacto cruzado detectado — dos cosas que valen más que el resto:**
-- `TASK-1662` (keyword gap): su taxonomía es **binaria** ("no aparece" vs "aparece peor") y ahora es
-  ternaria. Un `target` en la posición 60 cae en "no aparece" pero **no es un hallazgo, es un
-  compromiso en curso**: presentarlo como gap en la reunión de primera vez le vende al cliente algo
-  que ya le prometimos. El tercer estado va en el contrato del reader, no en la superficie.
-- `TASK-1690` (superficie cliente): `selectFeaturedRankSeries` ordena por mejor posición y corta en 5,
-  así que un objetivo en la 60 es **estructuralmente imposible de destacar** y entra al promedio como
-  fracaso permanente.
-- Menores, con delta escrito: `TASK-1667` (usa `objective` donde el valor canónico es `target`; funde
-  intención declarada con search intent estimado en una columna; y cita "readers de 1659" que no
-  existen — 1659 entregó un *command*) y `TASK-1669` (`intent` es homónimo dentro del mismo bundle de
-  evidencia).
-
-**Deuda documental declarada, NO cerrada:** el doc funcional y el manual del MCP no enumeran las tools
-de TASK-1664/1666 (`get_seo_keyword_discovery`, `discover_seo_keywords`, `get_seo_grounded_query_draft`,
-`prepare_seo_grounded_queries`); el manual sigue diciendo "10 de lectura + 2 de escritura". Se corrigió
-la afirmación falsa de alcance ("nada que escriba"), pero el inventario le toca al cierre de esas tasks.
-`TASK-1667` y `TASK-1669` están `legacy=1` en `task:lint` (les faltan markers ZONE) — preexistente.
 
 ### Auditoría SEO/AEO post-cierre 1664+1666 — CORREGIDA (2026-08-14)
 

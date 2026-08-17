@@ -178,7 +178,7 @@ never upgraded by backfill; withdrawal wins. Exact CV review for delegated agent
 contract and is still OFF in production pending its named-owner approvals and synthetic canary. Read the full runtime
 binding, evidence and rollback facts in `references/greenhouse-runtime.md` §Talent Pool / Banco de Talento.
 
-## Evaluation Dossier (TASK-1735 — code complete 2026-08-16)
+## Evaluation Dossier (TASK-1735 + consumer UI TASK-1737 — flag ON en staging 2026-08-16)
 
 Every `hiring_application` now carries an **expediente de evaluación**: an append-only note log
 (`greenhouse_hiring.hiring_application_note`, kinds `cv_analysis`/`assessment_review`/`interview_note`/`general`,
@@ -191,14 +191,34 @@ name/contact/legal identity/self-ID (the assembler does not even query them). Th
 expediente**, and it stays out of the TASK-1718 MCP review packet. Notes are narrative, never scores: they never touch
 `score`/`match_score`/`explainability_json`. Writes require capability `hiring.application.annotate` (role-only tier:
 `EFEONCE_ADMIN` ∪ `HR_MANAGER` ∪ `EFEONCE_OPERATIONS`); the propose lane is gated by
-`HIRING_EVALUATION_DOSSIER_AI_ENABLED` (default OFF, Vercel-only). E2E exercised locally (EO-APP-0078); the
-Application 360 consumer UI is a follow-up task. Runtime binding: `references/greenhouse-runtime.md`
-§Evaluation Dossier.
+`HIRING_EVALUATION_DOSSIER_AI_ENABLED` (Vercel-only, default OFF — **created ON in staging 2026-08-16 by CEO
+authorization; still OFF in Production**).
 
-Docs: architecture `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-16 · functional
-`docs/documentation/hr/expediente-de-evaluacion.md` · manual `docs/manual-de-uso/hr/operar-expediente-de-evaluacion.md`.
+**Consumer UI (TASK-1737)**: tab **Expediente** of `/agency/hiring/applications/[id]` (rename of `activity`,
+`?tab=activity` alias preserved) — timeline of notes + stage events, typed composer, propose→edit→confirm flow.
+It closed the BLOCKING anti-anchoring gate: a viewer whose **own** scorecard is still open no longer receives
+score-bearing notes from others nor **any** `source='agent'` note. That blindness lives in the **reader**
+(`listHiringApplicationNotes(applicationId, viewerUserId?)`), sharing one predicate
+(`getOwnScorecardStateForApplication`) with `listResponses` and peer ratings — so Nexa/MCP inherit it by
+construction. **NEVER** re-implement it client-side.
 
-## Assessment AI Scoring at Scale (TASK-1734 — code complete 2026-08-16)
+**Two later fixes are part of the contract, not footnotes** (the first real human confirm exposed both):
+- the note body limit is **20000**, not 8000 — the first confirmed dossier persisted at exactly 8000 chars while
+  the draft measured 8240 and the analysis was cut mid-sentence. The panel hid it because it renders from
+  `proposedJson`, but every `bodyMd` consumer (API, export, Nexa, MCP) read a mutilated document. The write path
+  now **fails loud** (`assertDossierBodyWithinLimit` → 400 `hiring_dossier_body_too_long`) instead of truncating.
+  **NEVER** silently trim a body to fit a CHECK.
+- a superseded note is shown as **history, not as current**: the reader derives `supersededByNoteId` from the
+  later note's `context_json.supersedesNoteId` (the append-only row is never mutated) and the panel marks it with
+  the chip **"Versión superada"** + dimmed treatment, so nobody reads the truncated version as the live one.
+
+Runtime binding: `references/greenhouse-runtime.md` §Evaluation Dossier.
+
+Docs: architecture `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-16, (4) y
+2026-08-17 · functional `docs/documentation/hr/expediente-de-evaluacion.md` · manual
+`docs/manual-de-uso/hr/operar-expediente-de-evaluacion.md`.
+
+## Assessment AI Scoring at Scale (TASK-1734 + workbench TASK-1738 — code complete, rollout gated)
 
 The individual propose→confirm of TASK-1361 now scales through an **async, durable, idempotent scoring run per
 exact `hiring_assessment`** (aggregate `hiring_assessment_ai_scoring_run` + items + append-only events), executed
@@ -209,16 +229,47 @@ confirmation only closes when mandatory exceptions and the blind sample are reso
 manifest (covered proposals, sample, exceptions, actor, digests, and `sawProposalBeforeScoring` per human
 resolution — anti-anchoring evidence). **The candidate never sees anything**: no score, band, rationale,
 confidence or review state, guarded by an executable denylist (`public-boundary.contract.ts`) across public
-view/route/emails/DTOs. **The promotion gate is blocking**: `pnpm hiring:ai:promotion-gate` exits 1 until a real
-Talent gold set with double independent human rating + adjudication passes — no agent may fabricate those ratings.
+view/route/emails/DTOs.
+
+**`perCriterion` declares its scale — it is never inferred** (fix 2026-08-17, found by running the workbench on
+a real run). The scorer returns **weighted contributions that SUM to the global score** (91 = 18+25+25+23, the
+bank rubric's own scale), and the risk router was comparing them against their **average** — so
+`per_criterion_contradictory` fired on **11 of 14** real items, and precisely on the GOOD answers: the better the
+answer, the more contradictory it looked, `batch_eligible` was dead and the operator hand-reviewed everything.
+The root cause was an **implicit contract** (prompt v1 said "the score per criterion", schema declared 0–100 per
+criterion — contribution and independent grade were equally valid readings). Now the scale is declared
+(`weighted_contribution`: `weight` + `score` ≤ weight), the prompt asks for it explicitly
+(`...scoring.v2`; v1 proposals go stale), `summarizeCriterionContribution` is the ONLY contributions→implied-global
+translation, and the router compares against that implied value (policy `...risk_policy.v1_1`). Replay of the 14
+real proposals: **11/14 → 2/14**, and those 2 are genuine model contradictions. **NEVER** read a criterion as a
+loose grade — it is an amount over its weight (`18 / 25`).
+
+**The promotion gate is blocking**: `pnpm hiring:ai:promotion-gate` exits 1 until a real Talent gold set with
+double independent human rating + adjudication passes — **no agent may fabricate those ratings**. The instrument
+now exists (`pnpm hiring:ai:gold-set-sample`: deterministic stratified sampling by competency × band over real
+anonymized answers, incomplete strata declared rather than filled; BARS rubric
+`docs/documentation/hr/gold-set-rubrica-de-anclaje.md`; blind protocol
+`docs/manual-de-uso/hr/calificar-gold-set-de-referencia.md`; route-aware gate). **Its finding is load-bearing:
+the DB holds 11 human-rated answers against a floor of 49 — route A is not executable today for lack of DATA,
+not of people.** The one-by-one lane is therefore the correct mode right now, and it is what generates that raw
+material. **NEVER** present the gold set as pending-people when it is pending-volume.
+
 Estado: **code complete, rollout gated a señal del operador** — the 3 new flags are OFF in every runtime, the
 scheduler `ops-assessment-ai-drain` is declared paused, and rollback runs by the new flags + run commands
-(`pnpm hiring:ai:run-rollback`), never by the master flag. Runbook:
-`docs/operations/runbooks/assessment-ai-scoring-rollout.md` · ADR
+(`pnpm hiring:ai:run-rollback`), never by the master flag.
+
+**Consumer UI (TASK-1738)**: workbench mounted on the assessment card of Application 360 — risk-ordered queue,
+**structurally** blind sample (the proposal never reaches the DOM), `sawProposalBeforeScoring` recorded from a
+real gesture, sticky honest coverage, confirm/cancel with manifest. Running GVC over a REAL run is what exposed
+`manifestSummary` rendering `{a}/{a}` (always 100% while the gates below said "faltan 10" — exactly the bug class
+this surface exists to prevent) and AA contrast failures. Related: ISSUE-159 — a partial scorecard is no longer
+presented as a final result.
+
+Runbook: `docs/operations/runbooks/assessment-ai-scoring-rollout.md` · ADR
 `docs/architecture/GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md`. Full runtime binding:
 `references/greenhouse-runtime.md` §Assessment AI Scoring Run.
 
-## Candidate identity intake (TASK-1736 — code complete 2026-08-16)
+## Candidate identity intake (TASK-1736 — remediación EJECUTADA + flag ON en staging 2026-08-16)
 
 Candidate identity now lives in **three layers** (ADR
 `GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1.md`): immutable **submitted evidence** per
@@ -229,10 +280,19 @@ conservative particle rules — never blind Title Case); everything ambiguous de
 The sticky name is closed by `reconcileCandidateIdentityDisplayName` (compare-and-set + append-only audit; a
 human correction ALWAYS wins over automation). Manual correction requires the new fine capability
 `hiring.candidate.correct_display` (EFEONCE_ADMIN + HR_MANAGER + EFEONCE_OPERATIONS). Historical remediation is
-governed: `pnpm hiring:candidates:remediate-display` (dry-run → human allowlist reviewed line by line — the real
-2026-08-16 case: 4 proposals = 2 humans + 2 QA test profiles that get PRUNED — → apply with actor/reason, CAS,
-batch of 1), independent of the flag. Estado: **code complete Slices 1-4, rollout gated a señal del operador** —
-`HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED` OFF everywhere (Vercel-only); 2 reliability signals
+governed: `pnpm hiring:candidates:remediate-display` (dry-run → human allowlist reviewed line by line → apply
+with actor/reason, CAS, batch of 1), independent of the flag.
+
+**The historical remediation was EXECUTED on 2026-08-16** (verified in
+`greenhouse_hiring.candidate_identity_display_audit`): **3 real people corrected** — `valentina villa` →
+`Valentina Villa`, `stana medina` → `Stana Medina`, `aldo romano` → `Aldo Romano` — all `source='reconcile'`,
+`outcome='applied'`, `normalization_version='v1'`, `actor_user_id='user-efeonce-admin-julio-reyes'`, reason
+`"display_refreshed — Remediacion autorizada por CEO 2026-08-16: casing degenerado del intake publico"`. **2 QA
+test profiles were deliberately excluded** by human pruning of the allowlist — that pruning is the point of the
+protocol, not an accident. **NEVER** cite the old "4 proposals = 2 humans" figure; the executed lot was 3.
+
+Estado: **Slices 1-4 code complete; `HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED` created ON in staging
+2026-08-16 by CEO authorization, still OFF in Production** (Vercel-only); 2 reliability signals
 `hiring.candidate_identity.*` (steady=0; flag OFF ⇒ ok with note). Runbook:
 `docs/operations/runbooks/candidate-identity-rollout.md`. Runtime binding: `references/greenhouse-runtime.md`
 §Candidate identity intake.

@@ -1,9 +1,10 @@
 # Scoring IA de Assessments — corrección asistida a escala con revisión humana
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-08-16 por Claude (TASK-1734)
-> **Ultima actualizacion:** 2026-08-17 por Claude (TASK-1738: revisión desde la pantalla)
+> **Ultima actualizacion:** 2026-08-17 por Claude (cierre del programa — instrumento del gold set y su hallazgo de volumen)
+> **Rúbrica del gold set:** [gold-set-rubrica-de-anclaje.md](gold-set-rubrica-de-anclaje.md) · **protocolo:** [calificar-gold-set-de-referencia.md](../../manual-de-uso/hr/calificar-gold-set-de-referencia.md)
 > **Documentacion tecnica:** [GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md) (Delta 2026-08-16 (2)) · ADR [GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md](../../architecture/GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md)
 
 ## Qué hace
@@ -74,6 +75,27 @@ producir un set de casos calificados por **dos evaluadores humanos independiente
 IA debe pasar esa vara. Un comando mecánico verifica ese requisito y bloquea la promoción si no se cumple;
 ningún agente puede fabricar esas calificaciones.
 
+## El gold set: el instrumento ya existe, faltan datos
+
+Para medir si la IA está a la altura hace falta un **gold set de referencia**: un conjunto de respuestas
+reales calificadas por personas, contra el cual comparar. Ese instrumento ya está construido:
+
+- un **muestreo** que elige casos de forma equilibrada por competencia y por banda de desempeño,
+  incluyendo casos difíciles a propósito, con una semilla fija para que la muestra sea reproducible.
+  Cuando un grupo no tiene suficientes casos, **lo declara en vez de rellenarlo**;
+- una **rúbrica de anclaje** con ejemplos concretos de qué es una respuesta buena, regular o mala en cada
+  competencia, para que dos personas distintas califiquen parecido;
+- un **protocolo de calificación en ciego**, con tres rutas posibles y el alcance honesto de cada una.
+
+**El hallazgo importante:** al correr el muestreo sobre datos reales apareció que la base tiene
+**11 respuestas calificadas por personas frente a un piso de 49** que la ruta principal necesita. Es
+decir, hoy el gate está bloqueado **por falta de datos, no por falta de personas**. El instrumento se
+entrega **vacío**: ningún agente puede llenarlo.
+
+**Qué implica en la práctica:** el modo correcto hoy es el **carril uno a uno** — corregir respuesta por
+respuesta con criterio humano —, que además es exactamente lo que produce la materia prima que falta. El
+carril por **lote** queda bloqueado hasta que ese volumen exista y la IA pase la vara.
+
 ## Estado actual: apagado
 
 El sistema está **completo en código pero apagado en todos los ambientes** (2026-08-16). Los tres
@@ -81,6 +103,10 @@ interruptores nuevos están en OFF, el trabajo en segundo plano está pausado, y
 secuencia gradual documentada (sombra → canary → promoción) que requiere señal explícita del operador. Si
 algo sale mal, existe un procedimiento de reversa que devuelve todo a la cola de corrección manual sin
 perder ninguna respuesta.
+
+Además del gate de promoción, encender el carril por lote depende del volumen del gold set descrito
+arriba. Mientras tanto la revisión uno a uno es el modo de trabajo, no una limitación temporal molesta:
+es la que genera la evidencia para poder confiar en el lote.
 
 > Detalle técnico: ADR [GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md](../../architecture/GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md) ·
 > runbook de rollout [assessment-ai-scoring-rollout.md](../../operations/runbooks/assessment-ai-scoring-rollout.md) ·
