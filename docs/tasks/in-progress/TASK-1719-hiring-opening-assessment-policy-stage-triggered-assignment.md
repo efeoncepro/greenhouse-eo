@@ -1,5 +1,80 @@
 # TASK-1719 — Hiring Opening Assessment Policy and Stage-Triggered Candidate Test Assignment
 
+## Delta 2026-08-17 — Slice 0 cerrado: ADR aceptado y correcciones a supuestos de esta spec
+
+ADR canónico: [`GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md`](../../architecture/GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md)
+(`Accepted`, autorización ejecutiva del CEO 2026-08-17). Las lentes de arquitectura y talent verificaron el
+runtime real y **corrigieron seis puntos de esta spec**. Donde la spec y el ADR difieran, manda el ADR.
+
+1. **Supuesto falso (a) — el trigger no puede salir del payload.** `src/lib/sync/reactive-consumer.ts:644-660`
+   hace coalescing por scope y conserva **el último payload**; el lane `notifications` corre cada 2 min
+   (`services/ops-worker/deploy.sh:1097-1102`) y es donde viven ambas projections de correo. Un candidato que
+   pasa `shortlisted → interview` en esa ventana entrega un solo refresh con `stage: interview` y **la etapa
+   trigger se pierde en silencio**. El Slice 4 debe derivar la etapa del **estado vigente en PG** con el mismo
+   predicado del reader de reconciliación, **nunca** de `payload.stage`. La reconciliación deja de ser red de
+   seguridad y pasa a ser parte del contrato.
+2. **Supuesto falso (b) — el cuestionario NO está congelado, y el template SÍ tiene versión.** La premisa
+   "el template no tiene versión" es **falsa**: `TASK-1383` le dio versión + inmutabilidad
+   (`migrations/20260710202351833_task-1383-assessment-hardening.sql:60-115`). El problema real es peor: esa
+   inmutabilidad **no cubre `hiring_question`**, y `public-taking.ts:241-285` resuelve el set **en vivo**
+   (`status='active'`, `ROW_NUMBER()` por módulo, `LIMIT 12`). Agregar/archivar una pregunta cambia el examen
+   del siguiente candidato con el mismo `template_id` y versión. Hay competencias con **una sola pregunta
+   activa** (`communication`, `content_analytics`, `research_synthesis`, `tool_fluency`): archivarla deja el
+   módulo **vacío** sin ruido. ⇒ **Snapshot inmutable del cuestionario por instancia** (D4), requisito duro
+   antes de expandir auto más allá del canary; `content_digest` en Slice 1.
+3. **Coordinación del correo: fan-in, no skip.** El Slice 5 cambia de forma. Un consumer único
+   `hiring_stage_changed_candidate_comms` **absorbe** `hiring_stage_changed_email`
+   (`projections/hiring-lifecycle-emails.ts:82-86`), decide `commsIntent` y **lo persiste antes de enviar**.
+   Outcome terminal (`held|blocked|stale`) ⇒ degrada al genérico **en la misma ejecución**; fault ⇒ retry sin
+   comunicar. Rechazado el patrón "el sender consulta la policy y hace skip" (decide sobre una predicción; si
+   el email corre primero y la policy termina `held`, el candidato recibe **silencio total**).
+4. **Bug vivo que el refactor de Slice 2 debe cerrar.** `assignCandidateTest` (`instances.ts:237-303`) hace
+   check-then-insert: el `SELECT` filtra 3 estados (`assigned|sent|in_progress`) pero el índice parcial
+   `hiring_assessment_open_instance_unique_idx` cubre **4** (incluye `submitted`). Una instancia `submitted`
+   produce un `23505` crudo → `error-response.ts:41-52` cae al branch genérico → **HTTP 500
+   `hiring_internal_error` con `actionable:true`** (la UI ofrece "Reintentar" para algo irreparable), y en el
+   carril reactivo se comporta como fault → dead-letter fabricado. Adoptar `ON CONFLICT DO NOTHING RETURNING`
+   + re-lectura del ganador, patrón `createScoringRun` (`ai/scoring-run/store.ts:216-252`). **La automatización
+   SOLO escribe `attempt_seq=1`**; retake/re-asignación son commands humanos.
+5. **Capability nueva role-only.** `hiring.assessment.policy.govern` (`execute`/`tenant`), grant
+   `EFEONCE_ADMIN ∪ HR_MANAGER ∪ EFEONCE_OPERATIONS`, **sin routeGroup `internal`** — precedente literal del
+   audit 2026-07-10 (`entitlements/runtime.ts:588-598`). Rechazado endurecer `hiring.assessment.author`
+   (regresión sobre TASK-1360/1363 + mezcla autorar contenido con decidir escrituras a una cohorte). Grant en
+   el mismo PR.
+6. **Rollout reescrito (la spec elegía Content Creator = error).** **No existe "probar en staging"**: el
+   ops-worker es un único Cloud Run compartido por staging y producción (`deploy.sh:23-30`). Estado real
+   verificado en DB: `atpl-account-manager-l2` = 6 instancias / **2 rendidos** (único ciclo cerrado);
+   Content Creator L2 Integral v2 = 9 instancias / **0 completados**; y hay **3 plantillas activas de Content
+   Creator**, sólo una en uso — ambigüedad que la policy existe para cerrar, y riesgo operativo hoy.
+   Secuencia: (0) alguien de Talent **rinde** el test cronometrado (¿alcanzan 45 min?); (1) opening+postulación
+   sintética, leer el correo en el teléfono; (2) verificar que `hiring_assessment_submitted_internal_email`
+   entrega de verdad; (3) manual-first en **Account Manager**, 2-3 candidatos; (4) auto en lotes ≤3,
+   **prohibido mover etapas en bulk**; (5) Content Creator sólo tras un ciclo completo de AM y tras entender
+   por qué sus 9 asignados no rindieron. Avisar al equipo **antes**: *"la columna de etapa dejó de ser una nota
+   interna y pasó a ser un botón de enviar"*. Kill switch = policy `disabled`.
+
+**Protecciones propias sin esperar `TASK-1739`**: policy nace `draft`+`manual` (flip exige capability +
+opening `published` + audit); **cap de volumen** por opening/ventana con auto-detención
+(`hiring.assessment_auto_assignment_blocked`, reason `volume_cap`); **recipient readiness fail-closed** con
+denylist (`.test`/`.invalid`/`.local`) ⇒ `blocked: unverified_recipient` — capa **desechable** cuando 1739
+aterrice `data_origin`.
+
+**Hallazgo adicional registrado**: `accommodations_json` está cableado end-to-end en lectura y render
+(`public-taking.ts:171-186`, `AssessmentTakingClient.tsx:353-358`) y `assignCandidateTest` lo persiste, pero
+**ningún caller productivo lo pasa** (`api/hiring/assessments/route.ts:93`): la accesibilidad es código muerto
+salvo SQL manual. Mitigación mínima en este alcance: la línea de accommodations en el copy de ambos correos.
+
+**Justificación de negocio (va en el ADR)**: una policy que dispara para **todos** los que entran a la etapa es
+más justa y defendible que un reclutador eligiendo a quién testear — es estructura, la palanca #1 de validez y
+la que baja adverse impact. **No es IA de alto riesgo** (regla determinística etapa→plantilla, sin inferencia);
+el invariante que lo sostiene: **el trigger es la etapa, NUNCA un score/match/atributo inferido**.
+
+**Open items que el ADR deja declarados y NO decididos**: TTL del proposal y SLA de reconciliación; si el
+snapshot es slice de esta task o task hija; recordatorios del test (hoy Out of Scope — 14 días sin recordatorio
+es un cementerio silencioso; mínimo, decir la **fecha** y no la duración); qué significa `expired`
+operativamente; qué pasa si se avanza a `interview` con el test de `shortlisted` abierto; el aviso en la
+vacante pública de que el proceso incluye evaluación.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -8,7 +83,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
