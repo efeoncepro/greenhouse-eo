@@ -33,13 +33,17 @@ schema, no bloquear publicación** (bloquear rompería re-publicar los 2 opening
 
 **Rollout pendiente (no ejecutable sin push/deploy + coordinación humana):**
 
-1. Confirmar con People/Legal países elegibles reales de las vacantes remotas y setearlos vía PATCH.
+1. ~~Confirmar países elegibles~~ **CUMPLIDO 2026-08-17**: el CEO aprobó toda Latinoamérica (AR BO BR
+   CL CO CR CU DO EC SV GT HN MX NI PA PY PE UY VE) + `US` + `ES` (21 países), seteados vía
+   `updateHiringOpening` en `EO-OPN-0009` y `EO-OPN-0061`. Verificado contra el reader real: ambas
+   producen `JobPosting` válido (TELECOMMUTE; salario sigue omitido — no hay compensación
+   estructurada aprobada, correcto).
 2. Push/release; prender `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` en staging → Rich Results Test →
-   producción (secuencia en el manual §Prender el schema JobPosting).
-3. Smoke lifecycle en runtime desplegado: publicar fixture autorizada → validar HTML/schema/canonical →
-   pausar → 404 sin schema.
-4. `pnpm build` de producción como gate final (pendiente de autorización del operador — regla de
-   memoria: el build completo consume ~30GB).
+   producción (secuencia en el manual §Prender el schema JobPosting). ⚠️ **Retenido por decisión del
+   operador (2026-08-17): el release espera a que TASK-1741 esté lista y viajan juntos.**
+3. Smoke lifecycle en runtime desplegado: validar HTML/schema/canonical → pausar → 404 sin schema.
+4. ~~`pnpm build` de producción~~ **autorizado y ejecutado 2026-08-17** (resultado en el delta de
+   evidencia).
 
 Evidencia local: `pnpm test` full **1522 files / 11498 tests verdes** (2026-08-17); `pnpm local:check`
 verde por slice; suite `public-careers` 71 passed.

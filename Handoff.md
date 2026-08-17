@@ -18,10 +18,13 @@ re-publicar los 2 openings vivos); `hiringOrganization` = marca Efeonce del bran
 (`EFEONCE_BRAND_NAME` nuevo). El PATCH interno transporta los campos sin cambio de ruta (parity).
 TASK-1741 quedó desbloqueada con fixture (`editorial-opening.fixture.ts`) y delta en su spec.
 
-**Pendiente de rollout (bloquea `complete`):** países elegibles confirmados por People/Legal +
-push/release + flag staging→Rich Results Test→producción + smoke lifecycle desplegado. `pnpm build`
-de cierre pendiente de autorización del operador. Runbook: manual `operar-careers-publicas.md`
-§Contenido estructurado y schema de Google.
+**Actualización mismo día:** el CEO aprobó los países elegibles — toda Latinoamérica (19) + US + ES,
+21 en total — y quedaron seteados vía command canónico en `EO-OPN-0009` y `EO-OPN-0061`; ambas
+producen ya `JobPosting` válido cuando el flag se prenda (verificado contra el reader real). El
+`pnpm build` de cierre fue autorizado y ejecutado. **Pendiente de rollout (bloquea `complete`):**
+push/release + flag staging→Rich Results Test→producción + smoke lifecycle desplegado — **retenido a
+propósito: el operador decidió que el release espera a TASK-1741 y viajan juntos.** Runbook: manual
+`operar-careers-publicas.md` §Contenido estructurado y schema de Google.
 
 ## 2026-08-17 — Tasks creadas para vacantes públicas: contrato SEO primero, renderer después
 

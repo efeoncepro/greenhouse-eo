@@ -134,6 +134,14 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   conserva URL, formulario y exactamente los dos CTA existentes, con legacy fallback y rollout reversible.
 - Gate: ninguna condición remota, país elegible, salario, beneficio ni mensaje de aplicación se inventa para
   completar el render o el schema. Primero foundation de 1740, después consumer UI de 1741.
+- Nota 2026-08-17 (TASK-1740): la foundation quedó **code complete, rollout pendiente** — existe
+  `PublicOpeningContent` v1 (`public_content_json` validado) + `public_remote_eligible_countries`
+  (ISO alpha-2), canonical explícito siempre en la leaf publicada y JSON-LD `JobPosting` fail-closed
+  detrás de `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` (default OFF). El write viaja por
+  `updateHiringOpening`/`PATCH /api/hiring/openings/{id}` (`publicContent`,
+  `publicRemoteEligibleCountries`); el parser de texto del view-model queda como fallback legacy.
+  Países elegibles ya seteados en las 2 vacantes publicadas. El release a producción está retenido
+  hasta TASK-1741. ADR: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (Delta 2026-08-17).
 
 ## Child Tasks
 

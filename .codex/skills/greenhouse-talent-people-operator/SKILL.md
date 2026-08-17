@@ -171,6 +171,43 @@ Public Careers applications now capture durable candidate contact, person-first.
 
 Docs: ADR Delta 2026-08-12 in `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (+ row in `DECISIONS_INDEX.md`) · functional `docs/documentation/hr/hiring-desk.md` §Datos de contacto del candidato · manual `docs/manual-de-uso/hr/operar-careers-publicas.md` §Datos de contacto en el formulario.
 
+## Public vacancy structured content + JobPosting foundation (TASK-1740 — code complete, rollout gated a TASK-1741)
+
+The public vacancy now carries a versioned structured block **`PublicOpeningContent` v1**
+(`greenhouse_hiring.hiring_opening.public_content_json`, JSONB: promise, intro, outcomes[], workItems[],
+essentials[], learnables[], evidenceAsk, remoteModel, processSteps[], benefits[], optional structured
+`compensation`), plus per-country remote eligibility (`public_remote_eligible_countries` TEXT[], real ISO
+3166-1 alpha-2 only) and technical SEO on the leaf `/public/careers/[publicId]`: explicit canonical always
+(published vacancy) + JSON-LD `JobPosting` behind `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` (Vercel-only,
+default OFF, in the flag ledger). Validator `src/lib/hiring/public-careers/public-content.ts`: **write path
+strict** (422 `hiring_opening_public_content_invalid`, always re-validated in the store), **read path
+lenient** (corrupt block or unknown version degrades to null = legacy prose fallback — the public page
+never breaks). Builder `src/lib/hiring/public-careers/job-posting.ts` is server-only, pure and fail-closed.
+
+- **NEVER** convert the free-text `public_compensation_band` into `baseSalary` — salary comes ONLY from
+  `content.compensation` structured data (currency ISO 4217 + min/max + unitText).
+- **NEVER** emit `directApply` or `validThrough` (withdrawal is the unpublish 404); employmentType only by
+  exact conservative mapping ("Jornada completa"→FULL_TIME; "Contrato indefinido" is omitted).
+- **NEVER** accept `LATAM`/`Global` as a country code — the countries array is the ONLY enabler of the
+  remote schema, and its absence omits the schema without ever blocking publication.
+- **NEVER** hardcode the brand: `hiringOrganization` comes from the brand SSOT (`EFEONCE_BRAND_NAME` +
+  `EFEONCE_URL_HTTPS`, `src/config/efeonce-brand.ts`).
+- **SIEMPRE** write via the existing canonical command `updateHiringOpening` / `PATCH /api/hiring/openings/{id}`
+  (fields `publicContent`, `publicRemoteEligibleCountries`; capability `hiring.opening.write`) — zero new
+  endpoints/capabilities/events.
+
+**Estado honesto**: code complete, rollout pendiente — the flag is OFF in every environment and the
+production release is deliberately held until TASK-1741 (editorial renderer) is ready, by operator decision.
+Eligible countries were approved by the CEO 2026-08-17 and are ALREADY SET on the 2 published vacancies
+(EO-OPN-0009, EO-OPN-0061): all of Latin America + US + ES (21 countries) — both produce a valid JobPosting
+the moment the flag flips. Renderer fixture: `src/lib/hiring/public-careers/editorial-opening.fixture.ts`.
+
+Docs: ADR Delta 2026-08-17 in `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` · functional
+`docs/documentation/hr/careers-publicas.md` §Contenido estructurado y SEO técnico · manual
+`docs/manual-de-uso/hr/operar-careers-publicas.md` §Contenido estructurado y schema de Google (includes the
+sitemap/Indexing API decision runbook — Indexing API stays OUT until authorized). Runtime binding:
+`references/greenhouse-runtime.md` §Public structured content + JobPosting schema.
+
 ## Candidate documents — a file is opened, an identity is revealed (TASK-1714/1715 — shipped 2026-08-15)
 
 The `Documentos` tab of Application 360 is now backed by a real reader, and revealing a candidate's identity document is its own audited path. The canonical model (`src/lib/hiring/documents/types.ts`) carries **two classes of datum that are treated differently**:

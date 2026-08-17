@@ -152,6 +152,57 @@ with `greenhouse-production-release` only when the request changes code,
 schema/migrations, flags/env vars, infrastructure, public renderer, apply
 contract, or initial cutover smoke.
 
+### Public structured content + JobPosting schema (TASK-1740 — code complete, rollout gated a TASK-1741)
+
+The public vacancy carries a versioned structured content block and a technical-SEO
+foundation. Rollout is honest: the flag is OFF everywhere and the production release
+is deliberately held until TASK-1741 (editorial renderer) lands.
+
+- **`PublicOpeningContent` v1** lives in
+  `greenhouse_hiring.hiring_opening.public_content_json` (JSONB): promise, intro,
+  outcomes[], workItems[], essentials[], learnables[], evidenceAsk, remoteModel,
+  processSteps[], benefits[], optional `compensation`
+  (`{currency ISO 4217, minValue, maxValue, unitText HOUR|DAY|WEEK|MONTH|YEAR}`).
+- **Validator** `src/lib/hiring/public-careers/public-content.ts`: write path is
+  strict (422 `hiring_opening_public_content_invalid`, ALWAYS re-validated in the
+  store `updateHiringOpening`); read path is lenient (a corrupt block or unknown
+  version degrades to null = legacy prose fallback — the public page never breaks).
+- **Remote eligibility**: `hiring_opening.public_remote_eligible_countries` TEXT[]
+  of real ISO 3166-1 alpha-2 codes (`isValidCountryCode`; `LATAM`/`Global` are
+  REJECTED as countries). It is the ONLY enabler of the remote schema; missing
+  countries never block publication — the schema is simply omitted.
+- **SEO**: the leaf `/public/careers/[publicId]` always emits an explicit canonical
+  (published vacancy) and JSON-LD `JobPosting` behind
+  `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` (Vercel-only, default OFF, registered
+  in `FEATURE_FLAG_STATE_LEDGER.md`).
+- **Builder** `src/lib/hiring/public-careers/job-posting.ts` — server-only, pure,
+  fail-closed: remote requires ≥1 eligible country (TELECOMMUTE +
+  `applicantLocationRequirements`); hybrid/onsite requires `public_city` +
+  `public_country` (jobLocation with PostalAddress); `baseSalary` ONLY from
+  `content.compensation` (the free-text `public_compensation_band` is NEVER
+  converted to salary); NEVER emits `directApply` nor `validThrough` (withdrawal
+  is the unpublish 404); employmentType by exact conservative mapping
+  ("Jornada completa"→FULL_TIME; "Contrato indefinido" omitted);
+  `hiringOrganization` = Efeonce brand from the SSOT (`EFEONCE_BRAND_NAME` +
+  `EFEONCE_URL_HTTPS`, `src/config/efeonce-brand.ts`).
+- **Write path**: the existing canonical command only — `updateHiringOpening` /
+  `PATCH /api/hiring/openings/{id}` with `publicContent` and
+  `publicRemoteEligibleCountries` (capability `hiring.opening.write`). Zero new
+  endpoints, capabilities or events.
+- **Fixture** for the TASK-1741 renderer:
+  `src/lib/hiring/public-careers/editorial-opening.fixture.ts`
+  (`editorialOpeningFixture` + `legacyOpeningFixture`).
+- **Live data**: eligible countries approved by the CEO 2026-08-17 and ALREADY SET
+  via the canonical command on the 2 published vacancies (EO-OPN-0009 and
+  EO-OPN-0061): AR BO BR CL CO CR CU DO EC SV GT HN MX NI PA PY PE UY VE + US +
+  ES (21 countries). Both produce a valid JobPosting when the flag flips.
+
+Docs: ADR Delta 2026-08-17 in `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` ·
+functional `docs/documentation/hr/careers-publicas.md` §Contenido estructurado y
+SEO técnico · manual `docs/manual-de-uso/hr/operar-careers-publicas.md`
+§Contenido estructurado y schema de Google (sitemap/Indexing API decision runbook;
+Indexing API stays OUT until authorized).
+
 ## Uploaded-file malware scanning (TASK-1378, flag `ASSET_MALWARE_SCAN_ENABLED`)
 
 There is a real malware scanner behind files uploaded from outside (Cloud Run `services/clamav/`; adapter `src/lib/storage/asset-scan/`). Invariants:
