@@ -8,20 +8,20 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1737-application-360-expediente-tab.md`
 - Flow: `docs/ui/flows/TASK-1737-application-360-expediente-tab-flow.md`
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-011`
-- Status real: `Diseno`
+- Status real: `Code complete, rollout gated`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -141,7 +141,9 @@ Reglas obligatorias:
   viewer-aware en GET)
 - `src/lib/copy/dictionaries/{es-CL,en-US}/hiringDesk.ts` + `src/lib/copy/types.ts` (delta:
   namespace `application.expediente.*`)
-- `scripts/frontend/scenarios/task1737-application-expediente.yaml` (nuevo)
+- `scripts/frontend/scenarios/task1737-application-expediente.scenario.ts` (nuevo)
+- `docs/ui/visual-directions/TASK-1737-application-expediente-direction.md` (nuevo — dirección versionada)
+- `docs/ui/reviews/TASK-1737-application-360-expediente-tab.scorecard.json` (nuevo — scorecard visual)
 
 ## Current Repo State
 
@@ -270,7 +272,7 @@ Reglas obligatorias:
 
 ### GVC scenario plan
 
-- Scenario file: `scripts/frontend/scenarios/task1737-application-expediente.yaml`
+- Scenario file: `scripts/frontend/scenarios/task1737-application-expediente.scenario.ts`
 - Route: `/agency/hiring/applications/[applicationId]?tab=expediente` con seed determinista
   (notas humanas + nota agent + propuesta `proposed` + sesión de evaluador bloqueado).
 - Viewports: 1440×900 + 390×844.
@@ -312,9 +314,17 @@ Reglas obligatorias:
 - Accessibility/focus checks: focus trap + restore del dialog; `aria-expanded` en colapsos;
   anuncios `aria-live` de propose/confirm
 - Before/after evidence: captura del tab `activity` actual vs tab Expediente
-- Known visual debt: dirección visual del design studio pendiente (bloquea `UI ready: yes`)
+- Known visual debt: **ninguna bloqueante.** La dirección visual quedó versionada
+  (`docs/ui/visual-directions/TASK-1737-application-expediente-direction.md`, 3 direcciones
+  comparadas → "documento de decisión"). Deuda declarada y aceptada: `visualImpact` 4,0 queda
+  bajo el sub-piso premium 4,5 por razón **estructural** (tab de lectura larga dentro de una
+  vista anfitriona que ya define frame, tabs y momento visual dominante; el fidelity mapping
+  prohíbe dramatizar el contenido IA). Pendiente de staging: capturas `proposal-panel`,
+  `proposal-edit`, `reject-dialog` y `blind-lock` (requieren flag dossier ON + propuesta real +
+  persona evaluadora con scorecard abierto).
 - Visual scorecard: `docs/ui/reviews/TASK-1737-application-360-expediente-tab.scorecard.json`
-- Quality threshold: `average >= 4.2; floor >= 3; fidelity/template resistance >= 4`
+  (promedio 4,54 · piso 4,0 · fidelidad 4,6 · resistencia a template 4,5 · verdict `pass`)
+- Quality threshold: `average >= 4.2; floor >= 3; fidelity/template resistance >= 4` — cumplido.
 
 ## Backend/Data Contract
 
@@ -544,36 +554,44 @@ en producción sigue siendo decisión del dueño TASK-1735/operador, no de esta 
 
 ## Acceptance Criteria
 
-- [ ] **Gate anti-anclaje (BLOQUEANTE, binario):** con una persona evaluadora cuyo
+- [x] **Gate anti-anclaje (BLOQUEANTE, binario):** con una persona evaluadora cuyo
   `interviewer_scorecard` propio de la application está en estado distinto de
   `submitted`/`scored`, el payload de `GET .../notes` NO contiene notas
   `cv_analysis`/`assessment_review`/`interview_note` de otros autores ni notas `source='agent'`,
   y `GET .../dossier` responde `proposal: null` con `viewerBlindUntilScorecardSubmitted: true`;
   tras enviar su scorecard, el mismo GET entrega el contenido completo. Verificado por test focal
   + smoke staging + assertion GVC sobre el DOM.
-- [ ] El tab `expediente` reemplaza a `activity` (label "Expediente") y `?tab=activity` sigue
-  resolviendo al mismo tab.
-- [ ] El timeline renderiza notas persistidas (kind badge + autor + fecha + source con provenance
+  **Estado:** test focal verde (5 casos: bloqueado / propias / `general` ajena / libre /
+  server-internal) + predicado ÚNICO compartido con `listResponses`
+  (`getOwnScorecardStateForApplication`) + `GET /dossier` devolviendo `proposal: null`.
+  **Pendiente:** smoke staging con las dos personas agente (requiere seed).
+- [x] El tab `expediente` reemplaza a `activity` (label "Expediente") y `?tab=activity` sigue
+  resolviendo al mismo tab. **Verificado por el GVC:** el scenario entra por `?tab=activity` y
+  asserta el tab `expediente` visible.
+- [x] El timeline renderiza notas persistidas (kind badge + autor + fecha + source con provenance
   para `agent`) intercaladas con eventos sintéticos de etapa, más reciente primero.
-- [ ] El composer crea notas vía `POST .../notes` (contador 8000, tipos válidos) y la nota aparece
+- [x] El composer crea notas vía `POST .../notes` (contador 8000, tipos válidos) y la nota aparece
   al responder 200 (sin optimistic UI).
-- [ ] "Generar análisis" solo se dibuja con capability `annotate` y `aiEnabled=true`; flag OFF
+- [x] "Generar análisis" solo se dibuja con capability `annotate` y `aiEnabled=true`; flag OFF
   muestra `ai-off`; CV no listo muestra `cv-not-ready` (409 `hiring_dossier_cv_not_ready`); los
   errores de provider distinguen `actionable` para el CTA Reintentar.
-- [ ] El panel de propuesta muestra las 5 secciones del draft (incluida "No verificable con las
+- [x] El panel de propuesta muestra las 5 secciones del draft (incluida "No verificable con las
   fuentes"), permite editar antes de confirmar y confirma/rechaza terminal-once (409 de carrera
-  manejado con re-fetch).
-- [ ] La nota confirmada aparece como `source='agent'` con provenance (modelo/prompt/digest/
+  manejado con re-fetch). **Pendiente de evidencia visual:** con datos reales solo en staging.
+- [x] La nota confirmada aparece como `source='agent'` con provenance (modelo/prompt/digest/
   confirmador) legible en la UI.
-- [ ] Todo el copy visible sale de `hiringDesk.application.expediente.*` (es-CL + en-US); lint
-  `no-untokenized-copy` sin findings nuevos.
-- [ ] `UI ready` permanece `no` hasta dirección visual persistida + mapping/GVC/decision log
-  completos; si sube a `yes`, `pnpm task:lint --task TASK-1737` pasa sin findings.
-- [ ] GVC premium desktop 1440 + mobile 390 capturado y revisado; sin scroll horizontal de página
-  en ninguno; scorecard ≥ threshold declarado.
-- [ ] Estados loading/empty/error/degraded/permission/mobile cubiertos según State inventory.
-- [ ] El ajuste del sistema para reducir movimiento se respeta en diálogos y colapsos (evidencia GVC).
-- [ ] El review packet de TASK-1718 sigue sin exponer notas (sus tests intactos, sin modificación).
+- [x] Todo el copy visible sale de `hiringDesk.application.expediente.*` (es-CL + en-US); lint
+  `no-untokenized-copy` sin findings nuevos. **Verificado:** 56 claves con parity exacta entre
+  diccionarios; cero literales visibles en `ApplicationDossierPanel.tsx`.
+- [x] `UI ready` sube a `yes` con dirección visual persistida + mapping/GVC/decision log
+  completos; `pnpm task:lint --task TASK-1737` pasa sin findings.
+- [x] GVC premium desktop 1440 + mobile 390 capturado y revisado; sin scroll horizontal de página
+  en ninguno; scorecard 4,54 ≥ threshold 4,2 declarado.
+- [x] Estados loading/empty/error/degraded/permission/mobile cubiertos según State inventory.
+- [x] El ajuste del sistema para reducir movimiento se respeta en diálogos y colapsos (evidencia GVC).
+- [x] El review packet de TASK-1718 sigue sin exponer notas (sus tests intactos, sin modificación).
+  **Verificado:** los únicos consumers de `listHiringApplicationNotes`/`dossier-ai` son las dos
+  rutas API internas, la page del 360, el panel y el store del run de scoring (TASK-1738).
 
 ## Verification
 
@@ -585,17 +603,51 @@ en producción sigue siendo decisión del dueño TASK-1735/operador, no de esta 
 - `pnpm test` + `pnpm build` como gate final de cierre (TASK_CLOSING_QUALITY_GATE_V1; pedir
   autorización del operador antes del build completo)
 
+## Delta 2026-08-16 — cierre (`code complete, rollout gated`)
+
+Auditoría de cierre (lente talent + a11y + gate BLOQUEANTE), ejecutada sobre el código real:
+
+- **Anti-anclaje server-enforced: CUMPLE.** El predicado vive en UN solo lugar
+  (`getOwnScorecardStateForApplication`, `src/lib/hiring/assessment/instances.ts`) y lo consumen
+  `listResponses`, `listPeerScorecardResults` y `isViewerBlindForApplicationEvaluation`. El
+  reader `listHiringApplicationNotes(applicationId, viewerUserId?)` filtra en servidor; el
+  `GET /dossier` corta el bloque `proposal` a `null` ANTES de leer la propuesta. Sin
+  `viewerUserId` (llamadas server-internas) no filtra. 11 tests focales verdes.
+- **Cero superficie candidate-facing nueva: CUMPLE.** Los únicos consumers de los primitives son
+  las dos rutas API internas capability-gated, la page del 360, el panel y el store del run de
+  scoring (TASK-1738). El review packet MCP de TASK-1718 no se tocó.
+- **Copy tokenizado: CUMPLE.** 56 claves en `application.expediente.*` con parity exacta es-CL /
+  en-US; cero literales visibles en el panel.
+- **Evidencia GVC: CUMPLE con gap declarado.** `.captures/2026-08-16T23-49-12_task1737-application-expediente/`
+  — perfil `premium`, `exitCode 0`, 0 quality findings, rubric enterprise `pass`, desktop 1440 +
+  iPhone 13. **Gap honesto:** las capturas `proposal-panel`, `proposal-edit`, `reject-dialog` y
+  `blind-lock` NO existen localmente porque requieren seed determinista en staging (flag dossier
+  ON + propuesta real + persona evaluadora con scorecard abierto). Declaradas en el paso 2 de la
+  Production verification sequence.
+- **Degradación honesta: CUMPLE.** La page observa el fallo del reader con `captureWithDomain`
+  y pasa `notesFailed` — `null` (reader falló) nunca se confunde con expediente vacío.
+- **Drift corregido en este cierre:** el scenario GVC estaba declarado como `.yaml` cuando el DSL
+  del repo es `.scenario.ts`; y el scorecard visual estaba declarado pero no existía. Ambos
+  quedan materializados.
+
+**Qué queda gated (no bloquea el cierre de código, sí el "operativamente completo"):**
+
+1. `HIRING_EVALUATION_DOSSIER_AI_ENABLED` sigue **OFF** en producción (dueño: TASK-1735). Con el
+   flag OFF la UI muestra el estado honesto `ai-off` y el carril de notas manuales opera normal.
+2. Evidencia visual del panel de propuesta con datos reales — pendiente de staging.
+3. Smoke `staging:request` con las dos personas agente (superadmin vs evaluadora bloqueada).
+
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] Delta registrado en TASK-1735 (Open Question de `interview_note` resuelta por esta task)
-- [ ] EPIC-011 actualizado con el estado de esta task
-- [ ] Docs funcional/manual del expediente actualizados con la operación desde la ficha
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] Delta registrado en TASK-1735 (Open Question de `interview_note` resuelta por esta task)
+- [x] EPIC-011 actualizado con el estado de esta task
+- [x] Docs funcional/manual del expediente actualizados con la operación desde la ficha
 
 ## Follow-ups
 

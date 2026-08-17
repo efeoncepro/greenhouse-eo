@@ -581,6 +581,31 @@ sin providers externos, sin coordinación de operadores más allá del manual nu
 - Métrica de calidad del borrador: medir el delta de edición humana (propuesta vs nota
   confirmada) como señal de drift del prompt/modelo.
 
+## Delta 2026-08-16 (4) — gate BLOQUEANTE anti-anclaje CERRADO por TASK-1737
+
+`TASK-1737` (complete) shippeó el consumer UI del expediente **y** resolvió el gate BLOQUEANTE
+que el Delta (3) dejó abierto. La Open Question sobre `interview_note` cross-evaluador
+pre-submit queda **resuelta con criterio conservador y server-enforced**:
+
+- El predicado "¿el scorecard PROPIO del viewer está abierto?" se extrajo a
+  `getOwnScorecardStateForApplication` (`src/lib/hiring/assessment/instances.ts`) y es UNO solo:
+  lo consumen `listResponses`, `listPeerScorecardResults` y el nuevo
+  `isViewerBlindForApplicationEvaluation`.
+- `listHiringApplicationNotes(applicationId, viewerUserId?)` omite, para el viewer bloqueado,
+  las notas score-bearing (`cv_analysis`/`assessment_review`/`interview_note`) de OTROS autores
+  y **toda** nota `source='agent'`; devuelve `hiddenNoteCount` +
+  `viewerBlindUntilScorecardSubmitted`. Las notas propias del viewer y las `general` ajenas
+  siempre pasan. Sin `viewerUserId` (llamadas server-internas, incluido el confirm del dossier)
+  no filtra — espejo exacto de `listResponses`.
+- `GET /api/hiring/applications/[id]/dossier` responde `proposal: null` +
+  `viewerBlindUntilScorecardSubmitted: true` bajo el mismo predicado.
+- La ceguera vive en el reader, no en la pantalla: Nexa/MCP y cualquier consumer futuro la
+  heredan por construcción. La UI solo pinta el estado honesto con salida al scorecard propio.
+
+El flag `HIRING_EVALUATION_DOSSIER_AI_ENABLED` sigue siendo de esta task y sigue **OFF** en
+producción; TASK-1737 no lo prende — con el flag OFF la superficie muestra `ai-off` honesto y el
+carril de notas manuales opera normal.
+
 ## Delta 2026-08-16 (3) — auditoría post-implementación (arch PASS + talent CONDITIONAL→resuelto)
 
 Correcciones aplicadas tras doble auditoría: (1) `answerText` del packet pasa por
@@ -618,10 +643,11 @@ CV-vs-assessment de EO-APP-0078 hecho a mano en esta misma sesión.
 
 ## Open Questions
 
-- Visibilidad de `interview_note` entre evaluadores antes del submit del scorecard propio:
-  el invariante anti-anclaje de TASK-1360 aplica a ratings; decidir en la task UI si las
-  notas de entrevista se ocultan cross-evaluador hasta el debrief para no debilitar su
-  espíritu.
+- ~~Visibilidad de `interview_note` entre evaluadores antes del submit del scorecard propio~~ —
+  **RESUELTA por TASK-1737 (2026-08-16), ver Delta (4):** ocultamiento conservador
+  server-enforced en `listHiringApplicationNotes` bajo el mismo predicado de `listResponses`;
+  el bloqueo es fino (score-bearing ajeno + `agent`), nunca el expediente entero, para que el
+  evaluador siga anotando su propia entrevista.
 - Retención/redacción: si el candidato ejerce derechos de privacidad, definir con
   `legal-privacy-ip-operator` el tratamiento del expediente (fuera de alcance aquí; las
   notas no guardan identidad legal ni demográficos).

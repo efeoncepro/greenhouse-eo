@@ -1575,3 +1575,51 @@ retry de un apply exitoso es idempotente (`already_canonical` cuenta como éxito
 vacío materializa el placeholder neutro `Candidato` + `needs_review` (jamás un display invisible); la
 evidencia trunca defensivamente a 400 chars pre-INSERT y el capture a Sentry de esa capa viaja
 sanitizado (code/constraint PG, jamás DETAIL con PII).
+
+## Delta 2026-08-16 (4) — Tab Expediente + gate anti-anclaje server-enforced (TASK-1737, code complete / rollout gated)
+
+El Expediente de Evaluación (TASK-1735) gana consumer UI y **cierra el gate BLOQUEANTE** que su
+Delta (3) dejó abierto: un evaluador con `hiring.application.read` podía leer el análisis con
+scores antes de rendir su propio scorecard, debilitando el invariante anti-anclaje de TASK-1383.
+
+**Predicado único (no duplicar el SQL).** El estado "¿el scorecard PROPIO del viewer en esta
+application está cerrado?" se extrajo a `getOwnScorecardStateForApplication(applicationId,
+viewerUserId)` en `src/lib/hiring/assessment/instances.ts`. Lo consumen los TRES caminos:
+`listResponses`, `listPeerScorecardResults` (ratings, TASK-1383) e
+`isViewerBlindForApplicationEvaluation` (expediente, TASK-1737). `CLOSED_SCORECARD_STATUSES =
+['submitted','scored']`. Un operador **sin** scorecard asignado (reclutador/People Ops) NO activa
+el predicado.
+
+**Contrato del reader.** `listHiringApplicationNotes(applicationId, viewerUserId?)` devuelve
+`HiringApplicationNotesView = { notes, hiddenNoteCount, viewerBlindUntilScorecardSubmitted }`.
+Para el viewer bloqueado omite (a) las notas de `HIRING_SCORE_BEARING_NOTE_KINDS` de OTROS
+autores y (b) **toda** nota `source='agent'` (el análisis IA lee scores por construcción). Las
+notas propias del viewer y las `general` ajenas SIEMPRE pasan. **Sin `viewerUserId` no filtra** —
+espejo exacto de `listResponses`, para que las llamadas server-internas (el confirm del dossier
+lee notas) no se rompan.
+
+**Contrato de las rutas.** `GET /notes` pasa `tenant.userId` como viewer y sirve el payload ya
+filtrado. `GET /dossier` evalúa el predicado ANTES de leer la propuesta y, bajo bloqueo, responde
+`{ aiEnabled, proposal: null, viewerBlindUntilScorecardSubmitted: true, hiddenNoteCount }`.
+
+**Invariantes para agentes:**
+
+- **NUNCA** implementar el anti-anclaje del expediente como filtro client-side ni duplicar el SQL
+  del predicado: la ceguera vive en el reader, así que Nexa/MCP y cualquier consumer futuro la
+  heredan por construcción (lección estructural del blind sample de TASK-1734).
+- **NUNCA** bloquear el expediente entero bajo el predicado: el bloqueo es fino (score-bearing
+  ajeno + `agent`) para que el evaluador siga anotando su propia entrevista.
+- **NUNCA** confundir `notes: null` (el reader FALLÓ — la page observa con `captureWithDomain` y
+  degrada honesto) con expediente vacío.
+- La UI es cliente delgado: `src/views/greenhouse/hiring/ApplicationDossierPanel.tsx` sólo
+  renderiza DTOs y llama las rutas; cero lógica de negocio.
+
+Superficie: tab `expediente` de `/agency/hiring/applications/[applicationId]` (rename de
+`activity`, alias `?tab=activity` preservado). Copy en `hiringDesk.application.expediente.*`
+(56 claves, parity es-CL/en-US). Dirección visual
+`docs/ui/visual-directions/TASK-1737-application-expediente-direction.md` · funcional
+`docs/documentation/hr/expediente-de-evaluacion.md` · manual
+`docs/manual-de-uso/hr/operar-expediente-de-evaluacion.md`. **Rollout gated:**
+`HIRING_EVALUATION_DOSSIER_AI_ENABLED` sigue OFF en producción (dueño TASK-1735; con el flag OFF
+la UI muestra el estado honesto `ai-off`) y la evidencia visual del panel de propuesta con datos
+reales queda pendiente de staging.

@@ -1,0 +1,102 @@
+{
+  "taskId": "TASK-1737",
+  "scenario": "task1737-application-expediente",
+  "reviewedAt": "2026-08-16",
+  "reviewer": "Claude (skills de product design) + GVC premium local evidence",
+  "evidence": {
+    "desktop": ".captures/2026-08-16T23-49-12_task1737-application-expediente/01-desktop/",
+    "mobile": ".captures/2026-08-16T23-49-12_task1737-application-expediente/02-mobile/",
+    "direction": "docs/ui/visual-directions/TASK-1737-application-expediente-direction.md",
+    "dossier": "commit e2405fd8a (bitácora de la pasada de diseño) + manifest.json del GVC"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.7,
+      "rationale": "Escalera lead 16 → afirmación 14/600 → evidencia 13/400 con encabezado de sección como regla editorial; el conteo da magnitud antes de leer.",
+      "evidence": "01-desktop, bloque COHERENCIAS/GAPS",
+      "nextAction": ""
+    },
+    "proportions": {
+      "score": 4.5,
+      "rationale": "Medida de lectura 64ch a nivel de <section> acota la columna aunque el canvas del 360 crezca; la propuesta ocupa el peso que su decisión exige.",
+      "evidence": "01-desktop full tab",
+      "nextAction": ""
+    },
+    "rhythm": {
+      "score": 4.7,
+      "rationale": "Proximidad 12px afirmación↔evidencia vs 32px entre claims (≈1:2,7): agrupa la cercanía, no una caja. Filetes estructuran cabecera, cuerpo y procedencia.",
+      "evidence": "01-desktop, nota agent con provenance",
+      "nextAction": ""
+    },
+    "density": {
+      "score": 4.5,
+      "rationale": "Lectura larga sin muro: el chip de score es anotación en línea que no infla interlineado; colapso 'Ver más' sobre 600 caracteres.",
+      "evidence": "01-desktop timeline",
+      "nextAction": ""
+    },
+    "depth": {
+      "score": 4.4,
+      "rationale": "Un solo Paper outlined por entrada; el perímetro primary marca el único bloque que exige decisión. Sin elevación decorativa.",
+      "evidence": "enterprise rubric pass",
+      "nextAction": "Confirmar con la propuesta real en staging (seed pendiente)."
+    },
+    "surfaceEconomy": {
+      "score": 4.7,
+      "rationale": "Se eliminó el relleno tonal por claim que producía once rectángulos idénticos dentro del Paper: cero card-on-card, cero card wallpaper.",
+      "evidence": "commit e2405fd8a — antes/después del bloque de claims",
+      "nextAction": ""
+    },
+    "visualImpact": {
+      "score": 4.0,
+      "rationale": "Bajo el piso premium de 4,5 por razón ESTRUCTURAL declarada y aceptada: la superficie es un tab de lectura larga dentro de una vista anfitriona que ya define frame, tabs y momento visual dominante (TASK-355). Un momento visual propio competiría con el host y contradiría el fidelity mapping del wireframe, que prohíbe explícitamente animar o dramatizar el contenido IA. El acento se concentra donde importa: el perímetro primary del único bloque que pide decisión.",
+      "evidence": "01-desktop first fold + wireframe §Visual Fidelity Mapping",
+      "nextAction": "Reevaluar si el expediente alguna vez sale a superficie propia (People 360, TASK-1733)."
+    },
+    "typography": {
+      "score": 4.8,
+      "rationale": "Escalera completa desde el SoT (body1/body2/caption/overline), 64ch de medida, tabular-nums en scores; se corrigió fontWeight 500 (rol prohibido, TASK-1039) a 600.",
+      "evidence": "design-contract:lint verde",
+      "nextAction": ""
+    },
+    "color": {
+      "score": 4.5,
+      "rationale": "Semáforo de hiring para chips de kind, primary solo en el bloque agéntico, info.lightOpacity en el LOCK con texto text.primary. Sin HEX literal.",
+      "evidence": "axe color-contrast sin violaciones (4.5:1)",
+      "nextAction": ""
+    },
+    "iconography": {
+      "score": 4.5,
+      "rationale": "Glyphs Tabler 18px aria-hidden como ancla del encabezado de sección; el ícono nunca porta significado solo (siempre con texto).",
+      "evidence": "01-desktop encabezados de sección",
+      "nextAction": ""
+    },
+    "responsive": {
+      "score": 4.7,
+      "rationale": "390px colapsa sin breakpoints ad-hoc: la medida 64ch deja de morder y la composición se apila. scrollWidth == clientWidth en ambos viewports.",
+      "evidence": "02-mobile (iPhone 13), layout pass",
+      "nextAction": ""
+    },
+    "motion": {
+      "score": 4.4,
+      "rationale": "Solo transiciones por defecto de Dialog/Collapse; sin entrada animada del borrador IA (prohibida). reduced-motion sin violaciones.",
+      "evidence": "probe reduced-motion del GVC",
+      "nextAction": ""
+    },
+    "fidelity": {
+      "score": 4.6,
+      "rationale": "Las tres regiones, los estados y el copy ledger del wireframe se materializaron sin reinterpretación; la dirección B quedó versionada antes de cerrar.",
+      "evidence": "wireframe §Layout Skeleton vs 01-desktop",
+      "nextAction": ""
+    },
+    "genericTemplateResistance": {
+      "score": 4.5,
+      "rationale": "La cita tipográfica con filete tonal y el encabezado-regla con conteo leen como documento de decisión de Efeonce, no como feed de comentarios de un ATS genérico.",
+      "evidence": "enterprise rubric pass, 0 findings",
+      "nextAction": ""
+    }
+  },
+  "average": 4.54,
+  "threshold": "average >= 4.2; floor >= 3; fidelity/template resistance >= 4 (declarado por TASK-1737)",
+  "premiumSubFloorException": "visualImpact 4,0 queda bajo el sub-piso 4,5 del estándar premium; excepción estructural declarada y aceptada (tab de lectura larga dentro de vista anfitriona con momento visual propio).",
+  "verdict": "pass"
+}

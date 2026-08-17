@@ -3,6 +3,18 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-16 — Tab Expediente en la Application 360 (TASK-1737)
+
+- Hiring: el tab "Actividad" pasa a ser **Expediente** — timeline de notas persistidas con
+  provenance del agente intercalado con eventos de etapa, composer tipado y flujo
+  propose → editar → confirmar/rechazar del análisis IA. Deep-links `?tab=activity` intactos.
+- Hiring: **gate anti-anclaje cerrado server-side.** Un evaluador con scorecard propio abierto
+  deja de recibir el análisis IA y las notas de evaluación ajenas — el filtro vive en el reader
+  con el MISMO predicado del anti-anclaje de ratings; sus notas propias y las `general` ajenas
+  siempre pasan. La ceguera no es de la pantalla: cualquier consumer futuro la hereda.
+- Rollout gated: flag `HIRING_EVALUATION_DOSSIER_AI_ENABLED` sigue OFF en producción (la UI lo
+  declara honestamente); evidencia visual del panel de propuesta pendiente de staging.
+
 ## 2026-08-16 — Identidad de intake canonicalizada completa (TASK-1736)
 
 - Hiring: cierre del trío del día — TASK-1736 complete con remediación gobernada
@@ -1110,27 +1122,3 @@ herramientas dejaron de aceptar.
 - **OAuth Search Console cableado en producción** — el flag llevaba ON pero el cliente OAuth existía solo
   en staging (`oauth/start` respondía `not_configured`; clase "flag sin cablear"). Vars en Vercel
   Production + redeploy; verificación del redirect URI al primer consent real.
-
-## 2026-08-07 — Los tres modelos de servicio dejan de ser vocabulario y pasan a ser contrato (TASK-1663)
-
-Al revisar quién debería declarar los objetivos de un cliente, el operador señaló que el módulo de
-búsqueda tiene los mismos tres modelos de servicio que el estudio creativo: operado por nosotros,
-co-operado, u operado por el cliente. Y que "el cliente contrata la herramienta" no es un cuarto
-modelo, sino el tercero cruzado con una forma de entrega distinta.
-
-Resultó que el vocabulario ya era canónico desde el modelo de negocio, y que el estudio creativo ya
-lo había convertido en un contrato de datos real y desplegado. Lo que faltaba era que Greenhouse
-tuviera el suyo: lo que había con nombre parecido pertenece a cotización, no a esto, y ningún módulo
-de producto conocía el concepto.
-
-La regla que hace que esto funcione, copiada tal cual del contrato existente: **el modo dice quién
-responde, nunca quién puede.** Si otorgara permisos, cambiar una etiqueta comercial en una tabla
-cambiaría en silencio quién puede comprometer gasto con un proveedor. Por eso el entregable más
-importante de la tarea no es la tabla: es la prueba automatizada de que cambiar el modo no altera lo
-que nadie puede hacer.
-
-Quedan tres preguntas separadas que antes se confundían: quién puede actuar, quién responde, y quién
-paga. Y una decisión deliberada: no hay valores por defecto por modelo. Cada acuerdo con un cliente
-declara explícitamente sus responsabilidades, y la ausencia de declaración es un estado cerrado, no
-una suposición. Un default parece cómodo y es justamente lo que hace que nadie revise el reparto
-real — que en el modelo co-operado es distinto para cada cliente.

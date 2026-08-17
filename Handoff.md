@@ -2,6 +2,50 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-16 — TASK-1737 complete (code complete, rollout gated) — tab Expediente
+
+El tab `activity` sintético de la Application 360 es ahora el **Expediente** real: timeline de
+notas persistidas (kind, autor, source con provenance del agente) intercalado con eventos de
+etapa, composer tipado y flujo dossier propose → editar → confirmar/rechazar con estados
+honestos. Alias `?tab=activity` preservado y probado por el GVC.
+
+**El gate BLOQUEANTE anti-anclaje del Delta (3) de TASK-1735 queda cerrado.** El predicado
+"scorecard propio abierto" se extrajo a `getOwnScorecardStateForApplication` y ahora es UNO
+solo, compartido por `listResponses`, `listPeerScorecardResults` e
+`isViewerBlindForApplicationEvaluation`. El reader `listHiringApplicationNotes(appId, viewerUserId?)`
+omite score-bearing ajeno + toda nota `agent` para el viewer bloqueado, y `GET /dossier`
+devuelve `proposal: null`. Sin `viewerUserId` (server-internal) no filtra. La ceguera vive en el
+reader, así que Nexa/MCP la heredan por construcción. Delta registrado en 1735 con la Open
+Question de `interview_note` resuelta.
+
+`UI ready` subió a `yes` en el cierre: se materializó la dirección visual versionada
+(`docs/ui/visual-directions/TASK-1737-application-expediente-direction.md`, 3 direcciones
+comparadas → "documento de decisión") y el scorecard
+(`docs/ui/reviews/TASK-1737-application-360-expediente-tab.scorecard.json`, promedio 4,54).
+`visualImpact` 4,0 queda bajo el sub-piso premium 4,5 por razón **estructural** declarada y
+aceptada: es un tab de lectura larga dentro de una vista anfitriona que ya define el momento
+visual dominante. `pnpm task:lint --task TASK-1737` → template=1 errors=0.
+
+**Drift corregido en el cierre:** el scenario GVC estaba declarado como `.yaml` cuando el DSL
+del repo es `.scenario.ts`, y el scorecard visual estaba declarado pero no existía.
+
+**Rollout gated (no cerrado):**
+
+1. `HIRING_EVALUATION_DOSSIER_AI_ENABLED` sigue **OFF** en producción — dueño TASK-1735, esta
+   task no lo prende. Con el flag OFF la UI muestra `ai-off` honesto y las notas manuales operan.
+2. Evidencia visual del panel de propuesta con datos reales (`proposal-panel`, `proposal-edit`,
+   `reject-dialog`, `blind-lock`) pendiente de seed en staging.
+3. Smoke `staging:request` con las dos personas agente (superadmin vs evaluadora bloqueada).
+
+GVC premium local verde: `.captures/2026-08-16T23-49-12_task1737-application-expediente/`
+(exitCode 0, 0 quality findings, rubric enterprise `pass`, 1440 + iPhone 13).
+
+**Impacto cruzado:** TASK-1737 libera la propiedad de `Application360View.tsx`. La nota
+"pendiente: integración con Application360View, el archivo lo posee TASK-1737" de
+`TASK-1738-assessment-ai-review-workbench.md` quedó **stale** — el commit `a533d10dd` ya montó
+`AssessmentAiRunEntry`. No edité esa spec porque otro agente la tiene en vuelo en esta misma
+sesión; que la actualice en su cierre.
+
 ## 2026-08-16 — Pipeline Hiring contenido y accesible
 
 El scope de vacante y el conteo de postulantes se integraron al `WorkbenchHeader`; búsqueda, ayuda y Kanban
@@ -550,50 +594,3 @@ deploy del gateway cuando el próximo release develop→main lleve el lane a pro
 tools federadas darían 404 upstream — lección TASK-1661). Sin enqueue automático: ON + cola vacía
 = costo cero; cada corrida pasa preview + gate. Desbloqueadas: TASK-1666, TASK-1667
 (`Blocked by: none`) y 1665 sólo espera 1666.
-
-### Release a producción 2026-08-14 — `3754a17d3b1d` RELEASED
-
-`release_id=3754a17d3b1d-4ae924ca-eb20-4c54-9ddb-e15a7ecfe26a`, run `31793370954`, PR #192.
-**Manifest `released`** (verificado en `greenhouse_sync.release_manifests`, no sólo en GitHub).
-Pasó a la primera: 0 retries, 0 runs quemados. E2E agente 1h04m; workflow 11m33s.
-
-**Verificado en runtime, no asumido:** 4 workers Cloud Run `Ready=True` (3 con el target SHA;
-`ops-worker` en `9edd4a0e1e0f` = **residual change-gated legítimo**, diff de rutas runtime vacío —
-NO forzar redeploy, runbook §4.1) · watchdog 3/3 `ok` · `/api/auth/health` 200 · **canary del
-gateway contra PRODUCCIÓN completo verde**, incluida la tool nueva
-(`keyword-market-data: market=available found=2/2 asOf=2026-08-13 servedMarket=2484/es`).
-
-**Break-glass usado con razón verificada** (no formulaica): `db_migrations` es dominio irreversible,
-pero la migración `20260813171143226` ya figuraba en `pgmigrations` (2026-08-13 21:13Z) y hay UNA
-sola instancia Cloud SQL — el dominio era reconciliación de archivos con un estado ya realizado.
-Rollback = revert del PR #192, sin undo de schema.
-
-**Gateway MCP:** deploy dispatchado (`efeonce-mcp` run `31794233777`, sha `c4e0fcd`) DESPUÉS de
-confirmar el lane vivo en producción. Verificar que cierre y correr el canary contra
-`mcp.efeonce.org`.
-
-**Pendiente menor:** primer run del scheduler `ops-seo-keyword-market-data` el día 15 08:00 CLT
-(esperado `already_fresh`, costo ~0).
-
-### ISSUE-152 + ISSUE-153 resueltos — mercado de Berel corregido + contrato multi-mercado (2026-08-13)
-
-**Berel migrado a México** (autorización del operador: "Berel es de México" + "solucionalo
-end-to-end"): `seot-berel-mx` activo con 31 keywords, `seot-berel-fase0` (CL) pausado con sus 238
-snapshots íntegros. Verificado con capturas reales (USD ~0.14): 31/31 rankings MX — **#1 en sus
-términos de marca** —, mercado 30/31, ledger atribuido. El cron diario toma MX solo desde el
-próximo ciclo (itera targets `active`).
-
-**Contrato multi-mercado shipped** (`bc7cafe77`): helper canónico `resolve-target.ts` (los 4
-`LIMIT 1` copy-pasteados migrados), lane con `?market=` + 409 `multiple_markets`/`market_not_found`,
-`meta.servedMarket` en toda respuesta, 9 MCP tools con `market` opcional. Suite 10.629 verde.
-
-**Pendientes que dejaron estos cierres (no bloqueantes):**
-- Selector de mercado en la UI admin (cockpit/keywords) — producto, para cuando una org
-  multi-mercado se materialice; declarado en ISSUE-153 §Follow-up.
-- Guardrail de alta de target (contrastar volumen del nombre de marca vs mercados vecinos) —
-  ISSUE-152 §4.
-- `keyword_difficulty`: RESUELTO, y desde `fc0019e43` ya **no gobierna la presentación**. La UI
-  muestra **Barrera de enlaces: Baja/Media/Alta** derivada por `deriveLinkBarrier`
-  (`src/lib/growth/seo/keyword-market-data.ts`) desde el perfil de enlaces del top-10 real
-  (`avg_backlinks_info`), ponderando **diversidad de dominios referentes + page rank, nunca el
-  conteo de enlaces** — explícitamente NO la KD. `classifyLinkBarrier` fue eliminada.

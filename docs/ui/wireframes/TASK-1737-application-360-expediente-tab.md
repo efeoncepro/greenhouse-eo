@@ -2,14 +2,15 @@
 
 ## Meta
 
-- Status: `contract-ready` (dirección visual del design studio pendiente — `UI ready: no` en la task)
+- Status: `direction-locked` (dirección visual versionada 2026-08-16 — `UI ready: yes` en la task)
 - Owner task: `TASK-1737 — Application 360: tab Expediente (consumer UI del Evaluation Dossier de TASK-1735)`
-- Product Design asset: **pendiente** — no existe todavía una dirección visual versionada del design studio para esta superficie. Este wireframe fija el contrato de regiones/estados/copy/datos; la task mantiene `UI ready: no` hasta que `greenhouse-ai-design-studio` persista la dirección (2–3 direcciones comparadas + asset duradero) y se complete el Visual Direction Contract.
-- Visual direction mode: `repo-native-benchmark` (propuesto): la composición hereda el vocabulario aprobado de la Application 360 (TASK-355/1422/1715 — frame, tabs, filas con icon-tile, chips de estado) y el timeline vertical ya usado en `decisionHistory`; el panel de propuesta IA hereda el patrón "Sugerencia de IA · revísala antes de confirmar" del drawer de corrección (TASK-1363/1361).
+- Product Design asset: docs/ui/visual-directions/TASK-1737-application-expediente-direction.md — dirección versionada con 3 direcciones comparadas (bloques rellenos por claim · documento de decisión · riel de acento), decisión "documento de decisión", token mapping y anti-patrones. Evidencia de la pasada: commit `e2405fd8a` + GVC premium `.captures/2026-08-16T23-49-12_task1737-application-expediente/`.
+- Visual direction mode: `repo-native-benchmark`
+- Direction rationale: la composición hereda el vocabulario aprobado de la Application 360 (TASK-355/1422/1715 — frame, tabs, filas con icon-tile, chips de estado) y el timeline vertical ya usado en `decisionHistory`; el panel de propuesta IA hereda el patrón "Sugerencia de IA · revísala antes de confirmar" del drawer de corrección (TASK-1363/1361).
 - Intended consumers: reclutador / hiring manager / People Ops con `hiring.application.read` (leer) y tier gobernanza con `hiring.application.annotate` (anotar/proponer/confirmar) en `/agency/hiring/applications/[applicationId]`.
 - Copy source: `src/lib/copy/dictionaries/{es-CL,en-US}/hiringDesk.ts` → namespace **nuevo** `application.expediente.*` + reuso de `common.*`. Tono validado con `greenhouse-ux-writing`.
 - Primitive decision: **reuse total** — MUI `Timeline`-like con `Stack` + `Paper variant='outlined'` (patrón decisionHistory), `GreenhouseChip kind='status'`, `GreenhouseButton`, `CustomTextField` (composer), `Dialog` (rechazo con nota), `Alert`, `Skeleton`, `Snackbar`. CERO primitives nuevas.
-- UI ready target: `no` (sube a `yes` solo con dirección visual persistida + GVC plan ejecutado en seco)
+- UI ready target: `yes` — dirección visual persistida, implementation mapping/GVC plan/decision log completos y GVC premium ejecutado (0 findings, rubric enterprise `pass`) en 1440 y 390.
 
 ## Brief
 
@@ -244,8 +245,8 @@ acción principal). `scrollWidth == clientWidth` es assertion del GVC en este vi
 | proposing | — | CTA en `aria-busy`, panel skeleton | — | idempotente: reintento devuelve la misma propuesta |
 | proposal-active | Borrador del análisis | panel REGION 1 completo | Editar / Rechazar / Confirmar | `proposal.status='proposed'` |
 | confirming/rejecting | — | CTA busy, panel bloqueado | — | terminal-once; doble click inofensivo (409 idempotente) |
-| blind-locked | Expediente parcialmente bloqueado | LOCK region; composer + notas propias visibles | Ir a mi scorecard | server-enforced; ver Region LOCK |
-| permission-denied (annotate) | — | composer y CTAs no se dibujan; caption `emptyReadOnly` | — | lectura sigue operando con `hiring.application.read` |
+| partial | Expediente parcialmente bloqueado (`blind-locked`) | LOCK region; composer + notas propias visibles; contador de notas ocultas | Ir a mi scorecard | anti-anclaje server-enforced; ver Region LOCK. El expediente NO se bloquea entero: el evaluador sigue anotando su propia entrevista |
+| denied | — | sin capability `annotate`: composer y CTAs no se dibujan; caption `emptyReadOnly` | — | lectura sigue operando con `hiring.application.read`; un 403 en vuelo muestra Alert `actionable=false` SIN botón Reintentar |
 | error | — | `loadError` / error canónico del command | Reintentar si `actionable=true` | nunca "sin notas" cuando el reader falló |
 | long content | — | notas colapsadas con Ver más | — | clamp accesible |
 | mobile | — | header apilado, composer Select, cards full-width | — | 390px sin scroll horizontal |
@@ -278,7 +279,7 @@ acción principal). `scrollWidth == clientWidth` es assertion del GVC en este vi
 
 ## GVC Scenario Plan
 
-- Scenario file: `scripts/frontend/scenarios/task1737-application-expediente.yaml` (nuevo).
+- Scenario file: `scripts/frontend/scenarios/task1737-application-expediente.scenario.ts` (nuevo; el DSL del repo es TypeScript, no YAML).
 - Route: `/agency/hiring/applications/[applicationId]` `?tab=expediente`, seed determinista: application con CV ready, assessment corregido, 2 notas humanas (interview_note + general), 1 nota agent confirmada con provenance, 1 propuesta `proposed` vigente, y una segunda sesión con persona evaluadora de scorecard abierto para el estado blind-locked.
 - Viewports: desktop 1440×900 + mobile 390×844.
 - Quality profile: `premium`.
@@ -290,6 +291,8 @@ acción principal). `scrollWidth == clientWidth` es assertion del GVC en este vi
 - Reduced-motion / focus evidence: captura con `prefers-reduced-motion: reduce`; ciclo abrir dialog→Esc→foco restaurado.
 - Review dossier: `pnpm fe:capture:review task1737-application-expediente`.
 - Baseline decision / surface ID: superficie renombrada dentro de vista existente → baseline nuevo para el tab Expediente; el resto de la Application 360 conserva su baseline vigente.
+- **Evidencia ejecutada (2026-08-16, local):** `.captures/2026-08-16T23-49-12_task1737-application-expediente/` — perfil `premium`, `exitCode 0`, `qualityFindings: []`, `enterpriseRubric: pass`, variantes `01-desktop` (1440×900) y `02-mobile` (iPhone 13), 4 frames cada una. Assertions verdes: sin redirect a login, sin error boundary, tab `expediente` visible entrando por `?tab=activity` (alias de deep-link probado), `[data-capture="hiring-expediente-timeline"]` presente. Probes de teclado y `prefers-reduced-motion` sin violaciones; axe sin `color-contrast`.
+- **Capturas pendientes de seed en staging:** `proposal-panel`, `proposal-edit`, `reject-dialog` y `blind-lock` requieren flag `HIRING_EVALUATION_DOSSIER_AI_ENABLED=true` + una propuesta `proposed` real + una persona evaluadora con scorecard abierto. Quedan declaradas en el Rollout Plan de la task (paso 2 de la Production verification sequence), NO simuladas localmente.
 
 ## Design Decision Log
 

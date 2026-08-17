@@ -182,6 +182,11 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   propose → editar → confirmar/rechazar) y resuelve el gate BLOQUEANTE anti-anclaje del Delta (3) de 1735 con
   ceguera server-enforced en el reader (viewer con scorecard propio abierto no ve análisis con scores). `ui-ux`
   con híbrido justificado (`reader`); sin bloqueo técnico (backend listo).
+  **✓ complete (code complete, rollout gated 2026-08-16).** Gate anti-anclaje CERRADO con predicado único
+  compartido con `listResponses` + `GET /dossier` devolviendo `proposal: null`. `UI ready: yes` (dirección visual
+  versionada, scorecard 4,54, GVC premium 1440+390 con rubric enterprise `pass`). Gated: flag
+  `HIRING_EVALUATION_DOSSIER_AI_ENABLED` OFF en producción (dueño 1735) + evidencia visual del panel de propuesta
+  con datos reales pendiente de staging.
 - `TASK-1738` — Workbench de revisión del scoring IA — **consumer UI de `TASK-1734`** (su follow-up declarado:
   workbench con anti-anchoring + honest provisional coverage): cobertura honesta del run, cola de excepciones con
   evidencia, muestra ciega estructural verificada sobre el DOM, `sawProposalBeforeScoring` por gesto real y
