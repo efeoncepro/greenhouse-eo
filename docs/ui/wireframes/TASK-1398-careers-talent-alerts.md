@@ -1,24 +1,24 @@
-# TASK-1398 — Careers Talent Alerts Wireframe
+# TASK-1398 — Careers Vacancy Alerts Wireframe
 
 ## Purpose
 
-Surface N4 of the public Careers journey: a voluntary, low-friction “Career Alerts” subscription for people who do not see a suitable opening today. It must make a clear promise, collect only the fields configured by the published Growth Form and leave the visitor in control.
+Surface N4 of the public Careers journey: a voluntary, low-friction public vacancy-alert subscription for people who do not see a suitable opening today. It is the secondary nurture lane; the primary Talent Pool alert preference lives in the separate tokenized self-service surface. It must make a clear promise, collect only the fields configured by the published Growth Form and leave the visitor in control.
 
 ## Desktop wireframe
 
 ```text
 ┌───────────────────────────────────────────────────────────────────────┐
 │  ¿Aún no encuentras tu próxima oportunidad?                            │
-│  Recibe alertas cuando publiquemos nuevas vacantes en Efeonce.         │
+│  Recibe avisos cuando publiquemos nuevas vacantes en Efeonce.          │
 │                                                                        │
 │  [ nombre (si el formulario lo configura) ] [ email ] [ Suscribirme ] │
-│  □ Acepto recibir alertas de carrera y conozco la política de privacidad│
+│  □ Acepto recibir avisos de vacantes y conozco la política de privacidad│
 │  Puedes desuscribirte en cualquier momento.                            │
 └───────────────────────────────────────────────────────────────────────┘
 ```
 
 - Banda plena al final de Careers, después de vacantes/CTA de aplicación y antes del footer.
-- Un solo foco: la suscripción. No compite con “Postular” ni hace promesas de proceso de selección.
+- Un solo foco: la suscripción pública. No compite con “Postular”, no crea un perfil del Banco de Talento ni hace promesas de proceso de selección.
 - El formulario es el `<greenhouse-form>` publicado por TASK-1397; el host no replica sus inputs, validación ni submit.
 
 ## Compact wireframe
@@ -44,13 +44,14 @@ Surface N4 of the public Careers journey: a voluntary, low-friction “Career Al
 | Estado | Contenido y comportamiento |
 |---|---|
 | Loading | Skeleton/placeholder del host, sin campos falsos interactivos. |
-| Default | Promesa, formulario publicado y nota de desuscripción. |
+| Default | Promesa de avisos públicos, formulario publicado y nota de desuscripción. |
 | Validation | Errores accesibles que provienen del renderer; foco al primer error. |
 | Submitting | CTA pending; inputs siguen coherentes con el contrato del renderer. |
 | Accepted | Confirmación genérica, sin revelar si el correo ya estaba inscrito. |
 | Unavailable | Si flag/form no está disponible, ocultar la banda sin dejar un CTA muerto. |
 | Network error | Mensaje recuperable y reintento; no mostrar error del proveedor. |
 | Vacancy-list empty | Usar la misma banda como siguiente paso de la empty state, sin duplicar formulario simultáneo. |
+| Talent Pool distinction | La banda indica que suscribe avisos públicos; no concede `future_opportunities` ni activa `opening_alerts` del Banco. |
 
 ## Accessibility notes
 
@@ -79,8 +80,8 @@ Surface N4 of the public Careers journey: a voluntary, low-friction “Career Al
 
 ## Design Decision Log
 
-- Decision: reuse the governed Growth Form renderer as a clearly framed Careers band.
-- Alternatives considered: custom local newsletter form (rejected: bypasses consent, anti-abuse, async handling and API parity); applicant intake form (rejected: a subscriber is not an applicant).
+- Decision: reuse the governed Growth Form renderer as a clearly framed public Careers band, separate from Talent Pool self-service.
+- Alternatives considered: custom local newsletter form (rejected: bypasses consent, anti-abuse, async handling and API parity); applicant intake form (rejected: a subscriber is not an applicant); direct Talent Pool enrollment from email (rejected: no candidate identity/evidence and wrong purpose boundary).
 - Why this pattern: it makes the product promise real while preserving a single public PII ingress and existing email preference controls.
 - Reuse / extend / new primitive: reuse renderer; extend Careers page with one tokenized host section; no new primitive.
 - Source reference: the local Careers prototype establishes hierarchy only. Its colloquial “locos” copy is deliberately not carried forward.

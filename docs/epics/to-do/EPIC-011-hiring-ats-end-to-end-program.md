@@ -152,8 +152,8 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `TASK-1383` — Assessment Engine hardening previo a la taking surface. **✓ complete.**
 - `TASK-1384` — Assessment Question Bank SME V1. **✓ complete.**
 - `TASK-1385` — AI-assisted vacancy public copy sobre propose→confirm. **✓ complete.**
-- `TASK-1397` — Careers Talent Alerts Foundation.
-- `TASK-1398` — Careers Talent Alerts UI.
+- `TASK-1397` — Talent Pool and Careers Vacancy Alerts Foundation: alertas primarias para miembros `pool_eligible` con `future_opportunities` vigente + `opening_alerts` explícito, y carril secundario de suscripción anónima Careers; sin crear identidad desde el home.
+- `TASK-1398` — Careers Vacancy Alerts UI Host: banda pública secundaria y empty state sobre Growth Forms; no administra el Banco de Talento ni duplica su self-service.
 - `TASK-1400` — Hiring Activation Blocker Resolution API. **✓ complete.**
 - `TASK-1422` — Vacancy AI Draft UI. **✓ complete.**
 - `TASK-1727` — Candidate Portal Principal + Session Foundation: claim post-apply, audiencia/capabilities propias,

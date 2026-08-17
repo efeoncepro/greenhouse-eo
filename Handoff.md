@@ -2,6 +2,21 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-17 — Ajuste de TASK-1397/TASK-1398: alertas de vacantes y Talent Pool
+
+Se reescribieron las tasks antiguas de Careers Alerts para el modelo actual. La audiencia
+primaria de avisos es el Talent Pool: solo reciben quienes estén `pool_eligible`, tengan
+`future_opportunities` vigente y activen explícitamente la nueva preferencia `opening_alerts`.
+La caja pública de Careers queda como carril secundario anónimo de avisos generales: usa Growth
+Forms, no crea `Person`, candidato, aplicación ni membresía, y no concede `future_opportunities`.
+
+`TASK-1397` ahora posee el contrato server-side, consentimiento/preferencia, fan-out de
+`hiring.opening.published`, dedupe y delivery de ambos carriles. `TASK-1398` solo posee el host
+visual público y consume el formulario gobernado. La preferencia del banco debe consumirse en el
+self-service tokenizado ya existente de `TASK-1724` antes de activar el carril primario. Ambas
+flags permanecen propuestas/OFF; no hubo cambios de runtime. Artefactos actualizados: tasks,
+Epic-011, índices, flow y wireframe de TASK-1398.
+
 ## 2026-08-17 — Cierre del programa Hiring: Expediente + Scoring IA + Identidad (TASK-1734/1735/1736/1737/1738)
 
 Cierre documental de dos días de trabajo en el dominio Hiring. Las 5 tasks están `complete` y
