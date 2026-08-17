@@ -79,7 +79,7 @@ const hashToken = (raw: string): string => createHash('sha256').update(raw).dige
 
 // ── Normalizers ──
 
-type AssessmentRow = {
+export type AssessmentRow = {
   assessment_id: unknown
   public_id: unknown
   application_id: unknown
@@ -96,7 +96,7 @@ type AssessmentRow = {
   updated_at: unknown
 }
 
-const normalizeAssessment = (r: AssessmentRow): Assessment => ({
+export const normalizeAssessment = (r: AssessmentRow): Assessment => ({
   assessmentId: str(r.assessment_id),
   publicId: str(r.public_id),
   applicationId: str(r.application_id),
@@ -114,7 +114,7 @@ const normalizeAssessment = (r: AssessmentRow): Assessment => ({
 })
 
 // public_id excluye access_token_hash del view model — el hash NUNCA sale del store.
-const ASSESSMENT_COLS = `assessment_id, public_id, application_id, template_id, method, evaluator_user_id, status, time_limit_minutes, accommodations_json, started_at, submitted_at, created_by, created_at, updated_at`
+export const ASSESSMENT_COLS = `assessment_id, public_id, application_id, template_id, method, evaluator_user_id, status, time_limit_minutes, accommodations_json, started_at, submitted_at, created_by, created_at, updated_at`
 
 type ResponseRow = {
   response_id: unknown

@@ -140,8 +140,10 @@ export interface HiringAssessmentCopy {
       submitted: string
       scored: string
       expired: string
+      cancelled: string
     }
     candidateIncomplete: string
+    cancelledDetail: string
     loadReviewPrompt: string
     noModules: string
     objective: string

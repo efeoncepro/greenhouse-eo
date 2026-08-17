@@ -2,6 +2,22 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-08-17 — TASK-1719: policy de assignment de assessment (5 events v1)
+
+Aggregate types nuevos: `hiring_assessment_assignment` (ledger durable de la asignación, identity `haa-{uuid}`) y `hiring_assessment_assignment_proposal` (preview del camino manual, identity `haap-{uuid}`).
+
+**Contrato de payload heredado y NO negociable: IDs-only.** Ninguno de estos eventos lleva email, nombre, token, score ni la nota de texto libre del operador. El outbox sincroniza a BigQuery — cualquier PII acá se replica fuera del control del dominio.
+
+| Event | Emisor | Nota |
+|---|---|---|
+| `hiring.assessment.assignment_recorded` | `assignAssessmentFromPolicy` (siempre, sea cual sea el outcome) | El hecho durable de que se INTENTÓ asignar. Payload: `{assignmentId, applicationId, policyId, policyVersion, origin, triggerStage, attemptSeq, outcome, reasonCode, assessmentId}`. Se emite también en los caminos no exitosos: un `blocked` que no deja rastro es un candidato que nadie sabe que quedó fuera. |
+| `hiring.assessment.auto_assignment_blocked` | `assignAssessmentFromPolicy`, rama `blocked` únicamente | Señal de auto-detención que consume la matriz de riesgo. **Sólo `blocked` lo emite** — `held` es el hold humano y no es una anomalía. |
+| `hiring.assessment.assignment_proposed` | `proposeAssessmentAssignment` (sólo cuando la propuesta se CREA) | Un propose idempotente que devuelve la propuesta vigente NO re-emite: el evento marca el nacimiento, no la consulta. |
+| `hiring.assessment.assignment_confirmed` | `confirmAssessmentAssignment` | Quién autorizó el envío y sobre qué propuesta. Es la respuesta durable a "¿quién decidió mandarle esta prueba a esta persona?". |
+| `hiring.assessment.cancelled` | `cancelCandidateTest` | Cancelación pre-inicio. Payload `{assessmentId, applicationId, reasonCode, actorUserId, hasNote}` — **la nota viaja como booleano**, nunca su texto: es campo libre de operador y puede traer PII. |
+
+Ningún consumer reactivo escucha estos cinco todavía: son audit/observabilidad. El consumer que SÍ actúa es `hiring_stage_changed_candidate_comms`, y escucha `hiring.application.stage_changed` (evento preexistente), no éstos.
+
 ## Delta 2026-07-10 — TASK-770: bridge de activación hiring→HRIS (2 events v1, audit-only)
 
 Aggregate type nuevo: `hiring_activation_request` (identity `hact-{uuid}`, UNIQUE por `hiring_handoff_id`). Sin consumer reactivo (audit/observabilidad). El lifecycle workforce que el bridge orquesta YA emite sus propios eventos (`member.created` — que dispara `hr_onboarding_auto_create` —, `workforce.member.intake_completed`, `hr.onboarding.instance_created`, `work_relationship_onboarding_case.*`): 770 NO los duplica.

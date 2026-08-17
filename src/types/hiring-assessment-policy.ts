@@ -124,6 +124,67 @@ export interface AssessmentAssignmentRecord {
   updatedAt: string
 }
 
+// ── Ledger de propuestas de asignación (Slice 2: propose → confirm) ──
+
+export const ASSESSMENT_ASSIGNMENT_PROPOSAL_STATUSES = [
+  'proposed',
+  'confirmed',
+  /** El operador dejó pasar la ventana: vuelve a mirar antes de mandarle un correo a alguien. */
+  'expired',
+  /** El mundo cambió entre el preview y el confirm: el digest ya no describe la realidad. */
+  'superseded',
+] as const
+export type AssessmentAssignmentProposalStatus = (typeof ASSESSMENT_ASSIGNMENT_PROPOSAL_STATUSES)[number]
+
+/**
+ * Preview PII-FREE por contrato: labels, versiones, banderas y reason codes. NUNCA nombre,
+ * correo, token, link ni respuestas del candidato — se persiste en `preview_json` y viaja al
+ * cliente tal cual.
+ */
+export interface AssessmentAssignmentPreview {
+  openingTitle: string | null
+  templateName: string | null
+  templateVersion: number | null
+  policyVersion: number
+  mode: OpeningAssessmentPolicyMode
+  triggerStage: AssessmentAssignmentTrigger
+  timeLimitMinutes: number | null
+  recipientReady: boolean
+  /**
+   * Instancia ABIERTA (`assigned|sent|in_progress|submitted`) — exactamente
+   * `OPEN_ASSESSMENT_INSTANCE_STATUSES`, el mismo predicado del índice parcial y del command.
+   * Es BLOQUEANTE: si esto es `true`, el command no crearía una instancia nueva.
+   */
+  existingOpenAssessment: boolean
+  /**
+   * Instancia YA CORREGIDA (`scored`). **NO es bloqueante**: un retake legítimo existe y el
+   * command sí crearía una instancia nueva. Se muestra igual porque quien confirma tiene que
+   * saber que le va a mandar una segunda prueba a alguien que ya fue evaluado.
+   */
+  existingScoredAssessment: boolean
+  /** Señal de preview, no la decisión: el outcome canónico lo resuelve el command. */
+  blockingReasonCode: AssessmentAssignmentReasonCode | null
+}
+
+export interface AssessmentAssignmentProposal {
+  proposalId: string
+  applicationId: string
+  policyId: string
+  policyVersion: number
+  /** Ata lo confirmado a lo que el operador vio; se recomputa en el confirm y se compara. */
+  effectDigest: string
+  preview: AssessmentAssignmentPreview
+  status: AssessmentAssignmentProposalStatus
+  proposedBy: string
+  confirmedBy: string | null
+  /** Fila del ledger de assignment que produjo el confirm (null hasta confirmar). */
+  assignmentId: string | null
+  expiresAt: string
+  confirmedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
 /**
  * Resultado tipado del command común. El caller DEBE leer `status`: nunca inferir éxito desde
  * HTTP 200 ni desde la ausencia de excepción. `deliveryStatus: 'pending'` NO significa correo

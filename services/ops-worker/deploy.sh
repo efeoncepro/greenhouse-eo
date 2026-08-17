@@ -440,6 +440,24 @@ ENV_VARS="${ENV_VARS},HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED=${HIRING_ASS
 HIRING_ASSESSMENT_AI_ENABLED="${HIRING_ASSESSMENT_AI_ENABLED:-false}"
 ENV_VARS="${ENV_VARS},HIRING_ASSESSMENT_AI_ENABLED=${HIRING_ASSESSMENT_AI_ENABLED}"
 
+# TASK-1719 Slice 4/5 — Asignación automática del test al entrar a la etapa configurada
+# (ADR GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1). Lo lee SOLO el consumer
+# reactivo `hiring_stage_changed_candidate_comms` en ESTE runtime: prenderlo en Vercel no
+# hace absolutamente nada. Declarado con default OFF para que `--set-env-vars` (destructivo)
+# no lo borre en cada redeploy.
+#
+# Con el flag OFF el consumer NO deja de existir: sigue mandando el correo genérico de
+# avance de etapa exactamente como antes. El flag gobierna SÓLO si además asigna el test.
+# Por eso apagarlo es un rollback seguro — nunca deja al candidato sin comunicación.
+#
+# NO prenderlo hasta que: la policy exista `enabled` en la opening del canary, el backlog
+# del consumer nuevo esté drenado (su handler key nuevo barre el histórico en la primera
+# corrida) y el cancel/recovery del Slice 3 esté verificado. Rollback (<5min):
+# `gcloud run services update ops-worker --update-env-vars HIRING_STAGE_TEST_ASSIGNMENT_ENABLED=false`
+# + dejar las policies en `disabled`. NUNCA borrar assessments ni audit para revertir.
+HIRING_STAGE_TEST_ASSIGNMENT_ENABLED="${HIRING_STAGE_TEST_ASSIGNMENT_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},HIRING_STAGE_TEST_ASSIGNMENT_ENABLED=${HIRING_STAGE_TEST_ASSIGNMENT_ENABLED}"
+
 # Buzón interno de People para el aviso de postulación nueva (configurable; default en código).
 HIRING_INTERNAL_NOTIFICATIONS_EMAIL="${HIRING_INTERNAL_NOTIFICATIONS_EMAIL:-people@efeoncepro.com}"
 ENV_VARS="${ENV_VARS},HIRING_INTERNAL_NOTIFICATIONS_EMAIL=${HIRING_INTERNAL_NOTIFICATIONS_EMAIL}"

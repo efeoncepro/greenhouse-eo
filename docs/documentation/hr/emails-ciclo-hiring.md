@@ -17,7 +17,7 @@ tenga que acordarse de escribirlos:
 | Llega una postulación nueva | El candidato | Acuse de recibo: "recibimos tu postulación, esto es lo que sigue" |
 | Se le asigna un test al candidato | El candidato | Link de acceso a su evaluación, tiempo estimado y vigencia del link |
 | El candidato completa el test | Buzón de People (`people@efeoncepro.com`) | Aviso de que las respuestas están listas, fecha de envío, vacante, postulación y link directo para revisar la evaluación |
-| La postulación avanza a Preselección o Entrevista | El candidato | "Tu postulación avanzó" con el nombre de la etapa |
+| La postulación avanza a Preselección o Entrevista | El candidato | **Una sola cosa**: si la vacante tiene declarado un test para esa etapa, le llega el correo del test; si no, le llega "Tu postulación avanzó" con el nombre de la etapa |
 | El candidato queda seleccionado | El candidato | Felicitación + aviso de que el equipo lo contactará |
 | El candidato no queda seleccionado | El candidato | Agradecimiento genuino, decisión clara y puerta abierta a futuras vacantes |
 
@@ -26,6 +26,18 @@ tenga que acordarse de escribirlos:
 - **Sólo etapas pensadas para el candidato notifican.** Los movimientos internos del pipeline
   (screening, revisión con cliente, decisión pendiente, etc.) NO generan correo y sus nombres
   internos jamás aparecen en un email.
+- **Un avance de etapa produce UNA comunicación: ni cero ni dos.** Quien decide es uno solo.
+  Si la vacante declara un test para esa etapa y el test se asigna, la comunicación es el
+  correo del test — el aviso genérico de avance NO se manda además. Si la asignación no se
+  puede hacer (falta el correo del candidato, la política está apagada, se alcanzó el tope de
+  envíos, la etapa ya cambió), se manda el aviso genérico en ese mismo momento, para que
+  nadie quede esperando algo que no va a llegar. **Nunca se le promete un test que no existe.**
+- **La etapa que se comunica es la que la plataforma tiene ahora, no la del momento del clic.**
+  Si alguien mueve una postulación dos veces seguidas, el candidato recibe una comunicación por
+  la etapa donde efectivamente quedó.
+- **Un cambio de etapa viejo no comunica nada.** Si por alguna razón un movimiento queda sin
+  procesar más de 24 horas, no se envía el correo tarde: pasa a una lista para que una persona
+  decida. Decirle a alguien "avanzaste" por algo de la semana pasada es peor que no decir nada.
 - **Un scorecard de entrevistador no le escribe al candidato.** Sólo los tests asignados al
   candidato generan el correo de evaluación.
 - **Completar un test no decide al candidato.** El aviso interno no incluye un veredicto ni dispara

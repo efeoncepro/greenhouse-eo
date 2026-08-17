@@ -57,9 +57,11 @@ export const hiringAssessment: HiringAssessmentCopy = {
       in_progress: 'En curso',
       submitted: 'Enviado por el candidato',
       scored: 'Corregido',
-      expired: 'Vencido'
+      expired: 'Vencido',
+      cancelled: 'Cancelado'
     },
     candidateIncomplete: 'El candidato aún no completa la evaluación.',
+    cancelledDetail: 'Esta evaluación se canceló antes de que el candidato la comenzara. El enlace ya no sirve.',
     loadReviewPrompt: 'Carga la revisión para ver respuestas, rúbricas y el scorecard por competencia.',
     noModules: 'Aún no hay módulos de competencia para esta evaluación.',
     objective: 'Objetivo',

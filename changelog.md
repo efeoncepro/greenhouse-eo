@@ -3,6 +3,28 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-17 — TASK-1719: la vacante declara su prueba y una sola pieza decide qué recibe el candidato
+
+- **La vacante declara su plantilla una vez y Greenhouse la resuelve sola.** Quien asigna ya no elige
+  plantilla: confirma. El camino manual es proponer→confirmar, atado por una huella del efecto que se
+  mostró y con vencimiento de 30 minutos **enforceado server-side** — si algo cambia en el medio o
+  pasa demasiado tiempo, el confirmar se rechaza en vez de ejecutar algo distinto de lo aprobado.
+- **Un avance de etapa produce UNA comunicación: ni cero ni dos.** El consumer
+  `hiring_stage_changed_candidate_comms` **reemplaza** a `hiring_stage_changed_email` (TASK-1689) y
+  decide: correo de la prueba si se asigna, aviso genérico si la asignación se detuvo. Nunca se le
+  promete al candidato una prueba que no existe. La etapa que se comunica es la vigente en la base,
+  nunca la del payload — el consumer reactivo coalescea y pierde las intermedias.
+- **Cancelar una prueba no iniciada libera el cupo** y permite reasignar: es recuperación real, no
+  sólo un cierre. El enlace muere de inmediato y responde igual que cualquier enlace inválido. Si el
+  correo ya había salido, la plataforma lo declara para que una persona avise — no manda correcciones
+  automáticas sin texto aprobado. Una prueba cancelada no entra al expediente de evaluación.
+- **Se archivaron dos plantillas de Content Creator que eran irrenderizables** (una entregaba 5
+  preguntas para 8 módulos, con 45% del peso sin instrumento). El módulo sin preguntas no desaparecía:
+  el candidato veía la sección vacía y el examen encogido se enviaba sin error. Señal nueva
+  `hiring.assessment.template_module_without_questions` para que la clase no vuelva a pasar inadvertida.
+- Runtime: la asignación automática nace **apagada** (`HIRING_STAGE_TEST_ASSIGNMENT_ENABLED`, sólo
+  ops-worker). Con el flag OFF el comportamiento visible es el mismo de antes.
+
 ## 2026-08-17 — Baseline global de beneficios para vacantes Efeonce documentado en las skills
 
 - Las skills espejo de Talent y Payroll incorporan el `Efeonce Candidate Benefits Charter` para comunicar en
@@ -12,8 +34,9 @@
   La ley local puede mejorar ese piso, nunca reducirlo. La carta diferencia esta política candidato-facing del
   runtime actual de Leave y del instrumento contractual/proveedor que Payroll/Legal debe validar. También
   define devengo, arrastre, familia, retorno postparto, cobertura, equivalencia contractor y wallets de
-  aprendizaje (US$500/año), equipo (US$400/36 meses), conectividad/coworking (US$40/mes) y salud mental
-  (US$300/año). Sin cambio de runtime, schema, contratos ni configuración de permisos.
+  aprendizaje (US$500/año), conectividad/coworking (US$50/mes) y salud mental (US$300/año). El aporte de
+  equipo (US$400/36 meses) continúa como política, pero se revela durante entrevista u oferta, no en el copy
+  estándar de vacantes. Sin cambio de runtime, schema, contratos ni configuración de permisos.
 
 ## 2026-08-17 — Vacantes públicas e inbound recruiting reforzados en la skill de Talent
 
@@ -1033,36 +1056,3 @@ herramientas dejaron de aceptar.
 - Deuda detectada: `greenhouse-ui-enterprise-review` vive en los dos árboles de skills pero **no está
   en el manifiesto de espejos** y ya divergía. Se aplicó el mismo bloque a ambas copias para que el
   gate sea idéntico; la divergencia previa sigue sin reconciliar.
-
-## 2026-08-08 — ISSUE-143: la migración del cutover SEO colapsó expand y contract, y tumbó producción
-
-- **Resuelto el mismo día (~25 min de caída).** La migración de viewCodes de TASK-1310 hace expand y
-  contract en el mismo archivo: crea `seo_v2` y en el mismo statement supersede `seo_v1`. Eso anula el
-  dual-read `SEO_MODULE_KEYS_READ` aplicado a los 5 consumidores, cuyo valor entero era que existiera
-  un período con ambas claves vigentes. Vercel producción corre `main`, que pide `seo_v1` literal:
-  Grupo Berel pasó de `domainQuadrant=riesgo keywords=50` a `hasModule=false` + 404 en los cinco lanes.
-- **El ops-worker no se vio afectado** (su deploy ya tenía el dual-read): los tres batches que le pagan
-  al proveedor siguieron sanos. El daño fue de lectura, no de gasto ni de datos.
-- Restaurado reabriendo la ventana y hecho durable por
-  `20260808184512073_task-1310-reopen-seo-module-cutover-window`, que hornea el invariante de simetría
-  (ambas claves cubren las mismas orgs; una ventana asimétrica aborta la migración con `RAISE`).
-- **El guardrail es lo que faltaba:** la regla ya estaba escrita en §10.7 de la arquitectura y no
-  impidió nada, porque nadie revisa una migración contra un párrafo. Ahora hay un test que escanea la
-  sección `Up` de `migrations/` y falla si una migración nueva supersede una clave que
-  `SEO_MODULE_KEYS_READ` todavía acepta. Probado por mutación contra la migración culpable.
-- Segunda causa, de método: verificar una migración de cutover con un `SELECT` es verificar la mitad
-  del contrato. La otra mitad es qué versión de código la lee en cada uno de los **cinco runtimes con
-  despliegues independientes**.
-- **Hallazgo colateral, arreglado de raíz: `docs:context-rotate` estaba ciego y reventaba.** Rotando el
-  Handoff para registrar este incidente, el rotador murió con `TypeError: Cannot read properties of
-  undefined (reading 'index')`. Su patrón buscaba secciones `##` con fecha y el archivo hace rato usa
-  `###`: 0 de 23. Es la **segunda** vez que la herramienta se queda ciega por la misma causa —el
-  propio código documenta la primera (`^## Sesi[oó]n…` matcheaba 1 de 40)—, y esta vez además crasheó
-  en vez de degradar. Una herramienta que el gate te MANDA a correr y muere sin explicar empuja a
-  rotar a mano, que es exactamente como se corrompen los marcadores de integridad de los shards.
-  El fix no es ampliar el patrón: el nivel de heading ahora se **descubre** (gana el que más secciones
-  fechadas produce), porque el ancla estable es la fecha, no el nivel. Sin secciones fechadas degrada
-  con un mensaje accionable en vez de tirar un stack. El script pasó a ser importable (guard de
-  entrypoint) y estrenó suite —5 tests, uno de ellos contra el `Handoff.md` real, que es el que se
-  romperá la próxima vez que la convención derive. Verificado: rotó `keep 20; archive 3` + `keep 60;
-  remove 1` donde antes decía "manual compaction required".

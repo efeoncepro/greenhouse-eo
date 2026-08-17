@@ -114,12 +114,25 @@ describe.skipIf(!hasPgConfig || !canCleanUp)('assessment assignment — live PG 
 
   it('asigna de verdad contra PG: crea la instancia y cierra el ledger sin violar ningún CHECK', async () => {
     const profiles = await runGreenhousePostgresQuery<{ profile_id: string }>(
+      // ⚠️ SÓLO identidades SINTÉTICAS. Este test asigna de verdad, y una asignación exitosa
+      // publica `hiring.assessment.assigned`; el publisher del outbox está VIVO en esta base y
+      // la projection `hiring_assessment_assigned_email` le manda al candidato el LINK de su
+      // prueba. Un fixture que tomara "los primeros perfiles activos con correo" le escribiría
+      // a una persona real — hasta 2026-08-17 este SELECT no filtraba nada y sólo el orden por
+      // `profile_id` evitó el accidente. Eso es suerte, no diseño.
       `SELECT profile_id FROM greenhouse_core.identity_profiles
-       WHERE active = true AND canonical_email IS NOT NULL AND canonical_email <> ''
+       WHERE active = true
+         AND canonical_email IS NOT NULL AND canonical_email <> ''
+         AND (canonical_email LIKE 't872p-%@efeoncepro.com' OR canonical_email LIKE 'task-%@efeonce.org')
        ORDER BY profile_id LIMIT 2`,
     )
 
-    expect(profiles.length).toBe(2)
+    // Falla fuerte en vez de degradar a personas reales: si no hay identidades sintéticas
+    // suficientes, el test NO corre con lo que haya a mano.
+    expect(
+      profiles.length,
+      'No hay 2 identidades sintéticas disponibles. NUNCA relajes este filtro para que el test corra: mandaría el link de una prueba a un candidato real.',
+    ).toBe(2)
 
     const demand = await createTalentDemand(
       {

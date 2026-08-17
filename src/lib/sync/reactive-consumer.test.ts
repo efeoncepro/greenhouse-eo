@@ -151,6 +151,46 @@ describe('processReactiveEvents (V2)', () => {
     expect(mockMarkRefreshCompleted).toHaveBeenCalledWith('test_projection:finance_period:2026-04')
   })
 
+  // TASK-1719 — la Phase A no filtra por fecha: un handler key nuevo barre TODO el
+  // histórico de su event type en la primera corrida. Una projection que comunica hacia
+  // afuera necesita poder negarse a actuar sobre un evento rancio, y para eso necesita
+  // saber CUÁNDO ocurrió. Si esta inyección se pierde, esas guardas se vuelven código
+  // muerto que nunca dispara — sin romper ningún test ni ningún build.
+  it('inyecta _occurredAt en el payload que recibe la projection', async () => {
+    const projection = buildProjection()
+
+    mockGetAllTriggerEventTypes.mockReturnValue(['finance.expense.created'])
+    mockGetProjectionsForEvent.mockReturnValue([projection])
+    mockQuery.mockResolvedValueOnce([buildEventRow('evt-1', 'finance.expense.created', '2026-04-05T19:41:26Z')])
+    mockQuery.mockResolvedValue([])
+
+    await processReactiveEvents()
+
+    expect(projection.refresh).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({ _eventId: 'evt-1', _occurredAt: '2026-04-05T19:41:26Z' })
+    )
+  })
+
+  it('normaliza _occurredAt a ISO cuando la fila trae un Date', async () => {
+    const projection = buildProjection()
+    const at = new Date('2026-04-05T19:41:26Z')
+
+    mockGetAllTriggerEventTypes.mockReturnValue(['finance.expense.created'])
+    mockGetProjectionsForEvent.mockReturnValue([projection])
+    mockQuery.mockResolvedValueOnce([
+      { ...buildEventRow('evt-1', 'finance.expense.created'), occurred_at: at }
+    ])
+    mockQuery.mockResolvedValue([])
+
+    await processReactiveEvents()
+
+    expect(projection.refresh).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({ _occurredAt: at.toISOString() })
+    )
+  })
+
   it('can replay active failed rows scoped to explicit handler keys', async () => {
     const projectionA = buildProjection({ name: 'projection_a' })
     const projectionB = buildProjection({ name: 'projection_b' })

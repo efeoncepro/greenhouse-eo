@@ -796,7 +796,20 @@ const Application360View = ({
                     <GreenhouseChip
                       kind='status'
                       variant='label'
-                      tone={entry.status === 'scored' ? 'success' : entry.status === 'submitted' ? 'warning' : entry.status === 'expired' ? 'error' : 'info'}
+                      tone={
+                        entry.status === 'scored'
+                          ? 'success'
+                          : entry.status === 'submitted'
+                            ? 'warning'
+                            : entry.status === 'expired'
+                              ? 'error'
+                              : // TASK-1719: `cancelled` es terminal-neutro (se retiró antes de que el
+                                // candidato empezara). Sin rama propia caía al `info` por defecto y una
+                                // evaluación cancelada se pintaba neutro-positiva, como una en curso.
+                                entry.status === 'cancelled'
+                                ? 'default'
+                                : 'info'
+                      }
                       label={assessmentCopy.review.assessmentStatuses[entry.status]}
                     />
                   </Stack>
@@ -842,11 +855,20 @@ const Application360View = ({
               <AssessmentAiRunEntry assessmentId={entry.assessmentId} copy={assessmentCopy.scoringRun} canScore={canScore} />
 
               {!review ? (
-                <Alert severity='info'>
-                  {entry.status === 'assigned' || entry.status === 'sent' || entry.status === 'in_progress'
-                    ? assessmentCopy.review.candidateIncomplete
-                    : assessmentCopy.review.loadReviewPrompt}
-                </Alert>
+                // TASK-1719: `cancelled` tenía que caer en su propia rama — en el `else` mostraba
+                // "Carga la revisión…", un prompt sin sentido para una instancia que nunca tuvo
+                // respuestas. Se retiró antes de que el candidato empezara: no hay nada que revisar.
+                entry.status === 'cancelled' ? (
+                  <Alert severity='warning' icon={<i className='tabler-ban' />}>
+                    {assessmentCopy.review.cancelledDetail}
+                  </Alert>
+                ) : (
+                  <Alert severity='info'>
+                    {entry.status === 'assigned' || entry.status === 'sent' || entry.status === 'in_progress'
+                      ? assessmentCopy.review.candidateIncomplete
+                      : assessmentCopy.review.loadReviewPrompt}
+                  </Alert>
+                )
               ) : (
                 <>
                   <Grid container spacing={3} sx={{ '& > *': { minWidth: 0 } }}>
@@ -1065,7 +1087,10 @@ const Application360View = ({
                     </Alert>
                   ) : null}
 
-                  {review.responses.length > 0 && entry.status !== 'scored' ? (
+                  {/* TASK-1719: `cancelled` seguía ofreciendo "Cerrar puntuación" — una instancia
+                      retirada no se corrige nunca. El estado terminal manda sobre el conteo de
+                      respuestas (que además siempre es 0 acá: sólo se cancela pre-inicio). */}
+                  {review.responses.length > 0 && entry.status !== 'scored' && entry.status !== 'cancelled' ? (
                     <GreenhouseButton
                       kind='primaryAction'
                       leadingIcon={finalizingAssessmentId === entry.assessmentId ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}

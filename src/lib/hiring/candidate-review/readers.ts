@@ -172,13 +172,21 @@ export const getCandidateReviewPacket = async ({
     },
     candidate: { displayName: name },
     portfolioLinks: resolved.documents.links.map(link => ({ ...link, trust: 'untrusted_candidate_supplied' })),
-    assessments: assessments.map(assessment => ({
-      assessmentId: assessment.publicId,
-      method: assessment.method,
-      status: assessment.status,
-      submittedAt: assessment.submittedAt,
-      updatedAt: assessment.updatedAt
-    })),
+    // TASK-1719 — Las evaluaciones `cancelled` NO entran al contexto del dossier IA.
+    // Una cancelación es un acto ADMINISTRATIVO del operador (plantilla equivocada, duplicada,
+    // enviada por error) y la instancia nunca tuvo respuestas: sólo se cancela pre-inicio.
+    // Dejarla entrar invita a la inferencia adversa —"no completó la evaluación"— y convierte
+    // un error nuestro en una señal negativa contra el candidato. Es exclusión DECLARADA, no
+    // silenciosa: la fila cancelada sigue visible en Application 360 para el operador humano.
+    assessments: assessments
+      .filter(assessment => assessment.status !== 'cancelled')
+      .map(assessment => ({
+        assessmentId: assessment.publicId,
+        method: assessment.method,
+        status: assessment.status,
+        submittedAt: assessment.submittedAt,
+        updatedAt: assessment.updatedAt
+      })),
     cv: {
       status: resolved.status,
       trust: 'untrusted_candidate_supplied',

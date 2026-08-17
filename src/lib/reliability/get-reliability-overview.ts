@@ -210,6 +210,7 @@ import { getAssetScanSignatureFreshnessSignal } from './queries/asset-scan-signa
 import { getHiringCandidateRetentionOverdueSignal } from './queries/hiring-candidate-retention-overdue'
 import { getHiringTalentPoolIntegritySignal } from './queries/hiring-talent-pool-integrity'
 import { getHiringAssessmentTemplateIntegritySignal } from './queries/hiring-assessment-template-integrity'
+import { getHiringAssessmentAssignmentHealthSignal } from './queries/hiring-assessment-assignment-signals'
 // TASK-356 — Hiring handoff workflow signals (moduleKey 'hiring').
 import { getHiringHandoffBlockedStaleSignal } from './queries/hiring-handoff-blocked-stale'
 import { getHiringInternalHireAwaitingOnboardingSignal } from './queries/hiring-internal-hire-awaiting-onboarding'
@@ -713,6 +714,8 @@ interface ReliabilityOverviewSources {
   hiringTalentPoolIntegrity?: ReliabilitySignal | null
   /** Plantillas activas con módulos sin preguntas: examen encogido que se envía sin error. */
   hiringAssessmentTemplateIntegrity?: ReliabilitySignal | null
+  /** TASK-1719 — asignación manual/automática: `intent` en reposo, backlog y propuestas vencidas. */
+  hiringAssessmentAssignmentHealth?: ReliabilitySignal | null
   hiringHandoffBlockedStale?: ReliabilitySignal | null
   hiringInternalHireAwaitingOnboarding?: ReliabilitySignal | null
   /** TASK-1734 — Assessment AI scoring run (backlog/provider/abstention/override/orphans). */
@@ -1208,6 +1211,7 @@ export const buildReliabilityOverview = (
     ...(sources.hiringCandidateRetentionOverdue ? [sources.hiringCandidateRetentionOverdue] : []),
     ...(sources.hiringTalentPoolIntegrity ? [sources.hiringTalentPoolIntegrity] : []),
     ...(sources.hiringAssessmentTemplateIntegrity ? [sources.hiringAssessmentTemplateIntegrity] : []),
+    ...(sources.hiringAssessmentAssignmentHealth ? [sources.hiringAssessmentAssignmentHealth] : []),
     ...(sources.hiringHandoffBlockedStale ? [sources.hiringHandoffBlockedStale] : []),
     ...(sources.hiringInternalHireAwaitingOnboarding ? [sources.hiringInternalHireAwaitingOnboarding] : []),
     // TASK-1734 — Assessment AI scoring run (5 señales, steady=0 con flags OFF).
@@ -1862,6 +1866,13 @@ export const getReliabilityOverview = async (
     preloadedSources.hiringAssessmentTemplateIntegrity !== undefined
       ? preloadedSources.hiringAssessmentTemplateIntegrity
       : await getHiringAssessmentTemplateIntegritySignal().catch(() => null)
+
+  // TASK-1719 — el monitor del canary de asignación automática. Un `intent` en reposo es
+  // un command que murió entre el ledger y la instancia: bug, no operación normal.
+  const hiringAssessmentAssignmentHealth =
+    preloadedSources.hiringAssessmentAssignmentHealth !== undefined
+      ? preloadedSources.hiringAssessmentAssignmentHealth
+      : await getHiringAssessmentAssignmentHealthSignal().catch(() => null)
 
   // TASK-356 — Handoffs bloqueados sin resolución humana (workflow atascado, steady=0).
   const hiringHandoffBlockedStale =
@@ -2730,6 +2741,7 @@ export const getReliabilityOverview = async (
     hiringCandidateRetentionOverdue,
     hiringTalentPoolIntegrity,
     hiringAssessmentTemplateIntegrity,
+    hiringAssessmentAssignmentHealth,
     hiringHandoffBlockedStale,
     hiringInternalHireAwaitingOnboarding,
     hiringAssessmentAiRun,

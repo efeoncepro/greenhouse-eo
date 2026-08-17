@@ -207,13 +207,53 @@ export const attachAssignmentInstance = async (
 }
 
 /**
- * Cantidad de asignaciones EFECTIVAS de una policy en su ventana (D5.2). Cuenta sólo
- * `assigned`: un `held`/`blocked` no gastó correo, así que no consume el cap.
+ * SUPERSEDE de la(s) fila(s) vigentes que apuntan a una instancia que acaba de morir.
+ *
+ * ⚠️ Es la mitad del ledger de la cancelación, y sin ella cancelar NO libera nada. El índice
+ * `hiring_assessment_open_instance_unique_idx` y el índice del ledger son llaves DISTINTAS:
+ * `cancelled` sale del primero (por eso se podía crear otra instancia), pero la fila del ledger
+ * seguía `outcome='assigned'`, `superseded_at IS NULL` y apuntando a la instancia muerta. La
+ * consecuencia observable era que re-asignar por el command gobernado devolvía `already_assigned`
+ * **con el assessmentId cancelado** (ruta 200, sin correo), y en el carril automático `decide.ts`
+ * leía ese `assigned` y CALLABA: candidato movido de etapa, prueba cancelada, cero comunicación.
+ *
+ * Va SIEMPRE en la misma transacción que cancela la instancia: dos writes, un solo hecho.
+ *
+ * Cero filas afectadas NO es error: las instancias creadas por el camino legacy
+ * (`assignCandidateTest`, el route manual pre-policy) nunca tuvieron fila de ledger. Es un no-op
+ * legítimo y silencioso — el caller no debe tratarlo como fallo.
+ */
+export const supersedeAssignmentsForAssessment = async (
+  client: PoolClient,
+  assessmentId: string,
+  outcomeReason: AssessmentAssignmentReasonCode,
+): Promise<string[]> => {
+  const rows = await runQuery<{ assignment_id: unknown }>(
+    client,
+    `UPDATE greenhouse_hiring.hiring_assessment_assignment
+       SET superseded_at = NOW(), outcome = 'cancelled', outcome_reason = $2, updated_at = NOW()
+     WHERE assessment_id = $1 AND superseded_at IS NULL
+     RETURNING assignment_id`,
+    [assessmentId, outcomeReason],
+  )
+
+  return rows.map(row => str(row.assignment_id))
+}
+
+/**
+ * Cantidad de asignaciones EFECTIVAS de una policy en su ventana (D5.2). Un `held`/`blocked`
+ * no gastó correo, así que no consume el cap.
  *
  * **NO filtra `superseded_at`, a propósito.** El cap limita CORREOS SALIDOS, no filas vigentes:
  * superseder una asignación no des-envía el correo que el candidato ya recibió. Con el filtro,
  * supersedear liberaba presupuesto retroactivamente y el freno de blast radius dejaba de frenar
  * justo en el escenario que existe para contener.
+ *
+ * ⚠️ Por la MISMA razón cuenta también `cancelled: operator_cancelled`: desde que
+ * `supersedeAssignmentsForAssessment` reescribe `assigned → cancelled`, contar sólo `assigned`
+ * habría dejado que cancelar liberara presupuesto del cap — exactamente el agujero que el
+ * párrafo anterior existe para cerrar. El par (outcome, reason) lo escribe SÓLO el path de
+ * cancelación, así que el predicado no sobre-cuenta nada más.
  *
  * El caller DEBE tener la fila de policy bloqueada (`FOR UPDATE`) antes de llamar: sin eso, dos
  * assignments concurrentes leen el mismo conteo y pasan los dos.
@@ -227,7 +267,7 @@ export const countAssignedInWindow = async (
     client,
     `SELECT COUNT(*)::int AS total FROM greenhouse_hiring.hiring_assessment_assignment
      WHERE policy_id = $1
-       AND outcome = 'assigned'
+       AND (outcome = 'assigned' OR (outcome = 'cancelled' AND outcome_reason = 'operator_cancelled'))
        AND created_at > NOW() - make_interval(mins => $2)`,
     [policyId, Math.max(1, Math.floor(windowMinutes))],
   )

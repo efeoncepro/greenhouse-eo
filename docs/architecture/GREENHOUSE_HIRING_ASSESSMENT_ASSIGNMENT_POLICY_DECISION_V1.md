@@ -91,6 +91,71 @@ que el gate sirve.
 
 ---
 
+## Delta 2026-08-17 (2) — auditoría adversarial de Slices 3-5
+
+Segunda auditoría, sobre cancelación, propose/confirm, fan-in y señales. Lo que cambia la decisión:
+
+**1. Cancelar libera DOS llaves, no una (bloqueante).** El ADR y el código trataban la recuperación
+como *estructural*: `cancelled` queda fuera del predicado de instancia abierta, así que el índice
+`hiring_assessment_open_instance_unique_idx` se libera solo. Cierto — pero es **la mitad**. El ledger
+tiene su propia llave de idempotencia `(application, policy, versión, etapa, intento) WHERE
+superseded_at IS NULL`, y ésa **no se libera sola**. `cancelCandidateTest` nunca tocaba el ledger, así
+que la fila seguía vigente diciendo `outcome='assigned'` y apuntando a la instancia muerta.
+
+Consecuencia observable: reclutador asigna → cancela → vuelve a asignar por el command gobernado ⇒
+`recordAssignment` choca la misma llave ⇒ `created=false` ⇒ **`already_assigned` con el
+`assessment_id` CANCELADO**. HTTP 200, sin instancia nueva, sin correo. En el carril automático es
+peor: `decide.ts` lee ese `assigned` y **calla**, dejando al candidato movido de etapa sin ninguna
+comunicación. Los outcomes `cancelled`/`held` del ledger eran, además, código muerto: nadie escribía
+`superseded_at`.
+
+**Decisión: el supersede es parte de la cancelación, en su misma transacción.**
+`supersedeAssignmentsForAssessment` marca `superseded_at = NOW()`, `outcome = 'cancelled'` y
+`outcome_reason = 'operator_cancelled'` sobre la(s) fila(s) vigentes de esa instancia. Cero filas
+afectadas es un **no-op legítimo** (las instancias del camino legacy `assignCandidateTest` no tienen
+ledger), no un error. Efecto de segundo orden que se corrige junto: el cap de volumen contaba sólo
+`outcome='assigned'`, así que reescribir a `cancelled` habría liberado presupuesto retroactivamente —
+exactamente lo que el invariante 14 prohíbe. El cap ahora cuenta `assigned` **más**
+`cancelled/operator_cancelled`.
+
+**2. El digest era ciego a `state` y `mode` de la policy.** `markPolicyEnabled`/`markPolicyDisabled`
+**no incrementan `policy_version`**, y `findActivePolicyForOpening` devuelve `state <> 'disabled'`
+(o sea incluye `draft`). Escenario completo: se propone con la policy en `draft` — el preview dice
+`blockingReasonCode: 'policy_disabled'`, que el operador lee como "no va a pasar nada" —, alguien
+habilita la policy, el operador confirma, el digest coincide **y sale un correo real a un candidato
+real**. `policyState` y `policyMode` entran al material del digest.
+
+**3. Dos correos por un movimiento (assign manual + cambio de etapa en la misma ventana).** El assign
+manual publica `hiring.assessment.assigned` ⇒ sale el correo del test; el `stage_changed` posterior
+encuentra la instancia abierta ⇒ `already_assigned / existing_open_instance` ⇒ degradaba al genérico.
+El dedupe no los ve (distinto `sourceEventId`, distinto `emailType`). Antes de degradar se consulta
+ahora el **ledger de entregas** por entidad (`wasEmailDeliveredForEntity(assessmentId,
+'hiring_assessment_assigned')`): si el correo del test ya salió, callar.
+
+**4. Tres definiciones de "instancia abierta", y `scored` era la discrepancia peligrosa.** El preview
+incluía `scored` en su predicado y lo marcaba `existing_open_instance` (bloqueante), pero el command
+usa `OPEN_ASSESSMENT_INSTANCE_STATUSES` (sin `scored`): el operador confirmaba sobre un "bloqueo" que
+el command no honra y **se le mandaba una segunda prueba a alguien ya evaluado**. Se separan en dos
+señales: `existingOpenAssessment` (predicado EXACTO del command ⇒ bloqueante) y
+`existingScoredAssessment` (informativo, no bloqueante — el retake es legítimo, pero tiene que ser una
+decisión, no una sorpresa). `readers.ts` conserva `scored` a propósito: responde otra pregunta.
+
+**5. Honestidad sobre "cero correos".** El fan-in suprime el genérico confiando en que la projection
+del correo del test entregue, pero ésa tiene cuatro salidas silenciosas (sin email resoluble, token no
+rotable, kill-switch por tipo, dead-letter tras 3 reintentos). El invariante 2 se cumple **sobre el
+ledger, no sobre la entrega**. No se cierra el hueco: se hace visible con la métrica
+`assigned_without_email_24h` (severidad `warning`, con 15 min de gracia por la latencia del lane).
+
+**6. Menores con consecuencia real.** (a) `findActiveAssignmentProposal` no filtraba `expires_at`, así
+que pasados los 30 min de TTL `propose` devolvía una propuesta muerta y el confirm fallaba **siempre**
+en el primer intento; ahora la cierra como `expired` y emite una nueva. (b) La guarda de expiry del
+confirm era `Number.isFinite(x) && x <= now` — **fail-abierto**: un `expires_at` imparseable la
+saltaba entera. Invertida a fail-closed. (c) El predicado `awaiting_terminal` de la señal no coincidía
+con el del reader canónico (sin scope por policy/versión/etapa, sin excluir instancias abiertas): al
+reconfigurar una policy la cola se llenaba y la señal seguía en `ok`.
+
+---
+
 ## Decisión (resumen ejecutivo)
 
 Greenhouse vincula una `HiringOpening` a una plantilla de assessment mediante una **policy versionada**, y
@@ -462,18 +527,35 @@ etapa→plantilla, sin inferencia, sin modelo, sin puntaje. El invariante que la
 
 1. **NUNCA derivar la etapa trigger desde `payload.stage`** — el consumer reactivo hace coalescing por scope y conserva el último payload, así que la etapa intermedia se pierde en silencio. **SIEMPRE** re-leer el estado vigente en PostgreSQL con **el mismo predicado** que usa el reader de reconciliación. **NUNCA** ampliar ese predicado consultando `outbox_events` para "recuperar" a quien ya avanzó (Delta 2026-08-17): la reconciliación automática cubre **sólo** a quien sigue en la etapa trigger, y el resto va a la cola humana `resolveApplicationsMissedTriggerAwaitingHuman`, que no ejecuta nada.
 2. **NUNCA dejar que el candidato reciba cero comunicación ni dos.** Un solo consumer (`hiring_stage_changed_candidate_comms`) decide `commsIntent` y lo **persiste ANTES de enviar**. Outcome terminal (`held|blocked|stale`) ⇒ degrada al genérico **en la misma ejecución**; fault (throw) ⇒ retry **sin comunicar**. **NUNCA** prometer un test que no existe.
+
+   **La persistencia previa NO necesita tabla nueva** (implementación 2026-08-17): el ledger de assignment se commitea dentro de la transacción del command, y el correo del test lo manda DESPUÉS otro consumer al procesar `hiring.assessment.assigned`. El hecho durable precede al envío por construcción.
+
+   ⚠️ **`already_assigned` es ambiguo y la ambigüedad manda cero o dos correos.** Cubre dos casos que exigen ramas OPUESTAS, y el deduplicador de emails **no** los cubre (el correo del test y el de etapa viajan con `sourceEventId` distintos, así que mandar ambos no se detecta como duplicado):
+   - fila del ledger `outcome='assigned'` ⇒ replay de nuestra propia asignación, el correo del test ya salió por esa llave ⇒ **callar**;
+   - `outcomeReason='existing_open_instance'` ⇒ el command NO emitió evento nuevo (para no mandar un link viejo), o sea **no habrá correo de test** ⇒ **degradar al genérico**, o el avance es silencioso.
+   La distinción se lee del **ledger**, no del resultado en memoria: sobrevive a un reintento en otro proceso.
+
+   ⚠️ **El ledger de assignment no basta para la rama `existing_open_instance`** (Delta 2026-08-17 (2)): la instancia preexistente pudo nacer por el camino manual, que **no deja fila propia** en el ledger pero **sí manda el correo del test**. Antes de degradar al genérico hay que preguntarle al ledger de ENTREGAS (`wasEmailDeliveredForEntity(assessmentId, 'hiring_assessment_assigned')`); si ya salió, callar. Sin eso, "asignar a mano y mover de etapa en el mismo minuto" —la secuencia más natural que existe— manda dos correos. **NUNCA** callar cuando el `assessmentId` no es resoluble: ahí se degrada (un correo de más molesta, cero deja al candidato colgado).
+
+   ⚠️ **El invariante se cumple sobre el LEDGER, no sobre la ENTREGA.** La projection del correo del test tiene cuatro salidas silenciosas (sin email resoluble, token no rotable, kill-switch por tipo, dead-letter tras 3 reintentos), así que "cero correos" sigue siendo posible por debajo. La métrica `assigned_without_email_24h` de `hiring.assessment.assignment_health` es lo único que lo delata: **NUNCA** tratarla como ruido.
 3. **NUNCA la automatización escribe `attempt_seq > 1`.** Retake y re-asignación post-cancelación son commands humanos con capability y razón. El guardia vive en TS **y** en la DB (`CHECK (origin = 'manual' OR attempt_seq = 1)`): `recordAssignment` está exportado, así que un guardia sólo-TS lo salta cualquier caller nuevo.
 4. **NUNCA dejar escapar un `23505` crudo del assignment** (fabrica dead-letters): **SIEMPRE** `ON CONFLICT DO NOTHING RETURNING` + re-lectura del ganador sobre el índice parcial existente, patrón `createScoringRun`. **NUNCA** devolver token en la rama `created:false`.
 5. **NUNCA gobernar la policy con `hiring.assessment.author` ni con routeGroup `internal`.** La capability es `hiring.assessment.policy.govern` (role-only, `execute`/`tenant`), granteada en el **mismo PR** que la registra. El assign manual puntual se queda en `author`.
 6. **NUNCA expandir la automatización más allá del canary sin el snapshot inmutable del cuestionario por instancia.** `public-taking` resuelve preguntas en vivo; sin snapshot, dos candidatos "del mismo test" rindieron exámenes distintos. **NUNCA** versionar el template como sustituto: ya está versionado, el problema es la resolución.
 7. **NUNCA una policy nace `enabled`+`on_stage_entry`** (nace `draft`+`manual`; el flip exige capability + opening `published` + audit). **SIEMPRE** cap de volumen por opening/ventana con auto-detención y readiness fail-closed. **NUNCA** planear "probar en staging" como carril aislado: el `ops-worker` es único y compartido. **NUNCA** mover etapas en bulk con el auto encendido.
 8. **NUNCA disparar un assessment desde un score, match o atributo inferido — el trigger es la etapa.** Ese invariante es lo que mantiene esta automatización fuera de "IA de alto riesgo"; romperlo exige una decisión nueva, no una excepción.
-9. **NUNCA registrar un consumer reactivo nuevo y encender su flag en el mismo paso.** La Phase A **no tiene ventana temporal** (`reactive-consumer.ts:506-527`): un `handler` key nuevo barre TODO evento `published` sin fila de log, o sea el histórico completo del event type. Combinado con la regla 1 (re-leer el estado vigente), un evento de hace meses se evalúa contra la etapa de hoy. Orden obligatorio: **registrar con flag OFF → confirmar backlog drenado → recién flip**. El cap de volumen es el último freno, no el primero.
-10. **NUNCA declarar un instrumento sano por contar sus módulos.** Un módulo cuya competencia no tiene preguntas activas **no desaparece** del examen: se renderiza como sección vacía y el submit lo acepta, así que el candidato rinde una fracción del peso sin que nada falle. **SIEMPRE** verificar ejercitando `PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL` contra la plantilla real, y vigilar `hiring.assessment.template_module_without_questions` (steady=0).
-9. **NUNCA escribir `outcome='assigned'` en el ledger sin su `assessment_id`** (viola `hiring_assessment_assignment_assigned_instance_ck` y sería un ledger que miente): el intent se registra como `intent` —no terminal, efímero, sólo dentro de la transacción— y se cierra con `attachAssignmentInstance`. **NUNCA** devolver una fila `intent` como outcome al fan-in de comunicación: es un fault, no una condición estable.
-10. **NUNCA degradar un fallo de readiness a `held`.** `held` es el hold **humano**; todo fallo de dato (`missing_email`, `unverified_recipient`) es `blocked`, que es la única rama que emite `hiring.assessment.auto_assignment_blocked`.
-11. **NUNCA contar el cap de volumen sin bloquear antes la fila de policy (`FOR UPDATE`)** ni filtrando `superseded_at`: el cap mide **correos salidos**, no filas vigentes, y sin el lock dos assigns concurrentes leen el mismo total y pasan los dos.
-12. **NUNCA hashear el `template_content_digest` sólo por IDs.** Debe incluir `prompt`, `options_json`, `type` y `level`: un digest ciego al contenido no detecta el drift D4, que es editar una pregunta existente sin cambiar su ID.
+9. **NUNCA comunicar hacia afuera por un evento rancio.** Un `stage_changed` de más de `STAGE_CHANGE_ACTIONABLE_WINDOW_HOURS` (24 h) no comunica ni asigna: va a la cola humana. Es regla de dominio —avisarle a alguien "avanzaste" por un movimiento de la semana pasada es peor que callar— y de paso hace segura la primera corrida de un consumer nuevo. La guarda depende de `_occurredAt`, que el consumer reactivo inyecta en el payload (`parsePayload`): **si esa inyección se pierde, la ventana se vuelve código muerto que nunca dispara, sin romper build ni tests** — por eso está cubierta por test propio.
+10. **NUNCA registrar un consumer reactivo nuevo y encender su flag en el mismo paso.** La Phase A **no tiene ventana temporal** (`reactive-consumer.ts:506-527`): un `handler` key nuevo barre TODO evento `published` sin fila de log, o sea el histórico completo del event type. Combinado con la regla 1 (re-leer el estado vigente), un evento de hace meses se evalúa contra la etapa de hoy. Orden obligatorio: **registrar con flag OFF → confirmar backlog drenado → recién flip**. El cap de volumen es el último freno, no el primero.
+11. **NUNCA declarar un instrumento sano por contar sus módulos.** Un módulo cuya competencia no tiene preguntas activas **no desaparece** del examen: se renderiza como sección vacía y el submit lo acepta, así que el candidato rinde una fracción del peso sin que nada falle. **SIEMPRE** verificar ejercitando `PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL` contra la plantilla real, y vigilar `hiring.assessment.template_module_without_questions` (steady=0).
+12. **NUNCA escribir `outcome='assigned'` en el ledger sin su `assessment_id`** (viola `hiring_assessment_assignment_assigned_instance_ck` y sería un ledger que miente): el intent se registra como `intent` —no terminal, efímero, sólo dentro de la transacción— y se cierra con `attachAssignmentInstance`. **NUNCA** devolver una fila `intent` como outcome al fan-in de comunicación: es un fault, no una condición estable.
+13. **NUNCA degradar un fallo de readiness a `held`.** `held` es el hold **humano**; todo fallo de dato (`missing_email`, `unverified_recipient`) es `blocked`, que es la única rama que emite `hiring.assessment.auto_assignment_blocked`.
+14. **NUNCA contar el cap de volumen sin bloquear antes la fila de policy (`FOR UPDATE`)** ni filtrando `superseded_at`: el cap mide **correos salidos**, no filas vigentes, y sin el lock dos assigns concurrentes leen el mismo total y pasan los dos. Por la misma razón el predicado cuenta `outcome='assigned'` **más** `('cancelled','operator_cancelled')` desde que la cancelación reescribe el outcome (Delta 2026-08-17 (2)): cancelar **no des-envía** el correo que el candidato ya recibió, así que no puede devolver presupuesto.
+15. **NUNCA hashear el `template_content_digest` sólo por IDs.** Debe incluir `prompt`, `options_json`, `type` y `level`: un digest ciego al contenido no detecta el drift D4, que es editar una pregunta existente sin cambiar su ID.
+16. **NUNCA cancelar una instancia sin superseder su fila del ledger EN LA MISMA TRANSACCIÓN.** Son DOS llaves de unicidad distintas: la de la instancia se libera sola (`cancelled` está fuera de su predicado), la del ledger `(application, policy, versión, etapa, intento) WHERE superseded_at IS NULL` **exige el write explícito** `supersedeAssignmentsForAssessment` (`superseded_at=NOW()`, `outcome='cancelled'`, `outcome_reason='operator_cancelled'`). Sin él, re-asignar devuelve `already_assigned` con el `assessment_id` cancelado y el carril automático calla. **Cero filas afectadas NO es error**: las instancias del camino legacy (`assignCandidateTest`) no tienen ledger. **NUNCA** "recuperar" borrando filas: la reversa es superseder.
+17. **NUNCA armar el material del digest sólo con `policy_version`.** `markPolicyEnabled`/`markPolicyDisabled` cambian `state` **sin** incrementar la versión, y `findActivePolicyForOpening` incluye `draft`: `policyState` y `policyMode` van en el digest o el confirm ejecuta un efecto distinto del aprobado (proponer en `draft` con preview "no va a pasar nada" → habilitar → confirmar → correo real). **SIEMPRE** que se agregue un campo al material, asumir que invalida toda propuesta abierta (`superseded`) — es el comportamiento correcto, pero hay que saberlo.
+18. **NUNCA mezclar "instancia abierta" con "instancia corregida" en el preview.** `existingOpenAssessment` usa EXACTAMENTE `OPEN_ASSESSMENT_INSTANCE_STATUSES` (el predicado del índice parcial y del command) y **es** bloqueante; `existingScoredAssessment` es informativo y **NO** bloquea, porque el command sí crearía una instancia nueva. Declarar un bloqueo que el command no honra es peor que no declarar nada: el operador confirma igual y le llega una segunda prueba a alguien ya evaluado. `resolveApplicationsAwaitingAssignment` (readers.ts) mantiene `scored` como "ya evaluado" **a propósito**: responde otra pregunta. **NUNCA** unificarlos "por consistencia".
+19. **NUNCA escribir un predicado de reliability signal distinto del reader canónico que describe.** `awaiting_terminal` debe ser el espejo exacto de `resolveApplicationsAwaitingAssignment` (scope por `policy_id`/`policy_version`/`trigger_stage` + `superseded_at IS NULL` + exclusión de instancia abierta de ESA plantilla). Con un predicado más laxo, un bump de versión de policy llena la cola de reconciliación mientras la señal sigue en `ok`.
+20. **NUNCA una guarda de vencimiento fail-abierta.** `Number.isFinite(x) && x <= now` deja pasar el `NaN`: la forma correcta es `!Number.isFinite(x) || x <= now`. Y el filtro de expiry va **en las dos mitades**: si `propose` devuelve una propuesta vencida que `confirm` rechaza siempre, el primer intento de asignar falla sistemáticamente. El índice parcial no sabe de vencimiento, así que `createAssignmentProposal` cierra la vencida como `expired` y reintenta el INSERT.
 
 ---
 

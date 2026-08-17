@@ -196,8 +196,15 @@ const resultFromRecord = (
   }
 }
 
+/**
+ * `txClient` permite participar en la transacción del caller (mismo patrón que
+ * `recordHiringApplicationNote`): el confirm de una propuesta marca la propuesta y ejecuta el
+ * assignment ATÓMICAMENTE — o pasan las dos cosas, o no pasa ninguna. Sin cliente inyectado
+ * abre su propia transacción, que es el camino del consumer reactivo y del route manual.
+ */
 export const assignAssessmentFromPolicy = async (
   input: AssignAssessmentFromPolicyInput,
+  txClient: PoolClient | null = null,
 ): Promise<AssessmentAssignmentResult> => {
   const applicationId = str(input.applicationId).trim()
   const policyId = str(input.policyId).trim()
@@ -231,7 +238,7 @@ export const assignAssessmentFromPolicy = async (
     )
   }
 
-  return withGreenhousePostgresTransaction(async (client) => {
+  const execute = async (client: PoolClient): Promise<AssessmentAssignmentResult> => {
     // `FOR UPDATE` sobre la fila de policy: serializa TODOS los assignments de esta policy
     // (grano exacto del cap de volumen) y ordena la carrera contra un `disable` concurrente.
     // Sin el lock, dos assigns simultáneos con cap=3 y count=2 pasaban los DOS, y un kill
@@ -381,7 +388,11 @@ export const assignAssessmentFromPolicy = async (
     })
 
     return resultFromRecord(closed)
-  })
+  }
+
+  if (txClient) return execute(txClient)
+
+  return withGreenhousePostgresTransaction(execute)
 }
 
 /**

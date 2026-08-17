@@ -18,9 +18,9 @@ import {
   sendHiringApplicationCreatedEmails,
   sendHiringAssessmentAssignedEmail,
   sendHiringAssessmentSubmittedInternalEmail,
-  sendHiringDecisionEmail,
-  sendHiringStageAdvancedEmail
+  sendHiringDecisionEmail
 } from '@/lib/hiring/notifications'
+import { resolveStageChangeCandidateComms } from '@/lib/hiring/stage-comms'
 import { sendTalentPoolVerificationEmail } from '@/lib/hiring/talent-pool'
 import { EVENT_TYPES } from '@/lib/sync/event-catalog'
 
@@ -79,14 +79,26 @@ export const hiringAssessmentSubmittedInternalEmailProjection: ProjectionDefinit
   maxRetries: 3
 }
 
-export const hiringStageChangedEmailProjection: ProjectionDefinition = {
-  name: 'hiring_stage_changed_email',
+/**
+ * TASK-1719 Slices 4/5 — ABSORBE a `hiring_stage_changed_email` (TASK-1689).
+ *
+ * Un solo consumer decide qué recibe el candidato por un cambio de etapa: el correo del
+ * test asignado, o el genérico de avance, nunca ambos y nunca ninguno. Mientras eran dos
+ * projections independientes sobre el mismo evento, ninguna de las dos podía garantizarlo.
+ *
+ * ⚠️ El `name` cambió, o sea el `handler` key cambió. La Phase A del consumer reactivo no
+ * filtra por fecha, así que en la primera corrida este handler ve TODO el histórico de
+ * `stage_changed` como no procesado. Lo cubre la ventana de accionabilidad de
+ * `stage-comms/config.ts`: un evento fuera de ella no comunica ni asigna.
+ */
+export const hiringStageChangedCandidateCommsProjection: ProjectionDefinition = {
+  name: 'hiring_stage_changed_candidate_comms',
   description:
-    'TASK-1689 — hiring.application.stage_changed → email de avance al candidato SOLO para etapas candidate-facing (allowlist con nombre público; etapas internas nunca).',
+    'TASK-1719 — hiring.application.stage_changed → decide UNA comunicación al candidato: asigna el test según la policy de la vacante (correo del test) o degrada al aviso genérico de avance. Re-lee la etapa vigente en PostgreSQL; nunca confía en payload.stage.',
   domain: 'notifications',
   triggerEvents: [EVENT_TYPES.hiringApplicationStageChanged],
   extractScope: applicationScope,
-  refresh: async (scope, payload) => sendHiringStageAdvancedEmail(scope.entityId, payload),
+  refresh: async (scope, payload) => resolveStageChangeCandidateComms(scope.entityId, payload),
   maxRetries: 3
 }
 

@@ -54,6 +54,8 @@ const ALLOWED_WRITE_TARGETS = new Set([
   'greenhouse_hiring.hiring_opening_assessment_policy',
   'greenhouse_hiring.hiring_opening_assessment_policy_event',
   'greenhouse_hiring.hiring_assessment_assignment',
+  // TASK-1719 Slice 2 — preview durable propose→confirm de la asignación manual.
+  'greenhouse_hiring.hiring_assessment_assignment_proposal',
   // TASK-1723–1726 — Talent Pool aggregate, append-only ledgers, projection and public/MCP audit.
   'greenhouse_hiring.talent_pool_membership',
   'greenhouse_hiring.talent_pool_consent_event',

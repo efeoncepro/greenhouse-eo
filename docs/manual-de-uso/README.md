@@ -94,6 +94,7 @@ La diferencia con otras capas de documentacion:
 
 ### HR y Nomina
 
+- [Operar la Asignación de Tests por Etapa](hr/operar-asignacion-de-tests.md) — declarar la prueba de una vacante, asignar con proponer→confirmar, cancelar una prueba no iniciada (y avisarle a la persona si el correo ya salió), leer los estados del resultado, drenar la cola de recuperación y el procedimiento —no el interruptor— para encender la asignación automática.
 - [Operar los Emails del Ciclo de Hiring](hr/operar-emails-ciclo-hiring.md) — prender/apagar el sistema (flag del ops-worker), pausar un correo puntual en caliente (kill-switch por tipo, incluido el de rechazo), leer las señales del reactive log y diagnosticar por qué un correo no llegó.
 - [Operar el Hiring Desk](hr/operar-hiring-desk.md) — demanda de talento, pipeline de postulaciones, Application 360, asignación de assessments por postulación, revisión/corrección, decisión estructurada, handoff y publicación de vacantes.
 - [Ver los documentos de un candidato](hr/ver-documentos-de-un-candidato.md) — leer el CV y el portafolio desde la pestaña Documentos de la Application 360 sin salir del portal, entender los estados del escáner (sin escanear, procesando, cuarentena) y revelar el documento de identidad dejando registrado el motivo.

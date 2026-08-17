@@ -24,8 +24,46 @@ export type TemplateStatus = (typeof TEMPLATE_STATUSES)[number]
 export const ASSESSMENT_METHODS = ['candidate_test', 'interviewer_scorecard'] as const
 export type AssessmentMethod = (typeof ASSESSMENT_METHODS)[number]
 
-export const ASSESSMENT_STATUSES = ['assigned', 'sent', 'in_progress', 'submitted', 'scored', 'expired'] as const
+// `cancelled` (TASK-1719 Slice 3) es TERMINAL y sólo alcanzable desde `assigned`/`sent`.
+// Espeja el CHECK `hiring_assessment_status_check`. Queda FUERA de
+// OPEN_ASSESSMENT_INSTANCE_STATUSES a propósito: liberar el slot (application, template)
+// ES la recuperación (habilita re-asignar sin borrar la fila cancelada).
+export const ASSESSMENT_STATUSES = [
+  'assigned',
+  'sent',
+  'in_progress',
+  'submitted',
+  'scored',
+  'expired',
+  'cancelled',
+] as const
 export type AssessmentStatus = (typeof ASSESSMENT_STATUSES)[number]
+
+/**
+ * Estados desde los que una instancia candidate_test AÚN se puede cancelar: el candidato
+ * no empezó a rendir. Desde `in_progress`/`submitted`/`scored` cancelar borraría trabajo
+ * suyo, así que es 409, no una transición.
+ */
+export const ASSESSMENT_CANCELLABLE_STATUSES = ['assigned', 'sent'] as const
+
+/**
+ * Motivos de cancelación — allowlist estable, NUNCA texto libre en el campo de razón.
+ * Sin PII: nunca nombre, email, token, respuesta ni score.
+ */
+export const ASSESSMENT_CANCELLATION_REASON_CODES = [
+  'sent_in_error',
+  'wrong_template',
+  'duplicate_assignment',
+  'opening_closed',
+  'application_withdrawn',
+  'application_rejected',
+  'accommodation_required',
+  'other',
+] as const
+export type AssessmentCancellationReasonCode = (typeof ASSESSMENT_CANCELLATION_REASON_CODES)[number]
+
+/** Techo de la nota libre opcional que acompaña al reason code (no sustituye la allowlist). */
+export const ASSESSMENT_CANCELLATION_NOTE_MAX_LENGTH = 500
 
 // Objective (auto-scored) vs human-rated question types.
 export const OBJECTIVE_QUESTION_TYPES: readonly QuestionType[] = ['single_choice', 'multi_choice', 'likert']

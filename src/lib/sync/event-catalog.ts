@@ -257,6 +257,10 @@ export const AGGREGATE_TYPES = {
   // TASK-1719 — Ledger de assignment. Identity: assignment_id ('hoaa-{uuid}'). Un intento
   // vigente por (application, policy, versión, etapa trigger, attempt_seq).
   hiringAssessmentAssignment: 'hiring_assessment_assignment',
+
+  // TASK-1719 Slice 2 — Preview durable propose→confirm. Identity: proposal_id ('haap-{uuid}').
+  // Una propuesta `proposed` por (application, effect_digest).
+  hiringAssessmentAssignmentProposal: 'hiring_assessment_assignment_proposal',
   talentPoolMembership: 'talent_pool_membership',
   talentPoolInvitation: 'talent_pool_invitation',
 
@@ -1161,6 +1165,13 @@ export const EVENT_TYPES = {
   hiringAssessmentAssigned: 'hiring.assessment.assigned',
   hiringAssessmentSubmitted: 'hiring.assessment.submitted',
   hiringAssessmentScored: 'hiring.assessment.scored',
+
+  // TASK-1719 Slice 3 — Cancelación gobernada de un candidate_test no comenzado. Payload
+  // IDs-only (assessmentId/applicationId/templateId/reasonCode/previousStatus/actorUserId),
+  // NUNCA email, nombre, token ni score — el outbox sincroniza a BigQuery. Sin consumer
+  // reactivo: la comunicación correctiva al candidato es decisión humana explícita
+  // (`operatorFollowupRequired`), no un email automático sin plantilla aprobada.
+  hiringAssessmentCancelled: 'hiring.assessment.cancelled',
   hiringCompetencyResultUpdated: 'hiring.competency_result.updated',
 
   // TASK-1719 — Assignment gobernado de assessment. Payloads IDs-only (assignmentId/
@@ -1170,6 +1181,12 @@ export const EVENT_TYPES = {
   // volumen o destinatario no verificable). Sin consumer reactivo en Slice 2.
   hiringAssessmentAssignmentRecorded: 'hiring.assessment.assignment_recorded',
   hiringAssessmentAutoAssignmentBlocked: 'hiring.assessment.auto_assignment_blocked',
+
+  // TASK-1719 Slice 2 — propose→confirm de la asignación manual. Payloads IDs-only
+  // (proposalId/applicationId/policyId/policyVersion/effectDigest/outcome/reason codes),
+  // NUNCA email, nombre, token ni link. Sin consumer reactivo (audit/observabilidad).
+  hiringAssessmentAssignmentProposed: 'hiring.assessment.assignment_proposed',
+  hiringAssessmentAssignmentConfirmed: 'hiring.assessment.assignment_confirmed',
 
   // TASK-1735 — Expediente de Evaluación; payloads IDs-only (noteId/applicationId/kind/actor),
   // nunca el cuerpo de la nota ni PII. Sin consumers reactivos en V1 (audit/observabilidad).

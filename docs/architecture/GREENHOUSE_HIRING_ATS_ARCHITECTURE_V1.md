@@ -184,6 +184,8 @@ Auditoría 2026-07-10 (código real + specs downstream) → hardening pre-TASK-1
 
 **NUNCA** declarar sano un instrumento contando módulos: **SIEMPRE** ejercitar el resolvedor real contra la plantilla. Señal canónica de la clase: `hiring.assessment.template_module_without_questions` (steady=0; `error` con una sola plantilla rota, `warning` en el precursor de competencias sin banco). El snapshot inmutable por instancia sigue pendiente — es prerrequisito declarado para expandir la automatización de assignment más allá del canary.
 
+**Quién asigna la plantilla y cómo (TASK-1719):** la vinculación vacante→plantilla es una **policy versionada por opening** y el assignment pasa por **un solo command idempotente** que resuelve la plantilla server-side — el caller (persona, agente o integración) **NUNCA** entrega `templateId`. Manual (propose→confirm con effect digest y expiry enforceado) y automático (consumer reactivo por entrada a etapa, flag `HIRING_STAGE_TEST_ASSIGNMENT_ENABLED` sólo en ops-worker, default OFF) convergen en ese command. La cancelación pre-inicio invalida el token y **libera el cupo de unicidad**, que es lo que la hace recuperación real. La comunicación al candidato la decide **un solo consumer** (`hiring_stage_changed_candidate_comms`, que absorbió al de TASK-1689): una por movimiento, ni cero ni dos. Contrato completo, invariantes y matriz de riesgo: [`GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md`](GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md).
+
 Verificación: 6 live guards E2E contra PG real (idempotencia, expiración, anti-anclaje, inmutabilidad, dedupe) + anti-leak unit + suite full.
 
 ## Delta 2026-07-10 — TASK-770: bridge de activación hiring→HRIS implementado

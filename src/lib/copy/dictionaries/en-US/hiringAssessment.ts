@@ -57,9 +57,11 @@ export const hiringAssessment: HiringAssessmentCopy = {
       in_progress: 'In progress',
       submitted: 'Submitted by candidate',
       scored: 'Scored',
-      expired: 'Expired'
+      expired: 'Expired',
+      cancelled: 'Cancelled'
     },
     candidateIncomplete: 'The candidate has not completed the assessment yet.',
+    cancelledDetail: 'This assessment was cancelled before the candidate started it. The link no longer works.',
     loadReviewPrompt: 'Load the review to see answers, rubrics, and the competency scorecard.',
     noModules: 'This assessment does not have competency modules yet.',
     objective: 'Target',

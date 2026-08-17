@@ -87,7 +87,7 @@ import {
   hiringApplicationDecidedEmailProjection,
   hiringAssessmentAssignedEmailProjection,
   hiringAssessmentSubmittedInternalEmailProjection,
-  hiringStageChangedEmailProjection,
+  hiringStageChangedCandidateCommsProjection,
   talentPoolVerificationEmailProjection
 } from './hiring-lifecycle-emails'
 import { growthGraderRunFromSubmissionProjection } from './growth-grader-run-from-submission'
@@ -196,7 +196,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(hiringApplicationCreatedEmailsProjection) // TASK-1689 — hiring.application.created → aviso interno People + acuse candidato; flag HIRING_LIFECYCLE_EMAILS_ENABLED (ops-worker); drenado por ops-reactive-notifications
   registerProjection(hiringAssessmentAssignedEmailProjection) // TASK-1689 — hiring.assessment.assigned (candidate_test) → email con link de evaluación (token re-emitido canónico)
   registerProjection(hiringAssessmentSubmittedInternalEmailProjection) // hiring.assessment.submitted (candidate_test) → aviso interno a People con CTA a Application 360
-  registerProjection(hiringStageChangedEmailProjection) // TASK-1689 — hiring.application.stage_changed → avance de etapa candidate-facing (allowlist)
+  registerProjection(hiringStageChangedCandidateCommsProjection) // TASK-1719 — hiring.application.stage_changed → UNA comunicación: test asignado por policy, o aviso genérico de avance (absorbe TASK-1689)
   registerProjection(hiringApplicationDecidedEmailProjection) // TASK-1689 — hiring.application.decided → selected/rejected (rejected pausable via email_type_config)
   registerProjection(talentPoolVerificationEmailProjection) // TASK-1724 — consentimiento futuro solicitado → email de verificación/token self-service
   registerProjection(hiringCandidateReviewProjection) // TASK-1718 — clean CV asset → minimized/redacted exact-application review packet projection

@@ -609,22 +609,30 @@ automatización queda bloqueada sin assessment, no se promete test.
 
 ## Acceptance Criteria
 
-- [ ] Opening puede tener policy versionada manual/auto con template activo, trigger y time limit.
-- [ ] Greenhouse resuelve template desde opening; assignment command no acepta template arbitrario del caller.
-- [ ] Proposal preview y confirm quedan ligados por effect digest, actor, expiry e idempotency.
-- [ ] Rutas nuevas nunca devuelven token/link; outbox/audit/logs tampoco lo contienen.
-- [ ] Manual y automático convergen en el mismo command y typed outcomes.
-- [ ] Dos stage events/retries concurrentes producen una instancia y un email.
-- [ ] Reentrada a etapa o assessment abierto retorna `already_assigned` sin side effects nuevos.
-- [ ] Hold/accommodation, missing email, policy disabled, template inactive, stale stage y decided fallan cerrados.
-- [ ] Cancelación invalida token sólo pre-inicio, preserva audit y exige razón/actor.
-- [ ] Stage trigger exitoso genera sólo email de test, no email genérico adicional.
-- [ ] Assignment bloqueado no comunica un test inexistente.
-- [ ] Worker flag está en deploy.sh/ledger y fue apagado/encendido con evidencia staging.
-- [ ] Reconciliation detecta trigger sin terminal outcome y permite retry gobernado.
-- [ ] Tests prueban que score/completion no mueve stage ni decide.
-- [ ] TASK-1603 consume la policy y no crea binding/table duplicada.
-- [ ] Manuales, arquitectura, evento y operación de email quedan actualizados.
+- [x] Opening puede tener policy versionada manual/auto con template activo, trigger y time limit.
+- [x] Greenhouse resuelve template desde opening; assignment command no acepta template arbitrario del caller.
+- [x] Proposal preview y confirm quedan ligados por effect digest, actor, expiry e idempotency. **Expiry ENFORCEADO server-side** (30 min): el único precedente de `expiresAt` en el repo es cosmético y no se copió.
+- [x] Rutas nuevas nunca devuelven token/link; outbox/audit/logs tampoco lo contienen. (Tests de anti-fuga en `propose-confirm.test.ts`; la nota de cancelación viaja como `hasNote: boolean`.)
+- [x] Manual y automático convergen en el mismo command y typed outcomes.
+- [x] Dos stage events/retries concurrentes producen una instancia y un email. (Índice parcial + `ON CONFLICT` + replay ⇒ `already_assigned`; el fan-in distingue replay propio de instancia preexistente para no mandar dos correos.)
+- [x] Reentrada a etapa o assessment abierto retorna `already_assigned` sin side effects nuevos.
+- [x] Hold/accommodation, missing email, policy disabled, template inactive, stale stage y decided fallan cerrados.
+- [x] Cancelación invalida token sólo pre-inicio, preserva audit y exige razón/actor. **Y libera el cupo de unicidad** — verificado contra PG real: cancelar → re-asignar la misma plantilla funciona.
+- [x] Stage trigger exitoso genera sólo email de test, no email genérico adicional.
+- [x] Assignment bloqueado no comunica un test inexistente. (Degrada al genérico en la misma ejecución.)
+- [x] Worker flag está en deploy.sh/ledger — **falta la evidencia de apagado/encendido en staging** (parte del rollout pendiente, no del código).
+- [x] Reconciliation detecta trigger sin terminal outcome y permite retry gobernado. (Readers + `GET .../assessment-policy/reconciliation` + señal `hiring.assessment.assignment_health`.)
+- [x] Tests prueban que score/completion no mueve stage ni decide. (`selection-boundary.test.ts`, verificación estática sobre todo el dominio assessment.)
+- [ ] TASK-1603 consume la policy y no crea binding/table duplicada. **Pendiente**: `TASK-1603` sigue bloqueada por `TASK-1602`; el binding canónico ya existe para cuando la tome.
+- [x] Manuales, arquitectura, evento y operación de email quedan actualizados.
+
+**Estado honesto:** `code complete, rollout pendiente`. Todo el código de los Slices 0-5 está
+implementado, testeado y con SQL ejercitado contra PostgreSQL real. Lo que falta es
+**operacional y no se puede hacer desde el repo**: declarar la policy en la vacante del canary,
+drenar el backlog del consumer nuevo, encender el flag en el ops-worker y monitorear 7 días con
+candidatos reales. Mientras eso no ocurra, la automatización está apagada y el comportamiento
+observable es idéntico al previo, salvo que el correo de avance de etapa ahora lo decide el
+consumer nuevo.
 
 ## Verification
 
@@ -652,9 +660,48 @@ automatización queda bloqueada sin assessment, no se promete test.
 
 ## Follow-ups
 
+- **Consumer de UI para las tres rutas nuevas** (`assessment-assignment` propose/confirm, `assessments/[id]/cancel`, `assessment-policy/reconciliation`). Hoy sólo existen por API — que es lo que Full API Parity exige y lo que esta task declaró en scope — pero un operador no puede asignar, cancelar ni drenar la cola desde el portal. Los tres fixes de estado `cancelled` en `Application360View` ya renderizan bien un test cancelado; falta la forma de llegar a ese estado. Sin esta task, la capability existe y nadie la usa.
+- **Cobertura de entrega, no sólo de ledger.** El invariante 2 ("ni cero ni dos") se cumple hoy sobre el ledger. La projection que manda el correo del test tiene cuatro salidas silenciosas (sin correo resoluble, token no rotable, kill-switch por tipo, dead-letter tras 3 reintentos): en esos casos el candidato avanzó y no recibe nada. La señal `assigned_without_email_24h` lo DETECTA, pero no lo previene. Cerrarlo de verdad exige que el fan-in observe la entrega, no la intención.
+- **Capabilities más anchas de lo que suenan.** `hiring.assessment.read`/`author` se otorgan por routeGroup `internal`, o sea todo tenant interno (collaborator, designer, people_viewer) puede confirmar una asignación que dispara un correo a un candidato externo, y cancelar. Es coherente con el invariante 5 y con el rechazo explícito a endurecer `author` (`runtime.ts:614`), y NO es una regresión — pero no es least-privilege real y conviene decidirlo aparte.
 - UI para configurar policy/hold y migrar Application 360 a delivery email-only si producto lo prioriza.
 - Stage transition MCP gobernada consumiendo `updateHiringApplicationStage`; no duplicar auto-assignment.
 - Recordatorios de test pendientes bajo policy de frecuencia/consentimiento separada.
+
+## Delta 2026-08-17 (2) — correcciones de la auditoría adversarial de Slices 3-5
+
+Detalle y razonamiento completos en el ADR (`Delta 2026-08-17 (2)`); acá el registro de qué cambió.
+
+- **B1 (bloqueante) — cancelar no liberaba el cupo del ledger.** `cancelCandidateTest` liberaba el
+  índice de la instancia pero dejaba la fila del ledger `assigned`, vigente y apuntando a la instancia
+  muerta ⇒ re-asignar por el command gobernado devolvía `already_assigned` con el `assessment_id`
+  cancelado (200, sin correo) y el carril automático callaba. Se agrega
+  `supersedeAssignmentsForAssessment` dentro de la transacción de cancelar. Efecto de segundo orden
+  corregido en el mismo cambio: el cap de volumen ahora cuenta `assigned` **+**
+  `cancelled/operator_cancelled` (cancelar no des-envía el correo ya salido). Cubierto por
+  `cancel.live.test.ts`, que **ahora usa `assignAssessmentFromPolicy`** — el test anterior usaba el
+  camino legacy `assignCandidateTest`, que no toca el ledger, y por eso no vio el bug. Verificado
+  contra PG real: sin el fix, falla en `expected 'assigned' to be 'cancelled'`.
+- **S2** — `policyState` y `policyMode` entran al material del digest (`state`/`mode` cambian sin
+  bump de `policy_version`, y `findActivePolicyForOpening` incluye `draft`).
+- **S3** — antes de degradar al genérico por `existing_open_instance`, `decide.ts` consulta
+  `wasEmailDeliveredForEntity(assessmentId, 'hiring_assessment_assigned')`: cierra el doble correo de
+  "asignar a mano + mover de etapa en el mismo minuto".
+- **S4** — métrica `assigned_without_email_24h` en `hiring.assessment.assignment_health` (warning, con
+  15 min de gracia por la latencia del lane). Cierra parcialmente el follow-up "cobertura de entrega,
+  no sólo de ledger": lo hace visible, no lo previene.
+- **S5** — el preview separa `existingOpenAssessment` (bloqueante, predicado exacto del command) de
+  `existingScoredAssessment` (informativo). Antes marcaba `scored` como bloqueo que el command no
+  honra ⇒ segunda prueba a alguien ya evaluado.
+- **S6** — `awaiting_terminal` pasa a ser espejo exacto de `resolveApplicationsAwaitingAssignment`.
+- **M7 / M8** — `findActiveAssignmentProposal` filtra vencidas (y `createAssignmentProposal` cierra la
+  vencida como `expired` y reintenta); la guarda de expiry del confirm pasa a fail-closed.
+- **Tests tautológicos reemplazados** — el aserto "un array literal es igual a sí mismo" de
+  `cancel.test.ts`, el fixture imposible `held`+`volume_cap` de `decide.test.ts` y su test de PII que
+  corría sobre una rama sin interpolación.
+- **Migración** `20260817121228750_task-1719-supersede-write-path.sql`: sin DDL (el GRANT
+  column-scoped ya cubría `superseded_at`/`outcome`/`outcome_reason`); corrige los COMMENT que
+  afirmaban que ningún write path escribe `superseded_at` y agrega guard de grants. Aplicada y
+  verificada contra PG.
 
 ## Delta 2026-08-15
 

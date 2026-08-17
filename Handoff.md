@@ -2,6 +2,42 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-17 — TASK-1719 code complete: asignación de tests por etapa (Slices 0-5)
+
+Se cerró el código de los seis slices. Antes de esto la task tenía la fundación (policy + command)
+pero **el command no tenía un solo llamador**: era un motor sin llave. Ahora hay superficie manual
+(propose→confirm con effect digest y expiry enforceado a 30 min), cancelación gobernada, consumer
+reactivo de etapa y cola de reconciliación con endpoint propio.
+
+Decisiones que cambian el contrato y no estaban en la spec:
+
+- **Slices 4 y 5 colapsaron en UNA pieza.** El ADR exige un consumer único que absorba el correo de
+  etapa; mantenerlos separados es justamente lo que produce cero correos o dos.
+  `hiring_stage_changed_email` (TASK-1689) fue **reemplazado** por
+  `hiring_stage_changed_candidate_comms`. El `handler` key cambió.
+- **Ventana de accionabilidad de 24 h.** Un `stage_changed` más viejo no comunica ni asigna: va a la
+  cola humana. Es regla de dominio y además hace segura la primera corrida del consumer nuevo, cuya
+  Phase A barre todo el histórico del event type.
+- **`_occurredAt` se inyecta ahora en el payload reactivo** (`parsePayload`). La fila ya lo traía y
+  no se exponía, así que ninguna projection podía saber la edad de lo que procesaba. Con test propio:
+  sin esa inyección la ventana sería código muerto que nunca dispara, con build y tests verdes.
+- **`already_assigned` es ambiguo** y la ambigüedad manda cero o dos correos. El fan-in lo desambigua
+  leyendo el LEDGER (replay propio ⇒ callar; `existing_open_instance` ⇒ degradar). El deduplicador de
+  emails NO cubre este caso: los dos correos viajan con `sourceEventId` distintos.
+- **Cancelar libera el cupo de unicidad** (`cancelled` fuera del predicado del índice parcial), que es
+  lo que la vuelve recuperación real y no sólo un cierre. Verificado contra PG.
+
+Hallazgo colateral, ya corregido y commiteado aparte: **dos plantillas de assessment activas eran
+irrenderizables** (5 preguntas para 8 módulos y 6 para 5) — el módulo sin preguntas no desaparece, el
+candidato ve la sección vacía y el examen encogido se envía sin error. Archivadas + señal
+`hiring.assessment.template_module_without_questions`. Precursor vivo: **6 competencias sin banco**.
+
+**Estado: `code complete, rollout pendiente`.** `HIRING_STAGE_TEST_ASSIGNMENT_ENABLED` nace OFF (SoT
+`services/ops-worker/deploy.sh`, sólo ops-worker — prenderlo en Vercel no hace nada) y toda policy nace
+`draft`+`manual`. Falta lo operacional: declarar la policy del canary, drenar el backlog del consumer,
+flip y monitor 7 días. Con el flag OFF el candidato **sigue recibiendo** el aviso de avance: apagarlo
+es rollback seguro, no apagón. Manual: `docs/manual-de-uso/hr/operar-asignacion-de-tests.md`.
+
 ## 2026-08-17 — Beneficios globales de Efeonce documentados para vacantes
 
 Las skills espejo de Talent y Payroll ahora comparten el `Efeonce Candidate Benefits Charter`: 15 días
@@ -11,7 +47,7 @@ deber cívico, matrimonio/unión civil, 10 semanas para la madre/persona que da 
 trabajo remoto/salud mental. Los feriados corporativos son los de Chile y van aparte de vacaciones; una cobertura preacordada recibe descanso compensatorio. La carta permite comunicar el baseline global en vacantes,
 pero prohíbe afirmar que todos los permisos ya se autogestionan o calculan en Greenhouse. Payroll/Legal debe
 incorporar cada beneficio al instrumento contractual o del proveedor según país/modalidad antes de operarlo.
-La carta ahora define año/prorrateo, carry-over, continuidad de servicio, familia, retorno postparto, equivalencia contractor y wallets: aprendizaje US$500/año, equipo US$400/36 meses, conectividad/coworking US$40/mes y salud mental US$300/año. La ley local es overlay que puede mejorar, nunca reducir, el baseline. No hubo cambio de runtime, schema,
+La carta ahora define año/prorrateo, carry-over, continuidad de servicio, familia, retorno postparto, equivalencia contractor y wallets: aprendizaje US$500/año, conectividad/coworking US$50/mes y salud mental US$300/año. El aporte de equipo (US$400/36 meses) sigue siendo política aprobada, pero se conversa en entrevista u oferta y no aparece en el copy estándar de vacantes. La ley local es overlay que puede mejorar, nunca reducir, el baseline. No hubo cambio de runtime, schema,
 contratos ni política configurada.
 
 ## 2026-08-17 — Skill de Talent reforzada para vacantes públicas e inbound
