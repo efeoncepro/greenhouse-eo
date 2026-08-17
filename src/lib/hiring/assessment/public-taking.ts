@@ -100,15 +100,26 @@ const jsonObj = (value: unknown): Record<string, unknown> => {
   return {}
 }
 
-const numberFromAccommodation = (accommodations: Record<string, unknown>, keys: string[]): number | null => {
-  for (const key of keys) {
-    const raw = accommodations[key]
-    const parsed = typeof raw === 'number' ? raw : typeof raw === 'string' ? Number(raw) : NaN
+/**
+ * TASK-1719 — Lectura del ÚNICO contrato canónico de accommodations: `extraMinutes`.
+ *
+ * ⚠️ Esto aceptaba SEIS grafías del mismo hecho (`extraMinutes`, `timeExtensionMinutes`,
+ * `additionalMinutes`, `extendedTimeMinutes`, más `timeMultiplier`/`extendedTimeMultiplier`
+ * y `extendedTimePercent`/`timeExtensionPercent`), defensa escrita cuando no existía write
+ * path que fijara una forma. Se narró al abrir el write path (`accommodations.ts`), con la
+ * base verificada: 17 instancias, 0 con `accommodations_json` distinto de `{}` y 0 claves
+ * distintas en uso — no había ningún ajuste que perder.
+ *
+ * Seis maneras de expresar lo mismo son un contrato implícito, y es la clase de bug que ya
+ * mordió a este repo: el `perCriterion` de TASK-1734 admitía dos lecturas y el router comparó
+ * contra la equivocada en 11 de 14 casos reales, con el build verde. NUNCA reintroducir un
+ * alias "por compatibilidad": el escritor canónico es uno solo.
+ */
+const accommodationExtraMinutes = (accommodations: Record<string, unknown>): number => {
+  const raw = accommodations.extraMinutes
+  const parsed = typeof raw === 'number' ? raw : typeof raw === 'string' ? Number(raw) : NaN
 
-    if (Number.isFinite(parsed) && parsed > 0) return parsed
-  }
-
-  return null
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : 0
 }
 
 export interface PublicAssessmentCompetency {
@@ -171,18 +182,7 @@ export interface PublicAssessmentView {
 export const resolveAssessmentTiming = (assessment: Assessment): PublicAssessmentTiming => {
   const baseMinutes = Math.max(0, assessment.timeLimitMinutes ?? 0)
 
-  const explicitExtra = numberFromAccommodation(assessment.accommodations, [
-    'extraMinutes',
-    'timeExtensionMinutes',
-    'additionalMinutes',
-    'extendedTimeMinutes',
-  ])
-
-  const multiplier = numberFromAccommodation(assessment.accommodations, ['timeMultiplier', 'extendedTimeMultiplier'])
-  const percent = numberFromAccommodation(assessment.accommodations, ['extendedTimePercent', 'timeExtensionPercent'])
-  const multiplierExtra = multiplier && multiplier > 1 ? Math.round(baseMinutes * (multiplier - 1)) : 0
-  const percentExtra = percent ? Math.round(baseMinutes * (percent / 100)) : 0
-  const extraMinutes = Math.max(0, Math.round(explicitExtra ?? Math.max(multiplierExtra, percentExtra, 0)))
+  const extraMinutes = accommodationExtraMinutes(assessment.accommodations)
   const effectiveMinutes = Math.max(0, baseMinutes + extraMinutes)
 
   if (!assessment.startedAt || effectiveMinutes <= 0) {

@@ -2234,6 +2234,12 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // escriba a una cohorte entera. Grant tier gobernanza role-only (el assign manual puntual
   // se queda en `author`).
   { key: 'hiring.assessment.policy.govern', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
+  // TASK-1719 — otorgar un ajuste razonable (tiempo extra) sobre la evaluación de UN candidato.
+  // Capability propia y NO `hiring.assessment.author`: autorar el banco de preguntas es craft de
+  // contenido; conceder una adaptación es una decisión de People sobre una persona concreta, con
+  // trazabilidad de quién y cuándo. Grant tier gobernanza role-only. El MOTIVO del ajuste nunca
+  // se persiste (categoría protegida) — ver `src/lib/hiring/assessment/accommodations.ts`.
+  { key: 'hiring.assessment.grant_accommodation', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
   // TASK-1365 — aggregate-only fairness reader. More restricted than assessment.read.
   { key: 'hiring.assessment.fairness_read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
   // TASK-1714 — revelar el valor completo del documento de identidad de un CANDIDATO.

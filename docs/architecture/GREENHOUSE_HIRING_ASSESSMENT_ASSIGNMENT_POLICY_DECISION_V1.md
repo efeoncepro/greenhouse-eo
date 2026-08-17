@@ -156,6 +156,64 @@ reconfigurar una policy la cola se llenaba y la señal seguía en `ok`.
 
 ---
 
+## Delta 2026-08-17 (3) — write path de ajustes razonables (cierra la Open Question 7)
+
+El campo `accommodations_json` estaba cableado **end-to-end en lectura** desde `TASK-1360`: el
+lector TS lo suma al tiempo efectivo, el predicado SQL de vencimiento lo respeta, y la pantalla del
+candidato tiene banner y copy es-CL para anunciarlo. Nunca tuvo write path. Verificado contra la
+base antes de decidir: **17 instancias, las 17 con `{}`, cero claves distintas en uso**. O sea, en
+toda la vida del motor **no se le concedió un ajuste a nadie** — no se podía.
+
+Eso volvía el ajuste una promesa vacía: la única palanca real era alargar el `time_limit_minutes`
+de la plantilla, que se lo alarga **a toda la cohorte**. Acomodar a una persona exigía desacomodar
+la comparabilidad de todas.
+
+**Lo que se decidió:**
+
+1. **Contrato canónico ÚNICO: `{ extraMinutes, grantedBy, grantedAt }`.** La lectura aceptaba
+   **seis grafías** del mismo hecho, defensa razonable mientras nadie escribiera y trampa en cuanto
+   alguien escribiera. Se narró a `extraMinutes` en los **dos** lectores (TS y SQL) — seguro porque
+   0 filas usaban cualquiera de ellas. Fundamento en el invariante 23.
+2. **El MOTIVO no se guarda. Nunca.** Es decisión de privacidad, no omisión: un ajuste revela
+   condición de discapacidad o salud (categoría protegida), y persistir el porqué crea el dato
+   sensible con el que después se discrimina. Se persiste sólo el **arreglo operativo** + quién y
+   cuándo (rendición de cuentas del operador, no dato del candidato). La constancia narrativa, si
+   hace falta, va al Expediente de Evaluación (`TASK-1735`), que ya tiene gobernanza propia.
+   Invariante 22.
+3. **Command `grantAssessmentAccommodation`** (`src/lib/hiring/assessment/accommodations.ts`):
+   actor obligatorio de sesión, `FOR UPDATE`, rango entero **1..180 min**, permitido sólo desde
+   `assigned|sent|in_progress` (desde los terminales es 409 — ya no hay tiempo que extender) y sólo
+   `method='candidate_test'` (un scorecard de entrevistador no tiene candidato a quien acomodar).
+   **Re-otorgar REEMPLAZA** con actor y timestamp nuevos —es la vía de corregir un monto mal
+   puesto—; el **mismo** monto es no-op idempotente que **no** reescribe al otorgante, para que el
+   trail refleje la decisión real y no un doble click. Evento
+   `hiring.assessment.accommodation_granted` en la misma transacción, payload IDs-only.
+4. **Capability propia `hiring.assessment.grant_accommodation`** (role-only
+   `EFEONCE_ADMIN ∪ HR_MANAGER ∪ EFEONCE_OPERATIONS`, sin routeGroup `internal` por la misma razón
+   que `reveal_identity`) y ruta `POST /api/hiring/assessments/[id]/accommodations`.
+   **Sin flag**: acomodar a una persona no puede depender de una variable de entorno.
+5. **El boundary público no cambia.** El candidato sigue recibiendo `PublicAssessmentTiming`
+   (`baseMinutes`/`extraMinutes`/`effectiveMinutes`/`hasAccommodation`) — números derivados, nunca
+   el JSON crudo.
+
+**Dónde entra el pedido**: el ajuste se **concede desde el operador**, no se pide en el formulario
+de postulación. Pedirlo ahí obligaría al candidato a declarar una condición protegida **antes** de
+ser evaluado, ante un formulario público y sin relación previa — exactamente el momento de máxima
+asimetría. La puerta de entrada sigue siendo la línea de copy de D1 en los correos ("si necesitas
+más tiempo o algún ajuste, respóndenos"): el candidato pide por un canal humano, y ahora existe
+dónde escribirlo.
+
+**Evidencia**: 28 tests unitarios + 5 live contra PG real (incluido que el tiempo efectivo del
+candidato sube de 45 a 75 min tras otorgar, y que el lector TS y el predicado SQL coinciden en el
+mismo número). Migración aplicada y verificada consultando `capabilities_registry`.
+
+**Lo que sigue abierto**: no hay superficie de UI todavía — el ajuste se otorga por el contrato
+programático (que es el requisito duro de Full API Parity; la UI es un consumer más). Tampoco hay
+comunicación automática al candidato de que se le concedió: es decisión humana explícita, igual que
+en cancelación.
+
+---
+
 ## Decisión (resumen ejecutivo)
 
 Greenhouse vincula una `HiringOpening` a una plantilla de assessment mediante una **policy versionada**, y
@@ -561,6 +619,8 @@ etapa→plantilla, sin inferencia, sin modelo, sin puntaje. El invariante que la
 19. **NUNCA escribir un predicado de reliability signal distinto del reader canónico que describe.** `awaiting_terminal` debe ser el espejo exacto de `resolveApplicationsAwaitingAssignment` (scope por `policy_id`/`policy_version`/`trigger_stage` + `superseded_at IS NULL` + exclusión de instancia abierta de ESA plantilla). Con un predicado más laxo, un bump de versión de policy llena la cola de reconciliación mientras la señal sigue en `ok`.
 20. **NUNCA una guarda de vencimiento fail-abierta.** `Number.isFinite(x) && x <= now` deja pasar el `NaN`: la forma correcta es `!Number.isFinite(x) || x <= now`. Y el filtro de expiry va **en las dos mitades**: si `propose` devuelve una propuesta vencida que `confirm` rechaza siempre, el primer intento de asignar falla sistemáticamente. El índice parcial no sabe de vencimiento, así que `createAssignmentProposal` cierra la vencida como `expired` y reintenta el INSERT.
 21. **NUNCA elegir la etapa trigger por conveniencia operativa: es una decisión de doctrina de selección Y de equidad.** La canónica recomendada es **`shortlisted`**, y `interview` exige justificación deliberada. Dos razones independientes: **(a)** la ganancia de validez está en combinar entrevista estructurada + muestra de trabajo (≈.63 vs cualquiera sola; Schmidt & Hunter 1998, ranking confirmado por Sackett et al. 2022, que deja la entrevista estructurada como el predictor más fuerte) — y esa ganancia NO es automática por tener ambas: aparece cuando la entrevista puede interrogar lo que la prueba dejó abierto, o sea cuando la prueba llegó ANTES; **(b)** una prueba no pagada aplicada temprano no sesga por el puntaje, sesga por **quién logra completarla** (empleo actual, cuidados, conectividad, margen económico) — impacto adverso por COMPLETACIÓN, estructuralmente invisible en las métricas de scoring porque esas personas nunca llegan a tener una. **NUNCA** habilitar `screening` como trigger sin resolver antes qué se comunica: no es candidate-facing, así que un assignment bloqueado ahí degrada a SILENCIO y rompe el invariante 2. **SIEMPRE** vigilar la tasa de completación por cohorte al encender: es la única superficie donde ese sesgo se ve. Constante: `OPENING_ASSESSMENT_RECOMMENDED_TRIGGER_STAGE`.
+22. **NUNCA guardar el MOTIVO de un ajuste razonable, y NUNCA gatear el ajuste por flag** (Delta 2026-08-17 (3), cierra la Open Question 7). Un ajuste revela, por construcción, una condición de discapacidad o de salud: **categoría protegida**. Persistir "dislexia", "TDAH" o "post-operatorio" junto al expediente crea un dato sensible durable, consultable y reutilizable — exactamente el material con el que se discrimina, y contra el que el proceso de selección debería blindarse. Se guarda **sólo el arreglo operativo**: `{ extraMinutes, grantedBy, grantedAt }`. Si People necesita constancia narrativa, va al Expediente de Evaluación (`hiring_application_note`, TASK-1735), que ya tiene su gobernanza. Y **no se gatea por flag**: acomodar a una persona no puede depender de que alguien haya prendido una variable de entorno (mismo criterio que `cancelCandidateTest`). Capability propia `hiring.assessment.grant_accommodation` (role-only, `execute`/`tenant`, sin routeGroup `internal`), **NUNCA** reusar `hiring.assessment.author`: autorar contenido ≠ conceder una adaptación a una persona concreta.
+23. **NUNCA aceptar más de una grafía para el mismo hecho en `accommodations_json`.** El contrato canónico es `extraMinutes` y ninguna otra. La lectura llegó a aceptar **seis** formas (`extraMinutes` · `timeExtensionMinutes` · `additionalMinutes` · `extendedTimeMinutes` · `timeMultiplier`/`extendedTimeMultiplier` · `extendedTimePercent`/`timeExtensionPercent`), defensa escrita cuando no existía write path que fijara una. Seis maneras de decir lo mismo **son un contrato implícito**, y es la clase de bug que ya mordió a este repo con el build verde: el `perCriterion` de `TASK-1734` admitía dos lecturas (contribución ponderada vs nota independiente) y el router comparó contra la equivocada en **11 de 14 casos reales**. Se narró con la base verificada (17 instancias, **0** con `accommodations_json <> '{}'`, 0 claves distintas en uso). **NUNCA** reintroducir un alias "por compatibilidad". Y **SIEMPRE** mover juntos los DOS lectores: el TS (`resolveAssessmentTiming`) y el SQL (`ACCOMMODATION_EXTRA_MINUTES_SQL`, que decide el vencimiento) — si divergen, el candidato ve un contador y el sistema aplica otro.
 
 ---
 
@@ -572,7 +632,7 @@ etapa→plantilla, sin inferencia, sin modelo, sin puntaje. El invariante que la
 4. **Qué significa `expired` operativamente**: el estado existe y hoy **nadie lo mira**. Falta definir si es cola de reclutador, señal, o ambas.
 5. **Qué pasa si se avanza a `interview` con el test de `shortlisted` abierto**: hoy no hay respuesta. ¿Se cancela, se conserva, se comunica?
 6. **Aviso en la vacante pública de que el proceso incluye evaluación**: hueco de defensibilidad — hoy la prueba llega **sin anuncio previo**. Copy y ubicación pendientes.
-7. **Write path de accommodations**: la lectura y el render existen; falta decidir si el ajuste se pide en el formulario de postulación, se concede desde el drawer del reclutador, o ambos. Hasta entonces, la línea de copy de D1 es la única puerta.
+7. ~~**Write path de accommodations**~~ — **CERRADA 2026-08-17**, ver `## Delta 2026-08-17 (4)`. Se concede desde el operador (command + ruta gobernada); el ajuste NO se pide en el formulario de postulación. La línea de copy de D1 sigue siendo la puerta de ENTRADA (el candidato pide por correo), pero ya no es también la salida: ahora hay dónde escribirlo.
 8. **Tasa de completado de Content Creator al vencer el plazo** (tokens expiran 2026-08-29/30). Hoy no hay señal: la cohorte tenía 36 h y dos de sus 9 casos tienen causa conocida (sintético · correo nunca enviado por flag OFF). Si al vencimiento la tasa real sigue en cero sobre los 7 candidatos con correo entregado, **ahí** hay que investigar instrumento/correo/experiencia. Medirlo antes es leer ruido.
 9. **Las 6 competencias sin preguntas activas**: completar el banco o retirarlas del catálogo. Mientras existan, cualquier plantilla nueva que las use nace con un módulo ciego que el candidato ve vacío y el submit acepta igual. La señal `hiring.assessment.template_module_without_questions` lo reporta como `warning` (precursor) y como `error` en cuanto una plantilla activa las use.
 

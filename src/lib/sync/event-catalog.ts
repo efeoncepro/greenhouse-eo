@@ -1172,6 +1172,13 @@ export const EVENT_TYPES = {
   // reactivo: la comunicación correctiva al candidato es decisión humana explícita
   // (`operatorFollowupRequired`), no un email automático sin plantilla aprobada.
   hiringAssessmentCancelled: 'hiring.assessment.cancelled',
+
+  // TASK-1719 — Ajuste razonable (tiempo extra) otorgado sobre un candidate_test. Payload
+  // IDs-only + extraMinutes/previousExtraMinutes/actorUserId. NUNCA el MOTIVO del ajuste:
+  // no viaja porque no se guarda (revelaría condición de discapacidad, categoría protegida
+  // — ver `src/lib/hiring/assessment/accommodations.ts`). Sin consumer reactivo: comunicar
+  // el ajuste al candidato es decisión humana, no un email automático.
+  hiringAssessmentAccommodationGranted: 'hiring.assessment.accommodation_granted',
   hiringCompetencyResultUpdated: 'hiring.competency_result.updated',
 
   // TASK-1719 — Assignment gobernado de assessment. Payloads IDs-only (assignmentId/

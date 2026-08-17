@@ -1,9 +1,9 @@
 # Asignación de tests por etapa
 
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-08-17 por Claude (TASK-1719)
-> **Última actualización:** 2026-08-17 por Claude (TASK-1719)
+> **Última actualización:** 2026-08-17 por Claude (TASK-1719 — ajustes razonables)
 > **Documentación técnica:** [`GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md`](../../architecture/GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md)
 > **Manual de uso:** [`operar-asignacion-de-tests.md`](../../manual-de-uso/hr/operar-asignacion-de-tests.md)
 
@@ -110,6 +110,42 @@ Al cancelar:
 Una prueba cancelada **no entra al expediente de evaluación**. Cancelar es un acto administrativo
 nuestro y esa instancia nunca tuvo respuestas; dejarla aparecer invitaría a leerla como "no
 completó la evaluación", que es exactamente lo contrario de lo que pasó.
+
+## Ajustes razonables (tiempo extra)
+
+A veces una persona necesita más tiempo para rendir: una condición de salud, una discapacidad, una
+situación temporal. Eso se llama **ajuste razonable**, y ahora se puede conceder de verdad.
+
+**Cómo llega el pedido.** Los correos del proceso incluyen una línea que lo invita: *"si necesitas
+más tiempo o algún ajuste, respóndenos este correo"*. El candidato pide por ese canal humano; nadie
+tiene que declarar una condición en un formulario público antes de ser evaluado.
+
+**Qué se concede.** Minutos adicionales sobre el límite de la prueba (entre 1 y 180). Se puede
+otorgar mientras la prueba esté asignada, enviada o incluso **mientras la persona la está
+rindiendo** — el contador se le alarga en el momento. Una vez entregada, corregida o vencida ya no:
+no queda tiempo que extender.
+
+**Qué NO se guarda: el motivo.** Y no es un olvido. Un ajuste revela, por su naturaleza, una
+condición de discapacidad o de salud: un dato protegido. Si la plataforma guardara "dislexia" o
+"post-operatorio" junto al expediente, estaría creando exactamente el registro con el que después
+se discrimina. Se guarda **sólo el arreglo**: cuántos minutos, quién los otorgó y cuándo. Si el
+equipo necesita dejar constancia de la conversación, va al **expediente de evaluación**, que tiene
+sus propias reglas de acceso.
+
+**Qué ve el candidato.** Un aviso en su pantalla: *"Tiempo extendido aplicado (+30 min)"*. Ve el
+tiempo que efectivamente tiene, nunca quién se lo dio ni por qué.
+
+**Otras reglas:**
+
+- **Volver a otorgar reemplaza, no suma.** Si se puso 15 y correspondían 45, se otorga 45 y queda
+  45 — así se corrige un monto mal puesto.
+- **Otorgar el mismo monto que ya está no cambia nada** (ni siquiera el registro de quién lo dio),
+  para que un doble clic no ensucie la trazabilidad.
+- **Solo lo puede hacer People**, no cualquier persona con acceso al portal.
+- **No depende de ninguna configuración encendida.** Acomodar a alguien tiene que poder hacerse
+  siempre.
+- **La plataforma no le avisa sola al candidato** que se le concedió. Eso lo escribe una persona,
+  igual que en una cancelación.
 
 ## Reglas que la plataforma no rompe
 

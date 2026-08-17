@@ -174,15 +174,19 @@ return rows.map(normalizeAssessment)
 /** Vigencia del link tokenizado del candidato (TASK-1383; 1363 comunica la fecha). */
 const TOKEN_TTL_DAYS = 14
 
+/**
+ * TASK-1719 — Espejo SQL del ÚNICO contrato canónico de accommodations: `extraMinutes`.
+ *
+ * ⚠️ Aceptaba las mismas cuatro grafías que el lector TS (`timeExtensionMinutes`,
+ * `additionalMinutes`, `extendedTimeMinutes`). Se narró junto con el write path
+ * (`accommodations.ts`), con la base verificada en 0 filas con `accommodations_json <> '{}'`.
+ * Este predicado decide cuándo una instancia vence: si divergiera del lector TS
+ * (`resolveAssessmentTiming`), el candidato vería un contador y el sistema aplicaría otro.
+ * Cualquier cambio acá va acompañado del cambio allá, o son dos verdades.
+ */
 const ACCOMMODATION_EXTRA_MINUTES_SQL = `GREATEST(0, COALESCE(
   CASE WHEN (accommodations_json->>'extraMinutes') ~ '^[0-9]+(\\.[0-9]+)?$'
     THEN FLOOR((accommodations_json->>'extraMinutes')::numeric)::int END,
-  CASE WHEN (accommodations_json->>'timeExtensionMinutes') ~ '^[0-9]+(\\.[0-9]+)?$'
-    THEN FLOOR((accommodations_json->>'timeExtensionMinutes')::numeric)::int END,
-  CASE WHEN (accommodations_json->>'additionalMinutes') ~ '^[0-9]+(\\.[0-9]+)?$'
-    THEN FLOOR((accommodations_json->>'additionalMinutes')::numeric)::int END,
-  CASE WHEN (accommodations_json->>'extendedTimeMinutes') ~ '^[0-9]+(\\.[0-9]+)?$'
-    THEN FLOOR((accommodations_json->>'extendedTimeMinutes')::numeric)::int END,
   0
 ))`
 

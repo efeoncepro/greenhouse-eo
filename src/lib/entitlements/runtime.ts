@@ -613,6 +613,12 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       // incluirlo dejaría que collaborator/designer/people_viewer prendan escrituras a una
       // cohorte completa de candidatos. Rechazado endurecer `hiring.assessment.author`.
       'hiring.assessment.policy.govern',
+      // TASK-1719 — otorgar un ajuste razonable (tiempo extra) a la evaluación de un candidato.
+      // Mismo tier de gobernanza, role-only por la MISMA razón: el routeGroup `internal` lo porta
+      // todo tenant interno, así que incluirlo dejaría que collaborator/designer/people_viewer
+      // alteren las condiciones de rendición de una prueba. Rechazado reusar `assessment.author`:
+      // autorar contenido ≠ conceder una adaptación a una persona concreta.
+      'hiring.assessment.grant_accommodation',
       // TASK-1736 — corregir el display name de la identidad de un candidato (write sobre
       // identity_profiles con audit append-only fuente `human`). Mismo tier de gobernanza que
       // reveal_identity y por la misma razón role-only: el routeGroup `internal` lo portaría

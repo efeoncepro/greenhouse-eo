@@ -1,15 +1,16 @@
 # Operar la asignación de tests por etapa
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-08-17 por Claude (TASK-1719)
+> **Última actualización:** 2026-08-17 por Claude (TASK-1719 — ajustes razonables)
 > **Documentación funcional:** [`asignacion-de-tests-por-etapa.md`](../../documentation/hr/asignacion-de-tests-por-etapa.md)
 > **ADR:** [`GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md`](../../architecture/GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md)
 
 ## Para qué sirve
 
-Declarar qué prueba le corresponde a una vacante, asignarla, cancelarla y —cuando el equipo lo
-decida— dejar que se asigne sola al mover una postulación de etapa.
+Declarar qué prueba le corresponde a una vacante, asignarla, cancelarla, otorgar ajustes razonables
+y —cuando el equipo lo decida— dejar que se asigne sola al mover una postulación de etapa.
 
 ## Antes de empezar
 
@@ -17,6 +18,9 @@ decida— dejar que se asigne sola al mover una postulación de etapa.
   política, y `hiring.assessment.author` para asignar o cancelar una prueba puntual. Son
   distintas a propósito: configurar la regla de una vacante no es lo mismo que mandarle un
   correo a una persona.
+- Para **otorgar un ajuste razonable** necesitas `hiring.assessment.grant_accommodation`, que es
+  otra distinta y más acotada: conceder una adaptación a una persona concreta no es lo mismo que
+  autorar contenido de evaluación.
 - **La automatización viene apagada.** Hoy sólo funciona el camino manual. Encenderla es un
   procedimiento aparte, más abajo.
 - **No hay pantalla todavía** para configurar la política ni para cancelar. Se opera por API
@@ -78,6 +82,39 @@ pnpm staging:request POST /api/hiring/assessments/<assessmentId>/cancel '{"reaso
 Si la respuesta trae `operatorFollowupRequired: true`, **el correo con el enlace ya había salido**.
 Escríbele tú a la persona: la plataforma no manda una corrección automática a propósito.
 
+## Paso a paso — otorgar un ajuste razonable (tiempo extra)
+
+Cuando un candidato pide más tiempo —responde el correo diciendo que tiene una condición de salud,
+una discapacidad o una situación temporal— así se lo concedes:
+
+```bash
+pnpm staging:request POST /api/hiring/assessments/<assessmentId>/accommodations '{"extraMinutes":30}'
+```
+
+La respuesta trae `outcome`:
+
+| `outcome` | Qué pasó |
+|---|---|
+| `granted` | Primer ajuste de esta prueba |
+| `replaced` | Ya tenía uno y quedó reemplazado por el nuevo monto (`previousExtraMinutes` dice cuál era) |
+| `unchanged` | Ya tenía exactamente ese monto. No se tocó nada |
+
+**Lo que necesitas saber antes de usarlo:**
+
+- **Entre 1 y 180 minutos**, enteros. Fuera de rango es un `400`.
+- **Se puede otorgar mientras la persona está rindiendo**, no sólo antes: el contador se le alarga
+  en el momento. Si ya entregó, ya está corregida o ya venció, la respuesta es `409` — no queda
+  tiempo que extender. En ese caso lo que corresponde es asignar una prueba nueva.
+- **Volver a otorgar reemplaza, no suma.** Si pusiste 15 y correspondían 45, mandas 45 y queda 45.
+- **No pidas ni registres el motivo en ningún campo.** El endpoint no acepta uno a propósito: el
+  motivo de un ajuste revela una condición protegida, y guardarlo crearía el dato con el que
+  después se discrimina. Si necesitas dejar constancia de la conversación, escríbela en el
+  **expediente de evaluación** de la postulación, que tiene su propio control de acceso.
+- **Avísale tú al candidato** que se lo concediste. La plataforma no manda un correo automático,
+  igual que en una cancelación.
+- Necesitas ser **People** (`EFEONCE_ADMIN`, `HR_MANAGER` o `EFEONCE_OPERATIONS`). No alcanza con
+  poder autorar pruebas.
+
 ## Qué significan los estados
 
 | Estado | Qué pasó | Qué hacer |
@@ -118,6 +155,10 @@ El orden importa y ninguno de estos pasos es opcional:
 - **No interpretes un 200 como éxito.** Lee `status`.
 - **No borres filas del registro de asignaciones** para arreglar algo. Es la respuesta a "quién
   autorizó este correo".
+- **No alargues el tiempo de la plantilla para acomodar a una persona.** Eso se lo alarga a toda la
+  cohorte y rompe la comparabilidad. Para eso existe el ajuste razonable.
+- **No anotes el motivo del ajuste en el campo de nota de otra operación** (por ejemplo, cancelando
+  y recreando con una nota). El motivo no va en ningún campo de la prueba.
 
 ## Problemas comunes
 
@@ -137,6 +178,7 @@ El orden importa y ninguno de estos pasos es opcional:
 
 - Política y ledger: `src/lib/hiring/assessment/assignment-policy/**`
 - Cancelación: `src/lib/hiring/assessment/cancel.ts`
+- Ajustes razonables: `src/lib/hiring/assessment/accommodations.ts` (capability `hiring.assessment.grant_accommodation`)
 - Decisión de comunicación: `src/lib/hiring/stage-comms/**`
 - Señal de salud: `hiring.assessment.assignment_health`
 - Flag y su runtime: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`

@@ -1,5 +1,43 @@
 # TASK-1719 — Hiring Opening Assessment Policy and Stage-Triggered Candidate Test Assignment
 
+## Delta 2026-08-17 (4) — write path de ajustes razonables (cierra la Open Question 7 del ADR)
+
+El Delta (3) dejó esto declarado como el pendiente que la decisión de etapa volvía más urgente. Se
+implementó.
+
+**El hallazgo que lo justifica, verificado contra la base**: `accommodations_json` estaba cableado
+end-to-end **en lectura** desde TASK-1360 (lector TS, predicado SQL de vencimiento, banner y copy
+es-CL en la pantalla del candidato), pero **17 instancias, las 17 con `{}` y cero claves distintas
+en uso**. Nunca se le concedió un ajuste a nadie porque no se podía: la única palanca real era
+alargar el `time_limit_minutes` de la plantilla, que se lo alarga a toda la cohorte.
+
+**Qué se construyó:**
+
+- **Contrato canónico único `{ extraMinutes, grantedBy, grantedAt }`.** La lectura aceptaba **seis
+  grafías** del mismo hecho; se narraron las otras cinco en los **dos** lectores (TS
+  `resolveAssessmentTiming` + SQL `ACCOMMODATION_EXTRA_MINUTES_SQL`), seguro porque 0 filas usaban
+  ninguna. Un test fija que las 5 narradas ya no conceden tiempo.
+- **Command `grantAssessmentAccommodation`** (`src/lib/hiring/assessment/accommodations.ts`): actor
+  de sesión obligatorio, `FOR UPDATE`, rango entero 1..180, sólo desde `assigned|sent|in_progress`
+  y sólo `method='candidate_test'`; re-otorgar reemplaza, mismo monto es no-op idempotente que no
+  reescribe al otorgante; evento `hiring.assessment.accommodation_granted` en la misma tx, payload
+  IDs-only. **Sin flag.**
+- **El motivo NO se persiste** — decisión de privacidad (categoría protegida), documentada en el
+  command, el ADR (invariante 22), la doc funcional y el manual para que no se lea como olvido. La
+  constancia narrativa va al Expediente de Evaluación (TASK-1735).
+- **Capability `hiring.assessment.grant_accommodation`** en los tres lugares del mismo cambio
+  (catálogo TS + grant role-only en `runtime.ts` + seed en `capabilities_registry`), y ruta
+  `POST /api/hiring/assessments/[id]/accommodations` (slug `[id]` por obligación de Next.js).
+
+**Evidencia**: 28 unitarios + 5 live contra PG real (el tiempo efectivo del candidato sube de 45 a
+75 min tras otorgar, y el lector TS coincide con el predicado SQL en el mismo número); migración
+aplicada y verificada consultando `capabilities_registry`; `pnpm typecheck` exit 0; suite
+`src/lib/hiring src/lib/entitlements` en 931 verdes, incluido el guard de grant coverage.
+
+**Pendiente declarado**: no hay superficie de UI (se opera por el contrato programático, que es el
+requisito duro de Full API Parity), y no hay comunicación automática al candidato — avisar que se
+le concedió es decisión humana, igual que en cancelación.
+
 ## Delta 2026-08-17 (3) — la etapa trigger canónica es `shortlisted`, no `interview`
 
 Decisión tomada con la lente `greenhouse-talent-people-operator` a pedido del operador, y
