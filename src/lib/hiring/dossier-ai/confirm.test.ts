@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { HIRING_APPLICATION_NOTE_BODY_MAX as NOTE_BODY_MAX } from '@/types/hiring-application-notes'
+
 vi.mock('server-only', () => ({}))
 
 const withTransactionMock = vi.fn()
@@ -22,12 +24,19 @@ vi.mock('./store', () => ({
   markDossierProposalDecided: (...args: unknown[]) => markDecidedMock(...args)
 }))
 
+// El literal del mock queda amarrado al contrato puro por el test `alineado con el contrato`
+// (abajo): si alguien mueve el techo y no mueve el CHECK/el mock, el test rompe.
 vi.mock('../application-notes', () => ({
-  HIRING_APPLICATION_NOTE_BODY_MAX: 8000,
+  HIRING_APPLICATION_NOTE_BODY_MAX: 20000,
   recordHiringApplicationNote: (...args: unknown[]) => recordNoteMock(...args)
 }))
 
-const { confirmEvaluationDossier, renderEvaluationDossierMarkdown, resolveDossierProposalTransition } = await import('./confirm')
+const {
+  assertDossierBodyWithinLimit,
+  confirmEvaluationDossier,
+  renderEvaluationDossierMarkdown,
+  resolveDossierProposalTransition
+} = await import('./confirm')
 
 const draft = {
   resumenEjecutivo: 'Candidato con perfil coherente entre CV y assessment.',
@@ -140,6 +149,49 @@ describe('confirmEvaluationDossier', () => {
     })
   })
 
+  // Regresión TASK-1735: el análisis confirmado de una candidata se persistió cortado a 8000
+  // porque el render truncaba en silencio. Ahora el borrador largo se persiste ÍNTEGRO…
+  it('un dossier que renderiza >8000 se persiste íntegro (nada se recorta)', async () => {
+    const longDraft = {
+      ...draft,
+      resumenEjecutivo: 'r'.repeat(1500),
+      coherencias: Array.from({ length: 12 }, (_, i) => ({
+        afirmacion: `a${i}-` + 'x'.repeat(390),
+        evidencia: 'e'.repeat(590)
+      }))
+    }
+
+    lockProposalMock.mockResolvedValue({
+      ...proposalFixture,
+      proposed: { dossier: longDraft, sources: { cvContentHash: 'hash-cv-1' } }
+    })
+
+    await confirmEvaluationDossier({ proposalId: 'hdsp-1', decision: 'confirm', actorUserId: 'user-2' })
+
+    const { bodyMd } = recordNoteMock.mock.calls[0][0]
+
+    expect(bodyMd.length).toBeGreaterThan(8000)
+    expect(bodyMd).not.toContain('truncado')
+    expect(bodyMd).toContain('## No verificable con las fuentes')
+    expect(bodyMd).toBe(renderEvaluationDossierMarkdown(longDraft))
+  })
+
+  // …y si aun así excede el techo nuevo, se ABORTA con error accionable en vez de cortar callado.
+  it('cuerpo sobre el techo → falla loud, sin nota, sin marcar la propuesta ni emitir evento', async () => {
+    await expect(
+      confirmEvaluationDossier({
+        proposalId: 'hdsp-1',
+        decision: 'confirm',
+        editedBodyMd: 'x'.repeat(NOTE_BODY_MAX + 1),
+        actorUserId: 'user-2'
+      })
+    ).rejects.toMatchObject({ code: 'hiring_dossier_body_too_long', statusCode: 400 })
+
+    expect(recordNoteMock).not.toHaveBeenCalled()
+    expect(markDecidedMock).not.toHaveBeenCalled()
+    expect(publishOutboxEventMock).not.toHaveBeenCalled()
+  })
+
   it('kind derivado: sin cvContentHash en las fuentes → assessment_review', async () => {
     lockProposalMock.mockResolvedValue({
       ...proposalFixture,
@@ -207,7 +259,12 @@ describe('resolveDossierProposalTransition', () => {
 })
 
 describe('renderEvaluationDossierMarkdown', () => {
-  it('trunca al máximo del body de nota sin romper el límite', () => {
+  it('alineado con el contrato: el techo del mock es el del primitive de notas', () => {
+    expect(NOTE_BODY_MAX).toBe(20000)
+  })
+
+  // Regresión TASK-1735: el render cortaba a 8000 y persistía el análisis a mitad de frase.
+  it('un dossier que renderiza >8000 se devuelve ÍNTEGRO (sin recorte ni marca de truncado)', () => {
     const huge = {
       ...draft,
       resumenEjecutivo: 'r'.repeat(1500),
@@ -219,7 +276,20 @@ describe('renderEvaluationDossierMarkdown', () => {
 
     const rendered = renderEvaluationDossierMarkdown(huge)
 
-    expect(rendered.length).toBeLessThanOrEqual(8000)
-    expect(rendered).toContain('truncado')
+    expect(rendered.length).toBeGreaterThan(8000)
+    expect(rendered).not.toContain('truncado')
+    // La última sección sobrevive: era justo lo que se perdía al cortar.
+    expect(rendered).toContain('## No verificable con las fuentes')
+    expect(rendered.endsWith(draft.noVerificable[0])).toBe(true)
+  })
+})
+
+describe('assertDossierBodyWithinLimit', () => {
+  it('deja pasar lo que cabe y falla LOUD (no trunca) lo que excede el techo', () => {
+    expect(() => assertDossierBodyWithinLimit('x'.repeat(NOTE_BODY_MAX))).not.toThrow()
+
+    expect(() => assertDossierBodyWithinLimit('x'.repeat(NOTE_BODY_MAX + 1))).toThrowError(
+      expect.objectContaining({ code: 'hiring_dossier_body_too_long', statusCode: 400 })
+    )
   })
 })

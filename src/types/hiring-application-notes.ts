@@ -12,7 +12,13 @@ export type HiringApplicationNoteKind = (typeof HIRING_APPLICATION_NOTE_KINDS)[n
 export const HIRING_APPLICATION_NOTE_SOURCES = ['human', 'agent'] as const
 export type HiringApplicationNoteSource = (typeof HIRING_APPLICATION_NOTE_SOURCES)[number]
 
-export const HIRING_APPLICATION_NOTE_BODY_MAX = 8000
+/**
+ * Techo del cuerpo de la nota — espejo EXACTO del CHECK `hiring_application_note_body_md_check`
+ * (migration `20260817000658897_task-1735-hiring-note-body-max-20000`). El original (8000) era
+ * conservador sin fundamento para narrativa de evaluación con evidencia citada y truncaba
+ * análisis reales; si se vuelve a mover, la migración y esta constante cambian JUNTAS.
+ */
+export const HIRING_APPLICATION_NOTE_BODY_MAX = 20000
 
 /** Kinds que cargan juicio evaluativo — bajo el gate anti-anclaje, las AJENAS se omiten. */
 export const HIRING_SCORE_BEARING_NOTE_KINDS = ['cv_analysis', 'assessment_review', 'interview_note'] as const

@@ -24,7 +24,7 @@ vi.mock('@/lib/observability/capture', () => ({
 // confirm.ts (renderEvaluationDossierMarkdown) importa el módulo de notas y el outbox;
 // acá solo se necesita el render puro para probar el invariante del panel.
 vi.mock('../application-notes', () => ({
-  HIRING_APPLICATION_NOTE_BODY_MAX: 8000,
+  HIRING_APPLICATION_NOTE_BODY_MAX: 20000,
   recordHiringApplicationNote: vi.fn()
 }))
 

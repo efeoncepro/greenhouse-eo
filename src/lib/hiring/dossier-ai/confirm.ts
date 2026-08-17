@@ -55,9 +55,16 @@ export const resolveDossierProposalTransition = (
   )
 }
 
-const TRUNCATION_SUFFIX = '\n\n_(Contenido truncado al máximo de la nota.)_'
-
-/** Render markdown es-CL del borrador estructurado, acotado al máximo del body de nota. */
+/**
+ * Render markdown es-CL del borrador estructurado — ÍNTEGRO, sin recorte.
+ *
+ * NUNCA truncar acá: hasta TASK-1735 este render cortaba en silencio a
+ * `HIRING_APPLICATION_NOTE_BODY_MAX` y persistía el análisis confirmado a mitad de frase
+ * (el panel no lo delataba porque renderiza desde `proposedJson`, pero todo consumer del
+ * `bodyMd` — API, export, Nexa, MCP — leía un documento cortado). El techo se subió a
+ * 20000 y el exceso ahora falla LOUD en `assertDossierBodyWithinLimit`; el humano edita
+ * el cuerpo antes de confirmar en vez de perder evidencia sin aviso.
+ */
 export const renderEvaluationDossierMarkdown = (draft: EvaluationDossierDraft): string => {
   const lines: string[] = ['## Resumen ejecutivo', '', draft.resumenEjecutivo]
 
@@ -81,11 +88,22 @@ export const renderEvaluationDossierMarkdown = (draft: EvaluationDossierDraft): 
     draft.noVerificable.forEach(item => lines.push(`- ${item}`))
   }
 
-  const rendered = lines.join('\n')
+  return lines.join('\n')
+}
 
-  if (rendered.length <= HIRING_APPLICATION_NOTE_BODY_MAX) return rendered
+/**
+ * Guard del write path: el cuerpo que se va a materializar cabe en la nota, o se aborta con
+ * error accionable. Truncar en silencio pierde evidencia del análisis; fallar loud le dice al
+ * humano exactamente cuánto sobra para que lo edite antes de confirmar.
+ */
+export const assertDossierBodyWithinLimit = (bodyMd: string): void => {
+  if (bodyMd.length <= HIRING_APPLICATION_NOTE_BODY_MAX) return
 
-  return rendered.slice(0, HIRING_APPLICATION_NOTE_BODY_MAX - TRUNCATION_SUFFIX.length) + TRUNCATION_SUFFIX
+  throw new HiringValidationError(
+    `El análisis tiene ${bodyMd.length} caracteres y el máximo de la nota es ${HIRING_APPLICATION_NOTE_BODY_MAX}. Edita el cuerpo antes de confirmar: no se guarda recortado.`,
+    'hiring_dossier_body_too_long',
+    400
+  )
 }
 
 export interface ConfirmEvaluationDossierResult {
@@ -140,6 +158,9 @@ export const confirmEvaluationDossier = async (
 
       const sources = (proposal.proposed.sources ?? {}) as Record<string, unknown>
       const bodyMd = input.editedBodyMd?.trim() || renderEvaluationDossierMarkdown(dossier)
+
+      // Fail loud antes del insert: nunca se recorta el análisis para que quepa.
+      assertDossierBodyWithinLimit(bodyMd)
 
       // Kind derivado del packet: con CV en las fuentes es análisis CV↔assessment;
       // sin CV, es una revisión del assessment.

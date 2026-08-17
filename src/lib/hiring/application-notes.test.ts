@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { HIRING_APPLICATION_NOTE_BODY_MAX } from '@/types/hiring-application-notes'
+
 vi.mock('server-only', () => ({}))
 
 const withTransactionMock = vi.fn()
@@ -111,7 +113,7 @@ describe('recordHiringApplicationNote', () => {
       recordHiringApplicationNote({
         applicationId: 'happ-1',
         kind: 'general',
-        bodyMd: 'x'.repeat(8001),
+        bodyMd: 'x'.repeat(HIRING_APPLICATION_NOTE_BODY_MAX + 1),
         authorUserId: 'user-1'
       })
     ).rejects.toMatchObject({ code: 'hiring_note_invalid_body' })
