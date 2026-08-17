@@ -16,6 +16,12 @@ el orden gobernado `renderer → contenido aprobado → JobPosting schema`.
 - Variante sobre la vacante publicada real y parcial `EO-OPN-0061`, después de corregir la semántica
   `Deseable, no excluyente`, 1440 y 390:
   `.captures/2026-08-17T15-51-54_task1741-careers-editorial-detail/`.
+- Delta remoto sobre `EO-OPN-0061`, 1440 y 390, con resumen de banderas y disclosure cerrado/abierto de los
+  veinte países:
+  `.captures/2026-08-17T17-11-13_task1741-careers-editorial-detail/`.
+- Delta final de iconografía sobre `EO-OPN-0061`, 1440 y 390, reemplazando emojis por banderas SVG circulares
+  controladas:
+  `.captures/2026-08-17T18-20-41_task1741-careers-editorial-detail/`.
 - Dirección seleccionada:
   `docs/ui/visual-directions/TASK-1741-public-careers-editorial-detail-renderer.md`.
 
@@ -31,9 +37,18 @@ el orden gobernado `renderer → contenido aprobado → JobPosting schema`.
 - En 390 px la hoja se recompone de forma lineal, el rail pasa al final y no existe overflow horizontal.
 - GVC premium terminó con exit code 0 en ambos viewports: axe, layout, runtime, teclado, foco, reduced motion
   y enterprise rubric pasaron. Hubo cero errores de consola, página, hidratación o HTTP.
-- El warning de transferencia (13–14 MB) proviene del bundle de desarrollo local de Next: la task no añade
-  imágenes, fuentes, dependencias ni requests de producto. FCP local fue 1172 ms en desktop y 312 ms en
-  móvil; se vuelve a medir en el build desplegado antes del flip.
+- El modelo remoto usa lenguaje `async-first`, separa modalidad/vinculación y muestra una pila de cinco
+  banderas SVG circulares más `+15` como apoyo. La información primaria sigue siendo textual: contador,
+  disclosure nativo y los veinte nombres localizados dentro de una lista semántica completa. Los SVG salen de
+  `circle-flags` 2.8.3 (MIT), se importan localmente y nunca dependen de emojis o un CDN.
+- El warning de transferencia (13–14 MB) de la captura anterior provino del bundle de desarrollo local de Next.
+  El delta de iconografía añade sólo los 20 SVG estáticos requeridos y ninguna fuente ni request a terceros;
+  la medición del build desplegado sigue siendo obligatoria antes del flip.
+- La recaptura SVG terminó `exitCode=0` en ambos viewports, con cero errores de consola, página, hidratación o
+  HTTP y sin findings de la rúbrica enterprise. Los veinte SVG fuente suman aproximadamente 80 KB. El servidor
+  de desarrollo transfirió 13,1 MB en ambos viewports y el primer desktop incluyó compilación en frío
+  (`FCP=14.920 ms`); móvil ya caliente quedó en `3.724 ms`. Ambos son warnings de desarrollo y no sustituyen la
+  medición del build desplegado previa al flip.
 
 ## Diferencia honesta entre fixture y dato real
 

@@ -988,7 +988,11 @@ export interface CareersCopy {
     evidenceTitle: string
     companyTitle: string
     remoteTitle: string
+    remoteIntro: string
+    workModelTitle: string
     eligibleCountriesTitle: string
+    eligibleCountriesDisclosure: string
+    eligibleCountriesListLabel: string
     collaborationLabels: {
       team: string
       reportsTo: string

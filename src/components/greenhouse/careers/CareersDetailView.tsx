@@ -1,20 +1,29 @@
+import Image from 'next/image'
 import Link from 'next/link'
 
-import type { CareersCopy } from '@/lib/copy'
+import type { CareersCopy, Locale } from '@/lib/copy'
 import { formatNumber } from '@/lib/format'
 import { formatCareersTemplate, type CareersOpeningViewModel } from '@/lib/hiring/public-careers/view-model'
+import { getCountryInfo } from '@/lib/locale/countries'
 
 import styles from './careers.module.css'
+import { getCandidateCountryFlagAsset } from './country-flag-assets'
 
 interface CareersDetailViewProps {
   copy: CareersCopy
   opening: CareersOpeningViewModel
   editorialEnabled?: boolean
+  locale?: Locale
 }
 
-export const CareersDetailView = ({ copy, opening, editorialEnabled = false }: CareersDetailViewProps) =>
+export const CareersDetailView = ({
+  copy,
+  opening,
+  editorialEnabled = false,
+  locale = 'es-CL'
+}: CareersDetailViewProps) =>
   editorialEnabled ? (
-    <EditorialCareersDetailView copy={copy} opening={opening} />
+    <EditorialCareersDetailView copy={copy} opening={opening} locale={locale} />
   ) : (
     <LegacyCareersDetailView copy={copy} opening={opening} />
   )
@@ -160,9 +169,16 @@ const LegacyCareersDetailView = ({ copy, opening }: Omit<CareersDetailViewProps,
   )
 }
 
-const EditorialCareersDetailView = ({ copy, opening }: Omit<CareersDetailViewProps, 'editorialEnabled'>) => {
+const EditorialCareersDetailView = ({
+  copy,
+  opening,
+  locale = 'es-CL'
+}: Omit<CareersDetailViewProps, 'editorialEnabled'>) => {
   const showLocation = opening.location !== opening.modality
   const { editorial } = opening
+  const eligibleCountries = resolveEligibleCountries(editorial.eligibleCountries, locale)
+  const previewCountries = eligibleCountries.slice(0, 5)
+  const remainingCountryCount = eligibleCountries.length - previewCountries.length
 
   const compensation = editorial.compensation
     ? `${editorial.compensation.currency} ${formatAmount(editorial.compensation.minValue)}–${formatAmount(editorial.compensation.maxValue)} · ${copy.detail.compensationUnits[editorial.compensation.unitText]}`
@@ -303,10 +319,21 @@ const EditorialCareersDetailView = ({ copy, opening }: Omit<CareersDetailViewPro
 
           {editorial.workModel || editorial.collaboration || editorial.eligibleCountries.length ? (
             <section className={styles.remotePanel} data-capture='careers-detail-remote'>
-              <div>
+              <div className={styles.remoteCopy}>
                 <p className={styles.editorialKicker}>{opening.modality}</p>
-                <h2 className={styles.editorialTitle}>{copy.detail.remoteTitle}</h2>
-                {editorial.workModel ? <p>{editorial.workModel}</p> : null}
+                <h2 className={styles.editorialTitle}>
+                  {opening.modalityKind === 'remote' ? copy.detail.remoteTitle : copy.detail.workModelTitle}
+                </h2>
+                {opening.modalityKind === 'remote' ? <p>{copy.detail.remoteIntro}</p> : null}
+                {editorial.workModel ? (
+                  <div className={styles.workModelNote}>
+                    <i className='tabler-file-description' aria-hidden='true' />
+                    <div>
+                      <h3>{copy.detail.workModelTitle}</h3>
+                      <p>{editorial.workModel}</p>
+                    </div>
+                  </div>
+                ) : null}
                 {editorial.collaboration ? (
                   <dl className={styles.collaborationList}>
                     <CollaborationItem
@@ -332,16 +359,50 @@ const EditorialCareersDetailView = ({ copy, opening }: Omit<CareersDetailViewPro
                   </dl>
                 ) : null}
               </div>
-              {editorial.eligibleCountries.length ? (
-                <div>
-                  <h3>{copy.detail.eligibleCountriesTitle}</h3>
-                  <ul className={styles.countryList}>
-                    {editorial.eligibleCountries.map(country => (
-                      <li className={styles.countryChip} key={country}>
-                        {country}
-                      </li>
-                    ))}
-                  </ul>
+              {eligibleCountries.length ? (
+                <div className={styles.countryPanel}>
+                  <div className={styles.countryHeading}>
+                    <span className={styles.countryGlobe} aria-hidden='true'>
+                      <i className='tabler-world' />
+                    </span>
+                    <div>
+                      <h3>
+                        {formatCareersTemplate(copy.detail.eligibleCountriesTitle, {
+                          count: eligibleCountries.length
+                        })}
+                      </h3>
+                      <div className={styles.countryFlagStack} aria-hidden='true'>
+                        {previewCountries.map(country => (
+                          <span className={styles.countryFlagBadge} key={country.code}>
+                            <CandidateCountryFlag code={country.code} size={32} />
+                          </span>
+                        ))}
+                        {remainingCountryCount > 0 ? (
+                          <span className={styles.countryMoreBadge}>+{remainingCountryCount}</span>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                  <details className={styles.countryDisclosure}>
+                    <summary>
+                      <span>
+                        {formatCareersTemplate(copy.detail.eligibleCountriesDisclosure, {
+                          count: eligibleCountries.length
+                        })}
+                      </span>
+                      <i className='tabler-chevron-down' aria-hidden='true' />
+                    </summary>
+                    <ul className={styles.countryList} aria-label={copy.detail.eligibleCountriesListLabel}>
+                      {eligibleCountries.map(country => (
+                        <li key={country.code}>
+                          <span className={styles.countryListFlag} aria-hidden='true'>
+                            <CandidateCountryFlag code={country.code} size={24} />
+                          </span>
+                          <span>{country.name}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
                 </div>
               ) : null}
             </section>
@@ -490,7 +551,42 @@ const CollaborationItem = ({ label, value }: { label: string; value: string }) =
   </div>
 )
 
+const CandidateCountryFlag = ({ code, size }: { code: string; size: number }) => {
+  const asset = getCandidateCountryFlagAsset(code)
+
+  return asset ? (
+    <Image
+      alt=''
+      aria-hidden='true'
+      className={styles.countryFlagImage}
+      data-country-flag={code}
+      height={size}
+      src={asset}
+      unoptimized
+      width={size}
+    />
+  ) : (
+    <i className='tabler-world' aria-hidden='true' data-country-flag-fallback={code} />
+  )
+}
+
 const formatAmount = (value: number): string => formatNumber(value, { maximumFractionDigits: 2 }, 'en-US')
+
+const resolveEligibleCountries = (codes: string[], locale: Locale) => {
+  const displayNames = new Intl.DisplayNames([locale], { type: 'region' })
+
+  return codes
+    .map(code => {
+      const normalizedCode = code.trim().toUpperCase()
+      const country = getCountryInfo(normalizedCode)
+
+      return {
+        code: normalizedCode,
+        name: displayNames.of(normalizedCode) ?? country?.name ?? normalizedCode
+      }
+    })
+    .sort((left, right) => left.name.localeCompare(right.name, locale))
+}
 
 const ListSection = ({
   check,

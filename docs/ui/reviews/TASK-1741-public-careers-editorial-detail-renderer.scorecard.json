@@ -9,6 +9,7 @@
     "dossier": "docs/ui/reviews/TASK-1741-public-careers-editorial-detail-renderer.review.md",
     "completeFixture": ".captures/2026-08-17T16-19-21_task1741-careers-editorial-detail/01-desktop1440/frames/02-detail-full.png",
     "partialRealOpening": ".captures/2026-08-17T15-51-54_task1741-careers-editorial-detail/",
+    "remoteCountries": ".captures/2026-08-17T17-11-13_task1741-careers-editorial-detail/",
     "baseline": ".captures/2026-08-17T12-25-12_task354-careers-runtime-audit/"
   },
   "dimensions": {
@@ -59,13 +60,13 @@
     },
     "iconography": {
       "score": 4.5,
-      "rationale": "Los iconos Tabler acompañan modalidad, jornada, trabajo, beneficios y CTA sin sustituir labels. La numeración explícita gobierna outcomes y proceso, donde un pictograma sería menos preciso.",
-      "evidence": "desktop, mobile"
+      "rationale": "Los iconos Tabler acompañan modalidad, jornada, trabajo, beneficios y CTA sin sustituir labels. En países, el globo y las banderas SVG circulares de Circle Flags son apoyo visual estable entre plataformas: el contador y los veinte nombres localizados conservan la semántica principal.",
+      "evidence": "desktop, mobile, remoteCountries"
     },
     "responsive": {
       "score": 4.7,
-      "rationale": "A 390 px el hero, skills, países, proceso y compensación se recomponen linealmente; el rail queda al final, ambos CTA siguen accesibles y GVC confirma ausencia de overflow de documento.",
-      "evidence": "mobile, GVC layout pass"
+      "rationale": "A 390 px el hero, skills, países, proceso y compensación se recomponen linealmente; el resumen geográfico conserva cinco banderas SVG y +15, la lista completa se abre en una columna y GVC confirma ausencia de overflow.",
+      "evidence": "mobile, remoteCountries, GVC layout pass"
     },
     "motion": {
       "score": 4.5,

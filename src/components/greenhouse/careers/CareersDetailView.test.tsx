@@ -54,10 +54,32 @@ describe('CareersDetailView — editorial rollout without vacancy-sheet regressi
     }
 
     expect(screen.getByText('USD 1,100–1,300 · por mes')).toBeTruthy()
+    expect(screen.getByRole('heading', { name: copy.detail.remoteTitle })).toBeTruthy()
+    expect(screen.getByText(copy.detail.remoteIntro)).toBeTruthy()
+    expect(screen.getByRole('list', { name: copy.detail.eligibleCountriesListLabel })).toBeTruthy()
 
     for (const country of editorialOpeningFixture.remoteEligibleCountries) {
-      expect(screen.getByText(country)).toBeTruthy()
+      const countryName = new Intl.DisplayNames(['es-CL'], { type: 'region' }).of(country)
+
+      expect(screen.getByText(countryName!)).toBeTruthy()
     }
+
+    expect(screen.queryByText('CL')).toBeNull()
+  })
+
+  it('localizes country names while keeping flags secondary to text', () => {
+    const englishCopy = getMicrocopy('en-US').careers
+    const opening = buildCareersOpeningViewModel(editorialOpeningFixture, englishCopy)
+
+    const { container } = render(
+      <CareersDetailView copy={englishCopy} opening={opening} editorialEnabled locale='en-US' />
+    )
+
+    expect(screen.getByRole('heading', { name: 'You can apply from 4 countries' })).toBeTruthy()
+    expect(screen.getByText('Mexico')).toBeTruthy()
+    expect(screen.queryByText('MX')).toBeNull()
+    expect(container.querySelectorAll('[data-country-flag="MX"]')).toHaveLength(2)
+    expect(container.querySelector('[data-country-flag-fallback]')).toBeNull()
   })
 
   it('preserves the complete legacy vacancy sheet when the editorial flag is off', () => {

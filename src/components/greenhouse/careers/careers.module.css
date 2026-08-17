@@ -1839,6 +1839,7 @@
 }
 
 .evidencePanel > i,
+.workModelNote > i,
 .editorialCompensation > i {
   color: var(--primary);
   font-size: 1.5em;
@@ -1912,19 +1913,139 @@
   color: var(--primary-dark);
 }
 
-.countryList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--editorial-space-1);
-  margin-block-start: var(--editorial-space-2);
+.remoteCopy,
+.countryPanel {
+  min-width: 0;
 }
 
-.countryChip {
-  padding: calc(var(--editorial-space-1) / 2) var(--editorial-space-1);
-  border: 1px solid var(--primary);
+.workModelNote {
+  display: grid;
+  grid-template-columns: min-content minmax(0, 1fr);
+  gap: var(--editorial-space-2);
+  margin-block-start: var(--editorial-space-3);
+  padding: var(--editorial-space-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.workModelNote h3,
+.workModelNote p {
+  margin: 0;
+}
+
+.workModelNote p {
+  margin-block-start: var(--editorial-space-1);
+}
+
+.countryPanel {
+  padding-inline-start: var(--editorial-space-3);
+  border-inline-start: 1px solid var(--border-subtle);
+}
+
+.countryHeading {
+  display: grid;
+  grid-template-columns: min-content minmax(0, 1fr);
+  gap: var(--editorial-space-2);
+  align-items: start;
+}
+
+.countryGlobe {
+  display: inline-flex;
+  width: var(--editorial-space-5);
+  height: var(--editorial-space-5);
+  align-items: center;
+  justify-content: center;
   border-radius: var(--radius-full);
+  background: var(--surface);
+  color: var(--primary-dark);
+}
+
+.countryFlagStack {
+  display: flex;
+  margin-block-start: var(--editorial-space-2);
+  padding-inline-start: var(--editorial-space-1);
+}
+
+.countryFlagBadge,
+.countryMoreBadge,
+.countryListFlag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  background: var(--surface);
+}
+
+.countryFlagBadge,
+.countryMoreBadge {
+  width: var(--editorial-space-4);
+  height: var(--editorial-space-4);
+  margin-inline-start: calc(var(--editorial-space-1) * -1);
+}
+
+.countryFlagBadge,
+.countryListFlag {
+  overflow: hidden;
+  border-color: var(--surface);
+}
+
+.countryFlagImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.countryMoreBadge {
   color: var(--primary-dark);
   font-weight: 800;
+}
+
+.countryDisclosure {
+  margin-block-start: var(--editorial-space-3);
+  border-block-start: 1px solid var(--border-subtle);
+}
+
+.countryDisclosure summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--editorial-space-1);
+  padding-block: var(--editorial-space-2);
+  color: var(--primary-dark);
+  cursor: pointer;
+  font-weight: 800;
+  list-style: none;
+}
+
+.countryDisclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.countryDisclosure[open] summary i {
+  transform: rotate(180deg);
+}
+
+.countryList {
+  display: grid;
+}
+
+.countryList li {
+  display: grid;
+  grid-template-columns: min-content minmax(0, 1fr);
+  gap: var(--editorial-space-1);
+  align-items: center;
+  padding-block: var(--editorial-space-1);
+  border-block-start: 1px solid var(--border-subtle);
+  color: var(--primary-dark);
+  line-height: 1.4;
+}
+
+.countryListFlag {
+  width: var(--editorial-space-3);
+  height: var(--editorial-space-3);
 }
 
 .benefitsBand {
@@ -2752,6 +2873,13 @@
   .remotePanel,
   .benefitsBand {
     padding: var(--editorial-space-3);
+  }
+
+  .countryPanel {
+    padding-block-start: var(--editorial-space-3);
+    padding-inline-start: 0;
+    border-block-start: 1px solid var(--border-subtle);
+    border-inline-start: 0;
   }
 
   .talentBand {

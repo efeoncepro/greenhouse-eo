@@ -22,6 +22,10 @@ Seleccionar `Editorial dossier`: role-first, evidence-led, dos CTA existentes y 
 - Hero inmersivo, secciones abiertas, banda de beneficios y rail contenido.
 - Dos columnas en desktop; secuencia lineal en 390 px, con CTA temprano y resumen al final.
 - Firma: numeración editorial sutil en outcomes, contraste tipográfico entre esencial y aprendible, benefits band sin card soup.
+- Firma del bloque remoto: un único panel tonal con explicación `async-first`, facts operativos y un resumen
+  geográfico compacto. Globo y contador cargan la semántica; una pila de hasta cinco banderas SVG circulares
+  controladas aporta ritmo visual y la lista completa permanece disponible mediante disclosure nativo. Los
+  assets salen de `circle-flags` 2.8.3 (MIT), se empaquetan localmente y nunca dependen de emojis o un CDN.
 
 ### B. Marketplace de talento — rechazada
 
@@ -73,6 +77,10 @@ Seleccionar `Editorial dossier`: role-first, evidence-led, dos CTA existentes y 
 - Un bloque parcial complementa la prosa legacy; nunca elimina requisitos, descripción o proceso disponibles.
 - No se truncan listas en la vista de detalle cuando el schema usa la lista completa.
 - `remoteModel`, países elegibles y compensación estructurada son visibles si alimentan `JobPosting`.
+- Los países se resuelven a nombres localizados; sus códigos ISO no son el label visible. Las banderas SVG son
+  decorativas, usan un mapa estático de los 20 países aprobados y degradan a un globo neutro si aparece un código
+  sin asset. La lista completa vive en el DOM dentro de `details/summary`, de modo que el resumen visual no oculta
+  ni contradice la elegibilidad de `JobPosting`.
 - Labels estables viven en `src/lib/copy/*`; hechos del rol sólo vienen del payload público.
 - `publicSeniority` es candidate-facing y obligatorio al publicar; nunca se sustituye por el nivel interno.
 

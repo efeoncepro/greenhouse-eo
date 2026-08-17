@@ -12,7 +12,8 @@
 - Audience and decision: una persona profesional evalúa si el trabajo es concreto, remoto viable y relevante antes de ir al formulario existente.
 - Action hierarchy: CTA verde del hero existente (primario) → CTA azul del resumen existente (refuerzo desktop/scroll) → ningún CTA adicional.
 - Visual fidelity mapping: navy/verde/magenta y tokenización de Careers existentes; jerarquía editorial, espacios y composición son una extensión de la surface, no un rediseño de marca.
-- Performance posture: sin stock, vídeo, canvas, WebGL, Lottie, nuevas fuentes ni dependencia visual pesada.
+- Performance posture: sin stock, vídeo, canvas, WebGL, Lottie ni nuevas fuentes. Las banderas usan sólo los 20
+  SVG estáticos requeridos desde `circle-flags` 2.8.3 (MIT), empaquetados localmente y sin CDN.
 
 ### Alternatives considered
 
@@ -108,8 +109,10 @@
 | `detail.essentialsTitle` | esenciales | `src/lib/copy/*` |
 | `detail.learnablesTitle` | aprendible | `src/lib/copy/*` |
 | `detail.evidenceTitle` | evidencia | `src/lib/copy/*` |
-| `detail.remoteTitle` | remoto | `src/lib/copy/*` |
-| `detail.eligibleCountriesTitle` | países | `src/lib/copy/*` |
+| `detail.remoteTitle` / `detail.remoteIntro` | remoto async-first | `src/lib/copy/*` |
+| `detail.workModelTitle` | modalidad y vinculación | `src/lib/copy/*` |
+| `detail.eligibleCountriesTitle` | cantidad de países habilitados | `src/lib/copy/*` |
+| `detail.eligibleCountriesDisclosure` | disclosure de lista completa | `src/lib/copy/*` |
 | `detail.compensationTitle` | compensación | `src/lib/copy/*` |
 | `detail.benefitsTitle` | beneficios | `src/lib/copy/*` |
 | `detail.processTitle` | proceso | `src/lib/copy/*` |
@@ -131,6 +134,11 @@
 - Orden DOM hero → contenido → resumen; el grid no cambia el orden de foco.
 - Ambos CTA tienen nombre accesible, foco visible y el mismo `applyHref`.
 - Esencial/aprendible no se diferencia sólo por color; contraste AA y sin dependencia de motion.
+- Los países se comunican por nombre dentro de una lista semántica completa. Las banderas SVG circulares son
+  apoyo visual `aria-hidden`, nunca sustituyen el nombre ni la elegibilidad exacta y degradan a un globo neutro
+  ante un código sin asset.
+- La lista de países usa `details/summary` nativo: funciona con teclado, expone estado abierto/cerrado y no se
+  presenta como un tercer CTA de postulación.
 - En 390 px no hay scroll horizontal; reduced motion conserva el mismo estado final.
 
 ## Implementation Mapping
@@ -140,6 +148,10 @@
 - Data: `src/lib/hiring/public-careers/view-model.ts` consuming the allowlist-safe structured payload from TASK-1740.
 - Reuse: existing hero, tags, links/buttons and summary rail. Extend the local section composition only; no global primitive or client fetch.
 - Content order: title/promise/facts → outcomes → work → essentials/evidence → remote model → benefits → process. Missing structured blocks fall back to compatible legacy copy/list sections.
+- Remote treatment: título `Trabajo remoto, en la práctica`, intro compartida `async-first`, facts específicos
+  del cargo y un bloque separado para la modalidad/vinculación declarada por el opening. Los veinte países no
+  se muestran como una pared de códigos ISO: globo + contador + hasta cinco banderas SVG circulares + `+N`, con
+  la lista completa de nombres en disclosure nativo.
 - CTA constraint: keep two existing `applyUrl` links exactly. The hero remains the early mobile action; the rail remains a desktop reinforcement and mobile terminal summary. No final CTA.
 - Token mapping: decide exact token names from `DESIGN.md` and Careers CSS during implementation. Do not introduce raw hex/font/spacing literals or a new palette.
 - Motion: none beyond existing CSS state affordances; `Motion: none` remains correct.

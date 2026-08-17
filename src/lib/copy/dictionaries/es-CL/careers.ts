@@ -203,13 +203,18 @@ export const careers: CareersCopy = {
     learnablesTitle: 'Lo que puedes aprender aquí',
     evidenceTitle: 'La evidencia que queremos ver',
     companyTitle: 'Efeonce en breve',
-    remoteTitle: 'Cómo trabajamos',
-    eligibleCountriesTitle: 'Países elegibles',
+    remoteTitle: 'Trabajo remoto, en la práctica',
+    remoteIntro:
+      'Trabajamos 100% remoto con una dinámica async-first: documentamos decisiones, avances y feedback para que el trabajo fluya sin depender de reuniones constantes. Reservamos las syncs para revisiones, decisiones y conversaciones que ganan valor al ocurrir en tiempo real.',
+    workModelTitle: 'Modalidad y vinculación',
+    eligibleCountriesTitle: 'Puedes postular desde {count} países',
+    eligibleCountriesDisclosure: 'Ver los {count} países',
+    eligibleCountriesListLabel: 'Lista completa de países habilitados',
     collaborationLabels: {
       team: 'Equipo',
       reportsTo: 'Reporta a',
-      language: 'Idioma',
-      timezoneOverlap: 'Solapamiento horario',
+      language: 'Idioma de trabajo',
+      timezoneOverlap: 'Overlap horario',
       workingRhythm: 'Ritmo de trabajo'
     },
     benefitsTitle: 'Lo que recibes',

@@ -55,7 +55,8 @@ export const editorialOpeningFixture: PublicOpeningPayload = {
     preferred: ['Experiencia en agencia o equipos con múltiples marcas'],
     learnables: ['AEO/GEO', 'Métricas de contenido', 'Distribución social B2B'],
     evidenceAsk: 'Portafolio con 3 piezas publicadas y el contexto de decisión de cada una.',
-    workModel: '100% remoto con overlap de 4 horas con GMT-4; rituales async y una sync semanal.',
+    workModel:
+      'En Chile, la vinculación se formaliza mediante contrato laboral local. En los demás países habilitados, usamos una vinculación internacional directa con Efeonce y pago directo.',
     collaboration: {
       team: 'Creative, SEO/AEO y cuentas',
       reportsTo: 'Content Lead',

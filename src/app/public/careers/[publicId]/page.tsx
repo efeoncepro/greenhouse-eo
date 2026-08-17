@@ -84,7 +84,7 @@ export default async function PublicCareersDetailPage({ params }: PageProps) {
       {jobPosting ? (
         <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: serializeJsonLd(jobPosting) }} />
       ) : null}
-      <CareersDetailView copy={copy} opening={viewModel} editorialEnabled={editorialEnabled} />
+      <CareersDetailView copy={copy} opening={viewModel} editorialEnabled={editorialEnabled} locale={locale} />
     </CareersPublicShell>
   )
 }

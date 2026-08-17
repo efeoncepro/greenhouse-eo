@@ -108,9 +108,19 @@ export const scenario: CaptureScenario = {
     },
     {
       kind: 'mark',
-      label: 'remote-and-summary',
-      fullPage: false,
-      note: 'Modelo remoto real, países elegibles y continuidad del rail.'
+      label: 'remote-countries-closed',
+      clipSelector: '[data-capture="careers-detail-remote"]',
+      note: 'Modelo remoto async-first y resumen accesible de los veinte países.'
+    },
+    {
+      kind: 'click',
+      selector: '[data-capture="careers-detail-remote"] summary'
+    },
+    {
+      kind: 'mark',
+      label: 'remote-countries-open',
+      clipSelector: '[data-capture="careers-detail-remote"]',
+      note: 'Disclosure abierto con los nombres completos; las banderas SVG circulares permanecen como apoyo visual.'
     }
   ]
 }

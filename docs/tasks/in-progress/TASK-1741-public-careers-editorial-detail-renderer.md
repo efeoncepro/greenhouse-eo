@@ -104,7 +104,7 @@ Reglas obligatorias:
 - Se mantienen exactamente los dos enlaces de aplicación existentes: CTA verde del hero y CTA azul del resumen; no agregar CTA al final ni repetir botones dentro de secciones.
 - El renderer es cliente de `PublicOpeningPayload`/view model; no lee DB, no reinterpreta datos privados y no introduce endpoints/client-side fetching.
 - La mejora debe ser incremental y reversible detrás de un flag server-side existente o aprobado; campos nuevos son opcionales y la lectura legacy es un fallback explícito.
-- No usar imágenes de stock, retratos de candidatos, arte IA decorativa, video, WebGL/canvas ni dependencia pesada. La modernidad nace de composición, tipografía, color, densidad, detalle y accesibilidad.
+- No usar imágenes de stock, retratos de candidatos, arte IA decorativa, video, WebGL/canvas ni dependencia pesada. Las únicas imágenes funcionales permitidas en esta task son los SVG circulares de países elegibles desde `circle-flags` 2.8.3 (MIT), importados localmente sin CDN. La modernidad nace de composición, tipografía, color, densidad, detalle y accesibilidad.
 
 ## Normative Docs
 
@@ -343,7 +343,7 @@ La variante se activa sólo tras revisar el mecanismo de flags existente. El lay
 | Contenido nuevo incompleto rompe layout            | UI / data      | high         | secciones opcionales + fallback legacy sin bandas vacías              | GVC partial/legacy defect                            |
 | Seniority interno o contradictorio llega a Careers | Hiring / trust | medium       | vocabulario único en UI+IA+writer+DB; reader fail-closed              | `L2`, `Intermedio` o título/nivel discordante        |
 | Regresión visual de Careers                        | UX/brand       | medium       | baseline, flag, revisión desktop/full-page y scorecard                | diferencia no intencional o score bajo               |
-| Peso/performance excesivo                          | public runtime | low          | CSS/React existente, cero assets/dependencias pesadas                 | cambio material de requests/transfer/FCP comparables |
+| Peso/performance excesivo                          | public runtime | low          | CSS/React existente + sólo 20 SVG locales de `circle-flags`; sin CDN | cambio material de requests/transfer/FCP comparables |
 
 ### Feature flags / cutover
 
@@ -409,8 +409,13 @@ La variante se activa sólo tras revisar el mecanismo de flags existente. El lay
 - Build productivo y typecheck con heap de 8 GB: PASS.
 - Suite focal del contrato, renderer, schema, publicación y seniority: 88 tests PASS; refuerzo posterior de
   fuente editorial única: 35 tests PASS.
+- Regresión final tras incorporar `circle-flags`: 86 tests PASS en 11 archivos focales, ESLint focal PASS y
+  `pnpm build` productivo PASS sobre el checkout integrado.
 - GVC premium local completo: `.captures/2026-08-17T16-19-21_task1741-careers-editorial-detail/`,
   1440 px + 390 px, cero errores de runtime y exactamente dos enlaces de postulación.
+- Recaptura final de iconografía: `.captures/2026-08-17T18-20-41_task1741-careers-editorial-detail/`,
+  1440 px + 390 px, banderas SVG circulares locales para los 20 países, cero errores de consola,
+  página, hidratación o HTTP y rúbrica enterprise sin hallazgos. Los 20 SVG fuente pesan ~80 KB.
 - Scorecard: `docs/ui/reviews/TASK-1741-public-careers-editorial-detail-renderer.scorecard.json`, promedio
   4,66 y piso 4,5.
 - El quick-create de Hiring queda sólo en borrador; el writer rechaza ediciones legacy sobre una vacante v2
@@ -432,16 +437,20 @@ La variante se activa sólo tras revisar el mecanismo de flags existente. El lay
 - [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] La evidencia visual tiene baseline, captures desktop/mobile, scorecard y decisión explícita de rollout/rollback.
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] La evidencia visual tiene baseline, captures desktop/mobile, scorecard y decisión explícita de rollout/rollback.
 
 ## Follow-ups
 
 - Instrumentación gobernada de view → apply si People/Growth aprueba una política de analytics/consentimiento.
 - Iterar la plantilla de benefits/copy sólo a través del charter y publicación de TASK-1740; no introducir texto por componente.
 
-## Open Questions
+## Resolved Questions
 
-- ¿Cuál es el flag/ledger canónico para una variante server-side de Careers?
-- ¿Qué fixture estable de staging puede usar GVC sin depender de datos sintéticos ambiguos?
-- ¿Se debe mover el rail hacia antes del contenido en mobile o el hero CTA actual ya satisface acceso temprano? Validar con evidencia, no con una CTA nueva.
+- Flag canónico: `CAREERS_DETAIL_EDITORIAL_V2_ENABLED`, server-side, default OFF y registrado en el ledger.
+  `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` sólo puede activarse cuando el renderer también esté activo.
+- Evidencia: `EO-OPN-0061` cubre el payload real parcial en GVC; `editorialOpeningFixture` cubre la estructura
+  completa determinística en tests. Ninguna de las dos se presenta como sustituto de la otra.
+- En móvil el rail permanece al final. El CTA del hero mantiene acceso temprano y el segundo CTA conserva el
+  resumen terminal; mover el rail crearía duplicación perceptual sin mejorar la acción y rompería la continuidad
+  aprobada de los dos CTA.
