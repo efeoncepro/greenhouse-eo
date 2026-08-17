@@ -103,7 +103,8 @@ export const hiringAssessment: HiringAssessmentCopy = {
     entryError: 'We could not check the AI run for this assessment.',
     open: 'Open run review',
     title: 'AI run review',
-    provenance: 'run {status} · model {model} · policy {policyVersion} · {date}',
+    // The status chip next to the title already declares it; repeating it was noise.
+    provenance: 'model {model} · policy {policyVersion} · {date}',
     refresh: 'Refresh',
     close: 'Close run review',
     statuses: {
@@ -169,8 +170,10 @@ export const hiringAssessment: HiringAssessmentCopy = {
     resolving: 'Saving…',
     resolved: 'Resolution recorded.',
     confirmTitle: 'Run confirmation',
+    // TASK-1738 — resolved OVER TOTAL. A `{a}/{a}` always renders 100% and would present
+    // a partial run as complete (ISSUE-159 lineage).
     manifestSummary:
-      'Covers {batch} proposals · exceptions {a}/{a} · sample {b}/{b} · digest current · policy {policyVersion}',
+      'Covers {batch} batch-eligible · exceptions {a}/{aTotal} · blind sample {b}/{bTotal} · digest current · policy {policyVersion}',
     gateOpenMandatory: '{count} exceptions still need resolution.',
     gateOpenSample: '{count} blind sample items still need scoring.',
     gateOpenScoring: 'The run is still scoring {count} answers.',

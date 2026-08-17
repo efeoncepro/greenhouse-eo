@@ -33,6 +33,7 @@ import Snackbar from '@mui/material/Snackbar'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
+import type { SxProps, Theme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 
 import CustomTextField from '@core/components/mui/TextField'
@@ -56,6 +57,25 @@ const COLLECTION_PATH = '/api/hiring/assessments/ai/scoring-runs'
 const RUN_TERMINAL: readonly AiScoringRunStatus[] = ['confirmed', 'cancelled', 'failed']
 
 const ANSWER_CLAMP_CHARS = 280
+
+/**
+ * Afordancia de texto en línea con el párrafo que la precede: sin esto, el padding
+ * horizontal del botón MUI la desalinea ~16px respecto de la columna de texto (hallazgo
+ * del frame real: "Ver más" y "Ver propuesta IA" quedaban sangrados contra su propio bloque).
+ */
+const INLINE_TEXT_AFFORDANCE_SX = {
+  alignSelf: 'flex-start',
+  paddingInline: 0,
+  minInlineSize: 0,
+} as const
+
+/**
+ * Tinta AA del rol `warning` (`theme.greenhouseSemantic.warning.ink`). `warning.main` es el
+ * RELLENO, no la tinta: como texto sobre blanco da 1.74:1 (axe lo marcó `serious` en el GVC
+ * real sobre las dos frases más load-bearing de la superficie — el registro del manifest y
+ * las causas por gate). El token canónico ya existe justamente para esto.
+ */
+const warningInkSx: SxProps<Theme> = theme => ({ color: theme.greenhouseSemantic.warning.ink })
 
 /** Interpolación literal de placeholders `{key}` del copy ledger (patrón hiring existente). */
 const fmt = (template: string, values: Record<string, string | number>): string =>
@@ -535,6 +555,7 @@ const AssessmentAiRunWorkbench = ({ open, runId, copy, confirmEnabled, onClose }
             leadingIconClassName={expanded ? 'tabler-eye' : 'tabler-eye-off'}
             onClick={() => setSeenProposals(prev => ({ ...prev, [item.runItemId]: true }))}
             disabled={expanded}
+            sx={INLINE_TEXT_AFFORDANCE_SX}
           >
             {copy.revealProposal}
           </GreenhouseButton>
@@ -544,7 +565,7 @@ const AssessmentAiRunWorkbench = ({ open, runId, copy, confirmEnabled, onClose }
         <Collapse in={expanded} timeout={collapseTimeout} unmountOnExit>
           <Stack spacing={2} sx={{ paddingBlockStart: 2 }}>
             {item.resolution == null ? (
-              <Typography variant='caption' color='warning.main' role='status'>
+              <Typography variant='caption' role='status' sx={warningInkSx}>
                 {copy.proposalSeen}
               </Typography>
             ) : null}
@@ -571,7 +592,9 @@ const AssessmentAiRunWorkbench = ({ open, runId, copy, confirmEnabled, onClose }
                 </Stack>
               </Box>
             ) : null}
-            <Typography variant='caption' color='text.disabled'>
+            {/* `text.disabled` (2.29:1) no es color de texto real: la procedencia del modelo
+                es evidencia auditable, no decoración. */}
+            <Typography variant='caption' color='text.secondary'>
               {fmt(copy.proposalProvenance, { model: item.proposal.model, promptVersion: item.proposal.promptVersion })}
             </Typography>
           </Stack>
@@ -599,6 +622,7 @@ const AssessmentAiRunWorkbench = ({ open, runId, copy, confirmEnabled, onClose }
             size='small'
             aria-expanded={expanded}
             onClick={() => setExpandedAnswers(prev => ({ ...prev, [item.runItemId]: !expanded }))}
+            sx={INLINE_TEXT_AFFORDANCE_SX}
           >
             {expanded ? copy.showLess : copy.showMore}
           </GreenhouseButton>
@@ -725,16 +749,6 @@ const AssessmentAiRunWorkbench = ({ open, runId, copy, confirmEnabled, onClose }
                 label={copy.resolutionLabels[item.resolution]}
               />
             ) : null}
-            {!resolved &&
-              item.routingReasons.map(code => (
-                <GreenhouseChip
-                  key={code}
-                  kind='attribute'
-                  variant='outlined'
-                  size='small'
-                  label={reasonLabel(copy, code)}
-                />
-              ))}
           </Stack>
 
           {isSample && !resolved ? (
@@ -754,10 +768,27 @@ const AssessmentAiRunWorkbench = ({ open, runId, copy, confirmEnabled, onClose }
 
           {renderAnswer(item)}
 
+          {/* Las razones de routing viven BAJO su etiqueta, no sueltas en el header: antes
+              la etiqueta quedaba huérfana (sin nada debajo) y los chips aparecían arriba sin
+              decir qué eran. En la muestra ciega no se listan: el único reason posible es
+              `blind_quality_sample`, que el chip + `sampleHint` ya explican. */}
           {!isSample && !resolved && item.routingReasons.length > 0 ? (
-            <Typography variant='caption' color='text.secondary'>
-              {copy.routingReasons}
-            </Typography>
+            <Box>
+              <Typography variant='caption' color='text.secondary' component='p'>
+                {copy.routingReasons}
+              </Typography>
+              <Stack direction='row' spacing={2} useFlexGap flexWrap='wrap' sx={{ marginBlockStart: 1 }}>
+                {item.routingReasons.map(code => (
+                  <GreenhouseChip
+                    key={code}
+                    kind='attribute'
+                    variant='outlined'
+                    size='small'
+                    label={reasonLabel(copy, code)}
+                  />
+                ))}
+              </Stack>
+            </Box>
           ) : null}
 
           {renderProposal(item)}
@@ -864,8 +895,22 @@ const AssessmentAiRunWorkbench = ({ open, runId, copy, confirmEnabled, onClose }
       fmt(copy.coverClosed, { count: coverage.closedWithoutProposal }),
     ]
 
+    // La cobertura es el techo permanente contra el rubber-stamp: si se va con el scroll, el
+    // operador trabaja la cola sin ver cuánto queda pendiente. El frame real la mostraba
+    // desapareciendo bajo el header — acá queda pegada al tope del contenedor scrolleable.
     return (
-      <Box role='group' aria-label={copy.coverageLabel} data-capture='assessment-run-coverage'>
+      <Box
+        role='group'
+        aria-label={copy.coverageLabel}
+        data-capture='assessment-run-coverage'
+        sx={{
+          position: 'sticky',
+          insetBlockStart: 0,
+          zIndex: 2,
+          backgroundColor: 'background.paper',
+          paddingBlockEnd: 2,
+        }}
+      >
         <Stack direction='row' spacing={2} useFlexGap flexWrap='wrap'>
           {chips.map(label => (
             <GreenhouseChip key={label} kind='metric' variant='label' size='small' label={label} />
@@ -888,13 +933,19 @@ const AssessmentAiRunWorkbench = ({ open, runId, copy, confirmEnabled, onClose }
     return (
       <Paper variant='outlined' sx={{ p: 3 }} data-capture='assessment-run-confirm'>
         <Stack spacing={3}>
-          <Typography variant='subtitle2'>{copy.confirmTitle}</Typography>
+          {/* El tema pinta `subtitle2` a text.primary@55% (3.38:1): insuficiente para el
+              encabezado de la región que gobierna la confirmación del run. */}
+          <Typography variant='subtitle2' color='text.primary'>
+            {copy.confirmTitle}
+          </Typography>
           {!coverage.digestStale ? (
             <Typography variant='body2' color='text.secondary'>
               {fmt(copy.manifestSummary, {
                 batch: coverage.batchEligible,
                 a: coverage.mandatoryResolved,
+                aTotal: coverage.mandatoryResolved + coverage.mandatoryPending,
                 b: coverage.sampleResolved,
+                bTotal: coverage.sampleResolved + coverage.samplePending,
                 policyVersion: run.policyVersion,
               })}
             </Typography>
@@ -902,7 +953,7 @@ const AssessmentAiRunWorkbench = ({ open, runId, copy, confirmEnabled, onClose }
           {gateMessages.length > 0 ? (
             <Stack component='ul' id='assessment-run-confirm-gates' spacing={1} sx={{ m: 0, paddingInlineStart: 4 }}>
               {gateMessages.map(message => (
-                <Typography key={message} component='li' variant='body2' color='warning.main'>
+                <Typography key={message} component='li' variant='body2' sx={warningInkSx}>
                   {message}
                 </Typography>
               ))}
@@ -995,7 +1046,6 @@ const AssessmentAiRunWorkbench = ({ open, runId, copy, confirmEnabled, onClose }
               {run ? (
                 <Typography variant='caption' color='text.secondary'>
                   {fmt(copy.provenance, {
-                    status: copy.statuses[run.status],
                     model: run.model,
                     policyVersion: run.policyVersion,
                     date: formatDate(run.createdAt),

@@ -826,15 +826,20 @@ const Application360View = ({
                   >
                     <ToggleButton value='bars' data-capture='assessment-mode-bars' aria-label={assessmentCopy.review.bars}>
                       <i aria-hidden='true' className='tabler-chart-bar' />
-                      <Box component='span' sx={{ ms: 1 }}>{assessmentCopy.review.bars}</Box>
+                      <Box component='span' sx={{ marginInlineStart: 1 }}>{assessmentCopy.review.bars}</Box>
                     </ToggleButton>
                     <ToggleButton value='radar' data-capture='assessment-mode-radar' aria-label={assessmentCopy.review.radar}>
                       <i aria-hidden='true' className='tabler-chart-radar' />
-                      <Box component='span' sx={{ ms: 1 }}>{assessmentCopy.review.radar}</Box>
+                      <Box component='span' sx={{ marginInlineStart: 1 }}>{assessmentCopy.review.radar}</Box>
                     </ToggleButton>
                   </ToggleButtonGroup>
                 )}
               </Stack>
+
+              {/* TASK-1738 — la entrada del run IA vive en la CARD, no dentro del panel de
+                  revisión: una cola de excepciones pendiente no puede quedar escondida detrás
+                  de "Revisar evaluación". Sin run o sin capability no dibuja nada. */}
+              <AssessmentAiRunEntry assessmentId={entry.assessmentId} copy={assessmentCopy.scoringRun} canScore={canScore} />
 
               {!review ? (
                 <Alert severity='info'>
@@ -889,9 +894,7 @@ const Application360View = ({
                             />
                           </Stack>
 
-                          <AssessmentAiRunEntry assessmentId={entry.assessmentId} copy={assessmentCopy.scoringRun} canScore={canScore} />
-
-                {scoreRows.length === 0 ? (
+                          {scoreRows.length === 0 ? (
                             <Alert severity='info'>{assessmentCopy.review.noModules}</Alert>
                           ) : scorecardMode === 'radar' ? (
                             <AssessmentCompetencyRadar

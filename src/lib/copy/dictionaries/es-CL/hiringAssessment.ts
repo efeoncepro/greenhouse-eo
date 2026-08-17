@@ -103,7 +103,8 @@ export const hiringAssessment: HiringAssessmentCopy = {
     entryError: 'No pudimos consultar el run IA de esta evaluación.',
     open: 'Abrir revisión del run',
     title: 'Revisión del run IA',
-    provenance: 'run {status} · modelo {model} · policy {policyVersion} · {date}',
+    // El estado ya lo declara el chip junto al título: repetirlo acá era ruido.
+    provenance: 'modelo {model} · policy {policyVersion} · {date}',
     refresh: 'Refrescar',
     close: 'Cerrar revisión del run',
     statuses: {
@@ -169,8 +170,10 @@ export const hiringAssessment: HiringAssessmentCopy = {
     resolving: 'Guardando…',
     resolved: 'Resolución registrada.',
     confirmTitle: 'Confirmación del run',
+    // TASK-1738 — el resumen declara resueltas SOBRE EL TOTAL. Un `{a}/{a}` siempre
+    // renderiza 100% y presentaría un run parcial como completo (herencia ISSUE-159).
     manifestSummary:
-      'Cubre {batch} propuestas · excepciones {a}/{a} · muestra {b}/{b} · digest vigente · policy {policyVersion}',
+      'Cubre {batch} de lote · excepciones {a}/{aTotal} · muestra ciega {b}/{bTotal} · digest vigente · policy {policyVersion}',
     gateOpenMandatory: 'Faltan {count} excepciones por resolver.',
     gateOpenSample: 'Falta puntuar {count} de la muestra ciega.',
     gateOpenScoring: 'El run aún está puntuando {count} respuestas.',
