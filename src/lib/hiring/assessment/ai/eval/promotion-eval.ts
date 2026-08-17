@@ -119,14 +119,156 @@ export interface PromotionEvalCase {
   /** Respuesta sintética o real ANONIMIZADA con propósito aprobado; nunca texto crudo de candidato sin contrato. */
   answerText: string
   caseKind: PromotionEvalCaseKind
-  /** Rating del rater A, independiente (sin ver B ni la propuesta IA). */
-  humanRatingA: number
-  /** Rating del rater B, independiente (sin ver A ni la propuesta IA). */
-  humanRatingB: number
-  /** Score adjudicado (tercera instancia humana resuelve la discrepancia A/B). */
-  adjudicatedScore: number
-  /** Banda declarada; el validador exige consistencia con `adjudicatedScore`. */
-  band: PromotionScoreBand
+  /**
+   * Rating del rater A, independiente (sin ver B ni la propuesta IA).
+   * `null` mientras el INSTRUMENTO no haya sido calificado por una persona — ningún agente
+   * puede rellenarlo, y el gate bloquea mientras siga vacío.
+   */
+  humanRatingA: number | null
+  /** Rating del rater B, independiente (sin ver A ni la propuesta IA). `null` = sin calificar. */
+  humanRatingB: number | null
+  /** Score adjudicado (tercera instancia humana resuelve la discrepancia A/B). `null` = sin adjudicar. */
+  adjudicatedScore: number | null
+  /**
+   * Banda declarada; el validador exige consistencia con `adjudicatedScore`. `null` mientras no
+   * exista adjudicación — declararla antes anclaría al rater con el estrato de origen.
+   */
+  band: PromotionScoreBand | null
+  /**
+   * Ruta C (routing-only): etiqueta humana de la decisión BINARIA "¿esta respuesta necesita
+   * revisión humana?". Habilita mejorar el router, NUNCA `batch_eligible`.
+   */
+  humanNeedsReview?: boolean | null
+  /**
+   * Razón que el rater anota cuando duda (protocolo §Reglas duras). Es material de adjudicación
+   * y de mejora de la BARS: NUNCA entra a ninguna métrica ni al veredicto del gate.
+   */
+  ratingNoteA?: string | null
+  ratingNoteB?: string | null
+}
+
+// ── Diseño de rating: qué evidencia trae REALMENTE el dataset ──
+//
+// El caso real: no siempre hay dos personas de Talent disponibles. En vez de decir sólo
+// "BLOQUEADO", el harness y el gate NOMBRAN la ruta que detectan y declaran qué habilita cada
+// una. Ninguna de las rutas degradadas equivale al doble rating: se dice, no se vende.
+
+export const PROMOTION_RATING_DESIGNS = [
+  /** A y B por raters distintos, independientes, con adjudicación. Única ruta que habilita `batch_eligible`. */
+  'double_rating_independent',
+  /** Ruta B: el MISMO rater califica dos veces con ≥7 días y orden distinto (estabilidad intra-rater). */
+  'test_retest_intra_rater',
+  /** Ruta C: sólo la decisión binaria "¿necesita revisión humana?", sin score continuo. */
+  'routing_decision_only',
+  /** El instrumento existe pero nadie lo ha calificado todavía. */
+  'unrated_instrument',
+] as const
+export type PromotionRatingDesign = (typeof PROMOTION_RATING_DESIGNS)[number]
+
+export interface PromotionRouteCapability {
+  label: string
+  enables: string[]
+  doesNotEnable: string[]
+}
+
+/**
+ * Qué habilita cada ruta, en términos de los flags REALES de TASK-1734. Es el contrato que el
+ * gate imprime: una ruta degradada no es "casi" el doble rating, habilita cosas distintas.
+ */
+export const PROMOTION_ROUTE_CAPABILITIES: Record<PromotionRatingDesign, PromotionRouteCapability> = {
+  double_rating_independent: {
+    label: 'Ruta A — doble rating humano independiente + adjudicación',
+    enables: [
+      'Evaluar los gates métricos completos (acuerdo IA-humano relativo al humano-humano, tolerancia, bandas, abstención, estabilidad).',
+      'Con gate VERDE + canary owner nombrado: considerar HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED (siempre shadow → canary primero).',
+    ],
+    doesNotEnable: [
+      'Saltarse el shadow y el canary: el gate verde autoriza evaluar la promoción, no encender el flag de una.',
+    ],
+  },
+  test_retest_intra_rater: {
+    label: 'Ruta B — test-retest intra-rater (un solo rater, dos pasadas ≥7 días)',
+    enables: [
+      'Medir estabilidad INTRA-rater y detectar deriva del modelo entre corridas (repeat stability, matriz de bandas como diagnóstico).',
+      'Sostener un canary observado con revisión humana total, sin reducir revisión.',
+    ],
+    doesNotEnable: [
+      'HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED / batch_eligible: no mide la varianza ENTRE personas, que es la mayor de las dos.',
+      'Usar el MAE "humano-humano" como piso de referencia: acá ese número es estabilidad de una persona consigo misma, no desacuerdo humano.',
+    ],
+  },
+  routing_decision_only: {
+    label: 'Ruta C — sólo la decisión binaria de ruteo (¿necesita revisión humana?)',
+    enables: [
+      'Medir y mejorar el ROUTER de riesgo (precisión/recall de mandatory_review) con un solo rater competente.',
+      'Ajustar señales y thresholds de la risk policy con evidencia humana real.',
+    ],
+    doesNotEnable: [
+      'HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED / batch_eligible: no hay score continuo, así que no hay acuerdo IA-humano que medir.',
+      'Cualquier afirmación sobre exactitud del score de la IA.',
+    ],
+  },
+  unrated_instrument: {
+    label: 'Instrumento SIN calificar — la muestra existe, la evidencia no',
+    enables: [
+      'Repartir el instrumento a los raters entrenados con la BARS y empezar a calificar.',
+    ],
+    doesNotEnable: [
+      'Absolutamente nada del rollout: sin ratings humanos no hay evidencia de promoción de ningún grado.',
+    ],
+  },
+}
+
+/**
+ * Detecta la ruta por la EVIDENCIA del dataset, no sólo por lo que declara `_meta`. Si la
+ * declaración y los datos no coinciden, manda el dato y el desacuerdo se reporta como blocker
+ * (`rating_design_declaration_mismatch`): una declaración es auditable, no autoritativa.
+ */
+export const detectPromotionRatingDesign = (
+  dataset: PromotionDataset,
+): { design: PromotionRatingDesign; declared: PromotionRatingDesign | null; evidence: string[] } => {
+  const cases = dataset.cases ?? []
+  const declared = dataset._meta?.ratingDesign ?? null
+  const evidence: string[] = []
+
+  const withA = cases.filter((c) => Number.isFinite(c.humanRatingA as number)).length
+  const withB = cases.filter((c) => Number.isFinite(c.humanRatingB as number)).length
+  const withAdjudication = cases.filter((c) => Number.isFinite(c.adjudicatedScore as number)).length
+  const withRoutingLabel = cases.filter((c) => typeof c.humanNeedsReview === 'boolean').length
+
+  evidence.push(
+    `casos=${cases.length} · con ratingA=${withA} · con ratingB=${withB} · con adjudicación=${withAdjudication} · con etiqueta de ruteo=${withRoutingLabel}`,
+  )
+
+  if (cases.length === 0 || (withA === 0 && withB === 0 && withRoutingLabel === 0)) {
+    evidence.push('ningún caso trae rating ni etiqueta humana ⇒ instrumento sin calificar')
+
+    return { design: 'unrated_instrument', declared, evidence }
+  }
+
+  if (withA === 0 && withB === 0 && withRoutingLabel > 0) {
+    evidence.push('sólo etiquetas binarias de ruteo, sin score continuo ⇒ ruta C')
+
+    return { design: 'routing_decision_only', declared, evidence }
+  }
+
+  if (declared === 'test_retest_intra_rater' || dataset._meta?.retestIntervalDays != null) {
+    evidence.push(
+      `dos pasadas del MISMO rater (intervalo declarado: ${dataset._meta?.retestIntervalDays ?? 'no declarado'} días) ⇒ ruta B`,
+    )
+
+    return { design: 'test_retest_intra_rater', declared, evidence }
+  }
+
+  if (withA > 0 && withB > 0 && dataset._meta?.doubleRating?.independent === true) {
+    evidence.push('dos raters independientes declarados + ratings A/B presentes ⇒ ruta A')
+
+    return { design: 'double_rating_independent', declared, evidence }
+  }
+
+  evidence.push('hay ratings pero `_meta.doubleRating.independent` no está declarado en true ⇒ no califica como ruta A')
+
+  return { design: 'test_retest_intra_rater', declared, evidence }
 }
 
 export interface PromotionDatasetMeta {
@@ -134,6 +276,10 @@ export interface PromotionDatasetMeta {
   /** true ⇒ el dataset sirve SOLO para probar el harness; el gate bloquea la promoción. */
   synthetic: boolean
   scale: string
+  /** Ruta declarada; la detección la contrasta contra la evidencia real de los casos. */
+  ratingDesign?: PromotionRatingDesign
+  /** Ruta B: días entre la primera y la segunda pasada del mismo rater (protocolo exige ≥7). */
+  retestIntervalDays?: number | null
   doubleRating: {
     /** Ratings A y B emitidos de forma independiente (sin verse entre sí ni ver la IA). */
     independent: boolean
@@ -162,6 +308,28 @@ export const validatePromotionDataset = (
     blockers.push('dataset_synthetic: dataset marcado synthetic — solo prueba el harness, jamás promueve')
   }
 
+  const { design, declared } = detectPromotionRatingDesign(dataset)
+
+  // Un instrumento sin calificar es un estado LEGÍTIMO del flujo, no un archivo corrupto: se
+  // reporta como tal (un blocker claro) en vez de escupir un `ratings_invalid` por cada caso.
+  if (design === 'unrated_instrument') {
+    blockers.push(
+      'dataset_unrated_instrument: el instrumento existe pero ningún humano lo ha calificado — ' +
+        'los ratings son trabajo de personas y ningún agente puede fabricarlos',
+    )
+  } else if (design !== 'double_rating_independent') {
+    blockers.push(
+      `dataset_rating_design_insufficient: ruta detectada \`${design}\` — no habilita batch_eligible ` +
+        '(sólo la ruta A, doble rating humano independiente + adjudicación, lo hace)',
+    )
+  }
+
+  if (declared != null && declared !== design) {
+    blockers.push(
+      `rating_design_declaration_mismatch: \`_meta.ratingDesign\` declara \`${declared}\` pero la evidencia de los casos es \`${design}\``,
+    )
+  }
+
   if (!dataset._meta.doubleRating?.independent || !dataset._meta.doubleRating?.adjudicated) {
     blockers.push('dataset_double_rating_incomplete: falta doble rating humano independiente + adjudicación')
   }
@@ -172,8 +340,11 @@ export const validatePromotionDataset = (
     if (seen.has(c.id)) blockers.push(`dataset_duplicate_case_ids: ${c.id}`)
     seen.add(c.id)
 
+    // En un instrumento sin calificar los ratings vacíos son lo esperado: no se reporta caso a caso.
+    if (design === 'unrated_instrument') continue
+
     const ratingsOk = [c.humanRatingA, c.humanRatingB, c.adjudicatedScore].every(
-      (v) => Number.isFinite(v) && v >= 0 && v <= 100,
+      (v) => Number.isFinite(v) && (v as number) >= 0 && (v as number) <= 100,
     )
 
     if (!ratingsOk) {
@@ -181,7 +352,7 @@ export const validatePromotionDataset = (
       continue
     }
 
-    if (resolvePromotionBand(c.adjudicatedScore, thresholds) !== c.band) {
+    if (resolvePromotionBand(c.adjudicatedScore as number, thresholds) !== c.band) {
       blockers.push(`dataset_band_mismatch: ${c.id} declara ${c.band} pero adjudicatedScore=${c.adjudicatedScore}`)
     }
   }
@@ -192,9 +363,19 @@ export const validatePromotionDataset = (
   const strata = new Map<string, number>()
 
   for (const c of standard) {
+    // Sin adjudicación no hay banda, y un estrato `…:null` con muchos casos daría un falso verde.
+    if (c.band == null) continue
+
     const key = `${c.templateKey}@${c.templateVersion}:${c.band}`
 
     strata.set(key, (strata.get(key) ?? 0) + 1)
+  }
+
+  if (strata.size === 0 && standard.length > 0) {
+    blockers.push(
+      'stratum_bands_undetermined: ningún caso estándar tiene banda adjudicada — los estratos template×banda ' +
+        'sólo existen después de la adjudicación humana',
+    )
   }
 
   for (const [key, count] of strata) {
@@ -310,10 +491,10 @@ export interface PromotionEvalCaseResult {
   templateKey: string
   templateVersion: string
   caseKind: PromotionEvalCaseKind
-  band: PromotionScoreBand
-  humanRatingA: number
-  humanRatingB: number
-  adjudicatedScore: number
+  band: PromotionScoreBand | null
+  humanRatingA: number | null
+  humanRatingB: number | null
+  adjudicatedScore: number | null
   /** Score de la PRIMERA corrida (contrato determinístico); null = abstención/fallo del provider. */
   aiScore: number | null
   repeatScores: Array<number | null>
@@ -344,6 +525,17 @@ export interface PromotionEvalReport {
   datasetVersion: string
   datasetSynthetic: boolean
   datasetPath: string | null
+  /**
+   * Ruta de rating detectada por evidencia + qué habilita. El gate la re-deriva del dataset JSON
+   * de forma independiente (mismo patrón que los thresholds: se computa una vez acá y viaja
+   * embebida, pero el gate no confía ciegamente y verifica que coincidan).
+   */
+  ratingDesign: {
+    detected: PromotionRatingDesign
+    declared: PromotionRatingDesign | null
+    evidence: string[]
+    capability: PromotionRouteCapability
+  }
   thresholds: AiRunPromotionThresholds
   totals: { cases: number; standard: number; adversarial: number; scored: number; abstained: number }
   /** Métricas headline SOLO sobre casos estándar puntuados. */
@@ -516,8 +708,15 @@ export const runPromotionEval = async (
     }
 
     const aiScore = repeatScores[0]
-    const toleranceBand = thresholds.toleranceBandByBand[c.band] ?? thresholds.toleranceBandDefault
-    const absoluteError = aiScore != null ? Math.abs(aiScore - c.adjudicatedScore) : null
+
+    const toleranceBand =
+      (c.band != null ? thresholds.toleranceBandByBand[c.band] : undefined) ?? thresholds.toleranceBandDefault
+
+    // Sin adjudicación humana no hay error que medir. NUNCA se sustituye por el score previo ni
+    // por un promedio A/B: eso convertiría la ausencia de evidencia en evidencia.
+    const absoluteError =
+      aiScore != null && c.adjudicatedScore != null ? Math.abs(aiScore - c.adjudicatedScore) : null
+
     const aiBand = aiScore != null ? resolvePromotionBand(aiScore, thresholds) : null
 
     results.push({
@@ -537,7 +736,8 @@ export const runPromotionEval = async (
       absoluteError,
       withinTolerance: absoluteError != null ? absoluteError <= toleranceBand : null,
       aiBand,
-      nonAdjacentConfusion: aiBand != null && Math.abs(BAND_INDEX[c.band] - BAND_INDEX[aiBand]) > 1,
+      nonAdjacentConfusion:
+        c.band != null && aiBand != null && Math.abs(BAND_INDEX[c.band] - BAND_INDEX[aiBand]) > 1,
     })
   }
 
@@ -547,13 +747,18 @@ export const runPromotionEval = async (
   const adversarialScored = adversarial.filter((r) => r.aiScore != null)
   const scored = results.filter((r) => r.aiScore != null)
 
-  const absErrors = standardScored.map((r) => r.absoluteError as number)
-  const withinFlags = standardScored.map((r) => (r.withinTolerance ? 1 : 0))
+  // Las métricas headline sólo existen sobre casos con adjudicación humana: un caso sin calificar
+  // no aporta ni a favor ni en contra, y desaparecer de la métrica es lo correcto.
+  const standardAdjudicated = standardScored.filter((r) => r.absoluteError != null)
+  const absErrors = standardAdjudicated.map((r) => r.absoluteError as number)
+  const withinFlags = standardAdjudicated.map((r) => (r.withinTolerance ? 1 : 0))
 
   const matrix = emptyConfusionMatrix()
   let nonAdjacentCount = 0
 
   for (const r of standard) {
+    if (r.band == null) continue
+
     matrix[r.band][r.aiBand ?? 'abstained'] += 1
 
     if (r.nonAdjacentConfusion) nonAdjacentCount += 1
@@ -568,6 +773,16 @@ export const runPromotionEval = async (
     datasetVersion: dataset._meta.version,
     datasetSynthetic: dataset._meta.synthetic,
     datasetPath: options.datasetPath ?? null,
+    ratingDesign: (() => {
+      const detection = detectPromotionRatingDesign(dataset)
+
+      return {
+        detected: detection.design,
+        declared: detection.declared,
+        evidence: detection.evidence,
+        capability: PROMOTION_ROUTE_CAPABILITIES[detection.design],
+      }
+    })(),
     thresholds,
     totals: {
       cases: results.length,
@@ -579,23 +794,30 @@ export const runPromotionEval = async (
     aiHuman: {
       mae: absErrors.length > 0 ? mean(absErrors) : null,
       pearson: pearson(
-        standardScored.map((r) => r.aiScore as number),
-        standardScored.map((r) => r.adjudicatedScore),
+        standardAdjudicated.map((r) => r.aiScore as number),
+        standardAdjudicated.map((r) => r.adjudicatedScore as number),
       ),
       withinToleranceRate: withinFlags.length > 0 ? mean(withinFlags) : null,
       maeCi95: bootstrapCi95(absErrors, thresholds.bootstrapIterations),
       withinToleranceRateCi95: bootstrapCi95(withinFlags, thresholds.bootstrapIterations),
     },
-    humanHuman: {
-      mae:
-        standard.length > 0
-          ? mean(standard.map((r) => Math.abs(r.humanRatingA - r.humanRatingB)))
-          : null,
-      pearson: pearson(
-        standard.map((r) => r.humanRatingA),
-        standard.map((r) => r.humanRatingB),
-      ),
-    },
+    humanHuman: (() => {
+      // Piso de referencia: sólo los casos que REALMENTE tienen dos lecturas humanas.
+      const bothRated = standard.filter(
+        (r) => Number.isFinite(r.humanRatingA as number) && Number.isFinite(r.humanRatingB as number),
+      )
+
+      return {
+        mae:
+          bothRated.length > 0
+            ? mean(bothRated.map((r) => Math.abs((r.humanRatingA as number) - (r.humanRatingB as number))))
+            : null,
+        pearson: pearson(
+          bothRated.map((r) => r.humanRatingA as number),
+          bothRated.map((r) => r.humanRatingB as number),
+        ),
+      }
+    })(),
     relativeAgreement: { ratio: null },
     abstention: {
       standardRate: standard.length > 0 ? (standard.length - standardScored.length) / standard.length : null,
@@ -642,6 +864,26 @@ export const renderPromotionEvalMarkdown = (report: PromotionEvalReport): string
   lines.push(
     `- Casos: ${report.totals.cases} (estándar ${report.totals.standard} · adversariales ${report.totals.adversarial}) · puntuados ${report.totals.scored} · abstenciones ${report.totals.abstained}`,
   )
+  lines.push('')
+  lines.push('## Ruta de rating detectada')
+  lines.push('')
+  lines.push(`**${report.ratingDesign.capability.label}** (\`${report.ratingDesign.detected}\`)`)
+  lines.push('')
+
+  for (const e of report.ratingDesign.evidence) lines.push(`- Evidencia: ${e}`)
+
+  lines.push('')
+  lines.push('**Habilita:**')
+  lines.push('')
+
+  for (const e of report.ratingDesign.capability.enables) lines.push(`- ${e}`)
+
+  lines.push('')
+  lines.push('**NO habilita:**')
+  lines.push('')
+
+  for (const e of report.ratingDesign.capability.doesNotEnable) lines.push(`- ${e}`)
+
   lines.push('')
   lines.push('## Acuerdo (casos estándar)')
   lines.push('')

@@ -45,6 +45,10 @@ const argValue = (flag: string): string | null => {
 const mockRunOne: RunOnePromotionScoring = async (c) => {
   if (c.caseKind === 'adversarial') return { score: null }
 
+  // Un instrumento sin calificar no tiene adjudicación que imitar: el mock abstiene en vez de
+  // inventar un número (fabricarlo daría un reporte con métricas falsamente completas).
+  if (c.adjudicatedScore == null) return { score: null }
+
   const offset = (createHash('sha256').update(c.id).digest().readUInt8(0) % 7) - 3
 
   return { score: Math.max(0, Math.min(100, c.adjudicatedScore + offset)) }

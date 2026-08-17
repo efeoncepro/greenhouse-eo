@@ -1,5 +1,29 @@
 # TASK-1734 — Assessment AI Scoring at Scale + Operator-Only Exception Review
 
+## Delta 2026-08-17 — Instrumento del gold set + hallazgo de volumen
+
+Se construyó el **instrumento completo** del gold set de promoción (muestreo estratificado desde
+respuestas reales, rúbrica de anclaje conductual derivada del banco, protocolo de rating en ciego,
+gate consciente de rutas). Ningún agente generó calificaciones humanas: el instrumento se entrega
+VACÍO de ratings y el gate sigue bloqueando `batch_eligible`.
+
+**Hallazgo que cambia el plan:** al ejecutar el muestreo contra la DB real, la base tiene sólo
+**11 respuestas abiertas calificadas por humanos** (piso fundamentado: 49; objetivo: 88). Los 21
+estratos competencia×banda quedaron incompletos y NO se rellenaron con casos de otro estrato
+(el sesgo sería peor que la muestra chica). Conclusión honesta: la ruta A (doble rating para
+habilitar lote) **no es ejecutable hoy por falta de datos, no por falta de personas** — se
+necesita volumen de correcciones humanas primero.
+
+Consecuencia operativa: el carril **uno-a-uno** (IA propone, humano confirma cada respuesta) es
+el modo correcto hoy, y además es el que genera la materia prima del gold set futuro. El lote
+queda como fase 2 con su requisito de datos + doble rating declarado.
+
+Artefactos: `src/lib/hiring/assessment/ai/eval/gold-set-sampling.ts`,
+`scripts/hiring/build-gold-set-sample.ts` (`pnpm hiring:ai:gold-set-sample`),
+`docs/documentation/hr/gold-set-rubrica-de-anclaje.md`,
+`docs/manual-de-uso/hr/calificar-gold-set-de-referencia.md`.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

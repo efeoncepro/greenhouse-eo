@@ -116,7 +116,7 @@ describe('runPromotionEval — métricas con valores conocidos', () => {
   it('sesgo +12 → MAE 12, tolerancia por banda (mid=10 falla) y blockers de acuerdo', async () => {
     const report = await runPromotionEval(
       validDataset,
-      async (c) => (c.caseKind === 'adversarial' ? { score: null } : { score: c.adjudicatedScore + 12 }),
+      async (c) => (c.caseKind === 'adversarial' ? { score: null } : { score: (c.adjudicatedScore as number) + 12 }),
       { thresholds: testThresholds },
     )
 
@@ -163,7 +163,9 @@ describe('runPromotionEval — métricas con valores conocidos', () => {
     const report = await runPromotionEval(
       validDataset,
       async (c, attempt) =>
-        c.caseKind === 'adversarial' ? { score: null } : { score: c.adjudicatedScore + attempt * 10 },
+        c.caseKind === 'adversarial'
+          ? { score: null }
+          : { score: (c.adjudicatedScore as number) + attempt * 10 },
       { thresholds: { ...testThresholds, repeatRuns: 3 } },
     )
 

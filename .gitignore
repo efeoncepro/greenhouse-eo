@@ -14,6 +14,9 @@
 # TASK-1736 — allowlists de remediación de display names (contienen PII; jamás se commitean)
 *.candidate-remediation-allowlist.json
 /.eval-reports/
+# TASK-1734 — instrumento del gold set: respuestas REALES de candidatos (anonimizadas, pero
+# jamás se commitean) + llave de estratificación sellada.
+/.gold-set/
 /test-results/
 /playwright-report/
 /blob-report/

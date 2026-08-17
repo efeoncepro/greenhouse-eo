@@ -131,3 +131,176 @@ describe('assessment-ai-promotion-gate.mjs', () => {
     expect(stdout).toContain('VERDE')
   }, 20_000)
 })
+
+// ── Rutas de rating: el gate NOMBRA en cuál está y qué habilita ──
+//
+// El caso real del operador: no siempre hay dos personas de Talent. Un "BLOQUEADO" a secas no le
+// dice si le faltan dos raters o le falta todo. Estas 4 formas cubren cada ruta, y ninguna de las
+// degradadas puede habilitar `batch_eligible`.
+
+const writeDataset = (dir: string, dataset: unknown) => {
+  const path = join(dir, 'dataset.json')
+
+  writeFileSync(path, JSON.stringify(dataset, null, 2))
+
+  return path
+}
+
+const baseCase = {
+  questionId: 'q-1',
+  templateKey: 'tpl-t',
+  templateVersion: 'v1',
+  competencyKey: 'k',
+  competencyName: 'K',
+  level: 'intermedio',
+  questionPrompt: '¿Cómo lo harías?',
+  rubric: { criteria: ['criterio'] },
+  answerText: 'respuesta de prueba suficientemente larga',
+  caseKind: 'standard' as const,
+}
+
+describe('assessment-ai-promotion-gate.mjs — detección de ruta de rating', () => {
+  it('instrumento SIN calificar: nombra la ruta, no escupe un blocker por caso, y bloquea', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'gh-route-unrated-'))
+
+    const datasetPath = writeDataset(dir, {
+      _meta: {
+        version: 'promotion-dataset.instrument.v1',
+        synthetic: false,
+        scale: '0-100',
+        ratingDesign: 'unrated_instrument',
+        doubleRating: { independent: false, adjudicated: false, raterTrainingReference: 'docs/...' },
+      },
+      cases: Array.from({ length: 11 }, (_, i) => ({
+        ...baseCase,
+        id: `gs-${i}`,
+        humanRatingA: null,
+        humanRatingB: null,
+        adjudicatedScore: null,
+        band: null,
+      })),
+    })
+
+    const { status, stderr } = runGate(['--dataset', datasetPath, '--dataset-only'])
+
+    expect(status).toBe(1)
+    expect(stderr).toContain('unrated_instrument')
+    expect(stderr).toContain('Instrumento SIN calificar')
+    expect(stderr).toContain('empezar a calificar')
+    // El ruido de "un ratings_invalid por caso" enterraría el único blocker que importa.
+    expect(stderr).not.toContain('dataset_case_ratings_invalid')
+  }, 20_000)
+
+  it('test-retest intra-rater (ruta B): habilita deriva, NO habilita batch_eligible', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'gh-route-retest-'))
+
+    const datasetPath = writeDataset(dir, {
+      _meta: {
+        version: 'promotion-dataset.retest.v1',
+        synthetic: false,
+        scale: '0-100',
+        ratingDesign: 'test_retest_intra_rater',
+        retestIntervalDays: 9,
+        doubleRating: { independent: false, adjudicated: false, raterTrainingReference: 'docs/...' },
+      },
+      cases: [
+        { ...baseCase, id: 'r1', humanRatingA: 80, humanRatingB: 84, adjudicatedScore: 82, band: 'high' },
+      ],
+    })
+
+    const { status, stderr } = runGate(['--dataset', datasetPath, '--dataset-only'])
+
+    expect(status).toBe(1)
+    expect(stderr).toContain('test_retest_intra_rater')
+    expect(stderr).toContain('estabilidad')
+    expect(stderr).toContain('HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED')
+    expect(stderr).toContain('SEGUNDO rater independiente')
+  }, 20_000)
+
+  it('routing-only (ruta C): habilita mejorar el router, NO afirmar exactitud del score', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'gh-route-routing-'))
+
+    const datasetPath = writeDataset(dir, {
+      _meta: {
+        version: 'promotion-dataset.routing.v1',
+        synthetic: false,
+        scale: '0-100',
+        ratingDesign: 'routing_decision_only',
+        doubleRating: { independent: false, adjudicated: false, raterTrainingReference: 'docs/...' },
+      },
+      cases: [
+        { ...baseCase, id: 'c1', humanRatingA: null, humanRatingB: null, adjudicatedScore: null, band: null, humanNeedsReview: true },
+        { ...baseCase, id: 'c2', humanRatingA: null, humanRatingB: null, adjudicatedScore: null, band: null, humanNeedsReview: false },
+      ],
+    })
+
+    const { status, stderr } = runGate(['--dataset', datasetPath, '--dataset-only'])
+
+    expect(status).toBe(1)
+    expect(stderr).toContain('routing_decision_only')
+    expect(stderr).toContain('router')
+    expect(stderr).toContain('exactitud del score')
+  }, 20_000)
+
+  it('doble rating (ruta A) es la única que se nombra como habilitante de batch_eligible', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'gh-route-double-'))
+
+    const datasetPath = writeDataset(dir, {
+      _meta: {
+        version: 'promotion-dataset.double.v1',
+        synthetic: false,
+        scale: '0-100',
+        ratingDesign: 'double_rating_independent',
+        doubleRating: { independent: true, adjudicated: true, raterTrainingReference: 'docs/...' },
+      },
+      cases: [
+        { ...baseCase, id: 'd1', humanRatingA: 80, humanRatingB: 86, adjudicatedScore: 83, band: 'high' },
+      ],
+    })
+
+    const { status, stderr } = runGate(['--dataset', datasetPath, '--dataset-only'])
+
+    // Sigue bloqueando: `--dataset-only` no evalúa métricas y nombrar la ruta nunca autoriza nada.
+    expect(status).toBe(1)
+    expect(stderr).toContain('double_rating_independent')
+    expect(stderr).toContain('Ruta A')
+    expect(stderr).toContain('shadow → canary')
+  }, 20_000)
+
+  it('una declaración que no coincide con la evidencia es un blocker (la declaración no manda)', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'gh-route-mismatch-'))
+
+    // Declara ruta A pero ningún caso trae ratings: la evidencia dice `unrated_instrument`.
+    const dataset = {
+      _meta: {
+        version: 'promotion-dataset.mismatch.v1',
+        synthetic: false,
+        scale: '0-100',
+        ratingDesign: 'double_rating_independent' as const,
+        doubleRating: { independent: true, adjudicated: true, raterTrainingReference: 'docs/...' },
+      },
+      cases: [
+        { ...baseCase, id: 'm1', humanRatingA: null, humanRatingB: null, adjudicatedScore: null, band: null },
+      ],
+    }
+
+    const datasetPath = writeDataset(dir, dataset)
+
+    const report = await runPromotionEval(dataset as unknown as PromotionDataset, perfectRunOne, {
+      thresholds: { ...DEFAULT_AI_RUN_PROMOTION_THRESHOLDS, repeatRuns: 1, bootstrapIterations: 50 },
+      datasetPath,
+    })
+
+    const reportPath = join(dir, 'promotion-eval-mismatch.json')
+
+    writeFileSync(reportPath, JSON.stringify(report, null, 2))
+
+    const { status, stderr } = runGate(['--report', reportPath])
+
+    expect(status).toBe(1)
+    expect(stderr).toContain('rating_design_declaration_mismatch')
+    // El harness (TS) y el gate (.mjs) detectan lo mismo ⇒ no hay drift entre las dos capas.
+    expect(stderr).not.toContain('rating_design_report_mismatch')
+    expect(report.ratingDesign.detected).toBe('unrated_instrument')
+  }, 20_000)
+})
