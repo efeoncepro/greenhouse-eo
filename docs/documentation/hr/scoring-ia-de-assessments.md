@@ -1,9 +1,9 @@
 # Scoring IA de Assessments — corrección asistida a escala con revisión humana
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-16 por Claude (TASK-1734)
-> **Ultima actualizacion:** 2026-08-16 por Claude
+> **Ultima actualizacion:** 2026-08-17 por Claude (TASK-1738: revisión desde la pantalla)
 > **Documentacion tecnica:** [GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md) (Delta 2026-08-16 (2)) · ADR [GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md](../../architecture/GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md)
 
 ## Qué hace
@@ -35,6 +35,36 @@ qué excepciones se resolvieron, quién confirmó y si el revisor vio la propues
   contrato (con tests que lo verifican) y **no tiene interruptor**: no hay configuración que lo habilite.
 - **Solo operadores internos autorizados** (con el permiso de puntuar assessments) ven la cola de
   revisión, las propuestas y el estado del run.
+
+## Desde la pantalla
+
+La revisión ya no se opera solo por API: vive dentro de la ficha del postulante.
+
+- **Dónde está.** En `Personas y equipos → Hiring → la candidatura → pestaña Evaluación`, la tarjeta del
+  assessment muestra una fila con el estado del run y cuántas excepciones esperan. Si no hay run, la
+  tarjeta se ve exactamente como antes. Si no tienes el permiso de puntuar, la fila no se dibuja.
+- **Qué abre.** Un espacio de trabajo (diálogo) con tres zonas: **la cobertura del run arriba**, la
+  **cola de revisión** al medio y la **confirmación** abajo.
+- **La cobertura no se pierde de vista.** Queda fija mientras recorres la cola: cuántas excepciones
+  llevas resueltas, cuántas de la muestra, cuántas devolviste a corrección manual. Es el techo que
+  impide dar por cerrado un run que está a medias.
+- **La cola viene ordenada por riesgo:** primero lo que exige revisión obligatoria, después la muestra
+  de calidad, al final el lote elegible (agrupado y colapsado, porque no pide trabajo).
+- **La muestra ciega es ciega de verdad.** En esos items la propuesta de la IA **no llega al navegador**:
+  puntúas con tu propio criterio y recién después ves el contraste con lo que había propuesto la IA. No
+  es una cortina visual; el dato no está.
+- **Mirar la propuesta queda registrado.** En las excepciones obligatorias la propuesta viene plegada
+  detrás de "Ver propuesta IA (queda registrado)". Abrirla no está mal — mentir sobre si la abriste sí.
+  El sistema anota el hecho para que la evidencia de supervisión sea honesta.
+- **Confirmar el run no siempre se puede.** Si falta resolver excepciones, completar la muestra o el
+  contenido cambió desde que se puntuó, el botón queda deshabilitado **con la causa escrita al lado**.
+  Cancelar el run, en cambio, siempre está disponible: es el camino de vuelta a la corrección manual.
+- **Puntaje por criterio.** Cada criterio se muestra como su aporte sobre el máximo posible (`18 / 25`),
+  no como una nota suelta: así se ve de inmediato si el aporte fue bueno.
+
+> Detalle técnico: `src/views/greenhouse/hiring/AssessmentAiRunWorkbench.tsx` ·
+> [manual del operador](../../manual-de-uso/hr/operar-scoring-ia-assessments.md) ·
+> task [TASK-1738](../../tasks/complete/TASK-1738-assessment-ai-review-workbench.md)
 
 ## El gate humano
 

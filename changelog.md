@@ -3,6 +3,20 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-17 — Workbench de scoring IA + escala explícita de criterios (TASK-1738, TASK-1734)
+
+- Hiring: el **workbench de revisión del scoring IA** queda operable desde la card del assessment
+  en la Application 360 — cobertura honesta sticky, cola por riesgo, muestra ciega real (la
+  propuesta no llega al navegador) y confirmación con manifest. Revisar deja de ser solo API.
+- Hiring: **la escala de `perCriterion` ahora es explícita.** Los criterios son aportes ponderados
+  que suman el score global (`18 / 25`), no notas independientes: el prompt lo pide
+  (`...scoring.v2`), el contrato lo valida y el router de riesgo compara contra lo que el contrato
+  garantiza. La señal `per_criterion_contradictory` disparaba en 11 de 14 items reales — justo en
+  las respuestas buenas — y dejaba muerto el carril por lote; ahora dispara en 2, que son
+  contradicciones reales.
+- Hiring: el resumen del manifest dejó de mostrar siempre 100% (`{a}/{a}`) y las frases
+  load-bearing del workbench pasaron a tinta AA.
+
 ## 2026-08-16 — Tab Expediente en la Application 360 (TASK-1737)
 
 - Hiring: el tab "Actividad" pasa a ser **Expediente** — timeline de notas persistidas con

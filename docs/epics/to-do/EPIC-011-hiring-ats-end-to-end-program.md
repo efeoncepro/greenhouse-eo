@@ -187,11 +187,14 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   versionada, scorecard 4,54, GVC premium 1440+390 con rubric enterprise `pass`). Gated: flag
   `HIRING_EVALUATION_DOSSIER_AI_ENABLED` OFF en producción (dueño 1735) + evidencia visual del panel de propuesta
   con datos reales pendiente de staging.
-- `TASK-1738` — Workbench de revisión del scoring IA — **consumer UI de `TASK-1734`** (su follow-up declarado:
-  workbench con anti-anchoring + honest provisional coverage): cobertura honesta del run, cola de excepciones con
-  evidencia, muestra ciega estructural verificada sobre el DOM, `sawProposalBeforeScoring` por gesto real y
-  confirm/cancel con manifest. Convive con el drawer per-response; cero superficie candidate-facing; el rollout de
-  flags de 1734 sigue su runbook aparte. `ui-ux` con híbrido justificado (`api`); sin bloqueo técnico.
+- `TASK-1738` ✅ **complete (2026-08-17, code complete; smoke staging pendiente)** — Workbench de revisión del
+  scoring IA — **consumer UI de `TASK-1734`** (su follow-up declarado: workbench con anti-anchoring + honest
+  provisional coverage): cobertura honesta **sticky**, cola de excepciones con evidencia por criterio, muestra
+  ciega estructural verificada sobre el DOM, `sawProposalBeforeScoring` por gesto real y confirm/cancel con
+  manifest. Montado en la card del assessment de la Application 360; convive con el drawer per-response; cero
+  superficie candidate-facing; el rollout de flags de 1734 sigue su runbook aparte. `UI ready: yes` (dirección
+  visual versionada + scorecard 4,46). El GVC premium sobre un run REAL destapó `manifestSummary` mintiendo 100%
+  y el bug del risk router cerrado en el delta 2026-08-17 de `TASK-1734`.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
 

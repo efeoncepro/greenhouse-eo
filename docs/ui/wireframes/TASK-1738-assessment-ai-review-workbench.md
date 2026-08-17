@@ -2,14 +2,15 @@
 
 ## Meta
 
-- Status: `contract-ready` (dirección visual del design studio pendiente — `UI ready: no` en la task)
+- Status: `shipped` — implementado, con evidencia GVC premium sobre un run REAL y dirección visual versionada (`UI ready: yes` en la task; delta 2026-08-17)
 - Owner task: `TASK-1738 — Workbench de revisión del scoring IA (consumer UI del run aggregate de TASK-1734)`
-- Product Design asset: **pendiente** — no existe dirección visual versionada para esta superficie. Este wireframe fija el contrato de regiones/estados/copy/datos; la task mantiene `UI ready: no` hasta que `greenhouse-ai-design-studio` persista la dirección comparada y se complete el Visual Direction Contract.
-- Visual direction mode: `repo-native-benchmark` (propuesto): hereda el frame de la Application 360 (TASK-355/1363), el patrón de cola de corrección existente ("Respuestas por corregir") y el vocabulario "Sugerencia de IA · revísala antes de confirmar" del drawer per-response (TASK-1361/1363), elevado a nivel de run.
+- Product Design asset: docs/ui/visual-directions/TASK-1738-assessment-run-workbench-direction.md — dirección versionada con 3 direcciones comparadas (dashboard del run · cola con cobertura sticky · wizard item por item), decisión "cola de trabajo con techo honesto", token mapping, anti-patrones y las correcciones que impuso el frame real. Evidencia de la pasada: commits `856adc201`/`a533d10dd`/`38b4310d6` + GVC premium `.captures/2026-08-17T00-42-52_task1738-assessment-run-workbench/` (run real con `claude-sonnet-5`, 14 items).
+- Visual direction mode: `repo-native-benchmark`
+- Benchmark heredado: hereda el frame de la Application 360 (TASK-355/1363), el patrón de cola de corrección existente ("Respuestas por corregir") y el vocabulario "Sugerencia de IA · revísala antes de confirmar" del drawer per-response (TASK-1361/1363), elevado a nivel de run.
 - Intended consumers: operador interno con `hiring.assessment.score` (la autoridad que aplica scores es la que revisa la cola — mismo tier del confirm, `scoring-runs/[runId]/route.ts`). CERO superficie candidate-facing.
 - Copy source: `src/lib/copy/dictionaries/{es-CL,en-US}/hiringAssessment.ts` → namespace **nuevo** `scoringRun.*` + reuso de `review.*` y `common.*`. Tono validado con `greenhouse-ux-writing`.
 - Primitive decision: **reuse total** — `Dialog fullScreen`-like (`maxWidth='lg'` alto 90vh, patrón visor TASK-1715), `Paper variant='outlined'`, `GreenhouseChip kind='status'`, `GreenhouseButton`, `CustomTextField`, `Alert`, `Skeleton`, `Snackbar`, `Accordion`/`Collapse` para evidencia por criterio. CERO primitives nuevas. La cola es lista de filas (patrón queue existente), no tabla >8 columnas — `DataTableShell` no aplica.
-- UI ready target: `no`
+- UI ready target: `yes` (alcanzado 2026-08-17)
 
 ## Brief
 
@@ -230,19 +231,20 @@ del GVC en este viewport (scroll SOLO vertical, dentro del diálogo).
 
 | State | Title | Body | CTA / recovery | Notes |
 |---|---|---|---|---|
-| no-run | — | el tab Evaluación queda exactamente como hoy | — | la ruta colección retorna vacío |
+| empty | — | `no-run`: el tab Evaluación queda exactamente como hoy | — | la ruta colección retorna vacío; nada se dibuja |
 | entry | — | chip de estado + excepciones pendientes | Abrir revisión del run | |
 | loading | — | `Skeleton` de cobertura + 3 items | — | al abrir el workbench |
-| awaiting_review | Revisión del run IA | cobertura + cola ordenada mandatory→sample→batch | resolver items | default de trabajo |
+| ready | Revisión del run IA | `awaiting_review`: cobertura + cola ordenada mandatory→sample→batch | resolver items | default de trabajo |
 | blind-sample | — | item sin bloque proposal (estructural) + `sampleHint` | Registrar mi puntaje | el DOM nunca contiene la propuesta |
 | proposal-collapsed | — | propuesta colapsada con label de consecuencia | Ver propuesta IA (queda registrado) | mandatory_review |
 | resolving | — | acciones del item en busy | — | terminal-once por item; doble click → 409 inofensivo |
 | confirmable | — | gates cerrados, manifest resumido | Confirmar run | flag ON |
+| partial | — | cobertura honesta: `scoringPending > 0`, items abstenidos y devueltos a manual contabilizados aparte; el run NUNCA se presenta como completo | refrescar / resolver lo pendiente | cobertura sticky; el resumen del manifest es resuelto/total, jamás `{a}/{a}` |
 | gates-open | — | causa por gate visible junto al CTA disabled | resolver lo pendiente | `aria-describedby` |
 | flag-off | — | `confirmFlagOff` | resolver items / carril individual | cancel sigue disponible |
 | stale | — | `staleBanner` + `gateStale`; confirm bloqueado | Cancelar run / cola manual | `coverage.digestStale` |
 | confirmed / cancelled / failed | chip terminal | resumen read-only del manifest / razón | cerrar | nunca se re-abre trabajo |
-| permission-denied | — | `permissionDenied` | sin Reintentar | capability `hiring.assessment.score` |
+| denied | — | `permissionDenied`; sin la capability la entrada ni siquiera se dibuja | sin Reintentar (`actionable=false`) | capability `hiring.assessment.score` |
 | error | — | `loadError` / error canónico | Reintentar si `actionable=true` | |
 | long content | — | respuesta con clamp + Ver más | — | |
 | mobile | — | diálogo fullScreen; acciones apiladas | — | 390px sin scroll horizontal |

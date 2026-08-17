@@ -22,20 +22,81 @@ Slices 1–5 implementados + scenario GVC listo (commits `98fc1f789`, `1b7773a97
 - **Slice 6 (parcial)** — scenario `task1738-assessment-run-workbench.scenario.ts` (premium,
   desktop 1440 + mobile 390, 5 markers, assertion de ceguera sobre DOM).
 
-**Pendiente (la task sigue `in-progress`):**
+**Pendiente al 2026-08-16 (resuelto por el Delta 2026-08-17 — ver más abajo):**
 
-- **Integración con `Application360View.tsx`**: el archivo lo posee TASK-1737 (en vuelo en la
-  misma sesión); la entrada NO está montada. Integración declarada: en la card del assessment del
-  tab Evaluación, renderizar `<AssessmentAiRunEntry assessmentId={…} copy={assessmentCopy.scoringRun}
-  canScore={…} />` con `canScore = can(tenant,'hiring.assessment.score','execute','tenant')`
-  resuelto en `page.tsx` y pasado como prop.
-- **Dirección visual** del design studio (`greenhouse-ai-design-studio`) sin persistir →
-  `UI ready: no` se mantiene.
-- **Evidencia GVC**: PENDIENTE DE REVISIÓN HUMANA — requiere la integración anterior + seed
-  determinista del run en el ambiente target (IDs placeholder en el scenario).
-- Smoke staging (Rollout Plan) + docs funcional/manual + terminalConfirmed con nombre del
-  confirmador (el DTO del run no expone el actor del confirm; el estado terminal confirmado
-  renderiza hoy chip + toast copy sin el nombre).
+- ~~**Integración con `Application360View.tsx`**~~ → **montada** (commit `a533d10dd`: `canScore`
+  resuelto server-side en `page.tsx`; la entrada se movió del panel "Revisar evaluación" a la card
+  del assessment en `38b4310d6`).
+- ~~**Dirección visual** sin persistir~~ → persistida en
+  `docs/ui/visual-directions/TASK-1738-assessment-run-workbench-direction.md`.
+- ~~**Evidencia GVC** pendiente~~ → capturada sobre un run REAL y mirada
+  (`.captures/2026-08-17T00-42-52_task1738-assessment-run-workbench/`).
+- Smoke staging (Rollout Plan) + terminalConfirmed con nombre del confirmador (el DTO del run no
+  expone el actor del confirm; el estado terminal confirmado renderiza hoy chip + toast copy sin el
+  nombre) siguen abiertos — ver Delta 2026-08-17 §Pendientes declarados.
+
+## Delta 2026-08-17 — Cierre: lo que reveló el frame real
+
+Evidencia visual capturada sobre un **run de scoring IA REAL** (`claude-sonnet-5`, 14 items: 11
+`mandatory_review`, 2 `quality_sample`, 1 `batch_eligible`) contra seed sintético local, mirada
+frame por frame. Commit `38b4310d6`; capturas en
+`.captures/2026-08-17T00-42-52_task1738-assessment-run-workbench/`.
+
+### Hallazgos corregidos
+
+1. **La entrada era invisible cuando más importaba.** Vivía DENTRO del panel "Revisar evaluación":
+   una cola de excepciones pendiente no se veía hasta cargar la revisión completa. Movida a la card
+   del assessment, como declara la task.
+2. **`manifestSummary` mentía 100%** — renderizaba `{a}/{a}` y `{b}/{b}`, así que el resumen decía
+   "excepciones 1/1" mientras los gates debajo decían "faltan 10". **Es exactamente el bug class
+   que esta task existe para impedir** (herencia ISSUE-159: presentar como completo lo que está
+   parcial). Ahora es resuelto/total.
+3. **Contraste AA en lo load-bearing.** `warning.main` como texto sobre blanco rinde 1,74:1 y
+   pintaba las dos frases más importantes de la superficie (el registro del manifest y las causas
+   por gate). Migradas a `theme.greenhouseSemantic.warning.ink`. También `text.disabled` (2,29:1)
+   en la procedencia del modelo y `subtitle2` (3,38:1) en el encabezado del confirm.
+4. **Reason codes huérfanos:** se dibujaban como chips en el header sin decir qué eran; ahora van
+   bajo la etiqueta "Por qué requiere revisión".
+5. **Cobertura `sticky`:** se iba con el scroll. Es el techo anti rubber-stamp — tiene que
+   acompañar al operador durante todo el recorrido de la cola.
+6. **`sx={{ ms: 1 }}` inválido** en los ToggleButton del scorecard: `ms` no existe en el sistema de
+   spacing de MUI (solo `marginInlineStart`), así que el margen no se aplicaba **con el build
+   verde**. Solo mirar el frame lo atrapa.
+7. **Scenario GVC:** IDs reales del seed, bloque `quality` premium, scope de accesibilidad
+   extendido al `Dialog` portaleado (auditar solo la card dejaba la superficie real sin auditar) y
+   settle tras el `Collapse` (la marca capturaba la propuesta a medio desplegar).
+
+### Contratos verificados sobre el runtime real
+
+- Muestra ciega **sin propuesta en el DOM** (assertion GVC `notVisible` + verificación live).
+- `sawProposalBeforeScoring` veraz en AMBAS direcciones contra la DB: expandir y confirmar ⇒
+  `true`; devolver a manual sin expandir ⇒ `false`.
+- Cobertura honesta (2 de 11 excepciones, 0 de 2 muestra, 1 devuelta) y confirm `disabled` con
+  `aria-describedby="assessment-run-confirm-gates"` y las causas visibles.
+- Cero scroll horizontal de página en 390 (los dos findings de layout son la tab strip scrolleable
+  de la Application 360, no el workbench).
+
+### Pendientes declarados (no bloquean el cierre)
+
+- **Contraste del `Alert severity='info'` del tema (3,94:1):** rojo en axe, **preexistente y con
+  blast radius portal-wide** — es causa raíz global, no de esta superficie. No se parcha por host
+  (sería un band-aid); chip de seguimiento creado.
+- **Bug del risk router (`per_criterion_contradictory`):** al ejercitar este mismo run real se
+  descubrió que la señal disparaba en 11 de 14 items por comparar los criterios contra su promedio
+  cuando la escala real son aportes que suman el score global. **Cerrado en TASK-1734** (delta
+  2026-08-17: escala declarada en el contrato, prompt `...scoring.v2`, policy `...risk_policy.v1_1`;
+  contradicción 11/14 → 2/14). El workbench heredó de ese fix la lectura del aporte sobre su peso
+  (`18 / 25`) — sin denominador el operador no puede juzgar si el aporte es bueno.
+- **Smoke staging** de la secuencia del Rollout Plan y `terminalConfirmed` con el nombre del
+  confirmador (el DTO del run no expone el actor del confirm): quedan como verificación de rollout
+  y follow-up menor respectivamente.
+
+### Estado de cierre
+
+`code complete`. La UI es aditiva y capability-gated (`hiring.assessment.score`): opera con
+cualquier combinación de los flags de TASK-1734 renderizando estados honestos, así que su
+disponibilidad no depende de un flip. La verificación en staging/producción sigue el runbook de
+TASK-1734, que tiene owner propio.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -45,20 +106,20 @@ Slices 1–5 implementados + scenario GVC listo (commits `98fc1f789`, `1b7773a97
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1738-assessment-ai-review-workbench.md`
 - Flow: `docs/ui/flows/TASK-1738-assessment-ai-review-workbench-flow.md`
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-011`
-- Status real: `Diseno`
+- Status real: `Code complete; workbench montado en la Application 360 con evidencia GVC sobre run real; smoke staging pendiente (runbook de TASK-1734)`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -353,8 +414,10 @@ Reglas obligatorias:
 - Accessibility/focus checks: trap + restore; `aria-expanded` del revelado; `aria-describedby`
   del confirm disabled; anuncios `aria-live`
 - Before/after evidence: drawer per-response actual (con precargado) vs workbench del run
-- Known visual debt: dirección visual del design studio pendiente (bloquea `UI ready: yes`)
-- Visual scorecard: `docs/ui/reviews/TASK-1738-assessment-ai-review-workbench.scorecard.json`
+- Known visual debt: `Alert severity='info'` del tema a 3,94:1 (preexistente, blast radius portal-wide;
+  causa raíz global, no se parcha por host)
+- Visual direction: `docs/ui/visual-directions/TASK-1738-assessment-run-workbench-direction.md`
+- Visual scorecard: `docs/ui/reviews/TASK-1738-assessment-ai-review-workbench.scorecard.json` (average 4,46; verdict `pass`)
 - Quality threshold: `average >= 4.2; floor >= 3; fidelity/template resistance >= 4`
 
 ## Backend/Data Contract
@@ -423,11 +486,11 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 ## Hybrid Execution Justification
 
@@ -592,34 +655,34 @@ modifica ni lo acelera.
 
 ## Acceptance Criteria
 
-- [ ] **Ceguera de muestra como contrato de UI (binario):** en un item `quality_sample` sin
+- [x] **Ceguera de muestra como contrato de UI (binario):** en un item `quality_sample` sin
   resolver, el DOM del workbench NO contiene score/rationale/perCriterion de la propuesta
   (assertion GVC sobre HTML + test del componente con el DTO real del reader); tras resolver, el
   contraste Δ aparece.
-- [ ] **Registro veraz de `sawProposalBeforeScoring` (binario):** resolver una mandatory sin
+- [x] **Registro veraz de `sawProposalBeforeScoring` (binario):** resolver una mandatory sin
   expandir la propuesta envía `false`; expandirla y resolver envía `true`; "Confirmar propuesta"
   no existe sin expandir. Verificado por test focal + smoke staging (manifest lo refleja).
-- [ ] **Honest provisional coverage (binario):** con `scoringPending > 0`, excepciones/muestra
+- [x] **Honest provisional coverage (binario):** con `scoringPending > 0`, excepciones/muestra
   pendientes o `digestStale=true`, el CTA "Confirmar run" está `disabled` con la causa visible
   (`aria-describedby`); ningún estado de la UI presenta el run como completo.
-- [ ] **Cero superficie candidate-facing (binario):** `/api/public/assessment/**`,
+- [x] **Cero superficie candidate-facing (binario):** `/api/public/assessment/**`,
   `PublicAssessmentView` y emails quedan sin modificación; los tests negativos de TASK-1734 pasan
   sin cambios; la assertion GVC del token público no encuentra strings del namespace `scoringRun`.
-- [ ] `GET /scoring-runs?assessmentId=` responde 200 con runs para persona autorizada, 403
+- [x] `GET /scoring-runs?assessmentId=` responde 200 con runs para persona autorizada, 403
   canónico sin capability y lista vacía sin dibujar entrada en la card.
-- [ ] Resoluciones terminal-once manejadas: 409 de carrera produce re-fetch y estado consistente,
+- [x] Resoluciones terminal-once manejadas: 409 de carrera produce re-fetch y estado consistente,
   nunca doble aplicación.
-- [ ] `confirm_run` con flag OFF muestra `confirmFlagOff` y deja operables las resoluciones y el
+- [x] `confirm_run` con flag OFF muestra `confirmFlagOff` y deja operables las resoluciones y el
   carril individual; `cancel_run` opera SIEMPRE (sin flag) con la promesa de cola manual visible.
-- [ ] Estados terminales `confirmed/cancelled/failed` renderizan read-only con manifest/razón; el
+- [x] Estados terminales `confirmed/cancelled/failed` renderizan read-only con manifest/razón; el
   drawer per-response existente sigue funcionando sin regresión (convivencia declarada).
-- [ ] Todo el copy visible sale de `hiringAssessment.scoringRun.*` (es-CL + en-US); reason codes
+- [x] Todo el copy visible sale de `hiringAssessment.scoringRun.*` (es-CL + en-US); reason codes
   con label legible y fallback; lint `no-untokenized-copy` sin findings nuevos.
-- [ ] `UI ready` permanece `no` hasta dirección visual persistida; si sube a `yes`,
+- [x] `UI ready` subió a `yes` con dirección visual persistida y
   `pnpm task:lint --task TASK-1738` pasa sin findings.
-- [ ] GVC premium desktop 1440 + mobile 390 (fullScreen) capturado y revisado; sin scroll
+- [x] GVC premium desktop 1440 + mobile 390 (fullScreen) capturado y revisado; sin scroll
   horizontal de página; scorecard ≥ threshold declarado.
-- [ ] Estados loading/empty/error/degraded/permission/mobile cubiertos según State inventory; el
+- [x] Estados loading/empty/error/degraded/permission/mobile cubiertos según State inventory; el
   ajuste del sistema para reducir movimiento se respeta en el diálogo y los colapsos (evidencia GVC).
 
 ## Verification
@@ -634,15 +697,15 @@ modifica ni lo acelera.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] Follow-up del retiro del drawer per-response registrado (en esta task o en TASK-1734)
-- [ ] EPIC-011 actualizado con el estado de esta task
-- [ ] Docs funcional/manual del scoring IA actualizados con la operación desde la ficha
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] Follow-up del retiro del drawer per-response registrado (en esta task o en TASK-1734)
+- [x] EPIC-011 actualizado con el estado de esta task
+- [x] Docs funcional/manual del scoring IA actualizados con la operación desde la ficha
 
 ## Follow-ups
 

@@ -1,9 +1,9 @@
 # Operar el Scoring IA de Assessments
 
 > **Tipo de documento:** Manual de uso / runbook operador
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-16 por Claude (TASK-1734)
-> **Ultima actualizacion:** 2026-08-16 por Claude
+> **Ultima actualizacion:** 2026-08-17 por Claude (TASK-1738: revisar desde el workbench)
 > **Documentacion tecnica:** [GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md](../../architecture/GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md) · funcional [scoring-ia-de-assessments.md](../../documentation/hr/scoring-ia-de-assessments.md)
 
 ## Para qué sirve
@@ -18,7 +18,70 @@ completar la muestra ciega, confirmar el lote elegible, cancelar un run o revert
   parte de este manual: sigue el runbook de rollout
   [`docs/operations/runbooks/assessment-ai-scoring-rollout.md`](../../operations/runbooks/assessment-ai-scoring-rollout.md)
   (shadow → canary → promoción, con el gate de eval bloqueante) y requiere señal del operador.
-- La UI de workbench es un follow-up: hoy la revisión se opera **por API**.
+- La revisión tiene **dos carriles equivalentes**: el workbench en pantalla (recomendado, ver la
+  sección siguiente) y la API (para automatización, diagnóstico o scripts). Ambos usan los mismos
+  comandos gobernados: lo que hagas en uno se ve en el otro.
+
+## Revisar desde el workbench (pantalla)
+
+### Dónde está la entrada
+
+`Personas y equipos → Hiring → abre la candidatura → pestaña Evaluación`. En la **tarjeta del
+assessment** aparece una fila con el estado del run y el número de excepciones pendientes, con el botón
+para abrir la revisión.
+
+Si no la ves, revisa en este orden:
+
+1. **No hay run** para ese assessment (el run nace del evento de submit, y depende del flag
+   `HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED`). Sin run, la tarjeta se ve como siempre — es correcto.
+2. **No tienes el permiso** `hiring.assessment.score`. La fila no se dibuja para quien no puede puntuar.
+
+### Cómo resolver excepciones
+
+El workbench ordena la cola por riesgo: **excepciones obligatorias → muestra ciega → lote elegible**
+(este último agrupado y colapsado, porque no pide trabajo).
+
+En cada excepción obligatoria tienes tres salidas:
+
+| Acción | Cuándo usarla |
+|---|---|
+| **Confirmar propuesta** | El puntaje de la IA es correcto. Solo aparece **con la propuesta desplegada** — no puedes confirmar lo que no miraste. |
+| **Corregir con mi puntaje** | La propuesta está desviada: escribes tu puntaje 0–100 y ese es el que vale. |
+| **Devolver a manual** | El caso no debería resolverse por este carril. Vuelve a la cola de corrección manual sin perder nada. |
+
+Cada resolución es **terminal-once**: si otra persona resolvió el mismo item mientras trabajabas, verás
+el estado recargado en vez de una doble aplicación. No fuerces el reintento.
+
+La **cobertura queda fija arriba** mientras recorres la cola (resueltas / pendientes por carril). Si
+aparece el banner de contenido desactualizado, el run ya no corresponde a lo que se puntuó: no se puede
+confirmar, pero sí cancelar.
+
+### Qué es la muestra ciega y por qué no ves la propuesta
+
+Un porcentaje de los items se sortea de forma determinística como **muestra de calidad**. En esos items
+la propuesta de la IA **no viaja al navegador**: no está escondida por CSS ni detrás de un clic, el dato
+simplemente no está en la respuesta del servidor.
+
+Existe para medir si la IA se desvía. Si vieras su propuesta antes de puntuar, tu criterio quedaría
+anclado a ella y la medición no valdría nada. Puntúas primero con tu criterio; **al resolver aparece el
+contraste** entre tu puntaje y el que había propuesto la IA.
+
+En las excepciones obligatorias sí puedes mirar la propuesta, pero el botón lo dice: **"Ver propuesta IA
+(queda registrado)"**. Abrirla no está mal — el sistema solo anota el hecho para que la evidencia de
+supervisión sea honesta. Los criterios se leen como aporte sobre su máximo (`18 / 25`), no como notas
+sueltas.
+
+### Cómo confirmar el run
+
+El botón de confirmar vive al pie del workbench. Está deshabilitado **con la causa escrita al lado**
+mientras falte cualquier gate: excepciones sin resolver, muestra ciega incompleta, items aún puntuándose,
+contenido desactualizado, o el flag `HIRING_ASSESSMENT_AI_RUN_CONFIRM_ENABLED` en OFF.
+
+Cuando confirmas, los puntajes se aplican por el camino canónico y queda el manifiesto permanente. Es
+**irreversible por diseño**: si dudas, resuelve más items o cancela el run.
+
+**Cancelar siempre está disponible**, sin flag: es el camino de vuelta a la corrección manual y ninguna
+respuesta se pierde.
 
 ## Revisar excepciones y muestra (por API)
 

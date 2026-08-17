@@ -1,0 +1,104 @@
+{
+  "taskId": "TASK-1738",
+  "scenario": "task1738-assessment-run-workbench",
+  "reviewedAt": "2026-08-17",
+  "reviewer": "Claude (skills de product design) + GVC premium local evidence sobre run REAL",
+  "evidence": {
+    "desktop": ".captures/2026-08-17T00-42-52_task1738-assessment-run-workbench/01-desktop/",
+    "mobile": ".captures/2026-08-17T00-42-52_task1738-assessment-run-workbench/02-mobile/",
+    "direction": "docs/ui/visual-directions/TASK-1738-assessment-run-workbench-direction.md",
+    "dossier": "commit 38b4310d6 (correcciones desde el frame real) + manifest.json del GVC",
+    "runtimeData": "run de scoring IA real con claude-sonnet-5: 14 items (11 mandatory_review, 2 quality_sample, 1 batch_eligible)"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.7,
+      "rationale": "Cobertura sticky como techo permanente → cola priorizada por riesgo → confirm con causas. Lo que puede bloquear la decisión está siempre visible; el trabajo pendiente nunca queda detrás de un gesto (la entrada salió del panel de revisión a la card).",
+      "evidence": "01-desktop run-coverage + run-entry",
+      "nextAction": ""
+    },
+    "proportions": {
+      "score": 4.5,
+      "rationale": "Dialog lg a 90vh con scroll interno: el workbench no compite con el frame de la Application 360 que lo hospeda. Cada item pesa lo que pesa su decisión; el batch agrupado colapsa.",
+      "evidence": "01-desktop workbench completo",
+      "nextAction": ""
+    },
+    "rhythm": {
+      "score": 4.5,
+      "rationale": "Escala 4n consistente; la propuesta indenta con filete de 2px en token divider (cita, no caja anidada). Se corrigió el sangrado ~16px de 'Ver más' / 'Ver propuesta IA' contra su columna de texto.",
+      "evidence": "01-desktop proposal-revealed",
+      "nextAction": ""
+    },
+    "density": {
+      "score": 4.4,
+      "rationale": "Cola de 14 items sin muro: pregunta + respuesta con clamp, evidencia por criterio dentro del colapso, batch agrupado. Stat chips compactos en vez de KPI cards.",
+      "evidence": "01-desktop cola completa",
+      "nextAction": ""
+    },
+    "depth": {
+      "score": 4.4,
+      "rationale": "Un solo Paper outlined por item; cero card-on-card dentro del diálogo. Sin elevación decorativa: la jerarquía la hace la posición sticky, no la sombra.",
+      "evidence": "enterprise rubric pass",
+      "nextAction": ""
+    },
+    "surfaceEconomy": {
+      "score": 4.6,
+      "rationale": "Se eliminó la duplicación de `provenance` (repetía el estado que ya declara el chip del título) y los reason codes dejaron de flotar como chips huérfanos en el header. Ninguna superficie repite información.",
+      "evidence": "commit 38b4310d6 — antes/después del header",
+      "nextAction": ""
+    },
+    "visualImpact": {
+      "score": 4.0,
+      "rationale": "Bajo el sub-piso premium 4,5 por razón ESTRUCTURAL declarada y aceptada: es una cola de trabajo operator-only que decide sobre personas, dentro de una vista anfitriona que ya define frame y momento visual (TASK-355). El Visual Fidelity Mapping del wireframe prohíbe explícitamente dramatizar el contenido IA (sin celebración al confirmar, sin revelado animado de la propuesta). El acento se concentra en la cobertura sticky, que es lo único que debe dominar.",
+      "evidence": "01-desktop first fold + wireframe §Visual Fidelity Mapping",
+      "nextAction": "Reevaluar si el run alguna vez sale a superficie propia (deep-link ?run= es follow-up)."
+    },
+    "typography": {
+      "score": 4.6,
+      "rationale": "Escalera del SoT sin fontSize inline; tabular-nums en cobertura y puntajes. Se corrigió `subtitle2` (3,38:1) en el encabezado del confirm. El aporte por criterio se lee sobre su peso (`18 / 25`), no como número suelto.",
+      "evidence": "design-contract:lint verde + delta TASK-1734 2026-08-17",
+      "nextAction": ""
+    },
+    "color": {
+      "score": 4.3,
+      "rationale": "Tinta canónica `greenhouseSemantic.warning.ink` en las dos frases load-bearing (registro del manifest y causas por gate) tras detectar 1,74:1 con `warning.main`; `text.disabled` (2,29:1) retirado de la procedencia del modelo. Todo chip lleva texto: el color nunca porta significado solo.",
+      "evidence": "axe sobre Dialog portaleado — findings resueltos salvo el info del tema",
+      "nextAction": "Alert severity='info' del tema (3,94:1) es causa raíz global, chip creado; no se parcha por host."
+    },
+    "iconography": {
+      "score": 4.4,
+      "rationale": "Glyphs Tabler acompañando texto (ojo tachado en muestra ciega, ojo en 'Ver propuesta IA'); nunca ícono solo como portador de estado.",
+      "evidence": "01-desktop blind-sample-item",
+      "nextAction": ""
+    },
+    "responsive": {
+      "score": 4.6,
+      "rationale": "390px fullScreen: chips en 2 columnas, acciones apiladas con la más comprometida al final, respuesta con overflowWrap anywhere. scrollWidth == clientWidth verificado; los 2 findings de layout son la tab strip del host, no el workbench.",
+      "evidence": "02-mobile (390×844)",
+      "nextAction": ""
+    },
+    "motion": {
+      "score": 4.4,
+      "rationale": "Solo Collapse/Dialog por defecto; sin celebración al confirmar ni revelado animado (prohibidos por el mapping). El scenario espera el settle del Collapse — la marca capturaba la propuesta a medio desplegar.",
+      "evidence": "probe reduced-motion del GVC + fix del scenario en 38b4310d6",
+      "nextAction": ""
+    },
+    "fidelity": {
+      "score": 4.6,
+      "rationale": "Las 3 regiones, la jerarquía de acciones, el copy ledger y los estados del wireframe se materializaron sin reinterpretación; las desviaciones detectadas en el frame real se corrigieron hacia la spec (entrada en la card, cobertura sticky), no al revés.",
+      "evidence": "wireframe §Layout Skeleton vs 01-desktop",
+      "nextAction": ""
+    },
+    "genericTemplateResistance": {
+      "score": 4.5,
+      "rationale": "La cobertura honesta sticky con causas por gate y el label que carga su consecuencia ('Ver propuesta IA (queda registrado)') leen como instrumento de supervisión gobernada de Efeonce, no como panel de resultados de IA de un ATS genérico.",
+      "evidence": "enterprise rubric pass",
+      "nextAction": ""
+    }
+  },
+  "average": 4.46,
+  "threshold": "average >= 4.2; floor >= 3; fidelity/template resistance >= 4 (declarado por TASK-1738)",
+  "premiumSubFloorException": "visualImpact 4,0 queda bajo el sub-piso 4,5 del estándar premium; excepción estructural declarada y aceptada (cola de trabajo operator-only dentro de vista anfitriona, con dramatización del contenido IA explícitamente prohibida por el wireframe).",
+  "openAccessibilityDebt": "Alert severity='info' del tema a 3,94:1 (preexistente, blast radius portal-wide) — causa raíz global, no se parcha por host.",
+  "verdict": "pass"
+}
