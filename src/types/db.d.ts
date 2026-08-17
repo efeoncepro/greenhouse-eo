@@ -8127,6 +8127,9 @@ export interface GreenhouseHiringHiringOpening {
    */
   public_remote_eligible_countries: Generated<string[]>;
   public_requirements: string | null;
+  /**
+   * Candidate-facing role level. Canonical values: Junior, Semi-senior, Senior, Lead. Internal levels such as L2 belong only in hiring_opening.seniority/assessment taxonomy.
+   */
   public_seniority: string | null;
   /**
    * TASK-1371: public skill/competency chips for Careers. Source of truth; no renderer inference from prose.

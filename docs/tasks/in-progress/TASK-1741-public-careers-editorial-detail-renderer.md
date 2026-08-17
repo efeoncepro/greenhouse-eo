@@ -58,7 +58,7 @@ CTA. V1/legacy conserva fallback completo durante la migración. Este delta no t
 - Motion: `none`
 - Backend impact: `schema|validation`
 - Epic: `EPIC-011`
-- Status real: `Implementacion en curso; rollout pendiente`
+- Status real: `Code complete; migración aplicada; rollout de flags pendiente`
 - Rank: `TBD`
 - Domain: `hr|ui|content`
 - Blocked by: `none`
@@ -416,7 +416,10 @@ La variante se activa sólo tras revisar el mecanismo de flags existente. El lay
 - El quick-create de Hiring queda sólo en borrador; el writer rechaza ediciones legacy sobre una vacante v2
   si el command no incluye `publicContent`. El publish canónico sigue siendo
   `pnpm hiring:publish-vacancy --file <brief.json>`/API compartida.
-- Estado honesto: code complete; la migración, activación de flags y GVC/smoke desplegado siguen pendientes.
+- Migración `20260817160000000_task-1741-public-seniority-canonical` aplicada en Cloud SQL dev/staging;
+  `pnpm pg:connect:status` confirma `No migrations to run!` y el tipo Kysely regenerado conserva el comentario
+  canónico de `public_seniority`.
+- Estado honesto: code complete; la activación de flags y GVC/smoke desplegado siguen pendientes.
 
 ## Closing Protocol
 
