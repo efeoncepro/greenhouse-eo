@@ -14,6 +14,21 @@ export const isHiringPublicApplicationsEnabled = (): boolean =>
 export const isCareersNativeGrowthFormEnabled = (): boolean =>
   process.env.CAREERS_NATIVE_GROWTH_FORM_ENABLED === 'true'
 
+/**
+ * TASK-1740 — emisión de JSON-LD `JobPosting` en la leaf page pública de una vacante.
+ * Default OFF (rollout gobernado + rollback sin revert de código). Vercel-only: se lee
+ * únicamente en el SSR del detalle público.
+ */
+export const isHiringPublicJobPostingSchemaEnabled = (): boolean =>
+  process.env.HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED === 'true'
+
+/**
+ * TASK-1740 — base URL pública canónica de careers (canonical + JSON-LD url).
+ * Mismo fallback productivo que el operator de publicación.
+ */
+export const resolvePublicCareersBaseUrl = (): string =>
+  (process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com').replace(/\/$/, '')
+
 // Salts byte-estables: cambiarlos orfana los contadores de ventana en vuelo.
 export const HIRING_INTAKE_EMAIL_SALT = 'gh-hiring-apply-intake-email-v1'
 export const HIRING_INTAKE_IP_SALT = 'gh-hiring-apply-intake-ip-v1'
