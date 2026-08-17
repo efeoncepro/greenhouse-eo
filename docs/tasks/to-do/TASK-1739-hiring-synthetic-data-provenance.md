@@ -704,6 +704,48 @@ encontraría a sí mismo.
 - [ ] `scripts/hiring/purge-task-1378-test-applications.ts` queda anotado como superado por el CLI
       genérico
 
+## Clasificación verificada por el operador (2026-08-17)
+
+Censo real contra la DB compartida, con la **verdad de origen confirmada por el CEO** en sesión.
+Esto es el input humano del backfill del Slice de remediación: quien ejecute la task NO debe
+re-derivar esta clasificación por heurística ni volver a preguntar.
+
+### Vacantes (`hiring_opening`) — 10 totales
+
+**REALES (2) — jamás tocar:**
+
+| public_id | Título | Estado | Apps |
+|---|---|---|---|
+| `EO-OPN-0009` | Account Manager / Especialista en Marketing | active/published | 15 |
+| `EO-OPN-0061` | Content Creator — SEO/AEO & Editorial | active/published | 32 |
+
+**SINTÉTICAS (8) — `data_origin='smoke_test'`, purgables:** `EO-OPN-0050`, `EO-OPN-0051`,
+`EO-OPN-0052`, `EO-OPN-0053`, `EO-OPN-0054`, `EO-OPN-0055`, `EO-OPN-0056`, `EO-OPN-0057` —
+todas `TASK-1372 SMOKE opening <timestamp>`, `created_by='task-1372-smoke'`, `status=closed`,
+creadas en ~5 minutos por la misma corrida. Arrastran 8 postulaciones sintéticas.
+
+### Candidatos sospechosos (10 de 52) — confirmar uno a uno antes de marcar
+
+`EO-ID0240` (QA Careers DomainSubmit), `EO-ID0272`–`EO-ID0276` (Task Smoke, TASK-1372),
+`EO-ID0277` (Http Smoke), `EO-ID0280` (SMOKE TASK-354 QA), `EO-ID0312` (PRUEBA TASK-1378),
+`EO-ID0313` (Prueba TASK-1689). Más el seed `qa.seed.task1738@efeonce.test` creado el 2026-08-16
+para la evidencia visual del workbench.
+
+### 🔴 Los DOS falsos positivos que prueban por qué no se infiere
+
+1. **Por creador:** `EO-OPN-0009` (Account Manager, **real**, 15 postulaciones, proceso vivo)
+   fue marcada 🚩 por la heurística `created_by ~ 'system:|agent'` — las vacantes reales de este
+   portal también las crea un agente (`system:codex`). Purgar por esa señal habría borrado la
+   vacante del proceso en curso.
+2. **Por nombre:** la respuesta real `arsp-61c6579f…` (candidata real, banda alta, dentro de la
+   muestra del gold set) dice *"Propondría pequeñas **pruebas** o pilotos…"* y hace match con
+   `SMOKE|PRUEBA|TEST`. Purgar por esa señal habría destruido evidencia de evaluación humana —
+   de las 11 únicas que existen.
+
+**Invariante que se deriva:** ninguna señal heurística (nombre, email, creador) auto-aplica jamás.
+Se usan sólo para *proponer* en el dry-run, con confianza declarada, y un humano aprueba la
+allowlist línea por línea. La marca `data_origin` se escribe **al crear**, nunca se infiere después.
+
 ## Follow-ups
 
 - Superficie UI de procedencia (badge en el desk, toggle "incluir sintéticos" gateado por capability,
