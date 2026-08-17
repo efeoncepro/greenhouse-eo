@@ -36,6 +36,11 @@ import {
 } from '@/types/hiring'
 
 import { HiringNotFoundError, HiringValidationError } from './errors'
+import {
+  normalizePublicOpeningContent,
+  parsePublicOpeningContent,
+  parseRemoteEligibleCountries,
+} from './public-careers/public-content'
 
 // ── Query helper: dentro de transacción usa el PoolClient; standalone usa el pool ──
 
@@ -267,6 +272,8 @@ type HiringOpeningRow = {
   public_employment_mode: unknown
   public_seniority: unknown
   public_process_notes: unknown
+  public_content_json: unknown
+  public_remote_eligible_countries: unknown
   apply_url: unknown
   status: unknown
   published_at: unknown
@@ -309,6 +316,8 @@ const normalizeHiringOpening = (row: HiringOpeningRow): HiringOpening => ({
   publicEmploymentMode: toNullableStr(row.public_employment_mode),
   publicSeniority: toNullableStr(row.public_seniority),
   publicProcessNotes: toNullableStr(row.public_process_notes),
+  publicContent: normalizePublicOpeningContent(row.public_content_json),
+  publicRemoteEligibleCountries: toStringArray(row.public_remote_eligible_countries),
   applyUrl: toNullableStr(row.apply_url),
   status: toStr(row.status) as HiringOpening['status'],
   publishedAt: toTimestamp(row.published_at),
@@ -449,7 +458,8 @@ const HIRING_OPENING_COLUMNS = `
   public_nice_to_have, public_location_mode, public_work_mode, public_hiring_region,
   public_city, public_country, public_office_location, public_area, public_skill_tags,
   public_compensation_band, publication_source_ref, public_employment_mode, public_seniority,
-  public_process_notes, apply_url, status, published_at, created_by, created_at, updated_at`
+  public_process_notes, public_content_json, public_remote_eligible_countries,
+  apply_url, status, published_at, created_by, created_at, updated_at`
 
 const CANDIDATE_FACET_COLUMNS = `
   candidate_facet_id, public_id, identity_profile_id, member_id, source, readiness, availability,
@@ -918,6 +928,19 @@ export const updateHiringOpening = async (
   if (input.publicEmploymentMode !== undefined) push('public_employment_mode', input.publicEmploymentMode)
   if (input.publicSeniority !== undefined) push('public_seniority', input.publicSeniority)
   if (input.publicProcessNotes !== undefined) push('public_process_notes', input.publicProcessNotes)
+
+  if (input.publicContent !== undefined) {
+    // TASK-1740 — el store re-valida SIEMPRE (defense in depth): un bloque inválido nunca
+    // llega a JSONB. null u objeto sin contenido limpian el bloque.
+    const content = parsePublicOpeningContent(input.publicContent)
+
+    push('public_content_json', content == null ? null : JSON.stringify(content))
+  }
+
+  if (input.publicRemoteEligibleCountries !== undefined) {
+    push('public_remote_eligible_countries', parseRemoteEligibleCountries(input.publicRemoteEligibleCountries))
+  }
+
   if (input.applyUrl !== undefined) push('apply_url', input.applyUrl)
 
   if (sets.length === 0) {

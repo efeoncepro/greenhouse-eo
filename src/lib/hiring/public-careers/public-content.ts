@@ -14,58 +14,19 @@
 // - La compensación estructurada es OPCIONAL y sólo se persiste cuando existe un rango
 //   monetario aprobado; los beneficios NUNCA se convierten en compensación.
 
+import {
+  PUBLIC_COMPENSATION_UNITS,
+  PUBLIC_OPENING_CONTENT_VERSION,
+  type PublicCompensationUnit,
+  type PublicOpeningCompensationRange,
+  type PublicOpeningContent,
+} from '@/types/hiring'
+import { isValidCountryCode } from '@/lib/locale/countries'
+
 import { HiringValidationError } from '../errors'
 
-export const PUBLIC_OPENING_CONTENT_VERSION = 1 as const
-
-/** Unidades admitidas por schema.org `QuantitativeValue.unitText` para baseSalary. */
-export const PUBLIC_COMPENSATION_UNITS = ['HOUR', 'DAY', 'WEEK', 'MONTH', 'YEAR'] as const
-export type PublicCompensationUnit = (typeof PUBLIC_COMPENSATION_UNITS)[number]
-
-/**
- * Rango monetario aprobado y estructurado. Presente sólo cuando Finance/People aprobaron
- * publicar compensación como hecho. Nunca se deriva de `public_compensation_band` (texto libre).
- */
-export interface PublicOpeningCompensationRange {
-  /** ISO 4217, p. ej. `USD`, `CLP`. */
-  currency: string
-  minValue: number
-  maxValue: number
-  unitText: PublicCompensationUnit
-}
-
-/**
- * Bloque de contenido público estructurado de una vacante (v1).
- *
- * Cada campo es opcional u omitible: el renderer no convierte ausencia en huecos, y el
- * fallback legacy (prosa de `public_description`/`public_requirements`) sigue operando
- * cuando el bloque no existe.
- */
-export interface PublicOpeningContent {
-  version: typeof PUBLIC_OPENING_CONTENT_VERSION
-  /** Promesa al candidato: qué gana la persona en este rol (1-2 frases). */
-  promise: string | null
-  /** Intro/misión del rol: el problema concreto que la persona resolverá. */
-  intro: string | null
-  /** Resultados observables esperados del primer año. */
-  outcomes: string[]
-  /** Trabajo real / entregables del rol. */
-  workItems: string[]
-  /** Habilidades esenciales (must-have). */
-  essentials: string[]
-  /** Habilidades que se pueden aprender en el rol (learnable). */
-  learnables: string[]
-  /** Qué evidencia/portafolio se pide al candidato. */
-  evidenceAsk: string | null
-  /** Cómo opera el modelo remoto/híbrido en la práctica (husos, rituales, idioma). */
-  remoteModel: string | null
-  /** Etapas reales del proceso de selección, en orden. */
-  processSteps: string[]
-  /** Beneficios aprobados aplicables a la vacante (no son compensación salarial). */
-  benefits: string[]
-  /** Rango de compensación aprobado y estructurado; null = no se publica salario. */
-  compensation: PublicOpeningCompensationRange | null
-}
+export { PUBLIC_COMPENSATION_UNITS, PUBLIC_OPENING_CONTENT_VERSION }
+export type { PublicCompensationUnit, PublicOpeningCompensationRange, PublicOpeningContent }
 
 const MAX_TEXT_LENGTH = 2000
 const MAX_ITEM_LENGTH = 400
@@ -231,4 +192,34 @@ const safeJsonParse = (value: string): unknown => {
   } catch {
     return null
   }
+}
+
+/**
+ * Write-path: valida la lista de países elegibles para una vacante remota.
+ * Normaliza a mayúsculas, deduplica y exige ISO 3166-1 alpha-2 reales
+ * (`isValidCountryCode`). `null` limpia la elegibilidad (lista vacía).
+ * Nunca convierte texto regional libre (`LATAM`, `Global`) en países.
+ */
+export const parseRemoteEligibleCountries = (input: unknown): string[] => {
+  if (input == null) return []
+
+  if (!Array.isArray(input)) {
+    throw invalid('publicRemoteEligibleCountries debe ser una lista de códigos ISO alpha-2.', {
+      field: 'publicRemoteEligibleCountries',
+    })
+  }
+
+  const normalized = input.map((item, index) => {
+    const code = typeof item === 'string' ? item.trim().toUpperCase() : ''
+
+    if (code.length !== 2 || !isValidCountryCode(code)) {
+      throw invalid(`publicRemoteEligibleCountries[${index}] no es un código ISO 3166-1 alpha-2 válido.`, {
+        field: 'publicRemoteEligibleCountries',
+      })
+    }
+
+    return code
+  })
+
+  return Array.from(new Set(normalized))
 }

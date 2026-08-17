@@ -32,6 +32,8 @@ const opening: PublicOpeningPayload = {
   processNotes: 'Postulas y luego conversamos.',
   applyUrl: null,
   publishedAt: '2026-07-08T00:00:00.000Z',
+  content: null,
+  remoteEligibleCountries: [],
 }
 
 describe('careers public view model', () => {

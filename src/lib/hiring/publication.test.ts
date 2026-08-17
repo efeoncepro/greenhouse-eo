@@ -38,6 +38,21 @@ const internalOpening: HiringOpening = {
   publicEmploymentMode: 'full_time',
   publicSeniority: 'Senior',
   publicProcessNotes: '3 etapas',
+  publicContent: {
+    version: 1,
+    promise: 'Vas a liderar el sistema visual de marcas reales.',
+    intro: null,
+    outcomes: ['Entregar 2 identidades completas por trimestre'],
+    workItems: [],
+    essentials: ['Figma avanzado'],
+    learnables: [],
+    evidenceAsk: 'Portafolio con decisiones explicadas.',
+    remoteModel: '100% remoto con overlap GMT-4.',
+    processSteps: ['Screening', 'Muestra de trabajo pagada'],
+    benefits: ['15 días hábiles de vacaciones'],
+    compensation: null,
+  },
+  publicRemoteEligibleCountries: ['CL', 'CO'],
   applyUrl: null,
   status: 'active',
   publishedAt: '2026-07-07T00:00:00.000Z',
@@ -66,6 +81,7 @@ describe('buildPublicOpeningPayload — allowlist de proyección pública', () =
     expect(Object.keys(payload).sort()).toEqual(
       [
         'applyUrl',
+        'content',
         'description',
         'employmentMode',
         'area',
@@ -79,6 +95,7 @@ describe('buildPublicOpeningPayload — allowlist de proyección pública', () =
         'processNotes',
         'publicId',
         'publishedAt',
+        'remoteEligibleCountries',
         'requirements',
         'seniority',
         'skillTags',
@@ -87,6 +104,31 @@ describe('buildPublicOpeningPayload — allowlist de proyección pública', () =
         'workMode',
       ].sort(),
     )
+  })
+
+  it('TASK-1740 — expone el bloque estructurado y los países elegibles sin arrastrar internos', () => {
+    const payload = buildPublicOpeningPayload(internalOpening)
+
+    expect(payload.content?.promise).toContain('sistema visual')
+    expect(payload.remoteEligibleCountries).toEqual(['CL', 'CO'])
+
+    // El contenido estructurado tampoco puede transportar sentinels internos.
+    const serialized = JSON.stringify(payload.content)
+
+    for (const sentinel of ['FALCON', 'user-secret-owner', 'org-confidential', 'CLP 3.5M-4.2M', 'internal-band-C', 'cliente sensible', 'bench']) {
+      expect(serialized).not.toContain(sentinel)
+    }
+  })
+
+  it('TASK-1740 — opening legacy degrada a content null y países vacíos (fallback de prosa)', () => {
+    const payload = buildPublicOpeningPayload({
+      ...internalOpening,
+      publicContent: null,
+      publicRemoteEligibleCountries: [],
+    })
+
+    expect(payload.content).toBeNull()
+    expect(payload.remoteEligibleCountries).toEqual([])
   })
 
   it('usa el título público y no el interno', () => {

@@ -9,6 +9,7 @@ import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import type { HiringOpening, PublicOpeningPayload } from '@/types/hiring'
 
 import { HiringNotFoundError, HiringValidationError } from './errors'
+import { normalizePublicOpeningContent } from './public-careers/public-content'
 
 /**
  * Contrato de publicación pública del opening (TASK-353 Slice 3).
@@ -40,6 +41,8 @@ export const buildPublicOpeningPayload = (opening: HiringOpening): PublicOpening
   processNotes: opening.publicProcessNotes,
   applyUrl: opening.applyUrl,
   publishedAt: opening.publishedAt,
+  content: opening.publicContent,
+  remoteEligibleCountries: opening.publicRemoteEligibleCountries,
 })
 
 // Columnas públicas allowlist para readers directos (no seleccionamos las internas).
@@ -48,7 +51,7 @@ const PUBLIC_OPENING_SELECT = `
   public_nice_to_have, public_location_mode, public_work_mode, public_hiring_region, public_city,
   public_country, public_office_location, public_area, public_skill_tags, public_compensation_band,
   public_employment_mode, public_seniority, seniority,
-  public_process_notes, apply_url, published_at`
+  public_process_notes, public_content_json, public_remote_eligible_countries, apply_url, published_at`
 
 type PublicOpeningRow = {
   public_id: unknown
@@ -71,6 +74,8 @@ type PublicOpeningRow = {
   public_seniority: unknown
   seniority: unknown
   public_process_notes: unknown
+  public_content_json: unknown
+  public_remote_eligible_countries: unknown
   apply_url: unknown
   published_at: unknown
 }
@@ -101,6 +106,8 @@ const normalizePublicOpeningRow = (row: PublicOpeningRow): PublicOpeningPayload 
   processNotes: nstr(row.public_process_notes),
   applyUrl: nstr(row.apply_url),
   publishedAt: ts(row.published_at),
+  content: normalizePublicOpeningContent(row.public_content_json),
+  remoteEligibleCountries: arr(row.public_remote_eligible_countries),
 })
 
 /**

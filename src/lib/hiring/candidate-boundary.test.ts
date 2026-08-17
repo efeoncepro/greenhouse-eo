@@ -85,6 +85,8 @@ describe('TASK-1734 Slice 5 — careers público (view model)', () => {
     processNotes: 'Postulas y luego conversamos.',
     applyUrl: null,
     publishedAt: '2026-08-01T00:00:00.000Z',
+    content: null,
+    remoteEligibleCountries: [],
   }
 
   it('el view model no expone scoring aunque el payload fuente venga envenenado', () => {

@@ -8101,6 +8101,10 @@ export interface GreenhouseHiringHiringOpening {
    */
   public_compensation_band: string | null;
   /**
+   * TASK-1740: structured candidate-facing content block (PublicOpeningContent v1). Versioned JSON validated by the canonical command; unknown versions degrade to legacy prose fallback on read.
+   */
+  public_content_json: Json | null;
+  /**
    * TASK-1371: public country for hybrid/onsite roles when applicable.
    */
   public_country: string | null;
@@ -8118,6 +8122,10 @@ export interface GreenhouseHiringHiringOpening {
    */
   public_office_location: string | null;
   public_process_notes: string | null;
+  /**
+   * TASK-1740: ISO 3166-1 alpha-2 eligible countries for 100% remote openings. Sole enabler of JobPosting TELECOMMUTE + applicantLocationRequirements; never derived from free-text public_hiring_region.
+   */
+  public_remote_eligible_countries: Generated<string[]>;
   public_requirements: string | null;
   public_seniority: string | null;
   /**

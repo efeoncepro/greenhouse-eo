@@ -90,3 +90,23 @@ describe('normalizePublicOpeningContent — read path leniente', () => {
     expect(normalizePublicOpeningContent(null)).toBeNull()
   })
 })
+
+describe('parseRemoteEligibleCountries — elegibilidad remota (TASK-1740)', () => {
+  it('normaliza a mayúsculas, deduplica y acepta ISO alpha-2 reales', async () => {
+    const { parseRemoteEligibleCountries } = await import('./public-content')
+
+    expect(parseRemoteEligibleCountries(['cl', 'CO', 'cl'])).toEqual(['CL', 'CO'])
+    expect(parseRemoteEligibleCountries(null)).toEqual([])
+    expect(parseRemoteEligibleCountries(undefined)).toEqual([])
+  })
+
+  it('rechaza regiones libres y códigos inválidos — LATAM/Global nunca se convierten en países', async () => {
+    const { parseRemoteEligibleCountries } = await import('./public-content')
+
+    expect(() => parseRemoteEligibleCountries(['LATAM'])).toThrow(HiringValidationError)
+    expect(() => parseRemoteEligibleCountries(['Global'])).toThrow(HiringValidationError)
+    expect(() => parseRemoteEligibleCountries(['XX'])).toThrow(HiringValidationError)
+    expect(() => parseRemoteEligibleCountries('CL')).toThrow(HiringValidationError)
+    expect(() => parseRemoteEligibleCountries([42])).toThrow(HiringValidationError)
+  })
+})

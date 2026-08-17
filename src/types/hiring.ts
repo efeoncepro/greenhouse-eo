@@ -187,6 +187,10 @@ export interface HiringOpening {
   publicEmploymentMode: string | null
   publicSeniority: string | null
   publicProcessNotes: string | null
+  /** TASK-1740 — contenido público estructurado versionado; null = opening legacy. */
+  publicContent: PublicOpeningContent | null
+  /** TASK-1740 — países elegibles ISO alpha-2 para schema remoto. */
+  publicRemoteEligibleCountries: string[]
   applyUrl: string | null
   status: HiringOpeningStatus
   publishedAt: string | null
@@ -315,6 +319,54 @@ export interface HiringDeskSnapshot {
   }
 }
 
+// ── Public opening structured content (TASK-1740) ──
+// Bloque candidate-facing versionado; el validador canónico vive en
+// src/lib/hiring/public-careers/public-content.ts.
+
+export const PUBLIC_OPENING_CONTENT_VERSION = 1 as const
+
+export const PUBLIC_COMPENSATION_UNITS = ['HOUR', 'DAY', 'WEEK', 'MONTH', 'YEAR'] as const
+export type PublicCompensationUnit = (typeof PUBLIC_COMPENSATION_UNITS)[number]
+
+/** Rango monetario aprobado y estructurado. Nunca derivado de public_compensation_band (texto libre). */
+export interface PublicOpeningCompensationRange {
+  /** ISO 4217, p. ej. `USD`, `CLP`. */
+  currency: string
+  minValue: number
+  maxValue: number
+  unitText: PublicCompensationUnit
+}
+
+/**
+ * Contenido público estructurado de una vacante (v1). Todo campo es opcional u omitible:
+ * su ausencia degrada al fallback legacy de prosa, nunca a huecos en el renderer.
+ */
+export interface PublicOpeningContent {
+  version: typeof PUBLIC_OPENING_CONTENT_VERSION
+  /** Promesa al candidato: qué gana la persona en este rol (1-2 frases). */
+  promise: string | null
+  /** Intro/misión: el problema concreto que la persona resolverá. */
+  intro: string | null
+  /** Resultados observables esperados del primer año. */
+  outcomes: string[]
+  /** Trabajo real / entregables del rol. */
+  workItems: string[]
+  /** Habilidades esenciales (must-have). */
+  essentials: string[]
+  /** Habilidades que se pueden aprender en el rol (learnable). */
+  learnables: string[]
+  /** Qué evidencia/portafolio se pide al candidato. */
+  evidenceAsk: string | null
+  /** Cómo opera el modelo remoto/híbrido en la práctica (husos, rituales, idioma). */
+  remoteModel: string | null
+  /** Etapas reales del proceso de selección, en orden. */
+  processSteps: string[]
+  /** Beneficios aprobados aplicables (no son compensación salarial). */
+  benefits: string[]
+  /** Rango de compensación aprobado y estructurado; null = no se publica salario. */
+  compensation: PublicOpeningCompensationRange | null
+}
+
 // ── Public opening projection (allowlist-only — consumido por TASK-354 careers) ──
 // NUNCA incluye owner, budget/rate, risk, notes internos, score ni cliente confidencial.
 
@@ -339,6 +391,10 @@ export interface PublicOpeningPayload {
   processNotes: string | null
   applyUrl: string | null
   publishedAt: string | null
+  /** TASK-1740 — bloque estructurado candidate-facing; null = fallback legacy de prosa. */
+  content: PublicOpeningContent | null
+  /** TASK-1740 — países elegibles ISO alpha-2 para remoto; [] = sin elegibilidad declarada. */
+  remoteEligibleCountries: string[]
 }
 
 // ── Input types (commands del store) ──
@@ -431,6 +487,10 @@ export interface UpdateHiringOpeningInput {
   publicEmploymentMode?: string | null
   publicSeniority?: string | null
   publicProcessNotes?: string | null
+  /** TASK-1740 — bloque estructurado; el store re-valida con parsePublicOpeningContent. */
+  publicContent?: PublicOpeningContent | Record<string, unknown> | null
+  /** TASK-1740 — ISO alpha-2; el store valida contra isValidCountryCode. null limpia a []. */
+  publicRemoteEligibleCountries?: string[] | null
   applyUrl?: string | null
 }
 
