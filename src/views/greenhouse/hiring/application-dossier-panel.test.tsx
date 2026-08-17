@@ -73,7 +73,8 @@ const agentNote = (bodyMd: string): HiringApplicationNote => ({
     model: 'claude-sonnet-5',
     promptVersion: 'hiring_evaluation_dossier.v2'
   },
-  createdAt: '2026-08-16T13:00:00.000Z'
+  createdAt: '2026-08-16T13:00:00.000Z',
+  supersededByNoteId: null
 })
 
 const mockDossierGet = (payload: Record<string, unknown>) => {

@@ -32,6 +32,12 @@ export interface HiringApplicationNote {
   source: HiringApplicationNoteSource
   contextJson: Record<string, unknown>
   createdAt: string
+  /**
+   * TASK-1735 — noteId de la nota que la reemplaza (derivado en el reader desde el
+   * `context_json.supersedesNoteId` de la nota posterior). Cuando existe, esta nota
+   * es historia: los consumers la marcan como superada y jamás la muestran como vigente.
+   */
+  supersededByNoteId?: string | null
 }
 
 export interface HiringApplicationNotesView {

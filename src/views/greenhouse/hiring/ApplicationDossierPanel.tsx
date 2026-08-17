@@ -828,6 +828,9 @@ const ApplicationDossierPanel = ({
 
   const renderNote = (note: HiringApplicationNote) => {
     const isAgent = note.source === 'agent'
+    // TASK-1735 — una nota reemplazada es HISTORIA: se conserva (ledger append-only) pero
+    // jamás compite visualmente con la vigente; el evaluador debe distinguirlas de un vistazo.
+    const isSuperseded = Boolean(note.supersededByNoteId)
     const structuredDraft = isAgent ? structuredNoteDraft(note) : null
     const isLong = structuredDraft === null && note.bodyMd.length > NOTE_COLLAPSE_THRESHOLD
     const expanded = expandedNotes[note.noteId] ?? false
@@ -849,7 +852,8 @@ const ApplicationDossierPanel = ({
         sx={theme => ({
           p: { xs: 2.5, md: 3 },
           minWidth: 0,
-          borderRadius: `${theme.shape.customBorderRadius.md}px`
+          borderRadius: `${theme.shape.customBorderRadius.md}px`,
+          ...(isSuperseded ? { bgcolor: 'action.hover', opacity: 0.72 } : {})
         })}
       >
         <Typography id={headingId} component='h3' variant='caption' sx={VISUALLY_HIDDEN_SX}>
@@ -877,6 +881,16 @@ const ApplicationDossierPanel = ({
                   tone='secondary'
                   iconClassName='tabler-sparkles'
                   label={expediente.agentBadge}
+                />
+              ) : null}
+              {isSuperseded ? (
+                <GreenhouseChip
+                  size='small'
+                  kind='status'
+                  variant='label'
+                  tone='warning'
+                  iconClassName='tabler-history'
+                  label={expediente.supersededBadge}
                 />
               ) : null}
             </Stack>

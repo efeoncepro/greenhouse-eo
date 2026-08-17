@@ -681,6 +681,8 @@ export interface HiringDeskCopy {
       addingNote: string
       noteAdded: string
       agentBadge: string
+      /** TASK-1735 — nota reemplazada por una posterior (append-only): es historia, no vigente. */
+      supersededBadge: string
       agentProvenance: string
       stageEvent: string
       receivedEvent: string

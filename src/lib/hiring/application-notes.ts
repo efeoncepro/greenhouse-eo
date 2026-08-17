@@ -75,6 +75,7 @@ const normalizeNote = (row: NoteRow): HiringApplicationNote => ({
   authorUserId: row.author_user_id,
   source: row.source as HiringApplicationNoteSource,
   contextJson: (row.context_json ?? {}) as Record<string, unknown>,
+  supersededByNoteId: null,
   createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at)
 })
 
@@ -178,6 +179,28 @@ const isNoteHiddenForBlindViewer = (note: HiringApplicationNote, viewerUserId: s
 }
 
 /**
+ * TASK-1735 — deriva `supersededByNoteId`: una nota posterior con
+ * `context_json.supersedesNoteId` marca a su predecesora como historia. El ledger es
+ * append-only (la fila superada NUNCA se muta ni se borra): el vínculo se calcula al leer,
+ * para que ningún consumer presente una nota reemplazada como vigente.
+ */
+const withSupersedeLinks = (notes: HiringApplicationNote[]): HiringApplicationNote[] => {
+  const supersededBy = new Map<string, string>()
+
+  for (const note of notes) {
+    const target = note.contextJson?.supersedesNoteId
+
+    if (typeof target === 'string' && target.length > 0) supersededBy.set(target, note.noteId)
+  }
+
+  if (supersededBy.size === 0) return notes
+
+  return notes.map(note =>
+    supersededBy.has(note.noteId) ? { ...note, supersededByNoteId: supersededBy.get(note.noteId) ?? null } : note
+  )
+}
+
+/**
  * Reader canónico: notas del expediente de una application, más reciente primero.
  *
  * Anti-anclaje (TASK-1737, mismo predicado que `listResponses`/`listPeerScorecardResults`):
@@ -200,7 +223,7 @@ export const listHiringApplicationNotes = async (
     [applicationId]
   )
 
-  const normalized = rows.map(normalizeNote)
+  const normalized = withSupersedeLinks(rows.map(normalizeNote))
 
   // TASK-1737 — display al servir: notas source='agent' materializadas desde propuestas
   // v1 pueden traer keys snake_case en el bodyMd almacenado (append-only — la fila NUNCA
