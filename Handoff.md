@@ -18,10 +18,21 @@ re-publicar los 2 openings vivos); `hiringOrganization` = marca Efeonce del bran
 (`EFEONCE_BRAND_NAME` nuevo). El PATCH interno transporta los campos sin cambio de ruta (parity).
 TASK-1741 quedó desbloqueada con fixture (`editorial-opening.fixture.ts`) y delta en su spec.
 
-**Actualización mismo día:** el CEO aprobó los países elegibles — toda Latinoamérica (19) + US + ES,
-21 en total — y quedaron seteados vía command canónico en `EO-OPN-0009` y `EO-OPN-0061`; ambas
-producen ya `JobPosting` válido cuando el flag se prenda (verificado contra el reader real). El
-`pnpm build` de cierre fue autorizado y ejecutado. **Pendiente de rollout (bloquea `complete`):**
+**Actualización mismo día:** el CEO decidió **20 países** (toda Latinoamérica **excepto Cuba** + US +
+ES) y precisó la vía contractual: **Chile con contrato laboral local, fuera de Chile vía internacional
+con pago directo de Efeonce** (`international_internal`, sin EOR). Eso quedó en la elegibilidad
+estructurada Y en el contenido visible (`content.remoteModel`) de ambas vacantes — porque el país de
+la entidad **no va en `jobLocation`**: ponerlo ahí haría que Google dejara de tratar la vacante como
+remota y la mostrara como empleo presencial en Santiago. El anclaje contractual se declara en el
+contenido; la elegibilidad, en `applicantLocationRequirements`.
+
+**El primer artefacto real destapó un bug del builder** (patrón real-artifact): un bloque estructurado
+PARCIAL —sólo `remoteModel`, que es exactamente el estado mientras el contenido editorial no se
+autora— hacía que la descripción del JSON-LD dejara de incluir la prosa del rol y quedara reducida a
+ese párrafo. Corregido: un bloque parcial **complementa** la prosa legacy y sólo un bloque con
+narrativa núcleo la reemplaza. Validado con el JSON-LD renderizado real de ambas vacantes (flag
+prendido en local y restaurado a OFF; cero campos requeridos faltantes). El `pnpm build` fue
+autorizado y salió verde. **Pendiente de rollout (bloquea `complete`):**
 push/release + flag staging→Rich Results Test→producción + smoke lifecycle desplegado — **retenido a
 propósito: el operador decidió que el release espera a TASK-1741 y viajan juntos.** Runbook: manual
 `operar-careers-publicas.md` §Contenido estructurado y schema de Google.

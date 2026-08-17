@@ -40,32 +40,53 @@ const listToHtml = (items: string[]): string =>
   items.length ? `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : ''
 
 /**
+ * Narrativa núcleo del bloque estructurado: lo único que puede REEMPLAZAR a la prosa
+ * legacy sin perder la descripción del rol.
+ */
+const hasCoreNarrative = (content: NonNullable<PublicOpeningPayload['content']>): boolean =>
+  Boolean(content.promise || content.intro || content.outcomes.length || content.workItems.length)
+
+/**
  * Descripción HTML segura construida desde el MISMO contenido visible del payload.
- * Con bloque estructurado usa sus secciones; sin él, cae a la prosa legacy
- * (description/requirements/niceToHave). No agrega hechos ni etiquetas inventadas.
+ *
+ * Un bloque estructurado COMPLETO (con narrativa núcleo) reemplaza a la prosa legacy.
+ * Un bloque PARCIAL —p. ej. sólo `remoteModel` declarado mientras el contenido editorial
+ * aún no se autora— la COMPLEMENTA: reemplazarla dejaría la descripción del schema como
+ * un fragmento del rol (bug cazado con el primer caso real, 2026-08-17). Cuando el bloque
+ * ya cubre habilidades, la prosa legacy de requisitos se omite para no duplicar lo mismo
+ * en dos formatos. No agrega hechos ni etiquetas inventadas en ningún caso.
  */
 const buildDescriptionHtml = (opening: PublicOpeningPayload): string => {
   const parts: string[] = []
   const content = opening.content
+  const structuredReplacesProse = Boolean(content && hasCoreNarrative(content))
+
+  if (!structuredReplacesProse) {
+    if (opening.summary) parts.push(paragraphsToHtml(opening.summary))
+    if (opening.description) parts.push(paragraphsToHtml(opening.description))
+
+    const blockCoversSkills = Boolean(content && (content.essentials.length || content.learnables.length))
+
+    if (!blockCoversSkills) {
+      if (opening.requirements) parts.push(paragraphsToHtml(opening.requirements))
+      if (opening.niceToHave) parts.push(paragraphsToHtml(opening.niceToHave))
+    }
+  }
 
   if (content) {
-    if (content.promise) parts.push(paragraphsToHtml(content.promise))
-    if (content.intro) parts.push(paragraphsToHtml(content.intro))
-    parts.push(listToHtml(content.outcomes))
-    parts.push(listToHtml(content.workItems))
+    if (structuredReplacesProse) {
+      if (content.promise) parts.push(paragraphsToHtml(content.promise))
+      if (content.intro) parts.push(paragraphsToHtml(content.intro))
+      parts.push(listToHtml(content.outcomes))
+      parts.push(listToHtml(content.workItems))
+    }
+
     parts.push(listToHtml(content.essentials))
     parts.push(listToHtml(content.learnables))
     if (content.evidenceAsk) parts.push(paragraphsToHtml(content.evidenceAsk))
     if (content.remoteModel) parts.push(paragraphsToHtml(content.remoteModel))
     parts.push(listToHtml(content.processSteps))
     parts.push(listToHtml(content.benefits))
-  }
-
-  if (!parts.some(Boolean)) {
-    if (opening.summary) parts.push(paragraphsToHtml(opening.summary))
-    if (opening.description) parts.push(paragraphsToHtml(opening.description))
-    if (opening.requirements) parts.push(paragraphsToHtml(opening.requirements))
-    if (opening.niceToHave) parts.push(paragraphsToHtml(opening.niceToHave))
   }
 
   return parts.filter(Boolean).join('')

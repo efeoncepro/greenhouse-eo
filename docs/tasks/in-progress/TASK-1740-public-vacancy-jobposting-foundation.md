@@ -33,11 +33,26 @@ schema, no bloquear publicación** (bloquear rompería re-publicar los 2 opening
 
 **Rollout pendiente (no ejecutable sin push/deploy + coordinación humana):**
 
-1. ~~Confirmar países elegibles~~ **CUMPLIDO 2026-08-17**: el CEO aprobó toda Latinoamérica (AR BO BR
-   CL CO CR CU DO EC SV GT HN MX NI PA PY PE UY VE) + `US` + `ES` (21 países), seteados vía
-   `updateHiringOpening` en `EO-OPN-0009` y `EO-OPN-0061`. Verificado contra el reader real: ambas
-   producen `JobPosting` válido (TELECOMMUTE; salario sigue omitido — no hay compensación
-   estructurada aprobada, correcto).
+1. ~~Confirmar países elegibles~~ **CUMPLIDO 2026-08-17**: el CEO (máxima autoridad de decisión)
+   aprobó **20 países** — toda Latinoamérica **excepto Cuba** (AR BO BR CL CO CR DO EC SV GT HN MX NI
+   PA PY PE UY VE) + `US` + `ES` — y precisó la **vía contractual**: Chile con contrato laboral local
+   y, fuera de Chile, vía internacional con **pago directo de Efeonce** (contract type
+   `international_internal`, sin EOR). Ambas vacantes publicadas quedaron seteadas vía
+   `updateHiringOpening` con los 20 países y con `content.remoteModel` declarando esa vía en el
+   contenido visible (para `EO-OPN-0009` incluye husos/idioma que su demand ya traía; `EO-OPN-0061`
+   no los declara y no se inventaron).
+   **Evidencia de artefacto real (flag prendido temporalmente en local, luego restaurado a OFF):** el
+   JSON-LD renderizado de ambas vacantes valida — `@type: JobPosting`, `TELECOMMUTE`, 20 países sin
+   Cuba, `hiringOrganization: Efeonce`, canonical correcto, `employmentType: FULL_TIME` en 0009 y
+   omitido en 0061 ("Contrato indefinido" no declara jornada), **cero campos requeridos faltantes**,
+   sin `directApply`/`validThrough`/`baseSalary`, escape anti-cierre de script presente. Con el flag
+   de vuelta en OFF el gate cierra (0 `ld+json`).
+   **Bug cazado y corregido con ese caso real:** un bloque estructurado PARCIAL (sólo `remoteModel`,
+   sin narrativa núcleo) hacía que `buildDescriptionHtml` dejara de usar la prosa legacy y la
+   descripción del schema quedara reducida a ese único párrafo. Ahora un bloque parcial
+   **complementa** la prosa y sólo un bloque con narrativa núcleo (`promise`/`intro`/`outcomes`/
+   `workItems`) la reemplaza; si el bloque ya cubre habilidades, los requisitos legacy se omiten para
+   no duplicar. Con test propio en ambas direcciones (descripciones reales: 1365 y 3296 caracteres).
 2. Push/release; prender `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` en staging → Rich Results Test →
    producción (secuencia en el manual §Prender el schema JobPosting). ⚠️ **Retenido por decisión del
    operador (2026-08-17): el release espera a que TASK-1741 esté lista y viajan juntos.**

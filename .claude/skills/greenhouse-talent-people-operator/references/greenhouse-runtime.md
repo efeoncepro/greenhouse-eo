@@ -185,6 +185,20 @@ is deliberately held until TASK-1741 (editorial renderer) lands.
   ("Jornada completa"→FULL_TIME; "Contrato indefinido" omitted);
   `hiringOrganization` = Efeonce brand from the SSOT (`EFEONCE_BRAND_NAME` +
   `EFEONCE_URL_HTTPS`, `src/config/efeonce-brand.ts`).
+- **The entity's country is NOT the job's location**: **NEVER** put the employing
+  entity's country into `jobLocation` of a remote vacancy "to make the contractual
+  anchor explicit". `jobLocation` means where the work is performed PHYSICALLY:
+  Google would stop classifying it as remote and would show it to people searching
+  for a job *in* that city. The contractual anchor is declared in the visible
+  content (`content.remoteModel`); eligibility goes in
+  `applicantLocationRequirements`, which accepts a SINGLE country and is still a
+  valid `TELECOMMUTE` (`["CL"]` = "remote, eligible in Chile" — honest and correct).
+- **A partial block complements, it does not replace**: **NEVER** let a PARTIAL
+  structured block replace the legacy prose in the JSON-LD description. Only a block
+  with core narrative (`promise`/`intro`/`outcomes`/`workItems`) replaces it; a
+  partial block — the NORMAL state while the editorial content is not authored —
+  complements it. Replacing it degraded the schema description to a fragment of the
+  role; bug caught with the first real artifact (2026-08-17), not by the unit tests.
 - **Write path**: the existing canonical command only — `updateHiringOpening` /
   `PATCH /api/hiring/openings/{id}` with `publicContent` and
   `publicRemoteEligibleCountries` (capability `hiring.opening.write`). Zero new
@@ -194,8 +208,13 @@ is deliberately held until TASK-1741 (editorial renderer) lands.
   (`editorialOpeningFixture` + `legacyOpeningFixture`).
 - **Live data**: eligible countries approved by the CEO 2026-08-17 and ALREADY SET
   via the canonical command on the 2 published vacancies (EO-OPN-0009 and
-  EO-OPN-0061): AR BO BR CL CO CR CU DO EC SV GT HN MX NI PA PY PE UY VE + US +
-  ES (21 countries). Both produce a valid JobPosting when the flag flips.
+  EO-OPN-0061): all of Latin America EXCEPT Cuba + US + ES — AR BO BR CL CO CR DO
+  EC SV GT HN MX NI PA PY PE UY VE + US + ES (20 countries). The contractual route
+  is declared in `content.remoteModel`: Chile with a local labor contract; outside
+  Chile, the international route with direct payment by Efeonce (contract type
+  `international_internal`, no EOR). Both produce a valid JobPosting when the flag
+  flips — the rendered JSON-LD was validated for real in local (flag flipped ON
+  temporarily and restored to OFF), with zero missing required fields.
 
 Docs: ADR Delta 2026-08-17 in `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` ·
 functional `docs/documentation/hr/careers-publicas.md` §Contenido estructurado y

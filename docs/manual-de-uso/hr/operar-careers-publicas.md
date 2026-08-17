@@ -176,11 +176,24 @@ pnpm staging:request PATCH /api/hiring/openings/<openingId> '{"publicContent":{"
 
 ### Declarar países elegibles (solo remoto)
 
-1. Confirma con People/Legal los países donde realmente se puede contratar.
+1. Confirma los países donde realmente se puede contratar **y pagar**. Estado
+   vigente (decisión CEO 2026-08-17): 20 países — toda Latinoamérica **excepto
+   Cuba** — más Estados Unidos y España. Vía contractual: Chile con contrato
+   laboral local; fuera de Chile, vía internacional con pago directo de Efeonce
+   (contract type `international_internal`, sin EOR).
 2. Decláralos como ISO alpha-2: `{"publicRemoteEligibleCountries":["CL","CO"]}`.
    `LATAM`/`Global` son display, no países: el API los rechaza.
 3. Sin países declarados la vacante sigue publicable, pero **no emite schema**
    (comportamiento correcto, no un bug).
+
+**El país de la entidad empleadora NO va como ubicación del puesto.** Es
+tentador poner "Santiago, Chile" en una vacante remota para dejar claro el
+anclaje contractual, pero `jobLocation` significa "dónde se realiza
+físicamente el trabajo": Google dejaría de tratarla como remota y la mostraría
+a quien busca empleo *en* Santiago. La forma correcta es la que ya opera:
+`TELECOMMUTE` + países elegibles en la elegibilidad, y el anclaje contractual
+declarado en el contenido visible (`content.remoteModel`). Una lista de un solo
+país (`["CL"]`) también es válida y honesta: "remoto, elegible en Chile".
 
 ### Prender el schema JobPosting
 

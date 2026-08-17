@@ -160,6 +160,50 @@ describe('buildJobPostingJsonLd — descripción HTML segura desde el contenido 
     expect(description).toContain('<p>100% remoto con overlap GMT-4.</p>')
   })
 
+  it('un bloque PARCIAL (solo remoteModel) COMPLEMENTA la prosa legacy en vez de reemplazarla', () => {
+    // Caso real 2026-08-17: se declara el modelo remoto antes de autorar el contenido
+    // editorial. Reemplazar la prosa dejaría la descripción del schema como un fragmento.
+    const jsonLd = buildJobPostingJsonLd(
+      {
+        ...baseOpening,
+        remoteEligibleCountries: ['CL'],
+        content: {
+          version: 1,
+          promise: null,
+          intro: null,
+          outcomes: [],
+          workItems: [],
+          essentials: [],
+          learnables: [],
+          evidenceAsk: null,
+          remoteModel: 'Trabajo 100% remoto con pago directo de Efeonce fuera de Chile.',
+          processSteps: [],
+          benefits: [],
+          compensation: null,
+        },
+      },
+      BASE_URL,
+    )
+
+    const description = String(jsonLd!.description)
+
+    expect(description).toContain('Producir piezas pillar con QA.')
+    expect(description).toContain('Redacción nativa')
+    expect(description).toContain('<p>Trabajo 100% remoto con pago directo de Efeonce fuera de Chile.</p>')
+  })
+
+  it('un bloque con narrativa núcleo SÍ reemplaza la prosa legacy (sin duplicar el rol)', () => {
+    const jsonLd = buildJobPostingJsonLd(
+      { ...baseOpening, remoteEligibleCountries: ['CL'], content: structuredContent },
+      BASE_URL,
+    )
+
+    const description = String(jsonLd!.description)
+
+    expect(description).toContain('Vas a operar el motor editorial')
+    expect(description).not.toContain('Producir piezas pillar con QA.')
+  })
+
   it('sin bloque estructurado cae a la prosa legacy visible (summary/description/requirements)', () => {
     const jsonLd = buildJobPostingJsonLd({ ...baseOpening, remoteEligibleCountries: ['CL'] }, BASE_URL)
     const description = String(jsonLd!.description)

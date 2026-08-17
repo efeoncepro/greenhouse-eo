@@ -190,6 +190,17 @@ never breaks). Builder `src/lib/hiring/public-careers/job-posting.ts` is server-
   exact conservative mapping ("Jornada completa"→FULL_TIME; "Contrato indefinido" is omitted).
 - **NEVER** accept `LATAM`/`Global` as a country code — the countries array is the ONLY enabler of the
   remote schema, and its absence omits the schema without ever blocking publication.
+- **NEVER** put the employing entity's country into `jobLocation` of a remote vacancy "to make the
+  contractual anchor explicit". `jobLocation` means where the work is performed PHYSICALLY: Google would
+  stop classifying it as remote and would show it to people searching for a job *in* that city. The
+  contractual anchor is declared in the visible content (`content.remoteModel`); eligibility goes in
+  `applicantLocationRequirements`, which accepts a SINGLE country and is still a valid `TELECOMMUTE`
+  (`["CL"]` = "remote, eligible in Chile" — honest and correct).
+- **NEVER** let a PARTIAL structured block replace the legacy prose in the JSON-LD description. Only a
+  block with core narrative (`promise`/`intro`/`outcomes`/`workItems`) replaces it; a partial block — the
+  NORMAL state while the editorial content is not authored — complements it. Replacing it degraded the
+  schema description to a fragment of the role; bug caught with the first real artifact (2026-08-17), not
+  by the unit tests.
 - **NEVER** hardcode the brand: `hiringOrganization` comes from the brand SSOT (`EFEONCE_BRAND_NAME` +
   `EFEONCE_URL_HTTPS`, `src/config/efeonce-brand.ts`).
 - **SIEMPRE** write via the existing canonical command `updateHiringOpening` / `PATCH /api/hiring/openings/{id}`
@@ -199,8 +210,13 @@ never breaks). Builder `src/lib/hiring/public-careers/job-posting.ts` is server-
 **Estado honesto**: code complete, rollout pendiente — the flag is OFF in every environment and the
 production release is deliberately held until TASK-1741 (editorial renderer) is ready, by operator decision.
 Eligible countries were approved by the CEO 2026-08-17 and are ALREADY SET on the 2 published vacancies
-(EO-OPN-0009, EO-OPN-0061): all of Latin America + US + ES (21 countries) — both produce a valid JobPosting
-the moment the flag flips. Renderer fixture: `src/lib/hiring/public-careers/editorial-opening.fixture.ts`.
+(EO-OPN-0009, EO-OPN-0061): all of Latin America EXCEPT Cuba + US + ES (20 countries — AR BO BR CL CO CR DO
+EC SV GT HN MX NI PA PY PE UY VE + US + ES), with the contractual route made explicit in
+`content.remoteModel`: **Chile with a local labor contract; outside Chile, the international route with
+direct payment by Efeonce** (contract type `international_internal`, no EOR). Both produce a valid
+JobPosting the moment the flag flips: the rendered JSON-LD was validated for real in local (flag flipped ON
+temporarily and restored to OFF), with zero missing required fields. Renderer fixture:
+`src/lib/hiring/public-careers/editorial-opening.fixture.ts`.
 
 Docs: ADR Delta 2026-08-17 in `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` · functional
 `docs/documentation/hr/careers-publicas.md` §Contenido estructurado y SEO técnico · manual

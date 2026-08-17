@@ -60,6 +60,17 @@ existentes (cero endpoints nuevos, cero capabilities nuevas, cero eventos nuevos
 - **NUNCA** derivar `baseSalary` de `public_compensation_band`; sólo `content.compensation`
   estructurado y aprobado. Beneficios no son compensación.
 - **NUNCA** emitir `directApply` ni `validThrough`; el lifecycle honesto es published → 404.
+- **NUNCA** poner el país de la entidad empleadora en `jobLocation` de una vacante remota para
+  "dejar claro el anclaje contractual": `jobLocation` significa dónde se realiza físicamente el
+  trabajo, así que Google dejaría de clasificarla como remota y la mostraría como empleo presencial
+  en esa ciudad. El anclaje contractual se declara en el contenido visible (`content.remoteModel`);
+  la elegibilidad, en `applicantLocationRequirements` — que admite **un solo país** y sigue siendo
+  `TELECOMMUTE` válido.
+- **NUNCA** dejar que un bloque estructurado PARCIAL reemplace la prosa legacy en la descripción del
+  schema. Sólo un bloque con **narrativa núcleo** (`promise`/`intro`/`outcomes`/`workItems`) la
+  reemplaza; un bloque parcial (el estado normal mientras el contenido editorial no se autora) la
+  **complementa**. Reemplazarla degradaba la descripción a un fragmento del rol — bug cazado con el
+  primer artefacto real, 2026-08-17.
 - **SIEMPRE** que el HTML de la descripción JSON-LD se genere, sale del mismo payload visible
   (escape XSS + `serializeJsonLd` que neutraliza `</script>`).
 - El renderer (TASK-1741) consume `content` con fallback legacy; fixture canónica
