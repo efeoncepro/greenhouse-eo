@@ -121,11 +121,23 @@ existing.representativePayload = payload   // :652
 ```
 
 El lane `notifications` corre cada **2 min** (`services/ops-worker/deploy.sh:1097-1102`, la cadencia más alta
-del servicio) y es **exactamente donde viven las dos projections de correo** — `hiring_stage_changed_email` y
-`hiring_assessment_submitted_internal_email` (`projections/index.ts:198-199`). Consecuencia directa: un
-candidato que pasa `shortlisted → interview` dentro de esa ventana entrega **un solo refresh con
-`stage: interview`**, y la etapa que debía disparar el test **desaparece sin traza**. No hay error, no hay
-dead-letter, no hay señal: el test simplemente nunca se asigna.
+del servicio) y es donde viven las projections de correo de hiring/talent-pool — entre ellas
+`hiring_stage_changed_email` y `hiring_assessment_submitted_internal_email` (`projections/index.ts:196-201`;
+son **seis** en ese domain, no dos). Consecuencia directa: un candidato que pasa `shortlisted → interview`
+dentro de esa ventana entrega **un solo refresh con `stage: interview`**, y la etapa que debía disparar el
+test **se pierde del payload**. No hay error ni dead-letter: el test simplemente nunca se asigna.
+
+**Dos precisiones que la auditoría adversarial 2026-08-17 impone sobre este argumento:**
+
+- **NO "desaparece sin traza".** En el éxito, todo evento contribuyente recibe fila propia en
+  `outbox_reactive_log` con `result = coalesced:<descripción>` (`reactive-consumer.ts:729-745`) — verificado
+  con datos reales. Lo que se pierde es el **payload**, no el registro. La reconciliación puede apoyarse en
+  ese log.
+- **El escenario NUNCA le ocurrió a un candidato real.** De los 23 `stage_changed` históricos, los movimientos
+  masivos fueron sobre postulaciones **distintas** (scope distinto ⇒ cero coalescing), y el único caso de dos
+  eventos de la misma postulación dentro de la ventana es `happ-aa9857b4`, una aplicación QA sintética. La
+  regla defensiva de abajo es correcta **por diseño**, no por patología observada: se sostiene sola sin
+  necesidad de un incidente que no existió.
 
 ⇒ **El trigger NUNCA se deriva de `payload.stage`.** El consumer re-lee el estado vigente en PostgreSQL con
 **el mismo predicado** que usará el reader de reconciliación. El payload sirve para saber *que algo pasó* con
@@ -215,8 +227,14 @@ hace **check-then-insert**: un `SELECT` previo que filtra `status IN ('assigned'
 
 En ambos casos el error **no** es `HiringValidationError`, así que `error-response.ts:41-52` cae al branch
 genérico: **HTTP 500 `hiring_internal_error` con `actionable: true`** — la UI ofrece "Reintentar" para algo que
-no se resuelve reintentando nunca. En el carril reactivo el mismo `23505` se comporta como fault y produce
-**dead-letter fabricado**. Alinear el predicado y adoptar `ON CONFLICT` cierra las dos salidas de una vez.
+no se resuelve reintentando nunca. La cadena completa (predicado de 3 estados vs índice de 4, rethrow crudo de
+la transacción, branch genérico) está verificada en el código pre-refactor; lo que **no** hay es evidencia de
+que un operador real la haya disparado en producción: es un bug latente, no un incidente ocurrido.
+
+El dead-letter en el carril reactivo es **proyección sobre un carril que todavía no existe** — hoy ningún
+consumer reactivo llama `assignCandidateTest`. Es la razón por la que este ADR lo cierra **antes** de crear
+ese carril, no la constatación de un daño ya causado. Alinear el predicado y adoptar `ON CONFLICT` cierra la
+salida vigente (el 500) y desactiva la futura de una vez.
 
 ### D3 — Capability nueva role-only para gobernar la policy
 
@@ -277,41 +295,69 @@ refs se montan. Cualquier plan que diga "lo probamos en staging primero" está d
 
 | Plantilla | Módulos | Instancias | Rendidos |
 |---|---|---|---|
-| `atpl-account-manager-l2` — Account Manager L2 (v1, active) | 9 | 6 | **2** |
-| `atpl-2c7dd874…` — Content Creator L2 Integral v2 (v1, active) | 8 | 9 | **0** |
-| `atpl-c0d996fd…` — Content Creator L2 Editorial SEO/AEO (active) | 5 | 0 | 0 |
-| `atpl-dae66420…` — Content Creator L2 Integral (active) | 8 | 0 | 0 |
+| Plantilla | Módulos | Preguntas que resuelve | Instancias | Rendidos |
+|---|---|---|---|---|
+| `atpl-account-manager-l2` — Account Manager L2 (v1, active) | 9 | 12 | 6 | **1 real** + 1 sintético |
+| `atpl-2c7dd874…` — Content Creator L2 Integral v2 (v1, active) | 8 | 11 | 9 | **0** |
+| `atpl-c0d996fd…` — Content Creator L2 Editorial SEO/AEO | 5 | **6 (1 módulo ciego, 25% del peso)** | 0 | 0 |
+| `atpl-dae66420…` — Content Creator L2 Integral | 8 | **5 (4 módulos ciegos, 45% del peso)** | 0 | 0 |
 
-Esto **corrige el fundamento**, no sólo la conclusión. Content Creator **sí tiene plantilla activa y ya en
-uso** (9 asignaciones vivas): el argumento "habría que construirle plantilla" es falso. El diferenciador real
-es otro y más importante: **Account Manager es la única vacante con el ciclo completo cerrado** — 2 tests
-rendidos y corregidos de punta a punta. **Content Creator tiene 9 asignados y CERO completados**: su
-instrumento nunca se ejercitó entero.
+Content Creator **sí tiene plantilla activa y ya en uso** (9 asignaciones vivas): el argumento "habría que
+construirle plantilla" es falso.
 
-Dos consecuencias que este ADR registra:
+**Corrección de la evidencia (auditoría adversarial 2026-08-17 — la versión anterior de este ADR afirmaba
+como verificado lo que sólo era plausible):**
 
-- **Hallazgo: hay TRES plantillas activas de Content Creator y sólo una en uso.** Hoy quien asigna elige a mano
-  entre tres sin ningún contrato que diga cuál corresponde a la vacante. Eso es **exactamente la ambigüedad
-  que la policy elimina** — refuerza la justificación de la feature y es, simultáneamente, un **riesgo
-  operativo vigente** mientras la policy no exista.
-- **Señal a investigar ANTES de automatizar ahí**: 9 asignados sin ningún completado. Si nadie completa, la
-  causa es del instrumento, del correo o de la experiencia — y **automatizar más envíos multiplica un problema
-  de completado en vez de resolverlo**.
+- **Account Manager tiene UN ciclo cerrado real, no dos.** El segundo "rendido" es `asmt-45f9ff2e`, de
+  *"Camila Seed (QA sintético TASK-1738)"* (`qa.seed.task1738@efeonce.test`), creado 10 h antes de este ADR
+  y en estado `submitted`, nunca `scored`. El canary se apoya en **n=1**. Sigue siendo el único instrumento
+  con ciclo cerrado, pero la muestra es la mitad de lo que decía.
+- **"9 asignados y CERO completados" NO es una señal: es una cohorte de 36 horas.** Content Creator se asignó
+  el 2026-08-15 21:54 y Account Manager el 2026-08-16 01:19 — **3 h 25 min de diferencia**, ambas con token a
+  14 días. Además, de esos 9: uno es sintético (*"Prueba TASK-1689 NO CONTACTAR"*) y **otro nunca recibió el
+  correo** (`outbox_reactive_log` registra `skip: flag OFF` para `EO-APP-0058`, 2026-08-11). Quedan **7
+  candidatos reales con correo entregado hace ~1,5 días y 12,5 días de plazo por delante**.
+- **Cae, por lo tanto, "automatizar más envíos multiplica un problema de completado".** Derivaba de una
+  patología que no existe. No es argumento para diferir Content Creator.
+
+Lo que sí queda en pie como consecuencia registrada:
+
+- **Hallazgo: había TRES plantillas activas de Content Creator y sólo una en uso.** Quien asignaba elegía a
+  mano entre tres sin contrato que dijera cuál corresponde a la vacante — **exactamente la ambigüedad que la
+  policy elimina**.
+- **Hallazgo NUEVO y más grave: dos de esas tres eran irrenderizables.** Ejercitando el resolvedor real
+  plantilla por plantilla, `atpl-dae66420` devuelve **5 preguntas para 8 módulos** y `atpl-c0d996fd` **6 para
+  5**. Un módulo sin preguntas activas **no desaparece**: el resolvedor conserva la fila con `question_id
+  NULL`, el candidato **ve la sección vacía**, y `submitPublicAssessment` no exige nada de ella — el examen
+  encogido **se envía sin error** y se puntúa sobre una fracción del peso. Ambas se archivaron
+  (`migrations/20260817103353922_archive-questionless-module-templates.sql`) y la clase quedó cubierta por la
+  señal `hiring.assessment.template_module_without_questions` (steady=0). El precursor sigue vivo: **6
+  competencias sin preguntas activas**.
 
 Secuencia canónica:
 
 0. **Alguien de Talent RINDE el test completo, cronometrado.** Verificar que 45 min alcanzan de verdad. Nadie
    debería enviar una prueba que el equipo no rindió.
 1. Opening + postulación **sintética** con el correo de un reclutador. Leer el correo **en el teléfono**.
-2. Verificar que el aviso interno `hiring_assessment_submitted_internal_email` **entrega de verdad** — nunca se
-   ejercitó con un test real.
-3. **Manual-first sobre Account Manager** (15 aplicaciones; `atpl-account-manager-l2` sembrada en
-   `migrations/20260708113740064_task-1360-seed-account-manager-template.sql:9` y **con ciclo cerrado
-   verificado**), 2-3 candidatos.
-4. **Auto sobre Account Manager en lotes ≤3.** **Prohibido mover etapas en bulk** mientras el auto esté ON.
-5. **Content Creator sólo tras un ciclo completo de Account Manager**, y sólo después de (a) declarar por
-   policy cuál de las tres plantillas corresponde a la vacante y (b) entender por qué sus 9 asignados no
-   rindieron.
+2. Confirmar que el aviso interno `hiring_assessment_submitted_internal_email` **llega a la bandeja**. Ya se
+   ejercitó con un test real — `outbox_reactive_log` registra `sent` para `asmt-0ff5613e` (Valentina Villa,
+   2026-08-16 15:21); lo que falta verificar es la entrega, no la ejecución. (El ledger de flags decía "espera
+   su primera entrega real": está desactualizado, la fuente es `outbox_reactive_log`.)
+3. **Registrar el consumer nuevo con el flag OFF y drenar su backlog ANTES de encenderlo.** La Phase A del
+   consumer reactivo **no tiene ventana temporal** (`reactive-consumer.ts:506-527`): trae todo evento
+   `published` sin fila de log para su `handler` key. Un consumer nuevo barre en su primera corrida **los 23
+   `stage_changed` desde 2026-07-09**, y como D0a manda re-leer la etapa vigente, un evento de julio se
+   evaluaría contra el estado de hoy (**6 postulaciones en `shortlisted`**). Orden obligatorio: registrar con
+   flag OFF → confirmar backlog drenado → recién flip.
+4. **Manual-first sobre Account Manager** (15 aplicaciones; `atpl-account-manager-l2` sembrada en
+   `migrations/20260708113740064_task-1360-seed-account-manager-template.sql:9`, **único instrumento con
+   ciclo cerrado verificado — n=1 real**), 2-3 candidatos.
+5. **Auto sobre Account Manager en lotes ≤3.** **Prohibido mover etapas en bulk** mientras el auto esté ON.
+6. **Content Creator tras un ciclo completo de Account Manager**, declarando por policy qué plantilla
+   corresponde a la vacante. Ya **no** aplica el prerrequisito "entender por qué sus 9 asignados no rindieron":
+   esa cohorte tenía 36 h de vida y 12,5 días de plazo restante, y dos de sus casos tienen causa conocida
+   (sintético · correo nunca enviado por flag OFF). Si al vencer el plazo la tasa sigue en cero, **ahí** es una
+   señal.
 
 **Comunicación al equipo ANTES del paso 4** — no después: *"la columna de etapa dejó de ser una nota interna y
 pasó a ser un botón de enviar"*. Además: re-asignar rompe el link vigente; el kill switch es dejar la policy
@@ -346,7 +392,7 @@ etapa→plantilla, sin inferencia, sin modelo, sin puntaje. El invariante que la
 - **Endurecer `hiring.assessment.author` para gobernar la policy**: regresión sobre consumers de TASK-1360/1363 y mezcla autorar contenido con decidir escrituras a una cohorte. Rechazada.
 - **RouteGroup `internal` para la capability nueva**: contradice el precedente del audit 2026-07-10; el gobierno de una policy no es una superficie de navegación. Rechazada.
 - **Permitir que la automatización escriba `attempt_seq > 1`**: un bug de policy podría generar la segunda prueba de una persona sin intervención humana. Rechazada.
-- **Canary en Content Creator**: no por falta de plantilla — tiene una activa con 9 asignaciones vivas — sino porque **cero de esas 9 se completó**: sería estrenar la automatización sobre el único instrumento que nunca cerró su ciclo, y sobre la cohorte mayor. Rechazada en favor de Account Manager manual-first (2 tests rendidos y corregidos).
+- **Canary en Content Creator**: no por falta de plantilla — tiene una activa con 9 asignaciones vivas — sino porque su instrumento aún no cerró un ciclo y su cohorte es la mayor. Rechazada en favor de Account Manager manual-first, el único con un rendido-y-corregido real (**n=1**; el segundo "rendido" que citaba la versión anterior de este ADR era un seed sintético). El argumento **no** es que "cero de 9 se completó" — esa cohorte tenía 36 h de vida: ver la corrección de evidencia más arriba.
 - **"Probar en staging" como carril aislado**: el ops-worker es un único Cloud Run compartido por staging y producción (misma DB, mismos jobs, misma revisión); ese carril no existe (D6). Rechazada.
 - **Dejar que quien asigna elija la plantilla a mano**: hoy conviven **tres plantillas activas de Content Creator** y sólo una en uso, sin contrato que diga cuál corresponde a la vacante. Rechazada — es la ambigüedad que la policy existe para cerrar.
 - **No hacer nada (statu quo)**: la vacante no declara su prueba, el operador elige `templateId` a mano y un cambio de etapa sólo produce el correo genérico — con discrecionalidad sobre a quién se testea y sin trazabilidad del examen rendido. Rechazada.
@@ -422,6 +468,8 @@ etapa→plantilla, sin inferencia, sin modelo, sin puntaje. El invariante que la
 6. **NUNCA expandir la automatización más allá del canary sin el snapshot inmutable del cuestionario por instancia.** `public-taking` resuelve preguntas en vivo; sin snapshot, dos candidatos "del mismo test" rindieron exámenes distintos. **NUNCA** versionar el template como sustituto: ya está versionado, el problema es la resolución.
 7. **NUNCA una policy nace `enabled`+`on_stage_entry`** (nace `draft`+`manual`; el flip exige capability + opening `published` + audit). **SIEMPRE** cap de volumen por opening/ventana con auto-detención y readiness fail-closed. **NUNCA** planear "probar en staging" como carril aislado: el `ops-worker` es único y compartido. **NUNCA** mover etapas en bulk con el auto encendido.
 8. **NUNCA disparar un assessment desde un score, match o atributo inferido — el trigger es la etapa.** Ese invariante es lo que mantiene esta automatización fuera de "IA de alto riesgo"; romperlo exige una decisión nueva, no una excepción.
+9. **NUNCA registrar un consumer reactivo nuevo y encender su flag en el mismo paso.** La Phase A **no tiene ventana temporal** (`reactive-consumer.ts:506-527`): un `handler` key nuevo barre TODO evento `published` sin fila de log, o sea el histórico completo del event type. Combinado con la regla 1 (re-leer el estado vigente), un evento de hace meses se evalúa contra la etapa de hoy. Orden obligatorio: **registrar con flag OFF → confirmar backlog drenado → recién flip**. El cap de volumen es el último freno, no el primero.
+10. **NUNCA declarar un instrumento sano por contar sus módulos.** Un módulo cuya competencia no tiene preguntas activas **no desaparece** del examen: se renderiza como sección vacía y el submit lo acepta, así que el candidato rinde una fracción del peso sin que nada falle. **SIEMPRE** verificar ejercitando `PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL` contra la plantilla real, y vigilar `hiring.assessment.template_module_without_questions` (steady=0).
 9. **NUNCA escribir `outcome='assigned'` en el ledger sin su `assessment_id`** (viola `hiring_assessment_assignment_assigned_instance_ck` y sería un ledger que miente): el intent se registra como `intent` —no terminal, efímero, sólo dentro de la transacción— y se cierra con `attachAssignmentInstance`. **NUNCA** devolver una fila `intent` como outcome al fan-in de comunicación: es un fault, no una condición estable.
 10. **NUNCA degradar un fallo de readiness a `held`.** `held` es el hold **humano**; todo fallo de dato (`missing_email`, `unverified_recipient`) es `blocked`, que es la única rama que emite `hiring.assessment.auto_assignment_blocked`.
 11. **NUNCA contar el cap de volumen sin bloquear antes la fila de policy (`FOR UPDATE`)** ni filtrando `superseded_at`: el cap mide **correos salidos**, no filas vigentes, y sin el lock dos assigns concurrentes leen el mismo total y pasan los dos.
@@ -438,7 +486,8 @@ etapa→plantilla, sin inferencia, sin modelo, sin puntaje. El invariante que la
 5. **Qué pasa si se avanza a `interview` con el test de `shortlisted` abierto**: hoy no hay respuesta. ¿Se cancela, se conserva, se comunica?
 6. **Aviso en la vacante pública de que el proceso incluye evaluación**: hueco de defensibilidad — hoy la prueba llega **sin anuncio previo**. Copy y ubicación pendientes.
 7. **Write path de accommodations**: la lectura y el render existen; falta decidir si el ajuste se pide en el formulario de postulación, se concede desde el drawer del reclutador, o ambos. Hasta entonces, la línea de copy de D1 es la única puerta.
-8. **Por qué 9 asignados de Content Creator no rindieron**: instrumento, correo, plazo o experiencia. Es una investigación previa a automatizar ahí, no un efecto que la automatización vaya a corregir.
+8. **Tasa de completado de Content Creator al vencer el plazo** (tokens expiran 2026-08-29/30). Hoy no hay señal: la cohorte tenía 36 h y dos de sus 9 casos tienen causa conocida (sintético · correo nunca enviado por flag OFF). Si al vencimiento la tasa real sigue en cero sobre los 7 candidatos con correo entregado, **ahí** hay que investigar instrumento/correo/experiencia. Medirlo antes es leer ruido.
+9. **Las 6 competencias sin preguntas activas**: completar el banco o retirarlas del catálogo. Mientras existan, cualquier plantilla nueva que las use nace con un módulo ciego que el candidato ve vacío y el submit acepta igual. La señal `hiring.assessment.template_module_without_questions` lo reporta como `warning` (precursor) y como `error` en cuanto una plantilla activa las use.
 
 ---
 

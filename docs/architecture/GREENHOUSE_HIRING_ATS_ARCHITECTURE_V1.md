@@ -177,6 +177,13 @@ Auditoría 2026-07-10 (código real + specs downstream) → hardening pre-TASK-1
 
 **Invariante nuevo — Template Versioning (pre-TASK-1364/1365):** un `hiring_assessment_template` con instancias es **INMUTABLE** en contenido y módulos (trigger DB; solo `status` muta). Editar = crear versión nueva con `version` + `supersedes_template_id`. **NUNCA** editar in-place un template usado: la correlación validez/fairness por `template_id` asume contenido congelado.
 
+**Invariante complementario — el versionado NO congela el instrumento (auditoría 2026-08-17).** Lo que el trigger congela es la **declaración** (nombre, módulos, pesos); las **preguntas se resuelven en vivo** en cada render, save y submit vía `PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL`, sin snapshot ni caché. Dos consecuencias que ningún gate detecta:
+
+- **Un módulo cuya competencia no tiene preguntas activas no desaparece.** El resolvedor conserva la fila con `question_id IS NULL` y el mapper registra la competencia antes del `continue`: el candidato **ve la sección vacía**, y `submitPublicAssessment` sólo exige responder las preguntas resueltas, así que el **examen encogido se envía sin error** y se puntúa sobre una fracción del peso declarado. Detectado en dos plantillas activas (45% y 25% del peso ciego), archivadas por `migrations/20260817103353922_archive-questionless-module-templates.sql`.
+- **Archivar o insertar una pregunta cambia el examen del siguiente candidato** sin tocar template ni versión (el orden es `match de nivel → tipo → created_at DESC`), y a mitad de rendición falla ruidosamente contra el candidato: `404 assessment_question_not_found` al guardar, `400 assessment_incomplete` al enviar.
+
+**NUNCA** declarar sano un instrumento contando módulos: **SIEMPRE** ejercitar el resolvedor real contra la plantilla. Señal canónica de la clase: `hiring.assessment.template_module_without_questions` (steady=0; `error` con una sola plantilla rota, `warning` en el precursor de competencias sin banco). El snapshot inmutable por instancia sigue pendiente — es prerrequisito declarado para expandir la automatización de assignment más allá del canary.
+
 Verificación: 6 live guards E2E contra PG real (idempotencia, expiración, anti-anclaje, inmutabilidad, dedupe) + anti-leak unit + suite full.
 
 ## Delta 2026-07-10 — TASK-770: bridge de activación hiring→HRIS implementado
