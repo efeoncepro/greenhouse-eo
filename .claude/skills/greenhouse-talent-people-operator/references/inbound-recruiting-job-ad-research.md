@@ -23,7 +23,9 @@ When sources conflict, role truth and policy win. When a material fact is absent
 
 ### Efeonce benefit-claim check
 
-Before naming paid leave, read `docs/documentation/hr/sistema-permisos-leave.md` and verify the active policy for the intended engagement. The configured base currently distinguishes 15 paid vacation days, one paid floating holiday, paid bereavement, paid civic duty and paid medical/cita leave from study, personal, parental and unpaid leave, which are not paid by default. **Marriage leave is not a configured Greenhouse leave type.** These values and their applicability are policy/runtime facts, not reusable marketing copy; do not promise them to international contractor/EOR candidates until Payroll/Legal confirms their eligibility.
+For the reusable Efeonce benefits section, read `efeonce-candidate-benefits-charter.md`. It authorizes the candidate-facing global baseline, including annual vacation from 15 to 20 paid working days by completed continuous tenure, health/wellbeing and the named life-event leaves. It does **not** prove that every item is configured in Greenhouse, self-service or automatically payable for a particular contract.
+
+Before publication, resolve country eligibility and engagement path; before offer, Payroll/Legal must confirm the agreement/provider treatment. The configured Leave base is still the runtime truth for what the portal currently supports. Use it to avoid false workflow claims, not to erase an approved candidate policy.
 
 ## Vacancy evidence packet
 

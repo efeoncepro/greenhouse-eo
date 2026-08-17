@@ -3,6 +3,18 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-17 — Baseline global de beneficios para vacantes Efeonce documentado en las skills
+
+- Las skills espejo de Talent y Payroll incorporan el `Efeonce Candidate Benefits Charter` para comunicar en
+  todas las vacantes una política global: 15 días hábiles de vacaciones remuneradas más un día por cada año
+  continuo cumplido hasta 20, dos días flotantes, 16 horas de atención médica, dos días de bienestar, duelo,
+  deber cívico, matrimonio/unión civil, 10 semanas para la madre/persona que da a luz y 2 para el padre/progenitor no gestante (adopción/cuidado: 4/2), mudanza, desarrollo, apoyo remoto y feriados corporativos chilenos aparte de vacaciones.
+  La ley local puede mejorar ese piso, nunca reducirlo. La carta diferencia esta política candidato-facing del
+  runtime actual de Leave y del instrumento contractual/proveedor que Payroll/Legal debe validar. También
+  define devengo, arrastre, familia, retorno postparto, cobertura, equivalencia contractor y wallets de
+  aprendizaje (US$500/año), equipo (US$400/36 meses), conectividad/coworking (US$40/mes) y salud mental
+  (US$300/año). Sin cambio de runtime, schema, contratos ni configuración de permisos.
+
 ## 2026-08-17 — Vacantes públicas e inbound recruiting reforzados en la skill de Talent
 
 - Las skills espejo de Talent para Claude/Codex ahora exigen evidence packet, benchmark actual,
@@ -1054,33 +1066,3 @@ herramientas dejaron de aceptar.
   entrypoint) y estrenó suite —5 tests, uno de ellos contra el `Handoff.md` real, que es el que se
   romperá la próxima vez que la convención derive. Verificado: rotó `keep 20; archive 3` + `keep 60;
   remove 1` donde antes decía "manual compaction required".
-
-## 2026-08-08 — TASK-1310: contrato de navegación SEO cliente corregido (rollout pendiente)
-
-- Se corrigió el drift entre los viewCodes TS de `/growth/seo` y `/growth/seo/report` y el catálogo
-  de módulos: la migración crea `seo_v2`, supersede los assignments activos de `seo_v1` preservando
-  tier/metadata y registra los dos viewCodes en `view_registry`.
-- SEO permanece module-gated por organización; los tres roles cliente reciben denials explícitos y
-  las rutas conservan `growth.seo.report.read_client` scope `own`. La paridad ahora falla también si
-  se agrega una surface module-gated al registry sin seed DB.
-- Validación local: 53 tests focales y migration marker gate verdes. No se aplicó la migración, no se
-  hizo push/deploy y no se ejecutó build completo por el límite de recursos del equipo.
-- **Verificación cruzada de la task (2026-08-08, tarde).** El barrido encontró que el código estaba
-  adelante de sus documentos y de sus gates, y que **dos gates estaban verdes de mentira**:
-  - la señal `seo.rank_capture_lag` tenía `module_key = 'seo_v2'` hardcodeado, así que veía 0 orgs y
-    reportaba `ok` — falsa-sana. Con el expand aplicado reporta `warning` con un hallazgo real; su
-    test pinneaba el bug (asertaba el literal SQL) y ahora aserta el contrato;
-  - los tres scenarios GVC de cliente capturaban con sesión de **operador** contra superficies
-    client-gated, así que el frame decía "SEO no está activo en tu plan" y el visual-gate daba BLOCK
-    por una razón que no era la UI. Se agregó `requiresStorageState` al contrato de scenario, exigido
-    antes de lanzar el browser: `ui:visual-gate --task TASK-1310` pasó de BLOCK a PASS.
-- **El scorecard se regeneró desde la auditoría premium.** El anterior daba PASS 4.61 y afirmaba "axe
-  sin violaciones" mientras la auditoría de las 10:25 registra 2 violaciones de contraste y economía
-  de superficies en 1.8. Ahora `ui:quality --task TASK-1310` da **BLOCK `average=2.29 floor=1.8`**,
-  que es el estado correcto para una task con `UI ready: no` y release gate bloqueado.
-- **Drift documental cerrado:** wireframe y flow describían un `masterDetail` con rail lateral que la
-  implementación descartó — la ruta exacta por la que el siguiente cambio lo reintroduce. Corregidos a
-  `composition='single'` + tabs, con el "por qué no" escrito. La superficie cliente salió de "Que NO
-  existe todavía" del doc funcional, ganó su sección con el estado de rollout declarado y su manual
-  (`docs/manual-de-uso/growth/habilitar-portal-seo-cliente.md`); README, EPIC-022 y el ledger de flags
-  quedaron sincronizados.

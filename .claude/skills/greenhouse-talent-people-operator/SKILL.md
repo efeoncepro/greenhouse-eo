@@ -76,7 +76,7 @@ Apply this workflow whenever the output will attract candidates externally: a Ca
 4. Create a claim ledger. Every benefit, client/brand, scale, certification, flexibility or compensation claim must cite an internal owner/source or be marked `needs confirmation`. Do not convert an assumption into attractive copy.
 5. Draft from candidate value and demonstrable work: concrete problem → work and outcomes → evidence sought → what the organization supplies → transparent process → low-friction CTA. A long requirements list is not a strategy.
 6. For remote/global roles, stop before publication unless country eligibility, engagement path, time-zone overlap, language and benefit applicability are explicit. `Global` is not a substitute for an operating model.
-7. Verify leave and benefit claims against `docs/documentation/hr/sistema-permisos-leave.md` and the applicable policy/runtime. A candidate brief is not a policy source; do not promise marriage, parental, study, personal or any other leave not explicitly active and paid for the candidate's engagement.
+7. If a candidate-facing output names any Efeonce benefit, load `references/efeonce-candidate-benefits-charter.md` in the current task before drafting. Derive every quantitative entitlement from its current table; never reuse figures from an earlier draft or conversation. Separately verify the active Leave/runtime state: the charter does not prove a portal workflow, contract term or payment treatment. Local law may improve the global floor but never reduce it.
 
 ### Senior creative IC calibration
 

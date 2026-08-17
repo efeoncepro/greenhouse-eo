@@ -10,7 +10,7 @@ Before writing, read `../references/inbound-recruiting-job-ad-research.md` and f
 - [ ] Three to five observable outcomes for the first 6–12 months are confirmed.
 - [ ] Essential evidence is separated from learnable/preferred capability.
 - [ ] Compensation, benefits and their engagement conditions have an approved owner/source.
-- [ ] Every paid-leave claim was verified against the active Leave policy; a brief's reference to marriage or “etc.” is not evidence.
+- [ ] If using Efeonce standard benefits, `../references/efeonce-candidate-benefits-charter.md` was read. The page uses its approved global floor without claiming Leave-portal availability, automatic approval or an unverified local implementation.
 - [ ] Country eligibility, engagement path, language, time-zone overlap and async/sync expectations are explicit for remote/global roles.
 - [ ] The candidate process, accommodation path, response commitment and any exercise are confirmed.
 - [ ] A material, senior, scarce or global role has a current benchmark of at least five comparable postings.
@@ -89,7 +89,7 @@ State likely timing, what each stage evaluates and how a candidate requests an a
 - `Global` needs an explicit eligibility set, engagement path, operational language and time-zone/async expectations. Do not write "work from anywhere" when any of those constraints exist.
 - For hybrid roles, location is mandatory because it defines where in-person presence happens: city/country or office region. Do not publish a hybrid role without that.
 - Do not invent pay ranges; finance/payroll owns numbers.
-- Do not promise a benefit to every international hire if policy varies by contractor, EOR, country or legal entity. Name the condition plainly.
+- The Efeonce Candidate Benefits Charter is a global people-policy baseline. State that the applicable agreement and country govern its formal implementation; do not imply a portal flow or a uniform legal mechanism across contractor, EOR, country or legal entity.
 
 ## 9. Inbound recruiting layer
 

@@ -2,6 +2,18 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-17 — Beneficios globales de Efeonce documentados para vacantes
+
+Las skills espejo de Talent y Payroll ahora comparten el `Efeonce Candidate Benefits Charter`: 15 días
+hábiles de vacaciones remuneradas más un día por cada año continuo cumplido hasta 20 para todos los
+colaboradores globales; dos días flotantes, 16 horas de atención médica, dos días de bienestar, duelo,
+deber cívico, matrimonio/unión civil, 10 semanas para la madre/persona que da a luz y 2 para el padre/progenitor no gestante (adopción/cuidado: 4/2), mudanza, desarrollo y apoyo para
+trabajo remoto/salud mental. Los feriados corporativos son los de Chile y van aparte de vacaciones; una cobertura preacordada recibe descanso compensatorio. La carta permite comunicar el baseline global en vacantes,
+pero prohíbe afirmar que todos los permisos ya se autogestionan o calculan en Greenhouse. Payroll/Legal debe
+incorporar cada beneficio al instrumento contractual o del proveedor según país/modalidad antes de operarlo.
+La carta ahora define año/prorrateo, carry-over, continuidad de servicio, familia, retorno postparto, equivalencia contractor y wallets: aprendizaje US$500/año, equipo US$400/36 meses, conectividad/coworking US$40/mes y salud mental US$300/año. La ley local es overlay que puede mejorar, nunca reducir, el baseline. No hubo cambio de runtime, schema,
+contratos ni política configurada.
+
 ## 2026-08-17 — Skill de Talent reforzada para vacantes públicas e inbound
 
 Las skills espejo `greenhouse-talent-people-operator` de Claude/Codex incorporan un protocolo

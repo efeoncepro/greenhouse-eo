@@ -63,6 +63,8 @@ The public offer is a conversion asset, not the internal job brief. After intake
 - compensation/location transparency;
 - nurture path through Talent Pool/Growth Forms when the candidate is not a fit today.
 
+For a reusable Efeonce benefits section, use `efeonce-candidate-benefits-charter.md`. It is candidate-facing policy, distinct from the narrower Greenhouse Leave runtime and from the contract/provider treatment that Payroll/Legal must still confirm.
+
 For senior creative roles, sell a real individual-contributor mandate and the concrete work rather than turning the opening into a generic art-director manifesto. Portfolio evidence and a structured conversation beat an unpaid speculative exercise.
 
 ### Distribución externa en grupos

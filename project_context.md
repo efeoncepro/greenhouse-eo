@@ -169,6 +169,12 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   `greenhouse-talent-people-operator`: evidence packet, benchmark actual, ledger de claims, funnel de fuente a
   outcome, nurturing consentido y condiciones explícitas de contratación global; no se publican supuestos de
   beneficio, modalidad, alcance o proceso como copy atractivo ni se optimiza por volumen sin calidad/experiencia.
+  El baseline público de beneficios de Efeonce está en
+  `references/efeonce-candidate-benefits-charter.md` de esa skill: 15 días hábiles de vacaciones remuneradas
+  más un día por cada año continuo cumplido, hasta 20, para colaboradores globales; dos días flotantes,
+  feriados corporativos chilenos aparte de vacaciones, salud/bienestar, desarrollo, wallets globales y permisos de vida definidos. Es una dirección de política global y copy
+  candidato-facing; la ley local puede mejorarla, nunca reducirla. No prueba todavía un flujo de Leave,
+  contrato o cálculo de Payroll.
 - La **evaluación del candidato** tiene tres contratos durables desde 2026-08-16/17 (`TASK-1734`–`TASK-1738`, EPIC-011;
   ADR [scoring run](docs/architecture/GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md) e
   [identidad de intake](docs/architecture/GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1.md), ambas
