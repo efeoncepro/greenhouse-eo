@@ -39,8 +39,9 @@ import { HiringNotFoundError, HiringValidationError } from './errors'
 import {
   normalizePublicOpeningContent,
   parsePublicOpeningContent,
-  parseRemoteEligibleCountries,
+  parseRemoteEligibleCountries
 } from './public-careers/public-content'
+import { assertPublishableOpening } from './public-careers/publishability'
 
 // ── Query helper: dentro de transacción usa el PoolClient; standalone usa el pool ──
 
@@ -963,6 +964,23 @@ export const updateHiringOpening = async (
 
     if (!rows[0]) throw new HiringNotFoundError('El opening no existe.', 'hiring_opening_not_found')
     const opening = normalizeHiringOpening(rows[0])
+
+    if (opening.publicationStatus === 'published') {
+      assertPublishableOpening({
+        publicTitle: opening.publicTitle,
+        publicSummary: opening.publicSummary,
+        publicDescription: opening.publicDescription,
+        publicWorkMode: opening.publicWorkMode,
+        publicHiringRegion: opening.publicHiringRegion,
+        publicCity: opening.publicCity,
+        publicCountry: opening.publicCountry,
+        publicOfficeLocation: opening.publicOfficeLocation,
+        publicArea: opening.publicArea,
+        publicSkillTags: opening.publicSkillTags,
+        publicSeniority: opening.publicSeniority,
+        visibility: opening.visibility
+      })
+    }
 
     await publishOutboxEvent(
       {

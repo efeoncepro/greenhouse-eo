@@ -6,7 +6,7 @@ import { HiringValidationError } from '../errors'
 import {
   normalizePublicOpeningContent,
   parsePublicOpeningContent,
-  PUBLIC_OPENING_CONTENT_VERSION,
+  PUBLIC_OPENING_CONTENT_VERSION
 } from './public-content'
 
 const validInput = {
@@ -21,7 +21,7 @@ const validInput = {
   remoteModel: '100% remoto, overlap 4 horas con GMT-4, rituales async.',
   processSteps: ['Screening', 'Muestra de trabajo pagada', 'Entrevista final'],
   benefits: ['15 días hábiles de vacaciones', 'Presupuesto anual de formación'],
-  compensation: { currency: 'usd', minValue: 1100, maxValue: 1300, unitText: 'month' },
+  compensation: { currency: 'usd', minValue: 1100, maxValue: 1300, unitText: 'month' }
 }
 
 describe('parsePublicOpeningContent — write path', () => {
@@ -51,23 +51,44 @@ describe('parsePublicOpeningContent — write path', () => {
   })
 
   it('rechaza compensación no estructurada o incoherente', () => {
+    expect(() => parsePublicOpeningContent({ version: 1, compensation: 'USD 1.100-1.300 mensuales' })).toThrow(
+      HiringValidationError
+    )
     expect(() =>
-      parsePublicOpeningContent({ version: 1, compensation: 'USD 1.100-1.300 mensuales' }),
+      parsePublicOpeningContent({
+        version: 1,
+        compensation: { currency: 'USD', minValue: 1300, maxValue: 1100, unitText: 'MONTH' }
+      })
     ).toThrow(HiringValidationError)
     expect(() =>
-      parsePublicOpeningContent({ version: 1, compensation: { currency: 'USD', minValue: 1300, maxValue: 1100, unitText: 'MONTH' } }),
+      parsePublicOpeningContent({
+        version: 1,
+        compensation: { currency: 'dólares', minValue: 1, maxValue: 2, unitText: 'MONTH' }
+      })
     ).toThrow(HiringValidationError)
     expect(() =>
-      parsePublicOpeningContent({ version: 1, compensation: { currency: 'dólares', minValue: 1, maxValue: 2, unitText: 'MONTH' } }),
+      parsePublicOpeningContent({
+        version: 1,
+        compensation: { currency: 'USD', minValue: 1, maxValue: 2, unitText: 'SPRINT' }
+      })
     ).toThrow(HiringValidationError)
     expect(() =>
-      parsePublicOpeningContent({ version: 1, compensation: { currency: 'USD', minValue: 1, maxValue: 2, unitText: 'SPRINT' } }),
+      parsePublicOpeningContent({
+        version: 1,
+        compensation: { currency: 'ZZZ', minValue: 1, maxValue: 2, unitText: 'MONTH' }
+      })
+    ).toThrow(HiringValidationError)
+    expect(() =>
+      parsePublicOpeningContent({
+        version: 1,
+        compensation: { currency: 'USD', minValue: true, maxValue: [2], unitText: 'MONTH' }
+      })
     ).toThrow(HiringValidationError)
   })
 
   it('rechaza listas sobredimensionadas y textos fuera de límite', () => {
     expect(() =>
-      parsePublicOpeningContent({ version: 1, outcomes: Array.from({ length: 13 }, (_, i) => `item ${i}`) }),
+      parsePublicOpeningContent({ version: 1, outcomes: Array.from({ length: 13 }, (_, i) => `item ${i}`) })
     ).toThrow(HiringValidationError)
     expect(() => parsePublicOpeningContent({ version: 1, promise: 'x'.repeat(2001) })).toThrow(HiringValidationError)
   })

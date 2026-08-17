@@ -19,7 +19,7 @@ import {
   PUBLIC_OPENING_CONTENT_VERSION,
   type PublicCompensationUnit,
   type PublicOpeningCompensationRange,
-  type PublicOpeningContent,
+  type PublicOpeningContent
 } from '@/types/hiring'
 import { isValidCountryCode } from '@/lib/locale/countries'
 
@@ -58,19 +58,21 @@ const parseTextList = (value: unknown, field: string): string[] => {
   if (value == null) return []
   if (!Array.isArray(value)) throw invalid(`El campo ${field} debe ser una lista de textos.`, { field })
 
-  const items = value.map((item, index) => {
-    if (typeof item !== 'string') {
-      throw invalid(`El campo ${field}[${index}] debe ser texto.`, { field })
-    }
+  const items = value
+    .map((item, index) => {
+      if (typeof item !== 'string') {
+        throw invalid(`El campo ${field}[${index}] debe ser texto.`, { field })
+      }
 
-    const cleaned = cleanText(item)
+      const cleaned = cleanText(item)
 
-    if (cleaned.length > MAX_ITEM_LENGTH) {
-      throw invalid(`El campo ${field}[${index}] supera el máximo de ${MAX_ITEM_LENGTH} caracteres.`, { field })
-    }
+      if (cleaned.length > MAX_ITEM_LENGTH) {
+        throw invalid(`El campo ${field}[${index}] supera el máximo de ${MAX_ITEM_LENGTH} caracteres.`, { field })
+      }
 
-    return cleaned
-  }).filter(Boolean)
+      return cleaned
+    })
+    .filter(Boolean)
 
   if (items.length > MAX_LIST_ITEMS) {
     throw invalid(`El campo ${field} admite máximo ${MAX_LIST_ITEMS} ítems.`, { field })
@@ -88,14 +90,21 @@ const parseCompensation = (value: unknown): PublicOpeningCompensationRange | nul
 
   const currency = typeof value.currency === 'string' ? value.currency.trim().toUpperCase() : ''
 
-  if (!/^[A-Z]{3}$/.test(currency)) {
+  if (!/^[A-Z]{3}$/.test(currency) || !Intl.supportedValuesOf('currency').includes(currency)) {
     throw invalid('compensation.currency debe ser un código ISO 4217 de 3 letras.', { field: 'compensation.currency' })
   }
 
-  const minValue = Number(value.minValue)
-  const maxValue = Number(value.maxValue)
+  const minValue = value.minValue
+  const maxValue = value.maxValue
 
-  if (!Number.isFinite(minValue) || !Number.isFinite(maxValue) || minValue <= 0 || maxValue <= 0) {
+  if (
+    typeof minValue !== 'number' ||
+    typeof maxValue !== 'number' ||
+    !Number.isFinite(minValue) ||
+    !Number.isFinite(maxValue) ||
+    minValue <= 0 ||
+    maxValue <= 0
+  ) {
     throw invalid('compensation.minValue/maxValue deben ser montos positivos.', { field: 'compensation' })
   }
 
@@ -108,7 +117,7 @@ const parseCompensation = (value: unknown): PublicOpeningCompensationRange | nul
   if (!PUBLIC_COMPENSATION_UNITS.includes(unitText as PublicCompensationUnit)) {
     throw invalid('compensation.unitText debe ser HOUR|DAY|WEEK|MONTH|YEAR.', {
       field: 'compensation.unitText',
-      allowed: PUBLIC_COMPENSATION_UNITS,
+      allowed: PUBLIC_COMPENSATION_UNITS
     })
   }
 
@@ -127,7 +136,7 @@ const hasAnyContent = (content: PublicOpeningContent): boolean =>
       content.essentials.length ||
       content.learnables.length ||
       content.processSteps.length ||
-      content.benefits.length,
+      content.benefits.length
   )
 
 /**
@@ -145,7 +154,9 @@ export const parsePublicOpeningContent = (input: unknown): PublicOpeningContent 
   const version = Number(input.version ?? PUBLIC_OPENING_CONTENT_VERSION)
 
   if (version !== PUBLIC_OPENING_CONTENT_VERSION) {
-    throw invalid(`publicContent.version debe ser ${PUBLIC_OPENING_CONTENT_VERSION}.`, { field: 'publicContent.version' })
+    throw invalid(`publicContent.version debe ser ${PUBLIC_OPENING_CONTENT_VERSION}.`, {
+      field: 'publicContent.version'
+    })
   }
 
   const content: PublicOpeningContent = {
@@ -160,7 +171,7 @@ export const parsePublicOpeningContent = (input: unknown): PublicOpeningContent 
     remoteModel: parseOptionalText(input.remoteModel, 'publicContent.remoteModel'),
     processSteps: parseTextList(input.processSteps, 'publicContent.processSteps'),
     benefits: parseTextList(input.benefits, 'publicContent.benefits'),
-    compensation: parseCompensation(input.compensation),
+    compensation: parseCompensation(input.compensation)
   }
 
   return hasAnyContent(content) ? content : null
@@ -205,7 +216,7 @@ export const parseRemoteEligibleCountries = (input: unknown): string[] => {
 
   if (!Array.isArray(input)) {
     throw invalid('publicRemoteEligibleCountries debe ser una lista de códigos ISO alpha-2.', {
-      field: 'publicRemoteEligibleCountries',
+      field: 'publicRemoteEligibleCountries'
     })
   }
 
@@ -214,7 +225,7 @@ export const parseRemoteEligibleCountries = (input: unknown): string[] => {
 
     if (code.length !== 2 || !isValidCountryCode(code)) {
       throw invalid(`publicRemoteEligibleCountries[${index}] no es un código ISO 3166-1 alpha-2 válido.`, {
-        field: 'publicRemoteEligibleCountries',
+        field: 'publicRemoteEligibleCountries'
       })
     }
 

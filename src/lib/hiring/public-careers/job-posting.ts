@@ -22,11 +22,7 @@ import { EFEONCE_BRAND_NAME, EFEONCE_URL_HTTPS } from '@/config/efeonce-brand'
 import type { PublicOpeningPayload } from '@/types/hiring'
 
 const escapeHtml = (value: string): string =>
-  value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
 const paragraphsToHtml = (value: string): string =>
   value
@@ -43,8 +39,11 @@ const listToHtml = (items: string[]): string =>
  * Narrativa núcleo del bloque estructurado: lo único que puede REEMPLAZAR a la prosa
  * legacy sin perder la descripción del rol.
  */
-const hasCoreNarrative = (content: NonNullable<PublicOpeningPayload['content']>): boolean =>
-  Boolean(content.promise || content.intro || content.outcomes.length || content.workItems.length)
+const hasCompleteCoreNarrative = (content: NonNullable<PublicOpeningPayload['content']>): boolean =>
+  Boolean(content.promise && content.intro && content.outcomes.length && content.workItems.length)
+
+const hasCompleteSkillsBlock = (content: NonNullable<PublicOpeningPayload['content']>): boolean =>
+  Boolean(content.essentials.length && content.learnables.length)
 
 /**
  * Descripción HTML segura construida desde el MISMO contenido visible del payload.
@@ -59,13 +58,13 @@ const hasCoreNarrative = (content: NonNullable<PublicOpeningPayload['content']>)
 const buildDescriptionHtml = (opening: PublicOpeningPayload): string => {
   const parts: string[] = []
   const content = opening.content
-  const structuredReplacesProse = Boolean(content && hasCoreNarrative(content))
+  const structuredReplacesProse = Boolean(content && hasCompleteCoreNarrative(content))
 
   if (!structuredReplacesProse) {
     if (opening.summary) parts.push(paragraphsToHtml(opening.summary))
     if (opening.description) parts.push(paragraphsToHtml(opening.description))
 
-    const blockCoversSkills = Boolean(content && (content.essentials.length || content.learnables.length))
+    const blockCoversSkills = Boolean(content && hasCompleteSkillsBlock(content))
 
     if (!blockCoversSkills) {
       if (opening.requirements) parts.push(paragraphsToHtml(opening.requirements))
@@ -74,12 +73,10 @@ const buildDescriptionHtml = (opening: PublicOpeningPayload): string => {
   }
 
   if (content) {
-    if (structuredReplacesProse) {
-      if (content.promise) parts.push(paragraphsToHtml(content.promise))
-      if (content.intro) parts.push(paragraphsToHtml(content.intro))
-      parts.push(listToHtml(content.outcomes))
-      parts.push(listToHtml(content.workItems))
-    }
+    if (content.promise) parts.push(paragraphsToHtml(content.promise))
+    if (content.intro) parts.push(paragraphsToHtml(content.intro))
+    parts.push(listToHtml(content.outcomes))
+    parts.push(listToHtml(content.workItems))
 
     parts.push(listToHtml(content.essentials))
     parts.push(listToHtml(content.learnables))
@@ -101,17 +98,17 @@ const EMPLOYMENT_TYPE_BY_MODE: Record<string, string> = {
   'jornada completa': 'FULL_TIME',
   'full time': 'FULL_TIME',
   'full-time': 'FULL_TIME',
-  'full_time': 'FULL_TIME',
+  full_time: 'FULL_TIME',
   'jornada parcial': 'PART_TIME',
   'media jornada': 'PART_TIME',
   'part time': 'PART_TIME',
   'part-time': 'PART_TIME',
-  'freelance': 'CONTRACTOR',
-  'contractor': 'CONTRACTOR',
-  'honorarios': 'CONTRACTOR',
-  'práctica': 'INTERN',
-  'practica': 'INTERN',
-  'internship': 'INTERN',
+  freelance: 'CONTRACTOR',
+  contractor: 'CONTRACTOR',
+  honorarios: 'CONTRACTOR',
+  práctica: 'INTERN',
+  practica: 'INTERN',
+  internship: 'INTERN'
 }
 
 const resolveEmploymentType = (employmentMode: string | null): string | null => {
@@ -136,8 +133,8 @@ const resolveLocationBlock = (opening: PublicOpeningPayload): LocationBlock | nu
       jobLocationType: 'TELECOMMUTE',
       applicantLocationRequirements: opening.remoteEligibleCountries.map(code => ({
         '@type': 'Country',
-        name: code,
-      })),
+        name: code
+      }))
     }
   }
 
@@ -150,9 +147,9 @@ const resolveLocationBlock = (opening: PublicOpeningPayload): LocationBlock | nu
         address: {
           '@type': 'PostalAddress',
           addressLocality: opening.city.trim(),
-          addressCountry: opening.country.trim(),
-        },
-      },
+          addressCountry: opening.country.trim()
+        }
+      }
     }
   }
 
@@ -172,8 +169,8 @@ const buildBaseSalary = (opening: PublicOpeningPayload): Record<string, unknown>
       '@type': 'QuantitativeValue',
       minValue: compensation.minValue,
       maxValue: compensation.maxValue,
-      unitText: compensation.unitText,
-    },
+      unitText: compensation.unitText
+    }
   }
 }
 
@@ -184,7 +181,7 @@ const buildBaseSalary = (opening: PublicOpeningPayload): Record<string, unknown>
  */
 export const buildJobPostingJsonLd = (
   opening: PublicOpeningPayload,
-  baseUrl: string,
+  baseUrl: string
 ): Record<string, unknown> | null => {
   if (!opening.publishedAt || !opening.title.trim()) return null
 
@@ -210,17 +207,17 @@ export const buildJobPostingJsonLd = (
       '@type': 'Organization',
       name: EFEONCE_BRAND_NAME,
       url: EFEONCE_URL_HTTPS,
-      sameAs: EFEONCE_URL_HTTPS,
+      sameAs: EFEONCE_URL_HTTPS
     },
     identifier: {
       '@type': 'PropertyValue',
       name: EFEONCE_BRAND_NAME,
-      value: opening.publicId,
+      value: opening.publicId
     },
     url: canonicalUrl,
     ...location,
     ...(employmentType ? { employmentType } : {}),
-    ...(baseSalary ? { baseSalary } : {}),
+    ...(baseSalary ? { baseSalary } : {})
   }
 }
 

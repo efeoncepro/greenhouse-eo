@@ -30,7 +30,7 @@ const baseOpening: PublicOpeningPayload = {
   applyUrl: null,
   publishedAt: '2026-07-30T04:00:00.000Z',
   content: null,
-  remoteEligibleCountries: [],
+  remoteEligibleCountries: []
 }
 
 const structuredContent: NonNullable<PublicOpeningPayload['content']> = {
@@ -45,7 +45,7 @@ const structuredContent: NonNullable<PublicOpeningPayload['content']> = {
   remoteModel: '100% remoto con overlap GMT-4.',
   processSteps: ['Screening', 'Muestra de trabajo pagada'],
   benefits: ['15 días hábiles de vacaciones'],
-  compensation: { currency: 'USD', minValue: 1100, maxValue: 1300, unitText: 'MONTH' },
+  compensation: { currency: 'USD', minValue: 1100, maxValue: 1300, unitText: 'MONTH' }
 }
 
 describe('buildJobPostingJsonLd — elegibilidad remota', () => {
@@ -60,7 +60,7 @@ describe('buildJobPostingJsonLd — elegibilidad remota', () => {
     expect(jsonLd!.jobLocationType).toBe('TELECOMMUTE')
     expect(jsonLd!.applicantLocationRequirements).toEqual([
       { '@type': 'Country', name: 'CL' },
-      { '@type': 'Country', name: 'CO' },
+      { '@type': 'Country', name: 'CO' }
     ])
     expect(jsonLd!.jobLocation).toBeUndefined()
   })
@@ -70,13 +70,13 @@ describe('buildJobPostingJsonLd — híbrida/presencial (vacantes de país espec
   it('híbrida con city+country emite jobLocation estructurado, sin TELECOMMUTE', () => {
     const jsonLd = buildJobPostingJsonLd(
       { ...baseOpening, workMode: 'hybrid', city: 'Santiago', country: 'Chile', remoteEligibleCountries: [] },
-      BASE_URL,
+      BASE_URL
     )
 
     expect(jsonLd).not.toBeNull()
     expect(jsonLd!.jobLocation).toEqual({
       '@type': 'Place',
-      address: { '@type': 'PostalAddress', addressLocality: 'Santiago', addressCountry: 'Chile' },
+      address: { '@type': 'PostalAddress', addressLocality: 'Santiago', addressCountry: 'Chile' }
     })
     expect(jsonLd!.jobLocationType).toBeUndefined()
     expect(jsonLd!.applicantLocationRequirements).toBeUndefined()
@@ -85,7 +85,7 @@ describe('buildJobPostingJsonLd — híbrida/presencial (vacantes de país espec
   it('presencial sin city+country NO emite schema (officeLocation libre no estructura dirección)', () => {
     const jsonLd = buildJobPostingJsonLd(
       { ...baseOpening, workMode: 'onsite', officeLocation: 'Oficina Providencia', city: null, country: null },
-      BASE_URL,
+      BASE_URL
     )
 
     expect(jsonLd).toBeNull()
@@ -98,23 +98,20 @@ describe('buildJobPostingJsonLd — híbrida/presencial (vacantes de país espec
 
 describe('buildJobPostingJsonLd — salario, directApply y lifecycle', () => {
   it('baseSalary SOLO desde compensación estructurada; el texto libre nunca se convierte', () => {
-    const withoutStructured = buildJobPostingJsonLd(
-      { ...baseOpening, remoteEligibleCountries: ['CL'] },
-      BASE_URL,
-    )
+    const withoutStructured = buildJobPostingJsonLd({ ...baseOpening, remoteEligibleCountries: ['CL'] }, BASE_URL)
 
     expect(withoutStructured!.baseSalary).toBeUndefined()
     expect(JSON.stringify(withoutStructured)).not.toContain('según experiencia')
 
     const withStructured = buildJobPostingJsonLd(
       { ...baseOpening, remoteEligibleCountries: ['CL'], content: structuredContent },
-      BASE_URL,
+      BASE_URL
     )
 
     expect(withStructured!.baseSalary).toEqual({
       '@type': 'MonetaryAmount',
       currency: 'USD',
-      value: { '@type': 'QuantitativeValue', minValue: 1100, maxValue: 1300, unitText: 'MONTH' },
+      value: { '@type': 'QuantitativeValue', minValue: 1100, maxValue: 1300, unitText: 'MONTH' }
     })
   })
 
@@ -127,7 +124,7 @@ describe('buildJobPostingJsonLd — salario, directApply y lifecycle', () => {
 
   it('sin publishedAt no hay schema (el retiro de una vacante es el 404 del reader)', () => {
     expect(
-      buildJobPostingJsonLd({ ...baseOpening, remoteEligibleCountries: ['CL'], publishedAt: null }, BASE_URL),
+      buildJobPostingJsonLd({ ...baseOpening, remoteEligibleCountries: ['CL'], publishedAt: null }, BASE_URL)
     ).toBeNull()
   })
 
@@ -138,7 +135,7 @@ describe('buildJobPostingJsonLd — salario, directApply y lifecycle', () => {
 
     const ambiguous = buildJobPostingJsonLd(
       { ...baseOpening, remoteEligibleCountries: ['CL'], employmentMode: 'Contrato indefinido' },
-      BASE_URL,
+      BASE_URL
     )
 
     expect(ambiguous!.employmentType).toBeUndefined()
@@ -149,7 +146,7 @@ describe('buildJobPostingJsonLd — descripción HTML segura desde el contenido 
   it('con bloque estructurado la descripción refleja sus secciones, escapadas', () => {
     const jsonLd = buildJobPostingJsonLd(
       { ...baseOpening, remoteEligibleCountries: ['CL'], content: structuredContent },
-      BASE_URL,
+      BASE_URL
     )
 
     const description = String(jsonLd!.description)
@@ -179,10 +176,10 @@ describe('buildJobPostingJsonLd — descripción HTML segura desde el contenido 
           remoteModel: 'Trabajo 100% remoto con pago directo de Efeonce fuera de Chile.',
           processSteps: [],
           benefits: [],
-          compensation: null,
-        },
+          compensation: null
+        }
       },
-      BASE_URL,
+      BASE_URL
     )
 
     const description = String(jsonLd!.description)
@@ -192,10 +189,52 @@ describe('buildJobPostingJsonLd — descripción HTML segura desde el contenido 
     expect(description).toContain('<p>Trabajo 100% remoto con pago directo de Efeonce fuera de Chile.</p>')
   })
 
+  it('una promesa aislada complementa la narrativa legacy en vez de borrarla', () => {
+    const jsonLd = buildJobPostingJsonLd(
+      {
+        ...baseOpening,
+        remoteEligibleCountries: ['CL'],
+        content: { ...structuredContent, intro: null, outcomes: [], workItems: [], essentials: [], learnables: [] }
+      },
+      BASE_URL
+    )
+
+    const description = String(jsonLd!.description)
+
+    expect(description).toContain('Vas a operar el motor editorial')
+    expect(description).toContain('Producir piezas pillar con QA.')
+    expect(description).toContain('Redacción nativa')
+  })
+
+  it('una habilidad aislada complementa requisitos y nice-to-have legacy', () => {
+    const jsonLd = buildJobPostingJsonLd(
+      {
+        ...baseOpening,
+        remoteEligibleCountries: ['CL'],
+        content: {
+          ...structuredContent,
+          promise: null,
+          intro: null,
+          outcomes: [],
+          workItems: [],
+          essentials: ['Criterio editorial'],
+          learnables: []
+        }
+      },
+      BASE_URL
+    )
+
+    const description = String(jsonLd!.description)
+
+    expect(description).toContain('Criterio editorial')
+    expect(description).toContain('Redacción nativa')
+    expect(description).toContain('AEO/GEO')
+  })
+
   it('un bloque con narrativa núcleo SÍ reemplaza la prosa legacy (sin duplicar el rol)', () => {
     const jsonLd = buildJobPostingJsonLd(
       { ...baseOpening, remoteEligibleCountries: ['CL'], content: structuredContent },
-      BASE_URL,
+      BASE_URL
     )
 
     const description = String(jsonLd!.description)
@@ -217,9 +256,9 @@ describe('buildJobPostingJsonLd — descripción HTML segura desde el contenido 
       {
         ...baseOpening,
         remoteEligibleCountries: ['CL'],
-        content: { ...structuredContent, promise: 'Rol <script>alert(1)</script> & más' },
+        content: { ...structuredContent, promise: 'Rol <script>alert(1)</script> & más' }
       },
-      BASE_URL,
+      BASE_URL
     )
 
     const description = String(jsonLd!.description)
@@ -243,7 +282,7 @@ describe('buildJobPostingJsonLd — descripción HTML segura desde el contenido 
   it('nunca filtra sentinels internos: el payload público es la única fuente', () => {
     const jsonLd = buildJobPostingJsonLd(
       { ...baseOpening, remoteEligibleCountries: ['CL'], content: structuredContent },
-      BASE_URL,
+      BASE_URL
     )
 
     const serialized = JSON.stringify(jsonLd)

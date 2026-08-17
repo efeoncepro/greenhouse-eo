@@ -50,7 +50,7 @@ const internalOpening: HiringOpening = {
     remoteModel: '100% remoto con overlap GMT-4.',
     processSteps: ['Screening', 'Muestra de trabajo pagada'],
     benefits: ['15 días hábiles de vacaciones'],
-    compensation: null,
+    compensation: null
   },
   publicRemoteEligibleCountries: ['CL', 'CO'],
   applyUrl: null,
@@ -58,7 +58,7 @@ const internalOpening: HiringOpening = {
   publishedAt: '2026-07-07T00:00:00.000Z',
   createdBy: 'user-secret-owner',
   createdAt: '2026-07-01T00:00:00.000Z',
-  updatedAt: '2026-07-07T00:00:00.000Z',
+  updatedAt: '2026-07-07T00:00:00.000Z'
 }
 
 describe('buildPublicOpeningPayload — allowlist de proyección pública', () => {
@@ -101,8 +101,8 @@ describe('buildPublicOpeningPayload — allowlist de proyección pública', () =
         'skillTags',
         'summary',
         'title',
-        'workMode',
-      ].sort(),
+        'workMode'
+      ].sort()
     )
   })
 
@@ -115,7 +115,15 @@ describe('buildPublicOpeningPayload — allowlist de proyección pública', () =
     // El contenido estructurado tampoco puede transportar sentinels internos.
     const serialized = JSON.stringify(payload.content)
 
-    for (const sentinel of ['FALCON', 'user-secret-owner', 'org-confidential', 'CLP 3.5M-4.2M', 'internal-band-C', 'cliente sensible', 'bench']) {
+    for (const sentinel of [
+      'FALCON',
+      'user-secret-owner',
+      'org-confidential',
+      'CLP 3.5M-4.2M',
+      'internal-band-C',
+      'cliente sensible',
+      'bench'
+    ]) {
       expect(serialized).not.toContain(sentinel)
     }
   })
@@ -124,7 +132,7 @@ describe('buildPublicOpeningPayload — allowlist de proyección pública', () =
     const payload = buildPublicOpeningPayload({
       ...internalOpening,
       publicContent: null,
-      publicRemoteEligibleCountries: [],
+      publicRemoteEligibleCountries: []
     })
 
     expect(payload.content).toBeNull()
@@ -141,10 +149,9 @@ describe('buildPublicOpeningPayload — allowlist de proyección pública', () =
     expect(payload.skillTags).toEqual(['Diseño', 'Figma'])
   })
 
-  it('cae al título interno solo si no hay público (openings legacy)', () => {
-    const payload = buildPublicOpeningPayload({ ...internalOpening, publicTitle: null })
-
-    // Fallback controlado: sin public_title mostramos el internal_title (ya sin codename en casos reales).
-    expect(payload.title).toBe(internalOpening.internalTitle)
+  it('falla cerrado si no hay título público y jamás expone el título interno', () => {
+    expect(() => buildPublicOpeningPayload({ ...internalOpening, publicTitle: null })).toThrowError(
+      expect.objectContaining({ code: 'hiring_opening_public_title_required' })
+    )
   })
 })
