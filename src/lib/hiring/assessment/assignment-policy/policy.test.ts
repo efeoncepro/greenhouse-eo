@@ -96,6 +96,20 @@ describe('TASK-1719 Slice 1 — nacimiento seguro de la policy (ADR D5.1)', () =
     expect(event?.values).toContain('configured')
   })
 
+  it('una policy NO puede nacer en on_stage_entry: pasar a automático es un acto aparte', async () => {
+    withHandlers([{ match: /INSERT INTO greenhouse_hiring\.hiring_opening_assessment_policy\b/, rows: [POLICY_ROW] }])
+
+    await expect(
+      configureOpeningAssessmentPolicy(
+        { openingId: 'opng-1', templateId: 'atpl-1', mode: 'on_stage_entry', triggerStage: 'shortlisted' },
+        'user-1',
+      ),
+    ).rejects.toMatchObject({ code: 'assessment_policy_must_be_born_manual' })
+
+    // Nada se escribió: ni la policy ni su evento.
+    expect(queries.some(q => /INSERT INTO greenhouse_hiring\.hiring_opening_assessment_policy\s/.test(q.text))).toBe(false)
+  })
+
   it('rechaza on_stage_entry sin etapa trigger (una policy automática que nunca dispara)', async () => {
     withHandlers()
 

@@ -191,12 +191,32 @@ export const attachAssignmentInstance = async (
     [assignmentId, input.assessmentId, input.outcome, input.outcomeReason],
   )
 
+  // 0 filas = el assignment desapareció entre el INSERT y el cierre (imposible dentro de la
+  // misma transacción, así que si pasa es un bug). Sin este guardia, `normalizeAssignment`
+  // recibía `undefined` y reventaba con un TypeError opaco en vez de decir qué falló.
+  if (!rows[0]) {
+    throw new HiringValidationError(
+      'No se pudo cerrar la asignación de la evaluación.',
+      'assessment_assignment_attach_failed',
+      500,
+      { assignmentId },
+    )
+  }
+
   return normalizeAssignment(rows[0])
 }
 
 /**
  * Cantidad de asignaciones EFECTIVAS de una policy en su ventana (D5.2). Cuenta sólo
  * `assigned`: un `held`/`blocked` no gastó correo, así que no consume el cap.
+ *
+ * **NO filtra `superseded_at`, a propósito.** El cap limita CORREOS SALIDOS, no filas vigentes:
+ * superseder una asignación no des-envía el correo que el candidato ya recibió. Con el filtro,
+ * supersedear liberaba presupuesto retroactivamente y el freno de blast radius dejaba de frenar
+ * justo en el escenario que existe para contener.
+ *
+ * El caller DEBE tener la fila de policy bloqueada (`FOR UPDATE`) antes de llamar: sin eso, dos
+ * assignments concurrentes leen el mismo conteo y pasan los dos.
  */
 export const countAssignedInWindow = async (
   client: PoolClient | null,
@@ -208,7 +228,6 @@ export const countAssignedInWindow = async (
     `SELECT COUNT(*)::int AS total FROM greenhouse_hiring.hiring_assessment_assignment
      WHERE policy_id = $1
        AND outcome = 'assigned'
-       AND superseded_at IS NULL
        AND created_at > NOW() - make_interval(mins => $2)`,
     [policyId, Math.max(1, Math.floor(windowMinutes))],
   )

@@ -60,23 +60,49 @@ export const resolveActivePolicyForApplication = async (
 /**
  * Digest del cuestionario que HOY resolvería la plantilla. Corre la MISMA resolución en vivo
  * que `listPublicAssessmentQuestions` (SQL compartido) y hashea la lista ordenada de
- * (module, competency, question). No congela nada — el snapshot inmutable por instancia es
- * requisito duro antes de expandir (ADR D4) — pero permite detectar drift barato: hay
- * competencias con UNA sola pregunta activa, y archivarla deja el módulo vacío sin ruido.
+ * (module, competency, question) **junto con el CONTENIDO de cada pregunta**. No congela nada
+ * — el snapshot inmutable por instancia es requisito duro antes de expandir (ADR D4) — pero
+ * permite detectar drift barato: hay competencias con UNA sola pregunta activa, y archivarla
+ * deja el módulo vacío sin ruido.
+ *
+ * El contenido entra al hash a propósito: hashear sólo IDs deja el digest CIEGO a editar el
+ * `prompt`, las alternativas, el tipo o el nivel de una pregunta existente — que es justo el
+ * riesgo D4 (dos candidatos "del mismo test" rindiendo exámenes distintos con el mismo
+ * `template_id` y la misma versión). Un cambio de contenido sin cambio de ID es el caso que un
+ * detector de drift tiene que ver.
  */
 export const resolveTemplateContentDigest = async (
   templateId: string,
   client: PoolClient | null = null,
 ): Promise<{ digest: string; moduleCount: number; questionCount: number; emptyModuleCount: number }> => {
-  const rows = await runQuery<{ module_id: unknown; competency_id: unknown; question_id: unknown }>(
-    client,
-    PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL,
-    [templateId],
-  )
+  const rows = await runQuery<{
+    module_id: unknown
+    competency_id: unknown
+    question_id: unknown
+    level: unknown
+    type: unknown
+    prompt: unknown
+    options_json: unknown
+  }>(client, PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL, [templateId])
 
-  const lines = rows.map(
-    row => `${str(row.module_id)}:${str(row.competency_id)}:${str(row.question_id) || '-'}`,
-  )
+  const lines = rows.map(row => {
+    const content = createHash('sha256')
+      .update(
+        [
+          str(row.level),
+          str(row.type),
+          str(row.prompt),
+          // `options_json` llega como objeto (jsonb) o string según el driver; se normaliza para
+          // que el digest no cambie por la representación, sólo por el contenido real.
+          typeof row.options_json === 'string' ? row.options_json : JSON.stringify(row.options_json ?? null),
+        ].join('|'),
+      )
+      .digest('hex')
+
+    return `${str(row.module_id)}:${str(row.competency_id)}:${str(row.question_id) || '-'}:${
+      row.question_id == null ? '-' : content
+    }`
+  })
 
   const modules = new Set(rows.map(row => str(row.module_id)))
   const emptyModules = new Set(rows.filter(row => row.question_id == null).map(row => str(row.module_id)))
@@ -98,8 +124,15 @@ export interface ApplicationAwaitingAssignment {
 /**
  * PREDICADO CANÓNICO — postulaciones de la policy que HOY cumplen la condición de trigger y
  * todavía no tienen un resultado terminal de assignment. Es el mismo predicado que usan el
- * consumer reactivo y la reconciliación: la reconciliación no es una red de seguridad
- * opcional, es la que atrapa el trigger que el coalescing del lane se comió (ADR D0a).
+ * consumer reactivo y la reconciliación (ADR D0a).
+ *
+ * **ALCANCE DECLARADO (Delta 2026-08-17).** Esta reconciliación recupera **sólo** a quien
+ * SIGUE en la etapa trigger: el evento que se perdió (coalescing, worker caído, dead-letter)
+ * mientras la postulación no se movió. A quien cruzó la etapa trigger y ya avanzó — el
+ * `shortlisted → interview` dentro de la ventana de coalescing — **este reader no lo ve, y no
+ * debe verlo**: su etapa vigente ya no es la del trigger, y el propio command lo resolvería
+ * `stale: stage_changed`. Ese caso NO se recupera solo; es
+ * `resolveApplicationsMissedTriggerAwaitingHuman` + decisión humana.
  *
  * Deriva TODO del estado vigente en PostgreSQL:
  * - la etapa actual de la postulación es la `trigger_stage` de la policy (nunca `payload.stage`);
@@ -150,5 +183,83 @@ export const resolveApplicationsAwaitingAssignment = async (
     applicationId: str(row.application_id),
     openingId: str(row.opening_id),
     stage: policy.triggerStage as OpeningAssessmentTriggerStage,
+  }))
+}
+
+/**
+ * Etapas que están AGUAS ABAJO de cada etapa trigger en la progresión candidate-facing. Se
+ * declaran explícitas en vez de derivarse por índice del array de etapas: el orden de
+ * `HIRING_APPLICATION_STAGES` mezcla progresión con salidas (`rejected`, `withdrawn`,
+ * `closed`), y una lista implícita por posición es justo el tipo de cosa que se rompe en
+ * silencio cuando alguien agrega una etapa.
+ */
+const STAGES_DOWNSTREAM_OF_TRIGGER: Record<OpeningAssessmentTriggerStage, readonly string[]> = {
+  shortlisted: ['client_review', 'interview', 'decision_pending', 'selected', 'backup', 'handoff_ready'],
+  interview: ['decision_pending', 'selected', 'backup', 'handoff_ready'],
+}
+
+export interface ApplicationMissedTrigger extends ApplicationAwaitingAssignment {
+  /** Etapa VIGENTE, ya posterior a la del trigger. */
+  currentStage: string
+}
+
+/**
+ * COLA HUMANA — postulaciones que la reconciliación automática NO puede recuperar: avanzaron
+ * más allá de la etapa trigger sin que quedara ningún outcome de assignment registrado.
+ *
+ * Existe porque la promesa "la reconciliación atrapa lo que el coalescing perdió" sólo se
+ * cumple mientras la postulación siga en la etapa trigger. Cuando ya avanzó, no hay rastro
+ * durable de que cruzó esa etapa fuera del payload de `outbox_events` — y ese payload es
+ * exactamente la fuente que el ADR declara no confiable para decidir etapa (D0a, invariante 1).
+ * Consultarlo además significaría un seq scan de la tabla más caliente de la plataforma
+ * (`outbox_events` no tiene índice por `event_type`, `aggregate_id` ni `payload`) sobre datos
+ * con retención declarada como borrable a futuro.
+ *
+ * Por eso el reader deriva TODO del estado vigente y **no ejecuta nada**: entrega una lista
+ * operable para que una persona decida si esa prueba todavía tiene sentido — decisión que
+ * además roza una Open Question abierta del ADR (qué pasa al avanzar a `interview` con el test
+ * de `shortlisted`). Sobre-incluye a quien llegó a la etapa posterior sin pasar por la trigger:
+ * es deliberado, un falso positivo en una cola humana cuesta una mirada, un falso negativo
+ * cuesta un candidato sin evaluar y sin señal.
+ */
+export const resolveApplicationsMissedTriggerAwaitingHuman = async (
+  policyId: string,
+  client: PoolClient | null = null,
+  limit = 200,
+): Promise<ApplicationMissedTrigger[]> => {
+  const policy = await getPolicyById(policyId, client)
+
+  if (!policy || policy.state === 'disabled' || !policy.triggerStage) return []
+
+  const downstream = STAGES_DOWNSTREAM_OF_TRIGGER[policy.triggerStage]
+
+  const rows = await runQuery<{ application_id: unknown; opening_id: unknown; stage: unknown }>(
+    client,
+    `SELECT app.application_id, app.opening_id, app.stage
+     FROM greenhouse_hiring.hiring_application app
+     WHERE app.opening_id = $1
+       AND app.stage = ANY($2::text[])
+       AND app.decision IS NULL
+       AND NOT EXISTS (
+         SELECT 1 FROM greenhouse_hiring.hiring_assessment a
+         WHERE a.application_id = app.application_id
+           AND a.template_id = $3
+           AND a.method = 'candidate_test'
+       )
+       AND NOT EXISTS (
+         SELECT 1 FROM greenhouse_hiring.hiring_assessment_assignment asg
+         WHERE asg.application_id = app.application_id
+           AND asg.policy_id = $4
+       )
+     ORDER BY app.updated_at
+     LIMIT $5`,
+    [policy.openingId, [...downstream], policy.templateId, policy.policyId, limit],
+  )
+
+  return rows.map(row => ({
+    applicationId: str(row.application_id),
+    openingId: str(row.opening_id),
+    stage: policy.triggerStage as OpeningAssessmentTriggerStage,
+    currentStage: str(row.stage),
   }))
 }

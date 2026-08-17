@@ -102,7 +102,8 @@ const baseHandlers = (overrides: Handler[] = []): Handler[] => [
   { match: /FROM greenhouse_hiring\.hiring_application app\b/, rows: [APPLICATION_ROW] },
   { match: /FROM greenhouse_hiring\.hiring_assessment_template\b/, rows: [{ status: 'active' }] },
   { match: /SELECT COUNT\(\*\)::int AS total/, rows: [{ total: 0 }] },
-  { match: /INSERT INTO greenhouse_hiring\.hiring_assessment_assignment\b/, rows: [ASSIGNMENT_ROW] },
+  // El INSERT registra el intent NO TERMINAL; el UPDATE es el que lo cierra a `assigned`.
+  { match: /INSERT INTO greenhouse_hiring\.hiring_assessment_assignment\b/, rows: [{ ...ASSIGNMENT_ROW, outcome: 'intent' }] },
   { match: /UPDATE greenhouse_hiring\.hiring_assessment_assignment\b/, rows: [{ ...ASSIGNMENT_ROW, assessment_id: 'asmt-1' }] },
   { match: /INSERT INTO greenhouse_hiring\.hiring_assessment\b/, rows: [ASSESSMENT_ROW] },
 ]
@@ -155,6 +156,39 @@ describe('TASK-1719 Slice 2 — happy path del command común', () => {
     const instanceInsert = queries.find(q => /INSERT INTO greenhouse_hiring\.hiring_assessment\s/.test(q.text))
 
     expect(instanceInsert?.values[1]).toBe('atpl-1')
+  })
+
+  it('el ledger registra `intent` ANTES de la instancia y sólo después lo cierra a `assigned`', async () => {
+    handlers = baseHandlers()
+
+    await assignAssessmentFromPolicy(autoInput)
+
+    const ledgerInsert = queries.find(q => /INSERT INTO greenhouse_hiring\.hiring_assessment_assignment\b/.test(q.text))
+    const ledgerUpdate = queries.find(q => /UPDATE greenhouse_hiring\.hiring_assessment_assignment\b/.test(q.text))
+
+    // `assigned` con `assessment_id = NULL` viola el CHECK del ledger: el intent es el hecho
+    // durable, la instancia su consecuencia, y el estado intermedio tiene que ser no terminal.
+    expect(ledgerInsert?.values).toContain('intent')
+    expect(ledgerInsert?.values).not.toContain('assigned')
+    expect(ledgerUpdate?.values).toContain('assigned')
+    expect(ledgerUpdate?.values).toContain('asmt-1')
+  })
+
+  it('bloquea la fila de policy con FOR UPDATE antes de decidir (serializa el cap y el kill switch)', async () => {
+    handlers = baseHandlers()
+
+    await assignAssessmentFromPolicy(autoInput)
+
+    const policyRead = queries.find(q => /FROM greenhouse_hiring\.hiring_opening_assessment_policy\b/.test(q.text))
+
+    expect(policyRead?.text).toMatch(/FOR UPDATE/)
+    // El lock tiene que tomarse ANTES del conteo del cap: si no, dos assigns concurrentes leen
+    // el mismo total y pasan los dos.
+    const policyIndex = queries.findIndex(q => /FOR UPDATE/.test(q.text))
+    const countIndex = queries.findIndex(q => /SELECT COUNT\(\*\)::int AS total/.test(q.text))
+
+    expect(policyIndex).toBeGreaterThanOrEqual(0)
+    expect(policyIndex).toBeLessThan(countIndex)
   })
 })
 
@@ -250,17 +284,20 @@ describe('TASK-1719 Slice 2 — límite de autoridad (ADR D2 capa 3)', () => {
 })
 
 describe('TASK-1719 Slice 2 — readiness fail-closed (ADR D5.3)', () => {
-  it('sin email ⇒ held: missing_email (no se crea instancia ni correo)', async () => {
+  it('sin email ⇒ blocked: missing_email + señal (no se crea instancia ni correo)', async () => {
     handlers = baseHandlers([
       { match: /FROM greenhouse_hiring\.hiring_application app\b/, rows: [{ ...APPLICATION_ROW, canonical_email: null }] },
-      { match: /INSERT INTO greenhouse_hiring\.hiring_assessment_assignment\b/, rows: [{ ...ASSIGNMENT_ROW, outcome: 'held', outcome_reason: 'missing_email' }] },
+      { match: /INSERT INTO greenhouse_hiring\.hiring_assessment_assignment\b/, rows: [{ ...ASSIGNMENT_ROW, outcome: 'blocked', outcome_reason: 'missing_email' }] },
     ])
 
     const result = await assignAssessmentFromPolicy(autoInput)
 
-    expect(result).toMatchObject({ status: 'held', reasonCode: 'missing_email' })
+    expect(result).toMatchObject({ status: 'blocked', reasonCode: 'missing_email' })
     expect(queries.some(q => /INSERT INTO greenhouse_hiring\.hiring_assessment\s/.test(q.text))).toBe(false)
     expect(eventTypes()).not.toContain('hiring.assessment.assigned')
+    // `held` está reservado al hold humano: un dato incompleto tiene que emitir la señal de
+    // auto-detención, no confundirse con "una persona lo detuvo".
+    expect(eventTypes()).toContain('hiring.assessment.auto_assignment_blocked')
   })
 
   it('dominio no entregable ⇒ blocked: unverified_recipient + señal de auto-detención', async () => {
@@ -285,8 +322,8 @@ describe('TASK-1719 Slice 2 — readiness fail-closed (ADR D5.3)', () => {
   })
 
   it('el predicado de readiness es puro y fail-closed', () => {
-    expect(resolveRecipientReadiness(null)).toMatchObject({ ok: false, outcome: 'held', reasonCode: 'missing_email' })
-    expect(resolveRecipientReadiness('   ')).toMatchObject({ ok: false, reasonCode: 'missing_email' })
+    expect(resolveRecipientReadiness(null)).toMatchObject({ ok: false, outcome: 'blocked', reasonCode: 'missing_email' })
+    expect(resolveRecipientReadiness('   ')).toMatchObject({ ok: false, outcome: 'blocked', reasonCode: 'missing_email' })
     expect(resolveRecipientReadiness('a@b.invalid')).toMatchObject({ ok: false, outcome: 'blocked' })
     expect(resolveRecipientReadiness('a@b.local')).toMatchObject({ ok: false, outcome: 'blocked' })
     expect(resolveRecipientReadiness('a@b')).toMatchObject({ ok: false, outcome: 'blocked' })
@@ -306,6 +343,19 @@ describe('TASK-1719 Slice 2 — cap de volumen (ADR D5.2)', () => {
     expect(result).toMatchObject({ status: 'blocked', reasonCode: 'volume_cap' })
     expect(queries.some(q => /INSERT INTO greenhouse_hiring\.hiring_assessment\s/.test(q.text))).toBe(false)
     expect(eventTypes()).toContain('hiring.assessment.auto_assignment_blocked')
+  })
+
+  it('el conteo del cap NO se descuenta al superseder: mide correos salidos, no filas vigentes', async () => {
+    handlers = baseHandlers()
+
+    await assignAssessmentFromPolicy(autoInput)
+
+    const count = queries.find(q => /SELECT COUNT\(\*\)::int AS total/.test(q.text))
+
+    // Supersederar una asignación no des-envía el correo que el candidato ya recibió; filtrar
+    // por `superseded_at` liberaba presupuesto retroactivamente y desarmaba el freno.
+    expect(count?.text).not.toMatch(/superseded_at/)
+    expect(count?.text).toMatch(/outcome = 'assigned'/)
   })
 
   it('el cap NO aplica a una confirmación humana (ya pasó por un juicio)', async () => {
@@ -394,6 +444,14 @@ describe('TASK-1719 Slice 2 — outcomes terminales derivados del estado vigente
     await expect(assignAssessmentFromPolicy(autoInput)).resolves.toMatchObject({
       status: 'blocked',
       reasonCode: 'template_inactive',
+    })
+  })
+
+  it('si el cierre del ledger no toca ninguna fila, falla loud (no TypeError opaco)', async () => {
+    handlers = baseHandlers([{ match: /UPDATE greenhouse_hiring\.hiring_assessment_assignment\b/, rows: [] }])
+
+    await expect(assignAssessmentFromPolicy(autoInput)).rejects.toMatchObject({
+      code: 'assessment_assignment_attach_failed',
     })
   })
 

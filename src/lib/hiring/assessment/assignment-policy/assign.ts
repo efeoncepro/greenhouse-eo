@@ -18,7 +18,7 @@ import {
 import { HiringNotFoundError, HiringValidationError } from '../../errors'
 import { insertCandidateTest } from '../instances'
 import { attachAssignmentInstance, countAssignedInWindow, recordAssignment } from './assignment-store'
-import { getPolicyById } from './store'
+import { lockPolicyForUpdate } from './store'
 
 /**
  * TASK-1719 Slice 2 — COMMAND COMÚN de assignment. Las dos rutas (confirmación humana y
@@ -94,13 +94,21 @@ const loadTemplateStatus = async (client: PoolClient, templateId: string): Promi
   return (result.rows[0] as { status: string } | undefined)?.status ?? null
 }
 
-/** Readiness FAIL-CLOSED del destinatario: la duda nunca se resuelve enviando. */
+/**
+ * Readiness FAIL-CLOSED del destinatario: la duda nunca se resuelve enviando.
+ *
+ * Todos los fallos de readiness son `blocked`, NUNCA `held`. `held` está reservado al hold
+ * HUMANO: mezclarlos borra la distinción entre "una persona lo detuvo" y "el dato está
+ * incompleto", y además silencia la señal — sólo la rama `blocked` publica
+ * `hiring.assessment.auto_assignment_blocked`, que es la que la risk matrix usa para detectar
+ * "candidato sin email recibe asignación inútil".
+ */
 export const resolveRecipientReadiness = (
   email: string | null,
-): { ok: true } | { ok: false; outcome: 'held' | 'blocked'; reasonCode: AssessmentAssignmentReasonCode } => {
+): { ok: true } | { ok: false; outcome: 'blocked'; reasonCode: AssessmentAssignmentReasonCode } => {
   const normalized = (email ?? '').trim().toLowerCase()
 
-  if (!normalized) return { ok: false, outcome: 'held', reasonCode: 'missing_email' }
+  if (!normalized) return { ok: false, outcome: 'blocked', reasonCode: 'missing_email' }
 
   const at = normalized.lastIndexOf('@')
   const domain = at > 0 ? normalized.slice(at + 1) : ''
@@ -158,6 +166,16 @@ const resultFromRecord = (
   }
 
   switch (record.outcome) {
+    // `intent` no es un outcome comunicable: es el estado efímero entre el INSERT del ledger y
+    // el UPDATE que le adjunta la instancia, en la misma transacción. Verlo en reposo significa
+    // que un command murió a mitad de camino ⇒ es un FAULT (el dispatcher reintenta sin
+    // comunicar), jamás un resultado que el fan-in pueda degradar al correo genérico.
+    case 'intent':
+      throw new HiringValidationError(
+        'La asignación quedó a medio registrar.',
+        'assessment_assignment_intent_unresolved',
+        500,
+      )
     case 'assigned':
       return {
         status: 'assigned',
@@ -214,11 +232,11 @@ export const assignAssessmentFromPolicy = async (
   }
 
   return withGreenhousePostgresTransaction(async (client) => {
-    const policy = await getPolicyById(policyId, client)
-
-    if (!policy) {
-      throw new HiringNotFoundError('La policy de evaluación no existe.', 'assessment_policy_not_found')
-    }
+    // `FOR UPDATE` sobre la fila de policy: serializa TODOS los assignments de esta policy
+    // (grano exacto del cap de volumen) y ordena la carrera contra un `disable` concurrente.
+    // Sin el lock, dos assigns simultáneos con cap=3 y count=2 pasaban los DOS, y un kill
+    // switch no detenía la asignación en vuelo. `lockPolicyForUpdate` lanza si no existe.
+    const policy = await lockPolicyForUpdate(client, policyId)
 
     const application = await loadApplicationSnapshot(client, applicationId)
 
@@ -246,7 +264,12 @@ export const assignAssessmentFromPolicy = async (
       triggerStage,
       attemptSeq,
       origin: input.origin,
-      outcome: intent.outcome,
+      // El intent es el hecho durable; la instancia es su consecuencia. Por eso se registra
+      // ANTES de crearla — pero `assigned` sin instancia viola
+      // `hiring_assessment_assignment_assigned_instance_ck` (y sería un ledger que miente). Se
+      // escribe el estado NO TERMINAL `intent` y `attachAssignmentInstance` lo cierra a
+      // `assigned | already_assigned` en esta misma transacción.
+      outcome: intent.outcome === 'assigned' ? 'intent' : intent.outcome,
       outcomeReason: intent.reasonCode,
       assessmentId: null,
       actorUserId: input.actorUserId,

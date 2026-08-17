@@ -7926,10 +7926,16 @@ export interface GreenhouseHiringHiringAssessmentAssignment {
   attempt_seq: Generated<number>;
   created_at: Generated<Timestamp>;
   origin: string;
+  /**
+   * TASK-1719: `intent` es NO TERMINAL y EFÍMERO — sólo vive entre el INSERT del intent y el UPDATE que le adjunta la instancia, dentro de la misma transacción. Una fila `intent` en reposo es evidencia de un bug, no un estado operable.
+   */
   outcome: string;
   outcome_reason: string | null;
   policy_id: string;
   policy_version: number;
+  /**
+   * TASK-1719: reservado para el retry gobernado de un outcome terminal-pero-recuperable. NINGÚN write path lo escribe todavía (Slice 4). Hasta entonces, un outcome terminal congela ese (application, policy, versión, etapa, intento) y la recuperación es un command humano.
+   */
   superseded_at: Timestamp | null;
   trigger_stage: string;
   updated_at: Generated<Timestamp>;

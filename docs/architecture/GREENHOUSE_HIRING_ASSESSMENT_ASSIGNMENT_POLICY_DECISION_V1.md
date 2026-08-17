@@ -10,6 +10,87 @@
 
 ---
 
+## Delta 2026-08-17 — auditoría adversarial de Slices 1-2
+
+Auditoría adversarial del código entregado. Once hallazgos; los que cambian esta decisión:
+
+**1. El alcance real de la reconciliación (corrige una promesa que el ADR no cumplía).** D0a y el
+invariante 1 dicen que la reconciliación "atrapa el trigger que el coalescing se comió". Sólo es
+cierto a medias, y conviene decirlo sin adornos: el predicado canónico
+(`resolveApplicationsAwaitingAssignment`) filtra `app.stage = policy.trigger_stage`, así que
+**recupera únicamente a quien SIGUE en la etapa trigger** — el evento perdido (coalescing, worker
+caído, dead-letter) mientras la postulación no se movió. El `shortlisted → interview` dentro de la
+ventana de coalescing —el caso que D0a usa como ejemplo motivador— **no lo recupera nadie**: la
+etapa vigente ya no es la del trigger, el reader no lo ve y el command lo resolvería
+`stale: stage_changed`.
+
+Se evaluó extender el predicado a `greenhouse_sync.outbox_events` (buscar un
+`hiring.application.stage_changed` con la etapa trigger en el payload). **Rechazado**, por tres
+razones que se refuerzan: (a) haría del `payload.stage` la fuente de elegibilidad, que es
+exactamente lo que el invariante 1 declara no confiable; (b) no sería un cambio de reader —
+obligaría a eximir a `origin='reconciliation'` del guardia de etapa vigente en
+`resolveAssignmentIntent`, aflojando el propio D0a y decidiendo de paso la Open Question 5 (qué
+pasa al avanzar a `interview` con el test de `shortlisted`); (c) `outbox_events` no tiene índice
+por `event_type`, `aggregate_id` ni `payload`, así que sería un seq scan de la tabla más caliente
+de la plataforma sobre datos cuya retención está declarada como borrable a futuro.
+
+**Decisión: alcance declarado + cola humana.** La reconciliación automática recupera sólo a quien
+sigue en la etapa trigger. El resto se entrega como **lista operable**
+(`resolveApplicationsMissedTriggerAwaitingHuman`): postulaciones del opening que ya están en una
+etapa posterior a la trigger, sin decisión, sin instancia de esa plantilla y sin ninguna fila en el
+ledger. Deriva todo del estado vigente, **no ejecuta nada** y sobre-incluye a propósito a quien
+llegó a la etapa posterior sin pasar por la trigger: en una cola humana un falso positivo cuesta
+una mirada y un falso negativo cuesta un candidato sin evaluar y sin señal. Una promesa falsa en un
+ADR es peor que un alcance declarado.
+
+**2. `outcome='intent'` (bloqueante corregido).** El ledger violaba su propio CHECK en el happy
+path: se escribía `outcome='assigned'` con `assessment_id=NULL` antes de crear la instancia ⇒
+`23514` en TODA asignación exitosa, error crudo, 500 y dead-letter fabricado. Se agrega el outcome
+**no terminal y efímero** `intent`: el command registra el intent, crea la instancia y cierra la
+fila a `assigned | already_assigned` en la misma transacción. Conserva "el intent es el hecho
+durable" y conserva el CHECK, que sigue prohibiendo el ledger que miente. Una fila `intent` en
+reposo es evidencia de un bug — se trata como fault, nunca como outcome comunicable.
+
+**3. `missing_email` es `blocked`, no `held`.** `held` queda reservado al hold **humano**.
+Degradarlo a `held` mezclaba "una persona lo detuvo" con "el dato está incompleto" y además
+silenciaba la señal: sólo la rama `blocked` publica `hiring.assessment.auto_assignment_blocked`,
+que es la que la risk matrix usa para ese riesgo exacto.
+
+**4. Cap de volumen serializado.** El conteo corría sin bloquear la policy: dos assigns concurrentes
+con cap=3 y count=2 pasaban los dos, y un `disable` concurrente no detenía la asignación en vuelo.
+Ahora el command toma `FOR UPDATE` sobre la fila de policy (grano exacto del cap) antes de decidir.
+Además el conteo **deja de filtrar `superseded_at`**: el cap limita correos salidos, no filas
+vigentes — supersedear no des-envía el correo que el candidato ya recibió.
+
+**5. `attempt_seq` baja a la DB.** El guardia de autoridad (ADR D2 capa 3) vivía sólo en TS y
+`recordAssignment` está exportado. Ahora es `CHECK (origin = 'manual' OR attempt_seq = 1)`.
+
+**6. Digest de contenido, no de IDs.** `template_content_digest` hasheaba sólo
+`(module, competency, question)` — ciego a editar el `prompt`, las alternativas, el tipo o el nivel
+de una pregunta existente, que es justamente el riesgo D4. Ahora el hash incluye el contenido.
+
+**7. La policy no puede nacer `on_stage_entry`.** Que `state` empezara en `draft` no alcanzaba:
+nacer ya en automático deja la automatización a un solo flip de distancia. Pasar a automático es un
+acto deliberado y separado (reconfigurar, que re-audita y devuelve a `draft`).
+
+**8. Correcciones de precisión.** (a) `superseded_at` existe y el índice único parcial lo honra,
+pero **ningún write path lo escribe** — el comentario de la migración del ledger afirmaba que "la
+reconciliación supersede y reintenta"; el supersede es Slice 4 y así queda escrito en la DB. Hasta
+entonces un outcome terminal congela ese `(application, policy, versión, etapa, intento)` y la
+recuperación es un command humano. (b) El nombre del evento del outbox
+(`hiring.assessment.auto_assignment_blocked`, notación por puntos del catálogo) y la clave del
+reliability signal de la risk matrix (`hiring.assessment_auto_assignment_blocked`, notación
+`dominio.snake_case`) difieren por convención de cada registro, no por drift: son la misma
+condición en dos superficies.
+
+**Gate de SQL vivo.** Ninguna query nueva se había ejercido contra PostgreSQL real (ISSUE-071 /
+TASK-893): los tests mockean `client.query` con regex sobre el texto del SQL. Se agrega
+`assign.live.test.ts` (assigned → replay → `blocked: volume_cap` + el CHECK de `attempt_seq`).
+Corrido contra PG real **antes** del fix, falla con el `23514` del hallazgo 2 — que es la prueba de
+que el gate sirve.
+
+---
+
 ## Decisión (resumen ejecutivo)
 
 Greenhouse vincula una `HiringOpening` a una plantilla de assessment mediante una **policy versionada**, y
@@ -333,14 +414,18 @@ etapa→plantilla, sin inferencia, sin modelo, sin puntaje. El invariante que la
 
 ## Invariantes operativos para agentes
 
-1. **NUNCA derivar la etapa trigger desde `payload.stage`** — el consumer reactivo hace coalescing por scope y conserva el último payload, así que la etapa intermedia se pierde en silencio. **SIEMPRE** re-leer el estado vigente en PostgreSQL con **el mismo predicado** que usa el reader de reconciliación.
+1. **NUNCA derivar la etapa trigger desde `payload.stage`** — el consumer reactivo hace coalescing por scope y conserva el último payload, así que la etapa intermedia se pierde en silencio. **SIEMPRE** re-leer el estado vigente en PostgreSQL con **el mismo predicado** que usa el reader de reconciliación. **NUNCA** ampliar ese predicado consultando `outbox_events` para "recuperar" a quien ya avanzó (Delta 2026-08-17): la reconciliación automática cubre **sólo** a quien sigue en la etapa trigger, y el resto va a la cola humana `resolveApplicationsMissedTriggerAwaitingHuman`, que no ejecuta nada.
 2. **NUNCA dejar que el candidato reciba cero comunicación ni dos.** Un solo consumer (`hiring_stage_changed_candidate_comms`) decide `commsIntent` y lo **persiste ANTES de enviar**. Outcome terminal (`held|blocked|stale`) ⇒ degrada al genérico **en la misma ejecución**; fault (throw) ⇒ retry **sin comunicar**. **NUNCA** prometer un test que no existe.
-3. **NUNCA la automatización escribe `attempt_seq > 1`.** Retake y re-asignación post-cancelación son commands humanos con capability y razón.
+3. **NUNCA la automatización escribe `attempt_seq > 1`.** Retake y re-asignación post-cancelación son commands humanos con capability y razón. El guardia vive en TS **y** en la DB (`CHECK (origin = 'manual' OR attempt_seq = 1)`): `recordAssignment` está exportado, así que un guardia sólo-TS lo salta cualquier caller nuevo.
 4. **NUNCA dejar escapar un `23505` crudo del assignment** (fabrica dead-letters): **SIEMPRE** `ON CONFLICT DO NOTHING RETURNING` + re-lectura del ganador sobre el índice parcial existente, patrón `createScoringRun`. **NUNCA** devolver token en la rama `created:false`.
 5. **NUNCA gobernar la policy con `hiring.assessment.author` ni con routeGroup `internal`.** La capability es `hiring.assessment.policy.govern` (role-only, `execute`/`tenant`), granteada en el **mismo PR** que la registra. El assign manual puntual se queda en `author`.
 6. **NUNCA expandir la automatización más allá del canary sin el snapshot inmutable del cuestionario por instancia.** `public-taking` resuelve preguntas en vivo; sin snapshot, dos candidatos "del mismo test" rindieron exámenes distintos. **NUNCA** versionar el template como sustituto: ya está versionado, el problema es la resolución.
 7. **NUNCA una policy nace `enabled`+`on_stage_entry`** (nace `draft`+`manual`; el flip exige capability + opening `published` + audit). **SIEMPRE** cap de volumen por opening/ventana con auto-detención y readiness fail-closed. **NUNCA** planear "probar en staging" como carril aislado: el `ops-worker` es único y compartido. **NUNCA** mover etapas en bulk con el auto encendido.
 8. **NUNCA disparar un assessment desde un score, match o atributo inferido — el trigger es la etapa.** Ese invariante es lo que mantiene esta automatización fuera de "IA de alto riesgo"; romperlo exige una decisión nueva, no una excepción.
+9. **NUNCA escribir `outcome='assigned'` en el ledger sin su `assessment_id`** (viola `hiring_assessment_assignment_assigned_instance_ck` y sería un ledger que miente): el intent se registra como `intent` —no terminal, efímero, sólo dentro de la transacción— y se cierra con `attachAssignmentInstance`. **NUNCA** devolver una fila `intent` como outcome al fan-in de comunicación: es un fault, no una condición estable.
+10. **NUNCA degradar un fallo de readiness a `held`.** `held` es el hold **humano**; todo fallo de dato (`missing_email`, `unverified_recipient`) es `blocked`, que es la única rama que emite `hiring.assessment.auto_assignment_blocked`.
+11. **NUNCA contar el cap de volumen sin bloquear antes la fila de policy (`FOR UPDATE`)** ni filtrando `superseded_at`: el cap mide **correos salidos**, no filas vigentes, y sin el lock dos assigns concurrentes leen el mismo total y pasan los dos.
+12. **NUNCA hashear el `template_content_digest` sólo por IDs.** Debe incluir `prompt`, `options_json`, `type` y `level`: un digest ciego al contenido no detecta el drift D4, que es editar una pregunta existente sin cambiar su ID.
 
 ---
 

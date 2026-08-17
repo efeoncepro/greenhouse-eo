@@ -73,6 +73,15 @@ export const ASSESSMENT_ASSIGNMENT_TRIGGERS = ['shortlisted', 'interview', 'manu
 export type AssessmentAssignmentTrigger = (typeof ASSESSMENT_ASSIGNMENT_TRIGGERS)[number]
 
 export const ASSESSMENT_ASSIGNMENT_OUTCOMES = [
+  /**
+   * NO TERMINAL y EFÍMERO: sólo vive entre el INSERT del intent y el UPDATE que le adjunta la
+   * instancia, dentro de la MISMA transacción. Existe porque el ledger es el hecho durable y la
+   * instancia su consecuencia: escribir `assigned` sin instancia viola
+   * `hiring_assessment_assignment_assigned_instance_ck` (y un ledger que dice `assigned` sin
+   * instancia sería un ledger que miente). Una fila `intent` en reposo es evidencia de un bug,
+   * nunca un outcome comunicable al candidato.
+   */
+  'intent',
   'assigned',
   'already_assigned',
   'held',

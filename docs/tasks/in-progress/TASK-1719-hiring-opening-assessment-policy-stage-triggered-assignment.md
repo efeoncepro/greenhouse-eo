@@ -1,5 +1,36 @@
 # TASK-1719 — Hiring Opening Assessment Policy and Stage-Triggered Candidate Test Assignment
 
+## Delta 2026-08-17 (2) — auditoría adversarial de Slices 1-2 y su corrección
+
+Auditoría adversarial del código de Slices 1-2. Detalle completo y fundamento en el
+**`## Delta 2026-08-17` del ADR**; resumen de lo que cambió en el runtime:
+
+- **Bloqueante cerrado:** el ledger violaba su propio CHECK en el happy path (`outcome='assigned'`
+  con `assessment_id=NULL` antes de crear la instancia ⇒ `23514` en TODA asignación exitosa, 500 y
+  dead-letter fabricado). Se agrega el outcome no terminal **`intent`**; el cierre a
+  `assigned | already_assigned` lo hace `attachAssignmentInstance` en la misma transacción.
+  Migración forward-fix `20260817102245965` (las de Slices 1-2 ya estaban aplicadas y **no** se
+  editan).
+- **Alcance de la reconciliación declarado, no inflado:** recupera **sólo** a quien sigue en la
+  etapa trigger. Quien cruzó la etapa y ya avanzó va a la cola humana
+  `resolveApplicationsMissedTriggerAwaitingHuman` (deriva del estado vigente, no ejecuta nada). Se
+  rechazó extender el predicado a `outbox_events` — haría del `payload.stage` la fuente de
+  elegibilidad (contra el invariante 1), obligaría a aflojar el guardia D0a para
+  `origin='reconciliation'` y sería un seq scan de la tabla más caliente de la plataforma.
+- `missing_email` pasa de `held` a **`blocked`** (`held` es el hold humano; sólo `blocked` emite la
+  señal de auto-detención que la risk matrix usa para ese riesgo).
+- **Cap de volumen serializado** con `FOR UPDATE` sobre la policy, y el conteo deja de filtrar
+  `superseded_at` (mide correos salidos, no filas vigentes).
+- `attempt_seq` baja a la DB: `CHECK (origin = 'manual' OR attempt_seq = 1)`.
+- `template_content_digest` ahora hashea el **contenido** (`prompt`/`options_json`/`type`/`level`),
+  no sólo IDs — antes era ciego a editar una pregunta existente, que es el riesgo D4.
+- Una policy **no puede nacer `on_stage_entry`**; pasar a automático es un acto aparte.
+- Guardia de 0 filas en `attachAssignmentInstance`; corregido el comentario de la migración del
+  ledger que afirmaba un supersede que **nada escribe** (es Slice 4).
+- **Gate de SQL vivo (ISSUE-071 / TASK-893):** `assign.live.test.ts` — ciclo `assigned` → replay
+  `already_assigned` → `blocked: volume_cap` + el CHECK de `attempt_seq`, contra PG real. Corrido
+  **antes** del fix, falla con el `23514` del bloqueante.
+
 ## Delta 2026-08-17 — Slice 0 cerrado: ADR aceptado y correcciones a supuestos de esta spec
 
 ADR canónico: [`GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md`](../../architecture/GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md)

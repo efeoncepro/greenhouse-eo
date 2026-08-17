@@ -199,6 +199,19 @@ export const configureOpeningAssessmentPolicy = async (
     const existing = await findActivePolicyForOpening(openingId, client)
 
     if (!existing) {
+      // D5.1 al pie de la letra: toda policy NACE `draft` + `manual`. Que `state` empiece en
+      // `draft` no alcanza — nacer ya en `on_stage_entry` deja la automatización a un solo flip
+      // de distancia y convierte "configurar" en medio paso hacia "habilitar". Pasar a
+      // automático es un acto deliberado y separado (reconfigurar, que además re-audita y
+      // devuelve la policy a `draft`).
+      if (mode !== 'manual') {
+        throw new HiringValidationError(
+          'La policy nace en modo manual: configúrala primero y luego cámbiala a automática.',
+          'assessment_policy_must_be_born_manual',
+          409,
+        )
+      }
+
       const { policy, created } = await insertPolicy(client, {
         openingId,
         templateId,
