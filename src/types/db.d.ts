@@ -7918,6 +7918,23 @@ export interface GreenhouseHiringHiringAssessmentAiScoringRunItem {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseHiringHiringAssessmentAssignment {
+  actor_user_id: string | null;
+  application_id: string;
+  assessment_id: string | null;
+  assignment_id: Generated<string>;
+  attempt_seq: Generated<number>;
+  created_at: Generated<Timestamp>;
+  origin: string;
+  outcome: string;
+  outcome_reason: string | null;
+  policy_id: string;
+  policy_version: number;
+  superseded_at: Timestamp | null;
+  trigger_stage: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseHiringHiringAssessmentResponse {
   answer_json: Generated<Json>;
   assessment_id: string;
@@ -12609,6 +12626,7 @@ export interface DB {
   "greenhouse_hiring.hiring_assessment_ai_scoring_run": GreenhouseHiringHiringAssessmentAiScoringRun;
   "greenhouse_hiring.hiring_assessment_ai_scoring_run_event": GreenhouseHiringHiringAssessmentAiScoringRunEvent;
   "greenhouse_hiring.hiring_assessment_ai_scoring_run_item": GreenhouseHiringHiringAssessmentAiScoringRunItem;
+  "greenhouse_hiring.hiring_assessment_assignment": GreenhouseHiringHiringAssessmentAssignment;
   "greenhouse_hiring.hiring_assessment_response": GreenhouseHiringHiringAssessmentResponse;
   "greenhouse_hiring.hiring_assessment_template": GreenhouseHiringHiringAssessmentTemplate;
   "greenhouse_hiring.hiring_assessment_template_module": GreenhouseHiringHiringAssessmentTemplateModule;

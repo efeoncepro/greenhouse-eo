@@ -253,6 +253,10 @@ export const AGGREGATE_TYPES = {
   // assessment_id ('asmt-{uuid}').
   hiringAssessmentTemplate: 'hiring_assessment_template',
   hiringAssessment: 'hiring_assessment',
+
+  // TASK-1719 — Ledger de assignment. Identity: assignment_id ('hoaa-{uuid}'). Un intento
+  // vigente por (application, policy, versión, etapa trigger, attempt_seq).
+  hiringAssessmentAssignment: 'hiring_assessment_assignment',
   talentPoolMembership: 'talent_pool_membership',
   talentPoolInvitation: 'talent_pool_invitation',
 
@@ -1158,6 +1162,14 @@ export const EVENT_TYPES = {
   hiringAssessmentSubmitted: 'hiring.assessment.submitted',
   hiringAssessmentScored: 'hiring.assessment.scored',
   hiringCompetencyResultUpdated: 'hiring.competency_result.updated',
+
+  // TASK-1719 — Assignment gobernado de assessment. Payloads IDs-only (assignmentId/
+  // applicationId/policyId/policyVersion/origin/outcome/reason codes), NUNCA email, nombre,
+  // token ni score. `assignment_recorded` registra TODO outcome (incluido `held`);
+  // `auto_assignment_blocked` es la señal de que la automatización se detuvo sola (cap de
+  // volumen o destinatario no verificable). Sin consumer reactivo en Slice 2.
+  hiringAssessmentAssignmentRecorded: 'hiring.assessment.assignment_recorded',
+  hiringAssessmentAutoAssignmentBlocked: 'hiring.assessment.auto_assignment_blocked',
 
   // TASK-1735 — Expediente de Evaluación; payloads IDs-only (noteId/applicationId/kind/actor),
   // nunca el cuerpo de la nota ni PII. Sin consumers reactivos en V1 (audit/observabilidad).

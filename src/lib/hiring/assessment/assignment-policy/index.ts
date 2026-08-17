@@ -5,6 +5,8 @@
 // consumen; ninguno duplica la resolución de plantilla ni acepta `templateId` del caller.
 
 export * from './store'
+export * from './assignment-store'
 export * from './readers'
 export * from './commands'
+export * from './assign'
 export type * from '@/types/hiring-assessment-policy'

@@ -105,10 +105,10 @@ export interface ApplicationAwaitingAssignment {
  * - la etapa actual de la postulación es la `trigger_stage` de la policy (nunca `payload.stage`);
  * - la postulación no tiene decisión formal (`decision IS NULL`);
  * - no existe una instancia de esa plantilla en un estado que ya cuenta como asignada
- *   (`assigned|sent|in_progress|submitted|scored`).
- *
- * Slice 2 agrega la exclusión por ledger vigente (un outcome terminal registrado no se
- * reintenta hasta que alguien lo supersede).
+ *   (`assigned|sent|in_progress|submitted|scored`);
+ * - no hay una fila VIGENTE del ledger para (application, policy, versión, etapa) — un
+ *   outcome terminal ya registrado no se reintenta hasta que alguien lo supersede
+ *   explícitamente, para que un `blocked: volume_cap` no se convierta en un bucle de correos.
  */
 export const resolveApplicationsAwaitingAssignment = async (
   policyId: string,
@@ -133,9 +133,17 @@ export const resolveApplicationsAwaitingAssignment = async (
            AND a.method = 'candidate_test'
            AND a.status IN ('assigned', 'sent', 'in_progress', 'submitted', 'scored')
        )
+       AND NOT EXISTS (
+         SELECT 1 FROM greenhouse_hiring.hiring_assessment_assignment asg
+         WHERE asg.application_id = app.application_id
+           AND asg.policy_id = $4
+           AND asg.policy_version = $5
+           AND asg.trigger_stage = $2
+           AND asg.superseded_at IS NULL
+       )
      ORDER BY app.updated_at
-     LIMIT $4`,
-    [policy.openingId, policy.triggerStage, policy.templateId, limit],
+     LIMIT $6`,
+    [policy.openingId, policy.triggerStage, policy.templateId, policy.policyId, policy.policyVersion, limit],
   )
 
   return rows.map(row => ({
