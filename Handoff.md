@@ -2,6 +2,17 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-17 — Tasks creadas para vacantes públicas: contrato SEO primero, renderer después
+
+Se registraron `TASK-1740` y `TASK-1741` como una partición deliberada. `TASK-1740` es la base
+backend/data: modela contenido candidato-facing allowlist-safe, fallback legacy, lifecycle y
+canonical/`JobPosting` desde el mismo contenido visible; no toca el formulario ni habilita Indexing
+API sin autorización/quota. `TASK-1741` es solamente el consumer UI: renderer editorial incremental
+de `/public/careers/[publicId]`, detrás de flag y con GVC 1440/390, que preserva URL, formulario y
+exactamente los dos CTA existentes (hero verde y resumen azul; sin CTA final). Ambas exigen que
+remote/global use países elegibles reales y nunca invente salario, beneficios o condiciones de
+contrato. El wireframe es `docs/ui/wireframes/TASK-1741-public-careers-editorial-detail-renderer.md`.
+
 ## 2026-08-17 — La etapa canónica del candidate test es `shortlisted`, no `interview`
 
 Decidido con la lente de talent a pedido del operador, y verificado contra la base ANTES de

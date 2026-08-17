@@ -125,6 +125,16 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - Boundary: no crea perfil profesional paralelo, no fusiona por nombre, no rankea, puntúa, mueve etapas, asigna
   tests, envía email ni muestra resultados internos al postulante.
 
+### Phase 11 — Public Vacancy Truth and Editorial Detail
+
+- `TASK-1740` convierte el copy público de cada opening en una proyección estructurada allowlist-safe y emite
+  canonical/`JobPosting` desde el mismo contenido visible. Conserva el lifecycle published → unpublished, no
+  toca el formulario y no incorpora Indexing API sin autorización externa.
+- `TASK-1741` consume ese contrato para evolucionar incrementalmente la página individual a un renderer editorial;
+  conserva URL, formulario y exactamente los dos CTA existentes, con legacy fallback y rollout reversible.
+- Gate: ninguna condición remota, país elegible, salario, beneficio ni mensaje de aplicación se inventa para
+  completar el render o el schema. Primero foundation de 1740, después consumer UI de 1741.
+
 ## Child Tasks
 
 - `TASK-352` — Program umbrella and coordination for Hiring / ATS.
@@ -219,6 +229,10 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   con allowlist humana (nunca regex en producción), purga gobernada archive-first, gate que impide
   crear datos sin declarar procedencia y señal `hiring.data_quality.synthetic_records_aging`.
   `backend-data`/`backend-critical`. Paralelizable con todos los carriles; `Blocked by: none`.
+- `TASK-1740` — Public Vacancy Content and Google JobPosting Foundation: proyección pública estructurada,
+  allowlist, lifecycle y SEO técnico de la URL leaf; no toca formulario ni implementa Indexing API.
+- `TASK-1741` — Public Careers Editorial Detail Renderer: consumer UI incremental de 1740, con wireframe,
+  fallback legacy, GVC premium y exactamente los dos CTA existentes; no agrega un CTA final.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
 
