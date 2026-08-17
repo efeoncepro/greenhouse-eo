@@ -24,7 +24,7 @@ Schedule policy:
 
 ## Efeonce Global Candidate Benefits Baseline
 
-The candidate-facing baseline is defined in `../../greenhouse-talent-people-operator/references/efeonce-candidate-benefits-charter.md`: it applies to all collaborators worldwide and includes 15 paid working days of annual vacation plus one day for every completed continuous year of service, capped at 20, alongside health/wellbeing, development and life-event benefits. It is a people-policy commitment, not evidence that current Greenhouse Leave balances or provider payroll have been configured for it.
+The candidate-facing baseline is defined in `../../greenhouse-talent-people-operator/references/efeonce-candidate-benefits-charter.md`: it applies to all collaborators worldwide and includes 15 paid working days of annual vacation plus one day for every completed continuous year of service, capped at 20, alongside health/wellbeing, development and life-event benefits. Its current remote-work wallet is US$50 monthly for connectivity/coworking. The separate US$400 equipment contribution is an approved policy benefit but is disclosed in interview or offer conversations, not standard public vacancy copy. This is a people-policy commitment, not evidence that current Greenhouse Leave balances or provider payroll have been configured for it.
 
 Before Payroll treats any item as payable or balance-consuming, confirm all of the following:
 

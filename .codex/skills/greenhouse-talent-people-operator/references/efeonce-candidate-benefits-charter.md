@@ -1,6 +1,6 @@
 # Efeonce Candidate Benefits Charter
 
-Use this reference when drafting the benefits section of any Efeonce vacancy, Careers page, job-board post or recruiting campaign. It is the approved candidate-facing baseline supplied by the operator on 2026-08-17. It is not a replacement for a signed agreement, local law, provider terms or the current Greenhouse Leave configuration.
+Use this reference when drafting the benefits section of any Efeonce vacancy, Careers page, job-board post or recruiting campaign. It defines the approved global baseline and its public-disclosure rules, supplied by the operator on 2026-08-17. It is not a replacement for a signed agreement, local law, provider terms or the current Greenhouse Leave configuration.
 
 ## Claim status and publication rule
 
@@ -10,7 +10,7 @@ Use this reference when drafting the benefits section of any Efeonce vacancy, Ca
 - Before an offer, Payroll/Legal must express the applicable baseline in the employee agreement, contractor agreement, EOR/provider instruction or equivalent governing document. Local statutory entitlements and mandatory provider rules may add protection; do not promise a reduction or waiver in public copy.
 - Preserve medical privacy. Managers receive the operational absence needed to coordinate work, never a diagnosis or medical history.
 
-## Approved public baseline
+## Approved benefits baseline and public-disclosure rules
 
 | Benefit | Candidate-facing entitlement | Operational note |
 | --- | --- | --- |
@@ -25,7 +25,8 @@ Use this reference when drafting the benefits section of any Efeonce vacancy, Ca
 | Birth, adoption or care placement | 10 paid weeks for the mother or person who gives birth; 2 paid weeks for the father or non-gestational parent. For adoption or care placement, 4 paid weeks for the primary caregiver and 2 for the co-parent. | This is a sustainable global Efeonce minimum, not an automatic supplement to an equivalent statutory entitlement; the more favourable lawful total and job protection apply. |
 | Primary-home move | 1 paid working day per calendar year. | Coordinate in advance where reasonably possible. |
 | Learning and certification | 5 paid working days for role-relevant learning per calendar year, plus a US$500 annual learning wallet. | Partner programmes must be current and role-relevant; not every certification is guaranteed to every person. |
-| Remote work environment | Role-appropriate equipment up to US$400 on joining and every 36 months thereafter, plus a US$40 monthly connectivity/coworking wallet. | Use the wallet for connectivity or coworking, not as salary or unrestricted cash. |
+| Remote connectivity/coworking | US$50 monthly connectivity/coworking wallet. | This may appear in public vacancy copy. Use the wallet for connectivity or coworking, not as salary or unrestricted cash. |
+| Equipment contribution | Role-appropriate equipment up to US$400 on joining and every 36 months thereafter. | Do **not** publish this amount in standard vacancy copy; discuss it in the interview or offer conversation. It remains an approved policy benefit, subject to the governing agreement. |
 | Mental health | Confidential access or an equivalent reimbursement up to US$300 per calendar year for mental-health and wellbeing support. | Administer without exposing a diagnosis or usage details to the manager. |
 
 ## Global operating rules
@@ -70,9 +71,9 @@ Use this as an opportunity statement, not a guarantee that every person receives
 
 Adapt for length, but retain the meaning and conditions:
 
-> **Tiempo, salud y desarrollo.** Trabajamos de forma remota y cuidamos el tiempo personal: comienzas con 15 días hábiles de vacaciones remuneradas al año y sumas un día por cada año completo de antigüedad, hasta 20. Además tienes los feriados corporativos de Chile aparte de vacaciones, dos días flotantes, dos días de bienestar, tiempo remunerado para atenciones de salud administrado con privacidad y permisos para situaciones importantes, como matrimonio o unión civil, nacimiento o adopción, mudanza, duelo y deberes cívicos. Impulsamos aprendizaje y certificaciones relevantes para el rol con partners internacionales como HubSpot, Google, Meta, Salesforce, OpenAI, Automattic, Truora y Aircall. La aplicación concreta se formaliza según tu modalidad de contratación y país de residencia.
+> **Tiempo, salud y desarrollo.** Trabajamos de forma remota y cuidamos el tiempo personal: comienzas con 15 días hábiles de vacaciones remuneradas al año y sumas un día por cada año completo de antigüedad, hasta 20. Además tienes los feriados corporativos de Chile aparte de vacaciones, dos días flotantes, dos días de bienestar, tiempo remunerado para atenciones de salud administrado con privacidad, US$50 mensuales para conectividad o coworking y permisos para situaciones importantes, como matrimonio o unión civil, nacimiento o adopción, mudanza, duelo y deberes cívicos. Impulsamos aprendizaje y certificaciones relevantes para el rol con partners internacionales como HubSpot, Google, Meta, Salesforce, OpenAI, Automattic, Truora y Aircall. La aplicación concreta se formaliza según tu modalidad de contratación y país de residencia.
 
-For a shorter version, retain at least: the 15-to-20 vacation progression, remote/global policy context, health/wellbeing, meaningful-life leave and role-relevant learning.
+For a shorter version, retain at least: the 15-to-20 vacation progression, remote/global policy context, health/wellbeing, the US$50 connectivity/coworking wallet, meaningful-life leave and role-relevant learning. Do not disclose the equipment contribution amount in standard vacancy copy.
 
 ## Before publishing / before operating
 
