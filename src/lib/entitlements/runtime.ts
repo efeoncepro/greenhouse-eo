@@ -607,6 +607,12 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       // del dossier agéntico). Mismo tier que decide/score: quien gobierna la evaluación
       // gobierna su narrativa. Role-only a propósito (sin routeGroup internal).
       'hiring.application.annotate',
+      // TASK-1719 — gobernar la policy de assessment de una vacante (declarar plantilla +
+      // habilitar la asignación automática por etapa). Mismo tier que decide/publish y por la
+      // misma razón role-only: el routeGroup `internal` lo porta TODO tenant interno, así que
+      // incluirlo dejaría que collaborator/designer/people_viewer prendan escrituras a una
+      // cohorte completa de candidatos. Rechazado endurecer `hiring.assessment.author`.
+      'hiring.assessment.policy.govern',
       // TASK-1736 — corregir el display name de la identidad de un candidato (write sobre
       // identity_profiles con audit append-only fuente `human`). Mismo tier de gobernanza que
       // reveal_identity y por la misma razón role-only: el routeGroup `internal` lo portaría

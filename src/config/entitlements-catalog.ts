@@ -2228,6 +2228,12 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // TASK-1361 — AI assist: proponer borradores de pregunta / sugerencias de puntaje (propose→confirm).
   // Solo PROPONE; el confirm reusa author (pregunta) / score (respuesta). El LLM nunca escribe.
   { key: 'hiring.assessment.ai_assist', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
+  // TASK-1719 — gobernar la policy de assessment de una vacante: declarar qué plantilla le
+  // corresponde y habilitar la asignación automática por etapa. Capability propia y NO un
+  // endurecimiento de `hiring.assessment.author`: autorar contenido ≠ decidir que el sistema
+  // escriba a una cohorte entera. Grant tier gobernanza role-only (el assign manual puntual
+  // se queda en `author`).
+  { key: 'hiring.assessment.policy.govern', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
   // TASK-1365 — aggregate-only fairness reader. More restricted than assessment.read.
   { key: 'hiring.assessment.fairness_read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
   // TASK-1714 — revelar el valor completo del documento de identidad de un CANDIDATO.

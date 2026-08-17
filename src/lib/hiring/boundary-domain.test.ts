@@ -49,6 +49,11 @@ const ALLOWED_WRITE_TARGETS = new Set([
   'greenhouse_hiring.hiring_assessment_ai_scoring_run',
   'greenhouse_hiring.hiring_assessment_ai_scoring_run_item',
   'greenhouse_hiring.hiring_assessment_ai_scoring_run_event',
+  // TASK-1719 — Policy de assessment por opening + su historia append-only, y el ledger
+  // durable de assignment (idempotencia manual/auto/reconciliación).
+  'greenhouse_hiring.hiring_opening_assessment_policy',
+  'greenhouse_hiring.hiring_opening_assessment_policy_event',
+  'greenhouse_hiring.hiring_assessment_assignment',
   // TASK-1723–1726 — Talent Pool aggregate, append-only ledgers, projection and public/MCP audit.
   'greenhouse_hiring.talent_pool_membership',
   'greenhouse_hiring.talent_pool_consent_event',

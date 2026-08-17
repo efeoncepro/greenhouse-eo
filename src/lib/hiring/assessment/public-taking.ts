@@ -238,14 +238,14 @@ const getAssessmentContext = async (assessmentId: string): Promise<ContextRow | 
   return rows[0] ?? null
 }
 
-export const listPublicAssessmentQuestions = async (assessment: Assessment): Promise<{
-  competencies: PublicAssessmentCompetency[]
-  questions: PublicAssessmentQuestion[]
-}> => {
-  if (!assessment.templateId) return { competencies: [], questions: [] }
-
-  const rows = await runGreenhousePostgresQuery<PublicQuestionRow>(
-    `WITH ranked AS (
+/**
+ * SoT de la resolución EN VIVO del cuestionario ($1 = template_id). Se exporta porque el
+ * `template_content_digest` de la policy (TASK-1719 D4) debe observar EXACTAMENTE lo que
+ * rendiría el candidato: dos consultas distintas producirían un digest que no detecta el
+ * drift real del banco de preguntas. Consumidores: `listPublicAssessmentQuestions` acá y
+ * `resolveTemplateContentDigest` en `assignment-policy/readers.ts`. NUNCA duplicar el SQL.
+ */
+export const PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL = `WITH ranked AS (
        SELECT tm.module_id,
               tm.weight,
               tm.target_level,
@@ -281,7 +281,16 @@ export const listPublicAssessmentQuestions = async (assessment: Assessment): Pro
      WHERE question_id IS NULL
         OR question_rank <= CASE WHEN module_rank <= 3 THEN 2 ELSE 1 END
      ORDER BY weight DESC, competency_key, question_rank
-     LIMIT 12`,
+     LIMIT 12`
+
+export const listPublicAssessmentQuestions = async (assessment: Assessment): Promise<{
+  competencies: PublicAssessmentCompetency[]
+  questions: PublicAssessmentQuestion[]
+}> => {
+  if (!assessment.templateId) return { competencies: [], questions: [] }
+
+  const rows = await runGreenhousePostgresQuery<PublicQuestionRow>(
+    PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL,
     [assessment.templateId],
   )
 

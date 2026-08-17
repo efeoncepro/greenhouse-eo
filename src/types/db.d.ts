@@ -8103,6 +8103,38 @@ export interface GreenhouseHiringHiringOpening {
   visibility: Generated<string>;
 }
 
+export interface GreenhouseHiringHiringOpeningAssessmentPolicy {
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  enabled_at: Timestamp | null;
+  enabled_by: string | null;
+  mode: Generated<string>;
+  opening_id: string;
+  policy_id: Generated<string>;
+  policy_version: Generated<number>;
+  state: Generated<string>;
+  template_content_digest: string | null;
+  template_id: string;
+  time_limit_minutes: number | null;
+  trigger_stage: string | null;
+  updated_at: Generated<Timestamp>;
+  volume_cap_per_window: Generated<number>;
+  volume_window_minutes: Generated<number>;
+}
+
+export interface GreenhouseHiringHiringOpeningAssessmentPolicyEvent {
+  actor_user_id: string | null;
+  created_at: Generated<Timestamp>;
+  detail_json: Generated<Json>;
+  event_type: string;
+  from_state: string | null;
+  policy_event_id: Generated<string>;
+  policy_id: string;
+  policy_version: number;
+  reason_code: string | null;
+  to_state: string;
+}
+
 export interface GreenhouseHiringHiringQuestion {
   answer_key_json: Generated<Json>;
   competency_id: string;
@@ -12587,6 +12619,8 @@ export interface DB {
   "greenhouse_hiring.hiring_handoff": GreenhouseHiringHiringHandoff;
   "greenhouse_hiring.hiring_handoff_audit": GreenhouseHiringHiringHandoffAudit;
   "greenhouse_hiring.hiring_opening": GreenhouseHiringHiringOpening;
+  "greenhouse_hiring.hiring_opening_assessment_policy": GreenhouseHiringHiringOpeningAssessmentPolicy;
+  "greenhouse_hiring.hiring_opening_assessment_policy_event": GreenhouseHiringHiringOpeningAssessmentPolicyEvent;
   "greenhouse_hiring.hiring_question": GreenhouseHiringHiringQuestion;
   "greenhouse_hiring.talent_demand": GreenhouseHiringTalentDemand;
   "greenhouse_hiring.talent_pool_access_audit": GreenhouseHiringTalentPoolAccessAudit;
