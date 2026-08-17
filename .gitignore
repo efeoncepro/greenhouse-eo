@@ -24,9 +24,12 @@
 /.playwright-mcp/
 
 # next.js
+# Glob, no una lista de variantes: cada agente/sesión que levanta su propio dev server
+# elige un distDir distinto (`.next-task1741`, etc.), y con una lista había que acordarse
+# de agregarlo ACÁ y en eslint.config.mjs. Cuando alguien olvidaba el segundo, ESLint
+# analizaba build output y tiraba miles de errores en un archivo que nadie escribió.
 /.next/
-/.next-cache/
-/.next-local/
+/.next-*/
 /.next-build-dir
 /.next-build-meta.json
 /out/
