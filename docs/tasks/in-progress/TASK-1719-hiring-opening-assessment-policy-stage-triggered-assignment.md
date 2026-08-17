@@ -1,5 +1,38 @@
 # TASK-1719 — Hiring Opening Assessment Policy and Stage-Triggered Candidate Test Assignment
 
+## Delta 2026-08-17 (3) — la etapa trigger canónica es `shortlisted`, no `interview`
+
+Decisión tomada con la lente `greenhouse-talent-people-operator` a pedido del operador, y
+verificada contra la base antes de argumentarla.
+
+**Los datos la fuerzan:** 42 postulaciones en `sourced`, 9 en `shortlisted`, 7 en `screening` y
+**0 en `interview`**. Las pruebas existentes se asignaron en `screening`/`shortlisted`. Declarar el
+trigger en `interview` sería una automatización que no se dispara nunca.
+
+**La doctrina la respalda por dos vías independientes:**
+
+1. La ganancia de validez está en **combinar** entrevista estructurada + muestra de trabajo (≈.63 vs
+   cualquiera sola; ranking confirmado por Sackett et al. 2022, que deja la entrevista estructurada
+   como el predictor más fuerte). Esa ganancia NO es automática por tener las dos cosas: aparece
+   cuando la entrevista puede interrogar lo que la prueba dejó abierto. Disparar en `interview`
+   entrega los dos métodos sin la combinación.
+2. **El momento del filtro es una decisión de equidad.** Una prueba no pagada aplicada temprano no
+   sesga por el puntaje: sesga por quién logra completarla. Es impacto adverso por **completación**,
+   invisible en las métricas de scoring porque esas personas nunca llegan a tener una.
+
+**`screening` queda fuera del allowlist a propósito** (no por olvido): no es candidate-facing, así
+que un assignment bloqueado ahí degradaría a silencio y rompería el invariante 2.
+
+Cambios: invariante 21 + paso 4 de la secuencia de rollout en el ADR · constante
+`OPENING_ASSESSMENT_RECOMMENDED_TRIGGER_STAGE` · doctrina en la skill de talent (ambos espejos) ·
+manual y doc funcional · tests que fijan el rechazo de `screening` con su razón. **Sin cambio de
+schema**: las dos policies de la base ya eran `shortlisted` (fixtures de test, hoy `disabled`).
+
+Pendiente que esta decisión vuelve más urgente: **el write path de ajustes razonables**
+(Open Question 7). La doctrina de selección exige poder otorgar tiempo extra o formato accesible, y
+hoy el campo existe sin forma de escribirlo — no se puede acomodar a nadie sin alargar el límite
+para todos.
+
 ## Delta 2026-08-17 (2) — auditoría adversarial de Slices 1-2 y su corrección
 
 Auditoría adversarial del código de Slices 1-2. Detalle completo y fundamento en el

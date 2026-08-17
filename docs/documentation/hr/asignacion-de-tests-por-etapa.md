@@ -17,6 +17,35 @@ rindieron exámenes diferentes no significa nada.
 Ahora **la vacante declara su prueba una sola vez**, y a partir de ahí la plataforma la resuelve
 sola. Quien asigna ya no elige plantilla: confirma.
 
+## En qué etapa se manda la prueba
+
+**En Preselección.** Es la etapa canónica recomendada, y la razón no es de eficiencia:
+
+**La prueba es la evidencia con la que se arma la entrevista, no un paso posterior.** Lo que mejor
+predice desempeño es la combinación de entrevista estructurada + muestra de trabajo — pero esa
+ganancia no aparece por tener las dos cosas: aparece cuando la entrevista puede ir a buscar
+justamente lo que la prueba dejó abierto. Mandarla al entrar a Entrevista entrega los dos métodos
+sin la combinación: se entrevista a ciegas y el resultado llega cuando ya no puede cambiar ninguna
+pregunta.
+
+**Y el momento del filtro es una decisión de equidad.** Una prueba de 45 minutos no pagada,
+aplicada temprano, no sesga por el puntaje: sesga por **quién logra completarla** — quien tiene
+trabajo actual, personas a cargo, conexión limitada o menos margen económico abandona más. Ese
+sesgo es invisible en las métricas de calificación, porque esas personas nunca llegan a tener una.
+En Preselección la población ya está acotada, el pedido tiene contrapartida para el candidato
+("avanzaste, este es el siguiente paso"), y si la tasa de completación cae, esa señal sí se puede
+interpretar.
+
+Entrevista sigue siendo una opción válida —por ejemplo, una prueba después de una primera
+conversación— pero elegirla debería ser deliberado.
+
+**Screening no está disponible a propósito**: no es una etapa que le comunique nada al candidato,
+así que si la asignación se bloqueara ahí, la persona no recibiría nada. Habilitarla exige decidir
+primero qué se le dice.
+
+> **Qué vigilar desde el primer día:** la tasa de completación por cohorte. Es donde aparecería un
+> sesgo por abandono, y no se ve mirando puntajes.
+
 ## Las dos formas de asignar
 
 Ambas terminan en el mismo lugar y dejan el mismo rastro.

@@ -13,9 +13,41 @@ export type OpeningAssessmentPolicyMode = (typeof OPENING_ASSESSMENT_POLICY_MODE
 export const OPENING_ASSESSMENT_POLICY_STATES = ['draft', 'enabled', 'disabled'] as const
 export type OpeningAssessmentPolicyState = (typeof OPENING_ASSESSMENT_POLICY_STATES)[number]
 
-/** Etapas candidate-facing no terminales habilitadas como trigger en V1. */
+/**
+ * Etapas candidate-facing no terminales habilitadas como trigger en V1.
+ *
+ * **`shortlisted` es la etapa canónica recomendada** (decisión de doctrina de selección,
+ * 2026-08-17). `interview` sigue siendo válida, pero elegirla debería ser deliberado:
+ *
+ * 1. **La prueba es la evidencia CON la que se arma la entrevista, no un paso posterior.** La
+ *    ganancia de validez real está en combinar entrevista estructurada + muestra de trabajo
+ *    (≈.63 vs cualquiera sola; Schmidt & Hunter 1998, ranking confirmado por Sackett et al.
+ *    2022, que además deja la entrevista estructurada como el predictor más fuerte). Esa
+ *    ganancia NO es automática por tener las dos cosas: aparece cuando la entrevista puede
+ *    interrogar lo que la prueba dejó abierto. Disparar en `interview` entrega los dos métodos
+ *    sin la combinación.
+ * 2. **El momento del filtro es una decisión de EQUIDAD, no de eficiencia.** Una prueba no
+ *    pagada aplicada temprano no sesga por el puntaje: sesga por quién logra completarla (empleo
+ *    actual, cuidados a cargo, conectividad, margen económico). Es impacto adverso por
+ *    COMPLETACIÓN, invisible en las métricas de scoring porque esas personas nunca llegan a
+ *    tener una. En `shortlisted` la población ya está acotada y una caída de completación sí es
+ *    interpretable.
+ * 3. **Es lo defendible frente al candidato.** En Preselección el pedido tiene contrapartida
+ *    ("avanzaste"); antes del juicio humano es pedir trabajo sin haber mirado.
+ *
+ * **NUNCA agregar `screening` sin resolver antes qué se le comunica al candidato**: no es una
+ * etapa candidate-facing, así que un assignment bloqueado ahí degrada a SILENCIO y rompe el
+ * invariante "ni cero ni dos".
+ */
 export const OPENING_ASSESSMENT_TRIGGER_STAGES = ['shortlisted', 'interview'] as const
 export type OpeningAssessmentTriggerStage = (typeof OPENING_ASSESSMENT_TRIGGER_STAGES)[number]
+
+/**
+ * Etapa recomendada por defecto al configurar una policy nueva. NO es un default automático —
+ * el command sigue exigiendo la etapa explícita — pero es la que las superficies deben
+ * preseleccionar y la que el canary usa.
+ */
+export const OPENING_ASSESSMENT_RECOMMENDED_TRIGGER_STAGE: OpeningAssessmentTriggerStage = 'shortlisted'
 
 export interface OpeningAssessmentPolicy {
   policyId: string

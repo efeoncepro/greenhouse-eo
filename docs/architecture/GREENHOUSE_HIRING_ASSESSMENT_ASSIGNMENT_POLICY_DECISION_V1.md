@@ -414,11 +414,15 @@ Secuencia canónica:
    `stage_changed` desde 2026-07-09**, y como D0a manda re-leer la etapa vigente, un evento de julio se
    evaluaría contra el estado de hoy (**6 postulaciones en `shortlisted`**). Orden obligatorio: registrar con
    flag OFF → confirmar backlog drenado → recién flip.
-4. **Manual-first sobre Account Manager** (15 aplicaciones; `atpl-account-manager-l2` sembrada en
+4. **La policy del canary se declara con `triggerStage: 'shortlisted'`** (invariante 21). Verificado
+   contra la base el 2026-08-17: hay **0 postulaciones en `interview`** (42 `sourced`, 9 `shortlisted`,
+   7 `screening`) y las pruebas existentes se asignaron en `screening`/`shortlisted` — declarar el
+   trigger en `interview` sería una automatización que no se dispara nunca.
+5. **Manual-first sobre Account Manager** (15 aplicaciones; `atpl-account-manager-l2` sembrada en
    `migrations/20260708113740064_task-1360-seed-account-manager-template.sql:9`, **único instrumento con
    ciclo cerrado verificado — n=1 real**), 2-3 candidatos.
-5. **Auto sobre Account Manager en lotes ≤3.** **Prohibido mover etapas en bulk** mientras el auto esté ON.
-6. **Content Creator tras un ciclo completo de Account Manager**, declarando por policy qué plantilla
+6. **Auto sobre Account Manager en lotes ≤3.** **Prohibido mover etapas en bulk** mientras el auto esté ON.
+7. **Content Creator tras un ciclo completo de Account Manager**, declarando por policy qué plantilla
    corresponde a la vacante. Ya **no** aplica el prerrequisito "entender por qué sus 9 asignados no rindieron":
    esa cohorte tenía 36 h de vida y 12,5 días de plazo restante, y dos de sus casos tienen causa conocida
    (sintético · correo nunca enviado por flag OFF). Si al vencer el plazo la tasa sigue en cero, **ahí** es una
@@ -556,6 +560,7 @@ etapa→plantilla, sin inferencia, sin modelo, sin puntaje. El invariante que la
 18. **NUNCA mezclar "instancia abierta" con "instancia corregida" en el preview.** `existingOpenAssessment` usa EXACTAMENTE `OPEN_ASSESSMENT_INSTANCE_STATUSES` (el predicado del índice parcial y del command) y **es** bloqueante; `existingScoredAssessment` es informativo y **NO** bloquea, porque el command sí crearía una instancia nueva. Declarar un bloqueo que el command no honra es peor que no declarar nada: el operador confirma igual y le llega una segunda prueba a alguien ya evaluado. `resolveApplicationsAwaitingAssignment` (readers.ts) mantiene `scored` como "ya evaluado" **a propósito**: responde otra pregunta. **NUNCA** unificarlos "por consistencia".
 19. **NUNCA escribir un predicado de reliability signal distinto del reader canónico que describe.** `awaiting_terminal` debe ser el espejo exacto de `resolveApplicationsAwaitingAssignment` (scope por `policy_id`/`policy_version`/`trigger_stage` + `superseded_at IS NULL` + exclusión de instancia abierta de ESA plantilla). Con un predicado más laxo, un bump de versión de policy llena la cola de reconciliación mientras la señal sigue en `ok`.
 20. **NUNCA una guarda de vencimiento fail-abierta.** `Number.isFinite(x) && x <= now` deja pasar el `NaN`: la forma correcta es `!Number.isFinite(x) || x <= now`. Y el filtro de expiry va **en las dos mitades**: si `propose` devuelve una propuesta vencida que `confirm` rechaza siempre, el primer intento de asignar falla sistemáticamente. El índice parcial no sabe de vencimiento, así que `createAssignmentProposal` cierra la vencida como `expired` y reintenta el INSERT.
+21. **NUNCA elegir la etapa trigger por conveniencia operativa: es una decisión de doctrina de selección Y de equidad.** La canónica recomendada es **`shortlisted`**, y `interview` exige justificación deliberada. Dos razones independientes: **(a)** la ganancia de validez está en combinar entrevista estructurada + muestra de trabajo (≈.63 vs cualquiera sola; Schmidt & Hunter 1998, ranking confirmado por Sackett et al. 2022, que deja la entrevista estructurada como el predictor más fuerte) — y esa ganancia NO es automática por tener ambas: aparece cuando la entrevista puede interrogar lo que la prueba dejó abierto, o sea cuando la prueba llegó ANTES; **(b)** una prueba no pagada aplicada temprano no sesga por el puntaje, sesga por **quién logra completarla** (empleo actual, cuidados, conectividad, margen económico) — impacto adverso por COMPLETACIÓN, estructuralmente invisible en las métricas de scoring porque esas personas nunca llegan a tener una. **NUNCA** habilitar `screening` como trigger sin resolver antes qué se comunica: no es candidate-facing, así que un assignment bloqueado ahí degrada a SILENCIO y rompe el invariante 2. **SIEMPRE** vigilar la tasa de completación por cohorte al encender: es la única superficie donde ese sesgo se ve. Constante: `OPENING_ASSESSMENT_RECOMMENDED_TRIGGER_STAGE`.
 
 ---
 

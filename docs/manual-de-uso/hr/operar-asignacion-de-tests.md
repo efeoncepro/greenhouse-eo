@@ -30,8 +30,19 @@ decida— dejar que se asigne sola al mover una postulación de etapa.
    ```
 2. **Declara la política.** Nace siempre en borrador: configurarla NO la enciende.
    ```bash
-   pnpm staging:request PUT /api/hiring/openings/<openingId>/assessment-policy '{"templateId":"<atpl-...>","mode":"manual","triggerStage":"interview","timeLimitMinutes":45}'
+   pnpm staging:request PUT /api/hiring/openings/<openingId>/assessment-policy '{"templateId":"<atpl-...>","mode":"manual","triggerStage":"shortlisted","timeLimitMinutes":45}'
    ```
+
+   **Usa `shortlisted` (Preselección) salvo que tengas una razón deliberada para otra cosa.**
+   La prueba es la evidencia con la que se arma la entrevista, no un paso posterior: si llega
+   al entrar a Entrevista, entrevistas a ciegas y lees el resultado cuando ya no puede cambiar
+   ninguna pregunta. Y hay una razón de equidad más fuerte: una prueba no pagada aplicada
+   temprano no sesga por el puntaje, sesga por **quién logra completarla** — y esa gente nunca
+   llega a tener puntaje, así que el sesgo no aparece en ninguna métrica. En Preselección la
+   población ya está acotada y el pedido tiene contrapartida para el candidato.
+
+   `interview` sigue siendo válida (por ejemplo, una prueba después de una primera conversación),
+   pero elegirla debería ser una decisión, no el default.
 3. **Habilítala** cuando esté revisada. Requiere que la vacante esté publicada:
    ```bash
    pnpm staging:request POST /api/hiring/openings/<openingId>/assessment-policy '{"action":"enable"}'

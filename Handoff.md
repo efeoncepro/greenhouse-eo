@@ -2,6 +2,31 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-17 — La etapa canónica del candidate test es `shortlisted`, no `interview`
+
+Decidido con la lente de talent a pedido del operador, y verificado contra la base ANTES de
+argumentarlo: hay **0 postulaciones en `interview`** (42 `sourced`, 9 `shortlisted`, 7 `screening`),
+y las pruebas existentes se asignaron en `screening`/`shortlisted`. El ejemplo que yo había escrito
+en el manual (`triggerStage: "interview"`) habría configurado una automatización que no se dispara.
+
+Dos razones independientes, ambas en el invariante 21 del ADR: (a) la ganancia de validez está en
+**combinar** entrevista estructurada + muestra de trabajo, y esa ganancia sólo aparece si la prueba
+llega ANTES —si no, se entrevista a ciegas y la evidencia llega cuando ya no cambia ninguna
+pregunta—; (b) el momento del filtro es una decisión de **equidad**: una prueba no pagada aplicada
+temprano no sesga por el puntaje, sesga por quién logra completarla, y ese sesgo es invisible en las
+métricas de scoring porque esas personas nunca llegan a tener una.
+
+`screening` queda fuera del allowlist **a propósito**: no es candidate-facing, así que un assignment
+bloqueado ahí degradaría a silencio y rompería "ni cero ni dos". Hay test que lo fija con su razón.
+
+Sin cambio de schema: las dos policies de la base ya eran `shortlisted` (fixtures de test). Esas dos
+quedaron **`disabled` por el command gobernado** — eran las únicas de la base, ambas `enabled` +
+`on_stage_entry` sobre openings `LIVE-TEST`, o sea una mina para el canary.
+
+Pendiente que esta decisión vuelve más urgente: **el write path de ajustes razonables**. La doctrina
+exige poder dar tiempo extra o formato accesible; hoy el campo existe sin forma de escribirlo, así
+que no se puede acomodar a nadie sin alargar el límite para todos.
+
 ## 2026-08-17 — TASK-1719 code complete: asignación de tests por etapa (Slices 0-5)
 
 Se cerró el código de los seis slices. Antes de esto la task tenía la fundación (policy + command)

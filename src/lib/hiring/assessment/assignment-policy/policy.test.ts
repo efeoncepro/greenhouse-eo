@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import {
+  OPENING_ASSESSMENT_RECOMMENDED_TRIGGER_STAGE,
+  OPENING_ASSESSMENT_TRIGGER_STAGES,
+} from '@/types/hiring-assessment-policy'
+
 vi.mock('server-only', () => ({}))
 
 const queries: { text: string; values: unknown[] }[] = []
@@ -127,6 +132,30 @@ describe('TASK-1719 Slice 1 — nacimiento seguro de la policy (ADR D5.1)', () =
         'user-1',
       ),
     ).rejects.toMatchObject({ code: 'assessment_policy_invalid_trigger_stage' })
+  })
+
+  // `screening` es la etapa que alguien va a querer agregar (hoy se asignan pruebas ahí a mano).
+  // Está fuera del allowlist POR DISEÑO, no por olvido: no es candidate-facing, así que un
+  // assignment bloqueado ahí degradaría a SILENCIO y rompería "una comunicación por movimiento,
+  // ni cero ni dos". Si este test empieza a fallar, la pregunta que hay que responder antes de
+  // borrarlo es qué se le comunica al candidato cuando la asignación falla en esa etapa.
+  it('rechaza `screening` como trigger: no es candidate-facing y degradar ahí sería silencio', async () => {
+    withHandlers()
+
+    await expect(
+      configureOpeningAssessmentPolicy(
+        { openingId: 'opng-1', templateId: 'atpl-1', mode: 'on_stage_entry', triggerStage: 'screening' },
+        'user-1',
+      ),
+    ).rejects.toMatchObject({ code: 'assessment_policy_invalid_trigger_stage' })
+  })
+
+  it('la etapa recomendada es `shortlisted` y es un trigger válido', async () => {
+    // La constante existe para que las superficies preseleccionen lo correcto sin re-litigar la
+    // doctrina (invariante 21 del ADR): la prueba es la evidencia CON la que se arma la entrevista,
+    // y aplicarla antes de Preselección filtra por quién PUEDE completarla, no por competencia.
+    expect(OPENING_ASSESSMENT_RECOMMENDED_TRIGGER_STAGE).toBe('shortlisted')
+    expect(OPENING_ASSESSMENT_TRIGGER_STAGES).toContain(OPENING_ASSESSMENT_RECOMMENDED_TRIGGER_STAGE)
   })
 
   it('rechaza una plantilla archivada', async () => {
