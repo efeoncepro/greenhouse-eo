@@ -33,8 +33,13 @@ export const isHiringAssessmentAiRunConfirmEnabled = (): boolean =>
  * peso de competencia + muestra ciega determinística. Toda evolución de señales o
  * thresholds cambia la versión (un run con policy vieja queda stale, nunca se
  * reinterpreta). La confianza CALIBRADA es Slice 3 y exigirá `...v2`.
+ *
+ * `v1_1` (delta 2026-08-17): la señal `per_criterion_contradictory` pasó a medirse en la escala
+ * DECLARADA del contrato (aportes ponderados que suman el score global) en vez de contra el
+ * promedio de los criterios. Es una corrección de la MISMA señal, no la calibración: por eso
+ * `v1_1` y no `v2` (ese sigue reservado para el Slice 3).
  */
-export const HIRING_ASSESSMENT_AI_RUN_POLICY_VERSION = 'hiring_assessment_ai_risk_policy.v1'
+export const HIRING_ASSESSMENT_AI_RUN_POLICY_VERSION = 'hiring_assessment_ai_risk_policy.v1_1'
 
 // ── Fan-out del drain (Slice 2, ADR D4): concurrencia/costo/timeout/retry acotados ──
 

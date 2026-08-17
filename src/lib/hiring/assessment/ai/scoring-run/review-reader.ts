@@ -104,7 +104,16 @@ const normalizeReviewItem = (row: ReviewItemRow): AssessmentAiReviewItem => {
 
         if (typeof c.criterion !== 'string' || typeof c.score !== 'number') return []
 
-        return [{ criterion: c.criterion, score: c.score, ...(typeof c.note === 'string' ? { note: c.note } : {}) }]
+        return [
+          {
+            criterion: c.criterion,
+            score: c.score,
+            // `weight` = puntos máximos del criterio (escala declarada del contrato). Ausente en
+            // proposals del prompt v1 — el DTO lo omite y la UI muestra solo el aporte.
+            ...(typeof c.weight === 'number' ? { weight: c.weight } : {}),
+            ...(typeof c.note === 'string' ? { note: c.note } : {}),
+          },
+        ]
       })
     : []
 

@@ -105,9 +105,10 @@ const okProposal = (n: number) => ({
   suggested: {
     score: 85,
     rationale: 'Sólida.',
+    // Escala declarada del contrato: aportes ponderados que suman el score global (43+42=85).
     perCriterion: [
-      { criterion: 'claridad', score: 86 },
-      { criterion: 'profundidad', score: 84 },
+      { criterion: 'claridad', weight: 50, score: 43 },
+      { criterion: 'profundidad', weight: 50, score: 42 },
     ],
   },
 })

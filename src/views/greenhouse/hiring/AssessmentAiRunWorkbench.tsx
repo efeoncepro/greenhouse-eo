@@ -584,8 +584,10 @@ const AssessmentAiRunWorkbench = ({ open, runId, copy, confirmEnabled, onClose }
                 </Typography>
                 <Stack component='ul' spacing={1} sx={{ m: 0, paddingInlineStart: 4 }}>
                   {item.proposal.perCriterion.map(entry => (
+                    // El aporte se lee sobre su peso (`20 / 25`): sin el denominador el operador
+                    // no puede saber si 20 es bueno. Proposals del prompt v1 no traen `weight`.
                     <Typography key={entry.criterion} component='li' variant='body2'>
-                      {entry.criterion}: {entry.score}
+                      {entry.criterion}: {entry.weight != null ? `${entry.score} / ${entry.weight}` : entry.score}
                       {entry.note ? ` — ${entry.note}` : ''}
                     </Typography>
                   ))}

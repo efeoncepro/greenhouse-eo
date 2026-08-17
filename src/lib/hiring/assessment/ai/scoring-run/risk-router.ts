@@ -1,11 +1,13 @@
 // TASK-1734 Slice 2 — Risk router PURO de la policy versionada
-// `hiring_assessment_ai_risk_policy.v1` (ADR D2). Clasifica cada item YA puntuado en
+// `hiring_assessment_ai_risk_policy.v1_1` (ADR D2). Clasifica cada item YA puntuado en
 // `mandatory_review` | `quality_sample` | `batch_eligible` usando SOLO las señales
 // implementables hoy de la spec (§Risk-routing minimum signals):
 //
 //   - respuesta vacía / demasiado corta / malformada;
 //   - rubric faltante o vacía;
-//   - proposal sin `perCriterion` o con criterios contradictorios vs el score global;
+//   - proposal sin `perCriterion` o con criterios contradictorios vs el score global
+//     (contradicción medida en la escala DECLARADA del contrato: aportes ponderados que suman
+//     el global — ver `summarizeCriterionContribution`, delta 2026-08-17);
 //   - score dentro de la banda decision-near definida por policy;
 //   - competencia de peso alto en el template;
 //   - muestra ciega aleatoria DETERMINÍSTICA por (runId, responseId) — sin Math.random.
@@ -24,6 +26,8 @@ import { createHash } from 'node:crypto'
 
 import type { AiScoringRiskClass } from '@/types/hiring-assessment-ai-run'
 import type { ResponseScoreProposal } from '@/types/hiring-assessment-ai'
+
+import { summarizeCriterionContribution } from '../contracts'
 
 // ── Reason codes ESTABLES (evidencia auditable en routing_reasons; nunca prosa) ──
 
@@ -54,7 +58,13 @@ export interface AiRunRiskPolicyConfig {
   highWeightThreshold: number
   /** Tasa de la muestra ciega determinística (0–1). */
   qualitySampleRate: number
-  /** |score global − promedio(perCriterion)| mayor que esto → criterios contradictorios. */
+  /**
+   * |score global − score IMPLICADO por los aportes de `perCriterion`| mayor que esto →
+   * criterios contradictorios. El implicado sale de `summarizeCriterionContribution` (escala
+   * declarada del contrato), NUNCA de un promedio: en la escala real los criterios son aportes
+   * ponderados que SUMAN el global, así que promediarlos hacía disparar la señal justo en el
+   * caso sano (delta 2026-08-17).
+   */
   criterionContradictionDelta: number
 }
 
@@ -134,9 +144,15 @@ export const routeScoredItem = (input: RiskRoutingInput): RiskRoutingResult => {
   if (!perCriterion || perCriterion.length === 0) {
     reasons.push('per_criterion_missing')
   } else {
-    const mean = perCriterion.reduce((acc, c) => acc + c.score, 0) / perCriterion.length
+    // Contradicción REAL = los aportes por criterio implican un score global materialmente
+    // distinto del propuesto (p.ej. "global 21" con aportes que suman 85). La traducción
+    // aportes → score global la hace el contrato, no este módulo.
+    const { impliedScore } = summarizeCriterionContribution(perCriterion)
 
-    if (Math.abs(input.proposal.score - mean) > policy.criterionContradictionDelta) {
+    if (
+      impliedScore != null &&
+      Math.abs(input.proposal.score - impliedScore) > policy.criterionContradictionDelta
+    ) {
       reasons.push('per_criterion_contradictory')
     }
   }

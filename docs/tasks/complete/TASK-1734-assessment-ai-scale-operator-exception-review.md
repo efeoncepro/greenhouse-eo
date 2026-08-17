@@ -658,6 +658,69 @@ esta task DEBE leer este delta antes de Discovery — corrige supuestos de la sp
 10. **Secuenciación:** esta task es paralelizable con TASK-1719/1721 (`Blocked by: none` es correcto — el scoring
     corre sobre `hiring.assessment.submitted` exista o no la policy de asignación); declarado también en EPIC-011.
 
+## Delta 2026-08-17 — Bug de dominio: `per_criterion_contradictory` medía la escala equivocada
+
+Descubierto al ejercitar el **primer run de scoring con datos reales** (14 items, ledger
+`greenhouse_hiring.hiring_assessment_ai_proposal`). La task está `complete`: esto es un delta correctivo del
+carril de riesgo, no una reapertura.
+
+**Síntoma.** La señal `per_criterion_contradictory` disparaba en **11 de 14 items** — y disparaba justo en las
+respuestas BUENAS. Con el carril de excepción encendido, `batch_eligible` quedaba prácticamente muerto: el
+operador terminaba revisando todo a mano, o sea el subsistema perdía su razón de ser (revisar por excepción, no
+revisar todo). Fail-closed sigue siendo la postura correcta, pero un fail-closed que se dispara por diseño en el
+caso sano no es conservador: es ruido que entrena al operador a ignorar la señal.
+
+**Causa raíz: contrato implícito de `perCriterion`.** Dos capas leían la misma estructura con escalas distintas:
+
+- El scorer devolvía **aportes ponderados que SUMAN el score global** (dato real: global `91` = `18+25+25+23`),
+  siguiendo la rúbrica del banco, que declara su escala en el propio texto:
+  `"0-100 (25 puntos por criterio; parcial permitido)"`.
+- El router comparaba el score global contra el **promedio** de esos aportes (`risk-router.ts`, `mean`). Con 4
+  criterios de 25 puntos, un `91` sano tiene promedio `22.75` → delta `68` ≫ `25` → contradicción falsa **por
+  construcción**. Cuanto mejor la respuesta, más "contradictoria" se veía.
+
+Ninguna de las dos capas estaba equivocada por sí sola: el prompt v1 pedía *"un `perCriterion` con el puntaje por
+criterio"* y el JSON Schema declaraba `score: 0–100` por criterio. Ambas lecturas (aporte vs nota independiente)
+eran válidas. El modelo mismo alternaba entre ellas según la calidad de la respuesta. **Un contrato implícito no es
+un contrato** — el bug no fue un `mean` mal tipeado, fue que nadie declaró la escala.
+
+**Fix — hacer explícita la escala, no parchar la comparación:**
+
+1. **Contrato** (`ai/contracts.ts`): se declara `RESPONSE_SCORE_CRITERION_SCALE = 'weighted_contribution'`. Cada
+   criterio lleva `weight` (puntos máximos, suman 100) y `score` (aporte obtenido, `0..weight`). El JSON Schema
+   exige `weight`. El sanitizer normaliza: `weight` ausente ⇒ reparto equitativo de 100; `score` se clampa a
+   `[0, weight]` — un aporte no puede exceder su propio peso, así que un criterio calificado en escala propia
+   0–100 queda acotado en la frontera de enforcement en vez de colarse como sano.
+2. **Prompt** (`ai/prompt.ts`): pide la escala explícitamente (respeta los pesos que la rúbrica declare; si no los
+   declara, reparte 100 en partes iguales; la suma de aportes debe dar el global; nunca una escala propia por
+   criterio). `HIRING_ASSESSMENT_SCORING_PROMPT_VERSION` sube a **`hiring_assessment_ai_scoring.v2`**: las
+   proposals v1 quedan **stale** por `promptVersion` distinto — comportamiento correcto, no se reinterpretan bajo
+   la escala nueva.
+3. **Consumidor único** (`summarizeCriterionContribution`): traduce aportes → score global implicado,
+   renormalizando por el total de pesos (una rúbrica cuyos pesos no suman 100 sigue implicando un score
+   comparable). Ningún consumidor rederiva la agregación por su cuenta.
+4. **Router** (`risk-router.ts`): compara el global contra el **implicado**, no contra el promedio. La señal ahora
+   detecta contradicción del AGREGADO — un criterio suelto lejos del global no es contradicción, es varianza
+   legítima de la rúbrica.
+5. **Policy version**: `hiring_assessment_ai_risk_policy.v1` → **`v1_1`** (evolución de una señal ⇒ bump; los runs
+   con la policy vieja quedan stale, nunca se reinterpretan). Se usa `v1_1` y no `v2` porque `v2` sigue reservado
+   para la calibración del Slice 3.
+6. **UI**: el workbench muestra el aporte sobre su peso (`18 / 25`). Sin denominador el operador no puede saber si
+   `18` es bueno — la escala tiene que ser legible donde se juzga.
+
+**Verificación con los datos reales** (replay de los 14 proposals del ledger por el router corregido):
+`per_criterion_contradictory` pasa de **11/14 a 2/14**, y los 2 que quedan son contradicciones REALES del modelo
+bajo el prompt ambiguo (global `21` con aportes que implican `65`; global `18` con aportes que implican `55`) —
+exactamente los items que un humano debe mirar. `batch_eligible` recupera 12/14 con la policy encendida.
+
+**Regresión cubierta** (`risk-router.test.ts`, `contracts.test.ts`): el caso real sano (aportes que suman el
+global) NO dispara; el caso real contradictorio SÍ; un criterio suelto en 0 no dispara; pesos que no suman 100 se
+renormalizan; el sanitizer valida la escala nueva y acota el drift de escala propia.
+
+**Lección transferible.** Cuando dos capas comparten una estructura de datos numérica, la escala es parte del
+contrato — no del contexto. Si el prompt no la declara y el schema admite dos lecturas, el modelo elegirá una por
+respuesta y el consumidor asumirá la otra; el síntoma aparecerá recién con datos reales, con build y tests verdes.
+
 ## Open Questions
 
 - Does the accepted policy confirm at one assessment per operator action or permit a bounded multi-assessment cohort?

@@ -7,7 +7,7 @@ import {
   type RiskRoutingInput,
 } from './risk-router'
 
-// TASK-1734 Slice 2 — Router de riesgo v1 (`hiring_assessment_ai_risk_policy.v1`).
+// TASK-1734 Slice 2 — Router de riesgo (`hiring_assessment_ai_risk_policy.v1_1`).
 // Módulo puro: cada señal, la muestra ciega determinística y el default conservador
 // (en duda / policy OFF → mandatory_review) se prueban sin DB ni env.
 
@@ -22,11 +22,12 @@ const cleanInput = (overrides: Partial<RiskRoutingInput> = {}): RiskRoutingInput
   competencyWeight: 20,
   proposal: {
     // 85 queda FUERA de la banda decision-near default (55–70).
+    // Escala declarada del contrato: aportes ponderados que SUMAN el score global (43+42=85).
     score: 85,
     rationale: 'Respuesta sólida.',
     perCriterion: [
-      { criterion: 'claridad', score: 88 },
-      { criterion: 'profundidad', score: 82 },
+      { criterion: 'claridad', weight: 50, score: 43 },
+      { criterion: 'profundidad', weight: 50, score: 42 },
     ],
   },
   exceptionPolicyEnabled: true,
@@ -100,10 +101,10 @@ describe('routeScoredItem — señales mandatory', () => {
         proposal: {
           score: 90,
           rationale: 'ok',
-          // promedio 30 vs global 90 → delta 60 > 25 (contradicción).
+          // Aportes 20+40 = 60 implicado vs global 90 → delta 30 > 25 (contradicción REAL).
           perCriterion: [
-            { criterion: 'claridad', score: 20 },
-            { criterion: 'profundidad', score: 40 },
+            { criterion: 'claridad', weight: 50, score: 20 },
+            { criterion: 'profundidad', weight: 50, score: 40 },
           ],
         },
       }),
@@ -120,8 +121,8 @@ describe('routeScoredItem — señales mandatory', () => {
           score: 60,
           rationale: 'ok',
           perCriterion: [
-            { criterion: 'claridad', score: 62 },
-            { criterion: 'profundidad', score: 58 },
+            { criterion: 'claridad', weight: 50, score: 32 },
+            { criterion: 'profundidad', weight: 50, score: 28 },
           ],
         },
       }),
@@ -151,6 +152,94 @@ describe('routeScoredItem — señales mandatory', () => {
     expect(result.reasons).toEqual(
       expect.arrayContaining(['answer_too_short', 'rubric_missing', 'high_weight_competency']),
     )
+  })
+})
+
+// ── Regresión del delta 2026-08-17: la señal se medía contra el PROMEDIO de los criterios,
+// pero la escala real son APORTES que suman el score global. Efecto perverso: disparaba en el
+// caso sano (11 de 14 items del primer run real) y mandaba a revisión justo las respuestas
+// buenas, dejando `batch_eligible` prácticamente muerto.
+describe('routeScoredItem — per_criterion_contradictory en la escala declarada', () => {
+  it('caso REAL sano: aportes que suman el global NO disparan la señal', () => {
+    // Item real del primer run: global 91 = 18+25+25+23 sobre criterios de 25 puntos.
+    const result = routeScoredItem(
+      cleanInput({
+        responseId: findNonSampledResponseId(),
+        proposal: {
+          score: 91,
+          rationale: 'Comunicación completa.',
+          perCriterion: [
+            { criterion: 'estado real', weight: 25, score: 18 },
+            { criterion: 'plan', weight: 25, score: 25 },
+            { criterion: 'riesgo con mitigación', weight: 25, score: 25 },
+            { criterion: 'estructura escaneable', weight: 25, score: 23 },
+          ],
+        },
+      }),
+    )
+
+    expect(result.reasons).not.toContain('per_criterion_contradictory')
+    expect(result.riskClass).toBe('batch_eligible')
+  })
+
+  it('caso REAL contradictorio: global 21 con aportes que suman 85 SÍ dispara la señal', () => {
+    const result = routeScoredItem(
+      cleanInput({
+        proposal: {
+          score: 21,
+          rationale: 'Respuesta parcial.',
+          perCriterion: [
+            { criterion: 'actúa sin esperar', weight: 25, score: 25 },
+            { criterion: 'contiene primero', weight: 25, score: 25 },
+            { criterion: 'comunica', weight: 25, score: 15 },
+            { criterion: 'deja aprendizaje', weight: 25, score: 20 },
+          ],
+        },
+      }),
+    )
+
+    expect(result.riskClass).toBe('mandatory_review')
+    expect(result.reasons).toContain('per_criterion_contradictory')
+  })
+
+  it('un criterio suelto lejos del global NO basta: contradice el AGREGADO, no un criterio', () => {
+    // Criterio en 0 y otro en 45: el agregado (85) sigue coherente con el global (85).
+    const result = routeScoredItem(
+      cleanInput({
+        responseId: findNonSampledResponseId(),
+        proposal: {
+          score: 85,
+          rationale: 'Fuerte salvo en un criterio.',
+          perCriterion: [
+            { criterion: 'a', weight: 25, score: 25 },
+            { criterion: 'b', weight: 25, score: 25 },
+            { criterion: 'c', weight: 25, score: 0 },
+            { criterion: 'd', weight: 25, score: 35 },
+          ],
+        },
+      }),
+    )
+
+    expect(result.reasons).not.toContain('per_criterion_contradictory')
+  })
+
+  it('renormaliza pesos que no suman 100 antes de comparar', () => {
+    // 40 aportes sobre 50 puntos declarados → implica 80: coherente con el global 85.
+    const result = routeScoredItem(
+      cleanInput({
+        responseId: findNonSampledResponseId(),
+        proposal: {
+          score: 85,
+          rationale: 'ok',
+          perCriterion: [
+            { criterion: 'a', weight: 30, score: 25 },
+            { criterion: 'b', weight: 20, score: 15 },
+          ],
+        },
+      }),
+    )
+
+    expect(result.reasons).not.toContain('per_criterion_contradictory')
   })
 })
 

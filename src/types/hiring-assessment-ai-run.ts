@@ -152,7 +152,8 @@ export interface AssessmentAiReviewItem {
     status: string
     score: number | null
     rationale: string | null
-    perCriterion: Array<{ criterion: string; score: number; note?: string }>
+    /** Aportes ponderados: `score` sobre `weight` puntos (escala declarada del contrato). */
+    perCriterion: Array<{ criterion: string; weight?: number; score: number; note?: string }>
     /** Provenance reconstruible (ADR D3): provider/model/prompt/digest, nunca payload crudo. */
     provider: string
     model: string
