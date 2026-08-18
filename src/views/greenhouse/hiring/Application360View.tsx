@@ -1015,12 +1015,20 @@ const Application360View = ({
                             sx={{
                               position: 'absolute',
                               inlineSize: 1,
+                              maxInlineSize: 1,
                               blockSize: 1,
                               m: -1,
                               overflow: 'hidden',
                               clip: 'rect(0 0 0 0)',
-                              whiteSpace: 'nowrap',
+                              tableLayout: 'fixed',
+                              whiteSpace: 'normal',
+                              overflowWrap: 'anywhere',
                               border: 0,
+                              '& caption, & tbody, & tr, & td': {
+                                inlineSize: 1,
+                                maxInlineSize: 1,
+                                overflow: 'hidden',
+                              },
                             }}
                           >
                             <caption>{assessmentCopy.review.title}</caption>
