@@ -1,3 +1,5 @@
+import type { HiringDataOrigin } from '@/lib/hiring/data-origin/contracts'
+
 // TASK-353 — Hiring / ATS domain foundation.
 // Tipos de dominio (view models camelCase + enums que espejan los CHECK constraints de
 // greenhouse_hiring). Arch: GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md.
@@ -449,6 +451,12 @@ export interface PublicOpeningPayload {
 // ── Input types (commands del store) ──
 
 export interface CreateTalentDemandInput {
+  /**
+   * TASK-1739 — Procedencia declarada en el NACIMIENTO del dato. Omitirla deja el dato visible
+   * (`real`), jamás oculto: perder un cargo real es peor que tolerar suciedad. Todo seed/smoke que
+   * cree demanda DEBE declararla.
+   */
+  dataOrigin?: HiringDataOrigin
   stakeholderType: TalentDemandStakeholderType
   engagementType: TalentDemandEngagementType
   fulfillmentMode: HiringFulfillmentMode
@@ -493,6 +501,8 @@ export interface UpdateTalentDemandInput {
 }
 
 export interface CreateHiringOpeningInput {
+  /** TASK-1739 — Procedencia declarada al nacer. Una vacante no-real NUNCA se puede publicar. */
+  dataOrigin?: HiringDataOrigin
   demandId: string
   internalTitle: string
   seniority?: string | null

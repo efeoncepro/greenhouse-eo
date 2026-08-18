@@ -5,6 +5,7 @@ import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { HIRING_PUBLIC_SENIORITIES, type HiringOpening, type PublicOpeningPayload } from '@/types/hiring'
 
+import { isSyntheticDataOrigin } from './data-origin/contracts'
 import { HiringNotFoundError, HiringValidationError } from './errors'
 import { normalizePublicOpeningContent, parseRemoteEligibleCountries } from './public-careers/public-content'
 import { assertPublishableOpening, requiresEditorialV2ForPublish } from './public-careers/publishability'
@@ -219,7 +220,7 @@ export const publishOpening = async (
       `SELECT public_title, public_summary, public_description, public_work_mode, public_hiring_region,
               public_city, public_country, public_office_location, public_area, public_skill_tags,
               public_seniority, public_content_json, public_remote_eligible_countries, publication_status,
-              published_at
+              published_at, data_origin
        FROM greenhouse_hiring.hiring_opening WHERE opening_id = $1 LIMIT 1`,
       [openingId]
     )
@@ -241,10 +242,28 @@ export const publishOpening = async (
           public_remote_eligible_countries: unknown
           publication_status: string
           published_at: Date | string | null
+          data_origin: string | null
         }
       | undefined
 
     if (!row) throw new HiringNotFoundError('El opening no existe.', 'hiring_opening_not_found')
+
+    // TASK-1739 Slice 2 — Una vacante que no representa un cargo real NUNCA se publica.
+    //
+    // Esto es la pieza PREVENTIVA del dominio, no una validación de forma. Ocho vacantes creadas
+    // por un smoke (`task-1372-smoke`) llegaron a estar publicadas en el careers real; que ningún
+    // candidato externo postulara a ellas fue suerte, no diseño. Y como la evidencia de identidad
+    // es append-only, un candidato externo atrapado en una vacante de prueba no se puede deshacer
+    // con el perfil runtime: queda pinneado por FK. Limpiar después es caro e incompleto; no
+    // publicar es gratis.
+    if (isSyntheticDataOrigin(row.data_origin)) {
+      throw new HiringValidationError(
+        'Una vacante marcada como dato no real no puede publicarse.',
+        'hiring_opening_synthetic_not_publishable',
+        422,
+        { openingId, dataOrigin: row.data_origin }
+      )
+    }
 
     // TASK-1740/1741 — Grandfathering de vacantes ya publicadas.
     //

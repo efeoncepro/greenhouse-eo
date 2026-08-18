@@ -35,6 +35,7 @@ import {
   type UpdateTalentDemandInput
 } from '@/types/hiring'
 
+import { HIRING_DATA_ORIGIN_VALUES, type HiringDataOrigin } from './data-origin/contracts'
 import { HiringNotFoundError, HiringValidationError } from './errors'
 import { assertPublicTitleSeniorityConsistency, parseHiringPublicSeniority } from './public-seniority'
 import {
@@ -665,6 +666,23 @@ export const listHiringApplications = async (
 // Writers — TalentDemand
 // ══════════════════════════════════════════════════════════════════════════
 
+/**
+ * TASK-1739 — Valida la procedencia declarada. Ausente ⇒ `real`: omitir deja el dato VISIBLE, que
+ * es molesto y evidente; el default inverso ocultaría un candidato o un cargo real, que es grave e
+ * invisible. Un valor fuera del enum es error del llamador y falla loud, no se degrada en silencio.
+ */
+const assertDataOrigin = (value: HiringDataOrigin | undefined): HiringDataOrigin => {
+  if (value === undefined) return 'real'
+
+  if (!(HIRING_DATA_ORIGIN_VALUES as readonly string[]).includes(value)) {
+    throw new HiringValidationError('La procedencia declarada no es válida.', 'hiring_invalid_data_origin', 400, {
+      dataOrigin: value
+    })
+  }
+
+  return value
+}
+
 export const createTalentDemand = async (
   input: CreateTalentDemandInput,
   actorUserId: string | null
@@ -684,10 +702,11 @@ export const createTalentDemand = async (
          stakeholder_type, engagement_type, fulfillment_mode, demand_origin, organization_id, client_id,
          space_id, business_unit, service_id, prospect_ref, deal_ref, external_account_ref,
          requested_company_name, requested_role, requested_seats, requested_skills, target_start_date,
-         priority, duration, timezone, language, budget_band, rate_band, owner_user_id, notes, created_by
+         priority, duration, timezone, language, budget_band, rate_band, owner_user_id, notes, created_by,
+         data_origin
        ) VALUES (
          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21,
-         $22, $23, $24, $25, $26
+         $22, $23, $24, $25, $26, $27
        )
        RETURNING ${TALENT_DEMAND_COLUMNS}`,
       [
@@ -716,7 +735,10 @@ export const createTalentDemand = async (
         input.rateBand ?? null,
         input.ownerUserId ?? null,
         input.notes ?? null,
-        actorUserId
+        actorUserId,
+        // TASK-1739 — raíz de procedencia de la demanda. Sin declaración explícita el dato nace
+        // `real`: omitir deja visible, nunca oculto.
+        assertDataOrigin(input.dataOrigin)
       ]
     )
 
@@ -835,8 +857,8 @@ export const createHiringOpening = async (
       client,
       `INSERT INTO greenhouse_hiring.hiring_opening (
          demand_id, internal_title, seniority, requested_seats, owner_user_id, space_id, organization_id,
-         budget_band, rate_band, risk_notes, internal_notes, created_by
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+         budget_band, rate_band, risk_notes, internal_notes, created_by, data_origin
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
        RETURNING ${HIRING_OPENING_COLUMNS}`,
       [
         demandId,
@@ -850,7 +872,10 @@ export const createHiringOpening = async (
         input.rateBand ?? null,
         input.riskNotes ?? null,
         input.internalNotes ?? null,
-        actorUserId
+        actorUserId,
+        // TASK-1739 — raíz de procedencia de la vacante. Una vacante no-real jamás se publica
+        // (guarda en `publishOpening`).
+        assertDataOrigin(input.dataOrigin)
       ]
     )
 
