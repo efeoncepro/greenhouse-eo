@@ -1,5 +1,6 @@
 import { afterAll, describe, expect, it } from 'vitest'
 
+import { resolveLiveTestIdentityProfileId } from '@/lib/hiring/live-test-identity'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
   createHiringApplication,
@@ -47,11 +48,7 @@ describe.skipIf(!hasPgConfig)('assessment scoring + rollup — live PG (TASK-136
   })
 
   it('objective auto-scores at submit; open answers queue for human; finalize rolls up weighted to the application', async () => {
-    const identityProfileId = (
-      await runGreenhousePostgresQuery<{ profile_id: string }>(
-        `SELECT profile_id FROM greenhouse_core.identity_profiles WHERE active = true LIMIT 1`,
-      )
-    )[0].profile_id
+    const identityProfileId = await resolveLiveTestIdentityProfileId()
 
     // Fixture pipeline.
     const demand = await createTalentDemand(

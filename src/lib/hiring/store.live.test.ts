@@ -1,5 +1,6 @@
 import { afterAll, describe, expect, it } from 'vitest'
 
+import { resolveLiveTestIdentityProfileId } from '@/lib/hiring/live-test-identity'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { editorialOpeningFixture } from '@/lib/hiring/public-careers/editorial-opening.fixture'
 
@@ -52,11 +53,9 @@ describe.skipIf(!hasPgConfig)('hiring store — live PG (TASK-353)', () => {
   })
 
   it('resolves an existing identity_profile to anchor the candidate facet', async () => {
-    const rows = await runGreenhousePostgresQuery<{ profile_id: string }>(
-      `SELECT profile_id FROM greenhouse_core.identity_profiles WHERE active = true LIMIT 1`
-    )
+    const syntheticProfileId = await resolveLiveTestIdentityProfileId()
 
-    identityProfileId = rows[0]?.profile_id ?? ''
+    identityProfileId = syntheticProfileId
     expect(identityProfileId).not.toBe('')
   })
 
