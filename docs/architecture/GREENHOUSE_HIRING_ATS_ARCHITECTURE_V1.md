@@ -61,6 +61,17 @@ existentes (cero endpoints nuevos, cero capabilities nuevas, cero eventos nuevos
 - **NUNCA** derivar `baseSalary` de `public_compensation_band`; sólo `content.compensation`
   estructurado y aprobado. Beneficios no son compensación.
 - **NUNCA** emitir `directApply` ni `validThrough`; el lifecycle honesto es published → 404.
+- **NUNCA** exigir el contrato editorial v2 para RE-publicar una vacante que ya estuvo al aire
+  (grandfathering, `requiresEditorialV2ForPublish` en `public-careers/publishability.ts`). El
+  contrato v2 es la barra de calidad de toda vacante que se publica **por primera vez**
+  (`published_at IS NULL`); aplicarlo también al re-publicar convierte una regla de autoría en una
+  **interrupción de servicio**: una vacante viva —`EO-OPN-0009` y `EO-OPN-0061` tenían 15 y 33
+  postulantes en proceso al 2026-08-17— que se pausa por cualquier motivo quedaría en 404 hasta
+  reescribir su bloque completo. La señal es `published_at`, que sólo escribe el publish, así que
+  una vacante nueva no puede saltarse v2 por esta vía. El operador desde brief
+  (`vacancy-publication-operator`) **sí** exige v2 siempre: siempre crea una vacante nueva.
+- **NUNCA** despublicar con `PATCH`/`visibility`: el guard de publicabilidad responde 422. El camino
+  canónico es `unpublishOpening` (`DELETE …/publish?mode=paused|closed`).
 - **NUNCA** poner el país de la entidad empleadora en `jobLocation` de una vacante remota para
   "dejar claro el anclaje contractual": `jobLocation` significa dónde se realiza físicamente el
   trabajo, así que Google dejaría de clasificarla como remota y la mostraría como empleo presencial

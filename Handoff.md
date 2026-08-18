@@ -2,6 +2,35 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-17 — Grandfathering: una vacante viva no se cae por una regla de autoría
+
+Revisión de TASK-1741 sobre el checkout compartido. El renderer editorial quedó bien (typecheck
+limpio, 974 tests verdes, migración de seniority aplicada, el texto de la vía contractual sobrevivió
+íntegro vía mapeo `remoteModel`→`workModel`), y **codificaron como candado el invariante de secuencia
+que TASK-1740 sólo había documentado**: el schema no puede emitirse sin el renderer editorial ON.
+Verifiqué la paridad empíricamente comparando frase por frase el JSON-LD contra el DOM renderizado:
+alineado en ambas vacantes.
+
+**El hallazgo que sí requería acción:** `publishOpening` pasó a exigir contenido editorial v2 de
+forma incondicional, y las dos vacantes publicadas son v1. Consecuencia: pausarlas las dejaba en 404
+hasta reescribir el bloque entero — con **15 postulantes en `EO-OPN-0009` y 33 en `EO-OPN-0061`**,
+o sea cortando el canal de procesos vivos. Autorizado por el CEO, se implementó **grandfathering**:
+`requiresEditorialV2ForPublish(published_at)` exige v2 sólo en la primera publicación. Verificado
+contra las filas reales: ambas pueden republicarse, y una vacante nueva con el mismo contenido sigue
+bloqueada (contraprueba en el mismo script). El operador desde brief conserva v2 obligatorio porque
+siempre crea vacantes nuevas.
+
+**Guardrail nuevo:** el invariante central del dominio (HTML visible ≡ JSON-LD) no tenía test que lo
+defendiera —el schema se testeaba aislado y la página aislada—, así que agregar un párrafo sólo-schema
+pasaba en verde. Ahora hay un test que cruza ambos lados sobre el DOM renderizado.
+
+**Pendientes que quedan del lado de TASK-1741 (reportados, no corregidos):** editar `publicContent`
+de una vacante publicada v1 obliga a migrarla entera a v2; el read path v2 traga excepciones con
+`catch → null`, así que el día que exista contenido v2 una validación más estricta lo haría
+desaparecer de la página **sin señal**; y toda vacante nombra 8 marcas de partners sin el gate de
+vigencia por vacante que pide el charter, además de publicar beneficios sin su calificador
+"se formaliza según tu modalidad y país" — relevante para vinculación internacional.
+
 ## 2026-08-17 — TASK-1741 tomada en develop tras auditoría paralela
 
 El operador autorizó expresamente ejecutar en el checkout compartido `develop`, sin cambiar de rama,

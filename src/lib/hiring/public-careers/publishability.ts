@@ -22,6 +22,21 @@ export type PublishableOpeningFields = {
 }
 
 /**
+ * TASK-1740/1741 — ¿esta publicación debe exigir el contrato editorial v2?
+ *
+ * Sólo cuando la vacante se publica POR PRIMERA VEZ. El contenido v2 es la barra de calidad
+ * del contrato nuevo y toda vacante nueva la cumple; pero aplicarla también al RE-publicar
+ * convertiría una regla de autoría en una interrupción de servicio: una vacante viva —con
+ * postulantes en proceso— que se pausa por cualquier motivo quedaría fuera del aire hasta
+ * reescribir su bloque completo, respondiendo 404 mientras tanto.
+ *
+ * `publishedAt` es la señal honesta de "ya estuvo al aire": sólo la escribe el publish, así
+ * que una vacante nueva la tiene en null y no puede saltarse v2 por esta vía.
+ */
+export const requiresEditorialV2ForPublish = (publishedAt: Date | string | null | undefined): boolean =>
+  publishedAt == null
+
+/**
  * Invariante compartida por publish y update: una fila que permanece publicada
  * nunca puede degradarse a un estado que el reader público no habría aceptado.
  */

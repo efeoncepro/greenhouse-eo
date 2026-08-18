@@ -7,7 +7,7 @@ import { HIRING_PUBLIC_SENIORITIES, type HiringOpening, type PublicOpeningPayloa
 
 import { HiringNotFoundError, HiringValidationError } from './errors'
 import { normalizePublicOpeningContent, parseRemoteEligibleCountries } from './public-careers/public-content'
-import { assertPublishableOpening } from './public-careers/publishability'
+import { assertPublishableOpening, requiresEditorialV2ForPublish } from './public-careers/publishability'
 import { assertPublicTitleSeniorityConsistency, parseHiringPublicSeniority } from './public-seniority'
 
 /**
@@ -218,7 +218,8 @@ export const publishOpening = async (
     const current = await client.query(
       `SELECT public_title, public_summary, public_description, public_work_mode, public_hiring_region,
               public_city, public_country, public_office_location, public_area, public_skill_tags,
-              public_seniority, public_content_json, public_remote_eligible_countries, publication_status
+              public_seniority, public_content_json, public_remote_eligible_countries, publication_status,
+              published_at
        FROM greenhouse_hiring.hiring_opening WHERE opening_id = $1 LIMIT 1`,
       [openingId]
     )
@@ -239,10 +240,24 @@ export const publishOpening = async (
           public_content_json: unknown
           public_remote_eligible_countries: unknown
           publication_status: string
+          published_at: Date | string | null
         }
       | undefined
 
     if (!row) throw new HiringNotFoundError('El opening no existe.', 'hiring_opening_not_found')
+
+    // TASK-1740/1741 — Grandfathering de vacantes ya publicadas.
+    //
+    // El contenido editorial v2 se exige a toda vacante que se publica POR PRIMERA VEZ: es la
+    // barra de calidad del contrato nuevo. Pero exigirlo también para RE-publicar convertiría
+    // una regla de autoría en una interrupción de servicio: una vacante viva —con postulantes
+    // en proceso— que se pausa por cualquier motivo quedaría fuera del aire hasta reescribir
+    // todo su bloque estructurado, y su URL pública respondería 404 mientras tanto.
+    //
+    // `published_at` es la señal honesta de "esta vacante ya estuvo al aire": sólo lo escribe
+    // el publish. Una vacante nueva lo tiene en null y por lo tanto NO puede saltarse v2.
+    const requireEditorialV2 = requiresEditorialV2ForPublish(row.published_at)
+
     assertPublishableOpening(
       {
         publicTitle: row.public_title,
@@ -259,7 +274,7 @@ export const publishOpening = async (
         publicContent: normalizePublicOpeningContent(row.public_content_json),
         publicRemoteEligibleCountries: parseRemoteEligibleCountries(row.public_remote_eligible_countries)
       },
-      { requireEditorialV2: true }
+      { requireEditorialV2 }
     )
 
     const updated = await client.query(

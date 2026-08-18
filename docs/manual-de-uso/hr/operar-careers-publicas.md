@@ -159,6 +159,25 @@ La distribución en redes o grupos externos ocurre **después** de publicar y ve
 
 Conserva el registro de campaña bajo `docs/operations/hiring/` con opening, URL, copy aprobado, destinos, estado observado y moderaciones pendientes. Ejemplo: [distribución de Facebook del 2026-08-11](../../operations/hiring/2026-08-11-facebook-vacancy-distribution.md).
 
+## Pausar y reabrir una vacante viva
+
+Una vacante que **ya estuvo publicada** se puede pausar y volver a publicar con
+su contenido tal como está: no se le exige el contrato editorial v2. Esto es
+deliberado — si se exigiera, pausar una vacante con postulantes en proceso la
+dejaría en 404 hasta reescribir todo su bloque estructurado.
+
+- Pausar/cerrar: `DELETE /api/hiring/openings/{id}/publish?mode=paused|closed`
+  (o `unpublishOpening`). No uses `PATCH` con `visibility` para despublicar: el
+  guard de publicabilidad lo rechaza con 422.
+- Reabrir: `POST /api/hiring/openings/{id}/publish`. Funciona con el contenido
+  vigente, sea v1 o v2.
+- **Una vacante nueva sí debe cumplir v2 para publicarse por primera vez.** Eso
+  incluye todo brief que pase por `pnpm hiring:publish-vacancy`.
+
+Migrar una vacante v1 a v2 es un trabajo de autoría de contenido, no un
+requisito para mantenerla al aire. Hazlo cuando vayas a mejorar la vacante, no
+bajo la presión de recuperarla.
+
 ## Contenido estructurado y schema de Google (TASK-1740)
 
 Toda vacante nueva lleva un bloque v2 que el renderer editorial, las proyecciones
