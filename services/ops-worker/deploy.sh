@@ -420,6 +420,15 @@ ENV_VARS="${ENV_VARS},HIRING_TALENT_POOL_PROJECTION_ENABLED=${HIRING_TALENT_POOL
 HIRING_TALENT_POOL_SELF_SERVICE_ENABLED="${HIRING_TALENT_POOL_SELF_SERVICE_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},HIRING_TALENT_POOL_SELF_SERVICE_ENABLED=${HIRING_TALENT_POOL_SELF_SERVICE_ENABLED}"
 
+# TASK-1718 — Proyección minimizada/redactada de CV por application exacta.
+# La materialización vive en este worker; el reader App API y las tools MCP tienen
+# flags propios. Activado para uso interno read-only autorizado por el operador el
+# 2026-08-18. No habilita ranking, decisiones, stage moves, tests ni email.
+# Rollback (<5 min):
+# `gcloud run services update ops-worker --region=us-east4 --update-env-vars HIRING_CANDIDATE_REVIEW_PROJECTION_ENABLED=false`.
+HIRING_CANDIDATE_REVIEW_PROJECTION_ENABLED="${HIRING_CANDIDATE_REVIEW_PROJECTION_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},HIRING_CANDIDATE_REVIEW_PROJECTION_ENABLED=${HIRING_CANDIDATE_REVIEW_PROJECTION_ENABLED}"
+
 # TASK-1734 — Run asíncrono de scoring IA por assessment (ADR
 # GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1, D6). Este deploy.sh es el SoT de los
 # flags cuyo runtime owner es el ops-worker: la proyección reactiva

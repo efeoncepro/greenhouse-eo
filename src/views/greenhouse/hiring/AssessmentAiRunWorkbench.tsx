@@ -250,6 +250,16 @@ export const AssessmentAiRunEntry = ({ assessmentId, copy, canScore }: Assessmen
 
   const coverage = provisional?.coverage
 
+  const reviewSettled = Boolean(
+    coverage
+    && coverage.totalResponses > 0
+    && coverage.effectiveResponses === coverage.totalResponses
+    && coverage.provisionalResponses === 0
+    && provisional?.exceptions.length === 0
+    && provisional.status !== 'running'
+    && provisional.status !== 'not_started',
+  )
+
   const statusMessage = provisional?.status === 'running' || provisional?.status === 'not_started'
     ? copy.provisionalPending
     : provisional?.status === 'partial'
@@ -275,7 +285,9 @@ export const AssessmentAiRunEntry = ({ assessmentId, copy, canScore }: Assessmen
       <Stack spacing={2.5} sx={{ p: { xs: 2.5, sm: 3 } }} data-capture='assessment-provisional-summary'>
         <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={1.5}>
           <Stack direction='row' spacing={1.25} alignItems='center' flexWrap='wrap' useFlexGap>
-            <Typography variant='subtitle1' color='text.primary' fontWeight={700}>{copy.provisionalTitle}</Typography>
+            <Typography variant='subtitle1' color='text.primary' fontWeight={700}>
+              {reviewSettled ? copy.reviewedTitle : copy.provisionalTitle}
+            </Typography>
             <GreenhouseChip kind='status' variant='label' size='small' tone='info' label={copy.operatorOnly} />
             {run && chipLabel ? <GreenhouseChip kind='status' variant='label' size='small' tone={runStatusTone(run.status)} label={chipLabel} /> : null}
           </Stack>
@@ -288,7 +300,14 @@ export const AssessmentAiRunEntry = ({ assessmentId, copy, canScore }: Assessmen
           ) : null}
         </Stack>
 
-        {provisional ? (
+        {provisional && reviewSettled && coverage ? (
+          <Typography variant='body2' color='text.secondary'>
+            {fmt(copy.reviewedSummary, {
+              effective: coverage.effectiveResponses,
+              total: coverage.totalResponses,
+            })}
+          </Typography>
+        ) : provisional ? (
           <>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 2, sm: 4 }} alignItems={{ xs: 'flex-start', sm: 'center' }}>
               <Box>

@@ -101,6 +101,8 @@ export const hiringAssessment: HiringAssessmentCopy = {
   },
   scoringRun: {
     provisionalTitle: 'Evaluación provisional de IA',
+    reviewedTitle: 'Evaluación asistida revisada',
+    reviewedSummary: '{effective} de {total} respuestas ya tienen puntaje efectivo. La trazabilidad del run sigue disponible.',
     operatorOnly: 'Solo para operadores',
     provisionalDisclaimer: 'No incorporada al resultado efectivo',
     provisionalScoreLabel: 'Puntaje provisional de IA',

@@ -27,6 +27,7 @@ interface ProjectionRow extends Record<string, unknown> {
   risk_class: unknown
   reason_code: unknown
   routing_reasons: unknown
+  resolution: unknown
   proposed_json: unknown
 }
 
@@ -83,7 +84,7 @@ export const readProvisionalAssessmentAiProjection = async (
             tm.target_level, COALESCE(tm.weight, 0) AS competency_weight,
             r.auto_score, r.human_score,
             i.run_item_id, i.status AS item_status, i.risk_class, i.reason_code,
-            i.routing_reasons, p.proposed_json
+            i.routing_reasons, i.resolution, p.proposed_json
        FROM greenhouse_hiring.hiring_assessment a
        JOIN greenhouse_hiring.hiring_assessment_response r ON r.assessment_id = a.assessment_id
        JOIN greenhouse_hiring.hiring_competency c ON c.competency_id = r.competency_id
@@ -242,8 +243,13 @@ export const readProvisionalAssessmentAiProjection = async (
     exceptions: normalized.flatMap(entry => {
       const itemStatus = entry.row.item_status as AiScoringRunItemStatus | null
       const routingReasons = stringArray(entry.row.routing_reasons)
+      const resolved = entry.row.resolution != null
 
-      if (!entry.row.run_item_id || (!['abstained', 'failed'].includes(itemStatus ?? '') && routingReasons.length === 0)) return []
+      if (
+        !entry.row.run_item_id
+        || resolved
+        || (!['abstained', 'failed'].includes(itemStatus ?? '') && routingReasons.length === 0)
+      ) return []
 
       return [{
         runItemId: String(entry.row.run_item_id),

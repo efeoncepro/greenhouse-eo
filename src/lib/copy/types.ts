@@ -188,6 +188,8 @@ export interface HiringAssessmentCopy {
    */
   scoringRun: {
     provisionalTitle: string
+    reviewedTitle: string
+    reviewedSummary: string
     operatorOnly: string
     provisionalDisclaimer: string
     provisionalScoreLabel: string

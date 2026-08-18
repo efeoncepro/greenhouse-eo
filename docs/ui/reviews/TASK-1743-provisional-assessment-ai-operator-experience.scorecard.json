@@ -1,0 +1,30 @@
+{
+  "taskId": "TASK-1743",
+  "scenario": "task-1743-provisional-assessment-ai",
+  "reviewedAt": "2026-08-18",
+  "reviewer": "Codex",
+  "evidence": {
+    "desktop": ".captures/2026-08-18T18-55-55_task-1743-provisional-assessment-ai/01-desktop/frames/01-provisional-summary.png",
+    "mobile": ".captures/2026-08-18T18-55-55_task-1743-provisional-assessment-ai/02-mobile/frames/01-provisional-summary.png",
+    "dossier": "docs/ui/reviews/TASK-1743-provisional-assessment-ai-operator-experience.review.md"
+  },
+  "dimensions": {
+    "hierarchy": { "score": 5, "rationale": "La autoridad provisional, el score y la cobertura se leen en ese orden.", "evidence": "desktop/mobile provisional-summary", "nextAction": "none" },
+    "proportions": { "score": 4, "rationale": "El resumen aprovecha dos columnas en desktop y una columna legible en 390 px.", "evidence": "desktop/mobile provisional-summary", "nextAction": "none" },
+    "rhythm": { "score": 4, "rationale": "Separadores y espaciado sostienen nueve competencias sin cortes.", "evidence": "desktop/mobile provisional-summary", "nextAction": "none" },
+    "density": { "score": 4, "rationale": "Cobertura alta, pero con disclosure progresivo y sin duplicar el score efectivo.", "evidence": "provisional-summary and provisional-coverage", "nextAction": "none" },
+    "depth": { "score": 4, "rationale": "La superficie operacional se distingue del canvas y preserva una jerarquía plana.", "evidence": "enterprise rubric pass", "nextAction": "none" },
+    "surfaceEconomy": { "score": 5, "rationale": "Extiende el workbench existente; no agrega dashboard, modal ni card paralela.", "evidence": "AssessmentAiRunWorkbench", "nextAction": "none" },
+    "visualImpact": { "score": 4, "rationale": "El estado operator-only y el valor provisional son notorios sin celebrar el score.", "evidence": "desktop/mobile provisional-summary", "nextAction": "none" },
+    "typography": { "score": 5, "rationale": "Labels completos, wrapping semántico y cifras alineadas; no hay truncado.", "evidence": "mobile provisional-summary", "nextAction": "none" },
+    "color": { "score": 4, "rationale": "Tokens canónicos y contraste AA; warning comunica revisión, no resultado adverso.", "evidence": "GVC contrast pass", "nextAction": "none" },
+    "iconography": { "score": 4, "rationale": "La señal de atención usa el icono canónico y no compite con la acción primaria.", "evidence": "provisional-summary", "nextAction": "none" },
+    "responsive": { "score": 5, "rationale": "390 px apila controles y competencias sin overflow de página.", "evidence": "mobile manifest exitCode 0", "nextAction": "none" },
+    "motion": { "score": 5, "rationale": "No introduce motion decorativa y conserva equivalencia con reduced motion.", "evidence": "scenario reduced-motion probe", "nextAction": "none" },
+    "fidelity": { "score": 5, "rationale": "Cumple el flujo, wireframe y separación provisional/efectivo aprobados.", "evidence": "TASK-1743 flow and wireframe", "nextAction": "none" },
+    "genericTemplateResistance": { "score": 4, "rationale": "La semántica de autoridad, cobertura y revisión es específica del dominio Hiring.", "evidence": "enterprise rubric pass", "nextAction": "none" }
+  },
+  "average": 4.43,
+  "floor": 4,
+  "verdict": "pass"
+}

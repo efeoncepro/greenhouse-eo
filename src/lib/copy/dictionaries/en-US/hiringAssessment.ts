@@ -101,6 +101,8 @@ export const hiringAssessment: HiringAssessmentCopy = {
   },
   scoringRun: {
     provisionalTitle: 'Provisional AI evaluation',
+    reviewedTitle: 'Assisted evaluation reviewed',
+    reviewedSummary: '{effective} of {total} responses now have an effective score. Run traceability remains available.',
     operatorOnly: 'Operators only',
     provisionalDisclaimer: 'Not incorporated into the effective result',
     provisionalScoreLabel: 'Provisional AI score',
