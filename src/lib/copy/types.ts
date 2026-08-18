@@ -187,6 +187,21 @@ export interface HiringAssessmentCopy {
    * vive acá se renderiza solo para operadores con `hiring.assessment.score`.
    */
   scoringRun: {
+    provisionalTitle: string
+    operatorOnly: string
+    provisionalDisclaimer: string
+    provisionalScoreLabel: string
+    provisionalPending: string
+    provisionalPartial: string
+    provisionalFailed: string
+    provisionalStale: string
+    provisionalCoverage: string
+    provisionalEffective: string
+    provisionalResponses: string
+    provisionalAbstained: string
+    provisionalFailures: string
+    provisionalCompetencies: string
+    provisionalNeedsAttention: string
     entryChip: string
     entryExceptions: string
     entryError: string

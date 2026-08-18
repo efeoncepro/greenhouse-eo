@@ -11,6 +11,8 @@ import {
   AI_SCORING_RUN_ITEM_TERMINAL_STATUSES,
   AI_SCORING_RUN_TERMINAL_STATUSES,
   type AiScoringRunWithItems,
+  type BackfillAssessmentAiScoringRunsInput,
+  type BackfillAssessmentAiScoringRunsResult,
   type ReconcileAiScoringRunsResult,
   type StartAiScoringRunResult,
 } from '@/types/hiring-assessment-ai-run'
@@ -19,7 +21,11 @@ import { HUMAN_RATED_QUESTION_TYPES } from '@/types/hiring-assessment'
 import { HiringNotFoundError, HiringValidationError } from '../../../errors'
 import { HIRING_ASSESSMENT_SCORING_PROMPT_VERSION, getHiringAssessmentScoringModel } from '../config'
 import { supersedeOrphanResponseScoreProposals } from '../proposal-store'
-import { HIRING_ASSESSMENT_AI_RUN_POLICY_VERSION, isHiringAssessmentAiRunEnqueueEnabled } from './config'
+import {
+  getEffectiveHiringAssessmentAiRunMode,
+  getHiringAssessmentAiRunPolicyVersion,
+  isHiringAssessmentAiRunEnqueueEnabled,
+} from './config'
 import {
   createScoringRun,
   findActiveScoringRun,
@@ -135,7 +141,7 @@ export const computeCurrentScoringRunDigest = async (
     assessmentId,
     getHiringAssessmentScoringModel(),
     HIRING_ASSESSMENT_SCORING_PROMPT_VERSION,
-    HIRING_ASSESSMENT_AI_RUN_POLICY_VERSION,
+    getHiringAssessmentAiRunPolicyVersion(),
     rows.map(r => ({
       responseId: String(r.response_id),
       questionPrompt: String(r.question_prompt),
@@ -183,12 +189,24 @@ const requireAssessment = async (assessmentId: string): Promise<{ assessmentId: 
 export const startAssessmentAiScoringRun = async (
   assessmentId: string,
   actorUserId: string | null,
+  context: { reason?: string; idempotencyKey?: string } = {},
 ): Promise<StartAiScoringRunResult> => {
   if (!isHiringAssessmentAiRunEnqueueEnabled()) {
     throw new HiringValidationError(
       'El scoring asíncrono por assessment está deshabilitado.',
       'assessment_ai_run_enqueue_disabled',
       409,
+    )
+  }
+
+  if (
+    getEffectiveHiringAssessmentAiRunMode() === 'synthetic_shadow' &&
+    !actorUserId?.startsWith('system:assessment-ai-synthetic-shadow')
+  ) {
+    throw new HiringValidationError(
+      'El modo synthetic_shadow solo admite el actor de shadow gobernado.',
+      'assessment_ai_shadow_actor_required',
+      403,
     )
   }
 
@@ -200,7 +218,7 @@ export const startAssessmentAiScoringRun = async (
     assessmentId,
     effectiveModel,
     HIRING_ASSESSMENT_SCORING_PROMPT_VERSION,
-    HIRING_ASSESSMENT_AI_RUN_POLICY_VERSION,
+    getHiringAssessmentAiRunPolicyVersion(),
     eligible.map(r => ({
       responseId: String(r.response_id),
       questionPrompt: String(r.question_prompt),
@@ -223,7 +241,7 @@ export const startAssessmentAiScoringRun = async (
       inputDigest,
       model: effectiveModel,
       promptVersion: HIRING_ASSESSMENT_SCORING_PROMPT_VERSION,
-      policyVersion: HIRING_ASSESSMENT_AI_RUN_POLICY_VERSION,
+      policyVersion: getHiringAssessmentAiRunPolicyVersion(),
       createdBy: actorUserId,
     })
 
@@ -238,6 +256,11 @@ export const startAssessmentAiScoringRun = async (
       fromStatus: null,
       toStatus: 'created',
       actorUserId,
+      detail: {
+        ...(context.reason ? { reason: context.reason.slice(0, 500) } : {}),
+        ...(context.idempotencyKey ? { idempotencyKey: context.idempotencyKey.slice(0, 200) } : {}),
+        mode: getEffectiveHiringAssessmentAiRunMode(),
+      },
     })
 
     const enumerating = await transitionScoringRun(client, run, 'enumerating', { actorUserId })
@@ -263,7 +286,7 @@ export const startAssessmentAiScoringRun = async (
           itemCount: items.length,
           model: effectiveModel,
           promptVersion: HIRING_ASSESSMENT_SCORING_PROMPT_VERSION,
-          policyVersion: HIRING_ASSESSMENT_AI_RUN_POLICY_VERSION,
+          policyVersion: getHiringAssessmentAiRunPolicyVersion(),
           actorUserId,
         },
       },
@@ -272,6 +295,54 @@ export const startAssessmentAiScoringRun = async (
 
     return { run: settled, items, created: true }
   })
+}
+
+/** Backfill gobernado: exact ID o lote submitted acotado; dry-run por defecto. */
+export const backfillSubmittedAssessmentAiScoringRuns = async (
+  input: BackfillAssessmentAiScoringRunsInput,
+): Promise<BackfillAssessmentAiScoringRunsResult> => {
+  if (!input.actorUserId || !input.reason.trim() || !input.idempotencyKey.trim()) {
+    throw new HiringValidationError(
+      'El backfill exige actor, reason e idempotencyKey.',
+      'assessment_ai_backfill_context_required',
+      400,
+    )
+  }
+
+  const limit = Math.max(1, Math.min(25, Math.floor(input.limit)))
+
+  const rows = await runGreenhousePostgresQuery<{ assessment_id: unknown }>(
+    `SELECT a.assessment_id
+       FROM greenhouse_hiring.hiring_assessment a
+      WHERE a.status = 'submitted'
+        AND ($1::text IS NULL OR a.assessment_id = $1)
+        AND EXISTS (
+          SELECT 1 FROM greenhouse_hiring.hiring_assessment_response r
+          WHERE r.assessment_id = a.assessment_id
+            AND r.needs_human_rating = TRUE
+            AND r.human_score IS NULL
+        )
+      ORDER BY a.submitted_at NULLS LAST, a.assessment_id
+      LIMIT $2`,
+    [input.assessmentId ?? null, limit],
+  )
+
+  const candidates = rows.map(row => String(row.assessment_id))
+
+  if (input.dryRun) return { dryRun: true, candidates, started: [] }
+
+  const started: BackfillAssessmentAiScoringRunsResult['started'] = []
+
+  for (const assessmentId of candidates) {
+    const result = await startAssessmentAiScoringRun(assessmentId, input.actorUserId, {
+      reason: input.reason,
+      idempotencyKey: `${input.idempotencyKey}:${assessmentId}`,
+    })
+
+    started.push({ assessmentId, runId: result.run.runId, created: result.created })
+  }
+
+  return { dryRun: false, candidates, started }
 }
 
 /** Reader exact-scoped: run + items (readback). `null` si el run no existe. */

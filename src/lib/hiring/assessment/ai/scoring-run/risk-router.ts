@@ -28,6 +28,7 @@ import type { AiScoringRiskClass } from '@/types/hiring-assessment-ai-run'
 import type { ResponseScoreProposal } from '@/types/hiring-assessment-ai'
 
 import { summarizeCriterionContribution } from '../contracts'
+import type { AssessmentAiInputSafetyReason } from '../input-safety'
 
 // ── Reason codes ESTABLES (evidencia auditable en routing_reasons; nunca prosa) ──
 
@@ -40,6 +41,11 @@ export const AI_RISK_ROUTING_REASONS = [
   'per_criterion_contradictory',
   'score_decision_near_band',
   'high_weight_competency',
+  'prompt_injection_detected',
+  'embedded_pii_redacted',
+  'protected_data_redacted',
+  'multilingual_or_ood',
+  'off_topic_or_ood',
   'exception_policy_disabled',
   'blind_quality_sample',
   'no_risk_signals',
@@ -106,6 +112,8 @@ export interface RiskRoutingInput {
   /** Peso del módulo de competencia en el template (0–100) o null si no hay template. */
   competencyWeight: number | null
   proposal: ResponseScoreProposal
+  /** Señales determinísticas producidas antes de egress; nunca texto ni PII. */
+  inputSafetyReasons?: AssessmentAiInputSafetyReason[]
   /** Estado inyectado de `HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED` (OFF ⇒ todo mandatory). */
   exceptionPolicyEnabled: boolean
   policy?: AiRunRiskPolicyConfig
@@ -126,6 +134,8 @@ export interface RiskRoutingResult {
 export const routeScoredItem = (input: RiskRoutingInput): RiskRoutingResult => {
   const policy = input.policy ?? DEFAULT_AI_RUN_RISK_POLICY
   const reasons: AiRiskRoutingReason[] = []
+
+  reasons.push(...(input.inputSafetyReasons ?? []))
 
   const answer = input.answerText.trim()
 

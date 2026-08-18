@@ -48,6 +48,7 @@ import type {
   AiScoringRunStatus,
   AssessmentAiReviewItem,
   AssessmentAiRunReview,
+  ProvisionalAssessmentAiProjection,
 } from '@/types/hiring-assessment-ai-run'
 
 type ScoringRunCopy = HiringAssessmentCopy['scoringRun']
@@ -147,6 +148,8 @@ export interface AssessmentAiRunEntryProps {
 
 interface CollectionResponse {
   runs: AiScoringRun[]
+  provisional: ProvisionalAssessmentAiProjection
+  mode: string
   confirmEnabled: boolean
 }
 
@@ -156,6 +159,7 @@ interface CollectionResponse {
  */
 export const AssessmentAiRunEntry = ({ assessmentId, copy, canScore }: AssessmentAiRunEntryProps) => {
   const [run, setRun] = useState<AiScoringRun | null>(null)
+  const [provisional, setProvisional] = useState<ProvisionalAssessmentAiProjection | null>(null)
   const [confirmEnabled, setConfirmEnabled] = useState(false)
   const [pendingExceptions, setPendingExceptions] = useState(0)
   const [failed, setFailed] = useState(false)
@@ -167,6 +171,7 @@ export const AssessmentAiRunEntry = ({ assessmentId, copy, canScore }: Assessmen
     if (!canScore) return
 
     let alive = true
+    let refreshTimer: ReturnType<typeof setTimeout> | null = null
 
     const load = async () => {
       try {
@@ -179,6 +184,7 @@ export const AssessmentAiRunEntry = ({ assessmentId, copy, canScore }: Assessmen
         const latest = body.runs[0] ?? null
 
         setRun(latest)
+        setProvisional(body.provisional)
         setConfirmEnabled(Boolean(body.confirmEnabled))
         setFailed(false)
 
@@ -196,6 +202,12 @@ export const AssessmentAiRunEntry = ({ assessmentId, copy, canScore }: Assessmen
         } else {
           setPendingExceptions(0)
         }
+
+        if (body.provisional.status === 'running' || latest?.status === 'scoring' || latest?.status === 'enumerating') {
+          refreshTimer = setTimeout(() => {
+            if (alive) setReloadKey(key => key + 1)
+          }, 5000)
+        }
       } catch {
         if (alive) setFailed(true)
       }
@@ -205,6 +217,7 @@ export const AssessmentAiRunEntry = ({ assessmentId, copy, canScore }: Assessmen
 
     return () => {
       alive = false
+      if (refreshTimer) clearTimeout(refreshTimer)
     }
   }, [assessmentId, canScore, reloadKey])
 
@@ -227,40 +240,114 @@ export const AssessmentAiRunEntry = ({ assessmentId, copy, canScore }: Assessmen
     )
   }
 
-  if (!run) return null
+  if (!run && !provisional) return null
 
-  const chipLabel =
+  const chipLabel = run && (
     pendingExceptions > 0
       ? `${fmt(copy.entryChip, { status: copy.statuses[run.status] })} · ${fmt(copy.entryExceptions, { count: pendingExceptions })}`
       : fmt(copy.entryChip, { status: copy.statuses[run.status] })
+  )
+
+  const coverage = provisional?.coverage
+
+  const statusMessage = provisional?.status === 'running' || provisional?.status === 'not_started'
+    ? copy.provisionalPending
+    : provisional?.status === 'partial'
+      ? copy.provisionalPartial
+      : provisional?.status === 'failed'
+        ? copy.provisionalFailed
+        : provisional?.status === 'stale'
+          ? copy.provisionalStale
+          : null
 
   return (
-    <Stack
-      direction='row'
-      spacing={2}
-      alignItems='center'
-      flexWrap='wrap'
-      useFlexGap
+    <Box
       data-capture='assessment-run-entry'
+      sx={theme => ({
+        border: '1px solid',
+        borderColor: theme.palette.info.main,
+        borderRadius: `${theme.shape.customBorderRadius.md}px`,
+        backgroundColor: theme.palette.info.lightOpacity,
+        overflow: 'hidden',
+      })}
     >
-      <GreenhouseChip kind='status' variant='label' size='small' tone={runStatusTone(run.status)} label={chipLabel} />
-      <Box ref={openTriggerRef} sx={{ display: 'inline-flex' }}>
-        <GreenhouseButton variant='outlined' size='small' onClick={() => setWorkbenchOpen(true)}>
-          {copy.open}
-        </GreenhouseButton>
-      </Box>
-      <AssessmentAiRunWorkbench
-        open={workbenchOpen}
-        runId={run.runId}
-        copy={copy}
-        confirmEnabled={confirmEnabled}
-        onClose={() => {
-          setWorkbenchOpen(false)
-          setReloadKey(k => k + 1)
-          restoreFocus()
-        }}
-      />
-    </Stack>
+      <Stack spacing={2.5} sx={{ p: { xs: 2.5, sm: 3 } }} data-capture='assessment-provisional-summary'>
+        <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={1.5}>
+          <Stack direction='row' spacing={1.25} alignItems='center' flexWrap='wrap' useFlexGap>
+            <Typography variant='subtitle1' fontWeight={700}>{copy.provisionalTitle}</Typography>
+            <GreenhouseChip kind='status' variant='label' size='small' tone='info' label={copy.operatorOnly} />
+            {run && chipLabel ? <GreenhouseChip kind='status' variant='label' size='small' tone={runStatusTone(run.status)} label={chipLabel} /> : null}
+          </Stack>
+          {run ? (
+            <Box ref={openTriggerRef} sx={{ display: 'inline-flex', inlineSize: { xs: '100%', sm: 'auto' } }}>
+              <GreenhouseButton variant='outlined' size='small' fullWidth onClick={() => setWorkbenchOpen(true)}>
+                {copy.open}
+              </GreenhouseButton>
+            </Box>
+          ) : null}
+        </Stack>
+
+        {provisional ? (
+          <>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 2, sm: 4 }} alignItems={{ xs: 'flex-start', sm: 'center' }}>
+              <Box>
+                <Typography variant='h4' component='p' aria-label={copy.provisionalScoreLabel}>
+                  {provisional.overallScore == null ? '—' : Math.round(provisional.overallScore)}
+                  <Typography component='span' variant='h6' color='text.secondary'> /100</Typography>
+                </Typography>
+                <Typography variant='caption' color='text.secondary'>{copy.provisionalDisclaimer}</Typography>
+              </Box>
+              {coverage ? (
+                <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap data-capture='assessment-ai-coverage'>
+                  <GreenhouseChip kind='attribute' size='small' label={fmt(copy.provisionalCoverage, { evaluated: coverage.evaluatedResponses, total: coverage.totalResponses })} />
+                  <GreenhouseChip kind='attribute' size='small' label={fmt(copy.provisionalEffective, { count: coverage.effectiveResponses })} />
+                  <GreenhouseChip kind='attribute' size='small' label={fmt(copy.provisionalResponses, { count: coverage.provisionalResponses })} />
+                  {coverage.abstainedResponses > 0 ? <GreenhouseChip kind='status' tone='warning' size='small' label={fmt(copy.provisionalAbstained, { count: coverage.abstainedResponses })} /> : null}
+                  {coverage.failedResponses > 0 ? <GreenhouseChip kind='status' tone='error' size='small' label={fmt(copy.provisionalFailures, { count: coverage.failedResponses })} /> : null}
+                </Stack>
+              ) : null}
+            </Stack>
+
+            {statusMessage ? <Alert severity={provisional.status === 'failed' ? 'error' : provisional.status === 'partial' || provisional.status === 'stale' ? 'warning' : 'info'}>{statusMessage}</Alert> : null}
+
+            {provisional.competencies.length > 0 ? (
+              <Box>
+                <Typography variant='subtitle2' sx={{ mb: 1.25 }}>{copy.provisionalCompetencies}</Typography>
+                <Box component='ul' sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' }, gap: 1, p: 0, m: 0, listStyle: 'none' }}>
+                  {provisional.competencies.map(competency => (
+                    <Stack component='li' key={competency.competencyId} direction='row' justifyContent='space-between' spacing={2} sx={{ minInlineSize: 0, py: 0.75, borderBlockEnd: '1px solid', borderColor: 'divider' }}>
+                      <Typography variant='body2' sx={{ overflowWrap: 'anywhere' }}>{competency.competencyName}</Typography>
+                      <Typography variant='body2' fontWeight={700} sx={{ whiteSpace: 'nowrap' }}>{competency.score == null ? '—' : `${Math.round(competency.score)}/100`}</Typography>
+                    </Stack>
+                  ))}
+                </Box>
+              </Box>
+            ) : null}
+
+            <Box data-capture='assessment-ai-exceptions'>
+              {provisional.exceptions.length > 0 ? (
+                <Alert severity='warning'>
+                  {copy.provisionalNeedsAttention.replace('{count}', String(provisional.exceptions.length))}
+                </Alert>
+              ) : null}
+            </Box>
+          </>
+        ) : null}
+      </Stack>
+      {run ? (
+        <AssessmentAiRunWorkbench
+          open={workbenchOpen}
+          runId={run.runId}
+          copy={copy}
+          confirmEnabled={confirmEnabled}
+          onClose={() => {
+            setWorkbenchOpen(false)
+            setReloadKey(k => k + 1)
+            restoreFocus()
+          }}
+        />
+      ) : null}
+    </Box>
   )
 }
 

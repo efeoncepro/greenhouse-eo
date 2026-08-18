@@ -485,6 +485,18 @@ export const listClaimableScoringRunIds = async (limit: number): Promise<string[
   return rows.map(r => str(r.run_id))
 }
 
+/** Uso agregado PII-free para el cost cap móvil de 24h. */
+export const countAssessmentAiProviderAttemptsSince = async (since: Date): Promise<number> => {
+  const rows = await runGreenhousePostgresQuery<{ attempts: unknown }>(
+    `SELECT COALESCE(SUM(attempt_count), 0)::bigint AS attempts
+       FROM greenhouse_hiring.hiring_assessment_ai_scoring_run_item
+      WHERE updated_at >= $1`,
+    [since.toISOString()],
+  )
+
+  return Math.max(0, int(rows[0]?.attempts))
+}
+
 /**
  * Claim atómico del run por lease: UN UPDATE condicional es el lock (el segundo drain
  * concurrente matchea cero filas y recibe `null` — nunca dos drains sobre el mismo run).

@@ -2,8 +2,16 @@ import { NextResponse } from 'next/server'
 
 import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { can } from '@/lib/entitlements/runtime'
-import { toHiringErrorResponse } from '@/lib/hiring'
-import { isHiringAssessmentAiRunConfirmEnabled, listAssessmentAiScoringRuns } from '@/lib/hiring/assessment/ai'
+import { hiringInvalidBodyResponse, toHiringErrorResponse } from '@/lib/hiring'
+import {
+  backfillSubmittedAssessmentAiScoringRuns,
+  getEffectiveHiringAssessmentAiRunMode,
+  isHiringAssessmentAiRunConfirmEnabled,
+  listAssessmentAiScoringRuns,
+  readProvisionalAssessmentAiProjection,
+  reconcileAssessmentAiScoringRuns,
+  startAssessmentAiScoringRun,
+} from '@/lib/hiring/assessment/ai'
 import { requireInternalTenantContext } from '@/lib/tenant/authorization'
 
 /**
@@ -45,10 +53,77 @@ export async function GET(request: Request) {
   }
 
   try {
-    const runs = await listAssessmentAiScoringRuns(assessmentId)
+    const [runs, provisional] = await Promise.all([
+      listAssessmentAiScoringRuns(assessmentId),
+      readProvisionalAssessmentAiProjection(assessmentId),
+    ])
 
-    return NextResponse.json({ runs, confirmEnabled: isHiringAssessmentAiRunConfirmEnabled() })
+    return NextResponse.json({
+      runs,
+      provisional,
+      mode: getEffectiveHiringAssessmentAiRunMode(),
+      confirmEnabled: isHiringAssessmentAiRunConfirmEnabled(),
+    })
   } catch (error) {
     return toHiringErrorResponse(error, 'assessment_ai_scoring_runs_collection')
+  }
+}
+
+interface ScoringRunsCommandBody {
+  action?: 'start' | 'backfill' | 'reconcile'
+  assessmentId?: string
+  dryRun?: boolean
+  limit?: number
+  reason?: string
+  idempotencyKey?: string
+}
+
+export async function POST(request: Request) {
+  const { tenant, errorResponse } = await requireInternalTenantContext()
+
+  if (!tenant) return errorResponse ?? canonicalErrorResponse('unauthorized')
+
+  if (!can(tenant, 'hiring.assessment.score', 'execute', 'tenant')) {
+    return canonicalErrorResponse('forbidden', { extra: { requiredCapability: 'hiring.assessment.score' } })
+  }
+
+  let body: ScoringRunsCommandBody
+
+  try {
+    body = (await request.json()) as ScoringRunsCommandBody
+  } catch {
+    return hiringInvalidBodyResponse()
+  }
+
+  try {
+    if (body.action === 'start') {
+      if (!body.assessmentId || !body.reason?.trim() || !body.idempotencyKey?.trim()) {
+        return hiringInvalidBodyResponse()
+      }
+
+      return NextResponse.json(await startAssessmentAiScoringRun(body.assessmentId, tenant.userId, {
+        reason: body.reason,
+        idempotencyKey: body.idempotencyKey,
+      }))
+    }
+
+    if (body.action === 'backfill') {
+      return NextResponse.json(await backfillSubmittedAssessmentAiScoringRuns({
+        dryRun: body.dryRun !== false,
+        limit: body.limit ?? 10,
+        assessmentId: body.assessmentId,
+        actorUserId: tenant.userId,
+        reason: body.reason ?? '',
+        idempotencyKey: body.idempotencyKey ?? '',
+      }))
+    }
+
+    if (body.action === 'reconcile') {
+      return NextResponse.json(await reconcileAssessmentAiScoringRuns(tenant.userId))
+    }
+
+    return hiringInvalidBodyResponse()
+  } catch (error) {
+    return toHiringErrorResponse(error, 'assessment_ai_scoring_runs_command')
   }
 }

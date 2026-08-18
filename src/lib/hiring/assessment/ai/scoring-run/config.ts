@@ -13,15 +13,65 @@ import { DEFAULT_AI_RUN_RISK_POLICY, type AiRunRiskPolicyConfig } from './risk-r
 // Registro obligatorio en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (mismo PR).
 
 /** Gatea creación de runs + fan-out de scoring (proyección + drain). Runtime owner: ops-worker. */
+export const HIRING_ASSESSMENT_AI_RUN_MODES = [
+  'disabled',
+  'synthetic_shadow',
+  'global_provisional',
+  'exception_canary',
+  'calibrated_batch',
+] as const
+
+export type HiringAssessmentAiRunMode = (typeof HIRING_ASSESSMENT_AI_RUN_MODES)[number]
+
+export const getRequestedHiringAssessmentAiRunMode = (): HiringAssessmentAiRunMode => {
+  const requested = process.env.HIRING_ASSESSMENT_AI_RUN_MODE?.trim()
+
+  // Compatibilidad de rollout: instalaciones existentes que ya prendieron el flag de
+  // enqueue antes de que existiera este enum migran al modo más seguro útil, provisional.
+  // Flag OFF + mode ausente sigue siendo `disabled`.
+  if (!requested) {
+    return process.env.HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED === 'true'
+      ? 'global_provisional'
+      : 'disabled'
+  }
+
+  return HIRING_ASSESSMENT_AI_RUN_MODES.includes(requested as HiringAssessmentAiRunMode)
+    ? (requested as HiringAssessmentAiRunMode)
+    : 'disabled'
+}
+
+export const getHiringAssessmentAiPromotionEvidenceDigest = (): string | null => {
+  const digest = process.env.HIRING_ASSESSMENT_AI_PROMOTION_EVIDENCE_DIGEST?.trim().toLowerCase()
+
+  return digest && /^[a-f0-9]{64}$/.test(digest) ? digest : null
+}
+
+/**
+ * Modos con autoridad superior a provisional solo existen con attestation versionada.
+ * Sin ella el runtime degrada a `global_provisional`; nunca interpreta un flag como evidencia.
+ */
+export const getEffectiveHiringAssessmentAiRunMode = (): HiringAssessmentAiRunMode => {
+  const requested = getRequestedHiringAssessmentAiRunMode()
+
+  if (requested === 'exception_canary' || requested === 'calibrated_batch') {
+    return getHiringAssessmentAiPromotionEvidenceDigest() ? requested : 'global_provisional'
+  }
+
+  return requested
+}
+
 export const isHiringAssessmentAiRunEnqueueEnabled = (): boolean =>
-  process.env.HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED === 'true'
+  process.env.HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED === 'true' &&
+  getEffectiveHiringAssessmentAiRunMode() !== 'disabled'
 
 /**
  * Gatea elegibilidad `batch_eligible` por policy (OFF ⇒ todo item es `mandatory_review`).
  * Runtime owner: ops-worker (evaluación en el drain) + Vercel (readers reflejan la clase).
  */
 export const isHiringAssessmentAiExceptionPolicyEnabled = (): boolean =>
-  process.env.HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED === 'true'
+  process.env.HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED === 'true' &&
+  getHiringAssessmentAiPromotionEvidenceDigest() != null &&
+  ['exception_canary', 'calibrated_batch'].includes(getEffectiveHiringAssessmentAiRunMode())
 
 /** Gatea el command de confirmación de run (batch). Runtime owner: Vercel (App API). */
 export const isHiringAssessmentAiRunConfirmEnabled = (): boolean =>
@@ -39,7 +89,14 @@ export const isHiringAssessmentAiRunConfirmEnabled = (): boolean =>
  * promedio de los criterios. Es una corrección de la MISMA señal, no la calibración: por eso
  * `v1_1` y no `v2` (ese sigue reservado para el Slice 3).
  */
-export const HIRING_ASSESSMENT_AI_RUN_POLICY_VERSION = 'hiring_assessment_ai_risk_policy.v1_1'
+export const HIRING_ASSESSMENT_AI_RUN_POLICY_VERSION = 'hiring_assessment_ai_risk_policy.v2_provisional'
+
+export const getHiringAssessmentAiRunPolicyVersion = (): string => {
+  const mode = getEffectiveHiringAssessmentAiRunMode()
+  const evidence = getHiringAssessmentAiPromotionEvidenceDigest()
+
+  return `${HIRING_ASSESSMENT_AI_RUN_POLICY_VERSION}:${mode}${evidence ? `:${evidence}` : ''}`
+}
 
 // ── Fan-out del drain (Slice 2, ADR D4): concurrencia/costo/timeout/retry acotados ──
 
@@ -56,6 +113,8 @@ export interface AiRunFanOutConfig {
    * con reason `run_cost_cap_exceeded` (fail-closed a la cola manual, nunca se pierden).
    */
   maxProviderAttemptsPerRun: number
+  /** Kill switch de costo agregado en ventana móvil de 24h. */
+  maxProviderAttemptsPerDay: number
   /** Lease del run reclamado por un drain (segundos); vencida, otro drain puede retomar. */
   leaseSeconds: number
 }
@@ -73,6 +132,7 @@ export const getAiRunFanOutConfig = (): AiRunFanOutConfig => ({
   itemTimeoutMs: intEnv('HIRING_ASSESSMENT_AI_RUN_ITEM_TIMEOUT_MS', 60_000, 5_000, 300_000),
   maxRetriesPerItem: intEnv('HIRING_ASSESSMENT_AI_RUN_MAX_RETRIES', 2, 0, 2),
   maxProviderAttemptsPerRun: intEnv('HIRING_ASSESSMENT_AI_RUN_MAX_PROVIDER_ATTEMPTS', 60, 1, 500),
+  maxProviderAttemptsPerDay: intEnv('HIRING_ASSESSMENT_AI_DAILY_PROVIDER_ATTEMPT_CAP', 1000, 1, 100_000),
   leaseSeconds: intEnv('HIRING_ASSESSMENT_AI_RUN_LEASE_SECONDS', 300, 30, 3600),
 })
 
