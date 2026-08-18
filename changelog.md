@@ -3,6 +3,16 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-18 — Evaluación provisional automática y CV por MCP interno
+
+- Los assessments elegibles de cualquier vacante generan ahora evaluación IA provisional en segundo plano para
+  operadores. No cambia el score efectivo y el postulante no recibe resultado, rationale ni estado de revisión.
+- El expediente auto-propone análisis con CV procesado + assessment puntuado; la confirmación sigue siendo humana.
+- Los agentes internos pueden leer el review packet exacto por MCP con CV minimizado/redactado y ligado a hash.
+  Sin contacto, PDF crudo, ranking, decisiones, writes ni acceso B2B.
+- La UI operator-only quedó compactada y validada GVC 4,82/5; su último ajuste visual aún espera promoción
+  ordinaria. TASK-1742/1718 conservan observación, rollback y firmas pendientes.
+
 ## 2026-08-18 — Los dos flags que quedaron "ON con pendiente" ya tienen su verificación hecha
 
 - **Canary de identidad del intake (TASK-1736), ejecutado y verde.** Los 5 puntos del runbook contra PG
@@ -979,25 +989,3 @@ permisivo es lo que lo hace usable sin seedear cientos de filas.
 - Señal `identity.view_access.client_role_without_grants`, steady 0 verificado contra PG.
 - Verificado con las tres personas agente (`scripts/identity/client-view-rail-persona-check.ts`).
   **Rollout pendiente:** no está en `main`, y `TASK-1679` va después por el orden de contención.
-
-## 2026-08-09 — El cutover SEO cerró del todo, en dos releases (TASK-1677, cierra ISSUE-143)
-
-La ventana expand/contract que `ISSUE-143` había dejado abierta a propósito quedó cerrada: el código
-dejó de leer `seo_v1` y los assignments quedaron superseded. Lo que vale registrar no es el cierre
-sino su forma.
-
-**Fueron dos releases, y no por prudencia: por construcción.** El check `postgres_migrations` del
-preflight es estricto, así que una migración commiteada y sin aplicar bloquea el release. Y aplicarla
-antes de desplegar el código es exactamente lo que el ordering del cutover prohíbe. Las dos reglas
-juntas hacen que un expand/contract no quepa en un solo ciclo — y eso, lejos de ser fricción, es lo
-que garantiza que exista un punto de verificación entre el código y los datos.
-
-La verificación fue con el canary del provider contra producción, antes y después de tocar los datos:
-la superficie de Grupo Berel abre con datos medidos, sin estado de "sin entitlement" y sin errores de
-consola. **No con un `SELECT`** — ése fue el método que falló en el incidente original y por eso la
-task lo prohíbe explícitamente.
-
-El bloque `DO` de la migración verificó que ninguna organización quedara sin cobertura antes de dejar
-pasar el cambio. Estado final: cero `seo_v1` vigentes, dos superseded con su historia intacta, dos
-`seo_v2` activos. La fila `seo_v1` sigue en el catálogo: el contract es `effective_to`, nunca un
-`DELETE`.

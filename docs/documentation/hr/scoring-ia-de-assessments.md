@@ -1,9 +1,9 @@
 # Scoring IA de Assessments — corrección asistida a escala con revisión humana
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-08-16 por Claude (TASK-1734)
-> **Ultima actualizacion:** 2026-08-17 por Claude (cierre del programa — instrumento del gold set y su hallazgo de volumen)
+> **Ultima actualizacion:** 2026-08-18 por Codex (activación global provisional en producción)
 > **Rúbrica del gold set:** [gold-set-rubrica-de-anclaje.md](gold-set-rubrica-de-anclaje.md) · **protocolo:** [calificar-gold-set-de-referencia.md](../../manual-de-uso/hr/calificar-gold-set-de-referencia.md)
 > **Documentacion tecnica:** [GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md) (Delta 2026-08-16 (2)) · ADR [GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md](../../architecture/GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md)
 
@@ -96,13 +96,14 @@ entrega **vacío**: ningún agente puede llenarlo.
 respuesta con criterio humano —, que además es exactamente lo que produce la materia prima que falta. El
 carril por **lote** queda bloqueado hasta que ese volumen exista y la IA pase la vara.
 
-## Estado actual: apagado
+## Estado actual: provisional activo
 
-El sistema está **completo en código pero apagado en todos los ambientes** (2026-08-16). Los tres
-interruptores nuevos están en OFF, el trabajo en segundo plano está pausado, y encenderlo sigue una
-secuencia gradual documentada (sombra → canary → promoción) que requiere señal explícita del operador. Si
-algo sale mal, existe un procedimiento de reversa que devuelve todo a la cola de corrección manual sin
-perder ninguna respuesta.
+Desde el 2026-08-18, `global_provisional` está activo en producción para los assessments elegibles de
+todas las vacantes. El worker procesa en segundo plano con concurrencia 1, tope diario 1000 y scheduler
+cada 2 minutos. El resultado aparece solo a operadores y **no se incorpora al score efectivo**.
+
+La confirmación por lote y la política que reduce excepciones siguen apagadas. Si algo sale mal, el
+runbook permite detener enqueue/scheduler y reconciliar o cancelar sin perder respuestas.
 
 Además del gate de promoción, encender el carril por lote depende del volumen del gold set descrito
 arriba. Mientras tanto la revisión uno a uno es el modo de trabajo, no una limitación temporal molesta:

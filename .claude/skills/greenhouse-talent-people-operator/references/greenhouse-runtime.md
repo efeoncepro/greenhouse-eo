@@ -297,9 +297,10 @@ A padlock that protects nothing teaches the operator to ignore the padlocks that
   `TASK-1718` separately owns exact-application CV/document review for delegated agents. Its strict readers are
   `hiring.applications.review.list` and `hiring.application.review_packet.get`; they expose only redacted, bounded CV
   chunks plus governed assessment summaries, require an explicit review purpose and preserve an append-only access
-  audit. Code, schema and MCP adapters exist, but real-CV projection/reader/tool flags remain OFF until the named
-  Talent, Privacy, Security, Identity and MCP owners approve the activation and a synthetic canary passes. Candidate
-  CV review remains separate and OFF in production; the public rate guard fails closed if its store is unavailable.
+  audit. Production internal-only activation passed on 2026-08-18: OAuth/token exchange, initialize, both review
+  tools and Talent Pool returned 200; the exact packet returned one minimized chunk with hash binding, while an
+  unauthenticated request returned 401. Formal Talent, Privacy/Legal, Security, Identity, MCP and Platform sign-offs,
+  revoked/base-only evidence and a rollback/revocation drill remain open. B2B stays blocked.
 - Command `revealCandidateIdentityDocument` (`src/lib/hiring/documents/reveal-identity-document.ts`) verifies the document belongs to the `identity_profile_id` of the path's `candidateFacetId`. **Anti-IDOR: a foreign `documentId` answers `404`, not `403`** — a `403` would confirm its existence to a prober. The lookup runs with `includeArchived: true` on purpose, so an _archived_ document of the candidate's own gets the `409` that names the cause instead of a `404` that would assert it does not exist.
 - Route `POST /api/hiring/candidate-facets/[candidateFacetId]/identity-documents/[documentId]/reveal`.
 - **No machinery duplicated**: the append-only audit and the outbox event are written by `revealPersonIdentityDocument` (784). No new event.
@@ -316,7 +317,7 @@ A padlock that protects nothing teaches the operator to ignore the padlocks that
 
 Docs: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-15 (8 invariants) · functional `docs/documentation/hr/documentos-de-candidatos.md` · manual `docs/manual-de-uso/hr/ver-documentos-de-un-candidato.md`.
 
-## Evaluation Dossier / Expediente de Evaluación (TASK-1735 + UI TASK-1737, flag ON en staging 2026-08-16)
+## Evaluation Dossier / Expediente de Evaluación (TASK-1735 + UI TASK-1737, production 2026-08-18)
 
 - **Notes (append-only)**: `greenhouse_hiring.hiring_application_note` (`hnote-*`) — `kind` CHECK
   (`cv_analysis|assessment_review|interview_note|general`), `body_md` **≤20000** (widened from 8000 on
@@ -332,8 +333,8 @@ Docs: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-15 (8 invariant
   Module `src/lib/hiring/dossier-ai/`: packet assembler with an **explicit allowlist** — redacted CV text from the
   TASK-1718 projection (never the PDF), assessment answers + effective scores + referenced rationale, stage journey;
   **PROHIBITED** name/contact/legal identity/self-ID (the assembler does not query them). Generation via
-  `generateStructuredAnthropic` (default `claude-sonnet-5`, override `HIRING_DOSSIER_AI_MODEL`, prompt
-  `hiring_evaluation_dossier.v1`); output cites evidence + `noVerificable` section. `proposeEvaluationDossier` is
+  the canonical Google structured generator (default `gemini-2.5-flash`, override `HIRING_DOSSIER_AI_MODEL`, prompt
+  `hiring_evaluation_dossier.v2`); output cites evidence + `noVerificable` section. `proposeEvaluationDossier` is
   idempotent by digest (effective model included); `confirmEvaluationDossier` materializes the `source='agent'` note
   **atomically** (same tx as the proposal mark) with full provenance in `context_json`.
   API `GET/POST /api/hiring/applications/[id]/dossier`.
@@ -358,8 +359,9 @@ viewerBlindUntilScorecardSubmitted }`; the anti-anchoring predicate is the SINGL
   `getOwnScorecardStateForApplication` shared with `listResponses` + `listPeerScorecardResults`. Without
   `viewerUserId` it does NOT filter (server-internal calls). `GET /dossier` under blindness returns
   `proposal: null`. View `src/views/greenhouse/hiring/ApplicationDossierPanel.tsx` is a thin client.
-- **Flag**: `HIRING_EVALUATION_DOSSIER_AI_ENABLED` Vercel-only, gates ONLY the propose. **Created ON in staging
-  2026-08-16** (CEO authorization); OFF in Production. With the flag OFF the UI shows the honest `ai-off` state.
+- **Flags**: generation and `HIRING_EVALUATION_DOSSIER_AI_AUTO_PROPOSE_ENABLED` are ON in production since
+  2026-08-18. A clean processed CV plus a scored assessment can auto-create a proposal; it never auto-confirms or
+  writes a note. With generation OFF the UI shows the honest `ai-off` state and manual notes still work.
 - **Hard invariants**: NEVER candidate-facing nor in the TASK-1718 MCP review packet (allowlist intact); NEVER does
   the LLM write a note directly (human confirm ALWAYS); NEVER touch `score`/`match_score`/`explainability_json`
   (a note is narrative, not score); NEVER demographics in notes (TASK-1365 boundary); NEVER trim a body to fit the
@@ -367,13 +369,13 @@ viewerBlindUntilScorecardSubmitted }`; the anti-anchoring predicate is the SINGL
   NEVER confuse `notes: null` (reader FAILED — honest degradation) with an empty expediente.
 - Related: scorecard display fix ISSUE-159 (`src/views/greenhouse/hiring/scorecard-summary.ts` — global "Parcial"
   while competencies remain pending, never a partial average as final result).
-- **Estado operativo honesto**: code complete + consumer UI complete; flag ON en staging, OFF en Production;
-  evidencia visual del panel de propuesta con datos reales pendiente de staging.
+- **Estado operativo honesto**: generation and auto-propose are live in production; operator confirm/reject remains
+  mandatory and candidate/public/MCP packets do not receive dossier notes.
 
 Docs: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-16, (4) y 2026-08-17 · functional
 `docs/documentation/hr/expediente-de-evaluacion.md` · manual `docs/manual-de-uso/hr/operar-expediente-de-evaluacion.md`.
 
-## Assessment AI Scoring Run (TASK-1734, code complete 2026-08-16 — rollout gated)
+## Assessment AI Scoring Run (TASK-1734/1742 — global provisional live 2026-08-18)
 
 Async scoring at scale over the TASK-1361 scorer. **One run per exact `hiring_assessment` + immutable
 input/policy digest (answers + rubric + prompt + policy + EFFECTIVE resolved model — env override included).**
@@ -449,9 +451,10 @@ input/policy digest (answers + rubric + prompt + policy + EFFECTIVE resolved mod
   rendering `{a}/{a}` — always 100% while the gates below said "faltan 10", exactly the bug class this surface
   exists to prevent — plus `warning.main` as text at 1,74:1 and `sx={{ ms: 1 }}` applying no margin (`ms` is not
   a MUI prop). **The frame is the evidence: green tests did not catch any of it.**
-- **Estado operativo honesto**: code complete Slices 0–6 + workbench; migración aplicada y verificada contra PG
-  real; el rollout real (flips, shadow, canary) NO se ejecutó — gated a señal del operador vía el runbook, y el
-  gate de promoción está bloqueado por VOLUMEN de gold set (11 vs 49), no por falta de instrumento.
+- **Estado operativo honesto**: `global_provisional` está activo en producción desde 2026-08-18 para todos los
+  assessments elegibles; master/enqueue ON, concurrencia 1, cap 1000 y scheduler cada 2 minutos. Exception policy
+  y batch confirm siguen OFF. TASK-1742 permanece en observación hasta cooldown, rollback residual-cero y firmas;
+  el gate de promoción continúa bloqueado por VOLUMEN de gold set (11 vs 49), no por falta de instrumento.
 
 Docs: ADR `GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md` · runbook
 `docs/operations/runbooks/assessment-ai-scoring-rollout.md` · architecture

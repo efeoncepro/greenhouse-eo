@@ -113,10 +113,10 @@ Dos aclaraciones importantes:
 - Las notas son narrativa: **no cambian puntajes** ni mueven etapas ni deciden nada.
 - Solo el tier de gobernanza de Hiring (admin, HR manager, operations) puede escribir o
   confirmar; cualquiera con acceso de lectura de Hiring puede leer.
-- La generación por IA está encendida **solo en staging** (desde el 2026-08-16, con autorización
-  del CEO) y sigue **apagada en producción** hasta revisar el primer expediente real.
-  Con el flag apagado el tab Expediente funciona igual para notas manuales y avisa, sin
-  inventar, que el análisis asistido no está disponible.
+- La generación por IA y el auto-propose están encendidos en producción desde el 2026-08-18. Cuando el
+  CV procesado está limpio y existe assessment puntuado, el sistema crea automáticamente una propuesta
+  operator-only con Google `gemini-2.5-flash` y prompt v2. La propuesta nunca se confirma ni se convierte
+  en nota por sí sola; una persona autorizada conserva confirm/reject.
 
 > Detalle técnico: primitives en `src/lib/hiring/application-notes.ts` y
 > `src/lib/hiring/dossier-ai/`; API `GET/POST /api/hiring/applications/[id]/notes` y `/dossier`.

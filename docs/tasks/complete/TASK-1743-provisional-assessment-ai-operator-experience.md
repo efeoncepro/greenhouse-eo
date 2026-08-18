@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -21,10 +21,10 @@
 - Motion: `docs/ui/motion/TASK-1743-provisional-assessment-ai-operator-experience.md`
 - Backend impact: `none`
 - Epic: `EPIC-011`
-- Status real: `En ejecución coordinada; implementación del consumer comienza después del DTO/reader de TASK-1742`
+- Status real: `Code complete y cerrada: consumer operator-only con GVC desktop/mobile PASS 4,82/5 y cero superficie candidate-facing. La compactación final de barras (20964b72a..3616cb5b8) aún no está en el SHA productivo 7e7a474217eb.`
 - Rank: `2`
 - Domain: `hr`
-- Blocked by: `TASK-1742`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -315,15 +315,15 @@ N/A — la coordinación de flags/runtime vive en TASK-1742; esta task es consum
 
 ## Acceptance Criteria
 
-- [ ] `Execution profile: ui-ux`, `UI impact: layout`, `UI ready: yes` y wireframe pasan gates focales.
-- [ ] Reutiliza/extiende `AssessmentAiRunWorkbench`; no crea primitive, dashboard o chart paralelo.
-- [ ] El copy reusable vive en `src/lib/copy/hiring.ts` y distingue provisional de efectivo sin ambigüedad.
-- [ ] Global/competencias/cobertura/evidencia/excepciones se muestran con numeradores y estados honestos.
-- [ ] Loading/empty/error/degraded/permission/long-content/mobile/keyboard/focus quedan cubiertos.
-- [ ] La muestra ciega conserva anti-anchoring y la propuesta no llega al DOM antes del juicio.
-- [ ] Candidate/public/email negative probes prueban cero score/rationale/confianza/review state.
-- [ ] GVC premium desktop + 390px pasa score threshold, contraste/focus y `scrollWidth === clientWidth`.
-- [ ] No hay ranking, recomendación, stage move, decisión, email, test assignment, MCP ni B2B access.
+- [x] `Execution profile: ui-ux`, `UI impact: layout`, `UI ready: yes` y wireframe pasan gates focales.
+- [x] Reutiliza/extiende `AssessmentAiRunWorkbench`; no crea primitive, dashboard o chart paralelo.
+- [x] El copy reusable vive en `src/lib/copy/hiring.ts` y distingue provisional de efectivo sin ambigüedad.
+- [x] Global/competencias/cobertura/evidencia/excepciones se muestran con numeradores y estados honestos.
+- [x] Loading/empty/error/degraded/permission/long-content/mobile/keyboard/focus quedan cubiertos.
+- [x] La muestra ciega conserva anti-anchoring y la propuesta no llega al DOM antes del juicio.
+- [x] Candidate/public/email negative probes prueban cero score/rationale/confianza/review state.
+- [x] GVC premium desktop + 390px pasa score threshold, contraste/focus y `scrollWidth === clientWidth`.
+- [x] No hay ranking, recomendación, stage move, decisión, email, test assignment, MCP ni B2B access.
 
 ## Verification
 
@@ -338,17 +338,27 @@ N/A — la coordinación de flags/runtime vive en TASK-1742; esta task es consum
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] El scorecard GVC y las capturas de rollout real quedaron enlazados.
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla).
+- [x] El archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`).
+- [x] `docs/tasks/README.md` quedó sincronizado con el cierre.
+- [x] `Handoff.md` quedó actualizado con rollout y evidencia real.
+- [x] `changelog.md` quedó actualizado con el cambio de comportamiento visible.
+- [x] Se ejecutó chequeo de impacto cruzado sobre TASK-1718/1734/1735/1738/1742.
+- [x] El scorecard GVC y las capturas del código final quedaron enlazados; la promoción visual posterior queda declarada como pendiente.
+
+## Evidencia de cierre — 2026-08-18
+
+- Foundation productiva: SHA `7e7a474217eb1bdd1f68f9dffa94c20333cefb6f`, run `32193134959`, Vercel `Ready`.
+- La compactación final de barras fue cerrada después, en `20964b72a..3616cb5b8`; está verificada local/GVC, pero su promoción productiva no se afirma en este cierre.
+- Review visual: `docs/ui/reviews/TASK-1743-provisional-assessment-ai-operator-experience.review.md`.
+- Scorecard final: `4,82/5`, piso `4,5`, desktop `1440x1100` y mobile `390x844`, sin overflow de página.
+- La evaluación provisional declara “Solo para operadores” y “No incorporada al resultado efectivo”; no sustituye el score efectivo.
+- Los probes contractuales preservan cero resultado en candidato, correo o superficie pública y no añaden ranking, recomendación, decisión, stage move ni asignación de tests.
 
 ## Follow-ups
 
-- Ninguno para provisional; `calibrated_batch` pertenece al gate backend de TASK-1742.
+- Promover el último ajuste visual mediante el siguiente release ordinario y repetir smoke visual de producción.
+- `calibrated_batch` pertenece al gate backend de TASK-1742.
 
 ## Open Questions
 

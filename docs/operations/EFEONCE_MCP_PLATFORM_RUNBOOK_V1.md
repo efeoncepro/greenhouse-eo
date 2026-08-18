@@ -42,20 +42,23 @@ pública.
   Sus tools de **lectura** están federadas y en producción; sus **dos tools de escritura** (TASK-1308) están
   federadas **en el repo pero sin desplegar** y, aun desplegadas, nacen fail-closed por falta de un cliente que
   pueda emitir su scope (ver la sección del provider).
-- Greenhouse Hiring, habilitado el 2026-08-16 sólo para
-  `hiring.talent_pool.search` y `hiring.talent_pool.profile.get`, con identidad interna delegada, scope propio,
-  capability/purpose Greenhouse y DTO sin contacto, CV, notas, economics ni atributos protegidos.
+- Greenhouse Hiring, habilitado internal-only para `hiring.talent_pool.search`,
+  `hiring.talent_pool.profile.get`, `hiring.applications.review.list` y
+  `hiring.application.review_packet.get`. Candidate review exige application exacta y purpose, devuelve solo CV
+  minimizado/redactado/chunked ligado a hash y conserva audit; no expone PDF crudo, contacto, notas ni atributos
+  protegidos.
 
 Este estado no habilita clientes externos ni multitenancy. El adjetivo `read_only` describe lo que hoy es
 **alcanzable por un token real**, no lo que está cableado: mientras `efeonce.mcp.seo.write` no lo tenga ningún
 cliente, ninguna escritura es ejecutable por el borde público.
 
-**Hiring está federado en producción interna.** `TASK-1726` publica el provider `greenhouse-hiring` y dos tools
-read-only del Talent Pool (`hiring.talent_pool.search`, `hiring.talent_pool.profile.get`). El 2026-08-16 el canary
+**Hiring está federado en producción interna.** `TASK-1726` publica los dos readers del Talent Pool y `TASK-1718`
+los dos readers exactos de candidate review. El 2026-08-16 el canary
 OAuth real verificó search/profile `200` con scope Hiring y `403` con el cliente base-only
-`66985833-14e9-438e-add4-b740e84e9a64`. Application 360, CV,
-documentos, links, tokens de assessment, invitaciones, cambios de etapa y asignaciones siguen fuera de este provider;
-`TASK-1718`–`TASK-1722` y `TASK-1631` conservan sus gates independientes.
+`66985833-14e9-438e-add4-b740e84e9a64`. El 2026-08-18 el canary review verificó OAuth/token exchange,
+initialize y ambas tools en 200, una chunk ligada a hash, y 401 sin autenticación. Links, tokens de assessment,
+invitaciones, cambios de etapa, asignaciones y B2B siguen fuera; `TASK-1719`–`TASK-1722` y `TASK-1631` conservan
+sus gates. TASK-1718 conserva firmas y pruebas revoked/base-only/rollback como deuda de cierre.
 
 ## Preflight
 

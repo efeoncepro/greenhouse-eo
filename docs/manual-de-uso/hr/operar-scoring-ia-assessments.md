@@ -1,9 +1,9 @@
 # Operar el Scoring IA de Assessments
 
 > **Tipo de documento:** Manual de uso / runbook operador
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-08-16 por Claude (TASK-1734)
-> **Ultima actualizacion:** 2026-08-17 por Claude (cierre del programa — uno a uno vs lote y estado real del gold set)
+> **Ultima actualizacion:** 2026-08-18 por Codex (modo global provisional activo)
 > **Protocolo del gold set:** [calificar-gold-set-de-referencia.md](calificar-gold-set-de-referencia.md) · **rúbrica:** [gold-set-rubrica-de-anclaje.md](../../documentation/hr/gold-set-rubrica-de-anclaje.md)
 > **Documentacion tecnica:** [GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md](../../architecture/GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md) · funcional [scoring-ia-de-assessments.md](../../documentation/hr/scoring-ia-de-assessments.md)
 
@@ -15,10 +15,9 @@ completar la muestra ciega, confirmar el lote elegible, cancelar un run o revert
 ## Antes de empezar
 
 - Necesitas el permiso `hiring.assessment.score` (el mismo que autoriza puntuar assessments).
-- **El sistema está apagado hoy** (flags OFF en todos los ambientes, scheduler pausado). Prenderlo NO es
-  parte de este manual: sigue el runbook de rollout
-  [`docs/operations/runbooks/assessment-ai-scoring-rollout.md`](../../operations/runbooks/assessment-ai-scoring-rollout.md)
-  (shadow → canary → promoción, con el gate de eval bloqueante) y requiere señal del operador.
+- `global_provisional` está activo en producción para todos los assessments elegibles. La propuesta se
+  genera automáticamente y es operator-only; no cambia el score efectivo. La confirmación por lote y la
+  política de excepciones continúan apagadas hasta completar calibración.
 - La revisión tiene **dos carriles equivalentes**: el workbench en pantalla (recomendado, ver la
   sección siguiente) y la API (para automatización, diagnóstico o scripts). Ambos usan los mismos
   comandos gobernados: lo que hagas en uno se ve en el otro.
@@ -184,8 +183,9 @@ En `/admin/operations`, módulo hiring: `hiring.assessment_ai.run_backlog_stuck`
 
 - **"El confirm devuelve 409/422"** — hay excepciones o muestra sin cerrar, o un digest quedó stale
   (cambió rúbrica/modelo/policy): el run requiere nueva propuesta/revisión, no un reintento.
-- **"No se crean runs"** — el enqueue está OFF o el scheduler `ops-assessment-ai-drain` está pausado
-  (estado esperado hoy). Verifica flags en la revisión ACTIVA del ops-worker, no en `deploy.sh`.
+- **"No se crean runs"** — no es el estado esperado: verifica que el assessment sea elegible, que enqueue
+  esté ON y que `ops-assessment-ai-drain` siga activo. Revisa la revisión ACTIVA del ops-worker, no solo
+  `deploy.sh`.
 
 ## Referencias técnicas
 

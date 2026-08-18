@@ -1,9 +1,9 @@
 # Operar el Expediente de Evaluación (pantalla + API)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-08-16 por Claude (TASK-1735)
-> **Ultima actualizacion:** 2026-08-17 por Claude (cierre del programa — chip "Version superada", limite 20.000, flag ON en staging)
+> **Ultima actualizacion:** 2026-08-18 por Codex (producción y auto-propose)
 > **Documentacion funcional:** [expediente-de-evaluacion.md](../../documentation/hr/expediente-de-evaluacion.md)
 
 ## Para qué sirve
@@ -17,8 +17,8 @@ por API (agentes, automatización, diagnóstico).
 - Rol con capability `hiring.application.annotate` (admin / HR manager / operations) para
   escribir; `hiring.application.read` basta para leer.
 - El `applicationId` (formato `happ-…`, visible en la URL de Application 360).
-- Para el borrador IA: flag `HIRING_EVALUATION_DOSSIER_AI_ENABLED=true` en el ambiente
-  (hoy OFF por defecto) y que el CV del candidato tenga proyección lista (TASK-1718).
+- Para el borrador IA: CV procesado limpio y assessment puntuado. En producción los flags de generación
+  y auto-propose están activos; el sistema intenta crear la propuesta automáticamente.
 
 ## Desde la pantalla (uso diario)
 
@@ -32,10 +32,10 @@ Entra a la ficha de la postulación y elige **Expediente**. Vas a ver la línea 
 las notas ya registradas y los eventos de etapa, de lo más reciente a lo más antiguo. Si
 todavía no hay notas, verás el estado vacío con el campo para escribir la primera.
 
-### 2. Generar el análisis (opcional, requiere IA encendida)
+### 2. Revisar o regenerar el análisis
 
-Pulsa **Generar análisis**. El botón solo aparece si tienes capability para anotar **y** la
-generación por IA está encendida en el ambiente.
+Normalmente la propuesta ya estará disponible cuando abras el tab. **Generar análisis** funciona como
+recuperación explícita si el auto-propose no pudo ejecutarse o las fuentes cambiaron.
 
 - Si no aparece y esperabas verlo: la IA está apagada en ese ambiente (la pantalla lo dice
   bajo el encabezado). Las notas manuales funcionan igual.
@@ -129,9 +129,8 @@ pnpm staging:request POST /api/hiring/applications/<happ-id>/dossier '{"action":
 
 ## Estados y señales
 
-- `409 hiring_dossier_ai_disabled`: el flag está OFF — las notas manuales siguen operando.
-  Hoy `HIRING_EVALUATION_DOSSIER_AI_ENABLED` está **ON en staging** (desde 2026-08-16) y **OFF en
-  producción**: en producción esta respuesta es la esperada, no una falla.
+- `409 hiring_dossier_ai_disabled`: el flag está OFF — no es el estado productivo esperado desde
+  2026-08-18; verifica la configuración runtime. Las notas manuales siguen operando.
 - `400 hiring_dossier_body_too_long`: el cuerpo excede los 20.000 caracteres. El servidor no
   guarda nada cortado — acorta o divide en dos notas.
 - `409 hiring_dossier_cv_not_ready`: la proyección del CV no está lista; reintenta cuando

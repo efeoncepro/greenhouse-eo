@@ -2,6 +2,22 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-18 — Hiring AI y candidate review MCP: runtime reconciliado
+
+El release `7e7a474217eb` (run `32193134959`) dejó `global_provisional` activo para assessments elegibles de
+todas las vacantes: ops-worker `00584-r4x`, 100% tráfico, concurrencia 1, cap 1000 y scheduler cada 2 minutos.
+Exception policy y batch confirm siguen OFF; nada muta el score efectivo ni llega al postulante. El dossier está
+ON en producción y auto-propone con Google `gemini-2.5-flash`/prompt v2 cuando CV limpio y assessment puntuado
+están listos; nunca auto-confirma.
+
+Candidate review MCP también quedó activo internal-only con applicationId exacto, chunks minimizados/redactados,
+hash, purpose y audit. Canary OAuth/MCP 200 y borde sin auth 401. B2B y todos los writes siguen bloqueados.
+
+Lifecycle honesto: TASK-1743 cerró code complete con GVC 4,82/5, pero la compactación final de barras
+`20964b72a..3616cb5b8` es posterior al SHA productivo y viaja en el siguiente release ordinario. TASK-1742 y
+TASK-1718 permanecen in-progress por cooldown/rollback/sign-offs; no se inventaron aprobaciones. El release
+classifier omitió rutas Hiring del ops-worker y exigió corrección manual; verificar siempre parity 4/4 por SHA.
+
 ## 2026-08-18 — Canary de identidad y smoke del expediente: los dos pendientes declarados, cerrados
 
 Los dos flags que se prendieron "ON con pendiente" ya tienen su verificación. Ambas filas del ledger
@@ -522,11 +538,3 @@ idempotente, nota A3 del COALESCE cross-dominio). Gates: suite full + build verd
 gated al runbook candidate-identity-rollout.md: flag OFF; remediación histórica requiere
 allowlist humana del operador. Con esto las 3 tasks del día (1735, 1734, 1736) están complete.
 Siguiente: /implement-task TASK-1737 (tab Expediente) + TASK-1738 (workbench scoring IA).
-
-## 2026-08-16 — Hiring Desk/Application 360 migrada a superficies canónicas
-
-El frame compartido de Hiring Desk y la Application 360 dejaron de montar título, navegación, identidad y tabs
-directamente sobre el canvas gris. Ahora usan `SurfaceRecipe`, `WorkbenchHeader`, `GreenhouseBreadcrumbs` y
-`DetailHero`; la evaluación quedó en una sola superficie y la cola vacía se compacta. ESLint focal, typecheck,
-8 tests y GVC desktop/390 px están verdes en
-`.captures/2026-08-16T21-30-17_task1363-assessment-radar-runtime`. Cambio local, sin push/deploy.

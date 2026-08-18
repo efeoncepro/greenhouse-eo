@@ -160,9 +160,12 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   `needs_reconsent`) sin consentimiento futuro inventado. Invite y self-service están habilitados detrás de flags
   independientes desde el 2026-08-16 por autorización operativa del CEO; el contacto futuro sigue requiriendo
   consentimiento explícito, tokenizado, vigente y reversible, y no hay backfill ni outreach automático. Canary OAuth
-  real: allow search/profile `200`, deny con cliente base-only `403`. `TASK-1718` está desplegada en producción por
-  release `6b78b040252d` pero continúa en rollout controlado: reader/proyección/provider de CV OFF, sin backfill ni
-  lectura de CV real. `TASK-1719`–`TASK-1722` permanecen `to-do` (asignación de tests, selección y writes MCP no
+  real: allow search/profile `200`, deny con cliente base-only `403`. Desde el 2026-08-18 `TASK-1718` está activa
+  internal-only: App API exacta y tools MCP `hiring.applications.review.list` /
+  `hiring.application.review_packet.get` entregan chunks de CV minimizados/redactados y ligados a hash, con
+  purpose/audit; el canary OAuth/MCP fue 200 y el borde sin auth 401. Sin PDF crudo, contacto, ranking, writes ni
+  B2B. La task sigue en progreso por firmas nombradas y pruebas de revocación/rollback. `TASK-1719`–`TASK-1722`
+  permanecen `to-do` (asignación de tests, selección y writes MCP no
   están activos). Talent Assurance (`EPIC-038`, `TASK-1602`–`TASK-1611`) permanece en fase de decisión/discovery
   mientras sus ADR y contratos base sigan `Proposed`.
 - Toda vacante pública o campaña inbound de Hiring se redacta con la skill espejo
@@ -186,10 +189,12 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   cualquier consumer futuro la heredan — nunca es un filtro de pantalla; (3) la **escala de un valor devuelto por un
   LLM se declara en el contrato**, no se infiere en el consumer (`weighted_contribution` + policy `...risk_policy.v1_1`
   tras el falso positivo 11/14). El candidato **jamás** ve score, banda, rationale ni estado de revisión — prohibido
-  por contrato ejecutable en todo estado, sin flag. Estado: flags de expediente e identidad **ON en staging, OFF en
-  producción**; los 3 flags del run OFF en todos los runtimes, con el gate de promoción bloqueado **por volumen del
-  gold set** (11 respuestas humanas calificadas contra un piso de 49): falta DATA, no personas, y el carril uno-a-uno es
-  el modo correcto porque es el que la genera. Ningún agente fabrica ratings del gold set.
+  por contrato ejecutable en todo estado, sin flag. Estado desde 2026-08-18: el scoring
+  `global_provisional` corre en producción para assessments elegibles de todas las vacantes (concurrencia 1, cap
+  1000, scheduler cada 2 minutos), operator-only y sin mutar score efectivo; exception policy y batch confirm siguen
+  OFF. El expediente genera propuestas automáticas con Google `gemini-2.5-flash`/prompt v2 cuando CV limpio y
+  assessment puntuado están listos, pero nunca auto-confirma. El gate calibrado sigue bloqueado **por volumen del
+  gold set** (11 contra un piso de 49). TASK-1742 conserva cooldown, rollback residual-cero y firmas pendientes.
 - La dirección aceptada para autoservicio candidato es **una cuenta y un `/my` longitudinal** (`TASK-1727`–`TASK-1733`,
   EPIC-011): mismo `identity_profile_id` y principal/login; `candidate_facet` y `member` son facetas aditivas;
   perfil profesional person-scoped; CV/respuestas/expectativa conservan snapshot por aplicación; activation suma

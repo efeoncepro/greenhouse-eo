@@ -154,6 +154,10 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   payloads candidate-facing; después habilitar todas las vacantes con concurrencia controlada y backlog acotado.
 - Boundary: no ranking, decisión, stage move, test assignment, email, resultado al postulante ni aprendizaje
   online autónomo. La evidencia acumulada puede alimentar calibración futura, pero no reentrena el runtime.
+- Estado 2026-08-18: `global_provisional` está activo en producción para assessments elegibles de todas las
+  vacantes, con scheduler cada 2 minutos, concurrencia 1 y tope diario 1000. `TASK-1742` permanece en observación
+  hasta documentar cooldown, rollback residual-cero y firmas/risk acceptance. `TASK-1743` está code complete con
+  GVC 4,82/5; su compactación visual final viaja en el siguiente release ordinario.
 
 ## Child Tasks
 
