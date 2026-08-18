@@ -2770,6 +2770,7 @@ export interface GreenhouseCoreIdentityProfiles {
   active: Generated<boolean>;
   canonical_email: string | null;
   created_at: Generated<Timestamp>;
+  data_origin: Generated<string>;
   default_auth_mode: string | null;
   full_name: string;
   job_title: string | null;
@@ -7768,6 +7769,7 @@ export interface GreenhouseHiringHiringApplication {
   candidate_message: string | null;
   created_at: Generated<Timestamp>;
   created_by: string | null;
+  data_origin: Generated<string>;
   decision: string | null;
   decision_at: Timestamp | null;
   decision_by: string | null;
@@ -8019,6 +8021,19 @@ export interface GreenhouseHiringHiringCompetencyResult {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseHiringHiringDataOriginAudit {
+  action: string;
+  actor_user_id: string;
+  after_value: string | null;
+  audit_id: Generated<string>;
+  before_value: string | null;
+  created_at: Generated<Timestamp>;
+  deleted_snapshot_json: Json | null;
+  reason: string;
+  record_id: string;
+  record_type: string;
+}
+
 export interface GreenhouseHiringHiringDemographicSelfid {
   application_id: string;
   category_key: string;
@@ -8082,6 +8097,7 @@ export interface GreenhouseHiringHiringOpening {
   budget_band: string | null;
   created_at: Generated<Timestamp>;
   created_by: string | null;
+  data_origin: Generated<string>;
   demand_id: string;
   internal_notes: string | null;
   internal_title: string;
@@ -8212,6 +8228,7 @@ export interface GreenhouseHiringTalentDemand {
   client_id: string | null;
   created_at: Generated<Timestamp>;
   created_by: string | null;
+  data_origin: Generated<string>;
   deal_ref: string | null;
   demand_id: Generated<string>;
   demand_origin: string;
@@ -12670,6 +12687,7 @@ export interface DB {
   "greenhouse_hiring.hiring_assessment_template_module": GreenhouseHiringHiringAssessmentTemplateModule;
   "greenhouse_hiring.hiring_competency": GreenhouseHiringHiringCompetency;
   "greenhouse_hiring.hiring_competency_result": GreenhouseHiringHiringCompetencyResult;
+  "greenhouse_hiring.hiring_data_origin_audit": GreenhouseHiringHiringDataOriginAudit;
   "greenhouse_hiring.hiring_demographic_selfid": GreenhouseHiringHiringDemographicSelfid;
   "greenhouse_hiring.hiring_demographic_selfid_audit": GreenhouseHiringHiringDemographicSelfidAudit;
   "greenhouse_hiring.hiring_handoff": GreenhouseHiringHiringHandoff;
