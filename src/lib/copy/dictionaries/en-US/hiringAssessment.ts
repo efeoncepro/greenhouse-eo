@@ -158,8 +158,9 @@ export const hiringAssessment: HiringAssessmentCopy = {
     answerLabel: 'Candidate answer',
     showMore: 'Show more',
     showLess: 'Show less',
-    revealProposal: 'View AI proposal (this is recorded)',
-    proposalSeen: 'You saw this proposal before scoring — it will be recorded in the manifest.',
+    revealProposal: 'View AI proposal',
+    proposalSeen:
+      'Proposal opened. To record a resolution, choose Accept AI proposal, Correct with my score, or Return to manual.',
     proposalScore: 'Proposed score: {score}',
     proposalProvenance: '{model} · {promptVersion}',
     perCriterion: 'Per-criterion evidence',
@@ -180,12 +181,12 @@ export const hiringAssessment: HiringAssessmentCopy = {
     myScoreLabel: 'Your score',
     scoreRangeError: 'The score must be between 0 and 100.',
     noteLabel: 'Note (optional)',
-    resolveConfirm: 'Confirm proposal',
+    resolveConfirm: 'Accept AI proposal',
     resolveOverride: 'Correct with my score',
     resolveReject: 'Return to manual',
     resolveSample: 'Record my score',
     resolving: 'Saving…',
-    resolved: 'Resolution recorded.',
+    resolved: 'Resolution recorded. This answer now counts as resolved.',
     confirmTitle: 'Run confirmation',
     // TASK-1738 — resolved OVER TOTAL. A `{a}/{a}` always renders 100% and would present
     // a partial run as complete (ISSUE-159 lineage).

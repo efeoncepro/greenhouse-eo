@@ -4,7 +4,7 @@
 // (1) ceguera de la muestra como contrato de UI verificado sobre el DOM (el DTO real del
 //     reader omite `proposal`; el DOM jamás contiene score/rationale de la propuesta);
 // (2) registro VERAZ de `sawProposalBeforeScoring`: resolver sin expandir envía false,
-//     expandir (gesto real) y resolver envía true, y "Confirmar propuesta" NO existe sin
+//     expandir (gesto real) y resolver envía true, y "Aceptar propuesta IA" NO existe sin
 //     haber expandido (DDL-3/DDL-4);
 // (3) honest provisional coverage: confirm disabled con causa visible (`aria-describedby`)
 //     mientras un gate esté abierto — herencia ISSUE-159;
@@ -256,7 +256,7 @@ describe('TASK-1738 — registro veraz de sawProposalBeforeScoring (anti-anclaje
     return chip.closest('li') as HTMLElement
   }
 
-  it('"Confirmar propuesta" NO existe sin expandir; expandir la revela y queda registrada', async () => {
+  it('"Aceptar propuesta IA" NO existe sin expandir; abrirla no la marca resuelta y aceptar sí persiste', async () => {
     renderWorkbench()
 
     const item = await getMandatoryItem()
