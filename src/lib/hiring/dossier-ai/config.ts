@@ -10,15 +10,22 @@ import 'server-only'
 export const isHiringDossierAiEnabled = (): boolean =>
   process.env.HIRING_EVALUATION_DOSSIER_AI_ENABLED === 'true'
 
-export const HIRING_DOSSIER_PROVIDER = 'anthropic' as const
+/**
+ * Worker-only gate. A clean, ready CV may enqueue an idempotent dossier proposal,
+ * but the proposal remains operator-only and never materializes a note by itself.
+ */
+export const isHiringDossierAutoProposeEnabled = (): boolean =>
+  process.env.HIRING_EVALUATION_DOSSIER_AI_AUTO_PROPOSE_ENABLED === 'true'
+
+export const HIRING_DOSSIER_PROVIDER = 'google' as const
 
 /**
- * Default = Claude Sonnet 5 (`claude-sonnet-5`). `generateStructuredAnthropic` recibe el
- * model string crudo y lo pasa al SDK. Override por env `HIRING_DOSSIER_AI_MODEL`.
+ * Deterministic Vertex structured-output route. The model is part of the input digest,
+ * so changing it intentionally supersedes prior active proposals without mutating them.
  * El digest de la propuesta captura SIEMPRE el modelo efectivo resuelto, no el default.
  */
 export const getHiringDossierModel = (): string =>
-  process.env.HIRING_DOSSIER_AI_MODEL?.trim() || 'claude-sonnet-5'
+  process.env.HIRING_DOSSIER_AI_MODEL?.trim() || 'gemini-2.5-flash'
 
 /**
  * v2 (TASK-1737): el packet lleva el nombre humano de cada competencia, el prompt exige

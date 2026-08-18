@@ -34,7 +34,7 @@ export const scenario: CaptureScenario = {
     layout: {
       enabled: true,
       includeSelector: 'main',
-      ignoreSelectors: ['.MuiLinearProgress-bar'],
+      ignoreSelectors: ['.MuiLinearProgress-bar', '[data-capture="assessment-accessible-score-table"]'],
       allowHorizontalScrollSelectors: [
         '[data-capture="hiring-tabs"]',
         '[data-capture="hiring-application-tabs"]',
@@ -53,11 +53,19 @@ export const scenario: CaptureScenario = {
       failOnViolations: true,
       reducedMotionCheck: true,
       probes: [{
-        name: 'open-close-ai-evidence',
-        startSelector: '[data-capture="assessment-run-entry"] button',
-        keys: ['Enter', 'Escape'],
+        name: 'switch-scorecard-mode',
+        startSelector: '[data-capture="assessment-mode-radar"]',
+        keys: ['Space'],
         requireVisibleFocusRing: true,
       }],
+    },
+    performance: {
+      enabled: true,
+      severity: 'warning',
+      maxDomNodes: 3600,
+      maxRequests: 200,
+      maxTransferBytes: 28_000_000,
+      maxFcpMs: 15000,
     },
     enterpriseRubric: {
       enabled: true,

@@ -111,6 +111,15 @@ const VISUALLY_HIDDEN_SX = {
   whiteSpace: 'nowrap'
 } as const
 
+/** El foco del grupo de decisión debe seguir visible sobre cualquier tono de botón. */
+const PROPOSAL_ACTION_FOCUS_SX = {
+  '&.Mui-focusVisible': {
+    outline: '2px solid',
+    outlineColor: 'primary.main',
+    outlineOffset: 2
+  }
+} as const
+
 const formatCopy = (template: string, values: Record<string, string | number>) =>
   Object.entries(values).reduce((text, [key, value]) => text.replaceAll(`{${key}}`, String(value)), template)
 
@@ -1026,6 +1035,7 @@ const ApplicationDossierPanel = ({
           {editing ? (
             <Button
               disabled={deciding !== null}
+              sx={PROPOSAL_ACTION_FOCUS_SX}
               onClick={() => {
                 setEditing(false)
                 setEditedBody('')
@@ -1040,6 +1050,7 @@ const ApplicationDossierPanel = ({
                 ref={editTriggerRef}
                 variant='outlined'
                 disabled={deciding !== null}
+                sx={PROPOSAL_ACTION_FOCUS_SX}
                 onClick={() => {
                   setEditedBody(proposalBodyMd ?? '')
                   setEditing(true)
@@ -1047,7 +1058,12 @@ const ApplicationDossierPanel = ({
               >
                 {expediente.edit}
               </Button>
-              <Button color='error' disabled={deciding !== null} onClick={() => setRejectOpen(true)}>
+              <Button
+                color='error'
+                disabled={deciding !== null}
+                sx={PROPOSAL_ACTION_FOCUS_SX}
+                onClick={() => setRejectOpen(true)}
+              >
                 {expediente.reject}
               </Button>
             </>

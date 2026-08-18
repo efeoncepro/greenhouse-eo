@@ -5,15 +5,21 @@
  *   pnpm hiring:candidate-review:backfill
  *   pnpm hiring:candidate-review:backfill -- --application-id happ-... --limit 1
  *   HIRING_CANDIDATE_REVIEW_PROJECTION_ENABLED=true pnpm hiring:candidate-review:backfill -- --apply
+ *   HIRING_CANDIDATE_REVIEW_PROJECTION_ENABLED=true HIRING_EVALUATION_DOSSIER_AI_ENABLED=true
+ *     HIRING_EVALUATION_DOSSIER_AI_AUTO_PROPOSE_ENABLED=true pnpm hiring:candidate-review:backfill -- --apply --propose-dossier
  *
  * Output is aggregate-only: candidate/application/asset identifiers and extracted text are never logged.
  */
 import { materializeCandidateReviewProjection } from '../../src/lib/hiring/candidate-review/projection'
+import { autoProposeEvaluationDossier } from '../../src/lib/hiring/dossier-ai/auto-propose'
 import { runGreenhousePostgresQuery } from '../../src/lib/postgres/client'
 
 type EligibleRow = { asset_id: string }
 
+type SafeFailure = { code?: unknown }
+
 const apply = process.argv.includes('--apply')
+const proposeDossier = process.argv.includes('--propose-dossier')
 
 const argumentValue = (name: string) => {
   const index = process.argv.indexOf(name)
@@ -37,6 +43,13 @@ if (apply && process.env.HIRING_CANDIDATE_REVIEW_PROJECTION_ENABLED !== 'true') 
   throw new Error('HIRING_CANDIDATE_REVIEW_PROJECTION_ENABLED=true is required for --apply')
 }
 
+if (apply && proposeDossier && (
+  process.env.HIRING_EVALUATION_DOSSIER_AI_ENABLED !== 'true'
+  || process.env.HIRING_EVALUATION_DOSSIER_AI_AUTO_PROPOSE_ENABLED !== 'true'
+)) {
+  throw new Error('Both dossier AI flags are required for --apply --propose-dossier')
+}
+
 const values: unknown[] = []
 
 const applicationFilter = applicationId
@@ -55,6 +68,27 @@ const main = async () => {
         AND a.visibility='private'
         AND a.mime_type='application/pdf'
         ${applicationFilter}
+        AND NOT EXISTS (
+          SELECT 1
+            FROM greenhouse_core.assets newer
+           WHERE newer.owner_aggregate_type = ANY(ARRAY['hiring_application_cv', 'hiring_application_cv_draft']::text[])
+             AND newer.status <> 'deleted'
+             AND (
+               newer.owner_aggregate_id = a.owner_aggregate_id
+               OR (
+                 newer.owner_aggregate_id IS NULL
+                 AND newer.metadata_json->>'applicationId' = a.owner_aggregate_id
+               )
+             )
+             AND (
+               newer.uploaded_at > a.uploaded_at
+               OR (
+                 (newer.uploaded_at = a.uploaded_at OR (newer.uploaded_at IS NULL AND a.uploaded_at IS NULL))
+                 AND newer.asset_id > a.asset_id
+               )
+               OR (a.uploaded_at IS NULL AND newer.uploaded_at IS NOT NULL)
+             )
+        )
         AND EXISTS (
           SELECT 1 FROM greenhouse_core.asset_scan_results scan
            WHERE scan.asset_id=a.asset_id AND scan.verdict='clean'
@@ -72,23 +106,46 @@ const main = async () => {
       eligible: rows.length,
       scopedToApplication: Boolean(applicationId),
       limited: limit != null,
+      proposeDossier,
     }))
 
     return
   }
 
   const outcomes: Record<string, number> = {}
+  const dossierOutcomes: Record<string, number> = {}
 
   for (const row of rows) {
-    const result = await materializeCandidateReviewProjection(row.asset_id)
+    try {
+      const result = await materializeCandidateReviewProjection(row.asset_id)
 
-    outcomes[result.outcome] = (outcomes[result.outcome] ?? 0) + 1
+      outcomes[result.outcome] = (outcomes[result.outcome] ?? 0) + 1
+
+      if (proposeDossier && result.outcome === 'ready' && result.applicationId) {
+        try {
+          const dossier = await autoProposeEvaluationDossier(result.applicationId)
+
+          dossierOutcomes[dossier.outcome] = (dossierOutcomes[dossier.outcome] ?? 0) + 1
+        } catch (error) {
+          const code = typeof (error as SafeFailure)?.code === 'string'
+            ? (error as SafeFailure).code as string
+            : 'unknown'
+
+          const outcome = code === 'hiring_dossier_cv_not_ready' ? 'not_ready' : 'failed'
+
+          dossierOutcomes[outcome] = (dossierOutcomes[outcome] ?? 0) + 1
+        }
+      }
+    } catch {
+      outcomes.failed = (outcomes.failed ?? 0) + 1
+    }
   }
 
   console.log(JSON.stringify({
     mode: 'apply',
     processed: rows.length,
     outcomes,
+    dossierOutcomes,
     scopedToApplication: Boolean(applicationId),
     limited: limit != null,
   }))

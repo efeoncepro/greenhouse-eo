@@ -912,7 +912,15 @@ const Application360View = ({
                                     setScorecardModes(current => ({ ...current, [entry.assessmentId]: nextMode }))
                                   }
                                 }}
-                                sx={{ alignSelf: { xs: 'stretch', sm: 'center' } }}
+                                sx={{
+                                  alignSelf: { xs: 'stretch', sm: 'center' },
+                                  '& .MuiToggleButton-root.Mui-focusVisible, & .MuiToggleButton-root:focus-visible': {
+                                    outline: '2px solid',
+                                    outlineColor: 'primary.main',
+                                    outlineOffset: 2,
+                                    zIndex: 1,
+                                  },
+                                }}
                               >
                                 <ToggleButton value='bars' data-capture='assessment-mode-bars' aria-label={assessmentCopy.review.bars} sx={{ flex: { xs: 1, sm: 'initial' } }}>
                                   <i aria-hidden='true' className='tabler-chart-bar' />
@@ -930,7 +938,7 @@ const Application360View = ({
                             data-capture='assessment-effective-visualization'
                             sx={theme => ({
                               inlineSize: '100%',
-                              maxInlineSize: theme.breakpoints.values.lg,
+                              maxInlineSize: theme.breakpoints.values.md,
                               mx: 'auto',
                             })}
                           >
@@ -951,21 +959,36 @@ const Application360View = ({
                                 }}
                               />
                             ) : (
-                              <Stack spacing={2.25}>
+                              <Box
+                                data-capture='assessment-bars-grid'
+                                role='list'
+                                aria-label={assessmentCopy.review.bars}
+                                sx={{
+                                  display: 'grid',
+                                  gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'repeat(2, minmax(0, 1fr))' },
+                                  columnGap: 4,
+                                }}
+                              >
                                 {scoreRows.map((row) => (
-                                <Box key={row.competencyId}>
-                                  <Stack direction='row' justifyContent='space-between' spacing={2} sx={{ mb: 1 }}>
-                                    <Stack direction='row' spacing={1.25} alignItems='center' sx={{ minWidth: 0 }}>
-                                      <Box sx={{ display: 'grid', placeItems: 'center', inlineSize: 32, blockSize: 32, borderRadius: '50%', color: 'primary.main', bgcolor: 'primary.lightOpacity' }}>
-                                        <i className={row.competencyCategory === 'attitudinal' ? 'tabler-heart-handshake' : 'tabler-target-arrow'} />
-                                      </Box>
-                                      <Box sx={{ minWidth: 0 }}>
-                                        <Typography fontWeight='fontWeightBold' sx={{ overflowWrap: 'anywhere' }}>{row.competencyName}</Typography>
-                                        <Typography variant='caption' color='text.secondary'>{assessmentCopy.review.objective} {row.target}% · peso {row.weight}%</Typography>
-                                      </Box>
-                                    </Stack>
-                                    <Stack direction='row' spacing={1} alignItems='center'>
-                                      <Typography fontWeight={800} sx={{ fontVariantNumeric: 'tabular-nums' }}>{row.score ?? assessmentCopy.review.pending}</Typography>
+                                <Box
+                                  key={row.competencyId}
+                                  role='listitem'
+                                  sx={{
+                                    minWidth: 0,
+                                    py: 2,
+                                    borderBlockEnd: '1px solid',
+                                    borderColor: 'divider',
+                                  }}
+                                >
+                                  <Stack direction='row' justifyContent='space-between' alignItems='flex-start' spacing={2}>
+                                    <Box sx={{ minWidth: 0, maxInlineSize: '68%' }}>
+                                      <Typography variant='h6' sx={{ overflowWrap: 'anywhere' }}>{row.competencyName}</Typography>
+                                      <Typography variant='caption' color='text.secondary'>
+                                        Peso {row.weight}% · {assessmentCopy.review.objective} {row.target}%
+                                      </Typography>
+                                    </Box>
+                                    <Stack direction='row' spacing={1} alignItems='center' sx={{ flexShrink: 0 }}>
+                                      <Typography variant='monoId'>{row.score ?? assessmentCopy.review.pending}</Typography>
                                       <GreenhouseChip
                                         size='small'
                                         kind='status'
@@ -975,34 +998,34 @@ const Application360View = ({
                                       />
                                     </Stack>
                                   </Stack>
-                                  <Box sx={{ position: 'relative', minWidth: 0 }}>
+                                  <Box sx={{ position: 'relative', minWidth: 0, mt: 1.5 }}>
                                     <LinearProgress
                                       variant='determinate'
                                       value={row.score ?? 0}
-                                      color={scoreTone(row.score)}
+                                      color='primary'
                                       aria-label={formatTemplate(assessmentCopy.review.scoreProgressLabel, {
                                         competency: row.competencyName,
                                         score: row.score ?? assessmentCopy.review.pending,
                                         target: row.target,
                                       })}
-                                      sx={(theme) => ({ blockSize: 10, borderRadius: `${theme.shape.customBorderRadius.lg}px` })}
+                                      sx={(theme) => ({ blockSize: 6, borderRadius: `${theme.shape.customBorderRadius.lg}px` })}
                                     />
                                     <Box
                                       aria-hidden='true'
                                       sx={{
                                         position: 'absolute',
-                                        insetBlockStart: -4,
+                                        insetBlockStart: -3,
                                         insetInlineStart: `${row.target}%`,
                                         inlineSize: 2,
-                                        blockSize: 18,
+                                        blockSize: 12,
                                         borderRadius: 1,
-                                        bgcolor: 'warning.main',
+                                        bgcolor: 'text.secondary',
                                       }}
                                     />
                                   </Box>
                                 </Box>
                                 ))}
-                              </Stack>
+                              </Box>
                             )}
                           </Box>
 
@@ -1012,15 +1035,24 @@ const Application360View = ({
 
                           <Box
                             component='table'
+                            data-capture='assessment-accessible-score-table'
                             sx={{
                               position: 'absolute',
                               inlineSize: 1,
+                              maxInlineSize: 1,
                               blockSize: 1,
                               m: -1,
                               overflow: 'hidden',
                               clip: 'rect(0 0 0 0)',
-                              whiteSpace: 'nowrap',
+                              tableLayout: 'fixed',
+                              whiteSpace: 'normal',
+                              overflowWrap: 'anywhere',
                               border: 0,
+                              '& caption, & tbody, & tr, & td': {
+                                inlineSize: 1,
+                                maxInlineSize: 1,
+                                overflow: 'hidden',
+                              },
                             }}
                           >
                             <caption>{assessmentCopy.review.title}</caption>

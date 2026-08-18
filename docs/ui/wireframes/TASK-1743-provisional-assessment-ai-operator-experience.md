@@ -150,3 +150,6 @@ El orden DOM pasa de resumen a cobertura, competencias y excepciones. El score p
 - Rationale: keeps context, reduces toil and preserves authority distinction.
 - Reuse: extend existing pattern; no new primitive or navigation destination.
 - Risk: nine competencies can create density; mitigate with compact summary and progressive disclosure.
+- Delta modo Barras: usar una hoja comparativa abierta de dos columnas en escritorio y una en móvil,
+  con medida máxima `md`, filas con divisores y barras primarias de 6 px. Se rechazan ranking/ordenación
+  y una lista full-width de una columna. Decisión `extend` local; no se crea primitive.

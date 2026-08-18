@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { generateStructuredAnthropic, isAnthropicConfigured } from '@/lib/ai/anthropic'
+import { generateStructuredGemini, isGeminiConfigured } from '@/lib/ai/google-genai'
 import { captureWithDomain } from '@/lib/observability/capture'
 import type { EvaluationDossierDraft, EvaluationDossierPacket } from '@/types/hiring-dossier-ai'
 
@@ -207,13 +207,13 @@ export interface DossierGenerationResult {
 }
 
 export interface DossierGenerationDeps {
-  isConfigured: () => Promise<boolean>
-  generate: typeof generateStructuredAnthropic
+  isConfigured: () => boolean | Promise<boolean>
+  generate: typeof generateStructuredGemini
 }
 
 const defaultDeps: DossierGenerationDeps = {
-  isConfigured: isAnthropicConfigured,
-  generate: generateStructuredAnthropic
+  isConfigured: isGeminiConfigured,
+  generate: generateStructuredGemini
 }
 
 /**
@@ -236,12 +236,9 @@ export const runDossierGeneration = async (
       model,
       system: EVALUATION_DOSSIER_SYSTEM_PROMPT,
       prompt: buildEvaluationDossierPrompt(packet),
-      toolName: 'propose_evaluation_dossier',
-      toolDescription:
-        'Propone el borrador del expediente de evaluación: resumen, coherencias y gaps CV↔assessment con evidencia citada, focos de entrevista y lo no verificable.',
-      inputSchema: EVALUATION_DOSSIER_JSON_SCHEMA as never,
+      jsonSchema: EVALUATION_DOSSIER_JSON_SCHEMA as unknown as Record<string, unknown>,
       temperature: 0,
-      maxTokens: 8192
+      maxOutputTokens: 8192
     })
 
     const dossier = sanitizeEvaluationDossier(result.data, buildCompetencyNameMap(packet))

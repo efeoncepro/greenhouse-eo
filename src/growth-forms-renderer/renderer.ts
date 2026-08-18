@@ -82,6 +82,16 @@ const el = <K extends keyof HTMLElementTagNameMap>(
 let idSeq = 0
 const SVG_NS = 'http://www.w3.org/2000/svg'
 
+/**
+ * Escapa identificadores de contrato antes de interpolarlos en selectores.
+ * `CSS.escape` no existe en todos los hosts del renderer (incluido jsdom), por
+ * lo que el fallback mantiene funcional el DOM patching sin depender del global.
+ */
+const escapeSelectorValue = (value: string): string =>
+  typeof CSS !== 'undefined' && typeof CSS.escape === 'function'
+    ? CSS.escape(value)
+    : value.replace(/["\\\]]/g, '\\$&')
+
 type PresentationIcon = NonNullable<NonNullable<RendererFieldDefinition['presentation']>['icon']>
 type RendererIconName = PresentationIcon | 'send' | 'spinner'
 
@@ -1562,7 +1572,7 @@ export class FormRenderer {
 
   private setFieldStatus(field: RendererFieldDefinition, status: 'neutral' | 'success' | 'error'): void {
     this.fieldStatus.set(field.key, status)
-    const control = this.opts.root.querySelector<HTMLElement>(`[name="${CSS.escape(field.key)}"]`)
+    const control = this.opts.root.querySelector<HTMLElement>(`[name="${escapeSelectorValue(field.key)}"]`)
     const wrap = control?.closest('.ghf-field')
 
     if (wrap) (wrap as HTMLElement).dataset.status = status
@@ -1875,7 +1885,7 @@ export class FormRenderer {
 
       if (error)
         entries.push({
-          focusSelector: `[name="${CSS.escape(field.key)}"]`,
+          focusSelector: `[name="${escapeSelectorValue(field.key)}"]`,
           text: `${this.fieldLabel(field)}: ${error}`
         })
     }
@@ -1884,7 +1894,7 @@ export class FormRenderer {
       for (const box of this.contract.consent?.checkboxes ?? []) {
         if (box.required !== false && this.consentState[box.key] !== true) {
           entries.push({
-            focusSelector: `[data-ghf-consent="${CSS.escape(box.key)}"]`,
+            focusSelector: `[data-ghf-consent="${escapeSelectorValue(box.key)}"]`,
             text: `${box.label ?? box.copyRef ?? 'Consentimiento'}: ${this.copy.errors.consentRequired}`
           })
         }
@@ -2208,7 +2218,7 @@ export class FormRenderer {
 
   /** Actualiza solo el DOM del error de un campo (sin re-render completo). */
   private patchFieldErrorDom(key: string): void {
-    const control = this.opts.root.querySelector<HTMLElement>(`[name="${CSS.escape(key)}"]`)
+    const control = this.opts.root.querySelector<HTMLElement>(`[name="${escapeSelectorValue(key)}"]`)
 
     if (!control) return
     const wrap = control.closest('.ghf-field')
@@ -2356,15 +2366,7 @@ export class FormRenderer {
 
   /** Inserta/actualiza el indicador "verificando…" + el affordance typo-suggest. */
   private patchEmailVerifyDom(field: RendererFieldDefinition): void {
-    // `CSS.escape` no existe en todos los entornos (el timer del debounce puede disparar
-    // post-teardown en jsdom/node y reventar como unhandled rejection — flake real de CI).
-    // Los field keys del contrato son identificadores simples; el fallback los escapa a mano.
-    const escapeKey =
-      typeof CSS !== 'undefined' && typeof CSS.escape === 'function'
-        ? CSS.escape(field.key)
-        : field.key.replace(/["\\\]]/g, '\\$&')
-
-    const control = this.opts.root.querySelector<HTMLElement>(`[name="${escapeKey}"]`)
+    const control = this.opts.root.querySelector<HTMLElement>(`[name="${escapeSelectorValue(field.key)}"]`)
     const wrap = control?.closest('.ghf-field')
 
     if (!wrap) return
@@ -2947,7 +2949,7 @@ export class FormRenderer {
     const firstKey = this.fieldsForStep().find(f => this.errors[f.key])?.key
 
     if (!firstKey) return
-    const control = this.opts.root.querySelector<HTMLElement>(`[name="${CSS.escape(firstKey)}"]`)
+    const control = this.opts.root.querySelector<HTMLElement>(`[name="${escapeSelectorValue(firstKey)}"]`)
 
     control?.focus?.()
   }
