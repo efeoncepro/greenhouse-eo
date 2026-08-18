@@ -912,7 +912,15 @@ const Application360View = ({
                                     setScorecardModes(current => ({ ...current, [entry.assessmentId]: nextMode }))
                                   }
                                 }}
-                                sx={{ alignSelf: { xs: 'stretch', sm: 'center' } }}
+                                sx={{
+                                  alignSelf: { xs: 'stretch', sm: 'center' },
+                                  '& .MuiToggleButton-root.Mui-focusVisible': {
+                                    outline: '2px solid',
+                                    outlineColor: 'primary.main',
+                                    outlineOffset: 2,
+                                    zIndex: 1,
+                                  },
+                                }}
                               >
                                 <ToggleButton value='bars' data-capture='assessment-mode-bars' aria-label={assessmentCopy.review.bars} sx={{ flex: { xs: 1, sm: 'initial' } }}>
                                   <i aria-hidden='true' className='tabler-chart-bar' />
