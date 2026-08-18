@@ -980,6 +980,11 @@ const Application360View = ({
                                       variant='determinate'
                                       value={row.score ?? 0}
                                       color={scoreTone(row.score)}
+                                      aria-label={formatTemplate(assessmentCopy.review.scoreProgressLabel, {
+                                        competency: row.competencyName,
+                                        score: row.score ?? assessmentCopy.review.pending,
+                                        target: row.target,
+                                      })}
                                       sx={(theme) => ({ blockSize: 10, borderRadius: `${theme.shape.customBorderRadius.lg}px` })}
                                     />
                                     <Box

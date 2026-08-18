@@ -23,7 +23,7 @@ export const scenario: CaptureScenario = {
   assertions: [
     { kind: 'noLoginRedirect', reason: 'la evaluación provisional es operator-only' },
     { kind: 'noErrorBoundary', reason: 'Application 360 debe renderizar sin degradación' },
-    { kind: 'visible', selector: 'text=No incorporada al resultado efectivo' },
+    { kind: 'visible', selector: 'text=Evaluación asistida revisada' },
   ],
   quality: {
     accessibility: {
@@ -34,6 +34,7 @@ export const scenario: CaptureScenario = {
     layout: {
       enabled: true,
       includeSelector: 'main',
+      ignoreSelectors: ['.MuiLinearProgress-bar'],
       allowHorizontalScrollSelectors: [
         '[data-capture="hiring-tabs"]',
         '[data-capture="hiring-application-tabs"]',
@@ -61,7 +62,7 @@ export const scenario: CaptureScenario = {
     enterpriseRubric: {
       enabled: true,
       includeSelector: '[data-capture="assessment-scorecard"]',
-      expectedDataCaptureRegions: ['assessment-provisional-summary', 'assessment-ai-coverage', 'assessment-ai-exceptions'],
+      expectedDataCaptureRegions: ['assessment-provisional-summary', 'assessment-scorecard', 'assessment-competency-radar'],
     },
   },
   steps: [
@@ -72,13 +73,23 @@ export const scenario: CaptureScenario = {
       clipSelector: '[data-capture="assessment-run-entry"]',
       note: 'Score provisional, autoridad operator-only, cobertura y competencias sin mezclarse con el resultado efectivo.',
     },
+    { kind: 'assert', assertion: { kind: 'visible', selector: 'text=Solo para operadores' } },
+    { kind: 'assert', assertion: { kind: 'visible', selector: 'text=Evaluación asistida revisada' } },
+    { kind: 'click', selector: 'button:has-text("Revisar evaluación")' },
+    { kind: 'wait', selector: '[data-capture="assessment-mode-radar"]', timeout: 15000 },
     {
       kind: 'mark',
-      label: 'provisional-coverage',
-      clipSelector: '[data-capture="assessment-ai-coverage"]',
-      note: 'Cobertura separa scores efectivos, propuestas, abstenciones y fallos.',
+      label: 'assessment-bars',
+      clipSelector: '[data-capture="assessment-scorecard"]',
+      note: 'Barras contenidas y centradas; el selector vive junto a la visualización que controla.',
     },
-    { kind: 'assert', assertion: { kind: 'visible', selector: 'text=Solo para operadores' } },
-    { kind: 'assert', assertion: { kind: 'visible', selector: 'text=No incorporada al resultado efectivo' } },
+    { kind: 'click', selector: '[data-capture="assessment-mode-radar"]' },
+    { kind: 'wait', selector: '[data-capture="assessment-competency-radar"]', timeout: 8000 },
+    {
+      kind: 'mark',
+      label: 'assessment-radar',
+      clipSelector: '[data-capture="assessment-scorecard"]',
+      note: 'Radar con etiquetas completas, objetivo comparable y ancho legible.',
+    },
   ],
 }

@@ -65,6 +65,7 @@ export const hiringAssessment: HiringAssessmentCopy = {
     loadReviewPrompt: 'Load the review to see answers, rubrics, and the competency scorecard.',
     noModules: 'This assessment does not have competency modules yet.',
     objective: 'Target',
+    scoreProgressLabel: '{competency}: {score} out of 100; target {target}',
     pending: 'Pending',
     radarScoreLegend: 'Candidate score',
     radarTargetLegend: 'Expected target',

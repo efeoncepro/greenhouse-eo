@@ -147,6 +147,7 @@ export interface HiringAssessmentCopy {
     loadReviewPrompt: string
     noModules: string
     objective: string
+    scoreProgressLabel: string
     pending: string
     radarScoreLegend: string
     radarTargetLegend: string
