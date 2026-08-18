@@ -45,48 +45,53 @@ const applicationFilter = applicationId
 
 const limitClause = limit == null ? '' : `LIMIT $${values.push(limit)}`
 
-const rows = await runGreenhousePostgresQuery<EligibleRow>(
-  `SELECT a.asset_id
-     FROM greenhouse_core.assets a
-    WHERE a.owner_aggregate_type='hiring_application_cv'
-      AND a.owner_aggregate_id IS NOT NULL
-      AND a.status='attached'
-      AND a.visibility='private'
-      AND a.mime_type='application/pdf'
-      ${applicationFilter}
-      AND EXISTS (
-        SELECT 1 FROM greenhouse_core.asset_scan_results scan
-         WHERE scan.asset_id=a.asset_id AND scan.verdict='clean'
-           AND scan.scan_id=(SELECT scan2.scan_id FROM greenhouse_core.asset_scan_results scan2
-             WHERE scan2.asset_id=a.asset_id ORDER BY scan2.scanned_at DESC,scan2.scan_id DESC LIMIT 1)
-      )
-    ORDER BY a.asset_id
-    ${limitClause}`,
-  values,
-)
+const main = async () => {
+  const rows = await runGreenhousePostgresQuery<EligibleRow>(
+    `SELECT a.asset_id
+       FROM greenhouse_core.assets a
+      WHERE a.owner_aggregate_type='hiring_application_cv'
+        AND a.owner_aggregate_id IS NOT NULL
+        AND a.status='attached'
+        AND a.visibility='private'
+        AND a.mime_type='application/pdf'
+        ${applicationFilter}
+        AND EXISTS (
+          SELECT 1 FROM greenhouse_core.asset_scan_results scan
+           WHERE scan.asset_id=a.asset_id AND scan.verdict='clean'
+             AND scan.scan_id=(SELECT scan2.scan_id FROM greenhouse_core.asset_scan_results scan2
+               WHERE scan2.asset_id=a.asset_id ORDER BY scan2.scanned_at DESC,scan2.scan_id DESC LIMIT 1)
+        )
+      ORDER BY a.asset_id
+      ${limitClause}`,
+    values,
+  )
 
-if (!apply) {
+  if (!apply) {
+    console.log(JSON.stringify({
+      mode: 'dry-run',
+      eligible: rows.length,
+      scopedToApplication: Boolean(applicationId),
+      limited: limit != null,
+    }))
+
+    return
+  }
+
+  const outcomes: Record<string, number> = {}
+
+  for (const row of rows) {
+    const result = await materializeCandidateReviewProjection(row.asset_id)
+
+    outcomes[result.outcome] = (outcomes[result.outcome] ?? 0) + 1
+  }
+
   console.log(JSON.stringify({
-    mode: 'dry-run',
-    eligible: rows.length,
+    mode: 'apply',
+    processed: rows.length,
+    outcomes,
     scopedToApplication: Boolean(applicationId),
     limited: limit != null,
   }))
-  process.exit(0)
 }
 
-const outcomes: Record<string, number> = {}
-
-for (const row of rows) {
-  const result = await materializeCandidateReviewProjection(row.asset_id)
-
-  outcomes[result.outcome] = (outcomes[result.outcome] ?? 0) + 1
-}
-
-console.log(JSON.stringify({
-  mode: 'apply',
-  processed: rows.length,
-  outcomes,
-  scopedToApplication: Boolean(applicationId),
-  limited: limit != null,
-}))
+void main()
