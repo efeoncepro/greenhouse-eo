@@ -382,7 +382,7 @@ const Application360View = ({
   const [scoreDrafts, setScoreDrafts] = useState<Record<string, string>>({})
   const [savingResponseId, setSavingResponseId] = useState<string | null>(null)
   const [selectedResponseId, setSelectedResponseId] = useState<string | null>(null)
-  const [scorecardMode, setScorecardMode] = useState<'bars' | 'radar'>('bars')
+  const [scorecardModes, setScorecardModes] = useState<Record<string, 'bars' | 'radar'>>({})
   const [finalizingAssessmentId, setFinalizingAssessmentId] = useState<string | null>(null)
   const [decision, setDecision] = useState<HiringDecision>(item.application.decision ?? 'selected')
   const [destination, setDestination] = useState<HiringFulfillmentMode | ''>(item.application.selectedDestination ?? '')
@@ -746,6 +746,7 @@ const Application360View = ({
         </Box>
       ) : assessments.map((entry) => {
         const review = assessmentReviews[entry.assessmentId]
+        const scorecardMode = scorecardModes[entry.assessmentId] ?? 'bars'
         const pendingHumanResponses = review?.responses.filter((response) => response.needsHumanRating && response.humanScore == null) ?? []
         const selectedResponse = review?.responses.find((response) => response.responseId === selectedResponseId) ?? null
 
@@ -826,27 +827,7 @@ const Application360View = ({
                   >
                     {copy.application.reviewAssessment}
                   </GreenhouseButton>
-                ) : (
-                  <ToggleButtonGroup
-                    exclusive
-                    size='small'
-                    value={scorecardMode}
-                    aria-label={assessmentCopy.review.title}
-                    onChange={(_, nextMode: 'bars' | 'radar' | null) => {
-                      if (nextMode) setScorecardMode(nextMode)
-                    }}
-                    sx={{ alignSelf: { xs: 'stretch', sm: 'center' } }}
-                  >
-                    <ToggleButton value='bars' data-capture='assessment-mode-bars' aria-label={assessmentCopy.review.bars}>
-                      <i aria-hidden='true' className='tabler-chart-bar' />
-                      <Box component='span' sx={{ marginInlineStart: 1 }}>{assessmentCopy.review.bars}</Box>
-                    </ToggleButton>
-                    <ToggleButton value='radar' data-capture='assessment-mode-radar' aria-label={assessmentCopy.review.radar}>
-                      <i aria-hidden='true' className='tabler-chart-radar' />
-                      <Box component='span' sx={{ marginInlineStart: 1 }}>{assessmentCopy.review.radar}</Box>
-                    </ToggleButton>
-                  </ToggleButtonGroup>
-                )}
+                ) : null}
               </Stack>
 
               {/* TASK-1738 — la entrada del run IA vive en la CARD, no dentro del panel de
@@ -863,7 +844,7 @@ const Application360View = ({
                     {assessmentCopy.review.cancelledDetail}
                   </Alert>
                 ) : (
-                  <Alert severity='info'>
+                  <Alert severity='info' sx={{ '& .MuiAlert-message': { color: 'text.primary' } }}>
                     {entry.status === 'assigned' || entry.status === 'sent' || entry.status === 'in_progress'
                       ? assessmentCopy.review.candidateIncomplete
                       : assessmentCopy.review.loadReviewPrompt}
@@ -880,7 +861,13 @@ const Application360View = ({
                         }}
                       >
                         <Stack spacing={3}>
-                          <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={2}>
+                          <Stack
+                            direction={{ xs: 'column', sm: 'row' }}
+                            justifyContent='space-between'
+                            alignItems={{ xs: 'stretch', sm: 'center' }}
+                            spacing={2}
+                            data-capture='assessment-effective-visualization-header'
+                          >
                             <Box>
                               <Typography variant='subtitle2' color='text.secondary' textTransform='uppercase' letterSpacing='0.08em'>
                                 {assessmentCopy.review.overall}
@@ -898,43 +885,74 @@ const Application360View = ({
                                 </Typography>
                               ) : null}
                             </Box>
-                            <GreenhouseChip
-                              kind='status'
-                              variant='label'
-                              tone={scorecardSummary.state === 'complete' ? scoreTone(overall) : 'info'}
-                              label={
-                                scorecardSummary.state === 'complete' && overall != null
-                                  ? overall >= 75
-                                    ? assessmentCopy.review.statuses.optimal
-                                    : overall >= 60
-                                      ? assessmentCopy.review.statuses.attention
-                                      : assessmentCopy.review.statuses.critical
-                                  : scorecardSummary.state === 'partial'
-                                    ? assessmentCopy.review.statuses.partial
-                                    : assessmentCopy.review.statuses.pending
-                              }
-                            />
+                            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', sm: 'center' }}>
+                              <GreenhouseChip
+                                kind='status'
+                                variant='label'
+                                tone={scorecardSummary.state === 'complete' ? scoreTone(overall) : 'info'}
+                                label={
+                                  scorecardSummary.state === 'complete' && overall != null
+                                    ? overall >= 75
+                                      ? assessmentCopy.review.statuses.optimal
+                                      : overall >= 60
+                                        ? assessmentCopy.review.statuses.attention
+                                        : assessmentCopy.review.statuses.critical
+                                    : scorecardSummary.state === 'partial'
+                                      ? assessmentCopy.review.statuses.partial
+                                      : assessmentCopy.review.statuses.pending
+                                }
+                              />
+                              <ToggleButtonGroup
+                                exclusive
+                                size='small'
+                                value={scorecardMode}
+                                aria-label={assessmentCopy.review.title}
+                                onChange={(_, nextMode: 'bars' | 'radar' | null) => {
+                                  if (nextMode) {
+                                    setScorecardModes(current => ({ ...current, [entry.assessmentId]: nextMode }))
+                                  }
+                                }}
+                                sx={{ alignSelf: { xs: 'stretch', sm: 'center' } }}
+                              >
+                                <ToggleButton value='bars' data-capture='assessment-mode-bars' aria-label={assessmentCopy.review.bars} sx={{ flex: { xs: 1, sm: 'initial' } }}>
+                                  <i aria-hidden='true' className='tabler-chart-bar' />
+                                  <Box component='span' sx={{ marginInlineStart: 1 }}>{assessmentCopy.review.bars}</Box>
+                                </ToggleButton>
+                                <ToggleButton value='radar' data-capture='assessment-mode-radar' aria-label={assessmentCopy.review.radar} sx={{ flex: { xs: 1, sm: 'initial' } }}>
+                                  <i aria-hidden='true' className='tabler-chart-radar' />
+                                  <Box component='span' sx={{ marginInlineStart: 1 }}>{assessmentCopy.review.radar}</Box>
+                                </ToggleButton>
+                              </ToggleButtonGroup>
+                            </Stack>
                           </Stack>
 
-                          {scoreRows.length === 0 ? (
-                            <Alert severity='info'>{assessmentCopy.review.noModules}</Alert>
-                          ) : scorecardMode === 'radar' ? (
-                            <AssessmentCompetencyRadar
-                              rows={scoreRows}
-                              ariaLabel={assessmentCopy.review.title}
-                              copy={{
-                                scoreLegend: assessmentCopy.review.radarScoreLegend,
-                                targetLegend: assessmentCopy.review.radarTargetLegend,
-                                partialTitle: assessmentCopy.review.radarPartialTitle,
-                                partialBody: assessmentCopy.review.radarPartialBody,
-                                score: assessmentCopy.review.radarMetricScore,
-                                objective: assessmentCopy.review.objective,
-                                pending: assessmentCopy.review.pending,
-                              }}
-                            />
-                          ) : (
-                            <Stack spacing={2.25}>
-                              {scoreRows.map((row) => (
+                          <Box
+                            data-capture='assessment-effective-visualization'
+                            sx={theme => ({
+                              inlineSize: '100%',
+                              maxInlineSize: theme.breakpoints.values.lg,
+                              mx: 'auto',
+                            })}
+                          >
+                            {scoreRows.length === 0 ? (
+                              <Alert severity='info'>{assessmentCopy.review.noModules}</Alert>
+                            ) : scorecardMode === 'radar' ? (
+                              <AssessmentCompetencyRadar
+                                rows={scoreRows}
+                                ariaLabel={assessmentCopy.review.title}
+                                copy={{
+                                  scoreLegend: assessmentCopy.review.radarScoreLegend,
+                                  targetLegend: assessmentCopy.review.radarTargetLegend,
+                                  partialTitle: assessmentCopy.review.radarPartialTitle,
+                                  partialBody: assessmentCopy.review.radarPartialBody,
+                                  score: assessmentCopy.review.radarMetricScore,
+                                  objective: assessmentCopy.review.objective,
+                                  pending: assessmentCopy.review.pending,
+                                }}
+                              />
+                            ) : (
+                              <Stack spacing={2.25}>
+                                {scoreRows.map((row) => (
                                 <Box key={row.competencyId}>
                                   <Stack direction='row' justifyContent='space-between' spacing={2} sx={{ mb: 1 }}>
                                     <Stack direction='row' spacing={1.25} alignItems='center' sx={{ minWidth: 0 }}>
@@ -962,6 +980,11 @@ const Application360View = ({
                                       variant='determinate'
                                       value={row.score ?? 0}
                                       color={scoreTone(row.score)}
+                                      aria-label={formatTemplate(assessmentCopy.review.scoreProgressLabel, {
+                                        competency: row.competencyName,
+                                        score: row.score ?? assessmentCopy.review.pending,
+                                        target: row.target,
+                                      })}
                                       sx={(theme) => ({ blockSize: 10, borderRadius: `${theme.shape.customBorderRadius.lg}px` })}
                                     />
                                     <Box
@@ -978,9 +1001,10 @@ const Application360View = ({
                                     />
                                   </Box>
                                 </Box>
-                              ))}
-                            </Stack>
-                          )}
+                                ))}
+                              </Stack>
+                            )}
+                          </Box>
 
                           <Alert severity='info' icon={<i className='tabler-info-circle' />}>
                             <Typography variant='body2'>{assessmentCopy.review.advisory}</Typography>

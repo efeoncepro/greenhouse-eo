@@ -250,6 +250,16 @@ export const AssessmentAiRunEntry = ({ assessmentId, copy, canScore }: Assessmen
 
   const coverage = provisional?.coverage
 
+  const reviewSettled = Boolean(
+    coverage
+    && coverage.totalResponses > 0
+    && coverage.effectiveResponses === coverage.totalResponses
+    && coverage.provisionalResponses === 0
+    && provisional?.exceptions.length === 0
+    && provisional.status !== 'running'
+    && provisional.status !== 'not_started',
+  )
+
   const statusMessage = provisional?.status === 'running' || provisional?.status === 'not_started'
     ? copy.provisionalPending
     : provisional?.status === 'partial'
@@ -263,18 +273,21 @@ export const AssessmentAiRunEntry = ({ assessmentId, copy, canScore }: Assessmen
   return (
     <Box
       data-capture='assessment-run-entry'
+      data-surface-recipe='operationalWorkbench'
       sx={theme => ({
         border: '1px solid',
-        borderColor: theme.palette.info.main,
+        borderColor: theme.palette.divider,
         borderRadius: `${theme.shape.customBorderRadius.md}px`,
-        backgroundColor: theme.palette.info.lightOpacity,
+        backgroundColor: theme.palette.background.paper,
         overflow: 'hidden',
       })}
     >
       <Stack spacing={2.5} sx={{ p: { xs: 2.5, sm: 3 } }} data-capture='assessment-provisional-summary'>
         <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={1.5}>
           <Stack direction='row' spacing={1.25} alignItems='center' flexWrap='wrap' useFlexGap>
-            <Typography variant='subtitle1' fontWeight={700}>{copy.provisionalTitle}</Typography>
+            <Typography variant='subtitle1' color='text.primary' fontWeight={700}>
+              {reviewSettled ? copy.reviewedTitle : copy.provisionalTitle}
+            </Typography>
             <GreenhouseChip kind='status' variant='label' size='small' tone='info' label={copy.operatorOnly} />
             {run && chipLabel ? <GreenhouseChip kind='status' variant='label' size='small' tone={runStatusTone(run.status)} label={chipLabel} /> : null}
           </Stack>
@@ -287,7 +300,14 @@ export const AssessmentAiRunEntry = ({ assessmentId, copy, canScore }: Assessmen
           ) : null}
         </Stack>
 
-        {provisional ? (
+        {provisional && reviewSettled && coverage ? (
+          <Typography variant='body2' color='text.secondary'>
+            {fmt(copy.reviewedSummary, {
+              effective: coverage.effectiveResponses,
+              total: coverage.totalResponses,
+            })}
+          </Typography>
+        ) : provisional ? (
           <>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 2, sm: 4 }} alignItems={{ xs: 'flex-start', sm: 'center' }}>
               <Box>
@@ -295,7 +315,7 @@ export const AssessmentAiRunEntry = ({ assessmentId, copy, canScore }: Assessmen
                   {provisional.overallScore == null ? '—' : Math.round(provisional.overallScore)}
                   <Typography component='span' variant='h6' color='text.secondary'> /100</Typography>
                 </Typography>
-                <Typography variant='caption' color='text.secondary'>{copy.provisionalDisclaimer}</Typography>
+                <Typography variant='caption' color='text.primary'>{copy.provisionalDisclaimer}</Typography>
               </Box>
               {coverage ? (
                 <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap data-capture='assessment-ai-coverage'>
@@ -308,11 +328,18 @@ export const AssessmentAiRunEntry = ({ assessmentId, copy, canScore }: Assessmen
               ) : null}
             </Stack>
 
-            {statusMessage ? <Alert severity={provisional.status === 'failed' ? 'error' : provisional.status === 'partial' || provisional.status === 'stale' ? 'warning' : 'info'}>{statusMessage}</Alert> : null}
+            {statusMessage ? (
+              <Alert
+                severity={provisional.status === 'failed' ? 'error' : provisional.status === 'partial' || provisional.status === 'stale' ? 'warning' : 'info'}
+                sx={provisional.status === 'partial' || provisional.status === 'stale' ? { color: 'text.primary', '& .MuiAlert-icon': { color: 'warning.dark' } } : undefined}
+              >
+                {statusMessage}
+              </Alert>
+            ) : null}
 
             {provisional.competencies.length > 0 ? (
               <Box>
-                <Typography variant='subtitle2' sx={{ mb: 1.25 }}>{copy.provisionalCompetencies}</Typography>
+                <Typography variant='subtitle2' color='text.primary' sx={{ mb: 1.25 }}>{copy.provisionalCompetencies}</Typography>
                 <Box component='ul' sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' }, gap: 1, p: 0, m: 0, listStyle: 'none' }}>
                   {provisional.competencies.map(competency => (
                     <Stack component='li' key={competency.competencyId} direction='row' justifyContent='space-between' spacing={2} sx={{ minInlineSize: 0, py: 0.75, borderBlockEnd: '1px solid', borderColor: 'divider' }}>
@@ -326,7 +353,7 @@ export const AssessmentAiRunEntry = ({ assessmentId, copy, canScore }: Assessmen
 
             <Box data-capture='assessment-ai-exceptions'>
               {provisional.exceptions.length > 0 ? (
-                <Alert severity='warning'>
+                <Alert severity='warning' sx={{ color: 'text.primary', '& .MuiAlert-icon': { color: 'warning.dark' } }}>
                   {copy.provisionalNeedsAttention.replace('{count}', String(provisional.exceptions.length))}
                 </Alert>
               ) : null}

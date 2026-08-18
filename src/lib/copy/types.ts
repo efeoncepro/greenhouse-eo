@@ -147,6 +147,7 @@ export interface HiringAssessmentCopy {
     loadReviewPrompt: string
     noModules: string
     objective: string
+    scoreProgressLabel: string
     pending: string
     radarScoreLegend: string
     radarTargetLegend: string
@@ -188,6 +189,8 @@ export interface HiringAssessmentCopy {
    */
   scoringRun: {
     provisionalTitle: string
+    reviewedTitle: string
+    reviewedSummary: string
     operatorOnly: string
     provisionalDisclaimer: string
     provisionalScoreLabel: string

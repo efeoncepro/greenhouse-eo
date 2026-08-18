@@ -59,6 +59,22 @@ describe('readProvisionalAssessmentAiProjection', () => {
     expect(result.exceptions[0]).toEqual(expect.objectContaining({ reasonCode: 'input_safety_blocked', routingReasons: ['prompt_injection_detected'] }))
   })
 
+  it('no conserva como excepción un ítem que el operador ya resolvió', async () => {
+    queryMock.mockResolvedValue([{
+      application_id: 'happ-1', response_id: 'resp-1', competency_id: 'comp-1',
+      competency_key: 'client', competency_name: 'Cliente', target_level: 'senior',
+      competency_weight: 100, auto_score: null, human_score: 70, run_item_id: 'item-1',
+      item_status: 'confirmed', risk_class: 'mandatory_review', reason_code: null,
+      routing_reasons: ['per_criterion_contradictory'], resolution: 'confirmed',
+      proposed_json: { score: 70 },
+    }])
+
+    const result = await readProvisionalAssessmentAiProjection('asmt-1')
+
+    expect(result.coverage).toEqual(expect.objectContaining({ effectiveResponses: 1, provisionalResponses: 0 }))
+    expect(result.exceptions).toEqual([])
+  })
+
   it('marca stale cuando el modo del run no coincide con el runtime efectivo', async () => {
     listRunsMock.mockResolvedValue([{ ...run, policyVersion: 'policy.v2:synthetic_shadow' }])
     queryMock.mockResolvedValue([{ application_id: 'happ-1', response_id: 'resp-1', competency_id: 'comp-1', competency_key: 'client', competency_name: 'Cliente', target_level: 'senior', competency_weight: 100, auto_score: null, human_score: null, run_item_id: 'item-1', item_status: 'proposed', risk_class: 'mandatory_review', reason_code: null, routing_reasons: [], proposed_json: { score: 70 } }])

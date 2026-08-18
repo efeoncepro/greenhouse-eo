@@ -4,7 +4,7 @@
 // (1) ceguera de la muestra como contrato de UI verificado sobre el DOM (el DTO real del
 //     reader omite `proposal`; el DOM jamás contiene score/rationale de la propuesta);
 // (2) registro VERAZ de `sawProposalBeforeScoring`: resolver sin expandir envía false,
-//     expandir (gesto real) y resolver envía true, y "Confirmar propuesta" NO existe sin
+//     expandir (gesto real) y resolver envía true, y "Aceptar propuesta IA" NO existe sin
 //     haber expandido (DDL-3/DDL-4);
 // (3) honest provisional coverage: confirm disabled con causa visible (`aria-describedby`)
 //     mientras un gate esté abierto — herencia ISSUE-159;
@@ -188,6 +188,31 @@ describe('TASK-1743 — resumen provisional operator-only', () => {
     expect(document.querySelector('[data-capture="assessment-ai-coverage"]')).not.toBeNull()
   })
 
+  it('colapsa la proyección cuando todas las respuestas ya tienen puntaje efectivo', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json({
+      runs: [baseRun],
+      confirmEnabled: false,
+      mode: 'global_provisional',
+      provisional: {
+        assessmentId: 'asm-1', applicationId: 'app-1', runId: RUN_ID,
+        runStatus: 'awaiting_review', mode: 'global_provisional', status: 'stale',
+        overallScore: 67, incorporatedIntoEffectiveScore: false,
+        coverage: { totalResponses: 12, evaluatedResponses: 12, effectiveResponses: 12, provisionalResponses: 0, pendingResponses: 0, abstainedResponses: 0, failedResponses: 0 },
+        competencies: [{ competencyId: 'comp-1', competencyKey: 'client', competencyName: 'Relación con clientes', targetLevel: 'senior', weight: 20, score: 67, totalResponses: 2, evaluatedResponses: 2, provisionalResponses: 0 }],
+        exceptions: [],
+        provenance: { model: 'claude-sonnet-5', promptVersion: 'prompt.v2', policyVersion: 'policy.v2:global_provisional', inputDigest: 'digest-1' },
+      },
+    })))
+
+    renderWithTheme(<AssessmentAiRunEntry assessmentId='asm-1' copy={copy} canScore />)
+
+    expect(await screen.findByText(copy.reviewedTitle)).toBeTruthy()
+    expect(screen.getByText('12 de 12 respuestas ya tienen puntaje efectivo. La trazabilidad del run sigue disponible.')).toBeTruthy()
+    expect(screen.queryByText(copy.provisionalDisclaimer)).toBeNull()
+    expect(screen.queryByText('Relación con clientes')).toBeNull()
+    expect(document.querySelector('[data-capture="assessment-ai-coverage"]')).toBeNull()
+  })
+
   it('no consulta ni dibuja la proyección sin capability', () => {
     const fetchMock = vi.fn()
 
@@ -256,7 +281,7 @@ describe('TASK-1738 — registro veraz de sawProposalBeforeScoring (anti-anclaje
     return chip.closest('li') as HTMLElement
   }
 
-  it('"Confirmar propuesta" NO existe sin expandir; expandir la revela y queda registrada', async () => {
+  it('"Aceptar propuesta IA" NO existe sin expandir; abrirla no la marca resuelta y aceptar sí persiste', async () => {
     renderWorkbench()
 
     const item = await getMandatoryItem()

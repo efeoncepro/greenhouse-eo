@@ -65,6 +65,7 @@ export const hiringAssessment: HiringAssessmentCopy = {
     loadReviewPrompt: 'Carga la revisión para ver respuestas, rúbricas y el scorecard por competencia.',
     noModules: 'Aún no hay módulos de competencia para esta evaluación.',
     objective: 'Objetivo',
+    scoreProgressLabel: '{competency}: {score} de 100; objetivo {target}',
     pending: 'Pendiente',
     radarScoreLegend: 'Puntaje obtenido',
     radarTargetLegend: 'Objetivo esperado',
@@ -101,6 +102,8 @@ export const hiringAssessment: HiringAssessmentCopy = {
   },
   scoringRun: {
     provisionalTitle: 'Evaluación provisional de IA',
+    reviewedTitle: 'Evaluación asistida revisada',
+    reviewedSummary: '{effective} de {total} respuestas ya tienen puntaje efectivo. La trazabilidad del run sigue disponible.',
     operatorOnly: 'Solo para operadores',
     provisionalDisclaimer: 'No incorporada al resultado efectivo',
     provisionalScoreLabel: 'Puntaje provisional de IA',
@@ -158,8 +161,9 @@ export const hiringAssessment: HiringAssessmentCopy = {
     answerLabel: 'Respuesta del candidato',
     showMore: 'Ver más',
     showLess: 'Ver menos',
-    revealProposal: 'Ver propuesta IA (queda registrado)',
-    proposalSeen: 'Viste esta propuesta antes de puntuar — quedará en el manifest.',
+    revealProposal: 'Ver propuesta IA',
+    proposalSeen:
+      'Propuesta abierta. Para registrarla como resolución, elige Aceptar propuesta IA, Corregir con mi puntaje o Devolver a manual.',
     proposalScore: 'Puntaje propuesto: {score}',
     proposalProvenance: '{model} · {promptVersion}',
     perCriterion: 'Evidencia por criterio',
@@ -180,12 +184,12 @@ export const hiringAssessment: HiringAssessmentCopy = {
     myScoreLabel: 'Tu puntaje',
     scoreRangeError: 'El puntaje debe estar entre 0 y 100.',
     noteLabel: 'Nota (opcional)',
-    resolveConfirm: 'Confirmar propuesta',
+    resolveConfirm: 'Aceptar propuesta IA',
     resolveOverride: 'Corregir con mi puntaje',
     resolveReject: 'Devolver a manual',
     resolveSample: 'Registrar mi puntaje',
     resolving: 'Guardando…',
-    resolved: 'Resolución registrada.',
+    resolved: 'Resolución registrada. Esta respuesta ya cuenta como resuelta.',
     confirmTitle: 'Confirmación del run',
     // TASK-1738 — el resumen declara resueltas SOBRE EL TOTAL. Un `{a}/{a}` siempre
     // renderiza 100% y presentaría un run parcial como completo (herencia ISSUE-159).

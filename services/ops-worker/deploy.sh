@@ -420,28 +420,40 @@ ENV_VARS="${ENV_VARS},HIRING_TALENT_POOL_PROJECTION_ENABLED=${HIRING_TALENT_POOL
 HIRING_TALENT_POOL_SELF_SERVICE_ENABLED="${HIRING_TALENT_POOL_SELF_SERVICE_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},HIRING_TALENT_POOL_SELF_SERVICE_ENABLED=${HIRING_TALENT_POOL_SELF_SERVICE_ENABLED}"
 
+# TASK-1718 — Proyección minimizada/redactada de CV por application exacta.
+# La materialización vive en este worker; el reader App API y las tools MCP tienen
+# flags propios. Activado para uso interno read-only autorizado por el operador el
+# 2026-08-18. No habilita ranking, decisiones, stage moves, tests ni email.
+# Rollback (<5 min):
+# `gcloud run services update ops-worker --region=us-east4 --update-env-vars HIRING_CANDIDATE_REVIEW_PROJECTION_ENABLED=false`.
+HIRING_CANDIDATE_REVIEW_PROJECTION_ENABLED="${HIRING_CANDIDATE_REVIEW_PROJECTION_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},HIRING_CANDIDATE_REVIEW_PROJECTION_ENABLED=${HIRING_CANDIDATE_REVIEW_PROJECTION_ENABLED}"
+
 # TASK-1734 — Run asíncrono de scoring IA por assessment (ADR
 # GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1, D6). Este deploy.sh es el SoT de los
 # flags cuyo runtime owner es el ops-worker: la proyección reactiva
 # (hiring_assessment_ai_scoring_run_enqueue) y el drain POST /assessment-ai/drain-scoring-runs
-# los leen SOLO acá — prenderlos en Vercel no hace nada. Declarados con default OFF para que
-# `--set-env-vars` (destructivo) no los borre en cada redeploy. NO prenderlos hasta que los
-# gates técnicos del ADR estén evidenciados (promotion-grade eval Slice 3, staging shadow,
-# canary sintético — Slice 6); el drain además exige el master HIRING_ASSESSMENT_AI_ENABLED
-# en ESTE runtime. Rollback SIEMPRE por estos flags + commands de run (confirm OFF →
+# los leen SOLO acá — prenderlos en Vercel no hace nada. TASK-1742 abre por defecto únicamente
+# `global_provisional`: sus propuestas son operator-only y nunca entran al score efectivo.
+# `exception_canary` y `calibrated_batch` permanecen fail-closed por evidence digest; el drain
+# además exige el master HIRING_ASSESSMENT_AI_ENABLED en ESTE runtime. Rollback SIEMPRE por
+# estos flags + commands de run (confirm OFF →
 # enqueue OFF → drain/cancel/reconcile → cola manual), nunca "apagando el master".
-HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED="${HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED:-false}"
+HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED="${HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED=${HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED}"
 HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED="${HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED:-false}"
 ENV_VARS="${ENV_VARS},HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED=${HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED}"
-HIRING_ASSESSMENT_AI_RUN_MODE="${HIRING_ASSESSMENT_AI_RUN_MODE:-disabled}"
+HIRING_ASSESSMENT_AI_RUN_MODE="${HIRING_ASSESSMENT_AI_RUN_MODE:-global_provisional}"
 ENV_VARS="${ENV_VARS},HIRING_ASSESSMENT_AI_RUN_MODE=${HIRING_ASSESSMENT_AI_RUN_MODE}"
+HIRING_ASSESSMENT_AI_RUN_CONCURRENCY="${HIRING_ASSESSMENT_AI_RUN_CONCURRENCY:-1}"
+ENV_VARS="${ENV_VARS},HIRING_ASSESSMENT_AI_RUN_CONCURRENCY=${HIRING_ASSESSMENT_AI_RUN_CONCURRENCY}"
 HIRING_ASSESSMENT_AI_DAILY_PROVIDER_ATTEMPT_CAP="${HIRING_ASSESSMENT_AI_DAILY_PROVIDER_ATTEMPT_CAP:-1000}"
 ENV_VARS="${ENV_VARS},HIRING_ASSESSMENT_AI_DAILY_PROVIDER_ATTEMPT_CAP=${HIRING_ASSESSMENT_AI_DAILY_PROVIDER_ATTEMPT_CAP}"
 # TASK-1734 Slice 6 — el master del scorer también se declara acá (segundo gate del drain
 # en ESTE runtime; sin declararlo, un flip out-of-band moriría en el próximo deploy). En
-# Vercel el master YA está ON (2026-07-16); acá parte OFF hasta el shadow del rollout.
-HIRING_ASSESSMENT_AI_ENABLED="${HIRING_ASSESSMENT_AI_ENABLED:-false}"
+# Vercel el master YA está ON (2026-07-16); TASK-1742 lo abre acá solo para el carril
+# provisional, con concurrencia inicial 1 y cap diario explícito.
+HIRING_ASSESSMENT_AI_ENABLED="${HIRING_ASSESSMENT_AI_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},HIRING_ASSESSMENT_AI_ENABLED=${HIRING_ASSESSMENT_AI_ENABLED}"
 
 # TASK-1719 Slice 4/5 — Asignación automática del test al entrar a la etapa configurada
