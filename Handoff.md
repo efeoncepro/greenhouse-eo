@@ -21,11 +21,22 @@ contratación y país de residencia") aparece en el HTML **y** en el schema, des
 el canary del runbook de identidad y el smoke propose/confirm del expediente. Están anotados en el
 ledger como ON-con-pendiente, no como cerrados.
 
-**El quinto flag NO se prendió, pese a la instrucción de prender todos.** `services/ops-worker/
-deploy.sh` documenta tres precondiciones para `HIRING_STAGE_TEST_ASSIGNMENT_ENABLED` y sólo se cumple
-una: el backlog se drenó solo el 17-ago (23 eventos, 22 `stale`, cero correos). La policy del canary
-sigue en `mode=manual` —así que prenderlo hoy es no-op— y el cancel/recovery se verificó en
-`LIVE-TEST`, no en la vacante real. Prenderlo dejaría un gatillo armado sin sus salvaguardas.
+**El quinto flag se prendió DESPUÉS de cumplir sus precondiciones, no saltándolas.** Primero quedó
+apagado porque `services/ops-worker/deploy.sh` exige tres y sólo se cumplía una. A instrucción del
+CEO ("resuelve lo que haga falta para prenderlo de forma robusta"), se resolvieron las otras dos:
+la policy del canary `EO-OPN-0009` se reconfiguró a `on_stage_entry`/`shortlisted` (cap 3/60 min) y
+se habilitó por command canónico —`configureOpeningAssessmentPolicy` la devuelve a `draft` a
+propósito, así que son dos llamadas y quedó en `policy_version=2`—, y el cancel/recovery se ejercitó
+con `cancel.live.test.ts` **5/5 contra PG real** en vez de cancelarle el test a un candidato real,
+que le habría matado el enlace. Recién entonces: default `true` en `deploy.sh` (SoT, porque
+`--set-env-vars` es destructivo y un flip out-of-band se evapora en silencio) **más**
+`gcloud run services update`, verificado en la revisión activa `ops-worker-00576-7zz`.
+
+⚠️ **Ahora sí dispara**: mover una postulación de esa vacante a `shortlisted` le asigna el test
+automáticamente. Las 5 que ya están en esa etapa tienen test abierto (4/5), así que la señal del
+canary llega cuando Talent mueva a alguien de los 10 `sourced`. El tope de 3 por hora es
+deliberadamente conservador: un movimiento en lote mayor deja a los excedentes con el aviso genérico
+de avance, sin prueba — conviene calibrarlo con Talent antes de un batch grande.
 
 **Dos aprendizajes operativos para el runbook:** (1) el clasificador de permisos bloquea
 `vercel env add`/`redeploy` hasta que el operador autoriza expresamente en el chat — no es credencial

@@ -455,7 +455,15 @@ ENV_VARS="${ENV_VARS},HIRING_ASSESSMENT_AI_ENABLED=${HIRING_ASSESSMENT_AI_ENABLE
 # corrida) y el cancel/recovery del Slice 3 esté verificado. Rollback (<5min):
 # `gcloud run services update ops-worker --update-env-vars HIRING_STAGE_TEST_ASSIGNMENT_ENABLED=false`
 # + dejar las policies en `disabled`. NUNCA borrar assessments ni audit para revertir.
-HIRING_STAGE_TEST_ASSIGNMENT_ENABLED="${HIRING_STAGE_TEST_ASSIGNMENT_ENABLED:-false}"
+# PRENDIDO 2026-08-18 con las TRES precondiciones cumplidas y verificadas:
+#   1. backlog del consumer drenado — 23 eventos procesados el 17-ago 13:54Z (22 `stale` por la
+#      ventana de 24 h + 1 no-op), CERO correos enviados;
+#   2. policy `enabled` en la opening del canary EO-OPN-0009 — reconfigurada a `on_stage_entry`
+#      (`shortlisted`, cap 3/60 min) y habilitada por command canónico, policy_version=2;
+#   3. cancel/recovery del Slice 3 verificado — `cancel.live.test.ts` 5/5 contra PG real.
+# El default vive acá porque `--set-env-vars` es destructivo: un flip aplicado sólo con
+# `--update-env-vars` se evapora en el próximo deploy del worker, en silencio.
+HIRING_STAGE_TEST_ASSIGNMENT_ENABLED="${HIRING_STAGE_TEST_ASSIGNMENT_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},HIRING_STAGE_TEST_ASSIGNMENT_ENABLED=${HIRING_STAGE_TEST_ASSIGNMENT_ENABLED}"
 
 # Buzón interno de People para el aviso de postulación nueva (configurable; default en código).
