@@ -2,6 +2,41 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-18 — Careers público EN PRODUCCIÓN: hoja editorial + JobPosting, con 4 flags prendidos
+
+Release `fa54670470c1` (`released`, run `32127499151`, 8m31s). Batch de EPIC-011: TASK-1740 +
+TASK-1741 + el acumulado 1719/1734/1735/1736 + `ISSUE-159`. Watchdog `OK` con **4/4 workers
+synced** (el residual change-gated del `ops-worker` lo clasificó solo, diff de rutas runtime vacío).
+
+**Verificado en producción real, no en el generador:** las dos vacantes emiten `JobPosting` con
+`TELECOMMUTE`, 20 países, `hiringOrganization: Efeonce`, canonical correcto y sin
+`directApply`/`validThrough`/`baseSalary`; la hoja editorial se sirve con sus secciones; una vacante
+cerrada responde 404 sin schema. El calificador de beneficios ("se formaliza según tu modalidad de
+contratación y país de residencia") aparece en el HTML **y** en el schema, desde la misma fuente.
+
+**Flags prendidos en Production** (con redeploy `greenhouse-4qu4swddd` — sin él quedan inertes):
+`CAREERS_DETAIL_EDITORIAL_V2_ENABLED`, `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED`,
+`HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED`, `HIRING_EVALUATION_DOSSIER_AI_ENABLED`. Los dos
+últimos se prendieron por autorización explícita del CEO **con sus verificaciones aún pendientes**:
+el canary del runbook de identidad y el smoke propose/confirm del expediente. Están anotados en el
+ledger como ON-con-pendiente, no como cerrados.
+
+**El quinto flag NO se prendió, pese a la instrucción de prender todos.** `services/ops-worker/
+deploy.sh` documenta tres precondiciones para `HIRING_STAGE_TEST_ASSIGNMENT_ENABLED` y sólo se cumple
+una: el backlog se drenó solo el 17-ago (23 eventos, 22 `stale`, cero correos). La policy del canary
+sigue en `mode=manual` —así que prenderlo hoy es no-op— y el cancel/recovery se verificó en
+`LIVE-TEST`, no en la vacante real. Prenderlo dejaría un gatillo armado sin sus salvaguardas.
+
+**Dos aprendizajes operativos para el runbook:** (1) el clasificador de permisos bloquea
+`vercel env add`/`redeploy` hasta que el operador autoriza expresamente en el chat — no es credencial
+ni scope; (2) `vercel env add <FLAG> Production` falla con `api_error: specify at least one
+Environment`: **el entorno estándar va en minúscula** (`production`), mientras el custom (`staging`)
+respeta su nombre literal.
+
+**Sigue pendiente de decisión del CEO:** monitor de equidad (capturaría categorías protegidas bajo
+una política que sólo existe en versión de pruebas), scoring por lotes (bloqueado por falta de gold
+set calificado, no de permiso) y lectura de CVs por agentes (sin firmas de privacidad/seguridad).
+
 ## 2026-08-17 — Barrido de cierre: lo que estaba a medias, y el incidente que nadie había registrado
 
 Tres auditorías paralelas sobre TASK-1719, el rollout de 1740/1741 y el estado general del
