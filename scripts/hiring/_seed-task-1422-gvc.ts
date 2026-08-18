@@ -43,6 +43,7 @@ const seed = async () => {
 
   const demand = await createTalentDemand(
     {
+      dataOrigin: 'synthetic_seed',
       stakeholderType: 'internal',
       engagementType: 'on_going',
       fulfillmentMode: 'internal_hire',
@@ -56,7 +57,7 @@ const seed = async () => {
   )
 
   const opening = await createHiringOpening(
-    { demandId: demand.demandId, internalTitle: MARKER, seniority: 'senior', budgetBand: 'INTERNO-NO-PUBLICABLE' },
+    { dataOrigin: 'synthetic_seed', demandId: demand.demandId, internalTitle: MARKER, seniority: 'senior', budgetBand: 'INTERNO-NO-PUBLICABLE' },
     ACTOR,
   )
 

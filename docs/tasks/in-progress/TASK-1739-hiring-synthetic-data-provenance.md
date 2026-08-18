@@ -830,6 +830,13 @@ allowlist línea por línea. La marca `data_origin` se escribe **al crear**, nun
 
 ## Follow-ups
 
+- **`scripts/hiring/verify-growth-forms-application-smoke.ts` queda BLOQUEADO por la guarda del
+  Slice 2 y necesita adaptación propia.** Declara `smoke_test` (la verdad) y por lo tanto ya no puede
+  publicar. Es el productor de las 8 vacantes `TASK-1372 SMOKE` que quedaron publicadas en el careers
+  real, y **no tiene teardown**. Dos salidas legítimas: que deje de necesitar la superficie pública
+  real, o que limpie lo que crea. Marcar su vacante como `real` para destrabarlo NO es una salida:
+  fabricaría otra vez fantasmas indistinguibles de una vacante verdadera.
+
 - Superficie UI de procedencia (badge en el desk, toggle "incluir sintéticos" gateado por capability,
   vista de administración): task `ui-ux` propia con wireframe.
 - Extender `data_origin` a otros dominios que compartan la base (payroll, CRM, delivery) reusando el

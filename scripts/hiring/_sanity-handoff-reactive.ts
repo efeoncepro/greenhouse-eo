@@ -95,6 +95,7 @@ const main = async () => {
 
     const demand = await createTalentDemand(
       {
+        dataOrigin: 'smoke_test',
         stakeholderType: 'internal',
         engagementType: 'on_going',
         fulfillmentMode: 'internal_hire',
