@@ -34,7 +34,10 @@ export const scenario: CaptureScenario = {
     layout: {
       enabled: true,
       includeSelector: 'main',
-      allowHorizontalScrollSelectors: ['[data-capture="hiring-application-tabs"]'],
+      allowHorizontalScrollSelectors: [
+        '[data-capture="hiring-tabs"]',
+        '[data-capture="hiring-application-tabs"]',
+      ],
       failOnViolations: true,
     },
     runtime: {

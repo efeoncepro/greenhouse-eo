@@ -863,7 +863,7 @@ const Application360View = ({
                     {assessmentCopy.review.cancelledDetail}
                   </Alert>
                 ) : (
-                  <Alert severity='info'>
+                  <Alert severity='info' sx={{ '& .MuiAlert-message': { color: 'text.primary' } }}>
                     {entry.status === 'assigned' || entry.status === 'sent' || entry.status === 'in_progress'
                       ? assessmentCopy.review.candidateIncomplete
                       : assessmentCopy.review.loadReviewPrompt}

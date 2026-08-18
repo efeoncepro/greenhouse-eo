@@ -312,7 +312,7 @@ export const AssessmentAiRunEntry = ({ assessmentId, copy, canScore }: Assessmen
             {statusMessage ? (
               <Alert
                 severity={provisional.status === 'failed' ? 'error' : provisional.status === 'partial' || provisional.status === 'stale' ? 'warning' : 'info'}
-                sx={provisional.status === 'partial' || provisional.status === 'stale' ? { color: 'warning.dark', '& .MuiAlert-icon': { color: 'warning.dark' } } : undefined}
+                sx={provisional.status === 'partial' || provisional.status === 'stale' ? { color: 'text.primary', '& .MuiAlert-icon': { color: 'warning.dark' } } : undefined}
               >
                 {statusMessage}
               </Alert>
@@ -334,7 +334,7 @@ export const AssessmentAiRunEntry = ({ assessmentId, copy, canScore }: Assessmen
 
             <Box data-capture='assessment-ai-exceptions'>
               {provisional.exceptions.length > 0 ? (
-                <Alert severity='warning' sx={{ color: 'warning.dark', '& .MuiAlert-icon': { color: 'warning.dark' } }}>
+                <Alert severity='warning' sx={{ color: 'text.primary', '& .MuiAlert-icon': { color: 'warning.dark' } }}>
                   {copy.provisionalNeedsAttention.replace('{count}', String(provisional.exceptions.length))}
                 </Alert>
               ) : null}
