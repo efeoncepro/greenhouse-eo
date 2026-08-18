@@ -1,6 +1,8 @@
 // TASK-1740 — Contrato canónico v2 de contenido público (write + read paths).
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+vi.mock('@/lib/observability/capture', () => ({ captureWithDomain: vi.fn() }))
 
 import { HiringValidationError } from '../errors'
 import {
@@ -183,5 +185,32 @@ describe('parseRemoteEligibleCountries — elegibilidad remota', () => {
     expect(() => parseRemoteEligibleCountries(['Global'])).toThrow(HiringValidationError)
     expect(() => parseRemoteEligibleCountries(['XX'])).toThrow(HiringValidationError)
     expect(() => parseRemoteEligibleCountries('CL')).toThrow(HiringValidationError)
+  })
+})
+
+describe('normalizePublicOpeningContent — degradación observable, no silenciosa', () => {
+  it('observa cuando un bloque de versión CONOCIDA no puede parsearse', async () => {
+    const { captureWithDomain } = await import('@/lib/observability/capture')
+    const spy = vi.mocked(captureWithDomain)
+
+    spy.mockClear()
+
+    // v2 declarada pero inválida: es el escenario real de un contrato que se endureció
+    // después de que el contenido fue aprobado y persistido.
+    expect(normalizePublicOpeningContent({ version: 2, promise: 'x' })).toBeNull()
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy.mock.calls[0]?.[1]).toBe('hiring')
+  })
+
+  it('NO emite ruido por ausencia ni por versión desconocida (no son anomalías)', async () => {
+    const { captureWithDomain } = await import('@/lib/observability/capture')
+    const spy = vi.mocked(captureWithDomain)
+
+    spy.mockClear()
+
+    expect(normalizePublicOpeningContent(null)).toBeNull()
+    expect(normalizePublicOpeningContent({ version: 99, promise: 'x' })).toBeNull()
+    expect(normalizePublicOpeningContent('{corrupto')).toBeNull()
+    expect(spy).not.toHaveBeenCalled()
   })
 })

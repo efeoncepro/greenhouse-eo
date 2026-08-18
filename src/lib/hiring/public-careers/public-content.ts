@@ -30,6 +30,7 @@ import {
   type PublicOpeningProcessStep
 } from '@/types/hiring'
 import { isValidCountryCode } from '@/lib/locale/countries'
+import { captureWithDomain } from '@/lib/observability/capture'
 
 import { HiringValidationError } from '../errors'
 
@@ -363,9 +364,17 @@ const normalizeLegacyV1 = (input: Record<string, unknown>): PublicOpeningContent
 }
 
 /**
- * Read-path: normaliza el JSONB persistido hacia el contrato v1. Es LENIENTE por diseño:
+ * Read-path: normaliza el JSONB persistido hacia el contrato vigente. Es LENIENTE por diseño:
  * un bloque corrupto o de versión desconocida degrada a `null` (fallback legacy de prosa)
- * en vez de romper la página pública. El caller decide si observa la degradación.
+ * en vez de romper la página pública.
+ *
+ * Pero degradar en SILENCIO es distinto de degradar honestamente. Un bloque v2 que ya fue
+ * aprobado y persistido sólo puede fallar el parseo si el contrato se endureció después
+ * (un `min` que sube, un campo que se vuelve obligatorio): en ese escenario el contenido
+ * aprobado desaparecería de la página pública sin que nadie se entere, y el síntoma —una
+ * vacante que "perdió" sus secciones— no se parece a la causa. Por eso la degradación de un
+ * bloque que SÍ declara una versión conocida se observa; la ausencia y las versiones
+ * desconocidas no son anomalías y no emiten ruido.
  */
 export const normalizePublicOpeningContent = (value: unknown): PublicOpeningContent | null => {
   if (value == null) return null
@@ -374,12 +383,21 @@ export const normalizePublicOpeningContent = (value: unknown): PublicOpeningCont
 
   if (!isRecord(parsed)) return null
 
+  const declaredVersion = Number(parsed.version)
+
   try {
-    if (Number(parsed.version) === PUBLIC_OPENING_CONTENT_VERSION) return parsePublicOpeningContent(parsed)
-    if (Number(parsed.version) === PUBLIC_OPENING_LEGACY_CONTENT_VERSION) return normalizeLegacyV1(parsed)
+    if (declaredVersion === PUBLIC_OPENING_CONTENT_VERSION) return parsePublicOpeningContent(parsed)
+    if (declaredVersion === PUBLIC_OPENING_LEGACY_CONTENT_VERSION) return normalizeLegacyV1(parsed)
 
     return null
-  } catch {
+  } catch (error) {
+    // Sin PII ni payload: sólo la versión y el motivo. El contenido público podría contener
+    // copy aprobado, y un log no es el lugar para volcarlo.
+    captureWithDomain(error, 'hiring', {
+      tags: { source: 'public_opening_content_normalize', declaredVersion: String(declaredVersion) },
+      extra: { reason: 'contenido público estructurado ilegible: la vacante degrada a la prosa legacy' },
+    })
+
     return null
   }
 }
