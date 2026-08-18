@@ -143,7 +143,13 @@ const main = async () => {
 
   // El perfil `ops` se aplica sobre las env vars canónicas y el borrado corre por el cliente
   // canónico (Cloud SQL Connector). Un `pg.Client` propio contra el proxy moría con ECONNRESET.
-  applyGreenhousePostgresProfile('ops')
+  // Perfil de escritura: `ops` por defecto; `admin` como break-glass cuando la credencial de ops
+  // no está disponible localmente (su contraseña sí vive en Secret Manager y el cliente canónico
+  // la resuelve por `*_SECRET_REF`, sin que el operador ni el agente vean el valor).
+  const writeProfile = process.env.PURGE_PG_PROFILE === 'admin' ? 'admin' : 'ops'
+
+  console.log(`\n  perfil de escritura: ${writeProfile}`)
+  applyGreenhousePostgresProfile(writeProfile)
   // Cerrar el pool abierto con el perfil runtime del dry-run: el próximo query lo reabre como `ops`.
   await closeGreenhousePostgres({ source: 'close' })
 
