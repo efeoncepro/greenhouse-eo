@@ -40,7 +40,7 @@ canary debería nacer marcando `data_origin='synthetic'` en el momento de creaci
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -320,8 +320,12 @@ Invariantes que no se pueden romper:
   **o** su `opening_id` es no-real. La columna se denormaliza porque el desk y las métricas filtran
   sobre `hiring_application` en cada lectura y un JOIN obligatorio a `identity_profiles` es un
   invariante que se olvida. Se enforcea con trigger `BEFORE INSERT OR UPDATE` que deriva el valor
-  desde las dos raíces; **el command nunca lo escribe a mano**. Si las dos raíces difieren, gana la
-  que no es `real` (una aplicación de persona real a una vacante inventada no es evidencia real).
+  desde las dos raíces; **el command nunca elige el valor a mano** — pero **SÍ debe provocar la
+  re-derivación**: marcar una raíz NO toca la fila de `hiring_application`, así que el trigger no
+  dispara solo. `applySyntheticOriginMarking` re-deriva los dependientes de esa raíz **en la misma
+  transacción** (Delta 2026-08-18 (2), punto 3); sin eso la copia queda obsoleta en el 100 % de los
+  marcados y el filtro del desk no observa nada. Si las dos raíces difieren, gana la que no es `real`
+  (una aplicación de persona real a una vacante inventada no es evidencia real).
 - **`candidate_facet` NO lleva columna.** Su FK a `identity_profiles` es `UNIQUE` (1:1 estricto):
   darle columna propia crearía una segunda verdad para la misma entidad y con ella la posibilidad de
   drift. Se resuelve por JOIN.
@@ -423,6 +427,10 @@ Invariantes que no se pueden romper:
 - `GRANT` a `greenhouse_runtime`; regenerar tipos con `pnpm db:generate-types`.
 - Módulo `src/lib/hiring/data-origin/contracts.ts` con el tipo `HiringDataOrigin`, el predicado de
   filtro y el helper de derivación, con tests unitarios.
+- **Señal de divergencia raíz↔derivada** (`hiring.data_quality.data_origin_derivation_drift`,
+  steady `0`): cuenta `hiring_application` cuyo `data_origin` no coincide con el derivado de sus dos
+  raíces. La matriz de riesgo la citaba como "signal de alerta" sin construirla; es el único detector
+  del defecto del punto 3 del Delta y por eso nace con la fundación, no al final.
 
 ### Slice 2 — Write path: declarar procedencia en el nacimiento
 
@@ -433,7 +441,13 @@ Invariantes que no se pueden romper:
 - Trigger `BEFORE INSERT OR UPDATE` en `hiring_application` que deriva `data_origin` desde
   `identity_profiles` + `hiring_opening` (gana el no-real). El command no escribe la columna.
 - Los seeds/smokes/scenarios existentes del repo declaran su `dataOrigin` explícito: los 8 archivos
-  enumerados en §`Why This Task Exists`.
+  enumerados en §`Why This Task Exists`, **más `task-1372-smoke`**, que el inventario original no
+  listaba y que resultó ser el mayor productor de vacantes fantasma (8 openings + 8 demands).
+- **Guarda de publicación — la pieza preventiva de la task.** `publishOpening` **rechaza** publicar
+  una vacante con `data_origin <> 'real'` (`HiringValidationError`, 422). Ocho vacantes sintéticas
+  llegaron a estar publicadas en el careers real; sin esta guarda, 1739 limpia el desorden y no
+  impide que se regenere. Es barato, va en el write path y convierte la task de limpieza en
+  prevención. Test: intentar publicar una opening `smoke_test` falla; una `real` publica igual.
 
 ### Slice 3 — Read path: los readers dejan de contar fantasmas
 
@@ -455,6 +469,12 @@ Invariantes que no se pueden romper:
   los modos dry-run / emit-allowlist / apply / rollback.
 - Las heurísticas del dry-run son **propuestas con evidencia citada**, nunca veredictos: cada fila
   del plan dice por qué señal entró y con qué confianza.
+- **Propagación explícita a dependientes**: el apply re-deriva `hiring_application.data_origin` de las
+  raíces marcadas en la MISMA transacción (Delta 2026-08-18 (2), punto 3). Sin esto el marcado no
+  tiene efecto observable.
+- **Guarda dura de vida laboral**: el apply aborta la fila si la persona tiene `members`,
+  `contractor_engagements`, `final_settlements` o `person_legal_entity_relationships`.
+- Tabla de heurísticas **por entidad**, recalibrada con el footprint real (ver §4 del Detailed Spec).
 - Apply del allowlist podado por el operador sobre el universo real.
 
 ### Slice 5 — Purga gobernada: archivar por defecto, borrar por excepción
@@ -463,8 +483,17 @@ Invariantes que no se pueden romper:
   (contrato detallado en §`Detailed Spec`).
 - CLI `scripts/hiring/purge-synthetic-hiring-data.ts` + script npm `hiring:data:purge-synthetic`,
   mismo protocolo dry-run → allowlist → apply.
+- **Precondición del lane A**: resolver cómo se cierra la dimensión que lee retención. Archivar con
+  `stage='closed'` NO setea `decision`, y el reader se guarda con `decision IS NULL`: la fila
+  archivada seguiría contando como abierta y **bloquearía para siempre** el vencimiento de retención
+  de esa persona (Delta 2026-08-18 (2), punto 4). Sin esto resuelto, el lane A no se ejecuta.
 - El lane de borrado corre una query de blockers **antes** de intentar el DELETE, con el patrón de
   `purge-task-1378-test-applications.ts`, y aborta la corrida entera si una sola fila no califica.
+  La query cubre los **9 dependientes reales** verificados contra PG — `hiring_assessment` (CASCADE),
+  `hiring_application_note`, `hiring_application_dossier_proposal`, `hiring_assessment_ai_scoring_run`,
+  `hiring_assessment_ai_scoring_run_item`, `candidate_identity_intake_evidence`,
+  `candidate_identity_display_audit`, `hiring_assessment_assignment`,
+  `hiring_assessment_assignment_proposal` — no las cinco condiciones genéricas originales.
 
 ### Slice 6 — Guardrail preventivo + señal de reliability
 
@@ -571,13 +600,32 @@ parámetro**: su exclusión es incondicional y así queda documentada en el `_me
 
 ### 4. Heurísticas del dry-run (propuestas, jamás veredictos)
 
-| Señal | Confianza | Nota |
+La confianza **depende de la entidad**: en las raíces de demanda el autor es señal fuerte; en personas
+es inútil (`created_by` es `NULL` en 55 de 61 `candidate_facet`). Recalibrado contra la base real:
+
+**Raíces de demanda (`talent_demand`, `hiring_opening`):**
+
+| Señal | Confianza | Evidencia en la base |
 |---|---|---|
-| `canonical_email` termina en `@efeonce.test` | alta | dominio reservado, nunca real |
+| `created_by` de un smoke conocido (`task-1372-smoke`) | **alta** | 8 openings + 8 demands — el cluster más grande |
+| `created_by` de un fixture de test (`user-live-test*`) | **alta** | 4 openings + 4 demands |
+| `created_by` ambiguo (`system:codex`, `cli-hiring-operator`) | **baja** | 1 c/u; autoría humana asistida, requiere revisión |
+
+**Personas (`identity_profiles` / `candidate_facet`):**
+
+| Señal | Confianza | Evidencia en la base |
+|---|---|---|
+| `canonical_email` en `@example.com` | **alta** | 8 personas; 7 de las 9 postulaciones sintéticas por careers |
+| `canonical_email` en `@live-test.invalid` | **alta** | 2 (fixture de live tests + canary de TASK-1736) |
 | `canonical_email` en la lista de correos de script conocidos | alta | enumerada desde el repo |
+| `canonical_email` termina en `@efeonce.test` | alta *(hoy 0 filas)* | dominio reservado; se conserva como preventiva |
 | `canonical_email` con sufijo `+test`/`+smoke` | media | podría ser un alias legítimo |
-| `created_by` es una persona agente (`user-agent-*-001`) | media | un operador humano pudo usar la sesión agente |
+| `created_by` es una persona agente (`user-agent-*-001`) | media | inútil para personas: `NULL` en 55 de 61 facets |
 | Nombre hace match de `SMOKE|PRUEBA|TEST|NO CONTACTAR` | **baja** | **falso positivo demostrado**; nunca suficiente por sí sola |
+
+⚠️ `@efeoncepro.com` **NUNCA** es señal de sintético: es el dominio corporativo real. Cinco
+postulaciones internas sobre vacantes de test lo usan, y marcarlas por el dominio arrastraría
+colaboradores reales.
 
 Ninguna combinación auto-aplica. El plan se imprime, el humano poda, el apply toca sólo lo aprobado.
 
