@@ -914,7 +914,7 @@ const Application360View = ({
                                 }}
                                 sx={{
                                   alignSelf: { xs: 'stretch', sm: 'center' },
-                                  '& .MuiToggleButton-root.Mui-focusVisible': {
+                                  '& .MuiToggleButton-root.Mui-focusVisible, & .MuiToggleButton-root:focus-visible': {
                                     outline: '2px solid',
                                     outlineColor: 'primary.main',
                                     outlineOffset: 2,
