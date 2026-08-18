@@ -26,6 +26,13 @@
 export const EFEONCE_URL = 'efeoncepro.com'
 export const EFEONCE_URL_HTTPS = 'https://efeoncepro.com'
 
+/**
+ * Candidate/customer-facing brand name (TASK-1740). Es la identidad pública que usan
+ * careers y el JSON-LD `JobPosting.hiringOrganization` — la marca, NO la razón social
+ * legal (esa es `EFEONCE_LEGAL_NAME_FALLBACK` / `getOperatingEntityIdentity()`).
+ */
+export const EFEONCE_BRAND_NAME = 'Efeonce'
+
 /** Canonical fallback legal entity (V1 single operating entity). Prefer getOperatingEntityIdentity() at runtime. */
 export const EFEONCE_LEGAL_NAME_FALLBACK = 'Efeonce Group SpA'
 

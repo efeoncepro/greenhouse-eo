@@ -186,6 +186,40 @@ export const careers: CareersCopy = {
     processTitle: 'How the process works',
     compensationTitle: 'Compensation',
     compensationFallback: 'Compensation is discussed transparently during the process.',
+    outcomesTitle: 'What a strong first year looks like',
+    workTitle: 'The work',
+    essentialsTitle: 'What is essential',
+    preferredTitle: 'Preferred, not required',
+    learnablesTitle: 'What you can learn here',
+    evidenceTitle: 'The evidence we want to see',
+    companyTitle: 'Efeonce at a glance',
+    remoteTitle: 'Remote work, in practice',
+    remoteIntro:
+      'We work 100% remote with an async-first rhythm: decisions, progress, and feedback are documented so work does not depend on constant meetings. We reserve syncs for reviews, decisions, and conversations that gain value in real time.',
+    workModelTitle: 'Work model and engagement',
+    eligibleCountriesTitle: 'You can apply from {count} countries',
+    eligibleCountriesDisclosure: 'View all {count} countries',
+    eligibleCountriesListLabel: 'Full list of eligible countries',
+    collaborationLabels: {
+      team: 'Team',
+      reportsTo: 'Reports to',
+      language: 'Language',
+      timezoneOverlap: 'Timezone overlap',
+      workingRhythm: 'Working rhythm'
+    },
+    benefitsTitle: 'What you receive',
+    processMetaLabels: {
+      expectedTiming: 'Expected timing',
+      responseCommitment: 'Our commitment',
+      accommodationPath: 'Accommodations'
+    },
+    compensationUnits: {
+      HOUR: 'per hour',
+      DAY: 'per day',
+      WEEK: 'per week',
+      MONTH: 'per month',
+      YEAR: 'per year'
+    },
     summaryTitle: 'Role summary',
     labels: {
       area: 'Area',

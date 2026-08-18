@@ -602,7 +602,28 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       'hiring.opening.publish',
       'hiring.application.decide',
       'hiring.assessment.score',
-      'hiring.handoff.approve'
+      'hiring.handoff.approve',
+      // TASK-1735 — anotar el Expediente de Evaluación (notas append-only + propose/confirm
+      // del dossier agéntico). Mismo tier que decide/score: quien gobierna la evaluación
+      // gobierna su narrativa. Role-only a propósito (sin routeGroup internal).
+      'hiring.application.annotate',
+      // TASK-1719 — gobernar la policy de assessment de una vacante (declarar plantilla +
+      // habilitar la asignación automática por etapa). Mismo tier que decide/publish y por la
+      // misma razón role-only: el routeGroup `internal` lo porta TODO tenant interno, así que
+      // incluirlo dejaría que collaborator/designer/people_viewer prendan escrituras a una
+      // cohorte completa de candidatos. Rechazado endurecer `hiring.assessment.author`.
+      'hiring.assessment.policy.govern',
+      // TASK-1719 — otorgar un ajuste razonable (tiempo extra) a la evaluación de un candidato.
+      // Mismo tier de gobernanza, role-only por la MISMA razón: el routeGroup `internal` lo porta
+      // todo tenant interno, así que incluirlo dejaría que collaborator/designer/people_viewer
+      // alteren las condiciones de rendición de una prueba. Rechazado reusar `assessment.author`:
+      // autorar contenido ≠ conceder una adaptación a una persona concreta.
+      'hiring.assessment.grant_accommodation',
+      // TASK-1736 — corregir el display name de la identidad de un candidato (write sobre
+      // identity_profiles con audit append-only fuente `human`). Mismo tier de gobernanza que
+      // reveal_identity y por la misma razón role-only: el routeGroup `internal` lo portaría
+      // TODO tenant interno (collaborator/designer/people_viewer incluidos).
+      'hiring.candidate.correct_display'
     ] as const) {
       addEntitlement(entries, { module: 'hiring', capability, action: 'execute', scope: 'tenant', source: 'role' })
     }

@@ -108,6 +108,41 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - Gate final longitudinal: `/my` candidato y People 360 consumen proyecciones distintas sobre los mismos hechos;
   ninguna copia CV, perfil o aplicaciones hacia una ficha paralela.
 
+### Phase 9 — Assessment AI Scoring at Scale
+
+- `TASK-1734` extiende la propuesta individual de TASK-1361 con un run asíncrono exacto por assessment,
+  abstención/routing por riesgo, muestra de calidad y confirmación humana gobernada del conjunto elegible.
+- Gate: la IA solo propone; un operador autorizado confirma antes del rollup. Puntaje, resultado, rationale,
+  confianza y estado de revisión nunca se exponen al postulante, que solo recibe confirmación de envío.
+- Boundary: no rankea candidatos, no decide contratación, no mueve etapas, no asigna tests y no envía correos.
+
+### Phase 10 — Candidate Identity Intake Canonicalization
+
+- `TASK-1736` separa evidencia submitted por aplicación, display person-first normalizado/corregible y search key
+  versionada; ambas entradas públicas ejecutan la misma policy antes de Person/Hiring.
+- Gate: ninguna corrección culturalmente ambigua muta identidad; el histórico sólo cambia mediante dry-run,
+  allowlist humana, compare-and-set, audit y rollback ensayado. Mensajes y respuestas abiertas se preservan.
+- Boundary: no crea perfil profesional paralelo, no fusiona por nombre, no rankea, puntúa, mueve etapas, asigna
+  tests, envía email ni muestra resultados internos al postulante.
+
+### Phase 11 — Public Vacancy Truth and Editorial Detail
+
+- `TASK-1740` convierte el copy público de cada opening en una proyección estructurada allowlist-safe y emite
+  canonical/`JobPosting` desde el mismo contenido visible. Conserva el lifecycle published → unpublished, no
+  toca el formulario y no incorpora Indexing API sin autorización externa.
+- `TASK-1741` consume ese contrato para evolucionar incrementalmente la página individual a un renderer editorial;
+  conserva URL, formulario y exactamente los dos CTA existentes, con legacy fallback y rollout reversible.
+- Gate: ninguna condición remota, país elegible, salario, beneficio ni mensaje de aplicación se inventa para
+  completar el render o el schema. Primero foundation de 1740, después consumer UI de 1741.
+- Nota 2026-08-17 (TASK-1740): la foundation quedó **code complete, rollout pendiente** — existe
+  `PublicOpeningContent` v1 (`public_content_json` validado) + `public_remote_eligible_countries`
+  (ISO alpha-2), canonical explícito siempre en la leaf publicada y JSON-LD `JobPosting` fail-closed
+  detrás de `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` (default OFF). El write viaja por
+  `updateHiringOpening`/`PATCH /api/hiring/openings/{id}` (`publicContent`,
+  `publicRemoteEligibleCountries`); el parser de texto del view-model queda como fallback legacy.
+  Países elegibles ya seteados en las 2 vacantes publicadas. El release a producción está retenido
+  hasta TASK-1741. ADR: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (Delta 2026-08-17).
+
 ## Child Tasks
 
 - `TASK-352` — Program umbrella and coordination for Hiring / ATS.
@@ -135,8 +170,8 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `TASK-1383` — Assessment Engine hardening previo a la taking surface. **✓ complete.**
 - `TASK-1384` — Assessment Question Bank SME V1. **✓ complete.**
 - `TASK-1385` — AI-assisted vacancy public copy sobre propose→confirm. **✓ complete.**
-- `TASK-1397` — Careers Talent Alerts Foundation.
-- `TASK-1398` — Careers Talent Alerts UI.
+- `TASK-1397` — Talent Pool and Careers Vacancy Alerts Foundation: alertas primarias para miembros `pool_eligible` con `future_opportunities` vigente + `opening_alerts` explícito, y carril secundario de suscripción anónima Careers; sin crear identidad desde el home.
+- `TASK-1398` — Careers Vacancy Alerts UI Host: banda pública secundaria y empty state sobre Growth Forms; no administra el Banco de Talento ni duplica su self-service.
 - `TASK-1400` — Hiring Activation Blocker Resolution API. **✓ complete.**
 - `TASK-1422` — Vacancy AI Draft UI. **✓ complete.**
 - `TASK-1727` — Candidate Portal Principal + Session Foundation: claim post-apply, audiencia/capabilities propias,
@@ -151,6 +186,61 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   sessionVersion y reconciliation sobre TASK-770.
 - `TASK-1732` — Identity-First People 360 Hiring Journey Reader: historia pre/post-member, paginada y allowlisted.
 - `TASK-1733` — People 360 Longitudinal Hiring History UI: timeline/detail interno sobre TASK-1732.
+- `TASK-1734` — Assessment AI Scoring at Scale + Operator-Only Exception Review: run asíncrono por assessment,
+  revisión humana gobernada y resultado exclusivamente interno; el postulante no ve score ni resultado.
+  **✓ complete (code complete, rollout gated 2026-08-16; delta correctivo 2026-08-17).** El delta cerró el
+  contrato de `perCriterion` (escala declarada `weighted_contribution` + prompt `...scoring.v2` + policy
+  `...risk_policy.v1_1`: `per_criterion_contradictory` bajó de 11/14 a 2/14 en el replay real, resucitando
+  `batch_eligible`) y entregó el **instrumento del gold set** (`pnpm hiring:ai:gold-set-sample` + rúbrica BARS
+  + protocolo en ciego + gate consciente de ruta). **Hallazgo que manda el plan:** la DB tiene 11 respuestas
+  humanas calificadas contra un piso de 49 — la ruta A no es ejecutable hoy **por falta de DATOS, no de
+  personas**, así que el carril uno-a-uno es el modo correcto y es el que genera esa materia prima. El
+  instrumento se entrega vacío: ningún agente fabrica ratings.
+- `TASK-1735` — Hiring Application Evaluation Dossier: expediente de evaluación append-only per-application
+  (`hiring_application_note` tipada + command/reader + API + capability `hiring.application.annotate`),
+  internal-only y fuera del review packet MCP; el consumer UI de Application 360 es follow-up (`TASK-1737`).
+  **✓ complete (code complete 2026-08-16; flag ON en staging 2026-08-16, OFF en producción).** Dos fixes
+  posteriores (2026-08-17) forman parte del contrato: el cuerpo de la nota pasó de 8000 a **20000** y el write
+  path **falla loud** en vez de truncar (el primer confirm real quedó cortado a mitad de frase sin que ningún
+  test lo viera, porque el panel renderiza desde `proposedJson`), y la nota reparada se muestra como historia
+  con chip **"Versión superada"**, derivando el supersede en el reader desde la nota posterior.
+- `TASK-1736` — Candidate Identity Intake Canonicalization + Governed Remediation: raw/display/search person-first,
+  parity Careers/Growth Forms, reconciliación identity-safe y remediación histórica allowlisted/reversible.
+  **✓ complete (Slices 1-4 code complete 2026-08-16).** Flag `HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED`
+  creada **ON en staging** 2026-08-16 (OFF en producción hasta el canary del runbook). **Remediación histórica
+  EJECUTADA** el 2026-08-16 con autorización del CEO: 3 personas reales corregidas (Valentina Villa, Stana
+  Medina, Aldo Romano) con actor + razón en `candidate_identity_display_audit`, y 2 perfiles QA podados a mano
+  de la allowlist. La cifra "4 propuestas = 2 humanos" del Slice 0 quedó superada por el lote real.
+- `TASK-1737` — Application 360: tab Expediente — **consumer UI de `TASK-1735`** (su follow-up declarado): el tab
+  `activity` sintético se convierte en el Expediente real (timeline de notas + eventos de etapa, composer, flujo
+  propose → editar → confirmar/rechazar) y resuelve el gate BLOQUEANTE anti-anclaje del Delta (3) de 1735 con
+  ceguera server-enforced en el reader (viewer con scorecard propio abierto no ve análisis con scores). `ui-ux`
+  con híbrido justificado (`reader`); sin bloqueo técnico (backend listo).
+  **✓ complete (code complete, rollout gated 2026-08-16).** Gate anti-anclaje CERRADO con predicado único
+  compartido con `listResponses` + `GET /dossier` devolviendo `proposal: null`. `UI ready: yes` (dirección visual
+  versionada, scorecard 4,54, GVC premium 1440+390 con rubric enterprise `pass`). Gated: flag
+  `HIRING_EVALUATION_DOSSIER_AI_ENABLED` OFF en producción (dueño 1735) + evidencia visual del panel de propuesta
+  con datos reales pendiente de staging.
+- `TASK-1738` ✅ **complete (2026-08-17, code complete; smoke staging pendiente)** — Workbench de revisión del
+  scoring IA — **consumer UI de `TASK-1734`** (su follow-up declarado: workbench con anti-anchoring + honest
+  provisional coverage): cobertura honesta **sticky**, cola de excepciones con evidencia por criterio, muestra
+  ciega estructural verificada sobre el DOM, `sawProposalBeforeScoring` por gesto real y confirm/cancel con
+  manifest. Montado en la card del assessment de la Application 360; convive con el drawer per-response; cero
+  superficie candidate-facing; el rollout de flags de 1734 sigue su runbook aparte. `UI ready: yes` (dirección
+  visual versionada + scorecard 4,46). El GVC premium sobre un run REAL destapó `manifestSummary` mintiendo 100%
+  y el bug del risk router cerrado en el delta 2026-08-17 de `TASK-1734`.
+- `TASK-1739` — **Procedencia de datos sintéticos en Hiring**: `data_origin`
+  (`real|synthetic_seed|smoke_test|demo`, default `real`) declarado en el nacimiento del dato, con dos
+  raíces (persona en `identity_profiles`, demanda en `talent_demand`/`hiring_opening`) y copia derivada
+  por trigger en `hiring_application`. Readers de desk/talent-pool filtran por defecto con opt-in
+  `includeSynthetic` detrás de flag; el sampler del gold set excluye **siempre y sin opt-in**. Backfill
+  con allowlist humana (nunca regex en producción), purga gobernada archive-first, gate que impide
+  crear datos sin declarar procedencia y señal `hiring.data_quality.synthetic_records_aging`.
+  `backend-data`/`backend-critical`. Paralelizable con todos los carriles; `Blocked by: none`.
+- `TASK-1740` — Public Vacancy Content and Google JobPosting Foundation: proyección pública estructurada,
+  allowlist, lifecycle y SEO técnico de la URL leaf; no toca formulario ni implementa Indexing API.
+- `TASK-1741` — Public Careers Editorial Detail Renderer: consumer UI incremental de 1740, con wireframe,
+  fallback legacy, GVC premium y exactamente los dos CTA existentes; no agrega un CTA final.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
 
@@ -162,6 +252,9 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `TASK-1363` — **Assessment Taking + Review Surface**: candidate-facing remote tokenized test-taking + internal rating/review surface in the desk. `ui-ux`. Blocked by `TASK-1360` (+ product-design loop).
 - `TASK-1364` — **Assessment Validity Feedback Loop**: link assessment score → real hire outcome (quality-of-hire 90d/6m) to measure predictive validity; read-only, advisory, feeds EU AI-Act technical documentation. `backend-data`. Blocked by `TASK-1360`. (From the `greenhouse-talent-people-operator` review of TASK-1360 — validity gap.)
 - `TASK-1365` — **Adverse-Impact & Fairness Monitoring**: privacy-safe aggregate monitoring of selection rates across groups (4/5ths) + drift; voluntary self-ID separated from the decision; observes, never adjusts; required for EU AI-Act bias testing. `backend-data`. Blocked by `TASK-1360`. (From the `greenhouse-talent-people-operator` review — fairness gap.)
+- `TASK-1734` — **Assessment AI Scoring at Scale + Operator-Only Exception Review**: completa el follow-up de
+  TASK-1361 con run durable/asíncrono, policy calibrada de abstención y riesgo, muestra de calidad y confirmación
+  humana del conjunto. Todo score/resultado/rationale/revisión es interno y candidate-facing permanece sin resultados.
 
 ### Publication + Growth Forms apply extension (Delta 2026-07-09)
 
@@ -172,6 +265,17 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 ### Contact completeness correction (Delta 2026-08-11)
 
 - `TASK-1688` — corrección del contrato que detectó la auditoría de postulaciones reales: teléfono y mensaje alcanzaban el schema pero el command no los persistía, y país de residencia no existía. Exige ADR antes de migrar, no permite inferencia/backfill histórico y gobierna ambas entradas públicas hacia el mismo command/reader.
+
+### Candidate identity intake canonicalization (Delta 2026-08-16)
+
+- `TASK-1736` continúa TASK-1367/1688 sin duplicarlas: conserva la Person canónica y agrega un contrato
+  raw/display/search versionado para nombres, parity de las dos entradas públicas y reconciliación conflict-safe
+  cuando el email ya resolvió una identidad existente.
+- La remediación histórica es backend-critical: ADR y sign-offs previos, detector read-only, dry-run vigente,
+  allowlist humana, compare-and-set, lotes de uno, audit sin PII y rollback exacto ensayado en staging.
+- La policy nunca aplica Title Case global ni reescribe mensajes/respuestas abiertas; phone calling-country es
+  explícito y distinto de residencia. UI de corrección, hardening genérico Growth Forms, assessment IDs y
+  filename CV quedan fuera.
 
 ### Agent-safe candidate review extension (Delta 2026-08-15)
 
@@ -226,6 +330,32 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   UI People 360. Esta partición evita tasks híbridas y copy-on-hire.
 - Referencias/recomendaciones, agenda y passkeys quedan post-MVP; no bloquean status/CV/perfil/preguntas.
 
+### Procedencia de datos sintéticos (Delta 2026-08-17)
+
+`TASK-1739` cierra un defecto transversal del programa: dev, staging y producción comparten una sola
+Cloud SQL, así que **cada task de este EPIC que crea un seed o un smoke deja candidatos y vacantes
+fantasma junto a los reales**, y hoy no existe ningún hecho en el modelo que diga "esto es sintético".
+La inferencia disponible —regex sobre el nombre— falla en los dos sentidos, con evidencia dura de
+ambos: un falso positivo demostrado en el gold set del 2026-08-16 (una respuesta real de 1206
+caracteres que menciona "pequeñas pruebas o pilotos") y un falso negativo estructural (cinco
+convenciones distintas de marcado repartidas en ocho scripts, ninguna compartida).
+
+- La procedencia (`data_origin`) es **ortogonal** a `source` (`public_careers|manual|referral|…`):
+  `source` responde por qué canal llegó, `data_origin` si el dato representa a alguien del mundo real.
+  **Nunca** se colapsan en una columna.
+- **Dos raíces**: `identity_profiles` para personas y `talent_demand`/`hiring_opening` para la demanda
+  (una vacante fantasma no tiene persona). `hiring_application` porta una copia derivada por trigger.
+- El sampler del gold set (`TASK-1734`) pasa a excluir sintéticos **siempre**, sin opt-in: la muestra
+  vigente salió limpia por suerte —los seeds no se califican a mano—, no por construcción.
+- La limpieza es **archive-first**: `hiring_assessment` cascadea desde `hiring_application`, así que
+  un DELETE se llevaría, en silencio, respuestas calificadas por personas.
+- **Obligación para todo carril activo del EPIC** (`1719/1720/1721/1722`, `1727…1733`): sus seeds,
+  smokes y scenarios declaran `dataOrigin` explícito. Un gate mecánico lo exige una vez que
+  `TASK-1739` cierre su Slice 6.
+
+Es paralelizable con todos los carriles: no bloquea ni es bloqueada por ninguno, y cuanto antes
+cierre, menos fantasmas hay que remediar después.
+
 ## Existing Related Work
 
 - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
@@ -262,7 +392,7 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - [ ] `TASK-770` delivered selected candidate -> collaborator active closure for `internal_hire`.
 - [ ] People 360 shows the journey from candidate/application to member/onboarding/active without duplicate identities.
 - [ ] Event catalog, architecture docs, functional docs and user manuals are updated where behavior changed.
-- [ ] `TASK-1723`–`TASK-1726` entregan Talent Pool person-first, consentimiento/withdrawal, Desk y MCP read-only con
+- [x] `TASK-1723`–`TASK-1726` entregan Talent Pool person-first, consentimiento/withdrawal, Desk y MCP read-only con
       Full API Parity, sin duplicar identidad, policy, documentos ni lógica entre consumers.
 - [ ] `TASK-1727`–`TASK-1730` entregan cuenta candidata, perfil profesional person-scoped, application self-service y
       `/my` longitudinal sin abrir superficies workforce ni copiar datos al contratar.
@@ -315,6 +445,24 @@ Operator requirement: el dominio necesita (1) **tests que rinde el candidato** �
 ### Secuencia actualizada
 
 `353 (✓) → 354 + 355 + 1360 + 1362 (paralelo tras foundation) → 1361 (tras 1360) → 1363 (tras 1360 + product-design) → 356 → 770`
+
+#### Delta 2026-08-16 — secuencia de las extensiones 2026-08-15/16
+
+Las extensiones no viven en las fases numeradas originales; su orden real es por cadena de blockers:
+
+- Carril assignment/selection: `1719 → 1603 (EPIC-038, consume la policy de 1719) → 1721`; `1720`/`1722` son
+  adapters MCP de sus dueñas y viajan después de cada foundation.
+- Carril scoring: **`1734` es paralelizable con `1719`/`1721`** — corre sobre `hiring.assessment.submitted` exista o
+  no la policy de asignación (`Blocked by: none` es correcto, no significa "última"). Su matriz de sign-offs quedó
+  resuelta por autorización ejecutiva del CEO (2026-08-16, ver Delta en la task); los gates técnicos (eval de
+  promoción, shadow, canary) se mantienen.
+- Carril expediente: `1735` (foundation backend del Evaluation Dossier) es independiente y paralelizable; su
+  consumer UI es follow-up. Frontera 1734↔1735: manifest estructurado vs nota narrativa (declarada en ambas).
+- Carril consumers UI (delta 2026-08-16): los dos follow-ups declarados ya tienen dueño — `1737` (tab Expediente,
+  consumer de 1735, incluye el gate anti-anclaje BLOQUEANTE) y `1738` (workbench del run, consumer de 1734).
+  Ambos sin bloqueo técnico: el backend está complete y el rollout de flags corre por sus runbooks; son
+  paralelizables entre sí y con el resto de los carriles.
+- Carril cuenta candidata: `1727 → 1728/1729 → 1730 → 1731 → 1732 → 1733` según sus blockers declarados.
 
 ### Supersede de non-goal
 

@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `migration|reader|command|api|sync`
 - Epic: `EPIC-011`
-- Status real: `Complete y operativo en producción interna; projection/search/App API/Desk/MCP ON, recontacto externo fail-closed hasta aprobación People + Legal/Privacy`
+- Status real: `Complete y operativo en producción interna; projection/search/App API/Desk/MCP ON y self-service/invite habilitados por flags independientes. Recontacto externo continúa fail-closed salvo consentimiento futuro explícito, vigente y reversible.`
 - Rank: `TBD`
 - Domain: `hr|identity|data|platform|ops`
 - Blocked by: `none`
@@ -42,9 +42,13 @@ Full API Parity para UI, Nexa, App API y el adapter MCP dependiente, sin duplica
 - Siete migraciones aplicadas en PostgreSQL productivo y cero pendientes; backfill/reconciler idempotente dejó 52
   memberships, 50 `active_process`, 2 `needs_reconsent`, sin copiar CV/contacto ni inventar consentimiento futuro.
 - Readers/commands, Product API y App API comparten contratos server-side; tests focales, TypeScript y lint pasan.
-- Release `a369165dfb2d`/run `31941320983` terminó `success`; reconciler productivo cada cinco minutos, Desk live y
-  canary MCP allow `200`/deny `403` prueban los consumers. Invitación/self-service externos permanecen OFF hasta
-  sign-off People + Legal/Privacy: es un gate operativo explícito, no consentimiento implícito ni deuda del foundation.
+- Release foundation `a369165dfb2d`/run `31941320983` terminó `success`; reconciler productivo cada cinco minutos,
+  Desk live y canary MCP allow `200`/deny `403` prueban los consumers. El encendido posterior de
+  self-service/invite quedó promovido por el release operativo `20245888625b8dc979cf2f747f5ef9d7999df6e5` / run
+  `31953851353`, con Vercel `dpl_CTxG3tx66S159tazMSyNiGSmqzHJ` `READY`, worker `ops-worker-00563-ghv` `Ready=True`
+  y watchdog `aggregateSeverity=ok`, `drift_count=0`. La revisión jurídica formal de copy, policy version, TTL y
+  retención permanece como sign-off residual si la política interna la exige; no existe consentimiento futuro por
+  backfill ni contacto automático.
 
 ## Why This Task Exists
 
@@ -206,7 +210,8 @@ Reglas obligatorias:
 ### Migration, backfill and rollout
 
 - Migration posture: `additive + backfill reconciliable; sin mutation destructiva ni grant automático`
-- Default state: `read-only/shadow; flags de projection, search e invite OFF; cohorte histórica no contactable por defecto`
+- Default de implementación histórico: `read-only/shadow; flags OFF`; estado live vigente: projection, search, MCP,
+  self-service e invite ON con consentimiento explícito y rollback por flags, según `Execution Evidence` y el feature-flag ledger.
 - Backfill plan: `dry-run obligatorio, clasificación por purpose/evidencia, batch/checkpoint, allowlist de openings y reporte sin PII; apply sólo con Legal/Privacy y People sign-off`
 - Rollback path: `flags OFF, detener consumer/reconciler, revocar capabilities y conservar schema/audit; no revertir por DELETE masivo`
 - External coordination: `Legal/Privacy + abogado habilitado, People, Identity/Platform, Vercel/worker flags y actualización del aviso público mediante TASK-1724`
@@ -333,7 +338,9 @@ e idempotency; email, template, stage y assessment se derivan server-side.
 
 - Slice 1 → Slice 2 → Slice 3 → Slice 4 → Slice 5 → Slice 6.
 - Search sólo puede servir tras policy/DTO/access; invite sólo tras search/readback y consent gate.
-- Ningún backfill apply ni recontacto ocurre antes de revisión People + Legal/Privacy y smoke de withdrawal.
+- No hubo backfill de opt-in futuro. El rollout posterior de self-service/invite fue explícitamente autorizado por el
+  CEO, con contacto todavía condicionado a grant futuro explícito, vigente y reversible; la revisión jurídica formal
+  de copy, TTL y retención queda documentada como sign-off residual cuando la política interna la exija.
 
 ### Risk matrix
 
@@ -347,8 +354,10 @@ e idempotency; email, template, stage y assessment se derivan server-side.
 
 ### Feature flags / cutover
 
-- Flags separados para projection, search y invite; todos default `false` y registrados en el ledger.
-- Retiro/contactability nunca se desactiva por flag. Rollback funcional = search/invite OFF, audit/retention siguen activos.
+- Flags separados para projection, search, self-service, invite y MCP; todos nacen default `false`, se registran en el
+  ledger y el estado live vigente queda verificado allí.
+- Retiro/contactability nunca se desactiva por flag. Rollback funcional = projection/search/self-service/invite/MCP
+  OFF según la superficie afectada; audit/retention siguen activos.
 
 ### Rollback plan per slice
 

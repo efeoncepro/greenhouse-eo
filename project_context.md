@@ -157,12 +157,39 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   El Banco de Talento person-first (`TASK-1723`–`TASK-1726`) está operativo en producción interna: projection,
   búsqueda/Desk del operador, App API y los readers MCP `hiring.talent_pool.search`/`.profile.get` comparten policy,
   capability, purpose/audit y DTO allowlisted. La cohorte tiene 52 memberships (50 `active_process`, 2
-  `needs_reconsent`) sin consentimiento futuro inventado; invite y self-service externos siguen OFF hasta aprobación
-  Privacy/People. Canary OAuth real: allow search/profile `200`, deny con cliente base-only `403`. `TASK-1718` está
-  desplegada en producción por release `6b78b040252d` y continúa en rollout controlado con
-  reader/proyección/provider de CV OFF, sin backfill ni lectura real; `TASK-1719`–`TASK-1722`
-  permanecen `to-do`. Talent Assurance (`EPIC-038`, `TASK-1602`–`TASK-1611`) permanece en fase de
-  decisión/discovery mientras sus ADR y contratos base sigan `Proposed`.
+  `needs_reconsent`) sin consentimiento futuro inventado. Invite y self-service están habilitados detrás de flags
+  independientes desde el 2026-08-16 por autorización operativa del CEO; el contacto futuro sigue requiriendo
+  consentimiento explícito, tokenizado, vigente y reversible, y no hay backfill ni outreach automático. Canary OAuth
+  real: allow search/profile `200`, deny con cliente base-only `403`. `TASK-1718` está desplegada en producción por
+  release `6b78b040252d` pero continúa en rollout controlado: reader/proyección/provider de CV OFF, sin backfill ni
+  lectura de CV real. `TASK-1719`–`TASK-1722` permanecen `to-do` (asignación de tests, selección y writes MCP no
+  están activos). Talent Assurance (`EPIC-038`, `TASK-1602`–`TASK-1611`) permanece en fase de decisión/discovery
+  mientras sus ADR y contratos base sigan `Proposed`.
+- Toda vacante pública o campaña inbound de Hiring se redacta con la skill espejo
+  `greenhouse-talent-people-operator`: evidence packet, benchmark actual, ledger de claims, funnel de fuente a
+  outcome, nurturing consentido y condiciones explícitas de contratación global; no se publican supuestos de
+  beneficio, modalidad, alcance o proceso como copy atractivo ni se optimiza por volumen sin calidad/experiencia.
+  El baseline público de beneficios de Efeonce está en
+  `references/efeonce-candidate-benefits-charter.md` de esa skill: 15 días hábiles de vacaciones remuneradas
+  más un día por cada año continuo cumplido, hasta 20, para colaboradores globales; dos días flotantes,
+  feriados corporativos chilenos aparte de vacaciones, salud/bienestar, desarrollo, US$50 mensuales para
+  conectividad/coworking y permisos de vida definidos. El aporte de equipo se conversa en entrevista u oferta,
+  no en el copy estándar de vacantes. Es una dirección de política global y copy candidato-facing; la ley local
+  puede mejorarla, nunca reducirla. No prueba todavía un flujo de Leave,
+  contrato o cálculo de Payroll.
+- La **evaluación del candidato** tiene tres contratos durables desde 2026-08-16/17 (`TASK-1734`–`TASK-1738`, EPIC-011;
+  ADR [scoring run](docs/architecture/GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md) e
+  [identidad de intake](docs/architecture/GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1.md), ambas
+  `Accepted`): (1) el **expediente** es append-only — corregir es agregar una nota que supersede, el supersede se
+  **deriva en el reader** desde la nota posterior y nada se trunca en silencio (el write path falla loud); (2) la
+  **ceguera anti-anclaje** vive en el reader con un predicado único compartido con `listResponses`, así que Nexa/MCP y
+  cualquier consumer futuro la heredan — nunca es un filtro de pantalla; (3) la **escala de un valor devuelto por un
+  LLM se declara en el contrato**, no se infiere en el consumer (`weighted_contribution` + policy `...risk_policy.v1_1`
+  tras el falso positivo 11/14). El candidato **jamás** ve score, banda, rationale ni estado de revisión — prohibido
+  por contrato ejecutable en todo estado, sin flag. Estado: flags de expediente e identidad **ON en staging, OFF en
+  producción**; los 3 flags del run OFF en todos los runtimes, con el gate de promoción bloqueado **por volumen del
+  gold set** (11 respuestas humanas calificadas contra un piso de 49): falta DATA, no personas, y el carril uno-a-uno es
+  el modo correcto porque es el que la genera. Ningún agente fabrica ratings del gold set.
 - La dirección aceptada para autoservicio candidato es **una cuenta y un `/my` longitudinal** (`TASK-1727`–`TASK-1733`,
   EPIC-011): mismo `identity_profile_id` y principal/login; `candidate_facet` y `member` son facetas aditivas;
   perfil profesional person-scoped; CV/respuestas/expectativa conservan snapshot por aplicación; activation suma

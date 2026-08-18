@@ -2228,6 +2228,18 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // TASK-1361 — AI assist: proponer borradores de pregunta / sugerencias de puntaje (propose→confirm).
   // Solo PROPONE; el confirm reusa author (pregunta) / score (respuesta). El LLM nunca escribe.
   { key: 'hiring.assessment.ai_assist', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
+  // TASK-1719 — gobernar la policy de assessment de una vacante: declarar qué plantilla le
+  // corresponde y habilitar la asignación automática por etapa. Capability propia y NO un
+  // endurecimiento de `hiring.assessment.author`: autorar contenido ≠ decidir que el sistema
+  // escriba a una cohorte entera. Grant tier gobernanza role-only (el assign manual puntual
+  // se queda en `author`).
+  { key: 'hiring.assessment.policy.govern', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
+  // TASK-1719 — otorgar un ajuste razonable (tiempo extra) sobre la evaluación de UN candidato.
+  // Capability propia y NO `hiring.assessment.author`: autorar el banco de preguntas es craft de
+  // contenido; conceder una adaptación es una decisión de People sobre una persona concreta, con
+  // trazabilidad de quién y cuándo. Grant tier gobernanza role-only. El MOTIVO del ajuste nunca
+  // se persiste (categoría protegida) — ver `src/lib/hiring/assessment/accommodations.ts`.
+  { key: 'hiring.assessment.grant_accommodation', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
   // TASK-1365 — aggregate-only fairness reader. More restricted than assessment.read.
   { key: 'hiring.assessment.fairness_read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
   // TASK-1714 — revelar el valor completo del documento de identidad de un CANDIDATO.
@@ -2236,6 +2248,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // el reveal sobre TODA persona del módulo (colaboradores, ex-colaboradores, direcciones).
   // El radio de ésta es exacto: la identidad de un candidato, que sólo existe post-decisión.
   { key: 'hiring.candidate.reveal_identity', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
+  // TASK-1736 — corregir el display name de la identidad de un candidato (before-value + actor +
+  // reason + audit append-only; la evidencia submitted jamás se toca). Capability propia porque es
+  // un WRITE sobre `identity_profiles` — verbo y radio distintos del reveal (read de PII) y del
+  // annotate (narrativa del expediente). Una corrección humana siempre gana sobre el automatismo
+  // de reconciliación (ADR D3). Grant tier gobernanza role-only, NUNCA client_*.
+  { key: 'hiring.candidate.correct_display', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
+  // TASK-1735 — Expediente de Evaluación: escribir notas append-only y proponer/confirmar
+  // borradores agénticos del dossier. Grant tier gobernanza (role-only), internal-only.
+  { key: 'hiring.application.annotate', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
   { key: 'hiring.talent_pool.read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
   { key: 'hiring.candidate.review.read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
   { key: 'hiring.talent_pool.manage', module: 'hiring', actions: ['update'] as const, defaultScope: 'tenant' },

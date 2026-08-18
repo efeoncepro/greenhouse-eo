@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import NextLink from 'next/link'
 import { useSearchParams } from 'next/navigation'
@@ -27,12 +27,17 @@ import Select from '@mui/material/Select'
 import Snackbar from '@mui/material/Snackbar'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
+import ToggleButton from '@mui/material/ToggleButton'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
 import type { Theme } from '@mui/material/styles'
 
 import {
   GreenhouseButton,
   GreenhouseChip,
+  DetailHero,
   isCardDensityAtLeast,
   useContainerDensity,
 } from '@/components/greenhouse/primitives'
@@ -54,20 +59,29 @@ import type {
   AssessmentReviewItem,
 } from '@/lib/hiring/assessment/review'
 import type { AiProposal } from '@/types/hiring-assessment-ai'
+import type { HiringApplicationNote } from '@/types/hiring-application-notes'
 
 import HiringDeskFrame from './HiringDeskFrame'
+import ApplicationDossierPanel from './ApplicationDossierPanel'
 import CandidateDocumentsPanel from './CandidateDocumentsPanel'
-import { hiringRequest } from './hiring-client'
+import AssessmentCompetencyRadar from './AssessmentCompetencyRadar'
+import { hiringRequest, scoreTone } from './hiring-client'
+import { computeScorecardSummary } from './scorecard-summary'
+import { AssessmentAiRunEntry } from './AssessmentAiRunWorkbench'
 
-type TabKey = 'overview' | 'assessment' | 'documents' | 'decision' | 'activity'
-const TAB_KEYS: TabKey[] = ['overview', 'assessment', 'documents', 'decision', 'activity']
+type TabKey = 'overview' | 'assessment' | 'documents' | 'decision' | 'expediente'
+const TAB_KEYS: TabKey[] = ['overview', 'assessment', 'documents', 'decision', 'expediente']
+
+// TASK-1737 — `activity` se convirtió en el Expediente real; el alias preserva
+// los deep-links guardados (`?tab=activity` sigue resolviendo al mismo tab).
+const TAB_ALIASES: Record<string, TabKey> = { activity: 'expediente' }
 
 const TAB_ICONS: Record<TabKey, string> = {
   overview: 'tabler-layout-dashboard',
   assessment: 'tabler-checkup-list',
   documents: 'tabler-files',
   decision: 'tabler-gavel',
-  activity: 'tabler-activity-heartbeat',
+  expediente: 'tabler-notes',
 }
 
 const DECISION_OPTIONS: Array<{ value: HiringDecision; label: string }> = [
@@ -128,14 +142,6 @@ const targetScoreForLevel = (level: string | null): number => {
   if (level === 'nociones') return 62
 
   return 72
-}
-
-const scoreTone = (score: number | null): 'success' | 'warning' | 'error' | 'info' => {
-  if (score == null) return 'info'
-  if (score >= 75) return 'success'
-  if (score >= 60) return 'warning'
-
-  return 'error'
 }
 
 const rubricLinesFrom = (rubric: Record<string, unknown>): string[] => {
@@ -227,6 +233,15 @@ interface Application360ViewProps {
   /** El reader falló (≠ candidato sin documentos): el panel degrada honesto. */
   documentsFailed: boolean
   canRevealIdentity: boolean
+  /** TASK-1737 — notas del expediente server-fed (viewer-aware). `null` = el reader FALLÓ. */
+  notes: HiringApplicationNote[] | null
+  notesFailed: boolean
+  hiddenNoteCount: number
+  /** Gate anti-anclaje server-enforced: el payload ya viene filtrado para este viewer. */
+  viewerBlind: boolean
+  canAnnotate: boolean
+  canScore: boolean
+  noteAuthorNames: Record<string, string>
 }
 
 const handoffTone = (handoff: HiringHandoff | null) => {
@@ -341,9 +356,17 @@ const Application360View = ({
   initialAssessments,
   templates,
   initialHandoff,
+  notes,
+  notesFailed,
+  hiddenNoteCount,
+  viewerBlind,
+  canAnnotate,
+  canScore,
+  noteAuthorNames,
 }: Application360ViewProps) => {
   const searchParams = useSearchParams()
-  const requestedTab = searchParams.get('tab')
+  const rawRequestedTab = searchParams.get('tab')
+  const requestedTab = rawRequestedTab ? TAB_ALIASES[rawRequestedTab] ?? rawRequestedTab : null
   const initialTab: TabKey = TAB_KEYS.includes(requestedTab as TabKey) ? (requestedTab as TabKey) : 'overview'
   const [item, setItem] = useState(initialItem)
   const [handoff, setHandoff] = useState(initialHandoff)
@@ -666,7 +689,16 @@ const Application360View = ({
   )
 
   const assessment = (
-    <Stack spacing={3}>
+    <Paper
+      variant='outlined'
+      data-capture='assessment-work-surface'
+      sx={theme => ({
+        p: { xs: 2.5, md: 4 },
+        borderRadius: `${theme.shape.customBorderRadius.xl}px`,
+        overflowX: 'clip',
+      })}
+    >
+      <Stack spacing={3}>
       <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' alignItems={{ xs: 'stretch', sm: 'center' }} spacing={2}>
         <Box>
           <Typography variant='h5'>{assessmentCopy.review.title}</Typography>
@@ -703,7 +735,7 @@ const Application360View = ({
       ) : null}
 
       {assessments.length === 0 ? (
-        <Paper variant='outlined' sx={(theme) => ({ p: 5, borderRadius: `${theme.shape.customBorderRadius.lg}px`, textAlign: 'center' })}>
+        <Box sx={{ p: 5, textAlign: 'center' }}>
           <Stack alignItems='center' spacing={2}>
             <Box sx={{ display: 'grid', placeItems: 'center', inlineSize: 58, blockSize: 58, borderRadius: '50%', color: 'primary.main', bgcolor: 'primary.lightOpacity' }}>
               <i aria-hidden='true' className='tabler-clipboard-off' />
@@ -711,7 +743,7 @@ const Application360View = ({
             <Typography variant='h6'>{copy.application.assessmentPending}</Typography>
             <Typography color='text.secondary'>Asigna un test para generar el link tokenizado de un solo uso del candidato.</Typography>
           </Stack>
-        </Paper>
+        </Box>
       ) : assessments.map((entry) => {
         const review = assessmentReviews[entry.assessmentId]
         const pendingHumanResponses = review?.responses.filter((response) => response.needsHumanRating && response.humanScore == null) ?? []
@@ -737,50 +769,48 @@ const Application360View = ({
           return { ...module, responses, score, target, pending }
         })
 
-        const scoredRows = scoreRows.filter((row) => row.score != null)
-        const totalWeight = scoredRows.reduce((sum, row) => sum + row.weight, 0)
-
-        const overall = scoredRows.length === 0
-          ? null
-          : totalWeight > 0
-            ? Math.round(scoredRows.reduce((sum, row) => sum + (row.score ?? 0) * row.weight, 0) / totalWeight)
-            : Math.round(scoredRows.reduce((sum, row) => sum + (row.score ?? 0), 0) / scoredRows.length)
-
-        const radarPoints = scoreRows.map((row, index) => {
-          const angle = -Math.PI / 2 + (index / Math.max(scoreRows.length, 1)) * Math.PI * 2
-          const radius = ((row.score ?? 0) / 100) * 72
-
-          return `${100 + Math.cos(angle) * radius},${100 + Math.sin(angle) * radius}`
-        }).join(' ')
-
-        const targetPoints = scoreRows.map((row, index) => {
-          const angle = -Math.PI / 2 + (index / Math.max(scoreRows.length, 1)) * Math.PI * 2
-          const radius = (row.target / 100) * 72
-
-          return `${100 + Math.cos(angle) * radius},${100 + Math.sin(angle) * radius}`
-        }).join(' ')
+        // ISSUE-159: el global SOLO existe con el scorecard completo. Un promedio parcial
+        // (p.ej. 2 competencias objetivas perfectas + 7 pendientes) mostraba "100/100
+        // Óptimo" como si fuera resultado final. El estado partial muestra progreso, no nota.
+        const scorecardSummary = computeScorecardSummary(scoreRows)
+        const overall = scorecardSummary.overall
 
         return (
-          <Paper
+          <Box
             key={entry.assessmentId}
-            variant='outlined'
             data-capture='assessment-scorecard'
-            sx={(theme) => ({
-              p: { xs: 2.5, md: 4 },
-              borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+            sx={{
+              pt: 3,
+              borderBlockStart: '1px solid',
+              borderColor: 'divider',
               overflowX: 'clip',
-            })}
+            }}
           >
             <Stack spacing={3}>
               <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' alignItems={{ xs: 'stretch', sm: 'center' }} spacing={2}>
                 <Box>
                   <Stack direction='row' spacing={1.25} alignItems='center' flexWrap='wrap' useFlexGap>
-                    <Typography variant='h6'>{entry.method === 'candidate_test' ? 'Candidate test' : 'Scorecard de entrevista'}</Typography>
+                    <Typography variant='h6'>
+                      {entry.method === 'candidate_test' ? assessmentCopy.review.candidateTest : assessmentCopy.review.interviewerScorecard}
+                    </Typography>
                     <GreenhouseChip
                       kind='status'
                       variant='label'
-                      tone={entry.status === 'scored' ? 'success' : entry.status === 'submitted' ? 'warning' : entry.status === 'expired' ? 'error' : 'info'}
-                      label={entry.status}
+                      tone={
+                        entry.status === 'scored'
+                          ? 'success'
+                          : entry.status === 'submitted'
+                            ? 'warning'
+                            : entry.status === 'expired'
+                              ? 'error'
+                              : // TASK-1719: `cancelled` es terminal-neutro (se retiró antes de que el
+                                // candidato empezara). Sin rama propia caía al `info` por defecto y una
+                                // evaluación cancelada se pintaba neutro-positiva, como una en curso.
+                                entry.status === 'cancelled'
+                                ? 'default'
+                                : 'info'
+                      }
+                      label={assessmentCopy.review.assessmentStatuses[entry.status]}
                     />
                   </Stack>
                   <Typography variant='caption' color='text.secondary'>{entry.publicId}{entry.timeLimitMinutes ? ` · ${entry.timeLimitMinutes} minutos` : ''}</Typography>
@@ -797,35 +827,57 @@ const Application360View = ({
                     {copy.application.reviewAssessment}
                   </GreenhouseButton>
                 ) : (
-                  <Stack direction='row' spacing={1} justifyContent={{ xs: 'stretch', sm: 'flex-end' }}>
-                    <Button data-capture='assessment-mode-bars' variant={scorecardMode === 'bars' ? 'contained' : 'tonal'} size='small' onClick={() => setScorecardMode('bars')}>
-                      {assessmentCopy.review.bars}
-                    </Button>
-                    <Button data-capture='assessment-mode-radar' variant={scorecardMode === 'radar' ? 'contained' : 'tonal'} size='small' onClick={() => setScorecardMode('radar')}>
-                      {assessmentCopy.review.radar}
-                    </Button>
-                  </Stack>
+                  <ToggleButtonGroup
+                    exclusive
+                    size='small'
+                    value={scorecardMode}
+                    aria-label={assessmentCopy.review.title}
+                    onChange={(_, nextMode: 'bars' | 'radar' | null) => {
+                      if (nextMode) setScorecardMode(nextMode)
+                    }}
+                    sx={{ alignSelf: { xs: 'stretch', sm: 'center' } }}
+                  >
+                    <ToggleButton value='bars' data-capture='assessment-mode-bars' aria-label={assessmentCopy.review.bars}>
+                      <i aria-hidden='true' className='tabler-chart-bar' />
+                      <Box component='span' sx={{ marginInlineStart: 1 }}>{assessmentCopy.review.bars}</Box>
+                    </ToggleButton>
+                    <ToggleButton value='radar' data-capture='assessment-mode-radar' aria-label={assessmentCopy.review.radar}>
+                      <i aria-hidden='true' className='tabler-chart-radar' />
+                      <Box component='span' sx={{ marginInlineStart: 1 }}>{assessmentCopy.review.radar}</Box>
+                    </ToggleButton>
+                  </ToggleButtonGroup>
                 )}
               </Stack>
 
+              {/* TASK-1738 — la entrada del run IA vive en la CARD, no dentro del panel de
+                  revisión: una cola de excepciones pendiente no puede quedar escondida detrás
+                  de "Revisar evaluación". Sin run o sin capability no dibuja nada. */}
+              <AssessmentAiRunEntry assessmentId={entry.assessmentId} copy={assessmentCopy.scoringRun} canScore={canScore} />
+
               {!review ? (
-                <Alert severity='info'>
-                  {entry.status === 'assigned' || entry.status === 'sent' || entry.status === 'in_progress'
-                    ? 'El candidato aún no completa la evaluación.'
-                    : 'Carga la revisión para ver respuestas, rúbricas y scorecard por competencia.'}
-                </Alert>
+                // TASK-1719: `cancelled` tenía que caer en su propia rama — en el `else` mostraba
+                // "Carga la revisión…", un prompt sin sentido para una instancia que nunca tuvo
+                // respuestas. Se retiró antes de que el candidato empezara: no hay nada que revisar.
+                entry.status === 'cancelled' ? (
+                  <Alert severity='warning' icon={<i className='tabler-ban' />}>
+                    {assessmentCopy.review.cancelledDetail}
+                  </Alert>
+                ) : (
+                  <Alert severity='info'>
+                    {entry.status === 'assigned' || entry.status === 'sent' || entry.status === 'in_progress'
+                      ? assessmentCopy.review.candidateIncomplete
+                      : assessmentCopy.review.loadReviewPrompt}
+                  </Alert>
+                )
               ) : (
                 <>
                   <Grid container spacing={3} sx={{ '& > *': { minWidth: 0 } }}>
-                    <Grid size={{ xs: 12, md: 7 }}>
-                      <Paper
-                        variant='outlined'
-                        sx={(theme) => ({
+                    <Grid size={{ xs: 12, md: pendingHumanResponses.length === 0 ? 12 : 7 }}>
+                      <Box
+                        sx={{
                           position: 'relative',
-                          p: { xs: 2.5, md: 3 },
-                          borderRadius: `${theme.shape.customBorderRadius.lg}px`,
                           overflowX: 'clip',
-                        })}
+                        }}
                       >
                         <Stack spacing={3}>
                           <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={2}>
@@ -837,38 +889,49 @@ const Application360View = ({
                                 <Typography variant='h2' sx={{ fontVariantNumeric: 'tabular-nums' }}>{overall ?? '—'}</Typography>
                                 <Typography color='text.secondary'>/100</Typography>
                               </Stack>
+                              {scorecardSummary.state === 'partial' ? (
+                                <Typography variant='caption' color='text.secondary'>
+                                  {formatTemplate(assessmentCopy.review.partialProgress, {
+                                    scored: scorecardSummary.scoredCount,
+                                    total: scorecardSummary.totalCount
+                                  })}
+                                </Typography>
+                              ) : null}
                             </Box>
                             <GreenhouseChip
                               kind='status'
                               variant='label'
-                              tone={scoreTone(overall)}
-                              label={overall == null ? assessmentCopy.review.statuses.pending : overall >= 75 ? assessmentCopy.review.statuses.optimal : overall >= 60 ? assessmentCopy.review.statuses.attention : assessmentCopy.review.statuses.critical}
+                              tone={scorecardSummary.state === 'complete' ? scoreTone(overall) : 'info'}
+                              label={
+                                scorecardSummary.state === 'complete' && overall != null
+                                  ? overall >= 75
+                                    ? assessmentCopy.review.statuses.optimal
+                                    : overall >= 60
+                                      ? assessmentCopy.review.statuses.attention
+                                      : assessmentCopy.review.statuses.critical
+                                  : scorecardSummary.state === 'partial'
+                                    ? assessmentCopy.review.statuses.partial
+                                    : assessmentCopy.review.statuses.pending
+                              }
                             />
                           </Stack>
 
                           {scoreRows.length === 0 ? (
-                            <Alert severity='info'>Aún no hay módulos de competencia para esta evaluación.</Alert>
+                            <Alert severity='info'>{assessmentCopy.review.noModules}</Alert>
                           ) : scorecardMode === 'radar' ? (
-                            <Box
-                              role='img'
-                              aria-label={assessmentCopy.review.title}
-                              sx={{ display: 'grid', placeItems: 'center', minBlockSize: 280, overflowX: 'clip' }}
-                            >
-                              <svg viewBox='0 0 200 200' width='100%' height='280' aria-hidden='true' focusable='false'>
-                                <circle cx='100' cy='100' r='72' fill='none' stroke='var(--mui-palette-divider)' strokeWidth='1' />
-                                <circle cx='100' cy='100' r='48' fill='none' stroke='var(--mui-palette-divider)' strokeWidth='1' opacity='0.7' />
-                                <circle cx='100' cy='100' r='24' fill='none' stroke='var(--mui-palette-divider)' strokeWidth='1' opacity='0.45' />
-                                {targetPoints ? <polygon points={targetPoints} fill='none' stroke='var(--mui-palette-warning-main)' strokeDasharray='4 5' strokeWidth='2' /> : null}
-                                {radarPoints ? <polygon points={radarPoints} fill='rgb(var(--mui-palette-primary-mainChannel) / 0.18)' stroke='var(--mui-palette-primary-main)' strokeWidth='2.5' /> : null}
-                                {scoreRows.map((row, index) => {
-                                  const angle = -Math.PI / 2 + (index / Math.max(scoreRows.length, 1)) * Math.PI * 2
-                                  const x = 100 + Math.cos(angle) * 86
-                                  const y = 100 + Math.sin(angle) * 86
-
-                                  return <text key={row.competencyId} x={x} y={y} fontSize='7' textAnchor='middle' fill='currentColor'>{row.competencyKey.slice(0, 7)}</text>
-                                })}
-                              </svg>
-                            </Box>
+                            <AssessmentCompetencyRadar
+                              rows={scoreRows}
+                              ariaLabel={assessmentCopy.review.title}
+                              copy={{
+                                scoreLegend: assessmentCopy.review.radarScoreLegend,
+                                targetLegend: assessmentCopy.review.radarTargetLegend,
+                                partialTitle: assessmentCopy.review.radarPartialTitle,
+                                partialBody: assessmentCopy.review.radarPartialBody,
+                                score: assessmentCopy.review.radarMetricScore,
+                                objective: assessmentCopy.review.objective,
+                                pending: assessmentCopy.review.pending,
+                              }}
+                            />
                           ) : (
                             <Stack spacing={2.25}>
                               {scoreRows.map((row) => (
@@ -879,7 +942,7 @@ const Application360View = ({
                                         <i className={row.competencyCategory === 'attitudinal' ? 'tabler-heart-handshake' : 'tabler-target-arrow'} />
                                       </Box>
                                       <Box sx={{ minWidth: 0 }}>
-                                        <Typography fontWeight={700} noWrap>{row.competencyName}</Typography>
+                                        <Typography fontWeight='fontWeightBold' sx={{ overflowWrap: 'anywhere' }}>{row.competencyName}</Typography>
                                         <Typography variant='caption' color='text.secondary'>{assessmentCopy.review.objective} {row.target}% · peso {row.weight}%</Typography>
                                       </Box>
                                     </Stack>
@@ -948,26 +1011,25 @@ const Application360View = ({
                             </tbody>
                           </Box>
                         </Stack>
-                      </Paper>
+                      </Box>
                     </Grid>
 
+                    {pendingHumanResponses.length > 0 ? (
                     <Grid size={{ xs: 12, md: 5 }}>
-                      <Paper
-                        variant='outlined'
+                      <Box
                         data-capture='assessment-review-queue'
-                        sx={(theme) => ({ p: { xs: 2.5, md: 3 }, borderRadius: `${theme.shape.customBorderRadius.lg}px` })}
+                        sx={{
+                          ps: { xs: 0, md: 3 },
+                          borderInlineStart: { xs: 0, md: '1px solid' },
+                          borderColor: 'divider',
+                        }}
                       >
                         <Stack spacing={2.25}>
                           <Box>
                             <Typography variant='h6'>{formatTemplate(assessmentCopy.review.queueTitle, { count: pendingHumanResponses.length })}</Typography>
                             <Typography variant='body2' color='text.secondary'>{assessmentCopy.review.subtitle}</Typography>
                           </Box>
-                          {pendingHumanResponses.length === 0 ? (
-                            <Alert severity='success' icon={<i className='tabler-circle-check' />}>
-                              <Typography fontWeight={700}>{assessmentCopy.review.queueEmptyTitle}</Typography>
-                              <Typography variant='body2'>{assessmentCopy.review.queueEmptyBody}</Typography>
-                            </Alert>
-                          ) : pendingHumanResponses.map((response) => {
+                          {pendingHumanResponses.map((response) => {
                             const item = review.reviewItems.find((entryItem) => entryItem.responseId === response.responseId)
 
                             return (
@@ -1007,11 +1069,28 @@ const Application360View = ({
                             )
                           })}
                         </Stack>
-                      </Paper>
+                      </Box>
                     </Grid>
+                    ) : null}
                   </Grid>
 
-                  {review.responses.length > 0 && entry.status !== 'scored' ? (
+                  {pendingHumanResponses.length === 0 ? (
+                    <Alert
+                      severity='success'
+                      icon={<i className='tabler-circle-check' />}
+                      data-capture='assessment-review-queue'
+                    >
+                      <Typography component='span' fontWeight='fontWeightBold'>
+                        {assessmentCopy.review.queueEmptyTitle}
+                      </Typography>
+                      <Typography component='span' variant='body2'> · 0 respuestas pendientes</Typography>
+                    </Alert>
+                  ) : null}
+
+                  {/* TASK-1719: `cancelled` seguía ofreciendo "Cerrar puntuación" — una instancia
+                      retirada no se corrige nunca. El estado terminal manda sobre el conteo de
+                      respuestas (que además siempre es 0 acá: sólo se cancela pre-inicio). */}
+                  {review.responses.length > 0 && entry.status !== 'scored' && entry.status !== 'cancelled' ? (
                     <GreenhouseButton
                       kind='primaryAction'
                       leadingIcon={finalizingAssessmentId === entry.assessmentId ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}
@@ -1139,10 +1218,11 @@ const Application360View = ({
                 </>
               )}
             </Stack>
-          </Paper>
+          </Box>
         )
       })}
-    </Stack>
+      </Stack>
+    </Paper>
   )
 
   // TASK-1715 — el panel consume el reader canónico resuelto en servidor. Antes de esto
@@ -1252,75 +1332,119 @@ const Application360View = ({
     </Stack>
   )
 
-  const activity = (
-    <Stack spacing={3}>
-      <Typography variant='h5'>{copy.application.activityTitle}</Typography>
-      <Stack spacing={0}>
-        {[
-          { title: 'Postulación creada', at: item.application.createdAt, icon: 'tabler-user-plus' },
-          { title: `Etapa actual: ${copy.pipeline.stages[item.application.stage]}`, at: item.application.updatedAt, icon: 'tabler-layout-kanban' },
-          ...decisionHistory.map((entry) => ({ title: `Decisión: ${entry.decision}`, at: entry.decidedAt, icon: 'tabler-gavel' })),
-        ].sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime()).map((event, index, events) => (
-          <Stack key={`${event.title}-${event.at}`} direction='row' spacing={2.5}>
-            <Stack alignItems='center'><Box sx={{ display: 'grid', placeItems: 'center', inlineSize: 40, blockSize: 40, borderRadius: '50%', color: 'primary.main', backgroundColor: 'primary.lightOpacity' }}><i className={event.icon} /></Box>{index < events.length - 1 ? <Box sx={{ inlineSize: 2, flex: 1, minBlockSize: 32, backgroundColor: 'divider' }} /> : null}</Stack>
-            <Box sx={{ pb: 3 }}><Typography color='text.primary' fontWeight={650}>{event.title}</Typography><Typography variant='caption' color='text.primary'>{formatDateTime(event.at, { dateStyle: 'medium', timeStyle: 'short' }, 'es-CL')}</Typography></Box>
-          </Stack>
-        ))}
-      </Stack>
-    </Stack>
-  )
-
-  const panels: Record<TabKey, React.ReactNode> = { overview, assessment, documents, decision: decisionPanel, activity }
-  const orderedTabs = Object.keys(TAB_ICONS) as TabKey[]
-
   const setApplicationTab = (nextTab: TabKey) => {
     setError(null)
     setTab(nextTab)
   }
 
-  const handleApplicationTabsKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
+  // TASK-1737 — el tab sintético `activity` se convirtió en el Expediente real:
+  // notas persistidas (TASK-1735, viewer-aware) + eventos de etapa como contexto +
+  // flujo propose→confirm del dossier. Panel route-local (patrón TASK-1715).
+  const expediente = (
+    <ApplicationDossierPanel
+      copy={copy}
+      applicationId={item.application.applicationId}
+      stageLabel={copy.pipeline.stages[item.application.stage]}
+      appliedAt={item.application.createdAt}
+      stageUpdatedAt={item.application.updatedAt}
+      decisionHistory={decisionHistory}
+      initialNotes={notesFailed ? null : notes}
+      initialHiddenNoteCount={hiddenNoteCount}
+      initialViewerBlind={viewerBlind}
+      canAnnotate={canAnnotate}
+      noteAuthorNames={noteAuthorNames}
+      onGoToScorecard={() => setApplicationTab('assessment')}
+      onToast={setToast}
+    />
+  )
 
-    event.preventDefault()
-    const currentIndex = orderedTabs.indexOf(tab)
-    const offset = event.key === 'ArrowRight' ? 1 : -1
-    const nextTab = orderedTabs[(currentIndex + offset + orderedTabs.length) % orderedTabs.length]
+  const panels: Record<TabKey, React.ReactNode> = { overview, assessment, documents, decision: decisionPanel, expediente }
+  const orderedTabs = Object.keys(TAB_ICONS) as TabKey[]
 
-    setApplicationTab(nextTab)
-    window.requestAnimationFrame(() => {
-      document.querySelector<HTMLButtonElement>(`[data-application-tab="${nextTab}"]`)?.focus()
-    })
-  }
+  const applicationNavigation = (
+    <Tabs
+      value={tab}
+      onChange={(_, nextTab: TabKey) => setApplicationTab(nextTab)}
+      variant='scrollable'
+      scrollButtons='auto'
+      allowScrollButtonsMobile
+      aria-label={`${item.candidateName} 360`}
+      data-capture='hiring-application-tabs'
+      sx={{
+        minBlockSize: 44,
+        '& .MuiTabs-flexContainer': { gap: 0.5 },
+        '& .MuiTab-root': {
+          minBlockSize: 44,
+          minInlineSize: 'auto',
+          px: 2,
+          py: 1.5,
+          alignItems: 'center',
+          fontWeight: 'fontWeightMedium',
+          textTransform: 'none',
+        },
+      }}
+    >
+      {orderedTabs.map(key => (
+        <Tab
+          key={key}
+          id={`hiring-application-tab-${key}`}
+          value={key}
+          label={key === 'expediente' ? copy.application.expediente.tabLabel : copy.application[key]}
+          aria-controls={`hiring-application-panel-${key}`}
+          data-application-tab={key}
+        />
+      ))}
+    </Tabs>
+  )
 
   const lead = (
-    <Stack direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'stretch', md: 'center' }} spacing={3.5}>
-      <Button component={NextLink} href='/agency/hiring/pipeline' startIcon={<i className='tabler-arrow-left' />} sx={{ alignSelf: { xs: 'flex-start', md: 'center' }, color: 'text.secondary', fontWeight: 650 }}>{copy.application.back}</Button>
-      <Box sx={{ display: { xs: 'none', md: 'block' }, inlineSize: 1, blockSize: 26, backgroundColor: 'divider' }} />
-      <Stack direction='row' alignItems='center' spacing={3} sx={{ minWidth: 0, flex: 1 }}>
-        <Avatar sx={{ inlineSize: 42, blockSize: 42, bgcolor: 'primary.lightOpacity', color: 'primary.dark', fontWeight: 750 }}>{item.candidateInitials}</Avatar>
-        <Box sx={{ minWidth: 0 }}>
-          <Typography id='hiring-application-title' tabIndex={-1} variant='h3' noWrap sx={{ outline: 'none', lineHeight: 1.2 }}>{item.candidateName}</Typography>
-          <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap sx={{ mt: 0.75 }}>
-            <Typography variant='body2' color='text.secondary'>{item.openingTitle}{item.area ? ` · ${item.area}` : ''} · Etapa:</Typography>
-            <GreenhouseChip size='small' kind='status' variant='label' tone='info' label={copy.pipeline.stages[item.application.stage]} />
-          </Stack>
-        </Box>
-      </Stack>
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ alignItems: { xs: 'stretch', sm: 'center' } }}>
-        {isInternalHireDecision ? (
-          <Button
-            component={NextLink}
-            href={activationHref}
-            variant='tonal'
-            color='success'
-            startIcon={<i className='tabler-users-plus' />}
+    <DetailHero
+      kind='report'
+      dataCapture='hiring-application-hero'
+      title={item.candidateName}
+      titleId='hiring-application-title'
+      titleTabIndex={-1}
+      description={`${item.openingTitle}${item.area ? ` · ${item.area}` : ''}`}
+      statusLabel={copy.pipeline.stages[item.application.stage]}
+      statusTone='info'
+      leading={
+        <Avatar
+          sx={{
+            inlineSize: { xs: 48, sm: 56 },
+            blockSize: { xs: 48, sm: 56 },
+            bgcolor: 'primary.lightOpacity',
+            color: 'primary.dark',
+            fontWeight: 'fontWeightBold',
+          }}
+        >
+          {item.candidateInitials}
+        </Avatar>
+      }
+      actions={
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ inlineSize: { xs: '100%', sm: 'auto' } }}>
+          {isInternalHireDecision ? (
+            <Button
+              component={NextLink}
+              href={activationHref}
+              variant='tonal'
+              color='success'
+              startIcon={<i className='tabler-users-plus' />}
+            >
+              {copy.application.openActivationLane}
+            </Button>
+          ) : null}
+          <GreenhouseButton
+            kind='primaryAction'
+            reserveInlineSize={130}
+            leadingIconClassName='tabler-gavel'
+            onClick={() => { setShowDecisionForm(true); setTab('decision') }}
           >
-            {copy.application.openActivationLane}
-          </Button>
-        ) : null}
-        <GreenhouseButton kind='primaryAction' reserveInlineSize={130} leadingIconClassName='tabler-gavel' onClick={() => { setShowDecisionForm(true); setTab('decision') }}>{copy.application.decideAction}</GreenhouseButton>
-      </Stack>
-    </Stack>
+            {copy.application.decideAction}
+          </GreenhouseButton>
+        </Stack>
+      }
+      supporting={applicationNavigation}
+    />
   )
 
   const dialogMotionProps = {
@@ -1341,75 +1465,16 @@ const Application360View = ({
   } as const
 
   const primary = (
-    <Stack spacing={4} sx={{ minWidth: 0, animation: 'ghHiringFade 240ms cubic-bezier(.2,0,0,1)' }}>
-      <Box
-        data-capture='hiring-application-tabs'
-        role='tablist'
-        aria-label={`${item.candidateName} 360`}
-        onKeyDown={handleApplicationTabsKeyDown}
-        sx={{
-          display: 'flex',
-          gap: 0.5,
-          minBlockSize: 44,
-          overflowX: { xs: 'auto', md: 'visible' },
-          overflowY: 'hidden',
-          scrollbarWidth: 'none',
-          WebkitOverflowScrolling: 'touch',
-          borderBlockEnd: 1,
-          borderColor: 'divider',
-          '&::-webkit-scrollbar': { display: 'none' },
-        }}
-      >
-        {orderedTabs.map((key) => {
-          const active = key === tab
-
-          return (
-            <Box
-              key={key}
-              component='button'
-              type='button'
-              role='tab'
-              data-application-tab={key}
-              aria-selected={active}
-              tabIndex={active ? 0 : -1}
-              onClick={() => setApplicationTab(key)}
-              sx={(theme) => ({
-                minBlockSize: 42,
-                px: 3.5,
-                py: 2.5,
-                border: 0,
-                borderBlockEnd: '2px solid',
-                borderColor: active ? 'primary.main' : 'transparent',
-                marginBlockEnd: '-1px',
-                backgroundColor: 'transparent',
-                color: active ? 'primary.dark' : 'text.secondary',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                fontSize: theme.typography.body2.fontSize,
-                fontWeight: active ? 700 : 650,
-                textTransform: 'none',
-                whiteSpace: 'nowrap',
-                transition: theme.transitions.create(['color', 'background-color', 'border-color'], { duration: theme.transitions.duration.shorter }),
-                '&:hover': { backgroundColor: 'action.hover', color: active ? 'primary.dark' : 'text.primary' },
-                '&:focus-visible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: -2 },
-                '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
-              })}
-            >
-              {copy.application[key]}
-            </Box>
-          )
-        })}
-      </Box>
-      <Box
-        key={tab}
-        data-capture={`hiring-application-panel-${tab}`}
-        role='tabpanel'
-        aria-label={copy.application[tab]}
-        sx={{ minWidth: 0, animation: 'ghHiringFade 240ms cubic-bezier(.2,0,0,1)' }}
-      >
-        {panels[tab]}
-      </Box>
-    </Stack>
+    <Box
+      key={tab}
+      id={`hiring-application-panel-${tab}`}
+      data-capture={`hiring-application-panel-${tab}`}
+      role='tabpanel'
+      aria-labelledby={`hiring-application-tab-${tab}`}
+      sx={{ minWidth: 0, animation: 'ghHiringFade 240ms cubic-bezier(.2,0,0,1)' }}
+    >
+      {panels[tab]}
+    </Box>
   )
 
   return (

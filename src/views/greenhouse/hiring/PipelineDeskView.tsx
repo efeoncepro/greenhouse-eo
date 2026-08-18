@@ -59,13 +59,11 @@ const LANES: LaneDefinition[] = [
 const laneForStage = (stage: HiringApplicationStage) =>
   LANES.find((lane) => lane.stages.includes(stage))?.id ?? 'inbox'
 
-const formatOpeningLabel = ({ demand, opening }: HiringDeskOpeningSummary) => {
-  const rawTitle = (opening.publicTitle ?? opening.internalTitle).trim()
-  const role = rawTitle.split('/')[0]?.trim() || rawTitle
-  const area = opening.publicArea ?? demand.businessUnit
+const formatOpeningTitle = ({ opening }: HiringDeskOpeningSummary) =>
+  (opening.publicTitle ?? opening.internalTitle).trim().replace(/\s*\/\s*/g, ' · ')
 
-  return area ? `${role} · ${area}` : rawTitle.replace(/\s*\/\s*/g, ' · ')
-}
+const formatOpeningMeta = ({ demand, opening }: HiringDeskOpeningSummary) =>
+  [opening.publicId, opening.publicArea ?? demand.businessUnit].filter(Boolean).join(' · ')
 
 const formatAppliedAgo = (copy: HiringDeskCopy, days: number) =>
   copy.pipeline.appliedDaysAgo
@@ -84,7 +82,7 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
   const [applications, setApplications] = useState(initialSnapshot.applications)
   const [openingId, setOpeningId] = useState(initialOpeningId ?? initialSnapshot.openings[0]?.opening.openingId ?? '')
   const [query, setQuery] = useState('')
-  const [simulateFailure, setSimulateFailure] = useState(simulateStageFailure)
+  const simulateFailure = simulateStageFailure
   const [savingIds, setSavingIds] = useState<Set<string>>(new Set())
   const [lastMovedId, setLastMovedId] = useState<string | null>(null)
   const [dragId, setDragId] = useState<string | null>(null)
@@ -347,7 +345,7 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
                 sx={(theme) => ({
                   inlineSize: 34,
                   blockSize: 34,
-                  bgcolor: 'primary.lightOpacity',
+                  bgcolor: alpha(theme.palette.primary.main, 0.08),
                   color: 'primary.dark',
                   fontSize: 12,
                   fontWeight: 750,
@@ -373,7 +371,7 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
                 >
                   {item.candidateName}
                 </Typography>
-                <Stack direction='row' alignItems='center' spacing={0.5} sx={{ mt: 0.35, color: 'text.disabled' }}>
+                <Stack direction='row' alignItems='center' spacing={0.5} sx={{ mt: 0.35, color: 'text.secondary' }}>
                   <i aria-hidden='true' className='tabler-world-www' style={{ fontSize: 12 }} />
                   <Typography variant='caption' color='inherit' noWrap>{source}</Typography>
                 </Stack>
@@ -383,7 +381,7 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
             {testTag ? <Box sx={(theme) => ({ display: 'inline-flex', alignItems: 'center', alignSelf: 'flex-start', gap: 0.5, px: 0.875, py: 0.25, borderRadius: `${theme.shape.customBorderRadius.md}px`, fontSize: 12, fontWeight: 650, color: testTag === copy.pipeline.tagDelivered ? 'info.dark' : 'warning.dark', backgroundColor: testTag === copy.pipeline.tagDelivered ? 'info.lightOpacity' : 'warning.lightOpacity' })}><i aria-hidden='true' className={testTag === copy.pipeline.tagDelivered ? 'tabler-flag-check' : 'tabler-flag'} style={{ fontSize: 12 }} />{testTag}</Box> : null}
 
             <Stack direction='row' alignItems='center' justifyContent='space-between' spacing={1} sx={{ minBlockSize: 16 }}>
-              <Typography variant='caption' color='text.disabled'>{appliedLabel}</Typography>
+              <Typography variant='caption' color='text.secondary'>{appliedLabel}</Typography>
               {saving ? (
                 <Typography variant='caption' color='primary.dark' fontWeight={700} sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
                   <i aria-hidden='true' className='tabler-loader-2' style={{ fontSize: 12, animation: 'ghHiringSpinner 800ms linear infinite' }} />
@@ -397,98 +395,130 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
     )
   }
 
-  const content = (
-    <Stack spacing={2.25} sx={{ minWidth: 0, animation: 'ghHiringFade 240ms cubic-bezier(.2,0,0,1)', '@keyframes ghHiringSpinner': { to: { transform: 'rotate(360deg)' } } }}>
-      <Box>
-        <Stack direction={{ xs: 'column', lg: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', lg: 'center' }}>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25} alignItems={{ xs: 'stretch', sm: 'center' }} sx={{ minWidth: 0, flex: { xs: '1 1 auto', lg: '0 1 auto' } }}>
-            <Typography variant='caption' color='text.secondary' sx={{ whiteSpace: 'nowrap' }}>{copy.pipeline.openingLabel}</Typography>
-            <FormControl
-              size='small'
-              sx={{
-                inlineSize: { xs: '100%', sm: 320 },
-                minWidth: 0,
-                flex: '0 0 auto',
-                '& .MuiSelect-select': {
-                  minWidth: 0,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                },
-              }}
-            >
-            <Select
-              inputProps={{ 'aria-label': copy.pipeline.openingLabel }}
-              value={openingId}
-              onChange={(event) => setOpeningId(event.target.value)}
-              renderValue={(value) => {
-                if (!value) return copy.pipeline.allOpenings
+  const openingScope = (
+    <Stack
+      spacing={0.75}
+      data-capture='hiring-pipeline-opening-scope'
+      sx={{
+        inlineSize: { xs: '100%', md: 400, lg: 460 },
+        minWidth: 0,
+      }}
+    >
+      <Typography id='hiring-pipeline-opening-label' variant='caption' color='text.secondary' fontWeight={600}>
+        {copy.pipeline.openingLabel}
+      </Typography>
+      <FormControl
+        size='small'
+        sx={{
+          minWidth: 0,
+          '& .MuiInputBase-root': { minBlockSize: 48 },
+          '& .MuiSelect-select': {
+            display: 'flex',
+            alignItems: 'center',
+            minWidth: 0,
+            minBlockSize: 'unset',
+            py: 1.25,
+            whiteSpace: 'normal !important',
+          },
+        }}
+      >
+        <Select
+          labelId='hiring-pipeline-opening-label'
+          value={openingId}
+          onChange={(event) => setOpeningId(event.target.value)}
+          renderValue={(value) => {
+            if (!value) return copy.pipeline.allOpenings
+            if (!selectedOpening) return value
 
-                return selectedOpening ? formatOpeningLabel(selectedOpening) : value
-              }}
-              startAdornment={<i aria-hidden='true' className='tabler-briefcase mie-2 text-primary' />}
-            >
-              <MenuItem value=''>{copy.pipeline.allOpenings}</MenuItem>
-              {openingOptions.map((summary) => (
-                <MenuItem key={summary.opening.openingId} value={summary.opening.openingId}>
-                  {formatOpeningLabel(summary)}
-                </MenuItem>
-              ))}
-            </Select>
-            </FormControl>
-            <Typography variant='caption' color='text.disabled' sx={{ whiteSpace: 'nowrap' }}>· {filtered.length} {applicantCountLabel}</Typography>
-          </Stack>
-          <Box sx={{ display: { xs: 'none', lg: 'block' }, flex: 1 }} />
-          <TextField
-            size='small'
-            sx={{ inlineSize: { xs: '100%', lg: 280 }, flex: '0 0 auto' }}
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder={copy.pipeline.searchPlaceholder}
-            aria-label={copy.pipeline.searchPlaceholder}
-            slotProps={{ input: { startAdornment: <InputAdornment position='start'><i aria-hidden='true' className='tabler-search' /></InputAdornment> } }}
-          />
-          <Stack direction='row' spacing={0.75} alignItems='center' sx={{ whiteSpace: 'nowrap' }}>
-            <Box component='button' type='button' role='switch' aria-checked={simulateFailure} aria-label={copy.pipeline.simulateFailure} onClick={() => setSimulateFailure((current) => !current)} sx={(theme) => ({ position: 'relative', inlineSize: 38, blockSize: 22, border: 0, borderRadius: 99, p: 0, cursor: 'pointer', backgroundColor: simulateFailure ? 'primary.main' : 'action.disabledBackground', transition: theme.transitions.create('background-color', { duration: theme.transitions.duration.shorter }), '& > span': { position: 'absolute', top: 2, left: simulateFailure ? 18 : 2, display: 'block', inlineSize: 18, blockSize: 18, borderRadius: '50%', backgroundColor: 'common.white', boxShadow: theme.shadows[1], transition: theme.transitions.create('left', { duration: theme.transitions.duration.shorter, easing: theme.transitions.easing.easeOut }) }, '&:focus-visible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 } })}><span /></Box>
-            <Typography variant='caption' color='text.secondary'>{copy.pipeline.simulateFailure}</Typography>
-          </Stack>
-        </Stack>
-        <Stack
-          direction='row'
-          alignItems='center'
-          spacing={1}
-          sx={(theme) => ({
-            mt: 1.75,
-            color: 'text.disabled',
-            inlineSize: 'fit-content',
-            maxInlineSize: '100%',
-            borderRadius: `${theme.shape.customBorderRadius.md}px`,
-          })}
+            return (
+              <Typography variant='body2' fontWeight={600} sx={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}>
+                {formatOpeningTitle(selectedOpening)}
+              </Typography>
+            )
+          }}
+          startAdornment={<i aria-hidden='true' className='tabler-briefcase mie-2 text-primary' />}
         >
+          <MenuItem value=''>{copy.pipeline.allOpenings}</MenuItem>
+          {openingOptions.map((summary) => (
+            <MenuItem key={summary.opening.openingId} value={summary.opening.openingId} sx={{ py: 1.25 }}>
+              <Stack spacing={0.25} sx={{ minWidth: 0 }}>
+                <Typography variant='body2' sx={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}>
+                  {formatOpeningTitle(summary)}
+                </Typography>
+                <Typography variant='caption' color='text.secondary'>
+                  {formatOpeningMeta(summary)}
+                </Typography>
+              </Stack>
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Stack>
+  )
+
+  const pipelineMeta = (
+    <Stack direction='row' alignItems='center' spacing={0.75}>
+      <i aria-hidden='true' className='tabler-users' />
+      <Typography variant='body2' color='text.secondary'>
+        {filtered.length} {applicantCountLabel}
+      </Typography>
+    </Stack>
+  )
+
+  const content = (
+    <Paper
+      variant='outlined'
+      data-capture='hiring-pipeline-workspace'
+      data-ui-surface='contained'
+      sx={theme => ({
+        minWidth: 0,
+        overflow: 'hidden',
+        borderRadius: `${theme.shape.customBorderRadius.xl}px`,
+        backgroundColor: 'background.paper',
+        boxShadow: theme.greenhouseElevation.raised.boxShadow,
+      })}
+    >
+      <Stack
+        direction={{ xs: 'column', md: 'row' }}
+        spacing={1.5}
+        alignItems={{ xs: 'stretch', md: 'center' }}
+        justifyContent='space-between'
+        sx={{ p: { xs: 2.5, md: 3 } }}
+      >
+        <TextField
+          size='small'
+          sx={{ inlineSize: { xs: '100%', md: 320 }, flex: '0 0 auto' }}
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder={copy.pipeline.searchPlaceholder}
+          aria-label={copy.pipeline.searchPlaceholder}
+          slotProps={{ input: { startAdornment: <InputAdornment position='start'><i aria-hidden='true' className='tabler-search' /></InputAdornment> } }}
+        />
+        <Stack direction='row' alignItems='center' spacing={1} sx={{ color: 'text.secondary', minWidth: 0 }}>
           <Box
             aria-hidden='true'
-            sx={(theme) => ({
+            sx={theme => ({
               inlineSize: 22,
               blockSize: 18,
               display: 'inline-grid',
               placeItems: 'center',
               border: `1px solid ${theme.palette.divider}`,
               borderRadius: `${theme.shape.customBorderRadius.sm}px`,
-              color: 'text.disabled',
+              color: 'text.secondary',
               backgroundColor: 'background.paper',
-              boxShadow: `0 8px 20px ${alpha(theme.palette.common.black, 0.035)}`,
               flex: '0 0 auto',
             })}
           >
             <i className='tabler-keyboard' style={{ fontSize: 13 }} />
           </Box>
-          <Typography variant='caption' color='inherit'>{copy.pipeline.boardHint}</Typography>
+          <Typography variant='caption' color='inherit' sx={{ overflowWrap: 'anywhere' }}>{copy.pipeline.boardHint}</Typography>
         </Stack>
-      </Box>
+      </Stack>
+      <Divider />
 
       <Box ref={liveRef} aria-live='polite' sx={{ position: 'absolute', inlineSize: 1, blockSize: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }} />
 
-      <Box sx={{ position: 'relative', minWidth: 0 }}>
+      <Box sx={{ position: 'relative', minWidth: 0, p: { xs: 1.5, md: 2.5 }, backgroundColor: 'action.hover' }}>
         <Box
           ref={boardRef}
           data-capture='hiring-pipeline-board'
@@ -524,23 +554,22 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
             const items = filtered.filter((item) => lane.stages.includes(item.application.stage))
 
             return (
-              <Paper
+              <Box
                 key={lane.id}
                 data-capture={`hiring-lane-${lane.id}`}
-                variant='outlined'
                 sx={(theme) => ({
                   minWidth: 0,
                   inlineSize: 264,
                   flex: '0 0 264px',
+                  border: '1px solid',
                   borderRadius: `${theme.shape.customBorderRadius.lg}px`,
                   background: dragOverLane === lane.id
                     ? `linear-gradient(180deg, ${alpha(theme.palette.primary.main, 0.08)}, ${alpha(theme.palette.primary.main, 0.035)})`
-                    : `linear-gradient(180deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.action.hover, 0.56)} 100%)`,
+                    : alpha(theme.palette.background.paper, 0.64),
                   borderColor: dragOverLane === lane.id ? theme.palette.primary.main : theme.palette.divider,
                   overflow: 'hidden',
                   minBlockSize: sparsePipeline ? 204 : 180,
                   scrollSnapAlign: 'start',
-                  boxShadow: `0 16px 40px ${alpha(theme.palette.common.black, 0.045)}`,
                   animation: 'ghHiringLaneIn 260ms cubic-bezier(.2,0,0,1) both',
                   animationDelay: `${laneIndex * 36}ms`,
                   transition: theme.transitions.create(['background-color', 'border-color', 'box-shadow'], { duration: theme.transitions.duration.shorter }),
@@ -568,7 +597,25 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
                   <Stack direction='row' alignItems='center' spacing={0.875}>
                     <Typography variant='caption' color='text.secondary' fontWeight={700} sx={{ letterSpacing: '.04em', textTransform: 'uppercase' }}>{copy.pipeline.stages[lane.titleStage]}</Typography>
                   </Stack>
-                  <Box sx={(theme) => ({ minInlineSize: 22, blockSize: 20, px: 0.75, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: '1px solid', borderColor: 'divider', borderRadius: 99, color: 'text.disabled', backgroundColor: 'background.paper', fontSize: 12, fontWeight: 700, fontFamily: theme.typography.fontFamily })}>{items.length}</Box>
+                  <Typography
+                    variant='caption'
+                    sx={(theme) => ({
+                      minInlineSize: 22,
+                      blockSize: 20,
+                      px: 0.75,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: `${theme.shape.customBorderRadius.xl}px`,
+                      color: 'text.secondary',
+                      backgroundColor: 'background.paper',
+                      fontWeight: 700,
+                    })}
+                  >
+                    {items.length}
+                  </Typography>
                 </Stack>
                 <Divider sx={{ opacity: 0.85 }} />
                 <Box sx={{ px: 1.25, pt: 1, pb: 1.5 }}>
@@ -584,33 +631,39 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
                       </Box>
                     ))}
                     {items.length === 0 ? (
-                      <Stack alignItems='center' justifyContent='center' spacing={0.75} sx={(theme) => ({ minBlockSize: sparsePipeline ? 104 : 86, px: 1.5, textAlign: 'center', color: 'text.disabled', border: '1px dashed', borderColor: dragOverLane === lane.id ? 'primary.main' : 'divider', borderRadius: `${theme.shape.customBorderRadius.md}px`, backgroundColor: dragOverLane === lane.id ? 'primary.lightOpacity' : alpha(theme.palette.background.paper, 0.52), transition: theme.transitions.create(['background-color', 'border-color', 'transform'], { duration: theme.transitions.duration.shorter }), ...(dragOverLane === lane.id ? { transform: 'translateY(-1px)' } : null) })}>
+                      <Stack role='listitem' alignItems='center' justifyContent='center' spacing={0.75} sx={(theme) => ({ minBlockSize: sparsePipeline ? 104 : 86, px: 1.5, textAlign: 'center', color: 'text.secondary', border: '1px dashed', borderColor: dragOverLane === lane.id ? 'primary.main' : 'divider', borderRadius: `${theme.shape.customBorderRadius.md}px`, backgroundColor: dragOverLane === lane.id ? 'primary.lightOpacity' : alpha(theme.palette.background.paper, 0.52), transition: theme.transitions.create(['background-color', 'border-color', 'transform'], { duration: theme.transitions.duration.shorter }), ...(dragOverLane === lane.id ? { transform: 'translateY(-1px)' } : null) })}>
                         <i aria-hidden='true' className='tabler-inbox' style={{ fontSize: 20 }} />
                         <Typography variant='caption' color='inherit'>{copy.pipeline.emptyLane}</Typography>
                       </Stack>
                     ) : null}
                   </Stack>
                 </Box>
-              </Paper>
+              </Box>
             )
           })}
         </Box>
         </Box>
         {boardEdges.start ? (
-          <Box aria-hidden='true' sx={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, inlineSize: 26, pointerEvents: 'none', background: 'linear-gradient(90deg, var(--mui-palette-background-default), transparent)' }} />
+          <Box aria-hidden='true' sx={theme => ({ position: 'absolute', insetBlock: 0, insetInlineStart: 0, inlineSize: 26, pointerEvents: 'none', background: `linear-gradient(90deg, ${theme.palette.action.hover}, transparent)` })} />
         ) : null}
         {boardEdges.end ? (
-          <Box aria-hidden='true' sx={{ position: 'absolute', insetBlock: 0, insetInlineEnd: 0, inlineSize: 88, pointerEvents: 'none', background: 'linear-gradient(270deg, var(--mui-palette-background-default) 12%, color-mix(in srgb, var(--mui-palette-background-default) 82%, transparent), transparent)' }} />
+          <Box aria-hidden='true' sx={theme => ({ position: 'absolute', insetBlock: 0, insetInlineEnd: 0, inlineSize: 88, pointerEvents: 'none', background: `linear-gradient(270deg, ${theme.palette.action.hover} 12%, ${alpha(theme.palette.background.paper, 0.72)}, transparent)` })} />
         ) : null}
       </Box>
 
-      {filtered.length === 0 ? <Alert severity='info'>{copy.common.noResults}</Alert> : null}
-    </Stack>
+      {filtered.length === 0 ? <Box sx={{ p: { xs: 2, md: 2.5 }, pt: 0 }}><Alert severity='info'>{copy.common.noResults}</Alert></Box> : null}
+    </Paper>
   )
 
   return (
     <>
-      <HiringDeskFrame surface='pipeline' copy={copy} primary={content} />
+      <HiringDeskFrame
+        surface='pipeline'
+        copy={copy}
+        primary={content}
+        secondaryActions={openingScope}
+        meta={pipelineMeta}
+      />
 
       <Menu
         anchorEl={menu?.anchor}

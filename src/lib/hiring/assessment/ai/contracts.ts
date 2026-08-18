@@ -115,6 +115,24 @@ export interface ResponseScoreRawOutput {
   perCriterion?: unknown
 }
 
+/**
+ * ESCALA DECLARADA de `perCriterion` (TASK-1734 delta 2026-08-17, prompt `...scoring.v2`).
+ *
+ * Cada criterio es un **APORTE PONDERADO** al score global, NO una nota independiente 0–100:
+ * `weight` = puntos máximos que ese criterio puede aportar (los pesos suman 100) y `score` =
+ * puntos efectivamente obtenidos (0..weight). Por construcción `Σ score ≈ score global`.
+ *
+ * Por qué explícito: el prompt v1 pedía "un `perCriterion` con el puntaje por criterio" y el
+ * schema declaraba `score: 0–100` por criterio — dos lecturas válidas (aporte vs nota). El modelo
+ * alternaba entre ambas según la calidad de la respuesta, y el consumidor downstream (risk router)
+ * asumía la otra. Un contrato implícito no es un contrato: acá se declara, el prompt lo pide y el
+ * sanitizer lo normaliza; nadie downstream vuelve a suponer.
+ */
+export const RESPONSE_SCORE_CRITERION_SCALE = 'weighted_contribution' as const
+
+/** Total canónico de pesos de la rúbrica (escala 0–100 del score global). */
+export const CRITERION_WEIGHT_TOTAL = 100
+
 export const RESPONSE_SCORE_JSON_SCHEMA = {
   type: 'object',
   additionalProperties: false,
@@ -128,9 +146,10 @@ export const RESPONSE_SCORE_JSON_SCHEMA = {
       items: {
         type: 'object',
         additionalProperties: false,
-        required: ['criterion', 'score'],
+        required: ['criterion', 'weight', 'score'],
         properties: {
           criterion: { type: 'string' },
+          weight: { type: 'number', minimum: 0, maximum: 100 },
           score: { type: 'number', minimum: 0, maximum: 100 },
           note: { type: 'string' },
         },
@@ -147,7 +166,17 @@ const clampScore = (v: unknown): number => {
   return Math.max(0, Math.min(100, n))
 }
 
-/** Valida+clampa el puntaje propuesto. Devuelve null si no hay un score/rationale usable. */
+/**
+ * Valida+clampa el puntaje propuesto. Devuelve null si no hay un score/rationale usable.
+ *
+ * `perCriterion` se normaliza a la escala DECLARADA (`RESPONSE_SCORE_CRITERION_SCALE`):
+ * - `weight` ausente/inválido ⇒ reparto equitativo de `CRITERION_WEIGHT_TOTAL` entre los criterios
+ *   (una rúbrica sin pesos explícitos pondera parejo — es la lectura que ya usan las rúbricas
+ *   reales del banco: `"0-100 (25 puntos por criterio; parcial permitido)"`).
+ * - `score` se clampa a `[0, weight]`: un APORTE no puede exceder su propio peso. Un modelo que
+ *   devuelve una nota independiente 0–100 en un criterio de 25 puntos queda acotado acá, y la
+ *   incoherencia resultante contra el score global la ve el risk router — no se cuela como sana.
+ */
 export const sanitizeResponseScore = (raw: unknown): ResponseScoreProposal | null => {
   if (!raw || typeof raw !== 'object') return null
   const r = raw as ResponseScoreRawOutput
@@ -156,13 +185,68 @@ export const sanitizeResponseScore = (raw: unknown): ResponseScoreProposal | nul
   if (typeof r.score !== 'number' && typeof r.score !== 'string') return null
   if (!rationale) return null
 
-  const perCriterion = Array.isArray(r.perCriterion)
+  const rawCriteria = Array.isArray(r.perCriterion)
     ? r.perCriterion
         .slice(0, MAX_CRITERIA)
         .filter((c): c is Record<string, unknown> => Boolean(c) && typeof c === 'object')
-        .map((c) => ({ criterion: clampStr(c.criterion, 200), score: clampScore(c.score), note: clampStr(c.note, MAX_OPTION_LEN) || undefined }))
-        .filter((c) => c.criterion.length > 0)
+        .filter((c) => clampStr(c.criterion, 200).length > 0)
+    : null
+
+  const defaultWeight = rawCriteria && rawCriteria.length > 0 ? CRITERION_WEIGHT_TOTAL / rawCriteria.length : 0
+
+  const perCriterion = rawCriteria
+    ? rawCriteria.map((c) => {
+        const declaredWeight = typeof c.weight === 'number' && Number.isFinite(c.weight) && c.weight > 0
+          ? Math.min(CRITERION_WEIGHT_TOTAL, c.weight)
+          : defaultWeight
+
+        return {
+          criterion: clampStr(c.criterion, 200),
+          weight: declaredWeight,
+          score: Math.min(declaredWeight, clampScore(c.score)),
+          note: clampStr(c.note, MAX_OPTION_LEN) || undefined,
+        }
+      })
     : undefined
 
   return { score: clampScore(r.score), rationale, perCriterion }
+}
+
+/** Agregado de la escala declarada — lo que el contrato GARANTIZA a los consumidores. */
+export interface CriterionContributionSummary {
+  /** Suma de aportes obtenidos. */
+  contribution: number
+  /** Suma de pesos declarados (normalmente `CRITERION_WEIGHT_TOTAL`). */
+  weightTotal: number
+  /**
+   * Score global 0–100 que IMPLICAN los aportes, renormalizado por el total de pesos (una
+   * rúbrica con pesos que no suman 100 sigue implicando un score comparable). `null` si no
+   * hay criterios utilizables.
+   */
+  impliedScore: number | null
+}
+
+/**
+ * Traduce `perCriterion` al score global que implica, según la escala declarada. Es la ÚNICA
+ * forma soportada de comparar criterios contra el score global: ningún consumidor debe rederivar
+ * la agregación (promedio, suma cruda, etc.) por su cuenta.
+ */
+export const summarizeCriterionContribution = (
+  perCriterion: ResponseScoreProposal['perCriterion'],
+): CriterionContributionSummary => {
+  if (!perCriterion || perCriterion.length === 0) {
+    return { contribution: 0, weightTotal: 0, impliedScore: null }
+  }
+
+  const contribution = perCriterion.reduce((acc, c) => acc + c.score, 0)
+
+  const weightTotal = perCriterion.reduce(
+    (acc, c) => acc + (typeof c.weight === 'number' && Number.isFinite(c.weight) && c.weight > 0 ? c.weight : 0),
+    0,
+  )
+
+  // Sin pesos utilizables la suma YA está en escala 0–100 (reparto implícito de 100 puntos).
+  const impliedScore = weightTotal > 0 ? (contribution / weightTotal) * CRITERION_WEIGHT_TOTAL : contribution
+
+  return { contribution, weightTotal, impliedScore }
 }

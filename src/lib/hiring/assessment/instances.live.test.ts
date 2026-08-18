@@ -1,5 +1,6 @@
 import { afterAll, describe, expect, it } from 'vitest'
 
+import { resolveLiveTestIdentityProfileId } from '@/lib/hiring/live-test-identity'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
   createHiringApplication,
@@ -56,11 +57,7 @@ describe.skipIf(!hasPgConfig)('assessment instances — live PG (TASK-1360)', ()
   })
 
   it('assigns a tokenized candidate test; the token resolves and the hash never leaks', async () => {
-    const profile = await runGreenhousePostgresQuery<{ profile_id: string }>(
-      `SELECT profile_id FROM greenhouse_core.identity_profiles WHERE active = true LIMIT 1`,
-    )
-
-    const identityProfileId = profile[0]?.profile_id ?? ''
+    const identityProfileId = await resolveLiveTestIdentityProfileId()
 
     expect(identityProfileId).not.toBe('')
 

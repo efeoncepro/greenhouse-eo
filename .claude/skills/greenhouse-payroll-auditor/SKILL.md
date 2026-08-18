@@ -1,6 +1,6 @@
 ---
 name: greenhouse-payroll-auditor
-description: Audit Efeonce/Greenhouse Payroll: Chile workers, honorarios, Deel/international, KPI ICO bonuses, readiness, calculations, exports, and compliance risk.
+description: "Audit Efeonce/Greenhouse Payroll: Chile workers, honorarios, Deel/international, KPI ICO bonuses, readiness, calculations, exports, and compliance risk."
 ---
 
 # Greenhouse Payroll Auditor
@@ -39,6 +39,7 @@ Load the smallest reference that matches the task:
 - `references/chile-payroll-law.md`: Chile legal/payroll formula map and official source links.
 - `references/greenhouse-payroll-runtime.md`: Greenhouse schema, code paths, formulas, known audit watchlist, and verification commands.
 - `references/international-remote-payroll.md`: Remote/international worker regimes, Deel/EOR/contractor boundaries, and Efeonce audit posture.
+- `../greenhouse-talent-people-operator/references/efeonce-candidate-benefits-charter.md`: approved candidate-facing global benefits baseline; use when an offer, agreement or provider instruction must reconcile public claims with payroll/leave implementation.
 - `references/international-withholding-americas-sii.md`: SII discovery summary for `international_internal` withholding across Americas, including LIR Art. 59/60/74/79, treaty evidence gates, country matrix, and TASK-905 fail-closed posture.
 - `references/international-withholding-europe-sii.md`: SII discovery summary for future Europe `international_internal` withholding, including European DTA list, MFN circular rate changes, MLI notes, territorial caveats, and fail-closed seed posture.
 

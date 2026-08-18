@@ -36,7 +36,7 @@ import {
   hiringApplicationDecidedEmailProjection,
   hiringAssessmentAssignedEmailProjection,
   hiringAssessmentSubmittedInternalEmailProjection,
-  hiringStageChangedEmailProjection,
+  hiringStageChangedCandidateCommsProjection,
 } from '@/lib/sync/projections/hiring-lifecycle-emails'
 
 const contextRow = (overrides: Record<string, unknown> = {}) => ({
@@ -82,14 +82,14 @@ describe('TASK-1689 hiring lifecycle emails', () => {
       expect(hiringApplicationCreatedEmailsProjection.triggerEvents).toContain('hiring.application.created')
       expect(hiringAssessmentAssignedEmailProjection.triggerEvents).toContain('hiring.assessment.assigned')
       expect(hiringAssessmentSubmittedInternalEmailProjection.triggerEvents).toContain('hiring.assessment.submitted')
-      expect(hiringStageChangedEmailProjection.triggerEvents).toContain('hiring.application.stage_changed')
+      expect(hiringStageChangedCandidateCommsProjection.triggerEvents).toContain('hiring.application.stage_changed')
       expect(hiringApplicationDecidedEmailProjection.triggerEvents).toContain('hiring.application.decided')
 
       for (const p of [
         hiringApplicationCreatedEmailsProjection,
         hiringAssessmentAssignedEmailProjection,
         hiringAssessmentSubmittedInternalEmailProjection,
-        hiringStageChangedEmailProjection,
+        hiringStageChangedCandidateCommsProjection,
         hiringApplicationDecidedEmailProjection,
       ]) {
         expect(p.domain).toBe('notifications')

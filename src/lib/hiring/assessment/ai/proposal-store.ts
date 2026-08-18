@@ -271,6 +271,40 @@ export const listAiProposals = async (filters: ListAiProposalFilters = {}): Prom
 }
 
 /**
+ * TASK-1734 (ADR D3) — Reconciliación del backlog huérfano: proposals `response_score`
+ * todavía `proposed` cuya respuesta YA recibió score humano por el carril manual directo
+ * (recordHumanScore sin confirm — caso EO-ASM-0050) o cuyo assessment ya quedó `scored`.
+ * Transición auditada a `superseded_by_manual` con referencia al score humano aplicado
+ * (`confirmed_ref` = responseId) — NUNCA DELETE. Idempotente: la segunda pasada no matchea.
+ */
+export const supersedeOrphanResponseScoreProposals = async (
+  client: PoolClient,
+  input: { actorUserId: string | null; reasonCode?: string },
+): Promise<AiProposal[]> => {
+  const rows = await runQuery<AiProposalRow>(
+    client,
+    `UPDATE greenhouse_hiring.hiring_assessment_ai_proposal p
+       SET status = 'superseded_by_manual',
+           decision_note = $1,
+           confirmed_ref = p.target_ref,
+           confirmed_by = $2,
+           confirmed_at = NOW()
+     FROM greenhouse_hiring.hiring_assessment_response r
+     JOIN greenhouse_hiring.hiring_assessment a ON a.assessment_id = r.assessment_id
+     WHERE p.kind = 'response_score'
+       AND p.status = 'proposed'
+       AND p.target_ref = r.response_id
+       AND (r.human_score IS NOT NULL OR a.status = 'scored')
+     RETURNING p.proposal_id, p.kind, p.target_ref, p.proposed_json, p.provider, p.model,
+       p.prompt_version, p.input_digest, p.usage_json, p.status, p.confirmed_ref,
+       p.decision_note, p.confirmed_by, p.confirmed_at, p.created_by, p.created_at, p.updated_at`,
+    [input.reasonCode ?? 'superseded_by_manual:human_score_applied', input.actorUserId],
+  )
+
+  return rows.map(normalizeProposal)
+}
+
+/**
  * Marca una propuesta como `confirmed`|`rejected` DENTRO de la tx del confirm (client obligatorio).
  * NO aplica el efecto downstream — eso lo hace confirmAiProposal antes de llamar esto.
  */

@@ -137,6 +137,9 @@ import { runBacklinkCaptureBatch } from '@/lib/growth/seo/backlinks/capture'
 import { runKeywordMarketDataBatch } from '@/lib/growth/seo/keyword-market-data-batch'
 import { drainKeywordDiscoveryRuns } from '@/lib/growth/seo/keyword-discovery/runner'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
+import { drainAssessmentAiScoringRuns } from '@/lib/hiring/assessment/ai/scoring-run/execute'
+import { isHiringAssessmentAiRunEnqueueEnabled } from '@/lib/hiring/assessment/ai/scoring-run/config'
+import { isHiringAssessmentAiEnabled } from '@/lib/hiring/assessment/ai/config'
 
 // TASK-1303 — el rank capture pega familias DataForSEO que GASTAN: sin este side-effect
 // import el transporte LANZA en la primera llamada cobrada (gastar sin contabilizar se
@@ -2168,6 +2171,67 @@ const handleSeoKeywordDiscoveryDrain = async (req: IncomingMessage, res: ServerR
   }
 }
 
+// ─── /assessment-ai/drain-scoring-runs ──────────────────────────────────────
+//
+// TASK-1734 Slice 2 — drena runs de scoring IA `enumerating|scoring` (ADR D4, pieza 2).
+//
+// 🔴 Este handler GASTA (fan-out LLM vía el scorer canónico de TASK-1361). Doble gate en
+// ESTE runtime: `HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED` (ADR D6, default OFF) +
+// el master `HIRING_ASSESSMENT_AI_ENABLED` (gatea el propose path del scorer). Claim
+// atómico por lease (conditional UPDATE, patrón TASK-1664): dos drains concurrentes
+// jamás procesan el mismo run. Fail-closed: item sin proposal queda abstained/failed
+// con reason code — nunca desaparece de la cola manual. El Cloud Scheduler que dispara
+// este endpoint es rollout del Slice 6 (nace después, PAUSADO).
+const handleAssessmentAiScoringDrain = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+  const maxRuns = typeof body.maxRuns === 'number' && body.maxRuns > 0 ? Math.floor(body.maxRuns) : undefined
+
+  if (!isHiringAssessmentAiRunEnqueueEnabled()) {
+    json(res, 200, { ok: true, skipped: 'assessment_ai_run_enqueue_disabled', claimed: 0 })
+
+    return
+  }
+
+  if (!isHiringAssessmentAiEnabled()) {
+    json(res, 200, { ok: true, skipped: 'assessment_ai_disabled', claimed: 0 })
+
+    return
+  }
+
+  console.log(`[ops-worker] POST /assessment-ai/drain-scoring-runs — maxRuns=${maxRuns ?? 'default'}`)
+
+  try {
+    const summary = await drainAssessmentAiScoringRuns({ maxRuns })
+
+    const proposed = summary.runs.reduce((acc, r) => acc + r.proposed, 0)
+    const abstained = summary.runs.reduce((acc, r) => acc + r.abstained, 0)
+    const failed = summary.runs.reduce((acc, r) => acc + r.failed, 0)
+
+    console.log(
+      `[ops-worker] /assessment-ai/drain-scoring-runs done — candidates=${summary.candidates} ` +
+        `claimed=${summary.claimed} busy=${summary.busy} proposed=${proposed} ` +
+        `abstained=${abstained} failed=${failed}`
+    )
+
+    // Items fallidos NO son éxito silencioso: quedan en la cola manual y se observan.
+    if (failed > 0) {
+      captureMessageWithDomain(
+        `[TASK-1734] assessment AI scoring drain — failed=${failed} abstained=${abstained}`,
+        'hiring',
+        { level: 'warning', tags: { source: 'ops_worker_assessment_ai_scoring' } }
+      )
+    }
+
+    json(res, 200, { ok: true, ...summary })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown assessment AI scoring drain error'
+
+    console.error('[ops-worker] /assessment-ai/drain-scoring-runs failed:', message)
+    captureWithDomain(error, 'hiring', { tags: { source: 'ops_worker_assessment_ai_scoring' } })
+    json(res, 502, { error: message })
+  }
+}
+
 // ─── /email-deliverability-monitor ──────────────────────────────────────────
 //
 // TASK-775 Slice 2 — Email deliverability monitor migrado de Vercel cron a
@@ -2839,6 +2903,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/hiring/talent-pool/reconcile') {
       await handleTalentPoolReconcile(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/assessment-ai/drain-scoring-runs') {
+      await handleAssessmentAiScoringDrain(req, res)
 
       return
     }

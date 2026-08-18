@@ -5,7 +5,10 @@
 export const AI_PROPOSAL_KINDS = ['question_draft', 'response_score', 'opening_public_copy'] as const
 export type AiProposalKind = (typeof AI_PROPOSAL_KINDS)[number]
 
-export const AI_PROPOSAL_STATUSES = ['proposed', 'confirmed', 'rejected'] as const
+// `superseded_by_manual` (TASK-1734, ADR D3): terminal explícito para proposals huérfanas
+// superadas por el carril manual directo (recordHumanScore sin confirm) — la reconciliación
+// las cierra por transición auditada, nunca por DELETE.
+export const AI_PROPOSAL_STATUSES = ['proposed', 'confirmed', 'rejected', 'superseded_by_manual'] as const
 export type AiProposalStatus = (typeof AI_PROPOSAL_STATUSES)[number]
 
 export const AI_PROPOSAL_DECISIONS = ['confirm', 'reject'] as const
@@ -30,11 +33,17 @@ export interface QuestionDraftProposal {
 /**
  * Payload estructurado de un `response_score`. El LLM aporta EVIDENCIA (score sugerido + rationale);
  * el humano fija el valor final al confirmar. score en escala canónica 0–100.
+ *
+ * `perCriterion` usa la escala DECLARADA `RESPONSE_SCORE_CRITERION_SCALE` (`weighted_contribution`,
+ * TASK-1734 delta 2026-08-17): `weight` = puntos máximos del criterio, `score` = APORTE obtenido
+ * (0..weight) — NUNCA una nota independiente 0–100. Comparar contra el score global SOLO vía
+ * `summarizeCriterionContribution`. `weight` es opcional en el tipo por compatibilidad con
+ * proposals del prompt v1 (stale por bump de `promptVersion`), no porque el contrato lo permita.
  */
 export interface ResponseScoreProposal {
   score: number
   rationale: string
-  perCriterion?: Array<{ criterion: string; score: number; note?: string }>
+  perCriterion?: Array<{ criterion: string; weight?: number; score: number; note?: string }>
 }
 
 /**

@@ -970,6 +970,33 @@ export const wasEmailAlreadySent = async (
   return rows[0]?.exists === true
 }
 
+/**
+ * TASK-1719 — ¿ya salió ALGÚN correo de este `emailType` ligado a esta entidad?
+ *
+ * Variante sin destinatario de `wasEmailAlreadySent`: responde por entidad, sin recibir ni
+ * devolver la dirección, para que un dominio pueda saber "esto ya se comunicó hacia afuera"
+ * sin resolver PII del candidato. NO sirve como dedupe de envío (ese sigue siendo
+ * `wasEmailAlreadySent`, que discrimina por destinatario); sirve para decidir si una
+ * cancelación exige comunicación correctiva humana.
+ */
+export const wasEmailDeliveredForEntity = async (
+  sourceEntity: string,
+  emailType: string
+): Promise<boolean> => {
+  const rows = await runGreenhousePostgresQuery<{ exists: boolean } & Record<string, unknown>>(
+    `SELECT EXISTS (
+       SELECT 1
+       FROM greenhouse_notifications.email_deliveries
+       WHERE source_entity = $1
+         AND email_type = $2
+         AND status = 'sent'
+     ) AS exists`,
+    [sourceEntity, emailType]
+  )
+
+  return rows[0]?.exists === true
+}
+
 export const sendEmail = async <TContext extends Record<string, unknown>>(
   input: SendEmailInput<TContext>
 ): Promise<SendEmailResult> => {

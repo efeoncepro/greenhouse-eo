@@ -38,12 +38,38 @@ const internalOpening: HiringOpening = {
   publicEmploymentMode: 'full_time',
   publicSeniority: 'Senior',
   publicProcessNotes: '3 etapas',
+  publicContent: {
+    version: 1,
+    promise: 'Vas a liderar el sistema visual de marcas reales.',
+    intro: null,
+    outcomes: ['Entregar 2 identidades completas por trimestre'],
+    workItems: [],
+    essentials: ['Figma avanzado'],
+    preferred: [],
+    learnables: [],
+    evidenceAsk: 'Portafolio con decisiones explicadas.',
+    workModel: '100% remoto con overlap GMT-4.',
+    collaboration: null,
+    process: {
+      steps: [
+        { title: 'Screening', body: null },
+        { title: 'Muestra de trabajo pagada', body: null }
+      ],
+      expectedTiming: null,
+      responseCommitment: null,
+      accommodationPath: null
+    },
+    benefits: ['15 días hábiles de vacaciones'],
+    compensation: null,
+    additionalSections: []
+  },
+  publicRemoteEligibleCountries: ['CL', 'CO'],
   applyUrl: null,
   status: 'active',
   publishedAt: '2026-07-07T00:00:00.000Z',
   createdBy: 'user-secret-owner',
   createdAt: '2026-07-01T00:00:00.000Z',
-  updatedAt: '2026-07-07T00:00:00.000Z',
+  updatedAt: '2026-07-07T00:00:00.000Z'
 }
 
 describe('buildPublicOpeningPayload — allowlist de proyección pública', () => {
@@ -66,6 +92,7 @@ describe('buildPublicOpeningPayload — allowlist de proyección pública', () =
     expect(Object.keys(payload).sort()).toEqual(
       [
         'applyUrl',
+        'content',
         'description',
         'employmentMode',
         'area',
@@ -79,14 +106,48 @@ describe('buildPublicOpeningPayload — allowlist de proyección pública', () =
         'processNotes',
         'publicId',
         'publishedAt',
+        'remoteEligibleCountries',
         'requirements',
         'seniority',
         'skillTags',
         'summary',
         'title',
-        'workMode',
-      ].sort(),
+        'workMode'
+      ].sort()
     )
+  })
+
+  it('TASK-1740 — expone el bloque estructurado y los países elegibles sin arrastrar internos', () => {
+    const payload = buildPublicOpeningPayload(internalOpening)
+
+    expect(payload.content?.promise).toContain('sistema visual')
+    expect(payload.remoteEligibleCountries).toEqual(['CL', 'CO'])
+
+    // El contenido estructurado tampoco puede transportar sentinels internos.
+    const serialized = JSON.stringify(payload.content)
+
+    for (const sentinel of [
+      'FALCON',
+      'user-secret-owner',
+      'org-confidential',
+      'CLP 3.5M-4.2M',
+      'internal-band-C',
+      'cliente sensible',
+      'bench'
+    ]) {
+      expect(serialized).not.toContain(sentinel)
+    }
+  })
+
+  it('TASK-1740 — opening legacy degrada a content null y países vacíos (fallback de prosa)', () => {
+    const payload = buildPublicOpeningPayload({
+      ...internalOpening,
+      publicContent: null,
+      publicRemoteEligibleCountries: []
+    })
+
+    expect(payload.content).toBeNull()
+    expect(payload.remoteEligibleCountries).toEqual([])
   })
 
   it('usa el título público y no el interno', () => {
@@ -99,10 +160,25 @@ describe('buildPublicOpeningPayload — allowlist de proyección pública', () =
     expect(payload.skillTags).toEqual(['Diseño', 'Figma'])
   })
 
-  it('cae al título interno solo si no hay público (openings legacy)', () => {
-    const payload = buildPublicOpeningPayload({ ...internalOpening, publicTitle: null })
+  it('falla cerrado si no hay título público y jamás expone el título interno', () => {
+    expect(() => buildPublicOpeningPayload({ ...internalOpening, publicTitle: null })).toThrowError(
+      expect.objectContaining({ code: 'hiring_opening_public_title_required' })
+    )
+  })
 
-    // Fallback controlado: sin public_title mostramos el internal_title (ya sin codename en casos reales).
-    expect(payload.title).toBe(internalOpening.internalTitle)
+  it.each(['L2', 'Intermedio', 'senior'])('falla cerrado ante seniority público no canónico: %s', publicSeniority => {
+    expect(() => buildPublicOpeningPayload({ ...internalOpening, publicSeniority })).toThrowError(
+      expect.objectContaining({ code: 'hiring_opening_public_seniority_invalid' })
+    )
+  })
+
+  it('falla cerrado si un título Senior se contradice con el nivel público', () => {
+    expect(() =>
+      buildPublicOpeningPayload({
+        ...internalOpening,
+        publicTitle: 'Senior Visual Designer',
+        publicSeniority: 'Semi-senior'
+      })
+    ).toThrowError(expect.objectContaining({ code: 'hiring_opening_public_seniority_title_mismatch' }))
   })
 })

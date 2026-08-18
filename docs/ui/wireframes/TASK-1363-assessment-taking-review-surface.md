@@ -7,7 +7,7 @@
 - Product Design asset: `/Users/jreye/Documents/carreers/Assesment/Task execution request/Superficie de evaluación.dc.html` + `support.js` + screenshots (`scorecard-markers`, `radar`, `radar2`)
 - Intended consumers: candidato (público tokenizado), reclutador (desk Application 360)
 - Copy source: `src/lib/copy/dictionaries/{es-CL,en-US}/hiringAssessment.ts` (es-CL, tuteo)
-- Primitive decision: reuse (shell público TASK-354 + Application360/Hiring Desk chrome + drawer/review surface + barras horizontales/radar inline); timer accesible implementado route-local por ser surface-specific.
+- Primitive decision: reuse (shell público TASK-354 + Application360/Hiring Desk chrome + drawer/review surface + barras horizontales + Recharts mediante `AppRecharts`); radar y timer accesible se mantienen route-local por ser surface-specific.
 - UI ready target: `yes` (source HTML reviewed; runtime GVC evidence attached in task)
 
 ## Brief
@@ -86,7 +86,7 @@
 ## Implementation Mapping
 
 - Route / surface: candidato `src/app/assessment/[token]/**` + compat `src/app/public/assessment/[token]/**` (URL limpia `/assessment/[token]`, NO `[lang]`, bilingüe vía `getMicrocopy`, shell público); interno `(dashboard)/agency/hiring/applications/[id]` tab `Evaluación`
-- Primitives: shell público tokenizado, Application360/Hiring Desk host, drawer MUI contextual, barras horizontales tokenizadas y radar SVG inline con tabla sr-only; timer accesible `role=timer`
+- Primitives: shell público tokenizado, Application360/Hiring Desk host, drawer MUI contextual, barras horizontales tokenizadas y radar Recharts route-local con guía visible + tabla sr-only; timer accesible `role=timer`
 - Variants / kinds: scorecard bar = tono semáforo por competencia (`success/warning/error` como estado, no color-only)
 - Component candidates: `CustomTextField`, radios/checkbox nativos, `CustomChip`, progress indicator, `EmptyState`
 - Copy source: `src/lib/copy/dictionaries/{es-CL,en-US}/hiringAssessment.ts` (todas las ids del ledger)
@@ -99,7 +99,7 @@
 
 ## GVC Scenario Plan
 
-- Scenario file: `scripts/frontend/scenarios/task1363-assessment-taking-runtime.scenario.ts` + `scripts/frontend/scenarios/task1363-assessment-review-runtime.scenario.ts`
+- Scenario file: `scripts/frontend/scenarios/task1363-assessment-taking-runtime.scenario.ts` + `scripts/frontend/scenarios/task1363-assessment-review-runtime.scenario.ts` + regresión focalizada `scripts/frontend/scenarios/task1363-assessment-radar-runtime.scenario.ts`
 - Route: `/assessment/<token>` (fixture) + `/agency/hiring/applications/<id>` tab `Evaluación`
 - Viewports: desktop 1440 + mobile 390
 - Required steps: token → instrucciones → consentir → iniciar → responder → autosave → avanzar; operador → tab Evaluación → cargar review → scorecard barras/radar → cola → drawer
@@ -112,7 +112,7 @@
 
 ## Design Decision Log
 
-- Decision: rendición como wizard single-column por pregunta/competencia (timer, autosave, envío irreversible); review como scorecard de barras horizontales + modo radar secundario + cola de corrección en drawer.
+- Decision: rendición como wizard single-column por pregunta/competencia (timer, autosave, envío irreversible); review como scorecard de barras horizontales + modo radar Recharts secundario + cola de corrección en drawer. El radar usa etiquetas humanas breves gobernadas en los ejes, conserva nombres completos en una guía visible y distingue puntaje/objetivo con leyenda textual. Si el scorecard está parcial, no dibuja el polígono de puntaje para evitar representar pendientes como cero.
 - Alternatives considered: scroll largo único (rechazado por fricción/forms-ux); radar en vez de barras (barras ganan en legibilidad/comparación por Cleveland & McGill; radar opcional secundario); test dentro del portal con login (rechazado, candidato externo).
 - Why this pattern: honesto, accesible, sin filtrar answer-key, respeta "humano decide" (scorecard advisory).
 - Reuse / extend / new primitive: reuse mayoritario; timer accesible se mantuvo local porque no hay aún patrón reutilizable de evaluación cronometrada en otras surfaces.

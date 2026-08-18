@@ -131,8 +131,28 @@ export interface HiringAssessmentCopy {
     overall: string
     bars: string
     radar: string
+    candidateTest: string
+    interviewerScorecard: string
+    assessmentStatuses: {
+      assigned: string
+      sent: string
+      in_progress: string
+      submitted: string
+      scored: string
+      expired: string
+      cancelled: string
+    }
+    candidateIncomplete: string
+    cancelledDetail: string
+    loadReviewPrompt: string
+    noModules: string
     objective: string
     pending: string
+    radarScoreLegend: string
+    radarTargetLegend: string
+    radarMetricScore: string
+    radarPartialTitle: string
+    radarPartialBody: string
     advisory: string
     queueTitle: string
     queueEmptyTitle: string
@@ -149,13 +169,120 @@ export interface HiringAssessmentCopy {
     cancel: string
     confirmed: string
     finalize: string
+    /** ISSUE-159 — progreso honesto mientras el scorecard está parcial: '{scored} de {total}…' */
+    partialProgress: string
     statuses: {
       optimal: string
       attention: string
       critical: string
       pending: string
       corrected: string
+      /** ISSUE-159 — global con competencias aún por corregir; nunca se muestra promedio parcial. */
+      partial: string
     }
+  }
+  /**
+   * TASK-1738 — Workbench operator-only de revisión del run de scoring IA (TASK-1734).
+   * CERO strings candidate-facing en este namespace (contrato anti-leak): todo lo que
+   * vive acá se renderiza solo para operadores con `hiring.assessment.score`.
+   */
+  scoringRun: {
+    entryChip: string
+    entryExceptions: string
+    entryError: string
+    open: string
+    title: string
+    provenance: string
+    refresh: string
+    close: string
+    statuses: {
+      created: string
+      enumerating: string
+      scoring: string
+      awaiting_review: string
+      confirmable: string
+      confirmed: string
+      cancelled: string
+      failed: string
+    }
+    coverageLabel: string
+    coverPending: string
+    coverMandatory: string
+    coverSample: string
+    coverBatch: string
+    coverManual: string
+    coverClosed: string
+    /** ISSUE-159 heredado vía TASK-1734: el stale bloquea el confirm, nunca se esconde. */
+    staleBanner: string
+    mandatoryChip: string
+    sampleChip: string
+    sampleResolvedChip: string
+    batchGroup: string
+    sampleHint: string
+    sampleContrast: string
+    resolutionLabels: {
+      confirmed: string
+      overridden: string
+      rejected_to_manual: string
+    }
+    questionLabel: string
+    answerLabel: string
+    showMore: string
+    showLess: string
+    /** El label lleva la consecuencia (expandir queda registrado) — DDL-3 del flow. */
+    revealProposal: string
+    proposalSeen: string
+    proposalScore: string
+    proposalProvenance: string
+    perCriterion: string
+    routingReasons: string
+    /** Mapa de reason codes del risk router (`AI_RISK_ROUTING_REASONS`); fallback al code. */
+    reasons: {
+      answer_empty: string
+      answer_too_short: string
+      answer_malformed: string
+      rubric_missing: string
+      per_criterion_missing: string
+      per_criterion_contradictory: string
+      score_decision_near_band: string
+      high_weight_competency: string
+      exception_policy_disabled: string
+      blind_quality_sample: string
+      no_risk_signals: string
+    }
+    myScoreLabel: string
+    scoreRangeError: string
+    noteLabel: string
+    resolveConfirm: string
+    resolveOverride: string
+    resolveReject: string
+    resolveSample: string
+    resolving: string
+    resolved: string
+    confirmTitle: string
+    manifestSummary: string
+    gateOpenMandatory: string
+    gateOpenSample: string
+    gateOpenScoring: string
+    gateStale: string
+    confirmFlagOff: string
+    confirmRun: string
+    confirming: string
+    confirmed: string
+    cancelRun: string
+    cancelDialogTitle: string
+    cancelDialogBody: string
+    cancelConfirm: string
+    cancelKeep: string
+    cancelling: string
+    cancelled: string
+    terminalConfirmed: string
+    terminalCancelled: string
+    terminalFailed: string
+    loadError: string
+    retry: string
+    permissionDenied: string
+    lineageError: string
   }
 }
 
@@ -355,7 +482,6 @@ export interface HiringDeskCopy {
     compensationHint: string
     previewTitle: string
     create: string
-    createAndPublish: string
     createAnother: string
     discardTitle: string
     discardBody: string
@@ -395,7 +521,6 @@ export interface HiringDeskCopy {
     documents: string
     decision: string
     decideAction: string
-    activity: string
     candidate: string
     contact: string
     opening: string
@@ -511,7 +636,71 @@ export interface HiringDeskCopy {
     handoffApproved: string
     handoffApproveError: string
     history: string
-    activityTitle: string
+    /**
+     * TASK-1737 — tab Expediente de la Application 360: timeline de notas tipadas
+     * (TASK-1735) + flujo propose→confirm del dossier agéntico + gate anti-anclaje.
+     * Ledger completo en docs/ui/wireframes/TASK-1737-application-360-expediente-tab.md.
+     */
+    expediente: {
+      tabLabel: string
+      title: string
+      subtitle: string
+      generate: string
+      generating: string
+      aiDisabled: string
+      cvNotReady: string
+      proposalTitle: string
+      proposalProvenance: string
+      sectionSummary: string
+      sectionCoherences: string
+      sectionGaps: string
+      sectionInterviewFocus: string
+      sectionUnverifiable: string
+      unverifiableSummary: string
+      evidenceTitle: string
+      edit: string
+      editCaption: string
+      cancelEdit: string
+      confirm: string
+      confirming: string
+      confirmed: string
+      reject: string
+      rejectDialogTitle: string
+      rejectDialogBody: string
+      rejectReasonLabel: string
+      rejectConfirm: string
+      rejected: string
+      decisionApplied: string
+      composerKindLabel: string
+      kindCvAnalysis: string
+      kindAssessmentReview: string
+      kindInterviewNote: string
+      kindGeneral: string
+      composerPlaceholder: string
+      composerCount: string
+      addNote: string
+      addingNote: string
+      noteAdded: string
+      agentBadge: string
+      /** TASK-1735 — nota reemplazada por una posterior (append-only): es historia, no vigente. */
+      supersededBadge: string
+      agentProvenance: string
+      stageEvent: string
+      receivedEvent: string
+      decisionEvent: string
+      empty: string
+      emptyReadOnly: string
+      showMore: string
+      showLess: string
+      blindTitle: string
+      blindBody: string
+      blindCount: string
+      blindCta: string
+      loadError: string
+      permissionDenied: string
+      staleProposal: string
+      noteAriaLabel: string
+    }
   }
   publication: {
     title: string
@@ -561,6 +750,7 @@ export interface HiringDeskCopy {
       fieldNiceToHave: string
       fieldArea: string
       fieldSeniority: string
+      fieldSeniorityPlaceholder: string
       fieldSkillTags: string
       fieldProcessNotes: string
       biasReminder: string
@@ -790,6 +980,33 @@ export interface CareersCopy {
     processTitle: string
     compensationTitle: string
     compensationFallback: string
+    outcomesTitle: string
+    workTitle: string
+    essentialsTitle: string
+    preferredTitle: string
+    learnablesTitle: string
+    evidenceTitle: string
+    companyTitle: string
+    remoteTitle: string
+    remoteIntro: string
+    workModelTitle: string
+    eligibleCountriesTitle: string
+    eligibleCountriesDisclosure: string
+    eligibleCountriesListLabel: string
+    collaborationLabels: {
+      team: string
+      reportsTo: string
+      language: string
+      timezoneOverlap: string
+      workingRhythm: string
+    }
+    benefitsTitle: string
+    processMetaLabels: {
+      expectedTiming: string
+      responseCommitment: string
+      accommodationPath: string
+    }
+    compensationUnits: Record<'HOUR' | 'DAY' | 'WEEK' | 'MONTH' | 'YEAR', string>
     summaryTitle: string
     labels: {
       area: string

@@ -420,6 +420,44 @@ ENV_VARS="${ENV_VARS},HIRING_TALENT_POOL_PROJECTION_ENABLED=${HIRING_TALENT_POOL
 HIRING_TALENT_POOL_SELF_SERVICE_ENABLED="${HIRING_TALENT_POOL_SELF_SERVICE_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},HIRING_TALENT_POOL_SELF_SERVICE_ENABLED=${HIRING_TALENT_POOL_SELF_SERVICE_ENABLED}"
 
+# TASK-1734 — Run asíncrono de scoring IA por assessment (ADR
+# GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1, D6). Este deploy.sh es el SoT de los
+# flags cuyo runtime owner es el ops-worker: la proyección reactiva
+# (hiring_assessment_ai_scoring_run_enqueue) y el drain POST /assessment-ai/drain-scoring-runs
+# los leen SOLO acá — prenderlos en Vercel no hace nada. Declarados con default OFF para que
+# `--set-env-vars` (destructivo) no los borre en cada redeploy. NO prenderlos hasta que los
+# gates técnicos del ADR estén evidenciados (promotion-grade eval Slice 3, staging shadow,
+# canary sintético — Slice 6); el drain además exige el master HIRING_ASSESSMENT_AI_ENABLED
+# en ESTE runtime. Rollback SIEMPRE por estos flags + commands de run (confirm OFF →
+# enqueue OFF → drain/cancel/reconcile → cola manual), nunca "apagando el master".
+HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED="${HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED=${HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED}"
+HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED="${HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED=${HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED}"
+# TASK-1734 Slice 6 — el master del scorer también se declara acá (segundo gate del drain
+# en ESTE runtime; sin declararlo, un flip out-of-band moriría en el próximo deploy). En
+# Vercel el master YA está ON (2026-07-16); acá parte OFF hasta el shadow del rollout.
+HIRING_ASSESSMENT_AI_ENABLED="${HIRING_ASSESSMENT_AI_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},HIRING_ASSESSMENT_AI_ENABLED=${HIRING_ASSESSMENT_AI_ENABLED}"
+
+# TASK-1719 Slice 4/5 — Asignación automática del test al entrar a la etapa configurada
+# (ADR GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1). Lo lee SOLO el consumer
+# reactivo `hiring_stage_changed_candidate_comms` en ESTE runtime: prenderlo en Vercel no
+# hace absolutamente nada. Declarado con default OFF para que `--set-env-vars` (destructivo)
+# no lo borre en cada redeploy.
+#
+# Con el flag OFF el consumer NO deja de existir: sigue mandando el correo genérico de
+# avance de etapa exactamente como antes. El flag gobierna SÓLO si además asigna el test.
+# Por eso apagarlo es un rollback seguro — nunca deja al candidato sin comunicación.
+#
+# NO prenderlo hasta que: la policy exista `enabled` en la opening del canary, el backlog
+# del consumer nuevo esté drenado (su handler key nuevo barre el histórico en la primera
+# corrida) y el cancel/recovery del Slice 3 esté verificado. Rollback (<5min):
+# `gcloud run services update ops-worker --update-env-vars HIRING_STAGE_TEST_ASSIGNMENT_ENABLED=false`
+# + dejar las policies en `disabled`. NUNCA borrar assessments ni audit para revertir.
+HIRING_STAGE_TEST_ASSIGNMENT_ENABLED="${HIRING_STAGE_TEST_ASSIGNMENT_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},HIRING_STAGE_TEST_ASSIGNMENT_ENABLED=${HIRING_STAGE_TEST_ASSIGNMENT_ENABLED}"
+
 # Buzón interno de People para el aviso de postulación nueva (configurable; default en código).
 HIRING_INTERNAL_NOTIFICATIONS_EMAIL="${HIRING_INTERNAL_NOTIFICATIONS_EMAIL:-people@efeoncepro.com}"
 ENV_VARS="${ENV_VARS},HIRING_INTERNAL_NOTIFICATIONS_EMAIL=${HIRING_INTERNAL_NOTIFICATIONS_EMAIL}"
@@ -1030,6 +1068,24 @@ upsert_scheduler_job \
   "/hiring/talent-pool/reconcile" \
   '{}'
 echo "  -> ops-hiring-talent-pool-reconcile: */5 * * * * (Talent Pool projection, TASK-1723)"
+
+# TASK-1734 Slice 6 — drain del run de scoring IA de assessments (ADR D4, pieza 2).
+# El job nace PAUSADO mientras HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED=false: el flip
+# del flag en ESTE archivo (SoT, rollout gated a señal del operador) lo resume en el
+# mismo deploy. Defensa doble: el handler además hace skip logueado con el flag OFF
+# (y exige también el master HIRING_ASSESSMENT_AI_ENABLED en este runtime).
+# Runbook: docs/operations/runbooks/assessment-ai-scoring-rollout.md
+ASSESSMENT_AI_DRAIN_PAUSED="true"
+if [ "${HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED}" = "true" ]; then
+  ASSESSMENT_AI_DRAIN_PAUSED="false"
+fi
+upsert_scheduler_job \
+  "ops-assessment-ai-drain" \
+  "*/2 * * * *" \
+  "/assessment-ai/drain-scoring-runs" \
+  '{}' \
+  "${ASSESSMENT_AI_DRAIN_PAUSED}"
+echo "  -> ops-assessment-ai-drain: */2 * * * * (assessment AI scoring drain, TASK-1734; paused=${ASSESSMENT_AI_DRAIN_PAUSED})"
 
 upsert_scheduler_job \
   "ops-reactive-organization" \

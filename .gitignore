@@ -10,6 +10,13 @@
 /artifacts/
 /.auth/
 /.captures/
+
+# TASK-1736 — allowlists de remediación de display names (contienen PII; jamás se commitean)
+*.candidate-remediation-allowlist.json
+/.eval-reports/
+# TASK-1734 — instrumento del gold set: respuestas REALES de candidatos (anonimizadas, pero
+# jamás se commitean) + llave de estratificación sellada.
+/.gold-set/
 /test-results/
 /playwright-report/
 /blob-report/
@@ -17,9 +24,12 @@
 /.playwright-mcp/
 
 # next.js
+# Glob, no una lista de variantes: cada agente/sesión que levanta su propio dev server
+# elige un distDir distinto (`.next-task1741`, etc.), y con una lista había que acordarse
+# de agregarlo ACÁ y en eslint.config.mjs. Cuando alguien olvidaba el segundo, ESLint
+# analizaba build output y tiraba miles de errores en un archivo que nadie escribió.
 /.next/
-/.next-cache/
-/.next-local/
+/.next-*/
 /.next-build-dir
 /.next-build-meta.json
 /out/

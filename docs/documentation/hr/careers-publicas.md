@@ -2,8 +2,10 @@
 
 ## Estado
 
-TASK-354 dejó la interfaz pública de careers implementada en código y validada en
-local. TASK-1373 migra el apply a un Growth Form nativo detrás de flag
+TASK-354 dejó la interfaz pública de careers implementada. TASK-1741 añade una
+variante editorial del detalle, validada en local y detrás de
+`CAREERS_DETAIL_EDITORIAL_V2_ENABLED` (default OFF; rollout pendiente). TASK-1373
+migra el apply a un Growth Form nativo detrás de flag
 (`CAREERS_NATIVE_GROWTH_FORM_ENABLED`) para rollout gradual por ambiente. El
 rollout productivo queda pendiente de sign-off de paridad visual y
 consentimiento/privacidad.
@@ -14,8 +16,8 @@ Careers públicas es la puerta externa de candidatos para Efeonce:
 
 - muestra una landing de employer brand y vacantes publicadas;
 - permite filtrar openings por búsqueda, área y modalidad;
-- muestra detalle de cada vacante con competencias, proceso y señal de
-  compensación;
+- muestra el detalle como una hoja editorial de decisión: promesa, resultados,
+  trabajo, encaje, evidencia, condiciones, beneficios, proceso y compensación;
 - permite postular mediante un formulario público con confirmación genérica.
 
 La UI no crea un pipeline paralelo. Listing y detalle leen el contrato público
@@ -103,6 +105,77 @@ La oferta debe separar `Ubicacion` y `Modalidad` como datos de dominio:
 - `public_compensation_band` queda disponible como campo estructurado opcional,
   no publish-required hasta cerrar governance de bandas.
 
+## Contenido estructurado y SEO técnico (TASK-1740)
+
+Toda publicación nueva usa `public_content_json` v2 como fuente editorial única:
+promesa, intro, 3–5 resultados, 4–8 elementos de trabajo, habilidades esenciales,
+preferidas y aprendibles, evidencia, modelo de trabajo, colaboración, proceso,
+beneficios adicionales, compensación opcional y hasta tres bloques de profundidad.
+La v1 permanece sólo como lectura compatible para vacantes ya publicadas. Reglas:
+
+- El bloque se escribe por el command canónico (`PATCH
+/api/hiring/openings/{id}` con `publicContent`) y se valida siempre en el
+  store; un bloque inválido responde 422 y nunca llega a la base.
+- Publicar o volver a publicar exige v2 completo. Un opening v1 ya publicado
+  degrada por sección al fallback de prosa hasta que People lo migre.
+- El contexto `Efeonce en breve` y el baseline global de beneficios se resuelven
+  desde una fuente central versionada; cada opening almacena sólo adiciones reales.
+- La zona de extensión acepta 0–3 bloques `narrative`, `bullets` o `milestones`;
+  nunca HTML, CTA, estilos, requisitos, beneficios ni procesos alternativos.
+- La compensación estructurada es un hecho aprobado; el texto libre
+  `public_compensation_band` sigue existiendo pero nunca se convierte en
+  salario para SEO.
+
+La elegibilidad remota por país vive en `public_remote_eligible_countries`
+(códigos ISO 3166-1 alpha-2 reales, ej. `["CL","CO"]`). `LATAM` o `Global`
+son regiones de display, no hechos legales. Una publicación remota v2 exige al
+menos un país elegible exacto.
+
+### Renderer editorial (TASK-1741)
+
+`CAREERS_DETAIL_EDITORIAL_V2_ENABLED` conmuta únicamente la hoja
+`/public/careers/[publicId]`. Con el flag OFF se conserva el DOM legacy; con el
+flag ON el mismo payload público se resuelve por sección y se presenta en este
+orden: hero/promesa, sobre el rol, Efeonce en breve, outcomes, trabajo, hasta tres
+bloques adicionales, esenciales/deseables/aprendibles, evidencia, cómo trabajamos,
+beneficios, proceso, compensación y resumen lateral. Reglas:
+
+- La hoja conserva exactamente los dos enlaces existentes al mismo `applyHref`:
+  hero y resumen. No añade CTA final ni formulario embebido.
+- El fallback es por sección. Un bloque parcial no puede esconder descripción,
+  responsabilidades, requisitos, deseables ni proceso legacy.
+- `public_nice_to_have` se presenta como `Deseable, no excluyente`. Sólo
+  `publicContent.learnables` puede aparecer bajo `Lo que puedes aprender aquí`.
+- El formulario apply, canonical y JSON-LD no son responsabilidad del
+  componente. El flag de schema sí está interlocked: no puede emitir
+  `JobPosting` si el renderer editorial está OFF.
+- El contenido real no se inventa para llenar una banda. En v2, la ausencia de
+  una región obligatoria bloquea publicación; sólo la zona adicional y la
+  compensación son opcionales.
+
+El seniority público tiene un vocabulario cerrado y separado de la evaluación
+interna: `Junior`, `Semi-senior`, `Senior` o `Lead`. `Intermedio` describe la
+proficiency de una habilidad; `L1/L2/L3` son niveles internos de assessment.
+El selector humano, Vacancy AI, writer, reader público y CHECK de PostgreSQL
+aplican la misma regla. Si el título contiene un nivel explícito, debe coincidir
+con `public_seniority`.
+
+El detalle público de una vacante publicada emite `canonical` explícito
+y, detrás del flag `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` (default OFF),
+JSON-LD `JobPosting` construido desde el mismo contenido visible:
+
+- Remota: `TELECOMMUTE` + países elegibles; sin países no hay schema.
+- Híbrida/presencial: `jobLocation` con `public_city` + `public_country`;
+  sin ambos no hay schema.
+- Nunca se emite `directApply` (hay paso detail → formulario) ni
+  `validThrough` (no existe expiración real); pausar/cerrar la vacante la
+  saca del reader público (404), que es la señal de retiro para Google.
+
+> Detalle técnico: `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
+> §Delta 2026-08-17 (TASK-1740); builder en
+> `src/lib/hiring/public-careers/job-posting.ts`; contrato en
+> `src/lib/hiring/public-careers/public-content.ts`.
+
 ## Voz pública y UX writing
 
 Careers es una superficie pública de employer brand. El copy visible vive en
@@ -121,7 +194,7 @@ Reglas vigentes:
   listado.
 - En vacantes de marketing, el spanglish profesional es válido cuando describe
   el trabajo real y el mercado lo usa: `growth`, `performance`, `vendor
-  management`, `brief`, `paid media`, `pipeline`, etc. No traducir esos términos
+management`, `brief`, `paid media`, `pipeline`, etc. No traducir esos términos
   por purismo si perderían precisión. Solo corregir spanglish que opaque,
   mezcle jerga interna innecesaria o dificulte a un candidato externo.
 
@@ -213,6 +286,18 @@ detalle `EO-OPN-0009`, apply y 404 en desktop1440, wide2048 y mobile390.
   `.captures/2026-07-09T-careers-apply-invalid-state`.
 - El circulo negro `N` de capturas locales es `nextjs-portal` (indicador de
   desarrollo de Next.js), no `NexaFloatingButton` ni UI de producto.
+
+La evidencia de TASK-1741 compara el baseline legacy con la variante editorial
+en 1440×1200 y 390×844:
+
+- Baseline: `.captures/2026-08-17T12-25-12_task354-careers-runtime-audit/`.
+- Fixture estructurada completa:
+  `.captures/2026-08-17T16-19-21_task1741-careers-editorial-detail/`.
+- Vacante real parcial después de la corrección de deseables:
+  `.captures/2026-08-17T15-51-54_task1741-careers-editorial-detail/`.
+- Scorecard/review:
+  `docs/ui/reviews/TASK-1741-public-careers-editorial-detail-renderer.scorecard.json`
+  y su dossier hermano. GVC premium terminó en verde; staging sigue pendiente.
 
 ## Documentación técnica relacionada
 

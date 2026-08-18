@@ -100,15 +100,26 @@ const jsonObj = (value: unknown): Record<string, unknown> => {
   return {}
 }
 
-const numberFromAccommodation = (accommodations: Record<string, unknown>, keys: string[]): number | null => {
-  for (const key of keys) {
-    const raw = accommodations[key]
-    const parsed = typeof raw === 'number' ? raw : typeof raw === 'string' ? Number(raw) : NaN
+/**
+ * TASK-1719 — Lectura del ÚNICO contrato canónico de accommodations: `extraMinutes`.
+ *
+ * ⚠️ Esto aceptaba SEIS grafías del mismo hecho (`extraMinutes`, `timeExtensionMinutes`,
+ * `additionalMinutes`, `extendedTimeMinutes`, más `timeMultiplier`/`extendedTimeMultiplier`
+ * y `extendedTimePercent`/`timeExtensionPercent`), defensa escrita cuando no existía write
+ * path que fijara una forma. Se narró al abrir el write path (`accommodations.ts`), con la
+ * base verificada: 17 instancias, 0 con `accommodations_json` distinto de `{}` y 0 claves
+ * distintas en uso — no había ningún ajuste que perder.
+ *
+ * Seis maneras de expresar lo mismo son un contrato implícito, y es la clase de bug que ya
+ * mordió a este repo: el `perCriterion` de TASK-1734 admitía dos lecturas y el router comparó
+ * contra la equivocada en 11 de 14 casos reales, con el build verde. NUNCA reintroducir un
+ * alias "por compatibilidad": el escritor canónico es uno solo.
+ */
+const accommodationExtraMinutes = (accommodations: Record<string, unknown>): number => {
+  const raw = accommodations.extraMinutes
+  const parsed = typeof raw === 'number' ? raw : typeof raw === 'string' ? Number(raw) : NaN
 
-    if (Number.isFinite(parsed) && parsed > 0) return parsed
-  }
-
-  return null
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : 0
 }
 
 export interface PublicAssessmentCompetency {
@@ -171,18 +182,7 @@ export interface PublicAssessmentView {
 export const resolveAssessmentTiming = (assessment: Assessment): PublicAssessmentTiming => {
   const baseMinutes = Math.max(0, assessment.timeLimitMinutes ?? 0)
 
-  const explicitExtra = numberFromAccommodation(assessment.accommodations, [
-    'extraMinutes',
-    'timeExtensionMinutes',
-    'additionalMinutes',
-    'extendedTimeMinutes',
-  ])
-
-  const multiplier = numberFromAccommodation(assessment.accommodations, ['timeMultiplier', 'extendedTimeMultiplier'])
-  const percent = numberFromAccommodation(assessment.accommodations, ['extendedTimePercent', 'timeExtensionPercent'])
-  const multiplierExtra = multiplier && multiplier > 1 ? Math.round(baseMinutes * (multiplier - 1)) : 0
-  const percentExtra = percent ? Math.round(baseMinutes * (percent / 100)) : 0
-  const extraMinutes = Math.max(0, Math.round(explicitExtra ?? Math.max(multiplierExtra, percentExtra, 0)))
+  const extraMinutes = accommodationExtraMinutes(assessment.accommodations)
   const effectiveMinutes = Math.max(0, baseMinutes + extraMinutes)
 
   if (!assessment.startedAt || effectiveMinutes <= 0) {
@@ -238,14 +238,14 @@ const getAssessmentContext = async (assessmentId: string): Promise<ContextRow | 
   return rows[0] ?? null
 }
 
-export const listPublicAssessmentQuestions = async (assessment: Assessment): Promise<{
-  competencies: PublicAssessmentCompetency[]
-  questions: PublicAssessmentQuestion[]
-}> => {
-  if (!assessment.templateId) return { competencies: [], questions: [] }
-
-  const rows = await runGreenhousePostgresQuery<PublicQuestionRow>(
-    `WITH ranked AS (
+/**
+ * SoT de la resolución EN VIVO del cuestionario ($1 = template_id). Se exporta porque el
+ * `template_content_digest` de la policy (TASK-1719 D4) debe observar EXACTAMENTE lo que
+ * rendiría el candidato: dos consultas distintas producirían un digest que no detecta el
+ * drift real del banco de preguntas. Consumidores: `listPublicAssessmentQuestions` acá y
+ * `resolveTemplateContentDigest` en `assignment-policy/readers.ts`. NUNCA duplicar el SQL.
+ */
+export const PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL = `WITH ranked AS (
        SELECT tm.module_id,
               tm.weight,
               tm.target_level,
@@ -281,7 +281,16 @@ export const listPublicAssessmentQuestions = async (assessment: Assessment): Pro
      WHERE question_id IS NULL
         OR question_rank <= CASE WHEN module_rank <= 3 THEN 2 ELSE 1 END
      ORDER BY weight DESC, competency_key, question_rank
-     LIMIT 12`,
+     LIMIT 12`
+
+export const listPublicAssessmentQuestions = async (assessment: Assessment): Promise<{
+  competencies: PublicAssessmentCompetency[]
+  questions: PublicAssessmentQuestion[]
+}> => {
+  if (!assessment.templateId) return { competencies: [], questions: [] }
+
+  const rows = await runGreenhousePostgresQuery<PublicQuestionRow>(
+    PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL,
     [assessment.templateId],
   )
 

@@ -20,16 +20,97 @@ Este documento fija:
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
 
+## Delta 2026-08-17 — TASK-1740: contenido público estructurado + fundación JobPosting/canonical
+
+La proyección pública de una vacante deja de depender del parser heurístico de prosa como única
+fuente y gana su fundación SEO técnica. Tres piezas, todas sobre el command/reader canónicos
+existentes (cero endpoints nuevos, cero capabilities nuevas, cero eventos nuevos):
+
+- **Bloque de contenido estructurado versionado** (`hiring_opening.public_content_json`, JSONB):
+  `PublicOpeningContent` v1 — promesa, intro, outcomes, trabajo, essentials/learnables, evidencia,
+  modelo remoto, proceso, beneficios y compensación estructurada opcional (`currency` ISO 4217 +
+  min/max + unitText). Validador canónico `src/lib/hiring/public-careers/public-content.ts`: write
+  path estricto (422 `hiring_opening_public_content_invalid`, re-validado SIEMPRE en el store) y
+  read path leniente (bloque corrupto o versión desconocida degrada a `null` = fallback legacy de
+  prosa, nunca rompe la página pública). El write viaja por `updateHiringOpening` (el PATCH interno
+  ya lo transporta) bajo `hiring.opening.write`.
+- **Elegibilidad remota por país** (`hiring_opening.public_remote_eligible_countries`, TEXT[] con
+  CHECK de forma alpha-2): países ISO 3166-1 reales validados con `isValidCountryCode`. Es el
+  ÚNICO habilitador del schema remoto; `public_hiring_region` (texto libre: `LATAM`, `Global`)
+  jamás se convierte en país. La publicación NO se bloquea por falta de países (los 2 openings
+  vivos son `LATAM` y deben poder re-publicarse): el schema simplemente se omite.
+- **Canonical + JSON-LD `JobPosting`** (`src/lib/hiring/public-careers/job-posting.ts`,
+  server-only, puro): nace de EXACTAMENTE el mismo `PublicOpeningPayload` visible (no existe un
+  segundo texto SEO). Fail-closed: remota sin países elegibles, híbrida/presencial sin
+  `public_city`+`public_country`, o sin `publishedAt`/descripción → `null` (sin schema). Salario
+  sólo desde compensación estructurada (`compensationBand` texto libre nunca se emite);
+  `directApply` y `validThrough` NUNCA se emiten (flujo con paso intermedio; sin expiración real —
+  el retiro es el 404 del unpublish). `employmentType` por mapeo exacto conservador
+  ("Jornada completa"→FULL_TIME; "Contrato indefinido" se omite). `hiringOrganization` = marca
+  Efeonce desde el brand SSOT (`EFEONCE_BRAND_NAME`/`EFEONCE_URL_HTTPS`), no la razón social.
+  Emisión gated por `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` **y**
+  `CAREERS_DETAIL_EDITORIAL_V2_ENABLED` (Vercel-only, default OFF, ledger);
+  el canonical explícito de la leaf publicada NO depende del flag.
+
+**Invariantes:**
+
+- **NUNCA** exponer contenido nuevo fuera de `buildPublicOpeningPayload()` (allowlist con set
+  cerrado de llaves + sentinels internos en el test anti-leak).
+- **NUNCA** emitir `TELECOMMUTE` sin ≥1 país en `public_remote_eligible_countries`, ni convertir
+  región libre en país, ni bloquear publish por falta de países (omitir, no bloquear).
+- **NUNCA** derivar `baseSalary` de `public_compensation_band`; sólo `content.compensation`
+  estructurado y aprobado. Beneficios no son compensación.
+- **NUNCA** emitir `directApply` ni `validThrough`; el lifecycle honesto es published → 404.
+- **NUNCA** exigir el contrato editorial v2 para RE-publicar una vacante que ya estuvo al aire
+  (grandfathering, `requiresEditorialV2ForPublish` en `public-careers/publishability.ts`). El
+  contrato v2 es la barra de calidad de toda vacante que se publica **por primera vez**
+  (`published_at IS NULL`); aplicarlo también al re-publicar convierte una regla de autoría en una
+  **interrupción de servicio**: una vacante viva —`EO-OPN-0009` y `EO-OPN-0061` tenían 15 y 33
+  postulantes en proceso al 2026-08-17— que se pausa por cualquier motivo quedaría en 404 hasta
+  reescribir su bloque completo. La señal es `published_at`, que sólo escribe el publish, así que
+  una vacante nueva no puede saltarse v2 por esta vía. El operador desde brief
+  (`vacancy-publication-operator`) **sí** exige v2 siempre: siempre crea una vacante nueva.
+- **NUNCA** despublicar con `PATCH`/`visibility`: el guard de publicabilidad responde 422. El camino
+  canónico es `unpublishOpening` (`DELETE …/publish?mode=paused|closed`).
+- **NUNCA** poner el país de la entidad empleadora en `jobLocation` de una vacante remota para
+  "dejar claro el anclaje contractual": `jobLocation` significa dónde se realiza físicamente el
+  trabajo, así que Google dejaría de clasificarla como remota y la mostraría como empleo presencial
+  en esa ciudad. El anclaje contractual se declara en el contenido visible (`content.remoteModel`);
+  la elegibilidad, en `applicantLocationRequirements` — que admite uno o varios países y sigue siendo
+  `TELECOMMUTE` válido.
+- **NUNCA** prender `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` sin que el renderer (TASK-1741)
+  muestre el bloque estructurado en la página visible. **El orden es renderer primero, schema
+  después**: el builder de JSON-LD ya consume `content`, pero `view-model.ts` y
+  `components/greenhouse/careers/**` no lo consumían antes de TASK-1741, así que el schema habría
+  emitido a Google un párrafo — el `remoteModel` ya poblado — que el candidato no veía. El config
+  ahora aplica un **interlock técnico**: schema ON sólo es efectivo cuando el renderer editorial
+  también está ON. Eso protege la paridad aun ante una combinación de env vars equivocada. TASK-1741
+  no necesita el flag de schema para desarrollarse:
+  `content` y `remoteEligibleCountries` viajan en el payload público SIEMPRE, sin flag, pero su
+  **orden de encendido no es libre**.
+- **NUNCA** dejar que un bloque estructurado PARCIAL reemplace la prosa legacy en la descripción del
+  schema. Sólo un bloque con **narrativa núcleo completa** (`promise` + `intro` + `outcomes` + `workItems`) la
+  reemplaza; un bloque parcial (el estado normal mientras el contenido editorial no se autora) la
+  **complementa**. Reemplazarla degradaba la descripción a un fragmento del rol — bug cazado con el
+  primer artefacto real, 2026-08-17.
+- **SIEMPRE** que el HTML de la descripción JSON-LD se genere, sale del mismo payload visible
+  (escape XSS + `serializeJsonLd` que neutraliza `</script>`).
+- El renderer (TASK-1741) consume `content` con fallback legacy; fixture canónica
+  `src/lib/hiring/public-careers/editorial-opening.fixture.ts`.
+
+Indexing API/sitemap quedan explícitamente FUERA (decisión + autorización + quota son follow-up;
+runbook de decisión en `docs/manual-de-uso/hr/operar-careers-publicas.md`).
+
 ## Delta 2026-08-12 — TASK-1688 (ADR): completitud de contacto del candidato — ubicación física y contrato
 
 **Decisión (Accepted 2026-08-12).** Los tres datos que el apply público aceptaba pero el command
 descartaba quedan persistidos así:
 
-| Dato | Ubicación física | Semántica |
-|---|---|---|
-| Teléfono | `greenhouse_hiring.candidate_facet.phone_e164` (TEXT NULL) | Contacto durable **person-first**, normalizado E.164; opcional |
+| Dato               | Ubicación física                                                                           | Semántica                                                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| Teléfono           | `greenhouse_hiring.candidate_facet.phone_e164` (TEXT NULL)                                 | Contacto durable **person-first**, normalizado E.164; opcional                                                |
 | País de residencia | `greenhouse_hiring.candidate_facet.residence_country_code` (TEXT NULL, CHECK `^[A-Z]{2}$`) | **Autodeclarado** ISO 3166-1 alpha-2; requerido en UI para postulaciones nuevas; NULL = legacy "No informado" |
-| Mensaje | `greenhouse_hiring.hiring_application.candidate_message` (TEXT NULL, CHECK ≤4000) | Contexto de **esa** postulación; nunca se copia al facet |
+| Mensaje            | `greenhouse_hiring.hiring_application.candidate_message` (TEXT NULL, CHECK ≤4000)          | Contexto de **esa** postulación; nunca se copia al facet                                                      |
 
 **Alternativas rechazadas:** inferir país desde prefijo telefónico/IP/CV (dato insuficiente y
 engañoso — prohibido); guardar todo en la aplicación (el contacto es de la persona, no de una
@@ -69,13 +150,13 @@ Rollout abajo; vive SOLO en el worker) + kill-switch por tipo en
 `greenhouse_notifications.email_type_config` (seed aplicado; `hiring_decision_rejected` pausable
 independiente):
 
-| Evento | Consumer | Email |
-|---|---|---|
-| `hiring.application.created` | `hiring_application_created_emails` | aviso interno a People (buzón `HIRING_INTERNAL_NOTIFICATIONS_EMAIL`, default `people@efeoncepro.com`) + acuse al candidato |
-| `hiring.assessment.assigned` | `hiring_assessment_assigned_email` | link de evaluación al candidato — SOLO `method=candidate_test` (un scorecard de entrevistador JAMÁS emailea al candidato) |
-| `hiring.assessment.submitted` | `hiring_assessment_submitted_internal_email` | aviso al buzón interno de People cuando un `candidate_test` queda completado y listo para revisión; incluye CTA a Application 360, nunca score ni decisión automática |
-| `hiring.application.stage_changed` | `hiring_stage_changed_email` | avance de etapa — SOLO allowlist candidate-facing (`shortlisted`→"Preselección", `interview`→"Entrevista"); etapas internas nunca llegan a copy |
-| `hiring.application.decided` | `hiring_application_decided_email` | `selected` (felicitación) / `rejected` (agradecimiento); anti-stale: re-verifica la decisión vigente en PG antes de enviar |
+| Evento                             | Consumer                                     | Email                                                                                                                                                                 |
+| ---------------------------------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `hiring.application.created`       | `hiring_application_created_emails`          | aviso interno a People (buzón `HIRING_INTERNAL_NOTIFICATIONS_EMAIL`, default `people@efeoncepro.com`) + acuse al candidato                                            |
+| `hiring.assessment.assigned`       | `hiring_assessment_assigned_email`           | link de evaluación al candidato — SOLO `method=candidate_test` (un scorecard de entrevistador JAMÁS emailea al candidato)                                             |
+| `hiring.assessment.submitted`      | `hiring_assessment_submitted_internal_email` | aviso al buzón interno de People cuando un `candidate_test` queda completado y listo para revisión; incluye CTA a Application 360, nunca score ni decisión automática |
+| `hiring.application.stage_changed` | `hiring_stage_changed_email`                 | avance de etapa — SOLO allowlist candidate-facing (`shortlisted`→"Preselección", `interview`→"Entrevista"); etapas internas nunca llegan a copy                       |
+| `hiring.application.decided`       | `hiring_application_decided_email`           | `selected` (felicitación) / `rejected` (agradecimiento); anti-stale: re-verifica la decisión vigente en PG antes de enviar                                            |
 
 **Invariantes:**
 
@@ -177,6 +258,15 @@ Auditoría 2026-07-10 (código real + specs downstream) → hardening pre-TASK-1
 
 **Invariante nuevo — Template Versioning (pre-TASK-1364/1365):** un `hiring_assessment_template` con instancias es **INMUTABLE** en contenido y módulos (trigger DB; solo `status` muta). Editar = crear versión nueva con `version` + `supersedes_template_id`. **NUNCA** editar in-place un template usado: la correlación validez/fairness por `template_id` asume contenido congelado.
 
+**Invariante complementario — el versionado NO congela el instrumento (auditoría 2026-08-17).** Lo que el trigger congela es la **declaración** (nombre, módulos, pesos); las **preguntas se resuelven en vivo** en cada render, save y submit vía `PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL`, sin snapshot ni caché. Dos consecuencias que ningún gate detecta:
+
+- **Un módulo cuya competencia no tiene preguntas activas no desaparece.** El resolvedor conserva la fila con `question_id IS NULL` y el mapper registra la competencia antes del `continue`: el candidato **ve la sección vacía**, y `submitPublicAssessment` sólo exige responder las preguntas resueltas, así que el **examen encogido se envía sin error** y se puntúa sobre una fracción del peso declarado. Detectado en dos plantillas activas (45% y 25% del peso ciego), archivadas por `migrations/20260817103353922_archive-questionless-module-templates.sql`.
+- **Archivar o insertar una pregunta cambia el examen del siguiente candidato** sin tocar template ni versión (el orden es `match de nivel → tipo → created_at DESC`), y a mitad de rendición falla ruidosamente contra el candidato: `404 assessment_question_not_found` al guardar, `400 assessment_incomplete` al enviar.
+
+**NUNCA** declarar sano un instrumento contando módulos: **SIEMPRE** ejercitar el resolvedor real contra la plantilla. Señal canónica de la clase: `hiring.assessment.template_module_without_questions` (steady=0; `error` con una sola plantilla rota, `warning` en el precursor de competencias sin banco). El snapshot inmutable por instancia sigue pendiente — es prerrequisito declarado para expandir la automatización de assignment más allá del canary.
+
+**Quién asigna la plantilla y cómo (TASK-1719):** la vinculación vacante→plantilla es una **policy versionada por opening** y el assignment pasa por **un solo command idempotente** que resuelve la plantilla server-side — el caller (persona, agente o integración) **NUNCA** entrega `templateId`. Manual (propose→confirm con effect digest y expiry enforceado) y automático (consumer reactivo por entrada a etapa, flag `HIRING_STAGE_TEST_ASSIGNMENT_ENABLED` sólo en ops-worker, default OFF) convergen en ese command. La cancelación pre-inicio invalida el token y **libera el cupo de unicidad**, que es lo que la hace recuperación real. La comunicación al candidato la decide **un solo consumer** (`hiring_stage_changed_candidate_comms`, que absorbió al de TASK-1689): una por movimiento, ni cero ni dos. Contrato completo, invariantes y matriz de riesgo: [`GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md`](GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md).
+
 Verificación: 6 live guards E2E contra PG real (idempotencia, expiración, anti-anclaje, inmutabilidad, dedupe) + anti-leak unit + suite full.
 
 ## Delta 2026-07-10 — TASK-770: bridge de activación hiring→HRIS implementado
@@ -263,7 +353,7 @@ escalan a error).
 
 El adapter `clamav-http` dejó de ser código latente: existe el servicio Cloud Run `services/clamav/` y el adapter se
 ejerció contra él. **El flag `ASSET_MALWARE_SCAN_ENABLED` sigue OFF en Vercel** — el flip es rollout pendiente.
-*(Superado por el Delta 2026-08-12: el flag está ON en staging y producción.)*
+_(Superado por el Delta 2026-08-12: el flag está ON en staging y producción.)_
 
 **El puerto de escaneo NO es de Hiring.** `scanAssetBytes` recibe bytes y devuelve un veredicto; no sabe de vacantes.
 Hoy lo consumen `hiring/public-careers/cv-upload.ts` y `growth/forms/file-uploads.ts`, y el guard del attach exige
@@ -432,12 +522,12 @@ En una frase:
 
 La demanda debe poder expresarse sobre cuatro cuadrantes sin cambiar de modelo:
 
-| Stakeholder | Engagement | Ejemplo | Destino probable |
-|---|---|---|---|
-| `internal` | `on_demand` | refuerzo temporal para un delivery o iniciativa interna | reassignment, contractor, partner |
-| `internal` | `on_going` | contratación estable o capacidad estructural | internal hire, internal reassignment |
-| `client` | `on_demand` | cobertura puntual para un cliente o proyecto acotado | contractor, staff augmentation, partner |
-| `client` | `on_going` | servicio continuo o squad estable | staff augmentation, internal hire, partner |
+| Stakeholder | Engagement  | Ejemplo                                                 | Destino probable                           |
+| ----------- | ----------- | ------------------------------------------------------- | ------------------------------------------ |
+| `internal`  | `on_demand` | refuerzo temporal para un delivery o iniciativa interna | reassignment, contractor, partner          |
+| `internal`  | `on_going`  | contratación estable o capacidad estructural            | internal hire, internal reassignment       |
+| `client`    | `on_demand` | cobertura puntual para un cliente o proyecto acotado    | contractor, staff augmentation, partner    |
+| `client`    | `on_going`  | servicio continuo o squad estable                       | staff augmentation, internal hire, partner |
 
 ## Canonical Objects Involved
 
@@ -985,8 +1075,10 @@ protegidos. No produce fit score, ranking ni decisión adversa. `active_process`
 pero sólo un consentimiento `future_opportunities` vigente permite recontactar o invitar a otra opening.
 
 Canon y rollout: `GREENHOUSE_TALENT_POOL_FULL_API_PARITY_DECISION_V1.md`; tasks `TASK-1723`–`TASK-1726`; flags
-separados projection/search/self-service/invite/MCP. Producción mantiene projection/search/MCP internos ON e
-invite/self-service externos OFF. La V1 no autoriza todavía
+separados projection/search/self-service/invite/MCP. Producción mantiene los cinco flags internos ON desde
+2026-08-16 (`projection`, `search`, `MCP`, `self-service` e `invite`) por autorización operativa del CEO. El
+self-service y la invitación siguen consent-gated, tokenizados/reversibles y no producen contacto automático,
+movimiento de etapa ni asignación de test. La V1 no autoriza todavía
 adapters de bench, internos, freelancers o partners: requieren su propio source adapter y policy.
 
 ### 3. Pipeline Board
@@ -1253,7 +1345,7 @@ La foundation transaccional del dominio quedó materializada (local-first, verif
 
 **API baseline interna:** `/api/hiring/{demands,openings,candidate-facets,applications}` (+ `openings/[id]/publish`), dual-gate `requireInternalTenantContext` + `can()`.
 
-**Capabilities V1 (8, seedeadas en `capabilities_registry` + grants en `runtime.ts`):** `hiring.demand.{read,write}`, `hiring.opening.{read,write,publish}`, `hiring.application.{read,write,decide}`. Grant: internal ∪ EFEONCE_ADMIN ∪ HR_MANAGER ∪ EFEONCE_OPERATIONS (∪ EFEONCE_ACCOUNT en read/write; publish/decide least-privilege sin comercial). NUNCA `client_*`. `hiring.application.decide` queda seedeada/grantada ahora y su endpoint dedicado llega con el desk interno (TASK-355).
+**Capabilities V1 (8, seedeadas en `capabilities_registry` + grants en `runtime.ts`):** `hiring.demand.{read,write}`, `hiring.opening.{read,write,publish}`, `hiring.application.{read,write,decide}`. Grant: internal ∪ EFEONCE*ADMIN ∪ HR_MANAGER ∪ EFEONCE_OPERATIONS (∪ EFEONCE_ACCOUNT en read/write; publish/decide least-privilege sin comercial). NUNCA `client*\*`. `hiring.application.decide` queda seedeada/grantada ahora y su endpoint dedicado llega con el desk interno (TASK-355).
 
 **Views (TASK-355, implementadas en dev):** `gestion.hiring`, `gestion.hiring_demand`, `gestion.hiring_pipeline`, `gestion.hiring_publication` y `gestion.hiring_application_detail` viven en `VIEW_REGISTRY`, `role_view_assignments` y el manifest de reachability junto con las rutas `/agency/hiring/**`. Los viewCodes mantienen namespace de navegación `gestion.*`; la ruta conserva ownership de producto bajo `agency`. El acceso visible no reemplaza las capabilities finas de cada reader/command.
 
@@ -1459,3 +1551,311 @@ re-autoriza en cada request.
   salida.
 - **SIEMPRE** que se agregue un consumidor del visor, pasar por `GreenhouseDocumentPreview` en vez de
   recrear el fetch→blob→render (hoy hay tres implementaciones paralelas; `TASK-1716` las unifica).
+
+## Delta 2026-08-16 — Expediente de Evaluación (TASK-1735, code complete)
+
+Nueva capa per-application de narrativa de evaluación, en dos piezas:
+
+**1. Notas append-only** — `greenhouse_hiring.hiring_application_note` (`hnote-*`): `kind`
+CHECK (`cv_analysis|assessment_review|interview_note|general`), `body_md` ≤8000, `author_user_id`,
+`source` (`human|agent`), `context_json` (referencias: `proposalId`/`assessmentId`/`supersedesNoteId` —
+nunca cuerpos duplicados). Trigger `prevent_hiring_note_mutation` + grants sin UPDATE/DELETE
+(verificado live). Primitive: `src/lib/hiring/application-notes.ts` (`recordHiringApplicationNote`
+acepta tx participante; `listHiringApplicationNotes`). API: `GET/POST /api/hiring/applications/[id]/notes`.
+Evento `hiring.application.note_recorded` (payload IDs-only, sin consumers reactivos V1).
+
+**2. Dossier agéntico propose→confirm** — `greenhouse_hiring.hiring_application_dossier_proposal`
+(`hdsp-*`, terminal-once `proposed→confirmed|rejected`, único `proposed` activo por
+`application_id+input_digest`). `src/lib/hiring/dossier-ai/`: packet assembler con **allowlist
+explícita** (CV = texto redactado de la proyección TASK-1718, nunca el PDF; assessment: respuestas +
+scores efectivos + rationale referenciado; journey de stages. PROHIBIDO nombre/contacto/identidad
+legal/self-ID — el assembler ni los consulta), generación vía `generateStructuredAnthropic` (default
+`claude-sonnet-5`, override `HIRING_DOSSIER_AI_MODEL`, prompt `hiring_evaluation_dossier.v1`), output
+con evidencia citada + sección `noVerificable`. `proposeEvaluationDossier` idempotente por digest
+(modelo efectivo incluido); `confirmEvaluationDossier` materializa la nota `source='agent'`
+ATÓMICAMENTE (misma tx que la marca de la propuesta) con provenance completo en `context_json`.
+API: `GET/POST /api/hiring/applications/[id]/dossier`. Flag `HIRING_EVALUATION_DOSSIER_AI_ENABLED`
+default OFF (Vercel-only, gatea SOLO el propose; ledger actualizado).
+
+**Autorización:** lectura `hiring.application.read`; escritura/propose/confirm capability
+`hiring.application.annotate` (tier gobernanza role-only: EFEONCE_ADMIN + HR_MANAGER +
+EFEONCE_OPERATIONS).
+
+**Invariantes duros:** **NUNCA** candidate-facing ni en el review packet MCP de TASK-1718 (allowlist
+intacta); **NUNCA** el LLM escribe una nota directo (confirm humano SIEMPRE); **NUNCA** tocar
+score/match_score/explainability_json (la nota es narrativa, no score); **NUNCA** demográficos en
+notas (boundary TASK-1365). El scorecard display fix relacionado (global "Parcial" mientras haya
+competencias pendientes) es ISSUE-159 / `scorecard-summary.ts`. UI del expediente: task consumer
+ui-ux follow-up (placement contractado en la spec de TASK-1735 §Superficie UI).
+
+### Contrato candidate-facing del scoring IA (TASK-1734 Slice 5)
+
+El candidato **solo ve rendición y confirmación de envío**: preguntas públicas (`buildPublicQuestion`),
+sus propias respuestas, timing/accommodations y el `status` del assessment. **NUNCA** ve score
+(auto/humano/efectivo), resultados por competencia, propuestas IA, rationale, confidence, clase de
+riesgo, estado de revisión, answer key ni rubric — ni por la vista pública, ni por el route
+`/api/public/assessment/[token]` (errores genéricos `PUBLIC_MESSAGES`, 404 anti-oracle), ni por los
+emails del ciclo (el interno `hiring_assessment_submitted_internal` existe pero sin score), ni por los
+DTOs candidate/client (careers público, talent pool self-service, review packet MCP de TASK-1718).
+
+La **denylist de campos prohibidos vive como contrato ejecutable** en
+`src/lib/hiring/assessment/public-boundary.test.ts` (constante compartida en
+`public-boundary.contract.ts`, deep-scan de keys + sentinels): un campo nuevo de resultado/scoring se
+agrega a esa constante y las suites del boundary (vista pública, route público,
+`hiring-lifecycle-emails-antileak`, `candidate-boundary`, `proposal-authz-boundary`) lo cubren solas.
+El reader interno `listAiProposals` sigue global (authz en el route vía `hiring.assessment.read`);
+el reader run-scoped con resource+purpose exacto es del Slice 4.
+
+## Delta 2026-08-16 (2) — Scoring IA a escala (TASK-1734, code complete / rollout gated)
+
+El propose→confirm individual de TASK-1361 escala a un **run asíncrono, durable e idempotente por
+`hiring_assessment` exacto**: aggregate `greenhouse_hiring.hiring_assessment_ai_scoring_run` (+ `_item`,
+`_event` append-only), a lo más un run activo por assessment + digest inmutable de inputs/policy/**modelo
+EFECTIVO**. El wiring vive en el **ops-worker existente** (ADR D4): proyección reactiva
+`hiring_assessment_ai_scoring_run_enqueue` sobre `hiring.assessment.submitted` + drain con claim atómico y
+fan-out acotado **reutilizando el scorer canónico de 1361** (nunca un segundo scorer). El **risk router**
+versionado clasifica cada propuesta como `mandatory_review` / `quality_sample` (muestra **CIEGA
+ESTRUCTURAL**: el revisor puntúa sin ver la propuesta) / `batch_eligible`; policy OFF ⇒ todo es
+`mandatory_review`. La confirmación de run (`confirm_run` vía
+`POST /api/hiring/assessments/ai/scoring-runs/[runId]`, capability `hiring.assessment.score`) exige
+excepciones y muestra cerradas y escribe un **manifest append-only** con `sawProposalBeforeScoring` por
+resolución humana (anti-anclaje); los scores confirmados aplican por el camino canónico 1361/1360. El
+candidato jamás ve nada (denylist ejecutable `public-boundary.contract.ts`, sin flag — prohibido por
+contrato). Promoción **bloqueada** por `pnpm hiring:ai:promotion-gate` hasta gold set humano de Talent con
+doble rating + adjudicación. 3 flags default-OFF en el ledger, scheduler `ops-assessment-ai-drain` pausado,
+rollback por `pnpm hiring:ai:run-rollback` + flags nuevos (nunca el master). Detalle completo: ADR
+`GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md` · runbook
+`docs/operations/runbooks/assessment-ai-scoring-rollout.md` · señales `hiring.assessment_ai.*` (5, steady=0).
+
+## Delta 2026-08-16 (3) — Identidad de intake canonicalizada (TASK-1736, code complete / rollout gated)
+
+La identidad del candidato en el intake se separa en **tres capas** (ADR
+`GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1.md`): **evidencia submitted**
+application-scoped e inmutable (`greenhouse_hiring.candidate_identity_intake_evidence`, append-only con
+trigger anti-mutación), **display person-first** corregible (`identity_profiles.full_name`) y **search key**
+derivada/versionada que jamás fusiona personas. Normalización estructural determinista (NFC + whitespace +
+controles/bidi) + casing SOLO `high_confidence` (degenerado evidente, reglas culturales conservadoras);
+todo lo ambiguo deriva `needs_review`. El sticky name se cierra con `reconcileCandidateIdentityDisplayName`
+(compare-and-set + audit `candidate_identity_display_audit`; una corrección humana SIEMPRE gana). La
+corrección manual es la capability nueva `hiring.candidate.correct_display` (role-only: EFEONCE_ADMIN +
+HR_MANAGER + EFEONCE_OPERATIONS). La remediación histórica es `dry-run → allowlist humana → apply CAS en
+lotes de 1 → rollback` vía `pnpm hiring:candidates:remediate-display`, independiente del flag
+`HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED` (Vercel-only, default OFF — gatea solo el writer del
+intake). Primitives: `src/lib/hiring/candidate-intake/**`. Señales `hiring.candidate_identity.*` (2,
+steady=0) · runbook `docs/operations/runbooks/candidate-identity-rollout.md` · funcional
+`docs/documentation/hr/identidad-de-candidatos-intake.md` · manual
+`docs/manual-de-uso/hr/operar-remediacion-nombres-candidatos.md`.
+
+**⚠️ Cambio de semántica del primitive 360 `createIdentityProfile` — afecta a TODOS los consumers
+(A3, auditoría 2026-08-16).** El fix del sticky name cambió el `ON CONFLICT (profile_id) DO UPDATE`
+de `organization-store.ts` a `full_name = COALESCE(full_name existente, EXCLUDED.full_name)`: el
+primitive ahora **preserva** el `full_name` vigente y sólo llena vacíos. Esto rige para **todo**
+consumer del primitive — HubSpot contacts, finance suppliers, org memberships, no sólo Hiring: un
+rename en el sistema externo **ya no refresca** `full_name` vía `ON CONFLICT`. El refresh legítimo
+exige un camino de reconcile propio del dominio (hoy sólo Hiring lo tiene:
+`reconcileCandidateIdentityDisplayName`, CAS + audit); dotar de reconcile a los demás dominios es un
+follow-up declarado (ver Delta de enmiendas del ADR
+`GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1.md`).
+
+**Auditoría doble 2026-08-16 — remediación completada:** el apply histórico persiste actor + motivo
+en el audit del reconcile (no sólo los valida); existe rollback per-record real
+(`rollbackCandidateIdentityRemediation` / CLI `--rollback <auditId>`: CAS del before-value del audit
+`reconcile/applied`, registrado como corrección humana; discrepancia ⇒ `needs_review` sin mutar); el
+retry de un apply exitoso es idempotente (`already_canonical` cuenta como éxito); el edge de display
+vacío materializa el placeholder neutro `Candidato` + `needs_review` (jamás un display invisible); la
+evidencia trunca defensivamente a 400 chars pre-INSERT y el capture a Sentry de esa capa viaja
+sanitizado (code/constraint PG, jamás DETAIL con PII).
+
+## Delta 2026-08-16 (4) — Tab Expediente + gate anti-anclaje server-enforced (TASK-1737, code complete / rollout gated)
+
+El Expediente de Evaluación (TASK-1735) gana consumer UI y **cierra el gate BLOQUEANTE** que su
+Delta (3) dejó abierto: un evaluador con `hiring.application.read` podía leer el análisis con
+scores antes de rendir su propio scorecard, debilitando el invariante anti-anclaje de TASK-1383.
+
+**Predicado único (no duplicar el SQL).** El estado "¿el scorecard PROPIO del viewer en esta
+application está cerrado?" se extrajo a `getOwnScorecardStateForApplication(applicationId,
+viewerUserId)` en `src/lib/hiring/assessment/instances.ts`. Lo consumen los TRES caminos:
+`listResponses`, `listPeerScorecardResults` (ratings, TASK-1383) e
+`isViewerBlindForApplicationEvaluation` (expediente, TASK-1737). `CLOSED_SCORECARD_STATUSES =
+['submitted','scored']`. Un operador **sin** scorecard asignado (reclutador/People Ops) NO activa
+el predicado.
+
+**Contrato del reader.** `listHiringApplicationNotes(applicationId, viewerUserId?)` devuelve
+`HiringApplicationNotesView = { notes, hiddenNoteCount, viewerBlindUntilScorecardSubmitted }`.
+Para el viewer bloqueado omite (a) las notas de `HIRING_SCORE_BEARING_NOTE_KINDS` de OTROS
+autores y (b) **toda** nota `source='agent'` (el análisis IA lee scores por construcción). Las
+notas propias del viewer y las `general` ajenas SIEMPRE pasan. **Sin `viewerUserId` no filtra** —
+espejo exacto de `listResponses`, para que las llamadas server-internas (el confirm del dossier
+lee notas) no se rompan.
+
+**Contrato de las rutas.** `GET /notes` pasa `tenant.userId` como viewer y sirve el payload ya
+filtrado. `GET /dossier` evalúa el predicado ANTES de leer la propuesta y, bajo bloqueo, responde
+`{ aiEnabled, proposal: null, viewerBlindUntilScorecardSubmitted: true, hiddenNoteCount }`.
+
+**Invariantes para agentes:**
+
+- **NUNCA** implementar el anti-anclaje del expediente como filtro client-side ni duplicar el SQL
+  del predicado: la ceguera vive en el reader, así que Nexa/MCP y cualquier consumer futuro la
+  heredan por construcción (lección estructural del blind sample de TASK-1734).
+- **NUNCA** bloquear el expediente entero bajo el predicado: el bloqueo es fino (score-bearing
+  ajeno + `agent`) para que el evaluador siga anotando su propia entrevista.
+- **NUNCA** confundir `notes: null` (el reader FALLÓ — la page observa con `captureWithDomain` y
+  degrada honesto) con expediente vacío.
+- La UI es cliente delgado: `src/views/greenhouse/hiring/ApplicationDossierPanel.tsx` sólo
+  renderiza DTOs y llama las rutas; cero lógica de negocio.
+
+Superficie: tab `expediente` de `/agency/hiring/applications/[applicationId]` (rename de
+`activity`, alias `?tab=activity` preservado). Copy en `hiringDesk.application.expediente.*`
+(56 claves, parity es-CL/en-US). Dirección visual
+`docs/ui/visual-directions/TASK-1737-application-expediente-direction.md` · funcional
+`docs/documentation/hr/expediente-de-evaluacion.md` · manual
+`docs/manual-de-uso/hr/operar-expediente-de-evaluacion.md`. **Rollout gated:**
+`HIRING_EVALUATION_DOSSIER_AI_ENABLED` sigue OFF en producción (dueño TASK-1735; con el flag OFF
+la UI muestra el estado honesto `ai-off`) y la evidencia visual del panel de propuesta con datos
+reales queda pendiente de staging.
+
+## Delta 2026-08-17 — Contratos que el primer uso real corrigió (TASK-1735, TASK-1734, TASK-1738)
+
+Tres correcciones de contrato descubiertas al ejercer el dominio con datos reales, no por tests.
+Las tres comparten una misma lección: **un contrato implícito se rompe en silencio**, y lo hace
+justo donde nadie está mirando.
+
+### 1. La nota del expediente no se trunca en silencio (TASK-1735, límite 20000)
+
+El primer confirm humano de producción-local (propuesta `hdsp-384b740a`) persistió la nota en
+exactamente **8000 caracteres** — el techo del CHECK `hiring_application_note_body_md_check` —
+mientras el markdown del borrador medía 8240. `renderEvaluationDossierMarkdown` recortaba antes del
+insert y el análisis quedó cortado a mitad de frase. **El panel no lo delataba** porque renderiza
+desde `proposedJson`; todo consumer del `bodyMd` (API, export, Nexa, MCP) leía un documento
+incompleto.
+
+- **Migración aditiva**: CHECK del body a `1..20000` (widening puro — 8000 era conservador sin
+  fundamento para narrativa de evaluación con evidencia citada). Aplicada y verificada contra PG real.
+  `HIRING_APPLICATION_NOTE_BODY_MAX` es el espejo exacto del CHECK.
+- **El write path falla loud**: `assertDossierBodyWithinLimit` → 400 `hiring_dossier_body_too_long`
+  con el largo real en un mensaje es-CL. **Truncar sin avisar es justo el bug que produjo esto.**
+- **Reparación append-only**: `scripts/hiring/repair-truncated-dossier-notes.ts` reconstruye el texto
+  íntegro desde el `proposed_json` del ledger y registra una nota **NUEVA** vía
+  `recordHiringApplicationNote` con `context_json.supersedesNoteId` + `reason='truncation_repair'`.
+  Idempotente. La fila superada **no se muta** — el ledger sigue siendo append-only.
+
+**Invariante para agentes:** **NUNCA** recortar un cuerpo para que quepa en un CHECK. Si no cabe,
+el write falla con el largo real. Un documento mutilado que se ve entero en una pantalla es peor
+que un error.
+
+### 2. La nota superada se muestra como historia, no como vigente (TASK-1735)
+
+Reparar generó el problema derivado: dos notas, una correcta y una truncada, ambas visibles como
+vigentes. El reader deriva `supersededByNoteId` **desde la nota posterior**
+(`context_json.supersedesNoteId`), nunca mutando la fila superada, y el panel la marca con el chip
+**"Versión superada"** + tratamiento atenuado.
+
+**Invariante para agentes:** en un ledger append-only, el estado "superado" se **deriva en el
+reader** desde la referencia de la fila posterior. **NUNCA** agregar una columna mutable
+`superseded` a la fila vieja: eso convierte el append-only en un update disfrazado.
+
+### 3. La escala de `perCriterion` se declara, no se supone (TASK-1734, policy `v1_1`)
+
+`per_criterion_contradictory` disparaba en **11 de 14** items del primer run real — y disparaba
+justo en las respuestas **BUENAS**. El scorer devolvía **aportes ponderados que SUMAN el score
+global** (91 = 18+25+25+23, la escala que la rúbrica del banco declara en su propio texto) y el
+router los comparaba contra su **PROMEDIO**. Con 4 criterios de 25 puntos, un 91 sano tiene promedio
+22,75 → delta 68 ≫ 25 → contradicción falsa **por construcción**: cuanto mejor la respuesta, más
+contradictoria se veía. Efecto: `batch_eligible` muerto y el operador revisando todo a mano — el
+subsistema perdía su razón de ser.
+
+La causa no fue un `mean` mal tipeado: fue un **contrato implícito**. El prompt v1 pedía "el puntaje
+por criterio" y el schema declaraba 0–100 por criterio; _aporte ponderado_ y _nota independiente_
+eran lecturas igual de válidas, y el modelo alternaba entre ambas según la calidad de la respuesta.
+
+- **Contrato**: escala declarada `weighted_contribution` (`weight` + `score` ≤ `weight`); el schema
+  exige `weight` y el sanitizer normaliza y acota el drift de escala propia.
+- **Prompt**: pide la escala explícitamente (`...scoring.v2`; las proposals v1 quedan stale).
+- **`summarizeCriterionContribution`**: única traducción aportes → score global implicado.
+- **Router**: compara contra el implicado, bajo policy `...risk_policy.v1_1`.
+- **Workbench**: el aporte se lee **sobre su peso** (`18 / 25`), no como nota suelta.
+
+Replay de los 14 proposals reales: **11/14 → 2/14**, y las 2 restantes son contradicciones reales
+del modelo (global 21 con aportes que implican 65).
+
+**Invariante para agentes:** **NUNCA** dejar que un consumer infiera la escala de un valor devuelto
+por un LLM. La escala se **declara en el contrato** (nombre del modo + `weight`), se valida en el
+schema y se traduce en UN solo helper. Un prompt ambiguo produce un dato ambiguo, y el modelo
+alterna entre lecturas sin avisar.
+
+### 4. Instrumento del gold set y su hallazgo de volumen (TASK-1734)
+
+El gate de promoción sigue **bloqueante**, pero ya no por falta de instrumento: `pnpm
+hiring:ai:gold-set-sample` entrega muestreo estratificado por competencia × banda sobre respuestas
+reales anonimizadas (semilla determinística, casos difíciles incluidos, **estratos incompletos
+declarados sin rellenar**), la rúbrica de anclaje conductual BARS derivada del banco real y el
+protocolo de rating en ciego con sus 3 rutas y su alcance honesto. El gate es consciente de ruta.
+
+**Hallazgo del muestreo real:** la DB tiene **11 respuestas humanas calificadas contra un piso de
+49**. La ruta A (doble rating independiente + adjudicación) **no es ejecutable hoy por falta de
+DATOS, no de personas**. El carril uno-a-uno es el modo correcto ahora mismo y es precisamente lo
+que genera esa materia prima.
+
+**Invariante para agentes:** **NINGÚN** rating humano puede ser generado por un agente. El
+instrumento se entrega **vacío**. Y **NUNCA** describir el gold set como "pendiente de personas"
+cuando está pendiente de **volumen**: son bloqueos distintos con planes de acción distintos.
+
+### 5. El frame real como evidencia (TASK-1738)
+
+Correr GVC sobre un run **REAL** con `claude-sonnet-5` destapó lo que ningún test verde atrapó:
+`manifestSummary` renderizaba `{a}/{a}` y por lo tanto **decía siempre 100%** mientras los gates
+debajo decían "faltan 10" — exactamente el bug class que esa superficie existe para impedir —,
+`warning.main` como texto daba 1,74:1 en las dos frases más load-bearing, la cobertura honesta se
+iba con el scroll y `sx={{ ms: 1 }}` no aplicaba margen alguno porque `ms` no existe en MUI.
+
+**Invariante para agentes:** una superficie cuyo propósito es **no mentir sobre cobertura** debe
+verificarse mirando el frame real con datos reales. Los tests verdes no vieron ninguno de estos
+cinco defectos.
+
+Funcional `docs/documentation/hr/expediente-de-evaluacion.md` +
+`docs/documentation/hr/scoring-ia-de-assessments.md` + `docs/documentation/hr/gold-set-rubrica-de-anclaje.md` ·
+manual `docs/manual-de-uso/hr/operar-expediente-de-evaluacion.md` +
+`docs/manual-de-uso/hr/operar-scoring-ia-assessments.md` +
+`docs/manual-de-uso/hr/calificar-gold-set-de-referencia.md`.
+
+## Delta 2026-08-17 (2) — Seniority público canónico y separado de assessments (TASK-1741)
+
+- **Status:** `Accepted` · **Owner:** Talent/Hiring · **Scope:** `hiring_opening.public_seniority`,
+  publicación canónica, AI vacancy copy y Careers · **Reversibility:** `two-way` · **Confidence:** `high`
+  · **Validated as of:** `2026-08-17`.
+- **Decisión:** el seniority candidate-facing usa exactamente `Junior`, `Semi-senior`, `Senior` o
+  `Lead`. El nivel interno de assessment (`L1/L2/L3`) permanece en `hiring_opening.seniority` y en
+  templates; nunca cruza a `public_seniority`. `Intermedio` queda reservado para proficiency de una
+  habilidad, no para el nivel del rol. Si `public_title` declara explícitamente un nivel, debe coincidir.
+- **Enforcement:** `src/lib/hiring/public-seniority.ts` es la regla browser/server-safe; selector humano,
+  JSON Schema + sanitizer de IA, `updateHiringOpening`, `publishOpening`, readers públicos fail-closed y
+  CHECK `hiring_opening_public_seniority_check` la consumen o espejan. La migración gobernada calibra los
+  valores legacy conocidos `L2` e `Intermedio` a `Semi-senior` y aborta ante cualquier valor desconocido.
+- **Alternativas rechazadas:** mostrar texto libre (permitió el leak `L2`); traducir en el renderer
+  (oculta corrupción y deja API/schema divergentes); reutilizar el nivel de assessment (mezcla una rúbrica
+  interna con lenguaje de mercado).
+- **Consecuencia:** una vacante inválida falla en escritura/publicación y una fila corrupta no aparece ni
+  acepta postulaciones por el reader público. El renderer conserva el valor exacto, sin reinterpretarlo.
+- **Revisit when:** Efeonce necesite un nivel público adicional sustentado por arquitectura de carrera y
+  benchmarking; debe agregarse de forma atómica a contrato, UI, IA, CHECK, docs y migración.
+
+## Delta 2026-08-17 (3) — Arquitectura editorial canónica de vacantes v2 (TASK-1740/1741)
+
+- **Status:** `Accepted` · **Owner:** Talent/Hiring + Public Careers · **Scope:** contenido público,
+  publicación, renderer y JobPosting · **Reversibility:** `two-way` para renderer, `expand-only` para writes
+  · **Confidence:** `high` · **Validated as of:** `2026-08-17`.
+- **Decisión:** todas las vacantes nuevas usan la misma arquitectura de información mediante
+  `PublicOpeningContent.version=2`. El contrato exige promesa, misión, 3–5 outcomes, 4–8 work items,
+  essentials, evidencia, modelo de trabajo, colaboración y proceso. Puede añadir máximo tres secciones
+  tipadas (`narrative|bullets|milestones`) después del trabajo. Contexto corporativo y beneficios globales
+  se resuelven desde `standard-content.ts`; el opening guarda sólo adiciones del rol.
+- **Enforcement:** el parser acepta sólo v2 en writes; `publishOpening` exige v2 completo y países ISO en
+  remoto; el vacancy publication operator deriva las proyecciones legacy; renderer y JobPosting consumen
+  la misma evidencia resuelta. V1 es read-only y conserva fallback por sección para filas publicadas.
+- **Alternativas rechazadas:** plantilla libre por vacante (drift y regresión visual); bloques HTML/CTA
+  arbitrarios (superficie insegura e imposible de comparar); duplicar beneficios y texto corporativo en
+  cada opening (desactualización); mantener v2 y prosa como dos superficies editables (claims divergentes).
+- **Consecuencia:** la complejidad del rol cambia el contenido y hasta tres bloques de profundidad, no la
+  arquitectura ni los CTA. Un humano o agente recibe 422 antes de publicar una vacante incompleta.
+- **Revisit when:** datos reales demuestren que tres bloques o los tres formatos no cubren una familia de
+  roles; el cambio debe versionar el contrato y preservar paridad HTML/JobPosting.

@@ -725,6 +725,15 @@ const normalizeToken = (v: string) => v.trim().toLowerCase().replace(/[^a-z0-9]+
 const buildIdentityProfileId = (source: { sourceSystem: string; sourceObjectType: string; sourceObjectId: string }) =>
   `identity-${normalizeToken(source.sourceSystem)}-${normalizeToken(source.sourceObjectType)}-${normalizeToken(source.sourceObjectId)}`
 
+// TASK-1736 Slice 2 (ADR GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1 §D3) —
+// semántica declarada de `full_name` en este primitive:
+// 1. Rama email-first: si el email ya existe, devuelve el perfil previo SIN tocar `full_name`.
+// 2. Rama `ON CONFLICT (profile_id)`: PRESERVA el `full_name` existente (COALESCE — sólo lo llena
+//    si estaba NULL). Ya NO sobreescribe verbatim: un re-upsert con un nombre distinto jamás pisa
+//    el vigente por last-write-wins.
+// El ÚNICO camino para refrescar el display de una identidad existente es
+// `reconcileCandidateIdentityDisplayName` (`src/lib/hiring/candidate-intake/reconcile-display.ts`;
+// compare-and-set + precondiciones D3 + audit append-only). No agregar acá reconciliación ad-hoc.
 export const createIdentityProfile = async (data: {
   sourceSystem: string
   sourceObjectType: string
@@ -752,7 +761,7 @@ export const createIdentityProfile = async (data: {
     ) VALUES ($1, $2, $3, 'external_contact', $4, $5, $6, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     ON CONFLICT (profile_id) DO UPDATE
     SET
-      full_name = EXCLUDED.full_name,
+      full_name = COALESCE(greenhouse_core.identity_profiles.full_name, EXCLUDED.full_name),
       canonical_email = COALESCE(EXCLUDED.canonical_email, greenhouse_core.identity_profiles.canonical_email),
       updated_at = CURRENT_TIMESTAMP,
       active = TRUE

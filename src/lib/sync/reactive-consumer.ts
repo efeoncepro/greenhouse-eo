@@ -182,6 +182,14 @@ const parsePayload = (event: ReactiveEventRow): Record<string, unknown> => {
   parsed._eventType = event.event_type
   parsed._eventId = event.event_id
 
+  // La fecha del evento ya venía en la fila pero no se exponía, así que ninguna projection
+  // podía saber qué tan viejo era lo que estaba procesando. Importa porque la Phase A NO
+  // tiene ventana temporal: un handler key nuevo barre todo el histórico de su event type
+  // en la primera corrida. Una projection que comunica hacia afuera necesita poder negarse
+  // a actuar sobre un evento rancio (TASK-1719).
+  parsed._occurredAt =
+    event.occurred_at instanceof Date ? event.occurred_at.toISOString() : String(event.occurred_at)
+
   return parsed
 }
 

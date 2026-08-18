@@ -78,6 +78,34 @@ The engine (EPIC-011 / TASK-1360..1363) implements exactly the above. Map your w
 
 Detail + invariants: `references/greenhouse-runtime.md`.
 
+### Cuándo se manda la prueba — `shortlisted`, y no es una decisión de eficiencia
+
+La etapa canónica de disparo del candidate test es **`shortlisted` (Preselección)**. `interview`
+sigue habilitada, pero elegirla exige justificación deliberada. Dos razones independientes:
+
+1. **La prueba es la evidencia CON la que se arma la entrevista, no un paso posterior.** La ganancia
+   de validez real está en combinar entrevista estructurada + muestra de trabajo (≈.63 vs cualquiera
+   sola). Esa ganancia **no es automática por tener las dos cosas**: aparece cuando la entrevista
+   puede interrogar lo que la prueba dejó abierto — o sea, cuando la prueba llegó antes. Disparar en
+   `interview` entrega los dos métodos sin la combinación: se entrevista a ciegas y el resultado
+   llega cuando ya no puede cambiar ninguna pregunta.
+2. **El momento del filtro es una decisión de EQUIDAD.** Una prueba no pagada aplicada temprano no
+   sesga por el puntaje: sesga por **quién logra completarla** (empleo actual, personas a cargo,
+   conectividad, margen económico). Es impacto adverso por **completación**, y es estructuralmente
+   invisible en las métricas de scoring porque esas personas nunca llegan a tener una. En
+   `shortlisted` la población ya está acotada, el pedido tiene contrapartida para el candidato
+   ("avanzaste, esto es lo que sigue") y una caída de completación sí es interpretable.
+
+**NUNCA habilitar `screening` como trigger sin resolver antes qué se le comunica al candidato**: no
+es una etapa candidate-facing, así que un assignment bloqueado ahí degrada a **silencio** y rompe el
+invariante "una comunicación por movimiento, ni cero ni dos".
+
+**SIEMPRE vigilar la tasa de completación por cohorte** al encender la automatización: es la única
+superficie donde ese sesgo por abandono se ve.
+
+Constante en runtime: `OPENING_ASSESSMENT_RECOMMENDED_TRIGGER_STAGE` (`src/types/hiring-assessment-policy.ts`).
+Contrato completo e invariante 21: `docs/architecture/GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md`.
+
 ## Analyzing an interview / candidate by competencies (the "analysis" ask)
 
 When asked to *analyze* an interview or evaluate a candidate:

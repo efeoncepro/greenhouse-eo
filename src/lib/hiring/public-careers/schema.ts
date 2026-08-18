@@ -1,6 +1,7 @@
 // TASK-1367 — Validación PURA del payload de postulación pública (single source of truth,
 // estilo grader public-intake, NO Zod). Sin IO. Normaliza email + valida URLs browser-safe.
 
+import { resolveHiringAvailability } from '@/lib/hiring/candidate-intake/availability'
 import { validateE164PhoneValue } from '@/lib/growth/forms/validators/phone'
 import { isValidCountryCode } from '@/lib/locale/countries'
 
@@ -72,6 +73,11 @@ export const parsePublicHiringApplication = (raw: unknown): NormalizedApplicatio
   if (body.consent !== true) return null
 
   const openingPublicId = asTrimmed(body.openingPublicId, 200)
+
+  // TASK-1736 (ADR D1) — el nombre se conserva RAW EXACTO como evidencia del postulante (sólo trim
+  // exterior + cap, igual que siempre). El parser NO normaliza NFC/whitespace/casing: la
+  // normalización estructural ocurre en el primitive canónico `@/lib/hiring/candidate-intake`
+  // dentro del command, sin mutar jamás lo que la persona escribió.
   const firstName = asTrimmed(body.firstName, MAX_NAME)
   const lastName = asTrimmed(body.lastName, MAX_NAME)
   const email = normalizeEmail(asTrimmed(body.email, MAX_NAME))
@@ -112,7 +118,11 @@ export const parsePublicHiringApplication = (raw: unknown): NormalizedApplicatio
     residenceCountryCode: residenceRaw || null,
     portfolioUrl: portfolioRaw || null,
     linkedinUrl: linkedinRaw || null,
-    availability: asTrimmed(body.availability, MAX_NAME) || null,
+    // TASK-1736 — availability se contrasta server-side contra el catálogo estable de options del
+    // Growth Form (mismo SSOT de copy): match mecánico-seguro devuelve el valor CANÓNICO; un valor
+    // fuera de catálogo se conserva como texto acotado (fallback tolerante — el intake público
+    // jamás pierde una application por esto).
+    availability: resolveHiringAvailability(asTrimmed(body.availability, MAX_NAME)).value,
     message: asTrimmed(body.message, MAX_MESSAGE) || null,
     consentPolicyVersion: asTrimmed(body.consentPolicyVersion, MAX_NAME) || null,
     futureOpportunitiesConsent: body.futureOpportunitiesConsent === true

@@ -19,6 +19,9 @@ export interface DetailHeroProps {
   metadata?: ReactNode
   actions?: ReactNode
   leading?: ReactNode
+  supporting?: ReactNode
+  titleId?: string
+  titleTabIndex?: number
   variant?: DetailHeroVariant
   kind?: DetailHeroKind
   dataCapture?: string
@@ -33,6 +36,9 @@ const DetailHero = ({
   metadata,
   actions,
   leading,
+  supporting,
+  titleId,
+  titleTabIndex,
   variant,
   kind = 'entity',
   dataCapture
@@ -52,7 +58,9 @@ const DetailHero = ({
         background:
           resolvedVariant === 'evidence'
             ? `linear-gradient(135deg, ${theme.palette.background.paper}, ${theme.palette.primary.lightOpacity})`
-            : 'transparent',
+            : resolvedVariant === 'entity'
+              ? 'transparent'
+              : theme.palette.background.paper,
         border: resolvedVariant === 'entity' ? 'none' : '1px solid',
         borderColor: resolvedVariant === 'evidence' ? 'primary.lightOpacity' : 'divider',
         boxShadow: resolvedVariant === 'entity' ? 'none' : theme.greenhouseElevation.raised.boxShadow,
@@ -71,7 +79,13 @@ const DetailHero = ({
               ) : null}
               {statusLabel ? <GreenhouseChip label={statusLabel} kind='status' variant='label' tone={statusTone} size='small' /> : null}
             </Stack>
-            <Typography component='h2' variant={resolvedVariant === 'report' ? 'h4' : 'h5'} sx={{ textWrap: 'balance' }}>
+            <Typography
+              id={titleId}
+              tabIndex={titleTabIndex}
+              component='h2'
+              variant={resolvedVariant === 'report' ? 'h4' : 'h5'}
+              sx={{ textWrap: 'balance', overflowWrap: 'anywhere', outline: 'none' }}
+            >
               {title}
             </Typography>
             {description ? (
@@ -84,6 +98,11 @@ const DetailHero = ({
         {actions ? <Box sx={{ flexShrink: 0 }}>{actions}</Box> : null}
       </Stack>
       {metadata ? <Box sx={{ color: 'text.primary' }}>{metadata}</Box> : null}
+      {supporting ? (
+        <Box sx={{ pt: 3, borderBlockStart: '1px solid', borderColor: 'divider' }}>
+          {supporting}
+        </Box>
+      ) : null}
     </Stack>
   )
 }

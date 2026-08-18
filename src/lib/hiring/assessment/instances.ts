@@ -79,7 +79,7 @@ const hashToken = (raw: string): string => createHash('sha256').update(raw).dige
 
 // ── Normalizers ──
 
-type AssessmentRow = {
+export type AssessmentRow = {
   assessment_id: unknown
   public_id: unknown
   application_id: unknown
@@ -96,7 +96,7 @@ type AssessmentRow = {
   updated_at: unknown
 }
 
-const normalizeAssessment = (r: AssessmentRow): Assessment => ({
+export const normalizeAssessment = (r: AssessmentRow): Assessment => ({
   assessmentId: str(r.assessment_id),
   publicId: str(r.public_id),
   applicationId: str(r.application_id),
@@ -114,7 +114,7 @@ const normalizeAssessment = (r: AssessmentRow): Assessment => ({
 })
 
 // public_id excluye access_token_hash del view model — el hash NUNCA sale del store.
-const ASSESSMENT_COLS = `assessment_id, public_id, application_id, template_id, method, evaluator_user_id, status, time_limit_minutes, accommodations_json, started_at, submitted_at, created_by, created_at, updated_at`
+export const ASSESSMENT_COLS = `assessment_id, public_id, application_id, template_id, method, evaluator_user_id, status, time_limit_minutes, accommodations_json, started_at, submitted_at, created_by, created_at, updated_at`
 
 type ResponseRow = {
   response_id: unknown
@@ -174,15 +174,19 @@ return rows.map(normalizeAssessment)
 /** Vigencia del link tokenizado del candidato (TASK-1383; 1363 comunica la fecha). */
 const TOKEN_TTL_DAYS = 14
 
+/**
+ * TASK-1719 — Espejo SQL del ÚNICO contrato canónico de accommodations: `extraMinutes`.
+ *
+ * ⚠️ Aceptaba las mismas cuatro grafías que el lector TS (`timeExtensionMinutes`,
+ * `additionalMinutes`, `extendedTimeMinutes`). Se narró junto con el write path
+ * (`accommodations.ts`), con la base verificada en 0 filas con `accommodations_json <> '{}'`.
+ * Este predicado decide cuándo una instancia vence: si divergiera del lector TS
+ * (`resolveAssessmentTiming`), el candidato vería un contador y el sistema aplicaría otro.
+ * Cualquier cambio acá va acompañado del cambio allá, o son dos verdades.
+ */
 const ACCOMMODATION_EXTRA_MINUTES_SQL = `GREATEST(0, COALESCE(
   CASE WHEN (accommodations_json->>'extraMinutes') ~ '^[0-9]+(\\.[0-9]+)?$'
     THEN FLOOR((accommodations_json->>'extraMinutes')::numeric)::int END,
-  CASE WHEN (accommodations_json->>'timeExtensionMinutes') ~ '^[0-9]+(\\.[0-9]+)?$'
-    THEN FLOOR((accommodations_json->>'timeExtensionMinutes')::numeric)::int END,
-  CASE WHEN (accommodations_json->>'additionalMinutes') ~ '^[0-9]+(\\.[0-9]+)?$'
-    THEN FLOOR((accommodations_json->>'additionalMinutes')::numeric)::int END,
-  CASE WHEN (accommodations_json->>'extendedTimeMinutes') ~ '^[0-9]+(\\.[0-9]+)?$'
-    THEN FLOOR((accommodations_json->>'extendedTimeMinutes')::numeric)::int END,
   0
 ))`
 
@@ -233,6 +237,99 @@ interface AssignCandidateTestInput {
   accommodations?: Record<string, unknown>
 }
 
+/**
+ * Estados en los que una instancia YA cuenta como abierta para (application, template).
+ * Es exactamente el predicado del índice parcial `hiring_assessment_open_instance_unique_idx`
+ * — incluye `submitted`. Antes el SELECT previo filtraba sólo 3 estados mientras el índice
+ * cubría 4: con una instancia `submitted` el INSERT reventaba con un `23505` crudo que salía
+ * como HTTP 500 `hiring_internal_error` con `actionable: true` (la UI ofrecía "Reintentar"
+ * para algo que no se resuelve reintentando nunca) y, en el carril reactivo, fabricaba
+ * dead-letters. NUNCA desalinear esta lista del predicado del índice.
+ */
+export const OPEN_ASSESSMENT_INSTANCE_STATUSES = ['assigned', 'sent', 'in_progress', 'submitted'] as const
+
+const OPEN_INSTANCE_SQL_PREDICATE = `status IN ('assigned', 'sent', 'in_progress', 'submitted')`
+
+/** Instancia candidate_test ya abierta para (application, template) — la ganadora de la carrera. */
+export const findOpenCandidateTest = async (
+  client: PoolClient | null,
+  applicationId: string,
+  templateId: string,
+): Promise<Assessment | null> => {
+  const rows = await runQuery<AssessmentRow>(
+    client,
+    `SELECT ${ASSESSMENT_COLS} FROM greenhouse_hiring.hiring_assessment
+     WHERE application_id = $1 AND template_id = $2 AND method = 'candidate_test'
+       AND ${OPEN_INSTANCE_SQL_PREDICATE} LIMIT 1`,
+    [applicationId, templateId],
+  )
+
+  return rows[0] ? normalizeAssessment(rows[0]) : null
+}
+
+export interface InsertCandidateTestResult {
+  assessment: Assessment
+  created: boolean
+  /** SÓLO en la rama `created: true`. La rama `created: false` NUNCA devuelve token. */
+  token: string | null
+}
+
+/**
+ * Primitive transaccional de creación de la instancia tokenizada (ADR D2).
+ *
+ * `ON CONFLICT DO NOTHING RETURNING` sobre el índice parcial ya existente + re-lectura del
+ * ganador, **sin excepción de por medio**: la carrera no es un error, es un resultado tipado.
+ * Cierra de una vez las dos vías de escape del check-then-insert anterior — el mismatch de
+ * predicado (determinista, con una instancia `submitted`) y la carrera entre SELECT e INSERT.
+ *
+ * El caller decide qué significa `created: false`: el route legacy lo traduce a 409
+ * `assessment_already_open`; el command gobernado devuelve `already_assigned` tipado.
+ */
+export const insertCandidateTest = async (
+  client: PoolClient,
+  input: AssignCandidateTestInput,
+  actorUserId: string | null,
+): Promise<InsertCandidateTestResult> => {
+  const applicationId = str(input.applicationId)
+  const templateId = str(input.templateId)
+  const rawToken = randomBytes(24).toString('base64url')
+
+  const rows = await runQuery<AssessmentRow>(
+    client,
+    `INSERT INTO greenhouse_hiring.hiring_assessment
+       (application_id, template_id, method, status, access_token_hash, time_limit_minutes, accommodations_json, created_by, token_expires_at)
+     VALUES ($1, $2, 'candidate_test', 'assigned', $3, $4, $5::jsonb, $6, NOW() + make_interval(days => ${TOKEN_TTL_DAYS}))
+     ON CONFLICT (application_id, template_id) WHERE ${OPEN_INSTANCE_SQL_PREDICATE}
+     DO NOTHING
+     RETURNING ${ASSESSMENT_COLS}`,
+    [
+      applicationId,
+      templateId,
+      hashToken(rawToken),
+      input.timeLimitMinutes ?? null,
+      JSON.stringify(input.accommodations ?? {}),
+      actorUserId,
+    ],
+  )
+
+  if (rows[0]) {
+    return { assessment: normalizeAssessment(rows[0]), created: true, token: rawToken }
+  }
+
+  const winner = await findOpenCandidateTest(client, applicationId, templateId)
+
+  if (!winner) {
+    throw new HiringValidationError(
+      'No se pudo registrar la evaluación de esta postulación.',
+      'assessment_assignment_conflict',
+      409,
+    )
+  }
+
+  // El token del intento perdedor se descarta: el link vive una sola vez, en su ganador.
+  return { assessment: winner, created: false, token: null }
+}
+
 /** Crea (o reusa) una instancia candidate_test tokenizada. El token crudo se devuelve UNA vez. */
 export const assignCandidateTest = async (
   input: AssignCandidateTestInput,
@@ -254,56 +351,30 @@ export const assignCandidateTest = async (
 
     if (!app[0]) throw new HiringValidationError('La postulación no existe.', 'hiring_application_not_found', 400)
 
-    // Idempotencia: si ya hay un candidate_test abierto para (application, template), lo reusamos
-    // (sin re-emitir token — el token vive una sola vez).
-    const existing = await runQuery<AssessmentRow>(
-      client,
-      `SELECT ${ASSESSMENT_COLS} FROM greenhouse_hiring.hiring_assessment
-       WHERE application_id = $1 AND template_id = $2 AND method = 'candidate_test'
-         AND status IN ('assigned', 'sent', 'in_progress') LIMIT 1`,
-      [applicationId, templateId],
-    )
+    const result = await insertCandidateTest(client, { ...input, applicationId, templateId }, actorUserId)
 
-    if (existing[0]) {
+    // Contrato POST legacy intacto: `created:false` → 409 `assessment_already_open`, ahora
+    // también para la instancia `submitted` que antes salía como 500 actionable.
+    if (!result.created || !result.token) {
       throw new HiringValidationError(
         'Ya existe una evaluación abierta para esta postulación y plantilla.',
         'assessment_already_open',
         409,
-        { assessmentId: str(existing[0].assessment_id) },
+        { assessmentId: result.assessment.assessmentId },
       )
     }
-
-    const rawToken = randomBytes(24).toString('base64url')
-
-    const rows = await runQuery<AssessmentRow>(
-      client,
-      `INSERT INTO greenhouse_hiring.hiring_assessment
-         (application_id, template_id, method, status, access_token_hash, time_limit_minutes, accommodations_json, created_by, token_expires_at)
-       VALUES ($1, $2, 'candidate_test', 'assigned', $3, $4, $5::jsonb, $6, NOW() + make_interval(days => ${TOKEN_TTL_DAYS}))
-       RETURNING ${ASSESSMENT_COLS}`,
-      [
-        applicationId,
-        templateId,
-        hashToken(rawToken),
-        input.timeLimitMinutes ?? null,
-        JSON.stringify(input.accommodations ?? {}),
-        actorUserId,
-      ],
-    )
-
-    const assessment = normalizeAssessment(rows[0])
 
     await publishOutboxEvent(
       {
         aggregateType: AGGREGATE_TYPES.hiringAssessment,
-        aggregateId: assessment.assessmentId,
+        aggregateId: result.assessment.assessmentId,
         eventType: EVENT_TYPES.hiringAssessmentAssigned,
-        payload: { assessmentId: assessment.assessmentId, applicationId, templateId, method: 'candidate_test' },
+        payload: { assessmentId: result.assessment.assessmentId, applicationId, templateId, method: 'candidate_test' },
       },
       client,
     )
-    
-return { assessment, token: rawToken }
+
+    return { assessment: result.assessment, token: result.token }
   })
 }
 
@@ -482,6 +553,52 @@ return normalizeResponse(rows[0])
   })
 }
 
+// ── Predicado anti-anclaje compartido (TASK-1383 · TASK-1737) ──
+// UN solo lugar decide "¿el scorecard PROPIO del viewer en esta application está cerrado?".
+// Lo consumen listResponses / listPeerScorecardResults (ratings) y el filtro del
+// Expediente de Evaluación (`listHiringApplicationNotes`, TASK-1737). No duplicar el SQL.
+
+const CLOSED_SCORECARD_STATUSES = ['submitted', 'scored'] as const
+
+export interface OwnScorecardState {
+  /** El viewer tiene un interviewer_scorecard propio asignado en la application. */
+  hasOwn: boolean
+  /** Ese scorecard propio ya está `submitted`/`scored`. */
+  ownClosed: boolean
+}
+
+/** Estado del scorecard PROPIO del viewer para una application (fuente única del predicado). */
+export const getOwnScorecardStateForApplication = async (
+  applicationId: string,
+  viewerUserId: string,
+): Promise<OwnScorecardState> => {
+  const own = await runGreenhousePostgresQuery<{ status: string }>(
+    `SELECT status FROM greenhouse_hiring.hiring_assessment
+     WHERE application_id = $1 AND method = 'interviewer_scorecard' AND evaluator_user_id = $2
+     LIMIT 1`,
+    [applicationId, viewerUserId],
+  )
+
+  return {
+    hasOwn: Boolean(own[0]),
+    ownClosed: Boolean(own[0] && CLOSED_SCORECARD_STATUSES.includes(own[0].status as (typeof CLOSED_SCORECARD_STATUSES)[number])),
+  }
+}
+
+/**
+ * Gate anti-anclaje del Expediente de Evaluación (TASK-1737): el viewer queda "blind"
+ * SOLO cuando tiene scorecard propio abierto (asignado y aún no submitted/scored).
+ * Un operador sin scorecard asignado (reclutador/People Ops) NO activa el predicado.
+ */
+export const isViewerBlindForApplicationEvaluation = async (
+  applicationId: string,
+  viewerUserId: string,
+): Promise<boolean> => {
+  const { hasOwn, ownClosed } = await getOwnScorecardStateForApplication(applicationId, viewerUserId)
+
+  return hasOwn && !ownClosed
+}
+
 /**
  * Respuestas de una instancia. Anti-anclaje (independent-before-debrief, TASK-1383): para un
  * interviewer_scorecard AJENO, el evaluador que mira NO recibe los ratings hasta que su
@@ -510,14 +627,7 @@ export const listResponses = async (
       instance.method === 'interviewer_scorecard' &&
       instance.evaluator_user_id !== viewerUserId
     ) {
-      const own = await runGreenhousePostgresQuery<{ status: string }>(
-        `SELECT status FROM greenhouse_hiring.hiring_assessment
-         WHERE application_id = $1 AND method = 'interviewer_scorecard' AND evaluator_user_id = $2
-         LIMIT 1`,
-        [instance.application_id, viewerUserId],
-      )
-
-      const ownClosed = own[0] && ['submitted', 'scored'].includes(own[0].status)
+      const { ownClosed } = await getOwnScorecardStateForApplication(instance.application_id, viewerUserId)
 
       // Anti-anclaje: el evaluador con scorecard abierto no ve ratings ajenos.
       if (!ownClosed) return []
@@ -541,13 +651,7 @@ export const listPeerScorecardResults = async (
   applicationId: string,
   viewerEvaluatorUserId: string,
 ): Promise<AssessmentResponse[]> => {
-  const own = await runGreenhousePostgresQuery<{ status: string }>(
-    `SELECT status FROM greenhouse_hiring.hiring_assessment
-     WHERE application_id = $1 AND method = 'interviewer_scorecard' AND evaluator_user_id = $2 LIMIT 1`,
-    [applicationId, viewerEvaluatorUserId],
-  )
-
-  const ownClosed = own[0] && ['submitted', 'scored'].includes(own[0].status)
+  const { ownClosed } = await getOwnScorecardStateForApplication(applicationId, viewerEvaluatorUserId)
 
   if (!ownClosed) return [] // anti-anclaje: no ves ratings ajenos hasta cerrar el propio
 

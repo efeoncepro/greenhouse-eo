@@ -361,6 +361,14 @@ Implementar DESDE el wireframe + flow + master flow. Reusar primitives canónico
 - GVC local final: Demand `.captures/2026-07-10T09-35-01_task355-hiring-demand-desk`; Pipeline `.captures/2026-07-10T09-05-35_task355-hiring-pipeline-board`; transición Demand→Pipeline→Publication `.captures/2026-07-10T09-07-55_task355-hiring-tabs-transition`.
 - Gates finales: `tsc --noEmit --incremental false`, `pnpm build`, `pnpm design:lint`, `pnpm task:lint --task TASK-355`, `pnpm ops:lint --changed`, `git diff --check` y `eslint` focal del scope Hiring verdes. Warning residual de build: broad pattern en roadmap reader, preexistente/no relacionado.
 
+### Evidence 2026-08-16 — Pipeline scope y plano operacional
+
+- El selector de vacante y el total de postulantes pasan a `WorkbenchHeader.secondaryActions/meta`; el valor activo conserva el título completo y recompone a 390 px.
+- Búsqueda, ayuda y Kanban quedan contenidos en un único plano operacional; las lanes son bandas tonales internas y las tarjetas siguen siendo las superficies primarias. La inyección de fallo permanece exclusiva del harness GVC.
+- GVC local final: `.captures/2026-08-16T22-13-39_task355-hiring-pipeline-board`, 14 frames desktop/390 px, teclado, rollback y reduced-motion; 0 errores, 0 warnings y runtime 0/0/0/0.
+- Gates focales: ESLint, typecheck, `ui:code-lint`, `design:lint`, `task:lint`, route reachability y `git diff --check` verdes. Sin cambios de datos, API, acceso, flags ni runtime remoto.
+- El primer build quedó transitoriamente bloqueado por un cambio concurrente ajeno en `Application360ViewProps`; una vez estabilizado ese trabajo, el rerun completo de `pnpm build` cerró verde sin modificar su scope.
+
 ## Verification
 
 - `pnpm ui:wireframe-check --task TASK-355` + `pnpm ui:flow-check --task TASK-355` + `pnpm ui:motion-check --task TASK-355`

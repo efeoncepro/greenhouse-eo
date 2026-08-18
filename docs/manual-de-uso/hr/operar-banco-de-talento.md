@@ -5,8 +5,9 @@
 Verifica que el entorno tenga `HIRING_TALENT_POOL_SEARCH_ENABLED=true` y que tu sesión porte
 `hiring.talent_pool.read`. Si el flag está apagado, la API responde fail-closed y no entrega resultados.
 
-Estado productivo 2026-08-16: búsqueda interna, Desk y MCP read-only están activos; invitación y autoservicio
-externos permanecen apagados hasta el gate Legal/Privacy.
+Estado productivo 2026-08-16: búsqueda interna, Desk, MCP read-only, invitación gobernada y autoservicio
+tokenizado están activos. El contacto futuro requiere opt-in explícito y confirmación del candidato; no hay
+backfill, recontacto automático, avance de etapa ni asignación automática de tests.
 
 La superficie del operador está en **Hiring → Banco de Talento** (`/agency/hiring/talent-pool`). La superficie del
 candidato es distinta y sólo abre con su enlace tokenizado; nunca entregues un link de preview o un ID interno.

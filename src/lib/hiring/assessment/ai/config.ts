@@ -22,7 +22,13 @@ export const HIRING_ASSESSMENT_SCORING_PROVIDER = 'anthropic' as const
 export const getHiringAssessmentScoringModel = (): string =>
   process.env.HIRING_ASSESSMENT_AI_SCORING_MODEL?.trim() || 'claude-sonnet-5'
 
-export const HIRING_ASSESSMENT_SCORING_PROMPT_VERSION = 'hiring_assessment_ai_scoring.v1'
+/**
+ * v2 (delta 2026-08-17): el prompt declara EXPLÍCITAMENTE la escala de `perCriterion`
+ * (aportes ponderados `weight`/`score` que suman el score global). v1 la dejaba implícita y el
+ * modelo alternaba entre aporte y nota independiente. Las proposals v1 quedan stale por
+ * `promptVersion` distinto — comportamiento correcto: no se reinterpretan bajo la escala nueva.
+ */
+export const HIRING_ASSESSMENT_SCORING_PROMPT_VERSION = 'hiring_assessment_ai_scoring.v2'
 
 // ── Generación de preguntas: tier barato (el SME gatea draft→sme_review→active) ──
 export const HIRING_ASSESSMENT_GENERATION_PROVIDER = 'gemini' as const

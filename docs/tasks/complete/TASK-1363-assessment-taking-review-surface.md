@@ -1,5 +1,12 @@
 # TASK-1363 — Assessment Taking + Review Surface
 
+## Delta 2026-08-16 — Application 360 migrada al sistema canónico de superficies
+
+- `HiringDeskFrame` usa `SurfaceRecipe` + `WorkbenchHeader kind='report'`; el canvas gris queda como gutter y la navegación entre rutas usa enlaces con `aria-current`, no tabs falsos.
+- La identidad de la persona y sus tabs locales viven en `DetailHero kind='report'`; el nombre permite wrap y MUI Tabs aporta relaciones `tab`/`tabpanel` y teclado completo.
+- La evaluación es una sola superficie de trabajo, Barras/Radar usa selección exclusiva y la cola con cero pendientes se compacta sin reservar una columna vacía.
+- Evidencia local desktop/390 px: `.captures/2026-08-16T21-30-17_task1363-assessment-radar-runtime`.
+
 ## Delta 2026-07-12 — TASK-354 is ready; formal blocker removed
 
 - **TASK-354 is code complete and its public Careers route is live** (`/public/careers`, application flag and Turnstile configured; `Blocked by: none`). Its reusable public shell is therefore an available dependency, not a blocker for this task.

@@ -3,6 +3,8 @@
 
 export * from './store'
 export * from './instances'
+export * from './cancel'
+export * from './accommodations'
 export * from './scoring'
 export * from './public-taking'
 export * from './review'

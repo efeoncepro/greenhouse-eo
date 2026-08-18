@@ -44,6 +44,18 @@ const ALLOWED_WRITE_TARGETS = new Set([
   'greenhouse_hiring.hiring_assessment_response',
   'greenhouse_hiring.hiring_competency_result',
   'greenhouse_hiring.hiring_assessment_ai_proposal',
+
+  // TASK-1734 — Assessment AI Scoring Run: aggregate durable + items + historia append-only.
+  'greenhouse_hiring.hiring_assessment_ai_scoring_run',
+  'greenhouse_hiring.hiring_assessment_ai_scoring_run_item',
+  'greenhouse_hiring.hiring_assessment_ai_scoring_run_event',
+  // TASK-1719 — Policy de assessment por opening + su historia append-only, y el ledger
+  // durable de assignment (idempotencia manual/auto/reconciliación).
+  'greenhouse_hiring.hiring_opening_assessment_policy',
+  'greenhouse_hiring.hiring_opening_assessment_policy_event',
+  'greenhouse_hiring.hiring_assessment_assignment',
+  // TASK-1719 Slice 2 — preview durable propose→confirm de la asignación manual.
+  'greenhouse_hiring.hiring_assessment_assignment_proposal',
   // TASK-1723–1726 — Talent Pool aggregate, append-only ledgers, projection and public/MCP audit.
   'greenhouse_hiring.talent_pool_membership',
   'greenhouse_hiring.talent_pool_consent_event',
@@ -56,6 +68,17 @@ const ALLOWED_WRITE_TARGETS = new Set([
   // TASK-1718 — exact-application CV projection and append-only delegated access audit.
   'greenhouse_hiring.candidate_document_review_projection',
   'greenhouse_hiring.candidate_review_access_audit',
+  // TASK-1735 — Expediente de Evaluación: notas append-only + ledger propose/confirm del dossier.
+  'greenhouse_hiring.hiring_application_note',
+  'greenhouse_hiring.hiring_application_dossier_proposal',
+  // TASK-1736 — evidencia de identidad del intake (append-only) + audit de display (append-only).
+  'greenhouse_hiring.candidate_identity_intake_evidence',
+  'greenhouse_hiring.candidate_identity_display_audit',
+  // TASK-1736 (ADR D3) — excepción DELIBERADA y acotada: los ÚNICOS writes del dominio sobre la
+  // Person canónica son el refresh CAS del display (`reconcile-display.ts`) y la corrección
+  // humana capability-gated (`correct-display.ts`), ambos sólo `full_name` + audit append-only.
+  // Cualquier otro write hiring→identity_profiles sigue prohibido.
+  'greenhouse_core.identity_profiles',
   // TASK-1365 — self-ID sensitive source + append-only audit, physically separate from decision.
   'greenhouse_hiring.hiring_demographic_selfid',
   'greenhouse_hiring.hiring_demographic_selfid_audit',

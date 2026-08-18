@@ -24,13 +24,29 @@ const MAX_ANSWER_CHARS = 6000
 /**
  * Extrae SOLO el texto de la respuesta para mandar al LLM (allowlist anti-PII: nunca identity docs
  * ni el objeto crudo entero). Toma `answer.text` si es string; si no, serializa el objeto acotado.
+ * Exportada (TASK-1734 Slice 4) para que el gate de staleness recompute el digest con LA MISMA
+ * extracción del propose.
  */
+export const extractResponseAnswerText = (answer: Record<string, unknown>): string => extractAnswerText(answer)
+
 const extractAnswerText = (answer: Record<string, unknown>): string => {
   if (typeof answer.text === 'string') return answer.text.slice(0, MAX_ANSWER_CHARS)
   if (typeof answer.value === 'string') return answer.value.slice(0, MAX_ANSWER_CHARS)
 
   return JSON.stringify(answer).slice(0, MAX_ANSWER_CHARS)
 }
+
+/**
+ * Digest canónico de trazabilidad/idempotencia de un `response_score` (TASK-1383):
+ * pregunta + respuesta (hash, NUNCA la PII cruda). Exportado para que el gate de vigencia
+ * del run (TASK-1734 Slice 4) verifique staleness con LA MISMA fórmula del propose —
+ * cualquier drift entre ambas rompería la detección de stale.
+ */
+export const computeResponseScoreInputDigest = (
+  responseId: string,
+  questionPrompt: string,
+  answerText: string,
+): string => createHash('sha256').update(`${responseId}|${questionPrompt}|${answerText}`).digest('hex')
 
 type ScoreContextRow = {
   answer_json: unknown
@@ -100,9 +116,7 @@ export const proposeScoreForResponse = async (
   }
 
   // input_digest sobre pregunta+respuesta (hash, NUNCA la PII cruda) para trazabilidad/idempotencia.
-  const inputDigest = createHash('sha256')
-    .update(`${responseId}|${String(ctx.question_prompt)}|${extractAnswerText(answer)}`)
-    .digest('hex')
+  const inputDigest = computeResponseScoreInputDigest(responseId, String(ctx.question_prompt), extractAnswerText(answer))
 
   const proposal = await createAiProposal(
     {

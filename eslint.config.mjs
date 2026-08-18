@@ -37,9 +37,13 @@ export default [
     ignores: [
       'next-env.d.ts',
       'src/types/db.d.ts',
+      // Glob, no una lista de variantes: cada dev server con distDir propio
+      // (`.next-local`, `.next-task1741`, …) es build output y NUNCA se lintea. Con una
+      // lista, el primero que elegía un nombre nuevo hacía que ESLint analizara código
+      // generado — pasó el 2026-08-17: 2733 errores en archivos que nadie escribió.
       '.next/**',
-      '.next-local/**',
-      '**/.next-local/**',
+      '.next-*/**',
+      '**/.next-*/**',
       'node_modules/**',
       '**/node_modules/**',
       // Python virtualenvs (vendored pip/site-packages JS) must never be linted.

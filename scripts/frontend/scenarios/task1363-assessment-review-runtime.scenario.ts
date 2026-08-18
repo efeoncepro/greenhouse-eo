@@ -44,7 +44,7 @@ export const scenario: CaptureScenario = {
     enterpriseRubric: {
       enabled: true,
       includeSelector: '[data-capture="hiring-application-panel-assessment"]',
-      expectedDataCaptureRegions: ['assessment-scorecard', 'assessment-review-queue'],
+      expectedDataCaptureRegions: ['assessment-scorecard', 'assessment-competency-radar', 'assessment-review-queue'],
     },
   },
   steps: [
@@ -76,7 +76,7 @@ export const scenario: CaptureScenario = {
       kind: 'mark',
       label: 'operator-scorecard-radar',
       clipSelector: '[data-capture="assessment-scorecard"]',
-      note: 'Modo radar con polígono de puntaje y target; tabla sr-only contenida.',
+      note: 'Radar Recharts con etiquetas humanas completas, leyenda de puntaje/objetivo y guía textual; nunca convierte pendientes en cero.',
     },
     {
       kind: 'mark',

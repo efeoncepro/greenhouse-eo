@@ -1,38 +1,72 @@
 {
-  "idempotencyKey": "vacancy-account-manager-marketing-20260709",
-  "sourceReference": "job-brief-account-manager-marketing-20260709",
+  "idempotencyKey": "vacancy-account-manager-marketing-20260817",
+  "sourceReference": "job-brief-account-manager-marketing-20260817",
   "requestedRole": "Account Manager / Especialista en Marketing",
   "publicTitle": "Account Manager / Especialista en Marketing",
-  "publicSummary": "Lidera cuentas de crecimiento combinando criterio operativo, marketing generalista y coordinación de especialistas.",
-  "publicDescription": "Buscamos a alguien que cuide la relación diaria con clientes, convierta prioridades de negocio en próximos pasos claros y coordine campañas, contenidos, SEO y proveedores con memoria operativa.",
-  "responsibilities": [
-    "Gestionar la relación diaria con clientes y mantener claridad sobre estado, riesgos y próximos pasos.",
-    "Coordinar campañas, contenidos, SEO, growth tasks y proveedores externos.",
-    "Preparar actualizaciones ejecutivas con foco en decisiones y aprendizaje reutilizable."
-  ],
-  "requirements": [
-    "Experiencia operando cuentas, proyectos o clientes de marketing digital.",
-    "Nociones prácticas de SEO, contenido, performance o growth.",
-    "Capacidad de ordenar prioridades, levantar riesgos y coordinar especialistas."
-  ],
-  "niceToHave": [
-    "Experiencia en agencia, consultora o equipos de crecimiento.",
-    "Familiaridad con HubSpot, analytics, paid media o automatización."
-  ],
-  "skillTags": [
-    "Marketing",
-    "SEO",
-    "Vendor management",
-    "Liderazgo operativo"
-  ],
+  "skillTags": ["Marketing", "SEO", "Vendor management", "Liderazgo operativo"],
   "publicArea": "Marketing",
   "workMode": "remote",
-  "hiringRegion": "LATAM",
-  "seniority": "L2",
+  "hiringRegion": "Global",
+  "publicRemoteEligibleCountries": ["CL", "CO", "MX", "PE"],
+  "seniority": "Semi-senior",
   "employmentMode": "Jornada completa",
   "engagementType": "on_going",
   "fulfillmentMode": "internal_hire",
   "demandOrigin": "manual_internal",
   "priority": "high",
-  "publicProcessNotes": "Postulación, conversación inicial, assessment práctico y entrevista final."
+  "publicContent": {
+    "version": 2,
+    "promise": "Lidera cuentas de crecimiento combinando criterio operativo, marketing generalista y coordinación de especialistas.",
+    "intro": "El reto es convertir prioridades de negocio en próximos pasos claros y mantener alineados a clientes, estrategia y equipos especialistas.",
+    "outcomes": [
+      "Dar claridad continua sobre prioridades, riesgos y siguientes pasos de cada cuenta.",
+      "Reducir retrabajo mediante briefs, acuerdos y criterios de aceptación mejor definidos.",
+      "Convertir los aprendizajes de cada cuenta en prácticas reutilizables para el equipo."
+    ],
+    "workItems": [
+      "Gestionar la relación diaria con clientes y conducir conversaciones de decisión.",
+      "Coordinar campañas, contenidos, SEO, growth tasks y proveedores externos.",
+      "Preparar actualizaciones ejecutivas con señales, riesgos y recomendaciones.",
+      "Documentar acuerdos, dependencias y aprendizajes para la siguiente entrega."
+    ],
+    "essentials": [
+      "Experiencia operando cuentas, proyectos o clientes de marketing digital.",
+      "Nociones prácticas de SEO, contenido, performance o growth.",
+      "Capacidad de ordenar prioridades, levantar riesgos y coordinar especialistas.",
+      "Comunicación escrita y oral clara con equipos y clientes."
+    ],
+    "preferred": [
+      "Experiencia en agencia, consultora o equipos de crecimiento.",
+      "Familiaridad con HubSpot, analytics, paid media o automatización."
+    ],
+    "learnables": ["AEO", "Automatización de operaciones", "Sistemas de memoria operativa"],
+    "evidenceAsk": "Comparte dos casos donde expliques el contexto, las decisiones que tomaste y el resultado alcanzado.",
+    "workModel": "Trabajo 100% remoto, con comunicación asíncrona y solapamiento planificado con GMT-4.",
+    "collaboration": {
+      "team": "Growth, Creative y especialistas de canal",
+      "reportsTo": "Account Director",
+      "language": "Español; inglés profesional deseable",
+      "timezoneOverlap": "Al menos 4 horas con GMT-4",
+      "workingRhythm": "Asíncrono con sincronizaciones planificadas por cuenta"
+    },
+    "process": {
+      "steps": [
+        { "title": "Revisión inicial", "body": "Revisamos experiencia, disponibilidad y evidencia existente." },
+        {
+          "title": "Caso práctico pagado",
+          "body": "Trabajamos un escenario ficticio y acotado relacionado con el rol."
+        },
+        {
+          "title": "Entrevista estructurada",
+          "body": "Profundizamos en decisiones, colaboración y expectativas mutuas."
+        }
+      ],
+      "expectedTiming": "El proceso completo suele tomar entre 2 y 3 semanas.",
+      "responseCommitment": "Te comunicamos la decisión final, avances o no.",
+      "accommodationPath": "Puedes solicitar una adaptación del proceso en cualquier etapa."
+    },
+    "benefits": [],
+    "compensation": null,
+    "additionalSections": []
+  }
 }

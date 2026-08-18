@@ -25,8 +25,8 @@
 - Rank: `TBD`
 - Domain: `hr|ui|agency`
 - Blocked by: `none`
-- Dependency resolution: `TASK-1723` mantiene su cierre integral abierto, pero su contrato consumidor requerido
-  (search/profile/invite, API y capabilities) está implementado y migrado en desarrollo.
+- Dependency resolution: `TASK-1723` está cerrada y operativa; su contrato consumidor (search/profile/invite, API y
+  capabilities) está implementado y verificado en producción.
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -49,7 +49,8 @@ contactability, dedupe ni creación de aplicaciones en componentes.
 - Search/projection/MCP están activos en producción; invite/self-service están habilitados detrás de flags independientes.
   La invitación sigue siendo proposal→confirm, idempotente y consent-gated; no mueve etapas, asigna tests ni envía
   correo por sí sola.
-  El acceso directo al CV desde el sidecar está code-complete y espera promoción junto con TASK-1718.
+  El acceso directo al CV desde el sidecar está disponible en producción mediante el reader exacto
+  `applicationId → assetId`; el reader agent-safe de CV de `TASK-1718` continúa OFF y es independiente.
 
 ## Why This Task Exists
 
@@ -317,7 +318,8 @@ history into one claim. Invite chooses from openings returned by server policy; 
 ### Slice ordering hard rule
 
 - TASK-1723 read contracts → Slice 1/2 read-only → GVC/access gates → TASK-1724 contactability → Slice 3 invite → rollout.
-- UI cannot enable invite before server allows it; read-only can ship while invite flag stays OFF.
+- UI cannot enable invite before server allows it; read-only can ship independently. Invite quedó ON sólo después de
+  la aprobación operativa del CEO y permanece consentimiento-gated.
 
 ### Risk matrix
 
@@ -330,7 +332,8 @@ history into one claim. Invite chooses from openings returned by server policy; 
 
 ### Feature flags / cutover
 
-- Read-only route y invite action usan flags separados de TASK-1723. Both default OFF; invite remains OFF after read launch.
+- Read-only route e invite action usan flags separados de TASK-1723. Nacieron OFF; el estado live vigente es
+  `read-only=ON` e `invite=ON` desde 2026-08-16, con consentimiento futuro explícito y confirmación humana.
 
 ### Rollback plan per slice
 
@@ -344,7 +347,7 @@ history into one claim. Invite chooses from openings returned by server policy; 
 ### Production verification sequence
 
 1. Verify TASK-1723 read APIs/capabilities and route grants in staging.
-2. Deploy flags OFF; run nav budget/reachability and denied user tests.
+2. Mantén flags OFF para rollback; ejecuta nav budget/reachability y denied user tests antes de cualquier reactivación.
 3. Enable read for People allowlist; execute GVC/axe/PII/query restoration desktop+390.
 4. Verify TASK-1724 consent/withdrawal; enable invite for one synthetic opening.
 5. Exercise proposal/duplicate/conflict/receipt; confirm exactly one application.
@@ -375,7 +378,8 @@ history into one claim. Invite chooses from openings returned by server policy; 
 - [x] Keyboard/focus/sidecar/dialog/mobile Back/reduced-motion pass WCAG 2.2 AA locally.
 - [x] GVC premium 1440/390 has no horizontal scroll, console or axe findings.
 - [x] Scorecard average ≥4.5 with required floors and final enterprise verdict not BLOCK.
-- [x] Read-only and invite flags/rollback were exercised separately; production read-only is ON and invite remains OFF.
+- [x] Read-only e invite tienen flags/rollback separados; producción mantiene ambos ON desde 2026-08-16, con invite
+  gobernado por `propose → confirm`, consent-gated y reversible.
 
 ## Verification
 

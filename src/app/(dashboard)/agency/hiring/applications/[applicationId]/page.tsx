@@ -7,6 +7,7 @@ import type { Metadata } from 'next'
 import Application360View from '@/views/greenhouse/hiring/Application360View'
 import { can } from '@/lib/entitlements/runtime'
 import { getHiringApplicationById, getHiringDeskSnapshot } from '@/lib/hiring'
+import { listHiringApplicationNotes, type HiringApplicationNotesView } from '@/lib/hiring/application-notes'
 import {
   buildCandidateDocumentsViewModel,
   canAccessHiringCandidateDocument,
@@ -15,6 +16,7 @@ import {
 import { getHiringHandoffByApplicationId } from '@/lib/hiring/handoff'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { listAssessmentsForApplication, listTemplates } from '@/lib/hiring/assessment'
+import { resolveUserDisplayNames } from '@/lib/identity/user-display-names'
 import { getMicrocopy } from '@/lib/copy'
 import { normalizeLocale } from '@/i18n/locales'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
@@ -55,7 +57,12 @@ export default async function HiringApplicationPage({ params }: Props) {
   // en vez de mostrar un candidato "sin documentos" que es indistinguible del vacío real.
   const canReadDocuments = canAccessHiringCandidateDocument(tenant)
 
-  const [locale, snapshot, assessments, templates, handoff, documents] = await Promise.all([
+  // TASK-1737 — capability de escritura del expediente resuelta server-side; la UI solo
+  // decide si dibuja affordances (composer / CTAs del dossier).
+  const canAnnotate = can(tenant, 'hiring.application.annotate', 'execute', 'tenant')
+  const canScore = can(tenant, 'hiring.assessment.score', 'execute', 'tenant')
+
+  const [locale, snapshot, assessments, templates, handoff, documents, notesView] = await Promise.all([
     getLocale(),
     getHiringDeskSnapshot({ openingId: application.openingId, openingLimit: 80, applicationLimit: 120 }),
     canReadAssessment ? listAssessmentsForApplication(applicationId) : Promise.resolve([]),
@@ -73,11 +80,27 @@ export default async function HiringApplicationPage({ params }: Props) {
             return null
           })
       : Promise.resolve(null),
+    // TASK-1737 — notas del expediente server-fed. El gate anti-anclaje vive en el reader
+    // (viewer-aware): si el operador tiene scorecard propio abierto, el payload YA viene
+    // filtrado. `null` = el reader FALLÓ (≠ expediente vacío): el tab degrada honesto.
+    listHiringApplicationNotes(applicationId, tenant.userId).catch((error: unknown): HiringApplicationNotesView | null => {
+      captureWithDomain(error, 'hiring', {
+        tags: { source: 'hiring:application-360-expediente-notes' },
+        extra: { applicationId },
+      })
+
+      return null
+    }),
   ])
 
   const item = snapshot.applications.find((entry) => entry.application.applicationId === applicationId)
 
   if (!item) notFound()
+
+  // Nombres de autores de nota (fallback honesto al id en la UI cuando no resuelve).
+  const noteAuthorNames = notesView
+    ? Object.fromEntries(await resolveUserDisplayNames(notesView.notes.map((note) => note.authorUserId)))
+    : {}
 
   return (
     <Application360View
@@ -91,6 +114,13 @@ export default async function HiringApplicationPage({ params }: Props) {
       documents={documents}
       documentsFailed={canReadDocuments && documents === null}
       canRevealIdentity={can(tenant, 'hiring.candidate.reveal_identity', 'read', 'tenant')}
+      notes={notesView?.notes ?? null}
+      notesFailed={notesView === null}
+      hiddenNoteCount={notesView?.hiddenNoteCount ?? 0}
+      viewerBlind={notesView?.viewerBlindUntilScorecardSubmitted ?? false}
+      canAnnotate={canAnnotate}
+      canScore={canScore}
+      noteAuthorNames={noteAuthorNames}
     />
   )
 }

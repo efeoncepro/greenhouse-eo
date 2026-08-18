@@ -16,7 +16,7 @@ export const HIRING_FULFILLMENT_MODES = [
   'internal_hire',
   'staff_augmentation',
   'contractor',
-  'partner',
+  'partner'
 ] as const
 export type HiringFulfillmentMode = (typeof HIRING_FULFILLMENT_MODES)[number]
 
@@ -26,7 +26,7 @@ export const TALENT_DEMAND_ORIGINS = [
   'replacement',
   'expansion',
   'capacity_gap',
-  'manual_internal',
+  'manual_internal'
 ] as const
 export type TalentDemandOrigin = (typeof TALENT_DEMAND_ORIGINS)[number]
 
@@ -42,7 +42,7 @@ export const TALENT_DEMAND_STATUSES = [
   'fulfilled',
   'stalled',
   'cancelled',
-  'archived',
+  'archived'
 ] as const
 export type TalentDemandStatus = (typeof TALENT_DEMAND_STATUSES)[number]
 
@@ -54,7 +54,7 @@ export const HIRING_OPENING_PUBLICATION_STATUSES = [
   'ready_for_review',
   'published',
   'paused',
-  'closed',
+  'closed'
 ] as const
 export type HiringOpeningPublicationStatus = (typeof HIRING_OPENING_PUBLICATION_STATUSES)[number]
 
@@ -63,6 +63,13 @@ export type HiringOpeningStatus = (typeof HIRING_OPENING_STATUSES)[number]
 
 export const HIRING_PUBLIC_WORK_MODES = ['remote', 'hybrid', 'onsite'] as const
 export type HiringPublicWorkMode = (typeof HIRING_PUBLIC_WORK_MODES)[number]
+
+/**
+ * Vocabulario candidate-facing. Los niveles internos (p. ej. L2) pertenecen a
+ * scorecards/assessment y nunca deben cruzar la frontera pública.
+ */
+export const HIRING_PUBLIC_SENIORITIES = ['Junior', 'Semi-senior', 'Senior', 'Lead'] as const
+export type HiringPublicSeniority = (typeof HIRING_PUBLIC_SENIORITIES)[number]
 
 export const HIRING_PUBLIC_AREAS = [
   'Marketing',
@@ -73,7 +80,7 @@ export const HIRING_PUBLIC_AREAS = [
   'People',
   'Finance',
   'Sales',
-  'Strategy',
+  'Strategy'
 ] as const
 export type HiringPublicArea = (typeof HIRING_PUBLIC_AREAS)[number]
 
@@ -84,7 +91,7 @@ export const CANDIDATE_SOURCES = [
   'bench_internal',
   'partner',
   'hubspot',
-  'import',
+  'import'
 ] as const
 export type CandidateSource = (typeof CANDIDATE_SOURCES)[number]
 
@@ -110,7 +117,7 @@ export const HIRING_APPLICATION_STAGES = [
   'rejected',
   'withdrawn',
   'handoff_ready',
-  'closed',
+  'closed'
 ] as const
 export type HiringApplicationStage = (typeof HIRING_APPLICATION_STAGES)[number]
 
@@ -187,6 +194,10 @@ export interface HiringOpening {
   publicEmploymentMode: string | null
   publicSeniority: string | null
   publicProcessNotes: string | null
+  /** TASK-1740 — contenido público estructurado versionado; null = opening legacy. */
+  publicContent: PublicOpeningContent | null
+  /** TASK-1740 — países elegibles ISO alpha-2 para schema remoto. */
+  publicRemoteEligibleCountries: string[]
   applyUrl: string | null
   status: HiringOpeningStatus
   publishedAt: string | null
@@ -315,6 +326,96 @@ export interface HiringDeskSnapshot {
   }
 }
 
+// ── Public opening structured content (TASK-1740) ──
+// Bloque candidate-facing versionado; el validador canónico vive en
+// src/lib/hiring/public-careers/public-content.ts.
+
+export const PUBLIC_OPENING_CONTENT_VERSION = 2 as const
+export const PUBLIC_OPENING_LEGACY_CONTENT_VERSION = 1 as const
+export type PublicOpeningContentVersion =
+  | typeof PUBLIC_OPENING_LEGACY_CONTENT_VERSION
+  | typeof PUBLIC_OPENING_CONTENT_VERSION
+
+export const PUBLIC_COMPENSATION_UNITS = ['HOUR', 'DAY', 'WEEK', 'MONTH', 'YEAR'] as const
+export type PublicCompensationUnit = (typeof PUBLIC_COMPENSATION_UNITS)[number]
+
+/** Rango monetario aprobado y estructurado. Nunca derivado de public_compensation_band (texto libre). */
+export interface PublicOpeningCompensationRange {
+  /** ISO 4217, p. ej. `USD`, `CLP`. */
+  currency: string
+  minValue: number
+  maxValue: number
+  unitText: PublicCompensationUnit
+}
+
+export const PUBLIC_OPENING_ADDITIONAL_SECTION_FORMATS = ['narrative', 'bullets', 'milestones'] as const
+export type PublicOpeningAdditionalSectionFormat = (typeof PUBLIC_OPENING_ADDITIONAL_SECTION_FORMATS)[number]
+
+export interface PublicOpeningAdditionalSection {
+  title: string
+  format: PublicOpeningAdditionalSectionFormat
+  intro: string | null
+  items: string[]
+}
+
+export interface PublicOpeningCollaboration {
+  team: string
+  reportsTo: string
+  language: string
+  timezoneOverlap: string
+  workingRhythm: string
+}
+
+export interface PublicOpeningProcessStep {
+  title: string
+  /** `null` sólo existe al normalizar contenido v1; en v2 cada etapa explica su propósito. */
+  body: string | null
+}
+
+export interface PublicOpeningProcess {
+  steps: PublicOpeningProcessStep[]
+  /** Campos nullable únicamente para compatibilidad read-only de v1. */
+  expectedTiming: string | null
+  responseCommitment: string | null
+  accommodationPath: string | null
+}
+
+/**
+ * Contenido público estructurado normalizado de una vacante. Writes nuevos usan v2 completo;
+ * `version: 1` aparece únicamente al leer datos legacy y degrada por sección.
+ */
+export interface PublicOpeningContent {
+  version: PublicOpeningContentVersion
+  /** Promesa al candidato: qué gana la persona en este rol (1-2 frases). */
+  promise: string | null
+  /** Intro/misión: el problema concreto que la persona resolverá. */
+  intro: string | null
+  /** Resultados observables esperados del primer año. */
+  outcomes: string[]
+  /** Trabajo real / entregables del rol. */
+  workItems: string[]
+  /** Habilidades esenciales (must-have). */
+  essentials: string[]
+  /** Capacidad preferida, explícitamente no excluyente. */
+  preferred: string[]
+  /** Habilidades que se pueden aprender en el rol (learnable). */
+  learnables: string[]
+  /** Qué evidencia/portafolio se pide al candidato. */
+  evidenceAsk: string | null
+  /** Cómo opera la modalidad en la práctica; aplica a remoto, híbrido o presencial. */
+  workModel: string | null
+  /** Equipo, reporte, idioma, solapamiento y ritmo; obligatorio en v2. */
+  collaboration: PublicOpeningCollaboration | null
+  /** Proceso candidate-facing completo; obligatorio en v2. */
+  process: PublicOpeningProcess | null
+  /** Beneficios adicionales del cargo; el baseline global se resuelve centralmente. */
+  benefits: string[]
+  /** Rango de compensación aprobado y estructurado; null = no se publica salario. */
+  compensation: PublicOpeningCompensationRange | null
+  /** Zona de extensión controlada después de `El trabajo`; máximo tres bloques. */
+  additionalSections: PublicOpeningAdditionalSection[]
+}
+
 // ── Public opening projection (allowlist-only — consumido por TASK-354 careers) ──
 // NUNCA incluye owner, budget/rate, risk, notes internos, score ni cliente confidencial.
 
@@ -339,6 +440,10 @@ export interface PublicOpeningPayload {
   processNotes: string | null
   applyUrl: string | null
   publishedAt: string | null
+  /** TASK-1740 — bloque estructurado candidate-facing; null = fallback legacy de prosa. */
+  content: PublicOpeningContent | null
+  /** TASK-1740 — países elegibles ISO alpha-2 para remoto; [] = sin elegibilidad declarada. */
+  remoteEligibleCountries: string[]
 }
 
 // ── Input types (commands del store) ──
@@ -431,6 +536,10 @@ export interface UpdateHiringOpeningInput {
   publicEmploymentMode?: string | null
   publicSeniority?: string | null
   publicProcessNotes?: string | null
+  /** TASK-1740 — bloque estructurado; el store re-valida con parsePublicOpeningContent. */
+  publicContent?: PublicOpeningContent | Record<string, unknown> | null
+  /** TASK-1740 — ISO alpha-2; el store valida contra isValidCountryCode. null limpia a []. */
+  publicRemoteEligibleCountries?: string[] | null
   applyUrl?: string | null
 }
 

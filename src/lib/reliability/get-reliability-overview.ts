@@ -209,11 +209,17 @@ import { getAssetScanOpenQuarantineSignal } from './queries/asset-scan-open-quar
 import { getAssetScanSignatureFreshnessSignal } from './queries/asset-scan-signature-freshness'
 import { getHiringCandidateRetentionOverdueSignal } from './queries/hiring-candidate-retention-overdue'
 import { getHiringTalentPoolIntegritySignal } from './queries/hiring-talent-pool-integrity'
+import { getHiringAssessmentTemplateIntegritySignal } from './queries/hiring-assessment-template-integrity'
+import { getHiringAssessmentAssignmentHealthSignal } from './queries/hiring-assessment-assignment-signals'
 // TASK-356 — Hiring handoff workflow signals (moduleKey 'hiring').
 import { getHiringHandoffBlockedStaleSignal } from './queries/hiring-handoff-blocked-stale'
 import { getHiringInternalHireAwaitingOnboardingSignal } from './queries/hiring-internal-hire-awaiting-onboarding'
 // TASK-770 — Bridge hiring→HRIS (moduleKey 'workforce').
 import { getWorkforceHiringActivationStuckSignal } from './queries/workforce-hiring-activation-stuck'
+// TASK-1734 Slice 6 — Assessment AI scoring run signals (moduleKey 'hiring').
+import { getHiringAssessmentAiRunSignals } from './queries/hiring-assessment-ai-run-signals'
+// TASK-1736 Slice 4 — Candidate identity intake signals (moduleKey 'hiring').
+import { getHiringCandidateIdentitySignals } from './queries/hiring-candidate-identity-signals'
 import { getKnowledgeQuarantineCountSignal } from './queries/knowledge-quarantine-count'
 import { getKnowledgeSyncFailedSourceSignal } from './queries/knowledge-sync-failed-source'
 // TASK-1085 — Nexa knowledge retrieval observability (moduleKey 'knowledge').
@@ -706,8 +712,16 @@ interface ReliabilityOverviewSources {
   assetScanSignatureFreshness?: ReliabilitySignal | null
   hiringCandidateRetentionOverdue?: ReliabilitySignal | null
   hiringTalentPoolIntegrity?: ReliabilitySignal | null
+  /** Plantillas activas con módulos sin preguntas: examen encogido que se envía sin error. */
+  hiringAssessmentTemplateIntegrity?: ReliabilitySignal | null
+  /** TASK-1719 — asignación manual/automática: `intent` en reposo, backlog y propuestas vencidas. */
+  hiringAssessmentAssignmentHealth?: ReliabilitySignal | null
   hiringHandoffBlockedStale?: ReliabilitySignal | null
   hiringInternalHireAwaitingOnboarding?: ReliabilitySignal | null
+  /** TASK-1734 — Assessment AI scoring run (backlog/provider/abstention/override/orphans). */
+  hiringAssessmentAiRun?: ReliabilitySignal[] | null
+  /** TASK-1736 — Candidate identity intake (needs_review backlog + evidence coverage gap). */
+  hiringCandidateIdentity?: ReliabilitySignal[] | null
   workforceHiringActivationStuck?: ReliabilitySignal | null
   knowledgeSyncFailedSource?: ReliabilitySignal | null
   knowledgeNotionIngestDeadLetter?: ReliabilitySignal | null
@@ -1196,8 +1210,14 @@ export const buildReliabilityOverview = (
     ...(sources.assetScanSignatureFreshness ? [sources.assetScanSignatureFreshness] : []),
     ...(sources.hiringCandidateRetentionOverdue ? [sources.hiringCandidateRetentionOverdue] : []),
     ...(sources.hiringTalentPoolIntegrity ? [sources.hiringTalentPoolIntegrity] : []),
+    ...(sources.hiringAssessmentTemplateIntegrity ? [sources.hiringAssessmentTemplateIntegrity] : []),
+    ...(sources.hiringAssessmentAssignmentHealth ? [sources.hiringAssessmentAssignmentHealth] : []),
     ...(sources.hiringHandoffBlockedStale ? [sources.hiringHandoffBlockedStale] : []),
     ...(sources.hiringInternalHireAwaitingOnboarding ? [sources.hiringInternalHireAwaitingOnboarding] : []),
+    // TASK-1734 — Assessment AI scoring run (5 señales, steady=0 con flags OFF).
+    ...(sources.hiringAssessmentAiRun ?? []),
+    // TASK-1736 — Identidad del intake de candidatos (2 señales, steady=0; flag OFF ⇒ ok).
+    ...(sources.hiringCandidateIdentity ?? []),
     ...(sources.workforceHiringActivationStuck ? [sources.workforceHiringActivationStuck] : []),
     ...(sources.knowledgeSyncFailedSource ? [sources.knowledgeSyncFailedSource] : []),
     ...(sources.knowledgeNotionIngestDeadLetter ? [sources.knowledgeNotionIngestDeadLetter] : []),
@@ -1839,6 +1859,21 @@ export const getReliabilityOverview = async (
       ? preloadedSources.hiringTalentPoolIntegrity
       : await getHiringTalentPoolIntegritySignal().catch(() => null)
 
+  // Módulo de plantilla activa sin preguntas: el candidato ve la sección vacía y el
+  // examen se envía igual, puntuado sobre una fracción del peso. Falla silenciosa en
+  // ambas puntas (2026-08-17: dos plantillas así, con 45% y 25% del peso ciego).
+  const hiringAssessmentTemplateIntegrity =
+    preloadedSources.hiringAssessmentTemplateIntegrity !== undefined
+      ? preloadedSources.hiringAssessmentTemplateIntegrity
+      : await getHiringAssessmentTemplateIntegritySignal().catch(() => null)
+
+  // TASK-1719 — el monitor del canary de asignación automática. Un `intent` en reposo es
+  // un command que murió entre el ledger y la instancia: bug, no operación normal.
+  const hiringAssessmentAssignmentHealth =
+    preloadedSources.hiringAssessmentAssignmentHealth !== undefined
+      ? preloadedSources.hiringAssessmentAssignmentHealth
+      : await getHiringAssessmentAssignmentHealthSignal().catch(() => null)
+
   // TASK-356 — Handoffs bloqueados sin resolución humana (workflow atascado, steady=0).
   const hiringHandoffBlockedStale =
     preloadedSources.hiringHandoffBlockedStale !== undefined
@@ -1856,6 +1891,20 @@ export const getReliabilityOverview = async (
     preloadedSources.workforceHiringActivationStuck !== undefined
       ? preloadedSources.workforceHiringActivationStuck
       : await getWorkforceHiringActivationStuckSignal().catch(() => null)
+
+  // TASK-1734 Slice 6 — run de scoring IA de assessments (5 señales PII-free; el
+  // agregador degrada por señal, este catch es solo defensa del wiring).
+  const hiringAssessmentAiRun =
+    preloadedSources.hiringAssessmentAiRun !== undefined
+      ? preloadedSources.hiringAssessmentAiRun
+      : await getHiringAssessmentAiRunSignals().catch(() => null)
+
+  // TASK-1736 Slice 4 — identidad del intake de candidatos (2 señales PII-free;
+  // cada getter degrada honesto por su cuenta, este catch es solo defensa del wiring).
+  const hiringCandidateIdentity =
+    preloadedSources.hiringCandidateIdentity !== undefined
+      ? preloadedSources.hiringCandidateIdentity
+      : await getHiringCandidateIdentitySignals().catch(() => null)
 
   const knowledgeSyncFailedSource =
     preloadedSources.knowledgeSyncFailedSource !== undefined
@@ -2691,8 +2740,12 @@ export const getReliabilityOverview = async (
     assetScanSignatureFreshness,
     hiringCandidateRetentionOverdue,
     hiringTalentPoolIntegrity,
+    hiringAssessmentTemplateIntegrity,
+    hiringAssessmentAssignmentHealth,
     hiringHandoffBlockedStale,
     hiringInternalHireAwaitingOnboarding,
+    hiringAssessmentAiRun,
+    hiringCandidateIdentity,
     workforceHiringActivationStuck,
     knowledgeSyncFailedSource,
     knowledgeNotionIngestDeadLetter,

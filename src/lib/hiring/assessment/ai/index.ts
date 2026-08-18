@@ -7,3 +7,6 @@ export * from './contracts'
 export * from './generate-questions'
 export * from './score-response'
 export * from './eval/eval-runner'
+
+// TASK-1734 — Scoring run aggregate (Slice 1).
+export * from './scoring-run'

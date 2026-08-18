@@ -22,6 +22,20 @@ Schedule policy:
 - Required for `indefinido` and `plazo_fijo`.
 - Optional/overridable for `honorarios`, `contractor`, and `eor`.
 
+## Efeonce Global Candidate Benefits Baseline
+
+The candidate-facing baseline is defined in `../../greenhouse-talent-people-operator/references/efeonce-candidate-benefits-charter.md`: it applies to all collaborators worldwide and includes 15 paid working days of annual vacation plus one day for every completed continuous year of service, capped at 20, alongside health/wellbeing, development and life-event benefits. Its current remote-work wallet is US$50 monthly for connectivity/coworking. The separate US$400 equipment contribution is an approved policy benefit but is disclosed in interview or offer conversations, not standard public vacancy copy. This is a people-policy commitment, not evidence that current Greenhouse Leave balances or provider payroll have been configured for it.
+
+Before Payroll treats any item as payable or balance-consuming, confirm all of the following:
+
+- the governing employee agreement, contractor agreement, EOR/provider instruction or equivalent incorporates the entitlement;
+- country-specific statutory rights and provider terms are mapped without a reduction or unlawful waiver;
+- accrual, proration, tenure progression, carryover, eligibility, evidence minimization, approval and payment treatment are explicit;
+- the benefit wallets are recorded as approved direct cost/reimbursement, in the agreement currency and outside salary/bonus calculations unless local law requires another treatment;
+- the relevant Leave type exists and is privacy/RBAC-safe before claiming automated use in Greenhouse.
+
+The 16-hour annual medical-appointment entitlement is approved policy, but do not implement or calculate it until a governed Leave/Payroll change defines the privacy-safe evidence, exception, provider and payment paths.
+
 ## Deel/EOR Boundary
 
 For `eor`:

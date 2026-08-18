@@ -28,13 +28,16 @@ export const resolveProposalTransition = (
     return { next: target, apply: true }
   }
 
-  // Estado terminal (confirmed | rejected).
+  // Estado terminal (confirmed | rejected | superseded_by_manual).
   if (current === target) {
     return { next: current, apply: false }
   }
 
+  const currentLabel =
+    current === 'confirmed' ? 'confirmada' : current === 'rejected' ? 'rechazada' : 'superada por corrección manual'
+
   throw new HiringValidationError(
-    `No se puede ${decision === 'confirm' ? 'confirmar' : 'rechazar'} una propuesta que ya está ${current === 'confirmed' ? 'confirmada' : 'rechazada'}.`,
+    `No se puede ${decision === 'confirm' ? 'confirmar' : 'rechazar'} una propuesta que ya está ${currentLabel}.`,
     'assessment_ai_proposal_invalid_transition',
     409,
   )

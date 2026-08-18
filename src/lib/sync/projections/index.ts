@@ -87,7 +87,7 @@ import {
   hiringApplicationDecidedEmailProjection,
   hiringAssessmentAssignedEmailProjection,
   hiringAssessmentSubmittedInternalEmailProjection,
-  hiringStageChangedEmailProjection,
+  hiringStageChangedCandidateCommsProjection,
   talentPoolVerificationEmailProjection
 } from './hiring-lifecycle-emails'
 import { growthGraderRunFromSubmissionProjection } from './growth-grader-run-from-submission'
@@ -99,6 +99,7 @@ import { seoSiteAuditHistoryBqSyncProjection } from './seo-site-audit-history-bq
 import { seoBacklinkHistoryBqSyncProjection } from './seo-backlink-history-bq-sync'
 import { growthAiVisibilityReportEmailProjection } from './growth-ai-visibility-report-email'
 import { hiringCandidateReviewProjection } from './hiring-candidate-review'
+import { hiringAssessmentAiScoringProjection } from './hiring-assessment-ai-scoring'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -195,10 +196,11 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(hiringApplicationCreatedEmailsProjection) // TASK-1689 — hiring.application.created → aviso interno People + acuse candidato; flag HIRING_LIFECYCLE_EMAILS_ENABLED (ops-worker); drenado por ops-reactive-notifications
   registerProjection(hiringAssessmentAssignedEmailProjection) // TASK-1689 — hiring.assessment.assigned (candidate_test) → email con link de evaluación (token re-emitido canónico)
   registerProjection(hiringAssessmentSubmittedInternalEmailProjection) // hiring.assessment.submitted (candidate_test) → aviso interno a People con CTA a Application 360
-  registerProjection(hiringStageChangedEmailProjection) // TASK-1689 — hiring.application.stage_changed → avance de etapa candidate-facing (allowlist)
+  registerProjection(hiringStageChangedCandidateCommsProjection) // TASK-1719 — hiring.application.stage_changed → UNA comunicación: test asignado por policy, o aviso genérico de avance (absorbe TASK-1689)
   registerProjection(hiringApplicationDecidedEmailProjection) // TASK-1689 — hiring.application.decided → selected/rejected (rejected pausable via email_type_config)
   registerProjection(talentPoolVerificationEmailProjection) // TASK-1724 — consentimiento futuro solicitado → email de verificación/token self-service
   registerProjection(hiringCandidateReviewProjection) // TASK-1718 — clean CV asset → minimized/redacted exact-application review packet projection
+  registerProjection(hiringAssessmentAiScoringProjection) // TASK-1734 — hiring.assessment.submitted → run durable de scoring IA (idempotente; flag HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED OFF; el fan-out LLM vive en el drain del ops-worker, jamás acá)
   registerProjection(growthHiringApplicationFromSubmissionProjection) // TASK-1372 — growth.forms.submission_accepted (application forms) → ATS application + scanned private CV asset; sin destination interno; drenado por ops-reactive-growth
   registerProjection(growthAeoDiagnosticGraderRunProjection) // TASK-1321 — growth.forms.submission_accepted (/aeo-2/ efeonce-aeo-diagnostic) → remap + brand-intelligence category + cost-cap → enqueue grader run + materialize lead (kill-switch GROWTH_AEO_FORM_GRADER_INTAKE_ENABLED default-ON); drenado por ops-reactive-growth
   registerProjection(growthAiVisibilityLeadHandoffProjection) // TASK-1242 — growth.ai_visibility.lead_handoff_requested → upsert contact/company en HubSpot (in-app directo, idempotente, consent+score gated); drenado por ops-reactive-growth

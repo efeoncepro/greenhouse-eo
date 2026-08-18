@@ -31,63 +31,76 @@ import { resolveProposalTransition } from './state'
  *
  * El score NUNCA auto-rechaza ni toca payroll/ICO. El rollup a `hiring_application` sigue su curso
  * canónico (finalizeAssessment) — este confirm solo alimenta la cola humana de TASK-1360.
+ *
+ * `client` opcional (TASK-1734 Slice 4): el confirm de run por lote aplica cada proposal
+ * cubierta A TRAVÉS de este mismo command dentro de SU tx (cero bypass, cero segundo
+ * writer); sin client, el command abre su propia tx como siempre.
  */
 export const confirmAiProposal = async (
   input: ConfirmAiProposalInput,
   actorUserId: string,
+  client?: PoolClient,
 ): Promise<AiProposal> => {
   if (!actorUserId) {
     throw new HiringValidationError('Falta el usuario que confirma.', 'assessment_ai_missing_actor', 401)
   }
 
-  return withGreenhousePostgresTransaction(async (client) => {
-    const proposal = await lockAiProposalForUpdate(client, input.proposalId)
-    const transition = resolveProposalTransition(proposal.status, input.decision)
+  if (client) return confirmAiProposalInTransaction(client, input, actorUserId)
 
-    // Idempotente: misma decisión ya aplicada → devolver el estado actual sin re-ejecutar el efecto.
-    if (!transition.apply) {
-      return proposal
+  return withGreenhousePostgresTransaction((tx) => confirmAiProposalInTransaction(tx, input, actorUserId))
+}
+
+const confirmAiProposalInTransaction = async (
+  client: PoolClient,
+  input: ConfirmAiProposalInput,
+  actorUserId: string,
+): Promise<AiProposal> => {
+  const proposal = await lockAiProposalForUpdate(client, input.proposalId)
+  const transition = resolveProposalTransition(proposal.status, input.decision)
+
+  // Idempotente: misma decisión ya aplicada → devolver el estado actual sin re-ejecutar el efecto.
+  if (!transition.apply) {
+    return proposal
+  }
+
+  let confirmedRef: string | null = null
+
+  if (input.decision === 'confirm') {
+    if (proposal.kind === 'question_draft') {
+      confirmedRef = await applyQuestionDraft(client, proposal, input.questionOverride, actorUserId)
+    } else if (proposal.kind === 'opening_public_copy') {
+      confirmedRef = await applyOpeningPublicCopy(client, proposal, input.publicCopyOverride, actorUserId)
+    } else {
+      confirmedRef = await applyResponseScore(client, proposal, input.finalScore, actorUserId)
     }
+  }
 
-    let confirmedRef: string | null = null
-
-    if (input.decision === 'confirm') {
-      if (proposal.kind === 'question_draft') {
-        confirmedRef = await applyQuestionDraft(client, proposal, input.questionOverride, actorUserId)
-      } else if (proposal.kind === 'opening_public_copy') {
-        confirmedRef = await applyOpeningPublicCopy(client, proposal, input.publicCopyOverride, actorUserId)
-      } else {
-        confirmedRef = await applyResponseScore(client, proposal, input.finalScore, actorUserId)
-      }
-    }
-
-    const decided = await markProposalDecided(client, {
-      proposalId: proposal.proposalId,
-      status: transition.next as 'confirmed' | 'rejected',
-      confirmedRef,
-      decisionNote: input.decisionNote ?? null,
-      actorUserId,
-    })
-
-    await publishOutboxEvent(
-      {
-        aggregateType: AGGREGATE_TYPES.hiringAssessmentAiProposal,
-        aggregateId: decided.proposalId,
-        eventType: EVENT_TYPES.hiringAssessmentAiConfirmed,
-        payload: {
-          proposalId: decided.proposalId,
-          kind: decided.kind,
-          decision: input.decision,
-          status: decided.status,
-          confirmedRef,
-          actorUserId,
-        },
-      },
-      client,
-    )
-
-    return decided
+  const decided = await markProposalDecided(client, {
+    proposalId: proposal.proposalId,
+    status: transition.next as 'confirmed' | 'rejected',
+    confirmedRef,
+    decisionNote: input.decisionNote ?? null,
+    actorUserId,
   })
+
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.hiringAssessmentAiProposal,
+      aggregateId: decided.proposalId,
+      eventType: EVENT_TYPES.hiringAssessmentAiConfirmed,
+      payload: {
+        proposalId: decided.proposalId,
+        kind: decided.kind,
+        decision: input.decision,
+        status: decided.status,
+        confirmedRef,
+        actorUserId,
+      },
+    },
+    client,
+  )
+
+  return decided
 }
 
 // ── Efectos downstream (atómicos con la marca de la propuesta) ──

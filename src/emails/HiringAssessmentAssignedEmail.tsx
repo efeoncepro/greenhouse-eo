@@ -41,6 +41,10 @@ export default function HiringAssessmentAssignedEmail({
           timeLimit: (min: number) => `Estimated time: ${min} minutes once you start.`,
           expiry: (days: number) => `The access link expires in ${days} days.`,
           cta: 'Start the assessment',
+          // Un ajuste que nadie sabe que puede pedir no es un ajuste. Sin esta línea, sólo
+          // preguntan quienes ya se sienten con derecho a hacerlo — que es exactamente el sesgo
+          // que el ajuste existe para corregir. Invita sin pedir que se declare una condición.
+          accommodations: 'If you need more time or any adjustment to take it, reply to this email and we will arrange it. You do not need to explain why.',
           fallback: 'If the button does not work, copy and paste this address into your browser:',
         }
       : {
@@ -54,6 +58,8 @@ export default function HiringAssessmentAssignedEmail({
           timeLimit: (min: number) => `Tiempo estimado: ${min} minutos una vez que comiences.`,
           expiry: (days: number) => `El link de acceso vence en ${days} días.`,
           cta: 'Comenzar la evaluación',
+          accommodations:
+            'Si necesitas más tiempo o algún ajuste para rendirla, respóndenos este correo y lo coordinamos. No necesitas explicar por qué.',
           fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
         }
 
@@ -122,6 +128,14 @@ export default function HiringAssessmentAssignedEmail({
 
         <EmailButton href={assessmentUrl}>{t.cta}</EmailButton>
       </Section>
+
+      {/* El canal por el que se pide un ajuste razonable. Es una respuesta a un humano, NO un
+          formulario: nadie debería tener que declarar una condición de salud en un campo antes
+          de ser evaluado. Por eso también dice explícitamente que no hay que explicar el motivo
+          — y por eso el motivo tampoco se persiste en ninguna parte del sistema. */}
+      <Text style={{ fontSize: '13px', color: EMAIL_COLORS.muted, lineHeight: '20px', margin: '0 0 16px' }}>
+        {t.accommodations}
+      </Text>
 
       <Text
         style={{

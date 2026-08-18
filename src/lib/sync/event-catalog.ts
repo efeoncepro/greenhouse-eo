@@ -253,11 +253,23 @@ export const AGGREGATE_TYPES = {
   // assessment_id ('asmt-{uuid}').
   hiringAssessmentTemplate: 'hiring_assessment_template',
   hiringAssessment: 'hiring_assessment',
+
+  // TASK-1719 — Ledger de assignment. Identity: assignment_id ('hoaa-{uuid}'). Un intento
+  // vigente por (application, policy, versión, etapa trigger, attempt_seq).
+  hiringAssessmentAssignment: 'hiring_assessment_assignment',
+
+  // TASK-1719 Slice 2 — Preview durable propose→confirm. Identity: proposal_id ('haap-{uuid}').
+  // Una propuesta `proposed` por (application, effect_digest).
+  hiringAssessmentAssignmentProposal: 'hiring_assessment_assignment_proposal',
   talentPoolMembership: 'talent_pool_membership',
   talentPoolInvitation: 'talent_pool_invitation',
 
   // TASK-1361 — Assessment AI Assist. Identity: proposal_id ('aip-{uuid}').
   hiringAssessmentAiProposal: 'hiring_assessment_ai_proposal',
+
+  // TASK-1734 — Assessment AI Scoring Run. Identity: run_id ('asrun-{uuid}').
+  // Un run activo por (assessment_id, input_digest); el digest usa el modelo EFECTIVO.
+  hiringAssessmentAiScoringRun: 'hiring_assessment_ai_scoring_run',
 
   // TASK-1365 — aggregate-only evidence snapshot. Raw self-ID never enters the outbox.
   assessmentFairnessEvidence: 'assessment_fairness_evidence'
@@ -1153,7 +1165,41 @@ export const EVENT_TYPES = {
   hiringAssessmentAssigned: 'hiring.assessment.assigned',
   hiringAssessmentSubmitted: 'hiring.assessment.submitted',
   hiringAssessmentScored: 'hiring.assessment.scored',
+
+  // TASK-1719 Slice 3 — Cancelación gobernada de un candidate_test no comenzado. Payload
+  // IDs-only (assessmentId/applicationId/templateId/reasonCode/previousStatus/actorUserId),
+  // NUNCA email, nombre, token ni score — el outbox sincroniza a BigQuery. Sin consumer
+  // reactivo: la comunicación correctiva al candidato es decisión humana explícita
+  // (`operatorFollowupRequired`), no un email automático sin plantilla aprobada.
+  hiringAssessmentCancelled: 'hiring.assessment.cancelled',
+
+  // TASK-1719 — Ajuste razonable (tiempo extra) otorgado sobre un candidate_test. Payload
+  // IDs-only + extraMinutes/previousExtraMinutes/actorUserId. NUNCA el MOTIVO del ajuste:
+  // no viaja porque no se guarda (revelaría condición de discapacidad, categoría protegida
+  // — ver `src/lib/hiring/assessment/accommodations.ts`). Sin consumer reactivo: comunicar
+  // el ajuste al candidato es decisión humana, no un email automático.
+  hiringAssessmentAccommodationGranted: 'hiring.assessment.accommodation_granted',
   hiringCompetencyResultUpdated: 'hiring.competency_result.updated',
+
+  // TASK-1719 — Assignment gobernado de assessment. Payloads IDs-only (assignmentId/
+  // applicationId/policyId/policyVersion/origin/outcome/reason codes), NUNCA email, nombre,
+  // token ni score. `assignment_recorded` registra TODO outcome (incluido `held`);
+  // `auto_assignment_blocked` es la señal de que la automatización se detuvo sola (cap de
+  // volumen o destinatario no verificable). Sin consumer reactivo en Slice 2.
+  hiringAssessmentAssignmentRecorded: 'hiring.assessment.assignment_recorded',
+  hiringAssessmentAutoAssignmentBlocked: 'hiring.assessment.auto_assignment_blocked',
+
+  // TASK-1719 Slice 2 — propose→confirm de la asignación manual. Payloads IDs-only
+  // (proposalId/applicationId/policyId/policyVersion/effectDigest/outcome/reason codes),
+  // NUNCA email, nombre, token ni link. Sin consumer reactivo (audit/observabilidad).
+  hiringAssessmentAssignmentProposed: 'hiring.assessment.assignment_proposed',
+  hiringAssessmentAssignmentConfirmed: 'hiring.assessment.assignment_confirmed',
+
+  // TASK-1735 — Expediente de Evaluación; payloads IDs-only (noteId/applicationId/kind/actor),
+  // nunca el cuerpo de la nota ni PII. Sin consumers reactivos en V1 (audit/observabilidad).
+  hiringApplicationNoteRecorded: 'hiring.application.note_recorded',
+  hiringApplicationDossierProposed: 'hiring.application.dossier_proposed',
+  hiringApplicationDossierConfirmed: 'hiring.application.dossier_confirmed',
 
   // TASK-1723 — Talent Pool; payloads only contain opaque IDs/reason codes, never candidate PII.
   talentPoolMembershipCreated: 'hiring.talent_pool.membership_created',
@@ -1167,6 +1213,19 @@ export const EVENT_TYPES = {
   // TASK-1361 — Assessment AI Assist. propose→confirm (audit/observabilidad, sin consumer reactivo V1).
   hiringAssessmentAiProposed: 'hiring.assessment.ai_proposed',
   hiringAssessmentAiConfirmed: 'hiring.assessment.ai_confirmed',
+
+  // TASK-1734 — Assessment AI Scoring Run (Slice 1). Payloads IDs-only (runId/assessmentId/
+  // applicationId/counts/reason codes), NUNCA texto de respuesta, score ni PII. Sin consumer
+  // reactivo en Slice 1 (el wiring del ops-worker es Slice 2; audit/observabilidad).
+  hiringAssessmentAiRunCreated: 'hiring.assessment.ai_run_created',
+  hiringAssessmentAiRunCancelled: 'hiring.assessment.ai_run_cancelled',
+  hiringAssessmentAiRunReconciled: 'hiring.assessment.ai_run_reconciled',
+
+  // TASK-1734 Slice 4 — Revisión por excepción + confirmación de run por lote. Payloads
+  // IDs-only (runId/runItemId/resolution/counts/reason codes), NUNCA score, texto de
+  // respuesta ni PII (el manifest estructurado vive en la historia append-only del run).
+  hiringAssessmentAiRunItemResolved: 'hiring.assessment.ai_run_item_resolved',
+  hiringAssessmentAiRunConfirmed: 'hiring.assessment.ai_run_confirmed',
 
   // TASK-1365 — payload contains only aggregate report scope/evidence references.
   hiringAssessmentFairnessAdverseImpactDetected: 'hiring.assessment.fairness.adverse_impact_detected'

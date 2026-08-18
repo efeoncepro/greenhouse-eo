@@ -7712,6 +7712,36 @@ export interface GreenhouseHiringCandidateFacet {
   verification_signals_json: Generated<Json>;
 }
 
+export interface GreenhouseHiringCandidateIdentityDisplayAudit {
+  actor_user_id: string | null;
+  after_full_name: string | null;
+  application_id: string | null;
+  audit_id: Generated<string>;
+  before_full_name: string | null;
+  created_at: Generated<Timestamp>;
+  identity_profile_id: string;
+  normalization_version: string;
+  outcome: string;
+  proposed_full_name: string | null;
+  reason: string;
+  source: string;
+}
+
+export interface GreenhouseHiringCandidateIdentityIntakeEvidence {
+  application_id: string;
+  casing_classification: string;
+  created_at: Generated<Timestamp>;
+  evidence_id: Generated<string>;
+  identity_profile_id: string;
+  input_digest: string;
+  normalization_version: string;
+  normalized_structural: string;
+  proposed_display_name: string | null;
+  search_key: string;
+  search_key_version: string;
+  submitted_full_name: string;
+}
+
 export interface GreenhouseHiringCandidateReviewAccessAudit {
   access_audit_id: Generated<string>;
   actor_user_id: string;
@@ -7761,6 +7791,23 @@ export interface GreenhouseHiringHiringApplication {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseHiringHiringApplicationDossierProposal {
+  application_id: string;
+  confirmed_at: Timestamp | null;
+  confirmed_by: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  decision_note: string | null;
+  input_digest: string;
+  model: string;
+  prompt_version: string;
+  proposal_id: Generated<string>;
+  proposed_json: Generated<Json>;
+  provider: string;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseHiringHiringApplicationIntakeEvents {
   created_at: Generated<Timestamp>;
   email_hash: string | null;
@@ -7768,6 +7815,17 @@ export interface GreenhouseHiringHiringApplicationIntakeEvents {
   ip_hash: string | null;
   opening_public_id: string | null;
   outcome: string;
+}
+
+export interface GreenhouseHiringHiringApplicationNote {
+  application_id: string;
+  author_user_id: string;
+  body_md: string;
+  context_json: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  kind: string;
+  note_id: Generated<string>;
+  source: Generated<string>;
 }
 
 export interface GreenhouseHiringHiringAssessment {
@@ -7781,6 +7839,9 @@ export interface GreenhouseHiringHiringAssessment {
   method: Generated<string>;
   public_id: Generated<string>;
   started_at: Timestamp | null;
+  /**
+   * TASK-1719: `cancelled` es TERMINAL y sólo alcanzable desde `assigned`/`sent` (el candidato aún no empezó). Queda FUERA del predicado de instancia abierta a propósito: liberar el slot (application, template) ES el mecanismo de recuperación — se re-asigna sin borrar la fila cancelada. NUNCA agregar `cancelled` a hiring_assessment_open_instance_unique_idx.
+   */
   status: Generated<string>;
   submitted_at: Timestamp | null;
   template_id: string | null;
@@ -7807,6 +7868,97 @@ export interface GreenhouseHiringHiringAssessmentAiProposal {
   target_ref: string;
   updated_at: Generated<Timestamp>;
   usage_json: Generated<Json>;
+}
+
+export interface GreenhouseHiringHiringAssessmentAiScoringRun {
+  application_id: string;
+  assessment_id: string;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  input_digest: string;
+  lease_expires_at: Timestamp | null;
+  lease_owner: string | null;
+  model: string;
+  policy_version: string;
+  prompt_version: string;
+  run_id: Generated<string>;
+  status: Generated<string>;
+  status_reason: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHiringHiringAssessmentAiScoringRunEvent {
+  actor_user_id: string | null;
+  created_at: Generated<Timestamp>;
+  detail_json: Generated<Json>;
+  event_type: string;
+  from_status: string | null;
+  reason_code: string | null;
+  run_event_id: Generated<string>;
+  run_id: string;
+  run_item_id: string | null;
+  to_status: string | null;
+}
+
+export interface GreenhouseHiringHiringAssessmentAiScoringRunItem {
+  application_id: string;
+  assessment_id: string;
+  attempt_count: Generated<number>;
+  created_at: Generated<Timestamp>;
+  input_digest: string | null;
+  proposal_id: string | null;
+  reason_code: string | null;
+  resolution: string | null;
+  resolved_at: Timestamp | null;
+  resolved_by: string | null;
+  response_id: string;
+  risk_class: string | null;
+  routing_reasons: Generated<Json>;
+  run_id: string;
+  run_item_id: Generated<string>;
+  saw_proposal_before_scoring: boolean | null;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHiringHiringAssessmentAssignment {
+  actor_user_id: string | null;
+  application_id: string;
+  assessment_id: string | null;
+  assignment_id: Generated<string>;
+  attempt_seq: Generated<number>;
+  created_at: Generated<Timestamp>;
+  origin: string;
+  /**
+   * TASK-1719: `intent` es NO TERMINAL y EFÍMERO — sólo vive entre el INSERT del intent y el UPDATE que le adjunta la instancia, dentro de la misma transacción; una fila `intent` en reposo es evidencia de un bug. `cancelled` lo escribe el supersede de la cancelación sobre una fila que era `assigned`: por eso el cap de volumen (D5.2) cuenta `assigned` MÁS `cancelled/operator_cancelled` — cancelar no des-envía el correo que el candidato ya recibió, así que no puede liberar presupuesto del cap.
+   */
+  outcome: string;
+  outcome_reason: string | null;
+  policy_id: string;
+  policy_version: number;
+  /**
+   * TASK-1719: libera la llave de idempotencia (application, policy, versión, etapa, intento). LO ESCRIBE el path de CANCELACIÓN (`supersedeAssignmentsForAssessment`, en la misma transacción que cancela la instancia), que además fija outcome=cancelled + outcome_reason=operator_cancelled. Cancelar libera DOS llaves: el índice de instancia abierta (estructural, `cancelled` está fuera de su predicado) y ésta (write explícito). El retry gobernado de un terminal-pero-recuperable (`held`/`blocked`/`stale`) por reconciliación sigue SIN write path: ese caso lo resuelve un command humano.
+   */
+  superseded_at: Timestamp | null;
+  trigger_stage: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHiringHiringAssessmentAssignmentProposal {
+  application_id: string;
+  assignment_id: string | null;
+  confirmed_at: Timestamp | null;
+  confirmed_by: string | null;
+  created_at: Generated<Timestamp>;
+  effect_digest: string;
+  expires_at: Timestamp;
+  policy_id: string;
+  policy_version: number;
+  preview_json: Generated<Json>;
+  proposal_id: Generated<string>;
+  proposed_by: string;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseHiringHiringAssessmentResponse {
@@ -7949,6 +8101,10 @@ export interface GreenhouseHiringHiringOpening {
    */
   public_compensation_band: string | null;
   /**
+   * TASK-1740: structured candidate-facing content block (PublicOpeningContent v1). Versioned JSON validated by the canonical command; unknown versions degrade to legacy prose fallback on read.
+   */
+  public_content_json: Json | null;
+  /**
    * TASK-1371: public country for hybrid/onsite roles when applicable.
    */
   public_country: string | null;
@@ -7966,7 +8122,14 @@ export interface GreenhouseHiringHiringOpening {
    */
   public_office_location: string | null;
   public_process_notes: string | null;
+  /**
+   * TASK-1740: ISO 3166-1 alpha-2 eligible countries for 100% remote openings. Sole enabler of JobPosting TELECOMMUTE + applicantLocationRequirements; never derived from free-text public_hiring_region.
+   */
+  public_remote_eligible_countries: Generated<string[]>;
   public_requirements: string | null;
+  /**
+   * Candidate-facing role level. Canonical values: Junior, Semi-senior, Senior, Lead. Internal levels such as L2 belong only in hiring_opening.seniority/assessment taxonomy.
+   */
   public_seniority: string | null;
   /**
    * TASK-1371: public skill/competency chips for Careers. Source of truth; no renderer inference from prose.
@@ -7992,6 +8155,38 @@ export interface GreenhouseHiringHiringOpening {
   status: Generated<string>;
   updated_at: Generated<Timestamp>;
   visibility: Generated<string>;
+}
+
+export interface GreenhouseHiringHiringOpeningAssessmentPolicy {
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  enabled_at: Timestamp | null;
+  enabled_by: string | null;
+  mode: Generated<string>;
+  opening_id: string;
+  policy_id: Generated<string>;
+  policy_version: Generated<number>;
+  state: Generated<string>;
+  template_content_digest: string | null;
+  template_id: string;
+  time_limit_minutes: number | null;
+  trigger_stage: string | null;
+  updated_at: Generated<Timestamp>;
+  volume_cap_per_window: Generated<number>;
+  volume_window_minutes: Generated<number>;
+}
+
+export interface GreenhouseHiringHiringOpeningAssessmentPolicyEvent {
+  actor_user_id: string | null;
+  created_at: Generated<Timestamp>;
+  detail_json: Generated<Json>;
+  event_type: string;
+  from_state: string | null;
+  policy_event_id: Generated<string>;
+  policy_id: string;
+  policy_version: number;
+  reason_code: string | null;
+  to_state: string;
 }
 
 export interface GreenhouseHiringHiringQuestion {
@@ -12456,11 +12651,20 @@ export interface DB {
   "greenhouse_hiring.assessment_fairness": GreenhouseHiringAssessmentFairness;
   "greenhouse_hiring.candidate_document_review_projection": GreenhouseHiringCandidateDocumentReviewProjection;
   "greenhouse_hiring.candidate_facet": GreenhouseHiringCandidateFacet;
+  "greenhouse_hiring.candidate_identity_display_audit": GreenhouseHiringCandidateIdentityDisplayAudit;
+  "greenhouse_hiring.candidate_identity_intake_evidence": GreenhouseHiringCandidateIdentityIntakeEvidence;
   "greenhouse_hiring.candidate_review_access_audit": GreenhouseHiringCandidateReviewAccessAudit;
   "greenhouse_hiring.hiring_application": GreenhouseHiringHiringApplication;
+  "greenhouse_hiring.hiring_application_dossier_proposal": GreenhouseHiringHiringApplicationDossierProposal;
   "greenhouse_hiring.hiring_application_intake_events": GreenhouseHiringHiringApplicationIntakeEvents;
+  "greenhouse_hiring.hiring_application_note": GreenhouseHiringHiringApplicationNote;
   "greenhouse_hiring.hiring_assessment": GreenhouseHiringHiringAssessment;
   "greenhouse_hiring.hiring_assessment_ai_proposal": GreenhouseHiringHiringAssessmentAiProposal;
+  "greenhouse_hiring.hiring_assessment_ai_scoring_run": GreenhouseHiringHiringAssessmentAiScoringRun;
+  "greenhouse_hiring.hiring_assessment_ai_scoring_run_event": GreenhouseHiringHiringAssessmentAiScoringRunEvent;
+  "greenhouse_hiring.hiring_assessment_ai_scoring_run_item": GreenhouseHiringHiringAssessmentAiScoringRunItem;
+  "greenhouse_hiring.hiring_assessment_assignment": GreenhouseHiringHiringAssessmentAssignment;
+  "greenhouse_hiring.hiring_assessment_assignment_proposal": GreenhouseHiringHiringAssessmentAssignmentProposal;
   "greenhouse_hiring.hiring_assessment_response": GreenhouseHiringHiringAssessmentResponse;
   "greenhouse_hiring.hiring_assessment_template": GreenhouseHiringHiringAssessmentTemplate;
   "greenhouse_hiring.hiring_assessment_template_module": GreenhouseHiringHiringAssessmentTemplateModule;
@@ -12471,6 +12675,8 @@ export interface DB {
   "greenhouse_hiring.hiring_handoff": GreenhouseHiringHiringHandoff;
   "greenhouse_hiring.hiring_handoff_audit": GreenhouseHiringHiringHandoffAudit;
   "greenhouse_hiring.hiring_opening": GreenhouseHiringHiringOpening;
+  "greenhouse_hiring.hiring_opening_assessment_policy": GreenhouseHiringHiringOpeningAssessmentPolicy;
+  "greenhouse_hiring.hiring_opening_assessment_policy_event": GreenhouseHiringHiringOpeningAssessmentPolicyEvent;
   "greenhouse_hiring.hiring_question": GreenhouseHiringHiringQuestion;
   "greenhouse_hiring.talent_demand": GreenhouseHiringTalentDemand;
   "greenhouse_hiring.talent_pool_access_audit": GreenhouseHiringTalentPoolAccessAudit;
