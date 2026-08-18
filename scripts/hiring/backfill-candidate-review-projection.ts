@@ -16,6 +16,8 @@ import { runGreenhousePostgresQuery } from '../../src/lib/postgres/client'
 
 type EligibleRow = { asset_id: string }
 
+type SafeFailure = { code?: unknown }
+
 const apply = process.argv.includes('--apply')
 const proposeDossier = process.argv.includes('--propose-dossier')
 
@@ -66,6 +68,27 @@ const main = async () => {
         AND a.visibility='private'
         AND a.mime_type='application/pdf'
         ${applicationFilter}
+        AND NOT EXISTS (
+          SELECT 1
+            FROM greenhouse_core.assets newer
+           WHERE newer.owner_aggregate_type = ANY(ARRAY['hiring_application_cv', 'hiring_application_cv_draft']::text[])
+             AND newer.status <> 'deleted'
+             AND (
+               newer.owner_aggregate_id = a.owner_aggregate_id
+               OR (
+                 newer.owner_aggregate_id IS NULL
+                 AND newer.metadata_json->>'applicationId' = a.owner_aggregate_id
+               )
+             )
+             AND (
+               newer.uploaded_at > a.uploaded_at
+               OR (
+                 (newer.uploaded_at = a.uploaded_at OR (newer.uploaded_at IS NULL AND a.uploaded_at IS NULL))
+                 AND newer.asset_id > a.asset_id
+               )
+               OR (a.uploaded_at IS NULL AND newer.uploaded_at IS NOT NULL)
+             )
+        )
         AND EXISTS (
           SELECT 1 FROM greenhouse_core.asset_scan_results scan
            WHERE scan.asset_id=a.asset_id AND scan.verdict='clean'
@@ -93,14 +116,28 @@ const main = async () => {
   const dossierOutcomes: Record<string, number> = {}
 
   for (const row of rows) {
-    const result = await materializeCandidateReviewProjection(row.asset_id)
+    try {
+      const result = await materializeCandidateReviewProjection(row.asset_id)
 
-    outcomes[result.outcome] = (outcomes[result.outcome] ?? 0) + 1
+      outcomes[result.outcome] = (outcomes[result.outcome] ?? 0) + 1
 
-    if (proposeDossier && result.outcome === 'ready' && result.applicationId) {
-      const dossier = await autoProposeEvaluationDossier(result.applicationId)
+      if (proposeDossier && result.outcome === 'ready' && result.applicationId) {
+        try {
+          const dossier = await autoProposeEvaluationDossier(result.applicationId)
 
-      dossierOutcomes[dossier.outcome] = (dossierOutcomes[dossier.outcome] ?? 0) + 1
+          dossierOutcomes[dossier.outcome] = (dossierOutcomes[dossier.outcome] ?? 0) + 1
+        } catch (error) {
+          const code = typeof (error as SafeFailure)?.code === 'string'
+            ? (error as SafeFailure).code as string
+            : 'unknown'
+
+          const outcome = code === 'hiring_dossier_cv_not_ready' ? 'not_ready' : 'failed'
+
+          dossierOutcomes[outcome] = (dossierOutcomes[outcome] ?? 0) + 1
+        }
+      }
+    } catch {
+      outcomes.failed = (outcomes.failed ?? 0) + 1
     }
   }
 
