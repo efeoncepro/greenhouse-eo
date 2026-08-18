@@ -100,6 +100,7 @@ import { seoBacklinkHistoryBqSyncProjection } from './seo-backlink-history-bq-sy
 import { growthAiVisibilityReportEmailProjection } from './growth-ai-visibility-report-email'
 import { hiringCandidateReviewProjection } from './hiring-candidate-review'
 import { hiringAssessmentAiScoringProjection } from './hiring-assessment-ai-scoring'
+import { hiringEvaluationDossierAutoProposeProjection } from './hiring-evaluation-dossier-auto-propose'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -201,6 +202,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(talentPoolVerificationEmailProjection) // TASK-1724 — consentimiento futuro solicitado → email de verificación/token self-service
   registerProjection(hiringCandidateReviewProjection) // TASK-1718 — clean CV asset → minimized/redacted exact-application review packet projection
   registerProjection(hiringAssessmentAiScoringProjection) // TASK-1734 — hiring.assessment.submitted → run durable de scoring IA (idempotente; flag HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED OFF; el fan-out LLM vive en el drain del ops-worker, jamás acá)
+  registerProjection(hiringEvaluationDossierAutoProposeProjection) // TASK-1718/1735 — assessment scored → refresh operator-only dossier proposal from the current redacted CV; no confirm/materialization
   registerProjection(growthHiringApplicationFromSubmissionProjection) // TASK-1372 — growth.forms.submission_accepted (application forms) → ATS application + scanned private CV asset; sin destination interno; drenado por ops-reactive-growth
   registerProjection(growthAeoDiagnosticGraderRunProjection) // TASK-1321 — growth.forms.submission_accepted (/aeo-2/ efeonce-aeo-diagnostic) → remap + brand-intelligence category + cost-cap → enqueue grader run + materialize lead (kill-switch GROWTH_AEO_FORM_GRADER_INTAKE_ENABLED default-ON); drenado por ops-reactive-growth
   registerProjection(growthAiVisibilityLeadHandoffProjection) // TASK-1242 — growth.ai_visibility.lead_handoff_requested → upsert contact/company en HubSpot (in-app directo, idempotente, consent+score gated); drenado por ops-reactive-growth
