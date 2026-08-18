@@ -481,12 +481,3 @@ El operador (CEO) reasignó TASK-1736 a esta sesión para avanzar en paralelo co
 (Slices 4-5 en vuelo por subagentes). Arranca por Slice 0 (ADR + field policy matrix,
 docs-only). La matriz de sign-offs se resuelve por la misma autorización ejecutiva del CEO
 registrada hoy para 1734. La sesión que la creó no había iniciado ejecución.
-
-## 2026-08-16 — Radar de assessment corregido localmente
-
-Application 360 ya usa Recharts para el radar de competencias: eliminó `competencyKey.slice(0, 7)`, muestra
-etiquetas humanas sin cortar palabras, leyenda puntaje/objetivo y una guía visible con nombres completos. El
-perfil azul sólo se dibuja con el scorecard completo; pendientes nunca se convierten en cero. La cola vacía
-cede ancho al scorecard y el copy técnico cercano quedó localizado. Tests focalizados, ESLint, typecheck y
-captura GVC desktop/mobile verdes en `.captures/2026-08-16T19-02-20_task1363-assessment-radar-runtime`.
-Rollout remoto pendiente de push/deploy.
