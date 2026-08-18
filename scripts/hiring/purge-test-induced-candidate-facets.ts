@@ -28,25 +28,32 @@
  *
  * La salida trae nombre y correo: es stdout local del operador. No pegarla en logs compartidos.
  *
- * ⚠️ ESTADO VERIFICADO 2026-08-17: el DRY-RUN funciona; el `--apply` NO corre en este entorno.
- * Falla con `read ECONNRESET` al abrir su propio `new Client` TCP con el perfil `ops` contra el
- * proxy local (127.0.0.1:15432, proxy vivo, credenciales presentes en `.env.local`). El mismo
- * proxy sirve sin problema al cliente canónico, que usa Cloud SQL Connector — o sea el corte es
- * de este cliente TCP, no de la base. Reproducido con una sonda mínima aislada.
- * Comprobado además que el camino canónico NO es alternativa: `greenhouse_app` (runtime)
- * responde `permission denied for table talent_pool_consent_event`, tal como este archivo
- * anticipa más arriba — el borrado exige `ops` por diseño.
- * Pendiente real: una ficha purgable identificada (colaborador ACTIVO en el Banco de Talento con
- * `consent=not_captured`, creado por el fixture `user-live-test-proposal`). Requiere resolver la
- * conexión `ops` —o ejecutar el borrado por `pnpm pg:connect:shell` replicando las TRES
- * condiciones de `rejectionReason`— antes de darlo por cerrado.
+ * CONEXIÓN: el borrado corre con el perfil `ops` aplicado sobre el CLIENTE CANÓNICO
+ * (`applyGreenhousePostgresProfile('ops')` + `withGreenhousePostgresTransaction`), no con un
+ * `pg.Client` propio. La primera versión abría su propio cliente TCP y moría con `ECONNRESET`
+ * contra el proxy local, mientras el cliente canónico —que usa Cloud SQL Connector— servía sin
+ * problema: el corte era del cliente TCP, no de la base. Además el repo prohíbe instanciar pools
+ * fuera de `src/lib/postgres/client.ts`, así que la corrección cierra las dos cosas a la vez.
+ * El perfil `ops` NO es opcional: `greenhouse_app` (runtime) responde `permission denied` sobre
+ * estas tablas por diseño, verificado en vivo.
  */
-import { Client } from 'pg'
-
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { applyGreenhousePostgresProfile } from '../lib/load-greenhouse-tool-env'
+import {
+  closeGreenhousePostgres,
+  runGreenhousePostgresQuery,
+  withGreenhousePostgresTransaction,
+} from '@/lib/postgres/client'
 
 /** Autores que SÓLO puede haber escrito un fixture. Nunca incluir un user-id humano real. */
-const SYNTHETIC_AUTHORS = new Set(['user-live-test-proposal', 'user-live-test', 'user-smoke-test'])
+const SYNTHETIC_AUTHORS = new Set([
+  'user-live-test',
+  'user-live-test-proposal',
+  'user-live-test-2',
+  'user-live-test-3',
+  'user-live-test-racer',
+  'user-reviewer',
+  'user-smoke-test',
+])
 
 const argValue = (flag: string): string | null => {
   const i = process.argv.indexOf(flag)
@@ -134,21 +141,14 @@ const main = async () => {
     return
   }
 
-  const client = new Client({
-    host: process.env.GREENHOUSE_POSTGRES_HOST,
-    port: Number(process.env.GREENHOUSE_POSTGRES_PORT ?? 5432),
-    database: process.env.GREENHOUSE_POSTGRES_DATABASE,
-    user: process.env.GREENHOUSE_POSTGRES_OPS_USER,
-    password: process.env.GREENHOUSE_POSTGRES_OPS_PASSWORD,
-    ssl: process.env.GREENHOUSE_POSTGRES_SSL === 'true' ? { rejectUnauthorized: false } : false,
-  })
+  // El perfil `ops` se aplica sobre las env vars canónicas y el borrado corre por el cliente
+  // canónico (Cloud SQL Connector). Un `pg.Client` propio contra el proxy moría con ECONNRESET.
+  applyGreenhousePostgresProfile('ops')
+  // Cerrar el pool abierto con el perfil runtime del dry-run: el próximo query lo reabre como `ops`.
+  await closeGreenhousePostgres({ source: 'close' })
 
-  await client.connect()
-
-  try {
-    for (const row of purgeable) {
-      await client.query('BEGIN')
-
+  for (const row of purgeable) {
+    await withGreenhousePostgresTransaction(async client => {
       const memberships = await client.query<{ membership_id: string }>(
         `SELECT membership_id FROM greenhouse_hiring.talent_pool_membership WHERE candidate_facet_id = $1`,
         [row.candidate_facet_id],
@@ -187,13 +187,7 @@ const main = async () => {
       )
 
       console.log(`  candidate_facet: ${f.rowCount}  → ${row.candidate_facet_id}`)
-      await client.query('COMMIT')
-    }
-  } catch (error) {
-    await client.query('ROLLBACK').catch(() => undefined)
-    throw error
-  } finally {
-    await client.end()
+    })
   }
 
   const left = await loadCandidates(purgeable.map(r => r.candidate_facet_id))
