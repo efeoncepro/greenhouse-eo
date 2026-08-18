@@ -10,17 +10,16 @@ import 'server-only'
 export const isHiringAssessmentAiEnabled = (): boolean =>
   process.env.HIRING_ASSESSMENT_AI_ENABLED === 'true'
 
-// ── Grading (respuestas open_text/situational): tier calidad/defensibilidad AI-Act ──
-export const HIRING_ASSESSMENT_SCORING_PROVIDER = 'anthropic' as const
+// ── Grading (respuestas open_text/situational): structured Vertex route ──
+export const HIRING_ASSESSMENT_SCORING_PROVIDER = 'google' as const
 
 /**
- * Default = Claude Sonnet 5 (`claude-sonnet-5`, familia Claude 5 — el más reciente y capaz para el
- * grading defendible AI-Act). `generateStructuredAnthropic` recibe el model string crudo y lo pasa
- * al SDK; NO está restringido al allowlist de nexa-models.ts (ese es el router de Nexa, no el
- * universo de modelos válidos). Override por env `HIRING_ASSESSMENT_AI_SCORING_MODEL`.
+ * Default = Gemini 2.5 Flash through the canonical Vertex structured-output client.
+ * The route is deterministic so run model, digest, proposal provenance and audit agree.
+ * Override by `HIRING_ASSESSMENT_AI_SCORING_MODEL` only after a calibrated rollout.
  */
 export const getHiringAssessmentScoringModel = (): string =>
-  process.env.HIRING_ASSESSMENT_AI_SCORING_MODEL?.trim() || 'claude-sonnet-5'
+  process.env.HIRING_ASSESSMENT_AI_SCORING_MODEL?.trim() || 'gemini-2.5-flash'
 
 /**
  * v2 (delta 2026-08-17): el prompt declara EXPLÍCITAMENTE la escala de `perCriterion`

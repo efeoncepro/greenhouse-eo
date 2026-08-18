@@ -6,9 +6,9 @@ const isConfiguredMock = vi.fn()
 const generateMock = vi.fn()
 const captureMock = vi.fn()
 
-vi.mock('@/lib/ai/anthropic', () => ({
-  isAnthropicConfigured: (...args: unknown[]) => isConfiguredMock(...args),
-  generateStructuredAnthropic: (...args: unknown[]) => generateMock(...args)
+vi.mock('@/lib/ai/google-genai', () => ({
+  isGeminiConfigured: (...args: unknown[]) => isConfiguredMock(...args),
+  generateStructuredGemini: (...args: unknown[]) => generateMock(...args)
 }))
 
 vi.mock('@/lib/observability/capture', () => ({
@@ -164,15 +164,14 @@ describe('runDossierGeneration', () => {
   it('salida válida → status ok con el modelo efectivo del provider', async () => {
     generateMock.mockResolvedValue({
       data: { resumenEjecutivo: 'Resumen', coherencias: [], gaps: [], focosEntrevista: [], noVerificable: [] },
-      model: 'claude-sonnet-5-20260101',
-      stopReason: 'tool_use',
+      model: 'gemini-2.5-flash',
       usage: { inputTokens: 100, outputTokens: 200 }
     })
 
     const result = await runDossierGeneration(packetFixture)
 
     expect(result.status).toBe('ok')
-    expect(result.model).toBe('claude-sonnet-5-20260101')
+    expect(result.model).toBe('gemini-2.5-flash')
     expect(result.dossier?.resumenEjecutivo).toBe('Resumen')
   })
 
@@ -185,8 +184,7 @@ describe('runDossierGeneration', () => {
         focosEntrevista: [],
         noVerificable: []
       },
-      model: 'claude-sonnet-5-20260101',
-      stopReason: 'tool_use',
+      model: 'gemini-2.5-flash',
       usage: { inputTokens: 100, outputTokens: 200 }
     })
 
@@ -196,7 +194,7 @@ describe('runDossierGeneration', () => {
   })
 
   it('salida malformada → schema_invalid; excepción del provider → provider_error (nunca throwea)', async () => {
-    generateMock.mockResolvedValue({ data: { basura: true }, model: 'm', stopReason: null, usage: { inputTokens: 0, outputTokens: 0 } })
+    generateMock.mockResolvedValue({ data: { basura: true }, model: 'm', usage: { inputTokens: 0, outputTokens: 0 } })
     expect((await runDossierGeneration(packetFixture)).status).toBe('schema_invalid')
 
     generateMock.mockRejectedValue(new Error('boom'))
