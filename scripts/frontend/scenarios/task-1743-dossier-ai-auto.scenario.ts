@@ -40,7 +40,13 @@ export const scenario: CaptureScenario = {
       enabled: true,
       failOnViolations: true,
       reducedMotionCheck: true,
-      probes: []
+      probes: [
+        {
+          name: 'proposal-actions-focus',
+          startSelector: '[data-capture="hiring-expediente-proposal"] button',
+          keys: ['Tab']
+        }
+      ]
     },
     performance: {
       enabled: true,
