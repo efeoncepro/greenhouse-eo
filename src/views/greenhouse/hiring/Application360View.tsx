@@ -1012,6 +1012,7 @@ const Application360View = ({
 
                           <Box
                             component='table'
+                            data-capture='assessment-accessible-score-table'
                             sx={{
                               position: 'absolute',
                               inlineSize: 1,
