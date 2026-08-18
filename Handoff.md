@@ -2,6 +2,30 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-18 — Las dos vacantes vivas ya están en el contrato editorial v2
+
+Autoradas y publicadas con `PublicOpeningContent` v2 completo por el command canónico. Antes tenían
+sólo `workModel` poblado y toda la hoja caía al fallback de prosa; ahora sirven las 13 secciones del
+formato canónico, incluida **"Cómo se ve un buen primer año"** — los outcomes observables, que es el
+campo que el formato agrega y que ninguna de las dos declaraba.
+
+Casi todo se **derivó de la prosa ya aprobada** (descripción, requisitos, deseables, notas de
+proceso), que es reestructurar, no inventar. Los tres hechos que no existían en ninguna fuente los
+resolvió el CEO, tal como exige la receta (`job-offer-recipe.md` §0: *"if a fact cannot be resolved,
+carry `needs confirmation` and stop before publication"*): **Account Manager reporta al CEO**,
+**Content Creator a la Creative Operations Lead**, y el **compromiso de respuesta es de 3 a 4
+semanas**. Ese último es el campo que más pesa: es donde la vacante deja de vender y se compromete —
+y hoy hay 35 postulaciones sin revisar, así que el compromiso es deliberadamente conservador.
+
+Corregido de paso: `EO-OPN-0061` publicaba "Contrato indefinido" como jornada, que con vinculación
+internacional sólo es exacto para Chile. Ahora dice "Jornada completa" —la dedicación sí es
+universal— y la forma contractual se explica en el modelo de trabajo. Efecto colateral correcto:
+`employmentType: FULL_TIME` en el schema, que antes se omitía por ambiguo.
+
+Verificado en producción: ambas 200, las 13 secciones presentes, JSON-LD de 5756 y 4508 caracteres
+con los outcomes incluidos, `baseSalary` sólo en Content Creator (la única con rango aprobado) y
+`employmentType: FULL_TIME` en las dos.
+
 ## 2026-08-18 — Careers público EN PRODUCCIÓN: hoja editorial + JobPosting, con 4 flags prendidos
 
 Release `fa54670470c1` (`released`, run `32127499151`, 8m31s). Batch de EPIC-011: TASK-1740 +
@@ -485,10 +509,3 @@ reader). Gates: suite full 11.157+ y build verdes. Rollout gated al runbook
 scheduler `ops-assessment-ai-drain` declarado nacido en pausa (se crea en el próximo deploy del
 ops-worker). TASK-1736 avanza: S0 ADR + S1 primitive de normalización + S2 evidencia/reconcile/
 corrección humana (flag OFF); quedan S3 (detector + remediación histórica) y S4 (canary/cierre).
-
-## 2026-08-16 — TASK-1736 tomada por la sesión Claude (reasignación de operador)
-
-El operador (CEO) reasignó TASK-1736 a esta sesión para avanzar en paralelo con TASK-1734
-(Slices 4-5 en vuelo por subagentes). Arranca por Slice 0 (ADR + field policy matrix,
-docs-only). La matriz de sign-offs se resuelve por la misma autorización ejecutiva del CEO
-registrada hoy para 1734. La sesión que la creó no había iniciado ejecución.
