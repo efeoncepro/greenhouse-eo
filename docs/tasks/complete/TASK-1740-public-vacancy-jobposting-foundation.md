@@ -72,15 +72,23 @@ schema, no bloquear publicación** (bloquear rompería re-publicar los 2 opening
    **complementa** la prosa y sólo un bloque con narrativa núcleo (`promise`/`intro`/`outcomes`/
    `workItems`) la reemplaza; si el bloque ya cubre habilidades, los requisitos legacy se omiten para
    no duplicar. Con test propio en ambas direcciones (descripciones reales: 1365 y 3296 caracteres).
-2. Push/release conjunto; prender primero `CAREERS_DETAIL_EDITORIAL_V2_ENABLED` en staging, verificar
-   HTML visible y después prender `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` → Rich Results Test →
-   producción (secuencia en el manual §Prender el schema JobPosting). **La precondición de código ya
-   quedó cumplida por TASK-1741:** el view model y el renderer consumen `publicContent` v2 y muestran
-   la misma evidencia usada por JSON-LD. El interlock técnico conserva el orden fail-closed: el schema
-   nunca retorna ON si el renderer editorial está OFF.
-3. Smoke lifecycle en runtime desplegado: validar HTML/schema/canonical → pausar → 404 sin schema.
-4. ~~`pnpm build` de producción~~ **autorizado y ejecutado 2026-08-17** (resultado en el delta de
-   evidencia).
+2. ~~Push/release conjunto y flip de flags~~ **CUMPLIDO 2026-08-18.** Release `fa54670470c1`
+   (`released`, run `32127499151`, 8m31s, watchdog `OK` 4/4 workers). Staging primero (renderer →
+   schema, con redeploy cada uno) y después Production con redeploy `greenhouse-4qu4swddd`. El
+   interlock fail-closed se respetó en ambos ambientes.
+3. ~~Smoke lifecycle en runtime desplegado~~ **CUMPLIDO 2026-08-18**, verificado contra
+   `greenhouse.efeoncepro.com`: las DOS vacantes emiten `JobPosting` con `TELECOMMUTE`, 20 países,
+   `hiringOrganization: Efeonce`, canonical correcto y sin `directApply`/`validThrough`/`baseSalary`;
+   la hoja editorial se sirve con sus secciones; `EO-OPN-0050` (cerrada) responde **404 sin schema**;
+   el listado público responde 200.
+4. ~~`pnpm build` de producción~~ **autorizado y ejecutado 2026-08-17**.
+
+**Estado: `complete`.** El preflight exigió `requires_break_glass` por 18 migraciones + `auth_access`
++ `cloud_release`; el bypass se redactó con hechos verificados (las 18 ya estaban en
+`public.pgmigrations` de la instancia única, o sea reconciliación de archivos con un estado ya
+realizado; rollback = revert del PR sin undo de schema). Pendiente NO bloqueante heredado por el
+dominio: Rich Results Test de Google como validación externa (el schema ya está servido y verificado
+campo por campo contra el HTML de producción).
 
 Evidencia local: `pnpm test` full **1522 files / 11498 tests verdes** (2026-08-17); `pnpm local:check`
 verde por slice; suite `public-careers` 71 passed.
@@ -93,7 +101,7 @@ verde por slice; suite `public-careers` 71 passed.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`

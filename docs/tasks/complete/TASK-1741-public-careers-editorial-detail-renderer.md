@@ -45,7 +45,7 @@ CTA. V1/legacy conserva fallback completo durante la migración. Este delta no t
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
