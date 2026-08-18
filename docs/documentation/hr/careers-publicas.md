@@ -2,13 +2,14 @@
 
 ## Estado
 
-TASK-354 dejó la interfaz pública de careers implementada. TASK-1741 añade una
-variante editorial del detalle, validada en local y detrás de
-`CAREERS_DETAIL_EDITORIAL_V2_ENABLED` (default OFF; rollout pendiente). TASK-1373
-migra el apply a un Growth Form nativo detrás de flag
-(`CAREERS_NATIVE_GROWTH_FORM_ENABLED`) para rollout gradual por ambiente. El
-rollout productivo queda pendiente de sign-off de paridad visual y
-consentimiento/privacidad.
+TASK-354 dejó la interfaz pública de careers implementada. **Desde 2026-08-18 el
+detalle sirve la hoja editorial de TASK-1741 y el JSON-LD `JobPosting` de
+TASK-1740 EN PRODUCCIÓN**: `CAREERS_DETAIL_EDITORIAL_V2_ENABLED` y
+`HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` están ON (release `fa54670470c1`), y el
+schema emitido pasó `validator.schema.org` con 0 errores y 0 advertencias. Las dos
+vacantes vivas están autoradas en contrato v2 completo. TASK-1373 migró el apply a
+un Growth Form nativo detrás de `CAREERS_NATIVE_GROWTH_FORM_ENABLED`, también ON en
+producción.
 
 ## Qué hace
 
@@ -107,6 +108,12 @@ La oferta debe separar `Ubicacion` y `Modalidad` como datos de dominio:
 
 ## Contenido estructurado y SEO técnico (TASK-1740)
 
+**Estado: en producción desde 2026-08-18.** El renderer editorial y el schema
+`JobPosting` están ambos ON en Production, y las dos vacantes vivas
+(`EO-OPN-0009` y `EO-OPN-0061`) ya están autoradas en contrato v2 completo, con
+las 13 secciones del contrato pobladas. El schema emitido pasó la validación
+externa de `validator.schema.org` con 0 errores y 0 advertencias.
+
 Toda publicación nueva usa `public_content_json` v2 como fuente editorial única:
 promesa, intro, 3–5 resultados, 4–8 elementos de trabajo, habilidades esenciales,
 preferidas y aprendibles, evidencia, modelo de trabajo, colaboración, proceso,
@@ -116,8 +123,12 @@ La v1 permanece sólo como lectura compatible para vacantes ya publicadas. Regla
 - El bloque se escribe por el command canónico (`PATCH
 /api/hiring/openings/{id}` con `publicContent`) y se valida siempre en el
   store; un bloque inválido responde 422 y nunca llega a la base.
-- Publicar o volver a publicar exige v2 completo. Un opening v1 ya publicado
-  degrada por sección al fallback de prosa hasta que People lo migre.
+- La **primera** publicación de una vacante exige v2 completo. Volver a
+  publicar una vacante que ya estuvo al aire NO lo exige: aplicar la barra de
+  autoría al republicar convertiría una regla editorial en una interrupción de
+  servicio (una vacante pausada con postulantes en proceso quedaría en 404 hasta
+  reescribir su bloque). Un opening v1 ya publicado degrada por sección al
+  fallback de prosa hasta que People lo migre.
 - El contexto `Efeonce en breve` y el baseline global de beneficios se resuelven
   desde una fuente central versionada; cada opening almacena sólo adiciones reales.
 - La zona de extensión acepta 0–3 bloques `narrative`, `bullets` o `milestones`;
@@ -130,6 +141,18 @@ La elegibilidad remota por país vive en `public_remote_eligible_countries`
 (códigos ISO 3166-1 alpha-2 reales, ej. `["CL","CO"]`). `LATAM` o `Global`
 son regiones de display, no hechos legales. Una publicación remota v2 exige al
 menos un país elegible exacto.
+
+La vinculación publicada es explícita: en Chile, contrato laboral local; fuera de
+Chile, vía internacional con pago directo de Efeonce (sin EOR). El universo
+vigente es de **20 países elegibles** — toda Latinoamérica excepto Cuba, más
+Estados Unidos y España. Por eso el bloque de beneficios cierra siempre con el
+calificador de modalidad y país: presentar el baseline sin esa condición le
+ofrecería a un candidato de cualquiera de esos países un equivalente contractual
+como si fuera un derecho estatutario idéntico al chileno.
+
+El proceso publicado declara además un **compromiso de respuesta de 3 a 4
+semanas**: el candidato sabe de antemano en qué plazo tendrá una definición,
+avance o no.
 
 ### Renderer editorial (TASK-1741)
 
@@ -161,8 +184,9 @@ aplican la misma regla. Si el título contiene un nivel explícito, debe coincid
 con `public_seniority`.
 
 El detalle público de una vacante publicada emite `canonical` explícito
-y, detrás del flag `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` (default OFF),
-JSON-LD `JobPosting` construido desde el mismo contenido visible:
+y, detrás del flag `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` (ON en Production
+desde 2026-08-18; nació OFF), JSON-LD `JobPosting` construido desde el mismo
+contenido visible:
 
 - Remota: `TELECOMMUTE` + países elegibles; sin países no hay schema.
 - Híbrida/presencial: `jobLocation` con `public_city` + `public_country`;

@@ -208,8 +208,8 @@ load-bearing in `templates/job-offer-recipe.md`. Builder `job-posting.ts` consum
 - **NEVER** hardcode the brand: `hiringOrganization` comes from the brand SSOT (`EFEONCE_BRAND_NAME` +
   `EFEONCE_URL_HTTPS`, `src/config/efeonce-brand.ts`).
 - **NEVER** flip `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` before the renderer (TASK-1741) shows the
-  structured block on the visible page. The order is **renderer first, schema second**: the JSON-LD builder
-  already consumes `content`, but the renderer does NOT yet, so flipping the schema first would emit to
+  structured block on the visible page. The order is **renderer first, schema second** (satisfied in the
+  2026-08-18 release: renderer shipped, then schema). Flipping the schema first would emit to
   Google content (e.g. `workModel` with the contractual route) that the candidate cannot see — the exact
   misalignment this domain forbids. The two flags are independent in terms of technical dependency
   (TASK-1741 does NOT need the schema flag to be developed: `content` and `remoteEligibleCountries` ALWAYS
@@ -217,16 +217,29 @@ load-bearing in `templates/job-offer-recipe.md`. Builder `job-posting.ts` consum
 - **SIEMPRE** write via the existing canonical command `updateHiringOpening` / `PATCH /api/hiring/openings/{id}`
   (fields `publicContent`, `publicRemoteEligibleCountries`; capability `hiring.opening.write`) — zero new
   endpoints/capabilities/events.
+- **Grandfathering: the v2 editorial contract is required only on the FIRST publication.**
+  `requiresEditorialV2ForPublish(published_at)` gates it; **re-publishing a LIVE vacancy does NOT require
+  v2**. Turning an authoring rule into a service interruption for vacancies already in the market is not
+  a quality gate, it is an outage: at the time of the flip the two live vacancies carried **15 and 33
+  candidates in process**. **NEVER** retrofit an authoring contract onto already-published rows by
+  blocking their re-publication.
+- **SIEMPRE** close the published benefits with the charter qualifier — *"La aplicación concreta se
+  formaliza según tu modalidad de contratación y país de residencia"*. Without it, a candidate in any of
+  the 20 eligible countries reads a **contractual equivalent** as a **Chilean statutory right**.
+- **NEVER** anchor a test/live fixture on "the first active profile" of the database (`ISSUE-159`). There is
+  **ONE Cloud SQL instance shared by dev, staging and production**: a fixture written that way fabricated a
+  candidate facet and a Talent Pool membership **for a real collaborator**. Use the dedicated identity in
+  `src/lib/hiring/live-test-identity.ts`.
 
-**Estado honesto**: code complete, rollout pendiente — the flag is OFF in every environment and the
-production release is deliberately held until TASK-1741 (editorial renderer) is ready, by operator decision.
-Eligible countries were approved by the CEO 2026-08-17 and are ALREADY SET on the 2 published vacancies
-(EO-OPN-0009, EO-OPN-0061): all of Latin America EXCEPT Cuba + US + ES (20 countries — AR BO BR CL CO CR DO
-EC SV GT HN MX NI PA PY PE UY VE + US + ES), with the contractual route made explicit in
-`content.workModel`: **Chile with a local labor contract; outside Chile, the international route with
-direct payment by Efeonce** (contract type `international_internal`, no EOR). Both produce a valid
-JobPosting the moment the flag flips: the rendered JSON-LD was validated for real in local (flag flipped ON
-temporarily and restored to OFF), with zero missing required fields. Renderer fixture:
+**Estado**: **EN PRODUCCIÓN 2026-08-18** (release `fa54670470c1`) — editorial page + JSON-LD `JobPosting`,
+**both flags ON**, schema externally validated by validator.schema.org with **0 errors / 0 warnings**.
+The two live vacancies were authored in **full v2 contract**: `EO-OPN-0009` (Account Manager, reports to the
+CEO) and `EO-OPN-0061` (Content Creator, reports to the Creative Operations Lead), with a published response
+commitment of **3 to 4 weeks**. Eligible countries were approved by the CEO 2026-08-17 and are set on both:
+all of Latin America EXCEPT Cuba + US + ES (20 countries — AR BO BR CL CO CR DO EC SV GT HN MX NI PA PY PE UY
+VE + US + ES), with the contractual route made explicit in `content.workModel`: **Chile with a local labor
+contract; outside Chile, the international route with direct payment by Efeonce** (contract type
+`international_internal`, no EOR). Renderer fixture:
 `src/lib/hiring/public-careers/editorial-opening.fixture.ts`.
 
 Docs: ADR Delta 2026-08-17 in `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` · functional

@@ -206,7 +206,7 @@ pnpm release:workers --expected-sha=<target_sha>
     - **Paso 0 obligatorio — mapear dónde se LEE el flag:** `grep -rn "<FLAG>" src/ services/ | grep -v __tests__`. Hay **5 runtimes con env vars independientes**: Vercel (app Next.js) + 4 Cloud Run (`ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`). Prenderlo en uno **NO** lo prende en los otros. **Heurística:** si gatea algo **async** (email, projection reactiva, consumer del outbox, cron de Cloud Scheduler, materializer) vive en el **`ops-worker`, NO en Vercel** — prenderlo en Vercel no hace nada; si gatea una ruta/superficie visible vive en Vercel; puede vivir en **ambos**.
     - **Paso 0.5 obligatorio — confirmar que el código lector está en `main`:** `git show origin/main:<archivo> | grep <FLAG>` por cada archivo del mapeo. Producción sirve `main`; un flag ON sobre código ausente (o sobre una versión vieja del lector) es fail-closed esperando gente. `pnpm flags:audit` lo chequea, pero hazlo también a mano antes de prender. Ver la hard rule de `ISSUE-150`.
     - **Aplicar en cada runtime del mapeo:** Vercel → `vercel env add <FLAG> Production` + **redeploy obligatorio** (Vercel **congela las env vars al crear el build**: un flag agregado después del build productivo del release no existe para el runtime hasta que hay un deployment nuevo — caso 2026-08-06, `GROWTH_SEO_ENABLED` requirió `dpl_GyGkdEQQTk65qkCs1S3TEH6Jquy9`). Si el flag se puede prender **antes** del merge del PR, el build del release lo hornea y el redeploy no existe. Cloud Run → **los DOS pasos**: (a) declarar el flag en `services/<worker>/deploy.sh` (SoT; esos scripts usan `--set-env-vars` **destructivo**, que borra cualquier var agregada out-of-band) y (b) `gcloud run services update <svc> --region <us-east4|us-central1> --project efeonce-group --update-env-vars <FLAG>=true` para efecto inmediato. Hacer sólo (b) = el flag desaparece en el próximo deploy del worker, en silencio.
-    - **Verificar en el deploy/revisión ACTIVO** (`vercel env ls` · `gcloud run revisions describe <rev> --format="json(spec.containers[0].env)"`) **y ejercitar el flujo real** — que la var exista ≠ que el consumer funcione.
+    - **Verificar en el deploy/revisión ACTIVO** (`vercel env ls` · `gcloud run revisions describe <rev> --format="json(spec.containers[0].env)"`) **y ejercitar el flujo real** — que la var exista ≠ que el consumer funcione. En Vercel, **confirmar cada flag con `vercel env ls | grep <FLAG>` filtrando por environment**: un `env add` fallido **no siempre es evidente en la salida** (sobre todo en batch, donde el script suele imprimir un `✗ falló` sin el mensaje de la API). Ver gotcha #14.
     - **Actualizar la fila del ledger declarando el/los runtime(s)** + fecha + revisión Cloud Run. Sin el runtime explícito, el próximo agente asume Vercel y se equivoca.
 
     El deploy del código no activa nada por sí solo. Si un flag requería su migración en prod, confirmar que entró por este release antes de prenderlo. **Apagar/rollback también es multi-runtime.** Caso fuente 2026-07-09: `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` vive sólo en el `ops-worker`; el runbook sólo enseñaba `vercel env add` y prenderlo ahí habría dejado el email muerto con la success card prometiéndoselo al usuario.
@@ -425,6 +425,24 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
     re-dispatchar el orquestador contra un CI rojo sin diagnosticar primero**: si el summary muestra
     tests fallidos reales, es regresión y el batch no sale; el rerun sólo es legítimo cuando el
     conteo de fallos es cero y el error es identificable como ajeno a los tests.
+
+14. **`vercel env add <FLAG> Production` falla con `api_error` — el entorno estándar va en MINÚSCULA
+    (verificado 2026-08-18, release `fa54670470c1`).** El comando responde
+    `"Please specify at least one Environment for your Environment Variable"` cuando se le pasa
+    `Production` con mayúscula, que es exactamente como aparece el entorno en la salida de
+    `vercel env ls`. El canónico es **`vercel env add <FLAG> production`** en minúscula; los entornos
+    **custom** (p. ej. `staging`) sí respetan su nombre literal. Costó **4 intentos fallidos
+    silenciosos**: el script de batch los reportaba como `✗ falló` sin propagar el mensaje de la API.
+    **Regla: si un `env add` falla dentro de un batch, corre UNO solo mostrando stderr completo antes
+    de diagnosticar nada más** — y verifica el resultado con `vercel env ls | grep <FLAG>` filtrando
+    por environment (paso 10).
+
+15. **El clasificador de permisos del agente bloquea `vercel env add` y `vercel redeploy` hasta que el
+    operador autoriza EXPRESAMENTE en el chat (verificado 2026-08-18, release `fa54670470c1`).** No es
+    credencial, no es scope, no es `.vercel/project.json`: **el comando ni siquiera se ejecuta**. Con la
+    autorización explícita del operador pasa a la primera. **Si un agente reporta "no pude prender el
+    flag", verificar primero si fue el clasificador de permisos antes de investigar Vercel** — perseguir
+    token/scope/link ante un bloqueo de permisos es tiempo puro perdido.
 
 ## What The Orchestrator Owns
 

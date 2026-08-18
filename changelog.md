@@ -3,6 +3,25 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-18 — Careers público en producción: una vacante que se lee como una oferta, y que Google entiende
+
+- **Lo que ve ahora un candidato.** El detalle de una vacante dejó de ser un bloque de prosa con
+  requisitos: hoy abre con la promesa del rol y sigue con qué resultados se esperan, cómo es el trabajo
+  real, qué es imprescindible, qué es deseable y **qué puede aprender ahí** — separado a propósito, para
+  que nadie se autodescarte por algo que el rol enseña. Lee además cuánto dura el proceso y **en qué
+  plazo tendrá respuesta: 3 a 4 semanas**, avance o no. Y ve la vinculación sin letra chica: en Chile
+  contrato laboral local; fuera de Chile, vía internacional con pago directo de Efeonce, sobre 20 países
+  elegibles (toda Latinoamérica salvo Cuba, más Estados Unidos y España). Las dos vacantes vivas ya están
+  escritas así.
+- **Lo que ve Google.** Cada vacante publicada emite `JobPosting` estructurado, construido desde el mismo
+  contenido visible en la página — nunca desde datos que la persona no puede leer. El schema **pasó la
+  validación externa de `validator.schema.org` con 0 errores y 0 advertencias**. Una vacante remota sin
+  países declarados sigue sin emitir schema, a propósito: es preferible no aparecer a aparecerle a alguien
+  a quien no podemos contratar. Pausar o cerrar una vacante la retira del aire y del schema en el mismo acto.
+- **Republicar una vacante viva ya no la saca del aire.** La barra editorial se exige al publicar por
+  primera vez, no al volver a publicar: antes, pausar una vacante con postulantes en proceso la habría
+  dejado en 404 hasta reescribir su contenido completo.
+
 ## 2026-08-17 — TASK-1740: una vacante pública tiene contenido estructurado y schema honesto
 
 - **El contenido candidate-facing deja de vivir sólo en prosa parseada.** Un opening puede declarar
@@ -996,36 +1015,3 @@ ejercita; un snippet en markdown es un fósil que nadie corre hasta el incidente
 puede distinguir "comando viejo" de "sistema roto".
 
 Verificado contra el batch real: el check pasó de no ver nada a clasificar 65 archivos citando su base.
-
-## 2026-08-09 — El menú del portal cliente ya puede mostrar un módulo contratado (TASK-1675)
-
-El portal cliente tenía dos carriles de verdad que nunca se tocaban: el gate de cada page leía
-`module_assignments`, y el menú leía `authorizedViews`, que se deriva de `role_view_assignments` y
-nunca de módulos. La consecuencia era estructural, no de un módulo puntual: Grupo Berel tenía SEO
-contratado, la pantalla renderizaba con sus datos reales, y no había forma de llegar salvo escribiendo
-la URL. Cualquier módulo per-org que se contratara heredaba lo mismo, y la única salida era hardcodear
-otro ítem — justo lo que la spec del dominio prohíbe desde TASK-827.
-
-`(dashboard)/layout.tsx` resuelve los módulos de la organización y pasa `clientNavItems` por props;
-`VerticalMenu` los suma a la lista base. Server-side y no fetch desde el cliente porque el sidebar es
-chrome persistente y un ítem que aparece tarde es CLS en el peor lugar posible. Dos cosas son
-load-bearing y no defensivas: el `try/catch` del layout, que es la raíz de todo el dashboard e
-internos incluidos —sin él, un resolver caído deja de ser "un cliente no ve un ítem" y pasa a ser
-"nadie entra al portal"—, y que el merge sea aditivo, porque la rama "cliente" del componente es en
-realidad la rama no-interno y los colaboradores puros caen ahí.
-
-Se mergean los tres grupos del composer y no sólo el primario. La captura lo justificó de inmediato:
-junto a SEO apareció **AEO**, un módulo del grupo `capabilities`, compuesto sin una línea de código
-dedicada. Con un merge sólo-primary se habría descartado en silencio.
-
-De paso, el `route-reachability-manifest` dejó de mentir: `/growth/seo` declaraba
-`parent:'/home', via:'inline-link'` para un enlace que nunca existió, y el gate no lo notaba porque
-verifica que la ruta esté declarada, no que el enlace declarado exista. Ahora vive en
-`MODULE_COMPOSED_NAV_ROUTES`, la categoría de rutas que sí son ítem de menú pero cuyo `href` se compone
-en runtime.
-
-Cierra la deuda `client-portal-vertical-menu-resolver-migration`, que TASK-827 dejó nombrada en cuatro
-lugares del repo y nunca registró como task. Llevaba meses sin tomarse en parte por eso.
-
-**Rollout gated por la promoción `develop → main`**: mientras el catálogo TS viva sólo en `develop`,
-`syncViewRegistryCatalog` apaga esos viewCodes desde cualquier runtime con código viejo.

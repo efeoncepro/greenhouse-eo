@@ -183,10 +183,17 @@ bajo la presión de recuperarla.
 Toda vacante nueva lleva un bloque v2 que el renderer editorial, las proyecciones
 legacy y el JSON-LD `JobPosting` consumen desde la misma fuente.
 
+> **Estado: ambos flags están ON en Production desde 2026-08-18.** Esta sección
+> ya no es un procedimiento de activación: es cómo se autora, se verifica y se
+> revierte.
+
 ### Autorar el bloque estructurado
 
 1. Prepara el paquete de evidencia con la skill de Talent y su Job Offer Recipe.
-   Completa la estructura v2 fija; separa essentials, preferred y learnables.
+   **La estructura canónica de las 13 secciones del contrato v2 vive en esa
+   receta**, no en este manual ni en el código: ahí está qué exige cada sección,
+   con qué evidencia se llena y qué la deja vacía. Complétala entera; separa
+   essentials, preferred y learnables.
 2. Para un cargo complejo, usa 0–3 `additionalSections` después de `workItems`.
    Sólo se permiten `narrative`, `bullets` o `milestones`; nunca HTML o CTA.
 3. Escribe el bloque por el operador canónico. El operador deriva summary,
@@ -220,34 +227,39 @@ a quien busca empleo _en_ Santiago. La forma correcta es la que ya opera:
 declarado en el contenido visible (`content.workModel`). Una lista de un solo
 país (`["CL"]`) también es válida y honesta: "remoto, elegible en Chile".
 
-### Activar renderer y schema JobPosting
+### Verificar que una vacante emite schema (renderer y schema ya ON)
 
-> ⚠️ **Precondición de secuencia (no negociable): el renderer va primero.**
-> El código del renderer ya consume el bloque estructurado, pero permanece OFF
-> hasta el rollout. **Orden correcto: renderer de TASK-1741 → contenido autorado
-> y revisado → recién entonces schema.** Existe un interlock técnico: aunque la
-> env del schema diga `true`, no se emite `JobPosting` mientras
-> `CAREERS_DETAIL_EDITORIAL_V2_ENABLED` esté OFF.
+El renderer (`CAREERS_DETAIL_EDITORIAL_V2_ENABLED`) y el schema
+(`HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED`) están ON en Production. Sigue vigente
+el interlock técnico: aunque la env del schema diga `true`, no se emite
+`JobPosting` mientras el renderer esté OFF — el orden nunca se invierte.
 
-1. Prende `CAREERS_DETAIL_EDITORIAL_V2_ENABLED` en staging y redespliega.
-2. Verifica la hoja completa en 1440 y 390: navegación, hero, seniority,
-   metadatos, prosa, requisitos/deseables, remoto, proceso, compensación, rail,
-   footer y exactamente dos enlaces de postulación al mismo destino.
-3. Confirma que los campos estructurados aprobados aparecen también en el HTML
-   visible. Un bloque parcial debe conservar el fallback legacy; no publiques
-   contenido ficticio para completar secciones. En una publicación v2 incompleta,
-   corrige el paquete antes de publicar.
-4. El flag `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` vive **solo en Vercel**
-   (SSR del detalle público). Default OFF.
-5. Préndelo en staging (`vercel env add … preview` + redeploy), abre el
-   detalle de una vacante con países/ciudad declarados y valida el HTML con
-   el [Rich Results Test](https://search.google.com/test/rich-results).
-6. Verifica el lifecycle: pausa la vacante (`DELETE
+1. Abre el detalle público de la vacante y verifica la hoja en 1440 y 390:
+   navegación, hero, seniority, metadatos, prosa, requisitos/deseables, remoto,
+   proceso, compensación, rail, footer y exactamente dos enlaces de postulación
+   al mismo destino.
+2. Confirma que cada hecho del schema aparece también en el HTML visible. Un
+   bloque parcial conserva el fallback legacy; no publiques contenido ficticio
+   para completar secciones. En una publicación v2 incompleta, corrige el
+   paquete antes de publicar.
+3. Valida el JSON-LD emitido con
+   [validator.schema.org](https://validator.schema.org/) y el
+   [Rich Results Test](https://search.google.com/test/rich-results). La barra
+   verificada el 2026-08-18 es **0 errores y 0 advertencias**; una advertencia
+   nueva es señal de contenido incompleto, no ruido.
+4. Si una vacante remota no emite schema, revisa primero sus países elegibles:
+   sin ISO declarados no hay schema, y eso es correcto por diseño.
+5. Verifica el lifecycle: pausa la vacante (`DELETE
 /api/hiring/openings/{id}/publish?mode=paused`) y confirma que la URL
    responde 404 sin schema; restaura solo con el command de publish.
-7. Producción: mismo procedimiento tras evidencia en staging. Rollback:
-   apaga primero el schema y redespliega; después apaga el renderer y vuelve a
-   desplegar. La URL, el canonical, el payload y el formulario no cambian.
+
+**Si necesitas tocar los flags** (rollback, o replicar el estado en otro
+entorno): el flag del schema vive **solo en Vercel** (SSR del detalle público).
+`vercel env add` toma el entorno **en minúscula** (`production`, `preview`) — con
+`Production` falla — y **exige redeploy**: Vercel no toma env vars nuevas en
+caliente, así que sin redeploy el flag queda declarado y sin efecto. Rollback:
+apaga primero el schema y redespliega; después apaga el renderer y vuelve a
+desplegar. La URL, el canonical, el payload y el formulario no cambian.
 
 ### Qué no hacer
 
