@@ -5,15 +5,19 @@
  *   pnpm hiring:candidate-review:backfill
  *   pnpm hiring:candidate-review:backfill -- --application-id happ-... --limit 1
  *   HIRING_CANDIDATE_REVIEW_PROJECTION_ENABLED=true pnpm hiring:candidate-review:backfill -- --apply
+ *   HIRING_CANDIDATE_REVIEW_PROJECTION_ENABLED=true HIRING_EVALUATION_DOSSIER_AI_ENABLED=true
+ *     HIRING_EVALUATION_DOSSIER_AI_AUTO_PROPOSE_ENABLED=true pnpm hiring:candidate-review:backfill -- --apply --propose-dossier
  *
  * Output is aggregate-only: candidate/application/asset identifiers and extracted text are never logged.
  */
 import { materializeCandidateReviewProjection } from '../../src/lib/hiring/candidate-review/projection'
+import { autoProposeEvaluationDossier } from '../../src/lib/hiring/dossier-ai/auto-propose'
 import { runGreenhousePostgresQuery } from '../../src/lib/postgres/client'
 
 type EligibleRow = { asset_id: string }
 
 const apply = process.argv.includes('--apply')
+const proposeDossier = process.argv.includes('--propose-dossier')
 
 const argumentValue = (name: string) => {
   const index = process.argv.indexOf(name)
@@ -35,6 +39,13 @@ if (rawLimit != null && (!Number.isInteger(limit) || (limit ?? 0) < 1 || (limit 
 
 if (apply && process.env.HIRING_CANDIDATE_REVIEW_PROJECTION_ENABLED !== 'true') {
   throw new Error('HIRING_CANDIDATE_REVIEW_PROJECTION_ENABLED=true is required for --apply')
+}
+
+if (apply && proposeDossier && (
+  process.env.HIRING_EVALUATION_DOSSIER_AI_ENABLED !== 'true'
+  || process.env.HIRING_EVALUATION_DOSSIER_AI_AUTO_PROPOSE_ENABLED !== 'true'
+)) {
+  throw new Error('Both dossier AI flags are required for --apply --propose-dossier')
 }
 
 const values: unknown[] = []
@@ -72,23 +83,32 @@ const main = async () => {
       eligible: rows.length,
       scopedToApplication: Boolean(applicationId),
       limited: limit != null,
+      proposeDossier,
     }))
 
     return
   }
 
   const outcomes: Record<string, number> = {}
+  const dossierOutcomes: Record<string, number> = {}
 
   for (const row of rows) {
     const result = await materializeCandidateReviewProjection(row.asset_id)
 
     outcomes[result.outcome] = (outcomes[result.outcome] ?? 0) + 1
+
+    if (proposeDossier && result.outcome === 'ready' && result.applicationId) {
+      const dossier = await autoProposeEvaluationDossier(result.applicationId)
+
+      dossierOutcomes[dossier.outcome] = (dossierOutcomes[dossier.outcome] ?? 0) + 1
+    }
   }
 
   console.log(JSON.stringify({
     mode: 'apply',
     processed: rows.length,
     outcomes,
+    dossierOutcomes,
     scopedToApplication: Boolean(applicationId),
     limited: limit != null,
   }))

@@ -10,6 +10,13 @@ import 'server-only'
 export const isHiringDossierAiEnabled = (): boolean =>
   process.env.HIRING_EVALUATION_DOSSIER_AI_ENABLED === 'true'
 
+/**
+ * Worker-only gate. A clean, ready CV may enqueue an idempotent dossier proposal,
+ * but the proposal remains operator-only and never materializes a note by itself.
+ */
+export const isHiringDossierAutoProposeEnabled = (): boolean =>
+  process.env.HIRING_EVALUATION_DOSSIER_AI_AUTO_PROPOSE_ENABLED === 'true'
+
 export const HIRING_DOSSIER_PROVIDER = 'anthropic' as const
 
 /**
