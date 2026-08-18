@@ -195,6 +195,7 @@
     "hiring:ai:gold-set-sample": "tsx --env-file=.env.local --require ./scripts/lib/server-only-shim.cjs scripts/hiring/build-gold-set-sample.ts",
     "hiring:ai:promotion-gate": "node scripts/hiring/assessment-ai-promotion-gate.mjs",
     "hiring:ai:run-rollback": "node scripts/hiring/assessment-ai-run-rollback.mjs",
+    "hiring:candidates:purge-test-facets": "tsx --env-file=.env.local --require ./scripts/lib/server-only-shim.cjs scripts/hiring/purge-test-induced-candidate-facets.ts",
     "hiring:candidates:remediate-display": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/remediate-candidate-display-names.ts",
     "pg:doctor": "bash scripts/gcloud-auth-preflight.sh && tsx --require ./scripts/lib/server-only-shim.cjs scripts/pg-doctor.ts",
     "gcp:doctor": "tsx scripts/gcp-auth-doctor.ts",
