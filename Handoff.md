@@ -2,6 +2,110 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-18 — Canary de identidad y smoke del expediente: los dos pendientes declarados, cerrados
+
+Los dos flags que se prendieron "ON con pendiente" ya tienen su verificación. Ambas filas del ledger
+quedaron actualizadas con la evidencia.
+
+**Canary TASK-1736 — verde, 4/4.** Se ejecutó como live test gobernado
+(`HIRING_CANARY_T1736=1 pnpm vitest run src/lib/hiring/candidate-intake/canary.live.test.ts`), no por el
+endpoint público. La razón importa: la base es UNA sola para dev/staging/prod y el ops-worker de correos
+es el mismo, así que postular contra `EO-OPN-0009`/`EO-OPN-0061` habría dejado un candidato falso
+—indeleble— en una vacante con candidatos en proceso. Verificado además que **no salió ningún correo**.
+
+**Lo que el canary enseñó y el runbook no decía.** Con el flag ON, la evidencia y el audit son
+append-only **por grant** (`greenhouse_runtime` no tiene DELETE) y esas filas pinnean por FK toda la
+cadena application → facet → Person → opening → demand. O sea: **el canary no puede limpiarse a sí
+mismo**. Mi teardown lo intentó y falló en silencio porque tenía `.catch(() => undefined)` — ese swallow
+está eliminado y ahora reporta el residuo a gritos. El runbook lleva la advertencia y el residuo exacto.
+
+**Residuo pendiente (bloqueado por la misma credencial que ISSUE-159).** Sujeto 100% sintético:
+Person `identity-…-canary-t1736-1787066079713-live-test-invalid`, application `happ-ffebd53b…`,
+opening `EO-OPN-0101` **ya despublicado** (`internal_only`, el listado público volvió a tener sólo las 2
+vacantes reales), más 2 filas de evidencia y 3 de audit. Registrado como **Delta en TASK-1739**, que es su
+hogar natural: su lane de purga ya distingue archivar-con-historia de borrar-huérfanos, y este es su primer
+objetivo concreto. `purge-test-facets` NO sirve acá (exige cero postulaciones y consent `not_captured`).
+
+**Smoke del expediente (TASK-1735) — verificado sobre el caso real, sin escribir nada nuevo.** El
+propose→confirm post-fix ya había ocurrido el 17-ago 00:12: la nota `hnote-d710c072` guardó sus 8240
+caracteres completos (termina en punto) contra los 8000 de `hnote-e2fd7280`, y lleva `supersedesNoteId` +
+`repairedFullLength` en su `context_json`. Queda **sólo la revisión humana del primer expediente real**:
+es el gate de supervisión humana, no lo puede firmar un agente.
+
+**Fix de paso:** `evidence_coverage_gap` ahora filtra `source='public_careers'`. Contaba todas las
+postulaciones, pero la evidencia sólo nace del intake público — cada carga manual desde el desk la habría
+dejado en `warning` para siempre. Test de regresión sobre el SQL. `local:check` EXIT=0.
+
+## 2026-08-18 — Las dos vacantes vivas ya están en el contrato editorial v2
+
+Autoradas y publicadas con `PublicOpeningContent` v2 completo por el command canónico. Antes tenían
+sólo `workModel` poblado y toda la hoja caía al fallback de prosa; ahora sirven las 13 secciones del
+formato canónico, incluida **"Cómo se ve un buen primer año"** — los outcomes observables, que es el
+campo que el formato agrega y que ninguna de las dos declaraba.
+
+Casi todo se **derivó de la prosa ya aprobada** (descripción, requisitos, deseables, notas de
+proceso), que es reestructurar, no inventar. Los tres hechos que no existían en ninguna fuente los
+resolvió el CEO, tal como exige la receta (`job-offer-recipe.md` §0: *"if a fact cannot be resolved,
+carry `needs confirmation` and stop before publication"*): **Account Manager reporta al CEO**,
+**Content Creator a la Creative Operations Lead**, y el **compromiso de respuesta es de 3 a 4
+semanas**. Ese último es el campo que más pesa: es donde la vacante deja de vender y se compromete —
+y hoy hay 35 postulaciones sin revisar, así que el compromiso es deliberadamente conservador.
+
+Corregido de paso: `EO-OPN-0061` publicaba "Contrato indefinido" como jornada, que con vinculación
+internacional sólo es exacto para Chile. Ahora dice "Jornada completa" —la dedicación sí es
+universal— y la forma contractual se explica en el modelo de trabajo. Efecto colateral correcto:
+`employmentType: FULL_TIME` en el schema, que antes se omitía por ambiguo.
+
+Verificado en producción: ambas 200, las 13 secciones presentes, JSON-LD de 5756 y 4508 caracteres
+con los outcomes incluidos, `baseSalary` sólo en Content Creator (la única con rango aprobado) y
+`employmentType: FULL_TIME` en las dos.
+
+## 2026-08-18 — Careers público EN PRODUCCIÓN: hoja editorial + JobPosting, con 4 flags prendidos
+
+Release `fa54670470c1` (`released`, run `32127499151`, 8m31s). Batch de EPIC-011: TASK-1740 +
+TASK-1741 + el acumulado 1719/1734/1735/1736 + `ISSUE-159`. Watchdog `OK` con **4/4 workers
+synced** (el residual change-gated del `ops-worker` lo clasificó solo, diff de rutas runtime vacío).
+
+**Verificado en producción real, no en el generador:** las dos vacantes emiten `JobPosting` con
+`TELECOMMUTE`, 20 países, `hiringOrganization: Efeonce`, canonical correcto y sin
+`directApply`/`validThrough`/`baseSalary`; la hoja editorial se sirve con sus secciones; una vacante
+cerrada responde 404 sin schema. El calificador de beneficios ("se formaliza según tu modalidad de
+contratación y país de residencia") aparece en el HTML **y** en el schema, desde la misma fuente.
+
+**Flags prendidos en Production** (con redeploy `greenhouse-4qu4swddd` — sin él quedan inertes):
+`CAREERS_DETAIL_EDITORIAL_V2_ENABLED`, `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED`,
+`HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED`, `HIRING_EVALUATION_DOSSIER_AI_ENABLED`. Los dos
+últimos se prendieron por autorización explícita del CEO **con sus verificaciones aún pendientes**:
+el canary del runbook de identidad y el smoke propose/confirm del expediente. Están anotados en el
+ledger como ON-con-pendiente, no como cerrados.
+
+**El quinto flag se prendió DESPUÉS de cumplir sus precondiciones, no saltándolas.** Primero quedó
+apagado porque `services/ops-worker/deploy.sh` exige tres y sólo se cumplía una. A instrucción del
+CEO ("resuelve lo que haga falta para prenderlo de forma robusta"), se resolvieron las otras dos:
+la policy del canary `EO-OPN-0009` se reconfiguró a `on_stage_entry`/`shortlisted` (cap 3/60 min) y
+se habilitó por command canónico —`configureOpeningAssessmentPolicy` la devuelve a `draft` a
+propósito, así que son dos llamadas y quedó en `policy_version=2`—, y el cancel/recovery se ejercitó
+con `cancel.live.test.ts` **5/5 contra PG real** en vez de cancelarle el test a un candidato real,
+que le habría matado el enlace. Recién entonces: default `true` en `deploy.sh` (SoT, porque
+`--set-env-vars` es destructivo y un flip out-of-band se evapora en silencio) **más**
+`gcloud run services update`, verificado en la revisión activa `ops-worker-00576-7zz`.
+
+⚠️ **Ahora sí dispara**: mover una postulación de esa vacante a `shortlisted` le asigna el test
+automáticamente. Las 5 que ya están en esa etapa tienen test abierto (4/5), así que la señal del
+canary llega cuando Talent mueva a alguien de los 10 `sourced`. El tope de 3 por hora es
+deliberadamente conservador: un movimiento en lote mayor deja a los excedentes con el aviso genérico
+de avance, sin prueba — conviene calibrarlo con Talent antes de un batch grande.
+
+**Dos aprendizajes operativos para el runbook:** (1) el clasificador de permisos bloquea
+`vercel env add`/`redeploy` hasta que el operador autoriza expresamente en el chat — no es credencial
+ni scope; (2) `vercel env add <FLAG> Production` falla con `api_error: specify at least one
+Environment`: **el entorno estándar va en minúscula** (`production`), mientras el custom (`staging`)
+respeta su nombre literal.
+
+**Sigue pendiente de decisión del CEO:** monitor de equidad (capturaría categorías protegidas bajo
+una política que sólo existe en versión de pruebas), scoring por lotes (bloqueado por falta de gold
+set calificado, no de permiso) y lectura de CVs por agentes (sin firmas de privacidad/seguridad).
+
 ## 2026-08-17 — Barrido de cierre: lo que estaba a medias, y el incidente que nadie había registrado
 
 Tres auditorías paralelas sobre TASK-1719, el rollout de 1740/1741 y el estado general del
@@ -426,32 +530,3 @@ directamente sobre el canvas gris. Ahora usan `SurfaceRecipe`, `WorkbenchHeader`
 `DetailHero`; la evaluación quedó en una sola superficie y la cola vacía se compacta. ESLint focal, typecheck,
 8 tests y GVC desktop/390 px están verdes en
 `.captures/2026-08-16T21-30-17_task1363-assessment-radar-runtime`. Cambio local, sin push/deploy.
-
-## 2026-08-16 — TASK-1734 complete (code complete, rollout gated) + TASK-1736 Slices 0-2
-
-TASK-1734 cerró sus 7 slices: ADR aceptado, run aggregate durable, fan-out con risk router,
-eval harness con gate de promoción BLOQUEANTE (dataset humano de Talent pendiente, owner por
-asignar), exception review + batch confirm con manifest anti-anclaje, suite anti-leak (37 tests,
-cero leaks reales), señales de reliability + rollback CLI + runbook. Auditoría doble CONDITIONAL
-→ resuelta (terminal SQL del enum, drain sin head-of-line, muestra ciega ESTRUCTURAL en el
-reader). Gates: suite full 11.157+ y build verdes. Rollout gated al runbook
-`docs/operations/runbooks/assessment-ai-scoring-rollout.md`: flags OFF en todos los runtimes,
-scheduler `ops-assessment-ai-drain` declarado nacido en pausa (se crea en el próximo deploy del
-ops-worker). TASK-1736 avanza: S0 ADR + S1 primitive de normalización + S2 evidencia/reconcile/
-corrección humana (flag OFF); quedan S3 (detector + remediación histórica) y S4 (canary/cierre).
-
-## 2026-08-16 — TASK-1736 tomada por la sesión Claude (reasignación de operador)
-
-El operador (CEO) reasignó TASK-1736 a esta sesión para avanzar en paralelo con TASK-1734
-(Slices 4-5 en vuelo por subagentes). Arranca por Slice 0 (ADR + field policy matrix,
-docs-only). La matriz de sign-offs se resuelve por la misma autorización ejecutiva del CEO
-registrada hoy para 1734. La sesión que la creó no había iniciado ejecución.
-
-## 2026-08-16 — Radar de assessment corregido localmente
-
-Application 360 ya usa Recharts para el radar de competencias: eliminó `competencyKey.slice(0, 7)`, muestra
-etiquetas humanas sin cortar palabras, leyenda puntaje/objetivo y una guía visible con nombres completos. El
-perfil azul sólo se dibuja con el scorecard completo; pendientes nunca se convierten en cero. La cola vacía
-cede ancho al scorecard y el copy técnico cercano quedó localizado. Tests focalizados, ESLint, typecheck y
-captura GVC desktop/mobile verdes en `.captures/2026-08-16T19-02-20_task1363-assessment-radar-runtime`.
-Rollout remoto pendiente de push/deploy.

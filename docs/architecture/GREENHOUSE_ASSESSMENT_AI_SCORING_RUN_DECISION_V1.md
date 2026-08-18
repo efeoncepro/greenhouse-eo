@@ -355,6 +355,31 @@ Cierre de la auditoría doble sobre `src/lib/hiring/assessment/ai/scoring-run/**
   `awaiting_review` con reason `no_eligible_items` — sin doble scoring, sin gasto de provider,
   cerrable por reconcile. Es la evidencia honesta del replay, no trabajo fantasma.
 
+## Delta 2026-08-18 — Autoridad provisional global y evidence binding mecánico
+
+`TASK-1742` acepta una extensión que resuelve el bloqueo operativo sin rebajar el gate de promoción:
+
+1. El runtime declara un modo efectivo entre `disabled | synthetic_shadow | global_provisional |
+   exception_canary | calibrated_batch`. `global_provisional` puede generar y servir propuestas
+   agregadas operator-only, pero no confirma ni escribe score efectivo.
+2. El modo efectivo y, cuando corresponda, el digest de evidencia de promoción entran al
+   `policy_version` y por tanto al digest inmutable del run. Un cambio invalida el run anterior.
+3. `exception_canary` y `calibrated_batch` fallan cerrados salvo que exista un digest de evidencia
+   explícito y el flag de exception policy esté ON. La evidencia vigente insuficiente de hoy mantiene
+   ambos modos inaccesibles; no se simula calibración.
+4. El packet al provider pasa por un sanitizer determinístico previo a egress. Prompt injection se
+   abstiene sin gasto; PII/contacto y datos protegidos detectables se redactan; señales adversariales
+   quedan como reason codes y fuerzan revisión.
+5. La proyección provisional se deriva de run/items/proposals existentes. Nunca se copia a
+   `human_score`, `auto_score`, assessment finalization, application score/stage ni ranking.
+6. El rollout es global por elegibilidad —sin allowlist de opening— pero operacionalmente acotado por
+   concurrencia, costo, exact canary y kill switch. `global` describe cobertura, no autoridad.
+
+Autorización: el operador/CEO aprobó explícitamente el 2026-08-18 ejecutar el modo provisional para
+todas las vacantes y mantenerlo exclusivamente interno. No autorizó resultados al postulante,
+`exception_canary`, `calibrated_batch`, ranking, decisiones, movimientos de etapa, asignación de tests,
+emails, handoff, MCP ni B2B.
+
 ## Referencias
 
 - [`TASK-1734`](../tasks/in-progress/TASK-1734-assessment-ai-scale-operator-exception-review.md) — spec + `## Delta 2026-08-16` (runtime-verificado)

@@ -3,6 +3,44 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-18 — Los dos flags que quedaron "ON con pendiente" ya tienen su verificación hecha
+
+- **Canary de identidad del intake (TASK-1736), ejecutado y verde.** Los 5 puntos del runbook contra PG
+  real: la evidencia guarda el nombre EXACTO como lo escribió la persona, la clasifica `degenerate_lower`
+  y propone la versión capitalizada; la Person queda con esa propuesta y no con el verbatim; el audit
+  registra `reconcile/applied`; un segundo envío en MAYÚSCULAS no duplica a la persona y deja el outcome
+  del CAS; un reenvío idéntico no agrega evidencia. **Cero correos** emitidos.
+- **El canary NO se corre contra una vacante real, y ahora el runbook lo dice.** Hacerlo mete un candidato
+  falso en el pipeline de una vacante viva (llevaban 15 y 33 candidatos) y dispara el aviso a People. Peor:
+  la evidencia es **append-only por grant**, así que ese candidato falso **no se puede borrar** — queda
+  pinneado por FK hasta que un humano purgue con perfil `ops`. El carril correcto es un live test opt-in
+  sobre una vacante desechable propia, que se despublica sola.
+- **Expediente de evaluación (TASK-1735): el arreglo del truncado quedó probado con el caso real.** La nota
+  posterior al fix persistió sus 8240 caracteres completos —termina en punto— contra los 8000 exactos de la
+  mutilada, y la vieja quedó enlazada como *versión superada*, no como vigente. El límite en base ya es 20000.
+- **Una señal que iba a mentir para siempre.** `evidence_coverage_gap` contaba TODAS las postulaciones, pero
+  la evidencia sólo la escribe el intake público: cada postulación cargada a mano desde el desk (6 en 30 días)
+  la habría dejado en `warning` de forma permanente, sobre la señal que justamente gatea este rollout.
+
+## 2026-08-18 — Careers público en producción: una vacante que se lee como una oferta, y que Google entiende
+
+- **Lo que ve ahora un candidato.** El detalle de una vacante dejó de ser un bloque de prosa con
+  requisitos: hoy abre con la promesa del rol y sigue con qué resultados se esperan, cómo es el trabajo
+  real, qué es imprescindible, qué es deseable y **qué puede aprender ahí** — separado a propósito, para
+  que nadie se autodescarte por algo que el rol enseña. Lee además cuánto dura el proceso y **en qué
+  plazo tendrá respuesta: 3 a 4 semanas**, avance o no. Y ve la vinculación sin letra chica: en Chile
+  contrato laboral local; fuera de Chile, vía internacional con pago directo de Efeonce, sobre 20 países
+  elegibles (toda Latinoamérica salvo Cuba, más Estados Unidos y España). Las dos vacantes vivas ya están
+  escritas así.
+- **Lo que ve Google.** Cada vacante publicada emite `JobPosting` estructurado, construido desde el mismo
+  contenido visible en la página — nunca desde datos que la persona no puede leer. El schema **pasó la
+  validación externa de `validator.schema.org` con 0 errores y 0 advertencias**. Una vacante remota sin
+  países declarados sigue sin emitir schema, a propósito: es preferible no aparecer a aparecerle a alguien
+  a quien no podemos contratar. Pausar o cerrar una vacante la retira del aire y del schema en el mismo acto.
+- **Republicar una vacante viva ya no la saca del aire.** La barra editorial se exige al publicar por
+  primera vez, no al volver a publicar: antes, pausar una vacante con postulantes en proceso la habría
+  dejado en 404 hasta reescribir su contenido completo.
+
 ## 2026-08-17 — TASK-1740: una vacante pública tiene contenido estructurado y schema honesto
 
 - **El contenido candidate-facing deja de vivir sólo en prosa parseada.** Un opening puede declarar
@@ -963,69 +1001,3 @@ El bloque `DO` de la migración verificó que ninguna organización quedara sin 
 pasar el cambio. Estado final: cero `seo_v1` vigentes, dos superseded con su historia intacta, dos
 `seo_v2` activos. La fila `seo_v1` sigue en el catálogo: el contract es `effective_to`, nunca un
 `DELETE`.
-
-## 2026-08-09 — El gate que aprobaba sin mirar (TASK-1676, cierra ISSUE-145)
-
-El `release_batch_policy` del preflight comparaba contra `origin/main`. Pero el orquestador lo corre
-con el `target_sha` ya mergeado en `main`, así que el rango quedaba vacío y el check devolvía `ship`
-sin haber mirado un solo archivo. No era una hipótesis: los `preflight-result.json` de tres releases
-consecutivos reportan `filesChanged=0, decision=ship`, y uno de ellos llevaba 1045 archivos y 14
-migraciones. Un gate que grita de más hace perder tiempo; uno que nunca grita entrega una seguridad
-que no existe.
-
-La base pasa a ser el `target_sha` del último manifest en estado `released` para la rama. El filtro
-por estado no es cosmético: en este repo conviven dos manifests con el mismo `target_sha`, uno
-`aborted` y uno `released`, y el helper que ya existía no filtraba. De paso, `rolled_back` queda
-excluido solo, así que el ancla nunca apunta a código que se sacó de producción.
-
-El invariante quedó formulado sobre el resultado y no sobre la base, que es más fuerte de lo que pedía
-la issue: **un diff vacío nunca es aprobación**, venga de donde venga el ancla. Eso permite conservar
-el fallback a la HEAD de la rama sin reabrir el agujero — y hace falta, porque los 75 manifests son de
-`main` y un preflight sobre otra rama habría quedado mudo para siempre.
-
-El marker `[release-coupled: …]` tenía el problema simétrico: nunca se leía donde el runbook decía, y
-al mismo tiempo lo disparaba cualquier mención en prosa dentro de los ~509 commits del rango — 442 KB
-donde una cita basta, y donde el marker desactiva de una sola vez TODA la detección de mezcla de
-dominios. Se cerró con dos candados: la regex exige que el marker abra la línea, y el texto donde se
-busca es sólo el cuerpo del commit objetivo. El caso de regresión más elocuente resultó ser el commit
-que creó la task para arreglar el defecto: al describirlo, lo disparaba.
-
-Aparte, `pnpm release:workers`. En el release del 2026-08-08/09 fallaron tres comandos copiados de la
-documentación y ninguno de los envueltos en `pnpm`. Un wrapper se arregla una vez y el uso diario lo
-ejercita; un snippet en markdown es un fósil que nadie corre hasta el incidente, y ahí el operador no
-puede distinguir "comando viejo" de "sistema roto".
-
-Verificado contra el batch real: el check pasó de no ver nada a clasificar 65 archivos citando su base.
-
-## 2026-08-09 — El menú del portal cliente ya puede mostrar un módulo contratado (TASK-1675)
-
-El portal cliente tenía dos carriles de verdad que nunca se tocaban: el gate de cada page leía
-`module_assignments`, y el menú leía `authorizedViews`, que se deriva de `role_view_assignments` y
-nunca de módulos. La consecuencia era estructural, no de un módulo puntual: Grupo Berel tenía SEO
-contratado, la pantalla renderizaba con sus datos reales, y no había forma de llegar salvo escribiendo
-la URL. Cualquier módulo per-org que se contratara heredaba lo mismo, y la única salida era hardcodear
-otro ítem — justo lo que la spec del dominio prohíbe desde TASK-827.
-
-`(dashboard)/layout.tsx` resuelve los módulos de la organización y pasa `clientNavItems` por props;
-`VerticalMenu` los suma a la lista base. Server-side y no fetch desde el cliente porque el sidebar es
-chrome persistente y un ítem que aparece tarde es CLS en el peor lugar posible. Dos cosas son
-load-bearing y no defensivas: el `try/catch` del layout, que es la raíz de todo el dashboard e
-internos incluidos —sin él, un resolver caído deja de ser "un cliente no ve un ítem" y pasa a ser
-"nadie entra al portal"—, y que el merge sea aditivo, porque la rama "cliente" del componente es en
-realidad la rama no-interno y los colaboradores puros caen ahí.
-
-Se mergean los tres grupos del composer y no sólo el primario. La captura lo justificó de inmediato:
-junto a SEO apareció **AEO**, un módulo del grupo `capabilities`, compuesto sin una línea de código
-dedicada. Con un merge sólo-primary se habría descartado en silencio.
-
-De paso, el `route-reachability-manifest` dejó de mentir: `/growth/seo` declaraba
-`parent:'/home', via:'inline-link'` para un enlace que nunca existió, y el gate no lo notaba porque
-verifica que la ruta esté declarada, no que el enlace declarado exista. Ahora vive en
-`MODULE_COMPOSED_NAV_ROUTES`, la categoría de rutas que sí son ítem de menú pero cuyo `href` se compone
-en runtime.
-
-Cierra la deuda `client-portal-vertical-menu-resolver-migration`, que TASK-827 dejó nombrada en cuatro
-lugares del repo y nunca registró como task. Llevaba meses sin tomarse en parte por eso.
-
-**Rollout gated por la promoción `develop → main`**: mientras el catálogo TS viva sólo en `develop`,
-`syncViewRegistryCatalog` apaga esos viewCodes desde cualquier runtime con código viejo.

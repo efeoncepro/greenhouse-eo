@@ -1,9 +1,32 @@
-# Runbook — Rollout del scoring IA de assessments (shadow → canary → promoción)
+# Runbook — Rollout del scoring IA de assessments (provisional → calibrado)
 
 > **Tipo de documento:** Runbook operativo
 > **Task dueña:** `TASK-1734` (Slice 6) · **ADR:** `docs/architecture/GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md`
 > **Creado:** 2026-08-16 (Claude, Slice 6 code-only)
-> **Estado:** rollout **gated a señal del operador** — este documento deja los pasos exactos listos; NADA de lo descrito aquí se ejecutó todavía (flags OFF, scheduler pausado o inexistente hasta el próximo deploy del ops-worker).
+> **Estado:** TASK-1742 autorizado para activar `global_provisional`; `exception_canary` y `calibrated_batch` siguen bloqueados por evidencia.
+
+## Ruta provisional global — TASK-1742
+
+`global_provisional` genera propuestas para todas las vacantes, pero no escribe `human_score`, no finaliza el assessment y no modifica score, etapa, decisión, asignación de test, email ni handoff. El resultado se sirve solo a operadores con `hiring.assessment.score` y siempre declara “No incorporada al resultado efectivo”.
+
+Variables del ops-worker:
+
+- `HIRING_ASSESSMENT_AI_RUN_MODE=global_provisional`
+- `HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED=true`
+- `HIRING_ASSESSMENT_AI_ENABLED=true`
+- `HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED=false`
+- `HIRING_ASSESSMENT_AI_RUN_CONCURRENCY=1` durante el canary
+- `HIRING_ASSESSMENT_AI_DAILY_PROVIDER_ATTEMPT_CAP=<tope aprobado>`
+
+Variables de Vercel:
+
+- `HIRING_ASSESSMENT_AI_RUN_MODE=global_provisional`
+- `HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED=false`
+- `HIRING_ASSESSMENT_AI_RUN_CONFIRM_ENABLED=false`
+
+Activación: desplegar primero el código con flags OFF, comprobar el assessment exacto y el command dry-run, activar los valores anteriores, ejecutar el assessment exacto de Lucero y verificar que la proyección existe mientras los campos efectivos permanecen bit-for-bit. Luego se mantiene el enqueue global para nuevos envíos y el backlog se abre con `pnpm hiring:ai:provisional-backfill`, dry-run por defecto, máximo 25 por lote.
+
+Cualquier modo superior a provisional requiere `HIRING_ASSESSMENT_AI_PROMOTION_EVIDENCE_DIGEST` válido; sin ese digest el runtime degrada mecánicamente a `global_provisional`. Una detección de prompt injection bloquea el egress; PII/protected data se redacta antes del provider; OOD/off-topic se enruta como excepción. El tope diario detiene nuevas llamadas sin perder la cola.
 
 ## Para qué sirve
 

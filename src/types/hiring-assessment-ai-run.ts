@@ -229,3 +229,70 @@ export interface ReconcileAiScoringRunsResult {
   /** Runs no terminales sin trabajo restante (assessment ya scored) → `cancelled`. */
   runsClosed: number
 }
+
+// ── TASK-1742 — Proyección provisional operator-only ──
+
+export type ProvisionalAssessmentAiStatus = 'not_started' | 'running' | 'complete' | 'partial' | 'failed' | 'stale'
+
+export interface ProvisionalAssessmentAiCompetency {
+  competencyId: string
+  competencyKey: string
+  competencyName: string
+  targetLevel: string | null
+  weight: number
+  score: number | null
+  totalResponses: number
+  evaluatedResponses: number
+  provisionalResponses: number
+}
+
+export interface ProvisionalAssessmentAiProjection {
+  assessmentId: string
+  applicationId: string
+  runId: string | null
+  runStatus: AiScoringRunStatus | null
+  mode: string
+  status: ProvisionalAssessmentAiStatus
+  /** Solo existe cuando TODAS las respuestas tienen score efectivo o proposal usable. */
+  overallScore: number | null
+  incorporatedIntoEffectiveScore: false
+  coverage: {
+    totalResponses: number
+    evaluatedResponses: number
+    effectiveResponses: number
+    provisionalResponses: number
+    pendingResponses: number
+    abstainedResponses: number
+    failedResponses: number
+  }
+  competencies: ProvisionalAssessmentAiCompetency[]
+  exceptions: Array<{
+    runItemId: string
+    responseId: string
+    status: AiScoringRunItemStatus
+    riskClass: AiScoringRiskClass | null
+    reasonCode: string | null
+    routingReasons: string[]
+  }>
+  provenance: {
+    model: string | null
+    promptVersion: string | null
+    policyVersion: string | null
+    inputDigest: string | null
+  }
+}
+
+export interface BackfillAssessmentAiScoringRunsInput {
+  dryRun: boolean
+  limit: number
+  assessmentId?: string
+  actorUserId: string
+  reason: string
+  idempotencyKey: string
+}
+
+export interface BackfillAssessmentAiScoringRunsResult {
+  dryRun: boolean
+  candidates: string[]
+  started: Array<{ assessmentId: string; runId: string; created: boolean }>
+}

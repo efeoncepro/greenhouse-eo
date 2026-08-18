@@ -142,11 +142,18 @@ type EvidenceCoverageRow = {
 }
 
 /**
- * Con `HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED=true`, TODA application nueva debe dejar
- * su fila de evidencia (el write vive en el mismo submit; el degrade a Sentry existe pero no
- * debe volverse régimen). Esta señal detecta el silent-skip: applications posteriores a la
+ * Con `HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED=true`, toda application del INTAKE PÚBLICO
+ * debe dejar su fila de evidencia (el write vive en el mismo submit; el degrade a Sentry existe
+ * pero no debe volverse régimen). Esta señal detecta el silent-skip: applications posteriores a la
  * primera evidencia observada (o de las últimas 24h si aún no existe ninguna) sin fila en
  * `candidate_identity_intake_evidence`, con 5 min de gracia por submissions en vuelo.
+ *
+ * El filtro `source = 'public_careers'` NO es cosmético (fix 2026-08-18, hallado corriendo el
+ * canary): la evidencia sólo la escribe `submitPublicHiringApplication`, así que una application
+ * `manual` —cargada por un operador desde el desk, 6 en los últimos 30 días— jamás puede tener
+ * fila y contarla era un falso positivo PERMANENTE. Como la ventana arranca en la primera
+ * evidencia y nunca se cierra, cada carga manual dejaba la señal en `warning` para siempre: el
+ * modo exacto de entrenar al operador a ignorar la señal que gatea este rollout.
  *
  * Flag OFF ⇒ `ok` con nota (no escribir evidencia es el comportamiento esperado; la señal no
  * consulta la DB). Steady=0 con flag ON. Severidad: 1-3 ⇒ `warning`; >3 ⇒ `error`.
@@ -179,7 +186,8 @@ export const getHiringCandidateIdentityEvidenceCoverageGapSignal = async (): Pro
         (SELECT COUNT(*)::int FROM ${EVIDENCE_TABLE}) AS evidence_rows,
         (SELECT COUNT(*)::int
            FROM ${APPLICATION_TABLE} ha
-          WHERE ha.created_at >= COALESCE(
+          WHERE ha.source = 'public_careers'
+            AND ha.created_at >= COALESCE(
                   (SELECT MIN(created_at) FROM ${EVIDENCE_TABLE}),
                   NOW() - INTERVAL '24 hours')
             AND ha.created_at < NOW() - INTERVAL '5 minutes'

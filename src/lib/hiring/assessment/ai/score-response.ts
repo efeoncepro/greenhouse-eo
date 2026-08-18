@@ -7,16 +7,25 @@ import type { AiProposal, ResponseScoreProposal } from '@/types/hiring-assessmen
 import { HUMAN_RATED_QUESTION_TYPES } from '@/types/hiring-assessment'
 
 import { HiringNotFoundError, HiringValidationError } from '../../errors'
-import { HIRING_ASSESSMENT_SCORING_PROMPT_VERSION, isHiringAssessmentAiEnabled } from './config'
+import {
+  HIRING_ASSESSMENT_SCORING_PROMPT_VERSION,
+  getHiringAssessmentScoringModel,
+  isHiringAssessmentAiEnabled,
+} from './config'
+import {
+  sanitizeAssessmentAiCandidateInput,
+  type AssessmentAiInputSafetyReason,
+} from './input-safety'
 import { createAiProposal } from './proposal-store'
 import { runResponseScoring } from './providers'
 
 export interface ProposeScoreResult {
   proposal: AiProposal | null
   suggested: ResponseScoreProposal | null
-  status: 'ok' | 'not_configured' | 'provider_error' | 'schema_invalid'
+  status: 'ok' | 'not_configured' | 'provider_error' | 'schema_invalid' | 'input_blocked'
   provider: string
   model: string
+  inputSafetyReasons: AssessmentAiInputSafetyReason[]
 }
 
 const MAX_ANSWER_CHARS = 6000
@@ -102,17 +111,41 @@ export const proposeScoreForResponse = async (
   const answer = (ctx.answer_json ?? {}) as Record<string, unknown>
   const rubric = (ctx.rubric_json ?? {}) as Record<string, unknown>
 
+  const safeInput = sanitizeAssessmentAiCandidateInput({
+    answerText: extractAnswerText(answer),
+    questionPrompt: String(ctx.question_prompt),
+    rubric,
+  })
+
+  if (safeInput.blocked) {
+    return {
+      proposal: null,
+      suggested: null,
+      status: 'input_blocked',
+      provider: 'none',
+      model: getHiringAssessmentScoringModel(),
+      inputSafetyReasons: safeInput.reasons,
+    }
+  }
+
   const scoring = await runResponseScoring({
     competencyKey: String(ctx.competency_key),
     competencyName: String(ctx.competency_name),
     level: String(ctx.level),
     questionPrompt: String(ctx.question_prompt),
     rubric,
-    candidateAnswer: extractAnswerText(answer),
+    candidateAnswer: safeInput.text,
   })
 
   if (scoring.status !== 'ok' || !scoring.score) {
-    return { proposal: null, suggested: null, status: scoring.status, provider: scoring.provider, model: scoring.model }
+    return {
+      proposal: null,
+      suggested: null,
+      status: scoring.status,
+      provider: scoring.provider,
+      model: scoring.model,
+      inputSafetyReasons: safeInput.reasons,
+    }
   }
 
   // input_digest sobre pregunta+respuesta (hash, NUNCA la PII cruda) para trazabilidad/idempotencia.
@@ -132,5 +165,12 @@ export const proposeScoreForResponse = async (
     actorUserId,
   )
 
-  return { proposal, suggested: scoring.score, status: 'ok', provider: scoring.provider, model: scoring.model }
+  return {
+    proposal,
+    suggested: scoring.score,
+    status: 'ok',
+    provider: scoring.provider,
+    model: scoring.model,
+    inputSafetyReasons: safeInput.reasons,
+  }
 }

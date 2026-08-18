@@ -143,6 +143,18 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   Países elegibles ya seteados en las 2 vacantes publicadas. El release a producción está retenido
   hasta TASK-1741. ADR: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (Delta 2026-08-17).
 
+### Phase 12 — Global Provisional Assessment AI
+
+- `TASK-1742` extiende TASK-1734 con un modo `global_provisional` para todos los assessments enviados: sanitiza
+  texto antes del provider, enruta señales deterministas de riesgo y publica una proyección/App API provisional
+  separada del score efectivo, con cost cap, kill switch, audit y rollback.
+- `TASK-1743` consume esa proyección dentro del workbench de TASK-1738 con cobertura, evidencia y excepciones
+  operator-only, sin presentar la propuesta como confirmada.
+- Gate: comenzar por la assessment exacta de Lucero, verificar no mutación de `human_score`/rollup y ausencia en
+  payloads candidate-facing; después habilitar todas las vacantes con concurrencia controlada y backlog acotado.
+- Boundary: no ranking, decisión, stage move, test assignment, email, resultado al postulante ni aprendizaje
+  online autónomo. La evidencia acumulada puede alimentar calibración futura, pero no reentrena el runtime.
+
 ## Child Tasks
 
 - `TASK-352` — Program umbrella and coordination for Hiring / ATS.
@@ -241,6 +253,10 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   allowlist, lifecycle y SEO técnico de la URL leaf; no toca formulario ni implementa Indexing API.
 - `TASK-1741` — Public Careers Editorial Detail Renderer: consumer UI incremental de 1740, con wireframe,
   fallback legacy, GVC premium y exactamente los dos CTA existentes; no agrega un CTA final.
+- `TASK-1742` — Global Provisional Assessment AI Foundation: modo global operator-only, sanitizer, riesgo
+  determinista, projection/App API, worker, observabilidad, canary y rollback sin mutar score efectivo.
+- `TASK-1743` — Provisional Assessment AI Operator Experience: consumer UI dentro del workbench existente,
+  con autoridad provisional explícita, cobertura, evidencia, excepciones y cero superficie candidate-facing.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
 

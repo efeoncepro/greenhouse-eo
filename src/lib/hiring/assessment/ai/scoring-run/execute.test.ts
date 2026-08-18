@@ -12,6 +12,7 @@ const listEligibleResponsesMock = vi.fn()
 const captureWithDomainMock = vi.fn()
 
 const claimScoringRunLeaseMock = vi.fn()
+const countAssessmentAiProviderAttemptsSinceMock = vi.fn()
 const insertRunItemsMock = vi.fn()
 const listClaimableScoringRunIdsMock = vi.fn()
 const listRunItemsMock = vi.fn()
@@ -39,6 +40,7 @@ vi.mock('./commands', () => ({
 
 vi.mock('./store', () => ({
   claimScoringRunLease: (...args: unknown[]) => claimScoringRunLeaseMock(...args),
+  countAssessmentAiProviderAttemptsSince: (...args: unknown[]) => countAssessmentAiProviderAttemptsSinceMock(...args),
   insertRunItems: (...args: unknown[]) => insertRunItemsMock(...args),
   listClaimableScoringRunIds: (...args: unknown[]) => listClaimableScoringRunIdsMock(...args),
   listRunItems: (...args: unknown[]) => listRunItemsMock(...args),
@@ -122,8 +124,10 @@ beforeEach(() => {
   delete process.env.HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED
   delete process.env.HIRING_ASSESSMENT_AI_RUN_CONCURRENCY
   delete process.env.HIRING_ASSESSMENT_AI_RUN_MAX_PROVIDER_ATTEMPTS
+  delete process.env.HIRING_ASSESSMENT_AI_DAILY_PROVIDER_ATTEMPT_CAP
 
   withTransactionMock.mockImplementation(async (fn: (client: unknown) => Promise<unknown>) => fn(txClient))
+  countAssessmentAiProviderAttemptsSinceMock.mockResolvedValue(0)
   lockScoringRunForUpdateMock.mockResolvedValue({ ...runFixture })
   transitionScoringRunMock.mockImplementation(async (_c, run, target, opts) => ({
     ...run,
@@ -348,6 +352,17 @@ describe('executeClaimedScoringRun — fan-out', () => {
 })
 
 describe('drainAssessmentAiScoringRuns — gates + claim atómico', () => {
+  it('daily cost cap agotado → skip sin claims ni provider', async () => {
+    process.env.HIRING_ASSESSMENT_AI_DAILY_PROVIDER_ATTEMPT_CAP = '10'
+    countAssessmentAiProviderAttemptsSinceMock.mockResolvedValue(10)
+
+    const summary = await drainAssessmentAiScoringRuns()
+
+    expect(summary).toMatchObject({ skipped: 'daily_cost_cap_exceeded', claimed: 0, dailyAttemptCap: 10 })
+    expect(listClaimableScoringRunIdsMock).not.toHaveBeenCalled()
+    expect(proposeScoreMock).not.toHaveBeenCalled()
+  })
+
   it('flag de enqueue OFF → 409 estable sin claims ni gasto', async () => {
     process.env.HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED = 'false'
 

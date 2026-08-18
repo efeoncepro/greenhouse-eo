@@ -1859,3 +1859,32 @@ manual `docs/manual-de-uso/hr/operar-expediente-de-evaluacion.md` +
   arquitectura ni los CTA. Un humano o agente recibe 422 antes de publicar una vacante incompleta.
 - **Revisit when:** datos reales demuestren que tres bloques o los tres formatos no cubren una familia de
   roles; el cambio debe versionar el contrato y preservar paridad HTML/JobPosting.
+
+## Delta 2026-08-18 — Careers público en producción (TASK-1740/1741 released)
+
+- **Status:** `Accepted` · **Owner:** Talent/Hiring + Public Careers · **Scope:** rollout, publishability,
+  guardrails · **Reversibility:** `two-way` (flags) · **Confidence:** `high` · **Validated as of:**
+  `2026-08-18`.
+- **Release y evidencia:** el manifest `fa54670470c1` quedó en estado `released` (run `32127499151`,
+  watchdog OK 4/4 workers) y promovió TASK-1740 + TASK-1741 junto al batch acumulado de EPIC-011. Cinco
+  flags quedaron ON en Production, incluidos `CAREERS_DETAIL_EDITORIAL_V2_ENABLED` y
+  `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED`. El JSON-LD emitido por las vacantes vivas (`EO-OPN-0009`,
+  `EO-OPN-0061`, ambas autoradas en v2 completo) pasó `validator.schema.org` con **0 errores y 0
+  advertencias**. El interlock se mantiene: el schema no se emite con el renderer OFF.
+- **Grandfathering de publicación (`requiresEditorialV2ForPublish`):** el contrato v2 se exige sólo en la
+  **primera** publicación de una vacante (`published_at IS NULL`). Exigirlo también al republicar convertiría
+  una regla de autoría en una interrupción de servicio: una vacante viva con postulantes en proceso que se
+  pausa por cualquier motivo quedaría en 404 hasta reescribir su bloque completo. `published_at` es la señal
+  honesta de "ya estuvo al aire" — sólo la escribe el publish, así que una vacante nueva no puede saltarse v2
+  por esta vía. Alternativa rechazada: un flag de excepción por vacante (crea una puerta trasera permanente
+  al contrato y depende de que alguien recuerde cerrarla).
+- **Guardrail de paridad JSON-LD↔HTML (`careers-schema-visible-parity.test.tsx`):** la paridad se verifica
+  contra el **DOM renderizado**, no contra el view-model ni el builder. Un test que compara dos derivaciones
+  del mismo objeto pasa aunque el renderer nunca haya pintado el hecho; sólo el DOM prueba que lo que Google
+  lee está efectivamente visible para la persona. Es la defensa contra el bug class de "schema que promete lo
+  que la página no muestra".
+- **Observabilidad de la degradación v2:** un `public_content_json` ilegible ya no se traga en silencio —
+  `normalize` emite `captureWithDomain(error, 'hiring', …)` con la versión declarada y el motivo (sin PII ni
+  payload: el contenido público puede traer copy aprobado, y un log no es el lugar para volcarlo) antes de
+  degradar al fallback de prosa legacy. La degradación sigue siendo el comportamiento correcto; lo que cambia
+  es que ahora es observable en vez de invisible.

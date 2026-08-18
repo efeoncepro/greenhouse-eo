@@ -20,7 +20,7 @@ import { renderWithTheme } from '@/test/render'
 import { hiringAssessment } from '@/lib/copy/dictionaries/es-CL/hiringAssessment'
 import type { AssessmentAiReviewItem, AssessmentAiRunReview } from '@/types/hiring-assessment-ai-run'
 
-import AssessmentAiRunWorkbench from './AssessmentAiRunWorkbench'
+import AssessmentAiRunWorkbench, { AssessmentAiRunEntry } from './AssessmentAiRunWorkbench'
 
 const copy = hiringAssessment.scoringRun
 
@@ -159,6 +159,44 @@ afterEach(() => {
   cleanup()
   vi.unstubAllGlobals()
   vi.clearAllMocks()
+})
+
+describe('TASK-1743 — resumen provisional operator-only', () => {
+  it('muestra score, cobertura y disclaimer sin presentarlos como resultado efectivo', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => Response.json({
+      runs: [baseRun],
+      confirmEnabled: false,
+      mode: 'global_provisional',
+      provisional: {
+        assessmentId: 'asm-1', applicationId: 'app-1', runId: RUN_ID,
+        runStatus: 'awaiting_review', mode: 'global_provisional', status: 'complete',
+        overallScore: 76, incorporatedIntoEffectiveScore: false,
+        coverage: { totalResponses: 12, evaluatedResponses: 12, effectiveResponses: 2, provisionalResponses: 10, pendingResponses: 0, abstainedResponses: 0, failedResponses: 0 },
+        competencies: [{ competencyId: 'comp-1', competencyKey: 'client', competencyName: 'Relación con clientes', targetLevel: 'senior', weight: 20, score: 76, totalResponses: 2, evaluatedResponses: 2, provisionalResponses: 2 }],
+        exceptions: [],
+        provenance: { model: 'claude-sonnet-5', promptVersion: 'prompt.v2', policyVersion: 'policy.v2:global_provisional', inputDigest: 'digest-1' },
+      },
+    })))
+
+    renderWithTheme(<AssessmentAiRunEntry assessmentId='asm-1' copy={copy} canScore />)
+
+    expect(await screen.findByText(copy.provisionalTitle)).toBeTruthy()
+    expect(screen.getByText(copy.operatorOnly)).toBeTruthy()
+    expect(screen.getByText(copy.provisionalDisclaimer)).toBeTruthy()
+    expect(screen.getByText('76')).toBeTruthy()
+    expect(screen.getByText('Relación con clientes')).toBeTruthy()
+    expect(document.querySelector('[data-capture="assessment-ai-coverage"]')).not.toBeNull()
+  })
+
+  it('no consulta ni dibuja la proyección sin capability', () => {
+    const fetchMock = vi.fn()
+
+    vi.stubGlobal('fetch', fetchMock)
+    renderWithTheme(<AssessmentAiRunEntry assessmentId='asm-1' copy={copy} canScore={false} />)
+
+    expect(fetchMock).not.toHaveBeenCalled()
+    expect(screen.queryByText(copy.provisionalTitle)).toBeNull()
+  })
 })
 
 const getBlindItem = async () => {

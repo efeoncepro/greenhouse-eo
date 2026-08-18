@@ -18,6 +18,7 @@ import { listEligibleResponses } from './commands'
 import { routeScoredItem, type AiRiskRoutingReason } from './risk-router'
 import {
   claimScoringRunLease,
+  countAssessmentAiProviderAttemptsSince,
   insertRunItems,
   listClaimableScoringRunIds,
   listRunItems,
@@ -62,6 +63,9 @@ export interface DrainAssessmentAiScoringRunsSummary {
    * liberada). El drain sigue con los demás — un run venenoso jamás bloquea el tick.
    */
   failedRuns: string[]
+  skipped: string | null
+  dailyProviderAttempts: number
+  dailyAttemptCap: number
 }
 
 // ── Helpers puros ──
@@ -217,6 +221,7 @@ const scoreOneItem = async (
           rubric: (ctx.rubric_json ?? null) as Record<string, unknown> | null,
           competencyWeight: ctx.competency_weight == null ? null : Number(ctx.competency_weight),
           proposal: result.suggested as ResponseScoreProposal,
+          inputSafetyReasons: result.inputSafetyReasons,
           exceptionPolicyEnabled: opts.exceptionPolicyEnabled,
           policy: getAiRunRiskPolicyConfig(),
         })
@@ -233,6 +238,15 @@ const scoreOneItem = async (
       if (result.status === 'not_configured') {
         // Configuración ausente no es transitoria: reintentar no ayuda.
         return { kind: 'failed', reasonCode: 'provider_not_configured', attempts }
+      }
+
+      if (result.status === 'input_blocked') {
+        return {
+          kind: 'abstained',
+          reasonCode: 'input_safety_blocked',
+          reasons: result.inputSafetyReasons,
+          attempts,
+        }
       }
 
       // `schema_invalid` (salida malformada del LLM) es retryable; agotado ⇒ abstención.
@@ -510,6 +524,23 @@ export const drainAssessmentAiScoringRuns = async (
   const maxRuns = Math.max(1, Math.min(20, Math.floor(opts.maxRuns ?? 5)))
   const drainOwner = opts.drainOwner ?? `${DRAIN_ACTOR}:${process.pid}`
 
+  const dailyProviderAttempts = await countAssessmentAiProviderAttemptsSince(
+    new Date(Date.now() - 24 * 60 * 60 * 1000),
+  )
+
+  if (dailyProviderAttempts >= fanOut.maxProviderAttemptsPerDay) {
+    return {
+      candidates: 0,
+      claimed: 0,
+      busy: 0,
+      runs: [],
+      failedRuns: [],
+      skipped: 'daily_cost_cap_exceeded',
+      dailyProviderAttempts,
+      dailyAttemptCap: fanOut.maxProviderAttemptsPerDay,
+    }
+  }
+
   const candidates = await listClaimableScoringRunIds(maxRuns)
 
   const summary: DrainAssessmentAiScoringRunsSummary = {
@@ -518,6 +549,9 @@ export const drainAssessmentAiScoringRuns = async (
     busy: 0,
     runs: [],
     failedRuns: [],
+    skipped: null,
+    dailyProviderAttempts,
+    dailyAttemptCap: fanOut.maxProviderAttemptsPerDay,
   }
 
   for (const runId of candidates) {

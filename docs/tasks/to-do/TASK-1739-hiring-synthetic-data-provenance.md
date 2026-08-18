@@ -1,5 +1,39 @@
 # TASK-1739 — Procedencia de datos sintéticos en Hiring (marca canónica, readers limpios, purga gobernada)
 
+## Delta 2026-08-18
+
+**Primer objetivo concreto para el lane de purga, generado por el canary de `TASK-1736`.** Al ejecutar
+el canary del runbook `docs/operations/runbooks/candidate-identity-rollout.md` (Paso 2) con el flag ya
+ON en producción, quedó un sujeto 100% sintético que **el perfil runtime no puede retirar**:
+
+| Objeto | Id |
+|---|---|
+| Person sintética (`@live-test.invalid`) | `identity-public-careers-candidate-canary-t1736-1787066079713-live-test-invalid` |
+| Application (`source='public_careers'`, consent `granted`) | `happ-ffebd53b-a76d-435a-95bd-538838a52db4` |
+| Opening + demand sintéticos (`EO-OPN-0101`, **ya despublicado** a `internal_only`) | `opng-ef6e58c2-7b63-4549-9e31-4239edaaac2e` |
+| Evidencia / audit de identidad | 2 filas / 3 filas de esa Person |
+
+Tres hechos que esta task ya anticipaba y que ahora están **verificados en vivo**, no inferidos:
+
+1. `greenhouse_runtime` responde `permission denied` sobre `candidate_identity_intake_evidence` y
+   `candidate_identity_display_audit` (append-only **por grant**, no sólo por trigger). Confirmado
+   ejecutando el DELETE.
+2. Esas 2 filas de evidencia **pinnean por FK toda la cadena**: application → candidate_facet →
+   Person → opening → talent_demand. Ninguno de los cinco se puede borrar mientras la evidencia
+   exista. Es el escenario exacto del §Lane de archivado: hay historia auditable, así que la
+   respuesta correcta NO es borrar sino **marcar procedencia y archivar** — que es justamente lo que
+   esta task instala.
+3. `pnpm hiring:candidates:purge-test-facets` **no cubre este caso** por diseño propio: exige cero
+   postulaciones y consentimiento `not_captured`, y este sujeto tiene una postulación con
+   consentimiento `granted`. Refuerza que la purga de `TASK-1739` no es un superset cosmético del
+   script de fichas, sino otro lane.
+
+**Consecuencia de diseño nueva**: los canaries/smokes de rollout son ellos mismos **productores de
+datos sintéticos no purgables** una vez que el flag que ejercitan está ON. Mientras `data_origin` no
+exista, el mitigante es el que aplicó el canary de 1736: vacante desechable propia (nunca una vacante
+real), despublicación en el teardown y reporte ruidoso del residuo. Cuando esta task aterrice, el
+canary debería nacer marcando `data_origin='synthetic'` en el momento de creación.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
