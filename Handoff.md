@@ -2,6 +2,40 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-18 — Canary de identidad y smoke del expediente: los dos pendientes declarados, cerrados
+
+Los dos flags que se prendieron "ON con pendiente" ya tienen su verificación. Ambas filas del ledger
+quedaron actualizadas con la evidencia.
+
+**Canary TASK-1736 — verde, 4/4.** Se ejecutó como live test gobernado
+(`HIRING_CANARY_T1736=1 pnpm vitest run src/lib/hiring/candidate-intake/canary.live.test.ts`), no por el
+endpoint público. La razón importa: la base es UNA sola para dev/staging/prod y el ops-worker de correos
+es el mismo, así que postular contra `EO-OPN-0009`/`EO-OPN-0061` habría dejado un candidato falso
+—indeleble— en una vacante con candidatos en proceso. Verificado además que **no salió ningún correo**.
+
+**Lo que el canary enseñó y el runbook no decía.** Con el flag ON, la evidencia y el audit son
+append-only **por grant** (`greenhouse_runtime` no tiene DELETE) y esas filas pinnean por FK toda la
+cadena application → facet → Person → opening → demand. O sea: **el canary no puede limpiarse a sí
+mismo**. Mi teardown lo intentó y falló en silencio porque tenía `.catch(() => undefined)` — ese swallow
+está eliminado y ahora reporta el residuo a gritos. El runbook lleva la advertencia y el residuo exacto.
+
+**Residuo pendiente (bloqueado por la misma credencial que ISSUE-159).** Sujeto 100% sintético:
+Person `identity-…-canary-t1736-1787066079713-live-test-invalid`, application `happ-ffebd53b…`,
+opening `EO-OPN-0101` **ya despublicado** (`internal_only`, el listado público volvió a tener sólo las 2
+vacantes reales), más 2 filas de evidencia y 3 de audit. Registrado como **Delta en TASK-1739**, que es su
+hogar natural: su lane de purga ya distingue archivar-con-historia de borrar-huérfanos, y este es su primer
+objetivo concreto. `purge-test-facets` NO sirve acá (exige cero postulaciones y consent `not_captured`).
+
+**Smoke del expediente (TASK-1735) — verificado sobre el caso real, sin escribir nada nuevo.** El
+propose→confirm post-fix ya había ocurrido el 17-ago 00:12: la nota `hnote-d710c072` guardó sus 8240
+caracteres completos (termina en punto) contra los 8000 de `hnote-e2fd7280`, y lleva `supersedesNoteId` +
+`repairedFullLength` en su `context_json`. Queda **sólo la revisión humana del primer expediente real**:
+es el gate de supervisión humana, no lo puede firmar un agente.
+
+**Fix de paso:** `evidence_coverage_gap` ahora filtra `source='public_careers'`. Contaba todas las
+postulaciones, pero la evidencia sólo nace del intake público — cada carga manual desde el desk la habría
+dejado en `warning` para siempre. Test de regresión sobre el SQL. `local:check` EXIT=0.
+
 ## 2026-08-18 — Las dos vacantes vivas ya están en el contrato editorial v2
 
 Autoradas y publicadas con `PublicOpeningContent` v2 completo por el command canónico. Antes tenían
@@ -496,16 +530,3 @@ directamente sobre el canvas gris. Ahora usan `SurfaceRecipe`, `WorkbenchHeader`
 `DetailHero`; la evaluación quedó en una sola superficie y la cola vacía se compacta. ESLint focal, typecheck,
 8 tests y GVC desktop/390 px están verdes en
 `.captures/2026-08-16T21-30-17_task1363-assessment-radar-runtime`. Cambio local, sin push/deploy.
-
-## 2026-08-16 — TASK-1734 complete (code complete, rollout gated) + TASK-1736 Slices 0-2
-
-TASK-1734 cerró sus 7 slices: ADR aceptado, run aggregate durable, fan-out con risk router,
-eval harness con gate de promoción BLOQUEANTE (dataset humano de Talent pendiente, owner por
-asignar), exception review + batch confirm con manifest anti-anclaje, suite anti-leak (37 tests,
-cero leaks reales), señales de reliability + rollback CLI + runbook. Auditoría doble CONDITIONAL
-→ resuelta (terminal SQL del enum, drain sin head-of-line, muestra ciega ESTRUCTURAL en el
-reader). Gates: suite full 11.157+ y build verdes. Rollout gated al runbook
-`docs/operations/runbooks/assessment-ai-scoring-rollout.md`: flags OFF en todos los runtimes,
-scheduler `ops-assessment-ai-drain` declarado nacido en pausa (se crea en el próximo deploy del
-ops-worker). TASK-1736 avanza: S0 ADR + S1 primitive de normalización + S2 evidencia/reconcile/
-corrección humana (flag OFF); quedan S3 (detector + remediación histórica) y S4 (canary/cierre).

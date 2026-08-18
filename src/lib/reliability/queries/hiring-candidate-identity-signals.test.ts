@@ -116,6 +116,21 @@ describe('getHiringCandidateIdentityEvidenceCoverageGapSignal', () => {
     expect(signal.kind).toBe('data_quality')
   })
 
+  it('sólo cuenta el intake PÚBLICO: una application manual jamás puede tener evidencia', async () => {
+    flagMock.mockReturnValue(true)
+    runQueryMock.mockResolvedValueOnce([{ evidence_rows: 5, missing_applications: 0 }])
+
+    await getHiringCandidateIdentityEvidenceCoverageGapSignal()
+
+    const sql = String(runQueryMock.mock.calls[0][0])
+
+    // La evidencia sólo la escribe `submitPublicHiringApplication`. Sin este filtro, cada
+    // application cargada a mano desde el desk deja la señal en `warning` PARA SIEMPRE (la
+    // ventana arranca en la primera evidencia y no se cierra) — falso positivo permanente
+    // sobre la señal que gatea el rollout del flag.
+    expect(sql).toContain("ha.source = 'public_careers'")
+  })
+
   it('flag ON con 1-3 applications sin evidencia → warning', async () => {
     flagMock.mockReturnValue(true)
     runQueryMock.mockResolvedValueOnce([{ evidence_rows: 5, missing_applications: 2 }])
