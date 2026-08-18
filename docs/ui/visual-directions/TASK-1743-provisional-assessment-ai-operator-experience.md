@@ -52,3 +52,30 @@ En 390 px, la franja se convierte en stack: identidad provisional, score con dis
 - Reusar `AdaptiveCard`, `StatusChip`, progress y patrones de disclosure/foco existentes.
 - Copy estable vive en `src/lib/copy/hiring.ts`; datos variables llegan desde el reader server-side.
 - No crear primitive global ni nuevo destino de navegación.
+
+## Delta — modo Barras denso
+
+### Problema observado
+
+La lista efectiva expandía cada competencia a todo el ancho disponible. En monitores amplios las barras
+se convertían en franjas dominantes, el semáforo ocupaba la mayor parte del lienzo y nueve competencias
+forzaban un recorrido vertical innecesario.
+
+### Alternativas comparadas
+
+- **Hoja comparativa de dos columnas — seleccionada.** Conserva el orden de la rúbrica, reduce la altura,
+  limita la medida de lectura y permite comparar puntaje, objetivo y peso sin promover ranking.
+- **Tabla ordenable por puntaje — rechazada.** Mejoraría la densidad, pero la ordenación y el patrón tabular
+  sugieren clasificación de competencias y, por extensión, de postulantes.
+- **Lista compacta de una columna — rechazada.** Reduce algo de chrome, pero mantiene nueve filas largas y
+  no resuelve el uso desproporcionado del ancho.
+
+### Dirección seleccionada
+
+- El bloque tiene una medida máxima gobernada por el breakpoint `md` y se centra en la superficie.
+- Escritorio usa dos columnas en orden de lectura; móvil recompone a una columna.
+- Cada competencia es una fila abierta con divisor, sin card ni icono repetitivo.
+- Nombre, peso y objetivo forman la primera lectura; puntaje tabular y estado tonal son apoyo.
+- La barra usa un único color primario y 6 px de altura. El estado nunca depende del color de la barra.
+- El objetivo se representa con una marca neutral y también se explicita como texto.
+- Radar, cálculo, orden de rúbrica y tabla accesible permanecen sin cambios.
