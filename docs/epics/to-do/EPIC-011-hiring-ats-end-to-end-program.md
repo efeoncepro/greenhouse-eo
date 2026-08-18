@@ -257,6 +257,10 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   determinista, projection/App API, worker, observabilidad, canary y rollback sin mutar score efectivo.
 - `TASK-1743` — Provisional Assessment AI Operator Experience: consumer UI dentro del workbench existente,
   con autoridad provisional explícita, cobertura, evidencia, excepciones y cero superficie candidate-facing.
+- `TASK-1744` — Borrado gobernado de documentos de candidato vencidos (Ley 21.719): cierra el follow-up que
+  `TASK-1362` dejó sin dueño. Plan read-only → allowlist humana → apply con actor, justificación y audit append-only;
+  soft-delete siempre (`asset_scan_results` es append-only y cascadea desde `assets`); lane aparte para el documento
+  de identidad; ciego a `data_origin`. Urgencia baja verificada (1 postulación con decisión, vence agosto 2027).
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
 
