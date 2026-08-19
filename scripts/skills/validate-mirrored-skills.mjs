@@ -36,6 +36,14 @@ const mirroredSkills = [
     codex: '.codex/skills/greenhouse-globe-model-fleet',
     claude: '.claude/skills/greenhouse-globe-model-fleet',
   },
+  {
+    // Resend es infraestructura de correo compartida: un invariante que divirja entre agentes
+    // termina en que uno de los dos vuelve a activar el tracking sobre enlaces con credencial.
+    id: 'resend-email-platform',
+    mode: 'byte-identical',
+    codex: '.codex/skills/resend-email-platform',
+    claude: '.claude/skills/resend-email-platform',
+  },
 ]
 
 const filesIn = root => {
