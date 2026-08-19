@@ -21,6 +21,10 @@ For the customer model (ICP, JTBD, buying group, decision, procurement, validati
 units, discounts, versioning, economics guardrails and the Pricing Integrity Pack.
 The transversal definition of Product Service, productization levels, delivery models, operating modes and
 engagements lives in `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md`.
+For recurring or bounded work that crosses Organizations, teams and Greenhouse/Notion projects or campaigns, also
+load `docs/business-models/EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md`. Preserve the hierarchy
+`Organization → Engagement → Project/Campaign → Task`: the engagement governs the commercial commitment, while the
+project/campaign organizes delivery and never substitutes contract, pricing, capacity or commercial lifecycle.
 The corporate 2028 direction requires every client-facing service to become productized and AI-native; use
 `docs/strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md` for maturity gates and
 exceptions.

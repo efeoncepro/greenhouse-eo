@@ -29,6 +29,10 @@ versionado, guardrails y Pricing Integrity Pack.
 La skill es transversal; los documentos de `docs/business-models/` son la fuente canónica de cada oferta.
 La definición transversal de qué es un Product Service, sus niveles de productización y la separación entre
 delivery model, operating mode y engagement vive en `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md`.
+Cuando el trabajo cruce contratos recurrentes o acotados con Organizations, equipos y proyectos/campañas de
+Greenhouse o Notion, cargar también `docs/business-models/EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md`.
+La regla central es `Organization → Engagement → Project/Campaign → Task`: engagement gobierna compromiso comercial;
+project/campaign organiza delivery y nunca sustituye contrato, pricing, capacidad o lifecycle comercial.
 La dirección corporativa vigente exige que todo servicio client-facing llegue a 2028 como Product Service
 productizado y AI-native; usar `docs/strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md`
 para sus gates, madurez y excepciones.
@@ -397,7 +401,8 @@ resolución/duración, reintentos y costo efectivo por output.
 4. Proyecto, retainer, plataforma, usage, IP y pass-through se separan.
 5. No hay pricing sin cost-to-serve, margen objetivo y sensibilidad.
 6. No hay margen agregado sin margen por oferta/cuenta/capability cuando el riesgo lo exige.
-7. Delivery, engagement y operating mode son ejes distintos.
+7. Delivery, engagement y operating mode son ejes distintos; Engagement tampoco es Project/Campaign y puede
+   contener uno o varios contenedores de ejecución.
 8. Credits no son dinero, horas, tokens, assets ni derechos.
 9. `Approved for validation` no habilita venta general.
 10. Todo KPI declara fórmula, período, denominador, moneda, fuente y owner.

@@ -35,6 +35,11 @@ La definición transversal de oferta, productización, delivery model, operating
 [`Efeonce Product Service Operating Model V1`](EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md). Los modelos de cada
 línea deben referenciarlo y declarar sus diferencias; no deben redefinir `Product Service` localmente.
 
+La separación durable entre Organization, Commercial Engagement, Project/Campaign y Task —incluida la convivencia
+de engagements On-Going y On-Demand sobre los mismos contenedores operativos de Notion— vive en
+[`Efeonce Engagement–Project Operating Model V1`](EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md). Un Project o
+Campaign organiza delivery; no sustituye el contrato, pricing, capacidad ni lifecycle del Engagement.
+
 La capa transversal que gobierna partners, providers, licencias, pass-through, co-selling, capability enablement y
 captura de valor vive en [`Efeonce Partner & Provider Layer Operating Model V1`](EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md).
 
@@ -163,6 +168,9 @@ Todo business model debe separar al menos estas dimensiones:
 
 - [Efeonce Product Service Operating Model V1](EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md) — contrato transversal
   para nombrar, empaquetar, entregar, medir y gobernar Product Services; no autoriza pricing o venta por sí solo.
+- [Efeonce Engagement–Project Operating Model V1](EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md) — working contract
+  para separar relación durable, compromiso comercial y contenedores de ejecución On-Going/On-Demand; no cambia
+  runtime ni autoriza una migración por sí solo.
 
 - [Portfolio Business Model Template](PORTFOLIO_BUSINESS_MODEL_TEMPLATE.md) — contrato para el modelo de
   Efeonce Group y sus capabilities; no autoriza por sí solo pricing, venta, inversión ni spinout.

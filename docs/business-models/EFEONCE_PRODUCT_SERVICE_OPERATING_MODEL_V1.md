@@ -77,6 +77,12 @@ Operating Mode    → quién tiene autoridad operativa día a día
 Engagement        → duración y cadencia de la relación
 ```
 
+`Engagement` tampoco equivale a `Project` o `Campaign`. El engagement es el compromiso comercial que declara
+términos, período, capacidad, accountability, economics y salida; Project/Campaign es el contenedor operativo de
+iniciativas y tareas para una Organization. Un engagement puede contener uno o varios proyectos, y un engagement
+On-Going puede producir múltiples campañas durante su vigencia. Contrato completo:
+[`Efeonce Engagement–Project Operating Model V1`](EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md).
+
 ### Product Service
 
 La oferta y el resultado controlable: por ejemplo `Experience LaunchOps`, `Creative Studio` o `Search Visibility
@@ -125,8 +131,12 @@ El operating mode puede cambiar por lane o etapa; no se infiere automáticamente
 - `Diagnostic`: descubrir, medir y decidir.
 - `Sprint`: outcome acotado con principio y fin.
 - `On-Going`: lane recurrente con cadencia y renovación.
-- `On-Demand`: solicitudes bajo capacidad/cola gobernada.
+- `On-Demand`: compromiso acotado con alcance, inicio, término, capacidad, aceptación y salida definidos; puede
+  contener uno o varios Projects/Campaigns y no implica trabajo pequeño.
 - `Pilot`: validación acotada y explícitamente no equivalente a aprobación comercial general.
+
+Estas formas no cambian la semántica de Projects/Campaigns en Greenhouse o Notion. Un trabajo acotado se modela
+como Engagement On-Demand que gobierna uno o más Projects; no como una segunda clase de “proyecto comercial”.
 
 ## Mandatory Product Service Contract
 

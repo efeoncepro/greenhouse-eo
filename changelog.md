@@ -3,6 +3,16 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-19 — On-Going y On-Demand ya comparten una ontología sin confundir engagement con proyecto
+
+- Se formalizó `Organization → Engagement → Project/Campaign → Task`: la organización y su Space conservan la
+  relación y memoria; el engagement gobierna contrato, capacidad, economics y cierre; proyectos/campañas siguen
+  siendo contenedores de tareas para ejecutar trabajo del cliente.
+- Un engagement On-Going puede producir múltiples proyectos/campañas y uno On-Demand puede contener uno o varios;
+  On-Demand describe un compromiso acotado, no un proyecto pequeño ni un retainer corto.
+- El contrato queda `Proposed` y sin cambio de runtime. La forma física sobre `services`, Notion, HubSpot, Finance,
+  equipos y Client Portal requiere cohortes reales, task y ADR antes de implementarse.
+
 ## 2026-08-19 — El reenvío gobernado de tests ya tiene command seguro
 
 - La recuperación por email genera un acceso nuevo sin duplicar el test, conserva el plazo cuando la evaluación
@@ -947,19 +957,3 @@ Tres auditorías paralelas (arquitectura, docs funcionales/manuales, skills) tra
 - Cinco aprendizajes de proceso a sus skills dueñas: el context gate va último, un gate con expectativa
   hardcodeada no prueba el motor, un override de lint fuera del alcance de la regla no protege nada,
   `VERCEL_ENV` nunca `NODE_ENV`, y una nota del Handoff no es evidencia.
-
-## 2026-08-09 — El carril del portal cliente, cerrado y verificado EN PRODUCCIÓN (release `ee0d568b8614`)
-
-Segundo release del día. Manifest `released`, watchdog `drift_count=0`, **sin bypass del batch policy**
-(cero migraciones — el contraste con el release de la mañana, que sí lo necesitó, muestra que la
-diferencia es la presencia de migraciones y no el tamaño del batch).
-
-- **Verificación completa en producción:** 9 rutas × 3 personas con sesión real. Las 3 vistas base
-  sirven `200`, las 6 module-gated redirigen a `/home?denied=<slug>`, cero `resolver_unavailable`, y
-  `/proyectos` sirve `200` al operador interno donde antes devolvía `/401`.
-- 🔴 **Corrección de un supuesto propio:** `agent-session` **sí** funciona en producción
-  (`AGENT_AUTH_ALLOW_PRODUCTION` seteada desde ~90 días). Lo negué toda la sesión tomándolo de una nota
-  del Handoff sin verificarlo. Postura abierta en `TASK-1684`.
-- Dos aprendizajes de release documentados en runbook + ambas skills: `vercel redeploy` no arregla un
-  staging cancelado por docs-only, y el context gate va último porque `docs:closure-check` no lo
-  reemplaza.

@@ -2,6 +2,22 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-19 — Working contract para operar engagements On-Demand sin confundirlos con Projects
+
+Se documentó la ontología `Organization → Engagement → Project/Campaign → Task` en
+`docs/business-models/EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md`. La decisión de trabajo preserva Projects y
+Campaigns como contenedores de tareas en Notion para un cliente; el Engagement es el compromiso comercial que
+gobierna términos, capacidad, accountability, economics y cierre. On-Going y On-Demand comparten los mismos objetos
+operativos: un engagement puede contener uno o varios Projects/Campaigns.
+
+Estado honesto: **diseño conceptual Proposed; cero cambio de runtime**. El repo ya tiene `services`, phases,
+progress, outcomes, lineage, asignación de equipo por `service_id` y `notion_project_id`, pero `engagement_kind` no
+distingue un contrato regular On-Going de uno regular On-Demand y el catálogo documenta ambos como `retainer`.
+
+Siguiente iteración: elegir 2–3 familias reales de engagements On-Demand, probar casos multi-capability y decidir si
+una root row de `services` sigue siendo el aggregate o si hace falta un Engagement superior. Cualquier schema/sync,
+Finance, access, team o Notion writeback requiere task + ADR; no implementar desde este handoff.
+
 ## 2026-08-19 — TASK-1739 cerrada en producción: qué queda vivo después del cierre
 
 El filtro de procedencia ya opera en producción (`HIRING_SYNTHETIC_DATA_FILTER_ENABLED` ON, release PR #203
@@ -538,43 +554,3 @@ correcto ahora, y es el que genera esa materia prima.**
 
 Ambas ADRs pasaron a **`Accepted`** en este cierre: la decisión fue autorizada e implementada.
 **Aceptar no es prender** — el estado de rollout de cada flag manda y vive en el ledger.
-
-## 2026-08-17 — Workbench de scoring IA (TASK-1738 complete) + escala de perCriterion (TASK-1734 delta)
-
-Dos trabajos encadenados: cerrar el workbench de revisión y arreglar el bug de dominio que el
-propio workbench destapó al correr con datos reales.
-
-**TASK-1734 — delta correctivo: `per_criterion_contradictory` medía la escala equivocada.** El
-primer run real (14 items) disparaba la señal en **11 de 14** — y justo en las respuestas BUENAS.
-El scorer devolvía **aportes ponderados que suman el score global** (91 = 18+25+25+23, la escala
-que la rúbrica del banco declara en su propio texto: `"0-100 (25 puntos por criterio)"`) y el
-router los comparaba contra su **promedio**. Con 4 criterios de 25 puntos, un 91 sano tiene
-promedio 22,75 → delta 68 ≫ 25 → contradicción falsa por construcción: cuanto mejor la respuesta,
-más contradictoria se veía. `batch_eligible` quedaba muerto y el operador revisaba todo a mano —
-el subsistema perdía su razón de ser.
-
-La causa no fue un `mean` mal tipeado: fue un **contrato implícito**. El prompt v1 pedía "el
-puntaje por criterio" y el schema declaraba 0–100 por criterio; aporte y nota independiente eran
-lecturas igual de válidas, y el modelo alternaba entre ambas según la calidad de la respuesta.
-Fix: la escala se **declara** (`weighted_contribution`, `weight` + `score` ≤ weight), el prompt la
-pide explícitamente (`...scoring.v2`, las proposals v1 quedan stale), `summarizeCriterionContribution`
-es la única traducción aportes → score global, y el router compara contra ese implicado
-(`...risk_policy.v1_1`). Replay de los 14 proposals reales: **11/14 → 2/14**, y las 2 restantes son
-contradicciones reales del modelo (global 21 con aportes que implican 65).
-
-**TASK-1738 complete (code complete; smoke staging pendiente).** El workbench quedó montado en la
-card del assessment de la Application 360, con `UI ready: yes` (dirección visual versionada +
-scorecard 4,46). La evidencia GVC se corrió sobre un run REAL con `claude-sonnet-5`, y mirar los
-frames reveló lo que ningún test verde había atrapado: la entrada vivía dentro del panel de
-revisión (una cola pendiente quedaba invisible), `manifestSummary` renderizaba `{a}/{a}` y por lo
-tanto **decía siempre 100%** mientras los gates debajo decían "faltan 10" — exactamente el bug
-class que esta superficie existe para impedir —, `warning.main` como texto daba 1,74:1 en las dos
-frases más load-bearing de la pantalla, la cobertura honesta se iba con el scroll y `sx={{ ms: 1 }}`
-no aplicaba ningún margen porque `ms` no existe en MUI.
-
-Contratos verificados sobre el runtime real: muestra ciega sin propuesta en el DOM,
-`sawProposalBeforeScoring` veraz en ambas direcciones contra la DB, confirm `disabled` con causas
-visibles, cero scroll horizontal en 390.
-
-Pendientes declarados: smoke staging (runbook de 1734) y el contraste del `Alert severity='info'`
-del tema (3,94:1, preexistente portal-wide — causa raíz global, no se parcha por host).
