@@ -146,8 +146,8 @@ aleatorios; savepoints conservan la cuota pero revierten cualquier write parcial
 buckets con readback y señal. Documentación, manuales y skills de Talento/Arquitectura/Secret Hygiene quedaron
 sincronizados, incluido el runbook global `docs/operations/runbooks/resend-email-lifecycle-rollout.md`.
 
-**Handoff a Claude:** no implementar de nuevo TASK-1745/1746. El checkout queda con Slice 4 listo para commit en
-esta sesión; después el siguiente bloque es TASK-1747 (UI Application 360). Antes de cualquier rollout: aplicar
+**Handoff a Claude:** no implementar de nuevo TASK-1745/1746. Slice 4 quedó versionado en
+`5d5eb2f9c`; el siguiente bloque es TASK-1747 (UI Application 360). Antes de cualquier rollout: aplicar
 migración TASK-1745, luego migración `20260819072130586`, ejecutar/verificar el índice concurrente de TASK-1746,
 desplegar app+worker dormantes, configurar webhook firmado global de Resend, verificar `click_tracking=false`, hacer
 smokes PG/browser/email consentidos y recién entonces habilitar capability/email type/cutover. Hoy no se aplicó ni
