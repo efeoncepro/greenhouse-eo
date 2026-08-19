@@ -304,10 +304,16 @@ Resend dashboard/API, Vercel production variables/secrets and a consented real i
 
 ### Lo que la reconciliación reveló
 
-**43 despachos nunca llegaron al destinatario**: 23 `suppressed` + 20 `bounced`. De ellos, **8 son
-`hiring_assessment_assigned`** (5 suprimidos + 3 rebotados) — exactamente el síntoma que originó ISSUE-160.
-Cada uno necesita recuperación gobernada (TASK-1746, canal de email ya habilitado) o contacto por otro canal.
-**Es trabajo operativo de People, no queda cerrado por esta task.**
+**44 despachos nunca llegaron al destinatario**: 23 `suppressed` + 21 `bounced`. De ellos, 8 son
+`hiring_assessment_assigned`.
+
+**Corrección (misma sesión, tras inspeccionar los destinatarios):** los **44** despachos fallidos van **todos a
+dominios internos de Efeonce** — `efeoncepro.com` (23), `efeonce.org` (13), `greenhouse.efeonce.org` (7) y
+`efeonce.test` (1). **Cero destinatarios externos.** Los 8 `hiring_assessment_assigned` que fallaron son direcciones de
+prueba/QA (`ta***@efeonce.org`, `t8***@efeoncepro.com`, `qa***@efeonce.org`), no candidatas reales. **Ningún candidato
+real quedó sin su test**, y no hay trabajo de rescate para People. Lo que el dato sí revela es otra cosa: datos
+sintéticos y de prueba transitando el pipeline de correo productivo, que es la misma clase de problema que
+`ISSUE-159`.
 
 ### Huecos declarados (no bloquean el cierre, quedan como follow-up)
 

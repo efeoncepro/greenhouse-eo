@@ -62,9 +62,16 @@ resolved (2026-08-19) — el lifecycle de entrega está operativo en producción
 | `hiring_decision_selected` | 1 | — |
 | `hiring_stage_advanced` | — | 1 |
 
-Los **8 `hiring_assessment_assigned` que no llegaron** son exactamente el caso que motivó este incidente: candidatas con
-el test marcado como enviado que nunca recibieron el correo. Cada uno requiere una recuperación gobernada (TASK-1746,
-canal ya habilitado) o contacto por otro canal. **Esto no lo cierra el incidente: es trabajo operativo de People.**
+**Corrección (misma sesión, tras inspeccionar los destinatarios):** los **44** despachos fallidos van **todos a
+dominios internos de Efeonce** — `efeoncepro.com` (23), `efeonce.org` (13), `greenhouse.efeonce.org` (7) y
+`efeonce.test` (1). **Cero destinatarios externos.** Los 8 `hiring_assessment_assigned` que fallaron son direcciones de
+prueba/QA (`ta***@efeonce.org`, `t8***@efeoncepro.com`, `qa***@efeonce.org`), no candidatas reales. **Ningún candidato
+real quedó sin su test**, y no hay trabajo de rescate para People. Lo que el dato sí revela es otra cosa: datos
+sintéticos y de prueba transitando el pipeline de correo productivo, que es la misma clase de problema que
+`ISSUE-159`.
+
+Con eso, el incidente queda cerrado **sin cola operativa**: el lifecycle ahora distingue aceptación de entrega, y la
+evidencia disponible dice que el daño temido (candidatas sin su test) no ocurrió.
 
 **Huecos declarados, no cerrados:**
 

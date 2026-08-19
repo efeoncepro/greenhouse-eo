@@ -3,17 +3,18 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
-## 2026-08-19 — 43 correos que nunca llegaron, y una documentación que decía que nada estaba aplicado
+## 2026-08-19 — El lifecycle de correo quedó operativo, y la documentación decía que nada estaba aplicado
 
 - **La doc mentía en la dirección peligrosa.** Runbook, arquitectura de webhooks, ledger de flags e
   `ISSUE-160` afirmaban "ninguna migración, ningún secreto, ningún webhook" cuando todo llevaba
   horas aplicado. Seguir el runbook al pie habría creado un segundo webhook al mismo endpoint
   —eventos duplicados que el dedupe por `svix-id` no detiene, porque son ids distintos— y una
   segunda versión del secreto, rompiendo la verificación del webhook vivo.
-- **La reconciliación destapó el daño real del incidente: 43 correos nunca llegaron** (23
-  `suppressed`, 20 `bounced`). Ocho de ellos son `hiring_assessment_assigned`: candidatas con el
-  test marcado como enviado que jamás lo recibieron. `sent` nunca significó entregado, y ahora se
-  puede demostrar cuáles no lo fueron.
+- **44 correos nunca llegaron** (23 `suppressed`, 21 `bounced`) — y todos van a dominios internos
+  de Efeonce. Cero externos: los 8 `hiring_assessment_assigned` fallidos son direcciones de
+  prueba/QA, no candidatas. El daño temido no ocurrió. `sent` nunca significó entregado, y ahora se
+  puede demostrar cuáles no lo fueron y a quién. Lo que sí queda a la vista es data sintética
+  circulando por el pipeline de correo productivo.
 - **Faltaba suscribir `email.suppressed`.** El bloqueo de reenvío consulta ese estado para no
   mandar a ciegas a una dirección suprimida — y ese evento nunca iba a llegar. Falso negativo
   silencioso en la puerta de recuperación.

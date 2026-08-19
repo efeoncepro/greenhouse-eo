@@ -19,10 +19,13 @@ confirmación empírica fue mejor que el chequeo de SHA: un assessment creado de
 `access_token_version_id`, y 0 filas violaban el invariante. El guard se probó en transacción revertida y rechaza como
 debe.
 
-**La reconciliación destapó el daño real de ISSUE-160: 43 correos nunca llegaron** — 23 `suppressed` y 20 `bounced`. De
-esos, **8 son `hiring_assessment_assigned`**: candidatas con el test marcado como enviado que jamás lo recibieron. Eso
-es exactamente lo que originó el incidente, y **no lo cierra ninguna task**: es trabajo operativo de People, ahora con
-el canal de recuperación habilitado para atenderlo.
+**La reconciliación destapó 44 correos que nunca llegaron** — 23 `suppressed` y 21 `bounced` — y después, al mirar los
+destinatarios, que **todos van a dominios internos de Efeonce**: `efeoncepro.com` (23), `efeonce.org` (13),
+`greenhouse.efeonce.org` (7), `efeonce.test` (1). **Cero externos.** Los 8 `hiring_assessment_assigned` fallidos son
+direcciones de prueba/QA, no candidatas. O sea: **el daño temido no ocurrió** y no hay cola de rescate para People.
+Casi lo reporto al revés — el conteo agregado parecía un incidente grave hasta que se miró a quién le llegaba. Lo que el
+dato sí muestra es datos sintéticos y de prueba transitando el pipeline de correo productivo, la misma clase de
+problema que `ISSUE-159`.
 
 **`email.suppressed` no estaba suscrito.** Los 8 eventos registrados omitían justo el noveno — y `recover-email.ts`
 consulta ese estado para bloquear un reenvío ciego. Un falso negativo silencioso en la puerta de recuperación. Ya son 9.
@@ -585,15 +588,3 @@ Decisiones que valen releer antes de tocar esto:
 Pendiente declarado: sin UI, sin aviso automático al candidato (avisar es acto humano, igual que en
 cancelación), y **sólo cubre tiempo extra** — formatos accesibles son trabajo de accesibilidad de la
 pantalla de rendición, no de este campo.
-
-## 2026-08-17 — Beneficios globales de Efeonce documentados para vacantes
-
-Las skills espejo de Talent y Payroll ahora comparten el `Efeonce Candidate Benefits Charter`: 15 días
-hábiles de vacaciones remuneradas más un día por cada año continuo cumplido hasta 20 para todos los
-colaboradores globales; dos días flotantes, 16 horas de atención médica, dos días de bienestar, duelo,
-deber cívico, matrimonio/unión civil, 10 semanas para la madre/persona que da a luz y 2 para el padre/progenitor no gestante (adopción/cuidado: 4/2), mudanza, desarrollo y apoyo para
-trabajo remoto/salud mental. Los feriados corporativos son los de Chile y van aparte de vacaciones; una cobertura preacordada recibe descanso compensatorio. La carta permite comunicar el baseline global en vacantes,
-pero prohíbe afirmar que todos los permisos ya se autogestionan o calculan en Greenhouse. Payroll/Legal debe
-incorporar cada beneficio al instrumento contractual o del proveedor según país/modalidad antes de operarlo.
-La carta ahora define año/prorrateo, carry-over, continuidad de servicio, familia, retorno postparto, equivalencia contractor y wallets: aprendizaje US$500/año, conectividad/coworking US$50/mes y salud mental US$300/año. El aporte de equipo (US$400/36 meses) sigue siendo política aprobada, pero se conversa en entrevista u oferta y no aparece en el copy estándar de vacantes. La ley local es overlay que puede mejorar, nunca reducir, el baseline. No hubo cambio de runtime, schema,
-contratos ni política configurada.
