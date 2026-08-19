@@ -3,6 +3,24 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-19 — El rollout de assessment iba a romper producción y a cortarle el test a los candidatos
+
+- **Una migración que no era aplicable en ningún orden.** El CHECK y el trigger de versión de
+  credencial rompían el writer que corre en `main`; el código nuevo rompía sin la migración.
+  Partida en expand/contract, con la fase contract FUERA de `migrations/` — porque el runner
+  aplica todas las pendientes en una transacción y un comentario de advertencia no detiene a un
+  runner.
+- **La sesión del candidato caducaba en el plazo para EMPEZAR, no en el de responder.** Quien
+  abría el enlace poco antes del límite y arrancaba perdía la sesión a mitad del test.
+- **Un enlace roto era invisible.** El bearer viaja en el fragmento, que nunca llega al servidor:
+  si un reescritor lo borra, el candidato queda fuera sin generar un solo request. Ahora hay un
+  hecho durable del canje y una señal que lo delata.
+- **El cap de recuperación castigaba al candidato por fallas nuestras**: contaba intentos fallidos
+  y compartía cuota con el enlace seguro, que es justamente el canal de rescate cuando el correo
+  no llega.
+- Todo salió de auditorías independientes con skills de arquitectura, talento y seguridad, corridas
+  ANTES de promover. Dos auditores encontraron el mismo P0 sin verse entre sí.
+
 ## 2026-08-19 — Un guard que verificaba menos de lo que su propio Down borraba
 
 - **La migration de TASK-1746 tenía un hueco silencioso.** Su bloque anti pre-up-marker contaba
@@ -964,12 +982,3 @@ planners `.codex` y `.claude`: antes de tocar registry/README o commitear, toda 
 aunque tenga cero errores, es un fallo bloqueante. La reparación también completó los contratos
 wireframe/flow/motion/readiness de TASK-1686; no cambió runtime, rutas, acceso ni la implementación de
 la task.
-
-## 2026-08-10 — TASK-1389 cerrada: la navegación quedó con candado anti-regresión
-
-Cierra el programa de navegación del día (1388 → 1686 → 1389): Contrato de Asignación de Superficies
-canónico (qué destino va a qué superficie, sin duplicar, nada nuevo colgado del primer nivel fuera de
-zonas) + campo `Nav placement` obligatorio en tasks con destino visible + gate `pnpm nav:budget` que
-mide el árbol real del rail interno contra el presupuesto (8 slots top-level · profundidad 2 · cero
-`/my/*`) y el manifest. Nació directo en `error` con 0 violaciones medidas; doble cobertura CI (suite
-+ job en design-contract.yml). Lo que infló el sidebar a 96 hojas ya no puede repetirse en silencio.

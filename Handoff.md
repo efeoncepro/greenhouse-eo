@@ -2,6 +2,57 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-19 — Seis auditorías pararon el rollout de assessment antes de romper producción
+
+El bloque TASK-1745/1746 estaba por promoverse. Tres auditores independientes (arquitectura,
+talento, seguridad) lo revisaron antes; dos encontraron **el mismo P0 sin verse entre sí**, y una
+segunda ronda encontró un P0 en la propia corrección. Todo corregido en `5937f6e35`.
+
+**La migración de 1746 no era aplicable en NINGÚN orden.** El CHECK + trigger de
+`access_token_version_id` rompían el writer de `main` (23514 en toda asignación de test, en Vercel
+y en el ops-worker), y el código nuevo rompía sin la migración (42703). Medido contra la base real:
+22 assessments con token, los 22 de los últimos 30 días — el camino está vivo. Y hay **una sola
+instancia Cloud SQL** compartida prod/staging/local, así que aplicarla desde local es un cambio
+productivo inmediato. Partida en expand/contract.
+
+**El split sin enforcement seguía siendo el mismo P0.** `node-pg-migrate` aplica TODAS las
+pendientes en una transacción: dejar el CONTRACT en `migrations/` con un comentario de advertencia
+no impedía nada — el runner no lee comentarios. Vive en `scripts/operations/`, se aplica a mano.
+
+**Dos regresiones que golpeaban al candidato.** La sesión caducaba en el plazo para EMPEZAR, no en
+el de responder: quien abría el enlace poco antes del límite y arrancaba perdía la sesión a mitad
+del test. Y un enlace con el fragmento borrado por un reescritor dejaba al candidato fuera **sin
+producir un solo request** — indetectable. Ambas cerradas: deadline vivo + señal
+`hiring.assessment.access_never_exchanged` sobre un hecho durable.
+
+**El cap de recuperación cerraba la última puerta.** Contaba intentos FALLIDOS y compartía cuota
+con el enlace seguro: tres correos rebotados por un proveedor degradado dejaban al candidato sin
+NINGÚN canal por 24 h, con su plazo corriendo. Ahora sólo consume cuota lo que entregó algo, y cada
+canal tiene presupuesto propio.
+
+**`boundary-domain.test.ts` estaba ROJO en `HEAD`.** `hiring_assessment_public_session` nunca entró
+al allowlist del dominio. No lo vio nadie porque sólo aparece corriendo `src/lib/hiring` completo,
+no los tests focales del módulo. Lección: los gates focales no sustituyen al dominio.
+
+**Riesgos residuales declarados, NO cerrados** (ninguno bloquea el release, todos anteceden al flip):
+- `purge_expired_assessment_public_sessions` borra filas ACTIVAS por `expires_at`. Hoy es coherente
+  porque el trigger de refresh mantiene ese campo canónico; el día que el trigger no dispare, el
+  purge le corta el test al candidato sin dejar fila `expired` que lo explique. Hacerlo
+  deadline-aware.
+- La copy terminal ("Puede haber expirado o ya haberse usado") cubre seis causas distintas, cuatro
+  de ellas con el enlace VIVO. El bootstrap ya sabe cuándo faltó el fragmento y lo colapsa en el
+  mismo mensaje: distinguirlo da copy honesta **y** medición directa del reescritor.
+- `purge_assessment_access_recovery` no tiene ningún caller: la retención de 12 meses y el purgado
+  por retiro de consentimiento están declarados y nunca se ejecutan.
+- `--reporter=basic` da falso verde en vitest 4.1.0 (falla al cargar, exit 0). No está en ningún
+  gate; anotado para que no se introduzca.
+
+**Estado: code complete, rollout pendiente.** Nada aplicado: ninguna migración, ningún secreto,
+ningún webhook, ningún flag movido. Orden en
+`docs/operations/runbooks/resend-email-lifecycle-rollout.md`, con dos scripts operacionales nuevos
+que se aplican DESPUÉS del deploy: el CONTRACT de credencial y el saneador de los bearers que
+quedaron en claro en `delivery_payload` desde el 12-ago.
+
 ## 2026-08-19 — Hallazgos post-Codex sobre el bloque 1745/1746: guard corregido y ledger reconciliado
 
 Codex cerró el paquete de recuperación de acceso (`5d5eb2f9c` + `f4b5f622f`). Una revisión posterior
@@ -520,42 +571,6 @@ quedaron **`disabled` por el command gobernado** — eran las únicas de la base
 Pendiente que esta decisión vuelve más urgente: **el write path de ajustes razonables**. La doctrina
 exige poder dar tiempo extra o formato accesible; hoy el campo existe sin forma de escribirlo, así
 que no se puede acomodar a nadie sin alargar el límite para todos.
-
-## 2026-08-17 — TASK-1719 code complete: asignación de tests por etapa (Slices 0-5)
-
-Se cerró el código de los seis slices. Antes de esto la task tenía la fundación (policy + command)
-pero **el command no tenía un solo llamador**: era un motor sin llave. Ahora hay superficie manual
-(propose→confirm con effect digest y expiry enforceado a 30 min), cancelación gobernada, consumer
-reactivo de etapa y cola de reconciliación con endpoint propio.
-
-Decisiones que cambian el contrato y no estaban en la spec:
-
-- **Slices 4 y 5 colapsaron en UNA pieza.** El ADR exige un consumer único que absorba el correo de
-  etapa; mantenerlos separados es justamente lo que produce cero correos o dos.
-  `hiring_stage_changed_email` (TASK-1689) fue **reemplazado** por
-  `hiring_stage_changed_candidate_comms`. El `handler` key cambió.
-- **Ventana de accionabilidad de 24 h.** Un `stage_changed` más viejo no comunica ni asigna: va a la
-  cola humana. Es regla de dominio y además hace segura la primera corrida del consumer nuevo, cuya
-  Phase A barre todo el histórico del event type.
-- **`_occurredAt` se inyecta ahora en el payload reactivo** (`parsePayload`). La fila ya lo traía y
-  no se exponía, así que ninguna projection podía saber la edad de lo que procesaba. Con test propio:
-  sin esa inyección la ventana sería código muerto que nunca dispara, con build y tests verdes.
-- **`already_assigned` es ambiguo** y la ambigüedad manda cero o dos correos. El fan-in lo desambigua
-  leyendo el LEDGER (replay propio ⇒ callar; `existing_open_instance` ⇒ degradar). El deduplicador de
-  emails NO cubre este caso: los dos correos viajan con `sourceEventId` distintos.
-- **Cancelar libera el cupo de unicidad** (`cancelled` fuera del predicado del índice parcial), que es
-  lo que la vuelve recuperación real y no sólo un cierre. Verificado contra PG.
-
-Hallazgo colateral, ya corregido y commiteado aparte: **dos plantillas de assessment activas eran
-irrenderizables** (5 preguntas para 8 módulos y 6 para 5) — el módulo sin preguntas no desaparece, el
-candidato ve la sección vacía y el examen encogido se envía sin error. Archivadas + señal
-`hiring.assessment.template_module_without_questions`. Precursor vivo: **6 competencias sin banco**.
-
-**Estado: `code complete, rollout pendiente`.** `HIRING_STAGE_TEST_ASSIGNMENT_ENABLED` nace OFF (SoT
-`services/ops-worker/deploy.sh`, sólo ops-worker — prenderlo en Vercel no hace nada) y toda policy nace
-`draft`+`manual`. Falta lo operacional: declarar la policy del canary, drenar el backlog del consumer,
-flip y monitor 7 días. Con el flag OFF el candidato **sigue recibiendo** el aviso de avance: apagarlo
-es rollback seguro, no apagón. Manual: `docs/manual-de-uso/hr/operar-asignacion-de-tests.md`.
 
 ## 2026-08-17 — Beneficios globales de Efeonce documentados para vacantes
 
