@@ -2,6 +2,27 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-19 — Ronda de documentación post-release: lo que quedó y la deuda que se hizo visible
+
+Tres subagentes cerraron los huecos que dejó el release de TASK-1739. Lo que el siguiente agente
+necesita saber:
+
+**El catálogo de patrones tiene un octavo.** Antes de inventar una forma propia para "declarar un hecho
+que no se puede inferir después", léelo: obliga a elegir entre propagar en transacción o hacer que los
+readers críticos lean la raíz.
+
+**El módulo Hiring emite 16 señales de reliability y sólo 5 estaban documentadas.** Ahora hay inventario
+con dueño; quedan 8 sin delta propio (`talent_pool.integrity`, `assessment.template_module_without_questions`,
+`assessment.assignment_health` y las 5 de `assessment_ai.*`). Ninguna está rota: es deuda documental.
+
+**Mover una task a `complete/` rompe punteros.** Cinco quedaron colgando, incluido uno dentro del reader
+de una señal productiva. Al cerrar una task, correr `grep -rn 'in-progress/TASK-####' src/ scripts/ docs/`
+antes de dar por terminado.
+
+**Deuda viva de TASK-1739** en `TASK-1748`: los readers del Banco de Talento no filtran por procedencia
+—hoy las 11 personas sintéticas quedan fuera por su `lifecycle_status`, no por el filtro—, el archivado
+escribe sólo sobre la postulación, y las 9 huérfanas del lane B siguen sin decisión.
+
 ## 2026-08-19 — Working contract para operar engagements On-Demand sin confundirlos con Projects
 
 Se documentó la ontología `Organization → Engagement → Project/Campaign → Task` en
@@ -528,54 +549,3 @@ visual público y consume el formulario gobernado. La preferencia del banco debe
 self-service tokenizado ya existente de `TASK-1724` antes de activar el carril primario. Ambas
 flags permanecen propuestas/OFF; no hubo cambios de runtime. Artefactos actualizados: tasks,
 Epic-011, índices, flow y wireframe de TASK-1398.
-
-## 2026-08-17 — Cierre del programa Hiring: Expediente + Scoring IA + Identidad (TASK-1734/1735/1736/1737/1738)
-
-Cierre documental de dos días de trabajo en el dominio Hiring. Las 5 tasks están `complete` y
-mergeadas en `develop`; ISSUE-159 resuelta. Esto es lo que quedó **operativo**, lo que quedó
-**gated** y lo que le toca al operador.
-
-**Operativo hoy (staging).** El **tab Expediente** de la Application 360 (`TASK-1737`) y el
-**workbench de scoring** montado en la card del assessment (`TASK-1738`) son superficies reales.
-Los flags `HIRING_EVALUATION_DOSSIER_AI_ENABLED` y
-`HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED` fueron **creados ON en staging el 2026-08-16**
-con autorización explícita del CEO (verdad live: `vercel env ls`); ambos siguen **OFF en
-producción**. La **remediación histórica de nombres se EJECUTÓ**: 3 personas reales corregidas
-(Valentina Villa, Stana Medina, Aldo Romano), con actor y razón en
-`candidate_identity_display_audit`, y 2 perfiles QA podados a mano de la allowlist. Verificado
-contra la DB real durante este cierre.
-
-**Gated (y por qué).** Los 3 flags del run de scoring (`..._RUN_ENQUEUE_`, `..._EXCEPTION_POLICY_`,
-`..._RUN_CONFIRM_`) siguen OFF en todos los runtimes y el scheduler `ops-assessment-ai-drain` nace
-pausado. El gate de promoción sigue bloqueante — pero **el bloqueo ya no es de instrumento, es de
-volumen**: `pnpm hiring:ai:gold-set-sample`, la rúbrica BARS y el protocolo en ciego existen y se
-entregan **vacíos**, y el muestreo real mostró **11 respuestas humanas calificadas contra un piso
-de 49**. La ruta A (doble rating + adjudicación) **no es ejecutable hoy por falta de DATOS, no de
-personas**. Consecuencia operativa que conviene no perder: **el carril uno-a-uno es el modo
-correcto ahora, y es el que genera esa materia prima.**
-
-**Lo que el primer uso real corrigió** (ninguno lo atrapó un test verde):
-
-- El primer expediente confirmado se guardó **cortado a mitad de frase** en exactamente 8000
-  caracteres. El panel no lo delataba porque renderiza desde `proposedJson`. Límite a **20000**,
-  write path que **falla loud**, y la versión completa registrada como nota nueva con chip
-  **"Versión superada"** sobre la truncada.
-- `per_criterion_contradictory` disparaba en **11 de 14** items reales, justo en las respuestas
-  buenas: el scorer devolvía aportes ponderados que suman el global y el router los comparaba
-  contra su promedio. La escala ahora se **declara** (`weighted_contribution`, prompt
-  `...scoring.v2`, policy `...risk_policy.v1_1`) → **2/14**, y las 2 son contradicciones reales.
-- `manifestSummary` renderizaba `{a}/{a}` y **decía siempre 100%** mientras los gates debajo decían
-  "faltan 10" — en la superficie cuyo propósito es no mentir sobre cobertura.
-
-**Próximos pasos del operador**, en orden:
-
-1. Smoke en staging del propose/confirm del expediente + evidencia visual del panel de propuesta
-   con datos reales (es lo único que separa a `TASK-1735`/`1737` de producción).
-2. Canary de identidad en staging por el runbook `candidate-identity-rollout.md`; luego flip de
-   producción.
-3. Acumular gold set por el carril uno-a-uno hasta el piso de 49 (protocolo
-   `docs/manual-de-uso/hr/calificar-gold-set-de-referencia.md`). Recién ahí corre
-   `pnpm hiring:ai:promotion-gate` y se abre la secuencia shadow → canary → promoción del run.
-
-Ambas ADRs pasaron a **`Accepted`** en este cierre: la decisión fue autorizada e implementada.
-**Aceptar no es prender** — el estado de rollout de cada flag manda y vive en el ledger.

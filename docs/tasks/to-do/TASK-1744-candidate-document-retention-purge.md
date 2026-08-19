@@ -116,7 +116,7 @@ Reglas obligatorias:
   identidad del candidato (capability `hiring.candidate.reveal_identity`, audit de revelado).
 - `scripts/hiring/purge-task-1378-test-applications.ts` — precedente real de purga: descubrió el
   choque con el trigger append-only y resolvió con soft-delete.
-- `docs/tasks/in-progress/TASK-1739-hiring-synthetic-data-provenance.md` — purga de datos
+- `docs/tasks/complete/TASK-1739-hiring-synthetic-data-provenance.md` — purga de datos
   **sintéticos**; lane distinto y explícitamente no reutilizable acá.
 
 ## Dependencies & Impact

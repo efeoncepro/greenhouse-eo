@@ -77,7 +77,7 @@ export const getHiringDataOriginDerivationDriftSignal = async (): Promise<Reliab
           label: 'Query',
           value: 'hiring_application.data_origin ≠ derivación de identity_profiles + hiring_opening',
         },
-        { kind: 'doc', label: 'Task', value: 'docs/tasks/in-progress/TASK-1739-hiring-synthetic-data-provenance.md' },
+        { kind: 'doc', label: 'Task', value: 'docs/tasks/complete/TASK-1739-hiring-synthetic-data-provenance.md' },
       ],
     }
   } catch (error) {

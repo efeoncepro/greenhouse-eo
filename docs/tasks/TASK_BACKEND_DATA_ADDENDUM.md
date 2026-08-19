@@ -41,6 +41,7 @@ No usarlo para docs puros, copy-only UI, cambios visuales sin API/data, refactor
 - Invariantes que no se pueden romper:
   - `[invariante 1]`
   - `[invariante 2]`
+- Write-target allowlist: `[si el dominio tiene boundary test (ej. ALLOWED_WRITE_TARGETS en src/lib/hiring/boundary-domain.test.ts), declarar ahí cada tabla nueva en el MISMO PR, con comentario que justifique por qué ese destino es legítimo | N/A]`
 - Tenant/space boundary: `[como se deriva space_id/account/member/session]`
 - Idempotency/concurrency: `[idempotency key, transaction boundary, lock, retry, exactly/at-least-once]`
 - Audit/outbox/history: `[append-only log, event, signal, none with rationale]`
@@ -72,6 +73,7 @@ No usarlo para docs puros, copy-only UI, cambios visuales sin API/data, refactor
 
 - [ ] Source of truth, contract surface and consumers are named with real paths or objects.
 - [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (donde exista boundary test), en el mismo PR: es un control de frontera deliberado, no un inventario que se actualiza solo.
 - [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
 - [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
 - [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.

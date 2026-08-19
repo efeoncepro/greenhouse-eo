@@ -95,4 +95,4 @@ pnpm hiring:data:purge-synthetic --archive --actor <tu-user-id> --reason "<motiv
 - Contrato: `src/lib/hiring/data-origin/`
 - Señal de salud: `hiring.data_quality.data_origin_derivation_drift` en `/admin/operations`
 - Gate preventivo: `pnpm hiring:data-origin-gate`
-- Spec: `docs/tasks/in-progress/TASK-1739-hiring-synthetic-data-provenance.md`
+- Spec: `docs/tasks/complete/TASK-1739-hiring-synthetic-data-provenance.md`

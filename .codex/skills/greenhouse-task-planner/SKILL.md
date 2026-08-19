@@ -65,7 +65,19 @@ Before writing:
    como checkboxes en su `## Acceptance Criteria`** — prosa no es criterio. Wireframe/flow/motion se migran con
    `git mv` a la nomenclatura de la dueña y se actualizan sus campos en `## Status`, o quedan huérfanos por nombre.
 
-1. Reserve the next available ID from `docs/tasks/TASK_ID_REGISTRY.md`.
+1. 🔴 **La reserva de ID CADUCA — vuelve a verificar el ID libre JUSTO antes de escribir el archivo, nunca al
+   planificar.** `docs/tasks/TASK_ID_REGISTRY.md` entrega el siguiente ID libre, pero este repo lo trabajan varios
+   agentes en paralelo (Claude, Codex, Cursor): un ID verificado hace media hora —o dictado por el operador— puede
+   estar tomado cuando vas a escribir. Verifica las **tres fuentes a la vez**, porque discrepan entre ellas: (a) la
+   nota de reserva al pie del registry (`El siguiente ID libre es TASK-####`), (b) las filas de la tabla, y (c) el
+   filesystem, `ls docs/tasks/*/TASK-####*`.
+
+   Caso fuente (2026-08-18): el operador indicó `TASK-1743` como siguiente libre; al ir a crearla, Codex ya había
+   reservado `TASK-1742` y `TASK-1743` ese mismo día para *"Provisional Assessment AI Operator Experience"*, con sus
+   archivos ya en `docs/tasks/in-progress/`. La task de retención terminó siendo `TASK-1744`. Ese mismo día
+   `TASK-1748` figuraba sólo dentro de una nota de reserva del registry mientras su archivo aún no existía: el
+   registry puede ir **adelante** del filesystem y también **atrás**, así que ninguna de las tres fuentes basta sola.
+
 2. Read the architecture and operational docs that govern the domain.
 3. Confirm real files, modules, tables, routes, schemas, or helper layers that already exist.
 4. Identify the real gap.
@@ -97,6 +109,11 @@ Write the complete markdown file following `docs/tasks/TASK_TEMPLATE.md`.
 Start by copying the template file's structure; do not reconstruct its headings or comments from memory. The task linter distinguishes a canonical task from a legacy task by the literal HTML comments that delimit Zones 0–4, not by headings with equivalent names.
 
 - preserve the five full `<!-- ... ZONE N ... -->` blocks verbatim, including the deliberately empty Zone 2 block
+- 🔴 **Los cinco markers `ZONE 0` … `ZONE 4` van SIEMPRE, incluido el de Zone 2 que queda vacío.** Omitirlo porque
+  "Zone 2 no se llena al crear la task" es el error fácil, y **falla en silencio**: `pnpm task:lint --task TASK-###`
+  reporta `template=0 legacy=1` con `errors=0 warnings=0` — cero hallazgos, sólo cambia el contador, y CLAUDE.md
+  exige `template=1`. Caso fuente (2026-08-18): `TASK-1748` hubo que reescribirla completa para restaurar el bloque
+  comentado `ZONE 2 — PLAN MODE`. Lee el contador `template=`, no sólo la línea de errores y warnings.
 - populate Zones 0, 1, 3, and 4 only; do not write a plan inside Zone 2
 - run `pnpm task:lint --task TASK-###` immediately after writing the task file and before changing the registry, README, Handoff, or committing
 - registration is permitted only when the summary reports `scanned=1 template=1 legacy=0` and `errors=0 warnings=0`
@@ -126,6 +143,19 @@ Rules:
 - for UI/UX flow tasks, include a binary acceptance criterion that the task declares an existing `docs/ui/flows/...` file and passes `pnpm ui:flow-check --task TASK-###`
 - for UI/UX motion tasks, include a binary acceptance criterion that the task declares an existing `docs/ui/motion/...` file and passes `pnpm ui:motion-check --task TASK-###`
 - for backend/data tasks, include binary acceptance criteria for source of truth, contract surface, data invariants, tenant/access boundary, idempotency/concurrency, migration/backfill/rollback posture, canonical errors, audit/signal posture, and runtime evidence
+
+🔴 **Cuidado con el `n/a` suelto dentro de `Rollout Plan & Risk Matrix`.** La regla `rollout-plan` de
+`scripts/ci/task-lint/rules.mjs` emite warning cuando la task es `implementation`, su `Domain` toca un dominio
+sensible (`finance`, `payroll`, `auth`, `identity`, `billing`, `cloud`, `data`, `production`) y el contenido de esa
+sección contiene `n/a` como palabra suelta **sin** que aparezca en la misma sección ninguna de estas: `additive`,
+`repo-only`, `no production runtime impact`, `sin impacto`. Basta un `n/a` en la celda "Tiempo" de la tabla de
+rollback para dispararlo: pasó dos veces al crear `TASK-1744` (domain `hr|identity|data`), y era un `n/a` legítimo
+—el lane era irreversible, no había tiempo de rollback que declarar—.
+
+La salida correcta **NO es agregar una de las palabras mágicas para callar al linter**. Escribe lo que quieres
+decir: en un lane irreversible **"sin retorno" describe mejor que "n/a"**, y de paso el disparador desaparece
+porque ya no hay `n/a` en la sección. Regla general: cuando un gate te pide una palabra, revisa si la frase honesta
+ya la contiene; si no, cambia la frase, no le pongas la palabra de adorno.
 
 ### Step 5 — Present and confirm
 

@@ -2,10 +2,115 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.14`
+> Versión: `1.15`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-08-11` por TASK-1378 (signal de frescura de firmas del escáner de malware)
+> Última actualización: `2026-08-19` por TASK-1739 (signal de deriva de la procedencia derivada) + registro retroactivo de las 2 signals de identidad del intake (TASK-1736)
+
+## Delta 2026-08-19 — TASK-1739: signal de deriva de la procedencia derivada de una postulación
+
+Una señal nueva bajo `moduleKey='hiring'` (`kind='data_quality'`), que hace observable la única pieza
+frágil del modelo de procedencia de datos: la copia. `hiring_application.data_origin` no es un hecho
+declarado sino una **derivación denormalizada** que mantiene un trigger `BEFORE INSERT OR UPDATE` desde
+sus dos raíces —la persona (`identity_profiles`) y la vacante (`hiring_opening`)—, y es por esa copia
+que el desk filtra. Marcar una raíz **no toca la fila de la postulación**, así que el trigger no dispara
+solo: el command de marcado (`applySyntheticOriginMarking`) debe provocar la re-derivación en la misma
+transacción. Si esa propagación falla o alguien la olvida, la copia queda obsoleta **en silencio** — el
+desk sigue mostrando fantasmas ya marcados y el gold set sigue contaminado, sin un solo error visible.
+Compuesta en `get-reliability-overview.ts` con `.catch(() => null)`, como el resto.
+
+| `signalId` | Qué mide | Severidad | Steady |
+| --- | --- | --- | --- |
+| `hiring.data_quality.data_origin_derivation_drift` | Postulaciones cuyo `data_origin` **persistido** difiere del que se deriva hoy de sus dos raíces. Reporta el conteo de postulaciones divergentes y cuántas vacantes distintas tocan. Reader: [`hiring-data-origin-drift.ts`](../../src/lib/reliability/queries/hiring-data-origin-drift.ts) | `0 → ok`; `1-5 → warning`; `>5 → error` | **0** |
+
+Notas de contrato:
+
+- La señal **reproduce la regla del trigger en su propio SQL** (gana el no-real; entre dos no-real gana
+  la más protectora) y la compara contra el valor persistido. Es deliberadamente una aserción
+  independiente y no una llamada al mismo helper: compartir implementación haría que un error de la
+  regla saliera verde a ambos lados. La contrapartida asumida es que la regla vive en dos lugares y
+  cambiarla obliga a moverla en los dos.
+- **PII-free por construcción**: sólo counts (`drifted_applications`, `affected_openings`). Ni nombres,
+  ni correos, ni identificadores de personas — el dominio de candidatos es de PII restringida y una
+  señal de observabilidad no es lugar para volcarla.
+- La spec de procedencia citaba esta divergencia en su matriz de riesgo con probabilidad `low` y sin
+  construir el detector. Es **probabilidad 1 si nadie propaga**: ocurre en cada marcado. Por eso la
+  señal se construye, no se anota.
+- Remediación: **NUNCA** un `UPDATE` manual sobre `hiring_application.data_origin`. Repara la fila y
+  deja intacta la causa —la propagación faltante—, así que la señal vuelve a encenderse en el siguiente
+  marcado. Re-derivar por el command de marcado.
+- Degrada honestamente a `unknown` si la query falla (`captureWithDomain(error, 'hiring')`): no poder
+  evaluar la divergencia no es evidencia de que no exista.
+
+Ejercitada contra PostgreSQL real al crearse: `ok`, 0 divergencias.
+Contrato: [`GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`](GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md)
+§`Delta 2026-08-18 — Procedencia de datos (TASK-1739)`.
+Runbook: `docs/manual-de-uso/hr/operar-procedencia-de-datos-hiring.md`.
+Task dueña: `TASK-1739` (EPIC-011), en producción desde `2026-08-19`.
+
+### Inventario del módulo `hiring` (al 2026-08-19)
+
+El módulo acumula **16 señales** emitiendo `moduleKey: 'hiring'`, repartidas en siete tasks dueñas. Se
+deja el inventario explícito porque hasta esta entrega el único delta del módulo era el de TASK-356, que
+declaraba 2 señales propias + 2 migradas: quien leyera esta spec para saber qué observa `hiring` veía un
+cuarto del módulo real.
+
+| Señal(es) | Task dueña | Delta en esta spec |
+| --- | --- | --- |
+| `hiring.handoff_blocked_stale`, `hiring.internal_hire_awaiting_onboarding` | `TASK-356` | 2026-07-10 |
+| `hiring.candidate_document.retention_overdue`, `storage.asset_scan.open_quarantine` | `TASK-1362` (migradas a `hiring` por `TASK-356`) | 2026-07-10 |
+| `storage.asset_scan.signature_freshness` | `TASK-1378` | 2026-08-11 |
+| `hiring.talent_pool.integrity` | — (sin task declarada en el reader) | **sin delta** |
+| `hiring.assessment.template_module_without_questions` | — (sin task declarada en el reader) | **sin delta** |
+| `hiring.assessment.assignment_health` | `TASK-1719` | **sin delta** |
+| `hiring.assessment_ai.run_backlog_stuck`, `.provider_failure_rate`, `.abstention_rate`, `.override_delta`, `.orphan_reconciliation` | `TASK-1734` Slice 6 | **sin delta** |
+| `hiring.candidate_identity.needs_review_backlog`, `.evidence_coverage_gap` | `TASK-1736` Slice 4 | 2026-08-18 (esta entrega) |
+| `hiring.data_quality.data_origin_derivation_drift` | `TASK-1739` | 2026-08-19 (esta entrega) |
+
+Las 8 filas marcadas **sin delta** son deuda documental de este control plane, no señales ausentes del
+runtime: todas están wired en `get-reliability-overview.ts` y visibles en `/admin/operations`. Registrar
+una señal aquí es parte de entregarla — una señal que nadie sabe que existe no gatea nada.
+
+## Delta 2026-08-18 — TASK-1736: 2 signals de la identidad del intake de candidatos
+
+Dos señales nuevas bajo `moduleKey='hiring'` (`kind='data_quality'`), que hacen observable la
+canonicalización de la identidad del candidato en el intake público (ADR
+`GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1`, §Resilience). Una vigila la **cola
+humana** que el automatismo genera cuando deriva fail-closed; la otra vigila que el **write path** siga
+dejando su rastro con el flag prendido. Reader único
+[`hiring-candidate-identity-signals.ts`](../../src/lib/reliability/queries/hiring-candidate-identity-signals.ts),
+compuesto en `get-reliability-overview.ts` con `.catch(() => null)`; cada getter degrada a `unknown` por
+su cuenta y el agregador nunca lanza.
+
+| `signalId` | Qué mide | Severidad | Steady |
+| --- | --- | --- | --- |
+| `hiring.candidate_identity.needs_review_backlog` | Filas de `greenhouse_hiring.candidate_identity_display_audit` con `outcome='needs_review'` (discrepancia sustantiva, conflicto CAS o drift de allowlist) cuya identidad **no** tiene una fila `source='human'` + `outcome='applied'` posterior. Cada una es una decisión humana pendiente: el automatismo derivó fail-closed y nadie resolvió | `0 → ok`; `1-5 → warning`; `>5 → error` (backlog sistemático: o el clasificador deriva de más, o nadie drena la cola) | **0** |
+| `hiring.candidate_identity.evidence_coverage_gap` | Applications **del intake público** (`source='public_careers'`) sin fila en `candidate_identity_intake_evidence` con el flag `HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED` en ON. Ventana: desde la primera evidencia observada, o las últimas 24 h si aún no existe ninguna, con 5 min de gracia por submissions en vuelo. Detecta el silent-skip del write path (el degrade a Sentry existe, pero no debe volverse régimen) | `0 → ok`; `1-3 → warning`; `>3 → error`. Flag OFF `→ ok` explícito, sin consultar la DB | **0** con flag ON |
+
+Notas de contrato:
+
+- **El filtro `source='public_careers'` no es cosmético** (corregido el `2026-08-18`, hallado corriendo
+  el canary del runbook). La evidencia sólo la escribe `submitPublicHiringApplication`, así que una
+  application `manual` —cargada por un operador desde el desk— jamás puede tener fila, y contarla era un
+  falso positivo **permanente**: como la ventana arranca en la primera evidencia y nunca se cierra, cada
+  carga manual dejaba la señal en `warning` para siempre. Es el modo exacto de entrenar al operador a
+  ignorar la señal que gatea este rollout. Regla general para cualquier señal de cobertura: **acotar el
+  denominador a las filas que el write path realmente puede cubrir**, no a la tabla entera.
+- Con el flag OFF el estado es `ok` **explícito con nota**, no un hallazgo: no escribir evidencia es el
+  comportamiento esperado antes del flip, y la señal ni siquiera consulta la DB.
+- **PII-free por hard rule del ADR**: sólo counts (`missing_applications`, `evidence_rows_total`,
+  `pending_rows`, `pending_profiles`). Jamás nombres, correos ni el before/after del display name — esa
+  PII vive en las tablas restringidas y en la revisión humana local, nunca en observabilidad.
+- Remediación del backlog: el command `correctCandidateIdentityDisplayName` (capability
+  `hiring.candidate.correct_display`), **nunca** SQL manual; la corrección humana es justamente la fila
+  que la señal busca para dar por resuelto el caso.
+- El summary de `evidence_coverage_gap` distingue **cero evidencias totales** (flag recién prendido, o
+  write path silencioso desde el flip) de **gap posterior a la primera evidencia** (degrade silencioso
+  ya en régimen), porque la acción difiere: correr el canary vs. revisar Sentry dominio `hiring`.
+
+Contrato: `docs/architecture/GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1.md`
+§Resilience. Runbook de rollout/canary: `docs/operations/runbooks/candidate-identity-rollout.md`.
+Task dueña: `TASK-1736` Slice 4.
 
 ## Delta 2026-08-11 — TASK-1378: signal de frescura de firmas del escáner de malware
 

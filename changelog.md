@@ -3,6 +3,20 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-19 — Un patrón nuevo en el catálogo, y una señal que nadie había registrado
+
+- **Octavo patrón canónico: "hecho declarado al nacer + copia derivada donde se filtra + obligación de
+  propagar".** Cruzó el umbral de tres dominios que el propio catálogo exige (Hiring, Knowledge y
+  Finance), y su valor no es describir lo que ya hacíamos: es forzar una decisión explícita. O te
+  obligas a propagar en la misma transacción y con señal de divergencia —y entonces los readers pueden
+  confiar en la copia—, o no te obligas y los readers críticos leen la raíz. Lo prohibido es el tercer
+  camino: filtrar por una copia que nadie se comprometió a mantener.
+- **Once señales del módulo Hiring estaban vivas en runtime pero sin documentar** en el control plane;
+  ahora hay inventario con la task dueña de cada una. Ocho siguen sin delta propio: deuda documental
+  declarada, no ausencia en producción.
+- **Cinco punteros quedaron rotos** al mover TASK-1739 a `complete/`, uno de ellos dentro de una señal
+  de reliability que corre en producción. Corregidos.
+
 ## 2026-08-19 — On-Going y On-Demand ya comparten una ontología sin confundir engagement con proyecto
 
 - Se formalizó `Organization → Engagement → Project/Campaign → Task`: la organización y su Space conservan la
@@ -943,22 +957,3 @@ los shortcuts cliente sin gating del avatar, el heading "Mi Cuenta" vacío y el 
 vacíos. El trigger del avatar pasa a botón semántico (aria + teclado + Esc/restore) para TODAS las
 audiencias. Cliente, interno e híbrido my+client conservan su salida byte-a-byte (tests de control
 19+7). Evidencia GVC con la persona collaborator real, baselines durables y scorecard 5.0.
-
-## 2026-08-10 — TASK-1388 cerrada: la navegación interna se reparte entre sus 3 superficies
-
-Reequilibrio del portal interno en develop (5 commits, sin push): el rail pasa de 12 grupos top-level
-a 3 zonas (Operación · Administración · Recursos) con dominios colapsables uniformes; las hojas
-personales `/my/*` viven ahora en el dropdown del avatar (header de perfil clickeable, sin atajos
-admin duplicados) servidas por el builder canónico `src/lib/navigation/my-nav-items.ts`; y hay UNA
-sola palette ⌘K (la `CommandPalette` de TASK-696, ahora con filtro de audiencia + recientes +
-acciones — la `NavSearch` retirada exponía el `VIEW_REGISTRY` completo sin filtrar).
-
-- Cero cambios de ruta/URL ni de gating: el set de hojas por rol quedó fijado por test de identidad
-  (`VerticalMenu.test.tsx`, interno + no-interno).
-- Dedup: Sample Sprints con hogar único en Comercial, Growth como sección de Comercial, "Spaces
-  (admin)" desambiguado, Herramientas IA una sola vez, `verticalMenuData.tsx` legacy borrado.
-- Los 4 hallazgos a11y del chrome que TASK-1675 midió quedaron cerrados: focus ring en el rail,
-  región scrollable con role/label/foco, toggle del drawer accesible, desborde de 8px del panel.
-- Evidencia GVC premium (3 scenarios, desktop+390px) + scorecard 4.93 + baselines durables
-  promovidos. Cerrada el mismo día con autorización del operador: build de producción verde, test
-  full (10.447), `UI ready: yes` (card-sort formal queda como validación posterior no bloqueante).
