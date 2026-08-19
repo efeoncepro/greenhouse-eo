@@ -300,6 +300,7 @@ Resend dashboard/API, Vercel production variables/secrets and a consented real i
 | Dedupe | `PRIMARY KEY (provider_event_id)` sobre `email_provider_events` (el `svix-id`) |
 | Índice | `idx_email_deliveries_provider_status` creado y `valid=true ready=true` |
 | Inbox | 17 eventos firmados por webhook (`signature_verified=t`), todos `processed` en 1 intento; **0 dead-letter, 0 pendientes** |
+| Smoke externo real | **la cadena `email.sent` → `email.delivered` se observó firmada sobre un `hiring_assessment_assigned` real a `gmail.com`**, más `hiring_application_confirmation` a `gmail.com` y un `email.clicked` sobre un assessment a `hotmail.com`. No es un correo interno de prueba: es tráfico productivo a candidatos reales |
 | Reconciliación | ventana 30 días, cursor agotado; `provider_status_source='reconciliation'` en 69 filas |
 
 ### Lo que la reconciliación reveló
@@ -323,7 +324,12 @@ sintéticos y de prueba transitando el pipeline de correo productivo, que es la 
 - **283 despachos con `resend_id` fuera de la ventana de 30 días** no se reconciliaron, por diseño del lookback.
 - **`redrivePendingResendWebhookEvents` sigue sin caller automático** — no hay cron ni Cloud Scheduler. Hoy hay 0
   eventos pendientes, así que no hay daño, pero la remediación desatendida no existe.
-- **No se ejercitó un replay real** del proveedor; el no-duplicado está garantizado estructuralmente, no probado en vivo.
+- **No se ejercitó un replay real** del proveedor; el no-duplicado está garantizado estructuralmente por
+  `PRIMARY KEY (provider_event_id)`, no probado en vivo.
+- ⚠️ **El `email.clicked` firmado sobre un assessment real a `hotmail.com` es la prueba dura de que el rewrite de links
+  de Resend está activo sobre correos de candidatos.** Confirma que el gate de `click_tracking` que bloquea el flip de
+  `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` (TASK-1746) no es teórico: hoy un enlace con el bearer en el
+  fragmento se perdería en el rewrite.
 - El comando `pnpm email:resend:reconcile` **falla en local sin `RESEND_API_KEY`** y el error queda enmascarado
   (`scripts/email/reconcile-resend-deliveries.ts:39-44` imprime sólo `error.name`). Vale exportar la key o mejorar el
   reporte de error.
