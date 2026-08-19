@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-011`
-- Status real: `Diseño listo — foundation API code-complete localmente; rollout y consumer JSX pendientes`
+- Status real: `En ejecución — backend de 1746 desplegado y con schema aplicado; falta el consumer JSX`
 - Rank: `TBD`
 - Domain: `hr|ui|delivery`
 - Blocked by: `TASK-1746`

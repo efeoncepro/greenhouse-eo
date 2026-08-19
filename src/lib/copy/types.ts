@@ -573,6 +573,65 @@ export interface HiringDeskCopy {
     documentsTitle: string
     revealConfirm: string
     /**
+     * TASK-1747 — copy de recuperación de acceso al test.
+     *
+     * Recuperar rota la credencial del candidato: el enlace anterior deja de servir. Por eso el
+     * copy nunca promete recepción en bandeja (sólo el proveedor la confirma), nombra la causa
+     * exacta cuando no se puede recuperar en vez de un "no disponible" genérico, y advierte que
+     * el enlace se muestra una sola vez antes de mostrarlo.
+     */
+    accessRecovery: {
+      cta: string
+      title: string
+      intro: string
+      channelLabel: string
+      channelEmail: string
+      channelEmailHelp: string
+      channelSecureLink: string
+      channelSecureLinkHelp: string
+      reasonLabel: string
+      reasons: {
+        candidate_reports_email_not_received: string
+        candidate_reports_link_invalid: string
+        alternate_channel_requested: string
+        provider_delivery_failed: string
+        token_expired_before_start: string
+      }
+      confirm: string
+      confirming: string
+      cancel: string
+      emailQueued: string
+      emailUnknown: string
+      emailFailed: string
+      linkTitle: string
+      linkWarning: string
+      linkCopy: string
+      linkCopied: string
+      linkClose: string
+      quotaRemaining: string
+      quotaExhausted: string
+      cooldown: string
+      emailBlocked: string
+      emailMissing: string
+      unavailableTitle: string
+      unavailable: {
+        assessment_recovery_method_not_supported: string
+        assessment_recovery_application_closed: string
+        assessment_recovery_consent_withdrawn: string
+        assessment_recovery_invalid_state: string
+        assessment_recovery_time_elapsed: string
+        assessment_recovery_expired_after_start: string
+        assessment_recovery_expiry_not_proven: string
+        assessment_recovery_status_not_allowed: string
+      }
+      errorGeneric: string
+      errorRateLimited: string
+      errorConflict: string
+      errorPermission: string
+      errorReadFailed: string
+      retry: string
+    }
+    /**
      * TASK-1715 — copy del panel de Documentos. Separa las dos clases del modelo
      * canónico: un archivo se ABRE (autorizado ya por la capability de la pantalla)
      * y la identidad se REVELA (capability + motivo + audit). El panel anterior las
