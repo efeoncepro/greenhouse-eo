@@ -275,6 +275,10 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   11 personas sintéticas quedan fuera por su `lifecycle_status`, no por el filtro), el archivado escribe sólo sobre la
   postulación cuando la spec definía tres entidades, y las 9 huérfanas del lane B siguen sin decisión. Sin efecto
   visible hoy; se escriben porque una deuda que no duele es la que se olvida.
+- `TASK-1751` — El candidato no ve su reloj ni entiende por qué no puede enviar: el temporizador de la rendición no
+  sigue el scroll, los avisos de 5 y 1 minuto son `srOnly` (invisibles para quien ve), la gracia de 30 minutos se rompe
+  con texto sin guardar y el error final manda a reintentar algo imposible. Caso real medido sobre una candidata que
+  perdió una respuesta escrita teniendo 26 minutos de gracia disponibles.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
 
