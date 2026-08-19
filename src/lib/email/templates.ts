@@ -1887,7 +1887,11 @@ interface HiringAssessmentAssignedContext extends EmailTemplateContext {
   timeLimitMinutes?: number | null
   tokenTtlDays?: number
   locale?: 'es' | 'en'
+  inProgress?: boolean
+  expiresAt?: string
 }
+
+type HiringAssessmentAccessRecoveryContext = HiringAssessmentAssignedContext
 
 interface HiringTalentPoolVerificationContext extends EmailTemplateContext {
   recipientName?: string
@@ -1937,6 +1941,48 @@ registerTemplate('hiring_assessment_assigned', (context: HiringAssessmentAssigne
       '',
       '— Efeonce · efeoncepro.com'
     ].join('\n')
+  }
+})
+
+registerTemplate('hiring_assessment_access_recovery', (context: HiringAssessmentAccessRecoveryContext) => {
+  const isEn = context.locale === 'en'
+  const first = context.recipientName?.split(' ')[0]
+
+  const expiryLabel = context.inProgress && context.expiresAt
+    ? new Intl.DateTimeFormat(isEn ? 'en-US' : 'es-CL', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+        timeZone: 'America/Santiago',
+      }).format(new Date(context.expiresAt))
+    : null
+
+  return {
+    subject: isEn
+      ? `${first ? `${first}, ` : ''}your new assessment access link — Efeonce`
+      : `${first ? `${first}, ` : ''}tu nuevo acceso a la evaluación — Efeonce`,
+    react: HiringAssessmentAssignedEmail({
+      recipientName: context.recipientName,
+      openingTitle: context.openingTitle,
+      assessmentUrl: context.assessmentUrl,
+      timeLimitMinutes: context.timeLimitMinutes ?? null,
+      tokenTtlDays: context.tokenTtlDays,
+      locale: context.locale ?? 'es',
+      mode: 'access_recovery',
+      inProgress: context.inProgress,
+      expiresAt: context.expiresAt,
+    }),
+    text: [
+      isEn ? 'Your new assessment access link is ready.' : 'Tu nuevo acceso a la evaluación está listo.',
+      isEn ? 'Any previous link is no longer valid.' : 'Cualquier enlace anterior dejó de ser válido.',
+      ...(context.inProgress && expiryLabel
+        ? [isEn
+          ? `Continue now: the assessment timer is already running. Its original deadline remains ${expiryLabel} (Chile time).`
+          : `Continúa ahora: el tiempo de la evaluación ya está corriendo. Su plazo original se mantiene hasta ${expiryLabel} (hora de Chile).`]
+        : []),
+      context.assessmentUrl,
+      '',
+      '— Efeonce · efeoncepro.com',
+    ].join('\n'),
   }
 })
 
@@ -2161,6 +2207,29 @@ registerPreviewMeta('hiring_assessment_assigned', {
     { key: 'tokenTtlDays', label: 'Vigencia del link (días)', type: 'number' },
     { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] }
   ]
+})
+
+registerPreviewMeta('hiring_assessment_access_recovery', {
+  label: 'Hiring — nuevo acceso a evaluación',
+  description: 'Enlace nuevo y rotado cuando People recupera el acceso de una candidata',
+  domain: 'hr',
+  supportsLocale: true,
+  defaultProps: {
+    recipientName: 'María González',
+    openingTitle: 'Content Creator',
+    assessmentUrl: 'https://greenhouse.efeoncepro.com/public/assessment/access#access=preview-token',
+    timeLimitMinutes: 45,
+    tokenTtlDays: 14,
+    locale: 'es',
+  },
+  propsSchema: [
+    { key: 'recipientName', label: 'Nombre del candidato', type: 'text' },
+    { key: 'openingTitle', label: 'Vacante', type: 'text' },
+    { key: 'assessmentUrl', label: 'URL de recuperación', type: 'text' },
+    { key: 'timeLimitMinutes', label: 'Tiempo límite (min)', type: 'number' },
+    { key: 'tokenTtlDays', label: 'Vigencia del link (días)', type: 'number' },
+    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] },
+  ],
 })
 
 registerPreviewMeta('hiring_assessment_submitted_internal', {

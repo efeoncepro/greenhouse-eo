@@ -49,6 +49,12 @@
   stale intents without inferring non-delivery. Rollout is gated on running
   `scripts/operations/task-1746-create-token-intent-index.sql` before the writers and retaining its
   valid/ready/unique readback. No schema, index or runtime change has been applied.
+- 2026-08-19 — Slice 2B email command code complete and independently validated by Architecture, Talent
+  and Security. Intent, receipt and token rotation share one transaction; the provider runs after commit;
+  replay never sends or rotates. A bounded receipt/delivery reconciler converges only from immutable durable
+  evidence and the global lifecycle signal surfaces stale drift after 15 minutes. HTML and plaintext preserve
+  the original in-progress deadline in Chile time. The email type remains disabled with no productive adapter.
+  Slice 3 fragment exchange, HttpOnly session, authorization/API and tracking smoke remain hard gates.
 
 ## Skills
 

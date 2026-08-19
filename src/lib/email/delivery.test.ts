@@ -230,6 +230,10 @@ describe('email delivery layer', () => {
       context: { openingTitle: 'Role', assessmentUrl: 'https://example.test/assessment/bearer', locale: 'es' }
     },
     {
+      emailType: 'hiring_assessment_access_recovery' as const,
+      context: { openingTitle: 'Role', assessmentUrl: 'https://example.test/assessment/access#token=bearer', locale: 'es' }
+    },
+    {
       emailType: 'hiring_talent_pool_verification' as const,
       context: { profileUrl: 'https://example.test/talent/bearer', locale: 'es' }
     }
@@ -247,6 +251,11 @@ describe('email delivery layer', () => {
     {
       emailType: 'hiring_assessment_assigned' as const,
       context: { openingTitle: 'Role', assessmentUrl: 'https://example.test/assessment/bearer', locale: 'es' },
+      sourceEntity: 'asmt-11111111-1111-4111-8111-111111111111'
+    },
+    {
+      emailType: 'hiring_assessment_access_recovery' as const,
+      context: { openingTitle: 'Role', assessmentUrl: 'https://example.test/assessment/access#token=bearer', locale: 'es' },
       sourceEntity: 'asmt-11111111-1111-4111-8111-111111111111'
     },
     {

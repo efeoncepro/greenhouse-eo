@@ -12,6 +12,9 @@ describe('TASK-1746 migration contract', () => {
   it('creates a mutable receipt and structurally append-only audit', () => {
     expect(migration).toContain('hiring_assessment_access_recovery (')
     expect(migration).toContain('hiring_assessment_access_recovery_event (')
+    expect(migration).toContain("VALUES ('hiring_assessment_access_recovery', FALSE)")
+    expect(migration).toContain("'pending_dispatch', 'dispatch_accepted', 'dispatch_failed', 'dispatch_unknown'")
+    expect(migration).toContain('AND delivery_id IS NOT NULL')
     expect(migration).toContain('BEFORE UPDATE OR DELETE')
     expect(migration).toContain('prevent_assessment_access_recovery_event_mutation')
     expect(migration).toContain('emit_assessment_access_recovery_event')
@@ -33,10 +36,10 @@ describe('TASK-1746 migration contract', () => {
 
   it('freezes receipt identity and allows only column-scoped lifecycle updates', () => {
     expect(migration).toContain('trg_hiring_assessment_access_recovery_update_guard')
-    expect(migration).toContain('GRANT UPDATE (outcome, delivery_id, updated_at)')
+    expect(migration).toContain('GRANT UPDATE (outcome, updated_at)')
     expect(migration).not.toMatch(/GRANT\s+SELECT,\s*INSERT,\s*UPDATE\s+ON\s+greenhouse_hiring\.hiring_assessment_access_recovery/i)
     expect(migration).toContain("OLD.outcome = 'pending_dispatch'")
-    expect(migration).toContain('delivery immutable without outcome transition')
+    expect(migration).toContain('delivery immutable (TASK-1746)')
     expect(migration).toContain('updated_at cannot regress')
     expect(migration).toMatch(/delivery_id\s+UUID REFERENCES greenhouse_notifications\.email_deliveries \(delivery_id\) ON DELETE RESTRICT/)
   })
@@ -52,6 +55,10 @@ describe('TASK-1746 migration contract', () => {
     expect(migration.match(/FOR UPDATE;/g)?.length).toBeGreaterThanOrEqual(4)
     expect(migration).toContain('populate_assessment_access_recovery_event')
     expect(migration).toContain('NEW.assessment_id := receipt.assessment_id')
+    expect(migration).toContain('assessment access recovery delivery intent inválido')
+    expect(migration).toContain("delivery_email_type IS DISTINCT FROM 'hiring_assessment_access_recovery'")
+    expect(migration).toContain('delivery_source_entity IS DISTINCT FROM NEW.assessment_id')
+    expect(migration).toContain("format('email:v1:%s:%s:%s', NEW.actor_user_id, NEW.assessment_id, NEW.idempotency_digest)")
   })
 
   it('enforces TTLs, digest shape and privileged retention purge', () => {

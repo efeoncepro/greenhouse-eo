@@ -26,6 +26,7 @@ export type EmailType =
   | 'hiring_application_received_internal'
   | 'hiring_application_confirmation'
   | 'hiring_assessment_assigned'
+  | 'hiring_assessment_access_recovery'
   | 'hiring_assessment_submitted_internal'
   | 'hiring_stage_advanced'
   | 'hiring_decision_selected'
@@ -53,6 +54,7 @@ export const TOKEN_SENSITIVE_EMAIL_TYPES = Object.freeze([
   'verify_email',
   'magic_link',
   'hiring_assessment_assigned',
+  'hiring_assessment_access_recovery',
   'hiring_talent_pool_verification'
 ] as const satisfies readonly EmailType[])
 
@@ -89,6 +91,7 @@ export const EMAIL_PRIORITY_MAP: Record<string, EmailPriority> = {
   hiring_application_received_internal: 'transactional',
   hiring_application_confirmation: 'transactional',
   hiring_assessment_assigned: 'transactional',
+  hiring_assessment_access_recovery: 'transactional',
   hiring_assessment_submitted_internal: 'transactional',
   hiring_stage_advanced: 'transactional',
   hiring_decision_selected: 'transactional',
@@ -134,6 +137,7 @@ export interface EmailTemplateContext extends Record<string, unknown> {
 export interface TokenSensitiveEmailSafeContext {
   locale?: string
   expiresAt?: string
+  inProgress?: boolean
   timeLimitMinutes?: number | null
   tokenTtlDays?: number | null
 }
@@ -200,6 +204,7 @@ export const AGENCY_BRANDED_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<EmailT
   // portal. Los avisos internos a People NO van acá: usan el sender plataforma.
   'hiring_application_confirmation',
   'hiring_assessment_assigned',
+  'hiring_assessment_access_recovery',
   'hiring_stage_advanced',
   'hiring_decision_selected',
   'hiring_decision_rejected',

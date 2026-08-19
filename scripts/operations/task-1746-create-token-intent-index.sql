@@ -8,7 +8,7 @@ SELECT (COUNT(*)>0) AS has_duplicates
   FROM (
     SELECT email_type,source_event_id,source_entity
       FROM greenhouse_notifications.email_deliveries
-     WHERE email_type IN ('hiring_assessment_assigned','hiring_talent_pool_verification')
+     WHERE email_type IN ('hiring_assessment_assigned','hiring_assessment_access_recovery','hiring_talent_pool_verification')
        AND source_event_id IS NOT NULL
        AND source_entity IS NOT NULL
      GROUP BY email_type,source_event_id,source_entity
@@ -27,22 +27,22 @@ SELECT EXISTS (
     JOIN pg_class c ON c.oid=i.indexrelid
     JOIN pg_namespace n ON n.oid=c.relnamespace
    WHERE n.nspname='greenhouse_notifications'
-     AND c.relname='uq_email_deliveries_token_intent'
+     AND c.relname='uq_email_deliveries_token_intent_v2'
      AND (NOT i.indisvalid OR NOT i.indisready)
 ) AS invalid_index
 \gset
 
 \if :invalid_index
-  \echo 'TASK-1746 blocked: uq_email_deliveries_token_intent exists but is INVALID. Drop it with DROP INDEX CONCURRENTLY and rerun this script.'
+  \echo 'TASK-1746 blocked: uq_email_deliveries_token_intent_v2 exists but is INVALID. Drop it with DROP INDEX CONCURRENTLY and rerun this script.'
   \quit 4
 \endif
 
 SET lock_timeout='2s';
 SET statement_timeout='15min';
 
-CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS uq_email_deliveries_token_intent
+CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS uq_email_deliveries_token_intent_v2
   ON greenhouse_notifications.email_deliveries (email_type,source_event_id,source_entity)
-  WHERE email_type IN ('hiring_assessment_assigned','hiring_talent_pool_verification')
+  WHERE email_type IN ('hiring_assessment_assigned','hiring_assessment_access_recovery','hiring_talent_pool_verification')
     AND source_event_id IS NOT NULL
     AND source_entity IS NOT NULL;
 
@@ -50,7 +50,7 @@ SELECT (COUNT(*)>0) AS duplicate_groups_after_build
   FROM (
     SELECT email_type,source_event_id,source_entity
       FROM greenhouse_notifications.email_deliveries
-     WHERE email_type IN ('hiring_assessment_assigned','hiring_talent_pool_verification')
+     WHERE email_type IN ('hiring_assessment_assigned','hiring_assessment_access_recovery','hiring_talent_pool_verification')
        AND source_event_id IS NOT NULL
        AND source_entity IS NOT NULL
      GROUP BY email_type,source_event_id,source_entity
@@ -69,13 +69,14 @@ SELECT EXISTS (
     JOIN pg_class c ON c.oid=i.indexrelid
     JOIN pg_namespace n ON n.oid=c.relnamespace
    WHERE n.nspname='greenhouse_notifications'
-     AND c.relname='uq_email_deliveries_token_intent'
+     AND c.relname='uq_email_deliveries_token_intent_v2'
      AND i.indisunique AND i.indisvalid AND i.indisready
      AND i.indnkeyatts=3
      AND pg_get_indexdef(i.indexrelid,1,true)='email_type'
      AND pg_get_indexdef(i.indexrelid,2,true)='source_event_id'
      AND pg_get_indexdef(i.indexrelid,3,true)='source_entity'
      AND pg_get_expr(i.indpred,i.indrelid) LIKE '%hiring_assessment_assigned%'
+     AND pg_get_expr(i.indpred,i.indrelid) LIKE '%hiring_assessment_access_recovery%'
      AND pg_get_expr(i.indpred,i.indrelid) LIKE '%hiring_talent_pool_verification%'
 ) AS index_contract_ok
 \gset

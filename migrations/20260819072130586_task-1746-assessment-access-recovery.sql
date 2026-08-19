@@ -4,6 +4,10 @@
 -- El receipt es idempotente y sólo permite cerrar outcome/delivery; el event es audit
 -- append-only. Ninguna tabla guarda token, URL, email, teléfono, nombre, texto libre o error.
 
+INSERT INTO greenhouse_notifications.email_type_config (email_type, enabled)
+VALUES ('hiring_assessment_access_recovery', FALSE)
+ON CONFLICT (email_type) DO NOTHING;
+
 CREATE TABLE IF NOT EXISTS greenhouse_hiring.hiring_assessment_access_recovery (
   recovery_id          TEXT PRIMARY KEY DEFAULT ('harc-' || gen_random_uuid()::text),
   assessment_id        TEXT NOT NULL REFERENCES greenhouse_hiring.hiring_assessment (assessment_id) ON DELETE RESTRICT,
@@ -37,9 +41,9 @@ CREATE TABLE IF NOT EXISTS greenhouse_hiring.hiring_assessment_access_recovery (
       OR (channel = 'secure_link' AND expires_at <= issued_at + INTERVAL '24 hours')),
   CHECK ((previous_status IN ('assigned', 'sent', 'expired') AND resulting_status = 'sent')
       OR (previous_status = 'in_progress' AND resulting_status = 'in_progress')),
-  CHECK ((channel = 'email' AND outcome = 'pending_dispatch' AND delivery_id IS NULL)
-      OR (channel = 'email' AND outcome = 'dispatch_accepted' AND delivery_id IS NOT NULL)
-      OR (channel = 'email' AND outcome IN ('dispatch_failed', 'dispatch_unknown'))
+  CHECK ((channel = 'email' AND outcome IN (
+               'pending_dispatch', 'dispatch_accepted', 'dispatch_failed', 'dispatch_unknown'
+             ) AND delivery_id IS NOT NULL)
       OR (channel = 'secure_link' AND outcome = 'link_issued' AND delivery_id IS NULL))
 );
 
@@ -94,6 +98,10 @@ DECLARE
   canonical_time_limit_minutes integer;
   canonical_accommodations jsonb;
   canonical_deadline timestamptz;
+  delivery_email_type text;
+  delivery_source_event_id text;
+  delivery_source_entity text;
+  expected_source_event_id text;
 BEGIN
   -- Orden de lock canónico: assessment → application → candidate facet. Evita que una
   -- decisión o retiro de consentimiento confirme entre la validación y el commit.
@@ -147,6 +155,26 @@ BEGIN
        canonical_started_at IS NOT NULL OR canonical_token_expires_at IS NULL
        OR canonical_token_expires_at > NOW() OR NEW.reason_code <> 'token_expired_before_start') THEN
     RAISE EXCEPTION 'assessment access recovery expired state not proven (TASK-1746)' USING ERRCODE = '23514';
+  END IF;
+
+  IF NEW.channel = 'email' THEN
+    SELECT email_type, source_event_id, source_entity
+      INTO delivery_email_type, delivery_source_event_id, delivery_source_entity
+    FROM greenhouse_notifications.email_deliveries
+    WHERE delivery_id = NEW.delivery_id
+    FOR SHARE;
+
+    expected_source_event_id := 'assessment-access-recovery:' || encode(sha256(convert_to(
+      format('email:v1:%s:%s:%s', NEW.actor_user_id, NEW.assessment_id, NEW.idempotency_digest),
+      'UTF8'
+    )), 'hex');
+
+    IF delivery_email_type IS DISTINCT FROM 'hiring_assessment_access_recovery'
+       OR delivery_source_entity IS DISTINCT FROM NEW.assessment_id
+       OR delivery_source_event_id IS DISTINCT FROM expected_source_event_id THEN
+      RAISE EXCEPTION 'assessment access recovery delivery intent inválido (TASK-1746)'
+        USING ERRCODE = '23514';
+    END IF;
   END IF;
 
   NEW.retention_class := 'hiring_candidate_recovery';
@@ -231,8 +259,8 @@ BEGIN
   ) THEN
     RAISE EXCEPTION 'assessment access recovery transition % -> % inválida', OLD.outcome, NEW.outcome USING ERRCODE = '23514';
   END IF;
-  IF NEW.outcome = OLD.outcome AND NEW.delivery_id IS DISTINCT FROM OLD.delivery_id THEN
-    RAISE EXCEPTION 'assessment access recovery delivery immutable without outcome transition (TASK-1746)'
+  IF NEW.delivery_id IS DISTINCT FROM OLD.delivery_id THEN
+    RAISE EXCEPTION 'assessment access recovery delivery immutable (TASK-1746)'
       USING ERRCODE = '55000';
   END IF;
   IF NEW.updated_at < OLD.updated_at THEN
@@ -508,7 +536,7 @@ REVOKE ALL ON FUNCTION greenhouse_hiring.purge_assessment_access_recovery(text, 
 GRANT EXECUTE ON FUNCTION greenhouse_hiring.purge_assessment_access_recovery(text, text, text) TO greenhouse_ops;
 
 GRANT SELECT, INSERT ON greenhouse_hiring.hiring_assessment_access_recovery TO greenhouse_runtime;
-GRANT UPDATE (outcome, delivery_id, updated_at)
+GRANT UPDATE (outcome, updated_at)
   ON greenhouse_hiring.hiring_assessment_access_recovery TO greenhouse_runtime;
 GRANT SELECT ON greenhouse_hiring.hiring_assessment_access_recovery_event TO greenhouse_runtime;
 
@@ -562,6 +590,9 @@ BEGIN
   END IF;
 END
 $$;
+
+-- Preserve the disabled type row: Up may have found a pre-existing operator-owned
+-- configuration via ON CONFLICT DO NOTHING, so Down must not delete it blindly.
 
 UPDATE greenhouse_core.capabilities_registry SET deprecated_at = NOW()
 WHERE capability_key IN ('hiring.assessment.recover_access_email', 'hiring.assessment.reveal_access_link')

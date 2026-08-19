@@ -722,3 +722,42 @@ export const reissueCandidateTestTokenForEmailWithClient = async (
     tokenTtlDays: TOKEN_TTL_DAYS,
   }
 }
+
+/**
+ * TASK-1746 — Rotation primitive for a governed access recovery. The caller has already
+ * inserted the recovery receipt in the same transaction, so the deferred DB constraint
+ * proves that this update and its audit either commit together or both roll back.
+ */
+export const rotateCandidateTestTokenForAccessRecoveryWithClient = async (
+  client: PoolClient,
+  input: {
+    assessmentId: string
+    expectedStatus: 'assigned' | 'sent' | 'in_progress' | 'expired'
+    resultingStatus: 'sent' | 'in_progress'
+    expiresAt: Date
+  },
+): Promise<{ token: string; timeLimitMinutes: number | null } | null> => {
+  const rawToken = randomBytes(24).toString('base64url')
+
+  const rows = await runQuery<{ assessment_id: string; time_limit_minutes: number | string | null }>(
+    client,
+    `UPDATE greenhouse_hiring.hiring_assessment
+     SET access_token_hash = $2,
+         token_expires_at = $3,
+         status = $4,
+         updated_at = NOW()
+     WHERE assessment_id = $1
+       AND method = 'candidate_test'
+       AND status = $5
+       AND (($4 = 'sent' AND started_at IS NULL) OR ($4 = 'in_progress' AND started_at IS NOT NULL))
+     RETURNING assessment_id, time_limit_minutes`,
+    [input.assessmentId, hashToken(rawToken), input.expiresAt, input.resultingStatus, input.expectedStatus],
+  )
+
+  if (!rows[0]) return null
+
+  return {
+    token: rawToken,
+    timeLimitMinutes: rows[0].time_limit_minutes == null ? null : Number(rows[0].time_limit_minutes),
+  }
+}

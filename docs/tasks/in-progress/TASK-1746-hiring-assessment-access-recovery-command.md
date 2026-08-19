@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-011`
-- Status real: `Slice 1 validado localmente — migración sin aplicar; Slice 2 pendiente`
+- Status real: `Slices 1, 2A y 2B validados localmente — migración/índice sin aplicar; sesión/API y rollout pendientes`
 - Rank: `TBD`
 - Domain: `hr|identity|delivery`
 - Blocked by: `none`
@@ -204,6 +204,15 @@ Reglas obligatorias:
 - Secure link: one-time browser-safe response with bounded expiry, no durable raw token and no hidden UI fallback.
 - Antes del command, endurecer globalmente el transporte de emails que llevan credenciales: sobre durable
   redactado, intent atómico previo a la rotación, sin batch/retry genérico y outcome honesto del proveedor.
+
+**Checkpoint 2026-08-19 — Slice 2B email code-complete, runtime pendiente.** El command de recuperación por
+email crea intent+receipt+rotación bajo la misma transacción, conserva el deadline de un test iniciado y deja
+el bearer únicamente en memoria. El receipt nace ligado al delivery canónico e inmutable; si el proveedor y
+el cierre local se separan por un crash, el replay reconcilia evidencia durable sin reenviar ni rotar y
+Platform Health señala el drift a los 15 minutos. El tipo `hiring_assessment_access_recovery` nace desactivado
+y no tiene adapter productivo: no puede habilitarse antes del fragment exchange/sesión HttpOnly de Slice 3,
+la autorización server-side y el smoke de tracking. Arquitectura, Talento y Seguridad validaron el slice sin
+P0/P1/P2; 90 tests focales y los gates locales quedaron verdes. No se aplicó migración, índice ni cambio runtime.
 
 ### Slice 3 — Guardrails y evidencia
 

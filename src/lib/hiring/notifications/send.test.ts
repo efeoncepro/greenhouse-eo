@@ -72,7 +72,7 @@ describe('TASK-1689 hiring lifecycle emails', () => {
     mockClaimTokenSensitiveEmailIntent.mockImplementation(async input => ({
       claimed: true,
       deliveryId: 'delivery-intent-1',
-      value: await input.issueCredential({})
+      value: await input.issueCredential({}, 'delivery-intent-1')
     }))
     mockSendEmail.mockResolvedValue({ deliveryId: 'd-1', resendId: 'r-1', status: 'sent' })
     mockRunQuery.mockResolvedValue([contextRow()])

@@ -72,6 +72,7 @@ const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f
 const OUTBOX_EVENT_ID = new RegExp(`^outbox-${UUID}$`, 'i')
 const ASSESSMENT_ID = new RegExp(`^asmt-${UUID}$`, 'i')
 const TALENT_CONSENT_ID = new RegExp(`^tlpc-${UUID}$`, 'i')
+const ASSESSMENT_RECOVERY_EVENT_ID = /^assessment-access-recovery:[a-f0-9]{64}$/
 
 const durableSensitiveSource = (
   emailType: EmailType,
@@ -90,6 +91,13 @@ const durableSensitiveSource = (
       ...(sourceEventId && (OUTBOX_EVENT_ID.test(sourceEventId) || sourceEventId === canonicalFallback)
         ? { sourceEventId }
         : {})
+    }
+  }
+
+  if (emailType === 'hiring_assessment_access_recovery' && sourceEntity && ASSESSMENT_ID.test(sourceEntity)) {
+    return {
+      sourceEntity,
+      ...(sourceEventId && ASSESSMENT_RECOVERY_EVENT_ID.test(sourceEventId) ? { sourceEventId } : {})
     }
   }
 
@@ -137,7 +145,7 @@ const serializeJsonSafe = <T>(value: T): T => JSON.parse(JSON.stringify(value)) 
 const normalizeTokenSensitiveSafeContext = (
   emailType: EmailType,
   input: Extract<NonNullable<SendEmailInput['persistence']>, { mode: 'token_sensitive' }>['safeContext']
-): Record<string, string | number | null> => {
+): Record<string, string | number | boolean | null> => {
   const locale = typeof input.locale === 'string' && /^[a-z]{2}(?:-[A-Z]{2})?$/.test(input.locale)
     ? input.locale
     : undefined
@@ -156,10 +164,13 @@ const normalizeTokenSensitiveSafeContext = (
       ? null
       : undefined
 
+  const inProgress = typeof input.inProgress === 'boolean' ? input.inProgress : undefined
+
   return {
     templateVersion: `${emailType}:current`,
     ...(locale ? { locale } : {}),
     ...(Number.isFinite(expiresAtMs) ? { expiresAt: new Date(expiresAtMs).toISOString() } : {}),
+    ...(inProgress !== undefined ? { inProgress } : {}),
     ...(timeLimitMinutes !== undefined ? { timeLimitMinutes } : {}),
     ...(tokenTtlDays !== undefined ? { tokenTtlDays } : {})
   }
@@ -218,10 +229,14 @@ const normalizePayload = <TContext extends Record<string, unknown>>(input: {
     : { mode: 'standard', retryable: true }
 })
 
-type RotationOwnerEmailType = 'hiring_assessment_assigned' | 'hiring_talent_pool_verification'
+type RotationOwnerEmailType =
+  | 'hiring_assessment_assigned'
+  | 'hiring_assessment_access_recovery'
+  | 'hiring_talent_pool_verification'
 
 const ROTATION_OWNER_EMAIL_TYPES: readonly RotationOwnerEmailType[] = Object.freeze([
   'hiring_assessment_assigned',
+  'hiring_assessment_access_recovery',
   'hiring_talent_pool_verification'
 ])
 
@@ -235,7 +250,7 @@ export const claimTokenSensitiveEmailIntent = async <T>(input: {
   sourceEventId: string
   sourceEntity: string
   safeContext: TokenSensitiveEmailSafeContext
-  issueCredential: (client: PoolClient) => Promise<T | null>
+  issueCredential: (client: PoolClient, deliveryId: string) => Promise<T | null>
 }): Promise<{ claimed: boolean; deliveryId: string; value: T | null }> => {
   const source = durableSensitiveSource(input.emailType, input.sourceEventId, input.sourceEntity)
 
@@ -324,7 +339,7 @@ export const claimTokenSensitiveEmailIntent = async <T>(input: {
       return { claimed: true, deliveryId, value: null }
     }
 
-    const value = await input.issueCredential(client)
+    const value = await input.issueCredential(client, deliveryId)
 
     if (value === null) {
       await client.query(

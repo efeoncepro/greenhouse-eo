@@ -3,6 +3,17 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-19 — El reenvío gobernado de tests ya tiene command seguro
+
+- La recuperación por email genera un acceso nuevo sin duplicar el test, conserva el plazo cuando la evaluación
+  ya comenzó y registra actor, motivo y resultado sin guardar el enlace secreto.
+- Si Resend acepta y el proceso cae antes de cerrar la operación, el sistema reconcilia el receipt desde evidencia
+  durable sin enviar otro correo ni invalidar nuevamente el enlace; Platform Health muestra el drift restante.
+- HTML y texto plano distinguen despacho de entrega, invalidan enlaces anteriores y, para tests en curso, piden
+  continuar de inmediato con el deadline expresado en hora de Chile.
+- El command está validado localmente, pero sigue inaccesible: el tipo de correo está OFF y faltan la sesión
+  HttpOnly, API autorizada, migraciones, índice y smokes antes de cualquier activación.
+
 ## 2026-08-19 — Los correos con enlaces de acceso ya no dependen de reintentos ciegos
 
 - Reset de contraseña, invitaciones, verificaciones, magic links, tests y acceso a Talent Pool comparten ahora
@@ -952,20 +963,3 @@ diferencia es la presencia de migraciones y no el tamaño del batch).
 - Dos aprendizajes de release documentados en runbook + ambas skills: `vercel redeploy` no arregla un
   staging cancelado por docs-only, y el context gate va último porque `docs:closure-check` no lo
   reemplaza.
-
-## 2026-08-09 — La verificación en staging del portal cliente encontró dos defectos más
-
-Recorrí las 9 rutas × 3 personas con sesión real contra staging. El fix quedó confirmado en runtime
-desplegado —3 base sirven `200`, las 6 module-gated redirigen a `/home?denied=<slug>`, **cero**
-`?error=resolver_unavailable`— y de paso salieron dos cosas que sólo se ven ejerciendo el flujo:
-
-- **`/proyectos` devolvía `/401` al operador interno**, y era la única de las 9 que conservaba un gate
-  legacy por route group **encima** del canónico, con el comentario de al lado diciendo que el
-  canónico lo reemplazaba. Corría primero, así que ganaba, y el scope del operador interno no incluye
-  `client`. Arreglado, con una guarda de source que barre las 9 páginas. **Producción sigue con el
-  síntoma hasta el próximo release** — clasificado `MENOR`: es fail-closed de más, no expone nada.
-- **El override de organización era solo-local por usar `NODE_ENV`.** Vercel compila todos los
-  deployments con `NODE_ENV=production`, así que el bloqueo apagaba el flag también en staging. El
-  discriminador canónico del repo es `VERCEL_ENV` (mismo que `agent-session` y `proxy.ts`). Corregido,
-  y **sin** válvula de escape de producción: la divergencia con `agent-session` es deliberada porque
-  este override concede lectura cross-tenant.

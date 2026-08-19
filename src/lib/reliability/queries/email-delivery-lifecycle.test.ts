@@ -22,6 +22,7 @@ describe('getEmailDeliveryLifecycleSignal', () => {
     mockQuery.mockResolvedValue([
       {
         stale_token_intent_15m: 0,
+        stale_recovery_receipt_15m: 0,
         webhook_pending_15m: 0,
         webhook_dead_letter_24h: 0,
         lifecycle_missing_24h: 2,
@@ -34,8 +35,9 @@ describe('getEmailDeliveryLifecycleSignal', () => {
     const sql = mockQuery.mock.calls[0]?.[0] as string
 
     expect(sql).toContain('greenhouse_notifications.email_deliveries')
-    expect(sql).not.toContain('greenhouse_hiring')
+    expect(sql).toContain('greenhouse_hiring.hiring_assessment_access_recovery')
     expect(sql).toContain('provider_status IS NULL')
+    expect(sql).toContain('hiring_assessment_access_recovery')
     expect(sql).toContain("provider_status IN ('sent', 'delivery_delayed')")
     expect(signal.severity).toBe('warning')
     expect(signal.summary).toContain('no tienen lifecycle')
@@ -45,6 +47,7 @@ describe('getEmailDeliveryLifecycleSignal', () => {
     mockQuery.mockResolvedValue([
       {
         stale_token_intent_15m: 0,
+        stale_recovery_receipt_15m: 0,
         webhook_pending_15m: 1,
         webhook_dead_letter_24h: 0,
         lifecycle_missing_24h: 0,
@@ -62,6 +65,7 @@ describe('getEmailDeliveryLifecycleSignal', () => {
   it('surfaces stale token intents that must use explicit recovery', async () => {
     mockQuery.mockResolvedValue([{
       stale_token_intent_15m: 1,
+      stale_recovery_receipt_15m: 0,
       webhook_pending_15m: 0,
       webhook_dead_letter_24h: 0,
       lifecycle_missing_24h: 0,
@@ -74,5 +78,23 @@ describe('getEmailDeliveryLifecycleSignal', () => {
     expect(signal.severity).toBe('warning')
     expect(signal.summary).toContain('recuperación explícita')
     expect(signal.evidence).toContainEqual({ kind: 'metric', label: 'stale_token_intent_15m', value: '1' })
+  })
+
+  it('surfaces a recovery receipt that did not converge with terminal delivery evidence', async () => {
+    mockQuery.mockResolvedValue([{
+      stale_token_intent_15m: 0,
+      stale_recovery_receipt_15m: 1,
+      webhook_pending_15m: 0,
+      webhook_dead_letter_24h: 0,
+      lifecycle_missing_24h: 0,
+      terminal_outcome_pending_24h: 0,
+      provider_failure_24h: 0
+    }])
+
+    const signal = await getEmailDeliveryLifecycleSignal()
+
+    expect(signal.severity).toBe('warning')
+    expect(signal.summary).toContain('receipt no convergió')
+    expect(signal.evidence).toContainEqual({ kind: 'metric', label: 'stale_recovery_receipt_15m', value: '1' })
   })
 })

@@ -68,6 +68,13 @@ workers concurrentes no vuelven a rotar. El índice único todavía no existe en
 writers debe correrse `scripts/operations/task-1746-create-token-intent-index.sql` y conservar su readback
 `unique/valid/ready`. Ninguna migración, índice, secret, webhook ni configuración runtime se aplicó en este slice.
 
+El Slice 2B de `TASK-1746` quedó code-complete local y validado sin P0/P1/P2 por Arquitectura, Talento y
+Seguridad. El recovery email liga intent+receipt+rotación bajo una transacción, mantiene el deadline de tests
+iniciados y no persiste el bearer. Replay y reconciliación solo proyectan evidencia durable; nunca reenvían ni
+rotan, y Platform Health detecta receipts divergentes después de 15 minutos. El tipo de correo sigue OFF y sin
+adapter productivo. Próximo paso: Slice 3, con fragment exchange, sesión HttpOnly, auth/capability server-side y
+smoke de tracking. Migración, índice y runtime continúan sin aplicar.
+
 ## 2026-08-18 — Hiring AI y candidate review MCP: runtime reconciliado
 
 El release `7e7a474217eb` (run `32193134959`) dejó `global_provisional` activo para assessments elegibles de

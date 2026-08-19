@@ -35,7 +35,7 @@ describe('sendTalentPoolVerificationEmail', () => {
     mockClaimIntent.mockImplementation(async input => ({
       claimed: true,
       deliveryId: 'delivery-intent-1',
-      value: await input.issueCredential({})
+      value: await input.issueCredential({}, 'delivery-intent-1')
     }))
     mockSendEmail.mockResolvedValue({ status: 'sent' })
     mockQuery.mockResolvedValue([

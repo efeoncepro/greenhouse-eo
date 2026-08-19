@@ -6,6 +6,7 @@ import type { ReliabilitySignal } from '@/types/reliability'
 
 type EmailLifecycleHealthRow = {
   stale_token_intent_15m: number
+  stale_recovery_receipt_15m: number
   webhook_pending_15m: number
   webhook_dead_letter_24h: number
   lifecycle_missing_24h: number
@@ -21,11 +22,21 @@ export const getEmailDeliveryLifecycleSignal = async (): Promise<ReliabilitySign
       `SELECT
          (SELECT COUNT(*)::int
             FROM greenhouse_notifications.email_deliveries
-           WHERE email_type IN ('hiring_assessment_assigned','hiring_talent_pool_verification')
+           WHERE email_type IN ('hiring_assessment_assigned','hiring_assessment_access_recovery','hiring_talent_pool_verification')
              AND status='pending'
              AND resend_id IS NULL
              AND delivery_payload->'persistence'->>'mode'='token_sensitive'
              AND created_at < NOW() - INTERVAL '15 minutes') AS stale_token_intent_15m,
+
+         (SELECT COUNT(*)::int
+            FROM greenhouse_hiring.hiring_assessment_access_recovery receipt
+            JOIN greenhouse_notifications.email_deliveries delivery
+              ON delivery.delivery_id=receipt.delivery_id
+           WHERE receipt.channel='email'
+             AND receipt.outcome IN ('pending_dispatch','dispatch_unknown')
+             AND receipt.created_at < NOW() - INTERVAL '15 minutes'
+             AND delivery.status IN ('sent','delivered','failed','skipped','rate_limited','dead_letter'))
+           AS stale_recovery_receipt_15m,
 
          (SELECT COUNT(*)::int
             FROM greenhouse_notifications.email_provider_events
@@ -70,6 +81,7 @@ export const getEmailDeliveryLifecycleSignal = async (): Promise<ReliabilitySign
 
     const row = rows[0] ?? {
       stale_token_intent_15m: 0,
+      stale_recovery_receipt_15m: 0,
       webhook_pending_15m: 0,
       webhook_dead_letter_24h: 0,
       lifecycle_missing_24h: 0,
@@ -78,6 +90,7 @@ export const getEmailDeliveryLifecycleSignal = async (): Promise<ReliabilitySign
     }
 
     const staleTokenIntents = Number(row.stale_token_intent_15m)
+    const staleRecoveryReceipts = Number(row.stale_recovery_receipt_15m ?? 0)
     const webhookPending = Number(row.webhook_pending_15m)
     const webhookDeadLetter = Number(row.webhook_dead_letter_24h)
     const lifecycleMissing = Number(row.lifecycle_missing_24h)
@@ -86,7 +99,8 @@ export const getEmailDeliveryLifecycleSignal = async (): Promise<ReliabilitySign
 
     const severity = webhookPending > 0 || webhookDeadLetter > 0
       ? 'error'
-      : staleTokenIntents > 0 || lifecycleMissing > 0 || terminalPending > 0 || providerFailures > 0
+      : staleTokenIntents > 0 || staleRecoveryReceipts > 0 || lifecycleMissing > 0
+          || terminalPending > 0 || providerFailures > 0
         ? 'warning'
         : 'ok'
 
@@ -95,6 +109,8 @@ export const getEmailDeliveryLifecycleSignal = async (): Promise<ReliabilitySign
         ? `${webhookDeadLetter} evento(s) firmado(s) de Resend agotaron su presupuesto de proyección en 24 horas.`
         : webhookPending > 0
         ? `${webhookPending} evento(s) firmado(s) de Resend siguen pendientes de proyección por más de 15 minutos.`
+        : staleRecoveryReceipts > 0
+          ? `${staleRecoveryReceipts} recuperación(es) de test tienen evidencia durable de despacho, pero su receipt no convergió; requieren reconciliación acotada.`
         : staleTokenIntents > 0
           ? `${staleTokenIntents} intento(s) con credencial llevan más de 15 minutos sin confirmación local de despacho; requieren recuperación explícita.`
           : lifecycleMissing > 0
@@ -116,6 +132,7 @@ export const getEmailDeliveryLifecycleSignal = async (): Promise<ReliabilitySign
       summary,
       evidence: [
         { kind: 'metric', label: 'stale_token_intent_15m', value: String(staleTokenIntents) },
+        { kind: 'metric', label: 'stale_recovery_receipt_15m', value: String(staleRecoveryReceipts) },
         { kind: 'metric', label: 'webhook_pending_15m', value: String(webhookPending) },
         { kind: 'metric', label: 'webhook_dead_letter_24h', value: String(webhookDeadLetter) },
         { kind: 'metric', label: 'lifecycle_missing_24h', value: String(lifecycleMissing) },
