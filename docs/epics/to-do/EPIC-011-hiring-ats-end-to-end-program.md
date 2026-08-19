@@ -171,6 +171,12 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `TASK-1718` — Candidate Review Packet + reader MCP delegado: lectura interna agent-safe de postulación/CV sobre App API, con identidad humana delegada, minimización, audit y provider read-only OFF por defecto.
 - `TASK-1719` — Opening Assessment Policy + Stage-Triggered Assignment: binding operativo opening→template,
   assignment manual/automático, cancelación y correo único sobre commands Hiring.
+- `TASK-1745` — Activar y reconciliar el lifecycle de entrega de Resend: handler firmado, webhook productivo,
+  estados de proveedor honestos y reconciliación acotada (`ISSUE-160`).
+- `TASK-1746` — Recovery command de acceso a assessment: capability, token nuevo atómico, email o enlace
+  temporal de una sola revelación, sin token crudo durable (`ISSUE-160`; bloqueada por ADR/Privacy-Security).
+- `TASK-1747` — Application 360 assessment access recovery: consumer de policy assignment, lifecycle y recovery;
+  no usa el endpoint legacy ni afirma inbox delivery (`ISSUE-160`).
 - `TASK-1720` — Delegated MCP Candidate Test Assignment: proposal/confirm/cancel MCP sobre TASK-1719, con write
   scope separado y fail-closed hasta grant revocable TASK-1631.
 - `TASK-1721` — Governed Hiring Selection Journey Orchestrator: proposal/confirm y saga durable que coordina la

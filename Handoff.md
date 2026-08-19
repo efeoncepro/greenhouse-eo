@@ -2,6 +2,20 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-18 — Incident response: delivery de Resend y recuperación de test planificadas
+
+Discovery read-only confirmó que Resend **sí despacha** (393 IDs de proveedor), pero Greenhouse no captura
+su lifecycle: no hay webhook registrado en la cuenta productiva, no hay secreto de firma operativo y las
+proyecciones históricas no tienen ningún `delivered`/bounce/engagement. `sent` significa aceptación de la API,
+no entrega al buzón. El handler existe pero debe corregir su resolución asíncrona de secretos antes de activar
+el webhook, porque hoy puede responder `200 ignored` durante cold start.
+
+Quedan creados `ISSUE-160`, ADR propuesto
+`GREENHOUSE_HIRING_ASSESSMENT_ACCESS_RECOVERY_AND_EMAIL_DELIVERY_DECISION_V1.md` y tres tasks compactas:
+`TASK-1745` (webhook/reconciliación), `TASK-1746` (command de recovery con rotación y capability; requiere
+sign-off Privacy/Security para bearer link) y `TASK-1747` (consumer Application 360). Gates de las tres tasks
+verdes. No hubo cambio de runtime ni configuración externa.
+
 ## 2026-08-18 — Hiring AI y candidate review MCP: runtime reconciliado
 
 El release `7e7a474217eb` (run `32193134959`) dejó `global_provisional` activo para assessments elegibles de
@@ -549,11 +563,3 @@ GVC premium local verde: `.captures/2026-08-16T23-49-12_task1737-application-exp
 `TASK-1738-assessment-ai-review-workbench.md` quedó **stale** — el commit `a533d10dd` ya montó
 `AssessmentAiRunEntry`. No edité esa spec porque otro agente la tiene en vuelo en esta misma
 sesión; que la actualice en su cierre.
-
-## 2026-08-16 — Pipeline Hiring contenido y accesible
-
-El scope de vacante y el conteo de postulantes se integraron al `WorkbenchHeader`; búsqueda, ayuda y Kanban
-quedaron dentro de un solo plano operacional, con lanes tonales y tarjetas como superficies primarias. El título
-de la vacante no se trunca a 390 px y el fallo simulado queda solo en el harness. GVC desktop/mobile, teclado,
-rollback, reduced-motion y axe están verdes sin findings en
-`.captures/2026-08-16T22-13-39_task355-hiring-pipeline-board`. Cambio local, sin commit/push/deploy.
