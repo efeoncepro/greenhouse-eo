@@ -1044,6 +1044,7 @@ ON CONFLICT (capability_key) DO UPDATE SET module = EXCLUDED.module,
 
 DO $$
 DECLARE seeded_count integer; trigger_count integer; session_column_count integer;
+  bucket_table_count integer; public_access_function_count integer;
 BEGIN
   SELECT COUNT(*) INTO seeded_count FROM greenhouse_core.capabilities_registry
   WHERE capability_key IN ('hiring.assessment.recover_access_email', 'hiring.assessment.reveal_access_link')
@@ -1069,9 +1070,24 @@ BEGIN
     AND ((table_name = 'hiring_assessment' AND column_name = 'access_token_version_id')
       OR (table_name = 'hiring_assessment_public_session'
         AND column_name IN ('session_token_hash', 'access_token_version_id', 'expires_at')));
-  IF seeded_count <> 2 OR trigger_count <> 14 OR session_column_count <> 4 THEN
-    RAISE EXCEPTION 'TASK-1746 anti pre-up-marker check failed: capabilities=%, triggers=%, session_columns=%',
-      seeded_count, trigger_count, session_column_count;
+  -- El Down dropea la tabla de buckets y las cuatro funciones de acceso publico; el guard del Up
+  -- debe verificarlas o un DDL que falle en silencio pasaria verde y el cron diario reventaria en runtime.
+  SELECT COUNT(*) INTO bucket_table_count
+  FROM information_schema.tables
+  WHERE table_schema = 'greenhouse_hiring'
+    AND table_name = 'hiring_assessment_public_request_bucket';
+  SELECT COUNT(*) INTO public_access_function_count
+  FROM pg_proc p
+  JOIN pg_namespace n ON n.oid = p.pronamespace
+  WHERE n.nspname = 'greenhouse_hiring'
+    AND p.proname IN ('run_assessment_public_access_retention',
+      'purge_expired_assessment_public_sessions',
+      'purge_assessment_public_request_buckets',
+      'claim_assessment_public_request_budget');
+  IF seeded_count <> 2 OR trigger_count <> 14 OR session_column_count <> 4
+     OR bucket_table_count <> 1 OR public_access_function_count <> 4 THEN
+    RAISE EXCEPTION 'TASK-1746 anti pre-up-marker check failed: capabilities=%, triggers=%, session_columns=%, bucket_table=%, public_access_functions=%',
+      seeded_count, trigger_count, session_column_count, bucket_table_count, public_access_function_count;
   END IF;
 END
 $$;
