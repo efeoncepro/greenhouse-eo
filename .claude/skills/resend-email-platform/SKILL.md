@@ -22,10 +22,18 @@ href>`**, y lo que le pasa a un fragmento (`#access=TOKEN`) **no está documenta
 el link abre, la página carga, y el usuario no tiene acceso. Peor: el `tracking_subdomain`
 **no se puede remover, sólo cambiar** [DOC], así que configurarlo es una decisión irreversible.
 
-**El tracking tiene DOBLE candado, y esto se malinterpreta constantemente** [DOC]: sólo está activo
-si `click_tracking=true` **Y** existe un `tracking_subdomain` verificado. Un dominio con
-`click_tracking=true` y `tracking_subdomain=None` **no reescribe nada**. Leer sólo el booleano lleva
-a conclusiones falsas en las dos direcciones.
+**El flag basta para que el rewrite ocurra. `tracking_subdomain` NO es un segundo candado.**
+Es fácil leer la documentación al revés — yo lo hice el 2026-08-19 y me costó un diagnóstico
+equivocado. `tracking_subdomain` sirve para usar un **dominio de tracking propio** (branding y
+reputación aislada); sin él, Resend reescribe igual usando su infraestructura compartida.
+
+Evidencia empírica del repo: `efeoncepro.com` tenía `click_tracking=true` y
+`tracking_subdomain=None`, y aun así llegaron eventos `email.clicked` **firmados por webhook** sobre
+correos reales de candidatos. El rewrite estaba ocurriendo.
+
+Corolario: **para saber si un dominio reescribe links, mira el flag, no el subdominio.** Y si quieres
+certeza, busca eventos `clicked` con `event_source='webhook'` — un clic registrado sólo puede existir
+si hubo rewrite.
 
 **El readback se hace con `GET /domains/{id}`, nunca con `PATCH` ni con `list`** [DOC]. El `PATCH`
 devuelve sólo `{object, id}` — no confirma el estado resultante. El `list` omite los DNS records.
