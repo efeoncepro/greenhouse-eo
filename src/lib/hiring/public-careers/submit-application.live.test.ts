@@ -87,6 +87,9 @@ describe.skipIf(!hasPgConfig)('submitPublicHiringApplication — live PG (TASK-1
         publicSummary: 'resumen',
         publicDescription: 'Descripción pública de la vacante para careers.',
         publicArea: 'Growth',
+        // TASK-1740 hizo obligatorio el seniority público al publicar; este live test quedó roto
+        // desde entonces y CI no lo veía porque los live tests sólo corren con PG configurado.
+        publicSeniority: 'Semi-senior',
         publicWorkMode: 'remote',
         publicHiringRegion: 'Chile',
         publicSkillTags: ['account-management', 'reporting'],
@@ -107,6 +110,7 @@ describe.skipIf(!hasPgConfig)('submitPublicHiringApplication — live PG (TASK-1
       firstName: 'X',
       lastName: 'Y',
       email,
+      residenceCountryCode: 'CL',
       consent: true
     })
 
@@ -123,6 +127,7 @@ describe.skipIf(!hasPgConfig)('submitPublicHiringApplication — live PG (TASK-1
       email,
       portfolioUrl: 'https://ada.dev',
       linkedinUrl: 'https://linkedin.com/in/ada',
+      residenceCountryCode: 'CL',
       consent: true,
       consentPolicyVersion: 'v1'
     })
@@ -174,6 +179,7 @@ describe.skipIf(!hasPgConfig)('submitPublicHiringApplication — live PG (TASK-1
       firstName: 'Ada',
       lastName: 'Lovelace',
       email,
+      residenceCountryCode: 'CL',
       consent: true
     })
 

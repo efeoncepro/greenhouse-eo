@@ -79,6 +79,10 @@ const ALLOWED_WRITE_TARGETS = new Set([
   // humana capability-gated (`correct-display.ts`), ambos sólo `full_name` + audit append-only.
   // Cualquier otro write hiring→identity_profiles sigue prohibido.
   'greenhouse_core.identity_profiles',
+  // TASK-1739 — audit append-only de procedencia (marcado/archivado/borrado/rollback). El marcado
+  // de una persona escribe además sobre `identity_profiles` (ya permitida arriba): es la MISMA
+  // excepción acotada de D3 —sólo una columna declarada + audit—, no una puerta nueva.
+  'greenhouse_hiring.hiring_data_origin_audit',
   // TASK-1365 — self-ID sensitive source + append-only audit, physically separate from decision.
   'greenhouse_hiring.hiring_demographic_selfid',
   'greenhouse_hiring.hiring_demographic_selfid_audit',
