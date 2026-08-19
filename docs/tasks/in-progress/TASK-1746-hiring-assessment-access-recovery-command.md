@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-011`
-- Status real: `Slices 1, 2A, 2B y 3A validados localmente — migración/índice sin aplicar; exchange/API y rollout pendientes`
+- Status real: `Slices 1–4 code-complete localmente — migración/índice/flags/smokes sin aplicar; rollout pendiente`
 - Rank: `TBD`
 - Domain: `hr|identity|delivery`
 - Blocked by: `none`
@@ -95,7 +95,7 @@ Reglas obligatorias:
 - `src/lib/hiring/assessment/access-recovery/**` (+ tests)
 - `src/lib/hiring/assessment/instances.ts` only for extracted shared token primitives
 - `src/lib/hiring/notifications/send.ts`
-- `src/app/api/hiring/assessments/[assessmentId]/access-recovery/route.ts`
+- `src/app/api/hiring/assessments/[id]/access-recovery/route.ts`
 - `src/config/entitlements-catalog.ts`
 - `src/lib/entitlements/runtime.ts`
 - `src/lib/sync/event-catalog.ts`
@@ -105,14 +105,19 @@ Reglas obligatorias:
 
 ### Already exists
 
-- `reissueCandidateTestTokenForEmail` atomically rotates a token for `assigned|sent` tests.
-- Canonical `sendEmail` persists delivery attempts and the lifecycle email consumer deduplicates assignment events.
-- Application 360 and the legacy assignment route do not provide a resend/recovery command.
+- `recoverCandidateTestAccess` gobierna email y `secure_link` con idempotencia, rate limit, receipt/audit/outbox
+  y rotación atómica; Product API expone un adapter humano capability-first.
+- El transporte token-sensitive persiste sólo intents/metadata allowlisted y excluye batch/retry genérico.
+- `/public/assessment/access` intercambia el fragmento por sesión HttpOnly; page/API posteriores no reciben token.
+- Ops-worker posee la retención acotada de sesiones/buckets y su señal de backlog residual.
+- Application 360 y la ruta legacy de asignación todavía no consumen recovery.
 
 ### Gap
 
-- No business capability represents recovery, source event, actor/reason, channel, rate limit or one-time secure-link reveal.
-- Generic delivery payload handling must be reviewed so token-bearing context is not retained durably.
+- La migración `20260819072130586_task-1746-assessment-access-recovery.sql` y el índice concurrente de intents
+  siguen sin aplicar; capacidades, email recovery y cutover de links permanecen OFF/no expuestos.
+- Faltan smokes PG, browser, email, secure-link y href; también readback Resend `click_tracking=false` y el
+  consumer Application 360 de TASK-1747. Código local no equivale a capacidad operativa.
 
 ## Modular Placement Contract
 
@@ -251,6 +256,15 @@ migración, no se desplegaron routes, no se cambió ninguna env y recovery conti
 - Adapter humano/capability-first por canal, rate limit, conflict handling, redacción y tests runtime/browser.
 - Operator runbook, tracking gate y smokes limitados de email + enlace temporal antes de habilitar el tipo.
 
+**Checkpoint 2026-08-19 — Slice 4 backend code-complete, rollout pendiente.** El command unificado valida canal
+fail-closed y la Product API exige sesión humana canónica, capability por canal antes de lookup, lectura exacta
+de application/assessment, Origin, JSON e idempotencia cerrados. `secure_link` revela una vez; replay nunca
+revela, y rotación invalida token/sesión anteriores. El guard público usa techo IP previo más bucket durable por
+credencial/sesión válida bajo la misma transacción; intentos inválidos no amplifican cardinalidad y acciones
+fallidas consumen cuota sin dejar writes parciales. El owner diario de retención drena por lotes con readback y
+señal de residuo. La availability/provider evidence es token-free. La implementación permanece dormante: no se
+aplicaron migración/índice, no se habilitaron flags/capabilities/email type y no se ejecutaron smokes ni deploy.
+
 ## Detailed Spec
 
 - Definir `recoverCandidateTestAccess({ assessmentId, channel, reasonCode, idempotencyKey, actorUserId })` como command server-side bajo lock transaccional; el adapter exige `hiring.assessment.recover_access_email:execute` o `hiring.assessment.reveal_access_link:execute` según el canal.
@@ -331,6 +345,16 @@ Privacy/Security/Product approval recorded in the accepted ADR. A consented cand
   Evidencia: 63 tests focales, ESLint, TypeScript, migration marker gate y `git diff --check` verdes.
   El índice único no está aplicado: `scripts/operations/task-1746-create-token-intent-index.sql` debe
   ejecutarse y conservar readback `unique/valid/ready` verde antes de desplegar estos writers.
+- 2026-08-19 — Slices 2B, 3A y 3B quedaron code-complete y reauditaron Arquitectura, Talento y Seguridad:
+  receipt/email reconciliable sin reenvío ciego; versionado de credencial, deadlines con reloj PG y sesión opaca;
+  bootstrap fragment-first, cookie HttpOnly, rutas token-free, CSP/maintenance guard y compatibilidad legacy.
+  El cutover del assignment está protegido por `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` default OFF.
+- 2026-08-19 — Slice 4 backend code-complete localmente: command `email|secure_link`, Product API humana,
+  availability token-free, doble budget anti-abuso y retención con owner/readback/signal. El claim funcional se
+  conserva aun si issuance/action falla, mientras un savepoint revierte writes parciales antes del commit. La
+  task no se cierra: migración, índice, flags/capabilities, deploy/readbacks y smokes staging/producción siguen
+  pendientes; la documentación funcional/manual está preparada como pre-rollout y deberá recibir evidencia live.
+  TASK-1747 continúa to-do.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -341,17 +365,17 @@ Privacy/Security/Product approval recorded in the accepted ADR. A consented cand
 
 ## Acceptance Criteria
 
-- [ ] `recoverCandidateTestAccess` is the only write primitive for recovery and each channel is gated by its dedicated capability/grant.
-- [ ] Recovery covers assigned/sent, a still-valid in-progress session without timer extension, and token-expired-before-start; it rotates exactly one token atomically and never creates a second assessment.
-- [ ] Email resend has a new idempotency source; a secure link is returned once only and both preserve no raw token in durable stores/logs/events.
-- [ ] Recovery has actor, reason code, channel, result and rate-limit evidence without candidate-sensitive narrative.
+- [x] `recoverCandidateTestAccess` is the only write primitive for recovery and each channel is gated by its dedicated capability/grant.
+- [x] Recovery covers assigned/sent, a still-valid in-progress session without timer extension, and token-expired-before-start; it rotates exactly one token atomically and never creates a second assessment.
+- [x] Email resend has a new idempotency source; a secure link is returned once only and both preserve no raw token in durable stores/logs/events.
+- [x] Recovery has actor, reason code, channel, result and rate-limit evidence without candidate-sensitive narrative.
 - [ ] Staging and production smokes prove email recovery and manual-link recovery against a consented account.
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
 - [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
-- [ ] Lógica en el primitive, no en la UI; capability, grants and programmatic path ship together.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Lógica en el primitive, no en la UI; capability, grants and programmatic path ship together.
 
 ## Verification
 
@@ -363,8 +387,8 @@ Privacy/Security/Product approval recorded in the accepted ADR. A consented cand
 
 ## Closing Protocol
 
-- [ ] Lifecycle, README and registry reflect reality.
-- [ ] ADR status, architecture, operator manual and copy contracts are synchronized.
+- [x] Lifecycle, README and registry reflect reality.
+- [x] ADR status, architecture, operator manual and copy contracts are synchronized for pre-rollout.
 - [ ] Handoff/changelog describe actual rollout and privacy sign-off.
 - [ ] `pnpm docs:closure-check` and `pnpm docs:context-check:strict` pass last.
 

@@ -2,6 +2,10 @@ import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
 import {
+  claimPublicAssessmentIpCeiling,
+  PublicAssessmentRequestRateLimitError,
+} from '@/lib/hiring/assessment/public-session/abuse-guard'
+import {
   buildPublicAssessmentViewWithClient,
   savePublicAssessmentResponseWithClient,
   startPublicAssessmentWithClient,
@@ -34,12 +38,18 @@ const messages = {
 
 const json = (body: object, status = 200) => NextResponse.json(body, {
   status,
-  headers: publicAssessmentResponseHeaders,
+  headers: status === 429
+    ? { ...publicAssessmentResponseHeaders, 'Retry-After': '60' }
+    : publicAssessmentResponseHeaders,
 })
 
 const unavailable = () => json({ ok: false, code: 'assessment_unavailable', message: messages.unavailable }, 404)
 
 const toPublicError = (error: unknown) => {
+  if (error instanceof PublicAssessmentRequestRateLimitError) {
+    return json({ ok: false, code: 'assessment_unavailable', message: messages.unavailable }, 429)
+  }
+
   if (error instanceof HiringValidationError) {
     return json({ ok: false, code: error.code, message: messages.invalid }, error.statusCode === 404 ? 404 : error.statusCode)
   }
@@ -55,8 +65,14 @@ const sessionTokenFrom = (request: NextRequest) =>
   request.cookies.get(PUBLIC_ASSESSMENT_SESSION_COOKIE)?.value ?? ''
 
 export async function GET(request: NextRequest) {
+  const rawSessionToken = sessionTokenFrom(request)
+
+  if (!(await claimPublicAssessmentIpCeiling(request, 'session_read'))) {
+    return json({ ok: false, code: 'assessment_unavailable', message: messages.unavailable }, 429)
+  }
+
   try {
-    const view = await withPublicAssessmentSession(sessionTokenFrom(request), async (client, session) => {
+    const view = await withPublicAssessmentSession(rawSessionToken, async (client, session) => {
       const assessment = await getAssessmentByIdWithClient(client, session.assessmentId)
 
       return assessment ? buildPublicAssessmentViewWithClient(client, assessment) : null
@@ -71,6 +87,12 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   if (!hasExactSameOrigin(request)) return json({ ok: false, code: 'assessment_unavailable', message: messages.unavailable }, 403)
 
+  const rawSessionToken = sessionTokenFrom(request)
+
+  if (!(await claimPublicAssessmentIpCeiling(request, 'session_write'))) {
+    return json({ ok: false, code: 'assessment_unavailable', message: messages.unavailable }, 429)
+  }
+
   const body = await readBoundedJsonObject(request)
 
   if (!body || typeof body.action !== 'string' || typeof body.expectedAssessmentPublicId !== 'string') {
@@ -78,7 +100,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const result = await withPublicAssessmentSession(sessionTokenFrom(request), async (client, session) => {
+    const result = await withPublicAssessmentSession(rawSessionToken, async (client, session) => {
       const assessment = await getAssessmentByIdWithClient(client, session.assessmentId)
 
       if (!assessment || assessment.publicId !== body.expectedAssessmentPublicId) return null
@@ -143,7 +165,7 @@ export async function POST(request: NextRequest) {
       }
 
       throw new HiringValidationError(messages.invalid, 'assessment_invalid_action', 400)
-    })
+    }, 'session_write')
 
     if (!result) return unavailable()
 

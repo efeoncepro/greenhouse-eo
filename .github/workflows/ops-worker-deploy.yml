@@ -48,6 +48,7 @@ on:
       # TASK-1746 — assignment/recovery email link policy is evaluated by the
       # reactive notifications sender in this worker, never by Vercel.
       - 'src/lib/hiring/notifications/**'
+      - 'src/lib/hiring/assessment/public-session/**'
       - 'src/lib/google-credentials.ts'
       - 'src/lib/space-notion/**'
       # TASK-742 — ops-worker hosts the auth-providers smoke lane and consumes
@@ -220,6 +221,7 @@ jobs:
               src/lib/globe \
               src/lib/hiring/talent-pool \
               src/lib/hiring/notifications \
+              src/lib/hiring/assessment/public-session \
               src/lib/google-credentials.ts \
               src/lib/space-notion \
               src/lib/auth \
@@ -287,6 +289,7 @@ jobs:
             src/lib/integrations
             src/lib/hiring/talent-pool
             src/lib/hiring/notifications
+            src/lib/hiring/assessment/public-session
             src/lib/space-notion
             src/lib/auth
             src/lib/auth-secrets.ts

@@ -34,7 +34,8 @@ Ejecutar TASK-1745 para reparar el handler, registrar el webhook firmado y recon
 
 ## Estado
 
-open
+open — TASK-1745 está code/build ready y TASK-1746 Slices 1–4 code-complete localmente. Ningún webhook,
+migración, índice, flag, capability o smoke fue aplicado; TASK-1747 y el rollout operativo siguen pendientes.
 
 ## Relacionado
 

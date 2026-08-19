@@ -1,2 +1,4 @@
 export * from './contracts'
-export * from './recover-email'
+export * from './availability'
+export * from './command'
+export { reconcileCandidateTestAccessRecoveryEmailReceipt } from './recover-email'

@@ -2,6 +2,10 @@ import 'server-only'
 
 import type { PoolClient } from 'pg'
 
+import {
+  PublicAssessmentRequestRateLimitError,
+  type PublicAssessmentRequestBudget,
+} from './abuse-guard'
 import type { PublicAssessmentSessionContext, PublicAssessmentSessionStatus } from './contracts'
 
 const TERMINAL_APPLICATION_STAGES = new Set(['selected', 'rejected', 'withdrawn', 'handoff_ready', 'closed'])
@@ -36,6 +40,11 @@ interface PublicSessionRow {
   status: PublicAssessmentSessionStatus
   expires_at: Date | string
 }
+
+export type PublicAssessmentAccessExchangeStoreResult =
+  | { outcome: 'issued'; session: PublicAssessmentSessionContext }
+  | { outcome: 'unavailable' }
+  | { outcome: 'issuance_failed' }
 
 const toMillis = (value: Date | string): number => new Date(value).getTime()
 const toIso = (value: Date | string): string => new Date(value).toISOString()
@@ -167,13 +176,29 @@ const expireAssessmentIfOverdue = async (
   }
 }
 
+const claimCredentialBudgetWithClient = async (
+  client: PoolClient,
+  budget: PublicAssessmentRequestBudget,
+): Promise<void> => {
+  const result = await client.query<{ allowed: boolean }>(
+    'SELECT greenhouse_hiring.claim_assessment_public_request_budget($1,$2,$3) AS allowed',
+    [budget.requesterDigest, budget.surface, budget.limit],
+  )
+
+  if (result.rows[0]?.allowed !== true) throw new PublicAssessmentRequestRateLimitError()
+}
+
 export const exchangePublicAssessmentAccessWithClient = async (
   client: PoolClient,
-  input: { accessTokenDigest: string; sessionTokenDigest: string },
-): Promise<PublicAssessmentSessionContext | null> => {
+  input: {
+    accessTokenDigest: string
+    sessionTokenDigest: string
+    requestBudget: PublicAssessmentRequestBudget
+  },
+): Promise<PublicAssessmentAccessExchangeStoreResult> => {
   const assessment = await loadAssessmentByCredential(client, input.accessTokenDigest)
 
-  if (!assessment) return null
+  if (!assessment) return { outcome: 'unavailable' }
 
   const lineage = await loadApplicationAndConsent(client, assessment.application_id)
   const nowResult = await client.query<{ database_now: Date | string }>('SELECT clock_timestamp() AS database_now')
@@ -183,22 +208,40 @@ export const exchangePublicAssessmentAccessWithClient = async (
       || !databaseNow || !isAssessmentEligible(assessment, databaseNow)) {
     if (databaseNow) await expireAssessmentIfOverdue(client, assessment, databaseNow)
 
-    return null
+    return { outcome: 'unavailable' }
   }
 
   const expiresAt = assessmentExpiry(assessment)
 
-  if (!expiresAt || !assessment.access_token_version_id) return null
+  if (!expiresAt || !assessment.access_token_version_id) return { outcome: 'unavailable' }
 
-  const inserted = await client.query<PublicSessionRow>(
-    `INSERT INTO greenhouse_hiring.hiring_assessment_public_session
-       (assessment_id, access_token_version_id, session_token_hash, expires_at)
-     VALUES ($1, $2::uuid, $3, $4)
-     RETURNING public_session_id, assessment_id, access_token_version_id, status, expires_at`,
-    [assessment.assessment_id, assessment.access_token_version_id, input.sessionTokenDigest, expiresAt],
-  )
+  await claimCredentialBudgetWithClient(client, input.requestBudget)
 
-  return inserted.rows[0] ? normalizeSession(inserted.rows[0]) : null
+  // A valid credential consumes its budget even if session issuance fails. The savepoint
+  // clears PostgreSQL's aborted-statement state without releasing the eligibility locks;
+  // the outer transaction can then commit the claim and report a generic failure.
+  await client.query('SAVEPOINT assessment_public_session_issue')
+
+  try {
+    const inserted = await client.query<PublicSessionRow>(
+      `INSERT INTO greenhouse_hiring.hiring_assessment_public_session
+         (assessment_id, access_token_version_id, session_token_hash, expires_at)
+       VALUES ($1, $2::uuid, $3, $4)
+       RETURNING public_session_id, assessment_id, access_token_version_id, status, expires_at`,
+      [assessment.assessment_id, assessment.access_token_version_id, input.sessionTokenDigest, expiresAt],
+    )
+
+    await client.query('RELEASE SAVEPOINT assessment_public_session_issue')
+
+    return inserted.rows[0]
+      ? { outcome: 'issued', session: normalizeSession(inserted.rows[0]) }
+      : { outcome: 'issuance_failed' }
+  } catch {
+    await client.query('ROLLBACK TO SAVEPOINT assessment_public_session_issue')
+    await client.query('RELEASE SAVEPOINT assessment_public_session_issue')
+
+    return { outcome: 'issuance_failed' }
+  }
 }
 
 const closeSession = async (
@@ -216,7 +259,7 @@ const closeSession = async (
 
 export const resolvePublicAssessmentSessionWithClient = async (
   client: PoolClient,
-  sessionTokenDigest: string,
+  input: { sessionTokenDigest: string; requestBudget: PublicAssessmentRequestBudget },
 ): Promise<PublicAssessmentSessionContext | null> => {
   // Hint only. The authoritative session row is locked after the assessment so every path
   // follows assessment → application → candidate facet → session and cannot deadlock recovery.
@@ -225,7 +268,7 @@ export const resolvePublicAssessmentSessionWithClient = async (
      FROM greenhouse_hiring.hiring_assessment_public_session
      WHERE session_token_hash = $1
      LIMIT 1`,
-    [sessionTokenDigest],
+    [input.sessionTokenDigest],
   )
 
   const hint = hintResult.rows[0]
@@ -246,7 +289,7 @@ export const resolvePublicAssessmentSessionWithClient = async (
      WHERE session_token_hash = $1 AND assessment_id = $2
      LIMIT 1
      FOR UPDATE`,
-    [sessionTokenDigest, assessment.assessment_id],
+    [input.sessionTokenDigest, assessment.assessment_id],
   )
 
   const session = sessionResult.rows[0]
@@ -286,6 +329,8 @@ export const resolvePublicAssessmentSessionWithClient = async (
 
     return null
   }
+
+  await claimCredentialBudgetWithClient(client, input.requestBudget)
 
   return normalizeSession(session)
 }

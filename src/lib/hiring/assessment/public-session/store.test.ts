@@ -4,6 +4,7 @@ vi.mock('server-only', () => ({}))
 
 import type { PoolClient } from 'pg'
 
+import { PublicAssessmentRequestRateLimitError } from './abuse-guard'
 import {
   exchangePublicAssessmentAccessWithClient,
   resolvePublicAssessmentSessionWithClient,
@@ -28,6 +29,8 @@ const assessmentRow = (overrides: Record<string, unknown> = {}) => ({
 
 const applicationRow = { candidate_facet_id: 'hcf-1', stage: 'screening', decision: null }
 const facetRow = { consent_status: 'granted' }
+const exchangeBudget = { requesterDigest: 'c'.repeat(64), surface: 'exchange_credential' as const, limit: 10 }
+const sessionBudget = { requesterDigest: 'd'.repeat(64), surface: 'session_read_credential' as const, limit: 120 }
 
 const sessionRow = (overrides: Record<string, unknown> = {}) => ({
   public_session_id: 'haps-1',
@@ -43,6 +46,27 @@ const clientFrom = (resolver: (sql: string, values: unknown[]) => { rows: unknow
 }) as unknown as PoolClient
 
 describe('public assessment session store', () => {
+  it('1000 bearers y cookies inválidos no crean buckets funcionales', async () => {
+    const client = clientFrom(() => ({ rows: [] }))
+
+    for (let index = 0; index < 1000; index += 1) {
+      await exchangePublicAssessmentAccessWithClient(client, {
+        accessTokenDigest: index.toString(16).padStart(64, '0'),
+        sessionTokenDigest: 'b'.repeat(64),
+        requestBudget: exchangeBudget,
+      })
+      await resolvePublicAssessmentSessionWithClient(client, {
+        sessionTokenDigest: index.toString(16).padStart(64, '0'),
+        requestBudget: sessionBudget,
+      })
+    }
+
+    const sql = vi.mocked(client.query).mock.calls.map(call => String(call[0])).join('\n')
+
+    expect(sql).not.toContain('claim_assessment_public_request_budget')
+    expect(sql).not.toContain('INSERT INTO greenhouse_hiring.hiring_assessment_public_session')
+  })
+
   it('locks assessment → application → facet and persists only credential digests', async () => {
     const client = clientFrom(sql => {
       if (sql.includes('clock_timestamp() AS database_now')) return { rows: [{ database_now: NOW }] }
@@ -50,6 +74,7 @@ describe('public assessment session store', () => {
       if (sql.includes('FROM greenhouse_hiring.hiring_application')) return { rows: [applicationRow] }
       if (sql.includes('FROM greenhouse_hiring.candidate_facet')) return { rows: [facetRow] }
       if (sql.includes('INSERT INTO greenhouse_hiring.hiring_assessment_public_session')) return { rows: [sessionRow()] }
+      if (sql.includes('claim_assessment_public_request_budget')) return { rows: [{ allowed: true }] }
 
       return { rows: [] }
     })
@@ -57,16 +82,22 @@ describe('public assessment session store', () => {
     const result = await exchangePublicAssessmentAccessWithClient(client, {
       accessTokenDigest: 'a'.repeat(64),
       sessionTokenDigest: 'b'.repeat(64),
+      requestBudget: exchangeBudget,
     })
 
-    expect(result?.assessmentId).toBe('asmt-1')
+    expect(result).toEqual(expect.objectContaining({
+      outcome: 'issued',
+      session: expect.objectContaining({ assessmentId: 'asmt-1' }),
+    }))
     const calls = vi.mocked(client.query).mock.calls.map(call => String(call[0]))
 
     expect(calls[0]).toMatch(/hiring_assessment[\s\S]*FOR UPDATE/)
     expect(calls[1]).toMatch(/hiring_application[\s\S]*FOR UPDATE/)
     expect(calls[2]).toMatch(/candidate_facet[\s\S]*FOR UPDATE/)
     expect(calls[3]).toContain('clock_timestamp() AS database_now')
-    expect(calls[4]).toContain('hiring_assessment_public_session')
+    expect(calls[4]).toContain('claim_assessment_public_request_budget')
+    expect(calls[5]).toContain('SAVEPOINT assessment_public_session_issue')
+    expect(calls[6]).toContain('hiring_assessment_public_session')
     expect(JSON.stringify(vi.mocked(client.query).mock.calls)).not.toContain('raw-secret')
   })
 
@@ -87,12 +118,65 @@ describe('public assessment session store', () => {
     await expect(exchangePublicAssessmentAccessWithClient(client, {
       accessTokenDigest: 'a'.repeat(64),
       sessionTokenDigest: 'b'.repeat(64),
-    })).resolves.toBeNull()
+      requestBudget: exchangeBudget,
+    })).resolves.toEqual({ outcome: 'unavailable' })
 
     const sql = vi.mocked(client.query).mock.calls.map(call => String(call[0])).join('\n')
 
     expect(sql).toContain("SET status = 'expired'")
     expect(sql).not.toContain('INSERT INTO greenhouse_hiring.hiring_assessment_public_session')
+  })
+
+  it('un bearer válido rate-limited reclama bajo locks pero no inserta sesión', async () => {
+    const client = clientFrom(sql => {
+      if (sql.includes('clock_timestamp() AS database_now')) return { rows: [{ database_now: NOW }] }
+      if (sql.includes('WHERE access_token_hash = $1')) return { rows: [assessmentRow()] }
+      if (sql.includes('FROM greenhouse_hiring.hiring_application')) return { rows: [applicationRow] }
+      if (sql.includes('FROM greenhouse_hiring.candidate_facet')) return { rows: [facetRow] }
+      if (sql.includes('claim_assessment_public_request_budget')) return { rows: [{ allowed: false }] }
+
+      return { rows: [] }
+    })
+
+    await expect(exchangePublicAssessmentAccessWithClient(client, {
+      accessTokenDigest: 'a'.repeat(64),
+      sessionTokenDigest: 'b'.repeat(64),
+      requestBudget: exchangeBudget,
+    })).rejects.toBeInstanceOf(PublicAssessmentRequestRateLimitError)
+
+    expect(vi.mocked(client.query).mock.calls.map(call => String(call[0])).join('\n'))
+      .not.toContain('INSERT INTO greenhouse_hiring.hiring_assessment_public_session')
+  })
+
+  it('preserva el claim cuando falla la inserción de la sesión', async () => {
+    const client = clientFrom(sql => {
+      if (sql.includes('clock_timestamp() AS database_now')) return { rows: [{ database_now: NOW }] }
+      if (sql.includes('WHERE access_token_hash = $1')) return { rows: [assessmentRow()] }
+      if (sql.includes('FROM greenhouse_hiring.hiring_application')) return { rows: [applicationRow] }
+      if (sql.includes('FROM greenhouse_hiring.candidate_facet')) return { rows: [facetRow] }
+      if (sql.includes('claim_assessment_public_request_budget')) return { rows: [{ allowed: true }] }
+
+      if (sql.includes('INSERT INTO greenhouse_hiring.hiring_assessment_public_session')) {
+        throw new Error('database detail must not escape')
+      }
+
+      return { rows: [] }
+    })
+
+    await expect(exchangePublicAssessmentAccessWithClient(client, {
+      accessTokenDigest: 'a'.repeat(64),
+      sessionTokenDigest: 'b'.repeat(64),
+      requestBudget: exchangeBudget,
+    })).resolves.toEqual({ outcome: 'issuance_failed' })
+
+    const calls = vi.mocked(client.query).mock.calls.map(call => String(call[0]))
+
+    expect(calls).toEqual(expect.arrayContaining([
+      expect.stringContaining('claim_assessment_public_request_budget'),
+      'SAVEPOINT assessment_public_session_issue',
+      'ROLLBACK TO SAVEPOINT assessment_public_session_issue',
+      'RELEASE SAVEPOINT assessment_public_session_issue',
+    ]))
   })
 
   it('revokes a session when credential rotation changed its version', async () => {
@@ -114,7 +198,9 @@ describe('public assessment session store', () => {
       return { rows: [], rowCount: 1 }
     })
 
-    await expect(resolvePublicAssessmentSessionWithClient(client, 'b'.repeat(64))).resolves.toBeNull()
+    await expect(resolvePublicAssessmentSessionWithClient(client, {
+      sessionTokenDigest: 'b'.repeat(64), requestBudget: sessionBudget,
+    })).resolves.toBeNull()
     expect(vi.mocked(client.query).mock.calls.some(call =>
       String(call[0]).includes("SET status = $2")
         && Array.isArray(call[1])
@@ -136,11 +222,14 @@ describe('public assessment session store', () => {
 
       if (sql.includes('FROM greenhouse_hiring.hiring_application')) return { rows: [applicationRow] }
       if (sql.includes('FROM greenhouse_hiring.candidate_facet')) return { rows: [facetRow] }
+      if (sql.includes('claim_assessment_public_request_budget')) return { rows: [{ allowed: true }] }
 
       return { rows: [] }
     })
 
-    const result = await resolvePublicAssessmentSessionWithClient(client, 'b'.repeat(64))
+    const result = await resolvePublicAssessmentSessionWithClient(client, {
+      sessionTokenDigest: 'b'.repeat(64), requestBudget: sessionBudget,
+    })
 
     expect(result).toEqual(expect.objectContaining({ publicSessionId: 'haps-1', assessmentId: 'asmt-1' }))
     expect(vi.mocked(client.query).mock.calls.map(call => String(call[0])).join('\n'))
@@ -166,11 +255,14 @@ describe('public assessment session store', () => {
 
       if (sql.includes('FROM greenhouse_hiring.hiring_application')) return { rows: [applicationRow] }
       if (sql.includes('FROM greenhouse_hiring.candidate_facet')) return { rows: [facetRow] }
+      if (sql.includes('claim_assessment_public_request_budget')) return { rows: [{ allowed: true }] }
 
       return { rows: [] }
     })
 
-    await expect(resolvePublicAssessmentSessionWithClient(client, 'b'.repeat(64)))
+    await expect(resolvePublicAssessmentSessionWithClient(client, {
+      sessionTokenDigest: 'b'.repeat(64), requestBudget: sessionBudget,
+    }))
       .resolves.toEqual(expect.objectContaining({ publicSessionId: 'haps-1' }))
 
     const calls = vi.mocked(client.query).mock.calls.map(call => String(call[0]))

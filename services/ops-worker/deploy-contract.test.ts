@@ -53,10 +53,20 @@ describe('ops-worker assessment public-session link cutover contract', () => {
     )
   })
 
+  it('schedules the canonical daily retention owner with readback runtime code', () => {
+    const script = deployScript()
+    const jobIndex = script.indexOf('"ops-hiring-assessment-public-access-retention"')
+
+    expect(jobIndex).toBeGreaterThan(0)
+    expect(script.slice(jobIndex, jobIndex + 300)).toContain('"17 4 * * *"')
+    expect(script.slice(jobIndex, jobIndex + 300)).toContain('"/hiring/assessment/public-access-retention"')
+  })
+
   it('treats Hiring notifications as worker inputs for push, latest-SHA and drift checks', () => {
     const workflow = deployWorkflow()
 
     expect(workflow.match(/src\/lib\/hiring\/notifications/g)).toHaveLength(3)
+    expect(workflow.match(/src\/lib\/hiring\/assessment\/public-session/g)).toHaveLength(3)
   })
 })
 

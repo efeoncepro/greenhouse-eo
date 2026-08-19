@@ -25,7 +25,7 @@ import {
   type AssessmentAccessRecoveryResult,
 } from './contracts'
 
-interface RecoveryStateRow extends Record<string, unknown> {
+export interface RecoveryStateRow extends Record<string, unknown> {
   assessment_id: string
   application_id: string
   opening_id: string
@@ -45,13 +45,13 @@ interface RecoveryStateRow extends Record<string, unknown> {
   effective_deadline_at: Date | string | null
 }
 
-interface RecoveryReceiptRow extends Record<string, unknown> {
+export interface RecoveryReceiptRow extends Record<string, unknown> {
   recovery_id: string
   assessment_id: string
   application_id: string
   opening_id: string
   actor_user_id: string
-  channel: 'email'
+  channel: 'email' | 'secure_link'
   reason_code: AssessmentAccessRecoveryReason
   previous_status: string
   resulting_status: string
@@ -120,7 +120,7 @@ export const resolveHiringCandidateAccessOrigin = (rawUrl = hiringPublicBaseUrl(
   return url.origin
 }
 
-const normalizeReceipt = (row: RecoveryReceiptRow): AssessmentAccessRecoveryReceipt => ({
+export const normalizeRecoveryReceipt = (row: RecoveryReceiptRow): AssessmentAccessRecoveryReceipt => ({
   recoveryId: row.recovery_id,
   assessmentId: row.assessment_id,
   applicationId: row.application_id,
@@ -144,7 +144,7 @@ const recoverySourceEventId = (input: {
   .update(`email:v1:${input.actorUserId}:${input.assessmentId}:${input.idempotencyDigest}`)
   .digest('hex')}`
 
-const loadRecoveryState = async (client: PoolClient, assessmentId: string): Promise<RecoveryStateRow | null> => {
+export const loadRecoveryState = async (client: PoolClient, assessmentId: string): Promise<RecoveryStateRow | null> => {
   const result = await client.query<RecoveryStateRow>(
     `SELECT assessment.assessment_id,
             assessment.application_id,
@@ -218,7 +218,7 @@ const assertEmailProviderAllowsRecovery = async (client: PoolClient, recipientEm
   }
 }
 
-const assertRecoveryRateLimit = async (client: PoolClient, assessmentId: string): Promise<void> => {
+export const assertRecoveryRateLimit = async (client: PoolClient, assessmentId: string): Promise<void> => {
   const result = await client.query<{ total_24h: number | string; cooldown_active: boolean }>(
     `SELECT COUNT(*) FILTER (WHERE created_at >= clock_timestamp() - INTERVAL '24 hours') AS total_24h,
             COALESCE(MAX(created_at) >= clock_timestamp()
@@ -275,7 +275,7 @@ const findReceipt = async (input: {
     )
   }
 
-  return normalizeReceipt(row)
+  return normalizeRecoveryReceipt(row)
 }
 
 const closeReceipt = async (
@@ -323,7 +323,7 @@ const closeReceipt = async (
       },
     }, client)
 
-    return normalizeReceipt(row)
+    return normalizeRecoveryReceipt(row)
   })
 }
 
@@ -358,7 +358,7 @@ export const reconcileCandidateTestAccessRecoveryEmailReceipt = async (
   const row = rows[0]
 
   if (!row) return null
-  if (!['pending_dispatch', 'dispatch_unknown'].includes(row.outcome)) return normalizeReceipt(row)
+  if (!['pending_dispatch', 'dispatch_unknown'].includes(row.outcome)) return normalizeRecoveryReceipt(row)
 
   const targetOutcome = row.resend_id && ['sent', 'delivered'].includes(row.delivery_status)
     ? 'dispatch_accepted'
@@ -366,7 +366,7 @@ export const reconcileCandidateTestAccessRecoveryEmailReceipt = async (
       ? 'dispatch_failed'
       : null
 
-  if (!targetOutcome || !row.delivery_id) return normalizeReceipt(row)
+  if (!targetOutcome || !row.delivery_id) return normalizeRecoveryReceipt(row)
 
   try {
     return await closeReceipt(row.recovery_id, targetOutcome, row.delivery_id)
@@ -381,7 +381,7 @@ export const reconcileCandidateTestAccessRecoveryEmailReceipt = async (
       [recoveryId],
     )
 
-    return current[0] ? normalizeReceipt(current[0]) : null
+    return current[0] ? normalizeRecoveryReceipt(current[0]) : null
   }
 }
 
@@ -575,7 +575,7 @@ export const recoverCandidateTestAccessByEmail = async (
       }, client)
 
       return {
-        receipt: normalizeReceipt(receipt),
+        receipt: normalizeRecoveryReceipt(receipt),
         token: rotated.token,
         recipientEmail: expectedRecipientEmail,
         recipientName: state.candidate_name?.trim() || null,

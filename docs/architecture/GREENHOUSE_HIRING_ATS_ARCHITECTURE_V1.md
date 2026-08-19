@@ -1,5 +1,25 @@
 # Greenhouse Hiring / ATS Architecture V1
 
+## Delta 2026-08-19 — Recovery de assessment y sesión pública, código dormante (TASK-1746)
+
+El write canónico de recuperación es `recoverCandidateTestAccess`; serializa por assessment, revalida
+assessment→application→candidate facet y separa `email` de `secure_link`. Ambos canales rotan una sola versión
+de credencial bajo la misma transacción que receipt/audit/outbox; el enlace manual se revela una vez en la
+respuesta y nunca se persiste. El adapter Product API
+`POST /api/hiring/assessments/[id]/access-recovery` exige sesión humana allowlisted, capability por canal,
+lectura de application y assessment antes de lookup, Origin exacto, body cerrado e idempotencia acotada.
+
+La nueva frontera candidata usa `/public/assessment/access#access=…` → exchange POST → cookie `__Host-` HttpOnly
+y rutas posteriores sin token. Rotar invalida sesiones anteriores; el reloj de PG gobierna start-by, plazo de
+respuesta, gracia de 30 minutos y 24 horas post-start cuando no existe límite. El abuso se controla con techo
+IP previo y presupuesto por credencial/sesión válida bajo locks; nunca se persisten IP o bearer raw. Retención
+de sesiones/buckets tiene owner diario en ops-worker, loop acotado, readback y señal de residuo.
+
+Estado real: Slices 1–4 están code-complete localmente, no operativas. La migración TASK-1746 y el índice único
+concurrente de intents no se han aplicado; capabilities/surface recovery no están expuestas, el tipo de email
+permanece OFF y `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` OFF conserva assignment legacy. Antes de cutover
+faltan rutas live, readback Resend `click_tracking=false`, smokes PG/browser/email/href y el consumer TASK-1747.
+
 ## Purpose
 
 Definir la arquitectura canónica del dominio `Hiring / ATS` dentro de Greenhouse como capa de fulfillment de talento para Efeonce.

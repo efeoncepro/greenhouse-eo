@@ -55,6 +55,16 @@
   evidence and the global lifecycle signal surfaces stale drift after 15 minutes. HTML and plaintext preserve
   the original in-progress deadline in Chile time. The email type remains disabled with no productive adapter.
   Slice 3 fragment exchange, HttpOnly session, authorization/API and tracking smoke remain hard gates.
+- 2026-08-19 — Slices 3A/3B code complete locally. Credential versions, PG-clock deadlines, opaque HttpOnly
+  sessions, fragment scrub/exchange, token-free page/API, multi-tab fence and legacy compatibility are in place.
+  Assignment cutover remains behind `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` default OFF.
+- 2026-08-19 — Slice 4 backend code complete locally. The unified command and human Product API implement
+  channel-specific capability, exact lineage, idempotency, one-time reveal, provider evidence and dual public
+  request budgets. Valid credentials consume their durable budget even when issuance/action fails; savepoints
+  prevent partial domain writes. Ops-worker owns bounded retention with readback and residual signal.
+  Operational completion is still blocked on unapplied migration/index, disabled flags/capabilities/email type,
+  live route/provider readbacks and controlled smokes. Functional/operator docs are prepared as pre-rollout
+  guidance and must be reconciled with live evidence before task closure.
 
 ## Skills
 

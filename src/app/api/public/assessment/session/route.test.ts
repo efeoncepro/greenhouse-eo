@@ -14,6 +14,8 @@ const mocks = vi.hoisted(() => ({
   getSubject: vi.fn(),
   captureSelfId: vi.fn(),
   capture: vi.fn(),
+  allowIp: vi.fn(),
+  RateLimitError: class extends Error {},
 }))
 
 vi.mock('@/lib/hiring/assessment/public-session/service', () => ({
@@ -31,6 +33,10 @@ vi.mock('@/lib/hiring/assessment/fairness/capture-self-id', () => ({
   captureVoluntaryDemographicSelfIdWithClient: mocks.captureSelfId,
 }))
 vi.mock('@/lib/observability/capture', () => ({ captureWithDomain: mocks.capture }))
+vi.mock('@/lib/hiring/assessment/public-session/abuse-guard', () => ({
+  claimPublicAssessmentIpCeiling: mocks.allowIp,
+  PublicAssessmentRequestRateLimitError: mocks.RateLimitError,
+}))
 
 const { GET, POST } = await import('./route')
 
@@ -73,6 +79,7 @@ describe('/api/public/assessment/session', () => {
     mocks.submit.mockResolvedValue({ outcome: 'ok', value: undefined })
     mocks.getSubject.mockResolvedValue({ identityProfileId: 'ip-1', applicationId: 'app-1' })
     mocks.captureSelfId.mockResolvedValue({ recorded: 1, unchanged: 0 })
+    mocks.allowIp.mockResolvedValue(true)
   })
 
   it('deriva la evaluación solo de la cookie y no filtra sesión/version/hash en el DTO', async () => {
@@ -83,6 +90,16 @@ describe('/api/public/assessment/session', () => {
     expect(mocks.getAssessment).toHaveBeenCalledWith(client, 'asmt-1')
     expect(JSON.stringify(payload)).not.toMatch(/session-secret|accessTokenVersionId|token_hash|sessionToken/i)
     expect(response.headers.get('cache-control')).toContain('no-store')
+  })
+
+  it('rate-limita por session credential antes de resolverla y comunica Retry-After', async () => {
+    mocks.withSession.mockRejectedValue(new mocks.RateLimitError())
+
+    const response = await GET(sessionRequest())
+
+    expect(response.status).toBe(429)
+    expect(response.headers.get('retry-after')).toBe('60')
+    expect(mocks.withSession).toHaveBeenCalledWith('session-secret', expect.any(Function))
   })
 
   it('rechaza mutaciones sin Origin exacto antes de resolver la sesión', async () => {
@@ -96,6 +113,7 @@ describe('/api/public/assessment/session', () => {
     const response = await POST(sessionRequest('POST', { action: 'start' }))
 
     expect(response.status).toBe(200)
+    expect(mocks.withSession).toHaveBeenCalledWith('session-secret', expect.any(Function), 'session_write')
     expect(mocks.start).toHaveBeenCalledWith(client, 'asmt-1')
     expect(mocks.buildView).toHaveBeenCalledWith(client, expect.objectContaining({ assessmentId: 'asmt-1' }))
   })

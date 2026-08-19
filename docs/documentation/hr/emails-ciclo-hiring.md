@@ -1,9 +1,9 @@
 # Emails del Ciclo de Hiring — Notificaciones a Candidatos y People
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-08-12 por Claude (TASK-1689)
-> **Ultima actualizacion:** 2026-08-15 por Codex
+> **Ultima actualizacion:** 2026-08-19 por Codex (TASK-1745, TASK-1746)
 > **Documentacion tecnica:** [GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md) (Delta 2026-08-12)
 
 ## Qué hace
@@ -53,6 +53,26 @@ tenga que acordarse de escribirlos:
 - Todo el sistema está detrás de un interruptor general (`HIRING_LIFECYCLE_EMAILS_ENABLED`),
   prendido en producción desde el 2026-08-12; el interruptor y los kill-switch por tipo siguen
   disponibles para pausar el sistema completo o un correo específico.
+
+## Despacho no es entrega
+
+El estado histórico `sent` significa que el proveedor aceptó el despacho. No demuestra que el mensaje llegó
+al buzón. La confirmación técnica de entrega requiere un evento firmado `delivered`; `bounced`, `complained`
+y `suppressed` indican que el canal email está bloqueado o degradado. `opened` y `clicked` son interacción,
+no sustitutos de entrega.
+
+El receptor global de lifecycle de Resend y su reconciliación están implementados, pero su rollout externo
+sigue pendiente: falta registrar el webhook, configurar el secreto, aplicar datos y ejecutar el canary live.
+Hasta entonces, Greenhouse no debe mostrar una entrega como confirmada por proveedor. El webhook es
+observador y nunca puede bloquear el envío de los demás correos.
+
+Los emails que transportan acceso se procesan como credenciales: reservan evidencia durable antes de emitir
+el token, no persisten la URL o bearer en payloads genéricos y no usan retry ciego. Si el proveedor pudo
+aceptar el correo pero el cierre local quedó incierto, el resultado es `unknown`, no un falso `sent`.
+
+La recuperación gobernada del mismo assessment —por email o enlace seguro de una sola revelación— también
+está implementada pero pendiente de rollout. Detalle funcional:
+[Entrega y recuperación de acceso a tests](entrega-y-recuperacion-de-acceso-a-tests.md).
 
 > Estado de rollout: el aviso interno de test completado está desplegado y configurado en el
 > ops-worker desde 2026-08-15, igual que los otros seis correos. Aún falta confirmar su primera

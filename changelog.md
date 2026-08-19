@@ -48,6 +48,15 @@
 - El correo vigente no cambia al desplegar este código: el cutover vive en
   `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`, default OFF. ON queda bloqueado por migración+índice, rutas live,
   `click_tracking=false` de Resend, rate limit y smokes reales de href/cookie/browser.
+- El backend de recuperación ya tiene un único command para email o enlace manual, Product API sólo para sesiones
+  humanas y revelación one-time. Siempre rota el acceso del assessment existente; nunca crea otro test, reinicia el
+  reloj, cambia etapa, score o respuestas.
+- El guard antiabuso combina cuota por credential/sesión válida con techo IP confiable de Vercel. Tokens aleatorios
+  inválidos no crean cardinalidad durable; la purga diaria drena con readback/señal. Savepoints conservan el consumo
+  de cuota y revierten writes parciales si una acción falla.
+- Arquitectura, manuales, issue/tasks y skills de Talento/Arquitectura/Secret Hygiene quedaron sincronizados. El
+  runbook global de Resend fija orden de migraciones, índice concurrente, webhook firmado, reconciliación,
+  `click_tracking=false`, smokes y rollback. Todo sigue `code complete, rollout pendiente`.
 
 ## 2026-08-19 — El reenvío gobernado de tests ya tiene command seguro
 

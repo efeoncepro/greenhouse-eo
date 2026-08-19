@@ -137,6 +137,22 @@ workflow del worker incluye notifications en trigger, latest-SHA y drift-check. 
 migración+índice, cuatro rutas live, `click_tracking=false` verificado en Resend, rate limit público y smokes
 PG/browser/href. No se aplicó migración, no se desplegó ni se cambió ninguna env.
 
+El Slice 4 de `TASK-1746` quedó code-complete local y reauditaron Arquitectura, Talento y Seguridad hasta
+P0/P1/P2=0. Existe un único command `recoverCandidateTestAccess` para email o enlace seguro; la Product API exige
+sesión humana canónica, capabilities por canal antes de lookup, lineage exacta, Origin/JSON/idempotencia cerrados y
+errores anti-oracle. El enlace manual rota el mismo assessment y se revela una vez; replay nunca devuelve el bearer.
+El rate limit usa techo IP confiable de Vercel más bucket por credential/sesión válida, sin amplificación por tokens
+aleatorios; savepoints conservan la cuota pero revierten cualquier write parcial. El owner diario de retención drena
+buckets con readback y señal. Documentación, manuales y skills de Talento/Arquitectura/Secret Hygiene quedaron
+sincronizados, incluido el runbook global `docs/operations/runbooks/resend-email-lifecycle-rollout.md`.
+
+**Handoff a Claude:** no implementar de nuevo TASK-1745/1746. El checkout queda con Slice 4 listo para commit en
+esta sesión; después el siguiente bloque es TASK-1747 (UI Application 360). Antes de cualquier rollout: aplicar
+migración TASK-1745, luego migración `20260819072130586`, ejecutar/verificar el índice concurrente de TASK-1746,
+desplegar app+worker dormantes, configurar webhook firmado global de Resend, verificar `click_tracking=false`, hacer
+smokes PG/browser/email consentidos y recién entonces habilitar capability/email type/cutover. Hoy no se aplicó ni
+activó nada; el correo inicial continúa por el enlace legacy y `sent` no prueba entrega.
+
 ## 2026-08-18 — Hiring AI y candidate review MCP: runtime reconciliado
 
 El release `7e7a474217eb` (run `32193134959`) dejó `global_provisional` activo para assessments elegibles de

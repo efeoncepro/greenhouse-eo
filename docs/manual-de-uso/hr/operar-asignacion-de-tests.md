@@ -119,7 +119,7 @@ La respuesta trae `outcome`:
 
 | Estado | Qué pasó | Qué hacer |
 |---|---|---|
-| `assigned` | Se creó la prueba. El correo sale por su propio camino | Nada. Verifica la entrega si es un caso sensible |
+| `assigned` | Se creó la prueba. No prueba despacho ni entrega del correo | Verifica el canal si es un caso sensible; no reasignes para reenviar |
 | `already_assigned` | Ya existía. No se creó nada nuevo ni salió otro correo | Nada |
 | `blocked` | Falta algo estructural (correo del candidato, plantilla inactiva, política apagada) | Corrige la causa y vuelve a proponer |
 | `held` | Se alcanzó el tope de envíos de la ventana | Espera, o revisa si el tope está bien calibrado |

@@ -2,10 +2,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('server-only', () => ({}))
 
-const mocks = vi.hoisted(() => ({ exchange: vi.fn() }))
+const mocks = vi.hoisted(() => ({
+  exchange: vi.fn(),
+  allowIp: vi.fn(),
+  RateLimitError: class extends Error {},
+}))
 
 vi.mock('@/lib/hiring/assessment/public-session/service', () => ({
   exchangePublicAssessmentAccess: mocks.exchange,
+}))
+vi.mock('@/lib/hiring/assessment/public-session/abuse-guard', () => ({
+  claimPublicAssessmentIpCeiling: mocks.allowIp,
+  PublicAssessmentRequestRateLimitError: mocks.RateLimitError,
 }))
 
 const { POST } = await import('./route')
@@ -32,6 +40,7 @@ describe('POST /api/public/assessment/access/exchange', () => {
       sessionToken: 's'.repeat(43),
       session: { expiresAt: '2026-08-20T10:00:00.000Z' },
     })
+    mocks.allowIp.mockResolvedValue(true)
   })
 
   it('rechaza Origin ausente, distinto o con prefijo engañoso antes del exchange', async () => {
@@ -98,5 +107,29 @@ describe('POST /api/public/assessment/access/exchange', () => {
 
     expect(response.status).toBe(400)
     expect(mocks.exchange).not.toHaveBeenCalled()
+  })
+
+  it('rate-limita antes de resolver el bearer y conserva respuesta genérica', async () => {
+    mocks.allowIp.mockResolvedValue(false)
+
+    const response = await POST(request())
+
+    expect(response.status).toBe(429)
+    expect(response.headers.get('retry-after')).toBe('60')
+    expect(mocks.exchange).not.toHaveBeenCalled()
+    await expect(response.json()).resolves.toEqual({
+      ok: false,
+      code: 'assessment_unavailable',
+      message: 'La evaluación no está disponible.',
+    })
+  })
+
+  it('propaga rate-limit sólo después de que el service validó el credential', async () => {
+    mocks.exchange.mockRejectedValue(new mocks.RateLimitError())
+
+    const response = await POST(request())
+
+    expect(response.status).toBe(429)
+    expect(mocks.exchange).toHaveBeenCalledWith(access)
   })
 })

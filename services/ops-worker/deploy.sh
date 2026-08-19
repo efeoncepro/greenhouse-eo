@@ -1428,6 +1428,13 @@ upsert_scheduler_job \
 echo "  -> ops-email-delivery-retry: */5 * * * * (failed email retry, TASK-775)"
 
 upsert_scheduler_job \
+  "ops-hiring-assessment-public-access-retention" \
+  "17 4 * * *" \
+  "/hiring/assessment/public-access-retention" \
+  '{}'
+echo "  -> ops-hiring-assessment-public-access-retention: 17 4 * * * (24h public access retention, TASK-1746)"
+
+upsert_scheduler_job \
   "ops-entra-profile-sync" \
   "0 8 * * *" \
   "/entra/profile-sync" \

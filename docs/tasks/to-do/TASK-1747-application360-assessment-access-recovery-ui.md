@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-011`
-- Status real: `Diseño — espera foundation API`
+- Status real: `Diseño listo — foundation API code-complete localmente; rollout y consumer JSX pendientes`
 - Rank: `TBD`
 - Domain: `hr|ui|delivery`
 - Blocked by: `TASK-1745`, `TASK-1746`
@@ -78,7 +78,7 @@ Reglas obligatorias:
 ### Depends on
 
 - TASK-1745 delivery lifecycle DTO and status semantics.
-- TASK-1746 recovery command/Product API/capability.
+- TASK-1746 recovery command/Product API/capability (code-complete localmente; runtime OFF/unapplied).
 - TASK-1719 policy proposal/confirmation endpoint.
 
 ### Blocks / Impacts
@@ -98,7 +98,8 @@ Reglas obligatorias:
 ### Already exists
 
 - Application 360 shows assessment status and uses the legacy direct assignment endpoint.
-- TASK-1719 exposes policy proposal/confirmation contracts; TASK-1746 will expose recovery.
+- TASK-1719 expone policy proposal/confirmation; TASK-1746 ya implementa localmente recovery/availability y su
+  Product API, pero schema, grants, flags y smokes siguen pendientes.
 - Assessment card, `GreenhouseButton`, `GreenhouseChip`, `Alert`, `Dialog` and `Snackbar` primitives exist.
 
 ### Gap
@@ -198,7 +199,8 @@ Reglas obligatorias:
 - Alternatives considered: persistent inline link (rejected: unsafe/stale); separate recovery page (rejected: breaks application context); silent resend (rejected: lacks operator intent).
 - Why this pattern: keeps the candidate, test state and recovery evidence in one operational surface without a card-within-card layer.
 - Reuse / extend / new primitive: extend local card composition; no new global primitive.
-- Open risks: actual DTO status shape and approved secure-link TTL depend on TASK-1745/1746.
+- Open risks: validar el DTO real durante integración y no exponer acciones mientras availability/capabilities
+  estén OFF; TTL secure-link de 24h ya está aprobada en el ADR.
 
 ### Visual verification
 

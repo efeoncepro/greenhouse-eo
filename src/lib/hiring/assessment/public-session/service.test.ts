@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('server-only', () => ({}))
 
@@ -38,8 +38,10 @@ describe('public assessment session service', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.stubEnv('NEXTAUTH_SECRET', 'test-only-public-session-budget-key')
     mocks.transaction.mockImplementation(async callback => callback(client))
   })
+  afterEach(() => vi.unstubAllEnvs())
 
   it('rejects malformed access credentials before opening a transaction', async () => {
     await expect(exchangePublicAssessmentAccess('short')).resolves.toBeNull()
@@ -49,7 +51,7 @@ describe('public assessment session service', () => {
   it('passes only digests to persistence and returns the raw session once', async () => {
     const rawAccessToken = 'a'.repeat(32)
 
-    mocks.exchange.mockResolvedValue(session)
+    mocks.exchange.mockResolvedValue({ outcome: 'issued', session })
     const result = await exchangePublicAssessmentAccess(rawAccessToken)
 
     expect(result?.session).toEqual(session)
@@ -58,6 +60,7 @@ describe('public assessment session service', () => {
 
     expect(persistedInput.accessTokenDigest).toMatch(/^[a-f0-9]{64}$/)
     expect(persistedInput.sessionTokenDigest).toMatch(/^[a-f0-9]{64}$/)
+    expect(persistedInput.requestBudget).toMatchObject({ surface: 'exchange_credential', limit: 10 })
     expect(JSON.stringify(mocks.exchange.mock.calls)).not.toContain(rawAccessToken)
     expect(JSON.stringify(mocks.exchange.mock.calls)).not.toContain(result?.sessionToken)
   })
@@ -68,7 +71,66 @@ describe('public assessment session service', () => {
 
     await expect(withPublicAssessmentSession('s'.repeat(43), callback)).resolves.toBe('asmt-1')
     expect(callback).toHaveBeenCalledWith(client, session)
+    expect(mocks.resolve.mock.calls[0]?.[1]).toMatchObject({
+      requestBudget: { surface: 'session_read_credential', limit: 120 },
+    })
     expect(mocks.transaction).toHaveBeenCalledTimes(1)
+  })
+
+  it('commits the valid-session budget before rethrowing a callback failure', async () => {
+    const transactionCompleted = vi.fn()
+
+    mocks.resolve.mockResolvedValue(session)
+    mocks.transaction.mockImplementationOnce(async callback => {
+      const result = await callback(client)
+
+      transactionCompleted()
+
+      return result
+    })
+
+    const failure = new Error('invalid action')
+
+    await expect(withPublicAssessmentSession('s'.repeat(43), async () => {
+      throw failure
+    }, 'session_write')).rejects.toBe(failure)
+    expect(transactionCompleted).toHaveBeenCalledOnce()
+    expect(client.query.mock.calls.map(call => call[0])).toEqual([
+      'SAVEPOINT assessment_public_session_action',
+      'ROLLBACK TO SAVEPOINT assessment_public_session_action',
+      'RELEASE SAVEPOINT assessment_public_session_action',
+    ])
+    expect(mocks.resolve.mock.calls[0]?.[1]).toMatchObject({
+      requestBudget: { surface: 'session_write_credential', limit: 60 },
+    })
+  })
+
+  it('releases the action savepoint only after a successful callback', async () => {
+    mocks.resolve.mockResolvedValue(session)
+
+    await expect(withPublicAssessmentSession('s'.repeat(43), async () => 'ok', 'session_write'))
+      .resolves.toBe('ok')
+    expect(client.query.mock.calls.map(call => call[0])).toEqual([
+      'SAVEPOINT assessment_public_session_action',
+      'RELEASE SAVEPOINT assessment_public_session_action',
+    ])
+  })
+
+  it('reports issuance failure only after the transaction commits its credential claim', async () => {
+    const transactionCompleted = vi.fn()
+
+    mocks.exchange.mockResolvedValue({ outcome: 'issuance_failed' })
+    mocks.transaction.mockImplementationOnce(async callback => {
+      const result = await callback(client)
+
+      transactionCompleted()
+
+      return result
+    })
+
+    await expect(exchangePublicAssessmentAccess('a'.repeat(32)))
+      .rejects.toThrow('Public assessment session issuance failed.')
+    expect(transactionCompleted).toHaveBeenCalledOnce()
   })
 
   it('resolves and revokes only well-formed session credentials', async () => {

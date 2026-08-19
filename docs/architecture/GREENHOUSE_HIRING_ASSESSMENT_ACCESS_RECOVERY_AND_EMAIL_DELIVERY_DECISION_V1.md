@@ -78,8 +78,11 @@ token-free page/API URLs. Responses use `Cache-Control: private, no-store`, `Pra
 `Referrer-Policy: no-referrer`.
 
 Resend and the operator-selected manual channel necessarily transport the bearer. Greenhouse's
-prohibition applies to its durable stores and telemetry. Existing legacy path links remain valid
-only for compatibility; every new assignment and recovery uses the fragment/session boundary.
+prohibition applies to its durable stores and telemetry. Existing legacy path links remain valid only for
+compatibility. Recovery always uses the fragment/session boundary; assignment switches to it only after the
+default-OFF `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` cutover passes migration/index readback,
+live-route, Resend `click_tracking=false` and href smoke evidence. Until then, assignment deliberately preserves
+the legacy URL so deploying dormant code cannot alter outbound email behavior.
 
 ### 3. One canonical assignment path for operators and automation
 
@@ -105,6 +108,11 @@ Application 360 becomes a consumer of the TASK-1719 policy/command path. Its leg
 - The candidate-facing boundary for newly issued links is `/public/assessment/access` plus an
   HttpOnly session. Legacy `/assessment/[token]` remains compatibility-only; no internal state,
   score, reason or recovery history is exposed.
+- Public exchange/session traffic uses two durable budgets: a high aggregate IP ceiling before lookup and a
+  credential/session budget claimed only after validity is established under the same canonical locks. Raw IPs
+  and bearers are never stored; valid attempts consume their functional budget even when the requested action or
+  session issuance fails. Expired sessions and buckets are drained by the ops-worker retention owner with bounded
+  loops, readback and a residual-backlog signal.
 - Recovery audit is append-only and IDs-only: recovery/assessment/application/opening/actor IDs,
   channel, reason code, opaque token-version ID, timestamps, expiry, idempotency digest, delivery
   ID and outcome. It contains no name, email, phone, URL, token, free text or raw error. Retention
@@ -142,6 +150,18 @@ retention and the guidance to share only in a verified conversation with the can
    historical `delivery_payload` rows containing `assessmentUrl`; separately rotate any still-live
    affected assessment through an explicit governed recovery.
 5. Ship the Desk consumer and train operators on email resend versus explicit manual-link sharing.
+
+### Transition state — 2026-08-19
+
+TASK-1745 is code/build ready but its migration, signing secret, provider subscription, reconciliation and
+signed canary remain unapplied. TASK-1746 Slices 1–4 are code-complete locally: schema/contracts, token-safe
+delivery, email and secure-link recovery, fragment exchange, opaque session, Product API, abuse controls and
+retention owner exist behind disabled configuration. The migration
+`20260819072130586_task-1746-assessment-access-recovery.sql` and the concurrent token-intent index operation
+remain unapplied; both recovery capabilities, `hiring_assessment_access_recovery` and
+`HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` remain OFF/unexposed. No staging/production email, secure-link,
+browser or href smoke has run. TASK-1747 remains the pending Application 360 consumer. This is code completion,
+not operational availability.
 
 ## Revisit when
 

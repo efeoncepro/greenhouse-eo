@@ -194,6 +194,101 @@ CREATE INDEX IF NOT EXISTS hiring_assessment_public_session_expiry_idx
   ON greenhouse_hiring.hiring_assessment_public_session (expires_at)
   WHERE status = 'active';
 
+-- Route-scoped anonymous abuse budget. Only a one-way requester digest is durable;
+-- raw IPs, bearer tokens and session cookies never enter this table.
+CREATE TABLE IF NOT EXISTS greenhouse_hiring.hiring_assessment_public_request_bucket (
+  requester_digest TEXT NOT NULL CHECK (requester_digest ~ '^[a-f0-9]{64}$'),
+  surface TEXT NOT NULL CHECK (surface IN (
+    'exchange_ip', 'exchange_credential',
+    'session_read_ip', 'session_read_credential',
+    'session_write_ip', 'session_write_credential'
+  )),
+  window_started_at TIMESTAMPTZ NOT NULL,
+  hit_count INTEGER NOT NULL CHECK (hit_count > 0),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+  PRIMARY KEY (requester_digest, surface, window_started_at)
+);
+
+ALTER TABLE greenhouse_hiring.hiring_assessment_public_request_bucket OWNER TO greenhouse_ops;
+REVOKE ALL ON TABLE greenhouse_hiring.hiring_assessment_public_request_bucket
+  FROM PUBLIC, greenhouse_runtime;
+
+CREATE INDEX IF NOT EXISTS hiring_assessment_public_request_bucket_expiry_idx
+  ON greenhouse_hiring.hiring_assessment_public_request_bucket (window_started_at);
+
+CREATE OR REPLACE FUNCTION greenhouse_hiring.claim_assessment_public_request_budget(
+  p_requester_digest text, p_surface text, p_limit integer
+) RETURNS boolean
+LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = pg_catalog, greenhouse_hiring AS $$
+DECLARE claimed boolean;
+BEGIN
+  IF p_requester_digest !~ '^[a-f0-9]{64}$'
+     OR p_surface NOT IN (
+       'exchange_ip', 'exchange_credential',
+       'session_read_ip', 'session_read_credential',
+       'session_write_ip', 'session_write_credential'
+     )
+     OR p_limit < 1 OR p_limit > 1000 THEN
+    RAISE EXCEPTION 'assessment public request budget input invalid' USING ERRCODE = '22023';
+  END IF;
+
+  INSERT INTO greenhouse_hiring.hiring_assessment_public_request_bucket
+    (requester_digest, surface, window_started_at, hit_count, updated_at)
+  VALUES (p_requester_digest, p_surface, date_trunc('minute', clock_timestamp()), 1, clock_timestamp())
+  ON CONFLICT (requester_digest, surface, window_started_at) DO UPDATE
+    SET hit_count = hiring_assessment_public_request_bucket.hit_count + 1,
+        updated_at = clock_timestamp()
+    WHERE hiring_assessment_public_request_bucket.hit_count < p_limit
+  RETURNING TRUE INTO claimed;
+
+  RETURN COALESCE(claimed, FALSE);
+END
+$$;
+
+ALTER FUNCTION greenhouse_hiring.claim_assessment_public_request_budget(text, text, integer)
+  OWNER TO greenhouse_ops;
+REVOKE ALL ON FUNCTION greenhouse_hiring.claim_assessment_public_request_budget(text, text, integer)
+  FROM PUBLIC, greenhouse_runtime;
+GRANT EXECUTE ON FUNCTION greenhouse_hiring.claim_assessment_public_request_budget(text, text, integer)
+  TO greenhouse_runtime, greenhouse_ops;
+
+CREATE OR REPLACE FUNCTION greenhouse_hiring.purge_assessment_public_request_buckets(
+  p_limit integer DEFAULT 5000
+) RETURNS integer
+LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = pg_catalog, greenhouse_hiring AS $$
+DECLARE purged_count integer;
+BEGIN
+  IF p_limit < 1 OR p_limit > 20000 THEN
+    RAISE EXCEPTION 'assessment public request bucket purge limit invalid' USING ERRCODE = '22023';
+  END IF;
+
+  WITH due AS (
+    SELECT requester_digest, surface, window_started_at
+    FROM greenhouse_hiring.hiring_assessment_public_request_bucket
+    WHERE window_started_at < clock_timestamp() - INTERVAL '24 hours'
+    ORDER BY window_started_at
+    LIMIT p_limit
+    FOR UPDATE SKIP LOCKED
+  )
+  DELETE FROM greenhouse_hiring.hiring_assessment_public_request_bucket target
+  USING due
+  WHERE (target.requester_digest,target.surface,target.window_started_at)
+      = (due.requester_digest,due.surface,due.window_started_at);
+
+  GET DIAGNOSTICS purged_count = ROW_COUNT;
+  RETURN purged_count;
+END
+$$;
+
+ALTER FUNCTION greenhouse_hiring.purge_assessment_public_request_buckets(integer)
+  OWNER TO greenhouse_ops;
+REVOKE ALL ON FUNCTION greenhouse_hiring.purge_assessment_public_request_buckets(integer)
+  FROM PUBLIC, greenhouse_runtime;
+GRANT EXECUTE ON FUNCTION greenhouse_hiring.purge_assessment_public_request_buckets(integer)
+  TO greenhouse_ops;
+
 CREATE OR REPLACE FUNCTION greenhouse_hiring.validate_hiring_assessment_public_session_insert()
 RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER
 SET search_path = pg_catalog, greenhouse_hiring AS $$
@@ -430,6 +525,40 @@ REVOKE ALL ON FUNCTION greenhouse_hiring.purge_expired_assessment_public_session
   FROM PUBLIC, greenhouse_runtime;
 GRANT EXECUTE ON FUNCTION greenhouse_hiring.purge_expired_assessment_public_sessions(integer)
   TO greenhouse_ops;
+
+-- Narrow runtime entrypoint owned by the canonical ops-worker scheduler. Runtime cannot
+-- call either generic purge directly or read the hash bucket table.
+CREATE OR REPLACE FUNCTION greenhouse_hiring.run_assessment_public_access_retention()
+RETURNS TABLE (
+  purged_sessions integer,
+  purged_request_buckets integer,
+  overdue_sessions bigint,
+  overdue_request_buckets bigint
+)
+LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = pg_catalog, greenhouse_hiring AS $$
+BEGIN
+  purged_sessions := greenhouse_hiring.purge_expired_assessment_public_sessions(5000);
+  purged_request_buckets := greenhouse_hiring.purge_assessment_public_request_buckets(20000);
+
+  SELECT COUNT(*) INTO overdue_sessions
+  FROM greenhouse_hiring.hiring_assessment_public_session
+  WHERE expires_at <= clock_timestamp()
+     OR (status <> 'active' AND updated_at <= clock_timestamp()-INTERVAL '30 days');
+
+  SELECT COUNT(*) INTO overdue_request_buckets
+  FROM greenhouse_hiring.hiring_assessment_public_request_bucket
+  WHERE window_started_at < clock_timestamp()-INTERVAL '24 hours';
+
+  RETURN NEXT;
+END
+$$;
+
+ALTER FUNCTION greenhouse_hiring.run_assessment_public_access_retention() OWNER TO greenhouse_ops;
+REVOKE ALL ON FUNCTION greenhouse_hiring.run_assessment_public_access_retention()
+  FROM PUBLIC, greenhouse_runtime;
+GRANT EXECUTE ON FUNCTION greenhouse_hiring.run_assessment_public_access_retention()
+  TO greenhouse_runtime, greenhouse_ops;
 
 CREATE OR REPLACE FUNCTION greenhouse_hiring.validate_assessment_access_recovery_receipt()
 RETURNS trigger LANGUAGE plpgsql AS $$
@@ -968,7 +1097,11 @@ $$;
 UPDATE greenhouse_core.capabilities_registry SET deprecated_at = NOW()
 WHERE capability_key IN ('hiring.assessment.recover_access_email', 'hiring.assessment.reveal_access_link')
   AND deprecated_at IS NULL;
+DROP FUNCTION IF EXISTS greenhouse_hiring.run_assessment_public_access_retention();
 DROP FUNCTION IF EXISTS greenhouse_hiring.purge_expired_assessment_public_sessions(integer);
+DROP FUNCTION IF EXISTS greenhouse_hiring.purge_assessment_public_request_buckets(integer);
+DROP FUNCTION IF EXISTS greenhouse_hiring.claim_assessment_public_request_budget(text, text, integer);
+DROP TABLE IF EXISTS greenhouse_hiring.hiring_assessment_public_request_bucket;
 DROP TRIGGER IF EXISTS trg_hiring_assessment_public_session_refresh ON greenhouse_hiring.hiring_assessment;
 DROP FUNCTION IF EXISTS greenhouse_hiring.refresh_assessment_public_sessions_after_change();
 DROP FUNCTION IF EXISTS greenhouse_hiring.refresh_assessment_public_session_expiry(text);

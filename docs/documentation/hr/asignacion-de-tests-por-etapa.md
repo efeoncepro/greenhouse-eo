@@ -156,6 +156,9 @@ tiempo que efectivamente tiene, nunca quién se lo dio ni por qué.
   categoría de sistemas que deciden sobre personas.
 - **Nunca se asigna dos veces por reintentar.** Si el sistema procesa el mismo evento otra vez,
   no se crea una segunda prueba ni sale un segundo correo.
+- **Asignado, despachado y entregado son hechos distintos.** `sent` sólo significa que el proveedor aceptó
+  el despacho. Si se pierde el acceso, la recuperación gobernada actúa sobre la misma instancia; su rollout
+  todavía está pendiente. Ver [Entrega y recuperación de acceso a tests](entrega-y-recuperacion-de-acceso-a-tests.md).
 - **Un reintento automático nunca cuenta como segundo intento.** Volver a tomar una prueba es
   siempre una decisión humana explícita, con su razón registrada.
 - **La etapa que se comunica es la vigente**, no la del momento en que se hizo clic. Si alguien
