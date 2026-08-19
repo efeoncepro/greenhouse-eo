@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -21,10 +21,10 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-011`
-- Status real: `Diseño — ADR propuesto`
+- Status real: `ADR aceptado — implementación local en curso`
 - Rank: `TBD`
 - Domain: `hr|identity|delivery`
-- Blocked by: `ADR de recuperación aceptado y sign-off Privacy/Security del canal secure_link`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `ISSUE-160`
@@ -63,8 +63,10 @@ Revisar y respetar:
 Reglas obligatorias:
 
 - Recovery rota un token nuevo con lock transaccional; nunca devuelve ni intenta descifrar el anterior.
-- Solo `candidate_test` en `assigned|sent` es elegible; iniciado, entregado, expirado o cancelado falla con código canónico.
+- `candidate_test` en `assigned|sent|in_progress` es elegible; `expired` solo cuando nunca comenzó.
+  Recuperar `in_progress` no reinicia ni extiende el timer. Submitted/scored/cancelled falla con código canónico.
 - Un email recovery usa idempotencia nueva y no reemite `hiring.assessment.assigned`.
+- Los enlaces nuevos usan fragmento → sesión HttpOnly; ningún bearer nuevo viaja en path/query.
 
 ## Normative Docs
 
@@ -152,7 +154,7 @@ Reglas obligatorias:
 
 ### Migration, backfill and rollout
 
-- Migration posture: `additive` only for durable recovery audit/idempotency if existing audit cannot meet the contract.
+- Migration posture: `additive` para recovery audit/idempotency, sesión y redacción de payload histórico.
 - Default state: `disabled` until ADR acceptance, capability grants and abuse tests pass.
 - Backfill plan: none; existing tests are recovered only by an explicit new operator action.
 - Rollback path: disable capability/route, retain audit; no token rollback after a deliberate recovery.
@@ -160,10 +162,12 @@ Reglas obligatorias:
 
 ### Security and access
 
-- Auth/access gate: dedicated `hiring.assessment.recover_access` capability, role-only grants and authenticated actor.
+- Auth/access gate: capabilities separadas `hiring.assessment.recover_access_email` y
+  `hiring.assessment.reveal_access_link`, role-only grants and authenticated actor.
 - Sensitive data posture: bearer token plus candidate contact context; no raw token persistence or logs.
 - Error contract: sanitized `assessment_recovery_*` errors and no assessment-existence oracle beyond existing Hiring authorization.
-- Abuse/rate-limit posture: per-assessment recovery cooldown, concurrency lock, one-time reveal and audit.
+- Abuse/rate-limit posture: cooldown global 60 s, máximo 3 rotaciones/24 h por assessment,
+  concurrency lock, one-time operator reveal and audit.
 
 ### Runtime evidence
 
@@ -190,7 +194,8 @@ Reglas obligatorias:
 
 ### Slice 1 — Contrato, capability y recovery audit
 
-- Aceptar el ADR, definir reason/channel/TTL policy and register the dedicated capability/grants.
+- ADR aceptado 2026-08-19 con TTL email 14d, secure-link 24h start-by, sesión iniciada separada,
+  retención audit 12m y capabilities/grants separados.
 - Implementar command, error contract, idempotency, lock and IDs-only audit/outbox.
 
 ### Slice 2 — Canal email y enlace temporal
@@ -209,7 +214,7 @@ Reglas obligatorias:
 - El command rechaza assessment inexistente, ajeno a la candidatura, no `candidate_test`, o en estado distinto de `assigned|sent`, con códigos canónicos y sin revelar información sensible.
 - En éxito crea exactamente un token nuevo y su hash, invalida el anterior atómicamente y registra un evento/audit IDs-only con actor, razón, canal, resultado y estado previo.
 - `email` crea un nuevo source event/idempotency key y envía mediante la capa canónica sin reutilizar `hiring.assessment.assigned`; el resultado comunica despacho aceptado, no entrega garantizada.
-- `secure_link` revela una URL bearer temporal solo en la respuesta de esa solicitud y nunca en almacenamiento durable, logs, outbox, toast, query string o analítica. No se permite combinar canales en una misma recuperación.
+- `secure_link` revela una URL bearer temporal solo en la respuesta de esa solicitud y nunca en almacenamiento durable, logs, outbox, toast, path/query string o analítica. Usa fragmento → sesión HttpOnly. No se permite combinar canales en una misma recuperación.
 - Se aplican límites por assessment/canal y la fuente de delivery redacts/encripta cualquier contexto que podría contener la URL antes de persistirlo.
 
 ## Out of Scope
@@ -255,7 +260,14 @@ Capability grant and route exposure stay disabled until ADR acceptance and stagi
 
 ### Out-of-band coordination required
 
-Privacy/Security approval of manual bearer-link TTL and retention; consented candidate/test inbox for smoke.
+Privacy/Security/Product approval recorded in the accepted ADR. A consented candidate/test inbox remains required for smoke.
+
+## Progress log
+
+- 2026-08-19 — ADR accepted after independent Architecture, Talent and Security audits. Contract
+  tightened to fragment → HttpOnly session, separate capabilities, 24h manual start-by TTL,
+  14d email TTL, no generic retry from token-sensitive payloads, 12m IDs-only audit retention and
+  explicit in-progress recovery without timer extension.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING

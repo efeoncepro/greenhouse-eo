@@ -42,10 +42,11 @@ proyecciones históricas no tienen ningún `delivered`/bounce/engagement. `sent`
 no entrega al buzón. El handler existe pero debe corregir su resolución asíncrona de secretos antes de activar
 el webhook, porque hoy puede responder `200 ignored` durante cold start.
 
-Quedan creados `ISSUE-160`, ADR propuesto
+Quedan creados `ISSUE-160`, ADR aceptado el 2026-08-19
 `GREENHOUSE_HIRING_ASSESSMENT_ACCESS_RECOVERY_AND_EMAIL_DELIVERY_DECISION_V1.md` y tres tasks compactas:
-`TASK-1745` (webhook/reconciliación), `TASK-1746` (command de recovery con rotación y capability; requiere
-sign-off Privacy/Security para bearer link) y `TASK-1747` (consumer Application 360). Gates de las tres tasks
+`TASK-1745` (webhook/reconciliación), `TASK-1746` (ADR aceptado; command de recovery con rotación,
+capabilities separadas y enlace fragment→sesión HttpOnly; implementación local en curso) y `TASK-1747`
+(consumer Application 360). Gates de las tres tasks
 verdes. `TASK-1745` está ahora `in-progress`: el preflight confirmó que el dedupe existente no es
 transaccional y que un fallo posterior puede perder el evento en un retry. El fix preservará el sender
 outbound como boundary independiente y activará el webhook sólo después de un canary firmado. Todavía no hay
