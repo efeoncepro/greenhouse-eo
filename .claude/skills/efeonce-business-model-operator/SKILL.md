@@ -25,6 +25,11 @@ For recurring or bounded work that crosses Organizations, teams and Greenhouse/N
 load `docs/business-models/EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md`. Preserve the hierarchy
 `Organization → Engagement → Project/Campaign → Task`: the engagement governs the commercial commitment, while the
 project/campaign organizes delivery and never substitutes contract, pricing, capacity or commercial lifecycle.
+`Product Service` is not the generic name for everything sold. Classify capability, offer/service, engagement,
+project/campaign, deliverable/asset and productization level separately; an audiovisual campaign, media plan or
+brandbook is not a Product Service by default. For commercial-to-delivery handoff, the quote/SOW/contract remains
+the legal/commercial truth and the Engagement Activation Brief is the accepted executable snapshot; Gantt is an
+optional planning view, not a universal source of truth.
 The corporate 2028 direction requires every client-facing service to become productized and AI-native; use
 `docs/strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md` for maturity gates and
 exceptions.

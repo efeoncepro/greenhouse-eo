@@ -17,6 +17,11 @@ Antes de fijar packaging o pricing, usar `docs/business-models/EFEONCE_PRODUCT_S
 separar Product Service, nivel de productización, delivery model, operating mode y engagement. Pricing no debe
 convertir un delivery model —por ejemplo Managed Squad o Staff Augmentation— en una oferta distinta sin decisión
 de negocio explícita.
+Tampoco debe convertir toda venta en Product Service: cargar
+`docs/business-models/EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md`, clasificar primero oferta/servicio,
+capability, engagement, project/campaign, deliverable/asset y nivel de productización, y pricear la categoría real.
+Una campaña audiovisual, un plan de medios o un brandbook pueden ser servicio, project o deliverable sin ser Product
+Service.
 
 Para Creator Influence & Content, cargar además `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md` y el benchmark fechado `docs/audits/commercial/CREATOR_INFLUENCE_CONTENT_MARKET_RESEARCH_2026-07-29.md`. Sus bandas y porcentajes son hipótesis de validación: no sustituyen Finance, Legal ni el cost-to-serve real.
 El pricing de servicios 2028 debe poder operar sobre Product Services AI-native: separar people capacity, platform,
@@ -168,6 +173,7 @@ tracción.
 - No hay pricing defendible sin cost-to-serve, margen objetivo y sensibilidad.
 - Revenue recurrente necesita trigger contractual y evidencia de renovación.
 - Project, recurring, platform, usage, IP, pass-through y credits se separan.
+- Product Service no es sinónimo de oferta, proyecto ni entregable; pricing no puede otorgar esa madurez por etiqueta.
 - Credits nunca son dinero, horas, tokens, piezas ni derechos; requieren ledger, policy, expiración y owner.
 - Un servicio compuesto no transfiere ownership ni permite doble cobro de shared services.
 - Providers de agentes son adapters/pass-through gobernados, no automáticamente productos o partnerships.

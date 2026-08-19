@@ -34,6 +34,9 @@ La separación entre marca paraguas, línea de negocio/práctica, product brand,
 La definición transversal de oferta, productización, delivery model, operating mode y engagement vive en
 [`Efeonce Product Service Operating Model V1`](EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md). Los modelos de cada
 línea deben referenciarlo y declarar sus diferencias; no deben redefinir `Product Service` localmente.
+`Product Service` es una clasificación gobernada y una dirección de madurez, no un sinónimo de toda venta: servicios
+bespoke/estructurados, implementation, advisory, paquetes de producción y deliverables conservan su categoría real
+hasta superar los gates aplicables.
 
 La separación durable entre Organization, Commercial Engagement, Project/Campaign y Task —incluida la convivencia
 de engagements On-Going y On-Demand sobre los mismos contenedores operativos de Notion— vive en

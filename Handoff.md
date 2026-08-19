@@ -10,6 +10,11 @@ Campaigns como contenedores de tareas en Notion para un cliente; el Engagement e
 gobierna términos, capacidad, accountability, economics y cierre. On-Going y On-Demand comparten los mismos objetos
 operativos: un engagement puede contener uno o varios Projects/Campaigns.
 
+La activación venta→Delivery usa una `Ficha de Activación del Engagement` como snapshot ejecutable —sin reemplazar
+quote/SOW/contrato— y provisiona sólo la diferencia sobre la Organization. `Product Service` queda como
+clasificación condicional: campaña audiovisual, plan de medios, brandbook u otro deliverable/servicio conserva su
+categoría y madurez real. La Gantt es una vista opcional según complejidad, no un requisito ni otro SSOT.
+
 Estado honesto: **diseño conceptual Proposed; cero cambio de runtime**. El repo ya tiene `services`, phases,
 progress, outcomes, lineage, asignación de equipo por `service_id` y `notion_project_id`, pero `engagement_kind` no
 distingue un contrato regular On-Going de uno regular On-Demand y el catálogo documenta ambos como `retainer`.

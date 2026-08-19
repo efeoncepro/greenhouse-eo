@@ -10,6 +10,10 @@
   siendo contenedores de tareas para ejecutar trabajo del cliente.
 - Un engagement On-Going puede producir múltiples proyectos/campañas y uno On-Demand puede contener uno o varios;
   On-Demand describe un compromiso acotado, no un proyecto pequeño ni un retainer corto.
+- La venta se activa hacia Delivery mediante una Ficha de Activación que referencia quote/SOW/contrato, y crea sólo
+  la diferencia sobre el workspace durable. La Gantt es opcional y se deriva de Projects/Tasks.
+- `Product Service` no se usa como sinónimo de todo lo vendido: campaña audiovisual, plan de medios, brandbook y
+  otros servicios/deliverables conservan su categoría y nivel real de productización.
 - El contrato queda `Proposed` y sin cambio de runtime. La forma física sobre `services`, Notion, HubSpot, Finance,
   equipos y Client Portal requiere cohortes reales, task y ADR antes de implementarse.
 

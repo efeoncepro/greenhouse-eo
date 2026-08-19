@@ -31,6 +31,25 @@ Un Product Service no es simplemente una lista de servicios, una skill interna, 
 tecnológica, un equipo de personas ni un tarifario. Puede combinar todos esos elementos, pero debe declarar cómo
 se relacionan y qué outcome controlable compra el cliente.
 
+## Verdad actual versus dirección de madurez
+
+No todo lo que Efeonce vende hoy es un Product Service. Una oferta puede ser bespoke o estructurada; también puede
+ser implementation, advisory, capacidad gestionada, paquete de producción, derechos/pass-through o una composición.
+`Product Service` se declara sólo cuando la oferta supera el contrato y los gates de esta especificación.
+
+Tampoco se infiere desde el entregable: una campaña audiovisual puede ser un engagement/proyecto de producción; un
+plan de medios puede ser un entregable o advisory; un brandbook es normalmente un deliverable/asset dentro del
+trabajo de marca. Ninguno se vuelve Product Service por tener nombre, precio o repetirse ocasionalmente.
+
+La dirección corporativa 2028 exige transformar el portfolio, no reetiquetar el presente. Registrar siempre dos
+hechos separados:
+
+1. `contracted_offer_kind`: qué servicio, oferta, capability o composición compró el cliente;
+2. `productization_level`: `bespoke | structured | productized | platform-enabled | managed | self-service`.
+
+La clasificación completa y su relación con Engagement, Project/Campaign y Deliverable vive en
+[`Efeonce Engagement–Project Operating Model V1`](EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md).
+
 ## 2028 portfolio requirement
 
 Para 2028, ningún servicio client-facing de Efeonce debe permanecer como trabajo bespoke no sistematizado. Todo
