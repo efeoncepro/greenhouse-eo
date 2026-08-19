@@ -611,6 +611,11 @@ export interface DecideHiringApplicationResult {
 }
 
 export interface ListTalentDemandFilters {
+  /**
+   * TASK-1739 — `true` incluye datos NO reales (seeds/smokes/demo). Default `false`: los readers
+   * operativos no cuentan fantasmas. La procedencia es ortogonal a `source` (canal de llegada).
+   */
+  includeSynthetic?: boolean
   status?: TalentDemandStatus
   stakeholderType?: TalentDemandStakeholderType
   organizationId?: string
@@ -621,6 +626,11 @@ export interface ListTalentDemandFilters {
 }
 
 export interface ListHiringOpeningFilters {
+  /**
+   * TASK-1739 — `true` incluye datos NO reales (seeds/smokes/demo). Default `false`: los readers
+   * operativos no cuentan fantasmas. La procedencia es ortogonal a `source` (canal de llegada).
+   */
+  includeSynthetic?: boolean
   demandId?: string
   status?: HiringOpeningStatus
   publicationStatus?: HiringOpeningPublicationStatus
@@ -630,6 +640,11 @@ export interface ListHiringOpeningFilters {
 }
 
 export interface ListHiringApplicationFilters {
+  /**
+   * TASK-1739 — `true` incluye datos NO reales (seeds/smokes/demo). Default `false`: los readers
+   * operativos no cuentan fantasmas. La procedencia es ortogonal a `source` (canal de llegada).
+   */
+  includeSynthetic?: boolean
   openingId?: string
   identityProfileId?: string
   stage?: HiringApplicationStage

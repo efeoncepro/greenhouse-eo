@@ -494,6 +494,12 @@ export const listTalentDemands = async (filters: ListTalentDemandFilters = {}): 
   const clauses: string[] = []
   const values: unknown[] = []
 
+  // TASK-1739 — Los readers operativos excluyen datos no reales por defecto. `includeSynthetic`
+  // es el opt-in EXPLÍCITO; nunca se filtra por procedencia con un WHERE escrito a mano.
+  if (!filters.includeSynthetic) {
+    clauses.push(`data_origin = 'real'`)
+  }
+
   if (filters.status) {
     values.push(filters.status)
     clauses.push(`status = $${values.length}`)
@@ -550,6 +556,12 @@ export const getHiringOpeningById = async (openingId: string): Promise<HiringOpe
 export const listHiringOpenings = async (filters: ListHiringOpeningFilters = {}): Promise<HiringOpening[]> => {
   const clauses: string[] = []
   const values: unknown[] = []
+
+  // TASK-1739 — Los readers operativos excluyen datos no reales por defecto. `includeSynthetic`
+  // es el opt-in EXPLÍCITO; nunca se filtra por procedencia con un WHERE escrito a mano.
+  if (!filters.includeSynthetic) {
+    clauses.push(`data_origin = 'real'`)
+  }
 
   if (filters.demandId) {
     values.push(filters.demandId)
@@ -626,6 +638,12 @@ export const listHiringApplications = async (
 ): Promise<HiringApplication[]> => {
   const clauses: string[] = []
   const values: unknown[] = []
+
+  // TASK-1739 — Los readers operativos excluyen datos no reales por defecto. `includeSynthetic`
+  // es el opt-in EXPLÍCITO; nunca se filtra por procedencia con un WHERE escrito a mano.
+  if (!filters.includeSynthetic) {
+    clauses.push(`data_origin = 'real'`)
+  }
 
   if (filters.openingId) {
     values.push(filters.openingId)

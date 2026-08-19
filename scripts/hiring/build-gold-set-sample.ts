@@ -96,11 +96,22 @@ const main = async () => {
        JOIN greenhouse_hiring.hiring_question q ON q.question_id = r.question_id
        JOIN greenhouse_hiring.hiring_competency c ON c.competency_id = r.competency_id
        JOIN greenhouse_hiring.hiring_assessment a ON a.assessment_id = r.assessment_id
+       JOIN greenhouse_hiring.hiring_application ha ON ha.application_id = a.application_id
        LEFT JOIN greenhouse_hiring.hiring_assessment_template t ON t.template_id = a.template_id
        LEFT JOIN greenhouse_hiring.hiring_assessment_template_module m
               ON m.template_id = a.template_id AND m.competency_id = r.competency_id
       WHERE q.type IN ('open_text', 'situational')
         AND r.answer_json->>'text' IS NOT NULL
+        -- TASK-1739 — Exclusión de datos sintéticos SIN opt-in y SIN flag.
+        --
+        -- Esto es evidencia de un gate de PROMOCIÓN: no existe razón legítima para calibrar el
+        -- scoring de candidatos reales contra una respuesta inventada. Hasta ahora la única
+        -- protección era accidental —los seeds no se califican a mano y buildGoldSetSample sólo
+        -- estratifica lo que tiene priorHumanScore—, así que la muestra del 2026-08-16 salió
+        -- limpia por SUERTE, no por construcción. El día que alguien calificara un seed para probar
+        -- el flujo de corrección humana, entraría al gold set. La procedencia se hereda por JOIN:
+        -- hiring_assessment_response no lleva columna propia (una sola verdad por entidad).
+        AND ha.data_origin = 'real'
         AND ($1::text IS NULL OR a.template_id = $1::text)
       ORDER BY r.response_id`,
     [templateFilter],
@@ -136,7 +147,9 @@ const main = async () => {
     generatedAt,
     raterTrainingReference: 'docs/documentation/hr/gold-set-rubrica-de-anclaje.md',
     notes:
-      'Muestra estratificada de respuestas REALES de candidatos (competencia × banda de score previo), ' +
+      'Muestra estratificada de respuestas REALES de candidatos (competencia × banda de score previo). ' +
+      'Procedencia: se excluyen postulaciones no reales (data_origin <> real, TASK-1739) SIN opt-in — ' +
+      'no existe razón legítima para calibrar contra una respuesta inventada. ' +
       'anonimizada: sin nombre, email, responseId ni score previo; texto pasado por redactCandidateContactText. ' +
       'Ratings VACÍOS a propósito — los emite una persona con la BARS ' +
       '(protocolo: docs/manual-de-uso/hr/calificar-gold-set-de-referencia.md). ' +

@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { isHiringSyntheticDataFilterEnabled } from './data-origin/config'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import type {
   HiringDeskApplicationSummary,
@@ -14,6 +15,12 @@ import {
 } from './store'
 
 interface HiringDeskSnapshotInput {
+  /**
+   * TASK-1739 — opt-in explícito para ver también datos no reales. Default: el desk NO cuenta
+   * fantasmas. Mientras `HIRING_SYNTHETIC_DATA_FILTER_ENABLED` esté OFF el filtro no se aplica y el
+   * desk se comporta exactamente como antes.
+   */
+  includeSynthetic?: boolean
   openingId?: string
   query?: string
   openingLimit?: number
@@ -78,23 +85,32 @@ export const getHiringDeskSnapshot = async (
   const applicationLimit = clampLimit(input.applicationLimit, 100)
   const normalizedQuery = input.query?.trim().toLocaleLowerCase('es-CL') ?? ''
 
+  // TASK-1739 — El filtro llega detrás de flag. Con el flag OFF el desk incluye todo, que es el
+  // comportamiento previo exacto; con el flag ON deja de contar fantasmas. El caller puede pedir
+  // ver sintéticos explícitamente, y ese opt-in gana sobre el flag.
+  const includeSynthetic = input.includeSynthetic ?? !isHiringSyntheticDataFilterEnabled()
+  // Los dos agregados corren sobre SQL propio: si el filtro no viajara también acá, los KPIs
+  // seguirían contando lo que las listas ya no muestran — el desk mostraría totales que no cuadran.
+  const originFilter = includeSynthetic ? '' : ` AND data_origin = 'real'`
+  const originWhere = includeSynthetic ? '' : ` WHERE data_origin = 'real'`
+
   const [demands, openings, applications, counts, totals] = await Promise.all([
-    listTalentDemands({ limit: 120 }),
-    listHiringOpenings({ limit: openingLimit }),
-    listHiringApplications({ openingId: input.openingId, limit: applicationLimit }),
+    listTalentDemands({ limit: 120, includeSynthetic }),
+    listHiringOpenings({ limit: openingLimit, includeSynthetic }),
+    listHiringApplications({ openingId: input.openingId, limit: applicationLimit, includeSynthetic }),
     runGreenhousePostgresQuery<OpeningCountRow>(
       `SELECT opening_id,
               COUNT(*)::int AS application_count,
               COUNT(*) FILTER (WHERE stage NOT IN ('rejected', 'withdrawn', 'closed'))::int AS active_application_count
-       FROM greenhouse_hiring.hiring_application
+       FROM greenhouse_hiring.hiring_application${originWhere}
        GROUP BY opening_id`,
     ),
     runGreenhousePostgresQuery<TotalsRow>(
       `SELECT
-         (SELECT COUNT(*) FROM greenhouse_hiring.hiring_opening)::int AS openings,
-         (SELECT COUNT(*) FROM greenhouse_hiring.hiring_application)::int AS applications,
-         (SELECT COUNT(*) FROM greenhouse_hiring.hiring_opening WHERE publication_status = 'published')::int AS published_openings,
-         (SELECT COUNT(*) FROM greenhouse_hiring.talent_demand WHERE status NOT IN ('fulfilled', 'cancelled'))::int AS active_demands`,
+         (SELECT COUNT(*) FROM greenhouse_hiring.hiring_opening${originWhere})::int AS openings,
+         (SELECT COUNT(*) FROM greenhouse_hiring.hiring_application${originWhere})::int AS applications,
+         (SELECT COUNT(*) FROM greenhouse_hiring.hiring_opening WHERE publication_status = 'published'${originFilter})::int AS published_openings,
+         (SELECT COUNT(*) FROM greenhouse_hiring.talent_demand WHERE status NOT IN ('fulfilled', 'cancelled')${originFilter})::int AS active_demands`,
     ),
   ])
 
