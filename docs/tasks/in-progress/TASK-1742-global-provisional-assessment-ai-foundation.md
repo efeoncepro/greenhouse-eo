@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-011`
-- Status real: `En ejecución end-to-end por autorización explícita del operador; rollout parte OFF y exige gates antes de activar producción`
+- Status real: `Operativa en producción y en observación: global_provisional activo para todas las vacantes, worker/scheduler saludables y canary exacto verde; lifecycle permanece in-progress hasta registrar cooldown, rollback/residual cero y sign-offs/risk acceptance trazables`
 - Rank: `1`
 - Domain: `hr`
 - Blocked by: `none`
@@ -89,7 +89,7 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- Bloquea TASK-1743, consumer UI del resultado provisional.
+- TASK-1743 cerró como consumer UI del resultado provisional.
 - Recalibra parcialmente el rollout de TASK-1734 mediante ADR/delta explícito; no reabre ni reescribe su historia.
 - Impacta ops-worker, App API, flag ledger, runbook y señales de confiabilidad.
 
@@ -182,19 +182,19 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] La lógica provisional y de backfill vive en primitives server-side, no en la UI.
-- [ ] Read y write tienen capability fina, idempotencia, audit, errores canónicos y observabilidad.
-- [ ] App API y CLI/worker consumen el mismo command/reader.
-- [ ] El write conserva `propose → confirm → execute` para cualquier materialización efectiva.
-- [ ] Cero integración Nexa/MCP específica dentro de esta task.
+- [x] La lógica provisional y de backfill vive en primitives server-side, no en la UI.
+- [x] Read y write tienen capability fina, idempotencia, audit, errores canónicos y observabilidad.
+- [x] App API y CLI/worker consumen el mismo command/reader.
+- [x] El write conserva `propose → confirm → execute` para cualquier materialización efectiva.
+- [x] Cero integración Nexa/MCP específica dentro de esta task.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -304,16 +304,26 @@ Slice 1 → Slice 2 → Slice 3 → Slice 4 → Slice 5. Ninguna respuesta real 
 
 ## Acceptance Criteria
 
-- [ ] Todos los nuevos candidate tests de todas las vacantes generan run/propuesta o abstención explícita sin allowlist por opening.
-- [ ] El provisional se deriva separado y no modifica `human_score`, assessment status/finalization, rollup o application score/stage.
-- [ ] Sanitizer único elimina PII embebida y bloquea/rutea injection, malformed, off-topic y OOD antes del provider; tests inspeccionan el payload exacto.
-- [ ] App API/CLI permite dry-run y start/backfill exacto/acotado con capability, actor, reason, idempotencia y readback.
-- [ ] Policy evidence binding impide mecánicamente `exception_canary|calibrated_batch` con evidencia ausente o stale.
-- [ ] Replays no duplican runs, scores ni gasto y rollback deja residual cero sin borrar audit.
-- [ ] Candidate/public/client/email negative probes prueban cero score, rationale, confianza o review state.
-- [ ] Lucero queda evaluada en `global_provisional` y el runtime prueba cero mutación efectiva.
-- [ ] No existe ranking, stage move, decisión, test assignment, email, handoff, MCP ni B2B access.
-- [ ] Staging y production evidencian flags, scheduler, cost cap, señales y rollback reales.
+- [x] Todos los nuevos candidate tests de todas las vacantes generan run/propuesta o abstención explícita sin allowlist por opening.
+- [x] El provisional se deriva separado y no modifica `human_score`, assessment status/finalization, rollup o application score/stage.
+- [x] Sanitizer único elimina PII embebida y bloquea/rutea injection, malformed, off-topic y OOD antes del provider; tests inspeccionan el payload exacto.
+- [x] App API/CLI permite dry-run y start/backfill exacto/acotado con capability, actor, reason, idempotencia y readback.
+- [x] Policy evidence binding impide mecánicamente `exception_canary|calibrated_batch` con evidencia ausente o stale.
+- [ ] Replays no duplican runs, scores ni gasto y rollback deja residual cero sin borrar audit. Los tests de replay están verdes; falta registrar un ensayo productivo de rollback con residual cero.
+- [x] Candidate/public/client/email negative probes prueban cero score, rationale, confianza o review state.
+- [x] Lucero queda evaluada en `global_provisional` y el runtime prueba cero mutación efectiva.
+- [x] No existe ranking, stage move, decisión, test assignment, email, handoff, MCP ni B2B access desde este carril.
+- [ ] Staging y production evidencian flags, scheduler y cost cap reales; falta cerrar cooldown y ensayo productivo de rollback/señales residuales.
+
+## Evidencia operativa — 2026-08-18
+
+- Release productivo: SHA `7e7a474217eb1bdd1f68f9dffa94c20333cefb6f`, run `32193134959`, Vercel `Ready`.
+- `ops-worker-00584-r4x` sirve el SHA exacto; el watchdog verificó 4/4 workers sincronizados.
+- `ops-assessment-ai-drain` está activo cada dos minutos y sus POST observados responden `200`.
+- Runtime efectivo: `global_provisional`, enqueue/master ON, exception policy OFF, concurrencia `1`, cap diario `1000`.
+- Canary exacto: application `happ-031318c2-02ce-4623-8ada-6970cf4a8fb4`, assessment `asmt-bbe4ea36-2f90-4d7c-b295-91663d3be254`; run/proyección leídos sin materializar score efectivo.
+- `exception_canary` y `calibrated_batch` permanecen fail-closed por falta de evidence digest vigente; no son condición de este rollout provisional.
+- Pendiente de cierre administrativo: cooldown documentado, rollback/residual cero y sign-offs/risk acceptance trazables de Talent/Privacy/Security.
 
 ## Verification
 

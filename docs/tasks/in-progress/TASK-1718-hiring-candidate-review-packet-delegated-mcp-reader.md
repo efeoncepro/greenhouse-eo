@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-011`
-- Status real: `Código desplegado en producción: reader exacto, visor directo, proyección minimizada, App API, OAuth separado, audit y dos tools MCP implementados. Release 6b78b040252d-d0d36c25-3634-4567-8be5-a807272e0ccb / run 31949566099 terminó released; CI, Deep, build, smoke E2E, watchdog, 197 pruebas focales Greenhouse, 56 pruebas MCP y GVC sintético desktop/mobile están verdes. La migración aditiva está aplicada al Cloud SQL compartido sin backfill. Los flags de reader/projection/provider documental permanecen OFF y faltan sign-offs Privacy/Security/Talent/Identity/MCP más canary sintético antes de cualquier CV real.`
+- Status real: `Operativa en producción para uso interno delegado: reader/proyección/provider ON, App API exacta y dos tools MCP verificadas con OAuth real sobre una application exacta; chunks/hash y deny no autenticado verdes. Permanece in-progress hasta documentar sign-offs Privacy/Security/Talent/Identity/MCP, prueba revoked/base-only y rollback/revocación ejercitados. B2B continúa fuera de alcance.`
 - Rank: `TBD`
 - Domain: `hr|platform|identity|data`
 - Blocked by: `none`
@@ -623,7 +623,7 @@ selector sensible es `applicationId`, y Greenhouse resuelve todas sus relaciones
 - [x] Gateway expone exactamente dos tools read-only y no accede a DB, storage ni URLs del candidato.
 - [ ] Provider y reader nacen OFF; rollback y revocación fueron ejercitados, no sólo documentados.
 - [ ] Allow/deny/revoked/base-only se prueban con identidades reales en staging.
-- [ ] Fixtures adversariales prueban IDOR, prompt injection, PII sentinel, parser limits, quarantine y stale hash.
+- [x] Fixtures adversariales prueban IDOR, prompt injection, PII sentinel, parser limits, quarantine y stale hash.
 - [ ] Codex y Claude leen todos los chunks de un packet sintético y abstienen si falta evidencia.
 - [x] Ningún análisis produce write-back, ranking, decisión, stage move, assessment assignment o email.
 - [x] Manuales, OpenAPI/contracts, runbooks, architecture, feature flag ledger y provider catalog quedan alineados.
@@ -643,8 +643,12 @@ Evidencia local 2026-08-16:
 - GVC premium desktop/390 pasó sobre `/agency/hiring/talent-pool/mockup`, harness sintético que responde 404 en
   producción: siete frames, cero PII real, cero errores de consola/hydration/red, cero findings axe y teclado/reduced
   motion verdes. Evidencia: `.captures/2026-08-16T12-22-58_hiring-talent-pool-desk`.
-- No se ejecutó backfill ni lectura de CV real por MCP. Esta ausencia es intencional hasta completar los gates
-  restantes, no evidencia de rollout.
+- Activación productiva 2026-08-18: Greenhouse reader/proyección y provider documental quedaron habilitados para
+  el cliente interno dedicado; el gateway conserva el acceso read-only y exacto por application.
+- Canary OAuth/MCP real sobre `happ-031318c2-02ce-4623-8ada-6970cf4a8fb4`: initialize `200`, review `200`,
+  un chunk, `expectedContentHash` ligado y gateway sin autenticación `401`. No se expusieron tokens ni CV en logs.
+- El canary técnico no sustituye los sign-offs nominales ni prueba todavía revocación/base-only end-to-end; por eso
+  la task conserva lifecycle `in-progress` aunque la superficie interna esté operativa.
 
 - `pnpm task:lint --task TASK-1718`
 - `pnpm ops:lint --changed`

@@ -95,6 +95,7 @@ const main = async () => {
 
     const demand = await createTalentDemand(
       {
+        dataOrigin: 'smoke_test',
         stakeholderType: 'internal',
         engagementType: 'on_going',
         fulfillmentMode: 'internal_hire',
@@ -106,7 +107,10 @@ const main = async () => {
 
     ids.demandId = demand.demandId
 
-    const opening = await createHiringOpening({ demandId: demand.demandId, internalTitle: 'SMOKE-356 opening' }, ACTOR)
+    const opening = await createHiringOpening(
+      { dataOrigin: 'smoke_test', demandId: demand.demandId, internalTitle: 'SMOKE-356 opening' },
+      ACTOR,
+    )
 
     ids.openingId = opening.openingId
 

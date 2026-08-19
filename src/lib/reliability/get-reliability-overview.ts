@@ -219,6 +219,7 @@ import { getWorkforceHiringActivationStuckSignal } from './queries/workforce-hir
 // TASK-1734 Slice 6 — Assessment AI scoring run signals (moduleKey 'hiring').
 import { getHiringAssessmentAiRunSignals } from './queries/hiring-assessment-ai-run-signals'
 // TASK-1736 Slice 4 — Candidate identity intake signals (moduleKey 'hiring').
+import { getHiringDataOriginDerivationDriftSignal } from './queries/hiring-data-origin-drift'
 import { getHiringCandidateIdentitySignals } from './queries/hiring-candidate-identity-signals'
 import { getKnowledgeQuarantineCountSignal } from './queries/knowledge-quarantine-count'
 import { getKnowledgeSyncFailedSourceSignal } from './queries/knowledge-sync-failed-source'
@@ -722,6 +723,7 @@ interface ReliabilityOverviewSources {
   hiringAssessmentAiRun?: ReliabilitySignal[] | null
   /** TASK-1736 — Candidate identity intake (needs_review backlog + evidence coverage gap). */
   hiringCandidateIdentity?: ReliabilitySignal[] | null
+  hiringDataOriginDrift?: ReliabilitySignal | null
   workforceHiringActivationStuck?: ReliabilitySignal | null
   knowledgeSyncFailedSource?: ReliabilitySignal | null
   knowledgeNotionIngestDeadLetter?: ReliabilitySignal | null
@@ -1218,6 +1220,7 @@ export const buildReliabilityOverview = (
     ...(sources.hiringAssessmentAiRun ?? []),
     // TASK-1736 — Identidad del intake de candidatos (2 señales, steady=0; flag OFF ⇒ ok).
     ...(sources.hiringCandidateIdentity ?? []),
+    ...(sources.hiringDataOriginDrift ? [sources.hiringDataOriginDrift] : []),
     ...(sources.workforceHiringActivationStuck ? [sources.workforceHiringActivationStuck] : []),
     ...(sources.knowledgeSyncFailedSource ? [sources.knowledgeSyncFailedSource] : []),
     ...(sources.knowledgeNotionIngestDeadLetter ? [sources.knowledgeNotionIngestDeadLetter] : []),
@@ -1905,6 +1908,12 @@ export const getReliabilityOverview = async (
     preloadedSources.hiringCandidateIdentity !== undefined
       ? preloadedSources.hiringCandidateIdentity
       : await getHiringCandidateIdentitySignals().catch(() => null)
+
+  // TASK-1739 — divergencia entre la procedencia derivada de la postulación y sus dos raíces.
+  const hiringDataOriginDrift =
+    preloadedSources.hiringDataOriginDrift !== undefined
+      ? preloadedSources.hiringDataOriginDrift
+      : await getHiringDataOriginDerivationDriftSignal().catch(() => null)
 
   const knowledgeSyncFailedSource =
     preloadedSources.knowledgeSyncFailedSource !== undefined
@@ -2746,6 +2755,7 @@ export const getReliabilityOverview = async (
     hiringInternalHireAwaitingOnboarding,
     hiringAssessmentAiRun,
     hiringCandidateIdentity,
+    hiringDataOriginDrift,
     workforceHiringActivationStuck,
     knowledgeSyncFailedSource,
     knowledgeNotionIngestDeadLetter,

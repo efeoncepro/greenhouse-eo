@@ -1888,3 +1888,36 @@ manual `docs/manual-de-uso/hr/operar-expediente-de-evaluacion.md` +
   payload: el contenido público puede traer copy aprobado, y un log no es el lugar para volcarlo) antes de
   degradar al fallback de prosa legacy. La degradación sigue siendo el comportamiento correcto; lo que cambia
   es que ahora es observable en vez de invisible.
+
+## Delta 2026-08-18 — Procedencia de datos (TASK-1739)
+
+El dominio incorpora `data_origin` (`real|synthetic_seed|smoke_test|demo`) como **hecho declarado en
+el nacimiento del dato**, ortogonal a `source` (canal de llegada). Dos raíces —`identity_profiles`
+(persona) y `talent_demand`/`hiring_opening` (demanda)— más una copia derivada por trigger en
+`hiring_application`, que es donde el desk filtra.
+
+Invariantes duros:
+
+- **`real` es el default y no se discute.** Omitir la declaración deja el dato visible; el default
+  inverso ocultaría un candidato real en silencio.
+- **La postulación no elige su procedencia**: la deriva un trigger desde sus dos raíces y gana el
+  no-real. Entre dos no-real distintas gana la **más protectora**, para que una fila derivada nunca
+  quede sujeta a una purga más agresiva que la de sus raíces.
+- **Marcar una raíz obliga a propagar** en la misma transacción: el trigger no dispara si nadie toca
+  la fila dependiente, así que sin propagación la copia queda obsoleta en el 100 % de los marcados.
+  Detector: señal `hiring.data_quality.data_origin_derivation_drift` (steady 0).
+- **Una vacante no-real NUNCA se publica** (`publishOpening`, 422). Es la pieza preventiva: ocho
+  vacantes de smoke llegaron a estar publicadas en el careers real.
+- **El gold set excluye sintéticos sin flag ni opt-in.** Es evidencia de un gate de promoción. Al
+  auditar la base ya existía una respuesta `smoke_test` con `human_score`, elegible para la muestra.
+- **La retención y el compliance son CIEGOS a la procedencia**, y la procedencia **nunca gatea
+  comunicaciones** (eso lo decide el consentimiento).
+- **Nunca se marca sintética a una persona con vida laboral** (members, contractor, finiquito,
+  relación legal): tocaría payroll.
+- **Purga archive-first.** `hiring_assessment` cascadea desde la postulación, así que un DELETE
+  destruiría respuestas calificadas por humanos. El lane de borrado exige cero dependientes sobre los
+  **diez** verificados contra PG y aborta la corrida completa si una fila no califica.
+
+Flag `HIRING_SYNTHETIC_DATA_FILTER_ENABLED` (Vercel-only, default OFF) gatea sólo el filtro de desk y
+talent pool. Docs: funcional `docs/documentation/hr/procedencia-de-datos-hiring.md`; manual
+`docs/manual-de-uso/hr/operar-procedencia-de-datos-hiring.md`.

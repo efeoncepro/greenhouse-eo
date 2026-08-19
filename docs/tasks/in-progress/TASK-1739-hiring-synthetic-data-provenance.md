@@ -132,6 +132,44 @@ Consecuencias ya materializadas o a un paso de materializarse:
      ZONE 1 — CONTEXT & CONSTRAINTS
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-18 (3) — Ejecución: slices 1-6 implementados, marcado y archivado APLICADOS
+
+Estado: `code complete, rollout pendiente`. Diez commits, todos locales (sin push).
+
+**Implementado y verificado contra PG real:** columna en las 2 raíces + derivada por trigger + audit
+append-only (Slice 1) · commands declaran, trigger deriva, `publishOpening` rechaza lo no-real, 7 seeds
+declarados (Slice 2) · gold set excluye sin flag, desk filtra tras flag, fila en el ledger (Slice 3) ·
+marcado gobernado con plan/allowlist/apply CAS/rollback + CLI (Slice 4) · purga archive-first con
+preflight de 10 dependientes + CLI (Slice 5) · gate de CI + señal de divergencia (Slice 6) · triple
+documentación.
+
+**Ejecutado con autorización del CEO (2026-08-18):**
+
+- **71 marcas** (`actor_user_id=user-efeonce-admin-julio-reyes`), de 55 entradas de allowlist revisada
+  + 16 de live tests. Resultado: 22 de 24 vacantes, 22 de 24 demandas, 11 personas y 32 postulaciones
+  quedaron como `smoke_test`. **Las 2 vacantes reales vivas (`EO-OPN-0009`, `EO-OPN-0061`) siguen
+  `real`**, verificado explícitamente antes y después.
+- **32 archivados** (lane A, reversible desde el audit).
+- Señal de divergencia en `ok`: la propagación funcionó en las 71 marcas.
+- Efecto medido del filtro: el desk pasa de **24 vacantes / 79 postulaciones** a **2 / 47**.
+
+**Hallazgo que valida la tesis de la task:** ya existía una respuesta sintética (`smoke_test`,
+`open_text`, 1010 caracteres) con `human_score = 90.00`, **elegible para el gold set**. La spec lo
+proyectaba como riesgo futuro ("el día que alguien califique un seed"); ya había ocurrido. La exclusión
+del gold set no era preventiva: era **correctiva**.
+
+**Pendiente, y por qué:**
+
+- **Lane B (borrado de 9 huérfanas)**: NO ejecutado a propósito. Es irreversible y su valor es bajo —
+  archivar ya las saca de toda lectura. Queda a decisión explícita.
+- **Push + deploy + flip del flag**: el código vive en commits locales, así que ni staging (`develop`)
+  ni producción (`main`) lo tienen. Prender el flag antes del deploy lo dejaría latente y se activaría
+  solo al aterrizar el código, sin flip controlado. Orden: push → deploy → flip staging → verificar →
+  flip producción.
+- **Capabilities `hiring.data_origin.mark`/`.purge`**: deferidas deliberadamente. Hoy la operación es
+  por CLI con actor registrado y sin superficie API/UI; una capability que ningún `can()` verifica da
+  falsa garantía. Se declaran cuando aterrice el consumer.
+
 ## Architecture Alignment
 
 Revisar y respetar:
@@ -829,6 +867,13 @@ Se usan sólo para *proponer* en el dry-run, con confianza declarada, y un human
 allowlist línea por línea. La marca `data_origin` se escribe **al crear**, nunca se infiere después.
 
 ## Follow-ups
+
+- **`scripts/hiring/verify-growth-forms-application-smoke.ts` queda BLOQUEADO por la guarda del
+  Slice 2 y necesita adaptación propia.** Declara `smoke_test` (la verdad) y por lo tanto ya no puede
+  publicar. Es el productor de las 8 vacantes `TASK-1372 SMOKE` que quedaron publicadas en el careers
+  real, y **no tiene teardown**. Dos salidas legítimas: que deje de necesitar la superficie pública
+  real, o que limpie lo que crea. Marcar su vacante como `real` para destrabarlo NO es una salida:
+  fabricaría otra vez fantasmas indistinguibles de una vacante verdadera.
 
 - Superficie UI de procedencia (badge en el desk, toggle "incluir sintéticos" gateado por capability,
   vista de administración): task `ui-ux` propia con wireframe.

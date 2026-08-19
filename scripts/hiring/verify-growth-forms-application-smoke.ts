@@ -50,6 +50,7 @@ const main = async () => {
 
   const demand = await createTalentDemand(
     {
+      dataOrigin: 'smoke_test',
       stakeholderType: 'internal',
       engagementType: 'on_going',
       fulfillmentMode: 'internal_hire',
@@ -60,7 +61,7 @@ const main = async () => {
   )
 
   const opening = await createHiringOpening(
-    { demandId: demand.demandId, internalTitle: `TASK-1372 SMOKE opening ${stamp}` },
+    { dataOrigin: 'smoke_test', demandId: demand.demandId, internalTitle: `TASK-1372 SMOKE opening ${stamp}` },
     actor
   )
 
@@ -78,6 +79,17 @@ const main = async () => {
     actor
   )
 
+  // TASK-1739 — ⚠️ ESTE SMOKE ESTÁ BLOQUEADO A PROPÓSITO desde que declara su procedencia real.
+  //
+  // `publishOpening` rechaza publicar una vacante `smoke_test`, así que esta línea falla. No es una
+  // regresión: es la guarda atrapando justo a la herramienta que causó el problema. Este script creó
+  // 8 vacantes (`TASK-1372 SMOKE`) que quedaron PUBLICADAS en el careers real y **nunca las limpió**
+  // —no tiene teardown—, y que ningún candidato externo postulara a ellas fue suerte, no diseño.
+  //
+  // Adaptarlo es trabajo propio, no un parche acá: o el smoke deja de necesitar la superficie pública
+  // real, o limpia lo que crea. Marcar su vacante como `real` para "destrabarlo" sería volver a
+  // fabricar fantasmas indistinguibles de una vacante verdadera, que es exactamente lo que esta task
+  // existe para terminar.
   const publishedOpening = await publishOpening(opening.openingId, actor)
 
   const authored = await authorDraftForm({

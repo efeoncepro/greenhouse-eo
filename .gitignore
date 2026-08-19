@@ -132,3 +132,4 @@ public/growth-meetings/BUILDINFO.json
 public/growth-meetings/icons.css
 public/growth-cta/*.js
 public/growth-cta/BUILDINFO.json
+*.synthetic-origin-allowlist.json

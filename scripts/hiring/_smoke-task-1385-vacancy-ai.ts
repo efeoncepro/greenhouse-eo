@@ -27,6 +27,7 @@ const main = async () => {
   try {
     const demand = await createTalentDemand(
       {
+        dataOrigin: 'smoke_test',
         stakeholderType: 'internal',
         engagementType: 'on_going',
         fulfillmentMode: 'internal_hire',
@@ -45,6 +46,7 @@ const main = async () => {
 
     const opening = await createHiringOpening(
       {
+        dataOrigin: 'smoke_test',
         demandId: demand.demandId,
         internalTitle: `SEO Specialist Senior (${marker})`,
         seniority: 'senior',

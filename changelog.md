@@ -3,6 +3,33 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-18 — Evaluación provisional automática y CV por MCP interno
+
+- Los assessments elegibles de cualquier vacante generan ahora evaluación IA provisional en segundo plano para
+  operadores. No cambia el score efectivo y el postulante no recibe resultado, rationale ni estado de revisión.
+- El expediente auto-propone análisis con CV procesado + assessment puntuado; la confirmación sigue siendo humana.
+- Los agentes internos pueden leer el review packet exacto por MCP con CV minimizado/redactado y ligado a hash.
+  Sin contacto, PDF crudo, ranking, decisiones, writes ni acceso B2B.
+- La UI operator-only quedó compactada y validada GVC 4,82/5; su último ajuste visual aún espera promoción
+  ordinaria. TASK-1742/1718 conservan observación, rollback y firmas pendientes.
+
+## 2026-08-18 — Un dato de prueba de Hiring ya no puede hacerse pasar por un candidato real
+
+- **La procedencia ahora es un hecho declarado, no una adivinanza.** Cada persona y cada vacante dice
+  si representa algo del mundo real, y la postulación lo hereda de ambas. Antes la única forma de
+  distinguir un seed de un candidato era adivinar por el nombre, y esa adivinanza falla en las dos
+  direcciones: hay una respuesta REAL de un candidato que dice "pequeñas pruebas o pilotos" y que un
+  barrido por regex habría borrado como basura.
+- **Omitir la declaración deja el dato visible, nunca oculto.** Es deliberado: la suciedad es molesta
+  y evidente; perder un candidato real sería grave e invisible.
+- **Una vacante de prueba ya no se puede publicar.** Ocho llegaron a estar publicadas en el careers
+  real y que ningún candidato externo postulara fue suerte. La guarda bloqueó el día uno al smoke que
+  las creaba, que además nunca limpiaba lo que dejaba.
+- **La IA deja de poder calibrarse contra respuestas inventadas.** El gold set excluye datos sintéticos
+  sin interruptor para volver atrás: es evidencia de un gate de promoción, no una preferencia.
+- **El desk podrá dejar de contar fantasmas**, detrás de un flag que nace apagado y con aviso previo a
+  HR, porque 12 de 14 vacantes son sintéticas y sin contexto eso se lee como pérdida de datos.
+
 ## 2026-08-18 — Los dos flags que quedaron "ON con pendiente" ya tienen su verificación hecha
 
 - **Canary de identidad del intake (TASK-1736), ejecutado y verde.** Los 5 puntos del runbook contra PG
@@ -959,45 +986,3 @@ module-gated sin módulo, `organization_unresolved` para sesión sin organizaci�
   un assignment, no código.
 - Persona de verificación con organización configurable, con 4 condiciones fail-closed y auditoría.
   **Rollout pendiente:** no está en `main`.
-
-## 2026-08-09 — El carril rol→vista del portal cliente falla hacia cerrado (TASK-1678, cierra ISSUE-147)
-
-`resolveAuthorizedViewsForUser` otorgaba por defecto: un rol `client_*` y una vista `cliente.*`
-comparten routeGroup `client`, así que toda vista cliente nueva se auto-otorgaba pese a que 18 de las
-25 están gobernadas por módulo contratado. Ahora el default se invierte sólo para ese routeGroup, el
-camino degradado devuelve lista vacía para tenants `client` en vez del `VIEW_REGISTRY` completo, y el
-`fallback` de lista vacía de `hasAuthorizedViewCode` deja de aplicar a sesiones cliente — sin eso
-último, degradar hacia cerrado habría abierto todo. El portal interno no se mueve: su default
-permisivo es lo que lo hace usable sin seedear cientos de filas.
-
-- Medido antes de apagar nada (`scripts/identity/client-view-fallback-audit.ts`): el cambio apaga
-  **un** viewCode por rol cliente y es module-gated → cero seed necesario.
-- Dos supuestos de `ISSUE-147` eran falsos: `role_view_assignments` no tiene columnas de vigencia, y
-  su punto 5 ("revisar el fallback de los callsites") no era limpieza sino requisito.
-- Los denials de rol siguen siendo unión, por decisión medida y no por omisión — el veto per-usuario
-  vive en `user_view_overrides`. Rationale en `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` §8.2.
-- Señal `identity.view_access.client_role_without_grants`, steady 0 verificado contra PG.
-- Verificado con las tres personas agente (`scripts/identity/client-view-rail-persona-check.ts`).
-  **Rollout pendiente:** no está en `main`, y `TASK-1679` va después por el orden de contención.
-
-## 2026-08-09 — El cutover SEO cerró del todo, en dos releases (TASK-1677, cierra ISSUE-143)
-
-La ventana expand/contract que `ISSUE-143` había dejado abierta a propósito quedó cerrada: el código
-dejó de leer `seo_v1` y los assignments quedaron superseded. Lo que vale registrar no es el cierre
-sino su forma.
-
-**Fueron dos releases, y no por prudencia: por construcción.** El check `postgres_migrations` del
-preflight es estricto, así que una migración commiteada y sin aplicar bloquea el release. Y aplicarla
-antes de desplegar el código es exactamente lo que el ordering del cutover prohíbe. Las dos reglas
-juntas hacen que un expand/contract no quepa en un solo ciclo — y eso, lejos de ser fricción, es lo
-que garantiza que exista un punto de verificación entre el código y los datos.
-
-La verificación fue con el canary del provider contra producción, antes y después de tocar los datos:
-la superficie de Grupo Berel abre con datos medidos, sin estado de "sin entitlement" y sin errores de
-consola. **No con un `SELECT`** — ése fue el método que falló en el incidente original y por eso la
-task lo prohíbe explícitamente.
-
-El bloque `DO` de la migración verificó que ninguna organización quedara sin cobertura antes de dejar
-pasar el cambio. Estado final: cero `seo_v1` vigentes, dos superseded con su historia intacta, dos
-`seo_v2` activos. La fila `seo_v1` sigue en el catálogo: el contract es `effective_to`, nunca un
-`DELETE`.

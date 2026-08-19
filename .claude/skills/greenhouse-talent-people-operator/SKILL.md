@@ -270,11 +270,14 @@ invite, move stages or assign assessments. Public self-service and operator invi
 flags. A candidate's optional `future_opportunities` checkbox only starts the tokenized confirmation flow; it does not
 grant future contact until the candidate confirms. Invitation requires a valid current grant, an exact opening and
 human confirmation, and does not itself send a message, move a stage or assign a test. Existing process consent is
-never upgraded by backfill; withdrawal wins. Exact CV review for delegated agents remains the separate `TASK-1718`
-contract and is still OFF in production pending its named-owner approvals and synthetic canary. Read the full runtime
+never upgraded by backfill; withdrawal wins. Exact CV review for delegated agents is the separate `TASK-1718`
+contract and is **live internal-only in production since 2026-08-18** through exact-application App API and the MCP
+tools `hiring.applications.review.list` / `hiring.application.review_packet.get`. It returns only minimized redacted
+chunks bound to an asset hash, with purpose/audit; no raw PDF, contact, ranking, writes or B2B. Formal owner
+sign-offs, revoked/base-only evidence and a rollback/revocation drill remain open. Read the full runtime
 binding, evidence and rollback facts in `references/greenhouse-runtime.md` §Talent Pool / Banco de Talento.
 
-## Evaluation Dossier (TASK-1735 + consumer UI TASK-1737 — flag ON en staging 2026-08-16)
+## Evaluation Dossier (TASK-1735 + consumer UI TASK-1737 — production 2026-08-18)
 
 Every `hiring_application` now carries an **expediente de evaluación**: an append-only note log
 (`greenhouse_hiring.hiring_application_note`, kinds `cv_analysis`/`assessment_review`/`interview_note`/`general`,
@@ -287,8 +290,10 @@ name/contact/legal identity/self-ID (the assembler does not even query them). Th
 expediente**, and it stays out of the TASK-1718 MCP review packet. Notes are narrative, never scores: they never touch
 `score`/`match_score`/`explainability_json`. Writes require capability `hiring.application.annotate` (role-only tier:
 `EFEONCE_ADMIN` ∪ `HR_MANAGER` ∪ `EFEONCE_OPERATIONS`); the propose lane is gated by
-`HIRING_EVALUATION_DOSSIER_AI_ENABLED` (Vercel-only, default OFF — **created ON in staging 2026-08-16 by CEO
-authorization; still OFF in Production**).
+`HIRING_EVALUATION_DOSSIER_AI_ENABLED`. Production also enables
+`HIRING_EVALUATION_DOSSIER_AI_AUTO_PROPOSE_ENABLED`: a clean processed CV plus a scored assessment can create an
+operator-only proposal automatically. Current provider/model/prompt are `google` / `gemini-2.5-flash` /
+`hiring_evaluation_dossier.v2`. Auto-propose never confirms or writes the note; human confirm/reject remains mandatory.
 
 **Consumer UI (TASK-1737)**: tab **Expediente** of `/agency/hiring/applications/[id]` (rename of `activity`,
 `?tab=activity` alias preserved) — timeline of notes + stage events, typed composer, propose→edit→confirm flow.
@@ -315,7 +320,7 @@ Docs: architecture `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` 
 2026-08-17 · functional `docs/documentation/hr/expediente-de-evaluacion.md` · manual
 `docs/manual-de-uso/hr/operar-expediente-de-evaluacion.md`.
 
-## Assessment AI Scoring at Scale (TASK-1734 + workbench TASK-1738 — code complete, rollout gated)
+## Assessment AI Scoring at Scale (TASK-1734/1742 + workbench TASK-1738/1743 — global provisional live)
 
 The individual propose→confirm of TASK-1361 now scales through an **async, durable, idempotent scoring run per
 exact `hiring_assessment`** (aggregate `hiring_assessment_ai_scoring_run` + items + append-only events), executed
@@ -351,9 +356,10 @@ the DB holds 11 human-rated answers against a floor of 49 — route A is not exe
 not of people.** The one-by-one lane is therefore the correct mode right now, and it is what generates that raw
 material. **NEVER** present the gold set as pending-people when it is pending-volume.
 
-Estado: **code complete, rollout gated a señal del operador** — the 3 new flags are OFF in every runtime, the
-scheduler `ops-assessment-ai-drain` is declared paused, and rollback runs by the new flags + run commands
-(`pnpm hiring:ai:run-rollback`), never by the master flag.
+Estado: **`global_provisional` live in production since 2026-08-18 for every eligible vacancy** — ops-worker
+master/enqueue ON, concurrency 1, daily cap 1000 and `ops-assessment-ai-drain` every 2 minutes. Exception policy and
+batch confirmation remain OFF, so the projection is operator-only and never mutates the effective score. TASK-1742
+remains in observation until cooldown, residual-zero rollback evidence and named sign-offs/risk acceptance close.
 
 **Consumer UI (TASK-1738)**: workbench mounted on the assessment card of Application 360 — risk-ordered queue,
 **structurally** blind sample (the proposal never reaches the DOM), `sawProposalBeforeScoring` recorded from a

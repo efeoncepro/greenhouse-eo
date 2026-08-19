@@ -3,7 +3,7 @@
 > **Tipo de documento:** Runbook operativo
 > **Task dueña:** `TASK-1734` (Slice 6) · **ADR:** `docs/architecture/GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md`
 > **Creado:** 2026-08-16 (Claude, Slice 6 code-only)
-> **Estado:** TASK-1742 autorizado para activar `global_provisional`; `exception_canary` y `calibrated_batch` siguen bloqueados por evidencia.
+> **Estado:** `global_provisional` activo en producción desde 2026-08-18; `exception_canary` y `calibrated_batch` siguen bloqueados por evidencia.
 
 ## Ruta provisional global — TASK-1742
 
@@ -24,7 +24,10 @@ Variables de Vercel:
 - `HIRING_ASSESSMENT_AI_EXCEPTION_POLICY_ENABLED=false`
 - `HIRING_ASSESSMENT_AI_RUN_CONFIRM_ENABLED=false`
 
-Activación: desplegar primero el código con flags OFF, comprobar el assessment exacto y el command dry-run, activar los valores anteriores, ejecutar el assessment exacto de Lucero y verificar que la proyección existe mientras los campos efectivos permanecen bit-for-bit. Luego se mantiene el enqueue global para nuevos envíos y el backlog se abre con `pnpm hiring:ai:provisional-backfill`, dry-run por defecto, máximo 25 por lote.
+Activación ejecutada: release `7e7a474217eb`, run `32193134959`; ops-worker `00584-r4x` con 100% tráfico,
+scheduler activo cada 2 minutos y drains 200 consecutivos. Lucero quedó como canary exacto sin convertir el run
+provisional en score efectivo. El enqueue global se mantiene para nuevos envíos; el backlog solo se abre con
+`pnpm hiring:ai:provisional-backfill`, dry-run por defecto, máximo 25 por lote.
 
 Cualquier modo superior a provisional requiere `HIRING_ASSESSMENT_AI_PROMOTION_EVIDENCE_DIGEST` válido; sin ese digest el runtime degrada mecánicamente a `global_provisional`. Una detección de prompt injection bloquea el egress; PII/protected data se redacta antes del provider; OOD/off-topic se enruta como excepción. El tope diario detiene nuevas llamadas sin perder la cola.
 
