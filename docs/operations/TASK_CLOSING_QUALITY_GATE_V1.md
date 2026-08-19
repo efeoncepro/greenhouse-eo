@@ -81,3 +81,29 @@ gh workflow run <workflow>.yml --ref develop -f environment=staging -f expected_
 ```
 
 **Excepcion legitima** (documentar): hotfix critico bajo incident response real (ej. ISSUE-### activo, production down) puede saltar este gate priorizando velocidad. En ese caso, post-push correr ambos comandos remoto via CI (`gh run watch`) y reportar verde como cierre.
+
+
+### Bug class — un campo que pasa a requerido rompe live tests que CI nunca ve (2026-08-19)
+
+Los `*.live.test.ts` sólo corren cuando hay PostgreSQL configurado en el entorno
+(`GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` o `..._HOST`); sin eso, `describe.skipIf` los salta.
+CI no los ejecuta. Consecuencia: **cuando una task vuelve requerido un campo, los live tests que
+construyen ese payload quedan rotos y nadie se entera** — ni el autor del cambio, ni el CI, ni el
+siguiente agente, hasta que alguien corre la suite con PG a mano.
+
+Dos casos reales encontrados el mismo día, en el mismo archivo
+(`src/lib/hiring/public-careers/submit-application.live.test.ts`):
+
+- `TASK-1740` volvió obligatorio `publicSeniority` para publicar una vacante → el `setup` del live
+  test fallaba con `hiring_opening_missing_public_structured_fields`.
+- `TASK-1688` volvió requerido `residenceCountryCode` a nivel de parser → `parsePublicHiringApplication`
+  devolvía `null` y los tests reventaban con `Cannot read properties of null`.
+
+Ambos llevaban días rotos y se descubrieron por accidente, al correr la suite completa con los live
+tests habilitados durante otra task.
+
+**Regla:** cuando una task vuelva requerido un campo de un parser, un command o un gate de publicación,
+buscar los live tests que construyen ese payload (`grep -rl "<comando>" --include='*.live.test.ts'`) y
+actualizarlos en el MISMO PR. Y al cerrar una task de dominio, correr al menos una vez la suite con las
+credenciales cargadas —`set -a && . ./.env.local && set +a && pnpm vitest run src/lib/<dominio>`— porque
+`pnpm test` a secas los salta y su verde no dice nada sobre ellos.
