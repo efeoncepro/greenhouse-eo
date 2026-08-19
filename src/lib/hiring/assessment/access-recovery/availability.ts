@@ -25,6 +25,7 @@ interface AvailabilityRow extends Record<string, unknown> {
   has_candidate_email: boolean
   email_provider_status: string | null
   recovery_count_24h: number | string
+  secure_link_count_24h: number | string
   latest_recovery_at: Date | string | null
 }
 
@@ -65,6 +66,7 @@ export const getAssessmentAccessRecoveryAvailability = async (
             (profile.canonical_email IS NOT NULL AND BTRIM(profile.canonical_email) <> '') AS has_candidate_email,
             provider.provider_status AS email_provider_status,
             COALESCE(recent.recovery_count_24h,0) AS recovery_count_24h,
+            COALESCE(recent.secure_link_count_24h,0) AS secure_link_count_24h,
             recent.latest_recovery_at
      FROM greenhouse_hiring.hiring_assessment assessment
      JOIN greenhouse_hiring.hiring_application application
@@ -89,7 +91,20 @@ export const getAssessmentAccessRecoveryAvailability = async (
        LIMIT 1
      ) provider ON TRUE
      LEFT JOIN LATERAL (
-       SELECT COUNT(*) FILTER (WHERE created_at >= clock_timestamp()-INTERVAL '24 hours') AS recovery_count_24h,
+       -- Espejo EXACTO de assertRecoveryRateLimit: sólo consumen cuota los intentos que
+       -- entregaron algo, y el enlace seguro tiene presupuesto propio. Si los dos predicados
+       -- divergen, la UI le dice a HR que puede recuperar y el command lo rechaza (o al revés,
+       -- que es peor: le oculta la única salida que le queda al candidato).
+       SELECT COUNT(*) FILTER (
+                WHERE created_at >= clock_timestamp()-INTERVAL '24 hours'
+                  AND channel='email'
+                  AND outcome IN ('dispatch_accepted','link_issued','dispatch_unknown')
+              ) AS recovery_count_24h,
+              COUNT(*) FILTER (
+                WHERE created_at >= clock_timestamp()-INTERVAL '24 hours'
+                  AND channel='secure_link'
+                  AND outcome IN ('dispatch_accepted','link_issued','dispatch_unknown')
+              ) AS secure_link_count_24h,
               MAX(created_at) AS latest_recovery_at
        FROM greenhouse_hiring.hiring_assessment_access_recovery recovery
        WHERE recovery.assessment_id=assessment.assessment_id
@@ -125,10 +140,18 @@ export const getAssessmentAccessRecoveryAvailability = async (
     ? new Date(latest.getTime() + ASSESSMENT_ACCESS_RECOVERY_COOLDOWN_SECONDS * 1000)
     : null
 
-  const limited = used >= ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS
-    || Boolean(cooldownUntil && cooldownUntil > now)
+  const secureLinkUsed = Number(row.secure_link_count_24h)
+  const cooldownActive = Boolean(cooldownUntil && cooldownUntil > now)
 
-  const eligible = eligibility.allowed && !limited
+  // Cada canal agota su propia cuota. El enlace seguro es la salida cuando el correo no llega:
+  // hacerlo depender del contador del correo cerraba la última puerta del candidato justo en el
+  // escenario para el que fue diseñado.
+  const emailLimited = used >= ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS || cooldownActive
+  const secureLinkLimited = secureLinkUsed >= ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS || cooldownActive
+
+  // `eligible` describe el assessment (estado, plazo, consentimiento), no el presupuesto de un
+  // canal: un test recuperable con el correo agotado sigue siendo recuperable por enlace seguro.
+  const eligible = eligibility.allowed && !(emailLimited && secureLinkLimited)
   const emailProviderBlocked = Boolean(row.email_provider_status)
 
   return {
@@ -140,17 +163,20 @@ export const getAssessmentAccessRecoveryAvailability = async (
     eligibilityCode: eligibility.allowed ? null : eligibility.code,
     channels: {
       email: {
-        available: eligible && row.has_candidate_email && !emailProviderBlocked,
+        available: eligibility.allowed && !emailLimited && row.has_candidate_email && !emailProviderBlocked,
         providerStatus: row.email_provider_status,
         hasCandidateEmail: row.has_candidate_email,
       },
-      secureLink: { available: eligible },
+      secureLink: { available: eligibility.allowed && !secureLinkLimited },
     },
     rateLimit: {
       maxPer24Hours: ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS,
       usedIn24Hours: used,
       cooldownUntil: cooldownUntil && cooldownUntil > now ? iso(cooldownUntil) : null,
-      limited,
+      // `limited` sigue significando "no queda ningún canal": es lo que la UI usa para decidir si
+      // muestra la salida o el mensaje de espera. Un correo agotado con enlace seguro disponible
+      // NO es estar limitado.
+      limited: emailLimited && secureLinkLimited,
     },
   }
 }

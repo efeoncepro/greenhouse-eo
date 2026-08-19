@@ -155,7 +155,7 @@ export const recoverCandidateTestAccessBySecureLink = async (
       )
     }
 
-    await assertRecoveryRateLimit(client, assessmentId)
+    await assertRecoveryRateLimit(client, assessmentId, 'secure_link')
 
     const secureLinkExpiry = new Date(now.getTime() + SECURE_LINK_TTL_MS)
 

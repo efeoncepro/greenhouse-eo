@@ -271,4 +271,80 @@ describe('public assessment session store', () => {
 
     expect(clockRead).toBeGreaterThan(sessionLock)
   })
+  it('no expira la sesión sellada con el start-by cuando el candidato ya está rindiendo', async () => {
+    // Regresión del corte a mitad de test: al canjear un assessment aún no iniciado, la sesión se
+    // sella con `token_expires_at` (la fecha límite para EMPEZAR). Si el candidato abre el enlace
+    // poco antes de ese límite y arranca, el deadline real pasa a `close_deadline`, pero la sesión
+    // conserva el techo viejo y ya no se re-extiende. Resolver contra ese techo le mataba la sesión
+    // con el test en curso. La vigencia la decide `close_deadline`, no el sello del canje.
+    const client = clientFrom(sql => {
+      if (sql.includes('clock_timestamp() AS database_now')) return { rows: [{ database_now: NOW }] }
+
+      if (sql.includes('WHERE session_token_hash = $1 AND assessment_id = $2')) {
+        return { rows: [sessionRow({ expires_at: '2026-08-19T09:30:00.000Z' })] }
+      }
+
+      if (sql.includes('SELECT public_session_id, assessment_id')) {
+        return { rows: [{ public_session_id: 'haps-1', assessment_id: 'asmt-1' }] }
+      }
+
+      if (sql.includes('WHERE assessment_id = $1') && sql.includes('FROM greenhouse_hiring.hiring_assessment')) {
+        return { rows: [assessmentRow({
+          status: 'in_progress',
+          token_expires_at: '2026-08-19T09:30:00.000Z',
+          close_deadline: EXPIRES,
+        })] }
+      }
+
+      if (sql.includes('FROM greenhouse_hiring.hiring_application')) return { rows: [applicationRow] }
+      if (sql.includes('FROM greenhouse_hiring.candidate_facet')) return { rows: [facetRow] }
+      if (sql.includes('claim_assessment_public_request_budget')) return { rows: [{ allowed: true }] }
+
+      return { rows: [] }
+    })
+
+    await expect(resolvePublicAssessmentSessionWithClient(client, {
+      sessionTokenDigest: 'b'.repeat(64), requestBudget: sessionBudget,
+    }))
+      .resolves.toEqual(expect.objectContaining({ publicSessionId: 'haps-1' }))
+
+    const closed = vi.mocked(client.query).mock.calls
+      .map(call => String(call[0]))
+      .some(sql => sql.includes('UPDATE greenhouse_hiring.hiring_assessment_public_session'))
+
+    expect(closed).toBe(false)
+  })
+
+  it('expira la sesión cuando el deadline vivo del assessment ya pasó', async () => {
+    // Contraparte del test anterior: quitar el techo sellado no puede volver inmortal a la sesión.
+    const client = clientFrom(sql => {
+      if (sql.includes('clock_timestamp() AS database_now')) return { rows: [{ database_now: NOW }] }
+
+      if (sql.includes('WHERE session_token_hash = $1 AND assessment_id = $2')) {
+        return { rows: [sessionRow({ expires_at: '2026-08-21T10:00:00.000Z' })] }
+      }
+
+      if (sql.includes('SELECT public_session_id, assessment_id')) {
+        return { rows: [{ public_session_id: 'haps-1', assessment_id: 'asmt-1' }] }
+      }
+
+      if (sql.includes('WHERE assessment_id = $1') && sql.includes('FROM greenhouse_hiring.hiring_assessment')) {
+        return { rows: [assessmentRow({
+          status: 'in_progress',
+          token_expires_at: '2026-08-19T08:00:00.000Z',
+          close_deadline: '2026-08-19T09:00:00.000Z',
+        })] }
+      }
+
+      if (sql.includes('FROM greenhouse_hiring.hiring_application')) return { rows: [applicationRow] }
+      if (sql.includes('FROM greenhouse_hiring.candidate_facet')) return { rows: [facetRow] }
+      if (sql.includes('claim_assessment_public_request_budget')) return { rows: [{ allowed: true }] }
+
+      return { rows: [] }
+    })
+
+    await expect(resolvePublicAssessmentSessionWithClient(client, {
+      sessionTokenDigest: 'b'.repeat(64), requestBudget: sessionBudget,
+    })).resolves.toBeNull()
+  })
 })

@@ -231,6 +231,17 @@ export const exchangePublicAssessmentAccessWithClient = async (
       [assessment.assessment_id, assessment.access_token_version_id, input.sessionTokenDigest, expiresAt],
     )
 
+    // Marca append-once del primer canje. Es lo único que sobrevive a la purga diaria de sesiones,
+    // así que es la evidencia de que el enlace llegó entero al candidato. COALESCE: un segundo
+    // canje (otro dispositivo, recarga) no la mueve. Va dentro del savepoint: si falla, el canje
+    // completo se reporta como fallido en vez de emitir una sesión sin evidencia.
+    await client.query(
+      `UPDATE greenhouse_hiring.hiring_assessment
+          SET first_access_exchanged_at = COALESCE(first_access_exchanged_at, clock_timestamp())
+        WHERE assessment_id = $1`,
+      [assessment.assessment_id],
+    )
+
     await client.query('RELEASE SAVEPOINT assessment_public_session_issue')
 
     return inserted.rows[0]
@@ -306,8 +317,19 @@ export const resolvePublicAssessmentSessionWithClient = async (
   const nowMs = toMillis(databaseNow)
   const effectiveExpiry = assessmentExpiry(assessment)
 
+  // La vigencia la decide SIEMPRE el deadline vivo del assessment, nunca el techo que la sesión
+  // selló al canjearse. `session.expires_at` se fija en el exchange con el valor de ESE momento:
+  // para un test aún no iniciado eso es `token_expires_at`, la fecha límite para EMPEZAR; al
+  // iniciar, el deadline real pasa a `close_deadline`, más lejano.
+  //
+  // Hay TRES piezas que deben coincidir sobre el mismo deadline, y si divergen el candidato pierde
+  // el test a mitad de camino: este resolver, el trigger `refresh_assessment_public_session_expiry`
+  // (reescribe `expires_at` cuando el assessment arranca) y `purge_expired_assessment_public_sessions`
+  // (BORRA filas activas usando ese mismo campo). El trigger mantiene `expires_at` canónico, así que
+  // hoy las tres coinciden; recalcular acá es defensa en profundidad para el día en que el trigger
+  // no dispare — no el único defensor. Confiar en el techo sellado convertía cualquier
+  // desincronización en un corte silencioso: respuestas guardadas, tiempo perdido.
   const expired = session.status === 'expired'
-    || toMillis(session.expires_at) <= nowMs
     || Boolean(effectiveExpiry && toMillis(effectiveExpiry) <= nowMs)
 
   if (expired) {

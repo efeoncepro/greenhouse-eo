@@ -218,14 +218,38 @@ const assertEmailProviderAllowsRecovery = async (client: PoolClient, recipientEm
   }
 }
 
-export const assertRecoveryRateLimit = async (client: PoolClient, assessmentId: string): Promise<void> => {
+/**
+ * Cuota diaria de recuperaciones, por canal.
+ *
+ * Dos decisiones que parecen detalles y son la diferencia entre un candidato con salida y uno sin
+ * ninguna:
+ *
+ * 1. SÓLO CUENTAN LOS INTENTOS QUE ENTREGARON ALGO. Contar `dispatch_failed` castigaba al candidato
+ *    por una falla NUESTRA: con el proveedor degradado, tres correos que rebotan agotaban la cuota
+ *    y lo dejaban sin acceso 24 horas, mientras su plazo seguía corriendo. `pending_dispatch` es
+ *    transitorio y tampoco cuenta; el cooldown de un minuto es lo que frena el abuso por ráfaga.
+ *    `dispatch_unknown` SÍ cuenta: la aceptación fue incierta pero la credencial rotó igual.
+ *
+ * 2. CADA CANAL TIENE SU PROPIA CUOTA. El enlace seguro existe precisamente para cuando el correo
+ *    no llega; que los intentos de correo consumieran su presupuesto cerraba la única puerta que
+ *    quedaba abierta. Además es el canal verificado por un humano, o sea el menos abusable.
+ */
+export const assertRecoveryRateLimit = async (
+  client: PoolClient,
+  assessmentId: string,
+  channel: 'email' | 'secure_link' = 'email',
+): Promise<void> => {
   const result = await client.query<{ total_24h: number | string; cooldown_active: boolean }>(
-    `SELECT COUNT(*) FILTER (WHERE created_at >= clock_timestamp() - INTERVAL '24 hours') AS total_24h,
+    `SELECT COUNT(*) FILTER (
+              WHERE created_at >= clock_timestamp() - INTERVAL '24 hours'
+                AND outcome IN ('dispatch_accepted', 'link_issued', 'dispatch_unknown')
+            ) AS total_24h,
             COALESCE(MAX(created_at) >= clock_timestamp()
               - make_interval(secs => $2::integer), FALSE) AS cooldown_active
      FROM greenhouse_hiring.hiring_assessment_access_recovery
-     WHERE assessment_id = $1`,
-    [assessmentId, ASSESSMENT_ACCESS_RECOVERY_COOLDOWN_SECONDS],
+     WHERE assessment_id = $1
+       AND channel = $3`,
+    [assessmentId, ASSESSMENT_ACCESS_RECOVERY_COOLDOWN_SECONDS, channel],
   )
 
   const total = Number(result.rows[0]?.total_24h ?? 0)
@@ -502,7 +526,7 @@ export const recoverCandidateTestAccessByEmail = async (
       }
 
       await assertEmailProviderAllowsRecovery(client, expectedRecipientEmail)
-      await assertRecoveryRateLimit(client, assessmentId)
+      await assertRecoveryRateLimit(client, assessmentId, 'email')
 
       const issuedAt = now
       const emailExpiry = new Date(issuedAt.getTime() + EMAIL_TTL_MS)

@@ -8,12 +8,38 @@ const migration = readFileSync(
   'utf8',
 )
 
+// El CHECK y el trigger de credencial NO están en la migración: se aplican a mano después del
+// deploy, porque exigen un invariante que el código vigente en producción no cumple. El split es
+// parte del contrato y este archivo lo verifica.
+const contractScript = readFileSync(
+  join(process.cwd(), 'scripts/operations/task-1746-assessment-access-credential-contract.sql'),
+  'utf8',
+)
+
 describe('TASK-1746 public assessment session migration contract', () => {
   it('adds versioned assessment credentials and binds recovery to the exact version', () => {
     expect(migration).toContain('access_token_version_id UUID')
-    expect(migration).toContain('trg_hiring_assessment_access_credential_guard')
     expect(migration).toContain('rotation requires a new version')
     expect(migration).toContain('canonical_token_version_id IS DISTINCT FROM NEW.token_version_id')
+  })
+
+  it('mantiene el CHECK y el trigger de credencial FUERA de la migración (fase expand/contract)', () => {
+    // Si el CREATE TRIGGER volviera a la migración, `pnpm migrate:up` lo aplicaría junto con la
+    // fase expand y toda asignación de test en producción fallaría con 23514: el writer vigente
+    // escribe el hash sin versión. El regex es deliberadamente estricto — el nombre aparece en
+    // prosa dentro de la migración explicando por qué NO está, y eso no debe dar falso verde.
+    expect(migration).not.toMatch(/CREATE\s+TRIGGER\s+trg_hiring_assessment_access_credential_guard/i)
+    expect(migration).not.toMatch(/ADD\s+CONSTRAINT\s+hiring_assessment_access_credential_version_check/i)
+
+    // La columna nace con DEFAULT: es lo que mantiene válido el INSERT del código viejo y lo que
+    // garantiza que el VALIDATE del contract no encuentre filas violatorias.
+    expect(migration).toMatch(/ALTER\s+COLUMN\s+access_token_version_id\s+SET\s+DEFAULT\s+gen_random_uuid\(\)/i)
+
+    // Y el contract sí las trae, con NOT VALID + VALIDATE separados y guard de `convalidated`.
+    expect(contractScript).toMatch(/CREATE\s+TRIGGER\s+trg_hiring_assessment_access_credential_guard/i)
+    expect(contractScript).toContain('NOT VALID')
+    expect(contractScript).toContain('VALIDATE CONSTRAINT hiring_assessment_access_credential_version_check')
+    expect(contractScript).toContain('convalidated')
   })
 
   it('stores only a hash for opaque browser sessions and guards immutable identity', () => {

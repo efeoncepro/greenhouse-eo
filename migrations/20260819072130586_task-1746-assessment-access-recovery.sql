@@ -10,6 +10,15 @@ ON CONFLICT (email_type) DO NOTHING;
 
 -- A credential version is the revocation boundary for opaque browser sessions. Existing
 -- candidate links receive a version without changing their bearer hash or expiry.
+-- EXPAND (TASK-1746, fase 1 de 2). El DEFAULT es lo que hace la migración compatible con el
+-- código que corre en `main`: `insertCandidateTest` escribe `access_token_hash` SIN esta columna,
+-- así que sin DEFAULT el INSERT violaría el CHECK y toda asignación de test caería con 23514.
+-- El DEFAULT se conserva de forma permanente como defensa: un writer que olvide la versión
+-- obtiene una válida en vez de romper la asignación de un candidato real.
+-- El orden importa: `gen_random_uuid()` es VOLATILE, así que un ADD COLUMN que lo declare como
+-- DEFAULT pierde el fast-path y REESCRIBE la tabla entera bajo ACCESS EXCLUSIVE, evaluando la
+-- expresión fila por fila — además de dejar el backfill de abajo sin filas que tocar. Columna
+-- primero (instantáneo), backfill acotado a lo que de verdad tiene credencial, DEFAULT al final.
 ALTER TABLE greenhouse_hiring.hiring_assessment
   ADD COLUMN IF NOT EXISTS access_token_version_id UUID;
 
@@ -17,19 +26,28 @@ UPDATE greenhouse_hiring.hiring_assessment
 SET access_token_version_id = gen_random_uuid()
 WHERE access_token_hash IS NOT NULL AND access_token_version_id IS NULL;
 
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_constraint
-    WHERE conname = 'hiring_assessment_access_credential_version_check'
-      AND conrelid = 'greenhouse_hiring.hiring_assessment'::regclass
-  ) THEN
-    ALTER TABLE greenhouse_hiring.hiring_assessment
-      ADD CONSTRAINT hiring_assessment_access_credential_version_check
-      CHECK (access_token_hash IS NULL OR access_token_version_id IS NOT NULL);
-  END IF;
-END
-$$;
+-- Marca durable del primer canje de acceso. NO es metadato decorativo: es la única evidencia que
+-- sobrevive a la purga diaria de `hiring_assessment_public_session`, y sin ella la detección de
+-- "el enlace llegó roto" es imposible — el bearer viaja en el fragmento, que nunca llega al
+-- servidor, así que un enlace reescrito no produce request, ni error, ni rastro. Se escribe una
+-- sola vez (COALESCE en el exchange) y jamás se borra.
+ALTER TABLE greenhouse_hiring.hiring_assessment
+  ADD COLUMN IF NOT EXISTS first_access_exchanged_at TIMESTAMPTZ;
+
+COMMENT ON COLUMN greenhouse_hiring.hiring_assessment.first_access_exchanged_at IS
+  'TASK-1746 — primer canje del enlace por sesión pública. Append-once, sobrevive a la retención; alimenta hiring.assessment.access_never_exchanged.';
+
+-- El DEFAULT es permanente y load-bearing: es lo que mantiene válido el INSERT del código que
+-- corre en `main` (no nombra la columna) y lo que garantiza que el VALIDATE CONSTRAINT de la
+-- fase CONTRACT no encuentre filas violatorias. NO quitarlo "porque el trigger ya cubre".
+ALTER TABLE greenhouse_hiring.hiring_assessment
+  ALTER COLUMN access_token_version_id SET DEFAULT gen_random_uuid();
+
+-- El CHECK `hiring_assessment_access_credential_version_check` y el trigger
+-- `trg_hiring_assessment_access_credential_guard` viven en la migración CONTRACT
+-- `..._task-1746-assessment-access-credential-contract.sql`, que se aplica DESPUÉS de que
+-- el código nuevo esté desplegado en todos los runtimes. Aplicarlos acá rompería la
+-- asignación de tests del código vigente en producción.
 
 CREATE OR REPLACE FUNCTION greenhouse_hiring.guard_hiring_assessment_access_credential()
 RETURNS trigger LANGUAGE plpgsql AS $$
@@ -58,11 +76,6 @@ BEGIN
   RETURN NEW;
 END
 $$;
-
-CREATE TRIGGER trg_hiring_assessment_access_credential_guard
-  BEFORE INSERT OR UPDATE OF access_token_hash, access_token_version_id
-  ON greenhouse_hiring.hiring_assessment
-  FOR EACH ROW EXECUTE FUNCTION greenhouse_hiring.guard_hiring_assessment_access_credential();
 
 CREATE TABLE IF NOT EXISTS greenhouse_hiring.hiring_assessment_access_recovery (
   recovery_id          TEXT PRIMARY KEY DEFAULT ('harc-' || gen_random_uuid()::text),
@@ -1060,14 +1073,14 @@ BEGIN
     'trg_hiring_application_assessment_recovery_retention',
     'trg_candidate_facet_assessment_recovery_retention',
     'trg_hiring_assessment_access_recovery_purge_audit_append_only',
-    'trg_hiring_assessment_access_credential_guard',
     'trg_hiring_assessment_public_session_refresh',
     'trg_hiring_assessment_public_session_validate',
     'trg_hiring_assessment_public_session_update_guard') AND NOT tgisinternal;
   SELECT COUNT(*) INTO session_column_count
   FROM information_schema.columns
   WHERE table_schema = 'greenhouse_hiring'
-    AND ((table_name = 'hiring_assessment' AND column_name = 'access_token_version_id')
+    AND ((table_name = 'hiring_assessment'
+          AND column_name IN ('access_token_version_id', 'first_access_exchanged_at'))
       OR (table_name = 'hiring_assessment_public_session'
         AND column_name IN ('session_token_hash', 'access_token_version_id', 'expires_at')));
   -- El Down dropea la tabla de buckets y las cuatro funciones de acceso publico; el guard del Up
@@ -1083,9 +1096,15 @@ BEGIN
     AND p.proname IN ('run_assessment_public_access_retention',
       'purge_expired_assessment_public_sessions',
       'purge_assessment_public_request_buckets',
-      'claim_assessment_public_request_budget');
-  IF seeded_count <> 2 OR trigger_count <> 14 OR session_column_count <> 4
-     OR bucket_table_count <> 1 OR public_access_function_count <> 4 THEN
+      'claim_assessment_public_request_budget',
+      'refresh_assessment_public_session_expiry',
+      'purge_assessment_access_recovery',
+      'assessment_access_recovery_deadline',
+      'assessment_candidate_test_close_deadline',
+      'assessment_candidate_test_deadline',
+      'guard_hiring_assessment_access_credential');
+  IF seeded_count <> 2 OR trigger_count <> 13 OR session_column_count <> 5
+     OR bucket_table_count <> 1 OR public_access_function_count <> 10 THEN
     RAISE EXCEPTION 'TASK-1746 anti pre-up-marker check failed: capabilities=%, triggers=%, session_columns=%, bucket_table=%, public_access_functions=%',
       seeded_count, trigger_count, session_column_count, bucket_table_count, public_access_function_count;
   END IF;
@@ -1152,8 +1171,9 @@ DROP TABLE IF EXISTS greenhouse_hiring.hiring_assessment_access_recovery;
 DROP FUNCTION IF EXISTS greenhouse_hiring.assessment_access_recovery_deadline(timestamptz, integer, jsonb);
 DROP FUNCTION IF EXISTS greenhouse_hiring.assessment_candidate_test_close_deadline(timestamptz, integer, jsonb);
 DROP FUNCTION IF EXISTS greenhouse_hiring.assessment_candidate_test_deadline(timestamptz, integer, jsonb);
-DROP TRIGGER IF EXISTS trg_hiring_assessment_access_credential_guard ON greenhouse_hiring.hiring_assessment;
 DROP FUNCTION IF EXISTS greenhouse_hiring.guard_hiring_assessment_access_credential();
 ALTER TABLE greenhouse_hiring.hiring_assessment
-  DROP CONSTRAINT IF EXISTS hiring_assessment_access_credential_version_check,
+  DROP COLUMN IF EXISTS first_access_exchanged_at;
+
+ALTER TABLE greenhouse_hiring.hiring_assessment
   DROP COLUMN IF EXISTS access_token_version_id;
