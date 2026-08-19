@@ -91,6 +91,16 @@ rotan, y Platform Health detecta receipts divergentes después de 15 minutos. El
 adapter productivo. Próximo paso: Slice 3, con fragment exchange, sesión HttpOnly, auth/capability server-side y
 smoke de tracking. Migración, índice y runtime continúan sin aplicar.
 
+El Slice 3A de `TASK-1746` también quedó code-complete local y auditado sin P0/P1/P2. Cada token ahora rota
+con una versión explícita y la sesión candidata persiste solo un digest opaco ligado a esa versión; una nueva
+emisión invalida las sesiones anteriores. El dominio distingue start-by, deadline de respuestas y 30 minutos
+de gracia de envío; no-limit cierra a las 24 horas. El reloj autoritativo viene de PG y el navegador lo proyecta
+con tiempo monotónico, por lo que un equipo adelantado o atrasado no congela ni extiende el test. Legacy
+GET/start/save/submit y SELF-ID conservan elegibilidad, consentimiento y audit bajo los mismos locks y la misma
+transacción. El feature continúa OFF y la migración no está aplicada. El siguiente slice debe construir la
+limpieza síncrona `#access`, exchange→cookie HttpOnly, rutas token-free y Product API antes de cualquier smoke o
+activación.
+
 ## 2026-08-18 — Hiring AI y candidate review MCP: runtime reconciliado
 
 El release `7e7a474217eb` (run `32193134959`) dejó `global_provisional` activo para assessments elegibles de

@@ -544,6 +544,7 @@ export const recoverCandidateTestAccessByEmail = async (
         expectedStatus: state.status as 'assigned' | 'sent' | 'in_progress' | 'expired',
         resultingStatus: decision.resultingStatus,
         expiresAt,
+        tokenVersionId: receipt.token_version_id,
       })
 
       if (!rotated) {

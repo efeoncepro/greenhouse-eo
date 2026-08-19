@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-011`
-- Status real: `Slices 1, 2A y 2B validados localmente — migración/índice sin aplicar; sesión/API y rollout pendientes`
+- Status real: `Slices 1, 2A, 2B y 3A validados localmente — migración/índice sin aplicar; exchange/API y rollout pendientes`
 - Rank: `TBD`
 - Domain: `hr|identity|delivery`
 - Blocked by: `none`
@@ -214,10 +214,30 @@ y no tiene adapter productivo: no puede habilitarse antes del fragment exchange/
 la autorización server-side y el smoke de tracking. Arquitectura, Talento y Seguridad validaron el slice sin
 P0/P1/P2; 90 tests focales y los gates locales quedaron verdes. No se aplicó migración, índice ni cambio runtime.
 
-### Slice 3 — Guardrails y evidencia
+### Slice 3 — Frontera de sesión candidata y relojes
 
-- Rate limit, conflict handling, secret/token redaction and runtime tests.
-- Operator runbook for candidate recovery and a limited production smoke.
+- Implementar `/public/assessment/access` con limpieza síncrona del fragmento, exchange POST same-origin,
+  sesión opaca HttpOnly vinculada a la versión/hash vigente y navegación/API posteriores sin token.
+- Separar start-by del enlace, deadline de respuestas y gracia de cierre; start/save/submit revalidan estado,
+  consentimiento, aplicación y reloj de DB bajo el lock canónico. Una rotación invalida sesiones anteriores.
+- Mantener las rutas con token en path sólo como compatibilidad temporal y emitir todo enlace nuevo por fragmento.
+
+**Checkpoint 2026-08-19 — Slice 3A core code-complete, runtime pendiente.** Cada credencial de assessment
+tiene una versión explícita y las sesiones públicas guardan únicamente un digest opaco vinculado a esa
+versión; una rotación invalida las sesiones anteriores. El dominio separa start-by, plazo de respuestas y
+gracia de envío, usa reloj de base de datos bajo locks y conserva 24 horas para evaluaciones sin límite.
+GET/start/save/submit y SELF-ID legacy revalidan assessment→application→candidate facet, decisión y
+consentimiento en una sola transacción. El cliente proyecta `databaseNowAt` con reloj monotónico, congela
+respuestas durante la gracia pero conserva revisar/enviar y usa copy tipado ES/EN para tiempo de respuesta,
+gracia y no-limit. Arquitectura, Talento y Seguridad cerraron sus auditorías sin P0/P1/P2; los gates focales,
+ESLint, TypeScript, migration marker y diff-check están verdes. La migración no está aplicada y el tipo de
+correo permanece OFF. Faltan la página de limpieza síncrona del fragmento, el exchange/cookie HttpOnly, las
+rutas token-free, el adapter Product API y los smokes PG/browser antes de cualquier activación.
+
+### Slice 4 — Product API, guardrails y evidencia
+
+- Adapter humano/capability-first por canal, rate limit, conflict handling, redacción y tests runtime/browser.
+- Operator runbook, tracking gate y smokes limitados de email + enlace temporal antes de habilitar el tipo.
 
 ## Detailed Spec
 

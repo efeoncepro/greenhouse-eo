@@ -13,6 +13,18 @@
 - El contrato queda `Proposed` y sin cambio de runtime. La forma física sobre `services`, Notion, HubSpot, Finance,
   equipos y Client Portal requiere cohortes reales, task y ADR antes de implementarse.
 
+## 2026-08-19 — El acceso al test ya tiene sesión opaca y reloj autoritativo
+
+- Cada credencial de evaluación tiene una versión explícita; las sesiones candidatas guardan solo un digest
+  opaco vinculado a esa versión, de modo que una recuperación invalida de inmediato los accesos anteriores.
+- El test distingue plazo para comenzar, plazo para responder y 30 minutos de gracia para revisar/enviar. Las
+  evaluaciones sin límite cierran a las 24 horas y ya no aparecen como “0 min”.
+- El navegador proyecta el reloj de base de datos con tiempo monotónico, por lo que cambiar el reloj local no
+  adelanta ni atrasa los límites. Durante la gracia se congelan respuestas, pero revisar y enviar siguen activos.
+- GET/start/save/submit y SELF-ID legacy mantienen decisión, consentimiento, captura y audit bajo una sola
+  transacción. El código fue auditado sin P0/P1/P2; sigue OFF y sin migración aplicada hasta completar el
+  fragment exchange, la cookie HttpOnly, Product API y los smokes reales.
+
 ## 2026-08-19 — El reenvío gobernado de tests ya tiene command seguro
 
 - La recuperación por email genera un acceso nuevo sin duplicar el test, conserva el plazo cuando la evaluación
@@ -940,20 +952,3 @@ acciones — la `NavSearch` retirada exponía el `VIEW_REGISTRY` completo sin fi
 - Evidencia GVC premium (3 scenarios, desktop+390px) + scorecard 4.93 + baselines durables
   promovidos. Cerrada el mismo día con autorización del operador: build de producción verde, test
   full (10.447), `UI ready: yes` (card-sort formal queda como validación posterior no bloqueante).
-
-## 2026-08-09 — Barrido documental del carril cliente: el doc de contrato estaba invertido
-
-Tres auditorías paralelas (arquitectura, docs funcionales/manuales, skills) tras los dos releases.
-
-- 🔴 **El §0 Status de `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1` afirmaba que no existían cuatro piezas que
-  se implementaron entre `TASK-824` y `TASK-828`** — carpeta, namespace de API, schema y modelo de
-  módulos. Tres meses así, y es lo primero que lee un agente que abre el doc de contrato del dominio.
-- ⚠️ **Defecto vivo que causó el assignment de hoy:** `/creative-hub` no existe y Sky Airlines ve el
-  enlace. Señal nueva `identity.client_portal.assigned_view_without_route` (hoy en 1). La condición la
-  crea un cambio de DATO, no un deploy, así que ningún gate de código la veía — y
-  `route-reachability-gate` sólo cubre la dirección contraria.
-- Los dos companions de invariantes no tenían nada del page guard ni de la derivación invertida, que es
-  justo lo que un agente carga al tocar el dominio. Agregados.
-- Cinco aprendizajes de proceso a sus skills dueñas: el context gate va último, un gate con expectativa
-  hardcodeada no prueba el motor, un override de lint fuera del alcance de la regla no protege nada,
-  `VERCEL_ENV` nunca `NODE_ENV`, y una nota del Handoff no es evidencia.

@@ -139,6 +139,10 @@ describe('recoverCandidateTestAccessByEmail', () => {
     expect(result.receipt.outcome).toBe('dispatch_accepted')
     expect(result.replayed).toBe(false)
     expect(mocks.rotateToken).toHaveBeenCalledTimes(1)
+    expect(mocks.rotateToken).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ tokenVersionId: '11111111-1111-4111-8111-111111111114' }),
+    )
     expect(mocks.sendEmail).toHaveBeenCalledWith(expect.objectContaining({
       emailType: 'hiring_assessment_access_recovery',
       sourceEntity: ASSESSMENT_ID,

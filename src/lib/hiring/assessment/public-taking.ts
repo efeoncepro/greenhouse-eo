@@ -1,19 +1,23 @@
 import 'server-only'
 
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import type { PoolClient } from 'pg'
+
+import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import {
-  getAssessmentById,
+  type AssessmentDeadlineResult,
+  getAssessmentByIdWithClient,
   listResponses,
-  resolveAssessmentByToken,
-  saveResponse,
-  startAssessment,
+  listResponsesWithClient,
+  resolveAssessmentByTokenWithClient,
+  saveResponseWithClient,
+  startAssessmentWithClient,
 } from '@/lib/hiring/assessment/instances'
 import { buildPublicQuestion } from '@/lib/hiring/assessment/store'
-import { submitAssessment } from '@/lib/hiring/assessment/scoring'
+import { submitAssessmentWithClient } from '@/lib/hiring/assessment/scoring'
 import { HiringNotFoundError, HiringValidationError } from '@/lib/hiring/errors'
 import {
-  captureVoluntaryDemographicSelfId,
-  getSelfIdSubjectByAssessment,
+  captureVoluntaryDemographicSelfIdWithClient,
+  getSelfIdSubjectByAssessmentWithClient,
 } from '@/lib/hiring/assessment/fairness/capture-self-id'
 import type {
   CaptureVoluntaryDemographicSelfIdResult,
@@ -155,8 +159,13 @@ export interface PublicAssessmentTiming {
   extraMinutes: number
   effectiveMinutes: number
   hasAccommodation: boolean
+  hasTimeLimit: boolean
+  databaseNowAt: string
   startedAt: string | null
   submittedAt: string | null
+  answerDeadlineAt: string | null
+  closeDeadlineAt: string | null
+  phase: 'answering' | 'submit_grace' | 'closed'
   expiresAt: string | null
   remainingSeconds: number | null
 }
@@ -179,43 +188,72 @@ export interface PublicAssessmentView {
   responses: PublicAssessmentResponse[]
 }
 
-export const resolveAssessmentTiming = (assessment: Assessment): PublicAssessmentTiming => {
+export const resolveAssessmentTiming = (
+  assessment: Assessment,
+  databaseNowMs = Date.now(),
+): PublicAssessmentTiming => {
   const baseMinutes = Math.max(0, assessment.timeLimitMinutes ?? 0)
-
   const extraMinutes = accommodationExtraMinutes(assessment.accommodations)
   const effectiveMinutes = Math.max(0, baseMinutes + extraMinutes)
+  const hasTimeLimit = assessment.timeLimitMinutes != null
+  const terminal = ['submitted', 'scored', 'expired', 'cancelled'].includes(assessment.status)
 
-  if (!assessment.startedAt || effectiveMinutes <= 0) {
+  if (!assessment.startedAt) {
     return {
       baseMinutes,
       extraMinutes,
       effectiveMinutes,
       hasAccommodation: extraMinutes > 0,
+      hasTimeLimit,
+      databaseNowAt: new Date(databaseNowMs).toISOString(),
       startedAt: assessment.startedAt,
       submittedAt: assessment.submittedAt,
+      answerDeadlineAt: null,
+      closeDeadlineAt: null,
+      phase: terminal ? 'closed' : 'answering',
       expiresAt: null,
-      remainingSeconds: assessment.startedAt ? 0 : null,
+      remainingSeconds: null,
     }
   }
 
   const startedMs = new Date(assessment.startedAt).getTime()
-  const expiresMs = startedMs + effectiveMinutes * 60_000
-  const remainingSeconds = Math.max(0, Math.ceil((expiresMs - Date.now()) / 1000))
+  const answerDeadlineMs = hasTimeLimit ? startedMs + effectiveMinutes * 60_000 : null
+
+  const closeDeadlineMs = answerDeadlineMs == null
+    ? startedMs + 24 * 60 * 60_000
+    : answerDeadlineMs + 30 * 60_000
+
+  const phase = terminal || databaseNowMs >= closeDeadlineMs
+    ? 'closed'
+    : answerDeadlineMs != null && databaseNowMs >= answerDeadlineMs
+      ? 'submit_grace'
+      : 'answering'
+
+  const visibleDeadlineMs = phase === 'answering' ? (answerDeadlineMs ?? closeDeadlineMs) : closeDeadlineMs
+  const remainingSeconds = Math.max(0, Math.ceil((visibleDeadlineMs - databaseNowMs) / 1000))
 
   return {
     baseMinutes,
     extraMinutes,
     effectiveMinutes,
     hasAccommodation: extraMinutes > 0,
+    hasTimeLimit,
+    databaseNowAt: new Date(databaseNowMs).toISOString(),
     startedAt: assessment.startedAt,
     submittedAt: assessment.submittedAt,
-    expiresAt: new Date(expiresMs).toISOString(),
+    answerDeadlineAt: answerDeadlineMs == null ? null : new Date(answerDeadlineMs).toISOString(),
+    closeDeadlineAt: new Date(closeDeadlineMs).toISOString(),
+    phase,
+    expiresAt: new Date(visibleDeadlineMs).toISOString(),
     remainingSeconds,
   }
 }
 
-const getAssessmentContext = async (assessmentId: string): Promise<ContextRow | null> => {
-  const rows = await runGreenhousePostgresQuery<ContextRow>(
+const getAssessmentContext = async (
+  assessmentId: string,
+  client: PoolClient | null = null,
+): Promise<ContextRow | null> => {
+  const sql =
     `SELECT a.assessment_id,
             app.public_id AS application_public_id,
             tpl.name AS template_name,
@@ -231,9 +269,11 @@ const getAssessmentContext = async (assessmentId: string): Promise<ContextRow | 
      LEFT JOIN greenhouse_hiring.talent_demand demand ON demand.demand_id = opening.demand_id
      LEFT JOIN greenhouse_hiring.hiring_assessment_template tpl ON tpl.template_id = a.template_id
      WHERE a.assessment_id = $1
-     LIMIT 1`,
-    [assessmentId],
-  )
+     LIMIT 1`
+
+  const rows = client
+    ? (await client.query<ContextRow>(sql, [assessmentId])).rows
+    : await runGreenhousePostgresQuery<ContextRow>(sql, [assessmentId])
 
   return rows[0] ?? null
 }
@@ -283,16 +323,18 @@ export const PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL = `WITH ranked AS (
      ORDER BY weight DESC, competency_key, question_rank
      LIMIT 12`
 
-export const listPublicAssessmentQuestions = async (assessment: Assessment): Promise<{
+export const listPublicAssessmentQuestionsWithClient = async (
+  client: PoolClient | null,
+  assessment: Assessment,
+): Promise<{
   competencies: PublicAssessmentCompetency[]
   questions: PublicAssessmentQuestion[]
 }> => {
   if (!assessment.templateId) return { competencies: [], questions: [] }
 
-  const rows = await runGreenhousePostgresQuery<PublicQuestionRow>(
-    PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL,
-    [assessment.templateId],
-  )
+  const rows = client
+    ? (await client.query<PublicQuestionRow>(PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL, [assessment.templateId])).rows
+    : await runGreenhousePostgresQuery<PublicQuestionRow>(PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL, [assessment.templateId])
 
   const competencyMap = new Map<string, PublicAssessmentCompetency>()
   const questions: PublicAssessmentQuestion[] = []
@@ -347,6 +389,9 @@ export const listPublicAssessmentQuestions = async (assessment: Assessment): Pro
   }
 }
 
+export const listPublicAssessmentQuestions = (assessment: Assessment) =>
+  listPublicAssessmentQuestionsWithClient(null, assessment)
+
 const publicResponsesFrom = (responses: AssessmentResponse[]): PublicAssessmentResponse[] =>
   responses.map((response) => ({
     responseId: response.responseId,
@@ -356,14 +401,23 @@ const publicResponsesFrom = (responses: AssessmentResponse[]): PublicAssessmentR
     updatedAt: response.updatedAt,
   }))
 
-export const buildPublicAssessmentView = async (assessment: Assessment): Promise<PublicAssessmentView> => {
-  const context = await getAssessmentContext(assessment.assessmentId)
+export const buildPublicAssessmentViewWithClient = async (
+  client: PoolClient | null,
+  assessment: Assessment,
+): Promise<PublicAssessmentView> => {
+  const databaseNowMs = client
+    ? new Date((await client.query<{ database_now: Date | string }>(
+      'SELECT clock_timestamp() AS database_now',
+    )).rows[0]?.database_now ?? Date.now()).getTime()
+    : Date.now()
+
+  const context = await getAssessmentContext(assessment.assessmentId, client)
 
   if (!context) throw new HiringNotFoundError('La evaluación no existe.', 'assessment_not_found')
 
   const [{ competencies, questions }, responses] = await Promise.all([
-    listPublicAssessmentQuestions(assessment),
-    listResponses(assessment.assessmentId),
+    listPublicAssessmentQuestionsWithClient(client, assessment),
+    client ? listResponsesWithClient(client, assessment.assessmentId) : listResponses(assessment.assessmentId),
   ])
 
   const roleTitle = str(context.opening_title || context.requested_role || context.template_name || 'la vacante')
@@ -380,17 +434,22 @@ export const buildPublicAssessmentView = async (assessment: Assessment): Promise
       area: nstr(context.public_area),
       seniority: nstr(context.public_seniority),
     },
-    timing: resolveAssessmentTiming(assessment),
+    timing: resolveAssessmentTiming(assessment, databaseNowMs),
     competencies,
     questions,
     responses: publicResponsesFrom(responses),
   }
 }
 
-export const resolvePublicAssessmentViewByToken = async (token: string): Promise<PublicAssessmentView | null> => {
-  const assessment = await resolveAssessmentByToken(token)
+export const buildPublicAssessmentView = (assessment: Assessment): Promise<PublicAssessmentView> =>
+  buildPublicAssessmentViewWithClient(null, assessment)
 
-  return assessment ? buildPublicAssessmentView(assessment) : null
+export const resolvePublicAssessmentViewByToken = async (token: string): Promise<PublicAssessmentView | null> => {
+  return withGreenhousePostgresTransaction(async (client) => {
+    const assessment = await resolveAssessmentByTokenWithClient(client, token)
+
+    return assessment ? buildPublicAssessmentViewWithClient(client, assessment) : null
+  })
 }
 
 export const capturePublicAssessmentSelfId = async (
@@ -401,12 +460,6 @@ export const capturePublicAssessmentSelfId = async (
     selections?: DemographicSelection[]
   },
 ): Promise<CaptureVoluntaryDemographicSelfIdResult> => {
-  const assessment = await resolveAssessmentByToken(token)
-
-  if (!assessment) {
-    throw new HiringValidationError('La evaluación no está disponible.', 'assessment_selfid_unavailable', 404)
-  }
-
   if (input.consentGranted !== true) {
     throw new HiringValidationError(
       'Se requiere consentimiento explícito para registrar la autoidentificación.',
@@ -415,31 +468,62 @@ export const capturePublicAssessmentSelfId = async (
     )
   }
 
-  const subject = await getSelfIdSubjectByAssessment(assessment.assessmentId)
+  const result = await withGreenhousePostgresTransaction(async (client) => {
+    const assessment = await resolveAssessmentByTokenWithClient(client, token)
 
-  if (!subject) {
+    if (!assessment) return null
+
+    const subject = await getSelfIdSubjectByAssessmentWithClient(client, assessment.assessmentId)
+
+    if (!subject) {
+      throw new HiringValidationError('La evaluación no está disponible.', 'assessment_selfid_unavailable', 404)
+    }
+
+    return captureVoluntaryDemographicSelfIdWithClient(client, {
+      identityProfileId: subject.identityProfileId,
+      applicationId: subject.applicationId,
+      consentGranted: true,
+      consentPolicyVersion: input.consentPolicyVersion?.trim() ?? '',
+      selections: input.selections ?? [],
+      actorKind: 'candidate_token',
+    })
+  })
+
+  if (!result) {
     throw new HiringValidationError('La evaluación no está disponible.', 'assessment_selfid_unavailable', 404)
   }
 
-  return captureVoluntaryDemographicSelfId({
-    identityProfileId: subject.identityProfileId,
-    applicationId: subject.applicationId,
-    consentGranted: true,
-    consentPolicyVersion: input.consentPolicyVersion?.trim() ?? '',
-    selections: input.selections ?? [],
-    actorKind: 'candidate_token',
-  })
+  return result
 }
 
 export const startPublicAssessment = async (token: string): Promise<PublicAssessmentView> => {
-  const assessment = await resolveAssessmentByToken(token)
+  const result = await withGreenhousePostgresTransaction(async (client) => {
+    const assessment = await resolveAssessmentByTokenWithClient(client, token)
 
-  if (!assessment) throw new HiringValidationError('La evaluación no está disponible.', 'assessment_not_startable', 404)
+    if (!assessment) return null
 
-  const started = await startAssessment(assessment.assessmentId)
+    const started = await startPublicAssessmentWithClient(client, assessment.assessmentId)
 
-  return buildPublicAssessmentView(started)
+    return started.outcome === 'ok'
+      ? { outcome: 'ok' as const, view: await buildPublicAssessmentViewWithClient(client, started.value) }
+      : started
+  })
+
+  if (!result || result.outcome === 'expired') {
+    throw new HiringValidationError(
+      'La evaluación no está disponible.',
+      'assessment_not_startable',
+      result ? 409 : 404,
+    )
+  }
+
+  return result.view
 }
+
+export const startPublicAssessmentWithClient = (
+  client: PoolClient,
+  assessmentId: string,
+): Promise<AssessmentDeadlineResult<Assessment>> => startAssessmentWithClient(client, assessmentId)
 
 const normalizePublicAnswer = (type: QuestionType, answer: unknown): Record<string, unknown> => {
   const value = jsonObj(answer)
@@ -485,16 +569,41 @@ export const savePublicAssessmentResponse = async (
   token: string,
   input: { questionId: string; answer: unknown },
 ): Promise<PublicAssessmentView> => {
-  const assessment = await resolveAssessmentByToken(token)
+  const result = await withGreenhousePostgresTransaction(async (client) => {
+    const assessment = await resolveAssessmentByTokenWithClient(client, token)
 
-  if (!assessment) throw new HiringValidationError('La evaluación no está disponible.', 'assessment_not_open', 409)
+    if (!assessment) return null
 
-  const { questions } = await listPublicAssessmentQuestions(assessment)
+    const saved = await savePublicAssessmentResponseWithClient(client, assessment, input)
+
+    if (saved.outcome === 'expired') return saved
+
+    const updated = await getAssessmentByIdWithClient(client, assessment.assessmentId)
+
+    if (!updated) throw new HiringNotFoundError('La evaluación no existe.', 'assessment_not_found')
+
+    return { outcome: 'ok' as const, view: await buildPublicAssessmentViewWithClient(client, updated) }
+  })
+
+  if (!result || result.outcome === 'expired') {
+    throw new HiringValidationError('La evaluación no está disponible.', 'assessment_not_open', 409)
+  }
+
+  return result.view
+}
+
+export const savePublicAssessmentResponseWithClient = async (
+  client: PoolClient,
+  assessment: Assessment,
+  input: { questionId: string; answer: unknown },
+): Promise<AssessmentDeadlineResult<void>> => {
+
+  const { questions } = await listPublicAssessmentQuestionsWithClient(client, assessment)
   const question = questions.find((entry) => entry.questionId === input.questionId)
 
   if (!question) throw new HiringValidationError('La pregunta no pertenece a esta evaluación.', 'assessment_question_not_found', 404)
 
-  await saveResponse({
+  const saved = await saveResponseWithClient(client, {
     assessmentId: assessment.assessmentId,
     competencyId: question.competencyId,
     questionId: question.questionId,
@@ -502,21 +611,41 @@ export const savePublicAssessmentResponse = async (
     answer: normalizePublicAnswer(question.type, input.answer),
   })
 
-  const updated = await getAssessmentById(assessment.assessmentId)
-
-  if (!updated) throw new HiringNotFoundError('La evaluación no existe.', 'assessment_not_found')
-
-  return buildPublicAssessmentView(updated)
+  return saved.outcome === 'ok' ? { outcome: 'ok', value: undefined } : saved
 }
 
 export const submitPublicAssessment = async (token: string): Promise<PublicAssessmentView> => {
-  const assessment = await resolveAssessmentByToken(token)
+  const result = await withGreenhousePostgresTransaction(async (client) => {
+    const assessment = await resolveAssessmentByTokenWithClient(client, token)
 
-  if (!assessment) throw new HiringValidationError('La evaluación no está disponible.', 'assessment_not_open', 409)
+    if (!assessment) return null
+
+    const submitted = await submitPublicAssessmentWithClient(client, assessment)
+
+    if (submitted.outcome === 'expired') return submitted
+
+    const updated = await getAssessmentByIdWithClient(client, assessment.assessmentId)
+
+    if (!updated) throw new HiringNotFoundError('La evaluación no existe.', 'assessment_not_found')
+
+    return { outcome: 'ok' as const, view: await buildPublicAssessmentViewWithClient(client, updated) }
+  })
+
+  if (!result || result.outcome === 'expired') {
+    throw new HiringValidationError('La evaluación no está disponible.', 'assessment_not_open', 409)
+  }
+
+  return result.view
+}
+
+export const submitPublicAssessmentWithClient = async (
+  client: PoolClient,
+  assessment: Assessment,
+): Promise<AssessmentDeadlineResult<void>> => {
 
   const [{ questions }, responses] = await Promise.all([
-    listPublicAssessmentQuestions(assessment),
-    listResponses(assessment.assessmentId),
+    listPublicAssessmentQuestionsWithClient(client, assessment),
+    listResponsesWithClient(client, assessment.assessmentId),
   ])
 
   const answeredQuestionIds = new Set(responses.map((response) => response.questionId).filter(Boolean))
@@ -528,10 +657,5 @@ export const submitPublicAssessment = async (token: string): Promise<PublicAsses
     })
   }
 
-  await submitAssessment(assessment.assessmentId, null)
-  const submitted = await getAssessmentById(assessment.assessmentId)
-
-  if (!submitted) throw new HiringNotFoundError('La evaluación no existe.', 'assessment_not_found')
-
-  return buildPublicAssessmentView(submitted)
+  return submitAssessmentWithClient(client, assessment.assessmentId, null)
 }

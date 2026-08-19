@@ -68,6 +68,15 @@ const validateSelections = (
 export const captureVoluntaryDemographicSelfId = async (
   input: CaptureVoluntaryDemographicSelfIdInput,
 ): Promise<CaptureVoluntaryDemographicSelfIdResult> => {
+  return withGreenhousePostgresTransaction(
+    (client) => captureVoluntaryDemographicSelfIdWithClient(client, input),
+  )
+}
+
+export const captureVoluntaryDemographicSelfIdWithClient = async (
+  client: PoolClient,
+  input: CaptureVoluntaryDemographicSelfIdInput,
+): Promise<CaptureVoluntaryDemographicSelfIdResult> => {
   const policy = requireHiringFairnessPolicy()
   const identityProfileId = input.identityProfileId?.trim() ?? ''
   const applicationId = input.applicationId?.trim() ?? ''
@@ -89,8 +98,7 @@ export const captureVoluntaryDemographicSelfId = async (
   const consentGrantedAt = new Date()
   const retentionExpiresAt = new Date(consentGrantedAt.getTime() + policy.retentionDays * 86_400_000)
 
-  return withGreenhousePostgresTransaction(async (client) => {
-    const subject = await runQuery<{ exists: boolean }>(
+  const subject = await runQuery<{ exists: boolean }>(
       client,
       `SELECT TRUE AS exists
        FROM greenhouse_hiring.hiring_application
@@ -99,15 +107,15 @@ export const captureVoluntaryDemographicSelfId = async (
       [applicationId, identityProfileId],
     )
 
-    if (!subject[0]?.exists) {
-      throw new HiringNotFoundError('La postulación candidata no existe.', 'hiring_fairness_subject_not_found')
-    }
+  if (!subject[0]?.exists) {
+    throw new HiringNotFoundError('La postulación candidata no existe.', 'hiring_fairness_subject_not_found')
+  }
 
-    let recorded = 0
-    let unchanged = 0
+  let recorded = 0
+  let unchanged = 0
 
-    for (const selection of selections) {
-      const existing = await runQuery<ExistingSelfIdRow>(
+  for (const selection of selections) {
+    const existing = await runQuery<ExistingSelfIdRow>(
         client,
         `SELECT selfid_id, category_key, consent_policy_version, withdrawn_at
          FROM greenhouse_hiring.hiring_demographic_selfid
@@ -116,19 +124,19 @@ export const captureVoluntaryDemographicSelfId = async (
         [applicationId, selection.dimensionKey],
       )
 
-      const current = existing[0]
+    const current = existing[0]
 
-      if (
-        current &&
-        current.category_key === selection.categoryKey &&
-        current.consent_policy_version === policy.policyVersion &&
-        current.withdrawn_at == null
-      ) {
-        unchanged += 1
-        continue
-      }
+    if (
+      current &&
+      current.category_key === selection.categoryKey &&
+      current.consent_policy_version === policy.policyVersion &&
+      current.withdrawn_at == null
+    ) {
+      unchanged += 1
+      continue
+    }
 
-      const rows = await runQuery<{ selfid_id: string }>(
+    const rows = await runQuery<{ selfid_id: string }>(
         client,
         `INSERT INTO greenhouse_hiring.hiring_demographic_selfid
            (identity_profile_id, application_id, dimension_key, category_key, consent_policy_version,
@@ -152,19 +160,19 @@ export const captureVoluntaryDemographicSelfId = async (
         ],
       )
 
-      const selfIdId = rows[0]?.selfid_id
+    const selfIdId = rows[0]?.selfid_id
 
-      if (!selfIdId) {
-        throw new HiringValidationError(
-          'No se pudo registrar la autoidentificación.',
-          'hiring_fairness_capture_failed',
-          500,
-        )
-      }
+    if (!selfIdId) {
+      throw new HiringValidationError(
+        'No se pudo registrar la autoidentificación.',
+        'hiring_fairness_capture_failed',
+        500,
+      )
+    }
 
-      const action = current ? 'updated' : 'captured'
+    const action = current ? 'updated' : 'captured'
 
-      await runQuery(
+    await runQuery(
         client,
         `INSERT INTO greenhouse_hiring.hiring_demographic_selfid_audit
            (selfid_id, action, consent_policy_version, actor_kind, actor_user_id)
@@ -172,16 +180,15 @@ export const captureVoluntaryDemographicSelfId = async (
         [selfIdId, action, policy.policyVersion, input.actorKind, input.actorUserId ?? null],
       )
 
-      recorded += 1
-    }
+    recorded += 1
+  }
 
-    return {
-      recorded,
-      unchanged,
-      consentPolicyVersion: policy.policyVersion,
-      retentionExpiresAt: retentionExpiresAt.toISOString(),
-    }
-  })
+  return {
+    recorded,
+    unchanged,
+    consentPolicyVersion: policy.policyVersion,
+    retentionExpiresAt: retentionExpiresAt.toISOString(),
+  }
 }
 
 export interface SelfIdSubject {
@@ -198,6 +205,22 @@ export const getSelfIdSubjectByAssessment = async (assessmentId: string): Promis
      LIMIT 1`,
     [assessmentId],
   )
+
+  const row = rows[0]
+
+  return row ? { applicationId: row.application_id, identityProfileId: row.identity_profile_id } : null
+}
+
+export const getSelfIdSubjectByAssessmentWithClient = async (
+  client: PoolClient,
+  assessmentId: string,
+): Promise<SelfIdSubject | null> => {
+  const rows = await runQuery<{ application_id: string; identity_profile_id: string }>(client,
+    `SELECT app.application_id, app.identity_profile_id
+       FROM greenhouse_hiring.hiring_assessment assessment
+       JOIN greenhouse_hiring.hiring_application app ON app.application_id = assessment.application_id
+      WHERE assessment.assessment_id = $1 LIMIT 1`,
+    [assessmentId])
 
   const row = rows[0]
 

@@ -8,6 +8,62 @@ INSERT INTO greenhouse_notifications.email_type_config (email_type, enabled)
 VALUES ('hiring_assessment_access_recovery', FALSE)
 ON CONFLICT (email_type) DO NOTHING;
 
+-- A credential version is the revocation boundary for opaque browser sessions. Existing
+-- candidate links receive a version without changing their bearer hash or expiry.
+ALTER TABLE greenhouse_hiring.hiring_assessment
+  ADD COLUMN IF NOT EXISTS access_token_version_id UUID;
+
+UPDATE greenhouse_hiring.hiring_assessment
+SET access_token_version_id = gen_random_uuid()
+WHERE access_token_hash IS NOT NULL AND access_token_version_id IS NULL;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'hiring_assessment_access_credential_version_check'
+      AND conrelid = 'greenhouse_hiring.hiring_assessment'::regclass
+  ) THEN
+    ALTER TABLE greenhouse_hiring.hiring_assessment
+      ADD CONSTRAINT hiring_assessment_access_credential_version_check
+      CHECK (access_token_hash IS NULL OR access_token_version_id IS NOT NULL);
+  END IF;
+END
+$$;
+
+CREATE OR REPLACE FUNCTION greenhouse_hiring.guard_hiring_assessment_access_credential()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  IF NEW.access_token_hash IS NOT NULL AND NEW.access_token_version_id IS NULL THEN
+    RAISE EXCEPTION 'assessment access credential requires a version (TASK-1746)'
+      USING ERRCODE = '23514';
+  END IF;
+
+  IF TG_OP = 'UPDATE' THEN
+    IF NEW.access_token_hash IS DISTINCT FROM OLD.access_token_hash
+       AND NEW.access_token_hash IS NOT NULL
+       AND NEW.access_token_version_id IS NOT DISTINCT FROM OLD.access_token_version_id THEN
+      RAISE EXCEPTION 'assessment access credential rotation requires a new version (TASK-1746)'
+        USING ERRCODE = '23514';
+    END IF;
+
+    IF NEW.access_token_version_id IS DISTINCT FROM OLD.access_token_version_id
+       AND (NEW.access_token_hash IS NULL
+         OR NEW.access_token_hash IS NOT DISTINCT FROM OLD.access_token_hash) THEN
+      RAISE EXCEPTION 'assessment access credential version cannot rotate independently (TASK-1746)'
+        USING ERRCODE = '23514';
+    END IF;
+  END IF;
+
+  RETURN NEW;
+END
+$$;
+
+CREATE TRIGGER trg_hiring_assessment_access_credential_guard
+  BEFORE INSERT OR UPDATE OF access_token_hash, access_token_version_id
+  ON greenhouse_hiring.hiring_assessment
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_hiring.guard_hiring_assessment_access_credential();
+
 CREATE TABLE IF NOT EXISTS greenhouse_hiring.hiring_assessment_access_recovery (
   recovery_id          TEXT PRIMARY KEY DEFAULT ('harc-' || gen_random_uuid()::text),
   assessment_id        TEXT NOT NULL REFERENCES greenhouse_hiring.hiring_assessment (assessment_id) ON DELETE RESTRICT,
@@ -58,19 +114,54 @@ CREATE INDEX IF NOT EXISTS hiring_assessment_access_recovery_retention_idx
   ON greenhouse_hiring.hiring_assessment_access_recovery (retention_expires_at)
   WHERE retention_expires_at IS NOT NULL;
 
-CREATE OR REPLACE FUNCTION greenhouse_hiring.assessment_access_recovery_deadline(
+CREATE OR REPLACE FUNCTION greenhouse_hiring.assessment_candidate_test_deadline(
+  p_started_at timestamptz, p_time_limit_minutes integer, p_accommodations jsonb
+) RETURNS timestamptz
+LANGUAGE sql IMMUTABLE PARALLEL SAFE AS $$
+  SELECT CASE
+    WHEN p_started_at IS NULL OR p_time_limit_minutes IS NULL THEN NULL
+    ELSE p_started_at + make_interval(mins => p_time_limit_minutes + GREATEST(0, COALESCE(
+      CASE WHEN (p_accommodations->>'extraMinutes') ~ '^[0-9]+(\.[0-9]+)?$'
+        THEN FLOOR((p_accommodations->>'extraMinutes')::numeric)::int END,
+      0
+    )))
+  END
+$$;
+
+ALTER FUNCTION greenhouse_hiring.assessment_candidate_test_deadline(timestamptz, integer, jsonb)
+  OWNER TO greenhouse_ops;
+REVOKE ALL ON FUNCTION greenhouse_hiring.assessment_candidate_test_deadline(timestamptz, integer, jsonb)
+  FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION greenhouse_hiring.assessment_candidate_test_deadline(timestamptz, integer, jsonb)
+  TO greenhouse_runtime, greenhouse_ops;
+
+CREATE OR REPLACE FUNCTION greenhouse_hiring.assessment_candidate_test_close_deadline(
   p_started_at timestamptz, p_time_limit_minutes integer, p_accommodations jsonb
 ) RETURNS timestamptz
 LANGUAGE sql IMMUTABLE PARALLEL SAFE AS $$
   SELECT CASE
     WHEN p_started_at IS NULL THEN NULL
     WHEN p_time_limit_minutes IS NULL THEN p_started_at + INTERVAL '24 hours'
-    ELSE p_started_at + make_interval(mins => p_time_limit_minutes + GREATEST(0, COALESCE(
-      CASE WHEN (p_accommodations->>'extraMinutes') ~ '^[0-9]+(\.[0-9]+)?$'
-        THEN FLOOR((p_accommodations->>'extraMinutes')::numeric)::int END,
-      0
-    ))) + INTERVAL '30 minutes'
+    ELSE greenhouse_hiring.assessment_candidate_test_deadline(
+      p_started_at, p_time_limit_minutes, p_accommodations
+    ) + INTERVAL '30 minutes'
   END
+$$;
+
+ALTER FUNCTION greenhouse_hiring.assessment_candidate_test_close_deadline(timestamptz, integer, jsonb)
+  OWNER TO greenhouse_ops;
+REVOKE ALL ON FUNCTION greenhouse_hiring.assessment_candidate_test_close_deadline(timestamptz, integer, jsonb)
+  FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION greenhouse_hiring.assessment_candidate_test_close_deadline(timestamptz, integer, jsonb)
+  TO greenhouse_runtime, greenhouse_ops;
+
+CREATE OR REPLACE FUNCTION greenhouse_hiring.assessment_access_recovery_deadline(
+  p_started_at timestamptz, p_time_limit_minutes integer, p_accommodations jsonb
+) RETURNS timestamptz
+LANGUAGE sql IMMUTABLE PARALLEL SAFE AS $$
+  SELECT greenhouse_hiring.assessment_candidate_test_close_deadline(
+    p_started_at, p_time_limit_minutes, p_accommodations
+  )
 $$;
 
 ALTER FUNCTION greenhouse_hiring.assessment_access_recovery_deadline(timestamptz, integer, jsonb)
@@ -79,6 +170,266 @@ REVOKE ALL ON FUNCTION greenhouse_hiring.assessment_access_recovery_deadline(tim
   FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION greenhouse_hiring.assessment_access_recovery_deadline(timestamptz, integer, jsonb)
   TO greenhouse_runtime, greenhouse_ops;
+
+CREATE TABLE IF NOT EXISTS greenhouse_hiring.hiring_assessment_public_session (
+  public_session_id       TEXT PRIMARY KEY DEFAULT ('haps-' || gen_random_uuid()::text),
+  assessment_id           TEXT NOT NULL REFERENCES greenhouse_hiring.hiring_assessment (assessment_id) ON DELETE CASCADE,
+  access_token_version_id UUID NOT NULL,
+  session_token_hash      TEXT NOT NULL UNIQUE CHECK (session_token_hash ~ '^[a-f0-9]{64}$'),
+  status                  TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'revoked', 'expired')),
+  expires_at              TIMESTAMPTZ NOT NULL,
+  created_at              TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+  updated_at              TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+  CHECK (expires_at > created_at)
+);
+
+ALTER TABLE greenhouse_hiring.hiring_assessment_public_session OWNER TO greenhouse_ops;
+REVOKE ALL ON TABLE greenhouse_hiring.hiring_assessment_public_session
+  FROM PUBLIC, greenhouse_runtime;
+
+CREATE INDEX IF NOT EXISTS hiring_assessment_public_session_assessment_active_idx
+  ON greenhouse_hiring.hiring_assessment_public_session (assessment_id, expires_at)
+  WHERE status = 'active';
+CREATE INDEX IF NOT EXISTS hiring_assessment_public_session_expiry_idx
+  ON greenhouse_hiring.hiring_assessment_public_session (expires_at)
+  WHERE status = 'active';
+
+CREATE OR REPLACE FUNCTION greenhouse_hiring.validate_hiring_assessment_public_session_insert()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = pg_catalog, greenhouse_hiring AS $$
+DECLARE
+  canonical_application_id text;
+  canonical_candidate_facet_id text;
+  canonical_method text;
+  canonical_status text;
+  canonical_access_token_hash text;
+  canonical_access_token_version_id uuid;
+  canonical_token_expires_at timestamptz;
+  canonical_started_at timestamptz;
+  canonical_time_limit_minutes integer;
+  canonical_accommodations jsonb;
+  canonical_deadline timestamptz;
+  effective_expiry timestamptz;
+  application_stage text;
+  application_decision text;
+  candidate_consent_status text;
+  inserted_at timestamptz;
+BEGIN
+  -- Same lock order as recovery and the runtime store.
+  SELECT application_id, method, status, access_token_hash, access_token_version_id,
+         token_expires_at, started_at, time_limit_minutes, accommodations_json
+    INTO canonical_application_id, canonical_method, canonical_status, canonical_access_token_hash,
+         canonical_access_token_version_id, canonical_token_expires_at, canonical_started_at,
+         canonical_time_limit_minutes, canonical_accommodations
+  FROM greenhouse_hiring.hiring_assessment
+  WHERE assessment_id = NEW.assessment_id
+  FOR UPDATE;
+
+  SELECT candidate_facet_id, stage, decision
+    INTO canonical_candidate_facet_id, application_stage, application_decision
+  FROM greenhouse_hiring.hiring_application
+  WHERE application_id = canonical_application_id
+  FOR UPDATE;
+
+  SELECT consent_status INTO candidate_consent_status
+  FROM greenhouse_hiring.candidate_facet
+  WHERE candidate_facet_id = canonical_candidate_facet_id
+  FOR UPDATE;
+
+  canonical_deadline := greenhouse_hiring.assessment_candidate_test_close_deadline(
+    canonical_started_at, canonical_time_limit_minutes, canonical_accommodations);
+  effective_expiry := CASE
+    WHEN canonical_status IN ('assigned', 'sent') THEN canonical_token_expires_at
+    ELSE canonical_deadline
+  END;
+
+  IF canonical_application_id IS NULL OR canonical_candidate_facet_id IS NULL
+     OR canonical_method <> 'candidate_test'
+     OR canonical_status NOT IN ('assigned', 'sent', 'in_progress')
+     OR canonical_access_token_hash IS NULL
+     OR canonical_access_token_version_id IS NULL
+     OR canonical_token_expires_at IS NULL
+     OR NEW.access_token_version_id IS DISTINCT FROM canonical_access_token_version_id
+     OR application_decision IS NOT NULL
+     OR application_stage IN ('selected', 'rejected', 'withdrawn', 'handoff_ready', 'closed')
+     OR candidate_consent_status = 'withdrawn'
+     OR effective_expiry IS NULL
+     OR effective_expiry <= clock_timestamp()
+     OR NEW.expires_at > effective_expiry THEN
+    RAISE EXCEPTION 'assessment public session eligibility invalid (TASK-1746)'
+      USING ERRCODE = '23514';
+  END IF;
+
+  -- A credential version may have at most three live browser sessions. The assessment
+  -- lock above serializes concurrent exchanges; keep the two newest before inserting.
+  PERFORM set_config('greenhouse.assessment_session_governed_update', 'on', true);
+  UPDATE greenhouse_hiring.hiring_assessment_public_session
+     SET status = 'revoked', updated_at = clock_timestamp()
+   WHERE public_session_id IN (
+     SELECT public_session_id
+       FROM greenhouse_hiring.hiring_assessment_public_session
+      WHERE assessment_id = NEW.assessment_id
+        AND access_token_version_id = NEW.access_token_version_id
+        AND status = 'active'
+      ORDER BY created_at DESC, public_session_id DESC
+      OFFSET 2
+   );
+  PERFORM set_config('greenhouse.assessment_session_governed_update', 'off', true);
+
+  inserted_at := clock_timestamp();
+  NEW.status := 'active';
+  NEW.created_at := inserted_at;
+  NEW.updated_at := inserted_at;
+  RETURN NEW;
+END
+$$;
+
+CREATE TRIGGER trg_hiring_assessment_public_session_validate
+  BEFORE INSERT ON greenhouse_hiring.hiring_assessment_public_session
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_hiring.validate_hiring_assessment_public_session_insert();
+
+ALTER FUNCTION greenhouse_hiring.validate_hiring_assessment_public_session_insert() OWNER TO greenhouse_ops;
+REVOKE ALL ON FUNCTION greenhouse_hiring.validate_hiring_assessment_public_session_insert()
+  FROM PUBLIC, greenhouse_runtime;
+
+CREATE OR REPLACE FUNCTION greenhouse_hiring.guard_hiring_assessment_public_session_update()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  IF ROW(NEW.public_session_id, NEW.assessment_id, NEW.access_token_version_id,
+         NEW.session_token_hash, NEW.created_at)
+     IS DISTINCT FROM
+     ROW(OLD.public_session_id, OLD.assessment_id, OLD.access_token_version_id,
+         OLD.session_token_hash, OLD.created_at) THEN
+    RAISE EXCEPTION 'assessment public session immutable fields changed (TASK-1746)'
+      USING ERRCODE = '55000';
+  END IF;
+
+  IF NEW.expires_at IS DISTINCT FROM OLD.expires_at
+     AND NOT (current_user = 'greenhouse_ops'
+       AND current_setting('greenhouse.assessment_session_governed_update', true) = 'on') THEN
+    RAISE EXCEPTION 'assessment public session expiry is governed (TASK-1746)'
+      USING ERRCODE = '55000';
+  END IF;
+
+  IF NEW.status <> OLD.status
+     AND NOT (OLD.status = 'active' AND NEW.status IN ('revoked', 'expired')) THEN
+    RAISE EXCEPTION 'assessment public session transition % -> % invalid (TASK-1746)',
+      OLD.status, NEW.status USING ERRCODE = '23514';
+  END IF;
+
+  IF NEW.updated_at < OLD.updated_at THEN
+    RAISE EXCEPTION 'assessment public session updated_at cannot regress (TASK-1746)'
+      USING ERRCODE = '22007';
+  END IF;
+
+  RETURN NEW;
+END
+$$;
+
+CREATE OR REPLACE FUNCTION greenhouse_hiring.refresh_assessment_public_session_expiry(
+  p_assessment_id text
+) RETURNS void
+LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = pg_catalog, greenhouse_hiring AS $$
+DECLARE
+  a greenhouse_hiring.hiring_assessment%ROWTYPE;
+  canonical_expiry timestamptz;
+BEGIN
+  SELECT * INTO a FROM greenhouse_hiring.hiring_assessment
+   WHERE assessment_id = p_assessment_id FOR UPDATE;
+  IF NOT FOUND THEN RETURN; END IF;
+
+  canonical_expiry := CASE
+    WHEN a.status IN ('assigned', 'sent') THEN a.token_expires_at
+    WHEN a.status = 'in_progress' THEN greenhouse_hiring.assessment_candidate_test_close_deadline(
+      a.started_at, a.time_limit_minutes, a.accommodations_json)
+    ELSE NULL
+  END;
+
+  PERFORM set_config('greenhouse.assessment_session_governed_update', 'on', true);
+  UPDATE greenhouse_hiring.hiring_assessment_public_session s
+     SET status = CASE
+           WHEN canonical_expiry IS NULL
+             OR s.access_token_version_id IS DISTINCT FROM a.access_token_version_id
+           THEN 'revoked'
+           WHEN canonical_expiry <= clock_timestamp() OR canonical_expiry <= s.created_at
+           THEN 'expired'
+           ELSE s.status END,
+         expires_at = CASE
+           WHEN canonical_expiry > s.created_at THEN canonical_expiry
+           ELSE s.expires_at
+         END,
+         updated_at = clock_timestamp()
+   WHERE s.assessment_id = a.assessment_id AND s.status = 'active'
+     AND (s.access_token_version_id IS DISTINCT FROM a.access_token_version_id
+       OR canonical_expiry IS NULL OR s.expires_at IS DISTINCT FROM canonical_expiry);
+  PERFORM set_config('greenhouse.assessment_session_governed_update', 'off', true);
+END
+$$;
+
+ALTER FUNCTION greenhouse_hiring.refresh_assessment_public_session_expiry(text) OWNER TO greenhouse_ops;
+REVOKE ALL ON FUNCTION greenhouse_hiring.refresh_assessment_public_session_expiry(text)
+  FROM PUBLIC, greenhouse_runtime;
+GRANT EXECUTE ON FUNCTION greenhouse_hiring.refresh_assessment_public_session_expiry(text)
+  TO greenhouse_ops;
+
+CREATE OR REPLACE FUNCTION greenhouse_hiring.refresh_assessment_public_sessions_after_change()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = pg_catalog, greenhouse_hiring AS $$
+BEGIN
+  PERFORM greenhouse_hiring.refresh_assessment_public_session_expiry(NEW.assessment_id);
+  RETURN NEW;
+END
+$$;
+ALTER FUNCTION greenhouse_hiring.refresh_assessment_public_sessions_after_change() OWNER TO greenhouse_ops;
+REVOKE ALL ON FUNCTION greenhouse_hiring.refresh_assessment_public_sessions_after_change()
+  FROM PUBLIC, greenhouse_runtime;
+
+CREATE TRIGGER trg_hiring_assessment_public_session_refresh
+  AFTER UPDATE OF status, started_at, time_limit_minutes, accommodations_json,
+                  token_expires_at, access_token_version_id
+  ON greenhouse_hiring.hiring_assessment
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_hiring.refresh_assessment_public_sessions_after_change();
+
+CREATE TRIGGER trg_hiring_assessment_public_session_update_guard
+  BEFORE UPDATE ON greenhouse_hiring.hiring_assessment_public_session
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_hiring.guard_hiring_assessment_public_session_update();
+
+CREATE OR REPLACE FUNCTION greenhouse_hiring.purge_expired_assessment_public_sessions(
+  p_limit integer DEFAULT 500
+) RETURNS integer
+LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = pg_catalog, greenhouse_hiring AS $$
+DECLARE purged_count integer;
+BEGIN
+  IF p_limit < 1 OR p_limit > 5000 THEN
+    RAISE EXCEPTION 'assessment public session purge limit invalid' USING ERRCODE = '22023';
+  END IF;
+
+  WITH due AS (
+    SELECT public_session_id
+    FROM greenhouse_hiring.hiring_assessment_public_session
+    WHERE expires_at <= clock_timestamp()
+       OR (status <> 'active' AND updated_at <= clock_timestamp() - INTERVAL '30 days')
+    ORDER BY expires_at, public_session_id
+    LIMIT p_limit
+    FOR UPDATE SKIP LOCKED
+  )
+  DELETE FROM greenhouse_hiring.hiring_assessment_public_session target
+  USING due
+  WHERE target.public_session_id = due.public_session_id;
+
+  GET DIAGNOSTICS purged_count = ROW_COUNT;
+  RETURN purged_count;
+END
+$$;
+
+ALTER FUNCTION greenhouse_hiring.purge_expired_assessment_public_sessions(integer)
+  OWNER TO greenhouse_ops;
+REVOKE ALL ON FUNCTION greenhouse_hiring.purge_expired_assessment_public_sessions(integer)
+  FROM PUBLIC, greenhouse_runtime;
+GRANT EXECUTE ON FUNCTION greenhouse_hiring.purge_expired_assessment_public_sessions(integer)
+  TO greenhouse_ops;
 
 CREATE OR REPLACE FUNCTION greenhouse_hiring.validate_assessment_access_recovery_receipt()
 RETURNS trigger LANGUAGE plpgsql AS $$
@@ -191,6 +542,7 @@ CREATE OR REPLACE FUNCTION greenhouse_hiring.validate_assessment_access_recovery
 RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE
   canonical_status text;
+  canonical_token_version_id uuid;
   canonical_started_at timestamptz;
   canonical_time_limit_minutes integer;
   canonical_accommodations jsonb;
@@ -199,9 +551,9 @@ DECLARE
   application_decision text;
   candidate_consent_status text;
 BEGIN
-  SELECT assessment.status, assessment.started_at, assessment.time_limit_minutes,
+  SELECT assessment.status, assessment.access_token_version_id, assessment.started_at, assessment.time_limit_minutes,
          assessment.accommodations_json, application.stage, application.decision, facet.consent_status
-    INTO canonical_status, canonical_started_at, canonical_time_limit_minutes,
+    INTO canonical_status, canonical_token_version_id, canonical_started_at, canonical_time_limit_minutes,
          canonical_accommodations, application_stage, application_decision, candidate_consent_status
   FROM greenhouse_hiring.hiring_assessment assessment
   JOIN greenhouse_hiring.hiring_application application
@@ -211,6 +563,10 @@ BEGIN
   WHERE assessment.assessment_id = NEW.assessment_id;
   IF canonical_status IS DISTINCT FROM NEW.resulting_status THEN
     RAISE EXCEPTION 'assessment access recovery final state mismatch (TASK-1746)' USING ERRCODE = '23514';
+  END IF;
+  IF canonical_token_version_id IS DISTINCT FROM NEW.token_version_id THEN
+    RAISE EXCEPTION 'assessment access recovery final credential version mismatch (TASK-1746)'
+      USING ERRCODE = '23514';
   END IF;
   IF NEW.resulting_status = 'sent' AND canonical_started_at IS NOT NULL THEN
     RAISE EXCEPTION 'assessment access recovery final unstarted state mismatch (TASK-1746)' USING ERRCODE = '23514';
@@ -539,6 +895,9 @@ GRANT SELECT, INSERT ON greenhouse_hiring.hiring_assessment_access_recovery TO g
 GRANT UPDATE (outcome, updated_at)
   ON greenhouse_hiring.hiring_assessment_access_recovery TO greenhouse_runtime;
 GRANT SELECT ON greenhouse_hiring.hiring_assessment_access_recovery_event TO greenhouse_runtime;
+GRANT SELECT, INSERT ON greenhouse_hiring.hiring_assessment_public_session TO greenhouse_runtime;
+GRANT UPDATE (status, updated_at)
+  ON greenhouse_hiring.hiring_assessment_public_session TO greenhouse_runtime;
 
 -- Historical bearer cleanup is intentionally NOT performed here. The repeatable sanitizer runs
 -- only after every writer persists token-sensitive context redacted and recovery is live.
@@ -555,7 +914,7 @@ ON CONFLICT (capability_key) DO UPDATE SET module = EXCLUDED.module,
   description = EXCLUDED.description, deprecated_at = NULL;
 
 DO $$
-DECLARE seeded_count integer; trigger_count integer;
+DECLARE seeded_count integer; trigger_count integer; session_column_count integer;
 BEGIN
   SELECT COUNT(*) INTO seeded_count FROM greenhouse_core.capabilities_registry
   WHERE capability_key IN ('hiring.assessment.recover_access_email', 'hiring.assessment.reveal_access_link')
@@ -570,9 +929,20 @@ BEGIN
     'trg_hiring_assessment_access_recovery_event_on_outcome',
     'trg_hiring_application_assessment_recovery_retention',
     'trg_candidate_facet_assessment_recovery_retention',
-    'trg_hiring_assessment_access_recovery_purge_audit_append_only') AND NOT tgisinternal;
-  IF seeded_count <> 2 OR trigger_count <> 10 THEN
-    RAISE EXCEPTION 'TASK-1746 anti pre-up-marker check failed: capabilities=%, triggers=%', seeded_count, trigger_count;
+    'trg_hiring_assessment_access_recovery_purge_audit_append_only',
+    'trg_hiring_assessment_access_credential_guard',
+    'trg_hiring_assessment_public_session_refresh',
+    'trg_hiring_assessment_public_session_validate',
+    'trg_hiring_assessment_public_session_update_guard') AND NOT tgisinternal;
+  SELECT COUNT(*) INTO session_column_count
+  FROM information_schema.columns
+  WHERE table_schema = 'greenhouse_hiring'
+    AND ((table_name = 'hiring_assessment' AND column_name = 'access_token_version_id')
+      OR (table_name = 'hiring_assessment_public_session'
+        AND column_name IN ('session_token_hash', 'access_token_version_id', 'expires_at')));
+  IF seeded_count <> 2 OR trigger_count <> 14 OR session_column_count <> 4 THEN
+    RAISE EXCEPTION 'TASK-1746 anti pre-up-marker check failed: capabilities=%, triggers=%, session_columns=%',
+      seeded_count, trigger_count, session_column_count;
   END IF;
 END
 $$;
@@ -585,7 +955,8 @@ DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM greenhouse_hiring.hiring_assessment_access_recovery LIMIT 1)
      OR EXISTS (SELECT 1 FROM greenhouse_hiring.hiring_assessment_access_recovery_event LIMIT 1)
-     OR EXISTS (SELECT 1 FROM greenhouse_hiring.hiring_assessment_access_recovery_purge_audit LIMIT 1) THEN
+     OR EXISTS (SELECT 1 FROM greenhouse_hiring.hiring_assessment_access_recovery_purge_audit LIMIT 1)
+     OR EXISTS (SELECT 1 FROM greenhouse_hiring.hiring_assessment_public_session LIMIT 1) THEN
     RAISE EXCEPTION 'TASK-1746 Down blocked: recovery audit exists; revoke capabilities instead';
   END IF;
 END
@@ -597,6 +968,15 @@ $$;
 UPDATE greenhouse_core.capabilities_registry SET deprecated_at = NOW()
 WHERE capability_key IN ('hiring.assessment.recover_access_email', 'hiring.assessment.reveal_access_link')
   AND deprecated_at IS NULL;
+DROP FUNCTION IF EXISTS greenhouse_hiring.purge_expired_assessment_public_sessions(integer);
+DROP TRIGGER IF EXISTS trg_hiring_assessment_public_session_refresh ON greenhouse_hiring.hiring_assessment;
+DROP FUNCTION IF EXISTS greenhouse_hiring.refresh_assessment_public_sessions_after_change();
+DROP FUNCTION IF EXISTS greenhouse_hiring.refresh_assessment_public_session_expiry(text);
+DROP TRIGGER IF EXISTS trg_hiring_assessment_public_session_update_guard ON greenhouse_hiring.hiring_assessment_public_session;
+DROP FUNCTION IF EXISTS greenhouse_hiring.guard_hiring_assessment_public_session_update();
+DROP TRIGGER IF EXISTS trg_hiring_assessment_public_session_validate ON greenhouse_hiring.hiring_assessment_public_session;
+DROP FUNCTION IF EXISTS greenhouse_hiring.validate_hiring_assessment_public_session_insert();
+DROP TABLE IF EXISTS greenhouse_hiring.hiring_assessment_public_session;
 DROP FUNCTION IF EXISTS greenhouse_hiring.purge_assessment_access_recovery(text, text, text);
 DROP TRIGGER IF EXISTS trg_hiring_assessment_access_recovery_purge_audit_append_only ON greenhouse_hiring.hiring_assessment_access_recovery_purge_audit;
 DROP FUNCTION IF EXISTS greenhouse_hiring.prevent_assessment_access_recovery_purge_audit_mutation();
@@ -621,3 +1001,10 @@ DROP FUNCTION IF EXISTS greenhouse_hiring.guard_assessment_access_recovery_updat
 DROP FUNCTION IF EXISTS greenhouse_hiring.validate_assessment_access_recovery_receipt();
 DROP TABLE IF EXISTS greenhouse_hiring.hiring_assessment_access_recovery;
 DROP FUNCTION IF EXISTS greenhouse_hiring.assessment_access_recovery_deadline(timestamptz, integer, jsonb);
+DROP FUNCTION IF EXISTS greenhouse_hiring.assessment_candidate_test_close_deadline(timestamptz, integer, jsonb);
+DROP FUNCTION IF EXISTS greenhouse_hiring.assessment_candidate_test_deadline(timestamptz, integer, jsonb);
+DROP TRIGGER IF EXISTS trg_hiring_assessment_access_credential_guard ON greenhouse_hiring.hiring_assessment;
+DROP FUNCTION IF EXISTS greenhouse_hiring.guard_hiring_assessment_access_credential();
+ALTER TABLE greenhouse_hiring.hiring_assessment
+  DROP CONSTRAINT IF EXISTS hiring_assessment_access_credential_version_check,
+  DROP COLUMN IF EXISTS access_token_version_id;

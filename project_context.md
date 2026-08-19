@@ -201,6 +201,13 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   OFF. El expediente genera propuestas automáticas con Google `gemini-2.5-flash`/prompt v2 cuando CV limpio y
   assessment puntuado están listos, pero nunca auto-confirma. El gate calibrado sigue bloqueado **por volumen del
   gold set** (11 contra un piso de 49). TASK-1742 conserva cooldown, rollback residual-cero y firmas pendientes.
+- La **recuperación de acceso al assessment** está gobernada por el ADR
+  [`GREENHOUSE_HIRING_ASSESSMENT_ACCESS_RECOVERY_AND_EMAIL_DELIVERY_DECISION_V1.md`](docs/architecture/GREENHOUSE_HIRING_ASSESSMENT_ACCESS_RECOVERY_AND_EMAIL_DELIVERY_DECISION_V1.md)
+  y `TASK-1745`–`TASK-1747`. Estado real al 2026-08-19: lifecycle global de Resend, transporte token-sensitive,
+  recovery email y core de sesión opaca/versionada están validados localmente, pero sus migraciones/índice no
+  están aplicados y el tipo de correo permanece OFF. El runtime productivo todavía usa el enlace legacy con
+  bearer en path; ningún enlace nuevo de recovery puede habilitarse hasta completar fragment→exchange→cookie
+  HttpOnly, Product API, UI y smokes PG/browser. `sent` significa despacho aceptado, nunca entrega confirmada.
 - La dirección aceptada para autoservicio candidato es **una cuenta y un `/my` longitudinal** (`TASK-1727`–`TASK-1733`,
   EPIC-011): mismo `identity_profile_id` y principal/login; `candidate_facet` y `member` son facetas aditivas;
   perfil profesional person-scoped; CV/respuestas/expectativa conservan snapshot por aplicación; activation suma
