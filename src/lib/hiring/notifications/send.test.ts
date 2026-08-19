@@ -67,6 +67,7 @@ describe('TASK-1689 hiring lifecycle emails', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     process.env.HIRING_LIFECYCLE_EMAILS_ENABLED = 'true'
+    delete process.env.HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED
     delete process.env.HIRING_INTERNAL_NOTIFICATIONS_EMAIL
     mockWasEmailAlreadySent.mockResolvedValue(false)
     mockClaimTokenSensitiveEmailIntent.mockImplementation(async input => ({
@@ -80,6 +81,7 @@ describe('TASK-1689 hiring lifecycle emails', () => {
 
   afterEach(() => {
     delete process.env.HIRING_LIFECYCLE_EMAILS_ENABLED
+    delete process.env.HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED
   })
 
   describe('projections declaration', () => {
@@ -279,6 +281,19 @@ describe('TASK-1689 hiring lifecycle emails', () => {
         deliveryIntentId: 'delivery-intent-1',
       })
       expect(JSON.stringify(call.persistence)).not.toContain('tok-abc')
+    })
+
+    it('uses the fragment exchange URL only when the ops-worker cutover flag is ON', async () => {
+      process.env.HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED = 'true'
+      mockGetAssessmentById.mockResolvedValue(assessment)
+      mockReissueToken.mockResolvedValue({ token: 'tok-fragment', timeLimitMinutes: 45, tokenTtlDays: 14 })
+
+      await sendHiringAssessmentAssignedEmail(assessmentId, { method: 'candidate_test', _eventId: eventId })
+
+      const call = mockSendEmail.mock.calls[0][0]
+
+      expect(call.context.assessmentUrl).toContain('/public/assessment/access#access=tok-fragment')
+      expect(call.context.assessmentUrl).not.toContain('/public/assessment/tok-fragment')
     })
   })
 

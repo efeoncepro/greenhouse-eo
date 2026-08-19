@@ -45,6 +45,9 @@ on:
       # bundles this projection/policy code. Omitting it leaves privacy fixes
       # stranded even when services/ops-worker itself is unchanged.
       - 'src/lib/hiring/talent-pool/**'
+      # TASK-1746 — assignment/recovery email link policy is evaluated by the
+      # reactive notifications sender in this worker, never by Vercel.
+      - 'src/lib/hiring/notifications/**'
       - 'src/lib/google-credentials.ts'
       - 'src/lib/space-notion/**'
       # TASK-742 — ops-worker hosts the auth-providers smoke lane and consumes
@@ -216,6 +219,7 @@ jobs:
               src/lib/integrations \
               src/lib/globe \
               src/lib/hiring/talent-pool \
+              src/lib/hiring/notifications \
               src/lib/google-credentials.ts \
               src/lib/space-notion \
               src/lib/auth \
@@ -282,6 +286,7 @@ jobs:
             src/lib/email
             src/lib/integrations
             src/lib/hiring/talent-pool
+            src/lib/hiring/notifications
             src/lib/space-notion
             src/lib/auth
             src/lib/auth-secrets.ts

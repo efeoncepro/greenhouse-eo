@@ -220,7 +220,9 @@ P0/P1/P2; 90 tests focales y los gates locales quedaron verdes. No se aplicó mi
   sesión opaca HttpOnly vinculada a la versión/hash vigente y navegación/API posteriores sin token.
 - Separar start-by del enlace, deadline de respuestas y gracia de cierre; start/save/submit revalidan estado,
   consentimiento, aplicación y reloj de DB bajo el lock canónico. Una rotación invalida sesiones anteriores.
-- Mantener las rutas con token en path sólo como compatibilidad temporal y emitir todo enlace nuevo por fragmento.
+- Mantener las rutas con token en path como compatibilidad temporal. El cutover del email inicial al
+  fragmento está gateado por `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` en ops-worker, default OFF;
+  recovery permanece OFF y conserva el contrato fragmentado para su activación gobernada.
 
 **Checkpoint 2026-08-19 — Slice 3A core code-complete, runtime pendiente.** Cada credencial de assessment
 tiene una versión explícita y las sesiones públicas guardan únicamente un digest opaco vinculado a esa
@@ -233,6 +235,16 @@ gracia y no-limit. Arquitectura, Talento y Seguridad cerraron sus auditorías si
 ESLint, TypeScript, migration marker y diff-check están verdes. La migración no está aplicada y el tipo de
 correo permanece OFF. Faltan la página de limpieza síncrona del fragmento, el exchange/cookie HttpOnly, las
 rutas token-free, el adapter Product API y los smokes PG/browser antes de cualquier activación.
+
+**Checkpoint 2026-08-19 — Slice 3B session transport code-complete, rollout pendiente.** La página de acceso
+elimina el fragmento antes de fetch/render, el exchange same-origin entrega una cookie `__Host-` HttpOnly y
+las páginas/API posteriores derivan la evaluación sólo de esa sesión. Origin, CSP, no-store/no-referrer,
+maintenance bypass acotado, trailing slash, rotación, multi-tab fence, reloj y modal accesible quedaron
+cubiertos localmente; las rutas legacy siguen separadas. El email inicial no cambia por defecto: el flag
+`HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` vive únicamente en ops-worker y se declara `false` en
+`deploy.sh` y en el ledger. Sólo puede habilitarse después de migración+índice con readback, cuatro routes
+live, Resend `click_tracking=false` verificado por API/readback y smoke del href fragmentado. No se aplicó
+migración, no se desplegaron routes, no se cambió ninguna env y recovery continúa OFF.
 
 ### Slice 4 — Product API, guardrails y evidencia
 
@@ -272,7 +284,11 @@ rutas token-free, el adapter Product API y los smokes PG/browser antes de cualqu
 
 ### Feature flags / cutover
 
-Capability grant and route exposure stay disabled until ADR acceptance and staging evidence. Revert by revoking capability/route exposure; issued tokens retain their documented expiry.
+Capability grant and route exposure stay disabled until ADR acceptance and staging evidence.
+`HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` es un gate del ops-worker default OFF; ausente/OFF conserva
+el link legacy y ON selecciona el fragment exchange sólo después de migración, routes live, readback de
+Resend `click_tracking=false` y smoke del href. Revert by setting it OFF and redeploying the worker; issued
+tokens retain their documented expiry.
 
 ### Rollback plan per slice
 

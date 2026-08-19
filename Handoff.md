@@ -106,6 +106,16 @@ transacción. El feature continúa OFF y la migración no está aplicada. El sig
 limpieza síncrona `#access`, exchange→cookie HttpOnly, rutas token-free y Product API antes de cualquier smoke o
 activación.
 
+El Slice 3B quedó code-complete/dormant y reauditaron Arquitectura, Talento y Seguridad hasta P0/P1/P2=0. Ya
+existen bootstrap pre-React que borra `#access`, exchange same-origin acotado, cookie `__Host-` HttpOnly, página y
+API token-free, CSP enforced y protección ante maintenance/trailing slash. La sesión conserva elegibilidad y reloj;
+un fence por public ID impide que dos pestañas con assessments distintos muten la instancia equivocada. El modal
+de envío reutiliza MUI Dialog con foco, Escape, trap y reduced motion. El correo inicial **no cambia todavía**:
+`HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` nace OFF en el ops-worker y OFF conserva el enlace legacy. El
+workflow del worker incluye notifications en trigger, latest-SHA y drift-check. Antes del flip siguen obligatorios
+migración+índice, cuatro rutas live, `click_tracking=false` verificado en Resend, rate limit público y smokes
+PG/browser/href. No se aplicó migración, no se desplegó ni se cambió ninguna env.
+
 ## 2026-08-18 — Hiring AI y candidate review MCP: runtime reconciliado
 
 El release `7e7a474217eb` (run `32193134959`) dejó `global_provisional` activo para assessments elegibles de

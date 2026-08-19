@@ -28,6 +28,12 @@
 - GET/start/save/submit y SELF-ID legacy mantienen decisión, consentimiento, captura y audit bajo una sola
   transacción. El código fue auditado sin P0/P1/P2; sigue OFF y sin migración aplicada hasta completar el
   fragment exchange, la cookie HttpOnly, Product API y los smokes reales.
+- La frontera browser ya está implementada localmente: elimina `#access` antes de React/red, intercambia por cookie
+  `__Host-` HttpOnly y usa rutas token-free con CSP/no-store/no-referrer. Maintenance y trailing slash no desvían el
+  bootstrap; un fence evita que dos pestañas muten assessments distintos.
+- El correo vigente no cambia al desplegar este código: el cutover vive en
+  `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`, default OFF. ON queda bloqueado por migración+índice, rutas live,
+  `click_tracking=false` de Resend, rate limit y smokes reales de href/cookie/browser.
 
 ## 2026-08-19 — El reenvío gobernado de tests ya tiene command seguro
 

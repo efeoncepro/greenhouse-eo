@@ -7,6 +7,7 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { getAssessmentById, reissueCandidateTestTokenForEmailWithClient } from '../assessment/instances'
 import {
   hiringPublicBaseUrl,
+  isHiringAssessmentPublicSessionLinksEnabled,
   isHiringLifecycleEmailsEnabled,
   resolveHiringInternalNotificationsEmail,
 } from './config'
@@ -172,6 +173,10 @@ export const sendHiringAssessmentAssignedEmail = async (
     return `hiring_assessment_assigned_email skip: assessment ${assessmentId} ya no es rotable (in_progress/submitted/expired)`
   }
 
+  const assessmentUrl = isHiringAssessmentPublicSessionLinksEnabled()
+    ? `${hiringPublicBaseUrl()}/public/assessment/access#access=${encodeURIComponent(reissued.token)}`
+    : `${hiringPublicBaseUrl()}/public/assessment/${reissued.token}`
+
   const result = await sendEmail({
     emailType: 'hiring_assessment_assigned',
     domain: 'hr',
@@ -179,7 +184,7 @@ export const sendHiringAssessmentAssignedEmail = async (
     context: {
       recipientName: ctx.candidateName ?? undefined,
       openingTitle: ctx.openingTitle,
-      assessmentUrl: `${hiringPublicBaseUrl()}/public/assessment/${reissued.token}`,
+      assessmentUrl,
       timeLimitMinutes: reissued.timeLimitMinutes,
       tokenTtlDays: reissued.tokenTtlDays,
       locale: 'es',

@@ -2,6 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 
+import Dialog from '@mui/material/Dialog'
+import useMediaQuery from '@mui/material/useMediaQuery'
+
 import type { HiringAssessmentCopy } from '@/lib/copy'
 import type { PublicAssessmentQuestion, PublicAssessmentView } from '@/lib/hiring/assessment/public-taking'
 
@@ -15,7 +18,7 @@ import {
 type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 
 interface AssessmentTakingClientProps {
-  token: string
+  token?: string
   copy: HiringAssessmentCopy
   initialAssessment: PublicAssessmentView | null
 }
@@ -77,11 +80,21 @@ const responseAnswerFor = (assessment: PublicAssessmentView | null, question: Pu
   return assessment.responses.find((response) => response.questionId === question.questionId)?.answer ?? {}
 }
 
-const apiRequest = async (token: string, body: Record<string, unknown>): Promise<PublicAssessmentView> => {
-  const response = await fetch(`/api/public/assessment/${encodeURIComponent(token)}`, {
+const apiRequest = async (
+  token: string | undefined,
+  expectedAssessmentPublicId: string,
+  body: Record<string, unknown>,
+): Promise<PublicAssessmentView> => {
+  const endpoint = token
+    ? `/api/public/assessment/${encodeURIComponent(token)}`
+    : '/api/public/assessment/session'
+
+  const requestBody = token ? body : { ...body, expectedAssessmentPublicId }
+
+  const response = await fetch(endpoint, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(body),
+    body: JSON.stringify(requestBody),
   })
 
   const payload = await response.json() as { ok: boolean; assessment?: PublicAssessmentView; message?: string }
@@ -100,6 +113,7 @@ const scrollAssessmentToTop = () => {
 }
 
 const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTakingClientProps) => {
+  const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
   const [assessment, setAssessment] = useState(initialAssessment)
   const [loading, setLoading] = useState(false)
   const [consent, setConsent] = useState(false)
@@ -227,7 +241,11 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
     if (saveFeedbackTimerRef.current) window.clearTimeout(saveFeedbackTimerRef.current)
 
     try {
-      const updated = await apiRequest(token, { action: 'save', questionId: question.questionId, answer: answerValue })
+      const updated = await apiRequest(token, assessment?.assessment.publicId ?? '', {
+        action: 'save',
+        questionId: question.questionId,
+        answer: answerValue,
+      })
 
       lastSavedRef.current[question.questionId] = key
       setAssessment(updated)
@@ -266,7 +284,7 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
     setLoading(true)
 
     try {
-      const startedAssessment = await apiRequest(token, { action: 'start' })
+      const startedAssessment = await apiRequest(token, assessment?.assessment.publicId ?? '', { action: 'start' })
 
       setAssessment(startedAssessment)
       scrollAssessmentToTop()
@@ -317,7 +335,7 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
     setSubmitting(true)
 
     try {
-      const updated = await apiRequest(token, { action: 'submit' })
+      const updated = await apiRequest(token, assessment?.assessment.publicId ?? '', { action: 'submit' })
 
       setAssessment(updated)
       setSubmitOpen(false)
@@ -644,26 +662,38 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
       </div>
 
       {submitOpen ? (
-        <div className={styles.modalBackdrop} role='presentation'>
-          <div className={styles.modalCard} role='dialog' aria-modal='true' aria-labelledby='assessment-submit-title'>
-            <h2 id='assessment-submit-title' className={styles.modalTitle}>{copy.taking.submitTitle}</h2>
-            <p className={styles.terminalBody}>{copy.taking.submitBody}</p>
-            <div className={styles.actionsRow}>
-              <button className={styles.secondaryButton} type='button' disabled={submitting} onClick={() => setSubmitOpen(false)}>
-                {copy.taking.cancel}
-              </button>
-              <button
-                className={styles.primaryButton}
-                type='button'
-                data-capture='assessment-confirm-submit'
-                disabled={submitting}
-                onClick={() => void submit()}
-              >
-                {submitting ? copy.taking.submitting : copy.taking.submit}
-              </button>
-            </div>
+        <Dialog
+          open
+          aria-labelledby='assessment-submit-title'
+          transitionDuration={prefersReducedMotion ? 0 : undefined}
+          slotProps={{
+            backdrop: {
+              className: styles.modalBackdrop,
+              style: prefersReducedMotion ? { transitionDuration: '0ms' } : undefined,
+            },
+            paper: { className: styles.modalCard },
+          }}
+          onClose={() => {
+            if (!submitting) setSubmitOpen(false)
+          }}
+        >
+          <h2 id='assessment-submit-title' className={styles.modalTitle}>{copy.taking.submitTitle}</h2>
+          <p className={styles.terminalBody}>{copy.taking.submitBody}</p>
+          <div className={styles.actionsRow}>
+            <button autoFocus className={styles.secondaryButton} type='button' disabled={submitting} onClick={() => setSubmitOpen(false)}>
+              {copy.taking.cancel}
+            </button>
+            <button
+              className={styles.primaryButton}
+              type='button'
+              data-capture='assessment-confirm-submit'
+              disabled={submitting}
+              onClick={() => void submit()}
+            >
+              {submitting ? copy.taking.submitting : copy.taking.submit}
+            </button>
           </div>
-        </div>
+        </Dialog>
       ) : null}
     </section>
   )
