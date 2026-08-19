@@ -3,6 +3,20 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-19 — La recuperación de acceso a tests ya tiene una base segura y auditable
+
+- Se definieron dos permisos distintos: reenviar por email y revelar un enlace temporal. Ninguno recupera ni
+  almacena el enlace anterior; cada acción futura rotará el acceso y quedará auditada sin nombre, correo,
+  teléfono, URL ni token.
+- La base bloquea recoveries sobre postulaciones cerradas, consentimiento retirado, tests terminados o timers
+  vencidos. Un test iniciado conserva exactamente su deadline, accommodations y gracia; una transacción larga
+  no puede confirmar después del vencimiento.
+- La evidencia nace automáticamente en la misma transacción y la retención distingue candidatos de personas
+  seleccionadas. El retiro de consentimiento Hiring no puede borrar registros que ya pasaron a retención
+  laboral.
+- Este slice está validado localmente pero todavía no opera en producción: la migración no se aplicará hasta
+  que exista el command token-safe y los smokes PostgreSQL prueben ACL, concurrencia, rollback y purga.
+
 ## 2026-08-19 — El tablero de Hiring dejó de mostrar gente y vacantes que no existen
 
 - **Lo que ve hoy quien abre el desk son procesos reales.** El tablero pasó de 24 vacantes y 79
@@ -964,21 +978,3 @@ dos hallazgos de tooling con ID.
   igual.
 - `TASK-1682` (la capability del bypass de release sin verificador ni grant) y `TASK-1683` (la
   rotación de contexto que borra el puntero al archive) quedan registradas con su medición.
-
-## 2026-08-09 — El carril de acceso del portal cliente, EN PRODUCCIÓN (release `2c87d71e2eca`)
-
-`TASK-1678` + `TASK-1679` promovidas juntas a propósito: la contención del fail-open se retira en el
-mismo instante en que el fail-open se cierra, así que no hubo ventana de exposición. Manifest
-`2c87d71e2eca-f444748c-92aa-484c-b118-02713ee63e06` en `released`, run `31335921151`, watchdog
-`drift_count=0`, `/api/auth/health` 200 con los 3 providers `ready`.
-
-- Pasó a la primera con un solo bypass previsto: los dos hallazgos del preflight se pre-emptaron antes
-  de tocar `main` (el staging `CANCELED` se resolvió con el propio push de código; el smoke sobre `main`
-  se **produjo** en vez de bypassearse).
-- 🔴 **Aprendizaje que no estaba en ningún runbook:** el marker `[release-coupled:]` **no** sirve para
-  `requires_break_glass` — sólo limpia `split_batch`. Ponerle marker a un `requires_break_glass` es
-  cargo-cult; su única salida es el bypass.
-- **Hay una sola instancia Cloud SQL:** producción, staging y local leen la misma base, así que las 2
-  migraciones del batch ya estaban aplicadas antes del deploy. Eso cambia cómo se evalúa el riesgo de un
-  release con `db_migrations`.
-- `TASK-1680` quedó desbloqueada (su `Blocked by` apuntaba a `TASK-1679`).

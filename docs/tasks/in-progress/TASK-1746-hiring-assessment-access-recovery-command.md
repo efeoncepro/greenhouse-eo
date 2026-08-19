@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-011`
-- Status real: `ADR aceptado — implementación local en curso`
+- Status real: `Slice 1 validado localmente — migración sin aplicar; Slice 2 pendiente`
 - Rank: `TBD`
 - Domain: `hr|identity|delivery`
 - Blocked by: `none`
@@ -149,7 +149,7 @@ Reglas obligatorias:
   - Raw token/link is absent from Postgres audit, outbox, logs and durable delivery payloads.
   - Email and secure-link are mutually exclusive actions per recovery request.
 - Tenant/space boundary: authenticated actor plus assessment→application→opening lineage; no cross-application recovery.
-- Idempotency/concurrency: row lock, recovery request idempotency key, canonical conflict responses and rate-limit per assessment/channel.
+- Idempotency/concurrency: row lock, recovery request idempotency key, canonical conflict responses and rate-limit global por assessment.
 - Audit/outbox/history: IDs-only recovery event/audit with actor, reason code, channel and outcome; delivery is separately recorded.
 
 ### Migration, backfill and rollout
@@ -196,11 +196,11 @@ Reglas obligatorias:
 
 - ADR aceptado 2026-08-19 con TTL email 14d, secure-link 24h start-by, sesión iniciada separada,
   retención audit 12m y capabilities/grants separados.
-- Implementar command, error contract, idempotency, lock and IDs-only audit/outbox.
+- Implementar contratos y errores canónicos, capabilities role-only, idempotency schema y audit/event IDs-only.
 
 ### Slice 2 — Canal email y enlace temporal
 
-- Email: delivery source distinct from assignment event, token created only in the recovery path and no duplicate dispatch.
+- Implementar el command transaccional con lock/rate limit. Email: delivery source distinct from assignment event, token created only in the recovery path and no duplicate dispatch.
 - Secure link: one-time browser-safe response with bounded expiry, no durable raw token and no hidden UI fallback.
 
 ### Slice 3 — Guardrails y evidencia
@@ -210,12 +210,12 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-- Definir `recoverCandidateTestAccess({ assessmentId, channel, reasonCode, idempotencyKey, actorUserId })` como command server-side bajo lock transaccional; el actor requiere `hiring.assessment.recover_access:execute`.
-- El command rechaza assessment inexistente, ajeno a la candidatura, no `candidate_test`, o en estado distinto de `assigned|sent`, con códigos canónicos y sin revelar información sensible.
+- Definir `recoverCandidateTestAccess({ assessmentId, channel, reasonCode, idempotencyKey, actorUserId })` como command server-side bajo lock transaccional; el adapter exige `hiring.assessment.recover_access_email:execute` o `hiring.assessment.reveal_access_link:execute` según el canal.
+- El command rechaza assessment inexistente, lineage inválida o no `candidate_test`. Permite `assigned|sent`; permite `in_progress` sólo con deadline vigente y sin extenderlo; permite `expired` sólo si nunca comenzó y venció el token. Submitted/scored/cancelled, timer agotado o application decidida fallan con códigos canónicos y sin revelar información sensible.
 - En éxito crea exactamente un token nuevo y su hash, invalida el anterior atómicamente y registra un evento/audit IDs-only con actor, razón, canal, resultado y estado previo.
 - `email` crea un nuevo source event/idempotency key y envía mediante la capa canónica sin reutilizar `hiring.assessment.assigned`; el resultado comunica despacho aceptado, no entrega garantizada.
 - `secure_link` revela una URL bearer temporal solo en la respuesta de esa solicitud y nunca en almacenamiento durable, logs, outbox, toast, path/query string o analítica. Usa fragmento → sesión HttpOnly. No se permite combinar canales en una misma recuperación.
-- Se aplican límites por assessment/canal y la fuente de delivery redacts/encripta cualquier contexto que podría contener la URL antes de persistirlo.
+- Se aplican límites globales por assessment (cambiar canal no evade cooldown/cap) y la fuente de delivery redacta cualquier contexto que podría contener la URL antes de persistirlo. El bearer nunca se guarda cifrado en el ledger genérico.
 
 ## Out of Scope
 
@@ -268,6 +268,12 @@ Privacy/Security/Product approval recorded in the accepted ADR. A consented cand
   tightened to fragment → HttpOnly session, separate capabilities, 24h manual start-by TTL,
   14d email TTL, no generic retry from token-sensitive payloads, 12m IDs-only audit retention and
   explicit in-progress recovery without timer extension.
+- 2026-08-19 — Slice 1 validado localmente tras cinco ciclos de auditoría independientes de
+  Arquitectura, Talento y Seguridad. Quedaron definidos: capabilities role-only separadas,
+  eligibility fail-closed, receipt idempotente, audit automático append-only, locks canónicos,
+  deadline inicial y diferido con reloj real, retención candidate/workforce y purga gobernada.
+  Evidencia: 200 tests focales/combinados, ESLint, TypeScript, migration marker gate (586/0),
+  `ops:lint --changed` y `git diff --check`. La migración no se aplicó; requiere command y smokes PG.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -278,8 +284,8 @@ Privacy/Security/Product approval recorded in the accepted ADR. A consented cand
 
 ## Acceptance Criteria
 
-- [ ] `recoverCandidateTestAccess` is the only write primitive for recovery and is gated by a dedicated capability/grant.
-- [ ] Recovery is allowed only for unstarted candidate tests, rotates exactly one token atomically and never creates a second assessment.
+- [ ] `recoverCandidateTestAccess` is the only write primitive for recovery and each channel is gated by its dedicated capability/grant.
+- [ ] Recovery covers assigned/sent, a still-valid in-progress session without timer extension, and token-expired-before-start; it rotates exactly one token atomically and never creates a second assessment.
 - [ ] Email resend has a new idempotency source; a secure link is returned once only and both preserve no raw token in durable stores/logs/events.
 - [ ] Recovery has actor, reason code, channel, result and rate-limit evidence without candidate-sensitive narrative.
 - [ ] Staging and production smokes prove email recovery and manual-link recovery against a consented account.

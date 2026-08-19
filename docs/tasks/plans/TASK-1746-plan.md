@@ -36,6 +36,12 @@
 4. **API/evidence** — Product API with same-origin and anti-oracle guards, live/focused tests,
    reliability signal, technical/functional/operator docs and controlled smoke plan.
 
+## Progress
+
+- 2026-08-19 — Slice 1 code complete and independently validated. Schema/capabilities/contracts
+  remain unapplied until Slice 2 provides the only governed writer and the PostgreSQL smoke can
+  exercise deferred constraints, effective ACLs, automatic events and retention transitions.
+
 ## Skills
 
 - `greenhouse-talent-people-operator`: Hiring state, candidate continuity and operator outcomes.

@@ -619,6 +619,10 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       // alteren las condiciones de rendición de una prueba. Rechazado reusar `assessment.author`:
       // autorar contenido ≠ conceder una adaptación a una persona concreta.
       'hiring.assessment.grant_accommodation',
+      // TASK-1746 — Recovery role-only. Separar email de reveal mantiene least privilege y
+      // permite retirar el canal bearer sin apagar la recuperación por email.
+      'hiring.assessment.recover_access_email',
+      'hiring.assessment.reveal_access_link',
       // TASK-1736 — corregir el display name de la identidad de un candidato (write sobre
       // identity_profiles con audit append-only fuente `human`). Mismo tier de gobernanza que
       // reveal_identity y por la misma razón role-only: el routeGroup `internal` lo portaría

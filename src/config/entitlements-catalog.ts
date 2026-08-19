@@ -2240,6 +2240,10 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // trazabilidad de quién y cuándo. Grant tier gobernanza role-only. El MOTIVO del ajuste nunca
   // se persiste (categoría protegida) — ver `src/lib/hiring/assessment/accommodations.ts`.
   { key: 'hiring.assessment.grant_accommodation', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
+  // TASK-1746 — Recovery divide dispatch y reveal: enviar un email transaccional y revelar
+  // un bearer a un humano tienen radios distintos aunque hoy compartan el tier de roles.
+  { key: 'hiring.assessment.recover_access_email', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'hiring.assessment.reveal_access_link', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
   // TASK-1365 — aggregate-only fairness reader. More restricted than assessment.read.
   { key: 'hiring.assessment.fairness_read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
   // TASK-1714 — revelar el valor completo del documento de identidad de un CANDIDATO.

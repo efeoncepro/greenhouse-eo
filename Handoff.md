@@ -52,6 +52,14 @@ transaccional y que un fallo posterior puede perder el evento en un retry. El fi
 outbound como boundary independiente y activará el webhook sólo después de un canary firmado. Todavía no hay
 cambio de runtime ni configuración externa.
 
+El Slice 1 de `TASK-1746` quedó code-complete y validado localmente tras cinco rondas independientes de
+Arquitectura, Talento y Seguridad: capabilities separadas, eligibility fail-closed, locks
+assessment→application→candidate facet, receipt idempotente, events automáticos append-only, deadline
+revalidado al commit con reloj real, retención candidate/workforce y purga gobernada. La migración sigue sin
+aplicarse; no debe promoverse antes del command token-safe y de smokes PG que prueben ACL, constraints
+diferidas, concurrencia y transiciones de retención. Evidencia local: 200 tests, ESLint, TypeScript, marker
+gate 586/0, lint operativo y diff-check verdes.
+
 ## 2026-08-18 — Hiring AI y candidate review MCP: runtime reconciliado
 
 El release `7e7a474217eb` (run `32193134959`) dejó `global_provisional` activo para assessments elegibles de
