@@ -2,6 +2,36 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-19 — Hallazgos post-Codex sobre el bloque 1745/1746: guard corregido y ledger reconciliado
+
+Codex cerró el paquete de recuperación de acceso (`5d5eb2f9c` + `f4b5f622f`). Una revisión posterior
+encontró tres cosas que no estaban en su alcance; las dos primeras ya quedaron corregidas en `b2ff2b33e`.
+
+**El guard de la migration de TASK-1746 tenía un hueco.** No verificaba la tabla de buckets ni las cuatro
+funciones de acceso público, que su propio Down sí dropea. La regla generalizada quedó en
+`GREENHOUSE_DATABASE_TOOLING_V1.md` §"El guard anti pre-up-marker debe ser simétrico con el Down". Como la
+migration **todavía no se aplica**, se corrigió en el archivo original: no hay forward-fix pendiente.
+
+**El ledger de flags mentía en dos filas.** Corregidas contra runtime real, no contra el doc:
+`HIRING_STAGE_TEST_ASSIGNMENT_ENABLED` está en `true` en la revisión activa `ops-worker-00585-nv6` (la fila
+del snapshot decía OFF), y `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` está `<NO SET>` en esa misma
+revisión — OFF de verdad, no sólo por default declarado — y ya tiene fila en `§ Pendientes de acción`.
+Nota operativa: la revisión activa ya no es la `00576-7zz` del flip original; el flag sobrevivió a deploys
+posteriores porque está declarado en `deploy.sh`, que es exactamente para lo que sirve declararlo ahí.
+
+**Riesgo abierto — `--reporter=basic` da falso verde.** En vitest 4.1.0 el reporter ya no existe: el comando
+falla al cargarlo y **sale con exit code 0**. Si alguien lo mete en un gate, ese gate pasa siempre. Los tests
+reales del dominio están verdes (439 pass, 42 skipped por falta de proxy PG). No se corrigió nada porque no
+está en ningún gate hoy; queda anotado para que nadie lo introduzca.
+
+**Estado del bloque: code complete, rollout pendiente.** Nada del rollout se ejecutó: ninguna migración
+aplicada, ningún secreto provisionado, el webhook de Resend sigue sin registrar y ningún flag cambió de
+estado. El orden completo está en `docs/operations/runbooks/resend-email-lifecycle-rollout.md` y el siguiente
+paso es suyo, no de código: aplicar las dos migraciones + el índice concurrente con readback.
+
+**Owner del siguiente paso: operador.** El rollout cruza Vercel, Cloud Run y un proveedor externo con gates
+humanos; no es candidato a automatización desatendida.
+
 ## 2026-08-19 — Ronda de documentación post-release: lo que quedó y la deuda que se hizo visible
 
 Tres subagentes cerraron los huecos que dejó el release de TASK-1739. Lo que el siguiente agente
@@ -550,18 +580,3 @@ consentimiento, compensación/condiciones como señales de confianza y experimen
 con fuerza y límites de la evidencia explícitos. No hubo cambio de runtime, schema, beneficios ni
 publicación de vacante. Pendiente operativo: completar los datos reales del Senior Visual Designer
 antes de redactar/publicar su opening.
-
-## 2026-08-17 — Ajuste de TASK-1397/TASK-1398: alertas de vacantes y Talent Pool
-
-Se reescribieron las tasks antiguas de Careers Alerts para el modelo actual. La audiencia
-primaria de avisos es el Talent Pool: solo reciben quienes estén `pool_eligible`, tengan
-`future_opportunities` vigente y activen explícitamente la nueva preferencia `opening_alerts`.
-La caja pública de Careers queda como carril secundario anónimo de avisos generales: usa Growth
-Forms, no crea `Person`, candidato, aplicación ni membresía, y no concede `future_opportunities`.
-
-`TASK-1397` ahora posee el contrato server-side, consentimiento/preferencia, fan-out de
-`hiring.opening.published`, dedupe y delivery de ambos carriles. `TASK-1398` solo posee el host
-visual público y consume el formulario gobernado. La preferencia del banco debe consumirse en el
-self-service tokenizado ya existente de `TASK-1724` antes de activar el carril primario. Ambas
-flags permanecen propuestas/OFF; no hubo cambios de runtime. Artefactos actualizados: tasks,
-Epic-011, índices, flow y wireframe de TASK-1398.

@@ -3,6 +3,23 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-19 — Un guard que verificaba menos de lo que su propio Down borraba
+
+- **La migration de TASK-1746 tenía un hueco silencioso.** Su bloque anti pre-up-marker contaba
+  capabilities, triggers y columnas de sesión, pero no la tabla `hiring_assessment_public_request_bucket`
+  ni las cuatro funciones de acceso público — que el Down sí dropeaba. La migration creció en dos tandas y
+  el guard, que vive al final del Up, no se actualizó con la segunda. Un fallo en ese DDL habría quedado
+  registrado como aplicado, verde, y sólo habría aparecido a las 04:17 cuando el cron de retención llamara
+  una función inexistente. Corregido antes de aplicarla, así que no hizo falta forward-fix.
+- **Regla nueva en la spec de migraciones:** el guard del Up debe cubrir todo lo que el Down dropea, y una
+  migration editada en varias tandas necesita revisarlo en cada tanda. Es una comparación mecánica de dos
+  listas: los `DROP` del Down contra los contadores del guard.
+- **El ledger de flags afirmaba dos cosas falsas.** `HIRING_STAGE_TEST_ASSIGNMENT_ENABLED` figuraba ON en
+  una sección y OFF en otra; la revisión activa `ops-worker-00585-nv6` lo tiene en `true`, así que la
+  segunda era la equivocada. Y `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`, code-complete sin prender,
+  sólo estaba en el snapshot y no en `§ Pendientes de acción`, que es donde la regla del propio ledger lo
+  exige. Ambas corregidas contra runtime, no contra memoria.
+
 ## 2026-08-19 — Un patrón nuevo en el catálogo, y una señal que nadie había registrado
 
 - **Octavo patrón canónico: "hecho declarado al nacer + copia derivada donde se filtra + obligación de
@@ -956,13 +973,3 @@ zonas) + campo `Nav placement` obligatorio en tasks con destino visible + gate `
 mide el árbol real del rail interno contra el presupuesto (8 slots top-level · profundidad 2 · cero
 `/my/*`) y el manifest. Nació directo en `error` con 0 violaciones medidas; doble cobertura CI (suite
 + job en design-contract.yml). Lo que infló el sidebar a 96 hojas ya no puede repetirse en silencio.
-
-## 2026-08-10 — TASK-1686 cerrada: el colaborador puro deja de ver un portal ajeno
-
-Continuación directa de TASK-1388, mismo día: la rama no-interna del menú bifurca con
-`isPureCollaborator` y el colaborador (solo rol Colaborador) ve exclusivamente su portal — rail =
-Mi Greenhouse + Mi Ficha + recursos concedidos; avatar = identidad + Mi Perfil + salir. Se cierran
-los shortcuts cliente sin gating del avatar, el heading "Mi Cuenta" vacío y el borde de claims
-vacíos. El trigger del avatar pasa a botón semántico (aria + teclado + Esc/restore) para TODAS las
-audiencias. Cliente, interno e híbrido my+client conservan su salida byte-a-byte (tests de control
-19+7). Evidencia GVC con la persona collaborator real, baselines durables y scorecard 5.0.

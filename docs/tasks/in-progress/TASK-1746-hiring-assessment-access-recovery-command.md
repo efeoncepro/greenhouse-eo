@@ -363,6 +363,22 @@ Privacy/Security/Product approval recorded in the accepted ADR. A consented cand
      al cerrar la task completa.
      ═══════════════════════════════════════════════════════════ -->
 
+- 2026-08-19 — Revisión independiente post-cierre de Codex (commit `b2ff2b33e`). El bloque DO
+  anti pre-up-marker de la migración verificaba capabilities, triggers y columnas de sesión, pero NO la
+  tabla `hiring_assessment_public_request_bucket` ni las cuatro funciones de acceso público
+  (`run_assessment_public_access_retention`, `purge_expired_assessment_public_sessions`,
+  `purge_assessment_public_request_buckets`, `claim_assessment_public_request_budget`), que el Down sí
+  dropea desde el primer día. La migración creció en dos tandas y el guard, que vive al final del Up, no
+  se actualizó con la segunda. Un fallo silencioso en ese DDL habría dejado la migración registrada como
+  aplicada con el guard verde, y el fallo sólo habría emergido a las 04:17 cuando el cron
+  `ops-hiring-assessment-public-access-retention` llamara una función inexistente. Corregido en el
+  archivo original — la migración no está aplicada, así que no hay forward-fix. Regla generalizada en
+  `GREENHOUSE_DATABASE_TOOLING_V1.md` §"El guard anti pre-up-marker debe ser simétrico con el Down".
+  En la misma pasada: `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` ganó su fila en
+  `§ Pendientes de acción` del ledger, y se verificó contra la revisión activa `ops-worker-00585-nv6`
+  que está `<NO SET>` — OFF real en runtime, no sólo por default declarado. `pnpm local:check` verde.
+  Sin cambios de rollout: ninguna migración aplicada, ningún secreto, ningún flag movido.
+
 ## Acceptance Criteria
 
 - [x] `recoverCandidateTestAccess` is the only write primitive for recovery and each channel is gated by its dedicated capability/grant.
