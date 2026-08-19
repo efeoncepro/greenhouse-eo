@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { generateStructuredAnthropic, isAnthropicConfigured } from '@/lib/ai/anthropic'
 import { generateStructuredGemini, isGeminiConfigured } from '@/lib/ai/google-genai'
 import { captureWithDomain } from '@/lib/observability/capture'
 import type { QuestionDraftProposal, ResponseScoreProposal } from '@/types/hiring-assessment-ai'
@@ -51,8 +52,9 @@ export interface GenerationDeps {
 }
 
 export interface ScoringDeps {
-  isConfigured: () => boolean
-  generate: typeof generateStructuredGemini
+  /** ASÍNCRONO a propósito: Anthropic resuelve su API key por referencia de secreto. */
+  isConfigured: () => Promise<boolean>
+  generate: typeof generateStructuredAnthropic
 }
 
 const defaultGenerationDeps: GenerationDeps = {
@@ -61,8 +63,8 @@ const defaultGenerationDeps: GenerationDeps = {
 }
 
 const defaultScoringDeps: ScoringDeps = {
-  isConfigured: isGeminiConfigured,
-  generate: generateStructuredGemini,
+  isConfigured: isAnthropicConfigured,
+  generate: generateStructuredAnthropic,
 }
 
 /** Genera borradores de preguntas (tier barato Gemini). El SME los gatea después. */
@@ -108,7 +110,7 @@ export const runResponseScoring = async (
   const model = getHiringAssessmentScoringModel()
   const base = { provider: HIRING_ASSESSMENT_SCORING_PROVIDER, model, usage: {} as Record<string, unknown> }
 
-  if (!deps.isConfigured()) {
+  if (!(await deps.isConfigured())) {
     return { ...base, score: null, status: 'not_configured' }
   }
 
@@ -117,9 +119,10 @@ export const runResponseScoring = async (
       model,
       system: RESPONSE_SCORE_SYSTEM_PROMPT,
       prompt: buildResponseScorePrompt(input),
-      jsonSchema: RESPONSE_SCORE_JSON_SCHEMA as Record<string, unknown>,
+      toolName: 'propose_response_score',
+      toolDescription: 'Sugiere un puntaje 0–100 con rationale y perCriterion para la respuesta del candidato.',
+      inputSchema: RESPONSE_SCORE_JSON_SCHEMA as never,
       temperature: 0,
-      maxOutputTokens: 4096,
     })
 
     const score = sanitizeResponseScore(result.data)

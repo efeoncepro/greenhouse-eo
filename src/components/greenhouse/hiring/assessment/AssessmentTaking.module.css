@@ -83,7 +83,13 @@
   min-width: 0;
 }
 
+/* TASK-1751 — La barra sigue el scroll. Antes vivía al tope del documento, así que el reloj
+   desaparecía justo cuando el candidato bajaba a escribir: el momento en que el tiempo importa.
+   El cambio de tono a los 5 y al 1 minuto sólo es perceptible si la barra está a la vista. */
 .sessionBar {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -94,6 +100,11 @@
   border-radius: var(--radius-lg);
   background: var(--surface);
   box-shadow: var(--shadow-raised);
+}
+
+/* Un ancla enfocada por teclado no puede quedar debajo de la barra fija. */
+.mainStack :is(button, a, textarea, input, [tabindex]) {
+  scroll-margin-block-start: 86px;
 }
 
 .sessionRole {

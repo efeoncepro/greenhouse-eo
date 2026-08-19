@@ -56,7 +56,7 @@ describe('runQuestionGeneration (honest-degrade)', () => {
 
 describe('runResponseScoring (honest-degrade)', () => {
   it('not_configured cuando el provider no está configurado', async () => {
-    const res = await runResponseScoring(scoreInput, { isConfigured: () => false, generate: vi.fn() as never })
+    const res = await runResponseScoring(scoreInput, { isConfigured: async () => false, generate: vi.fn() as never })
 
     expect(res.status).toBe('not_configured')
     expect(res.score).toBeNull()
@@ -64,16 +64,16 @@ describe('runResponseScoring (honest-degrade)', () => {
 
   it('ok con score clampeado cuando el provider responde', async () => {
     const res = await runResponseScoring(scoreInput, {
-      isConfigured: () => true,
+      isConfigured: async () => true,
       generate: (async () => ({
         data: { score: 88, rationale: 'buena respuesta' },
-        model: 'gemini-2.5-flash',
+        model: 'claude-sonnet-5',
         usage: { inputTokens: 20, outputTokens: 8 },
       })) as never,
     })
 
     expect(res.status).toBe('ok')
     expect(res.score?.score).toBe(88)
-    expect(res.model).toBe('gemini-2.5-flash')
+    expect(res.model).toBe('claude-sonnet-5')
   })
 })

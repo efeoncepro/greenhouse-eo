@@ -10,16 +10,31 @@ import 'server-only'
 export const isHiringAssessmentAiEnabled = (): boolean =>
   process.env.HIRING_ASSESSMENT_AI_ENABLED === 'true'
 
-// ── Grading (respuestas open_text/situational): structured Vertex route ──
-export const HIRING_ASSESSMENT_SCORING_PROVIDER = 'google' as const
+// ── Grading (respuestas open_text/situational): tier calidad/defensibilidad AI-Act ──
+export const HIRING_ASSESSMENT_SCORING_PROVIDER = 'anthropic' as const
 
 /**
- * Default = Gemini 2.5 Flash through the canonical Vertex structured-output client.
- * The route is deterministic so run model, digest, proposal provenance and audit agree.
- * Override by `HIRING_ASSESSMENT_AI_SCORING_MODEL` only after a calibrated rollout.
+ * Default = Claude Sonnet 5 (`claude-sonnet-5`).
+ *
+ * DECISIÓN EXPLÍCITA (2026-08-19, operador). Calificar a una persona que postula a un trabajo es
+ * un uso de ALTO RIESGO bajo el AI Act: va en el tier de calidad, no en el tier barato. La
+ * generación de preguntas (abajo) sí es tier barato — un borrador que un SME gatea no es lo mismo
+ * que una calificación que entra a una decisión de contratación.
+ *
+ * El 2026-08-18 el commit `644ac965c` movió esto a `gemini-2.5-flash` con la justificación de
+ * "ruta determinista", sin ADR, sin flag, sin variable de entorno y sin gold set que midiera si
+ * calificaba igual. Efecto colateral: el modelo entra al digest del run, así que TODO run anterior
+ * quedó stale por definición. Se revierte al tier de calidad.
+ *
+ * ⚠️ El chequeo de Anthropic es ASÍNCRONO a propósito: resuelve el secreto por referencia
+ * (`ANTHROPIC_API_KEY_SECRET_REF`). Nunca lo trates como síncrono — un cold start reportaría
+ * "no configurado" y el scoring degradaría en silencio. Es la misma clase de bug que ISSUE-160.
+ *
+ * Cambiar este modelo NO es un detalle de implementación: invalida los runs vigentes y altera la
+ * calibración. Exige decisión declarada y fila en el ledger de flags.
  */
 export const getHiringAssessmentScoringModel = (): string =>
-  process.env.HIRING_ASSESSMENT_AI_SCORING_MODEL?.trim() || 'gemini-2.5-flash'
+  process.env.HIRING_ASSESSMENT_AI_SCORING_MODEL?.trim() || 'claude-sonnet-5'
 
 /**
  * v2 (delta 2026-08-17): el prompt declara EXPLÍCITAMENTE la escala de `perCriterion`

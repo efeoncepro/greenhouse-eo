@@ -17,15 +17,18 @@ export const isHiringDossierAiEnabled = (): boolean =>
 export const isHiringDossierAutoProposeEnabled = (): boolean =>
   process.env.HIRING_EVALUATION_DOSSIER_AI_AUTO_PROPOSE_ENABLED === 'true'
 
-export const HIRING_DOSSIER_PROVIDER = 'google' as const
+export const HIRING_DOSSIER_PROVIDER = 'anthropic' as const
 
 /**
- * Deterministic Vertex structured-output route. The model is part of the input digest,
- * so changing it intentionally supersedes prior active proposals without mutating them.
- * El digest de la propuesta captura SIEMPRE el modelo efectivo resuelto, no el default.
+ * Default = Claude Sonnet 5. DECISIÓN EXPLÍCITA (2026-08-19, operador): el dossier redacta la
+ * narrativa CV-vs-assessment que un humano usa para decidir sobre una persona. Mismo tier de
+ * calidad que el scoring, por la misma razón.
+ *
+ * El modelo forma parte del digest de la propuesta, así que cambiarlo supersede las propuestas
+ * activas sin mutarlas. El digest captura SIEMPRE el modelo efectivo resuelto, no el default.
  */
 export const getHiringDossierModel = (): string =>
-  process.env.HIRING_DOSSIER_AI_MODEL?.trim() || 'gemini-2.5-flash'
+  process.env.HIRING_DOSSIER_AI_MODEL?.trim() || 'claude-sonnet-5'
 
 /**
  * v2 (TASK-1737): el packet lleva el nombre humano de cada competencia, el prompt exige
