@@ -270,9 +270,64 @@ sin JOIN, y el filtro crítico lee el documento vivo porque la copia puede lagea
 
 ---
 
+## 9. Un estado que el sistema distingue, la superficie no puede colapsarlo
+
+**Cuándo aplica:** cuando el sistema trata internamente como distintos dos o más estados
+—etapas, causas de fallo, códigos de un proveedor, operaciones detrás de un mismo flag— y
+la superficie que ve el operador o el usuario final los representa con **un solo nombre,
+un solo mensaje o un solo control**. El sistema sabe la diferencia; hacia afuera la borra.
+
+**Por qué es un patrón y no una molestia de UX:** el colapso no degrada la experiencia, la
+vuelve **indiagnosticable**. La persona no puede elegir bien porque no ve que hay una
+elección; y cuando algo falla, no puede saber cuál de las N causas ocurrió, así que no
+puede actuar. Cada caso obliga a alguien con acceso a la base de datos a reconstruir lo que
+el sistema ya sabía. Es la diferencia entre un sistema operable y uno que necesita un
+intérprete.
+
+**Forma canónica.** Si el sistema ramifica por un estado, la superficie **nombra ese
+estado**:
+
+1. **Nombres distintos para estados distintos.** Si `qualified`, `shortlisted` y
+   `client_review` disparan comportamientos distintos, no pueden llamarse los tres
+   "Evaluación". Si dos comparten nombre a propósito, el que ramifica debe decirlo en el
+   punto de decisión ("al mover aquí se asigna el test").
+2. **Un error dice qué pasó, no que pasó algo.** Si el código distingue "expiró",
+   "ya se usó", "fue reemplazado", "sin permiso" y "fallo de lectura", el mensaje también.
+   Un texto que cubre seis causas le atribuye al usuario una causa falsa en cinco de ellas.
+3. **La evidencia del proveedor se propaga, no se aplana.** Los `error-codes` de un tercero
+   son el diagnóstico; colapsarlos a un booleano convierte dos minutos en horas.
+4. **Un flag gatea una operación, no una familia.** Si un mismo flag apaga la operación
+   riesgosa y la inofensiva, la segunda queda rehén: el trabajo se completa y no hay
+   transición para cerrarlo.
+
+**Reglas duras:** **NUNCA** dos estados con comportamiento distinto bajo la misma etiqueta
+visible sin declarar cuál ramifica; **NUNCA** un mensaje de error que cubra causas con
+acciones de recuperación distintas; **NUNCA** descartar el código de error de un proveedor
+externo antes de persistirlo; **NUNCA** un flag que gatee simultáneamente una mutación
+riesgosa y el cierre de su propio flujo; **SIEMPRE** que un fallo deje al usuario sin
+salida, verificar que la superficie nombre la causa — si no puede, es un defecto de
+diseño, no una limitación.
+
+**Cómo se detecta:** el síntoma es un diagnóstico que exige leer la base de datos para
+responder "¿por qué no funcionó?". Si un incidente se resuelve mirando una tabla y el dato
+ya existía en el runtime, hubo colapso de estado.
+
+**Fuente:** los cinco casos del 2026-08-19, mismo día y mismo error: `hiringDesk.ts` mapea
+`qualified`/`shortlisted`/`client_review` a "Evaluación" mientras la policy de assessment
+sólo dispara en `shortlisted` (la automatización no corre y el operador no puede saber por
+qué); `hiringAssessment.ts` responde "Este enlace no está disponible" a seis causas, cuatro
+de ellas con el enlace vivo; el renderer de growth-forms muestra "No pudimos verificar el
+envío" para cuatro modos de falla distintos; `captcha.ts` colapsa los `error-codes` de
+Cloudflare en un `rejected` opaco (`invalid-input-secret` habría cerrado el diagnóstico en
+minutos); y `HIRING_ASSESSMENT_AI_RUN_CONFIRM_ENABLED` gatea a la vez la confirmación por
+lote —apagada por riesgo real en TASK-1742— y el cierre del run, dejando runs con todos sus
+ítems confirmados sin ninguna transición disponible.
+
+---
+
 ## Cómo extender este catálogo
 
-Si emerge un **9º patrón** genuinamente transversal (se repite ≥3 dominios), agregarlo
+Si emerge un **10º patrón** genuinamente transversal (se repite ≥3 dominios), agregarlo
 acá con la misma estructura (cuándo / forma canónica / reglas duras / fuente) y
 registrarlo en `DECISIONS_INDEX.md`. Si es específico de un dominio, vive en su spec,
 no acá.
