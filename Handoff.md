@@ -18,6 +18,38 @@ Lifecycle honesto: TASK-1743 cerró code complete con GVC 4,82/5, pero la compac
 TASK-1718 permanecen in-progress por cooldown/rollback/sign-offs; no se inventaron aprobaciones. El release
 classifier omitió rutas Hiring del ops-worker y exigió corrección manual; verificar siempre parity 4/4 por SHA.
 
+## 2026-08-18 — TASK-1739: procedencia de datos de Hiring, slices 1-4 y 6 implementados
+
+Ocho commits. Lo que ya opera: la procedencia existe como HECHO declarado en el nacimiento del dato
+(dos raíces, persona y demanda) con copia derivada por trigger en la postulación; los readers del desk
+dejan de contar fantasmas detrás de flag; el gold set los excluye SIN flag; hay marcado gobernado con
+allowlist humana; y un gate mecánico impide que un seed nuevo cree datos sin declarar.
+
+**Nada cambió todavía para el operador**: el flag nace OFF y nadie marcó nada. Estado correcto:
+`code complete, rollout pendiente`.
+
+**Lo que falta y por qué no lo hice**: el apply del marcado exige que un humano pode la allowlist
+línea a línea —ese es el punto del protocolo, no un trámite—; el flip del flag en producción exige
+**aviso previo a HR**, porque 12 de 14 vacantes son sintéticas por autor y el desk no perderá "algunas
+filas" sino casi todas las vacantes; y el Slice 5 (purga) está prohibido por la propia task hasta que
+el Slice 4 esté aplicado y verificado. Falta además la triple documentación y las dos capabilities
+(`hiring.data_origin.mark`/`.purge`), que hoy no tienen consumer porque la operación es por CLI.
+
+**Dry-run real listo para revisar**: 34 candidatos, todos de confianza ALTA — 12 demandas y 12
+vacantes por autor (8 de ellas marcadas además como "estuvo publicada" en el careers real) y 10
+personas por dominio de correo reservado. Cero falsos positivos: ningún `@efeoncepro.com`, ninguna
+coincidencia por nombre. Correr `pnpm hiring:data:mark-synthetic` para verlo.
+
+**Tres cosas que aparecieron al construir**, todas en los commits:
+
+- La guarda de publicación **bloqueó el smoke que causó el problema**: `verify-growth-forms-application-smoke.ts`
+  creó las 8 vacantes fantasma publicadas y no tiene teardown. Queda bloqueado a propósito, con sus dos
+  salidas legítimas registradas como follow-up. Destrabarlo marcando su vacante como `real` no es una.
+- El guard de frontera del dominio atrapó mi tabla de audit sin declarar. Declarada.
+- Corriendo la suite con live tests aparecieron **dos roturas preexistentes** de
+  `submit-application.live.test.ts` que CI nunca vio (sólo corren con PG): `publicSeniority` obligatorio
+  desde TASK-1740 y `residenceCountryCode` requerido desde el flip de TASK-1688. Ambas reparadas.
+
 ## 2026-08-18 — Canary de identidad y smoke del expediente: los dos pendientes declarados, cerrados
 
 Los dos flags que se prendieron "ON con pendiente" ya tienen su verificación. Ambas filas del ledger
@@ -525,16 +557,3 @@ quedaron dentro de un solo plano operacional, con lanes tonales y tarjetas como 
 de la vacante no se trunca a 390 px y el fallo simulado queda solo en el harness. GVC desktop/mobile, teclado,
 rollback, reduced-motion y axe están verdes sin findings en
 `.captures/2026-08-16T22-13-39_task355-hiring-pipeline-board`. Cambio local, sin commit/push/deploy.
-
-## 2026-08-16 — TASK-1736 complete (code complete, rollout gated) — cierre del trío del día
-
-TASK-1736 cerró sus 5 slices (0-4): ADR de canonicalización, primitive de normalización
-culturalmente segura (62 tests multiculturales), evidencia append-only + reconcile CAS +
-corrección humana capability-gated, detector live (51 perfiles: 4 remediables — 2 humanos +
-2 QA a podar) + remediación dry-run→allowlist→apply→rollback, 2 señales reliability, runbook.
-Auditoría doble: talent PASS, arch CONDITIONAL → resuelta (actor/razón al audit, rollback real
-con CAS del before-value, PII edge 401 chars, placeholder anti display-invisible, retry
-idempotente, nota A3 del COALESCE cross-dominio). Gates: suite full + build verdes. Rollout
-gated al runbook candidate-identity-rollout.md: flag OFF; remediación histórica requiere
-allowlist humana del operador. Con esto las 3 tasks del día (1735, 1734, 1736) están complete.
-Siguiente: /implement-task TASK-1737 (tab Expediente) + TASK-1738 (workbench scoring IA).
