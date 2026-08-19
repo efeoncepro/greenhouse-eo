@@ -7832,12 +7832,17 @@ export interface GreenhouseHiringHiringApplicationNote {
 
 export interface GreenhouseHiringHiringAssessment {
   access_token_hash: string | null;
+  access_token_version_id: Generated<string | null>;
   accommodations_json: Generated<Json>;
   application_id: string;
   assessment_id: Generated<string>;
   created_at: Generated<Timestamp>;
   created_by: string | null;
   evaluator_user_id: string | null;
+  /**
+   * TASK-1746 — primer canje del enlace por sesión pública. Append-once, sobrevive a la retención; alimenta hiring.assessment.access_never_exchanged.
+   */
+  first_access_exchanged_at: Timestamp | null;
   method: Generated<string>;
   public_id: Generated<string>;
   started_at: Timestamp | null;
@@ -7850,6 +7855,61 @@ export interface GreenhouseHiringHiringAssessment {
   time_limit_minutes: number | null;
   token_expires_at: Timestamp | null;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHiringHiringAssessmentAccessRecovery {
+  actor_user_id: string;
+  application_id: string;
+  assessment_id: string;
+  channel: string;
+  created_at: Generated<Timestamp>;
+  delivery_id: string | null;
+  expires_at: Timestamp;
+  idempotency_digest: string;
+  issued_at: Timestamp;
+  opening_id: string;
+  outcome: string;
+  previous_status: string;
+  reason_code: string;
+  recovery_id: Generated<string>;
+  request_fingerprint: string;
+  resulting_status: string;
+  retention_class: Generated<string>;
+  retention_expires_at: Timestamp | null;
+  token_version_id: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHiringHiringAssessmentAccessRecoveryEvent {
+  actor_user_id: string;
+  application_id: string;
+  assessment_id: string;
+  channel: string;
+  delivery_id: string | null;
+  expires_at: Timestamp;
+  idempotency_digest: string;
+  issued_at: Timestamp;
+  occurred_at: Generated<Timestamp>;
+  opening_id: string;
+  outcome: string;
+  previous_status: string;
+  reason_code: string;
+  recovery_event_id: Generated<string>;
+  recovery_id: string;
+  request_fingerprint: string;
+  resulting_status: string;
+  retention_class: string;
+  retention_expires_at: Timestamp | null;
+  token_version_id: string;
+}
+
+export interface GreenhouseHiringHiringAssessmentAccessRecoveryPurgeAudit {
+  application_digest: string;
+  executed_by: string;
+  occurred_at: Generated<Timestamp>;
+  purge_id: Generated<string>;
+  purged_recovery_count: number;
+  reason_code: string;
 }
 
 export interface GreenhouseHiringHiringAssessmentAiProposal {
@@ -7959,6 +8019,25 @@ export interface GreenhouseHiringHiringAssessmentAssignmentProposal {
   preview_json: Generated<Json>;
   proposal_id: Generated<string>;
   proposed_by: string;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHiringHiringAssessmentPublicRequestBucket {
+  hit_count: number;
+  requester_digest: string;
+  surface: string;
+  updated_at: Generated<Timestamp>;
+  window_started_at: Timestamp;
+}
+
+export interface GreenhouseHiringHiringAssessmentPublicSession {
+  access_token_version_id: string;
+  assessment_id: string;
+  created_at: Generated<Timestamp>;
+  expires_at: Timestamp;
+  public_session_id: Generated<string>;
+  session_token_hash: string;
   status: Generated<string>;
   updated_at: Generated<Timestamp>;
 }
@@ -9303,6 +9382,7 @@ export interface GreenhouseNotificationsEmailDeliveries {
    * Timestamp confirmed by Resend webhook email.delivered.
    */
   delivered_at: Timestamp | null;
+  delivery_delayed_at: Timestamp | null;
   delivery_id: Generated<string>;
   delivery_payload: Generated<Json>;
   domain: string;
@@ -9312,6 +9392,7 @@ export interface GreenhouseNotificationsEmailDeliveries {
    */
   error_class: string | null;
   error_message: string | null;
+  failed_at: Timestamp | null;
   has_attachments: Generated<boolean>;
   organization_id: string | null;
   parent_delivery_id: string | null;
@@ -9319,6 +9400,17 @@ export interface GreenhouseNotificationsEmailDeliveries {
    * critical | transactional | broadcast — critical/transactional bypass rate limits
    */
   priority: Generated<string>;
+  /**
+   * Provider timestamp used to prevent an older, out-of-order event from replacing a newer lifecycle fact.
+   */
+  provider_event_created_at: Timestamp | null;
+  provider_event_id: string | null;
+  provider_observed_at: Timestamp | null;
+  /**
+   * Latest observed Resend lifecycle fact; signed webhook evidence supersedes provisional reconciliation observations.
+   */
+  provider_status: string | null;
+  provider_status_source: string | null;
   recipient_contact_id: string | null;
   recipient_email: string;
   recipient_kind: string | null;
@@ -9330,6 +9422,7 @@ export interface GreenhouseNotificationsEmailDeliveries {
   source_event_id: string | null;
   status: Generated<string>;
   subject: string;
+  suppressed_at: Timestamp | null;
   updated_at: Generated<Timestamp>;
 }
 
@@ -9341,6 +9434,26 @@ export interface GreenhouseNotificationsEmailEngagement {
   link_url: string | null;
   resend_event_id: string | null;
   resend_id: string;
+}
+
+export interface GreenhouseNotificationsEmailProviderEvents {
+  bounce_type: string | null;
+  click_origin: string | null;
+  dead_lettered_at: Timestamp | null;
+  delivery_id: string | null;
+  event_source: Generated<string>;
+  event_type: string;
+  first_received_at: Generated<Timestamp>;
+  last_attempted_at: Timestamp | null;
+  next_attempt_at: Timestamp | null;
+  processed_at: Timestamp | null;
+  processing_attempts: Generated<number>;
+  processing_status: Generated<string>;
+  provider_created_at: Timestamp | null;
+  provider_event_id: string;
+  reason_code: string | null;
+  resend_id: string | null;
+  signature_verified: Generated<boolean>;
 }
 
 export interface GreenhouseNotificationsEmailSubscriptions {
@@ -12676,12 +12789,17 @@ export interface DB {
   "greenhouse_hiring.hiring_application_intake_events": GreenhouseHiringHiringApplicationIntakeEvents;
   "greenhouse_hiring.hiring_application_note": GreenhouseHiringHiringApplicationNote;
   "greenhouse_hiring.hiring_assessment": GreenhouseHiringHiringAssessment;
+  "greenhouse_hiring.hiring_assessment_access_recovery": GreenhouseHiringHiringAssessmentAccessRecovery;
+  "greenhouse_hiring.hiring_assessment_access_recovery_event": GreenhouseHiringHiringAssessmentAccessRecoveryEvent;
+  "greenhouse_hiring.hiring_assessment_access_recovery_purge_audit": GreenhouseHiringHiringAssessmentAccessRecoveryPurgeAudit;
   "greenhouse_hiring.hiring_assessment_ai_proposal": GreenhouseHiringHiringAssessmentAiProposal;
   "greenhouse_hiring.hiring_assessment_ai_scoring_run": GreenhouseHiringHiringAssessmentAiScoringRun;
   "greenhouse_hiring.hiring_assessment_ai_scoring_run_event": GreenhouseHiringHiringAssessmentAiScoringRunEvent;
   "greenhouse_hiring.hiring_assessment_ai_scoring_run_item": GreenhouseHiringHiringAssessmentAiScoringRunItem;
   "greenhouse_hiring.hiring_assessment_assignment": GreenhouseHiringHiringAssessmentAssignment;
   "greenhouse_hiring.hiring_assessment_assignment_proposal": GreenhouseHiringHiringAssessmentAssignmentProposal;
+  "greenhouse_hiring.hiring_assessment_public_request_bucket": GreenhouseHiringHiringAssessmentPublicRequestBucket;
+  "greenhouse_hiring.hiring_assessment_public_session": GreenhouseHiringHiringAssessmentPublicSession;
   "greenhouse_hiring.hiring_assessment_response": GreenhouseHiringHiringAssessmentResponse;
   "greenhouse_hiring.hiring_assessment_template": GreenhouseHiringHiringAssessmentTemplate;
   "greenhouse_hiring.hiring_assessment_template_module": GreenhouseHiringHiringAssessmentTemplateModule;
@@ -12753,6 +12871,7 @@ export interface DB {
   "greenhouse_knowledge.knowledge_sources": GreenhouseKnowledgeKnowledgeSources;
   "greenhouse_notifications.email_deliveries": GreenhouseNotificationsEmailDeliveries;
   "greenhouse_notifications.email_engagement": GreenhouseNotificationsEmailEngagement;
+  "greenhouse_notifications.email_provider_events": GreenhouseNotificationsEmailProviderEvents;
   "greenhouse_notifications.email_subscriptions": GreenhouseNotificationsEmailSubscriptions;
   "greenhouse_notifications.email_type_config": GreenhouseNotificationsEmailTypeConfig;
   "greenhouse_notifications.idempotency_keys": GreenhouseNotificationsIdempotencyKeys;
