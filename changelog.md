@@ -3,6 +3,17 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-19 — Los correos con enlaces de acceso ya no dependen de reintentos ciegos
+
+- Reset de contraseña, invitaciones, verificaciones, magic links, tests y acceso a Talent Pool comparten ahora
+  una protección global: el sistema guarda una intención redactada antes de emitir la credencial y nunca
+  persiste el enlace secreto para reconstruirlo después.
+- Dos workers concurrentes o un replay del mismo evento no pueden rotar dos veces el acceso. Si el proveedor
+  rechaza el correo se registra como fallo; si lo aceptó pero faltó confirmación local, se registra como incierto
+  y requiere recuperación explícita en vez de afirmar que no salió o reenviarlo automáticamente.
+- El cambio está validado localmente por Arquitectura, Talento y Seguridad. Todavía no está activo: primero se
+  instalará el índice concurrente con readback verde, sin pausar el resto del correo del sistema.
+
 ## 2026-08-19 — La recuperación de acceso a tests ya tiene una base segura y auditable
 
 - Se definieron dos permisos distintos: reenviar por email y revelar un enlace temporal. Ninguno recupera ni
@@ -958,23 +969,3 @@ desplegado —3 base sirven `200`, las 6 module-gated redirigen a `/home?denied=
   discriminador canónico del repo es `VERCEL_ENV` (mismo que `agent-session` y `proxy.ts`). Corregido,
   y **sin** válvula de escape de producción: la divergencia con `agent-session` es deliberada porque
   este override concede lectura cross-tenant.
-
-## 2026-08-09 — El carril de acceso del portal cliente queda cerrado del todo (TASK-1680 + Creative a SKY)
-
-Las tres piezas que quedaban después del release: el módulo Creative asignado, el lint cerrado y los
-dos hallazgos de tooling con ID.
-
-- **Creative Hub Globe asignado a Sky Airlines** vía el command canónico `enableClientPortalModule`
-  (no SQL: es el único camino con audit + outbox + invalidación de cache en una transacción). Las 4
-  páginas Creative del portal abren para SKY y siguen en empty state para el resto — que es el
-  producto funcionando.
-- **`TASK-1680`**: el lint `no-untokenized-business-line-branching` pasa a `error`. La medición dio
-  **0 violaciones** con el override intacto, y reveló que **4 de sus 6 entradas eximían paths que la
-  regla nunca miró** — hacían ver la gobernanza más estricta de lo que era. Quedó una exención, medida
-  y con dueño. 6 archivos muertos borrados de paso.
-- **El gate de verificación pasa a derivar su expectativa de los datos.** Hardcodeaba "3 abren y 6
-  empty state" y al asignarle el módulo a SKY reportó cuatro desvíos **por hacer lo correcto**. Un
-  gate que se edita por organización no prueba el carril: prueba que la primera organización sigue
-  igual.
-- `TASK-1682` (la capability del bypass de release sin verificador ni grant) y `TASK-1683` (la
-  rotación de contexto que borra el puntero al archive) quedan registradas con su medición.

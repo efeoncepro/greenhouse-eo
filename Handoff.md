@@ -60,6 +60,14 @@ aplicarse; no debe promoverse antes del command token-safe y de smokes PG que pr
 diferidas, concurrencia y transiciones de retención. Evidencia local: 200 tests, ESLint, TypeScript, marker
 gate 586/0, lint operativo y diff-check verdes.
 
+El Slice 2A de `TASK-1746` también quedó code-complete local y validado por Arquitectura, Talento y Seguridad
+sin P0/P1/P2. La capa global de email ahora clasifica los tipos que transportan credenciales, persiste un intent
+redactado antes de rotar, bloquea batch/retry genérico y distingue rechazo del proveedor de aceptación incierta.
+Assessment assignment y Talent Pool verification comparten claim atómico por evento+entidad; un replay o dos
+workers concurrentes no vuelven a rotar. El índice único todavía no existe en runtime: antes de desplegar estos
+writers debe correrse `scripts/operations/task-1746-create-token-intent-index.sql` y conservar su readback
+`unique/valid/ready`. Ninguna migración, índice, secret, webhook ni configuración runtime se aplicó en este slice.
+
 ## 2026-08-18 — Hiring AI y candidate review MCP: runtime reconciliado
 
 El release `7e7a474217eb` (run `32193134959`) dejó `global_provisional` activo para assessments elegibles de

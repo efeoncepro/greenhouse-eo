@@ -5,6 +5,7 @@ vi.mock('server-only', () => ({}))
 const mocks = vi.hoisted(() => ({
   sendEmail: vi.fn(),
   wasSent: vi.fn(),
+  claimIntent: vi.fn(),
   capture: vi.fn(),
   query: vi.fn(),
   getAssessment: vi.fn(),
@@ -14,12 +15,13 @@ const mocks = vi.hoisted(() => ({
 vi.mock('@/lib/email/delivery', () => ({
   sendEmail: mocks.sendEmail,
   wasEmailAlreadySent: mocks.wasSent,
+  claimTokenSensitiveEmailIntent: mocks.claimIntent,
 }))
 vi.mock('@/lib/observability/capture', () => ({ captureWithDomain: mocks.capture }))
 vi.mock('@/lib/postgres/client', () => ({ runGreenhousePostgresQuery: mocks.query }))
 vi.mock('@/lib/hiring/assessment/instances', () => ({
   getAssessmentById: mocks.getAssessment,
-  reissueCandidateTestTokenForEmail: mocks.reissue,
+  reissueCandidateTestTokenForEmailWithClient: mocks.reissue,
 }))
 
 import {
@@ -116,6 +118,11 @@ describe('TASK-1734 Slice 5 — hiring lifecycle emails anti-leak', () => {
     mocks.query.mockResolvedValue([poisonedContextRow])
     mocks.getAssessment.mockResolvedValue(poisonedAssessment)
     mocks.reissue.mockResolvedValue({ token: 'tok-abc', timeLimitMinutes: 90, tokenTtlDays: 14 })
+    mocks.claimIntent.mockImplementation(async input => ({
+      claimed: true,
+      deliveryId: 'delivery-intent-1',
+      value: await input.issueCredential({})
+    }))
   })
 
   afterEach(() => {

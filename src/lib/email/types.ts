@@ -44,6 +44,22 @@ export type EmailDeliveryStatus =
 export type EmailPriority = 'critical' | 'transactional' | 'broadcast'
 
 /**
+ * Types whose render context carries a credential/bearer. Persistence and generic retry are
+ * forced safe by the delivery layer even when a caller forgets or tries to opt out.
+ */
+export const TOKEN_SENSITIVE_EMAIL_TYPES = Object.freeze([
+  'password_reset',
+  'invitation',
+  'verify_email',
+  'magic_link',
+  'hiring_assessment_assigned',
+  'hiring_talent_pool_verification'
+] as const satisfies readonly EmailType[])
+
+export const isTokenSensitiveEmailType = (emailType: EmailType): boolean =>
+  TOKEN_SENSITIVE_EMAIL_TYPES.includes(emailType as (typeof TOKEN_SENSITIVE_EMAIL_TYPES)[number])
+
+/**
  * Priority mapping canónico por EmailType.
  * critical/transactional bypass rate limits completamente.
  * broadcast respeta rate limits y usa Batch API para multi-recipient.
@@ -103,12 +119,23 @@ export interface EmailDeliveryPayload<TContext extends EmailTemplateContext = Em
   recipients: EmailRecipient[]
   context: TContext
   attachments?: EmailAttachment[]
+  persistence?: {
+    mode: 'standard' | 'token_sensitive'
+    retryable: boolean
+  }
 }
 
 export interface EmailTemplateContext extends Record<string, unknown> {
   recipientEmail?: string
   recipientName?: string
   recipientUserId?: string
+}
+
+export interface TokenSensitiveEmailSafeContext {
+  locale?: string
+  expiresAt?: string
+  timeLimitMinutes?: number | null
+  tokenTtlDays?: number | null
 }
 
 export type EmailTemplateResolver<TContext extends EmailTemplateContext = EmailTemplateContext> = (
@@ -141,6 +168,20 @@ export interface SendEmailInput<TContext extends EmailTemplateContext = EmailTem
   sourceEntity?: string
   actorEmail?: string
 
+  /**
+   * Token-sensitive messages render with `context` in memory, but persist only `safeContext`.
+   * They are never replayed by the generic retry worker because recreating the bearer belongs
+   * to the owning domain command.
+   */
+  persistence?:
+    | { mode?: 'standard' }
+    | {
+        mode: 'token_sensitive'
+        safeContext: TokenSensitiveEmailSafeContext
+        /** Durable intent claimed before the owning domain rotates a bearer. */
+        deliveryIntentId?: string
+      }
+
   /** Priority override. Defaults to EMAIL_PRIORITY_MAP[emailType] ?? 'broadcast'. */
   priority?: EmailPriority
 }
@@ -169,10 +210,14 @@ export interface SendEmailResult {
   deliveryId: string
   resendId: string | null
   status: EmailDeliveryStatus
+  /** Provider acknowledgement, distinct from the local delivery-row status. */
+  dispatchOutcome?: 'accepted' | 'failed' | 'unknown'
   recipientResults?: Array<{
+    deliveryId?: string
     recipientEmail: string
     resendId: string | null
     status: EmailDeliveryStatus
+    dispatchOutcome?: 'accepted' | 'failed' | 'unknown'
     error?: string
   }>
   error?: string

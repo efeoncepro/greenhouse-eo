@@ -5,6 +5,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import type { ReliabilitySignal } from '@/types/reliability'
 
 type EmailLifecycleHealthRow = {
+  stale_token_intent_15m: number
   webhook_pending_15m: number
   webhook_dead_letter_24h: number
   lifecycle_missing_24h: number
@@ -18,6 +19,14 @@ export const getEmailDeliveryLifecycleSignal = async (): Promise<ReliabilitySign
   try {
     const rows = await runGreenhousePostgresQuery<EmailLifecycleHealthRow>(
       `SELECT
+         (SELECT COUNT(*)::int
+            FROM greenhouse_notifications.email_deliveries
+           WHERE email_type IN ('hiring_assessment_assigned','hiring_talent_pool_verification')
+             AND status='pending'
+             AND resend_id IS NULL
+             AND delivery_payload->'persistence'->>'mode'='token_sensitive'
+             AND created_at < NOW() - INTERVAL '15 minutes') AS stale_token_intent_15m,
+
          (SELECT COUNT(*)::int
             FROM greenhouse_notifications.email_provider_events
            WHERE event_source = 'webhook'
@@ -60,6 +69,7 @@ export const getEmailDeliveryLifecycleSignal = async (): Promise<ReliabilitySign
     )
 
     const row = rows[0] ?? {
+      stale_token_intent_15m: 0,
       webhook_pending_15m: 0,
       webhook_dead_letter_24h: 0,
       lifecycle_missing_24h: 0,
@@ -67,19 +77,27 @@ export const getEmailDeliveryLifecycleSignal = async (): Promise<ReliabilitySign
       provider_failure_24h: 0
     }
 
+    const staleTokenIntents = Number(row.stale_token_intent_15m)
     const webhookPending = Number(row.webhook_pending_15m)
     const webhookDeadLetter = Number(row.webhook_dead_letter_24h)
     const lifecycleMissing = Number(row.lifecycle_missing_24h)
     const terminalPending = Number(row.terminal_outcome_pending_24h)
     const providerFailures = Number(row.provider_failure_24h)
-    const severity = webhookPending > 0 || webhookDeadLetter > 0 ? 'error' : lifecycleMissing > 0 || terminalPending > 0 || providerFailures > 0 ? 'warning' : 'ok'
+
+    const severity = webhookPending > 0 || webhookDeadLetter > 0
+      ? 'error'
+      : staleTokenIntents > 0 || lifecycleMissing > 0 || terminalPending > 0 || providerFailures > 0
+        ? 'warning'
+        : 'ok'
 
     const summary =
       webhookDeadLetter > 0
         ? `${webhookDeadLetter} evento(s) firmado(s) de Resend agotaron su presupuesto de proyección en 24 horas.`
         : webhookPending > 0
         ? `${webhookPending} evento(s) firmado(s) de Resend siguen pendientes de proyección por más de 15 minutos.`
-        : lifecycleMissing > 0
+        : staleTokenIntents > 0
+          ? `${staleTokenIntents} intento(s) con credencial llevan más de 15 minutos sin confirmación local de despacho; requieren recuperación explícita.`
+          : lifecycleMissing > 0
           ? `${lifecycleMissing} despacho(s) de los últimos 30 días no tienen lifecycle de proveedor después de 24 horas.`
           : terminalPending > 0
             ? `${terminalPending} despacho(s) tienen lifecycle confirmado, pero aún no un resultado terminal después de 24 horas.`
@@ -97,6 +115,7 @@ export const getEmailDeliveryLifecycleSignal = async (): Promise<ReliabilitySign
       observedAt: new Date().toISOString(),
       summary,
       evidence: [
+        { kind: 'metric', label: 'stale_token_intent_15m', value: String(staleTokenIntents) },
         { kind: 'metric', label: 'webhook_pending_15m', value: String(webhookPending) },
         { kind: 'metric', label: 'webhook_dead_letter_24h', value: String(webhookDeadLetter) },
         { kind: 'metric', label: 'lifecycle_missing_24h', value: String(lifecycleMissing) },

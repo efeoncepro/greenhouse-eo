@@ -2,10 +2,12 @@ import 'server-only'
 
 import { randomUUID } from 'crypto'
 
+import type { PoolClient } from 'pg'
+
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import { getEmailFromAddress, getResendClient, isResendConfigured } from '@/lib/resend'
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
@@ -22,9 +24,16 @@ import type {
   EmailPriority,
   EmailType,
   SendEmailInput,
-  SendEmailResult
+  SendEmailResult,
+  TokenSensitiveEmailSafeContext
 } from './types'
-import { AGENCY_BRANDED_EMAIL_TYPES, AGENCY_FROM_ADDRESS, EMAIL_PRIORITY_MAP } from './types'
+import {
+  AGENCY_BRANDED_EMAIL_TYPES,
+  AGENCY_FROM_ADDRESS,
+  EMAIL_PRIORITY_MAP,
+  isTokenSensitiveEmailType,
+  TOKEN_SENSITIVE_EMAIL_TYPES
+} from './types'
 
 // ── Broadcast types that include List-Unsubscribe header ──
 const BROADCAST_EMAIL_TYPES: EmailType[] = ['payroll_export', 'notification', 'payroll_receipt']
@@ -38,6 +47,65 @@ const resolveEmailFromAddress = (emailType: EmailType): string =>
   AGENCY_BRANDED_EMAIL_TYPES.has(emailType) ? AGENCY_FROM_ADDRESS : getEmailFromAddress()
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase()
+
+const resolveDeliveryPersistence = (
+  emailType: EmailType,
+  requested: SendEmailInput['persistence']
+): NonNullable<SendEmailInput['persistence']> => {
+  if (isTokenSensitiveEmailType(emailType) || requested?.mode === 'token_sensitive') {
+    return {
+      mode: 'token_sensitive',
+      safeContext: requested?.mode === 'token_sensitive' ? requested.safeContext : {},
+      ...(requested?.mode === 'token_sensitive' && requested.deliveryIntentId
+        ? { deliveryIntentId: requested.deliveryIntentId }
+        : {})
+    }
+  }
+
+  return { mode: 'standard' }
+}
+
+const durableSubject = (emailType: EmailType, subject: string, persistence: SendEmailInput['persistence']) =>
+  persistence?.mode === 'token_sensitive' ? `[${emailType} token-sensitive]` : subject
+
+const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}'
+const OUTBOX_EVENT_ID = new RegExp(`^outbox-${UUID}$`, 'i')
+const ASSESSMENT_ID = new RegExp(`^asmt-${UUID}$`, 'i')
+const TALENT_CONSENT_ID = new RegExp(`^tlpc-${UUID}$`, 'i')
+
+const durableSensitiveSource = (
+  emailType: EmailType,
+  sourceEventId: string | undefined,
+  sourceEntity: string | undefined
+): { sourceEventId?: string; sourceEntity?: string } => {
+  if (emailType === 'password_reset' && sourceEntity === 'auth_tokens') return { sourceEntity }
+  if (emailType === 'invitation' && sourceEntity === 'client_users') return { sourceEntity }
+  if (emailType === 'verify_email' && sourceEntity === 'email_verification') return { sourceEntity }
+
+  if (emailType === 'hiring_assessment_assigned' && sourceEntity && ASSESSMENT_ID.test(sourceEntity)) {
+    const canonicalFallback = `hiring-assessment-assigned:${sourceEntity}`
+
+    return {
+      sourceEntity,
+      ...(sourceEventId && (OUTBOX_EVENT_ID.test(sourceEventId) || sourceEventId === canonicalFallback)
+        ? { sourceEventId }
+        : {})
+    }
+  }
+
+  if (emailType === 'hiring_talent_pool_verification' && sourceEntity && TALENT_CONSENT_ID.test(sourceEntity)) {
+    const canonicalFallback = `talent-pool-consent-requested:${sourceEntity}`
+
+    return {
+      sourceEntity,
+      ...(sourceEventId && (OUTBOX_EVENT_ID.test(sourceEventId) || sourceEventId === canonicalFallback)
+        ? { sourceEventId }
+        : {})
+    }
+  }
+
+  return {}
+}
 
 // ── Kill switch: check if email type is enabled ──
 const checkEmailTypeEnabled = async (emailType: string): Promise<{ enabled: boolean; pausedReason?: string }> => {
@@ -66,6 +134,37 @@ const mergeAttachments = (
 
 const serializeJsonSafe = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T
 
+const normalizeTokenSensitiveSafeContext = (
+  emailType: EmailType,
+  input: Extract<NonNullable<SendEmailInput['persistence']>, { mode: 'token_sensitive' }>['safeContext']
+): Record<string, string | number | null> => {
+  const locale = typeof input.locale === 'string' && /^[a-z]{2}(?:-[A-Z]{2})?$/.test(input.locale)
+    ? input.locale
+    : undefined
+
+  const expiresAtMs = typeof input.expiresAt === 'string' ? Date.parse(input.expiresAt) : Number.NaN
+
+  const timeLimitMinutes = typeof input.timeLimitMinutes === 'number' && Number.isFinite(input.timeLimitMinutes)
+    ? Math.max(0, Math.floor(input.timeLimitMinutes))
+    : input.timeLimitMinutes === null
+      ? null
+      : undefined
+
+  const tokenTtlDays = typeof input.tokenTtlDays === 'number' && Number.isFinite(input.tokenTtlDays)
+    ? Math.max(0, Math.floor(input.tokenTtlDays))
+    : input.tokenTtlDays === null
+      ? null
+      : undefined
+
+  return {
+    templateVersion: `${emailType}:current`,
+    ...(locale ? { locale } : {}),
+    ...(Number.isFinite(expiresAtMs) ? { expiresAt: new Date(expiresAtMs).toISOString() } : {}),
+    ...(timeLimitMinutes !== undefined ? { timeLimitMinutes } : {}),
+    ...(tokenTtlDays !== undefined ? { tokenTtlDays } : {})
+  }
+}
+
 const reviveJsonSafe = (value: unknown): unknown => {
   if (Array.isArray(value)) {
     return value.map(item => reviveJsonSafe(item))
@@ -92,22 +191,153 @@ const toResendAttachments = (attachments: EmailAttachment[] | undefined) =>
   }))
 
 const normalizePayload = <TContext extends Record<string, unknown>>(input: {
+  emailType: EmailType
   recipients: EmailRecipient[]
   context: TContext
   attachments?: EmailAttachment[]
+  persistence?: SendEmailInput['persistence']
 }): EmailDeliveryPayload<TContext> => ({
   recipients: input.recipients.map(recipient => ({
     email: normalizeEmail(recipient.email),
-    name: recipient.name,
-    userId: recipient.userId
+    ...(input.persistence?.mode === 'token_sensitive'
+      ? {}
+      : { name: recipient.name, userId: recipient.userId })
   })),
-  context: serializeJsonSafe(input.context),
+  context: serializeJsonSafe(
+    input.persistence?.mode === 'token_sensitive'
+      ? normalizeTokenSensitiveSafeContext(input.emailType, input.persistence.safeContext)
+      : input.context
+  ) as TContext,
   attachments: input.attachments?.map(attachment => ({
     filename: attachment.filename,
     content: Buffer.from(attachment.content),
     contentType: attachment.contentType
-  }))
+  })),
+  persistence: input.persistence?.mode === 'token_sensitive'
+    ? { mode: 'token_sensitive', retryable: false }
+    : { mode: 'standard', retryable: true }
 })
+
+type RotationOwnerEmailType = 'hiring_assessment_assigned' | 'hiring_talent_pool_verification'
+
+const ROTATION_OWNER_EMAIL_TYPES: readonly RotationOwnerEmailType[] = Object.freeze([
+  'hiring_assessment_assigned',
+  'hiring_talent_pool_verification'
+])
+
+const isRotationOwnerEmailType = (emailType: EmailType): emailType is RotationOwnerEmailType =>
+  ROTATION_OWNER_EMAIL_TYPES.includes(emailType as RotationOwnerEmailType)
+
+export const claimTokenSensitiveEmailIntent = async <T>(input: {
+  emailType: RotationOwnerEmailType
+  domain: EmailDomain
+  recipient: EmailRecipient
+  sourceEventId: string
+  sourceEntity: string
+  safeContext: TokenSensitiveEmailSafeContext
+  issueCredential: (client: PoolClient) => Promise<T | null>
+}): Promise<{ claimed: boolean; deliveryId: string; value: T | null }> => {
+  const source = durableSensitiveSource(input.emailType, input.sourceEventId, input.sourceEntity)
+
+  if (source.sourceEventId !== input.sourceEventId || source.sourceEntity !== input.sourceEntity) {
+    throw new Error('Invalid token-sensitive delivery correlation.')
+  }
+
+  const recipientEmail = normalizeEmail(input.recipient.email)
+  const lockKey = `${input.emailType}:${input.sourceEventId}:${input.sourceEntity}`
+
+  const payload = normalizePayload({
+    emailType: input.emailType,
+    recipients: [input.recipient],
+    context: {},
+    persistence: { mode: 'token_sensitive', safeContext: input.safeContext }
+  })
+
+  return withGreenhousePostgresTransaction(async client => {
+    await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1, 0))', [lockKey])
+
+    const existing = await client.query<{ delivery_id: string }>(
+      `SELECT delivery_id
+       FROM greenhouse_notifications.email_deliveries
+       WHERE email_type=$1 AND source_event_id=$2 AND source_entity=$3
+       ORDER BY created_at ASC
+       LIMIT 1`,
+      [input.emailType, input.sourceEventId, input.sourceEntity]
+    )
+
+    if (existing.rows[0]) {
+      return { claimed: false, deliveryId: existing.rows[0].delivery_id, value: null }
+    }
+
+    const batchId = randomUUID()
+
+    const inserted = await client.query<{ delivery_id: string }>(
+      `INSERT INTO greenhouse_notifications.email_deliveries (
+         batch_id,email_type,domain,recipient_email,recipient_name,recipient_user_id,
+         subject,resend_id,status,has_attachments,delivery_payload,source_event_id,
+         source_entity,actor_email,error_message,priority,error_class,attempt_number,created_at,updated_at
+       ) VALUES ($1,$2,$3,$4,NULL,NULL,$5,NULL,'pending',false,$6::jsonb,$7,$8,NULL,NULL,$9,NULL,1,NOW(),NOW())
+       ON CONFLICT DO NOTHING
+       RETURNING delivery_id`,
+      [
+        batchId,
+        input.emailType,
+        input.domain,
+        recipientEmail,
+        durableSubject(input.emailType, '', { mode: 'token_sensitive', safeContext: {} }),
+        JSON.stringify(payload),
+        input.sourceEventId,
+        input.sourceEntity,
+        EMAIL_PRIORITY_MAP[input.emailType] ?? 'transactional'
+      ]
+    )
+
+    const deliveryId = inserted.rows[0]?.delivery_id
+
+    if (!deliveryId) {
+      const raced = await client.query<{ delivery_id: string }>(
+        `SELECT delivery_id
+         FROM greenhouse_notifications.email_deliveries
+         WHERE email_type=$1 AND source_event_id=$2 AND source_entity=$3
+         ORDER BY created_at ASC LIMIT 1`,
+        [input.emailType, input.sourceEventId, input.sourceEntity]
+      )
+
+      if (!raced.rows[0]) throw new Error('Unable to claim token-sensitive delivery intent.')
+
+      return { claimed: false, deliveryId: raced.rows[0].delivery_id, value: null }
+    }
+
+    const config = await client.query<{ enabled: boolean }>(
+      `SELECT enabled FROM greenhouse_notifications.email_type_config WHERE email_type=$1 FOR SHARE`,
+      [input.emailType]
+    )
+
+    if (config.rows[0]?.enabled === false) {
+      await client.query(
+        `UPDATE greenhouse_notifications.email_deliveries
+         SET status='skipped',error_message='Email type paused before credential issuance.',updated_at=NOW()
+         WHERE delivery_id=$1`,
+        [deliveryId]
+      )
+
+      return { claimed: true, deliveryId, value: null }
+    }
+
+    const value = await input.issueCredential(client)
+
+    if (value === null) {
+      await client.query(
+        `UPDATE greenhouse_notifications.email_deliveries
+         SET status='failed',error_message='Credential could not be issued.',updated_at=NOW()
+         WHERE delivery_id=$1`,
+        [deliveryId]
+      )
+    }
+
+    return { claimed: true, deliveryId, value }
+  })
+}
 
 const reviveDeliveryPayload = <TContext extends Record<string, unknown>>(
   payload: unknown
@@ -117,6 +347,15 @@ const reviveDeliveryPayload = <TContext extends Record<string, unknown>>(
   }
 
   const record = reviveJsonSafe(payload) as Record<string, unknown>
+
+  if (
+    record.persistence &&
+    typeof record.persistence === 'object' &&
+    ((record.persistence as Record<string, unknown>).mode === 'token_sensitive' ||
+      (record.persistence as Record<string, unknown>).retryable === false)
+  ) {
+    return null
+  }
 
   const recipients = Array.isArray(record.recipients)
     ? record.recipients
@@ -190,6 +429,14 @@ const createDeliveryRow = async (input: {
   priority?: EmailPriority
   errorClass?: string | null
 }) => {
+  const persistence: SendEmailInput['persistence'] = input.payload.persistence?.mode === 'token_sensitive'
+    ? { mode: 'token_sensitive', safeContext: {} }
+    : { mode: 'standard' }
+
+  const sensitiveSource = persistence.mode === 'token_sensitive'
+    ? durableSensitiveSource(input.emailType as EmailType, input.sourceEventId, input.sourceEntity)
+    : null
+
   const rows = await runGreenhousePostgresQuery<{ delivery_id: string } & Record<string, unknown>>(
     `
       INSERT INTO greenhouse_notifications.email_deliveries (
@@ -223,16 +470,16 @@ const createDeliveryRow = async (input: {
       input.emailType,
       input.domain,
       normalizeEmail(input.recipient.email),
-      input.recipient.name ?? null,
-      input.recipient.userId ?? null,
-      input.subject,
+      persistence.mode === 'token_sensitive' ? null : input.recipient.name ?? null,
+      persistence.mode === 'token_sensitive' ? null : input.recipient.userId ?? null,
+      durableSubject(input.emailType as EmailType, input.subject, persistence),
       input.resendId,
       input.status,
       input.hasAttachments,
       JSON.stringify(input.payload),
-      input.sourceEventId ?? null,
-      input.sourceEntity ?? null,
-      input.actorEmail ?? null,
+      persistence.mode === 'token_sensitive' ? sensitiveSource?.sourceEventId ?? null : input.sourceEventId ?? null,
+      sensitiveSource?.sourceEntity ?? (persistence.mode === 'token_sensitive' ? null : input.sourceEntity ?? null),
+      persistence.mode === 'token_sensitive' ? null : input.actorEmail ?? null,
       input.errorMessage ?? null,
       input.priority ?? 'broadcast',
       input.errorClass ?? null
@@ -259,6 +506,40 @@ const updateDeliveryRow = async (input: {
     `,
     [input.deliveryId, input.resendId, input.status, input.errorMessage ?? null]
   )
+}
+
+const finalizeClaimedIntentWithoutDispatch = async <TContext extends Record<string, unknown>>(
+  input: SendEmailInput<TContext>,
+  deliveryIntentId: string,
+  reason: string
+) => {
+  const recipient = input.recipients?.length === 1 ? input.recipients[0] : null
+  const source = durableSensitiveSource(input.emailType, input.sourceEventId, input.sourceEntity)
+
+  if (!recipient || !source.sourceEventId || !source.sourceEntity) {
+    throw new Error('Claimed delivery intent cannot be finalized safely.')
+  }
+
+  const rows = await runGreenhousePostgresQuery<{ delivery_id: string } & Record<string, unknown>>(
+    `UPDATE greenhouse_notifications.email_deliveries
+     SET status='skipped',error_message=$6,updated_at=NOW()
+     WHERE delivery_id=$1 AND email_type=$2 AND recipient_email=$3
+       AND source_event_id=$4 AND source_entity=$5 AND status='pending'
+       AND delivery_payload->'persistence'->>'mode'='token_sensitive'
+     RETURNING delivery_id`,
+    [
+      deliveryIntentId,
+      input.emailType,
+      normalizeEmail(recipient.email),
+      source.sourceEventId,
+      source.sourceEntity,
+      reason
+    ]
+  )
+
+  if (!rows[0]) throw new Error('Claimed delivery intent could not be finalized.')
+
+  return rows[0].delivery_id
 }
 
 interface FailedDeliveryRow {
@@ -292,6 +573,8 @@ const claimFailedDelivery = async (deliveryId: string) => {
       WHERE delivery_id = $1
         AND status IN ('failed', 'rate_limited')
         AND attempt_number < 3
+        AND NOT (email_type = ANY($2::text[]))
+        AND COALESCE(delivery_payload->'persistence'->>'retryable', 'true') <> 'false'
       RETURNING
         delivery_id,
         batch_id,
@@ -311,7 +594,7 @@ const claimFailedDelivery = async (deliveryId: string) => {
         error_message,
         attempt_number
     `,
-    [deliveryId]
+    [deliveryId, [...TOKEN_SENSITIVE_EMAIL_TYPES]]
   )
 
   return rows[0] ?? null
@@ -329,14 +612,56 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
   actorEmail?: string
   existingDeliveryId?: string | null
   priority?: EmailPriority
+  persistence?: SendEmailInput['persistence']
 }) => {
+  let acceptedResendId: string | null = null
+  let durableDeliveryId = input.existingDeliveryId ?? null
+
+  const requestedIntentId = input.persistence?.mode === 'token_sensitive'
+    ? input.persistence.deliveryIntentId
+    : undefined
+
+  if (isRotationOwnerEmailType(input.emailType) && !requestedIntentId) {
+    throw new Error('A claimed delivery intent is required for credential-rotation email types.')
+  }
+
   const basePayload = normalizePayload({
+    emailType: input.emailType,
     recipients: [input.recipient],
     context: input.context,
-    attachments: input.attachments
+    attachments: input.persistence?.mode === 'token_sensitive' ? undefined : input.attachments,
+    persistence: input.persistence
   })
 
   try {
+    if (requestedIntentId) {
+      const source = durableSensitiveSource(input.emailType, input.sourceEventId, input.sourceEntity)
+
+      const rows = await runGreenhousePostgresQuery<{ exists: boolean } & Record<string, unknown>>(
+        `SELECT EXISTS (
+           SELECT 1 FROM greenhouse_notifications.email_deliveries
+           WHERE delivery_id=$1 AND email_type=$2 AND recipient_email=$3
+             AND source_event_id=$4 AND source_entity=$5 AND status='pending'
+             AND delivery_payload->'persistence'->>'mode'='token_sensitive'
+         ) AS exists`,
+        [
+          requestedIntentId,
+          input.emailType,
+          normalizeEmail(input.recipient.email),
+          source.sourceEventId ?? null,
+          source.sourceEntity ?? null
+        ]
+      )
+
+      if (rows[0]?.exists !== true) throw new Error('Token-sensitive delivery intent is not valid.')
+
+      durableDeliveryId = requestedIntentId
+    }
+
+    if (input.persistence?.mode === 'token_sensitive' && input.attachments?.length) {
+      throw new Error('Token-sensitive email cannot persist or replay attachments.')
+    }
+
     // ── Context Resolver: auto-hydrate recipient + client data ──
     let resolvedContext: Record<string, unknown> = {}
 
@@ -469,21 +794,50 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
     const resolvedTemplate = resolveTemplate(input.emailType, mergedContext)
 
     const mergedAttachments = mergeAttachments(resolvedTemplate.attachments, input.attachments)
+
+    if (input.persistence?.mode === 'token_sensitive' && mergedAttachments.length > 0) {
+      throw new Error('Token-sensitive email cannot persist or replay attachments.')
+    }
+
     const resendAttachments = toResendAttachments(mergedAttachments)
 
     const payload = normalizePayload({
+      emailType: input.emailType,
       recipients: [input.recipient],
       context: input.context,
-      attachments: mergedAttachments
+      attachments: mergedAttachments,
+      persistence: input.persistence
     })
+
+    if (input.persistence?.mode === 'token_sensitive' && !durableDeliveryId) {
+      durableDeliveryId = await createDeliveryRow({
+        batchId: input.batchId,
+        emailType: input.emailType,
+        domain: input.domain,
+        recipient: input.recipient,
+        subject: resolvedTemplate.subject,
+        resendId: null,
+        status: 'pending',
+        hasAttachments: false,
+        payload,
+        sourceEventId: input.sourceEventId,
+        sourceEntity: input.sourceEntity,
+        actorEmail: input.actorEmail,
+        priority: input.priority
+      })
+
+      if (!durableDeliveryId) {
+        throw new Error('Unable to establish token-sensitive delivery intent.')
+      }
+    }
 
     // ── RESEND_API_KEY guard: config error → failed (retryable), NOT skipped ──
     if (!isResendConfigured()) {
       const configErrorMsg = 'RESEND_API_KEY is not configured.'
 
-      if (input.existingDeliveryId) {
+      if (durableDeliveryId) {
         await updateDeliveryRow({
-          deliveryId: input.existingDeliveryId,
+          deliveryId: durableDeliveryId,
           resendId: null,
           status: 'failed',
           errorMessage: configErrorMsg
@@ -509,7 +863,7 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
       }
 
       return {
-        deliveryId: input.existingDeliveryId || input.batchId,
+        deliveryId: durableDeliveryId || input.batchId,
         recipientEmail: input.recipient.email,
         resendId: null,
         status: 'failed' as const,
@@ -539,11 +893,17 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
       ...unsubscribeHeaders
     })
 
-    const resendId = result?.data?.id ?? null
+    if (result?.error || !result?.data?.id) {
+      throw new Error('Email provider rejected dispatch.')
+    }
 
-    if (input.existingDeliveryId) {
+    const resendId = result.data.id
+
+    acceptedResendId = resendId
+
+    if (durableDeliveryId) {
       await updateDeliveryRow({
-        deliveryId: input.existingDeliveryId,
+        deliveryId: durableDeliveryId,
         resendId,
         status: 'sent'
       })
@@ -566,13 +926,20 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
     }
 
     return {
-      deliveryId: input.existingDeliveryId || input.batchId,
+      deliveryId: durableDeliveryId || input.batchId,
       recipientEmail: input.recipient.email,
       resendId,
-      status: 'sent' as const
+      status: 'sent' as const,
+      dispatchOutcome: 'accepted' as const
     }
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to send email.'
+    const tokenSensitive = input.persistence?.mode === 'token_sensitive'
+
+    const message = tokenSensitive
+      ? 'Token-sensitive email delivery failed.'
+      : error instanceof Error
+        ? error.message
+        : 'Failed to send email.'
 
     const isTemplateMissing = error instanceof Error && error.message.includes('No email template registered')
     const subject = isTemplateMissing ? '[template missing]' : '[email delivery failed]'
@@ -582,7 +949,7 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
     // surfaces in the Cloud Platform module's `incident` signal (email
     // delivery is part of the cloud infrastructure footprint via the
     // `Notificaciones` subsystem).
-    captureWithDomain(error, 'cloud', {
+    captureWithDomain(tokenSensitive ? new Error(message) : error, 'cloud', {
       extra: {
         emailType: input.emailType,
         recipientEmail: input.recipient.email,
@@ -593,9 +960,20 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
       tags: { surface: 'email_delivery' }
     })
 
-    if (input.existingDeliveryId) {
+    if (acceptedResendId) {
+      return {
+        deliveryId: durableDeliveryId || input.batchId,
+        recipientEmail: input.recipient.email,
+        resendId: acceptedResendId,
+        status: 'failed' as const,
+        dispatchOutcome: 'unknown' as const,
+        error: tokenSensitive ? 'Token-sensitive email dispatch state is unknown.' : 'Email dispatch state is unknown.'
+      }
+    }
+
+    if (durableDeliveryId) {
       await updateDeliveryRow({
-        deliveryId: input.existingDeliveryId,
+        deliveryId: durableDeliveryId,
         resendId: null,
         status: 'failed',
         errorMessage: message
@@ -611,7 +989,7 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
         subject,
         resendId: null,
         status: 'failed',
-        hasAttachments: Boolean(input.attachments?.length),
+            hasAttachments: tokenSensitive ? false : Boolean(input.attachments?.length),
         payload: basePayload,
         sourceEventId: input.sourceEventId,
         sourceEntity: input.sourceEntity,
@@ -625,10 +1003,11 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
     }
 
     return {
-      deliveryId: input.existingDeliveryId || input.batchId,
+      deliveryId: durableDeliveryId || input.batchId,
       recipientEmail: input.recipient.email,
       resendId: null,
       status: 'failed' as const,
+      dispatchOutcome: 'failed' as const,
       error: message
     }
   }
@@ -675,7 +1054,11 @@ const prepareBroadcastRecipient = async <TContext extends Record<string, unknown
     priority: EmailPriority
   }
 ): Promise<BroadcastPrepared> => {
-  const basePayload = normalizePayload({ recipients: [recipient], context: input.context })
+  const basePayload = normalizePayload({
+    emailType: input.emailType,
+    recipients: [recipient],
+    context: input.context
+  })
 
   try {
     // Rate limit (critical/transactional bypass handled inside checkRecipientRateLimit)
@@ -773,6 +1156,7 @@ const prepareBroadcastRecipient = async <TContext extends Record<string, unknown
     const mergedAttachments = mergeAttachments(resolvedTemplate.attachments, undefined)
 
     const payload = normalizePayload({
+      emailType: input.emailType,
       recipients: [recipient],
       context: input.context,
       attachments: mergedAttachments
@@ -859,9 +1243,11 @@ const deliverBroadcastBatch = async <TContext extends Record<string, unknown>>(i
       })
 
       results.push({
+        deliveryId: result.deliveryId,
         recipientEmail: item.recipient.email,
         resendId: result.resendId,
         status: result.status,
+        ...(result.dispatchOutcome ? { dispatchOutcome: result.dispatchOutcome } : {}),
         ...(result.error ? { error: result.error } : {})
       })
     }
@@ -883,13 +1269,18 @@ const deliverBroadcastBatch = async <TContext extends Record<string, unknown>>(i
     }))
 
     const batchResult = await resendClient.batch.send(batchPayload)
+    const accepted = batchResult.data?.data
+
+    if (batchResult.error || !accepted || accepted.length !== eligible.length || accepted.some(item => !item.id)) {
+      throw new Error('Email provider rejected batch dispatch.')
+    }
 
     // Record one delivery row per recipient
-    await Promise.allSettled(
-      eligible.map(async (item, i) => {
-        const resendId = batchResult.data?.data?.[i]?.id ?? null
+    const persistedResults = await Promise.all(eligible.map(async (item, i) => {
+      const resendId = accepted[i].id
 
-        await createDeliveryRow({
+      try {
+        const deliveryId = await createDeliveryRow({
           batchId: input.batchId,
           emailType: input.emailType,
           domain: input.domain,
@@ -905,9 +1296,25 @@ const deliverBroadcastBatch = async <TContext extends Record<string, unknown>>(i
           priority: input.priority
         })
 
-        results.push({ recipientEmail: item.recipient.email, resendId, status: 'sent' })
-      })
-    )
+        return {
+          ...(deliveryId ? { deliveryId } : {}),
+          recipientEmail: item.recipient.email,
+          resendId,
+          status: 'sent' as const,
+          dispatchOutcome: 'accepted' as const
+        }
+      } catch {
+        return {
+          recipientEmail: item.recipient.email,
+          resendId,
+          status: 'failed' as const,
+          dispatchOutcome: 'unknown' as const,
+          error: 'Email dispatch state is unknown.'
+        }
+      }
+    }))
+
+    results.push(...persistedResults)
   } catch (batchError) {
     // Batch API failed — record all eligible as failed (retryable)
     captureWithDomain(batchError, 'cloud', {
@@ -917,9 +1324,9 @@ const deliverBroadcastBatch = async <TContext extends Record<string, unknown>>(i
 
     const errorMessage = batchError instanceof Error ? batchError.message : 'Batch send failed.'
 
-    await Promise.allSettled(
-      eligible.map(async item => {
-        await createDeliveryRow({
+    const failedResults = await Promise.all(eligible.map(async item => {
+      try {
+        const deliveryId = await createDeliveryRow({
           batchId: input.batchId,
           emailType: input.emailType,
           domain: input.domain,
@@ -937,9 +1344,26 @@ const deliverBroadcastBatch = async <TContext extends Record<string, unknown>>(i
           errorClass: 'resend_api_error'
         })
 
-        results.push({ recipientEmail: item.recipient.email, resendId: null, status: 'failed', error: errorMessage })
-      })
-    )
+        return {
+          ...(deliveryId ? { deliveryId } : {}),
+          recipientEmail: item.recipient.email,
+          resendId: null,
+          status: 'failed' as const,
+          dispatchOutcome: 'failed' as const,
+          error: errorMessage
+        }
+      } catch {
+        return {
+          recipientEmail: item.recipient.email,
+          resendId: null,
+          status: 'failed' as const,
+          dispatchOutcome: 'failed' as const,
+          error: errorMessage
+        }
+      }
+    }))
+
+    results.push(...failedResults)
   }
 
   return results
@@ -1001,11 +1425,28 @@ export const sendEmail = async <TContext extends Record<string, unknown>>(
   input: SendEmailInput<TContext>
 ): Promise<SendEmailResult> => {
   const batchId = randomUUID()
+  const persistence = resolveDeliveryPersistence(input.emailType, input.persistence)
 
   // Kill switch: check if this email type is paused
   const killSwitch = await checkEmailTypeEnabled(input.emailType)
 
   if (!killSwitch.enabled) {
+    if (persistence.mode === 'token_sensitive' && persistence.deliveryIntentId) {
+      const deliveryId = await finalizeClaimedIntentWithoutDispatch(
+        input,
+        persistence.deliveryIntentId,
+        'Email type paused before provider dispatch.'
+      )
+
+      return {
+        deliveryId,
+        resendId: null,
+        status: 'skipped',
+        dispatchOutcome: 'failed',
+        error: `Email type paused: ${killSwitch.pausedReason ?? 'no reason provided'}`
+      }
+    }
+
     return {
       deliveryId: batchId,
       resendId: null,
@@ -1048,11 +1489,13 @@ export const sendEmail = async <TContext extends Record<string, unknown>>(
     priority === 'broadcast' &&
     recipients.length > 1 &&
     !input.attachments?.length &&
+    persistence.mode !== 'token_sensitive' &&
     isResendConfigured()
 
   let firstResendId: string | null = null
   let sawFailure = false
   let sawSkipped = false
+  let sawUnknown = false
   let lastError: string | undefined
   let recipientResults: NonNullable<SendEmailResult['recipientResults']>
 
@@ -1082,13 +1525,16 @@ export const sendEmail = async <TContext extends Record<string, unknown>>(
         sourceEventId: input.sourceEventId,
         sourceEntity: input.sourceEntity,
         actorEmail: input.actorEmail,
-        priority
+        priority,
+        persistence
       })
 
       recipientResults.push({
+        deliveryId: result.deliveryId,
         recipientEmail: recipient.email,
         resendId: result.resendId,
         status: result.status,
+        ...(result.dispatchOutcome ? { dispatchOutcome: result.dispatchOutcome } : {}),
         ...(result.error ? { error: result.error } : {})
       })
     }
@@ -1099,19 +1545,22 @@ export const sendEmail = async <TContext extends Record<string, unknown>>(
       firstResendId = result.resendId
     }
 
-    if (result.status === 'failed') {
+    if (result.status === 'failed' || result.status === 'rate_limited') {
       sawFailure = true
       lastError = lastError || result.error
     } else if (result.status === 'skipped') {
       sawSkipped = true
       lastError = lastError || result.error
     }
+
+    if (result.dispatchOutcome === 'unknown') sawUnknown = true
   }
 
   return {
-    deliveryId: batchId,
+    deliveryId: recipientResults.length === 1 ? recipientResults[0].deliveryId ?? batchId : batchId,
     resendId: firstResendId,
     status: sawFailure ? 'failed' : sawSkipped ? 'skipped' : 'sent',
+    dispatchOutcome: sawUnknown ? 'unknown' : sawFailure || sawSkipped ? 'failed' : 'accepted',
     recipientResults,
     ...(lastError ? { error: lastError } : {})
   }
@@ -1154,10 +1603,12 @@ export const processFailedEmailDeliveries = async (limit = 25) => {
         OR (status = 'rate_limited' AND updated_at < NOW() - INTERVAL '1 hour' AND attempt_number < 3)
       )
         AND created_at > NOW() - INTERVAL '24 hours'
+        AND NOT (email_type = ANY($2::text[]))
+        AND COALESCE(delivery_payload->'persistence'->>'retryable', 'true') <> 'false'
       ORDER BY created_at ASC
       LIMIT $1
     `,
-    [limit]
+    [limit, [...TOKEN_SENSITIVE_EMAIL_TYPES]]
   )
 
   let attempted = 0

@@ -202,6 +202,8 @@ Reglas obligatorias:
 
 - Implementar el command transaccional con lock/rate limit. Email: delivery source distinct from assignment event, token created only in the recovery path and no duplicate dispatch.
 - Secure link: one-time browser-safe response with bounded expiry, no durable raw token and no hidden UI fallback.
+- Antes del command, endurecer globalmente el transporte de emails que llevan credenciales: sobre durable
+  redactado, intent atómico previo a la rotación, sin batch/retry genérico y outcome honesto del proveedor.
 
 ### Slice 3 — Guardrails y evidencia
 
@@ -274,6 +276,16 @@ Privacy/Security/Product approval recorded in the accepted ADR. A consented cand
   deadline inicial y diferido con reloj real, retención candidate/workforce y purga gobernada.
   Evidencia: 200 tests focales/combinados, ESLint, TypeScript, migration marker gate (586/0),
   `ops:lint --changed` y `git diff --check`. La migración no se aplicó; requiere command y smokes PG.
+- 2026-08-19 — Slice 2A, transporte token-sensitive, validado localmente por Arquitectura, Talento y
+  Seguridad sin P0/P1/P2. La clasificación es global para reset, invitación, verificación, magic link,
+  test de candidato y verificación de Talent Pool. Los dos flows que rotan credenciales reservan un
+  intent durable redactado y emiten la credencial dentro de la misma transacción; sólo el ganador llama
+  al proveedor después del commit. Replays, carreras, kill switch, consentimiento concurrente, errores
+  explícitos de Resend y aceptación incierta quedan fail-closed u honestamente marcados, sin retry ciego.
+  Los intents `pending` envejecidos alimentan una señal global y exigen recuperación explícita.
+  Evidencia: 63 tests focales, ESLint, TypeScript, migration marker gate y `git diff --check` verdes.
+  El índice único no está aplicado: `scripts/operations/task-1746-create-token-intent-index.sql` debe
+  ejecutarse y conservar readback `unique/valid/ready` verde antes de desplegar estos writers.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING

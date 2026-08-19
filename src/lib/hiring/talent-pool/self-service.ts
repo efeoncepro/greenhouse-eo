@@ -2,6 +2,8 @@ import 'server-only'
 
 import { createHash, randomBytes } from 'node:crypto'
 
+import type { PoolClient } from 'pg'
+
 import { HiringNotFoundError } from '@/lib/hiring/errors'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
@@ -54,21 +56,61 @@ export const issueTalentPoolSelfServiceToken = async ({
   membershipId: string
   issuedBy?: string | null
 }) => {
+  return withGreenhousePostgresTransaction(client => issueTalentPoolSelfServiceTokenWithClient(client, {
+    membershipId,
+    issuedBy
+  }))
+}
+
+export const issueTalentPoolSelfServiceTokenWithClient = async (
+  client: PoolClient,
+  {
+    membershipId,
+    consentEventId,
+    issuedBy = null
+  }: {
+    membershipId: string
+    consentEventId?: string
+    issuedBy?: string | null
+  }
+) => {
+  if (consentEventId) {
+    const eligible = await client.query<{ consent_event_id: string }>(
+      `SELECT ce.consent_event_id
+         FROM greenhouse_hiring.talent_pool_membership m
+         JOIN greenhouse_hiring.candidate_facet cf ON cf.candidate_facet_id=m.candidate_facet_id
+         JOIN greenhouse_hiring.talent_pool_consent_event ce ON ce.membership_id=m.membership_id
+        WHERE m.membership_id=$1 AND ce.consent_event_id=$2
+          AND ce.purpose='future_opportunities' AND ce.action='requested'
+          AND m.lifecycle_status<>'withdrawn' AND cf.consent_status<>'withdrawn'
+          AND NOT EXISTS (
+            SELECT 1 FROM greenhouse_hiring.talent_pool_consent_event later
+             WHERE later.membership_id=ce.membership_id
+               AND later.purpose='future_opportunities'
+               AND later.consent_event_id<>ce.consent_event_id
+               AND (later.effective_at,later.occurred_at,later.consent_event_id)
+                   >(ce.effective_at,ce.occurred_at,ce.consent_event_id)
+          )
+        FOR UPDATE OF m,cf,ce`,
+      [membershipId, consentEventId]
+    )
+
+    if (!eligible.rows[0]) return null
+  }
+
   const token = randomBytes(32).toString('base64url')
   const expiresAt = new Date(Date.now() + TOKEN_TTL_DAYS * 86_400_000)
 
-  await withGreenhousePostgresTransaction(async client => {
-    await client.query(
-      `UPDATE greenhouse_hiring.talent_pool_self_service_token SET revoked_at=NOW()
+  await client.query(
+    `UPDATE greenhouse_hiring.talent_pool_self_service_token SET revoked_at=NOW()
         WHERE membership_id=$1 AND revoked_at IS NULL`,
-      [membershipId]
-    )
-    await client.query(
-      `INSERT INTO greenhouse_hiring.talent_pool_self_service_token
+    [membershipId]
+  )
+  await client.query(
+    `INSERT INTO greenhouse_hiring.talent_pool_self_service_token
         (membership_id,access_token_hash,expires_at,issued_by) VALUES ($1,$2,$3,$4)`,
-      [membershipId, hashToken(token), expiresAt, issuedBy]
-    )
-  })
+    [membershipId, hashToken(token), expiresAt, issuedBy]
+  )
 
   return { token, expiresAt: expiresAt.toISOString(), tokenTtlDays: TOKEN_TTL_DAYS }
 }

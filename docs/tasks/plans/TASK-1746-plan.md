@@ -41,6 +41,14 @@
 - 2026-08-19 — Slice 1 code complete and independently validated. Schema/capabilities/contracts
   remain unapplied until Slice 2 provides the only governed writer and the PostgreSQL smoke can
   exercise deferred constraints, effective ACLs, automatic events and retention transitions.
+- 2026-08-19 — Slice 2A code complete and independently validated. The shared email layer now derives
+  token sensitivity from an immutable email-type registry, persists only a redacted intent, forbids
+  generic retry/batch and reports provider rejection versus unknown acceptance honestly. Assessment
+  assignment and Talent Pool verification claim `(email_type, source_event_id, source_entity)` and
+  rotate their credential atomically; replays cannot rotate again. The global lifecycle reader exposes
+  stale intents without inferring non-delivery. Rollout is gated on running
+  `scripts/operations/task-1746-create-token-intent-index.sql` before the writers and retaining its
+  valid/ready/unique readback. No schema, index or runtime change has been applied.
 
 ## Skills
 

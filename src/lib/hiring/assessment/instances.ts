@@ -691,29 +691,34 @@ return method as AssessmentMethod
 export const reissueCandidateTestTokenForEmail = async (
   assessmentId: string,
 ): Promise<{ token: string; timeLimitMinutes: number | null; tokenTtlDays: number } | null> => {
+  return withGreenhousePostgresTransaction(client => reissueCandidateTestTokenForEmailWithClient(client, assessmentId))
+}
+
+export const reissueCandidateTestTokenForEmailWithClient = async (
+  client: PoolClient,
+  assessmentId: string,
+): Promise<{ token: string; timeLimitMinutes: number | null; tokenTtlDays: number } | null> => {
   const rawToken = randomBytes(24).toString('base64url')
 
-  return withGreenhousePostgresTransaction(async (client) => {
-    const rows = await runQuery<{ assessment_id: string; time_limit_minutes: number | string | null }>(
-      client,
-      `UPDATE greenhouse_hiring.hiring_assessment
+  const rows = await runQuery<{ assessment_id: string; time_limit_minutes: number | string | null }>(
+    client,
+    `UPDATE greenhouse_hiring.hiring_assessment
        SET access_token_hash = $2,
            token_expires_at = NOW() + make_interval(days => ${TOKEN_TTL_DAYS}),
            status = 'sent',
            updated_at = NOW()
        WHERE assessment_id = $1 AND method = 'candidate_test' AND status IN ('assigned', 'sent')
        RETURNING assessment_id, time_limit_minutes`,
-      [assessmentId, hashToken(rawToken)],
-    )
+    [assessmentId, hashToken(rawToken)],
+  )
 
-    if (!rows[0]) return null
+  if (!rows[0]) return null
 
-    const rawLimit = rows[0].time_limit_minutes
+  const rawLimit = rows[0].time_limit_minutes
 
-    return {
-      token: rawToken,
-      timeLimitMinutes: rawLimit == null ? null : Number(rawLimit),
-      tokenTtlDays: TOKEN_TTL_DAYS,
-    }
-  })
+  return {
+    token: rawToken,
+    timeLimitMinutes: rawLimit == null ? null : Number(rawLimit),
+    tokenTtlDays: TOKEN_TTL_DAYS,
+  }
 }

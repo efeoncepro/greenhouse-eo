@@ -1,10 +1,10 @@
 import 'server-only'
 
-import { sendEmail, wasEmailAlreadySent } from '@/lib/email/delivery'
+import { claimTokenSensitiveEmailIntent, sendEmail, wasEmailAlreadySent } from '@/lib/email/delivery'
 import { getCountryName } from '@/lib/locale/countries'
 import { captureWithDomain } from '@/lib/observability/capture'
 
-import { getAssessmentById, reissueCandidateTestTokenForEmail } from '../assessment/instances'
+import { getAssessmentById, reissueCandidateTestTokenForEmailWithClient } from '../assessment/instances'
 import {
   hiringPublicBaseUrl,
   isHiringLifecycleEmailsEnabled,
@@ -28,6 +28,14 @@ const FLAG_OFF_MSG = 'hiring_lifecycle_emails skip: flag OFF'
 
 const eventIdOr = (payload: Record<string, unknown>, fallback: string): string =>
   typeof payload._eventId === 'string' && payload._eventId.length > 0 ? payload._eventId : fallback
+
+const tokenDeliveryEventIdOr = (payload: Record<string, unknown>, fallback: string): string => {
+  const candidate = eventIdOr(payload, fallback)
+
+  return /^outbox-[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidate)
+    ? candidate
+    : fallback
+}
 
 const captureHiring = (message: string, extra: Record<string, unknown>) =>
   captureWithDomain(new Error(message), 'hiring', { tags: { source: 'hiring_lifecycle_emails' }, extra })
@@ -142,14 +150,23 @@ export const sendHiringAssessmentAssignedEmail = async (
     return `hiring_assessment_assigned_email skip: application ${assessment.applicationId} sin email`
   }
 
-  const eventId = eventIdOr(payload, `hiring-assessment-assigned:${assessmentId}`)
+  const eventId = tokenDeliveryEventIdOr(payload, `hiring-assessment-assigned:${assessmentId}`)
 
-  // Dedupe ANTES de rotar: re-rotar tras un envío exitoso invalidaría el link ya entregado.
-  if (await wasEmailAlreadySent(eventId, assessmentId, ctx.candidateEmail)) {
+  const intent = await claimTokenSensitiveEmailIntent({
+    emailType: 'hiring_assessment_assigned',
+    domain: 'hr',
+    recipient: { email: ctx.candidateEmail, ...(ctx.candidateName ? { name: ctx.candidateName } : {}) },
+    sourceEventId: eventId,
+    sourceEntity: assessmentId,
+    safeContext: { locale: 'es' },
+    issueCredential: client => reissueCandidateTestTokenForEmailWithClient(client, assessmentId)
+  })
+
+  if (!intent.claimed) {
     return `hiring_assessment_assigned_email dedupe: ${assessmentId}`
   }
 
-  const reissued = await reissueCandidateTestTokenForEmail(assessmentId)
+  const reissued = intent.value
 
   if (!reissued) {
     return `hiring_assessment_assigned_email skip: assessment ${assessmentId} ya no es rotable (in_progress/submitted/expired)`
@@ -169,6 +186,15 @@ export const sendHiringAssessmentAssignedEmail = async (
     },
     sourceEventId: eventId,
     sourceEntity: assessmentId,
+    persistence: {
+      mode: 'token_sensitive',
+      safeContext: {
+        locale: 'es',
+        timeLimitMinutes: reissued.timeLimitMinutes,
+        tokenTtlDays: reissued.tokenTtlDays,
+      },
+      deliveryIntentId: intent.deliveryId,
+    },
   })
 
   return `hiring_assessment_assigned_email ${assessmentId}: ${result.status}`

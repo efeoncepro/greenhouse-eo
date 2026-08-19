@@ -21,6 +21,7 @@ describe('getEmailDeliveryLifecycleSignal', () => {
   it('covers every delivery source and separates missing lifecycle from delayed terminal outcome', async () => {
     mockQuery.mockResolvedValue([
       {
+        stale_token_intent_15m: 0,
         webhook_pending_15m: 0,
         webhook_dead_letter_24h: 0,
         lifecycle_missing_24h: 2,
@@ -43,6 +44,7 @@ describe('getEmailDeliveryLifecycleSignal', () => {
   it('prioritizes durable signed events that remain pending', async () => {
     mockQuery.mockResolvedValue([
       {
+        stale_token_intent_15m: 0,
         webhook_pending_15m: 1,
         webhook_dead_letter_24h: 0,
         lifecycle_missing_24h: 0,
@@ -55,5 +57,22 @@ describe('getEmailDeliveryLifecycleSignal', () => {
 
     expect(signal.severity).toBe('error')
     expect(signal.summary).toContain('firmado')
+  })
+
+  it('surfaces stale token intents that must use explicit recovery', async () => {
+    mockQuery.mockResolvedValue([{
+      stale_token_intent_15m: 1,
+      webhook_pending_15m: 0,
+      webhook_dead_letter_24h: 0,
+      lifecycle_missing_24h: 0,
+      terminal_outcome_pending_24h: 0,
+      provider_failure_24h: 0
+    }])
+
+    const signal = await getEmailDeliveryLifecycleSignal()
+
+    expect(signal.severity).toBe('warning')
+    expect(signal.summary).toContain('recuperación explícita')
+    expect(signal.evidence).toContainEqual({ kind: 'metric', label: 'stale_token_intent_15m', value: '1' })
   })
 })
