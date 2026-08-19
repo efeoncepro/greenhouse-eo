@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `webhook`
 - Epic: `EPIC-011`
-- Status real: `Code/build ready — rollout externo y reconciliación productiva pendientes`
+- Status real: `Operativo en producción — webhook firmado, secreto, migración, índice y reconciliación aplicados y verificados el 2026-08-19`
 - Rank: `TBD`
 - Domain: `hr|platform|ops|delivery`
 - Blocked by: `none`
@@ -275,18 +275,52 @@ Resend dashboard/API, Vercel production variables/secrets and a consented real i
 - Auditorías independientes Talent y Arquitectura: sin findings bloqueantes de código tras dos ciclos de
   corrección.
 - Verificación: 73 tests focales, ESLint, TypeScript, migration marker y `git diff --check` verdes.
-- Estado honesto: ningún secreto, migración, webhook o reconciliación se activó todavía en producción.
+- Estado honesto (histórico, superado): al momento de escribir la task nada estaba activo en producción. **Ejecutado el 2026-08-19** — ver §Evidencia de rollout.
 
-- [ ] Un webhook de Resend habilitado y firmado existe en producción y el secreto no se expone en código/logs.
-- [ ] El handler espera la resolución de secreto, deduplica por `svix-id` y no responde éxito cuando no puede verificar/procesar de forma durable.
-- [ ] `email_deliveries` distingue despacho aceptado de lifecycle confirmado; eventos de fallo/demora/supresión tienen estado honesto.
-- [ ] Un test firmado y un correo real producen evidencia durable; un replay no duplica efectos.
-- [ ] La reconciliación histórica es acotada, auditable y no fabrica `delivered`.
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Un webhook de Resend habilitado y firmado existe en producción y el secreto no se expone en código/logs.
+- [x] El handler espera la resolución de secreto, deduplica por `svix-id` y no responde éxito cuando no puede verificar/procesar de forma durable.
+- [x] `email_deliveries` distingue despacho aceptado de lifecycle confirmado; eventos de fallo/demora/supresión tienen estado honesto.
+- [x] Un test firmado y un correo real producen evidencia durable; **el no-duplicado por replay está garantizado por `PRIMARY KEY (provider_event_id)` en `email_provider_events`, pero NO se ejercitó un replay real** — declarado como hueco.
+- [x] La reconciliación histórica es acotada, auditable y no fabrica `delivered`.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+
+
+## Evidencia de rollout (2026-08-19, verificado contra runtime)
+
+| Pieza | Evidencia |
+|---|---|
+| Migración | `20260819064224037_task-1745-resend-provider-lifecycle` en `public.pgmigrations`, `run_on=13:00 UTC` |
+| Webhook | `6cdbad94-cdda-4b80-b633-21583c8bb07e`, `status=enabled`, endpoint productivo, **9 eventos** (`email.suppressed` agregado 18:41 UTC) |
+| Secreto | `greenhouse-resend-webhook-signing-secret-production` v1; `RESEND_WEBHOOK_SIGNING_SECRET_SECRET_REF` en **Vercel Production únicamente** |
+| Handler | Probado en vivo contra producción: `POST` sin firma → **401**; configuración ausente → **503** reintentable (nunca `200 ignored`) |
+| Dedupe | `PRIMARY KEY (provider_event_id)` sobre `email_provider_events` (el `svix-id`) |
+| Índice | `idx_email_deliveries_provider_status` creado y `valid=true ready=true` |
+| Inbox | 17 eventos firmados por webhook (`signature_verified=t`), todos `processed` en 1 intento; **0 dead-letter, 0 pendientes** |
+| Reconciliación | ventana 30 días, cursor agotado; `provider_status_source='reconciliation'` en 69 filas |
+
+### Lo que la reconciliación reveló
+
+**43 despachos nunca llegaron al destinatario**: 23 `suppressed` + 20 `bounced`. De ellos, **8 son
+`hiring_assessment_assigned`** (5 suprimidos + 3 rebotados) — exactamente el síntoma que originó ISSUE-160.
+Cada uno necesita recuperación gobernada (TASK-1746, canal de email ya habilitado) o contacto por otro canal.
+**Es trabajo operativo de People, no queda cerrado por esta task.**
+
+### Huecos declarados (no bloquean el cierre, quedan como follow-up)
+
+- **78 despachos de los últimos 30 días siguen sin lifecycle**: su último evento en Resend es `opened`/`clicked`, y el
+  reconciliador lo clasifica `unsupported` en vez de inferir `delivered`. Es honesto pero descarta una señal que el
+  propio `opened` implica.
+- **283 despachos con `resend_id` fuera de la ventana de 30 días** no se reconciliaron, por diseño del lookback.
+- **`redrivePendingResendWebhookEvents` sigue sin caller automático** — no hay cron ni Cloud Scheduler. Hoy hay 0
+  eventos pendientes, así que no hay daño, pero la remediación desatendida no existe.
+- **No se ejercitó un replay real** del proveedor; el no-duplicado está garantizado estructuralmente, no probado en vivo.
+- El comando `pnpm email:resend:reconcile` **falla en local sin `RESEND_API_KEY`** y el error queda enmascarado
+  (`scripts/email/reconcile-resend-deliveries.ts:39-44` imprime sólo `error.name`). Vale exportar la key o mejorar el
+  reporte de error.
 
 ## Verification
 
@@ -298,9 +332,9 @@ Resend dashboard/API, Vercel production variables/secrets and a consented real i
 
 ## Closing Protocol
 
-- [ ] Lifecycle y ubicación del archivo reflejan estado real.
-- [ ] README, ISSUE-160, arquitectura y manual quedaron sincronizados.
-- [ ] Handoff/changelog registran evidencia runtime y rollback.
+- [x] Lifecycle y ubicación del archivo reflejan estado real.
+- [x] README, ISSUE-160, arquitectura y manual quedaron sincronizados.
+- [x] Handoff/changelog registran evidencia runtime y rollback.
 - [ ] `pnpm docs:closure-check` y `pnpm docs:context-check:strict` pasan al cierre.
 
 ## Follow-ups

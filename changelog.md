@@ -3,6 +3,27 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-19 — 43 correos que nunca llegaron, y una documentación que decía que nada estaba aplicado
+
+- **La doc mentía en la dirección peligrosa.** Runbook, arquitectura de webhooks, ledger de flags e
+  `ISSUE-160` afirmaban "ninguna migración, ningún secreto, ningún webhook" cuando todo llevaba
+  horas aplicado. Seguir el runbook al pie habría creado un segundo webhook al mismo endpoint
+  —eventos duplicados que el dedupe por `svix-id` no detiene, porque son ids distintos— y una
+  segunda versión del secreto, rompiendo la verificación del webhook vivo.
+- **La reconciliación destapó el daño real del incidente: 43 correos nunca llegaron** (23
+  `suppressed`, 20 `bounced`). Ocho de ellos son `hiring_assessment_assigned`: candidatas con el
+  test marcado como enviado que jamás lo recibieron. `sent` nunca significó entregado, y ahora se
+  puede demostrar cuáles no lo fueron.
+- **Faltaba suscribir `email.suppressed`.** El bloqueo de reenvío consulta ese estado para no
+  mandar a ciegas a una dirección suprimida — y ese evento nunca iba a llegar. Falso negativo
+  silencioso en la puerta de recuperación.
+- **Los writers de credenciales corrían sin su backstop.** El índice único token-intent, que el
+  runbook exige aplicar ANTES de desplegar esos writers, no existía. Aplicado, junto al CONTRACT
+  de credencial, verificando una por una sus tres precondiciones de despliegue.
+- **`mail.efeoncepro.com` está bien por nuestro lado y Resend aún no lo confirma.** DKIM publicado
+  con valor idéntico byte a byte. Aprendizaje: re-disparar la verificación resetea los registros ya
+  verificados a `pending` — se espera, no se reintenta.
+
 ## 2026-08-19 — El rollout de assessment iba a romper producción y a cortarle el test a los candidatos
 
 - **Una migración que no era aplicable en ningún orden.** El CHECK y el trigger de versión de
@@ -973,12 +994,3 @@ cliente perdió una superficie que su organización pagó— y los enlaces muert
 migraciones y sin feature flag: la tabla de overrides estaba vacía, así que el delta de acceso es cero.
 `role_view_assignments` deja de gobernar vistas `cliente.*` (para el portal interno sigue siendo el
 carril canónico) y un lint en `error` impide reintroducir la segunda fuente. Cierra `ISSUE-148`.
-
-## 2026-08-10 — Task planner: un resultado `legacy=1` deja de ser registrable
-
-Se corrigió TASK-1686 para preservar los cinco marcadores HTML `ZONE` del template y se endurecieron los
-planners `.codex` y `.claude`: antes de tocar registry/README o commitear, toda task nueva debe pasar
-`pnpm task:lint --task TASK-###` con `template=1 legacy=0 errors=0 warnings=0`. La salida `legacy=1`,
-aunque tenga cero errores, es un fallo bloqueante. La reparación también completó los contratos
-wireframe/flow/motion/readiness de TASK-1686; no cambió runtime, rutas, acceso ni la implementación de
-la task.

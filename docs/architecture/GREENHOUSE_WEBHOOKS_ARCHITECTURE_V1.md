@@ -268,8 +268,11 @@ outbox_events (published) → webhook-dispatch cron (*/2 min) → matches wh-sub
 
 **Endpoint:** `POST /api/webhooks/resend`
 **Authentication:** HMAC-SHA256 via Svix signing (`svix-id`, `svix-timestamp`, `svix-signature` headers)
-**Secret:** `RESEND_WEBHOOK_SIGNING_SECRET` (`whsec_` prefixed; pendiente de
-configuración y verificación operativa según el delta 2026-08-19).
+**Secret:** `RESEND_WEBHOOK_SIGNING_SECRET` (`whsec_` prefixed; **configurado y verificado en producción el
+2026-08-19**: Secret Manager `greenhouse-resend-webhook-signing-secret-production` v1, referenciado por
+`RESEND_WEBHOOK_SIGNING_SECRET_SECRET_REF` en **Vercel Production únicamente** — el ops-worker no sirve este
+endpoint). Webhook `6cdbad94-cdda-4b80-b633-21583c8bb07e` **enabled**, 9 eventos suscritos. Config ausente responde
+**503 reintentable**, nunca `200 ignored`; firma inválida responde `401`.
 
 **Events consumed:**
 

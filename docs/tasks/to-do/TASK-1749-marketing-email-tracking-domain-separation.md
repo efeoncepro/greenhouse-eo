@@ -95,7 +95,13 @@ Revisar y respetar:
 
 - `resolveEmailFromAddress(emailType)` en `src/lib/email/delivery.ts:46` — el remitente **ya se
   resuelve por tipo de correo**, no es global. Hoy separa los tipos con marca de agencia del resto.
-- `mail.efeoncepro.com` verificado en Resend, sin tracking y sin `tracking_subdomain` (TASK-1746).
+- `mail.efeoncepro.com` creado en Resend el 2026-08-19 (`us-east-1`), con `click_tracking=false` y
+  `open_tracking=false`. **NO está verificado todavía:** al 2026-08-19 19:00 UTC su estado es `pending`. El DNS en
+  HostGator está completo y correcto — DKIM `resend._domainkey.mail` publicado con valor idéntico byte a byte al
+  esperado (218 chars, una sola cadena, TTL 14400), SPF TXT y MX de `send.mail` publicados — así que no falta nada del
+  lado nuestro; falta que Resend complete su chequeo. ⚠️ **No re-disparar `POST /domains/{id}/verify`**: resetea los
+  tres registros a `pending` y alarga la espera (la zona tiene negative-cache SOA de 86400 s, que puede explicar la
+  demora si Resend consultó antes de que el registro existiera).
 - El apex `efeoncepro.com` verificado, con `click_tracking=true`/`open_tracking=true` y
   `tracking_subdomain=None` — encendido sin efecto.
 

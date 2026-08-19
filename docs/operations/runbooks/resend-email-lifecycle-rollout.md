@@ -4,7 +4,20 @@
 >
 > **Alcance:** infraestructura transversal de correo Greenhouse; no pertenece sólo a Hiring.
 >
-> **Estado al 2026-08-19:** código listo localmente; runtime, migraciones, secreto, webhook, reconciliación y smokes no verificados ni activados por este documento.
+> **Estado al 2026-08-19 (verificado contra runtime, 18:45 UTC):** **el rollout YA SE EJECUTÓ.** Migraciones
+> `20260819064224037_task-1745-resend-provider-lifecycle` y `20260819072130586_task-1746-assessment-access-recovery`
+> aplicadas 13:00 UTC. Webhook `6cdbad94-cdda-4b80-b633-21583c8bb07e` **enabled** sobre
+> `https://greenhouse.efeoncepro.com/api/webhooks/resend` con los **9** eventos suscritos (incluye `email.suppressed`,
+> agregado 18:41 UTC). Secreto `greenhouse-resend-webhook-signing-secret-production` v1 publicado y referenciado por
+> `RESEND_WEBHOOK_SIGNING_SECRET_SECRET_REF` en **Vercel Production únicamente**. Índices
+> `idx_email_deliveries_provider_status` y `uq_email_deliveries_token_intent_v2` creados y validados; CONTRACT de
+> credencial (`hiring_assessment_access_credential_version_check` + `trg_hiring_assessment_access_credential_guard`)
+> aplicado y `convalidated`. Reconciliación histórica ejecutada.
+>
+> ⚠️ **NO vuelvas a ejecutar §4 (registro del webhook) ni §3 (publicación del secreto).** Crear un segundo webhook al
+> mismo endpoint duplica eventos — el dedupe por `svix-id` **no** los detiene, porque son ids distintos — y publicar una
+> segunda versión del secreto rompe la verificación del webhook vivo. Antes de tocar cualquier paso, valida el estado
+> real con `GET https://api.resend.com/webhooks` y `gcloud secrets versions list`.
 
 ## Propósito
 

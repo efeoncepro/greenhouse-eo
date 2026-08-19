@@ -24,10 +24,28 @@
 - Status real: `Diseño listo — foundation API code-complete localmente; rollout y consumer JSX pendientes`
 - Rank: `TBD`
 - Domain: `hr|ui|delivery`
-- Blocked by: `TASK-1745`, `TASK-1746`
+- Blocked by: `TASK-1746`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `ISSUE-160`
+
+## Delta 2026-08-19
+
+- `TASK-1745` cerrada (lifecycle de entrega de Resend operativo en producción) — se retira de `Blocked by`.
+- El backend de `TASK-1746` está desplegado y su schema aplicado: migración, índice `uq_email_deliveries_token_intent_v2`,
+  CONTRACT de credencial (`convalidated`) y capabilities vivas en `capabilities_registry`. El canal de email del recovery
+  quedó **habilitado** (`email_type_config.hiring_assessment_access_recovery = true`, 2026-08-19 18:42 UTC).
+- Consecuencia: el contrato que esta task consume ya es ejercitable contra datos reales. Lo que falta para arrancar es
+  **propio de 1747**, no de 1746:
+  1. No hay read path de `availability` para la UI — `getAssessmentAccessRecoveryAvailability` sólo lo consume el POST.
+     Decidir entre leerlo en el server component (respeta `Backend impact: none`) o exponer un `GET` (mejor para Full API
+     Parity, pero obliga a corregir `Backend impact` a `api`).
+  2. La página de Application 360 no computa los `can()` de `recover_access_email` / `reveal_access_link`.
+  3. Falta toda la copy en `hiringDesk`: 5 `reasonCode`, 5 `outcome`, 8 `eligibilityCode` y el mapeo de ~8 códigos HTTP.
+  4. La route responde `{ok:false, code}` **sin** `error` es-CL ni `actionable` — no pasa por `canonicalErrorResponse`.
+     O se canoniza en 1746, o 1747 declara explícitamente el mapeo `code` → copy.
+  5. Hay que eliminar `oneTimeAssessmentLink` (`Application360View.tsx:414-419`), que arma la URL con el token en estado
+     de React — el anti-patrón que el ADR prohíbe.
 
 ## Summary
 

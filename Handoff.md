@@ -2,6 +2,45 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-19 (tarde) — El rollout ya estaba hecho y la documentación decía lo contrario
+
+**Corrección de estado.** Las entradas de más abajo dicen "nada aplicado: ninguna migración, ningún secreto, ningún
+webhook, ningún flag". Eso dejó de ser cierto a las 13:00 UTC de hoy y **nadie actualizó los documentos**. El peligro no
+era cosmético: un agente siguiendo el runbook al pie habría creado un **segundo webhook** al mismo endpoint (eventos
+duplicados que el dedupe por `svix-id` NO detiene, porque son ids distintos) y publicado una **segunda versión del
+secreto**, rompiendo la verificación del webhook vivo. Corregidos: runbook, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1`,
+ledger de flags, `ISSUE-160`, `TASK-1749` y este Handoff.
+
+**Lo que faltaba de verdad, ya aplicado con readback.** El índice único `uq_email_deliveries_token_intent_v2` (los
+writers que rotan credenciales llevaban horas corriendo **sin** el backstop que el runbook exigía aplicar antes) y el
+CONTRACT de credencial. Sus tres precondiciones se verificaron una por una antes de tocar nada: código en `origin/main`,
+Vercel productivo posterior al merge, y ops-worker en `1438906b8` — un SHA de `develop` que **sí** incluye el writer. La
+confirmación empírica fue mejor que el chequeo de SHA: un assessment creado después del deploy ya nació con
+`access_token_version_id`, y 0 filas violaban el invariante. El guard se probó en transacción revertida y rechaza como
+debe.
+
+**La reconciliación destapó el daño real de ISSUE-160: 43 correos nunca llegaron** — 23 `suppressed` y 20 `bounced`. De
+esos, **8 son `hiring_assessment_assigned`**: candidatas con el test marcado como enviado que jamás lo recibieron. Eso
+es exactamente lo que originó el incidente, y **no lo cierra ninguna task**: es trabajo operativo de People, ahora con
+el canal de recuperación habilitado para atenderlo.
+
+**`email.suppressed` no estaba suscrito.** Los 8 eventos registrados omitían justo el noveno — y `recover-email.ts`
+consulta ese estado para bloquear un reenvío ciego. Un falso negativo silencioso en la puerta de recuperación. Ya son 9.
+
+**Huecos declarados, no cerrados:** 78 despachos de los últimos 30 días quedan sin lifecycle porque su último evento es
+de engagement (`opened`/`clicked`) y el reconciliador prefiere no inferir `delivered` — honesto, pero descarta una señal
+que el `opened` implica; 283 despachos fuera de la ventana de 30 días sin reconciliar por diseño;
+`redrivePendingResendWebhookEvents` sigue sin caller automático; no se ejercitó un replay real del proveedor.
+
+**`mail.efeoncepro.com`: el DNS está perfecto, Resend no lo confirma.** DKIM publicado con valor idéntico byte a byte,
+SPF y MX en su lugar; el dominio sigue `pending`. Aprendizaje operativo: **re-disparar `POST /verify` resetea los tres
+registros a `pending`** — hay que esperar, no reintentar. Cuando verifique, mover el remitente de Hiring ahí desbloquea
+el flip de enlaces seguros **sin** apagar el `click_tracking` del apex, que marketing usa. Es la salida limpia al gate
+que hoy bloquea `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`.
+
+**Estado: TASK-1745 complete e ISSUE-160 resuelto. TASK-1746 sigue in-progress** — le faltan los dos smokes funcionales
+(requieren una candidata con consentimiento, decisión humana) y el flip de enlaces seguros. TASK-1747 quedó desbloqueada.
+
 ## 2026-08-19 — Seis auditorías pararon el rollout de assessment antes de romper producción
 
 El bloque TASK-1745/1746 estaba por promoverse. Tres auditores independientes (arquitectura,
@@ -547,31 +586,6 @@ Pendiente declarado: sin UI, sin aviso automático al candidato (avisar es acto 
 cancelación), y **sólo cubre tiempo extra** — formatos accesibles son trabajo de accesibilidad de la
 pantalla de rendición, no de este campo.
 
-## 2026-08-17 — La etapa canónica del candidate test es `shortlisted`, no `interview`
-
-Decidido con la lente de talent a pedido del operador, y verificado contra la base ANTES de
-argumentarlo: hay **0 postulaciones en `interview`** (42 `sourced`, 9 `shortlisted`, 7 `screening`),
-y las pruebas existentes se asignaron en `screening`/`shortlisted`. El ejemplo que yo había escrito
-en el manual (`triggerStage: "interview"`) habría configurado una automatización que no se dispara.
-
-Dos razones independientes, ambas en el invariante 21 del ADR: (a) la ganancia de validez está en
-**combinar** entrevista estructurada + muestra de trabajo, y esa ganancia sólo aparece si la prueba
-llega ANTES —si no, se entrevista a ciegas y la evidencia llega cuando ya no cambia ninguna
-pregunta—; (b) el momento del filtro es una decisión de **equidad**: una prueba no pagada aplicada
-temprano no sesga por el puntaje, sesga por quién logra completarla, y ese sesgo es invisible en las
-métricas de scoring porque esas personas nunca llegan a tener una.
-
-`screening` queda fuera del allowlist **a propósito**: no es candidate-facing, así que un assignment
-bloqueado ahí degradaría a silencio y rompería "ni cero ni dos". Hay test que lo fija con su razón.
-
-Sin cambio de schema: las dos policies de la base ya eran `shortlisted` (fixtures de test). Esas dos
-quedaron **`disabled` por el command gobernado** — eran las únicas de la base, ambas `enabled` +
-`on_stage_entry` sobre openings `LIVE-TEST`, o sea una mina para el canary.
-
-Pendiente que esta decisión vuelve más urgente: **el write path de ajustes razonables**. La doctrina
-exige poder dar tiempo extra o formato accesible; hoy el campo existe sin forma de escribirlo, así
-que no se puede acomodar a nadie sin alargar el límite para todos.
-
 ## 2026-08-17 — Beneficios globales de Efeonce documentados para vacantes
 
 Las skills espejo de Talent y Payroll ahora comparten el `Efeonce Candidate Benefits Charter`: 15 días
@@ -583,15 +597,3 @@ pero prohíbe afirmar que todos los permisos ya se autogestionan o calculan en G
 incorporar cada beneficio al instrumento contractual o del proveedor según país/modalidad antes de operarlo.
 La carta ahora define año/prorrateo, carry-over, continuidad de servicio, familia, retorno postparto, equivalencia contractor y wallets: aprendizaje US$500/año, conectividad/coworking US$50/mes y salud mental US$300/año. El aporte de equipo (US$400/36 meses) sigue siendo política aprobada, pero se conversa en entrevista u oferta y no aparece en el copy estándar de vacantes. La ley local es overlay que puede mejorar, nunca reducir, el baseline. No hubo cambio de runtime, schema,
 contratos ni política configurada.
-
-## 2026-08-17 — Skill de Talent reforzada para vacantes públicas e inbound
-
-Las skills espejo `greenhouse-talent-people-operator` de Claude/Codex incorporan un protocolo
-evidence-led para vacantes públicas: evidence packet, benchmark de roles comparables, ledger de
-claims, estructura de conversión, medición por fuente y gates de publicación global/remota. La
-referencia nueva `references/inbound-recruiting-job-ad-research.md` ahora documenta el playbook
-completo: propuesta y prueba, realistic preview, experiencia de candidato, Talent Pool con
-consentimiento, compensación/condiciones como señales de confianza y experimentación por outcome,
-con fuerza y límites de la evidencia explícitos. No hubo cambio de runtime, schema, beneficios ni
-publicación de vacante. Pendiente operativo: completar los datos reales del Senior Visual Designer
-antes de redactar/publicar su opening.
