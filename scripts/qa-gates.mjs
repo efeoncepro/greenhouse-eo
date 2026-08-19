@@ -140,6 +140,19 @@ const DOMAIN_DEFS = [
     blockers: ['Payroll/HR legal changes require the payroll auditor skill and legal/runtime invariants.'],
   },
   {
+    id: 'hiring-data-origin',
+    label: 'Hiring · procedencia de datos',
+    flags: ['hiring', 'data-origin'],
+    patterns: [/^src\/lib\/hiring\//, /^scripts\/hiring\//, /hiring_application/i, /candidate_facet/i],
+    codexSkills: ['greenhouse-talent-people-operator'],
+    claudeSkills: ['greenhouse-talent-people-operator'],
+    commands: ['pnpm hiring:data-origin-gate', 'pnpm exec vitest run src/lib/hiring/data-origin'],
+    blockers: [
+      'Un seed/smoke que crea datos de Hiring sin declarar dataOrigin nace indistinguible de un candidato o un cargo real (TASK-1739).',
+    ],
+    notes: ['El gate barre `git ls-files`: correrlo DESPUÉS de `git add` o no verá el archivo nuevo.'],
+  },
+  {
     id: 'integration',
     label: 'External integration',
     flags: ['integration'],

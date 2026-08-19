@@ -115,7 +115,10 @@ const main = async () => {
 
     ids.demandId = demand.demandId
 
-    const opening = await createHiringOpening({ demandId: demand.demandId, internalTitle: 'SMOKE-770 opening' }, ACTOR)
+    const opening = await createHiringOpening(
+      { dataOrigin: 'smoke_test', demandId: demand.demandId, internalTitle: 'SMOKE-770 opening' },
+      ACTOR,
+    )
 
     ids.openingId = opening.openingId
 
