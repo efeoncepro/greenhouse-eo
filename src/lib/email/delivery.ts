@@ -971,15 +971,15 @@ export const wasEmailAlreadySent = async (
 }
 
 /**
- * TASK-1719 — ¿ya salió ALGÚN correo de este `emailType` ligado a esta entidad?
+ * TASK-1719/TASK-1745 — ¿ya se despachó ALGÚN correo de este `emailType` ligado a esta entidad?
  *
  * Variante sin destinatario de `wasEmailAlreadySent`: responde por entidad, sin recibir ni
  * devolver la dirección, para que un dominio pueda saber "esto ya se comunicó hacia afuera"
  * sin resolver PII del candidato. NO sirve como dedupe de envío (ese sigue siendo
  * `wasEmailAlreadySent`, que discrimina por destinatario); sirve para decidir si una
- * cancelación exige comunicación correctiva humana.
+ * cancelación exige comunicación correctiva humana. No afirma entrega al servidor receptor.
  */
-export const wasEmailDeliveredForEntity = async (
+export const wasEmailDispatchedForEntity = async (
   sourceEntity: string,
   emailType: string
 ): Promise<boolean> => {
@@ -989,7 +989,7 @@ export const wasEmailDeliveredForEntity = async (
        FROM greenhouse_notifications.email_deliveries
        WHERE source_entity = $1
          AND email_type = $2
-         AND status = 'sent'
+         AND status IN ('sent', 'delivered')
      ) AS exists`,
     [sourceEntity, emailType]
   )

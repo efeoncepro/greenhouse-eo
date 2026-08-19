@@ -32,7 +32,7 @@ import type { ReliabilitySignal } from '@/types/reliability'
 //    daño (el confirm las rechaza), pero acumularlas indica que alguien abre el diálogo y
 //    no lo cierra: señal de fricción en la superficie, no de corrupción.
 //
-// 4. ASIGNADO SIN CORREO (24 h) — el ledger dice `assigned` y no hay entrega `sent` del
+// 4. ASIGNADO SIN DESPACHO (24 h) — el ledger dice `assigned` y no hay despacho `sent` del
 //    `hiring_assessment_assigned` para esa instancia.
 //
 //    Cierra PARCIALMENTE un hueco honesto: el fan-in de comunicación suprime el correo genérico
@@ -55,7 +55,7 @@ type AssignmentHealthRow = {
   awaiting_terminal: number
   expired_open_proposals: number
   blocked_last_24h: number
-  assigned_without_email_24h: number
+  assigned_without_dispatch_24h: number
 }
 
 export const HIRING_ASSESSMENT_ASSIGNMENT_HEALTH_SIGNAL_ID = 'hiring.assessment.assignment_health'
@@ -118,8 +118,8 @@ export const getHiringAssessmentAssignmentHealthSignal = async (): Promise<Relia
                    SELECT 1 FROM greenhouse_notifications.email_deliveries d
                     WHERE d.source_entity = asg.assessment_id
                       AND d.email_type = 'hiring_assessment_assigned'
-                      AND d.status = 'sent'
-                 ))                                                    AS assigned_without_email_24h`,
+                      AND d.status IN ('sent', 'delivered')
+                 ))                                                    AS assigned_without_dispatch_24h`,
     )
 
     const row = rows[0] ?? {
@@ -127,32 +127,32 @@ export const getHiringAssessmentAssignmentHealthSignal = async (): Promise<Relia
       awaiting_terminal: 0,
       expired_open_proposals: 0,
       blocked_last_24h: 0,
-      assigned_without_email_24h: 0,
+      assigned_without_dispatch_24h: 0,
     }
 
     const intentAtRest = Number(row.intent_at_rest)
     const awaiting = Number(row.awaiting_terminal)
     const expiredProposals = Number(row.expired_open_proposals)
     const blocked = Number(row.blocked_last_24h)
-    const assignedWithoutEmail = Number(row.assigned_without_email_24h)
+    const assignedWithoutDispatch = Number(row.assigned_without_dispatch_24h)
 
     const severity =
       intentAtRest > 0
         ? 'error'
-        : awaiting > 0 || expiredProposals > 0 || assignedWithoutEmail > 0
+        : awaiting > 0 || expiredProposals > 0 || assignedWithoutDispatch > 0
           ? 'warning'
           : 'ok'
 
     const summary =
       intentAtRest > 0
         ? `${intentAtRest} asignación(es) quedaron a medio registrar: el command murió entre el ledger y la instancia. Es un bug, no operación normal.`
-        : assignedWithoutEmail > 0
-          ? `${assignedWithoutEmail} asignación(es) de las últimas 24 h no tienen correo entregado al candidato. El ledger dice asignado, la bandeja del candidato no.`
+        : assignedWithoutDispatch > 0
+          ? `${assignedWithoutDispatch} asignación(es) de las últimas 24 h no tienen despacho de correo registrado.`
           : awaiting > 0
             ? `${awaiting} postulación(es) alcanzaron la etapa trigger sin resultado terminal en el ledger. La reconciliación debe drenarlas.`
             : expiredProposals > 0
               ? `${expiredProposals} propuesta(s) de asignación vencieron sin confirmarse ni cerrarse.`
-              : 'Toda asignación tiene resultado terminal, correo entregado y no hay propuestas vencidas abiertas.'
+              : 'Toda asignación tiene resultado terminal, despacho registrado y no hay propuestas vencidas abiertas.'
 
     return {
       signalId: HIRING_ASSESSMENT_ASSIGNMENT_HEALTH_SIGNAL_ID,
@@ -168,7 +168,7 @@ export const getHiringAssessmentAssignmentHealthSignal = async (): Promise<Relia
         { kind: 'metric', label: 'awaiting_terminal', value: String(awaiting) },
         { kind: 'metric', label: 'expired_open_proposals', value: String(expiredProposals) },
         { kind: 'metric', label: 'blocked_last_24h', value: String(blocked) },
-        { kind: 'metric', label: 'assigned_without_email_24h', value: String(assignedWithoutEmail) },
+        { kind: 'metric', label: 'assigned_without_dispatch_24h', value: String(assignedWithoutDispatch) },
         {
           kind: 'doc',
           label: 'ADR',

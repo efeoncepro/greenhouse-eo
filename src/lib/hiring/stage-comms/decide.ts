@@ -3,7 +3,7 @@ import 'server-only'
 import { listAssignmentsForApplication } from '@/lib/hiring/assessment/assignment-policy/assignment-store'
 import { assignAssessmentFromPolicy } from '@/lib/hiring/assessment/assignment-policy/assign'
 import { resolveActivePolicyForApplication } from '@/lib/hiring/assessment/assignment-policy/readers'
-import { wasEmailDeliveredForEntity } from '@/lib/email/delivery'
+import { wasEmailDispatchedForEntity } from '@/lib/email/delivery'
 import { isHiringLifecycleEmailsEnabled } from '@/lib/hiring/notifications/config'
 import { resolveHiringApplicationEmailContext } from '@/lib/hiring/notifications/recipient'
 import { sendHiringStageAdvancedEmail } from '@/lib/hiring/notifications/send'
@@ -105,7 +105,7 @@ const ASSESSMENT_ASSIGNED_EMAIL_TYPE = 'hiring_assessment_assigned'
 const assessmentEmailAlreadyDelivered = async (assessmentId: string | null): Promise<boolean> => {
   if (!assessmentId) return false
 
-  return wasEmailDeliveredForEntity(assessmentId, ASSESSMENT_ASSIGNED_EMAIL_TYPE)
+  return wasEmailDispatchedForEntity(assessmentId, ASSESSMENT_ASSIGNED_EMAIL_TYPE)
 }
 
 /**

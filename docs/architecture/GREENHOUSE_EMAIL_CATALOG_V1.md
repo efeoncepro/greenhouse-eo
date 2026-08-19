@@ -195,15 +195,20 @@ Y opera con dos caminos prácticos:
 
 #### 4. Webhook de entregabilidad
 
-`POST /api/webhooks/resend` ya procesa:
+`POST /api/webhooks/resend` implementa en código, con rollout operativo gobernado por TASK-1745:
 
 - `email.delivered`
 - `email.bounced`
 - `email.complained`
+- `email.sent`
+- `email.delivery_delayed`
+- `email.failed`
+- `email.suppressed`
 
 Eso permite:
 
-- confirmar delivered cuando Resend lo reporta
+- distinguir despacho aceptado (`status='sent'`) de lifecycle confirmado (`provider_status`)
+- confirmar delivered cuando Resend lo reporta, sin inferirlo desde open/click
 - marcar `email_undeliverable` en `client_users` frente a hard bounce
 - auto-desuscribir cuando hay complaint en un tipo broadcast
 

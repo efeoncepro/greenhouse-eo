@@ -45,6 +45,7 @@
     "task:lint": "node scripts/ci/task-lint.mjs",
     "task:lint:test": "node scripts/ci/__tests__/task-lint.test.mjs",
     "hiring:publish-vacancy": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/publish-vacancy.ts",
+    "email:resend:reconcile": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/email/reconcile-resend-deliveries.ts",
     "sister-platform:redirect": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/sister-platform-oauth-redirect-uris.ts",
     "globe:oauth-grants": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/update-globe-producer-oauth-grants.ts",
     "globe:credit-funding": "tsx scripts/globe-credit-funding.ts run",

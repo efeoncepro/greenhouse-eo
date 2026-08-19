@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `webhook`
 - Epic: `EPIC-011`
-- Status real: `Diseño — incidente abierto`
+- Status real: `Code/build ready — rollout externo y reconciliación productiva pendientes`
 - Rank: `TBD`
 - Domain: `hr|platform|ops|delivery`
 - Blocked by: `none`
@@ -265,6 +265,17 @@ Resend dashboard/API, Vercel production variables/secrets and a consented real i
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+### Evidencia de implementación local — 2026-08-19
+
+- Inbox global `greenhouse_notifications.email_provider_events` con source/firma, dedupe, backoff y
+  dead-letter; proyección lifecycle separada del dispatch outbound.
+- Reconciliación dry-run por defecto, cursor estable, CAS y observaciones sin timestamp de lifecycle fabricado.
+- Señal global `email.delivery.lifecycle_health`; Hiring conserva una señal distinta de asignación/despacho.
+- Auditorías independientes Talent y Arquitectura: sin findings bloqueantes de código tras dos ciclos de
+  corrección.
+- Verificación: 73 tests focales, ESLint, TypeScript, migration marker y `git diff --check` verdes.
+- Estado honesto: ningún secreto, migración, webhook o reconciliación se activó todavía en producción.
 
 - [ ] Un webhook de Resend habilitado y firmado existe en producción y el secreto no se expone en código/logs.
 - [ ] El handler espera la resolución de secreto, deduplica por `svix-id` y no responde éxito cuando no puede verificar/procesar de forma durable.
