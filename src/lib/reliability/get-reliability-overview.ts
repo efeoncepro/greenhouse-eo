@@ -210,7 +210,9 @@ import { getAssetScanSignatureFreshnessSignal } from './queries/asset-scan-signa
 import { getHiringCandidateRetentionOverdueSignal } from './queries/hiring-candidate-retention-overdue'
 import { getHiringTalentPoolIntegritySignal } from './queries/hiring-talent-pool-integrity'
 import { getHiringAssessmentTemplateIntegritySignal } from './queries/hiring-assessment-template-integrity'
+import { getHiringAssessmentAccessExchangeSignal } from './queries/hiring-assessment-access-exchange-signals'
 import { getHiringAssessmentAssignmentHealthSignal } from './queries/hiring-assessment-assignment-signals'
+import { getEmailDeliveryLifecycleSignal } from './queries/email-delivery-lifecycle'
 // TASK-356 — Hiring handoff workflow signals (moduleKey 'hiring').
 import { getHiringHandoffBlockedStaleSignal } from './queries/hiring-handoff-blocked-stale'
 import { getHiringInternalHireAwaitingOnboardingSignal } from './queries/hiring-internal-hire-awaiting-onboarding'
@@ -717,6 +719,9 @@ interface ReliabilityOverviewSources {
   hiringAssessmentTemplateIntegrity?: ReliabilitySignal | null
   /** TASK-1719 — asignación manual/automática: `intent` en reposo, backlog y propuestas vencidas. */
   hiringAssessmentAssignmentHealth?: ReliabilitySignal | null
+  hiringAssessmentAccessExchange?: ReliabilitySignal | null
+  /** TASK-1745 — lifecycle global de Resend; no se limita a Hiring. */
+  emailDeliveryLifecycle?: ReliabilitySignal | null
   hiringHandoffBlockedStale?: ReliabilitySignal | null
   hiringInternalHireAwaitingOnboarding?: ReliabilitySignal | null
   /** TASK-1734 — Assessment AI scoring run (backlog/provider/abstention/override/orphans). */
@@ -1214,6 +1219,8 @@ export const buildReliabilityOverview = (
     ...(sources.hiringTalentPoolIntegrity ? [sources.hiringTalentPoolIntegrity] : []),
     ...(sources.hiringAssessmentTemplateIntegrity ? [sources.hiringAssessmentTemplateIntegrity] : []),
     ...(sources.hiringAssessmentAssignmentHealth ? [sources.hiringAssessmentAssignmentHealth] : []),
+    ...(sources.hiringAssessmentAccessExchange ? [sources.hiringAssessmentAccessExchange] : []),
+    ...(sources.emailDeliveryLifecycle ? [sources.emailDeliveryLifecycle] : []),
     ...(sources.hiringHandoffBlockedStale ? [sources.hiringHandoffBlockedStale] : []),
     ...(sources.hiringInternalHireAwaitingOnboarding ? [sources.hiringInternalHireAwaitingOnboarding] : []),
     // TASK-1734 — Assessment AI scoring run (5 señales, steady=0 con flags OFF).
@@ -1876,6 +1883,19 @@ export const getReliabilityOverview = async (
     preloadedSources.hiringAssessmentAssignmentHealth !== undefined
       ? preloadedSources.hiringAssessmentAssignmentHealth
       : await getHiringAssessmentAssignmentHealthSignal().catch(() => null)
+
+  // TASK-1746 — el bearer viaja en el fragmento y el fragmento no llega al servidor: si algo lo
+  // borra en el camino, el candidato queda fuera sin dejar rastro. Esta señal es la única
+  // detección posible después del flip; el gate de click tracking es previo y de una sola vez.
+  const hiringAssessmentAccessExchange =
+    preloadedSources.hiringAssessmentAccessExchange !== undefined
+      ? preloadedSources.hiringAssessmentAccessExchange
+      : await getHiringAssessmentAccessExchangeSignal().catch(() => null)
+
+  const emailDeliveryLifecycle =
+    preloadedSources.emailDeliveryLifecycle !== undefined
+      ? preloadedSources.emailDeliveryLifecycle
+      : await getEmailDeliveryLifecycleSignal().catch(() => null)
 
   // TASK-356 — Handoffs bloqueados sin resolución humana (workflow atascado, steady=0).
   const hiringHandoffBlockedStale =
@@ -2751,6 +2771,8 @@ export const getReliabilityOverview = async (
     hiringTalentPoolIntegrity,
     hiringAssessmentTemplateIntegrity,
     hiringAssessmentAssignmentHealth,
+    hiringAssessmentAccessExchange,
+    emailDeliveryLifecycle,
     hiringHandoffBlockedStale,
     hiringInternalHireAwaitingOnboarding,
     hiringAssessmentAiRun,

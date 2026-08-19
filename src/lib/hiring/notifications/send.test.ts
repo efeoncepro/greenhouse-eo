@@ -4,6 +4,7 @@ vi.mock('server-only', () => ({}))
 
 const mockSendEmail = vi.fn()
 const mockWasEmailAlreadySent = vi.fn()
+const mockClaimTokenSensitiveEmailIntent = vi.fn()
 const mockCapture = vi.fn()
 const mockRunQuery = vi.fn()
 const mockGetAssessmentById = vi.fn()
@@ -12,6 +13,7 @@ const mockReissueToken = vi.fn()
 vi.mock('@/lib/email/delivery', () => ({
   sendEmail: (...args: unknown[]) => mockSendEmail(...args),
   wasEmailAlreadySent: (...args: unknown[]) => mockWasEmailAlreadySent(...args),
+  claimTokenSensitiveEmailIntent: (...args: unknown[]) => mockClaimTokenSensitiveEmailIntent(...args),
 }))
 vi.mock('@/lib/observability/capture', () => ({
   captureWithDomain: (...args: unknown[]) => mockCapture(...args),
@@ -21,7 +23,7 @@ vi.mock('@/lib/postgres/client', () => ({
 }))
 vi.mock('../assessment/instances', () => ({
   getAssessmentById: (...args: unknown[]) => mockGetAssessmentById(...args),
-  reissueCandidateTestTokenForEmail: (...args: unknown[]) => mockReissueToken(...args),
+  reissueCandidateTestTokenForEmailWithClient: (...args: unknown[]) => mockReissueToken(...args),
 }))
 
 import {
@@ -65,14 +67,21 @@ describe('TASK-1689 hiring lifecycle emails', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     process.env.HIRING_LIFECYCLE_EMAILS_ENABLED = 'true'
+    delete process.env.HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED
     delete process.env.HIRING_INTERNAL_NOTIFICATIONS_EMAIL
     mockWasEmailAlreadySent.mockResolvedValue(false)
+    mockClaimTokenSensitiveEmailIntent.mockImplementation(async input => ({
+      claimed: true,
+      deliveryId: 'delivery-intent-1',
+      value: await input.issueCredential({}, 'delivery-intent-1')
+    }))
     mockSendEmail.mockResolvedValue({ deliveryId: 'd-1', resendId: 'r-1', status: 'sent' })
     mockRunQuery.mockResolvedValue([contextRow()])
   })
 
   afterEach(() => {
     delete process.env.HIRING_LIFECYCLE_EMAILS_ENABLED
+    delete process.env.HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED
   })
 
   describe('projections declaration', () => {
@@ -201,7 +210,9 @@ describe('TASK-1689 hiring lifecycle emails', () => {
   })
 
   describe('assessment assigned', () => {
-    const assessment = { assessmentId: 'hass-1', applicationId: 'happ-1', method: 'candidate_test', status: 'assigned' }
+    const assessmentId = 'asmt-11111111-1111-4111-8111-111111111111'
+    const eventId = 'outbox-22222222-2222-4222-8222-222222222222'
+    const assessment = { assessmentId, applicationId: 'happ-1', method: 'candidate_test', status: 'assigned' }
 
     it('never emails for interviewer scorecards (payload filter, no reads)', async () => {
       const msg = await sendHiringAssessmentAssignedEmail('hass-1', { method: 'interviewer_scorecard' })
@@ -222,9 +233,13 @@ describe('TASK-1689 hiring lifecycle emails', () => {
 
     it('checks dedupe BEFORE rotating the token (never invalidates a delivered link)', async () => {
       mockGetAssessmentById.mockResolvedValue(assessment)
-      mockWasEmailAlreadySent.mockResolvedValue(true)
+      mockClaimTokenSensitiveEmailIntent.mockResolvedValue({
+        claimed: false,
+        deliveryId: 'delivery-intent-existing',
+        value: null
+      })
 
-      const msg = await sendHiringAssessmentAssignedEmail('hass-1', { method: 'candidate_test', _eventId: 'evt-2' })
+      const msg = await sendHiringAssessmentAssignedEmail(assessmentId, { method: 'candidate_test', _eventId: eventId })
 
       expect(msg).toContain('dedupe')
       expect(mockReissueToken).not.toHaveBeenCalled()
@@ -235,7 +250,7 @@ describe('TASK-1689 hiring lifecycle emails', () => {
       mockGetAssessmentById.mockResolvedValue(assessment)
       mockReissueToken.mockResolvedValue(null)
 
-      const msg = await sendHiringAssessmentAssignedEmail('hass-1', { method: 'candidate_test' })
+      const msg = await sendHiringAssessmentAssignedEmail(assessmentId, { method: 'candidate_test' })
 
       expect(msg).toContain('ya no es rotable')
       expect(mockSendEmail).not.toHaveBeenCalled()
@@ -245,7 +260,7 @@ describe('TASK-1689 hiring lifecycle emails', () => {
       mockGetAssessmentById.mockResolvedValue(assessment)
       mockReissueToken.mockResolvedValue({ token: 'tok-abc', timeLimitMinutes: 45, tokenTtlDays: 14 })
 
-      const msg = await sendHiringAssessmentAssignedEmail('hass-1', { method: 'candidate_test', _eventId: 'evt-2' })
+      const msg = await sendHiringAssessmentAssignedEmail(assessmentId, { method: 'candidate_test', _eventId: eventId })
 
       expect(msg).toContain('sent')
 
@@ -254,7 +269,31 @@ describe('TASK-1689 hiring lifecycle emails', () => {
       expect(call.emailType).toBe('hiring_assessment_assigned')
       expect(call.context.assessmentUrl).toContain('/public/assessment/tok-abc')
       expect(call.context.timeLimitMinutes).toBe(45)
-      expect(call.sourceEntity).toBe('hass-1')
+      expect(call.sourceEventId).toBe(eventId)
+      expect(call.sourceEntity).toBe(assessmentId)
+      expect(call.persistence).toEqual({
+        mode: 'token_sensitive',
+        safeContext: {
+          locale: 'es',
+          timeLimitMinutes: 45,
+          tokenTtlDays: 14,
+        },
+        deliveryIntentId: 'delivery-intent-1',
+      })
+      expect(JSON.stringify(call.persistence)).not.toContain('tok-abc')
+    })
+
+    it('uses the fragment exchange URL only when the ops-worker cutover flag is ON', async () => {
+      process.env.HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED = 'true'
+      mockGetAssessmentById.mockResolvedValue(assessment)
+      mockReissueToken.mockResolvedValue({ token: 'tok-fragment', timeLimitMinutes: 45, tokenTtlDays: 14 })
+
+      await sendHiringAssessmentAssignedEmail(assessmentId, { method: 'candidate_test', _eventId: eventId })
+
+      const call = mockSendEmail.mock.calls[0][0]
+
+      expect(call.context.assessmentUrl).toContain('/public/assessment/access#access=tok-fragment')
+      expect(call.context.assessmentUrl).not.toContain('/public/assessment/tok-fragment')
     })
   })
 

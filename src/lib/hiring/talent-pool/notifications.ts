@@ -1,12 +1,12 @@
 import 'server-only'
 
-import { sendEmail, wasEmailAlreadySent } from '@/lib/email/delivery'
+import { claimTokenSensitiveEmailIntent, sendEmail } from '@/lib/email/delivery'
 import { hiringPublicBaseUrl } from '@/lib/hiring/notifications'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { talentPoolFlags } from './config'
-import { issueTalentPoolSelfServiceToken } from './self-service'
+import { issueTalentPoolSelfServiceTokenWithClient } from './self-service'
 
 interface ConsentRequestContext extends Record<string, unknown> {
   consent_event_id: string
@@ -19,6 +19,14 @@ interface ConsentRequestContext extends Record<string, unknown> {
 
 const eventIdOr = (payload: Record<string, unknown>, fallback: string): string =>
   typeof payload._eventId === 'string' && payload._eventId.length > 0 ? payload._eventId : fallback
+
+const tokenDeliveryEventIdOr = (payload: Record<string, unknown>, fallback: string): string => {
+  const candidate = eventIdOr(payload, fallback)
+
+  return /^outbox-[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidate)
+    ? candidate
+    : fallback
+}
 
 const resolveConsentRequestContext = async (consentEventId: string): Promise<ConsentRequestContext | null> => {
   const rows = await runGreenhousePostgresQuery<ConsentRequestContext>(
@@ -33,7 +41,8 @@ const resolveConsentRequestContext = async (consentEventId: string): Promise<Con
                WHERE later.membership_id=ce.membership_id
                  AND later.purpose='future_opportunities'
                  AND later.consent_event_id<>ce.consent_event_id
-                 AND later.occurred_at>=ce.occurred_at
+                 AND (later.effective_at,later.occurred_at,later.consent_event_id)
+                     >(ce.effective_at,ce.occurred_at,ce.consent_event_id)
             )) AS is_current_request
        FROM greenhouse_hiring.talent_pool_consent_event ce
        JOIN greenhouse_hiring.talent_pool_membership m ON m.membership_id=ce.membership_id
@@ -70,13 +79,28 @@ export const sendTalentPoolVerificationEmail = async (
     return `talent_pool_verification_email skip: request ${consentEventId} sin email`
   }
 
-  const eventId = eventIdOr(payload, `talent-pool-consent-requested:${consentEventId}`)
+  const eventId = tokenDeliveryEventIdOr(payload, `talent-pool-consent-requested:${consentEventId}`)
 
-  if (await wasEmailAlreadySent(eventId, consentEventId, candidateEmail)) {
+  const intent = await claimTokenSensitiveEmailIntent({
+    emailType: 'hiring_talent_pool_verification',
+    domain: 'hr',
+    recipient: { email: candidateEmail, ...(context.candidate_name ? { name: context.candidate_name } : {}) },
+    sourceEventId: eventId,
+    sourceEntity: consentEventId,
+    safeContext: { locale: 'es' },
+    issueCredential: client => issueTalentPoolSelfServiceTokenWithClient(client, {
+      membershipId: context.membership_id,
+      consentEventId
+    })
+  })
+
+  if (!intent.claimed) {
     return `talent_pool_verification_email dedupe: ${consentEventId}`
   }
 
-  const issued = await issueTalentPoolSelfServiceToken({ membershipId: context.membership_id })
+  const issued = intent.value
+
+  if (!issued) return `talent_pool_verification_email skip: ${consentEventId} sin token emitido`
 
   const result = await sendEmail({
     emailType: 'hiring_talent_pool_verification',
@@ -89,7 +113,12 @@ export const sendTalentPoolVerificationEmail = async (
       locale: 'es'
     },
     sourceEventId: eventId,
-    sourceEntity: consentEventId
+    sourceEntity: consentEventId,
+    persistence: {
+      mode: 'token_sensitive',
+      safeContext: { locale: 'es', tokenTtlDays: issued.tokenTtlDays },
+      deliveryIntentId: intent.deliveryId
+    }
   })
 
   return `talent_pool_verification_email ${consentEventId}: ${result.status}`

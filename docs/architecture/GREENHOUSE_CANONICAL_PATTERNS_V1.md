@@ -1,6 +1,6 @@
 # Greenhouse Canonical Patterns V1 (TASK-1160 Slice 4)
 
-> **Tipo:** catálogo de los 7 patrones de implementación canónicos que se repiten
+> **Tipo:** catálogo de los 8 patrones de implementación canónicos que se repiten
 > a través de los dominios. Es el **único lugar** que describe cada patrón "de
 > fondo"; las specs/companions de cada dominio aplican el patrón con sus
 > particularidades y citan las tasks-fuente, pero la **forma canónica** vive acá.
@@ -210,9 +210,69 @@ feature-flags-audit (deriva de los `*_ENABLED` en código contra el ledger).
 
 ---
 
+## 8. Hecho declarado al nacer + copia derivada donde se filtra + obligación de propagar
+
+**Cuándo:** un **hecho sobre el dato mismo** —su procedencia, su audiencia, su naturaleza
+económica— que cumple dos condiciones: **no se puede reconstruir después** (es histórico:
+ninguna VIEW infiere a posteriori que una fila la sembró un smoke test) y los **readers
+filtran** por él. Es la contracara del patrón 1: ahí el cálculo se computa una vez en una
+VIEW y se lee read-time; acá el hecho se **persiste en el write** porque read-time no
+existe la información. La pregunta previa es honesta: si el hecho **sí** es derivable de
+lo que ya está en la fila, esto es el patrón 1 y no esta entrada.
+
+**Forma canónica (3 piezas):**
+
+1. **Declaración en el nacimiento, en la(s) raíz(ces) canónica(s)**, como columna
+   **ortogonal** a la dimensión que ya existe —procedencia ≠ canal de llegada (`source`);
+   categoría económica ≠ tipo fiscal (`expense_type`)—, con cero sobrescritura: las dos
+   coexisten en la misma fila. El **default falla hacia lo detectable, nunca hacia lo que
+   oculta**: `data_origin` default `real` hace que omitir la declaración produzca suciedad
+   evidente en el desk, mientras el default inverso escondería un candidato real en
+   silencio; Finance resuelve lo mismo dejando `NULL` + manual queue en vez de un default
+   sesgado. Una raíz ilegible degrada hacia el valor visible, no hacia el que purga.
+2. **Copia denormalizada donde los readers filtran**, mantenida por trigger, porque
+   obligar a un JOIN a las raíces en cada lectura es el invariante que se olvida en el
+   reader número once (y en el filtro pre-LLM de Knowledge el JOIN ni siquiera es una
+   opción barata). Cuando la fila derivada tiene **varias** raíces, la resolución se
+   declara y es **la más protectora**, para que nunca quede sujeta a una purga más
+   agresiva que la de sus raíces.
+3. **Marcar una raíz obliga a propagar en la misma transacción.** El trigger es `BEFORE
+   INSERT OR UPDATE` **de la fila dependiente**: marcar sólo la raíz no lo dispara, así que
+   sin propagación explícita la copia queda obsoleta **en el 100 % de los marcados y en
+   silencio**. El command toca las dependientes in-tx (el toque no-op `SET col = col` basta
+   para que el trigger recalcule) y el patrón exige además una **señal de divergencia
+   raíz↔derivada** con steady 0 — señal y no gate de CI, porque la condición la crea un
+   `UPDATE`, no un commit (patrón 7).
+
+**La bifurcación de confianza es obligatoria y explícita:** si el flujo **no** puede
+sostener la pieza 3 (la copia se refresca sólo al publicar y lagea tras una transición
+posterior), entonces los readers críticos **leen la raíz viva, no la copia** —Knowledge
+filtra policy/status contra el documento vivo y usa el chunk denormalizado sólo para lo
+que tolera lag—. Lo prohibido es el tercer camino: filtrar por una copia que nadie se
+obligó a mantener.
+
+**Reglas duras:** **NUNCA** dejar que la fila derivada elija su propio valor (lo deriva el
+trigger desde las raíces, con precedencia declarada y espejada en el contrato TS);
+**NUNCA** marcar una raíz sin propagar a las dependientes en la misma transacción;
+**NUNCA** filtrar por la copia denormalizada cuando el flujo no garantiza su frescura
+(leer la raíz viva); **NUNCA** un default que falle hacia ocultar; **NUNCA** dejar la
+divergencia raíz↔derivada sin señal steady 0.
+
+**Fuente:** TASK-768 (Finance `economic_category` ortogonal a `expense_type`, write-time
+persistido tras descartar explícitamente la lente derivada read-time; señal
+`economic_category_unresolved`), TASK-1739 (Hiring `data_origin` — raíces
+`identity_profiles` + `talent_demand`/`hiring_opening`, copia en `hiring_application`
+vía `derive_hiring_application_data_origin()`, propagación in-tx en
+`src/lib/hiring/data-origin/mark.ts`, señal
+`hiring.data_quality.data_origin_derivation_drift`), TASK-1083 (Knowledge: chunks
+denormalizan `audience`/`sensitivity`/`freshness`/`agentic_policy` para filtrar pre-LLM
+sin JOIN, y el filtro crítico lee el documento vivo porque la copia puede lagear).
+
+---
+
 ## Cómo extender este catálogo
 
-Si emerge un **8º patrón** genuinamente transversal (se repite ≥3 dominios), agregarlo
+Si emerge un **9º patrón** genuinamente transversal (se repite ≥3 dominios), agregarlo
 acá con la misma estructura (cuándo / forma canónica / reglas duras / fuente) y
 registrarlo en `DECISIONS_INDEX.md`. Si es específico de un dominio, vive en su spec,
 no acá.

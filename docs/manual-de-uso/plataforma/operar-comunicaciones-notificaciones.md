@@ -24,6 +24,31 @@ Necesitas acceso admin para revisar entregas, previews y configuracion de tipos 
 5. Lee `error_class`, provider id y metadata.
 6. Si el estado es bounced/complained, revisa si el destinatario quedo bloqueado o unsubscribed.
 
+Lee dos estados distintos: `status` describe el despacho Greenhouse (`sent` = Resend aceptó la API) y
+`provider_status` describe el lifecycle observado. `delivery_delayed` confirma que el proveedor reportó una
+demora, pero todavía no es un resultado terminal. `opened` y `clicked` son engagement y nunca prueban entrega.
+
+## Activar o reparar el webhook de Resend sin afectar los envíos
+
+El webhook es inbound y observer-only. No lo conectes al sender ni al kill switch de emails. Sigue este orden:
+
+1. Despliega migración y handler sin registrar todavía el endpoint en Resend.
+2. Verifica que los tests de firma, dedupe, desorden, CAS y redrive estén verdes.
+3. Crea el webhook mediante la API oficial de Resend para
+   `https://greenhouse.efeoncepro.com/api/webhooks/resend` y parte con un set canario acotado.
+4. Guarda el `signing_secret` en el mecanismo de secretos; nunca en git, logs o output de CI.
+5. Redeploy y ejecuta un evento firmado de prueba. Comprueba inbox, proyección y señal
+   `email.delivery.lifecycle_health`.
+6. Envía un único correo real consentido y confirma por separado: despacho outbound sano y lifecycle inbound
+   persistido.
+7. Sólo después amplía a `sent`, `delivered`, `delivery_delayed`, `failed`, `bounced`, `complained`,
+   `suppressed`, `opened` y `clicked`.
+8. Ejecuta `pnpm email:resend:reconcile` primero en dry-run. Usa `--apply` únicamente sobre evidencia retornada
+   por Resend y conserva `nextCursor` para el siguiente lote.
+
+Rollback inmediato: deshabilita o elimina únicamente el webhook en Resend. No apagues `RESEND_API_KEY`, no
+pauses tipos de correo y no cambies `sendEmail`; los despachos deben continuar aunque el observer esté caído.
+
 ## Probar un template de email
 
 1. Abre `/admin/emails/preview`.

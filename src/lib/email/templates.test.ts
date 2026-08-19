@@ -51,6 +51,40 @@ describe('email templates registry', () => {
     expect(template.text.toLowerCase()).not.toContain('score')
   })
 
+  it('renders assessment recovery as a new link that invalidates the previous one', () => {
+    const template = resolveTemplate('hiring_assessment_access_recovery', {
+      recipientName: 'María González',
+      openingTitle: 'Content Creator',
+      assessmentUrl: 'https://greenhouse.example/public/assessment/access#access=memory-only',
+      timeLimitMinutes: 45,
+      tokenTtlDays: 14,
+      locale: 'es',
+    })
+
+    expect(template.subject).toContain('nuevo acceso')
+    expect(template.text).toContain('Cualquier enlace anterior dejó de ser válido')
+    expect(template.text).toContain('#access=memory-only')
+  })
+
+  it('describes an in-progress recovery with its exact unchanged deadline', () => {
+    const template = resolveTemplate('hiring_assessment_access_recovery', {
+      recipientName: 'María González',
+      openingTitle: 'Content Creator',
+      assessmentUrl: 'https://greenhouse.example/public/assessment/access#access=memory-only',
+      timeLimitMinutes: 45,
+      tokenTtlDays: 14,
+      inProgress: true,
+      expiresAt: '2026-08-19T14:30:00.000Z',
+      locale: 'es',
+    })
+
+    expect(template.text).toContain('tiempo de la evaluación ya está corriendo')
+    expect(template.text).toContain('Continúa ahora')
+    expect(template.text).toContain('hora de Chile')
+    expect(template.text).not.toContain('2026-08-19T14:30:00.000Z')
+    expect(template.text).not.toContain('vence en 14 días')
+  })
+
   it('resolves the weekly executive digest template with digest context', () => {
     const template = resolveTemplate('weekly_executive_digest', {
       periodLabel: 'Semana del 8 al 14 de abril de 2026',

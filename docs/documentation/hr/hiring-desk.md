@@ -29,8 +29,11 @@ Regla práctica: si una vacante ya tiene la plantilla "lista", todavía hay que 
 
 1. El operador abre Application 360 de la postulación.
 2. En la pestaña `Evaluación`, asigna una plantilla activa (`POST /api/hiring/assessments` con `applicationId`, `templateId`, `method='candidate_test'` y tiempo límite si aplica).
-3. Greenhouse crea `hiring_assessment`, evita duplicados abiertos por aplicación/plantilla y devuelve el link limpio `/assessment/<token>`.
-4. El candidato rinde por `GET/POST /api/public/assessment/[token]`. El payload público es allowlisted: pregunta, opciones públicas, respuestas propias, progreso, timer y accommodation. Nunca incluye `answer_key_json`, `rubric_json`, token hash ni datos internos.
+3. Greenhouse crea `hiring_assessment`, evita duplicados abiertos por aplicación/plantilla y emite el acceso
+   sólo por un transporte token-sensitive. El token crudo se revela una vez y luego sólo existe su hash.
+4. Hoy el sender conserva el enlace legacy porque `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` está OFF.
+   El corte futuro intercambia `#access=<token>` por una cookie segura y deja cargar, iniciar, guardar y enviar
+   sin bearer en la URL. Ese código está validado, pero su rollout sigue pendiente.
 5. El autosave llama `saveResponse`; el submit exige que todas las preguntas públicas tengan respuesta guardada y que la instancia siga `in_progress`.
 6. Application 360 carga el review interno por `GET /api/hiring/assessments/[id]`: scorecard, módulos, respuestas abiertas, rúbrica interna y sugerencias IA si existen.
 7. El humano confirma/ajusta score por respuesta y finaliza el scorecard. El rollup actualiza el headline advisory en `hiring_application`.
@@ -42,10 +45,14 @@ Regla práctica: si una vacante ya tiene la plantilla "lista", todavía hay que 
 - `GET /api/hiring/assessments?applicationId=...`: lista instancias de la postulación. Requiere `hiring.assessment.read`.
 - `GET /api/hiring/assessments/[id]`: detalle de review interno. Requiere `hiring.assessment.read`.
 - `POST /api/hiring/assessments/[id]/score`: registra/cierra score humano. Requiere `hiring.assessment.score`.
-- `GET/POST /api/public/assessment/[token]`: superficie pública por token; no usa sesión de dashboard.
+- `GET/POST /api/public/assessment/[token]`: compatibilidad pública legacy mientras el cutover siga OFF.
+- `/api/public/assessment/access/exchange` y `/api/public/assessment/session`: boundary de sesión pública
+  futuro; no usa sesión de dashboard y todavía no está habilitado en producción.
 - `POST /api/hiring/openings/[id]/ai/propose-public-copy` (TASK-1385): la IA propone un borrador del copy público del aviso (título, resumen, descripción, requisitos, tags) desde inputs seguros — nunca ve presupuesto, tarifas ni notas internas. Requiere `hiring.opening.ai_assist` y el flag `HIRING_VACANCY_AI_ENABLED`. El borrador se confirma (editable) por `POST /api/hiring/assessments/ai/proposals/[id]/confirm` con `hiring.opening.write`; publicar sigue siendo la acción humana de siempre. **Desde TASK-1422 esto tiene UI en la pestaña Publicación**: botón `✨ Redactar con IA` en la columna pública del diff → drawer con el bloque "Lo que la IA verá", formulario editable y Aplicar/Descartar (manual: `docs/manual-de-uso/hr/operar-hiring-desk.md`).
 
 No crear instancias por SQL, no leer tokens desde logs y no exponer rúbricas/answer keys al browser candidato.
+Para pérdida o falla de acceso, se recupera el mismo assessment; nunca se crea otro. La capacidad está
+code-complete y pendiente de rollout: [Entrega y recuperación de acceso a tests](entrega-y-recuperacion-de-acceso-a-tests.md).
 
 ## Reglas de negocio
 

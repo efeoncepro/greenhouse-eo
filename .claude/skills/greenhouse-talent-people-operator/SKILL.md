@@ -23,6 +23,7 @@ This skill is a **decision aid, not legal advice**. For statutory pay, contract 
 | "inbound recruiting / careers / employer brand / talent pool"                                                     | Inbound + candidate experience; load `references/inbound-recruiting-job-ad-research.md` for the evidence-led full-funnel playbook before recommending a campaign, nurture or conversion change.                                                                                |
 | "design the test / interview / competency assessment / rubric"                                                    | Assessment + structured interviewing                                                                                                                                                                                                                                           |
 | "analyze this interview / evaluate this candidate by competencies"                                                | Assessment analysis (structured, bias-aware)                                                                                                                                                                                                                                   |
+| "candidate did not receive the test / resend or copy the assessment link"                                       | Assessment delivery + governed same-assessment access recovery; load `references/greenhouse-runtime.md` §Assessment delivery, recovery and public session                                                                                                                      |
 | "ver el CV / documentos del candidato / revelar el RUT de un candidato"                                           | Candidate documents — file vs identity (TASK-1714/1715; see the section below + `references/greenhouse-runtime.md` §Candidate documents)                                                                                                                                       |
 | "hire abroad / remote / contractor vs EOR / which country"                                                        | Global hiring (with payroll/legal boundary)                                                                                                                                                                                                                                    |
 | "onboarding / ramp / development / career path"                                                                   | People development                                                                                                                                                                                                                                                             |
@@ -123,6 +124,10 @@ Use the People guide at `docs/documentation/hr/efeonce-operating-code-hiring-onb
 
 - **NEVER** let an assessment/interview score auto-reject or auto-hire. It is **input to a human decision** (AI-Act human-oversight; also the Greenhouse invariant).
 - **NEVER** say or implement "assign the assessment to the vacancy" as the executable runtime action. A vacancy/opening can recommend a template, but the real Greenhouse action is assigning an assessment template to a concrete `hiring_application`, which creates a candidate-specific `hiring_assessment` instance and token.
+- **NEVER** equate assessment `assigned`, email `sent`, provider `delivered`, and candidate access. Historical
+  `sent` means provider-accepted dispatch only. Never duplicate an assessment, query a bearer from SQL/logs,
+  or use a blind resend to recover access; use the governed same-assessment recovery contract when its rollout
+  is active.
 - **NEVER** use — or recommend — emotion recognition, facial/voice "personality" inference, or social scoring of candidates (AI-Act prohibited + indefensible).
 - **NEVER** design a selection step that isn't **job-related and validity-oriented**; avoid anything that is a proxy for a protected class (adverse impact). Prefer structured interviews + work samples over unstructured "culture fit".
 - **NEVER** use "culture fit" as vague affinity. If evaluating Operating Code alignment, tie it to job-related evidence: transparency, education, memory, impact and system behavior.
@@ -153,7 +158,7 @@ Use the People guide at `docs/documentation/hr/efeonce-operating-code-hiring-onb
 The Hiring cycle emits 7 transactional emails as reactive consumers in the **ops-worker** (consumers `src/lib/sync/projections/hiring-lifecycle-emails.ts`; domain policy `src/lib/hiring/notifications/**`; templates `src/emails/Hiring*.tsx`):
 
 - `hiring.application.created` → internal alert to People (`HIRING_INTERNAL_NOTIFICATIONS_EMAIL`, default `people@efeoncepro.com`) + acknowledgement of receipt to the candidate.
-- `hiring.assessment.assigned` → assessment-link email **only when `method=candidate_test`** (interviewer scorecards NEVER email the candidate). The token is re-issued via `reissueCandidateTestTokenForEmail` (`src/lib/hiring/assessment/instances.ts`) — it never travels through the outbox, and re-assigning invalidates the previous link.
+- `hiring.assessment.assigned` → assessment-link email **only when `method=candidate_test`** (interviewer scorecards NEVER email the candidate). The token-sensitive sender reserves a durable redacted intent before issuing the credential; the bearer never travels through generic outbox/delivery metadata, and assignment is not a resend mechanism.
 - `hiring.assessment.submitted` → internal alert to People **only when `method=candidate_test`**. It links to Application 360 for human review, never carries a score and never advances or decides the application.
 - `hiring.application.stage_changed` → progress email **only for candidate-facing stages** (allowlist: `shortlisted`="Preselección", `interview`="Entrevista"); internal stage names never reach candidate copy.
 - `hiring.application.decided` → `selected` (congratulations) / `rejected` (thank-you; type `hiring_decision_rejected` is independently pausable).
@@ -161,6 +166,34 @@ The Hiring cycle emits 7 transactional emails as reactive consumers in the **ops
 Governance: flag `HIRING_LIFECYCLE_EMAILS_ENABLED` **ON in production since 2026-08-12** (rev `ops-worker-00548-x52`, default `true` in `services/ops-worker/deploy.sh`) — **it lives ONLY in the ops-worker** (flipping it in Vercel does nothing); per-type kill-switch in `greenhouse_notifications.email_type_config`; dedupe via `wasEmailAlreadySent`. EmailTypes: `hiring_application_received_internal`, `hiring_application_confirmation`, `hiring_assessment_assigned`, `hiring_assessment_submitted_internal`, `hiring_stage_advanced`, `hiring_decision_selected`, `hiring_decision_rejected`. The submitted-test alert shipped in production through release `0fe2420ed894` (orchestrator `31915501771`, manifest `released`, watchdog `ok`/`drift_count=0`); its live delivery has not yet been exercised with a real completed candidate test. Real E2E exercised (EO-APP-0090): 5 prior types `status=sent`; `hiring_decision_selected` is covered by tests until its first real use. Remaining open items: Legal/Privacy review of retention/notice, parser-level required flip for country, formal GVC scorecard.
 
 Docs: manual `docs/manual-de-uso/hr/operar-emails-ciclo-hiring.md` · functional `docs/documentation/hr/emails-ciclo-hiring.md` · architecture `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (Delta 2026-08-12) · flag ledger `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+
+## Assessment delivery and access recovery (TASK-1745/1746 — code complete, rollout pending)
+
+Keep three truths separate: assignment creates a candidate-specific assessment; `sent` means the provider
+accepted dispatch; only a signed provider event confirms `delivered`, `bounced`, `complained` or `suppressed`.
+The Resend lifecycle receiver is observer-only and must never sit on, pause, or fail the outbound path.
+Registration, secret, migrations/reconciliation and live canary remain pending, so do not claim provider
+lifecycle is active from code alone.
+
+Assessment assignment/recovery email is token-sensitive: reserve a durable redacted intent before issuing or
+rotating the bearer; never persist the bearer, full URL, name or contact in generic payload/audit/logs; never
+use generic retry or batch fallback. Provider acceptance plus uncertain local close is `unknown`, not `sent`,
+and requires explicit recovery.
+
+Recovery reuses the same assessment and has mutually exclusive `email` and `secure_link` channels. It never
+changes stage, score, answers or the original started timer. `bounced|complained|suppressed` blocks email only;
+the one-reveal secure link remains available to an authorized human after identity verification. Eligibility:
+unstarted `assigned|sent`; live-deadline `in_progress`; `expired` only when never started and access expiry is
+proven. Submitted/scored/cancelled, elapsed or terminal/withdrawn applications are blocked. Cooldown is 60s
+and the cross-channel cap is 3 successful rotations per assessment per 24h.
+
+The future public boundary exchanges `#access=<bearer>` for an HttpOnly Secure SameSite=Lax cookie, then uses
+token-free session operations. Answer deadline is started time + effective accommodation; 30m grace freezes
+answers but allows submit; no-limit gets 24h. `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` defaults OFF,
+so the legacy sender remains canonical until migration/index, routes/worker, UI, smokes and monitoring are
+rolled out together. Functional doc: `docs/documentation/hr/entrega-y-recuperacion-de-acceso-a-tests.md`;
+manual: `docs/manual-de-uso/hr/recuperar-acceso-a-test-de-candidato.md`; runtime detail:
+`references/greenhouse-runtime.md` §Assessment delivery, recovery and public session.
 
 ## Candidate contact completeness (TASK-1688 — LIVE en producción 2026-08-12)
 
@@ -372,7 +405,7 @@ Runbook: `docs/operations/runbooks/assessment-ai-scoring-rollout.md` · ADR
 `docs/architecture/GREENHOUSE_ASSESSMENT_AI_SCORING_RUN_DECISION_V1.md`. Full runtime binding:
 `references/greenhouse-runtime.md` §Assessment AI Scoring Run.
 
-## Candidate identity intake (TASK-1736 — remediación EJECUTADA + flag ON en staging 2026-08-16)
+## Candidate identity intake (TASK-1736 — remediación EJECUTADA + flag ON en Production 2026-08-18)
 
 Candidate identity now lives in **three layers** (ADR
 `GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1.md`): immutable **submitted evidence** per
@@ -394,15 +427,60 @@ with actor/reason, CAS, batch of 1), independent of the flag.
 test profiles were deliberately excluded** by human pruning of the allowlist — that pruning is the point of the
 protocol, not an accident. **NEVER** cite the old "4 proposals = 2 humans" figure; the executed lot was 3.
 
-Estado: **Slices 1-4 code complete; `HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED` created ON in staging
-2026-08-16 by CEO authorization, still OFF in Production** (Vercel-only); 2 reliability signals
-`hiring.candidate_identity.*` (steady=0; flag OFF ⇒ ok with note). Runbook:
+Estado: **`HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED` ON in staging since 2026-08-16 and ON in Production
+since 2026-08-18** (Vercel-only), with the post-flip canary **EXECUTED (5/5 green)**; 2 reliability signals
+`hiring.candidate_identity.*` (steady=0). **NEVER** describe this flag as pending in Production. Runbook:
 `docs/operations/runbooks/candidate-identity-rollout.md`. Runtime binding: `references/greenhouse-runtime.md`
 §Candidate identity intake.
 
 Docs: architecture `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-16 (3) · functional
 `docs/documentation/hr/identidad-de-candidatos-intake.md` · manual
 `docs/manual-de-uso/hr/operar-remediacion-nombres-candidatos.md`.
+
+## Data provenance in Hiring (TASK-1739 — LIVE en producción 2026-08-19)
+
+Every Hiring datum now declares **where it came from as a fact of its birth**: `data_origin` ∈
+`real | synthetic_seed | smoke_test | demo`, **orthogonal to `source`** (which is the arrival *channel*:
+public form, referral, import). **NEVER** add `synthetic`/`test` to the `source` CHECK — collapsing channel
+into provenance destroys both readings and makes "a real candidate who arrived through a seeded flow"
+unrepresentable. There are exactly **two roots**: the person (`identity_profiles`) and the demand
+(`talent_demand` / `hiring_opening`). `hiring_application` carries a **derived copy maintained by trigger**;
+`candidate_facet` and `hiring_assessment*` carry **no column at all** — they inherit by JOIN, because a facet
+of a synthetic person cannot be anything other than synthetic. `real` is the **default**, and that default is
+the main mitigation of the whole design: forgetting to declare leaves the datum **VISIBLE**, never hidden. An
+omission can never silently erase a real candidate from the desk.
+
+Derivation resolves by two rules: **non-real wins over real**, and between two different non-real values the
+**most protective wins** (`demo` > `synthetic_seed` > `smoke_test`), so a derived row is never left subject to
+a purge more aggressive than the roots it came from. **Marking a root OBLIGES propagating in the same
+transaction** — the trigger only fires when someone touches the dependent row, so a root marked in isolation
+leaves its applications reading `real` indefinitely. The signal
+`hiring.data_quality.data_origin_derivation_drift` (steady 0) exists precisely to catch that half-done marking.
+
+Two live findings justify the whole thing, and both are corrective, not hypothetical. **A non-real vacancy is
+NEVER published** (`publishOpening` → 422): eight smoke vacancies had actually reached **PUBLISHED** state on
+the real careers site. And **the gold set excludes synthetics with no flag and no opt-in**: there already
+existed a `smoke_test` `open_text` answer, 1010 chars long, carrying `human_score = 90.00` and therefore
+**eligible for the reference sample** — a fabricated answer about to anchor the calibration of the AI scorer
+against real candidates.
+
+Boundaries that do not move: **retention and compliance are BLIND to provenance** (a synthetic row obeys the
+same retention clock and the same data-subject duties), and **provenance NEVER gates communications** — whether
+an email may be sent is decided by consent, never by `data_origin`. **NEVER** mark synthetic a person with
+working life attached (`members`, `contractor_engagements`, `final_settlements`,
+`person_legal_entity_relationships`): that person is somebody's payroll, and provenance has no business
+touching it. Purge is **archive-first** for the same reason: `hiring_assessment` cascades from the application,
+so a plain DELETE would destroy answers a human already scored. Lane B demands **zero dependents over 10
+verified** and **aborts the ENTIRE run** if a single row fails to qualify — never a partial pass.
+
+Estado: flag `HIRING_SYNTHETIC_DATA_FILTER_ENABLED` (Vercel-only) **ON in staging and ON in Production since
+2026-08-19**. Executed: **71 marks + 32 archived** (actor `user-efeonce-admin-julio-reyes`), taking the desk
+from **24 vacancies / 79 applications to 2 / 47** — the real operating picture that was buried under seed data.
+CLI: `pnpm hiring:data:mark-synthetic` and `pnpm hiring:data:purge-synthetic`; gate `pnpm hiring:data-origin-gate`.
+
+Docs: architecture `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-18 · functional
+`docs/documentation/hr/procedencia-de-datos-hiring.md` · manual
+`docs/manual-de-uso/hr/operar-procedencia-de-datos-hiring.md`.
 
 ## First reads (before acting inside Greenhouse)
 

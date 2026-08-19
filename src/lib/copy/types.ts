@@ -98,6 +98,7 @@ export interface HiringAssessmentCopy {
     retry: string
     instructionsTitle: string
     instructionsBody: string
+    instructionsBodyNoLimit: string
     accommodation: string
     sectionsTitle: string
     consent: string
@@ -118,6 +119,9 @@ export interface HiringAssessmentCopy {
     expiredTitle: string
     expiredBody: string
     timeRemaining: string
+    timeToAnswer: string
+    timeToSubmit: string
+    submitGraceNotice: string
     timeWarningFive: string
     timeWarningOne: string
     textareaPlaceholder: string

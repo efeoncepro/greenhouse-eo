@@ -1,7 +1,7 @@
 # Operar los Emails del Ciclo de Hiring
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-08-12 por Claude (TASK-1689)
 > **Documentacion funcional:** [emails-ciclo-hiring.md](../../documentation/hr/emails-ciclo-hiring.md)
 
@@ -58,12 +58,18 @@ Su primer envío productivo sigue como smoke pendiente; no re-proceses un evento
 
 ## Qué significan las señales
 
-- En el reactive log del worker, cada consumer deja un mensaje por evento: `sent` (enviado),
+- En el reactive log del worker, cada consumer deja un mensaje por evento: `sent` (proveedor aceptó el
+  despacho; **no prueba entrega al buzón**),
   `dedupe` (ya se había enviado — normal en retries), `skip: flag OFF`, `skip: sin email`
   (candidato sin correo resoluble — se captura en Sentry dominio `hiring`), `no-op` (evento que
   no corresponde notificar: etapa interna, scorecard, decisión que no notifica).
 - El registro de cada envío queda en `greenhouse_notifications.email_deliveries`
   (`email_type LIKE 'hiring%'`).
+- Sólo un webhook firmado del proveedor puede registrar `delivered`, `bounced`, `complained`, `suppressed`
+  u otro lifecycle posterior. `opened` y `clicked` no reemplazan `delivered`.
+- El receptor global de Resend, la reconciliación y el recovery de assessment están code-complete, pero su
+  rollout sigue pendiente. No presentes esos estados como activos hasta verificar registro del webhook,
+  secreto, migraciones, deploy y canary live.
 
 ## Qué no hacer
 
@@ -74,6 +80,28 @@ Su primer envío productivo sigue como smoke pendiente; no re-proceses un evento
   misma plantilla falla con `assessment_already_open`; revisa el consumer y su delivery en vez de
   inventar un segundo test o intentar recuperar el token desde SQL/logs.
 
+## Gate previo al transporte token-sensitive (TASK-1746)
+
+El código que reserva un intent antes de rotar una credencial depende de un índice único creado fuera del
+migrator para no bloquear las escrituras del resto de correos. Antes de desplegar esos writers en cualquier
+entorno compartido, ejecuta con el rol operativo autorizado:
+
+```bash
+pnpm pg:connect --file scripts/operations/task-1746-create-token-intent-index.sql
+```
+
+El script es fail-closed: comprueba duplicados, rechaza un índice homónimo inválido o incompleto, usa
+`CREATE UNIQUE INDEX CONCURRENTLY`, repite el control de duplicados y finalmente exige que PostgreSQL reporte
+el índice como `unique`, `valid` y `ready`, con las tres columnas y el predicado esperados. Conserva esa salida
+como evidencia del rollout. Si el script falla, no despliegues los writers ni intentes crear el índice dentro
+de una migración transaccional. El sender outbound existente permanece operativo; corrige el preflight o sigue
+la instrucción explícita del script para retirar gobernadamente un índice inválido antes de reintentar.
+
+Orden obligatorio: índice con readback verde → migración → deploy de writers/rutas → smoke consentido →
+monitoreo de `email.delivery.lifecycle_health`. El código del recovery y de la sesión pública ya existe, pero
+el email de recovery nace deshabilitado, la UI operativa no está desplegada y el cutover de links públicos
+permanece OFF. No habilites una pieza aislada.
+
 ## Problemas comunes
 
 | Síntoma | Causa probable | Acción |
@@ -81,6 +109,8 @@ Su primer envío productivo sigue como smoke pendiente; no re-proceses un evento
 | No llega ningún correo | Flag OFF en el ops-worker (o borrado por un deploy) | Verificar env de la revisión activa + `deploy.sh` |
 | No llega un tipo puntual | Kill-switch pausado | Revisar `email_type_config` |
 | Candidato dice que el link del test no funciona | Token rotado, expirado (14 días) o instancia ya iniciada | Revisa la instancia y el delivery; no re-asignes mientras siga abierta ni intentes recuperar el token |
+| Figura `sent`, pero el candidato no recibió nada | El proveedor aceptó el despacho; no existe prueba de entrega o el lifecycle aún no está activo | No marques como entregado ni reintentes a ciegas; sigue [Recuperar acceso al test de un candidato](recuperar-acceso-a-test-de-candidato.md) |
+| Email bloqueado por `bounced`, `complained` o `suppressed` | El canal email no es seguro para otro intento | Después del rollout, usa enlace seguro con verificación de identidad; antes del rollout, escala el caso |
 | Correo interno no llega | Buzón mal configurado | Revisar `HIRING_INTERNAL_NOTIFICATIONS_EMAIL` |
 | No llega el aviso de test completado | Evento publicado antes del consumer, kill-switch pausado o evento aún no drenado | No hay backfill: verifica revisión activa, fila `hiring_assessment_submitted_internal`, `email_deliveries` y reactive log para el test nuevo |
 
@@ -88,5 +118,7 @@ Su primer envío productivo sigue como smoke pendiente; no re-proceses un evento
 
 - Consumers: `src/lib/sync/projections/hiring-lifecycle-emails.ts`
 - Política de dominio: `src/lib/hiring/notifications/`
+- Índice de intents token-sensitive: `scripts/operations/task-1746-create-token-intent-index.sql`
 - Ledger de flags: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`
 - Arquitectura: `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (Delta 2026-08-12)
+- Recuperación: `docs/manual-de-uso/hr/recuperar-acceso-a-test-de-candidato.md`

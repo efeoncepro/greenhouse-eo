@@ -140,6 +140,7 @@ import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { drainAssessmentAiScoringRuns } from '@/lib/hiring/assessment/ai/scoring-run/execute'
 import { isHiringAssessmentAiRunEnqueueEnabled } from '@/lib/hiring/assessment/ai/scoring-run/config'
 import { isHiringAssessmentAiEnabled } from '@/lib/hiring/assessment/ai/config'
+import { purgeAssessmentPublicAccessRetention } from '@/lib/hiring/assessment/public-session/retention'
 
 // TASK-1303 — el rank capture pega familias DataForSEO que GASTAN: sin este side-effect
 // import el transporte LANZA en la primera llamada cobrada (gastar sin contabilizar se
@@ -2266,6 +2267,14 @@ const handleTalentPoolReconcile = wrapCronHandler({
   run: async (): Promise<Record<string, unknown>> => runTalentPoolReconcile()
 })
 
+const handleAssessmentPublicAccessRetention = wrapCronHandler({
+  name: 'hiring-assessment-public-access-retention',
+  domain: 'hiring',
+  run: async (): Promise<Record<string, unknown>> => ({
+    ...(await purgeAssessmentPublicAccessRetention())
+  })
+})
+
 // ─── /nubox/* ───────────────────────────────────────────────────────────────
 //
 // TASK-775 Slice 3 — Nubox sync crons migrados de Vercel a Cloud Scheduler.
@@ -2903,6 +2912,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/hiring/talent-pool/reconcile') {
       await handleTalentPoolReconcile(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/hiring/assessment/public-access-retention') {
+      await handleAssessmentPublicAccessRetention(req, res)
 
       return
     }

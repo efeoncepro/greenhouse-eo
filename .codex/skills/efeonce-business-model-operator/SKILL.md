@@ -29,6 +29,13 @@ versionado, guardrails y Pricing Integrity Pack.
 La skill es transversal; los documentos de `docs/business-models/` son la fuente canónica de cada oferta.
 La definición transversal de qué es un Product Service, sus niveles de productización y la separación entre
 delivery model, operating mode y engagement vive en `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md`.
+Cuando el trabajo cruce contratos recurrentes o acotados con Organizations, equipos y proyectos/campañas de
+Greenhouse o Notion, cargar también `docs/business-models/EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md`.
+La regla central es `Organization → Engagement → Project/Campaign → Task`: engagement gobierna compromiso comercial;
+project/campaign organiza delivery y nunca sustituye contrato, pricing, capacidad o lifecycle comercial.
+`Product Service` no es el nombre genérico de lo vendido. Antes de usar la etiqueta, clasificar por separado
+capability, oferta/servicio, engagement, project/campaign, deliverable/asset y nivel de productización. Una campaña
+audiovisual, un plan de medios o un brandbook no son Product Services por defecto.
 La dirección corporativa vigente exige que todo servicio client-facing llegue a 2028 como Product Service
 productizado y AI-native; usar `docs/strategy/EFEONCE_2028_PRODUCTIZED_AI_NATIVE_SERVICES_STRATEGIC_DIRECTION_V1.md`
 para sus gates, madurez y excepciones.
@@ -187,6 +194,10 @@ Separar tres ejes:
 
 Definir RACI, accountable owner, scope, exclusiones, SLA/telemetría, change order, refunds, degradación,
 dependencias, onboarding y handoff. Nunca inferir autoridad desde el nombre comercial.
+
+Cuando una venta pasa a Delivery, usar el contrato de activación del Engagement: quote/SOW/contrato conserva la
+verdad comercial/legal y la `Ficha de Activación del Engagement` congela el snapshot ejecutable aceptado por
+Delivery, Finance y Operations. La Gantt es una vista opcional según complejidad, no una fuente de verdad universal.
 
 ### 5. Diseñar revenue architecture
 
@@ -397,20 +408,23 @@ resolución/duración, reintentos y costo efectivo por output.
 4. Proyecto, retainer, plataforma, usage, IP y pass-through se separan.
 5. No hay pricing sin cost-to-serve, margen objetivo y sensibilidad.
 6. No hay margen agregado sin margen por oferta/cuenta/capability cuando el riesgo lo exige.
-7. Delivery, engagement y operating mode son ejes distintos.
-8. Credits no son dinero, horas, tokens, assets ni derechos.
-9. `Approved for validation` no habilita venta general.
-10. Todo KPI declara fórmula, período, denominador, moneda, fuente y owner.
-11. Toda cifra externa tiene fuente y fecha; toda cifra interna tiene fuente y confidence.
-12. No se afirma adopción, ARR, NRR, margen SaaS o producto live sin evidencia.
-13. El costo humano no se oculta dentro de usage o credits.
-14. El cliente no debe quedar retenido por opacidad o falta de portabilidad.
-15. Una vertical no merece spinout por tener nombre, demo o roadmap.
-16. IP, datos, derechos y shared services tienen owner y boundary.
-17. Capital para producto, crecimiento y rescate operativo se separa.
-18. La categoría pública, el modelo económico y la visión estratégica permanecen separados.
-19. Finance valida economía; Legal valida derechos; Commercial valida venta; Product valida runtime.
-20. Si la evidencia contradice la narrativa, gana la evidencia.
+7. Delivery, engagement y operating mode son ejes distintos; Engagement tampoco es Project/Campaign y puede
+   contener uno o varios contenedores de ejecución.
+8. No toda oferta, proyecto o deliverable es Product Service; declarar categoría y madurez reales antes de usar el
+   término.
+9. Credits no son dinero, horas, tokens, assets ni derechos.
+10. `Approved for validation` no habilita venta general.
+11. Todo KPI declara fórmula, período, denominador, moneda, fuente y owner.
+12. Toda cifra externa tiene fuente y fecha; toda cifra interna tiene fuente y confidence.
+13. No se afirma adopción, ARR, NRR, margen SaaS o producto live sin evidencia.
+14. El costo humano no se oculta dentro de usage o credits.
+15. El cliente no debe quedar retenido por opacidad o falta de portabilidad.
+16. Una vertical no merece spinout por tener nombre, demo o roadmap.
+17. IP, datos, derechos y shared services tienen owner y boundary.
+18. Capital para producto, crecimiento y rescate operativo se separa.
+19. La categoría pública, el modelo económico y la visión estratégica permanecen separados.
+20. Finance valida economía; Legal valida derechos; Commercial valida venta; Product valida runtime.
+21. Si la evidencia contradice la narrativa, gana la evidencia.
 
 ## Artefactos de salida
 

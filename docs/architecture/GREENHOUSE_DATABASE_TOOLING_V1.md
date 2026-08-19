@@ -109,6 +109,28 @@ The wrapper uses the `migrator` profile by default. Override with `MIGRATE_PROFI
 4. **Set search_path.** Every migration must start with `SET search_path = <target_schema>, greenhouse_core, public;`
 5. **Types auto-regenerate.** `pnpm migrate:up` and `migrate:down` automatically run `kysely-codegen` after applying. Skip with `MIGRATE_SKIP_TYPES=true`.
 
+### El guard anti pre-up-marker debe ser simétrico con el Down (TASK-1746, 2026-08-19)
+
+Toda migration lleva un bloque `DO $$ ... RAISE EXCEPTION ... $$;` al final del Up que aborta si el DDL no
+quedó realmente aplicado (ver `CLAUDE.md` §Database — Migration markers). La regla que faltaba explicitar:
+
+**El conjunto de objetos que verifica el guard del Up debe cubrir todo lo que el Down dropea.** Si el Down
+hace `DROP TABLE x` o `DROP FUNCTION y` pero el guard no cuenta `x` ni `y`, existe un hueco silencioso: un DDL
+que falle sin abortar la transacción deja la migración registrada como aplicada, el guard pasa verde y el fallo
+sólo aparece cuando algo del runtime consume ese objeto — típicamente un cron, de madrugada y sin nadie mirando.
+
+**Heurística de revisión:** antes de cerrar una migration, listar los `DROP` del Down y confirmar que cada
+objeto aparece en algún contador del guard. Es una comparación mecánica de dos listas y caza el hueco entero.
+
+Caso fuente: la migration de TASK-1746 creció en dos tandas. La segunda agregó la tabla
+`hiring_assessment_public_request_bucket` y cuatro funciones de acceso público; el Down las dropeaba desde el
+primer día, pero el guard siguió contando sólo capabilities, triggers y columnas de sesión. Sin la corrección,
+un fallo en ese DDL habría pasado verde y el cron diario `ops-hiring-assessment-public-access-retention`
+(04:17) habría reventado llamando `run_assessment_public_access_retention()`, inexistente.
+
+**Corolario:** una migration que se edita en varias tandas antes de aplicarse necesita revisar el guard en
+CADA tanda. El guard se escribe al final del Up, así que un `CREATE` agregado más arriba no lo actualiza solo.
+
 ### Timestamp Rules (critical)
 
 `node-pg-migrate` orders migrations by their filename timestamp. It **refuses to execute** any migration whose timestamp is earlier than the last applied migration in `pgmigrations`.

@@ -7,6 +7,12 @@
 - `Subtask`: the same Task entity with a self-referencing parent relation. No configured domain depth limit.
 - Projects relate to tasks; hierarchy never lives in nested page bodies.
 
+A `Project` or `Campaign` is an execution container for one Greenhouse Organization/Space; it is not the Commercial
+Engagement. The Engagement owns contract, capacity, pricing, accountability and commercial closure, and may contain
+one or several Projects/Campaigns. When both concepts apply, resolve the Project's primary Engagement under
+`docs/business-models/EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md`; do not create a second project class to
+represent the contract.
+
 ## Hierarchy invariants
 
 - Parent and child belong to the same Greenhouse `space_id` and Tasks data source.

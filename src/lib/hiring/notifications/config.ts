@@ -13,6 +13,16 @@ export const isHiringLifecycleEmailsEnabled = (env: NodeJS.ProcessEnv = process.
   env[HIRING_LIFECYCLE_EMAILS_FLAG]?.trim().toLowerCase() === 'true'
 
 /**
+ * TASK-1746 — cutover de links de assessment path-bearer → fragment exchange.
+ * Lo consume exclusivamente el sender del ops-worker. Default OFF: el core de sesión puede
+ * desplegarse sin cambiar correos activos hasta completar migración, routes, tracking y smoke.
+ */
+export const HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_FLAG = 'HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED'
+
+export const isHiringAssessmentPublicSessionLinksEnabled = (): boolean =>
+  process.env.HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED?.trim().toLowerCase() === 'true'
+
+/**
  * Buzón interno de People para el aviso de postulación nueva. Configurable por env;
  * NUNCA hardcodear el literal en consumers/templates.
  */

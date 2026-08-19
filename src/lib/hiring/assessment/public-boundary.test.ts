@@ -10,28 +10,40 @@ const mocks = vi.hoisted(() => ({
   saveResponse: vi.fn(),
   startAssessment: vi.fn(),
   submitAssessment: vi.fn(),
+  selfIdCapture: vi.fn(),
+  selfIdSubject: vi.fn(),
+  transaction: vi.fn(),
 }))
 
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: mocks.query,
-  withGreenhousePostgresTransaction: vi.fn(),
+  withGreenhousePostgresTransaction: mocks.transaction,
 }))
 vi.mock('@/lib/sync/publish-event', () => ({ publishOutboxEvent: vi.fn() }))
 vi.mock('./instances', () => ({
   resolveAssessmentByToken: mocks.resolveByToken,
+  resolveAssessmentByTokenWithClient: mocks.resolveByToken,
   getAssessmentById: mocks.getById,
+  getAssessmentByIdWithClient: mocks.getById,
   listResponses: mocks.listResponses,
+  listResponsesWithClient: mocks.listResponses,
   saveResponse: mocks.saveResponse,
+  saveResponseWithClient: mocks.saveResponse,
   startAssessment: mocks.startAssessment,
+  startAssessmentWithClient: mocks.startAssessment,
 }))
-vi.mock('./scoring', () => ({ submitAssessment: mocks.submitAssessment }))
+vi.mock('./scoring', () => ({
+  submitAssessment: mocks.submitAssessment,
+  submitAssessmentWithClient: mocks.submitAssessment,
+}))
 vi.mock('./fairness/capture-self-id', () => ({
-  captureVoluntaryDemographicSelfId: vi.fn(),
-  getSelfIdSubjectByAssessment: vi.fn(),
+  captureVoluntaryDemographicSelfIdWithClient: mocks.selfIdCapture,
+  getSelfIdSubjectByAssessmentWithClient: mocks.selfIdSubject,
 }))
 
 import {
   buildPublicAssessmentView,
+  capturePublicAssessmentSelfId,
   resolvePublicAssessmentViewByToken,
   savePublicAssessmentResponse,
   submitPublicAssessment,
@@ -166,8 +178,16 @@ describe('TASK-1734 Slice 5 — PublicAssessmentView anti-leak (contrato ejecuta
     mocks.listResponses.mockResolvedValue(poisonedResponses)
     mocks.resolveByToken.mockResolvedValue(poisonedAssessment)
     mocks.getById.mockResolvedValue(poisonedAssessment)
-    mocks.saveResponse.mockResolvedValue(poisonedResponses[0])
-    mocks.submitAssessment.mockResolvedValue(undefined)
+    mocks.saveResponse.mockResolvedValue({ outcome: 'ok', value: poisonedResponses[0] })
+    mocks.startAssessment.mockResolvedValue({ outcome: 'ok', value: poisonedAssessment })
+    mocks.submitAssessment.mockResolvedValue({ outcome: 'ok', value: undefined })
+    mocks.selfIdSubject.mockResolvedValue({ applicationId: 'happ-1', identityProfileId: 'hip-1' })
+    mocks.selfIdCapture.mockResolvedValue({
+      recorded: 1, unchanged: 0, consentPolicyVersion: 'policy-v1', retentionExpiresAt: '2027-08-19T00:00:00.000Z',
+    })
+    mocks.transaction.mockImplementation(async callback => callback({
+      query: async (sql: string) => ({ rows: await mocks.query(sql) }),
+    }))
   })
 
   it('buildPublicAssessmentView NUNCA expone score/proposal/rationale/review/answerKey/rubric', async () => {
@@ -193,6 +213,16 @@ describe('TASK-1734 Slice 5 — PublicAssessmentView anti-leak (contrato ejecuta
     )
   })
 
+  it('timing expone deadlines y fase sin material sensible', async () => {
+    const view = await buildPublicAssessmentView(poisonedAssessment)
+
+    expect(Object.keys(view.timing).sort()).toEqual([
+      'answerDeadlineAt', 'baseMinutes', 'closeDeadlineAt', 'databaseNowAt', 'effectiveMinutes', 'expiresAt',
+      'extraMinutes', 'hasAccommodation', 'hasTimeLimit', 'phase', 'remainingSeconds',
+      'startedAt', 'submittedAt',
+    ].sort())
+  })
+
   it('cada pregunta pública nace de buildPublicQuestion (sin answerKey/rubric aunque la fila los traiga)', async () => {
     const view = await buildPublicAssessmentView(poisonedAssessment)
 
@@ -213,16 +243,49 @@ describe('TASK-1734 Slice 5 — PublicAssessmentView anti-leak (contrato ejecuta
     await expect(resolvePublicAssessmentViewByToken('token-desconocido')).resolves.toBeNull()
   })
 
+  it.each(['terminal application', 'withdrawn consent'])(
+    'SELF-ID no escribe con bearer inelegible por %s',
+    async () => {
+      mocks.resolveByToken.mockResolvedValue(null)
+
+      await expect(capturePublicAssessmentSelfId('tok-1', {
+        consentGranted: true,
+        consentPolicyVersion: 'policy-v1',
+        selections: [{ dimensionKey: 'gender', categoryKey: 'woman' }],
+      })).rejects.toMatchObject({ code: 'assessment_selfid_unavailable' })
+
+      expect(mocks.selfIdSubject).not.toHaveBeenCalled()
+      expect(mocks.selfIdCapture).not.toHaveBeenCalled()
+    },
+  )
+
+  it('SELF-ID conserva el mismo client bloqueado hasta insert y audit', async () => {
+    await capturePublicAssessmentSelfId('tok-1', {
+      consentGranted: true,
+      consentPolicyVersion: 'policy-v1',
+      selections: [{ dimensionKey: 'gender', categoryKey: 'woman' }],
+    })
+
+    const lockedClient = mocks.resolveByToken.mock.calls[0]?.[0]
+
+    expect(mocks.selfIdSubject.mock.calls[0]?.[0]).toBe(lockedClient)
+    expect(mocks.selfIdCapture.mock.calls[0]?.[0]).toBe(lockedClient)
+    expect(mocks.resolveByToken.mock.invocationCallOrder[0]).toBeLessThan(mocks.selfIdSubject.mock.invocationCallOrder[0])
+    expect(mocks.selfIdSubject.mock.invocationCallOrder[0]).toBeLessThan(mocks.selfIdCapture.mock.invocationCallOrder[0])
+  })
+
   it('save y submit devuelven vistas igual de limpias (mismo builder, mismo contrato)', async () => {
     const saved = await savePublicAssessmentResponse('tok-1', { questionId: 'qst-1', answer: { selected: 'a' } })
 
     expectCleanPublicView(saved)
+    expect(mocks.saveResponse.mock.calls[0]?.[0]).toBe(mocks.resolveByToken.mock.calls[0]?.[0])
 
     mocks.getById.mockResolvedValue({ ...(poisonedAssessment as object), status: 'submitted', submittedAt: '2026-08-16T11:00:00.000Z' } as never)
 
     const submitted = await submitPublicAssessment('tok-1')
 
     expectCleanPublicView(submitted)
+    expect(mocks.submitAssessment.mock.calls[0]?.[0]).toBe(mocks.resolveByToken.mock.calls[1]?.[0])
 
     // El candidato ve la confirmación de envío (status), jamás un resultado.
     expect(submitted.assessment.status).toBe('submitted')

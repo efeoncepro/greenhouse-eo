@@ -56,6 +56,12 @@ const ALLOWED_WRITE_TARGETS = new Set([
   'greenhouse_hiring.hiring_assessment_assignment',
   // TASK-1719 Slice 2 — preview durable propose→confirm de la asignación manual.
   'greenhouse_hiring.hiring_assessment_assignment_proposal',
+  // TASK-1746 — receipt idempotente + audit append-only de recovery de acceso.
+  'greenhouse_hiring.hiring_assessment_access_recovery',
+  'greenhouse_hiring.hiring_assessment_access_recovery_event',
+  // TASK-1746 — sesión pública opaca del candidato. El bearer del correo se canjea por una fila
+  // acá y el navegador sólo conserva una cookie HttpOnly; la tabla guarda hash, nunca el token.
+  'greenhouse_hiring.hiring_assessment_public_session',
   // TASK-1723–1726 — Talent Pool aggregate, append-only ledgers, projection and public/MCP audit.
   'greenhouse_hiring.talent_pool_membership',
   'greenhouse_hiring.talent_pool_consent_event',

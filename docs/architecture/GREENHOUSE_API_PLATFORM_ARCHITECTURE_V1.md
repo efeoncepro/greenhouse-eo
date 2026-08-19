@@ -1,5 +1,18 @@
 # Greenhouse API Platform Architecture V1
 
+## Delta 2026-08-19 — Product API humano para recovery de assessment (TASK-1746)
+
+`POST /api/hiring/assessments/[id]/access-recovery` es un adapter Product API interno y delgado sobre
+`recoverCandidateTestAccess`, no una API ecosystem/app ni un click handler con lógica propia. Autoriza capability
+por canal antes de resolver la entidad, exige sesión humana de providers canónicos, lectura exacta de application
+y assessment, Origin/JSON/idempotencia cerrados y devuelve un DTO anti-oracle `no-store/no-referrer`. El canal
+`secure_link` puede revelar una URL una vez; nunca se expone a agent/app/service principals ni se serializa en
+audit/outbox. El canal email devuelve aceptación/fallo/unknown de despacho, no entrega al inbox.
+
+La route y su primitive están code-complete localmente pero no disponibles en runtime: schema/índice, grants,
+flags y smokes siguen pendientes y TASK-1747 aún no consume el contrato. Full API Parity se conserva porque UI,
+CLI y futuros adapters gobernados delegan al mismo command/readers; no se publicará este write en MCP.
+
 > **Tipo de documento:** Spec de arquitectura
 > **Version:** 1.0
 > **Creado:** 2026-04-25

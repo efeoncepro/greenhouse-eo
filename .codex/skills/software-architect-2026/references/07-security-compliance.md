@@ -326,6 +326,21 @@ What you can't see, you can't defend:
 
 Centralize in a SIEM (Datadog Security, Splunk, Elastic Security) or build with OTel + a log warehouse.
 
+### Abuse budgets without attacker-controlled cardinality
+
+For anonymous bearer/session surfaces, do not create a durable rate-limit key for every unverified token, cookie,
+identifier, or spoofable address. Use a bounded aggregate ingress ceiling before lookup, then claim the functional
+budget only after the credential and current resource eligibility are verified. Claim under the same locks or
+transaction as the protected action so rotation/revocation cannot create a time-of-check/time-of-use gap. Persist
+only keyed digests, never the raw credential or address, and give bucket retention a real scheduler, readback, and
+backlog signal.
+
+Define failure atomicity explicitly. A valid attempt should normally consume budget even when the requested action
+is invalid or its side effect fails, but partial domain writes must not survive merely to preserve the claim. In a
+transactional store, isolate the action behind a savepoint: roll back the action on failure, commit the earlier
+budget claim, and return or rethrow only a sanitized outcome after commit. If the savepoint rollback itself fails,
+roll back the whole transaction rather than committing ambiguous state.
+
 ## What to put in the architecture spec for security
 
 For every system, the spec must answer:

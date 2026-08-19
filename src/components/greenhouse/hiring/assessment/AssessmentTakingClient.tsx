@@ -2,15 +2,23 @@
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 
+import Dialog from '@mui/material/Dialog'
+import useMediaQuery from '@mui/material/useMediaQuery'
+
 import type { HiringAssessmentCopy } from '@/lib/copy'
 import type { PublicAssessmentQuestion, PublicAssessmentView } from '@/lib/hiring/assessment/public-taking'
 
 import styles from './AssessmentTaking.module.css'
+import {
+  projectAssessmentDatabaseNow,
+  resolveTimerTotalSeconds,
+  type AssessmentClockAnchor,
+} from './assessment-taking-clock'
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 
 interface AssessmentTakingClientProps {
-  token: string
+  token?: string
   copy: HiringAssessmentCopy
   initialAssessment: PublicAssessmentView | null
 }
@@ -72,11 +80,21 @@ const responseAnswerFor = (assessment: PublicAssessmentView | null, question: Pu
   return assessment.responses.find((response) => response.questionId === question.questionId)?.answer ?? {}
 }
 
-const apiRequest = async (token: string, body: Record<string, unknown>): Promise<PublicAssessmentView> => {
-  const response = await fetch(`/api/public/assessment/${encodeURIComponent(token)}`, {
+const apiRequest = async (
+  token: string | undefined,
+  expectedAssessmentPublicId: string,
+  body: Record<string, unknown>,
+): Promise<PublicAssessmentView> => {
+  const endpoint = token
+    ? `/api/public/assessment/${encodeURIComponent(token)}`
+    : '/api/public/assessment/session'
+
+  const requestBody = token ? body : { ...body, expectedAssessmentPublicId }
+
+  const response = await fetch(endpoint, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(body),
+    body: JSON.stringify(requestBody),
   })
 
   const payload = await response.json() as { ok: boolean; assessment?: PublicAssessmentView; message?: string }
@@ -95,6 +113,7 @@ const scrollAssessmentToTop = () => {
 }
 
 const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTakingClientProps) => {
+  const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
   const [assessment, setAssessment] = useState(initialAssessment)
   const [loading, setLoading] = useState(false)
   const [consent, setConsent] = useState(false)
@@ -104,7 +123,8 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
   const [fieldError, setFieldError] = useState<string | null>(null)
   const [submitOpen, setSubmitOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
-  const [now, setNow] = useState(Date.now())
+  const initialDatabaseNowMs = Date.parse(initialAssessment?.timing.databaseNowAt ?? '')
+  const [now, setNow] = useState(Number.isFinite(initialDatabaseNowMs) ? initialDatabaseNowMs : 0)
   const [timeNote, setTimeNote] = useState<string | null>(null)
   const cardRef = useRef<HTMLElement | null>(null)
   const currentQuestionIdRef = useRef<string | null>(null)
@@ -112,20 +132,53 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
   const saveTimerRef = useRef<number | null>(null)
   const saveFeedbackTimerRef = useRef<number | null>(null)
 
+  const clockAnchorRef = useRef<AssessmentClockAnchor>({
+    databaseNowMs: Number.isFinite(initialDatabaseNowMs) ? initialDatabaseNowMs : 0,
+    monotonicStartedMs: 0,
+  })
+
   const questions = assessment?.questions ?? []
   const currentQuestion = questions[step]
   const started = assessment?.assessment.status === 'in_progress'
   const submitted = assessment?.assessment.status === 'submitted' || assessment?.assessment.status === 'scored'
 
+  const timingPhase = useMemo<PublicAssessmentView['timing']['phase']>(() => {
+    if (!assessment || submitted) return 'closed'
+
+    const answerDeadline = assessment.timing.answerDeadlineAt
+      ? new Date(assessment.timing.answerDeadlineAt).getTime()
+      : null
+
+    const closeDeadline = assessment.timing.closeDeadlineAt
+      ? new Date(assessment.timing.closeDeadlineAt).getTime()
+      : null
+
+    if (closeDeadline != null && now >= closeDeadline) return 'closed'
+    if (answerDeadline != null && now >= answerDeadline) return 'submit_grace'
+
+    return assessment.timing.phase
+  }, [assessment, now, submitted])
+
+  const canAnswer = Boolean(started && timingPhase === 'answering' && !submitted)
+
   const remainingSeconds = useMemo(() => {
-    if (!assessment?.timing.expiresAt) return assessment?.timing.remainingSeconds ?? null
+    const deadline = timingPhase === 'submit_grace'
+      ? assessment?.timing.closeDeadlineAt
+      : assessment?.timing.answerDeadlineAt ?? assessment?.timing.closeDeadlineAt
 
-    return Math.max(0, Math.ceil((new Date(assessment.timing.expiresAt).getTime() - now) / 1000))
-  }, [assessment?.timing.expiresAt, assessment?.timing.remainingSeconds, now])
+    if (!deadline) return assessment?.timing.remainingSeconds ?? null
 
-  const expired = Boolean(started && remainingSeconds === 0 && !submitted)
+    return Math.max(0, Math.ceil((new Date(deadline).getTime() - now) / 1000))
+  }, [assessment?.timing.answerDeadlineAt, assessment?.timing.closeDeadlineAt, assessment?.timing.remainingSeconds, now, timingPhase])
+
+  const expired = Boolean(started && timingPhase === 'closed' && !submitted)
   const timerTone = remainingSeconds != null && remainingSeconds <= 60 ? 'critical' : remainingSeconds != null && remainingSeconds <= 300 ? 'warning' : 'normal'
-  const timerTotalSeconds = Math.max(1, (assessment?.timing.effectiveMinutes ?? 0) * 60)
+
+  const timerTotalSeconds = resolveTimerTotalSeconds(timingPhase, {
+    hasTimeLimit: assessment?.timing.hasTimeLimit ?? false,
+    effectiveMinutes: assessment?.timing.effectiveMinutes ?? 0,
+  })
+
   const timerPercent = remainingSeconds == null ? 100 : Math.max(0, Math.min(100, (remainingSeconds / timerTotalSeconds) * 100))
   const timerVisualNote = timerTone === 'critical' ? copy.taking.timeWarningOne : timerTone === 'warning' ? copy.taking.timeWarningFive : null
   const answeredIds = useMemo(() => new Set(assessment?.responses.map((response) => response.questionId).filter(Boolean) ?? []), [assessment?.responses])
@@ -134,10 +187,22 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
   useEffect(() => {
     if (!started || submitted) return undefined
 
-    const id = window.setInterval(() => setNow(Date.now()), 1000)
+    const databaseNowMs = Date.parse(assessment?.timing.databaseNowAt ?? '')
+
+    if (!Number.isFinite(databaseNowMs)) return undefined
+
+    clockAnchorRef.current = {
+      databaseNowMs,
+      monotonicStartedMs: window.performance.now(),
+    }
+    setNow(databaseNowMs)
+
+    const id = window.setInterval(() => {
+      setNow(projectAssessmentDatabaseNow(clockAnchorRef.current, window.performance.now()))
+    }, 1000)
 
     return () => window.clearInterval(id)
-  }, [started, submitted])
+  }, [assessment?.timing.databaseNowAt, started, submitted])
 
   useEffect(() => {
     if (!started || !currentQuestion) return
@@ -166,7 +231,7 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
   }, [copy.taking.timeWarningFive, copy.taking.timeWarningOne, remainingSeconds])
 
   const saveAnswer = async (question = currentQuestion, answerValue = answer): Promise<PublicAssessmentView | null> => {
-    if (!question || !isAnswered(question, answerValue) || submitted || expired) return null
+    if (!question || !isAnswered(question, answerValue) || !canAnswer) return null
 
     const key = answerKey(answerValue)
 
@@ -176,7 +241,11 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
     if (saveFeedbackTimerRef.current) window.clearTimeout(saveFeedbackTimerRef.current)
 
     try {
-      const updated = await apiRequest(token, { action: 'save', questionId: question.questionId, answer: answerValue })
+      const updated = await apiRequest(token, assessment?.assessment.publicId ?? '', {
+        action: 'save',
+        questionId: question.questionId,
+        answer: answerValue,
+      })
 
       lastSavedRef.current[question.questionId] = key
       setAssessment(updated)
@@ -196,7 +265,7 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
   }
 
   useEffect(() => {
-    if (!started || !currentQuestion || submitted || expired) return undefined
+    if (!canAnswer || !currentQuestion) return undefined
     if (!isAnswered(currentQuestion, answer)) return undefined
 
     if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current)
@@ -208,17 +277,16 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
       if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [answer, currentQuestion?.questionId, started, submitted, expired])
+  }, [answer, canAnswer, currentQuestion?.questionId])
 
   const start = async () => {
     if (!consent) return
     setLoading(true)
 
     try {
-      const startedAssessment = await apiRequest(token, { action: 'start' })
+      const startedAssessment = await apiRequest(token, assessment?.assessment.publicId ?? '', { action: 'start' })
 
       setAssessment(startedAssessment)
-      setNow(Date.now())
       scrollAssessmentToTop()
     } finally {
       setLoading(false)
@@ -227,6 +295,12 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
 
   const goNext = async () => {
     if (!currentQuestion) return
+
+    if (timingPhase === 'submit_grace') {
+      setSubmitOpen(true)
+
+      return
+    }
 
     if (!isAnswered(currentQuestion, answer)) {
       setFieldError(copy.taking.answerRequired)
@@ -261,7 +335,7 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
     setSubmitting(true)
 
     try {
-      const updated = await apiRequest(token, { action: 'submit' })
+      const updated = await apiRequest(token, assessment?.assessment.publicId ?? '', { action: 'submit' })
 
       setAssessment(updated)
       setSubmitOpen(false)
@@ -282,10 +356,12 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
   }
 
   const updateAnswer = (nextAnswer: Record<string, unknown>) => {
+    if (!canAnswer) return
+
     setAnswer(nextAnswer)
     setFieldError(null)
 
-    if (currentQuestion && isAnswered(currentQuestion, nextAnswer) && started && !submitted && !expired) {
+    if (currentQuestion && isAnswered(currentQuestion, nextAnswer) && canAnswer) {
       if (saveFeedbackTimerRef.current) window.clearTimeout(saveFeedbackTimerRef.current)
       setSaveState('saving')
     } else {
@@ -345,7 +421,9 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
           </span>
           <h1 className={styles.instructionsTitle}>{copy.taking.instructionsTitle}</h1>
           <p className={styles.instructionsBody}>
-            {formatTemplate(copy.taking.instructionsBody, {
+            {formatTemplate(assessment.timing.hasTimeLimit
+              ? copy.taking.instructionsBody
+              : copy.taking.instructionsBodyNoLimit, {
               sections: Math.max(assessment.competencies.length, questions.length),
               minutes: formatMinutes(assessment.timing.effectiveMinutes),
             })}
@@ -402,6 +480,10 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
 
   const saveCopy = saveState === 'saving' ? copy.taking.saving : saveState === 'saved' ? copy.taking.saved : saveState === 'error' ? copy.taking.errorTitle : ''
 
+  const timerLabel = timingPhase === 'submit_grace' || !assessment.timing.hasTimeLimit
+    ? copy.taking.timeToSubmit
+    : copy.taking.timeToAnswer
+
   return (
     <section className={`${styles.assessmentRoot} ${styles.assessmentRootActive}`}>
       <div className={styles.assessmentShell}>
@@ -414,12 +496,12 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
             className={`${styles.timerCard} ${timerTone === 'warning' ? styles.timerWarning : ''} ${timerTone === 'critical' ? styles.timerCritical : ''}`}
             data-capture='assessment-timer'
             role='timer'
-            aria-label={`${copy.taking.timeRemaining} ${formatClock(remainingSeconds)}`}
+            aria-label={`${timerLabel} ${formatClock(remainingSeconds)}`}
           >
             <i className={`tabler-clock-hour-4 ${styles.timerIcon}`} aria-hidden='true' />
             <div className={styles.timerContent}>
               <div className={styles.timerMeta}>
-                <span className={styles.timerLabel}>{copy.taking.timeRemaining}</span>
+                <span className={styles.timerLabel}>{timerLabel}</span>
                 {timerVisualNote ? <span className={styles.timerBadge}>{timerVisualNote}</span> : null}
               </div>
               <div className={styles.timerCountdown}>
@@ -433,6 +515,12 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
           {timeNote ? <span className={styles.srOnly} aria-live='polite'>{timeNote}</span> : null}
         </div>
         <main className={styles.mainStack}>
+          {timingPhase === 'submit_grace' ? (
+            <div className={styles.accommodationBanner} role='status'>
+              <i className='tabler-send' aria-hidden='true' />
+              <strong>{copy.taking.submitGraceNotice}</strong>
+            </div>
+          ) : null}
           <div className={styles.wizardHeader}>
             <div className={styles.progressMeta}>
               <span>{formatTemplate(copy.taking.progressLabel, { current: step + 1, total: questions.length, competency: currentQuestion?.competencyName ?? '' })}</span>
@@ -493,6 +581,7 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
                           type={currentQuestion.type === 'multi_choice' ? 'checkbox' : 'radio'}
                           name={currentQuestion.questionId}
                           checked={selected}
+                          disabled={!canAnswer}
                           onChange={(event) => {
                             if (currentQuestion.type === 'multi_choice') {
                               const current = Array.isArray(answer.selected) ? answer.selected.map(String) : []
@@ -519,6 +608,7 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
                         type='radio'
                         name={currentQuestion.questionId}
                         checked={Number(answer.value) === value}
+                        disabled={!canAnswer}
                         onChange={() => updateAnswer({ value })}
                       />
                       <span className={styles.optionDot} aria-hidden='true'>
@@ -535,6 +625,7 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
                       onChange={(event) => updateAnswer({ text: event.target.value.slice(0, 6000) })}
                       placeholder={copy.taking.textareaPlaceholder}
                       maxLength={6000}
+                      disabled={!canAnswer}
                     />
                     <span className={styles.characterCount}>
                       {formatTemplate(copy.taking.characterCount, { count: typeof answer.text === 'string' ? answer.text.length : 0, max: 6000 })}
@@ -553,7 +644,9 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
                   {copy.taking.previous}
                 </button>
                 <button className={styles.primaryButton} type='button' data-capture='assessment-next' onClick={() => void goNext()}>
-                  {step === questions.length - 1 ? copy.taking.submit : copy.taking.next}
+                  {timingPhase === 'submit_grace' || step === questions.length - 1
+                    ? copy.taking.submit
+                    : copy.taking.next}
                 </button>
               </div>
               <div className={styles.saveState} role='status' aria-live='polite'>
@@ -569,26 +662,38 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
       </div>
 
       {submitOpen ? (
-        <div className={styles.modalBackdrop} role='presentation'>
-          <div className={styles.modalCard} role='dialog' aria-modal='true' aria-labelledby='assessment-submit-title'>
-            <h2 id='assessment-submit-title' className={styles.modalTitle}>{copy.taking.submitTitle}</h2>
-            <p className={styles.terminalBody}>{copy.taking.submitBody}</p>
-            <div className={styles.actionsRow}>
-              <button className={styles.secondaryButton} type='button' disabled={submitting} onClick={() => setSubmitOpen(false)}>
-                {copy.taking.cancel}
-              </button>
-              <button
-                className={styles.primaryButton}
-                type='button'
-                data-capture='assessment-confirm-submit'
-                disabled={submitting}
-                onClick={() => void submit()}
-              >
-                {submitting ? copy.taking.submitting : copy.taking.submit}
-              </button>
-            </div>
+        <Dialog
+          open
+          aria-labelledby='assessment-submit-title'
+          transitionDuration={prefersReducedMotion ? 0 : undefined}
+          slotProps={{
+            backdrop: {
+              className: styles.modalBackdrop,
+              style: prefersReducedMotion ? { transitionDuration: '0ms' } : undefined,
+            },
+            paper: { className: styles.modalCard },
+          }}
+          onClose={() => {
+            if (!submitting) setSubmitOpen(false)
+          }}
+        >
+          <h2 id='assessment-submit-title' className={styles.modalTitle}>{copy.taking.submitTitle}</h2>
+          <p className={styles.terminalBody}>{copy.taking.submitBody}</p>
+          <div className={styles.actionsRow}>
+            <button autoFocus className={styles.secondaryButton} type='button' disabled={submitting} onClick={() => setSubmitOpen(false)}>
+              {copy.taking.cancel}
+            </button>
+            <button
+              className={styles.primaryButton}
+              type='button'
+              data-capture='assessment-confirm-submit'
+              disabled={submitting}
+              onClick={() => void submit()}
+            >
+              {submitting ? copy.taking.submitting : copy.taking.submit}
+            </button>
           </div>
-        </div>
+        </Dialog>
       ) : null}
     </section>
   )

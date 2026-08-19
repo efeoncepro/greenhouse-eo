@@ -38,6 +38,67 @@ describe('proxy', () => {
     expect(response.headers.get('Content-Security-Policy-Report-Only')).toContain('https://vercel.live')
   })
 
+  it('enforces a self-only CSP and privacy headers on assessment session surfaces', () => {
+    for (const path of [
+      '/public/assessment/access',
+      '/public/assessment/session',
+      '/api/public/assessment/access/exchange',
+      '/api/public/assessment/session',
+    ]) {
+      const response = proxy(new NextRequest(`https://example.com${path}`))
+      const csp = response.headers.get('Content-Security-Policy') ?? ''
+
+      expect(response.headers.has('Content-Security-Policy-Report-Only')).toBe(false)
+      expect(csp).toContain("default-src 'self'")
+      expect(csp).toContain("connect-src 'self'")
+      expect(csp).toContain("frame-ancestors 'none'")
+      expect(csp).toMatch(/script-src 'self' 'nonce-[a-f0-9]+'/)
+      expect(csp).not.toContain('https:')
+      expect(response.headers.get('Referrer-Policy')).toBe('no-referrer')
+      expect(response.headers.get('X-Robots-Tag')).toContain('noindex')
+      expect(response.headers.get('Cache-Control')).toContain('no-store')
+      expect(response.headers.get('Pragma')).toBe('no-cache')
+    }
+  })
+
+  it('never rewrites assessment access or session surfaces before the fragment scrub', () => {
+    vi.stubEnv('MAINTENANCE_MODE', 'true')
+
+    const assessmentPaths = [
+      '/public/assessment/access',
+      '/public/assessment/session',
+      '/api/public/assessment/access/exchange',
+      '/api/public/assessment/session',
+    ]
+
+    for (const canonicalPath of assessmentPaths) {
+      for (const path of [canonicalPath, `${canonicalPath}/`, `${canonicalPath}///`]) {
+        const response = proxy(new NextRequest(`https://example.com${path}`))
+        const csp = response.headers.get('Content-Security-Policy') ?? ''
+
+        expect(response.status).toBe(200)
+        expect(response.headers.has('x-middleware-rewrite')).toBe(false)
+        expect(csp).toMatch(/script-src 'self' 'nonce-[a-f0-9]+'/)
+        expect(response.headers.get('Cache-Control')).toContain('no-store')
+        expect(response.headers.get('Pragma')).toBe('no-cache')
+        expect(response.headers.get('Referrer-Policy')).toBe('no-referrer')
+      }
+    }
+
+    for (const falsePositive of [
+      '/public/assessment/access/extra',
+      '/public/assessment/session-other',
+      '/api/public/assessment/access/exchange/extra',
+      '/api/public/assessment/session-other',
+    ]) {
+      const response = proxy(new NextRequest(`https://example.com${falsePositive}`))
+
+      expect(response.status).toBe(503)
+      expect(response.headers.get('x-middleware-rewrite')).toContain('/maintenance')
+      expect(response.headers.has('Content-Security-Policy')).toBe(false)
+    }
+  })
+
   it('responds cleanly to page OPTIONS requests', () => {
     const request = new NextRequest('https://example.com/dashboard', {
       method: 'OPTIONS'

@@ -1,5 +1,18 @@
 # CODEX TASK -- Greenhouse Email Catalog v1: transactional, security, executive y domain notifications
 
+## Delta 2026-08-19 — Credenciales de assessment y recovery token-safe (TASK-1746)
+
+Los tipos que transportan credenciales se clasifican centralmente como token-sensitive: renderizan el valor
+crudo sólo en memoria, persisten un intent/metadata allowlisted y quedan fuera de batch y de los retries genéricos.
+El intent durable se reclama antes de rotar; replay o dos workers concurrentes no emiten otra credencial. Una
+aceptación del proveedor seguida de fallo local queda `dispatch_unknown`, nunca se reenvía a ciegas.
+
+`hiring_assessment_access_recovery` es un tipo separado de assignment y nace OFF. Su command liga receipt,
+intent, versión de token y outbox; sólo un operador puede iniciar otra recuperación explícita. El assignment
+inicial conserva el enlace legacy mientras `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` esté OFF; el fragment
+exchange se habilita únicamente después de migración/índice, rutas live, `click_tracking=false` y smoke del href.
+Estado real: código local completo; migración/índice, flags, email recovery y smokes no aplicados.
+
 ## Delta 2026-04-17 — Foto real del sistema de email hoy
 
 Greenhouse ya no tiene solo un puñado de templates sueltos, pero tampoco debe documentarse como si fuera una plataforma completa de campañas, journeys y analytics avanzados.
@@ -195,15 +208,20 @@ Y opera con dos caminos prácticos:
 
 #### 4. Webhook de entregabilidad
 
-`POST /api/webhooks/resend` ya procesa:
+`POST /api/webhooks/resend` implementa en código, con rollout operativo gobernado por TASK-1745:
 
 - `email.delivered`
 - `email.bounced`
 - `email.complained`
+- `email.sent`
+- `email.delivery_delayed`
+- `email.failed`
+- `email.suppressed`
 
 Eso permite:
 
-- confirmar delivered cuando Resend lo reporta
+- distinguir despacho aceptado (`status='sent'`) de lifecycle confirmado (`provider_status`)
+- confirmar delivered cuando Resend lo reporta, sin inferirlo desde open/click
 - marcar `email_undeliverable` en `client_users` frente a hard bounce
 - auto-desuscribir cuando hay complaint en un tipo broadcast
 

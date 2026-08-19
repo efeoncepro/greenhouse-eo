@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { wasEmailDeliveredForEntity } from '@/lib/email/delivery'
+import { wasEmailDispatchedForEntity } from '@/lib/email/delivery'
 import { withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
@@ -218,7 +218,7 @@ export const cancelCandidateTest = async (
   // lo confirma sin resolver la dirección del candidato (consulta por entidad, sin PII).
   // En el no-op idempotente el estado previo ya es `cancelled`, así que sólo manda el ledger.
   const linkAlreadyDelivered =
-    previousStatus === 'sent' || (await wasEmailDeliveredForEntity(assessmentId, ASSESSMENT_ASSIGNED_EMAIL_TYPE))
+    previousStatus === 'sent' || (await wasEmailDispatchedForEntity(assessmentId, ASSESSMENT_ASSIGNED_EMAIL_TYPE))
 
   return {
     assessment,

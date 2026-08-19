@@ -1179,6 +1179,8 @@ export const EVENT_TYPES = {
   // — ver `src/lib/hiring/assessment/accommodations.ts`). Sin consumer reactivo: comunicar
   // el ajuste al candidato es decisión humana, no un email automático.
   hiringAssessmentAccommodationGranted: 'hiring.assessment.accommodation_granted',
+  // TASK-1746 — Recovery de acceso; payload IDs-only. Nunca token/URL/email/nombre/error.
+  hiringAssessmentAccessRecoveryRecorded: 'hiring.assessment.access_recovery_recorded',
   hiringCompetencyResultUpdated: 'hiring.competency_result.updated',
 
   // TASK-1719 — Assignment gobernado de assessment. Payloads IDs-only (assignmentId/

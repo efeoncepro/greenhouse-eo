@@ -277,8 +277,11 @@ describe('el ajuste llega DE VERDAD al tiempo que ve el candidato', () => {
   it('el vencimiento se corre por el ajuste: la ventana real es base + extra', () => {
     const startedAt = new Date(Date.now() - 50 * 60_000).toISOString()
 
-    // 50 min transcurridos sobre un límite base de 45: sin ajuste ya venció.
-    expect(resolveAssessmentTiming(assessment({}, startedAt)).remainingSeconds).toBe(0)
+    // 50 min transcurridos sobre un límite base de 45: respuestas cerradas, submit en gracia.
+    const withoutGrant = resolveAssessmentTiming(assessment({}, startedAt))
+
+    expect(withoutGrant.phase).toBe('submit_grace')
+    expect(withoutGrant.remainingSeconds).toBeGreaterThan(24 * 60)
 
     // Con +20 min la ventana es de 65: le quedan ~15 min reales.
     const withGrant = resolveAssessmentTiming(

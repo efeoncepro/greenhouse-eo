@@ -23,12 +23,12 @@ const listAssignments = vi.fn()
 /** Ledger de entregas simulado, con clave exacta `${entity}:${emailType}`. */
 const deliveredEmails = new Set<string>()
 
-const wasEmailDeliveredForEntity = vi.fn(async (entity: string, emailType: string) =>
+const wasEmailDispatchedForEntity = vi.fn(async (entity: string, emailType: string) =>
   deliveredEmails.has(`${entity}:${emailType}`),
 )
 
 vi.mock('@/lib/email/delivery', () => ({
-  wasEmailDeliveredForEntity: (entity: string, emailType: string) => wasEmailDeliveredForEntity(entity, emailType),
+  wasEmailDispatchedForEntity: (entity: string, emailType: string) => wasEmailDispatchedForEntity(entity, emailType),
 }))
 
 vi.mock('@/lib/hiring/notifications/config', () => ({
@@ -249,7 +249,7 @@ describe('ni cero correos ni dos', () => {
     await resolveStageChangeCandidateComms(APP, payload())
 
     expect(sendStageEmail).toHaveBeenCalledTimes(1)
-    expect(wasEmailDeliveredForEntity).toHaveBeenCalledWith('asmt-9', 'hiring_assessment_assigned')
+    expect(wasEmailDispatchedForEntity).toHaveBeenCalledWith('asmt-9', 'hiring_assessment_assigned')
   })
 
   it('instancia preexistente que YA entregó su correo de test ⇒ callar (no el segundo correo)', async () => {
@@ -276,7 +276,7 @@ describe('ni cero correos ni dos', () => {
     await resolveStageChangeCandidateComms(APP, payload())
 
     expect(sendStageEmail).toHaveBeenCalledTimes(1)
-    expect(wasEmailDeliveredForEntity).not.toHaveBeenCalled()
+    expect(wasEmailDispatchedForEntity).not.toHaveBeenCalled()
   })
 
   // Combinaciones (status, reasonCode) que `resolveAssignmentIntent` REALMENTE produce. Un

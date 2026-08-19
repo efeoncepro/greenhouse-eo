@@ -70,4 +70,4 @@ desactivar en minutos.
   procedencia: la ley no depende de que un dato parezca de prueba.
 
 > Detalle técnico: contrato en [`src/lib/hiring/data-origin/`](../../../src/lib/hiring/data-origin/);
-> spec en [`TASK-1739`](../../tasks/in-progress/TASK-1739-hiring-synthetic-data-provenance.md).
+> spec en [`TASK-1739`](../../tasks/complete/TASK-1739-hiring-synthetic-data-provenance.md).

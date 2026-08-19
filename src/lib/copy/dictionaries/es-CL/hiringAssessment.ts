@@ -15,6 +15,8 @@ export const hiringAssessment: HiringAssessmentCopy = {
     instructionsTitle: 'Antes de empezar',
     instructionsBody:
       'Vas a responder {sections} secciones, una competencia a la vez. Tienes {minutes} minutos en total. Una vez que envíes, no vas a poder editar tus respuestas.',
+    instructionsBodyNoLimit:
+      'Vas a responder {sections} secciones, una competencia a la vez. No hay un límite separado para responder; desde que empieces, tendrás hasta 24 horas para completar y enviar la evaluación.',
     accommodation: 'Tiempo extendido aplicado (+{minutes} min). Ajustamos tu evaluación según la adaptación acordada.',
     sectionsTitle: 'Secciones de la evaluación',
     consent:
@@ -36,6 +38,9 @@ export const hiringAssessment: HiringAssessmentCopy = {
     expiredTitle: 'Se acabó el tiempo',
     expiredBody: 'Guardamos lo que alcanzaste a responder. No es necesario que hagas nada más.',
     timeRemaining: 'Tiempo restante',
+    timeToAnswer: 'Tiempo para responder',
+    timeToSubmit: 'Tiempo para enviar',
+    submitGraceNotice: 'Las respuestas ya no se pueden editar. Aún puedes enviar la evaluación.',
     timeWarningFive: 'Quedan 5 minutos',
     timeWarningOne: 'Queda 1 minuto',
     textareaPlaceholder: 'Escribe tu respuesta con el mayor contexto útil posible…',

@@ -148,6 +148,10 @@ Reglas duras non-negociables:
 22. **SIEMPRE** validar schema fingerprint y property IDs antes de write; los nombres físicos son labels de UX, no identidad estable
 23. **SIEMPRE** separar estado actual de historial: `last_edited_time` no demuestra progreso y un webhook es señal para re-fetch
 24. **SIEMPRE** tratar estado terminal sin resultado/evidencia exigida como cierre incompleto
+25. **NUNCA** confundir un Project/Campaign de Notion con un Commercial Engagement: Project contiene Tasks para una
+    Organization; Engagement gobierna contrato, capacidad, pricing, accountability y cierre comercial. Cuando el
+    trabajo cruce ambos, cargar `docs/business-models/EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md` y resolver el
+    Engagement primario sin crear una segunda clase de “proyecto comercial”.
 
 ## 6. File map — POPULATED ★ vs STUB ◯
 

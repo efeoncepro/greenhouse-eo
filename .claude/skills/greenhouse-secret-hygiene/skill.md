@@ -30,6 +30,7 @@ Read only what the task needs, in this order:
 If the task touches a specific secret family, also read:
 
 - **Webhooks**: `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
+- **Resend email lifecycle**: `docs/operations/runbooks/resend-email-lifecycle-rollout.md`
 - **PostgreSQL**: `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
 - **Past incident**: `docs/issues/resolved/ISSUE-032-secret-manager-payload-contamination-breaks-runtime-secrets.md`
 
@@ -59,6 +60,30 @@ Always inspect the real consumers before acting:
 | `NUBOX_*` | Can break finance integrations (invoice download, DTE). |
 
 7. If a secret publication error caused runtime degradation, **document it as `ISSUE-###`** even if the fix also includes defensive code.
+
+### Resend webhook signing secret
+
+Treat `RESEND_WEBHOOK_SIGNING_SECRET` as an inbound verification secret, separate from the outbound
+`RESEND_API_KEY`. The Resend webhook is global email infrastructure, not Hiring-only, and its outage must never
+block or disable `sendEmail`.
+
+- The canonical source is Secret Manager through `RESEND_WEBHOOK_SIGNING_SECRET_SECRET_REF`; direct env is a
+  governed fallback only. Publish the `whsec_` value as a raw scalar.
+- Resend API/SDK create, get and list responses may contain `signing_secret`. Never print or serialize the full
+  response. Transfer the secret directly to Secret Manager and retain only webhook ID, endpoint, event set,
+  status and timestamp as evidence.
+- A missing/unavailable secret, cold start or persistence failure must produce a retryable non-2xx response.
+  Never acknowledge an unverifiable event as ignored.
+- Verify over the raw body and Svix headers before parse/persist; retain `svix-id` only as the dedupe key. Never
+  log signature headers, raw payload, email body, provider error or token-bearing URL.
+- Deploy the handler without a subscription first; prove outbound sending independently; then register one
+  minimal event, run a signed canary and only afterward expand the global event set.
+- Rotation is complete only after a cold-start signed event and a replay/dedupe check. Disable the provider
+  webhook during drift. Do not rotate or remove `RESEND_API_KEY` as webhook rollback.
+- Resend click tracking is a domain-level provider setting. Read it through the API; do not enable assessment
+  fragment links unless `click_tracking=false` and a received-href smoke preserves the fragment.
+- Do not claim runtime readiness from code or docs. Migration, secret ref, provider registration, deploy,
+  signed canary, reconciliation and readbacks are separate evidence.
 
 ### AXIS private package credential
 

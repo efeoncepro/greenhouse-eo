@@ -12,7 +12,8 @@ El flujo completo de Hiring es:
 2. **Recibir postulación**: Careers público crea/reconcilia Person + `candidate_facet` + `hiring_application`.
 3. **Revisar candidato**: Application 360 concentra resumen, documentos, assessment, decisión y actividad.
 4. **Asignar assessment**: el operador asigna una plantilla lista a una postulación concreta. Esto crea una instancia con token.
-5. **Candidato rinde**: el link `/assessment/<token>` abre la experiencia pública de evaluación.
+5. **Candidato rinde**: mientras el cutover permanezca OFF, usa el enlace legacy enviado por Greenhouse. La
+   sesión pública nueva por fragmento/cookie está implementada, pero todavía no está activa.
 6. **Operador corrige**: Application 360 muestra scorecard, cola de respuestas abiertas y drawer de corrección.
 7. **Decidir**: la decisión humana queda en `Decisión`; el scorecard es advisory.
 8. **Activar seleccionado**: `selected` + `internal_hire` genera/usa handoff y abre la Hiring Activation Lane.
@@ -74,22 +75,24 @@ Usa este flujo para la vacante real publicada o cualquier opening activo:
 8. El evento `hiring.assessment.assigned` activa el correo transaccional: el consumer rota el token
    canónico y envía el enlace público al candidato. Verifica en Actividad/correo antes de intervenir;
    el token crudo no es recuperable desde SQL ni logs.
-9. Si el correo no llega, no reutilices un token que hayas visto: revisa el estado de la instancia, el
-   reactive log y el kill-switch con el runbook `operar-emails-ciclo-hiring.md`.
+9. Si el correo no llega, no interpretes `sent` como entrega y no reutilices un token que hayas visto. Revisa
+   estado, reactive log y kill-switch, y sigue `recuperar-acceso-a-test-de-candidato.md`. La acción de recovery
+   aún está pendiente de rollout; el manual separa qué hacer hoy del procedimiento futuro.
 10. Vuelve a Application 360 para monitorear estado: asignado, enviado, en progreso, submitted,
     expirado o scored. Al completarse un `candidate_test`, People recibe un aviso interno de revisión;
     esto no decide ni cambia la etapa de la postulación.
 
-Si el correo falló o se perdió el enlace, no intentes recuperar ningún token desde SQL ni logs. El
-consumer de correo es el único camino que puede reemitirlo de forma segura; si el test ya comenzó,
-está enviado, completado o expiró, el consumer hace skip y People debe resolver el caso sin alterar
-respuestas ni estado terminal.
+Si el correo falló o se perdió el enlace, no intentes recuperar ningún token desde SQL ni logs. No reasignes
+ni crees otro assessment. La recuperación gobernada reutiliza la misma instancia y preserva respuestas,
+reloj y estado, pero todavía no está habilitada; antes del rollout, escala el caso según el manual específico.
 
 ## Operar una evaluación de candidato
 
 ### Candidato
 
-1. Abre `/assessment/<token>` en el ambiente correcto. La ruta `/public/assessment/<token>` existe como compatibilidad, pero la URL limpia es la preferida.
+1. Abre el enlace exacto enviado por Greenhouse en el ambiente correcto. Hoy corresponde al flujo legacy.
+   Después del cutover, el acceso llegará en el fragmento y se intercambiará por una cookie segura; no copies
+   una ruta manual ni reconstruyas el token.
 2. El candidato ve instrucciones, secciones, tiempo efectivo y, si aplica, una banda de accommodation por minutos extra.
 3. El botón de inicio queda bloqueado hasta consentimiento. Al iniciar, arranca el timer.
 4. Cada respuesta se guarda con autosave. El candidato ve feedback `Guardando…` / `Respuesta guardada`.
@@ -150,7 +153,9 @@ Revisar al menos: instrucciones/consentimiento, timer, autosave, avance, scoreca
 Algunas acciones del Desk envían un correo automático al candidato. Conviene saberlo antes de hacer clic:
 
 - **Mover la etapa a `Preselección` o `Entrevista`** → el candidato recibe un email de avance de proceso.
-- **Asignar un test al candidato** → el candidato recibe un email con el link para rendirlo. Ojo: **re-asignar el test rota el token e invalida el link anterior** — si el candidato tenía el correo viejo guardado, ese link ya no sirve.
+- **Asignar un test al candidato** → Greenhouse solicita el email con el link para rendirlo. `sent` sólo prueba
+  aceptación del despacho; no confirma entrega. No reasignes para reenviar: la recuperación gobernada rota el
+  acceso sobre la misma instancia y está pendiente de rollout.
 - **Decidir `selected` o `rejected`** → el candidato recibe el email de decisión. El correo de rechazo se puede pausar por configuración (`email_type_config`).
 
 Para pausar un tipo de correo, diagnosticar por qué no llegó o revisar el historial de envíos, usa el manual [Operar los emails del ciclo de hiring](operar-emails-ciclo-hiring.md).

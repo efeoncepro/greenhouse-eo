@@ -14,6 +14,8 @@ export const hiringAssessment: HiringAssessmentCopy = {
     instructionsTitle: 'Before you start',
     instructionsBody:
       'You will answer {sections} sections, one competency at a time. You have {minutes} minutes in total. Once submitted, your answers cannot be edited.',
+    instructionsBodyNoLimit:
+      'You will answer {sections} sections, one competency at a time. There is no separate answer deadline; once you start, you have up to 24 hours to complete and submit the assessment.',
     accommodation:
       'Extended time applied (+{minutes} min). We adjusted your assessment according to the agreed accommodation.',
     sectionsTitle: 'Assessment sections',
@@ -36,6 +38,9 @@ export const hiringAssessment: HiringAssessmentCopy = {
     expiredTitle: 'Time is up',
     expiredBody: 'We saved what you were able to answer. You do not need to do anything else.',
     timeRemaining: 'Time remaining',
+    timeToAnswer: 'Time to answer',
+    timeToSubmit: 'Time to submit',
+    submitGraceNotice: 'Answers can no longer be edited. You can still submit the assessment.',
     timeWarningFive: '5 minutes left',
     timeWarningOne: '1 minute left',
     textareaPlaceholder: 'Write your answer with as much useful context as possible…',

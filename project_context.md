@@ -150,6 +150,12 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   `.claude/skills/efeonce-mcp-platform/`; estas componen la skill dueña de cada provider y no duplican su policy.
   Las skills de arquitectura `software-architect-2026` y `arch-architect` deben cargar ese router antes de
   proponer una nueva surface, OAuth o binding cross-runtime.
+- Hiring/ATS declara la **procedencia del dato en su nacimiento** (`data_origin`, `TASK-1739`, en producción
+  desde 2026-08-19): dos raíces —persona y demanda— con copia derivada por trigger en la postulación, default
+  `real` porque omitir debe dejar el dato visible y nunca ocultarlo. Una vacante no real no se publica; el gold
+  set excluye sintéticos sin flag; retención y compliance son ciegos a la procedencia y la procedencia nunca
+  gatea comunicaciones. El primitive canónico es `src/lib/hiring/data-origin/` y ningún reader escribe su propio
+  predicado. Deuda declarada en `TASK-1748`: los readers del Banco de Talento aún no filtran por procedencia.
 - Hiring/ATS mantiene como caminos canónicos el reader de Application 360 para documentos y el reveal de
   identidad con capability, motivo y auditoría append-only (`TASK-1714`/`TASK-1715`). El evento
   `hiring.assessment.submitted` ya tiene en producción un consumer interno para People, con configuración
@@ -195,6 +201,16 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   OFF. El expediente genera propuestas automáticas con Google `gemini-2.5-flash`/prompt v2 cuando CV limpio y
   assessment puntuado están listos, pero nunca auto-confirma. El gate calibrado sigue bloqueado **por volumen del
   gold set** (11 contra un piso de 49). TASK-1742 conserva cooldown, rollback residual-cero y firmas pendientes.
+- La **recuperación de acceso al assessment** está gobernada por el ADR
+  [`GREENHOUSE_HIRING_ASSESSMENT_ACCESS_RECOVERY_AND_EMAIL_DELIVERY_DECISION_V1.md`](docs/architecture/GREENHOUSE_HIRING_ASSESSMENT_ACCESS_RECOVERY_AND_EMAIL_DELIVERY_DECISION_V1.md)
+  y `TASK-1745`–`TASK-1747`. Estado real al 2026-08-19: lifecycle global de Resend, transporte token-sensitive,
+  recovery email, enlace seguro one-time, Product API humana y frontera fragment→exchange→sesión opaca/versionada
+  están validados localmente, pero sus migraciones/índice no están aplicados y el tipo de correo permanece OFF. El runtime productivo todavía usa el
+  enlace legacy con bearer en path: el cutover del correo inicial está detrás de
+  `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`, default OFF en el ops-worker. Ningún enlace nuevo de recovery
+  puede habilitarse hasta completar TASK-1747/UI, readback `click_tracking=false` de Resend y smokes PG/browser/href.
+  El rate limit público ya está implementado con bucket por credential y techo IP, más retención diaria con readback;
+  sigue dormante hasta aplicar schema/deploy. `sent` significa despacho aceptado, nunca entrega confirmada.
 - La dirección aceptada para autoservicio candidato es **una cuenta y un `/my` longitudinal** (`TASK-1727`–`TASK-1733`,
   EPIC-011): mismo `identity_profile_id` y principal/login; `candidate_facet` y `member` son facetas aditivas;
   perfil profesional person-scoped; CV/respuestas/expectativa conservan snapshot por aplicación; activation suma
@@ -251,6 +267,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo reconciliar el costo del AI Visibility Grader | `docs/audits/cloud-cost/AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md` + documentación funcional/runbook del grader |
 | Cómo evaluar el portafolio de partners/providers de IA | `.codex/skills/efeonce-business-model-operator/SKILL.md` + `.codex/skills/efeonce-customer-model-operator/SKILL.md` + audit comercial fechado; economics y routing directo/Fal en `design-studio` y `motion-design-studio` |
 | Qué es un Product Service y cómo separar oferta, productización, delivery, operación y engagement | `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md` |
+| Cómo separar Organization, Engagement comercial, oferta/servicio, Project/Campaign, Task y Deliverable para operar On-Going y On-Demand; Product Service sólo cuando aplica; Ficha de Activación para venta→Delivery | `docs/business-models/EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md` + `EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md` |
 | Cómo se relacionan los modelos corporativo, portfolio, capability, packaging y submodelo | `docs/business-models/EFEONCE_BUSINESS_MODEL_ARCHITECTURE_V1.md` |
 | Cómo se estructura, vende y opera Creative Services, incluido Creative Operations, sus rutas de entrada, Efeonce Run & Gun Studio/Production y sus composiciones | `docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OFFER_ARCHITECTURE_V2.md` + `docs/services/creative-services/EFEONCE_CREATIVE_SERVICES_OPERATING_MODEL_V1.md` + `docs/services/creative-services/README.md` + `.codex/skills/creative-practice/modules/03_OFERTA.md` + `.codex/skills/creative-practice/efeonce/EFEONCE_OVERLAY.md` |
 | Cómo gobernar derechos, consentimiento, provenance, providers, no-training, retención, contratos y entrega enterprise de creatividad generativa | `docs/architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md` + `.codex/skills/greenhouse-ai-creative-rights-governance/SKILL.md` + `.codex/skills/greenhouse-ai-creative-rights-governance/references/` + Creative Services/Creative Studio docs + `legal-privacy-ip-operator` |

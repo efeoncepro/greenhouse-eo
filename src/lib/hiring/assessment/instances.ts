@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { createHash, randomBytes } from 'node:crypto'
+import { createHash, randomBytes, randomUUID } from 'node:crypto'
 
 import type { PoolClient } from 'pg'
 
@@ -76,6 +76,10 @@ return {}
 }
 
 const hashToken = (raw: string): string => createHash('sha256').update(raw).digest('hex')
+
+export type AssessmentDeadlineResult<T> =
+  | { outcome: 'ok'; value: T }
+  | { outcome: 'expired' }
 
 // ── Normalizers ──
 
@@ -160,6 +164,17 @@ export const getAssessmentById = async (assessmentId: string): Promise<Assessmen
 return rows[0] ? normalizeAssessment(rows[0]) : null
 }
 
+export const getAssessmentByIdWithClient = async (
+  client: PoolClient,
+  assessmentId: string,
+): Promise<Assessment | null> => {
+  const rows = await runQuery<AssessmentRow>(client,
+    `SELECT ${ASSESSMENT_COLS} FROM greenhouse_hiring.hiring_assessment WHERE assessment_id = $1 LIMIT 1`,
+    [assessmentId])
+
+  return rows[0] ? normalizeAssessment(rows[0]) : null
+}
+
 export const listAssessmentsForApplication = async (applicationId: string): Promise<Assessment[]> => {
   const rows = await runGreenhousePostgresQuery<AssessmentRow>(
     `SELECT ${ASSESSMENT_COLS} FROM greenhouse_hiring.hiring_assessment WHERE application_id = $1 ORDER BY created_at DESC`,
@@ -170,63 +185,81 @@ export const listAssessmentsForApplication = async (applicationId: string): Prom
 return rows.map(normalizeAssessment)
 }
 
-/** Predicado SQL de vencimiento: token vencido o time-limit excedido (TASK-1383). */
 /** Vigencia del link tokenizado del candidato (TASK-1383; 1363 comunica la fecha). */
 const TOKEN_TTL_DAYS = 14
+const TERMINAL_APPLICATION_STAGES = new Set(['selected', 'rejected', 'withdrawn', 'handoff_ready', 'closed'])
 
-/**
- * TASK-1719 — Espejo SQL del ÚNICO contrato canónico de accommodations: `extraMinutes`.
- *
- * ⚠️ Aceptaba las mismas cuatro grafías que el lector TS (`timeExtensionMinutes`,
- * `additionalMinutes`, `extendedTimeMinutes`). Se narró junto con el write path
- * (`accommodations.ts`), con la base verificada en 0 filas con `accommodations_json <> '{}'`.
- * Este predicado decide cuándo una instancia vence: si divergiera del lector TS
- * (`resolveAssessmentTiming`), el candidato vería un contador y el sistema aplicaría otro.
- * Cualquier cambio acá va acompañado del cambio allá, o son dos verdades.
- */
-const ACCOMMODATION_EXTRA_MINUTES_SQL = `GREATEST(0, COALESCE(
-  CASE WHEN (accommodations_json->>'extraMinutes') ~ '^[0-9]+(\\.[0-9]+)?$'
-    THEN FLOOR((accommodations_json->>'extraMinutes')::numeric)::int END,
-  0
-))`
-
-const OVERDUE_PREDICATE = `(
-  (token_expires_at IS NOT NULL AND token_expires_at < NOW())
-  OR (started_at IS NOT NULL AND time_limit_minutes IS NOT NULL
-      AND started_at + make_interval(mins => time_limit_minutes + ${ACCOMMODATION_EXTRA_MINUTES_SQL}) < NOW())
-)`
-
-/**
- * Transiciona a `expired` las instancias abiertas vencidas (token o time-limit).
- * Loud por estado: la instancia queda `expired` (auditable), nunca un skip mudo.
- */
-const expireOverdueAssessment = async (whereSql: string, params: unknown[]): Promise<void> => {
-  await runGreenhousePostgresQuery(
-    `UPDATE greenhouse_hiring.hiring_assessment
-     SET status = 'expired'
-     WHERE ${whereSql} AND status IN ('assigned', 'sent', 'in_progress') AND ${OVERDUE_PREDICATE}`,
-    params,
-  )
-}
-
-/** Resuelve una instancia por su token (single-use). Solo si sigue rendible (expira vencidas). */
-export const resolveAssessmentByToken = async (rawToken: string): Promise<Assessment | null> => {
+/** Resolución autoritativa bajo lock. Antes de iniciar manda el TTL; ya iniciada manda closeDeadline. */
+export const resolveAssessmentByTokenWithClient = async (
+  client: PoolClient,
+  rawToken: string,
+): Promise<Assessment | null> => {
   if (!rawToken) return null
 
   const tokenHash = hashToken(rawToken)
 
-  await expireOverdueAssessment('access_token_hash = $1', [tokenHash])
-
-  const rows = await runGreenhousePostgresQuery<AssessmentRow>(
-    `SELECT ${ASSESSMENT_COLS} FROM greenhouse_hiring.hiring_assessment
-     WHERE access_token_hash = $1 AND method = 'candidate_test' AND status IN ('assigned', 'sent', 'in_progress')
-     LIMIT 1`,
+  const rows = await runQuery<AssessmentRow & { effective_expiry: unknown }>(
+    client,
+    `SELECT ${ASSESSMENT_COLS}, CASE WHEN status = 'in_progress'
+              THEN greenhouse_hiring.assessment_candidate_test_close_deadline(
+                started_at, time_limit_minutes, accommodations_json)
+              ELSE token_expires_at END AS effective_expiry
+       FROM greenhouse_hiring.hiring_assessment
+      WHERE access_token_hash = $1 AND method = 'candidate_test'
+      LIMIT 1 FOR UPDATE`,
     [tokenHash],
   )
 
-  
-return rows[0] ? normalizeAssessment(rows[0]) : null
+  const row = rows[0]
+
+  if (!row || !['assigned', 'sent', 'in_progress'].includes(str(row.status))) return null
+
+  const applications = await runQuery<{ candidate_facet_id: string; stage: string; decision: string | null }>(
+    client,
+    `SELECT candidate_facet_id, stage, decision
+       FROM greenhouse_hiring.hiring_application
+      WHERE application_id = $1 LIMIT 1 FOR UPDATE`,
+    [str(row.application_id)],
+  )
+
+  const application = applications[0]
+
+  if (!application) return null
+
+  const facets = await runQuery<{ consent_status: string }>(client,
+    `SELECT consent_status FROM greenhouse_hiring.candidate_facet
+      WHERE candidate_facet_id = $1 LIMIT 1 FOR UPDATE`,
+    [application.candidate_facet_id])
+
+  const facet = facets[0]
+
+  if (!facet || application.decision
+      || TERMINAL_APPLICATION_STAGES.has(application.stage)
+      || facet.consent_status === 'withdrawn') {
+    return null
+  }
+
+  const clockRows = await runQuery<{ database_now: unknown }>(client,
+    'SELECT clock_timestamp() AS database_now', [])
+
+  const expiresAt = ts(row.effective_expiry)
+  const databaseNow = ts(clockRows[0]?.database_now)
+
+  if (!expiresAt || !databaseNow || Date.parse(expiresAt) <= Date.parse(databaseNow)) {
+    await runQuery(client,
+      `UPDATE greenhouse_hiring.hiring_assessment SET status = 'expired', updated_at = clock_timestamp()
+       WHERE assessment_id = $1 AND status IN ('assigned', 'sent', 'in_progress')`,
+      [str(row.assessment_id)],
+    )
+
+    return null
+  }
+
+  return normalizeAssessment(row)
 }
+
+export const resolveAssessmentByToken = async (rawToken: string): Promise<Assessment | null> =>
+  withGreenhousePostgresTransaction((client) => resolveAssessmentByTokenWithClient(client, rawToken))
 
 // ── Writers ──
 
@@ -293,12 +326,15 @@ export const insertCandidateTest = async (
   const applicationId = str(input.applicationId)
   const templateId = str(input.templateId)
   const rawToken = randomBytes(24).toString('base64url')
+  const accessTokenVersionId = randomUUID()
 
   const rows = await runQuery<AssessmentRow>(
     client,
     `INSERT INTO greenhouse_hiring.hiring_assessment
-       (application_id, template_id, method, status, access_token_hash, time_limit_minutes, accommodations_json, created_by, token_expires_at)
-     VALUES ($1, $2, 'candidate_test', 'assigned', $3, $4, $5::jsonb, $6, NOW() + make_interval(days => ${TOKEN_TTL_DAYS}))
+       (application_id, template_id, method, status, access_token_hash, access_token_version_id,
+        time_limit_minutes, accommodations_json, created_by, token_expires_at)
+     VALUES ($1, $2, 'candidate_test', 'assigned', $3, $4::uuid, $5, $6::jsonb, $7,
+             NOW() + make_interval(days => ${TOKEN_TTL_DAYS}))
      ON CONFLICT (application_id, template_id) WHERE ${OPEN_INSTANCE_SQL_PREDICATE}
      DO NOTHING
      RETURNING ${ASSESSMENT_COLS}`,
@@ -306,6 +342,7 @@ export const insertCandidateTest = async (
       applicationId,
       templateId,
       hashToken(rawToken),
+      accessTokenVersionId,
       input.timeLimitMinutes ?? null,
       JSON.stringify(input.accommodations ?? {}),
       actorUserId,
@@ -415,24 +452,65 @@ return assessment
   })
 }
 
-/** Marca una instancia como en progreso (arranca el timer). Idempotente. Expira vencidas. */
-export const startAssessment = async (assessmentId: string): Promise<Assessment> => {
-  await expireOverdueAssessment('assessment_id = $1', [assessmentId])
-
-  const rows = await runGreenhousePostgresQuery<AssessmentRow>(
-    `UPDATE greenhouse_hiring.hiring_assessment
-     SET status = 'in_progress', started_at = COALESCE(started_at, NOW())
-     WHERE assessment_id = $1 AND status IN ('assigned', 'sent', 'in_progress')
-     RETURNING ${ASSESSMENT_COLS}`,
+/** Arranca una sola vez bajo lock; el trigger DB recalcula todas las sesiones activas. */
+export const startAssessmentWithClient = async (
+  client: PoolClient,
+  assessmentId: string,
+): Promise<AssessmentDeadlineResult<Assessment>> => {
+  const rows = await runQuery<AssessmentRow & { database_now: unknown; effective_expiry: unknown }>(client,
+    `SELECT ${ASSESSMENT_COLS}, clock_timestamp() AS database_now,
+            CASE WHEN status = 'in_progress'
+              THEN greenhouse_hiring.assessment_candidate_test_close_deadline(
+                started_at, time_limit_minutes, accommodations_json)
+              ELSE token_expires_at END AS effective_expiry
+       FROM greenhouse_hiring.hiring_assessment WHERE assessment_id = $1 LIMIT 1 FOR UPDATE`,
     [assessmentId],
   )
 
-  if (!rows[0]) throw new HiringNotFoundError('La evaluación no existe o no está rendible.', 'assessment_not_startable')
-  
-return normalizeAssessment(rows[0])
+  const row = rows[0]
+
+  if (!row) throw new HiringNotFoundError('La evaluación no existe o no está rendible.', 'assessment_not_startable')
+
+  if (!['assigned', 'sent', 'in_progress'].includes(str(row.status))) {
+    throw new HiringNotFoundError('La evaluación no existe o no está rendible.', 'assessment_not_startable')
+  }
+
+  const expiry = ts(row.effective_expiry)
+  const now = ts(row.database_now)
+
+  if (!expiry || !now || Date.parse(expiry) <= Date.parse(now)) {
+    await runQuery(client,
+      `UPDATE greenhouse_hiring.hiring_assessment SET status = 'expired', updated_at = clock_timestamp()
+       WHERE assessment_id = $1 AND status IN ('assigned', 'sent', 'in_progress')`, [assessmentId])
+
+return { outcome: 'expired' }
+  }
+
+  if (str(row.status) === 'in_progress') return { outcome: 'ok', value: normalizeAssessment(row) }
+
+  const updated = await runQuery<AssessmentRow>(client,
+    `UPDATE greenhouse_hiring.hiring_assessment
+        SET status = 'in_progress', started_at = COALESCE(started_at, clock_timestamp()),
+            updated_at = clock_timestamp()
+      WHERE assessment_id = $1 AND status IN ('assigned', 'sent') RETURNING ${ASSESSMENT_COLS}`,
+    [assessmentId])
+
+  if (!updated[0]) throw new HiringNotFoundError('La evaluación no existe o no está rendible.', 'assessment_not_startable')
+
+  return { outcome: 'ok', value: normalizeAssessment(updated[0]) }
 }
 
-interface SaveResponseInput {
+export const startAssessment = async (assessmentId: string): Promise<Assessment> => {
+  const result = await withGreenhousePostgresTransaction((client) => startAssessmentWithClient(client, assessmentId))
+
+  if (result.outcome === 'expired') {
+    throw new HiringValidationError('La evaluación ya no está disponible.', 'assessment_not_startable', 409)
+  }
+
+  return result.value
+}
+
+export interface SaveResponseInput {
   assessmentId: string
   competencyId: string
   questionId?: string | null
@@ -448,7 +526,10 @@ interface SaveResponseInput {
  * 1363 no es fuente de verdad). El primer save auto-arranca el timer (assigned/sent →
  * in_progress) y las instancias vencidas se expiran antes de aceptar el write.
  */
-export const saveResponse = async (input: SaveResponseInput): Promise<AssessmentResponse> => {
+export const saveResponseWithClient = async (
+  client: PoolClient,
+  input: SaveResponseInput,
+): Promise<AssessmentDeadlineResult<AssessmentResponse>> => {
   const assessmentId = str(input.assessmentId)
   const competencyId = str(input.competencyId)
   const questionId = input.questionId ? str(input.questionId) : null
@@ -457,12 +538,19 @@ export const saveResponse = async (input: SaveResponseInput): Promise<Assessment
     throw new HiringValidationError('assessmentId y competencyId son obligatorios.', 'assessment_field_required', 400)
   }
 
-  await expireOverdueAssessment('assessment_id = $1', [assessmentId])
+  const started = await startAssessmentWithClient(client, assessmentId)
 
-  return withGreenhousePostgresTransaction(async (client) => {
-    const open = await runQuery<{ status: string }>(
+  if (started.outcome === 'expired') return started
+
+    const open = await runQuery<{ status: string; answer_deadline: unknown; close_deadline: unknown; database_now: unknown }>(
       client,
-      `SELECT status FROM greenhouse_hiring.hiring_assessment WHERE assessment_id = $1 LIMIT 1 FOR UPDATE`,
+      `SELECT status,
+              greenhouse_hiring.assessment_candidate_test_deadline(
+                started_at, time_limit_minutes, accommodations_json) AS answer_deadline,
+              greenhouse_hiring.assessment_candidate_test_close_deadline(
+                started_at, time_limit_minutes, accommodations_json) AS close_deadline,
+              clock_timestamp() AS database_now
+         FROM greenhouse_hiring.hiring_assessment WHERE assessment_id = $1 LIMIT 1 FOR UPDATE`,
       [assessmentId],
     )
 
@@ -474,15 +562,21 @@ export const saveResponse = async (input: SaveResponseInput): Promise<Assessment
       })
     }
 
-    // Primer write = la rendición empezó: arranca el timer (idempotente).
-    if (open[0].status !== 'in_progress') {
-      await runQuery(
-        client,
-        `UPDATE greenhouse_hiring.hiring_assessment
-         SET status = 'in_progress', started_at = COALESCE(started_at, NOW())
-         WHERE assessment_id = $1`,
-        [assessmentId],
-      )
+    const nowMs = Date.parse(ts(open[0].database_now) ?? '')
+    const closeMs = Date.parse(ts(open[0].close_deadline) ?? '')
+    const answer = ts(open[0].answer_deadline)
+
+    if (!Number.isFinite(nowMs) || !Number.isFinite(closeMs) || nowMs >= closeMs) {
+      await runQuery(client,
+        `UPDATE greenhouse_hiring.hiring_assessment SET status = 'expired', updated_at = clock_timestamp()
+         WHERE assessment_id = $1 AND status = 'in_progress'`, [assessmentId])
+
+return { outcome: 'expired' }
+    }
+
+    // Sin límite explícito, la ventana completa de 24 h es también la ventana de guardado.
+    if (answer && nowMs >= Date.parse(answer)) {
+      throw new HiringValidationError('La evaluación ya no acepta respuestas.', 'assessment_not_open', 409)
     }
 
     // Tipo real desde DB cuando hay pregunta; el declarado solo para respuestas ad-hoc.
@@ -516,9 +610,17 @@ export const saveResponse = async (input: SaveResponseInput): Promise<Assessment
       [assessmentId, questionId, competencyId, JSON.stringify(input.answer ?? {}), needsHumanRating],
     )
 
-    
-return normalizeResponse(rows[0])
-  })
+  return { outcome: 'ok', value: normalizeResponse(rows[0]) }
+}
+
+export const saveResponse = async (input: SaveResponseInput): Promise<AssessmentResponse> => {
+  const result = await withGreenhousePostgresTransaction((client) => saveResponseWithClient(client, input))
+
+  if (result.outcome === 'expired') {
+    throw new HiringValidationError('La evaluación ya no acepta respuestas.', 'assessment_not_open', 409)
+  }
+
+  return result.value
 }
 
 /** Rating por competencia de un evaluador humano (interviewer_scorecard). */
@@ -643,6 +745,19 @@ export const listResponses = async (
 return rows.map(normalizeResponse)
 }
 
+/** Reader transaccional para el boundary candidato; no aplica vistas de evaluador humano. */
+export const listResponsesWithClient = async (
+  client: PoolClient,
+  assessmentId: string,
+): Promise<AssessmentResponse[]> => {
+  const rows = await runQuery<ResponseRow>(client,
+    `SELECT ${RESPONSE_COLS} FROM greenhouse_hiring.hiring_assessment_response
+      WHERE assessment_id = $1 ORDER BY created_at`,
+    [assessmentId])
+
+  return rows.map(normalizeResponse)
+}
+
 /**
  * Ratings de scorecards de OTROS evaluadores de una application, respetando independent-before-debrief:
  * solo se devuelven si el evaluador que mira ya cerró (submitted/scored) su propio scorecard.
@@ -691,29 +806,84 @@ return method as AssessmentMethod
 export const reissueCandidateTestTokenForEmail = async (
   assessmentId: string,
 ): Promise<{ token: string; timeLimitMinutes: number | null; tokenTtlDays: number } | null> => {
-  const rawToken = randomBytes(24).toString('base64url')
+  return withGreenhousePostgresTransaction(client => reissueCandidateTestTokenForEmailWithClient(client, assessmentId))
+}
 
-  return withGreenhousePostgresTransaction(async (client) => {
-    const rows = await runQuery<{ assessment_id: string; time_limit_minutes: number | string | null }>(
-      client,
-      `UPDATE greenhouse_hiring.hiring_assessment
+export const reissueCandidateTestTokenForEmailWithClient = async (
+  client: PoolClient,
+  assessmentId: string,
+): Promise<{ token: string; timeLimitMinutes: number | null; tokenTtlDays: number } | null> => {
+  const rawToken = randomBytes(24).toString('base64url')
+  const accessTokenVersionId = randomUUID()
+
+  const rows = await runQuery<{ assessment_id: string; time_limit_minutes: number | string | null }>(
+    client,
+    `UPDATE greenhouse_hiring.hiring_assessment
        SET access_token_hash = $2,
+           access_token_version_id = $3::uuid,
            token_expires_at = NOW() + make_interval(days => ${TOKEN_TTL_DAYS}),
            status = 'sent',
            updated_at = NOW()
        WHERE assessment_id = $1 AND method = 'candidate_test' AND status IN ('assigned', 'sent')
        RETURNING assessment_id, time_limit_minutes`,
-      [assessmentId, hashToken(rawToken)],
-    )
+    [assessmentId, hashToken(rawToken), accessTokenVersionId],
+  )
 
-    if (!rows[0]) return null
+  if (!rows[0]) return null
 
-    const rawLimit = rows[0].time_limit_minutes
+  const rawLimit = rows[0].time_limit_minutes
 
-    return {
-      token: rawToken,
-      timeLimitMinutes: rawLimit == null ? null : Number(rawLimit),
-      tokenTtlDays: TOKEN_TTL_DAYS,
-    }
-  })
+  return {
+    token: rawToken,
+    timeLimitMinutes: rawLimit == null ? null : Number(rawLimit),
+    tokenTtlDays: TOKEN_TTL_DAYS,
+  }
+}
+
+/**
+ * TASK-1746 — Rotation primitive for a governed access recovery. The caller has already
+ * inserted the recovery receipt in the same transaction, so the deferred DB constraint
+ * proves that this update and its audit either commit together or both roll back.
+ */
+export const rotateCandidateTestTokenForAccessRecoveryWithClient = async (
+  client: PoolClient,
+  input: {
+    assessmentId: string
+    expectedStatus: 'assigned' | 'sent' | 'in_progress' | 'expired'
+    resultingStatus: 'sent' | 'in_progress'
+    expiresAt: Date
+    tokenVersionId: string
+  },
+): Promise<{ token: string; timeLimitMinutes: number | null } | null> => {
+  const rawToken = randomBytes(24).toString('base64url')
+
+  const rows = await runQuery<{ assessment_id: string; time_limit_minutes: number | string | null }>(
+    client,
+    `UPDATE greenhouse_hiring.hiring_assessment
+     SET access_token_hash = $2,
+         access_token_version_id = $3::uuid,
+         token_expires_at = $4,
+         status = $5,
+         updated_at = NOW()
+     WHERE assessment_id = $1
+       AND method = 'candidate_test'
+       AND status = $6
+       AND (($5 = 'sent' AND started_at IS NULL) OR ($5 = 'in_progress' AND started_at IS NOT NULL))
+     RETURNING assessment_id, time_limit_minutes`,
+    [
+      input.assessmentId,
+      hashToken(rawToken),
+      input.tokenVersionId,
+      input.expiresAt,
+      input.resultingStatus,
+      input.expectedStatus,
+    ],
+  )
+
+  if (!rows[0]) return null
+
+  return {
+    token: rawToken,
+    timeLimitMinutes: rows[0].time_limit_minutes == null ? null : Number(rows[0].time_limit_minutes),
+  }
 }

@@ -20,7 +20,9 @@ Load whenever the work happens _inside_ the Greenhouse repo (not pure advisory).
 - `TASK-1360` Assessment Engine — competency catalog (category × level), question bank (**answer_key sensitive, separate, never candidate-facing**), templates (compose per role; Account Manager seed), instances, objective + human scoring, competency-result rollup into `hiring_application` (**advisory**).
 - `TASK-1361` Assessment AI Assist — AI **proposes** questions + open-answer scores; **human confirms**; eval baseline; flag OFF default. (This is the AI-Act-safe pattern — see `assessment-interviewing.md`.)
 - `TASK-1362` Candidate Document Capture — CV/portfolio on the **private assets platform** (reuse, don't build buckets); **identity docs reuse the `person_identity_documents` table** (masked storage + append-only audit), captured **post-decision**; quarantine/scan for public uploads. ⚠️ The _reveal_ of a candidate's identity document does **not** use `person.legal_profile.reveal_sensitive` — that is the member-scoped path of TASK-784. The candidate path is `hiring.candidate.reveal_identity` (TASK-1714) — see §Candidate documents below.
-- `TASK-1363` Assessment Taking + Review Surface — candidate takes the test via a **public tokenized Greenhouse link** (`/assessment/[token]`, single-use, time-limited); internal review in Application 360 with advisory scorecard, queue and correction drawer. Complete local on 2026-07-13; rollout depends on push/deploy.
+- `TASK-1363` Assessment Taking + Review Surface — candidate takes the test through the public assessment
+  surface; internal review lives in Application 360 with advisory scorecard, queue and correction drawer.
+  The legacy bearer route remains active while TASK-1746's session cutover flag is OFF.
 
 ### Assessment operating flow (humans + agents)
 
@@ -35,10 +37,44 @@ Operational sequence:
 
 - Open Application 360 (`/agency/hiring/applications/[applicationId]`) → tab `Evaluación`.
 - Assign an active template with `POST /api/hiring/assessments` (`applicationId`, `templateId`, `method='candidate_test'`, optional time limit). Requires `hiring.assessment.author`.
-- Copy `/assessment/<token>` immediately; raw token is shown once, backend stores hash only.
-- Candidate completes via `GET/POST /api/public/assessment/[token]`; payload is allowlisted and never contains answer key/rubric.
+- Do not copy or reconstruct an assignment token. The outbound token-sensitive sender issues access without
+  persisting the bearer in generic outbox, delivery metadata, audit or logs.
+- While the session cutover flag is OFF, the candidate uses the legacy link. After the governed cutover, the
+  browser exchanges `#access=<bearer>` for a secure cookie and all taking operations are token-free.
 - Operator reviews via `GET /api/hiring/assessments/[id]`; score/finish via `/score` under `hiring.assessment.score`.
 - Decision remains human in Application 360. `selected + internal_hire` → handoff → Hiring Activation Lane. Assessment never activates anyone directly.
+
+### Assessment delivery, recovery and public session (TASK-1745/1746)
+
+**Runtime status (2026-08-19): code complete and locally validated; rollout pending.** The Resend webhook is
+not registered/verified live, recovery UI is not available, migration/index are not applied, recovery email
+type is born OFF, and `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` defaults OFF in ops-worker. Therefore
+legacy links remain the current production behavior and provider lifecycle/recovery must not be described as
+active.
+
+- Global lifecycle: historical `sent` = provider accepted dispatch, never inbox delivery. Signed provider
+  events own `delivered|bounced|complained|suppressed|delayed|failed`; open/click are engagement. The inbound
+  receiver is observer-only and cannot block outbound.
+- Token-sensitive intent: reserve durable, IDs-only/allowlisted metadata before credential issue or rotation.
+  Never durably store bearer, URL, name or contact. No generic retry/batch. Accepted + uncertain persistence is
+  `unknown`; stale intent is an operator signal and requires explicit recovery.
+- Recovery: one command, same assessment, channels `email|secure_link`. Email starts within 14d; secure link
+  within 24h and is revealed once. Provider block affects email only. Replay returns receipt without URL.
+  Separate capabilities: `hiring.assessment.recover_access_email` and
+  `hiring.assessment.reveal_access_link`; human roles only, reason enum, IDs-only audit. Cross-channel cooldown
+  60s and cap 3 successful rotations/assessment/24h.
+- Eligibility: unstarted `assigned|sent`; `in_progress` only before answer deadline; `expired` only never-started
+  access expiry. Submitted/scored/cancelled, elapsed, terminal or withdrawn is blocked. Final recheck occurs
+  under assessment→application→candidate locks. Recovery never changes stage/score/answers or extends time.
+- Time: start-by governs unstarted access; after start, answer deadline is `started_at + effective time` with
+  accommodations. Thirty-minute grace freezes answers and permits submit. No-limit uses 24h. DB clock is
+  canonical; UI derives from its DB anchor.
+- Session boundary after cutover: same-origin fragment exchange → HttpOnly Secure SameSite=Lax cookie;
+  GET/start/save/submit/SELF-ID carry no bearer. Reload/multi-tab resumes/fences the session without losing
+  access. Public errors remain generic. Limiting uses credential/session HMAC bucket plus generous IP ceiling.
+
+Docs: `docs/documentation/hr/entrega-y-recuperacion-de-acceso-a-tests.md` and
+`docs/manual-de-uso/hr/recuperar-acceso-a-test-de-candidato.md`.
 
 ## The handoff (decision → downstream runtime, TASK-356 ✓ complete)
 

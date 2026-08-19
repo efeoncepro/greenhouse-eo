@@ -35,12 +35,12 @@ vi.mock('@/lib/sync/publish-event', () => ({
 /** Ledger de entregas simulado, con clave exacta `${entity}:${emailType}`. */
 const deliveredEmails = new Set<string>()
 
-const wasEmailDeliveredForEntity = vi.fn(async (entity: string, emailType: string) =>
+const wasEmailDispatchedForEntity = vi.fn(async (entity: string, emailType: string) =>
   deliveredEmails.has(`${entity}:${emailType}`),
 )
 
 vi.mock('@/lib/email/delivery', () => ({
-  wasEmailDeliveredForEntity: (entity: string, emailType: string) => wasEmailDeliveredForEntity(entity, emailType),
+  wasEmailDispatchedForEntity: (entity: string, emailType: string) => wasEmailDispatchedForEntity(entity, emailType),
 }))
 
 const { cancelCandidateTest } = await import('./cancel')
@@ -91,7 +91,7 @@ beforeEach(() => {
   queries.length = 0
   handlers = []
   publishOutboxEvent.mockClear()
-  wasEmailDeliveredForEntity.mockClear()
+  wasEmailDispatchedForEntity.mockClear()
   deliveredEmails.clear()
 })
 
@@ -174,7 +174,7 @@ describe('cancelCandidateTest — TASK-1719 Slice 3', () => {
     const result = await cancelCandidateTest({ assessmentId: 'asmt-1', reasonCode: 'sent_in_error' }, ACTOR)
 
     expect(result.operatorFollowupRequired).toBe(true)
-    expect(wasEmailDeliveredForEntity).toHaveBeenCalledWith('asmt-1', 'hiring_assessment_assigned')
+    expect(wasEmailDispatchedForEntity).toHaveBeenCalledWith('asmt-1', 'hiring_assessment_assigned')
   })
 
   it('rechaza con 409 cuando `expectedStatus` quedó desalineado', async () => {

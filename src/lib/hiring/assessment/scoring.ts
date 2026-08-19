@@ -1,11 +1,14 @@
 import 'server-only'
 
+import type { PoolClient } from 'pg'
+
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { OBJECTIVE_QUESTION_TYPES, type AssessmentScorecard, type QuestionType } from '@/types/hiring-assessment'
 
 import { HiringNotFoundError, HiringValidationError } from '../errors'
+import type { AssessmentDeadlineResult } from './instances'
 
 // ══════════════════════════════════════════════════════════════════════════
 // Objective auto-scoring — PURE (testeable sin PG). Escala canónica 0-100.
@@ -78,14 +81,25 @@ return Number.isFinite(n) ? n : 0
  * las abiertas en cola humana, y marca la instancia `submitted`. NO hace rollup todavía (espera
  * a que las abiertas se corrijan). Emite hiring.assessment.submitted.
  */
-export const submitAssessment = async (assessmentId: string, actorUserId: string | null): Promise<void> => {
-  await withGreenhousePostgresTransaction(async (client) => {
+export const submitAssessmentWithClient = async (
+  client: PoolClient,
+  assessmentId: string,
+  actorUserId: string | null,
+): Promise<AssessmentDeadlineResult<void>> => {
     const a = await client.query(
-      `SELECT status, method FROM greenhouse_hiring.hiring_assessment WHERE assessment_id = $1 FOR UPDATE`,
+      `SELECT status, method, clock_timestamp() AS database_now,
+              greenhouse_hiring.assessment_candidate_test_close_deadline(
+                started_at, time_limit_minutes, accommodations_json) AS close_deadline
+         FROM greenhouse_hiring.hiring_assessment WHERE assessment_id = $1 FOR UPDATE`,
       [assessmentId],
     )
 
-    const row = a.rows[0] as { status: string; method: string } | undefined
+    const row = a.rows[0] as {
+      status: string
+      method: string
+      database_now: Date | string
+      close_deadline: Date | string | null
+    } | undefined
 
     if (!row) throw new HiringNotFoundError('La evaluación no existe.', 'assessment_not_found')
 
@@ -93,6 +107,18 @@ export const submitAssessment = async (assessmentId: string, actorUserId: string
     // autosave). Un submit sobre assigned/sent = flujo roto, no un estado válido.
     if (row.status !== 'in_progress') {
       throw new HiringValidationError('La evaluación no está en progreso.', 'assessment_not_open', 409, { status: row.status })
+    }
+
+    if (!row.close_deadline
+        || new Date(row.database_now).getTime() >= new Date(row.close_deadline).getTime()) {
+      await client.query(
+        `UPDATE greenhouse_hiring.hiring_assessment
+            SET status = 'expired', updated_at = clock_timestamp()
+          WHERE assessment_id = $1 AND status = 'in_progress'`,
+        [assessmentId],
+      )
+
+return { outcome: 'expired' }
     }
 
     // Auto-score objetivo: join a la pregunta para conocer type + answer_key.
@@ -135,7 +161,18 @@ export const submitAssessment = async (assessmentId: string, actorUserId: string
       },
       client,
     )
-  })
+
+    return { outcome: 'ok', value: undefined }
+}
+
+export const submitAssessment = async (assessmentId: string, actorUserId: string | null): Promise<void> => {
+  const result = await withGreenhousePostgresTransaction(
+    (client) => submitAssessmentWithClient(client, assessmentId, actorUserId),
+  )
+
+  if (result.outcome === 'expired') {
+    throw new HiringValidationError('La evaluación ya no está disponible.', 'assessment_not_open', 409)
+  }
 }
 
 /** Corrección humana de una respuesta abierta/situacional (o confirmación de sugerencia IA). */

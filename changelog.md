@@ -3,6 +3,151 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-19 — El rollout de assessment iba a romper producción y a cortarle el test a los candidatos
+
+- **Una migración que no era aplicable en ningún orden.** El CHECK y el trigger de versión de
+  credencial rompían el writer que corre en `main`; el código nuevo rompía sin la migración.
+  Partida en expand/contract, con la fase contract FUERA de `migrations/` — porque el runner
+  aplica todas las pendientes en una transacción y un comentario de advertencia no detiene a un
+  runner.
+- **La sesión del candidato caducaba en el plazo para EMPEZAR, no en el de responder.** Quien
+  abría el enlace poco antes del límite y arrancaba perdía la sesión a mitad del test.
+- **Un enlace roto era invisible.** El bearer viaja en el fragmento, que nunca llega al servidor:
+  si un reescritor lo borra, el candidato queda fuera sin generar un solo request. Ahora hay un
+  hecho durable del canje y una señal que lo delata.
+- **El cap de recuperación castigaba al candidato por fallas nuestras**: contaba intentos fallidos
+  y compartía cuota con el enlace seguro, que es justamente el canal de rescate cuando el correo
+  no llega.
+- Todo salió de auditorías independientes con skills de arquitectura, talento y seguridad, corridas
+  ANTES de promover. Dos auditores encontraron el mismo P0 sin verse entre sí.
+
+## 2026-08-19 — Un guard que verificaba menos de lo que su propio Down borraba
+
+- **La migration de TASK-1746 tenía un hueco silencioso.** Su bloque anti pre-up-marker contaba
+  capabilities, triggers y columnas de sesión, pero no la tabla `hiring_assessment_public_request_bucket`
+  ni las cuatro funciones de acceso público — que el Down sí dropeaba. La migration creció en dos tandas y
+  el guard, que vive al final del Up, no se actualizó con la segunda. Un fallo en ese DDL habría quedado
+  registrado como aplicado, verde, y sólo habría aparecido a las 04:17 cuando el cron de retención llamara
+  una función inexistente. Corregido antes de aplicarla, así que no hizo falta forward-fix.
+- **Regla nueva en la spec de migraciones:** el guard del Up debe cubrir todo lo que el Down dropea, y una
+  migration editada en varias tandas necesita revisarlo en cada tanda. Es una comparación mecánica de dos
+  listas: los `DROP` del Down contra los contadores del guard.
+- **El ledger de flags afirmaba dos cosas falsas.** `HIRING_STAGE_TEST_ASSIGNMENT_ENABLED` figuraba ON en
+  una sección y OFF en otra; la revisión activa `ops-worker-00585-nv6` lo tiene en `true`, así que la
+  segunda era la equivocada. Y `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`, code-complete sin prender,
+  sólo estaba en el snapshot y no en `§ Pendientes de acción`, que es donde la regla del propio ledger lo
+  exige. Ambas corregidas contra runtime, no contra memoria.
+
+## 2026-08-19 — Un patrón nuevo en el catálogo, y una señal que nadie había registrado
+
+- **Octavo patrón canónico: "hecho declarado al nacer + copia derivada donde se filtra + obligación de
+  propagar".** Cruzó el umbral de tres dominios que el propio catálogo exige (Hiring, Knowledge y
+  Finance), y su valor no es describir lo que ya hacíamos: es forzar una decisión explícita. O te
+  obligas a propagar en la misma transacción y con señal de divergencia —y entonces los readers pueden
+  confiar en la copia—, o no te obligas y los readers críticos leen la raíz. Lo prohibido es el tercer
+  camino: filtrar por una copia que nadie se comprometió a mantener.
+- **Once señales del módulo Hiring estaban vivas en runtime pero sin documentar** en el control plane;
+  ahora hay inventario con la task dueña de cada una. Ocho siguen sin delta propio: deuda documental
+  declarada, no ausencia en producción.
+- **Cinco punteros quedaron rotos** al mover TASK-1739 a `complete/`, uno de ellos dentro de una señal
+  de reliability que corre en producción. Corregidos.
+
+## 2026-08-19 — On-Going y On-Demand ya comparten una ontología sin confundir engagement con proyecto
+
+- Se formalizó `Organization → Engagement → Project/Campaign → Task`: la organización y su Space conservan la
+  relación y memoria; el engagement gobierna contrato, capacidad, economics y cierre; proyectos/campañas siguen
+  siendo contenedores de tareas para ejecutar trabajo del cliente.
+- Un engagement On-Going puede producir múltiples proyectos/campañas y uno On-Demand puede contener uno o varios;
+  On-Demand describe un compromiso acotado, no un proyecto pequeño ni un retainer corto.
+- La venta se activa hacia Delivery mediante una Ficha de Activación que referencia quote/SOW/contrato, y crea sólo
+  la diferencia sobre el workspace durable. La Gantt es opcional y se deriva de Projects/Tasks.
+- `Product Service` no se usa como sinónimo de todo lo vendido: campaña audiovisual, plan de medios, brandbook y
+  otros servicios/deliverables conservan su categoría y nivel real de productización.
+- El contrato queda `Proposed` y sin cambio de runtime. La forma física sobre `services`, Notion, HubSpot, Finance,
+  equipos y Client Portal requiere cohortes reales, task y ADR antes de implementarse.
+
+## 2026-08-19 — El acceso al test ya tiene sesión opaca y reloj autoritativo
+
+- Cada credencial de evaluación tiene una versión explícita; las sesiones candidatas guardan solo un digest
+  opaco vinculado a esa versión, de modo que una recuperación invalida de inmediato los accesos anteriores.
+- El test distingue plazo para comenzar, plazo para responder y 30 minutos de gracia para revisar/enviar. Las
+  evaluaciones sin límite cierran a las 24 horas y ya no aparecen como “0 min”.
+- El navegador proyecta el reloj de base de datos con tiempo monotónico, por lo que cambiar el reloj local no
+  adelanta ni atrasa los límites. Durante la gracia se congelan respuestas, pero revisar y enviar siguen activos.
+- GET/start/save/submit y SELF-ID legacy mantienen decisión, consentimiento, captura y audit bajo una sola
+  transacción. El código fue auditado sin P0/P1/P2; sigue OFF y sin migración aplicada hasta completar el
+  fragment exchange, la cookie HttpOnly, Product API y los smokes reales.
+- La frontera browser ya está implementada localmente: elimina `#access` antes de React/red, intercambia por cookie
+  `__Host-` HttpOnly y usa rutas token-free con CSP/no-store/no-referrer. Maintenance y trailing slash no desvían el
+  bootstrap; un fence evita que dos pestañas muten assessments distintos.
+- El correo vigente no cambia al desplegar este código: el cutover vive en
+  `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`, default OFF. ON queda bloqueado por migración+índice, rutas live,
+  `click_tracking=false` de Resend, rate limit y smokes reales de href/cookie/browser.
+- El backend de recuperación ya tiene un único command para email o enlace manual, Product API sólo para sesiones
+  humanas y revelación one-time. Siempre rota el acceso del assessment existente; nunca crea otro test, reinicia el
+  reloj, cambia etapa, score o respuestas.
+- El guard antiabuso combina cuota por credential/sesión válida con techo IP confiable de Vercel. Tokens aleatorios
+  inválidos no crean cardinalidad durable; la purga diaria drena con readback/señal. Savepoints conservan el consumo
+  de cuota y revierten writes parciales si una acción falla.
+- Arquitectura, manuales, issue/tasks y skills de Talento/Arquitectura/Secret Hygiene quedaron sincronizados. El
+  runbook global de Resend fija orden de migraciones, índice concurrente, webhook firmado, reconciliación,
+  `click_tracking=false`, smokes y rollback. Todo sigue `code complete, rollout pendiente`.
+
+## 2026-08-19 — El reenvío gobernado de tests ya tiene command seguro
+
+- La recuperación por email genera un acceso nuevo sin duplicar el test, conserva el plazo cuando la evaluación
+  ya comenzó y registra actor, motivo y resultado sin guardar el enlace secreto.
+- Si Resend acepta y el proceso cae antes de cerrar la operación, el sistema reconcilia el receipt desde evidencia
+  durable sin enviar otro correo ni invalidar nuevamente el enlace; Platform Health muestra el drift restante.
+- HTML y texto plano distinguen despacho de entrega, invalidan enlaces anteriores y, para tests en curso, piden
+  continuar de inmediato con el deadline expresado en hora de Chile.
+- El command está validado localmente, pero sigue inaccesible: el tipo de correo está OFF y faltan la sesión
+  HttpOnly, API autorizada, migraciones, índice y smokes antes de cualquier activación.
+
+## 2026-08-19 — Los correos con enlaces de acceso ya no dependen de reintentos ciegos
+
+- Reset de contraseña, invitaciones, verificaciones, magic links, tests y acceso a Talent Pool comparten ahora
+  una protección global: el sistema guarda una intención redactada antes de emitir la credencial y nunca
+  persiste el enlace secreto para reconstruirlo después.
+- Dos workers concurrentes o un replay del mismo evento no pueden rotar dos veces el acceso. Si el proveedor
+  rechaza el correo se registra como fallo; si lo aceptó pero faltó confirmación local, se registra como incierto
+  y requiere recuperación explícita en vez de afirmar que no salió o reenviarlo automáticamente.
+- El cambio está validado localmente por Arquitectura, Talento y Seguridad. Todavía no está activo: primero se
+  instalará el índice concurrente con readback verde, sin pausar el resto del correo del sistema.
+
+## 2026-08-19 — La recuperación de acceso a tests ya tiene una base segura y auditable
+
+- Se definieron dos permisos distintos: reenviar por email y revelar un enlace temporal. Ninguno recupera ni
+  almacena el enlace anterior; cada acción futura rotará el acceso y quedará auditada sin nombre, correo,
+  teléfono, URL ni token.
+- La base bloquea recoveries sobre postulaciones cerradas, consentimiento retirado, tests terminados o timers
+  vencidos. Un test iniciado conserva exactamente su deadline, accommodations y gracia; una transacción larga
+  no puede confirmar después del vencimiento.
+- La evidencia nace automáticamente en la misma transacción y la retención distingue candidatos de personas
+  seleccionadas. El retiro de consentimiento Hiring no puede borrar registros que ya pasaron a retención
+  laboral.
+- Este slice está validado localmente pero todavía no opera en producción: la migración no se aplicará hasta
+  que exista el command token-safe y los smokes PostgreSQL prueben ACL, concurrencia, rollback y purga.
+
+## 2026-08-19 — El tablero de Hiring dejó de mostrar gente y vacantes que no existen
+
+- **Lo que ve hoy quien abre el desk son procesos reales.** El tablero pasó de 24 vacantes y 79
+  postulaciones a **2 y 47**: la diferencia no se perdió ni se borró, era dato de prueba que hasta ayer
+  se contaba como si fuera un candidato o una búsqueda de verdad. Las dos vacantes vivas siguen ahí,
+  con todos sus postulantes, verificadas una por una antes y después.
+- **Menos filas no es pérdida de datos.** Si el tablero se ve más vacío que ayer, es porque por primera
+  vez muestra sólo lo que representa a una persona o una búsqueda del mundo real. Lo demás quedó
+  archivado y recuperable, no eliminado.
+- **La evaluación con IA ya no puede aprender de respuestas inventadas.** Había una respuesta de prueba
+  calificada con 90 puntos, lista para entrar al conjunto con que se calibra el sistema. No era un riesgo
+  a futuro: ya había pasado. Ahora queda excluida sin interruptor para volver atrás.
+- **Los conteos y métricas de contratación por fin cuentan personas.** Todo lo que se lee desde el
+  tablero y la reserva de talento parte del mismo criterio, así que dejaron de convivir dos verdades
+  sobre cuánta gente hay en un proceso.
+- **Lo que todavía no cambia**: nueve registros de prueba quedan archivados en vez de borrados, a la
+  espera de una decisión explícita. No aparecen en ninguna pantalla, así que borrarlos es prolijidad,
+  no necesidad.
+
 ## 2026-08-18 — Evaluación provisional automática y CV por MCP interno
 
 - Los assessments elegibles de cualquier vacante generan ahora evaluación IA provisional en segundo plano para
@@ -837,152 +982,3 @@ planners `.codex` y `.claude`: antes de tocar registry/README o commitear, toda 
 aunque tenga cero errores, es un fallo bloqueante. La reparación también completó los contratos
 wireframe/flow/motion/readiness de TASK-1686; no cambió runtime, rutas, acceso ni la implementación de
 la task.
-
-## 2026-08-10 — TASK-1389 cerrada: la navegación quedó con candado anti-regresión
-
-Cierra el programa de navegación del día (1388 → 1686 → 1389): Contrato de Asignación de Superficies
-canónico (qué destino va a qué superficie, sin duplicar, nada nuevo colgado del primer nivel fuera de
-zonas) + campo `Nav placement` obligatorio en tasks con destino visible + gate `pnpm nav:budget` que
-mide el árbol real del rail interno contra el presupuesto (8 slots top-level · profundidad 2 · cero
-`/my/*`) y el manifest. Nació directo en `error` con 0 violaciones medidas; doble cobertura CI (suite
-+ job en design-contract.yml). Lo que infló el sidebar a 96 hojas ya no puede repetirse en silencio.
-
-## 2026-08-10 — TASK-1686 cerrada: el colaborador puro deja de ver un portal ajeno
-
-Continuación directa de TASK-1388, mismo día: la rama no-interna del menú bifurca con
-`isPureCollaborator` y el colaborador (solo rol Colaborador) ve exclusivamente su portal — rail =
-Mi Greenhouse + Mi Ficha + recursos concedidos; avatar = identidad + Mi Perfil + salir. Se cierran
-los shortcuts cliente sin gating del avatar, el heading "Mi Cuenta" vacío y el borde de claims
-vacíos. El trigger del avatar pasa a botón semántico (aria + teclado + Esc/restore) para TODAS las
-audiencias. Cliente, interno e híbrido my+client conservan su salida byte-a-byte (tests de control
-19+7). Evidencia GVC con la persona collaborator real, baselines durables y scorecard 5.0.
-
-## 2026-08-10 — TASK-1388 cerrada: la navegación interna se reparte entre sus 3 superficies
-
-Reequilibrio del portal interno en develop (5 commits, sin push): el rail pasa de 12 grupos top-level
-a 3 zonas (Operación · Administración · Recursos) con dominios colapsables uniformes; las hojas
-personales `/my/*` viven ahora en el dropdown del avatar (header de perfil clickeable, sin atajos
-admin duplicados) servidas por el builder canónico `src/lib/navigation/my-nav-items.ts`; y hay UNA
-sola palette ⌘K (la `CommandPalette` de TASK-696, ahora con filtro de audiencia + recientes +
-acciones — la `NavSearch` retirada exponía el `VIEW_REGISTRY` completo sin filtrar).
-
-- Cero cambios de ruta/URL ni de gating: el set de hojas por rol quedó fijado por test de identidad
-  (`VerticalMenu.test.tsx`, interno + no-interno).
-- Dedup: Sample Sprints con hogar único en Comercial, Growth como sección de Comercial, "Spaces
-  (admin)" desambiguado, Herramientas IA una sola vez, `verticalMenuData.tsx` legacy borrado.
-- Los 4 hallazgos a11y del chrome que TASK-1675 midió quedaron cerrados: focus ring en el rail,
-  región scrollable con role/label/foco, toggle del drawer accesible, desborde de 8px del panel.
-- Evidencia GVC premium (3 scenarios, desktop+390px) + scorecard 4.93 + baselines durables
-  promovidos. Cerrada el mismo día con autorización del operador: build de producción verde, test
-  full (10.447), `UI ready: yes` (card-sort formal queda como validación posterior no bloqueante).
-
-## 2026-08-09 — Barrido documental del carril cliente: el doc de contrato estaba invertido
-
-Tres auditorías paralelas (arquitectura, docs funcionales/manuales, skills) tras los dos releases.
-
-- 🔴 **El §0 Status de `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1` afirmaba que no existían cuatro piezas que
-  se implementaron entre `TASK-824` y `TASK-828`** — carpeta, namespace de API, schema y modelo de
-  módulos. Tres meses así, y es lo primero que lee un agente que abre el doc de contrato del dominio.
-- ⚠️ **Defecto vivo que causó el assignment de hoy:** `/creative-hub` no existe y Sky Airlines ve el
-  enlace. Señal nueva `identity.client_portal.assigned_view_without_route` (hoy en 1). La condición la
-  crea un cambio de DATO, no un deploy, así que ningún gate de código la veía — y
-  `route-reachability-gate` sólo cubre la dirección contraria.
-- Los dos companions de invariantes no tenían nada del page guard ni de la derivación invertida, que es
-  justo lo que un agente carga al tocar el dominio. Agregados.
-- Cinco aprendizajes de proceso a sus skills dueñas: el context gate va último, un gate con expectativa
-  hardcodeada no prueba el motor, un override de lint fuera del alcance de la regla no protege nada,
-  `VERCEL_ENV` nunca `NODE_ENV`, y una nota del Handoff no es evidencia.
-
-## 2026-08-09 — El carril del portal cliente, cerrado y verificado EN PRODUCCIÓN (release `ee0d568b8614`)
-
-Segundo release del día. Manifest `released`, watchdog `drift_count=0`, **sin bypass del batch policy**
-(cero migraciones — el contraste con el release de la mañana, que sí lo necesitó, muestra que la
-diferencia es la presencia de migraciones y no el tamaño del batch).
-
-- **Verificación completa en producción:** 9 rutas × 3 personas con sesión real. Las 3 vistas base
-  sirven `200`, las 6 module-gated redirigen a `/home?denied=<slug>`, cero `resolver_unavailable`, y
-  `/proyectos` sirve `200` al operador interno donde antes devolvía `/401`.
-- 🔴 **Corrección de un supuesto propio:** `agent-session` **sí** funciona en producción
-  (`AGENT_AUTH_ALLOW_PRODUCTION` seteada desde ~90 días). Lo negué toda la sesión tomándolo de una nota
-  del Handoff sin verificarlo. Postura abierta en `TASK-1684`.
-- Dos aprendizajes de release documentados en runbook + ambas skills: `vercel redeploy` no arregla un
-  staging cancelado por docs-only, y el context gate va último porque `docs:closure-check` no lo
-  reemplaza.
-
-## 2026-08-09 — La verificación en staging del portal cliente encontró dos defectos más
-
-Recorrí las 9 rutas × 3 personas con sesión real contra staging. El fix quedó confirmado en runtime
-desplegado —3 base sirven `200`, las 6 module-gated redirigen a `/home?denied=<slug>`, **cero**
-`?error=resolver_unavailable`— y de paso salieron dos cosas que sólo se ven ejerciendo el flujo:
-
-- **`/proyectos` devolvía `/401` al operador interno**, y era la única de las 9 que conservaba un gate
-  legacy por route group **encima** del canónico, con el comentario de al lado diciendo que el
-  canónico lo reemplazaba. Corría primero, así que ganaba, y el scope del operador interno no incluye
-  `client`. Arreglado, con una guarda de source que barre las 9 páginas. **Producción sigue con el
-  síntoma hasta el próximo release** — clasificado `MENOR`: es fail-closed de más, no expone nada.
-- **El override de organización era solo-local por usar `NODE_ENV`.** Vercel compila todos los
-  deployments con `NODE_ENV=production`, así que el bloqueo apagaba el flag también en staging. El
-  discriminador canónico del repo es `VERCEL_ENV` (mismo que `agent-session` y `proxy.ts`). Corregido,
-  y **sin** válvula de escape de producción: la divergencia con `agent-session` es deliberada porque
-  este override concede lectura cross-tenant.
-
-## 2026-08-09 — El carril de acceso del portal cliente queda cerrado del todo (TASK-1680 + Creative a SKY)
-
-Las tres piezas que quedaban después del release: el módulo Creative asignado, el lint cerrado y los
-dos hallazgos de tooling con ID.
-
-- **Creative Hub Globe asignado a Sky Airlines** vía el command canónico `enableClientPortalModule`
-  (no SQL: es el único camino con audit + outbox + invalidación de cache en una transacción). Las 4
-  páginas Creative del portal abren para SKY y siguen en empty state para el resto — que es el
-  producto funcionando.
-- **`TASK-1680`**: el lint `no-untokenized-business-line-branching` pasa a `error`. La medición dio
-  **0 violaciones** con el override intacto, y reveló que **4 de sus 6 entradas eximían paths que la
-  regla nunca miró** — hacían ver la gobernanza más estricta de lo que era. Quedó una exención, medida
-  y con dueño. 6 archivos muertos borrados de paso.
-- **El gate de verificación pasa a derivar su expectativa de los datos.** Hardcodeaba "3 abren y 6
-  empty state" y al asignarle el módulo a SKY reportó cuatro desvíos **por hacer lo correcto**. Un
-  gate que se edita por organización no prueba el carril: prueba que la primera organización sigue
-  igual.
-- `TASK-1682` (la capability del bypass de release sin verificador ni grant) y `TASK-1683` (la
-  rotación de contexto que borra el puntero al archive) quedan registradas con su medición.
-
-## 2026-08-09 — El carril de acceso del portal cliente, EN PRODUCCIÓN (release `2c87d71e2eca`)
-
-`TASK-1678` + `TASK-1679` promovidas juntas a propósito: la contención del fail-open se retira en el
-mismo instante en que el fail-open se cierra, así que no hubo ventana de exposición. Manifest
-`2c87d71e2eca-f444748c-92aa-484c-b118-02713ee63e06` en `released`, run `31335921151`, watchdog
-`drift_count=0`, `/api/auth/health` 200 con los 3 providers `ready`.
-
-- Pasó a la primera con un solo bypass previsto: los dos hallazgos del preflight se pre-emptaron antes
-  de tocar `main` (el staging `CANCELED` se resolvió con el propio push de código; el smoke sobre `main`
-  se **produjo** en vez de bypassearse).
-- 🔴 **Aprendizaje que no estaba en ningún runbook:** el marker `[release-coupled:]` **no** sirve para
-  `requires_break_glass` — sólo limpia `split_batch`. Ponerle marker a un `requires_break_glass` es
-  cargo-cult; su única salida es el bypass.
-- **Hay una sola instancia Cloud SQL:** producción, staging y local leen la misma base, así que las 2
-  migraciones del batch ya estaban aplicadas antes del deploy. Eso cambia cómo se evalúa el riesgo de un
-  release con `db_migrations`.
-- `TASK-1680` quedó desbloqueada (su `Blocked by` apuntaba a `TASK-1679`).
-
-## 2026-08-09 — Las 9 páginas del portal cliente dejaron de mentir (TASK-1679, cierra ISSUE-146)
-
-Las nueve rutas guardadas redirigían con `?error=resolver_unavailable` —el banner de "el servicio no
-está disponible"— por tres defectos que vivían en la misma función y se tapaban entre sí: el
-`redirect()` del camino `denied` estaba **dentro** del `try`, así que su propio `catch` lo interceptaba;
-el guard pasaba un `clientId` donde el resolver espera un `organizationId`; y seis viewCodes de rutas
-vivas no los declaraba ningún módulo. Ahora cada resultado tiene su destino: empty state para
-module-gated sin módulo, `organization_unresolved` para sesión sin organización, y
-`resolver_unavailable` sólo cuando el resolver falla de verdad.
-
-- `ModuleNotAssignedEmpty` volvió a existir en runtime, y una denegación legítima dejó de reportarse a
-  Sentry como error del resolver — el dominio `client_portal` acumulaba incidentes por funcionamiento
-  normal.
-- Tres vistas pasaron a allowlist base (`notificaciones`, `configuracion`, `actualizaciones`): no son
-  producto vendible. Ciclos y Analytics quedaron module-gated por decisión del operador.
-- `/reviews` se unificó en `cliente.reviews`; `cliente.revisiones` queda marcado como retirado
-  (append-only).
-- **Medido, no supuesto:** corregir el guard NO abre las 9. Los módulos que declaran 4 de esas vistas
-  no están asignados a ninguna organización, así que 3 abren y 6 muestran el empty state. Abrirlas es
-  un assignment, no código.
-- Persona de verificación con organización configurable, con 4 condiciones fail-closed y auditoría.
-  **Rollout pendiente:** no está en `main`.

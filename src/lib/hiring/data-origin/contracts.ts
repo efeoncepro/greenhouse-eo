@@ -11,7 +11,7 @@
  * marcado/purga, la señal de reliability y los tests. La escritura vive en los commands; acá sólo
  * viven el tipo, el predicado de filtro y la derivación.
  *
- * Contrato vinculante: `docs/tasks/in-progress/TASK-1739-hiring-synthetic-data-provenance.md`.
+ * Contrato vinculante: `docs/tasks/complete/TASK-1739-hiring-synthetic-data-provenance.md`.
  */
 
 /**

@@ -404,6 +404,13 @@ ENV_VARS="${ENV_VARS},GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED=${GROWTH_EBOOK_EMAIL_D
 HIRING_LIFECYCLE_EMAILS_ENABLED="${HIRING_LIFECYCLE_EMAILS_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},HIRING_LIFECYCLE_EMAILS_ENABLED=${HIRING_LIFECYCLE_EMAILS_ENABLED}"
 
+# TASK-1746 — Cutover de links de assessment al exchange fragment→sesión HttpOnly.
+# Este sender corre sólo en ops-worker. Default OFF hasta aplicar migración, verificar routes
+# live, confirmar Resend click_tracking=false por API/readback y completar smoke del href.
+# No prender en Vercel: no tiene efecto. Rollback: volver a false y redeploy del worker.
+HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED="${HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED=${HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED}"
+
 # TASK-1723 — Banco de Talento person-first. El reconciliador es read/write sólo
 # sobre la proyección minimizada, idempotente y sin contacto al candidato. El
 # scheduler puede permanecer activo: este flag es el kill switch sin consultas.
@@ -1419,6 +1426,13 @@ upsert_scheduler_job \
   "/email-delivery-retry" \
   '{}'
 echo "  -> ops-email-delivery-retry: */5 * * * * (failed email retry, TASK-775)"
+
+upsert_scheduler_job \
+  "ops-hiring-assessment-public-access-retention" \
+  "17 4 * * *" \
+  "/hiring/assessment/public-access-retention" \
+  '{}'
+echo "  -> ops-hiring-assessment-public-access-retention: 17 4 * * * (24h public access retention, TASK-1746)"
 
 upsert_scheduler_job \
   "ops-entra-profile-sync" \

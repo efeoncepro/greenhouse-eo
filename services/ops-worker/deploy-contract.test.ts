@@ -41,6 +41,35 @@ describe('ops-worker deploy identity smoke contract', () => {
   })
 })
 
+describe('ops-worker assessment public-session link cutover contract', () => {
+  it('persists the TASK-1746 flag default OFF in the runtime that sends assignment emails', () => {
+    const script = deployScript()
+
+    expect(script).toContain(
+      'HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED="${HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED:-false}"'
+    )
+    expect(script).toContain(
+      'ENV_VARS="${ENV_VARS},HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED=${HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED}"'
+    )
+  })
+
+  it('schedules the canonical daily retention owner with readback runtime code', () => {
+    const script = deployScript()
+    const jobIndex = script.indexOf('"ops-hiring-assessment-public-access-retention"')
+
+    expect(jobIndex).toBeGreaterThan(0)
+    expect(script.slice(jobIndex, jobIndex + 300)).toContain('"17 4 * * *"')
+    expect(script.slice(jobIndex, jobIndex + 300)).toContain('"/hiring/assessment/public-access-retention"')
+  })
+
+  it('treats Hiring notifications as worker inputs for push, latest-SHA and drift checks', () => {
+    const workflow = deployWorkflow()
+
+    expect(workflow.match(/src\/lib\/hiring\/notifications/g)).toHaveLength(3)
+    expect(workflow.match(/src\/lib\/hiring\/assessment\/public-session/g)).toHaveLength(3)
+  })
+})
+
 describe('ops-worker Talent Pool projection contract', () => {
   it('persists the projection kill switch and schedules the idempotent reconciler', () => {
     const script = deployScript()

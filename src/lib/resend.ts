@@ -39,14 +39,17 @@ const resolveResendApiKeyInternal = async (): Promise<SecretResolution> => {
 }
 
 const resolveResendWebhookInternal = async (): Promise<SecretResolution> => {
-  if (cachedWebhookResolution) return cachedWebhookResolution
   if (inFlightWebhook) return inFlightWebhook
 
-  inFlightWebhook = resolveSecret({ envVarName: 'RESEND_WEBHOOK_SIGNING_SECRET' }).then(r => {
-    cachedWebhookResolution = r
+  inFlightWebhook = resolveSecret({ envVarName: 'RESEND_WEBHOOK_SIGNING_SECRET' })
+    .then(r => {
+      cachedWebhookResolution = r
 
-    return r
-  })
+      return r
+    })
+    .finally(() => {
+      inFlightWebhook = null
+    })
 
   return inFlightWebhook
 }
@@ -80,6 +83,24 @@ export const ensureResendSecretsResolved = async () => {
   await Promise.all([resolveResendApiKeyInternal(), resolveResendWebhookInternal()])
 }
 
+/**
+ * Resolve only the inbound webhook secret.
+ *
+ * The webhook boundary must not depend on the outbound API key: observing a
+ * provider event can never make the sender unavailable (TASK-1745).
+ */
+export const resolveResendWebhookSigningSecret = async () => {
+  const resolution = await resolveResendWebhookInternal()
+
+  return resolution.value?.trim() || null
+}
+
+export const resolveResendApiKey = async () => {
+  const resolution = await resolveResendApiKeyInternal()
+
+  return resolution.value?.trim() || null
+}
+
 export const getResendApiKey = () =>
   readSyncSecret('RESEND_API_KEY', cachedApiKeyResolution, resolveResendApiKeyInternal)
 
@@ -102,6 +123,18 @@ export const getResendClient = () => {
   if (!apiKey) {
     throw new Error('Missing RESEND_API_KEY environment variable.')
   }
+
+  cachedClient = new Resend(apiKey)
+
+  return cachedClient
+}
+
+export const getResendClientAsync = async () => {
+  if (cachedClient) return cachedClient
+
+  const apiKey = await resolveResendApiKey()
+
+  if (!apiKey) throw new Error('Missing RESEND_API_KEY environment variable.')
 
   cachedClient = new Resend(apiKey)
 

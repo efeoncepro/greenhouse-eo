@@ -42,6 +42,35 @@ function buildContentSecurityPolicyReportOnly() {
   ].join('; ')
 }
 
+const PUBLIC_ASSESSMENT_SESSION_PATHS = new Set([
+  '/public/assessment/access',
+  '/public/assessment/session',
+  '/api/public/assessment/access/exchange',
+  '/api/public/assessment/session',
+])
+
+const isPublicAssessmentSessionPath = (pathname: string) => {
+  const normalized = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname
+
+  return PUBLIC_ASSESSMENT_SESSION_PATHS.has(normalized)
+}
+
+const buildPublicAssessmentContentSecurityPolicy = (nonce: string) => [
+  "default-src 'self'",
+  "base-uri 'none'",
+  "frame-ancestors 'none'",
+  "object-src 'none'",
+  "form-action 'self'",
+  `script-src 'self' 'nonce-${nonce}'`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data:",
+  "font-src 'self' data:",
+  "connect-src 'self'",
+  "worker-src 'none'",
+  "manifest-src 'self'",
+  "media-src 'none'",
+].join('; ')
+
 function applyCrossCuttingHeaders(response: NextResponse): NextResponse {
   for (const [headerName, headerValue] of Object.entries(SECURITY_HEADERS)) {
     response.headers.set(headerName, headerValue)
@@ -56,11 +85,27 @@ function applyCrossCuttingHeaders(response: NextResponse): NextResponse {
   return response
 }
 
-function resolveMaintenanceResponse(request: NextRequest): NextResponse | null {
+function applyPublicAssessmentHeaders(response: NextResponse, nonce: string): NextResponse {
+  response.headers.delete('Content-Security-Policy-Report-Only')
+  response.headers.set('Content-Security-Policy', buildPublicAssessmentContentSecurityPolicy(nonce))
+  response.headers.set('Cache-Control', 'no-store, max-age=0')
+  response.headers.set('Pragma', 'no-cache')
+  response.headers.set('Referrer-Policy', 'no-referrer')
+  response.headers.set('X-Frame-Options', 'DENY')
+  response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive')
+
+  return response
+}
+
+function resolveMaintenanceResponse(request: NextRequest, forwardedHeaders?: Headers): NextResponse | null {
   try {
     if (!isMaintenanceModeEnabled()) return null
 
     const { pathname, searchParams } = request.nextUrl
+
+    // The access fragment must be scrubbed by its bootstrap before any generic rewrite.
+    // Keep this bypass scoped to the four assessment session surfaces only.
+    if (isPublicAssessmentSessionPath(pathname)) return null
 
     if (isMaintenanceAllowedPath(pathname)) return null
 
@@ -68,7 +113,7 @@ function resolveMaintenanceResponse(request: NextRequest): NextResponse | null {
 
     if (secret) {
       if (maintenanceBypassMatches(searchParams.get(MAINTENANCE_BYPASS_QUERY), secret)) {
-        const granted = NextResponse.next()
+        const granted = NextResponse.next(forwardedHeaders ? { request: { headers: forwardedHeaders } } : undefined)
 
         granted.cookies.set(MAINTENANCE_BYPASS_COOKIE, secret, {
           httpOnly: true,
@@ -105,12 +150,24 @@ export function proxy(request: NextRequest): NextResponse {
   const pathname = request.nextUrl.pathname
   const isApiRequest = pathname.startsWith('/api')
   const isPageOptionsRequest = request.method === 'OPTIONS' && !isApiRequest
+  const isAssessmentSessionPath = isPublicAssessmentSessionPath(pathname)
+  const assessmentNonce = isAssessmentSessionPath ? crypto.randomUUID().replaceAll('-', '') : ''
+  const forwardedHeaders = new Headers(request.headers)
+
+  if (assessmentNonce) {
+    forwardedHeaders.set('x-assessment-csp-nonce', assessmentNonce)
+    forwardedHeaders.set('Content-Security-Policy', buildPublicAssessmentContentSecurityPolicy(assessmentNonce))
+  }
 
   const response = isPageOptionsRequest
     ? new NextResponse(null, { status: 204 })
-    : resolveMaintenanceResponse(request) ?? NextResponse.next()
+    : resolveMaintenanceResponse(request, forwardedHeaders) ?? NextResponse.next({ request: { headers: forwardedHeaders } })
 
-  return applyCrossCuttingHeaders(response)
+  const secured = applyCrossCuttingHeaders(response)
+
+  return isAssessmentSessionPath && response.status !== 503
+    ? applyPublicAssessmentHeaders(secured, assessmentNonce)
+    : secured
 }
 
 export const config = {

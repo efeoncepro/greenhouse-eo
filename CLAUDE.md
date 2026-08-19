@@ -11,7 +11,7 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Dominio / disparador | Skill a invocar | Invariantes (cargar al tocar) |
 |---|---|---|
 | Contractor engagements/payables/honorarios | `greenhouse-finance-accounting-operator` (+payroll) | `architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` |
-| Hiring/ATS: documentos de candidato + scan/quarantine de assets | `greenhouse-talent-people-operator` | `architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (§Candidate document capture) |
+| Hiring/ATS: docs candidato · scan/quarantine · procedencia | `greenhouse-talent-people-operator` | `architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (§Candidate document capture · §Delta 2026-08-18 `data_origin` ⊥ `source`, NUNCA en su CHECK; `real`=default=VISIBLE; NUNCA publicar vacante no-real ni sintética a quien tenga vida laboral; retención/comms ciegas) |
 | Production release / promoción develop→main | `greenhouse-production-release` | `architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` |
 | Finance ledger/bank/CLP/FX/economic-category | `greenhouse-finance-accounting-operator` | `architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` |
 | ICO / delivery metrics / RpA / OTD / Notion-metrics | `greenhouse-ico` | `architecture/metrics/ICO_DELIVERY_METRICS_AGENT_INVARIANTS.md` |

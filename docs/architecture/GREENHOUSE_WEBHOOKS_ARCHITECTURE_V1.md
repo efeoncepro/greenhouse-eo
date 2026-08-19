@@ -1,5 +1,37 @@
 # GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md
 
+## Delta 2026-08-19 — Lifecycle global de Resend implementado; activación aún pendiente (TASK-1745)
+
+El adapter de Resend es infraestructura transversal de correo, no una pieza de Hiring. La ruta firmada escribe
+una inbox normalizada en `greenhouse_notifications.email_provider_events` y proyecta lifecycle en
+`email_deliveries` para cualquier `email_type` del sistema. `status='sent'` conserva su significado de despacho
+aceptado; `provider_status` registra delivery, demora, fallo, rebote, queja o supresión.
+
+La inbox y la proyección comparten transacción. Los webhooks usan `event_source='webhook'`,
+`signature_verified=TRUE` y timestamp real del proveedor; la reconciliación API usa
+`event_source='reconciliation'`, no fabrica timestamps y sólo aplica por CAS sobre lifecycle vacío. Un webhook
+firmado siempre puede reemplazar esa observación provisional. Clicks guardan sólo origin y nunca el bearer URL.
+
+El inbound observer no importa ni invoca `sendEmail`, no construye el cliente outbound y no participa en el
+resultado de `emails.send`. Por eso un fallo del webhook afecta observabilidad, no despacho. El rollout sigue
+pendiente hasta migración, secreto, registro API de Resend, canario firmado y correo real verificados.
+
+## Delta 2026-08-18 — Resend lifecycle: handler presente, operación no activada (ISSUE-160)
+
+La ruta `POST /api/webhooks/resend` y su proyección existen, pero **no deben
+describirse como operativas** hasta completar `TASK-1745`. La evidencia de
+runtime y base de datos de esta fecha muestra que la cuenta productiva no tiene
+un webhook de Resend registrado, no hay secreto de firma configurado y ningún
+lifecycle event se ha persistido: las filas `sent` representan aceptación del
+despacho por la API, no entrega en la bandeja.
+
+El contrato objetivo se mantiene: firma Svix sobre raw body, dedupe por
+`svix-id`, procesamiento idempotente de eventos desordenados y estados de
+delivery separados de engagement. Sin embargo, falta corregir la resolución
+asíncrona de secretos, registrar el endpoint y verificar un evento firmado
+antes de declarar disponibilidad. Referencias: `ISSUE-160`, `TASK-1745` y
+`GREENHOUSE_HIRING_ASSESSMENT_ACCESS_RECOVERY_AND_EMAIL_DELIVERY_DECISION_V1.md`.
+
 ## Delta 2026-07-17 — Backpressure de webhooks Notion con Cloud Tasks
 
 Los endpoints `notion-tasks-demo` y `notion-status-transitions` pueden usar una
@@ -236,7 +268,8 @@ outbox_events (published) → webhook-dispatch cron (*/2 min) → matches wh-sub
 
 **Endpoint:** `POST /api/webhooks/resend`
 **Authentication:** HMAC-SHA256 via Svix signing (`svix-id`, `svix-timestamp`, `svix-signature` headers)
-**Secret:** `RESEND_WEBHOOK_SIGNING_SECRET` (stored in Secret Manager, `whsec_` prefixed)
+**Secret:** `RESEND_WEBHOOK_SIGNING_SECRET` (`whsec_` prefixed; pendiente de
+configuración y verificación operativa según el delta 2026-08-19).
 
 **Events consumed:**
 
@@ -245,13 +278,23 @@ outbox_events (published) → webhook-dispatch cron (*/2 min) → matches wh-sub
 | `email.bounced` (hard) | Mark recipient undeliverable | `client_users.email_undeliverable = TRUE` |
 | `email.bounced` (soft) | Log only | Outbox event published |
 | `email.complained` | Auto-unsubscribe from email type | `email_subscriptions.active = FALSE` |
-| `email.delivered` | Update delivery tracking | `email_deliveries.status = 'delivered'` |
+| `email.sent` | Confirm provider acceptance | `provider_status = 'sent'` |
+| `email.delivered` | Confirm receiver-server delivery | `provider_status = 'delivered'` |
+| `email.delivery_delayed` | Record non-terminal delay | `provider_status = 'delivery_delayed'` |
+| `email.failed` | Record provider failure | `provider_status = 'failed'` |
+| `email.suppressed` | Record provider suppression | `provider_status = 'suppressed'` |
+| `email.opened` / `email.clicked` | Engagement only | `email_engagement`; never proves delivery |
 
 **Outbox events emitted:** `email_delivery.bounced`, `email_delivery.complained`, `email_delivery.undeliverable_marked`
 
-**Error handling:** Always returns 200 (even on processing errors) to prevent Resend retries. Errors logged for investigation. Only returns 401 for invalid signatures.
+**Error handling objetivo:** firma inválida devuelve `401`; secreto o
+persistencia no disponible debe devolver un estado reintentable. Un `2xx` solo
+se emite tras verificar y persistir/deduplicar el evento. La implementación
+actual cumple este contrato en código; la activación externa todavía requiere el rollout de TASK-1745.
 
-**Configuration:** Webhook URL must be registered in Resend dashboard pointing to `https://greenhouse.efeoncepro.com/api/webhooks/resend`
+**Configuration:** el endpoint a registrar es
+`https://greenhouse.efeoncepro.com/api/webhooks/resend`. Al 2026-08-18 no hay
+registro productivo verificable; TASK-1745 es el owner de activarlo y validarlo.
 
 ### Not Yet Active
 
