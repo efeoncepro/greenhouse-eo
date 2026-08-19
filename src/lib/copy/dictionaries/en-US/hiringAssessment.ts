@@ -209,6 +209,8 @@ export const hiringAssessment: HiringAssessmentCopy = {
     confirmRun: 'Confirm run',
     confirming: 'Confirming…',
     confirmed: 'Run confirmed. The covered scores entered the scorecard.',
+    nothingToConfirm:
+      'Nothing is left for batch confirmation: every response was already resolved one by one. You can close the run.',
     cancelRun: 'Cancel run',
     cancelDialogTitle: 'Cancel run',
     cancelDialogBody: 'No answer is lost: pending ones return to the manual review queue.',

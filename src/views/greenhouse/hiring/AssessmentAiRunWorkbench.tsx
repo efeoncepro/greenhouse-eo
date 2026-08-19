@@ -496,6 +496,16 @@ const AssessmentAiRunWorkbench = ({ open, runId, copy, confirmEnabled, onClose }
   const lineageBlocked = error?.code === 'assessment_ai_run_lineage_mismatch'
 
   // ── Gates del confirm: causas VISIBLES (aria-describedby), nunca disabled mudo ──
+  // Un run SIN lote pendiente no tiene nada que aplicar: ni el flag ni el digest stale lo
+  // protegen de nada, y bloquearlo lo dejaba incerrable (caso 2026-08-19, dos runs con el 100%
+  // de sus ítems ya resueltos a mano). El backend aplica exactamente el mismo criterio.
+  const settledWithoutBatch = coverage
+    ? coverage.scoringPending === 0 &&
+      coverage.mandatoryPending === 0 &&
+      coverage.samplePending === 0 &&
+      coverage.batchEligible === 0
+    : false
+
   const gateMessages = useMemo(() => {
     if (!coverage) return []
 
@@ -504,12 +514,13 @@ const AssessmentAiRunWorkbench = ({ open, runId, copy, confirmEnabled, onClose }
     if (coverage.scoringPending > 0) gates.push(fmt(copy.gateOpenScoring, { count: coverage.scoringPending }))
     if (coverage.mandatoryPending > 0) gates.push(fmt(copy.gateOpenMandatory, { count: coverage.mandatoryPending }))
     if (coverage.samplePending > 0) gates.push(fmt(copy.gateOpenSample, { count: coverage.samplePending }))
-    if (coverage.digestStale) gates.push(copy.gateStale)
+    if (coverage.digestStale && coverage.batchEligible > 0) gates.push(copy.gateStale)
 
     return gates
   }, [coverage, copy])
 
-  const confirmBlocked = gateMessages.length > 0 || !confirmFlagOn || runTerminal || requestInFlight
+  const confirmBlocked =
+    gateMessages.length > 0 || (!confirmFlagOn && !settledWithoutBatch) || runTerminal || requestInFlight
 
   const draftFor = (itemId: string): ItemDraft => drafts[itemId] ?? { score: '', note: '' }
 
@@ -1075,7 +1086,11 @@ const AssessmentAiRunWorkbench = ({ open, runId, copy, confirmEnabled, onClose }
               ))}
             </Stack>
           ) : null}
-          {!confirmFlagOn ? (
+          {settledWithoutBatch ? (
+            <Alert severity='info' id='assessment-run-nothing-to-confirm'>
+              {copy.nothingToConfirm}
+            </Alert>
+          ) : !confirmFlagOn ? (
             <Alert severity='info' id='assessment-run-confirm-flag-off'>
               {copy.confirmFlagOff}
             </Alert>
@@ -1099,9 +1114,11 @@ const AssessmentAiRunWorkbench = ({ open, runId, copy, confirmEnabled, onClose }
               aria-describedby={
                 gateMessages.length > 0
                   ? 'assessment-run-confirm-gates'
-                  : !confirmFlagOn
-                    ? 'assessment-run-confirm-flag-off'
-                    : undefined
+                  : settledWithoutBatch
+                    ? 'assessment-run-nothing-to-confirm'
+                    : !confirmFlagOn
+                      ? 'assessment-run-confirm-flag-off'
+                      : undefined
               }
               onClick={() => void confirmRun()}
               fullWidth={fullScreen}

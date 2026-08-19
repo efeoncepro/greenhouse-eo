@@ -291,6 +291,7 @@ export interface HiringAssessmentCopy {
     confirmRun: string
     confirming: string
     confirmed: string
+    nothingToConfirm: string
     cancelRun: string
     cancelDialogTitle: string
     cancelDialogBody: string

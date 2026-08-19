@@ -209,6 +209,8 @@ export const hiringAssessment: HiringAssessmentCopy = {
     confirmRun: 'Confirmar run',
     confirming: 'Confirmando…',
     confirmed: 'Run confirmado. Los puntajes cubiertos entraron al scorecard.',
+    nothingToConfirm:
+      'No queda nada por confirmar por lote: cada respuesta ya se resolvió una a una. Puedes cerrar el run.',
     cancelRun: 'Cancelar run',
     cancelDialogTitle: 'Cancelar run',
     cancelDialogBody: 'Ninguna respuesta se pierde: las pendientes vuelven a la cola de corrección manual.',

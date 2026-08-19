@@ -253,14 +253,24 @@ const ASSESSMENT_CONFIRMABLE_STATUSES = ['in_progress', 'submitted'] as const
  * Command `confirmAssessmentAiScoringRun` — la confirmación humana gobernada del conjunto
  * `batch_eligible` restante (ADR D1). Gates verificados DENTRO de la tx, bajo `FOR UPDATE`:
  *
- * 1. Flag `HIRING_ASSESSMENT_AI_RUN_CONFIRM_ENABLED` ON (Vercel; OFF ⇒ 409 estable).
- * 2. Run en estado de revisión (`awaiting_review`|`confirmable`); `confirmed` es no-op
+ * 1. Run en estado de revisión (`awaiting_review`|`confirmable`); `confirmed` es no-op
  *    idempotente SIN re-aplicar efectos ni manifest nuevo; `cancelled`/`failed` ⇒ 409.
- * 3. El assessment NO está `scored` ni terminal — un run jamás reescribe un assessment
- *    ya finalizado (guard 409, además del guard por-respuesta de `recordHumanScore`).
- * 4. Cero items en scoring, cero `mandatory_review` sin resolver, muestra ciega completa.
- * 5. Digest vigente: se recomputa HOY (answers/rubric + modelo/prompt/policy efectivos)
- *    contra el digest inmutable del run; stale ⇒ 409 `assessment_ai_run_stale`.
+ * 2. Cero items en scoring, cero `mandatory_review` sin resolver, muestra ciega completa.
+ *    Estos SIEMPRE aplican: miden si el trabajo humano terminó, no si se aplica algo.
+ *
+ * Y tres gates que aplican SÓLO cuando queda lote por aplicar (`batch.length > 0`), porque
+ * protegen exactamente eso —que una proposal de la IA entre a `human_score` cuando no debe—
+ * y con cero proposals pendientes no protegen nada:
+ *
+ * 3. Flag `HIRING_ASSESSMENT_AI_RUN_CONFIRM_ENABLED` ON (Vercel; OFF ⇒ 409 estable).
+ * 4. El assessment NO está `scored` ni terminal.
+ * 5. Digest vigente contra el digest inmutable del run; stale ⇒ 409.
+ *
+ * Ese reordenamiento es el fix del caso 2026-08-19: dos runs con el 100% de sus ítems ya
+ * resueltos uno a uno por un humano quedaron incerrables. El `SELECT ... FOR UPDATE` sobre el
+ * assessment se conserva incondicional (serializa contra `finalizeAssessment`), y los hechos que
+ * dejaron de bloquear quedan REGISTRADOS en el manifest (`digestStaleAtClose`,
+ * `assessmentStatusAtClose`, `closureMode`), nunca en silencio.
  *
  * Con los gates cerrados aplica las proposals `batch_eligible` restantes ATÓMICAMENTE vía
  * `confirmAiProposal` (canónico TASK-1361/1360, cero bypass), escribe el MANIFEST
@@ -275,14 +285,6 @@ const ASSESSMENT_CONFIRMABLE_STATUSES = ['in_progress', 'submitted'] as const
 export const confirmAssessmentAiScoringRun = async (
   input: ConfirmAssessmentAiScoringRunInput,
 ): Promise<ConfirmAssessmentAiScoringRunResult> => {
-  if (!isHiringAssessmentAiRunConfirmEnabled()) {
-    throw new HiringValidationError(
-      'La confirmación de runs de scoring está deshabilitada.',
-      'assessment_ai_run_confirm_disabled',
-      409,
-    )
-  }
-
   if (!input.actorUserId) {
     throw new HiringValidationError('Falta el usuario que confirma.', 'assessment_ai_run_missing_actor', 401)
   }
@@ -313,16 +315,9 @@ export const confirmAssessmentAiScoringRun = async (
       [run.assessmentId],
     )
 
+    // El `FOR UPDATE` de arriba se conserva SIEMPRE: serializa contra `finalizeAssessment`.
+    // El throw, en cambio, se evalúa más abajo y sólo si hay lote que aplicar (ver §gates).
     const assessmentStatus = String((assessmentRows.rows[0] as { status?: unknown } | undefined)?.status ?? '')
-
-    if (!(ASSESSMENT_CONFIRMABLE_STATUSES as readonly string[]).includes(assessmentStatus)) {
-      throw new HiringValidationError(
-        'El assessment ya fue finalizado o cerrado; el run no puede reescribirlo.',
-        'assessment_ai_run_assessment_not_writable',
-        409,
-        { assessmentStatus },
-      )
-    }
 
     const items = await listRunItems(run.runId, client)
 
@@ -363,23 +358,58 @@ export const confirmAssessmentAiScoringRun = async (
     }
 
     // Vigencia de digests (policy/model/prompt/answers/rubric): recomputar HOY y comparar.
+    // Se computa SIEMPRE porque es un hecho que el manifest debe registrar, aunque no bloquee.
     const currentDigest = await computeCurrentScoringRunDigest(
       run.assessmentId,
       items.map(i => i.responseId),
       client,
     )
 
-    if (currentDigest !== run.inputDigest) {
-      throw new HiringValidationError(
-        'El run quedó desactualizado (answers, rubric, modelo, prompt o policy cambiaron); se requiere un run nuevo.',
-        'assessment_ai_run_stale',
-        409,
-      )
+    const digestStaleAtClose = currentDigest !== run.inputDigest
+
+    const batch = items.filter(i => i.status === 'proposed' && i.riskClass === 'batch_eligible' && i.proposalId)
+
+    // ── Gates que protegen la APLICACIÓN de puntajes ──
+    //
+    // Los tres de abajo (flag, assessment escribible, digest vigente) existen para una sola cosa:
+    // impedir que proposals de la IA entren a `human_score` cuando no corresponde. Si no queda NADA
+    // que aplicar, no protegen nada — y su efecto real era dejar el run estructuralmente incerrable.
+    //
+    // Caso fuente 2026-08-19: dos runs productivos con el 100% de sus ítems resueltos UNO A UNO por
+    // un humano quedaron atrapados en `awaiting_review`. El operador hizo todo el trabajo por el
+    // único camino abierto (`resolveScoringRunItem`, que nunca se gateó) y el sistema no le dejaba
+    // guardarlo. Uno de los dos además quedó stale para siempre porque la policy cambió después.
+    //
+    // Los gates NO se relajan: cuando hay lote, los tres siguen siendo exactamente igual de duros.
+    if (batch.length > 0) {
+      if (!isHiringAssessmentAiRunConfirmEnabled()) {
+        throw new HiringValidationError(
+          'La confirmación de runs de scoring está deshabilitada.',
+          'assessment_ai_run_confirm_disabled',
+          409,
+        )
+      }
+
+      if (!(ASSESSMENT_CONFIRMABLE_STATUSES as readonly string[]).includes(assessmentStatus)) {
+        throw new HiringValidationError(
+          'El assessment ya fue finalizado o cerrado; el run no puede reescribirlo.',
+          'assessment_ai_run_assessment_not_writable',
+          409,
+          { assessmentStatus },
+        )
+      }
+
+      if (digestStaleAtClose) {
+        throw new HiringValidationError(
+          'El run quedó desactualizado (answers, rubric, modelo, prompt o policy cambiaron); se requiere un run nuevo.',
+          'assessment_ai_run_stale',
+          409,
+        )
+      }
     }
 
     // Aplicar el lote restante vía el confirm canónico (misma tx; secuencial a propósito —
     // un PoolClient dentro de una tx no paraleliza queries).
-    const batch = items.filter(i => i.status === 'proposed' && i.riskClass === 'batch_eligible' && i.proposalId)
     const confirmedItems: AiScoringRunItem[] = []
 
     for (const item of batch) {
@@ -430,6 +460,12 @@ export const confirmAssessmentAiScoringRun = async (
       toStatus: 'confirmed',
       actorUserId: input.actorUserId,
       detail: {
+        // Un cierre sin lote NO es una confirmación por lote: se distingue para que el manifest
+        // siga siendo evidencia y no decoración. `digestStaleAtClose` y `assessmentStatusAtClose`
+        // registran los hechos que dejaron de bloquear cuando no hay nada que aplicar.
+        closureMode: confirmedItems.length > 0 ? 'batch_confirmed' : 'settled_without_batch',
+        digestStaleAtClose,
+        assessmentStatusAtClose: assessmentStatus,
         assessmentId: run.assessmentId,
         applicationId: run.applicationId,
         inputDigest: run.inputDigest,
@@ -463,7 +499,7 @@ export const confirmAssessmentAiScoringRun = async (
 
     settled = await transitionScoringRun(client, settled, 'confirmed', {
       actorUserId: input.actorUserId,
-      reasonCode: 'run_confirmed',
+      reasonCode: confirmedItems.length > 0 ? 'run_confirmed' : 'run_closed_without_batch',
     })
 
     await publishOutboxEvent(
