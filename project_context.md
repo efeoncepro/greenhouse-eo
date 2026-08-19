@@ -150,6 +150,12 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   `.claude/skills/efeonce-mcp-platform/`; estas componen la skill dueña de cada provider y no duplican su policy.
   Las skills de arquitectura `software-architect-2026` y `arch-architect` deben cargar ese router antes de
   proponer una nueva surface, OAuth o binding cross-runtime.
+- Hiring/ATS declara la **procedencia del dato en su nacimiento** (`data_origin`, `TASK-1739`, en producción
+  desde 2026-08-19): dos raíces —persona y demanda— con copia derivada por trigger en la postulación, default
+  `real` porque omitir debe dejar el dato visible y nunca ocultarlo. Una vacante no real no se publica; el gold
+  set excluye sintéticos sin flag; retención y compliance son ciegos a la procedencia y la procedencia nunca
+  gatea comunicaciones. El primitive canónico es `src/lib/hiring/data-origin/` y ningún reader escribe su propio
+  predicado. Deuda declarada en `TASK-1748`: los readers del Banco de Talento aún no filtran por procedencia.
 - Hiring/ATS mantiene como caminos canónicos el reader de Application 360 para documentos y el reveal de
   identidad con capability, motivo y auditoría append-only (`TASK-1714`/`TASK-1715`). El evento
   `hiring.assessment.submitted` ya tiene en producción un consumer interno para People, con configuración

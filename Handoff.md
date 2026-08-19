@@ -2,6 +2,38 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-19 — TASK-1739 cerrada en producción: qué queda vivo después del cierre
+
+El filtro de procedencia ya opera en producción (`HIRING_SYNTHETIC_DATA_FILTER_ENABLED` ON, release PR #203
+sobre `30301816955f`, watchdog `ok`) y el marcado/archivado está aplicado con autorización del CEO. Lo que
+sigue importando no es lo hecho sino lo que cambia el terreno para el siguiente que toque Hiring.
+
+**El desk se ve vacío a propósito y eso va a parecer un bug.** Pasó de 24 vacantes / 79 postulaciones a 2 / 47.
+Si HR o cualquier agente reporta "desaparecieron candidatos", la respuesta no es apagar el flag: es mirar
+`data_origin`. Revertir es un `false` + redeploy en menos de 5 minutos, pero hacerlo devuelve los fantasmas al
+pipeline y vuelve a contaminar toda lectura downstream.
+
+**Riesgo abierto #1 — el smoke bloqueado.** `scripts/hiring/verify-growth-forms-application-smoke.ts` NO corre:
+declara `smoke_test` y la guarda del write path le prohíbe publicar. Es correcto, no es una regresión que
+arreglar. Sus únicas dos salidas legítimas son que deje de necesitar la superficie pública real o que limpie lo
+que crea. **Marcar su vacante como `real` para destrabarlo NO es una salida** — fabrica otra vez fantasmas
+indistinguibles de una vacante verdadera, que es exactamente el problema que esta task cerró.
+
+**Riesgo abierto #2 — falsa garantía de autorización.** Las capabilities `hiring.data_origin.mark`/`.purge`
+están deferidas a propósito: la operación es hoy por CLI con actor registrado y sin superficie API/UI. Quien
+construya el consumer (badge, toggle, vista de administración, ruta Nexa/MCP) las declara **en ese mismo PR**,
+con grant a ≥1 rol real; declararlas antes sólo simula un control que ningún `can()` verifica.
+
+**Decisión pendiente del operador — lane B de la purga.** Las 9 huérfanas siguen archivadas, no borradas. Es la
+única mutación irreversible de la task y su valor marginal es bajo, porque archivar ya las saca de toda lectura.
+El protocolo está intacto (`plan → allowlist → sign-off → apply`, abort total si una sola fila tiene dependiente
+auditable); ejecutarlo requiere decisión humana explícita, no la inercia de "quedaba pendiente".
+
+**Próximo paso concreto**: cerrar el impacto cruzado que no cabía en el dominio de edición del cierre — registrar
+el cierre en `EPIC-011`, agregar el `## Delta` a `TASK-1734` (el sampler del gold set ya excluye sintéticos por
+construcción, no por suerte) y anotar `scripts/hiring/purge-task-1378-test-applications.ts` como superado por el
+CLI genérico. Y vigilar `hiring.data_quality.synthetic_records_aging` durante 7 días: steady `0`.
+
 ## 2026-08-18 — Incident response: delivery de Resend y recuperación de test planificadas
 
 Discovery read-only confirmó que Resend **sí despacha** (393 IDs de proveedor), pero Greenhouse no captura
@@ -14,7 +46,10 @@ Quedan creados `ISSUE-160`, ADR propuesto
 `GREENHOUSE_HIRING_ASSESSMENT_ACCESS_RECOVERY_AND_EMAIL_DELIVERY_DECISION_V1.md` y tres tasks compactas:
 `TASK-1745` (webhook/reconciliación), `TASK-1746` (command de recovery con rotación y capability; requiere
 sign-off Privacy/Security para bearer link) y `TASK-1747` (consumer Application 360). Gates de las tres tasks
-verdes. No hubo cambio de runtime ni configuración externa.
+verdes. `TASK-1745` está ahora `in-progress`: el preflight confirmó que el dedupe existente no es
+transaccional y que un fallo posterior puede perder el evento en un retry. El fix preservará el sender
+outbound como boundary independiente y activará el webhook sólo después de un canary firmado. Todavía no hay
+cambio de runtime ni configuración externa.
 
 ## 2026-08-18 — Hiring AI y candidate review MCP: runtime reconciliado
 
@@ -519,47 +554,3 @@ visibles, cero scroll horizontal en 390.
 
 Pendientes declarados: smoke staging (runbook de 1734) y el contraste del `Alert severity='info'`
 del tema (3,94:1, preexistente portal-wide — causa raíz global, no se parcha por host).
-
-## 2026-08-16 — TASK-1737 complete (code complete, rollout gated) — tab Expediente
-
-El tab `activity` sintético de la Application 360 es ahora el **Expediente** real: timeline de
-notas persistidas (kind, autor, source con provenance del agente) intercalado con eventos de
-etapa, composer tipado y flujo dossier propose → editar → confirmar/rechazar con estados
-honestos. Alias `?tab=activity` preservado y probado por el GVC.
-
-**El gate BLOQUEANTE anti-anclaje del Delta (3) de TASK-1735 queda cerrado.** El predicado
-"scorecard propio abierto" se extrajo a `getOwnScorecardStateForApplication` y ahora es UNO
-solo, compartido por `listResponses`, `listPeerScorecardResults` e
-`isViewerBlindForApplicationEvaluation`. El reader `listHiringApplicationNotes(appId, viewerUserId?)`
-omite score-bearing ajeno + toda nota `agent` para el viewer bloqueado, y `GET /dossier`
-devuelve `proposal: null`. Sin `viewerUserId` (server-internal) no filtra. La ceguera vive en el
-reader, así que Nexa/MCP la heredan por construcción. Delta registrado en 1735 con la Open
-Question de `interview_note` resuelta.
-
-`UI ready` subió a `yes` en el cierre: se materializó la dirección visual versionada
-(`docs/ui/visual-directions/TASK-1737-application-expediente-direction.md`, 3 direcciones
-comparadas → "documento de decisión") y el scorecard
-(`docs/ui/reviews/TASK-1737-application-360-expediente-tab.scorecard.json`, promedio 4,54).
-`visualImpact` 4,0 queda bajo el sub-piso premium 4,5 por razón **estructural** declarada y
-aceptada: es un tab de lectura larga dentro de una vista anfitriona que ya define el momento
-visual dominante. `pnpm task:lint --task TASK-1737` → template=1 errors=0.
-
-**Drift corregido en el cierre:** el scenario GVC estaba declarado como `.yaml` cuando el DSL
-del repo es `.scenario.ts`, y el scorecard visual estaba declarado pero no existía.
-
-**Rollout gated (no cerrado):**
-
-1. `HIRING_EVALUATION_DOSSIER_AI_ENABLED` sigue **OFF** en producción — dueño TASK-1735, esta
-   task no lo prende. Con el flag OFF la UI muestra `ai-off` honesto y las notas manuales operan.
-2. Evidencia visual del panel de propuesta con datos reales (`proposal-panel`, `proposal-edit`,
-   `reject-dialog`, `blind-lock`) pendiente de seed en staging.
-3. Smoke `staging:request` con las dos personas agente (superadmin vs evaluadora bloqueada).
-
-GVC premium local verde: `.captures/2026-08-16T23-49-12_task1737-application-expediente/`
-(exitCode 0, 0 quality findings, rubric enterprise `pass`, 1440 + iPhone 13).
-
-**Impacto cruzado:** TASK-1737 libera la propiedad de `Application360View.tsx`. La nota
-"pendiente: integración con Application360View, el archivo lo posee TASK-1737" de
-`TASK-1738-assessment-ai-review-workbench.md` quedó **stale** — el commit `a533d10dd` ya montó
-`AssessmentAiRunEntry`. No edité esa spec porque otro agente la tiene en vuelo en esta misma
-sesión; que la actualice en su cierre.

@@ -271,6 +271,10 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   `TASK-1362` dejó sin dueño. Plan read-only → allowlist humana → apply con actor, justificación y audit append-only;
   soft-delete siempre (`asset_scan_results` es append-only y cascadea desde `assets`); lane aparte para el documento
   de identidad; ciego a `data_origin`. Urgencia baja verificada (1 postulación con decisión, vence agosto 2027).
+- `TASK-1748` — Cierre de deuda de procedencia: los readers del Banco de Talento no filtran por procedencia (hoy las
+  11 personas sintéticas quedan fuera por su `lifecycle_status`, no por el filtro), el archivado escribe sólo sobre la
+  postulación cuando la spec definía tres entidades, y las 9 huérfanas del lane B siguen sin decisión. Sin efecto
+  visible hoy; se escriben porque una deuda que no duele es la que se olvida.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
 

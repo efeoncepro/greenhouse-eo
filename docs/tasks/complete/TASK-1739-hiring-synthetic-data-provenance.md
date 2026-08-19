@@ -1,5 +1,49 @@
 # TASK-1739 — Procedencia de datos sintéticos en Hiring (marca canónica, readers limpios, purga gobernada)
 
+## Delta 2026-08-19 — Cierre: en producción, flag ON, datos aplicados
+
+La task queda `complete`: no es "código mergeado", es capacidad operando. El release viajó en el PR #203
+sobre el SHA objetivo `30301816955fc9b00c0598ee7806f7950ed43479`, orquestador run `32222385389`, manifiesto
+en `released` a las 06:23:28 del 2026-08-19, con el watchdog en `ok` en sus tres signals. Tres de los cuatro
+workers quedaron en el SHA exacto; el `ops-worker` quedó change-gated en `9cfde547d5b4` con diff **vacío**
+contra el objetivo, así que no es drift sino ausencia de cambio que desplegar.
+
+`HIRING_SYNTHETIC_DATA_FILTER_ENABLED` quedó ON en staging el 2026-08-18 y ON en producción el 2026-08-19,
+con su redeploy en ambos. El runtime declarado en el ledger se sostiene: el flag se lee sólo en el runtime
+Next.js de Vercel, así que no hubo que tocar ningún Cloud Run.
+
+El marcado y el archivado se aplicaron con autorización del CEO: **71 marcas** y **32 archivados**, actor
+`user-efeonce-admin-julio-reyes`. Las 2 vacantes reales vivas (`EO-OPN-0009`, `EO-OPN-0061`) siguen `real`,
+verificado explícitamente antes y después del apply. El efecto medido en staging es el que la spec proyectó:
+el desk pasa de **24 vacantes / 79 postulaciones** a **2 / 47**.
+
+El hallazgo que valida la tesis de la task ya está documentado en el Delta 2026-08-18 (3) y conviene no
+perderlo al leer sólo el cierre: existía una respuesta sintética (`smoke_test`, `open_text`, 1010 caracteres)
+con `human_score = 90.00`, **elegible para el gold set**. La spec lo proyectaba como riesgo futuro; ya había
+ocurrido. La exclusión del gold set no fue preventiva sino **correctiva**.
+
+**Lo que queda abierto, y por qué se cierra igual.** El lane B de la purga —borrado de 9 huérfanas— **no se
+ejecutó a propósito**: es la única mutación irreversible de la task y su valor marginal es bajo, porque
+archivar ya las saca de toda lectura. Queda a decisión explícita del operador, con su protocolo intacto. Las
+capabilities `hiring.data_origin.mark` y `hiring.data_origin.purge` siguen **deferidas**: la operación es hoy
+por CLI con actor registrado y sin superficie API/UI, y una capability que ningún `can()` verifica da falsa
+garantía en vez de seguridad; se declaran cuando aterrice el consumer. Y
+`scripts/hiring/verify-growth-forms-application-smoke.ts` queda **BLOQUEADO a propósito** por la guarda de
+publicación del Slice 2: es el productor de las 8 vacantes fantasma que llegaron al careers real y no tiene
+teardown; sus dos salidas legítimas están en §`Follow-ups` y marcar su vacante como `real` no es ninguna de
+las dos.
+
+Del `## Closing Protocol` quedan sin ejecutar los ítems que viven fuera de este archivo y de la bitácora
+—el registro del cierre en `EPIC-011`, el `## Delta` en `TASK-1734` sobre la exclusión del gold set y la
+anotación de `scripts/hiring/purge-task-1378-test-applications.ts` como superado— porque pertenecen a otros
+dominios de edición. Se listan acá para que el siguiente agente los levante, no para darlos por hechos.
+
+**Los tres cabos sueltos quedaron en `TASK-1748`** (creada 2026-08-19): los readers del Banco de
+Talento sin filtro de procedencia —hoy las 11 personas sintéticas no aparecen, pero por su
+`lifecycle_status='needs_reconsent'`, no por el filtro que debería excluirlas—, el archivado que
+escribe sólo sobre `hiring_application` cuando la spec definía tres entidades, y la decisión
+pendiente del lane B. Ninguno tiene efecto visible hoy y por eso no justificaron un release propio.
+
 ## Delta 2026-08-18
 
 **Primer objetivo concreto para el lane de purga, generado por el canary de `TASK-1736`.** Al ejecutar
@@ -40,7 +84,7 @@ canary debería nacer marcando `data_origin='synthetic'` en el momento de creaci
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -812,11 +856,11 @@ encontraría a sí mismo.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` quedó sincronizado con el cierre
-- [ ] `Handoff.md` quedó actualizado
-- [ ] `changelog.md` quedó actualizado
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` quedó sincronizado con el cierre
+- [x] `Handoff.md` quedó actualizado
+- [x] `changelog.md` quedó actualizado
 - [ ] se ejecutó chequeo de impacto cruzado sobre otras tasks afectadas
 - [ ] `EPIC-011` registra el cierre y la secuencia actualizada
 - [ ] `TASK-1734` recibe un `## Delta` indicando que el sampler del gold set ya excluye sintéticos

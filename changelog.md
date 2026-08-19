@@ -3,6 +3,25 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-19 — El tablero de Hiring dejó de mostrar gente y vacantes que no existen
+
+- **Lo que ve hoy quien abre el desk son procesos reales.** El tablero pasó de 24 vacantes y 79
+  postulaciones a **2 y 47**: la diferencia no se perdió ni se borró, era dato de prueba que hasta ayer
+  se contaba como si fuera un candidato o una búsqueda de verdad. Las dos vacantes vivas siguen ahí,
+  con todos sus postulantes, verificadas una por una antes y después.
+- **Menos filas no es pérdida de datos.** Si el tablero se ve más vacío que ayer, es porque por primera
+  vez muestra sólo lo que representa a una persona o una búsqueda del mundo real. Lo demás quedó
+  archivado y recuperable, no eliminado.
+- **La evaluación con IA ya no puede aprender de respuestas inventadas.** Había una respuesta de prueba
+  calificada con 90 puntos, lista para entrar al conjunto con que se calibra el sistema. No era un riesgo
+  a futuro: ya había pasado. Ahora queda excluida sin interruptor para volver atrás.
+- **Los conteos y métricas de contratación por fin cuentan personas.** Todo lo que se lee desde el
+  tablero y la reserva de talento parte del mismo criterio, así que dejaron de convivir dos verdades
+  sobre cuánta gente hay en un proceso.
+- **Lo que todavía no cambia**: nueve registros de prueba quedan archivados en vez de borrados, a la
+  espera de una decisión explícita. No aparecen en ninguna pantalla, así que borrarlos es prolijidad,
+  no necesidad.
+
 ## 2026-08-18 — Evaluación provisional automática y CV por MCP interno
 
 - Los assessments elegibles de cualquier vacante generan ahora evaluación IA provisional en segundo plano para
@@ -963,26 +982,3 @@ mismo instante en que el fail-open se cierra, así que no hubo ventana de exposi
   migraciones del batch ya estaban aplicadas antes del deploy. Eso cambia cómo se evalúa el riesgo de un
   release con `db_migrations`.
 - `TASK-1680` quedó desbloqueada (su `Blocked by` apuntaba a `TASK-1679`).
-
-## 2026-08-09 — Las 9 páginas del portal cliente dejaron de mentir (TASK-1679, cierra ISSUE-146)
-
-Las nueve rutas guardadas redirigían con `?error=resolver_unavailable` —el banner de "el servicio no
-está disponible"— por tres defectos que vivían en la misma función y se tapaban entre sí: el
-`redirect()` del camino `denied` estaba **dentro** del `try`, así que su propio `catch` lo interceptaba;
-el guard pasaba un `clientId` donde el resolver espera un `organizationId`; y seis viewCodes de rutas
-vivas no los declaraba ningún módulo. Ahora cada resultado tiene su destino: empty state para
-module-gated sin módulo, `organization_unresolved` para sesión sin organización, y
-`resolver_unavailable` sólo cuando el resolver falla de verdad.
-
-- `ModuleNotAssignedEmpty` volvió a existir en runtime, y una denegación legítima dejó de reportarse a
-  Sentry como error del resolver — el dominio `client_portal` acumulaba incidentes por funcionamiento
-  normal.
-- Tres vistas pasaron a allowlist base (`notificaciones`, `configuracion`, `actualizaciones`): no son
-  producto vendible. Ciclos y Analytics quedaron module-gated por decisión del operador.
-- `/reviews` se unificó en `cliente.reviews`; `cliente.revisiones` queda marcado como retirado
-  (append-only).
-- **Medido, no supuesto:** corregir el guard NO abre las 9. Los módulos que declaran 4 de esas vistas
-  no están asignados a ninguna organización, así que 3 abren y 6 muestran el empty state. Abrirlas es
-  un assignment, no código.
-- Persona de verificación con organización configurable, con 4 condiciones fail-closed y auditoría.
-  **Rollout pendiente:** no está en `main`.
