@@ -85,10 +85,15 @@
 
 /* TASK-1751 — La barra sigue el scroll. Antes vivía al tope del documento, así que el reloj
    desaparecía justo cuando el candidato bajaba a escribir: el momento en que el tiempo importa.
-   El cambio de tono a los 5 y al 1 minuto sólo es perceptible si la barra está a la vista. */
+   El cambio de tono a los 5 y al 1 minuto sólo es perceptible si la barra está a la vista.
+
+   El offset NO es 0: el header público de careers (`careers_header`) ya es sticky en `top: 0`
+   con 65px de alto y `z-index: 50`. Pegar la barra en 0 la mete DEBAJO del header y corta el
+   reloj a la mitad — verificado en pantalla antes de dejarlo. Va debajo del header (z menor) y
+   arranca donde el header termina. */
 .sessionBar {
   position: sticky;
-  inset-block-start: 0;
+  inset-block-start: var(--careers-header-height, 65px);
   z-index: 20;
   display: flex;
   align-items: center;
@@ -102,9 +107,9 @@
   box-shadow: var(--shadow-raised);
 }
 
-/* Un ancla enfocada por teclado no puede quedar debajo de la barra fija. */
+/* Un ancla enfocada por teclado no puede quedar debajo del header + la barra fija. */
 .mainStack :is(button, a, textarea, input, [tabindex]) {
-  scroll-margin-block-start: 86px;
+  scroll-margin-block-start: 156px;
 }
 
 .sessionRole {
