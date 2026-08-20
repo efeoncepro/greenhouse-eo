@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import NextLink from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
@@ -53,7 +53,7 @@ import type {
 } from '@/types/hiring'
 import type { CandidateDocumentsViewModel } from '@/lib/hiring/documents'
 import type { HiringHandoff } from '@/lib/hiring/handoff/types'
-import type { Assessment, AssessmentResponse, AssessmentTemplate, Competency } from '@/types/hiring-assessment'
+import type { Assessment, AssessmentResponse, Competency } from '@/types/hiring-assessment'
 import type {
   AssessmentReviewCompetencyModule,
   AssessmentReviewItem,
@@ -65,7 +65,8 @@ import HiringDeskFrame from './HiringDeskFrame'
 import ApplicationDossierPanel from './ApplicationDossierPanel'
 import CandidateDocumentsPanel from './CandidateDocumentsPanel'
 import AssessmentCompetencyRadar from './AssessmentCompetencyRadar'
-import { hiringRequest, scoreTone } from './hiring-client'
+import { HiringClientError, hiringRequest, scoreTone } from './hiring-client'
+import type { AssessmentAssignmentProposal, AssessmentAssignmentResult } from '@/types/hiring-assessment-policy'
 import { computeScorecardSummary } from './scorecard-summary'
 import { AssessmentAiRunEntry } from './AssessmentAiRunWorkbench'
 
@@ -225,7 +226,8 @@ interface Application360ViewProps {
   assessmentCopy: HiringAssessmentCopy
   initialItem: HiringDeskApplicationSummary
   initialAssessments: Assessment[]
-  templates: AssessmentTemplate[]
+  /** TASK-1747 — la asignación gobernada la decide la política; el cliente ya no elige. */
+  canAuthorAssessment: boolean
   initialHandoff: HiringHandoff | null
   canApproveHandoff: boolean
   /** TASK-1715 — paquete documental resuelto en servidor. `null` si falló o si no hay acceso. */
@@ -354,7 +356,7 @@ const Application360View = ({
   documentsFailed,
   initialItem,
   initialAssessments,
-  templates,
+  canAuthorAssessment,
   initialHandoff,
   notes,
   notesFailed,
@@ -365,6 +367,7 @@ const Application360View = ({
   noteAuthorNames,
 }: Application360ViewProps) => {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const rawRequestedTab = searchParams.get('tab')
   const requestedTab = rawRequestedTab ? TAB_ALIASES[rawRequestedTab] ?? rawRequestedTab : null
   const initialTab: TabKey = TAB_KEYS.includes(requestedTab as TabKey) ? (requestedTab as TabKey) : 'overview'
@@ -373,10 +376,11 @@ const Application360View = ({
   const [tab, setTab] = useState<TabKey>(initialTab)
   const [assessments, setAssessments] = useState(initialAssessments)
   const [assignOpen, setAssignOpen] = useState(false)
-  const [templateId, setTemplateId] = useState(templates[0]?.templateId ?? '')
-  const [timeLimit, setTimeLimit] = useState('45')
   const [assigning, setAssigning] = useState(false)
-  const [oneTimeToken, setOneTimeToken] = useState<string | null>(null)
+  // TASK-1747 — la propuesta la resuelve el servidor desde la política de la vacante. El cliente
+  // ya NO elige plantilla ni minutos, y NUNCA recibe el token: el enlace viaja por correo.
+  const [assignProposal, setAssignProposal] = useState<AssessmentAssignmentProposal | null>(null)
+  const [assignError, setAssignError] = useState<string | null>(null)
   const [assessmentReviews, setAssessmentReviews] = useState<Record<string, AssessmentReview>>({})
   const [reviewingAssessmentId, setReviewingAssessmentId] = useState<string | null>(null)
   const [scoreDrafts, setScoreDrafts] = useState<Record<string, string>>({})
@@ -411,35 +415,76 @@ const Application360View = ({
     ? `/hr/onboarding?lane=hiring-activation&applicationId=${encodeURIComponent(item.application.applicationId)}&handoffId=${encodeURIComponent(handoff.handoffId)}`
     : `/hr/onboarding?lane=hiring-activation&applicationId=${encodeURIComponent(item.application.applicationId)}`
 
-  const oneTimeAssessmentLink = useMemo(() => {
-    if (!oneTimeToken) return null
-    const base = typeof window === 'undefined' ? '' : window.location.origin
+  // TASK-1747 — camino gobernado propose→confirm (TASK-1719). Reemplaza el legacy
+  // `POST /api/hiring/assessments`, que dejaba al cliente elegir plantilla y devolvía el token
+  // crudo al navegador. Acá el servidor resuelve la política y el enlace viaja SOLO por correo.
+  const assignmentPath = `/api/hiring/applications/${encodeURIComponent(item.application.applicationId)}/assessment-assignment`
 
-    return `${base}/assessment/${oneTimeToken}`
-  }, [oneTimeToken])
+  const assignmentErrorMessage = (err: unknown) => {
+    const code = err instanceof HiringClientError ? err.code : null
+    const c = copy.application.assignment
 
-  const assignAssessment = async () => {
-    if (!templateId) return
+    if (code === 'assessment_assignment_policy_missing') return c.errorPolicyMissing
+    if (code === 'assessment_assignment_proposal_expired') return c.errorExpired
+    if (code === 'assessment_assignment_proposal_stale') return c.errorStale
+    if (code === 'assessment_assignment_proposal_not_confirmable') return c.errorNotConfirmable
+    if (code === 'forbidden') return c.errorPermission
 
+    return c.errorGeneric
+  }
+
+  const openAssignProposal = async () => {
     setAssigning(true)
-    setError(null)
+    setAssignError(null)
+    setAssignProposal(null)
+    setAssignOpen(true)
 
     try {
-      const result = await hiringRequest<{ assessment: Assessment; token: string }>('/api/hiring/assessments', {
+      const result = await hiringRequest<{ proposal: AssessmentAssignmentProposal }>(assignmentPath, {
         method: 'POST',
-        body: JSON.stringify({
-          applicationId: item.application.applicationId,
-          templateId,
-          method: 'candidate_test',
-          timeLimitMinutes: Number(timeLimit) || 45,
-        }),
+        body: JSON.stringify({ action: 'propose' }),
       })
 
-      setAssessments((current) => [result.assessment, ...current.filter((entry) => entry.assessmentId !== result.assessment.assessmentId)])
-      setOneTimeToken(result.token)
-      setAssignOpen(false)
-    } catch (assignError) {
-      setError(assignError instanceof Error ? assignError.message : 'No se pudo asignar el assessment.')
+      setAssignProposal(result.proposal)
+    } catch (proposeError) {
+      setAssignError(assignmentErrorMessage(proposeError))
+    } finally {
+      setAssigning(false)
+    }
+  }
+
+  const confirmAssignProposal = async () => {
+    if (!assignProposal) return
+
+    setAssigning(true)
+    setAssignError(null)
+
+    try {
+      const response = await hiringRequest<{ result: AssessmentAssignmentResult | null }>(assignmentPath, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'confirm', proposalId: assignProposal.proposalId }),
+      })
+
+      // El contrato lo advierte en el propio tipo: NUNCA inferir éxito desde HTTP 200 ni desde la
+      // ausencia de excepción. Sólo `assigned` creó una instancia; el resto son desenlaces reales.
+      const status = response.result?.status ?? 'already_assigned'
+      const results = copy.application.assignment.results
+
+      const reason =
+        response.result && 'reasonCode' in response.result && response.result.reasonCode
+          ? copy.application.assignment.reasons[response.result.reasonCode]
+          : null
+
+      if (status === 'assigned' || status === 'already_assigned') {
+        setToast([results[status], reason].filter(Boolean).join(' '))
+        setAssignOpen(false)
+        router.refresh()
+      } else {
+        // held/blocked/stale/cancelled se quedan en el diálogo con su causa a la vista.
+        setAssignError([results[status], reason].filter(Boolean).join(' '))
+      }
+    } catch (confirmError) {
+      setAssignError(assignmentErrorMessage(confirmError))
     } finally {
       setAssigning(false)
     }
@@ -704,35 +749,17 @@ const Application360View = ({
           <Typography variant='h5'>{assessmentCopy.review.title}</Typography>
           <Typography color='text.secondary' variant='body2'>{assessmentCopy.review.subtitle}</Typography>
         </Box>
-        <GreenhouseButton kind='secondaryAction' leadingIconClassName='tabler-plus' onClick={() => setAssignOpen(true)} sx={{ color: 'text.primary' }}>
-          {copy.application.assignAssessment}
-        </GreenhouseButton>
+        {canAuthorAssessment ? (
+          <GreenhouseButton
+            kind='secondaryAction'
+            leadingIconClassName='tabler-plus'
+            onClick={() => void openAssignProposal()}
+            sx={{ color: 'text.primary' }}
+          >
+            {copy.application.assignAssessment}
+          </GreenhouseButton>
+        ) : null}
       </Stack>
-
-      {oneTimeAssessmentLink ? (
-        <Alert severity='success' icon={<i className='tabler-key' />}>
-          <Stack spacing={1.25}>
-            <Typography fontWeight={700}>{copy.application.assignmentLink}</Typography>
-            <Typography variant='body2' sx={{ overflowWrap: 'anywhere' }}>{oneTimeAssessmentLink}</Typography>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-              <Button
-                size='small'
-                onClick={() => {
-                  void navigator.clipboard.writeText(oneTimeAssessmentLink)
-                  setToast('Enlace copiado.')
-                }}
-                sx={{ alignSelf: 'flex-start' }}
-              >
-                {copy.application.copyLink}
-              </Button>
-              <Button component='a' href={oneTimeAssessmentLink} size='small' target='_blank' rel='noreferrer' endIcon={<i className='tabler-external-link' />}>
-                Abrir superficie
-              </Button>
-            </Stack>
-            <Typography variant='caption'>Se muestra una sola vez; el token crudo no se guarda en claro.</Typography>
-          </Stack>
-        </Alert>
-      ) : null}
 
       {assessments.length === 0 ? (
         <Box sx={{ p: 5, textAlign: 'center' }}>
@@ -741,7 +768,7 @@ const Application360View = ({
               <i aria-hidden='true' className='tabler-clipboard-off' />
             </Box>
             <Typography variant='h6'>{copy.application.assessmentPending}</Typography>
-            <Typography color='text.secondary'>Asigna un test para generar el link tokenizado de un solo uso del candidato.</Typography>
+            <Typography color='text.secondary'>{copy.application.assignment.intro}</Typography>
           </Stack>
         </Box>
       ) : assessments.map((entry) => {
@@ -1537,10 +1564,94 @@ const Application360View = ({
     <>
       <HiringDeskFrame surface='application' copy={copy} lead={lead} primary={primary} />
 
-      <Dialog open={assignOpen} onClose={() => !assigning && setAssignOpen(false)} fullWidth maxWidth='sm' {...dialogMotionProps}>
-        <DialogTitle>{copy.application.assignAssessment}</DialogTitle>
-        <DialogContent><Stack spacing={3} sx={{ pt: 1 }}><FormControl fullWidth><InputLabel id='assessment-template-label'>Plantilla</InputLabel><Select labelId='assessment-template-label' label='Plantilla' value={templateId} onChange={(event) => setTemplateId(event.target.value)}>{templates.map((template) => <MenuItem key={template.templateId} value={template.templateId}>{template.name}</MenuItem>)}</Select></FormControl><TextField type='number' label='Tiempo límite (minutos)' value={timeLimit} onChange={(event) => setTimeLimit(event.target.value)} slotProps={{ htmlInput: { min: 5, max: 240 } }} />{templates.length === 0 ? <Alert severity='warning'>No hay plantillas activas disponibles.</Alert> : null}</Stack></DialogContent>
-        <DialogActions><Button onClick={() => setAssignOpen(false)} disabled={assigning}>{copy.common.cancel}</Button><GreenhouseButton disabled={assigning || !templateId} onClick={() => void assignAssessment()} leadingIcon={assigning ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}>{copy.application.assignAssessment}</GreenhouseButton></DialogActions>
+      <Dialog
+        open={assignOpen}
+        onClose={() => !assigning && setAssignOpen(false)}
+        fullWidth
+        maxWidth='sm'
+        aria-labelledby='assessment-assign-title'
+        {...dialogMotionProps}
+      >
+        <DialogTitle id='assessment-assign-title'>{copy.application.assignment.title}</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2.5} sx={{ pt: 1 }}>
+            <Typography color='text.secondary' variant='body2'>
+              {copy.application.assignment.intro}
+            </Typography>
+
+            {assigning && !assignProposal ? (
+              <Stack alignItems='center' direction='row' spacing={1.5}>
+                <CircularProgress size={18} />
+                <Typography variant='body2'>{copy.application.assignment.proposing}</Typography>
+              </Stack>
+            ) : null}
+
+            {assignProposal ? (
+              <Stack spacing={1.25}>
+                <Stack direction='row' justifyContent='space-between' spacing={2}>
+                  <Typography color='text.secondary' variant='body2'>
+                    {copy.application.assignment.previewTemplate}
+                  </Typography>
+                  <Typography fontWeight={700} variant='body2'>
+                    {assignProposal.preview.templateName ?? '—'}
+                  </Typography>
+                </Stack>
+                <Stack direction='row' justifyContent='space-between' spacing={2}>
+                  <Typography color='text.secondary' variant='body2'>
+                    {copy.application.assignment.previewTimeLimitLabel}
+                  </Typography>
+                  <Typography fontWeight={700} variant='body2'>
+                    {assignProposal.preview.timeLimitMinutes
+                      ? copy.application.assignment.previewTimeLimit.replace(
+                          '{minutes}',
+                          String(assignProposal.preview.timeLimitMinutes),
+                        )
+                      : copy.application.assignment.previewNoTimeLimit}
+                  </Typography>
+                </Stack>
+                {/* `recipientReady` no promete entrega: dice si hay a quién enviarle. */}
+                {assignProposal.preview.recipientReady ? (
+                  <Typography color='text.secondary' variant='caption'>
+                    {copy.application.assignment.previewRecipientReady}
+                  </Typography>
+                ) : (
+                  <Alert severity='warning'>{copy.application.assignment.previewRecipientNotReady}</Alert>
+                )}
+                {assignProposal.preview.existingOpenAssessment ? (
+                  <Alert severity='error'>{copy.application.assignment.existingOpen}</Alert>
+                ) : null}
+                {assignProposal.preview.existingScoredAssessment ? (
+                  <Alert severity='warning'>{copy.application.assignment.existingScored}</Alert>
+                ) : null}
+              </Stack>
+            ) : null}
+
+            {assignError ? (
+              <Alert severity='error' role='status'>
+                {assignError}
+              </Alert>
+            ) : null}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button disabled={assigning} onClick={() => setAssignOpen(false)}>
+            {copy.common.cancel}
+          </Button>
+          <GreenhouseButton
+            disabled={assigning || !assignProposal || assignProposal.preview.existingOpenAssessment}
+            aria-busy={assigning}
+            leadingIcon={
+              assigning && assignProposal ? (
+                <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} />
+              ) : undefined
+            }
+            onClick={() => void confirmAssignProposal()}
+          >
+            {assigning && assignProposal
+              ? copy.application.assignment.confirming
+              : copy.application.assignment.confirm}
+          </GreenhouseButton>
+        </DialogActions>
       </Dialog>
 
       <Dialog open={confirmOpen} onClose={() => !deciding && setConfirmOpen(false)} fullWidth maxWidth='sm' {...dialogMotionProps}>

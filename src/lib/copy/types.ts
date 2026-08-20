@@ -580,6 +580,54 @@ export interface HiringDeskCopy {
      * exacta cuando no se puede recuperar en vez de un "no disponible" genérico, y advierte que
      * el enlace se muestra una sola vez antes de mostrarlo.
      */
+    /**
+     * TASK-1747 — copy de la asignación gobernada (propose→confirm).
+     *
+     * Reemplaza el camino legacy, donde el cliente elegía plantilla y recibía el token crudo. Acá
+     * el servidor decide por política y el operador confirma lo que vio. El copy nunca afirma que
+     * el correo salió: el resultado trae `deliveryStatus: 'pending'`, que NO significa enviado.
+     */
+    assignment: {
+      title: string
+      intro: string
+      previewTemplate: string
+      previewTimeLimitLabel: string
+      previewTimeLimit: string
+      previewNoTimeLimit: string
+      previewRecipientReady: string
+      previewRecipientNotReady: string
+      existingOpen: string
+      existingScored: string
+      confirm: string
+      confirming: string
+      proposing: string
+      results: {
+        assigned: string
+        already_assigned: string
+        held: string
+        blocked: string
+        stale: string
+        cancelled: string
+      }
+      reasons: {
+        missing_email: string
+        unverified_recipient: string
+        volume_cap: string
+        policy_disabled: string
+        policy_mode_manual: string
+        template_inactive: string
+        stage_changed: string
+        application_decided: string
+        existing_open_instance: string
+        operator_cancelled: string
+      }
+      errorPolicyMissing: string
+      errorExpired: string
+      errorStale: string
+      errorNotConfirmable: string
+      errorGeneric: string
+      errorPermission: string
+    }
     accessRecovery: {
       cta: string
       title: string

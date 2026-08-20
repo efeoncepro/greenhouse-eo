@@ -15,7 +15,7 @@ import {
 } from '@/lib/hiring/documents'
 import { getHiringHandoffByApplicationId } from '@/lib/hiring/handoff'
 import { captureWithDomain } from '@/lib/observability/capture'
-import { listAssessmentsForApplication, listTemplates } from '@/lib/hiring/assessment'
+import { listAssessmentsForApplication } from '@/lib/hiring/assessment'
 import { resolveUserDisplayNames } from '@/lib/identity/user-display-names'
 import { getMicrocopy } from '@/lib/copy'
 import { normalizeLocale } from '@/i18n/locales'
@@ -62,11 +62,10 @@ export default async function HiringApplicationPage({ params }: Props) {
   const canAnnotate = can(tenant, 'hiring.application.annotate', 'execute', 'tenant')
   const canScore = can(tenant, 'hiring.assessment.score', 'execute', 'tenant')
 
-  const [locale, snapshot, assessments, templates, handoff, documents, notesView] = await Promise.all([
+  const [locale, snapshot, assessments, handoff, documents, notesView] = await Promise.all([
     getLocale(),
     getHiringDeskSnapshot({ openingId: application.openingId, openingLimit: 80, applicationLimit: 120 }),
     canReadAssessment ? listAssessmentsForApplication(applicationId) : Promise.resolve([]),
-    canAuthorAssessment ? listTemplates() : Promise.resolve([]),
     getHiringHandoffByApplicationId(applicationId),
     canReadDocuments
       ? resolveCandidateDocuments({ candidateFacetId: application.candidateFacetId })
@@ -108,7 +107,7 @@ export default async function HiringApplicationPage({ params }: Props) {
       assessmentCopy={getMicrocopy(normalizeLocale(locale) ?? undefined).hiringAssessment}
       initialItem={item}
       initialAssessments={assessments}
-      templates={templates}
+      canAuthorAssessment={canAuthorAssessment}
       initialHandoff={handoff}
       canApproveHandoff={canApproveHandoff}
       documents={documents}
