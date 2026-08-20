@@ -266,6 +266,32 @@ export const decideAssessmentAccessRotationNotice = (input: {
   return { notify: true }
 }
 
+/**
+ * TASK-1757 — el mismo juicio, ANTES de emitir.
+ *
+ * Existe para que el operador sepa si el candidato va a ser avisado **antes** de apretar. Sin esto,
+ * manda el WhatsApp diciendo "te llegó un correo" cuando ningún correo salió — y la persona se
+ * queda esperando algo que no existe.
+ *
+ * Delega en la misma función que usa el envío: predecir con una copia del criterio es cómo la
+ * pantalla y el worker terminan diciendo cosas distintas. La credencial todavía no existe, así que
+ * su vigencia se asume futura: es el único input que el momento de la predicción no puede conocer,
+ * y por construcción una credencial recién emitida está viva.
+ */
+export const predictAssessmentAccessRotationNotice = (input: {
+  reasonCode: AssessmentAccessRecoveryReason
+  hasCandidateEmail: boolean
+  providerBlockStatus: string | null
+}): AssessmentAccessRotationNoticeDecision =>
+  decideAssessmentAccessRotationNotice({
+    channel: 'secure_link',
+    outcome: 'link_issued',
+    reasonCode: input.reasonCode,
+    hasCandidateEmail: input.hasCandidateEmail,
+    providerBlockStatus: input.providerBlockStatus,
+    expiresAt: new Date(Date.now() + 60_000),
+  })
+
 export interface AssessmentAccessRecoveryAvailability {
   assessmentId: string
   applicationId: string

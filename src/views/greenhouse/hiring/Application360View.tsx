@@ -43,7 +43,10 @@ import {
 } from '@/components/greenhouse/primitives'
 import type { HiringAssessmentCopy, HiringDeskCopy } from '@/lib/copy'
 import { formatDate, formatDateTime } from '@/lib/format'
-import { ASSESSMENT_ACCESS_RECOVERY_REASONS } from '@/lib/hiring/assessment/access-recovery/vocabulary'
+import {
+  ASSESSMENT_ACCESS_RECOVERY_REASONS,
+  predictAssessmentAccessRotationNotice,
+} from '@/lib/hiring/assessment/access-recovery/vocabulary'
 import type {
   AssessmentAccessRecoveryAvailability,
   AssessmentAccessRecoveryChannel,
@@ -554,6 +557,23 @@ const Application360View = ({
       email: canRecoverAccessByEmail && Boolean(target) && open(target!.channels.email),
       secureLink: canRevealAccessLink && Boolean(target) && open(target!.channels.secureLink),
     }
+  })()
+
+  /**
+   * TASK-1757 — qué va a saber el candidato. Se recalcula con el canal y el motivo que el operador
+   * tiene elegidos AHORA, no con los del preview: el motivo cambia la respuesta, y esta línea
+   * existe para que nadie prometa por WhatsApp un correo que no va a salir.
+   */
+  const recoveryNoticePrediction = (() => {
+    const target = recoveryFor ? recoveryAvailability[recoveryFor] : null
+
+    if (!target) return null
+
+    return predictAssessmentAccessRotationNotice({
+      reasonCode: recoveryReason,
+      hasCandidateEmail: target.channels.email.hasCandidateEmail,
+      providerBlockStatus: target.channels.email.providerStatus,
+    })
   })()
 
   const closeRecovery = () => {
@@ -2007,6 +2027,23 @@ const Application360View = ({
                 ))}
               </Select>
             </FormControl>
+
+            {/* El canal `email` lleva el aviso en el mismo mensaje que la credencial, así que
+                acá sólo importa cuando el enlace se entrega en mano. */}
+            {recoveryChannel === 'secure_link' && recoveryNoticePrediction ? (
+              recoveryNoticePrediction.notify ? (
+                <Alert severity='info' icon={<i className='tabler-mail' />}>
+                  {recoveryCopy.noticeWillSend}
+                </Alert>
+              ) : (
+                <Alert severity='warning'>
+                  <Typography fontWeight={700} variant='body2'>{recoveryCopy.noticeSkipTitle}</Typography>
+                  <Typography variant='body2'>
+                    {recoveryCopy.noticeSkip[recoveryNoticePrediction.skip]}
+                  </Typography>
+                </Alert>
+              )
+            ) : null}
 
             {recoveryNotice ? (
               <Alert severity='info' role='status'>{recoveryNotice}</Alert>

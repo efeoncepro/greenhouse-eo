@@ -164,6 +164,15 @@ export const hiringDesk: HiringDeskCopy = {
         provider_delivery_failed: 'The email bounced or delivery failed',
         token_expired_before_start: 'It expired before they started',
       },
+      noticeWillSend: 'We will email them that their previous access stopped working. The link is NOT in that email.',
+      noticeSkipTitle: 'We will not notify them',
+      noticeSkip: {
+        no_candidate_email: 'There is no email on record, so they will not know their access changed. Deliver it yourself or they will be left waiting.',
+        provider_blocked: 'The provider blocks email to this address. No notice will reach them: hand delivery is their only path.',
+        operator_declared_delivery_failed: 'You declared the email send failed, so we are not insisting there. Hand delivery is their only path.',
+        not_secure_link: 'The recovery email already tells them the previous link stopped working.',
+        credential_already_expired: 'We will not notify them: the new access would already be expired.',
+      },
       confirm: 'Recover access',
       confirming: 'Recovering…',
       emailQueued:

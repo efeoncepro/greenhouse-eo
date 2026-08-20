@@ -216,6 +216,15 @@ export const hiringDesk: HiringDeskCopy = {
         provider_delivery_failed: 'El correo rebotó o falló el envío',
         token_expired_before_start: 'Se le venció antes de empezar',
       },
+      noticeWillSend: 'Le avisaremos por correo que su acceso anterior dejó de servir. El enlace NO va en ese correo.',
+      noticeSkipTitle: 'No le vamos a avisar',
+      noticeSkip: {
+        no_candidate_email: 'No tenemos un correo registrado para esta persona, así que no sabrá que su acceso cambió. Entrégaselo tú o quedará esperando.',
+        provider_blocked: 'El proveedor bloquea los correos a esta dirección. No le va a llegar ningún aviso: la entrega en mano es su única vía.',
+        operator_declared_delivery_failed: 'Declaraste que el envío por correo falló, así que no insistimos por ahí. La entrega en mano es su única vía.',
+        not_secure_link: 'El correo de recuperación ya le dice que el enlace anterior dejó de servir.',
+        credential_already_expired: 'No le avisaremos: el acceso nuevo ya estaría vencido.',
+      },
       confirm: 'Recuperar acceso',
       confirming: 'Recuperando…',
       emailQueued:

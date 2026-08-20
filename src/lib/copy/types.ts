@@ -26,6 +26,7 @@
  */
 export const SUPPORTED_LOCALES = ['es-CL', 'en-US'] as const
 
+import type { AssessmentAccessRotationNoticeSkip } from '@/lib/hiring/assessment/access-recovery/vocabulary'
 import type {
   AssessmentAssignmentReasonCode,
   AssessmentAssignmentResult,
@@ -651,6 +652,14 @@ export interface HiringDeskCopy {
         provider_delivery_failed: string
         token_expired_before_start: string
       }
+      /**
+       * TASK-1757 — qué se le va a decir (o no) al candidato. Atado a la unión del dominio: un
+       * motivo de omisión nuevo rompe el build en vez de dejar al operador sin saber por qué la
+       * persona no se va a enterar.
+       */
+      noticeWillSend: string
+      noticeSkipTitle: string
+      noticeSkip: Record<AssessmentAccessRotationNoticeSkip, string>
       confirm: string
       confirming: string
       emailQueued: string
