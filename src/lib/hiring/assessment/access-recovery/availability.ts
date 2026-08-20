@@ -6,6 +6,7 @@ import {
   ASSESSMENT_ACCESS_RECOVERY_COOLDOWN_SECONDS,
   ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS,
   decideAssessmentAccessRecoveryEligibility,
+  type AssessmentAccessRecoveryAvailability,
   type AssessmentAccessRecoveryReason,
 } from './contracts'
 
@@ -30,26 +31,6 @@ interface AvailabilityRow extends Record<string, unknown> {
   latest_secure_link_recovery_at: Date | string | null
 }
 
-export interface AssessmentAccessRecoveryAvailability {
-  assessmentId: string
-  applicationId: string
-  openingId: string
-  status: string
-  eligible: boolean
-  eligibilityCode: string | null
-  channels: {
-    email: { available: boolean; providerStatus: string | null; hasCandidateEmail: boolean }
-    secureLink: { available: boolean }
-  }
-  rateLimit: {
-    maxPer24Hours: number
-    usedIn24Hours: number
-    cooldownUntil: string | null
-    /** Cooldown propio del enlace seguro: NUNCA se comparte con el del correo. */
-    secureLinkCooldownUntil: string | null
-    limited: boolean
-  }
-}
 
 const iso = (value: Date | string) => new Date(value).toISOString()
 

@@ -177,6 +177,7 @@ export const hiringDesk: HiringDeskCopy = {
       linkWarning:
         'Verify their identity before handing it over, and copy it now: it will not be available again after you close this dialog.',
       linkExpiry: 'Expires in 24 hours ({date}).',
+      linkCopy: 'Copy link',
       linkCopied: 'Link copied.',
       linkAlreadyRevealed:
         'This link was already issued and is shown only once. If you lost it, recover access again to issue a new one.',

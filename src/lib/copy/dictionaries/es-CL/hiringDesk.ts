@@ -229,6 +229,7 @@ export const hiringDesk: HiringDeskCopy = {
       linkWarning:
         'Verifica su identidad antes de entregárselo y cópialo ahora: al cerrar esta ventana no vuelve a estar disponible.',
       linkExpiry: 'Vence en 24 horas ({date}).',
+      linkCopy: 'Copiar enlace',
       linkCopied: 'Enlace copiado.',
       linkAlreadyRevealed:
         'Este enlace ya se generó y sólo se muestra una vez. Si lo perdiste, recupera el acceso de nuevo para emitir otro.',

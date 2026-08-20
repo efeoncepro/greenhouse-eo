@@ -43,6 +43,13 @@ import {
 } from '@/components/greenhouse/primitives'
 import type { HiringAssessmentCopy, HiringDeskCopy } from '@/lib/copy'
 import { formatDate, formatDateTime } from '@/lib/format'
+import { ASSESSMENT_ACCESS_RECOVERY_REASONS } from '@/lib/hiring/assessment/access-recovery/vocabulary'
+import type {
+  AssessmentAccessRecoveryAvailability,
+  AssessmentAccessRecoveryChannel,
+  AssessmentAccessRecoveryOutcome,
+  AssessmentAccessRecoveryReason,
+} from '@/lib/hiring/assessment/access-recovery/vocabulary'
 import { getCountryName } from '@/lib/locale/countries'
 import type {
   DecideHiringApplicationResult,
@@ -69,6 +76,7 @@ import { HiringClientError, hiringRequest, scoreTone } from './hiring-client'
 import type { AssessmentAssignmentProposal, AssessmentAssignmentResult } from '@/types/hiring-assessment-policy'
 import { computeScorecardSummary } from './scorecard-summary'
 import { AssessmentAiRunEntry } from './AssessmentAiRunWorkbench'
+import { AssessmentRecoveryCluster } from './AssessmentRecoveryCluster'
 
 type TabKey = 'overview' | 'assessment' | 'documents' | 'decision' | 'expediente'
 const TAB_KEYS: TabKey[] = ['overview', 'assessment', 'documents', 'decision', 'expediente']
@@ -228,6 +236,19 @@ interface Application360ViewProps {
   initialAssessments: Assessment[]
   /** TASK-1747 — la asignación gobernada la decide la política; el cliente ya no elige. */
   canAuthorAssessment: boolean
+  /**
+   * TASK-1747 — las dos puertas de la recuperación son INDEPENDIENTES. El correo va al buzón ya
+   * registrado; el enlace se entrega en mano y exige verificar identidad, así que se otorga
+   * aparte. Nunca colapsar en un solo booleano.
+   */
+  canRecoverAccessByEmail: boolean
+  canRevealAccessLink: boolean
+  /**
+   * Disponibilidad por assessment. Ausente = no aplica (no es `candidate_test`, o el operador no
+   * tiene ninguna de las dos puertas). `null` = la lectura FALLÓ, que NO es lo mismo que "no se
+   * puede recuperar": la tarjeta lo dice en vez de esconder el camino.
+   */
+  recoveryAvailability: Record<string, AssessmentAccessRecoveryAvailability | null>
   initialHandoff: HiringHandoff | null
   canApproveHandoff: boolean
   /** TASK-1715 — paquete documental resuelto en servidor. `null` si falló o si no hay acceso. */
@@ -357,6 +378,9 @@ const Application360View = ({
   initialItem,
   initialAssessments,
   canAuthorAssessment,
+  canRecoverAccessByEmail,
+  canRevealAccessLink,
+  recoveryAvailability,
   initialHandoff,
   notes,
   notesFailed,
@@ -381,6 +405,22 @@ const Application360View = ({
   // ya NO elige plantilla ni minutos, y NUNCA recibe el token: el enlace viaja por correo.
   const [assignProposal, setAssignProposal] = useState<AssessmentAssignmentProposal | null>(null)
   const [assignError, setAssignError] = useState<string | null>(null)
+  /*
+   * TASK-1747 — recuperación de acceso.
+   *
+   * `revealedLink` es el ÚNICO lugar donde vive la URL con credencial, y muere al cerrar el
+   * diálogo: no va a toast, ni a la URL, ni a `localStorage`, ni al historial. El servidor la
+   * devuelve una sola vez y reintentar la misma solicitud responde `replayed` SIN el enlace.
+   */
+  const [recoveryFor, setRecoveryFor] = useState<string | null>(null)
+  const [recoveryChannel, setRecoveryChannel] = useState<AssessmentAccessRecoveryChannel>('email')
+  const [recoveryReason, setRecoveryReason] = useState<AssessmentAccessRecoveryReason>('candidate_reports_email_not_received')
+  const [recovering, setRecovering] = useState(false)
+  const [recoveryError, setRecoveryError] = useState<string | null>(null)
+  const [recoveryNotice, setRecoveryNotice] = useState<string | null>(null)
+  const [revealedLink, setRevealedLink] = useState<{ url: string; expiresAt: string } | null>(null)
+  const recoveryIdempotencyRef = useRef<string | null>(null)
+  const recoveryTriggerRef = useRef<HTMLButtonElement | null>(null)
   const [assessmentReviews, setAssessmentReviews] = useState<Record<string, AssessmentReview>>({})
   const [reviewingAssessmentId, setReviewingAssessmentId] = useState<string | null>(null)
   const [scoreDrafts, setScoreDrafts] = useState<Record<string, string>>({})
@@ -472,6 +512,118 @@ const Application360View = ({
     if (code === 'hiring_invalid_input') return c.errorStructural
 
     return actionable ? c.errorGeneric : c.errorStructural
+  }
+
+  const recoveryCopy = copy.application.accessRecovery
+
+  /**
+   * Los motivos NO son todos válidos para cualquier estado. `token_expired_before_start` es el
+   * único que puede probar el vencimiento previo al inicio, así que un test `expired` empieza con
+   * ese motivo preseleccionado: si no, el operador ve "no podemos probar cuándo caducó" sobre el
+   * caso más común y no tiene cómo adivinar que la salida es cambiar el motivo.
+   */
+  const openRecovery = (assessmentId: string, availability: AssessmentAccessRecoveryAvailability) => {
+    const emailAvailable = canRecoverAccessByEmail && availability.channels.email.available
+
+    setRecoveryFor(assessmentId)
+    setRecoveryChannel(emailAvailable ? 'email' : 'secure_link')
+    setRecoveryReason(
+      availability.status === 'expired' ? 'token_expired_before_start' : 'candidate_reports_email_not_received',
+    )
+    setRecoveryError(null)
+    setRecoveryNotice(null)
+    setRevealedLink(null)
+    // Una llave por INTENCIÓN, no por click: reintentar el mismo envío tras un error de red no
+    // puede emitir una credencial nueva ni consumir otra unidad de la cuota diaria.
+    recoveryIdempotencyRef.current = `assessment-recovery:${assessmentId}:${crypto.randomUUID()}`
+  }
+
+  const closeRecovery = () => {
+    setRecoveryFor(null)
+    // El enlace muere acá. Es la razón de ser de la revelación única.
+    setRevealedLink(null)
+    recoveryIdempotencyRef.current = null
+    recoveryTriggerRef.current?.focus()
+  }
+
+  const recoveryErrorMessage = (err: unknown) => {
+    const code = err instanceof HiringClientError ? err.code : null
+
+    if (code === 'forbidden') return recoveryCopy.errorPermission
+    if (code === 'unauthorized') return recoveryCopy.errorPermission
+    if (code === 'rate_limited') return recoveryCopy.errorRateLimited
+    if (code === 'assessment_recovery_idempotency_conflict') return recoveryCopy.errorIdempotencyConflict
+    if (code === 'assessment_recovery_email_provider_blocked') return recoveryCopy.emailBlocked
+    if (code === 'assessment_recovery_unavailable') return recoveryCopy.errorConflict
+    if (code === 'assessment_recovery_invalid_request') return recoveryCopy.errorConflict
+
+    return recoveryCopy.errorGeneric
+  }
+
+  const submitRecovery = async () => {
+    const assessmentId = recoveryFor
+    const idempotencyKey = recoveryIdempotencyRef.current
+
+    if (!assessmentId || !idempotencyKey) return
+
+    setRecovering(true)
+    setRecoveryError(null)
+    setRecoveryNotice(null)
+
+    try {
+      const response = await hiringRequest<{
+        recovery: { outcome: AssessmentAccessRecoveryOutcome; expiresAt: string }
+        replayed: boolean
+        linkRevealed: boolean
+        accessUrl?: string
+      }>(`/api/hiring/assessments/${encodeURIComponent(assessmentId)}/access-recovery`, {
+        method: 'POST',
+        headers: { 'x-idempotency-key': idempotencyKey },
+        body: JSON.stringify({
+          applicationId: item.application.applicationId,
+          channel: recoveryChannel,
+          reasonCode: recoveryReason,
+        }),
+      })
+
+      if (response.linkRevealed && response.accessUrl) {
+        setRevealedLink({ url: response.accessUrl, expiresAt: response.recovery.expiresAt })
+
+        return
+      }
+
+      // Enlace pedido pero NO revelado: es un replay. La credencial ya se emitió y sólo se muestra
+      // una vez — decirlo es la única salida honesta; inventar un "listo" dejaría al operador
+      // esperando un enlace que no va a aparecer.
+      if (recoveryChannel === 'secure_link') {
+        setRecoveryNotice(recoveryCopy.linkAlreadyRevealed)
+        router.refresh()
+
+        return
+      }
+
+      // Correo: el desenlace del PROVEEDOR, que no es lo mismo que "le llegó". Cada rama tiene su
+      // frase porque el siguiente paso del operador cambia en cada una.
+      const outcomeMessage =
+        response.recovery.outcome === 'dispatch_accepted'
+          ? recoveryCopy.emailQueued
+          : response.recovery.outcome === 'pending_dispatch'
+            ? recoveryCopy.emailPending
+            : response.recovery.outcome === 'dispatch_failed'
+              ? recoveryCopy.emailFailed
+              : recoveryCopy.emailUnknown
+
+      setRecoveryNotice(
+        [outcomeMessage, formatTemplate(recoveryCopy.emailExpiry, { date: formatDate(response.recovery.expiresAt) })]
+          .filter(Boolean)
+          .join(' '),
+      )
+      router.refresh()
+    } catch (recoverError) {
+      setRecoveryError(recoveryErrorMessage(recoverError))
+    } finally {
+      setRecovering(false)
+    }
   }
 
   const openAssignProposal = async () => {
@@ -927,6 +1079,31 @@ const Application360View = ({
                   revisión: una cola de excepciones pendiente no puede quedar escondida detrás
                   de "Revisar evaluación". Sin run o sin capability no dibuja nada. */}
               <AssessmentAiRunEntry assessmentId={entry.assessmentId} copy={assessmentCopy.scoringRun} canScore={canScore} />
+
+              {/* TASK-1747 — recuperación de acceso. Reemplaza al enlace que la pantalla mostraba
+                  en claro y que el correo invalidaba minutos después. Sólo se dibuja para tests
+                  del candidato y sólo si el operador tiene alguna de las dos puertas. */}
+              {entry.assessmentId in recoveryAvailability ? (
+                recoveryAvailability[entry.assessmentId] === null ? (
+                  // La lectura falló. Decirlo, no esconder el cluster: un affordance ausente es
+                  // indistinguible de uno prohibido.
+                  <Alert severity='warning'>{recoveryCopy.errorReadFailed}</Alert>
+                ) : (
+                  <AssessmentRecoveryCluster
+                    availability={recoveryAvailability[entry.assessmentId] as AssessmentAccessRecoveryAvailability}
+                    copy={recoveryCopy}
+                    canRecoverByEmail={canRecoverAccessByEmail}
+                    canRevealLink={canRevealAccessLink}
+                    onOpen={(trigger) => {
+                      recoveryTriggerRef.current = trigger
+                      openRecovery(
+                        entry.assessmentId,
+                        recoveryAvailability[entry.assessmentId] as AssessmentAccessRecoveryAvailability,
+                      )
+                    }}
+                  />
+                )
+              ) : null}
 
               {!review ? (
                 // TASK-1719: `cancelled` tenía que caer en su propia rama — en el `else` mostraba
@@ -1734,6 +1911,125 @@ const Application360View = ({
               ? copy.application.assignment.confirming
               : copy.application.assignment.confirm}
           </GreenhouseButton>
+        </DialogActions>
+      </Dialog>
+
+      {/* TASK-1747 — recuperación de acceso: confirmación deliberada.
+          El operador declara CÓMO se lo hace llegar y POR QUÉ. El motivo va al ledger append-only,
+          así que las etiquetas conservan el "dice que": nadie puede afirmar que un correo NO llegó. */}
+      <Dialog
+        open={recoveryFor !== null && revealedLink === null}
+        onClose={() => !recovering && closeRecovery()}
+        fullWidth
+        maxWidth='sm'
+        aria-label={formatTemplate(recoveryCopy.dialogAriaLabel, { name: item.candidateName })}
+        {...dialogMotionProps}
+      >
+        <DialogTitle>{recoveryCopy.title}</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2.5} sx={{ pt: 1 }}>
+            <Typography color='text.secondary' variant='body2'>{recoveryCopy.intro}</Typography>
+
+            <FormControl fullWidth>
+              <InputLabel id='recovery-channel-label'>{recoveryCopy.channelLabel}</InputLabel>
+              <Select
+                labelId='recovery-channel-label'
+                label={recoveryCopy.channelLabel}
+                value={recoveryChannel}
+                disabled={recovering}
+                onChange={(event) => setRecoveryChannel(event.target.value as AssessmentAccessRecoveryChannel)}
+              >
+                <MenuItem value='email' disabled={!canRecoverAccessByEmail}>{recoveryCopy.channelEmail}</MenuItem>
+                <MenuItem value='secure_link' disabled={!canRevealAccessLink}>{recoveryCopy.channelSecureLink}</MenuItem>
+              </Select>
+              <Typography color='text.secondary' variant='caption' sx={{ mt: 0.75 }}>
+                {recoveryChannel === 'email' ? recoveryCopy.channelEmailHelp : recoveryCopy.channelSecureLinkHelp}
+              </Typography>
+            </FormControl>
+
+            <FormControl fullWidth>
+              <InputLabel id='recovery-reason-label'>{recoveryCopy.reasonLabel}</InputLabel>
+              <Select
+                labelId='recovery-reason-label'
+                label={recoveryCopy.reasonLabel}
+                value={recoveryReason}
+                disabled={recovering}
+                onChange={(event) => setRecoveryReason(event.target.value as AssessmentAccessRecoveryReason)}
+              >
+                {ASSESSMENT_ACCESS_RECOVERY_REASONS.map((code) => (
+                  <MenuItem key={code} value={code}>{recoveryCopy.reasons[code]}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            {recoveryNotice ? (
+              <Alert severity='info' role='status'>{recoveryNotice}</Alert>
+            ) : null}
+            {recoveryError ? (
+              <Alert severity='error' role='alert'>{recoveryError}</Alert>
+            ) : null}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button disabled={recovering} onClick={closeRecovery}>{copy.common.cancel}</Button>
+          <GreenhouseButton
+            disabled={recovering}
+            aria-busy={recovering}
+            leadingIcon={recovering ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}
+            onClick={() => void submitRecovery()}
+          >
+            {recovering ? recoveryCopy.confirming : recoveryCopy.confirm}
+          </GreenhouseButton>
+        </DialogActions>
+      </Dialog>
+
+      {/* Revelación ÚNICA. El servidor devuelve la URL una sola vez; al cerrar, muere en memoria.
+          No hay toast, ni URL, ni persistencia local: reintentar la misma solicitud responde
+          `replayed` SIN el enlace, y esa es exactamente la garantía que hace segura la entrega. */}
+      <Dialog
+        open={revealedLink !== null}
+        onClose={closeRecovery}
+        fullWidth
+        maxWidth='sm'
+        aria-label={formatTemplate(recoveryCopy.dialogAriaLabel, { name: item.candidateName })}
+        {...dialogMotionProps}
+      >
+        <DialogTitle>{recoveryCopy.linkTitle}</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ pt: 1 }}>
+            <Alert severity='warning' role='alert'>{recoveryCopy.linkWarning}</Alert>
+            <TextField
+              fullWidth
+              multiline
+              minRows={2}
+              value={revealedLink?.url ?? ''}
+              slotProps={{ htmlInput: { readOnly: true, spellCheck: false } }}
+              onFocus={(event) => event.currentTarget.select()}
+            />
+            <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap' useFlexGap>
+              <GreenhouseButton
+                kind='secondaryAction'
+                leadingIconClassName='tabler-copy'
+                aria-label={formatTemplate(recoveryCopy.copyAriaLabel, { name: item.candidateName })}
+                onClick={() => {
+                  if (revealedLink) {
+                    void navigator.clipboard?.writeText(revealedLink.url)
+                    setToast(recoveryCopy.linkCopied)
+                  }
+                }}
+              >
+                {recoveryCopy.linkCopy}
+              </GreenhouseButton>
+              {revealedLink ? (
+                <Typography color='text.secondary' variant='caption'>
+                  {formatTemplate(recoveryCopy.linkExpiry, { date: formatDate(revealedLink.expiresAt) })}
+                </Typography>
+              ) : null}
+            </Stack>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <GreenhouseButton onClick={() => { closeRecovery(); router.refresh() }}>{copy.common.close}</GreenhouseButton>
         </DialogActions>
       </Dialog>
 

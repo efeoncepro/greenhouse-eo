@@ -77,6 +77,56 @@ const safeReceipt = (receipt: {
   deliveryId: receipt.deliveryId,
 })
 
+/**
+ * TASK-1747 — lectura de disponibilidad de recuperación.
+ *
+ * Existe para que la disponibilidad sea un CONTRATO y no un privilegio de la página: Application
+ * 360 la resuelve server-side, pero cualquier otro consumidor gobernado (Nexa, MCP, un runbook)
+ * necesita poder preguntar "¿se puede recuperar el acceso de este test y por qué canal?" sin
+ * ejecutar el command. Es de sólo lectura: NUNCA emite credencial ni consume cuota.
+ *
+ * `reason` es opcional y sí cambia la respuesta: la elegibilidad de un test `expired` depende del
+ * motivo declarado (sólo `token_expired_before_start` puede probar el vencimiento previo al
+ * inicio). Sin `reason`, se responde con el motivo por defecto.
+ */
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { tenant, errorResponse } = await requireInternalTenantContext()
+
+  if (!tenant) return errorResponse ?? json({ ok: false, code: 'unauthorized' }, 401)
+
+  if (!can(tenant, 'hiring.assessment.read', 'read', 'tenant')
+    || !can(tenant, 'hiring.application.read', 'read', 'tenant')) {
+    return json({ ok: false, code: 'forbidden' }, 403)
+  }
+
+  const reasonParam = new URL(request.url).searchParams.get('reason')
+
+  if (reasonParam !== null && !isAssessmentAccessRecoveryReason(reasonParam)) return invalid()
+
+  try {
+    const { id } = await params
+
+    const availability = reasonParam
+      ? await getAssessmentAccessRecoveryAvailability(id, reasonParam)
+      : await getAssessmentAccessRecoveryAvailability(id)
+
+    if (!availability) return unavailable()
+
+    return json({
+      ok: true,
+      availability,
+      canRecoverByEmail: can(tenant, 'hiring.assessment.recover_access_email', 'execute', 'tenant'),
+      canRevealSecureLink: can(tenant, 'hiring.assessment.reveal_access_link', 'execute', 'tenant'),
+    }, 200)
+  } catch (error) {
+    captureWithDomain(error, 'hiring', {
+      tags: { source: 'assessment_access_recovery_availability_api' },
+    })
+
+    return json({ ok: false, code: 'internal_error' }, 500)
+  }
+}
+
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!hasExactSameOrigin(request)) return json({ ok: false, code: 'forbidden' }, 403)
 

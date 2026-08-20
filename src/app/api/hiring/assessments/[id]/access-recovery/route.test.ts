@@ -26,7 +26,7 @@ vi.mock('@/lib/hiring/assessment/access-recovery', async importOriginal => {
   }
 })
 
-const { POST } = await import('./route')
+const { GET, POST } = await import('./route')
 
 const assessmentId = 'asmt-11111111-1111-4111-8111-111111111111'
 const applicationId = 'happ-11111111-1111-4111-8111-111111111111'
@@ -238,5 +238,64 @@ describe('POST hiring assessment access recovery', () => {
     const manual = await POST(request(), context)
 
     expect(manual.status).toBe(201)
+  })
+})
+
+/**
+ * TASK-1747 — la lectura de disponibilidad es un CONTRATO, no un privilegio de Application 360.
+ * Sin ella, cualquier otro consumidor gobernado tendría que ejecutar el command para averiguar si
+ * podía ejecutarlo.
+ */
+describe('GET /api/hiring/assessments/[id]/access-recovery', () => {
+  const params = Promise.resolve({ id: assessmentId })
+
+  const url = (reason?: string) =>
+    new Request(`https://greenhouse.test/api/hiring/assessments/${assessmentId}/access-recovery${reason ? `?reason=${reason}` : ''}`)
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mocks.tenant.mockResolvedValue({ tenant })
+    mocks.can.mockReturnValue(true)
+    mocks.availability.mockResolvedValue({ assessmentId, applicationId, eligible: true })
+  })
+
+  it('responde la disponibilidad junto con las DOS puertas por separado', async () => {
+    mocks.can.mockImplementation((_t: unknown, capability: string) => capability !== 'hiring.assessment.reveal_access_link')
+
+    const response = await GET(url(), { params })
+    const body = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(body.canRecoverByEmail).toBe(true)
+    // Colapsar las dos puertas en un booleano dejaría revelar enlaces a quien sólo puede reenviar.
+    expect(body.canRevealSecureLink).toBe(false)
+  })
+
+  it('NO ejecuta el command: leer disponibilidad nunca emite credencial ni consume cuota', async () => {
+    await GET(url(), { params })
+
+    expect(mocks.secureLink).not.toHaveBeenCalled()
+  })
+
+  it('un motivo inválido se rechaza en vez de resolverse al default en silencio', async () => {
+    const response = await GET(url('motivo_inventado'), { params })
+
+    expect(response.status).toBe(400)
+    expect(mocks.availability).not.toHaveBeenCalled()
+  })
+
+  it('el motivo declarado llega al reader: la elegibilidad de un test vencido depende de él', async () => {
+    await GET(url('token_expired_before_start'), { params })
+
+    expect(mocks.availability).toHaveBeenCalledWith(assessmentId, 'token_expired_before_start')
+  })
+
+  it('sin capability de lectura no revela ni la existencia del test', async () => {
+    mocks.can.mockReturnValue(false)
+
+    const response = await GET(url(), { params })
+
+    expect(response.status).toBe(403)
+    expect(mocks.availability).not.toHaveBeenCalled()
   })
 })

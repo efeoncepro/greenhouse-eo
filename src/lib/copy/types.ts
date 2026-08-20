@@ -661,6 +661,7 @@ export interface HiringDeskCopy {
       linkTitle: string
       linkWarning: string
       linkExpiry: string
+      linkCopy: string
       linkCopied: string
       linkAlreadyRevealed: string
       quotaRemainingEmail: string

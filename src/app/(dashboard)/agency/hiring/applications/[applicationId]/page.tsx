@@ -16,6 +16,10 @@ import {
 import { getHiringHandoffByApplicationId } from '@/lib/hiring/handoff'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { listAssessmentsForApplication } from '@/lib/hiring/assessment'
+import {
+  getAssessmentAccessRecoveryAvailability,
+  type AssessmentAccessRecoveryAvailability,
+} from '@/lib/hiring/assessment/access-recovery'
 import { resolveUserDisplayNames } from '@/lib/identity/user-display-names'
 import { getMicrocopy } from '@/lib/copy'
 import { normalizeLocale } from '@/i18n/locales'
@@ -62,6 +66,13 @@ export default async function HiringApplicationPage({ params }: Props) {
   const canAnnotate = can(tenant, 'hiring.application.annotate', 'execute', 'tenant')
   const canScore = can(tenant, 'hiring.assessment.score', 'execute', 'tenant')
 
+  // TASK-1747 — las dos puertas de la recuperación son INDEPENDIENTES: quien puede reenviar por
+  // correo no necesariamente puede revelar un enlace (el enlace se entrega en mano y exige
+  // verificar identidad). Se resuelven acá porque el cliente NUNCA decide permisos.
+  const canRecoverAccessByEmail = can(tenant, 'hiring.assessment.recover_access_email', 'execute', 'tenant')
+  const canRevealAccessLink = can(tenant, 'hiring.assessment.reveal_access_link', 'execute', 'tenant')
+  const canRecoverAccess = canRecoverAccessByEmail || canRevealAccessLink
+
   const [locale, snapshot, assessments, handoff, documents, notesView] = await Promise.all([
     getLocale(),
     getHiringDeskSnapshot({ openingId: application.openingId, openingLimit: 80, applicationLimit: 120 }),
@@ -96,6 +107,39 @@ export default async function HiringApplicationPage({ params }: Props) {
 
   if (!item) notFound()
 
+  /*
+   * TASK-1747 — disponibilidad de recuperación por test.
+   *
+   * Sólo se consulta para `candidate_test` (un scorecard de evaluador no tiene acceso que
+   * recuperar) y sólo si el operador tiene al menos una de las dos puertas: preguntar por algo
+   * que igual no vas a poder hacer es trabajo de base gratis.
+   *
+   * `null` significa que la LECTURA FALLÓ, que no es lo mismo que "no se puede recuperar": la
+   * tarjeta lo dice en vez de esconder el cluster, porque un affordance ausente es indistinguible
+   * de uno prohibido y deja al operador sin saber que existe el camino.
+   */
+  const recoveryTargets = canRecoverAccess
+    ? assessments.filter((assessment) => assessment.method === 'candidate_test')
+    : []
+
+  const recoveryAvailability: Record<string, AssessmentAccessRecoveryAvailability | null> =
+    Object.fromEntries(
+      await Promise.all(
+        recoveryTargets.map(async (assessment) => {
+          try {
+            return [assessment.assessmentId, await getAssessmentAccessRecoveryAvailability(assessment.assessmentId)] as const
+          } catch (error: unknown) {
+            captureWithDomain(error, 'hiring', {
+              tags: { source: 'hiring:application-360-recovery-availability' },
+              extra: { applicationId, assessmentId: assessment.assessmentId },
+            })
+
+            return [assessment.assessmentId, null] as const
+          }
+        }),
+      ),
+    )
+
   // Nombres de autores de nota (fallback honesto al id en la UI cuando no resuelve).
   const noteAuthorNames = notesView
     ? Object.fromEntries(await resolveUserDisplayNames(notesView.notes.map((note) => note.authorUserId)))
@@ -108,6 +152,9 @@ export default async function HiringApplicationPage({ params }: Props) {
       initialItem={item}
       initialAssessments={assessments}
       canAuthorAssessment={canAuthorAssessment}
+      canRecoverAccessByEmail={canRecoverAccessByEmail}
+      canRevealAccessLink={canRevealAccessLink}
+      recoveryAvailability={recoveryAvailability}
       initialHandoff={handoff}
       canApproveHandoff={canApproveHandoff}
       documents={documents}
