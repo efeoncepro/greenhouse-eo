@@ -44,13 +44,26 @@ type LaneDefinition = {
   icon: string
 }
 
-const LANES: LaneDefinition[] = [
+/**
+ * TASK-1754 — exportado para que el invariante del tablero se pueda fijar en una prueba.
+ *
+ * El invariante es "lo que el operador ve es lo que se escribe": `destination` DEBE ser
+ * `titleStage`. No basta con que el destino esté dentro de `stages` — el bug del 2026-08-19 fue
+ * exactamente eso: un destino legítimo dentro del carril, pero distinto de la etapa que le da
+ * nombre y que la automatización vigila.
+ */
+export const LANES: LaneDefinition[] = [
   // The approved Hiring Desk uses six canonical columns. Backend stages that
   // represent the same operational step are intentionally grouped inside the
   // visual lane (the user still sees the canonical vocabulary).
   { id: 'inbox', titleStage: 'sourced', stages: ['sourced'], destination: 'sourced', tone: 'primary', icon: 'tabler-sparkles' },
   { id: 'screening', titleStage: 'screening', stages: ['screening'], destination: 'screening', tone: 'info', icon: 'tabler-scan' },
-  { id: 'shortlist', titleStage: 'shortlisted', stages: ['qualified', 'shortlisted', 'client_review'], destination: 'qualified', tone: 'secondary', icon: 'tabler-list-check' },
+  // TASK-1754 — el destino DEBE ser la etapa que titula el carril. Decía `qualified`: la columna
+  // se llamaba desde `shortlisted` y escribía otra cosa, así que soltar una tarjeta acá dejaba la
+  // postulación en una etapa que la automatización de assessment no vigila. 14 vacantes tenían su
+  // política configurada en `shortlisted` y ninguna disparaba: dos candidatas reales pasaron por
+  // esta columna el 2026-08-19 y ninguna recibió su test, sin dejar rastro en pantalla.
+  { id: 'shortlist', titleStage: 'shortlisted', stages: ['qualified', 'shortlisted', 'client_review'], destination: 'shortlisted', tone: 'secondary', icon: 'tabler-list-check' },
   { id: 'interview', titleStage: 'interview', stages: ['interview'], destination: 'interview', tone: 'warning', icon: 'tabler-messages' },
   { id: 'decision', titleStage: 'decision_pending', stages: ['decision_pending'], destination: 'decision_pending', tone: 'primary', icon: 'tabler-gavel' },
   { id: 'outcome', titleStage: 'closed', stages: ['closed', 'selected', 'backup', 'rejected', 'withdrawn', 'handoff_ready'], destination: 'closed', tone: 'success', icon: 'tabler-rosette-discount-check' },
