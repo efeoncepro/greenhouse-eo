@@ -96,58 +96,75 @@ export const hiringDesk: HiringDeskCopy = {
       cta: 'Recover access',
       title: 'Recover access to the test?',
       intro:
-        'A new credential is issued and the previous link stops working. No second test is created and the timer of someone already in progress is not reset.',
-      channelLabel: 'How they receive it',
+        'You issue a new credential and the previous link stops working. You do not create a second test and you do not reset the timer of someone already in progress.',
+      channelLabel: 'How you send it to them',
       channelEmail: 'By email',
-      channelEmailHelp: 'We resend the test to their registered email.',
-      channelSecureLink: 'Temporary link',
-      channelSecureLinkHelp: 'You get a link to share through another channel. Shown only once.',
+      channelEmailHelp: 'We send new access to their registered email.',
+      channelSecureLink: 'Temporary access link',
+      channelSecureLinkHelp: 'You get a link to hand over through another channel. Shown only once.',
       reasonLabel: 'Reason',
       reasons: {
-        candidate_reports_email_not_received: 'They did not receive the email',
-        candidate_reports_link_invalid: 'The link did not work for them',
+        candidate_reports_email_not_received: 'They report they did not receive the email',
+        candidate_reports_link_invalid: 'They report the link did not work',
         alternate_channel_requested: 'They asked for another channel',
         provider_delivery_failed: 'The email bounced or delivery failed',
         token_expired_before_start: 'It expired before they started',
       },
       confirm: 'Recover access',
       confirming: 'Recovering…',
-      cancel: 'Cancel',
-      emailQueued: 'Email on its way. We will flag it here if the provider rejects it.',
+      emailQueued:
+        'Email dispatched to the provider. That does not confirm they received it: if they tell you it is not there, recover again or use the temporary link.',
+      emailPending: 'The send is in progress. Refresh in a few seconds to see the result.',
       emailUnknown:
         'The credential was renewed, but we could not confirm dispatch. Check the status before retrying.',
       emailFailed: 'The provider rejected the send. Use the temporary link instead.',
+      emailExpiry: 'The new access expires on {date}.',
       linkTitle: 'Link ready — shown only once',
       linkWarning:
-        'Copy it now: it will not be available again after you close this dialog. Share it only with the candidate.',
-      linkCopy: 'Copy link',
+        'Verify their identity before handing it over, and copy it now: it will not be available again after you close this dialog.',
+      linkExpiry: 'Expires in 24 hours ({date}).',
       linkCopied: 'Link copied.',
-      linkClose: 'Close',
-      quotaRemaining: '{remaining} of {max} recoveries left in 24 hours.',
-      quotaExhausted: 'You reached the 24-hour recovery limit. Try again tomorrow.',
-      cooldown: 'Wait a moment before recovering again.',
+      linkAlreadyRevealed:
+        'This link was already issued and is shown only once. If you lost it, recover access again to issue a new one.',
+      quotaRemainingEmail: '{remaining} of {max} email sends left in 24 hours.',
+      quotaExhaustedEmail:
+        'Email used up its {max} attempts for 24 hours. You can still use the temporary link.',
+      quotaExhaustedAll:
+        'This test used up its recoveries for the last 24 hours on both channels. Try again tomorrow.',
+      cooldown: 'Wait {seconds} s before recovering again.',
       emailBlocked:
-        'Their email is blocked by the provider: it bounced or was marked as spam. Use the temporary link.',
+        'The provider is blocking sends to this address. Verify their identity and hand them the temporary link.',
       emailMissing: 'We have no email on record for this person.',
       unavailableTitle: 'Access cannot be recovered',
       unavailable: {
         assessment_recovery_method_not_supported:
           'This assessment is not taken through a link, so there is no access to recover.',
-        assessment_recovery_application_closed: 'This application is already closed.',
+        assessment_recovery_application_closed:
+          'This application already has a decision on record, so the test cannot be recovered. Review it in the Decision tab.',
         assessment_recovery_consent_withdrawn: 'The person withdrew their consent.',
-        assessment_recovery_invalid_state: 'The test status does not match its progress. Check the dossier.',
+        assessment_recovery_invalid_state:
+          'This test has inconsistent data and cannot be recovered without fixing it. Report it to platform with the application ID.',
         assessment_recovery_time_elapsed: 'Their time to answer already ran out.',
         assessment_recovery_expired_after_start: 'They started the test and the deadline passed.',
         assessment_recovery_expiry_not_proven:
-          'To recover an expired test, choose the reason “It expired before they started”.',
-        assessment_recovery_status_not_allowed: 'The test was already submitted or scored.',
+          'This test shows as expired, but we cannot prove when access lapsed. If they never started it, choose the reason “It expired before they started”; if it blocks again, report it to platform.',
+        assessment_recovery_status_not_allowed: 'The test was already taken, so there is no access to recover.',
+        assessment_recovery_status_cancelled:
+          'This test was cancelled. To let them take it again, assign a new test.',
       },
       errorGeneric: 'We could not recover access. Try again in a few minutes.',
+      errorNotFound: 'This test is no longer available. Refresh the application.',
       errorRateLimited: 'You reached the limit for now. Try again later.',
+      errorIdempotencyConflict:
+        'This same confirmation was already used for another request. Close and start the recovery again.',
+      errorRecipientChanged:
+        'The person’s email changed while you were confirming. Check the contact and try again.',
       errorConflict: 'The test status changed while you were confirming. Review the card and decide again.',
-      errorPermission: 'You do not have permission to recover access. Ask People Ops.',
+      errorPermission: 'You do not have permission to recover access. Ask Admin or People Ops.',
       errorReadFailed: 'We could not read whether access can be recovered.',
-      retry: 'Retry',
+      copyAriaLabel: 'Copy the access link for {name}',
+      dialogAriaLabel: 'Recover access to the test for {name}',
+      statusAriaLive: 'Recovery status',
     },
     documentsPanel: {
       ...esCL.application.documentsPanel,

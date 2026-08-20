@@ -145,58 +145,84 @@ export const hiringDesk: HiringDeskCopy = {
       cta: 'Recuperar acceso',
       title: '¿Recuperar el acceso al test?',
       intro:
-        'Se genera una credencial nueva y el enlace anterior deja de funcionar. No se crea otro test ni se reinicia el tiempo de quien ya empezó.',
+        'Emites una credencial nueva y el enlace anterior deja de funcionar. No creas otro test ni reinicias el tiempo de quien ya empezó.',
       channelLabel: 'Cómo se lo haces llegar',
       channelEmail: 'Por correo',
-      channelEmailHelp: 'Le reenviamos el test a su correo registrado.',
-      channelSecureLink: 'Enlace temporal',
-      channelSecureLinkHelp: 'Obtienes un enlace para compartirlo tú por otro canal. Se muestra una sola vez.',
+      channelEmailHelp: 'Enviamos un acceso nuevo a su correo registrado.',
+      channelSecureLink: 'Enlace de acceso temporal',
+      channelSecureLinkHelp: 'Obtienes un enlace para entregárselo tú por otro canal. Se muestra una sola vez.',
       reasonLabel: 'Motivo',
       reasons: {
-        candidate_reports_email_not_received: 'No recibió el correo',
-        candidate_reports_link_invalid: 'El enlace no le funcionó',
+        // El código dice `reports` a propósito: nadie puede afirmar que un correo NO llegó. La
+        // etiqueta conserva el reporte para no dejar un hecho inventado en un ledger append-only.
+        candidate_reports_email_not_received: 'Dice que no le llegó el correo',
+        candidate_reports_link_invalid: 'Dice que el enlace no le funcionó',
         alternate_channel_requested: 'Pidió recibirlo por otro canal',
         provider_delivery_failed: 'El correo rebotó o falló el envío',
         token_expired_before_start: 'Se le venció antes de empezar',
       },
       confirm: 'Recuperar acceso',
       confirming: 'Recuperando…',
-      cancel: 'Cancelar',
-      emailQueued: 'Correo en camino. Te avisamos acá si el proveedor lo rechaza.',
+      emailQueued:
+        'Correo despachado al proveedor. Eso no confirma que le haya llegado: si te dice que no lo ve, recupera de nuevo o usa el enlace temporal.',
+      emailPending: 'El envío está en curso. Actualiza en unos segundos para ver el resultado.',
       emailUnknown:
         'La credencial se renovó, pero no pudimos confirmar el despacho. Revisa el estado antes de reintentar.',
       emailFailed: 'El proveedor rechazó el envío. Usa el enlace temporal para hacérselo llegar.',
+      emailExpiry: 'El acceso nuevo vence el {date}.',
       linkTitle: 'Enlace listo — se muestra una sola vez',
       linkWarning:
-        'Cópialo ahora: al cerrar esta ventana no vuelve a estar disponible. Compártelo sólo con la persona candidata.',
-      linkCopy: 'Copiar enlace',
+        'Verifica su identidad antes de entregárselo y cópialo ahora: al cerrar esta ventana no vuelve a estar disponible.',
+      linkExpiry: 'Vence en 24 horas ({date}).',
       linkCopied: 'Enlace copiado.',
-      linkClose: 'Cerrar',
-      quotaRemaining: 'Te quedan {remaining} de {max} recuperaciones en 24 horas.',
-      quotaExhausted: 'Alcanzaste el máximo de recuperaciones por 24 horas. Vuelve a intentar mañana.',
-      cooldown: 'Espera un momento antes de recuperar de nuevo.',
+      linkAlreadyRevealed:
+        'Este enlace ya se generó y sólo se muestra una vez. Si lo perdiste, recupera el acceso de nuevo para emitir otro.',
+      // Cuota POR CANAL: el correo agotado no puede cerrar la última puerta.
+      quotaRemainingEmail: 'Te quedan {remaining} de {max} envíos por correo en 24 horas.',
+      quotaExhaustedEmail:
+        'El correo agotó sus {max} intentos de 24 horas. Todavía puedes usar el enlace temporal.',
+      quotaExhaustedAll:
+        'Este test agotó las recuperaciones de las últimas 24 horas por los dos canales. Vuelve a intentar mañana.',
+      cooldown: 'Espera {seconds} s antes de recuperar de nuevo.',
+      // Sin atribuir conducta: `suppressed` no es rebote ni spam, y un filtro corporativo no
+      // dice nada de la persona candidata a quien el operador está evaluando.
       emailBlocked:
-        'Su correo está bloqueado por el proveedor: rebotó o fue marcado como no deseado. Usa el enlace temporal.',
+        'El proveedor está bloqueando los envíos a esta dirección. Verifica su identidad y hazle llegar el enlace temporal.',
       emailMissing: 'No tenemos un correo registrado para esta persona.',
       unavailableTitle: 'No se puede recuperar el acceso',
       unavailable: {
         assessment_recovery_method_not_supported:
           'Esta evaluación no se rinde con enlace, así que no hay acceso que recuperar.',
-        assessment_recovery_application_closed: 'La candidatura ya está cerrada.',
+        // Dispara con CUALQUIER decisión registrada, incluidas `selected` y `on_hold`: decir
+        // "cerrada" daría por fuera del proceso a alguien que sigue vivo en él.
+        assessment_recovery_application_closed:
+          'Esta candidatura ya tiene una decisión registrada, así que el test no se recupera. Revísala en la pestaña Decisión.',
         assessment_recovery_consent_withdrawn: 'La persona retiró su consentimiento.',
-        assessment_recovery_invalid_state: 'El estado del test no coincide con su avance. Revisa el expediente.',
+        // Las dos ramas son inconsistencia de datos; el Expediente no las muestra ni las corrige.
+        assessment_recovery_invalid_state:
+          'Los datos de este test quedaron inconsistentes y no podemos recuperarlo sin arreglarlos. Repórtalo a plataforma con el ID de la postulación.',
         assessment_recovery_time_elapsed: 'Ya se le acabó el tiempo para responder.',
         assessment_recovery_expired_after_start: 'Empezó el test y se le venció el plazo.',
+        // Tres ramas, no una: motivo distinto, vencimiento sin fecha legible, o token aún vigente.
         assessment_recovery_expiry_not_proven:
-          'Para recuperar un test vencido, elige el motivo «Se le venció antes de empezar».',
-        assessment_recovery_status_not_allowed: 'El test ya se envió o se corrigió.',
+          'Este test figura vencido, pero no podemos probar cuándo caducó el acceso. Si nunca lo empezó, elige el motivo «Se le venció antes de empezar»; si vuelve a bloquearse, repórtalo a plataforma.',
+        assessment_recovery_status_not_allowed: 'El test ya se rindió, así que no hay acceso que recuperar.',
+        assessment_recovery_status_cancelled:
+          'Este test se canceló. Para que rinda de nuevo, asígnale un test otra vez.',
       },
       errorGeneric: 'No pudimos recuperar el acceso. Intenta de nuevo en unos minutos.',
+      errorNotFound: 'Este test ya no está disponible. Actualiza la postulación.',
       errorRateLimited: 'Alcanzaste el límite por ahora. Intenta más tarde.',
+      errorIdempotencyConflict:
+        'Esta misma confirmación ya se usó para otra solicitud. Cierra y vuelve a empezar la recuperación.',
+      errorRecipientChanged:
+        'El correo de la persona cambió mientras confirmabas. Revisa el contacto y vuelve a intentar.',
       errorConflict: 'El estado del test cambió mientras confirmabas. Revisa la tarjeta y decide de nuevo.',
-      errorPermission: 'No tienes permiso para recuperar acceso. Pídeselo a People Ops.',
+      errorPermission: 'No tienes permiso para recuperar acceso. Pídeselo a Admin o a People Ops.',
       errorReadFailed: 'No pudimos leer si se puede recuperar el acceso.',
-      retry: 'Reintentar',
+      copyAriaLabel: 'Copiar el enlace de acceso de {name}',
+      dialogAriaLabel: 'Recuperar acceso al test de {name}',
+      statusAriaLive: 'Estado de la recuperación',
     },
     documentsPanel: {
       subtitle: 'El CV se abre directo; la identidad se revela con motivo y queda auditada.',

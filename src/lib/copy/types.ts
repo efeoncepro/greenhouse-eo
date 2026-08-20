@@ -599,17 +599,19 @@ export interface HiringDeskCopy {
       }
       confirm: string
       confirming: string
-      cancel: string
       emailQueued: string
+      emailPending: string
       emailUnknown: string
       emailFailed: string
+      emailExpiry: string
       linkTitle: string
       linkWarning: string
-      linkCopy: string
+      linkExpiry: string
       linkCopied: string
-      linkClose: string
-      quotaRemaining: string
-      quotaExhausted: string
+      linkAlreadyRevealed: string
+      quotaRemainingEmail: string
+      quotaExhaustedEmail: string
+      quotaExhaustedAll: string
       cooldown: string
       emailBlocked: string
       emailMissing: string
@@ -623,13 +625,19 @@ export interface HiringDeskCopy {
         assessment_recovery_expired_after_start: string
         assessment_recovery_expiry_not_proven: string
         assessment_recovery_status_not_allowed: string
+        assessment_recovery_status_cancelled: string
       }
       errorGeneric: string
+      errorNotFound: string
       errorRateLimited: string
+      errorIdempotencyConflict: string
+      errorRecipientChanged: string
       errorConflict: string
       errorPermission: string
       errorReadFailed: string
-      retry: string
+      copyAriaLabel: string
+      dialogAriaLabel: string
+      statusAriaLive: string
     }
     /**
      * TASK-1715 — copy del panel de Documentos. Separa las dos clases del modelo
