@@ -19,6 +19,14 @@ const repo = resolve(new URL('../..', import.meta.url).pathname)
 
 const mirroredSkills = [
   {
+    // Data Studio se opera por UI y cambia con frecuencia. Codex y Claude deben compartir el mismo
+    // catálogo, límites de autorización y protocolo browser para no editar un reporte con dos reglas.
+    id: 'google-data-studio',
+    mode: 'byte-identical',
+    codex: '.codex/skills/google-data-studio',
+    claude: '.claude/skills/google-data-studio',
+  },
+  {
     id: 'efeonce-mcp-platform',
     mode: 'byte-identical',
     codex: '.codex/skills/efeonce-mcp-platform',

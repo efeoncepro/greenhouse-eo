@@ -3,6 +3,22 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-20 — Skill compartida para diseñar y operar dashboards en Google Data Studio
+
+- La nueva skill `google-data-studio` queda invocable por Codex y Claude con bundles byte-identical y aliases para
+  el nombre histórico Looker Studio; separa el producto de Looker/LookML y consulta fuentes oficiales fechadas.
+- Cubre selección de gráficos, modelado, calculated fields, filtros, controles, parámetros, blends, responsive,
+  rendimiento, credenciales, sharing y embedding mediante referencias load-on-demand.
+- Su ejecución browser parte en `inspect`, distingue Browser/Playwright, Computer Use y Webwright, exige cambios
+  atómicos por el autosave y protege OAuth, credenciales, fuentes reutilizables, sharing y costos con gates explícitos.
+- La auditoría adversarial amplía el contrato con onboarding de Sheets/BigQuery, row-level security por email,
+  lifecycle `refresh fields|reconnect`, copias/rollback, draft/published, extracts, freshness, delivery/alertas, APIs
+  limitadas y una escalera de troubleshooting; también refuerza sesión autorizada y minimización de evidencia en
+  ambos runtimes.
+- El aprendizaje de operación con Search Console queda generalizado: polaridad inversa de Average Position,
+  protección contra ejes globales en combos, rangos parciales visibles, cohortes `new|rewrite`, fórmulas ponderadas y
+  una narrativa cliente que separa resultado observado, inferencia e impacto de negocio demostrado.
+
 ## 2026-08-19 — El lifecycle de correo quedó operativo, y la documentación decía que nada estaba aplicado
 
 - **La doc mentía en la dirección peligrosa.** Runbook, arquitectura de webhooks, ledger de flags e

@@ -1,0 +1,7 @@
+interface:
+  display_name: 'Google Data Studio'
+  short_description: 'Diseña y mejora dashboards de Data Studio.'
+  default_prompt: 'Use $google-data-studio to design, audit, build, or improve a Google Data Studio dashboard.'
+
+policy:
+  allow_implicit_invocation: true
