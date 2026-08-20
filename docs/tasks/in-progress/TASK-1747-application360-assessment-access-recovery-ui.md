@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-011`
-- Status real: `En ejecución — backend de 1746 desplegado y con schema aplicado; falta el consumer JSX`
+- Status real: `En ejecución — Slices 1-3 cerrados y auditados; faltan recuperación (4) y calidad (5)`
 - Rank: `TBD`
 - Domain: `hr|ui|delivery`
 - Blocked by: `TASK-1746`
@@ -31,7 +31,7 @@
 
 ## Traspaso 2026-08-19 — estado para tomar en frío
 
-Slices 1 y 2 cerrados y commiteados en `develop` (sin push). Slice 3 **no empezado**.
+Slices 1, 2 y 3 cerrados y commiteados en `develop` (sin push). Slice 4 **no empezado**.
 
 ### Commits de esta task
 
@@ -41,6 +41,8 @@ Slices 1 y 2 cerrados y commiteados en `develop` (sin push). Slice 3 **no empeza
 | `34fed36e6` | Slice 1 corregido tras auditoría de dominio (6 bloqueantes) |
 | `f99bb92e1` | Slice 2 — puente de datos (**revertido en parte**, ver abajo) |
 | `2e2d4de86` | Slice 2 corregido tras auditoría de arquitectura |
+| `6e75fe482` | Slice 3 — enlace efímero eliminado + asignación gobernada |
+| _(pendiente)_ | Slice 3 corregido tras auditoría adversarial (3 bloqueantes + 5 altos) |
 
 ### Qué está hecho
 
@@ -67,21 +69,37 @@ sin usar). Van con el slice que dibuja el affordance.
 
 ### Slices pendientes
 
-**Slice 3 — matar el enlace efímero + asignación canónica.**
-- Eliminar `oneTimeToken` (`Application360View.tsx:379`), `oneTimeAssessmentLink` (`:414-419`) y el
-  bloque `Alert` con el enlace (`:712-735`), incluido el botón "Abrir superficie" que navega con el
-  token en la URL. **Esta es la causa directa del incidente del 2026-08-19**: el enlace que la
-  pantalla mostraba lo invalidaba el correo 2,5 minutos después.
-- Migrar `assignAssessment` (`:421-446`) del endpoint legacy `POST /api/hiring/assessments` — que
-  deja al cliente elegir plantilla y devuelve el token crudo — al camino gobernado
-  `/api/hiring/applications/[id]/assessment-assignment` (propose→confirm).
-- ⚠️ **Ramificar por `result.status`**, nunca por "no hubo excepción". La unión tiene 6 estados
-  (`assigned|already_assigned|held|blocked|stale|cancelled`) y el propio tipo lo advierte.
-  `deliveryStatus: 'pending'` NO significa correo enviado.
-- El diálogo cambia de forma: hoy elige plantilla y minutos; con el camino canónico el servidor
-  decide por política y el diálogo pasa a ser preview + confirmación.
-- **Falta copy para esto** (el Slice 1 sólo cubrió recuperación): labels del preview, los 6 estados
-  del resultado y los 8 códigos de error de la propuesta.
+**Slice 3 — CERRADO.** El enlace efímero ya no existe en el cliente (`oneTimeToken`,
+`oneTimeAssessmentLink`, el `Alert` con la URL y el botón "Abrir superficie" están eliminados;
+`grep` da 0). La asignación pasa por propose→confirm y el diálogo es preview + confirmación: el
+servidor resuelve la plantilla desde la política de la vacante. `listTemplates()` salió de la página
+y el botón quedó gateado por `hiring.assessment.author`.
+
+La auditoría adversarial encontró que el slice reintrodujo la misma clase de mentira un nivel más
+abajo, y quedó corregido:
+
+- **Falso éxito.** `result: null` no es `already_assigned`: llega **sólo** cuando la propuesta ya
+  era terminal, y el desenlace original pudo ser cualquiera de los 6 —bloqueos incluidos—. La
+  pantalla pintaba toast verde y cerraba. Ahora se declara que no se sabe en qué terminó y se manda
+  a revisar la ficha.
+- **Bloqueo invisible.** El preview trae `blockingReasonCode`, que existe justamente para mostrar el
+  bloqueo antes de confirmar, y el diálogo lo descartaba. Cubre tres causas que ningún otro campo
+  delata —política en `draft`, plantilla inactiva, candidatura decidida—, y `draft` es el estado en
+  que nace toda política. Ahora se renderiza y deshabilita el confirm.
+- **Intento quemado.** Confirmar contra un bloqueo ocupa la clave de idempotencia del ledger de esa
+  persona **para siempre**. La mitigación de pantalla (no dejar confirmar sobre un bloqueo
+  declarado) es lo que cabe acá; la causa vive en el command y quedó registrada como `TASK-1755`.
+- **La tarjeta no se actualizaba.** `router.refresh()` re-renderiza el server component pero el
+  initializer de `useState` no vuelve a correr: tras asignar seguía viéndose "sin test asignado".
+  Resuelto con re-sincronización desde props.
+- **Copy que mentía.** "el test se crea, pero nadie se lo puede enviar" era falso (sin correo el
+  command bloquea antes de crear nada), y `existingOpen` derivaba a una recuperación que aún no
+  existe. Corregidos.
+- **Endpoint legacy retirado.** `POST /api/hiring/assessments` con `method='candidate_test'` seguía
+  devolviendo el token crudo a cualquier consumidor con la capability; sacarlo de la UI no cerraba
+  nada. Devuelve 410 apuntando al camino gobernado. `interviewer_scorecard` sigue vivo.
+- **Errores.** El mapa cubría 5 códigos y recetaba "intenta de nuevo" a causas estructurales.
+  `HiringClientError` ahora conserva `actionable` y el fallback distingue reintentable de terminal.
 
 **Slice 4 — recuperación.** Cluster de acciones + diálogo de confirmación con motivo + diálogo de
 revelación única. **Acá va también el cableado revertido** (los dos `can()` + la disponibilidad por

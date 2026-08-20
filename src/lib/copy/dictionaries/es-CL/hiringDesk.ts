@@ -150,8 +150,14 @@ export const hiringDesk: HiringDeskCopy = {
       previewTimeLimit: '{minutes} minutos',
       previewNoTimeLimit: 'Sin límite de tiempo',
       previewRecipientReady: 'Tiene correo registrado',
-      previewRecipientNotReady: 'No tiene correo registrado: el test se crea, pero nadie se lo puede enviar.',
-      existingOpen: 'Esta persona ya tiene un test abierto. Recupera su acceso en vez de asignar otro.',
+      previewRecipientNotReady:
+        'Sin correo registrado no se puede asignar: el test no se crea. Registra el correo de la persona primero.',
+      existingOpen:
+        'Esta persona ya tiene un test abierto. No se puede asignar otro mientras siga abierto.',
+      previewBlockedTitle: 'No se puede asignar todavía',
+      emptyBody: 'Todavía no se le ha asignado ningún test a esta persona.',
+      emptyBodyCanAssign:
+        'Todavía no se le ha asignado ningún test. La vacante define cuál corresponde; tú confirmas el envío.',
       existingScored: 'Esta persona ya rindió un test corregido. Si confirmas, le mandas una segunda prueba.',
       confirm: 'Confirmar y asignar',
       confirming: 'Asignando…',
@@ -164,11 +170,13 @@ export const hiringDesk: HiringDeskCopy = {
         stale: 'La propuesta quedó desactualizada. Vuelve a abrirla para ver el estado actual.',
         cancelled: 'La asignación se canceló.',
       },
+      resultAlreadyConfirmed:
+        'Esta propuesta ya se había confirmado antes. No sabemos desde acá en qué terminó: cierra y revisa el estado del test en la ficha.',
       reasons: {
         missing_email: 'No hay correo registrado para esta persona.',
         unverified_recipient: 'El correo de esta persona no está verificado.',
-        volume_cap: 'Se alcanzó el tope de envíos automáticos por ahora.',
-        policy_disabled: 'La vacante tiene la asignación automática apagada.',
+        volume_cap: 'Se alcanzó el tope de envíos por ahora.',
+        policy_disabled: 'La vacante todavía no tiene su política de tests habilitada.',
         policy_mode_manual: 'Esta vacante asigna sus tests a mano.',
         template_inactive: 'El test que define la vacante ya no está activo.',
         stage_changed: 'La etapa de la candidatura cambió mientras confirmabas.',
@@ -183,6 +191,10 @@ export const hiringDesk: HiringDeskCopy = {
       errorNotConfirmable: 'Esta propuesta ya no se puede confirmar. Ciérrala y vuelve a empezar.',
       errorGeneric: 'No pudimos asignar el test. Intenta de nuevo en unos minutos.',
       errorPermission: 'No tienes permiso para asignar tests. Pídeselo a Admin o a People Ops.',
+      errorNotFound: 'Esta propuesta ya no existe. Cierra y vuelve a abrirla.',
+      errorConflict: 'Otra persona movió esta asignación al mismo tiempo. Cierra y revisa el estado actual.',
+      errorSession: 'Tu sesión venció. Inicia sesión de nuevo para continuar.',
+      errorStructural: 'No pudimos asignar el test y reintentar no lo resuelve. Avísale a Admin con el nombre de la persona.',
     },
     accessRecovery: {
       cta: 'Recuperar acceso',

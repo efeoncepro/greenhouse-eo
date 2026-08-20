@@ -101,8 +101,13 @@ export const hiringDesk: HiringDeskCopy = {
       previewTimeLimit: '{minutes} minutes',
       previewNoTimeLimit: 'No time limit',
       previewRecipientReady: 'Has an email on record',
-      previewRecipientNotReady: 'No email on record: the test is created, but nobody can send it to them.',
-      existingOpen: 'This person already has an open test. Recover their access instead of assigning another one.',
+      previewRecipientNotReady:
+        'Without an email on record it cannot be assigned: the test is not created. Add the person’s email first.',
+      existingOpen: 'This person already has an open test. Another one cannot be assigned while it stays open.',
+      previewBlockedTitle: 'Cannot be assigned yet',
+      emptyBody: 'No test has been assigned to this person yet.',
+      emptyBodyCanAssign:
+        'No test has been assigned yet. The opening defines which one applies; you confirm the send.',
       existingScored: 'This person already took a scored test. If you confirm, you send them a second one.',
       confirm: 'Confirm and assign',
       confirming: 'Assigning…',
@@ -115,11 +120,13 @@ export const hiringDesk: HiringDeskCopy = {
         stale: 'The proposal is out of date. Open it again to see the current status.',
         cancelled: 'The assignment was cancelled.',
       },
+      resultAlreadyConfirmed:
+        'This proposal had already been confirmed. We cannot tell from here how it ended: close and check the test status on the record.',
       reasons: {
         missing_email: 'There is no email on record for this person.',
         unverified_recipient: 'This person’s email is not verified.',
-        volume_cap: 'The automatic send cap was reached for now.',
-        policy_disabled: 'This opening has automatic assignment turned off.',
+        volume_cap: 'The send cap was reached for now.',
+        policy_disabled: 'This opening does not have its test policy enabled yet.',
         policy_mode_manual: 'This opening assigns its tests manually.',
         template_inactive: 'The test defined by the opening is no longer active.',
         stage_changed: 'The application stage changed while you were confirming.',
@@ -134,6 +141,10 @@ export const hiringDesk: HiringDeskCopy = {
       errorNotConfirmable: 'This proposal can no longer be confirmed. Close it and start again.',
       errorGeneric: 'We could not assign the test. Try again in a few minutes.',
       errorPermission: 'You do not have permission to assign tests. Ask Admin or People Ops.',
+      errorNotFound: 'This proposal no longer exists. Close and open it again.',
+      errorConflict: 'Someone else moved this assignment at the same time. Close and review the current status.',
+      errorSession: 'Your session expired. Sign in again to continue.',
+      errorStructural: 'We could not assign the test and retrying will not fix it. Tell Admin the person’s name.',
     },
     accessRecovery: {
       cta: 'Recover access',

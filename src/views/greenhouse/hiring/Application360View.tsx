@@ -403,10 +403,21 @@ const Application360View = ({
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<string | null>(null)
   const idempotencyKeyRef = useRef<string | null>(null)
+  const assignTriggerRef = useRef<HTMLButtonElement | null>(null)
 
   useEffect(() => {
     document.getElementById('hiring-application-title')?.focus()
   }, [])
+
+  /**
+   * `router.refresh()` re-renderiza el server component, pero el initializer de `useState` NO
+   * vuelve a correr: React conserva el estado local entre re-renders. Sin esto, asignar un test
+   * dejaba la tarjeta mostrando "sin test asignado" hasta recargar a mano — y el operador
+   * volvía a asignar.
+   */
+  useEffect(() => {
+    setAssessments(initialAssessments)
+  }, [initialAssessments])
 
   const decisionHistory = useMemo(() => historyFrom(item.application.explainability), [item.application.explainability])
   const isInternalHireDecision = item.application.decision === 'selected' && item.application.selectedDestination === 'internal_hire'
@@ -420,8 +431,32 @@ const Application360View = ({
   // crudo al navegador. Acá el servidor resuelve la política y el enlace viaja SOLO por correo.
   const assignmentPath = `/api/hiring/applications/${encodeURIComponent(item.application.applicationId)}/assessment-assignment`
 
+  /**
+   * El fallback genérico dice "intenta de nuevo en unos minutos", así que sólo puede cubrir
+   * fallas donde reintentar TIENE sentido. Todo lo estructural se nombra: recetar un reintento
+   * sobre una causa que no cambia sola esconde la acción real (contrato canónico de errores).
+   */
+  /**
+   * Señal canónica de bloqueo del preview. `null` = el command asignaría hoy.
+   *
+   * Se lee del preview y NO se recompone desde campos sueltos: hay bloqueos (política sin
+   * habilitar, plantilla inactiva, candidatura decidida) que ningún otro campo del preview
+   * delata, y confirmar contra ellos consume el intento registrado de esa persona.
+   */
+  const assignProposalBlocker = assignProposal?.preview.blockingReasonCode ?? null
+
+  /**
+   * Cerrar devuelve el foco al botón que abrió el diálogo. Sin esto el foco vuelve al `<body>`
+   * y quien navega por teclado pierde el lugar donde estaba.
+   */
+  const closeAssignDialog = () => {
+    setAssignOpen(false)
+    assignTriggerRef.current?.focus()
+  }
+
   const assignmentErrorMessage = (err: unknown) => {
     const code = err instanceof HiringClientError ? err.code : null
+    const actionable = err instanceof HiringClientError ? err.actionable : true
     const c = copy.application.assignment
 
     if (code === 'assessment_assignment_policy_missing') return c.errorPolicyMissing
@@ -429,8 +464,14 @@ const Application360View = ({
     if (code === 'assessment_assignment_proposal_stale') return c.errorStale
     if (code === 'assessment_assignment_proposal_not_confirmable') return c.errorNotConfirmable
     if (code === 'forbidden') return c.errorPermission
+    if (code === 'unauthorized') return c.errorSession
+    if (code === 'assessment_assignment_proposal_not_found') return c.errorNotFound
+    if (code === 'hiring_application_not_found') return c.errorNotFound
+    if (code === 'assessment_assignment_conflict') return c.errorConflict
+    if (code === 'assessment_assignment_intent_unresolved') return c.errorStructural
+    if (code === 'hiring_invalid_input') return c.errorStructural
 
-    return c.errorGeneric
+    return actionable ? c.errorGeneric : c.errorStructural
   }
 
   const openAssignProposal = async () => {
@@ -460,29 +501,47 @@ const Application360View = ({
     setAssignError(null)
 
     try {
-      const response = await hiringRequest<{ result: AssessmentAssignmentResult | null }>(assignmentPath, {
+      const response = await hiringRequest<{
+        result: AssessmentAssignmentResult | null
+        alreadyConfirmed: boolean
+      }>(assignmentPath, {
         method: 'POST',
         body: JSON.stringify({ action: 'confirm', proposalId: assignProposal.proposalId }),
       })
 
-      // El contrato lo advierte en el propio tipo: NUNCA inferir éxito desde HTTP 200 ni desde la
-      // ausencia de excepción. Sólo `assigned` creó una instancia; el resto son desenlaces reales.
-      const status = response.result?.status ?? 'already_assigned'
-      const results = copy.application.assignment.results
+      const c = copy.application.assignment
 
-      const reason =
-        response.result && 'reasonCode' in response.result && response.result.reasonCode
-          ? copy.application.assignment.reasons[response.result.reasonCode]
-          : null
+      // Una propuesta ya confirmada NO trae desenlace (`result: null`): el confirm original pudo
+      // terminar en cualquiera de los 6, bloqueos incluidos. Traducir esa ausencia a "ya estaba
+      // asignado" le reportaría al operador una asignación que quizá nunca ocurrió — la misma
+      // clase de mentira que este camino vino a matar. Decimos que no sabemos.
+      if (response.alreadyConfirmed || !response.result) {
+        setAssignError(c.resultAlreadyConfirmed)
+        setAssignProposal(null)
 
-      if (status === 'assigned' || status === 'already_assigned') {
-        setToast([results[status], reason].filter(Boolean).join(' '))
-        setAssignOpen(false)
-        router.refresh()
-      } else {
-        // held/blocked/stale/cancelled se quedan en el diálogo con su causa a la vista.
-        setAssignError([results[status], reason].filter(Boolean).join(' '))
+        return
       }
+
+      const outcome = response.result
+
+      const reasonText =
+        'reasonCode' in outcome && outcome.reasonCode ? c.reasons[outcome.reasonCode] : null
+
+      const message = [c.results[outcome.status], reasonText].filter(Boolean).join(' ')
+
+      if (outcome.status === 'assigned' || outcome.status === 'already_assigned') {
+        setToast(message)
+        closeAssignDialog()
+        router.refresh()
+
+        return
+      }
+
+      // held/blocked/stale/cancelled se quedan en el diálogo con su causa a la vista. La propuesta
+      // ya es terminal: se limpia para que el botón no invite a re-confirmarla (re-confirmar sólo
+      // devuelve el mismo desenlace del ledger, nunca uno nuevo).
+      setAssignError(message)
+      setAssignProposal(null)
     } catch (confirmError) {
       setAssignError(assignmentErrorMessage(confirmError))
     } finally {
@@ -753,6 +812,9 @@ const Application360View = ({
           <GreenhouseButton
             kind='secondaryAction'
             leadingIconClassName='tabler-plus'
+            disabled={assigning}
+            aria-busy={assigning}
+            ref={assignTriggerRef}
             onClick={() => void openAssignProposal()}
             sx={{ color: 'text.primary' }}
           >
@@ -768,7 +830,11 @@ const Application360View = ({
               <i aria-hidden='true' className='tabler-clipboard-off' />
             </Box>
             <Typography variant='h6'>{copy.application.assessmentPending}</Typography>
-            <Typography color='text.secondary'>{copy.application.assignment.intro}</Typography>
+            <Typography color='text.secondary'>
+              {canAuthorAssessment
+                ? copy.application.assignment.emptyBodyCanAssign
+                : copy.application.assignment.emptyBody}
+            </Typography>
           </Stack>
         </Box>
       ) : assessments.map((entry) => {
@@ -1566,7 +1632,7 @@ const Application360View = ({
 
       <Dialog
         open={assignOpen}
-        onClose={() => !assigning && setAssignOpen(false)}
+        onClose={() => !assigning && closeAssignDialog()}
         fullWidth
         maxWidth='sm'
         aria-labelledby='assessment-assign-title'
@@ -1614,12 +1680,29 @@ const Application360View = ({
                   <Typography color='text.secondary' variant='caption'>
                     {copy.application.assignment.previewRecipientReady}
                   </Typography>
-                ) : (
-                  <Alert severity='warning'>{copy.application.assignment.previewRecipientNotReady}</Alert>
-                )}
-                {assignProposal.preview.existingOpenAssessment ? (
-                  <Alert severity='error'>{copy.application.assignment.existingOpen}</Alert>
                 ) : null}
+                {/*
+                  El bloqueo se muestra ANTES de confirmar y sale del campo canónico del preview,
+                  no de deducirlo campo por campo: `blockingReasonCode` cubre causas que ningún
+                  otro campo delata (política no habilitada, plantilla inactiva, candidatura ya
+                  decidida). Descubrirlo recién en el desenlace le cuesta al operador el único
+                  intento de esa persona.
+                */}
+                {assignProposalBlocker ? (
+                  <Alert severity='error'>
+                    <Typography fontWeight={700} variant='body2'>
+                      {copy.application.assignment.previewBlockedTitle}
+                    </Typography>
+                    <Typography variant='body2'>
+                      {assignProposalBlocker === 'existing_open_instance'
+                        ? copy.application.assignment.existingOpen
+                        : assignProposalBlocker === 'missing_email'
+                          ? copy.application.assignment.previewRecipientNotReady
+                          : copy.application.assignment.reasons[assignProposalBlocker]}
+                    </Typography>
+                  </Alert>
+                ) : null}
+                {/* Advertencia, NO bloqueo: el command sí asignaría (retake legítimo). */}
                 {assignProposal.preview.existingScoredAssessment ? (
                   <Alert severity='warning'>{copy.application.assignment.existingScored}</Alert>
                 ) : null}
@@ -1627,18 +1710,18 @@ const Application360View = ({
             ) : null}
 
             {assignError ? (
-              <Alert severity='error' role='status'>
+              <Alert severity='error' role='alert'>
                 {assignError}
               </Alert>
             ) : null}
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button disabled={assigning} onClick={() => setAssignOpen(false)}>
+          <Button disabled={assigning} onClick={closeAssignDialog}>
             {copy.common.cancel}
           </Button>
           <GreenhouseButton
-            disabled={assigning || !assignProposal || assignProposal.preview.existingOpenAssessment}
+            disabled={assigning || !assignProposal || Boolean(assignProposalBlocker)}
             aria-busy={assigning}
             leadingIcon={
               assigning && assignProposal ? (

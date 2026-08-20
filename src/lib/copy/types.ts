@@ -26,6 +26,11 @@
  */
 export const SUPPORTED_LOCALES = ['es-CL', 'en-US'] as const
 
+import type {
+  AssessmentAssignmentReasonCode,
+  AssessmentAssignmentResult,
+} from '@/types/hiring-assessment-policy'
+
 export type Locale = (typeof SUPPORTED_LOCALES)[number]
 
 export const DEFAULT_LOCALE: Locale = 'es-CL'
@@ -601,32 +606,33 @@ export interface HiringDeskCopy {
       confirm: string
       confirming: string
       proposing: string
-      results: {
-        assigned: string
-        already_assigned: string
-        held: string
-        blocked: string
-        stale: string
-        cancelled: string
-      }
-      reasons: {
-        missing_email: string
-        unverified_recipient: string
-        volume_cap: string
-        policy_disabled: string
-        policy_mode_manual: string
-        template_inactive: string
-        stage_changed: string
-        application_decided: string
-        existing_open_instance: string
-        operator_cancelled: string
-      }
+      previewBlockedTitle: string
+      /** Empty state: describe el estado. NO instruye una acción que el lector quizá no tiene. */
+      emptyBody: string
+      emptyBodyCanAssign: string
+      /**
+       * Atados a las uniones del DOMINIO, no a claves escritas a mano: un desenlace o un motivo
+       * nuevo en `hiring-assessment-policy` rompe el build acá en vez de resolverse a `undefined`
+       * y dejar al operador viendo un estado sin causa.
+       */
+      results: Record<AssessmentAssignmentResult['status'], string>
+      /**
+       * Una propuesta ya confirmada NO es un desenlace: el confirm original pudo terminar en
+       * cualquiera de los 6. Por eso vive fuera de `results` — la UI no puede afirmar en cuál.
+       */
+      resultAlreadyConfirmed: string
+      reasons: Record<AssessmentAssignmentReasonCode, string>
       errorPolicyMissing: string
       errorExpired: string
       errorStale: string
       errorNotConfirmable: string
       errorGeneric: string
       errorPermission: string
+      errorNotFound: string
+      errorConflict: string
+      errorSession: string
+      /** Fallas donde reintentar NO resuelve (`actionable: false` del contrato canónico). */
+      errorStructural: string
     }
     accessRecovery: {
       cta: string
