@@ -2,6 +2,52 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-19 (noche) — Release 1745/1746 en producción, y cuatro hallazgos que quedaron en tasks
+
+Sesión paralela a la de TASK-1747. Lo que sigue es lo que una sesión fresca necesita saber para no
+repetir trabajo ni reabrir decisiones ya tomadas.
+
+**El release está en producción y verificado.** `6f85644cd`, orchestrator run `32256882119` success,
+watchdog `drift_count=0`. El `ops-worker` muestra SHA distinto: es el change-gate, los árboles son
+idénticos, no es drift. Las dos migraciones están aplicadas con readback, el índice concurrente creado
+(`valid=true, ready=true`) y **20 bearers que estaban en claro en `delivery_payload` fueron saneados**.
+
+**El webhook de Resend funciona.** Nunca había existido — esa era la causa raíz de ISSUE-160. Probado
+con correo real: `email.sent` y `email.delivered` firmados en 45 s. Ya se puede responder "¿este correo
+llegó?" con `email_deliveries.provider_status` + `delivered_at`, que era imposible esta mañana.
+
+**Dos cosas que NO hay que deshacer.** El fix de Turnstile `ef30759a1` fue revertido en `a36967531`:
+el timeout de 15 s no se cancelaba al entrar el desafío interactivo, y el supuesto de dónde pinta
+Cloudflare quedó sin verificar. Y `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` sigue en `false`
+a propósito: hay `email.clicked` **firmados por webhook**, o sea el rewrite de links está ocurriendo
+hoy sobre correos de candidatos, y el bearer del cutover viaja en el fragmento.
+
+**Corrección de un error mío que quedó escrito antes:** dije que el tracking del apex "no medía nada"
+por faltarle `tracking_subdomain`. Es falso — ese campo es para un dominio de tracking propio, no un
+segundo candado. El flag solo basta. Corregido en la skill `resend-email-platform`, que además quedó
+espejada a `.codex` y protegida por el gate de espejos.
+
+**Cuatro tasks nuevas, todas con el análisis dentro:**
+- `TASK-1749` — tracking de marketing sobre dominio propio (bloqueada por el cutover)
+- `TASK-1750` — el desafío interactivo de Turnstile deja fuera a candidatos; su Slice 1 es **verificar
+  con la sitekey `3x00000000000000000000FF` antes de implementar**, que es lo que el intento revertido
+  se saltó
+- `TASK-1754` — las etapas del dominio son las que el operador puede elegir
+- Pendiente sin ID: invertir el default de la política de assessment + revisar plantilla por vacante
+
+**El hallazgo que más cuesta y por qué quedó como patrón.** `GREENHOUSE_CANONICAL_PATTERNS_V1.md` §9:
+*un estado que el sistema distingue, la superficie no puede colapsarlo*. Cinco casos del mismo día en
+cuatro dominios. El síntoma reconocible: **si responder "¿por qué no funcionó?" exige leer la base de
+datos para recuperar un dato que el runtime ya tenía, hubo colapso de estado.** Hoy pasó cinco veces y
+cada una costó horas.
+
+**Dominio `mail.efeoncepro.com`**: verificado, con SPF/DKIM/DMARC en PASS. Nace sin tracking y **nunca**
+debe configurársele un `tracking_subdomain` — es irreversible, sólo se cambia. Mover Hiring ahí es la
+salida limpia al problema del rewrite.
+
+**Estado del árbol:** producción corre `6f85644cd`; hay commits en `develop` sin push de las dos
+sesiones. No hay nada mío a medio camino.
+
 ## 2026-08-19 (noche) — TASK-1747 en curso, traspasada para una sesión nueva
 
 Slices 1 y 2 cerrados; Slice 3 sin empezar. El estado completo para tomarla en frío está en
@@ -537,52 +583,6 @@ puede invalidarse mediante PATCH, los bloques parciales no borran la prosa legac
 rechaza monedas/tipos falsos. Tests focales (53) y TypeScript verdes. TASK-1741 está ahora
 `in-progress`, `UI ready: yes`, con dirección durable `Editorial dossier`; implementación secuencial
 por solapamiento causal entre view model, copy, renderer y CSS. El formulario queda fuera de alcance.
-
-## 2026-08-17 — TASK-1740 code complete: contenido público estructurado + fundación JobPosting
-
-Slices 1-4 en `develop` local (4 commits, sin push). El opening gana `public_content_json`
-(`PublicOpeningContent` v1: promesa/outcomes/trabajo/essentials/learnables/evidencia/modelo
-remoto/proceso/beneficios/compensación estructurada; write 422 estricto, read leniente con fallback
-legacy de prosa) y `public_remote_eligible_countries` (ISO alpha-2 reales — `LATAM`/`Global` se
-rechazan, verificado en vivo contra PG). El detalle público emite canonical explícito siempre y
-`JobPosting` JSON-LD detrás de `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` (Vercel-only, OFF, en
-ledger), con builder fail-closed desde el MISMO payload visible: remota sin países o presencial sin
-city+country ⇒ sin schema (hoy NINGUNA vacante viva emite schema — ambas son `LATAM` sin país, y eso
-es lo correcto, no un bug). Sin directApply, sin validThrough, salario sólo estructurado; el retiro
-es el 404 del unpublish. Decisiones: omitir schema en vez de bloquear publish (bloquear rompería
-re-publicar los 2 openings vivos); `hiringOrganization` = marca Efeonce del brand SSOT
-(`EFEONCE_BRAND_NAME` nuevo). El PATCH interno transporta los campos sin cambio de ruta (parity).
-TASK-1741 quedó desbloqueada con fixture (`editorial-opening.fixture.ts`) y delta en su spec.
-
-**Actualización mismo día:** el CEO decidió **20 países** (toda Latinoamérica **excepto Cuba** + US +
-ES) y precisó la vía contractual: **Chile con contrato laboral local, fuera de Chile vía internacional
-con pago directo de Efeonce** (`international_internal`, sin EOR). Eso quedó en la elegibilidad
-estructurada Y en el contenido visible (`content.remoteModel`) de ambas vacantes — porque el país de
-la entidad **no va en `jobLocation`**: ponerlo ahí haría que Google dejara de tratar la vacante como
-remota y la mostrara como empleo presencial en Santiago. El anclaje contractual se declara en el
-contenido; la elegibilidad, en `applicantLocationRequirements`.
-
-**Precondición de secuencia entre los dos flags (la pregunta "¿no hay que prender el flag para 1741?"
-tiene respuesta doble):** TASK-1741 **no** necesita el flag de schema para desarrollarse — `content` y
-`remoteEligibleCountries` viajan en el payload público siempre, sin flag. Pero el orden inverso sí es
-obligatorio: **el renderer va primero**. Verificado que `view-model.ts` y
-`components/greenhouse/careers/**` todavía NO consumen `content`, mientras el builder de JSON-LD sí; por
-lo tanto prender `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` antes de 1741 emitiría a Google el
-`remoteModel` (ya poblado en las 2 vacantes) sin estar visible en la página — la desalineación
-HTML↔schema que el propio dominio prohíbe, y una desviación de las guías de Google. Con el flag OFF no
-hay desalineación activa: el dato espera a su consumidor. Documentado como invariante duro en ADR,
-manual, ledger, ambas tasks y las skills.
-
-**El primer artefacto real destapó un bug del builder** (patrón real-artifact): un bloque estructurado
-PARCIAL —sólo `remoteModel`, que es exactamente el estado mientras el contenido editorial no se
-autora— hacía que la descripción del JSON-LD dejara de incluir la prosa del rol y quedara reducida a
-ese párrafo. Corregido: un bloque parcial **complementa** la prosa legacy y sólo un bloque con
-narrativa núcleo la reemplaza. Validado con el JSON-LD renderizado real de ambas vacantes (flag
-prendido en local y restaurado a OFF; cero campos requeridos faltantes). El `pnpm build` fue
-autorizado y salió verde. **Pendiente de rollout (bloquea `complete`):**
-push/release + flag staging→Rich Results Test→producción + smoke lifecycle desplegado — **retenido a
-propósito: el operador decidió que el release espera a TASK-1741 y viajan juntos.** Runbook: manual
-`operar-careers-publicas.md` §Contenido estructurado y schema de Google.
 
 ## 2026-08-17 — Tasks creadas para vacantes públicas: contrato SEO primero, renderer después
 
