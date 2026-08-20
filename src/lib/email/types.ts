@@ -27,6 +27,7 @@ export type EmailType =
   | 'hiring_application_confirmation'
   | 'hiring_assessment_assigned'
   | 'hiring_assessment_access_recovery'
+  | 'hiring_assessment_access_rotated'
   | 'hiring_assessment_submitted_internal'
   | 'hiring_stage_advanced'
   | 'hiring_decision_selected'
@@ -92,6 +93,7 @@ export const EMAIL_PRIORITY_MAP: Record<string, EmailPriority> = {
   hiring_application_confirmation: 'transactional',
   hiring_assessment_assigned: 'transactional',
   hiring_assessment_access_recovery: 'transactional',
+  hiring_assessment_access_rotated: 'transactional',
   hiring_assessment_submitted_internal: 'transactional',
   hiring_stage_advanced: 'transactional',
   hiring_decision_selected: 'transactional',
@@ -205,6 +207,9 @@ export const AGENCY_BRANDED_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<EmailT
   'hiring_application_confirmation',
   'hiring_assessment_assigned',
   'hiring_assessment_access_recovery',
+  // El aviso de rotación NO lleva credencial (ver `TOKEN_SENSITIVE_EMAIL_TYPES`), pero sí es
+  // candidate-facing: el candidato conoce a Efeonce, no al portal.
+  'hiring_assessment_access_rotated',
   'hiring_stage_advanced',
   'hiring_decision_selected',
   'hiring_decision_rejected',
