@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-011`
-- Status real: `En ejecución — Slices 1-3 cerrados y auditados; faltan recuperación (4) y calidad (5)`
+- Status real: `Los 5 slices cerrados y auditados; falta ejercitar en staging las ramas no capturables`
 - Rank: `TBD`
 - Domain: `hr|ui|delivery`
 - Blocked by: `TASK-1746`
@@ -31,7 +31,7 @@
 
 ## Traspaso 2026-08-19 — estado para tomar en frío
 
-Slices 1 a 4 cerrados y commiteados en `develop` (sin push). Slice 5 **no empezado**.
+Los cinco slices cerrados, auditados y commiteados. Queda ejercitar en staging las ramas que ninguna captura puede dar contra datos reales.
 
 ### Commits de esta task
 
@@ -44,7 +44,9 @@ Slices 1 a 4 cerrados y commiteados en `develop` (sin push). Slice 5 **no empeza
 | `6e75fe482` | Slice 3 — enlace efímero eliminado + asignación gobernada |
 | `5319de56a` | Slice 3 corregido tras auditoría adversarial (3 bloqueantes + 5 altos) |
 | `8a102ecea` | Slice 4 — recuperación de acceso + revelación única |
-| _(pendiente)_ | Slice 4 corregido tras auditoría adversarial (2 bloqueantes + 7 altos) |
+| `304e973dc` | Slice 4 corregido tras auditoría adversarial (2 bloqueantes + 7 altos) |
+| `8803dfd46` | Slice 5 — calidad: aria-live, 390px, degradado con salida, escenario GVC |
+| `957d17f6f` | Slice 5 corregido tras auditoría adversarial (3 bloqueantes + 4 altos) |
 
 ### Qué está hecho
 
@@ -144,8 +146,38 @@ Pendiente declarado del Slice 4 (no bloqueante): el candidato **no recibe aviso*
 enlace seguro, aunque su credencial anterior queda muerta. Si la entrega en mano falla, la persona
 queda sin acceso y sin saber por qué. Es herencia de TASK-1746 y merece decisión de People Ops.
 
-**Slice 5 — calidad.** Estados degradado/permiso/móvil 390px, `aria-live`, focus restore, escenario
-GVC y los cuatro gates de UI.
+**Slice 5 — CERRADO.** `aria-live` con el rol elegido a conciencia, apilado a 390px con la primaria
+a ancho completo en los DOS diálogos, foco restaurado cuando el diálogo terminó de salir, degradado
+con salida y señal, escenario GVC con sonda que ejerce `reduced-motion`, y gate de FUENTE sobre la
+credencial. Cuatro gates verdes: design-contract, ui:code-lint, ui:visual-gate, ui:quality
+(promedio 4,61 · piso 4,0).
+
+La auditoría adversarial encontró algo que vale más que sus arreglos: **los cuatro gates estaban
+verdes midiendo, con rigor real, un alert estático de bloqueo — y nada más.** El escenario no abría
+ningún diálogo, los gates de accesibilidad y layout estaban scopeados a la tarjeta (que no contiene
+diálogos), la sonda de teclado aterrizaba en un componente ajeno, la de `reduced-motion` no llegaba
+a ejecutarse, y la única aserción apuntada al incidente buscaba un selector que ninguna rama del
+código puede producir. Así fue como la acción primaria terminó sin ancho completo en móvil con el
+commit afirmando "verificado en captura real".
+
+Lo corregido: primaria a ancho completo (el reemplazo original falló en silencio porque la línea
+objetivo había cambiado en el slice anterior); `aria-live` que era inerte sobre Alerts que ya eran
+regiones vivas; foco que no volvía tras la revelación única; aserción vacía reemplazada por gate de
+fuente; sonda que ahora sí ejerce `reduced-motion`; reintento con señal; copy duplicada retirada.
+
+**Sobre `UI ready`:** se deja en `no` deliberadamente. Ese flag responde si la task tenía contrato de
+diseño suficiente ANTES de escribir JSX, y la respuesta honesta al momento de autorarla fue que no —
+el wireframe declaraba un escenario que no existía y su plan GVC citaba aserciones que ninguna rama
+podía producir. Ponerlo en `yes` al cerrar no vuelve más lista la ejecución que ya ocurrió; sólo
+borraría el registro de que se implementó sin ese contrato completo. Las secciones que faltaban
+(Mobile Target, Action Hierarchy, Visual Fidelity Mapping, Copy Ledger, Accessibility Contract) SÍ
+se escribieron y quedan en el wireframe: sirven para la próxima superficie que toque esta card, que
+es su propósito real.
+
+**Pendiente declarado, no resuelto:** la mascota flotante de Nexa se superpone al borde derecho del
+cluster a 390px, y el gate de layout NO detecta oclusión — su verde nunca fue evidencia sobre eso.
+En la rama con CTA ese borde aloja el botón y su cuota. Merece verificación cuando esa rama sea
+capturable.
 
 ### Hallazgos de la auditoría que siguen ABIERTOS
 
