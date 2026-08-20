@@ -26,7 +26,8 @@ interface AvailabilityRow extends Record<string, unknown> {
   email_provider_status: string | null
   recovery_count_24h: number | string
   secure_link_count_24h: number | string
-  latest_recovery_at: Date | string | null
+  latest_email_recovery_at: Date | string | null
+  latest_secure_link_recovery_at: Date | string | null
 }
 
 export interface AssessmentAccessRecoveryAvailability {
@@ -44,6 +45,8 @@ export interface AssessmentAccessRecoveryAvailability {
     maxPer24Hours: number
     usedIn24Hours: number
     cooldownUntil: string | null
+    /** Cooldown propio del enlace seguro: NUNCA se comparte con el del correo. */
+    secureLinkCooldownUntil: string | null
     limited: boolean
   }
 }
@@ -67,7 +70,8 @@ export const getAssessmentAccessRecoveryAvailability = async (
             provider.provider_status AS email_provider_status,
             COALESCE(recent.recovery_count_24h,0) AS recovery_count_24h,
             COALESCE(recent.secure_link_count_24h,0) AS secure_link_count_24h,
-            recent.latest_recovery_at
+            recent.latest_email_recovery_at,
+            recent.latest_secure_link_recovery_at
      FROM greenhouse_hiring.hiring_assessment assessment
      JOIN greenhouse_hiring.hiring_application application
        ON application.application_id=assessment.application_id
@@ -105,7 +109,12 @@ export const getAssessmentAccessRecoveryAvailability = async (
                   AND channel='secure_link'
                   AND outcome IN ('dispatch_accepted','link_issued','dispatch_unknown')
               ) AS secure_link_count_24h,
-              MAX(created_at) AS latest_recovery_at
+              -- El cooldown es POR CANAL, igual que en el command (recover-email.ts filtra
+              -- por channel). Un MAX() sin filtro hacía que un correo recién enviado
+              -- apagara también el enlace seguro por 60 s: exactamente ocultarle al candidato
+              -- la única salida que le quedaba, que es lo que este bloque dice evitar.
+              MAX(created_at) FILTER (WHERE channel='email') AS latest_email_recovery_at,
+              MAX(created_at) FILTER (WHERE channel='secure_link') AS latest_secure_link_recovery_at
        FROM greenhouse_hiring.hiring_assessment_access_recovery recovery
        WHERE recovery.assessment_id=assessment.assessment_id
      ) recent ON TRUE
@@ -134,20 +143,26 @@ export const getAssessmentAccessRecoveryAvailability = async (
   })
 
   const used = Number(row.recovery_count_24h)
-  const latest = row.latest_recovery_at ? new Date(row.latest_recovery_at) : null
-
-  const cooldownUntil = latest
-    ? new Date(latest.getTime() + ASSESSMENT_ACCESS_RECOVERY_COOLDOWN_SECONDS * 1000)
-    : null
-
   const secureLinkUsed = Number(row.secure_link_count_24h)
-  const cooldownActive = Boolean(cooldownUntil && cooldownUntil > now)
 
-  // Cada canal agota su propia cuota. El enlace seguro es la salida cuando el correo no llega:
-  // hacerlo depender del contador del correo cerraba la última puerta del candidato justo en el
-  // escenario para el que fue diseñado.
-  const emailLimited = used >= ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS || cooldownActive
-  const secureLinkLimited = secureLinkUsed >= ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS || cooldownActive
+  // Cooldown POR CANAL: mirror exacto del predicado del command, que filtra por `channel`.
+  const cooldownFor = (raw: Date | string | null) => {
+    const latest = raw ? new Date(raw) : null
+
+    const until = latest
+      ? new Date(latest.getTime() + ASSESSMENT_ACCESS_RECOVERY_COOLDOWN_SECONDS * 1000)
+      : null
+
+    return until && until > now ? until : null
+  }
+
+  const emailCooldownUntil = cooldownFor(row.latest_email_recovery_at)
+  const secureLinkCooldownUntil = cooldownFor(row.latest_secure_link_recovery_at)
+
+  const emailLimited = used >= ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS || Boolean(emailCooldownUntil)
+
+  const secureLinkLimited =
+    secureLinkUsed >= ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS || Boolean(secureLinkCooldownUntil)
 
   // `eligible` describe el assessment (estado, plazo, consentimiento), no el presupuesto de un
   // canal: un test recuperable con el correo agotado sigue siendo recuperable por enlace seguro.
@@ -172,7 +187,8 @@ export const getAssessmentAccessRecoveryAvailability = async (
     rateLimit: {
       maxPer24Hours: ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS,
       usedIn24Hours: used,
-      cooldownUntil: cooldownUntil && cooldownUntil > now ? iso(cooldownUntil) : null,
+      cooldownUntil: emailCooldownUntil ? iso(emailCooldownUntil) : null,
+      secureLinkCooldownUntil: secureLinkCooldownUntil ? iso(secureLinkCooldownUntil) : null,
       // `limited` sigue significando "no queda ningún canal": es lo que la UI usa para decidir si
       // muestra la salida o el mensaje de espera. Un correo agotado con enlace seguro disponible
       // NO es estar limitado.
