@@ -1,9 +1,9 @@
 # Emails del Ciclo de Hiring — Notificaciones a Candidatos y People
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-08-12 por Claude (TASK-1689)
-> **Ultima actualizacion:** 2026-08-19 por Codex (TASK-1745, TASK-1746)
+> **Ultima actualizacion:** 2026-08-20 por Claude (TASK-1747, TASK-1757)
 > **Documentacion tecnica:** [GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md) (Delta 2026-08-12)
 
 ## Qué hace
@@ -20,6 +20,8 @@ tenga que acordarse de escribirlos:
 | La postulación avanza a Preselección o Entrevista | El candidato | **Una sola cosa**: si la vacante tiene declarado un test para esa etapa, le llega el correo del test; si no, le llega "Tu postulación avanzó" con el nombre de la etapa |
 | El candidato queda seleccionado | El candidato | Felicitación + aviso de que el equipo lo contactará |
 | El candidato no queda seleccionado | El candidato | Agradecimiento genuino, decisión clara y puerta abierta a futuras vacantes |
+| Se recupera su acceso al test **por correo** | El candidato | Acceso nuevo + aviso de que el enlace anterior dejó de ser válido; si ya había empezado, su plazo original |
+| Se recupera su acceso al test **por enlace temporal** | El candidato | Aviso **sin el enlace**: su acceso anterior murió, el nuevo se le entrega por otra vía, y puede responder ese correo si no le llega |
 
 ## Reglas de comportamiento
 
@@ -48,6 +50,10 @@ tenga que acordarse de escribirlos:
   resto — útil si Talent quiere controlar el momento del envío.
 - **Los correos al candidato salen a nombre de Efeonce** (la agencia); el aviso interno usa el
   remitente de la plataforma.
+- **Si el candidato responde, su respuesta llega a `people@efeoncepro.com`.** Los ocho tipos
+  dirigidos a candidatos declaran ese buzón como destino de respuesta. Antes no existía y una
+  respuesta caía en la dirección de envío del proveedor, que nadie lee — aunque varios de esos
+  correos le piden explícitamente responder. Ese buzón tiene que estar atendido.
 - **Los correos se sienten personales**: el asunto y el saludo usan el nombre del candidato y el
   nombre de la vacante (p. ej. "María, recibimos tu postulación a «Content Creator»").
 - Todo el sistema está detrás de un interruptor general (`HIRING_LIFECYCLE_EMAILS_ENABLED`),
@@ -61,17 +67,16 @@ al buzón. La confirmación técnica de entrega requiere un evento firmado `deli
 y `suppressed` indican que el canal email está bloqueado o degradado. `opened` y `clicked` son interacción,
 no sustitutos de entrega.
 
-El receptor global de lifecycle de Resend y su reconciliación están implementados, pero su rollout externo
-sigue pendiente: falta registrar el webhook, configurar el secreto, aplicar datos y ejecutar el canary live.
-Hasta entonces, Greenhouse no debe mostrar una entrega como confirmada por proveedor. El webhook es
-observador y nunca puede bloquear el envío de los demás correos.
+El receptor global de lifecycle de Resend y su reconciliación quedaron operativos en producción con el
+cierre de TASK-1745. El webhook es observador y nunca puede bloquear el envío de los demás correos.
 
 Los emails que transportan acceso se procesan como credenciales: reservan evidencia durable antes de emitir
 el token, no persisten la URL o bearer en payloads genéricos y no usan retry ciego. Si el proveedor pudo
 aceptar el correo pero el cierre local quedó incierto, el resultado es `unknown`, no un falso `sent`.
 
-La recuperación gobernada del mismo assessment —por email o enlace seguro de una sola revelación— también
-está implementada pero pendiente de rollout. Detalle funcional:
+La recuperación gobernada del mismo assessment —por email o enlace seguro de una sola revelación— está
+habilitada en producción desde el 2026-08-19. La superficie del operador y el aviso de rotación al
+candidato están en `develop`/staging. Detalle funcional:
 [Entrega y recuperación de acceso a tests](entrega-y-recuperacion-de-acceso-a-tests.md).
 
 > Estado de rollout: el aviso interno de test completado está desplegado y configurado en el

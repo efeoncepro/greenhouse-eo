@@ -1,24 +1,143 @@
 # Greenhouse Hiring / ATS Architecture V1
 
-## Delta 2026-08-19 — Recovery de assessment y sesión pública, código dormante (TASK-1746)
+## Acceso al test del candidato — asignación, recuperación y aviso (TASK-1746/1747/1757)
 
-El write canónico de recuperación es `recoverCandidateTestAccess`; serializa por assessment, revalida
+Contrato vigente. Cubre el write de recuperación, su carril de lectura, el único camino de asignación y el
+aviso al candidato cuando su credencial se rota. Cronología en `docs/changelog/` y en las tasks dueñas.
+
+### Write: un solo command, dos canales excluyentes
+
+El write canónico es `recoverCandidateTestAccess`; serializa por assessment, revalida
 assessment→application→candidate facet y separa `email` de `secure_link`. Ambos canales rotan una sola versión
 de credencial bajo la misma transacción que receipt/audit/outbox; el enlace manual se revela una vez en la
 respuesta y nunca se persiste. El adapter Product API
 `POST /api/hiring/assessments/[id]/access-recovery` exige sesión humana allowlisted, capability por canal,
 lectura de application y assessment antes de lookup, Origin exacto, body cerrado e idempotencia acotada.
 
-La nueva frontera candidata usa `/public/assessment/access#access=…` → exchange POST → cookie `__Host-` HttpOnly
+La frontera candidata usa `/public/assessment/access#access=…` → exchange POST → cookie `__Host-` HttpOnly
 y rutas posteriores sin token. Rotar invalida sesiones anteriores; el reloj de PG gobierna start-by, plazo de
 respuesta, gracia de 30 minutos y 24 horas post-start cuando no existe límite. El abuso se controla con techo
 IP previo y presupuesto por credencial/sesión válida bajo locks; nunca se persisten IP o bearer raw. Retención
 de sesiones/buckets tiene owner diario en ops-worker, loop acotado, readback y señal de residuo.
 
-Estado real: Slices 1–4 están code-complete localmente, no operativas. La migración TASK-1746 y el índice único
-concurrente de intents no se han aplicado; capabilities/surface recovery no están expuestas, el tipo de email
-permanece OFF y `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` OFF conserva assignment legacy. Antes de cutover
-faltan rutas live, readback Resend `click_tracking=false`, smokes PG/browser/email/href y el consumer TASK-1747.
+### Read: la disponibilidad es su propio carril, y es MÁS estrecho que el write
+
+`GET /api/hiring/assessments/[id]/access-recovery?applicationId=…[&reason=…]` responde
+`{ availability, canRecoverByEmail, canRevealSecureLink }` desde el mismo reader que ya consumía el POST
+(`getAssessmentAccessRecoveryAvailability`). Existe para que la capacidad "explicar por qué NO se puede
+recuperar" no quede UI-only: sin él, ni Nexa ni MCP ni un segundo consumidor alcanzan el juicio.
+
+Su puerta **no** es `hiring.assessment.read`. Esa capability la porta todo tenant interno por el routeGroup
+`internal` —collaborator, designer, people_viewer incluidos—, y el DTO expone si la candidata retiró su
+consentimiento, si su decisión no se le comunicó y si el proveedor bloqueó su correo. La puerta es
+`hiring.assessment.read` + `hiring.application.read` + **al menos una** de las dos capabilities de
+recuperación. `applicationId` es obligatorio y se compara contra el aggregate, igual que en el POST: un test
+que no pertenece a esa postulación se responde como inexistente, sin confirmar que existe en otro lado.
+
+`reason` es opcional y validado contra el enum. Importa porque la elegibilidad es reason-dependent: un
+assessment `expired` sólo es recuperable con `token_expired_before_start`, así que la lectura sin motivo
+no puede probar el caso más común del incidente del 2026-08-19.
+
+### El DTO nombra la causa; nunca la colapsa
+
+`AssessmentAccessRecoveryAvailability` vive en el vocabulario isomorfo, no en el módulo server. Cada canal
+declara `blockedBy` sobre un enum cerrado —`assessment_not_eligible`, `no_candidate_email`,
+`provider_blocked`, `quota_exhausted`, `cooldown`— porque un `available: false` que colapsa cinco causas con
+cinco remedios distintos deja a la superficie sin nada que decir salvo el peor default posible ("no tienes
+permiso", a alguien que sí lo tiene). Es el noveno patrón canónico aplicado al DTO.
+
+El cooldown es **por canal**: `cooldownUntil` (correo) y `secureLinkCooldownUntil` viajan separados porque el
+command los filtra por canal. Compartir un solo campo hacía que un correo recién enviado apagara el enlace
+seguro por 60 s sin motivo.
+
+`contracts.ts` quedó partido: `vocabulary.ts` es isomorfo (enums, tipos, TTLs, cuotas, el DTO y las funciones
+puras de elegibilidad y de aviso) y `contracts.ts` es la mitad server que necesita `node:crypto` y re-exporta
+el vocabulario. Sin esa partición el navegador re-declara el vocabulario y nacen dos fuentes de verdad.
+
+### Asignación: el camino legacy está retirado, no sólo escondido
+
+Application 360 asigna por el camino gobernado propose→confirm de TASK-1719: el servidor resuelve la
+plantilla desde la política de la vacante y el diálogo es preview + confirmación. El preview expone
+`blockingReasonCode` y la superficie lo renderiza y deshabilita el confirm — cubre tres causas que ningún
+otro campo delata (política en `draft`, plantilla inactiva, candidatura ya decidida), y `draft` es el estado
+en que nace toda política.
+
+`POST /api/hiring/assessments` con `method='candidate_test'` responde **410** (`assessment_legacy_assignment_retired`):
+dejaba que el cliente eligiera plantilla y devolvía el token crudo a cualquier consumidor con la capability,
+así que sacarlo de la UI no cerraba nada. `method='interviewer_scorecard'` sigue vivo por esa misma ruta.
+
+### Aviso al candidato cuando su acceso se rota (TASK-1757)
+
+Emitir un enlace seguro **mata la credencial anterior** y la entrega en mano al operador. Si esa entrega
+falla, la persona queda sin acceso, sin saber por qué y con el plazo corriendo — y la elegibilidad permite
+recuperar en `in_progress`, así que puede estar respondiendo en otra pestaña.
+
+El tipo `hiring_assessment_access_rotated` cuelga del evento de dominio
+`hiring.assessment.access_recovery_recorded` vía la projection `hiring_assessment_access_rotated_email`
+(ops-worker, domain `notifications`), no del route handler: cualquier consumidor del command avisa por
+construcción. El dedupe es por **recuperación** (`recoveryId`), no por assessment ni por evento — con
+`assessmentId` una segunda rotación sería indistinguible de la primera y la persona no se enteraría de la
+más reciente.
+
+La decisión de avisar es una función pura isomorfa, `decideAssessmentAccessRotationNotice`, con cinco
+motivos de omisión: `not_secure_link` (el correo de recuperación ya lleva el aviso y la credencial),
+`operator_declared_delivery_failed` (evidencia más fresca que el webhook), `no_candidate_email`,
+`provider_blocked` y `credential_already_expired` (fail-closed: sin vencimiento legible NO se asume vigente).
+Vive en el vocabulario y no en el consumer a propósito: `predictAssessmentAccessRotationNotice` delega en la
+misma función para que el operador vea **antes de confirmar** si el candidato va a ser avisado — si no, manda
+el WhatsApp diciendo "te llegó un correo" cuando ningún correo salió.
+
+El predicado "el proveedor bloqueó esta dirección" tiene fuente única en `provider-block.ts`
+(`BLOCKING_PROVIDER_STATUSES` + sus generadores SQL): estaba escrito dos veces verbatim y el tercer
+copy-paste es cómo se convierte en tres que divergen en silencio.
+
+El correo candidate-facing gana `Reply-To`: `CANDIDATE_REPLY_TO_EMAIL_TYPES` + `resolveCandidateReplyToAddress`
+(`HIRING_CANDIDATE_REPLY_TO_EMAIL`, default `people@efeoncepro.com`) en la plataforma de correo. Antes **no
+existía** y una respuesta del candidato caía en la dirección de envío del proveedor. El párrafo "responde este
+correo y lo reponemos" no es cortesía: es la condición que hace legítimo un aviso sin credencial.
+
+Señal acompañante: `hiring.assessment.access_recovery.rotation_unnotified` (módulo `hiring`, steady 0).
+Kill-switch: fila `email_type_config.hiring_assessment_access_rotated`, flipeable con
+`pnpm hiring:email-type` (dry-run por defecto) sin redeploy.
+
+### Invariantes operativos para agentes — Acceso al test del candidato
+
+- **NUNCA** construir ni renderizar el enlace del candidato en la superficie del operador. La única URL con
+  credencial la arma el servidor justo antes de enviar el correo, y el enlace revelado llega ya armado desde
+  la respuesta del command: la vista lo muestra, no lo compone. Gate de FUENTE:
+  `src/views/greenhouse/hiring/assessment-credential-source-gate.test.ts` (una captura sólo prueba la rama
+  que se renderizó; la garantía vive en el código).
+- **NUNCA** re-abrir un camino de asignación que deje al cliente elegir plantilla o devuelva el token crudo.
+  Asignar un `candidate_test` pasa SIEMPRE por propose→confirm.
+- **NUNCA** gatear un read de recuperación sólo con `hiring.assessment.read`: exige al menos una de las dos
+  capabilities de recuperación **y** el binding a `applicationId` contra el aggregate.
+- **NUNCA** colapsar en un booleano las causas por las que un canal no está disponible. Si agregas una causa,
+  agrégala al enum `AssessmentAccessRecoveryChannelBlock` y dale su frase.
+- **NUNCA** meter el enlace, el token ni nada derivable de ellos en el aviso de rotación. El canal existe
+  justamente para entregar la credencial por una vía donde el operador verifica identidad. Cinco tests
+  anti-fuga lo hacen cumplir con la fila de origen envenenada.
+- **NUNCA** escribir el `delivery_id` del aviso en el ledger de recuperaciones: es append-only, IDs-only, y
+  el CHECK de schema prohíbe un `delivery_id` en una fila `secure_link`. La traza del aviso es su fila de
+  `email_deliveries` (`source_entity = recoveryId`).
+- **NUNCA** predecir el aviso con una copia del criterio. Predicción y envío delegan en
+  `decideAssessmentAccessRotationNotice`.
+- **NUNCA** duplicar el predicado de buzón bloqueado: importarlo de `provider-block.ts`.
+- **SIEMPRE** recordar que en `email_type_config` una fila **AUSENTE significa ENCENDIDO**
+  (`resolveEmailTypeConfig` es fail-open): el seed `enabled = FALSE` es la puerta, no una formalidad.
+
+### Estado de rollout
+
+`hiring_assessment_access_recovery` y sus dos capabilities están vivas; la migración TASK-1746 y el índice
+único de intents quedaron aplicados el 2026-08-19, y el canal de correo del recovery se habilitó ese mismo
+día. El aviso de rotación shipeó apagado por seed (migración `20260820045834971`) y se **prendió el
+2026-08-20 con autorización del CEO**, tras verificar contra PG que el ledger de recuperaciones estaba vacío
+(sin historial no hay ráfaga de backfill en el primer drenaje). `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`
+sigue OFF en el ops-worker, así que el correo de asignación conserva el link legacy; su cutover espera el
+readback Resend `click_tracking=false` y los smokes de href. Detalle por flag y runtime:
+`docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+
+Pendiente de evidencia runtime: ejercitar una rotación real con el flag ON (TASK-1757) y las ramas de
+TASK-1747 que ninguna captura puede dar contra datos sintéticos.
 
 ## Purpose
 

@@ -8,6 +8,7 @@
 - **Confidence:** High.
 - **Validated as of:** 2026-08-18 — production DB, Vercel runtime, Resend API, code and official Resend documentation.
 - **Accepted:** 2026-08-19. Product/Privacy approval: Julio Reyes, explicit operator approval in the ISSUE-160 execution session. Security review: Codex threat-model audit `audit_1746_security`; Architecture and Talent reviews: `audit_1745_architecture` and `audit_1745_talent`.
+- **Amended:** 2026-08-20 (TASK-1757) — a credential-free candidate notice was added to the `secure_link` channel, which Privacy had approved without one. See `## Amendment 2026-08-20`.
 
 ## Context
 
@@ -151,17 +152,69 @@ retention and the guidance to share only in a verified conversation with the can
    affected assessment through an explicit governed recovery.
 5. Ship the Desk consumer and train operators on email resend versus explicit manual-link sharing.
 
-### Transition state — 2026-08-19
+## Amendment 2026-08-20 — the candidate is told when their access is rotated (TASK-1757)
 
-TASK-1745 is code/build ready but its migration, signing secret, provider subscription, reconciliation and
-signed canary remain unapplied. TASK-1746 Slices 1–4 are code-complete locally: schema/contracts, token-safe
-delivery, email and secure-link recovery, fragment exchange, opaque session, Product API, abuse controls and
-retention owner exist behind disabled configuration. The migration
-`20260819072130586_task-1746-assessment-access-recovery.sql` and the concurrent token-intent index operation
-remain unapplied; both recovery capabilities, `hiring_assessment_access_recovery` and
-`HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` remain OFF/unexposed. No staging/production email, secure-link,
-browser or href smoke has run. TASK-1747 remains the pending Application 360 consumer. This is code completion,
-not operational availability.
+**This changes what Privacy approved.** The decision above specifies `secure_link` as a hand-delivered
+credential and says nothing about notifying the candidate; the approval covered the flow *as specified*, so a
+new candidate-facing outbound email is a change to it, not an implementation detail. It is recorded here so a
+later reader does not read the original silence as deliberate and remove the notice.
+
+The omission was not a decision. Notifying the candidate appears neither in the decision nor among its
+non-goals. What the TASK-1747 Slice 4 adversarial audit surfaced, and two independent reviews confirmed
+(Talent domain and Architecture, 2026-08-20), is that issuing a secure link **kills the candidate's previous
+credential** and hands the new one to the operator. If that hand-off fails — the operator gets distracted,
+copies it wrong, the person never answers — the candidate is locked out, does not know why, and their clock
+keeps running: §2 is explicit that recovery never extends a deadline. Eligibility also permits recovery while
+the assessment is `in_progress`, so someone can be answering in another tab and be evicted silently. A
+candidate who does not sit the test because of an infrastructure failure does not enter the pool as
+"not evaluated"; they enter as absence of evidence, which reads in practice as a rejection — and that lands
+asymmetrically on whoever is least able to insist.
+
+The notice is therefore added, subject to the constraints of the original decision:
+
+- It **never** carries the link, the token, or anything derivable from them. Including it would defeat the
+  identity verification that is the channel's entire reason to exist.
+- It **never** uses the `token_sensitive` lane: there is no credential to bind, and the receipt CHECK forbids
+  a `delivery_id` on a `secure_link` row. The recovery ledger receives no new writes; the notice's trace is
+  its own `email_deliveries` row (`source_entity = recoveryId`).
+- It is **fail-closed on feasibility**: the declared reason sets intent, provider state sets feasibility, and
+  feasibility wins. It is skipped when the operator already declared the send failed, when there is no
+  candidate email, when the provider blocked that mailbox, and when the credential is already expired or its
+  expiry is unreadable.
+- It hangs off the domain event `hiring.assessment.access_recovery_recorded`, not the route handler, so every
+  consumer of the command notifies by construction. Dedupe is per recovery, not per assessment or per event.
+- It ships disabled by seed (`email_type_config.hiring_assessment_access_rotated`), reversible with
+  `SET enabled = FALSE` and no redeploy.
+
+The "reply to this email and we will reissue it" paragraph is not a courtesy close: it is the condition that
+makes a credential-free notice legitimate. It required adding `Reply-To` to the email platform, which did not
+exist — a candidate reply previously landed on the provider's sending address.
+
+Authorization: CEO sign-off on the copy, the conditionality and the flip (2026-08-20), including the commitment
+that `people@efeoncepro.com` is an attended mailbox. Coverage signal:
+`hiring.assessment.access_recovery.rotation_unnotified` (steady 0), which exists because
+`hiring.assessment.access_never_exchanged` joins against `email_deliveries` and a `secure_link` recovery
+produces no delivery row — the one channel that can fail silently was the one no signal could see.
+
+Open, and owned by People Ops rather than by this decision: whether a failed hand-off should restore time to
+the candidate. Today the system says no, which is a policy, not a defect.
+
+### As-built — 2026-08-20
+
+TASK-1746 is operational: migration `20260819072130586_task-1746-assessment-access-recovery.sql` and the
+concurrent token-intent index were applied on 2026-08-19, both recovery capabilities are live, and the recovery
+email type is enabled. TASK-1747 shipped the Application 360 consumer: the ephemeral link no longer exists in
+the client, assignment goes through the TASK-1719 propose→confirm path, and the legacy
+`POST /api/hiring/assessments` with `method='candidate_test'` now answers **410**
+(`interviewer_scorecard` is unaffected). A read lane `GET .../access-recovery` was added for parity, gated on
+at least one recovery capability plus a mandatory `applicationId` binding — deliberately stricter than
+`hiring.assessment.read`, which every internal tenant carries. TASK-1757 shipped the rotation notice above and
+its signal.
+
+Still pending: `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` remains OFF in the ops-worker, so assignment
+email keeps the legacy URL until the Resend `click_tracking=false` readback and href smoke are done — the apex
+domain currently rewrites links, which would discard the fragment. No real rotation has yet been exercised with
+the notice flag ON. Per-flag runtime detail lives in `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
 ## Revisit when
 

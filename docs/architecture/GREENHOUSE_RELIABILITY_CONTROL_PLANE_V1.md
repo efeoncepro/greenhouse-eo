@@ -48,9 +48,9 @@ Contrato: [`GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`](GREENHOUSE_HIRING_ATS_ARC
 Runbook: `docs/manual-de-uso/hr/operar-procedencia-de-datos-hiring.md`.
 Task dueña: `TASK-1739` (EPIC-011), en producción desde `2026-08-19`.
 
-### Inventario del módulo `hiring` (al 2026-08-19)
+### Inventario del módulo `hiring` (al 2026-08-20)
 
-El módulo acumula **16 señales** emitiendo `moduleKey: 'hiring'`, repartidas en siete tasks dueñas. Se
+El módulo acumula **17 señales** emitiendo `moduleKey: 'hiring'`, repartidas en ocho tasks dueñas. Se
 deja el inventario explícito porque hasta esta entrega el único delta del módulo era el de TASK-356, que
 declaraba 2 señales propias + 2 migradas: quien leyera esta spec para saber qué observa `hiring` veía un
 cuarto del módulo real.
@@ -65,11 +65,45 @@ cuarto del módulo real.
 | `hiring.assessment.assignment_health` | `TASK-1719` | **sin delta** |
 | `hiring.assessment_ai.run_backlog_stuck`, `.provider_failure_rate`, `.abstention_rate`, `.override_delta`, `.orphan_reconciliation` | `TASK-1734` Slice 6 | **sin delta** |
 | `hiring.candidate_identity.needs_review_backlog`, `.evidence_coverage_gap` | `TASK-1736` Slice 4 | 2026-08-18 (esta entrega) |
-| `hiring.data_quality.data_origin_derivation_drift` | `TASK-1739` | 2026-08-19 (esta entrega) |
+| `hiring.data_quality.data_origin_derivation_drift` | `TASK-1739` | 2026-08-19 |
+| `hiring.assessment.access_recovery.rotation_unnotified` | `TASK-1757` | registrada abajo |
 
 Las 8 filas marcadas **sin delta** son deuda documental de este control plane, no señales ausentes del
 runtime: todas están wired en `get-reliability-overview.ts` y visibles en `/admin/operations`. Registrar
 una señal aquí es parte de entregarla — una señal que nadie sabe que existe no gatea nada.
+
+#### `hiring.assessment.access_recovery.rotation_unnotified` (TASK-1757)
+
+| `signalId` | Qué mide | Severidad | Steady |
+| --- | --- | --- | --- |
+| `hiring.assessment.access_recovery.rotation_unnotified` | Rotaciones por `secure_link` de las últimas 24 h que debían avisar al candidato y no produjeron fila de `email_deliveries`. Evidencia: `rotations_24h` y `unnotified`. Reader: [`hiring-assessment-rotation-notice-signals.ts`](../../src/lib/reliability/queries/hiring-assessment-rotation-notice-signals.ts) | `0 → ok`; `1-2 → warning`; `≥3 → error` | **0** |
+
+Por qué existe: la señal preexistente `hiring.assessment.access_never_exchanged` joinea contra
+`email_deliveries`, y una recuperación por `secure_link` **no produce fila de delivery** (`delivery_id` es
+`NULL` por CHECK de schema). El único canal donde la entrega puede fallar en silencio —el operador se
+distrae, copia mal, la persona no contesta— era precisamente el que ninguna señal podía ver, por
+construcción. Un candidato que no rinde por eso no entra al pool como "no evaluado": entra como ausencia
+de evidencia, que se lee de facto como descarte.
+
+Notas de contrato:
+
+- La población se acota a rotaciones con la credencial **todavía viva**: una ya vencida no tiene remedio
+  disponible, y contarla dejaría la señal en un número permanente distinto de cero — una señal cuyo estado
+  estable no es cero deja de leerse.
+- El SQL **excluye los mismos motivos de omisión** que la función pura `decideAssessmentAccessRotationNotice`
+  (entrega declarada fallida por el operador, sin correo del candidato, buzón bloqueado por el proveedor):
+  una rotación que no debía avisar no es una rotación sin aviso. Hay **test de paridad** sobre
+  la unión de motivos ([`hiring-assessment-rotation-notice-parity.test.ts`](../../src/lib/reliability/queries/hiring-assessment-rotation-notice-parity.test.ts)) porque SQL y TS son dos implementaciones del mismo juicio y ya se sabe cómo divergen.
+- El predicado de buzón bloqueado sale de la fuente única `provider-block.ts`, que exporta tanto el `Set` de
+  estados como sus generadores SQL. **NUNCA** re-escribir el literal.
+- PII-free por construcción: sólo counts. El dominio de candidatos es de PII restringida.
+- Degrada a `unknown` con `captureWithDomain(error, 'hiring')` si la query falla: no poder evaluar el hueco
+  no es evidencia de que no exista.
+- Remediación: **NUNCA** insertar a mano una fila de `email_deliveries` para apagarla. El aviso se emite por
+  el consumer o no se emite; una fila fabricada borra la única evidencia de que alguien quedó sin acceso.
+
+Contrato: [`GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`](GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md)
+§`Acceso al test del candidato`. Task dueña: `TASK-1757` (EPIC-011); flag ON desde `2026-08-20`.
 
 ## Delta 2026-08-18 — TASK-1736: 2 signals de la identidad del intake de candidatos
 

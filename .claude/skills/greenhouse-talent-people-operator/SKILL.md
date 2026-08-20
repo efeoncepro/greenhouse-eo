@@ -23,7 +23,7 @@ This skill is a **decision aid, not legal advice**. For statutory pay, contract 
 | "inbound recruiting / careers / employer brand / talent pool"                                                     | Inbound + candidate experience; load `references/inbound-recruiting-job-ad-research.md` for the evidence-led full-funnel playbook before recommending a campaign, nurture or conversion change.                                                                                |
 | "design the test / interview / competency assessment / rubric"                                                    | Assessment + structured interviewing                                                                                                                                                                                                                                           |
 | "analyze this interview / evaluate this candidate by competencies"                                                | Assessment analysis (structured, bias-aware)                                                                                                                                                                                                                                   |
-| "candidate did not receive the test / resend or copy the assessment link"                                       | Assessment delivery + governed same-assessment access recovery; load `references/greenhouse-runtime.md` §Assessment delivery, recovery and public session                                                                                                                      |
+| "candidate did not receive the test / give them access again / the link does not work"                                       | Assessment delivery + governed same-assessment access recovery (there is no credential on screen to copy); load `references/greenhouse-runtime.md` §Assessment delivery, recovery and public session                                                                                                                      |
 | "ver el CV / documentos del candidato / revelar el RUT de un candidato"                                           | Candidate documents — file vs identity (TASK-1714/1715; see the section below + `references/greenhouse-runtime.md` §Candidate documents)                                                                                                                                       |
 | "hire abroad / remote / contractor vs EOR / which country"                                                        | Global hiring (with payroll/legal boundary)                                                                                                                                                                                                                                    |
 | "onboarding / ramp / development / career path"                                                                   | People development                                                                                                                                                                                                                                                             |
@@ -126,8 +126,14 @@ Use the People guide at `docs/documentation/hr/efeonce-operating-code-hiring-onb
 - **NEVER** say or implement "assign the assessment to the vacancy" as the executable runtime action. A vacancy/opening can recommend a template, but the real Greenhouse action is assigning an assessment template to a concrete `hiring_application`, which creates a candidate-specific `hiring_assessment` instance and token.
 - **NEVER** equate assessment `assigned`, email `sent`, provider `delivered`, and candidate access. Historical
   `sent` means provider-accepted dispatch only. Never duplicate an assessment, query a bearer from SQL/logs,
-  or use a blind resend to recover access; use the governed same-assessment recovery contract when its rollout
-  is active.
+  or use a blind resend to recover access; use the governed same-assessment recovery contract, live since
+  2026-08-19.
+- **NEVER** render an assessment credential — token, full URL or anything derived — on an operator screen or
+  in a rotation notice. The surface offers the action; the secure link is revealed once, to one authorized
+  human, after identity verification. Dispatching (or revealing) is not delivering: never claim to a
+  candidate that something reached them.
+- **NEVER** retry by email against a mailbox the provider blocked (`bounced|complained|suppressed`), and
+  never attribute conduct to the candidate from a provider status. Switch to the secure link.
 - **NEVER** use — or recommend — emotion recognition, facial/voice "personality" inference, or social scoring of candidates (AI-Act prohibited + indefensible).
 - **NEVER** design a selection step that isn't **job-related and validity-oriented**; avoid anything that is a proxy for a protected class (adverse impact). Prefer structured interviews + work samples over unstructured "culture fit".
 - **NEVER** use "culture fit" as vague affinity. If evaluating Operating Code alignment, tie it to job-related evidence: transparency, education, memory, impact and system behavior.
@@ -167,13 +173,12 @@ Governance: flag `HIRING_LIFECYCLE_EMAILS_ENABLED` **ON in production since 2026
 
 Docs: manual `docs/manual-de-uso/hr/operar-emails-ciclo-hiring.md` · functional `docs/documentation/hr/emails-ciclo-hiring.md` · architecture `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (Delta 2026-08-12) · flag ledger `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
-## Assessment delivery and access recovery (TASK-1745/1746 — code complete, rollout pending)
+## Assessment delivery and access recovery (TASK-1745/1746/1747/1757)
 
 Keep three truths separate: assignment creates a candidate-specific assessment; `sent` means the provider
 accepted dispatch; only a signed provider event confirms `delivered`, `bounced`, `complained` or `suppressed`.
-The Resend lifecycle receiver is observer-only and must never sit on, pause, or fail the outbound path.
-Registration, secret, migrations/reconciliation and live canary remain pending, so do not claim provider
-lifecycle is active from code alone.
+The Resend lifecycle receiver is observer-only and must never sit on, pause, or fail the outbound path; it
+went operational in production with TASK-1745.
 
 Assessment assignment/recovery email is token-sensitive: reserve a durable redacted intent before issuing or
 rotating the bearer; never persist the bearer, full URL, name or contact in generic payload/audit/logs; never
@@ -184,15 +189,54 @@ Recovery reuses the same assessment and has mutually exclusive `email` and `secu
 changes stage, score, answers or the original started timer. `bounced|complained|suppressed` blocks email only;
 the one-reveal secure link remains available to an authorized human after identity verification. Eligibility:
 unstarted `assigned|sent`; live-deadline `in_progress`; `expired` only when never started and access expiry is
-proven. Submitted/scored/cancelled, elapsed or terminal/withdrawn applications are blocked. Cooldown is 60s
-and the cross-channel cap is 3 successful rotations per assessment per 24h.
+proven. Submitted/scored/cancelled, elapsed or terminal/withdrawn applications are blocked. **Cooldown (60s)
+and the cap (3 successful rotations per 24h) are PER CHANNEL, never shared** — sharing them let a just-sent
+email switch the secure link off for a minute, which is exactly hiding from the candidate the only door they
+had left. The two channels are also two capabilities, granted separately:
+`hiring.assessment.recover_access_email` and `hiring.assessment.reveal_access_link`.
 
 The future public boundary exchanges `#access=<bearer>` for an HttpOnly Secure SameSite=Lax cookie, then uses
 token-free session operations. Answer deadline is started time + effective accommodation; 30m grace freezes
 answers but allows submit; no-limit gets 24h. `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` defaults OFF,
 so the legacy sender remains canonical until migration/index, routes/worker, UI, smokes and monitoring are
-rolled out together. Functional doc: `docs/documentation/hr/entrega-y-recuperacion-de-acceso-a-tests.md`;
-manual: `docs/manual-de-uso/hr/recuperar-acceso-a-test-de-candidato.md`; runtime detail:
+rolled out together.
+
+**Craft invariants — the ones an operator surface gets wrong:**
+
+- **A credential is never displayed. The surface offers the ACTION, never the value.** Application 360 used
+  to show the tokenized link in the clear, and the candidate email rotated that same token ~2.5 minutes
+  later, so copying it handed over a dead access. It happened to a real candidate on 2026-08-19.
+- **The secure link is delivered AFTER verifying identity, which is precisely why it never travels by
+  email.** Putting it in the notice — "to help" — voids the verification that is the channel's whole reason
+  to exist. Five anti-leak tests enforce it.
+- **Dispatching is not delivering.** Provider acceptance and reveal-to-operator are both promises of
+  delivery, not deliveries. Never present `sent` to a candidate as proof, and never tell a candidate "you
+  got an email" without first reading whether a notice was actually going to be sent.
+- **Never insist by email against a mailbox the provider blocked.** It is an active control, not a candidate
+  preference; forcing it burns the domain's sending reputation for every other candidate. And `suppressed`
+  is not a bounce and not spam — never attribute conduct to the person from a provider status.
+- **A secure-link recovery leaves NO delivery trace, by construction** (`delivery_id` is NULL by schema
+  CHECK), so the sibling signal that joins `email_deliveries` is blind to the one channel where hand-delivery
+  can fail silently. That is why `hiring.assessment.access_recovery.rotation_unnotified` exists (steady 0).
+  Legitimate skips are outside its population: they are domain decisions, not failures.
+- **Every block declares its own cause and remedy.** Collapsing "not recoverable", "no email on file",
+  "provider blocked", "quota exhausted" and "wait 60s" into one `false` sent all five to the same message,
+  and the operator ended up asking Admin for a permission he already had. Same for a cancelled test vs a
+  submitted one: same eligibility code, but only one has a remedy (reassign).
+- **The operator does not pick the assessment template.** The vacancy policy resolves it server-side, and
+  the preview shows the block BEFORE confirming.
+- **Rotating access notifies the candidate** — without the link — unless the channel was email (that message
+  already carries both), there is no address, the provider blocks it, the operator declared the send failed,
+  or the new credential would already be expired. The operator sees that prediction before confirming, from
+  the same pure function the worker runs. Candidate replies now reach `people@efeoncepro.com` (`Reply-To` on
+  all 8 candidate-facing types); before TASK-1757 there was none, and replies fell into the provider's
+  verified sending address that nobody reads — while several of those emails explicitly ask for a reply.
+
+**Estado**: recovery command, capabilities and candidate email are **in production since 2026-08-19**. The
+Application 360 surface (TASK-1747) and the rotation notice (TASK-1757) are **on `develop`/staging**;
+promotion to production is a separate step, and neither has been exercised against a real rotation yet.
+Functional doc: `docs/documentation/hr/entrega-y-recuperacion-de-acceso-a-tests.md`; manual:
+`docs/manual-de-uso/hr/recuperar-acceso-a-test-de-candidato.md`; runtime detail:
 `references/greenhouse-runtime.md` §Assessment delivery, recovery and public session.
 
 ## Candidate contact completeness (TASK-1688 — LIVE en producción 2026-08-12)

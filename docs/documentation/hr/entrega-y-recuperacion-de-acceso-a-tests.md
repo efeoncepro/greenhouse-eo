@@ -1,10 +1,13 @@
 # Entrega y recuperación de acceso a tests
 
 > **Tipo de documento:** Documentación funcional
-> **Versión:** 1.0
-> **Última actualización:** 2026-08-19 por Codex (TASK-1745, TASK-1746, ISSUE-160)
-> **Estado operativo:** código implementado y validado localmente; rollout pendiente. La recuperación,
-> la sesión pública nueva y el lifecycle de Resend descritos aquí todavía no están habilitados en producción.
+> **Versión:** 1.1
+> **Creado:** 2026-08-19 por Codex (TASK-1745, TASK-1746, ISSUE-160)
+> **Última actualización:** 2026-08-20 por Claude (TASK-1747, TASK-1757)
+> **Estado operativo:** la recuperación (comando, permisos y correo al candidato) está en producción
+> desde el 2026-08-19. La superficie del operador en Application 360 y el aviso de rotación al
+> candidato están en `develop`/staging; su promoción a producción es un paso aparte. La sesión pública
+> nueva sigue apagada.
 
 ## El problema que resuelve
 
@@ -21,9 +24,8 @@ existe aceptación técnica del despacho y para recuperar el acceso sin crear ot
 | Provider `opened` o `clicked` | Señal de interacción | Sustituto de `delivered` |
 
 El webhook de Resend es observador: registra hechos posteriores al envío y nunca participa en el camino
-crítico del correo saliente. Si el webhook falla, los demás correos deben seguir enviándose. Su registro,
-secreto, reconciliación y canary live siguen pendientes de rollout; mientras tanto, la UI actual no puede
-afirmar entrega confirmada por proveedor.
+crítico del correo saliente. Si el webhook falla, los demás correos deben seguir enviándose. Su lifecycle
+quedó operativo en producción con el cierre de TASK-1745.
 
 ## Credenciales sensibles
 
@@ -48,8 +50,58 @@ Hay dos canales excluyentes:
   un canal verificado. Tiene vigencia de inicio de 24 horas. Repetir el command devuelve el recibo, nunca la URL.
 
 El bloqueo del email no bloquea el enlace seguro. La recuperación exige sesión humana, capability específica,
-aplicación activa, razón estructurada y trazabilidad sólo con IDs. Aplica un cooldown global de 60 segundos y
-un máximo de tres rotaciones exitosas por assessment en 24 horas, sumando ambos canales.
+aplicación activa, razón estructurada y trazabilidad sólo con IDs.
+
+**Cuota y espera son por canal, no compartidas:** hasta tres rotaciones exitosas por canal en 24 horas y
+60 segundos entre intentos del mismo canal. Compartirlas hacía que un correo recién enviado apagara el
+enlace seguro durante un minuto, que es exactamente ocultarle al candidato la única salida que le quedaba.
+
+Los dos canales tienen **capabilities distintas**, y se otorgan por separado:
+`hiring.assessment.recover_access_email` para reenviar por correo y `hiring.assessment.reveal_access_link`
+para revelar el enlace. Tener una no implica la otra.
+
+## Qué ve el operador (Application 360)
+
+La tarjeta del assessment **no muestra ninguna credencial**. Antes exhibía en claro el enlace tokenizado;
+como el correo al candidato rotaba ese mismo token minutos después, copiarlo y entregarlo en mano entregaba
+un acceso ya muerto. La superficie ofrece la acción, nunca el valor.
+
+- **Asignar** pasa por una vista previa: el servidor resuelve qué test corresponde según la política de la
+  vacante — el operador ya no elige plantilla — y muestra el bloqueo, con su causa, **antes** de confirmar.
+- **Recuperar** es una acción explícita con canal y motivo declarados. El motivo no es papeleo: un
+  assessment `expired` sólo se habilita declarando `token_expired_before_start`, porque es el único motivo
+  que prueba que el acceso caducó antes de que la persona empezara.
+- **Cada bloqueo declara su causa y su remedio.** El DTO expone por canal *por qué* está cerrado — test no
+  recuperable, sin correo registrado, buzón bloqueado por el proveedor, cuota agotada, espera de 60 s — en
+  lugar de un booleano único. Colapsarlas mandaba las cinco al mismo mensaje, y el operador terminaba
+  pidiéndole a Admin un permiso que ya tenía.
+- **La revelación del enlace es única**: se muestra una sola vez, no sobrevive al cierre de la ventana ni a
+  una recarga, y la ventana no se cierra con Escape para que un reflejo de teclado no destruya una
+  credencial irrepetible.
+
+## Aviso de rotación al candidato
+
+Emitir un enlace seguro **mata la credencial anterior del candidato** y se la entrega en mano al operador.
+Si esa entrega falla, la persona queda sin acceso, sin saber por qué y con su plazo corriendo — y como la
+elegibilidad permite recuperar en `in_progress`, puede ser expulsada de una evaluación que estaba
+respondiendo. El aviso cubre ese hueco.
+
+- **Nunca lleva el enlace ni el token.** Ponerlo ahí anularía la verificación de identidad que es la razón
+  de existir del canal. Sólo dice que el acceso anterior dejó de servir, hasta cuándo vale el nuevo, que se
+  entrega por otra vía, y que puede responder ese correo para pedir ayuda.
+- **No se envía** cuando el canal fue correo (ese mensaje ya lleva el aviso y la credencial juntos), cuando
+  no hay correo registrado, cuando el proveedor bloquea esa dirección, cuando el operador declaró que el
+  envío falló, o cuando la credencial nueva ya estaría vencida.
+- **El operador ve la predicción antes de confirmar.** La misma decisión que ejecuta el envío se evalúa en
+  la pantalla, para que nadie avise «te llegó un correo» cuando ningún correo salió.
+- **Las respuestas del candidato llegan a un buzón atendido.** Los ocho tipos candidate-facing del ciclo
+  ahora declaran `Reply-To` hacia `people@efeoncepro.com` (`HIRING_CANDIDATE_REPLY_TO_EMAIL`). Antes no
+  existía: una respuesta caía en la dirección de envío verificada del proveedor, que nadie lee — y varios de
+  esos correos le piden explícitamente responder.
+- **Una recuperación por enlace no deja rastro de entrega**, por diseño: no produce fila de `email_deliveries`.
+  Por eso existe la señal `hiring.assessment.access_recovery.rotation_unnotified` (estado normal 0), que
+  vigila las rotaciones con credencial todavía viva donde el aviso debía salir y no hay evidencia de que
+  saliera. Las omisiones legítimas quedan fuera de su población: son decisiones del dominio, no fallas.
 
 ## Estados y continuidad del candidato
 
@@ -80,6 +132,12 @@ UI operativa y monitoreo. Código listo no equivale a capacidad activa.
 - Nunca se recupera un token desde SQL, logs o historial.
 - Nunca se crea un segundo assessment para resolver un problema de acceso.
 - El enlace seguro se entrega sólo después de verificar identidad y canal del destinatario.
+- Ninguna superficie del operador muestra una credencial: ofrece la acción, nunca el valor.
+- Despachar no es entregar. Aceptación del proveedor y revelación al operador son promesas de entrega,
+  no entregas.
+- Con el buzón bloqueado por el proveedor no se insiste por correo: es un control activo, y forzarlo
+  degrada la entregabilidad del dominio para el resto de los candidatos.
+- Recuperar acceso nunca agrega tiempo. Extender es el flujo gobernado de accommodations.
 - Los estados y errores públicos son genéricos; los detalles permanecen en la operación autorizada.
 
 ## Referencias

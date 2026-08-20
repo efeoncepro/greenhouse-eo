@@ -44,13 +44,14 @@ Operational sequence:
 - Operator reviews via `GET /api/hiring/assessments/[id]`; score/finish via `/score` under `hiring.assessment.score`.
 - Decision remains human in Application 360. `selected + internal_hire` → handoff → Hiring Activation Lane. Assessment never activates anyone directly.
 
-### Assessment delivery, recovery and public session (TASK-1745/1746)
+### Assessment delivery, recovery and public session (TASK-1745/1746/1747/1757)
 
-**Runtime status (2026-08-19): code complete and locally validated; rollout pending.** The Resend webhook is
-not registered/verified live, recovery UI is not available, migration/index are not applied, recovery email
-type is born OFF, and `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` defaults OFF in ops-worker. Therefore
-legacy links remain the current production behavior and provider lifecycle/recovery must not be described as
-active.
+**Runtime status (2026-08-20).** Provider lifecycle (1745) and the recovery command + capabilities + candidate
+email (1746) are **in production since 2026-08-19**: migration and index `uq_email_deliveries_token_intent_v2`
+applied, `email_type_config.hiring_assessment_access_recovery = true`. The Application 360 surface (1747) and
+the rotation notice (1757) are **on `develop`/staging only** — promotion is a separate step and neither has
+been exercised against a real rotation. `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` still defaults OFF in
+ops-worker, so legacy links remain the sender's behavior.
 
 - Global lifecycle: historical `sent` = provider accepted dispatch, never inbox delivery. Signed provider
   events own `delivered|bounced|complained|suppressed|delayed|failed`; open/click are engagement. The inbound
@@ -61,8 +62,9 @@ active.
 - Recovery: one command, same assessment, channels `email|secure_link`. Email starts within 14d; secure link
   within 24h and is revealed once. Provider block affects email only. Replay returns receipt without URL.
   Separate capabilities: `hiring.assessment.recover_access_email` and
-  `hiring.assessment.reveal_access_link`; human roles only, reason enum, IDs-only audit. Cross-channel cooldown
-  60s and cap 3 successful rotations/assessment/24h.
+  `hiring.assessment.reveal_access_link`; human roles only, reason enum, IDs-only audit. **Cooldown (60s) and
+  cap (3 successful rotations/assessment/24h) are PER CHANNEL** — the availability reader mirrors the command's
+  `channel` filter exactly; a shared predicate let a just-sent email switch the secure link off for 60s.
 - Eligibility: unstarted `assigned|sent`; `in_progress` only before answer deadline; `expired` only never-started
   access expiry. Submitted/scored/cancelled, elapsed, terminal or withdrawn is blocked. Final recheck occurs
   under assessment→application→candidate locks. Recovery never changes stage/score/answers or extends time.
@@ -72,6 +74,25 @@ active.
 - Session boundary after cutover: same-origin fragment exchange → HttpOnly Secure SameSite=Lax cookie;
   GET/start/save/submit/SELF-ID carry no bearer. Reload/multi-tab resumes/fences the session without losing
   access. Public errors remain generic. Limiting uses credential/session HMAC bucket plus generous IP ceiling.
+
+- Operator surface (1747): **no credential is ever rendered** — the card offers the action. Assignment goes
+  through a server-resolved preview (the operator does not pick the template) that shows `blockingReasonCode`
+  BEFORE confirming. The availability DTO declares `channels.*.blockedBy` per channel
+  (`assessment_not_eligible|no_candidate_email|provider_blocked|quota_exhausted|cooldown`) so no two causes
+  share a message; the reveal dialog is one-time and deliberately does not close on Escape. The read lane
+  (`GET .../access-recovery`) requires `applicationId` compared against the aggregate plus at least one
+  recovery capability — `hiring.assessment.read` alone is carried by every internal tenant.
+- Rotation notice (1757): `decideAssessmentAccessRotationNotice` (isomorphic, `vocabulary.ts`) hangs off the
+  domain event, not the route handler, so every consumer of the command notifies by construction. It **never**
+  carries the link/token, and skips on `not_secure_link | no_candidate_email | provider_blocked |
+  operator_declared_delivery_failed | credential_already_expired`. `predictAssessmentAccessRotationNotice`
+  delegates to the same function so the screen and the worker cannot diverge. A `secure_link` recovery
+  produces no `email_deliveries` row (`delivery_id` NULL by CHECK), which is why the signal
+  `hiring.assessment.access_recovery.rotation_unnotified` (steady 0) exists — its SQL predicate mirrors the TS
+  function and is held together by a parity test. All 8 candidate-facing types now carry `Reply-To`
+  (`HIRING_CANDIDATE_REPLY_TO_EMAIL`, default `people@efeoncepro.com`); there was none before.
+- Kill-switch flips go through `pnpm hiring:email-type` (dry-run by default, upsert): in `email_type_config`
+  an **absent row means ENABLED** (fail-open), so a plain UPDATE that matches nothing looks like an OFF.
 
 Docs: `docs/documentation/hr/entrega-y-recuperacion-de-acceso-a-tests.md` and
 `docs/manual-de-uso/hr/recuperar-acceso-a-test-de-candidato.md`.

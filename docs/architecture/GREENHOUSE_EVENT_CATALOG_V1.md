@@ -866,6 +866,19 @@ Invariants:
 Publisher: `src/app/api/webhooks/resend/route.ts` (bounce/complaint), `src/lib/email/delivery.ts` (rate_limited)
 Consumer: none yet (future: admin alerts, delivery health metrics)
 
+### Hiring — Recuperación de acceso a un assessment (TASK-1746 / TASK-1757)
+
+| Aggregate Type                         | Event Type                                   | Publisher                                                                         | Payload                                                                                                                   | Consumer reactivo                             |
+| -------------------------------------- | -------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `hiring_assessment_access_recovery`    | `hiring.assessment.access_recovery_recorded` | `recover-email.ts` y `recover-secure-link.ts`, dentro de la misma tx que la rotación | IDs-only: `{ recoveryId, assessmentId, applicationId, channel, reasonCode, outcome, … }`. **Sin token, URL, nombre ni correo** | `hiring_assessment_access_rotated_email` (TASK-1757) |
+
+- El evento se publica **en la misma transacción que la rotación**, así que el aviso se considera si y sólo
+  si la rotación commiteó. Un replay del command retorna antes del publish: no genera un segundo evento.
+- Tuvo **cero consumidores** entre TASK-1746 y TASK-1757 — era audit puro. Desde TASK-1757 lo consume la
+  projection del aviso al candidato, que filtra `channel='secure_link'` + `outcome='link_issued'`.
+- **El outbox sincroniza a BigQuery**: cualquier PII o credencial en este payload se replica fuera del
+  control del dominio. El contrato IDs-only heredado de `hiring.*` no es negociable.
+
 ### User Lifecycle (TASK-253, TASK-267)
 
 | Aggregate Type   | Event Type          | Publisher                   | Payload                                  | Consumer reactivo |
@@ -900,6 +913,10 @@ El consumer ya no usa handlers hardcodeados. Usa el Projection Registry declarat
 | `payroll_reliquidation_delta`       | finance       | payroll_entry.reliquidated                                                                                                                                                                                                                                                                                                                                                        | Aplica delta neto (`deltaGross`) como nuevo expense con `source_type='payroll_reliquidation'` y `reopen_audit_id` FK. Skip/no-op si delta=0. Idempotente por `(event_id, handler)` en outbox_reactive_log. |
 | `payroll_receipts_delivery`         | notifications | payroll_period.exported                                                                                                                                                                                                                                                                                                                                                           | Genera, persiste y envía el batch de recibos del período exportado                                                                                                                                         |
 | `payroll_export_ready_notification` | notifications | payroll_period.exported                                                                                                                                                                                                                                                                                                                                                           | Envía el aviso de cierre/exportación a Finance/HR con el resumen operativo del período                                                                                                                     |
+| `hiring_assessment_access_rotated_email` | notifications | hiring.assessment.access_recovery_recorded                                                                                                                                                                                                                                                                                                                                   | Avisa al candidato que su acceso anterior murió cuando la recuperación fue por `secure_link`. **NUNCA lleva el enlace.** Dedupe por `recoveryId`; kill-switch `email_type_config.hiring_assessment_access_rotated` |
+
+Los siete consumers de email del ciclo de vida de Hiring (TASK-1689) no están tabulados acá; su contrato
+vive en [`GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`](GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md).
 
 ### Sample Sprints / Engagement Platform (TASK-808)
 
