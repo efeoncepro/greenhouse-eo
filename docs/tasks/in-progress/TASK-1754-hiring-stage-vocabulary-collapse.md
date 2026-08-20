@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-011`
-- Status real: `Diagnóstico verificado contra runtime; decisión de dirección aprobada por el operador`
+- Status real: `Slice 0 (mitigación) commiteado; el colapso —que es la solución de fondo— NO empezado`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -64,6 +64,132 @@ mira.
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
      ═══════════════════════════════════════════════════════════ -->
+
+
+## Traspaso 2026-08-20 — estado para tomar en frío
+
+### Lo primero que hay que entender
+
+**El Slice 0 que está commiteado es una MITIGACIÓN, no la solución.** Frena el daño en un camino de
+dos. La causa de fondo sigue viva y es lo que queda por hacer.
+
+### Commits
+
+| Commit | Qué |
+|---|---|
+| `4e1566d9a` | Slice 0 — mitigación: `PipelineDeskView` escribía una etapa distinta de la que muestra |
+
+### Qué se arregló, y por qué no alcanza
+
+El carril "Evaluación" declaraba `titleStage: 'shortlisted'` con `destination: 'qualified'`: tomaba
+su nombre de la etapa que la automatización vigila y guardaba la postulación en otra. Como el
+diccionario de copy traduce AMBAS a "Evaluación", en pantalla no se veía nada raro.
+
+Se cambió el literal a `destination: 'shortlisted'`. Los tests vuelven a salir por el tablero.
+
+**Por qué es mitigación y no solución:** el error no fue escribir mal un literal, fue que ese
+literal se pudiera escribir mal. El carril necesita TRES campos de etapa —de cuál toma el nombre,
+cuáles agrupa, en cuál guarda— **sólo porque el dominio tiene 13 etapas y el tablero 6**. Cada
+columna hace de traductora, y una traductora puede traducir mal.
+
+Y deja intacto el camino del agente: `PATCH /api/hiring/applications/[id]` valida contra las 13 del
+dominio, así que ante "muévela a Evaluación" un agente tiene TRES etapas donde elegir
+(`qualified`, `shortlisted`, `client_review`) y sólo una dispara. Peor: ahora el arrastre escribe
+`shortlisted` y un agente puede escribir `qualified`, así que dos tarjetas en la misma columna
+divergen en comportamiento — una divergencia que antes no existía porque todo caía en `qualified`.
+
+**Condición de retiro de la mitigación:** cuando el colapso deje UNA sola etapa detrás de cada
+columna, `LaneDefinition` debe perder los tres campos y quedarse con uno. Ahí
+`pipeline-lane-contract.test.ts` se vuelve innecesario y **se borra** — que es la señal de que el
+arreglo fue estructural y no un guardián sobre un parche.
+
+### Datos verificados contra PG (2026-08-20) — la spec los tiene viejos
+
+| Dato | Spec | Realidad |
+|---|---|---|
+| Filas por etapa | `sourced` 36 · `shortlisted` 5 · `qualified` 2 | `closed` 32 · `sourced` 30 · **`qualified` 7** · `screening` 5 · **`shortlisted` 4** · `interview` 3 · `rejected` 1 |
+| `client_review` | — | **0 filas** |
+| Valores del enum | 12 | **13** |
+| CHECK constraints | 1 (implícita) | **3** |
+
+Las **3 CHECK** que nombran `shortlisted`: `hiring_application_stage_check` (13 valores),
+`hiring_opening_assessment_policy_trigger_stage_check` (`shortlisted|interview`),
+`hiring_assessment_assignment_trigger_stage_check` (`shortlisted|interview|manual`).
+
+**14 políticas, las 14 en `shortlisted`** (12 `enabled`, 2 `disabled`, todas `on_stage_entry`). No
+faltaba configuración: toda la que había apuntaba a una etapa inalcanzable.
+
+**20 filas históricas** en el ledger con `trigger_stage='shortlisted'` (6 `assigned`, 10
+`cancelled`, 4 `blocked`).
+
+**Las 32 filas `closed` con `decision = NULL` son `data_origin='smoke_test'`** — las archivó
+`archiveSyntheticRecords` (`purge.ts:173`), que hace `UPDATE ... SET stage='closed'` sin tocar
+`decision`. **No son candidatos ignorados.** El proceso real ha cerrado UNA postulación y sí tiene
+su decisión. La premisa "Cerrado colapsa sin pérdida" no está desmentida: está **sin estrenar**.
+
+### Decisiones tomadas (arquitectura + talento, 2026-08-20)
+
+1. **El identificador se queda en `shortlisted`; NO se introduce `evaluation`.** El operador nunca
+   lo ve, y reusar evita migrar 14 políticas, 20 filas de ledger y 2 de las 3 CHECK. El colapso
+   ocurre igual: `qualified` y `client_review` desaparecen absorbidas. Sólo migran **7 filas**.
+2. **Pero el comentario de doctrina de `hiring-assessment-policy.ts:19-42` hay que reescribirlo.**
+   Justifica `shortlisted` porque "la población ya está acotada" y "el pedido tiene contrapartida".
+   Al absorber `qualified`, la población se ensancha y ese argumento deja de ser cierto. Dejarlo
+   como está es exactamente la deriva silenciosa que produjo este incidente.
+3. **La protección se muda de la etapa a la compuerta:** `mode: 'manual'` por defecto deja de ser un
+   follow-up opcional. Con el disparador en una etapa ancha, `on_stage_entry` por defecto significa
+   mandar trabajo no pagado a todo el que pase screening.
+4. **El ledger NUNCA se reescribe.** Es append-only, `trigger_stage` participa de su clave de
+   idempotencia, y es el rastro de auditoría de un dominio de alto riesgo bajo el AI Act.
+5. **El colapso de las 5 etapas TERMINALES no va en esta task.** Ver "defectos vivos" abajo.
+6. **Copy del candidato:** el correo de avance sólo sale cuando la automatización NO disparó (es el
+   camino de fallback, no el feliz). Talento recomienda **"En evaluación" / "Under evaluation"**, no
+   "Preselección" —que afirmaría un estatus que el sistema dejó de saber— ni "Evaluación" a secas
+   —que en español choca con el nombre del artefacto, porque el correo del test ya dice "tienes una
+   evaluación pendiente"—. En inglés esa colisión no existe (`assessment` ≠ `evaluation`).
+
+### Defectos VIVOS encontrados de paso — NO son de esta task
+
+- **`store.ts:1311` deja `closed` fuera del guard** que protege las etapas terminales (bloquea
+  `selected|backup|rejected|withdrawn` y omite la quinta), y el carril `outcome` tiene
+  `destination: 'closed'`. Arrastrar a "Cerrada" cierra a alguien **sin emitir
+  `hiring.application.decided`**, sin correo de decisión y con el reloj de retención congelado
+  (`documents/retention.ts:69` filtra `decision IS NOT NULL`, así que el CV nunca se vuelve elegible
+  para borrado).
+- **Las tres copias de `TERMINAL_APPLICATION_STAGES` omiten `backup`**
+  (`assessment/instances.ts:190`, `assessment/public-session/store.ts:11`,
+  `assessment/access-recovery/vocabulary.ts:93`), mientras `decide.ts:29` mapea
+  `backup_selected → 'backup'`. **Una persona marcada como respaldo puede seguir abriendo y
+  recuperando su prueba.** Tres literales duplicados que ya divergieron una vez.
+- **El lane programático acepta `stage` como string libre** (`app-hiring-candidate-review.ts:206`).
+  Un agente que filtre por una etapa retirada no recibe error: recibe **cero resultados**.
+
+### Plan restante
+
+| # | Qué | Nota |
+|---|---|---|
+| 1 | **Paridad estructural, antes de mover un literal.** `satisfies readonly HiringApplicationStage[]` en `OPENING_ASSESSMENT_TRIGGER_STAGES` y `ASSESSMENT_ASSIGNMENT_TRIGGERS`; `Record<HiringApplicationStage, string>` en `copy/types.ts:544` (hoy es `Record<string,string>`, así que una clave faltante no rompe nada); tipar el cast de `stage-comms/decide.ts:160`. Dos de tres son compile-time, sin archivo nuevo. |
+| 2 | **Test derivado enum ↔ CHECK.** Ambos lados se DERIVAN, ninguno se escribe a mano: `expect(literalesDelCheck.sort()).toEqual([...HIRING_APPLICATION_STAGES].sort())`. Si enumera las etapas esperadas es el test de regresión del snapshot con que se escribió. |
+| 3 | **Copy:** `qualified`/`client_review` → "Evaluación" ya está; retirar sus claves al final. Cerrar de paso que `en-US` nunca redefine `stages` y hoy muestra los nombres en castellano. |
+| 4 | **Expand/contract de `qualified` + `client_review` → `shortlisted`.** 7 filas y 0 filas, 0 políticas, 0 ledger. Readback por etapa antes y después. |
+| 5 | **Estructural:** `LaneDefinition` pasa a UNA etapa por carril; se borra `pipeline-lane-contract.test.ts`. |
+| 6 | **Deduplicar la escalera de rangos de `assessment_fairness`** (`migrations/20260713173500000_…:71-119`): tres listas de literales, dos con `ELSE 0`, así que una etapa desconocida cae a rango 0 en silencio. Derivar los dos `CASE` del CTE por join. |
+
+**Nudge operativo:** migrar las 7 filas por SQL **no dispara la automatización** — `stage_changed` lo
+emite el comando, no la base. Esas 7 quedan igual de mudas después de migrar. O las mueve un
+operador por el tablero ya corregido, o se les asigna por el camino manual. Decidirlo explícito.
+
+### Lo que NUNCA se debe hacer
+
+- **NUNCA** introducir `evaluation` como valor de dominio.
+- **NUNCA** reescribir `trigger_stage` en el ledger de asignaciones.
+- **NUNCA** backfillear `decision` en las 32 filas sintéticas: sería fabricar un acto humano.
+- **NUNCA** colapsar las etapas terminales antes de cerrar la puerta de `closed` en `store.ts:1311`:
+  en ese orden se pierde el último discriminante que queda.
+- **NUNCA** retirar un literal del enum mientras una política, una CHECK o la escalera de la VIEW lo
+  nombren.
+- **NUNCA** buscar y reemplazar `qualified` fuera de `src/lib/hiring/**` + `src/types/hiring*.ts` +
+  `src/lib/copy/**`: colisiona con `commercial` e ICO, donde `qualified` es otra cosa.
 
 ## Architecture Alignment
 

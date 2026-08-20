@@ -47,6 +47,20 @@ type LaneDefinition = {
 /**
  * TASK-1754 — exportado para que el invariante del tablero se pueda fijar en una prueba.
  *
+ * ⚠️ **MITIGACIÓN TEMPORAL, no la solución.** Estos tres campos de etapa —de cuál toma el nombre,
+ * cuáles agrupa, en cuál guarda— existen SÓLO porque el dominio tiene 13 etapas y el tablero 6.
+ * Cada carril hace de traductor, y un traductor puede traducir mal: eso fue el incidente del
+ * 2026-08-19, donde el carril se titulaba desde `shortlisted` y guardaba en `qualified`.
+ *
+ * Corregir el literal frena el daño en el arrastre, pero deja intacto el camino del agente:
+ * `PATCH /api/hiring/applications/[id]` valida contra las 13 del dominio, así que ante "muévela a
+ * Evaluación" un consumidor programático todavía tiene TRES etapas donde elegir y sólo una dispara.
+ *
+ * **Retiro:** cuando TASK-1754 colapse el enum y quede UNA etapa por carril, `LaneDefinition` pierde
+ * los tres campos y se queda con uno. Ahí el error deja de poder escribirse, y
+ * `pipeline-lane-contract.test.ts` sobra — borrarlo es la señal de que el arreglo fue estructural.
+ * Dueño: TASK-1754.
+ *
  * El invariante es "lo que el operador ve es lo que se escribe": `destination` DEBE ser
  * `titleStage`. No basta con que el destino esté dentro de `stages` — el bug del 2026-08-19 fue
  * exactamente eso: un destino legítimo dentro del carril, pero distinto de la etapa que le da
