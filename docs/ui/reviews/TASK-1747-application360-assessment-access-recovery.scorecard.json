@@ -1,0 +1,30 @@
+{
+  "taskId": "TASK-1747",
+  "scenario": "task1747-assessment-access-recovery",
+  "reviewedAt": "2026-08-20",
+  "reviewer": "Claude",
+  "evidence": {
+    "desktop": ".captures/2026-08-20T07-08-35_task1747-assessment-access-recovery/01-desktop/frames/02-recovery-cluster.png",
+    "mobile": ".captures/2026-08-20T07-08-35_task1747-assessment-access-recovery/02-mobile/frames/02-recovery-cluster.png",
+    "dossier": "docs/ui/reviews/TASK-1747-application360-assessment-access-recovery.review.md"
+  },
+  "dimensions": {
+    "hierarchy": { "score": 5, "rationale": "Título del bloqueo y su causa se leen en ese orden; el remedio queda en la misma frase que la causa, no en una nota aparte.", "evidence": "desktop/mobile recovery-cluster", "nextAction": "none" },
+    "proportions": { "score": 4.5, "rationale": "El alert ocupa el ancho de la tarjeta sin caja propia; a 390px conserva dos líneas legibles sin truncado.", "evidence": "mobile recovery-cluster", "nextAction": "none" },
+    "rhythm": { "score": 4.5, "rationale": "Un solo bloque dentro del ritmo ya establecido por la tarjeta de evaluación; no introduce separadores nuevos.", "evidence": "desktop assessment-tab-full", "nextAction": "none" },
+    "density": { "score": 4.5, "rationale": "Causa y remedio en una sola frase; la cuota viaja como caption junto al CTA en la rama con acción, sin disclosure adicional.", "evidence": "desktop recovery-cluster", "nextAction": "none" },
+    "depth": { "score": 4.5, "rationale": "El alert vive DENTRO de la tarjeta existente, sin card-on-card; el diálogo es la única superficie flotante y sólo para la revelación deliberada.", "evidence": "enterprise rubric pass", "nextAction": "none" },
+    "surfaceEconomy": { "score": 5, "rationale": "Extiende la tarjeta de evaluación; no agrega ruta, panel ni sidecar. Eliminó una superficie previa —el bloque con el enlace en claro— en vez de sumar otra.", "evidence": "Application360View diff", "nextAction": "none" },
+    "visualImpact": { "score": 4.5, "rationale": "Un estado bloqueado informa, no compite: darle peso visual sería empeorarlo. El impacto real es semántico — cinco causas con cinco remedios donde antes había una frase genérica, y un caso que mandaba a pedir un permiso ya concedido.", "evidence": "desktop/mobile recovery-cluster + AssessmentRecoveryCluster.test.ts", "nextAction": "La rama con CTA no es capturable hoy: no hay candidatura con test recuperable en la base. Verificar en la secuencia de staging del Rollout Plan." },
+    "typography": { "score": 5, "rationale": "Título en peso 700 y cuerpo en variante de body; sin truncado a 390px y sin fontSize inline.", "evidence": "mobile recovery-cluster", "nextAction": "none" },
+    "color": { "score": 5, "rationale": "Tono informativo del sistema para el bloqueo y warning para la advertencia reason-dependent; el estado nunca depende sólo del color — cada uno trae su frase.", "evidence": "accessibility pass", "nextAction": "none" },
+    "iconography": { "score": 4.5, "rationale": "Un solo ícono funcional de candado en el bloqueo y llave en el CTA; no hay decoración repetida por fila.", "evidence": "desktop recovery-cluster", "nextAction": "none" },
+    "responsive": { "score": 5, "rationale": "390px verificado sin overflow de página; las acciones del diálogo se apilan con la primaria a ancho completo.", "evidence": "mobile manifest exitCode 0", "nextAction": "none" },
+    "motion": { "score": 5, "rationale": "No agrega motion propia; el diálogo usa el comportamiento del primitive y la sonda de reduced-motion pasa.", "evidence": "scenario reducedMotionCheck", "nextAction": "none" },
+    "fidelity": { "score": 5, "rationale": "Implementa el State inventory del contrato: default, loading, empty, error, degradado con salida, permiso denegado, móvil y foco restaurado. El enlace crudo desapareció, que era el no-goal duro.", "evidence": "TASK-1747 UI/UX Contract + notVisible assertion", "nextAction": "none" },
+    "genericTemplateResistance": { "score": 4.5, "rationale": "El componente es un alert del sistema, pero su contenido no es sustituible: distingue cancelado de rendido, cuota de cooldown, buzón sin registrar de buzón bloqueado. Un template genérico colapsa los cinco en 'no disponible', que es exactamente el estado del que se viene.", "evidence": "AssessmentRecoveryCluster.test.ts (11 tests)", "nextAction": "none" }
+  },
+  "average": 4.75,
+  "floor": 4.5,
+  "verdict": "pass"
+}

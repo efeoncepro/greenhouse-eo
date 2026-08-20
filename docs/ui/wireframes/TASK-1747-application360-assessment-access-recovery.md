@@ -65,10 +65,24 @@ success / secure-link only
 
 ## GVC Scenario Plan
 
-- Scenario: `assessment-access-recovery` with synthetic fixture.
-- Viewports: 1440px and 390px.
-- Capture: no-test, unknown lifecycle, delivered, recovery channel selector, secure-link one-time success, error and permission denied.
-- Assertions: accessible labels/focus restore; no page overflow; no raw link after dialog close/reload.
+- Scenario file: `scripts/frontend/scenarios/task1747-assessment-access-recovery.scenario.ts`
+- Route: `/agency/hiring/applications/[id]?tab=assessment`
+- Viewports: `desktop` 1440x900 y `mobile` iPhone 13 (390px).
+- Quality profile: `premium`.
+- Required captures: `assessment-tab-full` (fullPage), `recovery-cluster` (clip del cluster).
+- Required `data-capture` markers: `hiring-application-tabs`, `assessment-scorecard`,
+  `assessment-access-recovery`.
+- Assertions: `noLoginRedirect`, `noErrorBoundary`, y `notVisible` sobre
+  `a[href*="/public/assessment/access"]` — la pantalla NUNCA vuelve a mostrar una credencial, que es
+  la causa directa del incidente del 2026-08-19.
+- Keyboard probe: `recovery-cta-focus` desde el CTA del cluster, con `reducedMotionCheck`.
+- Scroll-width check: cubierto por el gate de layout sobre `assessment-scorecard`.
+
+**No cubierto por el escenario, y se declara para que nadie lo dé por hecho:** la revelación única
+del enlace exige una emisión REAL (rotaría el acceso de una candidata real y consumiría su cuota de
+24 h), y el estado `provider_blocked` exige una dirección con rebote registrado. Ambos se verifican
+en la secuencia de staging del Rollout Plan, no en la captura. El escenario NO es `mutating`: abre
+la superficie, nunca confirma.
 
 ## Design Decision Log
 

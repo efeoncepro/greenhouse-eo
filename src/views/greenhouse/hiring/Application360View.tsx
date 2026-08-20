@@ -1150,8 +1150,18 @@ const Application360View = ({
               {entry.assessmentId in recoveryAvailability ? (
                 recoveryAvailability[entry.assessmentId] === null ? (
                   // La lectura falló. Decirlo, no esconder el cluster: un affordance ausente es
-                  // indistinguible de uno prohibido.
-                  <Alert severity='warning'>{recoveryCopy.errorReadFailed}</Alert>
+                  // indistinguible de uno prohibido. Y con salida: una degradación honesta que no
+                  // ofrece nada deja al operador mirando un mensaje, no resolviendo el caso.
+                  <Alert
+                    severity='warning'
+                    action={
+                      <Button color='inherit' size='small' onClick={() => router.refresh()}>
+                        {recoveryCopy.errorReadFailedRetry}
+                      </Button>
+                    }
+                  >
+                    {recoveryCopy.errorReadFailed}
+                  </Alert>
                 ) : (
                   <AssessmentRecoveryCluster
                     availability={recoveryAvailability[entry.assessmentId] as AssessmentAccessRecoveryAvailability}
@@ -1950,11 +1960,13 @@ const Application360View = ({
               </Stack>
             ) : null}
 
-            {assignError ? (
-              <Alert severity='error' role='alert'>
-                {assignError}
-              </Alert>
-            ) : null}
+            <Box aria-live='polite' aria-atomic='true'>
+              {assignError ? (
+                <Alert severity='error' role='alert'>
+                  {assignError}
+                </Alert>
+              ) : null}
+            </Box>
           </Stack>
         </DialogContent>
         <DialogActions>
@@ -2045,16 +2057,23 @@ const Application360View = ({
               )
             ) : null}
 
-            {recoveryNotice ? (
-              <Alert severity='info' role='status'>{recoveryNotice}</Alert>
-            ) : null}
-            {recoveryError ? (
-              <Alert severity='error' role='alert'>{recoveryError}</Alert>
-            ) : null}
+            {/* Región viva: quien navega con lector de pantalla no ve el Alert aparecer, así que
+                el resultado se ANUNCIA. `polite` y no `assertive` porque el desenlace llega
+                después de una acción deliberada — interrumpir sería ruido, no ayuda. */}
+            <Box aria-live='polite' aria-atomic='true' aria-label={recoveryCopy.statusAriaLive}>
+              {recoveryNotice ? (
+                <Alert severity='info' role='status' sx={{ mb: recoveryError ? 1.5 : 0 }}>
+                  {recoveryNotice}
+                </Alert>
+              ) : null}
+              {recoveryError ? (
+                <Alert severity='error' role='alert'>{recoveryError}</Alert>
+              ) : null}
+            </Box>
           </Stack>
         </DialogContent>
-        <DialogActions>
-          <Button disabled={recovering} onClick={closeRecovery}>
+        <DialogActions sx={{ flexDirection: { xs: 'column-reverse', sm: 'row' }, gap: { xs: 1, sm: 0 }, '& > :not(style) ~ :not(style)': { ml: { xs: 0, sm: 1 } } }}>
+          <Button disabled={recovering} onClick={closeRecovery} sx={{ inlineSize: { xs: '100%', sm: 'auto' } }}>
             {recoveryIdempotencyRef.current ? copy.common.cancel : copy.common.close}
           </Button>
           <GreenhouseButton

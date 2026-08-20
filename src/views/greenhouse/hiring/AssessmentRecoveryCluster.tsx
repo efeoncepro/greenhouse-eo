@@ -127,7 +127,7 @@ export const AssessmentRecoveryCluster = ({
   // El test entero no se recupera y el motivo no lo cambia: no hay acción que ofrecer.
   if (emailBlock === 'assessment_not_eligible' && linkBlock === 'assessment_not_eligible' && !reasonDependent) {
     return (
-      <Alert severity='info' icon={<i className='tabler-lock' />}>
+      <Alert severity='info' icon={<i className='tabler-lock' />} data-capture='assessment-access-recovery'>
         <Typography fontWeight={700} variant='body2'>{copy.unavailableTitle}</Typography>
         <Typography variant='body2'>{resolveRecoveryUnavailableMessage(availability, copy)}</Typography>
       </Alert>
@@ -148,7 +148,7 @@ export const AssessmentRecoveryCluster = ({
         ].filter(Boolean).join(' ') || copy.errorPermission
 
     return (
-      <Alert severity='info' icon={<i className='tabler-lock' />}>
+      <Alert severity='info' icon={<i className='tabler-lock' />} data-capture='assessment-access-recovery'>
         <Typography fontWeight={700} variant='body2'>{copy.unavailableTitle}</Typography>
         <Typography variant='body2'>{message}</Typography>
       </Alert>
@@ -167,7 +167,7 @@ export const AssessmentRecoveryCluster = ({
   ].filter((entry): entry is string => Boolean(entry))
 
   return (
-    <Stack spacing={1.25}>
+    <Stack spacing={1.25} data-capture='assessment-access-recovery'>
       {warnings.map((warning) => (
         <Alert key={warning} severity='warning'>{warning}</Alert>
       ))}
