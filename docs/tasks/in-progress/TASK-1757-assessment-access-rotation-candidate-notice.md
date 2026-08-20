@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-011`
-- Status real: `Code-complete, apagado — falta sign-off de Talent y Privacidad para el flip`
+- Status real: `Flag ON autorizado por el CEO; falta ejercitar una rotación real con el código desplegado`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -201,8 +201,8 @@ Reglas obligatorias:
 - **Slice 4 — Consumer.** Sender + projection + test anti-fuga extendido. ✅
 - **Slice 5 — Predicción en la superficie.** El operador ve ANTES de confirmar si el candidato va a
   ser avisado. ✅
-- **Slice 6 — Señal + rollout.** Señal de rotaciones sin aviso ✅; el flip queda pendiente de
-  sign-off.
+- **Slice 6 — Señal + rollout.** Señal de rotaciones sin aviso ✅; `reply-to` en la plataforma ✅;
+  CLI gobernado del kill-switch ✅; flip aplicado con autorización del CEO ✅.
 
 ## Out of Scope
 
@@ -262,7 +262,8 @@ Nace apagado por seed. El deploy es ordinario; el flip es una decisión separada
 
 ### Out-of-band coordination required
 
-Sign-off de Talent y Privacidad. Confirmación de que el `reply-to` es un buzón atendido.
+Resuelto: el CEO autorizó el flip y comprometió el buzón atendido (2026-08-20). Queda la parte
+operativa —que alguien efectivamente lea y responda `people@efeoncepro.com`— que no es código.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -279,8 +280,8 @@ Sign-off de Talent y Privacidad. Confirmación de que el `reply-to` es un buzón
 - [x] El operador ve antes de confirmar si el candidato va a ser avisado.
 - [x] Existe señal con `steady = 0` para rotaciones sin aviso.
 - [x] Hay test de paridad entre el SQL de la señal y la función TS.
-- [ ] Sign-off de Talent y Privacidad sobre el copy y la condicionalidad.
-- [ ] `reply-to` confirmado como buzón atendido.
+- [x] Sign-off del CEO sobre el copy y la condicionalidad (2026-08-20).
+- [x] `reply-to` implementado en la plataforma y comprometido por el CEO como buzón atendido.
 - [ ] Rotación real ejercitada con el flag ON.
 
 ## Verification

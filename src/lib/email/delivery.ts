@@ -30,6 +30,8 @@ import type {
 import {
   AGENCY_BRANDED_EMAIL_TYPES,
   AGENCY_FROM_ADDRESS,
+  CANDIDATE_REPLY_TO_EMAIL_TYPES,
+  resolveCandidateReplyToAddress,
   EMAIL_PRIORITY_MAP,
   isTokenSensitiveEmailType,
   TOKEN_SENSITIVE_EMAIL_TYPES
@@ -45,6 +47,13 @@ const BROADCAST_EMAIL_TYPES: EmailType[] = ['payroll_export', 'notification', 'p
  */
 const resolveEmailFromAddress = (emailType: EmailType): string =>
   AGENCY_BRANDED_EMAIL_TYPES.has(emailType) ? AGENCY_FROM_ADDRESS : getEmailFromAddress()
+
+/**
+ * Buzón que atiende la respuesta, cuando el destinatario es un candidato. Misma forma que el
+ * remitente: política centralizada, no un override por llamada — la frontera se decide una vez.
+ */
+const resolveEmailReplyTo = (emailType: EmailType): string | undefined =>
+  CANDIDATE_REPLY_TO_EMAIL_TYPES.has(emailType) ? resolveCandidateReplyToAddress() : undefined
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase()
 
@@ -898,8 +907,11 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
         }
       : {}
 
+    const replyTo = resolveEmailReplyTo(input.emailType)
+
     const result = await resend.emails.send({
       from: resolveEmailFromAddress(input.emailType),
+      ...(replyTo ? { replyTo } : {}),
       to: normalizeEmail(input.recipient.email),
       subject: resolvedTemplate.subject,
       react: resolvedTemplate.react,

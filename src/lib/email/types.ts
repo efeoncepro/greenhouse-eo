@@ -199,6 +199,37 @@ export interface SendEmailInput<TContext extends EmailTemplateContext = EmailTem
  * address stays a Resend-verified domain; only the display name differs.
  */
 export const AGENCY_FROM_ADDRESS = 'Efeonce <greenhouse@efeoncepro.com>'
+
+/**
+ * TASK-1757 — Buzón que ATIENDE las respuestas de un candidato.
+ *
+ * `AGENCY_FROM_ADDRESS` es una dirección de ENVÍO verificada en el proveedor, no un buzón que
+ * alguien lea. Sin `Reply-To`, un candidato que responde escribe a un agujero negro — y varios de
+ * estos correos le piden explícitamente que responda (el aviso de rotación termina en «responde
+ * este correo y lo reponemos»). Una salida de emergencia que nadie atiende es peor que no ofrecer
+ * ninguna: la persona cree que pidió ayuda y se queda esperando.
+ *
+ * Configurable por env; NUNCA hardcodear el literal en consumers ni en templates.
+ */
+export const resolveCandidateReplyToAddress = (env: NodeJS.ProcessEnv = process.env): string =>
+  env.HIRING_CANDIDATE_REPLY_TO_EMAIL?.trim() || 'people@efeoncepro.com'
+
+/**
+ * Tipos cuyo destinatario es una PERSONA CANDIDATA, que puede necesitar responder.
+ *
+ * Es un subconjunto de `AGENCY_BRANDED_EMAIL_TYPES`: la marca dice quién firma, esto dice a quién
+ * le llega la respuesta. Los avisos internos a People no entran — ya salen del buzón de People.
+ */
+export const CANDIDATE_REPLY_TO_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<EmailType>([
+  'hiring_application_confirmation',
+  'hiring_assessment_assigned',
+  'hiring_assessment_access_recovery',
+  'hiring_assessment_access_rotated',
+  'hiring_stage_advanced',
+  'hiring_decision_selected',
+  'hiring_decision_rejected',
+  'hiring_talent_pool_verification'
+])
 export const AGENCY_BRANDED_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<EmailType>([
   'ai_visibility_grader_report',
   'growth_ebook_delivery',
