@@ -3,6 +3,12 @@ import 'server-only'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import {
+  providerBlockRecencySql,
+  providerBlockStatusSql,
+  providerBlockedConditionSql,
+} from './provider-block'
+
+import {
   ASSESSMENT_ACCESS_RECOVERY_COOLDOWN_SECONDS,
   ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS,
   decideAssessmentAccessRecoveryEligibility,
@@ -62,18 +68,13 @@ export const getAssessmentAccessRecoveryAvailability = async (
      JOIN greenhouse_core.identity_profiles profile
        ON profile.profile_id=application.identity_profile_id
      LEFT JOIN LATERAL (
-       SELECT CASE
-                WHEN delivery.complained_at IS NOT NULL OR delivery.provider_status='complained' THEN 'complained'
-                WHEN delivery.bounced_at IS NOT NULL OR delivery.provider_status='bounced' THEN 'bounced'
-                WHEN delivery.suppressed_at IS NOT NULL OR delivery.provider_status='suppressed' THEN 'suppressed'
-              END AS provider_status
+       -- Mismo predicado que el guardrail del command (assertEmailProviderAllowsRecovery) y que
+       -- el aviso de rotacion: fuente unica en provider-block.ts.
+       SELECT ${providerBlockStatusSql('delivery')} AS provider_status
        FROM greenhouse_notifications.email_deliveries delivery
        WHERE LOWER(delivery.recipient_email)=LOWER(profile.canonical_email)
-         AND (delivery.bounced_at IS NOT NULL OR delivery.complained_at IS NOT NULL
-           OR delivery.suppressed_at IS NOT NULL
-           OR delivery.provider_status IN ('bounced','complained','suppressed'))
-       ORDER BY COALESCE(delivery.provider_event_created_at,delivery.provider_observed_at,
-                         delivery.updated_at) DESC,delivery.created_at DESC
+         AND ${providerBlockedConditionSql('delivery')}
+       ORDER BY ${providerBlockRecencySql('delivery')}
        LIMIT 1
      ) provider ON TRUE
      LEFT JOIN LATERAL (

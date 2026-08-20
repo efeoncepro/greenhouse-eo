@@ -188,6 +188,84 @@ export type AssessmentAccessRecoveryChannelBlock =
   | 'quota_exhausted'
   | 'cooldown'
 
+/**
+ * TASK-1757 — ¿se le avisa al candidato que su acceso fue rotado?
+ *
+ * Emitir un enlace seguro **mata la credencial anterior del candidato** y se la entrega en mano al
+ * operador. Si esa entrega falla —se distrae, copia mal, la persona no contesta— el candidato queda
+ * sin acceso, sin saber por qué, y con el plazo corriendo: la recuperación NUNCA devuelve tiempo.
+ * Peor aún, la elegibilidad permite recuperar en `in_progress`, así que alguien puede estar
+ * respondiendo en otra pestaña y ser expulsado en silencio.
+ *
+ * El aviso NUNCA lleva el enlace: eso anularía la verificación de identidad que es la razón de ser
+ * del canal. Sólo dice que el acceso anterior dejó de servir y cómo pedir ayuda.
+ *
+ * **Vive acá, y no en el consumer, a propósito.** La superficie del operador tiene que poder decir
+ * ANTES de confirmar si el candidato va a ser avisado: si la decisión viviera sólo en el worker, el
+ * operador manda el WhatsApp diciendo "te llegó un correo" cuando ningún correo salió. Misma regla
+ * que el resto de este archivo: un vocabulario que se re-declara río abajo se convierte en dos que
+ * divergen en silencio.
+ */
+export type AssessmentAccessRotationNoticeSkip =
+  /** El correo de recuperación ya dice que el anterior dejó de servir: un segundo mensaje es ruido. */
+  | 'not_secure_link'
+  /** Sin dirección registrada no hay a quién avisarle. */
+  | 'no_candidate_email'
+  /**
+   * El proveedor bloqueó esa dirección. NO es preferencia: el command ya rechaza duro el canal de
+   * correo con esta misma evidencia, así que avisar por ahí sería abrir un agujero en un control ya
+   * vigente. Y sobre `complained` —la persona nos marcó como spam— insistir quema la reputación de
+   * envío del dominio para todos los demás candidatos.
+   */
+  | 'provider_blocked'
+  /**
+   * El operador declaró que el envío falló. Es evidencia MÁS FRESCA que el estado del proveedor:
+   * el webhook puede tardar, y un rebote de hace un minuto todavía no figura.
+   */
+  | 'operator_declared_delivery_failed'
+  /** La credencial ya venció: el aviso llega a informar de algo que ya no se puede usar. */
+  | 'credential_already_expired'
+
+export type AssessmentAccessRotationNoticeDecision =
+  | { notify: true }
+  | { notify: false; skip: AssessmentAccessRotationNoticeSkip }
+
+/**
+ * Decisión pura. El orden de las guardas es el orden en que importan: primero lo que hace que el
+ * aviso no corresponda, después lo que lo hace imposible, y al final lo que lo vuelve inútil.
+ */
+export const decideAssessmentAccessRotationNotice = (input: {
+  channel: AssessmentAccessRecoveryChannel
+  outcome: AssessmentAccessRecoveryOutcome
+  reasonCode: AssessmentAccessRecoveryReason
+  hasCandidateEmail: boolean
+  providerBlockStatus: string | null
+  expiresAt: Date | string | null
+  now?: Date
+}): AssessmentAccessRotationNoticeDecision => {
+  // El canal de correo ya lleva el aviso Y la credencial en el mismo mensaje.
+  if (input.channel !== 'secure_link' || input.outcome !== 'link_issued') {
+    return { notify: false, skip: 'not_secure_link' }
+  }
+
+  if (input.reasonCode === 'provider_delivery_failed') {
+    return { notify: false, skip: 'operator_declared_delivery_failed' }
+  }
+
+  if (!input.hasCandidateEmail) return { notify: false, skip: 'no_candidate_email' }
+  if (input.providerBlockStatus) return { notify: false, skip: 'provider_blocked' }
+
+  const expiresAt = input.expiresAt ? new Date(input.expiresAt).getTime() : Number.NaN
+
+  // Sin vencimiento legible NO se asume vigente: un aviso sobre una credencial que no sabemos si
+  // sirve es peor que el silencio, porque le promete al candidato algo que quizá ya murió.
+  if (!Number.isFinite(expiresAt) || expiresAt <= (input.now ?? new Date()).getTime()) {
+    return { notify: false, skip: 'credential_already_expired' }
+  }
+
+  return { notify: true }
+}
+
 export interface AssessmentAccessRecoveryAvailability {
   assessmentId: string
   applicationId: string

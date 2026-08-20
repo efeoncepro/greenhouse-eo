@@ -24,6 +24,11 @@ import {
   type AssessmentAccessRecoveryReceipt,
   type AssessmentAccessRecoveryResult,
 } from './contracts'
+import {
+  BLOCKING_PROVIDER_STATUSES,
+  providerBlockStatusForEmailSql,
+  providerBlockedConditionSql,
+} from './provider-block'
 
 export interface RecoveryStateRow extends Record<string, unknown> {
   assessment_id: string
@@ -77,7 +82,6 @@ export interface RecoverCandidateTestAccessByEmailInput {
   idempotencyKey: string
 }
 
-const BLOCKING_PROVIDER_STATUSES = new Set(['bounced', 'complained', 'suppressed'])
 const EMAIL_TTL_MS = ASSESSMENT_ACCESS_RECOVERY_EMAIL_TTL_HOURS * 60 * 60 * 1000
 
 const CANDIDATE_ACCESS_HOSTS = new Set([
@@ -183,26 +187,17 @@ export const loadRecoveryState = async (client: PoolClient, assessmentId: string
 }
 
 const assertEmailProviderAllowsRecovery = async (client: PoolClient, recipientEmail: string): Promise<void> => {
+  // Predicado compartido con el reader de disponibilidad y con el aviso de rotación: escrito una
+  // vez en `provider-block.ts`. Que el guardrail y la UI divergieran era la clase de bug del
+  // dominio — la pantalla ofreciendo un canal que el command rechaza, o al revés.
   const evidence = await client.query<{ blocked: boolean; provider_status: string | null }>(
     `SELECT EXISTS (
        SELECT 1
        FROM greenhouse_notifications.email_deliveries evidence
        WHERE LOWER(evidence.recipient_email) = $1
-         AND (evidence.bounced_at IS NOT NULL OR evidence.complained_at IS NOT NULL
-           OR evidence.suppressed_at IS NOT NULL
-           OR evidence.provider_status IN ('bounced','complained','suppressed'))
+         AND ${providerBlockedConditionSql('evidence')}
      ) AS blocked,
-     (SELECT CASE
-               WHEN complained_at IS NOT NULL OR provider_status='complained' THEN 'complained'
-               WHEN bounced_at IS NOT NULL OR provider_status='bounced' THEN 'bounced'
-               WHEN suppressed_at IS NOT NULL OR provider_status='suppressed' THEN 'suppressed'
-             END
-      FROM greenhouse_notifications.email_deliveries
-      WHERE LOWER(recipient_email) = $1
-        AND (bounced_at IS NOT NULL OR complained_at IS NOT NULL OR suppressed_at IS NOT NULL
-          OR provider_status IN ('bounced','complained','suppressed'))
-      ORDER BY COALESCE(provider_event_created_at, provider_observed_at, updated_at) DESC, created_at DESC
-      LIMIT 1) AS provider_status`,
+     ${providerBlockStatusForEmailSql('$1')} AS provider_status`,
     [normalizeEmail(recipientEmail)],
   )
 
