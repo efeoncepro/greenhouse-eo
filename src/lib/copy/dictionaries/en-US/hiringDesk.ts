@@ -231,7 +231,6 @@ export const hiringDesk: HiringDeskCopy = {
       errorSession: 'Your session expired. Sign in again to continue.',
       errorReadFailed:
         'We could not read whether access can be recovered. The test is unchanged: this is our lookup failing, not a change in their assessment.',
-      errorReadFailedRetry: 'Try again',
       copyAriaLabel: 'Copy the access link for {name}',
       dialogAriaLabel: 'Recover access to the test for {name}',
       statusAriaLive: 'Recovery status',

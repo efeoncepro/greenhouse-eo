@@ -290,7 +290,6 @@ export const hiringDesk: HiringDeskCopy = {
       errorSession: 'Tu sesión venció. Inicia sesión de nuevo para continuar.',
       errorReadFailed:
         'No pudimos leer si se puede recuperar el acceso. El test sigue como estaba: esto es una falla nuestra al consultar, no un cambio en su evaluación.',
-      errorReadFailedRetry: 'Reintentar',
       copyAriaLabel: 'Copiar el enlace de acceso de {name}',
       dialogAriaLabel: 'Recuperar acceso al test de {name}',
       statusAriaLive: 'Estado de la recuperación',

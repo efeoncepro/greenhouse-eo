@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 
 import NextLink from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -424,6 +424,9 @@ const Application360View = ({
   const [revealedLink, setRevealedLink] = useState<{ url: string; expiresAt: string } | null>(null)
   const recoveryIdempotencyRef = useRef<string | null>(null)
   const recoveryTriggerRef = useRef<HTMLButtonElement | null>(null)
+  // Sin esto, un reintento que vuelve a fallar deja el DOM idéntico: indistinguible de un botón
+  // muerto. La transición da el pendiente sin inventar un estado local que se desincronice.
+  const [refreshingAvailability, startAvailabilityRefresh] = useTransition()
   const [assessmentReviews, setAssessmentReviews] = useState<Record<string, AssessmentReview>>({})
   const [reviewingAssessmentId, setReviewingAssessmentId] = useState<string | null>(null)
   const [scoreDrafts, setScoreDrafts] = useState<Record<string, string>>({})
@@ -492,10 +495,9 @@ const Application360View = ({
    * Cerrar devuelve el foco al botón que abrió el diálogo. Sin esto el foco vuelve al `<body>`
    * y quien navega por teclado pierde el lugar donde estaba.
    */
-  const closeAssignDialog = () => {
-    setAssignOpen(false)
-    assignTriggerRef.current?.focus()
-  }
+  const closeAssignDialog = () => setAssignOpen(false)
+
+  const restoreAssignFocus = () => assignTriggerRef.current?.focus()
 
   const assignmentErrorMessage = (err: unknown) => {
     const code = err instanceof HiringClientError ? err.code : null
@@ -581,8 +583,16 @@ const Application360View = ({
     // El enlace muere acá. Es la razón de ser de la revelación única.
     setRevealedLink(null)
     recoveryIdempotencyRef.current = null
-    recoveryTriggerRef.current?.focus()
   }
+
+  /**
+   * El foco vuelve al disparador cuando el diálogo TERMINÓ de salir, no al despachar el cierre.
+   * Llamarlo sincrónicamente dentro del handler no sirve: la trampa de foco del diálogo sigue
+   * activa y devuelve el foco a su propia raíz, anulando la restauración. Y en el traspaso
+   * confirmación → revelación el nodo que la trampa guardó ya está desmontado, así que sin esto el
+   * foco cae al `body` — justo al cerrar la pantalla que mostró una credencial irrepetible.
+   */
+  const restoreRecoveryFocus = () => recoveryTriggerRef.current?.focus()
 
   const recoveryErrorMessage = (err: unknown) => {
     const code = err instanceof HiringClientError ? err.code : null
@@ -1154,9 +1164,17 @@ const Application360View = ({
                   // ofrece nada deja al operador mirando un mensaje, no resolviendo el caso.
                   <Alert
                     severity='warning'
+                    role='status'
+                    data-capture='assessment-access-recovery'
                     action={
-                      <Button color='inherit' size='small' onClick={() => router.refresh()}>
-                        {recoveryCopy.errorReadFailedRetry}
+                      <Button
+                        color='inherit'
+                        size='small'
+                        disabled={refreshingAvailability}
+                        aria-busy={refreshingAvailability}
+                        onClick={() => startAvailabilityRefresh(() => router.refresh())}
+                      >
+                        {refreshingAvailability ? copy.common.loading : copy.common.retry}
                       </Button>
                     }
                   >
@@ -1884,6 +1902,7 @@ const Application360View = ({
       <Dialog
         open={assignOpen}
         onClose={() => !assigning && closeAssignDialog()}
+        TransitionProps={{ onExited: restoreAssignFocus }}
         fullWidth
         maxWidth='sm'
         aria-labelledby='assessment-assign-title'
@@ -1960,17 +1979,15 @@ const Application360View = ({
               </Stack>
             ) : null}
 
-            <Box aria-live='polite' aria-atomic='true'>
-              {assignError ? (
-                <Alert severity='error' role='alert'>
-                  {assignError}
-                </Alert>
-              ) : null}
-            </Box>
+            {assignError ? (
+              <Alert severity='error' role='alert'>
+                {assignError}
+              </Alert>
+            ) : null}
           </Stack>
         </DialogContent>
-        <DialogActions>
-          <Button disabled={assigning} onClick={closeAssignDialog}>
+        <DialogActions sx={{ flexDirection: { xs: 'column-reverse', sm: 'row' }, gap: { xs: 1, sm: 0 } }}>
+          <Button disabled={assigning} onClick={closeAssignDialog} sx={{ inlineSize: { xs: '100%', sm: 'auto' } }}>
             {copy.common.cancel}
           </Button>
           <GreenhouseButton
@@ -1982,6 +1999,7 @@ const Application360View = ({
               ) : undefined
             }
             onClick={() => void confirmAssignProposal()}
+            sx={{ inlineSize: { xs: '100%', sm: 'auto' } }}
           >
             {assigning && assignProposal
               ? copy.application.assignment.confirming
@@ -2000,6 +2018,7 @@ const Application360View = ({
         maxWidth='sm'
         aria-label={formatTemplate(recoveryCopy.dialogAriaLabel, { name: item.candidateName })}
         {...dialogMotionProps}
+        TransitionProps={{ onExited: restoreRecoveryFocus }}
       >
         <DialogTitle>{recoveryCopy.title}</DialogTitle>
         <DialogContent>
@@ -2057,19 +2076,23 @@ const Application360View = ({
               )
             ) : null}
 
-            {/* Región viva: quien navega con lector de pantalla no ve el Alert aparecer, así que
-                el resultado se ANUNCIA. `polite` y no `assertive` porque el desenlace llega
-                después de una acción deliberada — interrumpir sería ruido, no ayuda. */}
-            <Box aria-live='polite' aria-atomic='true' aria-label={recoveryCopy.statusAriaLive}>
-              {recoveryNotice ? (
-                <Alert severity='info' role='status' sx={{ mb: recoveryError ? 1.5 : 0 }}>
-                  {recoveryNotice}
-                </Alert>
-              ) : null}
-              {recoveryError ? (
-                <Alert severity='error' role='alert'>{recoveryError}</Alert>
-              ) : null}
-            </Box>
+            {/*
+              Los Alert de MUI YA son regiones vivas (`role='alert'` por defecto). Envolverlos en un
+              contenedor `aria-live` no agrega nada: en regiones anidadas gana la más cercana al
+              nodo que cambia, así que el envoltorio quedaría inerte mientras el `role` interno
+              sigue mandando. Se declara el rol EN el Alert y se elige a conciencia:
+              — el desenlace es `status` (polite): llega tras una acción deliberada del operador,
+                interrumpir su lectura sería ruido;
+              — el error es `alert` (assertive): cambia lo que puede hacer a continuación.
+            */}
+            {recoveryNotice ? (
+              <Alert severity='info' role='status' sx={{ mb: recoveryError ? 1.5 : 0 }}>
+                {recoveryNotice}
+              </Alert>
+            ) : null}
+            {recoveryError ? (
+              <Alert severity='error' role='alert'>{recoveryError}</Alert>
+            ) : null}
           </Stack>
         </DialogContent>
         <DialogActions sx={{ flexDirection: { xs: 'column-reverse', sm: 'row' }, gap: { xs: 1, sm: 0 }, '& > :not(style) ~ :not(style)': { ml: { xs: 0, sm: 1 } } }}>
@@ -2081,6 +2104,7 @@ const Application360View = ({
             aria-busy={recovering}
             leadingIcon={recovering ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}
             onClick={() => void submitRecovery()}
+            sx={{ inlineSize: { xs: '100%', sm: 'auto' } }}
           >
             {recovering ? recoveryCopy.confirming : recoveryCopy.confirm}
           </GreenhouseButton>
@@ -2102,6 +2126,7 @@ const Application360View = ({
         maxWidth='sm'
         aria-label={formatTemplate(recoveryCopy.dialogAriaLabel, { name: item.candidateName })}
         {...dialogMotionProps}
+        TransitionProps={{ onExited: restoreRecoveryFocus }}
       >
         <DialogTitle>{recoveryCopy.linkTitle}</DialogTitle>
         <DialogContent>

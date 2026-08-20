@@ -702,7 +702,6 @@ export interface HiringDeskCopy {
       errorPermission: string
       errorSession: string
       errorReadFailed: string
-      errorReadFailedRetry: string
       copyAriaLabel: string
       dialogAriaLabel: string
       statusAriaLive: string

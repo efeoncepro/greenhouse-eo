@@ -55,11 +55,12 @@ export const scenario: CaptureScenario = {
       reducedMotionCheck: true,
       probes: [
         {
-          // Desde el primer control de la tarjeta hacia adelante: anillo de foco visible en la
-          // superficie donde vive el cluster. El CTA de recuperación sólo existe cuando el test es
-          // recuperable, así que anclar la sonda a él haría fallar la captura de la rama bloqueada.
+          // Ancla en el CONTROL de la tarjeta que precede al cluster, y declara qué debe seguir
+          // visible: sin `expectedVisibleSelector` el check de `reduced-motion` NO se ejecuta
+          // (`keyboard-gate.ts` lo exige), y el escenario declaraba una cobertura que nunca corrió.
           name: 'recovery-cluster-focus',
           startSelector: '[data-capture="assessment-scorecard"] button',
+          expectedVisibleSelector: '[data-capture="assessment-access-recovery"]',
           keys: ['Tab']
         }
       ]
@@ -83,9 +84,15 @@ export const scenario: CaptureScenario = {
     { kind: 'noLoginRedirect', reason: 'la captura corre con la identidad declarada' },
     { kind: 'noErrorBoundary', reason: 'el tab resuelve los readers reales sin romper la vista' },
     {
+      // El enlace del incidente era `${origin}/assessment/<token>` pintado en un Typography y en un
+      // `Button component='a'`. El selector apunta a ESA forma —cualquier ancla hacia la superficie
+      // del candidato— porque una aserción sobre el path nuevo no habría atrapado el bug que esta
+      // task existe para cerrar. La garantía de que la credencial no viaja en NINGUNA forma la
+      // sostiene el gate de fuente `assessment-credential-source-gate.test.ts`, no una captura:
+      // un selector sólo prueba lo que se renderizó en la rama capturada.
       kind: 'notVisible',
-      selector: 'a[href*="/public/assessment/access"]',
-      reason: 'la pantalla NUNCA vuelve a mostrar una credencial: es la causa directa del incidente'
+      selector: 'a[href*="/assessment/"]',
+      reason: 'ninguna ancla lleva a la superficie del candidato: es la forma exacta del incidente'
     }
   ],
   steps: [
