@@ -65,6 +65,7 @@ import HiringDeskFrame from './HiringDeskFrame'
 import ApplicationDossierPanel from './ApplicationDossierPanel'
 import CandidateDocumentsPanel from './CandidateDocumentsPanel'
 import AssessmentCompetencyRadar from './AssessmentCompetencyRadar'
+import type { AssessmentAccessRecoveryAvailability } from '@/lib/hiring/assessment/access-recovery/availability'
 import { hiringRequest, scoreTone } from './hiring-client'
 import { computeScorecardSummary } from './scorecard-summary'
 import { AssessmentAiRunEntry } from './AssessmentAiRunWorkbench'
@@ -241,6 +242,23 @@ interface Application360ViewProps {
   viewerBlind: boolean
   canAnnotate: boolean
   canScore: boolean
+  /** TASK-1747 — la asignación se gatea aparte de la lectura; antes no bajaba a la vista. */
+  canAuthorAssessment: boolean
+  /**
+   * TASK-1747 — las dos capabilities de recuperación viven en un tier MÁS ESTRECHO que la de
+   * lectura: quien ve la card no necesariamente puede recuperar. Se separan porque despachar un
+   * correo y revelar un bearer a un humano tienen radios distintos.
+   */
+  canRecoverAccessEmail: boolean
+  canRevealAccessLink: boolean
+  /**
+   * Disponibilidad de recuperación por `assessmentId`. Sólo trae los estados donde recuperar es
+   * concebible. `null` en una entrada = el reader FALLÓ para ese assessment (≠ "no se puede").
+   */
+  accessRecovery: Record<string, AssessmentAccessRecoveryAvailability | null>
+  accessRecoveryFailed: boolean
+  // Slice 2 congela el contrato y el cableado; el consumo (affordances + diálogos) entra en el
+  // slice siguiente. Por eso estas props bajan desde la página pero la vista aún no las lee.
   noteAuthorNames: Record<string, string>
 }
 

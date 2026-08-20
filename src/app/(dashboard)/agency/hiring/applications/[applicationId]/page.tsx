@@ -16,6 +16,10 @@ import {
 import { getHiringHandoffByApplicationId } from '@/lib/hiring/handoff'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { listAssessmentsForApplication, listTemplates } from '@/lib/hiring/assessment'
+import {
+  getAssessmentAccessRecoveryAvailability,
+  type AssessmentAccessRecoveryAvailability,
+} from '@/lib/hiring/assessment/access-recovery/availability'
 import { resolveUserDisplayNames } from '@/lib/identity/user-display-names'
 import { getMicrocopy } from '@/lib/copy'
 import { normalizeLocale } from '@/i18n/locales'
@@ -62,6 +66,12 @@ export default async function HiringApplicationPage({ params }: Props) {
   const canAnnotate = can(tenant, 'hiring.application.annotate', 'execute', 'tenant')
   const canScore = can(tenant, 'hiring.assessment.score', 'execute', 'tenant')
 
+  // TASK-1747 — las dos capabilities de recuperación son role-only y de tier MÁS ESTRECHO que
+  // el de lectura: hay operadores que ven la card de assessment y NO pueden recuperar acceso.
+  // Se resuelven por separado para no dibujar un affordance que siempre fallaría con 403.
+  const canRecoverAccessEmail = can(tenant, 'hiring.assessment.recover_access_email', 'execute', 'tenant')
+  const canRevealAccessLink = can(tenant, 'hiring.assessment.reveal_access_link', 'execute', 'tenant')
+
   const [locale, snapshot, assessments, templates, handoff, documents, notesView] = await Promise.all([
     getLocale(),
     getHiringDeskSnapshot({ openingId: application.openingId, openingLimit: 80, applicationLimit: 120 }),
@@ -97,6 +107,56 @@ export default async function HiringApplicationPage({ params }: Props) {
 
   if (!item) notFound()
 
+  // TASK-1747 — disponibilidad de recuperación por assessment.
+  //
+  // El reader es `server-only` y su docstring ya lo declara "token-free operator reader used by
+  // Application 360": se consume acá y baja como prop, sin endpoint nuevo. Sirve para EXPLICAR
+  // antes de intentar — la respuesta del POST colapsa la mayoría de las causas en un solo código,
+  // así que sin esto la card no podría distinguir "consentimiento retirado" de "el correo cambió".
+  //
+  // Sólo se consulta para estados donde recuperar es concebible; en los terminales la card deriva
+  // el mensaje del propio `status` y no gasta una query. Medido: máximo 2 assessments por
+  // postulación, así que no hace falta un reader por lote.
+  //
+  // El `reasonCode` NO es cosmético: para un assessment `expired` el único motivo que puede
+  // habilitarlo es `token_expired_before_start`. Consultarlo con el default lo mostraría siempre
+  // como irrecuperable, que es precisamente la respuesta engañosa que esta task viene a matar.
+  const RECOVERABLE_STATUSES = new Set(['assigned', 'sent', 'in_progress', 'expired'])
+  const canRecoverAny = canRecoverAccessEmail || canRevealAccessLink
+
+  const recoverableAssessments = canRecoverAny
+    ? assessments.filter((entry) => RECOVERABLE_STATUSES.has(entry.status))
+    : []
+
+  let accessRecoveryFailed = false
+
+  const accessRecoveryEntries = await Promise.all(
+    recoverableAssessments.map(async (entry) => {
+      try {
+        const availability = await getAssessmentAccessRecoveryAvailability(
+          entry.assessmentId,
+          entry.status === 'expired' ? 'token_expired_before_start' : 'alternate_channel_requested',
+        )
+
+        return [entry.assessmentId, availability] as const
+      } catch (error: unknown) {
+        captureWithDomain(error, 'hiring', {
+          tags: { source: 'hiring:application-360-access-recovery-availability' },
+          extra: { applicationId, assessmentId: entry.assessmentId },
+        })
+
+        accessRecoveryFailed = true
+
+        return [entry.assessmentId, null] as const
+      }
+    }),
+  )
+
+  // `null` = el reader falló (≠ "no se puede recuperar"): la card lo dice y ofrece reintentar,
+  // igual que el precedente de documentos y notas de esta misma página.
+  const accessRecovery: Record<string, AssessmentAccessRecoveryAvailability | null> =
+    Object.fromEntries(accessRecoveryEntries)
+
   // Nombres de autores de nota (fallback honesto al id en la UI cuando no resuelve).
   const noteAuthorNames = notesView
     ? Object.fromEntries(await resolveUserDisplayNames(notesView.notes.map((note) => note.authorUserId)))
@@ -120,6 +180,11 @@ export default async function HiringApplicationPage({ params }: Props) {
       viewerBlind={notesView?.viewerBlindUntilScorecardSubmitted ?? false}
       canAnnotate={canAnnotate}
       canScore={canScore}
+      canAuthorAssessment={canAuthorAssessment}
+      canRecoverAccessEmail={canRecoverAccessEmail}
+      canRevealAccessLink={canRevealAccessLink}
+      accessRecovery={accessRecovery}
+      accessRecoveryFailed={accessRecoveryFailed}
       noteAuthorNames={noteAuthorNames}
     />
   )
