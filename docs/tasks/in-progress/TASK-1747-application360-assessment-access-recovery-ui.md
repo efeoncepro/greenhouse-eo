@@ -29,6 +29,113 @@
 - Legacy ID: `none`
 - GitHub Issue: `ISSUE-160`
 
+## Traspaso 2026-08-19 — estado para tomar en frío
+
+Slices 1 y 2 cerrados y commiteados en `develop` (sin push). Slice 3 **no empezado**.
+
+### Commits de esta task
+
+| Commit | Qué |
+|---|---|
+| `3ea7d6f7e` | Slice 1 — copy en los 3 archivos (es-CL, en-US, tipo) |
+| `34fed36e6` | Slice 1 corregido tras auditoría de dominio (6 bloqueantes) |
+| `f99bb92e1` | Slice 2 — puente de datos (**revertido en parte**, ver abajo) |
+| `2e2d4de86` | Slice 2 corregido tras auditoría de arquitectura |
+
+### Qué está hecho
+
+- **Copy completo** bajo `hiringDesk.application.accessRecovery`: CTA, canal, 5 motivos, 9 mensajes
+  de no-disponibilidad, cuota por canal, cooldown, revelación única, errores y 3 aria-labels.
+  Auditado y corregido: los motivos conservan el "dice que" del enum (nadie puede afirmar que un
+  correo NO llegó), "candidatura cerrada" no se le muestra a alguien con decisión `selected`, y
+  `cancelled` tiene su propia frase con el remedio real (reasignar).
+- **Bug de backend corregido** (`2e2d4de86`): el cooldown de `availability.ts` era cross-canal
+  mientras el command lo filtra por canal — un correo recién enviado apagaba el enlace seguro por
+  60 s. El DTO ahora expone `cooldownUntil` y `secureLinkCooldownUntil` por separado. 4 tests nuevos.
+- **Fixture de `availability.test.ts` corregido**: omitía `secure_link_count_24h`, así que
+  `Number(undefined)` daba `NaN` y el presupuesto del enlace **nunca se ejercitaba**.
+
+### Qué se revirtió a propósito
+
+El cableado de `accessRecovery` a la página y a las props de la vista se **revirtió**. Motivo: las
+props de un Client Component se serializan en el payload RSC y viajan en el HTML **se lean o no**,
+así que el slice bajaba al navegador el consentimiento de la candidata y el estado del proveedor sin
+que ningún componente los renderizara. El cableado debe viajar **en el mismo slice que lo pinta**.
+
+Las dos `can()` de recuperación tampoco quedaron en la página por la misma razón (lint las marcaba
+sin usar). Van con el slice que dibuja el affordance.
+
+### Slices pendientes
+
+**Slice 3 — matar el enlace efímero + asignación canónica.**
+- Eliminar `oneTimeToken` (`Application360View.tsx:379`), `oneTimeAssessmentLink` (`:414-419`) y el
+  bloque `Alert` con el enlace (`:712-735`), incluido el botón "Abrir superficie" que navega con el
+  token en la URL. **Esta es la causa directa del incidente del 2026-08-19**: el enlace que la
+  pantalla mostraba lo invalidaba el correo 2,5 minutos después.
+- Migrar `assignAssessment` (`:421-446`) del endpoint legacy `POST /api/hiring/assessments` — que
+  deja al cliente elegir plantilla y devuelve el token crudo — al camino gobernado
+  `/api/hiring/applications/[id]/assessment-assignment` (propose→confirm).
+- ⚠️ **Ramificar por `result.status`**, nunca por "no hubo excepción". La unión tiene 6 estados
+  (`assigned|already_assigned|held|blocked|stale|cancelled`) y el propio tipo lo advierte.
+  `deliveryStatus: 'pending'` NO significa correo enviado.
+- El diálogo cambia de forma: hoy elige plantilla y minutos; con el camino canónico el servidor
+  decide por política y el diálogo pasa a ser preview + confirmación.
+- **Falta copy para esto** (el Slice 1 sólo cubrió recuperación): labels del preview, los 6 estados
+  del resultado y los 8 códigos de error de la propuesta.
+
+**Slice 4 — recuperación.** Cluster de acciones + diálogo de confirmación con motivo + diálogo de
+revelación única. **Acá va también el cableado revertido** (los dos `can()` + la disponibilidad por
+assessment). El copy ya existe completo.
+
+**Slice 5 — calidad.** Estados degradado/permiso/móvil 390px, `aria-live`, focus restore, escenario
+GVC y los cuatro gates de UI.
+
+### Hallazgos de la auditoría que siguen ABIERTOS
+
+Ninguno bloquea el Slice 3, pero el Slice 4 los va a chocar:
+
+1. **`contracts.ts` es `server-only`** y contiene los 5 motivos, los 8 códigos y las constantes de
+   cuota — justo lo que la UI necesita para mapear código→copy. El navegador no puede importarlo.
+   Sin partirlo en `contracts.ts` (server) + `vocabulary.ts` (isomorfo con los `as const`, los tipos
+   y la función pura de elegibilidad), el Slice 4 va a re-declarar el vocabulario en el cliente:
+   dos fuentes de verdad sin gate que las compare.
+2. **El `reasonCode` que determinó la respuesta no viaja en el DTO.** Para un assessment `expired`
+   el único motivo que lo habilita es `token_expired_before_start`; consultarlo con otro devuelve
+   "no disponible" sin decir por qué. El reader debería exponer `allowedReasonCodes` en vez de que
+   la página adivine con un ternario.
+3. **`null` significa dos cosas** en el reader: falló, y el assessment no existe (`availability.ts`
+   devuelve `null` en ambos). La UI no puede distinguir "reintenta" de "no reintentes nunca".
+4. **`RECOVERABLE_STATUSES` duplicaba** el `ASSESSMENT_ACCESS_RECOVERY_ELIGIBLE_STATUSES` que
+   `contracts.ts` ya exporta. Al recablear, importarlo en vez de re-escribir el literal.
+5. **Full API Parity sin declarar.** La capacidad "explicar por qué no se puede recuperar" queda
+   UI-only: ni Nexa ni MCP la alcanzan. O se agrega `GET .../access-recovery` (adapter delgado del
+   mismo reader, mismas capabilities) y se corrige `Backend impact: api`, o se declara follow-up.
+6. **El reader no está acotado al aggregate**: recibe sólo `assessmentId`. Como primitive de parity,
+   un segundo consumidor obtendría consentimiento y entregabilidad de cualquier candidato.
+7. **`eligible: false` con `eligibilityCode: null`** cuando la denegación viene del rate limit. La UI
+   queda con una denegación sin etiqueta.
+8. **Dos implementaciones de la misma decisión** (`availability.ts` explica, `recover-email.ts`
+   ejecuta) sin nada mecánico que las alinee. Ya divergieron una vez — es el bug que corrigió
+   `2e2d4de86`. El patrón canónico del repo para esto es VIEW + helper + señal.
+
+### Decisiones ya tomadas que NO hay que re-litigar
+
+- **Props desde la página, no `GET` nuevo** — el reader ya se declara "token-free operator reader
+  used by Application 360". El `GET` queda como follow-up de parity (punto 5).
+- **La franja de "estado de entrega" del wireframe se reduce.** El reader sólo expone estados
+  NEGATIVOS (`bounced`/`complained`/`suppressed`); no hay `delivered`. Informar sólo cuando el correo
+  está bloqueado y callar el resto, en vez de inventar un estado.
+- **Los errores del POST se mapean en la UI**, no se canoniza la ruta acá (sería backend y ampliaría
+  la task). Queda declarado como deuda: la ruta devuelve `{ok:false, code}` sin `error` es-CL ni
+  `actionable`, y su catch-all colapsa ~18 códigos en uno.
+
+### Contexto vecino
+
+- `TASK-1754` (creada por otra sesión) va a colapsar las etapas del dominio a las 6 de la UI. Toca
+  `hiringDesk.ts`, el mismo archivo del copy de esta task. **Coordinar antes de tocarlo.**
+- El backend de `TASK-1746` está desplegado y con schema aplicado; el canal de correo quedó
+  habilitado el 2026-08-19.
+
 ## Delta 2026-08-19
 
 - `TASK-1745` cerrada (lifecycle de entrega de Resend operativo en producción) — se retira de `Blocked by`.

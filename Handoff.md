@@ -2,6 +2,35 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-19 (noche) — TASK-1747 en curso, traspasada para una sesión nueva
+
+Slices 1 y 2 cerrados; Slice 3 sin empezar. El estado completo para tomarla en frío está en
+**`docs/tasks/in-progress/TASK-1747-…md` §Traspaso 2026-08-19** — commits, qué se revirtió y por qué,
+los 8 hallazgos de auditoría abiertos y las 3 decisiones que no hay que re-litigar.
+
+**Lo que la auditoría adversarial cambió, y vale más que el código entregado.** El Slice 2 bajaba al
+navegador el consentimiento de la candidata y el estado del proveedor de correo, con **ningún**
+componente leyéndolos: las props de un Client Component se serializan en el HTML se lean o no. Ningún
+gate lo veía — GVC no captura lo que no se pinta y el build no lo mira. Se revirtió el cableado; viaja
+con el slice que lo renderiza.
+
+**Y destapó un bug real de `TASK-1746` que ya estaba en producción:** el cooldown de recuperación era
+cross-canal en la lectura y por-canal en el comando. Un correo recién enviado apagaba el enlace seguro
+durante 60 s — exactamente ocultarle al candidato la única salida que le quedaba, que es lo que el
+comentario de ese bloque juraba evitar diciéndose "espejo EXACTO". Corregido en `2e2d4de86` con
+cooldown por canal y 4 tests. Lo que lo mantuvo vivo: al fixture del test le faltaba un campo, así que
+`Number(undefined)` daba `NaN` y el presupuesto del enlace seguro nunca se ejercitaba.
+
+**El copy también salió corregido de auditoría**, con tres hallazgos que verifiqué contra el código
+antes de aceptarlos: los motivos borraban el "reports" del enum (nadie puede afirmar que un correo NO
+llegó, y eso quedaba escrito en un ledger append-only); "la candidatura ya está cerrada" se le habría
+mostrado a alguien con decisión `selected`; y el mensaje de vencimiento describía 1 de sus 3 ramas, así
+que en las otras dos el operador seguía la instrucción y volvía a chocar.
+
+**Estado: nada de esto está en producción.** `develop` tiene además Sonnet 5 de vuelta en el scoring y
+la reconciliación del item del run, ambos sin promover. La promoción exige verificar que el ops-worker
+quede en el SHA nuevo: el scoring corre ahí, no en Vercel.
+
 ## 2026-08-19 (tarde) — El rollout ya estaba hecho y la documentación decía lo contrario
 
 **Corrección de estado.** Las entradas de más abajo dicen "nada aplicado: ninguna migración, ningún secreto, ningún
@@ -565,31 +594,3 @@ de `/public/careers/[publicId]`, detrás de flag y con GVC 1440/390, que preserv
 exactamente los dos CTA existentes (hero verde y resumen azul; sin CTA final). Ambas exigen que
 remote/global use países elegibles reales y nunca invente salario, beneficios o condiciones de
 contrato. El wireframe es `docs/ui/wireframes/TASK-1741-public-careers-editorial-detail-renderer.md`.
-
-## 2026-08-17 — Ajustes razonables: ahora se pueden otorgar, y se pueden pedir
-
-Cierra la Open Question 7 del ADR de TASK-1719. `accommodations_json` estaba cableado end-to-end
-**en lectura** desde TASK-1360 —lector TS, predicado SQL de vencimiento, banner al candidato— pero
-**17 instancias, las 17 vacías**: nunca se le concedió un ajuste a nadie porque no se podía. La
-única palanca era alargar el límite de la plantilla, que se lo alarga a toda la cohorte. Pesa más
-desde que la prueba se manda en Preselección: se le pide trabajo a más gente.
-
-Decisiones que valen releer antes de tocar esto:
-
-- **El motivo NO se persiste, y es decisión, no omisión.** Un ajuste revela por naturaleza una
-  condición protegida; guardarlo crea el dato con el que después se discrimina. Se guarda sólo el
-  arreglo (minutos, quién, cuándo). La constancia narrativa va al expediente.
-- **Capability role-only (People), no la genérica de autorar.** En esta plataforma "usuario interno"
-  incluye diseñadores y colaboradores: con la genérica cualquiera concedería tiempo extra.
-- **Se cerró un contrato implícito**: la lectura aceptaba SEIS grafías del mismo hecho. Queda una.
-  Seguro de narrar porque 0 filas usaban ninguna.
-- **Divergencia latente encontrada al unificar**: el lector TS redondeaba y el SQL truncaba — un
-  valor fraccionario habría mostrado un contador y vencido con otro. Ambos truncan; hay test vivo.
-- **La otra mitad, que la doc daba por hecha sin serlo**: el correo NO invitaba a pedir el ajuste.
-  Uno que nadie sabe que puede pedir no es un ajuste, y quienes preguntan igual son los que ya se
-  sienten con derecho — el sesgo que esto corrige. Ahora lo invita en ambos idiomas y dice que no
-  hay que explicar por qué.
-
-Pendiente declarado: sin UI, sin aviso automático al candidato (avisar es acto humano, igual que en
-cancelación), y **sólo cubre tiempo extra** — formatos accesibles son trabajo de accesibilidad de la
-pantalla de rendición, no de este campo.
