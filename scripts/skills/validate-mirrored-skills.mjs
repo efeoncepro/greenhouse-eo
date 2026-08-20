@@ -44,6 +44,19 @@ const mirroredSkills = [
     codex: '.codex/skills/resend-email-platform',
     claude: '.claude/skills/resend-email-platform',
   },
+  {
+    // El espejo existía y NADIE lo validaba: al 2026-08-20 llevaba dos actualizaciones de atraso.
+    // La versión de Codex seguía declarando que la cuota de recuperación de acceso era
+    // "cross-channel" cuando el código la aplica POR CANAL — así que un agente que entrara por
+    // Codex le habría dicho al operador que reenviar un correo apagaba también el enlace temporal,
+    // escondiéndole la única salida que le quedaba a un candidato sin acceso a su prueba.
+    // La divergencia de una skill de dominio no es cosmética: es dos agentes operando el mismo
+    // proceso de contratación con reglas distintas sobre una persona real.
+    id: 'greenhouse-talent-people-operator',
+    mode: 'byte-identical',
+    codex: '.codex/skills/greenhouse-talent-people-operator',
+    claude: '.claude/skills/greenhouse-talent-people-operator',
+  },
 ]
 
 const filesIn = root => {
