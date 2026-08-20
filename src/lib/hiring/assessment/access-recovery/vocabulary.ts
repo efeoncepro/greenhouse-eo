@@ -172,6 +172,22 @@ export type AssessmentAccessRecoveryResult =
  * Vive acá y no junto al reader porque el NAVEGADOR la renderiza: el reader importa `node:pg` y es
  * `server-only`, así que dejar su DTO ahí obliga a cada consumidor de UI a re-declararlo.
  */
+/**
+ * Por qué ESTE canal no se puede usar ahora. Existe porque `available: boolean` colapsaba cinco
+ * causas con remedios distintos —el test no es recuperable, no hay correo, el proveedor bloquea,
+ * se agotó el presupuesto de 24 h, hay que esperar segundos— en un solo `false`, y la superficie
+ * ya no podía recuperarlas: todas terminaban en el mismo mensaje.
+ *
+ * Es el noveno patrón canónico aplicado al DTO: la superficie no puede distinguir lo que el
+ * contrato colapsó antes de llegar a ella.
+ */
+export type AssessmentAccessRecoveryChannelBlock =
+  | 'assessment_not_eligible'
+  | 'no_candidate_email'
+  | 'provider_blocked'
+  | 'quota_exhausted'
+  | 'cooldown'
+
 export interface AssessmentAccessRecoveryAvailability {
   assessmentId: string
   applicationId: string
@@ -180,8 +196,14 @@ export interface AssessmentAccessRecoveryAvailability {
   eligible: boolean
   eligibilityCode: string | null
   channels: {
-    email: { available: boolean; providerStatus: string | null; hasCandidateEmail: boolean }
-    secureLink: { available: boolean }
+    email: {
+      available: boolean
+      /** `null` sólo cuando `available` es `true`. Nombra la causa, no la esconde. */
+      blockedBy: AssessmentAccessRecoveryChannelBlock | null
+      providerStatus: string | null
+      hasCandidateEmail: boolean
+    }
+    secureLink: { available: boolean; blockedBy: AssessmentAccessRecoveryChannelBlock | null }
   }
   rateLimit: {
     maxPer24Hours: number

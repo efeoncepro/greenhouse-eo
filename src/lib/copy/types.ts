@@ -655,6 +655,8 @@ export interface HiringDeskCopy {
       confirming: string
       emailQueued: string
       emailPending: string
+      emailAlreadySent: string
+      linkCopyFailed: string
       emailUnknown: string
       emailFailed: string
       emailExpiry: string
@@ -689,6 +691,7 @@ export interface HiringDeskCopy {
       errorRecipientChanged: string
       errorConflict: string
       errorPermission: string
+      errorSession: string
       errorReadFailed: string
       copyAriaLabel: string
       dialogAriaLabel: string

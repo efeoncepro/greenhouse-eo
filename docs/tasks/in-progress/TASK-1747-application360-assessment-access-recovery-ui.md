@@ -19,7 +19,7 @@
 - Wireframe: `docs/ui/wireframes/TASK-1747-application360-assessment-access-recovery.md`
 - Flow: `docs/ui/flows/TASK-1747-application360-assessment-access-recovery-flow.md`
 - Motion: `none`
-- Backend impact: `none`
+- Backend impact: `api`
 - Epic: `EPIC-011`
 - Status real: `En ejecución — Slices 1-3 cerrados y auditados; faltan recuperación (4) y calidad (5)`
 - Rank: `TBD`
@@ -31,7 +31,7 @@
 
 ## Traspaso 2026-08-19 — estado para tomar en frío
 
-Slices 1, 2 y 3 cerrados y commiteados en `develop` (sin push). Slice 4 **no empezado**.
+Slices 1 a 4 cerrados y commiteados en `develop` (sin push). Slice 5 **no empezado**.
 
 ### Commits de esta task
 
@@ -42,7 +42,9 @@ Slices 1, 2 y 3 cerrados y commiteados en `develop` (sin push). Slice 4 **no emp
 | `f99bb92e1` | Slice 2 — puente de datos (**revertido en parte**, ver abajo) |
 | `2e2d4de86` | Slice 2 corregido tras auditoría de arquitectura |
 | `6e75fe482` | Slice 3 — enlace efímero eliminado + asignación gobernada |
-| _(pendiente)_ | Slice 3 corregido tras auditoría adversarial (3 bloqueantes + 5 altos) |
+| `5319de56a` | Slice 3 corregido tras auditoría adversarial (3 bloqueantes + 5 altos) |
+| `8a102ecea` | Slice 4 — recuperación de acceso + revelación única |
+| _(pendiente)_ | Slice 4 corregido tras auditoría adversarial (2 bloqueantes + 7 altos) |
 
 ### Qué está hecho
 
@@ -101,9 +103,46 @@ abajo, y quedó corregido:
 - **Errores.** El mapa cubría 5 códigos y recetaba "intenta de nuevo" a causas estructurales.
   `HiringClientError` ahora conserva `actionable` y el fallback distingue reintentable de terminal.
 
-**Slice 4 — recuperación.** Cluster de acciones + diálogo de confirmación con motivo + diálogo de
-revelación única. **Acá va también el cableado revertido** (los dos `can()` + la disponibilidad por
-assessment). El copy ya existe completo.
+**Slice 4 — CERRADO.** Cluster por tarjeta, confirmación deliberada (canal + motivo) y revelación
+única. El cableado revertido en el Slice 2 viajó acá, en el mismo slice que lo pinta.
+
+La auditoría adversarial encontró que el DTO cometía el noveno patrón canónico una capa más abajo, y
+quedó corregido en la raíz:
+
+- **El DTO colapsaba estados que el sistema distingue.** `channels.*.available` era
+  `eligibility.allowed && !limited && hasEmail && !providerBlocked`: cinco causas con cinco remedios
+  distintos en un solo `false`. La superficie ya no podía recuperarlas y todas caían al último
+  `else` del cluster, que decía **"No tienes permiso"** a un operador que sí lo tenía. Ahora cada
+  canal declara `blockedBy` y cada causa tiene su frase.
+- **El caso del incidente terminaba en "pide permiso a Admin".** Un test vencido que la persona
+  nunca empezó es exactamente el 2026-08-19. La página lee la disponibilidad sin motivo, el default
+  no puede probar el vencimiento previo al inicio, ambos canales quedaban en `false` y el operador
+  era enviado a Admin por algo que él resolvía declarando el motivo correcto. Toda la maquinaria
+  reason-dependent era código muerto.
+- **Cuota agotada se disfrazaba de falla transitoria.** `limited` implica `eligible:false` con
+  `eligibilityCode:null`, así que caía al genérico "intenta de nuevo en unos minutos" — y la espera
+  real es de hasta 24 horas. El cooldown, que tenía copy con segundos, nunca se renderizaba.
+- **Un replay de correo se reportaba como despacho nuevo.** `replayed` no se leía: la UI pintaba
+  "correo despachado" sobre un recibo original donde no salió ningún correo. Ahora se lee, y la
+  llave de idempotencia se consume tras el desenlace para que el botón no invite a repetirlo.
+- **El portapapeles afirmaba éxito sin verificarlo.** Si `writeText` rechaza, la credencial se
+  pierde con el token del candidato YA rotado. Ahora se confirma o se avisa.
+- **ESC mataba la revelación única.** Un reflejo de teclado destruía una credencial que no se vuelve
+  a mostrar. El diálogo se cierra sólo por su botón.
+- **El GET nuevo abría consentimiento y entregabilidad a todo tenant interno.** Estaba gateado con
+  `hiring.assessment.read`, que la porta el routeGroup `internal` — collaborator, designer,
+  people_viewer incluidos —, y devolvía consentimiento retirado, decisión no comunicada y
+  `providerStatus`. Además aceptaba un `assessmentId` suelto, sin el binding a `applicationId` que
+  el POST sí exige. Ahora pide al menos una capability de recuperación y compara el aggregate.
+- **`providerStatus` viajaba al payload RSC sin que nadie lo pintara**, la misma regla que se
+  revirtió en el Slice 2. Ahora se usa: el buzón bloqueado se ve en la tarjeta en vez de descubrirse
+  gastando un intento.
+- El vencimiento del enlace usa hora, no sólo fecha: para una credencial de 24 h, "20/08/2026" no
+  distingue 1 hora de 23.
+
+Pendiente declarado del Slice 4 (no bloqueante): el candidato **no recibe aviso** cuando se emite un
+enlace seguro, aunque su credencial anterior queda muerta. Si la entrega en mano falla, la persona
+queda sin acceso y sin saber por qué. Es herencia de TASK-1746 y merece decisión de People Ops.
 
 **Slice 5 — calidad.** Estados degradado/permiso/móvil 390px, `aria-live`, focus restore, escenario
 GVC y los cuatro gates de UI.
@@ -259,6 +298,106 @@ Reglas obligatorias:
 - Server/browser split: React consumes DTOs and actions only; token creation, email, DB and secrets remain server-only.
 - Build impact: `none` — reuse existing MUI/Greenhouse primitives.
 - Extraction blocker: Application 360 is currently portal-local and session/capability-aware.
+
+## Hybrid Execution Justification
+
+Esta task nació `ui-ux` puro: el backend de la recuperación es TASK-1746 y ya estaba desplegado. El
+componente backend apareció durante la ejecución del Slice 4 y es deliberadamente mínimo:
+
+- **Qué es.** Un carril de LECTURA (`GET`) sobre un reader que ya existía, y un campo aditivo en su
+  DTO. Cero migraciones, cero tablas, cero escrituras nuevas, cero flags.
+- **Por qué no se parte en dos tasks.** Partirla dejaría a la mitad de UI dependiendo de una task
+  hermana para leer un dato que su propia página ya lee server-side. El GET no habilita ninguna
+  capacidad nueva: expone, con la puerta correcta, exactamente lo que la pantalla ya resolvía. Una
+  task backend para eso sería una ceremonia sobre un contrato que no cambia de forma.
+- **Por qué el DTO se tocó acá y no antes.** El campo `blockedBy` no era previsible desde el diseño:
+  emergió de la auditoría adversarial del Slice 4, que encontró que `available: boolean` colapsaba
+  cinco causas con remedios distintos y mandaba todas al mismo mensaje —incluido decirle "no tienes
+  permiso" a un operador que sí lo tenía. Arreglarlo en la pantalla habría sido reconstruir en el
+  cliente una distinción que el servidor ya tenía y tiró.
+- **Orden interno de ejecución.** El backend va PRIMERO dentro del slice: el DTO declara la causa,
+  después la superficie la muestra. Al revés, la pantalla adivinaría.
+- **Reversibilidad.** Ambas piezas se revierten con el commit. Sin migración no hay estado que
+  deshacer.
+
+## Backend/Data Contract
+
+### Backend/data brief
+
+- Backend rigor: `backend-standard`
+- Impacto principal: `api`
+- Source of truth afectado: `getAssessmentAccessRecoveryAvailability` (reader canónico de TASK-1746)
+- Consumidores afectados: Application 360 (server component) y cualquier consumidor gobernado
+  (Nexa, MCP, runbook) vía el carril de lectura nuevo
+- Runtime target: `local|staging|production`
+
+### Contract surface
+
+- Contrato existente a respetar: `POST /api/hiring/assessments/[id]/access-recovery` (TASK-1746) y
+  `src/lib/hiring/assessment/access-recovery/`
+- Contrato nuevo o modificado: `GET /api/hiring/assessments/[id]/access-recovery`; el DTO
+  `AssessmentAccessRecoveryAvailability` gana `channels.*.blockedBy`
+- Backward compatibility: `compatible` — `available` se conserva con el mismo significado; el campo
+  nuevo es aditivo
+- Full API parity: la pantalla y cualquier agente consumen el MISMO reader. La disponibilidad dejó
+  de ser un privilegio del server component: sin el GET, otro consumidor tendría que ejecutar el
+  command para averiguar si podía ejecutarlo.
+
+### Data model and invariants
+
+- Entidades/tablas/views afectadas: ninguna nueva. Lectura sobre `greenhouse_hiring.hiring_assessment`
+  y el ledger de recuperaciones.
+- Invariantes que no se pueden romper:
+  - Leer disponibilidad **NUNCA** emite credencial ni consume cuota.
+  - El DTO **NUNCA** vuelve a colapsar en un solo booleano causas con remedios distintos: cada
+    canal declara por qué está cerrado.
+  - El token **NUNCA** viaja en una respuesta de lectura.
+- Write-target allowlist: N/A — carril de sólo lectura.
+- Tenant/space boundary: sesión interna + `applicationId` obligatorio comparado contra el aggregate,
+  igual que el POST. Un `assessmentId` suelto no alcanza para sondear a un candidato.
+- Idempotency/concurrency: N/A en lectura. El POST conserva su llave por intención.
+- Audit/outbox/history: la lectura no audita. El command sí, sin cambios.
+
+### Migration, backfill and rollout
+
+- Migration posture: `none`
+- Default state: `enabled with rationale` — es lectura gobernada por capability; no agrega
+  superficie de escritura.
+- Backfill plan: N/A
+- Rollback path: revert del PR
+- External coordination: ninguna
+
+### Security and access
+
+- Auth/access gate: sesión interna + `hiring.assessment.read` + `hiring.application.read` **y al
+  menos una de** `hiring.assessment.recover_access_email` / `hiring.assessment.reveal_access_link`.
+  Las dos primeras las porta todo tenant interno vía el routeGroup `internal`; solas dejarían que
+  collaborator/designer/people_viewer lean consentimiento retirado, decisión no comunicada y estado
+  de entregabilidad del correo de un candidato.
+- Sensitive data posture: PII indirecta — consentimiento, decisión y entregabilidad. No expone
+  correo, nombre ni contenido de respuestas.
+- Error contract: prosa es-CL + `code` + `actionable` en todas las salidas del carril nuevo;
+  `captureWithDomain` para lo inesperado.
+- Abuse/rate-limit posture: la lectura no consume cuota. El command conserva su cooldown por canal
+  y su presupuesto de 24 horas.
+
+### Runtime evidence
+
+- Local checks: `pnpm vitest run src/lib/hiring src/app/api/hiring src/views/greenhouse/hiring`
+- DB/runtime checks: ejercitar el reader contra PostgreSQL real con un test `expired`, uno con
+  cuota agotada y uno con buzón bloqueado
+- Integration checks: recuperación real por correo contra el proveedor
+- Reliability signals/logs: las de TASK-1746
+- Production verification sequence: recuperar el acceso de un test real y confirmar que el
+  candidato entra con la credencial nueva
+
+### Acceptance criteria additions
+
+- [ ] La lectura de disponibilidad exige al menos una capability de recuperación.
+- [ ] El GET exige `applicationId` y lo compara contra el aggregate.
+- [ ] Cada canal declara su causa de bloqueo; ninguna cae en un mensaje compartido.
+- [ ] El carril nuevo devuelve prosa es-CL y `actionable` en todas sus salidas.
+- [ ] Ninguna respuesta de lectura contiene el token ni la URL de acceso.
 
 ## UI/UX Contract
 

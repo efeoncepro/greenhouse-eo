@@ -39,8 +39,40 @@ const json = (body: object, status: number) => NextResponse.json(body, {
   headers: status === 429 ? { ...headers, 'Retry-After': '60' } : headers,
 })
 
-const invalid = () => json({ ok: false, code: 'assessment_recovery_invalid_request' }, 400)
-const unavailable = () => json({ ok: false, code: 'assessment_recovery_unavailable' }, 404)
+const invalid = () => json(
+  {
+    ok: false,
+    code: 'assessment_recovery_invalid_request',
+    error: 'La solicitud no es válida. Cierra y vuelve a empezar la recuperación.',
+    actionable: false,
+  },
+  400,
+)
+
+const unavailable = () => json(
+  {
+    ok: false,
+    code: 'assessment_recovery_unavailable',
+    error: 'Este test ya no está disponible. Actualiza la postulación.',
+    actionable: false,
+  },
+  404,
+)
+
+const unauthorized = () => json(
+  { ok: false, code: 'unauthorized', error: 'Tu sesión venció. Inicia sesión de nuevo para continuar.', actionable: false },
+  401,
+)
+
+const forbidden = () => json(
+  {
+    ok: false,
+    code: 'forbidden',
+    error: 'No tienes permiso para recuperar acceso. Pídeselo a Admin o a People Ops.',
+    actionable: false,
+  },
+  403,
+)
 
 const isHumanSession = (provider?: string | null, authMode?: string | null) => {
   const normalizedProvider = provider?.trim().toLowerCase() ?? ''
@@ -85,6 +117,15 @@ const safeReceipt = (receipt: {
  * necesita poder preguntar "¿se puede recuperar el acceso de este test y por qué canal?" sin
  * ejecutar el command. Es de sólo lectura: NUNCA emite credencial ni consume cuota.
  *
+ * **La puerta NO es `hiring.assessment.read`.** Esa capability la porta todo tenant interno vía el
+ * routeGroup `internal` —collaborator, designer, people_viewer incluidos—, y el payload declara si
+ * la persona retiró su consentimiento, si su candidatura ya tiene decisión antes de que se le
+ * comunique, y si su correo rebotó o nos marcó como spam. Las dos capabilities de recuperación son
+ * role-only justamente por eso; leer la disponibilidad exige al menos una de ellas.
+ *
+ * `applicationId` es obligatorio y se compara contra el aggregate, igual que en el POST: sin ese
+ * binding, un `assessmentId` suelto alcanza para sondear a cualquier candidato del tenant.
+ *
  * `reason` es opcional y sí cambia la respuesta: la elegibilidad de un test `expired` depende del
  * motivo declarado (sólo `token_expired_before_start` puede probar el vencimiento previo al
  * inicio). Sin `reason`, se responde con el motivo por defecto.
@@ -92,15 +133,22 @@ const safeReceipt = (receipt: {
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { tenant, errorResponse } = await requireInternalTenantContext()
 
-  if (!tenant) return errorResponse ?? json({ ok: false, code: 'unauthorized' }, 401)
+  if (!tenant) return errorResponse ?? unauthorized()
+
+  const canRecoverByEmail = can(tenant, 'hiring.assessment.recover_access_email', 'execute', 'tenant')
+  const canRevealSecureLink = can(tenant, 'hiring.assessment.reveal_access_link', 'execute', 'tenant')
 
   if (!can(tenant, 'hiring.assessment.read', 'read', 'tenant')
-    || !can(tenant, 'hiring.application.read', 'read', 'tenant')) {
-    return json({ ok: false, code: 'forbidden' }, 403)
+    || !can(tenant, 'hiring.application.read', 'read', 'tenant')
+    || !(canRecoverByEmail || canRevealSecureLink)) {
+    return forbidden()
   }
 
-  const reasonParam = new URL(request.url).searchParams.get('reason')
+  const query = new URL(request.url).searchParams
+  const applicationId = query.get('applicationId')?.trim() ?? ''
+  const reasonParam = query.get('reason')
 
+  if (!applicationId) return invalid()
   if (reasonParam !== null && !isAssessmentAccessRecoveryReason(reasonParam)) return invalid()
 
   try {
@@ -110,20 +158,25 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       ? await getAssessmentAccessRecoveryAvailability(id, reasonParam)
       : await getAssessmentAccessRecoveryAvailability(id)
 
-    if (!availability) return unavailable()
+    // Mismo binding que el POST: un test que no pertenece a esa postulación se responde como
+    // inexistente, sin confirmar que existe en otro lado.
+    if (!availability || availability.applicationId !== applicationId) return unavailable()
 
-    return json({
-      ok: true,
-      availability,
-      canRecoverByEmail: can(tenant, 'hiring.assessment.recover_access_email', 'execute', 'tenant'),
-      canRevealSecureLink: can(tenant, 'hiring.assessment.reveal_access_link', 'execute', 'tenant'),
-    }, 200)
+    return json({ ok: true, availability, canRecoverByEmail, canRevealSecureLink }, 200)
   } catch (error) {
     captureWithDomain(error, 'hiring', {
       tags: { source: 'assessment_access_recovery_availability_api' },
     })
 
-    return json({ ok: false, code: 'internal_error' }, 500)
+    return json(
+      {
+        ok: false,
+        code: 'internal_error',
+        error: 'No pudimos leer si se puede recuperar el acceso. Intenta de nuevo en unos minutos.',
+        actionable: true,
+      },
+      500,
+    )
   }
 }
 

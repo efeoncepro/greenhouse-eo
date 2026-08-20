@@ -538,6 +538,24 @@ const Application360View = ({
     recoveryIdempotencyRef.current = `assessment-recovery:${assessmentId}:${crypto.randomUUID()}`
   }
 
+  /**
+   * Qué canal se puede usar AHORA. Repite la regla del cluster a propósito: con un bloqueo
+   * dependiente del motivo el canal figura cerrado porque la elegibilidad se computó con otro
+   * motivo, y ahí es el operador quien lo destraba declarando el correcto.
+   */
+  const recoveryChannelOpen = (() => {
+    const target = recoveryFor ? recoveryAvailability[recoveryFor] : null
+    const reasonDependent = target?.eligibilityCode === 'assessment_recovery_expiry_not_proven'
+
+    const open = (channel: { available: boolean; blockedBy: string | null }) =>
+      channel.available || (reasonDependent && channel.blockedBy === 'assessment_not_eligible')
+
+    return {
+      email: canRecoverAccessByEmail && Boolean(target) && open(target!.channels.email),
+      secureLink: canRevealAccessLink && Boolean(target) && open(target!.channels.secureLink),
+    }
+  })()
+
   const closeRecovery = () => {
     setRecoveryFor(null)
     // El enlace muere acá. Es la razón de ser de la revelación única.
@@ -548,9 +566,19 @@ const Application360View = ({
 
   const recoveryErrorMessage = (err: unknown) => {
     const code = err instanceof HiringClientError ? err.code : null
+    const target = recoveryFor ? recoveryAvailability[recoveryFor] : null
+
+    // Un test vencido rechazado con cualquier motivo que no sea `token_expired_before_start` NO es
+    // "el estado cambió mientras confirmabas": el estado es el mismo y el remedio es el motivo.
+    // Mandar a revisar la tarjeta acá deja al operador dando vueltas sobre algo que él resuelve.
+    if (code === 'assessment_recovery_unavailable'
+      && target?.status === 'expired'
+      && recoveryReason !== 'token_expired_before_start') {
+      return recoveryCopy.unavailable.assessment_recovery_expiry_not_proven
+    }
 
     if (code === 'forbidden') return recoveryCopy.errorPermission
-    if (code === 'unauthorized') return recoveryCopy.errorPermission
+    if (code === 'unauthorized') return recoveryCopy.errorSession
     if (code === 'rate_limited') return recoveryCopy.errorRateLimited
     if (code === 'assessment_recovery_idempotency_conflict') return recoveryCopy.errorIdempotencyConflict
     if (code === 'assessment_recovery_email_provider_blocked') return recoveryCopy.emailBlocked
@@ -592,10 +620,26 @@ const Application360View = ({
         return
       }
 
-      // Enlace pedido pero NO revelado: es un replay. La credencial ya se emitió y sólo se muestra
-      // una vez — decirlo es la única salida honesta; inventar un "listo" dejaría al operador
-      // esperando un enlace que no va a aparecer.
+      // La intención está consumida: esta llave ya tiene desenlace registrado y volver a mandarla
+      // sólo puede devolver el mismo. Sin esto, el botón quedaba activo y un segundo click
+      // reportaba "correo despachado" sobre un replay donde no salió ningún correo.
+      recoveryIdempotencyRef.current = null
+
+      // `replayed` se LEE, no se infiere de la ausencia del enlace: el recibo que vuelve es el
+      // original, con su desenlace original. Pintar `emailQueued` sobre un replay le dice al
+      // operador que acaba de salir un correo que no salió.
+      if (response.replayed) {
+        setRecoveryNotice(
+          recoveryChannel === 'secure_link' ? recoveryCopy.linkAlreadyRevealed : recoveryCopy.emailAlreadySent,
+        )
+        router.refresh()
+
+        return
+      }
+
       if (recoveryChannel === 'secure_link') {
+        // Enlace pedido, no revelado y sin `replayed`: el servidor no honró la revelación y no
+        // sabemos por qué. Decirlo es la única salida honesta.
         setRecoveryNotice(recoveryCopy.linkAlreadyRevealed)
         router.refresh()
 
@@ -614,7 +658,7 @@ const Application360View = ({
               : recoveryCopy.emailUnknown
 
       setRecoveryNotice(
-        [outcomeMessage, formatTemplate(recoveryCopy.emailExpiry, { date: formatDate(response.recovery.expiresAt) })]
+        [outcomeMessage, formatTemplate(recoveryCopy.emailExpiry, { date: formatDateTime(response.recovery.expiresAt) })]
           .filter(Boolean)
           .join(' '),
       )
@@ -1939,8 +1983,10 @@ const Application360View = ({
                 disabled={recovering}
                 onChange={(event) => setRecoveryChannel(event.target.value as AssessmentAccessRecoveryChannel)}
               >
-                <MenuItem value='email' disabled={!canRecoverAccessByEmail}>{recoveryCopy.channelEmail}</MenuItem>
-                <MenuItem value='secure_link' disabled={!canRevealAccessLink}>{recoveryCopy.channelSecureLink}</MenuItem>
+                {/* Se apagan por permiso Y por disponibilidad: ofrecer un canal que el servidor
+                    va a rechazar hace gastar un intento para descubrir algo que ya sabíamos. */}
+                <MenuItem value='email' disabled={!recoveryChannelOpen.email}>{recoveryCopy.channelEmail}</MenuItem>
+                <MenuItem value='secure_link' disabled={!recoveryChannelOpen.secureLink}>{recoveryCopy.channelSecureLink}</MenuItem>
               </Select>
               <Typography color='text.secondary' variant='caption' sx={{ mt: 0.75 }}>
                 {recoveryChannel === 'email' ? recoveryCopy.channelEmailHelp : recoveryCopy.channelSecureLinkHelp}
@@ -1971,9 +2017,11 @@ const Application360View = ({
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button disabled={recovering} onClick={closeRecovery}>{copy.common.cancel}</Button>
+          <Button disabled={recovering} onClick={closeRecovery}>
+            {recoveryIdempotencyRef.current ? copy.common.cancel : copy.common.close}
+          </Button>
           <GreenhouseButton
-            disabled={recovering}
+            disabled={recovering || !recoveryIdempotencyRef.current}
             aria-busy={recovering}
             leadingIcon={recovering ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}
             onClick={() => void submitRecovery()}
@@ -1988,7 +2036,12 @@ const Application360View = ({
           `replayed` SIN el enlace, y esa es exactamente la garantía que hace segura la entrega. */}
       <Dialog
         open={revealedLink !== null}
-        onClose={closeRecovery}
+        // Sin esto, un ESC reflejo o un clic afuera matan la credencial sin confirmación — y no
+        // se vuelve a mostrar. Se cierra sólo por el botón, deliberadamente.
+        disableEscapeKeyDown
+        onClose={(_event, reason) => {
+          if (reason !== 'backdropClick') closeRecovery()
+        }}
         fullWidth
         maxWidth='sm'
         aria-label={formatTemplate(recoveryCopy.dialogAriaLabel, { name: item.candidateName })}
@@ -2012,17 +2065,22 @@ const Application360View = ({
                 leadingIconClassName='tabler-copy'
                 aria-label={formatTemplate(recoveryCopy.copyAriaLabel, { name: item.candidateName })}
                 onClick={() => {
-                  if (revealedLink) {
-                    void navigator.clipboard?.writeText(revealedLink.url)
-                    setToast(recoveryCopy.linkCopied)
-                  }
+                  if (!revealedLink) return
+
+                  // Afirmar "copiado" sin verificarlo cuesta caro acá: el token del candidato YA
+                  // se rotó, así que si el copiado falló en silencio la credencial se pierde y
+                  // recuperar cuesta otra rotación y otra unidad de cuota.
+                  void navigator.clipboard
+                    ?.writeText(revealedLink.url)
+                    .then(() => setToast(recoveryCopy.linkCopied))
+                    .catch(() => setRecoveryError(recoveryCopy.linkCopyFailed))
                 }}
               >
                 {recoveryCopy.linkCopy}
               </GreenhouseButton>
               {revealedLink ? (
                 <Typography color='text.secondary' variant='caption'>
-                  {formatTemplate(recoveryCopy.linkExpiry, { date: formatDate(revealedLink.expiresAt) })}
+                  {formatTemplate(recoveryCopy.linkExpiry, { date: formatDateTime(revealedLink.expiresAt) })}
                 </Typography>
               ) : null}
             </Stack>

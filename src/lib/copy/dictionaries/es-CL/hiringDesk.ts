@@ -221,6 +221,9 @@ export const hiringDesk: HiringDeskCopy = {
       emailQueued:
         'Correo despachado al proveedor. Eso no confirma que le haya llegado: si te dice que no lo ve, recupera de nuevo o usa el enlace temporal.',
       emailPending: 'El envío está en curso. Actualiza en unos segundos para ver el resultado.',
+      emailAlreadySent:
+        'Esta misma recuperación ya se había hecho: no salió un correo nuevo. Si necesitas reenviar, cierra y vuelve a empezar.',
+      linkCopyFailed: 'No pudimos copiar el enlace. Selecciónalo y cópialo a mano ANTES de cerrar: no se vuelve a mostrar.',
       emailUnknown:
         'La credencial se renovó, pero no pudimos confirmar el despacho. Revisa el estado antes de reintentar.',
       emailFailed: 'El proveedor rechazó el envío. Usa el enlace temporal para hacérselo llegar.',
@@ -275,6 +278,7 @@ export const hiringDesk: HiringDeskCopy = {
         'El correo de la persona cambió mientras confirmabas. Revisa el contacto y vuelve a intentar.',
       errorConflict: 'El estado del test cambió mientras confirmabas. Revisa la tarjeta y decide de nuevo.',
       errorPermission: 'No tienes permiso para recuperar acceso. Pídeselo a Admin o a People Ops.',
+      errorSession: 'Tu sesión venció. Inicia sesión de nuevo para continuar.',
       errorReadFailed: 'No pudimos leer si se puede recuperar el acceso.',
       copyAriaLabel: 'Copiar el enlace de acceso de {name}',
       dialogAriaLabel: 'Recuperar acceso al test de {name}',

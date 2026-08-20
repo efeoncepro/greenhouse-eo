@@ -169,6 +169,9 @@ export const hiringDesk: HiringDeskCopy = {
       emailQueued:
         'Email dispatched to the provider. That does not confirm they received it: if they tell you it is not there, recover again or use the temporary link.',
       emailPending: 'The send is in progress. Refresh in a few seconds to see the result.',
+      emailAlreadySent:
+        'This same recovery had already been done: no new email went out. To resend, close and start again.',
+      linkCopyFailed: 'We could not copy the link. Select it and copy it by hand BEFORE closing: it is not shown again.',
       emailUnknown:
         'The credential was renewed, but we could not confirm dispatch. Check the status before retrying.',
       emailFailed: 'The provider rejected the send. Use the temporary link instead.',
@@ -216,6 +219,7 @@ export const hiringDesk: HiringDeskCopy = {
         'The person’s email changed while you were confirming. Check the contact and try again.',
       errorConflict: 'The test status changed while you were confirming. Review the card and decide again.',
       errorPermission: 'You do not have permission to recover access. Ask Admin or People Ops.',
+      errorSession: 'Your session expired. Sign in again to continue.',
       errorReadFailed: 'We could not read whether access can be recovered.',
       copyAriaLabel: 'Copy the access link for {name}',
       dialogAriaLabel: 'Recover access to the test for {name}',

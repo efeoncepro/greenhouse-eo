@@ -7,6 +7,7 @@ import {
   ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS,
   decideAssessmentAccessRecoveryEligibility,
   type AssessmentAccessRecoveryAvailability,
+  type AssessmentAccessRecoveryChannelBlock,
   type AssessmentAccessRecoveryReason,
 } from './contracts'
 
@@ -140,15 +141,41 @@ export const getAssessmentAccessRecoveryAvailability = async (
   const emailCooldownUntil = cooldownFor(row.latest_email_recovery_at)
   const secureLinkCooldownUntil = cooldownFor(row.latest_secure_link_recovery_at)
 
-  const emailLimited = used >= ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS || Boolean(emailCooldownUntil)
-
-  const secureLinkLimited =
-    secureLinkUsed >= ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS || Boolean(secureLinkCooldownUntil)
+  // Cuota y cooldown se computan SEPARADOS: una espera de 60 segundos y un presupuesto agotado por
+  // 24 horas no son el mismo hecho, y decirle "intenta más tarde" a los dos deja al operador sin
+  // saber si vuelve en un minuto o mañana.
+  const emailQuotaExhausted = used >= ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS
+  const secureLinkQuotaExhausted = secureLinkUsed >= ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS
+  const emailLimited = emailQuotaExhausted || Boolean(emailCooldownUntil)
+  const secureLinkLimited = secureLinkQuotaExhausted || Boolean(secureLinkCooldownUntil)
 
   // `eligible` describe el assessment (estado, plazo, consentimiento), no el presupuesto de un
   // canal: un test recuperable con el correo agotado sigue siendo recuperable por enlace seguro.
   const eligible = eligibility.allowed && !(emailLimited && secureLinkLimited)
   const emailProviderBlocked = Boolean(row.email_provider_status)
+
+  // Orden deliberado: primero lo que descarta el test entero, después lo propio del canal, y al
+  // final lo que sólo cuesta esperar. El primero que aplica es el que el operador tiene que
+  // resolver; los demás no le sirven de nada mientras ése siga en pie.
+  const emailBlockedBy: AssessmentAccessRecoveryChannelBlock | null = !eligibility.allowed
+    ? 'assessment_not_eligible'
+    : !row.has_candidate_email
+      ? 'no_candidate_email'
+      : emailProviderBlocked
+        ? 'provider_blocked'
+        : emailQuotaExhausted
+          ? 'quota_exhausted'
+          : emailCooldownUntil
+            ? 'cooldown'
+            : null
+
+  const secureLinkBlockedBy: AssessmentAccessRecoveryChannelBlock | null = !eligibility.allowed
+    ? 'assessment_not_eligible'
+    : secureLinkQuotaExhausted
+      ? 'quota_exhausted'
+      : secureLinkCooldownUntil
+        ? 'cooldown'
+        : null
 
   return {
     assessmentId: row.assessment_id,
@@ -159,11 +186,12 @@ export const getAssessmentAccessRecoveryAvailability = async (
     eligibilityCode: eligibility.allowed ? null : eligibility.code,
     channels: {
       email: {
-        available: eligibility.allowed && !emailLimited && row.has_candidate_email && !emailProviderBlocked,
+        available: emailBlockedBy === null,
+        blockedBy: emailBlockedBy,
         providerStatus: row.email_provider_status,
         hasCandidateEmail: row.has_candidate_email,
       },
-      secureLink: { available: eligibility.allowed && !secureLinkLimited },
+      secureLink: { available: secureLinkBlockedBy === null, blockedBy: secureLinkBlockedBy },
     },
     rateLimit: {
       maxPer24Hours: ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS,
