@@ -1,0 +1,109 @@
+---
+name: greenhouse-email
+description: Crear, modificar y validar templates React Email de Greenhouse, su registro, copy, previews y conexión con la entrega canónica. Usar para correos transaccionales o broadcast y para sus hero images; usar resend-email-platform, no esta skill, para dominios, tracking, webhooks, suppressions o diagnóstico del proveedor.
+---
+
+# Greenhouse Email
+
+Construye correos de Greenhouse sobre el catálogo y la entrega existentes. La unidad de trabajo no es solo el
+componente visual: incluye tipo, prioridad, destinatario, consentimiento, trigger, contexto, plain text, preview,
+dedupe, runtime consumidor y evidencia proporcional.
+
+## Primera lectura
+
+Lee solo lo que el cambio necesita:
+
+- `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` para catálogo, arquitectura y estado operativo.
+- `src/lib/email/types.ts`, `templates.ts`, `delivery.ts`, `tokens.ts` y `context-resolver.ts` para el contrato real.
+- `src/emails/components/EmailLayout.tsx`, `EmailButton.tsx` y `src/emails/constants.ts` para primitives y tokens.
+- `resend-email-platform` cuando cambien provider, dominio, tracking, webhook, suppression, retry o entregabilidad.
+- `greenhouse-ai-image-generator` y
+  `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md` cuando el correo necesite
+  un visual generado. Lee además [references/ai-visuals.md](references/ai-visuals.md).
+- La arquitectura y skill del dominio dueño —Hiring, Payroll, Finance, Growth, etc.— antes de cablear el trigger.
+
+## Frontera de autorización
+
+Esta skill autoriza trabajo local sobre templates y documentación dentro del alcance pedido. No autoriza enviar
+correos reales, agregar destinatarios, habilitar tipos, cambiar tracking, subir assets a producción, desplegar
+Vercel/Cloud Run ni promover flags. Esas acciones requieren aprobación explícita y su skill operativa.
+
+## Arquitectura vigente
+
+| Responsabilidad | Fuente canónica |
+|---|---|
+| Componentes | `src/emails/*.tsx` |
+| Layout, botón y tokens | `src/emails/components/*` + `src/emails/constants.ts` |
+| Tipos, prioridad y sensibilidad | `src/lib/email/types.ts` |
+| Registro y preview | `src/lib/email/templates.ts` |
+| Entrega | `src/lib/email/delivery.ts` → `sendEmail()` |
+| Contexto runtime | `src/lib/email/context-resolver.ts` + `tokens.ts` |
+| Provider | Resend mediante la capa centralizada |
+| Historial/retry | `greenhouse_notifications.email_deliveries` |
+| Assets públicos | `GREENHOUSE_PUBLIC_MEDIA_BUCKET` |
+
+No inventes un sender, cliente Resend, endpoint de envío ni registry paralelo.
+
+## Flujo de implementación
+
+1. Define propósito, dominio, trigger exacto, audiencia, prioridad y si el correo contiene credencial o dato
+   sensible. Confirma que el evento merece email y no una superficie interna.
+2. Busca un template, bloque de copy, primitive, email type y caller reutilizable antes de agregar piezas.
+3. Extiende `EmailType` y sus sets/mapas relacionados solo cuando corresponda. La marca, prioridad,
+   token-sensitivity, reply-to y broadcast son contratos independientes.
+4. Crea o modifica un componente puro de React Email. Usa `EmailLayout`, `EmailButton`, tokens compartidos,
+   estilos inline y el diccionario canónico `src/lib/copy/*/emails.ts` para copy reutilizable.
+5. Registra template, subject, plain text y preview metadata desde la misma semántica. Los datos de negocio
+   siguen viniendo del contexto runtime, nunca del diccionario.
+6. Cablea el caller mediante `sendEmail()`. En consumers reactivos, ejecuta dedupe antes de rotar tokens o
+   realizar cualquier side effect no idempotente.
+7. Agrega visual solo si mejora comprensión o jerarquía. Un hero no sustituye copy, CTA, estado ni datos exactos.
+8. Verifica render HTML, plain text, snapshots/tests, TypeScript y build proporcional. Si el cambio es visible,
+   revisa el preview en ancho desktop y móvil.
+9. Declara el estado honestamente: código local no significa template desplegado ni consumer operativo.
+
+## Reglas de template
+
+- Cada prop opcional necesita un default seguro para preview; una prop de negocio requerida no debe inventarse
+  silenciosamente en producción.
+- Mantén español/inglés donde el email type lo soporte. El subject, preview text, HTML y plain text deben contar
+  la misma verdad sin duplicar frases inútilmente.
+- Todo CTA incluye una URL de fallback legible. Nunca expongas un bearer en logs, persistencia genérica, analytics
+  ni copy de error.
+- Broadcast exige preferencias/unsubscribe y respeta su prioridad/rate limit. No conviertas un transaccional en
+  broadcast para reutilizar una lista.
+- Usa tablas de presentación y estilos inline compatibles con clientes de correo. No dependas de JavaScript,
+  SVG animado, video, hover o CSS moderno para transmitir información esencial.
+- Imágenes decorativas usan `alt=""`; imágenes informativas requieren un alt equivalente, breve y localizado.
+  Declara dimensiones para evitar layout shift.
+- Copy institucional reutilizable vive en `src/lib/copy/`; nombres, fechas, montos, URLs, decisiones y estados
+  llegan desde el contexto del dominio.
+
+## Runtime y rollout
+
+Los consumers reactivos y templates compilados viven en el `ops-worker` compartido. Modificar
+`src/emails/*.tsx`, `src/lib/email/templates.ts`, `delivery.ts` o la projection no vuelve operativo el cambio por
+sí solo: identifica el consumidor real y documenta deploy, flag/DB kill switch, canary, observabilidad y rollback.
+
+No ejecutes `services/ops-worker/deploy.sh` como consecuencia automática de editar un template.
+
+## Verificación mínima
+
+Selecciona gates proporcionales al diff:
+
+```bash
+pnpm email:dev
+pnpm exec vitest run src/emails
+pnpm exec tsc --noEmit
+pnpm build
+```
+
+Para cambios de skill corre además:
+
+```bash
+pnpm skills:mirrors
+node scripts/skills/validate-skill-routes.mjs --all
+```
+
+Un email queda `code complete, rollout pendiente` mientras falten deploy del runtime dueño, habilitación,
+canary consentido o readback del provider.

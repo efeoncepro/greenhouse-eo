@@ -61,6 +61,14 @@ const mirroredSkills = [
     claude: '.claude/skills/resend-email-platform',
   },
   {
+    // Templates, delivery y visuales de email son un solo contrato compartido. El espejo evita que
+    // un agente reactive un generador legacy o use GPT Image 1.5 como fallback de transparencia.
+    id: 'greenhouse-email',
+    mode: 'byte-identical',
+    codex: '.codex/skills/greenhouse-email',
+    claude: '.claude/skills/greenhouse-email',
+  },
+  {
     // El espejo existía y NADIE lo validaba: al 2026-08-20 llevaba dos actualizaciones de atraso.
     // La versión de Codex seguía declarando que la cuota de recuperación de acceso era
     // "cross-channel" cuando el código la aplica POR CANAL — así que un agente que entrara por
