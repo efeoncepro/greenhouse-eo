@@ -518,3 +518,20 @@ Consecuencias operativas:
 - **El Slice 3 es el que cierra el problema**, no el Slice 6. Al cubrir los 19 event types en la projection reactiva, `member.created` y `compensation_version.created` vuelven a emitirse. El Slice 6 (los 16 dead-letters) sigue siendo lo último y sigue siendo evento por evento.
 - **`member.created` falló con HTTP 500, no 401.** Es una causa distinta a la del resto y hay que diagnosticarla aparte: el 500 sale del receptor, no de la firma ausente. Puede que el consumer reviente con ese payload. Verificarlo antes de asumir que la migración lo arregla sola.
 - Si se busca la ruta más corta al valor sin esperar la migración completa, la alternativa acotada es **agregar esos dos event types a la projection reactiva existente** (`src/lib/sync/projections/notifications.ts`, que ya cubre 15 tipos) sin retirar todavía el bus. Es un subconjunto del Slice 3 y no compromete ninguna decisión de arquitectura.
+
+### Conteo 2026-08-21 — el daño acumulado es de un solo aviso a una persona
+
+Medido tras escribir el Delta (3), que decía "a la persona a la que le cambiaron la compensación no se le avisó" sin cuantificar. El número importa y lo corrige a la baja:
+
+```
+eventos desde 2026-06-15 (fecha de la ruptura)
+  member.created               12   del 2026-06-15 al 2026-06-26
+  compensation_version.created  1   el 2026-06-15
+```
+
+- **`compensation_version.created`: exactamente UNO.** El único cambio de compensación desde que el canal se rompió ocurrió el mismo `2026-06-15`, el día de la ruptura. No es "todos los cambios de dos meses": es una persona, una vez, hace dos meses. Sigue siendo un aviso que alguien debió recibir y no recibió, pero no hay daño acumulado.
+- **`member.created`: 12 eventos, todos entre el 15 y el 26 de junio, nada después.** Corresponden a 12 de los 33 `members` creados en tres tandas de 11 (`2026-06-15`, `2026-06-19`, `2026-06-26`), todos `@efeoncepro.com`, 18 activos y 15 inactivos. El patrón de tandas idénticas indica un proceso de sincronización o recreación, no 33 contrataciones. Y ese aviso va a **admins** como `system_event`, no a la persona: es un FYI sobre registros que se estaban creando en bloque de todos modos.
+
+**Consecuencia para la prioridad:** ambos flujos están **dormidos** — cero eventos desde el 26 de junio. Esto deja de ser "sangra" y pasa a ser **bomba dormida**: el próximo cambio de compensación tampoco va a notificar, y el próximo colaborador tampoco. Eso es motivo suficiente para arreglarlo, pero no para adelantarlo a `TASK-1760`, que sí crece un mes por mes.
+
+`Rank` se mantiene en `2`. El argumento del Delta (3) —que el motivo de esta task son los avisos huérfanos y no los dead-letters— sigue siendo válido; lo que se corrige es la magnitud, no la naturaleza.
