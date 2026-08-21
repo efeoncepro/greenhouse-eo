@@ -22,7 +22,7 @@
 - Backend impact: `webhook`
 - Epic: `EPIC-041`
 - Status real: `Diagnostico verificado contra codigo y runtime declarado; decision de arquitectura tomada; correccion no iniciada`
-- Rank: `TBD`
+- Rank: `2`
 - Domain: `platform|ops|finance`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
@@ -494,3 +494,27 @@ Correcciones sobre esta task:
 La decisión de arquitectura del `Detailed Spec` —migrar a projection reactiva— **se sostiene sin cambios**: sigue siendo cierto que la primitiva canónica ya existe, que `finance.dte.discrepancy_found` está duplicado en ambos caminos, y que ninguna de las tres suscripciones reales tiene un destino externo verdadero.
 
 Contexto de programa: `EPIC-041`.
+
+## Delta 2026-08-21 (3) — El motivo de esta task no son los dead-letters: son dos avisos que nadie recibe
+
+Verificado contra runtime el 2026-08-21. Tres correcciones al encuadre, y la tercera cambia la prioridad.
+
+**1. Las notificaciones SÍ funcionan hoy.** `greenhouse_notifications.email_deliveries` muestra actividad continua los últimos 7 días, **100% `sent`, cero `failed`, cero `bounced`** (48 el 2026-08-19, 7 el 2026-08-20). Los 12 handlers `notification_dispatch:*` están `healthy` con `consecutive_failures = 0`. El webhook `wh-sub-notifications` es un carril **secundario y paralelo** que además apunta a staging (`dev-greenhouse.efeoncepro.com`), no el camino principal. Nada de esta task es una interrupción de servicio.
+
+**2. Cobertura real, evento por evento.** Los 19 event types del bus no son equivalentes entre sí:
+
+| Evento | ¿Se pierde algo hoy? |
+| --- | --- |
+| `payroll_period.exported` | **No** — lo cubre la projection `payroll_export_ready_notification`. El email de 2026-07 salió el 2026-08-01 |
+| `assignment.created / updated / removed` | **No hoy** — cero eventos emitidos en 120 días. Pero es una bomba dormida: en cuanto alguien mueva una asignación, ese aviso tampoco saldrá |
+| `member.created` | **SÍ** — 13 dead-letters (HTTP **500**, no 401). `notification_log` categoría `system_event` tiene su última fila el `2026-06-12`. Cada colaborador nuevo desde entonces no generó su aviso a admins |
+| `compensation_version.created` | **SÍ** — el aviso *"Tu compensación fue actualizada"*. Última entrega exitosa `2026-06-01`; el evento del `2026-06-15` murió. **A la persona a la que le cambiaron la compensación no se le avisó** |
+
+**3. Ese es el motivo de la task.** Está escrita como si importara por los 16 dead-letters congelados. No: los dead-letters son un backlog acotado, viejo y en su mayoría no accionable. Lo que importa es que **dos tipos de aviso quedaron huérfanos** — ninguna otra projection los cubre — y uno de ellos tiene consecuencia sobre una persona concreta que no fue informada de un cambio en su compensación.
+
+Consecuencias operativas:
+
+- **`Rank` pasa a `2`** en el orden de `EPIC-041`, detrás de `TASK-1760`. Es lo único del programa con consecuencia humana directa.
+- **El Slice 3 es el que cierra el problema**, no el Slice 6. Al cubrir los 19 event types en la projection reactiva, `member.created` y `compensation_version.created` vuelven a emitirse. El Slice 6 (los 16 dead-letters) sigue siendo lo último y sigue siendo evento por evento.
+- **`member.created` falló con HTTP 500, no 401.** Es una causa distinta a la del resto y hay que diagnosticarla aparte: el 500 sale del receptor, no de la firma ausente. Puede que el consumer reviente con ese payload. Verificarlo antes de asumir que la migración lo arregla sola.
+- Si se busca la ruta más corta al valor sin esperar la migración completa, la alternativa acotada es **agregar esos dos event types a la projection reactiva existente** (`src/lib/sync/projections/notifications.ts`, que ya cubre 15 tipos) sin retirar todavía el bus. Es un subconjunto del Slice 3 y no compromete ninguna decisión de arquitectura.
