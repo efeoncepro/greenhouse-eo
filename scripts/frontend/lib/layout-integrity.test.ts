@@ -21,7 +21,7 @@ describe('layout-integrity severity mapping', () => {
   })
 
   it('escalates to error when failOnViolations is set', async () => {
-    const page = stubPage(() => [{ code: 'layout_element_overflow', message: 'x' }])
+    const page = stubPage(() => [{ code: 'layout_out_of_flow_vertical_runaway', message: 'x' }])
     const findings = await analyzeLayoutIntegrity(page, 'f', { enabled: true, failOnViolations: true })
 
     expect(findings[0].severity).toBe('error')

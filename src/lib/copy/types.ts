@@ -156,7 +156,9 @@ export interface HiringAssessmentCopy {
     cancelledDetail: string
     loadReviewPrompt: string
     noModules: string
+    competency: string
     objective: string
+    status: string
     scoreProgressLabel: string
     pending: string
     radarScoreLegend: string

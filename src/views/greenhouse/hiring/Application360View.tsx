@@ -132,6 +132,18 @@ const proposedScoreFrom = (proposal: AiProposal | undefined) => {
   return typeof score === 'number' ? score : null
 }
 
+const assessmentScoreStatusLabel = (
+  score: number | null,
+  pending: boolean,
+  statuses: HiringAssessmentCopy['review']['statuses'],
+) => {
+  if (pending) return statuses.pending
+  if (score != null && score >= 75) return statuses.optimal
+  if (score != null && score >= 60) return statuses.attention
+
+  return statuses.critical
+}
+
 const responseAnswerText = (answer: Record<string, unknown>) => {
   for (const key of ['text', 'value', 'answer', 'selected']) {
     const value = answer[key]
@@ -1356,7 +1368,7 @@ const Application360View = ({
                                         kind='status'
                                         variant='label'
                                         tone={row.pending ? 'info' : scoreTone(row.score)}
-                                        label={row.pending ? assessmentCopy.review.statuses.pending : row.score != null && row.score >= 75 ? assessmentCopy.review.statuses.optimal : row.score != null && row.score >= 60 ? assessmentCopy.review.statuses.attention : assessmentCopy.review.statuses.critical}
+                                        label={assessmentScoreStatusLabel(row.score, row.pending, assessmentCopy.review.statuses)}
                                       />
                                     </Stack>
                                   </Stack>
@@ -1396,37 +1408,43 @@ const Application360View = ({
                           </Alert>
 
                           <Box
-                            component='table'
-                            data-capture='assessment-accessible-score-table'
+                            data-visually-hidden='true'
+                            data-capture='assessment-accessible-score-table-wrapper'
                             sx={{
                               position: 'absolute',
                               inlineSize: 1,
                               maxInlineSize: 1,
                               blockSize: 1,
                               m: -1,
+                              p: 0,
                               overflow: 'hidden',
                               clip: 'rect(0 0 0 0)',
-                              tableLayout: 'fixed',
-                              whiteSpace: 'normal',
-                              overflowWrap: 'anywhere',
+                              clipPath: 'inset(50%)',
+                              whiteSpace: 'nowrap',
                               border: 0,
-                              '& caption, & tbody, & tr, & td': {
-                                inlineSize: 1,
-                                maxInlineSize: 1,
-                                overflow: 'hidden',
-                              },
                             }}
                           >
-                            <caption>{assessmentCopy.review.title}</caption>
-                            <tbody>
-                              {scoreRows.map((row) => (
-                                <tr key={row.competencyId}>
-                                  <td>{row.competencyName}</td>
-                                  <td>{row.target}</td>
-                                  <td>{row.score ?? assessmentCopy.review.pending}</td>
+                            <Box component='table' data-capture='assessment-accessible-score-table'>
+                              <caption>{assessmentCopy.review.title}</caption>
+                              <thead>
+                                <tr>
+                                  <th scope='col'>{assessmentCopy.review.competency}</th>
+                                  <th scope='col'>{assessmentCopy.review.objective}</th>
+                                  <th scope='col'>{assessmentCopy.review.radarMetricScore}</th>
+                                  <th scope='col'>{assessmentCopy.review.status}</th>
                                 </tr>
-                              ))}
-                            </tbody>
+                              </thead>
+                              <tbody>
+                                {scoreRows.map((row) => (
+                                  <tr key={row.competencyId}>
+                                    <th scope='row'>{row.competencyName}</th>
+                                    <td>{row.target}</td>
+                                    <td>{row.score ?? assessmentCopy.review.pending}</td>
+                                    <td>{assessmentScoreStatusLabel(row.score, row.pending, assessmentCopy.review.statuses)}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </Box>
                           </Box>
                         </Stack>
                       </Box>
