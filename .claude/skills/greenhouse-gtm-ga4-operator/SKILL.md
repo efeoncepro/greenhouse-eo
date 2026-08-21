@@ -54,6 +54,22 @@ Ante una tarea de medición, seguir este árbol; NO improvisar el camino:
 
 Diagnóstico "no llega a GA4" → el **diagnostic ladder del doc `06 §6`** (dataLayer → Preview → `/g/collect` → DebugView → realtime; el primer eslabón que rompe nombra la falla).
 
+### Fallback DOM para CTA anidado (cuando no existe `dataLayer`)
+
+Si Preview muestra un `Click Element` interno (`div`, `span`, icono) y `Click URL` vacío, inspeccionar el DOM antes
+de cambiar el activador:
+
+- si se quiere medir todo el enlace o toda la tarjeta, usar `Solo enlaces` + `Click URL` y evitar JavaScript;
+- si se quiere medir sólo un CTA dentro del enlace, usar `Todos los elementos` + un selector CSS acotado al CTA y
+  una Custom JavaScript mínima que busque `closest('a[href]')` y retorne su `href` con guards explícitos;
+- la variable debe ser pura y sin efectos laterales; si `Click URL` ya contiene el destino, no crearla;
+- preferir siempre un evento semántico de la aplicación en `dataLayer` cuando se controla el renderer;
+- verificar al menos las variantes DOM positivas y un clic negativo ajeno al CTA.
+
+Un tag genérico con `destination_url` cubre N productos; no crear un tag por producto. Caso verificado, selector y
+función compatibles con GTM ES5: `docs/reference/measurement-gtm-ga4/LEARNINGS.md` → “CTA anidado en una tarjeta
+enlazada”.
+
 ## Hard Rules (acción gobernada)
 
 - **SIEMPRE leer `docs/reference/measurement-gtm-ga4/LEARNINGS.md` + el doc `05` (shapes) ANTES de construir un tag.** Los gotchas verificados (`measurementIdOverride` no tagReference, scope `quick_preview`, consent en verificación, branch-from-version) evitan repetir errores ya pagados.
