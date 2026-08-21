@@ -375,3 +375,22 @@ Cada remediación debe producir este paquete mínimo antes de mutar:
 - ¿Qué drifts financieros son consecuencia de una falla actual de materialización y cuáles son datos históricos que requieren decisión contable?
 - ¿Los writebacks Notion atrasados requieren solo replay o exponen una divergencia de configuración/credencial entre runtimes?
 - ¿La proyección de costo Cloud Run corresponde a carga legítima, una configuración fija o un ciclo anómalo que comparte causa con los lags observados?
+
+## Delta 2026-08-21 — Los tres hallazgos principales ya tienen causa raiz y dueño
+
+Revision de los hallazgos reportados por esta umbrella. Los tres carriles que concentraban el diagnostico dejaron de ser sintomas sin causa:
+
+| Carril reportado aqui | Causa raiz verificada | Dueño |
+| --- | --- | --- |
+| `wh-sub-notifications`, `401 missing_signature` | Asimetria de runtime: el emisor corre en el Cloud Run `ops-worker`, donde `WEBHOOK_NOTIFICATIONS_SECRET` no esta declarada, y el receptor en Vercel, donde si. El dispatcher firma dentro de un `if (secret)` sin `else` (`src/lib/webhooks/outbound.ts:77-83`) y envia sin firma en silencio. Son 15 eventos distintos, no reintentos: un 4xx no reintenta. | `TASK-1759` |
+| Dos handlers `contract_mrr_arr` fallidos | `SELECT business_line_code FROM greenhouse_commercial.contracts` sobre una columna que esa tabla nunca tuvo: `42703` en la primera query, dead-letter al primer intento por `maxRetries: 1`. No son dos handlers duplicados sino dos handler keys de la misma projection. La consecuencia real es que la serie de MRR/ARR esta vacia desde 2026-04-19. | `TASK-1758` |
+| `reliability_control_plane` excede 6000 ms | Error de composicion, no carga: `withSourceTimeout` arranca el cronometro de 6000 ms y lo primero que espera adentro es una fuente con presupuesto propio de 5000 ms (`src/lib/platform-health/composer.ts:273-291`), dejando menos de 2 s para 157 `await` secuenciales. | `TASK-928` (`Delta 2026-08-21`) |
+
+Notas de gobernanza que esta umbrella deberia absorber:
+
+- `TASK-1710` (2026-08-15) y `TASK-1432` (2026-07-18) describen el mismo incidente con un mes de diferencia y **no se referencian entre si**. Ambas siguen en `to-do` con cero commits desde su creacion y sin una sola task hija. El unico delta medible en ese mes fue 14 -> 15 dead-letters.
+- Ninguno de los hallazgos entro nunca al lifecycle de issues: `missing_signature` no aparece en `docs/issues/open/` ni en `Handoff.md`.
+- Los tres carriles resueltos aqui son cambios de codigo y configuracion, reversibles por revert y sin migracion. Los bloqueos de aprobacion humana que esta umbrella declara aplican a los backfills y a las mutaciones de datos, no a las causas.
+- El bloqueo de `agentAutomationSafe=false` que esta umbrella se autoimpone es circular: el programa que corregiria el timeout esta gobernado por el flag que el timeout mantiene en `false`. Corregir la composicion del composer lo rompe.
+
+Quedan sin dueño en esta umbrella: `hubspot_services_intake` degradado, el drift fiscal de Finance, las transiciones no capturadas de Delivery/Notion (con un writeback de ~79,6 dias que precede a ambas umbrellas), los leads de Growth que no llegaron a HubSpot, y el forecast de costo de Cloud Run.

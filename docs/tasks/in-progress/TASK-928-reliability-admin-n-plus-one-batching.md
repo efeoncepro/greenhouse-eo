@@ -194,3 +194,41 @@ Sin flag para refactors internos request-scoped y readers agregados. Si aparece 
 
 - Optional `pnpm build` if this remains the final integration batch on `develop`.
 - Post-deploy Sentry performance review for 24-48h before resolving N+1 issues.
+
+## Delta 2026-08-21 — El presupuesto del control plane se consume esperandose a si mismo
+
+Diagnostico verificado en codigo durante la revision de los hallazgos de confiabilidad que `TASK-1432` (2026-07-18) y `TASK-1710` (2026-08-15) reportaron sin causa. Esta task es la dueña declarada de `src/lib/platform-health/**` y `src/lib/reliability/**`, asi que el trabajo entra aca como ampliacion de alcance y no como task nueva.
+
+**El hallazgo.** `platform-health.v1` devuelve `overallStatus='unknown'` y `agentAutomationSafe=false` porque la fuente `reliability_control_plane` agota su presupuesto de 6000 ms. No es un query lento: es un error de composicion. En `src/lib/platform-health/composer.ts:273-291`, `withSourceTimeout` arranca el cronometro de 6000 ms y lo primero que ejecuta dentro es `await Promise.all([operationsPromise, syntheticsPromise])`, donde `operationsPromise` tiene presupuesto propio de 5000 ms (`:263-266`) y `syntheticsPromise` de 3000 ms (`:268-271`). Si `operations` tarda 4 s, al control plane le quedan menos de 2 s para ejecutar `getReliabilityOverview`, que es una cadena de 157 `await` de nivel superior estrictamente secuenciales (`src/lib/reliability/get-reliability-overview.ts:1455-2900`; `grep -c "      : await "` devuelve 157), cuyos primeros siete son red externa — BigQuery, API de Vercel, API de GitHub, Sentry via `hydrateDomainIncidents` (`:1462-1520`, `:2892-2909`). Es aritmeticamente imposible, no un problema de carga.
+
+**Agravantes verificados.**
+
+- El timeout no cancela al productor (`src/lib/platform-health/with-source-timeout.ts:53-56`): los ~19 s del overview se siguen pagando en PostgreSQL aunque el payload ya salio.
+- El estado degradado se cachea 30 s (`src/lib/platform-health/cache.ts:21`, `composer.ts:382-384`), asi que la degradacion es pegajosa entre requests.
+- El comentario del cache subestima el fan-out real: dice que el composer abre 7 source readers (`cache.ts:9`), cuando una de esas 7 fuentes son 157 readers en serie.
+- `SourceResult` mide `durationMs` (`with-source-timeout.ts:28`, `:80`) pero `buildDegradedSourceList` no lo propaga (`composer.ts:232-255`) y `PlatformHealthDegradedSource` no tiene el campo (`src/types/platform-health.ts:77-82`). Por eso la pregunta "que reader consume el presupuesto" lleva un mes sin respuesta: no hay telemetria per-source en produccion.
+- La cadena de consecuencia esta confirmada: timeout produce `value=null` -> `modules=[]` (`composer.ts:334`) -> `rollupOverallStatus([])` devuelve `'unknown'` (`:199-200`) -> `moduleByKey` devuelve `undefined` y los seis flags de `safe-modes.ts:62-116` colapsan juntos a `false`. El diseño fail-closed es correcto; el problema es que una fuente lenta produce el mismo veredicto que una plataforma caida, sin distinguirlos.
+
+**Consecuencia operativa.** Ningun consumer en runtime ramifica sobre `safeModes` — el grep solo devuelve el tipo, el derivador y el esquema de salida de la tool MCP (`src/mcp/greenhouse/tools.ts:54`). El bloqueo es normativo, no mecanico: lo aplican los agentes por doctrina (`docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md`). El daño real es que el preflight canonico lleva un mes emitiendo un veredicto indistinguible entre "plataforma rota" y "el compositor no alcanzo a leer", lo que entrena a operadores y agentes a ignorarlo. Ademas produce un bloqueo circular: `TASK-1710` se autobloquea con ese flag, asi que el programa que corregiria el timeout esta gobernado por el flag que el timeout mantiene en `false`.
+
+**Alcance que se agrega a esta task.**
+
+1. Sacar la espera de `operationsPromise` y `syntheticsPromise` de dentro del presupuesto de `reliability_control_plane`: resolverlas fuera y pasarlas ya materializadas a `produce()`, o dar al control plane un presupuesto que descuente el de sus dependencias. Recupera hasta 5 de los 6 segundos sin tocar un solo query.
+2. Propagar `durationMs` por fuente a `degradedSources[]` y agregar medicion por reader dentro de `getReliabilityOverview`. Es aditivo al contrato de `platform-health.v1`, no breaking.
+3. Paralelizar la cadena de 157 `await` en lotes con `Promise.allSettled`, preservando el manejo de error por señal para no perder la degradacion honesta. Esto ataca tambien los ~19 s del overview directo, que es el mismo endpoint que ya rompia el presupuesto de un smoke Playwright (`docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md:265`).
+
+**Prohibido explicitamente.** Subir el presupuesto de 6000 ms para que el sintoma desaparezca. `TASK-1710` lo prohibe y con razon: enmascara la composicion incorrecta y deja los 19 s intactos.
+
+**Nota de prioridad.** Esta task figura `P2` y su `Status real` dice implementacion directa en develop por override del operador del 2026-05-24, es decir cerca de tres meses sin cierre. El alcance que entra por este Delta es el unico camino declarado para restaurar un preflight interpretable, y `TASK-1432` ya la declaraba dependencia principal (referencia que `TASK-1710` perdio). Corresponde reevaluar la prioridad con el operador.
+
+### Acceptance Criteria — Delta 2026-08-21
+
+- [ ] `reliability_control_plane` deja de esperar `operationsPromise` y `syntheticsPromise` dentro de su propio presupuesto, verificado leyendo `composer.ts` y con test que fije la composicion.
+- [ ] `GET /api/admin/platform-health` devuelve `overallStatus` distinto de `unknown` en staging, con `reliability_control_plane` ausente de `degradedSources[]`.
+- [ ] `degradedSources[]` expone `durationMs` por fuente y el tipo `PlatformHealthDegradedSource` lo declara; el cambio es aditivo y no rompe consumers existentes.
+- [ ] Existe medicion por reader dentro de `getReliabilityOverview` que permite nombrar cual consume mas presupuesto, y el resultado de la primera medicion queda registrado.
+- [ ] La cadena de readers de nivel superior corre en lotes concurrentes y la degradacion honesta por señal se conserva: una señal que falla no tumba el resto.
+- [ ] El presupuesto de 6000 ms no fue aumentado.
+- [ ] `agentAutomationSafe` vuelve a `true` en staging cuando los modulos requeridos estan sanos, y sigue en `false` cuando alguno esta realmente en error — es decir, el flag vuelve a distinguir ambos casos.
+- [ ] Latencia del overview directo medida antes y despues, con ambos numeros registrados.
+- [ ] `TASK-1710` y `TASK-1432` reciben `Delta` indicando que el carril de control plane quedo cubierto por esta task.
