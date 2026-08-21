@@ -45,6 +45,14 @@ const mirroredSkills = [
     claude: '.claude/skills/greenhouse-globe-model-fleet',
   },
   {
+    // La operación de imágenes comparte código, modelos y restricciones de formato. Una divergencia
+    // entre agentes puede convertir una capacidad preview del proveedor en un fallback deprecated.
+    id: 'greenhouse-ai-image-generator',
+    mode: 'byte-identical',
+    codex: '.codex/skills/greenhouse-ai-image-generator',
+    claude: '.claude/skills/greenhouse-ai-image-generator',
+  },
+  {
     // Resend es infraestructura de correo compartida: un invariante que divirja entre agentes
     // termina en que uno de los dos vuelve a activar el tracking sobre enlaces con credencial.
     id: 'resend-email-platform',

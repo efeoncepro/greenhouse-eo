@@ -49,7 +49,7 @@ loadEnv({ path: join(process.cwd(), '.env.local') })
  *   --out-dir <dir>         Output directory. Default: public/images/generated
  *   --size <WxH>            1024x1024 | 1536x1024 | 1024x1536 | 2048x... (default 1536x1024)
  *   --quality <q>           low | medium | high | auto (default high)
- *   --background <b>        opaque | transparent (default opaque; transparent → gpt-image-1.5)
+ *   --background <b>        opaque | transparent (default opaque; GPT Image 2 transparency is preview)
  *   --model <m>             gpt-image-2 | gpt-image-1.5 | gpt-image-1 | gpt-image-1-mini (default gpt-image-2)
  *   --count <n>             Images per prompt (default 1)
  *   --timeout <ms>          Per-image timeout (default 280000; gpt-image-2 high can exceed 125s)
@@ -277,8 +277,7 @@ const generateOne = async (item: GenItem, args: CliArgs): Promise<void> => {
           format: 'png',
           numberOfImages: 1,
           timeoutMs: args.timeoutMs,
-          ...(args.inputFidelity ? { inputFidelity: args.inputFidelity } : {}),
-          ...(args.background === 'transparent' ? { transparentBackgroundStrategy: 'fallback-to-gpt-image-1.5' as const } : {})
+          ...(args.inputFidelity ? { inputFidelity: args.inputFidelity } : {})
         })
       : await generateOpenAIImage({
           prompt: item.prompt,

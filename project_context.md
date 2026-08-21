@@ -56,7 +56,11 @@ Claude; sus route cards machine-readable viven en `docs/architecture/creative-st
 sustituyen la autoridad live del reader. ADR-023 y el card inicial de FLUX 3 fijan la separación entre evidencia del
 proveedor, cables de integración y disponibilidad de Globe; el baseline auditado también cubre Gemini Omni, Veo 3.1,
 Seedance 2.0/R2V, GPT Image 2, Seedream 5 Pro, Nano Banana 2/Pro y Kling 3.0. “Imagen 2 de ChatGPT” se normaliza a
-`gpt-image-2`; Google `imagen-2` no tiene ruta en Globe. Seedream T2I, GPT Image 2 y Nano Banana 2/Pro están disponibles
+`gpt-image-2`; Google `imagen-2` no tiene ruta en Globe. OpenAI documenta transparencia GPT Image 2 en preview con
+PNG/WebP. Globe ya la declara y verifica en código para su ruta PNG mediante `backgroundMode` y alfa decodificado,
+pero la variante continúa gated hasta deploy, canary facturable, readback y promoción/rollback; la matriz canónica
+vive en [`OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`](docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md).
+Seedream T2I, GPT Image 2 y Nano Banana 2/Pro están disponibles
 según el reader live; Seedream Edit queda `gated` por binding deshabilitado. Seedream Lite, edición de OpenAI/Nano
 Banana y video-to-image de Nano Banana permanecen como superficies no públicas hasta tener ruta, binding, canary y
 readback propios. Un lookup de circuito `not_found` para Nano Banana Pro es blocker operativo explícito.

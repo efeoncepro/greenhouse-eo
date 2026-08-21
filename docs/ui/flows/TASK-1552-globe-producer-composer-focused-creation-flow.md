@@ -1,5 +1,15 @@
 # TASK-1552 — Composer del Producer de Globe · Flow Contract
 
+## Delta 2026-08-21 — cambio de fondo dentro de la secuencia de gasto
+
+`backgroundMode` es parte de la recipe. Cambiar `auto ↔ opaque ↔ transparent` sigue exactamente la compuerta G1:
+invalida el estimate de inmediato, conserva el valor anterior atenuado, deshabilita Generate y solicita un estimate
+nuevo después del debounce. No cambia ruta/modelo, no borra prompt/referencias y no dispara prepare/execute.
+
+La ruta decide qué valores existen. Un valor no soportado nunca llega al flujo de gasto; aparece fijo, ausente o
+deshabilitado con razón según el descriptor. Cuando `transparent` termina, el manifest sólo lo registra como modo
+efectivo si el readback de bytes confirma alfa; el browser no lo deduce por la apariencia del asset.
+
 > **Migrado 2026-07-25** desde `TASK-1564`, retirada por duplicación. El dueño del composer es `TASK-1552`.
 
 
@@ -139,8 +149,10 @@ misma clave de idempotencia. Si el refresh falla:
 El canary tiene que ejercitar la secuencia completa, no los pasos por separado:
 
 1. escribir prompt → estimar → cambiar cantidad → **afirmar que Generar quedó deshabilitado**;
-2. esperar el nuevo estimado → afirmar habilitado;
-3. doble click en Generar → **contar una** llamada a `execute`;
-4. afirmar que la clave de idempotencia del `execute` **es igual** a la del `prepare`;
-5. matar la sesión entre `prepare` y `execute` → afirmar un refresh, un reintento, **misma clave**;
-6. cancelar → afirmar que la UI dice "cancelación pedida" y no "cancelado".
+2. seleccionar `Fondo transparente` → afirmar estimate stale inmediato, mismo routeId/modelo y recipe/fingerprint distinta;
+3. esperar el nuevo estimado → afirmar habilitado;
+4. doble click en Generar → **contar una** llamada a `execute`;
+5. afirmar que la clave de idempotencia del `execute` **es igual** a la del `prepare`;
+6. matar la sesión entre `prepare` y `execute` → afirmar un refresh, un reintento, **misma clave**;
+7. cancelar → afirmar que la UI dice "cancelación pedida" y no "cancelado";
+8. completar un run transparente → verificar metadata + PNG/WebP + canal alfa por readback, no sólo la apariencia.

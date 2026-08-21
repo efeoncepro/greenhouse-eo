@@ -1,5 +1,69 @@
 # TASK-1633 — Globe Producer Creative Operation, Input Roles and Control Support Contract
 
+## Delta 2026-08-21 — transparencia como forma de salida de imagen
+
+Este delta absorbe el contrato compartido requerido para exponer fondos transparentes en Globe sin crear una
+task híbrida ni convertir la transparencia en un control creativo. `TASK-1633` conserva la autoridad sobre
+`RouteCreativeContractV1`, `RouteConstraintsV1`, `OutputShapeV1` y los fingerprints; `TASK-1553` implementa el
+catálogo/adapter de GPT Image 2 y `TASK-1552` consume la capacidad en el composer.
+
+La decisión aplica ADR-022: el fondo es **forma de salida**, igual que ratio/resolución, y no pertenece a
+`creativeControls` ni al prompt. El contrato público propuesto es:
+
+```ts
+type ImageBackgroundModeV1 = 'auto' | 'opaque' | 'transparent'
+
+type ImageOutputShapeV1 = Readonly<{
+  modality: 'image'
+  quality: string
+  aspectRatio: string
+  count: number
+  backgroundMode?: ImageBackgroundModeV1 // V1 legacy read; prepare siempre materializa el default de ruta
+}>
+```
+
+`ImageRouteConstraintsV1` agrega un bloque explícito
+`backgroundMode: { allowed, default, preview? }`: `allowed` enumera valores, `default` fija la lectura/escritura
+canónica y `preview` identifica opciones que requieren disclosure sin inventar un estado de disponibilidad. `auto`
+es el default compatible para snapshots/pedidos legacy; una ruta con un solo valor lo proyecta como hecho fijo,
+no como selector. El manifest conserva el modo pedido y el modo efectivo cuando el proveedor lo informa, porque
+`auto` puede resolver a `opaque` o `transparent`.
+
+Evidencia de proveedor validada 2026-08-21: la API oficial de OpenAI acepta `background` =
+`transparent | opaque | auto`; GPT Image 2 ofrece transparencia en preview y exige `png` o `webp` (no `jpeg`).
+Fuentes:
+[Image generation guide](https://developers.openai.com/api/docs/guides/image-generation#customize-image-output) y
+[Create image reference](https://developers.openai.com/api/reference/resources/images/methods/generate).
+
+### Criterios adicionales del contrato
+
+- [x] `ImageOutputShapeV1` y `ImageRouteConstraintsV1.backgroundMode = { allowed, default, preview? }` modelan
+      el fondo sin duplicarlo en `creativeControls`; `auto` preserva la lectura de pedidos/snapshots legacy.
+- [x] Catálogo, validators, reader browser-safe, prepare/execute, snapshots y manifest transportan el valor sin
+      aceptar enums libres enviados por el browser.
+- [x] Cambiar sólo `backgroundMode` cambia el fingerprint canónico e invalida estimate, approval e idempotencia,
+      aunque la rate efectiva resulte igual.
+- [x] Una ruta que no declara `transparent` falla antes del estimate/reserva/provider submit con una razón
+      canónica `route_output_background_unsupported` (o equivalente nombrado) clasificada `terminal`.
+- [x] Un output efectivo `transparent` sólo admite `image/png` o `image/webp`; el readback verifica encoding con
+      alfa y al menos un píxel no opaco antes de publicar el asset como transparente.
+- [x] Manifest/lineage distinguen `requestedBackgroundMode` de `effectiveBackgroundMode`; no infieren
+      transparencia sólo por extensión/MIME ni pierden el valor resuelto cuando el pedido fue `auto`.
+- [x] Golden tests prueban compatibilidad legacy, invalidación por modo, rechazo de ruta/format incompatibles y
+      readback alfa positivo/negativo.
+
+Fuera de alcance: quitar el fondo de una imagen existente, inpainting/máscaras y habilitar transparencia en rutas
+que no la declaren. Esas capacidades requieren su contrato de edición y evidencia por ruta.
+
+### Ejecución local 2026-08-21
+
+Implementado en Globe: `ImageBackgroundModeV1`, constraints route-driven, canonicalización legacy a `auto`,
+transporte por estimate/prepare/execute/provider, requested/effective en manifest, metadata por output y QC alfa
+decodificado en el driver. Cambiar el fondo entra en la recipe/fingerprint; una ruta incompatible conserva el
+`invalid_request` público sanitizado y registra `route_output_background_unsupported`, clasificado `terminal`.
+`pnpm check` y `pnpm build` pasan en Globe. Pendiente: proyección requested/effective al feed/viewer y verificación
+live; los checks locales no acreditan despliegue.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

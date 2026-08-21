@@ -7,7 +7,7 @@
 > sustenta en `globe.production-routing` + `globe.model-readiness.*`. Este documento es el mapa
 > legible que reconcilia ambas autoridades.
 >
-> **Creado:** 2026-07-24 (TASK-1553). **Última actualización:** 2026-08-07.
+> **Creado:** 2026-07-24 (TASK-1553). **Última actualización:** 2026-08-21.
 > **Contrato técnico:** `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`,
 > `EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`, `EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md` (ADR-013).
 
@@ -67,6 +67,14 @@ es `routeId + capability + provider + model + version/endpoint + region + comple
 - “Imagen 2 de ChatGPT” corresponde a **GPT Image 2**: `ref/still/openai-v2` / OpenAI / `gpt-image-2` / `2026-04-21` /
   `openai.gpt-image-2` / `us-central1` / `poll`. Globe expone generación prompt-only con PNG; `/v1/images/edits` queda fuera
   hasta implementar un transporte multipart y una ruta gobernada propia.
+- **Delta de proveedor 2026-08-21:** OpenAI documenta `background: transparent` para GPT Image 2 en preview con
+  PNG/WebP. El checkout local de Globe ya transporta `backgroundMode`, lo compila para GPT Image 2, persiste
+  requested/effective y verifica alfa decodificado; la ruta mantiene PNG. La variante sigue `gated` porque no hubo
+  deploy, canary facturable ni readback live, aunque la generación prompt-only conserve su estado leído.
+  Matriz: [`OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`](../../architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md).
+- **Sunset requerido:** OpenAI anunció el retiro de `gpt-image-1.5` para el 2026-12-01. La ruta
+  `ref/still/openai-v1-5` necesita ficha propia, plan de retiro y readback antes de cualquier cambio; no debe seguir
+  como fallback silencioso de transparencia. Esta nota no modifica disponibilidad: el reader live sigue mandando.
 - Seedream generación: `ref/still/rrss-v1` / Fal / `seedream-5-pro` / `v5-pro` / `fal.seedream.text-to-image` /
   `us-central1` / `webhook-and-poll`, **available**. Seedream edición: `ref/still/reference-v1` / Fal /
   `seedream-5-pro-edit` / `v5-pro` / `fal.seedream.edit` / `us-central1` / `webhook-and-poll`, contrato
