@@ -9,7 +9,7 @@
 ## Status
 
 - Lifecycle: `to-do`
-- Priority: `P1`
+- Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
@@ -20,7 +20,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `sync`
-- Epic: `none`
+- Epic: `EPIC-041`
 - Status real: `Diagnostico verificado contra codigo y schema vivo; correccion no iniciada`
 - Rank: `TBD`
 - Domain: `crm|finance|data`
@@ -431,3 +431,26 @@ Ninguna coordinacion externa: el cambio es de codigo y de datos derivados dentro
 1. **Origen de `business_line_code`.** Las opciones son (a) derivarlo por JOIN desde donde la linea de negocio si vive — `greenhouse_commercial.contracts` tiene `originator_quote_id`, y varias tablas del schema comercial llevan la columna —, o (b) emitir `NULL::text` y aceptar la dimension nula en la snapshot. (a) preserva la dimension del dashboard y es la preferida salvo que se confirme que no existe origen canonico aguas arriba. Decidir en Discovery, con evidencia de la cadena de FK, no por conveniencia.
 2. **Mecanismo anti-regresion del Slice 4.** Cruzar columnas contra `db.d.ts` en el test es mas fuerte pero acopla el test al codegen; dejar el sanity script como gate documentado es mas debil pero mas honesto sobre que se verifica. Elegir uno y declararlo.
 3. **Alcance temporal del backfill.** `backfillMrrArrFromFirstContract` recorre desde el primer contrato. Confirmar si eso es deseable o si hay un periodo de corte comercial a partir del cual la serie tiene sentido.
+
+## Delta 2026-08-21 (2) — Medición runtime: no existen contratos `retainer`, el fix no puebla la serie
+
+Medido contra PostgreSQL el 2026-08-21, después de escribir esta task:
+
+```
+commercial_model | status | count
+project          | draft  |    22
+project          | active |     3
+```
+
+**Cero contratos `retainer`.** El materializer filtra `WHERE commercial_model = 'retainer'` (`src/lib/commercial-intelligence/mrr-arr-materializer.ts:118`). Corregir `business_line_code` deja la query ejecutable, pero devuelve **cero filas**: `greenhouse_serving.contract_mrr_arr_snapshots` seguirá vacía (verificado: 0 filas hoy).
+
+Consecuencias sobre esta task:
+
+- **Priority baja de `P1` a `P2`.** El bug de schema es real y hay que arreglarlo, pero el resultado prometido —la serie de MRR/ARR— no depende de él sino de que exista negocio recurrente modelado como `retainer`.
+- **El Slice 5 (backfill cronológico) queda sin efecto útil** mientras no haya contratos elegibles. No ejecutarlo para "dejarlo hecho": produciría una tabla vacía con más pasos y una falsa sensación de cierre.
+- El último fallo del handler es del **2026-06-22**: lleva dos meses dormido porque no llegan eventos de contratos nuevos. No está sangrando.
+- **Se agrega una pregunta previa a todo el scope**: ¿el negocio recurrente se está modelando en otra parte (project + renovación, `service_engagements`, quotes recurrentes), o simplemente no hay retainers hoy? Si es lo primero, el filtro del materializer es el bug de fondo y esta task cambia de forma. Si es lo segundo, el fix es correcto y queda esperando datos.
+
+Este delta NO invalida los Slices 1-4 ni 6: la query rota, el `maxRetries: 1`, el clasificador ciego a `42703` y el test que fabrica la columna inexistente siguen siendo defectos reales que hay que cerrar. Lo que cambia es la expectativa de valor y la urgencia.
+
+Contexto de programa: `EPIC-041`.

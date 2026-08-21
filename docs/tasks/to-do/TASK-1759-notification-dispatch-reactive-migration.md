@@ -20,7 +20,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `webhook`
-- Epic: `none`
+- Epic: `EPIC-041`
 - Status real: `Diagnostico verificado contra codigo y runtime declarado; decision de arquitectura tomada; correccion no iniciada`
 - Rank: `TBD`
 - Domain: `platform|ops|finance`
@@ -464,3 +464,33 @@ Requiere coordinacion con quien opere GCP para el flag del `ops-worker` y, si se
 2. **Medida puente.** Si el operador decide que la interrupcion no puede esperar a la migracion, declarar el secreto en el `ops-worker` restaura la entrega en minutos. Es andamiaje que se retira al cerrar el Slice 4, y reintroduce temporalmente la duplicacion de la pregunta 1. Es decision del operador, no del agente.
 3. **Alcance del corte de vigencia en el Slice 6.** Falta definir a partir de que antiguedad un evento deja de ser accionable, y si el criterio es uniforme o depende del tipo. Un aviso de orden de compra por vencer caduca distinto que un cambio de compensacion.
 4. **Ventana de timestamp del Slice 5.** Elegir la tolerancia concreta y verificar que ningun destino externo futuro quede excluido por reloj desincronizado.
+
+## Delta 2026-08-21 (2) — Medición runtime: la suscripción SÍ funcionó; es una regresión fechada
+
+Medido contra PostgreSQL el 2026-08-21, después de escribir esta task. La premisa original —"el secreto nunca estuvo declarado en el runtime del emisor, así que nunca funcionó"— es **incorrecta**:
+
+```
+    mes     |   status    | count | http
+ 2026-03-01 | dead_letter |     1 |  500
+ 2026-04-01 | succeeded   |     6 |  200
+ 2026-05-01 | succeeded   |    29 |  200
+ 2026-06-01 | succeeded   |    11 |  200
+ 2026-06-01 | dead_letter |    13 |  401
+ 2026-07-01 | dead_letter |     1 |  401
+ 2026-08-01 | dead_letter |     1 |  401
+```
+
+**46 entregas exitosas** entre 2026-04-08 y 2026-06-12. El primer `401 missing_signature` es del **2026-06-15**; los 15 restantes van hasta el 2026-08-01. El `500` de marzo es un fallo distinto y anterior. Total real: **16** dead-letters, no 15.
+
+Correcciones sobre esta task:
+
+- La pregunta de Discovery deja de ser "por qué falta el secreto" y pasa a ser **"qué cambió el 2026-06-15"**. Candidato principal: un `deploy.sh` del `ops-worker` que borró con `--set-env-vars` una variable aplicada out-of-band con `--update-env-vars`. Es exactamente el modo de falla que el propio `services/ops-worker/deploy.sh` documenta y que ocurrió el 2026-07-10 con `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED`. Verificar el historial de revisiones de Cloud Run alrededor de esa fecha antes de asumir.
+- La configuración de la suscripción está **correcta** en la base: `auth_mode='hmac_sha256'`, `secret_ref='WEBHOOK_NOTIFICATIONS_SECRET'`, `active=true`. La hipótesis (a) del `secret_ref` torcido queda descartada con evidencia.
+- Composición real de los 16: **13 `member.created`** (2026-03-29 a 2026-06-26), **2 `payroll_period.exported`** (2026-07-06 y 2026-08-01), **1 `compensation_version.created`** (2026-06-15). Ese detalle es el insumo del Slice 6: los `member.created` viejos casi con seguridad ya no son accionables.
+- Está **congelado**: el último dead-letter es del 2026-08-01, hace 20 días. No crece.
+
+**Hallazgo de seguridad adicional, no contemplado en el scope original.** El `target_url` de las suscripciones `wh-sub-notifications` y `wh-sub-canary` contiene el token `x-vercel-protection-bypass` **en texto plano como query param, persistido en `greenhouse_sync.webhook_subscriptions`**. Viola la regla de no poner datos sensibles en URLs y deja un secreto de bypass en una columna legible. Agregar al Slice 4: al retirar la suscripción, el token queda igualmente expuesto en la fila histórica y en `wh-sub-canary`, que sigue activa. Decidir rotación con el operador.
+
+La decisión de arquitectura del `Detailed Spec` —migrar a projection reactiva— **se sostiene sin cambios**: sigue siendo cierto que la primitiva canónica ya existe, que `finance.dte.discrepancy_found` está duplicado en ambos caminos, y que ninguna de las tres suscripciones reales tiene un destino externo verdadero.
+
+Contexto de programa: `EPIC-041`.

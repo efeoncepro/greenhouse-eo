@@ -394,3 +394,9 @@ Notas de gobernanza que esta umbrella deberia absorber:
 - El bloqueo de `agentAutomationSafe=false` que esta umbrella se autoimpone es circular: el programa que corregiria el timeout esta gobernado por el flag que el timeout mantiene en `false`. Corregir la composicion del composer lo rompe.
 
 Quedan sin dueño en esta umbrella: `hubspot_services_intake` degradado, el drift fiscal de Finance, las transiciones no capturadas de Delivery/Notion (con un writeback de ~79,6 dias que precede a ambas umbrellas), los leads de Growth que no llegaron a HubSpot, y el forecast de costo de Cloud Run.
+
+## Delta 2026-08-21 (2) — Superseded por EPIC-041
+
+La medición contra el runtime del 2026-08-21 mostró que varios hallazgos de esta umbrella estaban mal calibrados o eran falsos positivos, y que el problema más caro de la plataforma no aparecía en ninguna de sus filas. El programa de reparación vive ahora en `docs/epics/to-do/EPIC-041-reliability-remediation-verified-findings.md`, con baseline medido y fechado, ownership por carril y orden de ejecución.
+
+Esta umbrella se cierra como superseded: no ejecutar su lista original sin contrastarla contra el baseline de EPIC-041.
