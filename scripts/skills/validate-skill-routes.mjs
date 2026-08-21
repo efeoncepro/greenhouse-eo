@@ -22,7 +22,8 @@ import { join, dirname, resolve, relative } from 'node:path'
 import { homedir } from 'node:os'
 
 const REPO = resolve(new URL('../..', import.meta.url).pathname)
-const ROOTS = [join(homedir(), '.claude/skills'), join(REPO, '.codex/skills'), join(REPO, '.claude/skills')]
+const REPO_SKILL_ROOTS = [join(REPO, '.codex/skills'), join(REPO, '.claude/skills')]
+const ROOTS = [join(homedir(), '.claude/skills'), ...REPO_SKILL_ROOTS]
 const DEFAULT_SKILLS = ['tailwind-engineer', 'css-architect', 'html-react-engineer']
 
 const all = process.argv.includes('--all')
@@ -43,6 +44,7 @@ const skillsIn = root =>
         const p = join(root, d)
 
         if (!statSync(p).isDirectory()) return false
+
         
 return all ? existsSync(join(p, 'SKILL.md')) : DEFAULT_SKILLS.includes(d)
       })
@@ -71,6 +73,15 @@ const crossSkillCandidates = ref => {
 
   return roots ? roots.map(r => join(r, ...parts.slice(1))) : []
 }
+
+// Algunas skills declaran una referencia canónica en el bundle del otro runtime para evitar
+// duplicarla (p. ej. DataForSEO: Codex lee `references/` desde el bundle Claude del repo). La ruta
+// sigue siendo válida para la misma skill, pero no debe resolverse accidentalmente contra una
+// instalación global distinta de este checkout.
+const counterpartSkillCandidates = (skill, ref) =>
+  (skillIndex.get(skill) ?? [])
+    .filter(root => REPO_SKILL_ROOTS.some(repoRoot => root.startsWith(`${repoRoot}/`)))
+    .map(root => resolve(root, ref))
 
 let checked = 0
 const broken = []
@@ -114,6 +125,7 @@ for (const root of ROOTS) {
         const candidates = [
           resolve(dirname(file), expanded), // relativa al archivo
           resolve(skillRoot, expanded), // relativa a la raíz de la skill
+          ...counterpartSkillCandidates(skill, expanded), // mismo nombre, runtime hermano del repo
           resolve(REPO, expanded), // anclada al repo
           expanded, // absoluta (o `~/…` ya expandida)
           ...crossSkillCandidates(ref) // `otra-skill/references/x.md`

@@ -1,6 +1,6 @@
 ---
 name: resend-email-platform
-description: Operar Resend como plataforma de correo de Greenhouse — envío, idempotencia, dominios y subdominios, tracking (open/click), webhooks y firma Svix, reintentos y replay, reconciliación de estado, suppression list, entregabilidad, límites y errores. Invócala al tocar `src/lib/email/**`, el handler `/api/webhooks/resend`, la configuración de dominios en Resend, cualquier flujo con bearer/magic link por correo, o al diagnosticar por qué un correo no llegó. Verificada contra docs oficiales as-of 2026-08-19.
+description: Operar Resend como plataforma de correo de Greenhouse — envío, idempotencia, dominios y subdominios, tracking (open/click), webhooks y firma Svix, reintentos y replay, reconciliación de estado, suppression list, entregabilidad, límites y errores. Invócala al tocar `src/lib/email/**`, el handler `/api/webhooks/resend`, la configuración de dominios en Resend, cualquier flujo con bearer/magic link por correo, o al diagnosticar por qué un correo no llegó. Verificada contra docs oficiales as-of 2026-08-20.
 ---
 
 # Resend — plataforma de correo
@@ -9,9 +9,10 @@ Resend es la infraestructura de correo **global** de Greenhouse: no es de Hiring
 Finance. Un cambio acá los afecta a todos, y esa es la primera cosa que hay que tener presente antes
 de tocar nada.
 
-Convención de esta skill: **[DOC]** = documentado por el proveedor · **[INF]** = inferido con la
-cadena de evidencia declarada · **[NO-DOC]** = confirmado ausente de la documentación. Cuando algo es
-`[NO-DOC]`, la respuesta correcta es verificarlo empíricamente, no completarlo con intuición.
+Convención de esta skill: **[DOC]** = documentado por el proveedor · **[OBS]** = observado en runtime
+· **[INF]** = inferido con la cadena de evidencia declarada · **[NO-DOC]** = confirmado ausente de la
+documentación. Cuando algo es `[NO-DOC]`, la respuesta correcta es verificarlo empíricamente, no
+completarlo con intuición.
 
 ## Los cinco invariantes que más caro cuestan
 
@@ -22,18 +23,20 @@ href>`**, y lo que le pasa a un fragmento (`#access=TOKEN`) **no está documenta
 el link abre, la página carga, y el usuario no tiene acceso. Peor: el `tracking_subdomain`
 **no se puede remover, sólo cambiar** [DOC], así que configurarlo es una decisión irreversible.
 
-**El flag basta para que el rewrite ocurra. `tracking_subdomain` NO es un segundo candado.**
-Es fácil leer la documentación al revés — yo lo hice el 2026-08-19 y me costó un diagnóstico
-equivocado. `tracking_subdomain` sirve para usar un **dominio de tracking propio** (branding y
-reputación aislada); sin él, Resend reescribe igual usando su infraestructura compartida.
+**La documentación actual declara un doble candado: flag + tracking subdomain verificado.**
+Desde el readback documental del 2026-08-20, el tracking sólo está activo cuando
+`open_tracking|click_tracking` está habilitado **y** existe un `tracking_subdomain` verificado.
+No obstante, el runtime observado el 2026-08-19 produjo eventos `email.clicked` con
+`tracking_subdomain=None`. Esa contradicción se trata como drift, no como permiso para confiar en
+un solo campo: en links con secreto, apaga `click_tracking` y prueba el href realmente recibido.
 
 Evidencia empírica del repo: `efeoncepro.com` tenía `click_tracking=true` y
 `tracking_subdomain=None`, y aun así llegaron eventos `email.clicked` **firmados por webhook** sobre
 correos reales de candidatos. El rewrite estaba ocurriendo.
 
-Corolario: **para saber si un dominio reescribe links, mira el flag, no el subdominio.** Y si quieres
-certeza, busca eventos `clicked` con `event_source='webhook'` — un clic registrado sólo puede existir
-si hubo rewrite.
+Corolario: **ningún readback aislado demuestra que un link sensible quedó intacto.** Comprueba flag,
+subdominio y DNS en `GET /domains/{id}`; para certeza de comportamiento, usa un correo canary y el
+href recibido. Un evento `clicked` firmado demuestra que hubo rewrite.
 
 **El readback se hace con `GET /domains/{id}`, nunca con `PATCH` ni con `list`** [DOC]. El `PATCH`
 devuelve sólo `{object, id}` — no confirma el estado resultante. El `list` omite los DNS records.
@@ -42,10 +45,10 @@ devuelve sólo `{object, id}` — no confirma el estado resultante. El `list` om
 tracking propio. Comprobar `efeoncepro.com` cuando el correo sale de `avisos.efeoncepro.com` da falso
 verde.
 
-**Un envío a una dirección suprimida NO falla** [DOC]: devuelve éxito de API y dispara
-`email.suppressed`. Si tu lógica de reintento sólo mira 4xx/5xx, nunca se entera de que ese correo
-jamás va a llegar, por más que reintentes. La suppression list es **team-wide**: afecta todos los
-dominios y subdominios de la cuenta.
+**Un envío a una dirección suprimida puede quedar aceptado sin entrega** [OBS]: Greenhouse observó
+un ID de proveedor seguido de `email.suppressed`; la documentación confirma que Resend omite el
+despacho. Si tu lógica sólo mira 4xx/5xx, nunca se entera de que ese correo no llegará. La
+suppression list es **team-wide**: afecta todos sus dominios y subdominios.
 
 ## Cómo decidir dónde vive cada correo
 
