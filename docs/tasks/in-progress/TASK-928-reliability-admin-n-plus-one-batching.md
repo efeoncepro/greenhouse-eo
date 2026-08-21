@@ -232,3 +232,17 @@ Diagnostico verificado en codigo durante la revision de los hallazgos de confiab
 - [ ] `agentAutomationSafe` vuelve a `true` en staging cuando los modulos requeridos estan sanos, y sigue en `false` cuando alguno esta realmente en error — es decir, el flag vuelve a distinguir ambos casos.
 - [ ] Latencia del overview directo medida antes y despues, con ambos numeros registrados.
 - [ ] `TASK-1710` y `TASK-1432` reciben `Delta` indicando que el carril de control plane quedo cubierto por esta task.
+
+### Corrección 2026-08-21 al Delta anterior — parte del trabajo ya está entregada
+
+Al releer `## Implementation Progress 2026-05-24` de esta misma task, el punto 1 del Delta anterior queda mal descrito. Ese registro dice:
+
+> *"Platform Health: `fetchAllSources()` reutiliza las promises de operations y synthetics y las entrega como preloaded sources a `getReliabilityOverview()` cuando estan sanas."*
+
+Es correcto y está en el código: las promesas **se comparten**, no se piden dos veces. Esa mitad ya se hizo.
+
+Lo que queda es más chico y más quirúrgico de lo que decía el Delta: **el cronómetro de 6000 ms de `reliability_control_plane` arranca antes de esperar esas promesas compartidas**. En `src/lib/platform-health/composer.ts:273-291`, `withSourceTimeout` inicia su presupuesto y lo primero que ejecuta dentro es `await Promise.all([operationsPromise, syntheticsPromise])`, cuyos presupuestos propios son 5000 ms y 3000 ms. El problema no es "se pide dos veces" — es **"el reloj corre mientras espero a otro"**.
+
+Por lo tanto el arreglo no es reutilizar las promesas (ya está), sino **sacar la espera de dentro del presupuesto**: resolverlas antes de abrir el cronómetro del control plane y pasar los valores ya materializados, o descontar del presupuesto del control plane el de sus dependencias.
+
+El resto del Delta anterior — la cadena de 157 `await` secuenciales, la falta de `durationMs` por fuente, y la prohibición de subir el timeout — se mantiene sin cambios.

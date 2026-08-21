@@ -101,6 +101,10 @@ A esto se suma la falta de señales para clases de fallo enteras: no existe señ
 - `TASK-1758` — drift de schema de `contract_mrr_arr`. **Corregir**: baja a P2 y declarar que con cero contratos `retainer` el fix no puebla la serie. El bug es real; el valor prometido no.
 - `TASK-1759` — transporte de notificaciones fuera del bus de webhooks. **Corregir**: la premisa cambia de "nunca funcionó" a "regresión del 2026-06-15 tras 46 entregas exitosas". La decisión de arquitectura (migrar a projection reactiva) se sostiene.
 
+### Creadas por este epic
+
+- `TASK-1760` — cablear la materialización reactiva de PPM y retenciones. **Punto 1 del orden de ejecución tras el Delta (4)**: único carril con hueco fiscal que crece un mes por mes, y con arreglo conocido y acotado porque el materializador ya existe. Hija de `TASK-1186`, que coordina ambas líneas y declara que sus hijos aportan sus propios files.
+
 ### Deltas en la task que ya posee la superficie — NO crear tasks nuevas
 
 - `TASK-928` (`in-progress`) — presupuesto anidado del composer de `platform-health`. Delta ya aplicado el 2026-08-21 con 9 criterios. **Rompe el bloqueo circular: va primero.**
