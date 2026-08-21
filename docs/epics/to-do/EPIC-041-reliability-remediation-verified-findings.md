@@ -195,3 +195,82 @@ Consecuencias, y son de método más que de finanzas:
 - **Acción concreta que sí queda**: actualizar el `notes` de esa fila por migración gobernada — nunca por `UPDATE` manual — para que declare la tasa como definida, con su fecha y su origen. Sin eso, el próximo barrido vuelve a levantar la misma falsa alarma.
 
 **Lo único que sobrevive del carril PPM** es que el materializador no corre desde el `2026-06-20`: `2026-07` y `2026-08` no tienen posición materializada. Degrada honestamente (`ppm: null`, el consumer distingue "sin materializar" de "cero"), así que no produce un número falso — pero si el contador necesita la línea PPM de esos meses, no está. Ese sí es un gap operativo real, y su dueña sigue siendo `TASK-1203`.
+
+## Delta 2026-08-21 (4) — Corrección mayor: dos de los tres titulares de este epic estaban mal encuadrados
+
+Tres subagentes verificaron contra runtime las premisas del epic. Dos hallazgos centrales resultaron incorrectos y uno encontró por fin su causa. **Leer esto antes que el baseline: el baseline sigue siendo cierto en sus cifras, pero su interpretación cambió.**
+
+### 4.1 — Las facturas a HubSpot NO son un P0 de CLP 141.562.545
+
+**El puente nunca se terminó de construir.** `pushIncomeToHubSpot` hace `POST /invoices` contra el bridge Cloud Run `hubspot_greenhouse_integration`. Ese endpoint **no existe**: el servicio implementa `/quotes` (`services/hubspot_greenhouse_integration/app.py:1534`) y nunca se escribió `/invoices` — `git log -S "/invoices" -- services/` no devuelve un solo commit en ninguna rama. `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md:1170` lo lista como follow-up pendiente.
+
+Además la premisa de diseño de `TASK-524` no coincide con la realidad de los datos: asumía que el income nacería de cotizaciones heredando anchors, pero **80 de 84 filas vienen de Nubox**, que estructuralmente nunca traerá `hubspot_company_id`. Ni las 4 que sí nacieron de cotización tienen anchors, porque sus quotes de origen tampoco los tienen.
+
+El bridge **nunca ejecutó una sola llamada HTTP**: las 83 se detienen en el guard de anchors antes del `fetch`. Cero llamadas, cero fallos de red, cero contrato ejercido contra HubSpot.
+
+`TASK-524` está en `complete/` con **todos sus checkboxes sin marcar**, incluido *"validación manual en staging del flujo quote issued → income materialized → outbound HubSpot trace"*. Es una task cerrada sin verificar.
+
+**Corrección del encuadre:** no hay dinero perdido. Nubox es el emisor tributario legal y `greenhouse_finance.income` es el SoT financiero; HubSpot solo iba a ser un espejo read-only para continuidad de CRM. Lo real es **ruido P3**: ~2.400 eventos/mes contra un endpoint inexistente.
+
+**Y lo que sí funciona son las cotizaciones**: 65 de 108 tienen `hubspot_quote_id` y sincronizaron el 2026-08-21. Lo accionable de este carril son los lanes `quotation_hubspot_outbound:issued` y `:sent`, degradados desde 2026-04-19 — no las facturas.
+
+Antes de reabrir el bridge hay que **reabrir la pregunta de diseño**: si se quiere continuidad factura↔deal, la vía verosímil es una property `ef_*` o una nota en el Deal — el patrón que el resto del repo ya usa — no crear objetos Invoice nativos, cuya creación vía API es restringida. El análisis de ANAM (`docs/architecture/kortex/hubspot-as-a-service/anam-billing-event-hubspot-decision-v1.md:179`) ya rechazó el Invoice nativo como modelo primario.
+
+### 4.2 — El fix de `skipped` apuntaba al mecanismo equivocado y no habría arreglado nada
+
+La sección `Cegueras estructurales` de este epic dice que `skipped` cuenta como éxito en `src/lib/sync/handler-health.ts:41-45`. **Eso es cierto y es irrelevante**: medido contra la base, `skipped` es prácticamente código muerto.
+
+```
+income_hubspot_outbound → coalesced: 9.083 | no-op: 3.083 | skipped: 0
+Filas que empiezan con 'skipped' en TODA la tabla: 4 (la última, 2026-04-12)
+```
+
+Los 9.001 falsos éxitos los produce **`no-op`**, no `skipped`. El consumer envuelve los resultados con `coalesced:` y el skip queda *dentro* del mensaje, no en el prefijo: `coalesced:income_hubspot_outbound INC-NB-…: skipped_no_anchors`. Ambos prefijos caen en `isSuccessOutcome`.
+
+**Sacar `'skipped'` de esa lista se habría desplegado, habría pasado los tests, no habría roto nada y no habría arreglado nada** — dejando la impresión de que el problema quedó cerrado.
+
+Riesgos adicionales que el análisis de blast radius encontró y que el plan original no veía:
+
+- **No existe un solo test** de `recordHandlerOutcomes` ni de `classifyOutcome`, y la llamada está envuelta en un `try/catch` que sólo hace `console.warn`: un bug en esa state machine no rompe tests ni rompe el worker.
+- Hacer `skipped` neutro sin tocar el `CASE ... ELSE 0` de `consecutive_successes` **resetearía la racha** de handlers sanos, y `current_state` se volvería **pegajoso**: un handler que dead-letteó una vez y luego sólo salta quedaría `failed` para siempre sin camino de vuelta.
+- Ningún consumer de `handler_health` **bloquea** nada — ni deploys, ni `agentAutomationSafe`, ni gates de CI. Es todo informativo. Baja el riesgo del cambio y también su urgencia.
+
+**Camino correcto, en orden inverso al propuesto:** (1) señal aditiva que detecte "handler con muchos saltos y cero trabajo real", cruzando `outbox_reactive_log` con el estado real del dominio — cero blast radius, reversible borrando una fila del registry; (2) con tests escritos primero, distinguir en el **origen** entre skip terminal y skip bloqueado, con un outcome propio, que es donde vive el conocimiento semántico.
+
+### 4.3 — PPM: la causa es que nunca se cableó, no la tasa
+
+`grep -rn "ppm" src/lib/sync/projections/` devuelve **cero**. IVA tiene projection reactiva registrada (`vat-monthly-position.ts`, registrada en `index.ts:170`) con 6 event triggers y endpoint en el ops-worker; **PPM y retenciones no tienen projection, ni cron de Vercel, ni job de Cloud Scheduler** entre los 57 declarados. Las 19 filas del `2026-06-20` son un backfill manual único de `TASK-1204`, cuya propia spec asumía *"la re-materialización corre por ops-worker/cron o endpoint admin existente"* — un cron que nunca existió. Los únicos callers de `materializePpmForPeriod` son su propio wrapper y su test: **ningún caller de runtime**.
+
+La ruta `/api/finance/ppm/monthly-position` es read-only pura: nunca materializa.
+
+**Consecuencia medida:** julio y agosto tienen income real (`CLP 5.800.000` de base cada mes) y **cero** posición PPM. A la tasa correcta de 0,125%, son `CLP 7.250` por mes sin calcular. Montos menores, pero el hueco es estructural y crece un mes por mes.
+
+**Y el signal de drift no puede verlo, por construcción:** `ppm-position-drift.ts:46` parte `FROM ppm_monthly_positions LEFT JOIN recomputed`, así que un período **sin fila** no entra en el `FROM`. Los 8 que reporta son bases stale; los 2 períodos huérfanos son invisibles. Es la misma bug class que el resto del epic: la ausencia no se distingue del cero.
+
+El arreglo mínimo es registrar una projection PPM/retención con los mismos `triggerEvents` que la de IVA. El materializador ya existe y funciona; le falta el cable.
+
+### 4.4 — Las notificaciones SÍ funcionan hoy
+
+Corrección a lo que este epic implicaba. `greenhouse_notifications.email_deliveries` muestra actividad continua los últimos 7 días, **100% `sent`, cero `failed`, cero `bounced`** (48 el 2026-08-19, 7 el 2026-08-20). Los 12 handlers `notification_dispatch:*` están `healthy` con `consecutive_failures = 0`.
+
+El webhook `wh-sub-notifications` es un **carril secundario paralelo** que apunta a staging (`dev-greenhouse.efeoncepro.com`), no el camino principal.
+
+Lo que sí se perdió, evento por evento:
+
+| Evento | ¿Se pierde algo hoy? |
+| --- | --- |
+| `payroll_period.exported` | **No** — lo cubre la projection `payroll_export_ready_notification` |
+| `assignment.*` | **No** — cero eventos emitidos en 120 días. Bomba dormida: en cuanto alguien mueva una asignación, ese aviso tampoco saldrá |
+| `member.created` | **SÍ** — 13 dead-letters (HTTP 500, no 401). `notification_log` categoría `system_event` última fila `2026-06-12`. Cada colaborador nuevo desde entonces no generó su aviso a admins |
+| `compensation_version.created` | **SÍ** — "Tu compensación fue actualizada". Última entrega exitosa `2026-06-01`; el evento del `2026-06-15` murió. **A la persona a la que le cambiaron la compensación no se le avisó** |
+
+Esos dos avisos huérfanos son el hallazgo con consecuencia humana directa de todo el epic, y son mucho más chicos y más concretos que el titular con el que empezó.
+
+### Qué cambia en el orden de ejecución
+
+1. La conversación con el contador sobre la tasa: **eliminada** (Delta 3).
+2. El bridge income→HubSpot como P0: **degradado a P3** — silenciar el lazo de ruido y reabrir la pregunta de diseño. No es reparación, es decisión de producto.
+3. El fix de `skipped`: **reemplazado** por señal aditiva primero, tests después, outcome nuevo en el origen al final.
+4. **Sube al primer lugar** cablear la projection de PPM/retenciones: es el único con hueco fiscal creciente y el arreglo es conocido y acotado.
+5. **Sube al segundo lugar** los dos avisos huérfanos (`member.created`, `compensation_version.created`): consecuencia humana directa, alcance chico.
+6. `TASK-928` (composer) se mantiene donde estaba: barato y desbloquea interpretación.
