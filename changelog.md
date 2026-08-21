@@ -3,6 +3,17 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-21 — Hiring incorpora un plan gobernado para crear la cuenta Microsoft del nuevo colaborador
+
+- `TASK-1761`, anclada a `EPIC-011`, separa la cuenta Entra deshabilitada, su binding OID, la habilitación laboral
+  y el readiness M365; no trata selección, handoff ni `member.created` como permiso suficiente.
+- El ADR Proposed elige API-driven inbound provisioning con app dedicada, matching por ancla longitudinal y
+  reconciliación de logs; rechaza `POST /users`, email/UPN como identidad y grupo/licencia antes del OID binding.
+- Quedan documentados dos blockers P0 previos al canary: `accountEnabled=false` no puede apagar el principal `/my`
+  y el roundtrip SCIM debe actualizar la misma persona sin crear otro principal/member.
+- Azure no se modificó. El snapshot read-only no muestra capacidad libre de Microsoft 365 ni grupo de
+  licenciamiento válido; ADR, licencia, app/consent, security group y canary siguen pendientes.
+
 ## 2026-08-21 — La revisión de confiabilidad pasa de reportar síntomas a medir causas
 
 - `EPIC-041` reemplaza a `TASK-1432` y `TASK-1710`, dos umbrellas P0 que describían el mismo incidente con un mes
@@ -956,25 +967,3 @@ completo — escaneada por los dos motores, limpia y adjunta en 129 ms. La issue
 doble incidente quedó resuelta y la task de provisión cerrada. Costo steady del
 servicio: ≈USD 19/mes. Recursos Humanos descarta la postulación de prueba desde el
 Hiring Desk.
-
-## 2026-08-11 — El flag del escáner falló dos veces en producción; causa raíz cerrada en código
-
-Corrección al estado que reporta la entrada siguiente: en producción el escáner de
-firmas quedó **apagado**. Prenderlo falló dos veces el mismo día bloqueando CVs de
-candidatos reales (recuperados todos, 5+1): primero porque el código estaba sólo en
-`develop` y producción sirve `main`; después —con el código ya promovido— porque
-producción resuelve credenciales GCP por service account key (postura transicional,
-TASK-800) y el camino de ID tokens del scanner no tenía esa rama: caía a un método
-que exige credenciales ambiente que Vercel no tiene, y fallaba en 21 ms. Staging
-nunca lo mostró porque usa la rama WIF, que sí existía.
-
-El fix agrega la rama de service account key al resolver canónico
-(`src/lib/google-credentials.ts`), con el plan de credencial exportado y testeado
-contra los shapes exactos de producción y staging, y nace el endpoint de diagnóstico
-`GET /api/internal/health/scanner-auth`: acuña el ID token en el runtime donde corre
-y opcionalmente golpea el `/scan` real, sin tocar el path de uploads. Es la
-verificación que faltó dos veces — probar con la identidad del operador no prueba
-nada sobre el runtime. Verificado con la credencial real de producción: token en
-120 ms y el Cloud Run lo aceptó. El flag se re-prende recién cuando el endpoint
-responda verde EN producción (ISSUE-150 tiene la secuencia exacta). Staging sigue
-operativo end-to-end.

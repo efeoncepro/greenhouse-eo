@@ -104,8 +104,10 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- Bloquea `TASK-1732`; impacta TASK-1721 checkpoints y `/my` capability refresh.
+- Bloquea `TASK-1732` y `TASK-1761`; impacta TASK-1721 checkpoints y `/my` capability refresh.
 - TASK-1721 registra/readback `principal_bound` y `workforce_enabled`, pero no ejecuta writes de Identity.
+- TASK-1761 consume ambos checkpoints para Microsoft Entra; no amplía el significado de `workforce_enabled` ni
+  mete Graph/SCIM/licencias dentro de esta task.
 
 ### Files owned
 
@@ -272,6 +274,7 @@ Reglas obligatorias:
 - Cambiar la decisión Hiring, autoaprobar handoff, completar intake/readiness o fusionar identidades automáticamente.
 - Invocar `provisionInternalCollaboratorFromScim` desde Hiring o exigir Entra para preservar una cuenta candidata.
 - Otorgar capabilities payroll/leave/performance por selección, handoff aprobado o member `pending_intake`.
+- Crear, habilitar, licenciar o deshabilitar cuentas Microsoft Entra; eso pertenece a `TASK-1761`.
 
 ## Detailed Spec
 
@@ -347,4 +350,10 @@ refresh periódico de cinco minutos no cuenta como revocación correcta.
 
 ## Follow-ups
 
-- `TASK-1732`, `TASK-1733`.
+- `TASK-1732`, `TASK-1733`, `TASK-1761`.
+
+## Delta 2026-08-21 — consumer Microsoft Entra separado
+
+`TASK-1761` queda como follow-on explícito de los checkpoints de esta task. `principal_bound` permite solicitar una
+cuenta Entra deshabilitada, pero `workforce_enabled` no equivale por sí solo a licencia o readiness M365. El bridge
+Microsoft debe preservar el mismo principal longitudinal y nunca mapear `accountEnabled=false` a apagar `/my`.

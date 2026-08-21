@@ -2,6 +2,27 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-21 — TASK-1761 formaliza Hiring → Microsoft Entra; implementación bloqueada por ADR y gates P0
+
+Se creó `TASK-1761` dentro de `EPIC-011` y el ADR Proposed
+`GREENHOUSE_HIRING_ENTRA_WORKFORCE_ACCOUNT_PROVISIONING_DECISION_V1.md`. La decisión propone API-driven inbound
+provisioning con app dedicada: cuenta disabled-first desde `principal_bound`, reconciliación de provisioning logs,
+OID binding al mismo principal antes del SCIM de retorno, y enable/grupo/licencia sólo después de
+`workforce_enabled`, approval y capacidad verificada. TASK-1721 observa checkpoints; 770/1731 mantienen sus
+owners; 872 conserva Entra → Greenhouse; 1349 entrega el hecho de baja y 1761 compensa en Microsoft.
+
+Dos gates P0 salieron de la revisión adversarial: `src/lib/entra/profile-sync.ts` hoy convierte
+`accountEnabled=false` en `client_users.active=false`, por lo que una precreación segura podría apagar `/my`; y
+meter la cuenta al grupo SCIM antes de ligar el OID puede crear otro principal/member. Ambos se convirtieron en
+precondiciones de canary con negative/roundtrip tests. Email/UPN no son anchor; `202` no es éxito; rollback exige
+disable/revoke/remove group-license y no sólo flag OFF.
+
+Azure CLI fue read-only. El tenant tiene Entra P1 consumido 1/1, Microsoft 365 Business Premium consumido 6/6,
+ningún grupo con licencias y `Efeonce Group` no es security-enabled. La identidad inbound puede diseñarse, pero
+M365 readiness queda bloqueada/unknown hasta readback comercial y de assignment. TAP también quedó unknown por
+403. Estado: **diseño formalizado; ADR Proposed; ningún código/runtime/Azure mutado**. Siguiente paso: aceptar o
+ajustar el ADR y luego tomar TASK-1761 con goal + task hook.
+
 ## 2026-08-21 — Confiabilidad: hallazgos medidos contra runtime; dos umbrellas superseded por EPIC-041
 
 Codex venía reportando hace semanas dos hallazgos de confiabilidad (`wh-sub-notifications` con dead-letters `401` y

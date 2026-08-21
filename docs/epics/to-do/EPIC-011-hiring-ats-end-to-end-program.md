@@ -44,6 +44,7 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
 - `docs/architecture/GREENHOUSE_CANDIDATE_ACCOUNT_LONGITUDINAL_MY_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_CANDIDATE_SELF_SERVICE_LONGITUDINAL_MY_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_HIRING_ENTRA_WORKFORCE_ACCOUNT_PROVISIONING_DECISION_V1.md`
 
 ## Execution Sequence
 
@@ -100,6 +101,16 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   reconciliar parciales sin conceder workforce desde la decisión Hiring.
 - Gate: selected→activated conserva `user_id` e `identity_profile_id`; session refresh/revocation y retries no crean
   una segunda cuenta o member.
+
+### Phase 7B — Microsoft Entra Workforce Account Provisioning
+
+- `TASK-1761` consume `principal_bound` y `workforce_enabled` sin reabrir TASK-770/1731: provisiona primero una
+  cuenta Entra cloud-only deshabilitada, reconcilia el resultado asíncrono, liga el OID al principal existente y
+  separa enablement, grupo y licencia.
+- Gate: el fix `accountEnabled ≠ portal principal active`, uniqueness inversa del objeto externo y roundtrip SCIM
+  anti-duplicación cierran antes del canary; `m365_service_ready` exige licencia/grupo/approval readback y no se
+  confunde con `workforce_enabled`.
+- Boundary: Entra failure no revierte selección/member/workforce; TASK-1721 sólo observa status y next action.
 
 ### Phase 8 — Longitudinal People 360 Closure
 
@@ -206,6 +217,8 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   capabilities y consumidores canónicos.
 - `TASK-1731` — Selection-to-Workforce Account Continuity Bridge: mismo principal/persona, member additive,
   sessionVersion y reconciliation sobre TASK-770.
+- `TASK-1761` — Hiring-to-Entra Workforce Account Provisioning and Lifecycle Bridge: API-driven inbound sobre el
+  mismo principal, cuenta disabled-first, OID binding pre-SCIM, enable/licensing gated y Joiner-Mover-Leaver.
 - `TASK-1732` — Identity-First People 360 Hiring Journey Reader: historia pre/post-member, paginada y allowlisted.
 - `TASK-1733` — People 360 Longitudinal Hiring History UI: timeline/detail interno sobre TASK-1732.
 - `TASK-1734` — Assessment AI Scoring at Scale + Operator-Only Exception Review: run asíncrono por assessment,

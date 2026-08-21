@@ -357,6 +357,15 @@ Referencia canónica: `docs/issues/open/ISSUE-117-...`. El corazón es cerrar el
 - Posible UI/Nexa consumer para "desactivar/reactivar member" gobernado (Full API Parity) si emerge necesidad operativa.
 - Migrar el resto de consumers de "workforce activo" (people directory, account/person 360, candidatos) al reader canónico `resolveActiveWorkforceMembers()` (Slice 1b migra solo el roster gatillo; el resto queda como sweep declarado).
 - Evaluar `members.status` como state machine canónica con transiciones declaradas + audit log dedicado si hoy es free-text (arch: state-machine+CHECK+audit trio).
+- `TASK-1761` posee la compensación Microsoft de Joiner-Mover-Leaver: disable, revocación de bootstrap/sesiones y
+  retiro de grupos/licencia con readback. Esta task conserva ownership del cierre laboral/member y debe emitir el
+  hecho canónico que 1761 consume; ninguna baja de Entra mata por sí sola el principal longitudinal `/my`.
+
+## Delta 2026-08-21 — handoff de baja Microsoft
+
+El rollout real de `TASK-1761` queda bloqueado hasta probar el camino de salida integrado con esta task. Offboarding
+no hace hard-delete de la persona ni de la cuenta Microsoft: preserva historia, deshabilita acceso externo y deja
+residual-access signals en steady state cero.
 
 ## Delta 2026-07-06 — revisión tri-skill (payroll + arquitectura + finanzas)
 

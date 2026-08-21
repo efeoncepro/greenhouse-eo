@@ -69,7 +69,7 @@ servidor; principal/facetas son aditivos y una colisión ambigua bloquea auto-li
 
 ### Blocks / Impacts
 
-- Bloquea `TASK-1728`, `TASK-1729`, `TASK-1730` y `TASK-1731`.
+- Bloquea `TASK-1728`, `TASK-1729`, `TASK-1730`, `TASK-1731` y, transitivamente, `TASK-1761`.
 - Impacta auth/session, route governance y recuperación de cuenta.
 
 ### Files owned
@@ -198,4 +198,9 @@ El modelo físico debe conservar `client_users.user_id` o su alias canónico med
 
 ## Follow-ups
 
-- `TASK-1728`, `TASK-1729`, `TASK-1730`, `TASK-1731`.
+- `TASK-1728`, `TASK-1729`, `TASK-1730`, `TASK-1731`, `TASK-1761`.
+
+## Delta 2026-08-21 — binding Microsoft posterior y source-neutral
+
+`TASK-1761` debe ligar el OID/UPN corporativo al mismo `user_id`/`identity_profile_id` creado aquí. Email personal,
+UPN y `accountEnabled` nunca sustituyen el principal longitudinal ni su lifecycle candidate/ex-collaborator.

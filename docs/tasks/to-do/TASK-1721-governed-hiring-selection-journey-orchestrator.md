@@ -314,6 +314,9 @@ Reglas obligatorias:
 - Cancelar sólo futuro trabajo cancelable; nunca borrar/revertir decision/member/history.
 - Agregar stuck/uncertain/reconciliation signals y runbook de recuperación.
 - Probar crash después de cada boundary y convergencia sin side effects duplicados.
+- Observar los checkpoints externos de `TASK-1761` (`entra_account_reserved`, `entra_oid_bound`,
+  `m365_service_ready`, `entra_account_disabled`; nombres finales por ADR) y exponer `nextRequiredAction` sin
+  ejecutar Graph/SCIM/licencias ni revertir hechos Hiring/Workforce si Microsoft falla.
 
 ### Slice 4 — Product API parity and controlled rollout
 
@@ -420,6 +423,8 @@ y event/history, no repitiendo ciegamente la decisión.
 - [ ] Tests allow/deny/revoked/stale/replay/IDOR y capability coverage cierran con cero bypass.
 - [ ] Synthetic staging journey prueba pause/resume/completion contra DB, outbox, delivery y workforce reales.
 - [ ] Flags, worker deploy contract, rollback y Platform Health quedan documentados y verificados por runtime.
+- [ ] El status distingue `workforce_enabled` de `m365_service_ready`; un bloqueo Entra queda visible y recuperable,
+      nunca convierte selección/member/workforce en fallidos ni autoriza un write externo desde el orquestador.
 
 ## Verification
 
@@ -451,6 +456,7 @@ y event/history, no repitiendo ciegamente la decisión.
 ## Follow-ups
 
 - `TASK-1722` — Delegated MCP Candidate Selection Journey.
+- `TASK-1761` — Microsoft Entra workforce provisioning; este journey consume readback/checkpoints y no posee writes.
 - UI/UX consumer en Application 360 para timeline/next action, sólo si el primitive requiere nueva superficie visible.
 - Placement Staff Augmentation journey cuando exista command canónico y owner de reversa.
 - Policy explícita para capacity/opening closure y tratamiento de candidaturas restantes; no inferirla aquí.
