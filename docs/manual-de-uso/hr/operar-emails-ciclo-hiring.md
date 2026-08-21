@@ -1,9 +1,9 @@
 # Operar los Emails del Ciclo de Hiring
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-08-12 por Claude (TASK-1689)
-> **Ultima actualizacion:** 2026-08-20 por Claude (TASK-1746, TASK-1757)
+> **Ultima actualizacion:** 2026-08-21 por Codex (correo de persona seleccionada)
 > **Documentacion funcional:** [emails-ciclo-hiring.md](../../documentation/hr/emails-ciclo-hiring.md)
 
 ## Para qué sirve
@@ -62,6 +62,11 @@ Tipos disponibles: `hiring_application_received_internal`, `hiring_application_c
 `hiring_assessment_assigned`, `hiring_assessment_access_recovery`,
 `hiring_assessment_access_rotated`, `hiring_assessment_submitted_internal`,
 `hiring_stage_advanced`, `hiring_decision_selected`, `hiring_decision_rejected`.
+
+`hiring_decision_selected` confirma que la persona fue elegida, pero no comunica incorporación. Explica que el
+siguiente paso es recibir y aceptar la carta oferta y que después se avanza a la firma del contrato. Su ilustración
+es decorativa y secundaria: si el cliente de correo bloquea imágenes, el asunto, el título y el cuerpo conservan el
+mensaje completo.
 
 Los dos de acceso están **encendidos**: `hiring_assessment_access_recovery` desde el 2026-08-19 y
 `hiring_assessment_access_rotated` desde el 2026-08-20, este último con autorización del CEO.

@@ -2143,8 +2143,8 @@ registerTemplate('hiring_decision_selected', (context: HiringDecisionContext) =>
 
   return {
     subject: isEn
-      ? `${first ? `${first}, ` : ''}good news about your application — Efeonce`
-      : `${first ? `${first}, ` : ''}buenas noticias sobre tu postulación — Efeonce`,
+      ? `${first ? `${first}, ` : ''}we chose you for ${context.openingTitle} — Efeonce`
+      : `${first ? `${first}, ` : ''}te elegimos para ${context.openingTitle} — Efeonce`,
     react: HiringDecisionEmail({
       recipientName: context.recipientName,
       openingTitle: context.openingTitle,
@@ -2152,11 +2152,25 @@ registerTemplate('hiring_decision_selected', (context: HiringDecisionContext) =>
       locale: context.locale ?? 'es'
     }),
     text: [
-      isEn ? 'We chose you' : '¡Te elegimos!',
+      isEn
+        ? `${first ? `We chose you, ${first}!` : 'We chose you!'}`
+        : `${first ? `¡Te elegimos, ${first}!` : '¡Te elegimos!'}`,
       '',
       isEn
-        ? `We have good news: we chose you for «${context.openingTitle}» at Efeonce. Our team will contact you with the next steps.`
-        : `Tenemos buenas noticias: te elegimos para «${context.openingTitle}» en Efeonce. Nuestro equipo te contactará con los próximos pasos.`,
+        ? `After reviewing your application and everything you shared with us throughout the process, we are delighted to confirm that we chose you for «${context.openingTitle}» at Efeonce.`
+        : `Después de revisar tu postulación y todo lo que compartiste con nosotros durante el proceso, nos alegra confirmarte que te elegimos para «${context.openingTitle}» en Efeonce.`,
+      '',
+      isEn
+        ? 'Thank you for the time, dedication, and openness you brought to each stage. Getting to know your experience and what you can bring to the team made this decision especially meaningful.'
+        : 'Gracias por el tiempo, la dedicación y la apertura que mostraste en cada etapa. Conocer tu experiencia y lo que puedes aportar al equipo hizo que esta decisión fuera especialmente significativa.',
+      '',
+      isEn
+        ? 'The next step is to prepare and send you the offer letter. Once you have reviewed and accepted it, we will proceed with the employment agreement. Our team will write to this same email address; you do not need to take any action for now.'
+        : 'El próximo paso es preparar y enviarte la carta oferta. Cuando la revises y aceptes, avanzaremos con la firma del contrato. Nuestro equipo te escribirá a este mismo correo; por ahora, no necesitas realizar ninguna acción.',
+      '',
+      isEn
+        ? 'We are very happy to take this next step with you. We will be in touch soon.'
+        : 'Nos alegra mucho dar este paso contigo. Hablamos pronto.',
       '',
       '— Efeonce · efeoncepro.com'
     ].join('\n')

@@ -314,7 +314,9 @@ independiente):
   estados previos y expirados; deduplica por evento + assessment + buzón interno. El subject es
   `Test completado: {candidato} — {vacante}` y el cuerpo no expone respuestas ni score.
 - Candidate-facing emails envían como **Efeonce** (AGENCY_BRANDED); el aviso interno usa el sender
-  plataforma. Templates en `src/emails/Hiring*.tsx` (es/en; default es).
+  plataforma. Templates en `src/emails/Hiring*.tsx` (es/en; default es). La variante `selected` mantiene paridad
+  HTML/texto plano, personaliza nombre + vacante y expresa la secuencia `selección → carta oferta aceptada →
+  contrato`; la ilustración remota es decorativa (`alt=""`), secundaria y nunca porta la decisión ni los próximos pasos.
 - Rollout: ledger `FEATURE_FLAG_STATE_LEDGER.md` — flip exige ejercicio end-to-end + revisión
   humana de Talent del copy (especialmente el rechazo). **El flip se ejecutó el 2026-08-12**: flag
   ON en el ops-worker (rev `ops-worker-00548-x52`, default `true` en `deploy.sh`), ejercicio E2E

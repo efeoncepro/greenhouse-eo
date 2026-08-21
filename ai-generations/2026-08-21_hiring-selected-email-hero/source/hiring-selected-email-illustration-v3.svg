@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" role="img" aria-labelledby="title desc">
+  <title id="title">Ilustración de celebración Efeonce</title>
+  <desc id="desc">Composición de marca con el isotipo orbital de Efeonce, bandas angulares azules y acentos de celebración.</desc>
+
+  <defs>
+    <linearGradient id="orbit" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0375DB"/>
+      <stop offset="1" stop-color="#082E8E"/>
+    </linearGradient>
+  </defs>
+
+  <!-- The angular ribbons reuse Efeonce Wave's canonical folded geometry. -->
+  <g opacity="0.98">
+    <path d="M0 174 236 94 236 172 74 226 0 204Z" fill="#082E8E"/>
+    <path d="M0 292 236 372 236 294 74 240 0 262Z" fill="#0375DB"/>
+    <path d="M960 174 724 94 724 172 886 226 960 204Z" fill="#0375DB"/>
+    <path d="M960 292 724 372 724 294 886 240 960 262Z" fill="#082E8E"/>
+  </g>
+
+  <!-- A light orbital field gives the mark room to breathe on white email canvas. -->
+  <ellipse cx="480" cy="240" rx="214" ry="137" fill="none" stroke="url(#orbit)" stroke-width="3" stroke-dasharray="4 14" opacity="0.24"/>
+  <!-- Canonical Efeonce isotipo, preserved without generative reinterpretation. -->
+  <image href="../../../public/branding/SVG/isotipo-full-efeonce.svg" x="330" y="133" width="300" height="213" preserveAspectRatio="xMidYMid meet"/>
+
+  <!-- Controlled celebratory accents from the Efeonce family palette. -->
+  <g fill="#FF6500">
+    <path d="M674 103 682 124 703 132 682 140 674 161 666 140 645 132 666 124Z"/>
+    <circle cx="716" cy="88" r="7"/>
+  </g>
+  <g fill="#6EC207">
+    <circle cx="288" cy="330" r="9"/>
+    <circle cx="268" cy="352" r="4"/>
+  </g>
+  <g fill="#BB1954">
+    <path d="M284 104 289 117 302 122 289 127 284 140 279 127 266 122 279 117Z"/>
+  </g>
+</svg>

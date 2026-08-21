@@ -1,0 +1,9 @@
+Create a premium transparent-background 3D editorial illustration for the hero of a candidate-selection email from a modern professional agency.
+
+Core visual thesis: “the next step”. A single flowing ribbon or pathway rises gently from lower left to upper right and passes through an open circular arch, expressing that the candidate has been chosen and is moving into the offer-letter stage. Add one small warm amber sphere crossing the threshold and only a few restrained celebratory paper shapes around the arch. The emotion is optimistic, personal, calm, and meaningful — celebration without looking childish or like a party invitation.
+
+Visual language: refined soft-touch 3D sculpture, matte ceramic and lightly translucent materials, smooth rounded geometry, subtle tactile grain, polished enterprise editorial craft. Use a restrained Efeonce-adjacent palette of deep clear blue, lighter sky blue, teal, off-white highlights, and one warm amber accent. Soft diffused studio lighting, gentle contact shadows contained within the objects, crisp clean edges, premium depth.
+
+Composition: horizontal 3:2 canvas, one strong focal point, balanced asymmetry, generous transparent negative space around all edges, entire sculpture fully visible, suitable for display at approximately 560 × 300 pixels inside an email. Keep important geometry in the central 70% and avoid thin fragile details.
+
+Hard constraints: true transparent background with alpha, isolated object only, no floor or rectangular backdrop, no baked checkerboard, no gradients extending into the background, no people, no hands, no faces, no office scene, no laptop, no dashboard, no envelope, no contract, no trophy, no literal job icons, no text, no letters, no numbers, no logos, no brand marks, no watermark, no frame, no cropped elements.
