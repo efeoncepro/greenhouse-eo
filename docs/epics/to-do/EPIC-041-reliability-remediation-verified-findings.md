@@ -180,3 +180,18 @@ El flag está **encendido**, así que `enabledByLine.ppm = true` y los consumers
 Consecuencia para la priorización del epic: el punto 1 del `Orden de ejecución` deja de ser contención urgente y pasa a ser **una conversación con el contador** — confirmar la tasa PPM real del contribuyente y corregir `rate_source` para que deje de mentir. Sigue yendo primero por ser lo único con consecuencia hacia afuera, pero no requiere apagar nada hoy ni bloquea el resto del programa.
 
 `RETENTION_POSITION_ENABLED=true` tiene la misma forma: materializador detenido el mismo `2026-06-20`, y su única señal de drift es un falso positivo (documento anulado que el reader no filtra).
+
+## Delta 2026-08-21 (3) — La tasa PPM es correcta; el falso positivo lo produjo la nota
+
+Confirmado por el operador el 2026-08-21: **la tasa PPM real del contribuyente ES 0,125%**, es decir el `0.00125` que ya está configurado. El valor nunca estuvo mal.
+
+Lo que está mal es el campo `notes` de la única fila de `greenhouse_finance.ppm_rate_config`, que sigue diciendo *"tasa PPM default placeholder (0,25%). La tasa real del contribuyente la fija el SII — el contador debe actualizar esta fila…"*. Esa nota es de `TASK-1189`, quedó obsoleta cuando la tasa se definió, y nadie la actualizó.
+
+Consecuencias, y son de método más que de finanzas:
+
+- **`rate_source = 'sii_f29_confirmed_2026'` es exacto.** El Delta (2) afirmó que la etiqueta mentía; era al revés — mentía la nota. Queda corregido acá.
+- **El punto 1 del `Orden de ejecución` deja de existir como riesgo fiscal.** No hay conversación pendiente con el contador sobre la tasa, ni contención, ni flag que apagar. `PPM_POSITION_ENABLED=true` es el estado correcto.
+- **Es el mismo bug class que este epic persigue, en versión documental**: un dato de gobierno que se quedó atrás y produjo un diagnóstico equivocado con alta confianza. Un agente leyó la nota, la creyó, y elevó a P0 algo que estaba bien. Exactamente lo que hace `skipped = éxito` en `handler-health.ts`, pero en prosa.
+- **Acción concreta que sí queda**: actualizar el `notes` de esa fila por migración gobernada — nunca por `UPDATE` manual — para que declare la tasa como definida, con su fecha y su origen. Sin eso, el próximo barrido vuelve a levantar la misma falsa alarma.
+
+**Lo único que sobrevive del carril PPM** es que el materializador no corre desde el `2026-06-20`: `2026-07` y `2026-08` no tienen posición materializada. Degrada honestamente (`ppm: null`, el consumer distingue "sin materializar" de "cero"), así que no produce un número falso — pero si el contador necesita la línea PPM de esos meses, no está. Ese sí es un gap operativo real, y su dueña sigue siendo `TASK-1203`.
