@@ -3,6 +3,23 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-21 — La revisión de confiabilidad pasa de reportar síntomas a medir causas
+
+- `EPIC-041` reemplaza a `TASK-1432` y `TASK-1710`, dos umbrellas P0 que describían el mismo incidente con un mes
+  de diferencia, sin referenciarse y sin una sola task hija; el epic conserva un baseline de 16 hallazgos medidos
+  contra PostgreSQL y fechados, con la instrucción explícita de re-medir antes de actuar.
+- Siete hallazgos previos quedan reclasificados como mal calibrados o falsos positivos: los "4 leads de Growth" son
+  correos de prueba con runs no releasables, la "retención en drift" es un documento anulado que el reader no
+  filtra, el "rate MXN/CLP faltante" es una señal insatisfacible por diseño USD-pivot, y los "79,6 días" de
+  writeback son la edad del ítem atascado, no la frescura del tablero.
+- El bridge income→HubSpot se degrada de P0 a P3: su endpoint receptor `/invoices` nunca se escribió y 80 de 84
+  incomes vienen de Nubox, que estructuralmente no traerá anchors. Las cotizaciones sí llegan al CRM.
+- `TASK-1760` documenta que PPM y retenciones no se recalculan desde el 2026-06-20 porque **nunca se cableó un
+  disparador** — el IVA sí tiene projection reactiva y por eso está al día —, y que su señal de drift es ciega a un
+  período ausente porque parte desde las posiciones existentes.
+- Queda registrado que sacar `skipped` de `isSuccessOutcome` no habría corregido los 9.001 falsos éxitos, que los
+  produce `no-op`, y que la state machine de `handler_health` no tiene ningún test que la cubra.
+
 ## 2026-08-21 — GPT Image 2 gana transparencia end-to-end en código, con rollout aún gated
 
 - La nueva matriz oficial cubre GPT Image 2/1.5/1/1 Mini/`chatgpt-image-latest`, endpoints, tamaños flexibles,
@@ -961,25 +978,3 @@ nada sobre el runtime. Verificado con la credencial real de producción: token e
 120 ms y el Cloud Run lo aceptó. El flag se re-prende recién cuando el endpoint
 responda verde EN producción (ISSUE-150 tiene la secuencia exacta). Staging sigue
 operativo end-to-end.
-
-## 2026-08-11 — Escaneo de malware activo sobre los archivos que suben desde afuera
-
-El escáner de firmas dejó de ser código latente y quedó operativo en staging y en
-producción. Todo archivo que entra desde afuera pasa ahora por dos revisiones
-complementarias: la estructural, que mira los bytes reales y detecta un ejecutable
-renombrado a `.pdf`, y ClamAV, que reconoce firmas de malware dentro de archivos que
-sí son del tipo que dicen ser. El peor veredicto gana. No es una función de
-reclutamiento: cubre el CV público, los adjuntos de Growth Forms y los pliegos y
-entregables que se cargan a una propuesta.
-
-Se verificó con postulaciones reales por el formulario público, no con mocks: un PDF
-válido queda adjunto y un archivo de prueba EICAR queda en cuarentena, sin que la
-persona que lo subió reciba ninguna señal distinta — avisarle a un atacante que su
-archivo fue rechazado le diría qué probar después. Si el escáner no puede
-pronunciarse, el archivo también se bloquea: es deliberado, y por eso una mala
-configuración es más peligrosa que no tener antivirus.
-
-Corre en un único servicio Cloud Run cerrado por IAM, ≈USD 19/mes, con las firmas
-actualizándose solas dentro del contenedor. De paso quedó corregida en el flag ledger
-una calibración de costo que estaba desfasada 24×: Cloud Run no cuesta USD 7,32 cada
-30 días sino ≈USD 169.

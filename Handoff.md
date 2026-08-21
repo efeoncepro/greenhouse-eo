@@ -2,6 +2,34 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-21 — Confiabilidad: hallazgos medidos contra runtime; dos umbrellas superseded por EPIC-041
+
+Codex venía reportando hace semanas dos hallazgos de confiabilidad (`wh-sub-notifications` con dead-letters `401` y
+dos handlers `contract_mrr_arr` fallidos). Al medirlos contra PostgreSQL el 2026-08-21 resultó que **son los dos
+menos urgentes**, que **siete hallazgos previos estaban mal calibrados o eran falsos positivos**, y que el problema
+más caro no aparecía en ningún reporte porque el módulo de confiabilidad lo muestra en verde.
+
+`TASK-1432` (2026-07-18) y `TASK-1710` (2026-08-15) describían el mismo incidente con un mes de diferencia, sin
+referenciarse, con cero commits y cero tasks hijas. Ambas quedan **superseded** por `EPIC-041`, que conserva el
+baseline medido y fechado, la tabla de falsos positivos y el orden de ejecución.
+
+Correcciones que importan para quien retome: el bridge income→HubSpot **nunca se terminó de construir** — su
+endpoint receptor `/invoices` no existe en ninguna rama y 80 de 84 incomes vienen de Nubox, que nunca traerá
+anchors; no hay `CLP 141.562.545` perdidos, hay ruido P3. La tasa PPM **es correcta** (`0,125%` confirmada por el
+operador); lo obsoleto es el campo `notes` de `ppm_rate_config`, que produjo una falsa alarma de P0. Las
+notificaciones **sí funcionan hoy** (7 días de actividad, 100% `sent`); los únicos avisos huérfanos son
+`member.created` y `compensation_version.created`, y el conteo dio 12 y **1** respectivamente, ambos sin eventos
+desde el 2026-06-26.
+
+Se descartó además un fix que parecía obvio: sacar `skipped` de `isSuccessOutcome` en `handler-health.ts` **no
+habría arreglado nada** — sólo 4 filas en toda la tabla empiezan con `skipped`, y los 9.001 falsos éxitos los
+produce `no-op`. Ese análisis también expuso que **no existe ni un test** de `recordHandlerOutcomes` ni de
+`classifyOutcome`, y que la llamada está envuelta en un `try/catch` que sólo hace `console.warn`.
+
+Estado: **documentación completa, ejecución no iniciada**. Ningún cambio de código, ninguna mutación de datos,
+ningún flag tocado. Siguiente paso: `TASK-1760` (cablear las projections de PPM y retenciones), único carril cuyo
+daño crece. Owner sin asignar.
+
 ## 2026-08-21 — Transparencia GPT Image 2 code complete; rollout de Globe pendiente
 
 La documentación oficial completa de OpenAI quedó consolidada en
@@ -541,39 +569,3 @@ respeta su nombre literal.
 **Sigue pendiente de decisión del CEO:** monitor de equidad (capturaría categorías protegidas bajo
 una política que sólo existe en versión de pruebas), scoring por lotes (bloqueado por falta de gold
 set calificado, no de permiso) y lectura de CVs por agentes (sin firmas de privacidad/seguridad).
-
-## 2026-08-17 — Barrido de cierre: lo que estaba a medias, y el incidente que nadie había registrado
-
-Tres auditorías paralelas sobre TASK-1719, el rollout de 1740/1741 y el estado general del
-dominio. Se empujaron 7 commits a `develop` (CI verde antes del push, pre-push limpio).
-
-**Lo más grave no era ninguna de las tres tasks: era un fixture.** Los `*.live.test.ts` de hiring
-anclaban con `SELECT profile_id FROM identity_profiles WHERE active = true LIMIT 1`. Sin `ORDER BY`
-el sujeto es no determinista, y la base es **única para dev, staging y producción**: cayó sobre un
-colaborador ACTIVO y `reconcileCandidateFacet` le fabricó ficha de candidato, membresía de Banco de
-Talento y evento de consentimiento con `consent_status=not_captured`. Una persona real registrada
-como candidata sin postular ni aceptar nada. Cerrado con `live-test-identity.ts` (perfil sintético
-dedicado, idempotente, verificado contra PG) y **`ISSUE-159`** abierto ANTES de purgar, porque la
-purga borra la evidencia del propio incidente. **La ficha contaminada sigue viva**: el `--apply` del
-script de purga muere en `ECONNRESET` abriendo su cliente TCP con perfil `ops`, y el camino canónico
-no sirve (runtime no tiene DELETE, por diseño).
-
-**Otros dos cierres del lado 1740/1741:** los beneficios publicados ya llevan el calificador que el
-charter exige ("se formaliza según tu modalidad de contratación y país de residencia") — importa
-porque fuera de Chile la vinculación es internacional y publicar "15 días de vacaciones" en seco
-presenta un equivalente contractual como derecho estatutario; y la degradación del contenido v2 dejó
-de ser silenciosa (emite señal sólo cuando la versión es conocida, o sea cuando es anomalía real).
-
-**TASK-1719 — el Handoff estaba desactualizado en su punto más caro:** el backlog del consumer **ya
-se drenó solo** a las 13:54Z de hoy (23 eventos, 22 `stale` por la ventana de 24 h y 1 no-op, cero
-correos). Ese era el bloqueador principal declarado. Lo que sí falta y nadie había escrito: la policy
-del canary está en `mode=manual`, así que **prender el flag hoy es un no-op**; y el default de
-`deploy.sh:458` sigue en `false`, con lo que un flip por `--update-env-vars` se evapora en el próximo
-deploy del ops-worker (que se redespliega cada pocas horas — mismo patrón que borró
-`GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED`). Además el canary no produce señal: las 5 postulaciones
-`shortlisted` ya tienen test abierto, así que hace falta que Talent mueva a alguien de `sourced`.
-
-**Riesgos vivos que quedan documentados, no cerrados:** retención Ley 21.719 sin comando de borrado
-(sólo hay un reader que reporta vencimiento); CVs `legacy_unscanned` descargables mientras
-`ASSET_MALWARE_SCAN_ENABLED` sigue bloqueado por ClamAV no provisionado (TASK-1378 sin decidir); y
-TASK-1718 con código en producción tras flags cerrados y sus sign-offs abiertos.

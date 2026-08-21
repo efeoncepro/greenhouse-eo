@@ -278,3 +278,21 @@ Esos dos avisos huérfanos son el hallazgo con consecuencia humana directa de to
 4. **Sube al primer lugar** cablear la projection de PPM/retenciones: es el único con hueco fiscal creciente y el arreglo es conocido y acotado.
 5. **Sube al segundo lugar** los dos avisos huérfanos (`member.created`, `compensation_version.created`): consecuencia humana directa, alcance chico.
 6. `TASK-928` (composer) se mantiene donde estaba: barato y desbloquea interpretación.
+
+## Delta 2026-08-21 (5) — Conteo de los avisos huérfanos: el orden queda confirmado
+
+El Delta (4) subió los dos avisos huérfanos al segundo lugar por "consecuencia humana directa", sin cuantificar. Medido:
+
+```
+eventos desde la ruptura (2026-06-15)
+  member.created                12   →  del 2026-06-15 al 2026-06-26, nada después
+  compensation_version.created   1   →  el 2026-06-15
+```
+
+- **Un solo cambio de compensación**, ocurrido el mismo día de la ruptura. No es "todos los cambios de dos meses": es una persona, una vez, hace dos meses.
+- Los 12 `member.created` corresponden a 12 de los 33 `members` creados en **tres tandas de exactamente 11** (`2026-06-15`, `2026-06-19`, `2026-06-26`), todos `@efeoncepro.com`, 18 activos y 15 inactivos. El patrón indica sincronización o recreación, no 33 contrataciones. Ese aviso va a admins como `system_event`, no a la persona.
+- **Cero eventos de ambos tipos desde el 2026-06-26.**
+
+**Conclusión: bomba dormida, no hemorragia.** El próximo cambio de compensación tampoco notificará y el próximo colaborador tampoco, lo que justifica arreglarlo; pero no justifica adelantarlo a `TASK-1760`, que es el único carril cuyo daño crece un mes por mes.
+
+**Orden confirmado con dato:** `TASK-1760` (rank 1) → `TASK-1759` (rank 2) → `TASK-928` (rank 3). Sin cambios respecto al Delta (4); lo que cambia es que ahora está sostenido por una medición y no por una intuición.
