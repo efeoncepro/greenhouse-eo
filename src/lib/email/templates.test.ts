@@ -96,6 +96,7 @@ describe('email templates registry', () => {
     expect(template.text).toContain('carta oferta')
     expect(template.text).toContain('Cuando la revises y aceptes')
     expect(template.text).toContain('firma del contrato')
+    expect(template.text).toContain('Equipo de Talento\nEfeonce · efeoncepro.com')
     expect(template.text).not.toContain('Te damos la bienvenida')
   })
 

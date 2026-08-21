@@ -66,7 +66,8 @@ Tipos disponibles: `hiring_application_received_internal`, `hiring_application_c
 `hiring_decision_selected` confirma que la persona fue elegida, pero no comunica incorporación. Explica que el
 siguiente paso es recibir y aceptar la carta oferta y que después se avanza a la firma del contrato. Su ilustración
 es decorativa y secundaria: si el cliente de correo bloquea imágenes, el asunto, el título y el cuerpo conservan el
-mensaje completo.
+mensaje completo. La firma visible es `Equipo de Talento · Efeonce`, coherente con el buzón que recibe las respuestas;
+no se muestra una persona específica si el evento no aporta un owner real.
 
 Los dos de acceso están **encendidos**: `hiring_assessment_access_recovery` desde el 2026-08-19 y
 `hiring_assessment_access_rotated` desde el 2026-08-20, este último con autorización del CEO.

@@ -4,7 +4,12 @@ import EmailLayout from './components/EmailLayout'
 import { EMAIL_COLORS, EMAIL_FONTS } from './constants'
 
 const MEDIA_BUCKET = process.env.GREENHOUSE_PUBLIC_MEDIA_BUCKET || 'efeonce-group-greenhouse-public-media-prod'
-const SELECTED_ILLUSTRATION_IMAGE_URL = `https://storage.googleapis.com/${MEDIA_BUCKET}/emails/hiring-selected-email-illustration-v3.png`
+const SELECTED_ILLUSTRATION_IMAGE_URL = `https://storage.googleapis.com/${MEDIA_BUCKET}/emails/hiring-selected-email-mail-icon-v4.png`
+
+const EMPHASIS_STYLE = {
+  color: EMAIL_COLORS.text,
+  fontWeight: 700,
+} as const
 
 /**
  * TASK-1689 — Email de decisión al candidato: seleccionado o no seleccionado.
@@ -118,20 +123,65 @@ export default function HiringDecisionEmail({
       ) : null}
 
       <Text style={{ fontSize: '15px', color: EMAIL_COLORS.secondary, lineHeight: '24px', margin: '0 0 16px' }}>
-        {t.body1(openingTitle)}
+        {isSelected ? (
+          locale === 'en' ? (
+            <>
+              After reviewing your application and everything you shared with us throughout the process, we are
+              delighted to confirm that{' '}
+              <strong style={EMPHASIS_STYLE}>we chose you for «{openingTitle}» at Efeonce</strong>.
+            </>
+          ) : (
+            <>
+              Después de revisar tu postulación y todo lo que compartiste con nosotros durante el proceso, nos
+              alegra confirmarte que{' '}
+              <strong style={EMPHASIS_STYLE}>te elegimos para «{openingTitle}» en Efeonce</strong>.
+            </>
+          )
+        ) : (
+          t.body1(openingTitle)
+        )}
       </Text>
 
       <Text style={{ fontSize: '15px', color: EMAIL_COLORS.secondary, lineHeight: '24px', margin: '0 0 16px' }}>
         {t.body2}
       </Text>
 
-      {t.body3 ? (
+      {isSelected ? (
         <Text style={{ fontSize: '15px', color: EMAIL_COLORS.secondary, lineHeight: '24px', margin: '0 0 16px' }}>
-          {t.body3}
+          {locale === 'en' ? (
+            <>
+              <strong style={EMPHASIS_STYLE}>The next step is to prepare and send you the offer letter.</strong>{' '}
+              <strong style={EMPHASIS_STYLE}>
+                Once you have reviewed and accepted it, we will proceed with the employment agreement.
+              </strong>{' '}
+              Our team will write to this same email address; you do not need to take any action for now.
+            </>
+          ) : (
+            <>
+              <strong style={EMPHASIS_STYLE}>El próximo paso es preparar y enviarte la carta oferta.</strong>{' '}
+              <strong style={EMPHASIS_STYLE}>
+                Cuando la revises y aceptes, avanzaremos con la firma del contrato.
+              </strong>{' '}
+              Nuestro equipo te escribirá a este mismo correo; por ahora, no necesitas realizar ninguna acción.
+            </>
+          )}
         </Text>
       ) : null}
 
       <Text style={{ fontSize: '14px', color: EMAIL_COLORS.muted, lineHeight: '21px', margin: '0' }}>{t.closing}</Text>
+
+      <Text
+        style={{
+          fontSize: '14px',
+          color: EMAIL_COLORS.secondary,
+          lineHeight: '21px',
+          margin: '20px 0 0',
+        }}
+      >
+        <strong style={EMPHASIS_STYLE}>{locale === 'en' ? 'Talent Team' : 'Equipo de Talento'}</strong>
+        <br />
+        Efeonce
+      </Text>
     </EmailLayout>
   )
 }

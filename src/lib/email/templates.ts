@@ -2172,7 +2172,8 @@ registerTemplate('hiring_decision_selected', (context: HiringDecisionContext) =>
         ? 'We are very happy to take this next step with you. We will be in touch soon.'
         : 'Nos alegra mucho dar este paso contigo. Hablamos pronto.',
       '',
-      '— Efeonce · efeoncepro.com'
+      isEn ? 'Talent Team' : 'Equipo de Talento',
+      'Efeonce · efeoncepro.com'
     ].join('\n')
   }
 })
@@ -2199,7 +2200,8 @@ registerTemplate('hiring_decision_rejected', (context: HiringDecisionContext) =>
         ? `Thank you for the time you put into your application to «${context.openingTitle}» at Efeonce. After completing the process, we decided not to move forward on this occasion. We would be glad to see you apply to future openings closer to your profile.`
         : `Gracias por el tiempo que pusiste en tu postulación a «${context.openingTitle}» en Efeonce. Después de completar el proceso, decidimos no avanzar en esta oportunidad. Nos encantaría verte postular a futuras vacantes que se acerquen más a tu perfil.`,
       '',
-      '— Efeonce · efeoncepro.com'
+      isEn ? 'Talent Team' : 'Equipo de Talento',
+      'Efeonce · efeoncepro.com'
     ].join('\n')
   }
 })

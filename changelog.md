@@ -7,11 +7,14 @@
 
 - El asunto identifica nombre y vacante; el título visible evita duplicar el saludo y el cuerpo explica la
   secuencia real: selección, carta oferta, aceptación y firma del contrato.
-- La propuesta 3D fue rechazada por lenguaje tecnológico y el bouquet V2, aunque más cálido, por falta de ajuste de
-  marca. Diseño + Talent convergen en una V3 con el isotipo orbital intacto, las bandas angulares de Wave y la paleta
-  oficial de Efeonce. El PNG transparente pesa 25.228 bytes y su URL respondió `200 image/png`.
+- Las tres primeras rutas fueron rechazadas por resultar tecnológicas, genéricas o demasiado abstractas. Diseño +
+  Talent convergen en una V4 concreta: icono 3D de sobre abierto, tarjeta sin texto, check de confirmación y un único
+  destello naranja. El PNG transparente pesa 63.972 bytes y su URL respondió `200 image/png`.
 - HTML y texto plano conservan la misma verdad; la variante de rechazo no carga el hero. Código completo con
-  captura local revisada; rollout del template pendiente y ningún correo real enviado.
+  captura local revisada. La decisión, la carta oferta y el contrato reciben negritas visibles sobre frases
+  completas; las dos variantes de decisión firman `Equipo de Talento · Efeonce`, sin atribuir el mensaje a una
+  persona inexistente.
+  Rollout del template pendiente y ningún correo real enviado.
 
 ## 2026-08-21 — Hiring formaliza el cierre empático de una vacante cuando se completan sus cupos
 

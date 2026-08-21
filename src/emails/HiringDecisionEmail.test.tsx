@@ -15,11 +15,21 @@ describe('HiringDecisionEmail', () => {
     )
 
     expect(html).toContain('¡Te elegimos, María!')
-    expect(html).toContain('/emails/hiring-selected-email-illustration-v3.png')
+    expect(html).toContain('/emails/hiring-selected-email-mail-icon-v4.png')
     expect(html).toContain('alt=""')
     expect(html).not.toMatch(/<h[1-6][^>]*>Content Creator<\/h[1-6]>/)
     expect(html).toContain('carta oferta')
     expect(html).toContain('firma del contrato')
+    expect(html).toMatch(
+      /<strong style="[^"]*font-weight:700[^"]*">te elegimos para «(?:<!-- -->)?Content Creator(?:<!-- -->)?» en Efeonce<\/strong>/,
+    )
+    expect(html).toMatch(
+      /<strong style="[^"]*font-weight:700[^"]*">El próximo paso es preparar y enviarte la carta oferta\.<\/strong>/,
+    )
+    expect(html).toMatch(
+      /<strong style="[^"]*font-weight:700[^"]*">Cuando la revises y aceptes, avanzaremos con la firma del contrato\.<\/strong>/,
+    )
+    expect(html).toMatch(/<strong style="[^"]*font-weight:700[^"]*">Equipo de Talento<\/strong>/)
     expect(html).not.toContain('Hola María')
     expect(html).not.toContain('Te damos la bienvenida')
   })
@@ -36,6 +46,7 @@ describe('HiringDecisionEmail', () => {
 
     expect(html).toContain('Hola María')
     expect(html).toContain('Sobre tu postulación')
-    expect(html).not.toContain('/emails/hiring-selected-email-illustration-v3.png')
+    expect(html).toMatch(/<strong style="[^"]*font-weight:700[^"]*">Equipo de Talento<\/strong>/)
+    expect(html).not.toContain('/emails/hiring-selected-email-mail-icon-v4.png')
   })
 })

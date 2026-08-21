@@ -59,7 +59,10 @@ tenga que acordarse de escribirlos:
 - **El correo de selección distingue asunto, preencabezado y título visible.** El asunto identifica persona y
   vacante; el título celebra `¡Te elegimos, {nombre}!`; el preencabezado anticipa la carta oferta. Incluye una
   ilustración pequeña de reconocimiento con texto alternativo vacío, por lo que bloquear imágenes no elimina
-  ninguna información ni desplaza el nombre de la persona como foco principal.
+  ninguna información ni desplaza el nombre de la persona como foco principal. La decisión, la carta oferta y la
+  firma del contrato usan negritas visibles sobre frases completas para guiar la lectura. Los correos de decisión
+  firman institucionalmente como `Equipo de Talento · Efeonce`; no inventan el nombre de un recruiter. Las respuestas
+  llegan al mismo equipo.
 - Todo el sistema está detrás de un interruptor general (`HIRING_LIFECYCLE_EMAILS_ENABLED`),
   prendido en producción desde el 2026-08-12; el interruptor y los kill-switch por tipo siguen
   disponibles para pausar el sistema completo o un correo específico.

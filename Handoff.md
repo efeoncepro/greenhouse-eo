@@ -6,16 +6,18 @@
 
 `hiring_decision_selected` ahora separa asunto, preencabezado y título visible, confirma la elección sin declarar
 incorporación y explica `carta oferta → aceptación → contrato` con paridad HTML/texto plano. La primera propuesta
-3D quedó rechazada por lenguaje tecnológico y el bouquet V2, aunque cálido, por parecer genérico. Diseño + Talent
-convergen en una V3 pequeña y secundaria construida con el isotipo orbital intacto, las bandas de Wave y la paleta
-oficial de Efeonce. No representa demografía ni onboarding, pesa 25.228 bytes y quedó en
-`gs://efeonce-group-greenhouse-public-media-prod/emails/hiring-selected-email-illustration-v3.png` con readback 200.
+3D, el bouquet genérico y la V3 corporativa abstracta quedaron rechazados. Diseño + Talent
+convergen en una V4 concreta: sobre abierto, tarjeta sin texto, check de confirmación y un destello naranja. No
+representa demografía, contrato ni onboarding, pesa 63.972 bytes y quedó en
+`gs://efeonce-group-greenhouse-public-media-prod/emails/hiring-selected-email-mail-icon-v4.png` con readback 200.
 
-Las capturas finales están en `.captures/hiring-selected-email-hero/email-v4-720.png` y
-`.captures/hiring-selected-email-hero/email-v4-390.png`; se retiró la tarjeta que repetía la vacante y la imagen
-permanece decorativa (`alt=""`). La variante de rechazo no la consume. Estado: **code complete, rollout pendiente**. No se envió ningún
-correo real ni se desplegó el cambio; el siguiente paso es incluirlo en un release normal y verificar un envío
-consentido en un cliente de correo real.
+Se retiró la tarjeta que repetía la vacante y la imagen permanece decorativa (`alt=""`). La decisión y los hitos
+documentales ahora guían la lectura con negritas visibles aplicadas a frases completas,
+y ambas variantes de decisión firman `Equipo de Talento · Efeonce`, alineadas con el Reply-To real. La variante de
+rechazo no consume la imagen. Capturas finales: `.captures/hiring-selected-email-hero/email-v6-720.png` y
+`.captures/hiring-selected-email-hero/email-v6-390.png`. Estado: **code complete, rollout pendiente**. No se envió ningún correo real ni se
+desplegó el cambio; el siguiente paso es incluirlo en un release normal y verificar un envío consentido en un
+cliente de correo real.
 
 ## 2026-08-21 — TASK-1762/1763 formalizan cierre por cupos y correo empático; cero runtime nuevo
 
