@@ -3,6 +3,26 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-21 — El correo de selección celebra sin adelantar la incorporación
+
+- El asunto identifica nombre y vacante; el título visible evita duplicar el saludo y el cuerpo explica la
+  secuencia real: selección, carta oferta, aceptación y firma del contrato.
+- La propuesta 3D fue rechazada por lenguaje tecnológico y el bouquet V2, aunque más cálido, por falta de ajuste de
+  marca. Diseño + Talent convergen en una V3 con el isotipo orbital intacto, las bandas angulares de Wave y la paleta
+  oficial de Efeonce. El PNG transparente pesa 25.228 bytes y su URL respondió `200 image/png`.
+- HTML y texto plano conservan la misma verdad; la variante de rechazo no carga el hero. Código completo con
+  captura local revisada; rollout del template pendiente y ningún correo real enviado.
+
+## 2026-08-21 — Hiring formaliza el cierre empático de una vacante cuando se completan sus cupos
+
+- `TASK-1762` separa capacidad de publicación y selección: preview fresco, confirmación humana y run durable por
+  aplicación antes de rechazar/notificar a la cohorte restante.
+- `TASK-1763` diseña el segundo paso en Application 360 con CTA explícita `Cerrar vacante y notificar a N personas`,
+  estados stale/partial y evidencia desktop/mobile planificada.
+- El ADR Proposed conserva `TASK-1689` como pipeline individual, prohíbe batch SQL/email directo y sólo permite
+  afirmar Banco de Talentos cuando el consentimiento futuro está vigente. `data_origin` no gatea comunicaciones.
+- Estado: documentación/diseño; no hay migraciones, código, flags ni emails nuevos activos.
+
 ## 2026-08-21 — Hiring incorpora un plan gobernado para crear la cuenta Microsoft del nuevo colaborador
 
 - `TASK-1761`, anclada a `EPIC-011`, separa la cuenta Entra deshabilitada, su binding OID, la habilitación laboral
@@ -938,32 +958,3 @@ consumers reactivos en el ops-worker sobre la plataforma de email canónica, ide
 retries, con kill-switch por tipo (el de rechazo pausable aparte) y detrás de
 `HIRING_LIFECYCLE_EMAILS_ENABLED` default OFF. Code complete con suite completa verde; el flip
 espera deploy del worker, ejercicio en staging y revisión del copy por Talent.
-
-## 2026-08-12 — Sentry separa el ruido del bridge de Facebook de los errores reales de Careers
-
-El cliente de Sentry filtra exclusivamente la firma del bridge nativo que Facebook inyecta en
-Android cuando el objeto Java desaparece durante el ciclo de vida de su WebView: exige el mensaje,
-navegador y frame `app://` exactos. No toca Careers, Turnstile ni la captura de otros errores de
-Facebook/Android. La investigación comprobó que la página pública y el formulario nativo responden
-correctamente; el cambio llegó a producción por `d139726ff` y 8W no tuvo recurrencias posteriores al rollout.
-
-En el mismo cierre se recupera la gobernanza persistida de `/admin/globe/credits`: una migration
-añade el registry y el único grant que autoriza su contrato (`efeonce_admin`), eliminando el
-fallback que generaba `role_view_fallback_used` durante el refresh de claims. La migration quedó aplicada y
-el grant se verificó en Cloud SQL. También se corrigió el smoke de identidad: el `ops-worker` compartido
-consultaba el portal staging protegido por SSO (HTTP 302); al usar el portal público dos runs fueron 5/5 y
-la health fue `ready`. Los tickets remotos de Sentry quedan por marcar como resueltos cuando exista una
-sesión o token con escritura.
-
-## 2026-08-12 — El escáner de malware quedó vivo en producción, verificado de punta a punta
-
-Cierre de la historia que las dos entradas siguientes cuentan: el escáner de firmas
-está operativo en staging y en producción, y esta vez la verificación corrió donde
-tenía que correr. Tres capas independientes, todas desde el runtime real: el
-endpoint de diagnóstico acuñó la credencial y el servicio la aceptó ANTES de
-prender el flag; después del flip el mismo endpoint confirmó el flag horneado; y
-una postulación de prueba por el formulario público real atravesó el camino
-completo — escaneada por los dos motores, limpia y adjunta en 129 ms. La issue del
-doble incidente quedó resuelta y la task de provisión cerrada. Costo steady del
-servicio: ≈USD 19/mes. Recursos Humanos descarta la postulación de prueba desde el
-Hiring Desk.

@@ -2,6 +2,34 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-21 — Correo de selección personalizado adopta una firma visual Efeonce; rollout pendiente
+
+`hiring_decision_selected` ahora separa asunto, preencabezado y título visible, confirma la elección sin declarar
+incorporación y explica `carta oferta → aceptación → contrato` con paridad HTML/texto plano. La primera propuesta
+3D quedó rechazada por lenguaje tecnológico y el bouquet V2, aunque cálido, por parecer genérico. Diseño + Talent
+convergen en una V3 pequeña y secundaria construida con el isotipo orbital intacto, las bandas de Wave y la paleta
+oficial de Efeonce. No representa demografía ni onboarding, pesa 25.228 bytes y quedó en
+`gs://efeonce-group-greenhouse-public-media-prod/emails/hiring-selected-email-illustration-v3.png` con readback 200.
+
+Las capturas finales están en `.captures/hiring-selected-email-hero/email-v4-720.png` y
+`.captures/hiring-selected-email-hero/email-v4-390.png`; se retiró la tarjeta que repetía la vacante y la imagen
+permanece decorativa (`alt=""`). La variante de rechazo no la consume. Estado: **code complete, rollout pendiente**. No se envió ningún
+correo real ni se desplegó el cambio; el siguiente paso es incluirlo en un release normal y verificar un envío
+consentido en un cliente de correo real.
+
+## 2026-08-21 — TASK-1762/1763 formalizan cierre por cupos y correo empático; cero runtime nuevo
+
+Se crearon dos tasks bajo `EPIC-011` y un ADR Proposed. `TASK-1762` posee capacidad explícita separada de
+publicación, preview/confirm humano, run durable por item, decisión/evento canónicos y variantes de rechazo directo
+o vacante completada. `TASK-1763` es el consumer UI de Application 360 con dirección visual, wireframe y flow.
+
+La selección de una persona nunca auto-rechaza. Sólo un preview fresco y una confirmación explícita crean el run;
+el worker llama `decideHiringApplication` por cada application y el correo nace desde ese hecho, conservando dedupe
+y recovery parcial. `backup_selected`/`on_hold` se muestran aparte. La frase de Banco de Talentos sólo aparece con
+consentimiento futuro vigente; `data_origin` no gatea comunicaciones. TASK-1689 queda histórica y TASK-1721 ahora
+apunta a estos owners. Estado: **diseño/documentación; ADR Proposed; sin código, migración, flag ni envío nuevo**.
+Siguiente paso: aceptar/ajustar el ADR, tomar TASK-1762 y después TASK-1763.
+
 ## 2026-08-21 — TASK-1761 formaliza Hiring → Microsoft Entra; implementación bloqueada por ADR y gates P0
 
 Se creó `TASK-1761` dentro de `EPIC-011` y el ADR Proposed
@@ -544,49 +572,3 @@ universal— y la forma contractual se explica en el modelo de trabajo. Efecto c
 Verificado en producción: ambas 200, las 13 secciones presentes, JSON-LD de 5756 y 4508 caracteres
 con los outcomes incluidos, `baseSalary` sólo en Content Creator (la única con rango aprobado) y
 `employmentType: FULL_TIME` en las dos.
-
-## 2026-08-18 — Careers público EN PRODUCCIÓN: hoja editorial + JobPosting, con 4 flags prendidos
-
-Release `fa54670470c1` (`released`, run `32127499151`, 8m31s). Batch de EPIC-011: TASK-1740 +
-TASK-1741 + el acumulado 1719/1734/1735/1736 + `ISSUE-159`. Watchdog `OK` con **4/4 workers
-synced** (el residual change-gated del `ops-worker` lo clasificó solo, diff de rutas runtime vacío).
-
-**Verificado en producción real, no en el generador:** las dos vacantes emiten `JobPosting` con
-`TELECOMMUTE`, 20 países, `hiringOrganization: Efeonce`, canonical correcto y sin
-`directApply`/`validThrough`/`baseSalary`; la hoja editorial se sirve con sus secciones; una vacante
-cerrada responde 404 sin schema. El calificador de beneficios ("se formaliza según tu modalidad de
-contratación y país de residencia") aparece en el HTML **y** en el schema, desde la misma fuente.
-
-**Flags prendidos en Production** (con redeploy `greenhouse-4qu4swddd` — sin él quedan inertes):
-`CAREERS_DETAIL_EDITORIAL_V2_ENABLED`, `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED`,
-`HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED`, `HIRING_EVALUATION_DOSSIER_AI_ENABLED`. Los dos
-últimos se prendieron por autorización explícita del CEO **con sus verificaciones aún pendientes**:
-el canary del runbook de identidad y el smoke propose/confirm del expediente. Están anotados en el
-ledger como ON-con-pendiente, no como cerrados.
-
-**El quinto flag se prendió DESPUÉS de cumplir sus precondiciones, no saltándolas.** Primero quedó
-apagado porque `services/ops-worker/deploy.sh` exige tres y sólo se cumplía una. A instrucción del
-CEO ("resuelve lo que haga falta para prenderlo de forma robusta"), se resolvieron las otras dos:
-la policy del canary `EO-OPN-0009` se reconfiguró a `on_stage_entry`/`shortlisted` (cap 3/60 min) y
-se habilitó por command canónico —`configureOpeningAssessmentPolicy` la devuelve a `draft` a
-propósito, así que son dos llamadas y quedó en `policy_version=2`—, y el cancel/recovery se ejercitó
-con `cancel.live.test.ts` **5/5 contra PG real** en vez de cancelarle el test a un candidato real,
-que le habría matado el enlace. Recién entonces: default `true` en `deploy.sh` (SoT, porque
-`--set-env-vars` es destructivo y un flip out-of-band se evapora en silencio) **más**
-`gcloud run services update`, verificado en la revisión activa `ops-worker-00576-7zz`.
-
-⚠️ **Ahora sí dispara**: mover una postulación de esa vacante a `shortlisted` le asigna el test
-automáticamente. Las 5 que ya están en esa etapa tienen test abierto (4/5), así que la señal del
-canary llega cuando Talent mueva a alguien de los 10 `sourced`. El tope de 3 por hora es
-deliberadamente conservador: un movimiento en lote mayor deja a los excedentes con el aviso genérico
-de avance, sin prueba — conviene calibrarlo con Talent antes de un batch grande.
-
-**Dos aprendizajes operativos para el runbook:** (1) el clasificador de permisos bloquea
-`vercel env add`/`redeploy` hasta que el operador autoriza expresamente en el chat — no es credencial
-ni scope; (2) `vercel env add <FLAG> Production` falla con `api_error: specify at least one
-Environment`: **el entorno estándar va en minúscula** (`production`), mientras el custom (`staging`)
-respeta su nombre literal.
-
-**Sigue pendiente de decisión del CEO:** monitor de equidad (capturaría categorías protegidas bajo
-una política que sólo existe en versión de pruebas), scoring por lotes (bloqueado por falta de gold
-set calificado, no de permiso) y lectura de CVs por agentes (sin firmas de privacidad/seguridad).
