@@ -158,3 +158,25 @@ El orden no es por severidad: es por desbloqueo y por reversibilidad.
 - Optimización del costo de Cloud Run. Aparece en `TASK-1710` pero no comparte causa ni superficie con nada de este epic; merece su propio carril.
 - Reparar HubSpot cambiando datos a mano en el CRM. Todo va por el bridge y su derivación de anchors.
 - Aumentar timeouts, acknowledgear dead-letters o silenciar señales para que el dashboard se vea verde.
+
+## Delta 2026-08-21 (2) — Flags fiscales verificados en Production: el riesgo PPM es real pero pequeño
+
+Leídos con `vercel env run --environment=production` (sin escribir secretos a disco):
+
+```
+PPM_POSITION_ENABLED       = true
+RETENTION_POSITION_ENABLED = true
+VAT_POSITION_ENABLED       = (no existe — el IVA no tiene flag: es oficial siempre por diseño)
+```
+
+El flag está **encendido**, así que `enabledByLine.ppm = true` y los consumers presentan la línea PPM como **oficial**, no shadow (`src/lib/finance/f29-consolidated.ts:34-41`). Pero la exposición real es mucho menor de lo que sugería el hallazgo, por dos razones medidas:
+
+**1. Los períodos recientes NO están materializados, y eso degrada honestamente.** `ppm_monthly_positions` tiene 19 filas que van de `2024-07` a `2026-06`, todas materializadas de una sola vez el `2026-06-20`. **No existe posición para `2026-07` ni `2026-08`.** El contrato devuelve `ppm: null` para esos períodos y el consumer distingue "sin materializar" de "cero" — no muestra un número malo, muestra ausencia.
+
+**2. Los montos son minúsculos.** Con la tasa placeholder de `0.00125`, el PPM más alto de toda la serie es `2025-09` con **CLP 31.178**, y los 19 períodos juntos suman del orden de **CLP 135.000**. El "delta de base de CLP 12,6M" del hallazgo original se traduce, a esa tasa, en unos **CLP 15.750** de diferencia de PPM.
+
+**Lo que sí queda como defecto real, y no es el monto:** las 19 filas llevan `rate_source = 'sii_f29_confirmed_2026'` mientras la única fila de `ppm_rate_config` se autodescribe como *"tasa PPM default placeholder (0,25%)… el contador debe actualizar esta fila"*. **La etiqueta afirma una confirmación del SII que no ocurrió.** Ese es el problema: un dato marcado como validado que nadie validó. Un contador que confíe en la etiqueta no va a revisar la tasa.
+
+Consecuencia para la priorización del epic: el punto 1 del `Orden de ejecución` deja de ser contención urgente y pasa a ser **una conversación con el contador** — confirmar la tasa PPM real del contribuyente y corregir `rate_source` para que deje de mentir. Sigue yendo primero por ser lo único con consecuencia hacia afuera, pero no requiere apagar nada hoy ni bloquea el resto del programa.
+
+`RETENTION_POSITION_ENABLED=true` tiene la misma forma: materializador detenido el mismo `2026-06-20`, y su única señal de drift es un falso positivo (documento anulado que el reader no filtra).
