@@ -131,12 +131,17 @@ mueve, y este es el orden"* sí.
 10. 🔴 **NUNCA inventes un caso.** **Hoy tenemos CERO casos de SEO/AEO citables** (métrica verificable +
     relación sana + autorización). → `efeonce/ESTADO_ACTUAL.md`. **Con cero casos, el precio y el Grader hacen
     el trabajo de la prueba — y por eso tienen que estar impecables.**
+11. 🔴 **NUNCA vendas un cambio de parser como actualización de ranking.** Primero demuestra en HTML live que
+    el cliente emite el patrón afectado y cuantifica templates/URLs; después encuadra el impacto verificable en
+    datos estructurados, rich results y CTR. El cambio de Google del 2026-08-21 fue una sola pasada de HTML
+    unescaping en JSON-LD, no una penalización ni un core update
+    ([fuente primaria](https://www.linkedin.com/feed/update/urn:li:activity:7496492350907596801/)).
 
 **Fronteras**
 
-11. 🔴 **NUNCA reinventes el método de venta** (`commercial-expert`) ni el motion GTM (`gtm-architect`).
+12. 🔴 **NUNCA reinventes el método de venta** (`commercial-expert`) ni el motion GTM (`gtm-architect`).
     Esta skill aporta el **dominio**, no el **método**.
-12. 🔴 **NUNCA reimplementes el oficio** (`seo-aeo`). Acá se vende; allá se hace.
+13. 🔴 **NUNCA reimplementes el oficio** (`seo-aeo`). Acá se vende; allá se hace.
 
 ---
 

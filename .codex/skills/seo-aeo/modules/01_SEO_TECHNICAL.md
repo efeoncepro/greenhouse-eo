@@ -3,8 +3,9 @@
 > Carga este módulo para: rastreo/indexación, Core Web Vitals, render JS,
 > sitemaps, canonicalización, datos estructurados (JSON-LD), arquitectura de
 > sitio, y **gestión de crawlers de IA** (robots para GPTBot/ClaudeBot/etc.).
-> Sello base: as-of 2026-06; delta GSC/API verificado 2026-07-18. Reverifica
-> umbrales CWV, lista de bots y features de Search Console con WebSearch.
+> Sello base: as-of 2026-06; delta GSC/API verificado 2026-07-18; cambio de
+> extracción JSON-LD de Google verificado 2026-08-21. Reverifica umbrales CWV,
+> lista de bots, parsers y features de Search Console con WebSearch.
 
 ## Mapa mental: la técnica habilita las 3 capas
 
@@ -128,6 +129,90 @@ Para infografías complejas, usar ALT breve + descripción larga equivalente. Ca
 - **Nota de volatilidad:** Google ha recortado qué rich results muestra (p.ej.
   FAQ/HowTo se restringieron en 2023). Marca igual por la capa de entidad/IA,
   pero no prometas el rich snippet sin verificar elegibilidad vigente.
+
+### Cambio de parser 2026-08-21: un solo HTML unescape
+
+[Google Search Central anunció](https://www.linkedin.com/feed/update/urn:li:activity:7496492350907596801/)
+que su extractor de JSON-LD aplica desde ahora **una sola pasada de HTML
+unescaping**. Es un cambio de compatibilidad del parser, no un core update, spam
+update ni nueva señal general de ranking. Los datos estructurados hacen a una
+página elegible para experiencias enriquecidas; no garantizan que aparezcan y
+un problema de schema no equivale por sí mismo a una caída del resultado web
+normal ([guía oficial de Google](https://developers.google.com/search/docs/appearance/structured-data/sd-policies)).
+
+**Qué cambia exactamente.** Una entidad HTML doblemente escapada deja de
+"desenrollarse" hasta el carácter final:
+
+| Literal emitido dentro del JSON-LD | Tras una pasada | Valor que probablemente se quería |
+|---|---|---|
+| `Efeonce &amp;amp; Wave` | `Efeonce &amp; Wave` | `Efeonce & Wave` |
+| `SEO &amp;#10004;` | `SEO &#10004;` | `SEO ✓` |
+
+Las entidades HTML (`&amp;`, `&#10004;`) **no son escapes JSON**. JSON admite
+Unicode directo y escapes `\u` de cuatro dígitos según
+[RFC 8259 §7](https://www.rfc-editor.org/rfc/rfc8259.html#section-7). Las formas
+correctas son, por ejemplo:
+
+```json
+{
+  "name": "Efeonce & Wave",
+  "alternateName": "Efeonce \u0026 Wave",
+  "headline": "SEO \u2714"
+}
+```
+
+**Por qué un validador puede quedar verde.** `"&amp;amp;"` sigue siendo una
+cadena JSON sintácticamente válida. `JSON.parse()` puede aprobar el bloque y el
+grafo seguir transportando el literal equivocado. Distingue por eso:
+
+1. **Sintaxis:** ¿el bloque se parsea como JSON?
+2. **Extracción:** ¿qué valor obtiene el consumidor después de su única pasada?
+3. **Semántica:** ¿ese valor coincide con el contenido visible y el source of
+   truth?
+
+El riesgo suele ser mayor en `@id`, `url`, `sameAs`, `image`, `contentUrl` y
+URLs con query strings: una entidad residual puede fragmentar la identidad del
+grafo o apuntar a otro recurso. En `name`, `headline` o `description` puede
+quedar copy corrupto o inconsistente. El efecto puede ir desde un literal
+incorrecto hasta que Google ignore un campo o un item para una feature; **no
+afirmes que siempre descarta el grafo completo**. Tampoco extrapoles este cambio
+de Google a ChatGPT, Perplexity, Bing u otro parser sin evidencia propia.
+
+**Contrato de generación — causa raíz, no parche:**
+
+1. Construye el schema como objeto desde el mismo contenido gobernado que se
+   muestra a la persona.
+2. Serialízalo **una vez** con el serializer JSON estándar del lenguaje.
+3. Insértalo como data block `application/ld+json`; la especificación JSON-LD
+   permite extraer el documento embebido *as is*
+   ([W3C JSON-LD 1.1 §7](https://www.w3.org/TR/json-ld11/#embedding-json-ld-in-html-documents)).
+4. Si el contexto HTML exige neutralizar `<` o la secuencia `</script>`, usa un
+   escape JSON/Unicode como `\u003c` o un serializer seguro para ese contexto;
+   **no** pases el JSON serializado por un encoder de entidades HTML.
+5. No agregues una segunda decodificación de input ni un replace global sobre
+   el HTML servido: puede alterar contenido visible, URLs o la frontera XSS.
+   Corrige el writer/template/plugin que serializa dos veces.
+
+**Auditoría y verificación:**
+
+- inspecciona el HTML **live emitido**, no solo el objeto previo al render, en
+  una muestra por template/tipo de schema y en páginas de mayor valor;
+- dentro de cada `script[type="application/ld+json"]`, busca entidades HTML y
+  eleva como riesgo de doble escape el patrón
+  `&amp;(?:#[0-9]+|#x[0-9A-Fa-f]+|[A-Za-z][A-Za-z0-9]+);`;
+- ejecuta `JSON.parse(script.textContent)` y luego compara valores sensibles
+  contra el DOM visible y la fuente gobernada; parseable no significa correcto;
+- prueba la **URL live** con Rich Results Test y Schema.org Validator, revisando
+  los valores extraídos además del estado verde; Google advierte que sus tests
+  no capturan todos los problemas semánticos;
+- tras el fix, monitorea items válidos/inválidos y el informe *Unparsable
+  structured data*; para impacto observa Search Console por *Search appearance*
+  (impresiones, clicks y CTR), dejando tiempo para recrawl/reindexación.
+
+**Prioridad:** si nace en un template o plugin sitewide, el reach vuelve el fix
+alto impacto/bajo esfuerzo y va primero. Una entidad residual aislada en un
+campo no elegible de una página de bajo valor no debe presentarse como incidente
+de ranking.
 
 ## 6. Gestión de crawlers de IA (robots para bots LLM) — as-of 2026-06
 
