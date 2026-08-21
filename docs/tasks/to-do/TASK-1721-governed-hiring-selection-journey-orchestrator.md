@@ -97,8 +97,8 @@ Reglas obligatorias:
 - El orquestador ejecuta sólo commands canónicos y registra resultados observables; no business rules duplicadas.
 - Un fallo después de la decisión no revierte ni elimina la selección. El run queda `blocked`/`failed` y reconcilia.
 - Una re-decisión/supersesión crea o reconcilia una nueva versión; nunca muta historia para aparentar rollback.
-- No se rechazan, archivan ni mueven automáticamente otras aplicaciones. Opening capacity y cierre de cohorte son
-  policy fuera de esta task.
+- No se rechazan, archivan ni mueven automáticamente otras aplicaciones. `TASK-1762` posee opening capacity y
+  cierre de cohorte; `TASK-1763` posee su confirmación visible. Este journey sólo puede exponer ese next action.
 - El correo de selección es reactivo a la decisión; `decision_recorded` no se representa como `email_sent`.
 - CV, assessment y notas son inputs de preview allowlisted; no se copian al aggregate de journey.
 - El camino `internal_hire` puede llegar hasta onboarding/readiness. `staff_augmentation` se detiene en el boundary
@@ -130,6 +130,8 @@ Reglas obligatorias:
 ### Blocks / Impacts
 
 - `TASK-1722`: adapter MCP delegado consume exclusivamente estos commands/readers.
+- `TASK-1762`: consume el hecho de selección y expone un cierre de capacidad separado; no forma parte de esta saga.
+- `TASK-1763`: muestra ese next action en Application 360 sin duplicar orchestration.
 - Nexa/Application 360 pueden consumir el mismo preview/status en un follow-up UI, sin duplicar orchestration.
 - Reliability/Platform Health recibe stuck/failed/uncertain journey signals.
 - El recorrido actual de Activation Lane permanece válido y puede operar el mismo handoff/run en paralelo seguro.
@@ -328,7 +330,8 @@ Reglas obligatorias:
 ## Out of Scope
 
 - Seleccionar automáticamente al candidato “mejor”, rankear, recomendar contratación o reemplazar criterio humano.
-- Rechazar/mover otras aplicaciones, cerrar opening, consumir seat capacity o emitir oferta/contrato.
+- Rechazar/mover otras aplicaciones, cerrar opening o consumir seat capacity: ownership explícito de
+  `TASK-1762`/`TASK-1763`. Oferta/contrato siguen fuera.
 - Completar documentos legales, payroll, access, compensation o workforce intake por inferencia.
 - Auto-fusionar identidad o crear persona/member paralelo.
 - Implementar placement Staff Augmentation si no existe command dueño aprobado.
@@ -459,7 +462,8 @@ y event/history, no repitiendo ciegamente la decisión.
 - `TASK-1761` — Microsoft Entra workforce provisioning; este journey consume readback/checkpoints y no posee writes.
 - UI/UX consumer en Application 360 para timeline/next action, sólo si el primitive requiere nueva superficie visible.
 - Placement Staff Augmentation journey cuando exista command canónico y owner de reversa.
-- Policy explícita para capacity/opening closure y tratamiento de candidaturas restantes; no inferirla aquí.
+- `TASK-1762`/`TASK-1763` — capacity/opening closure y tratamiento consent-aware de candidaturas restantes; este
+  journey no lo infiere ni lo ejecuta.
 
 ## Delta 2026-08-15
 

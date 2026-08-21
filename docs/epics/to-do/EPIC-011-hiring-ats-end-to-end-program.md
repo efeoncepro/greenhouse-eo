@@ -194,6 +194,10 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   decisión atómica con handoff, email y activation sin saltarse gates ni duplicar commands.
 - `TASK-1722` — Delegated MCP Candidate Selection Journey: tools start/status/advance/cancel sobre TASK-1721, con
   authority por step y write fail-closed hasta grant revocable TASK-1631.
+- `TASK-1762` — Hiring Opening Capacity Closure and Candidate Disposition Foundation: capacidad explícita,
+  preview/confirm, run durable por aplicación y email consent-aware sobre el evento canónico.
+- `TASK-1763` — Hiring Capacity Closure Preview and Confirmation Flow: segundo paso visible en Application 360,
+  con cohorte/consecuencia exacta antes de cerrar y notificar.
 - `TASK-1723` — Talent Pool Canonical Foundation + Full API Parity: membership/purpose/evidence/search/commands/API.
 - `TASK-1724` — Talent Pool Consent + Candidate Self-Service: opt-in independiente, status/renew/withdrawal público.
 - `TASK-1725` — Talent Pool Desk: workbench interno person-first y invitation proposal/confirm.
@@ -219,6 +223,11 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   sessionVersion y reconciliation sobre TASK-770.
 - `TASK-1761` — Hiring-to-Entra Workforce Account Provisioning and Lifecycle Bridge: API-driven inbound sobre el
   mismo principal, cuenta disabled-first, OID binding pre-SCIM, enable/licensing gated y Joiner-Mover-Leaver.
+- `TASK-1752` — Assessment AI Run Settled-Not-Closed Signal: detecta runs settled atrapados en `awaiting_review`.
+- `TASK-1754` — Hiring Stage Vocabulary Collapse: alinea etapas elegibles con las que el operador puede elegir.
+- `TASK-1755` — Assessment Assignment Attempt Recovery: permite reintento gobernado tras un intento `blocked`.
+- `TASK-1756` — Dossier Partial Evidence Disclosure: impide recomendaciones silenciosas sobre evidencia incompleta.
+- `TASK-1757` — Assessment Access Rotation Candidate Notice: avisa una rotación sin filtrar la credencial.
 - `TASK-1732` — Identity-First People 360 Hiring Journey Reader: historia pre/post-member, paginada y allowlisted.
 - `TASK-1733` — People 360 Longitudinal Hiring History UI: timeline/detail interno sobre TASK-1732.
 - `TASK-1734` — Assessment AI Scoring at Scale + Operator-Only Exception Review: run asíncrono por assessment,
@@ -450,6 +459,9 @@ cierre, menos fantasmas hay que remediar después.
 - [ ] `TASK-1731` demuestra selección→activación con el mismo principal/persona y revocación/refresh de sesión.
 - [ ] `TASK-1732`–`TASK-1733` muestran People 360 identity-first antes/después de member, con todas las aplicaciones
       autorizadas y sin mezclar evidencia entre procesos.
+- [ ] `TASK-1762`–`TASK-1763` permiten declarar cupos, revisar y confirmar un cierre de cohorte sin inferirlo desde
+      publicación/selección; retries no duplican decisiones/emails y Banco de Talentos sólo se afirma con
+      consentimiento futuro vigente.
 
 ## Non-goals
 
