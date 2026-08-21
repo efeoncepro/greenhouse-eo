@@ -2,6 +2,40 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-21 — Transparencia GPT Image 2 code complete; rollout de Globe pendiente
+
+La documentación oficial completa de OpenAI quedó consolidada en
+`OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`: GPT Image 2 es el único miembro activo/recomendado y soporta
+`background=transparent` en preview con PNG/WebP. GPT Image 1.5, 1, 1 Mini y `chatgpt-image-latest` están deprecated
+con retiros en octubre/diciembre de 2026. Las skills `greenhouse-ai-image-generator` y
+`greenhouse-globe-model-fleet` quedaron corregidas y espejadas; el gate ahora valida también el bundle de imágenes.
+
+El helper Greenhouse ya conserva GPT Image 2, rechaza `transparent+jpeg`, evita pagar/descartar outputs múltiples,
+valida máscara/formato/dimensiones y no promete partial images sin transporte SSE. Globe transporta
+`backgroundMode` desde catálogo/shape hasta request, fingerprint, manifest y output; verifica alfa decodificado,
+expone el selector route-driven y usa checkerboard tokenizado. La ruta Globe queda probada localmente, sin deploy ni
+gasto desde ese runtime.
+
+El CLI canónico de Greenhouse completó además un canary facturable mínimo con `gpt-image-2`, PNG 1024×1024,
+`quality=low` y `background=transparent`: el archivo tiene cuatro canales, alfa real y 470.164 píxeles totalmente
+transparentes; la composición visual pasó sobre fondos claro y oscuro. Esta evidencia valida el helper Greenhouse,
+no el adapter/runtime autenticado de Globe.
+
+Estado: **code complete, rollout pendiente**. La variante transparente sigue Globe-gated hasta desplegar, ejecutar
+un canary autenticado y facturable sobre `ref/still/openai-v2`, leer bytes/metadata/cobro, capturar GVC y ejercer
+promoción/rollback. No actualizar evidencia de reader/canary histórico sin revalidación real. Pendientes adicionales
+quedan en `TASK-1552`, `TASK-1553` y `TASK-1633`: badge requested/effective en feed/viewer, GVC/canary live,
+promoción/rollback del modo preview y WebP sólo si se decide ampliar la ruta PNG actual.
+
+## 2026-08-20 — Hiring Evaluación: espacio vertical fantasma corregido localmente
+
+La tabla accesible del scorecard ya no recibe dimensiones de 1 px directamente: vive dentro de un
+wrapper genérico `1×1` clipado y conserva `caption`, encabezados `scope` y las cuatro columnas del
+contrato. GVC local premium pasó desktop 1440 y mobile 390 con cero findings/runtime errors; geometría
+medida: `scrollWidth === clientWidth`, wrapper `1×1`, `scrollHeight` 1549/2296. El scenario dejó de
+ignorar la tabla y el layout gate detecta `layout_out_of_flow_vertical_runaway`. Estado: **code complete,
+rollout pendiente**; no hubo push, deploy ni release en esta sesión.
+
 ## 2026-08-19 (noche) — Release 1745/1746 en producción, y cuatro hallazgos que quedaron en tasks
 
 Sesión paralela a la de TASK-1747. Lo que sigue es lo que una sesión fresca necesita saber para no
@@ -543,54 +577,3 @@ deploy del ops-worker (que se redespliega cada pocas horas — mismo patrón que
 (sólo hay un reader que reporta vencimiento); CVs `legacy_unscanned` descargables mientras
 `ASSET_MALWARE_SCAN_ENABLED` sigue bloqueado por ClamAV no provisionado (TASK-1378 sin decidir); y
 TASK-1718 con código en producción tras flags cerrados y sus sign-offs abiertos.
-
-## 2026-08-17 — Grandfathering: una vacante viva no se cae por una regla de autoría
-
-Revisión de TASK-1741 sobre el checkout compartido. El renderer editorial quedó bien (typecheck
-limpio, 974 tests verdes, migración de seniority aplicada, el texto de la vía contractual sobrevivió
-íntegro vía mapeo `remoteModel`→`workModel`), y **codificaron como candado el invariante de secuencia
-que TASK-1740 sólo había documentado**: el schema no puede emitirse sin el renderer editorial ON.
-Verifiqué la paridad empíricamente comparando frase por frase el JSON-LD contra el DOM renderizado:
-alineado en ambas vacantes.
-
-**El hallazgo que sí requería acción:** `publishOpening` pasó a exigir contenido editorial v2 de
-forma incondicional, y las dos vacantes publicadas son v1. Consecuencia: pausarlas las dejaba en 404
-hasta reescribir el bloque entero — con **15 postulantes en `EO-OPN-0009` y 33 en `EO-OPN-0061`**,
-o sea cortando el canal de procesos vivos. Autorizado por el CEO, se implementó **grandfathering**:
-`requiresEditorialV2ForPublish(published_at)` exige v2 sólo en la primera publicación. Verificado
-contra las filas reales: ambas pueden republicarse, y una vacante nueva con el mismo contenido sigue
-bloqueada (contraprueba en el mismo script). El operador desde brief conserva v2 obligatorio porque
-siempre crea vacantes nuevas.
-
-**Guardrail nuevo:** el invariante central del dominio (HTML visible ≡ JSON-LD) no tenía test que lo
-defendiera —el schema se testeaba aislado y la página aislada—, así que agregar un párrafo sólo-schema
-pasaba en verde. Ahora hay un test que cruza ambos lados sobre el DOM renderizado.
-
-**Pendientes que quedan del lado de TASK-1741 (reportados, no corregidos):** editar `publicContent`
-de una vacante publicada v1 obliga a migrarla entera a v2; el read path v2 traga excepciones con
-`catch → null`, así que el día que exista contenido v2 una validación más estricta lo haría
-desaparecer de la página **sin señal**; y toda vacante nombra 8 marcas de partners sin el gate de
-vigencia por vacante que pide el charter, además de publicar beneficios sin su calificador
-"se formaliza según tu modalidad y país" — relevante para vinculación internacional.
-
-## 2026-08-17 — TASK-1741 tomada en develop tras auditoría paralela
-
-El operador autorizó expresamente ejecutar en el checkout compartido `develop`, sin cambiar de rama,
-y usar subagentes. Tres auditorías read-only revisaron contrato público/SEO y readiness UI. Antes del
-renderer se corrigieron los blockers de TASK-1740: la proyección pública ya no selecciona ni usa
-`internal_title`/`seniority`, `publicSeniority` es obligatorio al publicar, un opening publicado no
-puede invalidarse mediante PATCH, los bloques parciales no borran la prosa legacy y la compensación
-rechaza monedas/tipos falsos. Tests focales (53) y TypeScript verdes. TASK-1741 está ahora
-`in-progress`, `UI ready: yes`, con dirección durable `Editorial dossier`; implementación secuencial
-por solapamiento causal entre view model, copy, renderer y CSS. El formulario queda fuera de alcance.
-
-## 2026-08-17 — Tasks creadas para vacantes públicas: contrato SEO primero, renderer después
-
-Se registraron `TASK-1740` y `TASK-1741` como una partición deliberada. `TASK-1740` es la base
-backend/data: modela contenido candidato-facing allowlist-safe, fallback legacy, lifecycle y
-canonical/`JobPosting` desde el mismo contenido visible; no toca el formulario ni habilita Indexing
-API sin autorización/quota. `TASK-1741` es solamente el consumer UI: renderer editorial incremental
-de `/public/careers/[publicId]`, detrás de flag y con GVC 1440/390, que preserva URL, formulario y
-exactamente los dos CTA existentes (hero verde y resumen azul; sin CTA final). Ambas exigen que
-remote/global use países elegibles reales y nunca invente salario, beneficios o condiciones de
-contrato. El wireframe es `docs/ui/wireframes/TASK-1741-public-careers-editorial-detail-renderer.md`.

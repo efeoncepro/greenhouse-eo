@@ -3,6 +3,28 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-21 — GPT Image 2 gana transparencia end-to-end en código, con rollout aún gated
+
+- La nueva matriz oficial cubre GPT Image 2/1.5/1/1 Mini/`chatgpt-image-latest`, endpoints, tamaños flexibles,
+  edición/máscaras, streaming, precios, datos, provenance, deprecaciones y contradicciones entre páginas oficiales.
+- Se elimina el fallback falso Greenhouse GPT Image 2→1.5; el helper valida transparencia/formato, máscaras,
+  singularidad de salida y streaming no implementado antes de llamar al proveedor.
+- Globe incorpora `backgroundMode` de forma provider-neutral en shape, catálogo, request, fingerprint, manifest y
+  output; el driver comprueba alfa real y el Producer deriva selector/checkerboard desde constraints.
+- `greenhouse-ai-image-generator` y `greenhouse-globe-model-fleet` quedan alineadas entre Codex y Claude; el gate de
+  mirrors incorpora por primera vez el bundle completo de generación de imágenes, incluido `agents/openai.yaml`.
+- La ficha GPT Image 2 separa código local verificado de reader/canary históricos. La variante sigue gated hasta
+  deploy, canary billable, readback, GVC, promoción y rollback; WebP no se anuncia en la ruta PNG vigente.
+
+## 2026-08-20 — El gate de rutas de skills queda sin enlaces rotos
+
+- `validate-skill-routes --all` ahora reconoce las referencias canónicas de una misma skill alojadas en el runtime
+  hermano del repo, sin permitir que una instalación global o externa oculte archivos faltantes.
+- `resend-email-platform` incorpora sus tres referencias prometidas —dominios/tracking, webhooks/eventos y
+  envío/límites— en espejos byte-identical para Codex y Claude, verificadas contra fuentes oficiales actuales.
+- La guía de Resend separa el contrato documental vigente de la evidencia runtime que lo contradice: links con
+  secreto siguen fail-closed y requieren `click_tracking=false` más un canary del href recibido.
+
 ## 2026-08-20 — Skill compartida para diseñar y operar dashboards en Google Data Studio
 
 - La nueva skill `google-data-studio` queda invocable por Codex y Claude con bundles byte-identical y aliases para
@@ -18,6 +40,15 @@
 - El aprendizaje de operación con Search Console queda generalizado: polaridad inversa de Average Position,
   protección contra ejes globales en combos, rangos parciales visibles, cohortes `new|rewrite`, fórmulas ponderadas y
   una narrativa cliente que separa resultado observado, inferencia e impacto de negocio demostrado.
+
+## 2026-08-20 — La tabla accesible del scorecard deja de inflar la página
+
+- La tabla `sr-only` de Hiring > Evaluación aplicaba su caja de 1 px directamente sobre `<table>`;
+  el layout tabular envolvía texto carácter por carácter y extendía el documento varios miles de píxeles.
+- El fallback se conserva dentro de un wrapper genérico 1×1 clipado y gana semántica completa:
+  `caption`, encabezados con `scope`, competencia, objetivo, puntaje y estado.
+- GVC ya no ignora ese nodo y reporta `layout_out_of_flow_vertical_runaway` cuando un elemento
+  `absolute|fixed` vuelve a extender anormalmente el layout vertical.
 
 ## 2026-08-19 — El lifecycle de correo quedó operativo, y la documentación decía que nada estaba aplicado
 
@@ -952,62 +983,3 @@ Corre en un único servicio Cloud Run cerrado por IAM, ≈USD 19/mes, con las fi
 actualizándose solas dentro del contenedor. De paso quedó corregida en el flag ledger
 una calibración de costo que estaba desfasada 24×: Cloud Run no cuesta USD 7,32 cada
 30 días sino ≈USD 169.
-
-## 2026-08-11 — Distribución de vacantes en Facebook, trazable y reusable
-
-Se difundieron las vacantes públicas `EO-OPN-0061` (Content Creator) y `EO-OPN-0009`
-(Account Manager) en grupos de Facebook ya unidos y afines; la expansión dejó diez
-envíos adicionales por rol, con nueve visibles y uno a moderación en cada caso al
-momento de verificar. El registro operativo conserva copy, beneficios aprobados,
-destinos, evidencia de estado y la decisión explícita de continuar sin imágenes.
-Hiring Desk, el manual de Careers y las skills espejo ahora separan con claridad la
-publicación canónica del opening de su distribución externa: confirmación humana,
-sin grupos nuevos ni DMs no autorizados, y nunca reintentar un estado ambiguo sin
-verificar antes el texto exacto.
-
-## 2026-08-11 — Radar Wherex reutilizable y documentado
-
-La skill de licitaciones incorpora el companion `wherex-radar-chrome-playwright.md`, el manual comercial y la
-CLI `pnpm wherex:radar`. Su setup aislado guarda la cuenta sólo en `.auth/` con `0600` y Git ignore; el runner
-usa un perfil Chrome separado, revisa **Nueva** y **Editando**, lee fichas y adjuntos técnicos temporales, y deja
-un reporte local protegido. Su salida es read-only y evidence-first; participar, responder, cargar o firmar sigue
-bajo control humano explícito. El flujo documentado continúa con el archivo de originales en OneDrive y con la
-verificación/alta por MCP HubSpot de empresa, deal y asociación en dos confirmaciones; no se eluden visores
-protegidos ni se guardan URLs firmadas. El dictamen exige leer la descripción completa y el Centro de mensajes →
-Preguntas, porque ahí pueden estar el máximo de presupuesto, pago, alcance, inicio, facturación y exclusiones; si
-el reporte no contiene esas aclaraciones, se revisan en la UI autenticada antes de clasificar. La misma fuente ahora
-documenta el cierre de una postulación: precio desde cotización aprobada → condiciones/adjuntos → reconciliación
-en resumen → aceptación y envío únicamente con confirmación humana final.
-
-## 2026-08-11 — Oferta completa para Ajinomoto LIC-962
-
-Se redactó la propuesta técnica y económica para el programa influen-SER Team de Ajinomoto del Perú, con ledger
-trazable al brief y a las respuestas de Wherex, matriz de cumplimiento, límites de alcance y condiciones de
-facturación Chile–Perú. La oferta fija S/ 7.000 mensuales sin IGV peruano y S/ 84.000 referenciales para los 12
-meses de la ficha; no promete resultados de plataforma ni producción ilimitada. Se emitió la cotización XLSX y
-se compuso una presentación técnica de 11 láminas, validada por el composer. Ningún precio, adjunto, término o
-envío fue ingresado en Wherex. El blueprint interno conserva el gate de Finanzas por costo cargado/squad y la
-revisión tributaria previa a adjudicación.
-
-## 2026-08-10 — TASK-1685 cerrada: el portal cliente tiene un solo primitive de visibilidad
-
-El menú del portal cliente y la puerta de cada página dejaron de decidir por su cuenta. Existe un solo
-predicado —`acceso = interna ∨ (¬revocada ∧ (vistaBase ∨ móduloDeLaOrgLaDeclara))`— y lo consumen los
-cuatro caminos: page guard, lista base del menú, ⌘K y layouts de ruta. Antes el menú preguntaba por el
-ROL y la puerta por el MÓDULO contratado, y ninguna de las dos mitades podía observar a la otra:
-medidos contra PG, eran **36 enlaces que el menú ofrecía y la puerta negaba**, sobre los 8 usuarios
-cliente activos, incluidos los 3 reales de Sky Airlines. Hoy el menú muestra exactamente lo que se
-puede abrir. Un `user_view_overrides` con `override_type='revoke'` pasó de decorativo a cerrar la
-puerta de verdad.
-
-Cambio de acceso, no sólo de experiencia: cuatro rutas de detalle del portal (`/proyectos/[id]`,
-`/campanas/[campaignId]`, `/sprints/[id]`, `/notifications/preferences`) no tienen guard propio y su
-única puerta era un layout que gateaba por el carril de rol — un cliente cuyo rol concedía la vista
-pero cuya organización no tenía el módulo entraba al detalle por URL. Los cuatro pasan al guard
-canónico.
-
-Verificado contra PG antes y después: los 24 pares usuario×vista contratados quedaron intactos —ningún
-cliente perdió una superficie que su organización pagó— y los enlaces muertos bajaron de 36 a 0. Sin
-migraciones y sin feature flag: la tabla de overrides estaba vacía, así que el delta de acceso es cero.
-`role_view_assignments` deja de gobernar vistas `cliente.*` (para el portal interno sigue siendo el
-carril canónico) y un lint en `error` impide reintroducir la segunda fuente. Cierra `ISSUE-148`.
