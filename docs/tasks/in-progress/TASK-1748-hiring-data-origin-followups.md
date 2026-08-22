@@ -531,3 +531,12 @@ repite: **anidar transacciones en este repo no aísla nada.**
 
 - Adaptar `verify-growth-forms-application-smoke.ts` (follow-up heredado de `TASK-1739`).
 - Declarar las capabilities de procedencia cuando aterrice una superficie API/UI.
+- **Extender `hiring:data-origin-gate` a `src/**/*.live.test.ts` + arreglar los 12 fixtures que
+  nacen `real`.** El gate barre sólo `scripts/` y `tests/e2e/`, y 12 live tests de hiring llaman
+  `createHiringOpening` sin declarar `dataOrigin`: nacen `real` y publicables en la base compartida.
+  Detectado por `TASK-1755` y confirmado acá con dos casos más, de identidad: los perfiles
+  `identity-live-test-hiring-fixture` y `identity-public-careers-candidate-smoke-task354-…-invalid`
+  están marcados `real`. El código del primero ya declara `smoke_test` en el nacimiento
+  (`live-test-identity.ts`); **las filas existentes esperan `pnpm hiring:data:mark-synthetic`**, que
+  deja audit con actor y motivo. Es el mismo bug class que esta task cierra en el read path, del lado
+  del write path — merece ID propio porque toca 12 archivos de otros dueños.
