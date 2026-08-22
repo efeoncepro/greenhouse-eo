@@ -16,6 +16,8 @@
  * Skill governance: ~/.claude/skills/greenhouse-ux-writing/skill.md
  */
 
+import type { HiringApplicationStage } from '@/types/hiring'
+
 /**
  * Locales soportados por la plataforma. `es-CL` es el default canónico
  * mientras Greenhouse opera como portal `es-only`. `en-US` queda como stub
@@ -543,7 +545,13 @@ export interface HiringDeskCopy {
     appliedDaysAgo: string
     appliedDayUnit: string
     appliedDaysUnit: string
-    stages: Record<string, string>
+    /**
+     * TASK-1754 — indexado por el enum del dominio, NO por `string`. Como
+     * `Record<string, string>` una clave faltante no rompía nada: la columna se quedaba
+     * sin nombre en pantalla y nadie se enteraba hasta verla. Atado al enum, agregar o
+     * retirar una etapa obliga a decidir su nombre visible en el mismo cambio.
+     */
+    stages: Record<HiringApplicationStage, string>
   }
   application: {
     back: string

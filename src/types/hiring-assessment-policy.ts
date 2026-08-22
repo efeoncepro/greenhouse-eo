@@ -5,6 +5,8 @@
 // es determinística (regla etapa→plantilla): NUNCA se dispara desde un score, match o atributo
 // inferido — ese invariante es lo que la mantiene fuera de "IA de alto riesgo" (ADR D7).
 
+import type { HiringApplicationStage } from '@/types/hiring'
+
 // ── Policy (state machine D5.1: nace draft + manual) ──
 
 export const OPENING_ASSESSMENT_POLICY_MODES = ['manual', 'on_stage_entry'] as const
@@ -38,8 +40,16 @@ export type OpeningAssessmentPolicyState = (typeof OPENING_ASSESSMENT_POLICY_STA
  * **NUNCA agregar `screening` sin resolver antes qué se le comunica al candidato**: no es una
  * etapa candidate-facing, así que un assignment bloqueado ahí degrada a SILENCIO y rompe el
  * invariante "ni cero ni dos".
+ *
+ * TASK-1754 — el `satisfies` no es adorno de tipos: es el único lado del contrato que se
+ * revisaba a ojo. Esta lista y `HIRING_APPLICATION_STAGES` eran dos arreglos de strings sin
+ * relación declarada, así que un disparador podía apuntar a una etapa que el dominio no tiene
+ * —o que dejó de tener— y compilar igual. Es exactamente la forma del incidente del 2026-08-19:
+ * la automatización apuntando a un estado que nadie podía alcanzar. Con el `satisfies`, retirar
+ * un literal del enum de etapas rompe la compilación acá, en vez de romper el silencio en
+ * producción.
  */
-export const OPENING_ASSESSMENT_TRIGGER_STAGES = ['shortlisted', 'interview'] as const
+export const OPENING_ASSESSMENT_TRIGGER_STAGES = ['shortlisted', 'interview'] as const satisfies readonly HiringApplicationStage[]
 export type OpeningAssessmentTriggerStage = (typeof OPENING_ASSESSMENT_TRIGGER_STAGES)[number]
 
 /**
@@ -100,8 +110,16 @@ export type AssessmentAssignmentOrigin = (typeof ASSESSMENT_ASSIGNMENT_ORIGINS)[
  * `manual` es un valor legítimo de `triggerStage` en el ledger: identifica la asignación
  * confirmada por un humano fuera de una entrada a etapa. Mantenerlo en la misma columna
  * conserva una sola clave de idempotencia para ambas rutas.
+ *
+ * TASK-1754 — el `satisfies` admite `'manual'` de forma EXPLÍCITA porque no es una etapa, y
+ * declararlo así es lo que deja al resto de la lista atada al enum del dominio. Escribirlo
+ * como `readonly HiringApplicationStage[]` a secas no compilaría, y ensancharlo a `string[]`
+ * devolvería el arreglo al estado en que cualquier literal pasa.
  */
-export const ASSESSMENT_ASSIGNMENT_TRIGGERS = ['shortlisted', 'interview', 'manual'] as const
+export const ASSESSMENT_ASSIGNMENT_TRIGGERS = ['shortlisted', 'interview', 'manual'] as const satisfies readonly (
+  | HiringApplicationStage
+  | 'manual'
+)[]
 export type AssessmentAssignmentTrigger = (typeof ASSESSMENT_ASSIGNMENT_TRIGGERS)[number]
 
 export const ASSESSMENT_ASSIGNMENT_OUTCOMES = [

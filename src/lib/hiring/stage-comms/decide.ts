@@ -139,14 +139,23 @@ export const resolveStageChangeCandidateComms = async (
 
   const policy = await resolveActivePolicyForApplication(applicationId)
 
+  // TASK-1754 — `triggerStage` sale de la POLICY, no de un cast sobre la etapa vigente. Decía
+  // `ctx.stage as 'shortlisted' | 'interview'`: un cast repite a mano un enum que ya existe
+  // (`OpeningAssessmentTriggerStage`) y, sobre todo, MIENTE si alguien mueve el disparador —
+  // afirma en compilación algo que sólo era cierto por la comparación de tres líneas más arriba.
+  // La policy ya trae el literal validado en su lectura (`assertEnum` en `store.ts`), así que
+  // usarlo elimina el cast en vez de tiparlo.
+  const triggerStage = policy?.triggerStage ?? null
+
   const autoEligible =
     policy !== null &&
+    triggerStage !== null &&
     policy.mode === 'on_stage_entry' &&
     policy.state === 'enabled' &&
-    policy.triggerStage === ctx.stage &&
+    triggerStage === ctx.stage &&
     isHiringStageTestAssignmentEnabled()
 
-  if (!policy || !autoEligible) {
+  if (!policy || !triggerStage || !autoEligible) {
     return sendGenericStageEmail(applicationId, payload, ctx.stage)
   }
 
@@ -157,7 +166,7 @@ export const resolveStageChangeCandidateComms = async (
     policyId: policy.policyId,
     origin: 'stage_auto',
     actorUserId: null,
-    triggerStage: ctx.stage as 'shortlisted' | 'interview',
+    triggerStage,
   })
 
   if (result.status === 'assigned') {
