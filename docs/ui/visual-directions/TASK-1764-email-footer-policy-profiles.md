@@ -29,6 +29,10 @@ duplicar el componente.
 - Typography role: identidad 600, contexto 400, links subrayados
 - Color role: texto muted con contraste; azul sólo para links funcionales
 - Signature details: Efeonce siempre visible; Greenhouse sólo como descriptor de plataforma
+- Optional institutional layer: RRSS sólo en suscripción/marketing, monocromáticas, pequeñas y debajo de controles;
+  nunca compiten con el CTA del mensaje
+- Legal layer: razón social/dirección/nota específica en el último nivel de jerarquía, con wrap legible y datos del
+  operating entity
 
 ## Desktop target
 
@@ -58,6 +62,8 @@ legal comprimida lateralmente.
 - Presentar Greenhouse y Efeonce como marcas equivalentes.
 - Promociones, cross-sell o CTA comercial en correos de servicio.
 - Dirección legal hardcodeada en JSX.
+- RRSS universales, a color o presentadas como “Síguenos” dentro de mensajes transaccionales.
+- Disclaimer de confidencialidad genérico aplicado a todos los propósitos.
 - Cambiar todos los templates mediante el default de `EmailLayout`.
 
 ## Acceptance signature

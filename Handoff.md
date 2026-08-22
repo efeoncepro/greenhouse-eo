@@ -9,6 +9,11 @@ superficies más estables del producto. Efeonce es siempre la masterbrand; Green
 plataforma. Firma y footer quedan separados, prioridad de entrega no determina propósito y unsubscribe nace
 prohibido salvo suscripción opcional o marketing explícitamente clasificados.
 
+El contrato incluye además RRSS, dirección e información legal como bloques independientes: RRSS default `none`
+y sólo institucionales en suscripción/marketing; identidad `compact|entity|full` desde el operating entity; nota
+`none|security|privacy|regulated`, sin disclaimer universal. Full legal en marketing es baseline conservador sujeto
+a validación con abogado habilitado por jurisdicción, no una declaración de cumplimiento global.
+
 La task no posee código ni habilita un reemplazo global de `EmailLayout`. La primera child deberá introducir el
 contrato con output legacy byte-idéntico; las siguientes cubrirán una sola familia y máximo cuatro `EmailType`.
 Cada cohorte exige baseline, diff limitado al footer, previews 720/390 y sin imágenes, tests, aprobación explícita,

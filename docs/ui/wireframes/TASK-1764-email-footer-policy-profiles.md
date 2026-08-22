@@ -35,7 +35,9 @@
                        Efeonce
           [contexto de recepción según policy]
         [ayuda/respuesta] [preferencias/baja sólo si aplica]
+               [RRSS sólo suscripción/marketing]
             [identidad legal completa sólo si aplica]
+                 [nota legal específica]
 ```
 
 El footer vive fuera de la card y centrado. La firma nunca se mueve al footer.
@@ -50,6 +52,7 @@ desbordamiento. Se conserva una separación visual inequívoca entre firma y foo
 - Primary: ninguna acción universal; la policy decide si existe ayuda/respuesta
 - Secondary: preferencias sólo para suscripción opcional
 - Destructive: unsubscribe sólo en `optional_subscription|commercial_marketing`
+- Institutional: RRSS sólo en `optional_subscription|commercial_marketing`, visualmente secundarias
 - Selection vs action: no aplica
 - Pending / disabled: no aplica; links inexistentes no se renderizan
 
@@ -72,7 +75,8 @@ desbordamiento. Se conserva una separación visual inequívoca entre firma y foo
 | 3 | Footer identity | Efeonce | `EmailFooter` | brand SSOT |
 | 4 | Footer context | Por qué llegó / Greenhouse como plataforma | `EmailFooter` | policy + copy |
 | 5 | Footer controls | Reply/help/preferences/unsubscribe | `EmailFooter` | policy + URLs runtime |
-| 6 | Legal | Entidad/dirección/privacidad cuando aplica | `EmailFooter` | operating entity + policy |
+| 6 | Social | Cuentas institucionales oficiales cuando aplica | `EmailFooter` | brand/social SSOT + policy |
+| 7 | Legal | Entidad/dirección/privacidad/nota específica cuando aplica | `EmailFooter` | operating entity + policy |
 
 ## Copy Ledger
 
@@ -85,6 +89,9 @@ desbordamiento. Se conserva una separación visual inequívoca entre firma y foo
 | `emails.footer.managePreferences` | controls | `Gestionar preferencias` | preferencesUrl | optional subscription |
 | `emails.footer.unsubscribe` | controls | `Dejar de recibir estos correos` | unsubscribeUrl | sólo perfiles required |
 | `emails.footer.privacy` | legal | `Privacidad` | privacyUrl | marketing/full legal |
+| `emails.footer.socialLinkedIn` | social | `LinkedIn` | governedSocialUrl | sólo policy institutional; ejemplo de slot, no cuenta hardcodeada |
+| `emails.footer.legalIdentity` | legal | runtime | legalName, country, postalAddress | modo entity/full; datos no viven en copy |
+| `emails.footer.securityNotice` | legal | por definir en child | none | sólo policy security |
 
 El copy definitivo de cada child task se valida con el owner de dominio; esta umbrella no lo publica.
 
@@ -102,7 +109,7 @@ El copy definitivo de cada child task se valida con el owner de dominio; esta um
 - Heading order: el footer no introduce headings
 - Chart/table alternatives: no aplica
 - Aria labels: texto visible de links describe su acción
-- Focus notes: orden DOM identidad → contexto → controles → legal
+- Focus notes: orden DOM identidad → contexto → controles → social opcional → legal
 - Color-independent state labels: todos los controles usan texto y underline; no dependen del color
 
 ## Implementation Mapping
@@ -117,7 +124,7 @@ El copy definitivo de cada child task se valida con el owner de dominio; esta um
 - Access / capability: none
 - Runtime consumers: web/ops-worker mediante templates existentes
 - Print/email/PDF considerations: email usa tablas/inline styles; no extiende esta policy a PDF
-- GVC markers: `email-footer`, `email-signature`, `email-unsubscribe`
+- GVC markers: `email-footer`, `email-signature`, `email-social-links`, `email-legal`, `email-unsubscribe`
 
 ## GVC Scenario Plan
 
@@ -128,7 +135,8 @@ El copy definitivo de cada child task se valida con el owner de dominio; esta um
 - Required steps: render legacy y governed con mismo fixture; bloquear imágenes; inspeccionar links
 - Required captures: before/after completo y crop footer
 - Required `data-capture` markers: footer, firma y unsubscribe cuando corresponda
-- Assertions: Efeonce masterbrand; Greenhouse sólo descriptor; unsubscribe conforme a policy
+- Assertions: Efeonce masterbrand; Greenhouse sólo descriptor; unsubscribe/RRSS/legal conforme a policy y RRSS
+  accesibles aun con imágenes bloqueadas
 - Scroll-width checks: `scrollWidth === clientWidth` en ambos viewports
 - Accessibility/focus checks: contraste y orden/nombre de links
 - Reduced-motion evidence: no motion
@@ -141,7 +149,7 @@ El copy definitivo de cada child task se valida con el owner de dominio; esta um
 - Alternatives considered: footer universal; footer por template; big-bang global
 - Why this pattern: menor blast radius, enforcement y rollback atribuible
 - Reuse / extend / new primitive: nuevo `EmailFooter` integrado gradualmente con `EmailLayout`
-- Open risks: mensajes mixtos, buzones no atendidos y legal identity no hidratada
+- Open risks: mensajes mixtos, buzones no atendidos, RRSS stale y legal identity no hidratada
 - Follow-up: child foundation y cohorts con máximo cuatro tipos
 
 ## Acceptance Checklist

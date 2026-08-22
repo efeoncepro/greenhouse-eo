@@ -51,7 +51,9 @@ La policy separará como mínimo:
 - `replyMode`: monitored, support route o none;
 - `signaturePolicy`: none, institutional team o runtime owner verificado;
 - `unsubscribePolicy`: forbidden o required;
-- `legalIdentityMode`: compact o full;
+- `socialLinksPolicy`: none o institutional;
+- `legalIdentityMode`: compact, entity o full;
+- `legalNoticePolicy`: none, security, privacy o regulated;
 - `rollout`: legacy o governed-v1.
 
 Ausencia de policy es error de build/test, nunca fallback inferido.
@@ -77,7 +79,20 @@ Fuentes regulatorias usadas para la dirección —orientación, no asesoría leg
 
 La activación de marketing internacional requiere validación con abogado habilitado en cada jurisdicción.
 
-### 5. Migración incremental, legacy por defecto
+### 5. RRSS, dirección e información legal son bloques gobernados
+
+- `socialLinksPolicy` nace `none`. Sólo `optional_subscription|commercial_marketing` pueden declarar
+  `institutional`; access/security, transactional, Hiring, regulated e internal operational las prohíben.
+- RRSS usan cuentas oficiales y activas desde un SSOT; los íconos son secundarios, monocromáticos, con nombre
+  accesible y fallback textual. No se agregan parámetros de tracking por inferencia.
+- `legalIdentityMode='compact'` muestra Efeonce; `entity` agrega razón social y país; `full` agrega dirección postal
+  válida y privacidad. Los datos provienen del operating entity canónico, nunca de literales JSX.
+- `legalNoticePolicy` activa sólo notas específicas de seguridad, privacidad o dominio regulado. Se prohíbe un
+  párrafo universal de confidencialidad que no corresponda al propósito real.
+- Marketing y suscripción adoptan `full` como baseline conservador del producto; transaccionales no heredan
+  dirección postal ni RRSS por esa decisión. Cada jurisdicción sigue requiriendo validación profesional.
+
+### 6. Migración incremental, legacy por defecto
 
 - El primitive legacy permanece como default mientras exista un solo tipo no migrado.
 - Ningún cambio a `EmailLayout` promueve por herencia todos los tipos.
@@ -90,15 +105,15 @@ La activación de marketing internacional requiere validación con abogado habil
 
 ## Perfiles base
 
-| Purpose | Unsubscribe | Identidad/contexto |
-|---|---|---|
-| `access_security` | forbidden | Efeonce + Greenhouse como plataforma + ayuda de seguridad |
-| `transactional_service` | forbidden | Efeonce + motivo operativo de recepción |
-| `relationship_transactional` | forbidden | Efeonce + relación activa + respuesta atendida cuando exista |
-| `regulated_transactional` | forbidden | Efeonce + entidad legal/referencia documental requerida |
-| `internal_operational` | forbidden | Efeonce + aviso interno + fuente/caso operativo |
-| `optional_subscription` | required | Efeonce + motivo de suscripción + preferencias/baja |
-| `commercial_marketing` | required | Efeonce + consentimiento/origen + baja + privacidad + identidad legal completa |
+| Purpose | Unsubscribe | RRSS | Identidad legal | Nota |
+|---|---|---|---|---|
+| `access_security` | forbidden | none | compact | security cuando corresponda |
+| `transactional_service` | forbidden | none | compact | none o privacy por dominio |
+| `relationship_transactional` | forbidden | none | compact/entity | none o privacy por dominio |
+| `regulated_transactional` | forbidden | none | entity/full | regulated |
+| `internal_operational` | forbidden | none | compact | none |
+| `optional_subscription` | required | institutional opcional | full | privacy |
+| `commercial_marketing` | required | institutional opcional | full | privacy |
 
 ## Alternatives Considered
 
@@ -134,6 +149,8 @@ Seleccionado. Mantiene una fuente de verdad, permite reglas mecánicas y conserv
 - El legacy coexistirá temporalmente con governed-v1.
 - Clasificar mensajes mixtos exige juicio de propósito y revisión legal cuando haya promoción.
 - Un reply-to visual sólo puede mostrarse si el buzón está realmente atendido.
+- Una cuenta social, dirección o razón social stale convierte el footer en información falsa; sus fuentes requieren
+  owner y readback antes de promoción.
 
 ## Runtime Contract
 

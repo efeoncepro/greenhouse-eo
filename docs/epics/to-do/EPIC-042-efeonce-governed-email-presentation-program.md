@@ -34,11 +34,33 @@ Resend, Growth o Hiring en children por coincidencia temática.
 ## Outcome
 
 - Todo `EmailType` queda clasificado mediante una policy exhaustiva de presentación con Efeonce como masterbrand.
+- RRSS, identidad/dirección y notas legales dejan de ser decoración libre: cada tipo declara su elegibilidad y
+  fuente canónica.
 - La foundation se introduce con output legacy byte-idéntico y sin cutover implícito.
 - Cada familia se migra en cohorts de máximo cuatro tipos, con baseline, diff, previews, aprobación, canary y
   rollback independientes.
 - Unsubscribe aparece sólo donde propósito y consentimiento lo exigen; prioridad de entrega nunca lo infiere.
 - El legacy se retira únicamente después de evidencia y aceptación individual para los 30 tipos.
+
+## Presentation Blocks and Eligibility
+
+El footer mantiene una anatomía común —identidad → contexto/ayuda → RRSS opcionales → controles → legal—, pero
+ningún bloque se renderiza por costumbre. La policy de cada `EmailType` declara, como mínimo:
+
+- `socialLinksPolicy: 'none' | 'institutional'`: default `none`. `institutional` sólo se permite en
+  `optional_subscription|commercial_marketing`, con destinos oficiales/activos desde SSOT, íconos monocromáticos,
+  nombre accesible y fallback textual. Está prohibido en access/security, transaccionales, Hiring, regulados e
+  internos; no se agregan parámetros de tracking por inferencia.
+- `legalIdentityMode: 'compact' | 'entity' | 'full'`: `compact` muestra Efeonce; `entity` agrega razón social y
+  país; `full` agrega además dirección postal válida y privacidad. Razón social/dirección vienen del operating
+  entity canónico, nunca hardcodeadas en JSX.
+- `legalNoticePolicy: 'none' | 'security' | 'privacy' | 'regulated'`: sólo copy específico al propósito. Se
+  prohíbe el disclaimer genérico de confidencialidad como footer universal.
+
+Baseline del programa: transaccionales usan `socialLinksPolicy='none'`; marketing/suscripción usan identidad
+`full`, controles de baja y pueden habilitar RRSS institucionales. Correos regulados resuelven identidad/nota desde
+su dominio y jurisdicción. La activación internacional requiere revisión con abogado habilitado; esta clasificación
+es dirección de producto, no una declaración de cumplimiento jurídico global.
 
 ## Architecture Alignment
 
@@ -90,6 +112,10 @@ delivery como sustituto del rollback visual por `EmailType`.
 - [ ] Cada cohorte externa tiene previews 720/390 y sin imágenes, tests, aprobación, canary consentido y rollback.
 - [ ] Access/security, Hiring externo y regulated transactional no compartieron release de migración.
 - [ ] Ningún tipo transaccional incorporó unsubscribe o contenido promocional por herencia.
+- [ ] RRSS sólo aparecen con `socialLinksPolicy='institutional'` en suscripción/marketing y tienen nombre accesible,
+      fallback textual y destino oficial gobernado.
+- [ ] Razón social, país y dirección se resuelven desde el operating entity; ningún template hardcodea identidad legal.
+- [ ] Cada tipo declara `legalNoticePolicy`; no existe un disclaimer legal universal ni copy regulatorio inventado.
 - [ ] Los 30 tipos fueron aceptados individualmente antes de retirar el primitive legacy.
 - [ ] El runtime final conserva delivery ledger, suppression, reply-to, tracking y kill-switch canónicos sin duplicarlos.
 - [ ] Todas las child tasks obligatorias están `complete` o fueron retiradas explícitamente con evidencia.

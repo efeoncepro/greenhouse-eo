@@ -80,6 +80,8 @@ Reglas obligatorias:
 - Todo tipo nace con política de unsubscribe `forbidden`; sólo una clasificación explícita como suscripción
   opcional o marketing puede cambiarla a `required`.
 - Firma y footer son bloques distintos. Un template no inventa personas, equipos, reply-to ni identidad legal.
+- RRSS nacen deshabilitadas y sólo se permiten en suscripción/marketing; dirección e identidad legal vienen del
+  operating entity y las notas legales son específicas, nunca un disclaimer universal.
 - El estado inicial de todo tipo es `legacy`; ningún cambio al primitive compartido altera automáticamente los
   correos no promovidos.
 - Ninguna child task migra más de cuatro `EmailType` ni mezcla familias de dominio para “terminar más rápido”.
@@ -92,6 +94,7 @@ Reglas obligatorias:
 - `docs/tasks/complete/TASK-408-copy-migration-notifications-emails.md`
 - `docs/tasks/to-do/TASK-1057-email-palette-axis-adapter-migration.md`
 - `src/config/efeonce-brand.ts`
+- operating entity canónico `[resolver en child foundation; no hardcodear]`
 - `src/lib/email/types.ts`
 - `src/emails/components/EmailLayout.tsx`
 - `src/lib/copy/dictionaries/es-CL/emails.ts`
@@ -133,6 +136,7 @@ Las child tasks declararán ownership del código por cohort; esta umbrella no a
 - No existe una política exhaustiva de presentación por `EmailType`.
 - La marca se modela como `greenhouse|efeonce`, aunque Greenhouse es plataforma de Efeonce, no masterbrand paralela.
 - Footer, firma, disclaimer, ayuda, preferencias e identidad legal están mezclados.
+- RRSS, dirección y notas legales no tienen eligibility ni fuente tipada por `EmailType`.
 - No hay cutover por tipo: modificar el layout compartido puede alterar 28 templates simultáneamente.
 
 ## Modular Placement Contract
@@ -184,6 +188,8 @@ Las child tasks declararán ownership del código por cohort; esta umbrella no a
 ### Interaction contract
 
 - Primary interaction: sólo links permitidos por la policy (`reply/support`, preferencias, unsubscribe, privacidad)
+- RRSS: sólo links institucionales permitidos en suscripción/marketing; nunca CTA primario ni salida promocional en
+  mensajes transaccionales
 - Hover / focus / active: comportamiento nativo de link compatible con clientes de correo
 - Pending / disabled: no aplica
 - Escape / click-away: no aplica
@@ -221,7 +227,8 @@ Las child tasks declararán ownership del código por cohort; esta umbrella no a
 - Required steps: render legacy y candidate por tipo; comparar estructura y links
 - Required captures: footer completo, unión cuerpo/firma/footer y versión sin imágenes cuando aplique
 - Required `data-capture` markers: `email-footer`, `email-signature`, `email-unsubscribe` cuando exista
-- Assertions: `scrollWidth === clientWidth`, links permitidos por policy y Efeonce como masterbrand
+- Assertions: `scrollWidth === clientWidth`, links permitidos por policy, RRSS ausentes/presentes correctamente,
+  identidad legal desde fixture gobernado y Efeonce como masterbrand
 - Scroll-width checks: 720 y 390 px
 - Reduced-motion / focus evidence: DOM/link order; motion no aplica
 - Review dossier: uno por child task
@@ -351,7 +358,12 @@ asignación explícita. El kill-switch existente puede detener despacho, pero no
 
 - [ ] La ADR fija Efeonce como única marca principal y Greenhouse como plataforma/producto.
 - [ ] La policy separa `EmailPriority`, propósito, audience, reply, firma y unsubscribe.
+- [ ] La policy incluye `socialLinksPolicy`, `legalIdentityMode` y `legalNoticePolicy` con defaults fail-closed.
 - [ ] `unsubscribe` nace `forbidden` y sólo `optional_subscription|commercial_marketing` permiten `required`.
+- [ ] RRSS nacen `none`, sólo suscripción/marketing permiten `institutional`, y cada link tiene destino oficial,
+      nombre accesible y fallback textual.
+- [ ] Razón social/dirección provienen del operating entity canónico y ningún template las hardcodea.
+- [ ] No existe disclaimer legal universal; security/privacy/regulated se prueban por policy y propósito.
 - [ ] Los 30 `EmailType` están inventariados y asignados a una cohorte, sin promoverlos todavía.
 - [ ] Existe una child task foundation cuyo criterio principal es output byte-idéntico para los 28 templates.
 - [ ] Cada child task posterior cubre una sola familia y máximo cuatro tipos.
