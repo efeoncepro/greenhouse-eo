@@ -288,7 +288,9 @@ on_hold         → decision_pending      ← no es terminal: vuelve al paso 5
 | `closed` | **sin decisión** | `smoke_test` | 32 |
 | `rejected` | `rejected` | `real` | **1** |
 
-**Cero postulaciones reales han estado jamás en `closed`.** Las 32 son sintéticas, escritas por `purge.ts:173`. El log de eventos no registra **ninguna** escritura de `closed` por el PATCH — ningún operador arrastró jamás una tarjeta real a esa columna. La única terminal real del sistema entero es esa `rejected`, y sí tiene su decisión.
+**Cero postulaciones reales han estado jamás en `closed`.** Las 32 son sintéticas, escritas por `purge.ts:173`.
+
+> **Corrección 2026-08-22 (sesión de `TASK-1765`):** el invariante `stage='closed'` ⟺ desenlace se viola por **los dos lados**, y esta auditoría contaba sólo uno. Son **33 filas**, no 32: las 32 sintéticas (`closed` **sin** desenlace) **más la fila real `rejected`**, que tiene desenlace y **no** está en `closed`. El criterio de aceptación de la migración es **33 → 0**. Quien lea «32» va a buscar sólo las sintéticas y va a tomar la real por un falso positivo. El log de eventos no registra **ninguna** escritura de `closed` por el PATCH — ningún operador arrastró jamás una tarjeta real a esa columna. La única terminal real del sistema entero es esa `rejected`, y sí tiene su decisión.
 
 > La columna «Cerrado» es un arma cargada que nunca se disparó. **Eso es lo que mantiene abierta la decisión Q2: no hay filas reales que migrar.** Deja de estar abierta el día que alguien suelte la primera tarjeta real ahí.
 
