@@ -124,6 +124,38 @@ export const HIRING_APPLICATION_STAGES = [
 export type HiringApplicationStage = (typeof HIRING_APPLICATION_STAGES)[number]
 
 /**
+ * TASK-1765 — las etapas del RECORRIDO: el subconjunto que un cambio de etapa puede escribir.
+ *
+ * Polaridad invertida a propósito. El guard anterior era una DENYLIST de cuatro literales
+ * (`['selected','backup','rejected','withdrawn']`) y, como toda lista de excepciones, falló por lo
+ * que no enumeraba: por ahí se colaron `closed` y `handoff_ready`, que son justo los dos que hacen
+ * daño. Arrastrar una tarjeta a «Cerrado» escribía `closed` SIN decisión: sin evento, sin correo,
+ * sin arrancar el reloj de retención — y peor, congelando el borrado de los documentos de esa
+ * persona en TODAS sus demás postulaciones, porque el detector de retención cruza por
+ * `identity_profile_id`.
+ *
+ * Agregar un quinto nombre a la denylist habría repetido el defecto con más letras. Acá el conjunto
+ * de lo escribible se define por INCLUSIÓN, y el tipo lo hace cumplir en compilación: una etapa
+ * nueva nace NO escribible hasta que alguien la agregue deliberadamente.
+ *
+ * Fuera del subconjunto, y por qué:
+ * - `closed` — cerrar ES decidir. Pasa por `decideHiringApplication`, nunca por un `PATCH` de etapa.
+ * - `selected` / `backup` / `rejected` / `withdrawn` — espejos del desenlace; son del command.
+ * - `handoff_ready` — no es una posición del recorrido de la PERSONA, sino un estado del agregado
+ *   `handoff`, que tiene su propia máquina de estados.
+ */
+export const HIRING_PIPELINE_STAGES = [
+  'sourced',
+  'screening',
+  'qualified',
+  'shortlisted',
+  'client_review',
+  'interview',
+  'decision_pending'
+] as const
+export type HiringPipelineStage = (typeof HIRING_PIPELINE_STAGES)[number]
+
+/**
  * TASK-1765 — el eje de DESENLACE: cómo terminó el recorrido de una persona.
  * ADR: GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1 §4.
  *
@@ -636,7 +668,13 @@ export interface CreateHiringApplicationInput {
   identityProfileId: string
   candidateFacetId: string
   ownerUserId?: string | null
-  stage?: HiringApplicationStage
+  /**
+   * TASK-1765 — una postulación NACE en el recorrido, nunca cerrada ni en un espejo de desenlace.
+   * El tipo es el subconjunto escribible por la misma razón que en `updateHiringApplicationStage`:
+   * si crear pudiera escribir `closed`, quedaría abierta la misma puerta que el `PATCH` acaba de
+   * perder, y con el invariante del Slice 5 sería además una fila que la base rechaza.
+   */
+  stage?: HiringPipelineStage
   source?: CandidateSource
   score?: number | null
   matchScore?: number | null
