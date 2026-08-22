@@ -1,5 +1,12 @@
 # CODEX TASK -- Greenhouse Email Catalog v1: transactional, security, executive y domain notifications
 
+> **Presentación y footers:** la dirección Proposed vive en
+> [GREENHOUSE_EMAIL_PRESENTATION_POLICY_DECISION_V1.md](GREENHOUSE_EMAIL_PRESENTATION_POLICY_DECISION_V1.md) y
+> el programa vive en [EPIC-042](../epics/to-do/EPIC-042-efeonce-governed-email-presentation-program.md), cuya
+> primera child es [TASK-1764](../tasks/to-do/TASK-1764-governed-email-footer-profile-migration.md). No autoriza
+> un reemplazo global de `EmailLayout`: legacy permanece por defecto y cada cohorte exige child task, evidencia,
+> aprobación, canary y rollback propios.
+
 ## Delta 2026-08-19 — Credenciales de assessment y recovery token-safe (TASK-1746)
 
 Los tipos que transportan credenciales se clasifican centralmente como token-sensitive: renderizan el valor

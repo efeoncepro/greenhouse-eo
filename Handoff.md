@@ -2,6 +2,21 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-22 — EPIC-042/TASK-1764 gobiernan footers sin big bang; cero cambios de correo o runtime
+
+Se creó `EPIC-042`, su primera child `TASK-1764` y un ADR Proposed para dejar de improvisar footers sin poner en riesgo una de las
+superficies más estables del producto. Efeonce es siempre la masterbrand; Greenhouse sólo puede aparecer como su
+plataforma. Firma y footer quedan separados, prioridad de entrega no determina propósito y unsubscribe nace
+prohibido salvo suscripción opcional o marketing explícitamente clasificados.
+
+La task no posee código ni habilita un reemplazo global de `EmailLayout`. La primera child deberá introducir el
+contrato con output legacy byte-idéntico; las siguientes cubrirán una sola familia y máximo cuatro `EmailType`.
+Cada cohorte exige baseline, diff limitado al footer, previews 720/390 y sin imágenes, tests, aprobación explícita,
+canary consentido en cliente real y rollback por tipo. Access/security, Hiring externo y transaccionales regulados
+nunca comparten release. Estado: **diseño/documentación; ADR Proposed; ningún template, envío o runtime cambió**.
+Siguiente paso: revisar/aceptar el ADR y sólo entonces crear la child foundation dentro de `EPIC-042`; siguientes
+IDs libres `TASK-1765` y `EPIC-043`.
+
 ## 2026-08-21 — Correo de selección personalizado adopta una firma visual Efeonce; rollout pendiente
 
 `hiring_decision_selected` ahora separa asunto, preencabezado y título visible, confirma la elección sin declarar
