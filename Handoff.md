@@ -221,6 +221,25 @@ procedencia, así que nacen `real` y publicables en la base compartida; el gate 
 `scripts/` y `tests/e2e/`. El fixture de esta task ya quedó corregido; los otros 12 y la extensión del gate quedan
 propuestos como trabajo aparte.
 
+## 2026-08-22 — El gate de `pnpm build` corrió y pasa: cierra el pendiente de TASK-1748/1754/1755
+
+El operador autorizó el build de producción, que las tres tasks de hiring de hoy declararon **NO ejecutado**
+(`TASK-1755` por un error de tipos ajeno que ya no existe; `TASK-1754` y `TASK-1748` por costo de máquina,
+con la puerta abierta a autorización posterior).
+
+**Resultado: verde.** `Compiled successfully in 27.8s`, exit 0, **0 errores**. Los 10 warnings del log son
+`npm warn Unknown env config` — ruido de `.npmrc`, ajeno al código. Corrido sobre `develop` ya sincronizado
+con `origin` (38 commits empujados, fast-forward, hook pre-push con lint + typecheck en verde).
+
+**Por qué importa que este gate corriera y no se delegara:** el build de producción es el único que atrapa
+violaciones de frontera `server-only`→cliente y dynamic imports rotos — clases de bug que `pnpm test` y
+`pnpm typecheck` no ven. Las tres tasks tocaron `src/lib/hiring/**` y una de ellas
+(`PipelineDeskView.tsx`, TASK-1754) tocó una superficie cliente.
+
+Con esto, **ninguna de las tres tiene gates mecánicos pendientes**. Lo que les falta es runtime, no
+verificación: las tres migraciones parqueadas en `docs/tasks/pending-migrations/` esperan el release, en el
+orden declarado en su README (contract del enum → backfill de 1748 → `CHECK` del invariante).
+
 ## 2026-08-22 — EPIC-042/TASK-1764 gobiernan footers sin big bang; cero cambios de correo o runtime
 
 Se creó `EPIC-042`, su primera child `TASK-1764` y un ADR Proposed para dejar de improvisar footers sin poner en riesgo una de las
