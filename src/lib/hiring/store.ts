@@ -406,6 +406,7 @@ export type HiringApplicationRow = {
   explainability_json: unknown
   dedupe_fingerprint: unknown
   decision: unknown
+  decision_cause: unknown
   decision_at: unknown
   decision_by: unknown
   selected_destination: unknown
@@ -436,6 +437,9 @@ export const normalizeHiringApplication = (row: HiringApplicationRow): HiringApp
   explainability: toJsonObject(row.explainability_json),
   dedupeFingerprint: toNullableStr(row.dedupe_fingerprint),
   decision: (toNullableStr(row.decision) as HiringApplication['decision']) ?? null,
+  // TASK-1765 — cast, NO assertEnum: este es un camino de LECTURA, y un assertEnum acá produciría
+  // un 500 al releer una fila histórica cuyo literal se retiró del enum (H-05 de la auditoría).
+  decisionCause: (toNullableStr(row.decision_cause) as HiringApplication['decisionCause']) ?? null,
   decisionAt: toTimestamp(row.decision_at),
   decisionBy: toNullableStr(row.decision_by),
   selectedDestination: (toNullableStr(row.selected_destination) as HiringApplication['selectedDestination']) ?? null,
@@ -474,8 +478,9 @@ const CANDIDATE_FACET_COLUMNS = `
 export const HIRING_APPLICATION_COLUMNS = `
   application_id, public_id, opening_id, identity_profile_id, candidate_facet_id, owner_user_id, stage,
   score, match_score, blocking_issues, next_step_at, source, notes, candidate_message, explainability_json,
-  dedupe_fingerprint, decision, decision_at, decision_by, selected_destination, tentative_start_date,
-  expected_legal_entity, expected_context, prerequisites_snapshot_json, created_by, created_at, updated_at`
+  dedupe_fingerprint, decision, decision_cause, decision_at, decision_by, selected_destination,
+  tentative_start_date, expected_legal_entity, expected_context, prerequisites_snapshot_json,
+  created_by, created_at, updated_at`
 
 // ══════════════════════════════════════════════════════════════════════════
 // Readers — TalentDemand

@@ -7761,6 +7761,10 @@ export interface GreenhouseHiringCandidateReviewAccessAudit {
 
 export interface GreenhouseHiringHiringApplication {
   application_id: Generated<string>;
+  /**
+   * TASK-1765 — archivado del REGISTRO, ortogonal a `stage` y a `decision`. Archivar no declara el desenlace de nadie. Lo escribe TASK-1748; archivar escribiendo `closed` está prohibido (ADR §5).
+   */
+  archived_at: Timestamp | null;
   blocking_issues: Generated<string[]>;
   candidate_facet_id: string;
   /**
@@ -7773,6 +7777,10 @@ export interface GreenhouseHiringHiringApplication {
   decision: string | null;
   decision_at: Timestamp | null;
   decision_by: string | null;
+  /**
+   * TASK-1765 — causa gobernada del desenlace. Obligatoria en `not_selected`, prohibida en el resto. Enum, NUNCA texto libre: el embudo de equidad y el cuerpo del correo ramifican por ella.
+   */
+  decision_cause: string | null;
   dedupe_fingerprint: string | null;
   expected_context: string | null;
   expected_legal_entity: string | null;

@@ -7,11 +7,13 @@ import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import {
   HIRING_DECISIONS,
+  HIRING_DECISION_CAUSES,
   HIRING_FULFILLMENT_MODES,
   type DecideHiringApplicationInput,
   type DecideHiringApplicationResult,
   type HiringApplicationStage,
   type HiringDecision,
+  type HiringDecisionCause,
   type HiringDecisionHistoryEntry,
   type HiringDecisionReason,
   type HiringFulfillmentMode,
@@ -24,11 +26,24 @@ import {
   type HiringApplicationRow,
 } from './store'
 
+/**
+ * TASK-1765 — un desenlace terminal escribe SIEMPRE `stage='closed'`, y ninguna etapa espejo se
+ * vuelve a escribir (ADR §3/§4). Antes esto era un espejo redundante — `decide` escribía el mismo
+ * valor en los dos ejes y la etapa no aportaba un bit — y era además el origen del doble sentido de
+ * la columna «Decisión», donde `on_hold` decía «terminó» y «sigue vivo» a la vez.
+ *
+ * `on_hold` conserva `decision_pending` mientras exista, y desaparece con él en el Slice 4.
+ *
+ * Esta es una `Record` TOTAL a propósito: agregar un desenlace al enum sin decidir su etapa deja de
+ * compilar. Es el mismo default por inclusión que gobierna `HIRING_PIPELINE_STAGES`.
+ */
 const DECISION_STAGE: Record<HiringDecision, HiringApplicationStage> = {
-  selected: 'selected',
-  backup_selected: 'backup',
-  rejected: 'rejected',
-  withdrawn: 'withdrawn',
+  selected: 'closed',
+  backup_selected: 'closed',
+  not_selected: 'closed',
+  rejected: 'closed',
+  withdrawn: 'closed',
+  unresponsive: 'closed',
   on_hold: 'decision_pending',
 }
 
@@ -79,6 +94,43 @@ const assertDecision = (value: string): HiringDecision => {
   return value as HiringDecision
 }
 
+/**
+ * TASK-1765 — la causa es una BICONDICIONAL, no un campo opcional: obligatoria en `not_selected` y
+ * prohibida en los otros cinco desenlaces. La base lo garantiza con
+ * `hiring_application_decision_cause_pairing_check`; esto lo convierte en un 422 con prose es-CL en
+ * vez de dejar que la violación llegue a PG y salga como 500.
+ *
+ * Por qué es enum y no prosa: el embudo de equidad ramifica por la causa (`capacity_filled` cuenta
+ * como proceso concluido, `opening_closed` y `process_cancelled` NO) y el cuerpo del correo también.
+ * Un texto libre acá haría irreproducible el análisis de impacto adverso.
+ */
+const assertCause = (
+  value: HiringDecisionCause | null | undefined,
+  decision: HiringDecision,
+): HiringDecisionCause | null => {
+  if (value != null && !HIRING_DECISION_CAUSES.includes(value)) {
+    throw new HiringValidationError('La causa indicada no es válida.', 'hiring_decision_cause_invalid')
+  }
+
+  if (decision === 'not_selected' && !value) {
+    throw new HiringValidationError(
+      'Indica por qué esta persona no quedó: el cupo lo tomó otra persona, se cerró la búsqueda o se canceló el proceso.',
+      'hiring_decision_cause_required',
+      422,
+    )
+  }
+
+  if (decision !== 'not_selected' && value) {
+    throw new HiringValidationError(
+      'La causa sólo corresponde cuando la persona llegó al final y no quedó.',
+      'hiring_decision_cause_not_allowed',
+      422,
+    )
+  }
+
+  return value ?? null
+}
+
 const assertDestination = (
   value: HiringFulfillmentMode | null | undefined,
   decision: HiringDecision,
@@ -97,14 +149,26 @@ const assertDestination = (
   return value ?? null
 }
 
+/**
+ * TASK-1765 — la causa ENTRA en la comparación de replay. Dos confirmaciones con la misma clave de
+ * idempotencia y distinta causa son un CONFLICTO (409), no un replay: cerrar «porque el cupo lo tomó
+ * otra persona» y cerrar «porque cancelamos el proceso» son hechos distintos, cuentan distinto en el
+ * embudo de equidad y le mandan al candidato un cuerpo de correo distinto. Tratarlas como idénticas
+ * dejaría la segunda intención silenciosamente descartada.
+ *
+ * `?? null` a ambos lados: las entradas de historial anteriores a esta task no tienen `cause`, y
+ * `undefined !== null` las haría entrar en conflicto consigo mismas al reintentar.
+ */
 const sameReplayPayload = (
   entry: HiringDecisionHistoryEntry,
   input: DecideHiringApplicationInput,
   reason: HiringDecisionReason,
   destination: HiringFulfillmentMode | null,
+  cause: HiringDecisionCause | null,
 ) =>
   entry.decision === input.decision &&
   entry.selectedDestination === destination &&
+  (entry.cause ?? null) === cause &&
   entry.reason.summary === reason.summary
 
 /**
@@ -134,6 +198,7 @@ export const decideHiringApplication = async (
   const decision = assertDecision(input.decision)
   const reason = normalizeReason(input.reason)
   const selectedDestination = assertDestination(input.selectedDestination, decision)
+  const cause = assertCause(input.cause, decision)
 
   return withGreenhousePostgresTransaction(async (client) => {
     const currentResult = await client.query<HiringApplicationRow>(
@@ -158,7 +223,7 @@ export const decideHiringApplication = async (
     const replay = history.find((entry) => entry.idempotencyKey === idempotencyKey)
 
     if (replay) {
-      if (!sameReplayPayload(replay, input, reason, selectedDestination)) {
+      if (!sameReplayPayload(replay, input, reason, selectedDestination, cause)) {
         throw new HiringValidationError(
           'La clave de idempotencia ya fue usada con otra decisión.',
           'hiring_decision_idempotency_conflict',
@@ -215,6 +280,7 @@ export const decideHiringApplication = async (
       decisionId: `hiring-decision-${randomUUID()}`,
       idempotencyKey,
       decision,
+      cause,
       decidedAt: now,
       decidedBy: actorUserId,
       reason,
@@ -229,20 +295,25 @@ export const decideHiringApplication = async (
     const nextHistory = [...history, decisionEntry]
 
     const updatedResult = await client.query<HiringApplicationRow>(
+      // TASK-1765 — `decision` y `decision_cause` se escriben en el MISMO UPDATE, nunca en dos
+      // escrituras: `hiring_application_decision_cause_pairing_check` es una bicondicional y
+      // cualquier estado intermedio la viola. Lo mismo vale para `stage`, que el CHECK del
+      // invariante (Slice 5) va a atar a `decision`.
       `UPDATE greenhouse_hiring.hiring_application
        SET decision = $2,
-           decision_at = $3,
-           decision_by = $4,
-           selected_destination = $5,
-           tentative_start_date = $6,
-           expected_legal_entity = $7,
-           expected_context = $8,
-           prerequisites_snapshot_json = $9::jsonb,
-           stage = $10,
+           decision_cause = $3,
+           decision_at = $4,
+           decision_by = $5,
+           selected_destination = $6,
+           tentative_start_date = $7,
+           expected_legal_entity = $8,
+           expected_context = $9,
+           prerequisites_snapshot_json = $10::jsonb,
+           stage = $11,
            explainability_json = jsonb_set(
              COALESCE(explainability_json, '{}'::jsonb),
              '{decisionHistory}',
-             $11::jsonb,
+             $12::jsonb,
              true
            )
        WHERE application_id = $1
@@ -250,6 +321,7 @@ export const decideHiringApplication = async (
       [
         safeApplicationId,
         decision,
+        cause,
         now,
         actorUserId,
         selectedDestination,
@@ -277,6 +349,10 @@ export const decideHiringApplication = async (
           applicationId: safeApplicationId,
           decisionId: decisionEntry.decisionId,
           decision,
+          // TASK-1765 — la causa es un enum gobernado, NO dato personal: entra al payload para que
+          // el embudo de equidad y el correo ramifiquen por ella. La RAZÓN de la decisión (prosa
+          // libre) y el nombre del candidato NUNCA entran acá.
+          cause,
           selectedDestination,
           decidedBy: actorUserId,
           decidedAt: now,

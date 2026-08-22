@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { claimTokenSensitiveEmailIntent, sendEmail, wasEmailAlreadySent } from '@/lib/email/delivery'
+import type { EmailType } from '@/lib/email/types'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getCountryName } from '@/lib/locale/countries'
 import { captureWithDomain } from '@/lib/observability/capture'
@@ -319,6 +320,35 @@ export const sendHiringStageAdvancedEmail = async (
 
 // ── 6+7. Decisión → seleccionado / no seleccionado ──
 
+/**
+ * TASK-1765 — mapa EXPLÍCITO desenlace → `EmailType`, con no-op declarado para lo que todavía no
+ * tiene tipo propio.
+ *
+ * Esto era un ternario binario, `decision === 'selected' ? …selected : …rejected`, que colapsaba
+ * TODO lo no-seleccionado en «rechazado». Con el eje de desenlace nuevo eso significa que el primer
+ * cierre `not_selected` le mandaría un correo de RECHAZO a alguien que nadie rechazó — y el log de
+ * envíos, que es append-only, quedaría firmando ese hecho falso.
+ *
+ * La regla que fija el techo (ADR §7.3): **un `EmailType` por desenlace; la causa modula el CUERPO,
+ * nunca el tipo.** NUNCA reusar el tipo de un desenlace para otro: el sistema ramifica por este
+ * valor en tres lugares (kill-switch de `email_type_config`, perfil de footer, y este selector), así
+ * que colapsarlos deja un cierre de cohorte y un descarte individual bajo el mismo interruptor.
+ *
+ * Un desenlace ausente de este mapa NO notifica. Es un default por inclusión: un desenlace nuevo
+ * nace mudo hasta que alguien le asigne un tipo deliberadamente, en vez de heredar el del vecino.
+ *
+ * - `not_selected` → `hiring_decision_not_selected`, que **todavía no existe**. Lo crea TASK-1762
+ *   junto con su fila de `email_type_config` y su seed en el `ops-worker` (NO en Vercel).
+ * - `backup_selected` → su variante se decide en su propia task.
+ * - `withdrawn` → acuse de recibo, pendiente de tipo.
+ * - `unresponsive` → **ninguno, y es deliberado**: no se le escribe a quien no declaró nada.
+ * - `on_hold` → no es un desenlace; sale del enum en el Slice 4.
+ */
+const DECISION_EMAIL_TYPE: Record<string, EmailType | undefined> = {
+  selected: 'hiring_decision_selected',
+  rejected: 'hiring_decision_rejected',
+}
+
 export const sendHiringDecisionEmail = async (
   applicationId: string,
   payload: Record<string, unknown>,
@@ -326,8 +356,9 @@ export const sendHiringDecisionEmail = async (
   if (!isHiringLifecycleEmailsEnabled()) return FLAG_OFF_MSG
 
   const decision = typeof payload.decision === 'string' ? payload.decision : ''
+  const emailType = DECISION_EMAIL_TYPE[decision]
 
-  if (decision !== 'selected' && decision !== 'rejected') {
+  if (!emailType) {
     return `hiring_application_decided_email no-op: decision ${decision || '(vacía)'} no notifica`
   }
 
@@ -355,7 +386,7 @@ export const sendHiringDecisionEmail = async (
   }
 
   const result = await sendEmail({
-    emailType: decision === 'selected' ? 'hiring_decision_selected' : 'hiring_decision_rejected',
+    emailType,
     domain: 'hr',
     recipients: [{ email: ctx.candidateEmail, ...(ctx.candidateName ? { name: ctx.candidateName } : {}) }],
     context: {

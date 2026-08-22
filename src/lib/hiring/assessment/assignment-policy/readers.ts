@@ -193,9 +193,14 @@ export const resolveApplicationsAwaitingAssignment = async (
  * `closed`), y una lista implícita por posición es justo el tipo de cosa que se rompe en
  * silencio cuando alguien agrega una etapa.
  */
+// TASK-1765 — `closed` ENTRA en ambas listas. Desde que el command de decisión escribe siempre
+// `stage='closed'` en vez de una etapa espejo por desenlace, omitirlo vaciaba esta cola en silencio:
+// una persona decidida sin haber recibido nunca su prueba dejaba de aparecer acá, que es
+// exactamente el H-11 de la auditoría del vocabulario. Los espejos terminales se conservan mientras
+// TASK-1754 no los retire del enum de etapas: siguen existiendo en filas históricas.
 const STAGES_DOWNSTREAM_OF_TRIGGER: Record<OpeningAssessmentTriggerStage, readonly string[]> = {
-  shortlisted: ['client_review', 'interview', 'decision_pending', 'selected', 'backup', 'handoff_ready'],
-  interview: ['decision_pending', 'selected', 'backup', 'handoff_ready'],
+  shortlisted: ['client_review', 'interview', 'decision_pending', 'selected', 'backup', 'handoff_ready', 'closed'],
+  interview: ['decision_pending', 'selected', 'backup', 'handoff_ready', 'closed'],
 }
 
 export interface ApplicationMissedTrigger extends ApplicationAwaitingAssignment {

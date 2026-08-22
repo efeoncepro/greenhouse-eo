@@ -123,8 +123,54 @@ export const HIRING_APPLICATION_STAGES = [
 ] as const
 export type HiringApplicationStage = (typeof HIRING_APPLICATION_STAGES)[number]
 
-export const HIRING_DECISIONS = ['selected', 'backup_selected', 'rejected', 'withdrawn', 'on_hold'] as const
+/**
+ * TASK-1765 — el eje de DESENLACE: cómo terminó el recorrido de una persona.
+ * ADR: GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1 §4.
+ *
+ * El campo físico se sigue llamando `decision`, pero el concepto es DESENLACE: `withdrawn` y
+ * `unresponsive` no son decisiones de Efeonce. NUNCA leer esta columna como «lo que Efeonce
+ * decidió»; significa «cómo terminó el proceso».
+ *
+ * - `selected`         — la elegimos.
+ * - `backup_selected`  — la elegimos como respaldo.
+ * - `not_selected`     — llegó al final y no quedó. Exige `cause`. Es la población objetivo del
+ *                        Talent Pool: NUNCA usar `rejected` acá (rejected es un juicio sobre la
+ *                        persona, y aplicarlo sin juicio infla la tasa de rechazo de su cohorte
+ *                        demográfica en el análisis de impacto adverso).
+ * - `rejected`         — juicio desfavorable para este rol.
+ * - `withdrawn`        — se retiró, y lo DECLARÓ.
+ * - `unresponsive`     — dejó de responder. Sin conducta atribuida y sin correo. NUNCA registrar
+ *                        el silencio como `withdrawn`: es atribuirle una decisión que no tomó.
+ *
+ * `on_hold` sigue acá SÓLO durante el expand (Slice 1): Application 360 todavía lo ofrece, y
+ * retirarlo del tipo antes de retirarlo de esa superficie la dejaría escribiendo un valor que la
+ * base rechaza. Sale en el Slice 4, junto con los tres puntos de la vista. Una pausa NO es un
+ * cierre: se registra moviendo la etapa a `decision_pending`, que el PATCH sí acepta.
+ */
+export const HIRING_DECISIONS = [
+  'selected',
+  'backup_selected',
+  'not_selected',
+  'rejected',
+  'withdrawn',
+  'unresponsive',
+  'on_hold'
+] as const
 export type HiringDecision = (typeof HIRING_DECISIONS)[number]
+
+/**
+ * TASK-1765 — la CAUSA del desenlace (ADR §4.1). Obligatoria en `not_selected`, prohibida en el
+ * resto; la bicondicional la garantiza `hiring_application_decision_cause_pairing_check`.
+ *
+ * Es enum gobernado y NUNCA texto libre, porque hay consumidores que ramifican por ella: el embudo
+ * de equidad (`capacity_filled` cuenta como proceso concluido; los otros dos NO) y el cuerpo del
+ * correo al candidato. Si algo ramifica por un valor, ese valor no puede ser prosa.
+ *
+ * La vacante entra SIEMPRE como causa, JAMÁS como desenlace: etiquetar a una persona con el estado
+ * de la vacante es el defecto que este eje viene a cerrar.
+ */
+export const HIRING_DECISION_CAUSES = ['capacity_filled', 'opening_closed', 'process_cancelled'] as const
+export type HiringDecisionCause = (typeof HIRING_DECISION_CAUSES)[number]
 
 // ── View models (camelCase, retornados por el store) ──
 
@@ -258,6 +304,8 @@ export interface HiringApplication {
   explainability: Record<string, unknown>
   dedupeFingerprint: string | null
   decision: HiringDecision | null
+  /** TASK-1765 — causa del desenlace; no-null sólo con `decision === 'not_selected'`. */
+  decisionCause: HiringDecisionCause | null
   decisionAt: string | null
   decisionBy: string | null
   selectedDestination: HiringFulfillmentMode | null
@@ -284,6 +332,13 @@ export interface HiringDecisionHistoryEntry {
   decisionId: string
   idempotencyKey: string
   decision: HiringDecision
+  /**
+   * TASK-1765 — causa gobernada, presente SÓLO cuando `decision === 'not_selected'`. Vive en cada
+   * entrada del historial y no sólo en la columna snapshot: el snapshot dice el desenlace VIGENTE,
+   * el historial dice el de cada decisión que hubo. Ausente en las entradas anteriores a esta task,
+   * que son inmutables y NUNCA se reescriben.
+   */
+  cause?: HiringDecisionCause | null
   decidedAt: string
   decidedBy: string | null
   reason: HiringDecisionReason
@@ -595,6 +650,12 @@ export interface CreateHiringApplicationInput {
 
 export interface DecideHiringApplicationInput {
   decision: HiringDecision
+  /**
+   * TASK-1765 — obligatoria en `not_selected`, rechazada en el resto (422 canónico). La causa viaja
+   * en el input del command y NUNCA en un `PATCH` paralelo ni en un campo de notas: la bicondicional
+   * de base exige que desenlace y causa se escriban en el MISMO `UPDATE`.
+   */
+  cause?: HiringDecisionCause | null
   reason: HiringDecisionReason
   idempotencyKey: string
   selectedDestination?: HiringFulfillmentMode | null
