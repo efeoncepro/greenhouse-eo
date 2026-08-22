@@ -2,6 +2,39 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-22 — TASK-1755 destraba el callejón del ledger de asignación; sin migración, verificado contra PG real
+
+Un intento manual de asignar prueba que terminaba en `blocked`/`held`/`stale` ocupaba la clave de idempotencia del
+ledger de forma permanente: corregir la causa real —habilitar la política (que es el estado en que NACE toda
+política), activar la plantilla, registrar el correo— no devolvía la capacidad de asignar, porque el `INSERT` hacía
+`DO NOTHING` y el replay repetía el resultado viejo. `confirmAssessmentAssignment` ahora pide el intento siguiente y
+`assignAssessmentFromPolicy` lo resuelve contra el ledger bajo el `FOR UPDATE` de la policy, dentro de la misma
+transacción que ya tiene bloqueada la propuesta.
+
+Tres respuestas del resolver, y la tercera es la que evita el daño caro: sin intento vigente o vigente recuperable ⇒
+`max + 1` (monotónico contra toda la historia, superseded incluida); **cualquier otro resultado vigente ⇒ su mismo
+número**, para que el `ON CONFLICT` colisione y la respuesta sea el replay — un casillero libre junto a un `assigned`
+vivo le crearía una segunda prueba al mismo candidato. Lo que define un intento nuevo es la **identidad de la
+propuesta**, no su digest: `templateStatus` no entra al material del digest, así que con "digest distinto" como
+criterio un `blocked: template_inactive` quedaría irrecuperable.
+
+Sin migración: `attempt_seq`, el `CHECK (origin = 'manual' OR attempt_seq = 1)` y los `GRANT` por columna ya
+existían. Ledger append-only: cero `DELETE`, cero `UPDATE` destructivo. Estado: **code complete y verificado en
+runtime** — 8/8 en el test de reproducción, 472 verdes en `src/lib/hiring/assessment` y **3/3 del gate vivo contra
+PostgreSQL real** (policy `draft` bloquea → `markPolicyEnabled` → asigna en el intento 2, con las dos filas vigentes
+en la base), con teardown verificado sin residuo. No requiere flags, env vars ni backfill; entra por un deploy
+ordinario.
+
+**Sin backfill, decidido con el conteo real.** Las únicas 4 filas en callejón son del carril **automático**
+(`stage_auto` / `volume_cap`), sobre candidaturas `closed` con `data_origin='smoke_test'` —no son personas— y su
+clave manual está libre. Ese carril no puede reintentar por `attempt_seq` (lo prohíbe el `CHECK`) y su reversa
+declarada, `superseded_at` por reconciliación, no tiene write path: es el hueco de **`TASK-1771`**, que además
+hereda la restricción de orden respecto de `TASK-1754` que el Delta original le atribuía a esta task por error.
+
+Siguiente paso: incluirlo en un release normal. Riesgo residual conocido: el blast radius es alto porque es el único
+camino que crea pruebas de candidato, y la defensa contra la doble prueba es la rama 3 del resolver más el índice
+único parcial — ambas cubiertas por test unitario y por el gate vivo.
+
 ## 2026-08-22 — EPIC-042/TASK-1764 gobiernan footers sin big bang; cero cambios de correo o runtime
 
 Se creó `EPIC-042`, su primera child `TASK-1764` y un ADR Proposed para dejar de improvisar footers sin poner en riesgo una de las
@@ -536,40 +569,6 @@ coincidencia por nombre. Correr `pnpm hiring:data:mark-synthetic` para verlo.
 - Corriendo la suite con live tests aparecieron **dos roturas preexistentes** de
   `submit-application.live.test.ts` que CI nunca vio (sólo corren con PG): `publicSeniority` obligatorio
   desde TASK-1740 y `residenceCountryCode` requerido desde el flip de TASK-1688. Ambas reparadas.
-
-## 2026-08-18 — Canary de identidad y smoke del expediente: los dos pendientes declarados, cerrados
-
-Los dos flags que se prendieron "ON con pendiente" ya tienen su verificación. Ambas filas del ledger
-quedaron actualizadas con la evidencia.
-
-**Canary TASK-1736 — verde, 4/4.** Se ejecutó como live test gobernado
-(`HIRING_CANARY_T1736=1 pnpm vitest run src/lib/hiring/candidate-intake/canary.live.test.ts`), no por el
-endpoint público. La razón importa: la base es UNA sola para dev/staging/prod y el ops-worker de correos
-es el mismo, así que postular contra `EO-OPN-0009`/`EO-OPN-0061` habría dejado un candidato falso
-—indeleble— en una vacante con candidatos en proceso. Verificado además que **no salió ningún correo**.
-
-**Lo que el canary enseñó y el runbook no decía.** Con el flag ON, la evidencia y el audit son
-append-only **por grant** (`greenhouse_runtime` no tiene DELETE) y esas filas pinnean por FK toda la
-cadena application → facet → Person → opening → demand. O sea: **el canary no puede limpiarse a sí
-mismo**. Mi teardown lo intentó y falló en silencio porque tenía `.catch(() => undefined)` — ese swallow
-está eliminado y ahora reporta el residuo a gritos. El runbook lleva la advertencia y el residuo exacto.
-
-**Residuo pendiente (bloqueado por la misma credencial que ISSUE-159).** Sujeto 100% sintético:
-Person `identity-…-canary-t1736-1787066079713-live-test-invalid`, application `happ-ffebd53b…`,
-opening `EO-OPN-0101` **ya despublicado** (`internal_only`, el listado público volvió a tener sólo las 2
-vacantes reales), más 2 filas de evidencia y 3 de audit. Registrado como **Delta en TASK-1739**, que es su
-hogar natural: su lane de purga ya distingue archivar-con-historia de borrar-huérfanos, y este es su primer
-objetivo concreto. `purge-test-facets` NO sirve acá (exige cero postulaciones y consent `not_captured`).
-
-**Smoke del expediente (TASK-1735) — verificado sobre el caso real, sin escribir nada nuevo.** El
-propose→confirm post-fix ya había ocurrido el 17-ago 00:12: la nota `hnote-d710c072` guardó sus 8240
-caracteres completos (termina en punto) contra los 8000 de `hnote-e2fd7280`, y lleva `supersedesNoteId` +
-`repairedFullLength` en su `context_json`. Queda **sólo la revisión humana del primer expediente real**:
-es el gate de supervisión humana, no lo puede firmar un agente.
-
-**Fix de paso:** `evidence_coverage_gap` ahora filtra `source='public_careers'`. Contaba todas las
-postulaciones, pero la evidencia sólo nace del intake público — cada carga manual desde el desk la habría
-dejado en `warning` para siempre. Test de regresión sobre el SQL. `local:check` EXIT=0.
 
 ## 2026-08-18 — Las dos vacantes vivas ya están en el contrato editorial v2
 

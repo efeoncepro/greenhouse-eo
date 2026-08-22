@@ -333,6 +333,31 @@ medio**. La carrera no es un error: es un resultado tipado. El patrón correcto 
 re-asignación post-cancelación son **commands humanos** con capability y razón. Un bug de la policy no puede
 generar la segunda prueba de nadie.
 
+**Quién incrementa el intento (TASK-1755).** El límite de autoridad no dice "nadie lo incrementa": dice que
+sólo un command humano puede. Ese command es `confirmAssessmentAssignment`, que pide
+`attemptSeq: NEXT_ATTEMPT_AFTER_DEAD_END` y deja que `assignAssessmentFromPolicy` resuelva el casillero contra
+el ledger **bajo el `FOR UPDATE` de la policy**, dentro de la transacción que ya tiene bloqueada la propuesta.
+El resolver tiene tres respuestas: sin intento vigente (o todos superseded) ⇒ `max + 1`; intento vigente con
+resultado **recuperable** (`blocked`/`held`/`stale`) ⇒ `max + 1`; **cualquier otro resultado vigente ⇒ su mismo
+número**, para que el `ON CONFLICT` colisione y la respuesta sea el replay. El `max` se toma contra TODA la
+historia, superseded incluida, para que dos filas no compartan rótulo de intento.
+
+Sin esto, un resultado no-asignado ocupaba la clave **para siempre**: corregir la causa —habilitar la policy
+(que es el estado en que NACE toda policy), activar la plantilla, registrar el correo— no devolvía la capacidad
+de asignar, porque `recordAssignment` hacía `DO NOTHING` y el replay repetía el resultado viejo. El único
+supersede existente filtra por `assessment_id`, que en una fila bloqueada es `NULL`: nunca la alcanzaba.
+
+**Lo que define un intento nuevo es la IDENTIDAD de la propuesta, NO su digest.** La confirmación es one-shot
+(`lockAssignmentProposalForUpdate` + guarda de `status`), así que un reintento de transporte sale por
+`already_confirmed` sin tocar el ledger: llegar al command significa que una persona confirmó una propuesta que
+nunca se había confirmado. Atarlo al digest sería peor y no equivalente — `templateStatus` **no entra** al
+material del digest, así que activar una plantilla inactiva lo deja idéntico y un `blocked: template_inactive`
+quedaría en callejón permanente.
+
+**El carril automático NO tiene esta salida.** `stage_auto` no puede escribir `attempt_seq > 1` (lo prohíbe el
+`CHECK`), y su reversa declarada —`superseded_at` por reconciliación— **no tiene write path**. Ése es un hueco
+abierto, dueño `TASK-1771`.
+
 **Refactor de `assignCandidateTest`** (`instances.ts:237-303`): se extrae `insertCandidateTest(client, …)` con
 `ON CONFLICT` sobre el índice parcial **ya existente** `hiring_assessment_open_instance_unique_idx`
 (`migrations/20260710223640237_audit-hiring-structural-uniqueness.sql:12-14`). El route legacy traduce
@@ -601,6 +626,8 @@ etapa→plantilla, sin inferencia, sin modelo, sin puntaje. El invariante que la
 
    ⚠️ **El invariante se cumple sobre el LEDGER, no sobre la ENTREGA.** La projection del correo del test tiene cuatro salidas silenciosas (sin email resoluble, token no rotable, kill-switch por tipo, dead-letter tras 3 reintentos), así que "cero correos" sigue siendo posible por debajo. La métrica `assigned_without_email_24h` de `hiring.assessment.assignment_health` es lo único que lo delata: **NUNCA** tratarla como ruido.
 3. **NUNCA la automatización escribe `attempt_seq > 1`.** Retake y re-asignación post-cancelación son commands humanos con capability y razón. El guardia vive en TS **y** en la DB (`CHECK (origin = 'manual' OR attempt_seq = 1)`): `recordAssignment` está exportado, así que un guardia sólo-TS lo salta cualquier caller nuevo.
+
+   ⚠️ **NUNCA resolver el intento de un confirm humano a un número LIBRE cuando la clave está legítimamente ocupada** (TASK-1755). Si el intento vigente es `assigned`/`already_assigned`/`intent`, el resolver devuelve **SU** número para que el `ON CONFLICT` colisione y la respuesta sea el replay: un casillero vacío junto a un `assigned` vivo le crea una **segunda prueba** al mismo candidato. **NUNCA** atar el intento nuevo al digest de la propuesta en vez de a su identidad: `templateStatus` no está en el material del digest y `blocked: template_inactive` quedaría irrecuperable. **NUNCA** tomar el `max` sólo entre filas vigentes: reusar el rótulo de un intento superseded deja dos filas diciendo "intento N".
 4. **NUNCA dejar escapar un `23505` crudo del assignment** (fabrica dead-letters): **SIEMPRE** `ON CONFLICT DO NOTHING RETURNING` + re-lectura del ganador sobre el índice parcial existente, patrón `createScoringRun`. **NUNCA** devolver token en la rama `created:false`.
 5. **NUNCA gobernar la policy con `hiring.assessment.author` ni con routeGroup `internal`.** La capability es `hiring.assessment.policy.govern` (role-only, `execute`/`tenant`), granteada en el **mismo PR** que la registra. El assign manual puntual se queda en `author`.
 6. **NUNCA expandir la automatización más allá del canary sin el snapshot inmutable del cuestionario por instancia.** `public-taking` resuelve preguntas en vivo; sin snapshot, dos candidatos "del mismo test" rindieron exámenes distintos. **NUNCA** versionar el template como sustituto: ya está versionado, el problema es la resolución.

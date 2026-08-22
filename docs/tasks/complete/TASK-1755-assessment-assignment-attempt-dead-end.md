@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-011`
-- Status real: `Diseño — hueco detectado por auditoría adversarial el 2026-08-19`
+- Status real: `Complete — verificado contra PostgreSQL real 2026-08-22; sin migración, sin flags, sin backfill`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -31,11 +31,11 @@
 
 ## Summary
 
-Cuando una confirmación manual de asignación termina en un desenlace no-asignado (`blocked`,
+Cuando una confirmación manual de asignación termina en un resultado de intento no-asignado (`blocked`,
 `held`), la fila del ledger queda ocupando la clave de idempotencia de esa persona **para siempre**.
 Corregir la causa real —registrar el correo, habilitar la política, activar la plantilla— no
 devuelve la posibilidad de asignar: la confirmación siguiente vuelve a leer la fila vieja y repite el
-mismo desenlace. No hay UI, endpoint ni CLI que rompa el empate.
+mismo resultado. No hay UI, endpoint ni CLI que rompa el empate.
 
 ## Why This Task Exists
 
@@ -111,7 +111,7 @@ Reglas obligatorias:
 - La idempotencia existe para que un reintento de transporte no genere dos tests al mismo candidato.
   Un intento nuevo debe ser una decisión humana explícita, no un efecto de reenviar la misma
   petición.
-- El desenlace `assigned` **NUNCA** se puede reintentar: esa clave está bien ocupada.
+- El resultado `assigned` **NUNCA** se puede reintentar: esa clave está bien ocupada.
 
 ## Normative Docs
 
@@ -184,6 +184,59 @@ Reglas obligatorias:
      Lo completa el agente que TOMA la task, no quien la crea.
      ═══════════════════════════════════════════════════════════ -->
 
+## Plan ejecutado (2026-08-22)
+
+**Sin migración.** `attempt_seq`, el `CHECK (origin = 'manual' OR attempt_seq = 1)` y los
+`GRANT` por columna ya existían: la task usa el mecanismo que TASK-1719 dejó puesto y nadie
+accionaba.
+
+| Slice | Qué | Archivos |
+|---|---|---|
+| 1 | Reproducción con un ledger en memoria que honra los tres índices parciales | `attempt-retry.test.ts` |
+| 2 | `readAssignmentAttemptState` + resolución del intento bajo el lock de la policy + el confirm pide el intento siguiente | `assignment-store.ts`, `assign.ts`, `confirm-assignment.ts` |
+| 3 | Decisión sobre las filas existentes + gate vivo contra PostgreSQL real | esta spec, `attempt-retry.live.test.ts` |
+
+### Por qué el test de reproducción no reusa los handlers existentes
+
+Los handlers de `propose-confirm.test.ts` devuelven filas FIJAS por regex. Con ellos el INSERT
+del ledger siempre "gana" y el callejón es literalmente irreproducible: un test verde sobre un
+bug vivo. El fake de `attempt-retry.test.ts` mantiene el ledger en memoria y honra el índice
+único parcial del ledger, el de la propuesta y el de instancia abierta.
+
+### La decisión de diseño, corregida respecto del Detailed Spec original
+
+El Detailed Spec proponía atar el intento nuevo a una **propuesta con digest distinto**. No
+sirve, y la razón es verificable: `templateStatus` **no entra** a `AssignmentEffectMaterial`
+(`proposal-digest.ts`). Activar una plantilla inactiva deja el digest idéntico ⇒ con ese
+criterio, un `blocked: template_inactive` quedaría en callejón **permanente**, que es
+exactamente el bug que esta task cierra.
+
+El criterio correcto es la **identidad de la propuesta**, no su digest: la confirmación es
+one-shot (`lockAssignmentProposalForUpdate` + la guarda de `status`), así que un reintento de
+transporte sale por `already_confirmed` sin tocar el ledger. Llegar al command significa que
+una persona confirmó una propuesta que nunca se había confirmado — una decisión humana nueva,
+que es la condición que la idempotencia pedía.
+
+### Las tres respuestas del resolver, y por qué la del medio es la peligrosa
+
+1. Sin intento vigente (o todos superseded por cancelación) ⇒ `max + 1`, monotónico contra
+   TODA la historia: reusar el rótulo de un intento cancelado dejaría dos filas distintas
+   diciendo "intento 2".
+2. Intento vigente con resultado recuperable (`blocked`/`held`/`stale`) ⇒ `max + 1`. Es lo que
+   devuelve la capacidad de asignar.
+3. Cualquier otro resultado vigente ⇒ **su mismo número**, nunca 1 ni uno libre. Devolver un
+   casillero vacío junto a un `assigned` vivo le crearía una **segunda prueba** al mismo
+   candidato. Devolviendo el suyo, el `ON CONFLICT` colisiona y la respuesta es el replay
+   honesto (`already_assigned`, o el fault si la fila estaba en `intent`).
+
+### Dónde ocurre el cálculo
+
+Dentro de `assignAssessmentFromPolicy`, **después de `lockPolicyForUpdate`**. Ese `FOR UPDATE`
+serializa todos los assignments de la policy y, cuando el caller es el confirm humano, se
+sostiene en la MISMA transacción que ya tiene bloqueada la fila de la propuesta: el cálculo
+queda bajo los dos locks a la vez, que es más fuerte que lo que pedía el criterio de
+aceptación. La capa 2 del ADR D2 (`ON CONFLICT DO NOTHING` + re-lectura) sigue siendo la red.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      ═══════════════════════════════════════════════════════════ -->
@@ -194,8 +247,8 @@ Reglas obligatorias:
   habilitarla, generar propuesta nueva y confirmar. Debe asignar y hoy no lo hace.
 - **Slice 2 — Intento siguiente.** La confirmación de una propuesta **distinta** a la que produjo el
   último intento no-asignado abre `attempt_seq + 1`. Reconfirmar la MISMA propuesta sigue siendo
-  idempotente y devuelve su desenlace registrado.
-- **Slice 3 — Desenlaces existentes.** Decidir y ejecutar qué pasa con las filas bloqueadas que ya
+  idempotente y devuelve su resultado registrado.
+- **Slice 3 — Resultados de intento existentes.** Decidir y ejecutar qué pasa con las filas bloqueadas que ya
   están en la base: recovery declarado o convergencia natural por el camino nuevo.
 
 ## Out of Scope
@@ -231,7 +284,7 @@ es alto: es el único camino que crea tests de candidato.
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
 | Abrir intentos de más y mandar dos tests a la misma persona | Hiring | Media | El intento nuevo se ata a una propuesta distinta, no a un click; cálculo bajo el `FOR UPDATE` existente | `hiring.assessment_assignment.*` |
-| Relajar la idempotencia de transporte sin querer | Hiring | Media | Test explícito: reconfirmar la misma propuesta devuelve su desenlace, no uno nuevo | Tests del dominio |
+| Relajar la idempotencia de transporte sin querer | Hiring | Media | Test explícito: reconfirmar la misma propuesta devuelve su resultado, no uno nuevo | Tests del dominio |
 | Las filas bloqueadas viejas quedan sin resolver | Hiring | Alta | Slice 3 decide explícitamente; no se cierra la task sin esa decisión | Conteo de candidaturas bloqueadas |
 
 ### Feature flags / cutover
@@ -262,33 +315,95 @@ Ninguna.
 
 ## Acceptance Criteria
 
-- [ ] Corregir la causa de un bloqueo y confirmar de nuevo asigna el test.
-- [ ] Reconfirmar la MISMA propuesta sigue devolviendo su desenlace registrado, sin intento nuevo.
-- [ ] Un desenlace `assigned` vigente sigue impidiendo una asignación nueva.
-- [ ] El ledger conserva ambos intentos: no se borra ni se sobreescribe historia.
-- [ ] El cálculo del intento siguiente ocurre bajo el mismo `FOR UPDATE` que serializa la propuesta.
-- [ ] Existe decisión ejecutada sobre las filas bloqueadas que ya están en la base.
-- [ ] El ciclo completo quedó ejercitado contra PostgreSQL real, no sólo con mocks.
+- [x] Corregir la causa de un bloqueo y confirmar de nuevo asigna el test.
+- [x] Reconfirmar la MISMA propuesta sigue devolviendo su resultado registrado, sin intento nuevo.
+- [x] Un resultado `assigned` vigente sigue impidiendo una asignación nueva.
+- [x] El ledger conserva ambos intentos: no se borra ni se sobreescribe historia.
+- [x] El cálculo del intento siguiente ocurre bajo el mismo `FOR UPDATE` que serializa la propuesta.
+- [x] Existe decisión ejecutada sobre las filas bloqueadas que ya están en la base.
+- [x] El ciclo completo quedó ejercitado contra PostgreSQL real, no sólo con mocks.
 
 ## Verification
 
-- `pnpm local:check`
-- `pnpm vitest run src/lib/hiring/assessment/assignment-policy`
-- Ejercicio del ciclo completo contra PostgreSQL real
+Ejecutada 2026-08-22:
+
+- `npx vitest run src/lib/hiring/assessment` → **472 passed**, 0 fallos (42 skipped: los gates
+  vivos, que necesitan las credenciales cargadas).
+- `npx vitest run src/lib/hiring/assessment/assignment-policy/attempt-retry.test.ts` → **8/8**.
+- Ciclo completo contra PostgreSQL real:
+  `set -a && . ./.env.local && set +a && npx vitest run …/attempt-retry.live.test.ts` → **3/3**.
+  Teardown verificado: cero residuo (policy, opening, demand, ledger y outbox limpios).
+- `npx eslint src/lib/hiring/assessment/assignment-policy/` → 0 findings.
+- `pnpm typecheck` → el único error del repo es `src/lib/hiring/store.ts` (`HiringPipelineStage`),
+  de `TASK-1765` en curso en otra sesión sobre el mismo checkout. Ningún error en los archivos de
+  esta task.
 
 ## Closing Protocol
 
-- [ ] Lifecycle y ubicación del archivo reflejan estado real.
-- [ ] README y registry sincronizados.
-- [ ] Handoff y changelog registran la evidencia runtime.
-- [ ] `pnpm docs:closure-check` y `pnpm docs:context-check:strict` pasan al cierre.
+- [x] Lifecycle y ubicación del archivo reflejan estado real.
+- [x] README y registry sincronizados.
+- [x] Handoff y changelog registran la evidencia runtime.
+- [x] `pnpm docs:closure-check` y `pnpm docs:context-check:strict` pasan al cierre.
+
+## Slice 3 — decisión sobre las filas existentes (evidencia 2026-08-22, PostgreSQL real)
+
+Contadas contra la base, no estimadas. El ledger completo tiene 23 filas; **las únicas cuyo
+último intento vigente es un callejón son 4**, y no son lo que el brief suponía:
+
+| outcome | reason | origin | trigger_stage | attempt | filas | vigentes |
+|---|---|---|---|---|---|---|
+| `blocked` | `volume_cap` | **`stage_auto`** | **`shortlisted`** | 1 | 4 | 4 |
+
+Estado del mundo de esas 4 (PII-free): candidaturas en `stage='closed'`, `decision IS NULL`,
+**`data_origin='smoke_test'`**, sin instancia viva, plantilla `active`, correo presente; 2 con la
+policy hoy `disabled` y 2 `enabled`. Y el dato que cierra el caso: **su clave manual
+(`trigger_stage='manual'`) está LIBRE en las 4**.
+
+**Decisión: sin backfill.** Cuatro razones, en orden de fuerza:
+
+1. **No son personas.** `data_origin='smoke_test'`: recuperarlas sería fabricar actividad sobre
+   datos de humo, no rescatar a nadie.
+2. **No hay ni un solo callejón manual en producción.** El confirm humano escribe siempre
+   `trigger_stage='manual'`; esas filas ocupan `'shortlisted'`. Son llaves distintas.
+3. **Su callejón es otro mecanismo.** `stage_auto` no puede usar `attempt_seq > 1` — lo prohíbe
+   el `CHECK (origin = 'manual' OR attempt_seq = 1)`
+   (`migrations/20260817102245965_task-1719-assignment-ledger-intent-outcome.sql:45`). Su reversa
+   declarada es `superseded_at`, y ese write path no existe. Está fuera del `## Out of Scope`.
+4. **Están `closed`.** Crearles una prueba hoy sería incorrecto; ya quedan fuera de
+   `resolveApplicationsAwaitingAssignment`, que filtra `stage = trigger_stage`.
+
+**`assertEnum` corre en el camino de LECTURA del ledger** (`assignment-store.ts`) y una fila
+histórica es irreescribible por diseño (el `GRANT UPDATE` es column-scoped y excluye
+`trigger_stage`). Verificado: las filas vivas nombran `shortlisted`, `manual`, `stage_auto`,
+`blocked` y `volume_cap` — **todos literales que TASK-1754 y TASK-1765 conservan**. Nada de lo que
+esta task hace retira un literal que una fila viva nombre.
+
+## Delta 2026-08-22 (b) — corrección al orden respecto del colapso del enum
+
+El Delta anterior justificaba correr esta task antes de `TASK-1754` porque el colapso mete más
+población a la etapa que dispara la policy y "cada política mal configurada quema un cupo para
+siempre". **Ese argumento apunta al carril automático, que esta task excluye.** Más población en
+`shortlisted` ⇒ más intentos `stage_auto` ⇒ más `blocked` en el carril que el `CHECK` de la base
+impide reintentar. **La restricción de orden le pertenece a `TASK-1771`, no a ésta.**
+
+Esta task sigue conviniendo ahora por su propio mérito: el callejón manual es real y alcanzable
+hoy sin que haya pasado nada raro —toda policy nace en `draft`, se confirma, y la llave manual
+queda quemada—, y cualquier consumidor del contrato gobernado (Nexa, MCP, un script) llega a él
+aunque `TASK-1747` haya cerrado el camino en la pantalla.
 
 ## Follow-ups
 
+- **`TASK-1771`** — el callejón del carril AUTOMÁTICO (`blocked: volume_cap` en `stage_auto`).
+  Mecanismo distinto: supersede por reconciliación, no `attempt_seq`; el write path no existe.
+  Hereda la restricción de orden respecto de `TASK-1754` (ver Delta b). La escribe y registra la
+  sesión que gobierna el registry; esta task sólo la referencia.
 - Evaluar una señal de reliability para candidaturas cuyo último intento de asignación quedó en un
-  desenlace no-asignado por sobre un umbral de días. Hoy ese estado es invisible.
+  resultado no-asignado por sobre un umbral de días. Hoy ese estado es invisible.
+- Residuo preexistente y ajeno a esta task: 13 `hiring_opening` con prefijo `LIVE-TEST` quedaron
+  de corridas anteriores de otros gates vivos (`accommodations`, `assignment policy`, `assignment
+  proposal`, `cancel`). El gate de esta task no deja residuo — verificado post-corrida.
 
-## Open Questions
+## Open Questions — RESUELTA (2026-08-22)
 
-- ¿Las filas bloqueadas existentes se resuelven con recovery declarado o se dejan converger por el
-  camino nuevo? La respuesta depende de cuántas haya en producción; contarlas es parte del Slice 3.
+**¿Recovery declarado o convergencia natural?** → **Sin backfill.** Decisión ejecutada con el
+conteo real; la evidencia está en `## Slice 3 — decisión sobre las filas existentes`.

@@ -3,6 +3,17 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-22 — Un test bloqueado ya no deja a esa persona sin segunda oportunidad
+
+- Corregir la causa de un bloqueo —registrar el correo, activar la plantilla, habilitar la política— y volver a
+  proponer ahora **sí asigna la prueba**. Antes el intento bloqueado ocupaba el cupo de esa persona de forma
+  permanente y no había forma de destrabarlo desde el portal.
+- El intento bloqueado no se borra: queda como intento 1 y el nuevo entra como intento 2, así que el historial
+  sigue diciendo qué pasó y en qué orden.
+- Lo que no cambió: una prueba ya asignada sigue sin reintentarse (para eso está cancelar), y un bloqueo del
+  carril automático —al mover de etapa— todavía no se destraba solo; hay que asignar a mano.
+- Sin migración ni flags. Verificado contra PostgreSQL real, no sólo con tests.
+
 ## 2026-08-21 — El correo de selección celebra sin adelantar la incorporación
 
 - El asunto identifica nombre y vacante; el título visible evita duplicar el saludo y el cuerpo explica la
@@ -949,15 +960,3 @@ postulación. El reclutador lo lee en la Postulación 360; las postulaciones his
 informado" sin inventar datos. ADR registrado, migración aditiva aplicada, país requerido primero
 en UI (expand/contract). Pendiente de rollout: ejercicio en staging + GVC, revisión de Privacy y el
 flip a requerido en parser.
-
-## 2026-08-12 — El proceso de contratación ahora avisa por correo en cada hito (TASK-1689)
-
-Greenhouse deja de estar mudo durante el hiring: al llegar una postulación, People recibe un aviso
-con los datos del postulante y el candidato un acuse de recibo; al asignarle un test le llega su
-link de acceso (con token re-emitido de forma canónica — nunca viaja por el outbox); al avanzar a
-una etapa candidate-facing (Preselección/Entrevista, nunca etapas internas) se le informa; y la
-decisión final llega como felicitación o como agradecimiento cuidado si no quedó. Todo corre como
-consumers reactivos en el ops-worker sobre la plataforma de email canónica, idempotente ante
-retries, con kill-switch por tipo (el de rechazo pausable aparte) y detrás de
-`HIRING_LIFECYCLE_EMAILS_ENABLED` default OFF. Code complete con suite completa verde; el flip
-espera deploy del worker, ejercicio en staging y revisión del copy por Talent.

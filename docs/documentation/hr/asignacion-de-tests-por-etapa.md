@@ -1,9 +1,9 @@
 # Asignación de tests por etapa
 
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-08-17 por Claude (TASK-1719)
-> **Última actualización:** 2026-08-17 por Claude (TASK-1719 — ajustes razonables)
+> **Última actualización:** 2026-08-22 por Claude (TASK-1755 — corregir la causa de un bloqueo devuelve la asignación)
 > **Documentación técnica:** [`GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md`](../../architecture/GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md)
 > **Manual de uso:** [`operar-asignacion-de-tests.md`](../../manual-de-uso/hr/operar-asignacion-de-tests.md)
 
@@ -161,6 +161,14 @@ tiempo que efectivamente tiene, nunca quién se lo dio ni por qué.
   todavía está pendiente. Ver [Entrega y recuperación de acceso a tests](entrega-y-recuperacion-de-acceso-a-tests.md).
 - **Un reintento automático nunca cuenta como segundo intento.** Volver a tomar una prueba es
   siempre una decisión humana explícita, con su razón registrada.
+- **Corregir la causa de un bloqueo devuelve la posibilidad de asignar.** Si el intento quedó
+  bloqueado porque faltaba el correo, la plantilla estaba inactiva o la política seguía en
+  borrador, arreglar eso y volver a proponer sí asigna. Antes no: el intento bloqueado dejaba a
+  esa persona sin segunda oportunidad, y no había forma de destrabarla desde el portal.
+  El bloqueo viejo **no se borra**: queda como intento 1 y el nuevo entra como intento 2, así que
+  se puede leer qué pasó y en qué orden.
+- **Esto vale para el carril manual, no para el automático.** Si la prueba se bloqueó al mover
+  de etapa, esa vía todavía no se destraba sola: hay que asignar a mano.
 - **La etapa que se comunica es la vigente**, no la del momento en que se hizo clic. Si alguien
   mueve una postulación dos veces seguidas, el candidato recibe una comunicación por donde
   efectivamente quedó.

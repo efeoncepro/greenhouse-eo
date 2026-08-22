@@ -1,9 +1,9 @@
 # Operar la asignación de tests por etapa
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-08-17 por Claude (TASK-1719)
-> **Última actualización:** 2026-08-17 por Claude (TASK-1719 — ajustes razonables)
+> **Última actualización:** 2026-08-22 por Claude (TASK-1755 — reintento tras corregir la causa)
 > **Documentación funcional:** [`asignacion-de-tests-por-etapa.md`](../../documentation/hr/asignacion-de-tests-por-etapa.md)
 > **ADR:** [`GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md`](../../architecture/GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md)
 
@@ -121,9 +121,19 @@ La respuesta trae `outcome`:
 |---|---|---|
 | `assigned` | Se creó la prueba. No prueba despacho ni entrega del correo | Verifica el canal si es un caso sensible; no reasignes para reenviar |
 | `already_assigned` | Ya existía. No se creó nada nuevo ni salió otro correo | Nada |
-| `blocked` | Falta algo estructural (correo del candidato, plantilla inactiva, política apagada) | Corrige la causa y vuelve a proponer |
+| `blocked` | Falta algo estructural (correo del candidato, plantilla inactiva, política apagada) | Corrige la causa y vuelve a proponer: ahora sí asigna |
 | `held` | Se alcanzó el tope de envíos de la ventana | Espera, o revisa si el tope está bien calibrado |
 | `stale` | El mundo cambió entre proponer y confirmar | Vuelve a proponer y mira la vista previa nueva |
+
+> **Sobre "vuelve a proponer" en `blocked`, `held` y `stale`.** Desde `TASK-1755` esa instrucción
+> hace lo que promete: corregida la causa, la confirmación siguiente abre un intento nuevo y asigna.
+> Antes el intento bloqueado ocupaba el cupo de esa persona de forma permanente y ninguna
+> corrección lo liberaba. El intento viejo **no se borra** — queda en el historial como intento 1 y
+> el nuevo entra como intento 2.
+>
+> Dos límites que siguen vigentes: **(a)** un `assigned` vigente no se reintenta (para eso está
+> cancelar, que libera el cupo); **(b)** esto aplica al carril **manual**. Un bloqueo del carril
+> automático (al mover de etapa) todavía no se destraba solo: asigna a mano esa postulación.
 
 ## Encender la automatización (procedimiento, no un interruptor)
 
