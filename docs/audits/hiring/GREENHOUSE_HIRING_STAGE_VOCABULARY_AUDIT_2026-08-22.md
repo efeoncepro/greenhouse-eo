@@ -11,7 +11,27 @@
 - Task dueña: [`TASK-1754`](../../tasks/in-progress/TASK-1754-hiring-stage-vocabulary-collapse.md) (`in-progress`)
 - Documento de lectura para el operador: <https://claude.ai/code/artifact/5b23dc9b-c027-40aa-bc68-84f965344fbb>
 
-> **Regla de uso.** Esta auditoría documenta el estado observado el 2026-08-22. Antes de consumirla, revalidar contra el runtime: varios hallazgos son de estado (conteos, flags, qué está o no en producción) y caducan rápido. Los hallazgos estructurales (H-01 a H-08) sólo caducan si alguien los cierra.
+> ## ⚠️ Estado de verificación — LEER ANTES DE ACTUAR
+>
+> **Esta auditoría está EN VERIFICACIÓN ADVERSARIAL y no debe usarse todavía como base de una decisión irreversible.**
+>
+> El levantamiento se hizo con seis barridos automatizados en paralelo. **Al menos uno produjo un hallazgo falso de severidad P0**: reportó que el trigger de retención de `migrations/20260819072130586_…:891-906` clasificaba «por etapa» con `ELSE NULL`, cuando el predicado real es `NEW.stage = 'selected' OR NEW.decision = 'selected'`. **Citó sólo la primera rama de un `OR`** y convirtió un predicado defensivo en un riesgo de compliance inexistente. Se detectó al leer el SQL directo, no por el barrido.
+>
+> Ese error obliga a tratar **todo** el levantamiento como no confirmado hasta que cada afirmación load-bearing sea verificada leyendo el predicado completo y verbatim. El modo de fallo a cazar es específico: **citar parcialmente un predicado compuesto** (una rama de un `OR`, un `CASE` sin su `ELSE`, un `WHERE` sin su `AND`).
+>
+> Estado por hallazgo:
+>
+> | Hallazgo | Estado |
+> |---|---|
+> | H-01 | **Reescrito** tras verificación directa del SQL (§7.5) — la versión original era falsa |
+> | H-03, H-04 (fairness / AI Act) | en verificación adversarial |
+> | Veredicto «scoring IA indiferente» + digest del expediente | en verificación adversarial |
+> | H-01 corregido, H-23, H-24, anatomía del cierre (§7) | en verificación adversarial |
+> | H-14 (Full API Parity) + recuento de particiones | en verificación adversarial |
+> | §3 (arqueología de autoría) | en verificación adversarial |
+> | Resto | levantado por barrido, **sin verificación independiente** |
+>
+> **Regla de uso.** Esta auditoría documenta el estado observado el 2026-08-22. Además de la verificación pendiente, varios hallazgos son de estado (conteos, flags, qué está o no en producción) y caducan rápido; revalidar contra runtime antes de consumirlos.
 
 ---
 
@@ -27,9 +47,11 @@ La auditoría partió de un síntoma acotado —una automatización de assessmen
 
 El hallazgo que explica por qué esto sobrevivió seis semanas sin detección es de método, no de código, y está en §3.
 
-**Qué NO se rompe:** el subsistema de **scoring de assessment con IA es indiferente** al colapso. Es el único subsistema grande del dominio que no toca la etapa.
+**Y falta un eje.** `stage` carga hoy dos preguntas —*dónde está en el proceso* y *cómo terminó respecto de la persona*— cuando la segunda ya tiene campo propio (`decision`). Las cuatro etapas terminales «reales» son espejo redundante de ese campo; `handoff_ready` pertenece a otro agregado y nadie lo escribe; y **`closed` no significa nada: ninguna decisión lo produce**. Lo que el dominio no puede expresar es la tercera pregunta —*por qué terminó, si no fue por la persona*— y es justo la que `TASK-1762` necesita. Anatomía completa en §7.
 
-**Qué sí requiere decisión humana antes de tocar nada:** cinco preguntas, en §9. Dos de ellas —el corpus histórico de evidencia de fairness y la semántica de `closed`— **no tienen remediación después del hecho**.
+**Qué NO se rompe:** el subsistema de **scoring de assessment con IA es indiferente** al colapso. Es el único subsistema grande del dominio que no toca la etapa. Y el colapso terminal es **más seguro de lo que parecía**: cinco de los seis consumidores relevantes ramifican por `stage OR decision`, no por etapa sola (§7.5).
+
+**Qué sí requiere decisión humana antes de tocar nada:** cinco preguntas, en §10. Dos de ellas —el corpus histórico de evidencia de fairness y la semántica de `closed`— **no tienen remediación después del hecho**.
 
 ---
 
@@ -147,19 +169,118 @@ El 2026-08-17, el commit `cff96f16b` fijó `shortlisted` como etapa canónica de
 
 ---
 
-## 7. Hallazgos
+## 7. Anatomía del cierre — qué es realmente cada etapa terminal
+
+La columna «Cerrado» agrupa seis etapas, pero **no son seis cosas del mismo tipo**. Son tres tipos distintos bajo una etiqueta, y uno de los tres no significa nada.
+
+### 7.1 Los tres tipos
+
+| Tipo | Etapas | Qué es | Quién la escribe | ¿Aporta información que `decision` no tenga? |
+|---|---|---|---|---|
+| **A — proyección de la decisión** | `selected` · `backup` · `rejected` · `withdrawn` | `decide.ts:241` escribe `decision` y `stage` **en la misma transacción**, con valores equivalentes. La etapa es un espejo redundante del desenlace. | comando `decide` | **No. Ninguno.** |
+| **B — estado operativo post-decisión** | `handoff_ready` | «Seleccionado y listo para el traspaso a Workforce». No es un estado del proceso de selección: es un estado del **handoff**, que es un agregado aguas abajo con vida propia (`src/lib/hiring/handoff/**`). | **nadie** | n/a — literal muerto |
+| **C — sin desenlace** | `closed` | **Nada.** No existe ninguna decisión que lo produzca; no está en el mapa `DECISION_STAGE`. | la columna «Cerrado» del tablero (`destination: 'closed'`) y `data-origin/purge.ts:173` | n/a — no hay decisión que espejar |
+
+**El mapa completo decisión → etapa** (`decide.ts:27-33`), que es el contrato real del cierre:
+
+```
+selected        → selected
+backup_selected → backup
+rejected        → rejected
+withdrawn       → withdrawn
+on_hold         → decision_pending      ← no es terminal: vuelve al paso 5
+```
+
+`closed` y `handoff_ready` **no aparecen**. Son las dos únicas etapas del carril que ninguna decisión produce.
+
+### 7.2 Qué significa cada una, con precisión
+
+| Etapa | Significado real | Quién decidió | Consecuencia downstream |
+|---|---|---|---|
+| `selected` | Efeonce eligió a la persona. | Efeonce | Traspaso a Workforce; retención `workforce_record` **sin expiración**; excluida del vencimiento de documentos (`was_hired`) |
+| `backup` | Efeonce la eligió **como reserva**. No es un rechazo ni una contratación. | Efeonce | Tratada como contratada para documentos (`was_hired` incluye `backup_selected`), pero **cae al `ELSE` de la escalera de recuperación** — ver H-23 |
+| `rejected` | Efeonce **juzgó a la persona** y la descartó. | Efeonce | Correo de rechazo; reloj de retención +12 meses |
+| `withdrawn` | **La persona se retiró.** No hay juicio de Efeonce. | el candidato | Mismo tratamiento de retención que `rejected` (+12 meses), aunque la causa es opuesta |
+| `handoff_ready` | Post-selección, listo para traspaso. | — | **Nadie lo escribe.** Pertenece conceptualmente al agregado `handoff`, no a `stage` |
+| `closed` | **Indefinido.** | — | Sin decisión ⇒ congela ambos relojes de retención (H-01) |
+| `decision_pending` | Doble sentido: «aún no decidido» (paso 5) **y** «decidido = `on_hold`». | ambos | El desk cuenta las dos poblaciones juntas (H-17) |
+
+### 7.3 Verificado: la columna «Cerrado» nunca se disparó sobre una persona real
+
+**Verificado contra runtime, 2026-08-22:**
+
+| etapa | decisión | procedencia | filas |
+|---|---|---|---|
+| `closed` | **sin decisión** | `smoke_test` | 32 |
+| `rejected` | `rejected` | `real` | **1** |
+
+**Cero postulaciones reales han estado jamás en `closed`.** Las 32 son sintéticas, escritas por `purge.ts:173`. El log de eventos no registra **ninguna** escritura de `closed` por el PATCH — ningún operador arrastró jamás una tarjeta real a esa columna. La única terminal real del sistema entero es esa `rejected`, y sí tiene su decisión.
+
+> La columna «Cerrado» es un arma cargada que nunca se disparó. **Eso es lo que mantiene abierta la decisión Q2: no hay filas reales que migrar.** Deja de estar abierta el día que alguien suelte la primera tarjeta real ahí.
+
+### 7.4 El eje que falta
+
+`stage` está cargando hoy **dos preguntas distintas**, y no tiene dónde poner una tercera:
+
+1. **¿Dónde está en el proceso?** — la posición en el embudo. Es lo que `stage` debería ser, y sólo es en las 6 no terminales.
+2. **¿Cómo terminó respecto de la persona?** — ya existe como campo propio: `decision`. Las 4 etapas de tipo A son duplicación de esto, no información adicional.
+3. **¿Por qué terminó, si no fue por la persona?** — **no existe.** Vacante cancelada, cupo lleno, proceso abandonado, oferta declinada por presupuesto.
+
+La tercera es un hueco genuino del dominio, y no es teórico: **`TASK-1762` (cierre de vacante por capacidad) lo necesita**. Hoy la única salida disponible para «esto terminó y no fue por ti» es `rejected` — que es un juicio sobre la persona, dispara correo de rechazo y arranca su reloj de retención. Usar `rejected` para un cierre por capacidad **le atribuye a la persona una causa falsa**, que es exactamente lo que el patrón §9 prohíbe en su corolario 2.
+
+`closed` está intentando ser tres cosas incompatibles a la vez: **archivado** (lo que hace el purge: el *registro* sale de circulación), **terminó** (lo que escribe el tablero: un terminal sin desenlace, que es el bug), y **cierre sin juicio sobre la persona** (el hueco que falta). Q2 no es «¿qué significa `closed`?» sino **«¿cuántos ejes hay?»**.
+
+### 7.5 Revisión de la premisa de `TASK-1754`
+
+El wireframe afirma que «Cerrado» colapsa **sin pérdida** porque `decision` sobrevive como campo aparte. **La auditoría verificó la premisa consumidor por consumidor y en general se sostiene** — mejor de lo que una lectura superficial sugiere:
+
+| Consumidor | Llave | ¿El colapso terminal lo rompe? |
+|---|---|---|
+| `documents/retention.ts:57-98` | `decision` únicamente; **la palabra `stage` no aparece** | **No** |
+| Trigger de retención de recuperación (`…1746…:891-906`) | `NEW.stage = 'selected' OR NEW.decision = 'selected'` … | **No** — es defensivo en ambos ejes |
+| Función de purga de recuperación (`…1746…:998-1000`) | `application_stage IN (…) OR application_decision IN (…)` | **No** — ídem |
+| `TERMINAL_APPLICATION_STAGES` (6 copias) | `applicationDecision \|\| stage ∈ set` | **No** — `closed` ya está en el set |
+| Escalera de fairness histórica | evento `decided` con `decision='selected'` → rango 7 | **No** para `selected` |
+| **`desk.ts:104` · `talent-pool/projection.ts` · `DemandDeskView.tsx:348`** | **`stage` únicamente** (`NOT IN rejected/withdrawn/closed`) | **Sí — cambia de comportamiento**, ver H-24 |
+
+**Corrección al hallazgo H-01 tal como se publicó inicialmente:** una lectura preliminar reportó que el trigger de retención clasificaba **sólo** por `stage` y que el colapso lo llevaría al `ELSE NULL`. **Es incorrecto.** El predicado real es `stage OR decision` en los tres puntos. El riesgo de retención no viene del colapso: viene de (a) `closed` **sin ninguna decisión** — H-02 — y de (b) una omisión preexistente en la escalera — H-23. H-01 quedó reescrito abajo con el predicado verbatim.
+
+---
+
+## 8. Hallazgos
 
 Severidad: **P0** = daño a persona real, irreversible o de compliance · **P1** = fallo silencioso con daño operativo · **P2** = incoherencia estructural sin daño hoy · **P3** = higiene.
 
 ### P0 — daño irreversible o de compliance
 
-**H-01 · Dos relojes de retención de PII, con claves distintas, ambos rotos por el colapso terminal.** *(Verificado contra código.)*
-Existen dos mecanismos independientes y ninguno lo sabe del otro:
-- `src/lib/hiring/documents/retention.ts:57-98` — la palabra `stage` **no aparece ni una vez**; el reloj arranca con `decision IS NOT NULL` (`:69`).
-- `migrations/20260819072130586_…:891-906` — trigger `AFTER UPDATE OF stage, decision, decision_at` que clasifica por **etapa**: `stage='selected'` → sin expiración; `stage IN ('rejected','withdrawn')` → +12 meses; **`ELSE NULL`**.
+**H-01 · Una postulación cerrada sin decisión congela la retención de PII de la persona entera.** *(Verificado contra código. **Reescrito** — ver §7.5 para la corrección de la lectura preliminar.)*
 
-Si las 5 terminales colapsan a `closed`, **toda** postulación cerrada cae al `ELSE` → `retention_expires_at = NULL` → **el dato del candidato no expira nunca**, en silencio. En paralelo, `closed` + `decision IS NULL` no sólo nunca vence en el otro reloj: bloquea vía `NOT EXISTS` (`retention.ts:90-94`, join por `identity_profile_id`) el borrado de **todos** los documentos de esa persona en **todas** sus otras postulaciones. Contra la ventana de 12 meses de la Ley 21.719 declarada en `retention.ts:5-27`.
-*Sin dueño. Precondición de `TASK-1744`.*
+Hay **dos relojes de retención independientes**, sobre objetos distintos, y ninguno sabe del otro:
+
+| Reloj | Qué retiene | Llave | Archivo |
+|---|---|---|---|
+| 1 | documentos del candidato (CV, portafolio) | **`decision` únicamente**; la palabra `stage` no aparece en el archivo | `documents/retention.ts:57-98` |
+| 2 | recibos de recuperación de acceso al test | `stage` **OR** `decision` | trigger en `migrations/20260819072130586_…:891-906` |
+
+El predicado verbatim del reloj 2 —defensivo en ambos ejes, y por eso **el colapso terminal no lo rompe**:
+
+```sql
+retention_expires_at = CASE
+  WHEN retention_class = 'workforce_record' OR NEW.stage = 'selected' OR NEW.decision = 'selected' THEN NULL
+  WHEN NEW.stage IN ('rejected','withdrawn') OR NEW.decision IN ('rejected','withdrawn')
+    THEN COALESCE(NEW.decision_at, NOW()) + INTERVAL '12 months'
+  ELSE NULL
+END
+```
+
+**El daño no viene del colapso: viene de cerrar sin decisión.** Una postulación en `closed` con `decision IS NULL` (lo que hoy escriben la columna «Cerrado» del tablero y `purge.ts:173`):
+
+1. cae al `ELSE` del reloj 2 → `retention_expires_at = NULL` → el recibo **no expira nunca**;
+2. no entra al universo del reloj 1 (falla el `WHERE ha.decision IS NOT NULL` de `:69`), así que nunca aporta un `closed_at` que pueda vencer;
+3. y **satisface el `NOT EXISTS` de `:90-94` como si fuera un proceso vivo**. Como ese join es por `identity_profile_id`, **una sola postulación `closed` sin decisión bloquea indefinidamente el borrado de los documentos de esa persona en TODAS sus demás postulaciones**, aunque todas estén decididas y vencidas hace años.
+
+El fallo es silencioso por construcción: la fila simplemente no aparece en el signal. Contra la ventana de 12 meses de la Ley 21.719 declarada en `retention.ts:5-27`.
+*Sin dueño. Precondición de `TASK-1744`. Consecuencia directa de H-02.*
 
 **H-02 · La puerta de `closed` cierra a una persona sin decisión, sin correo, y le mata el test.** *(Verificado contra código.)*
 El guard del PATCH bloquea 4 etapas (`store.ts:1311`) y **deja pasar 9**, incluidas `handoff_ready` y `closed` — que es justo lo que escribe el carril «Cerrado» (`PipelineDeskView.tsx:83`). Arrastrar una tarjeta ahí:
@@ -220,6 +341,17 @@ Al absorber `qualified` dentro de `shortlisted`, más población entra a la etap
 **H-13 · Más entradas a la etapa que dispara = más cupos quemados irrecuperables.** *(Derivado, con base verificada.)*
 El ledger tiene hoy 4 filas `blocked` sobre 20. `trigger_stage` participa de la clave de idempotencia y es irreescribible. `TASK-1755` (callejón sin salida del ledger) **debe ir antes o en paralelo, nunca después**: si el colapso llega primero, cada política mal configurada quema un cupo para siempre.
 
+**H-23 · La escalera de retención enumera 3 de las 5 decisiones. `backup_selected` y `on_hold` caen al `ELSE NULL`, hoy.** *(Verificado contra código. Trampa armada, nunca disparada.)*
+El reloj 2 (ver H-01) resuelve por `selected` / `rejected` / `withdrawn` en ambos ejes, y **omite `backup_selected` y `on_hold`** en los dos. Una persona marcada como reserva, o cuya decisión se puso en pausa, obtiene `retention_expires_at = NULL`: su recibo de recuperación **no expira nunca**.
+Esto **no es consecuencia del colapso** — está vivo desde que existe el trigger. Hoy no ha hecho daño porque **hay 0 filas con esas dos decisiones** (verificado contra runtime: la única decisión registrada en todo el sistema es 1 `rejected`). Se dispara con la primera reserva real.
+Nota de asimetría: el reloj 1 **sí** contempla `backup_selected` — lo trata como contratado (`was_hired`, `retention.ts:65`). Los dos relojes discrepan sobre qué es una reserva.
+*Sin dueño.*
+
+**H-24 · El colapso terminal cambia en silencio quién cuenta como «activo» y quién entra al Talent Pool.** *(Derivado, con base verificada.)*
+Tres predicados clave por **`stage` únicamente** — `desk.ts:104`, `talent-pool/projection.ts` (5 sitios) + `commands.ts:272`, `DemandDeskView.tsx:348` — definen «activa» como `stage NOT IN ('rejected','withdrawn','closed')`. Hoy eso cuenta a `selected`, `backup` y `handoff_ready` **como activas**, y por lo tanto las mantiene **fuera** del Talent Pool.
+Si las 5 terminales colapsan a `closed`, esas tres poblaciones pasan a «no activas» de golpe: el KPI de postulaciones activas cambia de valor y **personas ya seleccionadas se vuelven elegibles para el pool**. Es discutiblemente una corrección —una persona seleccionada no debería contar como proceso activo— pero **es un cambio de comportamiento sobre datos de personas reales, y debe decidirse, no descubrirse**. Son los únicos consumidores encontrados que ramifican por etapa terminal sin mirar `decision`.
+*Sin dueño. Depende de Q3.*
+
 ### P2 — incoherencia estructural
 
 **H-14 · Full API Parity: no se cumple.** *(Verificado contra código; conclusión derivada.)*
@@ -254,7 +386,7 @@ Es el paso 5 del tablero («aún no decidido») **y** el resultado de `on_hold` 
 
 ---
 
-## 8. Taxonomía de los modos de fallo
+## 9. Taxonomía de los modos de fallo
 
 Los 22 hallazgos se agrupan en **tres modos**, y sólo uno de ellos es ruidoso:
 
@@ -266,7 +398,7 @@ Los 22 hallazgos se agrupan en **tres modos**, y sólo uno de ellos es ruidoso:
 
 ---
 
-## 9. Preguntas que necesitan decisión humana
+## 10. Preguntas que necesitan decisión humana
 
 | # | Pregunta | Por qué no la puede tomar un agente | ¿Reversible? |
 |---|---|---|---|
@@ -280,7 +412,7 @@ Los 22 hallazgos se agrupan en **tres modos**, y sólo uno de ellos es ruidoso:
 
 ---
 
-## 10. Grafo de dependencias entre tasks vivas
+## 11. Grafo de dependencias entre tasks vivas
 
 **Colisiones de archivo.** El archivo caliente no es el enum: es **`hiringDesk.ts` (3 tasks: 1747, 1754, 1763)** y **`notifications/**` (5 tasks: 1719, 1746, 1754, 1757, 1762)**. `src/types/hiring.ts` no lo disputa nadie. `TASK-1747` está `in-progress` con sesión activa: **hay que serializar el archivo, no las tasks.**
 
@@ -305,7 +437,7 @@ TASK-1755 (ledger)  ────────────────┤
 
 ---
 
-## 11. El vocabulario de etapas no tiene ADR
+## 12. El vocabulario de etapas no tiene ADR
 
 **Verificado contra código y `git log -S`.**
 
@@ -318,7 +450,7 @@ TASK-1755 (ledger)  ────────────────┤
 
 ---
 
-## 12. Evidencia y reproducibilidad
+## 13. Evidencia y reproducibilidad
 
 | Qué | Cómo se obtuvo |
 |---|---|
