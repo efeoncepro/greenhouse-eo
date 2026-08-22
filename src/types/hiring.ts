@@ -143,13 +143,19 @@ export type HiringApplicationStage = (typeof HIRING_APPLICATION_STAGES)[number]
  * - `selected` / `backup` / `rejected` / `withdrawn` — espejos del desenlace; son del command.
  * - `handoff_ready` — no es una posición del recorrido de la PERSONA, sino un estado del agregado
  *   `handoff`, que tiene su propia máquina de estados.
+ * - `qualified` / `client_review` — TASK-1754: absorbidas por `shortlisted`. Salen de acá ANTES
+ *   que del `CHECK`, y ese orden es el slice entero. El tablero muestra seis columnas y el
+ *   dominio tenía trece etapas, así que las tres que se ven como «Evaluación» eran tres destinos
+ *   posibles para un mismo gesto: los diez movimientos humanos a esa columna cayeron en
+ *   `qualified`, que ninguna automatización vigila, y las quince políticas configuradas en
+ *   `shortlisted` nunca dispararon. Retirarlas del subconjunto escribible cierra la boca por la
+ *   que entraban; retirarlas del `CHECK` es el contract, y ése va DESPUÉS del release —
+ *   producción todavía escribe `qualified` desde el tablero viejo.
  */
 export const HIRING_PIPELINE_STAGES = [
   'sourced',
   'screening',
-  'qualified',
   'shortlisted',
-  'client_review',
   'interview',
   'decision_pending'
 ] as const
