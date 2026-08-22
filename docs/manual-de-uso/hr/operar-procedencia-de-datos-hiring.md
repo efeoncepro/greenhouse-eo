@@ -1,8 +1,9 @@
 # Operar la procedencia de datos de Hiring
 
 > **Tipo de documento:** Manual de uso (operador)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-18 por Claude (TASK-1739)
+> **Ultima actualizacion:** 2026-08-22 por Claude (TASK-1748)
 > **Documentacion funcional:** [procedencia-de-datos-hiring.md](../../documentation/hr/procedencia-de-datos-hiring.md)
 
 ## Para qué sirve
@@ -61,6 +62,21 @@ pnpm hiring:data:purge-synthetic                      # ver el plan
 pnpm hiring:data:purge-synthetic --archive --actor <tu-user-id> --reason "<motivo>"
 ```
 
+El plan lista **tres bloques** y el archivado los cubre a los tres: postulaciones, fichas de candidato
+y vacantes. Lee los tres antes de aplicar; el conteo del resumen viene separado por entidad para que
+puedas comparar contra lo que el plan proponía.
+
+Qué escribe cada una:
+
+| Entidad | Qué se escribe | Qué NO se escribe |
+|---|---|---|
+| Postulación | su fecha de archivado | **nunca** la etapa. Archivar no cierra el proceso de nadie |
+| Ficha de candidato | estado `archived` | |
+| Vacante | estado `cancelled` + publicación cerrada | una vacante ya `closed` o `filled` se salta: ese desenlace lo declaró alguien |
+
+Cada fila deja su propio registro de auditoría con quién y por qué, y volver atrás se hace leyendo
+ese registro.
+
 ## Qué significan los estados
 
 | Resultado | Qué pasó |
@@ -78,6 +94,9 @@ pnpm hiring:data:purge-synthetic --archive --actor <tu-user-id> --reason "<motiv
   auditoría. El borrado es irreversible y sólo acepta registros sin ningún rastro.
 - **No pegues la salida en chat, issues ni logs compartidos.** Trae identificadores de personas.
 - **No edites la procedencia con SQL a mano.** La única puerta es el comando, que deja auditoría.
+- **No archives moviendo la etapa a «Cerrado».** Cerrar exige declarar un desenlace; archivar no dice
+  nada sobre la persona. Mezclarlos fue justo lo que dejó 32 postulaciones marcadas como cerradas sin
+  que nadie hubiera decidido nada.
 - **No uses la procedencia para decidir si contactar a alguien.** Eso lo decide el consentimiento.
 
 ## Problemas comunes

@@ -60,7 +60,7 @@ cuarto del módulo real.
 | `hiring.handoff_blocked_stale`, `hiring.internal_hire_awaiting_onboarding` | `TASK-356` | 2026-07-10 |
 | `hiring.candidate_document.retention_overdue`, `storage.asset_scan.open_quarantine` | `TASK-1362` (migradas a `hiring` por `TASK-356`) | 2026-07-10 |
 | `storage.asset_scan.signature_freshness` | `TASK-1378` | 2026-08-11 |
-| `hiring.talent_pool.integrity` | — (sin task declarada en el reader) | **sin delta** |
+| `hiring.talent_pool.integrity` | `TASK-1748` (procedencia) | 2026-08-22 — `facets_without_membership` cuenta **sólo población real**: desde que la projection no materializa personas sintéticas a propósito, una ficha sintética sin membresía dejó de ser un atraso y la señal habría quedado en `warning` permanente. Los contadores de consentimiento y retiro **no** se filtran, a propósito: la procedencia gobierna la visibilidad, jamás el consentimiento. |
 | `hiring.assessment.template_module_without_questions` | — (sin task declarada en el reader) | **sin delta** |
 | `hiring.assessment.assignment_health` | `TASK-1719` | **sin delta** |
 | `hiring.assessment_ai.run_backlog_stuck`, `.provider_failure_rate`, `.abstention_rate`, `.override_delta`, `.orphan_reconciliation` | `TASK-1734` Slice 6 | **sin delta** |

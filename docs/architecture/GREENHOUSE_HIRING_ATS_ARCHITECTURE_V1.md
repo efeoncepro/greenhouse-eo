@@ -252,8 +252,12 @@ fila de `email_type_config` y su seed en el `ops-worker` (**NO** en Vercel).
 | Señal `hiring.application.closed_without_outcome` | **aplicada** (hoy `warning`: 32 sintéticas de `TASK-1748` + 1 etapa espejo) |
 | Contract del enum (retirar `on_hold` del `CHECK`) | **pendiente** — post-release |
 | `CHECK` del invariante `(stage='closed') = (decision IS NOT NULL)` | **pendiente** — espera a `TASK-1748` |
+| Escritor de `archived_at` (`archiveSyntheticRecords`, `TASK-1748`) | **code complete** — sin desplegar |
+| Backfill de las 32 filas sintéticas de `closed` a `archived_at` | **pendiente** — espera al despliegue del filtro de `TASK-1748` |
 
-Las dos pendientes viven en `docs/tasks/pending-migrations/` con su condición de ejecución declarada.
+Las pendientes viven en `docs/tasks/pending-migrations/` con su condición de ejecución declarada, y
+su orden es **una sola cadena**: contract del enum → filtro de `TASK-1748` desplegado → backfill del
+eje de archivado → `CHECK` del invariante.
 
 ### Invariantes operativos para agentes — Eje de desenlace
 
@@ -2173,6 +2177,29 @@ Invariantes duros:
 - **Purga archive-first.** `hiring_assessment` cascadea desde la postulación, así que un DELETE
   destruiría respuestas calificadas por humanos. El lane de borrado exige cero dependientes sobre los
   **diez** verificados contra PG y aborta la corrida completa si una fila no califica.
+
+#### Delta 2026-08-22 (`TASK-1748`) — archivar tiene eje propio, y el filtro llegó al Banco de Talento
+
+- **Archivar NUNCA escribe `stage`.** `archiveSyntheticRecords` escribe `hiring_application.archived_at`
+  (`candidate_facet.status='archived'`, `hiring_opening.status='cancelled'` en las otras dos entidades),
+  y la guarda de idempotencia lee ese eje. La versión anterior archivaba con `stage='closed'`, y ese
+  `UPDATE` es el origen de las 32 filas `closed` sin desenlace de la auditoría del vocabulario.
+- **El archivado cubre las TRES entidades**, cada una sobre allowlist explícita: omitir la lista no
+  escribe nada. `closed`/`filled` de una vacante NO se reescriben — son desenlaces declarados. Una
+  vacante que se cancela cierra también su `publication_status`.
+- **El Banco de Talento filtra por procedencia**, y el predicado viaja por JOIN a `identity_profiles`:
+  `candidate_facet` **no tiene** `data_origin` propio, lo hereda de la persona.
+- **La projection del Banco de Talento NO gatea su filtro por el flag**, a propósito:
+  `HIRING_SYNTHETIC_DATA_FILTER_ENABLED` es Vercel-only y `reconcileTalentPoolProjection` corre en el
+  `ops-worker` de Cloud Run, donde lo leería `undefined`, o sea OFF en silencio.
+- **Se filtran los caminos que CREAN; el que CORRIGE converge.** El `UPDATE` de ciclo de vida incluye a
+  las membresías sintéticas y las reclasifica a un estado no servible en vez de excluirlas: excluirlas
+  las congelaba en el estado que tuvieran, y una congelada en `pool_eligible` habría quedado visible
+  sin que ninguna corrida pudiera corregirla.
+- **La señal `hiring.talent_pool.integrity` cuenta sólo población real** en
+  `facets_without_membership`: desde que la projection no proyecta sintéticos a propósito, una ficha
+  sintética sin membresía dejó de ser un atraso. Los contadores de consentimiento y retiro **no** se
+  filtran — la procedencia gobierna la visibilidad, jamás el consentimiento.
 
 Flag `HIRING_SYNTHETIC_DATA_FILTER_ENABLED` (Vercel-only, default OFF) gatea sólo el filtro de desk y
 talent pool. Docs: funcional `docs/documentation/hr/procedencia-de-datos-hiring.md`; manual

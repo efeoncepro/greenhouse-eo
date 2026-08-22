@@ -397,23 +397,117 @@ existente y ON en staging y producción.
      ZONE 4 — VERIFICATION & CLOSING
      ═══════════════════════════════════════════════════════════ -->
 
+## Execution log — 2026-08-22
+
+### Estado: `code complete` para los Slices 1 y 2 · **rollout pendiente** · Slice 3 bloqueado
+
+Commits: `1d0b4e32a` (Slice 1) · `b0415ef50` (correcciones del Slice 1) · `5fd8e5245` (Slice 2).
+
+### Lo que cambió respecto de la spec, con su evidencia
+
+1. **`Slice 1` y `Slice 2` NO son independientes.** La spec decía que podían ir en cualquier orden;
+   es falso, y el orden importa en producción. La migración del Slice 2 devuelve las 32 filas
+   sintéticas fuera de `stage='closed'`, y el predicado `stage NOT IN ('rejected','withdrawn','closed')`
+   de `talent-pool/projection.ts` pasa entonces a dar `has_active_application = true` para sus 11
+   fichas: la projection las reclasifica a `active_process`, que **sí** está en el `baseSelect`
+   servible. El reconcile corre por Cloud Scheduler **cada 5 minutos**
+   (`ops-hiring-talent-pool-reconcile`), así que la ventana es de ≤5 minutos hasta que 11 personas
+   inventadas aparezcan en el Banco de Talento de un operador real. **El Slice 1 es precondición
+   desplegada del Slice 2.**
+2. **La migración de datos quedó PARQUEADA**, no en `migrations/`:
+   `docs/tasks/pending-migrations/TASK-1748-synthetic-archive-axis-backfill.sql.pending`. Una
+   migración committeada y sin aplicar bloquea a cualquiera que corra `pnpm migrate:up`, incluido
+   quien esté reparando un incidente. Su condición de ejecución es el punto 1.
+3. **Ninguna de las 32 filas necesita el fallback a `sourced`.** Las 32 tienen `beforeStage` en el
+   audit (21 `shortlisted`, 10 `sourced`, 1 `screening`), verificado contra PG. El fallback se
+   implementó igual y el readback lo enumera; su conteo esperado es 0.
+4. **La spec decía «14 vacantes sintéticas siguen en `draft`». Son 13 en `draft` + 1 en
+   `active`/`published`** (`EO-OPN-0101 CANARY T1736 interna`). Es `visibility=internal_only`, así que
+   nunca estuvo en el careers público, pero sí es una vacante sintética viva y publicada. El
+   archivado cierra su publicación junto con el estado.
+5. **`candidate_facet` no tiene `data_origin`**: hereda de `identity_profiles`. Todo predicado de
+   procedencia del talent pool viaja por JOIN a `ip`.
+6. **El audit no podía nombrar la ficha.** El `CHECK` de `record_type` estaba cerrado en cuatro
+   valores; sin ampliarlo, archivar una ficha revienta con `23514` en la fila de auditoría después de
+   haber escrito el estado, y la transacción aborta. Migración aditiva aplicada y verificada:
+   `migrations/20260822222315619_task-1748-audit-record-type-candidate-facet.sql`.
+7. **El filtro de la projection NO va detrás del flag.** `HIRING_SYNTHETIC_DATA_FILTER_ENABLED` es
+   Vercel-only y `reconcileTalentPoolProjection` corre en el `ops-worker` de Cloud Run: leerlo ahí lo
+   encontraría `undefined`, o sea OFF en silencio. Hay un test que lo impide. Los readers sí lo
+   respetan — corren en Vercel, donde el flag existe y está ON.
+8. **Se filtran los caminos que CREAN; el que CORRIGE converge.** La primera versión excluía las
+   membresías sintéticas del `UPDATE` de ciclo de vida, y eso no las excluía: las **congelaba**. Una
+   congelada en `pool_eligible` habría quedado visible para siempre sin que ninguna corrida pudiera
+   sacarla, y `eligible_without_consent` la habría marcado como `error` permanente. Ahora entra a la
+   población y sale reclasificada.
+9. **La señal `hiring.talent_pool.integrity` habría empezado a mentir.** Su contador
+   `facets_without_membership` cuenta fichas activas «aún no proyectadas»; desde que la projection no
+   proyecta sintéticos a propósito, esa premisa es falsa y la señal habría quedado en `warning`
+   permanente. Ahora cuenta sólo población real. Los contadores de consentimiento y retiro **no** se
+   filtran, a propósito.
+
+### Hallazgo colateral — reportado, no cerrado
+
+Dos perfiles de identidad claramente sintéticos están marcados `real` en la base compartida:
+`identity-live-test-hiring-fixture` (el fixture canónico de todos los live tests de Hiring) y
+`identity-public-careers-candidate-smoke-task354-…-invalid`. Hoy no tienen `candidate_facet`, así que
+no hay exposición — pero el fixture la fabrica en cuanto un live test lo use. El código ya declara
+`data_origin='smoke_test'` en el nacimiento (`live-test-identity.ts`); **las dos filas existentes
+esperan el marcado gobernado** (`pnpm hiring:data:mark-synthetic`), que deja audit con actor y motivo.
+Es la misma clase de bug que `TASK-1755` dejó propuesta para las vacantes.
+
+### Corrida accidental contra producción, declarada
+
+Al ejercitar el SQL nuevo se envolvió `reconcileTalentPoolProjection({ apply: true })` en un
+`withGreenhousePostgresTransaction` externo creyendo que se revertiría. **No se revirtió**: el helper
+abre su propia conexión, así que el reconcile **commiteó** contra la base compartida. Efecto real
+medido: idéntico a un tick del cron —441 filas de evidencia borradas y reinsertadas con el mismo
+contenido, 0 membresías creadas, 0 reclasificadas, un evento de outbox—. Verificado post-corrida: 441
+filas de evidencia intactas y la población sin cambios. Sin daño, pero la lección va acá porque se
+repite: **anidar transacciones en este repo no aísla nada.**
+
+### Verificación ejecutada
+
+- `pnpm vitest run src/lib/hiring/data-origin src/lib/hiring/talent-pool` → 41 verdes.
+- Live test contra PG real, **3 corridas consecutivas verdes** y estado restaurado:
+  `src/lib/hiring/talent-pool/data-origin.live.test.ts`.
+- Todo el SQL nuevo ejercitado contra PG real (plan de purga, señal de integridad, projection en
+  `dry-run` y en `apply`).
+- `pnpm typecheck` → 0 errores. `npx eslint` sobre lo tocado → 0 findings.
+- Readback de la migración aplicada: el `CHECK` de `record_type` admite `candidate_facet`.
+
+### Pendiente de rollout
+
+| Paso | Bloqueado por |
+|---|---|
+| Desplegar Slice 1 y 2 a producción (Vercel + `ops-worker`) | release normal |
+| Aplicar la migración parqueada de las 32 filas | el paso anterior |
+| Aplicar el archivado de 11 fichas + 14 vacantes por el CLI | decisión del operador (escritura sobre la base compartida) |
+| `Slice 3` — lane B | **doble bloqueo**: sign-off del operador **y** la migración parqueada. Hoy el plan reporta `deletable=0` porque las 32 siguen en `closed` y el lane exige `stage='sourced'`; las 10 que califican sólo reaparecen cuando la migración restaure sus etapas |
+
 ## Acceptance Criteria
 
-- [ ] `readers.ts` y `projection.ts` del talent pool excluyen no-real por defecto y aceptan
-      `includeSynthetic`, usando el predicado canónico y sin `WHERE` propio.
-- [ ] Existe un test que prueba la exclusión **por procedencia**: una ficha sintética forzada a un
-      `lifecycle_status` servible sigue sin aparecer.
-- [ ] `archiveSyntheticRecords` escribe las tres entidades y deja una fila de audit por cada una, y
+- [x] `readers.ts` y `projection.ts` del talent pool excluyen no-real por defecto y aceptan
+      `includeSynthetic`, usando el predicado canónico y sin `WHERE` propio. (La projection no acepta
+      `includeSynthetic` ni lee el flag **a propósito**: corre en Cloud Run — ver punto 7 del log.)
+- [x] Existe un test que prueba la exclusión **por procedencia**: una ficha sintética forzada a un
+      `lifecycle_status` servible sigue sin aparecer. (`data-origin.live.test.ts`, contra PG real.)
+- [x] `archiveSyntheticRecords` escribe las tres entidades y deja una fila de audit por cada una, y
       **ningún camino de la función escribe `hiring_application.stage`** (test que lo prueba).
 - [ ] Tras el archivado, cero fichas sintéticas en `active` y cero vacantes sintéticas en
-      `draft`/`active`.
+      `draft`/`active`. **Código listo; la corrida del CLI espera decisión del operador** (escribe
+      sobre la base compartida mientras otras sesiones corren live tests).
 - [ ] Las 32 filas sintéticas archivadas quedaron migradas al campo de archivado y **cero
       postulaciones no-real siguen en `stage='closed'`**, verificado por readback contra PG real.
+      **Migración escrita y parqueada**; su condición es el Slice 1 desplegado.
 - [ ] La migración corrió **antes** de que entrara el `CHECK stage='closed' ⟺ desenlace` de
       `TASK-1765`, y ese orden quedó registrado en el `Handoff.md`.
 - [ ] El lane B quedó ejecutado o explícitamente descartado, con su razón registrada.
-- [ ] `hiring.data_quality.data_origin_derivation_drift` sigue en `0`.
-- [ ] Ningún camino de esta task filtra retención por procedencia ni gatea comunicaciones.
+- [x] `hiring.data_quality.data_origin_derivation_drift` sigue en `0`. Además
+      `hiring.talent_pool.integrity` queda en `ok` con sus tres contadores en 0, verificado en vivo.
+- [x] Ningún camino de esta task filtra retención por procedencia ni gatea comunicaciones. Al
+      contrario: los contadores de consentimiento y retiro de la señal se dejaron SIN filtrar a
+      propósito, y queda escrito por qué.
 
 ## Verification
 
