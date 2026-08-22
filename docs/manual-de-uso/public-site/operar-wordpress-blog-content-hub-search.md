@@ -1,9 +1,9 @@
 # Operar WordPress Blog, Content Hub y Busqueda
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-07-09 por Codex
-> **Ultima actualizacion:** 2026-07-18 por Codex
+> **Ultima actualizacion:** 2026-08-22 por Codex
 > **Modulo:** Public Site / WordPress / Ohio / Content Hub
 > **Documentacion relacionada:** `docs/documentation/public-site/wordpress-blog-content-hub-search.md`
 
@@ -163,6 +163,7 @@ El layout elegido como referencia visual para la home del blog es
 page_id=225984
 url=https://efeoncepro.com/homedemo35-elementor/
 auditoria=docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md
+contrato=docs/audits/public-site/2026-08-22-demo35-elementor-runtime-contract.md
 ```
 
 Antes de pedir o aplicar cambios sobre ese layout:
@@ -174,8 +175,10 @@ pnpm public-website:bridge-inspect -- --page-id 225984 --no-catalog
 ```
 
 2. Confirma que sigue siendo Elementor builder, `post_status=publish`,
-   `post_type=page`, y que no cambio el conteo base aproximado: 55 containers,
-   58 widgets, 15 `ohio_recent_posts`.
+   `post_type=page`, y que no cambió el baseline: 7 raíces, 113 nodos, 55
+   containers, 58 widgets y 15 `ohio_recent_posts`. Para la fuente intacta,
+   contrasta además el hash `_elementor_data`
+   `e63a70342e2cb83fae341637968ac05ccb30d0679438e143b8a8f3b047537394`.
 
 3. Mapea la seccion afectada por `path`/widget ID. Referencias principales:
 
@@ -195,10 +198,25 @@ pnpm public-website:bridge-inspect -- --page-id 225984 --no-catalog
 4. No edites directo el documento publicado para probar ideas. Primero crear una
    copia/draft gobernada o acordar la mutacion explicita con snapshot.
 
-5. Si el cambio toca Elementor, no escribir `_elementor_data` directo. Usar el
-   protocolo Elementor document save de la skill `efeonce-public-site-wordpress`.
+   Incluye en el snapshot la fuente `225984`, la página actual `/blog/` `18456`,
+   document settings, metas Ohio `page_*`, `_thumbnail_id`, Yoast, slug y menú.
+   Los IDs de elementos cambiarán al clonar: ubica cada pieza por path, tipo y
+   fingerprint, no únicamente por ID.
 
-6. Antes de promoverlo como hub, resolver deudas minimas:
+5. Mantén `page_for_posts=0`. No asignes Demo 35 ni su copia como página de
+   entradas: WordPress omite el contenido Elementor y renderiza el archivo Ohio.
+
+6. Antes de borrar posts o media demo, clasifica cada `ohio_recent_posts` como
+   `manual`, `query` o `remove`. Catorce usan IDs fijos, cinco referencias son
+   attachments, cuatro widgets ya renderizan vacíos y dos listas pierden un
+   slot. Vaciar `posts` tampoco es neutro: puede activar una query fallback.
+
+7. Si el cambio toca Elementor, no escribir `_elementor_data` directo. Usar el
+   protocolo Elementor document save de la skill `efeonce-public-site-wordpress`.
+   El guardado debe incluir `elements` y `settings`; las metas Ohio externas al
+   árbol se preservan o actualizan explícitamente.
+
+8. Antes de promoverlo como hub, resolver deudas minimas:
    - reemplazar posts demo y IDs de attachments;
    - corregir banners `/demo35/category/...`;
    - reemplazar `See More` `href="#"`;
@@ -207,15 +225,23 @@ pnpm public-website:bridge-inspect -- --page-id 225984 --no-catalog
      medicion;
    - retirar recursos/footer demo si aparecen en la experiencia final.
 
-7. Verificar render:
+9. Para el corte, conserva una única canónica `/blog/`: define si se reemplaza el
+   contenido de `18456` o se hace un swap controlado de slug, con redirects,
+   menú, Yoast y rollback. Revisa también el shell: Demo 35 renderiza
+   `with-header-3`; el `/blog/` actual usa `with-header-6` con sidebar.
+
+10. Verificar render:
 
 ```bash
 node tmp/<render-summary>.mjs
 ```
 
-La verificacion minima debe cubrir desktop `1440` y mobile `390`, status 200,
-`scrollWidth == clientWidth`, widgets esperados visibles, enlaces internos sin
-404 y consola sin errores relevantes.
+La verificacion minima debe cubrir navegación anónima desktop `1440` y mobile
+`390`, status 200, `scrollWidth == clientWidth`, siete raíces y tarjetas
+esperadas visibles, header/footer, enlaces internos sin 404, reduced motion,
+formulario y consola sin errores relevantes. La barra administrativa puede
+introducir un falso positivo de 440 px en mobile; no lo atribuyas al documento
+Elementor sin aislar `#wpadminbar` y el menú fuera de lienzo.
 
 ## Checklist Antes de Publicar en el Content Hub
 

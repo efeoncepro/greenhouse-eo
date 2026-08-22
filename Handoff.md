@@ -2,6 +2,20 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-22 — Demo 35 queda estudiada y registrada; WordPress sigue intacto
+
+Inspección read-only de `Demo 35: Blog Magazine` (`page_id=225984`) para su posible adaptación como home del
+blog. El baseline vigente es 7 raíces, 113 nodos, 55 containers, 58 widgets y 15 `ohio_recent_posts`; catorce
+usan IDs fijos, cinco referencias son attachments, cuatro widgets ya renderizan vacíos y dos pierden un slot.
+La causa de que el layout parezca romperse al retirar Ohio es el wiring de contenido, no los containers.
+
+Contrato operativo nuevo:
+`docs/audits/public-site/2026-08-22-demo35-elementor-runtime-contract.md`. La landing quedó registrada en las
+skills espejadas `efeonce-public-site-wordpress`. Regla principal: conservarla como página Elementor normal,
+mantener `page_for_posts=0`, adaptar primero una copia/draft y preservar árbol, settings Elementor y metas Ohio;
+el futuro corte debe mantener una sola canónica `/blog/`. Dueño arquitectónico existente: Public Website Landing
+Control Plane. No se modificaron páginas, posts, opciones, formularios, caché ni archivos de Kinsta.
+
 ## 2026-08-22 — El vocabulario de etapas de Hiring tiene su primer ADR; auditoría de 30 hallazgos verificada adversarialmente
 
 Sesión de diagnóstico y decisión, **cero código**. Partió de un síntoma acotado —la automatización de assessment no
@@ -517,80 +531,3 @@ auditable); ejecutarlo requiere decisión humana explícita, no la inercia de "q
 el cierre en `EPIC-011`, agregar el `## Delta` a `TASK-1734` (el sampler del gold set ya excluye sintéticos por
 construcción, no por suerte) y anotar `scripts/hiring/purge-task-1378-test-applications.ts` como superado por el
 CLI genérico. Y vigilar `hiring.data_quality.synthetic_records_aging` durante 7 días: steady `0`.
-
-## 2026-08-18 — Incident response: delivery de Resend y recuperación de test planificadas
-
-Discovery read-only confirmó que Resend **sí despacha** (393 IDs de proveedor), pero Greenhouse no captura
-su lifecycle: no hay webhook registrado en la cuenta productiva, no hay secreto de firma operativo y las
-proyecciones históricas no tienen ningún `delivered`/bounce/engagement. `sent` significa aceptación de la API,
-no entrega al buzón. El handler existe pero debe corregir su resolución asíncrona de secretos antes de activar
-el webhook, porque hoy puede responder `200 ignored` durante cold start.
-
-Quedan creados `ISSUE-160`, ADR aceptado el 2026-08-19
-`GREENHOUSE_HIRING_ASSESSMENT_ACCESS_RECOVERY_AND_EMAIL_DELIVERY_DECISION_V1.md` y tres tasks compactas:
-`TASK-1745` (webhook/reconciliación), `TASK-1746` (ADR aceptado; command de recovery con rotación,
-capabilities separadas y enlace fragment→sesión HttpOnly; implementación local en curso) y `TASK-1747`
-(consumer Application 360). Gates de las tres tasks
-verdes. `TASK-1745` está ahora `in-progress`: el preflight confirmó que el dedupe existente no es
-transaccional y que un fallo posterior puede perder el evento en un retry. El fix preservará el sender
-outbound como boundary independiente y activará el webhook sólo después de un canary firmado. Todavía no hay
-cambio de runtime ni configuración externa.
-
-El Slice 1 de `TASK-1746` quedó code-complete y validado localmente tras cinco rondas independientes de
-Arquitectura, Talento y Seguridad: capabilities separadas, eligibility fail-closed, locks
-assessment→application→candidate facet, receipt idempotente, events automáticos append-only, deadline
-revalidado al commit con reloj real, retención candidate/workforce y purga gobernada. La migración sigue sin
-aplicarse; no debe promoverse antes del command token-safe y de smokes PG que prueben ACL, constraints
-diferidas, concurrencia y transiciones de retención. Evidencia local: 200 tests, ESLint, TypeScript, marker
-gate 586/0, lint operativo y diff-check verdes.
-
-El Slice 2A de `TASK-1746` también quedó code-complete local y validado por Arquitectura, Talento y Seguridad
-sin P0/P1/P2. La capa global de email ahora clasifica los tipos que transportan credenciales, persiste un intent
-redactado antes de rotar, bloquea batch/retry genérico y distingue rechazo del proveedor de aceptación incierta.
-Assessment assignment y Talent Pool verification comparten claim atómico por evento+entidad; un replay o dos
-workers concurrentes no vuelven a rotar. El índice único todavía no existe en runtime: antes de desplegar estos
-writers debe correrse `scripts/operations/task-1746-create-token-intent-index.sql` y conservar su readback
-`unique/valid/ready`. Ninguna migración, índice, secret, webhook ni configuración runtime se aplicó en este slice.
-
-El Slice 2B de `TASK-1746` quedó code-complete local y validado sin P0/P1/P2 por Arquitectura, Talento y
-Seguridad. El recovery email liga intent+receipt+rotación bajo una transacción, mantiene el deadline de tests
-iniciados y no persiste el bearer. Replay y reconciliación solo proyectan evidencia durable; nunca reenvían ni
-rotan, y Platform Health detecta receipts divergentes después de 15 minutos. El tipo de correo sigue OFF y sin
-adapter productivo. Próximo paso: Slice 3, con fragment exchange, sesión HttpOnly, auth/capability server-side y
-smoke de tracking. Migración, índice y runtime continúan sin aplicar.
-
-El Slice 3A de `TASK-1746` también quedó code-complete local y auditado sin P0/P1/P2. Cada token ahora rota
-con una versión explícita y la sesión candidata persiste solo un digest opaco ligado a esa versión; una nueva
-emisión invalida las sesiones anteriores. El dominio distingue start-by, deadline de respuestas y 30 minutos
-de gracia de envío; no-limit cierra a las 24 horas. El reloj autoritativo viene de PG y el navegador lo proyecta
-con tiempo monotónico, por lo que un equipo adelantado o atrasado no congela ni extiende el test. Legacy
-GET/start/save/submit y SELF-ID conservan elegibilidad, consentimiento y audit bajo los mismos locks y la misma
-transacción. El feature continúa OFF y la migración no está aplicada. El siguiente slice debe construir la
-limpieza síncrona `#access`, exchange→cookie HttpOnly, rutas token-free y Product API antes de cualquier smoke o
-activación.
-
-El Slice 3B quedó code-complete/dormant y reauditaron Arquitectura, Talento y Seguridad hasta P0/P1/P2=0. Ya
-existen bootstrap pre-React que borra `#access`, exchange same-origin acotado, cookie `__Host-` HttpOnly, página y
-API token-free, CSP enforced y protección ante maintenance/trailing slash. La sesión conserva elegibilidad y reloj;
-un fence por public ID impide que dos pestañas con assessments distintos muten la instancia equivocada. El modal
-de envío reutiliza MUI Dialog con foco, Escape, trap y reduced motion. El correo inicial **no cambia todavía**:
-`HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` nace OFF en el ops-worker y OFF conserva el enlace legacy. El
-workflow del worker incluye notifications en trigger, latest-SHA y drift-check. Antes del flip siguen obligatorios
-migración+índice, cuatro rutas live, `click_tracking=false` verificado en Resend, rate limit público y smokes
-PG/browser/href. No se aplicó migración, no se desplegó ni se cambió ninguna env.
-
-El Slice 4 de `TASK-1746` quedó code-complete local y reauditaron Arquitectura, Talento y Seguridad hasta
-P0/P1/P2=0. Existe un único command `recoverCandidateTestAccess` para email o enlace seguro; la Product API exige
-sesión humana canónica, capabilities por canal antes de lookup, lineage exacta, Origin/JSON/idempotencia cerrados y
-errores anti-oracle. El enlace manual rota el mismo assessment y se revela una vez; replay nunca devuelve el bearer.
-El rate limit usa techo IP confiable de Vercel más bucket por credential/sesión válida, sin amplificación por tokens
-aleatorios; savepoints conservan la cuota pero revierten cualquier write parcial. El owner diario de retención drena
-buckets con readback y señal. Documentación, manuales y skills de Talento/Arquitectura/Secret Hygiene quedaron
-sincronizados, incluido el runbook global `docs/operations/runbooks/resend-email-lifecycle-rollout.md`.
-
-**Handoff a Claude:** no implementar de nuevo TASK-1745/1746. Slice 4 quedó versionado en
-`5d5eb2f9c`; el siguiente bloque es TASK-1747 (UI Application 360). Antes de cualquier rollout: aplicar
-migración TASK-1745, luego migración `20260819072130586`, ejecutar/verificar el índice concurrente de TASK-1746,
-desplegar app+worker dormantes, configurar webhook firmado global de Resend, verificar `click_tracking=false`, hacer
-smokes PG/browser/email consentidos y recién entonces habilitar capability/email type/cutover. Hoy no se aplicó ni
-activó nada; el correo inicial continúa por el enlace legacy y `sent` no prueba entrega.

@@ -3,6 +3,16 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-22 — Demo 35 queda documentada antes de tocar la home del blog
+
+- La página candidata se revalidó read-only: siete raíces, 113 nodos y 15 widgets de posts; cuatro ya están
+  vacíos porque apuntan a attachments y otros dos pierden un slot. La estructura no falla por Elementor: falla el
+  contenido fijo si se borra antes de recablear cada bloque.
+- El contrato operativo deja explícito que Demo 35 debe seguir como página Elementor normal, nunca como
+  `page_for_posts`, y que el futuro corte debe conservar una sola canónica `/blog/`, sus metas Ohio y rollback.
+- La skill del sitio público ahora registra la landing, sus parámetros, guards y secuencia de adaptación. No se
+  modificó WordPress, Kinsta, formularios ni caché.
+
 ## 2026-08-22 — Cerrar una postulación ahora obliga a decir cómo terminó
 
 - El proceso de una persona ya no se cierra arrastrando su tarjeta a «Cerrado». Cerrar es **decidir**, y la
@@ -959,8 +969,3 @@ del candidato). El Growth Form de careers se republicó (v4) con el país de res
 paridad nativa, y el release `393144e9f` promovió todo a producción por el control plane (manifest
 `released`, watchdog ok, campo país verificado en vivo). Quedan como pendientes menores la revisión
 de Privacy, el flip del país a requerido-en-parser y el scorecard GVC formal.
-
-## 2026-08-12 — Archivo puntual de adjuntos Wherex
-
-- `wherex:radar` incorpora `--tender-id` + `--archive-originals <carpeta>`: guarda y analiza originales únicamente cuando Wherex emite una descarga nativa; el visor protegido queda explícitamente en `manual-save-required`, sin extraer enlaces firmados.
-- Para una sesión Chrome principal expresamente autorizada, el manual y ambas skills documentan el fallback visible: activar temporalmente **Descargar archivos PDF**, validar cada descarga individual y restaurar el visor cuando corresponda. Sika LIC-1120 quedó archivada en OneDrive; sus anexos contienen una discrepancia de plazo que exige aclaración antes de cotizar.

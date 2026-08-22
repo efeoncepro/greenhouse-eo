@@ -50,6 +50,7 @@ Read the minimal set:
 | Custom Elementor widget/plugin work | `references/custom-elementor-widgets.md` |
 | Historical layout incident or older public page | `references/layout-incidents.md` |
 | Runtime discovery, bridge inspection, repo binding, Kinsta/WP inventory | `references/runtime-and-discovery.md` |
+| Demo 35 / future blog home | `references/landing-workflow.md` + `references/elementor-mutation.md` + `references/landings/demo35-blog-magazine.md` |
 | AEO `/aeo-2/` | `references/landings/aeo.md` |
 | Agencia Creativa `/agencia-creativa/` | `references/landings/agencia-creativa.md` |
 | HubSpot services `/servicios-contratar-hubspot/` | `references/landings/hubspot-services.md` |
@@ -65,6 +66,7 @@ Use repo docs as source of truth for long-lived contracts:
 - `docs/documentation/public-site/wordpress-ohio-elementor-layout.md`
 - `docs/documentation/public-site/wordpress-blog-content-hub-search.md`
 - `docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md`
+- `docs/audits/public-site/2026-08-22-demo35-elementor-runtime-contract.md`
 - `docs/manual-de-uso/public-site/operar-wordpress-blog-content-hub-search.md`
 - `docs/manual-de-uso/public-site/wordpress-ohio-elementor-layout.md`
 - `docs/documentation/public-site/wordpress-ohio-elementor-widget-inventory.md`
