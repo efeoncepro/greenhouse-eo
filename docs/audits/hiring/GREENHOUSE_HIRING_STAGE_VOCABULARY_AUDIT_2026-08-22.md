@@ -9,6 +9,7 @@
 - Evidencia: repositorio en `develop` (`d8c58b964`), Cloud SQL `greenhouse-pg-dev` leído el 2026-08-22, `greenhouse_sync.outbox_events` (222.801 eventos)
 - Verdict: **`structural_defect_confirmed` — el vocabulario de etapas no tiene dueño único. Cumple la letra del ADR de Full API Parity por su cláusula de deuda temporal documentada; incumple el patrón canónico §2 del repo, que no tiene cláusula de escape**
 - Task dueña: [`TASK-1754`](../../tasks/in-progress/TASK-1754-hiring-stage-vocabulary-collapse.md) (`in-progress`)
+- **Decisión que produjo esta auditoría**: [`GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1`](../../architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md) (`Accepted` 2026-08-22) — fija el vocabulario en dos ejes y cierra H-01 y H-02 por `CHECK`. **Es el primer ADR que este vocabulario tiene.**
 - Documento de lectura para el operador: <https://claude.ai/code/artifact/5b23dc9b-c027-40aa-bc68-84f965344fbb>
 
 > ## Estado de verificación — LEER ANTES DE ACTUAR

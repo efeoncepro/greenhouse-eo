@@ -19,7 +19,8 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-011`
-- Status real: `Slice 0 en develop y NO en produccion; el colapso de fondo NO empezado; vocabulario cerrado`
+- Status real: `Slice 0 en develop y NO en produccion; ADR del vocabulario Accepted 2026-08-22; el colapso NO empezado`
+- ADR: `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -189,6 +190,32 @@ fairness como tabla de traducción permanente, `assertEnum` en el camino de lect
 
 Documento de diagnóstico para el operador (línea de tiempo + orden de desarme):
 <https://claude.ai/code/artifact/5b23dc9b-c027-40aa-bc68-84f965344fbb>
+
+### ⚠️ El vocabulario ya NO se decide acá — vive en el ADR (2026-08-22)
+
+**`docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md` (`Accepted`)**
+fija el vocabulario completo y **supersede el Slice 1 de esta task**. Lo esencial, porque cambia el
+alcance de los slices restantes:
+
+- **El pipeline es el recorrido de la PERSONA.** Premisa que nunca estuvo escrita y de la que se
+  deriva todo lo demás.
+- **Dos ejes, no uno.** `stage` = dónde va en el recorrido (6 valores, uno por columna). **Desenlace**
+  = cómo terminó (6 valores + causa gobernada).
+- **`closed` SE QUEDA y es escribible.** La opción de retirarlo quedó descartada por el operador: una
+  columna terminal que no puede recibir una tarjeta no es un kanban. Lo que faltaba no era quitarlo:
+  era que escribirlo **obligue a declarar el desenlace**.
+- **El invariante nuevo, como `CHECK` de base:** `stage='closed'` ⟺ desenlace declarado. Con eso
+  desaparecen **estructuralmente** los dos defectos vivos que esta task declaraba fuera de alcance
+  (la puerta de `closed` en `store.ts:1311` y la retención congelada).
+- **Se retiran del enum de etapas** `qualified`, `client_review`, las 4 proyecciones de desenlace y
+  **`handoff_ready`** (no tiene ningún escritor; pertenece al agregado handoff). **`on_hold` deja de
+  ser un desenlace** — una pausa no es un cierre.
+- **Etiquetas del operador** (neutras, sin género): `Selección` · `Reserva` · `Sin selección` ·
+  `Descarte` · `Retiro` · `Sin respuesta`. El candidato nunca las lee.
+- **`purge.ts` deja de escribir `closed`** y pasa a un campo de archivado propio.
+
+**Esto amplía el alcance de la task** respecto del traspaso del 2026-08-20: el eje de desenlace y el
+invariante entran al trabajo, y los «defectos vivos» listados abajo dejan de ser ajenos.
 
 ### Decisiones tomadas (arquitectura + talento, 2026-08-20)
 
