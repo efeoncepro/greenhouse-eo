@@ -61,6 +61,11 @@ export interface TalentPoolProfileDto {
 }
 
 export interface SearchTalentPoolInput {
+  /**
+   * TASK-1748 — `true` incluye datos NO reales (seeds/smokes/demo). Default: lo decide
+   * `HIRING_SYNTHETIC_DATA_FILTER_ENABLED`, igual que el desk. El opt-in explicito gana sobre el flag.
+   */
+  includeSynthetic?: boolean
   query?: string
   capabilityKeys?: string[]
   seniority?: string
