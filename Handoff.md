@@ -118,9 +118,23 @@ clave manual está libre. Ese carril no puede reintentar por `attempt_seq` (lo p
 declarada, `superseded_at` por reconciliación, no tiene write path: es el hueco de **`TASK-1771`**, que además
 hereda la restricción de orden respecto de `TASK-1754` que el Delta original le atribuía a esta task por error.
 
-Siguiente paso: incluirlo en un release normal. Riesgo residual conocido: el blast radius es alto porque es el único
-camino que crea pruebas de candidato, y la defensa contra la doble prueba es la rama 3 del resolver más el índice
-único parcial — ambas cubiertas por test unitario y por el gate vivo.
+Siguiente paso: incluirlo en un release normal. **`pnpm build` no se ejecutó, por decisión declarada:** el repo tiene
+hoy un error de tipos vivo de `TASK-1765` en `src/lib/hiring/store.ts` sobre el mismo checkout, así que el build
+fallaría por causa ajena, y el riesgo propio es bajo (server-only, sin JSX ni frontera cliente). Lo corre el release
+con el árbol limpio. `pnpm test` completo sí: **11.938 verdes, 0 fallos**.
+
+> **Corrección 2026-08-22 (sesión de auditoría):** el error de tipos citado arriba **ya no existe** — `pnpm typecheck`
+> pasa limpio sobre este árbol. O sea que el bloqueo declarado para saltarse el build se disolvió. Ojo con la
+> conclusión: **typecheck limpio no es build verde** (el build de producción además atrapa violaciones de frontera
+> server-only→cliente y dynamic imports rotos), así que el gate sigue pendiente — lo que cambió es que ya no hay
+> causa ajena que lo justifique.
+
+Riesgo residual conocido: el blast radius es alto porque es el único camino que crea pruebas de candidato, y la
+defensa contra la doble prueba es la rama 3 del resolver más el índice único parcial — ambas cubiertas por test
+unitario y por el gate vivo. Hallazgo colateral abierto: 12 live tests de hiring fabrican vacantes sin declarar
+procedencia, así que nacen `real` y publicables en la base compartida; el gate no las ve porque sólo barre
+`scripts/` y `tests/e2e/`. El fixture de esta task ya quedó corregido; los otros 12 y la extensión del gate quedan
+propuestos como trabajo aparte.
 
 ## 2026-08-22 — EPIC-042/TASK-1764 gobiernan footers sin big bang; cero cambios de correo o runtime
 
