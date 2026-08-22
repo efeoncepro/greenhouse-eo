@@ -416,6 +416,33 @@ convenciones distintas de marcado repartidas en ocho scripts, ninguna compartida
 Es paralelizable con todos los carriles: no bloquea ni es bloqueada por ninguno, y cuanto antes
 cierre, menos fantasmas hay que remediar después.
 
+### Eje de desenlace del pipeline — `TASK-1765`…`TASK-1770` (2026-08-22)
+
+Carril nuevo abierto por [`GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1`](../../architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md)
+(`Accepted`), el **primer ADR que el vocabulario del pipeline tiene**. Evidencia base:
+[auditoría 2026-08-22](../../audits/hiring/GREENHOUSE_HIRING_STAGE_VOCABULARY_AUDIT_2026-08-22.md), 30 hallazgos con
+verificación adversarial completa.
+
+La premisa que fija el carril: **el pipeline es el recorrido de la persona candidata**, y modela dos ejes —
+`stage` (dónde va) y **desenlace** (cómo terminó), unidos por el invariante `stage='closed'` ⟺ desenlace
+declarado, como `CHECK` de base.
+
+- `TASK-1765` — **Outcome axis + command de cierre.** Enum de 6 desenlaces + causa gobernada de 3 + el `CHECK` +
+  el campo de archivado. Vertical híbrida deliberada: el `CHECK` es inaplicable mientras el `PATCH` acepte
+  `closed`. Cierra H-01 y H-02 **estructuralmente**, no por parche.
+- `TASK-1766` — **Superficie del kanban.** Chip de desenlace en la tarjeta y diálogo de cierre. Cubre los **dos**
+  caminos de escritura (arrastre y menú contextual, que en móvil es el principal). *Bloqueada por 1765.*
+- `TASK-1767` — **Embudo de equidad por desenlace + causa.** Task propia porque su error es irreversible sobre
+  evidencia AI Act append-only. *Bloqueada por 1765.*
+- `TASK-1768` — **Eje de progreso de la etapa Entrevista.** Hace visible el scorecard que ya existe. Declara la
+  distinción **progreso ≠ desenlace** que impide volver a acumular etapas. *Bloqueada por 1766.*
+- `TASK-1769` — **Agendamiento vía Microsoft Graph.** Greenhouse agenda pero **no es dueño del calendario**
+  (decisión del operador 2026-08-22). `Calendars.ReadWrite` **no está otorgado**: precondición dura.
+- `TASK-1770` — **Motor de disponibilidad y propuesta de horarios** (`getSchedule`). *Bloqueada por 1769.*
+
+Dos superficies **no** generaron ID nuevo y entraron como Delta a su dueño: el archivado que escribía `closed`
+(`TASK-1748`) y el arranque del reloj de retención (`TASK-1744`).
+
 ## Existing Related Work
 
 - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
