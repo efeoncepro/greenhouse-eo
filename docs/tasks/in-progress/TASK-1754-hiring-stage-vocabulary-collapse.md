@@ -99,13 +99,17 @@ su identificador justamente para eso.
 - GVC `task355-hiring-pipeline-board` en desktop 1440 y móvil 390 → seis columnas, menú «Mover a
   etapa» con los seis destinos, sin overflow de página. Sin cambio visual respecto de antes del Slice
   E, que es lo esperable de un refactor de estructura.
-- `pnpm build` de producción → **NO ejecutado.** Se preguntó al fijar el plan y el operador respondió
-  *«no, salvo que lo autorices después»*: es una postergación por costo de máquina (~30 GB, le cuelga
-  el equipo) con la puerta abierta a autorizarlo, **no** una delegación al release. Queda como **gate
-  pendiente de autorización caso a caso**. El riesgo propio es acotado: el único archivo de cliente
-  tocado es `PipelineDeskView.tsx`, sin import nuevo ni frontera server/client cruzada — que son las
-  clases de bug que el build atrapa y los tests no. El error de tipos ajeno que citaba `TASK-1755`
-  ya no existe: `pnpm typecheck` pasa limpio.
+- `pnpm build` de producción → **EJECUTADO Y VERDE (2026-08-22, actualizado por la sesión de
+  auditoría tras cerrar esta sesión).** El operador lo autorizó —*«no, salvo que lo autorices
+  después»* era una postergación con la puerta abierta, y la puerta se abrió—. Resultado:
+  `Compiled successfully in 27.8s`, exit 0, **cero errores**; los 10 warnings del log son
+  `npm warn Unknown env config`, ruido de `.npmrc` ajeno al código. Corrido sobre `develop` ya
+  sincronizado con `origin`. Cubre justamente el riesgo que esta task declaraba acotado pero no
+  nulo: `PipelineDeskView.tsx` es superficie de cliente, y el build de producción es el único gate
+  que atrapa violaciones de frontera `server-only`→cliente y dynamic imports rotos — clases de bug
+  que `pnpm test` y `pnpm typecheck` no ven. **Con esto la task no tiene gates mecánicos
+  pendientes; lo que le falta es runtime** (Slice F, bloqueado hasta que `TASK-1765` esté verificada
+  en producción). Registro en `Handoff.md` (`507fab02e`).
 
 ### Verificación que NO se pudo hacer, y por qué
 
