@@ -68,6 +68,29 @@ dentro de Hiring. Esta task agrega coordinación durable sobre commands existent
      existe en el repo, reporta antes de continuar.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-22 — ADR del vocabulario de etapas y desenlace
+
+Se aceptó `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md` (`Accepted`), primer ADR del vocabulario del pipeline. Fija **dos ejes**:
+`stage` = dónde va la persona en el recorrido (6 valores, uno por columna; `closed` se queda y **es
+escribible**) y **desenlace** = cómo terminó (`selected`, `backup_selected`, `not_selected`, `rejected`,
+`withdrawn`, `unresponsive`) + **causa gobernada** obligatoria en `not_selected` (`capacity_filled`,
+`opening_closed`, `process_cancelled`). Invariante como `CHECK`: **`stage='closed'` ⟺ desenlace declarado**.
+El eje de desenlace lo implementa `TASK-1765`; la superficie del kanban, `TASK-1766`; el embudo de equidad,
+`TASK-1767`.
+
+**El ADR refuerza su boundary y le agrega dos invariantes.**
+
+- **El modelo que el ADR §10 pide para la API de cierre es `HiringHandoff`** (`POST
+  /api/hiring/handoffs/[id]/[action]`, ruta que nombra el PASO), no el `PATCH {stage}` genérico. El journey
+  de esta task ya expone `propose → confirm → status → advance/cancel`: **ya es el molde correcto**, y vale
+  declararlo explícito como refuerzo.
+- **Invariante nuevo:** el ADR §6 retira `handoff_ready` del enum de etapas porque pertenece al agregado
+  handoff. Eso **valida** la separación de esta task, y obliga a declarar que **el estado del handoff jamás
+  vuelve a proyectarse sobre `hiring_application.stage`**.
+- El invariante `decision_recorded` debe leer **desenlace + causa** en el readback, no sólo «hay decisión».
+- Vocabulario: «rechaza a los demás candidatos» → «registra el desenlace de las demás candidaturas». El
+  boundary en sí no cambia.
+
 ## Architecture Alignment
 
 Revisar y respetar:

@@ -126,17 +126,53 @@ Sustantivos neutros. Describen el desenlace del proceso, **no a la persona**, y 
 
 **Nunca lee la etiqueta interna.** Misma regla que ya rige el correo de avance de etapa: vocabulario interno adentro, mensaje humano afuera.
 
-| Desenlace | Lo que lee |
-|---|---|
-| `selected` | la oferta / felicitación |
-| `backup_selected` | «quedaste en reserva para esta vacante» |
-| `not_selected` + `capacity_filled` | «esta vez elegimos a otra persona» |
-| `not_selected` + `opening_closed` | «cerramos esta búsqueda» — **explícitamente no es sobre ti** |
-| `rejected` | agradecimiento, sin razón interna ni score |
-| `withdrawn` | acuse de recibo |
-| `unresponsive` | **ninguno** |
+| Desenlace | Lo que lee | `EmailType` |
+|---|---|---|
+| `selected` | la oferta / felicitación | `hiring_decision_selected` *(existe)* |
+| `backup_selected` | «quedaste en reserva para esta vacante» | variante de `hiring_decision_selected` o tipo propio, a decidir en su task |
+| `not_selected` + `capacity_filled` | «esta vez elegimos a otra persona» | **`hiring_decision_not_selected`** *(nuevo)* |
+| `not_selected` + `opening_closed` | «cerramos esta búsqueda» — **explícitamente no es sobre ti** | **`hiring_decision_not_selected`** — misma causa, cuerpo distinto |
+| `not_selected` + `process_cancelled` | «cancelamos este proceso» | **`hiring_decision_not_selected`** |
+| `rejected` | agradecimiento, sin razón interna ni score | `hiring_decision_rejected` *(existe)* |
+| `withdrawn` | acuse de recibo | acuse existente |
+| `unresponsive` | **ninguno** | — |
 
 Copy definitivo: `src/lib/copy/dictionaries/{es-CL,en-US}/hiringDesk.ts`, validado con `greenhouse-ux-writing`. Ningún literal en JSX.
+
+### 7.3 Un `EmailType` por desenlace. La causa modula el CUERPO, no el tipo
+
+`EmailType` **no es una etiqueta descriptiva: el sistema ramifica por ella** en tres lugares —el kill-switch
+por tipo (`greenhouse_notifications.email_type_config`, consultado en `src/lib/email/delivery.ts:131` y otra
+vez bajo lock en `:336`), el dedupe de «¿ya se envió?», y el perfil de footer, que `TASK-1764` (`EPIC-042`)
+resuelve **por `EmailType`**. Es el patrón canónico §9 aplicado a la capa de correo: si algo ramifica por un
+valor, ese valor no se colapsa.
+
+**Por eso un cierre por capacidad NO reusa `hiring_decision_rejected`.** El argumento decisivo es operativo,
+no semántico: un cierre de cohorte manda **N correos de golpe** (las vacantes vivas tienen 15 y 33 personas)
+y un descarte individual manda uno. Si un run sale mal a mitad, hay que poder **pausar ese envío sin
+silenciar los correos de decisión individual** — y con un tipo compartido el kill-switch apaga los dos. El
+repo ya tomó esta decisión antes: `hiring_decision_selected` y `hiring_decision_rejected` **ya son tipos
+separados** (`src/lib/email/types.ts:33-34`) exactamente para poder pausarlos por separado. Que el log
+append-only quedaría diciendo «rechazado» de quien no lo fue es cierto, pero es refuerzo: el registro
+autoritativo es el desenlace, no el correo.
+
+**La regla que fija el techo y evita la explosión combinatoria:**
+
+> **Un `EmailType` por desenlace. La causa modula el cuerpo del mensaje, nunca el tipo.**
+
+De los 6 desenlaces sólo **4 comunican** (`selected`, `rejected`, `not_selected`, `withdrawn`);
+`unresponsive` no manda nada y `backup_selected` resuelve en su propia task. Las 3 causas viven **dentro** del
+cuerpo de `not_selected`. El vocabulario de correo queda acotado por el mismo enum del dominio.
+
+**Dos condiciones sin las cuales el tipo nuevo nace roto:**
+
+1. **`TASK-1764` (`EPIC-042`) resuelve los perfiles de footer por `EmailType`.** Un tipo que no se declara ahí
+   cae al perfil legacy **en silencio**.
+2. **El envío es asíncrono y vive en el `ops-worker`, NO en Vercel.** El seed de `email_type_config` y
+   cualquier flag asociado van en `services/ops-worker/deploy.sh` —que usa `--set-env-vars`
+   **destructivo**— y **además** aplicados en vivo con `--update-env-vars`, con su fila en
+   `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`. Declararlo sólo en Vercel deja el envío apagado sin que
+   nada avise; ya ocurrió en este repo con un correo que la UI prometía y nunca salió.
 
 ---
 
@@ -170,6 +206,7 @@ Razón: `rejected` es un juicio sobre la persona. Aplicarlo a 33 personas que no
 | **Equidad / AI Act** | Las escaleras de rango deben **conservar los literales retirados mapeados al rango nuevo**: los payloads históricos de `outbox_events` son inmutables y son la única memoria del avance de un rechazado dentro de la VIEW. Y el embudo debe ramificar por desenlace **+ causa** |
 | **Talent Pool** | `not_selected`, con cualquier causa, es la población objetivo. No hay que mirar la causa para eso |
 | **Expediente de evaluación** | La etapa cruda entra al prompt del modelo. **Hay que decidir qué token recibe por cada etapa fusionada** antes de migrar (H-15) |
+| **Correo al candidato (tipos)** | `not_selected` estrena `EmailType` propio; la causa modula el cuerpo. Requiere fila en `TASK-1764` (footers por tipo) y seed en el `ops-worker`, no en Vercel — ver §7.3 |
 | **Carril programático** | Un desenlace no se escribe por `PATCH`. La API de cierre nombra el paso, no el literal — el modelo a copiar es `HiringHandoff` (`POST /api/hiring/handoffs/[id]/[action]`), no el `PATCH {stage}` genérico |
 
 ---
@@ -194,6 +231,9 @@ Razón: `rejected` es un juicio sobre la persona. Aplicarlo a 33 personas que no
 - **NUNCA** archivar un registro escribiendo `closed`. Archivar es un eje aparte.
 - **NUNCA** mostrar una tarjeta en «Cerrado» sin su chip de desenlace.
 - **NUNCA** exponer el identificador interno del desenlace ni su causa a la persona candidata.
+- **NUNCA** reusar el `EmailType` de un desenlace para otro. El sistema ramifica por ese valor (kill-switch, dedupe, perfil de footer): colapsarlos deja un cierre de cohorte y un descarte individual bajo el mismo interruptor.
+- **NUNCA** crear un `EmailType` por causa. Un tipo por desenlace; la causa modula el cuerpo.
+- **NUNCA** sembrar un `EmailType` nuevo sólo en Vercel: el envío es del `ops-worker`, y el flag declarado fuera de su `deploy.sh` desaparece en el siguiente deploy, en silencio.
 - **NUNCA** retirar un literal de las escaleras de rango de la VIEW de equidad: son **tabla de traducción histórica**, no espejo del vocabulario vigente.
 - **SIEMPRE** declarar en el punto de decisión que soltar en «Evaluación» dispara la prueba.
 

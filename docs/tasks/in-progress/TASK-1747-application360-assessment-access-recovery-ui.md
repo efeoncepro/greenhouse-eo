@@ -264,6 +264,29 @@ La ficha mantiene un botón legacy que intenta asignar un test incluso cuando ya
      existe en el repo, reporta antes de continuar.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-22 — ADR del vocabulario de etapas y desenlace
+
+Se aceptó `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md` (`Accepted`), primer ADR del vocabulario del pipeline. Fija **dos ejes**:
+`stage` = dónde va la persona en el recorrido (6 valores, uno por columna; `closed` se queda y **es
+escribible**) y **desenlace** = cómo terminó (`selected`, `backup_selected`, `not_selected`, `rejected`,
+`withdrawn`, `unresponsive`) + **causa gobernada** obligatoria en `not_selected` (`capacity_filled`,
+`opening_closed`, `process_cancelled`). Invariante como `CHECK`: **`stage='closed'` ⟺ desenlace declarado**.
+El eje de desenlace lo implementa `TASK-1765`; la superficie del kanban, `TASK-1766`; el embudo de equidad,
+`TASK-1767`.
+
+**Coordinación de `hiringDesk.ts` — la colisión crece de tres tasks a cuatro.**
+
+Esta task ya declara la colisión con `TASK-1754` sobre el diccionario de copy, pero la subestima: el ADR §7
+agrega **dos bloques nuevos de claves** a ese archivo — las 6 etiquetas de desenlace y las 3 causas — más el
+copy del diálogo de cierre. Los escritores concurrentes pasan a ser cuatro (`1747`, `1754`, `1763`, `1766`).
+
+**Se particiona por CLAVE, no por archivo:** 1747 = claves de la card de assessment · 1754 = claves de
+`stages` · 1763 = claves de capacity closure · 1766 = claves nuevas de desenlace y causa. Esta task está
+`in-progress` con sesión activa: **cierra primero**, y las demás rebasan sobre ella.
+
+Nota de vocabulario: esta task usa «desenlace» para el resultado de la propuesta de assessment, y el ADR
+acaba de fijar esa palabra para el segundo eje del pipeline. Ambos tienen 6 valores. Desambiguar.
+
 ## Architecture Alignment
 
 Revisar y respetar:

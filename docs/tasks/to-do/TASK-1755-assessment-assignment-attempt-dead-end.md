@@ -74,6 +74,29 @@ ni relajar la idempotencia que evita el doble envío.
      existe en el repo, reporta antes de continuar.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-22 — ADR del vocabulario de etapas y desenlace
+
+Se aceptó `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md` (`Accepted`), primer ADR del vocabulario del pipeline. Fija **dos ejes**:
+`stage` = dónde va la persona en el recorrido (6 valores, uno por columna; `closed` se queda y **es
+escribible**) y **desenlace** = cómo terminó (`selected`, `backup_selected`, `not_selected`, `rejected`,
+`withdrawn`, `unresponsive`) + **causa gobernada** obligatoria en `not_selected` (`capacity_filled`,
+`opening_closed`, `process_cancelled`). Invariante como `CHECK`: **`stage='closed'` ⟺ desenlace declarado**.
+El eje de desenlace lo implementa `TASK-1765`; la superficie del kanban, `TASK-1766`; el embudo de equidad,
+`TASK-1767`.
+
+**No contradice el ADR, pero cambia de orden y gana una restricción.**
+
+- **Sube en la secuencia: va ANTES o EN PARALELO al colapso, nunca después.** Al absorber `qualified`
+  dentro de `shortlisted`, entra más población a la etapa que dispara la policy → más intentos → **más
+  cupos quemados irrecuperables**. Hoy hay 4 filas `blocked` sobre 20. Si el colapso llega primero, cada
+  política mal configurada quema un cupo para siempre (hallazgo H-13).
+- El Slice que decide qué hacer con las filas bloqueadas existentes debe declarar que **`assertEnum` corre
+  en el camino de LECTURA del ledger**: retirar un literal que una fila histórica nombre produce `500` al
+  releerla, y esas filas son irreescribibles por diseño. Hoy las 20 son `shortlisted`, que se conserva.
+- **Colisión de vocabulario:** esta task usa «desenlace» para el `outcome` del **ledger de asignación**
+  (`assigned|blocked|held|intent`). El ADR acaba de fijar «desenlace» como el segundo eje del **pipeline**.
+  Renombrar el uso local a «resultado del intento» para que no queden dos conceptos con una palabra.
+
 ## Architecture Alignment
 
 Revisar y respetar:

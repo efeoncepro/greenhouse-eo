@@ -31,7 +31,7 @@
 1. Entry: operador registra `selected` por el command actual.
 2. Primary action: respuesta/readback indica `capacityClosureAvailable`.
 3. Transition: UI solicita preview TASK-1762 y abre segundo dialog.
-4. User decision: revisa categorías; incluye explícitamente backup/hold; confirma o elige `Ahora no`.
+4. User decision: revisa el desenlace y la causa que se van a registrar y las categorías; incluye explícitamente backup/hold; confirma o elige `Ahora no`.
 5. Completion: confirm crea run; UI muestra status real `running|completed|partial_failed`.
 6. Recovery / exit: stale refresca preview; cancel preserva selección; partial reintenta sólo pendientes.
 
@@ -40,7 +40,7 @@
 | Trigger | Source | Target state/surface | Keyboard equivalent | Notes |
 | --- | --- | --- | --- | --- |
 | selección persistida + available | decision response | preview loading | n/a | no auto-confirm |
-| preview ready | reader | dialog ready | focus title | announce N |
+| preview ready | reader | dialog ready | focus title | announce N, desenlace y causa |
 | confirm | button | pending/status | Enter/Space | actor + digest |
 | cancel/Escape | dialog | Application 360 | Escape | sólo antes de submit |
 | stale | confirm error | refresh required | button | no side effects |
@@ -51,7 +51,7 @@
 | --- | --- | --- | --- | --- |
 | closed | dialog ausente | default/cancel | available | selección permanece |
 | opening | solicita preview | available | ready/error | feedback explícito |
-| open | preview fresco | reader success | confirm/cancel | N y categorías |
+| open | preview fresco | reader success | confirm/cancel | N, categorías y el desenlace + causa que se escribirán (`not_selected` / `capacity_filled`) |
 | loading | confirm pending | primary CTA | status/error | CTA/close disabled |
 | error | preview/confirm falló | sanitized error | retry/cancel | no false rollback |
 | dirty | backup/hold cambia | operator toggle | refresh/confirm | effect digest local no autoritativo |
@@ -107,7 +107,7 @@
 - Required steps: ready/cancel, ready/confirm, stale/refresh, partial/retry, denied.
 - Required captures: cada estado y mobile single-plane.
 - Required `data-capture` markers: dialog, summary, confirm, run status.
-- Assertions: exact N, no double submit, selection preserved, focus restore.
+- Assertions: exact N, desenlace y causa visibles antes de confirmar, no double submit, selection preserved, focus restore.
 - Scroll-width checks: `scrollWidth === clientWidth`.
 - Accessibility/focus checks: Escape, pending lock, live status, axe.
 - Reduced-motion evidence: capture con preferencia activa.

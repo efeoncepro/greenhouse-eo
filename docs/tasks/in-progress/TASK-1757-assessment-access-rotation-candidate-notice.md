@@ -70,6 +70,24 @@ aviso no pueda salir, el sistema lo sepa y alguien pueda actuar antes de que se 
      existe en el repo, reporta antes de continuar.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-22 — ADR del vocabulario de etapas y desenlace
+
+Se aceptó `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md` (`Accepted`), primer ADR del vocabulario del pipeline. Fija **dos ejes**:
+`stage` = dónde va la persona en el recorrido (6 valores, uno por columna; `closed` se queda y **es
+escribible**) y **desenlace** = cómo terminó (`selected`, `backup_selected`, `not_selected`, `rejected`,
+`withdrawn`, `unresponsive`) + **causa gobernada** obligatoria en `not_selected` (`capacity_filled`,
+`opening_closed`, `process_cancelled`). Invariante como `CHECK`: **`stage='closed'` ⟺ desenlace declarado**.
+El eje de desenlace lo implementa `TASK-1765`; la superficie del kanban, `TASK-1766`; el embudo de equidad,
+`TASK-1767`.
+
+**Coordinación de `send.ts` — tres tasks lo tocan.**
+
+El ADR no cambia el aviso de rotación (no es candidate-facing de desenlace), pero **sí toca el mismo
+archivo**: `notifications/send.ts:285` es el `no-op: etapa no candidate-facing` que el eje de desenlace
+reescribe. `TASK-1754` reclama `src/lib/hiring/notifications/**` completo y `TASK-1762` también.
+
+Acordar el orden de merge antes de tocar el bloque de rotación. El alcance de esta task no cambia.
+
 ## Architecture Alignment
 
 Revisar y respetar:

@@ -17,12 +17,12 @@
 - Wireframe: `none`
 - Flow: `none`
 - Motion: `none`
-- Backend impact: `reader`
+- Backend impact: `migration`
 - Epic: `EPIC-011`
 - Status real: `Diseño`
 - Rank: `TBD`
 - Domain: `hr|data`
-- Blocked by: `none`
+- Blocked by: `TASK-1765` (define el campo de archivado propio que el Slice 2 escribe; su `CHECK stage='closed' ⟺ desenlace` entra DESPUÉS de la migración de las 32 filas)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -32,7 +32,11 @@
 `TASK-1739` dejó la procedencia de datos operando en producción, pero con tres piezas sin cerrar que
 hoy **no tienen efecto visible** y por eso no justificaron un release propio. Esta task las cierra:
 el filtro de procedencia en los readers del Banco de Talento, el archivado completo de fichas y
-vacantes, y el lane de borrado de las postulaciones huérfanas.
+vacantes **sobre un eje de archivado propio**, y el lane de borrado de las postulaciones huérfanas.
+
+Hereda además una cuarta pieza que el ADR del vocabulario volvió urgente: **migrar las 32 filas
+sintéticas que hoy quedaron archivadas como `stage='closed'`** al campo de archivado, antes de que el
+`CHECK` de `TASK-1765` vuelva ese estado irrepresentable.
 
 ## Why This Task Exists
 
@@ -47,11 +51,17 @@ escribirlos: **una deuda que no duele es la que se olvida.**
    `src/lib/hiring/talent-pool/readers.ts` sólo sirve `('active_process','pool_eligible','paused')`.
    Es decir, la invisibilidad depende hoy de un estado del ciclo de vida que nadie garantizó — si
    alguna de esas fichas volviera a un estado servible, reaparecerían.
-2. **El lane de archivado quedó parcial.** La spec definía archivar como tres escrituras
-   —`hiring_application.stage='closed'`, `candidate_facet.status='archived'`,
-   `hiring_opening.status='cancelled'`— y `archiveSyntheticRecords`
-   (`src/lib/hiring/data-origin/purge.ts`) sólo hace la primera. Por eso las 11 fichas sintéticas
-   siguen `active` y 14 vacantes sintéticas siguen en `draft`.
+2. **El lane de archivado quedó parcial y, además, escribe en el eje equivocado.** La spec de
+   `TASK-1739` definía archivar como tres escrituras —`hiring_application.stage='closed'`,
+   `candidate_facet.status='archived'`, `hiring_opening.status='cancelled'`— y
+   `archiveSyntheticRecords` (`src/lib/hiring/data-origin/purge.ts:173`) sólo hace la primera.
+   **Esa primera escritura quedó superseded por el ADR del vocabulario**: `stage='closed'` pasó a
+   significar «el recorrido de la persona terminó, con desenlace declarado», y archivar un registro
+   no es cerrar el proceso de nadie. Ese mismo `UPDATE … SET stage='closed'` es el origen de las 32
+   filas `closed` sin decisión que ensuciaron todo el diagnóstico de la auditoría del vocabulario.
+   Por eso la corrección **no** es «completar las tres escrituras tal como la spec las definió» sino
+   **cambiar la primera de eje** y migrar lo ya escrito. Las otras dos siguen faltando igual: 11
+   fichas sintéticas siguen `active` y 14 vacantes sintéticas siguen en `draft`.
 3. **El lane B de la purga no se ejecutó.** Nueve postulaciones huérfanas califican para borrado
    (cero dependientes, `stage='sourced'`); las otras 23 no pueden borrarse porque tienen assessments
    o evidencia append-only. La decisión de borrarlas es humana y sigue pendiente.
@@ -60,23 +70,54 @@ escribirlos: **una deuda que no duele es la que se olvida.**
 
 - Que la invisibilidad de un dato sintético dependa de **su procedencia declarada**, no de un estado
   de ciclo de vida que podría cambiar.
-- Que archivar signifique lo mismo en las tres entidades que la spec definió.
+- Que archivar tenga **eje propio** —un campo de archivado, jamás `stage`— y signifique lo mismo en
+  las tres entidades, con las 32 filas ya escritas migradas a ese eje antes de que el `CHECK` de
+  `TASK-1765` las vuelva irrepresentables.
 - Que las nueve huérfanas se borren o se descarte el borrado de forma explícita y registrada.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-22 — ADR del vocabulario de etapas y desenlace
+
+Se aceptó `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md` (`Accepted`), primer ADR del vocabulario del pipeline. Fija **dos ejes**:
+`stage` = dónde va la persona en el recorrido (6 valores, uno por columna; `closed` se queda y **es
+escribible**) y **desenlace** = cómo terminó (`selected`, `backup_selected`, `not_selected`, `rejected`,
+`withdrawn`, `unresponsive`) + **causa gobernada** obligatoria en `not_selected` (`capacity_filled`,
+`opening_closed`, `process_cancelled`). Invariante como `CHECK`: **`stage='closed'` ⟺ desenlace declarado**.
+El eje de desenlace lo implementa `TASK-1765`; la superficie del kanban, `TASK-1766`; el embudo de equidad,
+`TASK-1767`.
+
+**Su Slice 2 embarca hoy el anti-patrón que el ADR prohíbe — es la corrección más urgente del barrido.**
+
+El Slice 2 y sus Acceptance Criteria dicen que `archiveSyntheticRecords` escribe *«postulación a `closed`»*.
+El ADR §5 y §12 lo prohíben explícitamente: **NUNCA archivar un registro escribiendo `closed`. Archivar es
+un eje aparte.** Ese mismo `UPDATE ... SET stage='closed'` (`src/lib/hiring/data-origin/purge.ts:173`) es el
+origen de las 32 filas `closed` sin decisión que ensuciaron todo el diagnóstico.
+
+**Correcciones:**
+
+- El Slice 2 escribe un **campo de archivado propio** (`archived_at` o equivalente), **nunca `stage`**.
+- La task **hereda migrar las 32 filas sintéticas** ya archivadas de `closed` al campo nuevo.
+- **Cambia el orden:** ese trabajo va **ANTES** del `CHECK` de `TASK-1765`. Si el `CHECK` entra primero, la
+  migración falla contra esas 32 filas.
+- `Blocked by`: necesita el campo de archivado que define `TASK-1765`.
+
 ## Architecture Alignment
 
 Revisar y respetar:
 
+- `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md` (§5, §12)
 - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (§Delta 2026-08-18 — procedencia)
 - `docs/architecture/GREENHOUSE_CANONICAL_PATTERNS_V1.md`
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
 
 Reglas obligatorias:
 
+- **NUNCA archivar un registro escribiendo `stage='closed'`** (ADR §5 y §12). Archivar es un eje
+  aparte: `stage` describe el recorrido de la persona y `closed` exige desenlace declarado. El
+  archivado de un sintético no declara desenlace de nadie, así que no puede tocar ese campo.
 - **La retención y el compliance siguen siendo CIEGOS a la procedencia**, y la procedencia **nunca
   gatea comunicaciones**: eso lo decide el consentimiento.
 - **Nunca un DELETE físico de un asset** ni de una tabla append-only.
@@ -86,6 +127,10 @@ Reglas obligatorias:
 
 ## Normative Docs
 
+- `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md` — ADR que
+  supersede la definición de archivado de la spec madre (tres escrituras con `stage='closed'`).
+- `docs/audits/hiring/GREENHOUSE_HIRING_STAGE_VOCABULARY_AUDIT_2026-08-22.md` — evidencia de que las
+  32 filas `closed` sin decisión las escribió este archivado.
 - `docs/tasks/complete/TASK-1739-hiring-synthetic-data-provenance.md` — spec madre y su Delta de cierre.
 - `docs/manual-de-uso/hr/operar-procedencia-de-datos-hiring.md`
 - `docs/documentation/hr/procedencia-de-datos-hiring.md`
@@ -96,12 +141,17 @@ Reglas obligatorias:
 
 - `TASK-1739` completa y en producción (release `30301816955f`, 2026-08-19).
 - Columna `data_origin` + trigger de derivación + audit append-only, ya aplicados.
+- `TASK-1765` — el campo de archivado propio (`archived_at` o equivalente) y el invariante
+  `stage='closed'` ⟺ desenlace. El Slice 2 escribe ese campo; su migración de datos corre **antes**
+  de que entre el `CHECK`.
 
 ### Blocks / Impacts
 
 - El Banco de Talento servirá menos filas cuando el filtro entre; el efecto hoy es **cero** porque
   esas 11 ya están fuera por `needs_reconsent`.
 - `TASK-1734` (gold set): sin impacto adicional — su exclusión ya opera sin flag.
+- `TASK-1765`: su `CHECK stage='closed' ⟺ desenlace` **no puede entrar** mientras las 32 filas
+  sintéticas sigan en `stage='closed'` sin desenlace. Esta task es su precondición de datos.
 
 ### Files owned
 
@@ -109,6 +159,8 @@ Reglas obligatorias:
 - `src/lib/hiring/talent-pool/projection.ts`
 - `src/lib/hiring/data-origin/purge.ts` (+ tests)
 - `scripts/hiring/purge-synthetic-hiring-data.ts`
+- `migrations/<timestamp>_task-1748-synthetic-archive-axis-backfill.sql` (migración de datos de las
+  32 filas; el DDL del campo de archivado es de `TASK-1765`)
 
 ## Current Repo State
 
@@ -123,7 +175,13 @@ Reglas obligatorias:
 
 - `talent-pool/readers.ts` y `talent-pool/projection.ts` sin filtro de procedencia (verificado por
   ausencia de `data_origin` en ambos archivos).
-- `archiveSyntheticRecords` escribe sólo sobre `hiring_application`.
+- `archiveSyntheticRecords` escribe sólo sobre `hiring_application`, y lo hace en el campo
+  equivocado: `UPDATE … SET stage = 'closed'` (`src/lib/hiring/data-origin/purge.ts:173`), que el ADR
+  prohíbe explícitamente.
+- 32 postulaciones sintéticas ya quedaron archivadas por esa vía: `stage='closed'` y `decision IS
+  NULL`, es decir violando el invariante que `TASK-1765` va a imponer como `CHECK`.
+- No existe todavía campo de archivado en `hiring_application` (verificado contra el DDL vigente:
+  `migrations/20260707235655376_task-353-hiring-ats-domain-foundation.sql:144-184` no lo declara).
 - Nueve postulaciones huérfanas sin decisión de borrado.
 
 ## Modular Placement Contract
@@ -142,9 +200,10 @@ Reglas obligatorias:
 ### Backend/data brief
 
 - Backend rigor: `backend-standard`
-- Impacto principal: `reader`
+- Impacto principal: `migration`
 - Source of truth afectado: `greenhouse_hiring.talent_pool_membership` + `candidate_facet` +
-  `hiring_opening` (estados), con la procedencia heredada por JOIN.
+  `hiring_opening` (estados) + el campo de archivado de `hiring_application` (`TASK-1765`), con la
+  procedencia heredada por JOIN.
 - Consumidores afectados: Banco de Talento (desk y provider MCP read-only), CLI de purga.
 - Runtime target: `production` (readers) + `local` (CLI)
 
@@ -153,7 +212,8 @@ Reglas obligatorias:
 - Contrato existente a respetar: `realOnlyPredicate` de `data-origin/contracts.ts`;
   `archiveSyntheticRecords` / `deleteOrphanSyntheticRecords`.
 - Contrato nuevo o modificado: parámetro `includeSynthetic` en los readers del talent pool; el
-  archivado pasa a escribir las tres entidades.
+  archivado pasa a escribir las tres entidades y **cambia de eje en la postulación**: del `stage` al
+  campo de archivado propio que define `TASK-1765`.
 - Backward compatibility: `compatible` — el filtro llega detrás del flag ya existente
   `HIRING_SYNTHETIC_DATA_FILTER_ENABLED`, hoy ON.
 - Full API parity: el predicado es único y compartido; el MCP read-only lo hereda por construcción.
@@ -163,6 +223,10 @@ Reglas obligatorias:
 - Entidades afectadas: `talent_pool_membership`, `candidate_facet`, `hiring_opening`,
   `hiring_application`, `hiring_data_origin_audit`.
 - Invariantes que no se pueden romper:
+  - **Archivar NUNCA escribe `stage`.** El registro sintético se archiva en su campo propio; `stage`
+    sigue describiendo el recorrido de la persona (ADR §5, §12).
+  - Tras la migración, **cero postulaciones no-real en `stage='closed'`**: es la precondición de
+    datos del `CHECK` de `TASK-1765`.
   - La invisibilidad de un sintético debe derivar de `data_origin`, **no** de `lifecycle_status`.
   - El archivado escribe una fila de audit por entidad tocada, con actor y motivo.
   - El borrado exige cero dependientes sobre los 10 verificados y aborta la corrida completa.
@@ -173,10 +237,16 @@ Reglas obligatorias:
 
 ### Migration, backfill and rollout
 
-- Migration posture: `none` — additive sobre contrato ya desplegado, sin cambio de schema.
+- Migration posture: `additive` — el DDL del campo de archivado lo aporta `TASK-1765`; esta task
+  aporta la **migración de datos** que mueve las 32 filas sintéticas de `stage='closed'` a ese campo.
 - Default state: el filtro entra detrás del flag vigente, hoy ON en staging y producción.
-- Backfill plan: no hay backfill nuevo; se completa el archivado de lo ya marcado.
-- Rollback path: revert del PR; el archivado se revierte devolviendo los estados desde el audit.
+- Backfill plan: las 32 filas sintéticas archivadas se migran al campo de archivado y su `stage`
+  vuelve al valor previo que ya guardó `hiring_data_origin_audit.deleted_snapshot_json`
+  (`->>'beforeStage'`, escrito por `purge.ts:186`); las que no tengan snapshot vuelven a `sourced` y
+  quedan listadas en el readback. Corre **antes** del `CHECK` de `TASK-1765`. Además se completa el
+  archivado de fichas y vacantes ya marcadas.
+- Rollback path: revert del PR; el archivado se revierte devolviendo los estados desde el audit, y la
+  migración de datos tiene su `down` que devuelve las 32 filas a su estado previo.
 - External coordination: sign-off del CEO antes del lane B (única mutación irreversible).
 
 ### Security and access
@@ -191,6 +261,9 @@ Reglas obligatorias:
 - Local checks: `pnpm vitest run src/lib/hiring/data-origin src/lib/hiring/talent-pool`, `pnpm local:check`.
 - DB/runtime checks: confirmar que las 11 fichas sintéticas quedan fuera del Banco de Talento **por
   procedencia**, forzando una a un `lifecycle_status` servible en una transacción con ROLLBACK.
+  Readback de la migración: `SELECT count(*) FROM greenhouse_hiring.hiring_application WHERE
+  data_origin <> 'real' AND stage = 'closed'` debe dar `0`, y el conteo de sintéticas con el campo de
+  archivado poblado debe dar `32`.
 - Integration checks: sin provider externo en el camino.
 - Reliability signals/logs: `hiring.data_quality.data_origin_derivation_drift` en steady 0.
 - Production verification sequence: ver §Rollout.
@@ -212,11 +285,26 @@ Reglas obligatorias:
 - Test que prueba la exclusión **por procedencia** y no por ciclo de vida: forzar una ficha sintética
   a `pool_eligible` dentro de una transacción y verificar que igual no aparece.
 
-### Slice 2 — Archivado completo
+### Slice 2 — Archivado sobre eje propio + migración de las 32 filas ya escritas
 
-- `archiveSyntheticRecords` escribe las tres entidades de la spec: postulación a `closed`, ficha a
-  `archived`, vacante a `cancelled`, cada una con su fila de audit.
+- `archiveSyntheticRecords` escribe las tres entidades, **con la postulación cambiada de eje**:
+  postulación al **campo de archivado propio** (`archived_at` o equivalente, definido por
+  `TASK-1765`) — **nunca `stage`** —, ficha a `archived`, vacante a `cancelled`, cada una con su
+  fila de audit.
+- Retirar del código el `UPDATE … SET stage = 'closed'` (`src/lib/hiring/data-origin/purge.ts:173`);
+  la guarda de idempotencia, que hoy lee `row.stage === 'closed'` (`purge.ts:169`), pasa a leer el
+  campo de archivado. El `deleted_snapshot_json` del audit deja de registrar
+  `{beforeStage, afterStage}` y pasa a registrar el archivado real.
+- **Migrar las 32 filas sintéticas ya archivadas**: poblar el campo de archivado y devolver `stage`
+  al `beforeStage` que guardó `hiring_data_origin_audit.deleted_snapshot_json` (fallback `sourced`,
+  listado explícito en el readback). Ninguna fila sintética queda en `stage='closed'`.
+- Readback obligatorio dentro de la propia migración: bloque `DO` que aborta si queda alguna
+  postulación no-real en `stage='closed'`, o si el conteo de archivadas por el campo nuevo no cuadra
+  con lo migrado.
 - Aplicar sobre lo ya marcado: 11 fichas y las vacantes sintéticas que sigan en `draft`/`active`.
+- Actualizar el docstring de `archiveSyntheticRecords`, que hoy declara la deuda «archivar mueve
+  `stage` a `closed` pero NO setea `decision`» (`purge.ts:138-147`): con el eje propio esa deuda
+  desaparece y el texto debe decirlo, apuntando al ADR.
 
 ### Slice 3 — Decisión del lane B
 
@@ -231,13 +319,20 @@ Reglas obligatorias:
 - **Capabilities `hiring.data_origin.mark`/`.purge`**: se declaran cuando exista superficie API o UI
   que las verifique; hoy darían falsa garantía.
 - **Adaptar `verify-growth-forms-application-smoke.ts`**: sigue siendo follow-up de `TASK-1739`.
+- **Implementar el eje de desenlace, el campo de archivado o su `CHECK`**: es `TASK-1765`. Acá sólo
+  se consume el campo y se migran las filas sintéticas que hoy lo violan.
 - **Separar bases por ambiente**: otro proyecto.
 
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
 
-- `Slice 1` y `Slice 2` son independientes y pueden ir en cualquier orden.
+- `Slice 1` y `Slice 2` son independientes entre sí y pueden ir en cualquier orden.
+- **Orden duro cross-task, no es preferencia:** el `Slice 2` (cambio de eje + migración de las 32
+  filas) va **ANTES** de que entre el `CHECK stage='closed' ⟺ desenlace` de `TASK-1765`. Si el
+  `CHECK` entra primero, **la migración falla contra esas 32 filas**: son exactamente las que violan
+  el invariante. El único orden válido es `TASK-1765` crea el campo de archivado → este `Slice 2`
+  migra y deja de escribir `stage` → `TASK-1765` aplica el `CHECK`.
 - `Slice 3` va **al final**: es la única mutación irreversible y exige sign-off.
 
 ### Risk matrix
@@ -247,6 +342,8 @@ Reglas obligatorias:
 | El filtro nuevo esconde una ficha real | hiring / talent pool | low | el predicado es el canónico ya probado; `real` es el default y un valor ilegible degrada a real | caída anómala del conteo del Banco de Talento |
 | El archivado de vacantes rompe un reader que asume `draft` | hiring | low | los estados `cancelled`/`archived` ya existen en los CHECK vigentes | tests focales de hiring |
 | El borrado del lane B destruye evidencia | hiring / assessment | low | preflight de 10 dependientes + aborto total de la corrida | el CLI aborta loud |
+| El `CHECK` de `TASK-1765` entra antes de la migración | hiring / release | medium | orden duro declarado arriba; la migración del `CHECK` verifica primero que no queden no-real en `closed` | la migración del `CHECK` aborta contra las 32 filas |
+| Una fila sin `beforeStage` en el audit queda con `stage` inventado | hiring | low | fallback explícito a `sourced` + listado en el readback, nunca silencioso | el readback enumera las filas con fallback |
 
 ### Feature flags / cutover
 
@@ -258,7 +355,7 @@ existente y ON en staging y producción.
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
 | Slice 1 | flag a `false` + redeploy, o revert del PR | < 5 min | sí |
-| Slice 2 | devolver los estados desde el audit, por registro | < 5 min por registro | sí |
+| Slice 2 | devolver los estados desde el audit, por registro (guarda `beforeStage`); la migración de las 32 filas se revierte con su `down` | < 5 min por registro | sí |
 | Slice 3 | **no reversible** — por eso exige sign-off | sin retorno | **no** |
 
 ### Production verification sequence
@@ -267,8 +364,11 @@ existente y ON en staging y producción.
    estaban fuera por ciclo de vida).
 2. Forzar en una transacción con ROLLBACK una ficha sintética a `pool_eligible` y verificar que el
    filtro por procedencia la sigue excluyendo.
-3. Aplicar el archivado completo y verificar los estados y el audit.
-4. Dry-run del lane B, sign-off, y aplicar o descartar con registro.
+3. Aplicar la migración de las 32 filas y hacer readback: cero postulaciones no-real en
+   `stage='closed'` y las 32 con el campo de archivado poblado.
+4. Aplicar el archivado completo (ficha y vacante) y verificar los estados y el audit.
+5. Sólo con ese readback en cero, habilitar la entrada del `CHECK` de `TASK-1765`.
+6. Dry-run del lane B, sign-off, y aplicar o descartar con registro.
 
 ### Out-of-band coordination required
 
@@ -284,9 +384,14 @@ existente y ON en staging y producción.
       `includeSynthetic`, usando el predicado canónico y sin `WHERE` propio.
 - [ ] Existe un test que prueba la exclusión **por procedencia**: una ficha sintética forzada a un
       `lifecycle_status` servible sigue sin aparecer.
-- [ ] `archiveSyntheticRecords` escribe las tres entidades y deja una fila de audit por cada una.
+- [ ] `archiveSyntheticRecords` escribe las tres entidades y deja una fila de audit por cada una, y
+      **ningún camino de la función escribe `hiring_application.stage`** (test que lo prueba).
 - [ ] Tras el archivado, cero fichas sintéticas en `active` y cero vacantes sintéticas en
       `draft`/`active`.
+- [ ] Las 32 filas sintéticas archivadas quedaron migradas al campo de archivado y **cero
+      postulaciones no-real siguen en `stage='closed'`**, verificado por readback contra PG real.
+- [ ] La migración corrió **antes** de que entrara el `CHECK stage='closed' ⟺ desenlace` de
+      `TASK-1765`, y ese orden quedó registrado en el `Handoff.md`.
 - [ ] El lane B quedó ejecutado o explícitamente descartado, con su razón registrada.
 - [ ] `hiring.data_quality.data_origin_derivation_drift` sigue en `0`.
 - [ ] Ningún camino de esta task filtra retención por procedencia ni gatea comunicaciones.
@@ -307,6 +412,7 @@ existente y ON en staging y producción.
 - [ ] `changelog.md` actualizado si cambió comportamiento visible
 - [ ] chequeo de impacto cruzado sobre otras tasks
 - [ ] el Delta de cierre de `TASK-1739` queda actualizado apuntando a esta task como resuelta
+- [ ] `TASK-1765` quedó avisada de que su `CHECK` ya tiene la precondición de datos cumplida
 
 ## Follow-ups
 

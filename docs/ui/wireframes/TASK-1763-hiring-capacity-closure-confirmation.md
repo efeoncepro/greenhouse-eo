@@ -16,7 +16,7 @@
 - Primary user: operador de Talent que acaba de seleccionar.
 - User moment: la selección completa el objetivo de cupos.
 - Job to be done: revisar y confirmar el cierre/notificación de la cohorte exacta.
-- Primary decision signal: `N personas serán rechazadas y notificadas`.
+- Primary decision signal: `N personas quedarán sin selección y serán notificadas`.
 - Non-goals: editar capacidad, ranking, exponer PII o auto-confirmar.
 
 ## Desktop Target — 1440×1000
@@ -28,8 +28,11 @@ Application 360 / Decisión
 │ Esta selección completa 1 de 1 cupos.                    │
 │                                                          │
 │ Cierre propuesto                                         │
-│ 12 personas recibirán el cierre de esta vacante          │
+│ 12 personas quedarán sin selección y serán notificadas   │
 │ Sin decisión 9 · En espera 2 · Backup 1                  │
+│                                                          │
+│ Se registrará  [Sin selección]  ·  Causa: cupo lleno     │
+│ Nadie queda marcado como Descarte.                       │
 │                                                          │
 │ El correo agradecerá su tiempo. La mención al Banco de   │
 │ Talentos dependerá del consentimiento vigente.           │
@@ -57,6 +60,7 @@ final sin ocultar el verbo ni N. No hay scroll horizontal y el foco vuelve a `De
 | --- | --- | --- | --- |
 | Diálogo actual de decisión | MUI Dialog + AXIS theme | continuidad y foco modal | px/HEX inline |
 | Consecuencia dominante | Typography + Alert/state surface | claridad sin alarmismo | KPI card |
+| Desenlace y causa | GreenhouseChip (`Sin selección`) + texto de causa | el registro es visible antes de escribirlo | chip «Rechazado» o tono punitivo |
 | Categorías | GreenhouseChip/list | estado con texto | semáforo por color |
 | Acción irreversible | GreenhouseButton | verbo+objeto+N | “Confirmar” genérico |
 
@@ -66,17 +70,20 @@ final sin ocultar el verbo ni N. No hay scroll horizontal y el foco vuelve a `De
 | --- | --- | --- | --- | --- |
 | 0 | Dialog title | separar decisión y cierre | DialogTitle | copy |
 | 1 | Summary | cupos y N | local summary + Typography | preview DTO |
-| 2 | Categories | cohort/exclusions | list + Chips | preview DTO |
-| 3 | Consent note | promesa honesta | Alert/info | policy summary |
-| 4 | Actions | cancel/confirm | DialogActions + GreenhouseButton | command state |
-| 5 | Run status | pending/partial/completed | state surface | status DTO |
+| 2 | Outcome & cause | desenlace y causa que se van a escribir | GreenhouseChip + Typography | preview DTO (`not_selected` + `capacity_filled`) |
+| 3 | Categories | cohort/exclusions | list + Chips | preview DTO |
+| 4 | Consent note | promesa honesta | Alert/info | policy summary |
+| 5 | Actions | cancel/confirm | DialogActions + GreenhouseButton | command state |
+| 6 | Run status | pending/partial/completed | state surface | status DTO |
 
 ## Copy Ledger
 
 | Copy id | Region | Text | Dynamic values | Notes |
 | --- | --- | --- | --- | --- |
 | `hiringDesk.application.capacityClosure.title` | title | `Esta selección completa los cupos` | opening | separa hechos |
-| `hiringDesk.application.capacityClosure.summary` | summary | `{count} personas recibirán el cierre de esta vacante.` | count | count exacto |
+| `hiringDesk.application.capacityClosure.summary` | summary | `{count} personas quedarán sin selección y serán notificadas.` | count | count exacto; **nunca** «rechazadas» (ADR §12) |
+| `hiringDesk.application.capacityClosure.outcome` | outcome | `Se registrará {outcomeLabel} con causa {causeLabel} en cada candidatura.` | outcomeLabel, causeLabel | las etiquetas vienen de las claves de desenlace/causa de `TASK-1766`; aquí no se redefinen |
+| `hiringDesk.application.capacityClosure.outcomeReassurance` | outcome | `Nadie queda marcado como Descarte: no hubo un juicio sobre estas personas.` | none | explica por qué no es un rechazo |
 | `hiringDesk.application.capacityClosure.consent` | note | `La mención al Banco de Talentos dependerá del consentimiento vigente de cada persona.` | none | no promete opt-in |
 | `hiringDesk.application.capacityClosure.confirm` | action | `Cerrar vacante y notificar a {count} personas` | count | verbo+objeto+N |
 | `hiringDesk.application.capacityClosure.cancel` | action | `Ahora no` | none | selección queda |
@@ -87,16 +94,16 @@ final sin ocultar el verbo ni N. No hay scroll horizontal y el foco vuelve a `De
 | --- | --- | --- | --- | --- |
 | ready | `Revisa el cierre propuesto` | impacto y categorías | cerrar / ahora no | no success anticipado |
 | loading | `Calculando el impacto` | `Releemos la vacante antes de mostrarte a quién afectará.` | disabled | no spinner mudo |
-| empty | `No hay otras personas por notificar` | `Puedes cerrar la vacante sin enviar rechazos.` | cerrar vacante | count 0 |
+| empty | `No hay otras personas por notificar` | `Puedes cerrar la vacante sin notificar a nadie.` | cerrar vacante | count 0 |
 | partial | `El cierre quedó incompleto` | procesados/pendientes/fallidos | reintentar pendientes | persistente |
 | error | `No pudimos confirmar el cierre` | selección preservada | volver a revisar | error sanitizado |
 | denied | `No tienes permiso para cerrar esta vacante` | decisión individual preservada | cerrar dialog | sin oracle |
 
 ## Accessibility Contract
 
-- Heading order: DialogTitle → resumen → categorías → status.
+- Heading order: DialogTitle → resumen → desenlace y causa → categorías → status.
 - Chart/table alternatives: no aplica; conteos tienen texto completo.
-- Aria labels: confirm incluye N; categorías anuncian label+count.
+- Aria labels: confirm incluye N; el chip de desenlace anuncia su etiqueta y la causa como texto, no sólo color; categorías anuncian label+count.
 - Focus notes: título al abrir; Escape/restauración antes de submit; pending bloquea cierre accidental.
 - Color-independent state labels: todos los estados y categorías tienen texto/icono.
 
@@ -106,7 +113,7 @@ final sin ocultar el verbo ni N. No hay scroll horizontal y el foco vuelve a `De
 - Primitives: Dialog, Alert, GreenhouseButton, GreenhouseChip, state surfaces.
 - Variants / kinds: existing domain-safe variants; confirmar lookup en ejecución.
 - Component candidates: `HiringCapacityClosureConfirmation` domain-local.
-- Copy source: `src/lib/copy/dictionaries/*/hiringDesk.ts`.
+- Copy source: `src/lib/copy/dictionaries/*/hiringDesk.ts` — esta task escribe **sólo** las claves de capacity closure; el diccionario tiene cuatro escritores concurrentes (`TASK-1747`, `TASK-1754`, `TASK-1763`, `TASK-1766`) y se particiona por clave, no por archivo.
 - Data reader / command: TASK-1762 preview/status/confirm.
 - API parity: thin consumer.
 - Access / capability: `hiring.opening.capacity.read|confirm` server-resolved.
@@ -123,7 +130,7 @@ final sin ocultar el verbo ni N. No hay scroll horizontal y el foco vuelve a `De
 - Required steps: decisión → preview → cancel/confirm → status.
 - Required captures: ready, empty, backups, stale, denied, partial, mobile.
 - Required `data-capture` markers: `hiring-capacity-closure-dialog`, `hiring-capacity-cohort-summary`, `hiring-capacity-confirm`, `hiring-capacity-run-status`.
-- Assertions: N/DTO, focus, no PII, no false success.
+- Assertions: N/DTO, desenlace y causa visibles y coincidentes con el DTO, ninguna string de «rechazo», focus, no PII, no false success.
 - Scroll-width checks: `scrollWidth === clientWidth`.
 - Accessibility/focus checks: Escape, restore, keyboard traversal y axe.
 - Reduced-motion evidence: mismo estado final sin animación.

@@ -16,13 +16,14 @@
 
 ## Tesis seleccionada
 
-“Una decisión, dos consecuencias visibles”. La composición no dramatiza el rechazo: prioriza número de cupos,
-personas afectadas, categorías y estado. El tono es calmo, directo y humano.
+“Una decisión, dos consecuencias visibles”. La composición no dramatiza el desenlace: prioriza número de cupos,
+personas afectadas, el desenlace y la causa que se van a registrar, categorías y estado. El tono es calmo, directo y
+humano — este cierre no es un juicio sobre nadie, y la dirección visual no debe sugerir que lo sea.
 
 ## Desktop and mobile targets
 
 - Desktop: dialog `sm/md` sobre Application 360, resumen dominante `cupo objetivo → seleccionados → N restantes`,
-  seguido por categorías y consecuencia de comunicación.
+  seguido por el desenlace y su causa, las categorías y la consecuencia de comunicación.
 - Mobile 390: single-plane/full-screen; resumen y CTA dentro del primer recorrido, categorías colapsables, sin tabla.
 
 ## Action hierarchy
@@ -40,9 +41,13 @@ personas afectadas, categorías y estado. El tono es calmo, directo y humano.
 
 ## Signature and anti-patterns
 
-- Signature: la cifra N aparece junto al verbo final y al resumen de cupos, no como KPI decorativo.
+- Signature: la cifra N aparece junto al verbo final y al resumen de cupos, no como KPI decorativo; el desenlace se
+  muestra como chip neutro («Sin selección») con su causa en texto.
 - Evitar semáforos, card wall, nombres/emails de toda la cohorte, confirmación genérica y success prematuro.
+- Evitar cualquier lenguaje o tratamiento visual de «rechazo»: rojo punitivo, iconografía de descarte o un chip que
+  sugiera juicio sobre la persona.
 
 ## Acceptance signature
 
-En una lectura se distingue qué quedó decidido, qué aún no ocurrió y cuántas personas recibirán una comunicación.
+En una lectura se distingue qué quedó decidido, qué aún no ocurrió, cuántas personas recibirán una comunicación y
+con qué desenlace y causa quedará registrada cada una.

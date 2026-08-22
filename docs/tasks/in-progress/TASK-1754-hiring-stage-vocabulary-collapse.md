@@ -36,7 +36,7 @@ candidata.
 
 ## Why This Task Exists
 
-El dominio tiene doce etapas y la interfaz ofrece seis. Tres de las internas —`qualified`,
+El dominio tiene **trece** etapas y la interfaz ofrece seis. Tres de las internas —`qualified`,
 `shortlisted` y `client_review`— se muestran todas como **"Evaluación"**.
 
 La política de assessment sólo acepta `shortlisted` o `interview` como disparador
@@ -238,23 +238,41 @@ invariante entran al trabajo, y los «defectos vivos» listados abajo dejan de s
    —que en español choca con el nombre del artefacto, porque el correo del test ya dice "tienes una
    evaluación pendiente"—. En inglés esa colisión no existe (`assessment` ≠ `evaluation`).
 
-### Defectos VIVOS encontrados de paso — NO son de esta task
+### Defectos VIVOS encontrados de paso — con dueño declarado (actualizado 2026-08-22 post-ADR)
+
+Los tres siguen vivos. Lo que cambió es que **dos de ellos ya no son huérfanos**: el ADR §5 los absorbe
+estructuralmente y los reparte.
 
 - **`store.ts:1311` deja `closed` fuera del guard** que protege las etapas terminales (bloquea
   `selected|backup|rejected|withdrawn` y omite la quinta), y el carril `outcome` tiene
   `destination: 'closed'`. Arrastrar a "Cerrada" cierra a alguien **sin emitir
   `hiring.application.decided`**, sin correo de decisión y con el reloj de retención congelado
   (`documents/retention.ts:69` filtra `decision IS NOT NULL`, así que el CV nunca se vuelve elegible
-  para borrado).
+  para borrado). → **La puerta la cierra `TASK-1765`, y la cierra por `CHECK`, no por denylist.** Con
+  `stage='closed'` ⟺ desenlace declarado, un cierre sin desenlace se vuelve **irrepresentable** y el
+  `PATCH` de etapa deja de poder escribir `closed` porque no acepta desenlace (ADR §5). **Esta task no
+  toca ese guard**: ampliarle la denylist sería el parche que el ADR viene a evitar.
 - **Las tres copias de `TERMINAL_APPLICATION_STAGES` omiten `backup`**
   (`assessment/instances.ts:190`, `assessment/public-session/store.ts:11`,
   `assessment/access-recovery/vocabulary.ts:93`), mientras `decide.ts:29` mapea
   `backup_selected → 'backup'`. **Una persona marcada como respaldo puede seguir abriendo y
-  recuperando su prueba.** Tres literales duplicados que ya divergieron una vez.
-- **El lane programático acepta `stage` como string libre** (`app-hiring-candidate-review.ts:206`).
-  Un agente que filtre por una etapa retirada no recibe error: recibe **cero resultados**.
+  recuperando su prueba.** → **Deja de ser ajeno: entra al Slice F de esta task.** Retirar
+  `selected|backup|rejected|withdrawn` del enum obliga a reescribir las tres listas contra el eje de
+  desenlace (`decision IS NOT NULL`, no una lista de etapas), lo que elimina la duplicación en vez de
+  sincronizarla. Por eso el Slice F está bloqueado por `TASK-1765`: sin el eje no hay contra qué
+  reescribirlas.
+- **El lane programático acepta `stage` como string libre**
+  (`src/lib/api-platform/resources/app-hiring-candidate-review.ts:206`:
+  `query.get('stage')?.trim() || undefined`, sin `assertEnum`). Un agente que filtre por una etapa
+  retirada no recibe error: recibe **cero resultados**. → **Es el único que queda ajeno.** Dueño
+  `TASK-1718` (posee ese recurso App API). No se arregla acá, pero el Slice F lo empeora: al retirar
+  literales, un filtro programático que hoy devuelve filas pasará a devolver cero en silencio.
+  Notificar a `TASK-1718` antes de ejecutar el contract.
 
 ### Plan restante
+
+> Esta tabla es el inventario técnico heredado del traspaso del 2026-08-20; los slices ejecutables
+> vigentes son los **A–F** de `## Scope`. Mapeo: 1→A, 2→B (test derivado), 3→D, 4→B, 5→E, 6→F.
 
 | # | Qué | Nota |
 |---|---|---|
@@ -274,8 +292,9 @@ operador por el tablero ya corregido, o se les asigna por el camino manual. Deci
 - **NUNCA** introducir `evaluation` como valor de dominio.
 - **NUNCA** reescribir `trigger_stage` en el ledger de asignaciones.
 - **NUNCA** backfillear `decision` en las 32 filas sintéticas: sería fabricar un acto humano.
-- **NUNCA** colapsar las etapas terminales antes de cerrar la puerta de `closed` en `store.ts:1311`:
-  en ese orden se pierde el último discriminante que queda.
+- **NUNCA** colapsar las etapas terminales antes de que exista el `CHECK` `stage='closed'` ⟺ desenlace
+  (`TASK-1765`): en ese orden se pierde el último discriminante que queda. Y **NUNCA** cerrar esa
+  puerta desde acá ampliándole la denylist a `store.ts:1311` — el ADR §5 la cierra estructuralmente.
 - **NUNCA** retirar un literal del enum mientras una política, una CHECK o la escalera de la VIEW lo
   nombren.
 - **NUNCA** buscar y reemplazar `qualified` fuera de `src/lib/hiring/**` + `src/types/hiring*.ts` +
@@ -303,17 +322,34 @@ operador por el tablero ya corregido, o se les asigna por el camino manual. Deci
 
 ### Files owned
 
-- `src/types/hiring.ts` — `HIRING_APPLICATION_STAGES`.
-- `src/types/hiring-assessment-policy.ts` — `OPENING_ASSESSMENT_TRIGGER_STAGES`.
-- `src/lib/copy/dictionaries/{es-CL,en-US}/hiringDesk.ts` — nombres visibles.
-- `src/lib/hiring/notifications/**` — allowlist de etapas que comunican al candidato.
-- Migración nueva en `migrations/`.
+- `src/types/hiring.ts` — `HIRING_APPLICATION_STAGES` **únicamente**. `HIRING_DECISIONS` (línea 126) es
+  de `TASK-1765`.
+- `src/types/hiring-assessment-policy.ts` — `OPENING_ASSESSMENT_TRIGGER_STAGES` y
+  `ASSESSMENT_ASSIGNMENT_TRIGGERS` (el `satisfies` del Slice A). **El comentario de doctrina de
+  `:16-42` es de `TASK-1719`.**
+- `src/lib/copy/dictionaries/{es-CL,en-US}/hiringDesk.ts` — nombres visibles de etapa. **Coordinar con
+  `TASK-1747`**, que trabaja los mismos archivos.
+- `src/lib/hiring/notifications/stage-policy.ts` — **sólo** el mapa
+  `CANDIDATE_FACING_STAGE_LABELS` (allowlist de etapas que comunican al candidato). **NO** se declara
+  `src/lib/hiring/notifications/**`: ese glob lo disputan otras cinco tasks vivas (`TASK-1719`,
+  `TASK-1721`, `TASK-1746`, `TASK-1757`, `TASK-1762`), y reclamarlo entero produciría exactamente la
+  colisión que esta task viene a evitar.
+- `src/views/greenhouse/hiring/PipelineDeskView.tsx` — `LaneDefinition` y sus tres campos de etapa
+  (Slice E). **Ninguna otra task lo declara** y es el archivo donde nació el defecto (`4e1566d9a`).
+- `src/views/greenhouse/hiring/pipeline-lane-contract.test.ts` — se **borra** en el Slice E.
+- Migración nueva en `migrations/` (expand del Slice B; el contract del Slice F es una segunda
+  migración separada).
+
+**Explícitamente NO owned** — declararlos sería invadir a otra task: `src/lib/hiring/decide.ts`,
+`src/lib/hiring/store.ts` (el guard de `:1311` y el `CHECK`) y el `HIRING_DECISIONS` de
+`src/types/hiring.ts` son de `TASK-1765`; `src/lib/hiring/data-origin/purge.ts` es de `TASK-1748`;
+`src/lib/api-platform/resources/app-hiring-candidate-review.ts` es de `TASK-1718`.
 
 ## Current Repo State
 
 **Ya existe:**
 
-- El enum de 12 etapas en `src/types/hiring.ts:109`.
+- El enum de **13** etapas en `src/types/hiring.ts:109` (el «12» que decía esta línea salía de la spec original y quedó desmentido por el readback del 2026-08-20), y el enum de 5 desenlaces `HIRING_DECISIONS` en `:126`.
 - El mapa de nombres visibles en `hiringDesk.ts:97`, con las tres colapsadas.
 - `hiring_application.decision` como campo independiente de la etapa.
 - El ledger `hiring_assessment_assignment`, que registra cada intento de asignación.
@@ -324,10 +360,11 @@ operador por el tablero ya corregido, o se les asigna por el camino manual. Deci
 - No hay señal ni aviso cuando una vacante no tiene política: se comporta igual que una que falló.
 - La allowlist de correos y el mapa del desk nombran distinto la misma etapa.
 
-**Distribución real de filas (verificada 2026-08-19):**
-
-`sourced` 36 · `closed` 32 · `shortlisted` **5** · `screening` 5 · `qualified` 2 · `rejected` 1.
-Las 5 de `shortlisted` son **migración de datos**, no un cambio de enum.
+**Distribución real de filas:** el conteo vigente es el del **2026-08-22**, en «Conteos frescos
+2026-08-22» más arriba. El bloque del 2026-08-19 que vivía acá (`sourced` 36 · `shortlisted` 5 ·
+`qualified` 2) quedó desmentido **dos veces** por readbacks posteriores y se retira: mantenerlo era
+ofrecerle al implementador tres distribuciones distintas de la misma tabla, y la más vieja era la más
+visible.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — EXECUTION PLAN (la llena el agente que toma la task)
@@ -339,38 +376,84 @@ Las 5 de `shortlisted` son **migración de datos**, no un cambio de enum.
 
 ## Scope
 
-- **Slice 1 — Decidir el vocabulario.** Confirmar las seis etapas y sus nombres, y resolver si el
-  correo al candidato dice "Evaluación" o conserva "Preselección" a propósito. Entregable: el mapa
-  cerrado en el wireframe. Sin esto los demás slices no tienen destino.
-- **Slice 2 — Expand.** Agregar la etapa destino al enum y migrar las filas de `qualified`,
-  `shortlisted` y `client_review`, dejando las viejas todavía válidas. Readback obligatorio del
-  conteo por etapa antes y después.
-- **Slice 3 — Redirigir el disparador.** `OPENING_ASSESSMENT_TRIGGER_STAGES` apunta a la etapa nueva,
-  y las políticas existentes que apuntan a `shortlisted` se migran en la misma transacción. **Si la
-  etapa desaparece antes que la política, la política queda apuntando al vacío.**
-- **Slice 4 — Correo y superficies.** La allowlist de progreso y los nombres visibles quedan
-  coherentes en ambos diccionarios.
-- **Slice 5 — Contract.** Retirar las etapas muertas del enum, con readback de que ninguna fila las usa.
+> **El vocabulario NO se decide acá.** El ex-Slice 1 («Decidir el vocabulario») **lo absorbió el ADR**
+> `GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1` (`Accepted` 2026-08-22): las seis
+> etapas están en su §3, el eje de desenlace en su §4, las etiquetas visibles en su §7 y las dos
+> preguntas del correo quedaron cerradas (§10 y Open Questions de esta task). Esta task **ejecuta** ese
+> vocabulario; no lo discute ni lo reabre.
+
+- **Slice A — Paridad estructural, antes de mover un literal.** `satisfies readonly
+  HiringApplicationStage[]` en `OPENING_ASSESSMENT_TRIGGER_STAGES` y `ASSESSMENT_ASSIGNMENT_TRIGGERS`;
+  `Record<HiringApplicationStage, string>` en `copy/types.ts:544` (hoy `Record<string,string>`, así que
+  una clave faltante no rompe nada); tipar el cast de `stage-comms/decide.ts:160`. Compile-time, sin
+  migración.
+- **Slice B — Expand.** Migrar las filas de `qualified` (7) y `client_review` (0) a `shortlisted`,
+  dejando los literales viejos todavía válidos en el `CHECK`. Readback obligatorio del conteo por
+  etapa antes y después. `shortlisted` **conserva su identificador** (ADR §3): no se agrega etapa nueva.
+- **Slice C — Disparador y políticas.** `OPENING_ASSESSMENT_TRIGGER_STAGES` sigue apuntando a
+  `shortlisted`, ahora **alcanzable**; verificar que las 15 políticas y las 20 filas del ledger no
+  requieren migración. **La política se toca antes que la etapa, nunca al revés.**
+- **Slice D — Copy y superficies.** Los nombres visibles quedan coherentes en ambos diccionarios y
+  `en-US` **redefine `stages`** (hoy hereda castellano por spread de `es-CL`). La allowlist
+  candidate-facing **no se toca**: «Preselección» es divergencia deliberada (Open Questions).
+- **Slice E — Estructural.** `LaneDefinition` pasa a UNA etapa por carril en
+  `src/views/greenhouse/hiring/PipelineDeskView.tsx`; se borra `pipeline-lane-contract.test.ts`.
+- **Slice F — Contract, bloqueado por `TASK-1765`.** Retirar `qualified`, `client_review`,
+  `handoff_ready` y las cuatro proyecciones de desenlace (`selected`, `backup`, `rejected`,
+  `withdrawn`) del enum y del `CHECK`, con readback de que ninguna fila las usa.
+
+**Dependencia dura del Slice F (ADR §14, paso 2):** retirar `selected|backup|rejected|withdrawn` del
+enum de etapas **sólo es seguro cuando el eje de desenlace ya los posee**. Si el literal desaparece de
+`stage` antes de que exista el `CHECK` `stage='closed'` ⟺ desenlace, se pierde el último discriminante
+que queda para saber cómo terminó un proceso, y el guard de `store.ts:1311` —que hoy bloquea esos
+cuatro por denylist— se queda protegiendo nombres que ya no existen mientras `closed` sigue abierto.
+Por eso **el Slice F no se ejecuta hasta que `TASK-1765` esté verificada en producción**; los Slices A–E
+no dependen de ella.
 
 ## Out of Scope
 
-- Cambiar el modelo de `decision` (sobrevive tal cual y es lo que hace limpio el colapso de "Cerrado").
-- Invertir el default de la política de assessment — es real y necesario, pero va en una task aparte.
+- **El eje de desenlace completo — lo posee `TASK-1765`.** No es que `decision` "sobreviva tal cual":
+  post-ADR el modelo de desenlace **es** trabajo real (los seis valores, la causa gobernada de
+  `not_selected`, el `CHECK` `stage='closed'` ⟺ desenlace, el command de cierre y la migración de
+  `on_hold` fuera del enum de desenlaces). Esta task no lo diseña ni lo implementa: **consume** su
+  resultado, y por eso su Slice de contract queda bloqueado hasta que exista.
+- El chip de desenlace en la tarjeta y el diálogo de cierre del kanban — superficie de `TASK-1766`.
+- Que `purge.ts` deje de escribir `closed` y pase a un campo de archivado propio (ADR §5) —
+  `TASK-1748`.
+- Invertir el default de la policy de assessment: **ya está hecho** (nace `draft` + `manual`,
+  `assignment-policy/commands.ts:40` y `:202`). Lo que queda vivo es reescribir el comentario de
+  doctrina de `src/types/hiring-assessment-policy.ts:16-42` — dueño `TASK-1719`.
 - Revisar qué plantilla corresponde a cada vacante — task aparte.
 - Rediseñar el pipeline o el desk más allá de los nombres.
+- El rename físico `decision` → `outcome`: deferido por el ADR §11, con su propia migración.
 
 ## Detailed Spec
 
-El mapa completo, las dos naturalezas del colapso y la decisión pendiente del correo están en
-`docs/ui/wireframes/TASK-1754-hiring-stage-vocabulary.md`.
+El mapa visible completo está en `docs/ui/wireframes/TASK-1754-hiring-stage-vocabulary.md`; el
+vocabulario normativo, en el ADR. Las dos preguntas del correo están **cerradas** (ver Open Questions).
 
-**La decisión de diseño central**, que debe tomarse a propósito y no descubrirse después:
+**Lo que se retira, y con qué naturaleza** (ADR §6 — la versión anterior de esta sección decía que
+«"Cerrado" colapsa SIN pérdida porque `decision` sobrevive como campo aparte», y eso es **falso para 2
+de los 5 literales**):
 
-- **"Cerrado" colapsa SIN pérdida** — absorbe cinco etapas terminales, pero `decision` sobrevive como
-  campo aparte. La etapa dice *terminó*, la decisión dice *cómo*.
-- **"Evaluación" colapsa CON pérdida** — absorbe tres etapas y **ningún campo recupera cuál era**. Se
-  acepta porque esas tres nunca fueron elegibles desde la interfaz: no hay intención humana que
-  preservar. Pero es pérdida real y se declara.
+| Literal retirado del enum de etapas | ¿Lo recupera el eje de desenlace? | Naturaleza |
+|---|---|---|
+| `selected` | sí — desenlace `selected` | espejo redundante: `decide` escribía ambos campos con el mismo valor |
+| `backup` | sí — desenlace `backup_selected` | espejo redundante |
+| `rejected` | sí — desenlace `rejected` (o `not_selected`, ADR §9) | espejo redundante |
+| `withdrawn` | sí — desenlace `withdrawn` | espejo redundante |
+| `handoff_ready` | **NO** | **no tiene contraparte en `decision`**: no es un desenlace, es un estado del agregado `handoff`, que tiene su propia máquina (`TASK-356`). Se retira porque **ningún escritor lo produce jamás**, no porque otro campo lo preserve |
+| `qualified`, `client_review` | **NO** | colapso **CON pérdida declarada**: ningún campo recupera cuál era. Se acepta porque nunca fueron elegibles desde ninguna superficie — no hay intención humana que preservar |
+
+**Y `on_hold` no es un cierre.** Hoy está en `HIRING_DECISIONS` (`src/types/hiring.ts:126`) *y* mapea a
+la etapa `decision_pending` (`src/lib/hiring/decide.ts:32`). Post-ADR §6 **deja de ser un desenlace**:
+una pausa vive en la columna «Decisión», no en «Cerrado». Ese cambio lo ejecuta `TASK-1765`, no esta
+task; acá sólo se registra para que nadie lo lea como «`on_hold` → `closed`».
+
+**Consecuencia de método:** «Cerrado» **no** es un colapso sin pérdida que la existencia de `decision`
+haga gratis. Es el punto donde el modelo pasa de un eje a dos, y lo que lo hace seguro no es que el
+campo exista, sino el `CHECK` `stage='closed'` ⟺ desenlace declarado (ADR §5) — que esta task **no**
+implementa.
 
 ## Rollout Plan & Risk Matrix
 
@@ -381,13 +464,18 @@ mientras una política todavía la nombra, esa política queda inerte sin avisar
 silencioso que la task viene a cerrar. El mismo orden que ya mordió una vez con la migración de
 TASK-1746 el 2026-08-19.
 
+**Y una restricción anterior a todas (ADR §14, paso 2): el eje de desenlace entra ANTES que el colapso
+terminal.** El Slice F retira `selected|backup|rejected|withdrawn` del enum de etapas; eso sólo es
+seguro cuando el desenlace ya los posee y el `CHECK` `stage='closed'` ⟺ desenlace existe. Al revés se
+pierde el último discriminante de cómo terminó un proceso. **Bloqueante: `TASK-1765`.**
+
 ### Risk matrix
 
 | Riesgo | Sistema | Prob. | Mitigación | Señal |
 |---|---|---|---|---|
 | Una postulación queda en una etapa que ya no existe | Desk / pipeline | Media | Migración con readback por etapa antes y después | Conteo por etapa |
 | La política queda apuntando a una etapa muerta | Automatización | **Alta si se invierte el orden** | Migrar políticas en la misma transacción que las filas | `hiring_assessment_assignment` sin filas nuevas |
-| El candidato lee un nombre y el operador otro | Comunicación | Media | Slice 4 cierra ambos diccionarios y la allowlist | Revisión del correo real |
+| El candidato lee un nombre y el operador otro | Comunicación | Media | El Slice D cierra ambos diccionarios; la divergencia «Preselección» queda documentada, no corregida | Revisión del correo real |
 | Colisión con TASK-1747 | Desk | **Alta** | Coordinar con la sesión que la trabaja antes de tocar copy | — |
 
 ### Feature flags / cutover
@@ -399,19 +487,23 @@ vez, que es precisamente el problema.
 
 | Slice | Rollback | Tiempo | ¿Reversible? |
 |---|---|---|---|
-| 1 | N/A — sólo decisión documentada | — | Sí |
-| 2 | Down de la migración; las etapas viejas siguen válidas durante el expand | < 15 min | Sí |
-| 3–4 | Revert del PR | < 15 min | Sí |
-| 5 | **Irreversible sin migración nueva** — no ejecutar hasta que 2–4 estén verificados en producción | — | No |
+| A | Revert del PR — sólo tipos | < 15 min | Sí |
+| B | Down de la migración; los literales viejos siguen válidos durante el expand | < 15 min | Sí |
+| C–E | Revert del PR | < 15 min | Sí |
+| F | **Irreversible sin migración nueva** — no ejecutar hasta que A–E estén verificados en producción **y `TASK-1765` haya entregado el eje de desenlace** | — | No |
 
 ### Production verification sequence
 
 Readback del conteo por etapa antes y después. Una postulación real movida a "Evaluación" que recibe
-su test. Y el correo de progreso recibido, para confirmar que nombra la etapa igual que el desk.
+su test, con su fila en el ledger. El desk leído con locale `en-US` mostrando las seis columnas en
+inglés (hoy hereda castellano). Y el correo de progreso recibido, para confirmar que dice
+«Preselección» **a propósito** — la divergencia con «Evaluación» del desk es la decisión, no el
+defecto. Antes del Slice F, además: readback de que ninguna fila, policy, ledger ni `CHECK` nombra un
+literal retirado, y que las escaleras de `assessment_fairness` **siguen** nombrándolos.
 
 ### Out-of-band coordination required
 
-La decisión del Slice 1 es del operador. Y la coordinación con la sesión que trabaja TASK-1747.
+El vocabulario ya lo decidió el operador en el ADR; no queda decisión de producto pendiente acá. Sí queda coordinación viva: con la sesión que trabaja `TASK-1747` (mismos diccionarios de copy), con `TASK-1765` antes de ejecutar el Slice F, y con `TASK-1718` antes de retirar literales que su lane programático pueda estar filtrando.
 
 ## Modular Placement Contract
 
@@ -481,8 +573,24 @@ La decisión del Slice 1 es del operador. Y la coordinación con la sesión que 
 - [ ] Ninguna política queda apuntando a una etapa inexistente (readback).
 - [ ] Una postulación real movida a "Evaluación" recibe su assessment, con fila en el ledger.
 - [ ] El nombre de la etapa en el correo al candidato coincide con el del desk, o la divergencia está
-      documentada con su razón.
-- [ ] Los dos diccionarios de copy (es-CL, en-US) están alineados.
+      documentada con su razón. **Es el segundo caso:** «Preselección» ≠ «Evaluación» es deliberada
+      (decisión del operador 2026-08-22) y debe quedar escrita con su razón en la doc funcional, para
+      que un agente futuro no la lea como drift.
+- [ ] Los dos diccionarios de copy (es-CL, en-US) están alineados, y **`en-US` redefine `stages`**: hoy
+      hereda los nombres en castellano por `...esCL` (`dictionaries/en-US/hiringDesk.ts:6`) y nunca
+      sobreescribe esa clave. Verificar leyendo el desk con locale `en-US`, no sólo el diff.
+- [ ] **Los literales retirados SIGUEN nombrados en las tres escaleras de rango de la VIEW
+      `greenhouse_hiring.assessment_fairness`** (`migrations/20260713173500000_…:71-119`:
+      `stage_targets`, el `CASE` de `event_progress` y el `CASE` de `application_progress`) mapeados a
+      su rango nuevo. **No** se retiran del `CASE` al retirarlos del enum: los payloads de
+      `outbox_events` son inmutables y son la única memoria del avance de una persona rechazada. Son
+      **tabla de traducción histórica**, no espejo del vocabulario vigente (ADR §12). Verificar que un
+      `application_id` con eventos históricos en `qualified` conserva su rango después del contract.
+- [ ] La deduplicación de esa escalera (paso 6 del «Plan restante») **no** convierte los `ELSE 0` en
+      `ELSE NULL` ni pierde un literal histórico al derivar los dos `CASE` por join.
+- [ ] `assertEnum` no rompe ninguna lectura: ninguna fila de policy, ledger o `CHECK` nombra un literal
+      retirado en el momento del contract (readback, no inspección de código — corre en el camino de
+      LECTURA y esas filas son irreescribibles).
 - [ ] GVC del pipeline en desktop y 390 px con las seis columnas.
 - [ ] `UI ready` pasa a `yes` sólo con mapping, plan GVC y decision log completos.
 
@@ -494,11 +602,23 @@ La decisión del Slice 1 es del operador. Y la coordinación con la sesión que 
 
 - [ ] Handoff y changelog actualizados.
 - [ ] Lifecycle a `complete` y `docs/tasks/README.md` + registry sincronizados.
-- [ ] Si el Slice 1 cambia la dirección, la task se replantea antes de migrar.
+- [ ] El Slice F no se marca hecho sin confirmar que `TASK-1765` está verificada en producción.
 
 ## Follow-ups
 
-- **Task nueva (ID por reservar)** — invertir el default de la política de assessment y revisar la plantilla por vacante.
+- ~~**Task nueva (ID por reservar)** — invertir el default de la política de assessment.~~ **YA ESTÁ
+  HECHO (verificado 2026-08-22):** toda policy nace `draft` + `manual`
+  (`src/lib/hiring/assessment/assignment-policy/commands.ts:40` resuelve el default a `'manual'` y
+  `:202` lo documenta como «D5.1 al pie de la letra: toda policy NACE `draft` + `manual`»). **No
+  reservar un ID por esto.**
+- **Lo que sí queda vivo, y su dueño ya existe:** reescribir el comentario de doctrina de
+  `src/types/hiring-assessment-policy.ts:16-42`, que justifica `shortlisted` porque «la población ya
+  está acotada» y «el pedido tiene contrapartida». Al absorber `qualified`, la población se ensancha y
+  ese argumento deja de ser cierto. **Dueño: `TASK-1719`** (posee ese archivo y su ADR). Dejarlo como
+  está es la deriva silenciosa que produjo este incidente.
+- **Revisar qué plantilla corresponde a cada vacante** — sigue sin dueño; task aparte cuando se priorice.
+- **Señal de fiabilidad «vacante activa sin política de assessment»** — hoy ese estado es
+  indistinguible de una política que falló. Va con la task de plantilla por vacante.
 
 ## Open Questions
 
@@ -507,7 +627,7 @@ La decisión del Slice 1 es del operador. Y la coordinación con la sesión que 
 - ~~¿El correo al candidato dice "Evaluación" o conserva "Preselección"?~~ **RESUELTA 2026-08-22
   por el operador: conserva "Preselección".** Es una divergencia **deliberada** con el "Evaluación"
   del desk, no un defecto: hacia afuera el registro es más suave, y evita chocar con el correo del
-  test que ya dice "tienes una evaluación pendiente". El Slice 4 **no toca** la allowlist
+  test que ya dice "tienes una evaluación pendiente". El Slice D **no toca** la allowlist
   (`notifications/stage-policy.ts`); sí debe **documentar la divergencia con su razón** en la doc
   funcional, para que un agente futuro no la lea como drift y la "arregle". La recomendación de
   Talento del 2026-08-20 ("En evaluación") queda **descartada**.

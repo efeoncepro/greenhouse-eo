@@ -29,12 +29,12 @@
 
 Añade a Application 360 un segundo paso explícito cuando una selección completa los cupos: muestra la cohorte y
 las consecuencias, permite revisar backups/holds y confirma “Cerrar vacante y notificar a N personas” sin calcular
-reglas en browser. El rechazo individual conserva su confirmación y gana copy más humano.
+reglas en browser. La decisión individual conserva su confirmación y gana copy más humano.
 
 ## Why This Task Exists
 
 El efecto masivo no puede quedar implícito en el botón `Decidir` ni enterrado en un toast. Sin preview visible, el
-operador no puede distinguir selección, cierre de publicación y rechazo de la cohorte ni detectar un estado stale.
+operador no puede distinguir selección, cierre de publicación y el desenlace de la cohorte ni detectar un estado stale.
 
 ## Goal
 
@@ -44,9 +44,33 @@ operador no puede distinguir selección, cierre de publicación y rechazo de la 
 
 <!-- ZONE 1 — CONTEXT & CONSTRAINTS -->
 
+## Delta 2026-08-22 — ADR del vocabulario de etapas y desenlace
+
+Se aceptó `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md` (`Accepted`), primer ADR del vocabulario del pipeline. Fija **dos ejes**:
+`stage` = dónde va la persona en el recorrido (6 valores, uno por columna; `closed` se queda y **es
+escribible**) y **desenlace** = cómo terminó (`selected`, `backup_selected`, `not_selected`, `rejected`,
+`withdrawn`, `unresponsive`) + **causa gobernada** obligatoria en `not_selected` (`capacity_filled`,
+`opening_closed`, `process_cancelled`). Invariante como `CHECK`: **`stage='closed'` ⟺ desenlace declarado**.
+El eje de desenlace lo implementa `TASK-1765`; la superficie del kanban, `TASK-1766`; el embudo de equidad,
+`TASK-1767`.
+
+**Hereda la enmienda de `TASK-1762`, y tiene copy visible que viola el ADR §12.**
+
+- **`docs/ui/wireframes/TASK-1763-*.md`** declara como señal primaria del diálogo
+  *«N personas serán rechazadas y notificadas»*. Eso es copy que se muestra, y el ADR §12 lo prohíbe:
+  **NUNCA usar `rejected` para un cierre en el que no hubo juicio sobre la persona.** Debe decir
+  «N personas quedarán **sin selección** y serán notificadas».
+- Su empty state («puedes cerrar la vacante sin enviar rechazos») y el vocabulario de los docs de motion y
+  dirección visual («no dramatiza el rechazo») se corrigen igual.
+- **El diálogo debe mostrar el desenlace y la causa** que se van a escribir. Hoy sólo muestra cupos, N y
+  categorías.
+- Coordinación: es el cuarto escritor de `hiringDesk.ts`. Se particiona **por clave, no por archivo** —
+  ver el Delta de `TASK-1747`.
+
 ## Architecture Alignment
 
-- `docs/architecture/GREENHOUSE_HIRING_OPENING_CAPACITY_CLOSURE_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_HIRING_OPENING_CAPACITY_CLOSURE_DECISION_V1.md` (enmendada por el ADR de vocabulario §9)
+- `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md` (§7.1 vocabulario visible · §9 enmienda · §12 reglas duras)
 - `docs/architecture/agent-invariants/UI_PLATFORM_AGENT_INVARIANTS.md`
 - `docs/architecture/ui-platform/README.md`
 - `docs/ui/GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`
@@ -72,9 +96,16 @@ operador no puede distinguir selección, cierre de publicación y rechazo de la 
 
 - `src/views/greenhouse/hiring/Application360View.tsx` y componentes locales de confirmación
 - `src/app/(dashboard)/agency/hiring/applications/[applicationId]/page.tsx`
-- `src/lib/copy/dictionaries/{es-CL,en-US}/hiringDesk.ts`
+- `src/lib/copy/dictionaries/{es-CL,en-US}/hiringDesk.ts` — **sólo el bloque `hiringDesk.application.capacityClosure.*`**
 - `docs/ui/motion/TASK-1763-hiring-capacity-closure-confirmation-motion.md`
 - GVC scenario/dossier de `TASK-1763`
+
+**Coordinación de `hiringDesk.ts` — cuatro escritores concurrentes.** El diccionario lo escriben a la vez
+`TASK-1747` (claves de la card de assessment), `TASK-1754` (claves de `stages`), `TASK-1763` (claves de capacity
+closure) y `TASK-1766` (claves nuevas de desenlace y causa). **Se particiona por CLAVE, no por archivo:** esta task
+es dueña únicamente de sus claves de capacity closure, **consume** las etiquetas de desenlace y causa que define
+`TASK-1766` en vez de duplicarlas, y no renombra ni borra claves ajenas. `TASK-1747` está `in-progress` con sesión
+activa: cierra primero y esta task rebasa sobre ella.
 
 ## Current Repo State
 
@@ -223,6 +254,14 @@ El flujo muestra dos resultados independientes: “Decisión registrada” y “
 completa capacidad, no aparece el segundo paso. Si la completa, el preview nombra cupos, N afectado, categorías y
 efecto de comunicación. El CTA contiene verbo+objeto+N. Cancelar deja la selección registrada y no cierra nada.
 
+**El diálogo muestra el desenlace y la causa que se van a escribir, no sólo el conteo.** Antes de confirmar, la
+superficie declara textualmente que en cada candidatura de la cohorte se registrará el desenlace `not_selected`
+(«Sin selección») con causa `capacity_filled` — la enmienda del ADR §9 — y que **nadie queda marcado como
+«Descarte»**. Ese par viene del DTO de preview de `TASK-1762`; sus etiquetas visibles salen de las claves de
+desenlace y causa que define `TASK-1766`, que esta task consume sin redefinir. Ninguna superficie de este flujo
+llama «rechazo» al cierre por capacidad (ADR §12). La persona candidata nunca lee la etiqueta interna: su correo
+es el de `not_selected + capacity_filled` («esta vez elegimos a otra persona»), propiedad de `TASK-1762`.
+
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
@@ -253,6 +292,8 @@ efecto de comunicación. El CTA contiene verbo+objeto+N. Cancelar deja la selecc
 - [ ] Registrar selección y cerrar/notificar son pasos visual y semánticamente distintos.
 - [ ] CTA final incluye el número real de personas y no puede confirmarse con preview stale.
 - [ ] Cancelar no revierte la selección ni ejecuta cierre.
+- [ ] El diálogo muestra el desenlace `not_selected` («Sin selección») y la causa `capacity_filled` antes de confirmar.
+- [ ] Ninguna superficie del flujo nombra este cierre como «rechazo» ni escribe el desenlace `rejected`.
 - [ ] Backups/holds se muestran como categorías explícitas y no se incluyen silenciosamente.
 - [ ] Loading, empty, stale, denied, error y partial failure son honestos y recuperables.
 - [ ] Copy reusable está tokenizada y revisada con UX content/accessibility.

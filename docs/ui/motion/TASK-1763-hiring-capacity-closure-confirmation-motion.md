@@ -11,7 +11,8 @@
 ## Intent
 
 La transición sólo explica que comienza o termina un segundo paso. No celebra una contratación ni dramatiza el
-rechazo. El cambio importante se comunica por título, conteos, copy y foco; motion nunca carga significado exclusivo.
+desenlace. El cambio importante se comunica por título, conteos, desenlace y causa, copy y foco; motion nunca carga
+significado exclusivo.
 
 ## State Transitions
 
@@ -29,6 +30,8 @@ rechazo. El cambio importante se comunica por título, conteos, copy y foco; mot
 - El CTA reserva ancho para que el estado pending no mueva acciones.
 - Escape/click-away sólo funcionan antes de submit; motion no retrasa ni altera esta regla.
 - `partial_failed` permanece visible y estático; no se representa con color o animación intermitente.
+- El chip de desenlace («Sin selección») y su causa aparecen sin énfasis punitivo: ni sacudida, ni pulso, ni color de
+  alarma. El desenlace se lee, no se dramatiza.
 - El live region anuncia una sola transición semántica por cambio de status.
 
 ## Tokens and implementation
@@ -49,3 +52,4 @@ rechazo. El cambio importante se comunica por título, conteos, copy y foco; mot
 - [ ] Pending/status no producen layout shift ni double-submit.
 - [ ] Reduced motion conserva significado, foco y resultado.
 - [ ] No existe motion celebratoria, punitiva o auto-dismiss para este flujo.
+- [ ] El desenlace y la causa entran con la misma transición que el resto del contenido, sin acento propio.

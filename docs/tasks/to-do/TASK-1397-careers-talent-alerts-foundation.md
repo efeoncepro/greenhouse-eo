@@ -49,6 +49,27 @@ El prototipo de Careers llama “Banco de talento” a una caja de email, pero e
      ZONE 1 — CONTEXT & CONSTRAINTS
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-22 — ADR del vocabulario de etapas y desenlace
+
+Se aceptó `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md` (`Accepted`), primer ADR del vocabulario del pipeline. Fija **dos ejes**:
+`stage` = dónde va la persona en el recorrido (6 valores, uno por columna; `closed` se queda y **es
+escribible**) y **desenlace** = cómo terminó (`selected`, `backup_selected`, `not_selected`, `rejected`,
+`withdrawn`, `unresponsive`) + **causa gobernada** obligatoria en `not_selected` (`capacity_filled`,
+`opening_closed`, `process_cancelled`). Invariante como `CHECK`: **`stage='closed'` ⟺ desenlace declarado**.
+El eje de desenlace lo implementa `TASK-1765`; la superficie del kanban, `TASK-1766`; el embudo de equidad,
+`TASK-1767`.
+
+**El ADR cambia quién es elegible para el Talent Pool, y por lo tanto para estas alertas.**
+
+- **`not_selected` es la población objetivo del pool** (ADR §4): la gente que llegó al final y no quedó es
+  justamente la que se quiere re-contactar. Hoy es indistinguible de `rejected`.
+- **Cambio de comportamiento a declarar (hallazgo H-24, sin dueño):** la elegibilidad se deriva hoy de
+  `stage NOT IN ('rejected','withdrawn','closed')` en 7 sitios, así que `selected`, `backup` y
+  `handoff_ready` cuentan como **activas** y quedan **fuera** del pool. Con el colapso terminal pasan a «no
+  activas» de golpe, y **personas ya seleccionadas se vuelven elegibles para el pool y para estas alertas**.
+  Es discutiblemente una corrección, pero es un cambio sobre personas reales: **hay que decidirlo, no
+  descubrirlo**.
+
 ## Architecture Alignment
 
 Revisar y respetar:

@@ -76,6 +76,28 @@ de EPIC-038.
      existe en el repo, reporta antes de continuar.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-22 — ADR del vocabulario de etapas y desenlace
+
+Se aceptó `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md` (`Accepted`), primer ADR del vocabulario del pipeline. Fija **dos ejes**:
+`stage` = dónde va la persona en el recorrido (6 valores, uno por columna; `closed` se queda y **es
+escribible**) y **desenlace** = cómo terminó (`selected`, `backup_selected`, `not_selected`, `rejected`,
+`withdrawn`, `unresponsive`) + **causa gobernada** obligatoria en `not_selected` (`capacity_filled`,
+`opening_closed`, `process_cancelled`). Invariante como `CHECK`: **`stage='closed'` ⟺ desenlace declarado**.
+El eje de desenlace lo implementa `TASK-1765`; la superficie del kanban, `TASK-1766`; el embudo de equidad,
+`TASK-1767`.
+
+**El ADR §10 le agrega una obligación al carril programático.**
+
+El filtro `stage` de `app-hiring-candidate-review.ts:206` entra como **texto libre**, se lava con
+`stage as never` en el reader, y ante un literal inexistente responde **`200 {items: []}`** — indistinguible
+de «no hay nadie en esa etapa» (hallazgo H-10). El DTO declara `stage: string`, más débil que el enum que sí
+valida el `PATCH`.
+
+Correcciones: tipar `stage` contra `HiringApplicationStage` y devolver **error canónico**, no cero filas.
+Es especialmente urgente con el colapso en curso: un agente que filtre por una etapa retirada recibiría
+silencio en vez de un error. Nota: el fixture de test del propio reader usa `stage: 'assessment'`, que **no
+existe en el enum** — pasa porque los fixtures son object literals sin `satisfies`.
+
 ## Architecture Alignment
 
 Revisar y respetar:
