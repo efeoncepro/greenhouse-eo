@@ -3,6 +3,23 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-22 — Mover a «Evaluación» ya no guarda una etapa distinta de la que muestra
+
+- El tablero mostraba seis columnas sobre trece etapas del dominio, y tres de ellas se veían todas como
+  «Evaluación». Soltar una tarjeta ahí guardaba `qualified`, mientras la automatización de pruebas vigilaba
+  `shortlisted`: **quince vacantes tenían su política bien configurada y ninguna disparaba**, sin que en pantalla
+  se viera nada raro. Dos candidatas reales cruzaron esa columna el 2026-08-19 y no recibieron su prueba.
+- Ahora hay una etapa por columna. `qualified` y `client_review` se absorbieron en `shortlisted`, y el carril del
+  tablero declara **una sola** etapa: la que lo titula es la que se escribe, así que ese error dejó de poder
+  cometerse. Siete postulaciones reales se movieron con el cambio y quedan visibles en la cola de reconciliación
+  de su vacante para que una persona decida si corresponde asignarles la prueba.
+- El desk leído en inglés mostraba las seis columnas en castellano: heredaba los nombres del diccionario es-CL sin
+  sobreescribirlos. Ya no.
+- **«Preselección» en el correo al candidato y «Evaluación» en el tablero se conservan distintos a propósito.**
+  Hacia afuera el registro es más suave, y decirle «Evaluación» chocaría con el correo del test, que ya dice
+  «tienes una evaluación pendiente». Queda escrito con su razón para que nadie lo lea como error.
+- Nada de esto está en producción todavía: allí mover a «Evaluación» sigue guardando la etapa vieja.
+
 ## 2026-08-22 — Demo 35 queda documentada antes de tocar la home del blog
 
 - La página candidata se revalidó read-only: siete raíces, 113 nodos y 15 widgets de posts; cuatro ya están
@@ -958,14 +975,3 @@ estuviera elegida cuando no hay valor. El sexto y último correo del ciclo (sele
 ejercitó en vivo, el scorecard visual formal quedó en PASS con capturas de escritorio y móvil, y la
 revisión de privacidad de los tres campos quedó documentada con dos recomendaciones no bloqueantes.
 De paso se cazó un flake real del CI (timer de verificación de email que dispara tras el teardown).
-
-## 2026-08-12 — Los emails de hiring y el contacto completo de Careers quedaron VIVOS en producción
-
-Rollout completo en una sesión: el flag de los 6 emails del ciclo de contratación quedó prendido en
-el ops-worker (con default durable en deploy.sh), un ejercicio E2E real con los commands canónicos
-recorrió postulación → preselección → evaluación → rechazo y los 5 correos salieron `sent` con
-asuntos personalizados (el aviso interno llegó a people@efeoncepro.com con teléfono, país y mensaje
-del candidato). El Growth Form de careers se republicó (v4) con el país de residencia para cerrar la
-paridad nativa, y el release `393144e9f` promovió todo a producción por el control plane (manifest
-`released`, watchdog ok, campo país verificado en vivo). Quedan como pendientes menores la revisión
-de Privacy, el flip del país a requerido-en-parser y el scorecard GVC formal.

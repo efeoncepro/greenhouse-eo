@@ -317,3 +317,30 @@ Pesa el doble en este repo porque **hay una sola instancia de Cloud SQL** compar
 ### Lo que este delta NO cambia
 
 `decision` conserva su nombre físico (§11). Las escaleras de rango de la VIEW de equidad quedan intactas: son tabla de traducción histórica y su definición viva está en `migrations/20260713173500000_task-1365-application-scoped-selfid-hardening.sql`, **no** en la copia superseded de `20260713165547000_*`.
+
+---
+
+## 17. Delta de implementación — 2026-08-22 (`TASK-1754`, eje de ETAPA)
+
+Complementa el §16, que cubrió el eje de desenlace. Acá entra el eje de etapa, en la mitad **expand**.
+
+### Aplicado en base y en código
+
+| Sección | Qué entró | Dónde |
+|---|---|---|
+| §3 | `qualified` y `client_review` **absorbidas en `shortlisted`** — expand aplicado contra la instancia compartida. Readback: `qualified` 7 → 0, `shortlisted` 4 → 11, total 83 sin cambio; `client_review` ya estaba en 0 | `migrations/20260822222736803_*` |
+| §14 paso 3 | El subconjunto escribible `HIRING_PIPELINE_STAGES` pierde los dos literales **antes** que el `CHECK`. Es el orden del §16: primero se corta el escritor, después se angosta la base | `src/types/hiring.ts` |
+| §3 | El disparador y el ledger declaran `satisfies` contra `HiringApplicationStage`; el mapa de copy pasa a `Record<HiringApplicationStage, string>`; muere el cast `ctx.stage as 'shortlisted' \| 'interview'` | `src/types/hiring-assessment-policy.ts`, `src/lib/copy/types.ts`, `src/lib/hiring/stage-comms/decide.ts` |
+| §8 | El carril del kanban declara **UNA** etapa (`stage`), que titula y se escribe. Lo que agrupa se separó en `absorbs`, con nombre propio: mezclarlos fue lo que permitió que el destino fuera uno de los agrupados | `src/views/greenhouse/hiring/PipelineDeskView.tsx` |
+| §7.1 | `en-US` **redefine** `pipeline.stages`. Heredaba por spread, así que el desk en inglés mostraba las seis columnas en castellano — sin línea que mirar en ningún diff | `src/lib/copy/dictionaries/en-US/hiringDesk.ts` |
+| — | Paridad enum ↔ `CHECK` derivada de los dos lados, contra PostgreSQL real; y el tablero renderizado con cada diccionario | `stage-enum-check-parity.live.test.ts`, `pipeline-desk-locale.test.tsx`, `hiring-desk-stage-locale-parity.test.ts` |
+
+### Pendiente, con condición de ejecución declarada
+
+**El contract del enum de etapas** —retirar `qualified`, `client_review`, `handoff_ready` y las cuatro proyecciones de desenlace del `CHECK`— **no está escrito todavía**, por el §16: se aplica después del release que retira el escritor. Hoy `origin/main` sigue escribiendo `qualified` al arrastrar a «Evaluación» (la mitigación `4e1566d9a` no está en producción), y los cuatro espejos terminales necesitan además que el eje de desenlace esté verificado en producción (§14 paso 2).
+
+### Dos hallazgos del expand que la auditoría no tenía
+
+1. **Migrar por SQL no deja las filas mudas del todo.** No emite `stage_changed` —eso lo produce el command, no la base— así que ni correo ni prueba automática. Pero `resolveApplicationsAwaitingAssignment` deriva del **estado vigente**, no del evento, así que las filas migradas **sí aparecen en la cola de reconciliación de su vacante**. Esa cola es read-only (su único consumidor no-test es un `GET`), de modo que nada se asigna solo: queda operable para que una persona decida. Es el resultado correcto y conviene decirlo, porque la spec afirmaba que quedaban «igual de mudas».
+
+2. **La retención de recuperación de acceso ramifica por literales que este eje retira.** El trigger `refresh_assessment_access_recovery_retention_for_application` decide `retention_class` y `retention_expires_at` con `NEW.stage = 'selected'` **y** `NEW.decision = 'selected'`, y con `NEW.stage IN ('rejected','withdrawn')` **o** `NEW.decision IN (…)`. Las ramas por `stage` mueren con el contract; las que sobreviven por `decision` **no cubren `backup_selected`, `not_selected` ni `unresponsive`** — los tres desenlaces que el §4 introdujo. Su rama `ELSE` deja `retention_expires_at` en `NULL`, o sea **sin vencimiento**, y `not_selected` es la población más grande del §4. Hoy no muerde porque la tabla está vacía. Es trabajo del eje de desenlace (`TASK-1765`), no de éste.
