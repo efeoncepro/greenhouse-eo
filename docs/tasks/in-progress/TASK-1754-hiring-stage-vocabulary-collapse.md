@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-011`
-- Status real: `Slice 0 (mitigación) commiteado; el colapso —que es la solución de fondo— NO empezado`
+- Status real: `Slice 0 en develop y NO en produccion; el colapso de fondo NO empezado; vocabulario cerrado`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -126,6 +126,62 @@ faltaba configuración: toda la que había apuntaba a una etapa inalcanzable.
 `archiveSyntheticRecords` (`purge.ts:173`), que hace `UPDATE ... SET stage='closed'` sin tocar
 `decision`. **No son candidatos ignorados.** El proceso real ha cerrado UNA postulación y sí tiene
 su decisión. La premisa "Cerrado colapsa sin pérdida" no está desmentida: está **sin estrenar**.
+
+### Arqueología 2026-08-22 — cuándo se desvió, y por qué la verificación no lo atrapó
+
+Reconstruido del log append-only `hiring.application.stage_changed` en `outbox_events` (222.801
+eventos; sin índice por `event_type`, seq scan de ~140 MB, aceptable para un diagnóstico puntual).
+El payload sólo lleva `stage`, `actorUserId` y `applicationId` — **no lleva etapa previa**, que es
+justamente por qué la reconciliación no puede recuperar un trigger perdido.
+
+**El dato que cierra el caso — autoría histórica de cada escritura de etapa:**
+
+| Etapa escrita | Humano | Agente E2E | Script (actor null) |
+|---|---|---|---|
+| `qualified` | **10** | 0 | 0 |
+| `shortlisted` | **0** | 5 | 1 |
+| `screening` | 6 | 6 | 0 |
+| `interview` | 3 | 0 | 0 |
+| `sourced` | 5 | 0 | 0 |
+
+**Ningún operador movió jamás una tarjeta a `shortlisted`.** Las 6 escrituras que existen salieron
+de `scripts/hiring/_sanity-task1689-lifecycle-emails-e2e.ts` (1, con actor `null`) y de
+`user-agent-e2e-001` (5). Los 10 movimientos humanos a la columna "Evaluación" cayeron **todos** en
+`qualified`.
+
+**Consecuencia para el método, no sólo para el bug:** el commit de doctrina `cff96f16b`
+(2026-08-17) sí verificó contra la base antes de fijar el disparador — su mensaje cita "9
+shortlisted" y concluye que la etapa se usa. La verificación fue real y la conclusión falsa, porque
+la pregunta era **"¿hay filas acá?"** en vez de **"¿puede un operador escribir acá?"**. Las 9 filas
+las habían puesto robots. **NUNCA** tomar presencia de filas como prueba de alcanzabilidad de una
+etapa: filtrar por autoría humana, o derivar la alcanzabilidad del contrato de la superficie.
+
+**Cronología de la deriva (fechas verificadas contra git + PG):**
+
+| Fecha | Qué pasó |
+|---|---|
+| 2026-07-07 | `TASK-353` crea el CHECK de 13 etapas. |
+| 2026-07-09 | `559f5654b` (`TASK-355`) crea el tablero de 6 columnas. **El carril "Evaluación" nace con `titleStage: 'shortlisted'` y `destination: 'qualified'`** — el defecto está en la PRIMERA versión del archivo, no se introdujo después. El wireframe `TASK-355-hiring-desk.md:71` afirma literalmente `columnas = etapas canónicas`, y además nombra la tercera columna **"Assessment"** (un tercer nombre para lo mismo). |
+| 2026-07-10 | Primer movimiento humano a "Evaluación" → `qualified`. Sin consecuencia: nada automático miraba la etapa. |
+| 2026-08-12 | `TASK-1689` ata el correo de avance a `shortlisted`. Primera dependencia automática. Mismo día, el script de sanity escribe la primera fila de la historia en esa etapa. |
+| 2026-08-16 | El agente E2E escribe 5 filas más en `shortlisted`. La etapa ya "parece" viva desde afuera. |
+| 2026-08-17 | `cff96f16b` fija `shortlisted` como etapa canónica del disparador. **La doctrina es correcta; movió el trigger desde `interview` —la única de las dos alcanzable— hacia la que nunca lo fue.** |
+| 2026-08-19 | 10 políticas configuradas ese día, todas en `shortlisted`. Dos postulaciones reales cruzan "Evaluación" sin recibir prueba. |
+| 2026-08-20 | Slice 0 (`4e1566d9a`). Ese mismo día, 5 movimientos humanos más caen en `qualified`. |
+
+**⚠️ La mitigación NO está en producción (verificado 2026-08-22):** `4e1566d9a` no es ancestro de
+`origin/main`. En producción, mover una tarjeta a "Evaluación" **sigue escribiendo `qualified` y
+sigue sin disparar**. Primera decisión operativa, anterior a cualquier slice: si esa corrección de
+una línea sube sola o espera al resto.
+
+**Conteos frescos 2026-08-22** (el bloque de 2026-08-20 quedó viejo): `sourced` 31 · `closed` 32
+(todas `smoke_test`) · **`qualified` 7** · `screening` 5 · `shortlisted` 4 · `interview` 3 ·
+`rejected` 1 · `client_review` **0**. **15 políticas** (12 `on_stage_entry`/`enabled`, 2
+`on_stage_entry`/`disabled`, 1 `manual`/`enabled`), **las 15 en `shortlisted`**. Ledger: 20 filas
+`shortlisted` + 3 `manual`.
+
+Documento de diagnóstico para el operador (línea de tiempo + orden de desarme):
+<https://claude.ai/code/artifact/5b23dc9b-c027-40aa-bc68-84f965344fbb>
 
 ### Decisiones tomadas (arquitectura + talento, 2026-08-20)
 
@@ -412,7 +468,15 @@ La decisión del Slice 1 es del operador. Y la coordinación con la sesión que 
 
 ## Open Questions
 
-- ¿El correo al candidato dice "Evaluación" o conserva "Preselección" a propósito? **Lo decide el
-  Slice 1 y afecta al Slice 4.**
-- ¿La etapa nueva se llama `evaluation` o se reusa uno de los tres nombres existentes? Reusar
-  `shortlisted` ahorra migrar 5 filas pero conserva un nombre que no coincide con lo que se ve.
+**Las dos quedaron CERRADAS. No reabrir sin decisión explícita del operador.**
+
+- ~~¿El correo al candidato dice "Evaluación" o conserva "Preselección"?~~ **RESUELTA 2026-08-22
+  por el operador: conserva "Preselección".** Es una divergencia **deliberada** con el "Evaluación"
+  del desk, no un defecto: hacia afuera el registro es más suave, y evita chocar con el correo del
+  test que ya dice "tienes una evaluación pendiente". El Slice 4 **no toca** la allowlist
+  (`notifications/stage-policy.ts`); sí debe **documentar la divergencia con su razón** en la doc
+  funcional, para que un agente futuro no la lea como drift y la "arregle". La recomendación de
+  Talento del 2026-08-20 ("En evaluación") queda **descartada**.
+- ~~¿La etapa nueva se llama `evaluation` o se reusa un nombre existente?~~ **RESUELTA 2026-08-20:
+  se reusa `shortlisted`**; ver "Lo que NUNCA se debe hacer" (introducir `evaluation` está
+  prohibido).
