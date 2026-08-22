@@ -7774,6 +7774,9 @@ export interface GreenhouseHiringHiringApplication {
   created_at: Generated<Timestamp>;
   created_by: string | null;
   data_origin: Generated<string>;
+  /**
+   * TASK-1765 — DESENLACE del recorrido, no «lo que Efeonce decidió»: `withdrawn` y `unresponsive` no son decisiones de Efeonce. Seis valores. El rename físico a `outcome` queda deferido (ADR §11).
+   */
   decision: string | null;
   decision_at: Timestamp | null;
   decision_by: string | null;

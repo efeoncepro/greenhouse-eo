@@ -261,7 +261,7 @@ export const hiringDesk: HiringDeskCopy = {
       unavailable: {
         assessment_recovery_method_not_supported:
           'Esta evaluación no se rinde con enlace, así que no hay acceso que recuperar.',
-        // Dispara con CUALQUIER decisión registrada, incluidas `selected` y `on_hold`: decir
+        // Dispara con CUALQUIER desenlace registrado, incluido `selected`: decir
         // "cerrada" daría por fuera del proceso a alguien que sigue vivo en él.
         assessment_recovery_application_closed:
           'Esta candidatura ya tiene una decisión registrada, así que el test no se recupera. Revísala en la pestaña Decisión.',

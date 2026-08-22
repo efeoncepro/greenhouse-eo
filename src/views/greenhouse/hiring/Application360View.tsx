@@ -101,7 +101,6 @@ const DECISION_OPTIONS: Array<{ value: HiringDecision; label: string }> = [
   { value: 'backup_selected', label: 'Seleccionar como backup' },
   { value: 'rejected', label: 'Descartar' },
   { value: 'withdrawn', label: 'Registrar retiro' },
-  { value: 'on_hold', label: 'Dejar en espera' },
 ]
 
 const DESTINATIONS: Array<{ value: HiringFulfillmentMode; label: string }> = [
@@ -1702,15 +1701,20 @@ const Application360View = ({
             <Grid size={{ xs: 12 }}>
               <Typography variant='body2' fontWeight={650} sx={{ mb: 1 }}>{copy.application.decisionType}</Typography>
               <Grid container spacing={2.5}>
+                {/*
+                  TASK-1765 — «En espera» ya no está: una pausa NO es un desenlace. Se registra
+                  moviendo la ETAPA a «Decisión» desde el tablero, no cerrando el proceso de alguien.
+                  Al quedar dos opciones pasan de `sm: 4` a `sm: 6` para que la fila no quede coja.
+                  El chip de desenlace y el diálogo que ofrece los seis valores son de TASK-1766.
+                */}
                 {[
                   ['selected', copy.application.decisionAdvance, 'tabler-arrow-up-right', 'success'],
                   ['rejected', copy.application.decisionReject, 'tabler-x', 'error'],
-                  ['on_hold', copy.application.decisionHold, 'tabler-player-pause', 'warning'],
                 ].map(([value, label, icon, tone]) => {
                   const active = decision === value
 
                   return (
-                    <Grid key={value} size={{ xs: 12, sm: 4 }}>
+                    <Grid key={value} size={{ xs: 12, sm: 6 }}>
                       <Box
                         component='button'
                         type='button'
@@ -1758,7 +1762,7 @@ const Application360View = ({
           {[...decisionHistory].reverse().map((entry) => (
             <Paper key={entry.decisionId} variant='outlined' sx={{ p: 2.5, borderRadius: 3 }}>
               <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' spacing={2}>
-                <Box><Stack direction='row' spacing={1} alignItems='center'><GreenhouseChip size='small' kind='status' variant='label' tone={entry.decision === 'rejected' ? 'error' : entry.decision === 'on_hold' ? 'warning' : 'success'} label={entry.decision} />{entry.supersedesDecisionId ? <GreenhouseChip size='small' kind='attribute' label='Re-decisión' /> : null}</Stack><Typography sx={{ mt: 1.5 }}>{entry.reason.summary}</Typography></Box>
+                <Box><Stack direction='row' spacing={1} alignItems='center'><GreenhouseChip size='small' kind='status' variant='label' tone={entry.decision === 'rejected' ? 'error' : 'success'} label={entry.decision} />{entry.supersedesDecisionId ? <GreenhouseChip size='small' kind='attribute' label='Re-decisión' /> : null}</Stack><Typography sx={{ mt: 1.5 }}>{entry.reason.summary}</Typography></Box>
                 <Typography variant='caption' color='text.secondary' sx={{ whiteSpace: 'nowrap' }}>{formatDateTime(entry.decidedAt, { dateStyle: 'medium', timeStyle: 'short' }, 'es-CL')}</Typography>
               </Stack>
             </Paper>

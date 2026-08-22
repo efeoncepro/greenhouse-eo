@@ -394,7 +394,10 @@ describe('TASK-1689 hiring lifecycle emails', () => {
 
   describe('decision', () => {
     it('only notifies selected/rejected', async () => {
-      for (const decision of ['backup_selected', 'on_hold', 'withdrawn', '']) {
+      // TASK-1765 — `not_selected` y `unresponsive` entran acá y son el corazón del caso: sin el
+      // mapa explícito, el ternario binario le habría mandado un correo de RECHAZO a quien nadie
+      // rechazó. `unresponsive` además NUNCA notifica por diseño (ADR §7.2).
+      for (const decision of ['backup_selected', 'not_selected', 'unresponsive', 'withdrawn', '']) {
         const msg = await sendHiringDecisionEmail('happ-1', { decision })
 
         expect(msg).toContain('no notifica')

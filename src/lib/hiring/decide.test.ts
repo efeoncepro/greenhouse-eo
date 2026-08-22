@@ -113,7 +113,7 @@ describe('decideHiringApplication', () => {
     const existingEntry = {
       decisionId: 'decision-1',
       idempotencyKey: 'same-key',
-      decision: 'on_hold',
+      decision: 'unresponsive',
       decidedAt: '2026-07-09T10:00:00.000Z',
       decidedBy: 'user-hr',
       reason: { summary: 'Esperamos una referencia laboral adicional.' },
@@ -126,13 +126,13 @@ describe('decideHiringApplication', () => {
     }
 
     const query = vi.fn().mockResolvedValueOnce({
-      rows: [{ ...baseRow, decision: 'on_hold', explainability_json: { decisionHistory: [existingEntry] } }],
+      rows: [{ ...baseRow, decision: 'unresponsive', explainability_json: { decisionHistory: [existingEntry] } }],
     })
 
     withTransactionMock.mockImplementation(async (callback) => callback({ query }))
 
     const result = await decideHiringApplication('app-1', {
-      decision: 'on_hold',
+      decision: 'unresponsive',
       idempotencyKey: 'same-key',
       reason: { summary: 'Esperamos una referencia laboral adicional.' },
     }, 'user-hr')

@@ -32,8 +32,6 @@ import {
  * valor en los dos ejes y la etapa no aportaba un bit — y era además el origen del doble sentido de
  * la columna «Decisión», donde `on_hold` decía «terminó» y «sigue vivo» a la vez.
  *
- * `on_hold` conserva `decision_pending` mientras exista, y desaparece con él en el Slice 4.
- *
  * Esta es una `Record` TOTAL a propósito: agregar un desenlace al enum sin decidir su etapa deja de
  * compilar. Es el mismo default por inclusión que gobierna `HIRING_PIPELINE_STAGES`.
  */
@@ -44,7 +42,6 @@ const DECISION_STAGE: Record<HiringDecision, HiringApplicationStage> = {
   rejected: 'closed',
   withdrawn: 'closed',
   unresponsive: 'closed',
-  on_hold: 'decision_pending',
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>

@@ -342,7 +342,6 @@ export const sendHiringStageAdvancedEmail = async (
  * - `backup_selected` → su variante se decide en su propia task.
  * - `withdrawn` → acuse de recibo, pendiente de tipo.
  * - `unresponsive` → **ninguno, y es deliberado**: no se le escribe a quien no declaró nada.
- * - `on_hold` → no es un desenlace; sale del enum en el Slice 4.
  */
 const DECISION_EMAIL_TYPE: Record<string, EmailType | undefined> = {
   selected: 'hiring_decision_selected',

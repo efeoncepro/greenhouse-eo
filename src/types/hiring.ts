@@ -174,10 +174,10 @@ export type HiringPipelineStage = (typeof HIRING_PIPELINE_STAGES)[number]
  * - `unresponsive`     — dejó de responder. Sin conducta atribuida y sin correo. NUNCA registrar
  *                        el silencio como `withdrawn`: es atribuirle una decisión que no tomó.
  *
- * `on_hold` sigue acá SÓLO durante el expand (Slice 1): Application 360 todavía lo ofrece, y
- * retirarlo del tipo antes de retirarlo de esa superficie la dejaría escribiendo un valor que la
- * base rechaza. Sale en el Slice 4, junto con los tres puntos de la vista. Una pausa NO es un
- * cierre: se registra moviendo la etapa a `decision_pending`, que el PATCH sí acepta.
+ * `on_hold` NO está, y su ausencia es la decisión: una pausa no es un cierre. Vivía en este enum *y*
+ * mapeaba a la etapa `decision_pending`, así que la misma fila decía «terminó» y «sigue viva» a la
+ * vez. Una pausa se registra moviendo la ETAPA a `decision_pending`, que el cambio de etapa sí
+ * acepta.
  */
 export const HIRING_DECISIONS = [
   'selected',
@@ -185,8 +185,7 @@ export const HIRING_DECISIONS = [
   'not_selected',
   'rejected',
   'withdrawn',
-  'unresponsive',
-  'on_hold'
+  'unresponsive'
 ] as const
 export type HiringDecision = (typeof HIRING_DECISIONS)[number]
 
