@@ -62,7 +62,40 @@ export const hiringDesk: HiringDeskCopy = {
     tagAssigned: 'Test assigned',
     appliedDaysAgo: 'Applied {days} {unit} ago',
     appliedDayUnit: 'day',
-    appliedDaysUnit: 'days'
+    appliedDaysUnit: 'days',
+    /**
+     * TASK-1754 — `stages` se REDEFINE acá, no se hereda.
+     *
+     * `pipeline` empieza con `...esCL.pipeline` y nunca sobreescribía esta clave, así que un
+     * operador con locale `en-US` leía el tablero entero en inglés y las seis columnas en
+     * castellano. El diff no lo mostraba —no hay línea que borrar— y sólo aparecía al abrir el
+     * desk en inglés.
+     *
+     * Las seis columnas del ADR (§3) son `sourced`, `screening`, `shortlisted`, `interview`,
+     * `decision_pending` y `closed`. Las otras siete claves siguen acá porque el enum todavía
+     * las declara durante el expand: una fila histórica en `rejected` tiene que poder mostrar
+     * su nombre. Se retiran junto con sus literales, en el contract.
+     *
+     * `shortlisted` se lee «Evaluation» en el desk y «Shortlist» en el correo al candidato
+     * (`notifications/stage-policy.ts`). La divergencia es DELIBERADA —decisión del operador,
+     * 2026-08-22— y espeja la de castellano («Evaluación» vs «Preselección»): hacia afuera el
+     * registro es más suave. NO alinearlas.
+     */
+    stages: {
+      sourced: 'Sourced',
+      screening: 'Screening',
+      qualified: 'Evaluation',
+      shortlisted: 'Evaluation',
+      client_review: 'Evaluation',
+      interview: 'Interview',
+      decision_pending: 'Decision',
+      selected: 'Closed',
+      backup: 'Closed',
+      rejected: 'Closed',
+      withdrawn: 'Closed',
+      handoff_ready: 'Closed',
+      closed: 'Closed'
+    }
   },
   application: {
     ...esCL.application,

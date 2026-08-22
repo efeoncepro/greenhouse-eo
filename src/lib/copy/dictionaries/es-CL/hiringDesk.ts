@@ -90,6 +90,18 @@ export const hiringDesk: HiringDeskCopy = {
     appliedDaysAgo: 'Postuló hace {days} {unit}',
     appliedDayUnit: 'día',
     appliedDaysUnit: 'días',
+    /**
+     * TASK-1754 — las seis columnas del ADR (§3) son `sourced`, `screening`, `shortlisted`,
+     * `interview`, `decision_pending` y `closed`. Las otras siete claves siguen acá porque el
+     * enum todavía las declara durante el expand: una fila histórica en `rejected` tiene que
+     * poder mostrar su nombre. Se retiran junto con sus literales, en el contract.
+     *
+     * `shortlisted` se lee «Evaluación» en el desk y «Preselección» en el correo al candidato
+     * (`notifications/stage-policy.ts`). La divergencia es DELIBERADA —decisión del operador,
+     * 2026-08-22— por dos razones: hacia afuera el registro es más suave, y «Evaluación» en el
+     * correo chocaría con el del test, que ya dice «tienes una evaluación pendiente». NO
+     * alinearlas: leerla como drift y «arreglarla» reintroduce esa colisión.
+     */
     stages: {
       sourced: 'Sourced',
       screening: 'Screening',
