@@ -22,6 +22,12 @@ const REAL_PERSON_JOIN = `JOIN greenhouse_core.identity_profiles ip
        ON ip.profile_id = cf.identity_profile_id AND ${realOnlyPredicate('ip')}`
 
 /**
+ * El ciclo de vida NO usa este JOIN: ahi la procedencia se lee como columna, no como filtro. Ver el
+ * comentario en `membership_state` — excluir a la membresia sintetica de su propia poblacion la
+ * congela, y congelar no es corregir.
+ */
+
+/**
  * Rebuildable, PII-free projection. Safe to run at-least-once: memberships and evidence use
  * structural uniqueness; withdrawal/expiry membership state is never overwritten by reconciliation.
  */
@@ -104,13 +110,20 @@ export const reconcileTalentPoolProjection = async ({
             WHERE ce.membership_id=m.membership_id AND ce.purpose='future_opportunities'
             ORDER BY ce.effective_at DESC, ce.occurred_at DESC, ce.consent_event_id DESC LIMIT 1
           ) AS future_action,
-          m.future_consent_expires_at
+          m.future_consent_expires_at,
+          -- TASK-1748 -- la membresia sintetica NO se excluye de la poblacion: se RECLASIFICA.
+          -- Sacarla del UPDATE la congelaria en el estado que tuviera, y una congelada en
+          -- pool_eligible quedaria contando para siempre en hiring.talent_pool.integrity sin que
+          -- ninguna corrida pudiera corregirla. Aca entra igual que las demas y sale a un estado no
+          -- servible. TRUE por defecto: procedencia ilegible degrada a real, nunca al reves.
+          COALESCE(${realOnlyPredicate('ip')}, true) AS is_real
         FROM greenhouse_hiring.talent_pool_membership m
         JOIN greenhouse_hiring.candidate_facet cf ON cf.candidate_facet_id = m.candidate_facet_id
-        ${REAL_PERSON_JOIN}
+        LEFT JOIN greenhouse_core.identity_profiles ip ON ip.profile_id = cf.identity_profile_id
       ), next_state AS (
         SELECT membership_id,
           CASE
+            WHEN NOT is_real THEN 'needs_reconsent'
             WHEN has_active_application AND future_action IN ('granted','resumed')
               AND future_consent_expires_at>NOW() THEN 'pool_eligible'
             WHEN has_active_application THEN 'active_process'

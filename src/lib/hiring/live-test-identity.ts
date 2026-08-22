@@ -33,10 +33,16 @@ const LIVE_TEST_IDENTITY_EMAIL = 'live-test-hiring-fixture@live-test.invalid'
  * en paralelo (`ON CONFLICT DO NOTHING`). Nunca devuelve el perfil de una persona real.
  */
 export const resolveLiveTestIdentityProfileId = async (): Promise<string> => {
+  // TASK-1748 — la procedencia se DECLARA en el nacimiento del dato. Sin esta columna el fixture
+  // nacía `real` (el default del dominio, que es el correcto: omitir deja el dato VISIBLE, nunca
+  // oculto), o sea: el sujeto de todos los live tests de Hiring quedaba registrado como una persona
+  // real en la base única y compartida, y cualquier ficha que un test le creara entraba al Banco de
+  // Talento como candidata legítima. Declararlo acá es la mitad del arreglo; la fila que ya existe
+  // se corrige por el camino gobernado (`pnpm hiring:data:mark-synthetic`), que deja audit con actor y motivo.
   await runGreenhousePostgresQuery(
     `INSERT INTO greenhouse_core.identity_profiles
-       (profile_id, profile_type, canonical_email, full_name, status, active)
-     VALUES ($1, 'candidate', $2, 'LIVE-TEST Hiring Fixture', 'active', true)
+       (profile_id, profile_type, canonical_email, full_name, status, active, data_origin)
+     VALUES ($1, 'candidate', $2, 'LIVE-TEST Hiring Fixture', 'active', true, 'smoke_test')
      ON CONFLICT (profile_id) DO NOTHING`,
     [LIVE_TEST_IDENTITY_PROFILE_ID, LIVE_TEST_IDENTITY_EMAIL]
   )

@@ -87,6 +87,20 @@ describe('TASK-1748 — la projection no materializa personas sinteticas', () =>
     expect(withPredicate.every(sql => sql.includes('ip.profile_id = cf.identity_profile_id'))).toBe(true)
   })
 
+  it('la membresia sintetica se RECLASIFICA, no se congela', async () => {
+    const statements = await statementsWithFlag('true')
+    const lifecycle = statements.find(sql => sql.includes('next_state AS'))
+
+    // Si el UPDATE de ciclo de vida se excluyera a si mismo la poblacion sintetica, una membresia
+    // que hubiera quedado en `pool_eligible` seguiria contando para siempre en la senal de
+    // integridad del Banco de Talento sin que ninguna corrida pudiera corregirla. Entra a la
+    // poblacion y sale a un estado no servible.
+    expect(lifecycle).toContain('LEFT JOIN greenhouse_core.identity_profiles ip')
+    expect(lifecycle).toContain("WHEN NOT is_real THEN 'needs_reconsent'")
+    expect(lifecycle).not.toContain(`JOIN greenhouse_core.identity_profiles ip
+       ON ip.profile_id = cf.identity_profile_id AND ip.data_origin = 'real'`)
+  })
+
   it('NO depende del flag: corre en Cloud Run, donde ese flag no existe', async () => {
     // Si el filtro estuviera gateado por `HIRING_SYNTHETIC_DATA_FILTER_ENABLED` (Vercel-only), el
     // ops-worker lo leeria indefinido y quedaria OFF en silencio. Este test es el que lo impide.

@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { realOnlyPredicate } from '@/lib/hiring/data-origin/contracts'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import type { ReliabilitySignal } from '@/types/reliability'
@@ -12,12 +13,28 @@ type IntegrityRow = {
 
 export const HIRING_TALENT_POOL_INTEGRITY_SIGNAL_ID = 'hiring.talent_pool.integrity'
 
+/**
+ * TASK-1748 — la señal cuenta SÓLO población real, y no es cosmético.
+ *
+ * `facets_without_membership` mide «fichas activas que la projection todavía no proyectó». Desde que
+ * la projection deja de materializar membresías para personas sintéticas (a propósito), una ficha
+ * sintética sin membresía dejó de ser un atraso y pasó a ser el resultado correcto. Sin este filtro
+ * la señal saldría de su steady 0 y diría «N candidate facets aún no están proyectados» sobre
+ * registros que nunca van a proyectarse — una alerta permanente y falsa, que es peor que no tenerla
+ * porque entrena a ignorar el tablero.
+ *
+ * Los otros dos contadores (consentimiento y retiro) NO se filtran por procedencia y también es
+ * deliberado: miden violaciones sobre membresías que ya existen, y una violación de consentimiento
+ * no deja de serlo por la procedencia del sujeto. Lo que la procedencia gobierna es la visibilidad,
+ * jamás el consentimiento ni el compliance.
+ */
 export const getHiringTalentPoolIntegritySignal = async (): Promise<ReliabilitySignal> => {
   const label = 'Integridad del Banco de Talento'
 
   try {
     const rows = await runGreenhousePostgresQuery<IntegrityRow>(`SELECT
       (SELECT COUNT(*)::int FROM greenhouse_hiring.candidate_facet cf
+        JOIN greenhouse_core.identity_profiles ip ON ip.profile_id=cf.identity_profile_id AND ${realOnlyPredicate('ip')}
         WHERE cf.status='active' AND NOT EXISTS (SELECT 1 FROM greenhouse_hiring.talent_pool_membership m WHERE m.candidate_facet_id=cf.candidate_facet_id)) AS facets_without_membership,
       (SELECT COUNT(*)::int FROM greenhouse_hiring.talent_pool_membership m
         WHERE m.lifecycle_status='pool_eligible' AND NOT EXISTS (
@@ -46,7 +63,7 @@ export const getHiringTalentPoolIntegritySignal = async (): Promise<ReliabilityS
         critical > 0
           ? 'El banco contiene una violación de consentimiento o retiro.'
           : lag > 0
-            ? `${lag} candidate facets aún no están proyectados.`
+            ? `${lag} fichas reales aún no están proyectadas.`
             : 'Membership, consentimiento y retiro están reconciliados.',
       observedAt: new Date().toISOString(),
       evidence: [
