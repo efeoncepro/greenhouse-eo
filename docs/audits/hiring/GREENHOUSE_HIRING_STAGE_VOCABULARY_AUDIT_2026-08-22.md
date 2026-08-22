@@ -318,7 +318,7 @@ El wireframe afirma que «Cerrado» colapsa **sin pérdida** porque `decision` s
 | Función de purga de recuperación (`…1746…:998-1000`) | `application_stage IN (…) OR application_decision IN (…)` | **No** — ídem |
 | `TERMINAL_APPLICATION_STAGES` (6 copias) | `applicationDecision \|\| stage ∈ set` | **No** — `closed` ya está en el set |
 | Escalera de fairness histórica | evento `decided` con `decision='selected'` → rango 7 | **No** para `selected` |
-| **`desk.ts:104` · `talent-pool/projection.ts` · `DemandDeskView.tsx:348`** | **`stage` únicamente** (`NOT IN rejected/withdrawn/closed`) | **Sí — cambia de comportamiento**, ver H-24 |
+| **`desk.ts:104` · `talent-pool/projection.ts` · `DemandDeskView.tsx:348`** | **`stage` únicamente** (`NOT IN rejected/withdrawn/closed`) | **No — el colapso los deja MÁS correctos** (pasan a significar «sin desenlace declarado»); ver H-24 reformulado |
 
 **Corrección al hallazgo H-01 tal como se publicó inicialmente:** una lectura preliminar reportó que el trigger de retención clasificaba **sólo** por `stage` y que el colapso lo llevaría al `ELSE NULL`. **Es incorrecto.** El predicado real es `stage OR decision` en los tres puntos. El riesgo de retención no viene del colapso: viene de (a) `closed` **sin ninguna decisión** — H-02 — y de (b) una omisión preexistente en la escalera — H-23. H-01 quedó reescrito abajo con el predicado verbatim.
 
@@ -446,8 +446,25 @@ Nota de asimetría: el reloj 1 **sí** contempla `backup_selected` — lo trata 
 
 **H-24 · El colapso terminal cambia en silencio quién cuenta como «activo» y quién entra al Talent Pool.** *(Derivado, con base verificada.)*
 Tres predicados clave por **`stage` únicamente** — `desk.ts:104`, `talent-pool/projection.ts` (5 sitios) + `commands.ts:272`, `DemandDeskView.tsx:348` — definen «activa» como `stage NOT IN ('rejected','withdrawn','closed')`. Hoy eso cuenta a `selected`, `backup` y `handoff_ready` **como activas**, y por lo tanto las mantiene **fuera** del Talent Pool.
-Si las 5 terminales colapsan a `closed`, esas tres poblaciones pasan a «no activas» de golpe: el KPI de postulaciones activas cambia de valor y **personas ya seleccionadas se vuelven elegibles para el pool**. Es discutiblemente una corrección —una persona seleccionada no debería contar como proceso activo— pero **es un cambio de comportamiento sobre datos de personas reales, y debe decidirse, no descubrirse**. Son los únicos consumidores encontrados que ramifican por etapa terminal sin mirar `decision`.
-*Sin dueño. Depende de Q3.*
+**REFORMULADO 2026-08-22 tras verificación adversarial contra el código. La mitad alarmante era falsa.**
+
+**Lo que se retira:** ~~«personas ya seleccionadas se vuelven elegibles para el pool»~~. El `CASE` de `talent-pool/projection.ts:95-102` tiene **siete ramas, y la 1 y la 3 dan las dos `pool_eligible`**:
+
+```sql
+WHEN has_active_application AND future_action IN ('granted','resumed') AND expires>NOW() THEN 'pool_eligible'  -- 1
+WHEN has_active_application THEN 'active_process'                                                              -- 2
+WHEN future_action IN ('granted','resumed') AND expires>NOW() THEN 'pool_eligible'                             -- 3
+```
+
+`has_active_application` **no gatea `pool_eligible` en absoluto** — lo decide el consentimiento solo. Quien consintió **ya es `pool_eligible` hoy**, con o sin colapso. Lo único que el colapso mueve es a quien NO consintió: de `active_process` a `needs_reconsent`/`withdrawn`/`expired`, y esos estados quedan **fuera** de la proyección buscable (`:131` y `:151` admiten sólo `active_process`, `pool_eligible`, `paused`). El colapso es **más** protector, no menos.
+
+**Y los otros dos consumidores quedan MÁS correctos.** Después del colapso, `stage NOT IN ('rejected','withdrawn','closed')` significa exactamente *«todavía sin desenlace declarado»*. Antes, alguien marcado `selected` o `not_selected` contaba como **postulación activa** en `active_application_count` (`desk.ts:104`) y en el pipeline del demand desk — eso sí estaba mal. El colapso lo arregla de paso.
+
+**Lo que sostiene el hallazgo, y es anterior al colapso:** el ADR §4 dice que `selected` **no** entra al Banco de Talento —pasa a ser parte del equipo— pero el runtime deja `pool_eligible` a quien fue contratada y había marcado futuras oportunidades. Y **no hay ninguna exclusión por `member_id` en todo `src/lib/hiring/talent-pool/**`**: el banco no distingue a un colaborador de un candidato. Hoy eso sólo la muestra en una búsqueda; con `TASK-1397` significa **mandarle una alerta de vacante a quien acabas de contratar**.
+
+*Dueño: `TASK-1397`, que declara `src/lib/hiring/talent-pool/**` «for the alert preference reader/command and eligibility projection» y es donde el daño aterriza. Precondición bloqueante de su carril de alertas. **No** depende del colapso de Q3.*
+
+> **Modo de fallo que este hallazgo ilustra, y que es el más caro de esta auditoría.** La versión falsa sobrevivió a una verificación mía porque confirmé que **las dos citas fueran textuales** —lo eran— sin trazar la **transición** de estado. Verificar que una cita es exacta no es verificar que la conclusión se siga. En un `CASE` de siete ramas hay que leer **todas**, no la que confirma la hipótesis.
 
 ### P2 — incoherencia estructural
 

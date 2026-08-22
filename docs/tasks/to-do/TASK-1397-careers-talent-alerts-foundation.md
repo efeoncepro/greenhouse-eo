@@ -63,12 +63,25 @@ El eje de desenlace lo implementa `TASK-1765`; la superficie del kanban, `TASK-1
 
 - **`not_selected` es la población objetivo del pool** (ADR §4): la gente que llegó al final y no quedó es
   justamente la que se quiere re-contactar. Hoy es indistinguible de `rejected`.
-- **Cambio de comportamiento a declarar (hallazgo H-24, sin dueño):** la elegibilidad se deriva hoy de
-  `stage NOT IN ('rejected','withdrawn','closed')` en 7 sitios, así que `selected`, `backup` y
-  `handoff_ready` cuentan como **activas** y quedan **fuera** del pool. Con el colapso terminal pasan a «no
-  activas» de golpe, y **personas ya seleccionadas se vuelven elegibles para el pool y para estas alertas**.
-  Es discutiblemente una corrección, pero es un cambio sobre personas reales: **hay que decidirlo, no
-  descubrirlo**.
+- **Hallazgo H-24 — REFORMULADO Y CON DUEÑO: esta task (2026-08-22).** La formulación original decía que
+  el colapso terminal volvería elegibles a las personas seleccionadas. **Se verificó contra el código y es
+  falso.** El `CASE` de `talent-pool/projection.ts:95-102` tiene siete ramas, y **la 1 y la 3 dan las dos
+  `pool_eligible`**: `has_active_application` **no gatea `pool_eligible` en absoluto** — lo decide el
+  consentimiento solo. Una persona contratada que consintió **ya es `pool_eligible` HOY**, antes de
+  cualquier colapso. El colapso sólo mueve a la que NO consintió, de `active_process` a
+  `needs_reconsent`/`withdrawn`/`expired`, y esos estados quedan **fuera** de la proyección buscable
+  (`:131` y `:151` admiten sólo `active_process`, `pool_eligible`, `paused`). Es decir: el colapso es **más**
+  protector, no menos.
+
+- **Lo que sí está roto, y es de esta task porque el daño aterriza en sus alertas:** el ADR §4 dice que
+  `selected` **no** entra al Banco de Talento —pasa a ser parte del equipo—, pero el runtime deja
+  `pool_eligible` a quien fue contratada y había marcado futuras oportunidades. Y **no existe ninguna
+  exclusión por `member_id` en todo `src/lib/hiring/talent-pool/**`** (verificado por grep): el banco no
+  sabe distinguir a un colaborador de un candidato. Hoy sólo significa que aparece en una búsqueda; **con
+  esta task significa mandarle una alerta de vacante a alguien que acabas de contratar**. Es precondición
+  bloqueante del carril de alertas: antes del primer envío, la elegibilidad debe excluir a quien tenga
+  vínculo laboral vigente. El consentimiento no se revoca —la persona sí lo dio— pero el propósito
+  «futuras oportunidades» no aplica a quien ya está adentro.
 
 ## Architecture Alignment
 
