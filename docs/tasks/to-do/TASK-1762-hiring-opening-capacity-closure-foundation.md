@@ -25,6 +25,25 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-08-22 — HABILITADA por TASK-1765
+
+- **El par `not_selected` + `capacity_filled` ya es escribible.** `decideHiringApplication` recibe
+  `cause` y la persiste en el mismo `UPDATE` que el desenlace, en la entrada de historial y en el
+  payload de `hiring.application.decided`. El Slice 3 de esta task puede llamarlo tal cual.
+- **La causa entra en la comparación de replay**: misma idempotency key con distinta causa responde
+  **409**, no un replay silencioso. Importa para el run por cohorte: si un item se reintenta con otra
+  causa, es un conflicto que hay que ver, no una escritura que se descarta callada.
+- **Errores canónicos disponibles**: `hiring_decision_cause_required` (422) y
+  `hiring_decision_cause_not_allowed` (422). El worker no necesita inventar los suyos.
+- **Sigue siendo tuyo `hiring_decision_not_selected`.** El selector de `send.ts` ya es un mapa
+  explícito con **no-op declarado**: hoy un cierre `not_selected` **no manda ningún correo**, que es
+  preferible a mandar uno de rechazo a quien nadie rechazó. Al crear el tipo, agregar su fila al mapa
+  `DECISION_EMAIL_TYPE`, su `email_type_config` y su seed en `services/ops-worker/deploy.sh` — **NO**
+  en Vercel, o el envío queda apagado sin que nada avise.
+- Recordatorio del ADR §9: el desenlace de una cohorte cerrada por capacidad es `not_selected`, **no**
+  `rejected`. Marcar 33 personas como rechazadas les atribuye un juicio que nadie emitió e infla la
+  tasa de rechazo de su cohorte demográfica en el análisis de impacto adverso.
+
 ## Summary
 
 Crea la fuente de verdad de cupos por vacante y el cierre durable de una cohorte. El operador obtiene un preview,

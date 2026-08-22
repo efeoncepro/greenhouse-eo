@@ -28,6 +28,26 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-08-22 — TASK-1765 avanzó; el Slice F sigue bloqueado
+
+- `src/types/hiring.ts` fue tocado por `TASK-1765`, pero **sólo** en `HIRING_DECISIONS`. Además nace
+  ahí `HIRING_PIPELINE_STAGES` —el subconjunto de etapas escribible como cambio de etapa—, que **no**
+  modifica `HIRING_APPLICATION_STAGES`, propiedad de esta task. Sin colisión de contenido; rebasear.
+- **`HIRING_PIPELINE_STAGES` es el consumidor nuevo del colapso.** Cuando esta task retire
+  `qualified` y `client_review` del enum de etapas, hay que retirarlos también de ese subconjunto.
+  Está en el mismo archivo y a diez líneas de distancia, a propósito.
+- **El Slice F (retirar los espejos terminales del enum de etapas) sigue bloqueado.** El ADR §14
+  paso 2 exige que el desenlace posea esos literales **y** que el `CHECK` del invariante exista. Lo
+  primero ya está; el `CHECK` no — espera a `TASK-1748`. Vive en
+  `docs/tasks/pending-migrations/TASK-1765-closed-invariant.sql.pending`.
+- **Regla nueva que aplica directamente a tu contract del enum de etapas**, aprendida en producción
+  el 2026-08-22: un contract de enum se aplica **DESPUÉS** del release que retira el valor del
+  código, nunca antes. «Cero filas» no es «nadie lo escribe». Con una sola instancia de Cloud SQL
+  compartida, angostar un `CHECK` «en dev» lo angosta en producción contra un front-end más viejo.
+  Canon en `GREENHOUSE_DATABASE_TOOLING_V1.md`; caso fuente en el §16 del ADR del vocabulario.
+- `decide` ya **no** escribe etapas espejo: todo desenlace terminal escribe `stage='closed'`. El
+  carril `outcome` del kanban ya incluía `closed`, así que ninguna tarjeta desapareció.
+
 ## Summary
 
 Colapsar el enum de etapas de postulación a las seis que la interfaz ofrece, para que la automatización

@@ -3,6 +3,22 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-22 — Cerrar una postulación ahora obliga a decir cómo terminó
+
+- El proceso de una persona ya no se cierra arrastrando su tarjeta a «Cerrado». Cerrar es **decidir**, y la
+  decisión pide el desenlace. Ese camino silencioso, además de no avisarle a nadie, **congelaba el borrado de los
+  documentos de esa persona en todas sus postulaciones** — una obligación legal bloqueada sin que se notara.
+- Aparecen dos desenlaces que faltaban. **«Sin selección»** para quien llegó al final y no quedó: antes había que
+  marcarla como descarte, un juicio que nadie emitió, que la sacaba del Banco de Talento y que distorsionaba el
+  análisis de equidad de su cohorte. Y **«Sin respuesta»** para quien deja de responder: antes había que
+  inventarle un retiro que no declaró o un juicio que no hubo.
+- «Sin selección» **exige decir por qué**: el cupo lo tomó otra persona, se cerró la búsqueda o se canceló el
+  proceso. Es una lista cerrada, no texto libre, porque el embudo de equidad y el correo cambian según cuál sea.
+- **Una pausa deja de ser un cierre.** «Dejar en espera» desaparece: para pausar, la tarjeta se queda en la
+  columna «Decisión». Su proceso no terminó, así que no tiene desenlace.
+- Ningún desenlace nuevo manda correo todavía. Es deliberado: preferible no escribir a mandarle un correo de
+  rechazo a quien nadie rechazó. El correo de «Sin selección» llega con su propia entrega.
+
 ## 2026-08-22 — Un test bloqueado ya no deja a esa persona sin segunda oportunidad
 
 - Corregir la causa de un bloqueo —registrar el correo, activar la plantilla, habilitar la política— y volver a
@@ -948,15 +964,3 @@ de Privacy, el flip del país a requerido-en-parser y el scorecard GVC formal.
 
 - `wherex:radar` incorpora `--tender-id` + `--archive-originals <carpeta>`: guarda y analiza originales únicamente cuando Wherex emite una descarga nativa; el visor protegido queda explícitamente en `manual-save-required`, sin extraer enlaces firmados.
 - Para una sesión Chrome principal expresamente autorizada, el manual y ambas skills documentan el fallback visible: activar temporalmente **Descargar archivos PDF**, validar cada descarga individual y restaurar el visor cuando corresponda. Sika LIC-1120 quedó archivada en OneDrive; sus anexos contienen una discrepancia de plazo que exige aclaración antes de cotizar.
-
-## 2026-08-12 — El formulario de Careers ya no pierde el contacto del candidato (TASK-1688)
-
-Se cerró la pérdida silenciosa que descubrió la auditoría de postulaciones: teléfono y mensaje se
-validaban en el navegador pero el command los descartaba, y no existía país de residencia. Ahora el
-apply (estándar y Growth Form nativo, mismo parser/command) pide país de residencia autodeclarado
-(select textual del catálogo ISO — jamás deducido del prefijo telefónico), guarda el teléfono E.164
-opcional en el perfil del candidato con política anti-wipe y el mensaje como contexto de esa
-postulación. El reclutador lo lee en la Postulación 360; las postulaciones históricas muestran "No
-informado" sin inventar datos. ADR registrado, migración aditiva aplicada, país requerido primero
-en UI (expand/contract). Pendiente de rollout: ejercicio en staging + GVC, revisión de Privacy y el
-flip a requerido en parser.

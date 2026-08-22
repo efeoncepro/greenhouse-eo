@@ -2,6 +2,36 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-22 — TASK-1765 parte el pipeline en dos ejes; cerrar es decidir. Contract del enum, POST-RELEASE
+
+El pipeline de Hiring pasa a modelar **etapa** (dónde va la persona) y **desenlace** (cómo terminó su proceso) como
+ejes ortogonales. Entran `not_selected` y `unresponsive`, nace `decision_cause` como enum gobernado obligatorio
+sólo en `not_selected`, y nace `archived_at` — el campo que `TASK-1748` necesitaba para dejar de archivar
+escribiendo `closed`. Cerrar deja de ser un cambio de etapa: la denylist del `PATCH` **se borró** y nace
+`HIRING_PIPELINE_STAGES`, que excluye `closed` por TIPO, así que un cierre por esa vía ni compila.
+
+Aplicado y verificado contra PG real: expand, command con causa en el mismo `UPDATE` (y en el replay: distinta
+causa ⇒ 409), colapso de `DECISION_STAGE` a `closed`, `PATCH` acotado, señal
+`hiring.application.closed_without_outcome` y las tres capas documentales. Dos regresiones se cerraron en el mismo
+cambio: el selector de correo era un ternario binario que le habría mandado un **correo de rechazo al primer
+`not_selected`**, y `STAGES_DOWNSTREAM_OF_TRIGGER` no listaba `closed`, así que la cola humana de triggers perdidos
+se habría vaciado en silencio (H-11).
+
+**Incidente y su lección, que vale más que la task.** El contract del enum (retirar `on_hold`) se aplicó y **rompió
+producción ~7 minutos**: hay UNA sola instancia de Cloud SQL, producción sirve `origin/main` —que todavía ofrece
+«Dejar en espera»— y la acción quedó en `23514`. Cero filas afectadas, reparado con forward fix permisivo. El
+readback previo era correcto pero sobre el eje equivocado: **«cero filas» no es «nadie lo escribe»**. La regla
+—*un contract de enum va DESPUÉS del release que retira el valor del código*— quedó en
+`GREENHOUSE_DATABASE_TOOLING_V1.md` y como enmienda al §14 del ADR. Segundo hallazgo: **no existe «migración
+escrita y sin aplicar» como estado seguro** — la del Slice 5 bloqueó la reparación urgente porque `migrate:up`
+corre todas las pendientes. Nace `docs/tasks/pending-migrations/`.
+
+Estado: **code complete parcial; dos migraciones POST-RELEASE pendientes**. (1) contract del enum, cuando `main` ya
+no ofrezca `on_hold`; (2) `CHECK` del invariante, cuando `TASK-1748` mueva sus 32 filas — readback esperado
+**33 → 0**, no 32 (la bicondicional se viola por los dos lados). `TASK-1748` quedó desbloqueada; `TASK-1744` pasa a
+depender de ella; el Slice F de `TASK-1754` sigue bloqueado. Siguiente paso: **`TASK-1748`**, y después el release
+que habilita las dos migraciones parqueadas. Sin push.
+
 ## 2026-08-22 — TASK-1755 destraba el callejón del ledger de asignación; sin migración, verificado contra PG real
 
 Un intento manual de asignar prueba que terminaba en `blocked`/`held`/`stale` ocupaba la clave de idempotencia del
@@ -537,38 +567,6 @@ Lifecycle honesto: TASK-1743 cerró code complete con GVC 4,82/5, pero la compac
 `20964b72a..3616cb5b8` es posterior al SHA productivo y viaja en el siguiente release ordinario. TASK-1742 y
 TASK-1718 permanecen in-progress por cooldown/rollback/sign-offs; no se inventaron aprobaciones. El release
 classifier omitió rutas Hiring del ops-worker y exigió corrección manual; verificar siempre parity 4/4 por SHA.
-
-## 2026-08-18 — TASK-1739: procedencia de datos de Hiring, slices 1-4 y 6 implementados
-
-Ocho commits. Lo que ya opera: la procedencia existe como HECHO declarado en el nacimiento del dato
-(dos raíces, persona y demanda) con copia derivada por trigger en la postulación; los readers del desk
-dejan de contar fantasmas detrás de flag; el gold set los excluye SIN flag; hay marcado gobernado con
-allowlist humana; y un gate mecánico impide que un seed nuevo cree datos sin declarar.
-
-**Nada cambió todavía para el operador**: el flag nace OFF y nadie marcó nada. Estado correcto:
-`code complete, rollout pendiente`.
-
-**Lo que falta y por qué no lo hice**: el apply del marcado exige que un humano pode la allowlist
-línea a línea —ese es el punto del protocolo, no un trámite—; el flip del flag en producción exige
-**aviso previo a HR**, porque 12 de 14 vacantes son sintéticas por autor y el desk no perderá "algunas
-filas" sino casi todas las vacantes; y el Slice 5 (purga) está prohibido por la propia task hasta que
-el Slice 4 esté aplicado y verificado. Falta además la triple documentación y las dos capabilities
-(`hiring.data_origin.mark`/`.purge`), que hoy no tienen consumer porque la operación es por CLI.
-
-**Dry-run real listo para revisar**: 34 candidatos, todos de confianza ALTA — 12 demandas y 12
-vacantes por autor (8 de ellas marcadas además como "estuvo publicada" en el careers real) y 10
-personas por dominio de correo reservado. Cero falsos positivos: ningún `@efeoncepro.com`, ninguna
-coincidencia por nombre. Correr `pnpm hiring:data:mark-synthetic` para verlo.
-
-**Tres cosas que aparecieron al construir**, todas en los commits:
-
-- La guarda de publicación **bloqueó el smoke que causó el problema**: `verify-growth-forms-application-smoke.ts`
-  creó las 8 vacantes fantasma publicadas y no tiene teardown. Queda bloqueado a propósito, con sus dos
-  salidas legítimas registradas como follow-up. Destrabarlo marcando su vacante como `real` no es una.
-- El guard de frontera del dominio atrapó mi tabla de audit sin declarar. Declarada.
-- Corriendo la suite con live tests aparecieron **dos roturas preexistentes** de
-  `submit-application.live.test.ts` que CI nunca vio (sólo corren con PG): `publicSeniority` obligatorio
-  desde TASK-1740 y `residenceCountryCode` requerido desde el flip de TASK-1688. Ambas reparadas.
 
 ## 2026-08-18 — Las dos vacantes vivas ya están en el contrato editorial v2
 

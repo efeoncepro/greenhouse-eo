@@ -30,6 +30,27 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-08-22 — el eje y la causa por los que vas a ramificar ya existen (TASK-1765)
+
+- **`decision_cause` está persistida** y es un enum gobernado, no prosa:
+  `capacity_filled` · `opening_closed` · `process_cancelled`. La bicondicional de base garantiza que
+  es no-null **si y sólo si** `decision='not_selected'`, así que el embudo puede confiar en el par sin
+  defenderse de estados imposibles.
+- **La regla de conteo del ADR §4.1**, que es tuya de implementar: `capacity_filled` **sí** cuenta
+  como proceso concluido (hubo comparación); `opening_closed` y `process_cancelled` **no** (el proceso
+  no concluyó). Contarlos como rechazo infla la tasa de la cohorte demográfica que estuviera ahí y el
+  ratio 4/5 leería un impacto adverso que no ocurrió.
+- **La causa viaja también en el payload de `hiring.application.decided`** y en cada entrada de
+  `decisionHistory[]`, no sólo en la columna snapshot. Las entradas anteriores al 2026-08-22 no la
+  tienen y son inmutables: tratar su ausencia como «sin causa», nunca inferirla.
+- **Corrección de cita, importante para esta task:** la definición VIVA de la VIEW
+  `greenhouse_hiring.assessment_fairness` está en
+  `migrations/20260713173500000_task-1365-application-scoped-selfid-hardening.sql:71+`. La copia de
+  `20260713165547000_*:91` está **superseded**. Varias specs citan la muerta.
+- **NUNCA** retirar literales de las escaleras de rango: son tabla de traducción histórica sobre
+  payloads inmutables de `outbox_events`, no espejo del vocabulario vigente. `on_hold` salió del enum
+  de desenlaces pero cualquier payload histórico que lo nombre debe seguir traduciéndose.
+
 ## Summary
 
 La VIEW `greenhouse_hiring.assessment_fairness` cuenta hoy a **toda** persona con self-ID en el

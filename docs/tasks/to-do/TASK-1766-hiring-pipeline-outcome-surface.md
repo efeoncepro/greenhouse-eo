@@ -29,6 +29,25 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-08-22 — el contrato que consumes ya existe (TASK-1765)
+
+- **Los seis desenlaces y las tres causas están en `src/types/hiring.ts`**: `HIRING_DECISIONS` y
+  `HIRING_DECISION_CAUSES`. El chip y el diálogo se construyen sobre esos enums; **NUNCA** hardcodear
+  la lista en la vista.
+- **Soltar en «Cerrado» ya responde 422**, no 200 y no 500: el código canónico es
+  `hiring_application_close_requires_outcome`, con prose es-CL y `actionable: false`. Hasta que tu
+  diálogo exista, ése es el comportamiento — la acción falla ruidosa y nombra el camino correcto, en
+  vez de escribir un cierre mudo. **Respetar `actionable: false`: no pintar «Reintentar».**
+- **El PATCH ya no acepta `closed` por TIPO** (`HIRING_PIPELINE_STAGES`), así que el carril de teclado
+  y el menú contextual tampoco pueden colarlo. Tu trabajo es que la superficie **abra el diálogo
+  antes de escribir**, no interceptar una escritura que ya no pasa.
+- **`Application360View.tsx` perdió sus tres referencias a «Dejar en espera»** (opción, botón y tono
+  del historial). La clave de copy `decisionHold` (`src/lib/copy/dictionaries/es-CL/hiringDesk.ts`)
+  quedó **huérfana y viva** a propósito: retirarla rompe el contrato de `src/lib/copy/types.ts`.
+  **Su retiro es tuyo**, junto con el vocabulario visible de desenlace.
+- Vocabulario visible aprobado (ADR §7.1), sustantivos neutros que describen el desenlace y no a la
+  persona: **Selección · Reserva · Sin selección · Descarte · Retiro · Sin respuesta**.
+
 ## Summary
 
 El kanban de Hiring hace visible el segundo eje del modelo: **la tarjeta en «Cerrado» muestra su chip de

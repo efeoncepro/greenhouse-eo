@@ -22,10 +22,29 @@
 - Status real: `Diseño`
 - Rank: `TBD`
 - Domain: `hr|data`
-- Blocked by: `TASK-1765` (define el campo de archivado propio que el Slice 2 escribe; su `CHECK stage='closed' ⟺ desenlace` entra DESPUÉS de la migración de las 32 filas)
+- Blocked by: `none` (DESBLOQUEADA 2026-08-22: `archived_at` ya existe en `hiring_application`. La relación se invirtió — ahora esta task **bloquea** el `CHECK` del invariante de `TASK-1765`, que espera a que sus 32 filas salgan de `closed`)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Delta 2026-08-22 — DESBLOQUEADA por TASK-1765
+
+- **`greenhouse_hiring.hiring_application.archived_at` ya existe** (`TIMESTAMPTZ`, nullable, con índice
+  parcial `hiring_application_archived_idx`). El Slice 2 de esta task ya tiene dónde escribir, y
+  `archiveSyntheticRecords` puede dejar de escribir `stage='closed'`.
+- Verificado contra PG que el campo es **ortogonal**: se escribe sin tocar `stage` ni `decision`
+  (test live en `src/lib/hiring/store.live.test.ts`).
+- **Esta task ahora bloquea a TASK-1765.** Su `CHECK` del invariante `(stage='closed') = (decision IS
+  NOT NULL)` está escrito y **sin aplicar**, esperando que las 32 filas sintéticas salgan de `closed`.
+  Vive en `docs/tasks/pending-migrations/TASK-1765-closed-invariant.sql.pending` — **no** en
+  `migrations/`, porque una migración pendiente ahí bloquea a cualquiera que corra `pnpm migrate:up`.
+  El README de esa carpeta tiene el runbook.
+- Readback esperado tras el trabajo de esta task: `SELECT count(*) FROM
+  greenhouse_hiring.hiring_application WHERE (stage='closed') <> (decision IS NOT NULL)` debe pasar de
+  **33 a 1** (queda la fila real `rejected` en su etapa espejo, que la migra el propio `UPDATE` del
+  Slice 5 de TASK-1765). Son **33**, no 32: la bicondicional se viola por los dos lados.
+- **NUNCA** backfillear `decision` en esas 32 filas para que pasen el `CHECK`: sería fabricar un acto
+  humano que nadie realizó. Se mueven a `archived_at`.
 
 ## Summary
 

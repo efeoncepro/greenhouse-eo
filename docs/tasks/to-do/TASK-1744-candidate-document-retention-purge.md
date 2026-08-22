@@ -22,10 +22,27 @@
 - Status real: `Diseño`
 - Rank: `TBD`
 - Domain: `hr|identity|data`
-- Blocked by: `TASK-1765` (el eje de desenlace y el `CHECK stage='closed'` ⟺ desenlace; los Slices 1 y 2 ramifican por esos literales)
+- Blocked by: `TASK-1748` (2026-08-22: el eje de desenlace de `TASK-1765` YA existe y los Slices 1 y 2 pueden ramificar por `not_selected`/`unresponsive`. Lo que falta es el `CHECK` del invariante, que espera a que `TASK-1748` mueva sus 32 filas; hasta entonces el detector se sigue congelando)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Delta 2026-08-22 — parcialmente desbloqueada por TASK-1765
+
+- **Los literales por los que ramifican los Slices 1 y 2 ya existen**: `not_selected` y `unresponsive`
+  están en `HIRING_DECISIONS` (`src/types/hiring.ts`) y admitidos por el `CHECK` de base. La escalera
+  de retención ya puede enumerarlos.
+- **`decision_cause` existe** y es una bicondicional garantizada por la base: no-null si y sólo si
+  `decision='not_selected'`. Si la escalera de retención quiere distinguir un cierre por capacidad de
+  uno por cancelación de la búsqueda, el valor está ahí y es enum, no prosa.
+- **El detector todavía se puede congelar.** El `CHECK` del invariante NO está aplicado: sigue
+  esperando a que `TASK-1748` mueva sus 32 filas. Mientras tanto, el `NOT EXISTS ... decision IS NULL`
+  de `documents/retention.ts:90-94` sigue bloqueando el borrado para esas identidades. La señal
+  `hiring.application.closed_without_outcome` (`/admin/operations`) reporta el estado real y separa
+  las filas REALES —que sí congelan retención de una persona verdadera— de las sintéticas.
+- Recordatorio del H-23, que sigue abierto y es de esta task: la escalera omite `backup_selected` y
+  cae a `ELSE NULL`. Con el eje nuevo hay que enumerar los **seis** desenlaces explícitamente, no
+  cinco y un `ELSE`.
 
 ## Summary
 
