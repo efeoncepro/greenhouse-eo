@@ -2,6 +2,49 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-22 — El vocabulario de etapas de Hiring tiene su primer ADR; auditoría de 30 hallazgos verificada adversarialmente
+
+Sesión de diagnóstico y decisión, **cero código**. Partió de un síntoma acotado —la automatización de assessment no
+disparaba— y terminó en el primer ADR que el vocabulario del pipeline tiene: nació el 2026-07-07 con `TASK-353` **sin
+decisión registrada** (su spec no menciona la palabra `stage` ni una vez) y ninguna fila del índice de decisiones lo
+justificaba.
+
+**Arqueología del defecto.** Reconstruida del log append-only `hiring.application.stage_changed` (222.801 eventos) y
+del historial de `git`: el carril «Evaluación» nació el 2026-07-09 (`559f5654b`) tomando su nombre de `shortlisted` y
+escribiendo `qualified` — el defecto está en la **primera versión** del archivo, y el wireframe de `TASK-355` afirmaba
+`columnas = etapas canónicas` cuando eran 6 contra 13. Sobrevivió seis semanas porque nada automático miraba la etapa;
+se volvió caro el 2026-08-17, cuando la doctrina de selección —correcta— movió el disparador desde `interview`, la
+única alcanzable, hacia la que nunca lo fue. **Ningún operador escribió jamás `shortlisted`**: de las 27 escrituras
+históricas, 21 entraron por el INSERT (que no emite `stage_changed`) y ninguna es humana.
+
+**El ADR fija dos ejes.** `stage` = dónde va la persona en el recorrido (6 valores, uno por columna; `closed` **se
+queda y es escribible**, porque una columna terminal que no recibe tarjetas no es un kanban). **Desenlace** = cómo
+terminó (`selected`, `backup_selected`, `not_selected`, `rejected`, `withdrawn`, `unresponsive`) + causa gobernada
+obligatoria en `not_selected`. El invariante `stage='closed'` ⟺ desenlace declarado, como `CHECK` de base, vuelve
+**irrepresentables** los dos P0 de la auditoría en vez de parchearlos. Decisión del operador: el desenlace describe a
+la persona, **nunca el estado de la vacante** — cupo lleno o búsqueda cerrada son *causa* de «Sin selección», no
+etiqueta. Enmienda `GREENHOUSE_HIRING_OPENING_CAPACITY_CLOSURE_DECISION_V1` (corregido en sitio, sigue `Proposed`).
+
+**La auditoría se equivocó cinco veces y está declarado.** 6 barridos automatizados levantaron 22 hallazgos; 5
+verificadores adversariales después, ninguna conclusión estructural cayó pero **5 afirmaciones estaban
+sobredimensionadas y 2 evidencias declaradas eran falsas** — dos de ellas propias. H-03 y H-04 bajaron de P0; el
+veredicto de Full API Parity se reformuló (cumple la letra del ADR por su cláusula de deuda; incumple el patrón
+canónico §2, que no tiene escape, y el modelo correcto ya existe en el mismo dominio: `HiringHandoff`). El banner del
+encabezado declara **cuatro modos de fallo** para quien audite después; el cuarto —*verificar el contenido de la tabla
+cuando lo que gobierna es el código desplegado*— salió de **ejecutar** la auditoría, no de escribirla, y produjo un
+break real de producción reparado en minutos (regla dura nueva en `GREENHOUSE_DATABASE_TOOLING_V1.md`).
+
+**Carril abierto:** `TASK-1765`…`TASK-1771` (`EPIC-011`), con 12 tasks vivas alineadas — 5 con el cuerpo reescrito
+porque su contrato contradecía el ADR (el Slice 2 de `TASK-1748` escribía `stage='closed'` al archivar, que es justo
+lo prohibido; `TASK-1763` mostraba «N personas serán rechazadas» en pantalla) y 7 con Delta de coordinación. Dos
+superficies no generaron ID y entraron como Delta a su dueño. Decisiones del operador registradas: el correo al
+candidato conserva **«Preselección»** como divergencia deliberada; el identificador se queda en `shortlisted`; y en
+agendamiento de entrevistas **el calendario manda** — Greenhouse agenda pero no es su dueño.
+
+Siguiente paso: `TASK-1748` destraba el `CHECK` del invariante moviendo sus 32 filas; `TASK-1771` va **antes** del
+colapso de `TASK-1754`. Estado: **todo documental, sin push pendiente salvo los últimos commits**; ningún cambio de
+runtime salió de esta sesión.
+
 ## 2026-08-22 — TASK-1765 parte el pipeline en dos ejes; cerrar es decidir. Contract del enum, POST-RELEASE
 
 El pipeline de Hiring pasa a modelar **etapa** (dónde va la persona) y **desenlace** (cómo terminó su proceso) como
@@ -83,7 +126,7 @@ Cada cohorte exige baseline, diff limitado al footer, previews 720/390 y sin im�
 canary consentido en cliente real y rollback por tipo. Access/security, Hiring externo y transaccionales regulados
 nunca comparten release. Estado: **diseño/documentación; ADR Proposed; ningún template, envío o runtime cambió**.
 Siguiente paso: revisar/aceptar el ADR y sólo entonces crear la child foundation dentro de `EPIC-042`; siguientes
-IDs libres `TASK-1765` y `EPIC-043`.
+IDs libres `TASK-1772` y `EPIC-043` (actualizado 2026-08-22: `TASK-1765`…`TASK-1771` tomadas por el carril de desenlace).
 
 ## 2026-08-21 — Correo de selección personalizado adopta una firma visual Efeonce; rollout pendiente
 
@@ -551,43 +594,3 @@ migración TASK-1745, luego migración `20260819072130586`, ejecutar/verificar e
 desplegar app+worker dormantes, configurar webhook firmado global de Resend, verificar `click_tracking=false`, hacer
 smokes PG/browser/email consentidos y recién entonces habilitar capability/email type/cutover. Hoy no se aplicó ni
 activó nada; el correo inicial continúa por el enlace legacy y `sent` no prueba entrega.
-
-## 2026-08-18 — Hiring AI y candidate review MCP: runtime reconciliado
-
-El release `7e7a474217eb` (run `32193134959`) dejó `global_provisional` activo para assessments elegibles de
-todas las vacantes: ops-worker `00584-r4x`, 100% tráfico, concurrencia 1, cap 1000 y scheduler cada 2 minutos.
-Exception policy y batch confirm siguen OFF; nada muta el score efectivo ni llega al postulante. El dossier está
-ON en producción y auto-propone con Google `gemini-2.5-flash`/prompt v2 cuando CV limpio y assessment puntuado
-están listos; nunca auto-confirma.
-
-Candidate review MCP también quedó activo internal-only con applicationId exacto, chunks minimizados/redactados,
-hash, purpose y audit. Canary OAuth/MCP 200 y borde sin auth 401. B2B y todos los writes siguen bloqueados.
-
-Lifecycle honesto: TASK-1743 cerró code complete con GVC 4,82/5, pero la compactación final de barras
-`20964b72a..3616cb5b8` es posterior al SHA productivo y viaja en el siguiente release ordinario. TASK-1742 y
-TASK-1718 permanecen in-progress por cooldown/rollback/sign-offs; no se inventaron aprobaciones. El release
-classifier omitió rutas Hiring del ops-worker y exigió corrección manual; verificar siempre parity 4/4 por SHA.
-
-## 2026-08-18 — Las dos vacantes vivas ya están en el contrato editorial v2
-
-Autoradas y publicadas con `PublicOpeningContent` v2 completo por el command canónico. Antes tenían
-sólo `workModel` poblado y toda la hoja caía al fallback de prosa; ahora sirven las 13 secciones del
-formato canónico, incluida **"Cómo se ve un buen primer año"** — los outcomes observables, que es el
-campo que el formato agrega y que ninguna de las dos declaraba.
-
-Casi todo se **derivó de la prosa ya aprobada** (descripción, requisitos, deseables, notas de
-proceso), que es reestructurar, no inventar. Los tres hechos que no existían en ninguna fuente los
-resolvió el CEO, tal como exige la receta (`job-offer-recipe.md` §0: *"if a fact cannot be resolved,
-carry `needs confirmation` and stop before publication"*): **Account Manager reporta al CEO**,
-**Content Creator a la Creative Operations Lead**, y el **compromiso de respuesta es de 3 a 4
-semanas**. Ese último es el campo que más pesa: es donde la vacante deja de vender y se compromete —
-y hoy hay 35 postulaciones sin revisar, así que el compromiso es deliberadamente conservador.
-
-Corregido de paso: `EO-OPN-0061` publicaba "Contrato indefinido" como jornada, que con vinculación
-internacional sólo es exacto para Chile. Ahora dice "Jornada completa" —la dedicación sí es
-universal— y la forma contractual se explica en el modelo de trabajo. Efecto colateral correcto:
-`employmentType: FULL_TIME` en el schema, que antes se omitía por ambiguo.
-
-Verificado en producción: ambas 200, las 13 secciones presentes, JSON-LD de 5756 y 4508 caracteres
-con los outcomes incluidos, `baseSalary` sólo en Content Creator (la única con rango aprobado) y
-`employmentType: FULL_TIME` en las dos.
