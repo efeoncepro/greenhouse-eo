@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-011`
-- Status real: `ADR Accepted 2026-08-22; cero código, cero migración, cero cambio de runtime`
+- Status real: `Slices 1-3 + 6 aplicados 2026-08-22 (expand, command con causa, cierre por tipo, señal, docs). Slice 4 (contract del enum) y Slice 5 (CHECK del invariante) POST-RELEASE en docs/tasks/pending-migrations/`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -101,7 +101,10 @@ Reglas obligatorias:
   (`src/lib/hiring/assessment/assignment-policy/store.ts:106-109` y `assignment-store.ts:82`) y produce `500` al
   releer una fila histórica, que además es irreescribible por diseño (H-05).
 - **NUNCA** retirar literales de las escaleras de rango de la VIEW de equidad
-  (`migrations/20260713165547000_task-1365-voluntary-demographics-and-fairness.sql:104-143`): son tabla de
+  — la definición VIVA es `migrations/20260713173500000_task-1365-application-scoped-selfid-hardening.sql:71+`
+  (**corregido 2026-08-22**: esta spec citaba `20260713165547000_*`, que es la copia SUPERSEDED; apuntar un
+  «NUNCA modificar» al archivo muerto es peor que no tenerlo, porque da sensación de protección
+  mientras alguien edita la copia viva sin fricción). Son tabla de
   traducción histórica de payloads inmutables, no espejo del vocabulario vigente.
 - **SIEMPRE** expand antes que contract, y readback contra PG real antes y después de cada migración.
 
@@ -255,8 +258,7 @@ del kanban y `PipelineDeskView.tsx` (`TASK-1766`); la VIEW de equidad (`TASK-176
 
 ### Data model and invariants
 
-- Entidades/tablas/views afectadas: `greenhouse_hiring.hiring_application`; la VIEW de equidad de
-  `migrations/20260713165547000_task-1365-voluntary-demographics-and-fairness.sql` se **lee**, no se modifica
+- Entidades/tablas/views afectadas: `greenhouse_hiring.hiring_application`; la VIEW de equidad viva (`migrations/20260713173500000_task-1365-application-scoped-selfid-hardening.sql`) se **lee**, no se modifica
   (es de `TASK-1767`).
 - Invariantes que no se pueden romper:
   - `stage = 'closed'` ⟺ `decision IS NOT NULL`. Como `CHECK`, en ambas direcciones.
@@ -582,6 +584,73 @@ escribible hasta que alguien la agregue deliberadamente, que es la dirección co
 validación de opening para `selected`/`backup_selected` → snapshot de assessment → `UPDATE` de la fila con
 `decision`, `decision_cause` y `stage='closed'` → `jsonb_set` del historial → `publishOutboxEvent`. La causa entra
 en el mismo `UPDATE`, nunca en una segunda escritura: el `CHECK` de pareja lo exige.
+
+## Delta de ejecución 2026-08-22 — el orden de slices cambió, y por qué
+
+### Lo aplicado
+
+Slices **1, 2, 3 y 6** están aplicados en base y en código. Los Slices 1 y 2 fueron **un solo commit**
+y no por conveniencia: `DECISION_STAGE` es una `Record` TOTAL, así que ampliar el enum obliga a
+completar el mapa en el mismo cambio, y separarlos dejaba un estado donde `not_selected` pasaba la
+validación del command pero violaba el `CHECK` de pareja en la base — un 500 en vez del 422 canónico.
+El `Hybrid Execution Justification` de esta misma task ya argumentaba que dato y command son una
+pieza; el compilador lo confirmó.
+
+### Lo que se movió a POST-RELEASE, por un incidente en producción
+
+Slice **4** (retirar `on_hold` del `CHECK`) y Slice **5** (el `CHECK` del invariante) pasan al **mismo
+lote post-release**. Los dos son irreversibles y los dos dependen de que el código ya esté arriba.
+
+El Slice 4 se aplicó y **rompió producción durante ~7 minutos**. El readback previo era correcto —0
+filas `on_hold`, 0 entradas de historial— pero estaba sobre el eje equivocado:
+
+> **«Cero filas» no es «nadie lo escribe»: sólo dice que nadie lo escribió TODAVÍA.**
+
+Hay **una sola instancia de Cloud SQL** compartida por dev, staging y producción, y producción sirve
+`origin/main`, que todavía pinta el botón «Dejar en espera». Angostar el `CHECK` dejó esa acción
+respondiendo `23514`. Cero filas afectadas, cero datos perdidos; reparado con el forward fix
+permisivo `20260822204609045_task-1765-hiring-outcome-restore-on-hold-until-release`, verificado
+ejercitando un `UPDATE` real y no leyendo la definición del `CHECK`.
+
+La regla que faltaba, y que **ningún guard de SQL puede sustituir** —sólo ve datos, y la precondición
+es sobre código desplegado—:
+
+> **Un contract de enum se aplica DESPUÉS del release que retira el valor del código, nunca antes.**
+> La alcanzabilidad se deriva del **contrato de la superficie desplegada** (`origin/main`), jamás del
+> contenido de la tabla.
+
+Está escrita en `GREENHOUSE_DATABASE_TOOLING_V1.md` y como enmienda al §14 del ADR, porque no es una
+regla de Hiring.
+
+### Segundo hallazgo: no existe «migración escrita y sin aplicar» como estado seguro
+
+Esta spec pedía dejar el `CHECK` del Slice 5 «escrito y committeado sin aplicar». Eso **bloqueó la
+reparación urgente de producción**: `pnpm migrate:up` corre todas las pendientes en orden de
+timestamp y abortó contra su guard antes de llegar al forward fix. El guard funcionó perfecto; el
+problema es que estaba en el camino.
+
+Nace `docs/tasks/pending-migrations/` — migraciones revisadas, con sufijo `.sql.pending`, fuera del
+alcance del runner, con su condición de reactivación declarada. **Esa instrucción de esta spec queda
+invalidada.** El lote pendiente y su orden están en el README de esa carpeta.
+
+### Ownership acotado declarado
+
+- `src/views/greenhouse/hiring/Application360View.tsx` — el archivo es de `TASK-1747`. Esta task tocó
+  **sólo tres líneas** (`on_hold` en el arreglo de opciones, en el grupo de botones y en el tono del
+  historial), coordinado con esa sesión antes de editar. La clave de copy `decisionHold` queda
+  **viva**: retirarla rompería el contrato de `src/lib/copy/types.ts` y su retiro es de `TASK-1766`.
+- `src/lib/hiring/assessment/assignment-policy/readers.ts` — cae en el glob de `TASK-1719` y lo
+  referencia `TASK-1767`. Esta task agregó `'closed'` a `STAGES_DOWNSTREAM_OF_TRIGGER` (dos líneas,
+  aditivo) porque el colapso de `DECISION_STAGE` habría vaciado en silencio la cola humana de
+  triggers perdidos — es el H-11 de la auditoría, encontrado desde el otro lado.
+
+### Corrección de conteo
+
+Las violaciones del invariante son **33, no 32**, y se violan por **los dos lados** de la
+bicondicional: 32 filas `closed` sin desenlace (sintéticas, de `TASK-1748`) **más** 1 fila real
+`rejected` que vive todavía en su etapa espejo. El criterio de aceptación correcto es **33 → 0**.
+
+---
 
 ## Rollout Plan & Risk Matrix
 

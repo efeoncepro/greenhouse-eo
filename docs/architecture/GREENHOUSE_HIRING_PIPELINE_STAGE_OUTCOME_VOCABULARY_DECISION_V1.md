@@ -1,6 +1,6 @@
 # GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1 — El pipeline es el recorrido de la persona: etapa y desenlace son dos ejes, y cerrar obliga a declarar cómo
 
-- **Status**: Accepted (2026-08-22 — decisión del operador en sesión de diseño. **NO implementada**: cero código, cero migración, cero cambio de runtime. Autoriza el vocabulario, no la ejecución)
+- **Status**: Accepted (2026-08-22) — **§4, §4.1 y §6 implementados parcialmente el 2026-08-22 por [`TASK-1765`](../tasks/in-progress/TASK-1765-hiring-application-outcome-axis.md); §5 escrito y pendiente de aplicar.** Ver §16.
 - **Date**: 2026-08-22
 - **Deciders**: operador (CEO) — decisión de producto sobre el vocabulario y sus etiquetas · agente de diseño (skills `state-design`, `info-architecture`, `greenhouse-ux-writing`, `greenhouse-talent-people-operator`)
 - **Tags**: hiring, ats, pipeline, vocabulary, kanban, privacy, retención, fairness, talent-pool, full-api-parity
@@ -279,3 +279,41 @@ El orden no es preferencia: cada paso destruye el discriminante que el siguiente
 - ¿La causa se extiende también a `rejected` (motivo del descarte: requisitos, evidencia, entrevista)? Útil para calibrar selección; **no** es requisito de este ADR y no debe frenarlo.
 - ¿`unresponsive` se puede derivar automáticamente tras N días sin respuesta, o siempre lo declara una persona? Deriva automática toca comunicación al candidato y necesita su propia decisión.
 - Rename físico `decision` → `outcome`: deferido, con su propia migración.
+
+---
+
+## 16. Delta de implementación — 2026-08-22 (`TASK-1765`)
+
+### Aplicado en base y en código
+
+| Sección | Qué entró | Dónde |
+|---|---|---|
+| §4 | Los dos desenlaces nuevos, `not_selected` y `unresponsive`, admitidos en el `CHECK` y en el enum TS | `migrations/20260822202243572_*`, `src/types/hiring.ts` |
+| §4.1 | `decision_cause` con su `CHECK` de enum y su `CHECK` de pareja **bicondicional**: obligatoria en `not_selected`, prohibida en el resto | misma migración |
+| §5 | `archived_at` — el campo de archivado ortogonal que `TASK-1748` necesita para dejar de archivar escribiendo `closed` | misma migración |
+| §4 | El command recibe y persiste desenlace **y** causa en el mismo `UPDATE`, en el historial y en `sameReplayPayload` (distinta causa ⇒ 409) | `src/lib/hiring/decide.ts` |
+| §3 | Todo desenlace terminal escribe `stage='closed'`; ninguna etapa espejo se vuelve a escribir | `DECISION_STAGE` |
+| §5 | El cambio de etapa **no puede cerrar, por tipo**: nace `HIRING_PIPELINE_STAGES` y la denylist se borró | `src/types/hiring.ts`, `src/lib/hiring/store.ts` |
+| §7.3 | El selector de `EmailType` pasa a mapa explícito con no-op declarado: un desenlace sin tipo propio nace mudo | `src/lib/hiring/notifications/send.ts` |
+| — | Señal `hiring.application.closed_without_outcome`, que nace **antes** que el `CHECK` para medir el drift que ese `CHECK` va a impedir | `src/lib/reliability/queries/hiring-application-outcome-signals.ts` |
+
+### Pendiente, con condición de ejecución declarada
+
+Ambas viven en `docs/tasks/pending-migrations/` y **no** en `migrations/` — ver ahí el porqué.
+
+1. **Contract del enum de desenlaces** (retirar `on_hold` del `CHECK`) — cuando `origin/main` ya no ofrezca «Dejar en espera».
+2. **§5, el `CHECK` del invariante** `(stage='closed') = (decision IS NOT NULL)` — cuando `TASK-1748` haya movido sus 32 filas sintéticas. Readback esperado: **33 → 0**.
+
+### Enmienda a §14 — el orden vale para CUALQUIER enum, no sólo para el de etapas
+
+El §14 dice «el contract es irreversible y no se ejecuta hasta verificar el expand en producción», y estaba escrito pensando en el enum de **etapas**. El 2026-08-22 se aplicó el contract del enum de **desenlaces** contra la instancia compartida mientras producción todavía ofrecía `on_hold`: la acción «Dejar en espera» quedó rota (`23514`) durante ~7 minutos, con cero filas afectadas, hasta un forward fix permisivo.
+
+La regla generalizada, y la razón por la que ningún guard de SQL puede sustituirla:
+
+> **Un contract de enum se aplica DESPUÉS del release que retira el valor del código, nunca antes.** La alcanzabilidad se deriva del **contrato de la superficie desplegada** (`origin/main`), jamás del contenido de la tabla: «cero filas» sólo dice que nadie lo escribió *todavía*. Un `RAISE EXCEPTION` dentro de la migración **no puede** validar esto — sólo ve datos, y la precondición es sobre código desplegado.
+
+Pesa el doble en este repo porque **hay una sola instancia de Cloud SQL** compartida por dev, staging y producción. Detalle canónico en `GREENHOUSE_DATABASE_TOOLING_V1.md`.
+
+### Lo que este delta NO cambia
+
+`decision` conserva su nombre físico (§11). Las escaleras de rango de la VIEW de equidad quedan intactas: son tabla de traducción histórica y su definición viva está en `migrations/20260713173500000_task-1365-application-scoped-selfid-hardening.sql`, **no** en la copia superseded de `20260713165547000_*`.

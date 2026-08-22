@@ -223,6 +223,7 @@ import { getWorkforceHiringActivationStuckSignal } from './queries/workforce-hir
 import { getHiringAssessmentAiRunSignals } from './queries/hiring-assessment-ai-run-signals'
 // TASK-1736 Slice 4 — Candidate identity intake signals (moduleKey 'hiring').
 import { getHiringDataOriginDerivationDriftSignal } from './queries/hiring-data-origin-drift'
+import { getHiringApplicationOutcomeDriftSignal } from './queries/hiring-application-outcome-signals'
 import { getHiringCandidateIdentitySignals } from './queries/hiring-candidate-identity-signals'
 import { getKnowledgeQuarantineCountSignal } from './queries/knowledge-quarantine-count'
 import { getKnowledgeSyncFailedSourceSignal } from './queries/knowledge-sync-failed-source'
@@ -731,6 +732,7 @@ interface ReliabilityOverviewSources {
   /** TASK-1736 — Candidate identity intake (needs_review backlog + evidence coverage gap). */
   hiringCandidateIdentity?: ReliabilitySignal[] | null
   hiringDataOriginDrift?: ReliabilitySignal | null
+  hiringApplicationOutcomeDrift?: ReliabilitySignal | null
   workforceHiringActivationStuck?: ReliabilitySignal | null
   knowledgeSyncFailedSource?: ReliabilitySignal | null
   knowledgeNotionIngestDeadLetter?: ReliabilitySignal | null
@@ -1231,6 +1233,7 @@ export const buildReliabilityOverview = (
     // TASK-1736 — Identidad del intake de candidatos (2 señales, steady=0; flag OFF ⇒ ok).
     ...(sources.hiringCandidateIdentity ?? []),
     ...(sources.hiringDataOriginDrift ? [sources.hiringDataOriginDrift] : []),
+    ...(sources.hiringApplicationOutcomeDrift ? [sources.hiringApplicationOutcomeDrift] : []),
     ...(sources.workforceHiringActivationStuck ? [sources.workforceHiringActivationStuck] : []),
     ...(sources.knowledgeSyncFailedSource ? [sources.knowledgeSyncFailedSource] : []),
     ...(sources.knowledgeNotionIngestDeadLetter ? [sources.knowledgeNotionIngestDeadLetter] : []),
@@ -1945,6 +1948,13 @@ export const getReliabilityOverview = async (
     preloadedSources.hiringDataOriginDrift !== undefined
       ? preloadedSources.hiringDataOriginDrift
       : await getHiringDataOriginDerivationDriftSignal().catch(() => null)
+
+  // TASK-1765 — drift del invariante `stage='closed'` ⟺ desenlace. Nace ANTES que el CHECK de base
+  // para medir el drift que ese CHECK va a impedir, y queda después como red.
+  const hiringApplicationOutcomeDrift =
+    preloadedSources.hiringApplicationOutcomeDrift !== undefined
+      ? preloadedSources.hiringApplicationOutcomeDrift
+      : await getHiringApplicationOutcomeDriftSignal().catch(() => null)
 
   const knowledgeSyncFailedSource =
     preloadedSources.knowledgeSyncFailedSource !== undefined
@@ -2790,6 +2800,7 @@ export const getReliabilityOverview = async (
     hiringAssessmentAiRun,
     hiringCandidateIdentity,
     hiringDataOriginDrift,
+    hiringApplicationOutcomeDrift,
     workforceHiringActivationStuck,
     knowledgeSyncFailedSource,
     knowledgeNotionIngestDeadLetter,

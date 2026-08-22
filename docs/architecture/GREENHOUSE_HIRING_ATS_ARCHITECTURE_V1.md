@@ -159,6 +159,121 @@ Este documento fija:
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
 
+## Delta 2026-08-22 — TASK-1765: el eje de DESENLACE, su causa gobernada y el cierre como command
+
+Implementa `GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1` §4/§4.1/§5/§6. El
+pipeline pasa a modelar **dos ejes ortogonales**: `stage` es *dónde va la persona en el recorrido*, y
+el desenlace es *cómo terminó ese recorrido*.
+
+### El desenlace, y por qué el campo no se llama como el concepto
+
+El campo físico conserva el nombre `decision` (el rename a `outcome` está deferido, ADR §11), pero el
+concepto es **desenlace**. `withdrawn` y `unresponsive` **no son decisiones de Efeonce**, así que
+**NUNCA** leer esa columna como «lo que Efeonce decidió»: significa «cómo terminó el proceso».
+
+Seis valores: `selected`, `backup_selected`, `not_selected`, `rejected`, `withdrawn`, `unresponsive`.
+
+Las dos distinciones que se ganaron su existencia porque cambian una consecuencia real:
+
+- **`not_selected` ≠ `rejected`.** `rejected` es un juicio sobre la persona. Usarlo para quien llegó
+  al final y no quedó porque el cupo lo tomó otra la saca del Talent Pool por defecto, sesga a
+  cualquier revisor futuro que lea su historia, e **infla la tasa de rechazo de su cohorte
+  demográfica** en el análisis de impacto adverso. `not_selected` es la población objetivo del
+  Talent Pool.
+- **`unresponsive` ≠ `withdrawn`.** A quien deja de responder había que inventarle un retiro que no
+  declaró o un juicio que no hubo. Las dos son atribución falsa. `unresponsive` no atribuye conducta
+  y **no manda correo**.
+
+`on_hold` deja de ser desenlace: una pausa no es un cierre. Vivía en el enum *y* mapeaba a la etapa
+`decision_pending`, así que la misma fila decía «terminó» y «sigue viva». Una pausa se registra
+moviendo la **etapa** a `decision_pending`.
+
+### La causa, y por qué es enum y no prosa
+
+`decision_cause` es **obligatoria en `not_selected` y prohibida en los otros cinco**. No es opcional:
+es una **bicondicional**, garantizada por `hiring_application_decision_cause_pairing_check`.
+
+| Causa | Qué pasó | ¿Cuenta en el embudo de equidad? |
+|---|---|---|
+| `capacity_filled` | El cupo lo tomó otra persona | **sí** — el proceso concluyó y hubo comparación |
+| `opening_closed` | Se cerró la búsqueda | **no** — el proceso no concluyó |
+| `process_cancelled` | Se canceló el proceso | **no** |
+
+Es enum gobernado porque **hay consumidores que ramifican por ella** (el embudo de equidad y el
+cuerpo del correo). Texto libre acá haría irreproducible el análisis de impacto adverso.
+
+**La vacante entra SIEMPRE como causa, JAMÁS como desenlace.** Etiquetar a una persona con el estado
+de la vacante es el defecto que este eje viene a cerrar.
+
+### Cerrar es decidir: el cambio de etapa pierde `closed` por TIPO
+
+El guard anterior era una **denylist** de cuatro literales, y como toda lista de excepciones falló
+por lo que no enumeraba: por ahí se colaron `closed` y `handoff_ready`. Arrastrar una tarjeta a
+«Cerrado» escribía `closed` **sin decisión** — sin evento, sin correo, sin arrancar el reloj de
+retención, y congelando el borrado de los documentos de esa persona en **todas** sus postulaciones,
+porque el detector de retención cruza por `identity_profile_id`.
+
+La denylist **se borró, no se amplió**. Nace `HIRING_PIPELINE_STAGES` —el subconjunto escribible como
+cambio de etapa— y el tipo lo hace cumplir en compilación. **Una etapa nueva nace NO escribible**
+hasta que alguien la agregue deliberadamente. `createHiringApplication` se acota igual: una
+postulación nace en el recorrido.
+
+Error canónico: `hiring_application_close_requires_outcome` (422, `actionable: false`) — reintentar
+el mismo `PATCH` no lo resuelve; la acción real es decidir el desenlace.
+
+### Contrato del command
+
+`decideHiringApplication` conserva su transacción única y suma la causa:
+`SELECT ... FOR UPDATE` → detección de replay → validación de opening → snapshot de assessment →
+`UPDATE` con `decision`, `decision_cause` y `stage='closed'` **en el mismo statement** (la
+bicondicional no admite estados intermedios) → `jsonb_set` del historial → `publishOutboxEvent`.
+
+- La causa entra en `sameReplayPayload`: **misma clave de idempotencia con distinta causa ⇒ 409**, no
+  un replay silencioso. Cerrar «porque el cupo lo tomó otra persona» y «porque cancelamos el proceso»
+  son hechos distintos, cuentan distinto en el embudo y mandan cuerpos de correo distintos.
+- `hiring.application.decided` suma `cause` al payload. La causa es un enum, no PII; la **razón** de
+  la decisión y el nombre del candidato nunca entran.
+
+### Un `EmailType` por desenlace; la causa modula el cuerpo
+
+El selector de `send.ts` era un ternario binario que colapsaba todo lo no-seleccionado en
+«rechazado»: el primer `not_selected` habría mandado un correo de **rechazo** a quien nadie rechazó, y
+el log append-only habría firmado ese hecho falso. Ahora es un **mapa explícito con no-op declarado**:
+un desenlace sin tipo propio **nace mudo**. `hiring_decision_not_selected` lo crea `TASK-1762` con su
+fila de `email_type_config` y su seed en el `ops-worker` (**NO** en Vercel).
+
+### Estado de rollout
+
+| Pieza | Estado |
+|---|---|
+| Expand del `CHECK`, `decision_cause`, `archived_at`, índice parcial | **aplicado** |
+| Command con causa + colapso de `DECISION_STAGE` a `closed` | **aplicado** |
+| Cambio de etapa sin `closed`, por tipo | **aplicado** |
+| Señal `hiring.application.closed_without_outcome` | **aplicada** (hoy `warning`: 32 sintéticas de `TASK-1748` + 1 etapa espejo) |
+| Contract del enum (retirar `on_hold` del `CHECK`) | **pendiente** — post-release |
+| `CHECK` del invariante `(stage='closed') = (decision IS NOT NULL)` | **pendiente** — espera a `TASK-1748` |
+
+Las dos pendientes viven en `docs/tasks/pending-migrations/` con su condición de ejecución declarada.
+
+### Invariantes operativos para agentes — Eje de desenlace
+
+- **NUNCA** un `stage='closed'` sin desenlace declarado. Cerrar pasa por `decideHiringApplication`.
+- **NUNCA** etiquetar a una persona con el estado de la vacante: la vacante es **causa** de
+  `not_selected`, jamás desenlace.
+- **NUNCA** usar `rejected` donde no hubo juicio sobre la persona — ni por capacidad, ni por
+  cancelación, ni por silencio.
+- **NUNCA** registrar el silencio como `withdrawn`: es atribuirle a alguien una decisión que no tomó.
+- **NUNCA** dejar la causa como texto libre, ni escribirla en un `UPDATE` distinto al del desenlace.
+- **NUNCA** archivar escribiendo `closed`: archivar es `archived_at`, un eje aparte.
+- **NUNCA** ampliar una denylist de etapas: el conjunto escribible se define por **inclusión**.
+- **NUNCA** reusar el `EmailType` de un desenlace para otro — el sistema ramifica por ese valor
+  (kill-switch, perfil de footer, selector de envío).
+- **NUNCA** aplicar un contract de enum antes del release que retira el valor del código. «Cero
+  filas» no es «nadie lo escribe»: la alcanzabilidad sale del **contrato de la superficie
+  desplegada**. Ocurrió el 2026-08-22; detalle en `GREENHOUSE_DATABASE_TOOLING_V1.md`.
+
+---
+
 ## Delta 2026-08-17 — TASK-1740: contenido público estructurado + fundación JobPosting/canonical
 
 La proyección pública de una vacante deja de depender del parser heurístico de prosa como única
