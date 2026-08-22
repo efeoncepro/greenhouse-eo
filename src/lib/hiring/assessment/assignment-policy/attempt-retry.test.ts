@@ -399,6 +399,7 @@ vi.mock('@/lib/sync/publish-event', () => ({ publishOutboxEvent: () => publishOu
 
 const { proposeAssessmentAssignment } = await import('./propose-assignment')
 const { confirmAssessmentAssignment } = await import('./confirm-assignment')
+const { assignAssessmentFromPolicy, NEXT_ATTEMPT_AFTER_DEAD_END } = await import('./assign')
 
 const ACTOR = 'user-1'
 
@@ -537,5 +538,53 @@ describe('TASK-1755 — lo que NO se puede relajar', () => {
     expect(second.result?.status).toBe('blocked')
     expect(manualLedger().map(r => r.attempt_seq)).toEqual([1, 2])
     expect(db.instances).toHaveLength(0)
+  })
+})
+
+describe('TASK-1755 — límite de autoridad y numeración de intentos', () => {
+  it('un origen automático NO puede ni pedir el intento siguiente', async () => {
+    world.policyState = 'enabled'
+
+    await expect(
+      assignAssessmentFromPolicy({
+        applicationId: 'happ-1',
+        policyId: 'hoap-1',
+        origin: 'stage_auto',
+        actorUserId: null,
+        triggerStage: 'shortlisted',
+        attemptSeq: NEXT_ATTEMPT_AFTER_DEAD_END,
+      }),
+    ).rejects.toMatchObject({ code: 'assessment_assignment_attempt_forbidden' })
+
+    // El fault ocurre ANTES de tocar nada: ni ledger, ni instancia.
+    expect(db.ledger).toHaveLength(0)
+    expect(db.instances).toHaveLength(0)
+  })
+
+  it('tras una cancelación el intento nuevo es monotónico: no reusa el rótulo del superseded', async () => {
+    world.policyState = 'enabled'
+
+    // Intento 1 asigna.
+    const first = await proposeAndConfirm()
+
+    expect(first.result?.status).toBe('assigned')
+
+    // Cancelación: supersede la fila del ledger y cierra la instancia (lo que hace
+    // `supersedeAssignmentsForAssessment` dentro de la tx de `cancelAssessment`).
+    db.ledger[0].superseded_at = NOW
+    db.ledger[0].outcome = 'cancelled'
+    db.ledger[0].outcome_reason = 'operator_cancelled'
+    db.instances[0].status = 'cancelled'
+
+    const second = await proposeAndConfirm()
+
+    expect(second.result?.status).toBe('assigned')
+    expect(db.instances).toHaveLength(2)
+    // Intento 2, NO otro intento 1: dos filas con el mismo rótulo serían dos historias distintas
+    // diciendo lo mismo, y el ledger dejaría de poder ordenarse por intento.
+    expect(manualLedger().map(r => ({ attempt: r.attempt_seq, outcome: r.outcome }))).toEqual([
+      { attempt: 1, outcome: 'cancelled' },
+      { attempt: 2, outcome: 'assigned' },
+    ])
   })
 })

@@ -17,7 +17,13 @@ import {
 
 import { HiringNotFoundError, HiringValidationError } from '../../errors'
 import { insertCandidateTest } from '../instances'
-import { attachAssignmentInstance, countAssignedInWindow, recordAssignment } from './assignment-store'
+import {
+  attachAssignmentInstance,
+  countAssignedInWindow,
+  isRecoverableAssignmentOutcome,
+  readAssignmentAttemptState,
+  recordAssignment,
+} from './assignment-store'
 import { lockPolicyForUpdate } from './store'
 
 /**
@@ -41,6 +47,22 @@ import { lockPolicyForUpdate } from './store'
  * como permanente.
  */
 const UNDELIVERABLE_EMAIL_DOMAIN_SUFFIXES = ['.test', '.invalid', '.local', '.localhost', '.example'] as const
+
+/**
+ * TASK-1755 — Sentinel del intento siguiente. **Sólo `confirmAssessmentAssignment` lo pasa**, y
+ * eso es el contrato entero: la confirmación es one-shot por propuesta
+ * (`lockAssignmentProposalForUpdate` + la guarda de `status`), así que un reintento de
+ * TRANSPORTE de la misma petición nunca llega hasta acá — la segunda respuesta sale por la rama
+ * `already_confirmed`. Llegar acá significa que una persona confirmó una propuesta que nunca se
+ * había confirmado, o sea una decisión humana nueva. Esa es la condición que la idempotencia
+ * necesita, y la da la IDENTIDAD de la propuesta.
+ *
+ * ⚠️ **NO se ata al digest de la propuesta, a propósito.** `templateStatus` no entra al material
+ * del digest (`proposal-digest.ts`): activar una plantilla inactiva deja el efecto propuesto
+ * idéntico. Con "digest distinto" como criterio, un `blocked: template_inactive` quedaría en
+ * callejón permanente — que es justo el bug que esta task cierra.
+ */
+export const NEXT_ATTEMPT_AFTER_DEAD_END = 'next-after-dead-end'
 
 interface ApplicationSnapshot {
   applicationId: string
@@ -131,8 +153,17 @@ export interface AssignAssessmentFromPolicyInput {
   actorUserId: string | null
   /** Requerido para orígenes automáticos; `manual` cuando lo confirma una persona. */
   triggerStage?: AssessmentAssignmentTrigger | null
-  /** SÓLO un command humano puede pedir > 1 (ADR D2 capa 3). */
-  attemptSeq?: number
+  /**
+   * SÓLO un command humano puede pedir más de un intento (ADR D2 capa 3).
+   *
+   * - Un número: el intento EXACTO. Es lo que usa la automatización, que siempre escribe 1.
+   * - `'next-after-dead-end'` (TASK-1755): resuélvelo contra el ledger bajo el lock de la
+   *   policy. Abre el intento siguiente sólo si el intento vigente terminó en un resultado
+   *   recuperable; si la clave está legítimamente ocupada devuelve SU número, para que el
+   *   `ON CONFLICT` colisione y el caller reciba el replay honesto en vez de una asignación
+   *   nueva. Lo pide el confirm humano y NADIE más.
+   */
+  attemptSeq?: number | typeof NEXT_ATTEMPT_AFTER_DEAD_END
 }
 
 const terminalResult = (
@@ -225,12 +256,17 @@ export const assignAssessmentFromPolicy = async (
     )
   }
 
-  const attemptSeq = Math.max(1, Math.floor(input.attemptSeq ?? 1))
+  const requestedAttempt = input.attemptSeq ?? 1
 
   // Límite de autoridad (ADR D2 capa 3): un bug de la policy no genera la segunda prueba de
   // nadie. Es un fault deliberado, NO un outcome modelado — el caller automático está
   // pidiendo algo que no le corresponde.
-  if (input.origin !== 'manual' && attemptSeq > 1) {
+  //
+  // Se evalúa sobre lo PEDIDO y antes de resolver nada: un origen automático no puede ni
+  // siquiera pedir el sentinel. El CHECK `(origin = 'manual' OR attempt_seq = 1)` de la base es
+  // la última red, pero acá el error dice qué pasó en vez de reventar como violación de
+  // constraint.
+  if (input.origin !== 'manual' && requestedAttempt !== 1) {
     throw new HiringValidationError(
       'La asignación automática sólo puede registrar el primer intento.',
       'assessment_assignment_attempt_forbidden',
@@ -263,6 +299,27 @@ export const assignAssessmentFromPolicy = async (
       input.origin === 'manual' ? (input.triggerStage ?? 'manual') : (input.triggerStage ?? policy.triggerStage ?? 'manual')
 
     const intent = await resolveAssignmentIntent(client, policy, application, input.origin, triggerStage)
+
+    // TASK-1755 — En qué casillero del ledger va este intento. Corre BAJO el `FOR UPDATE` de la
+    // policy que tomó `lockPolicyForUpdate` unas líneas más arriba: ese lock serializa TODOS los
+    // assignments de la policy, y cuando el caller es el confirm humano se sostiene además
+    // dentro de la MISMA transacción que ya tiene bloqueada la fila de la propuesta. O sea: el
+    // cálculo del intento siguiente no puede cruzarse con otro que esté resolviendo el suyo.
+    const attemptSeq = await resolveAttemptSeq(
+      client,
+      { applicationId, policyId: policy.policyId, policyVersion: policy.policyVersion, triggerStage },
+      requestedAttempt,
+    )
+
+    // Defensa en profundidad del límite de autoridad: la guarda de arriba mira lo pedido, ésta
+    // mira lo resuelto. Ningún camino automático puede terminar escribiendo un intento > 1.
+    if (input.origin !== 'manual' && attemptSeq > 1) {
+      throw new HiringValidationError(
+        'La asignación automática sólo puede registrar el primer intento.',
+        'assessment_assignment_attempt_forbidden',
+        409,
+      )
+    }
 
     const { assignment, created } = await recordAssignment(client, {
       applicationId,
@@ -393,6 +450,43 @@ export const assignAssessmentFromPolicy = async (
   if (txClient) return execute(txClient)
 
   return withGreenhousePostgresTransaction(execute)
+}
+
+/**
+ * TASK-1755 — Traduce lo que el caller pidió al `attempt_seq` que se va a escribir.
+ *
+ * Con el sentinel hay exactamente tres respuestas, y la del medio es la peligrosa:
+ *
+ * 1. **Sin intento vigente** (no hay historia, o todos quedaron superseded por una cancelación)
+ *    ⇒ `max + 1`. Monotónico contra TODA la historia, superseded incluida: reusar el rótulo de
+ *    un intento cancelado dejaría dos filas distintas diciendo "intento 2".
+ * 2. **El intento vigente terminó en un resultado recuperable** (`blocked`/`held`/`stale`) ⇒
+ *    `max + 1`. La causa vive fuera del ledger y pudo corregirse; esto es lo que devuelve la
+ *    capacidad de asignar.
+ * 3. **Cualquier otro resultado vigente** (`assigned`, `already_assigned`, `intent`, una
+ *    `cancelled` que por lo que sea siguiera vigente) ⇒ **SU MISMO número**, nunca 1 ni uno
+ *    libre. Devolver un casillero vacío acá sería el bug caro de todos: insertaría una fila
+ *    nueva junto a un `assigned` vivo y le crearía una SEGUNDA prueba al mismo candidato.
+ *    Devolviendo el suyo, el `ON CONFLICT` colisiona y `resultFromRecord(replay)` responde
+ *    `already_assigned` — o lanza el fault, si la fila estaba en `intent`.
+ */
+const resolveAttemptSeq = async (
+  client: PoolClient,
+  key: {
+    applicationId: string
+    policyId: string
+    policyVersion: number
+    triggerStage: AssessmentAssignmentTrigger
+  },
+  requested: number | typeof NEXT_ATTEMPT_AFTER_DEAD_END,
+): Promise<number> => {
+  if (typeof requested === 'number') return Math.max(1, Math.floor(requested))
+
+  const { maxAttemptSeq, latestActive } = await readAssignmentAttemptState(client, key)
+
+  if (!latestActive) return maxAttemptSeq + 1
+
+  return isRecoverableAssignmentOutcome(latestActive.outcome) ? maxAttemptSeq + 1 : latestActive.attemptSeq
 }
 
 /**

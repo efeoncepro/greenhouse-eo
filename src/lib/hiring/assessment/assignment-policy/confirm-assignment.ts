@@ -9,7 +9,7 @@ import type {
 } from '@/types/hiring-assessment-policy'
 
 import { HiringNotFoundError, HiringValidationError } from '../../errors'
-import { assignAssessmentFromPolicy } from './assign'
+import { assignAssessmentFromPolicy, NEXT_ATTEMPT_AFTER_DEAD_END } from './assign'
 import { buildAssignmentEffectMaterial } from './proposal-digest'
 import {
   lockAssignmentProposalForUpdate,
@@ -118,6 +118,17 @@ export const confirmAssessmentAssignment = async (
       return { kind: 'stale', proposal: await markAssignmentProposalTerminal(client, proposalId, 'superseded') }
     }
 
+    // TASK-1755 — El intento NO se fija en 1. Un resultado no-asignado (`blocked`/`held`/
+    // `stale`) ocupa la clave `(application, policy, versión, 'manual', intento)` mientras siga
+    // vigente, y corregir la causa —habilitar la policy, activar la plantilla, registrar el
+    // correo— no la libera: sin esto, la confirmación siguiente colisionaba y repetía el mismo
+    // resultado PARA SIEMPRE. `assign` resuelve el casillero contra el ledger bajo el lock de la
+    // policy, dentro de ESTA transacción, que ya tiene bloqueada la fila de la propuesta.
+    //
+    // Que llegar acá sea una decisión humana lo garantiza el one-shot de arriba: reconfirmar la
+    // misma propuesta sale por `already_confirmed` sin tocar el ledger, así que un reintento de
+    // transporte no abre ningún intento. Y un `assigned` vigente sigue cerrando la puerta: el
+    // resolver devuelve SU número, el `ON CONFLICT` colisiona y la respuesta es el replay.
     const result = await assignAssessmentFromPolicy(
       {
         applicationId,
@@ -125,6 +136,7 @@ export const confirmAssessmentAssignment = async (
         origin: 'manual',
         actorUserId,
         triggerStage: 'manual',
+        attemptSeq: NEXT_ATTEMPT_AFTER_DEAD_END,
       },
       client,
     )
