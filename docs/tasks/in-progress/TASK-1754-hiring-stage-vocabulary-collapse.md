@@ -180,6 +180,13 @@ una línea sube sola o espera al resto.
 `on_stage_entry`/`disabled`, 1 `manual`/`enabled`), **las 15 en `shortlisted`**. Ledger: 20 filas
 `shortlisted` + 3 `manual`.
 
+**Auditoría completa del radio de impacto (2026-08-22, 6 barridos exhaustivos):**
+[`docs/audits/hiring/GREENHOUSE_HIRING_STAGE_VOCABULARY_AUDIT_2026-08-22.md`](../../audits/hiring/GREENHOUSE_HIRING_STAGE_VOCABULARY_AUDIT_2026-08-22.md)
+— 22 hallazgos (4 P0), las 14 particiones del enum, el grafo de dependencias entre tasks vivas y las
+5 preguntas que exigen decisión humana. **Leerla antes de ejecutar cualquier slice**: contiene
+precondiciones duras que esta spec no tenía (dos relojes de retención, la escalera histórica de
+fairness como tabla de traducción permanente, `assertEnum` en el camino de lectura).
+
 Documento de diagnóstico para el operador (línea de tiempo + orden de desarme):
 <https://claude.ai/code/artifact/5b23dc9b-c027-40aa-bc68-84f965344fbb>
 
