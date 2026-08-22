@@ -21,7 +21,7 @@ Indice de auditorias tecnicas y operativas versionadas dentro de `docs/`.
 - [Higgsfield y Magnific — auditoría de UI y workflow — 2026-08-04](competitive-ui/COMPETITIVE_UI_AUDIT_HIGGSFIELD_MAGNIFIC_2026-08-04.md)
 - [Globe frente a Higgsfield y Magnific — benchmark comparativo — 2026-08-05](competitive-ui/GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05.md)
 - [Hiring — quality assurance de selección y capacidad — 2026-07-30](hiring/GREENHOUSE_HIRING_QUALITY_ASSURANCE_AUDIT_2026-07-30.md)
-- [Hiring — vocabulario de etapas del pipeline — 2026-08-22](hiring/GREENHOUSE_HIRING_STAGE_VOCABULARY_AUDIT_2026-08-22.md) — 24 hallazgos; 14 particiones del mismo enum sin binding; el enum no tiene ADR. **En verificación adversarial**
+- [Hiring — vocabulario de etapas del pipeline — 2026-08-22](hiring/GREENHOUSE_HIRING_STAGE_VOCABULARY_AUDIT_2026-08-22.md) — 30 hallazgos, verificación adversarial completa; 17 particiones del mismo enum; el enum no tiene ADR
 
 - [Design Tokens](design-tokens/README.md)
 - [Cloud Cost](cloud-cost/README.md)

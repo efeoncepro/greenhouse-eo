@@ -182,7 +182,7 @@ una línea sube sola o espera al resto.
 
 **Auditoría completa del radio de impacto (2026-08-22, 6 barridos exhaustivos):**
 [`docs/audits/hiring/GREENHOUSE_HIRING_STAGE_VOCABULARY_AUDIT_2026-08-22.md`](../../audits/hiring/GREENHOUSE_HIRING_STAGE_VOCABULARY_AUDIT_2026-08-22.md)
-— 24 hallazgos (4 P0), las 14 particiones del enum, el grafo de dependencias entre tasks vivas y las
+— 30 hallazgos verificados adversarialmente, las 17 particiones del enum, el grafo de dependencias entre tasks vivas y las
 5 preguntas que exigen decisión humana. **Leerla antes de ejecutar cualquier slice**: contiene
 precondiciones duras que esta spec no tenía (dos relojes de retención, la escalera histórica de
 fairness como tabla de traducción permanente, `assertEnum` en el camino de lectura).
