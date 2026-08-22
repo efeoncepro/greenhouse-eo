@@ -28,6 +28,20 @@ Guardarlas acá conserva la revisión y el contexto sin poner una mina en el cam
 4. Readback **antes**, `pnpm migrate:up`, readback **después**.
 5. Borrar el `.pending` en el mismo commit que agrega la migración real.
 
+## Lote pendiente — post-release, en este orden
+
+El orden de abajo es **una sola cadena**, no tres listas independientes. Cada eslabón es la
+precondición del siguiente, y saltarse uno rompe el siguiente de forma observable:
+
+```
+TASK-1765 Slice 1 (crea `archived_at`)              ── APLICADO 2026-08-22
+  └─ release que retira `on_hold` de la superficie
+       ├─ 1. TASK-1765-decision-enum-contract        ── contract del enum
+       └─ 2. TASK-1748 Slice 1 desplegado (Vercel + ops-worker)
+              └─ 3. TASK-1748-synthetic-archive-axis-backfill
+                     └─ 4. TASK-1765-closed-invariant  ── readback 1 → 0
+```
+
 ## Lote pendiente de TASK-1765 — post-release, en este orden
 
 Los dos son irreversibles y los dos exigen que el código ya esté en producción.
@@ -35,16 +49,26 @@ Los dos son irreversibles y los dos exigen que el código ya esté en producció
 | # | Archivo | Condición de ejecución |
 |---|---|---|
 | 1 | `TASK-1765-decision-enum-contract.sql.pending` | `origin/main` ya NO ofrece `on_hold` (o sea: el release con los Slices 1-4 ya subió). Verificar contra `origin/main`, **nunca** contra el working tree. |
-| 2 | `TASK-1765-closed-invariant.sql.pending` | `TASK-1748` ya movió sus 32 filas sintéticas de `stage='closed'` a `archived_at`. Readback esperado **con la precondición cumplida: `1 → 0`** (queda sólo la fila real en etapa antigua, que el `UPDATE` corrige). Si ves 33, `TASK-1748` no corrió: para. |
+| 2 | `TASK-1748-synthetic-archive-axis-backfill.sql.pending` | El **Slice 1 de `TASK-1748`** (filtro de procedencia en `talent-pool/readers.ts` **y** `talent-pool/projection.ts`) corre en producción **en los dos runtimes**: Vercel y `ops-worker`. Verificar contra `origin/main`, nunca contra el working tree. |
+| 3 | `TASK-1765-closed-invariant.sql.pending` | `TASK-1748` ya movió sus 32 filas sintéticas de `stage='closed'` a `archived_at`. Readback esperado **con la precondición cumplida: `1 → 0`** (queda sólo la fila real en etapa antigua, que el `UPDATE` corrige). Si ves 33, `TASK-1748` no corrió: para. |
 
-### La lección que ordena las dos condiciones
+### La lección que ordena las condiciones
 
-La regla que faltaba, y que ninguna de las dos migraciones podía verificar por sí sola:
+Las condiciones 1 y 3 son sobre **datos + código desplegado**; la 2 es puramente sobre **código
+desplegado**, y es la misma familia de error. La regla que faltaba, y que ninguna de estas
+migraciones puede verificar por sí sola:
 
 > **Un contract de enum no se aplica hasta que el código que ya no escribe ese valor esté en
 > producción.** «Cero filas» no es «nadie lo escribe»: sólo dice que nadie lo escribió *todavía*. La
 > alcanzabilidad se deriva del **contrato de la superficie desplegada**, jamás del contenido de la
 > tabla.
+
+Y su corolario, que es el que ordena a `TASK-1748`: **una migración de datos puede ser segura o
+peligrosa según qué código esté corriendo encima.** El backfill del cambio de eje devuelve 32
+postulaciones sintéticas fuera de `stage='closed'`; con el filtro de procedencia desplegado eso no
+se ve, y sin él la projection del Banco de Talento —que corre cada 5 minutos— reclasifica esas
+fichas a un estado servible y las publica ante un operador real. El SQL es idéntico en los dos
+casos: lo que cambia es el runtime.
 
 Un `RAISE EXCEPTION` dentro de la migración **no puede** validar esto: sólo ve datos, y la
 precondición es sobre código desplegado. Por eso vive acá, como condición de proceso, y no allá como

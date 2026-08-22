@@ -3,6 +3,7 @@ import 'server-only'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 
 import { HiringValidationError } from '../errors'
+import { realOnlyPredicate } from './contracts'
 import { DATA_ORIGIN_REASON_MIN } from './mark'
 
 /**
@@ -29,13 +30,35 @@ export interface PurgeCandidate {
   openingId: string
   dataOrigin: string
   stage: string
+  /** `null` ⇒ la postulación todavía no está archivada. Es el ÚNICO eje de archivado (ADR §5). */
+  archivedAt: string | null
   /** Dependientes que impiden el borrado. Vacío ⇒ la fila califica para Lane B. */
   deleteBlockers: string[]
+}
+
+/**
+ * TASK-1748 Slice 2 — archivar significa lo mismo en las tres entidades, así que el plan enumera
+ * las tres. `TASK-1739` sólo enumeraba postulaciones y por eso el archivado quedó a un tercio:
+ * 11 fichas sintéticas seguían `active` y 14 vacantes sintéticas en `draft`/`active`.
+ */
+export interface PurgeFacetCandidate {
+  candidateFacetId: string
+  dataOrigin: string
+  status: string
+}
+
+export interface PurgeOpeningCandidate {
+  openingId: string
+  dataOrigin: string
+  status: string
+  publicationStatus: string
 }
 
 export interface PurgePlan {
   generatedAt: string
   candidates: PurgeCandidate[]
+  facets: PurgeFacetCandidate[]
+  openings: PurgeOpeningCandidate[]
 }
 
 /**
@@ -76,17 +99,50 @@ const loadDeleteBlockers = async (applicationIds: string[]): Promise<Map<string,
   return byApplication
 }
 
-/** Plan READ-ONLY sobre postulaciones ya marcadas como no reales. No infiere por nombre jamás. */
+/**
+ * Estados de vacante que ya son terminales: archivar no los reescribe. Cancelar una vacante que
+ * alguien cerró o llenó borraría el desenlace real de ese proceso.
+ */
+const TERMINAL_OPENING_STATUSES = new Set(['cancelled', 'closed', 'filled'])
+
+/** Plan READ-ONLY sobre registros ya marcados como no reales. No infiere por nombre jamás. */
 export const planSyntheticPurge = async (): Promise<PurgePlan> => {
   const rows = await runGreenhousePostgresQuery<{
     application_id: string
     opening_id: string
     data_origin: string
     stage: string
+    archived_at: Date | string | null
   }>(
-    `SELECT application_id, opening_id, data_origin, stage
+    `SELECT application_id, opening_id, data_origin, stage, archived_at
        FROM greenhouse_hiring.hiring_application
       WHERE data_origin <> 'real'
+      ORDER BY created_at`,
+  )
+
+  // La ficha no tiene procedencia propia: la hereda de la persona (`candidate_facet` no declara
+  // `data_origin`). El predicado canónico viaja sobre `ip`, nunca sobre `cf`.
+  const facetRows = await runGreenhousePostgresQuery<{
+    candidate_facet_id: string
+    data_origin: string
+    status: string
+  }>(
+    `SELECT cf.candidate_facet_id, ip.data_origin, cf.status
+       FROM greenhouse_hiring.candidate_facet cf
+       JOIN greenhouse_core.identity_profiles ip ON ip.profile_id = cf.identity_profile_id
+      WHERE NOT (${realOnlyPredicate('ip')}) AND cf.status <> 'archived'
+      ORDER BY cf.candidate_facet_id`,
+  )
+
+  const openingRows = await runGreenhousePostgresQuery<{
+    opening_id: string
+    data_origin: string
+    status: string
+    publication_status: string
+  }>(
+    `SELECT opening_id, data_origin, status, publication_status
+       FROM greenhouse_hiring.hiring_opening
+      WHERE data_origin <> 'real' AND status NOT IN ('cancelled', 'closed', 'filled')
       ORDER BY created_at`,
   )
 
@@ -99,7 +155,19 @@ export const planSyntheticPurge = async (): Promise<PurgePlan> => {
       openingId: row.opening_id,
       dataOrigin: row.data_origin,
       stage: row.stage,
+      archivedAt: row.archived_at ? new Date(row.archived_at).toISOString() : null,
       deleteBlockers: blockers.get(row.application_id) ?? [],
+    })),
+    facets: facetRows.map(row => ({
+      candidateFacetId: row.candidate_facet_id,
+      dataOrigin: row.data_origin,
+      status: row.status,
+    })),
+    openings: openingRows.map(row => ({
+      openingId: row.opening_id,
+      dataOrigin: row.data_origin,
+      status: row.status,
+      publicationStatus: row.publication_status,
     })),
   }
 }
@@ -107,12 +175,20 @@ export const planSyntheticPurge = async (): Promise<PurgePlan> => {
 export interface ApplyPurgeInput {
   lane: PurgeLane
   applicationIds: string[]
+  /** Fichas de candidato a archivar. Omitirlo NO archiva ninguna: nada se escribe sin allowlist. */
+  candidateFacetIds?: string[]
+  /** Vacantes a archivar. Omitirlo NO archiva ninguna. */
+  openingIds?: string[]
   actorUserId: string
   reason: string
 }
 
+/** Entidades que el archivado toca. Coincide con el CHECK de `hiring_data_origin_audit.record_type`. */
+export type PurgeRecordType = 'hiring_application' | 'candidate_facet' | 'hiring_opening'
+
 export interface PurgeEntryResult {
-  applicationId: string
+  recordType: PurgeRecordType
+  recordId: string
   outcome: 'archived' | 'deleted' | 'skipped'
   reasonCode?: 'not_synthetic' | 'already_archived' | 'not_found'
 }
@@ -139,55 +215,179 @@ const assertActorAndReason = (actorUserId: string, reason: string): void => {
  * Lane A — Archivado. Reversible, preserva TODA la auditoría. Es lo que se aplica a cualquier
  * registro con dependientes auditables, o sea a casi todo.
  *
- * ⚠️ Deuda declarada: archivar mueve `stage` a `closed` pero NO setea `decision`, y el reader de
- * retención (`documents/retention.ts`) se guarda con `decision IS NULL`. Para un sujeto sintético eso
- * es inocuo. Para una persona REAL que hubiese heredado no-real por su vacante, congelaría su reloj
- * de retención — por eso `TASK-1744` lo declara como precondición y esta función se limita a lo
- * sintético.
+ * **Archivar tiene EJE PROPIO y jamás toca `stage`** (`GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_
+ * VOCABULARY_DECISION_V1` §5 y §12). `TASK-1739` archivaba escribiendo `stage='closed'`, y ese
+ * `UPDATE` es el origen de las 32 filas `closed` sin desenlace que ensuciaron el diagnóstico de la
+ * auditoría del vocabulario: `closed` significa «el recorrido de esta persona terminó, con desenlace
+ * declarado», y archivar un registro sintético no declara el desenlace de nadie. Son dos preguntas
+ * distintas y viven en dos columnas distintas:
+ *
+ *   `stage`        → dónde va la persona en el recorrido
+ *   `archived_at`  → si el REGISTRO sigue a la vista del operador
+ *
+ * La deuda que este docstring declaraba antes —«archivar mueve `stage` a `closed` pero NO setea
+ * `decision`, y el reader de retención se guarda con `decision IS NULL`»— **desaparece con el cambio
+ * de eje**: archivar ya no escribe `stage`, así que no puede fabricar un `closed` sin desenlace ni
+ * congelar el reloj de retención de nadie.
+ *
+ * Archiva las TRES entidades sobre allowlist explícita, cada una en su propia transacción con CAS
+ * sobre su estado actual y su fila de audit. Re-ejecutar es no-op (`already_archived`).
  */
 export const archiveSyntheticRecords = async (input: ApplyPurgeInput): Promise<ApplyPurgeSummary> => {
   assertActorAndReason(input.actorUserId, input.reason)
 
   const results: PurgeEntryResult[] = []
 
+  const writeAudit = async (
+    client: { query: (sql: string, values: unknown[]) => Promise<unknown> },
+    recordType: PurgeRecordType,
+    recordId: string,
+    dataOrigin: string,
+    snapshot: Record<string, unknown>,
+  ) => {
+    await client.query(
+      `INSERT INTO greenhouse_hiring.hiring_data_origin_audit
+         (record_type, record_id, action, before_value, after_value, actor_user_id, reason, deleted_snapshot_json)
+       VALUES ($1, $2, 'archive', $3, $3, $4, $5, $6)`,
+      [recordType, recordId, dataOrigin, input.actorUserId, input.reason, JSON.stringify(snapshot)],
+    )
+  }
+
   for (const applicationId of input.applicationIds) {
     const result = await withGreenhousePostgresTransaction(async client => {
       const current = await client.query(
-        `SELECT data_origin, stage FROM greenhouse_hiring.hiring_application WHERE application_id = $1 FOR UPDATE`,
+        `SELECT data_origin, stage, archived_at
+           FROM greenhouse_hiring.hiring_application
+          WHERE application_id = $1 FOR UPDATE`,
         [applicationId],
       )
 
-      const row = current.rows[0] as { data_origin: string; stage: string } | undefined
+      const row = current.rows[0] as
+        | { data_origin: string; stage: string; archived_at: Date | string | null }
+        | undefined
 
-      if (!row) return { applicationId, outcome: 'skipped' as const, reasonCode: 'not_found' as const }
+      if (!row) {
+        return { recordType: 'hiring_application' as const, recordId: applicationId, outcome: 'skipped' as const, reasonCode: 'not_found' as const }
+      }
 
       // Nunca se archiva un dato real por esta vía: la puerta es la procedencia, no el criterio del operador.
       if (row.data_origin === 'real') {
-        return { applicationId, outcome: 'skipped' as const, reasonCode: 'not_synthetic' as const }
+        return { recordType: 'hiring_application' as const, recordId: applicationId, outcome: 'skipped' as const, reasonCode: 'not_synthetic' as const }
       }
 
-      if (row.stage === 'closed') {
-        return { applicationId, outcome: 'skipped' as const, reasonCode: 'already_archived' as const }
+      // La guarda de idempotencia lee el EJE DE ARCHIVADO, no `stage`. Leerla en `stage='closed'`
+      // (como hacía TASK-1739) confundía «archivado» con «proceso cerrado».
+      if (row.archived_at) {
+        return { recordType: 'hiring_application' as const, recordId: applicationId, outcome: 'skipped' as const, reasonCode: 'already_archived' as const }
       }
-
-      await client.query(`UPDATE greenhouse_hiring.hiring_application SET stage = 'closed' WHERE application_id = $1`, [
-        applicationId,
-      ])
 
       await client.query(
-        `INSERT INTO greenhouse_hiring.hiring_data_origin_audit
-           (record_type, record_id, action, before_value, after_value, actor_user_id, reason, deleted_snapshot_json)
-         VALUES ('hiring_application', $1, 'archive', $2, $2, $3, $4, $5)`,
-        [
-          applicationId,
-          row.data_origin,
-          input.actorUserId,
-          input.reason,
-          JSON.stringify({ beforeStage: row.stage, afterStage: 'closed' }),
-        ],
+        `UPDATE greenhouse_hiring.hiring_application SET archived_at = NOW() WHERE application_id = $1`,
+        [applicationId],
       )
 
-      return { applicationId, outcome: 'archived' as const }
+      // El snapshot registra el archivado real. `stage` viaja como CONTEXTO de lo que había, no como
+      // un campo que esta función tocó: `beforeStage`/`afterStage` describían una mutación que ya no
+      // ocurre y habrían mentido.
+      await writeAudit(client, 'hiring_application', applicationId, row.data_origin, {
+        axis: 'archived_at',
+        stageAtArchive: row.stage,
+      })
+
+      return { recordType: 'hiring_application' as const, recordId: applicationId, outcome: 'archived' as const }
+    })
+
+    results.push(result)
+  }
+
+  for (const candidateFacetId of input.candidateFacetIds ?? []) {
+    const result = await withGreenhousePostgresTransaction(async client => {
+      const current = await client.query(
+        `SELECT cf.status, ip.data_origin
+           FROM greenhouse_hiring.candidate_facet cf
+           JOIN greenhouse_core.identity_profiles ip ON ip.profile_id = cf.identity_profile_id
+          WHERE cf.candidate_facet_id = $1 FOR UPDATE OF cf`,
+        [candidateFacetId],
+      )
+
+      const row = current.rows[0] as { status: string; data_origin: string } | undefined
+
+      if (!row) {
+        return { recordType: 'candidate_facet' as const, recordId: candidateFacetId, outcome: 'skipped' as const, reasonCode: 'not_found' as const }
+      }
+
+      if (row.data_origin === 'real') {
+        return { recordType: 'candidate_facet' as const, recordId: candidateFacetId, outcome: 'skipped' as const, reasonCode: 'not_synthetic' as const }
+      }
+
+      if (row.status === 'archived') {
+        return { recordType: 'candidate_facet' as const, recordId: candidateFacetId, outcome: 'skipped' as const, reasonCode: 'already_archived' as const }
+      }
+
+      await client.query(
+        `UPDATE greenhouse_hiring.candidate_facet SET status = 'archived' WHERE candidate_facet_id = $1`,
+        [candidateFacetId],
+      )
+
+      await writeAudit(client, 'candidate_facet', candidateFacetId, row.data_origin, {
+        axis: 'status',
+        beforeStatus: row.status,
+        afterStatus: 'archived',
+      })
+
+      return { recordType: 'candidate_facet' as const, recordId: candidateFacetId, outcome: 'archived' as const }
+    })
+
+    results.push(result)
+  }
+
+  for (const openingId of input.openingIds ?? []) {
+    const result = await withGreenhousePostgresTransaction(async client => {
+      const current = await client.query(
+        `SELECT data_origin, status, publication_status
+           FROM greenhouse_hiring.hiring_opening
+          WHERE opening_id = $1 FOR UPDATE`,
+        [openingId],
+      )
+
+      const row = current.rows[0] as
+        | { data_origin: string; status: string; publication_status: string }
+        | undefined
+
+      if (!row) {
+        return { recordType: 'hiring_opening' as const, recordId: openingId, outcome: 'skipped' as const, reasonCode: 'not_found' as const }
+      }
+
+      if (row.data_origin === 'real') {
+        return { recordType: 'hiring_opening' as const, recordId: openingId, outcome: 'skipped' as const, reasonCode: 'not_synthetic' as const }
+      }
+
+      // `closed`/`filled` son desenlaces que alguien declaró: archivar no los reescribe.
+      if (TERMINAL_OPENING_STATUSES.has(row.status)) {
+        return { recordType: 'hiring_opening' as const, recordId: openingId, outcome: 'skipped' as const, reasonCode: 'already_archived' as const }
+      }
+
+      // La publicación se cierra junto con el estado. Una vacante `cancelled` que sigue diciendo
+      // `published` es una contradicción, y contradice además la guarda de `publishOpening`, que
+      // prohíbe publicar una vacante no real.
+      const nextPublicationStatus = row.publication_status === 'draft' ? 'draft' : 'closed'
+
+      await client.query(
+        `UPDATE greenhouse_hiring.hiring_opening
+            SET status = 'cancelled', publication_status = $2
+          WHERE opening_id = $1`,
+        [openingId, nextPublicationStatus],
+      )
+
+      await writeAudit(client, 'hiring_opening', openingId, row.data_origin, {
+        axis: 'status',
+        beforeStatus: row.status,
+        afterStatus: 'cancelled',
+        beforePublicationStatus: row.publication_status,
+        afterPublicationStatus: nextPublicationStatus,
+      })
+
+      return { recordType: 'hiring_opening' as const, recordId: openingId, outcome: 'archived' as const }
     })
 
     results.push(result)
@@ -265,7 +465,7 @@ export const deleteOrphanSyntheticRecords = async (input: ApplyPurgeInput): Prom
       await client.query(`DELETE FROM greenhouse_hiring.hiring_application WHERE application_id = $1`, [applicationId])
     })
 
-    results.push({ applicationId, outcome: 'deleted' })
+    results.push({ recordType: 'hiring_application', recordId: applicationId, outcome: 'deleted' })
   }
 
   return { lane: 'delete', processed: results.length, results }

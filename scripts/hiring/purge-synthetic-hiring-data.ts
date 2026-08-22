@@ -48,18 +48,27 @@ const main = async (): Promise<void> => {
   if (hasFlag('--archive')) {
     const { actor, reason } = requireActorAndReason()
 
+    // TASK-1748 — el archivado cubre las TRES entidades. Antes sólo tocaba la postulación, y por eso
+    // quedaron 11 fichas `active` y 14 vacantes en `draft`/`active` con el lane dado por terminado.
     const summary = await archiveSyntheticRecords({
       lane: 'archive',
       applicationIds: plan.candidates.map(c => c.applicationId),
+      candidateFacetIds: plan.facets.map(f => f.candidateFacetId),
+      openingIds: plan.openings.map(o => o.openingId),
       actorUserId: actor,
       reason,
     })
 
-    const archived = summary.results.filter(r => r.outcome === 'archived').length
-    const skipped = summary.results.filter(r => r.outcome === 'skipped').length
+    const count = (recordType: string, outcome: string) =>
+      summary.results.filter(r => r.recordType === recordType && r.outcome === outcome).length
 
-    console.log(`\n══ Lane A · ARCHIVADO ══\n  archivadas=${archived}  saltadas=${skipped}\n`)
-    console.log('  Reversible: el audit guarda el stage anterior de cada fila.\n')
+    console.log('\n══ Lane A · ARCHIVADO ══')
+    console.log(`  postulaciones  archivadas=${count('hiring_application', 'archived')}  saltadas=${count('hiring_application', 'skipped')}`)
+    console.log(`  fichas         archivadas=${count('candidate_facet', 'archived')}  saltadas=${count('candidate_facet', 'skipped')}`)
+    console.log(`  vacantes       archivadas=${count('hiring_opening', 'archived')}  saltadas=${count('hiring_opening', 'skipped')}\n`)
+    console.log('  La postulación se archiva en `archived_at`, NUNCA moviendo `stage` a `closed`:')
+    console.log('  archivar un registro no declara el desenlace de nadie (ADR del vocabulario §5).')
+    console.log('  Reversible: el audit guarda el estado anterior de cada fila.\n')
 
     return
   }
@@ -86,6 +95,8 @@ const main = async (): Promise<void> => {
   console.log(`Postulaciones no reales: ${plan.candidates.length}\n`)
   console.log(`  Lane A · ARCHIVAR (tienen historia auditable o ya fueron trabajadas): ${archivable.length}`)
   console.log(`  Lane B · BORRAR (huérfanas, sin rastro, en 'sourced'):                ${deletable.length}\n`)
+  console.log(`  Fichas de candidato sin archivar:  ${plan.facets.length}`)
+  console.log(`  Vacantes sin archivar:             ${plan.openings.length}\n`)
 
   for (const candidate of archivable) {
     const why = candidate.deleteBlockers.join(', ') || 'ya fue trabajada por alguien'
@@ -96,6 +107,16 @@ const main = async (): Promise<void> => {
 
   for (const candidate of deletable) {
     console.log(`  borrable  ${candidate.applicationId}  stage=${candidate.stage}  (sin dependientes)`)
+  }
+
+  for (const facet of plan.facets) {
+    console.log(`  archivar  ${facet.candidateFacetId}  ficha status=${facet.status} -> archived`)
+  }
+
+  for (const opening of plan.openings) {
+    console.log(
+      `  archivar  ${opening.openingId}  vacante status=${opening.status}/${opening.publicationStatus} -> cancelled`,
+    )
   }
 
   console.log('\n⚠️  El borrado es IRREVERSIBLE y aborta la corrida completa si una sola fila no califica.')
