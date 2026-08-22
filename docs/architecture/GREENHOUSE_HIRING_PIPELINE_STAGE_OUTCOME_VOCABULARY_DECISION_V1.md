@@ -141,20 +141,34 @@ Copy definitivo: `src/lib/copy/dictionaries/{es-CL,en-US}/hiringDesk.ts`, valida
 
 ### 7.3 Un `EmailType` por desenlace. La causa modula el CUERPO, no el tipo
 
-`EmailType` **no es una etiqueta descriptiva: el sistema ramifica por ella** en tres lugares —el kill-switch
-por tipo (`greenhouse_notifications.email_type_config`, consultado en `src/lib/email/delivery.ts:131` y otra
-vez bajo lock en `:336`), el dedupe de «¿ya se envió?», y el perfil de footer, que `TASK-1764` (`EPIC-042`)
-resuelve **por `EmailType`**. Es el patrón canónico §9 aplicado a la capa de correo: si algo ramifica por un
-valor, ese valor no se colapsa.
+`EmailType` **no es una etiqueta descriptiva: el sistema ramifica por ella** en tres lugares verificados:
+
+1. **El kill-switch por tipo** — `greenhouse_notifications.email_type_config`, consultado en
+   `src/lib/email/delivery.ts:131` y otra vez bajo lock (`FOR SHARE`) en `:336`.
+2. **El perfil de footer**, que `TASK-1764` (`EPIC-042`) resuelve **por `EmailType`**.
+3. **El selector del propio envío de decisión** — `src/lib/hiring/notifications/send.ts:358` es hoy un
+   ternario binario, `decision === 'selected' ? 'hiring_decision_selected' : 'hiring_decision_rejected'`, que
+   **colapsa todo lo no-seleccionado en `rejected`**. Es el callsite exacto que mislabelaría el envío, y hay
+   que tocarlo sí o sí.
+
+Es el patrón canónico §9 aplicado a la capa de correo: si algo ramifica por un valor, ese valor no se colapsa.
+
+> **El dedupe NO es argumento, y no debe reintroducirse como tal.** `wasEmailAlreadySent`
+> (`src/lib/email/delivery.ts:1404-1418`) filtra por `source_event_id + source_entity + recipient_email`; el
+> tipo **no entra en la clave**. Verificado 2026-08-22 tras haberlo afirmado mal.
 
 **Por eso un cierre por capacidad NO reusa `hiring_decision_rejected`.** El argumento decisivo es operativo,
 no semántico: un cierre de cohorte manda **N correos de golpe** (las vacantes vivas tienen 15 y 33 personas)
 y un descarte individual manda uno. Si un run sale mal a mitad, hay que poder **pausar ese envío sin
-silenciar los correos de decisión individual** — y con un tipo compartido el kill-switch apaga los dos. El
-repo ya tomó esta decisión antes: `hiring_decision_selected` y `hiring_decision_rejected` **ya son tipos
-separados** (`src/lib/email/types.ts:33-34`) exactamente para poder pausarlos por separado. Que el log
-append-only quedaría diciendo «rechazado» de quien no lo fue es cierto, pero es refuerzo: el registro
-autoritativo es el desenlace, no el correo.
+silenciar los correos de decisión individual** — y con un tipo compartido el kill-switch apaga los dos.
+
+El repo ya tomó esta decisión antes, y lo dice por escrito: `hiring_decision_selected` y
+`hiring_decision_rejected` **ya son tipos separados** (`src/lib/email/types.ts:33-34`), y
+`services/ops-worker/deploy.sh:399` declara literalmente que `hiring_decision_rejected` es
+**«pausable aparte en `email_type_config`»**. El tipo nuevo sigue el diseño existente, no inventa una carga.
+
+Que el log append-only quedaría diciendo «rechazado» de quien no lo fue es cierto, pero es **refuerzo
+secundario**: el registro autoritativo es el desenlace, no el correo.
 
 **La regla que fija el techo y evita la explosión combinatoria:**
 
