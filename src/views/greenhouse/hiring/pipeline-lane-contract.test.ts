@@ -1,41 +1,33 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { HIRING_APPLICATION_STAGES } from '@/types/hiring'
-import { LANES } from './PipelineDeskView'
+import { LANES, stagesOfLane } from './PipelineDeskView'
 
 vi.mock('server-only', () => ({}))
 
 /**
- * TASK-1754 — el tablero escribe la etapa que muestra.
+ * TASK-1754 — invariantes del tablero que el tipo NO puede expresar.
  *
- * El 2026-08-19 la columna "Evaluación" tomaba su nombre de `shortlisted` —la etapa que la
- * automatización de assessment vigila— y al soltar una tarjeta escribía `qualified`. Catorce
- * vacantes tenían su política configurada y ninguna disparaba. Dos candidatas reales pasaron por
- * esa columna sin recibir su test, y el fallo NO dejaba rastro: una vacante sin política y una
- * cuya automatización apunta al vacío se ven idénticas en pantalla.
+ * Este archivo tenía cuatro pruebas y ahora tiene dos, y la resta es el resultado del slice:
+ * las dos que se fueron —«cada carril escribe la etapa que le da nombre» y «la etapa que da
+ * nombre pertenece al carril»— vigilaban una divergencia entre `titleStage` y `destination` que
+ * ya no existe, porque el carril declara UN solo campo. Un invariante que se vuelve
+ * irrepresentable no necesita guardián: mantenerlo enseñaría que el defecto sigue siendo
+ * posible.
  *
- * El destino estaba DENTRO del carril, así que un invariante de pertenencia lo habría dejado
- * pasar. El invariante correcto es más fuerte: lo que el operador lee es lo que el sistema escribe.
+ * Las dos que quedan no son residuo del parche. Dependen del CONJUNTO de carriles, no de la
+ * forma de uno, así que ningún tipo las alcanza — y la primera es la que evita el mismo daño
+ * silencioso por otra vía: una etapa que ningún carril agrupa manda la tarjeta a la primera
+ * columna (`?? 'inbox'`) sin decirlo. La postulación sigue existiendo en la base y nadie la ve
+ * donde debería.
+ *
+ * El archivo se borra cuando el contract (Slice F) retire los literales y `absorbs` quede
+ * vacía en todos los carriles: ahí «una etapa, un carril» pasa a ser cierto por construcción.
+ * Hasta entonces sigue siendo una afirmación sobre datos, no sobre tipos.
  */
-
 describe('contrato de carriles del pipeline', () => {
-  it('cada carril escribe la etapa que le da nombre', () => {
-    for (const lane of LANES) {
-      expect(lane.destination, `el carril "${lane.id}" se titula desde "${lane.titleStage}" y escribe "${lane.destination}"`)
-        .toBe(lane.titleStage)
-    }
-  })
-
-  it('la etapa que da nombre pertenece al carril', () => {
-    for (const lane of LANES) {
-      expect(lane.stages).toContain(lane.titleStage)
-    }
-  })
-
   it('ninguna etapa del dominio queda fuera del tablero', () => {
-    // Una etapa que ningún carril contiene es una postulación que desaparece de la vista: sigue
-    // existiendo en la base y nadie la ve. Es la misma clase de fallo silencioso.
-    const cubiertas = new Set(LANES.flatMap((lane) => lane.stages))
+    const cubiertas = new Set(LANES.flatMap(stagesOfLane))
 
     for (const stage of HIRING_APPLICATION_STAGES) {
       expect(cubiertas.has(stage), `la etapa "${stage}" no aparece en ningún carril`).toBe(true)
@@ -47,7 +39,7 @@ describe('contrato de carriles del pipeline', () => {
     const vistas = new Set<string>()
 
     for (const lane of LANES) {
-      for (const stage of lane.stages) {
+      for (const stage of stagesOfLane(lane)) {
         expect(vistas.has(stage), `la etapa "${stage}" aparece en más de un carril`).toBe(false)
         vistas.add(stage)
       }
