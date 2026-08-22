@@ -36,7 +36,8 @@
 >
 > 1. **Citar parcialmente un predicado compuesto.** Una rama de un `OR`, un `CASE` sin su `ELSE`, un `WHERE` sin su `AND`. Produjo un P0 falso sobre retención de PII.
 > 2. **Verificar el EJE y no el CONJUNTO DE VALORES.** El predicado correcto sobre el campo correcto puede seguir omitiendo el valor que importa.
-> 3. **Confiar en un log append-only sin verificar QUÉ camino lo emite.** El evento de creación escribe `stage` y **no emite `stage_changed`**; además omite el actor del payload. Una agregación por actor sobre ese log es ciega al camino dominante y mal-atribuye lo que sí ve.
+> 3. **Verificar el CONTENIDO de la tabla cuando lo que gobierna es el CÓDIGO DESPLEGADO.** Detectado **ejecutando** esta auditoría: un readback correcto de «0 filas con `on_hold`» autorizó retirar el valor del `CHECK`, y rompió producción — porque `main` seguía ofreciendo el botón que lo escribe. **Un guard sobre datos no puede validar una precondición sobre código desplegado.** Regla y caso fuente en [`GREENHOUSE_DATABASE_TOOLING_V1.md`](../../architecture/GREENHOUSE_DATABASE_TOOLING_V1.md) §contract-después-del-release.
+> 4. **Confiar en un log append-only sin verificar QUÉ camino lo emite.** El evento de creación escribe `stage` y **no emite `stage_changed`**; además omite el actor del payload. Una agregación por actor sobre ese log es ciega al camino dominante y mal-atribuye lo que sí ve.
 >
 > **Regla de uso.** Esta auditoría documenta el estado observado el 2026-08-22. Varios hallazgos son de estado (conteos, flags, qué está o no en producción) y caducan rápido; revalidar contra runtime antes de consumirlos.
 

@@ -131,6 +131,54 @@ un fallo en ese DDL habría pasado verde y el cron diario `ops-hiring-assessment
 **Corolario:** una migration que se edita en varias tandas antes de aplicarse necesita revisar el guard en
 CADA tanda. El guard se escribe al final del Up, así que un `CREATE` agregado más arriba no lo actualiza solo.
 
+### Un `contract` de enum se aplica DESPUÉS del release, nunca antes (2026-08-22)
+
+**Hay UNA sola instancia Cloud SQL** (`greenhouse-pg-dev`) compartida por dev, staging y producción.
+Aplicar una migración «en dev» es aplicarla **en producción**. Y producción sirve `main`, no tu
+working tree.
+
+Por lo tanto: **retirar un valor de un `CHECK` rompe producción si el código de `main` todavía lo
+escribe** — la pantalla ofrece la acción y la base la rechaza con `23514`.
+
+**Caso fuente (2026-08-22, `TASK-1765`):** se retiró `on_hold` del `CHECK` de
+`hiring_application.decision` tras un readback correcto de **0 filas y 0 entradas de historial**.
+Pero `origin/main` seguía ofreciendo el botón «Dejar en espera» (`Application360View.tsx:92`) y
+seguía teniendo `on_hold` en su enum. Cualquier operador que lo pulsara recibía un `23514`.
+Reparado en minutos ensanchando el `CHECK` (migración permisiva, riesgo cero, cero filas tocadas).
+
+**⚠️ Reglas duras:**
+
+- **NUNCA** retirar un valor de un `CHECK`/enum sin verificar antes que **el código desplegado en
+  `origin/main` ya no lo escribe**: `git show origin/main:<archivo> | grep <valor>` sobre cada
+  superficie que pueda producirlo (tipos, vistas, commands, rutas).
+- **NUNCA** tomar «0 filas» como prueba de que un valor es retirable. **0 filas dice que nadie lo
+  escribió todavía, no que nadie pueda escribirlo.** Lo que gobierna es el contrato de la superficie.
+- **NUNCA** confiar en un `RAISE EXCEPTION` de la propia migración para validar esto: **un guard
+  sobre datos no puede validar una precondición sobre código desplegado.** Son ejes distintos, y el
+  guard va a pasar en verde mientras produce el break.
+- **SIEMPRE** agrupar el `contract` con los demás pasos irreversibles y ejecutarlo **después** de que
+  el release lleve a producción el código que ya no escribe el valor.
+
+### Una migración committeada y sin aplicar es una mina (2026-08-22)
+
+`pnpm migrate:up` corre **todas** las pendientes en orden de timestamp. Una migración dejada
+deliberadamente sin aplicar **bloquea cualquier `migrate:up` posterior** — incluida una reparación
+urgente de producción, que es exactamente cuando nadie quiere descubrirla.
+
+**Caso fuente (2026-08-22, `TASK-1765`):** la migración del invariante `closed ⟺ desenlace` quedó
+committeada en `migrations/` esperando a que `TASK-1748` moviera 32 filas. Al aplicar un forward-fix
+urgente, `migrate:up` abortó — **no por el forward-fix, sino por el guard (correcto) de la migración
+parqueada**, que es anterior por timestamp.
+
+**⚠️ Reglas duras:**
+
+- **NUNCA** dejar una migración en `migrations/` con la intención de no aplicarla. No existe «escrita
+  y sin aplicar» como estado seguro: o se aplica, o **no vive en `migrations/`**.
+- **SIEMPRE** parquear ese SQL fuera del directorio que el runner escanea (p. ej.
+  `docs/tasks/pending-migrations/TASK-###-<slug>.sql.pending`), declarando en la task quién la
+  reactiva y bajo qué condición. Se vuelve a `migrations/` **con timestamp nuevo** cuando su
+  precondición se cumple.
+
 ### Timestamp Rules (critical)
 
 `node-pg-migrate` orders migrations by their filename timestamp. It **refuses to execute** any migration whose timestamp is earlier than the last applied migration in `pgmigrations`.
