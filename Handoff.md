@@ -83,7 +83,8 @@ de `decision` **no cubren `backup_selected`, `not_selected` ni `unresponsive`**.
 `retention_expires_at` en `NULL` — sin vencimiento en absoluto — y `not_selected` es la población más grande del
 eje de desenlace. Hoy no muerde porque la tabla está vacía. Registrado en el §17 del ADR del vocabulario.
 
-`pnpm build` NO se ejecutó (decisión declarada del operador); `pnpm test` completo 11.962 verdes, `pnpm lint` 0
+`pnpm build` NO se ejecutó: el operador respondió «no, salvo que lo autorices después» — postergado por costo
+de máquina, con la puerta abierta, **no** delegado al release; `pnpm test` completo 11.962 verdes, `pnpm lint` 0
 errores, `pnpm typecheck` limpio, GVC del tablero en desktop y 390 px mirado.
 
 ## 2026-08-22 — Demo 35 queda estudiada y registrada; WordPress sigue intacto
@@ -576,24 +577,3 @@ antes de dar por terminado.
 **Deuda viva de TASK-1739** en `TASK-1748`: los readers del Banco de Talento no filtran por procedencia
 —hoy las 11 personas sintéticas quedan fuera por su `lifecycle_status`, no por el filtro—, el archivado
 escribe sólo sobre la postulación, y las 9 huérfanas del lane B siguen sin decisión.
-
-## 2026-08-19 — Working contract para operar engagements On-Demand sin confundirlos con Projects
-
-Se documentó la ontología `Organization → Engagement → Project/Campaign → Task` en
-`docs/business-models/EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md`. La decisión de trabajo preserva Projects y
-Campaigns como contenedores de tareas en Notion para un cliente; el Engagement es el compromiso comercial que
-gobierna términos, capacidad, accountability, economics y cierre. On-Going y On-Demand comparten los mismos objetos
-operativos: un engagement puede contener uno o varios Projects/Campaigns.
-
-La activación venta→Delivery usa una `Ficha de Activación del Engagement` como snapshot ejecutable —sin reemplazar
-quote/SOW/contrato— y provisiona sólo la diferencia sobre la Organization. `Product Service` queda como
-clasificación condicional: campaña audiovisual, plan de medios, brandbook u otro deliverable/servicio conserva su
-categoría y madurez real. La Gantt es una vista opcional según complejidad, no un requisito ni otro SSOT.
-
-Estado honesto: **diseño conceptual Proposed; cero cambio de runtime**. El repo ya tiene `services`, phases,
-progress, outcomes, lineage, asignación de equipo por `service_id` y `notion_project_id`, pero `engagement_kind` no
-distingue un contrato regular On-Going de uno regular On-Demand y el catálogo documenta ambos como `retainer`.
-
-Siguiente iteración: elegir 2–3 familias reales de engagements On-Demand, probar casos multi-capability y decidir si
-una root row de `services` sigue siendo el aggregate o si hace falta un Engagement superior. Cualquier schema/sync,
-Finance, access, team o Notion writeback requiere task + ADR; no implementar desde este handoff.
