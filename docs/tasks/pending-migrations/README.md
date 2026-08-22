@@ -35,7 +35,7 @@ Los dos son irreversibles y los dos exigen que el código ya esté en producció
 | # | Archivo | Condición de ejecución |
 |---|---|---|
 | 1 | `TASK-1765-decision-enum-contract.sql.pending` | `origin/main` ya NO ofrece `on_hold` (o sea: el release con los Slices 1-4 ya subió). Verificar contra `origin/main`, **nunca** contra el working tree. |
-| 2 | `TASK-1765-closed-invariant.sql.pending` | `TASK-1748` ya movió sus 32 filas sintéticas de `stage='closed'` a `archived_at`. Readback esperado: **33 → 0**. |
+| 2 | `TASK-1765-closed-invariant.sql.pending` | `TASK-1748` ya movió sus 32 filas sintéticas de `stage='closed'` a `archived_at`. Readback esperado **con la precondición cumplida: `1 → 0`** (queda sólo la fila real en etapa antigua, que el `UPDATE` corrige). Si ves 33, `TASK-1748` no corrió: para. |
 
 ### La lección que ordena las dos condiciones
 

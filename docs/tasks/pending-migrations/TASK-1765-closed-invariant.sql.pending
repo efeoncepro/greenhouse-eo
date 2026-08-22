@@ -22,7 +22,11 @@
 --   ·  1 fila `decision='rejected'` con `stage='rejected'` → real, decidida, viviendo todavía en su
 --     etapa espejo. **La migra el UPDATE de más abajo.**
 --
--- El readback esperado inmediatamente antes de aplicar es **33 → 0**, y de nuevo 0 después.
+-- CUIDADO CON EL READBACK: **33 es el conteo de HOY, no el esperado al aplicar.** La precondición
+-- de esta migración es que `TASK-1748` ya haya movido sus 32 filas sintéticas; cuando eso pase, el
+-- conteo previo será **1** (la fila real en etapa antigua), y esa fila la corrige el `UPDATE` de acá
+-- mismo. O sea: si al ir a aplicar ves **1 → 0**, ESTÁS BIEN, es exactamente lo esperado. Si ves 33,
+-- `TASK-1748` no corrió y debes parar. Cualquier otro número: STOP & ESCALATE.
 -- Si da cualquier otro número: STOP & ESCALATE. No relajar el CHECK para que pase.
 --
 -- Qué cierra estructuralmente (ADR §5): un `stage='closed'` sin desenlace se vuelve

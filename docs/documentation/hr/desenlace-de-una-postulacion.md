@@ -24,12 +24,18 @@ puede pasar es lo contrario: si el recorrido terminó, alguien tiene que haber d
 
 | Desenlace | Qué significa | ¿Le llega correo? | ¿Entra al Banco de Talento? |
 |---|---|---|---|
-| **Selección** | La elegimos | sí, la oferta | no — pasa a ser parte del equipo |
-| **Reserva** | La elegimos como respaldo | sí | no — hay un compromiso vigente |
-| **Sin selección** | Llegó al final y no quedó | sí, según la causa | **sí — es justo la gente que quieres volver a llamar** |
-| **Descarte** | No cumplía para este rol | sí, agradecimiento | no por defecto |
-| **Retiro** | La persona **dijo** que se retiraba | acuse de recibo | según su consentimiento |
-| **Sin respuesta** | Dejó de responder y no dijo nada | **ninguno** | no |
+| **Selección** | La elegimos | **sí, hoy** — la oferta | no — pasa a ser parte del equipo |
+| **Reserva** | La elegimos como respaldo | diseñado; **todavía no sale** | no — hay un compromiso vigente |
+| **Sin selección** | Llegó al final y no quedó | diseñado según la causa; **todavía no sale** | **sí — es justo la gente que quieres volver a llamar** |
+| **Descarte** | No cumplía para este rol | **sí, hoy** — agradecimiento | no por defecto |
+| **Retiro** | La persona **dijo** que se retiraba | acuse de recibo diseñado; **todavía no sale** | según su consentimiento |
+| **Sin respuesta** | Dejó de responder y no dijo nada | **ninguno, y es deliberado** | no |
+
+> **Ojo con la columna de correo.** Hoy sólo salen dos: la oferta de «Selección» y el agradecimiento
+> de «Descarte». Los otros tres están **diseñados pero sin plantilla**, así que cerrar con esos
+> desenlaces **no le escribe nada a la persona**. Si necesitas avisarle, hazlo por fuera hasta que
+> existan: «Sin selección» los crea `TASK-1762`, y «Reserva» y «Retiro» esperan su propia task.
+> El sistema **no miente por omisión**: registra el cierre igual, simplemente no notifica.
 
 ### Las dos distinciones que importan de verdad
 
@@ -85,7 +91,19 @@ Confundirlas tenía una consecuencia invisible y seria: dejaba postulaciones mar
 sin ninguna decisión detrás, y eso **congelaba el borrado de los documentos de esa persona en todas
 sus postulaciones** — una obligación legal (Ley 21.719) bloqueada sin que nadie se enterara.
 
+## Estado a hoy (2026-08-22): qué ya rige y qué todavía no
+
+Lo que **ya rige**: cerrar exige declarar el desenlace, la causa es obligatoria en «Sin selección», y
+existen los seis desenlaces. Eso está activo.
+
+Lo que **todavía no**: la base **aún no impide** por sí sola que exista una postulación marcada como
+cerrada sin desenlace. Hoy quedan 33 registros en ese estado —32 son datos de prueba y 1 es un
+registro real que sí tiene su decisión, sólo que en una etapa antigua— y se limpian antes de activar
+la restricción definitiva. Mientras tanto, el estado real es visible en `/admin/operations` bajo la
+señal «Desenlace del pipeline: cierres sin desenlace declarado».
+
 > Detalle técnico: el eje de desenlace vive en `greenhouse_hiring.hiring_application`
 > (`decision`, `decision_cause`) y su único escritor es `decideHiringApplication`
-> (`src/lib/hiring/decide.ts`). El invariante `stage='closed'` ⟺ desenlace declarado se aplica como
-> restricción de base de datos. Ver [la arquitectura](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md).
+> (`src/lib/hiring/decide.ts`). El `CHECK` del invariante `stage='closed'` ⟺ desenlace declarado está
+> escrito y **pendiente de aplicar** en `docs/tasks/pending-migrations/`. Ver
+> [la arquitectura](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md).
