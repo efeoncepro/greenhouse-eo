@@ -2,6 +2,56 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-22 — TASK-1748: archivar dejó de fingir cierres, y el orden de sus slices no era preferencia
+
+Estado correcto: **`code complete, rollout pendiente`**. Slices 1 y 2 en `develop` local, sin push:
+`1d0b4e32a`, `b0415ef50`, `5fd8e5245`, `afed7098f`. `pnpm test` completo → **11.960 verdes**; `pnpm lint` y
+`pnpm typecheck` → 0 errores; `pnpm build` **no** se corrió (pendiente de autorización del operador, ~30 GB).
+
+**Lo que cambió.** `archiveSyntheticRecords` archivaba escribiendo `stage='closed'`, y ese `UPDATE` es el origen
+de las 32 filas `closed` sin desenlace que ensuciaron el diagnóstico de la auditoría del vocabulario. Ahora
+escribe `archived_at` —eje propio— y cubre las tres entidades sobre allowlist explícita. El Banco de Talento
+filtra por procedencia, con el predicado viajando por JOIN a `identity_profiles` porque `candidate_facet` no
+tiene `data_origin` propio.
+
+**El hallazgo que reordena el trabajo, y la spec decía lo contrario.** El `Slice 1` y el `Slice 2` **no son
+independientes**. La migración del Slice 2 devuelve las 32 filas fuera de `closed`; el predicado
+`stage NOT IN ('rejected','withdrawn','closed')` de `talent-pool/projection.ts` pasa entonces a dar
+`has_active_application = true` para sus 11 fichas, la projection las reclasifica a `active_process` —que sí es
+servible— y esa projection corre **cada 5 minutos** por Cloud Scheduler. Sin el filtro desplegado arriba, la
+migración **causa** el defecto que la task vino a cerrar. Por eso quedó parqueada en
+`docs/tasks/pending-migrations/` con condición de **código desplegado en los dos runtimes** (Vercel para los
+readers, `ops-worker` para la projection), no de datos.
+
+**Dos reglas nuevas que valen fuera de esta task:**
+
+- **Se filtran los caminos que CREAN; el que CORRIGE converge.** La primera versión excluía las membresías
+  sintéticas del `UPDATE` de ciclo de vida, y eso no las excluía: las **congelaba**. Una congelada en
+  `pool_eligible` habría quedado visible para siempre sin que ninguna corrida pudiera sacarla.
+- **Un filtro nuevo puede sacar de su steady a una señal que no tocaste.** `hiring.talent_pool.integrity` cuenta
+  fichas activas «aún no proyectadas»; desde que la projection no proyecta sintéticos a propósito, esa premisa
+  es falsa y la señal habría quedado en `warning` permanente — una alarma que no puede volver a cero entrena a
+  ignorar el tablero.
+
+**Trampa cara, verificada en `src/lib/postgres/client.ts` junto con la sesión de TASK-1765/1754:** anidar
+`withGreenhousePostgresTransaction` **no aísla nada**. El helper llama `acquireGreenhouseTransactionClient()`
+incondicionalmente, así que la transacción de adentro toma otra conexión y hace su propio `COMMIT`; el
+`ROLLBACK` de afuera no la alcanza. Envolví un `reconcileTalentPoolProjection({apply:true})` creyendo que se
+revertía y **commiteó contra la base compartida**. Efecto medido: idéntico a un tick del cron (441 filas de
+evidencia borradas y reinsertadas iguales, 0 membresías creadas, 0 reclasificadas). Sin daño, verificado
+post-corrida.
+
+**Siguiente paso:** el release. Después, en este orden: aplicar la migración parqueada del cambio de eje →
+readback (`0` no-real en `closed`, invariante 33 → 1) → correr el archivado de 11 fichas + 14 vacantes por CLI →
+recién ahí el `CHECK` de `TASK-1765`. El `Slice 3` (lane B, borrado irreversible) tiene **doble bloqueo**:
+sign-off del operador y esa migración — hoy el plan reporta `deletable=0` porque las 32 siguen en `closed` y el
+lane exige `stage='sourced'`.
+
+**Deuda abierta que toca este dominio:** 12 live tests de hiring crean vacantes sin declarar `dataOrigin`, así
+que nacen `real` y publicables en la base compartida; `pnpm hiring:data-origin-gate` no las ve porque sólo barre
+`scripts/` y `tests/e2e/`. Dos perfiles de identidad sintéticos (`identity-live-test-hiring-fixture` y el smoke
+de TASK-354) siguen marcados `real` y esperan el marcado gobernado. Queda propuesto como trabajo aparte.
+
 ## 2026-08-22 — TASK-1754 colapsa el eje de etapa: expand APLICADO en base, código NO en producción
 
 Estado correcto: **`code complete, rollout pendiente`**, y la asimetría importa. El expand de datos sí está
@@ -547,35 +597,3 @@ distingue un contrato regular On-Going de uno regular On-Demand y el catálogo d
 Siguiente iteración: elegir 2–3 familias reales de engagements On-Demand, probar casos multi-capability y decidir si
 una root row de `services` sigue siendo el aggregate o si hace falta un Engagement superior. Cualquier schema/sync,
 Finance, access, team o Notion writeback requiere task + ADR; no implementar desde este handoff.
-
-## 2026-08-19 — TASK-1739 cerrada en producción: qué queda vivo después del cierre
-
-El filtro de procedencia ya opera en producción (`HIRING_SYNTHETIC_DATA_FILTER_ENABLED` ON, release PR #203
-sobre `30301816955f`, watchdog `ok`) y el marcado/archivado está aplicado con autorización del CEO. Lo que
-sigue importando no es lo hecho sino lo que cambia el terreno para el siguiente que toque Hiring.
-
-**El desk se ve vacío a propósito y eso va a parecer un bug.** Pasó de 24 vacantes / 79 postulaciones a 2 / 47.
-Si HR o cualquier agente reporta "desaparecieron candidatos", la respuesta no es apagar el flag: es mirar
-`data_origin`. Revertir es un `false` + redeploy en menos de 5 minutos, pero hacerlo devuelve los fantasmas al
-pipeline y vuelve a contaminar toda lectura downstream.
-
-**Riesgo abierto #1 — el smoke bloqueado.** `scripts/hiring/verify-growth-forms-application-smoke.ts` NO corre:
-declara `smoke_test` y la guarda del write path le prohíbe publicar. Es correcto, no es una regresión que
-arreglar. Sus únicas dos salidas legítimas son que deje de necesitar la superficie pública real o que limpie lo
-que crea. **Marcar su vacante como `real` para destrabarlo NO es una salida** — fabrica otra vez fantasmas
-indistinguibles de una vacante verdadera, que es exactamente el problema que esta task cerró.
-
-**Riesgo abierto #2 — falsa garantía de autorización.** Las capabilities `hiring.data_origin.mark`/`.purge`
-están deferidas a propósito: la operación es hoy por CLI con actor registrado y sin superficie API/UI. Quien
-construya el consumer (badge, toggle, vista de administración, ruta Nexa/MCP) las declara **en ese mismo PR**,
-con grant a ≥1 rol real; declararlas antes sólo simula un control que ningún `can()` verifica.
-
-**Decisión pendiente del operador — lane B de la purga.** Las 9 huérfanas siguen archivadas, no borradas. Es la
-única mutación irreversible de la task y su valor marginal es bajo, porque archivar ya las saca de toda lectura.
-El protocolo está intacto (`plan → allowlist → sign-off → apply`, abort total si una sola fila tiene dependiente
-auditable); ejecutarlo requiere decisión humana explícita, no la inercia de "quedaba pendiente".
-
-**Próximo paso concreto**: cerrar el impacto cruzado que no cabía en el dominio de edición del cierre — registrar
-el cierre en `EPIC-011`, agregar el `## Delta` a `TASK-1734` (el sampler del gold set ya excluye sintéticos por
-construcción, no por suerte) y anotar `scripts/hiring/purge-task-1378-test-applications.ts` como superado por el
-CLI genérico. Y vigilar `hiring.data_quality.synthetic_records_aging` durante 7 días: steady `0`.

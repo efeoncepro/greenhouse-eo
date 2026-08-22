@@ -20,6 +20,18 @@
   «tienes una evaluación pendiente». Queda escrito con su razón para que nadie lo lea como error.
 - Nada de esto está en producción todavía: allí mover a «Evaluación» sigue guardando la etapa vieja.
 
+## 2026-08-22 — Archivar un dato de prueba dejó de marcarlo como «Cerrado»
+
+- Archivar y cerrar eran la misma escritura, y no son la misma cosa. Cerrar significa que el proceso de una
+  persona terminó **con un desenlace que alguien declaró**; archivar sólo saca un registro de la vista. Al
+  mezclarlos quedaron 32 postulaciones de prueba marcadas como cerradas sin que nadie hubiera decidido nada.
+- Archivar ahora tiene su propia marca y **nunca** toca la etapa, y cubre las tres piezas de un candidato de
+  prueba: su postulación, su ficha y la vacante inventada. Una vacante que alguien ya cerró o llenó no se
+  reescribe.
+- El **Banco de Talento** dejó de mostrar personas de prueba **por su procedencia declarada**. Antes tampoco
+  aparecían, pero por casualidad: bastaba con que su estado en el ciclo de vida cambiara para que reaparecieran.
+- Nada de esto está en producción todavía: el cambio de las 32 filas ya escritas espera al despliegue.
+
 ## 2026-08-22 — Demo 35 queda documentada antes de tocar la home del blog
 
 - La página candidata se revalidó read-only: siete raíces, 113 nodos y 15 widgets de posts; cuatro ya están
@@ -965,13 +977,3 @@ En el camino aparecieron dos defectos que ningún gate podía ver porque ninguno
 el informe anunciaba "Aún no hay una posición media para leer" con la posición impresa al lado, y el
 botón global de "volver arriba" no tenía nombre accesible en ninguna ruta del portal. Los dos
 salieron mirando las capturas, no leyendo los reportes.
-
-## 2026-08-12 — El contrato de contacto de Careers quedó cerrado de punta a punta
-
-Segundo release del día (`950f5bdb4`): el país de residencia pasó a ser requerido también en el
-parser (antes sólo la UI lo exigía), el formulario nativo lo muestra en «Tus datos» junto al correo
-—ya no relegado a una sección genérica— y el selector dejó de mostrar la primera opción como si
-estuviera elegida cuando no hay valor. El sexto y último correo del ciclo (seleccionado) se
-ejercitó en vivo, el scorecard visual formal quedó en PASS con capturas de escritorio y móvil, y la
-revisión de privacidad de los tres campos quedó documentada con dos recomendaciones no bloqueantes.
-De paso se cazó un flake real del CI (timer de verificación de email que dispara tras el teardown).

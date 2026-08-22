@@ -42,6 +42,15 @@ TASK-1765 Slice 1 (crea `archived_at`)              ── APLICADO 2026-08-22
                      └─ 4. TASK-1765-closed-invariant  ── readback 1 → 0
 ```
 
+**`1` y `3` son independientes entre sí**: el contract sólo estrecha el `CHECK` de `decision` y el
+backfill sólo toca `stage`/`archived_at` de filas sintéticas. Se pueden aplicar en cualquier orden.
+Lo que **no** es negociable es que **las dos vayan antes de `4`**: el invariante aborta contra las
+filas de `3`, y su `UPDATE ... SET stage='closed' WHERE decision IS NOT NULL` barrería a `closed`
+cualquier fila `on_hold` que producción siga escribiendo mientras `1` no se haya aplicado.
+
+Y las dos comparten el mismo release, por razones distintas: `1` espera a que el código **deje de
+escribir** `on_hold`; `3` espera a que el código **empiece a filtrar** por procedencia.
+
 ## Lote pendiente de TASK-1765 — post-release, en este orden
 
 Los dos son irreversibles y los dos exigen que el código ya esté en producción.
