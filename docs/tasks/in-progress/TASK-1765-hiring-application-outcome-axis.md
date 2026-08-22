@@ -35,6 +35,46 @@ gobernada** obligatoria en `not_selected`, y el invariante **`stage='closed'` �
 disciplina y pasa a `CHECK` de base. Cerrar deja de ser un cambio de etapa: pasa siempre por el command de
 decisión, y el `PATCH` de etapa pierde `closed` **por tipo**, no por una lista de excepciones más larga.
 
+## Delta 2026-08-22 — el trigger de retención sólo cubre 3 de tus 6 desenlaces
+
+Hallazgo de la sesión de `TASK-1754`, **verificado verbatim** contra
+`migrations/20260819072130586_task-1746-assessment-access-recovery.sql:886`.
+
+`greenhouse_hiring.refresh_assessment_access_recovery_retention_for_application()` decide la retención
+de `hiring_assessment_access_recovery` con dos listas:
+
+```sql
+retention_class      ← 'workforce_record'  WHEN NEW.stage='selected' OR NEW.decision='selected'
+retention_expires_at ← decision_at + 12mo  WHEN NEW.stage IN ('rejected','withdrawn')
+                                              OR NEW.decision IN ('rejected','withdrawn')
+                       ELSE NULL
+```
+
+Tus seis desenlaces contra ese trigger:
+
+| Desenlace | `retention_class` | `retention_expires_at` |
+|---|---|---|
+| `selected` | `workforce_record` ✅ | `NULL` (correcto: no vence) |
+| `rejected` | `hiring_candidate_recovery` ✅ | +12 meses ✅ |
+| `withdrawn` | `hiring_candidate_recovery` ✅ | +12 meses ✅ |
+| **`backup_selected`** | ELSE → candidate ⚠️ | **`NULL` — sin vencimiento** |
+| **`not_selected`** | ELSE → candidate ⚠️ | **`NULL` — sin vencimiento** |
+| **`unresponsive`** | ELSE → candidate ⚠️ | **`NULL` — sin vencimiento** |
+
+**No es que el reloj arranque tarde: la rama `ELSE` pone `NULL`, o sea que no arranca nunca.** Y
+`not_selected` es, por el §4 del propio ADR, **la población más grande** — la gente que llegó al final y
+no quedó. Es la misma familia del **H-01** de la auditoría: una obligación de la Ley 21.719 congelada sin
+que nadie se entere, y el mismo patrón de denylist por literales que esta task vino a borrar.
+
+**Se agrava con el Slice F de `TASK-1754`:** al retirar `selected`/`rejected`/`withdrawn` del enum de
+etapas, las ramas `NEW.stage = ...` mueren y **sólo quedan las de `decision`** — las que cubren 3 de 6.
+
+**Hoy no muerde** porque la tabla estaría en 0 filas según la sesión que lo encontró; **no se re-midió
+contra PostgreSQL**. Verificar antes de dimensionar.
+
+*Dueño: esta task, porque los tres desenlaces sin cubrir son los que ella crea. Coordinar con `TASK-1744`,
+que posee la retención de documentos y ya tiene un Delta de cobertura de desenlaces (H-23).*
+
 ## Why This Task Exists
 
 Hoy `hiring_application` tiene un eje y medio. `stage` acumula posiciones del recorrido, espejos del desenlace y
