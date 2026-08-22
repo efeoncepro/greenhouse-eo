@@ -138,6 +138,12 @@ describe.skipIf(!hasPgConfig || !canCleanUp)('assignment attempt retry — live 
     // Falla FUERTE: sin identidades sintéticas este archivo no corre sobre personas reales.
     expect(profiles.length).toBe(2)
 
+    // TASK-1739 — procedencia DECLARADA. Sin `dataOrigin` el dato nace `real` (verificado con una
+    // sonda contra la base: `assertDataOrigin(undefined) === 'real'`), o sea una vacante VISIBLE y
+    // publicable en la misma instancia que comparten dev, staging y producción. El default es
+    // deliberadamente el peligroso —ocultar un cargo real sería peor que mostrar uno de humo— así
+    // que declararlo es responsabilidad de quien fabrica. La postulación no se declara: su
+    // procedencia la deriva un trigger desde persona ∪ vacante.
     const demand = await createTalentDemand(
       {
         stakeholderType: 'internal',
@@ -145,6 +151,7 @@ describe.skipIf(!hasPgConfig || !canCleanUp)('assignment attempt retry — live 
         fulfillmentMode: 'internal_hire',
         demandOrigin: 'capacity_gap',
         requestedRole: 'LIVE-TEST AM (attempt retry)',
+        dataOrigin: 'smoke_test',
       },
       ACTOR,
     )
@@ -152,7 +159,11 @@ describe.skipIf(!hasPgConfig || !canCleanUp)('assignment attempt retry — live 
     created.demandId = demand.demandId
 
     const opening = await createHiringOpening(
-      { demandId: demand.demandId, internalTitle: 'LIVE-TEST opening (attempt retry)' },
+      {
+        demandId: demand.demandId,
+        internalTitle: 'LIVE-TEST opening (attempt retry)',
+        dataOrigin: 'smoke_test',
+      },
       ACTOR,
     )
 
