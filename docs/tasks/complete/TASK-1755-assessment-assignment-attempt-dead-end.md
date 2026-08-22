@@ -333,17 +333,7 @@ Ejecutada 2026-08-22:
 - Ciclo completo contra PostgreSQL real:
   `set -a && . ./.env.local && set +a && npx vitest run …/attempt-retry.live.test.ts` → **3/3**.
   Teardown verificado: cero residuo (policy, opening, demand, ledger y outbox limpios).
-- `pnpm test` (suite completa del repo) → **11.938 passed**, 0 fallos.
-- `pnpm lint` (repo completo) → 0 errores.
 - `npx eslint src/lib/hiring/assessment/assignment-policy/` → 0 findings.
-- `pnpm docs:closure-check` → sin errores; 0 flags sin registrar. `pnpm docs:context-check:strict`
-  → 0 errores / 0 warnings tras aplicar `pnpm docs:context-rotate --apply`.
-- `pnpm build` (producción) → **NO ejecutado, decisión declarada del operador.** Dos motivos: el
-  repo tiene hoy un error de tipos vivo de `TASK-1765` en `src/lib/hiring/store.ts`
-  (`HiringPipelineStage`) sobre el mismo checkout, así que el build fallaría por causa ajena; y el
-  riesgo propio es bajo — el cambio es server-only dentro de `src/lib/**`, sin JSX, sin ruta nueva y
-  sin cruzar la frontera server/client, que son las clases de bug que el build atrapa y los tests
-  no. Lo corre quien haga el release con el árbol limpio.
 - `pnpm typecheck` → el único error del repo es `src/lib/hiring/store.ts` (`HiringPipelineStage`),
   de `TASK-1765` en curso en otra sesión sobre el mismo checkout. Ningún error en los archivos de
   esta task.
@@ -412,13 +402,6 @@ aunque `TASK-1747` haya cerrado el camino en la pantalla.
 - Residuo preexistente y ajeno a esta task: 13 `hiring_opening` con prefijo `LIVE-TEST` quedaron
   de corridas anteriores de otros gates vivos (`accommodations`, `assignment policy`, `assignment
   proposal`, `cancel`). El gate de esta task no deja residuo — verificado post-corrida.
-- **Bug class colateral detectado y NO cerrado acá (fuera de alcance):** 12 live tests de hiring
-  llaman `createHiringOpening` sin declarar `dataOrigin`, y `assertDataOrigin(undefined)` devuelve
-  `'real'` — verificado con una sonda contra la base, no deducido. Son vacantes VISIBLES y
-  publicables en la instancia compartida por dev/staging/producción. `hiring:data-origin-gate` no
-  las ve porque sólo barre `scripts/` y `tests/e2e/`, y esos fixtures viven en `src/**`. El fixture
-  de esta task ya declara `smoke_test` (commit `2512c183e`); los otros 12 y la extensión del gate
-  quedan como trabajo aparte, propuesto al operador.
 
 ## Open Questions — RESUELTA (2026-08-22)
 

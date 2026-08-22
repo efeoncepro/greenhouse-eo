@@ -39,6 +39,24 @@ El carril **automático** (`origin='stage_auto'`) no puede usar esa salida: el
 evidencia de que la causa del bloqueo ya no aplica, tope anti-bucle y señal que haga visible el
 estado. Es **preventiva**: hoy no hay backlog productivo que rescatar.
 
+## Delta 2026-08-22 — el carril MANUAL tampoco tiene tope, y el concepto es uno solo
+
+Auditoría del cierre de `TASK-1755` (la task hermana, ya `complete`). Hallazgo verificado en código:
+`resolveAttemptSeq` (`src/lib/hiring/assessment/assignment-policy/assign.ts`) devuelve
+`maxAttemptSeq + 1` **sin techo**, y el test `attempt-retry.test.ts:531-543` asserta explícitamente que
+reintentar **sin corregir nada** produce `[1, 2]`. O sea: el tope anti-bucle que esta task declara para el
+carril AUTOMÁTICO **tampoco existe en el manual**.
+
+El daño del lado manual es menor y acotado —`blocked`/`held` no crean instancia ni mandan correo, porque
+`resolveAssignmentIntent` decide antes de tocar el ledger, y cada reintento exige propose + confirm
+humanos— pero cada ciclo abre 1 propuesta + 1 fila de ledger + 2 eventos de outbox, sin tope y **sin
+señal**. Los Follow-ups de `TASK-1755` proponen una señal por antigüedad, no un tope.
+
+**Implicación para esta task: el tope es UN concepto, no dos.** Si lo derivas contando filas superseded de
+la misma clave —como declara tu `Migration posture`— esa misma derivación cubre el carril manual contando
+por `attempt_seq`. Decláralo explícitamente para los dos carriles o declara por qué el manual queda fuera;
+no lo dejes implícito, que es como este hallazgo llegó hasta acá sin dueño.
+
 ## Why This Task Exists
 
 Una fila `blocked` del carril automático ocupa la clave de idempotencia
