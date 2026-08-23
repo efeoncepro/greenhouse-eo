@@ -82,6 +82,24 @@ conserva su comportamiento actual. Defensa en profundidad: guarda de aplicación
 - `TASK-1764` sigue `to-do`: sin ella el `EmailType` nuevo cae al perfil de footer legacy en silencio.
   Bloquea **sólo** Slice 4, no Slices 1-3.
 
+## Delta 2026-08-23 (2) — decisión resuelta: el cierre masivo NO se federa como acción de agente
+
+`TASK-1773` dejaba abierto si el carril gobernado federa también el cierre masivo o sólo la decisión
+individual. **Queda resuelto acá para que no siga siendo un supuesto: no se federa.**
+
+El cierre masivo es un efecto externo irreversible sobre decenas de personas y su gate es una
+confirmación humana contra un digest fresco. Federarlo convertiría el `preview → confirm` en una
+llamada, que es exactamente el gate que el ADR existe para imponer — y bajo el AI Act, selección es
+alto riesgo con supervisión humana obligatoria: una acción de agente que cierra una cohorte es
+precisamente la decisión automatizada que no se puede tomar.
+
+**Lo que el carril SÍ expone, y basta para Full API Parity:** el `preview` de la cohorte (lectura) y
+el `status` del run (lectura). Un agente puede explicar a cuántas personas afectaría un cierre y en
+qué va uno en curso; no puede dispararlo. Es el mismo reparto que ya rige en el resto de Hiring: el
+LLM propone y lee, el humano confirma en el endpoint de confirmación.
+
+La decisión individual (`decideHiringApplication`) conserva su propio contrato y no cambia acá.
+
 ## Summary
 
 Crea la fuente de verdad de cupos por vacante y el cierre durable de una cohorte. El operador obtiene un preview,
