@@ -14,6 +14,7 @@ import {
   type OpeningAssessmentPolicy,
 } from '@/types/hiring-assessment-policy'
 
+import { notArchivedPredicate } from '../../active-process'
 import { realOnlyPredicate } from '../../data-origin/contracts'
 import { HiringValidationError } from '../../errors'
 
@@ -101,12 +102,21 @@ const DEAD_END_PREDICATE_SQL = `
  *
  * La exclusión NUNCA es silenciosa: se cuenta y se reporta aparte (`excludedSynthetic`).
  *
- * La mitad de procedencia sale de `realOnlyPredicate` (TASK-1739), que es el fragmento canónico
- * del dominio: ningún reader escribe su propio WHERE de procedencia. `archived_at` se suma acá
- * porque es el eje que `TASK-1748` separó del de etapa, y responde otra pregunta — no "¿es una
- * persona real?" sino "¿este registro sigue a la vista del operador?".
+ * **Las dos mitades salen de sus dueños canónicos, y son preguntas DISTINTAS** que este módulo
+ * COMPONE — nunca funde:
+ *
+ * - procedencia ← `realOnlyPredicate` (TASK-1739): "¿es una persona real?"
+ * - visibilidad ← `activeProcessPredicate` (TASK-1772): "¿este registro sigue a la vista?"
+ *
+ * De la segunda se toma sólo el eje de visibilidad, y eso es deliberado: el predicado canónico
+ * también exige `decision IS NULL`, pero acá esa condición ya la impone el `DEAD_END_PREDICATE_SQL`
+ * por otra vía (la fila del ledger vigente de una policy activa). Sumarla completa no cambiaría el
+ * resultado y sí haría que este filtro respondiera dos preguntas a medias.
+ *
+ * ⚠️ El eje de visibilidad se IMPORTA como pieza nombrada, no se recorta de la conjunción ni se
+ * reescribe a mano. Es la novena copia que TASK-1772 retira.
  */
-const REAL_APPLICATION_SQL = `${realOnlyPredicate('app')} AND app.archived_at IS NULL`
+const REAL_APPLICATION_SQL = `${realOnlyPredicate('app')} AND ${notArchivedPredicate('app')}`
 
 /**
  * Recuperaciones YA gastadas de esta clave: filas superseded cuyo outcome sigue siendo

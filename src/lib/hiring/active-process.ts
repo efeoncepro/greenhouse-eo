@@ -60,13 +60,35 @@
  */
 
 /**
+ * EJE DE DESENLACE, suelto: «el recorrido no ha terminado».
+ *
+ * Se exporta como pieza de primera clase porque hay consumidores legítimos de UNA mitad —y porque
+ * la alternativa observada es peor: recortarle una mitad a la conjunción con `split`/`replace`.
+ * Esa cirugía sobrevive a que el predicado cambie de orden o crezca un eje, y entonces produce otra
+ * pregunta EN SILENCIO. Componer piezas nombradas falla al compilar; recortar strings no falla.
+ */
+export const decidedOutcomePredicate = (alias: string): string => `${alias}.decision IS NULL`
+
+/**
+ * EJE DE VISIBILIDAD, suelto: «el registro no fue retirado de la vista».
+ *
+ * Lo consume `assessment/assignment-policy/dead-ends.ts`, que necesita componerlo con procedencia
+ * (`realOnlyPredicate`) y NO con el eje de desenlace — su pregunta es «¿es dato real y visible?»,
+ * no «¿sigue en proceso?». Dos preguntas ortogonales que comparten esta mitad.
+ */
+export const notArchivedPredicate = (alias: string): string => `${alias}.archived_at IS NULL`
+
+/**
  * Fragmento SQL canónico. Ningún reader escribe su propio WHERE de «proceso activo».
+ *
+ * Se COMPONE de las dos piezas de arriba en vez de repetir sus literales: así un cambio de eje se
+ * propaga a los tres exportables a la vez, y las mitades sueltas no pueden derivar del todo.
  *
  * `alias` debe ser un alias de tabla controlado por el llamador (nunca input de usuario): se
  * interpola como identificador, no como valor — mismo contrato que `realOnlyPredicate`.
  */
 export const activeProcessPredicate = (alias: string): string =>
-  `${alias}.decision IS NULL AND ${alias}.archived_at IS NULL`
+  `${decidedOutcomePredicate(alias)} AND ${notArchivedPredicate(alias)}`
 
 /**
  * Negación explícita, para los `FILTER`/`NOT EXISTS` que preguntan por lo contrario.
