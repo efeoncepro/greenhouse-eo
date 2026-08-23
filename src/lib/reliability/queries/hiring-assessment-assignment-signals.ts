@@ -52,6 +52,14 @@ import type { ReliabilitySignal } from '@/types/reliability'
 //    (`blocked`/`held`/`stale`) de un origen NO manual, que ocupan la clave de idempotencia de
 //    una policy activa sin haber asignado nada.
 //
+//    Se cuentan en TRES poblaciones que no son lo mismo, y mezclarlas rompería la señal:
+//      · `recoverable` — la causa YA NO aplicaría hoy. Accionable ⇒ `warning`. Steady = 0: si el
+//        supersede funciona, este conteo vuelve a cero solo.
+//      · `honest` — bloqueada y la causa SIGUE aplicando. **No alarma**: no hay nada que hacer
+//        todavía, y alarmar por esto entrena a la gente a ignorar la señal entera.
+//      · `cap_reached` — agotaron el tope de recuperación ⇒ `error`. Mismo espíritu que el
+//        `dead_letter` del outbox: alguien tiene que mirar.
+//
 //    Es el hueco que `blocked_last_24h` no cubre y no puede cubrir: esa métrica **no entra al
 //    cálculo de severidad** y caduca a las 24 horas, así que una clave quemada sale hasta de la
 //    evidencia mientras sigue bloqueando a la persona. `awaiting_terminal` tampoco la ve — la
@@ -157,27 +165,34 @@ export const getHiringAssessmentAssignmentHealthSignal = async (): Promise<Relia
     const blocked = Number(row.blocked_last_24h)
     const assignedWithoutDispatch = Number(row.assigned_without_dispatch_24h)
     const deadEnds = deadEndCounts.deadEnds
+    const recoverableDeadEnds = deadEndCounts.recoverable
+    const honestDeadEnds = deadEndCounts.honest
+    const deadEndsCapReached = deadEndCounts.capReached
     const deadEndsExcludedSynthetic = deadEndCounts.excludedSynthetic
 
     const severity =
-      intentAtRest > 0
+      intentAtRest > 0 || deadEndsCapReached > 0
         ? 'error'
-        : deadEnds > 0 || awaiting > 0 || expiredProposals > 0 || assignedWithoutDispatch > 0
+        : recoverableDeadEnds > 0 || awaiting > 0 || expiredProposals > 0 || assignedWithoutDispatch > 0
           ? 'warning'
           : 'ok'
 
     const summary =
       intentAtRest > 0
         ? `${intentAtRest} asignación(es) quedaron a medio registrar: el command murió entre el ledger y la instancia. Es un bug, no operación normal.`
-        : deadEnds > 0
-          ? `${deadEnds} asignación(es) automáticas quedaron en callejón: ocupan la clave sin haber asignado nada y no se liberan solas.`
+        : deadEndsCapReached > 0
+          ? `${deadEndsCapReached} asignación(es) automáticas agotaron el tope de recuperación: la clave sigue ocupada y exige intervención humana.`
+        : recoverableDeadEnds > 0
+          ? `${recoverableDeadEnds} asignación(es) automáticas quedaron en callejón y su causa ya no aplicaría: se pueden liberar por el supersede gobernado.`
           : assignedWithoutDispatch > 0
             ? `${assignedWithoutDispatch} asignación(es) de las últimas 24 h no tienen despacho de correo registrado.`
             : awaiting > 0
               ? `${awaiting} postulación(es) alcanzaron la etapa trigger sin resultado terminal en el ledger. La reconciliación debe drenarlas.`
               : expiredProposals > 0
                 ? `${expiredProposals} propuesta(s) de asignación vencieron sin confirmarse ni cerrarse.`
-                : 'Toda asignación tiene resultado terminal, despacho registrado, no hay callejones vigentes ni propuestas vencidas abiertas.'
+                : honestDeadEnds > 0
+                  ? `${honestDeadEnds} asignación(es) siguen bloqueadas por una causa vigente. No hay nada que liberar todavía: primero se corrige la causa.`
+                  : 'Toda asignación tiene resultado terminal, despacho registrado, no hay callejones vigentes ni propuestas vencidas abiertas.'
 
     return {
       signalId: HIRING_ASSESSMENT_ASSIGNMENT_HEALTH_SIGNAL_ID,
@@ -194,7 +209,11 @@ export const getHiringAssessmentAssignmentHealthSignal = async (): Promise<Relia
         { kind: 'metric', label: 'expired_open_proposals', value: String(expiredProposals) },
         { kind: 'metric', label: 'blocked_last_24h', value: String(blocked) },
         { kind: 'metric', label: 'assignment_dead_ends', value: String(deadEnds) },
+        { kind: 'metric', label: 'dead_ends_recoverable', value: String(recoverableDeadEnds) },
+        { kind: 'metric', label: 'dead_ends_honest', value: String(honestDeadEnds) },
+        { kind: 'metric', label: 'dead_ends_cap_reached', value: String(deadEndsCapReached) },
         { kind: 'metric', label: 'dead_ends_excluded_synthetic', value: String(deadEndsExcludedSynthetic) },
+        { kind: 'metric', label: 'dead_ends_evaluation_truncated', value: String(deadEndCounts.truncated) },
         { kind: 'metric', label: 'assigned_without_dispatch_24h', value: String(assignedWithoutDispatch) },
         {
           kind: 'doc',

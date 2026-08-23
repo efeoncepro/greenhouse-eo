@@ -2,7 +2,7 @@ import 'server-only'
 
 import type { PoolClient } from 'pg'
 
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import {
   ASSESSMENT_ASSIGNMENT_ORIGINS,
   ASSESSMENT_ASSIGNMENT_OUTCOMES,
@@ -11,11 +11,13 @@ import {
   type AssessmentAssignmentOutcome,
   type AssessmentAssignmentReasonCode,
   type AssessmentAssignmentTrigger,
+  type OpeningAssessmentPolicy,
 } from '@/types/hiring-assessment-policy'
 
 import { realOnlyPredicate } from '../../data-origin/contracts'
 import { HiringValidationError } from '../../errors'
 
+import { resolveLiveAssignmentIntent } from './assign'
 import { RECOVERABLE_ASSIGNMENT_OUTCOMES } from './assignment-store'
 import { getPolicyById } from './store'
 
@@ -200,8 +202,72 @@ const normalizeDeadEnd = (row: DeadEndRow): AssignmentDeadEnd => ({
 })
 
 /**
- * Callejones de UNA policy exacta. Reader scoped: nunca lista global — ésa vive sólo en la señal
- * y devuelve conteos, sin IDs.
+ * Consulta interna compartida por el reader scoped y el resumen global. Existe para que ninguno
+ * de los dos escriba su propio SELECT: el `policyId` es lo ÚNICO que los diferencia.
+ */
+const queryDeadEnds = async (
+  client: PoolClient | null,
+  policyId: string | null,
+  limit: number,
+): Promise<{ rows: DeadEndRow[]; excludedSynthetic: number }> => {
+  const scope = policyId ? 'AND p.policy_id = $3' : ''
+
+  const values: unknown[] = policyId
+    ? [RECOVERABLE_OUTCOMES_PARAM, limit, policyId]
+    : [RECOVERABLE_OUTCOMES_PARAM, limit]
+
+  const rows = await runQuery<DeadEndRow>(
+    client,
+    `SELECT asg.assignment_id, asg.application_id, asg.policy_id, asg.policy_version,
+            asg.trigger_stage, asg.attempt_seq, asg.origin, asg.outcome, asg.outcome_reason,
+            asg.created_at, app.stage AS application_stage,
+            ${RECOVERY_COUNT_SQL} AS recovery_count,
+            COUNT(*) OVER ()::int AS total_matching
+       FROM greenhouse_hiring.hiring_assessment_assignment asg
+       JOIN greenhouse_hiring.hiring_opening_assessment_policy p ON p.policy_id = asg.policy_id
+       JOIN greenhouse_hiring.hiring_application app ON app.application_id = asg.application_id
+      WHERE ${DEAD_END_PREDICATE_SQL}
+        AND ${REAL_APPLICATION_SQL}
+        ${scope}
+      ORDER BY asg.created_at
+      LIMIT $2`,
+    values,
+  )
+
+  const excluded = await runQuery<{ total: unknown }>(
+    client,
+    `SELECT COUNT(*)::int AS total
+       FROM greenhouse_hiring.hiring_assessment_assignment asg
+       JOIN greenhouse_hiring.hiring_opening_assessment_policy p ON p.policy_id = asg.policy_id
+       JOIN greenhouse_hiring.hiring_application app ON app.application_id = asg.application_id
+      WHERE ${DEAD_END_PREDICATE_SQL}
+        AND NOT (${REAL_APPLICATION_SQL})
+        ${policyId ? 'AND p.policy_id = $2' : ''}`,
+    policyId ? [RECOVERABLE_OUTCOMES_PARAM, policyId] : [RECOVERABLE_OUTCOMES_PARAM],
+  )
+
+  return { rows, excludedSynthetic: int(excluded[0]?.total) }
+}
+
+const safeLimit = (limit: number): number => Math.max(1, Math.min(500, Math.floor(limit)))
+
+const buildQueue = (
+  rows: DeadEndRow[],
+  excludedSynthetic: number,
+): AssignmentDeadEndQueue => {
+  const totalMatching = int(rows[0]?.total_matching)
+
+  return {
+    deadEnds: rows.map(normalizeDeadEnd),
+    totalMatching,
+    truncated: totalMatching > rows.length,
+    excludedSynthetic,
+  }
+}
+
+/**
+ * Callejones de UNA policy exacta, SIN evaluar si la causa sigue aplicando. Reader scoped: nunca
+ * lista global — ésa vive sólo en el resumen de la señal y devuelve conteos, sin IDs.
  *
  * Devuelve la cola vacía cuando la policy no existe, no está `enabled` o no es `on_stage_entry`,
  * exactamente como `resolveApplicationsAwaitingAssignment`: sin carril automático no hay callejón
@@ -219,77 +285,199 @@ export const resolveAssignmentDeadEndsForPolicy = async (
     return empty
   }
 
-  const safeLimit = Math.max(1, Math.min(500, Math.floor(limit)))
+  const { rows, excludedSynthetic } = await queryDeadEnds(client, policy.policyId, safeLimit(limit))
 
-  const rows = await runQuery<DeadEndRow>(
+  return buildQueue(rows, excludedSynthetic)
+}
+
+// ── TASK-1771 Slice 2 — ¿esta causa seguiría bloqueando HOY? ──
+
+/**
+ * Tope anti-bucle por clave. Un supersede que vuelve a bloquear por la misma causa genera filas
+ * infinitas con el mismo `attempt_seq = 1` (el índice único es PARCIAL, así que la base no frena
+ * nada). Tres recuperaciones y la clave exige intervención humana — mismo espíritu que el
+ * `dead_letter` del outbox: agotar los reintentos no es un fracaso silencioso, es un estado
+ * declarado que alguien tiene que mirar.
+ */
+export const DEAD_END_RECOVERY_CAP = 3
+
+export interface DeadEndRecoveryEvaluation {
+  /** Lo que el assignment resolvería HOY con el estado vigente. */
+  liveOutcome: AssessmentAssignmentOutcome
+  liveReason: AssessmentAssignmentReasonCode | null
+  /**
+   * ÚNICA condición de avance: hoy la asignación SÍ ocurriría.
+   *
+   * **NO basta con que la evaluación difiera del resultado registrado**, que es la lectura
+   * intuitiva y es incorrecta. Evidencia contra la base compartida (2026-08-23): hay filas que
+   * dicen `volume_cap` y hoy evaluarían `blocked: policy_disabled` porque su policy se apagó
+   * después. Con "difiere" como criterio, superseder volvería a quemar la clave con otra razón —
+   * el bucle con otro nombre. Superseder para volver a bloquear no es recuperación, es ruido.
+   */
+  recoverable: boolean
+  /** Recuperaciones ya gastadas de esta clave. */
+  recoveryCount: number
+  capReached: boolean
+  /** Por qué NO se puede superseder hoy. `null` cuando sí se puede. */
+  blockedBy: 'cause' | 'cap' | null
+}
+
+export interface EvaluatedAssignmentDeadEnd extends AssignmentDeadEnd {
+  evaluation: DeadEndRecoveryEvaluation
+}
+
+export interface EvaluatedAssignmentDeadEndQueue {
+  deadEnds: EvaluatedAssignmentDeadEnd[]
+  totalMatching: number
+  truncated: boolean
+  excludedSynthetic: number
+  /** Callejón RECUPERABLE: la causa ya no aplicaría. Es el que importa y el que alarma. */
+  recoverable: number
+  /** Callejón HONESTO: la causa sigue aplicando. No es accionable todavía; no debe alarmar. */
+  honest: number
+  /** Agotaron el tope: exigen intervención humana. */
+  capReached: number
+}
+
+/**
+ * Evaluación DRY-RUN de una fila en callejón. No escribe nada y no decide por sí sola: el command
+ * del supersede la vuelve a pedir bajo el `FOR UPDATE` de la policy antes de estampar nada.
+ *
+ * Esa repetición NO es redundante. `volume_cap` se auto-cura con una ventana MÓVIL
+ * (`countAssignedInWindow` cuenta `created_at > NOW() - ventana`), así que esta lectura describe
+ * un instante que puede haber pasado para cuando alguien apriete el botón. La cola muestra una
+ * foto; el write vuelve a mirar.
+ */
+export const evaluateAssignmentDeadEndRecovery = async (
+  client: PoolClient,
+  policy: OpeningAssessmentPolicy,
+  deadEnd: AssignmentDeadEnd,
+): Promise<DeadEndRecoveryEvaluation> => {
+  const live = await resolveLiveAssignmentIntent(
     client,
-    `SELECT asg.assignment_id, asg.application_id, asg.policy_id, asg.policy_version,
-            asg.trigger_stage, asg.attempt_seq, asg.origin, asg.outcome, asg.outcome_reason,
-            asg.created_at, app.stage AS application_stage,
-            ${RECOVERY_COUNT_SQL} AS recovery_count,
-            COUNT(*) OVER ()::int AS total_matching
-       FROM greenhouse_hiring.hiring_assessment_assignment asg
-       JOIN greenhouse_hiring.hiring_opening_assessment_policy p ON p.policy_id = asg.policy_id
-       JOIN greenhouse_hiring.hiring_application app ON app.application_id = asg.application_id
-      WHERE p.policy_id = $2
-        AND ${DEAD_END_PREDICATE_SQL}
-        AND ${REAL_APPLICATION_SQL}
-      ORDER BY asg.created_at
-      LIMIT $3`,
-    [RECOVERABLE_OUTCOMES_PARAM, policy.policyId, safeLimit],
+    policy,
+    deadEnd.applicationId,
+    // Origen y etapa se toman de la fila REGISTRADA: evaluar un `stage_auto` como si fuera
+    // manual saltaría el cap de volumen y la guarda de modo, dos de las causas que más bloquean.
+    deadEnd.origin,
+    deadEnd.triggerStage,
   )
 
-  const excluded = await runQuery<{ total: unknown }>(
-    client,
-    `SELECT COUNT(*)::int AS total
-       FROM greenhouse_hiring.hiring_assessment_assignment asg
-       JOIN greenhouse_hiring.hiring_opening_assessment_policy p ON p.policy_id = asg.policy_id
-       JOIN greenhouse_hiring.hiring_application app ON app.application_id = asg.application_id
-      WHERE p.policy_id = $2
-        AND ${DEAD_END_PREDICATE_SQL}
-        AND NOT (${REAL_APPLICATION_SQL})`,
-    [RECOVERABLE_OUTCOMES_PARAM, policy.policyId],
-  )
-
-  const totalMatching = int(rows[0]?.total_matching)
+  const recoverable = live.outcome === 'assigned'
+  const capReached = deadEnd.recoveryCount >= DEAD_END_RECOVERY_CAP
 
   return {
-    deadEnds: rows.map(normalizeDeadEnd),
-    totalMatching,
-    truncated: totalMatching > rows.length,
-    excludedSynthetic: int(excluded[0]?.total),
+    liveOutcome: live.outcome,
+    liveReason: live.reasonCode,
+    recoverable,
+    recoveryCount: deadEnd.recoveryCount,
+    capReached,
+    // El tope se reporta ANTES que la causa: una clave agotada no vuelve a intentarse aunque el
+    // mundo se haya corregido, y decir "la causa sigue aplicando" ahí sería mentir sobre por qué.
+    blockedBy: capReached ? 'cap' : recoverable ? null : 'cause',
   }
 }
+
+/**
+ * Cola de UNA policy CON la evaluación por fila. Abre una transacción propia porque la evaluación
+ * necesita cliente y porque leer todas las filas contra el mismo snapshot evita que la foto salga
+ * mezclada entre dos instantes.
+ */
+export const resolveEvaluatedAssignmentDeadEndsForPolicy = async (
+  policyId: string,
+  limit = 100,
+): Promise<EvaluatedAssignmentDeadEndQueue> =>
+  withGreenhousePostgresTransaction(async client => {
+    const base = await resolveAssignmentDeadEndsForPolicy(policyId, client, limit)
+
+    if (base.deadEnds.length === 0) {
+      return { ...base, deadEnds: [], recoverable: 0, honest: 0, capReached: 0 }
+    }
+
+    const policy = await getPolicyById(policyId, client)
+
+    if (!policy) {
+      return { ...base, deadEnds: [], recoverable: 0, honest: 0, capReached: 0 }
+    }
+
+    const deadEnds: EvaluatedAssignmentDeadEnd[] = []
+
+    for (const deadEnd of base.deadEnds) {
+      deadEnds.push({ ...deadEnd, evaluation: await evaluateAssignmentDeadEndRecovery(client, policy, deadEnd) })
+    }
+
+    return {
+      ...base,
+      deadEnds,
+      recoverable: deadEnds.filter(d => d.evaluation.recoverable && !d.evaluation.capReached).length,
+      honest: deadEnds.filter(d => !d.evaluation.recoverable && !d.evaluation.capReached).length,
+      capReached: deadEnds.filter(d => d.evaluation.capReached).length,
+    }
+  })
 
 export interface AssignmentDeadEndCounts {
   /** Callejones vigentes sobre postulaciones reales. Steady esperado: 0. */
   deadEnds: number
+  /** La causa ya no aplicaría: accionable HOY. Es el conteo que mueve la severidad. */
+  recoverable: number
+  /** La causa sigue aplicando: no accionable todavía, y alarmar por esto entrena a ignorar. */
+  honest: number
+  /** Agotaron el tope de recuperación: exigen intervención humana. */
+  capReached: number
   /** Excluidos por procedencia sintética o archivado. Evidencia, no alarma. */
   excludedSynthetic: number
+  /** `true` si el bound de evaluación cortó. Un tope silencioso se leería como "no hay más". */
+  truncated: boolean
 }
 
 /**
- * Conteo GLOBAL para la señal de reliability. Sólo números: ningún `applicationId`, ningún
- * `assignmentId`, ninguna PII. Comparte los MISMOS fragmentos de predicado que el reader scoped,
- * que es lo que impide que la señal y la cola se separen con el tiempo.
+ * Bound de la evaluación global. La señal no puede evaluar filas sin límite —cada una son cuatro
+ * consultas— y tampoco puede callar que cortó: por eso `truncated` viaja en el resultado.
  */
-export const countAssignmentDeadEnds = async (
-  client: PoolClient | null = null,
-): Promise<AssignmentDeadEndCounts> => {
-  const rows = await runQuery<{ dead_ends: unknown; excluded_synthetic: unknown }>(
-    client,
-    `SELECT
-       COUNT(*) FILTER (WHERE ${REAL_APPLICATION_SQL})::int       AS dead_ends,
-       COUNT(*) FILTER (WHERE NOT (${REAL_APPLICATION_SQL}))::int AS excluded_synthetic
-     FROM greenhouse_hiring.hiring_assessment_assignment asg
-     JOIN greenhouse_hiring.hiring_opening_assessment_policy p ON p.policy_id = asg.policy_id
-     JOIN greenhouse_hiring.hiring_application app ON app.application_id = asg.application_id
-    WHERE ${DEAD_END_PREDICATE_SQL}`,
-    [RECOVERABLE_OUTCOMES_PARAM],
-  )
+const SIGNAL_EVALUATION_BOUND = 200
 
-  return {
-    deadEnds: int(rows[0]?.dead_ends),
-    excludedSynthetic: int(rows[0]?.excluded_synthetic),
-  }
-}
+/**
+ * Resumen GLOBAL para la señal de reliability. Sólo números: ningún `applicationId`, ningún
+ * `assignmentId`, ninguna PII. Comparte los MISMOS fragmentos de predicado que el reader scoped,
+ * que es lo que impide que la señal y la cola se separen con el tiempo (invariante 19 del ADR).
+ */
+export const countAssignmentDeadEnds = async (): Promise<AssignmentDeadEndCounts> =>
+  withGreenhousePostgresTransaction(async client => {
+    const { rows, excludedSynthetic } = await queryDeadEnds(client, null, SIGNAL_EVALUATION_BOUND)
+    const queue = buildQueue(rows, excludedSynthetic)
+
+    const policies = new Map<string, OpeningAssessmentPolicy | null>()
+    let recoverable = 0
+    let honest = 0
+    let capReached = 0
+
+    for (const deadEnd of queue.deadEnds) {
+      if (!policies.has(deadEnd.policyId)) {
+        policies.set(deadEnd.policyId, await getPolicyById(deadEnd.policyId, client))
+      }
+
+      const policy = policies.get(deadEnd.policyId)
+
+      // Sin policy no hay evaluación posible. Se cuenta como honesto —no accionable— en vez de
+      // como recuperable: la duda NUNCA se resuelve alarmando por algo que nadie puede arreglar.
+      if (!policy) {
+        honest += 1
+        continue
+      }
+
+      const evaluation = await evaluateAssignmentDeadEndRecovery(client, policy, deadEnd)
+
+      if (evaluation.capReached) capReached += 1
+      else if (evaluation.recoverable) recoverable += 1
+      else honest += 1
+    }
+
+    return {
+      deadEnds: queue.deadEnds.length,
+      recoverable,
+      honest,
+      capReached,
+      excludedSynthetic,
+      truncated: queue.truncated,
+    }
+  })
