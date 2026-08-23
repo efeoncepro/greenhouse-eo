@@ -233,6 +233,68 @@ const assertActorAndReason = (actorUserId: string, reason: string): void => {
  * Archiva las TRES entidades sobre allowlist explícita, cada una en su propia transacción con CAS
  * sobre su estado actual y su fila de audit. Re-ejecutar es no-op (`already_archived`).
  */
+/**
+ * TASK-1772 — Allowlist de purga ACOTADA: qué registros considerar, separados por entidad.
+ *
+ * Vive en la biblioteca y no en el CLI a propósito. La validación de una allowlist es la parte que
+ * DECIDE qué se muta sobre la única instancia Cloud SQL que comparten dev, staging y producción;
+ * dejarla en un script la vuelve inalcanzable para cualquier otro consumidor (una ruta de API
+ * gobernada, un runbook, un test) y confía en que nadie la reescriba distinto.
+ *
+ * Las TRES entidades se podan por separado, y eso es el punto: se puede archivar una postulación
+ * dejando VIVAS su ficha y su vacante, que es justo lo que exige un fixture todavía en uso por un
+ * gate. Una allowlist plana obligaría a arrastrar las tres o ninguna.
+ */
+export interface PurgeAllowlist {
+  generatedAt?: string
+  applicationIds?: string[]
+  candidateFacetIds?: string[]
+  openingIds?: string[]
+}
+
+export const PURGE_ALLOWLIST_SUFFIX = '.synthetic-purge-allowlist.json'
+
+/**
+ * Total de entradas across las tres entidades. Una allowlist vacía NO es «archivar todo»: es un
+ * error del operador (emitió y podó de más, o apuntó al archivo equivocado), y tratarla como
+ * no-op silencioso escondería la equivocación.
+ */
+export const countPurgeAllowlistEntries = (allowlist: PurgeAllowlist): number =>
+  (allowlist.applicationIds?.length ?? 0) +
+  (allowlist.candidateFacetIds?.length ?? 0) +
+  (allowlist.openingIds?.length ?? 0)
+
+/**
+ * Toda id de la allowlist tiene que existir en el plan vigente. Si no está, o el plan cambió bajo
+ * los pies (alguien más marcó, archivó o borró en la base compartida) o la allowlist se escribió
+ * contra otra realidad.
+ *
+ * En los dos casos se aborta la corrida ENTERA y se devuelven TODAS las ids desconocidas, no la
+ * primera: un archivado parcial silencioso sobre una base compartida es peor que no correr nada,
+ * porque nadie sabe qué mitad se aplicó. Y fallar de a una id obliga a N corridas para descubrir N
+ * problemas.
+ */
+export const findPurgeAllowlistEntriesOutsidePlan = (
+  allowlist: PurgeAllowlist,
+  plan: Pick<PurgePlan, 'candidates' | 'facets' | 'openings'>,
+): string[] => {
+  const known: Array<[keyof PurgeAllowlist, Set<string>]> = [
+    ['applicationIds', new Set(plan.candidates.map(candidate => candidate.applicationId))],
+    ['candidateFacetIds', new Set(plan.facets.map(facet => facet.candidateFacetId))],
+    ['openingIds', new Set(plan.openings.map(opening => opening.openingId))],
+  ]
+
+  const unknown: string[] = []
+
+  for (const [field, ids] of known) {
+    for (const id of (allowlist[field] as string[] | undefined) ?? []) {
+      if (!ids.has(id)) unknown.push(`${String(field)}: ${id}`)
+    }
+  }
+
+  return unknown
+}
+
 export const archiveSyntheticRecords = async (input: ApplyPurgeInput): Promise<ApplyPurgeSummary> => {
   assertActorAndReason(input.actorUserId, input.reason)
 

@@ -133,3 +133,5 @@ public/growth-meetings/icons.css
 public/growth-cta/*.js
 public/growth-cta/BUILDINFO.json
 *.synthetic-origin-allowlist.json
+# TASK-1772 — allowlists de purga acotada (ids de registros; se podan a mano, no se commitean)
+*.synthetic-purge-allowlist.json
