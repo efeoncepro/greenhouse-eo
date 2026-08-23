@@ -58,3 +58,60 @@ export interface OpeningCapacityStatus {
   activeApplications: number
   policy: OpeningCapacityPolicy | null
 }
+
+// ── Slice 2 — preview, digest y run durable ─────────────────────────────────────────────────────
+
+/**
+ * De qué categoría del preview viene una candidatura.
+ *
+ * `eligible` entra por defecto. `paused` y `backup` **NO**: son compromisos abiertos o pausas
+ * deliberadas, y meterlas sin que el humano las pida sería cerrar a alguien que el equipo
+ * conscientemente dejó en espera.
+ */
+export type ClosureCohortCategory = 'eligible' | 'paused' | 'backup'
+
+export interface ClosureCohortMember {
+  applicationId: string
+  category: ClosureCohortCategory
+  stage: string
+}
+
+export interface OpeningClosurePreview {
+  openingId: string
+  publicId: string
+  targetSeats: number
+  occupiedSeats: number
+  remainingSeats: number
+  capacityFilled: boolean
+  /** Candidaturas que entrarían por defecto. */
+  eligible: ClosureCohortMember[]
+  /** Etapa `decision_pending` sin desenlace: una pausa deliberada. Sólo entra si se pide. */
+  paused: ClosureCohortMember[]
+  /** Desenlace `backup_selected`: compromiso abierto. Sólo entra si se pide. */
+  backup: ClosureCohortMember[]
+  /** Cuántas quedaron fuera por tener ya un desenlace terminal o estar archivadas. */
+  excludedCount: number
+  /**
+   * Huella de la cohorte exacta. El confirm la exige: si la realidad cambió entre el preview y la
+   * confirmación, no coincide y el cierre se rechaza. Nadie cierra una cohorte distinta de la que vio.
+   */
+  effectDigest: string
+}
+
+export type ClosureRunState = 'pending' | 'running' | 'completed' | 'partially_failed' | 'cancelled'
+
+export interface OpeningClosureRunStatus {
+  runId: string
+  openingId: string
+  state: ClosureRunState
+  cohortSize: number
+  pending: number
+  decided: number
+  failed: number
+  quarantined: number
+  skipped: number
+  includedPaused: boolean
+  includedBackup: boolean
+  createdAt: string
+  completedAt: string | null
+}

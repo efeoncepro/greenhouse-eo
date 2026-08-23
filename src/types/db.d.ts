@@ -8322,6 +8322,38 @@ export interface GreenhouseHiringHiringOpeningCapacityEvent {
   reason: string;
 }
 
+export interface GreenhouseHiringHiringOpeningClosureRun {
+  cohort_size: number;
+  completed_at: Timestamp | null;
+  confirmed_by_user_id: string;
+  created_at: Generated<Timestamp>;
+  /**
+   * TASK-1762: huella de la cohorte exacta que el humano aprobo. Un preview vencido no puede confirmar.
+   */
+  effect_digest: string;
+  idempotency_key: string;
+  included_backup: Generated<boolean>;
+  included_paused: Generated<boolean>;
+  occupied_seats: number;
+  opening_id: string;
+  run_id: Generated<string>;
+  started_at: Timestamp | null;
+  state: Generated<string>;
+  target_seats: number;
+}
+
+export interface GreenhouseHiringHiringOpeningClosureRunItem {
+  application_id: string;
+  attempts: Generated<number>;
+  cohort_category: string;
+  decided_at: Timestamp | null;
+  item_id: Generated<string>;
+  last_error_code: string | null;
+  run_id: string;
+  state: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseHiringHiringQuestion {
   answer_key_json: Generated<Json>;
   competency_id: string;
@@ -12853,6 +12885,8 @@ export interface DB {
   "greenhouse_hiring.hiring_opening_assessment_policy_event": GreenhouseHiringHiringOpeningAssessmentPolicyEvent;
   "greenhouse_hiring.hiring_opening_capacity": GreenhouseHiringHiringOpeningCapacity;
   "greenhouse_hiring.hiring_opening_capacity_event": GreenhouseHiringHiringOpeningCapacityEvent;
+  "greenhouse_hiring.hiring_opening_closure_run": GreenhouseHiringHiringOpeningClosureRun;
+  "greenhouse_hiring.hiring_opening_closure_run_item": GreenhouseHiringHiringOpeningClosureRunItem;
   "greenhouse_hiring.hiring_question": GreenhouseHiringHiringQuestion;
   "greenhouse_hiring.talent_demand": GreenhouseHiringTalentDemand;
   "greenhouse_hiring.talent_pool_access_audit": GreenhouseHiringTalentPoolAccessAudit;
