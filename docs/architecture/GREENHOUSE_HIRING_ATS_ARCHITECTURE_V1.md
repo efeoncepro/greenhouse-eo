@@ -930,17 +930,24 @@ Regla:
 
 - no reducir toda la evaluación a comments sueltos dentro de `application`
 
-### `HiringDecision`
+### `HiringDecision` — el DESENLACE
 
-Resultado formal sobre una `application`.
+Cómo terminó el recorrido de la persona. El campo físico conserva el nombre `decision`, pero **NUNCA**
+se lee como «lo que Efeonce decidió»: `withdrawn` y `unresponsive` no son decisiones de Efeonce.
 
-Valores típicos:
+Seis valores:
 
 - `selected`
 - `backup_selected`
+- `not_selected` — exige `decision_cause` (`capacity_filled` · `opening_closed` · `process_cancelled`);
+  la causa está prohibida en los otros cinco
 - `rejected`
 - `withdrawn`
-- `on_hold`
+- `unresponsive`
+
+`on_hold` **dejó de ser desenlace**: una pausa no es un cierre, y se registra moviendo la ETAPA a
+`decision_pending`. **Pendiente post-release:** sigue en el `CHECK` de la base a propósito, porque
+`origin/main` todavía ofrece «Dejar en espera» (`ISSUE-161`).
 
 ### `HiringHandoff`
 

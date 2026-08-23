@@ -1,6 +1,6 @@
 # GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1 — El pipeline es el recorrido de la persona: etapa y desenlace son dos ejes, y cerrar obliga a declarar cómo
 
-- **Status**: Accepted (2026-08-22) — **§4, §4.1 y §6 implementados parcialmente el 2026-08-22 por [`TASK-1765`](../tasks/in-progress/TASK-1765-hiring-application-outcome-axis.md); §5 escrito y pendiente de aplicar.** Ver §16.
+- **Status**: Accepted (2026-08-22) — **§4, §4.1 y §6 implementados parcialmente el 2026-08-22 por [`TASK-1765`](../tasks/in-progress/TASK-1765-hiring-application-outcome-axis.md), y el §3 en su mitad EXPAND por [`TASK-1754`](../tasks/in-progress/TASK-1754-hiring-stage-vocabulary-collapse.md). De §5, `archived_at` quedó aplicado; el `CHECK` del invariante está parqueado. Los contract de ambos enums van DESPUÉS del release. §5 escrito y pendiente de aplicar.** Ver §16.
 - **Date**: 2026-08-22
 - **Deciders**: operador (CEO) — decisión de producto sobre el vocabulario y sus etiquetas · agente de diseño (skills `state-design`, `info-architecture`, `greenhouse-ux-writing`, `greenhouse-talent-people-operator`)
 - **Tags**: hiring, ats, pipeline, vocabulary, kanban, privacy, retención, fairness, talent-pool, full-api-parity
@@ -13,10 +13,13 @@
 
 ## 1. Decisión (resumen ejecutivo)
 
-El pipeline de Hiring modela **dos ejes ortogonales**, no uno:
+El pipeline de Hiring modela **tres ejes ortogonales**, no uno:
 
 - **Etapa (`stage`)** — *dónde va la persona en el recorrido*. Seis valores, uno por columna del kanban. `closed` es el sexto y significa **el recorrido terminó**; es escribible, porque una columna terminal que no puede recibir una tarjeta no es un kanban.
 - **Desenlace** — *cómo terminó ese recorrido*. Seis valores, más una **causa gobernada** obligatoria en uno de ellos.
+- **Archivado (`archived_at`)** — *si el registro se muestra*. Eje de **visibilidad del registro**, no de estado del proceso: **archivar NO declara desenlace** y NUNCA escribe `stage`. Confundirlos produjo las 32 filas `closed` sin decisión que ensuciaron el diagnóstico. Su único escritor hoy es `archiveSyntheticRecords` (CLI, sin superficie de portal).
+
+Corolario: **«proceso activo» se responde con los tres ejes** (`decision IS NULL AND archived_at IS NULL`), nunca infiriéndolo desde `stage`. Dueño: `TASK-1772`.
 
 El invariante que los une, y que se implementa como `CHECK` en la base:
 

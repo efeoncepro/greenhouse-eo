@@ -159,6 +159,44 @@ Use the People guide at `docs/documentation/hr/efeonce-operating-code-hiring-onb
 - **SIEMPRE** make selection **structured, documented, and contestable** (a candidate can be told why; a recruiter can override AI).
 - **SIEMPRE** keep the human recruiter–candidate relationship central; AI removes toil, not judgment.
 
+## Pipeline vocabulary — stage, outcome and archived are THREE axes (ADR 2026-08-22)
+
+The pipeline is **the candidate's journey**, modelled on three orthogonal axes. ADR:
+`docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md` (Accepted 2026-08-22,
+the first ADR this vocabulary ever had).
+
+1. **`stage` — where the person is.** Six values, one per kanban column: `sourced`, `screening`,
+   `shortlisted` (column «Evaluación»), `interview`, `decision_pending`, `closed`. `qualified` and
+   `client_review` were **absorbed into `shortlisted`** (migration applied 2026-08-22: `qualified` 7 → 0,
+   `shortlisted` 4 → 11); the five outcome mirrors (`selected`, `backup`, `rejected`, `withdrawn`,
+   `handoff_ready`) collapse into `closed`. `closed` is written **only** by the decision command.
+2. **Outcome (physical column `decision`) — how the journey ended.** Six values: `selected`,
+   `backup_selected`, `not_selected`, `rejected`, `withdrawn`, `unresponsive`, plus a **governed cause**
+   mandatory on `not_selected` and forbidden on the rest (`capacity_filled`, `opening_closed`,
+   `process_cancelled`).
+3. **`archived_at` — whether the record is displayed.** Born 2026-08-22, orthogonal to the other two:
+   archiving does NOT declare an outcome.
+
+**Invariant** `stage='closed'` ⟺ outcome declared. **It is NOT enforced as a `CHECK` yet** — it is written and
+parked in `docs/tasks/pending-migrations/`, waiting for TASK-1748 to move its 32 synthetic rows. Same for the
+enum contracts: the database **still accepts the 13 old stages and `on_hold`, on purpose**, because a contract
+is applied only AFTER the release that removes the writer from deployed code. **NEVER** state this invariant
+in the present tense as if the database enforced it.
+
+- **NEVER** say `on_hold` is an outcome. A pause is not a closure: it is recorded by moving the **stage** to
+  `decision_pending`. It survives in the `CHECK` only until the release.
+- **NEVER** label a person with the state of the vacancy. Capacity filled / opening closed / process
+  cancelled are the **cause** of `not_selected`, never an outcome and **never `rejected`** — `rejected` is a
+  judgement about the person, and applying it to a cohort nobody judged inflates that cohort's rejection rate
+  in the adverse-impact analysis and pushes them out of the Talent Pool.
+- **NEVER** record silence as `withdrawn`. Whoever stopped answering is `unresponsive`; `withdrawn` means the
+  person **declared** it. Both alternatives are false attribution.
+- **NEVER** close through a stage `PATCH`. Closing IS deciding: it goes through the decision command, which
+  emits the event, starts the retention clock and picks the email type.
+- **NEVER** archive by writing `closed`, and never treat `handoff_ready` as a journey position — it is a state
+  of the `handoff` aggregate, with its own state machine.
+- **NEVER** leave the cause as free text: the equity funnel and the email body branch on it.
+
 ## Hiring lifecycle emails (TASK-1689 — LIVE en producción 2026-08-12)
 
 The Hiring cycle emits 7 transactional emails as reactive consumers in the **ops-worker** (consumers `src/lib/sync/projections/hiring-lifecycle-emails.ts`; domain policy `src/lib/hiring/notifications/**`; templates `src/emails/Hiring*.tsx`):
@@ -167,7 +205,7 @@ The Hiring cycle emits 7 transactional emails as reactive consumers in the **ops
 - `hiring.assessment.assigned` → assessment-link email **only when `method=candidate_test`** (interviewer scorecards NEVER email the candidate). The token-sensitive sender reserves a durable redacted intent before issuing the credential; the bearer never travels through generic outbox/delivery metadata, and assignment is not a resend mechanism.
 - `hiring.assessment.submitted` → internal alert to People **only when `method=candidate_test`**. It links to Application 360 for human review, never carries a score and never advances or decides the application.
 - `hiring.application.stage_changed` → progress email **only for candidate-facing stages** (allowlist: `shortlisted`="Preselección", `interview`="Entrevista"); internal stage names never reach candidate copy.
-- `hiring.application.decided` → `selected` (congratulations) / `rejected` (thank-you; type `hiring_decision_rejected` is independently pausable).
+- `hiring.application.decided` → **only 2 of the 6 outcomes write to the candidate today**: `selected` (congratulations) and `rejected` (thank-you; type `hiring_decision_rejected` is independently pausable). `not_selected`, `backup_selected` and `withdrawn` are designed but have **no template yet**, and `unresponsive` is silent **by design** — closing with any of those four sends the person NOTHING. The selector is an explicit map with a declared no-op (`DECISION_EMAIL_TYPE`, `src/lib/hiring/notifications/send.ts`): an outcome absent from it is born mute rather than inheriting its neighbour's type. **NEVER** reuse another outcome's `EmailType` to "at least notify".
 
 Governance: flag `HIRING_LIFECYCLE_EMAILS_ENABLED` **ON in production since 2026-08-12** (rev `ops-worker-00548-x52`, default `true` in `services/ops-worker/deploy.sh`) — **it lives ONLY in the ops-worker** (flipping it in Vercel does nothing); per-type kill-switch in `greenhouse_notifications.email_type_config`; dedupe via `wasEmailAlreadySent`. EmailTypes: `hiring_application_received_internal`, `hiring_application_confirmation`, `hiring_assessment_assigned`, `hiring_assessment_submitted_internal`, `hiring_stage_advanced`, `hiring_decision_selected`, `hiring_decision_rejected`. The submitted-test alert shipped in production through release `0fe2420ed894` (orchestrator `31915501771`, manifest `released`, watchdog `ok`/`drift_count=0`); its live delivery has not yet been exercised with a real completed candidate test. Real E2E exercised (EO-APP-0090): 5 prior types `status=sent`; `hiring_decision_selected` is covered by tests until its first real use. Remaining open items: Legal/Privacy review of retention/notice, parser-level required flip for country, formal GVC scorecard.
 
@@ -530,6 +568,7 @@ Docs: architecture `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` 
 
 - `CLAUDE.md`, `AGENTS.md`, `project_context.md`, `Handoff.md`
 - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (domain + assessment deltas)
+- `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md` — the pipeline vocabulary (stage / outcome / archived), whose closing sections declare what is applied and what is parked
 - The active `EPIC-011` + `TASK-1360..1363` specs (assessment engine + surfaces)
 - `docs/context/` business pack (voice, ICO, agency, HubSpot) when the work touches brand/roles/metrics
 - `docs/operations/EFEONCE_OPERATING_CODE_V1.md` when the work touches culture, onboarding, performance or Efeonce-specific hiring

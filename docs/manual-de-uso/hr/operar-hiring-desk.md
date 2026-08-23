@@ -41,7 +41,7 @@ Esta separación permite que dos candidatos de la misma vacante tengan tokens, t
 1. Abre `Pipeline` y filtra por opening o persona.
 2. Mueve una tarjeta arrastrándola a otra lane, o abre `⋮` y elige la etapa con teclado.
 3. Espera el feedback de guardado. Si aparece rollback, la tarjeta vuelve a la etapa anterior; reintenta cuando el servicio esté disponible.
-4. Para seleccionar, rechazar o dejar en espera, abre la postulación y usa `Decidir`; no uses drag para outcomes terminales.
+4. Para declarar el desenlace, abre la postulación y usa `Decidir`; no uses el arrastre para cerrar. Para **pausar** a alguien, deja su tarjeta en la columna «Decisión»: una pausa no es un cierre y no tiene desenlace.
 
 **Las seis columnas son las seis etapas (TASK-1754).** Desde 2026-08-22 hay una etapa por columna:
 Sourced · Screening · **Evaluación** · Entrevista · Decisión · Cerrado. Antes el dominio tenía trece y
@@ -67,7 +67,7 @@ que reciba la prueba todavía, revisa el modo de la política de la vacante ante
    identidad, usa **Revelar** sólo si tienes `hiring.candidate.reveal_identity`, entrega un motivo y
    necesitas el dato para el proceso: queda auditado. Un estado de error no significa que el candidato
    no tenga documentos; sigue el manual `ver-documentos-de-un-candidato.md`.
-7. En `Decisión`, elige avanzar, rechazar o esperar; completa destino cuando aplique, razón y evidencia. Revisa el diálogo antes de confirmar.
+7. En `Decisión`, elige uno de los seis desenlaces: Selección · Reserva · Sin selección · Descarte · Retiro · Sin respuesta. Si eliges **Sin selección**, el sistema te exige la causa (sin cupo · vacante cerrada · proceso cancelado). Completa destino cuando aplique, razón y evidencia. Revisa el diálogo antes de confirmar.
 8. Si seleccionas (`selected`) con destino `internal_hire`, revisa el bridge de handoff que aparece en la misma pestaña. Cuando el handoff esté pendiente y tengas `hiring.handoff.approve`, usa **Aprobar handoff**; cuando esté aprobado, usa **Abrir Activation Lane** para continuar en `HR → Onboarding & Offboarding → Contrataciones listas`.
 9. Usa `Actividad` e `Historial de decisiones` para verificar la trazabilidad append-only.
 
@@ -86,15 +86,16 @@ Usa este flujo para la vacante real publicada o cualquier opening activo:
    canónico y envía el enlace público al candidato. Verifica en Actividad/correo antes de intervenir;
    el token crudo no es recuperable desde SQL ni logs.
 9. Si el correo no llega, no interpretes `sent` como entrega y no reutilices un token que hayas visto. Revisa
-   estado, reactive log y kill-switch, y sigue `recuperar-acceso-a-test-de-candidato.md`. La acción de recovery
-   aún está pendiente de rollout; el manual separa qué hacer hoy del procedimiento futuro.
+   estado, reactive log y kill-switch, y sigue `recuperar-acceso-a-test-de-candidato.md`. La recuperación gobernada
+   **está en producción desde el 2026-08-19** (comando, permisos y correo al candidato); la pantalla del
+   operador en Application 360 todavía está en staging.
 10. Vuelve a Application 360 para monitorear estado: asignado, enviado, en progreso, submitted,
     expirado o scored. Al completarse un `candidate_test`, People recibe un aviso interno de revisión;
     esto no decide ni cambia la etapa de la postulación.
 
 Si el correo falló o se perdió el enlace, no intentes recuperar ningún token desde SQL ni logs. No reasignes
 ni crees otro assessment. La recuperación gobernada reutiliza la misma instancia y preserva respuestas,
-reloj y estado, pero todavía no está habilitada; antes del rollout, escala el caso según el manual específico.
+reloj y estado, y **está habilitada desde el 2026-08-19**; sigue el manual específico.
 
 ## Operar una evaluación de candidato
 
@@ -169,8 +170,8 @@ Algunas acciones del Desk envían un correo automático al candidato. Conviene s
   «corrija».**
 - **Asignar un test al candidato** → Greenhouse solicita el email con el link para rendirlo. `sent` sólo prueba
   aceptación del despacho; no confirma entrega. No reasignes para reenviar: la recuperación gobernada rota el
-  acceso sobre la misma instancia y está pendiente de rollout.
-- **Decidir `selected` o `rejected`** → el candidato recibe el email de decisión. El correo de rechazo se puede pausar por configuración (`email_type_config`).
+  acceso sobre la misma instancia y **está disponible desde el 2026-08-19**.
+- **Decidir «Selección» o «Descarte»** → el candidato recibe el email de decisión. El de Descarte se puede pausar por configuración (`email_type_config`). **Los otros cuatro desenlaces no mandan nada:** «Sin selección», «Reserva» y «Retiro» están diseñados pero sin plantilla, y «Sin respuesta» no manda por diseño.
 
 Para pausar un tipo de correo, diagnosticar por qué no llegó o revisar el historial de envíos, usa el manual [Operar los emails del ciclo de hiring](operar-emails-ciclo-hiring.md).
 

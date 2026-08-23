@@ -19,14 +19,15 @@ tenga que acordarse de escribirlos:
 | El candidato completa el test | Buzón de People (`people@efeoncepro.com`) | Aviso de que las respuestas están listas, fecha de envío, vacante, postulación y link directo para revisar la evaluación |
 | La postulación avanza a Preselección o Entrevista | El candidato | **Una sola cosa**: si la vacante tiene declarado un test para esa etapa, le llega el correo del test; si no, le llega "Tu postulación avanzó" con el nombre de la etapa |
 | El candidato queda seleccionado | El candidato | Confirmación personalizada de que fue elegido + secuencia carta oferta → aceptación → contrato; no afirma que ya se incorporó |
-| El candidato no queda seleccionado | El candidato | Agradecimiento genuino, decisión clara y puerta abierta a futuras vacantes |
+| El candidato queda **descartado** (desenlace «Descarte») | El candidato | Agradecimiento genuino, decisión clara y puerta abierta a futuras vacantes |
+| El candidato cierra con **Sin selección**, **Reserva** o **Retiro** | Nadie | **Hoy no sale ningún correo.** Están diseñados y sin plantilla; si necesitas avisarle, hazlo por fuera |
 | Se recupera su acceso al test **por correo** | El candidato | Acceso nuevo + aviso de que el enlace anterior dejó de ser válido; si ya había empezado, su plazo original |
 | Se recupera su acceso al test **por enlace temporal** | El candidato | Aviso **sin el enlace**: su acceso anterior murió, el nuevo se le entrega por otra vía, y puede responder ese correo si no le llega |
 
 ## Reglas de comportamiento
 
 - **Sólo etapas pensadas para el candidato notifican.** Los movimientos internos del pipeline
-  (screening, revisión con cliente, decisión pendiente, etc.) NO generan correo y sus nombres
+  (Sourced, Screening, Decisión y Cerrado) NO generan correo y sus nombres
   internos jamás aparecen en un email.
 - **Un avance de etapa produce UNA comunicación: ni cero ni dos.** Quien decide es uno solo.
   Si la vacante declara un test para esa etapa y el test se asigna, la comunicación es el
@@ -46,8 +47,9 @@ tenga que acordarse de escribirlos:
   un avance de etapa; sólo informa que existe evidencia lista para revisión humana.
 - **Sin duplicados.** Si el sistema reintenta procesar el mismo evento, el correo no se envía
   dos veces.
-- **El correo de "no seleccionado" se puede pausar aparte** (kill-switch propio) sin apagar el
-  resto — útil si Talent quiere controlar el momento del envío.
+- **El correo de «Descarte» se puede pausar aparte** (kill-switch propio) sin apagar el resto —
+  útil si Talent quiere controlar el momento del envío. Ojo: es el correo del desenlace **Descarte**,
+  no el de **Sin selección**, que todavía no tiene plantilla.
 - **Los correos al candidato salen a nombre de Efeonce** (la agencia); el aviso interno usa el
   remitente de la plataforma.
 - **Si el candidato responde, su respuesta llega a `people@efeoncepro.com`.** Los ocho tipos

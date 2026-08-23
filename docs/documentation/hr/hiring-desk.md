@@ -65,7 +65,7 @@ code-complete y pendiente de rollout: [Entrega y recuperación de acceso a tests
   **Documentos** dentro del portal; un documento de identidad sí exige el reveal auditado de
   `TASK-1714` (`hiring.candidate.reveal_identity`, motivo y trazabilidad). Un error del reader no
   equivale a “sin documentos”.
-- Los outcomes terminales no se alcanzan arrastrando una tarjeta: selección/rechazo/espera pasan por la decisión estructurada.
+- El desenlace no se alcanza arrastrando una tarjeta: los seis (Selección, Reserva, Sin selección, Descarte, Retiro, Sin respuesta) pasan por la decisión estructurada. «Dejar en espera» **ya no es un desenlace**: una pausa se registra dejando la tarjeta en «Decisión».
 
 ## Acceso
 
@@ -79,7 +79,7 @@ La interfaz diferencia loading, vacío inicial, filtros sin resultados, error re
 
 Cuando una postulación se decide como **seleccionada**, Greenhouse materializa automáticamente (vía el pipeline reactivo) un **handoff**: una ficha auditable que dice "esta persona fue seleccionada para este destino" y espera aprobación humana. Nada se contrata solo: aprobar el handoff no crea colaboradores ni asignaciones — entrega la solicitud al equipo receptor (HRIS para contratación interna, Staff Augmentation para placements). El equipo receptor confirma el cierre con evidencia (referencia del colaborador o placement creado).
 
-- Un rechazo, un respaldo o una espera **nunca** generan handoff.
+- **Sólo «Selección» genera handoff.** Ninguno de los otros cinco desenlaces lo hace, y una pausa tampoco: no es un desenlace.
 - Si la decisión cambia después de aprobar el handoff, este se **bloquea** para revisión humana en lugar de sobrescribirse en silencio.
 - Los destinos que aún no tienen equipo receptor en Greenhouse (contractor, partner, reasignación interna) nacen bloqueados con motivo visible, nunca en silencio.
 - Para contratación interna, el **bridge de activación** (TASK-770) toma el handoff aprobado y crea la ficha de colaborador **sobre la misma persona** (nunca una identidad nueva), en estado "pendiente de intake" — invisible para nómina hasta que HR completa la ficha por Workforce Activation. El cierre siempre exige evidencia (la ficha creada) y los conflictos de identidad quedan bloqueados para revisión humana, nunca se fusionan solos.

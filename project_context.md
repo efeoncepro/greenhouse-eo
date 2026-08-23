@@ -159,7 +159,8 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   `real` porque omitir debe dejar el dato visible y nunca ocultarlo. Una vacante no real no se publica; el gold
   set excluye sintéticos sin flag; retención y compliance son ciegos a la procedencia y la procedencia nunca
   gatea comunicaciones. El primitive canónico es `src/lib/hiring/data-origin/` y ningún reader escribe su propio
-  predicado. Deuda declarada en `TASK-1748`: los readers del Banco de Talento aún no filtran por procedencia.
+  predicado. `TASK-1748` cerró esa deuda **en `develop`** (los readers y la projection del Banco de Talento
+  ya filtran por procedencia); en producción todavía no: `code complete, rollout pendiente`.
 - Hiring/ATS mantiene como caminos canónicos el reader de Application 360 para documentos y el reveal de
   identidad con capability, motivo y auditoría append-only (`TASK-1714`/`TASK-1715`). El evento
   `hiring.assessment.submitted` ya tiene en producción un consumer interno para People, con configuración

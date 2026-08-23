@@ -80,7 +80,7 @@ Detail + invariants: `references/greenhouse-runtime.md`.
 
 ### Cuándo se manda la prueba — `shortlisted`, y no es una decisión de eficiencia
 
-La etapa canónica de disparo del candidate test es **`shortlisted` (Preselección)**. `interview`
+La etapa canónica de disparo del candidate test es **`shortlisted`**, que se lee **«Evaluación» en el desk del operador** y **«Preselección» en el correo al candidato**. Esa divergencia es **deliberada** (decisión del operador 2026-08-22; el propio código la documenta en `hiringDesk.ts`), NO es drift — nunca «corregirla». `interview`
 sigue habilitada, pero elegirla exige justificación deliberada. Dos razones independientes:
 
 1. **La prueba es la evidencia CON la que se arma la entrevista, no un paso posterior.** La ganancia
@@ -95,6 +95,13 @@ sigue habilitada, pero elegirla exige justificación deliberada. Dos razones ind
    invisible en las métricas de scoring porque esas personas nunca llegan a tener una. En
    `shortlisted` la población ya está acotada, el pedido tiene contrapartida para el candidato
    ("avanzaste, esto es lo que sigue") y una caída de completación sí es interpretable.
+
+**Delta 2026-08-22 — la etapa se ENSANCHÓ y eso toca este argumento.** `shortlisted` absorbió `qualified` y
+`client_review` (ADR del vocabulario del pipeline), así que «la población ya está acotada» es hoy menos cierto
+que cuando se escribió: `on_stage_entry` sobre una etapa ancha manda trabajo no pagado a **todo el que pase
+screening**. Revisar el default de la policy es trabajo declarado del ADR y **no** está hecho. Hasta entonces,
+vigilar la completación por cohorte deja de ser recomendación y pasa a ser condición para dejar la
+automatización encendida.
 
 **NUNCA habilitar `screening` como trigger sin resolver antes qué se le comunica al candidato**: no
 es una etapa candidate-facing, así que un assignment bloqueado ahí degrada a **silencio** y rompe el

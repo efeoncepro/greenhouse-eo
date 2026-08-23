@@ -140,7 +140,7 @@ working tree.
 Por lo tanto: **retirar un valor de un `CHECK` rompe producción si el código de `main` todavía lo
 escribe** — la pantalla ofrece la acción y la base la rechaza con `23514`.
 
-**Caso fuente (2026-08-22, `TASK-1765`):** se retiró `on_hold` del `CHECK` de
+**Caso fuente (2026-08-22, `TASK-1765` — [`ISSUE-161`](../issues/resolved/ISSUE-161-hiring-decision-check-contract-before-release.md)):** se retiró `on_hold` del `CHECK` de
 `hiring_application.decision` tras un readback correcto de **0 filas y 0 entradas de historial**.
 Pero `origin/main` seguía ofreciendo el botón «Dejar en espera» (`Application360View.tsx:92`) y
 seguía teniendo `on_hold` en su enum. Cualquier operador que lo pulsara recibía un `23514`.
