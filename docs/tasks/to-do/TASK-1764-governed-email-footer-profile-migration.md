@@ -80,8 +80,11 @@ Reglas obligatorias:
 - Todo tipo nace con política de unsubscribe `forbidden`; sólo una clasificación explícita como suscripción
   opcional o marketing puede cambiarla a `required`.
 - Firma y footer son bloques distintos. Un template no inventa personas, equipos, reply-to ni identidad legal.
-- RRSS nacen deshabilitadas y sólo se permiten en suscripción/marketing; dirección e identidad legal vienen del
+- RRSS nacen deshabilitadas y sólo se permiten en suscripción/marketing; son obligatorias en marketing y consumen
+  YouTube, Instagram, LinkedIn y Threads desde `EFEONCE_SOCIAL_LINKS`. Dirección e identidad legal vienen del
   operating entity y las notas legales son específicas, nunca un disclaimer universal.
+- Todo footer gobernado muestra como mínimo razón social, RUT y casa matriz. Es una decisión institucional
+  conservadora de Efeonce, no una afirmación de que todas las jurisdicciones lo exijan para cada transaccional.
 - El estado inicial de todo tipo es `legacy`; ningún cambio al primitive compartido altera automáticamente los
   correos no promovidos.
 - Ninguna child task migra más de cuatro `EmailType` ni mezcla familias de dominio para “terminar más rápido”.
@@ -310,13 +313,13 @@ migrando otra familia.
 
 ### Risk matrix
 
-| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
-|---|---|---|---|---|
-| Cambio global involuntario | email UI | high | legacy default + child tasks + diff por tipo | snapshots/capturas cambian fuera del footer |
-| Unsubscribe en transaccional | delivery/compliance | medium | policy `forbidden` por default + invariant test | tipo forbidden renderiza unsubscribe |
-| Marketing disfrazado de servicio | content/compliance | medium | no promotional content + revisión legal por jurisdicción | subject/body contiene promoción en perfil transactional |
-| Marca Greenhouse paralela | agency/UI | medium | Efeonce única masterbrand + snapshot assertion | masthead/footer principal dice Greenhouse |
-| Cliente de correo rompe layout | email UI | medium | inline/table-safe + canary real por cohorte | overflow, links ilegibles o imágenes bloqueadas |
+| Riesgo                           | Sistema             | Probabilidad | Mitigation                                               | Signal de alerta                                        |
+| -------------------------------- | ------------------- | ------------ | -------------------------------------------------------- | ------------------------------------------------------- |
+| Cambio global involuntario       | email UI            | high         | legacy default + child tasks + diff por tipo             | snapshots/capturas cambian fuera del footer             |
+| Unsubscribe en transaccional     | delivery/compliance | medium       | policy `forbidden` por default + invariant test          | tipo forbidden renderiza unsubscribe                    |
+| Marketing disfrazado de servicio | content/compliance  | medium       | no promotional content + revisión legal por jurisdicción | subject/body contiene promoción en perfil transactional |
+| Marca Greenhouse paralela        | agency/UI           | medium       | Efeonce única masterbrand + snapshot assertion           | masthead/footer principal dice Greenhouse               |
+| Cliente de correo rompe layout   | email UI            | medium       | inline/table-safe + canary real por cohorte              | overflow, links ilegibles o imágenes bloqueadas         |
 
 ### Feature flags / cutover
 
@@ -325,11 +328,11 @@ asignación explícita. El kill-switch existente puede detener despacho, pero no
 
 ### Rollback plan per slice
 
-| Slice | Rollback | Tiempo | Reversible? |
-|---|---|---|---|
-| Foundation | revert del child commit; output legacy debe ser byte-idéntico | un release | sí |
-| Cohort por tipo | restaurar asignación `legacy` sólo para esos tipos y redeploy del runtime dueño | un release | sí |
-| Retiro legacy | no inicia sin 30/30 tipos aceptados; revert restaura primitive legacy | un release | sí |
+| Slice           | Rollback                                                                        | Tiempo     | Reversible? |
+| --------------- | ------------------------------------------------------------------------------- | ---------- | ----------- |
+| Foundation      | revert del child commit; output legacy debe ser byte-idéntico                   | un release | sí          |
+| Cohort por tipo | restaurar asignación `legacy` sólo para esos tipos y redeploy del runtime dueño | un release | sí          |
+| Retiro legacy   | no inicia sin 30/30 tipos aceptados; revert restaura primitive legacy           | un release | sí          |
 
 ### Production verification sequence
 
@@ -360,9 +363,14 @@ asignación explícita. El kill-switch existente puede detener despacho, pero no
 - [ ] La policy separa `EmailPriority`, propósito, audience, reply, firma y unsubscribe.
 - [ ] La policy incluye `socialLinksPolicy`, `legalIdentityMode` y `legalNoticePolicy` con defaults fail-closed.
 - [ ] `unsubscribe` nace `forbidden` y sólo `optional_subscription|commercial_marketing` permiten `required`.
-- [ ] RRSS nacen `none`, sólo suscripción/marketing permiten `institutional`, y cada link tiene destino oficial,
-      nombre accesible y fallback textual.
-- [ ] Razón social/dirección provienen del operating entity canónico y ningún template las hardcodea.
+- [ ] RRSS nacen `none`; suscripción puede permitir `institutional`, marketing lo exige, y YouTube, Instagram,
+      LinkedIn y Threads resuelven destino oficial desde `EFEONCE_SOCIAL_LINKS`, con nombre accesible y fallback
+      textual.
+- [ ] Razón social, RUT y casa matriz provienen del operating entity canónico; los países vienen del SSOT de marca,
+      se muestran como lista compacta sin el rótulo `Operación en` y ningún template hardcodea esos datos, presenta
+      los países como entidades legales locales ni usa Chile como límite geográfico.
+- [ ] Todos los perfiles gobernados usan `legalIdentityMode='entity'` como mínimo; `full` agrega países y privacidad,
+      pero nunca elimina razón social, RUT o casa matriz.
 - [ ] No existe disclaimer legal universal; security/privacy/regulated se prueban por policy y propósito.
 - [ ] Los 30 `EmailType` están inventariados y asignados a una cohorte, sin promoverlos todavía.
 - [ ] Existe una child task foundation cuyo criterio principal es output byte-idéntico para los 28 templates.
@@ -375,6 +383,9 @@ asignación explícita. El kill-switch existente puede detener despacho, pero no
 - [ ] `UI ready` permanece `no` hasta que las child tasks posean mapping, GVC y decision log propios.
 - [ ] El copy reusable se resuelve desde `src/lib/copy/*`; datos legales usan el SSOT de operating entity.
 - [ ] El footer es completamente estático y el email conserva significado sin imágenes.
+- [ ] Wordmark e íconos sociales usan PNG transparentes reproducibles mediante
+      `scripts/email/generate-footer-assets.mjs`; el HTML del correo no depende de `next/image`, icon fonts, SVG
+      remoto ni filtros CSS.
 - [ ] La umbrella sólo puede cerrar cuando todas las child tasks estén cerradas con rollout honesto o formalmente retiradas.
 
 ## Verification

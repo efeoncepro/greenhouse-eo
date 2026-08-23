@@ -26,13 +26,21 @@ duplicar el componente.
 - Dominant decision: comprender quién envía y por qué llegó el mensaje
 - Density: compacta; máximo tres niveles tipográficos y sin repetir el cuerpo
 - Depth model: fuera de la card principal, sin nueva card ni sombra
-- Typography role: identidad 600, contexto 400, links subrayados
-- Color role: texto muted con contraste; azul sólo para links funcionales
+- Typography role: motivo de recepción 400, links funcionales 600 y subrayados, razón social/RUT 600, metadata
+  legal 400; máximo tres niveles y sin reducir el tamaño de la metadata por debajo de `caption`
+- Color role: `secondary` para el motivo y la ayuda, `primaryHover` para links funcionales de 13 px y `muted` para
+  identidad legal, países, dirección, avisos y referencias. `primary` no se usa como tinta pequeña porque queda en
+  4.17:1 sobre `background`; `primaryHover` llega a 6.10:1 y `muted` conserva 4.51:1
 - Signature details: Efeonce siempre visible; Greenhouse sólo como descriptor de plataforma
-- Optional institutional layer: RRSS sólo en suscripción/marketing, monocromáticas, pequeñas y debajo de controles;
-  nunca compiten con el CTA del mensaje
-- Legal layer: razón social/dirección/nota específica en el último nivel de jerarquía, con wrap legible y datos del
-  operating entity
+- Email-safe assets: wordmark gris y cuatro isotipos sólidos de bordes redondeados desde Font Awesome Brands —
+  `square-youtube`, `square-instagram`, `linkedin` y `square-threads`—, rasterizados como PNG transparentes con
+  `EMAIL_COLORS.muted`; sin contenedor visible añadido, dibujos manuales, icon fonts, SVG remoto ni filtros CSS
+- Institutional layer: RRSS opcionales en suscripción y obligatorias en marketing; YouTube, Instagram, LinkedIn y
+  Threads se muestran como isotipos sólidos y redondeados con nombre accesible, debajo de controles y sin competir con
+  el CTA del mensaje
+- Legal layer: razón social + RUT + casa matriz en todos los perfiles; países como lista compacta separada por `·`
+  sólo en `full`, en el último nivel de jerarquía, con wrap legible, sin el rótulo `Operación en` y sin presentar
+  Chile como límite geográfico
 
 ## Desktop target
 
@@ -46,13 +54,13 @@ legal comprimida lateralmente.
 
 ## Token mapping
 
-| Cue | Canonical token / primitive / recipe | Deviation |
-|---|---|---|
-| Fondo exterior | `EMAIL_COLORS.background` | ninguna |
-| Identidad/footer | `EMAIL_COLORS.muted` + `EMAIL_FONTS.body` | ninguna |
-| Links funcionales | `EMAIL_COLORS.primary` con underline | ninguna |
-| Separación | `EMAIL_COLORS.border` | ninguna |
-| Marca | wordmark Efeonce desde SSOT existente | Greenhouse no es variante de marca |
+| Cue               | Canonical token / primitive / recipe      | Deviation                          |
+| ----------------- | ----------------------------------------- | ---------------------------------- |
+| Fondo exterior    | `EMAIL_COLORS.background`                 | ninguna                            |
+| Identidad/footer  | `EMAIL_COLORS.muted` + `EMAIL_FONTS.body` | ninguna                            |
+| Links funcionales | `EMAIL_COLORS.primaryHover` con underline | contraste AA a 13 px              |
+| Separación        | `EMAIL_COLORS.border`                     | ninguna                            |
+| Marca             | wordmark Efeonce desde SSOT existente     | Greenhouse no es variante de marca |
 
 ## Anti-patterns
 

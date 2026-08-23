@@ -6,7 +6,7 @@
 - **Scope:** `src/emails/**`, `src/lib/email/**`, `src/lib/copy/**`, sender/presentation metadata y previews
 - **Reversibility:** two-way-but-slow
 - **Confidence:** high en marca y separación semántica; medium en clasificación final de cada tipo
-- **Validated as of:** 2026-08-22
+- **Validated as of:** 2026-08-23
 - **Implementation umbrella:** `TASK-1764`
 - **Program epic:** `EPIC-042`
 
@@ -76,21 +76,40 @@ Fuentes regulatorias usadas para la dirección —orientación, no asesoría leg
   https://ico.org.uk/for-organisations/direct-marketing-and-privacy-and-electronic-communications/guidance-on-direct-marketing-using-electronic-mail/key-concepts-for-direct-marketing-using-electronic-mail/
 - Chile, Ley 19.496 artículo 28 B: la vía de suspensión se exige a comunicaciones promocionales o publicitarias:
   https://www.bcn.cl/leychile/navegar?idNorma=61438&idParte=8542485
+- México, Ley Federal de Protección al Consumidor artículo 17: la publicidad debe identificar al proveedor y
+  entregar datos de contacto; no convierte esa regla publicitaria en una obligación universal para mensajes
+  transaccionales:
+  https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPC.pdf
+- Colombia, Ley 1480 de 2011 artículo 50: el proveedor de comercio electrónico debe mantener accesibles su razón
+  social, NIT, dirección y contacto; la norma no ordena repetirlos dentro de cada correo transaccional:
+  https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=44306
+- Perú, Ley 28493 y su reglamento: gobiernan correo electrónico comercial no solicitado, no todo mensaje
+  operacional o de relación:
+  https://www.leyes.congreso.gob.pe/DetLeyNume_1p.aspx?xNorma=6&xNumero=28493&xTipoNorma=0
 
-La activación de marketing internacional requiere validación con abogado habilitado en cada jurisdicción.
+No existe, en estas fuentes, una regla única que obligue a incluir razón social, identificador tributario y domicilio
+en cada correo transaccional. Efeonce adopta esos tres datos en todos los footers gobernados como estándar
+institucional conservador; no se documenta como cumplimiento legal universal. La activación de marketing
+internacional requiere validación con abogado habilitado en cada jurisdicción.
 
 ### 5. RRSS, dirección e información legal son bloques gobernados
 
-- `socialLinksPolicy` nace `none`. Sólo `optional_subscription|commercial_marketing` pueden declarar
-  `institutional`; access/security, transactional, Hiring, regulated e internal operational las prohíben.
-- RRSS usan cuentas oficiales y activas desde un SSOT; los íconos son secundarios, monocromáticos, con nombre
-  accesible y fallback textual. No se agregan parámetros de tracking por inferencia.
-- `legalIdentityMode='compact'` muestra Efeonce; `entity` agrega razón social y país; `full` agrega dirección postal
-  válida y privacidad. Los datos provienen del operating entity canónico, nunca de literales JSX.
+- `socialLinksPolicy` nace `none`. `optional_subscription` puede declarar `institutional` y
+  `commercial_marketing` debe declararlo; access/security, transactional, Hiring, regulated e internal operational
+  las prohíben.
+- RRSS usan las cuatro cuentas oficiales desde `EFEONCE_SOCIAL_LINKS` —YouTube, Instagram, LinkedIn y Threads—. Los
+  íconos son secundarios, monocromáticos, con nombre accesible y fallback textual. No se agregan parámetros de
+  tracking por inferencia.
+- `legalIdentityMode='compact'` muestra Efeonce; `entity` agrega razón social, identificador tributario y casa
+  matriz; `full` agrega una lista compacta de países y privacidad. La lista se presenta como
+  `Chile · Estados Unidos · Colombia · México · Perú`, sin el rótulo `Operación en`; declara presencia de marca,
+  no entidades legales locales. La dirección de casa matriz no limita el alcance geográfico de Efeonce. Los datos
+  provienen del operating entity y el SSOT de marca, nunca de literales JSX.
 - `legalNoticePolicy` activa sólo notas específicas de seguridad, privacidad o dominio regulado. Se prohíbe un
   párrafo universal de confidencialidad que no corresponda al propósito real.
-- Marketing y suscripción adoptan `full` como baseline conservador del producto; transaccionales no heredan
-  dirección postal ni RRSS por esa decisión. Cada jurisdicción sigue requiriendo validación profesional.
+- Todo perfil gobernado adopta `entity` como mínimo institucional, incluidos transaccionales, seguridad e internos.
+  Marketing y suscripción adoptan `full`; sólo ellos pueden incorporar RRSS y controles de baja. Cada jurisdicción
+  sigue requiriendo validación profesional.
 
 ### 6. Migración incremental, legacy por defecto
 
@@ -105,15 +124,15 @@ La activación de marketing internacional requiere validación con abogado habil
 
 ## Perfiles base
 
-| Purpose | Unsubscribe | RRSS | Identidad legal | Nota |
-|---|---|---|---|---|
-| `access_security` | forbidden | none | compact | security cuando corresponda |
-| `transactional_service` | forbidden | none | compact | none o privacy por dominio |
-| `relationship_transactional` | forbidden | none | compact/entity | none o privacy por dominio |
-| `regulated_transactional` | forbidden | none | entity/full | regulated |
-| `internal_operational` | forbidden | none | compact | none |
-| `optional_subscription` | required | institutional opcional | full | privacy |
-| `commercial_marketing` | required | institutional opcional | full | privacy |
+| Purpose                      | Unsubscribe | RRSS                      | Identidad legal | Nota                        |
+| ---------------------------- | ----------- | ------------------------- | --------------- | --------------------------- |
+| `access_security`            | forbidden   | none                      | entity          | security cuando corresponda |
+| `transactional_service`      | forbidden   | none                      | entity          | none o privacy por dominio  |
+| `relationship_transactional` | forbidden   | none                      | entity          | none o privacy por dominio  |
+| `regulated_transactional`    | forbidden   | none                      | entity          | regulated                   |
+| `internal_operational`       | forbidden   | none                      | entity          | none                        |
+| `optional_subscription`      | required    | institutional opcional    | full            | privacy                     |
+| `commercial_marketing`       | required    | institutional obligatorio | full            | privacy                     |
 
 ## Alternatives Considered
 

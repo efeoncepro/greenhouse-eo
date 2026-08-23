@@ -33,11 +33,27 @@ export const EFEONCE_URL_HTTPS = 'https://efeoncepro.com'
  */
 export const EFEONCE_BRAND_NAME = 'Efeonce'
 
+/** Official institutional social profiles. Email and public surfaces consume this SSOT; never duplicate URLs. */
+export const EFEONCE_SOCIAL_LINKS = [
+  { channel: 'youtube', label: 'YouTube', url: 'https://www.youtube.com/@efeoncepro' },
+  { channel: 'instagram', label: 'Instagram', url: 'https://instagram.com/efeoncepro' },
+  { channel: 'linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com/company/efeoncecl' },
+  { channel: 'threads', label: 'Threads', url: 'https://threads.com/efeoncepro' }
+] as const
+
+export type EfeonceSocialChannel = (typeof EFEONCE_SOCIAL_LINKS)[number]['channel']
+
 /** Canonical fallback legal entity (V1 single operating entity). Prefer getOperatingEntityIdentity() at runtime. */
 export const EFEONCE_LEGAL_NAME_FALLBACK = 'Efeonce Group SpA'
 
+/** Canonical fallback Chilean tax identifier. Prefer operatingEntity.taxId at runtime. */
+export const EFEONCE_TAX_ID_FALLBACK = '77.357.182-1'
+
 /** Canonical fallback legal address. Prefer operatingEntity.legalAddress at runtime. */
 export const EFEONCE_LEGAL_ADDRESS_FALLBACK = 'Dr. Manuel Barros Borgoño 71 Of 1105, Providencia, RM — Chile'
+
+/** Current operating footprint for institutional presentation; this does not imply a local legal entity per market. */
+export const EFEONCE_OPERATING_MARKETS = ['Chile', 'Estados Unidos', 'Colombia', 'México', 'Perú'] as const
 
 /**
  * Efeonce slogan — "Empower your Growth".
