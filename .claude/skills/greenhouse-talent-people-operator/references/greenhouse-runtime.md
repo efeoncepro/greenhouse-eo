@@ -4,13 +4,46 @@ Load whenever the work happens _inside_ the Greenhouse repo (not pure advisory).
 
 ## The Hiring / ATS domain (canonical)
 
+## Pipeline vocabulary — code paths (TASK-1754 stage axis + TASK-1765 outcome axis)
+
+- `src/types/hiring.ts` holds **five** lists, and confusing them is the bug:
+  `HIRING_APPLICATION_STAGES` (**6** since TASK-1754 Slice F: `sourced`, `screening`, `shortlisted`,
+  `interview`, `decision_pending`, `closed` — it is **no longer the mirror of the DB `CHECK`**, which stays
+  wide on purpose until the contract), `HIRING_PIPELINE_STAGES` (**5** — the subset a stage change may write;
+  **allowlist, not denylist**; `closed` is outside it because closing is deciding),
+  `TERMINAL_APPLICATION_STAGES` (**fuente única** for "this journey ended", today `{'closed'}`; it replaced
+  three verbatim copies in `assessment/instances.ts`, `assessment/public-session/store.ts` and
+  `assessment/access-recovery/vocabulary.ts` — **never declare a local copy again**), `HIRING_DECISIONS` (6)
+  and `HIRING_DECISION_CAUSES` (3).
+- Two retirements, two different reasons — never conflate them: `qualified` and `client_review` were
+  **absorbed** into `shortlisted` (Slice B, in production); `selected`, `backup`, `rejected`, `withdrawn` and
+  `handoff_ready` were **outcome mirrors**, replaced by the `decision` axis of TASK-1765.
+- `src/lib/hiring/decide.ts` — `DECISION_STAGE` maps all six outcomes to `closed`; the command persists
+  outcome **and** cause in one `UPDATE`, in the history and in `sameReplayPayload` (a different cause ⇒ 409).
+- `src/lib/hiring/store.ts` — the stage change cannot close, **by type**. The old four-literal denylist is
+  gone; `closed` and `handoff_ready` used to slip through it.
+- `src/lib/hiring/notifications/send.ts` — `DECISION_EMAIL_TYPE` is an explicit map with a declared no-op.
+- Signal `hiring.application.closed_without_outcome`
+  (`src/lib/reliability/queries/hiring-application-outcome-signals.ts`) exists **before** the `CHECK`, to
+  measure the drift the `CHECK` will later make impossible.
+- **Parked, NOT applied**: `docs/tasks/pending-migrations/` holds the outcome-enum contract (drops `on_hold`),
+  the `closed ⟺ outcome` invariant and the synthetic-archive backfill. Precondition for all of them: the
+  release that removes the writer from `origin/main`. Reachability comes from the **deployed surface
+  contract**, never from "zero rows" — there is ONE Cloud SQL instance shared by dev, staging and production,
+  and applying a contract early broke «Dejar en espera» in production on 2026-08-22 (`ISSUE-161`).
+- **Verify the predicate, never the `grep -c`.** Counting a literal proves nothing about who writes it: a hit
+  on `stage = $n` in `store.ts` turned out to be a **list filter**, and a hit on `on_hold` in
+  `src/types/hiring.ts` was a **comment explaining its absence**. And `TALENT_DEMAND_STATUSES` carries its own
+  `'qualified'` — talent **demand**, a different domain; leave it alone when cleaning application stages.
+
+
 - Architecture: `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (+ its 2026-07-08 assessment delta).
 - Program: `EPIC-011` (`docs/epics/to-do/EPIC-011-hiring-ats-end-to-end-program.md`).
 - Schema `greenhouse_hiring` (TASK-353, ✓ complete): 4 person-first aggregates —
   - `talent_demand` — the root (stakeholder internal/client × engagement on_demand/on_going × fulfillment_mode). **Workforce planning produces this** (see `workforce-planning.md`).
   - `hiring_opening` — derived from demand; internal truth vs **public allowlist payload** (`buildPublicOpeningPayload` — never leak internal fields).
   - `candidate_facet` — the recruiting facet on a **Person** (`greenhouse_core.identity_profiles`), UNIQUE per person. **No parallel `candidate` identity.**
-  - `hiring_application` — the pipeline unit; carries decision + handoff snapshots; `score`/`match_score`/`explainability_json` (the assessment rollup target).
+  - `hiring_application` — the pipeline unit; carries `stage` (where the person is), `decision` + `decision_cause` (how it ended) and `archived_at` (whether it is displayed) as **three orthogonal axes**, plus handoff snapshots; `score`/`match_score`/`explainability_json` (the assessment rollup target).
   - `hiring_handoff` (TASK-356, ✓ complete) — the explicit boundary object decision→downstream. UNIQUE per application, anchored to `decision_id` (supersede), state-machine `pending→approved→[in_setup]→completed` + `blocked`/`cancelled`, append-only `hiring_handoff_audit`.
 - Store: `src/lib/hiring/**` (SQL-crudo + `HiringValidationError` + transactional outbox). API: `/api/hiring/**` (dual-gate: internal tenant + `can()`).
 - Capabilities: `hiring.{demand,opening,application}.*` (granted to internal roles only — NUNCA `client_*`).
@@ -99,7 +132,7 @@ Docs: `docs/documentation/hr/entrega-y-recuperacion-de-acceso-a-tests.md` and
 
 ## The handoff (decision → downstream runtime, TASK-356 ✓ complete)
 
-- **Trigger**: `hiring.application.decided` with `decision='selected'` materializes a `HiringHandoff` via the reactive consumer `hiring_handoff_materialize` (domain `people`, runs in ops-worker; **no flag** — a no-op would be terminal in `outbox_reactive_log`). Rejections/backups/holds NEVER create a handoff; a re-decision that revokes a selection cancels a pending handoff or blocks an approved one (`decision_revoked`).
+- **Trigger**: `hiring.application.decided` with `decision='selected'` materializes a `HiringHandoff` via the reactive consumer `hiring_handoff_materialize` (domain `people`, runs in ops-worker; **no flag** — a no-op would be terminal in `outbox_reactive_log`). **The other FIVE outcomes never create a handoff** (`backup_selected`, `not_selected`, `rejected`, `withdrawn`, `unresponsive`) — `on_hold` is no longer among them: it stopped being an outcome in the 2026-08-22 ADR and is now recorded as the stage `decision_pending`. a re-decision that revokes a selection cancels a pending handoff or blocks an approved one (`decision_revoked`).
 - **Supersede**: a new `selected` decision updates a `pending` handoff (audited `decision_superseded`); on an `approved|in_setup|completed` handoff it BLOCKS (`decision_superseded_after_approval`) — never silent overwrite. Blocked-post-approval is sticky: a human resolves via cancel.
 - **Supported destinations V1**: `internal_hire` (→ HRIS queue, TASK-770) + `staff_augmentation` (owner calls `createStaffAugPlacement` explicitly). `contractor`/`partner`/`internal_reassignment` are born `blocked:destination_not_supported`.
 - **Command**: `transitionHiringHandoff` / `POST /api/hiring/handoffs/[id]/(approve|setup|complete|cancel)` — capability `hiring.handoff.approve` (governance tier, same as decide). `complete` REQUIRES `downstreamRef` (evidence: member/placement id) — never by inference.

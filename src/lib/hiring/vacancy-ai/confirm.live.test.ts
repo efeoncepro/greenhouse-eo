@@ -46,14 +46,15 @@ describe.skipIf(!hasPgConfig)('vacancy AI propose→confirm — live PG (TASK-13
         demandOrigin: 'manual_internal',
         requestedRole: `SEO Specialist ${marker}`,
         requestedSkills: ['SEO técnico', 'GA4'],
-      },
+              dataOrigin: 'smoke_test', // TASK-1739 — fixture
+},
       actor,
     )
 
     demandId = demand.demandId
 
     const opening = await createHiringOpening(
-      { demandId: demand.demandId, internalTitle: `SEO Specialist ${marker}`, budgetBand: 'SECRET_BUDGET_BAND' },
+      { demandId: demand.demandId, internalTitle: `SEO Specialist ${marker}`, budgetBand: 'SECRET_BUDGET_BAND' , dataOrigin: 'smoke_test'},
       actor,
     )
 

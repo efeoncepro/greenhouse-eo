@@ -592,6 +592,9 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     // TASK-1765 — 1 señal `data_quality` del invariante de cierre `stage='closed'` ⟺ desenlace
     // (queries/hiring-application-outcome-signals.ts). Nace ANTES que el CHECK de base para medir
     // el drift que ese CHECK va a impedir; después queda como red ante una vía de escritura nueva.
+    // TASK-1772 — divergencia del predicado de «proceso activo»: los tres ejes (etapa, desenlace,
+    // archivado) contra el predicado por etapa que usaban los ocho callsites
+    // (queries/hiring-active-process-drift.ts). Steady 0.
     expectedSignalKinds: ['lag', 'data_quality', 'incident', 'dead_letter', 'drift'],
     incidentDomainTag: 'hiring'
   },

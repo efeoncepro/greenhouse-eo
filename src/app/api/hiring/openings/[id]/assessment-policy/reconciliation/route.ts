@@ -7,6 +7,7 @@ import {
   resolveActivePolicyForOpening,
   resolveApplicationsAwaitingAssignment,
   resolveApplicationsMissedTriggerAwaitingHuman,
+  resolveEvaluatedAssignmentDeadEndsForPolicy,
 } from '@/lib/hiring/assessment/assignment-policy'
 import { requireInternalTenantContext } from '@/lib/tenant/authorization'
 
@@ -21,6 +22,13 @@ import { requireInternalTenantContext } from '@/lib/tenant/authorization'
  * - `missedTriggerAwaitingHuman`: postulaciones que cruzaron la etapa trigger y YA avanzaron.
  *   La reconciliación automática no las toca a propósito — su etapa vigente ya no es la del
  *   trigger — así que la decisión es de una persona.
+ * - `deadEnds` (TASK-1771): filas VIGENTES del ledger con resultado recuperable y origen no
+ *   manual, que ocupan la clave de idempotencia de esta policy sin haber asignado nada. Las otras
+ *   dos colas no pueden mostrarlas —`awaitingAssignment` las excluye justamente porque la fila
+ *   existe— así que hasta ahora una clave quemada no aparecía en ninguna superficie. Cada fila
+ *   viaja con su evaluación DRY-RUN: si la causa registrada seguiría bloqueando hoy o no. Es una
+ *   foto: el command del supersede vuelve a evaluar bajo el lock antes de escribir, porque
+ *   `volume_cap` se auto-cura con una ventana móvil.
  *
  * Este endpoint sólo LEE. La recuperación se ejecuta por el camino gobernado de siempre:
  * propose → confirm sobre la postulación. No hay "reintentar todo".
@@ -50,18 +58,29 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         policy: null,
         awaitingAssignment: [],
         missedTriggerAwaitingHuman: [],
+        deadEnds: {
+          deadEnds: [],
+          totalMatching: 0,
+          truncated: false,
+          excludedSynthetic: 0,
+          recoverable: 0,
+          honest: 0,
+          capReached: 0,
+        },
       })
     }
 
-    const [awaitingAssignment, missedTriggerAwaitingHuman] = await Promise.all([
+    const [awaitingAssignment, missedTriggerAwaitingHuman, deadEnds] = await Promise.all([
       resolveApplicationsAwaitingAssignment(policy.policyId),
       resolveApplicationsMissedTriggerAwaitingHuman(policy.policyId),
+      resolveEvaluatedAssignmentDeadEndsForPolicy(policy.policyId),
     ])
 
     return NextResponse.json({
       policy: { policyId: policy.policyId, policyVersion: policy.policyVersion, state: policy.state, mode: policy.mode, triggerStage: policy.triggerStage },
       awaitingAssignment,
       missedTriggerAwaitingHuman,
+      deadEnds,
     })
   } catch (error) {
     return toHiringErrorResponse(error, 'assessment_policy_reconciliation')

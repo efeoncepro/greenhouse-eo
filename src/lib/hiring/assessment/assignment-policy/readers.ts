@@ -6,7 +6,9 @@ import type { PoolClient } from 'pg'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import type { OpeningAssessmentPolicy, OpeningAssessmentTriggerStage } from '@/types/hiring-assessment-policy'
+import type { HiringApplicationStage } from '@/types/hiring'
 
+import { activeProcessPredicate } from '../../active-process'
 import { PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL } from '../public-taking'
 import { findActivePolicyForOpening, getPolicyById } from './store'
 
@@ -134,9 +136,22 @@ export interface ApplicationAwaitingAssignment {
  * `stale: stage_changed`. Ese caso NO se recupera solo; es
  * `resolveApplicationsMissedTriggerAwaitingHuman` + decisión humana.
  *
+ * **Delta TASK-1772 — la condición de «sigue en proceso» son DOS columnas, no una.** Este reader
+ * preguntaba sólo `decision IS NULL`, así que una postulación ARCHIVADA —retirada de la vista a
+ * propósito, sin declarar desenlace— seguía calificando para recibir una prueba. Es la novena
+ * ocurrencia del mismo defecto y la causa de `ISSUE-162`. Hoy consume `activeProcessPredicate`.
+ *
+ * ⚠️ **La PROCEDENCIA no entra acá, y es deliberado.** «¿sigue en proceso?» y «¿es dato real?» son
+ * preguntas ortogonales que comparten una mitad (`archived_at`); fundirlas produciría un predicado
+ * que responde las dos a medias. Y hay evidencia concreta: el carril vivo de `TASK-1771`
+ * (`dead-end-supersede.live.test.ts`) ejercita este reader con `dataOrigin: 'smoke_test'` NO
+ * archivado y asserta que lo devuelve. Filtrar procedencia acá rompería la única prueba que
+ * demuestra que liberar una clave la devuelve de verdad a la cola. Donde la procedencia SÍ importa
+ * —la cola de callejones— se compone aparte y su exclusión se reporta (`dead-ends.ts`).
+ *
  * Deriva TODO del estado vigente en PostgreSQL:
  * - la etapa actual de la postulación es la `trigger_stage` de la policy (nunca `payload.stage`);
- * - la postulación no tiene decisión formal (`decision IS NULL`);
+ * - la postulación sigue en proceso activo (`decision IS NULL AND archived_at IS NULL`);
  * - no existe una instancia de esa plantilla en un estado que ya cuenta como asignada
  *   (`assigned|sent|in_progress|submitted|scored`);
  * - no hay una fila VIGENTE del ledger para (application, policy, versión, etapa) — un
@@ -158,7 +173,7 @@ export const resolveApplicationsAwaitingAssignment = async (
      FROM greenhouse_hiring.hiring_application app
      WHERE app.opening_id = $1
        AND app.stage = $2
-       AND app.decision IS NULL
+       AND ${activeProcessPredicate('app')}
        AND NOT EXISTS (
          SELECT 1 FROM greenhouse_hiring.hiring_assessment a
          WHERE a.application_id = app.application_id
@@ -207,9 +222,16 @@ export const resolveApplicationsAwaitingAssignment = async (
 //
 // Los espejos terminales sí se conservan mientras `TASK-1754` no los retire del enum de etapas:
 // siguen existiendo en filas históricas, y ésas sí pueden tener `decision IS NULL`.
-const STAGES_DOWNSTREAM_OF_TRIGGER: Record<OpeningAssessmentTriggerStage, readonly string[]> = {
-  shortlisted: ['client_review', 'interview', 'decision_pending', 'selected', 'backup', 'handoff_ready'],
-  interview: ['decision_pending', 'selected', 'backup', 'handoff_ready'],
+//
+// TASK-1754 Slice F — reescrito, no podado. `client_review` figuraba como aguas ABAJO de
+// `shortlisted`, y el colapso la absorbió DENTRO de `shortlisted`: dejarla habría contado como
+// «avanzó más allá del gatillo» a quien sigue exactamente en la etapa del gatillo, mandando a la
+// cola humana postulaciones que la reconciliación automática sí puede recuperar. Los espejos
+// terminales (`selected`, `backup`, `handoff_ready`) salen porque el contract del enum los volvió
+// irrepresentables: una fila no puede estar ahí ni histórica ni nuevamente.
+const STAGES_DOWNSTREAM_OF_TRIGGER: Record<OpeningAssessmentTriggerStage, readonly HiringApplicationStage[]> = {
+  shortlisted: ['interview', 'decision_pending'],
+  interview: ['decision_pending'],
 }
 
 export interface ApplicationMissedTrigger extends ApplicationAwaitingAssignment {
@@ -253,7 +275,7 @@ export const resolveApplicationsMissedTriggerAwaitingHuman = async (
      FROM greenhouse_hiring.hiring_application app
      WHERE app.opening_id = $1
        AND app.stage = ANY($2::text[])
-       AND app.decision IS NULL
+       AND ${activeProcessPredicate('app')}
        AND NOT EXISTS (
          SELECT 1 FROM greenhouse_hiring.hiring_assessment a
          WHERE a.application_id = app.application_id

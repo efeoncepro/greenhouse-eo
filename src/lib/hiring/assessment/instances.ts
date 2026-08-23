@@ -7,6 +7,7 @@ import type { PoolClient } from 'pg'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { TERMINAL_APPLICATION_STAGES } from '@/types/hiring'
 import {
   ASSESSMENT_METHODS,
   HUMAN_RATED_QUESTION_TYPES,
@@ -187,7 +188,6 @@ return rows.map(normalizeAssessment)
 
 /** Vigencia del link tokenizado del candidato (TASK-1383; 1363 comunica la fecha). */
 const TOKEN_TTL_DAYS = 14
-const TERMINAL_APPLICATION_STAGES = new Set(['selected', 'rejected', 'withdrawn', 'handoff_ready', 'closed'])
 
 /** Resolución autoritativa bajo lock. Antes de iniciar manda el TTL; ya iniciada manda closeDeadline. */
 export const resolveAssessmentByTokenWithClient = async (

@@ -914,7 +914,7 @@ Los invariantes operativos de signature platform (provider-neutral + ZapSign), s
 - **Framework**: `node-pg-migrate` — SQL-first, versionado en `migrations/`
 - **Comandos**: `pnpm migrate:create <nombre>`, `pnpm migrate:up`, `pnpm migrate:down`, `pnpm migrate:status`
 - **Flujo obligatorio**: `migrate:create` → editar SQL → `migrate:up` (auto-regenera tipos) → commit todo junto
-- **Regla**: migración ANTES del deploy, siempre. Columnas nullable primero, constraints después.
+- **Regla**: **expand** ANTES del deploy (columnas nullable primero, constraints después); **contract** —retirar un valor de un `CHECK`/enum— **DESPUÉS del release**: hay UNA instancia Cloud SQL dev/staging/prod y «0 filas» ≠ nadie lo escribe (ISSUE-161). La que hoy no se aplica va a `docs/tasks/pending-migrations/`, NUNCA a `migrations/`.
 - **Timestamps**: SIEMPRE usar `pnpm migrate:create` para generar archivos. NUNCA renombrar timestamps manualmente ni crear archivos a mano — `node-pg-migrate` rechaza migraciones con timestamp anterior a la última aplicada.
 - **Spec completa**: `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
 
@@ -1074,7 +1074,7 @@ DROP TABLE IF EXISTS schema.table;
 - **SIEMPRE** que migrations creen tablas críticas para runtime, escribir bloque DO de verificación post-DDL en la misma migration. Pattern fuente: `migrations/20260508104217939_task-611-capabilities-registry.sql` y `migrations/20260507183122498_task-810-engagement-anti-zombie-trigger.sql`.
 - Si la down migration es destructiva, separar con marker `-- Down Migration` exacto. Sin él, el rollback no opera. Y sus statements son SOLO DROP / undo, NUNCA CREATE.
 
-**Defense in depth (CI gate, en construcción — Fase 2 de ISSUE-068)**: `scripts/ci/migration-marker-gate.mjs` detectará automáticamente migrations con sección Up vacía + sección Down con DDL keywords. Modo blocking en PRs. Hasta que aplique, la regla anterior es enforcement humano + code review.
+**Defense in depth (CI gate activo)**: `pnpm migration-marker-gate` corre blocking en `ci.yml` + self-tests del parser.
 
 ### SQL embebido — type alignment + live testing (ISSUE-071, 2026-05-08)
 

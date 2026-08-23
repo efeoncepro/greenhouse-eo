@@ -16,7 +16,12 @@ export const metadata: Metadata = { title: 'Pipeline | Hiring Desk | Greenhouse'
 export const dynamic = 'force-dynamic'
 
 interface Props {
-  searchParams?: Promise<{ openingId?: string; captureFailure?: string; captureApplication?: string }>
+  searchParams?: Promise<{
+    openingId?: string
+    focusApplication?: string
+    captureFailure?: string
+    captureApplication?: string
+  }>
 }
 
 export default async function HiringPipelinePage({ searchParams }: Props) {
@@ -48,6 +53,7 @@ export default async function HiringPipelinePage({ searchParams }: Props) {
       copy={getMicrocopy(normalizeLocale(locale) ?? undefined).hiringDesk}
       initialSnapshot={snapshot}
       initialOpeningId={resolved?.openingId}
+      initialFocusApplicationId={resolved?.focusApplication}
       simulateStageFailure={process.env.NODE_ENV !== 'production' && resolved?.captureFailure === 'stage'}
     />
   )

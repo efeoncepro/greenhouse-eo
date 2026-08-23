@@ -109,16 +109,9 @@ export type CandidateFacetStatus = (typeof CANDIDATE_FACET_STATUSES)[number]
 export const HIRING_APPLICATION_STAGES = [
   'sourced',
   'screening',
-  'qualified',
   'shortlisted',
-  'client_review',
   'interview',
   'decision_pending',
-  'selected',
-  'backup',
-  'rejected',
-  'withdrawn',
-  'handoff_ready',
   'closed'
 ] as const
 export type HiringApplicationStage = (typeof HIRING_APPLICATION_STAGES)[number]
@@ -160,6 +153,23 @@ export const HIRING_PIPELINE_STAGES = [
   'decision_pending'
 ] as const
 export type HiringPipelineStage = (typeof HIRING_PIPELINE_STAGES)[number]
+
+/**
+ * TASK-1754 Slice F — las etapas que significan «este recorrido terminó». FUENTE ÚNICA.
+ *
+ * Existían tres copias verbatim del mismo `Set` —en `assessment/instances.ts`,
+ * `assessment/public-session/store.ts` y `assessment/access-recovery/vocabulary.ts`— cada una con
+ * cinco literales, cuatro de los cuales el contract del enum acaba de volver irrepresentables.
+ * Tres copias sin fuente compartida son tres oportunidades de que la próxima corrección alcance a
+ * dos.
+ *
+ * Con el colapso queda UNA etapa terminal, y el `CHECK` del invariante de `TASK-1765`
+ * (`(stage='closed') = (decision IS NOT NULL)`) la ata al eje de desenlace. Los tres guards que la
+ * consumen ya comprueban `decision` por separado, así que hoy este conjunto es redundante con esa
+ * comprobación — **y se conserva a propósito**: es la guarda que sigue siendo correcta si algún día
+ * el invariante se relaja, y leerla es más barato que re-derivar la equivalencia en cada callsite.
+ */
+export const TERMINAL_APPLICATION_STAGES: ReadonlySet<string> = new Set<HiringApplicationStage>(['closed'])
 
 /**
  * TASK-1765 — el eje de DESENLACE: cómo terminó el recorrido de una persona.
@@ -343,6 +353,12 @@ export interface HiringApplication {
   decision: HiringDecision | null
   /** TASK-1765 — causa del desenlace; no-null sólo con `decision === 'not_selected'`. */
   decisionCause: HiringDecisionCause | null
+  /**
+   * TASK-1772 — TERCER eje: `if el registro se muestra`. ORTOGONAL a `decision`: archivar NUNCA
+   * declara desenlace (ADR §12). Para preguntar «¿sigue en proceso?» usar `isActiveProcess`
+   * (`@/lib/hiring/active-process`), jamás esta columna ni `stage` por separado.
+   */
+  archivedAt: string | null
   decisionAt: string | null
   decisionBy: string | null
   selectedDestination: HiringFulfillmentMode | null

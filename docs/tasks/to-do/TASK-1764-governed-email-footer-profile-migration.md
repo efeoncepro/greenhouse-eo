@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-042`
-- Status real: `Diseno`
+- Status real: `Diseño aprobado; foundation pendiente`
 - Rank: `TBD`
 - Domain: `delivery|ui|content|agency`
 - Blocked by: `none`
@@ -72,6 +72,10 @@ Revisar y respetar:
 - `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`
 - `docs/context/05_voz-tono-estilo.md`
 - `docs/context/09_marca-agencia.md`
+- `src/views/greenhouse/admin/email-footer-profiles/mockup/EmailFooterProfilesMockupView.tsx`
+- `src/views/greenhouse/admin/email-footer-profiles/mockup/data.ts`
+- `public/branding/email/footer/*`
+- `scripts/email/generate-footer-assets.mjs`
 
 Reglas obligatorias:
 
@@ -80,8 +84,11 @@ Reglas obligatorias:
 - Todo tipo nace con política de unsubscribe `forbidden`; sólo una clasificación explícita como suscripción
   opcional o marketing puede cambiarla a `required`.
 - Firma y footer son bloques distintos. Un template no inventa personas, equipos, reply-to ni identidad legal.
-- RRSS nacen deshabilitadas y sólo se permiten en suscripción/marketing; dirección e identidad legal vienen del
+- RRSS nacen deshabilitadas y sólo se permiten en suscripción/marketing; son obligatorias en marketing y consumen
+  YouTube, Instagram, LinkedIn y Threads desde `EFEONCE_SOCIAL_LINKS`. Dirección e identidad legal vienen del
   operating entity y las notas legales son específicas, nunca un disclaimer universal.
+- Todo footer gobernado muestra como mínimo razón social, RUT y casa matriz. Es una decisión institucional
+  conservadora de Efeonce, no una afirmación de que todas las jurisdicciones lo exijan para cada transaccional.
 - El estado inicial de todo tipo es `legacy`; ningún cambio al primitive compartido altera automáticamente los
   correos no promovidos.
 - Ninguna child task migra más de cuatro `EmailType` ni mezcla familias de dominio para “terminar más rápido”.
@@ -130,6 +137,11 @@ Las child tasks declararán ownership del código por cohort; esta umbrella no a
 - `EmailType`, `EMAIL_PRIORITY_MAP`, `AGENCY_BRANDED_EMAIL_TYPES` y reply-to viven en `src/lib/email/types.ts`.
 - `src/config/efeonce-brand.ts` ya posee nombre, URL, slogan e identidad legal fallback canónicos.
 - Resend ya diferencia prioridad, unsubscribe broadcast, suppression y entrega; no se crea otro sender.
+- La lámina `/admin/emails/footer-profiles/mockup` ya fue revisada y define el punto de partida aprobado para los
+  cinco grupos visuales: operación interna, acceso y seguridad, relación y servicio, operaciones reguladas, y
+  marketing y suscripciones.
+- La vista, sus fixtures, el SSOT de marca, los PNG transparentes y los contratos UI ya fijan jerarquía, copy de
+  referencia, responsive desktop/mobile, legal, controles y RRSS. No corresponde rediseñarlos al implementar.
 
 ### Gap
 
@@ -138,6 +150,8 @@ Las child tasks declararán ownership del código por cohort; esta umbrella no a
 - Footer, firma, disclaimer, ayuda, preferencias e identidad legal están mezclados.
 - RRSS, dirección y notas legales no tienen eligibility ni fuente tipada por `EmailType`.
 - No hay cutover por tipo: modificar el layout compartido puede alterar 28 templates simultáneamente.
+- El mockup todavía no es un primitive React Email ni está conectado a una policy exhaustiva por `EmailType`;
+  sus fixtures de aprobación no son un SSOT runtime.
 
 ## Modular Placement Contract
 
@@ -209,10 +223,13 @@ Las child tasks declararán ownership del código por cohort; esta umbrella no a
 
 ### Implementation mapping
 
-- Route / surface: previews React Email; no ruta productiva nueva
+- Route / surface: previews React Email; la referencia aprobada vive en `/admin/emails/footer-profiles/mockup` y
+  no es una ruta productiva de correo
 - Primitive / variant / kind: `EmailFooter` + perfiles semánticos de policy
 - Component candidates: `src/emails/components/EmailLayout.tsx`, nuevo `EmailFooter.tsx`
 - Copy source: `src/lib/copy/dictionaries/es-CL/emails.ts` con paridad locale vigente
+- Approved presentation source: vista + data del mockup, `src/config/efeonce-brand.ts`,
+  `public/branding/email/footer/*`, wireframe y dirección visual de `TASK-1764`
 - Data reader / command: ninguno
 - API parity: no aplica; no hay acción de negocio
 - Access / capability: none
@@ -254,6 +271,13 @@ Las child tasks declararán ownership del código por cohort; esta umbrella no a
 - Known visual debt: `TASK-1057` gobierna paleta AXIS
 - Visual scorecard: uno por cohorte cuando el cambio sea material
 - Quality threshold: `average >= 4.5; floor >= 4; fidelity/template resistance >= 4.5`
+- Mockup audit 2026-08-23: cinco perfiles revisados en desktop/mobile (10 estados), sin overflow; contraste mínimo
+  4.51:1; controles de texto con target de 24 px, RRSS 32 × 32 px y foco visible de 2 px.
+- Semántica verificada: headings `h1 → h2 → h3`, footer sin headings, controles/RRSS/legal como listas nativas y
+  matriz de policy como tabla nativa con instrucción de scroll en móvil.
+- GVC local final: 1440 × 900 e iPhone 13 con `consoleErrorCount=0`, `pageErrorCount=0`,
+  `hydrationWarningCount=0`, `httpFailureCount=0` y `qualityFindings=[]`; los dossiers viven en `.captures/` y no
+  prueban React Email ni rollout.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -270,7 +294,8 @@ Las child tasks declararán ownership del código por cohort; esta umbrella no a
 
 ## Scope
 
-Esta umbrella sólo formaliza policy, dirección visual, cohorts, gates y child-task boundaries. No implementa código.
+Esta umbrella formaliza policy, dirección visual, cohorts, gates y child-task boundaries, y conserva el mockup local
+aprobado. No implementa el primitive React Email, policy runtime, cohorts, envío ni rollout.
 
 Orden de child tasks obligatorio:
 
@@ -282,6 +307,32 @@ Orden de child tasks obligatorio:
 5. Suscripción opcional/marketing sólo después de confirmar que existe un tipo real y su fuente de consentimiento.
 6. Retiro del legacy únicamente cuando los 30 tipos tengan evidencia y aceptación individual.
 
+### Contrato aprobado de implementación
+
+La foundation y las cohorts parten de `/admin/emails/footer-profiles/mockup`; no vuelven a diseñar el footer. Deben
+traducir su composición a HTML/estilos compatibles con React Email conservando:
+
+- paridad visual a 720 px y 390 px, sin overflow y con degradación legible cuando las imágenes estén bloqueadas;
+- wordmark Efeonce gris, separación clara respecto de firma/cuerpo y jerarquía tipográfica/color definida;
+- razón social, RUT y casa matriz en todos los perfiles gobernados; países sólo en modo `full`;
+- RRSS institucionales sólidas y redondeadas únicamente donde la policy las permite, con accessible name;
+- preferencias, baja, privacidad, ayuda, nota legal y referencia sólo cuando la policy del `EmailType` lo exige.
+
+Los cinco perfiles del mockup son grupos de presentación para aprobación. No colapsan los `purpose` de la ADR ni
+autorizan importar `FOOTER_PROFILE_MOCKS` en producción. La implementación resuelve policy/copy/operating entity por
+los caminos canónicos. Una diferencia sólo es admisible si una limitación medida de cliente de correo,
+accesibilidad o dato runtime la exige; requiere evidencia before/after y aprobación explícita.
+
+Mapping obligatorio de presentación a policy:
+
+| Perfil visual             | `purpose`                                             | Regla diferencial                                                                   |
+| ------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Operación interna         | `internal_operational`                                | Referencia operativa condicional                                                    |
+| Acceso y seguridad        | `access_security`                                     | Ayuda/nota de seguridad condicional                                                 |
+| Relación y servicio       | `transactional_service`, `relationship_transactional` | Contexto y reply/help por tipo                                                      |
+| Operaciones reguladas     | `regulated_transactional`                             | Nota, referencia y controles por obligación                                         |
+| Marketing y suscripciones | `optional_subscription`, `commercial_marketing`       | Baja requerida en ambos; RRSS opcionales en suscripción y obligatorias en marketing |
+
 ## Out of Scope
 
 - Modificar hoy `EmailLayout`, templates, sender, reply-to, Resend, tracking, dominios, flags o runtime.
@@ -292,10 +343,11 @@ Orden de child tasks obligatorio:
 
 ## Detailed Spec
 
-La umbrella no define JSX final ni ejecuta cohorts. La ADR contiene la decisión compartida; el wireframe contiene
-la anatomía y el mapping visual; cada child task debe copiar únicamente los tipos de su familia, declarar baseline,
-diff permitido, fixture, preview, canary y rollback. Cualquier child que intente modificar el default global o
-agrupar más de cuatro tipos contradice esta task y debe detenerse antes de código.
+La umbrella no ejecuta cohorts. La ADR contiene la decisión compartida; el mockup aprobado, el wireframe y la
+dirección visual contienen la referencia concreta de composición y contenido. Cada child task debe copiar únicamente
+los tipos de su familia, declarar baseline, diff permitido, fixture, preview, paridad con el mockup, canary y
+rollback. Cualquier child que intente rediseñar sin evidencia, modificar el default global o agrupar más de cuatro
+tipos contradice esta task y debe detenerse antes de código.
 
 ## Rollout Plan & Risk Matrix
 
@@ -310,13 +362,13 @@ migrando otra familia.
 
 ### Risk matrix
 
-| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
-|---|---|---|---|---|
-| Cambio global involuntario | email UI | high | legacy default + child tasks + diff por tipo | snapshots/capturas cambian fuera del footer |
-| Unsubscribe en transaccional | delivery/compliance | medium | policy `forbidden` por default + invariant test | tipo forbidden renderiza unsubscribe |
-| Marketing disfrazado de servicio | content/compliance | medium | no promotional content + revisión legal por jurisdicción | subject/body contiene promoción en perfil transactional |
-| Marca Greenhouse paralela | agency/UI | medium | Efeonce única masterbrand + snapshot assertion | masthead/footer principal dice Greenhouse |
-| Cliente de correo rompe layout | email UI | medium | inline/table-safe + canary real por cohorte | overflow, links ilegibles o imágenes bloqueadas |
+| Riesgo                           | Sistema             | Probabilidad | Mitigation                                               | Signal de alerta                                        |
+| -------------------------------- | ------------------- | ------------ | -------------------------------------------------------- | ------------------------------------------------------- |
+| Cambio global involuntario       | email UI            | high         | legacy default + child tasks + diff por tipo             | snapshots/capturas cambian fuera del footer             |
+| Unsubscribe en transaccional     | delivery/compliance | medium       | policy `forbidden` por default + invariant test          | tipo forbidden renderiza unsubscribe                    |
+| Marketing disfrazado de servicio | content/compliance  | medium       | no promotional content + revisión legal por jurisdicción | subject/body contiene promoción en perfil transactional |
+| Marca Greenhouse paralela        | agency/UI           | medium       | Efeonce única masterbrand + snapshot assertion           | masthead/footer principal dice Greenhouse               |
+| Cliente de correo rompe layout   | email UI            | medium       | inline/table-safe + canary real por cohorte              | overflow, links ilegibles o imágenes bloqueadas         |
 
 ### Feature flags / cutover
 
@@ -325,21 +377,23 @@ asignación explícita. El kill-switch existente puede detener despacho, pero no
 
 ### Rollback plan per slice
 
-| Slice | Rollback | Tiempo | Reversible? |
-|---|---|---|---|
-| Foundation | revert del child commit; output legacy debe ser byte-idéntico | un release | sí |
-| Cohort por tipo | restaurar asignación `legacy` sólo para esos tipos y redeploy del runtime dueño | un release | sí |
-| Retiro legacy | no inicia sin 30/30 tipos aceptados; revert restaura primitive legacy | un release | sí |
+| Slice           | Rollback                                                                        | Tiempo     | Reversible? |
+| --------------- | ------------------------------------------------------------------------------- | ---------- | ----------- |
+| Foundation      | revert del child commit; output legacy debe ser byte-idéntico                   | un release | sí          |
+| Cohort por tipo | restaurar asignación `legacy` sólo para esos tipos y redeploy del runtime dueño | un release | sí          |
+| Retiro legacy   | no inicia sin 30/30 tipos aceptados; revert restaura primitive legacy           | un release | sí          |
 
 ### Production verification sequence
 
 1. Capturar baseline legacy por tipo antes del cambio.
 2. Ejecutar tests/render/HTML diff local; cualquier cambio fuera del footer bloquea.
 3. Revisar desktop 720 px, mobile 390 px y versión sin imágenes.
-4. Obtener aprobación explícita del operador para esa cohorte.
-5. Desplegar sólo la cohorte y realizar un canary consentido; no enviar correos reales por inferencia.
-6. Verificar proveedor, cliente real, links, reply-to y ausencia/presencia correcta de unsubscribe.
-7. Documentar aceptación o rollback antes de abrir la siguiente child task.
+4. Renderizar la matriz mínima: Outlook Desktop Windows (motor Word), Outlook Web, Gmail y un cliente WebKit.
+5. Bloquear imágenes y verificar lectura, identidad y fallback textual/accesible de RRSS.
+6. Obtener aprobación explícita del operador para esa cohorte.
+7. Desplegar sólo la cohorte y realizar un canary consentido; no enviar correos reales por inferencia.
+8. Verificar proveedor, cliente real, links, reply-to y ausencia/presencia correcta de unsubscribe.
+9. Documentar aceptación o rollback antes de abrir la siguiente child task.
 
 ### Out-of-band coordination required
 
@@ -360,9 +414,14 @@ asignación explícita. El kill-switch existente puede detener despacho, pero no
 - [ ] La policy separa `EmailPriority`, propósito, audience, reply, firma y unsubscribe.
 - [ ] La policy incluye `socialLinksPolicy`, `legalIdentityMode` y `legalNoticePolicy` con defaults fail-closed.
 - [ ] `unsubscribe` nace `forbidden` y sólo `optional_subscription|commercial_marketing` permiten `required`.
-- [ ] RRSS nacen `none`, sólo suscripción/marketing permiten `institutional`, y cada link tiene destino oficial,
-      nombre accesible y fallback textual.
-- [ ] Razón social/dirección provienen del operating entity canónico y ningún template las hardcodea.
+- [ ] RRSS nacen `none`; suscripción puede permitir `institutional`, marketing lo exige, y YouTube, Instagram,
+      LinkedIn y Threads resuelven destino oficial desde `EFEONCE_SOCIAL_LINKS`, con nombre accesible y fallback
+      textual.
+- [ ] Razón social, RUT y casa matriz provienen del operating entity canónico; los países vienen del SSOT de marca,
+      se muestran como lista compacta sin el rótulo `Operación en` y ningún template hardcodea esos datos, presenta
+      los países como entidades legales locales ni usa Chile como límite geográfico.
+- [ ] Todos los perfiles gobernados usan `legalIdentityMode='entity'` como mínimo; `full` agrega países y privacidad,
+      pero nunca elimina razón social, RUT o casa matriz.
 - [ ] No existe disclaimer legal universal; security/privacy/regulated se prueban por policy y propósito.
 - [ ] Los 30 `EmailType` están inventariados y asignados a una cohorte, sin promoverlos todavía.
 - [ ] Existe una child task foundation cuyo criterio principal es output byte-idéntico para los 28 templates.
@@ -372,9 +431,21 @@ asignación explícita. El kill-switch existente puede detener despacho, pero no
 - [ ] Firma y footer se documentan como primitives separados.
 - [ ] Cada cohorte declara rollback a `legacy` por tipo.
 - [ ] La task declara `Execution profile: ui-ux`, `UI impact: primitive` y un wireframe existente.
+- [x] `/admin/emails/footer-profiles/mockup`, su vista/data, `src/config/efeonce-brand.ts`, assets PNG y docs UI
+      figuran como contrato aprobado de partida; los fixtures no se importan como policy runtime.
+- [ ] Foundation y cohorts prueban paridad 720/390 con el mockup en jerarquía, espaciado, color, legal, RRSS y
+      controles, además de la versión con imágenes bloqueadas.
+- [ ] Toda desviación del mockup identifica una limitación medida, adjunta before/after y tiene aprobación explícita.
+- [ ] Los cinco perfiles visuales mapean explícitamente a los siete `purpose`; `optional_subscription` y
+      `commercial_marketing` conservan reglas distintas de RRSS aunque compartan presentación base.
+- [ ] Cada cohorte prueba Outlook Desktop Windows, Outlook Web, Gmail, un cliente WebKit e imágenes bloqueadas, con
+      fallback textual y nombre accesible para cada RRSS.
 - [ ] `UI ready` permanece `no` hasta que las child tasks posean mapping, GVC y decision log propios.
 - [ ] El copy reusable se resuelve desde `src/lib/copy/*`; datos legales usan el SSOT de operating entity.
 - [ ] El footer es completamente estático y el email conserva significado sin imágenes.
+- [ ] Wordmark e íconos sociales usan PNG transparentes reproducibles mediante
+      `scripts/email/generate-footer-assets.mjs`; el HTML del correo no depende de `next/image`, icon fonts, SVG
+      remoto ni filtros CSS.
 - [ ] La umbrella sólo puede cerrar cuando todas las child tasks estén cerradas con rollout honesto o formalmente retiradas.
 
 ## Verification
@@ -382,6 +453,11 @@ asignación explícita. El kill-switch existente puede detener despacho, pero no
 - `pnpm task:lint --task TASK-1764`
 - `pnpm ui:wireframe-check --task TASK-1764`
 - `pnpm docs:closure-check`
+- `pnpm qa:gates --changed --agent codex --task TASK-1764 --ui --docs`
+- `pnpm design:lint`
+- `pnpm exec eslint src/views/greenhouse/admin/email-footer-profiles/mockup/{EmailFooterProfilesMockupView.tsx,data.ts}`
+- `pnpm exec tsc --noEmit --pretty false`
+- GVC local desktop + iPhone 13 sobre `/admin/emails/footer-profiles/mockup`, más loop Playwright de 10 estados
 - Revisión manual contra los 30 `EmailType`, 28 consumers de `EmailLayout` y perfiles definidos en la ADR.
 
 ## Closing Protocol

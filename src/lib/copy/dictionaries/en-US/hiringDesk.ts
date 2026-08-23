@@ -19,6 +19,7 @@ export const hiringDesk: HiringDeskCopy = {
     loading: 'Loading…',
     noResults: 'No results found.',
     openApplication: 'Open application',
+    returnToOpeningPipeline: 'Return to the {opening} pipeline',
     previous: 'Previous',
     next: 'Next',
     agency: 'Agency',
@@ -84,16 +85,9 @@ export const hiringDesk: HiringDeskCopy = {
     stages: {
       sourced: 'Sourced',
       screening: 'Screening',
-      qualified: 'Evaluation',
       shortlisted: 'Evaluation',
-      client_review: 'Evaluation',
       interview: 'Interview',
       decision_pending: 'Decision',
-      selected: 'Closed',
-      backup: 'Closed',
-      rejected: 'Closed',
-      withdrawn: 'Closed',
-      handoff_ready: 'Closed',
       closed: 'Closed'
     }
   },

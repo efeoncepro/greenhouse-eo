@@ -72,6 +72,7 @@ import type { AiProposal } from '@/types/hiring-assessment-ai'
 import type { HiringApplicationNote } from '@/types/hiring-application-notes'
 
 import HiringDeskFrame from './HiringDeskFrame'
+import { hiringApplicationViewTransitionStyle } from './hiring-navigation'
 import ApplicationDossierPanel from './ApplicationDossierPanel'
 import CandidateDocumentsPanel from './CandidateDocumentsPanel'
 import AssessmentCompetencyRadar from './AssessmentCompetencyRadar'
@@ -1838,7 +1839,8 @@ const Application360View = ({
   )
 
   const lead = (
-    <DetailHero
+    <Box style={hiringApplicationViewTransitionStyle(item.application.applicationId)}>
+      <DetailHero
       kind='report'
       dataCapture='hiring-application-hero'
       title={item.candidateName}
@@ -1884,7 +1886,8 @@ const Application360View = ({
         </Stack>
       }
       supporting={applicationNavigation}
-    />
+      />
+    </Box>
   )
 
   const dialogMotionProps = {
@@ -1919,7 +1922,17 @@ const Application360View = ({
 
   return (
     <>
-      <HiringDeskFrame surface='application' copy={copy} lead={lead} primary={primary} />
+      <HiringDeskFrame
+        surface='application'
+        copy={copy}
+        lead={lead}
+        primary={primary}
+        applicationContext={{
+          applicationId: item.application.applicationId,
+          openingId: item.application.openingId,
+          openingTitle: item.openingTitle,
+        }}
+      />
 
       <Dialog
         open={assignOpen}

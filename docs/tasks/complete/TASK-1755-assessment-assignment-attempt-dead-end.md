@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-011`
-- Status real: `code complete, rollout pendiente — el fix NO está en producción; sube con el release del dominio Hiring`
+- Status real: `rollout COMPLETO 2026-08-23: el fix está en producción (release `304371f73`, verificado 2 ocurrencias de `NEXT_ATTEMPT_AFTER_DEAD_END` en `origin/main`). Verificación funcional en runtime pendiente de autorización del operador (es mutación sobre una candidatura real)`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`

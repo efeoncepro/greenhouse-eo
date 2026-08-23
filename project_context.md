@@ -154,12 +154,21 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   `.claude/skills/efeonce-mcp-platform/`; estas componen la skill dueña de cada provider y no duplican su policy.
   Las skills de arquitectura `software-architect-2026` y `arch-architect` deben cargar ese router antes de
   proponer una nueva surface, OAuth o binding cross-runtime.
+- Hiring/ATS separa **etapa** (¿dónde está?) de **desenlace** (¿cómo terminó?) y ésos son ejes ortogonales,
+  atados por el `CHECK` `(stage='closed') = (decision IS NOT NULL)`. `TASK-1754` dejó el vocabulario de etapas
+  en **seis** (`sourced`, `screening`, `shortlisted`, `interview`, `decision_pending`, `closed`) y `TASK-1765`
+  el de desenlaces en seis; `HIRING_PIPELINE_STAGES` (cinco) es el subconjunto escribible por un cambio de
+  etapa —`closed` no está: cerrar exige declarar el desenlace— y `TERMINAL_APPLICATION_STAGES` es la fuente
+  única de lo terminal. **Un contract de enum se aplica DESPUÉS del release que retira sus escritores, nunca
+  antes**, y la alcanzabilidad de un valor se deriva del contrato de la superficie desplegada, jamás del
+  conteo de filas (`ISSUE-161`). El contract de etapas está escrito y **pendiente de aplicar** al 2026-08-23.
 - Hiring/ATS declara la **procedencia del dato en su nacimiento** (`data_origin`, `TASK-1739`, en producción
   desde 2026-08-19): dos raíces —persona y demanda— con copia derivada por trigger en la postulación, default
   `real` porque omitir debe dejar el dato visible y nunca ocultarlo. Una vacante no real no se publica; el gold
   set excluye sintéticos sin flag; retención y compliance son ciegos a la procedencia y la procedencia nunca
   gatea comunicaciones. El primitive canónico es `src/lib/hiring/data-origin/` y ningún reader escribe su propio
-  predicado. Deuda declarada en `TASK-1748`: los readers del Banco de Talento aún no filtran por procedencia.
+  predicado. `TASK-1748` cerró esa deuda **en `develop`** (los readers y la projection del Banco de Talento
+  ya filtran por procedencia); en producción todavía no: `code complete, rollout pendiente`.
 - Hiring/ATS mantiene como caminos canónicos el reader de Application 360 para documentos y el reveal de
   identidad con capability, motivo y auditoría append-only (`TASK-1714`/`TASK-1715`). El evento
   `hiring.assessment.submitted` ya tiene en producción un consumer interno para People, con configuración
@@ -269,7 +278,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Qué tooling/modelos evalúa Efeonce Globe / Creative Studio | `docs/architecture/EFEONCE_CREATIVE_STUDIO_ENTERPRISE_MODEL_PORTFOLIO_V1.md` + capability registry |
 | Cómo crea y captura valor Creative Studio, cómo funcionan sus créditos y qué skills lo adoptan | `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md` + `EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md` + `EFEONCE_CREATIVE_STUDIO_SKILL_ADOPTION_V1.md` |
 | Cómo producir posts sociales visuales con reportes, dashboards o evidencia de producto | `docs/operations/GREENHOUSE_SOCIAL_VISUAL_REPORT_PRODUCTION_V1.md` + capas funcional/manual + skills `design-studio` y `social-media-studio` |
-| Cómo crear o modificar templates y hero images de email | skill espejo `greenhouse-email` + `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`; delivery/provider se opera por separado con `resend-email-platform` y visuales GPT Image 2 con `greenhouse-ai-image-generator` |
+| Cómo crear o modificar templates, footers y hero images de email | skill espejo `greenhouse-email` + `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`; delivery/provider se opera por separado con `resend-email-platform` y visuales GPT Image 2 con `greenhouse-ai-image-generator` |
 | Cómo diseñar, construir, auditar o mejorar dashboards en Google Data Studio (antes Looker Studio) | skill espejo `.codex/skills/google-data-studio/SKILL.md` + `.claude/skills/google-data-studio/SKILL.md`; usar `inspect` por defecto y validar modelado, filtros, browser, permisos y sharing desde sus references |
 | Cómo modelar Efeonce Group, Media & Distribution, Growth Platform, AEO y Search Visibility 360 | `docs/business-models/README.md` + `.codex/skills/efeonce-business-model-operator/SKILL.md` + modelos vigentes |
 | Cómo leer un site audit de crawler sin mentir el diagnóstico (orden de hallazgos, laboratorio vs campo, techo del crawl, huecos de cobertura AEO) | `.codex/skills/seo-aeo/modules/01_SEO_TECHNICAL.md` §8 + `.claude/skills/dataforseo-operator/references/04-onpage.md` §11 + `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.6 |

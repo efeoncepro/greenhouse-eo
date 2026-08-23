@@ -416,7 +416,7 @@ convenciones distintas de marcado repartidas en ocho scripts, ninguna compartida
 Es paralelizable con todos los carriles: no bloquea ni es bloqueada por ninguno, y cuanto antes
 cierre, menos fantasmas hay que remediar después.
 
-### Eje de desenlace del pipeline — `TASK-1765`…`TASK-1770` (2026-08-22)
+### Eje de desenlace del pipeline — `TASK-1765`…`TASK-1770` + `TASK-1773` (2026-08-22/23)
 
 Carril nuevo abierto por [`GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1`](../../architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md)
 (`Accepted`), el **primer ADR que el vocabulario del pipeline tiene**. Evidencia base:
@@ -439,6 +439,13 @@ declarado, como `CHECK` de base.
 - `TASK-1769` — **Agendamiento vía Microsoft Graph.** Greenhouse agenda pero **no es dueño del calendario**
   (decisión del operador 2026-08-22). `Calendars.ReadWrite` **no está otorgado**: precondición dura.
 - `TASK-1770` — **Motor de disponibilidad y propuesta de horarios** (`getSchedule`). *Bloqueada por 1769.*
+
+- `TASK-1773` — **Parity gobernada del eje de desenlace.** El eje se entregó COMPLETO y sin contrato
+  programático: se puede cerrar una postulación desde el portal y desde ningún otro lado — ni por
+  `api/platform/app/**`, ni por MCP, ni por Nexa. Es una violación directa de Full API Parity, y el
+  agravante es que **ninguna de las cuatro tasks del eje lo declaró como pendiente**: la pregunta
+  obligatoria del principio no se hizo en ninguna, ni en la auditoría que las revisó. Su Slice 5 es el
+  guard que impide que la clase vuelva. *Bloqueada por nada: 1765 ya está en producción.*
 
 Dos superficies **no** generaron ID nuevo y entraron como Delta a su dueño: el archivado que escribía `closed`
 (`TASK-1748`) y el arranque del reloj de retención (`TASK-1744`).

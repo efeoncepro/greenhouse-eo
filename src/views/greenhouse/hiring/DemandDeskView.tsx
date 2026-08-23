@@ -32,6 +32,7 @@ import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
 import { GreenhouseButton, GreenhouseChip } from '@/components/greenhouse/primitives'
+import { isActiveProcess } from '@/lib/hiring/active-process'
 import type { HiringDeskCopy } from '@/lib/copy'
 import {
   HIRING_PUBLIC_SENIORITIES,
@@ -344,13 +345,15 @@ const DemandDeskView = ({
   )
 
   const pipelineMetrics = useMemo(() => {
-    const active = snapshot.applications.filter(
-      ({ application }) => !['rejected', 'withdrawn', 'closed'].includes(application.stage)
-    )
+    // TASK-1772 — «en proceso» son TRES ejes, y este callsite sólo miraba uno. `stage !== 'closed'`
+    // era equivalente a `decision IS NULL` (el CHECK del invariante lo garantiza), así que seguía
+    // contando como viva una postulación ARCHIVADA: retirada de la vista a propósito, sin declarar
+    // desenlace. El predicado canónico vive en `@/lib/hiring/active-process` y es el MISMO que
+    // consumen el desk server-side, la projection del Banco de Talento y la señal de drift.
+    const active = snapshot.applications.filter(({ application }) => isActiveProcess(application))
 
-    const evaluation = active.filter(({ application }) =>
-      ['qualified', 'shortlisted', 'client_review'].includes(application.stage)
-    )
+    // `qualified` y `client_review` se absorbieron en `shortlisted`: la columna es una sola etapa.
+    const evaluation = active.filter(({ application }) => application.stage === 'shortlisted')
 
     const pendingDecision = active.filter(({ application }) => application.stage === 'decision_pending')
     const now = new Date()

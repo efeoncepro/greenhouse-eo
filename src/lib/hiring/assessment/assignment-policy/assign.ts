@@ -490,6 +490,42 @@ const resolveAttemptSeq = async (
 }
 
 /**
+ * TASK-1771 — EVALUACIÓN VIVA de una clave ya registrada: «¿esta causa seguiría bloqueando hoy?».
+ *
+ * Existe para que el supersede del carril automático (`supersede-dead-end.ts`) y su cola de
+ * lectura reusen **el mismo** `resolveAssignmentIntent` que decide un assignment real, en vez de
+ * reimplementar sus siete condiciones. La duplicación acá no sería un detalle de estilo: dos
+ * definiciones de "por qué se bloqueó" divergen, y el supersede empezaría a reabrir claves que el
+ * assignment vuelve a bloquear — el bucle exacto que ese command existe para impedir.
+ *
+ * Carga el snapshot vigente de la postulación y delega. NO escribe nada y NO decide si
+ * corresponde superseder: eso lo resuelve el command con su tope y su condición de avance.
+ *
+ * El caller DEBE tener la fila de policy bloqueada (`FOR UPDATE`) antes de llamar cuando el
+ * resultado vaya a sostener una escritura: `volume_cap` se auto-cura con la ventana móvil, así
+ * que una evaluación tomada fuera del lock describe un instante que ya pasó.
+ *
+ * `origin` y `triggerStage` se pasan tal como quedaron REGISTRADOS en la fila: evaluar un
+ * `stage_auto` como si fuera manual saltaría el cap de volumen y la guarda de modo, que son dos
+ * de las condiciones que más bloquean.
+ */
+export const resolveLiveAssignmentIntent = async (
+  client: PoolClient,
+  policy: OpeningAssessmentPolicy,
+  applicationId: string,
+  origin: AssessmentAssignmentOrigin,
+  triggerStage: AssessmentAssignmentTrigger,
+): Promise<{ outcome: AssessmentAssignmentOutcome; reasonCode: AssessmentAssignmentReasonCode | null }> => {
+  const application = await loadApplicationSnapshot(client, applicationId)
+
+  if (!application) {
+    throw new HiringNotFoundError('La postulación no existe.', 'hiring_application_not_found')
+  }
+
+  return resolveAssignmentIntent(client, policy, application, origin, triggerStage)
+}
+
+/**
  * Decide el outcome ANTES de tocar el ledger. Todas las condiciones se leen del estado
  * vigente en PostgreSQL dentro de la misma transacción.
  */

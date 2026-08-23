@@ -25,7 +25,8 @@
 - ADR: `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md`
 - Rank: `TBD`
 - Domain: `hr`
-- Blocked by: `TASK-1765`
+- Blocked by: `none`
+- Nota de desbloqueo (2026-08-23): el embudo de equidad ya puede ramificar por desenlace y causa reales
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

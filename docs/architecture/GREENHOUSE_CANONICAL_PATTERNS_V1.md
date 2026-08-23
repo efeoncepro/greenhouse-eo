@@ -312,9 +312,10 @@ diseño, no una limitación.
 responder "¿por qué no funcionó?". Si un incidente se resuelve mirando una tabla y el dato
 ya existía en el runtime, hubo colapso de estado.
 
-**Fuente:** los cinco casos del 2026-08-19, mismo día y mismo error: `hiringDesk.ts` mapea
+**Fuente:** los cinco casos del 2026-08-19, mismo día y mismo error: `hiringDesk.ts` **mapeaba**
 `qualified`/`shortlisted`/`client_review` a "Evaluación" mientras la policy de assessment
-sólo dispara en `shortlisted` (la automatización no corre y el operador no puede saber por
+sólo disparaba en `shortlisted` — **cerrado el 2026-08-22**: el carril declara UNA etapa y lo que
+agrupa vive aparte (la automatización no corría y el operador no podía saber por
 qué); `hiringAssessment.ts` responde "Este enlace no está disponible" a seis causas, cuatro
 de ellas con el enlace vivo; el renderer de growth-forms muestra "No pudimos verificar el
 envío" para cuatro modos de falla distintos; `captcha.ts` colapsa los `error-codes` de

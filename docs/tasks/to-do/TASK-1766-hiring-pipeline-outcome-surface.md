@@ -24,7 +24,8 @@
 - Status real: `Diseño`
 - Rank: `TBD`
 - Domain: `hr|ui`
-- Blocked by: `TASK-1765`
+- Blocked by: `none`
+- Nota de desbloqueo (2026-08-23): el eje de desenlace, la causa gobernada y el `CHECK` del invariante están en producción
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-011`
-- Status real: `Slices A-E en develop y NO en produccion; expand APLICADO contra la instancia compartida (qualified 7 -> 0); Slice F bloqueado por TASK-1765 en produccion`
+- Status real: `COMPLETA 2026-08-23 — Slices A-F. El contract se aplico contra la instancia compartida: el CHECK de stage paso de 13 a 6 valores y `stage-enum-check-parity.live.test.ts` pasa 4/4 (no skipped), o sea que el enum TS y el CHECK son el mismo contrato`
 - ADR: `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md`
 - Rank: `TBD`
 - Domain: `hr`
@@ -123,6 +123,10 @@ presente Y castellano ausente.
 
 ### Lo que queda, con su condición
 
+> **Superada el 2026-08-23.** Los cinco puntos de abajo los cerró el Slice F; se conservan como
+> registro de lo que estaba abierto ese día. La lista vigente es la de «Lo que queda, con su
+> condición» de la ejecución del 2026-08-23, más abajo.
+
 - **Slice F (contract).** Bloqueado por dos condiciones independientes: el release que retira los
   escritores debe estar en producción (§16 del ADR), y `TASK-1765` debe estar verificada en producción
   antes de tocar los cuatro espejos terminales (§14 paso 2). Su SQL va a
@@ -141,6 +145,106 @@ presente Y castellano ausente.
   `refresh_assessment_access_recovery_retention_for_application` no cubre `backup_selected`,
   `not_selected` ni `unresponsive`; su rama `ELSE` deja `retention_expires_at` en `NULL`, o sea sin
   vencimiento. Registrado en el §17 del ADR.
+
+## Ejecución 2026-08-23 — Slice F (contract) escrito; falta aplicar la migración
+
+**Estado honesto: `code complete, migración pendiente de aplicar`.** El enum, la copy, los carriles,
+los readers y la migración están escritos y verdes en local; el `CHECK` de la base **sigue admitiendo
+las trece etapas**. `pnpm pg:connect:migrate` quedó bloqueado por el clasificador de permisos y espera
+autorización explícita del operador. **El contract no está aplicado.**
+
+El Slice F se desbloqueó porque sus dos condiciones —independientes entre sí— se cumplieron: el
+release `304371f73` con los Slices A–E está en producción, y `TASK-1765` quedó verificada en
+producción con su `CHECK` del invariante ya existente.
+
+### La autorización para angostar no salió de contar filas — salió del contrato de la superficie
+
+El §16 del ADR y el Delta del 2026-08-22 lo dejaron escrito: «cero filas» no es «nadie lo escribe».
+Lo que autoriza a angostar el `CHECK` es que **ningún escritor desplegado pueda producir el literal**.
+En `origin/main` hay **exactamente tres** escritores de `hiring_application.stage`, y los tres están
+acotados por tipo:
+
+| Escritor en `origin/main` | Operación | Cómo acota la etapa |
+|---|---|---|
+| `store.ts:1249` | INSERT | `assertOptionalEnum(input.stage, HIRING_PIPELINE_STAGES) ?? 'sourced'` |
+| `store.ts:1340` | UPDATE | `assertEnum(stage, HIRING_PIPELINE_STAGES)` + rechazo explícito de `closed` |
+| `decide.ts:299` | UPDATE | `DECISION_STAGE[decision]`: los seis desenlaces escriben `'closed'` |
+
+La unión de los tres es exactamente el conjunto de seis que queda. **`store.ts:666` también tiene
+`stage = $n`, pero es un filtro de lista, no una escritura** — era la duda que dejaba abierta un grep
+laxo, y queda cerrada.
+
+### Cambios aplicados
+
+> Los commits todavía no existen. Cuando se hagan, registrar sus SHA en esta tabla.
+
+| Archivo | Qué |
+|---|---|
+| `src/types/hiring.ts` | `HIRING_APPLICATION_STAGES` de 13 a **6** (`sourced`, `screening`, `shortlisted`, `interview`, `decision_pending`, `closed`). Nace `TERMINAL_APPLICATION_STAGES` como **fuente única** (`ReadonlySet<string>` = `{'closed'}`) |
+| `assessment/instances.ts` · `assessment/public-session/store.ts` · `assessment/access-recovery/vocabulary.ts` | Las **tres** copias verbatim de `TERMINAL_APPLICATION_STAGES` pasan a importar la fuente única |
+| `assessment/assignment-policy/readers.ts` | `STAGES_DOWNSTREAM_OF_TRIGGER` **reescrito**: `shortlisted → [interview, decision_pending]`, `interview → [decision_pending]`, tipado con `HiringApplicationStage` |
+| `src/lib/copy/dictionaries/{es-CL,en-US}/hiringDesk.ts` | Retiradas las 7 claves muertas de `stages` en ambos diccionarios |
+| `PipelineDeskView.tsx` | Los carriles pierden `absorbs`; el carril `outcome` queda con **una** etapa |
+| `DemandDeskView.tsx` | `active` pasa de `!['rejected','withdrawn','closed']` a `stage !== 'closed'`; `evaluation` pasa de `['qualified','shortlisted','client_review']` a `stage === 'shortlisted'` |
+| `instances.eligibility.test.ts` | Su caso «terminal stage» usaba `stage: 'rejected'`, que dejó de ser etapa; pasa a `'closed'` |
+| `docs/tasks/pending-migrations/TASK-1754-stage-vocabulary-contract.sql.pending` | Guarda de datos que aborta si queda una fila en etapa retirada · DDL que reemplaza el `CHECK` (13 → 6) · bloque anti pre-up-marker que lee `pg_get_constraintdef` y revienta si el `CHECK` todavía admite cualquiera de los siete |
+
+### Decisiones tomadas durante la ejecución, con su razón
+
+1. **Las tres copias de `TERMINAL_APPLICATION_STAGES` se unificaron, no se sincronizaron.** El defecto
+   que la auditoría les encontró —omitir `backup`— era consecuencia de que fueran tres definiciones sin
+   dueño. Retirar los literales de cada una habría dejado tres listas correctas y el mismo defecto
+   latente. Ahora hay una y tres importadores. En `vocabulary.ts` se respetó su regla de módulo
+   isomorfo: es un import de constantes puras, no arrastra Node ni la base.
+2. **`STAGES_DOWNSTREAM_OF_TRIGGER` se reescribió, no se podó.** Listaba `client_review` aguas **abajo**
+   de `shortlisted`, y el colapso la absorbió **dentro**. Podarla habría dejado el mapa sintácticamente
+   limpio y semánticamente falso: mandaba a la cola humana postulaciones que la reconciliación
+   automática sí recupera. Quedó tipado con `HiringApplicationStage` para que el próximo literal muerto
+   **no compile**, en vez de sobrevivir como string.
+3. **`FAIRNESS_REPORTABLE_STAGES` conserva `qualified`, `client_review` y `selected` — deuda declarada,
+   no descuido.** Retirarlos rompería el monitor de equidad, porque `getSelectionFairness` usa
+   `input.stage ?? 'selected'` como **default**. Re-apuntar el cubo terminal al eje de desenlace cambia
+   **qué** mide el four-fifths rule, y eso no cabe en un contract de vocabulario. **Mitigación aplicada
+   en este mismo slice:** el reader **falla ruidoso** (`hiring_fairness_stage_retired`, 422) en vez de
+   devolver cero en silencio. Un cero silencioso en una métrica de equidad se lee como «no hay impacto
+   adverso» — la conclusión contraria a la verdad. **Condición de retiro** registrada en
+   `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`: `TASK-1365` cierra **antes** de prender
+   `HIRING_FAIRNESS_MONITOR_ENABLED` en producción.
+4. **El carril `outcome` queda con UNA etapa, que cumple la condición de retiro que esta misma task
+   había declarado** para `pipeline-lane-contract.test.ts` (traspaso del 2026-08-20). Con `absorbs`
+   fuera de `LaneDefinition`, ninguna columna traduce ya entre etapa mostrada y etapa guardada.
+5. **La migración verifica el resultado, no el marker.** Su bloque anti pre-up-marker no pregunta si la
+   constraint existe: lee `pg_get_constraintdef` y aborta si el `CHECK` todavía admite cualquiera de los
+   siete literales retirados. Un `CHECK` reemplazado a medias es indistinguible de uno intacto si sólo
+   se comprueba la existencia.
+
+### Gates ejecutados
+
+- `pnpm typecheck` → limpio.
+- `eslint` sobre los archivos tocados → limpio.
+- Suite del dominio (`src/lib/hiring src/views/greenhouse/hiring src/lib/copy`) → **1.236 verdes**, 0 fallos.
+- **`src/lib/hiring/stage-enum-check-parity.live.test.ts` falla a propósito ahora mismo** (enum 6 ≠
+  `CHECK` 13). No es una regresión: es el readback del Slice A2 haciendo su trabajo. Se pone verde
+  cuando la migración se aplique, y ésa es la señal de que el contract quedó cerrado.
+- **Readback previo tomado contra la instancia compartida:** `CHECK` en 13 valores, **0 filas** en las
+  siete etapas retiradas. La guarda de datos de la migración vuelve a comprobarlo en el momento de
+  aplicar, que es cuando importa.
+
+### Lo que queda, con su condición
+
+- **Aplicar la migración `TASK-1754-stage-vocabulary-contract.sql.pending`.** Es lo único
+  pendiente. Requiere autorización explícita del operador para `pnpm pg:connect:migrate`: el comando
+  quedó bloqueado por el clasificador de permisos. **Antes de aplicarla, avisar a `TASK-1718`** — su
+  lane programático acepta `stage` como string libre sin `assertEnum`, así que un filtro por un literal
+  retirado pasará a devolver cero **en silencio**.
+- **Al aplicarla, la evidencia de cierre es doble:** el guard derivado
+  `stage-enum-check-parity.live.test.ts` pasa a verde, y el readback de `pg_get_constraintdef` muestra
+  el `CHECK` en seis valores. Sin las dos, el contract no está cerrado.
+- **Recién ahí la task se mueve a `complete/`** y se sincronizan `docs/tasks/README.md` y
+  `TASK_ID_REGISTRY.md`. Hoy no: el trabajo está en código, no en el runtime.
+- **Deuda que sobrevive al cierre, con dueño:** `FAIRNESS_REPORTABLE_STAGES` conserva tres literales
+  retirados como tabla de traducción histórica. La cierra `TASK-1365`, y su condición está en el ledger
+  de flags — `HIRING_FAIRNESS_MONITOR_ENABLED` no se prende en producción antes que ella.
 
 ## Summary
 

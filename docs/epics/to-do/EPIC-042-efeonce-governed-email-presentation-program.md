@@ -44,23 +44,26 @@ Resend, Growth o Hiring en children por coincidencia temática.
 
 ## Presentation Blocks and Eligibility
 
-El footer mantiene una anatomía común —identidad → contexto/ayuda → RRSS opcionales → controles → legal—, pero
+El footer mantiene una anatomía común —identidad → contexto/ayuda → RRSS gobernadas → controles → legal—, pero
 ningún bloque se renderiza por costumbre. La policy de cada `EmailType` declara, como mínimo:
 
-- `socialLinksPolicy: 'none' | 'institutional'`: default `none`. `institutional` sólo se permite en
-  `optional_subscription|commercial_marketing`, con destinos oficiales/activos desde SSOT, íconos monocromáticos,
-  nombre accesible y fallback textual. Está prohibido en access/security, transaccionales, Hiring, regulados e
-  internos; no se agregan parámetros de tracking por inferencia.
-- `legalIdentityMode: 'compact' | 'entity' | 'full'`: `compact` muestra Efeonce; `entity` agrega razón social y
-  país; `full` agrega además dirección postal válida y privacidad. Razón social/dirección vienen del operating
-  entity canónico, nunca hardcodeadas en JSX.
+- `socialLinksPolicy: 'none' | 'institutional'`: default `none`. `optional_subscription` puede usar `institutional`
+  y `commercial_marketing` debe usarlo con YouTube, Instagram, LinkedIn y Threads desde `EFEONCE_SOCIAL_LINKS`,
+  íconos monocromáticos, nombre accesible y fallback textual. Está prohibido en access/security, transaccionales,
+  Hiring, regulados e internos; no se agregan parámetros de tracking por inferencia.
+- `legalIdentityMode: 'compact' | 'entity' | 'full'`: `compact` muestra Efeonce; `entity` agrega razón social,
+  identificador tributario y casa matriz; `full` agrega una lista compacta de países y privacidad. La lista se
+  presenta sin el rótulo `Operación en` y no implica entidades legales locales. La casa matriz no se presenta como
+  límite geográfico. Identidad legal/dirección vienen del operating entity y los países del SSOT de marca, nunca
+  hardcodeados en JSX.
 - `legalNoticePolicy: 'none' | 'security' | 'privacy' | 'regulated'`: sólo copy específico al propósito. Se
   prohíbe el disclaimer genérico de confidencialidad como footer universal.
 
-Baseline del programa: transaccionales usan `socialLinksPolicy='none'`; marketing/suscripción usan identidad
-`full`, controles de baja y pueden habilitar RRSS institucionales. Correos regulados resuelven identidad/nota desde
-su dominio y jurisdicción. La activación internacional requiere revisión con abogado habilitado; esta clasificación
-es dirección de producto, no una declaración de cumplimiento jurídico global.
+Baseline del programa: todo perfil gobernado usa identidad `entity` como mínimo; marketing/suscripción usan
+`full` y controles de baja. Transaccionales conservan `socialLinksPolicy='none'` y no reciben unsubscribe.
+Marketing exige las cuatro RRSS institucionales; suscripción puede habilitarlas. Correos regulados resuelven su
+nota desde el dominio y la jurisdicción. La activación internacional requiere revisión con abogado habilitado;
+esta clasificación es dirección de producto, no una declaración de cumplimiento jurídico global.
 
 ## Architecture Alignment
 
@@ -74,6 +77,13 @@ es dirección de producto, no una declaración de cumplimiento jurídico global.
 ## Child Tasks
 
 - `TASK-1764` — policy, dirección visual, inventario, decomposición de cohorts y gates anti-big-bang.
+
+`TASK-1764` ya incluye una lámina aprobada en `/admin/emails/footer-profiles/mockup`. Su vista, fixtures, SSOT de
+marca, assets PNG y contratos UI son el baseline visual/de contenido para la foundation y cada cohorte. Las child
+tasks implementan paridad y evidencia; no vuelven a inventar el footer. La lámina no habilita runtime ni cambia la
+secuencia: legacy por defecto, foundation byte-idéntica y cohorts de una familia con máximo cuatro `EmailType`.
+La auditoría final de la lámina cubrió los cinco perfiles en desktop/mobile, contraste, targets, foco, orden de
+headings, listas/tablas nativas y GVC sin errores; esa evidencia cierra el diseño del mockup, no la foundation.
 
 ## Planned Child Lanes
 
@@ -112,9 +122,17 @@ delivery como sustituto del rollback visual por `EmailType`.
 - [ ] Cada cohorte externa tiene previews 720/390 y sin imágenes, tests, aprobación, canary consentido y rollback.
 - [ ] Access/security, Hiring externo y regulated transactional no compartieron release de migración.
 - [ ] Ningún tipo transaccional incorporó unsubscribe o contenido promocional por herencia.
-- [ ] RRSS sólo aparecen con `socialLinksPolicy='institutional'` en suscripción/marketing y tienen nombre accesible,
-      fallback textual y destino oficial gobernado.
-- [ ] Razón social, país y dirección se resuelven desde el operating entity; ningún template hardcodea identidad legal.
+- [ ] RRSS sólo aparecen con `socialLinksPolicy='institutional'`; marketing incluye obligatoriamente YouTube,
+      Instagram, LinkedIn y Threads desde `EFEONCE_SOCIAL_LINKS`, con nombre accesible y fallback textual.
+- [ ] Todo footer gobernado muestra razón social, RUT y casa matriz resueltos desde el operating entity; la presencia
+      operativa adicional sólo aparece en `full`, viene del SSOT de marca y ningún template hardcodea identidad
+      legal o limita Efeonce a Chile.
+- [ ] Foundation y cohorts demuestran paridad con `/admin/emails/footer-profiles/mockup` en desktop y mobile,
+      incluidos jerarquía, espaciado, contraste, wordmark, identidad legal, RRSS elegibles y controles permitidos.
+- [ ] Cualquier desviación del mockup responde a una limitación medida de cliente de correo, accesibilidad o dato
+      runtime, queda documentada con before/after y recibe aprobación explícita.
+- [ ] Cada cohorte verifica Outlook Desktop Windows, Outlook Web, Gmail, un cliente WebKit e imágenes bloqueadas;
+      las RRSS mantienen nombre accesible y fallback textual.
 - [ ] Cada tipo declara `legalNoticePolicy`; no existe un disclaimer legal universal ni copy regulatorio inventado.
 - [ ] Los 30 tipos fueron aceptados individualmente antes de retirar el primitive legacy.
 - [ ] El runtime final conserva delivery ledger, suppression, reply-to, tracking y kill-switch canónicos sin duplicarlos.

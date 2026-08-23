@@ -257,6 +257,14 @@ code {
   animation: 260ms cubic-bezier(0.32, 0.72, 0, 1) both greenhouse-view-transition-fade-in;
 }
 
+/* Hiring: continuidad espacial entre una tarjeta del Kanban y Application 360.
+   El mismo elemento se expande al detalle y se contrae al volver. La clase evita
+   hardcodear selectores por applicationId; el helper canónico apaga todo en reduced motion. */
+::view-transition-group(.hiring-application) {
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
 /* ───────────────────────────────────────────────────────────────────────
    TASK-1102 — Nexa Answers multi-turno: compactación de turno.
    Cada turno (vivo / compactado en historial) lleva `view-transition-class: nexa-turn`

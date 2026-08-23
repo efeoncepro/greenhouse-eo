@@ -1190,6 +1190,10 @@ export const EVENT_TYPES = {
   // volumen o destinatario no verificable). Sin consumer reactivo en Slice 2.
   hiringAssessmentAssignmentRecorded: 'hiring.assessment.assignment_recorded',
   hiringAssessmentAutoAssignmentBlocked: 'hiring.assessment.auto_assignment_blocked',
+  // TASK-1771 — una fila en callejón del carril automático liberó su clave de idempotencia. Es
+  // AUDITORÍA, no disparador: no crea instancia, no manda correo y no tiene consumer reactivo.
+  // La fila superseded es la historia; este evento responde quién la liberó y con qué evidencia.
+  hiringAssessmentAssignmentSuperseded: 'hiring.assessment.assignment_superseded',
 
   // TASK-1719 Slice 2 — propose→confirm de la asignación manual. Payloads IDs-only
   // (proposalId/applicationId/policyId/policyVersion/effectDigest/outcome/reason codes),

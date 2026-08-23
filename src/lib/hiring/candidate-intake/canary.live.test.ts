@@ -252,7 +252,8 @@ describe.skipIf(!canaryEnabled)('CANARY TASK-1736 — identidad del intake contr
         engagementType: 'on_going',
         fulfillmentMode: 'internal_hire',
         demandOrigin: 'capacity_gap',
-        requestedRole: 'CANARY T1736 (sintética)'
+        requestedRole: 'CANARY T1736 (sintética)',
+        dataOrigin: 'real', // TASK-1739 — publica: publishOpening rechaza vacantes no reales
       },
       'user-live-test'
     )
@@ -260,7 +261,7 @@ describe.skipIf(!canaryEnabled)('CANARY TASK-1736 — identidad del intake contr
     state.demandId = demand.demandId
 
     const opening = await createHiringOpening(
-      { demandId: demand.demandId, internalTitle: 'CANARY T1736 interna' },
+      { demandId: demand.demandId, internalTitle: 'CANARY T1736 interna' , dataOrigin: 'real'},
       'user-live-test'
     )
 

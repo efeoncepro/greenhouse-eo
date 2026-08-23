@@ -6,7 +6,7 @@
 - **Scope:** `src/emails/**`, `src/lib/email/**`, `src/lib/copy/**`, sender/presentation metadata y previews
 - **Reversibility:** two-way-but-slow
 - **Confidence:** high en marca y separación semántica; medium en clasificación final de cada tipo
-- **Validated as of:** 2026-08-22
+- **Validated as of:** 2026-08-23
 - **Implementation umbrella:** `TASK-1764`
 - **Program epic:** `EPIC-042`
 
@@ -76,21 +76,40 @@ Fuentes regulatorias usadas para la dirección —orientación, no asesoría leg
   https://ico.org.uk/for-organisations/direct-marketing-and-privacy-and-electronic-communications/guidance-on-direct-marketing-using-electronic-mail/key-concepts-for-direct-marketing-using-electronic-mail/
 - Chile, Ley 19.496 artículo 28 B: la vía de suspensión se exige a comunicaciones promocionales o publicitarias:
   https://www.bcn.cl/leychile/navegar?idNorma=61438&idParte=8542485
+- México, Ley Federal de Protección al Consumidor artículo 17: la publicidad debe identificar al proveedor y
+  entregar datos de contacto; no convierte esa regla publicitaria en una obligación universal para mensajes
+  transaccionales:
+  https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPC.pdf
+- Colombia, Ley 1480 de 2011 artículo 50: el proveedor de comercio electrónico debe mantener accesibles su razón
+  social, NIT, dirección y contacto; la norma no ordena repetirlos dentro de cada correo transaccional:
+  https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=44306
+- Perú, Ley 28493 y su reglamento: gobiernan correo electrónico comercial no solicitado, no todo mensaje
+  operacional o de relación:
+  https://www.leyes.congreso.gob.pe/DetLeyNume_1p.aspx?xNorma=6&xNumero=28493&xTipoNorma=0
 
-La activación de marketing internacional requiere validación con abogado habilitado en cada jurisdicción.
+No existe, en estas fuentes, una regla única que obligue a incluir razón social, identificador tributario y domicilio
+en cada correo transaccional. Efeonce adopta esos tres datos en todos los footers gobernados como estándar
+institucional conservador; no se documenta como cumplimiento legal universal. La activación de marketing
+internacional requiere validación con abogado habilitado en cada jurisdicción.
 
 ### 5. RRSS, dirección e información legal son bloques gobernados
 
-- `socialLinksPolicy` nace `none`. Sólo `optional_subscription|commercial_marketing` pueden declarar
-  `institutional`; access/security, transactional, Hiring, regulated e internal operational las prohíben.
-- RRSS usan cuentas oficiales y activas desde un SSOT; los íconos son secundarios, monocromáticos, con nombre
-  accesible y fallback textual. No se agregan parámetros de tracking por inferencia.
-- `legalIdentityMode='compact'` muestra Efeonce; `entity` agrega razón social y país; `full` agrega dirección postal
-  válida y privacidad. Los datos provienen del operating entity canónico, nunca de literales JSX.
+- `socialLinksPolicy` nace `none`. `optional_subscription` puede declarar `institutional` y
+  `commercial_marketing` debe declararlo; access/security, transactional, Hiring, regulated e internal operational
+  las prohíben.
+- RRSS usan las cuatro cuentas oficiales desde `EFEONCE_SOCIAL_LINKS` —YouTube, Instagram, LinkedIn y Threads—. Los
+  íconos son secundarios, monocromáticos, con nombre accesible y fallback textual. No se agregan parámetros de
+  tracking por inferencia.
+- `legalIdentityMode='compact'` muestra Efeonce; `entity` agrega razón social, identificador tributario y casa
+  matriz; `full` agrega una lista compacta de países y privacidad. La lista se presenta como
+  `Chile · Estados Unidos · Colombia · México · Perú`, sin el rótulo `Operación en`; declara presencia de marca,
+  no entidades legales locales. La dirección de casa matriz no limita el alcance geográfico de Efeonce. Los datos
+  provienen del operating entity y el SSOT de marca, nunca de literales JSX.
 - `legalNoticePolicy` activa sólo notas específicas de seguridad, privacidad o dominio regulado. Se prohíbe un
   párrafo universal de confidencialidad que no corresponda al propósito real.
-- Marketing y suscripción adoptan `full` como baseline conservador del producto; transaccionales no heredan
-  dirección postal ni RRSS por esa decisión. Cada jurisdicción sigue requiriendo validación profesional.
+- Todo perfil gobernado adopta `entity` como mínimo institucional, incluidos transaccionales, seguridad e internos.
+  Marketing y suscripción adoptan `full`; sólo ellos pueden incorporar RRSS y controles de baja. Cada jurisdicción
+  sigue requiriendo validación profesional.
 
 ### 6. Migración incremental, legacy por defecto
 
@@ -103,17 +122,59 @@ La activación de marketing internacional requiere validación con abogado habil
 - Access/security, Hiring externo y regulated transactional nunca comparten release de migración.
 - El legacy sólo puede retirarse con aceptación 30/30.
 
+### 7. Paquete visual y de contenido aprobado como punto de partida
+
+La lámina interna `/admin/emails/footer-profiles/mockup` fija el contrato de partida aprobado para implementar
+los footers gobernados. No es una exploración ni una alternativa pendiente de escoger. Su paquete de referencia es:
+
+- composición y jerarquía: `src/views/greenhouse/admin/email-footer-profiles/mockup/EmailFooterProfilesMockupView.tsx`;
+- perfiles y copy de muestra: `src/views/greenhouse/admin/email-footer-profiles/mockup/data.ts`;
+- identidad, mercados y destinos sociales: `src/config/efeonce-brand.ts`;
+- assets email-safe: `public/branding/email/footer/*`, reproducibles con
+  `scripts/email/generate-footer-assets.mjs`;
+- anatomía, copy ledger, responsive y verificación:
+  `docs/ui/wireframes/TASK-1764-email-footer-policy-profiles.md`;
+- dirección visual y anti-patterns:
+  `docs/ui/visual-directions/TASK-1764-email-footer-policy-profiles.md`.
+
+La implementación conserva esa jerarquía, densidad, espaciado, contraste, wordmark, iconografía social sólida,
+identidad legal y comportamiento desktop/mobile. Los fixtures del mockup sirven para probar la presentación; no
+se importan como policy ni sustituyen el registro exhaustivo por `EmailType`, el copy canónico o el operating entity
+server-side. Los cinco ejemplos visuales agrupan propósitos afines para comparar la anatomía; la policy mantiene
+la clasificación semántica exhaustiva de esta ADR.
+
+| Perfil visual del mockup  | `purpose` de policy representado                      | Diferencia que la implementación conserva                                           |
+| ------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Operación interna         | `internal_operational`                                | Referencia operativa sólo cuando existe                                             |
+| Acceso y seguridad        | `access_security`                                     | Ayuda/nota de seguridad sólo según policy                                           |
+| Relación y servicio       | `transactional_service`, `relationship_transactional` | Contexto y reply/help dependen del tipo, no del perfil visual                       |
+| Operaciones reguladas     | `regulated_transactional`                             | Nota, referencia y controles dependen de la obligación aplicable                    |
+| Marketing y suscripciones | `optional_subscription`, `commercial_marketing`       | Baja requerida en ambos; RRSS opcionales en suscripción y obligatorias en marketing |
+
+Una child task puede desviarse sólo por una limitación medida de cliente de correo, accesibilidad o dato runtime.
+Debe documentar el motivo, mostrar before/after y obtener aprobación; no reabre el diseño por preferencia del agente.
+
+La auditoría del mockup fijó además el contrato accesible de partida: contexto e instrucciones en el equivalente a
+14 px; controles y metadata no menores a 13 px; pesos 400/600; footer sin headings; listas nativas para controles,
+RRSS e identidad legal; targets mínimos de 24 px para texto y 32 × 32 px para RRSS; foco visible, wrap natural y
+contraste mínimo 4.5:1. La implementación email-safe preserva la intención con tablas y estilos inline, sin copiar
+primitives MUI ni la tabla de gobierno de la lámina.
+
+La paridad de una cohorte no se prueba sólo en el mockup web. Como mínimo se verifica el HTML de correo en Outlook
+Desktop para Windows (motor Word), Outlook Web, Gmail y un cliente WebKit, además del estado con imágenes
+bloqueadas. Las RRSS conservan nombre accesible y fallback textual cuando el asset no carga.
+
 ## Perfiles base
 
-| Purpose | Unsubscribe | RRSS | Identidad legal | Nota |
-|---|---|---|---|---|
-| `access_security` | forbidden | none | compact | security cuando corresponda |
-| `transactional_service` | forbidden | none | compact | none o privacy por dominio |
-| `relationship_transactional` | forbidden | none | compact/entity | none o privacy por dominio |
-| `regulated_transactional` | forbidden | none | entity/full | regulated |
-| `internal_operational` | forbidden | none | compact | none |
-| `optional_subscription` | required | institutional opcional | full | privacy |
-| `commercial_marketing` | required | institutional opcional | full | privacy |
+| Purpose                      | Unsubscribe | RRSS                      | Identidad legal | Nota                        |
+| ---------------------------- | ----------- | ------------------------- | --------------- | --------------------------- |
+| `access_security`            | forbidden   | none                      | entity          | security cuando corresponda |
+| `transactional_service`      | forbidden   | none                      | entity          | none o privacy por dominio  |
+| `relationship_transactional` | forbidden   | none                      | entity          | none o privacy por dominio  |
+| `regulated_transactional`    | forbidden   | none                      | entity          | regulated                   |
+| `internal_operational`       | forbidden   | none                      | entity          | none                        |
+| `optional_subscription`      | required    | institutional opcional    | full            | privacy                     |
+| `commercial_marketing`       | required    | institutional obligatorio | full            | privacy                     |
 
 ## Alternatives Considered
 

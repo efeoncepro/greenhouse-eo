@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-011`
-- Status real: `Diseño — hueco verificado contra PostgreSQL real 2026-08-22; preventiva, sin backlog productivo que recuperar`
+- Status real: `in-progress 2026-08-23 — CODE COMPLETE, ROLLOUT PENDIENTE. Slices 1-4 en develop local sin push (617d18df7, 146242339, d5914c841, 0f558666a). Gate vivo verde en dos corridas seguidas con residuo cero verificado en dos ejes. Falta: push/release, la Production verification sequence, y la migracion del COMMENT parqueada en pending-migrations con condicion de release. NO mover a complete hasta que el rollout ocurra`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -56,6 +56,115 @@ señal**. Los Follow-ups de `TASK-1755` proponen una señal por antigüedad, no 
 la misma clave —como declara tu `Migration posture`— esa misma derivación cubre el carril manual contando
 por `attempt_seq`. Decláralo explícitamente para los dos carriles o declara por qué el manual queda fuera;
 no lo dejes implícito, que es como este hallazgo llegó hasta acá sin dueño.
+
+## Delta 2026-08-23 — dos premisas de esta spec ya eran falsas al empezar, y las cuatro Open Questions quedaron resueltas
+
+Recalibración hecha **antes** de escribir código, con medición contra la base compartida. Lo que
+sigue reemplaza lo que dicen las secciones de arriba donde se contradigan.
+
+### Premisa muerta 1 — el orden se invirtió: `TASK-1754` aterrizó primero
+
+La spec declara que esta task «va ANTES» del colapso de etapas. **Ya no.** `TASK-1754` está
+`complete` y su contract se aplicó: el `CHECK` de `stage` pasó de trece valores a seis. O sea que
+el carril automático corre hoy en producción sobre una etapa más ancha y **sin reversa**.
+
+Consecuencias concretas, para que nadie las re-derive:
+
+- La coordinación out-of-band con la sesión de `TASK-1754` **deja de ser bloqueante**: ya ocurrió.
+- La fila de la risk matrix «el colapso llega primero» pasó de riesgo a hecho consumado.
+- El `trigger_stage` del ledger es **otro enum** (`shortlisted|interview|manual`, su propio `CHECK`)
+  y el colapso no lo tocó.
+- La task **sigue siendo preventiva**: el colapso no generó callejones nuevos (ver premisa 2).
+
+### Premisa muerta 2 — las 4 filas ya no están «cerradas»
+
+La spec dice que las cuatro candidaturas en callejón están en `stage='closed'`. Medido el
+2026-08-23:
+
+| assignment | outcome_reason | stage | decision | archived_at | data_origin | policy |
+|---|---|---|---|---|---|---|
+| `hoaa-ca235cc0…` | `volume_cap` | `shortlisted` | `null` | 2026-08-19 | `smoke_test` | disabled |
+| `hoaa-eca09585…` | `volume_cap` | `shortlisted` | `null` | 2026-08-19 | `smoke_test` | disabled |
+| `hoaa-b75a80c9…` | `volume_cap` | `shortlisted` | `null` | 2026-08-19 | `smoke_test` | enabled |
+| `hoaa-dcd92523…` | `volume_cap` | `shortlisted` | `null` | 2026-08-19 | `smoke_test` | enabled |
+
+Causa: `TASK-1748` cambió el archivado para sellar `archived_at` en vez de escribir
+`stage='closed'` —archivar no declara desenlace— y eso las devolvió a su etapa previa.
+
+**La decisión no cambia: sin backfill**, siguen siendo humo. Pero la consecuencia de diseño sí es
+nueva y es load-bearing: hoy cumplen `stage = trigger_stage` con `decision IS NULL`, así que sin
+filtro de procedencia la métrica del Slice 1 **nacería en 2** y su steady = 0 sería inalcanzable el
+primer día. Una señal que nace amarilla nadie la vuelve a mirar. Por eso el reader excluye
+`data_origin <> 'real'` y `archived_at IS NOT NULL`, y **reporta el conteo excluido** para que la
+exclusión no sea un cap silencioso.
+
+Hallazgo colateral, fuera de scope y con ficha propia: `awaiting_terminal` vale **13** y **diez son
+de humo archivadas**. La señal vive en `warning` por datos de smoke. → **`ISSUE-162`**.
+
+### Las cuatro Open Questions, resueltas
+
+**1. ¿Quién dispara el supersede?** → **Command humano explícito** sobre una fila concreta, con
+`hiring.assessment.policy.govern` (que ya existe y ya está granteada, así que el guard de
+capability-grant-coverage no pide grant nuevo). Rechazados los otros dos: convertir el GET de
+reconciliación en ejecutor le cambia la naturaleza que su propio comentario declara, y hacerlo
+desde `assign` significa un supersede con `actorUserId: null` —el consumer reactivo del
+`ops-worker` corre así— con la cohorte entera como blast radius.
+
+**Quién ejecuta el intento siguiente: NADIE automáticamente.** El supersede devuelve la fila a
+`resolveApplicationsAwaitingAssignment` y el intento nuevo sale del camino gobernado de siempre
+(propose → confirm humano, o el próximo stage event). Queda declarado, que es lo que la spec pedía
+que no quedara implícito.
+
+**2. ¿Qué evidencia justifica superseder?** → `resolveAssignmentIntent` reusado vía el wrapper
+`resolveLiveAssignmentIntent`, bajo el `FOR UPDATE` de la policy, en el mismo instante y
+transacción del write. **La condición de avance es «hoy resolvería `assigned`», NO «difiere de lo
+registrado».** La lectura intuitiva es la segunda y está mal; la evidencia lo demuestra ejercitando
+el resolver real contra PostgreSQL sobre las cuatro filas:
+
+```
+hoaa-ca235cc0…  policy disabled  volume_cap → hoy blocked:policy_disabled   recuperable=false
+hoaa-eca09585…  policy disabled  volume_cap → hoy blocked:policy_disabled   recuperable=false
+hoaa-b75a80c9…  policy enabled   volume_cap → hoy assigned                  recuperable=true
+hoaa-dcd92523…  policy enabled   volume_cap → hoy assigned                  recuperable=true
+```
+
+Las dos primeras **difieren de lo registrado y siguen bloqueadas**: con el criterio laxo el command
+las habría liberado para volver a quemar la clave con otra razón — el bucle con otro nombre.
+
+**2b. `volume_cap` y su ventana móvil** → sin caso especial en el command: evaluar bajo el lock en
+el instante del write **es** el tratamiento. La cola del endpoint muestra una foto y lo declara; el
+write vuelve a mirar.
+
+**3. ¿Cómo se evita el bucle?** → `DEAD_END_RECOVERY_CAP = 3`, derivado del ledger contando filas
+superseded de la misma clave **con outcome recuperable** (las `cancelled` no cuentan: ésas las
+escribe el otro mecanismo, y sumarlas gastaría el tope con actos que no son recuperaciones). Sin
+columna nueva. Al agotarse, la clave exige intervención humana — espíritu `dead_letter`.
+
+`recoverable` y `blockedBy` se reportan **separados a propósito**: «la causa se corrigió **y** la
+autoridad se acabó» es un estado real (`recoverable: true, blockedBy: 'cap'`), y colapsarlos diría
+«la causa sigue aplicando», que mandaría a alguien a arreglar algo que ya está bien.
+
+**4. ¿Señal propia o métrica?** → Métrica dentro de `hiring.assessment.assignment_health`, que es
+el patrón del dominio y evita partir el espejo del invariante 19. Tres poblaciones distintas:
+`recoverable` alarma (`warning`), `cap_reached` es `error`, y `honest` **no alarma** — avisar de
+algo que nadie puede arreglar todavía entrena a ignorar el tablero. Más
+`dead_ends_evaluation_truncated`, porque el bound de la evaluación no puede ser un cap silencioso.
+
+### El carril manual queda fuera, con razón declarada
+
+Lo pedía el `## Delta 2026-08-22`. La derivación del tope vive en un helper reusable, pero **el
+comportamiento del carril manual no cambia en esta task**: (i) `attempt-retry.test.ts:531-543`
+afirma `[1,2]` como contrato de una task cerrada y en producción, y mutarlo desde otra task es
+cambiar un contrato ajeno sin su dueño; (ii) cada ciclo manual exige propose + confirm humanos, o
+sea ya está limitado por una persona, no por un bucle; (iii) el daño es acotado — no crea instancia
+ni manda correo. Queda como Follow-up con la derivación ya escrita.
+
+### Full API Parity — diferido explícitamente
+
+El command nace en el primitive (`src/lib/hiring/assessment/assignment-policy/**`) y la ruta es su
+consumer, así que la paridad existe por construcción y el loop `propose → confirm → execute` es
+apto para Nexa/MCP sin trabajo adicional. El carril `api/platform/app/*` **se difiere**, y se
+declara acá en vez de omitirse: omitirlo es lo que costó `TASK-1773`.
 
 ## Why This Task Exists
 
@@ -553,28 +662,80 @@ opera sobre candidatos reales desde el primer minuto.
 
 ## Acceptance Criteria
 
-- [ ] Una clave quemada del carril automático es visible desde el momento en que se quema: aparece en
+- [x] Una clave quemada del carril automático es visible desde el momento en que se quema: aparece en
       la cola de reconciliación y mueve la severidad de la señal.
-- [ ] La señal distingue «callejón honesto» (la causa sigue aplicando) de «callejón recuperable» (la
+- [x] La señal distingue «callejón honesto» (la causa sigue aplicando) de «callejón recuperable» (la
       causa ya no aplicaría hoy), y sólo la segunda alarma. Steady declarado = 0.
-- [ ] La evidencia que justifica superseder se resuelve contra el estado vigente **reusando**
+- [x] La evidencia que justifica superseder se resuelve contra el estado vigente **reusando**
       `resolveAssignmentIntent`, sin duplicar ninguna de sus condiciones.
-- [ ] El supersede estampa `superseded_at` y deja `outcome` y `outcome_reason` intactos, con test que
+- [x] El supersede estampa `superseded_at` y deja `outcome` y `outcome_reason` intactos, con test que
       lo afirma.
-- [ ] Existe un tope por clave y una condición de avance; ambos shippean en el mismo slice que el
+- [x] Existe un tope por clave y una condición de avance; ambos shippean en el mismo slice que el
       command, y hay un test que demuestra que el bucle supersede → blocked → supersede se detiene.
-- [ ] Superseder **no** manda correo ni crea instancia por sí mismo, y la task declara explícitamente
+- [x] Superseder **no** manda correo ni crea instancia por sí mismo, y la task declara explícitamente
       quién ejecuta el intento nuevo después.
-- [ ] El carril automático sigue sin poder escribir `attempt_seq > 1`: el `CHECK` y las dos guardas
+- [x] El carril automático sigue sin poder escribir `attempt_seq > 1`: el `CHECK` y las dos guardas
       de `assign.ts` quedan intactos.
-- [ ] Un resultado `assigned` vigente sigue sin poder superseder-se por esta vía.
-- [ ] El cap de volumen no libera presupuesto por un supersede: test de no-regresión sobre
+- [x] Un resultado `assigned` vigente sigue sin poder superseder-se por esta vía.
+- [x] El cap de volumen no libera presupuesto por un supersede: test de no-regresión sobre
       `countAssignedInWindow`.
-- [ ] El ciclo completo quedó ejercitado contra PostgreSQL real con teardown a residuo cero.
-- [ ] La decisión sobre las 4 filas `blocked` existentes quedó ejecutada y escrita (la evidencia de
+- [x] El ciclo completo quedó ejercitado contra PostgreSQL real con teardown a residuo cero.
+- [x] La decisión sobre las 4 filas `blocked` existentes quedó ejecutada y escrita (la evidencia de
       2026-08-22 dice **sin backfill**).
-- [ ] La suite de `TASK-1755` (`attempt-retry.test.ts` y su gate vivo) sigue verde: el carril manual
+- [x] La suite de `TASK-1755` (`attempt-retry.test.ts` y su gate vivo) sigue verde: el carril manual
       no cambia de comportamiento.
+
+
+## Delta de cierre 2026-08-23 — code complete, rollout pendiente
+
+Los cuatro slices están implementados y verificados en local. **El estado correcto NO es `complete`**: nada
+de esto corre todavía en producción, así que mover el lifecycle sería declarar operable algo que ningún
+operador puede usar.
+
+### Lo que quedó hecho
+
+| Slice | Commit | Qué |
+|---|---|---|
+| 1 | `617d18df7` | Reader de callejones + tercera cola en reconciliación + métrica en la señal |
+| 2 | `146242339` | `resolveLiveAssignmentIntent` + evaluación dry-run + tope derivado |
+| 3 | `d5914c841` | Command de supersede + ruta POST + evento de auditoría |
+| 4 | `0f558666a` | Gate vivo contra PostgreSQL real |
+
+Además: `ISSUE-162` (`9d1db5252`) y la recalibración de esta spec (`12868f9c7`).
+
+### Evidencia
+
+- Gate vivo: **dos corridas seguidas, ambas exit 0**, con `awaiting_terminal` = 13 antes de la primera y
+  después de la segunda, cero eventos `hiring.assessment.*` sobrevivientes y cero fixtures residuales.
+- Métricas nuevas en su steady: `assignment_dead_ends = 0`, `recoverable = 0`, `honest = 0`,
+  `cap_reached = 0`, `excluded_synthetic = 2`, `truncated = false`.
+- `pnpm lint` exit 0 · `pnpm typecheck` exit 0 · `src/lib/hiring` + `src/lib/reliability` **1.812 verdes**.
+  Todos leídos capturando el exit code directo, sin pipe de por medio.
+- Las 4 filas `blocked` siguen siendo 4, siguen siendo `smoke_test` y la cola las excluye. **Sin backfill**,
+  como declaraba la evidencia del 2026-08-22.
+
+### Lo que falta para `complete`
+
+1. Push + release. Nada de esto está desplegado.
+2. La `## Production verification sequence` completa, que sólo se puede ejecutar contra el runtime desplegado.
+3. La migración del `COMMENT` de `superseded_at`, parqueada en
+   `docs/tasks/pending-migrations/TASK-1771-superseded-at-comment.sql.pending` con su condición: **el release
+   que despliega el command ya ocurrió**, verificado contra `origin/main`. Antes de eso el comentario
+   describiría una capacidad que el runtime desplegado no tiene.
+4. `pnpm test` completo + `pnpm build` de producción como gate de cierre (el build consume ~30 GB y requiere
+   autorización del operador).
+
+### Advertencia para el próximo gate vivo de este dominio
+
+El gate de esta task **asignó de verdad** en una versión intermedia y dejó un `hiring.assessment.assigned` en
+estado `pending` —el evento del que cuelga el correo al candidato— apuntando a una instancia que el teardown ya
+había borrado. **El publisher del outbox corre cada 2 minutos sobre la base compartida por dev, staging y
+producción.** Se retiró a mano con verify-then-delete (confirmar `event_id`, estado `pending` e instancia
+inexistente, y sólo entonces borrar).
+
+La causa raíz no fue el teardown: el encabezado del test **afirmaba** que el gate nunca llegaba a `assigned`, y
+esa afirmación era cierta cuando se escribió y dejó de serlo cuando el escenario cambió. **Un comentario no es
+una guarda.** Quedó enforced: la policy se apaga antes del reintento y el test asserta cero instancias.
 
 ## Verification
 

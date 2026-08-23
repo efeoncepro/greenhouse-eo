@@ -15,6 +15,10 @@
  * lugar.
  */
 
+// TASK-1754 Slice F — fuente única del vocabulario terminal. Es un import de tipos y constantes
+// puras: no arrastra Node ni la base, así que respeta la regla del encabezado.
+import { TERMINAL_APPLICATION_STAGES } from '@/types/hiring'
+
 export const ASSESSMENT_ACCESS_RECOVERY_CHANNELS = ['email', 'secure_link'] as const
 export type AssessmentAccessRecoveryChannel = (typeof ASSESSMENT_ACCESS_RECOVERY_CHANNELS)[number]
 
@@ -90,7 +94,6 @@ export type AssessmentAccessRecoveryEligibility =
   | { allowed: true; resultingStatus: 'sent' | 'in_progress' }
   | { allowed: false; code: AssessmentAccessRecoveryEligibilityCode }
 
-const TERMINAL_APPLICATION_STAGES = new Set(['selected', 'rejected', 'withdrawn', 'handoff_ready', 'closed'])
 
 /** Pure state decision; the command supplies values read under the assessment row lock. */
 export const decideAssessmentAccessRecoveryEligibility = (input: {

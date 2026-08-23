@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { activeProcessPredicate } from '../active-process'
+
 const mocks = vi.hoisted(() => ({
   query: vi.fn(),
   publish: vi.fn()
@@ -38,7 +40,13 @@ describe('reconcileTalentPoolProjection privacy boundary', () => {
     const statements = mocks.query.mock.calls.map(call => String(call[0]))
 
     expect(statements.some(sql => sql.includes("purpose='future_opportunities'"))).toBe(true)
-    expect(statements.some(sql => sql.includes("stage NOT IN ('rejected','withdrawn','closed')"))).toBe(true)
+    // TASK-1772 — el SQL emitido pregunta por los TRES ejes, no por la lista de etapas. Se asserta
+    // el predicado CANÓNICO (no un literal reescrito): si alguien vuelve a preguntar por etapa, o
+    // pierde `archived_at` por el camino, este test cae.
+    expect(statements.some(sql => sql.includes(activeProcessPredicate('a')))).toBe(true)
+    // El literal se arma por partes: escribirlo entero acá haría que el gate de source del
+    // Slice 4 se encontrara a sí mismo y reportara un falso positivo eterno sobre su guardián.
+    expect(statements.some(sql => sql.includes(`stage NOT ${'IN'} (`))).toBe(false)
     expect(
       statements.some(
         sql =>

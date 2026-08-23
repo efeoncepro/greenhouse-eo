@@ -1,5 +1,3 @@
--- ⚠️  NO ESTÁ EN `migrations/` A PROPÓSITO. Ver README.md de esta carpeta.
---
 -- TASK-1765 — re-angostar el CHECK de `decision` a los SEIS desenlaces definitivos.
 --
 -- CONDICIÓN DE EJECUCIÓN (dura): `origin/main` ya NO ofrece `on_hold`, o sea el release que sube los

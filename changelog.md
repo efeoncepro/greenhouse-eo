@@ -3,6 +3,105 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-23 — Application 360 vuelve al pipeline de la vacante que corresponde
+
+- La pestaña `Pipeline` ahora funciona como retorno contextual desde cualquier postulación: deriva la vacante desde `application.openingId`, en vez de caer en la vacante más reciente.
+- La URL conserva el scope de vacante y, al regresar, el Kanban enfoca la tarjeta de origen sin aplicar filtros que oculten a otros postulantes.
+- La tarjeta y el hero comparten una View Transition breve; reduced motion conserva el mismo destino y foco sin animación. La validación local pasó en 1440 y 390 px, sin errores de consola, página, hidratación ni red.
+
+## 2026-08-23 — Cinco personas reales eran buscables en el Banco de Talento por una postulación que alguien había retirado
+
+- «Postulación en proceso activo» pasó a tener **una sola definición** en toda la plataforma, y son **tres
+  ejes, no uno**: el proceso no terminó (`decision`) **y** el registro no fue retirado de la vista
+  (`archived_at`). Antes, once lugares distintos respondían esa pregunta mirando la **etapa**, cada uno con su
+  propia lista escrita a mano.
+- Preguntar por etapa fallaba por una razón concreta: **archivar devuelve la postulación a su etapa anterior**.
+  Una postulación archivada volvía a verse «en Preseleccionado», así que seguía contando como viva. Medido: **5
+  personas reales** figuraban como «en proceso activo» en el Banco de Talento —y por lo tanto buscables e
+  invitables— únicamente por una postulación que alguien había archivado a propósito. Pasan a
+  `needs_reconsent`.
+- La señal de salud de la asignación de pruebas dejó de vivir en amarillo por datos de humo (`ISSUE-162`):
+  contaba **13** postulaciones esperando, de las cuales **10 eran de prueba, archivadas**. Ahora cuenta **3**,
+  que son las reales, y **reporta aparte** las 10 que excluyó — un filtro que no dice cuánto dejó fuera es
+  indistinguible de un tope silencioso.
+- Si ves un conteo de activas más bajo que ayer, es esto y no se perdió ningún dato: las postulaciones
+  archivadas siguen completas, sólo dejaron de contarse como procesos vivos. Cuántas son se lee en
+  `/admin/operations`.
+- Un gate de CI rechaza que alguien vuelva a escribir la lista a mano, y una señal de confiabilidad detecta en
+  runtime lo que el gate no alcanza a ver.
+
+## 2026-08-23 — Los footers aprobados dejaron de depender de la imaginación del siguiente agente
+
+- El mockup aprobado ahora es el punto de partida obligatorio para implementar footers: conserva jerarquía,
+  espaciado, contraste, wordmark Efeonce, identidad legal, iconos sociales y reglas responsive.
+- Los cinco perfiles visuales no borran la semántica: representan siete propósitos, y suscripción opcional no se
+  confunde con marketing aunque compartan anatomía.
+- La skill de email ya no infiere baja desde `broadcast`: unsubscribe y RRSS dependen de propósito y consentimiento.
+- La revisión final endureció tipografía, jerarquía semántica, listas, tabla de policy, targets, foco y contraste en
+  los cinco perfiles; los diez estados desktop/mobile quedaron sin overflow y GVC no registró errores runtime.
+- Cada cohorte deberá probar Outlook Desktop Windows, Outlook Web, Gmail, un cliente WebKit e imágenes bloqueadas.
+  El mockup sigue siendo diseño aprobado, no evidencia de envío, deploy o runtime.
+
+## 2026-08-23 — Cuando el sistema intentaba mandar la prueba solo y se trababa, esa persona quedaba en un limbo que nadie veía
+
+- Si la prueba la asignaba una persona y se bloqueaba, corregir la causa y volver a proponer alcanzaba. Si la
+  iba a mandar el sistema solo, el intento quedaba registrado **reservando el lugar de esa persona en esa
+  vacante** — a propósito, para que un error de configuración no le mande tres veces la misma prueba a alguien.
+  Pero ese lugar reservado no tenía forma de liberarse, y mientras siguiera ahí la postulación **desaparecía de
+  las listas de recuperación**: no porque estuviera resuelta, sino porque el sistema ya había anotado que lo
+  intentó.
+- Lo grave no era que fuera irreversible: era que **las tres superficies que debían delatarlo callaban a la
+  vez**. La cola la excluía, la señal del panel era su espejo exacto, y la métrica que sí la contaba no movía
+  la alarma y además caducaba a las 24 horas. A las 24 h el caso salía hasta de la evidencia mientras la
+  persona seguía trabada.
+- Ahora esas postulaciones aparecen en una lista propia y quien gobierna la prueba de la vacante puede liberar
+  el lugar. Con dos condiciones que la plataforma verifica sola: **sólo se libera si hoy la prueba SÍ se
+  mandaría** —liberar con la causa viva vuelve a bloquear en el acto y gasta uno de los tres intentos de
+  recuperación de esa persona— y **tres recuperaciones por persona y vacante**, tras las cuales el caso pide
+  revisión humana.
+- Liberar **no manda ningún correo**, no borra el motivo del bloqueo y no devuelve cupo al tope de envíos de la
+  vacante: ese tope cuenta correos que ya salieron, y liberar no des-envía nada.
+- El panel distingue dos cosas que no son lo mismo: la que ya se puede destrabar **alarma**, y la que sigue
+  bloqueada por una causa vigente **no** — avisar de algo que nadie puede arreglar todavía es la forma más
+  rápida de que el equipo deje de mirar el tablero.
+- **Todavía no está en producción.** El código está completo y verificado contra la base real; falta el
+  release. Y de paso quedó abierto `ISSUE-162`: la señal de salud vive en amarillo por diez postulaciones de
+  prueba archivadas, no por un defecto real.
+
+## 2026-08-23 — Las trece etapas del pipeline quedaron en seis, y las que sobran ya no son etapas
+
+- El recorrido de una postulación se describía con trece etapas, y cinco de ellas no decían _dónde está_ la
+  persona sino _cómo terminó_: «seleccionado», «rechazado», «retirado». Dos preguntas distintas contestadas
+  con el mismo campo. Ahora el recorrido tiene seis etapas y el desenlace vive en su propio eje.
+- Otras dos, «calificado» y «revisión de cliente», se habían absorbido en «Evaluación» pero seguían existiendo
+  por debajo: era el origen del bug que dejó quince vacantes con su política de pruebas bien configurada y
+  ninguna disparando.
+- El contract que retira los siete literales de la base **está escrito y revisado, y todavía no aplicado**:
+  espera autorización. Hasta entonces el candado de seis vive en la aplicación y la base sigue aceptando trece.
+- Un detalle que parecía poda y era corrección: el mapa de «etapas posteriores al gatillo» listaba «revisión de
+  cliente» como posterior a «Evaluación», cuando el colapso la había metido **dentro**. Mandaba a revisión
+  humana postulaciones que la reconciliación automática sí sabe recuperar.
+- Y una deuda que se declara en vez de esconderse: el monitor de equidad medía su cubo terminal en una etapa
+  que dejó de existir. En vez de devolver cero —que en una métrica de equidad se lee como «no hay impacto
+  adverso»— ahora falla ruidoso, y no se prende hasta que se le apunte al eje correcto.
+
+## 2026-08-23 — El dominio de Hiring reparado llegó a producción, y el reloj de retención con él
+
+- Las cuatro correcciones del día estaban `code complete, rollout pendiente`: el eje de desenlace, el colapso de
+  trece etapas a seis, el filtro de procedencia del Banco de Talento y el callejón del ledger de asignación de
+  pruebas. Ninguna servía de nada mientras producción siguiera corriendo el código anterior. Ahora corren.
+- Viajó dentro el fix de una regresión con implicación legal: el reloj de retención de la Ley 21.719 no
+  arrancaba para `not_selected`, la población más grande del pipeline. No estaba viva porque producción todavía
+  no podía escribir ese desenlace — **se habría vuelto viva en el mismo instante en que este release lo
+  habilitó**. Por eso no podía quedar para el siguiente.
+- Quedan tres migraciones escritas y revisadas que **no** viajaron: viven fuera de `migrations/` a propósito,
+  porque una migración committeada y sin aplicar bloquea a cualquiera que corra `migrate:up`, incluido quien
+  esté reparando un incidente. Corren después del release, en cadena, y cada una espera que el código del
+  eslabón anterior esté desplegado.
+- La lección que ordena esa cadena, y que ya costó un incidente: **«cero filas» no es «nadie lo escribe»**. Lo
+  que decide si un valor es alcanzable es el contrato de la superficie desplegada, nunca el contenido de la
+  tabla.
+
 ## 2026-08-22 — Mover a «Evaluación» ya no guarda una etapa distinta de la que muestra
 
 - El tablero mostraba seis columnas sobre trece etapas del dominio, y tres de ellas se veían todas como
@@ -375,7 +474,7 @@
   sobre una vacante desechable propia, que se despublica sola.
 - **Expediente de evaluación (TASK-1735): el arreglo del truncado quedó probado con el caso real.** La nota
   posterior al fix persistió sus 8240 caracteres completos —termina en punto— contra los 8000 exactos de la
-  mutilada, y la vieja quedó enlazada como *versión superada*, no como vigente. El límite en base ya es 20000.
+  mutilada, y la vieja quedó enlazada como _versión superada_, no como vigente. El límite en base ya es 20000.
 - **Una señal que iba a mentir para siempre.** `evidence_coverage_gap` contaba TODAS las postulaciones, pero
   la evidencia sólo la escribe el intake público: cada postulación cargada a mano desde el desk (6 en 30 días)
   la habría dejado en `warning` de forma permanente, sobre la señal que justamente gatea este rollout.
@@ -547,10 +646,10 @@
 - Hiring: intake de identidad — normalización culturalmente segura del nombre (evidencia raw
   inmutable + display corregible + searchKey), reconciliación CAS del sticky name y corrección
   humana capability-gated. Flag OFF.
-> inicio ni usar una entrada histórica como contrato vigente sin contrastarla.
->
-> Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
-> `pnpm docs:context-rotate --apply`.
+  > inicio ni usar una entrada histórica como contrato vigente sin contrastarla.
+  >
+  > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
+  > `pnpm docs:context-rotate --apply`.
 
 ## 2026-08-16 — Pipeline Hiring contenido en un plano operacional
 
@@ -843,137 +942,3 @@ oportunidad medida (lo que el sitio ya recibe y no sigue), el desempate usa la b
 canónica en vez del KD que colapsa en es-LATAM, y repetir el mismo intent en un mes nuevo vuelve a
 descubrir (antes quedaba congelado para siempre). Todo corregido el mismo día, antes de que el
 workbench (TASK-1665) congelara el contrato.
-
-## 2026-08-14 — Las keywords descubiertas ahora saben llegar a los motores de IA (TASK-1666)
-
-El mismo día que el discovery quedó operativo, se cerró el puente que faltaba hacia el otro
-internet de búsqueda: un operador selecciona hasta 20 candidatos de una corrida y pide un
-**borrador de grounded queries** para el grader AEO. La regla central es semántica: una keyword
-de Google no es una pregunta a ChatGPT — el sistema la usa como **tema de investigación** (dato
-delimitado, inmune a prompt injection) y redacta preguntas naturales con la identidad de marca ya
-autorizada del perfil. La prueba real lo mostró: de "recubrimiento epóxico" salió "qué tipos de
-recubrimientos existen para madera", no una copia; y ninguna pregunta de descubrimiento nombra la
-marca (la medición a ciegas sigue siendo a ciegas).
-
-La honestidad quedó cableada, no prometida: el modo `grounded_llm` sólo existe cuando la autoría
-usó de verdad el contexto (cerebro versionado aparte; el authoring sin contexto quedó byte a byte
-idéntico y probado); sin autoría disponible el borrador sale del baseline **y lo dice** con un
-aviso obligatorio. La trazabilidad viaja como referencias opacas (corrida, candidatos y hash
-verificable del contexto exacto) — jamás la keyword en logs. Y el puente sólo crea borradores:
-aprobar y activar sigue siendo el flujo AEO con revisión humana, sin atajos.
-
-Verificado contra el mundo real: 16/16 checks contra PG incluyendo una autoría LLM real de 15
-preguntas evaluadas a mano, idempotencia que devuelve el mismo borrador sin segundo gasto, y el
-active previo intacto. Con esto TASK-1665 (el workbench visual) quedó sin bloqueos.
-
-## 2026-08-14 — Descubrir keywords deja de ser un viaje a otra herramienta (TASK-1664)
-
-El módulo SEO contestaba qué empujar de lo que ya aparece en Search Console; no contestaba cómo
-pasar de una hipótesis a un conjunto priorizado de términos. Hoy existe el primitive completo de
-**keyword discovery**: una corrida recibe hasta 10 seeds (manuales, de las consultas GSC, del set
-monitoreado o del dominio propio), las expande con DataForSEO Labs, deduplica y deja **candidatos**
-con procedencia trazable — y con volumen, intención y barrera de enlaces compuestos desde el store
-de mercado de TASK-1661, porque el `keyword_info` que viene inline y pagado en cada respuesta se
-persiste ahí mediante un writer canónico nuevo (`persistKeywordMarketData`) en vez de tirarse.
-`keyword_overview` quedó como top-up sólo del faltante: en el smoke real, el enriquecimiento costó
-**cero llamadas** porque el inline ya había dejado todo fresco.
-
-Las tres fronteras que la spec exigía quedaron en el código, no en la disciplina: el **costo se ve
-antes de gastar** (preview con fórmula, gate de entitlement y fence cada 10 llamadas); **descubrir
-no es seguir** (ninguna pieza escribe el set monitoreado; las decisiones son un log append-only y
-la promoción usa el command de tracking existente); y **repetir la pregunta no paga dos veces**
-(idempotencia por intent completo — el smoke lo midió: segunda corrida USD 0). Paridad completa en
-el mismo cambio: route admin, lane ecosystem (write sólo bindings internos), tools MCP con preview
-y confirmación humana obligatoria, y dos señales de confiabilidad nuevas.
-
-Verificado contra el mundo real, no contra mocks: sanity de 27 checks contra PG y una corrida live
-de Berel MX que costó **USD 0.0132** (estimado conservador 0.0612) y dejó 10 candidatos. Queda
-apagado por diseño: flag OFF en ambos runtimes y scheduler pausado hasta el sign-off de rollout.
-
-## 2026-08-13 — Berel se mide donde vive su mercado, y el país deja de elegirse en silencio
-
-Una pregunta del operador sobre un dato dudoso destapó dos problemas reales, y los dos quedaron
-resueltos el mismo día.
-
-**El primero era de datos.** El seguimiento SEO de Berel llevaba un año midiendo Chile — y Berel es
-una marca mexicana. Su propio nombre tiene 1.650 veces más búsquedas en México que en Chile, y nada
-en el dashboard lo delataba porque la serie se veía poblada y sana. La corrección respetó la regla
-de oro del histórico: no se reescribió nada. Se creó un target nuevo para México, el de Chile quedó
-pausado con su serie íntegra, y las 31 keywords se re-trackearon por el command canónico. La
-verificación con capturas reales contó el final de la historia: **Berel es #1 en México en sus
-términos de marca** — la marca siempre fue real; el país era el equivocado.
-
-**El segundo era de arquitectura, y era más profundo.** El módulo asumía que una organización tiene
-UN mercado, y esa suposición vivía escondida en un `LIMIT 1` copiado en cuatro lugares: con dos
-países activos, cada pantalla servía el más nuevo sin error, sin señal y sin decir cuál. Efeonce
-misma —que opera en Chile, México, Colombia y Perú— es el caso que ese código no sabía describir.
-Ahora la resolución vive en un solo lugar y dice la verdad: un mercado resuelve solo, varios exigen
-elegir (con la lista de opciones en la respuesta), y toda lectura declara qué país está sirviendo.
-Las posiciones de países distintos jamás se promedian: son experimentos distintos.
-
-## 2026-08-13 — El módulo SEO deja de leer "volumen: sin dato", y un smoke real destapa una fuga de costo
-
-Durante meses la tabla de oportunidades mostraba las columnas de volumen y dificultad vacías, y eso
-se leía como "falta integrar DataForSEO". Era falso: la cañería estaba desde hace tiempo; lo que
-faltaba eran las columnas donde guardar el agua. Ahora existen, y `market` deja de estar cableado a
-"no disponible".
-
-La decisión de fondo no fue traer el dato sino **dónde vive**. El volumen de una keyword es un hecho
-de la keyword, el país y la fecha — no de si nosotros la seguimos ni de quién la descubrió: "pintura
-industrial" tiene el mismo volumen en Chile para todos los clientes de la cartera. Por eso la tabla
-no cuelga de un target ni del set monitoreado, y nace **multi-productor**: la captura de hoy la llena
-desde un endpoint, y el descubrimiento de keywords y el análisis de competencia que vienen después
-escribirán en la MISMA tabla el dato que ya viene incluido y pagado en sus propias respuestas.
-Guardarlo dos veces habría garantizado que dos pantallas mostraran cifras distintas para lo mismo
-dentro del mismo mes.
-
-La captura corre **una vez al mes**, porque el proveedor refresca una vez al mes: un cron diario
-pagaría treinta veces por el mismo número. Y nace con dos frenos independientes —el cron pausado y
-el flag apagado— porque a diferencia del resto del módulo, esta corrida le paga al proveedor por cada
-fila.
-
-**Lo que enseñó correrlo de verdad.** El smoke con dinero real (USD 0.05 en total) destapó un defecto
-que ningún test con mocks podía ver: una keyword que el proveedor **no tiene** no escribía fila, y
-como el chequeo previo mira filas, esas keywords nunca quedaban "ya consultadas" y se volvían a
-comprar en cada corrida, para siempre. El modelo correcto son tres estados y no dos —nunca
-preguntamos, preguntamos y no hay, demanda cero real— y con eso la segunda corrida pasó a costar
-exactamente cero. Quedó también una observación honesta sin resolver: el proveedor devuelve
-dificultad 0 para cabeceras de alto volumen, y esa columna no se le muestra a un cliente hasta
-contrastarla con otra fuente.
-
-## 2026-08-13 — La credencial de partner entra al deck sin duplicar la contraportada
-
-El badge de HubSpot Solutions Partner apuntaba a una carpeta fuera del catálogo, y eso rompía la
-regla que mantiene los decks reproducibles: un catálogo tiene que renderizar igual en cualquier
-máquina, y una referencia que se sale funciona en el repo del autor y falla en el worker. El badge se
-mudó adentro del catálogo y ahora se pide por una clave cerrada, el mismo trato que los logos de
-cliente: una acreditación que no se tiene no se puede presentar por accidente.
-
-No hizo falta una contraportada nueva. La misma lámina ya sirve las dos versiones —con y sin
-credencial— porque el motor borra el elemento cuando el plan no lo declara; una segunda plantilla
-casi idéntica solo habría garantizado que las dos se separaran con el tiempo.
-
-Los aprendizajes quedaron escritos donde se van a leer: el runbook del gate visual explica por qué
-declarar un slot nuevo siempre mueve la imagen de referencia de esa lámina, y cómo distinguir un
-drift propio de un baseline viejo; el estándar premium de UI incorpora que un scorecard es una foto
-con fecha (uno vencido bloqueó cuatro días un trabajo ya terminado) y que ningún gate lee lo que la
-pantalla dice; y la skill de captura registra que una superficie gateada por organización exige la
-persona de esa organización, con la consulta que la encuentra.
-
-## 2026-08-12 — El portal SEO del cliente quedó cerrado, y su propio scorecard estaba equivocado
-
-`TASK-1310` cierra la cara cliente del módulo SEO: dashboard `/growth/seo` con Resumen, Evolución y
-Quadrant 360, más el informe `/growth/seo/report` en web e imprimible sobre el mismo modelo de
-artefacto que el AEO. Con ella el módulo tiene sus dos caras —las cuatro pestañas del operador y el
-portal del cliente— y la pata visible del criterio de paridad queda cubierta.
-
-El cierre empezó desmintiendo su propia evidencia: el scorecard vigente bloqueaba la task con 2.29
-sobre capturas tomadas nueve horas antes del commit que ejecutó la ronda premium, así que describía
-una interfaz que ya no existía. Medida de nuevo contra el código real —tres superficies, escritorio y
-móvil, con sesión de un cliente de verdad atravesando el gate por organización— las tres cierran sin
-un solo hallazgo de calidad y los cuatro gates de UI quedan en verde.
-
-En el camino aparecieron dos defectos que ningún gate podía ver porque ninguno es un error técnico:
-el informe anunciaba "Aún no hay una posición media para leer" con la posición impresa al lado, y el
-botón global de "volver arriba" no tenía nombre accesible en ninguna ruta del portal. Los dos
-salieron mirando las capturas, no leyendo los reportes.

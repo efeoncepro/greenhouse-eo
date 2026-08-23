@@ -43,7 +43,9 @@ const clientFor = (input: { stage?: string; decision?: string | null; consent?: 
 
 describe('TASK-1746 legacy raw-token eligibility', () => {
   it.each([
-    { label: 'terminal stage', input: { stage: 'rejected' } },
+    // TASK-1754 Slice F — `rejected` dejo de ser una etapa: el contract del enum la retiro y hoy es
+    // un DESENLACE. La unica etapa terminal es `closed`, que es lo que esta rama debe denegar.
+    { label: 'terminal stage', input: { stage: 'closed' } },
     { label: 'decision', input: { decision: 'rejected' } },
     { label: 'withdrawn consent', input: { consent: 'withdrawn' } },
   ])('denies $label after locking canonical lineage', async ({ input }) => {

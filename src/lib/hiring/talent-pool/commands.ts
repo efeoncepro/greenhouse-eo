@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto'
 
 import type { PoolClient } from 'pg'
 
+import { activeProcessPredicate } from '@/lib/hiring/active-process'
 import { HiringNotFoundError, HiringValidationError } from '@/lib/hiring/errors'
 import { createHiringApplication } from '@/lib/hiring/store'
 import { withGreenhousePostgresTransaction } from '@/lib/postgres/client'
@@ -268,8 +269,8 @@ export const withdrawTalentPoolConsent = async (input: {
 
     const activeApplication = await client.query<{ active: boolean }>(
       `SELECT EXISTS (
-        SELECT 1 FROM greenhouse_hiring.hiring_application
-        WHERE candidate_facet_id=$1 AND stage NOT IN ('rejected','withdrawn','closed')
+        SELECT 1 FROM greenhouse_hiring.hiring_application app
+        WHERE app.candidate_facet_id=$1 AND ${activeProcessPredicate('app')}
       ) AS active`,
       [membership.candidate_facet_id]
     )

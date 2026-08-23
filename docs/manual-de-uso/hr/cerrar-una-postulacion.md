@@ -69,8 +69,10 @@ correo nunca (por diseño), y **Sin selección** todavía no tiene su tipo de co
 alguien que nadie rechazó.
 
 **Necesito archivar registros de prueba.** Archivar no es cerrar, y no toca el desenlace de nadie —
-son ejes independientes a propósito. Pero **hoy no hay forma de archivar desde el portal**: la base ya
-tiene el campo, y falta el botón y el comando que lo escriban (`TASK-1748`). Hasta entonces, no cierres
+son ejes independientes a propósito. Pero **hoy no hay forma de archivar desde el portal**: el comando ya
+existe y falta el botón (`TASK-1748`). Si tienes acceso a consola, el procedimiento gobernado está en
+[Operar la procedencia de datos de Hiring](operar-procedencia-de-datos-hiring.md); si no, pídeselo a
+plataforma. En ningún caso cierres
 un registro de prueba con un desenlace inventado para «sacarlo de en medio»: ensucia el embudo de
 equidad y las métricas de la vacante. Déjalo donde está y pídele a plataforma que lo archive.
 

@@ -164,6 +164,7 @@ describe.skipIf(!hasPgConfig || !canCleanUp)('assessment cancel — live PG (TAS
         fulfillmentMode: 'internal_hire',
         demandOrigin: 'capacity_gap',
         requestedRole: 'LIVE-TEST AM (cancel)',
+        dataOrigin: 'smoke_test', // TASK-1739 — fixture
       },
       'user-live-test',
     )
@@ -171,7 +172,7 @@ describe.skipIf(!hasPgConfig || !canCleanUp)('assessment cancel — live PG (TAS
     created.demandId = demand.demandId
 
     const opening = await createHiringOpening(
-      { demandId: demand.demandId, internalTitle: 'LIVE-TEST opening (cancel)' },
+      { demandId: demand.demandId, internalTitle: 'LIVE-TEST opening (cancel)' , dataOrigin: 'smoke_test'},
       'user-live-test',
     )
 

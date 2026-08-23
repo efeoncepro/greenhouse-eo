@@ -2,13 +2,12 @@
 
 import type { ReactNode } from 'react'
 
-import NextLink from 'next/link'
-
 import Box from '@mui/material/Box'
 import ButtonBase from '@mui/material/ButtonBase'
 import Stack from '@mui/material/Stack'
 import { alpha } from '@mui/material/styles'
 
+import ViewTransitionLink from '@/components/greenhouse/motion/ViewTransitionLink'
 import {
   GreenhouseBreadcrumbs,
   SurfaceRecipe,
@@ -16,6 +15,8 @@ import {
 } from '@/components/greenhouse/primitives'
 
 import type { HiringDeskCopy } from '@/lib/copy'
+
+import { buildHiringPipelineHref } from './hiring-navigation'
 
 export type HiringDeskSurface = 'demand' | 'pipeline' | 'publication' | 'talentPool' | 'application'
 
@@ -28,6 +29,11 @@ interface HiringDeskFrameProps {
   action?: ReactNode
   secondaryActions?: ReactNode
   meta?: ReactNode
+  applicationContext?: {
+    applicationId: string
+    openingId: string
+    openingTitle: string
+  }
 }
 
 const NAV_ITEMS = [
@@ -37,7 +43,7 @@ const NAV_ITEMS = [
   { key: 'talentPool', href: '/agency/hiring/talent-pool', icon: 'tabler-user-search' }
 ] as const
 
-const HiringDeskFrame = ({ surface, copy, primary, lead, aside, action, secondaryActions, meta }: HiringDeskFrameProps) => {
+const HiringDeskFrame = ({ surface, copy, primary, lead, aside, action, secondaryActions, meta, applicationContext }: HiringDeskFrameProps) => {
   const isApplication = surface === 'application'
   const activeSurface = (isApplication ? 'pipeline' : surface) as keyof typeof copy.navigation
 
@@ -62,14 +68,25 @@ const HiringDeskFrame = ({ surface, copy, primary, lead, aside, action, secondar
     >
       {NAV_ITEMS.map(item => {
         const active = item.key === surface || (isApplication && item.key === 'pipeline')
+        const isApplicationParent = isApplication && item.key === 'pipeline' && applicationContext
+
+        const href = isApplicationParent
+          ? buildHiringPipelineHref(applicationContext.openingId, applicationContext.applicationId)
+          : item.href
+
+        const ariaLabel = isApplicationParent
+          ? copy.common.returnToOpeningPipeline.replace('{opening}', applicationContext.openingTitle)
+          : undefined
 
         return (
           <ButtonBase
             key={item.key}
-            component={NextLink}
-            href={item.href}
-            aria-current={active ? 'page' : undefined}
+            component={ViewTransitionLink}
+            href={href}
+            aria-label={ariaLabel}
+            aria-current={active ? (isApplicationParent ? 'location' : 'page') : undefined}
             data-tab={item.key}
+            data-parent-return={isApplicationParent ? 'true' : undefined}
             sx={theme => ({
               display: 'inline-flex',
               alignItems: 'center',
@@ -85,13 +102,21 @@ const HiringDeskFrame = ({ surface, copy, primary, lead, aside, action, secondar
                 duration: theme.transitions.duration.shorter,
               }),
               '&:hover': {
-                backgroundColor: active ? alpha(theme.palette.primary.main, 0.08) : theme.palette.action.hover,
+                backgroundColor: isApplicationParent
+                  ? alpha(theme.palette.primary.main, 0.14)
+                  : active
+                    ? alpha(theme.palette.primary.main, 0.08)
+                    : theme.palette.action.hover,
                 color: active ? theme.palette.primary.dark : theme.palette.text.primary,
               },
+              '&:active': isApplicationParent ? { transform: 'translateY(1px)' } : undefined,
               '&:focus-visible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 },
               '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
             })}
           >
+            {isApplicationParent ? (
+              <Box component='i' aria-hidden='true' className='tabler-arrow-left' sx={{ fontSize: 18, me: 0.75 }} />
+            ) : null}
             {copy.navigation[item.key]}
           </ButtonBase>
         )
@@ -150,6 +175,13 @@ const HiringDeskFrame = ({ surface, copy, primary, lead, aside, action, secondar
         '@keyframes ghHiringMoved': {
           from: { boxShadow: '0 0 0 2px var(--mui-palette-primary-main)', transform: 'translateY(-5px)' },
           to: { boxShadow: 'none', transform: 'none' }
+        },
+        '@keyframes ghHiringReturnFocus': {
+          from: {
+            outline: '2px solid color-mix(in srgb, var(--mui-palette-primary-main) 72%, transparent)',
+            outlineOffset: '2px'
+          },
+          to: { outline: '2px solid transparent', outlineOffset: '2px' }
         },
         '@keyframes ghHiringDrawer': {
           from: { transform: 'translateX(100%)' },

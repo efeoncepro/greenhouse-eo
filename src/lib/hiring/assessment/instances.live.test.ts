@@ -68,14 +68,15 @@ describe.skipIf(!hasPgConfig)('assessment instances — live PG (TASK-1360)', ()
         fulfillmentMode: 'internal_hire',
         demandOrigin: 'capacity_gap',
         requestedRole: 'LIVE-TEST AM (assessment)',
-      },
+              dataOrigin: 'smoke_test', // TASK-1739 — fixture
+},
       'user-live-test',
     )
 
     created.demandId = demand.demandId
 
     const opening = await createHiringOpening(
-      { demandId: demand.demandId, internalTitle: 'LIVE-TEST opening' },
+      { demandId: demand.demandId, internalTitle: 'LIVE-TEST opening' , dataOrigin: 'smoke_test'},
       'user-live-test',
     )
 

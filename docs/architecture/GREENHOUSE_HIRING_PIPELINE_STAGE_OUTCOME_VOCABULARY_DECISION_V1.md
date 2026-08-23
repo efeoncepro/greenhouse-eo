@@ -1,6 +1,6 @@
 # GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1 — El pipeline es el recorrido de la persona: etapa y desenlace son dos ejes, y cerrar obliga a declarar cómo
 
-- **Status**: Accepted (2026-08-22) — **§4, §4.1 y §6 implementados parcialmente el 2026-08-22 por [`TASK-1765`](../tasks/in-progress/TASK-1765-hiring-application-outcome-axis.md); §5 escrito y pendiente de aplicar.** Ver §16.
+- **Status**: Accepted (2026-08-22) — **§4, §4.1 y §6 implementados parcialmente el 2026-08-22 por [`TASK-1765`](../tasks/in-progress/TASK-1765-hiring-application-outcome-axis.md). El §3 lo cierra [`TASK-1754`](../tasks/in-progress/TASK-1754-hiring-stage-vocabulary-collapse.md): EXPAND aplicado el 2026-08-22, CONTRACT escrito y revisado el 2026-08-23 y **pendiente de aplicar** — el `CHECK` de la base sigue admitiendo trece valores. De §5, `archived_at` quedó aplicado; el `CHECK` del invariante está escrito y parqueado. El contract del enum de desenlaces va DESPUÉS del release.** Ver §16, §17 y §18.
 - **Date**: 2026-08-22
 - **Deciders**: operador (CEO) — decisión de producto sobre el vocabulario y sus etiquetas · agente de diseño (skills `state-design`, `info-architecture`, `greenhouse-ux-writing`, `greenhouse-talent-people-operator`)
 - **Tags**: hiring, ats, pipeline, vocabulary, kanban, privacy, retención, fairness, talent-pool, full-api-parity
@@ -13,10 +13,13 @@
 
 ## 1. Decisión (resumen ejecutivo)
 
-El pipeline de Hiring modela **dos ejes ortogonales**, no uno:
+El pipeline de Hiring modela **tres ejes ortogonales**, no uno:
 
 - **Etapa (`stage`)** — *dónde va la persona en el recorrido*. Seis valores, uno por columna del kanban. `closed` es el sexto y significa **el recorrido terminó**; es escribible, porque una columna terminal que no puede recibir una tarjeta no es un kanban.
 - **Desenlace** — *cómo terminó ese recorrido*. Seis valores, más una **causa gobernada** obligatoria en uno de ellos.
+- **Archivado (`archived_at`)** — *si el registro se muestra*. Eje de **visibilidad del registro**, no de estado del proceso: **archivar NO declara desenlace** y NUNCA escribe `stage`. Confundirlos produjo las 32 filas `closed` sin decisión que ensuciaron el diagnóstico. Su único escritor hoy es `archiveSyntheticRecords` (CLI, sin superficie de portal).
+
+Corolario: **«proceso activo» se responde con los tres ejes** (`decision IS NULL AND archived_at IS NULL`), nunca infiriéndolo desde `stage`. Dueño: `TASK-1772`.
 
 El invariante que los une, y que se implementa como `CHECK` en la base:
 
@@ -272,6 +275,18 @@ El orden no es preferencia: cada paso destruye el discriminante que el siguiente
 3. **Expand antes que contract, y la política antes que la etapa.** Si un literal desaparece del enum mientras una policy lo nombra, esa policy queda inerte sin avisar.
 4. **El contract es irreversible** y no se ejecuta hasta verificar el expand en producción.
 
+### 14.1 Cómo se verifica la precondición del paso 4 (y por qué contar filas no sirve)
+
+El paso 4 exige verificar el expand en producción antes del contract. **Esa verificación se hace sobre el CÓDIGO DESPLEGADO, no sobre la tabla.** «Cero filas» sólo dice que nadie escribió el literal *todavía*; no dice que la superficie desplegada no pueda escribirlo mañana. Es el mismo razonamiento del §16, acá bajado a método ejecutable.
+
+El método, tal como se aplicó al contract del eje de etapa el 2026-08-23 (§18):
+
+1. **Enumerar los escritores de la columna sobre `origin/main`** —el release efectivamente desplegado, con su SHA anotado en la migración—, nunca sobre el working tree ni sobre `develop`.
+2. **Comprobar que cada escritor está acotado por tipo**, no por convención: un `assertEnum` / `assertOptionalEnum` contra el subconjunto escribible, o un mapa total desde otro enum.
+3. **La unión de lo escribible por esos escritores es la cota superior de lo alcanzable.** Si esa unión cabe dentro del vocabulario nuevo, el contract es seguro. Si un solo escritor acepta `string` libre, no lo es: la cota se vuelve infinita y el paso 3 falla, sin importar cuántas filas haya.
+
+Trampa del método, que hay que nombrar porque es la que se comete: **un `grep` laxo confunde filtro con escritura.** Un `stage = $n` dentro del `WHERE` de un reader de lista es un filtro y no autoriza nada. Contarlo como escritor invalida el barrido hacia el falso positivo; omitir un escritor real lo invalida hacia el daño. Cada hit se clasifica, no se cuenta.
+
 ---
 
 ## 15. Preguntas abiertas
@@ -337,10 +352,183 @@ Complementa el §16, que cubrió el eje de desenlace. Acá entra el eje de etapa
 
 ### Pendiente, con condición de ejecución declarada
 
-**El contract del enum de etapas** —retirar `qualified`, `client_review`, `handoff_ready` y las cuatro proyecciones de desenlace del `CHECK`— **no está escrito todavía**, por el §16: se aplica después del release que retira el escritor. Hoy `origin/main` sigue escribiendo `qualified` al arrastrar a «Evaluación» (la mitigación `4e1566d9a` no está en producción), y los cuatro espejos terminales necesitan además que el eje de desenlace esté verificado en producción (§14 paso 2).
+**El contract del enum de etapas** —retirar `qualified`, `client_review`, `handoff_ready` y las cuatro proyecciones de desenlace del `CHECK`— quedó **escrito y revisado el 2026-08-23**, y sigue **pendiente de aplicar**. Su precondición, su método de verificación y su estado honesto están en el **§18**.
 
 ### Dos hallazgos del expand que la auditoría no tenía
 
 1. **Migrar por SQL no deja las filas mudas del todo.** No emite `stage_changed` —eso lo produce el command, no la base— así que ni correo ni prueba automática. Pero `resolveApplicationsAwaitingAssignment` deriva del **estado vigente**, no del evento, así que las filas migradas **sí aparecen en la cola de reconciliación de su vacante**. Esa cola es read-only (su único consumidor no-test es un `GET`), de modo que nada se asigna solo: queda operable para que una persona decida. Es el resultado correcto y conviene decirlo, porque la spec afirmaba que quedaban «igual de mudas».
 
 2. **La retención de recuperación de acceso ramifica por literales que este eje retira.** El trigger `refresh_assessment_access_recovery_retention_for_application` decide `retention_class` y `retention_expires_at` con `NEW.stage = 'selected'` **y** `NEW.decision = 'selected'`, y con `NEW.stage IN ('rejected','withdrawn')` **o** `NEW.decision IN (…)`. Las ramas por `stage` mueren con el contract; las que sobreviven por `decision` **no cubren `backup_selected`, `not_selected` ni `unresponsive`** — los tres desenlaces que el §4 introdujo. Su rama `ELSE` deja `retention_expires_at` en `NULL`, o sea **sin vencimiento**, y `not_selected` es la población más grande del §4. Hoy no muerde porque la tabla está vacía. Es trabajo del eje de desenlace (`TASK-1765`), no de éste.
+
+---
+
+## 18. Delta de implementación — 2026-08-23 (`TASK-1754` Slice F, el CONTRACT del eje de etapa)
+
+Cierra la mitad que el §17 dejó abierta. `HIRING_APPLICATION_STAGES` (`src/types/hiring.ts`) pasa de **trece a seis** valores: `sourced`, `screening`, `shortlisted`, `interview`, `decision_pending`, `closed`.
+
+Los siete literales que salen lo hacen **por dos razones distintas, y conviene no mezclarlas**:
+
+| Sale | Razón | Desde |
+|---|---|---|
+| `qualified`, `client_review` | **Absorbidos** por `shortlisted` | Slice B (§17), ya en producción |
+| `selected`, `backup`, `rejected`, `withdrawn`, `handoff_ready` | **Espejos terminales.** Dejaron de ser etapas cuando el §16 creó el eje de desenlace: todo recorrido terminado escribe `stage='closed'` y su desenlace vive en la columna `decision` | §16 (`TASK-1765`) |
+
+### Cómo se autorizó a angostar el `CHECK` (aplicación del §14.1)
+
+La precondición **no** salió de contar filas. Salió del **contrato de la superficie desplegada**: en `origin/main`, release `304371f73` —ya en producción—, hay **exactamente tres** escritores de `hiring_application.stage`, y los tres están acotados por tipo.
+
+| Escritor | Cota |
+|---|---|
+| `src/lib/hiring/store.ts:1249` (INSERT) | `assertOptionalEnum(input.stage, HIRING_PIPELINE_STAGES) ?? 'sourced'` |
+| `src/lib/hiring/store.ts:1340` (UPDATE) | `assertEnum(stage, HIRING_PIPELINE_STAGES)` + rechazo explícito de `closed` |
+| `src/lib/hiring/decide.ts:299` (UPDATE) | `DECISION_STAGE[decision]`, mapa total de los seis desenlaces a `'closed'` |
+
+La unión de lo escribible son exactamente los seis que quedan. Dato para el próximo barrido: `store.ts:666` también tiene `stage = $n`, pero es un **filtro** de lista, no una escritura — el falso positivo típico del grep laxo que el §14.1 advierte.
+
+La propia migración lleva su guarda de datos (aborta con `RAISE EXCEPTION` si alguna fila quedó en una etapa retirada) y su bloque anti pre-up-marker que verifica el `CHECK` **resultante**, no la intención.
+
+### Aplicado en código
+
+| Qué entró | Dónde |
+|---|---|
+| El enum de etapas en seis valores | `src/types/hiring.ts` |
+| `TERMINAL_APPLICATION_STAGES` nace como **fuente única** (`ReadonlySet<string>` = `{'closed'}`). Había **tres copias verbatim** del mismo `Set`, cada una con cinco literales de los que cuatro acaban de volverse irrepresentables; tres copias sin fuente compartida son tres oportunidades de que la próxima corrección alcance sólo a dos | `src/types/hiring.ts`, importada por `assessment/instances.ts`, `assessment/public-session/store.ts` y `assessment/access-recovery/vocabulary.ts` |
+| `STAGES_DOWNSTREAM_OF_TRIGGER` **reescrito, no podado**, y tipado con `HiringApplicationStage` para que el próximo literal muerto no compile | `src/lib/hiring/assessment/assignment-policy/readers.ts` |
+
+**Reescrito y no podado, y ésa es la parte que importa:** el mapa declaraba `client_review` como aguas **abajo** de `shortlisted`, y el colapso la absorbió **dentro**. Podar el literal habría dejado la relación al revés y seguido mandando a la cola humana postulaciones que la reconciliación automática sí puede recuperar. Queda `shortlisted → [interview, decision_pending]` e `interview → [decision_pending]`. Lección transferible: cuando un colapso fusiona dos literales, cualquier mapa de **relaciones entre etapas** se revisa entero — podar el nombre no arregla una relación que cambió de sentido.
+
+### Deuda declarada: el cubo terminal del monitor de equidad
+
+`FAIRNESS_REPORTABLE_STAGES` (`src/lib/hiring/assessment/fairness/contracts.ts`) **conserva** `qualified`, `client_review` y `selected`. No es descuido, y no cabía en este slice por dos razones:
+
+- `getSelectionFairness` usa `input.stage ?? 'selected'` como **default**, así que retirarlo rompería toda llamada sin etapa explícita.
+- Re-apuntar el cubo terminal al eje de desenlace cambia **QUÉ mide** el monitor — la tasa de selección final es justo el cociente que vigila el four-fifths rule. Eso no es una decisión que corresponda tomar dentro de un contract de vocabulario (§11).
+
+**Mitigación aplicada:** el reader **falla ruidoso** (`hiring_fairness_stage_retired`, 422, `actionable: false`) en vez de devolver cero. Un cero silencioso en una métrica de equidad se lee como «no hay impacto adverso» — exactamente la conclusión contraria a la verdad.
+
+**Condición de retiro:** `TASK-1365` re-apunta el cubo terminal al eje de desenlace **antes** de que `HIRING_FAIRNESS_MONITOR_ENABLED` se prenda en producción. Hoy el flag está OFF y los tres literales tienen cero filas desde el colapso, así que el hueco no está vivo.
+
+### Aviso vigente
+
+`TASK-1718` acepta `stage` como **string libre, sin `assertEnum`**, en su lane programático. Un filtro por un literal retirado no falla ahí: **devuelve cero en silencio**.
+
+### Estado honesto al 2026-08-23
+
+| Pieza | Estado |
+|---|---|
+| Enum TS en seis valores + los tres consumers apuntados a la fuente única + mapa de aguas abajo reescrito | **aplicado** — `typecheck` y `eslint` limpios, 1.236 tests del dominio verdes |
+| `docs/tasks/pending-migrations/TASK-1754-stage-vocabulary-contract.sql.pending` | **escrita y revisada, NO aplicada.** Espera autorización del operador: el `CHECK` de la base **sigue admitiendo trece valores** |
+
+Mientras esa migración no corra, el estado correcto de la task es `code complete, rollout pendiente` — no `complete`.
+
+
+---
+
+## 19. Delta de implementación — 2026-08-23 (`TASK-1772`, el TERCER eje)
+
+### Lo que este ADR separó, y lo que no alcanzó a separar
+
+§3 y §4 partieron en dos un eje que estaba colapsado: **dónde va la persona** (`stage`) y **cómo
+terminó** (`decision`). Lo que no quedó declarado —porque `archived_at` nació en el Slice 1 de
+`TASK-1765`, el mismo día que este ADR se escribía— es que hay un **tercer eje ortogonal**:
+
+> **Eje 3 — Visibilidad: ¿el registro se muestra?** Lo responde `hiring_application.archived_at`.
+
+Es ortogonal a los otros dos **por contrato de este mismo ADR**: §12 prohíbe expresamente que
+archivar declare desenlace. Y ortogonal a la etapa por construcción: el backfill de `TASK-1748`
+devuelve la fila a su etapa previa y sella `archived_at`, en vez de escribir `stage='closed'`.
+
+### «Proceso activo» es la conjunción de dos ejes, y nunca fue el de etapa
+
+```sql
+decision IS NULL          -- el recorrido no ha terminado
+AND archived_at IS NULL   -- y el registro no fue retirado de la vista
+```
+
+`stage` **no participa**. Con el `CHECK` `hiring_application_closed_outcome_check` aplicado,
+`stage <> 'closed'` ⟺ `decision IS NULL`: nombrarlo sería repetir la primera condición. Y sin el
+`CHECK`, lo único que agregaría es la combinación que este predicado no quiere contar. En los dos
+mundos, `stage` es ruido.
+
+**Los cuatro cuadrantes:**
+
+| `decision` | `archived_at` | ¿activo? | caso real |
+|---|---|---|---|
+| `NULL` | `NULL` | **sí** | la persona está en el pipeline |
+| `NULL` | fecha | **no** | registro retirado de la vista sin declarar desenlace |
+| valor | `NULL` | no | el recorrido terminó |
+| valor | fecha | no | terminó y además se archivó |
+
+El **segundo** cuadrante es el que ningún consumidor cubría, y el que motivó la task.
+
+### La predicción de `TASK-1765` se cumplió, y su conclusión no
+
+`TASK-1765` midió los dos candidatos el 2026-08-22 y dejó la deuda condicionada: *«después del
+backfill y del `CHECK`, cuando los dos predicados se vuelven equivalentes y el cambio pasa a ser
+puramente de claridad»*. La primera mitad era cierta; la segunda no. Readback 2026-08-23:
+
+| Predicado | 2026-08-22 | 2026-08-23 (post backfill + `CHECK`) |
+|---|---|---|
+| `stage NOT IN ('rejected','withdrawn','closed')` | 50 | **82** |
+| `decision IS NULL` | 82 | **82** |
+| `decision IS NULL AND archived_at IS NULL` | — | **50** |
+
+Convergieron, exactamente como se predijo. Pero convergieron **al valor equivocado**: los dos
+contaban como «en proceso» 32 postulaciones que alguien archivó a propósito. Migrar del eje de etapa
+al de desenlace no habría sido un cambio de claridad — habría sido adoptar el mismo defecto en los
+ocho callsites a la vez.
+
+**Lección transferible:** cuando una task deja una deuda con la condición «cuando A y B converjan,
+el cambio es cosmético», la condición se verifica midiendo, no razonando. Dos predicados pueden
+converger y estar los dos mal.
+
+### Daño concreto, medido
+
+`talent-pool/projection.ts` deriva `lifecycle_status='active_process'` de este predicado, y
+`active_process` entra a la **proyección buscable** del Banco de Talento. Medición previa a la
+migración: **5 membresías de personas reales** eran `active_process` únicamente por una postulación
+archivada. Eran buscables e invitables por un registro retirado de la vista. Post-migración pasan a
+`needs_reconsent` (54 → 49).
+
+### Aplicado en código
+
+| Pieza | Ubicación |
+|---|---|
+| Predicado canónico `activeProcessPredicate` / `isActiveProcess`, con los dos ejes exportados por separado (`decidedOutcomePredicate`, `notArchivedPredicate`) para composición | `src/lib/hiring/active-process.ts` |
+| Los 8 callsites por lista literal de etapas | `desk.ts`, `talent-pool/projection.ts` (5), `talent-pool/commands.ts`, `DemandDeskView.tsx` |
+| La segunda familia (`decision IS NULL` sin `archived_at`) | `assessment/assignment-policy/readers.ts` (2), `reliability/queries/hiring-assessment-assignment-signals.ts` |
+| `archived_at` expuesto al VM para que la vista pueda preguntar por los tres ejes | `store.ts`, `types/hiring.ts` |
+| Señal `hiring.data_quality.active_process_predicate_drift`, steady 0 | `reliability/queries/hiring-active-process-drift.ts` |
+| Gate de source `pnpm hiring:active-process-gate` | `scripts/ci/hiring-active-process-gate.mjs` |
+
+### Sitios clasificados y declarados FUERA, con el predicado leído entero
+
+Un `grep` es un inventario, no una prueba. Estos tres usan `decision IS NULL` y **no** son el
+defecto:
+
+- **`documents/retention.ts`** — ese `NOT EXISTS` no es un reloj de retención (el reloj es
+  `closed_at`, que sale de `decision_at`): es un **guard que PROTEGE de la purga**. Agregarle
+  `archived_at IS NULL` invertiría su sentido — una postulación archivada por error pasaría de
+  bloquear el borrado a autorizarlo. Queda fuera por **asimetría de daño**: conservar documentos de
+  más es reversible, borrarlos no.
+- **`store.ts:1341`** — guard de concurrencia de un `UPDATE` (compare-and-set sobre el eje de
+  desenlace), no una lectura de «proceso activo». Cambiarlo alteraría el comportamiento de archivado.
+- **`reliability/queries/hiring-application-outcome-signals.ts`** — mide la bicondicional del cierre
+  (`stage='closed'` ⟺ desenlace). Su pregunta es otra.
+
+### Corrección al «Estado honesto al 2026-08-23» de §18
+
+Ese cuadro declara la migración `TASK-1754-stage-vocabulary-contract.sql.pending` como **no
+aplicada** y el `CHECK` de la base **«admitiendo trece valores»**. **Ya no es cierto.** Readback
+contra PostgreSQL real del 2026-08-23:
+
+```
+hiring_application_stage_check
+  CHECK (stage = ANY (ARRAY['sourced','screening','shortlisted','interview','decision_pending','closed']))
+hiring_application_closed_outcome_check
+  CHECK ((stage = 'closed') = (decision IS NOT NULL))
+```
+
+Seis valores, y el invariante de cierre enforceado. Las tres migraciones parqueadas corrieron.
+Queda escrito acá porque un cuadro de estado que caducó es indistinguible de uno vigente para quien
+lo lee después.

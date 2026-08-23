@@ -223,6 +223,7 @@ import { getWorkforceHiringActivationStuckSignal } from './queries/workforce-hir
 import { getHiringAssessmentAiRunSignals } from './queries/hiring-assessment-ai-run-signals'
 // TASK-1736 Slice 4 — Candidate identity intake signals (moduleKey 'hiring').
 import { getHiringDataOriginDerivationDriftSignal } from './queries/hiring-data-origin-drift'
+import { getHiringActiveProcessPredicateDriftSignal } from './queries/hiring-active-process-drift'
 import { getHiringApplicationOutcomeDriftSignal } from './queries/hiring-application-outcome-signals'
 import { getHiringCandidateIdentitySignals } from './queries/hiring-candidate-identity-signals'
 import { getKnowledgeQuarantineCountSignal } from './queries/knowledge-quarantine-count'
@@ -733,6 +734,7 @@ interface ReliabilityOverviewSources {
   hiringCandidateIdentity?: ReliabilitySignal[] | null
   hiringDataOriginDrift?: ReliabilitySignal | null
   hiringApplicationOutcomeDrift?: ReliabilitySignal | null
+  hiringActiveProcessPredicateDrift?: ReliabilitySignal | null
   workforceHiringActivationStuck?: ReliabilitySignal | null
   knowledgeSyncFailedSource?: ReliabilitySignal | null
   knowledgeNotionIngestDeadLetter?: ReliabilitySignal | null
@@ -1234,6 +1236,7 @@ export const buildReliabilityOverview = (
     ...(sources.hiringCandidateIdentity ?? []),
     ...(sources.hiringDataOriginDrift ? [sources.hiringDataOriginDrift] : []),
     ...(sources.hiringApplicationOutcomeDrift ? [sources.hiringApplicationOutcomeDrift] : []),
+    ...(sources.hiringActiveProcessPredicateDrift ? [sources.hiringActiveProcessPredicateDrift] : []),
     ...(sources.workforceHiringActivationStuck ? [sources.workforceHiringActivationStuck] : []),
     ...(sources.knowledgeSyncFailedSource ? [sources.knowledgeSyncFailedSource] : []),
     ...(sources.knowledgeNotionIngestDeadLetter ? [sources.knowledgeNotionIngestDeadLetter] : []),
@@ -1955,6 +1958,14 @@ export const getReliabilityOverview = async (
     preloadedSources.hiringApplicationOutcomeDrift !== undefined
       ? preloadedSources.hiringApplicationOutcomeDrift
       : await getHiringApplicationOutcomeDriftSignal().catch(() => null)
+
+  // TASK-1772 — divergencia entre el predicado canónico de «proceso activo» (tres ejes) y el de
+  // etapa que usaban los ocho callsites. El gate de source atrapa la reintroducción en CI; esta
+  // señal la atrapa en runtime, que es donde el gate no llega.
+  const hiringActiveProcessPredicateDrift =
+    preloadedSources.hiringActiveProcessPredicateDrift !== undefined
+      ? preloadedSources.hiringActiveProcessPredicateDrift
+      : await getHiringActiveProcessPredicateDriftSignal().catch(() => null)
 
   const knowledgeSyncFailedSource =
     preloadedSources.knowledgeSyncFailedSource !== undefined
@@ -2801,6 +2812,7 @@ export const getReliabilityOverview = async (
     hiringCandidateIdentity,
     hiringDataOriginDrift,
     hiringApplicationOutcomeDrift,
+    hiringActiveProcessPredicateDrift,
     workforceHiringActivationStuck,
     knowledgeSyncFailedSource,
     knowledgeNotionIngestDeadLetter,

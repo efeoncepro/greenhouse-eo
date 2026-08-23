@@ -1,24 +1,28 @@
 # Desenlace de una Postulación — Cómo Termina el Proceso de una Persona
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-22 por Claude (TASK-1765)
-> **Ultima actualizacion:** 2026-08-22 por Claude (TASK-1765)
+> **Ultima actualizacion:** 2026-08-23 por Claude (TASK-1772)
 > **Documentacion tecnica:** [ADR del vocabulario](../../architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md) · [Arquitectura Hiring/ATS](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md)
 
-## Dos preguntas distintas, dos respuestas distintas
+## Tres preguntas distintas, tres respuestas distintas
 
-El pipeline de Hiring responde dos preguntas que antes se mezclaban en una sola columna:
+El pipeline de Hiring responde tres preguntas que antes se mezclaban en una sola columna:
 
 | Pregunta | Se responde con | Ejemplo |
 |---|---|---|
 | ¿**Dónde va** esta persona en el proceso? | la **etapa** | «en Entrevista» |
 | ¿**Cómo terminó** su proceso? | el **desenlace** | «no quedó, porque el cupo lo tomó otra persona» |
+| ¿El registro **se muestra**? | el **archivado** | «esta postulación se retiró de la vista» |
 
 Una postulación puede estar en una etapa sin tener desenlace (su proceso sigue vivo). Lo que **no**
 puede pasar es lo contrario: si el recorrido terminó, alguien tiene que haber dicho cómo terminó.
 
 > **Cerrar es decidir.** No existe un cierre sin desenlace.
+
+> **Archivar no es cerrar.** Retirar un registro de la vista no dice nada sobre cómo terminó el
+> proceso de esa persona — de hecho, normalmente ni siquiera terminó.
 
 ## Los seis desenlaces
 
@@ -107,3 +111,44 @@ señal «Desenlace del pipeline: cierres sin desenlace declarado».
 > (`src/lib/hiring/decide.ts`). El `CHECK` del invariante `stage='closed'` ⟺ desenlace declarado está
 > escrito y **pendiente de aplicar** en `docs/tasks/pending-migrations/`. Ver
 > [la arquitectura](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md).
+
+## Qué cuenta como «proceso activo», y qué no
+
+Varias pantallas necesitan saber si una persona **sigue en juego**: el conteo de postulaciones
+activas por vacante en el desk, el Banco de Talento (que decide si una persona es buscable), y el
+carril que asigna pruebas automáticamente.
+
+La respuesta correcta necesita **dos** de los tres ejes, no uno:
+
+> Una postulación está **en proceso activo** cuando **no tiene desenlace** *y* **no está archivada**.
+
+| ¿Tiene desenlace? | ¿Está archivada? | ¿Cuenta como activa? | Qué pasó de verdad |
+|---|---|---|---|
+| No | No | **Sí** | la persona está en el pipeline |
+| No | **Sí** | No | alguien retiró el registro de la vista, sin cerrar el proceso |
+| Sí | No | No | el recorrido terminó |
+| Sí | Sí | No | terminó y además se archivó |
+
+### Por qué la etapa NO sirve para esta pregunta
+
+Es tentador preguntar «¿está en la etapa Cerrado?». No sirve, y el motivo es concreto: **archivar
+devuelve la postulación a su etapa anterior**. Una postulación archivada vuelve a verse como si
+estuviera en «Preseleccionado» o donde estuviera antes — así que preguntando por etapa cuenta como
+viva.
+
+Eso tuvo una consecuencia real y medida: **5 personas reales** quedaron marcadas como «en proceso
+activo» en el Banco de Talento, y por lo tanto **buscables e invitables**, únicamente por una
+postulación que alguien había archivado a propósito.
+
+### Si ves que un conteo de activas bajó
+
+Es lo esperado desde el 2026-08-23. Los conteos dejaron de incluir postulaciones archivadas. **No se
+perdió ningún dato**: las postulaciones archivadas siguen ahí, con toda su historia; sólo dejaron de
+contarse como procesos vivos. La señal `hiring.data_quality.active_process_predicate_drift` en
+`/admin/operations` reporta cuántas son (`archived_gap`).
+
+> Detalle técnico: la definición ejecutable vive en un solo lugar,
+> [`src/lib/hiring/active-process.ts`](../../../src/lib/hiring/active-process.ts). Ninguna pantalla
+> escribe su propia versión, y un gate de CI (`pnpm hiring:active-process-gate`) rechaza que alguien
+> vuelva a hacerlo. Contrato completo en el
+> [ADR del vocabulario, §19](../../architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md).

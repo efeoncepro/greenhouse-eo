@@ -1,3 +1,19 @@
+/**
+ * ⚠️ TASK-1754 Slice F — esta lista NO es el enum de etapas, y por eso sobrevivió al contract.
+ *
+ * `qualified`, `client_review` y `selected` ya no son etapas: las dos primeras se absorbieron en
+ * `shortlisted` y la tercera pasó a ser un DESENLACE (`decision='selected'`, eje de TASK-1765).
+ * Aun así se conservan acá, y la razón es concreta: `getSelectionFairness` usa
+ * `input.stage ?? 'selected'` como DEFAULT, así que retirarlo haría que toda llamada sin etapa
+ * explícita muriera en `hiring_fairness_stage_invalid`.
+ *
+ * Lo correcto es re-apuntar el cubo terminal al eje de desenlace, pero eso cambia QUÉ mide el
+ * monitor —la tasa de selección final es justo el cociente que vigila el four-fifths rule— y no es
+ * una decisión que corresponda tomar dentro de un contract de vocabulario. **Queda como deuda
+ * declarada, no como descuido.** Estado real hoy: los tres literales tienen cero filas desde el
+ * colapso, así que el cubo terminal ya no mide nada; `HIRING_FAIRNESS_MONITOR_ENABLED` está OFF en
+ * producción, de modo que el hueco no está vivo. Follow-up: TASK-1365.
+ */
 export const FAIRNESS_REPORTABLE_STAGES = [
   'screening',
   'qualified',

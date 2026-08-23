@@ -10,8 +10,9 @@
 
 Prender, apagar, pausar y diagnosticar los 9 correos automáticos del proceso de contratación
 (aviso interno de postulación, acuse al candidato, test asignado, recuperación de acceso al test,
-aviso de rotación de acceso, test completado para People, avance de etapa, seleccionado y no
-seleccionado).
+aviso de rotación de acceso, test completado para People, avance de etapa, seleccionado y descartado).
+Los desenlaces **Sin selección**, **Reserva**, **Retiro** y **Sin respuesta** no tienen correo: cerrar con
+cualquiera de ellos no le escribe nada a la persona.
 
 ## Antes de empezar
 

@@ -124,6 +124,12 @@ describe.skipIf(!hasPgConfig || !canCleanUp)('assessment assignment — live PG 
        WHERE active = true
          AND canonical_email IS NOT NULL AND canonical_email <> ''
          AND (canonical_email LIKE 't872p-%@efeoncepro.com' OR canonical_email LIKE 'task-%@efeonce.org')
+         -- TASK-1739 — el patron de arriba LOCALIZA los fixtures sembrados; esta linea es la
+         -- GUARDA. La propia herramienta del dominio (hiring:data:mark-synthetic) advierte que
+         -- "la senal de nombre es notoriamente falible y por eso no se usa": el 2026-08-23 ese
+         -- patron matcheaba 3 identidades y 2 seguian marcadas real, o sea que el gate podia
+         -- correr sobre gente que el sistema considera real. Un nombre no puede vencer esto.
+         AND data_origin <> 'real'
        ORDER BY profile_id LIMIT 2`,
     )
 
@@ -134,6 +140,11 @@ describe.skipIf(!hasPgConfig || !canCleanUp)('assessment assignment — live PG 
       'No hay 2 identidades sintéticas disponibles. NUNCA relajes este filtro para que el test corra: mandaría el link de una prueba a un candidato real.',
     ).toBe(2)
 
+    // TASK-1739 — procedencia DECLARADA al NACER. Sin `dataOrigin` el registro nace `real`, o sea
+    // una vacante VISIBLE en la MISMA instancia que comparten dev, staging y producción. Y si el
+    // teardown muere a mitad (se cae el proxy, se aborta la corrida), lo que queda es
+    // indistinguible de un candidato de verdad: ninguna señal posterior recupera la procedencia
+    // con certeza. Declararlo acá es lo único que no depende de que la limpieza alcance a correr.
     const demand = await createTalentDemand(
       {
         stakeholderType: 'internal',
@@ -141,6 +152,7 @@ describe.skipIf(!hasPgConfig || !canCleanUp)('assessment assignment — live PG 
         fulfillmentMode: 'internal_hire',
         demandOrigin: 'capacity_gap',
         requestedRole: 'LIVE-TEST AM (assignment policy)',
+        dataOrigin: 'smoke_test',
       },
       'user-live-test',
     )
@@ -148,7 +160,7 @@ describe.skipIf(!hasPgConfig || !canCleanUp)('assessment assignment — live PG 
     created.demandId = demand.demandId
 
     const opening = await createHiringOpening(
-      { demandId: demand.demandId, internalTitle: 'LIVE-TEST opening (assignment policy)' },
+      { demandId: demand.demandId, internalTitle: 'LIVE-TEST opening (assignment policy)', dataOrigin: 'smoke_test' },
       'user-live-test',
     )
 

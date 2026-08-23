@@ -132,6 +132,12 @@ describe.skipIf(!hasPgConfig || !canCleanUp)('assignment attempt retry — live 
        WHERE ip.active = true
          AND ip.canonical_email ILIKE '%@efeonce.org'
          AND ip.canonical_email ~* '^(task-[0-9]+|qa\\.careers\\+)'
+         -- TASK-1739 — el patron de arriba LOCALIZA los fixtures sembrados; esta linea es la
+         -- GUARDA. La propia herramienta del dominio (hiring:data:mark-synthetic) advierte que
+         -- "la senal de nombre es notoriamente falible y por eso no se usa": el 2026-08-23 ese
+         -- patron matcheaba 3 identidades y 2 seguian marcadas real, o sea que el gate podia
+         -- correr sobre gente que el sistema considera real. Un nombre no puede vencer esto.
+         AND ip.data_origin <> 'real'
        ORDER BY ip.profile_id LIMIT 2`,
     )
 

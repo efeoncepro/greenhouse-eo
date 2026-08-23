@@ -1,6 +1,6 @@
 ---
 name: greenhouse-email
-description: Crear, modificar y validar templates React Email de Greenhouse, su registro, copy, previews y conexión con la entrega canónica. Usar para correos transaccionales o broadcast y para sus hero images; usar resend-email-platform, no esta skill, para dominios, tracking, webhooks, suppressions o diagnóstico del proveedor.
+description: Crear, modificar y validar templates React Email operados por Greenhouse para comunicaciones Efeonce, su presentación gobernada, registro, copy, previews y conexión con la entrega canónica. Usar para correos transaccionales o broadcast, perfiles de footer y hero images; usar resend-email-platform, no esta skill, para dominios, tracking, webhooks, suppressions o diagnóstico del proveedor.
 ---
 
 # Greenhouse Email
@@ -16,6 +16,10 @@ Lee solo lo que el cambio necesita:
 - `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` para catálogo, arquitectura y estado operativo.
 - `src/lib/email/types.ts`, `templates.ts`, `delivery.ts`, `tokens.ts` y `context-resolver.ts` para el contrato real.
 - `src/emails/components/EmailLayout.tsx`, `EmailButton.tsx` y `src/emails/constants.ts` para primitives y tokens.
+- `docs/architecture/GREENHOUSE_EMAIL_PRESENTATION_POLICY_DECISION_V1.md`, `EPIC-042`, `TASK-1764` y
+  [references/footer-presentation.md](references/footer-presentation.md) cuando cambien marca, firma, footer,
+  identidad legal, RRSS, preferencias o unsubscribe. El mockup aprobado vive en
+  `/admin/emails/footer-profiles/mockup`; es referencia visual, no runtime productivo.
 - `resend-email-platform` cuando cambien provider, dominio, tracking, webhook, suppression, retry o entregabilidad.
 - `greenhouse-ai-image-generator` y
   `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md` cuando el correo necesite
@@ -30,17 +34,17 @@ Vercel/Cloud Run ni promover flags. Esas acciones requieren aprobación explíci
 
 ## Arquitectura vigente
 
-| Responsabilidad | Fuente canónica |
-|---|---|
-| Componentes | `src/emails/*.tsx` |
-| Layout, botón y tokens | `src/emails/components/*` + `src/emails/constants.ts` |
-| Tipos, prioridad y sensibilidad | `src/lib/email/types.ts` |
-| Registro y preview | `src/lib/email/templates.ts` |
-| Entrega | `src/lib/email/delivery.ts` → `sendEmail()` |
-| Contexto runtime | `src/lib/email/context-resolver.ts` + `tokens.ts` |
-| Provider | Resend mediante la capa centralizada |
-| Historial/retry | `greenhouse_notifications.email_deliveries` |
-| Assets públicos | `GREENHOUSE_PUBLIC_MEDIA_BUCKET` |
+| Responsabilidad                 | Fuente canónica                                       |
+| ------------------------------- | ----------------------------------------------------- |
+| Componentes                     | `src/emails/*.tsx`                                    |
+| Layout, botón y tokens          | `src/emails/components/*` + `src/emails/constants.ts` |
+| Tipos, prioridad y sensibilidad | `src/lib/email/types.ts`                              |
+| Registro y preview              | `src/lib/email/templates.ts`                          |
+| Entrega                         | `src/lib/email/delivery.ts` → `sendEmail()`           |
+| Contexto runtime                | `src/lib/email/context-resolver.ts` + `tokens.ts`     |
+| Provider                        | Resend mediante la capa centralizada                  |
+| Historial/retry                 | `greenhouse_notifications.email_deliveries`           |
+| Assets públicos                 | `GREENHOUSE_PUBLIC_MEDIA_BUCKET`                      |
 
 No inventes un sender, cliente Resend, endpoint de envío ni registry paralelo.
 
@@ -51,16 +55,19 @@ No inventes un sender, cliente Resend, endpoint de envío ni registry paralelo.
 2. Busca un template, bloque de copy, primitive, email type y caller reutilizable antes de agregar piezas.
 3. Extiende `EmailType` y sus sets/mapas relacionados solo cuando corresponda. La marca, prioridad,
    token-sensitivity, reply-to y broadcast son contratos independientes.
-4. Crea o modifica un componente puro de React Email. Usa `EmailLayout`, `EmailButton`, tokens compartidos,
+4. Clasifica la presentación por `EmailType`; si el trabajo toca footer, aplica la policy y el rollout de
+   [references/footer-presentation.md](references/footer-presentation.md). Nunca infieras unsubscribe o RRSS desde
+   `EmailPriority`.
+5. Crea o modifica un componente puro de React Email. Usa `EmailLayout`, `EmailButton`, tokens compartidos,
    estilos inline y el diccionario canónico `src/lib/copy/*/emails.ts` para copy reutilizable.
-5. Registra template, subject, plain text y preview metadata desde la misma semántica. Los datos de negocio
+6. Registra template, subject, plain text y preview metadata desde la misma semántica. Los datos de negocio
    siguen viniendo del contexto runtime, nunca del diccionario.
-6. Cablea el caller mediante `sendEmail()`. En consumers reactivos, ejecuta dedupe antes de rotar tokens o
+7. Cablea el caller mediante `sendEmail()`. En consumers reactivos, ejecuta dedupe antes de rotar tokens o
    realizar cualquier side effect no idempotente.
-7. Agrega visual solo si mejora comprensión o jerarquía. Un hero no sustituye copy, CTA, estado ni datos exactos.
-8. Verifica render HTML, plain text, snapshots/tests, TypeScript y build proporcional. Si el cambio es visible,
+8. Agrega visual solo si mejora comprensión o jerarquía. Un hero no sustituye copy, CTA, estado ni datos exactos.
+9. Verifica render HTML, plain text, snapshots/tests, TypeScript y build proporcional. Si el cambio es visible,
    revisa el preview en ancho desktop y móvil.
-9. Declara el estado honestamente: código local no significa template desplegado ni consumer operativo.
+10. Declara el estado honestamente: código local no significa template desplegado ni consumer operativo.
 
 ## Reglas de template
 
@@ -70,8 +77,9 @@ No inventes un sender, cliente Resend, endpoint de envío ni registry paralelo.
   la misma verdad sin duplicar frases inútilmente.
 - Todo CTA incluye una URL de fallback legible. Nunca expongas un bearer en logs, persistencia genérica, analytics
   ni copy de error.
-- Broadcast exige preferencias/unsubscribe y respeta su prioridad/rate limit. No conviertas un transaccional en
-  broadcast para reutilizar una lista.
+- Unsubscribe depende del propósito y consentimiento, no de `broadcast`: está prohibido por defecto y sólo es
+  obligatorio para suscripción opcional o marketing comercial. No conviertas un transaccional en broadcast para
+  reutilizar una lista ni agregues promoción a un correo esencial.
 - Usa tablas de presentación y estilos inline compatibles con clientes de correo. No dependas de JavaScript,
   SVG animado, video, hover o CSS moderno para transmitir información esencial.
 - Imágenes decorativas usan `alt=""`; imágenes informativas requieren un alt equivalente, breve y localizado.

@@ -22,7 +22,8 @@
 - Status real: `Diseño`
 - Rank: `TBD`
 - Domain: `hr|identity|data`
-- Blocked by: `TASK-1748` (2026-08-22: el eje de desenlace de `TASK-1765` YA existe y los Slices 1 y 2 pueden ramificar por `not_selected`/`unresponsive`. Lo que falta es el `CHECK` del invariante, que espera a que `TASK-1748` mueva sus 32 filas; hasta entonces el detector se sigue congelando)
+- Blocked by: `none`
+- Nota de desbloqueo (2026-08-23): el backfill de procedencia movió las 32 filas sintéticas de `stage=closed` a `archived_at`, que era lo que congelaba el detector de retención
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

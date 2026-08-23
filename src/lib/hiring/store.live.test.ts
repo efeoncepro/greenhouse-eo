@@ -67,7 +67,8 @@ describe.skipIf(!hasPgConfig)('hiring store — live PG (TASK-353)', () => {
         fulfillmentMode: 'internal_hire',
         demandOrigin: 'capacity_gap',
         requestedRole: 'LIVE-TEST Account Manager',
-        requestedSkills: ['seo', 'copywriting']
+        requestedSkills: ['seo', 'copywriting'],
+        dataOrigin: 'real', // TASK-1739 — publica: publishOpening rechaza vacantes no reales
       },
       'user-live-test'
     )
@@ -77,7 +78,7 @@ describe.skipIf(!hasPgConfig)('hiring store — live PG (TASK-353)', () => {
     expect(demand.status).toBe('draft')
 
     const opening = await createHiringOpening(
-      { demandId: demand.demandId, internalTitle: 'LIVE-TEST internal codename', seniority: 'senior' },
+      { demandId: demand.demandId, internalTitle: 'LIVE-TEST internal codename', seniority: 'senior' , dataOrigin: 'real'},
       'user-live-test'
     )
 
@@ -155,10 +156,16 @@ describe.skipIf(!hasPgConfig)('hiring store — live PG (TASK-353)', () => {
 
   // TASK-1765 — la bicondicional de la causa vive en la BASE, no sólo en el command. Si alguien
   // encuentra otra vía de escritura, PostgreSQL sigue rechazando el par imposible.
+  //
+  // Los UPDATE fijan `stage = 'closed'` A PROPÓSITO: desde la migración del invariante conviven DOS
+  // bicondicionales sobre la misma fila —`(stage='closed') = (decision IS NOT NULL)` y la de la
+  // causa— y la del cierre se evalúa primero. Sin declarar la etapa, los tres casos morían con
+  // `hiring_application_closed_outcome_check` y este test dejaba de ejercitar lo que dice ejercitar:
+  // seguía VERDE la protección, pero en rojo el gate, y por el eje equivocado.
   it('la base rechaza `not_selected` sin causa y una causa sin `not_selected`', async () => {
     await expect(
       runGreenhousePostgresQuery(
-        `UPDATE greenhouse_hiring.hiring_application SET decision = 'not_selected', decision_cause = NULL
+        `UPDATE greenhouse_hiring.hiring_application SET stage = 'closed', decision = 'not_selected', decision_cause = NULL
          WHERE application_id = $1`,
         [created.applicationId]
       )
@@ -166,7 +173,7 @@ describe.skipIf(!hasPgConfig)('hiring store — live PG (TASK-353)', () => {
 
     await expect(
       runGreenhousePostgresQuery(
-        `UPDATE greenhouse_hiring.hiring_application SET decision = 'rejected', decision_cause = 'capacity_filled'
+        `UPDATE greenhouse_hiring.hiring_application SET stage = 'closed', decision = 'rejected', decision_cause = 'capacity_filled'
          WHERE application_id = $1`,
         [created.applicationId]
       )
@@ -174,7 +181,7 @@ describe.skipIf(!hasPgConfig)('hiring store — live PG (TASK-353)', () => {
 
     await expect(
       runGreenhousePostgresQuery(
-        `UPDATE greenhouse_hiring.hiring_application SET decision = 'not_selected', decision_cause = 'porque_si'
+        `UPDATE greenhouse_hiring.hiring_application SET stage = 'closed', decision = 'not_selected', decision_cause = 'porque_si'
          WHERE application_id = $1`,
         [created.applicationId]
       )
