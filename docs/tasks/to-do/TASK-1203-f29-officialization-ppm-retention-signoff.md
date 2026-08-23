@@ -299,3 +299,13 @@ Accountant/finance sign-off for PPM rate and retention filing use.
 ## Open Questions
 
 - What is the accountant-approved PPM rate and effective period for Efeonce?
+
+## Delta 2026-08-21 — La cadencia de materialización de PPM y retenciones nunca se cableó
+
+Medido contra el runtime el 2026-08-21: `ppm_monthly_positions` y `retention_monthly_positions` no se actualizan desde el `2026-06-20`. La causa **no es la tasa** —el operador confirmó que `0,125%` es la correcta— sino que **nunca existió un disparador**: `grep -rn "ppm" src/lib/sync/projections/` devuelve cero, no hay cron de Vercel (8) ni job de Cloud Scheduler (57) que llame al materializador, y los únicos callers de `materializePpmForPeriod` son su propio wrapper y su test. El IVA sí tiene projection reactiva registrada con 6 disparadores, y por eso está al día hoy.
+
+Las 19 filas de PPM y las 2 de retenciones son un backfill manual único de `TASK-1204`, cuya spec asumió por escrito una cadencia *"por ops-worker/cron o endpoint admin existente"* que describía la del IVA y nunca existió para estas dos líneas.
+
+`2026-07` y `2026-08` tienen documentos con base imponible real (`CLP 5.800.000` cada mes) y **cero posición**. La señal `finance.ppm.position_drift` no puede detectarlo: parte `FROM ppm_monthly_positions LEFT JOIN recomputed`, así que un período sin fila nunca entra en el `FROM`. Reporta 8 posiciones con base obsoleta y los 2 períodos huérfanos le son invisibles por construcción.
+
+El trabajo queda en **`TASK-1760`** (`docs/tasks/to-do/TASK-1760-ppm-retention-reactive-materialization-cadence.md`), bajo `EPIC-041`. Registra las dos projections faltantes replicando el patrón del IVA —sin heredar su defecto de atribución de período, que cae al mes corriente porque el payload de Nubox no trae fecha—, corrige ambas señales de drift para que vean períodos ausentes, y materializa julio y agosto. No decide qué línea del F29 es oficial ni toca la tasa: eso sigue siendo de `TASK-1203`.

@@ -5,7 +5,7 @@ import 'server-only'
 // scope en el consumer reactivo). Abre su propia transacción (`refresh()` no recibe client).
 //
 // Invariantes (task §Data model and invariants):
-// - Solo `decision='selected'` materializa. rejected|withdrawn|on_hold|backup_selected → si no
+// - Solo `decision='selected'` materializa. Cualquier otro desenlace → si no
 //   hay handoff, no-op explícito; si hay, REVOCACIÓN (pending/blocked → cancelled;
 //   post-aprobación → blocked:decision_revoked). Un backup NUNCA entra a la cola de onboarding.
 // - Un handoff por aplicación (UNIQUE) con supersede guardado por decision_id + state:
@@ -335,7 +335,11 @@ export const materializeHandoffFromApplication = async (
   })
 }
 
-/** Revocación: la selección fue retirada (rejected/withdrawn/on_hold/backup_selected). */
+/**
+ * Revocación: la selección fue retirada. TASK-1765 — la rama real es `decision !== 'selected'`, así
+ * que NO se enumera el vocabulario acá: enumerarlo es lo que dejaba la doctrina mintiendo cada vez
+ * que el enum de desenlaces cambiaba. Los desenlaces nuevos caen a revocación por construcción.
+ */
 const revokeExistingHandoff = async (
   client: PoolClient,
   existingRow: HiringHandoffRow,

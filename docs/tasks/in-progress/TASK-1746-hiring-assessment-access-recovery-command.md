@@ -21,13 +21,51 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-011`
-- Status real: `Slices 1–4 code-complete localmente — migración/índice/flags/smokes sin aplicar; rollout pendiente`
+- Status real: `Desplegado y con schema aplicado (migración + índice + CONTRACT + canal email habilitado) — faltan los smokes funcionales y el flip de enlaces seguros`
 - Rank: `TBD`
 - Domain: `hr|identity|delivery`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `ISSUE-160`
+
+## Delta 2026-08-19 — rollout aplicado y verificado
+
+Lo que estaba declarado como pendiente **ya se aplicó**, contra la instancia Cloud SQL compartida y con readback:
+
+| Pieza | Estado | Evidencia |
+|---|---|---|
+| Migración EXPAND | aplicada 13:00 UTC | `20260819072130586_task-1746-assessment-access-recovery` en `pgmigrations` |
+| Índice único token-intent | **creado y validado** | `uq_email_deliveries_token_intent_v2`: `unique=true, valid=true, ready=true`; 0 duplicados previos |
+| CONTRACT de credencial | **aplicado y `convalidated`** | `hiring_assessment_access_credential_version_check` + `trg_hiring_assessment_access_credential_guard` |
+| Guard probado | **rechaza correctamente** | en transacción revertida, rotar `access_token_hash` sin rotar versión → `assessment access credential rotation requires a new version (TASK-1746)` |
+| Capabilities | vivas | `hiring.assessment.recover_access_email` y `hiring.assessment.reveal_access_link` en `capabilities_registry`, `deprecated_at IS NULL` |
+| Canal email | **habilitado** 18:42 UTC | `email_type_config.hiring_assessment_access_recovery = true` (nació `false` por el patrón flag default-OFF) |
+| Saneado de bearers | sin trabajo pendiente | `delivery_payload->'context' ? 'assessmentUrl'` = 0 filas |
+
+**Precondiciones del CONTRACT verificadas antes de aplicarlo** (las tres del propio script):
+código en `origin/main` (`6f85644cd`, release #204), deployment productivo de Vercel posterior al merge, y ops-worker
+corriendo `1438906b8` — un SHA de `develop` que **sí incluye** los commits del writer (`5d5eb2f9c`, `5937f6e35`,
+`b2ff2b33e` son sus ancestros). Confirmación empírica: un assessment creado después del deploy nació con
+`access_token_version_id` poblado, y 0 filas violaban el invariante antes del `VALIDATE`.
+
+### Lo que queda abierto
+
+1. **Los dos smokes funcionales de aceptación** (recovery por `email` y por `secure_link`) siguen sin ejecutarse:
+   `hiring_assessment_access_recovery` tiene **0 filas**. Requieren una candidata con consentimiento — es una decisión
+   humana, no automatizable por un agente.
+2. **El flip de `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` sigue bloqueado** por `click_tracking=true` en el
+   dominio remitente `efeoncepro.com`. La prueba ya llegó sola: se recibió un `email.clicked` real, o sea el rewrite de
+   links está activo y descartaría el fragmento donde viaja el bearer. **Salida limpia identificada:**
+   `mail.efeoncepro.com` (creado en Resend el 2026-08-19, DNS completo y correcto, DKIM idéntico al esperado) nace con
+   `click_tracking=false` y `open_tracking=false` — mover el remitente ahí desbloquea el flip **sin** apagar el tracking
+   del apex, que marketing usa. Al 2026-08-19 19:00 UTC el dominio sigue `pending` del lado de Resend pese a tener el
+   DNS correcto y propagado; ojo: **re-disparar `POST /verify` resetea los tres registros a `pending`**, así que hay que
+   esperar, no reintentar.
+3. **Riesgos residuales de las auditorías, todos vivos:** `purge_expired_assessment_public_sessions` borra por
+   `expires_at` y no por deadline (y su scheduler ya está ENABLED en producción — latente sólo porque hay 0 sesiones);
+   la copy terminal colapsa seis causas en un mensaje; `purge_assessment_access_recovery` existe en DB con **cero
+   callers**, así que la retención de 12 meses y el purgado por retiro de consentimiento nunca se ejecutan.
 
 ## Summary
 

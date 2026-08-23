@@ -2,11 +2,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
   editOpenAIImage,
+  generateOpenAIImage,
   getOpenAIImageModel,
   isOpenAIImageModel,
   resolveOpenAIImageBackground,
   resolveOpenAIImageRequestModel,
   resolveOpenAIImageSize,
+  runOpenAIImageTool,
   type OpenAIImageModel
 } from '@/lib/ai/openai-image'
 
@@ -62,22 +64,70 @@ describe('openai-image helpers', () => {
     expect(resolveOpenAIImageSize({ model: 'gpt-image-1.5', size: '1024x1536' })).toBe('1024x1536')
   })
 
-  it('falls back to GPT Image 1.5 when transparent background is requested for GPT Image 2', () => {
+  it('keeps GPT Image 2 when transparent background is requested', () => {
     expect(resolveOpenAIImageRequestModel({ model: 'gpt-image-2', background: 'transparent' })).toEqual({
-      model: 'gpt-image-1.5',
+      model: 'gpt-image-2',
       requestedModel: 'gpt-image-2',
-      modelFallbackReason: 'gpt-image-2 does not support transparent backgrounds; using gpt-image-1.5.'
+      modelFallbackReason: null
     })
   })
 
-  it('can fail closed for unsupported GPT Image 2 transparent backgrounds', () => {
-    expect(() =>
-      resolveOpenAIImageBackground({
-        model: 'gpt-image-2',
-        background: 'transparent',
-        transparentBackgroundStrategy: 'throw'
-      })
-    ).toThrow('gpt-image-2 does not support transparent backgrounds')
+  it('preserves transparent background for GPT Image 2', () => {
+    expect(resolveOpenAIImageBackground({ model: 'gpt-image-2', background: 'transparent' })).toBe('transparent')
+  })
+
+  it('serializes GPT Image 2 transparent PNG without changing the model', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      background: 'transparent',
+      data: [{ b64_json: 'aW1hZ2U=' }]
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } }))
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    const result = await generateOpenAIImage({
+      prompt: 'A reusable icon.',
+      model: 'gpt-image-2',
+      background: 'transparent',
+      format: 'png'
+    })
+
+    const [, request] = fetchMock.mock.calls[0] as [string, RequestInit]
+    const body = JSON.parse(String(request.body)) as Record<string, unknown>
+
+    expect(body).toMatchObject({ model: 'gpt-image-2', background: 'transparent', output_format: 'png', n: 1 })
+    expect(result).toMatchObject({ model: 'gpt-image-2', requestedModel: 'gpt-image-2', modelFallbackReason: null, background: 'transparent' })
+  })
+
+  it('rejects transparent JPEG and multiple outputs before a paid request', async () => {
+    const fetchMock = vi.fn()
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(generateOpenAIImage({
+      prompt: 'A reusable icon.',
+      background: 'transparent',
+      format: 'jpeg'
+    })).rejects.toThrow('Transparent OpenAI image output requires PNG or WebP')
+
+    await expect(generateOpenAIImage({
+      prompt: 'Two icons.',
+      numberOfImages: 2
+    })).rejects.toThrow('This OpenAI image helper returns one image')
+
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('rejects partial images until the Responses helper implements SSE', async () => {
+    const fetchMock = vi.fn()
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(runOpenAIImageTool({
+      prompt: 'A reusable icon.',
+      partialImages: 1
+    })).rejects.toThrow('OpenAI partial images require an SSE streaming transport')
+
+    expect(fetchMock).not.toHaveBeenCalled()
   })
 })
 
@@ -130,12 +180,12 @@ describe('editOpenAIImage multi-reference requests', () => {
     expect(body.get('quality')).toBe('high')
   })
 
-  it('rejects more than ten references before making a paid API request', async () => {
+  it('rejects more than sixteen references before making a paid API request', async () => {
     const fetchMock = vi.fn()
 
     vi.stubGlobal('fetch', fetchMock)
 
-    const references = Array.from({ length: 11 }, (_, index) => ({
+    const references = Array.from({ length: 17 }, (_, index) => ({
       bytes: new Uint8Array([index]),
       filename: `reference-${index + 1}.png`,
       mimeType: 'image/png'
@@ -147,7 +197,21 @@ describe('editOpenAIImage multi-reference requests', () => {
         image: references,
         model: 'gpt-image-2'
       })
-    ).rejects.toThrow('OpenAI image editing supports at most 10 input images per request.')
+    ).rejects.toThrow('OpenAI image editing supports at most 16 input images per request.')
+
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('rejects a mask whose format differs from the first image before a paid request', async () => {
+    const fetchMock = vi.fn()
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(editOpenAIImage({
+      prompt: 'Edit the transparent area.',
+      image: { bytes: new Uint8Array([1]), filename: 'source.png', mimeType: 'image/png' },
+      mask: { bytes: new Uint8Array([2]), filename: 'mask.webp', mimeType: 'image/webp' }
+    })).rejects.toThrow('OpenAI image mask must use the same format as the first image input.')
 
     expect(fetchMock).not.toHaveBeenCalled()
   })

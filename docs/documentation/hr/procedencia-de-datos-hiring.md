@@ -1,9 +1,9 @@
 # Procedencia de Datos de Hiring
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-18 por Claude (TASK-1739)
-> **Ultima actualizacion:** 2026-08-18 por Claude
+> **Ultima actualizacion:** 2026-08-22 por Claude (TASK-1748)
 > **Documentacion tecnica:** [GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md)
 
 ## Qué problema resuelve
@@ -59,6 +59,31 @@ Ese salto es grande y esperable: casi todo lo que había de más eran restos de 
 durante meses. **No se perdió nada**: los datos siguen ahí, marcados y archivados, y el filtro se puede
 desactivar en minutos.
 
+## Qué significa archivar (y qué no)
+
+Archivar un registro de prueba es **sacarlo de la vista**, nada más. No dice nada sobre la persona ni
+sobre cómo terminó su proceso: son dos preguntas distintas y el sistema las guarda en dos lugares
+distintos.
+
+- **La etapa** responde dónde va una persona en el recorrido. Su valor final, «Cerrado», significa que
+  el proceso terminó **con un desenlace declarado por alguien**.
+- **El archivado** responde si el registro sigue apareciendo. Es una marca aparte, con su propia fecha.
+
+Hasta agosto de 2026 archivar movía la etapa a «Cerrado», y eso dejó 32 postulaciones marcadas como
+cerradas sin que nadie hubiera decidido nada sobre ellas. Se corrigió: hoy archivar escribe su propia
+marca y **nunca** toca la etapa.
+
+Cuando se archiva un candidato de prueba se archivan las tres piezas: su postulación, su ficha y la
+vacante inventada a la que postuló. Una vacante que alguien ya cerró o llenó **no se reescribe** — ese
+desenlace lo declaró una persona.
+
+## Dónde deja de aparecer
+
+Además del escritorio de contratación, el **Banco de Talento** dejó de servir personas de prueba. Antes
+tampoco aparecían, pero por casualidad: estaban en un estado del ciclo de vida que el buscador no
+muestra. Bastaba con que ese estado cambiara para que reaparecieran. Ahora quedan fuera **por su
+procedencia declarada**, que es un dato que nadie cambia sin dejar registro.
+
 ## Qué NO hace
 
 - **No borra nada por su cuenta.** Marcar y purgar son acciones que una persona autoriza explícitamente,
@@ -70,4 +95,5 @@ desactivar en minutos.
   procedencia: la ley no depende de que un dato parezca de prueba.
 
 > Detalle técnico: contrato en [`src/lib/hiring/data-origin/`](../../../src/lib/hiring/data-origin/);
-> spec en [`TASK-1739`](../../tasks/complete/TASK-1739-hiring-synthetic-data-provenance.md).
+> spec en [`TASK-1739`](../../tasks/complete/TASK-1739-hiring-synthetic-data-provenance.md) y el cierre
+> de deuda en [`TASK-1748`](../../tasks/in-progress/TASK-1748-hiring-data-origin-followups.md).

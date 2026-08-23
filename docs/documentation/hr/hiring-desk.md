@@ -86,6 +86,56 @@ Cuando una postulación se decide como **seleccionada**, Greenhouse materializa 
 - Application 360 muestra el handoff real cuando la decisión es `selected` + destino `internal_hire`. Si el handoff está pendiente y el actor tiene `hiring.handoff.approve`, puede aprobarlo desde la pestaña **Decisión**; si está aprobado o en ejecución, **Abrir Activation Lane** lleva a `/hr/onboarding?lane=hiring-activation&applicationId=...&handoffId=...`.
 - La Activation Lane de TASK-1368 es la UI People Ops de N11. Consume el bridge de TASK-770 y el resolver de blockers de TASK-1400; si el target todavía no está en la cola, muestra estado honesto en vez de seleccionar otro caso.
 
+## Las seis etapas del pipeline, y por qué el candidato lee otro nombre (TASK-1754)
+
+El tablero muestra **seis columnas**, y desde 2026-08-22 el dominio tiene una etapa por columna.
+Antes tenía trece, y tres de ellas —`qualified`, `shortlisted` y `client_review`— se mostraban todas
+como «Evaluación». Ese desajuste no era cosmético: la automatización de assessment vigila
+`shortlisted`, pero mover una tarjeta a «Evaluación» guardaba `qualified`. Quince vacantes tenían su
+política configurada y ninguna disparaba; dos candidatas reales cruzaron esa columna el 2026-08-19 sin
+recibir su prueba, y en pantalla no se veía nada raro.
+
+| Columna | Etapa | Qué significa | ¿Dispara la prueba? |
+|---|---|---|---|
+| Sourced | `sourced` | Entró al pipeline, sin revisar | no |
+| Screening | `screening` | En revisión inicial | no |
+| **Evaluación** | `shortlisted` | Se evalúa con evidencia (prueba, muestra de trabajo) | **sí** |
+| Entrevista | `interview` | En conversación con el equipo | opcional |
+| Decisión | `decision_pending` | Evaluada, esperando desenlace | no |
+| Cerrado | `closed` | El recorrido terminó; el desenlace dice cómo | no |
+
+`qualified` y `client_review` se absorbieron en `shortlisted`. Es un colapso **con pérdida
+declarada**: ninguna postulación conserva de cuál de las tres venía. Se aceptó porque ninguna de las
+dos absorbidas fue jamás elegible desde una superficie —los movimientos humanos a «Evaluación» caían
+todos en `qualified` sin que nadie pudiera elegirlo—, así que no había intención humana que preservar.
+
+### «Preselección» en el correo y «Evaluación» en el tablero son a propósito
+
+El correo de avance al candidato llama a `shortlisted` **«Preselección»** («Shortlist» en inglés),
+mientras el desk la llama **«Evaluación»** («Evaluation»). **No es drift y no hay que alinearlo.** Es
+una decisión del operador del 2026-08-22, por dos razones:
+
+1. Hacia afuera el registro es más suave: «te preseleccionamos» dice algo sobre el avance de la
+   persona; «estás en evaluación» la deja en un estado sin promesa.
+2. «Evaluación» en el correo chocaría con el correo del test, que ya dice *«tienes una evaluación
+   pendiente»*. En inglés esa colisión no existe (`assessment` ≠ `evaluation`), pero la divergencia se
+   mantiene espejada para que las dos versiones digan lo mismo.
+
+Un agente que lea las dos capas y las «arregle» reintroduce esa colisión. La divergencia está anotada
+en el código, en los dos diccionarios de copy y acá.
+
+### Lo que todavía no está hecho
+
+Los cinco literales terminales del enum de etapas (`selected`, `backup`, `rejected`, `withdrawn`,
+`handoff_ready`) siguen existiendo aunque ninguna superficie los escriba: el command de decisión ya
+escribe siempre `closed`. Se retiran cuando el eje de desenlace (`TASK-1765`) esté verificado en
+producción — antes de eso se perdería el último discriminante de cómo terminó un proceso. Mientras
+tanto, el tablero los sigue agrupando en «Cerrado» para que ninguna tarjeta histórica desaparezca.
+
+> Detalle técnico: ADR `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md`
+> · enum en `src/types/hiring.ts` · nombres visibles en `src/lib/copy/dictionaries/{es-CL,en-US}/hiringDesk.ts`
+> · allowlist del correo en `src/lib/hiring/notifications/stage-policy.ts`.
+
 ## Datos de contacto del candidato (TASK-1688)
 
 Desde 2026-08-12, cada postulación nueva del apply público (formulario estándar o Growth Form

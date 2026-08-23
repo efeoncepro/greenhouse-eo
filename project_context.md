@@ -56,7 +56,11 @@ Claude; sus route cards machine-readable viven en `docs/architecture/creative-st
 sustituyen la autoridad live del reader. ADR-023 y el card inicial de FLUX 3 fijan la separación entre evidencia del
 proveedor, cables de integración y disponibilidad de Globe; el baseline auditado también cubre Gemini Omni, Veo 3.1,
 Seedance 2.0/R2V, GPT Image 2, Seedream 5 Pro, Nano Banana 2/Pro y Kling 3.0. “Imagen 2 de ChatGPT” se normaliza a
-`gpt-image-2`; Google `imagen-2` no tiene ruta en Globe. Seedream T2I, GPT Image 2 y Nano Banana 2/Pro están disponibles
+`gpt-image-2`; Google `imagen-2` no tiene ruta en Globe. OpenAI documenta transparencia GPT Image 2 en preview con
+PNG/WebP. Globe ya la declara y verifica en código para su ruta PNG mediante `backgroundMode` y alfa decodificado,
+pero la variante continúa gated hasta deploy, canary facturable, readback y promoción/rollback; la matriz canónica
+vive en [`OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`](docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md).
+Seedream T2I, GPT Image 2 y Nano Banana 2/Pro están disponibles
 según el reader live; Seedream Edit queda `gated` por binding deshabilitado. Seedream Lite, edición de OpenAI/Nano
 Banana y video-to-image de Nano Banana permanecen como superficies no públicas hasta tener ruta, binding, canary y
 readback propios. Un lookup de circuito `not_found` para Nano Banana Pro es blocker operativo explícito.
@@ -203,14 +207,17 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   gold set** (11 contra un piso de 49). TASK-1742 conserva cooldown, rollback residual-cero y firmas pendientes.
 - La **recuperación de acceso al assessment** está gobernada por el ADR
   [`GREENHOUSE_HIRING_ASSESSMENT_ACCESS_RECOVERY_AND_EMAIL_DELIVERY_DECISION_V1.md`](docs/architecture/GREENHOUSE_HIRING_ASSESSMENT_ACCESS_RECOVERY_AND_EMAIL_DELIVERY_DECISION_V1.md)
-  y `TASK-1745`–`TASK-1747`. Estado real al 2026-08-19: lifecycle global de Resend, transporte token-sensitive,
-  recovery email, enlace seguro one-time, Product API humana y frontera fragment→exchange→sesión opaca/versionada
-  están validados localmente, pero sus migraciones/índice no están aplicados y el tipo de correo permanece OFF. El runtime productivo todavía usa el
-  enlace legacy con bearer en path: el cutover del correo inicial está detrás de
-  `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`, default OFF en el ops-worker. Ningún enlace nuevo de recovery
-  puede habilitarse hasta completar TASK-1747/UI, readback `click_tracking=false` de Resend y smokes PG/browser/href.
-  El rate limit público ya está implementado con bucket por credential y techo IP, más retención diaria con readback;
-  sigue dormante hasta aplicar schema/deploy. `sent` significa despacho aceptado, nunca entrega confirmada.
+  y `TASK-1745`–`TASK-1747`/`TASK-1757`. Estado real al 2026-08-20: **operativa** — migración/índice aplicados,
+  ambas capabilities vivas, tipo de correo de recovery ON y Application 360 como consumidor. El enlace efímero
+  salió del cliente; asignar un `candidate_test` pasa SIEMPRE por propose→confirm y el camino legacy
+  `POST /api/hiring/assessments` responde **410** (`interviewer_scorecard` sigue vivo). El carril de LECTURA
+  `GET .../access-recovery` exige capability de recuperación + binding a `applicationId`: es más estrecho que el
+  write, porque `hiring.assessment.read` la porta todo tenant interno. Rotar por enlace seguro **avisa al
+  candidato sin credencial** (`TASK-1757`, flag ON 2026-08-20) con señal `…rotation_unnotified` (steady 0).
+  El correo de asignación inicial todavía usa el enlace legacy con bearer en path: su cutover sigue detrás de
+  `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`, default OFF en el ops-worker, a la espera del readback
+  `click_tracking=false` de Resend y los smokes de href. `sent` significa despacho aceptado, nunca entrega
+  confirmada. Invariantes: `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §`Acceso al test del candidato`.
 - La dirección aceptada para autoservicio candidato es **una cuenta y un `/my` longitudinal** (`TASK-1727`–`TASK-1733`,
   EPIC-011): mismo `identity_profile_id` y principal/login; `candidate_facet` y `member` son facetas aditivas;
   perfil profesional person-scoped; CV/respuestas/expectativa conservan snapshot por aplicación; activation suma
@@ -262,6 +269,8 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Qué tooling/modelos evalúa Efeonce Globe / Creative Studio | `docs/architecture/EFEONCE_CREATIVE_STUDIO_ENTERPRISE_MODEL_PORTFOLIO_V1.md` + capability registry |
 | Cómo crea y captura valor Creative Studio, cómo funcionan sus créditos y qué skills lo adoptan | `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md` + `EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md` + `EFEONCE_CREATIVE_STUDIO_SKILL_ADOPTION_V1.md` |
 | Cómo producir posts sociales visuales con reportes, dashboards o evidencia de producto | `docs/operations/GREENHOUSE_SOCIAL_VISUAL_REPORT_PRODUCTION_V1.md` + capas funcional/manual + skills `design-studio` y `social-media-studio` |
+| Cómo crear o modificar templates y hero images de email | skill espejo `greenhouse-email` + `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`; delivery/provider se opera por separado con `resend-email-platform` y visuales GPT Image 2 con `greenhouse-ai-image-generator` |
+| Cómo diseñar, construir, auditar o mejorar dashboards en Google Data Studio (antes Looker Studio) | skill espejo `.codex/skills/google-data-studio/SKILL.md` + `.claude/skills/google-data-studio/SKILL.md`; usar `inspect` por defecto y validar modelado, filtros, browser, permisos y sharing desde sus references |
 | Cómo modelar Efeonce Group, Media & Distribution, Growth Platform, AEO y Search Visibility 360 | `docs/business-models/README.md` + `.codex/skills/efeonce-business-model-operator/SKILL.md` + modelos vigentes |
 | Cómo leer un site audit de crawler sin mentir el diagnóstico (orden de hallazgos, laboratorio vs campo, techo del crawl, huecos de cobertura AEO) | `.codex/skills/seo-aeo/modules/01_SEO_TECHNICAL.md` §8 + `.claude/skills/dataforseo-operator/references/04-onpage.md` §11 + `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.6 |
 | Cómo reconciliar el costo del AI Visibility Grader | `docs/audits/cloud-cost/AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md` + documentación funcional/runbook del grader |

@@ -1,0 +1,74 @@
+-- ⚠️  NO ESTÁ EN `migrations/` A PROPÓSITO. Ver README.md de esta carpeta.
+--
+-- TASK-1765 — re-angostar el CHECK de `decision` a los SEIS desenlaces definitivos.
+--
+-- CONDICIÓN DE EJECUCIÓN (dura): `origin/main` ya NO ofrece `on_hold`, o sea el release que sube los
+-- Slices 1-4 ya está en producción. Verificar ANTES de mover este archivo a `migrations/`:
+--
+--   git show origin/main:src/types/hiring.ts | grep HIRING_DECISIONS
+--   git show origin/main:src/views/greenhouse/hiring/Application360View.tsx | grep on_hold
+--
+-- Ambos deben salir SIN `on_hold`. Si alguno lo tiene, esto rompe la acción en producción — que es
+-- exactamente lo que pasó el 2026-08-22 y lo que el forward fix
+-- `20260822204609045_task-1765-hiring-outcome-restore-on-hold-until-release` reparó.
+--
+-- Y el readback de datos SIGUE siendo obligatorio, aunque no sea suficiente:
+--   SELECT count(*) FROM greenhouse_hiring.hiring_application WHERE decision = 'on_hold';   -- 0
+--   SELECT count(*) FROM greenhouse_hiring.hiring_application
+--    WHERE explainability_json::text LIKE '%on_hold%';                                      -- 0
+--
+-- Para ejecutarlo: `pnpm migrate:create task-1765-decision-enum-contract` y pegar este cuerpo, para
+-- que el timestamp quede posterior a todo lo aplicado.
+
+-- Up Migration
+
+DO $$
+DECLARE
+  stranded_rows int;
+  stranded_history int;
+BEGIN
+  SELECT COUNT(*) INTO stranded_rows
+    FROM greenhouse_hiring.hiring_application WHERE decision = 'on_hold';
+
+  IF stranded_rows > 0 THEN
+    RAISE EXCEPTION 'TASK-1765 contract abortado: % fila(s) con decision=on_hold. Su desenlace real se decide con People Ops; no se reescriben a ciegas.', stranded_rows;
+  END IF;
+
+  SELECT COUNT(*) INTO stranded_history
+    FROM greenhouse_hiring.hiring_application WHERE explainability_json::text LIKE '%on_hold%';
+
+  IF stranded_history > 0 THEN
+    RAISE EXCEPTION 'TASK-1765 contract abortado: % fila(s) con on_hold en decisionHistory (append-only).', stranded_history;
+  END IF;
+END
+$$;
+
+ALTER TABLE greenhouse_hiring.hiring_application
+  DROP CONSTRAINT IF EXISTS hiring_application_decision_check;
+
+ALTER TABLE greenhouse_hiring.hiring_application
+  ADD CONSTRAINT hiring_application_decision_check CHECK (decision IN (
+    'selected', 'backup_selected', 'not_selected', 'rejected', 'withdrawn', 'unresponsive'));
+
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_constraint
+     WHERE conrelid = 'greenhouse_hiring.hiring_application'::regclass
+       AND conname = 'hiring_application_decision_check'
+       AND pg_get_constraintdef(oid) LIKE '%on_hold%'
+  ) THEN
+    RAISE EXCEPTION 'TASK-1765: el CHECK todavía admite on_hold.';
+  END IF;
+END
+$$;
+
+-- Down Migration
+
+ALTER TABLE greenhouse_hiring.hiring_application
+  DROP CONSTRAINT IF EXISTS hiring_application_decision_check;
+
+ALTER TABLE greenhouse_hiring.hiring_application
+  ADD CONSTRAINT hiring_application_decision_check CHECK (decision IN (
+    'selected', 'backup_selected', 'not_selected', 'rejected',
+    'withdrawn', 'unresponsive', 'on_hold'));

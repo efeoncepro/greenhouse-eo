@@ -69,7 +69,9 @@ export const hiringAssessment: HiringAssessmentCopy = {
     cancelledDetail: 'This assessment was cancelled before the candidate started it. The link no longer works.',
     loadReviewPrompt: 'Load the review to see answers, rubrics, and the competency scorecard.',
     noModules: 'This assessment does not have competency modules yet.',
+    competency: 'Competency',
     objective: 'Target',
+    status: 'Status',
     scoreProgressLabel: '{competency}: {score} out of 100; target {target}',
     pending: 'Pending',
     radarScoreLegend: 'Candidate score',
@@ -209,6 +211,8 @@ export const hiringAssessment: HiringAssessmentCopy = {
     confirmRun: 'Confirm run',
     confirming: 'Confirming…',
     confirmed: 'Run confirmed. The covered scores entered the scorecard.',
+    nothingToConfirm:
+      'Nothing is left for batch confirmation: every response was already resolved one by one. You can close the run.',
     cancelRun: 'Cancel run',
     cancelDialogTitle: 'Cancel run',
     cancelDialogBody: 'No answer is lost: pending ones return to the manual review queue.',

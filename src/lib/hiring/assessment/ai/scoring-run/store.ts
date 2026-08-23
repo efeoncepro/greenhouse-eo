@@ -469,6 +469,30 @@ export const getRunItemInRun = async (
   return normalizeRunItem(rows[0])
 }
 
+/**
+ * Item del run que corresponde a una proposal, si existe.
+ *
+ * Existe para cerrar la causa raíz del run que nunca cierra: `confirmAiProposal` es el ÚNICO punto
+ * donde una proposal se convierte en puntaje humano, pero llega por DOS puertas — la cola del run y
+ * el confirm individual por respuesta. La segunda escribía el puntaje y dejaba el item en
+ * `proposed`, así que la cobertura mentía ("faltan 5" sobre trabajo ya hecho) y el run quedaba
+ * incerrable. Devuelve `null` cuando la proposal no pertenece a ningún run (confirm suelto legítimo).
+ */
+export const findRunItemByProposalId = async (
+  client: PoolClient,
+  proposalId: string,
+): Promise<AiScoringRunItem | null> => {
+  const rows = await runQuery<RunItemRow>(
+    client,
+    `SELECT ${RUN_ITEM_COLS} FROM greenhouse_hiring.hiring_assessment_ai_scoring_run_item
+     WHERE proposal_id = $1
+     FOR UPDATE`,
+    [proposalId],
+  )
+
+  return rows[0] ? normalizeRunItem(rows[0]) : null
+}
+
 // ── Lease del run (drain claim atómico — patrón conditional-UPDATE TASK-1664) ──
 
 /** Run IDs reclamables por el drain: no terminales de scoring con lease libre o vencida. */

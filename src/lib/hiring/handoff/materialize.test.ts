@@ -201,7 +201,10 @@ describe('materializeHandoffFromApplication', () => {
     assertBoundary()
   })
 
-  it.each(['rejected', 'withdrawn', 'on_hold', 'backup_selected'] as const)(
+  // TASK-1765 — `on_hold` dejó de ser desenlace; entran `not_selected` y `unresponsive`, que caen a
+  // la misma rama por construcción (`decision !== 'selected'`). El caso NO se borra: lo que prueba
+  // —que un desenlace no-selected no materializa handoff— sigue vigente y ahora cubre los seis.
+  it.each(['rejected', 'withdrawn', 'not_selected', 'unresponsive', 'backup_selected'] as const)(
     'decision=%s sin handoff previo → no-op explícito, cero escrituras',
     async (decision) => {
       const client = buildClient({ app: appRow({ decision }), existingHandoff: null })

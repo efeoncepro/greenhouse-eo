@@ -1,9 +1,9 @@
 # Emails del Ciclo de Hiring — Notificaciones a Candidatos y People
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.4
 > **Creado:** 2026-08-12 por Claude (TASK-1689)
-> **Ultima actualizacion:** 2026-08-19 por Codex (TASK-1745, TASK-1746)
+> **Ultima actualizacion:** 2026-08-21 por Codex (correo de persona seleccionada)
 > **Documentacion tecnica:** [GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md) (Delta 2026-08-12)
 
 ## Qué hace
@@ -18,8 +18,10 @@ tenga que acordarse de escribirlos:
 | Se le asigna un test al candidato | El candidato | Link de acceso a su evaluación, tiempo estimado y vigencia del link |
 | El candidato completa el test | Buzón de People (`people@efeoncepro.com`) | Aviso de que las respuestas están listas, fecha de envío, vacante, postulación y link directo para revisar la evaluación |
 | La postulación avanza a Preselección o Entrevista | El candidato | **Una sola cosa**: si la vacante tiene declarado un test para esa etapa, le llega el correo del test; si no, le llega "Tu postulación avanzó" con el nombre de la etapa |
-| El candidato queda seleccionado | El candidato | Felicitación + aviso de que el equipo lo contactará |
+| El candidato queda seleccionado | El candidato | Confirmación personalizada de que fue elegido + secuencia carta oferta → aceptación → contrato; no afirma que ya se incorporó |
 | El candidato no queda seleccionado | El candidato | Agradecimiento genuino, decisión clara y puerta abierta a futuras vacantes |
+| Se recupera su acceso al test **por correo** | El candidato | Acceso nuevo + aviso de que el enlace anterior dejó de ser válido; si ya había empezado, su plazo original |
+| Se recupera su acceso al test **por enlace temporal** | El candidato | Aviso **sin el enlace**: su acceso anterior murió, el nuevo se le entrega por otra vía, y puede responder ese correo si no le llega |
 
 ## Reglas de comportamiento
 
@@ -48,8 +50,19 @@ tenga que acordarse de escribirlos:
   resto — útil si Talent quiere controlar el momento del envío.
 - **Los correos al candidato salen a nombre de Efeonce** (la agencia); el aviso interno usa el
   remitente de la plataforma.
+- **Si el candidato responde, su respuesta llega a `people@efeoncepro.com`.** Los ocho tipos
+  dirigidos a candidatos declaran ese buzón como destino de respuesta. Antes no existía y una
+  respuesta caía en la dirección de envío del proveedor, que nadie lee — aunque varios de esos
+  correos le piden explícitamente responder. Ese buzón tiene que estar atendido.
 - **Los correos se sienten personales**: el asunto y el saludo usan el nombre del candidato y el
   nombre de la vacante (p. ej. "María, recibimos tu postulación a «Content Creator»").
+- **El correo de selección distingue asunto, preencabezado y título visible.** El asunto identifica persona y
+  vacante; el título celebra `¡Te elegimos, {nombre}!`; el preencabezado anticipa la carta oferta. Incluye una
+  ilustración pequeña de reconocimiento con texto alternativo vacío, por lo que bloquear imágenes no elimina
+  ninguna información ni desplaza el nombre de la persona como foco principal. La decisión, la carta oferta y la
+  firma del contrato usan negritas visibles sobre frases completas para guiar la lectura. Los correos de decisión
+  firman institucionalmente como `Equipo de Talento · Efeonce`; no inventan el nombre de un recruiter. Las respuestas
+  llegan al mismo equipo.
 - Todo el sistema está detrás de un interruptor general (`HIRING_LIFECYCLE_EMAILS_ENABLED`),
   prendido en producción desde el 2026-08-12; el interruptor y los kill-switch por tipo siguen
   disponibles para pausar el sistema completo o un correo específico.
@@ -61,17 +74,16 @@ al buzón. La confirmación técnica de entrega requiere un evento firmado `deli
 y `suppressed` indican que el canal email está bloqueado o degradado. `opened` y `clicked` son interacción,
 no sustitutos de entrega.
 
-El receptor global de lifecycle de Resend y su reconciliación están implementados, pero su rollout externo
-sigue pendiente: falta registrar el webhook, configurar el secreto, aplicar datos y ejecutar el canary live.
-Hasta entonces, Greenhouse no debe mostrar una entrega como confirmada por proveedor. El webhook es
-observador y nunca puede bloquear el envío de los demás correos.
+El receptor global de lifecycle de Resend y su reconciliación quedaron operativos en producción con el
+cierre de TASK-1745. El webhook es observador y nunca puede bloquear el envío de los demás correos.
 
 Los emails que transportan acceso se procesan como credenciales: reservan evidencia durable antes de emitir
 el token, no persisten la URL o bearer en payloads genéricos y no usan retry ciego. Si el proveedor pudo
 aceptar el correo pero el cierre local quedó incierto, el resultado es `unknown`, no un falso `sent`.
 
-La recuperación gobernada del mismo assessment —por email o enlace seguro de una sola revelación— también
-está implementada pero pendiente de rollout. Detalle funcional:
+La recuperación gobernada del mismo assessment —por email o enlace seguro de una sola revelación— está
+habilitada en producción desde el 2026-08-19. La superficie del operador y el aviso de rotación al
+candidato están en `develop`/staging. Detalle funcional:
 [Entrega y recuperación de acceso a tests](entrega-y-recuperacion-de-acceso-a-tests.md).
 
 > Estado de rollout: el aviso interno de test completado está desplegado y configurado en el

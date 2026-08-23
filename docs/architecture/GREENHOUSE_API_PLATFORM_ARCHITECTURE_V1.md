@@ -1,6 +1,6 @@
 # Greenhouse API Platform Architecture V1
 
-## Delta 2026-08-19 — Product API humano para recovery de assessment (TASK-1746)
+## Product API humano para recovery de assessment (TASK-1746/1747)
 
 `POST /api/hiring/assessments/[id]/access-recovery` es un adapter Product API interno y delgado sobre
 `recoverCandidateTestAccess`, no una API ecosystem/app ni un click handler con lógica propia. Autoriza capability
@@ -9,9 +9,36 @@ y assessment, Origin/JSON/idempotencia cerrados y devuelve un DTO anti-oracle `n
 `secure_link` puede revelar una URL una vez; nunca se expone a agent/app/service principals ni se serializa en
 audit/outbox. El canal email devuelve aceptación/fallo/unknown de despacho, no entrega al inbox.
 
-La route y su primitive están code-complete localmente pero no disponibles en runtime: schema/índice, grants,
-flags y smokes siguen pendientes y TASK-1747 aún no consume el contrato. Full API Parity se conserva porque UI,
-CLI y futuros adapters gobernados delegan al mismo command/readers; no se publicará este write en MCP.
+### El carril de LECTURA es propio, y su puerta es MÁS estrecha que la del write (TASK-1747)
+
+`GET /api/hiring/assessments/[id]/access-recovery?applicationId=…[&reason=…]` devuelve
+`{ availability, canRecoverByEmail, canRevealSecureLink }` desde el mismo reader que consume el POST. Existe
+porque "explicar por qué NO se puede recuperar el acceso" es una capacidad, y sin contrato programático quedaba
+UI-only: ni Nexa ni MCP ni un segundo consumidor la alcanzaban. La feature no estaba completa.
+
+Es el caso donde **la lectura pide más autorización que la escritura**, y conviene tenerlo presente como patrón
+antes de asumir que un GET siempre es la puerta barata:
+
+- La puerta **no** puede ser `hiring.assessment.read`. Esa capability la porta todo tenant interno por el
+  routeGroup `internal` —collaborator, designer, people_viewer incluidos—, y el DTO expone si la candidata
+  retiró su consentimiento, si su decisión aún no se le comunicó y si el proveedor bloqueó su correo. La puerta
+  real es `hiring.assessment.read` + `hiring.application.read` + **al menos una** de las dos capabilities de
+  recuperación (`recover_access_email` / `reveal_access_link`).
+- El binding a `applicationId` es **obligatorio** y se compara contra el aggregate, igual que en el POST. Un
+  read que acepta un `assessmentId` suelto entrega el consentimiento y la entregabilidad de cualquier candidato
+  del tenant. Un id que no pertenece a esa postulación se responde como inexistente, sin confirmar que existe
+  en otro lado (anti-oracle).
+- El `reason` es opcional pero validado contra el enum: la elegibilidad es reason-dependent, así que una lectura
+  sin motivo no puede probar el caso más común (`token_expired_before_start`).
+- El error 500 pasa por el contrato canónico (`error` es-CL + `actionable: true`); el cliente conserva
+  `actionable` en `HiringClientError` para no ofrecer "Reintentar" sobre una causa estructural.
+
+Full API Parity se conserva porque UI, CLI y futuros adapters gobernados delegan al mismo command/readers. El
+write NO se publica en MCP: revelar un bearer link exige sesión humana. La lectura sí es candidata a lane
+ecosystem cuando exista consumidor.
+
+Runtime: capabilities y schema vivos desde el 2026-08-19; Application 360 es el consumidor. Contrato de dominio:
+[`GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`](GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md) §`Acceso al test del candidato`.
 
 > **Tipo de documento:** Spec de arquitectura
 > **Version:** 1.0

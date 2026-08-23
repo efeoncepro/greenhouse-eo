@@ -589,6 +589,9 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     // 5 señales del scoring run (queries/hiring-assessment-ai-run-signals.ts).
     // TASK-1736 Slice 4 — 2 señales `data_quality` de identidad del intake (needs_review
     // backlog + evidence coverage gap; queries/hiring-candidate-identity-signals.ts).
+    // TASK-1765 — 1 señal `data_quality` del invariante de cierre `stage='closed'` ⟺ desenlace
+    // (queries/hiring-application-outcome-signals.ts). Nace ANTES que el CHECK de base para medir
+    // el drift que ese CHECK va a impedir; después queda como red ante una vía de escritura nueva.
     expectedSignalKinds: ['lag', 'data_quality', 'incident', 'dead_letter', 'drift'],
     incidentDomainTag: 'hiring'
   },

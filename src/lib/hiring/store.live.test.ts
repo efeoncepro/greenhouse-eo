@@ -134,6 +134,88 @@ describe.skipIf(!hasPgConfig)('hiring store — live PG (TASK-353)', () => {
     expect(staged.stage).toBe('shortlisted')
   })
 
+  // TASK-1765 — cerrar deja de ser un cambio de etapa. Contra PG real, no contra mocks: lo que se
+  // verifica es que la postulación NO quedó cerrada, y eso sólo lo prueba releer la fila.
+  it('el cambio de etapa NO puede cerrar: 422 canónico y la fila queda intacta', async () => {
+    await expect(
+      updateHiringApplicationStage(created.applicationId, 'closed' as never, 'user-live-test')
+    ).rejects.toSatisfy(
+      (err: unknown) =>
+        isHiringError(err) && (err as { code: string }).code === 'hiring_application_close_requires_outcome'
+    )
+
+    const [row] = await runGreenhousePostgresQuery<{ stage: string; decision: string | null }>(
+      `SELECT stage, decision FROM greenhouse_hiring.hiring_application WHERE application_id = $1`,
+      [created.applicationId]
+    )
+
+    expect(row?.stage).toBe('shortlisted')
+    expect(row?.decision).toBeNull()
+  })
+
+  // TASK-1765 — la bicondicional de la causa vive en la BASE, no sólo en el command. Si alguien
+  // encuentra otra vía de escritura, PostgreSQL sigue rechazando el par imposible.
+  it('la base rechaza `not_selected` sin causa y una causa sin `not_selected`', async () => {
+    await expect(
+      runGreenhousePostgresQuery(
+        `UPDATE greenhouse_hiring.hiring_application SET decision = 'not_selected', decision_cause = NULL
+         WHERE application_id = $1`,
+        [created.applicationId]
+      )
+    ).rejects.toThrow(/hiring_application_decision_cause_pairing_check/)
+
+    await expect(
+      runGreenhousePostgresQuery(
+        `UPDATE greenhouse_hiring.hiring_application SET decision = 'rejected', decision_cause = 'capacity_filled'
+         WHERE application_id = $1`,
+        [created.applicationId]
+      )
+    ).rejects.toThrow(/hiring_application_decision_cause_pairing_check/)
+
+    await expect(
+      runGreenhousePostgresQuery(
+        `UPDATE greenhouse_hiring.hiring_application SET decision = 'not_selected', decision_cause = 'porque_si'
+         WHERE application_id = $1`,
+        [created.applicationId]
+      )
+    ).rejects.toThrow(/hiring_application_decision_cause_check/)
+
+    const [row] = await runGreenhousePostgresQuery<{ decision: string | null; decision_cause: string | null }>(
+      `SELECT decision, decision_cause FROM greenhouse_hiring.hiring_application WHERE application_id = $1`,
+      [created.applicationId]
+    )
+
+    expect(row?.decision).toBeNull()
+    expect(row?.decision_cause).toBeNull()
+  })
+
+  // TASK-1765 — `archived_at` es ORTOGONAL: archivar no declara el desenlace de nadie ni mueve la
+  // etapa. Es la garantía que TASK-1748 necesita para dejar de archivar escribiendo `closed`.
+  it('`archived_at` se escribe sin tocar `stage` ni `decision`', async () => {
+    await runGreenhousePostgresQuery(
+      `UPDATE greenhouse_hiring.hiring_application SET archived_at = NOW() WHERE application_id = $1`,
+      [created.applicationId]
+    )
+
+    const [row] = await runGreenhousePostgresQuery<{
+      stage: string
+      decision: string | null
+      archived_at: string | null
+    }>(
+      `SELECT stage, decision, archived_at FROM greenhouse_hiring.hiring_application WHERE application_id = $1`,
+      [created.applicationId]
+    )
+
+    expect(row?.archived_at).not.toBeNull()
+    expect(row?.stage).toBe('shortlisted')
+    expect(row?.decision).toBeNull()
+
+    await runGreenhousePostgresQuery(
+      `UPDATE greenhouse_hiring.hiring_application SET archived_at = NULL WHERE application_id = $1`,
+      [created.applicationId]
+    )
+  })
+
   it('publish guard (422) requires public_title; publish/unpublish toggles the public listing', async () => {
     await expect(publishOpening(created.openingId, 'user-live-test')).rejects.toSatisfy(
       (err: unknown) =>

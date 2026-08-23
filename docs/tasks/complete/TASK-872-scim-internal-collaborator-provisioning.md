@@ -1,5 +1,12 @@
 # TASK-872 — SCIM Internal Collaborator Provisioning
 
+## Delta 2026-08-21 — coexistencia con Greenhouse → Entra
+
+`TASK-1761` crea un carril separado de API-driven inbound provisioning Greenhouse → Entra. Nunca invoca
+`provisionInternalCollaboratorFromScim`: antes de incluir la cuenta en el scope del SCIM saliente debe reconciliar
+y bindear el OID/UPN al principal/member existentes, de modo que el roundtrip sea update/idempotent y cree cero
+`client_user`, member, role o evento lógico adicional. TASK-872 conserva ownership del carril Entra → Greenhouse.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

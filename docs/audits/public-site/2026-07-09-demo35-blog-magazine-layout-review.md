@@ -1,5 +1,10 @@
 # Public Site Demo 35 Blog Magazine Layout Review - 2026-07-09
 
+> **Revalidación 2026-08-22:** el baseline runtime actual, el catálogo de
+> parámetros usados y la secuencia segura de adaptación están en
+> `docs/audits/public-site/2026-08-22-demo35-elementor-runtime-contract.md`.
+> Este documento se conserva como evidencia histórica.
+
 > **Tipo:** auditoria tecnica y operativa read-only
 > **Fecha:** 2026-07-09
 > **Sitio:** `https://efeoncepro.com`

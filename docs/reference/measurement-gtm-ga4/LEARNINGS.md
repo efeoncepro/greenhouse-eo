@@ -4,6 +4,52 @@
 
 ---
 
+## 2026-08-20 — CTA anidado en una tarjeta enlazada: `Click URL` vacío no significa que no exista destino
+
+**Qué:** en el sitio cliente Berel, el CTA visible `Conoce más` no tiene una sola forma DOM. En las tarjetas de
+producto es un `<div class="... btn ...">` dentro de un `<a href="/productos/…">`; en otra superficie el propio
+`<a>` tiene la clase `btn`. Con un activador `Clic - Todos los elementos`, GTM reportó el `<div>` como
+`Click Element` y dejó `Click URL` vacío, aunque el navegador sí navegó al producto.
+
+- **No cambiar a `Solo enlaces` a ciegas.** Ese activador sirve cuando la intención es medir todo el enlace o toda
+  la tarjeta. En este caso habría contado también clics en imagen, título y contenido, no sólo el CTA.
+- **Fallback preciso cuando no existe un evento de negocio en `dataLayer`:** usar `Todos los elementos`, filtrar
+  `Click Element` con un selector CSS que cubra tanto el enlace-botón como el botón anidado, y derivar el destino
+  desde el ancestro enlazado más cercano:
+
+  ```js
+  function() {
+    var el = {{Click Element}};
+    if (!el) return;
+    var link = el.closest ? el.closest('a[href]') : null;
+    return link ? link.href : undefined;
+  }
+  ```
+
+  Selector verificado para esta familia de productos:
+
+  ```css
+  a[href*="/productos/"].btn,
+  a[href*="/productos/"].btn *,
+  a[href*="/productos/"] .btn,
+  a[href*="/productos/"] .btn *
+  ```
+
+- **La variable Custom JavaScript es un adaptador DOM mínimo, no un segundo sistema de tracking.** Debe ser pura,
+  sin red, storage ni efectos laterales; sólo inspecciona `{{Click Element}}`, retorna `undefined` si no encuentra
+  un enlace y alimenta un parámetro como `destination_url`. Si la variable integrada `Click URL` ya trae el valor,
+  no crear este fallback.
+- **Un solo tag genérico, no uno por producto.** El evento mantiene un nombre estable y diferencia el producto con
+  `destination_url`. Si el parámetro se usará en reportes o exploraciones, registrarlo como dimensión personalizada
+  con alcance de evento en GA4.
+- **Orden de preferencia:** evento semántico emitido por la aplicación al `dataLayer` → `Solo enlaces` + `Click URL`
+  cuando se quiere medir todo el enlace → `Todos los elementos` + selector preciso + `closest('a[href]')` cuando se
+  necesita aislar un CTA anidado en HTML que no controlamos.
+- **Verificación proporcional:** Tag Assistant confirmó el tag en tres destinos y en ambas formas DOM (botón
+  anidado y `<a class="btn">`), con `destination_url` evaluado correctamente; un clic de navegación ajeno quedó con
+  `Etiquetas activadas: Ninguna`. La prueba negativa evita que el selector termine midiendo toda la tarjeta o todo
+  `/productos/`.
+
 ## 2026-07-18 — CTA engine en WordPress (TASK-1427): evidencia E2E + estado real del consent
 
 **Qué:** primera verificación E2E del motor Growth CTA en el host WordPress (página de prueba `efeoncepro.com/greenhouse-cta-prueba/`, decisión del operador: test page antes del placement amplio). Desktop 1440: `greenhouse_cta_viewed/clicked/form_opened` en dataLayer + los 3 saliendo por `/g/collect` a `G-KYPPY57M14` + ingest server 202 + ledger `browser_reported/accepted`. Mobile 390: `viewed` completo. Forja con embed key inválida → `403 surface_unauthorized`.

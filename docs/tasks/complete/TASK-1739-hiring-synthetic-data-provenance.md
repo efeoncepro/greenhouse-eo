@@ -44,6 +44,16 @@ Talento sin filtro de procedencia —hoy las 11 personas sintéticas no aparecen
 escribe sólo sobre `hiring_application` cuando la spec definía tres entidades, y la decisión
 pendiente del lane B. Ninguno tiene efecto visible hoy y por eso no justificaron un release propio.
 
+**Estado 2026-08-22 (`TASK-1748`, `in-progress`):** los dos primeros están **code complete**. El filtro
+de procedencia llegó a `talent-pool/readers.ts` y `projection.ts`, y el archivado pasó a las tres
+entidades **cambiando de eje**: escribe `archived_at`, nunca `stage='closed'` —el ADR del vocabulario
+lo prohíbe, y ese `UPDATE` de acá es justamente el origen de las 32 filas `closed` sin desenlace que
+ensuciaron el diagnóstico de la auditoría—. Dos cosas que esta spec no anticipaba: el archivado de la
+ficha exigía ampliar el `CHECK` de `record_type` del audit (aplicado), y **los dos cabos no son
+independientes** — la migración de las 32 filas quedó parqueada hasta que el filtro esté desplegado,
+porque restaurar sus etapas hace que la projection reclasifique sus 11 fichas a un estado servible.
+El lane B sigue pendiente y ahora tiene doble bloqueo: sign-off del operador y esa migración.
+
 ## Delta 2026-08-18
 
 **Primer objetivo concreto para el lane de purga, generado por el canary de `TASK-1736`.** Al ejecutar

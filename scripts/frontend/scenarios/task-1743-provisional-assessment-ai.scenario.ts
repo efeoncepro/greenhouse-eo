@@ -34,7 +34,7 @@ export const scenario: CaptureScenario = {
     layout: {
       enabled: true,
       includeSelector: 'main',
-      ignoreSelectors: ['.MuiLinearProgress-bar', '[data-capture="assessment-accessible-score-table"]'],
+      ignoreSelectors: ['.MuiLinearProgress-bar'],
       allowHorizontalScrollSelectors: [
         '[data-capture="hiring-tabs"]',
         '[data-capture="hiring-application-tabs"]',

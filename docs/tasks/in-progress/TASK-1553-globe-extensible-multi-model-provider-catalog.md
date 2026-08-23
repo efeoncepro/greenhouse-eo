@@ -1,5 +1,54 @@
 # TASK-1553 — Globe Extensible Multi-Model Provider Catalog + Route-Based Model Resolution
 
+## Delta 2026-08-21 — GPT Image 2 con fondo transparente
+
+`TASK-1553` es la dueña del catálogo de modelos, `ref/still/openai-v2`, `openai-adapter.ts` y el allowlist del
+endpoint; por eso absorbe la integración concreta y no nace una cuarta task para el mismo adapter. El contrato
+compartido `backgroundMode` pertenece al delta enlazado de `TASK-1633`, y la afordancia UI a `TASK-1552`.
+
+Alcance:
+
+- declarar en la revisión de `ref/still/openai-v2` los modos `auto | opaque | transparent`, con `auto` como
+  default compatible y `transparent` dentro de `backgroundMode.preview` para el disclosure visible;
+- compilar `backgroundMode: 'transparent'` al campo OpenAI `background: 'transparent'` y conservar la
+  equivalencia legacy de `auto`; no filtrar el provider/model slug al contrato público;
+- mantener `png` como formato efectivo actual y aceptar `webp` sólo si la ruta lo declara; rechazar
+  `transparent + jpeg` antes del provider;
+- persistir el `background` resuelto por la respuesta OpenAI y reconciliarlo con los bytes recuperados;
+- propagar el mismo output shape por estimate → prepare → execute, sin endpoint, capability, bypass de readiness
+  ni ciclo de promoción paralelos.
+
+### Criterios adicionales de adapter y rollout
+
+- [x] Fixtures del catálogo prueban que sólo las revisiones con soporte proyectan `transparent`; las demás rutas
+      no heredan soporte desde un default global.
+- [x] Tests exactos de request prueban `background: 'transparent'`, el PNG de la ruta vigente y ausencia de
+      submit cuando la ruta no soporta transparencia; `auto` conserva el comportamiento anterior. WebP deberá
+      agregar sus propios tests antes de exponerse y no se infiere desde el soporte del proveedor.
+- [x] La respuesta conserva `effectiveBackgroundMode`; un mismatch entre metadata, MIME y alfa falla cerrado y
+      no publica un asset falsamente transparente.
+- [ ] Un canary facturable desde el Producer autenticado usa exactamente `ref/still/openai-v2`, produce una pieza
+      aislada sobre fondo transparente y verifica run terminal, cobro único, PNG, hash, canal alfa y al menos
+      un píxel no opaco mediante readback de bytes.
+- [x] La evidencia de preview queda ligada a la revisión exacta de ruta/modelo y no amplía GPT Image 1.5 ni otras
+      rutas por analogía.
+- [ ] El rollback despublica sólo el modo `transparent` de la revisión/catálogo y conserva GPT Image 2 disponible
+      con `auto`; no exige retirar la ruta completa.
+
+Fuentes de proveedor verificadas 2026-08-21:
+[Image generation guide](https://developers.openai.com/api/docs/guides/image-generation#customize-image-output) y
+[Create image reference](https://developers.openai.com/api/reference/resources/images/methods/generate).
+
+### Ejecución local 2026-08-21
+
+Implementado en el checkout compartido de Globe, sin deploy ni gasto: constraints por ruta, traducción exacta a
+`background`, rechazo pre-red en GPT Image 1.5, persistencia de requested/effective y verificación decodificada de
+alfa. El formato efectivo de esta ruta permanece PNG; WebP no se expone. Pendiente operativo: canary facturable,
+readback live, receipt de revisión y promoción/rollback del modo preview.
+
+Verificación local: `pnpm check` y `pnpm build` verdes en Globe. Esta evidencia no sustituye el canary autenticado
+ni acredita que el modo esté desplegado.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -19,10 +68,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-028`
-- Status real: `CODE + ROLLOUT DE LAS SEIS RUTAS DE IMAGEN COMPLETOS — Seedream 5 Pro, Nano Banana Pro, Nano Banana 2, GPT Image 2, GPT Image 1.5 y Recraft v4.1 están simultáneamente available en Producer y ejercitados desde la UI autenticada. TASK-1553 permanece in-progress únicamente porque falta adjuntar, por ruta promovible, la rate version vigente de TASK-1468 y el onboarding receipt de TASK-1578. No queda código, promoción ni canary pendiente para estas seis rutas`
+- Status real: `Transparencia GPT Image 2 code complete en checkouts locales; rollout pendiente. Faltan canary facturable/readback live/promoción del modo preview y los receipts TASK-1468/TASK-1578 del alcance original`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-1468, TASK-1578` (sólo receipts de cierre; no bloquean el runtime live)
+- Blocked by: `TASK-1633 para backgroundMode; TASK-1468 y TASK-1578 sólo para receipts del alcance original`
 - Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 

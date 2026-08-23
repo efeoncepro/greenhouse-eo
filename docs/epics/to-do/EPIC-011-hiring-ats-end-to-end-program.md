@@ -44,6 +44,7 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
 - `docs/architecture/GREENHOUSE_CANDIDATE_ACCOUNT_LONGITUDINAL_MY_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_CANDIDATE_SELF_SERVICE_LONGITUDINAL_MY_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_HIRING_ENTRA_WORKFORCE_ACCOUNT_PROVISIONING_DECISION_V1.md`
 
 ## Execution Sequence
 
@@ -100,6 +101,16 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   reconciliar parciales sin conceder workforce desde la decisión Hiring.
 - Gate: selected→activated conserva `user_id` e `identity_profile_id`; session refresh/revocation y retries no crean
   una segunda cuenta o member.
+
+### Phase 7B — Microsoft Entra Workforce Account Provisioning
+
+- `TASK-1761` consume `principal_bound` y `workforce_enabled` sin reabrir TASK-770/1731: provisiona primero una
+  cuenta Entra cloud-only deshabilitada, reconcilia el resultado asíncrono, liga el OID al principal existente y
+  separa enablement, grupo y licencia.
+- Gate: el fix `accountEnabled ≠ portal principal active`, uniqueness inversa del objeto externo y roundtrip SCIM
+  anti-duplicación cierran antes del canary; `m365_service_ready` exige licencia/grupo/approval readback y no se
+  confunde con `workforce_enabled`.
+- Boundary: Entra failure no revierte selección/member/workforce; TASK-1721 sólo observa status y next action.
 
 ### Phase 8 — Longitudinal People 360 Closure
 
@@ -183,6 +194,10 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   decisión atómica con handoff, email y activation sin saltarse gates ni duplicar commands.
 - `TASK-1722` — Delegated MCP Candidate Selection Journey: tools start/status/advance/cancel sobre TASK-1721, con
   authority por step y write fail-closed hasta grant revocable TASK-1631.
+- `TASK-1762` — Hiring Opening Capacity Closure and Candidate Disposition Foundation: capacidad explícita,
+  preview/confirm, run durable por aplicación y email consent-aware sobre el evento canónico.
+- `TASK-1763` — Hiring Capacity Closure Preview and Confirmation Flow: segundo paso visible en Application 360,
+  con cohorte/consecuencia exacta antes de cerrar y notificar.
 - `TASK-1723` — Talent Pool Canonical Foundation + Full API Parity: membership/purpose/evidence/search/commands/API.
 - `TASK-1724` — Talent Pool Consent + Candidate Self-Service: opt-in independiente, status/renew/withdrawal público.
 - `TASK-1725` — Talent Pool Desk: workbench interno person-first y invitation proposal/confirm.
@@ -206,6 +221,13 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   capabilities y consumidores canónicos.
 - `TASK-1731` — Selection-to-Workforce Account Continuity Bridge: mismo principal/persona, member additive,
   sessionVersion y reconciliation sobre TASK-770.
+- `TASK-1761` — Hiring-to-Entra Workforce Account Provisioning and Lifecycle Bridge: API-driven inbound sobre el
+  mismo principal, cuenta disabled-first, OID binding pre-SCIM, enable/licensing gated y Joiner-Mover-Leaver.
+- `TASK-1752` — Assessment AI Run Settled-Not-Closed Signal: detecta runs settled atrapados en `awaiting_review`.
+- `TASK-1754` — Hiring Stage Vocabulary Collapse: alinea etapas elegibles con las que el operador puede elegir.
+- `TASK-1755` — Assessment Assignment Attempt Recovery: permite reintento gobernado tras un intento `blocked`.
+- `TASK-1756` — Dossier Partial Evidence Disclosure: impide recomendaciones silenciosas sobre evidencia incompleta.
+- `TASK-1757` — Assessment Access Rotation Candidate Notice: avisa una rotación sin filtrar la credencial.
 - `TASK-1732` — Identity-First People 360 Hiring Journey Reader: historia pre/post-member, paginada y allowlisted.
 - `TASK-1733` — People 360 Longitudinal Hiring History UI: timeline/detail interno sobre TASK-1732.
 - `TASK-1734` — Assessment AI Scoring at Scale + Operator-Only Exception Review: run asíncrono por assessment,
@@ -275,6 +297,10 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   11 personas sintéticas quedan fuera por su `lifecycle_status`, no por el filtro), el archivado escribe sólo sobre la
   postulación cuando la spec definía tres entidades, y las 9 huérfanas del lane B siguen sin decisión. Sin efecto
   visible hoy; se escriben porque una deuda que no duele es la que se olvida.
+- `TASK-1751` — El candidato no ve su reloj ni entiende por qué no puede enviar: el temporizador de la rendición no
+  sigue el scroll, los avisos de 5 y 1 minuto son `srOnly` (invisibles para quien ve), la gracia de 30 minutos se rompe
+  con texto sin guardar y el error final manda a reintentar algo imposible. Caso real medido sobre una candidata que
+  perdió una respuesta escrita teniendo 26 minutos de gracia disponibles.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
 
@@ -390,6 +416,33 @@ convenciones distintas de marcado repartidas en ocho scripts, ninguna compartida
 Es paralelizable con todos los carriles: no bloquea ni es bloqueada por ninguno, y cuanto antes
 cierre, menos fantasmas hay que remediar después.
 
+### Eje de desenlace del pipeline — `TASK-1765`…`TASK-1770` (2026-08-22)
+
+Carril nuevo abierto por [`GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1`](../../architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md)
+(`Accepted`), el **primer ADR que el vocabulario del pipeline tiene**. Evidencia base:
+[auditoría 2026-08-22](../../audits/hiring/GREENHOUSE_HIRING_STAGE_VOCABULARY_AUDIT_2026-08-22.md), 30 hallazgos con
+verificación adversarial completa.
+
+La premisa que fija el carril: **el pipeline es el recorrido de la persona candidata**, y modela dos ejes —
+`stage` (dónde va) y **desenlace** (cómo terminó), unidos por el invariante `stage='closed'` ⟺ desenlace
+declarado, como `CHECK` de base.
+
+- `TASK-1765` — **Outcome axis + command de cierre.** Enum de 6 desenlaces + causa gobernada de 3 + el `CHECK` +
+  el campo de archivado. Vertical híbrida deliberada: el `CHECK` es inaplicable mientras el `PATCH` acepte
+  `closed`. Cierra H-01 y H-02 **estructuralmente**, no por parche.
+- `TASK-1766` — **Superficie del kanban.** Chip de desenlace en la tarjeta y diálogo de cierre. Cubre los **dos**
+  caminos de escritura (arrastre y menú contextual, que en móvil es el principal). *Bloqueada por 1765.*
+- `TASK-1767` — **Embudo de equidad por desenlace + causa.** Task propia porque su error es irreversible sobre
+  evidencia AI Act append-only. *Bloqueada por 1765.*
+- `TASK-1768` — **Eje de progreso de la etapa Entrevista.** Hace visible el scorecard que ya existe. Declara la
+  distinción **progreso ≠ desenlace** que impide volver a acumular etapas. *Bloqueada por 1766.*
+- `TASK-1769` — **Agendamiento vía Microsoft Graph.** Greenhouse agenda pero **no es dueño del calendario**
+  (decisión del operador 2026-08-22). `Calendars.ReadWrite` **no está otorgado**: precondición dura.
+- `TASK-1770` — **Motor de disponibilidad y propuesta de horarios** (`getSchedule`). *Bloqueada por 1769.*
+
+Dos superficies **no** generaron ID nuevo y entraron como Delta a su dueño: el archivado que escribía `closed`
+(`TASK-1748`) y el arranque del reloj de retención (`TASK-1744`).
+
 ## Existing Related Work
 
 - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
@@ -433,6 +486,9 @@ cierre, menos fantasmas hay que remediar después.
 - [ ] `TASK-1731` demuestra selección→activación con el mismo principal/persona y revocación/refresh de sesión.
 - [ ] `TASK-1732`–`TASK-1733` muestran People 360 identity-first antes/después de member, con todas las aplicaciones
       autorizadas y sin mezclar evidencia entre procesos.
+- [ ] `TASK-1762`–`TASK-1763` permiten declarar cupos, revisar y confirmar un cierre de cohorte sin inferirlo desde
+      publicación/selección; retries no duplican decisiones/emails y Banco de Talentos sólo se afirma con
+      consentimiento futuro vigente.
 
 ## Non-goals
 

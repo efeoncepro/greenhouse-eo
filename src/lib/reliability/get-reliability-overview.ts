@@ -211,6 +211,7 @@ import { getHiringCandidateRetentionOverdueSignal } from './queries/hiring-candi
 import { getHiringTalentPoolIntegritySignal } from './queries/hiring-talent-pool-integrity'
 import { getHiringAssessmentTemplateIntegritySignal } from './queries/hiring-assessment-template-integrity'
 import { getHiringAssessmentAccessExchangeSignal } from './queries/hiring-assessment-access-exchange-signals'
+import { getHiringAssessmentRotationNoticeSignal } from './queries/hiring-assessment-rotation-notice-signals'
 import { getHiringAssessmentAssignmentHealthSignal } from './queries/hiring-assessment-assignment-signals'
 import { getEmailDeliveryLifecycleSignal } from './queries/email-delivery-lifecycle'
 // TASK-356 — Hiring handoff workflow signals (moduleKey 'hiring').
@@ -222,6 +223,7 @@ import { getWorkforceHiringActivationStuckSignal } from './queries/workforce-hir
 import { getHiringAssessmentAiRunSignals } from './queries/hiring-assessment-ai-run-signals'
 // TASK-1736 Slice 4 — Candidate identity intake signals (moduleKey 'hiring').
 import { getHiringDataOriginDerivationDriftSignal } from './queries/hiring-data-origin-drift'
+import { getHiringApplicationOutcomeDriftSignal } from './queries/hiring-application-outcome-signals'
 import { getHiringCandidateIdentitySignals } from './queries/hiring-candidate-identity-signals'
 import { getKnowledgeQuarantineCountSignal } from './queries/knowledge-quarantine-count'
 import { getKnowledgeSyncFailedSourceSignal } from './queries/knowledge-sync-failed-source'
@@ -720,6 +722,7 @@ interface ReliabilityOverviewSources {
   /** TASK-1719 — asignación manual/automática: `intent` en reposo, backlog y propuestas vencidas. */
   hiringAssessmentAssignmentHealth?: ReliabilitySignal | null
   hiringAssessmentAccessExchange?: ReliabilitySignal | null
+  hiringAssessmentRotationNotice?: ReliabilitySignal | null
   /** TASK-1745 — lifecycle global de Resend; no se limita a Hiring. */
   emailDeliveryLifecycle?: ReliabilitySignal | null
   hiringHandoffBlockedStale?: ReliabilitySignal | null
@@ -729,6 +732,7 @@ interface ReliabilityOverviewSources {
   /** TASK-1736 — Candidate identity intake (needs_review backlog + evidence coverage gap). */
   hiringCandidateIdentity?: ReliabilitySignal[] | null
   hiringDataOriginDrift?: ReliabilitySignal | null
+  hiringApplicationOutcomeDrift?: ReliabilitySignal | null
   workforceHiringActivationStuck?: ReliabilitySignal | null
   knowledgeSyncFailedSource?: ReliabilitySignal | null
   knowledgeNotionIngestDeadLetter?: ReliabilitySignal | null
@@ -1220,6 +1224,7 @@ export const buildReliabilityOverview = (
     ...(sources.hiringAssessmentTemplateIntegrity ? [sources.hiringAssessmentTemplateIntegrity] : []),
     ...(sources.hiringAssessmentAssignmentHealth ? [sources.hiringAssessmentAssignmentHealth] : []),
     ...(sources.hiringAssessmentAccessExchange ? [sources.hiringAssessmentAccessExchange] : []),
+    ...(sources.hiringAssessmentRotationNotice ? [sources.hiringAssessmentRotationNotice] : []),
     ...(sources.emailDeliveryLifecycle ? [sources.emailDeliveryLifecycle] : []),
     ...(sources.hiringHandoffBlockedStale ? [sources.hiringHandoffBlockedStale] : []),
     ...(sources.hiringInternalHireAwaitingOnboarding ? [sources.hiringInternalHireAwaitingOnboarding] : []),
@@ -1228,6 +1233,7 @@ export const buildReliabilityOverview = (
     // TASK-1736 — Identidad del intake de candidatos (2 señales, steady=0; flag OFF ⇒ ok).
     ...(sources.hiringCandidateIdentity ?? []),
     ...(sources.hiringDataOriginDrift ? [sources.hiringDataOriginDrift] : []),
+    ...(sources.hiringApplicationOutcomeDrift ? [sources.hiringApplicationOutcomeDrift] : []),
     ...(sources.workforceHiringActivationStuck ? [sources.workforceHiringActivationStuck] : []),
     ...(sources.knowledgeSyncFailedSource ? [sources.knowledgeSyncFailedSource] : []),
     ...(sources.knowledgeNotionIngestDeadLetter ? [sources.knowledgeNotionIngestDeadLetter] : []),
@@ -1892,6 +1898,14 @@ export const getReliabilityOverview = async (
       ? preloadedSources.hiringAssessmentAccessExchange
       : await getHiringAssessmentAccessExchangeSignal().catch(() => null)
 
+  // TASK-1757 — un enlace seguro mata la credencial del candidato y se entrega en mano. Si esa
+  // entrega falla y el aviso tampoco salió, la persona queda fuera sin que nadie se entere: la
+  // señal hermana no puede verlo porque una recuperación por enlace no deja fila de delivery.
+  const hiringAssessmentRotationNotice =
+    preloadedSources.hiringAssessmentRotationNotice !== undefined
+      ? preloadedSources.hiringAssessmentRotationNotice
+      : await getHiringAssessmentRotationNoticeSignal().catch(() => null)
+
   const emailDeliveryLifecycle =
     preloadedSources.emailDeliveryLifecycle !== undefined
       ? preloadedSources.emailDeliveryLifecycle
@@ -1934,6 +1948,13 @@ export const getReliabilityOverview = async (
     preloadedSources.hiringDataOriginDrift !== undefined
       ? preloadedSources.hiringDataOriginDrift
       : await getHiringDataOriginDerivationDriftSignal().catch(() => null)
+
+  // TASK-1765 — drift del invariante `stage='closed'` ⟺ desenlace. Nace ANTES que el CHECK de base
+  // para medir el drift que ese CHECK va a impedir, y queda después como red.
+  const hiringApplicationOutcomeDrift =
+    preloadedSources.hiringApplicationOutcomeDrift !== undefined
+      ? preloadedSources.hiringApplicationOutcomeDrift
+      : await getHiringApplicationOutcomeDriftSignal().catch(() => null)
 
   const knowledgeSyncFailedSource =
     preloadedSources.knowledgeSyncFailedSource !== undefined
@@ -2772,12 +2793,14 @@ export const getReliabilityOverview = async (
     hiringAssessmentTemplateIntegrity,
     hiringAssessmentAssignmentHealth,
     hiringAssessmentAccessExchange,
+    hiringAssessmentRotationNotice,
     emailDeliveryLifecycle,
     hiringHandoffBlockedStale,
     hiringInternalHireAwaitingOnboarding,
     hiringAssessmentAiRun,
     hiringCandidateIdentity,
     hiringDataOriginDrift,
+    hiringApplicationOutcomeDrift,
     workforceHiringActivationStuck,
     knowledgeSyncFailedSource,
     knowledgeNotionIngestDeadLetter,

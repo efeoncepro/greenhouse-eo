@@ -395,6 +395,12 @@ Idempotency: key `hiring_handoff_id + identity_profile_id`; reintento retorna el
 ## Follow-ups
 
 - **`TASK-1368`** — activation lane UI (ui-ux, blocked by 770, mockup 763).
-- Automatización parcial de access provisioning post-readiness.
+- `TASK-1761` — automatización gobernada de Microsoft Entra post-principal/readiness; conserva esta task cerrada y
+  consume el mismo member/identity profile sin invocar la primitive SCIM ni crear otra persona.
 - Staff Augmentation activation lane para destino `staff_augmentation` (simétrico), si aplica.
 - Analytics time-to-hire / time-to-active desde `HiringApplication` hasta `member` activo.
+
+## Delta 2026-08-21 — owner del provisioning Microsoft
+
+El follow-up genérico de access provisioning queda asignado a `TASK-1761`. TASK-770 mantiene ownership de member,
+onboarding y workforce readiness; no crea cuentas Microsoft, no decide licencias y no cambia su cierre histórico.

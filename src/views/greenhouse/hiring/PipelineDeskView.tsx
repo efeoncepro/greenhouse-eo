@@ -37,27 +37,69 @@ type LaneId = 'inbox' | 'screening' | 'shortlist' | 'interview' | 'decision' | '
 
 type LaneDefinition = {
   id: LaneId
-  titleStage: HiringApplicationStage
-  stages: HiringApplicationStage[]
-  destination: HiringApplicationStage | null
+  /**
+   * TASK-1754 — UNA etapa por carril: la que le da nombre Y la que se escribe al soltar.
+   *
+   * Antes eran tres campos —`titleStage`, `stages`, `destination`— y esa tercera coordenada
+   * era el defecto, no un detalle de implementación: el carril «Evaluación» se titulaba desde
+   * `shortlisted` y guardaba en `qualified`. Ambas se traducen a «Evaluación» en pantalla, así
+   * que nadie lo vio durante seis semanas mientras quince políticas configuradas en
+   * `shortlisted` no disparaban. Con un solo campo, el error deja de poder escribirse.
+   */
+  stage: HiringApplicationStage
+  /**
+   * Literales que este carril todavía AGRUPA sin poder escribirlos: filas históricas de etapas
+   * que el dominio va a retirar. No es lo mismo que la etapa del carril y por eso tiene nombre
+   * propio — mezclarlos en una sola lista fue lo que permitió que el destino fuera uno de ellos.
+   *
+   * Vacía cuando el contract (Slice F) retire los literales. Hasta entonces es obligatoria:
+   * producción todavía escribe `qualified` al arrastrar a «Evaluación», y una etapa que ningún
+   * carril agrupa manda la tarjeta a la primera columna en silencio.
+   */
+  absorbs?: readonly HiringApplicationStage[]
   tone: 'primary' | 'info' | 'secondary' | 'warning' | 'success' | 'default'
   icon: string
 }
 
-const LANES: LaneDefinition[] = [
-  // The approved Hiring Desk uses six canonical columns. Backend stages that
-  // represent the same operational step are intentionally grouped inside the
-  // visual lane (the user still sees the canonical vocabulary).
-  { id: 'inbox', titleStage: 'sourced', stages: ['sourced'], destination: 'sourced', tone: 'primary', icon: 'tabler-sparkles' },
-  { id: 'screening', titleStage: 'screening', stages: ['screening'], destination: 'screening', tone: 'info', icon: 'tabler-scan' },
-  { id: 'shortlist', titleStage: 'shortlisted', stages: ['qualified', 'shortlisted', 'client_review'], destination: 'qualified', tone: 'secondary', icon: 'tabler-list-check' },
-  { id: 'interview', titleStage: 'interview', stages: ['interview'], destination: 'interview', tone: 'warning', icon: 'tabler-messages' },
-  { id: 'decision', titleStage: 'decision_pending', stages: ['decision_pending'], destination: 'decision_pending', tone: 'primary', icon: 'tabler-gavel' },
-  { id: 'outcome', titleStage: 'closed', stages: ['closed', 'selected', 'backup', 'rejected', 'withdrawn', 'handoff_ready'], destination: 'closed', tone: 'success', icon: 'tabler-rosette-discount-check' },
+/** Todas las etapas que un carril muestra: la suya más las históricas que absorbe. */
+export const stagesOfLane = (lane: LaneDefinition): readonly HiringApplicationStage[] => [lane.stage, ...(lane.absorbs ?? [])]
+
+/**
+ * TASK-1754 — exportado para que los invariantes del tablero se puedan fijar en una prueba.
+ *
+ * Cada carril declara UNA etapa: la que lo titula y la que se escribe al soltar una tarjeta.
+ * La divergencia entre ambas era estructuralmente posible y produjo el incidente del
+ * 2026-08-19 — la columna se titulaba desde `shortlisted` y guardaba en `qualified`, dos
+ * literales que el diccionario traduce igual, así que en pantalla no se veía nada raro.
+ * Ahora es un solo campo y esa clase de error dejó de existir.
+ *
+ * `absorbs` es otra cosa y por eso tiene otro nombre: literales que el carril MUESTRA porque
+ * quedan filas históricas, sin poder escribirlos. Se vacía en el contract (Slice F), cuando
+ * esos literales salgan del enum y del `CHECK`.
+ */
+export const LANES: LaneDefinition[] = [
+  { id: 'inbox', stage: 'sourced', tone: 'primary', icon: 'tabler-sparkles' },
+  { id: 'screening', stage: 'screening', tone: 'info', icon: 'tabler-scan' },
+  // `qualified` y `client_review` se absorbieron en `shortlisted` (Slice B). Siguen acá como
+  // históricas hasta el contract: `origin/main` todavía las escribe, y una tarjeta cuya etapa
+  // ningún carril agrupa aparece en la primera columna sin que nadie lo note.
+  { id: 'shortlist', stage: 'shortlisted', absorbs: ['qualified', 'client_review'], tone: 'secondary', icon: 'tabler-list-check' },
+  { id: 'interview', stage: 'interview', tone: 'warning', icon: 'tabler-messages' },
+  { id: 'decision', stage: 'decision_pending', tone: 'primary', icon: 'tabler-gavel' },
+  // Los cuatro espejos terminales y `handoff_ready` son históricos: el command de decisión ya
+  // escribe siempre `closed` (TASK-1765). Salen del enum en el Slice F, bloqueado hasta que el
+  // eje de desenlace esté verificado en producción.
+  {
+    id: 'outcome',
+    stage: 'closed',
+    absorbs: ['selected', 'backup', 'rejected', 'withdrawn', 'handoff_ready'],
+    tone: 'success',
+    icon: 'tabler-rosette-discount-check',
+  },
 ]
 
 const laneForStage = (stage: HiringApplicationStage) =>
-  LANES.find((lane) => lane.stages.includes(stage))?.id ?? 'inbox'
+  LANES.find((lane) => stagesOfLane(lane).includes(stage))?.id ?? 'inbox'
 
 const formatOpeningTitle = ({ opening }: HiringDeskOpeningSummary) =>
   (opening.publicTitle ?? opening.internalTitle).trim().replace(/\s*\/\s*/g, ' · ')
@@ -201,8 +243,6 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
   }
 
   const handleLaneDragOver = (event: DragEvent<HTMLElement>, lane: LaneDefinition) => {
-    if (!lane.destination) return
-
     event.preventDefault()
     if (dragOverLane !== lane.id) setDragOverLane(lane.id)
 
@@ -221,11 +261,11 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
     setDragId(null)
     setDragOverLane(null)
 
-    if (!applicationId || !lane.destination) return
+    if (!applicationId) return
 
     const item = applications.find((candidate) => candidate.application.applicationId === applicationId)
 
-    if (item) void persistStage(item, lane.destination)
+    if (item) void persistStage(item, lane.stage)
   }
 
   const card = (item: HiringDeskApplicationSummary) => {
@@ -551,7 +591,7 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
         >
         <Box sx={{ display: 'flex', gap: 1.75, minInlineSize: 'max-content', alignItems: 'flex-start', px: 0.125 }}>
           {LANES.map((lane, laneIndex) => {
-            const items = filtered.filter((item) => lane.stages.includes(item.application.stage))
+            const items = filtered.filter((item) => stagesOfLane(lane).includes(item.application.stage))
 
             return (
               <Box
@@ -595,7 +635,7 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
                   })}
                 >
                   <Stack direction='row' alignItems='center' spacing={0.875}>
-                    <Typography variant='caption' color='text.secondary' fontWeight={700} sx={{ letterSpacing: '.04em', textTransform: 'uppercase' }}>{copy.pipeline.stages[lane.titleStage]}</Typography>
+                    <Typography variant='caption' color='text.secondary' fontWeight={700} sx={{ letterSpacing: '.04em', textTransform: 'uppercase' }}>{copy.pipeline.stages[lane.stage]}</Typography>
                   </Stack>
                   <Typography
                     variant='caption'
@@ -621,7 +661,7 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
                 <Box sx={{ px: 1.25, pt: 1, pb: 1.5 }}>
                   <Stack
                     role='list'
-                    aria-label={`${copy.pipeline.stages[lane.titleStage]}: ${items.length}`}
+                    aria-label={`${copy.pipeline.stages[lane.stage]}: ${items.length}`}
                     spacing={1.25}
                     sx={{ minBlockSize: sparsePipeline ? 128 : 104 }}
                   >
@@ -684,16 +724,16 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
         }}
       >
         <MenuItem disabled><Typography variant='caption' color='text.secondary'>{copy.pipeline.moveTo}</Typography></MenuItem>
-        {LANES.filter((lane) => lane.destination).map((lane) => (
+        {LANES.map((lane) => (
           <MenuItem
             key={lane.id}
             selected={menu ? laneForStage(menu.application.application.stage) === lane.id : false}
             onClick={() => {
-              if (menu && lane.destination) void persistStage(menu.application, lane.destination)
+              if (menu) void persistStage(menu.application, lane.stage)
               setMenu(null)
             }}
           >
-            {copy.pipeline.stages[lane.titleStage]}
+            {copy.pipeline.stages[lane.stage]}
           </MenuItem>
         ))}
         <Divider />

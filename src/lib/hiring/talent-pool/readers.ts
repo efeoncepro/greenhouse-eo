@@ -5,6 +5,8 @@ import { createHash, createHmac, timingSafeEqual } from 'node:crypto'
 
 import { getNextAuthSecret } from '@/lib/auth-secrets'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { isHiringSyntheticDataFilterEnabled } from '@/lib/hiring/data-origin/config'
+import { realOnlyPredicate } from '@/lib/hiring/data-origin/contracts'
 import { HiringNotFoundError, HiringValidationError } from '@/lib/hiring/errors'
 
 import type {
@@ -91,7 +93,11 @@ const filterFingerprint = (input: SearchTalentPoolInput) =>
       languageCode: input.languageCode ?? null,
       countryCode: input.countryCode?.toUpperCase() ?? null,
       availability: input.availability ?? null,
-      lifecycle: [...(input.lifecycle ?? [])].sort()
+      lifecycle: [...(input.lifecycle ?? [])].sort(),
+      // El cursor firma la procedencia igual que los demas filtros: sin esto, una pagina emitida con
+      // el filtro puesto se podria continuar sin el (o al reves) y la paginacion serviria un conjunto
+      // distinto del que firmo.
+      includeSynthetic: resolveIncludeSynthetic(input.includeSynthetic)
     })
   )
 
@@ -210,6 +216,27 @@ const mapProfile = (row: ProfileRow, evidence: TalentPoolEvidenceDto[]): TalentP
   }
 }
 
+/**
+ * TASK-1748 Slice 1 — la invisibilidad de un dato sintetico debe derivar de SU PROCEDENCIA, no de un
+ * estado del ciclo de vida.
+ *
+ * Hasta esta task las 11 fichas sinteticas no aparecian en el Banco de Talento, pero por accidente:
+ * quedaron en `lifecycle_status='needs_reconsent'` y el `baseSelect` solo sirve
+ * `('active_process','pool_eligible','paused')`. Nadie garantizaba ese estado — y de hecho el
+ * archivado del Slice 2 lo cambia: al devolver las postulaciones sinteticas de `closed` a su etapa
+ * previa, la projection las reclasifica a `active_process` en su siguiente corrida (cada 5 min por
+ * Cloud Scheduler) y reaparecerian. Por eso el filtro es precondicion de ese Slice, no un adorno.
+ *
+ * Mismo contrato exacto que el desk (`desk.ts`): el flag decide el default y el `includeSynthetic`
+ * explicito del caller gana sobre el flag.
+ */
+const resolveIncludeSynthetic = (value: boolean | undefined): boolean =>
+  value ?? !isHiringSyntheticDataFilterEnabled()
+
+/** La procedencia de una ficha se hereda de la persona: `candidate_facet` no tiene `data_origin`. */
+const originClause = (includeSynthetic: boolean): string =>
+  includeSynthetic ? '' : ` AND ${realOnlyPredicate('ip')}`
+
 const baseSelect = `SELECT m.public_id, m.lifecycle_status, m.aggregate_version,
   m.future_consent_expires_at, cf.availability, cf.seniority,
   cf.residence_country_code AS country_code, ip.full_name, m.updated_at
@@ -219,7 +246,11 @@ const baseSelect = `SELECT m.public_id, m.lifecycle_status, m.aggregate_version,
 
 export const searchTalentPool = async (input: SearchTalentPoolInput = {}): Promise<SearchTalentPoolResult> => {
   const values: unknown[] = []
-  const where = [`m.lifecycle_status IN ('active_process', 'pool_eligible', 'paused')`]
+  const includeSynthetic = resolveIncludeSynthetic(input.includeSynthetic)
+
+  const where = [
+    `m.lifecycle_status IN ('active_process', 'pool_eligible', 'paused')${originClause(includeSynthetic)}`
+  ]
 
   const add = (clause: string, value: unknown) => {
     values.push(value)
@@ -299,12 +330,17 @@ export const searchTalentPool = async (input: SearchTalentPoolInput = {}): Promi
   }
 }
 
-export const getTalentPoolProfile = async (talentProfileId: string): Promise<TalentPoolProfileDto> => {
+export const getTalentPoolProfile = async (
+  talentProfileId: string,
+  options: { includeSynthetic?: boolean } = {}
+): Promise<TalentPoolProfileDto> => {
   const id = safeFilter(talentProfileId, 'talentProfileId')
+  const includeSynthetic = resolveIncludeSynthetic(options.includeSynthetic)
 
   const rows = await runGreenhousePostgresQuery<ProfileRow>(
     `${baseSelect} WHERE m.public_id = $1
-      AND m.lifecycle_status IN ('active_process', 'pool_eligible', 'paused') LIMIT 1`,
+      AND m.lifecycle_status IN ('active_process', 'pool_eligible', 'paused')${originClause(includeSynthetic)}
+      LIMIT 1`,
     [id]
   )
 

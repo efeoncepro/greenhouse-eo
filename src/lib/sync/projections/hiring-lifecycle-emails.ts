@@ -16,6 +16,7 @@ import 'server-only'
 
 import {
   sendHiringApplicationCreatedEmails,
+  sendHiringAssessmentAccessRotatedEmail,
   sendHiringAssessmentAssignedEmail,
   sendHiringAssessmentSubmittedInternalEmail,
   sendHiringDecisionEmail
@@ -128,4 +129,34 @@ export const talentPoolVerificationEmailProjection: ProjectionDefinition = {
   },
   refresh: async (scope, payload) => sendTalentPoolVerificationEmail(scope.entityId, payload),
   maxRetries: 3
+}
+
+/**
+ * TASK-1757 — el candidato se entera de que su acceso fue reemplazado.
+ *
+ * Cuelga del evento de dominio y NO del route handler: así, cualquier consumidor del command
+ * —la UI, MCP, Nexa, un runbook— avisa por construcción, en vez de rotar la credencial del
+ * candidato en silencio.
+ *
+ * El scope es la RECUPERACIÓN, no el assessment: con `assessmentId` una segunda rotación sería
+ * indistinguible de la primera para el dedupe, y la persona no se enteraría de la más reciente.
+ *
+ * Nace apagado por la fila `enabled = FALSE` en `email_type_config` (TASK-1757 seed): en esa tabla
+ * una fila AUSENTE significa encendido, así que el seed es la puerta, no una formalidad.
+ */
+export const hiringAssessmentAccessRotatedEmailProjection: ProjectionDefinition = {
+  name: 'hiring_assessment_access_rotated_email',
+  description:
+    'TASK-1757 — hiring.assessment.access_recovery_recorded (sólo secure_link + link_issued) → aviso al candidato de que su acceso anterior murió. NUNCA lleva el enlace: se entrega en mano tras verificar identidad.',
+  domain: 'notifications',
+  triggerEvents: [EVENT_TYPES.hiringAssessmentAccessRecoveryRecorded],
+  extractScope: payload => {
+    const recoveryId = typeof payload.recoveryId === 'string' ? payload.recoveryId.trim() : ''
+
+    if (!recoveryId) return null
+
+    return { entityType: 'hiring_assessment_access_recovery', entityId: recoveryId }
+  },
+  refresh: async (scope, payload) => sendHiringAssessmentAccessRotatedEmail(scope.entityId, payload),
+  maxRetries: 3,
 }

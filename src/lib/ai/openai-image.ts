@@ -3,6 +3,8 @@ import 'server-only'
 import { readFile } from 'node:fs/promises'
 import { basename, extname } from 'node:path'
 
+import sharp from 'sharp'
+
 import { resolveSecret, type SecretResolutionSource } from '@/lib/secrets/secret-manager'
 
 export type OpenAIImageModel = 'gpt-image-2' | 'gpt-image-1.5' | 'gpt-image-1' | 'gpt-image-1-mini'
@@ -11,7 +13,6 @@ export type OpenAIImageFormat = 'png' | 'webp' | 'jpeg'
 export type OpenAIImageBackground = 'auto' | 'opaque' | 'transparent'
 export type OpenAIImageInputFidelity = 'low' | 'high'
 export type OpenAIImageOperation = 'generate' | 'edit' | 'responses'
-export type OpenAITransparentBackgroundStrategy = 'fallback-to-gpt-image-1.5' | 'throw' | 'opaque'
 export type OpenAIImageAspectRatio = '1:1' | '16:9' | '9:16' | '4:3' | '3:4'
 export type OpenAIImageSize =
   | 'auto'
@@ -32,7 +33,6 @@ export interface GenerateOpenAIImageInput {
   quality?: OpenAIImageQuality
   format?: OpenAIImageFormat
   background?: OpenAIImageBackground
-  transparentBackgroundStrategy?: OpenAITransparentBackgroundStrategy
   numberOfImages?: number
   timeoutMs?: number
 }
@@ -62,7 +62,6 @@ export interface EditOpenAIImageInput {
   quality?: OpenAIImageQuality
   format?: OpenAIImageFormat
   background?: OpenAIImageBackground
-  transparentBackgroundStrategy?: OpenAITransparentBackgroundStrategy
   inputFidelity?: OpenAIImageInputFidelity
   numberOfImages?: number
   timeoutMs?: number
@@ -140,6 +139,7 @@ interface OpenAIImageUsage {
 }
 
 interface OpenAIImagesResponse {
+  background?: 'opaque' | 'transparent'
   data?: Array<{
     b64_json?: string
     revised_prompt?: string
@@ -169,7 +169,6 @@ const OPENAI_IMAGES_GENERATIONS_URL = 'https://api.openai.com/v1/images/generati
 const OPENAI_IMAGES_EDITS_URL = 'https://api.openai.com/v1/images/edits'
 const OPENAI_RESPONSES_URL = 'https://api.openai.com/v1/responses'
 const DEFAULT_OPENAI_IMAGE_MODEL: OpenAIImageModel = 'gpt-image-2'
-const TRANSPARENT_BACKGROUND_FALLBACK_MODEL: OpenAIImageModel = 'gpt-image-1.5'
 const DEFAULT_OPENAI_IMAGE_RESPONSES_MODEL = 'gpt-5.5'
 const DEFAULT_OPENAI_IMAGE_QUALITY: OpenAIImageQuality = 'medium'
 const DEFAULT_OPENAI_IMAGE_FORMAT: OpenAIImageFormat = 'png'
@@ -183,7 +182,7 @@ const OPENAI_IMAGE_MODELS = new Set<OpenAIImageModel>([
 ])
 
 const LEGACY_OPENAI_IMAGE_SIZES = new Set<OpenAIImageSize>(['auto', '1024x1024', '1024x1536', '1536x1024'])
-const MAX_OPENAI_IMAGE_INPUTS = 10
+const MAX_OPENAI_IMAGE_INPUTS = 16
 const MAX_OPENAI_IMAGE_INPUT_BYTES = 50 * 1024 * 1024
 
 const sanitizeEnvValue = (value: string | undefined) => value?.trim() || null
@@ -247,60 +246,24 @@ export const resolveOpenAIImageSize = ({
 }
 
 export const resolveOpenAIImageBackground = ({
-  model,
-  background,
-  transparentBackgroundStrategy = 'throw'
+  background
 }: {
   model: OpenAIImageModel
   background?: OpenAIImageBackground
-  transparentBackgroundStrategy?: OpenAITransparentBackgroundStrategy
 }): OpenAIImageBackground | null => {
-  if (!background) {
-    return null
-  }
-
-  if (model === 'gpt-image-2' && background === 'transparent') {
-    if (transparentBackgroundStrategy === 'opaque') {
-      return 'opaque'
-    }
-
-    throw new Error('gpt-image-2 does not support transparent backgrounds. Use background "opaque" or omit it.')
-  }
-
-  return background
+  return background ?? null
 }
 
 export const resolveOpenAIImageRequestModel = ({
-  model,
-  background,
-  transparentBackgroundStrategy = 'fallback-to-gpt-image-1.5'
+  model
 }: {
   model: OpenAIImageModel
   background?: OpenAIImageBackground
-  transparentBackgroundStrategy?: OpenAITransparentBackgroundStrategy
 }): {
   model: OpenAIImageModel
   requestedModel: OpenAIImageModel
   modelFallbackReason: string | null
 } => {
-  if (model === 'gpt-image-2' && background === 'transparent') {
-    if (transparentBackgroundStrategy === 'fallback-to-gpt-image-1.5') {
-      return {
-        model: TRANSPARENT_BACKGROUND_FALLBACK_MODEL,
-        requestedModel: model,
-        modelFallbackReason: 'gpt-image-2 does not support transparent backgrounds; using gpt-image-1.5.'
-      }
-    }
-
-    if (transparentBackgroundStrategy === 'opaque') {
-      return {
-        model,
-        requestedModel: model,
-        modelFallbackReason: 'gpt-image-2 does not support transparent backgrounds; background was coerced to opaque.'
-      }
-    }
-  }
-
   return {
     model,
     requestedModel: model,
@@ -308,8 +271,20 @@ export const resolveOpenAIImageRequestModel = ({
   }
 }
 
-const clampNumberOfImages = (value: number | undefined) =>
-  Math.max(1, Math.min(4, Number.isFinite(value) ? Math.floor(value as number) : 1))
+const assertSingleImageRequest = (value: number | undefined) => {
+  if (value === undefined || value === 1) return
+
+  throw new Error('This OpenAI image helper returns one image. Use one request per output instead of numberOfImages > 1.')
+}
+
+const assertBackgroundFormatCompatibility = (
+  background: OpenAIImageBackground | undefined,
+  format: OpenAIImageFormat
+) => {
+  if (background === 'transparent' && format === 'jpeg') {
+    throw new Error('Transparent OpenAI image output requires PNG or WebP; JPEG cannot preserve alpha.')
+  }
+}
 
 const resolveOpenAIApiKey = async () => {
   const resolution = await resolveSecret({ envVarName: 'OPENAI_API_KEY' })
@@ -349,6 +324,7 @@ const resolveOpenAIImageFile = async (input: OpenAIImageFileInput) => {
     }
 
     return {
+      bytes: new Uint8Array(bytes),
       blob: new Blob([new Uint8Array(bytes)], { type: mimeType }),
       filename,
       mimeType
@@ -362,9 +338,35 @@ const resolveOpenAIImageFile = async (input: OpenAIImageFileInput) => {
   }
 
   return {
+    bytes: new Uint8Array(bytes),
     blob: new Blob([new Uint8Array(bytes)], { type: input.mimeType }),
     filename: input.filename,
     mimeType: input.mimeType
+  }
+}
+
+const assertMaskMatchesPrimaryImage = async ({
+  image,
+  mask
+}: {
+  image: Awaited<ReturnType<typeof resolveOpenAIImageFile>>
+  mask: Awaited<ReturnType<typeof resolveOpenAIImageFile>>
+}) => {
+  if (image.mimeType !== mask.mimeType) {
+    throw new Error('OpenAI image mask must use the same format as the first image input.')
+  }
+
+  const [imageMetadata, maskMetadata] = await Promise.all([
+    sharp(image.bytes).metadata(),
+    sharp(mask.bytes).metadata()
+  ])
+
+  if (!imageMetadata.width || !imageMetadata.height || !maskMetadata.width || !maskMetadata.height) {
+    throw new Error('OpenAI image mask and first image must have readable dimensions.')
+  }
+
+  if (imageMetadata.width !== maskMetadata.width || imageMetadata.height !== maskMetadata.height) {
+    throw new Error('OpenAI image mask must have the same dimensions as the first image input.')
   }
 }
 
@@ -501,7 +503,6 @@ export const generateOpenAIImage = async ({
   quality = DEFAULT_OPENAI_IMAGE_QUALITY,
   format = DEFAULT_OPENAI_IMAGE_FORMAT,
   background,
-  transparentBackgroundStrategy,
   numberOfImages = 1,
   timeoutMs = DEFAULT_OPENAI_IMAGE_TIMEOUT_MS
 }: GenerateOpenAIImageInput): Promise<GenerateOpenAIImageOutput> => {
@@ -511,13 +512,15 @@ export const generateOpenAIImage = async ({
     throw new Error('OpenAI image generation requires a non-empty prompt.')
   }
 
-  const resolvedRequest = resolveOpenAIImageRequestModel({ model, background, transparentBackgroundStrategy })
+  assertSingleImageRequest(numberOfImages)
+  assertBackgroundFormatCompatibility(background, format)
+
+  const resolvedRequest = resolveOpenAIImageRequestModel({ model, background })
   const resolvedSize = resolveOpenAIImageSize({ model: resolvedRequest.model, size, aspectRatio })
 
   const resolvedBackground = resolveOpenAIImageBackground({
     model: resolvedRequest.model,
-    background,
-    transparentBackgroundStrategy
+    background
   })
 
   const apiKeyResolution = await resolveOpenAIApiKey()
@@ -529,7 +532,7 @@ export const generateOpenAIImage = async ({
     body: {
       model: resolvedRequest.model,
       prompt: normalizedPrompt,
-      n: clampNumberOfImages(numberOfImages),
+      n: 1,
       size: resolvedSize,
       quality,
       output_format: format,
@@ -548,7 +551,7 @@ export const generateOpenAIImage = async ({
     size: resolvedSize,
     quality,
     format,
-    background: resolvedBackground,
+    background: payload.background ?? resolvedBackground,
     revisedPrompt: generated.revisedPrompt,
     usage: payload.usage ?? null,
     secretSource: apiKeyResolution.source
@@ -565,7 +568,6 @@ export const editOpenAIImage = async ({
   quality = DEFAULT_OPENAI_IMAGE_QUALITY,
   format = DEFAULT_OPENAI_IMAGE_FORMAT,
   background,
-  transparentBackgroundStrategy,
   inputFidelity,
   numberOfImages = 1,
   timeoutMs = DEFAULT_OPENAI_IMAGE_TIMEOUT_MS
@@ -575,6 +577,10 @@ export const editOpenAIImage = async ({
   if (!normalizedPrompt) {
     throw new Error('OpenAI image editing requires a non-empty prompt.')
   }
+
+
+  assertSingleImageRequest(numberOfImages)
+  assertBackgroundFormatCompatibility(background, format)
 
   const imageInputs = Array.isArray(image) ? image : [image]
 
@@ -586,13 +592,12 @@ export const editOpenAIImage = async ({
     throw new Error(`OpenAI image editing supports at most ${MAX_OPENAI_IMAGE_INPUTS} input images per request.`)
   }
 
-  const resolvedRequest = resolveOpenAIImageRequestModel({ model, background, transparentBackgroundStrategy })
+  const resolvedRequest = resolveOpenAIImageRequestModel({ model, background })
   const resolvedSize = resolveOpenAIImageSize({ model: resolvedRequest.model, size, aspectRatio })
 
   const resolvedBackground = resolveOpenAIImageBackground({
     model: resolvedRequest.model,
-    background,
-    transparentBackgroundStrategy
+    background
   })
 
   const apiKeyResolution = await resolveOpenAIApiKey()
@@ -600,7 +605,7 @@ export const editOpenAIImage = async ({
 
   formData.append('model', resolvedRequest.model)
   formData.append('prompt', normalizedPrompt)
-  formData.append('n', String(clampNumberOfImages(numberOfImages)))
+  formData.append('n', '1')
   formData.append('size', resolvedSize)
   formData.append('quality', quality)
   formData.append('output_format', format)
@@ -613,14 +618,17 @@ export const editOpenAIImage = async ({
     formData.append('input_fidelity', inputFidelity)
   }
 
-  for (const imageInput of imageInputs) {
-    const file = await resolveOpenAIImageFile(imageInput)
+  const resolvedImageInputs = await Promise.all(imageInputs.map(resolveOpenAIImageFile))
+
+  for (const file of resolvedImageInputs) {
 
     formData.append(imageInputs.length > 1 ? 'image[]' : 'image', file.blob, file.filename)
   }
 
   if (mask) {
     const maskFile = await resolveOpenAIImageFile(mask)
+
+    await assertMaskMatchesPrimaryImage({ image: resolvedImageInputs[0], mask: maskFile })
 
     formData.append('mask', maskFile.blob, maskFile.filename)
   }
@@ -643,7 +651,7 @@ export const editOpenAIImage = async ({
     size: resolvedSize,
     quality,
     format,
-    background: resolvedBackground,
+    background: payload.background ?? resolvedBackground,
     revisedPrompt: edited.revisedPrompt,
     usage: payload.usage ?? null,
     secretSource: apiKeyResolution.source
@@ -672,6 +680,13 @@ export const runOpenAIImageTool = async ({
     throw new Error('OpenAI Responses image generation requires a non-empty prompt.')
   }
 
+
+  assertBackgroundFormatCompatibility(background, format)
+
+  if (partialImages && partialImages > 0) {
+    throw new Error('OpenAI partial images require an SSE streaming transport, which this final-result helper does not implement.')
+  }
+
   const resolvedSize = size ?? resolveOpenAIImageSize({ model: 'gpt-image-2', aspectRatio })
   const apiKeyResolution = await resolveOpenAIApiKey()
 
@@ -685,10 +700,6 @@ export const runOpenAIImageTool = async ({
 
   if (background) {
     tool.background = background
-  }
-
-  if (typeof partialImages === 'number') {
-    tool.partial_images = Math.max(0, Math.min(3, Math.floor(partialImages))) as 0 | 1 | 2 | 3
   }
 
   if (maskFileId?.trim()) {

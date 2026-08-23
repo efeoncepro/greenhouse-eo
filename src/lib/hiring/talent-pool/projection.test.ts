@@ -61,3 +61,60 @@ describe('reconcileTalentPoolProjection privacy boundary', () => {
     })
   })
 })
+
+describe('TASK-1748 — la projection no materializa personas sinteticas', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mocks.query.mockResolvedValue({ rows: [], rowCount: 0 })
+    mocks.publish.mockResolvedValue(undefined)
+  })
+
+  const statementsWithFlag = async (flag: string) => {
+    vi.stubEnv('HIRING_SYNTHETIC_DATA_FILTER_ENABLED', flag)
+    await reconcileTalentPoolProjection({ apply: true, actorUserId: 'task-1748-test' })
+
+    return mocks.query.mock.calls.map(call => String(call[0]))
+  }
+
+  it('el predicado de procedencia viaja en creacion, ciclo de vida y las tres evidencias', async () => {
+    const statements = await statementsWithFlag('true')
+    const withPredicate = statements.filter(sql => sql.includes("ip.data_origin = 'real'"))
+
+    // inventario + INSERT de membresia + UPDATE de ciclo de vida + 3 inserts de evidencia
+    expect(withPredicate).toHaveLength(6)
+
+    // Y siempre por la PERSONA: `candidate_facet` no tiene columna de procedencia propia.
+    expect(withPredicate.every(sql => sql.includes('ip.profile_id = cf.identity_profile_id'))).toBe(true)
+  })
+
+  it('la membresia sintetica se RECLASIFICA, no se congela', async () => {
+    const statements = await statementsWithFlag('true')
+    const lifecycle = statements.find(sql => sql.includes('next_state AS'))
+
+    // Si el UPDATE de ciclo de vida se excluyera a si mismo la poblacion sintetica, una membresia
+    // que hubiera quedado en `pool_eligible` seguiria contando para siempre en la senal de
+    // integridad del Banco de Talento sin que ninguna corrida pudiera corregirla. Entra a la
+    // poblacion y sale a un estado no servible.
+    expect(lifecycle).toContain('LEFT JOIN greenhouse_core.identity_profiles ip')
+    expect(lifecycle).toContain("WHEN NOT is_real THEN 'needs_reconsent'")
+    expect(lifecycle).not.toContain(`JOIN greenhouse_core.identity_profiles ip
+       ON ip.profile_id = cf.identity_profile_id AND ip.data_origin = 'real'`)
+  })
+
+  it('NO depende del flag: corre en Cloud Run, donde ese flag no existe', async () => {
+    // Si el filtro estuviera gateado por `HIRING_SYNTHETIC_DATA_FILTER_ENABLED` (Vercel-only), el
+    // ops-worker lo leeria indefinido y quedaria OFF en silencio. Este test es el que lo impide.
+    const off = await statementsWithFlag('false')
+
+    expect(off.filter(sql => sql.includes("ip.data_origin = 'real'"))).toHaveLength(6)
+
+    vi.clearAllMocks()
+    mocks.query.mockResolvedValue({ rows: [], rowCount: 0 })
+
+    vi.stubEnv('HIRING_SYNTHETIC_DATA_FILTER_ENABLED', '')
+    await reconcileTalentPoolProjection({ apply: true, actorUserId: 'task-1748-test' })
+    expect(
+      mocks.query.mock.calls.map(call => String(call[0])).filter(sql => sql.includes("ip.data_origin = 'real'"))
+    ).toHaveLength(6)
+  })
+})

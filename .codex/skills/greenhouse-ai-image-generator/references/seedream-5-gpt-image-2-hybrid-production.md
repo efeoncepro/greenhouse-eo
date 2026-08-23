@@ -28,6 +28,15 @@ El router es un default informado, no una ley. Revisar cada salida contra el bri
 
 ## Contratos confirmados
 
+> **Regla dura de slug ByteDance (reverificado en vivo 2026-07-19, end-to-end con hash real):** los slugs de
+> Seedream van **SIN** el prefijo `fal-ai/` — `bytedance/seedream/v5/{pro,lite}/{text-to-image,edit}`. Con
+> `fal-ai/bytedance/...` el submit responde 200 pero el *result* da **404** (`Path /... not found`) con
+> `inference_time` ≈ 0.02s y no genera nada. FLUX, Recraft, GPT Image y Topaz **sí** llevan `fal-ai/`.
+>
+> **Método barato para verificar un slug (sin gastar):** `POST {}` (body vacío) a `https://fal.run/<slug>` →
+> **404** = la app no existe · **422** = la app existe (falló la validación de input por falta de campos).
+> Confirmar el slug así antes de generar.
+
 ### Seedream 5 Lite en fal.ai
 
 Endpoints:
@@ -100,7 +109,8 @@ Hechos operativos:
 - `quality`: `low | medium | high | auto`.
 - Ambos ejes deben ser múltiplos de 16; lado máximo 3840; ratio máximo 3:1; área entre 655.360 y 8.294.400 píxeles.
 - Outputs sobre 3.686.400 píxeles se documentan como experimentales.
-- Formatos: PNG, JPEG y WebP. GPT Image 2 no entrega transparencia.
+- Formatos: PNG, JPEG y WebP. GPT Image 2 admite `background: transparent` en preview con PNG o WebP; JPEG no
+  preserva alfa. La capacidad oficial no demuestra que el helper local ni Globe la transporten.
 - Todas las referencias se procesan a alta fidelidad; no enviar `input_fidelity` para este modelo.
 - Edit soporta máscara alfa: misma dimensión/formato que la primera imagen y menos de 50 MB. Con múltiples referencias, la máscara aplica a la primera.
 - La máscara es guidance generativa, no un hard matte pixel-perfect.
@@ -109,7 +119,8 @@ Fuentes:
 
 - https://developers.openai.com/api/docs/models/gpt-image-2
 - https://developers.openai.com/api/docs/guides/image-generation
-- https://openai.com/api/pricing/
+- https://developers.openai.com/api/docs/pricing
+- `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`
 
 ## Flujo canónico
 

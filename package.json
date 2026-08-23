@@ -189,6 +189,7 @@
     "hiring:question-bank-coverage": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/question-bank-coverage.ts",
     "hiring:fairness-smoke": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/verify-assessment-fairness-smoke.ts",
     "hiring:careers-native-growth-form-smoke": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/verify-careers-native-growth-form-smoke.ts",
+    "hiring:email-type": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/toggle-candidate-email-type.ts",
     "hiring:talent-pool:backfill": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/backfill-talent-pool.ts",
     "hiring:candidate-review:backfill": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/backfill-candidate-review-projection.ts",
     "hiring:growth-forms-application-smoke": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/verify-growth-forms-application-smoke.ts",

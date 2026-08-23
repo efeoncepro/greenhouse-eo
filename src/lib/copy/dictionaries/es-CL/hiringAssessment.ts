@@ -69,7 +69,9 @@ export const hiringAssessment: HiringAssessmentCopy = {
     cancelledDetail: 'Esta evaluación se canceló antes de que el candidato la comenzara. El enlace ya no sirve.',
     loadReviewPrompt: 'Carga la revisión para ver respuestas, rúbricas y el scorecard por competencia.',
     noModules: 'Aún no hay módulos de competencia para esta evaluación.',
+    competency: 'Competencia',
     objective: 'Objetivo',
+    status: 'Estado',
     scoreProgressLabel: '{competency}: {score} de 100; objetivo {target}',
     pending: 'Pendiente',
     radarScoreLegend: 'Puntaje obtenido',
@@ -209,6 +211,8 @@ export const hiringAssessment: HiringAssessmentCopy = {
     confirmRun: 'Confirmar run',
     confirming: 'Confirmando…',
     confirmed: 'Run confirmado. Los puntajes cubiertos entraron al scorecard.',
+    nothingToConfirm:
+      'No queda nada por confirmar por lote: cada respuesta ya se resolvió una a una. Puedes cerrar el run.',
     cancelRun: 'Cancelar run',
     cancelDialogTitle: 'Cancelar run',
     cancelDialogBody: 'Ninguna respuesta se pierde: las pendientes vuelven a la cola de corrección manual.',

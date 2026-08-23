@@ -42,7 +42,10 @@ describe('captureCandidateIdentityDocument', () => {
       ['sin decisión todavía', null],
       ['rechazado', 'rejected'],
       ['retirado', 'withdrawn'],
-      ['en pausa', 'on_hold'],
+      // TASK-1765 — `on_hold` ya no es desenlace. Los dos casos nuevos son justamente los que más
+      // importan acá: sin selección no hay base de licitud para pedirle el documento a nadie.
+      ['sin selección', 'not_selected'],
+      ['sin respuesta', 'unresponsive'],
     ])('rechaza la captura para un candidato %s', async (_label, decision) => {
       listHiringApplications.mockResolvedValue([{ applicationId: 'happ-1', decision }])
 

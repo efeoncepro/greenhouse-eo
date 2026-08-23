@@ -484,7 +484,13 @@ GVC deja de ser solo evidencia y se vuelve **contrato operacional de implementac
 
 ### 2. Layout integrity (`quality.layout`, Slice 2)
 
-Scan en un solo `page.evaluate` por frame: overflow horizontal de página/elemento, target interactivo < `minTargetSize` (default 24px, piso WCAG 2.2 AA 2.5.8), texto cortado, regiones scrollables sin label, cards MUI anidadas. Opciones `includeSelector`/`ignoreSelectors`/`allowHorizontalScrollSelectors`/`failOnViolations`.
+Scan en un solo `page.evaluate` por frame: overflow horizontal de página/elemento, elementos
+`absolute|fixed` con crecimiento vertical patológico (`layout_out_of_flow_vertical_runaway`), target
+interactivo < `minTargetSize` (default 24px, piso WCAG 2.2 AA 2.5.8), texto cortado, regiones
+scrollables sin label y cards MUI anidadas. Los wrappers `data-visually-hidden` y sus descendientes
+quedan fuera del scan; el wrapper debe contener realmente su contenido en una caja clipada, no ocultar
+el nodo problemático mediante `ignoreSelectors`. Opciones
+`includeSelector`/`ignoreSelectors`/`allowHorizontalScrollSelectors`/`failOnViolations`.
 
 ### 3. Console / hydration / network strict (`quality.runtime`, Slice 3)
 
@@ -581,6 +587,7 @@ En TASK-1306 destapó, sobre una pantalla que a ojo se veía bien:
 | **8 excepciones de runtime por corrida** — invisibles en pantalla | `runtimeSummary.pageErrorCount` + `pageErrorSamples` |
 | Violaciones axe reales: `aria-required-children`, `aria-valid-attr-value` | `qualityFindings[]` code `axe_violations` |
 | Overflow horizontal | `qualityFindings[]` codes `layout_horizontal_overflow` / `layout_element_overflow` |
+| Elemento `absolute|fixed` que extiende el documento miles de px | `qualityFindings[]` code `layout_out_of_flow_vertical_runaway` |
 | Targets interactivos < 24px (piso WCAG 2.2 AA 2.5.8) | `qualityFindings[]` code `layout_target_too_small` |
 
 **Cómo se lee el resultado — el diagnóstico está en el `manifest.json` del run, NO en el log de consola:**

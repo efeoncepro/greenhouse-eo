@@ -62,6 +62,12 @@ frescura. Para claims inestables conserva URL o path, autoridad, fecha observada
 revalidación. Antes de implementar o promover, vuelve a consultar el proveedor; no conviertas un snapshot en hecho
 actual.
 
+Para cualquier ruta OpenAI GPT Image, carga además
+[`OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`](../../../docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md).
+Separa capacidades por modelo/snapshot y superficie API. La transparencia de GPT Image 2 está documentada en
+preview y tiene implementación local en `OutputShapeV1`, compiler, adapter y verificación binaria; no la declares
+operativa en Globe hasta que deploy, canary facturable y readback live demuestren el cable completo.
+
 Para Fal, resuelve el endpoint desde catálogo/OpenAPI y un submit controlado. Conserva las URLs `status_url`,
 `response_url` y `cancel_url` que Fal devuelva por request; nunca derives una URL de seguimiento desde el slug.
 Mantén `x-app-fal-disable-fallback` (singular, nombre oficial de Fal) y la key únicamente en Globe server-side. Si
@@ -180,6 +186,8 @@ La auditoría del 2026-08-04 añadió cuatro fichas de imagen sin mover la autor
   Google `imagen-2` es otra familia, deprecated y **no existe como routeId, adapter ni binding en Globe**. OpenAI
   soporta edición en sus superficies de proveedor, pero Globe mantiene esa operación `deferred` porque `/v1/images/edits`
   requiere un transporte multipart y una ruta gobernada propios.
+  La misma ficha registra transparencia como superficie provider-supported en preview, code-complete local y
+  Globe-gated por rollout; no degradar la ruta completa ni afirmar fondo opaco cuando el request usa `auto`.
 - [`SEEDREAM_5_PRO_IMAGE_ROUTE_CARD_V1.json`](../../../docs/architecture/creative-studio/model-fleet/routes/SEEDREAM_5_PRO_IMAGE_ROUTE_CARD_V1.json)
   — `ref/still/rrss-v1` usa Fal `seedream-5-pro` / `v5-pro` con el slug bare
   `bytedance/seedream/v5/pro/text-to-image`, y `ref/still/reference-v1` usa `seedream-5-pro-edit` / `v5-pro`
@@ -202,6 +210,11 @@ reader; `externalRollout` permanece gated mientras el rollout multitenant no ten
 
 Estas fichas reflejan evidencia observada, no disponibilidad final. Antes de afirmar `available`, lee siempre
 `globe.producer.fleet.list` y reconcilia el resultado con el ledger y el handoff de Globe.
+
+`ref/still/openai-v1-5` requiere una ficha y un sunset gobernado: OpenAI anunció el retiro de
+`gpt-image-1.5` para el 2026-12-01. No puede seguir actuando como fallback silencioso de transparencia ni heredar
+disponibilidad futura de GPT Image 2. GPT Image 1, 1 Mini y `chatgpt-image-latest` también están deprecated, pero
+no se inventan routeIds de Globe para representar superficies que el runtime no publica.
 
 ## Cómo leer y modificar una ficha
 

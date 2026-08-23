@@ -5,6 +5,8 @@ import type { PoolClient } from 'pg'
 import { withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
+
+import { findRunItemByProposalId, transitionRunItem } from './scoring-run/store'
 import type { AiProposal, ConfirmAiProposalInput, QuestionDraftProposal, ResponseScoreProposal } from '@/types/hiring-assessment-ai'
 import type { CreateQuestionInput } from '@/types/hiring-assessment'
 
@@ -60,6 +62,14 @@ const confirmAiProposalInTransaction = async (
 
   // Idempotente: misma decisión ya aplicada → devolver el estado actual sin re-ejecutar el efecto.
   if (!transition.apply) {
+    // ...pero SÍ reconciliar el item del run. Este es el camino que SANA los items que quedaron
+    // desalineados antes de que existiera la reconciliación de abajo: la respuesta ya tiene su
+    // `human_score` y el item se quedó en `proposed`. Re-confirmar es idempotente sobre la
+    // proposal y converge el run, sin tocar el puntaje.
+    if (proposal.kind === 'response_score' && proposal.status === 'confirmed') {
+      await reconcileRunItemForScoredProposal(client, proposal.proposalId, actorUserId)
+    }
+
     return proposal
   }
 
@@ -72,6 +82,21 @@ const confirmAiProposalInTransaction = async (
       confirmedRef = await applyOpeningPublicCopy(client, proposal, input.publicCopyOverride, actorUserId)
     } else {
       confirmedRef = await applyResponseScore(client, proposal, input.finalScore, actorUserId)
+
+      // El item del run SIGUE al puntaje, por construcción y en la MISMA transacción.
+      //
+      // Causa raíz cerrada acá (caso real 2026-08-19): este command es el único punto donde una
+      // proposal se vuelve `human_score`, pero se llega por DOS puertas — la cola del run
+      // (`resolveScoringRunItem`) y el confirm individual por respuesta. Sólo la primera movía el
+      // item. La segunda dejaba la respuesta puntuada y el item en `proposed`, así que la cobertura
+      // decía "faltan 5" sobre trabajo YA hecho y el run quedaba incerrable para siempre.
+      //
+      // Ponerlo en cada puerta es lo que ya se intentó y volvió a romperse: la puerta siguiente
+      // vuelve a olvidarlo. Acá no hay puerta que se lo salte.
+      //
+      // Idempotente: si el caller ya lo movió (la cola del run transiciona después de llamarnos),
+      // `resolveItemTransition` resuelve `confirmed → confirmed` como no-op sin escribir nada.
+      await reconcileRunItemForScoredProposal(client, proposal.proposalId, actorUserId)
     }
   }
 
@@ -148,4 +173,25 @@ const applyResponseScore = async (
   await recordHumanScore(responseId, finalScore, actorUserId, client)
 
   return responseId
+}
+
+
+/**
+ * Lleva a `confirmed` el item del run cuya proposal acaba de aplicarse como puntaje humano.
+ *
+ * No-op cuando la proposal no pertenece a ningún run, o cuando el item ya es terminal.
+ */
+const reconcileRunItemForScoredProposal = async (
+  client: PoolClient,
+  proposalId: string,
+  actorUserId: string,
+): Promise<void> => {
+  const item = await findRunItemByProposalId(client, proposalId)
+
+  if (!item || item.status === 'confirmed') return
+
+  await transitionRunItem(client, item, 'confirmed', {
+    actorUserId,
+    reasonCode: 'scored_via_proposal_confirm',
+  })
 }

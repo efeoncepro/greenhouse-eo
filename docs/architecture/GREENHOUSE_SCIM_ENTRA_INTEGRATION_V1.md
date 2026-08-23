@@ -19,6 +19,23 @@ Use together with:
 
 Implemented and active in production. SCIM provisioning job is running in Entra, scoped to the "Efeonce Group" group. Profile sync cron runs daily at 08:00 UTC.
 
+### Proposed reverse lane — 2026-08-21 / TASK-1761
+
+La dirección productiva descrita por esta spec sigue siendo Entra → Greenhouse. El ADR
+`GREENHOUSE_HIRING_ENTRA_WORKFORCE_ACCOUNT_PROVISIONING_DECISION_V1.md` propone el sentido adicional
+Greenhouse Hiring/Workforce → API-driven inbound provisioning → Entra, sin reutilizar esta Enterprise App ni la
+primitive `provisionInternalCollaboratorFromScim`.
+
+La coexistencia exige antes de cualquier canary:
+
+- crear la cuenta Microsoft disabled y fuera del grupo que alimenta este SCIM;
+- confirmar resultado terminal/OID y bindearlo al `user_id`/`identity_profile_id`/member existentes;
+- recién entonces permitir scope SCIM, enablement, grupos o licencia;
+- separar `accountEnabled` Microsoft de `client_users.active`/audiences del portal longitudinal;
+- probar que el roundtrip ejecuta update/idempotent y crea cero principal/member/role adicionales.
+
+El ADR está `Proposed`; no describe runtime activo ni autoriza cambios Azure.
+
 ### Production Incident Closure — 2026-05-04
 
 On 2026-05-04, Microsoft Entra provisioning was failing on SCIM `CREATE` for internal Efeonce users because the internal tenant mapping used the legacy pseudo-client `efeonce-admin`. That value does not exist in `greenhouse_core.clients`, so `client_users.client_id` failed `client_users_client_id_fkey`.
@@ -132,7 +149,10 @@ Además de los granulares (`scim.user.created`, `member.created`, `membership.cr
 | Enrichment profile (jobTitle, country, city, phone) | Entra ID | Synced via Graph API cron, not SCIM |
 | Reporting hierarchy formal | Greenhouse | `greenhouse_core.reporting_lines` remains canonical; Entra only proposes drift for review |
 
-Entra is the source of truth for who exists and whether they are active. Greenhouse is the source of truth for what they can do.
+Entra is the source of truth for who exists and whether they are active **inside the Microsoft directory**.
+Greenhouse is the source of truth for what they can do in Greenhouse. If the proposed TASK-1761 lane is accepted,
+Greenhouse Hiring/Workforce additionally owns the employment intent that requests the Microsoft desired state;
+`accountEnabled=false` must not deactivate a valid candidate/ex-collaborator portal principal.
 
 ## Architecture
 

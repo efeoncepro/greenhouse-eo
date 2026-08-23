@@ -9,8 +9,7 @@ import {
   generateOpenAIImage,
   type OpenAIImageBackground,
   type OpenAIImageQuality,
-  type OpenAIImageSize,
-  type OpenAITransparentBackgroundStrategy
+  type OpenAIImageSize
 } from '@/lib/ai/openai-image'
 
 // ── Types ──
@@ -26,7 +25,6 @@ export interface GenerateImageOptions {
   quality?: OpenAIImageQuality
   size?: OpenAIImageSize
   background?: OpenAIImageBackground
-  transparentBackgroundStrategy?: OpenAITransparentBackgroundStrategy
   /**
    * Per-image timeout in ms for the `openai-image` provider. Omit → the canonical
    * 125s default (tuned for Vercel function limits). Raise it explicitly off-Vercel
@@ -152,7 +150,6 @@ export const generateImage = async (
       quality: options.quality,
       size: options.size,
       background: options.background,
-      transparentBackgroundStrategy: options.transparentBackgroundStrategy,
       timeoutMs: options.timeoutMs
     })
 

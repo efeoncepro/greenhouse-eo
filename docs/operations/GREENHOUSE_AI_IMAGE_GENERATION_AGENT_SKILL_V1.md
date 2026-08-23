@@ -3,8 +3,8 @@
 > **Tipo:** operating guide para agentes
 > **Estado:** Accepted
 > **Creado:** 2026-06-01
-> **Ultima actualizacion:** 2026-07-19
-> **Fuentes externas verificadas:** OpenAI developer docs y fichas oficiales Fal.ai, 2026-07-18
+> **Ultima actualizacion:** 2026-08-21
+> **Fuentes externas verificadas:** OpenAI developer docs 2026-08-21 y fichas oficiales Fal.ai 2026-07-18
 
 ## Purpose
 
@@ -21,6 +21,7 @@ Fuentes oficiales consultadas:
 - OpenAI Images API reference: `https://developers.openai.com/api/reference/resources/images`
 - OpenAI API overview/auth: `https://developers.openai.com/api/reference/overview`
 - OpenAI Cookbook GPT Image prompting guide: `https://developers.openai.com/cookbook/examples/multimodal/image-gen-1.5-prompting_guide`
+- Matriz canónica de la familia: `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`
 - Fal Seedream 5.0 Lite: `https://fal.ai/models/fal-ai/bytedance/seedream/v5/lite/text-to-image`
 - Fal Seedream 5.0 Lite Edit: `https://fal.ai/models/fal-ai/bytedance/seedream/v5/lite/edit`
 - Fal Seedream 5.0 Pro: `https://fal.ai/models/fal-ai/bytedance/seedream/v5/pro/text-to-image`
@@ -32,7 +33,8 @@ Facts operativos vigentes al 2026-06-01:
 - Image API es la opcion preferida para un asset puntual desde un prompt o una edicion acotada.
 - Responses API es la opcion preferida para iterar sobre una imagen, usar contexto conversacional, o forzar `action: "generate" | "edit" | "auto"`.
 - `gpt-image-2` es el modelo OpenAI mas reciente documentado para generacion/edicion, con tamanos flexibles y buen seguimiento de instrucciones.
-- `gpt-image-2` no soporta `background: "transparent"`. Para PNG/WebP transparente, usar el fallback del helper a `gpt-image-1.5` o fallar cerrado si el modelo exacto importa.
+- `gpt-image-2` soporta `background: "transparent"` en preview con PNG o WebP. El helper local conserva la
+  identidad pedida, rechaza JPEG transparente antes de red y nunca cambia silenciosamente a `gpt-image-1.5`.
 - Transparencia solo es compatible con formatos que soportan alpha, principalmente `png` y `webp`.
 - OpenAI recomienda calidad `medium` o `high` para transparencia; `low` es util para drafts rapidos.
 - GPT Image puede tardar hasta unos minutos con prompts complejos. No marcar fallo prematuro si el helper tiene timeout largo y progreso claro.
@@ -45,8 +47,8 @@ Facts operativos vigentes al 2026-06-01:
 
 | Necesidad | Carril canonico | Opciones |
 |---|---|---|
-| Icono raster, sticker, elemento UI aislado | `generateImage()` con `provider: "openai-image"` | `format: "png"`, `background: "transparent"`, `quality: "high"`, `aspectRatio: "1:1"` |
-| Lote de PNG transparentes | `generateImage()` o `generateOpenAIImage()` en script server-only | Usar nombres deterministas, validar alpha, controlar costo con lotes chicos |
+| Icono raster, sticker, elemento UI aislado | GPT Image 2 por Image API | `format: "png"`, `background: "transparent"`, `quality: "high"`; el helper conserva GPT Image 2 y falla cerrado para JPEG |
+| Lote de PNG transparentes | GPT Image 2 por Image API | Usar nombres deterministas, validar alfa real y controlar costo con lotes pequeños |
 | Banner, hero, thumbnail, empty state ilustrado | `generateImage()` | OpenAI para fidelidad/composicion, Imagen para continuidad con assets existentes |
 | Edicion de imagen existente | `editOpenAIImage()` | Referencias/mask server-only, maximo del helper vigente |
 | Iteracion multi-turn sobre una imagen | `runOpenAIImageTool()` | Mantener `responseId` o `imageGenerationCallId`; ideal para refinar direccion visual |
@@ -334,7 +336,8 @@ If using a mask, describe the masked region semantically. Do not assume pixel-pe
 
 ### Generate via Greenhouse helper
 
-Use this pattern from the repo root for one-off asset generation:
+Use the canonical helper. It preserves exact model identity and validates the format boundary; the caller must
+still inspect the decoded alpha before accepting the asset:
 
 ```bash
 GCP_PROJECT=efeonce-group GOOGLE_CLOUD_PROJECT=efeonce-group \

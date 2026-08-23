@@ -1,9 +1,18 @@
 import 'server-only'
 
 import { claimTokenSensitiveEmailIntent, sendEmail, wasEmailAlreadySent } from '@/lib/email/delivery'
+import type { EmailType } from '@/lib/email/types'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getCountryName } from '@/lib/locale/countries'
 import { captureWithDomain } from '@/lib/observability/capture'
 
+import { providerBlockStatusForEmailSql } from '../assessment/access-recovery/provider-block'
+import {
+  decideAssessmentAccessRotationNotice,
+  type AssessmentAccessRecoveryChannel,
+  type AssessmentAccessRecoveryOutcome,
+  type AssessmentAccessRecoveryReason,
+} from '../assessment/access-recovery/vocabulary'
 import { getAssessmentById, reissueCandidateTestTokenForEmailWithClient } from '../assessment/instances'
 import {
   hiringPublicBaseUrl,
@@ -311,6 +320,34 @@ export const sendHiringStageAdvancedEmail = async (
 
 // ── 6+7. Decisión → seleccionado / no seleccionado ──
 
+/**
+ * TASK-1765 — mapa EXPLÍCITO desenlace → `EmailType`, con no-op declarado para lo que todavía no
+ * tiene tipo propio.
+ *
+ * Esto era un ternario binario, `decision === 'selected' ? …selected : …rejected`, que colapsaba
+ * TODO lo no-seleccionado en «rechazado». Con el eje de desenlace nuevo eso significa que el primer
+ * cierre `not_selected` le mandaría un correo de RECHAZO a alguien que nadie rechazó — y el log de
+ * envíos, que es append-only, quedaría firmando ese hecho falso.
+ *
+ * La regla que fija el techo (ADR §7.3): **un `EmailType` por desenlace; la causa modula el CUERPO,
+ * nunca el tipo.** NUNCA reusar el tipo de un desenlace para otro: el sistema ramifica por este
+ * valor en tres lugares (kill-switch de `email_type_config`, perfil de footer, y este selector), así
+ * que colapsarlos deja un cierre de cohorte y un descarte individual bajo el mismo interruptor.
+ *
+ * Un desenlace ausente de este mapa NO notifica. Es un default por inclusión: un desenlace nuevo
+ * nace mudo hasta que alguien le asigne un tipo deliberadamente, en vez de heredar el del vecino.
+ *
+ * - `not_selected` → `hiring_decision_not_selected`, que **todavía no existe**. Lo crea TASK-1762
+ *   junto con su fila de `email_type_config` y su seed en el `ops-worker` (NO en Vercel).
+ * - `backup_selected` → su variante se decide en su propia task.
+ * - `withdrawn` → acuse de recibo, pendiente de tipo.
+ * - `unresponsive` → **ninguno, y es deliberado**: no se le escribe a quien no declaró nada.
+ */
+const DECISION_EMAIL_TYPE: Record<string, EmailType | undefined> = {
+  selected: 'hiring_decision_selected',
+  rejected: 'hiring_decision_rejected',
+}
+
 export const sendHiringDecisionEmail = async (
   applicationId: string,
   payload: Record<string, unknown>,
@@ -318,8 +355,9 @@ export const sendHiringDecisionEmail = async (
   if (!isHiringLifecycleEmailsEnabled()) return FLAG_OFF_MSG
 
   const decision = typeof payload.decision === 'string' ? payload.decision : ''
+  const emailType = DECISION_EMAIL_TYPE[decision]
 
-  if (decision !== 'selected' && decision !== 'rejected') {
+  if (!emailType) {
     return `hiring_application_decided_email no-op: decision ${decision || '(vacía)'} no notifica`
   }
 
@@ -347,7 +385,7 @@ export const sendHiringDecisionEmail = async (
   }
 
   const result = await sendEmail({
-    emailType: decision === 'selected' ? 'hiring_decision_selected' : 'hiring_decision_rejected',
+    emailType,
     domain: 'hr',
     recipients: [{ email: ctx.candidateEmail, ...(ctx.candidateName ? { name: ctx.candidateName } : {}) }],
     context: {
@@ -360,4 +398,111 @@ export const sendHiringDecisionEmail = async (
   })
 
   return `hiring_application_decided_email ${applicationId} (${decision}): ${result.status}`
+}
+
+// ── 8. Rotación por enlace seguro → aviso al candidato (SIN credencial) ──
+
+interface AccessRotationRow extends Record<string, unknown> {
+  channel: string
+  outcome: string
+  expires_at: string | null
+  assessment_status: string
+  effective_deadline_at: string | null
+  candidate_email: string | null
+  candidate_name: string | null
+  opening_title: string
+  provider_block_status: string | null
+}
+
+/**
+ * TASK-1757 — el candidato se entera de que su acceso fue reemplazado.
+ *
+ * Emitir un enlace seguro **mata la credencial anterior** y se la entrega en mano al operador. Si
+ * esa entrega falla, la persona queda sin acceso, sin saber por qué y con el plazo corriendo. Con
+ * el test `in_progress` es peor: pudo haber sido expulsada de una evaluación que estaba
+ * respondiendo.
+ *
+ * **El correo NUNCA lleva el enlace ni el token.** El canal existe para entregar la credencial por
+ * una vía donde el operador verifica identidad; ponerla acá anularía esa verificación. Por eso este
+ * envío NO usa `claimTokenSensitiveEmailIntent`: no hay credencial que ligar.
+ *
+ * Cuelga del evento de dominio, no del route handler, para que cualquier consumidor del command
+ * —UI, MCP, Nexa, un runbook— avise por construcción en vez de rotar la credencial en silencio.
+ */
+export const sendHiringAssessmentAccessRotatedEmail = async (
+  recoveryId: string,
+  payload: Record<string, unknown>,
+): Promise<string> => {
+  if (!isHiringLifecycleEmailsEnabled()) return FLAG_OFF_MSG
+
+  // Todo se re-lee de PG por ID: el evento no lleva PII, ni token, ni el estado del proveedor.
+  const rows = await runGreenhousePostgresQuery<AccessRotationRow>(
+    `SELECT recovery.channel, recovery.outcome, recovery.expires_at,
+            assessment.status AS assessment_status,
+            greenhouse_hiring.assessment_access_recovery_deadline(
+              assessment.started_at, assessment.time_limit_minutes, assessment.accommodations_json
+            ) AS effective_deadline_at,
+            profile.canonical_email AS candidate_email,
+            profile.display_name AS candidate_name,
+            opening.internal_title AS opening_title,
+            ${providerBlockStatusForEmailSql('profile.canonical_email')} AS provider_block_status
+       FROM greenhouse_hiring.hiring_assessment_access_recovery recovery
+       JOIN greenhouse_hiring.hiring_assessment assessment
+         ON assessment.assessment_id = recovery.assessment_id
+       JOIN greenhouse_hiring.hiring_application application
+         ON application.application_id = recovery.application_id
+       JOIN greenhouse_hiring.hiring_opening opening
+         ON opening.opening_id = application.opening_id
+       JOIN greenhouse_core.identity_profiles profile
+         ON profile.profile_id = application.identity_profile_id
+      WHERE recovery.recovery_id = $1`,
+    [recoveryId],
+  )
+
+  const row = rows[0]
+
+  if (!row) return `hiring_assessment_access_rotated no-op: recovery ${recoveryId} no existe`
+
+  const decision = decideAssessmentAccessRotationNotice({
+    channel: row.channel as AssessmentAccessRecoveryChannel,
+    outcome: row.outcome as AssessmentAccessRecoveryOutcome,
+    reasonCode: (payload.reasonCode as AssessmentAccessRecoveryReason) ?? 'alternate_channel_requested',
+    hasCandidateEmail: Boolean(row.candidate_email?.trim()),
+    providerBlockStatus: row.provider_block_status,
+    expiresAt: row.expires_at,
+  })
+
+  // El skip queda en el reactive log con su causa: "no se avisó porque el buzón rebota" es un
+  // hecho distinto de "nadie lo mandó", y sólo el primero es defendible ante una revisión.
+  if (!decision.notify) return `hiring_assessment_access_rotated skip: ${recoveryId} — ${decision.skip}`
+
+  const candidateEmail = row.candidate_email as string
+
+  // Llave determinista por RECUPERACIÓN, no por evento: sobrevive a un re-delivery con outbox id
+  // nuevo y es exactamente-una-vez por rotación aunque el evento llegue N veces.
+  const eventId = `hiring-assessment-access-rotated:${recoveryId}`
+
+  if (await wasEmailAlreadySent(eventId, recoveryId, candidateEmail)) {
+    return `hiring_assessment_access_rotated dedupe: ${recoveryId}`
+  }
+
+  const inProgress = row.assessment_status === 'in_progress'
+
+  const result = await sendEmail({
+    emailType: 'hiring_assessment_access_rotated',
+    domain: 'hr',
+    recipients: [{ email: candidateEmail, ...(row.candidate_name ? { name: row.candidate_name } : {}) }],
+    context: {
+      recipientName: row.candidate_name ?? undefined,
+      openingTitle: row.opening_title,
+      expiresAt: row.expires_at as string,
+      originalDeadlineAt: row.effective_deadline_at,
+      inProgress,
+      locale: 'es',
+    },
+    sourceEventId: eventId,
+    sourceEntity: recoveryId,
+  })
+
+  return `hiring_assessment_access_rotated ${recoveryId}: ${result.status}`
 }

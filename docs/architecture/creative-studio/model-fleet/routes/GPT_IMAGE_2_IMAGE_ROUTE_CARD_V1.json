@@ -2,7 +2,7 @@
   "schemaVersion": "model-route-card.v1",
   "cardId": "route-card/gpt-image-2-image",
   "snapshot": {
-    "observedAt": "2026-08-04",
+    "observedAt": "2026-08-21",
     "maxAgeDays": 14,
     "revalidateBeforeUse": true
   },
@@ -24,7 +24,7 @@
       "id": "fleet-ledger",
       "authority": "runtime_primary",
       "kind": "human-model-ledger",
-      "observedAt": "2026-08-04",
+      "observedAt": "2026-08-21",
       "reference": "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md",
       "revalidateBeforeUse": true
     },
@@ -41,7 +41,7 @@
       "id": "route-catalog",
       "authority": "repo_primary",
       "kind": "producer-route-catalog",
-      "observedAt": "2026-08-04",
+      "observedAt": "2026-08-21",
       "reference": "efeonce-globe:packages/domain/src/producer-catalog.ts",
       "revalidateBeforeUse": false
     },
@@ -49,7 +49,7 @@
       "id": "openai-adapter",
       "authority": "repo_primary",
       "kind": "openai-images-adapter",
-      "observedAt": "2026-08-04",
+      "observedAt": "2026-08-21",
       "reference": "efeonce-globe:apps/creative-runner/src/openai-adapter.ts",
       "revalidateBeforeUse": false
     },
@@ -57,7 +57,7 @@
       "id": "governed-composition",
       "authority": "repo_primary",
       "kind": "governed-openai-endpoint-allowlist",
-      "observedAt": "2026-08-04",
+      "observedAt": "2026-08-21",
       "reference": "efeonce-globe:apps/studio-web/src/governed-production-composition.ts",
       "revalidateBeforeUse": false
     },
@@ -70,10 +70,28 @@
       "revalidateBeforeUse": false
     },
     {
+      "id": "openai-alpha-driver",
+      "authority": "repo_primary",
+      "kind": "decoded-alpha-output-verification",
+      "observedAt": "2026-08-21",
+      "reference": "efeonce-globe:apps/creative-runner/src/openai-images-governed-driver.ts",
+      "revalidateBeforeUse": false,
+      "note": "Local code decodes the retained PNG, verifies the alpha channel and rejects a transparent request whose bytes are fully opaque before recording effective background metadata."
+    },
+    {
+      "id": "producer-background-ui",
+      "authority": "repo_primary",
+      "kind": "producer-background-control-and-checkerboard",
+      "observedAt": "2026-08-21",
+      "reference": "efeonce-globe:apps/studio-client/src/ProducerComposer.tsx",
+      "revalidateBeforeUse": false,
+      "note": "The local Producer derives the background selector from route constraints, invalidates stale estimates and renders ready images on a tokenized checkerboard."
+    },
+    {
       "id": "openai-docs",
       "authority": "provider_primary",
       "kind": "gpt-image-2-model-and-images-api",
-      "observedAt": "2026-08-04",
+      "observedAt": "2026-08-21",
       "reference": "https://developers.openai.com/api/docs/models/gpt-image-2",
       "revalidateBeforeUse": true,
       "ttlDays": 14,
@@ -83,20 +101,39 @@
       "id": "openai-image-guide",
       "authority": "provider_primary",
       "kind": "images-and-vision-guide",
-      "observedAt": "2026-08-04",
-      "reference": "https://developers.openai.com/api/docs/guides/images-vision",
-      "revalidateBeforeUse": true,
-      "ttlDays": 14
-    },
-    {
-      "id": "openai-chatgpt-images",
-      "authority": "provider_primary",
-      "kind": "chatgpt-images-2-announcement",
-      "observedAt": "2026-08-04",
-      "reference": "https://openai.com/index/introducing-chatgpt-images-2-0/",
+      "observedAt": "2026-08-21",
+      "reference": "https://developers.openai.com/api/docs/guides/image-generation",
       "revalidateBeforeUse": true,
       "ttlDays": 14,
-      "note": "Primary source for the ChatGPT-facing name; the API/runtime identity remains `gpt-image-2`."
+      "note": "Primary guide for generation, edits, transparent backgrounds, flexible sizes, streaming and output constraints. Globe has implemented the transparent PNG path locally, but it remains unverified in the deployed runtime."
+    },
+    {
+      "id": "openai-deprecations",
+      "authority": "provider_primary",
+      "kind": "gpt-image-model-deprecations",
+      "observedAt": "2026-08-21",
+      "reference": "https://developers.openai.com/api/docs/deprecations",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "GPT Image 1.5, 1, 1 Mini and chatgpt-image-latest are deprecated; 1.5 must not remain a silent transparency fallback."
+    },
+    {
+      "id": "openai-provider-matrix",
+      "authority": "repo_primary",
+      "kind": "gpt-image-family-capability-matrix",
+      "observedAt": "2026-08-21",
+      "reference": "docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md",
+      "revalidateBeforeUse": false
+    },
+    {
+      "id": "openai-model-catalog",
+      "authority": "provider_primary",
+      "kind": "gpt-image-2-public-and-api-name",
+      "observedAt": "2026-08-21",
+      "reference": "https://developers.openai.com/api/docs/models/gpt-image-2",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "The current developer catalog names GPT Image 2 and fixes the API/runtime identity as `gpt-image-2`."
     },
     {
       "id": "google-imagen-2-deprecation",
@@ -175,6 +212,7 @@
       "controls": [
         { "name": "quality", "owner": "providerRequest", "valueShape": "enum(low|medium|high)", "mechanism": "OpenAI Images API quality" },
         { "name": "aspect-ratio", "owner": "outputShape", "valueShape": "enum(1:1|16:9|9:16|4:3|3:4)", "mechanism": "Globe-to-OpenAI discrete size mapping" },
+        { "name": "background", "owner": "outputShape", "valueShape": "enum(auto|opaque|transparent)", "mechanism": "Provider-neutral backgroundMode compiled to the OpenAI Images API; transparent is preview and PNG-only in Globe" },
         { "name": "count", "owner": "outputShape", "valueShape": "integer(1)", "mechanism": "Globe route contract pins one output" }
       ],
       "output": {
@@ -214,6 +252,7 @@
       "evidenceRefs": ["route-catalog", "openai-adapter", "governed-composition", "openai-docs", "openai-canary", "reader-live"],
       "blockers": [
         "Keep the public Globe route prompt-only until a separate multipart edit route is implemented and governed.",
+        "Keep transparent output gated until the locally implemented contract/compiler/adapter/alpha-verification slice is deployed and a dedicated authenticated billable canary proves requested/effective metadata, retained alpha bytes, settlement and rollback.",
         "Revalidate OpenAI snapshot, pricing, output limits and rights terms before changing the route contract.",
         "Read the live reader and workspace entitlement before making any external availability claim."
       ]
@@ -241,6 +280,28 @@
       },
       "evidenceRefs": ["openai-image-guide", "openai-adapter", "reader-live"],
       "note": "Do not turn provider support into Globe capability by analogy. The next implementation needs a route identity, multipart transport, result schema, rates, rights evidence and a separate canary."
+    },
+    {
+      "surfaceId": "openai-gpt-image-2-transparent-background",
+      "provider": "openai",
+      "endpointId": "openai.images.generations.background.transparent",
+      "status": "deferred",
+      "modes": ["transparent-background-preview"],
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["openai-image-guide", "openai-docs", "openai-provider-matrix"], "note": "OpenAI documents transparent backgrounds for GPT Image 2 in preview with PNG or WebP; JPEG is invalid." },
+        "contract_declared": { "state": "verified", "evidenceRefs": ["route-catalog", "openai-provider-matrix"], "note": "The backward-compatible V1 output shape carries provider-neutral backgroundMode and the GPT Image 2 route declares auto, opaque and transparent." },
+        "adapter_wired": { "state": "wired", "evidenceRefs": ["openai-adapter", "governed-composition"], "note": "The local adapter and governed compiler send background to the exact GPT Image 2 Images API request." },
+        "transport_verified": { "state": "unknown", "evidenceRefs": ["openai-image-guide"] },
+        "output_verified": { "state": "verified", "evidenceRefs": ["openai-alpha-driver", "openai-provider-matrix"], "note": "Hermetic local tests prove decoded alpha inspection and fail-closed behavior for fully opaque bytes; deployed provider output remains unverified." },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["openai-terms"] },
+        "rights_verified": { "state": "verified", "evidenceRefs": ["openai-terms"] },
+        "evaluated": { "state": "verified", "evidenceRefs": ["openai-alpha-driver", "producer-background-ui"], "note": "Local contract, adapter, driver, UI and canary-spec tests pass; this is not runtime evidence." },
+        "canary_passed": { "state": "not_started", "evidenceRefs": ["openai-provider-matrix"] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": ["reader-live"] },
+        "available": { "state": "gated", "evidenceRefs": ["reader-live", "openai-provider-matrix"], "note": "Local code is complete, but the deployed runtime, billable output, persisted readback and promotion are not verified." }
+      },
+      "evidenceRefs": ["openai-image-guide", "openai-docs", "openai-provider-matrix", "route-catalog", "openai-adapter", "governed-composition", "openai-alpha-driver", "producer-background-ui"],
+      "note": "The capability is code complete locally and rollout pending. Do not infer alpha from the historical PNG canary: it omitted background and predates byte-level alpha inspection."
     }
   ],
   "implementationChecklist": [
@@ -262,6 +323,13 @@
       "ownerBoundary": "Globe OpenAI adapter and governed route compiler",
       "evidenceRefs": ["openai-docs", "openai-adapter"],
       "note": "Multipart image editing is provider-supported but intentionally not connected. It requires a new route identity and independent evidence."
+    },
+    {
+      "id": "gpt-image-2-transparent-output",
+      "status": "open",
+      "ownerBoundary": "Globe output-shape contract, governed compiler, OpenAI adapter, result driver, Producer UI and canary",
+      "evidenceRefs": ["openai-image-guide", "openai-provider-matrix", "route-catalog", "openai-adapter", "governed-composition", "openai-alpha-driver", "producer-background-ui"],
+      "note": "Local implementation is complete. Remaining closure: deploy, run an authenticated billable canary on the exact route, prove requested/effective metadata plus retained non-opaque alpha bytes, verify settlement, capture Producer at desktop and mobile, then exercise promotion and rollback. WebP stays outside the current PNG-only Globe route."
     },
     {
       "id": "gpt-image-2-external-rollout",

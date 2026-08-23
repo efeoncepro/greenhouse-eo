@@ -49,6 +49,40 @@ El prototipo de Careers llama “Banco de talento” a una caja de email, pero e
      ZONE 1 — CONTEXT & CONSTRAINTS
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-22 — ADR del vocabulario de etapas y desenlace
+
+Se aceptó `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md` (`Accepted`), primer ADR del vocabulario del pipeline. Fija **dos ejes**:
+`stage` = dónde va la persona en el recorrido (6 valores, uno por columna; `closed` se queda y **es
+escribible**) y **desenlace** = cómo terminó (`selected`, `backup_selected`, `not_selected`, `rejected`,
+`withdrawn`, `unresponsive`) + **causa gobernada** obligatoria en `not_selected` (`capacity_filled`,
+`opening_closed`, `process_cancelled`). Invariante como `CHECK`: **`stage='closed'` ⟺ desenlace declarado**.
+El eje de desenlace lo implementa `TASK-1765`; la superficie del kanban, `TASK-1766`; el embudo de equidad,
+`TASK-1767`.
+
+**El ADR cambia quién es elegible para el Talent Pool, y por lo tanto para estas alertas.**
+
+- **`not_selected` es la población objetivo del pool** (ADR §4): la gente que llegó al final y no quedó es
+  justamente la que se quiere re-contactar. Hoy es indistinguible de `rejected`.
+- **Hallazgo H-24 — REFORMULADO Y CON DUEÑO: esta task (2026-08-22).** La formulación original decía que
+  el colapso terminal volvería elegibles a las personas seleccionadas. **Se verificó contra el código y es
+  falso.** El `CASE` de `talent-pool/projection.ts:95-102` tiene siete ramas, y **la 1 y la 3 dan las dos
+  `pool_eligible`**: `has_active_application` **no gatea `pool_eligible` en absoluto** — lo decide el
+  consentimiento solo. Una persona contratada que consintió **ya es `pool_eligible` HOY**, antes de
+  cualquier colapso. El colapso sólo mueve a la que NO consintió, de `active_process` a
+  `needs_reconsent`/`withdrawn`/`expired`, y esos estados quedan **fuera** de la proyección buscable
+  (`:131` y `:151` admiten sólo `active_process`, `pool_eligible`, `paused`). Es decir: el colapso es **más**
+  protector, no menos.
+
+- **Lo que sí está roto, y es de esta task porque el daño aterriza en sus alertas:** el ADR §4 dice que
+  `selected` **no** entra al Banco de Talento —pasa a ser parte del equipo—, pero el runtime deja
+  `pool_eligible` a quien fue contratada y había marcado futuras oportunidades. Y **no existe ninguna
+  exclusión por `member_id` en todo `src/lib/hiring/talent-pool/**`** (verificado por grep): el banco no
+  sabe distinguir a un colaborador de un candidato. Hoy sólo significa que aparece en una búsqueda; **con
+  esta task significa mandarle una alerta de vacante a alguien que acabas de contratar**. Es precondición
+  bloqueante del carril de alertas: antes del primer envío, la elegibilidad debe excluir a quien tenga
+  vínculo laboral vigente. El consentimiento no se revoca —la persona sí lo dio— pero el propósito
+  «futuras oportunidades» no aplica a quien ya está adentro.
+
 ## Architecture Alignment
 
 Revisar y respetar:

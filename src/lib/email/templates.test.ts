@@ -85,6 +85,21 @@ describe('email templates registry', () => {
     expect(template.text).not.toContain('vence en 14 días')
   })
 
+  it('personalizes the selected-candidate subject and preserves the offer-before-contract sequence', () => {
+    const template = resolveTemplate('hiring_decision_selected', {
+      recipientName: 'María González',
+      openingTitle: 'Content Creator',
+      locale: 'es',
+    })
+
+    expect(template.subject).toBe('María, te elegimos para Content Creator — Efeonce')
+    expect(template.text).toContain('carta oferta')
+    expect(template.text).toContain('Cuando la revises y aceptes')
+    expect(template.text).toContain('firma del contrato')
+    expect(template.text).toContain('Equipo de Talento\nEfeonce · efeoncepro.com')
+    expect(template.text).not.toContain('Te damos la bienvenida')
+  })
+
   it('resolves the weekly executive digest template with digest context', () => {
     const template = resolveTemplate('weekly_executive_digest', {
       periodLabel: 'Semana del 8 al 14 de abril de 2026',

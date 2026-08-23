@@ -297,14 +297,73 @@ describe('resolveScoringRunItem', () => {
 const confirmInput = { runId: 'asrun-1', actorUserId: 'user-9', decisionNote: 'lote revisado' }
 
 describe('confirmAssessmentAiScoringRun', () => {
-  it('flag OFF → 409 estable sin abrir tx', async () => {
+  // El contrato cambió el 2026-08-19: el flag protege APLICAR el lote, no abrir el command.
+  // Antes se evaluaba en la entrada y de paso dejaba incerrable un run sin nada que aplicar.
+  it('flag OFF CON lote pendiente → 409: la protección real sigue intacta', async () => {
     isRunConfirmEnabledMock.mockReturnValue(false)
+    listRunItemsMock.mockResolvedValue([
+      itemFixture({ runItemId: 'asri-b', riskClass: 'batch_eligible', status: 'proposed' }),
+    ])
 
     await expect(confirmAssessmentAiScoringRun(confirmInput)).rejects.toMatchObject({
       code: 'assessment_ai_run_confirm_disabled',
       statusCode: 409,
     })
-    expect(withTransactionMock).not.toHaveBeenCalled()
+    expect(confirmAiProposalMock).not.toHaveBeenCalled()
+  })
+
+  it('flag OFF SIN lote pendiente → cierra: no había nada que el flag pudiera proteger', async () => {
+    isRunConfirmEnabledMock.mockReturnValue(false)
+    listRunItemsMock.mockResolvedValue([
+      itemFixture({ status: 'confirmed', resolution: 'confirmed', resolvedBy: 'user-9' }),
+    ])
+    transitionScoringRunMock
+      .mockResolvedValueOnce(runFixture({ status: 'confirmable' }))
+      .mockResolvedValueOnce(runFixture({ status: 'confirmed' }))
+
+    const result = await confirmAssessmentAiScoringRun(confirmInput)
+
+    expect(result.run.status).toBe('confirmed')
+    expect(result.appliedProposals).toBe(0)
+    expect(confirmAiProposalMock).not.toHaveBeenCalled()
+    expect(insertRunEventMock.mock.calls[0]?.[1]?.detail?.closureMode).toBe('settled_without_batch')
+  })
+
+  it('digest stale SIN lote pendiente → cierra, y el manifest lo declara en vez de callarlo', async () => {
+    listRunItemsMock.mockResolvedValue([
+      itemFixture({ status: 'confirmed', resolution: 'confirmed', resolvedBy: 'user-9' }),
+    ])
+    computeCurrentScoringRunDigestMock.mockResolvedValue('digest-DISTINTO')
+    transitionScoringRunMock
+      .mockResolvedValueOnce(runFixture({ status: 'confirmable' }))
+      .mockResolvedValueOnce(runFixture({ status: 'confirmed' }))
+
+    const result = await confirmAssessmentAiScoringRun(confirmInput)
+
+    expect(result.run.status).toBe('confirmed')
+    expect(insertRunEventMock.mock.calls[0]?.[1]?.detail?.digestStaleAtClose).toBe(true)
+  })
+
+  it('assessment scored SIN lote pendiente → cierra, con el estado registrado en el manifest', async () => {
+    fakeClient.query.mockImplementation(async (text: string) => {
+      if (text.includes('FROM greenhouse_hiring.hiring_assessment WHERE assessment_id')) {
+        return { rows: [{ status: 'scored' }] }
+      }
+
+      return { rows: [] }
+    })
+
+    listRunItemsMock.mockResolvedValue([
+      itemFixture({ status: 'confirmed', resolution: 'confirmed', resolvedBy: 'user-9' }),
+    ])
+    transitionScoringRunMock
+      .mockResolvedValueOnce(runFixture({ status: 'confirmable' }))
+      .mockResolvedValueOnce(runFixture({ status: 'confirmed' }))
+
+    const result = await confirmAssessmentAiScoringRun(confirmInput)
+
+    expect(result.run.status).toBe('confirmed')
+    expect(insertRunEventMock.mock.calls[0]?.[1]?.detail?.assessmentStatusAtClose).toBe('scored')
   })
 
   it('mandatory_review pendiente bloquea el confirm → 409', async () => {
@@ -352,7 +411,7 @@ describe('confirmAssessmentAiScoringRun', () => {
     expect(confirmAiProposalMock).not.toHaveBeenCalled()
   })
 
-  it('assessment ya scored → 409, el run jamás lo reescribe', async () => {
+  it('assessment ya scored CON lote pendiente → 409: el run jamás lo reescribe', async () => {
     fakeClient.query.mockImplementation(async (text: string) => {
       if (text.includes('FROM greenhouse_hiring.hiring_assessment WHERE assessment_id')) {
         return { rows: [{ status: 'scored' }] }
@@ -360,6 +419,10 @@ describe('confirmAssessmentAiScoringRun', () => {
 
       return { rows: [] }
     })
+
+    listRunItemsMock.mockResolvedValue([
+      itemFixture({ runItemId: 'asri-b', riskClass: 'batch_eligible', status: 'proposed' }),
+    ])
 
     await expect(confirmAssessmentAiScoringRun(confirmInput)).rejects.toMatchObject({
       code: 'assessment_ai_run_assessment_not_writable',

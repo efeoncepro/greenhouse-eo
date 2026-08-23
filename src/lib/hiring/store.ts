@@ -9,10 +9,10 @@ import {
   CANDIDATE_CONSENT_STATUSES,
   CANDIDATE_READINESS,
   CANDIDATE_SOURCES,
-  HIRING_APPLICATION_STAGES,
   HIRING_FULFILLMENT_MODES,
   HIRING_OPENING_STATUSES,
   HIRING_OPENING_VISIBILITIES,
+  HIRING_PIPELINE_STAGES,
   HIRING_PUBLIC_WORK_MODES,
   TALENT_DEMAND_ENGAGEMENT_TYPES,
   TALENT_DEMAND_ORIGINS,
@@ -25,6 +25,7 @@ import {
   type CreateTalentDemandInput,
   type HiringApplication,
   type HiringOpening,
+  type HiringPipelineStage,
   type ListHiringApplicationFilters,
   type ListHiringOpeningFilters,
   type ListTalentDemandFilters,
@@ -406,6 +407,7 @@ export type HiringApplicationRow = {
   explainability_json: unknown
   dedupe_fingerprint: unknown
   decision: unknown
+  decision_cause: unknown
   decision_at: unknown
   decision_by: unknown
   selected_destination: unknown
@@ -436,6 +438,9 @@ export const normalizeHiringApplication = (row: HiringApplicationRow): HiringApp
   explainability: toJsonObject(row.explainability_json),
   dedupeFingerprint: toNullableStr(row.dedupe_fingerprint),
   decision: (toNullableStr(row.decision) as HiringApplication['decision']) ?? null,
+  // TASK-1765 — cast, NO assertEnum: este es un camino de LECTURA, y un assertEnum acá produciría
+  // un 500 al releer una fila histórica cuyo literal se retiró del enum (H-05 de la auditoría).
+  decisionCause: (toNullableStr(row.decision_cause) as HiringApplication['decisionCause']) ?? null,
   decisionAt: toTimestamp(row.decision_at),
   decisionBy: toNullableStr(row.decision_by),
   selectedDestination: (toNullableStr(row.selected_destination) as HiringApplication['selectedDestination']) ?? null,
@@ -474,8 +479,9 @@ const CANDIDATE_FACET_COLUMNS = `
 export const HIRING_APPLICATION_COLUMNS = `
   application_id, public_id, opening_id, identity_profile_id, candidate_facet_id, owner_user_id, stage,
   score, match_score, blocking_issues, next_step_at, source, notes, candidate_message, explainability_json,
-  dedupe_fingerprint, decision, decision_at, decision_by, selected_destination, tentative_start_date,
-  expected_legal_entity, expected_context, prerequisites_snapshot_json, created_by, created_at, updated_at`
+  dedupe_fingerprint, decision, decision_cause, decision_at, decision_by, selected_destination,
+  tentative_start_date, expected_legal_entity, expected_context, prerequisites_snapshot_json,
+  created_by, created_at, updated_at`
 
 // ══════════════════════════════════════════════════════════════════════════
 // Readers — TalentDemand
@@ -1185,7 +1191,7 @@ export const createHiringApplication = async (
   const openingId = assertNonEmptyString(input.openingId, 'openingId')
   const identityProfileId = assertNonEmptyString(input.identityProfileId, 'identityProfileId')
   const candidateFacetId = assertNonEmptyString(input.candidateFacetId, 'candidateFacetId')
-  const stage = assertOptionalEnum(input.stage, HIRING_APPLICATION_STAGES, 'stage') ?? 'sourced'
+  const stage = assertOptionalEnum(input.stage, HIRING_PIPELINE_STAGES, 'stage') ?? 'sourced'
   const source = assertOptionalEnum(input.source, CANDIDATE_SOURCES, 'source') ?? 'manual'
 
   const execute = async (client: PoolClient) => {
@@ -1299,22 +1305,34 @@ export const createHiringApplication = async (
   return externalClient ? execute(externalClient) : withGreenhousePostgresTransaction(execute)
 }
 
+/**
+ * Mueve la postulación por el RECORRIDO. NO cierra: cerrar es decidir.
+ *
+ * TASK-1765 — el parámetro es `HiringPipelineStage`, no `HiringApplicationStage`, así que un
+ * `closed` ni siquiera compila. La denylist de cuatro literales que vivía acá **se borró, no se
+ * amplió**: era una lista de excepciones, y por lo que no enumeraba se colaron `closed` y
+ * `handoff_ready`. Ver el docstring de `HIRING_PIPELINE_STAGES` para el razonamiento completo.
+ *
+ * `assertEnum` contra el mismo subconjunto cubre el caller sin tipos (payload HTTP crudo, Nexa, MCP):
+ * el tipo protege la compilación, el assert protege el runtime, y ambos leen la MISMA lista.
+ */
 export const updateHiringApplicationStage = async (
   applicationId: string,
-  stage: HiringApplication['stage'],
+  stage: HiringPipelineStage,
   actorUserId: string | null
 ): Promise<HiringApplication> => {
-  const nextStage = assertEnum(stage, HIRING_APPLICATION_STAGES, 'stage')
-
-  // Audit 2026-07-10: los stages terminales son propiedad del command decide (snapshot de
-  // prerequisitos + decision audit). Setearlos via PATCH crearía drift stage↔decision.
-  if (['selected', 'backup', 'rejected', 'withdrawn'].includes(nextStage)) {
+  // Un cierre que llega por acá se nombra por su nombre y apunta al camino correcto, en vez de caer
+  // en el error genérico de enum inválido — que le diría al operador que `closed` no existe cuando
+  // el problema real es que ese cambio exige declarar el desenlace.
+  if (stage === ('closed' as string)) {
     throw new HiringValidationError(
-      'Este estado se define con la decisión formal de la postulación, no con un cambio de etapa.',
-      'hiring_application_stage_decision_owned',
+      'Cerrar una postulación exige declarar el desenlace: hazlo con la decisión formal, no con un cambio de etapa.',
+      'hiring_application_close_requires_outcome',
       422
     )
   }
+
+  const nextStage = assertEnum(stage, HIRING_PIPELINE_STAGES, 'stage')
 
   return withGreenhousePostgresTransaction(async client => {
     const rows = await runQuery<HiringApplicationRow>(

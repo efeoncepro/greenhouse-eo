@@ -48,7 +48,7 @@ const proposalFixture = {
   applicationId: 'happ-1',
   proposed: { dossier: { resumenEjecutivo: 'ok' }, sources: { cvContentHash: 'hash-cv-1' } },
   provider: 'google',
-  model: 'gemini-2.5-flash',
+  model: 'claude-sonnet-5',
   promptVersion: 'hiring_evaluation_dossier.v1',
   inputDigest: 'digest-1',
   status: 'proposed',
@@ -69,7 +69,7 @@ beforeEach(() => {
   runGenerationMock.mockResolvedValue({
     dossier: { resumenEjecutivo: 'ok', coherencias: [], gaps: [], focosEntrevista: [], noVerificable: [] },
     provider: 'google',
-    model: 'gemini-2.5-flash',
+    model: 'claude-sonnet-5',
     usage: { inputTokens: 10, outputTokens: 20 },
     status: 'ok'
   })
@@ -115,14 +115,14 @@ describe('proposeEvaluationDossier', () => {
 
     // TASK-1737: el digest se computa con el prompt contract vigente (v2) — las
     // propuestas v1 quedan stale por diseño al cambiar la versión.
-    expect(computeDigestMock).toHaveBeenCalledWith(packetFixture, 'gemini-2.5-flash', 'hiring_evaluation_dossier.v2')
+    expect(computeDigestMock).toHaveBeenCalledWith(packetFixture, 'claude-sonnet-5', 'hiring_evaluation_dossier.v2')
 
     const createInput = createProposalMock.mock.calls[0][1]
 
     expect(createInput.promptVersion).toBe('hiring_evaluation_dossier.v2')
 
     expect(createInput.inputDigest).toBe('digest-1')
-    expect(createInput.model).toBe('gemini-2.5-flash')
+    expect(createInput.model).toBe('claude-sonnet-5')
     expect(createInput.proposed.sources.cvContentHash).toBe('hash-cv-1')
 
     expect(publishOutboxEventMock).toHaveBeenCalledTimes(1)
@@ -133,7 +133,7 @@ describe('proposeEvaluationDossier', () => {
       proposalId: 'hdsp-1',
       applicationId: 'happ-1',
       provider: 'google',
-      model: 'gemini-2.5-flash',
+      model: 'claude-sonnet-5',
       actorUserId: 'user-1'
     })
 

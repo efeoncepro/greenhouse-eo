@@ -1,7 +1,15 @@
-import { Heading, Section, Text } from '@react-email/components'
+import { Heading, Img, Text } from '@react-email/components'
 
 import EmailLayout from './components/EmailLayout'
 import { EMAIL_COLORS, EMAIL_FONTS } from './constants'
+
+const MEDIA_BUCKET = process.env.GREENHOUSE_PUBLIC_MEDIA_BUCKET || 'efeonce-group-greenhouse-public-media-prod'
+const SELECTED_ILLUSTRATION_IMAGE_URL = `https://storage.googleapis.com/${MEDIA_BUCKET}/emails/hiring-selected-email-mail-icon-v4.png`
+
+const EMPHASIS_STYLE = {
+  color: EMAIL_COLORS.text,
+  fontWeight: 700,
+} as const
 
 /**
  * TASK-1689 — Email de decisión al candidato: seleccionado o no seleccionado.
@@ -24,18 +32,22 @@ export default function HiringDecisionEmail({
   locale = 'es',
 }: HiringDecisionEmailProps) {
   const isSelected = variant === 'selected'
+  const firstName = recipientName?.split(' ')[0]
 
   const t =
     locale === 'en'
       ? isSelected
         ? {
-            preview: (title: string) => `Good news about your application to ${title}.`,
-            heading: 'We chose you',
-            greeting: (n?: string) => (n ? `Hi ${n},` : 'Hi,'),
+            preview: (title: string) => `The next step is your offer letter for ${title}.`,
+            heading: firstName ? `We chose you, ${firstName}!` : 'We chose you!',
+            greeting: null,
             body1: (title: string) =>
-              `We have good news: we chose you for «${title}» at Efeonce. Congratulations — your profile stood out throughout the process.`,
-            body2: 'Our team will contact you by email with the next steps. You do not need to do anything else for now.',
-            closing: 'Welcome — we are glad you are joining the team.',
+              `After reviewing your application and everything you shared with us throughout the process, we are delighted to confirm that we chose you for «${title}» at Efeonce.`,
+            body2:
+              'Thank you for the time, dedication, and openness you brought to each stage. Getting to know your experience and what you can bring to the team made this decision especially meaningful.',
+            body3:
+              'The next step is to prepare and send you the offer letter. Once you have reviewed and accepted it, we will proceed with the employment agreement. Our team will write to this same email address; you do not need to take any action for now.',
+            closing: 'We are very happy to take this next step with you. We will be in touch soon.',
           }
         : {
             preview: (title: string) => `An update about your application to ${title}.`,
@@ -45,17 +57,21 @@ export default function HiringDecisionEmail({
               `Thank you for the time and interest you put into your application to «${title}» at Efeonce. After completing the process, we decided not to move forward on this occasion.`,
             body2:
               'This decision is about this particular search and the specific fit we needed right now. We would be glad to see you apply to future openings closer to your profile.',
+            body3: null,
             closing: 'We sincerely appreciate your interest in working with us.',
           }
       : isSelected
         ? {
-            preview: (title: string) => `Buenas noticias sobre tu postulación a ${title}.`,
-            heading: '¡Te elegimos!',
-            greeting: (n?: string) => (n ? `Hola ${n},` : 'Hola,'),
+            preview: (title: string) => `El próximo paso será recibir tu carta oferta para ${title}.`,
+            heading: firstName ? `¡Te elegimos, ${firstName}!` : '¡Te elegimos!',
+            greeting: null,
             body1: (title: string) =>
-              `Tenemos buenas noticias: te elegimos para «${title}» en Efeonce. Felicitaciones — tu perfil destacó durante todo el proceso.`,
-            body2: 'Nuestro equipo te contactará por correo con los próximos pasos. Por ahora no necesitas hacer nada más.',
-            closing: 'Te damos la bienvenida — nos alegra que te sumes al equipo.',
+              `Después de revisar tu postulación y todo lo que compartiste con nosotros durante el proceso, nos alegra confirmarte que te elegimos para «${title}» en Efeonce.`,
+            body2:
+              'Gracias por el tiempo, la dedicación y la apertura que mostraste en cada etapa. Conocer tu experiencia y lo que puedes aportar al equipo hizo que esta decisión fuera especialmente significativa.',
+            body3:
+              'El próximo paso es preparar y enviarte la carta oferta. Cuando la revises y aceptes, avanzaremos con la firma del contrato. Nuestro equipo te escribirá a este mismo correo; por ahora, no necesitas realizar ninguna acción.',
+            closing: 'Nos alegra mucho dar este paso contigo. Hablamos pronto.',
           }
         : {
             preview: (title: string) => `Una actualización sobre tu postulación a ${title}.`,
@@ -65,13 +81,28 @@ export default function HiringDecisionEmail({
               `Gracias por el tiempo y el interés que pusiste en tu postulación a «${title}» en Efeonce. Después de completar el proceso, decidimos no avanzar en esta oportunidad.`,
             body2:
               'La decisión responde a esta búsqueda en particular y al calce específico que necesitábamos ahora. Nos encantaría verte postular a futuras vacantes que se acerquen más a tu perfil.',
+            body3: null,
             closing: 'Agradecemos de verdad tu interés en trabajar con nosotros.',
           }
 
-  const firstName = recipientName?.split(' ')[0]
-
   return (
     <EmailLayout previewText={t.preview(openingTitle)} locale={locale} brand='efeonce'>
+      {isSelected ? (
+        <Img
+          src={SELECTED_ILLUSTRATION_IMAGE_URL}
+          alt=""
+          width={360}
+          height={180}
+          style={{
+            width: '100%',
+            maxWidth: '360px',
+            height: 'auto',
+            margin: '0 auto 16px',
+            display: 'block',
+          }}
+        />
+      ) : null}
+
       <Heading
         style={{
           fontFamily: EMAIL_FONTS.heading,
@@ -85,45 +116,72 @@ export default function HiringDecisionEmail({
         {t.heading}
       </Heading>
 
-      <Text style={{ fontSize: '15px', color: EMAIL_COLORS.secondary, lineHeight: '24px', margin: '0 0 8px' }}>
-        {t.greeting(firstName)}
-      </Text>
+      {t.greeting ? (
+        <Text style={{ fontSize: '15px', color: EMAIL_COLORS.secondary, lineHeight: '24px', margin: '0 0 8px' }}>
+          {t.greeting(firstName)}
+        </Text>
+      ) : null}
 
       <Text style={{ fontSize: '15px', color: EMAIL_COLORS.secondary, lineHeight: '24px', margin: '0 0 16px' }}>
-        {t.body1(openingTitle)}
+        {isSelected ? (
+          locale === 'en' ? (
+            <>
+              After reviewing your application and everything you shared with us throughout the process, we are
+              delighted to confirm that{' '}
+              <strong style={EMPHASIS_STYLE}>we chose you for «{openingTitle}» at Efeonce</strong>.
+            </>
+          ) : (
+            <>
+              Después de revisar tu postulación y todo lo que compartiste con nosotros durante el proceso, nos
+              alegra confirmarte que{' '}
+              <strong style={EMPHASIS_STYLE}>te elegimos para «{openingTitle}» en Efeonce</strong>.
+            </>
+          )
+        ) : (
+          t.body1(openingTitle)
+        )}
       </Text>
-
-      {isSelected ? (
-        <Section
-          style={{
-            backgroundColor: '#ECFDF3',
-            border: `1px solid ${EMAIL_COLORS.border}`,
-            borderRadius: '12px',
-            padding: '20px',
-            margin: '0 0 24px',
-            textAlign: 'center' as const,
-          }}
-        >
-          <Heading
-            style={{
-              fontFamily: EMAIL_FONTS.heading,
-              fontSize: '18px',
-              fontWeight: 700,
-              color: EMAIL_COLORS.success,
-              margin: '0',
-              lineHeight: '26px',
-            }}
-          >
-            {openingTitle}
-          </Heading>
-        </Section>
-      ) : null}
 
       <Text style={{ fontSize: '15px', color: EMAIL_COLORS.secondary, lineHeight: '24px', margin: '0 0 16px' }}>
         {t.body2}
       </Text>
 
+      {isSelected ? (
+        <Text style={{ fontSize: '15px', color: EMAIL_COLORS.secondary, lineHeight: '24px', margin: '0 0 16px' }}>
+          {locale === 'en' ? (
+            <>
+              <strong style={EMPHASIS_STYLE}>The next step is to prepare and send you the offer letter.</strong>{' '}
+              <strong style={EMPHASIS_STYLE}>
+                Once you have reviewed and accepted it, we will proceed with the employment agreement.
+              </strong>{' '}
+              Our team will write to this same email address; you do not need to take any action for now.
+            </>
+          ) : (
+            <>
+              <strong style={EMPHASIS_STYLE}>El próximo paso es preparar y enviarte la carta oferta.</strong>{' '}
+              <strong style={EMPHASIS_STYLE}>
+                Cuando la revises y aceptes, avanzaremos con la firma del contrato.
+              </strong>{' '}
+              Nuestro equipo te escribirá a este mismo correo; por ahora, no necesitas realizar ninguna acción.
+            </>
+          )}
+        </Text>
+      ) : null}
+
       <Text style={{ fontSize: '14px', color: EMAIL_COLORS.muted, lineHeight: '21px', margin: '0' }}>{t.closing}</Text>
+
+      <Text
+        style={{
+          fontSize: '14px',
+          color: EMAIL_COLORS.secondary,
+          lineHeight: '21px',
+          margin: '20px 0 0',
+        }}
+      >
+        <strong style={EMPHASIS_STYLE}>{locale === 'en' ? 'Talent Team' : 'Equipo de Talento'}</strong>
+        <br />
+        Efeonce
+      </Text>
     </EmailLayout>
   )
 }

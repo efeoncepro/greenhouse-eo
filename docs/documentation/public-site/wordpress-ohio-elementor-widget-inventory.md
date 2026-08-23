@@ -1,12 +1,12 @@
 # Public Site WordPress — Inventario Ohio + Elementor
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-14 por Codex
-> **Ultima actualizacion:** 2026-06-14 por Codex
+> **Ultima actualizacion:** 2026-08-22 por Codex
 > **Dominio:** Public Site
 > **Sitio:** `https://efeoncepro.com`
-> **Runtime observado:** WordPress `7.0`, Kinsta, theme `ohio-child` `1.0.0` sobre Ohio `3.7.0`, Elementor `4.1.3`, Elementor Pro `4.1.1`, Ohio Extra `3.7.0`
+> **Runtime revalidado para Demo 35 (2026-08-22):** WordPress `7.1`, Kinsta, theme `ohio-child` `1.0.0` sobre Ohio `3.7.0`, Elementor `4.2.3`, Elementor Pro `4.2.2`, Ohio Extra `3.7.0`. Los conteos agregados de este inventario siguen siendo el snapshot del 2026-06-14.
 > **Manual relacionado:** [Playbook de landings Ohio + Elementor](../../manual-de-uso/public-site/wordpress-ohio-elementor-landing-playbook.md)
 > **Layout relacionado:** [Layout Ohio + Elementor](./wordpress-ohio-elementor-layout.md)
 > **Extensiones relacionadas:** [Custom Elementor Widgets y React](./wordpress-custom-widgets-react-strategy.md)
@@ -54,6 +54,13 @@ Resumen observado:
 | Templates en `elementor_library` | 67 |
 | Widget mas usado | `spacer` (1868 usos) |
 | Widget Ohio mas usado | `ohio_heading` (874 usos) |
+
+Revalidación focalizada de Demo 35: el contrato de sus siete raíces, controles
+usados, 15 instancias de `ohio_recent_posts` y dependencias Ohio externas al
+árbol vive en
+[`2026-08-22-demo35-elementor-runtime-contract.md`](../../audits/public-site/2026-08-22-demo35-elementor-runtime-contract.md).
+No extrapolar sus versiones runtime a los conteos agregados sin repetir el
+discovery global.
 
 ## Fundaciones visuales: color, tipografia y motion
 
@@ -335,14 +342,14 @@ Por eso una discontinuidad visual entre hero y contenido puede venir de Ohio, no
 
 | Plugin | Version | Estado | Uso operativo |
 | --- | --- | --- | --- |
-| Elementor | 4.1.3 | activo | Builder principal, containers/sections/widgets, CSS externo. |
-| Elementor Pro | 4.1.1 | activo | Widgets Pro, loops, slides, templates. |
+| Elementor | 4.2.3 | activo, revalidado 2026-08-22 | Builder principal, containers/sections/widgets, CSS externo. |
+| Elementor Pro | 4.2.2 | activo, revalidado 2026-08-22 | Widgets Pro, loops, slides, templates. |
 | Ohio Extra | 3.7.0 | activo | 37 widgets Ohio para Elementor + shortcodes legacy. |
 | Ohio Portfolio | 1.1.3 | activo | CPT/proyectos usados por `ohio_recent_projects`. |
 | Ohio Importer | 1.3.3 | activo | Import demos/templates; no usar como runtime bridge. |
 | HubSpot All-In-One Marketing | 11.3.45 | activo | Widget `hubspot-form`, forms/popups/chat. |
 | HubSpot Content embed | 1.3.7 | activo | Embeds HubSpot. |
-| Contact Form 7 | 6.1.6 | activo | Formulario consumido por `ohio_contact_form`. |
+| Contact Form 7 | 6.1.7 | activo, revalidado 2026-08-22 | Formulario consumido por `ohio_contact_form`. |
 | WPOP Contact Form 7 to Hubspot | 1.0.9 | activo | Integracion CF7 -> HubSpot. |
 | Essential Addons for Elementor | 6.6.7 | activo | Widgets `eael-*`; hoy se observa `eael-adv-accordion` y `eael-sticky-video`. |
 | Essential Addons Pro | 6.0.0 | inactivo | No asumir disponibilidad productiva. |

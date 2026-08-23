@@ -26,7 +26,7 @@ vi.mock('@/lib/hiring/assessment/access-recovery', async importOriginal => {
   }
 })
 
-const { POST } = await import('./route')
+const { GET, POST } = await import('./route')
 
 const assessmentId = 'asmt-11111111-1111-4111-8111-111111111111'
 const applicationId = 'happ-11111111-1111-4111-8111-111111111111'
@@ -238,5 +238,96 @@ describe('POST hiring assessment access recovery', () => {
     const manual = await POST(request(), context)
 
     expect(manual.status).toBe(201)
+  })
+})
+
+/**
+ * TASK-1747 — la lectura de disponibilidad es un CONTRATO, no un privilegio de Application 360.
+ * Sin ella, cualquier otro consumidor gobernado tendría que ejecutar el command para averiguar si
+ * podía ejecutarlo.
+ */
+describe('GET /api/hiring/assessments/[id]/access-recovery', () => {
+  const params = Promise.resolve({ id: assessmentId })
+
+  const url = (query = `applicationId=${applicationId}`) =>
+    new Request(`https://greenhouse.test/api/hiring/assessments/${assessmentId}/access-recovery?${query}`)
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mocks.tenant.mockResolvedValue({ tenant })
+    mocks.can.mockReturnValue(true)
+    mocks.availability.mockResolvedValue({ assessmentId, applicationId, eligible: true })
+  })
+
+  it('responde la disponibilidad junto con las DOS puertas por separado', async () => {
+    mocks.can.mockImplementation((_t: unknown, capability: string) => capability !== 'hiring.assessment.reveal_access_link')
+
+    const response = await GET(url(), { params })
+    const body = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(body.canRecoverByEmail).toBe(true)
+    // Colapsar las dos puertas en un booleano dejaría revelar enlaces a quien sólo puede reenviar.
+    expect(body.canRevealSecureLink).toBe(false)
+  })
+
+  it('NO ejecuta el command: leer disponibilidad nunca emite credencial ni consume cuota', async () => {
+    await GET(url(), { params })
+
+    expect(mocks.secureLink).not.toHaveBeenCalled()
+  })
+
+  /**
+   * `hiring.assessment.read` la porta TODO tenant interno vía el routeGroup `internal`
+   * (collaborator, designer, people_viewer incluidos), y el payload declara si la persona retiró su
+   * consentimiento, si su candidatura ya tiene decisión antes de comunicársela, y si su correo
+   * rebotó o nos marcó como spam. Las dos capabilities de recuperación son role-only por eso mismo.
+   */
+  it('leer exige al menos una capability de recuperación, no sólo las de lectura', async () => {
+    mocks.can.mockImplementation((_t: unknown, capability: string) =>
+      capability === 'hiring.assessment.read' || capability === 'hiring.application.read')
+
+    const response = await GET(url(), { params })
+
+    expect(response.status).toBe(403)
+    expect(mocks.availability).not.toHaveBeenCalled()
+  })
+
+  it('sin applicationId no responde: un assessmentId suelto sondearía a cualquier candidato', async () => {
+    const response = await GET(url(''), { params })
+
+    expect(response.status).toBe(400)
+    expect(mocks.availability).not.toHaveBeenCalled()
+  })
+
+  it('un assessment de OTRA postulación se responde como inexistente', async () => {
+    mocks.availability.mockResolvedValue({ assessmentId, applicationId: 'happ-otra', eligible: true })
+
+    const response = await GET(url(), { params })
+
+    expect(response.status).toBe(404)
+  })
+
+  it('un motivo inválido se rechaza en vez de resolverse al default en silencio', async () => {
+    const response = await GET(url(`applicationId=${applicationId}&reason=motivo_inventado`), { params })
+
+    expect(response.status).toBe(400)
+    expect(mocks.availability).not.toHaveBeenCalled()
+  })
+
+  it('el motivo declarado llega al reader: la elegibilidad de un test vencido depende de él', async () => {
+    await GET(url(`applicationId=${applicationId}&reason=token_expired_before_start`), { params })
+
+    expect(mocks.availability).toHaveBeenCalledWith(assessmentId, 'token_expired_before_start')
+  })
+
+  it('todo error trae prosa es-CL y declara si reintentar sirve', async () => {
+    mocks.can.mockReturnValue(false)
+
+    const body = await (await GET(url(), { params })).json()
+
+    expect(body.error).toMatch(/permiso/i)
+    // Sin `actionable`, el cliente asume que reintentar sirve — incluso ante un permiso que falta.
+    expect(body.actionable).toBe(false)
   })
 })

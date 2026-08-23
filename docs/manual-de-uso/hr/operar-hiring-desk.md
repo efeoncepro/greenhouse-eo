@@ -43,6 +43,16 @@ Esta separación permite que dos candidatos de la misma vacante tengan tokens, t
 3. Espera el feedback de guardado. Si aparece rollback, la tarjeta vuelve a la etapa anterior; reintenta cuando el servicio esté disponible.
 4. Para seleccionar, rechazar o dejar en espera, abre la postulación y usa `Decidir`; no uses drag para outcomes terminales.
 
+**Las seis columnas son las seis etapas (TASK-1754).** Desde 2026-08-22 hay una etapa por columna:
+Sourced · Screening · **Evaluación** · Entrevista · Decisión · Cerrado. Antes el dominio tenía trece y
+tres se mostraban todas como «Evaluación», así que soltar una tarjeta ahí guardaba una etapa distinta
+de la que la automatización vigila: las políticas de assessment estaban bien configuradas y no
+disparaban, sin dejar rastro en pantalla.
+
+Lo que cambia para ti: **soltar una tarjeta en «Evaluación» ahora sí dispara la prueba** cuando la
+vacante tiene su política habilitada en modo automático. Antes no. Si mueves a alguien ahí y no quieres
+que reciba la prueba todavía, revisa el modo de la política de la vacante antes de soltar.
+
 ## Revisar una postulación
 
 1. En `Resumen`, confirma opening, etapa, contacto enmascarado y señales advisory.
@@ -152,7 +162,11 @@ Revisar al menos: instrucciones/consentimiento, timer, autosave, avance, scoreca
 
 Algunas acciones del Desk envían un correo automático al candidato. Conviene saberlo antes de hacer clic:
 
-- **Mover la etapa a `Preselección` o `Entrevista`** → el candidato recibe un email de avance de proceso.
+- **Mover la etapa a `Evaluación` o `Entrevista`** → el candidato recibe un email de avance de proceso.
+  Ojo con el nombre: en ese correo la etapa se llama **«Preselección»**, no «Evaluación». Es
+  deliberado, no un error — hacia el candidato el registro es más suave, y decirle «Evaluación»
+  chocaría con el correo del test, que ya dice «tienes una evaluación pendiente». **No pidas que se
+  «corrija».**
 - **Asignar un test al candidato** → Greenhouse solicita el email con el link para rendirlo. `sent` sólo prueba
   aceptación del despacho; no confirma entrega. No reasignes para reenviar: la recuperación gobernada rota el
   acceso sobre la misma instancia y está pendiente de rollout.

@@ -12,7 +12,6 @@ const VALID_FORMATS = ['webp', 'png'] as const
 const VALID_PROVIDERS = ['google-imagen', 'openai-image'] as const
 const VALID_OPENAI_QUALITIES = ['auto', 'low', 'medium', 'high'] as const
 const VALID_OPENAI_BACKGROUNDS = ['auto', 'opaque', 'transparent'] as const
-const VALID_OPENAI_TRANSPARENT_STRATEGIES = ['fallback-to-gpt-image-1.5', 'throw', 'opaque'] as const
 
 const VALID_OPENAI_SIZES = [
   'auto',
@@ -77,13 +76,6 @@ export async function POST(request: Request) {
 
     if (body.background && VALID_OPENAI_BACKGROUNDS.includes(body.background)) {
       options.background = body.background
-    }
-
-    if (
-      body.transparentBackgroundStrategy &&
-      VALID_OPENAI_TRANSPARENT_STRATEGIES.includes(body.transparentBackgroundStrategy)
-    ) {
-      options.transparentBackgroundStrategy = body.transparentBackgroundStrategy
     }
 
     if (typeof body.filename === 'string' && body.filename.trim()) {

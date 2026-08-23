@@ -1,24 +1,143 @@
 # Greenhouse Hiring / ATS Architecture V1
 
-## Delta 2026-08-19 — Recovery de assessment y sesión pública, código dormante (TASK-1746)
+## Acceso al test del candidato — asignación, recuperación y aviso (TASK-1746/1747/1757)
 
-El write canónico de recuperación es `recoverCandidateTestAccess`; serializa por assessment, revalida
+Contrato vigente. Cubre el write de recuperación, su carril de lectura, el único camino de asignación y el
+aviso al candidato cuando su credencial se rota. Cronología en `docs/changelog/` y en las tasks dueñas.
+
+### Write: un solo command, dos canales excluyentes
+
+El write canónico es `recoverCandidateTestAccess`; serializa por assessment, revalida
 assessment→application→candidate facet y separa `email` de `secure_link`. Ambos canales rotan una sola versión
 de credencial bajo la misma transacción que receipt/audit/outbox; el enlace manual se revela una vez en la
 respuesta y nunca se persiste. El adapter Product API
 `POST /api/hiring/assessments/[id]/access-recovery` exige sesión humana allowlisted, capability por canal,
 lectura de application y assessment antes de lookup, Origin exacto, body cerrado e idempotencia acotada.
 
-La nueva frontera candidata usa `/public/assessment/access#access=…` → exchange POST → cookie `__Host-` HttpOnly
+La frontera candidata usa `/public/assessment/access#access=…` → exchange POST → cookie `__Host-` HttpOnly
 y rutas posteriores sin token. Rotar invalida sesiones anteriores; el reloj de PG gobierna start-by, plazo de
 respuesta, gracia de 30 minutos y 24 horas post-start cuando no existe límite. El abuso se controla con techo
 IP previo y presupuesto por credencial/sesión válida bajo locks; nunca se persisten IP o bearer raw. Retención
 de sesiones/buckets tiene owner diario en ops-worker, loop acotado, readback y señal de residuo.
 
-Estado real: Slices 1–4 están code-complete localmente, no operativas. La migración TASK-1746 y el índice único
-concurrente de intents no se han aplicado; capabilities/surface recovery no están expuestas, el tipo de email
-permanece OFF y `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` OFF conserva assignment legacy. Antes de cutover
-faltan rutas live, readback Resend `click_tracking=false`, smokes PG/browser/email/href y el consumer TASK-1747.
+### Read: la disponibilidad es su propio carril, y es MÁS estrecho que el write
+
+`GET /api/hiring/assessments/[id]/access-recovery?applicationId=…[&reason=…]` responde
+`{ availability, canRecoverByEmail, canRevealSecureLink }` desde el mismo reader que ya consumía el POST
+(`getAssessmentAccessRecoveryAvailability`). Existe para que la capacidad "explicar por qué NO se puede
+recuperar" no quede UI-only: sin él, ni Nexa ni MCP ni un segundo consumidor alcanzan el juicio.
+
+Su puerta **no** es `hiring.assessment.read`. Esa capability la porta todo tenant interno por el routeGroup
+`internal` —collaborator, designer, people_viewer incluidos—, y el DTO expone si la candidata retiró su
+consentimiento, si su decisión no se le comunicó y si el proveedor bloqueó su correo. La puerta es
+`hiring.assessment.read` + `hiring.application.read` + **al menos una** de las dos capabilities de
+recuperación. `applicationId` es obligatorio y se compara contra el aggregate, igual que en el POST: un test
+que no pertenece a esa postulación se responde como inexistente, sin confirmar que existe en otro lado.
+
+`reason` es opcional y validado contra el enum. Importa porque la elegibilidad es reason-dependent: un
+assessment `expired` sólo es recuperable con `token_expired_before_start`, así que la lectura sin motivo
+no puede probar el caso más común del incidente del 2026-08-19.
+
+### El DTO nombra la causa; nunca la colapsa
+
+`AssessmentAccessRecoveryAvailability` vive en el vocabulario isomorfo, no en el módulo server. Cada canal
+declara `blockedBy` sobre un enum cerrado —`assessment_not_eligible`, `no_candidate_email`,
+`provider_blocked`, `quota_exhausted`, `cooldown`— porque un `available: false` que colapsa cinco causas con
+cinco remedios distintos deja a la superficie sin nada que decir salvo el peor default posible ("no tienes
+permiso", a alguien que sí lo tiene). Es el noveno patrón canónico aplicado al DTO.
+
+El cooldown es **por canal**: `cooldownUntil` (correo) y `secureLinkCooldownUntil` viajan separados porque el
+command los filtra por canal. Compartir un solo campo hacía que un correo recién enviado apagara el enlace
+seguro por 60 s sin motivo.
+
+`contracts.ts` quedó partido: `vocabulary.ts` es isomorfo (enums, tipos, TTLs, cuotas, el DTO y las funciones
+puras de elegibilidad y de aviso) y `contracts.ts` es la mitad server que necesita `node:crypto` y re-exporta
+el vocabulario. Sin esa partición el navegador re-declara el vocabulario y nacen dos fuentes de verdad.
+
+### Asignación: el camino legacy está retirado, no sólo escondido
+
+Application 360 asigna por el camino gobernado propose→confirm de TASK-1719: el servidor resuelve la
+plantilla desde la política de la vacante y el diálogo es preview + confirmación. El preview expone
+`blockingReasonCode` y la superficie lo renderiza y deshabilita el confirm — cubre tres causas que ningún
+otro campo delata (política en `draft`, plantilla inactiva, candidatura ya decidida), y `draft` es el estado
+en que nace toda política.
+
+`POST /api/hiring/assessments` con `method='candidate_test'` responde **410** (`assessment_legacy_assignment_retired`):
+dejaba que el cliente eligiera plantilla y devolvía el token crudo a cualquier consumidor con la capability,
+así que sacarlo de la UI no cerraba nada. `method='interviewer_scorecard'` sigue vivo por esa misma ruta.
+
+### Aviso al candidato cuando su acceso se rota (TASK-1757)
+
+Emitir un enlace seguro **mata la credencial anterior** y la entrega en mano al operador. Si esa entrega
+falla, la persona queda sin acceso, sin saber por qué y con el plazo corriendo — y la elegibilidad permite
+recuperar en `in_progress`, así que puede estar respondiendo en otra pestaña.
+
+El tipo `hiring_assessment_access_rotated` cuelga del evento de dominio
+`hiring.assessment.access_recovery_recorded` vía la projection `hiring_assessment_access_rotated_email`
+(ops-worker, domain `notifications`), no del route handler: cualquier consumidor del command avisa por
+construcción. El dedupe es por **recuperación** (`recoveryId`), no por assessment ni por evento — con
+`assessmentId` una segunda rotación sería indistinguible de la primera y la persona no se enteraría de la
+más reciente.
+
+La decisión de avisar es una función pura isomorfa, `decideAssessmentAccessRotationNotice`, con cinco
+motivos de omisión: `not_secure_link` (el correo de recuperación ya lleva el aviso y la credencial),
+`operator_declared_delivery_failed` (evidencia más fresca que el webhook), `no_candidate_email`,
+`provider_blocked` y `credential_already_expired` (fail-closed: sin vencimiento legible NO se asume vigente).
+Vive en el vocabulario y no en el consumer a propósito: `predictAssessmentAccessRotationNotice` delega en la
+misma función para que el operador vea **antes de confirmar** si el candidato va a ser avisado — si no, manda
+el WhatsApp diciendo "te llegó un correo" cuando ningún correo salió.
+
+El predicado "el proveedor bloqueó esta dirección" tiene fuente única en `provider-block.ts`
+(`BLOCKING_PROVIDER_STATUSES` + sus generadores SQL): estaba escrito dos veces verbatim y el tercer
+copy-paste es cómo se convierte en tres que divergen en silencio.
+
+El correo candidate-facing gana `Reply-To`: `CANDIDATE_REPLY_TO_EMAIL_TYPES` + `resolveCandidateReplyToAddress`
+(`HIRING_CANDIDATE_REPLY_TO_EMAIL`, default `people@efeoncepro.com`) en la plataforma de correo. Antes **no
+existía** y una respuesta del candidato caía en la dirección de envío del proveedor. El párrafo "responde este
+correo y lo reponemos" no es cortesía: es la condición que hace legítimo un aviso sin credencial.
+
+Señal acompañante: `hiring.assessment.access_recovery.rotation_unnotified` (módulo `hiring`, steady 0).
+Kill-switch: fila `email_type_config.hiring_assessment_access_rotated`, flipeable con
+`pnpm hiring:email-type` (dry-run por defecto) sin redeploy.
+
+### Invariantes operativos para agentes — Acceso al test del candidato
+
+- **NUNCA** construir ni renderizar el enlace del candidato en la superficie del operador. La única URL con
+  credencial la arma el servidor justo antes de enviar el correo, y el enlace revelado llega ya armado desde
+  la respuesta del command: la vista lo muestra, no lo compone. Gate de FUENTE:
+  `src/views/greenhouse/hiring/assessment-credential-source-gate.test.ts` (una captura sólo prueba la rama
+  que se renderizó; la garantía vive en el código).
+- **NUNCA** re-abrir un camino de asignación que deje al cliente elegir plantilla o devuelva el token crudo.
+  Asignar un `candidate_test` pasa SIEMPRE por propose→confirm.
+- **NUNCA** gatear un read de recuperación sólo con `hiring.assessment.read`: exige al menos una de las dos
+  capabilities de recuperación **y** el binding a `applicationId` contra el aggregate.
+- **NUNCA** colapsar en un booleano las causas por las que un canal no está disponible. Si agregas una causa,
+  agrégala al enum `AssessmentAccessRecoveryChannelBlock` y dale su frase.
+- **NUNCA** meter el enlace, el token ni nada derivable de ellos en el aviso de rotación. El canal existe
+  justamente para entregar la credencial por una vía donde el operador verifica identidad. Cinco tests
+  anti-fuga lo hacen cumplir con la fila de origen envenenada.
+- **NUNCA** escribir el `delivery_id` del aviso en el ledger de recuperaciones: es append-only, IDs-only, y
+  el CHECK de schema prohíbe un `delivery_id` en una fila `secure_link`. La traza del aviso es su fila de
+  `email_deliveries` (`source_entity = recoveryId`).
+- **NUNCA** predecir el aviso con una copia del criterio. Predicción y envío delegan en
+  `decideAssessmentAccessRotationNotice`.
+- **NUNCA** duplicar el predicado de buzón bloqueado: importarlo de `provider-block.ts`.
+- **SIEMPRE** recordar que en `email_type_config` una fila **AUSENTE significa ENCENDIDO**
+  (`resolveEmailTypeConfig` es fail-open): el seed `enabled = FALSE` es la puerta, no una formalidad.
+
+### Estado de rollout
+
+`hiring_assessment_access_recovery` y sus dos capabilities están vivas; la migración TASK-1746 y el índice
+único de intents quedaron aplicados el 2026-08-19, y el canal de correo del recovery se habilitó ese mismo
+día. El aviso de rotación shipeó apagado por seed (migración `20260820045834971`) y se **prendió el
+2026-08-20 con autorización del CEO**, tras verificar contra PG que el ledger de recuperaciones estaba vacío
+(sin historial no hay ráfaga de backfill en el primer drenaje). `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`
+sigue OFF en el ops-worker, así que el correo de asignación conserva el link legacy; su cutover espera el
+readback Resend `click_tracking=false` y los smokes de href. Detalle por flag y runtime:
+`docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+
+Pendiente de evidencia runtime: ejercitar una rotación real con el flag ON (TASK-1757) y las ramas de
+TASK-1747 que ninguna captura puede dar contra datos sintéticos.
 
 ## Purpose
 
@@ -39,6 +158,125 @@ Este documento fija:
 - State: `Canonical`
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
+
+## Delta 2026-08-22 — TASK-1765: el eje de DESENLACE, su causa gobernada y el cierre como command
+
+Implementa `GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1` §4/§4.1/§5/§6. El
+pipeline pasa a modelar **dos ejes ortogonales**: `stage` es *dónde va la persona en el recorrido*, y
+el desenlace es *cómo terminó ese recorrido*.
+
+### El desenlace, y por qué el campo no se llama como el concepto
+
+El campo físico conserva el nombre `decision` (el rename a `outcome` está deferido, ADR §11), pero el
+concepto es **desenlace**. `withdrawn` y `unresponsive` **no son decisiones de Efeonce**, así que
+**NUNCA** leer esa columna como «lo que Efeonce decidió»: significa «cómo terminó el proceso».
+
+Seis valores: `selected`, `backup_selected`, `not_selected`, `rejected`, `withdrawn`, `unresponsive`.
+
+Las dos distinciones que se ganaron su existencia porque cambian una consecuencia real:
+
+- **`not_selected` ≠ `rejected`.** `rejected` es un juicio sobre la persona. Usarlo para quien llegó
+  al final y no quedó porque el cupo lo tomó otra la saca del Talent Pool por defecto, sesga a
+  cualquier revisor futuro que lea su historia, e **infla la tasa de rechazo de su cohorte
+  demográfica** en el análisis de impacto adverso. `not_selected` es la población objetivo del
+  Talent Pool.
+- **`unresponsive` ≠ `withdrawn`.** A quien deja de responder había que inventarle un retiro que no
+  declaró o un juicio que no hubo. Las dos son atribución falsa. `unresponsive` no atribuye conducta
+  y **no manda correo**.
+
+`on_hold` deja de ser desenlace: una pausa no es un cierre. Vivía en el enum *y* mapeaba a la etapa
+`decision_pending`, así que la misma fila decía «terminó» y «sigue viva». Una pausa se registra
+moviendo la **etapa** a `decision_pending`.
+
+### La causa, y por qué es enum y no prosa
+
+`decision_cause` es **obligatoria en `not_selected` y prohibida en los otros cinco**. No es opcional:
+es una **bicondicional**, garantizada por `hiring_application_decision_cause_pairing_check`.
+
+| Causa | Qué pasó | ¿Cuenta en el embudo de equidad? |
+|---|---|---|
+| `capacity_filled` | El cupo lo tomó otra persona | **sí** — el proceso concluyó y hubo comparación |
+| `opening_closed` | Se cerró la búsqueda | **no** — el proceso no concluyó |
+| `process_cancelled` | Se canceló el proceso | **no** |
+
+Es enum gobernado porque **hay consumidores que ramifican por ella** (el embudo de equidad y el
+cuerpo del correo). Texto libre acá haría irreproducible el análisis de impacto adverso.
+
+**La vacante entra SIEMPRE como causa, JAMÁS como desenlace.** Etiquetar a una persona con el estado
+de la vacante es el defecto que este eje viene a cerrar.
+
+### Cerrar es decidir: el cambio de etapa pierde `closed` por TIPO
+
+El guard anterior era una **denylist** de cuatro literales, y como toda lista de excepciones falló
+por lo que no enumeraba: por ahí se colaron `closed` y `handoff_ready`. Arrastrar una tarjeta a
+«Cerrado» escribía `closed` **sin decisión** — sin evento, sin correo, sin arrancar el reloj de
+retención, y congelando el borrado de los documentos de esa persona en **todas** sus postulaciones,
+porque el detector de retención cruza por `identity_profile_id`.
+
+La denylist **se borró, no se amplió**. Nace `HIRING_PIPELINE_STAGES` —el subconjunto escribible como
+cambio de etapa— y el tipo lo hace cumplir en compilación. **Una etapa nueva nace NO escribible**
+hasta que alguien la agregue deliberadamente. `createHiringApplication` se acota igual: una
+postulación nace en el recorrido.
+
+Error canónico: `hiring_application_close_requires_outcome` (422, `actionable: false`) — reintentar
+el mismo `PATCH` no lo resuelve; la acción real es decidir el desenlace.
+
+### Contrato del command
+
+`decideHiringApplication` conserva su transacción única y suma la causa:
+`SELECT ... FOR UPDATE` → detección de replay → validación de opening → snapshot de assessment →
+`UPDATE` con `decision`, `decision_cause` y `stage='closed'` **en el mismo statement** (la
+bicondicional no admite estados intermedios) → `jsonb_set` del historial → `publishOutboxEvent`.
+
+- La causa entra en `sameReplayPayload`: **misma clave de idempotencia con distinta causa ⇒ 409**, no
+  un replay silencioso. Cerrar «porque el cupo lo tomó otra persona» y «porque cancelamos el proceso»
+  son hechos distintos, cuentan distinto en el embudo y mandan cuerpos de correo distintos.
+- `hiring.application.decided` suma `cause` al payload. La causa es un enum, no PII; la **razón** de
+  la decisión y el nombre del candidato nunca entran.
+
+### Un `EmailType` por desenlace; la causa modula el cuerpo
+
+El selector de `send.ts` era un ternario binario que colapsaba todo lo no-seleccionado en
+«rechazado»: el primer `not_selected` habría mandado un correo de **rechazo** a quien nadie rechazó, y
+el log append-only habría firmado ese hecho falso. Ahora es un **mapa explícito con no-op declarado**:
+un desenlace sin tipo propio **nace mudo**. `hiring_decision_not_selected` lo crea `TASK-1762` con su
+fila de `email_type_config` y su seed en el `ops-worker` (**NO** en Vercel).
+
+### Estado de rollout
+
+| Pieza | Estado |
+|---|---|
+| Expand del `CHECK`, `decision_cause`, `archived_at`, índice parcial | **aplicado** |
+| Command con causa + colapso de `DECISION_STAGE` a `closed` | **aplicado** |
+| Cambio de etapa sin `closed`, por tipo | **aplicado** |
+| Señal `hiring.application.closed_without_outcome` | **aplicada** (hoy `warning`: 32 sintéticas de `TASK-1748` + 1 etapa espejo) |
+| Contract del enum (retirar `on_hold` del `CHECK`) | **pendiente** — post-release |
+| `CHECK` del invariante `(stage='closed') = (decision IS NOT NULL)` | **pendiente** — espera a `TASK-1748` |
+| Escritor de `archived_at` (`archiveSyntheticRecords`, `TASK-1748`) | **code complete** — sin desplegar |
+| Backfill de las 32 filas sintéticas de `closed` a `archived_at` | **pendiente** — espera al despliegue del filtro de `TASK-1748` |
+
+Las pendientes viven en `docs/tasks/pending-migrations/` con su condición de ejecución declarada, y
+su orden es **una sola cadena**: contract del enum → filtro de `TASK-1748` desplegado → backfill del
+eje de archivado → `CHECK` del invariante.
+
+### Invariantes operativos para agentes — Eje de desenlace
+
+- **NUNCA** un `stage='closed'` sin desenlace declarado. Cerrar pasa por `decideHiringApplication`.
+- **NUNCA** etiquetar a una persona con el estado de la vacante: la vacante es **causa** de
+  `not_selected`, jamás desenlace.
+- **NUNCA** usar `rejected` donde no hubo juicio sobre la persona — ni por capacidad, ni por
+  cancelación, ni por silencio.
+- **NUNCA** registrar el silencio como `withdrawn`: es atribuirle a alguien una decisión que no tomó.
+- **NUNCA** dejar la causa como texto libre, ni escribirla en un `UPDATE` distinto al del desenlace.
+- **NUNCA** archivar escribiendo `closed`: archivar es `archived_at`, un eje aparte.
+- **NUNCA** ampliar una denylist de etapas: el conjunto escribible se define por **inclusión**.
+- **NUNCA** reusar el `EmailType` de un desenlace para otro — el sistema ramifica por ese valor
+  (kill-switch, perfil de footer, selector de envío).
+- **NUNCA** aplicar un contract de enum antes del release que retira el valor del código. «Cero
+  filas» no es «nadie lo escribe»: la alcanzabilidad sale del **contrato de la superficie
+  desplegada**. Ocurrió el 2026-08-22; detalle en `GREENHOUSE_DATABASE_TOOLING_V1.md`.
+
+---
 
 ## Delta 2026-08-17 — TASK-1740: contenido público estructurado + fundación JobPosting/canonical
 
@@ -195,7 +433,9 @@ independiente):
   estados previos y expirados; deduplica por evento + assessment + buzón interno. El subject es
   `Test completado: {candidato} — {vacante}` y el cuerpo no expone respuestas ni score.
 - Candidate-facing emails envían como **Efeonce** (AGENCY_BRANDED); el aviso interno usa el sender
-  plataforma. Templates en `src/emails/Hiring*.tsx` (es/en; default es).
+  plataforma. Templates en `src/emails/Hiring*.tsx` (es/en; default es). La variante `selected` mantiene paridad
+  HTML/texto plano, personaliza nombre + vacante y expresa la secuencia `selección → carta oferta aceptada →
+  contrato`; la ilustración remota es decorativa (`alt=""`), secundaria y nunca porta la decisión ni los próximos pasos.
 - Rollout: ledger `FEATURE_FLAG_STATE_LEDGER.md` — flip exige ejercicio end-to-end + revisión
   humana de Talent del copy (especialmente el rechazo). **El flip se ejecutó el 2026-08-12**: flag
   ON en el ops-worker (rev `ops-worker-00548-x52`, default `true` en `deploy.sh`), ejercicio E2E
@@ -1937,6 +2177,29 @@ Invariantes duros:
 - **Purga archive-first.** `hiring_assessment` cascadea desde la postulación, así que un DELETE
   destruiría respuestas calificadas por humanos. El lane de borrado exige cero dependientes sobre los
   **diez** verificados contra PG y aborta la corrida completa si una fila no califica.
+
+#### Delta 2026-08-22 (`TASK-1748`) — archivar tiene eje propio, y el filtro llegó al Banco de Talento
+
+- **Archivar NUNCA escribe `stage`.** `archiveSyntheticRecords` escribe `hiring_application.archived_at`
+  (`candidate_facet.status='archived'`, `hiring_opening.status='cancelled'` en las otras dos entidades),
+  y la guarda de idempotencia lee ese eje. La versión anterior archivaba con `stage='closed'`, y ese
+  `UPDATE` es el origen de las 32 filas `closed` sin desenlace de la auditoría del vocabulario.
+- **El archivado cubre las TRES entidades**, cada una sobre allowlist explícita: omitir la lista no
+  escribe nada. `closed`/`filled` de una vacante NO se reescriben — son desenlaces declarados. Una
+  vacante que se cancela cierra también su `publication_status`.
+- **El Banco de Talento filtra por procedencia**, y el predicado viaja por JOIN a `identity_profiles`:
+  `candidate_facet` **no tiene** `data_origin` propio, lo hereda de la persona.
+- **La projection del Banco de Talento NO gatea su filtro por el flag**, a propósito:
+  `HIRING_SYNTHETIC_DATA_FILTER_ENABLED` es Vercel-only y `reconcileTalentPoolProjection` corre en el
+  `ops-worker` de Cloud Run, donde lo leería `undefined`, o sea OFF en silencio.
+- **Se filtran los caminos que CREAN; el que CORRIGE converge.** El `UPDATE` de ciclo de vida incluye a
+  las membresías sintéticas y las reclasifica a un estado no servible en vez de excluirlas: excluirlas
+  las congelaba en el estado que tuvieran, y una congelada en `pool_eligible` habría quedado visible
+  sin que ninguna corrida pudiera corregirla.
+- **La señal `hiring.talent_pool.integrity` cuenta sólo población real** en
+  `facets_without_membership`: desde que la projection no proyecta sintéticos a propósito, una ficha
+  sintética sin membresía dejó de ser un atraso. Los contadores de consentimiento y retiro **no** se
+  filtran — la procedencia gobierna la visibilidad, jamás el consentimiento.
 
 Flag `HIRING_SYNTHETIC_DATA_FILTER_ENABLED` (Vercel-only, default OFF) gatea sólo el filtro de desk y
 talent pool. Docs: funcional `docs/documentation/hr/procedencia-de-datos-hiring.md`; manual

@@ -85,6 +85,7 @@ import { growthEbookDeliveryFromSubmissionProjection } from './growth-ebook-deli
 import {
   hiringApplicationCreatedEmailsProjection,
   hiringApplicationDecidedEmailProjection,
+  hiringAssessmentAccessRotatedEmailProjection,
   hiringAssessmentAssignedEmailProjection,
   hiringAssessmentSubmittedInternalEmailProjection,
   hiringStageChangedCandidateCommsProjection,
@@ -196,6 +197,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(growthEbookDeliveryFromSubmissionProjection) // TASK-1375 — growth.forms.submission_accepted (ebook form) → email de respaldo con link gated de descarga (genérico por ebook, idempotente); drenado por ops-reactive-growth
   registerProjection(hiringApplicationCreatedEmailsProjection) // TASK-1689 — hiring.application.created → aviso interno People + acuse candidato; flag HIRING_LIFECYCLE_EMAILS_ENABLED (ops-worker); drenado por ops-reactive-notifications
   registerProjection(hiringAssessmentAssignedEmailProjection) // TASK-1689 — hiring.assessment.assigned (candidate_test) → email con link de evaluación (token re-emitido canónico)
+  registerProjection(hiringAssessmentAccessRotatedEmailProjection) // TASK-1757 — hiring.assessment.access_recovery_recorded (secure_link) → aviso al candidato de que su acceso anterior murió; NUNCA lleva el enlace
   registerProjection(hiringAssessmentSubmittedInternalEmailProjection) // hiring.assessment.submitted (candidate_test) → aviso interno a People con CTA a Application 360
   registerProjection(hiringStageChangedCandidateCommsProjection) // TASK-1719 — hiring.application.stage_changed → UNA comunicación: test asignado por policy, o aviso genérico de avance (absorbe TASK-1689)
   registerProjection(hiringApplicationDecidedEmailProjection) // TASK-1689 — hiring.application.decided → selected/rejected (rejected pausable via email_type_config)

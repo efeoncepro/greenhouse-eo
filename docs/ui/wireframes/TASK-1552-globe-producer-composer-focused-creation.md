@@ -1,5 +1,25 @@
 # TASK-1552 — Globe Producer Composer Focused Creation
 
+## Delta 2026-08-21 — fondo como parte del output shape
+
+La región `Formato`/`Salida` incorpora un grupo `Fondo` derivado de `RouteConstraintsV1`:
+
+```text
+Formato
+[1:1] [4:5] [16:9] [9:16]
+
+Fondo
+[Automático] [Sólido] [Transparente · Vista previa]
+```
+
+- La enumeración usa chips con semántica radio; no es toggle binario porque `auto` es un tercer estado real.
+- Si la ruta admite un solo valor, se muestra como `shape-fixed`; no se renderiza un selector inerte.
+- El control vive dentro de `producer-output-shape`, antes del estimate. No se mueve al riel de dinero ni a
+  `Dirección`.
+- El swatch/preview de transparencia usa checkerboard `aria-hidden` bajo el contenido y texto visible
+  `Fondo transparente`; el patrón nunca se exporta dentro del asset.
+- Cambiar el valor conserva prompt/referencias/modelo, marca el estimate stale de inmediato y no desplaza foco.
+
 > **Reconciliado 2026-07-25.** Este documento tenía dos cabeceras que se contradecían: la original (ruta
 > `/producer`, copy en `producer-copy.ts`, componentes del payload legacy) y la del anexo migrado de
 > `TASK-1564` (prototipo medido, payload cliente). **Manda el anexo**, corregido contra el runtime: el composer
@@ -40,6 +60,8 @@ Reducir la carga visual del composer sin eliminar capacidades existentes. La exp
 │                              │                                    │
 │ Formato                      │                                    │
 │ [1:1] [4:5] [16:9] [9:16]  │                                    │
+│ Fondo                       │                                    │
+│ [Auto] [Sólido] [Transp.]   │                                    │
 │                              │                                    │
 │ Ajustes avanzados            │                                    │
 │ Modelo recomendado · Seed   │                                    │
@@ -67,6 +89,9 @@ Reducir la carga visual del composer sin eliminar capacidades existentes. La exp
 - Gated modality: capacidad visible con estado honesto, sin controles falsamente activos.
 - No references: no renderizar un panel vacío dominante; mostrar ayuda contextual cerca de la selección de ruta.
 - Advanced open: disclosure persistente durante la sesión, sin convertirlo en modo obligatorio.
+- Background auto/opaque/transparent: valores y madurez derivados de la ruta; `transparent` no se ofrece por
+  nombre de modelo ni se infiere desde PNG.
+- Background unsupported/fixed: razón visible si está gated; un solo valor se presenta como hecho fijo.
 
 ## Implementation Mapping
 
@@ -85,7 +110,8 @@ Reducir la carga visual del composer sin eliminar capacidades existentes. La exp
 - Data-capture (medidos contra el runtime): existentes `producer-prompt-bar`, `producer-reference-tray`,
   `producer-seed`, `producer-route`, `producer-output-shape`, `producer-estimate`; de `TASK-1555` y no se
   renombran acá: `producer-model-{picker,trigger,list,option,recommended}`; **a agregar**:
-  `producer-composer`, `producer-advanced-settings`, `producer-generate-primary`.
+  `producer-composer`, `producer-advanced-settings`, `producer-generate-primary`,
+  `producer-image-background-mode`.
 
 ## GVC Scenario Plan
 
@@ -95,7 +121,7 @@ Reducir la carga visual del composer sin eliminar capacidades existentes. La exp
 - Route: `http://127.0.0.1:<puerto>/producer`.
 - Viewports: `1440×1000`, `390×844` y **`320`**.
 - Quality profile: `premium`.
-- Required steps: initial Image, Video and Audio modality; prompt entered; direction selection; advanced disclosure; route without references; stale estimate; one-click generate; keyboard; reduced motion.
+- Required steps: initial Image, Video and Audio modality; prompt entered; direction selection; advanced disclosure; route without references; image background `auto/opaque/transparent`; unsupported route; stale estimate; one-click generate; keyboard; reduced motion.
 - Required captures: first fold, advanced collapsed/open, each modality, invalid/gated, ready/stale CTA and mobile recomposition.
 - Assertions: one primary action, no manual estimate action, no duplicated cost line, no empty references panel as dominant content, no provider slug/vendor cost/margin in DOM, no horizontal overflow.
 - Scroll-width checks: `document.documentElement.scrollWidth === document.documentElement.clientWidth` at both viewports.
@@ -218,7 +244,7 @@ que no aplican sería ruido; el prototipo cambia el set.
 
 | Capability | Campos |
 |---|---|
-| `image-generate` / `image-edit` | formato de salida · calidad · proporción · cantidad · resolución · seed |
+| `image-generate` / `image-edit` | formato de salida · calidad · proporción · cantidad · resolución · fondo (si la ruta lo declara) · seed |
 | `image-vectorize` / `image-upscale` | formato · resolución (sin cantidad ni seed: derivan de la fuente) |
 | `video-generate` / `video-extend` | + duración · fps |
 | `audio-generate` / `speech-synthesize` | voz · frecuencia · formato · velocidad · volumen · tono |
@@ -279,6 +305,13 @@ Todo en el namespace nuevo `producerComposer` de `apps/studio-client/src/copy/in
 | `blockedNoGrant` | `No tienes permiso para ejecutar generaciones. Pídeselo a un administrador.` |
 | `routeNotReady` | `Este modelo no está disponible ahora` |
 | `pendingContract` | `Todavía no tiene contrato gobernado: se habilita cuando exista su capability.` |
+| `backgroundLabel` | `Fondo` |
+| `backgroundAuto` | `Automático` |
+| `backgroundOpaque` | `Sólido` |
+| `backgroundTransparent` | `Transparente` |
+| `backgroundPreview` | `Vista previa` |
+| `backgroundUnsupported` | `Esta ruta no admite fondo transparente.` |
+| `backgroundTransparentStatus` | `Fondo transparente` |
 
 ## State copy
 
@@ -300,6 +333,8 @@ sesión expirar no puede perder el texto: es el activo de la sesión.
 ## Accessibility contract
 
 - Cada campo con `<label>` real, no placeholder-como-label.
+- `Fondo` usa un grupo radio con nombre accesible; las flechas cambian opción dentro del grupo y `Tab` sale al
+  siguiente control. El checkerboard es decorativo y lleva `aria-hidden="true"`.
 - El estimado vive en una live region `polite`: cambia solo y el usuario tiene que enterarse sin perder foco.
 - `Cmd/Ctrl+Enter` genera desde cualquier campo. Documentado en el `title` del botón.
 - Los popovers de ruta/estilo/voz: `Esc` cierra, foco vuelve al trigger, `aria-expanded` en el trigger.

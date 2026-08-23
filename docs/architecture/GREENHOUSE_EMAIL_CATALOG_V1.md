@@ -1,5 +1,12 @@
 # CODEX TASK -- Greenhouse Email Catalog v1: transactional, security, executive y domain notifications
 
+> **Presentación y footers:** la dirección Proposed vive en
+> [GREENHOUSE_EMAIL_PRESENTATION_POLICY_DECISION_V1.md](GREENHOUSE_EMAIL_PRESENTATION_POLICY_DECISION_V1.md) y
+> el programa vive en [EPIC-042](../epics/to-do/EPIC-042-efeonce-governed-email-presentation-program.md), cuya
+> primera child es [TASK-1764](../tasks/to-do/TASK-1764-governed-email-footer-profile-migration.md). No autoriza
+> un reemplazo global de `EmailLayout`: legacy permanece por defecto y cada cohorte exige child task, evidencia,
+> aprobación, canary y rollback propios.
+
 ## Delta 2026-08-19 — Credenciales de assessment y recovery token-safe (TASK-1746)
 
 Los tipos que transportan credenciales se clasifican centralmente como token-sensitive: renderizan el valor
@@ -102,10 +109,15 @@ Los emails se personalizan automaticamente desde el event payload del outbox —
 - `notes` — observaciones del revisor (condicional)
 - `locale` — es/en auto-resuelto via context resolver
 
-### Hero images (Imagen 4, clay 3D)
+### Hero images (familia Imagen existente + GPT Image 2 para trabajo nuevo)
 
-Estilo canonico: **clay 3D sobre fondo blanco puro** con colores de marca (navy/blue/teal/green).
-Almacenadas en **GCS public buckets** (no Vercel), accesibles sin auth:
+Los heroes de Leave existentes conservan su provenance de **Imagen 4** y su estilo clay 3D sobre blanco; no se
+regeneran para cambiar de modelo. Para visuales OpenAI nuevos, el carril canónico usa `gpt-image-2`, nunca el
+deprecated `gpt-image-1.5`. GPT Image 2 puede producir un source PNG transparente en preview, pero el master de
+email se compone por defecto sobre el fondo final blanco para evitar resultados impredecibles en dark mode. El
+source alfa requiere inspección de bytes y bordes sobre fondos claro/oscuro.
+
+Los masters se almacenan en **GCS public buckets** (no Vercel), accesibles sin auth:
 
 | Imagen | Bucket path | Descripcion |
 |--------|------------|-------------|
@@ -120,7 +132,8 @@ URL pattern: `https://storage.googleapis.com/${GREENHOUSE_PUBLIC_MEDIA_BUCKET}/e
 
 - **Delivery**: via notification projection en ops-worker Cloud Run (outbox reactivo, cada 5 min)
 - **Event payload**: enriquecido con `notes` y `reason` en `buildLeaveEventPayload`
-- **Skill**: `/greenhouse-email` creada (repo `.claude/skills/` + global `~/.claude/skills/`) con workflow completo
+- **Skill**: `greenhouse-email` compartida y gateada en `.codex/skills/` + `.claude/skills/`; separa templates de
+  la operación Resend y delega generación/QA visual a `greenhouse-ai-image-generator`
 - **CRITICO**: cambios en templates requieren redeploy de ops-worker (`bash services/ops-worker/deploy.sh`)
 - **Imagenes**: GCS public bucket por entorno, NUNCA Vercel (SSO Protection bloquea carga)
 

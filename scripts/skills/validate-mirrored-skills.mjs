@@ -19,6 +19,14 @@ const repo = resolve(new URL('../..', import.meta.url).pathname)
 
 const mirroredSkills = [
   {
+    // Data Studio se opera por UI y cambia con frecuencia. Codex y Claude deben compartir el mismo
+    // catálogo, límites de autorización y protocolo browser para no editar un reporte con dos reglas.
+    id: 'google-data-studio',
+    mode: 'byte-identical',
+    codex: '.codex/skills/google-data-studio',
+    claude: '.claude/skills/google-data-studio',
+  },
+  {
     id: 'efeonce-mcp-platform',
     mode: 'byte-identical',
     codex: '.codex/skills/efeonce-mcp-platform',
@@ -35,6 +43,43 @@ const mirroredSkills = [
     mode: 'byte-identical',
     codex: '.codex/skills/greenhouse-globe-model-fleet',
     claude: '.claude/skills/greenhouse-globe-model-fleet',
+  },
+  {
+    // La operación de imágenes comparte código, modelos y restricciones de formato. Una divergencia
+    // entre agentes puede convertir una capacidad preview del proveedor en un fallback deprecated.
+    id: 'greenhouse-ai-image-generator',
+    mode: 'byte-identical',
+    codex: '.codex/skills/greenhouse-ai-image-generator',
+    claude: '.claude/skills/greenhouse-ai-image-generator',
+  },
+  {
+    // Resend es infraestructura de correo compartida: un invariante que divirja entre agentes
+    // termina en que uno de los dos vuelve a activar el tracking sobre enlaces con credencial.
+    id: 'resend-email-platform',
+    mode: 'byte-identical',
+    codex: '.codex/skills/resend-email-platform',
+    claude: '.claude/skills/resend-email-platform',
+  },
+  {
+    // Templates, delivery y visuales de email son un solo contrato compartido. El espejo evita que
+    // un agente reactive un generador legacy o use GPT Image 1.5 como fallback de transparencia.
+    id: 'greenhouse-email',
+    mode: 'byte-identical',
+    codex: '.codex/skills/greenhouse-email',
+    claude: '.claude/skills/greenhouse-email',
+  },
+  {
+    // El espejo existía y NADIE lo validaba: al 2026-08-20 llevaba dos actualizaciones de atraso.
+    // La versión de Codex seguía declarando que la cuota de recuperación de acceso era
+    // "cross-channel" cuando el código la aplica POR CANAL — así que un agente que entrara por
+    // Codex le habría dicho al operador que reenviar un correo apagaba también el enlace temporal,
+    // escondiéndole la única salida que le quedaba a un candidato sin acceso a su prueba.
+    // La divergencia de una skill de dominio no es cosmética: es dos agentes operando el mismo
+    // proceso de contratación con reglas distintas sobre una persona real.
+    id: 'greenhouse-talent-people-operator',
+    mode: 'byte-identical',
+    codex: '.codex/skills/greenhouse-talent-people-operator',
+    claude: '.claude/skills/greenhouse-talent-people-operator',
   },
 ]
 

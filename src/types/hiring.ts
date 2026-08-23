@@ -123,8 +123,91 @@ export const HIRING_APPLICATION_STAGES = [
 ] as const
 export type HiringApplicationStage = (typeof HIRING_APPLICATION_STAGES)[number]
 
-export const HIRING_DECISIONS = ['selected', 'backup_selected', 'rejected', 'withdrawn', 'on_hold'] as const
+/**
+ * TASK-1765 — las etapas del RECORRIDO: el subconjunto que un cambio de etapa puede escribir.
+ *
+ * Polaridad invertida a propósito. El guard anterior era una DENYLIST de cuatro literales
+ * (`['selected','backup','rejected','withdrawn']`) y, como toda lista de excepciones, falló por lo
+ * que no enumeraba: por ahí se colaron `closed` y `handoff_ready`, que son justo los dos que hacen
+ * daño. Arrastrar una tarjeta a «Cerrado» escribía `closed` SIN decisión: sin evento, sin correo,
+ * sin arrancar el reloj de retención — y peor, congelando el borrado de los documentos de esa
+ * persona en TODAS sus demás postulaciones, porque el detector de retención cruza por
+ * `identity_profile_id`.
+ *
+ * Agregar un quinto nombre a la denylist habría repetido el defecto con más letras. Acá el conjunto
+ * de lo escribible se define por INCLUSIÓN, y el tipo lo hace cumplir en compilación: una etapa
+ * nueva nace NO escribible hasta que alguien la agregue deliberadamente.
+ *
+ * Fuera del subconjunto, y por qué:
+ * - `closed` — cerrar ES decidir. Pasa por `decideHiringApplication`, nunca por un `PATCH` de etapa.
+ * - `selected` / `backup` / `rejected` / `withdrawn` — espejos del desenlace; son del command.
+ * - `handoff_ready` — no es una posición del recorrido de la PERSONA, sino un estado del agregado
+ *   `handoff`, que tiene su propia máquina de estados.
+ * - `qualified` / `client_review` — TASK-1754: absorbidas por `shortlisted`. Salen de acá ANTES
+ *   que del `CHECK`, y ese orden es el slice entero. El tablero muestra seis columnas y el
+ *   dominio tenía trece etapas, así que las tres que se ven como «Evaluación» eran tres destinos
+ *   posibles para un mismo gesto: los diez movimientos humanos a esa columna cayeron en
+ *   `qualified`, que ninguna automatización vigila, y las quince políticas configuradas en
+ *   `shortlisted` nunca dispararon. Retirarlas del subconjunto escribible cierra la boca por la
+ *   que entraban; retirarlas del `CHECK` es el contract, y ése va DESPUÉS del release —
+ *   producción todavía escribe `qualified` desde el tablero viejo.
+ */
+export const HIRING_PIPELINE_STAGES = [
+  'sourced',
+  'screening',
+  'shortlisted',
+  'interview',
+  'decision_pending'
+] as const
+export type HiringPipelineStage = (typeof HIRING_PIPELINE_STAGES)[number]
+
+/**
+ * TASK-1765 — el eje de DESENLACE: cómo terminó el recorrido de una persona.
+ * ADR: GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1 §4.
+ *
+ * El campo físico se sigue llamando `decision`, pero el concepto es DESENLACE: `withdrawn` y
+ * `unresponsive` no son decisiones de Efeonce. NUNCA leer esta columna como «lo que Efeonce
+ * decidió»; significa «cómo terminó el proceso».
+ *
+ * - `selected`         — la elegimos.
+ * - `backup_selected`  — la elegimos como respaldo.
+ * - `not_selected`     — llegó al final y no quedó. Exige `cause`. Es la población objetivo del
+ *                        Talent Pool: NUNCA usar `rejected` acá (rejected es un juicio sobre la
+ *                        persona, y aplicarlo sin juicio infla la tasa de rechazo de su cohorte
+ *                        demográfica en el análisis de impacto adverso).
+ * - `rejected`         — juicio desfavorable para este rol.
+ * - `withdrawn`        — se retiró, y lo DECLARÓ.
+ * - `unresponsive`     — dejó de responder. Sin conducta atribuida y sin correo. NUNCA registrar
+ *                        el silencio como `withdrawn`: es atribuirle una decisión que no tomó.
+ *
+ * `on_hold` NO está, y su ausencia es la decisión: una pausa no es un cierre. Vivía en este enum *y*
+ * mapeaba a la etapa `decision_pending`, así que la misma fila decía «terminó» y «sigue viva» a la
+ * vez. Una pausa se registra moviendo la ETAPA a `decision_pending`, que el cambio de etapa sí
+ * acepta.
+ */
+export const HIRING_DECISIONS = [
+  'selected',
+  'backup_selected',
+  'not_selected',
+  'rejected',
+  'withdrawn',
+  'unresponsive'
+] as const
 export type HiringDecision = (typeof HIRING_DECISIONS)[number]
+
+/**
+ * TASK-1765 — la CAUSA del desenlace (ADR §4.1). Obligatoria en `not_selected`, prohibida en el
+ * resto; la bicondicional la garantiza `hiring_application_decision_cause_pairing_check`.
+ *
+ * Es enum gobernado y NUNCA texto libre, porque hay consumidores que ramifican por ella: el embudo
+ * de equidad (`capacity_filled` cuenta como proceso concluido; los otros dos NO) y el cuerpo del
+ * correo al candidato. Si algo ramifica por un valor, ese valor no puede ser prosa.
+ *
+ * La vacante entra SIEMPRE como causa, JAMÁS como desenlace: etiquetar a una persona con el estado
+ * de la vacante es el defecto que este eje viene a cerrar.
+ */
+export const HIRING_DECISION_CAUSES = ['capacity_filled', 'opening_closed', 'process_cancelled'] as const
+export type HiringDecisionCause = (typeof HIRING_DECISION_CAUSES)[number]
 
 // ── View models (camelCase, retornados por el store) ──
 
@@ -258,6 +341,8 @@ export interface HiringApplication {
   explainability: Record<string, unknown>
   dedupeFingerprint: string | null
   decision: HiringDecision | null
+  /** TASK-1765 — causa del desenlace; no-null sólo con `decision === 'not_selected'`. */
+  decisionCause: HiringDecisionCause | null
   decisionAt: string | null
   decisionBy: string | null
   selectedDestination: HiringFulfillmentMode | null
@@ -284,6 +369,13 @@ export interface HiringDecisionHistoryEntry {
   decisionId: string
   idempotencyKey: string
   decision: HiringDecision
+  /**
+   * TASK-1765 — causa gobernada, presente SÓLO cuando `decision === 'not_selected'`. Vive en cada
+   * entrada del historial y no sólo en la columna snapshot: el snapshot dice el desenlace VIGENTE,
+   * el historial dice el de cada decisión que hubo. Ausente en las entradas anteriores a esta task,
+   * que son inmutables y NUNCA se reescriben.
+   */
+  cause?: HiringDecisionCause | null
   decidedAt: string
   decidedBy: string | null
   reason: HiringDecisionReason
@@ -581,7 +673,13 @@ export interface CreateHiringApplicationInput {
   identityProfileId: string
   candidateFacetId: string
   ownerUserId?: string | null
-  stage?: HiringApplicationStage
+  /**
+   * TASK-1765 — una postulación NACE en el recorrido, nunca cerrada ni en un espejo de desenlace.
+   * El tipo es el subconjunto escribible por la misma razón que en `updateHiringApplicationStage`:
+   * si crear pudiera escribir `closed`, quedaría abierta la misma puerta que el `PATCH` acaba de
+   * perder, y con el invariante del Slice 5 sería además una fila que la base rechaza.
+   */
+  stage?: HiringPipelineStage
   source?: CandidateSource
   score?: number | null
   matchScore?: number | null
@@ -595,6 +693,12 @@ export interface CreateHiringApplicationInput {
 
 export interface DecideHiringApplicationInput {
   decision: HiringDecision
+  /**
+   * TASK-1765 — obligatoria en `not_selected`, rechazada en el resto (422 canónico). La causa viaja
+   * en el input del command y NUNCA en un `PATCH` paralelo ni en un campo de notas: la bicondicional
+   * de base exige que desenlace y causa se escriban en el MISMO `UPDATE`.
+   */
+  cause?: HiringDecisionCause | null
   reason: HiringDecisionReason
   idempotencyKey: string
   selectedDestination?: HiringFulfillmentMode | null

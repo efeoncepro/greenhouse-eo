@@ -3,9 +3,17 @@ import 'server-only'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import {
+  providerBlockRecencySql,
+  providerBlockStatusSql,
+  providerBlockedConditionSql,
+} from './provider-block'
+
+import {
   ASSESSMENT_ACCESS_RECOVERY_COOLDOWN_SECONDS,
   ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS,
   decideAssessmentAccessRecoveryEligibility,
+  type AssessmentAccessRecoveryAvailability,
+  type AssessmentAccessRecoveryChannelBlock,
   type AssessmentAccessRecoveryReason,
 } from './contracts'
 
@@ -26,27 +34,10 @@ interface AvailabilityRow extends Record<string, unknown> {
   email_provider_status: string | null
   recovery_count_24h: number | string
   secure_link_count_24h: number | string
-  latest_recovery_at: Date | string | null
+  latest_email_recovery_at: Date | string | null
+  latest_secure_link_recovery_at: Date | string | null
 }
 
-export interface AssessmentAccessRecoveryAvailability {
-  assessmentId: string
-  applicationId: string
-  openingId: string
-  status: string
-  eligible: boolean
-  eligibilityCode: string | null
-  channels: {
-    email: { available: boolean; providerStatus: string | null; hasCandidateEmail: boolean }
-    secureLink: { available: boolean }
-  }
-  rateLimit: {
-    maxPer24Hours: number
-    usedIn24Hours: number
-    cooldownUntil: string | null
-    limited: boolean
-  }
-}
 
 const iso = (value: Date | string) => new Date(value).toISOString()
 
@@ -67,7 +58,8 @@ export const getAssessmentAccessRecoveryAvailability = async (
             provider.provider_status AS email_provider_status,
             COALESCE(recent.recovery_count_24h,0) AS recovery_count_24h,
             COALESCE(recent.secure_link_count_24h,0) AS secure_link_count_24h,
-            recent.latest_recovery_at
+            recent.latest_email_recovery_at,
+            recent.latest_secure_link_recovery_at
      FROM greenhouse_hiring.hiring_assessment assessment
      JOIN greenhouse_hiring.hiring_application application
        ON application.application_id=assessment.application_id
@@ -76,18 +68,13 @@ export const getAssessmentAccessRecoveryAvailability = async (
      JOIN greenhouse_core.identity_profiles profile
        ON profile.profile_id=application.identity_profile_id
      LEFT JOIN LATERAL (
-       SELECT CASE
-                WHEN delivery.complained_at IS NOT NULL OR delivery.provider_status='complained' THEN 'complained'
-                WHEN delivery.bounced_at IS NOT NULL OR delivery.provider_status='bounced' THEN 'bounced'
-                WHEN delivery.suppressed_at IS NOT NULL OR delivery.provider_status='suppressed' THEN 'suppressed'
-              END AS provider_status
+       -- Mismo predicado que el guardrail del command (assertEmailProviderAllowsRecovery) y que
+       -- el aviso de rotacion: fuente unica en provider-block.ts.
+       SELECT ${providerBlockStatusSql('delivery')} AS provider_status
        FROM greenhouse_notifications.email_deliveries delivery
        WHERE LOWER(delivery.recipient_email)=LOWER(profile.canonical_email)
-         AND (delivery.bounced_at IS NOT NULL OR delivery.complained_at IS NOT NULL
-           OR delivery.suppressed_at IS NOT NULL
-           OR delivery.provider_status IN ('bounced','complained','suppressed'))
-       ORDER BY COALESCE(delivery.provider_event_created_at,delivery.provider_observed_at,
-                         delivery.updated_at) DESC,delivery.created_at DESC
+         AND ${providerBlockedConditionSql('delivery')}
+       ORDER BY ${providerBlockRecencySql('delivery')}
        LIMIT 1
      ) provider ON TRUE
      LEFT JOIN LATERAL (
@@ -105,7 +92,12 @@ export const getAssessmentAccessRecoveryAvailability = async (
                   AND channel='secure_link'
                   AND outcome IN ('dispatch_accepted','link_issued','dispatch_unknown')
               ) AS secure_link_count_24h,
-              MAX(created_at) AS latest_recovery_at
+              -- El cooldown es POR CANAL, igual que en el command (recover-email.ts filtra
+              -- por channel). Un MAX() sin filtro hacía que un correo recién enviado
+              -- apagara también el enlace seguro por 60 s: exactamente ocultarle al candidato
+              -- la única salida que le quedaba, que es lo que este bloque dice evitar.
+              MAX(created_at) FILTER (WHERE channel='email') AS latest_email_recovery_at,
+              MAX(created_at) FILTER (WHERE channel='secure_link') AS latest_secure_link_recovery_at
        FROM greenhouse_hiring.hiring_assessment_access_recovery recovery
        WHERE recovery.assessment_id=assessment.assessment_id
      ) recent ON TRUE
@@ -134,25 +126,57 @@ export const getAssessmentAccessRecoveryAvailability = async (
   })
 
   const used = Number(row.recovery_count_24h)
-  const latest = row.latest_recovery_at ? new Date(row.latest_recovery_at) : null
-
-  const cooldownUntil = latest
-    ? new Date(latest.getTime() + ASSESSMENT_ACCESS_RECOVERY_COOLDOWN_SECONDS * 1000)
-    : null
-
   const secureLinkUsed = Number(row.secure_link_count_24h)
-  const cooldownActive = Boolean(cooldownUntil && cooldownUntil > now)
 
-  // Cada canal agota su propia cuota. El enlace seguro es la salida cuando el correo no llega:
-  // hacerlo depender del contador del correo cerraba la última puerta del candidato justo en el
-  // escenario para el que fue diseñado.
-  const emailLimited = used >= ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS || cooldownActive
-  const secureLinkLimited = secureLinkUsed >= ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS || cooldownActive
+  // Cooldown POR CANAL: mirror exacto del predicado del command, que filtra por `channel`.
+  const cooldownFor = (raw: Date | string | null) => {
+    const latest = raw ? new Date(raw) : null
+
+    const until = latest
+      ? new Date(latest.getTime() + ASSESSMENT_ACCESS_RECOVERY_COOLDOWN_SECONDS * 1000)
+      : null
+
+    return until && until > now ? until : null
+  }
+
+  const emailCooldownUntil = cooldownFor(row.latest_email_recovery_at)
+  const secureLinkCooldownUntil = cooldownFor(row.latest_secure_link_recovery_at)
+
+  // Cuota y cooldown se computan SEPARADOS: una espera de 60 segundos y un presupuesto agotado por
+  // 24 horas no son el mismo hecho, y decirle "intenta más tarde" a los dos deja al operador sin
+  // saber si vuelve en un minuto o mañana.
+  const emailQuotaExhausted = used >= ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS
+  const secureLinkQuotaExhausted = secureLinkUsed >= ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS
+  const emailLimited = emailQuotaExhausted || Boolean(emailCooldownUntil)
+  const secureLinkLimited = secureLinkQuotaExhausted || Boolean(secureLinkCooldownUntil)
 
   // `eligible` describe el assessment (estado, plazo, consentimiento), no el presupuesto de un
   // canal: un test recuperable con el correo agotado sigue siendo recuperable por enlace seguro.
   const eligible = eligibility.allowed && !(emailLimited && secureLinkLimited)
   const emailProviderBlocked = Boolean(row.email_provider_status)
+
+  // Orden deliberado: primero lo que descarta el test entero, después lo propio del canal, y al
+  // final lo que sólo cuesta esperar. El primero que aplica es el que el operador tiene que
+  // resolver; los demás no le sirven de nada mientras ése siga en pie.
+  const emailBlockedBy: AssessmentAccessRecoveryChannelBlock | null = !eligibility.allowed
+    ? 'assessment_not_eligible'
+    : !row.has_candidate_email
+      ? 'no_candidate_email'
+      : emailProviderBlocked
+        ? 'provider_blocked'
+        : emailQuotaExhausted
+          ? 'quota_exhausted'
+          : emailCooldownUntil
+            ? 'cooldown'
+            : null
+
+  const secureLinkBlockedBy: AssessmentAccessRecoveryChannelBlock | null = !eligibility.allowed
+    ? 'assessment_not_eligible'
+    : secureLinkQuotaExhausted
+      ? 'quota_exhausted'
+      : secureLinkCooldownUntil
+        ? 'cooldown'
+        : null
 
   return {
     assessmentId: row.assessment_id,
@@ -163,16 +187,18 @@ export const getAssessmentAccessRecoveryAvailability = async (
     eligibilityCode: eligibility.allowed ? null : eligibility.code,
     channels: {
       email: {
-        available: eligibility.allowed && !emailLimited && row.has_candidate_email && !emailProviderBlocked,
+        available: emailBlockedBy === null,
+        blockedBy: emailBlockedBy,
         providerStatus: row.email_provider_status,
         hasCandidateEmail: row.has_candidate_email,
       },
-      secureLink: { available: eligibility.allowed && !secureLinkLimited },
+      secureLink: { available: secureLinkBlockedBy === null, blockedBy: secureLinkBlockedBy },
     },
     rateLimit: {
       maxPer24Hours: ASSESSMENT_ACCESS_RECOVERY_MAX_PER_24_HOURS,
       usedIn24Hours: used,
-      cooldownUntil: cooldownUntil && cooldownUntil > now ? iso(cooldownUntil) : null,
+      cooldownUntil: emailCooldownUntil ? iso(emailCooldownUntil) : null,
+      secureLinkCooldownUntil: secureLinkCooldownUntil ? iso(secureLinkCooldownUntil) : null,
       // `limited` sigue significando "no queda ningún canal": es lo que la UI usa para decidir si
       // muestra la salida o el mensaje de espera. Un correo agotado con enlace seguro disponible
       // NO es estar limitado.

@@ -164,6 +164,8 @@ and audit. No rollback copies person data back into candidate/member duplicates.
 
 ## Related contracts
 
+- `GREENHOUSE_HIRING_ENTRA_WORKFORCE_ACCOUNT_PROVISIONING_DECISION_V1.md` — follow-on Microsoft; conserva el mismo
+  principal y separa `accountEnabled` del lifecycle longitudinal del portal.
 - `GREENHOUSE_CANDIDATE_SELF_SERVICE_LONGITUDINAL_MY_ARCHITECTURE_V1.md`
 - `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
 - `GREENHOUSE_IDENTITY_ACCESS_V2.md`

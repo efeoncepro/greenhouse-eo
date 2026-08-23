@@ -90,6 +90,18 @@ export const hiringDesk: HiringDeskCopy = {
     appliedDaysAgo: 'Postuló hace {days} {unit}',
     appliedDayUnit: 'día',
     appliedDaysUnit: 'días',
+    /**
+     * TASK-1754 — las seis columnas del ADR (§3) son `sourced`, `screening`, `shortlisted`,
+     * `interview`, `decision_pending` y `closed`. Las otras siete claves siguen acá porque el
+     * enum todavía las declara durante el expand: una fila histórica en `rejected` tiene que
+     * poder mostrar su nombre. Se retiran junto con sus literales, en el contract.
+     *
+     * `shortlisted` se lee «Evaluación» en el desk y «Preselección» en el correo al candidato
+     * (`notifications/stage-policy.ts`). La divergencia es DELIBERADA —decisión del operador,
+     * 2026-08-22— por dos razones: hacia afuera el registro es más suave, y «Evaluación» en el
+     * correo chocaría con el del test, que ya dice «tienes una evaluación pendiente». NO
+     * alinearlas: leerla como drift y «arreglarla» reintroduce esa colisión.
+     */
     stages: {
       sourced: 'Sourced',
       screening: 'Screening',
@@ -141,6 +153,159 @@ export const hiringDesk: HiringDeskCopy = {
     finalizeScorecard: 'Finalizar scorecard',
     scorecardFinalized: 'Scorecard finalizado.',
     revealConfirm: 'Revelar y registrar',
+    assignment: {
+      title: 'Asignar test a esta persona',
+      intro:
+        'La vacante define qué test corresponde. Revisa lo que se va a enviar y confirma; el enlace viaja por correo, no se muestra acá.',
+      previewTemplate: 'Test',
+      previewTimeLimitLabel: 'Tiempo',
+      previewTimeLimit: '{minutes} minutos',
+      previewNoTimeLimit: 'Sin límite de tiempo',
+      previewRecipientReady: 'Tiene correo registrado',
+      previewRecipientNotReady:
+        'Sin correo registrado no se puede asignar: el test no se crea. Registra el correo de la persona primero.',
+      existingOpen:
+        'Esta persona ya tiene un test abierto. No se puede asignar otro mientras siga abierto.',
+      previewBlockedTitle: 'No se puede asignar todavía',
+      emptyBody: 'Todavía no se le ha asignado ningún test a esta persona.',
+      emptyBodyCanAssign:
+        'Todavía no se le ha asignado ningún test. La vacante define cuál corresponde; tú confirmas el envío.',
+      existingScored: 'Esta persona ya rindió un test corregido. Si confirmas, le mandas una segunda prueba.',
+      confirm: 'Confirmar y asignar',
+      confirming: 'Asignando…',
+      proposing: 'Revisando la política…',
+      results: {
+        assigned: 'Test asignado. El correo sale por su cuenta; revisa acá si el proveedor lo rechaza.',
+        already_assigned: 'Ya estaba asignado. No se creó un segundo test.',
+        held: 'La política dejó la asignación en espera.',
+        blocked: 'La política bloqueó la asignación.',
+        stale: 'La propuesta quedó desactualizada. Vuelve a abrirla para ver el estado actual.',
+        cancelled: 'La asignación se canceló.',
+      },
+      resultAlreadyConfirmed:
+        'Esta propuesta ya se había confirmado antes. No sabemos desde acá en qué terminó: cierra y revisa el estado del test en la ficha.',
+      reasons: {
+        missing_email: 'No hay correo registrado para esta persona.',
+        unverified_recipient: 'El correo de esta persona no está verificado.',
+        volume_cap: 'Se alcanzó el tope de envíos por ahora.',
+        policy_disabled: 'La vacante todavía no tiene su política de tests habilitada.',
+        policy_mode_manual: 'Esta vacante asigna sus tests a mano.',
+        template_inactive: 'El test que define la vacante ya no está activo.',
+        stage_changed: 'La etapa de la candidatura cambió mientras confirmabas.',
+        application_decided: 'La candidatura ya tiene una decisión registrada.',
+        existing_open_instance: 'Ya hay un test abierto para esta persona.',
+        operator_cancelled: 'Alguien canceló esta asignación.',
+      },
+      errorPolicyMissing:
+        'Esta vacante todavía no declara qué test corresponde. Configúralo en la vacante antes de asignar.',
+      errorExpired: 'La propuesta venció. Vuelve a abrirla para revisar el estado actual.',
+      errorStale: 'Algo cambió desde que abriste la propuesta. Ciérrala y vuelve a empezar.',
+      errorNotConfirmable: 'Esta propuesta ya no se puede confirmar. Ciérrala y vuelve a empezar.',
+      errorGeneric: 'No pudimos asignar el test. Intenta de nuevo en unos minutos.',
+      errorPermission: 'No tienes permiso para asignar tests. Pídeselo a Admin o a People Ops.',
+      errorNotFound: 'Esta propuesta ya no existe. Cierra y vuelve a abrirla.',
+      errorConflict: 'Otra persona movió esta asignación al mismo tiempo. Cierra y revisa el estado actual.',
+      errorSession: 'Tu sesión venció. Inicia sesión de nuevo para continuar.',
+      errorStructural: 'No pudimos asignar el test y reintentar no lo resuelve. Avísale a Admin con el nombre de la persona.',
+    },
+    accessRecovery: {
+      cta: 'Recuperar acceso',
+      title: '¿Recuperar el acceso al test?',
+      intro:
+        'Emites una credencial nueva y el enlace anterior deja de funcionar. No creas otro test ni reinicias el tiempo de quien ya empezó.',
+      channelLabel: 'Cómo se lo haces llegar',
+      channelEmail: 'Por correo',
+      channelEmailHelp: 'Enviamos un acceso nuevo a su correo registrado.',
+      channelSecureLink: 'Enlace de acceso temporal',
+      channelSecureLinkHelp: 'Obtienes un enlace para entregárselo tú por otro canal. Se muestra una sola vez.',
+      reasonLabel: 'Motivo',
+      reasons: {
+        // El código dice `reports` a propósito: nadie puede afirmar que un correo NO llegó. La
+        // etiqueta conserva el reporte para no dejar un hecho inventado en un ledger append-only.
+        candidate_reports_email_not_received: 'Dice que no le llegó el correo',
+        candidate_reports_link_invalid: 'Dice que el enlace no le funcionó',
+        alternate_channel_requested: 'Pidió recibirlo por otro canal',
+        provider_delivery_failed: 'El correo rebotó o falló el envío',
+        token_expired_before_start: 'Se le venció antes de empezar',
+      },
+      noticeWillSend: 'Le avisaremos por correo que su acceso anterior dejó de servir. El enlace NO va en ese correo.',
+      noticeSkipTitle: 'No le vamos a avisar',
+      noticeSkip: {
+        no_candidate_email: 'No tenemos un correo registrado para esta persona, así que no sabrá que su acceso cambió. Entrégaselo tú o quedará esperando.',
+        provider_blocked: 'El proveedor bloquea los correos a esta dirección. No le va a llegar ningún aviso: la entrega en mano es su única vía.',
+        operator_declared_delivery_failed: 'Declaraste que el envío por correo falló, así que no insistimos por ahí. La entrega en mano es su única vía.',
+        not_secure_link: 'El correo de recuperación ya le dice que el enlace anterior dejó de servir.',
+        credential_already_expired: 'No le avisaremos: el acceso nuevo ya estaría vencido.',
+      },
+      confirm: 'Recuperar acceso',
+      confirming: 'Recuperando…',
+      emailQueued:
+        'Correo despachado al proveedor. Eso no confirma que le haya llegado: si te dice que no lo ve, recupera de nuevo o usa el enlace temporal.',
+      emailPending: 'El envío está en curso. Actualiza en unos segundos para ver el resultado.',
+      emailAlreadySent:
+        'Esta misma recuperación ya se había hecho: no salió un correo nuevo. Si necesitas reenviar, cierra y vuelve a empezar.',
+      linkCopyFailed: 'No pudimos copiar el enlace. Selecciónalo y cópialo a mano ANTES de cerrar: no se vuelve a mostrar.',
+      emailUnknown:
+        'La credencial se renovó, pero no pudimos confirmar el despacho. Revisa el estado antes de reintentar.',
+      emailFailed: 'El proveedor rechazó el envío. Usa el enlace temporal para hacérselo llegar.',
+      emailExpiry: 'El acceso nuevo vence el {date}.',
+      linkTitle: 'Enlace listo — se muestra una sola vez',
+      linkWarning:
+        'Verifica su identidad antes de entregárselo y cópialo ahora: al cerrar esta ventana no vuelve a estar disponible.',
+      linkExpiry: 'Vence en 24 horas ({date}).',
+      linkCopy: 'Copiar enlace',
+      linkCopied: 'Enlace copiado.',
+      linkAlreadyRevealed:
+        'Este enlace ya se generó y sólo se muestra una vez. Si lo perdiste, recupera el acceso de nuevo para emitir otro.',
+      // Cuota POR CANAL: el correo agotado no puede cerrar la última puerta.
+      quotaRemainingEmail: 'Te quedan {remaining} de {max} envíos por correo en 24 horas.',
+      quotaExhaustedEmail:
+        'El correo agotó sus {max} intentos de 24 horas. Todavía puedes usar el enlace temporal.',
+      quotaExhaustedAll:
+        'Este test agotó las recuperaciones de las últimas 24 horas por los dos canales. Vuelve a intentar mañana.',
+      cooldown: 'Espera {seconds} s antes de recuperar de nuevo.',
+      // Sin atribuir conducta: `suppressed` no es rebote ni spam, y un filtro corporativo no
+      // dice nada de la persona candidata a quien el operador está evaluando.
+      emailBlocked:
+        'El proveedor está bloqueando los envíos a esta dirección. Verifica su identidad y hazle llegar el enlace temporal.',
+      emailMissing: 'No tenemos un correo registrado para esta persona.',
+      unavailableTitle: 'No se puede recuperar el acceso',
+      unavailable: {
+        assessment_recovery_method_not_supported:
+          'Esta evaluación no se rinde con enlace, así que no hay acceso que recuperar.',
+        // Dispara con CUALQUIER desenlace registrado, incluido `selected`: decir
+        // "cerrada" daría por fuera del proceso a alguien que sigue vivo en él.
+        assessment_recovery_application_closed:
+          'Esta candidatura ya tiene una decisión registrada, así que el test no se recupera. Revísala en la pestaña Decisión.',
+        assessment_recovery_consent_withdrawn: 'La persona retiró su consentimiento.',
+        // Las dos ramas son inconsistencia de datos; el Expediente no las muestra ni las corrige.
+        assessment_recovery_invalid_state:
+          'Los datos de este test quedaron inconsistentes y no podemos recuperarlo sin arreglarlos. Repórtalo a plataforma con el ID de la postulación.',
+        assessment_recovery_time_elapsed: 'Ya se le acabó el tiempo para responder.',
+        assessment_recovery_expired_after_start: 'Empezó el test y se le venció el plazo.',
+        // Tres ramas, no una: motivo distinto, vencimiento sin fecha legible, o token aún vigente.
+        assessment_recovery_expiry_not_proven:
+          'Este test figura vencido, pero no podemos probar cuándo caducó el acceso. Si nunca lo empezó, elige el motivo «Se le venció antes de empezar»; si vuelve a bloquearse, repórtalo a plataforma.',
+        assessment_recovery_status_not_allowed: 'El test ya se rindió, así que no hay acceso que recuperar.',
+        assessment_recovery_status_cancelled:
+          'Este test se canceló. Para que rinda de nuevo, asígnale un test otra vez.',
+      },
+      errorGeneric: 'No pudimos recuperar el acceso. Intenta de nuevo en unos minutos.',
+      errorNotFound: 'Este test ya no está disponible. Actualiza la postulación.',
+      errorRateLimited: 'Alcanzaste el límite por ahora. Intenta más tarde.',
+      errorIdempotencyConflict:
+        'Esta misma confirmación ya se usó para otra solicitud. Cierra y vuelve a empezar la recuperación.',
+      errorRecipientChanged:
+        'El correo de la persona cambió mientras confirmabas. Revisa el contacto y vuelve a intentar.',
+      errorConflict: 'El estado del test cambió mientras confirmabas. Revisa la tarjeta y decide de nuevo.',
+      errorPermission: 'No tienes permiso para recuperar acceso. Pídeselo a Admin o a People Ops.',
+      errorSession: 'Tu sesión venció. Inicia sesión de nuevo para continuar.',
+      errorReadFailed:
+        'No pudimos leer si se puede recuperar el acceso. El test sigue como estaba: esto es una falla nuestra al consultar, no un cambio en su evaluación.',
+      copyAriaLabel: 'Copiar el enlace de acceso de {name}',
+      dialogAriaLabel: 'Recuperar acceso al test de {name}',
+      statusAriaLive: 'Estado de la recuperación',
+    },
     documentsPanel: {
       subtitle: 'El CV se abre directo; la identidad se revela con motivo y queda auditada.',
       filesGroup: 'Archivos y enlaces',

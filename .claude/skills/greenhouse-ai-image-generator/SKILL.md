@@ -15,6 +15,8 @@ Read only what the task needs:
 
 - `docs/operations/GREENHOUSE_AI_IMAGE_GENERATION_AGENT_SKILL_V1.md`
 - `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`
+- `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md` whenever the task
+  uses GPT Image, transparency, editing, masks, flexible sizes, streaming, pricing or model selection
 - `references/seedream-5-gpt-image-2-hybrid-production.md` when the task uses Seedream 5,
   fal.ai still-image generation, multiple image models or campaign profusion
 - `docs/operations/GREENHOUSE_MULTIMODAL_CAMPAIGN_PRODUCTION_V1.md` when stills hand off to Gemini Omni,
@@ -55,8 +57,16 @@ pnpm ai:image --batch concepts.json         # [{ "filename": "a.png", "prompt": 
 
 - Wraps the canonical `generateOpenAIImage` (`src/lib/ai/openai-image.ts`). Self-contained: loads `.env.local`, resolves `OPENAI_API_KEY_SECRET_REF` server-side, never prints the secret.
 - Defaults: `gpt-image-2 · 1536x1024 · quality high · opaque · out-dir public/images/generated`. Timeout default **280s** (gpt-image-2 `high` exceeds the 125s of the runtime `generateImage` helper).
-- `--background transparent` falls back to `gpt-image-1.5` (gpt-image-2 has no alpha). Still **raster** (PNG) — for real vectors use Higgsfield + Recraft V4.1 (fal slug verified live 2026-07-19: `fal-ai/recraft/v4.1/text-to-vector`, text-driven, carries the `fal-ai/` prefix).
+- OpenAI documents native `background: transparent` for `gpt-image-2` in **preview**, with PNG or WebP. The
+  canonical helper/CLI preserves the requested GPT Image 2 identity, rejects transparent JPEG before network I/O
+  and never falls back silently to deprecated `gpt-image-1.5`.
+- GPT Image outputs are still **raster**. For real vectors use Higgsfield + Recraft V4.1 (fal slug verified live
+  2026-07-19: `fal-ai/recraft/v4.1/text-to-vector`, text-driven, carries the `fal-ai/` prefix).
 - The CLI **operates** the model; THIS skill is the **art direction** (brief, composition, finish, palette, QA). Run the skill to write the prompt, then the CLI to generate, then critique + GVC if it lands in UI.
+- For a slide-integrated, extractable asset, generate on a **uniform studio background**
+  (not a baked checkerboard), then run `pnpm ai:image:rmbg` and inspect the resulting
+  alpha at original size and on the destination slide. This reduces matting halos and
+  keeps the asset reusable across layouts.
 - Keep exploratory concepts out of commits (gitignored dir, e.g. `.captures/concepts/`).
 
 ## Reference edit + character consistency (`--image`)
@@ -101,19 +111,22 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
   consistency — they treat the reference as inspiration and drift to a different subject + mangled logo.
 - **Prompt = identity-lock scaffold + one small delta.** Fix everything (face, hair, outfit, the exact logo, framing, lighting) and change ONLY the requested pose/expression. Big deltas break consistency; small deltas hold it. Anchor every variant to the SAME canonical reference, not to a previous generation.
 - **No engine keeps a logo pixel-exact** (~90% redraw). If the mark must be exact, mask its region and re-stamp the real vector (e.g. `public/branding/SVG/isotipo-efeonce-negativo.svg`) by composition. With `gpt-image-2` the logo is faithful enough that this is optional.
-- **Background:** `gpt-image-2` returns opaque. `pnpm ai:image:rmbg` cuts it to transparent with **AI matting**
-  (soft, professional hair edges) — a color-key/flood-fill leaves "bitten" edges + white halos in hair and must
-  not be used for character assets. Local deterministic matting: do not route it through a metered generative
-  workbench. Engine = `@imgly/background-removal-node` (model `medium` default; `small` for speed — `large` is
-  NOT bundled in v1.4.5). Its native deps (`onnxruntime-node` + a nested `sharp`) are approved via
-  `pnpm.onlyBuiltDependencies` in `package.json`, so a plain `pnpm install` builds them; first run has a
-  few-seconds model warm-up.
+- **Background:** GPT Image 2 can return native transparency in preview when the request uses
+  `background: 'transparent'` with PNG or WebP. Validate alpha from the decoded bytes; metadata or prompt copy is
+  insufficient. Use `pnpm ai:image:rmbg` only as local post-processing for an intentionally opaque source or a
+  provider output that failed alpha QA—not as a claim that GPT Image 2 lacks alpha. AI matting gives softer hair
+  edges than color-key/flood-fill, but it can erase white interior details and must be inspected over light/dark
+  backgrounds. Engine = `@imgly/background-removal-node` (model `medium` default; `small` for speed—`large` is not
+  bundled in v1.4.5). Its native dependencies are approved through `pnpm.onlyBuiltDependencies`.
 - **Human-review every variant against the anchor** for identity drift before keeping it.
 - **Log durable generations in `ai-generations/`** (repo, not `.captures/`): one subfolder per run named `YYYY-MM-DD_<semantic>/` with `README.md` (verbatim prompts) + `manifest.json`, plus a row in `ai-generations/INDEX.md`. Worked example: `ai-generations/2026-07-05_nexa-fallback-characters/` — the 3D Nexa character (`public/images/illustrations/characters/greenhouse-*.png`) posed per fallback `kind`.
 
 ## Provider Choice
 
 - Use `openai-image` for higher prompt fidelity, complex composition, reference-guided edits, UI assets, icon sets, and transparent PNG batches.
+- For new OpenAI work, target `gpt-image-2` or its dated snapshot. Do not route new work to `gpt-image-1.5`,
+  `gpt-image-1`, `gpt-image-1-mini` or `chatgpt-image-latest`: all are deprecated with shutdowns in October or
+  December 2026. Read the capability matrix before changing model, pricing or output constraints.
 - Use `google-imagen` when matching existing Imagen-generated banners or when the current surface already uses that visual language.
 - Use Seedream 5 Lite out-of-band for inexpensive creative divergence and Seedream 5 Pro for
   material/color/atmosphere development or semantic regional edits; use `src/lib/ai/fal.ts`,
@@ -219,6 +232,9 @@ deterministic and are composed after any generative finish.
 6. For a Creative Studio run, obtain the governed estimate/reservation/approval; then generate through the
    canonical capability route. For a repo-bound Greenhouse asset outside Globe, use the canonical helper.
 7. Critique the result like production design: small-size readability, crop, alpha edge, material believability, brand fit, and integration fit.
+   When the image contains channel iconography or marks, inspect every light/white
+   interior (for example the LinkedIn “in” and YouTube play) after matting; a clean
+   silhouette with erased logo details is a failed asset.
 8. Refine with single-change follow-ups; restate invariants on every edit. In multi-model flows,
    carry `anchor_id`, parent asset, reference roles, precedence, locks, one delta, safe zones and
    acceptance criteria at every handoff; derive every ratio from the approved anchor using star topology,
@@ -229,6 +245,9 @@ deterministic and are composed after any generative finish.
 ## Hard Constraints
 
 - Never hardcode API keys or print secret values.
+- Never present provider support or local code as live runtime evidence. GPT Image 2 transparency is implemented
+  locally in the Greenhouse helper and Globe contract/adapter with byte-level alpha validation; Globe remains
+  rollout-pending until an authenticated billable canary and runtime readback prove the deployed route.
 - When the user or contract requires an exact model, use a path that returns the model identity. For
   `gpt-image-2`, prefer `pnpm ai:image --model gpt-image-2 ...` and retain the CLI result with model, quality and
   size. The built-in chat generator may be used for exploration, but its model must remain `unknown` when the
@@ -243,6 +262,10 @@ deterministic and are composed after any generative finish.
   family in deterministic post; use Seedance 2.0 only for a genuinely new shot/action/continuity need,
   never to repair timing, crop, copy/logo, grade, foley or other editing defects.
 - Do not ship assets with watermarks, fake logos, accidental letters, cropped subjects, dirty alpha edges, or background residue.
+- Do not accept a full-bleed scene or dashboard collage when the brief requires an
+  extractable slide asset. Prefer one clear visual thesis, a clean plate/alpha channel,
+  and deterministic placement inside the deck. Preserve white logo details during
+  background removal; if a logo must be exact, use the real vector asset in composition.
 - For hands or culturally meaningful gestures, validate topology rather than silhouette: identify palm/dorso,
   locate the thumb/radial side, trace every digit from base to tip and inspect offensive/alternative readings at
   original resolution and thumbnail. A mirrored crop invalidates the previous approval. If text-only prompting

@@ -1,0 +1,107 @@
+{
+  "runId": "2026-08-21_hiring-selected-email-hero",
+  "status": "v4-integrated-local-rollout-pending",
+  "model": "gpt-image-2 + built-in-imagegen-model-unknown + deterministic-svg-sharp",
+  "operation": "generate-then-optimize",
+  "background": "transparent",
+  "selectedAsset": "hiring-selected-email-mail-icon-v4",
+  "outputs": [
+    {
+      "path": "source/hiring-selected-email-hero-master-v1.png",
+      "role": "rejected-v1-master",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 1473765,
+      "sha256": "b8606bc095893d3827244cb778500d274930ae4451076bfed14a81edc0adf033",
+      "decision": "rejected-design-and-talent-audit"
+    },
+    {
+      "path": "source/hiring-selected-email-illustration-master-v2.png",
+      "role": "rejected-v2-master",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 2020332,
+      "sha256": "dd4eaa2d1508b9849e5cf63a63ad435c797481b8f1177216a55e4810f0ca55f9"
+    },
+    {
+      "path": "rejected/hiring-selected-email-illustration-v2.png",
+      "remoteUrl": "https://storage.googleapis.com/efeonce-group-greenhouse-public-media-prod/emails/hiring-selected-email-illustration-v2.png",
+      "role": "rejected-v2-optimized-email-illustration",
+      "width": 960,
+      "height": 640,
+      "displayWidth": 320,
+      "displayHeight": 213,
+      "bytes": 143187,
+      "sha256": "aed75bfb0a1db41ac1c84fd07e58ddb43dd355f9bbe52e6b15e0d7b76cfce16e",
+      "decision": "rejected-operator-brand-fit-review"
+    },
+    {
+      "path": "source/hiring-selected-email-illustration-v3.svg",
+      "role": "selected-v3-editable-composition",
+      "width": 960,
+      "height": 480,
+      "bytes": 1826,
+      "sha256": "f3c8ba9846569d68ec3c998e8857c611a96e1ede56e5989c44c2bb82dfbb9bae"
+    },
+    {
+      "path": "../../public/images/generated/hiring-selected-email-illustration-v3.png",
+      "remoteUrl": "https://storage.googleapis.com/efeonce-group-greenhouse-public-media-prod/emails/hiring-selected-email-illustration-v3.png",
+      "role": "rejected-v3-optimized-email-illustration",
+      "width": 960,
+      "height": 480,
+      "displayWidth": 360,
+      "displayHeight": 180,
+      "bytes": 25228,
+      "sha256": "a88408e636adf915b8d9fdb024e42ba89bb6eb826b2216cbd839a722c598cdc0",
+      "decision": "rejected-operator-too-abstract"
+    },
+    {
+      "path": "source/hiring-selected-email-mail-icon-master-v4.png",
+      "role": "selected-v4-model-master",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 1499878,
+      "sha256": "ba932c38ee82b36212d29f4735cfa318bb44658541836e8848944c7307537601",
+      "model": "unknown-built-in-imagegen"
+    },
+    {
+      "path": "../../public/images/generated/hiring-selected-email-mail-icon-v4.png",
+      "remoteUrl": "https://storage.googleapis.com/efeonce-group-greenhouse-public-media-prod/emails/hiring-selected-email-mail-icon-v4.png",
+      "role": "selected-v4-optimized-email-icon",
+      "width": 960,
+      "height": 480,
+      "displayWidth": 360,
+      "displayHeight": 180,
+      "bytes": 63972,
+      "sha256": "d47f257373b19720fb67bfa60ab7d1879d98a9ee8d4c4b4f60d2ff93adbf39b5"
+    }
+  ],
+  "governance": {
+    "lane": "B-ai-produced-human-directed",
+    "thirdPartyInputs": false,
+    "likenessOrIdentity": false,
+    "visibleText": false,
+    "releaseState": "approved-with-restrictions",
+    "restrictions": [
+      "Efeonce candidate-selection email only",
+      "decorative secondary use; candidate name and message remain primary",
+      "message must remain complete when images are blocked"
+    ]
+  },
+  "qa": {
+    "v1Audit": "audit-v1-rejected.md",
+    "v1Decision": "rejected",
+    "v2Audit": "audit-v2-rejected.md",
+    "v2Decision": "paper-bouquet-rejected-brand-fit",
+    "v3Audit": "audit-v3-rejected.md",
+    "v3Decision": "official-efeonce-orbit-and-wave-rejected-too-abstract",
+    "v4Decision": "concrete-3d-mail-confirmation-icon-selected",
+    "alphaValidated": true,
+    "lightBackgroundReviewed": true,
+    "darkBackgroundReviewed": true,
+    "emailRenderReviewed": true,
+    "remoteReadbackStatus": 200,
+    "remoteContentType": "image/png",
+    "remoteCacheControl": "public,max-age=3600"
+  }
+}

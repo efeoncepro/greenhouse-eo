@@ -23,6 +23,7 @@ import BeneficiaryPaymentProfileChangedEmail, {
 import ContractorRemittanceEmail from '@/emails/ContractorRemittanceEmail'
 import HiringApplicationConfirmationEmail from '@/emails/HiringApplicationConfirmationEmail'
 import HiringApplicationReceivedInternalEmail from '@/emails/HiringApplicationReceivedInternalEmail'
+import HiringAssessmentAccessRotatedEmail from '@/emails/HiringAssessmentAccessRotatedEmail'
 import HiringAssessmentAssignedEmail from '@/emails/HiringAssessmentAssignedEmail'
 import HiringAssessmentSubmittedInternalEmail from '@/emails/HiringAssessmentSubmittedInternalEmail'
 import HiringDecisionEmail from '@/emails/HiringDecisionEmail'
@@ -1986,6 +1987,78 @@ registerTemplate('hiring_assessment_access_recovery', (context: HiringAssessment
   }
 })
 
+interface HiringAssessmentAccessRotatedContext extends EmailTemplateContext {
+  recipientName?: string
+  openingTitle: string
+  locale?: 'es' | 'en'
+  /** Vigencia ISO de la credencial nueva. NUNCA la credencial en sí. */
+  expiresAt: string
+  /** Plazo original de la evaluación, sólo si la persona ya la había empezado. */
+  originalDeadlineAt?: string | null
+  inProgress?: boolean
+}
+
+/**
+ * TASK-1757 — el candidato se entera de que su acceso fue reemplazado.
+ *
+ * El contexto NO tiene `assessmentUrl` ni token, y no es un olvido: el enlace se entrega en mano
+ * por un canal donde el operador verifica identidad. Ponerlo acá anularía esa verificación.
+ */
+registerTemplate('hiring_assessment_access_rotated', (context: HiringAssessmentAccessRotatedContext) => {
+  const isEn = context.locale === 'en'
+  const first = context.recipientName?.split(' ')[0]
+
+  const chileTime = (value: string | null | undefined) =>
+    value
+      ? new Intl.DateTimeFormat(isEn ? 'en-US' : 'es-CL', {
+          dateStyle: 'medium',
+          timeStyle: 'short',
+          timeZone: 'America/Santiago',
+        }).format(new Date(value))
+      : null
+
+  const expiresAtLabel = chileTime(context.expiresAt) ?? context.expiresAt
+  const originalDeadlineLabel = context.inProgress ? chileTime(context.originalDeadlineAt) : null
+
+  return {
+    subject: isEn
+      ? `${first ? `${first}, ` : ''}we replaced your assessment access — Efeonce`
+      : `${first ? `${first}, ` : ''}reemplazamos tu acceso a la evaluación — Efeonce`,
+    react: HiringAssessmentAccessRotatedEmail({
+      recipientName: context.recipientName,
+      openingTitle: context.openingTitle,
+      expiresAtLabel,
+      originalDeadlineLabel,
+      inProgress: context.inProgress ?? false,
+      locale: context.locale ?? 'es',
+    }),
+    text: [
+      isEn ? 'We replaced your assessment access' : 'Reemplazamos tu acceso a la evaluación',
+      '',
+      isEn
+        ? `We generated new access to your ${context.openingTitle} assessment. The link you had before no longer works.`
+        : `Generamos un acceso nuevo a tu evaluación de ${context.openingTitle}. El enlace que tenías antes dejó de funcionar.`,
+      isEn
+        ? `The new access does not travel in this email: it is delivered another way, and is valid until ${expiresAtLabel} (Chile time).`
+        : `El acceso nuevo no viaja en este correo: se entrega por otra vía y está vigente hasta ${expiresAtLabel} (hora de Chile).`,
+      ...(originalDeadlineLabel
+        ? [isEn
+          ? `Your assessment timer is already running and does not reset: the original deadline stays at ${originalDeadlineLabel} (Chile time).`
+          : `El tiempo de tu evaluación ya está corriendo y no se reinicia: el plazo original se mantiene hasta ${originalDeadlineLabel} (hora de Chile).`]
+        : []),
+      '',
+      isEn
+        ? 'If it does not reach you, if it arrives expired, or if you would rather receive it here, reply to this email and we will send it again.'
+        : 'Si no te llega, si te llega vencido o si prefieres recibirlo por acá, responde este correo y lo reponemos.',
+      isEn
+        ? 'This does not affect your application or how you will be evaluated.'
+        : 'Esto no afecta tu postulación ni cómo te vamos a evaluar.',
+      '',
+      '— Efeonce · efeoncepro.com',
+    ].join('\n'),
+  }
+})
+
 interface HiringAssessmentSubmittedInternalContext extends EmailTemplateContext {
   candidateName: string
   openingTitle: string
@@ -2070,8 +2143,8 @@ registerTemplate('hiring_decision_selected', (context: HiringDecisionContext) =>
 
   return {
     subject: isEn
-      ? `${first ? `${first}, ` : ''}good news about your application — Efeonce`
-      : `${first ? `${first}, ` : ''}buenas noticias sobre tu postulación — Efeonce`,
+      ? `${first ? `${first}, ` : ''}we chose you for ${context.openingTitle} — Efeonce`
+      : `${first ? `${first}, ` : ''}te elegimos para ${context.openingTitle} — Efeonce`,
     react: HiringDecisionEmail({
       recipientName: context.recipientName,
       openingTitle: context.openingTitle,
@@ -2079,13 +2152,28 @@ registerTemplate('hiring_decision_selected', (context: HiringDecisionContext) =>
       locale: context.locale ?? 'es'
     }),
     text: [
-      isEn ? 'We chose you' : '¡Te elegimos!',
+      isEn
+        ? `${first ? `We chose you, ${first}!` : 'We chose you!'}`
+        : `${first ? `¡Te elegimos, ${first}!` : '¡Te elegimos!'}`,
       '',
       isEn
-        ? `We have good news: we chose you for «${context.openingTitle}» at Efeonce. Our team will contact you with the next steps.`
-        : `Tenemos buenas noticias: te elegimos para «${context.openingTitle}» en Efeonce. Nuestro equipo te contactará con los próximos pasos.`,
+        ? `After reviewing your application and everything you shared with us throughout the process, we are delighted to confirm that we chose you for «${context.openingTitle}» at Efeonce.`
+        : `Después de revisar tu postulación y todo lo que compartiste con nosotros durante el proceso, nos alegra confirmarte que te elegimos para «${context.openingTitle}» en Efeonce.`,
       '',
-      '— Efeonce · efeoncepro.com'
+      isEn
+        ? 'Thank you for the time, dedication, and openness you brought to each stage. Getting to know your experience and what you can bring to the team made this decision especially meaningful.'
+        : 'Gracias por el tiempo, la dedicación y la apertura que mostraste en cada etapa. Conocer tu experiencia y lo que puedes aportar al equipo hizo que esta decisión fuera especialmente significativa.',
+      '',
+      isEn
+        ? 'The next step is to prepare and send you the offer letter. Once you have reviewed and accepted it, we will proceed with the employment agreement. Our team will write to this same email address; you do not need to take any action for now.'
+        : 'El próximo paso es preparar y enviarte la carta oferta. Cuando la revises y aceptes, avanzaremos con la firma del contrato. Nuestro equipo te escribirá a este mismo correo; por ahora, no necesitas realizar ninguna acción.',
+      '',
+      isEn
+        ? 'We are very happy to take this next step with you. We will be in touch soon.'
+        : 'Nos alegra mucho dar este paso contigo. Hablamos pronto.',
+      '',
+      isEn ? 'Talent Team' : 'Equipo de Talento',
+      'Efeonce · efeoncepro.com'
     ].join('\n')
   }
 })
@@ -2112,7 +2200,8 @@ registerTemplate('hiring_decision_rejected', (context: HiringDecisionContext) =>
         ? `Thank you for the time you put into your application to «${context.openingTitle}» at Efeonce. After completing the process, we decided not to move forward on this occasion. We would be glad to see you apply to future openings closer to your profile.`
         : `Gracias por el tiempo que pusiste en tu postulación a «${context.openingTitle}» en Efeonce. Después de completar el proceso, decidimos no avanzar en esta oportunidad. Nos encantaría verte postular a futuras vacantes que se acerquen más a tu perfil.`,
       '',
-      '— Efeonce · efeoncepro.com'
+      isEn ? 'Talent Team' : 'Equipo de Talento',
+      'Efeonce · efeoncepro.com'
     ].join('\n')
   }
 })
@@ -2207,6 +2296,29 @@ registerPreviewMeta('hiring_assessment_assigned', {
     { key: 'tokenTtlDays', label: 'Vigencia del link (días)', type: 'number' },
     { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] }
   ]
+})
+
+registerPreviewMeta('hiring_assessment_access_rotated', {
+  label: 'Hiring — acceso reemplazado (sin enlace)',
+  description: 'Aviso al candidato de que su acceso anterior murió; la credencial nueva se entrega en mano',
+  domain: 'hr',
+  supportsLocale: true,
+  defaultProps: {
+    recipientName: 'María González',
+    openingTitle: 'Content Creator',
+    expiresAt: '2026-08-21T18:30:00.000Z',
+    originalDeadlineAt: '2026-08-22T12:00:00.000Z',
+    inProgress: true,
+    locale: 'es',
+  },
+  propsSchema: [
+    { key: 'recipientName', label: 'Nombre', type: 'text' },
+    { key: 'openingTitle', label: 'Vacante', type: 'text' },
+    { key: 'expiresAt', label: 'Vence (ISO)', type: 'text' },
+    { key: 'originalDeadlineAt', label: 'Plazo original (ISO)', type: 'text' },
+    { key: 'inProgress', label: '¿Ya la había empezado?', type: 'boolean' },
+    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] },
+  ],
 })
 
 registerPreviewMeta('hiring_assessment_access_recovery', {

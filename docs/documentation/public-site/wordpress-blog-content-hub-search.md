@@ -1,9 +1,9 @@
 # WordPress Blog, Content Hub and Search Contract
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-07-09 por Codex
-> **Ultima actualizacion:** 2026-07-18 por Codex
+> **Ultima actualizacion:** 2026-08-22 por Codex
 > **Modulo:** Public Site / WordPress / Ohio / Content Hub
 > **Runtime vigente:** `efeoncepro.com` en WordPress/Kinsta, tema activo
 > `ohio-child`, parent `ohio`
@@ -223,8 +223,11 @@ No es apto como experiencia final del content hub. Opciones recomendadas:
 
 El operador eligio `Demo 35: Blog Magazine` (`page_id=225984`,
 `/homedemo35-elementor/`) como referencia visual para la futura pagina principal
-del blog/content hub. La auditoria dedicada vive en
-`docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md`.
+del blog/content hub. La auditoria histórica vive en
+`docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md`; el
+baseline técnico revalidado, los parámetros por widget y la secuencia segura de
+adaptación viven en
+`docs/audits/public-site/2026-08-22-demo35-elementor-runtime-contract.md`.
 
 Contrato funcional:
 
@@ -238,6 +241,9 @@ Contrato funcional:
 - Los `ohio_recent_posts` estan mayoritariamente curados por IDs fijos. Antes de
   usarlo como hub, cada widget debe decidir explicitamente si sera curado manual,
   query dinamica por categoria/serie o bloque eliminado.
+- Catorce de quince widgets tienen `posts` fijos; cinco referencias son
+  attachments. Cuatro widgets ya tienen altura cero y dos listas mixtas pierden
+  un slot. Borrar primero el contenido demo hace que la retícula parezca rota.
 - La pagina renderizo sin overflow horizontal en desktop `1440` ni mobile
   `390`, pero mobile supera 13k px de scroll y debe priorizar secciones.
 
@@ -255,6 +261,13 @@ Regla para el refresh: usar `Demo 35` como referencia de layout, no como
 contenido final. Si se adopta, hacerlo sobre copia/draft gobernada, reemplazar
 IDs demo/attachments, corregir enlaces, conectar suscripcion a un contrato
 medible y validar desktop/mobile con `scrollWidth == clientWidth`.
+
+Regla de corte: mantener `page_for_posts=0`. WordPress ignora el contenido
+Elementor de una página cuando se la asigna como página de entradas y entrega el
+archivo Ohio. La futura home debe seguir siendo una página Elementor normal y
+conservar una sola URL canónica `/blog/`. El árbol no basta: se deben preservar o
+definir también las metas Ohio, porque Demo 35 usa `with-header-3` y el `/blog/`
+actual usa `with-header-6` con sidebar.
 
 ## Relacion Con Think
 

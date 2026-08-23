@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 
 import NextLink from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
@@ -43,6 +43,16 @@ import {
 } from '@/components/greenhouse/primitives'
 import type { HiringAssessmentCopy, HiringDeskCopy } from '@/lib/copy'
 import { formatDate, formatDateTime } from '@/lib/format'
+import {
+  ASSESSMENT_ACCESS_RECOVERY_REASONS,
+  predictAssessmentAccessRotationNotice,
+} from '@/lib/hiring/assessment/access-recovery/vocabulary'
+import type {
+  AssessmentAccessRecoveryAvailability,
+  AssessmentAccessRecoveryChannel,
+  AssessmentAccessRecoveryOutcome,
+  AssessmentAccessRecoveryReason,
+} from '@/lib/hiring/assessment/access-recovery/vocabulary'
 import { getCountryName } from '@/lib/locale/countries'
 import type {
   DecideHiringApplicationResult,
@@ -53,7 +63,7 @@ import type {
 } from '@/types/hiring'
 import type { CandidateDocumentsViewModel } from '@/lib/hiring/documents'
 import type { HiringHandoff } from '@/lib/hiring/handoff/types'
-import type { Assessment, AssessmentResponse, AssessmentTemplate, Competency } from '@/types/hiring-assessment'
+import type { Assessment, AssessmentResponse, Competency } from '@/types/hiring-assessment'
 import type {
   AssessmentReviewCompetencyModule,
   AssessmentReviewItem,
@@ -65,9 +75,11 @@ import HiringDeskFrame from './HiringDeskFrame'
 import ApplicationDossierPanel from './ApplicationDossierPanel'
 import CandidateDocumentsPanel from './CandidateDocumentsPanel'
 import AssessmentCompetencyRadar from './AssessmentCompetencyRadar'
-import { hiringRequest, scoreTone } from './hiring-client'
+import { HiringClientError, hiringRequest, scoreTone } from './hiring-client'
+import type { AssessmentAssignmentProposal, AssessmentAssignmentResult } from '@/types/hiring-assessment-policy'
 import { computeScorecardSummary } from './scorecard-summary'
 import { AssessmentAiRunEntry } from './AssessmentAiRunWorkbench'
+import { AssessmentRecoveryCluster } from './AssessmentRecoveryCluster'
 
 type TabKey = 'overview' | 'assessment' | 'documents' | 'decision' | 'expediente'
 const TAB_KEYS: TabKey[] = ['overview', 'assessment', 'documents', 'decision', 'expediente']
@@ -89,7 +101,6 @@ const DECISION_OPTIONS: Array<{ value: HiringDecision; label: string }> = [
   { value: 'backup_selected', label: 'Seleccionar como backup' },
   { value: 'rejected', label: 'Descartar' },
   { value: 'withdrawn', label: 'Registrar retiro' },
-  { value: 'on_hold', label: 'Dejar en espera' },
 ]
 
 const DESTINATIONS: Array<{ value: HiringFulfillmentMode; label: string }> = [
@@ -118,6 +129,18 @@ const proposedScoreFrom = (proposal: AiProposal | undefined) => {
   const score = proposal?.proposed.score
 
   return typeof score === 'number' ? score : null
+}
+
+const assessmentScoreStatusLabel = (
+  score: number | null,
+  pending: boolean,
+  statuses: HiringAssessmentCopy['review']['statuses'],
+) => {
+  if (pending) return statuses.pending
+  if (score != null && score >= 75) return statuses.optimal
+  if (score != null && score >= 60) return statuses.attention
+
+  return statuses.critical
 }
 
 const responseAnswerText = (answer: Record<string, unknown>) => {
@@ -225,7 +248,21 @@ interface Application360ViewProps {
   assessmentCopy: HiringAssessmentCopy
   initialItem: HiringDeskApplicationSummary
   initialAssessments: Assessment[]
-  templates: AssessmentTemplate[]
+  /** TASK-1747 — la asignación gobernada la decide la política; el cliente ya no elige. */
+  canAuthorAssessment: boolean
+  /**
+   * TASK-1747 — las dos puertas de la recuperación son INDEPENDIENTES. El correo va al buzón ya
+   * registrado; el enlace se entrega en mano y exige verificar identidad, así que se otorga
+   * aparte. Nunca colapsar en un solo booleano.
+   */
+  canRecoverAccessByEmail: boolean
+  canRevealAccessLink: boolean
+  /**
+   * Disponibilidad por assessment. Ausente = no aplica (no es `candidate_test`, o el operador no
+   * tiene ninguna de las dos puertas). `null` = la lectura FALLÓ, que NO es lo mismo que "no se
+   * puede recuperar": la tarjeta lo dice en vez de esconder el camino.
+   */
+  recoveryAvailability: Record<string, AssessmentAccessRecoveryAvailability | null>
   initialHandoff: HiringHandoff | null
   canApproveHandoff: boolean
   /** TASK-1715 — paquete documental resuelto en servidor. `null` si falló o si no hay acceso. */
@@ -354,7 +391,10 @@ const Application360View = ({
   documentsFailed,
   initialItem,
   initialAssessments,
-  templates,
+  canAuthorAssessment,
+  canRecoverAccessByEmail,
+  canRevealAccessLink,
+  recoveryAvailability,
   initialHandoff,
   notes,
   notesFailed,
@@ -365,6 +405,7 @@ const Application360View = ({
   noteAuthorNames,
 }: Application360ViewProps) => {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const rawRequestedTab = searchParams.get('tab')
   const requestedTab = rawRequestedTab ? TAB_ALIASES[rawRequestedTab] ?? rawRequestedTab : null
   const initialTab: TabKey = TAB_KEYS.includes(requestedTab as TabKey) ? (requestedTab as TabKey) : 'overview'
@@ -373,10 +414,30 @@ const Application360View = ({
   const [tab, setTab] = useState<TabKey>(initialTab)
   const [assessments, setAssessments] = useState(initialAssessments)
   const [assignOpen, setAssignOpen] = useState(false)
-  const [templateId, setTemplateId] = useState(templates[0]?.templateId ?? '')
-  const [timeLimit, setTimeLimit] = useState('45')
   const [assigning, setAssigning] = useState(false)
-  const [oneTimeToken, setOneTimeToken] = useState<string | null>(null)
+  // TASK-1747 — la propuesta la resuelve el servidor desde la política de la vacante. El cliente
+  // ya NO elige plantilla ni minutos, y NUNCA recibe el token: el enlace viaja por correo.
+  const [assignProposal, setAssignProposal] = useState<AssessmentAssignmentProposal | null>(null)
+  const [assignError, setAssignError] = useState<string | null>(null)
+  /*
+   * TASK-1747 — recuperación de acceso.
+   *
+   * `revealedLink` es el ÚNICO lugar donde vive la URL con credencial, y muere al cerrar el
+   * diálogo: no va a toast, ni a la URL, ni a `localStorage`, ni al historial. El servidor la
+   * devuelve una sola vez y reintentar la misma solicitud responde `replayed` SIN el enlace.
+   */
+  const [recoveryFor, setRecoveryFor] = useState<string | null>(null)
+  const [recoveryChannel, setRecoveryChannel] = useState<AssessmentAccessRecoveryChannel>('email')
+  const [recoveryReason, setRecoveryReason] = useState<AssessmentAccessRecoveryReason>('candidate_reports_email_not_received')
+  const [recovering, setRecovering] = useState(false)
+  const [recoveryError, setRecoveryError] = useState<string | null>(null)
+  const [recoveryNotice, setRecoveryNotice] = useState<string | null>(null)
+  const [revealedLink, setRevealedLink] = useState<{ url: string; expiresAt: string } | null>(null)
+  const recoveryIdempotencyRef = useRef<string | null>(null)
+  const recoveryTriggerRef = useRef<HTMLButtonElement | null>(null)
+  // Sin esto, un reintento que vuelve a fallar deja el DOM idéntico: indistinguible de un botón
+  // muerto. La transición da el pendiente sin inventar un estado local que se desincronice.
+  const [refreshingAvailability, startAvailabilityRefresh] = useTransition()
   const [assessmentReviews, setAssessmentReviews] = useState<Record<string, AssessmentReview>>({})
   const [reviewingAssessmentId, setReviewingAssessmentId] = useState<string | null>(null)
   const [scoreDrafts, setScoreDrafts] = useState<Record<string, string>>({})
@@ -399,10 +460,21 @@ const Application360View = ({
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<string | null>(null)
   const idempotencyKeyRef = useRef<string | null>(null)
+  const assignTriggerRef = useRef<HTMLButtonElement | null>(null)
 
   useEffect(() => {
     document.getElementById('hiring-application-title')?.focus()
   }, [])
+
+  /**
+   * `router.refresh()` re-renderiza el server component, pero el initializer de `useState` NO
+   * vuelve a correr: React conserva el estado local entre re-renders. Sin esto, asignar un test
+   * dejaba la tarjeta mostrando "sin test asignado" hasta recargar a mano — y el operador
+   * volvía a asignar.
+   */
+  useEffect(() => {
+    setAssessments(initialAssessments)
+  }, [initialAssessments])
 
   const decisionHistory = useMemo(() => historyFrom(item.application.explainability), [item.application.explainability])
   const isInternalHireDecision = item.application.decision === 'selected' && item.application.selectedDestination === 'internal_hire'
@@ -411,35 +483,304 @@ const Application360View = ({
     ? `/hr/onboarding?lane=hiring-activation&applicationId=${encodeURIComponent(item.application.applicationId)}&handoffId=${encodeURIComponent(handoff.handoffId)}`
     : `/hr/onboarding?lane=hiring-activation&applicationId=${encodeURIComponent(item.application.applicationId)}`
 
-  const oneTimeAssessmentLink = useMemo(() => {
-    if (!oneTimeToken) return null
-    const base = typeof window === 'undefined' ? '' : window.location.origin
+  // TASK-1747 — camino gobernado propose→confirm (TASK-1719). Reemplaza el legacy
+  // `POST /api/hiring/assessments`, que dejaba al cliente elegir plantilla y devolvía el token
+  // crudo al navegador. Acá el servidor resuelve la política y el enlace viaja SOLO por correo.
+  const assignmentPath = `/api/hiring/applications/${encodeURIComponent(item.application.applicationId)}/assessment-assignment`
 
-    return `${base}/assessment/${oneTimeToken}`
-  }, [oneTimeToken])
+  /**
+   * El fallback genérico dice "intenta de nuevo en unos minutos", así que sólo puede cubrir
+   * fallas donde reintentar TIENE sentido. Todo lo estructural se nombra: recetar un reintento
+   * sobre una causa que no cambia sola esconde la acción real (contrato canónico de errores).
+   */
+  /**
+   * Señal canónica de bloqueo del preview. `null` = el command asignaría hoy.
+   *
+   * Se lee del preview y NO se recompone desde campos sueltos: hay bloqueos (política sin
+   * habilitar, plantilla inactiva, candidatura decidida) que ningún otro campo del preview
+   * delata, y confirmar contra ellos consume el intento registrado de esa persona.
+   */
+  const assignProposalBlocker = assignProposal?.preview.blockingReasonCode ?? null
 
-  const assignAssessment = async () => {
-    if (!templateId) return
+  /**
+   * Cerrar devuelve el foco al botón que abrió el diálogo. Sin esto el foco vuelve al `<body>`
+   * y quien navega por teclado pierde el lugar donde estaba.
+   */
+  const closeAssignDialog = () => setAssignOpen(false)
 
-    setAssigning(true)
-    setError(null)
+  const restoreAssignFocus = () => assignTriggerRef.current?.focus()
+
+  const assignmentErrorMessage = (err: unknown) => {
+    const code = err instanceof HiringClientError ? err.code : null
+    const actionable = err instanceof HiringClientError ? err.actionable : true
+    const c = copy.application.assignment
+
+    if (code === 'assessment_assignment_policy_missing') return c.errorPolicyMissing
+    if (code === 'assessment_assignment_proposal_expired') return c.errorExpired
+    if (code === 'assessment_assignment_proposal_stale') return c.errorStale
+    if (code === 'assessment_assignment_proposal_not_confirmable') return c.errorNotConfirmable
+    if (code === 'forbidden') return c.errorPermission
+    if (code === 'unauthorized') return c.errorSession
+    if (code === 'assessment_assignment_proposal_not_found') return c.errorNotFound
+    if (code === 'hiring_application_not_found') return c.errorNotFound
+    if (code === 'assessment_assignment_conflict') return c.errorConflict
+    if (code === 'assessment_assignment_intent_unresolved') return c.errorStructural
+    if (code === 'hiring_invalid_input') return c.errorStructural
+
+    return actionable ? c.errorGeneric : c.errorStructural
+  }
+
+  const recoveryCopy = copy.application.accessRecovery
+
+  /**
+   * Los motivos NO son todos válidos para cualquier estado. `token_expired_before_start` es el
+   * único que puede probar el vencimiento previo al inicio, así que un test `expired` empieza con
+   * ese motivo preseleccionado: si no, el operador ve "no podemos probar cuándo caducó" sobre el
+   * caso más común y no tiene cómo adivinar que la salida es cambiar el motivo.
+   */
+  const openRecovery = (assessmentId: string, availability: AssessmentAccessRecoveryAvailability) => {
+    const emailAvailable = canRecoverAccessByEmail && availability.channels.email.available
+
+    setRecoveryFor(assessmentId)
+    setRecoveryChannel(emailAvailable ? 'email' : 'secure_link')
+    setRecoveryReason(
+      availability.status === 'expired' ? 'token_expired_before_start' : 'candidate_reports_email_not_received',
+    )
+    setRecoveryError(null)
+    setRecoveryNotice(null)
+    setRevealedLink(null)
+    // Una llave por INTENCIÓN, no por click: reintentar el mismo envío tras un error de red no
+    // puede emitir una credencial nueva ni consumir otra unidad de la cuota diaria.
+    recoveryIdempotencyRef.current = `assessment-recovery:${assessmentId}:${crypto.randomUUID()}`
+  }
+
+  /**
+   * Qué canal se puede usar AHORA. Repite la regla del cluster a propósito: con un bloqueo
+   * dependiente del motivo el canal figura cerrado porque la elegibilidad se computó con otro
+   * motivo, y ahí es el operador quien lo destraba declarando el correcto.
+   */
+  const recoveryChannelOpen = (() => {
+    const target = recoveryFor ? recoveryAvailability[recoveryFor] : null
+    const reasonDependent = target?.eligibilityCode === 'assessment_recovery_expiry_not_proven'
+
+    const open = (channel: { available: boolean; blockedBy: string | null }) =>
+      channel.available || (reasonDependent && channel.blockedBy === 'assessment_not_eligible')
+
+    return {
+      email: canRecoverAccessByEmail && Boolean(target) && open(target!.channels.email),
+      secureLink: canRevealAccessLink && Boolean(target) && open(target!.channels.secureLink),
+    }
+  })()
+
+  /**
+   * TASK-1757 — qué va a saber el candidato. Se recalcula con el canal y el motivo que el operador
+   * tiene elegidos AHORA, no con los del preview: el motivo cambia la respuesta, y esta línea
+   * existe para que nadie prometa por WhatsApp un correo que no va a salir.
+   */
+  const recoveryNoticePrediction = (() => {
+    const target = recoveryFor ? recoveryAvailability[recoveryFor] : null
+
+    if (!target) return null
+
+    return predictAssessmentAccessRotationNotice({
+      reasonCode: recoveryReason,
+      hasCandidateEmail: target.channels.email.hasCandidateEmail,
+      providerBlockStatus: target.channels.email.providerStatus,
+    })
+  })()
+
+  const closeRecovery = () => {
+    setRecoveryFor(null)
+    // El enlace muere acá. Es la razón de ser de la revelación única.
+    setRevealedLink(null)
+    recoveryIdempotencyRef.current = null
+  }
+
+  /**
+   * El foco vuelve al disparador cuando el diálogo TERMINÓ de salir, no al despachar el cierre.
+   * Llamarlo sincrónicamente dentro del handler no sirve: la trampa de foco del diálogo sigue
+   * activa y devuelve el foco a su propia raíz, anulando la restauración. Y en el traspaso
+   * confirmación → revelación el nodo que la trampa guardó ya está desmontado, así que sin esto el
+   * foco cae al `body` — justo al cerrar la pantalla que mostró una credencial irrepetible.
+   */
+  const restoreRecoveryFocus = () => recoveryTriggerRef.current?.focus()
+
+  const recoveryErrorMessage = (err: unknown) => {
+    const code = err instanceof HiringClientError ? err.code : null
+    const target = recoveryFor ? recoveryAvailability[recoveryFor] : null
+
+    // Un test vencido rechazado con cualquier motivo que no sea `token_expired_before_start` NO es
+    // "el estado cambió mientras confirmabas": el estado es el mismo y el remedio es el motivo.
+    // Mandar a revisar la tarjeta acá deja al operador dando vueltas sobre algo que él resuelve.
+    if (code === 'assessment_recovery_unavailable'
+      && target?.status === 'expired'
+      && recoveryReason !== 'token_expired_before_start') {
+      return recoveryCopy.unavailable.assessment_recovery_expiry_not_proven
+    }
+
+    if (code === 'forbidden') return recoveryCopy.errorPermission
+    if (code === 'unauthorized') return recoveryCopy.errorSession
+    if (code === 'rate_limited') return recoveryCopy.errorRateLimited
+    if (code === 'assessment_recovery_idempotency_conflict') return recoveryCopy.errorIdempotencyConflict
+    if (code === 'assessment_recovery_email_provider_blocked') return recoveryCopy.emailBlocked
+    if (code === 'assessment_recovery_unavailable') return recoveryCopy.errorConflict
+    if (code === 'assessment_recovery_invalid_request') return recoveryCopy.errorConflict
+
+    return recoveryCopy.errorGeneric
+  }
+
+  const submitRecovery = async () => {
+    const assessmentId = recoveryFor
+    const idempotencyKey = recoveryIdempotencyRef.current
+
+    if (!assessmentId || !idempotencyKey) return
+
+    setRecovering(true)
+    setRecoveryError(null)
+    setRecoveryNotice(null)
 
     try {
-      const result = await hiringRequest<{ assessment: Assessment; token: string }>('/api/hiring/assessments', {
+      const response = await hiringRequest<{
+        recovery: { outcome: AssessmentAccessRecoveryOutcome; expiresAt: string }
+        replayed: boolean
+        linkRevealed: boolean
+        accessUrl?: string
+      }>(`/api/hiring/assessments/${encodeURIComponent(assessmentId)}/access-recovery`, {
         method: 'POST',
+        headers: { 'x-idempotency-key': idempotencyKey },
         body: JSON.stringify({
           applicationId: item.application.applicationId,
-          templateId,
-          method: 'candidate_test',
-          timeLimitMinutes: Number(timeLimit) || 45,
+          channel: recoveryChannel,
+          reasonCode: recoveryReason,
         }),
       })
 
-      setAssessments((current) => [result.assessment, ...current.filter((entry) => entry.assessmentId !== result.assessment.assessmentId)])
-      setOneTimeToken(result.token)
-      setAssignOpen(false)
-    } catch (assignError) {
-      setError(assignError instanceof Error ? assignError.message : 'No se pudo asignar el assessment.')
+      if (response.linkRevealed && response.accessUrl) {
+        setRevealedLink({ url: response.accessUrl, expiresAt: response.recovery.expiresAt })
+
+        return
+      }
+
+      // La intención está consumida: esta llave ya tiene desenlace registrado y volver a mandarla
+      // sólo puede devolver el mismo. Sin esto, el botón quedaba activo y un segundo click
+      // reportaba "correo despachado" sobre un replay donde no salió ningún correo.
+      recoveryIdempotencyRef.current = null
+
+      // `replayed` se LEE, no se infiere de la ausencia del enlace: el recibo que vuelve es el
+      // original, con su desenlace original. Pintar `emailQueued` sobre un replay le dice al
+      // operador que acaba de salir un correo que no salió.
+      if (response.replayed) {
+        setRecoveryNotice(
+          recoveryChannel === 'secure_link' ? recoveryCopy.linkAlreadyRevealed : recoveryCopy.emailAlreadySent,
+        )
+        router.refresh()
+
+        return
+      }
+
+      if (recoveryChannel === 'secure_link') {
+        // Enlace pedido, no revelado y sin `replayed`: el servidor no honró la revelación y no
+        // sabemos por qué. Decirlo es la única salida honesta.
+        setRecoveryNotice(recoveryCopy.linkAlreadyRevealed)
+        router.refresh()
+
+        return
+      }
+
+      // Correo: el desenlace del PROVEEDOR, que no es lo mismo que "le llegó". Cada rama tiene su
+      // frase porque el siguiente paso del operador cambia en cada una.
+      const outcomeMessage =
+        response.recovery.outcome === 'dispatch_accepted'
+          ? recoveryCopy.emailQueued
+          : response.recovery.outcome === 'pending_dispatch'
+            ? recoveryCopy.emailPending
+            : response.recovery.outcome === 'dispatch_failed'
+              ? recoveryCopy.emailFailed
+              : recoveryCopy.emailUnknown
+
+      setRecoveryNotice(
+        [outcomeMessage, formatTemplate(recoveryCopy.emailExpiry, { date: formatDateTime(response.recovery.expiresAt) })]
+          .filter(Boolean)
+          .join(' '),
+      )
+      router.refresh()
+    } catch (recoverError) {
+      setRecoveryError(recoveryErrorMessage(recoverError))
+    } finally {
+      setRecovering(false)
+    }
+  }
+
+  const openAssignProposal = async () => {
+    setAssigning(true)
+    setAssignError(null)
+    setAssignProposal(null)
+    setAssignOpen(true)
+
+    try {
+      const result = await hiringRequest<{ proposal: AssessmentAssignmentProposal }>(assignmentPath, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'propose' }),
+      })
+
+      setAssignProposal(result.proposal)
+    } catch (proposeError) {
+      setAssignError(assignmentErrorMessage(proposeError))
+    } finally {
+      setAssigning(false)
+    }
+  }
+
+  const confirmAssignProposal = async () => {
+    if (!assignProposal) return
+
+    setAssigning(true)
+    setAssignError(null)
+
+    try {
+      const response = await hiringRequest<{
+        result: AssessmentAssignmentResult | null
+        alreadyConfirmed: boolean
+      }>(assignmentPath, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'confirm', proposalId: assignProposal.proposalId }),
+      })
+
+      const c = copy.application.assignment
+
+      // Una propuesta ya confirmada NO trae desenlace (`result: null`): el confirm original pudo
+      // terminar en cualquiera de los 6, bloqueos incluidos. Traducir esa ausencia a "ya estaba
+      // asignado" le reportaría al operador una asignación que quizá nunca ocurrió — la misma
+      // clase de mentira que este camino vino a matar. Decimos que no sabemos.
+      if (response.alreadyConfirmed || !response.result) {
+        setAssignError(c.resultAlreadyConfirmed)
+        setAssignProposal(null)
+
+        return
+      }
+
+      const outcome = response.result
+
+      const reasonText =
+        'reasonCode' in outcome && outcome.reasonCode ? c.reasons[outcome.reasonCode] : null
+
+      const message = [c.results[outcome.status], reasonText].filter(Boolean).join(' ')
+
+      if (outcome.status === 'assigned' || outcome.status === 'already_assigned') {
+        setToast(message)
+        closeAssignDialog()
+        router.refresh()
+
+        return
+      }
+
+      // held/blocked/stale/cancelled se quedan en el diálogo con su causa a la vista. La propuesta
+      // ya es terminal: se limpia para que el botón no invite a re-confirmarla (re-confirmar sólo
+      // devuelve el mismo desenlace del ledger, nunca uno nuevo).
+      setAssignError(message)
+      setAssignProposal(null)
+    } catch (confirmError) {
+      setAssignError(assignmentErrorMessage(confirmError))
     } finally {
       setAssigning(false)
     }
@@ -704,35 +1045,20 @@ const Application360View = ({
           <Typography variant='h5'>{assessmentCopy.review.title}</Typography>
           <Typography color='text.secondary' variant='body2'>{assessmentCopy.review.subtitle}</Typography>
         </Box>
-        <GreenhouseButton kind='secondaryAction' leadingIconClassName='tabler-plus' onClick={() => setAssignOpen(true)} sx={{ color: 'text.primary' }}>
-          {copy.application.assignAssessment}
-        </GreenhouseButton>
+        {canAuthorAssessment ? (
+          <GreenhouseButton
+            kind='secondaryAction'
+            leadingIconClassName='tabler-plus'
+            disabled={assigning}
+            aria-busy={assigning}
+            ref={assignTriggerRef}
+            onClick={() => void openAssignProposal()}
+            sx={{ color: 'text.primary' }}
+          >
+            {copy.application.assignAssessment}
+          </GreenhouseButton>
+        ) : null}
       </Stack>
-
-      {oneTimeAssessmentLink ? (
-        <Alert severity='success' icon={<i className='tabler-key' />}>
-          <Stack spacing={1.25}>
-            <Typography fontWeight={700}>{copy.application.assignmentLink}</Typography>
-            <Typography variant='body2' sx={{ overflowWrap: 'anywhere' }}>{oneTimeAssessmentLink}</Typography>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-              <Button
-                size='small'
-                onClick={() => {
-                  void navigator.clipboard.writeText(oneTimeAssessmentLink)
-                  setToast('Enlace copiado.')
-                }}
-                sx={{ alignSelf: 'flex-start' }}
-              >
-                {copy.application.copyLink}
-              </Button>
-              <Button component='a' href={oneTimeAssessmentLink} size='small' target='_blank' rel='noreferrer' endIcon={<i className='tabler-external-link' />}>
-                Abrir superficie
-              </Button>
-            </Stack>
-            <Typography variant='caption'>Se muestra una sola vez; el token crudo no se guarda en claro.</Typography>
-          </Stack>
-        </Alert>
-      ) : null}
 
       {assessments.length === 0 ? (
         <Box sx={{ p: 5, textAlign: 'center' }}>
@@ -741,7 +1067,11 @@ const Application360View = ({
               <i aria-hidden='true' className='tabler-clipboard-off' />
             </Box>
             <Typography variant='h6'>{copy.application.assessmentPending}</Typography>
-            <Typography color='text.secondary'>Asigna un test para generar el link tokenizado de un solo uso del candidato.</Typography>
+            <Typography color='text.secondary'>
+              {canAuthorAssessment
+                ? copy.application.assignment.emptyBodyCanAssign
+                : copy.application.assignment.emptyBody}
+            </Typography>
           </Stack>
         </Box>
       ) : assessments.map((entry) => {
@@ -834,6 +1164,49 @@ const Application360View = ({
                   revisión: una cola de excepciones pendiente no puede quedar escondida detrás
                   de "Revisar evaluación". Sin run o sin capability no dibuja nada. */}
               <AssessmentAiRunEntry assessmentId={entry.assessmentId} copy={assessmentCopy.scoringRun} canScore={canScore} />
+
+              {/* TASK-1747 — recuperación de acceso. Reemplaza al enlace que la pantalla mostraba
+                  en claro y que el correo invalidaba minutos después. Sólo se dibuja para tests
+                  del candidato y sólo si el operador tiene alguna de las dos puertas. */}
+              {entry.assessmentId in recoveryAvailability ? (
+                recoveryAvailability[entry.assessmentId] === null ? (
+                  // La lectura falló. Decirlo, no esconder el cluster: un affordance ausente es
+                  // indistinguible de uno prohibido. Y con salida: una degradación honesta que no
+                  // ofrece nada deja al operador mirando un mensaje, no resolviendo el caso.
+                  <Alert
+                    severity='warning'
+                    role='status'
+                    data-capture='assessment-access-recovery'
+                    action={
+                      <Button
+                        color='inherit'
+                        size='small'
+                        disabled={refreshingAvailability}
+                        aria-busy={refreshingAvailability}
+                        onClick={() => startAvailabilityRefresh(() => router.refresh())}
+                      >
+                        {refreshingAvailability ? copy.common.loading : copy.common.retry}
+                      </Button>
+                    }
+                  >
+                    {recoveryCopy.errorReadFailed}
+                  </Alert>
+                ) : (
+                  <AssessmentRecoveryCluster
+                    availability={recoveryAvailability[entry.assessmentId] as AssessmentAccessRecoveryAvailability}
+                    copy={recoveryCopy}
+                    canRecoverByEmail={canRecoverAccessByEmail}
+                    canRevealLink={canRevealAccessLink}
+                    onOpen={(trigger) => {
+                      recoveryTriggerRef.current = trigger
+                      openRecovery(
+                        entry.assessmentId,
+                        recoveryAvailability[entry.assessmentId] as AssessmentAccessRecoveryAvailability,
+                      )
+                    }}
+                  />
+                )
+              ) : null}
 
               {!review ? (
                 // TASK-1719: `cancelled` tenía que caer en su propia rama — en el `else` mostraba
@@ -994,7 +1367,7 @@ const Application360View = ({
                                         kind='status'
                                         variant='label'
                                         tone={row.pending ? 'info' : scoreTone(row.score)}
-                                        label={row.pending ? assessmentCopy.review.statuses.pending : row.score != null && row.score >= 75 ? assessmentCopy.review.statuses.optimal : row.score != null && row.score >= 60 ? assessmentCopy.review.statuses.attention : assessmentCopy.review.statuses.critical}
+                                        label={assessmentScoreStatusLabel(row.score, row.pending, assessmentCopy.review.statuses)}
                                       />
                                     </Stack>
                                   </Stack>
@@ -1034,37 +1407,43 @@ const Application360View = ({
                           </Alert>
 
                           <Box
-                            component='table'
-                            data-capture='assessment-accessible-score-table'
+                            data-visually-hidden='true'
+                            data-capture='assessment-accessible-score-table-wrapper'
                             sx={{
                               position: 'absolute',
                               inlineSize: 1,
                               maxInlineSize: 1,
                               blockSize: 1,
                               m: -1,
+                              p: 0,
                               overflow: 'hidden',
                               clip: 'rect(0 0 0 0)',
-                              tableLayout: 'fixed',
-                              whiteSpace: 'normal',
-                              overflowWrap: 'anywhere',
+                              clipPath: 'inset(50%)',
+                              whiteSpace: 'nowrap',
                               border: 0,
-                              '& caption, & tbody, & tr, & td': {
-                                inlineSize: 1,
-                                maxInlineSize: 1,
-                                overflow: 'hidden',
-                              },
                             }}
                           >
-                            <caption>{assessmentCopy.review.title}</caption>
-                            <tbody>
-                              {scoreRows.map((row) => (
-                                <tr key={row.competencyId}>
-                                  <td>{row.competencyName}</td>
-                                  <td>{row.target}</td>
-                                  <td>{row.score ?? assessmentCopy.review.pending}</td>
+                            <Box component='table' data-capture='assessment-accessible-score-table'>
+                              <caption>{assessmentCopy.review.title}</caption>
+                              <thead>
+                                <tr>
+                                  <th scope='col'>{assessmentCopy.review.competency}</th>
+                                  <th scope='col'>{assessmentCopy.review.objective}</th>
+                                  <th scope='col'>{assessmentCopy.review.radarMetricScore}</th>
+                                  <th scope='col'>{assessmentCopy.review.status}</th>
                                 </tr>
-                              ))}
-                            </tbody>
+                              </thead>
+                              <tbody>
+                                {scoreRows.map((row) => (
+                                  <tr key={row.competencyId}>
+                                    <th scope='row'>{row.competencyName}</th>
+                                    <td>{row.target}</td>
+                                    <td>{row.score ?? assessmentCopy.review.pending}</td>
+                                    <td>{assessmentScoreStatusLabel(row.score, row.pending, assessmentCopy.review.statuses)}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </Box>
                           </Box>
                         </Stack>
                       </Box>
@@ -1322,15 +1701,20 @@ const Application360View = ({
             <Grid size={{ xs: 12 }}>
               <Typography variant='body2' fontWeight={650} sx={{ mb: 1 }}>{copy.application.decisionType}</Typography>
               <Grid container spacing={2.5}>
+                {/*
+                  TASK-1765 — «En espera» ya no está: una pausa NO es un desenlace. Se registra
+                  moviendo la ETAPA a «Decisión» desde el tablero, no cerrando el proceso de alguien.
+                  Al quedar dos opciones pasan de `sm: 4` a `sm: 6` para que la fila no quede coja.
+                  El chip de desenlace y el diálogo que ofrece los seis valores son de TASK-1766.
+                */}
                 {[
                   ['selected', copy.application.decisionAdvance, 'tabler-arrow-up-right', 'success'],
                   ['rejected', copy.application.decisionReject, 'tabler-x', 'error'],
-                  ['on_hold', copy.application.decisionHold, 'tabler-player-pause', 'warning'],
                 ].map(([value, label, icon, tone]) => {
                   const active = decision === value
 
                   return (
-                    <Grid key={value} size={{ xs: 12, sm: 4 }}>
+                    <Grid key={value} size={{ xs: 12, sm: 6 }}>
                       <Box
                         component='button'
                         type='button'
@@ -1378,7 +1762,7 @@ const Application360View = ({
           {[...decisionHistory].reverse().map((entry) => (
             <Paper key={entry.decisionId} variant='outlined' sx={{ p: 2.5, borderRadius: 3 }}>
               <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='space-between' spacing={2}>
-                <Box><Stack direction='row' spacing={1} alignItems='center'><GreenhouseChip size='small' kind='status' variant='label' tone={entry.decision === 'rejected' ? 'error' : entry.decision === 'on_hold' ? 'warning' : 'success'} label={entry.decision} />{entry.supersedesDecisionId ? <GreenhouseChip size='small' kind='attribute' label='Re-decisión' /> : null}</Stack><Typography sx={{ mt: 1.5 }}>{entry.reason.summary}</Typography></Box>
+                <Box><Stack direction='row' spacing={1} alignItems='center'><GreenhouseChip size='small' kind='status' variant='label' tone={entry.decision === 'rejected' ? 'error' : 'success'} label={entry.decision} />{entry.supersedesDecisionId ? <GreenhouseChip size='small' kind='attribute' label='Re-decisión' /> : null}</Stack><Typography sx={{ mt: 1.5 }}>{entry.reason.summary}</Typography></Box>
                 <Typography variant='caption' color='text.secondary' sx={{ whiteSpace: 'nowrap' }}>{formatDateTime(entry.decidedAt, { dateStyle: 'medium', timeStyle: 'short' }, 'es-CL')}</Typography>
               </Stack>
             </Paper>
@@ -1537,10 +1921,277 @@ const Application360View = ({
     <>
       <HiringDeskFrame surface='application' copy={copy} lead={lead} primary={primary} />
 
-      <Dialog open={assignOpen} onClose={() => !assigning && setAssignOpen(false)} fullWidth maxWidth='sm' {...dialogMotionProps}>
-        <DialogTitle>{copy.application.assignAssessment}</DialogTitle>
-        <DialogContent><Stack spacing={3} sx={{ pt: 1 }}><FormControl fullWidth><InputLabel id='assessment-template-label'>Plantilla</InputLabel><Select labelId='assessment-template-label' label='Plantilla' value={templateId} onChange={(event) => setTemplateId(event.target.value)}>{templates.map((template) => <MenuItem key={template.templateId} value={template.templateId}>{template.name}</MenuItem>)}</Select></FormControl><TextField type='number' label='Tiempo límite (minutos)' value={timeLimit} onChange={(event) => setTimeLimit(event.target.value)} slotProps={{ htmlInput: { min: 5, max: 240 } }} />{templates.length === 0 ? <Alert severity='warning'>No hay plantillas activas disponibles.</Alert> : null}</Stack></DialogContent>
-        <DialogActions><Button onClick={() => setAssignOpen(false)} disabled={assigning}>{copy.common.cancel}</Button><GreenhouseButton disabled={assigning || !templateId} onClick={() => void assignAssessment()} leadingIcon={assigning ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}>{copy.application.assignAssessment}</GreenhouseButton></DialogActions>
+      <Dialog
+        open={assignOpen}
+        onClose={() => !assigning && closeAssignDialog()}
+        TransitionProps={{ onExited: restoreAssignFocus }}
+        fullWidth
+        maxWidth='sm'
+        aria-labelledby='assessment-assign-title'
+        {...dialogMotionProps}
+      >
+        <DialogTitle id='assessment-assign-title'>{copy.application.assignment.title}</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2.5} sx={{ pt: 1 }}>
+            <Typography color='text.secondary' variant='body2'>
+              {copy.application.assignment.intro}
+            </Typography>
+
+            {assigning && !assignProposal ? (
+              <Stack alignItems='center' direction='row' spacing={1.5}>
+                <CircularProgress size={18} />
+                <Typography variant='body2'>{copy.application.assignment.proposing}</Typography>
+              </Stack>
+            ) : null}
+
+            {assignProposal ? (
+              <Stack spacing={1.25}>
+                <Stack direction='row' justifyContent='space-between' spacing={2}>
+                  <Typography color='text.secondary' variant='body2'>
+                    {copy.application.assignment.previewTemplate}
+                  </Typography>
+                  <Typography fontWeight={700} variant='body2'>
+                    {assignProposal.preview.templateName ?? '—'}
+                  </Typography>
+                </Stack>
+                <Stack direction='row' justifyContent='space-between' spacing={2}>
+                  <Typography color='text.secondary' variant='body2'>
+                    {copy.application.assignment.previewTimeLimitLabel}
+                  </Typography>
+                  <Typography fontWeight={700} variant='body2'>
+                    {assignProposal.preview.timeLimitMinutes
+                      ? copy.application.assignment.previewTimeLimit.replace(
+                          '{minutes}',
+                          String(assignProposal.preview.timeLimitMinutes),
+                        )
+                      : copy.application.assignment.previewNoTimeLimit}
+                  </Typography>
+                </Stack>
+                {/* `recipientReady` no promete entrega: dice si hay a quién enviarle. */}
+                {assignProposal.preview.recipientReady ? (
+                  <Typography color='text.secondary' variant='caption'>
+                    {copy.application.assignment.previewRecipientReady}
+                  </Typography>
+                ) : null}
+                {/*
+                  El bloqueo se muestra ANTES de confirmar y sale del campo canónico del preview,
+                  no de deducirlo campo por campo: `blockingReasonCode` cubre causas que ningún
+                  otro campo delata (política no habilitada, plantilla inactiva, candidatura ya
+                  decidida). Descubrirlo recién en el desenlace le cuesta al operador el único
+                  intento de esa persona.
+                */}
+                {assignProposalBlocker ? (
+                  <Alert severity='error'>
+                    <Typography fontWeight={700} variant='body2'>
+                      {copy.application.assignment.previewBlockedTitle}
+                    </Typography>
+                    <Typography variant='body2'>
+                      {assignProposalBlocker === 'existing_open_instance'
+                        ? copy.application.assignment.existingOpen
+                        : assignProposalBlocker === 'missing_email'
+                          ? copy.application.assignment.previewRecipientNotReady
+                          : copy.application.assignment.reasons[assignProposalBlocker]}
+                    </Typography>
+                  </Alert>
+                ) : null}
+                {/* Advertencia, NO bloqueo: el command sí asignaría (retake legítimo). */}
+                {assignProposal.preview.existingScoredAssessment ? (
+                  <Alert severity='warning'>{copy.application.assignment.existingScored}</Alert>
+                ) : null}
+              </Stack>
+            ) : null}
+
+            {assignError ? (
+              <Alert severity='error' role='alert'>
+                {assignError}
+              </Alert>
+            ) : null}
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ flexDirection: { xs: 'column-reverse', sm: 'row' }, gap: { xs: 1, sm: 0 } }}>
+          <Button disabled={assigning} onClick={closeAssignDialog} sx={{ inlineSize: { xs: '100%', sm: 'auto' } }}>
+            {copy.common.cancel}
+          </Button>
+          <GreenhouseButton
+            disabled={assigning || !assignProposal || Boolean(assignProposalBlocker)}
+            aria-busy={assigning}
+            leadingIcon={
+              assigning && assignProposal ? (
+                <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} />
+              ) : undefined
+            }
+            onClick={() => void confirmAssignProposal()}
+            sx={{ inlineSize: { xs: '100%', sm: 'auto' } }}
+          >
+            {assigning && assignProposal
+              ? copy.application.assignment.confirming
+              : copy.application.assignment.confirm}
+          </GreenhouseButton>
+        </DialogActions>
+      </Dialog>
+
+      {/* TASK-1747 — recuperación de acceso: confirmación deliberada.
+          El operador declara CÓMO se lo hace llegar y POR QUÉ. El motivo va al ledger append-only,
+          así que las etiquetas conservan el "dice que": nadie puede afirmar que un correo NO llegó. */}
+      <Dialog
+        open={recoveryFor !== null && revealedLink === null}
+        onClose={() => !recovering && closeRecovery()}
+        fullWidth
+        maxWidth='sm'
+        aria-label={formatTemplate(recoveryCopy.dialogAriaLabel, { name: item.candidateName })}
+        {...dialogMotionProps}
+        TransitionProps={{ onExited: restoreRecoveryFocus }}
+      >
+        <DialogTitle>{recoveryCopy.title}</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2.5} sx={{ pt: 1 }}>
+            <Typography color='text.secondary' variant='body2'>{recoveryCopy.intro}</Typography>
+
+            <FormControl fullWidth>
+              <InputLabel id='recovery-channel-label'>{recoveryCopy.channelLabel}</InputLabel>
+              <Select
+                labelId='recovery-channel-label'
+                label={recoveryCopy.channelLabel}
+                value={recoveryChannel}
+                disabled={recovering}
+                onChange={(event) => setRecoveryChannel(event.target.value as AssessmentAccessRecoveryChannel)}
+              >
+                {/* Se apagan por permiso Y por disponibilidad: ofrecer un canal que el servidor
+                    va a rechazar hace gastar un intento para descubrir algo que ya sabíamos. */}
+                <MenuItem value='email' disabled={!recoveryChannelOpen.email}>{recoveryCopy.channelEmail}</MenuItem>
+                <MenuItem value='secure_link' disabled={!recoveryChannelOpen.secureLink}>{recoveryCopy.channelSecureLink}</MenuItem>
+              </Select>
+              <Typography color='text.secondary' variant='caption' sx={{ mt: 0.75 }}>
+                {recoveryChannel === 'email' ? recoveryCopy.channelEmailHelp : recoveryCopy.channelSecureLinkHelp}
+              </Typography>
+            </FormControl>
+
+            <FormControl fullWidth>
+              <InputLabel id='recovery-reason-label'>{recoveryCopy.reasonLabel}</InputLabel>
+              <Select
+                labelId='recovery-reason-label'
+                label={recoveryCopy.reasonLabel}
+                value={recoveryReason}
+                disabled={recovering}
+                onChange={(event) => setRecoveryReason(event.target.value as AssessmentAccessRecoveryReason)}
+              >
+                {ASSESSMENT_ACCESS_RECOVERY_REASONS.map((code) => (
+                  <MenuItem key={code} value={code}>{recoveryCopy.reasons[code]}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            {/* El canal `email` lleva el aviso en el mismo mensaje que la credencial, así que
+                acá sólo importa cuando el enlace se entrega en mano. */}
+            {recoveryChannel === 'secure_link' && recoveryNoticePrediction ? (
+              recoveryNoticePrediction.notify ? (
+                <Alert severity='info' icon={<i className='tabler-mail' />}>
+                  {recoveryCopy.noticeWillSend}
+                </Alert>
+              ) : (
+                <Alert severity='warning'>
+                  <Typography fontWeight={700} variant='body2'>{recoveryCopy.noticeSkipTitle}</Typography>
+                  <Typography variant='body2'>
+                    {recoveryCopy.noticeSkip[recoveryNoticePrediction.skip]}
+                  </Typography>
+                </Alert>
+              )
+            ) : null}
+
+            {/*
+              Los Alert de MUI YA son regiones vivas (`role='alert'` por defecto). Envolverlos en un
+              contenedor `aria-live` no agrega nada: en regiones anidadas gana la más cercana al
+              nodo que cambia, así que el envoltorio quedaría inerte mientras el `role` interno
+              sigue mandando. Se declara el rol EN el Alert y se elige a conciencia:
+              — el desenlace es `status` (polite): llega tras una acción deliberada del operador,
+                interrumpir su lectura sería ruido;
+              — el error es `alert` (assertive): cambia lo que puede hacer a continuación.
+            */}
+            {recoveryNotice ? (
+              <Alert severity='info' role='status' sx={{ mb: recoveryError ? 1.5 : 0 }}>
+                {recoveryNotice}
+              </Alert>
+            ) : null}
+            {recoveryError ? (
+              <Alert severity='error' role='alert'>{recoveryError}</Alert>
+            ) : null}
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ flexDirection: { xs: 'column-reverse', sm: 'row' }, gap: { xs: 1, sm: 0 }, '& > :not(style) ~ :not(style)': { ml: { xs: 0, sm: 1 } } }}>
+          <Button disabled={recovering} onClick={closeRecovery} sx={{ inlineSize: { xs: '100%', sm: 'auto' } }}>
+            {recoveryIdempotencyRef.current ? copy.common.cancel : copy.common.close}
+          </Button>
+          <GreenhouseButton
+            disabled={recovering || !recoveryIdempotencyRef.current}
+            aria-busy={recovering}
+            leadingIcon={recovering ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}
+            onClick={() => void submitRecovery()}
+            sx={{ inlineSize: { xs: '100%', sm: 'auto' } }}
+          >
+            {recovering ? recoveryCopy.confirming : recoveryCopy.confirm}
+          </GreenhouseButton>
+        </DialogActions>
+      </Dialog>
+
+      {/* Revelación ÚNICA. El servidor devuelve la URL una sola vez; al cerrar, muere en memoria.
+          No hay toast, ni URL, ni persistencia local: reintentar la misma solicitud responde
+          `replayed` SIN el enlace, y esa es exactamente la garantía que hace segura la entrega. */}
+      <Dialog
+        open={revealedLink !== null}
+        // Sin esto, un ESC reflejo o un clic afuera matan la credencial sin confirmación — y no
+        // se vuelve a mostrar. Se cierra sólo por el botón, deliberadamente.
+        disableEscapeKeyDown
+        onClose={(_event, reason) => {
+          if (reason !== 'backdropClick') closeRecovery()
+        }}
+        fullWidth
+        maxWidth='sm'
+        aria-label={formatTemplate(recoveryCopy.dialogAriaLabel, { name: item.candidateName })}
+        {...dialogMotionProps}
+        TransitionProps={{ onExited: restoreRecoveryFocus }}
+      >
+        <DialogTitle>{recoveryCopy.linkTitle}</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ pt: 1 }}>
+            <Alert severity='warning' role='alert'>{recoveryCopy.linkWarning}</Alert>
+            <TextField
+              fullWidth
+              multiline
+              minRows={2}
+              value={revealedLink?.url ?? ''}
+              slotProps={{ htmlInput: { readOnly: true, spellCheck: false } }}
+              onFocus={(event) => event.currentTarget.select()}
+            />
+            <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap' useFlexGap>
+              <GreenhouseButton
+                kind='secondaryAction'
+                leadingIconClassName='tabler-copy'
+                aria-label={formatTemplate(recoveryCopy.copyAriaLabel, { name: item.candidateName })}
+                onClick={() => {
+                  if (!revealedLink) return
+
+                  // Afirmar "copiado" sin verificarlo cuesta caro acá: el token del candidato YA
+                  // se rotó, así que si el copiado falló en silencio la credencial se pierde y
+                  // recuperar cuesta otra rotación y otra unidad de cuota.
+                  void navigator.clipboard
+                    ?.writeText(revealedLink.url)
+                    .then(() => setToast(recoveryCopy.linkCopied))
+                    .catch(() => setRecoveryError(recoveryCopy.linkCopyFailed))
+                }}
+              >
+                {recoveryCopy.linkCopy}
+              </GreenhouseButton>
+              {revealedLink ? (
+                <Typography color='text.secondary' variant='caption'>
+                  {formatTemplate(recoveryCopy.linkExpiry, { date: formatDateTime(revealedLink.expiresAt) })}
+                </Typography>
+              ) : null}
+            </Stack>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <GreenhouseButton onClick={() => { closeRecovery(); router.refresh() }}>{copy.common.close}</GreenhouseButton>
+        </DialogActions>
       </Dialog>
 
       <Dialog open={confirmOpen} onClose={() => !deciding && setConfirmOpen(false)} fullWidth maxWidth='sm' {...dialogMotionProps}>

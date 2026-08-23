@@ -193,6 +193,20 @@ export const resolveApplicationsAwaitingAssignment = async (
  * `closed`), y una lista implícita por posición es justo el tipo de cosa que se rompe en
  * silencio cuando alguien agrega una etapa.
  */
+// TASK-1765 — `closed` NO entra acá, y el motivo importa más que la línea.
+//
+// Se agregó primero razonando que, como el command de decisión pasó a escribir siempre
+// `stage='closed'`, omitirlo vaciaría esta cola. Ese razonamiento era erróneo: la query que consume
+// este mapa filtra además `AND app.decision IS NULL`, así que una postulación DECIDIDA nunca aparece
+// acá — con `closed` en la lista o sin él. La entrada habría sido inerte y su comentario habría
+// mentido, que es peor que no tenerla.
+//
+// Y cuando entre el `CHECK` del invariante (`(stage='closed') = (decision IS NOT NULL)`), la
+// combinación `closed AND decision IS NULL` pasa a ser **irrepresentable**: la entrada moriría por
+// construcción.
+//
+// Los espejos terminales sí se conservan mientras `TASK-1754` no los retire del enum de etapas:
+// siguen existiendo en filas históricas, y ésas sí pueden tener `decision IS NULL`.
 const STAGES_DOWNSTREAM_OF_TRIGGER: Record<OpeningAssessmentTriggerStage, readonly string[]> = {
   shortlisted: ['client_review', 'interview', 'decision_pending', 'selected', 'backup', 'handoff_ready'],
   interview: ['decision_pending', 'selected', 'backup', 'handoff_ready'],

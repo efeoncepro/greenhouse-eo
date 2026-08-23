@@ -115,6 +115,66 @@ export const findActiveAssignment = async (
   return rows[0] ? normalizeAssignment(rows[0]) : null
 }
 
+/**
+ * TASK-1755 — Resultados de intento que NO cerraron la puerta. La causa vive FUERA del ledger
+ * (la policy en `draft`, la plantilla inactiva, el correo sin registrar), así que corregirla
+ * puede cambiar el resultado del intento siguiente. `assigned`/`already_assigned` no están acá
+ * a propósito: esa clave está legítimamente ocupada y su reversa es la cancelación, no un
+ * reintento. `intent` tampoco: una fila a medio escribir es un FAULT, y abrirle un intento
+ * nuevo taparía el bug en vez de delatarlo.
+ */
+export const RECOVERABLE_ASSIGNMENT_OUTCOMES = ['blocked', 'held', 'stale'] as const
+
+export const isRecoverableAssignmentOutcome = (outcome: AssessmentAssignmentOutcome): boolean =>
+  (RECOVERABLE_ASSIGNMENT_OUTCOMES as readonly string[]).includes(outcome)
+
+export interface AssignmentAttemptState {
+  /** Mayor `attempt_seq` jamás escrito para la clave, superseded incluido. 0 si no hay historia. */
+  maxAttemptSeq: number
+  /** Intento VIGENTE más alto. `null` cuando ninguno lo está (p.ej. todos cancelados). */
+  latestActive: { attemptSeq: number; outcome: AssessmentAssignmentOutcome } | null
+}
+
+/**
+ * TASK-1755 — Estado de los intentos de una clave SIN fijar `attempt_seq`: qué número se usó
+ * más alto (para que el siguiente sea monotónico y nunca reuse el rótulo de un intento
+ * superseded) y cuál es el intento vigente más alto con su resultado (para decidir si la
+ * puerta está cerrada o si el mundo puede haberse corregido).
+ *
+ * **El caller DEBE tener la fila de policy bloqueada (`FOR UPDATE`) antes de llamar**, igual
+ * que `countAssignedInWindow`: sin eso dos confirmaciones concurrentes leen el mismo estado y
+ * resuelven el mismo intento. Con el lock, la carrera queda ordenada; la capa 2 del ADR D2
+ * (`ON CONFLICT DO NOTHING` + re-lectura) sigue siendo la red por debajo.
+ *
+ * Devuelve las filas crudas y agrega en TS a propósito: una clave real tiene uno o dos
+ * intentos, y un `MAX(...) FILTER (...)` acá sería SQL más difícil de leer sin ganar nada.
+ */
+export const readAssignmentAttemptState = async (
+  client: PoolClient,
+  key: Omit<AssignmentKey, 'attemptSeq'>,
+): Promise<AssignmentAttemptState> => {
+  const rows = await runQuery<{ attempt_seq: unknown; outcome: unknown; superseded_at: unknown }>(
+    client,
+    `SELECT attempt_seq, outcome, superseded_at
+     FROM greenhouse_hiring.hiring_assessment_assignment
+     WHERE application_id = $1 AND policy_id = $2 AND policy_version = $3 AND trigger_stage = $4
+     ORDER BY attempt_seq DESC`,
+    [key.applicationId, key.policyId, key.policyVersion, key.triggerStage],
+  )
+
+  const active = rows.find(row => row.superseded_at == null)
+
+  return {
+    maxAttemptSeq: rows.reduce((max, row) => Math.max(max, int(row.attempt_seq)), 0),
+    latestActive: active
+      ? {
+          attemptSeq: int(active.attempt_seq),
+          outcome: assertEnum(active.outcome, ASSESSMENT_ASSIGNMENT_OUTCOMES, 'outcome'),
+        }
+      : null,
+  }
+}
+
 export interface RecordAssignmentInput extends AssignmentKey {
   origin: AssessmentAssignmentOrigin
   outcome: AssessmentAssignmentOutcome

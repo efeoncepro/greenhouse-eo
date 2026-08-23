@@ -1,0 +1,108 @@
+-- Up Migration
+
+-- ╔══════════════════════════════════════════════════════════════════════════════════════════╗
+-- ║  TASK-1765 Slice 5 — EL INVARIANTE.  ⚠️  NO APLICAR TODAVÍA: espera a TASK-1748.          ║
+-- ╚══════════════════════════════════════════════════════════════════════════════════════════╝
+--
+-- Esta migración está ESCRITA y COMMITEADA a propósito sin aplicarse. Si la corres antes de que
+-- TASK-1748 mueva sus filas, ABORTA — y ese es el comportamiento correcto, no un bug.
+--
+--   TASK-1765 Slice 1  ──▶  TASK-1748  ──────────────────▶  TASK-1765 Slice 5
+--   crea `archived_at`      mueve sus 32 filas de `closed`   aplica este CHECK
+--                          a `archived_at`
+--
+-- Readback del 2026-08-22, verificado contra PG real:
+--   SELECT count(*) FROM greenhouse_hiring.hiring_application
+--    WHERE (stage='closed') <> (decision IS NOT NULL);   -- 33
+--
+-- Son **33, no 32**, y se violan por los DOS lados de la bicondicional. Quien lea «32» va a buscar
+-- sólo las sintéticas y va a creer que la restante es un falso positivo:
+--   · 32 filas `stage='closed'` con `decision IS NULL`   → todas `smoke_test`, las escribió
+--     `data-origin/purge.ts` archivando. **Son de TASK-1748.**
+--   ·  1 fila `decision='rejected'` con `stage='rejected'` → real, decidida, viviendo todavía en su
+--     etapa espejo. **La migra el UPDATE de más abajo.**
+--
+-- CUIDADO CON EL READBACK: **33 es el conteo de HOY, no el esperado al aplicar.** La precondición
+-- de esta migración es que `TASK-1748` ya haya movido sus 32 filas sintéticas; cuando eso pase, el
+-- conteo previo será **1** (la fila real en etapa antigua), y esa fila la corrige el `UPDATE` de acá
+-- mismo. O sea: si al ir a aplicar ves **1 → 0**, ESTÁS BIEN, es exactamente lo esperado. Si ves 33,
+-- `TASK-1748` no corrió y debes parar. Cualquier otro número: STOP & ESCALATE.
+-- Si da cualquier otro número: STOP & ESCALATE. No relajar el CHECK para que pase.
+--
+-- Qué cierra estructuralmente (ADR §5): un `stage='closed'` sin desenlace se vuelve
+-- IRREPRESENTABLE. Hoy una sola fila así congela, vía el `NOT EXISTS` por `identity_profile_id` de
+-- `documents/retention.ts`, el borrado de TODOS los documentos de esa persona en TODAS sus demás
+-- postulaciones. Eso es H-01 y H-02 de la auditoría, y dejan de existir cuando esto se aplica.
+
+DO $$
+DECLARE
+  archived_pending int;
+  invariant_violations int;
+BEGIN
+  -- Guard de orden cross-task. Existe para que la precondición no dependa de que quien ejecute la
+  -- migración haya leído la task.
+  SELECT COUNT(*) INTO archived_pending
+    FROM greenhouse_hiring.hiring_application
+   WHERE stage = 'closed' AND decision IS NULL;
+
+  IF archived_pending > 0 THEN
+    RAISE EXCEPTION USING
+      MESSAGE = format('TASK-1765 Slice 5 abortado: %s fila(s) con stage=closed y decision NULL.', archived_pending),
+      DETAIL  = 'Son las filas sintéticas que TASK-1748 debe mover a `archived_at`. Archivar un registro NO es cerrar el proceso de una persona.',
+      HINT    = 'Ejecutar TASK-1748 primero. NUNCA backfillear `decision` en estas filas: sería fabricar un acto humano que nadie realizó.';
+  END IF;
+END
+$$;
+
+-- Las filas DECIDIDAS que todavía viven en una etapa espejo pasan a `closed`. El `WHERE` exige
+-- `decision IS NOT NULL`: sin ese predicado, este UPDATE cerraría postulaciones vivas.
+-- Reversible desde `explainability_json.decisionHistory[]`, que conserva desenlace y fecha por fila.
+UPDATE greenhouse_hiring.hiring_application
+   SET stage = 'closed'
+ WHERE decision IS NOT NULL
+   AND stage <> 'closed';
+
+-- Readback del invariante DENTRO de la propia migración: si algo quedó fuera, aborta antes de
+-- intentar crear la constraint, con el conteo exacto en el mensaje.
+DO $$
+DECLARE
+  invariant_violations int;
+BEGIN
+  SELECT COUNT(*) INTO invariant_violations
+    FROM greenhouse_hiring.hiring_application
+   WHERE (stage = 'closed') <> (decision IS NOT NULL);
+
+  IF invariant_violations > 0 THEN
+    RAISE EXCEPTION 'TASK-1765 Slice 5 abortado: quedan % fila(s) violando (stage=closed) <> (decision IS NOT NULL) después del UPDATE. STOP & ESCALATE: no relajar el CHECK para que pase.', invariant_violations;
+  END IF;
+END
+$$;
+
+-- La bicondicional es TOTAL: `stage` es NOT NULL y `decision IS NOT NULL` siempre es booleano, así
+-- que acá NO hay NULL posible (a diferencia del CHECK de pareja de la causa, que sí lo admite y a
+-- propósito). Rechaza los dos defectos de una vez: un `closed` sin desenlace, y un desenlace que no
+-- cerró.
+ALTER TABLE greenhouse_hiring.hiring_application
+  ADD CONSTRAINT hiring_application_closed_outcome_check CHECK (
+    (stage = 'closed') = (decision IS NOT NULL));
+
+-- Guard anti pre-up-marker.
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+     WHERE conrelid = 'greenhouse_hiring.hiring_application'::regclass
+       AND conname = 'hiring_application_closed_outcome_check'
+  ) THEN
+    RAISE EXCEPTION 'TASK-1765 anti pre-up-marker check: hiring_application_closed_outcome_check no quedó creado.';
+  END IF;
+END
+$$;
+
+-- Down Migration
+
+-- La constraint se retira sin más. El UPDATE de etapa NO se revierte acá: reconstruir qué etapa
+-- espejo tenía cada fila exige leer su `decisionHistory[]`, que conserva desenlace y fecha. Es
+-- reversión PARCIAL y declarada — la constraint sí, el dato exige reconstrucción manual.
+ALTER TABLE greenhouse_hiring.hiring_application
+  DROP CONSTRAINT IF EXISTS hiring_application_closed_outcome_check;

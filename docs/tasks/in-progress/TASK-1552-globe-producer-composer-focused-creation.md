@@ -1,5 +1,56 @@
 # TASK-1552 — Globe Producer Composer Focused Creation
 
+## Delta 2026-08-21 — selector route-driven de fondo transparente
+
+TASK-1552 continúa como única dueña del composer; no se crea otra task UI. El output shape de imagen incorpora
+`backgroundMode` desde el contrato de `TASK-1633`, y `TASK-1553` habilita la traducción concreta de
+`ref/still/openai-v2` hacia GPT Image 2.
+
+Dirección aprobada (`extend`, dentro de la región existente `producer-output-shape`):
+
+- `Fondo` se presenta como una enumeración de chips/radio accesible, nunca como un control creativo ni como
+  texto añadido al prompt;
+- la UI muestra sólo los valores de `RouteConstraintsV1`; con un único valor muestra un hecho fijo y no una
+  elección falsa;
+- `auto` es el default compatible; `transparent` se rotula `Vista previa` mientras el contrato de proveedor
+  mantenga esa madurez; `opaque` se presenta como `Sólido`;
+- no hay branch por `gpt-image-2`, provider o slug: una ruta nueva que declare el mismo contrato reutiliza el
+  mismo control;
+- cambiar el modo invalida el estimate inmediatamente mediante la recipe/fingerprint canónica y conserva el
+  valor anterior atenuado hasta obtener uno vigente;
+- cuando el modo **pedido** es transparente, la previsualización de forma usa checkerboard semántico bajo la
+  muestra, sin hornear el patrón en el asset ni usar color como único indicador; el modo efectivo lo confirma el
+  manifest/readback de `TASK-1553`, no la UI por apariencia.
+
+Criterios exigibles adicionales:
+
+- [x] El selector vive en `producer-output-shape`, con `<fieldset>/<legend>` o patrón radio equivalente,
+      navegación por teclado, foco visible, target de 44 px y copy desde `producerComposer`.
+- [x] `auto | opaque | transparent` y la razón de no disponibilidad vienen del descriptor; ninguna matriz por
+      route/model/provider vive en React.
+- [x] Una ruta sin transparencia no muestra una opción accionable; `backgroundMode.preview` agrega el disclosure
+      `Vista previa` sin alterar los estados canónicos `available | policy-blocked | unsupported` de la ruta.
+- [x] Cambiar sólo el fondo marca el estimate stale antes del debounce, deshabilita Generate y produce un nuevo
+      estimate/approval sin perder prompt, referencias, modelo ni el resto del output shape.
+- [ ] La muestra transparente usa checkerboard decorativo `aria-hidden`; label/status textual comunica
+      `Fondo transparente` y el manifest/readback, no la apariencia del patrón por sí sola.
+- [ ] GVC cubre `auto`, `opaque`, `transparent`, ruta sin soporte, estado stale/ready, teclado y reduced motion en
+      1440×1000, 390×844 y 320×844, con `scrollWidth === clientWidth`.
+- [ ] El canary end-to-end consume la evidencia de `TASK-1553`: selección en UI → estimate → prepare/execute con
+      una clave → asset terminal cuyo readback confirma alfa; el feed/viewer existente recibe un smoke de no
+      regresión, pero esta task no reasigna su ownership ni simula éxito con un fixture opaco.
+
+Fuera de alcance: remover el fondo de un asset existente, máscaras/inpainting y extender el control a rutas que
+no declaren soporte.
+
+### Ejecución local 2026-08-21
+
+Implementado en Globe: `Fondo` se deriva de las constraints, conserva `auto`, presenta `Transparente · Vista
+previa`, usa targets de 44 px y entra en la recipe que invalida el estimate. El canary de browser prueba el cambio
+de fondo, el stale inmediato, el payload de `prepare`, desktop/390/320 y reduced motion. El viewer coloca un
+checkerboard tokenizado bajo outputs de imagen. Pendiente operativo: GVC live y canary facturable con readback alfa;
+el viewer aún no muestra un badge requested/effective porque el feed no proyecta ese dato.
+
 ## Delta 2026-08-02 — operaciones, referencias y controles derivados de ruta
 
 TASK-1552 continúa como única dueña del composer; no se crea otra task UI. Después de `TASK-1633`, la composición
@@ -59,7 +110,7 @@ Criterios exigibles adicionales:
 - Status real: `SLICE 1 EN CURSO — LOS CINCO BLOQUES EXISTEN, LA CONVERSION A TAILWIND VA POR TRES REGIONES (2026-07-27, commits 5b7cb3f + 512dcbc + a37d105). Cada bloque declara su pregunta creativa con su icono; Modo subio al bloque 1; el cajon de sastre no existe y el canary ahora afirma su ausencia en vez de un KNOWN sobre un elemento borrado. Convertidas a Tailwind: cabecera, modality-pill y fila de Modo, verificadas por VALOR COMPUTADO en browser. El SSOT gano 5 tokens (--text-micro, --text-meta, --text-lg, --accent-ink-bright, --field/--white) por decision del operador de tokenizar en vez de normalizar. HALLAZGO: el peso 700 no tenia utilidad alcanzable (font-display lo tomaba la familia) con el build en verde — corregido en el generador + guardrail que lanza. Slice 1h: los 8 `capability-button` pasan a un COMPONENTE local (CapabilityButton.tsx) con API de tipo discriminado — `blocked` siempre trae razon. HALLAZGO: el orden dentro del className NO decide nada; con `rounded-sm` en base y `rounded-full` en la variante, el boton circular rindio 9,28px con build y typecheck verdes. Regla: una propiedad se declara en UNA sola capa. Slices 1i/1j: el BLOQUE 1 queda entero en Tailwind (campo de prompt con su glow tokenizado, acciones, sugerencias, negativo) y el canary gana el aserto del glow que el STYLE_REFERENCE §9 pedia y no existia. Slices 1k/1l: overlays, direccion y seed convertidos. HALLAZGO MAYOR: el gate de reduced-motion leia solo CSS, asi que una animacion escrita en Tailwind era INVISIBLE para el — mismo agujero que ADR-016 condicion 2 describe para los otros tres gates, que si se reescribieron. Cerrado antes de crear la animacion. Slice 1m: referencias convertidas. HALLAZGO: el fixture no podia producir una ficha, asi que esa region nunca se habia renderizado en el canary — al poblarlo aparecieron TRES defectos, dos de ellos cancelandose mutuamente. Y «Mencionar del feed» estaba bloqueado POR OMISION (falta en el mapa de gates), no por el gate. SLICE 1 CERRADO (1n + 1o): la superficie queda con CERO clases de la hoja legacy — se cumple la regla dura de ADR-016. Incluye la atenuacion del estimado, que el contrato llama el motion mas importante y no existia. HALLAZGO: una utilidad de Tailwind puede colisionar POR NOMBRE con una clase del legacy y las capas NO lo resuelven — `text-action` daba al marco del icono 30,8x44px en vez de 28x28, y estuvo asi en varias capturas revisadas sin notarse. Cerrado con guardrail. SLICE 2 CERRADO (a631f7c): tool dock con 4 herramientas, role=toolbar, 44px constante y razon visible en las bloqueadas. El negativo y el seed salen del flujo. FRONTERA DECLARADA: el dock 100% derivado del catalogo NO es alcanzable — /v1/capabilities publica disponibilidad y NADA sobre presentacion (sin icono ni etiqueta); gap escalado al API Contract Spine (TASK-1481). PENDIENTE: resto de Slice 3 (estados de ejecucion y evidencia premium). Historico: TAILWIND LISTO, SUPERFICIE NO MIGRADA (2026-07-27): el motor de ADR-016 quedo instalado, gateado y verificado en efeonce-globe (804b7d7 + 91432ed) — theme generado desde el SSOT, 4 gates que muerden en className, canary de motor sobre valores computados. NINGUNA superficie migrada: el composer sigue con producerStyles y cero utilidades Tailwind. Unico bloqueo restante: cerrar TASK-1555. Baseline de diff capturado a 1440/390/320 CON la hoja del legacy. Historico: ADR-016 CAMBIO EL PLAN (2026-07-27): Slice 0 RETIRADO — el payload cliente migra a Tailwind v4 y una superficie reescrita no depende de la hoja legacy. BLOQUEADA por el slice de Tailwind en TASK-1485 y por cerrar TASK-1555. Diseno COMPLETO y documentado en docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md (leer PRIMERO). Rama efeonce-globe task/TASK-1552-slice0-internalizar-css commit 5edd2a3 = WIP congelado con partes a revertir, ver su mensaje`
 - Rank: `TBD`
 - Domain: `creative|ui|product`
-- Blocked by: `TASK-1633 para el slice route-driven de referencias/controles; el craft visual independiente puede avanzar`
+- Blocked by: `TASK-1633 para contrato/fingerprint route-driven y TASK-1553 para adapter/canary de transparencia; el craft visual independiente puede avanzar`
 - Branch: `Greenhouse develop; Globe main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

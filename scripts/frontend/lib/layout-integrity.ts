@@ -55,6 +55,7 @@ export const analyzeLayoutIntegrity = async (
         // que NO existe en el contexto del browser de page.evaluate.
         function isIgnored(el: Element): boolean {
           if (el.closest('[aria-hidden="true"]')) return true
+          if (el.closest('[data-visually-hidden]')) return true
           if (isVisuallyHidden(el)) return true
           for (const ig of ignore) if (ig === el || ig.contains(el)) return true
 
@@ -109,7 +110,25 @@ export const analyzeLayoutIntegrity = async (
         for (const el of candidates) {
           const r = el.getBoundingClientRect()
 
-          // 2. Elemento desbordando el viewport horizontalmente.
+          // 2a. Un elemento absolute/fixed no participa del flujo, pero sí puede
+          // extender el scrollable overflow miles de px (por ejemplo una tabla
+          // sr-only cuyo layout intrínseco envuelve cada celda a 1px).
+          if (!cap('layout_out_of_flow_vertical_runaway')) {
+            const style = getComputedStyle(el)
+            const outOfFlow = style.position === 'absolute' || style.position === 'fixed'
+            const runawayHeight = Math.max(window.innerHeight * 2, 1600)
+            const extendsFarBeyondViewport = r.bottom > window.innerHeight * 2
+
+            if (outOfFlow && r.height > runawayHeight && extendsFarBeyondViewport) {
+              issues.push({
+                code: 'layout_out_of_flow_vertical_runaway',
+                message: `Elemento fuera del flujo extiende el layout vertical (${Math.round(r.height)}px de alto; bottom=${Math.round(r.bottom)}).`,
+                selector: describe(el)
+              })
+            }
+          }
+
+          // 2b. Elemento desbordando el viewport horizontalmente.
           if (!cap('layout_element_overflow')) {
             const overflowsRight = r.right > vw + 2
             const overflowsLeft = r.left < -2

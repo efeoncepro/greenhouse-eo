@@ -39,6 +39,7 @@ export const FINDING_CODES = {
   // --- Slice 2: layout integrity ---
   layout_horizontal_overflow: 'layout_horizontal_overflow',
   layout_element_overflow: 'layout_element_overflow',
+  layout_out_of_flow_vertical_runaway: 'layout_out_of_flow_vertical_runaway',
   layout_target_too_small: 'layout_target_too_small',
   layout_text_clipped: 'layout_text_clipped',
   layout_scroll_region_unlabeled: 'layout_scroll_region_unlabeled',

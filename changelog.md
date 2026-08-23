@@ -3,6 +3,192 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-22 — Mover a «Evaluación» ya no guarda una etapa distinta de la que muestra
+
+- El tablero mostraba seis columnas sobre trece etapas del dominio, y tres de ellas se veían todas como
+  «Evaluación». Soltar una tarjeta ahí guardaba `qualified`, mientras la automatización de pruebas vigilaba
+  `shortlisted`: **quince vacantes tenían su política bien configurada y ninguna disparaba**, sin que en pantalla
+  se viera nada raro. Dos candidatas reales cruzaron esa columna el 2026-08-19 y no recibieron su prueba.
+- Ahora hay una etapa por columna. `qualified` y `client_review` se absorbieron en `shortlisted`, y el carril del
+  tablero declara **una sola** etapa: la que lo titula es la que se escribe, así que ese error dejó de poder
+  cometerse. Siete postulaciones reales se movieron con el cambio y quedan visibles en la cola de reconciliación
+  de su vacante para que una persona decida si corresponde asignarles la prueba.
+- El desk leído en inglés mostraba las seis columnas en castellano: heredaba los nombres del diccionario es-CL sin
+  sobreescribirlos. Ya no.
+- **«Preselección» en el correo al candidato y «Evaluación» en el tablero se conservan distintos a propósito.**
+  Hacia afuera el registro es más suave, y decirle «Evaluación» chocaría con el correo del test, que ya dice
+  «tienes una evaluación pendiente». Queda escrito con su razón para que nadie lo lea como error.
+- Nada de esto está en producción todavía: allí mover a «Evaluación» sigue guardando la etapa vieja.
+
+## 2026-08-22 — Archivar un dato de prueba dejó de marcarlo como «Cerrado»
+
+- Archivar y cerrar eran la misma escritura, y no son la misma cosa. Cerrar significa que el proceso de una
+  persona terminó **con un desenlace que alguien declaró**; archivar sólo saca un registro de la vista. Al
+  mezclarlos quedaron 32 postulaciones de prueba marcadas como cerradas sin que nadie hubiera decidido nada.
+- Archivar ahora tiene su propia marca y **nunca** toca la etapa, y cubre las tres piezas de un candidato de
+  prueba: su postulación, su ficha y la vacante inventada. Una vacante que alguien ya cerró o llenó no se
+  reescribe.
+- El **Banco de Talento** dejó de mostrar personas de prueba **por su procedencia declarada**. Antes tampoco
+  aparecían, pero por casualidad: bastaba con que su estado en el ciclo de vida cambiara para que reaparecieran.
+- Nada de esto está en producción todavía: el cambio de las 32 filas ya escritas espera al despliegue.
+
+## 2026-08-22 — Demo 35 queda documentada antes de tocar la home del blog
+
+- La página candidata se revalidó read-only: siete raíces, 113 nodos y 15 widgets de posts; cuatro ya están
+  vacíos porque apuntan a attachments y otros dos pierden un slot. La estructura no falla por Elementor: falla el
+  contenido fijo si se borra antes de recablear cada bloque.
+- El contrato operativo deja explícito que Demo 35 debe seguir como página Elementor normal, nunca como
+  `page_for_posts`, y que el futuro corte debe conservar una sola canónica `/blog/`, sus metas Ohio y rollback.
+- La skill del sitio público ahora registra la landing, sus parámetros, guards y secuencia de adaptación. No se
+  modificó WordPress, Kinsta, formularios ni caché.
+
+## 2026-08-22 — Cerrar una postulación ahora obliga a decir cómo terminó
+
+- El proceso de una persona ya no se cierra arrastrando su tarjeta a «Cerrado». Cerrar es **decidir**, y la
+  decisión pide el desenlace. Ese camino silencioso, además de no avisarle a nadie, **congelaba el borrado de los
+  documentos de esa persona en todas sus postulaciones** — una obligación legal bloqueada sin que se notara.
+- Aparecen dos desenlaces que faltaban. **«Sin selección»** para quien llegó al final y no quedó: antes había que
+  marcarla como descarte, un juicio que nadie emitió, que la sacaba del Banco de Talento y que distorsionaba el
+  análisis de equidad de su cohorte. Y **«Sin respuesta»** para quien deja de responder: antes había que
+  inventarle un retiro que no declaró o un juicio que no hubo.
+- «Sin selección» **exige decir por qué**: el cupo lo tomó otra persona, se cerró la búsqueda o se canceló el
+  proceso. Es una lista cerrada, no texto libre, porque el embudo de equidad y el correo cambian según cuál sea.
+- **Una pausa deja de ser un cierre.** «Dejar en espera» desaparece: para pausar, la tarjeta se queda en la
+  columna «Decisión». Su proceso no terminó, así que no tiene desenlace.
+- Ningún desenlace nuevo manda correo todavía. Es deliberado: preferible no escribir a mandarle un correo de
+  rechazo a quien nadie rechazó. El correo de «Sin selección» llega con su propia entrega.
+
+## 2026-08-22 — Un test bloqueado ya no deja a esa persona sin segunda oportunidad
+
+- Corregir la causa de un bloqueo —registrar el correo, activar la plantilla, habilitar la política— y volver a
+  proponer ahora **sí asigna la prueba**. Antes el intento bloqueado ocupaba el cupo de esa persona de forma
+  permanente y no había forma de destrabarlo desde el portal.
+- El intento bloqueado no se borra: queda como intento 1 y el nuevo entra como intento 2, así que el historial
+  sigue diciendo qué pasó y en qué orden.
+- Lo que no cambió: una prueba ya asignada sigue sin reintentarse (para eso está cancelar), y un bloqueo del
+  carril automático —al mover de etapa— todavía no se destraba solo; hay que asignar a mano.
+- Sin migración ni flags. Verificado contra PostgreSQL real, no sólo con tests.
+
+## 2026-08-21 — El correo de selección celebra sin adelantar la incorporación
+
+- El asunto identifica nombre y vacante; el título visible evita duplicar el saludo y el cuerpo explica la
+  secuencia real: selección, carta oferta, aceptación y firma del contrato.
+- Las tres primeras rutas fueron rechazadas por resultar tecnológicas, genéricas o demasiado abstractas. Diseño +
+  Talent convergen en una V4 concreta: icono 3D de sobre abierto, tarjeta sin texto, check de confirmación y un único
+  destello naranja. El PNG transparente pesa 63.972 bytes y su URL respondió `200 image/png`.
+- HTML y texto plano conservan la misma verdad; la variante de rechazo no carga el hero. Código completo con
+  captura local revisada. La decisión, la carta oferta y el contrato reciben negritas visibles sobre frases
+  completas; las dos variantes de decisión firman `Equipo de Talento · Efeonce`, sin atribuir el mensaje a una
+  persona inexistente.
+  Rollout del template pendiente y ningún correo real enviado.
+
+## 2026-08-21 — Hiring formaliza el cierre empático de una vacante cuando se completan sus cupos
+
+- `TASK-1762` separa capacidad de publicación y selección: preview fresco, confirmación humana y run durable por
+  aplicación antes de rechazar/notificar a la cohorte restante.
+- `TASK-1763` diseña el segundo paso en Application 360 con CTA explícita `Cerrar vacante y notificar a N personas`,
+  estados stale/partial y evidencia desktop/mobile planificada.
+- El ADR Proposed conserva `TASK-1689` como pipeline individual, prohíbe batch SQL/email directo y sólo permite
+  afirmar Banco de Talentos cuando el consentimiento futuro está vigente. `data_origin` no gatea comunicaciones.
+- Estado: documentación/diseño; no hay migraciones, código, flags ni emails nuevos activos.
+
+## 2026-08-21 — Hiring incorpora un plan gobernado para crear la cuenta Microsoft del nuevo colaborador
+
+- `TASK-1761`, anclada a `EPIC-011`, separa la cuenta Entra deshabilitada, su binding OID, la habilitación laboral
+  y el readiness M365; no trata selección, handoff ni `member.created` como permiso suficiente.
+- El ADR Proposed elige API-driven inbound provisioning con app dedicada, matching por ancla longitudinal y
+  reconciliación de logs; rechaza `POST /users`, email/UPN como identidad y grupo/licencia antes del OID binding.
+- Quedan documentados dos blockers P0 previos al canary: `accountEnabled=false` no puede apagar el principal `/my`
+  y el roundtrip SCIM debe actualizar la misma persona sin crear otro principal/member.
+- Azure no se modificó. El snapshot read-only no muestra capacidad libre de Microsoft 365 ni grupo de
+  licenciamiento válido; ADR, licencia, app/consent, security group y canary siguen pendientes.
+
+## 2026-08-21 — La revisión de confiabilidad pasa de reportar síntomas a medir causas
+
+- `EPIC-041` reemplaza a `TASK-1432` y `TASK-1710`, dos umbrellas P0 que describían el mismo incidente con un mes
+  de diferencia, sin referenciarse y sin una sola task hija; el epic conserva un baseline de 16 hallazgos medidos
+  contra PostgreSQL y fechados, con la instrucción explícita de re-medir antes de actuar.
+- Siete hallazgos previos quedan reclasificados como mal calibrados o falsos positivos: los "4 leads de Growth" son
+  correos de prueba con runs no releasables, la "retención en drift" es un documento anulado que el reader no
+  filtra, el "rate MXN/CLP faltante" es una señal insatisfacible por diseño USD-pivot, y los "79,6 días" de
+  writeback son la edad del ítem atascado, no la frescura del tablero.
+- El bridge income→HubSpot se degrada de P0 a P3: su endpoint receptor `/invoices` nunca se escribió y 80 de 84
+  incomes vienen de Nubox, que estructuralmente no traerá anchors. Las cotizaciones sí llegan al CRM.
+- `TASK-1760` documenta que PPM y retenciones no se recalculan desde el 2026-06-20 porque **nunca se cableó un
+  disparador** — el IVA sí tiene projection reactiva y por eso está al día —, y que su señal de drift es ciega a un
+  período ausente porque parte desde las posiciones existentes.
+- Queda registrado que sacar `skipped` de `isSuccessOutcome` no habría corregido los 9.001 falsos éxitos, que los
+  produce `no-op`, y que la state machine de `handler_health` no tiene ningún test que la cubra.
+
+## 2026-08-21 — GPT Image 2 gana transparencia end-to-end en código, con rollout aún gated
+
+- La nueva matriz oficial cubre GPT Image 2/1.5/1/1 Mini/`chatgpt-image-latest`, endpoints, tamaños flexibles,
+  edición/máscaras, streaming, precios, datos, provenance, deprecaciones y contradicciones entre páginas oficiales.
+- Se elimina el fallback falso Greenhouse GPT Image 2→1.5; el helper valida transparencia/formato, máscaras,
+  singularidad de salida y streaming no implementado antes de llamar al proveedor.
+- Globe incorpora `backgroundMode` de forma provider-neutral en shape, catálogo, request, fingerprint, manifest y
+  output; el driver comprueba alfa real y el Producer deriva selector/checkerboard desde constraints.
+- `greenhouse-ai-image-generator` y `greenhouse-globe-model-fleet` quedan alineadas entre Codex y Claude; el gate de
+  mirrors incorpora por primera vez el bundle completo de generación de imágenes, incluido `agents/openai.yaml`.
+- La ficha GPT Image 2 separa código local verificado de reader/canary históricos. La variante sigue gated hasta
+  deploy, canary billable, readback, GVC, promoción y rollback; WebP no se anuncia en la ruta PNG vigente.
+
+## 2026-08-20 — El gate de rutas de skills queda sin enlaces rotos
+
+- `validate-skill-routes --all` ahora reconoce las referencias canónicas de una misma skill alojadas en el runtime
+  hermano del repo, sin permitir que una instalación global o externa oculte archivos faltantes.
+- `resend-email-platform` incorpora sus tres referencias prometidas —dominios/tracking, webhooks/eventos y
+  envío/límites— en espejos byte-identical para Codex y Claude, verificadas contra fuentes oficiales actuales.
+- La guía de Resend separa el contrato documental vigente de la evidencia runtime que lo contradice: links con
+  secreto siguen fail-closed y requieren `click_tracking=false` más un canary del href recibido.
+
+## 2026-08-20 — Skill compartida para diseñar y operar dashboards en Google Data Studio
+
+- La nueva skill `google-data-studio` queda invocable por Codex y Claude con bundles byte-identical y aliases para
+  el nombre histórico Looker Studio; separa el producto de Looker/LookML y consulta fuentes oficiales fechadas.
+- Cubre selección de gráficos, modelado, calculated fields, filtros, controles, parámetros, blends, responsive,
+  rendimiento, credenciales, sharing y embedding mediante referencias load-on-demand.
+- Su ejecución browser parte en `inspect`, distingue Browser/Playwright, Computer Use y Webwright, exige cambios
+  atómicos por el autosave y protege OAuth, credenciales, fuentes reutilizables, sharing y costos con gates explícitos.
+- La auditoría adversarial amplía el contrato con onboarding de Sheets/BigQuery, row-level security por email,
+  lifecycle `refresh fields|reconnect`, copias/rollback, draft/published, extracts, freshness, delivery/alertas, APIs
+  limitadas y una escalera de troubleshooting; también refuerza sesión autorizada y minimización de evidencia en
+  ambos runtimes.
+- El aprendizaje de operación con Search Console queda generalizado: polaridad inversa de Average Position,
+  protección contra ejes globales en combos, rangos parciales visibles, cohortes `new|rewrite`, fórmulas ponderadas y
+  una narrativa cliente que separa resultado observado, inferencia e impacto de negocio demostrado.
+
+## 2026-08-20 — La tabla accesible del scorecard deja de inflar la página
+
+- La tabla `sr-only` de Hiring > Evaluación aplicaba su caja de 1 px directamente sobre `<table>`;
+  el layout tabular envolvía texto carácter por carácter y extendía el documento varios miles de píxeles.
+- El fallback se conserva dentro de un wrapper genérico 1×1 clipado y gana semántica completa:
+  `caption`, encabezados con `scope`, competencia, objetivo, puntaje y estado.
+- GVC ya no ignora ese nodo y reporta `layout_out_of_flow_vertical_runaway` cuando un elemento
+  `absolute|fixed` vuelve a extender anormalmente el layout vertical.
+
+## 2026-08-19 — El lifecycle de correo quedó operativo, y la documentación decía que nada estaba aplicado
+
+- **La doc mentía en la dirección peligrosa.** Runbook, arquitectura de webhooks, ledger de flags e
+  `ISSUE-160` afirmaban "ninguna migración, ningún secreto, ningún webhook" cuando todo llevaba
+  horas aplicado. Seguir el runbook al pie habría creado un segundo webhook al mismo endpoint
+  —eventos duplicados que el dedupe por `svix-id` no detiene, porque son ids distintos— y una
+  segunda versión del secreto, rompiendo la verificación del webhook vivo.
+- **44 correos nunca llegaron** (23 `suppressed`, 21 `bounced`) — y todos van a dominios internos
+  de Efeonce. Cero externos: los 8 `hiring_assessment_assigned` fallidos son direcciones de
+  prueba/QA, no candidatas. El daño temido no ocurrió. `sent` nunca significó entregado, y ahora se
+  puede demostrar cuáles no lo fueron y a quién. Lo que sí queda a la vista es data sintética
+  circulando por el pipeline de correo productivo.
+- **Faltaba suscribir `email.suppressed`.** El bloqueo de reenvío consulta ese estado para no
+  mandar a ciegas a una dirección suprimida — y ese evento nunca iba a llegar. Falso negativo
+  silencioso en la puerta de recuperación.
+- **Los writers de credenciales corrían sin su backstop.** El índice único token-intent, que el
+  runbook exige aplicar ANTES de desplegar esos writers, no existía. Aplicado, junto al CONTRACT
+  de credencial, verificando una por una sus tres precondiciones de despliegue.
+- **`mail.efeoncepro.com` está bien por nuestro lado y Resend aún no lo confirma.** DKIM publicado
+  con valor idéntico byte a byte. Aprendizaje: re-disparar la verificación resetea los registros ya
+  verificados a `pending` — se espera, no se reintenta.
+
 ## 2026-08-19 — El rollout de assessment iba a romper producción y a cortarle el test a los candidatos
 
 - **Una migración que no era aplicable en ningún orden.** El CHECK y el trigger de versión de
@@ -791,194 +977,3 @@ En el camino aparecieron dos defectos que ningún gate podía ver porque ninguno
 el informe anunciaba "Aún no hay una posición media para leer" con la posición impresa al lado, y el
 botón global de "volver arriba" no tenía nombre accesible en ninguna ruta del portal. Los dos
 salieron mirando las capturas, no leyendo los reportes.
-
-## 2026-08-12 — El contrato de contacto de Careers quedó cerrado de punta a punta
-
-Segundo release del día (`950f5bdb4`): el país de residencia pasó a ser requerido también en el
-parser (antes sólo la UI lo exigía), el formulario nativo lo muestra en «Tus datos» junto al correo
-—ya no relegado a una sección genérica— y el selector dejó de mostrar la primera opción como si
-estuviera elegida cuando no hay valor. El sexto y último correo del ciclo (seleccionado) se
-ejercitó en vivo, el scorecard visual formal quedó en PASS con capturas de escritorio y móvil, y la
-revisión de privacidad de los tres campos quedó documentada con dos recomendaciones no bloqueantes.
-De paso se cazó un flake real del CI (timer de verificación de email que dispara tras el teardown).
-
-## 2026-08-12 — Los emails de hiring y el contacto completo de Careers quedaron VIVOS en producción
-
-Rollout completo en una sesión: el flag de los 6 emails del ciclo de contratación quedó prendido en
-el ops-worker (con default durable en deploy.sh), un ejercicio E2E real con los commands canónicos
-recorrió postulación → preselección → evaluación → rechazo y los 5 correos salieron `sent` con
-asuntos personalizados (el aviso interno llegó a people@efeoncepro.com con teléfono, país y mensaje
-del candidato). El Growth Form de careers se republicó (v4) con el país de residencia para cerrar la
-paridad nativa, y el release `393144e9f` promovió todo a producción por el control plane (manifest
-`released`, watchdog ok, campo país verificado en vivo). Quedan como pendientes menores la revisión
-de Privacy, el flip del país a requerido-en-parser y el scorecard GVC formal.
-
-## 2026-08-12 — Archivo puntual de adjuntos Wherex
-
-- `wherex:radar` incorpora `--tender-id` + `--archive-originals <carpeta>`: guarda y analiza originales únicamente cuando Wherex emite una descarga nativa; el visor protegido queda explícitamente en `manual-save-required`, sin extraer enlaces firmados.
-- Para una sesión Chrome principal expresamente autorizada, el manual y ambas skills documentan el fallback visible: activar temporalmente **Descargar archivos PDF**, validar cada descarga individual y restaurar el visor cuando corresponda. Sika LIC-1120 quedó archivada en OneDrive; sus anexos contienen una discrepancia de plazo que exige aclaración antes de cotizar.
-
-## 2026-08-12 — El formulario de Careers ya no pierde el contacto del candidato (TASK-1688)
-
-Se cerró la pérdida silenciosa que descubrió la auditoría de postulaciones: teléfono y mensaje se
-validaban en el navegador pero el command los descartaba, y no existía país de residencia. Ahora el
-apply (estándar y Growth Form nativo, mismo parser/command) pide país de residencia autodeclarado
-(select textual del catálogo ISO — jamás deducido del prefijo telefónico), guarda el teléfono E.164
-opcional en el perfil del candidato con política anti-wipe y el mensaje como contexto de esa
-postulación. El reclutador lo lee en la Postulación 360; las postulaciones históricas muestran "No
-informado" sin inventar datos. ADR registrado, migración aditiva aplicada, país requerido primero
-en UI (expand/contract). Pendiente de rollout: ejercicio en staging + GVC, revisión de Privacy y el
-flip a requerido en parser.
-
-## 2026-08-12 — El proceso de contratación ahora avisa por correo en cada hito (TASK-1689)
-
-Greenhouse deja de estar mudo durante el hiring: al llegar una postulación, People recibe un aviso
-con los datos del postulante y el candidato un acuse de recibo; al asignarle un test le llega su
-link de acceso (con token re-emitido de forma canónica — nunca viaja por el outbox); al avanzar a
-una etapa candidate-facing (Preselección/Entrevista, nunca etapas internas) se le informa; y la
-decisión final llega como felicitación o como agradecimiento cuidado si no quedó. Todo corre como
-consumers reactivos en el ops-worker sobre la plataforma de email canónica, idempotente ante
-retries, con kill-switch por tipo (el de rechazo pausable aparte) y detrás de
-`HIRING_LIFECYCLE_EMAILS_ENABLED` default OFF. Code complete con suite completa verde; el flip
-espera deploy del worker, ejercicio en staging y revisión del copy por Talent.
-
-## 2026-08-12 — Sentry separa el ruido del bridge de Facebook de los errores reales de Careers
-
-El cliente de Sentry filtra exclusivamente la firma del bridge nativo que Facebook inyecta en
-Android cuando el objeto Java desaparece durante el ciclo de vida de su WebView: exige el mensaje,
-navegador y frame `app://` exactos. No toca Careers, Turnstile ni la captura de otros errores de
-Facebook/Android. La investigación comprobó que la página pública y el formulario nativo responden
-correctamente; el cambio llegó a producción por `d139726ff` y 8W no tuvo recurrencias posteriores al rollout.
-
-En el mismo cierre se recupera la gobernanza persistida de `/admin/globe/credits`: una migration
-añade el registry y el único grant que autoriza su contrato (`efeonce_admin`), eliminando el
-fallback que generaba `role_view_fallback_used` durante el refresh de claims. La migration quedó aplicada y
-el grant se verificó en Cloud SQL. También se corrigió el smoke de identidad: el `ops-worker` compartido
-consultaba el portal staging protegido por SSO (HTTP 302); al usar el portal público dos runs fueron 5/5 y
-la health fue `ready`. Los tickets remotos de Sentry quedan por marcar como resueltos cuando exista una
-sesión o token con escritura.
-
-## 2026-08-12 — El escáner de malware quedó vivo en producción, verificado de punta a punta
-
-Cierre de la historia que las dos entradas siguientes cuentan: el escáner de firmas
-está operativo en staging y en producción, y esta vez la verificación corrió donde
-tenía que correr. Tres capas independientes, todas desde el runtime real: el
-endpoint de diagnóstico acuñó la credencial y el servicio la aceptó ANTES de
-prender el flag; después del flip el mismo endpoint confirmó el flag horneado; y
-una postulación de prueba por el formulario público real atravesó el camino
-completo — escaneada por los dos motores, limpia y adjunta en 129 ms. La issue del
-doble incidente quedó resuelta y la task de provisión cerrada. Costo steady del
-servicio: ≈USD 19/mes. Recursos Humanos descarta la postulación de prueba desde el
-Hiring Desk.
-
-## 2026-08-11 — El flag del escáner falló dos veces en producción; causa raíz cerrada en código
-
-Corrección al estado que reporta la entrada siguiente: en producción el escáner de
-firmas quedó **apagado**. Prenderlo falló dos veces el mismo día bloqueando CVs de
-candidatos reales (recuperados todos, 5+1): primero porque el código estaba sólo en
-`develop` y producción sirve `main`; después —con el código ya promovido— porque
-producción resuelve credenciales GCP por service account key (postura transicional,
-TASK-800) y el camino de ID tokens del scanner no tenía esa rama: caía a un método
-que exige credenciales ambiente que Vercel no tiene, y fallaba en 21 ms. Staging
-nunca lo mostró porque usa la rama WIF, que sí existía.
-
-El fix agrega la rama de service account key al resolver canónico
-(`src/lib/google-credentials.ts`), con el plan de credencial exportado y testeado
-contra los shapes exactos de producción y staging, y nace el endpoint de diagnóstico
-`GET /api/internal/health/scanner-auth`: acuña el ID token en el runtime donde corre
-y opcionalmente golpea el `/scan` real, sin tocar el path de uploads. Es la
-verificación que faltó dos veces — probar con la identidad del operador no prueba
-nada sobre el runtime. Verificado con la credencial real de producción: token en
-120 ms y el Cloud Run lo aceptó. El flag se re-prende recién cuando el endpoint
-responda verde EN producción (ISSUE-150 tiene la secuencia exacta). Staging sigue
-operativo end-to-end.
-
-## 2026-08-11 — Escaneo de malware activo sobre los archivos que suben desde afuera
-
-El escáner de firmas dejó de ser código latente y quedó operativo en staging y en
-producción. Todo archivo que entra desde afuera pasa ahora por dos revisiones
-complementarias: la estructural, que mira los bytes reales y detecta un ejecutable
-renombrado a `.pdf`, y ClamAV, que reconoce firmas de malware dentro de archivos que
-sí son del tipo que dicen ser. El peor veredicto gana. No es una función de
-reclutamiento: cubre el CV público, los adjuntos de Growth Forms y los pliegos y
-entregables que se cargan a una propuesta.
-
-Se verificó con postulaciones reales por el formulario público, no con mocks: un PDF
-válido queda adjunto y un archivo de prueba EICAR queda en cuarentena, sin que la
-persona que lo subió reciba ninguna señal distinta — avisarle a un atacante que su
-archivo fue rechazado le diría qué probar después. Si el escáner no puede
-pronunciarse, el archivo también se bloquea: es deliberado, y por eso una mala
-configuración es más peligrosa que no tener antivirus.
-
-Corre en un único servicio Cloud Run cerrado por IAM, ≈USD 19/mes, con las firmas
-actualizándose solas dentro del contenedor. De paso quedó corregida en el flag ledger
-una calibración de costo que estaba desfasada 24×: Cloud Run no cuesta USD 7,32 cada
-30 días sino ≈USD 169.
-
-## 2026-08-11 — Distribución de vacantes en Facebook, trazable y reusable
-
-Se difundieron las vacantes públicas `EO-OPN-0061` (Content Creator) y `EO-OPN-0009`
-(Account Manager) en grupos de Facebook ya unidos y afines; la expansión dejó diez
-envíos adicionales por rol, con nueve visibles y uno a moderación en cada caso al
-momento de verificar. El registro operativo conserva copy, beneficios aprobados,
-destinos, evidencia de estado y la decisión explícita de continuar sin imágenes.
-Hiring Desk, el manual de Careers y las skills espejo ahora separan con claridad la
-publicación canónica del opening de su distribución externa: confirmación humana,
-sin grupos nuevos ni DMs no autorizados, y nunca reintentar un estado ambiguo sin
-verificar antes el texto exacto.
-
-## 2026-08-11 — Radar Wherex reutilizable y documentado
-
-La skill de licitaciones incorpora el companion `wherex-radar-chrome-playwright.md`, el manual comercial y la
-CLI `pnpm wherex:radar`. Su setup aislado guarda la cuenta sólo en `.auth/` con `0600` y Git ignore; el runner
-usa un perfil Chrome separado, revisa **Nueva** y **Editando**, lee fichas y adjuntos técnicos temporales, y deja
-un reporte local protegido. Su salida es read-only y evidence-first; participar, responder, cargar o firmar sigue
-bajo control humano explícito. El flujo documentado continúa con el archivo de originales en OneDrive y con la
-verificación/alta por MCP HubSpot de empresa, deal y asociación en dos confirmaciones; no se eluden visores
-protegidos ni se guardan URLs firmadas. El dictamen exige leer la descripción completa y el Centro de mensajes →
-Preguntas, porque ahí pueden estar el máximo de presupuesto, pago, alcance, inicio, facturación y exclusiones; si
-el reporte no contiene esas aclaraciones, se revisan en la UI autenticada antes de clasificar. La misma fuente ahora
-documenta el cierre de una postulación: precio desde cotización aprobada → condiciones/adjuntos → reconciliación
-en resumen → aceptación y envío únicamente con confirmación humana final.
-
-## 2026-08-11 — Oferta completa para Ajinomoto LIC-962
-
-Se redactó la propuesta técnica y económica para el programa influen-SER Team de Ajinomoto del Perú, con ledger
-trazable al brief y a las respuestas de Wherex, matriz de cumplimiento, límites de alcance y condiciones de
-facturación Chile–Perú. La oferta fija S/ 7.000 mensuales sin IGV peruano y S/ 84.000 referenciales para los 12
-meses de la ficha; no promete resultados de plataforma ni producción ilimitada. Se emitió la cotización XLSX y
-se compuso una presentación técnica de 11 láminas, validada por el composer. Ningún precio, adjunto, término o
-envío fue ingresado en Wherex. El blueprint interno conserva el gate de Finanzas por costo cargado/squad y la
-revisión tributaria previa a adjudicación.
-
-## 2026-08-10 — TASK-1685 cerrada: el portal cliente tiene un solo primitive de visibilidad
-
-El menú del portal cliente y la puerta de cada página dejaron de decidir por su cuenta. Existe un solo
-predicado —`acceso = interna ∨ (¬revocada ∧ (vistaBase ∨ móduloDeLaOrgLaDeclara))`— y lo consumen los
-cuatro caminos: page guard, lista base del menú, ⌘K y layouts de ruta. Antes el menú preguntaba por el
-ROL y la puerta por el MÓDULO contratado, y ninguna de las dos mitades podía observar a la otra:
-medidos contra PG, eran **36 enlaces que el menú ofrecía y la puerta negaba**, sobre los 8 usuarios
-cliente activos, incluidos los 3 reales de Sky Airlines. Hoy el menú muestra exactamente lo que se
-puede abrir. Un `user_view_overrides` con `override_type='revoke'` pasó de decorativo a cerrar la
-puerta de verdad.
-
-Cambio de acceso, no sólo de experiencia: cuatro rutas de detalle del portal (`/proyectos/[id]`,
-`/campanas/[campaignId]`, `/sprints/[id]`, `/notifications/preferences`) no tienen guard propio y su
-única puerta era un layout que gateaba por el carril de rol — un cliente cuyo rol concedía la vista
-pero cuya organización no tenía el módulo entraba al detalle por URL. Los cuatro pasan al guard
-canónico.
-
-Verificado contra PG antes y después: los 24 pares usuario×vista contratados quedaron intactos —ningún
-cliente perdió una superficie que su organización pagó— y los enlaces muertos bajaron de 36 a 0. Sin
-migraciones y sin feature flag: la tabla de overrides estaba vacía, así que el delta de acceso es cero.
-`role_view_assignments` deja de gobernar vistas `cliente.*` (para el portal interno sigue siendo el
-carril canónico) y un lint en `error` impide reintroducir la segunda fuente. Cierra `ISSUE-148`.
-
-## 2026-08-10 — Task planner: un resultado `legacy=1` deja de ser registrable
-
-Se corrigió TASK-1686 para preservar los cinco marcadores HTML `ZONE` del template y se endurecieron los
-planners `.codex` y `.claude`: antes de tocar registry/README o commitear, toda task nueva debe pasar
-`pnpm task:lint --task TASK-###` con `template=1 legacy=0 errors=0 warnings=0`. La salida `legacy=1`,
-aunque tenga cero errores, es un fallo bloqueante. La reparación también completó los contratos
-wireframe/flow/motion/readiness de TASK-1686; no cambió runtime, rutas, acceso ni la implementación de
-la task.

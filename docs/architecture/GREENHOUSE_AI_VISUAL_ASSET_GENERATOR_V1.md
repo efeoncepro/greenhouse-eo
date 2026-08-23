@@ -3,7 +3,7 @@
 > **Tipo de documento:** Spec de arquitectura
 > **Version:** 1.1
 > **Creado:** 2026-04-07 por Claude (TASK-278)
-> **Ultima actualizacion:** 2026-07-18
+> **Ultima actualizacion:** 2026-08-21
 > **Task:** TASK-278 — AI Visual Asset Generator
 
 ---
@@ -50,7 +50,7 @@ git add + commit → asset servido por Vercel CDN
 |-------|-------|--------|--------|-----|
 | Imágenes rasterizadas legacy | Imagen 4 | `imagen-4.0-generate-001` — **deprecated/bloqueado para trabajo nuevo** | PNG/WebP | Migrar a provider Gemini Image `generateContent`; no sustituir sólo el ID |
 | Imagenes rasterizadas opt-in | OpenAI GPT Image | `gpt-image-2` (configurable via `OPENAI_IMAGE_MODEL`) | PNG/WebP/JPEG | Assets de mayor fidelidad, composicion y adherencia a prompts |
-| Imagenes PNG transparentes | OpenAI GPT Image | `gpt-image-1.5` fallback automatico cuando `background='transparent'` | PNG transparente | Batches de assets recortables, stickers, overlays, iconografia raster |
+| Imagenes transparentes | OpenAI GPT Image | `gpt-image-2`, capacidad provider en preview | PNG/WebP con alfa | Helper/CLI locales conservan GPT Image 2 y rechazan JPEG; aceptar el asset exige QA de alfa |
 | Animaciones SVG | Gemini | Resuelto via `resolveNexaModel()` | SVG con CSS keyframes | Loading spinners, iconos animados, empty states, micro-interacciones |
 | Produccion still hibrida out-of-band | Fal Seedream 5 Lite/Pro + OpenAI GPT Image 2 | Slugs verificados en el catalogo Fal y adapter OpenAI server-only | PNG/JPEG de trabajo; export gobernado posterior | Campanas multi-formato: exploracion/materialidad en Seedream, estructura/reparacion/adaptacion en GPT |
 
@@ -100,6 +100,7 @@ import {
 } from '@/lib/ai/openai-image'
 
 // 1. Text-to-image directo via Image API.
+// El helper conserva la identidad GPT Image 2 y rechaza transparent + JPEG antes de red.
 await generateOpenAIImage({
   prompt: 'Clean app icon, transparent background, no text',
   format: 'png',
@@ -123,7 +124,10 @@ await runOpenAIImageTool({
 })
 ```
 
-Para batches grandes de PNG transparente, usar `generateOpenAIImage()` / `editOpenAIImage()` con `background: 'transparent'`. El helper detecta que `gpt-image-2` no soporta transparencia y usa automaticamente `gpt-image-1.5`, dejando `requestedModel` y `modelFallbackReason` en el resultado. Si un flujo prefiere fallar en vez de degradar modelo, pasar `transparentBackgroundStrategy: 'throw'`.
+OpenAI documenta PNG/WebP transparente nativo en `gpt-image-2` como preview. El helper preserva el modelo exacto,
+rechaza `transparent + jpeg` antes de red y no usa `gpt-image-1.5` como fallback. La aceptación del asset verifica
+el canal alfa desde bytes decodificados. Matriz completa:
+`creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`.
 
 ### `generateAnimation(prompt, options)`
 
@@ -213,7 +217,8 @@ Las animaciones SVG generadas por Gemini siguen estas reglas (enforced via syste
 - Auth: `requireAdminTenantContext` — solo efeonce_admin con route group admin
 - OpenAI API key se resuelve solo server-side via `OPENAI_API_KEY` o `OPENAI_API_KEY_SECRET_REF`; nunca se hardcodea en repo ni se expone al cliente
 - Provider OpenAI es opt-in via `GREENHOUSE_IMAGE_PROVIDER=openai-image` o `options.provider='openai-image'`; el default conserva Imagen para no romper flujos existentes
-- PNG transparente: `gpt-image-2` no soporta `background='transparent'`; el helper aplica fallback seguro a `gpt-image-1.5` por default y registra el motivo
+- Transparencia: el proveedor soporta `background='transparent'` en GPT Image 2 preview con PNG/WebP. El helper
+  local conserva GPT Image 2, rechaza JPEG antes de red y exige verificar alfa real antes de aceptar el asset.
 - Inputs de edicion/referencia se limitan a 10 imagenes y 50MB por archivo antes de llamar a OpenAI
 - Los assets generados son archivos estaticos commiteados al repo — no hay generacion en runtime para usuarios
 
@@ -257,10 +262,12 @@ Zero dependencias nuevas.
 - La skill no solo opera el provider: debe actuar como direccion de arte, con brief visual, composicion, materiales/acabados, iluminacion, paleta, iteracion single-change y rubric de QA profesional. Guia compartida: `docs/operations/GREENHOUSE_AI_IMAGE_GENERATION_AGENT_SKILL_V1.md`.
 - Entry point canonico para assets visuales generados por agentes: `src/lib/ai/image-generator.ts`.
 - `generateImage()` soporta providers `google-imagen` y `openai-image`; no llamar APIs de imagen desde scripts paralelos si el helper cubre el caso.
-- **CLI canonica de generacion `pnpm ai:image` (gpt-image-2, desde 2026-06-10):** wrapper operativo del fn canonico `generateOpenAIImage` (`src/lib/ai/openai-image.ts`) para generar imagenes desde la terminal — conceptos del `product-design-loop`, fixtures de mockup, batches de iconos/assets. **NO crear scripts de generacion ad-hoc** (`scripts/_gen-*.ts`): usar esta CLI. Self-contained (carga `.env.local` solo; resuelve `OPENAI_API_KEY_SECRET_REF` server-side, nunca imprime el secreto). Default `gpt-image-2 · 1536x1024 · quality high · opaque · out-dir public/images/generated`. Timeout default **280s** (gpt-image-2 `high` supera los 125s del helper runtime `generateImage`, que NO pasa-through `timeoutMs` — por eso la CLI usa el fn de bajo nivel). Uso: `pnpm ai:image --prompt "<texto>" [--out <path>] [--size 1024x1024|1536x1024|1024x1536|2048x...] [--quality low|medium|high|auto] [--background opaque|transparent] [--model gpt-image-2] [--count N] [--timeout ms] [--open]`; `--prompt-file <path>` (prompts largos); `--batch <json>` (`[{ filename, prompt }, …]`, varios). `--background transparent` cae a `gpt-image-1.5` (gpt-image-2 no soporta alpha). **Sigue siendo raster** (PNG/WebP) — para vectores reales, Higgsfield + Recraft V4.1 (abajo). Para assets repo-bound que el runtime sirve, preferir el helper `generateImage()`; la CLI es para generacion operada por agente/operador. **Direccion de arte = invocar la skill `greenhouse-ai-image-generator`** (la CLI opera el modelo; la skill aporta brief/composicion/QA).
+- **CLI canonica de generacion `pnpm ai:image` (gpt-image-2, desde 2026-06-10):** wrapper operativo del fn canonico `generateOpenAIImage` (`src/lib/ai/openai-image.ts`) para generar imagenes desde la terminal — conceptos del `product-design-loop`, fixtures de mockup, batches de iconos/assets. **NO crear scripts de generacion ad-hoc** (`scripts/_gen-*.ts`): usar esta CLI. Self-contained (carga `.env.local` solo; resuelve `OPENAI_API_KEY_SECRET_REF` server-side, nunca imprime el secreto). Default `gpt-image-2 · 1536x1024 · quality high · opaque · out-dir public/images/generated`. Timeout default **280s** (gpt-image-2 `high` supera los 125s del helper runtime `generateImage`, que NO pasa-through `timeoutMs` — por eso la CLI usa el fn de bajo nivel). Uso: `pnpm ai:image --prompt "<texto>" [--out <path>] [--size 1024x1024|1536x1024|1024x1536|2048x...] [--quality low|medium|high|auto] [--background opaque|transparent] [--model gpt-image-2] [--count N] [--timeout ms] [--open]`; `--prompt-file <path>` (prompts largos); `--batch <json>` (`[{ filename, prompt }, …]`, varios). La CLI preserva GPT Image 2 para transparencia, rechaza JPEG y no degrada a 1.5. **Sigue siendo raster** (PNG/WebP) — para vectores reales, Higgsfield + Recraft V4.1 (abajo). Para assets repo-bound que el runtime sirve, preferir el helper `generateImage()`; la CLI es para generacion operada por agente/operador. **Direccion de arte = invocar la skill `greenhouse-ai-image-generator`** (la CLI opera el modelo; la skill aporta brief/composicion/QA).
 - `GREENHOUSE_IMAGE_PROVIDER` controla el default runtime, pero cada llamada puede pasar `provider`.
 - OpenAI usa `src/lib/ai/openai-image.ts` y resuelve la key solo server-side con `OPENAI_API_KEY` / `OPENAI_API_KEY_SECRET_REF`; el secreto canonico es `greenhouse-openai-api-key` en GCP Secret Manager. Nunca hardcodear `sk-*` en repo, Vercel env directo, logs, tests ni docs.
-- Para PNG transparente, pedir `format: 'png'` + `background: 'transparent'`; `gpt-image-2` no soporta transparencia y el helper aplica fallback seguro a `gpt-image-1.5`, dejando `requestedModel` y `modelFallbackReason`.
+- Para transparencia del proveedor, pedir GPT Image 2 con `format: 'png' | 'webp'` y
+  `background: 'transparent'`; el helper transporta ese contrato sin degradar a un modelo deprecated. La
+  aceptación exige canal alfa y al menos un píxel no opaco.
 - Modos OpenAI disponibles: `generateOpenAIImage()` para text-to-image, `editOpenAIImage()` para imagenes de referencia/mascara, y `runOpenAIImageTool()` para Responses API multi-turn con `image_generation`.
 - **`gpt-image-*` es RASTER** (PNG/WebP/JPEG) — **NO genera SVG**. Si se necesita vector, vectorizar el raster como paso aparte (no hay helper canonico de vectorizacion hoy) o aceptar un SVG real via upload (el uploader hoy acepta PNG/JPG/WebP, no SVG).
 - **Vectores para implementacion de UI vía Higgsfield CLI + Recraft V4.1 (desde 2026-06-09):** la CLI `higgsfield` (binario en `~/.local/bin`, alias `hf`, cuenta `mkt@efeoncepro.com` plan Ultra, autenticada via `higgsfield auth login`) + el MCP Higgsfield exponen **Recraft V4.1** (`job_set_type: recraft_v4_1`) con `--model_type vector` → **salida vectorial real**, justo el hueco que `gpt-image` (raster-only) deja abierto. Es la herramienta para **producir assets vectoriales de UI/marca** (iconos, logos, ilustraciones de design-system, empty states) con **paleta controlada** (`--colors`, p.ej. pinear tonos AXIS) + `--background_color`, `--aspect_ratio`, `--resolution {1k,2k}`. Comando canonico: `higgsfield generate create recraft_v4_1 --prompt "…" --model_type vector --aspect_ratio 1:1 --resolution 2k --wait`. **Caveats duros:** (1) Higgsfield es **producción de assets out-of-band** (se generan acá y se SUBEN al portal vía el uploader canonico), **NO** el path runtime — el entrypoint runtime canonico sigue siendo `src/lib/ai/image-generator.ts` (OpenAI/Imagen); NUNCA cablear Higgsfield a un flujo runtime del producto. (2) Las skills (`higgsfield-generate`, `-product-photoshoot`, `-soul-id`, `-marketplace-cards`) aportan el craft (modelo correcto por tarea, modos, art direction); usarlas. (3) Verificar el **formato del archivo entregado (SVG)** en el primer uso real antes de asumirlo. (4) Aplica el contrato visual Greenhouse igual (tokens AXIS, no inventar hex) + revisar el asset producido con las skills de diseño antes de integrarlo.

@@ -2,6 +2,532 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-22 — TASK-1748: archivar dejó de fingir cierres, y el orden de sus slices no era preferencia
+
+Estado correcto: **`code complete, rollout pendiente`**. Slices 1 y 2 en `develop` local, sin push:
+`1d0b4e32a`, `b0415ef50`, `5fd8e5245`, `afed7098f`. `pnpm test` completo → **11.960 verdes**; `pnpm lint` y
+`pnpm typecheck` → 0 errores; `pnpm build` **no** se corrió (pendiente de autorización del operador, ~30 GB).
+
+**Lo que cambió.** `archiveSyntheticRecords` archivaba escribiendo `stage='closed'`, y ese `UPDATE` es el origen
+de las 32 filas `closed` sin desenlace que ensuciaron el diagnóstico de la auditoría del vocabulario. Ahora
+escribe `archived_at` —eje propio— y cubre las tres entidades sobre allowlist explícita. El Banco de Talento
+filtra por procedencia, con el predicado viajando por JOIN a `identity_profiles` porque `candidate_facet` no
+tiene `data_origin` propio.
+
+**El hallazgo que reordena el trabajo, y la spec decía lo contrario.** El `Slice 1` y el `Slice 2` **no son
+independientes**. La migración del Slice 2 devuelve las 32 filas fuera de `closed`; el predicado
+`stage NOT IN ('rejected','withdrawn','closed')` de `talent-pool/projection.ts` pasa entonces a dar
+`has_active_application = true` para sus 11 fichas, la projection las reclasifica a `active_process` —que sí es
+servible— y esa projection corre **cada 5 minutos** por Cloud Scheduler. Sin el filtro desplegado arriba, la
+migración **causa** el defecto que la task vino a cerrar. Por eso quedó parqueada en
+`docs/tasks/pending-migrations/` con condición de **código desplegado en los dos runtimes** (Vercel para los
+readers, `ops-worker` para la projection), no de datos.
+
+**Dos reglas nuevas que valen fuera de esta task:**
+
+- **Se filtran los caminos que CREAN; el que CORRIGE converge.** La primera versión excluía las membresías
+  sintéticas del `UPDATE` de ciclo de vida, y eso no las excluía: las **congelaba**. Una congelada en
+  `pool_eligible` habría quedado visible para siempre sin que ninguna corrida pudiera sacarla.
+- **Un filtro nuevo puede sacar de su steady a una señal que no tocaste.** `hiring.talent_pool.integrity` cuenta
+  fichas activas «aún no proyectadas»; desde que la projection no proyecta sintéticos a propósito, esa premisa
+  es falsa y la señal habría quedado en `warning` permanente — una alarma que no puede volver a cero entrena a
+  ignorar el tablero.
+
+**Trampa cara, verificada en `src/lib/postgres/client.ts` junto con la sesión de TASK-1765/1754:** anidar
+`withGreenhousePostgresTransaction` **no aísla nada**. El helper llama `acquireGreenhouseTransactionClient()`
+incondicionalmente, así que la transacción de adentro toma otra conexión y hace su propio `COMMIT`; el
+`ROLLBACK` de afuera no la alcanza. Envolví un `reconcileTalentPoolProjection({apply:true})` creyendo que se
+revertía y **commiteó contra la base compartida**. Efecto medido: idéntico a un tick del cron (441 filas de
+evidencia borradas y reinsertadas iguales, 0 membresías creadas, 0 reclasificadas). Sin daño, verificado
+post-corrida.
+
+**Siguiente paso:** el release. Después, en este orden: aplicar la migración parqueada del cambio de eje →
+readback (`0` no-real en `closed`, invariante 33 → 1) → correr el archivado de 11 fichas + 14 vacantes por CLI →
+recién ahí el `CHECK` de `TASK-1765`. El `Slice 3` (lane B, borrado irreversible) tiene **doble bloqueo**:
+sign-off del operador y esa migración — hoy el plan reporta `deletable=0` porque las 32 siguen en `closed` y el
+lane exige `stage='sourced'`.
+
+**Deuda abierta que toca este dominio:** 12 live tests de hiring crean vacantes sin declarar `dataOrigin`, así
+que nacen `real` y publicables en la base compartida; `pnpm hiring:data-origin-gate` no las ve porque sólo barre
+`scripts/` y `tests/e2e/`. Dos perfiles de identidad sintéticos (`identity-live-test-hiring-fixture` y el smoke
+de TASK-354) siguen marcados `real` y esperan el marcado gobernado. Queda propuesto como trabajo aparte.
+
+## 2026-08-22 — TASK-1754 colapsa el eje de etapa: expand APLICADO en base, código NO en producción
+
+Estado correcto: **`code complete, rollout pendiente`**, y la asimetría importa. El expand de datos sí está
+aplicado contra la instancia compartida —que es producción—; el código no. La mitigación `4e1566d9a` sigue sin
+subir, así que **hoy en producción arrastrar a «Evaluación» todavía escribe `qualified` y sigue sin disparar**.
+
+Slices A–E en `develop` local, sin push: `a0cee45b0` (paridad estructural: `satisfies` contra el enum del
+dominio en los dos disparadores, `Record<HiringApplicationStage, string>` en el mapa de copy, muere el cast de
+`stage-comms/decide.ts`), `c27ad6432` (paridad enum ↔ `CHECK` derivada de los dos lados contra PG real),
+`a9926e981` (expand: `qualified` 7 → 0, `shortlisted` 4 → 11, total 83 sin cambio; `HIRING_PIPELINE_STAGES`
+pierde los dos literales **antes** que el `CHECK`), `f5ca4b4f9` (`en-US` redefine `stages`; heredaba castellano
+por spread sin línea que mirar en ningún diff), `1047f5ee6` (el carril declara UNA etapa; lo que agrupa se
+separó en `absorbs`), `b2fbabd80` (el tablero renderizado con cada diccionario).
+
+**Riesgo residual y siguiente paso operativo: hay 7 postulaciones REALES esperando decisión de asignación.** La
+migración por SQL no emite `stage_changed`, así que no recibieron correo ni prueba — pero sí aparecen en la cola
+de reconciliación de su vacante, que deriva del estado vigente y no del evento. Están en dos vacantes: 4 bajo
+policy `enabled/manual` y 3 bajo `enabled/on_stage_entry`. **Avisarle a Talento.**
+
+**El Slice F (contract) queda bloqueado por dos condiciones independientes**, y confundirlas es cómo se rompió
+producción esta mañana: el release que retira los escritores tiene que estar en producción, y `TASK-1765` tiene
+que estar verificada ahí antes de tocar los cuatro espejos terminales. Antes de ejecutarlo, avisarle a
+`TASK-1718`: su lane programático acepta `stage` como string libre sin `assertEnum`, así que un filtro por un
+literal retirado pasará a devolver cero en silencio.
+
+**Hallazgo entregado a `TASK-1765`, no cerrado acá:** el trigger
+`refresh_assessment_access_recovery_retention_for_application` ramifica por `stage` y por `decision`, y sus ramas
+de `decision` **no cubren `backup_selected`, `not_selected` ni `unresponsive`**. La rama `ELSE` deja
+`retention_expires_at` en `NULL` — sin vencimiento en absoluto — y `not_selected` es la población más grande del
+eje de desenlace. Hoy no muerde porque la tabla está vacía. Registrado en el §17 del ADR del vocabulario.
+
+`pnpm build` NO se ejecutó: el operador respondió «no, salvo que lo autorices después» — postergado por costo
+de máquina, con la puerta abierta, **no** delegado al release; `pnpm test` completo 11.962 verdes, `pnpm lint` 0
+errores, `pnpm typecheck` limpio, GVC del tablero en desktop y 390 px mirado.
+
+## 2026-08-22 — Demo 35 queda estudiada y registrada; WordPress sigue intacto
+
+Inspección read-only de `Demo 35: Blog Magazine` (`page_id=225984`) para su posible adaptación como home del
+blog. El baseline vigente es 7 raíces, 113 nodos, 55 containers, 58 widgets y 15 `ohio_recent_posts`; catorce
+usan IDs fijos, cinco referencias son attachments, cuatro widgets ya renderizan vacíos y dos pierden un slot.
+La causa de que el layout parezca romperse al retirar Ohio es el wiring de contenido, no los containers.
+
+Contrato operativo nuevo:
+`docs/audits/public-site/2026-08-22-demo35-elementor-runtime-contract.md`. La landing quedó registrada en las
+skills espejadas `efeonce-public-site-wordpress`. Regla principal: conservarla como página Elementor normal,
+mantener `page_for_posts=0`, adaptar primero una copia/draft y preservar árbol, settings Elementor y metas Ohio;
+el futuro corte debe mantener una sola canónica `/blog/`. Dueño arquitectónico existente: Public Website Landing
+Control Plane. No se modificaron páginas, posts, opciones, formularios, caché ni archivos de Kinsta.
+
+## 2026-08-22 — El vocabulario de etapas de Hiring tiene su primer ADR; auditoría de 30 hallazgos verificada adversarialmente
+
+Sesión de diagnóstico y decisión, **cero código**. Partió de un síntoma acotado —la automatización de assessment no
+disparaba— y terminó en el primer ADR que el vocabulario del pipeline tiene: nació el 2026-07-07 con `TASK-353` **sin
+decisión registrada** (su spec no menciona la palabra `stage` ni una vez) y ninguna fila del índice de decisiones lo
+justificaba.
+
+**Arqueología del defecto.** Reconstruida del log append-only `hiring.application.stage_changed` (222.801 eventos) y
+del historial de `git`: el carril «Evaluación» nació el 2026-07-09 (`559f5654b`) tomando su nombre de `shortlisted` y
+escribiendo `qualified` — el defecto está en la **primera versión** del archivo, y el wireframe de `TASK-355` afirmaba
+`columnas = etapas canónicas` cuando eran 6 contra 13. Sobrevivió seis semanas porque nada automático miraba la etapa;
+se volvió caro el 2026-08-17, cuando la doctrina de selección —correcta— movió el disparador desde `interview`, la
+única alcanzable, hacia la que nunca lo fue. **Ningún operador escribió jamás `shortlisted`**: de las 27 escrituras
+históricas, 21 entraron por el INSERT (que no emite `stage_changed`) y ninguna es humana.
+
+**El ADR fija dos ejes.** `stage` = dónde va la persona en el recorrido (6 valores, uno por columna; `closed` **se
+queda y es escribible**, porque una columna terminal que no recibe tarjetas no es un kanban). **Desenlace** = cómo
+terminó (`selected`, `backup_selected`, `not_selected`, `rejected`, `withdrawn`, `unresponsive`) + causa gobernada
+obligatoria en `not_selected`. El invariante `stage='closed'` ⟺ desenlace declarado, como `CHECK` de base, vuelve
+**irrepresentables** los dos P0 de la auditoría en vez de parchearlos. Decisión del operador: el desenlace describe a
+la persona, **nunca el estado de la vacante** — cupo lleno o búsqueda cerrada son *causa* de «Sin selección», no
+etiqueta. Enmienda `GREENHOUSE_HIRING_OPENING_CAPACITY_CLOSURE_DECISION_V1` (corregido en sitio, sigue `Proposed`).
+
+**La auditoría se equivocó cinco veces y está declarado.** 6 barridos automatizados levantaron 22 hallazgos; 5
+verificadores adversariales después, ninguna conclusión estructural cayó pero **5 afirmaciones estaban
+sobredimensionadas y 2 evidencias declaradas eran falsas** — dos de ellas propias. H-03 y H-04 bajaron de P0; el
+veredicto de Full API Parity se reformuló (cumple la letra del ADR por su cláusula de deuda; incumple el patrón
+canónico §2, que no tiene escape, y el modelo correcto ya existe en el mismo dominio: `HiringHandoff`). El banner del
+encabezado declara **cuatro modos de fallo** para quien audite después; el cuarto —*verificar el contenido de la tabla
+cuando lo que gobierna es el código desplegado*— salió de **ejecutar** la auditoría, no de escribirla, y produjo un
+break real de producción reparado en minutos (regla dura nueva en `GREENHOUSE_DATABASE_TOOLING_V1.md`).
+
+**Carril abierto:** `TASK-1765`…`TASK-1771` (`EPIC-011`), con 12 tasks vivas alineadas — 5 con el cuerpo reescrito
+porque su contrato contradecía el ADR (el Slice 2 de `TASK-1748` escribía `stage='closed'` al archivar, que es justo
+lo prohibido; `TASK-1763` mostraba «N personas serán rechazadas» en pantalla) y 7 con Delta de coordinación. Dos
+superficies no generaron ID y entraron como Delta a su dueño. Decisiones del operador registradas: el correo al
+candidato conserva **«Preselección»** como divergencia deliberada; el identificador se queda en `shortlisted`; y en
+agendamiento de entrevistas **el calendario manda** — Greenhouse agenda pero no es su dueño.
+
+Siguiente paso: `TASK-1748` destraba el `CHECK` del invariante moviendo sus 32 filas; `TASK-1771` va **antes** del
+colapso de `TASK-1754`. Estado: **todo documental, sin push pendiente salvo los últimos commits**; ningún cambio de
+runtime salió de esta sesión.
+
+## 2026-08-22 (cierre) — TASK-1765: una regresión propia corregida antes del release
+
+Auditoría adversarial cruzada sobre el trabajo del día. **Un hallazgo real y mío, corregido:** el trigger de
+retención de recibos de recuperación de acceso (`TASK-1746`) decidía con listas de literales, y los dos
+desenlaces nuevos caían al `ELSE`, que pone **NULL** — el reloj de la Ley 21.719 no arrancaba nunca para
+`not_selected`, que es la población más grande. Familia del H-01, y el mismo patrón de denylist que esta task vino
+a borrar, sobreviviendo dentro de un trigger de PostgreSQL. Corregido con migración aplicada y verificada
+evaluando el `CASE` de la función instalada; `backup_selected` queda sin vencimiento **explícito** con dueño
+(`TASK-1744`, H-23) en vez de colarse por un `ELSE` mudo. **No bloquea el release: tiene que ir DENTRO de él**,
+porque la regresión se vuelve viva cuando el release habilite los desenlaces nuevos.
+
+**Dos hallazgos de la auditoría NO se sostuvieron al verificarlos** y quedaron documentados: el colapso de
+`DECISION_STAGE` no mete a nadie al Banco de Talento (el `CASE` tiene dos ramas que dan `pool_eligible`; el
+consentimiento decide, no `has_active_application`), y `withdrawn` no perdió su correo (ya era mudo por el
+early-return). Tres sí: retiré el guard `closed` que era inerte, endurecí el guard del mapa de correo para que
+itere el enum, y **honesté la doc funcional**, que afirmaba en presente un invariante todavía parqueado.
+
+**Deuda declarada con condición medible:** cuatro predicados de «proceso activo» preguntan por `stage` cuando el
+desenlace ya vive en `decision`. NO se cambian todavía: hoy darían 82 activas en vez de 50, porque las 32
+sintéticas archivadas volverían a contar. Sólo es seguro tras el backfill de `TASK-1748` y el `CHECK`.
+
+Estado: **code complete; tres migraciones parqueadas esperan el release** (contract del enum → backfill de 1748 →
+`CHECK` del invariante). Árbol e índice compartido limpios. Sin push.
+
+## 2026-08-22 — TASK-1765 parte el pipeline en dos ejes; cerrar es decidir. Contract del enum, POST-RELEASE
+
+El pipeline de Hiring pasa a modelar **etapa** (dónde va la persona) y **desenlace** (cómo terminó su proceso) como
+ejes ortogonales. Entran `not_selected` y `unresponsive`, nace `decision_cause` como enum gobernado obligatorio
+sólo en `not_selected`, y nace `archived_at` — el campo que `TASK-1748` necesitaba para dejar de archivar
+escribiendo `closed`. Cerrar deja de ser un cambio de etapa: la denylist del `PATCH` **se borró** y nace
+`HIRING_PIPELINE_STAGES`, que excluye `closed` por TIPO, así que un cierre por esa vía ni compila.
+
+Aplicado y verificado contra PG real: expand, command con causa en el mismo `UPDATE` (y en el replay: distinta
+causa ⇒ 409), colapso de `DECISION_STAGE` a `closed`, `PATCH` acotado, señal
+`hiring.application.closed_without_outcome` y las tres capas documentales. Dos regresiones se cerraron en el mismo
+cambio: el selector de correo era un ternario binario que le habría mandado un **correo de rechazo al primer
+`not_selected`**, y `STAGES_DOWNSTREAM_OF_TRIGGER` no listaba `closed`, así que la cola humana de triggers perdidos
+se habría vaciado en silencio (H-11).
+
+**Incidente y su lección, que vale más que la task.** El contract del enum (retirar `on_hold`) se aplicó y **rompió
+producción ~7 minutos**: hay UNA sola instancia de Cloud SQL, producción sirve `origin/main` —que todavía ofrece
+«Dejar en espera»— y la acción quedó en `23514`. Cero filas afectadas, reparado con forward fix permisivo. El
+readback previo era correcto pero sobre el eje equivocado: **«cero filas» no es «nadie lo escribe»**. La regla
+—*un contract de enum va DESPUÉS del release que retira el valor del código*— quedó en
+`GREENHOUSE_DATABASE_TOOLING_V1.md` y como enmienda al §14 del ADR. Segundo hallazgo: **no existe «migración
+escrita y sin aplicar» como estado seguro** — la del Slice 5 bloqueó la reparación urgente porque `migrate:up`
+corre todas las pendientes. Nace `docs/tasks/pending-migrations/`.
+
+Estado: **code complete parcial; dos migraciones POST-RELEASE pendientes**. (1) contract del enum, cuando `main` ya
+no ofrezca `on_hold`; (2) `CHECK` del invariante, cuando `TASK-1748` mueva sus 32 filas — readback esperado
+**33 → 0**, no 32 (la bicondicional se viola por los dos lados). `TASK-1748` quedó desbloqueada; `TASK-1744` pasa a
+depender de ella; el Slice F de `TASK-1754` sigue bloqueado. Siguiente paso: **`TASK-1748`**, y después el release
+que habilita las dos migraciones parqueadas. Sin push.
+
+## 2026-08-22 — TASK-1755 destraba el callejón del ledger de asignación; sin migración, verificado contra PG real
+
+Un intento manual de asignar prueba que terminaba en `blocked`/`held`/`stale` ocupaba la clave de idempotencia del
+ledger de forma permanente: corregir la causa real —habilitar la política (que es el estado en que NACE toda
+política), activar la plantilla, registrar el correo— no devolvía la capacidad de asignar, porque el `INSERT` hacía
+`DO NOTHING` y el replay repetía el resultado viejo. `confirmAssessmentAssignment` ahora pide el intento siguiente y
+`assignAssessmentFromPolicy` lo resuelve contra el ledger bajo el `FOR UPDATE` de la policy, dentro de la misma
+transacción que ya tiene bloqueada la propuesta.
+
+Tres respuestas del resolver, y la tercera es la que evita el daño caro: sin intento vigente o vigente recuperable ⇒
+`max + 1` (monotónico contra toda la historia, superseded incluida); **cualquier otro resultado vigente ⇒ su mismo
+número**, para que el `ON CONFLICT` colisione y la respuesta sea el replay — un casillero libre junto a un `assigned`
+vivo le crearía una segunda prueba al mismo candidato. Lo que define un intento nuevo es la **identidad de la
+propuesta**, no su digest: `templateStatus` no entra al material del digest, así que con "digest distinto" como
+criterio un `blocked: template_inactive` quedaría irrecuperable.
+
+Sin migración: `attempt_seq`, el `CHECK (origin = 'manual' OR attempt_seq = 1)` y los `GRANT` por columna ya
+existían. Ledger append-only: cero `DELETE`, cero `UPDATE` destructivo. Evidencia: 8/8 en el test de reproducción,
+472 verdes en `src/lib/hiring/assessment` y **3/3 del gate vivo contra PostgreSQL real** (policy `draft` bloquea →
+`markPolicyEnabled` → asigna en el intento 2, con las dos filas vigentes en la base), con teardown verificado sin
+residuo.
+
+Estado: **`code complete, rollout pendiente`**, no `complete`. Verificado, no supuesto:
+`git show origin/main:…/confirm-assignment.ts` no contiene el sentinel, o sea **el callejón sigue vivo en
+producción** — hoy confirmar con la política en `draft` todavía quema la llave de esa persona. La task se movió a
+`complete/` por error y se devolvió a `in-progress/`, quedando alineada con `TASK-1748`, `TASK-1754` y `TASK-1765`,
+que suben en el mismo release del dominio Hiring. Lo que falta es sólo el deploy: no hay flags, env vars, migración
+ni backfill que aplicar.
+
+**Sin backfill, decidido con el conteo real.** Las únicas 4 filas en callejón son del carril **automático**
+(`stage_auto` / `volume_cap`), sobre candidaturas `closed` con `data_origin='smoke_test'` —no son personas— y su
+clave manual está libre. Ese carril no puede reintentar por `attempt_seq` (lo prohíbe el `CHECK`) y su reversa
+declarada, `superseded_at` por reconciliación, no tiene write path: es el hueco de **`TASK-1771`**, que además
+hereda la restricción de orden respecto de `TASK-1754` que el Delta original le atribuía a esta task por error.
+
+Siguiente paso: que suba en el release del dominio Hiring y verificar el ciclo contra el deployment activo antes de
+mover la task a `complete/`. Nota para ese release: de las 7 postulaciones reales que esperan decisión de asignación
+de prueba, **las 4 manuales son exactamente la población que esta corrección desbloquea**.
+**`pnpm build` no se ejecutó, por decisión declarada:** el repo tiene
+hoy un error de tipos vivo de `TASK-1765` en `src/lib/hiring/store.ts` sobre el mismo checkout, así que el build
+fallaría por causa ajena, y el riesgo propio es bajo (server-only, sin JSX ni frontera cliente). Lo corre el release
+con el árbol limpio. `pnpm test` completo sí: **11.938 verdes, 0 fallos**.
+
+> **Corrección 2026-08-22 (sesión de auditoría):** el error de tipos citado arriba **ya no existe** — `pnpm typecheck`
+> pasa limpio sobre este árbol. O sea que el bloqueo declarado para saltarse el build se disolvió. Ojo con la
+> conclusión: **typecheck limpio no es build verde** (el build de producción además atrapa violaciones de frontera
+> server-only→cliente y dynamic imports rotos), así que el gate sigue pendiente — lo que cambió es que ya no hay
+> causa ajena que lo justifique.
+
+Riesgo residual conocido: el blast radius es alto porque es el único camino que crea pruebas de candidato, y la
+defensa contra la doble prueba es la rama 3 del resolver más el índice único parcial — ambas cubiertas por test
+unitario y por el gate vivo. Hallazgo colateral abierto: 12 live tests de hiring fabrican vacantes sin declarar
+procedencia, así que nacen `real` y publicables en la base compartida; el gate no las ve porque sólo barre
+`scripts/` y `tests/e2e/`. El fixture de esta task ya quedó corregido; los otros 12 y la extensión del gate quedan
+propuestos como trabajo aparte.
+
+## 2026-08-22 — El gate de `pnpm build` corrió y pasa: cierra el pendiente de TASK-1748/1754/1755
+
+El operador autorizó el build de producción, que las tres tasks de hiring de hoy declararon **NO ejecutado**
+(`TASK-1755` por un error de tipos ajeno que ya no existe; `TASK-1754` y `TASK-1748` por costo de máquina,
+con la puerta abierta a autorización posterior).
+
+**Resultado: verde.** `Compiled successfully in 27.8s`, exit 0, **0 errores**. Los 10 warnings del log son
+`npm warn Unknown env config` — ruido de `.npmrc`, ajeno al código. Corrido sobre `develop` ya sincronizado
+con `origin` (38 commits empujados, fast-forward, hook pre-push con lint + typecheck en verde).
+
+**Por qué importa que este gate corriera y no se delegara:** el build de producción es el único que atrapa
+violaciones de frontera `server-only`→cliente y dynamic imports rotos — clases de bug que `pnpm test` y
+`pnpm typecheck` no ven. Las tres tasks tocaron `src/lib/hiring/**` y una de ellas
+(`PipelineDeskView.tsx`, TASK-1754) tocó una superficie cliente.
+
+Con esto, **ninguna de las tres tiene gates mecánicos pendientes**. Lo que les falta es runtime, no
+verificación: las tres migraciones parqueadas en `docs/tasks/pending-migrations/` esperan el release, en el
+orden declarado en su README (contract del enum → backfill de 1748 → `CHECK` del invariante).
+
+## 2026-08-22 — EPIC-042/TASK-1764 gobiernan footers sin big bang; cero cambios de correo o runtime
+
+Se creó `EPIC-042`, su primera child `TASK-1764` y un ADR Proposed para dejar de improvisar footers sin poner en riesgo una de las
+superficies más estables del producto. Efeonce es siempre la masterbrand; Greenhouse sólo puede aparecer como su
+plataforma. Firma y footer quedan separados, prioridad de entrega no determina propósito y unsubscribe nace
+prohibido salvo suscripción opcional o marketing explícitamente clasificados.
+
+El contrato incluye además RRSS, dirección e información legal como bloques independientes: RRSS default `none`
+y sólo institucionales en suscripción/marketing; identidad `compact|entity|full` desde el operating entity; nota
+`none|security|privacy|regulated`, sin disclaimer universal. Full legal en marketing es baseline conservador sujeto
+a validación con abogado habilitado por jurisdicción, no una declaración de cumplimiento global.
+
+La task no posee código ni habilita un reemplazo global de `EmailLayout`. La primera child deberá introducir el
+contrato con output legacy byte-idéntico; las siguientes cubrirán una sola familia y máximo cuatro `EmailType`.
+Cada cohorte exige baseline, diff limitado al footer, previews 720/390 y sin imágenes, tests, aprobación explícita,
+canary consentido en cliente real y rollback por tipo. Access/security, Hiring externo y transaccionales regulados
+nunca comparten release. Estado: **diseño/documentación; ADR Proposed; ningún template, envío o runtime cambió**.
+Siguiente paso: revisar/aceptar el ADR y sólo entonces crear la child foundation dentro de `EPIC-042`; siguientes
+IDs libres `TASK-1772` y `EPIC-043` (actualizado 2026-08-22: `TASK-1765`…`TASK-1771` tomadas por el carril de desenlace).
+
+## 2026-08-21 — Correo de selección personalizado adopta una firma visual Efeonce; rollout pendiente
+
+`hiring_decision_selected` ahora separa asunto, preencabezado y título visible, confirma la elección sin declarar
+incorporación y explica `carta oferta → aceptación → contrato` con paridad HTML/texto plano. La primera propuesta
+3D, el bouquet genérico y la V3 corporativa abstracta quedaron rechazados. Diseño + Talent
+convergen en una V4 concreta: sobre abierto, tarjeta sin texto, check de confirmación y un destello naranja. No
+representa demografía, contrato ni onboarding, pesa 63.972 bytes y quedó en
+`gs://efeonce-group-greenhouse-public-media-prod/emails/hiring-selected-email-mail-icon-v4.png` con readback 200.
+
+Se retiró la tarjeta que repetía la vacante y la imagen permanece decorativa (`alt=""`). La decisión y los hitos
+documentales ahora guían la lectura con negritas visibles aplicadas a frases completas,
+y ambas variantes de decisión firman `Equipo de Talento · Efeonce`, alineadas con el Reply-To real. La variante de
+rechazo no consume la imagen. Capturas finales: `.captures/hiring-selected-email-hero/email-v6-720.png` y
+`.captures/hiring-selected-email-hero/email-v6-390.png`. Estado: **code complete, rollout pendiente**. No se envió ningún correo real ni se
+desplegó el cambio; el siguiente paso es incluirlo en un release normal y verificar un envío consentido en un
+cliente de correo real.
+
+## 2026-08-21 — TASK-1762/1763 formalizan cierre por cupos y correo empático; cero runtime nuevo
+
+Se crearon dos tasks bajo `EPIC-011` y un ADR Proposed. `TASK-1762` posee capacidad explícita separada de
+publicación, preview/confirm humano, run durable por item, decisión/evento canónicos y variantes de rechazo directo
+o vacante completada. `TASK-1763` es el consumer UI de Application 360 con dirección visual, wireframe y flow.
+
+La selección de una persona nunca auto-rechaza. Sólo un preview fresco y una confirmación explícita crean el run;
+el worker llama `decideHiringApplication` por cada application y el correo nace desde ese hecho, conservando dedupe
+y recovery parcial. `backup_selected`/`on_hold` se muestran aparte. La frase de Banco de Talentos sólo aparece con
+consentimiento futuro vigente; `data_origin` no gatea comunicaciones. TASK-1689 queda histórica y TASK-1721 ahora
+apunta a estos owners. Estado: **diseño/documentación; ADR Proposed; sin código, migración, flag ni envío nuevo**.
+Siguiente paso: aceptar/ajustar el ADR, tomar TASK-1762 y después TASK-1763.
+
+## 2026-08-21 — TASK-1761 formaliza Hiring → Microsoft Entra; implementación bloqueada por ADR y gates P0
+
+Se creó `TASK-1761` dentro de `EPIC-011` y el ADR Proposed
+`GREENHOUSE_HIRING_ENTRA_WORKFORCE_ACCOUNT_PROVISIONING_DECISION_V1.md`. La decisión propone API-driven inbound
+provisioning con app dedicada: cuenta disabled-first desde `principal_bound`, reconciliación de provisioning logs,
+OID binding al mismo principal antes del SCIM de retorno, y enable/grupo/licencia sólo después de
+`workforce_enabled`, approval y capacidad verificada. TASK-1721 observa checkpoints; 770/1731 mantienen sus
+owners; 872 conserva Entra → Greenhouse; 1349 entrega el hecho de baja y 1761 compensa en Microsoft.
+
+Dos gates P0 salieron de la revisión adversarial: `src/lib/entra/profile-sync.ts` hoy convierte
+`accountEnabled=false` en `client_users.active=false`, por lo que una precreación segura podría apagar `/my`; y
+meter la cuenta al grupo SCIM antes de ligar el OID puede crear otro principal/member. Ambos se convirtieron en
+precondiciones de canary con negative/roundtrip tests. Email/UPN no son anchor; `202` no es éxito; rollback exige
+disable/revoke/remove group-license y no sólo flag OFF.
+
+Azure CLI fue read-only. El tenant tiene Entra P1 consumido 1/1, Microsoft 365 Business Premium consumido 6/6,
+ningún grupo con licencias y `Efeonce Group` no es security-enabled. La identidad inbound puede diseñarse, pero
+M365 readiness queda bloqueada/unknown hasta readback comercial y de assignment. TAP también quedó unknown por
+403. Estado: **diseño formalizado; ADR Proposed; ningún código/runtime/Azure mutado**. Siguiente paso: aceptar o
+ajustar el ADR y luego tomar TASK-1761 con goal + task hook.
+
+## 2026-08-21 — Confiabilidad: hallazgos medidos contra runtime; dos umbrellas superseded por EPIC-041
+
+Codex venía reportando hace semanas dos hallazgos de confiabilidad (`wh-sub-notifications` con dead-letters `401` y
+dos handlers `contract_mrr_arr` fallidos). Al medirlos contra PostgreSQL el 2026-08-21 resultó que **son los dos
+menos urgentes**, que **siete hallazgos previos estaban mal calibrados o eran falsos positivos**, y que el problema
+más caro no aparecía en ningún reporte porque el módulo de confiabilidad lo muestra en verde.
+
+`TASK-1432` (2026-07-18) y `TASK-1710` (2026-08-15) describían el mismo incidente con un mes de diferencia, sin
+referenciarse, con cero commits y cero tasks hijas. Ambas quedan **superseded** por `EPIC-041`, que conserva el
+baseline medido y fechado, la tabla de falsos positivos y el orden de ejecución.
+
+Correcciones que importan para quien retome: el bridge income→HubSpot **nunca se terminó de construir** — su
+endpoint receptor `/invoices` no existe en ninguna rama y 80 de 84 incomes vienen de Nubox, que nunca traerá
+anchors; no hay `CLP 141.562.545` perdidos, hay ruido P3. La tasa PPM **es correcta** (`0,125%` confirmada por el
+operador); lo obsoleto es el campo `notes` de `ppm_rate_config`, que produjo una falsa alarma de P0. Las
+notificaciones **sí funcionan hoy** (7 días de actividad, 100% `sent`); los únicos avisos huérfanos son
+`member.created` y `compensation_version.created`, y el conteo dio 12 y **1** respectivamente, ambos sin eventos
+desde el 2026-06-26.
+
+Se descartó además un fix que parecía obvio: sacar `skipped` de `isSuccessOutcome` en `handler-health.ts` **no
+habría arreglado nada** — sólo 4 filas en toda la tabla empiezan con `skipped`, y los 9.001 falsos éxitos los
+produce `no-op`. Ese análisis también expuso que **no existe ni un test** de `recordHandlerOutcomes` ni de
+`classifyOutcome`, y que la llamada está envuelta en un `try/catch` que sólo hace `console.warn`.
+
+Estado: **documentación completa, ejecución no iniciada**. Ningún cambio de código, ninguna mutación de datos,
+ningún flag tocado. Siguiente paso: `TASK-1760` (cablear las projections de PPM y retenciones), único carril cuyo
+daño crece. Owner sin asignar.
+
+## 2026-08-21 — Transparencia GPT Image 2 code complete; rollout de Globe pendiente
+
+La documentación oficial completa de OpenAI quedó consolidada en
+`OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`: GPT Image 2 es el único miembro activo/recomendado y soporta
+`background=transparent` en preview con PNG/WebP. GPT Image 1.5, 1, 1 Mini y `chatgpt-image-latest` están deprecated
+con retiros en octubre/diciembre de 2026. Las skills `greenhouse-ai-image-generator` y
+`greenhouse-globe-model-fleet` quedaron corregidas y espejadas; el gate ahora valida también el bundle de imágenes.
+
+El helper Greenhouse ya conserva GPT Image 2, rechaza `transparent+jpeg`, evita pagar/descartar outputs múltiples,
+valida máscara/formato/dimensiones y no promete partial images sin transporte SSE. Globe transporta
+`backgroundMode` desde catálogo/shape hasta request, fingerprint, manifest y output; verifica alfa decodificado,
+expone el selector route-driven y usa checkerboard tokenizado. La ruta Globe queda probada localmente, sin deploy ni
+gasto desde ese runtime.
+
+El CLI canónico de Greenhouse completó además un canary facturable mínimo con `gpt-image-2`, PNG 1024×1024,
+`quality=low` y `background=transparent`: el archivo tiene cuatro canales, alfa real y 470.164 píxeles totalmente
+transparentes; la composición visual pasó sobre fondos claro y oscuro. Esta evidencia valida el helper Greenhouse,
+no el adapter/runtime autenticado de Globe.
+
+Estado: **code complete, rollout pendiente**. La variante transparente sigue Globe-gated hasta desplegar, ejecutar
+un canary autenticado y facturable sobre `ref/still/openai-v2`, leer bytes/metadata/cobro, capturar GVC y ejercer
+promoción/rollback. No actualizar evidencia de reader/canary histórico sin revalidación real. Pendientes adicionales
+quedan en `TASK-1552`, `TASK-1553` y `TASK-1633`: badge requested/effective en feed/viewer, GVC/canary live,
+promoción/rollback del modo preview y WebP sólo si se decide ampliar la ruta PNG actual.
+
+## 2026-08-20 — Hiring Evaluación: espacio vertical fantasma corregido localmente
+
+La tabla accesible del scorecard ya no recibe dimensiones de 1 px directamente: vive dentro de un
+wrapper genérico `1×1` clipado y conserva `caption`, encabezados `scope` y las cuatro columnas del
+contrato. GVC local premium pasó desktop 1440 y mobile 390 con cero findings/runtime errors; geometría
+medida: `scrollWidth === clientWidth`, wrapper `1×1`, `scrollHeight` 1549/2296. El scenario dejó de
+ignorar la tabla y el layout gate detecta `layout_out_of_flow_vertical_runaway`. Estado: **code complete,
+rollout pendiente**; no hubo push, deploy ni release en esta sesión.
+
+## 2026-08-19 (noche) — Release 1745/1746 en producción, y cuatro hallazgos que quedaron en tasks
+
+Sesión paralela a la de TASK-1747. Lo que sigue es lo que una sesión fresca necesita saber para no
+repetir trabajo ni reabrir decisiones ya tomadas.
+
+**El release está en producción y verificado.** `6f85644cd`, orchestrator run `32256882119` success,
+watchdog `drift_count=0`. El `ops-worker` muestra SHA distinto: es el change-gate, los árboles son
+idénticos, no es drift. Las dos migraciones están aplicadas con readback, el índice concurrente creado
+(`valid=true, ready=true`) y **20 bearers que estaban en claro en `delivery_payload` fueron saneados**.
+
+**El webhook de Resend funciona.** Nunca había existido — esa era la causa raíz de ISSUE-160. Probado
+con correo real: `email.sent` y `email.delivered` firmados en 45 s. Ya se puede responder "¿este correo
+llegó?" con `email_deliveries.provider_status` + `delivered_at`, que era imposible esta mañana.
+
+**Dos cosas que NO hay que deshacer.** El fix de Turnstile `ef30759a1` fue revertido en `a36967531`:
+el timeout de 15 s no se cancelaba al entrar el desafío interactivo, y el supuesto de dónde pinta
+Cloudflare quedó sin verificar. Y `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` sigue en `false`
+a propósito: hay `email.clicked` **firmados por webhook**, o sea el rewrite de links está ocurriendo
+hoy sobre correos de candidatos, y el bearer del cutover viaja en el fragmento.
+
+**Corrección de un error mío que quedó escrito antes:** dije que el tracking del apex "no medía nada"
+por faltarle `tracking_subdomain`. Es falso — ese campo es para un dominio de tracking propio, no un
+segundo candado. El flag solo basta. Corregido en la skill `resend-email-platform`, que además quedó
+espejada a `.codex` y protegida por el gate de espejos.
+
+**Cuatro tasks nuevas, todas con el análisis dentro:**
+- `TASK-1749` — tracking de marketing sobre dominio propio (bloqueada por el cutover)
+- `TASK-1750` — el desafío interactivo de Turnstile deja fuera a candidatos; su Slice 1 es **verificar
+  con la sitekey `3x00000000000000000000FF` antes de implementar**, que es lo que el intento revertido
+  se saltó
+- `TASK-1754` — las etapas del dominio son las que el operador puede elegir
+- Pendiente sin ID: invertir el default de la política de assessment + revisar plantilla por vacante
+
+**El hallazgo que más cuesta y por qué quedó como patrón.** `GREENHOUSE_CANONICAL_PATTERNS_V1.md` §9:
+*un estado que el sistema distingue, la superficie no puede colapsarlo*. Cinco casos del mismo día en
+cuatro dominios. El síntoma reconocible: **si responder "¿por qué no funcionó?" exige leer la base de
+datos para recuperar un dato que el runtime ya tenía, hubo colapso de estado.** Hoy pasó cinco veces y
+cada una costó horas.
+
+**Dominio `mail.efeoncepro.com`**: verificado, con SPF/DKIM/DMARC en PASS. Nace sin tracking y **nunca**
+debe configurársele un `tracking_subdomain` — es irreversible, sólo se cambia. Mover Hiring ahí es la
+salida limpia al problema del rewrite.
+
+**Estado del árbol:** producción corre `6f85644cd`; hay commits en `develop` sin push de las dos
+sesiones. No hay nada mío a medio camino.
+
+## 2026-08-19 (noche) — TASK-1747 en curso, traspasada para una sesión nueva
+
+Slices 1 y 2 cerrados; Slice 3 sin empezar. El estado completo para tomarla en frío está en
+**`docs/tasks/in-progress/TASK-1747-…md` §Traspaso 2026-08-19** — commits, qué se revirtió y por qué,
+los 8 hallazgos de auditoría abiertos y las 3 decisiones que no hay que re-litigar.
+
+**Lo que la auditoría adversarial cambió, y vale más que el código entregado.** El Slice 2 bajaba al
+navegador el consentimiento de la candidata y el estado del proveedor de correo, con **ningún**
+componente leyéndolos: las props de un Client Component se serializan en el HTML se lean o no. Ningún
+gate lo veía — GVC no captura lo que no se pinta y el build no lo mira. Se revirtió el cableado; viaja
+con el slice que lo renderiza.
+
+**Y destapó un bug real de `TASK-1746` que ya estaba en producción:** el cooldown de recuperación era
+cross-canal en la lectura y por-canal en el comando. Un correo recién enviado apagaba el enlace seguro
+durante 60 s — exactamente ocultarle al candidato la única salida que le quedaba, que es lo que el
+comentario de ese bloque juraba evitar diciéndose "espejo EXACTO". Corregido en `2e2d4de86` con
+cooldown por canal y 4 tests. Lo que lo mantuvo vivo: al fixture del test le faltaba un campo, así que
+`Number(undefined)` daba `NaN` y el presupuesto del enlace seguro nunca se ejercitaba.
+
+**El copy también salió corregido de auditoría**, con tres hallazgos que verifiqué contra el código
+antes de aceptarlos: los motivos borraban el "reports" del enum (nadie puede afirmar que un correo NO
+llegó, y eso quedaba escrito en un ledger append-only); "la candidatura ya está cerrada" se le habría
+mostrado a alguien con decisión `selected`; y el mensaje de vencimiento describía 1 de sus 3 ramas, así
+que en las otras dos el operador seguía la instrucción y volvía a chocar.
+
+**Estado: nada de esto está en producción.** `develop` tiene además Sonnet 5 de vuelta en el scoring y
+la reconciliación del item del run, ambos sin promover. La promoción exige verificar que el ops-worker
+quede en el SHA nuevo: el scoring corre ahí, no en Vercel.
+
+## 2026-08-19 (tarde) — El rollout ya estaba hecho y la documentación decía lo contrario
+
+**Corrección de estado.** Las entradas de más abajo dicen "nada aplicado: ninguna migración, ningún secreto, ningún
+webhook, ningún flag". Eso dejó de ser cierto a las 13:00 UTC de hoy y **nadie actualizó los documentos**. El peligro no
+era cosmético: un agente siguiendo el runbook al pie habría creado un **segundo webhook** al mismo endpoint (eventos
+duplicados que el dedupe por `svix-id` NO detiene, porque son ids distintos) y publicado una **segunda versión del
+secreto**, rompiendo la verificación del webhook vivo. Corregidos: runbook, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1`,
+ledger de flags, `ISSUE-160`, `TASK-1749` y este Handoff.
+
+**Lo que faltaba de verdad, ya aplicado con readback.** El índice único `uq_email_deliveries_token_intent_v2` (los
+writers que rotan credenciales llevaban horas corriendo **sin** el backstop que el runbook exigía aplicar antes) y el
+CONTRACT de credencial. Sus tres precondiciones se verificaron una por una antes de tocar nada: código en `origin/main`,
+Vercel productivo posterior al merge, y ops-worker en `1438906b8` — un SHA de `develop` que **sí** incluye el writer. La
+confirmación empírica fue mejor que el chequeo de SHA: un assessment creado después del deploy ya nació con
+`access_token_version_id`, y 0 filas violaban el invariante. El guard se probó en transacción revertida y rechaza como
+debe.
+
+**La reconciliación destapó 44 correos que nunca llegaron** — 23 `suppressed` y 21 `bounced` — y después, al mirar los
+destinatarios, que **todos van a dominios internos de Efeonce**: `efeoncepro.com` (23), `efeonce.org` (13),
+`greenhouse.efeonce.org` (7), `efeonce.test` (1). **Cero externos.** Los 8 `hiring_assessment_assigned` fallidos son
+direcciones de prueba/QA, no candidatas. O sea: **el daño temido no ocurrió** y no hay cola de rescate para People.
+Casi lo reporto al revés — el conteo agregado parecía un incidente grave hasta que se miró a quién le llegaba. Lo que el
+dato sí muestra es datos sintéticos y de prueba transitando el pipeline de correo productivo, la misma clase de
+problema que `ISSUE-159`.
+
+**`email.suppressed` no estaba suscrito.** Los 8 eventos registrados omitían justo el noveno — y `recover-email.ts`
+consulta ese estado para bloquear un reenvío ciego. Un falso negativo silencioso en la puerta de recuperación. Ya son 9.
+
+**El smoke externo real ya está probado por tráfico productivo:** la cadena `email.sent` → `email.delivered` se observó
+firmada sobre un `hiring_assessment_assigned` a `gmail.com` — un candidato real, no una casilla interna. Y el
+`email.clicked` firmado sobre un assessment a `hotmail.com` es la **prueba dura** de que el rewrite de links de Resend
+ya opera sobre correos de candidatos: el gate de `click_tracking` que bloquea el flip de enlaces seguros no es teórico.
+
+**Huecos declarados, no cerrados:** 78 despachos de los últimos 30 días quedan sin lifecycle porque su último evento es
+de engagement (`opened`/`clicked`) y el reconciliador prefiere no inferir `delivered` — honesto, pero descarta una señal
+que el `opened` implica; 283 despachos fuera de la ventana de 30 días sin reconciliar por diseño;
+`redrivePendingResendWebhookEvents` sigue sin caller automático; no se ejercitó un replay real del proveedor.
+
+**`mail.efeoncepro.com`: el DNS está perfecto, Resend no lo confirma.** DKIM publicado con valor idéntico byte a byte,
+SPF y MX en su lugar; el dominio sigue `pending`. Aprendizaje operativo: **re-disparar `POST /verify` resetea los tres
+registros a `pending`** — hay que esperar, no reintentar. Cuando verifique, mover el remitente de Hiring ahí desbloquea
+el flip de enlaces seguros **sin** apagar el `click_tracking` del apex, que marketing usa. Es la salida limpia al gate
+que hoy bloquea `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`.
+
+**Estado: TASK-1745 complete e ISSUE-160 resuelto. TASK-1746 sigue in-progress** — le faltan los dos smokes funcionales
+(requieren una candidata con consentimiento, decisión humana) y el flip de enlaces seguros. TASK-1747 quedó desbloqueada.
+
 ## 2026-08-19 — Seis auditorías pararon el rollout de assessment antes de romper producción
 
 El bloque TASK-1745/1746 estaba por promoverse. Tres auditores independientes (arquitectura,
@@ -52,546 +578,3 @@ ningún webhook, ningún flag movido. Orden en
 `docs/operations/runbooks/resend-email-lifecycle-rollout.md`, con dos scripts operacionales nuevos
 que se aplican DESPUÉS del deploy: el CONTRACT de credencial y el saneador de los bearers que
 quedaron en claro en `delivery_payload` desde el 12-ago.
-
-## 2026-08-19 — Hallazgos post-Codex sobre el bloque 1745/1746: guard corregido y ledger reconciliado
-
-Codex cerró el paquete de recuperación de acceso (`5d5eb2f9c` + `f4b5f622f`). Una revisión posterior
-encontró tres cosas que no estaban en su alcance; las dos primeras ya quedaron corregidas en `b2ff2b33e`.
-
-**El guard de la migration de TASK-1746 tenía un hueco.** No verificaba la tabla de buckets ni las cuatro
-funciones de acceso público, que su propio Down sí dropea. La regla generalizada quedó en
-`GREENHOUSE_DATABASE_TOOLING_V1.md` §"El guard anti pre-up-marker debe ser simétrico con el Down". Como la
-migration **todavía no se aplica**, se corrigió en el archivo original: no hay forward-fix pendiente.
-
-**El ledger de flags mentía en dos filas.** Corregidas contra runtime real, no contra el doc:
-`HIRING_STAGE_TEST_ASSIGNMENT_ENABLED` está en `true` en la revisión activa `ops-worker-00585-nv6` (la fila
-del snapshot decía OFF), y `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` está `<NO SET>` en esa misma
-revisión — OFF de verdad, no sólo por default declarado — y ya tiene fila en `§ Pendientes de acción`.
-Nota operativa: la revisión activa ya no es la `00576-7zz` del flip original; el flag sobrevivió a deploys
-posteriores porque está declarado en `deploy.sh`, que es exactamente para lo que sirve declararlo ahí.
-
-**Riesgo abierto — `--reporter=basic` da falso verde.** En vitest 4.1.0 el reporter ya no existe: el comando
-falla al cargarlo y **sale con exit code 0**. Si alguien lo mete en un gate, ese gate pasa siempre. Los tests
-reales del dominio están verdes (439 pass, 42 skipped por falta de proxy PG). No se corrigió nada porque no
-está en ningún gate hoy; queda anotado para que nadie lo introduzca.
-
-**Estado del bloque: code complete, rollout pendiente.** Nada del rollout se ejecutó: ninguna migración
-aplicada, ningún secreto provisionado, el webhook de Resend sigue sin registrar y ningún flag cambió de
-estado. El orden completo está en `docs/operations/runbooks/resend-email-lifecycle-rollout.md` y el siguiente
-paso es suyo, no de código: aplicar las dos migraciones + el índice concurrente con readback.
-
-**Owner del siguiente paso: operador.** El rollout cruza Vercel, Cloud Run y un proveedor externo con gates
-humanos; no es candidato a automatización desatendida.
-
-## 2026-08-19 — Ronda de documentación post-release: lo que quedó y la deuda que se hizo visible
-
-Tres subagentes cerraron los huecos que dejó el release de TASK-1739. Lo que el siguiente agente
-necesita saber:
-
-**El catálogo de patrones tiene un octavo.** Antes de inventar una forma propia para "declarar un hecho
-que no se puede inferir después", léelo: obliga a elegir entre propagar en transacción o hacer que los
-readers críticos lean la raíz.
-
-**El módulo Hiring emite 16 señales de reliability y sólo 5 estaban documentadas.** Ahora hay inventario
-con dueño; quedan 8 sin delta propio (`talent_pool.integrity`, `assessment.template_module_without_questions`,
-`assessment.assignment_health` y las 5 de `assessment_ai.*`). Ninguna está rota: es deuda documental.
-
-**Mover una task a `complete/` rompe punteros.** Cinco quedaron colgando, incluido uno dentro del reader
-de una señal productiva. Al cerrar una task, correr `grep -rn 'in-progress/TASK-####' src/ scripts/ docs/`
-antes de dar por terminado.
-
-**Deuda viva de TASK-1739** en `TASK-1748`: los readers del Banco de Talento no filtran por procedencia
-—hoy las 11 personas sintéticas quedan fuera por su `lifecycle_status`, no por el filtro—, el archivado
-escribe sólo sobre la postulación, y las 9 huérfanas del lane B siguen sin decisión.
-
-## 2026-08-19 — Working contract para operar engagements On-Demand sin confundirlos con Projects
-
-Se documentó la ontología `Organization → Engagement → Project/Campaign → Task` en
-`docs/business-models/EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md`. La decisión de trabajo preserva Projects y
-Campaigns como contenedores de tareas en Notion para un cliente; el Engagement es el compromiso comercial que
-gobierna términos, capacidad, accountability, economics y cierre. On-Going y On-Demand comparten los mismos objetos
-operativos: un engagement puede contener uno o varios Projects/Campaigns.
-
-La activación venta→Delivery usa una `Ficha de Activación del Engagement` como snapshot ejecutable —sin reemplazar
-quote/SOW/contrato— y provisiona sólo la diferencia sobre la Organization. `Product Service` queda como
-clasificación condicional: campaña audiovisual, plan de medios, brandbook u otro deliverable/servicio conserva su
-categoría y madurez real. La Gantt es una vista opcional según complejidad, no un requisito ni otro SSOT.
-
-Estado honesto: **diseño conceptual Proposed; cero cambio de runtime**. El repo ya tiene `services`, phases,
-progress, outcomes, lineage, asignación de equipo por `service_id` y `notion_project_id`, pero `engagement_kind` no
-distingue un contrato regular On-Going de uno regular On-Demand y el catálogo documenta ambos como `retainer`.
-
-Siguiente iteración: elegir 2–3 familias reales de engagements On-Demand, probar casos multi-capability y decidir si
-una root row de `services` sigue siendo el aggregate o si hace falta un Engagement superior. Cualquier schema/sync,
-Finance, access, team o Notion writeback requiere task + ADR; no implementar desde este handoff.
-
-## 2026-08-19 — TASK-1739 cerrada en producción: qué queda vivo después del cierre
-
-El filtro de procedencia ya opera en producción (`HIRING_SYNTHETIC_DATA_FILTER_ENABLED` ON, release PR #203
-sobre `30301816955f`, watchdog `ok`) y el marcado/archivado está aplicado con autorización del CEO. Lo que
-sigue importando no es lo hecho sino lo que cambia el terreno para el siguiente que toque Hiring.
-
-**El desk se ve vacío a propósito y eso va a parecer un bug.** Pasó de 24 vacantes / 79 postulaciones a 2 / 47.
-Si HR o cualquier agente reporta "desaparecieron candidatos", la respuesta no es apagar el flag: es mirar
-`data_origin`. Revertir es un `false` + redeploy en menos de 5 minutos, pero hacerlo devuelve los fantasmas al
-pipeline y vuelve a contaminar toda lectura downstream.
-
-**Riesgo abierto #1 — el smoke bloqueado.** `scripts/hiring/verify-growth-forms-application-smoke.ts` NO corre:
-declara `smoke_test` y la guarda del write path le prohíbe publicar. Es correcto, no es una regresión que
-arreglar. Sus únicas dos salidas legítimas son que deje de necesitar la superficie pública real o que limpie lo
-que crea. **Marcar su vacante como `real` para destrabarlo NO es una salida** — fabrica otra vez fantasmas
-indistinguibles de una vacante verdadera, que es exactamente el problema que esta task cerró.
-
-**Riesgo abierto #2 — falsa garantía de autorización.** Las capabilities `hiring.data_origin.mark`/`.purge`
-están deferidas a propósito: la operación es hoy por CLI con actor registrado y sin superficie API/UI. Quien
-construya el consumer (badge, toggle, vista de administración, ruta Nexa/MCP) las declara **en ese mismo PR**,
-con grant a ≥1 rol real; declararlas antes sólo simula un control que ningún `can()` verifica.
-
-**Decisión pendiente del operador — lane B de la purga.** Las 9 huérfanas siguen archivadas, no borradas. Es la
-única mutación irreversible de la task y su valor marginal es bajo, porque archivar ya las saca de toda lectura.
-El protocolo está intacto (`plan → allowlist → sign-off → apply`, abort total si una sola fila tiene dependiente
-auditable); ejecutarlo requiere decisión humana explícita, no la inercia de "quedaba pendiente".
-
-**Próximo paso concreto**: cerrar el impacto cruzado que no cabía en el dominio de edición del cierre — registrar
-el cierre en `EPIC-011`, agregar el `## Delta` a `TASK-1734` (el sampler del gold set ya excluye sintéticos por
-construcción, no por suerte) y anotar `scripts/hiring/purge-task-1378-test-applications.ts` como superado por el
-CLI genérico. Y vigilar `hiring.data_quality.synthetic_records_aging` durante 7 días: steady `0`.
-
-## 2026-08-18 — Incident response: delivery de Resend y recuperación de test planificadas
-
-Discovery read-only confirmó que Resend **sí despacha** (393 IDs de proveedor), pero Greenhouse no captura
-su lifecycle: no hay webhook registrado en la cuenta productiva, no hay secreto de firma operativo y las
-proyecciones históricas no tienen ningún `delivered`/bounce/engagement. `sent` significa aceptación de la API,
-no entrega al buzón. El handler existe pero debe corregir su resolución asíncrona de secretos antes de activar
-el webhook, porque hoy puede responder `200 ignored` durante cold start.
-
-Quedan creados `ISSUE-160`, ADR aceptado el 2026-08-19
-`GREENHOUSE_HIRING_ASSESSMENT_ACCESS_RECOVERY_AND_EMAIL_DELIVERY_DECISION_V1.md` y tres tasks compactas:
-`TASK-1745` (webhook/reconciliación), `TASK-1746` (ADR aceptado; command de recovery con rotación,
-capabilities separadas y enlace fragment→sesión HttpOnly; implementación local en curso) y `TASK-1747`
-(consumer Application 360). Gates de las tres tasks
-verdes. `TASK-1745` está ahora `in-progress`: el preflight confirmó que el dedupe existente no es
-transaccional y que un fallo posterior puede perder el evento en un retry. El fix preservará el sender
-outbound como boundary independiente y activará el webhook sólo después de un canary firmado. Todavía no hay
-cambio de runtime ni configuración externa.
-
-El Slice 1 de `TASK-1746` quedó code-complete y validado localmente tras cinco rondas independientes de
-Arquitectura, Talento y Seguridad: capabilities separadas, eligibility fail-closed, locks
-assessment→application→candidate facet, receipt idempotente, events automáticos append-only, deadline
-revalidado al commit con reloj real, retención candidate/workforce y purga gobernada. La migración sigue sin
-aplicarse; no debe promoverse antes del command token-safe y de smokes PG que prueben ACL, constraints
-diferidas, concurrencia y transiciones de retención. Evidencia local: 200 tests, ESLint, TypeScript, marker
-gate 586/0, lint operativo y diff-check verdes.
-
-El Slice 2A de `TASK-1746` también quedó code-complete local y validado por Arquitectura, Talento y Seguridad
-sin P0/P1/P2. La capa global de email ahora clasifica los tipos que transportan credenciales, persiste un intent
-redactado antes de rotar, bloquea batch/retry genérico y distingue rechazo del proveedor de aceptación incierta.
-Assessment assignment y Talent Pool verification comparten claim atómico por evento+entidad; un replay o dos
-workers concurrentes no vuelven a rotar. El índice único todavía no existe en runtime: antes de desplegar estos
-writers debe correrse `scripts/operations/task-1746-create-token-intent-index.sql` y conservar su readback
-`unique/valid/ready`. Ninguna migración, índice, secret, webhook ni configuración runtime se aplicó en este slice.
-
-El Slice 2B de `TASK-1746` quedó code-complete local y validado sin P0/P1/P2 por Arquitectura, Talento y
-Seguridad. El recovery email liga intent+receipt+rotación bajo una transacción, mantiene el deadline de tests
-iniciados y no persiste el bearer. Replay y reconciliación solo proyectan evidencia durable; nunca reenvían ni
-rotan, y Platform Health detecta receipts divergentes después de 15 minutos. El tipo de correo sigue OFF y sin
-adapter productivo. Próximo paso: Slice 3, con fragment exchange, sesión HttpOnly, auth/capability server-side y
-smoke de tracking. Migración, índice y runtime continúan sin aplicar.
-
-El Slice 3A de `TASK-1746` también quedó code-complete local y auditado sin P0/P1/P2. Cada token ahora rota
-con una versión explícita y la sesión candidata persiste solo un digest opaco ligado a esa versión; una nueva
-emisión invalida las sesiones anteriores. El dominio distingue start-by, deadline de respuestas y 30 minutos
-de gracia de envío; no-limit cierra a las 24 horas. El reloj autoritativo viene de PG y el navegador lo proyecta
-con tiempo monotónico, por lo que un equipo adelantado o atrasado no congela ni extiende el test. Legacy
-GET/start/save/submit y SELF-ID conservan elegibilidad, consentimiento y audit bajo los mismos locks y la misma
-transacción. El feature continúa OFF y la migración no está aplicada. El siguiente slice debe construir la
-limpieza síncrona `#access`, exchange→cookie HttpOnly, rutas token-free y Product API antes de cualquier smoke o
-activación.
-
-El Slice 3B quedó code-complete/dormant y reauditaron Arquitectura, Talento y Seguridad hasta P0/P1/P2=0. Ya
-existen bootstrap pre-React que borra `#access`, exchange same-origin acotado, cookie `__Host-` HttpOnly, página y
-API token-free, CSP enforced y protección ante maintenance/trailing slash. La sesión conserva elegibilidad y reloj;
-un fence por public ID impide que dos pestañas con assessments distintos muten la instancia equivocada. El modal
-de envío reutiliza MUI Dialog con foco, Escape, trap y reduced motion. El correo inicial **no cambia todavía**:
-`HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` nace OFF en el ops-worker y OFF conserva el enlace legacy. El
-workflow del worker incluye notifications en trigger, latest-SHA y drift-check. Antes del flip siguen obligatorios
-migración+índice, cuatro rutas live, `click_tracking=false` verificado en Resend, rate limit público y smokes
-PG/browser/href. No se aplicó migración, no se desplegó ni se cambió ninguna env.
-
-El Slice 4 de `TASK-1746` quedó code-complete local y reauditaron Arquitectura, Talento y Seguridad hasta
-P0/P1/P2=0. Existe un único command `recoverCandidateTestAccess` para email o enlace seguro; la Product API exige
-sesión humana canónica, capabilities por canal antes de lookup, lineage exacta, Origin/JSON/idempotencia cerrados y
-errores anti-oracle. El enlace manual rota el mismo assessment y se revela una vez; replay nunca devuelve el bearer.
-El rate limit usa techo IP confiable de Vercel más bucket por credential/sesión válida, sin amplificación por tokens
-aleatorios; savepoints conservan la cuota pero revierten cualquier write parcial. El owner diario de retención drena
-buckets con readback y señal. Documentación, manuales y skills de Talento/Arquitectura/Secret Hygiene quedaron
-sincronizados, incluido el runbook global `docs/operations/runbooks/resend-email-lifecycle-rollout.md`.
-
-**Handoff a Claude:** no implementar de nuevo TASK-1745/1746. Slice 4 quedó versionado en
-`5d5eb2f9c`; el siguiente bloque es TASK-1747 (UI Application 360). Antes de cualquier rollout: aplicar
-migración TASK-1745, luego migración `20260819072130586`, ejecutar/verificar el índice concurrente de TASK-1746,
-desplegar app+worker dormantes, configurar webhook firmado global de Resend, verificar `click_tracking=false`, hacer
-smokes PG/browser/email consentidos y recién entonces habilitar capability/email type/cutover. Hoy no se aplicó ni
-activó nada; el correo inicial continúa por el enlace legacy y `sent` no prueba entrega.
-
-## 2026-08-18 — Hiring AI y candidate review MCP: runtime reconciliado
-
-El release `7e7a474217eb` (run `32193134959`) dejó `global_provisional` activo para assessments elegibles de
-todas las vacantes: ops-worker `00584-r4x`, 100% tráfico, concurrencia 1, cap 1000 y scheduler cada 2 minutos.
-Exception policy y batch confirm siguen OFF; nada muta el score efectivo ni llega al postulante. El dossier está
-ON en producción y auto-propone con Google `gemini-2.5-flash`/prompt v2 cuando CV limpio y assessment puntuado
-están listos; nunca auto-confirma.
-
-Candidate review MCP también quedó activo internal-only con applicationId exacto, chunks minimizados/redactados,
-hash, purpose y audit. Canary OAuth/MCP 200 y borde sin auth 401. B2B y todos los writes siguen bloqueados.
-
-Lifecycle honesto: TASK-1743 cerró code complete con GVC 4,82/5, pero la compactación final de barras
-`20964b72a..3616cb5b8` es posterior al SHA productivo y viaja en el siguiente release ordinario. TASK-1742 y
-TASK-1718 permanecen in-progress por cooldown/rollback/sign-offs; no se inventaron aprobaciones. El release
-classifier omitió rutas Hiring del ops-worker y exigió corrección manual; verificar siempre parity 4/4 por SHA.
-
-## 2026-08-18 — TASK-1739: procedencia de datos de Hiring, slices 1-4 y 6 implementados
-
-Ocho commits. Lo que ya opera: la procedencia existe como HECHO declarado en el nacimiento del dato
-(dos raíces, persona y demanda) con copia derivada por trigger en la postulación; los readers del desk
-dejan de contar fantasmas detrás de flag; el gold set los excluye SIN flag; hay marcado gobernado con
-allowlist humana; y un gate mecánico impide que un seed nuevo cree datos sin declarar.
-
-**Nada cambió todavía para el operador**: el flag nace OFF y nadie marcó nada. Estado correcto:
-`code complete, rollout pendiente`.
-
-**Lo que falta y por qué no lo hice**: el apply del marcado exige que un humano pode la allowlist
-línea a línea —ese es el punto del protocolo, no un trámite—; el flip del flag en producción exige
-**aviso previo a HR**, porque 12 de 14 vacantes son sintéticas por autor y el desk no perderá "algunas
-filas" sino casi todas las vacantes; y el Slice 5 (purga) está prohibido por la propia task hasta que
-el Slice 4 esté aplicado y verificado. Falta además la triple documentación y las dos capabilities
-(`hiring.data_origin.mark`/`.purge`), que hoy no tienen consumer porque la operación es por CLI.
-
-**Dry-run real listo para revisar**: 34 candidatos, todos de confianza ALTA — 12 demandas y 12
-vacantes por autor (8 de ellas marcadas además como "estuvo publicada" en el careers real) y 10
-personas por dominio de correo reservado. Cero falsos positivos: ningún `@efeoncepro.com`, ninguna
-coincidencia por nombre. Correr `pnpm hiring:data:mark-synthetic` para verlo.
-
-**Tres cosas que aparecieron al construir**, todas en los commits:
-
-- La guarda de publicación **bloqueó el smoke que causó el problema**: `verify-growth-forms-application-smoke.ts`
-  creó las 8 vacantes fantasma publicadas y no tiene teardown. Queda bloqueado a propósito, con sus dos
-  salidas legítimas registradas como follow-up. Destrabarlo marcando su vacante como `real` no es una.
-- El guard de frontera del dominio atrapó mi tabla de audit sin declarar. Declarada.
-- Corriendo la suite con live tests aparecieron **dos roturas preexistentes** de
-  `submit-application.live.test.ts` que CI nunca vio (sólo corren con PG): `publicSeniority` obligatorio
-  desde TASK-1740 y `residenceCountryCode` requerido desde el flip de TASK-1688. Ambas reparadas.
-
-## 2026-08-18 — Canary de identidad y smoke del expediente: los dos pendientes declarados, cerrados
-
-Los dos flags que se prendieron "ON con pendiente" ya tienen su verificación. Ambas filas del ledger
-quedaron actualizadas con la evidencia.
-
-**Canary TASK-1736 — verde, 4/4.** Se ejecutó como live test gobernado
-(`HIRING_CANARY_T1736=1 pnpm vitest run src/lib/hiring/candidate-intake/canary.live.test.ts`), no por el
-endpoint público. La razón importa: la base es UNA sola para dev/staging/prod y el ops-worker de correos
-es el mismo, así que postular contra `EO-OPN-0009`/`EO-OPN-0061` habría dejado un candidato falso
-—indeleble— en una vacante con candidatos en proceso. Verificado además que **no salió ningún correo**.
-
-**Lo que el canary enseñó y el runbook no decía.** Con el flag ON, la evidencia y el audit son
-append-only **por grant** (`greenhouse_runtime` no tiene DELETE) y esas filas pinnean por FK toda la
-cadena application → facet → Person → opening → demand. O sea: **el canary no puede limpiarse a sí
-mismo**. Mi teardown lo intentó y falló en silencio porque tenía `.catch(() => undefined)` — ese swallow
-está eliminado y ahora reporta el residuo a gritos. El runbook lleva la advertencia y el residuo exacto.
-
-**Residuo pendiente (bloqueado por la misma credencial que ISSUE-159).** Sujeto 100% sintético:
-Person `identity-…-canary-t1736-1787066079713-live-test-invalid`, application `happ-ffebd53b…`,
-opening `EO-OPN-0101` **ya despublicado** (`internal_only`, el listado público volvió a tener sólo las 2
-vacantes reales), más 2 filas de evidencia y 3 de audit. Registrado como **Delta en TASK-1739**, que es su
-hogar natural: su lane de purga ya distingue archivar-con-historia de borrar-huérfanos, y este es su primer
-objetivo concreto. `purge-test-facets` NO sirve acá (exige cero postulaciones y consent `not_captured`).
-
-**Smoke del expediente (TASK-1735) — verificado sobre el caso real, sin escribir nada nuevo.** El
-propose→confirm post-fix ya había ocurrido el 17-ago 00:12: la nota `hnote-d710c072` guardó sus 8240
-caracteres completos (termina en punto) contra los 8000 de `hnote-e2fd7280`, y lleva `supersedesNoteId` +
-`repairedFullLength` en su `context_json`. Queda **sólo la revisión humana del primer expediente real**:
-es el gate de supervisión humana, no lo puede firmar un agente.
-
-**Fix de paso:** `evidence_coverage_gap` ahora filtra `source='public_careers'`. Contaba todas las
-postulaciones, pero la evidencia sólo nace del intake público — cada carga manual desde el desk la habría
-dejado en `warning` para siempre. Test de regresión sobre el SQL. `local:check` EXIT=0.
-
-## 2026-08-18 — Las dos vacantes vivas ya están en el contrato editorial v2
-
-Autoradas y publicadas con `PublicOpeningContent` v2 completo por el command canónico. Antes tenían
-sólo `workModel` poblado y toda la hoja caía al fallback de prosa; ahora sirven las 13 secciones del
-formato canónico, incluida **"Cómo se ve un buen primer año"** — los outcomes observables, que es el
-campo que el formato agrega y que ninguna de las dos declaraba.
-
-Casi todo se **derivó de la prosa ya aprobada** (descripción, requisitos, deseables, notas de
-proceso), que es reestructurar, no inventar. Los tres hechos que no existían en ninguna fuente los
-resolvió el CEO, tal como exige la receta (`job-offer-recipe.md` §0: *"if a fact cannot be resolved,
-carry `needs confirmation` and stop before publication"*): **Account Manager reporta al CEO**,
-**Content Creator a la Creative Operations Lead**, y el **compromiso de respuesta es de 3 a 4
-semanas**. Ese último es el campo que más pesa: es donde la vacante deja de vender y se compromete —
-y hoy hay 35 postulaciones sin revisar, así que el compromiso es deliberadamente conservador.
-
-Corregido de paso: `EO-OPN-0061` publicaba "Contrato indefinido" como jornada, que con vinculación
-internacional sólo es exacto para Chile. Ahora dice "Jornada completa" —la dedicación sí es
-universal— y la forma contractual se explica en el modelo de trabajo. Efecto colateral correcto:
-`employmentType: FULL_TIME` en el schema, que antes se omitía por ambiguo.
-
-Verificado en producción: ambas 200, las 13 secciones presentes, JSON-LD de 5756 y 4508 caracteres
-con los outcomes incluidos, `baseSalary` sólo en Content Creator (la única con rango aprobado) y
-`employmentType: FULL_TIME` en las dos.
-
-## 2026-08-18 — Careers público EN PRODUCCIÓN: hoja editorial + JobPosting, con 4 flags prendidos
-
-Release `fa54670470c1` (`released`, run `32127499151`, 8m31s). Batch de EPIC-011: TASK-1740 +
-TASK-1741 + el acumulado 1719/1734/1735/1736 + `ISSUE-159`. Watchdog `OK` con **4/4 workers
-synced** (el residual change-gated del `ops-worker` lo clasificó solo, diff de rutas runtime vacío).
-
-**Verificado en producción real, no en el generador:** las dos vacantes emiten `JobPosting` con
-`TELECOMMUTE`, 20 países, `hiringOrganization: Efeonce`, canonical correcto y sin
-`directApply`/`validThrough`/`baseSalary`; la hoja editorial se sirve con sus secciones; una vacante
-cerrada responde 404 sin schema. El calificador de beneficios ("se formaliza según tu modalidad de
-contratación y país de residencia") aparece en el HTML **y** en el schema, desde la misma fuente.
-
-**Flags prendidos en Production** (con redeploy `greenhouse-4qu4swddd` — sin él quedan inertes):
-`CAREERS_DETAIL_EDITORIAL_V2_ENABLED`, `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED`,
-`HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED`, `HIRING_EVALUATION_DOSSIER_AI_ENABLED`. Los dos
-últimos se prendieron por autorización explícita del CEO **con sus verificaciones aún pendientes**:
-el canary del runbook de identidad y el smoke propose/confirm del expediente. Están anotados en el
-ledger como ON-con-pendiente, no como cerrados.
-
-**El quinto flag se prendió DESPUÉS de cumplir sus precondiciones, no saltándolas.** Primero quedó
-apagado porque `services/ops-worker/deploy.sh` exige tres y sólo se cumplía una. A instrucción del
-CEO ("resuelve lo que haga falta para prenderlo de forma robusta"), se resolvieron las otras dos:
-la policy del canary `EO-OPN-0009` se reconfiguró a `on_stage_entry`/`shortlisted` (cap 3/60 min) y
-se habilitó por command canónico —`configureOpeningAssessmentPolicy` la devuelve a `draft` a
-propósito, así que son dos llamadas y quedó en `policy_version=2`—, y el cancel/recovery se ejercitó
-con `cancel.live.test.ts` **5/5 contra PG real** en vez de cancelarle el test a un candidato real,
-que le habría matado el enlace. Recién entonces: default `true` en `deploy.sh` (SoT, porque
-`--set-env-vars` es destructivo y un flip out-of-band se evapora en silencio) **más**
-`gcloud run services update`, verificado en la revisión activa `ops-worker-00576-7zz`.
-
-⚠️ **Ahora sí dispara**: mover una postulación de esa vacante a `shortlisted` le asigna el test
-automáticamente. Las 5 que ya están en esa etapa tienen test abierto (4/5), así que la señal del
-canary llega cuando Talent mueva a alguien de los 10 `sourced`. El tope de 3 por hora es
-deliberadamente conservador: un movimiento en lote mayor deja a los excedentes con el aviso genérico
-de avance, sin prueba — conviene calibrarlo con Talent antes de un batch grande.
-
-**Dos aprendizajes operativos para el runbook:** (1) el clasificador de permisos bloquea
-`vercel env add`/`redeploy` hasta que el operador autoriza expresamente en el chat — no es credencial
-ni scope; (2) `vercel env add <FLAG> Production` falla con `api_error: specify at least one
-Environment`: **el entorno estándar va en minúscula** (`production`), mientras el custom (`staging`)
-respeta su nombre literal.
-
-**Sigue pendiente de decisión del CEO:** monitor de equidad (capturaría categorías protegidas bajo
-una política que sólo existe en versión de pruebas), scoring por lotes (bloqueado por falta de gold
-set calificado, no de permiso) y lectura de CVs por agentes (sin firmas de privacidad/seguridad).
-
-## 2026-08-17 — Barrido de cierre: lo que estaba a medias, y el incidente que nadie había registrado
-
-Tres auditorías paralelas sobre TASK-1719, el rollout de 1740/1741 y el estado general del
-dominio. Se empujaron 7 commits a `develop` (CI verde antes del push, pre-push limpio).
-
-**Lo más grave no era ninguna de las tres tasks: era un fixture.** Los `*.live.test.ts` de hiring
-anclaban con `SELECT profile_id FROM identity_profiles WHERE active = true LIMIT 1`. Sin `ORDER BY`
-el sujeto es no determinista, y la base es **única para dev, staging y producción**: cayó sobre un
-colaborador ACTIVO y `reconcileCandidateFacet` le fabricó ficha de candidato, membresía de Banco de
-Talento y evento de consentimiento con `consent_status=not_captured`. Una persona real registrada
-como candidata sin postular ni aceptar nada. Cerrado con `live-test-identity.ts` (perfil sintético
-dedicado, idempotente, verificado contra PG) y **`ISSUE-159`** abierto ANTES de purgar, porque la
-purga borra la evidencia del propio incidente. **La ficha contaminada sigue viva**: el `--apply` del
-script de purga muere en `ECONNRESET` abriendo su cliente TCP con perfil `ops`, y el camino canónico
-no sirve (runtime no tiene DELETE, por diseño).
-
-**Otros dos cierres del lado 1740/1741:** los beneficios publicados ya llevan el calificador que el
-charter exige ("se formaliza según tu modalidad de contratación y país de residencia") — importa
-porque fuera de Chile la vinculación es internacional y publicar "15 días de vacaciones" en seco
-presenta un equivalente contractual como derecho estatutario; y la degradación del contenido v2 dejó
-de ser silenciosa (emite señal sólo cuando la versión es conocida, o sea cuando es anomalía real).
-
-**TASK-1719 — el Handoff estaba desactualizado en su punto más caro:** el backlog del consumer **ya
-se drenó solo** a las 13:54Z de hoy (23 eventos, 22 `stale` por la ventana de 24 h y 1 no-op, cero
-correos). Ese era el bloqueador principal declarado. Lo que sí falta y nadie había escrito: la policy
-del canary está en `mode=manual`, así que **prender el flag hoy es un no-op**; y el default de
-`deploy.sh:458` sigue en `false`, con lo que un flip por `--update-env-vars` se evapora en el próximo
-deploy del ops-worker (que se redespliega cada pocas horas — mismo patrón que borró
-`GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED`). Además el canary no produce señal: las 5 postulaciones
-`shortlisted` ya tienen test abierto, así que hace falta que Talent mueva a alguien de `sourced`.
-
-**Riesgos vivos que quedan documentados, no cerrados:** retención Ley 21.719 sin comando de borrado
-(sólo hay un reader que reporta vencimiento); CVs `legacy_unscanned` descargables mientras
-`ASSET_MALWARE_SCAN_ENABLED` sigue bloqueado por ClamAV no provisionado (TASK-1378 sin decidir); y
-TASK-1718 con código en producción tras flags cerrados y sus sign-offs abiertos.
-
-## 2026-08-17 — Grandfathering: una vacante viva no se cae por una regla de autoría
-
-Revisión de TASK-1741 sobre el checkout compartido. El renderer editorial quedó bien (typecheck
-limpio, 974 tests verdes, migración de seniority aplicada, el texto de la vía contractual sobrevivió
-íntegro vía mapeo `remoteModel`→`workModel`), y **codificaron como candado el invariante de secuencia
-que TASK-1740 sólo había documentado**: el schema no puede emitirse sin el renderer editorial ON.
-Verifiqué la paridad empíricamente comparando frase por frase el JSON-LD contra el DOM renderizado:
-alineado en ambas vacantes.
-
-**El hallazgo que sí requería acción:** `publishOpening` pasó a exigir contenido editorial v2 de
-forma incondicional, y las dos vacantes publicadas son v1. Consecuencia: pausarlas las dejaba en 404
-hasta reescribir el bloque entero — con **15 postulantes en `EO-OPN-0009` y 33 en `EO-OPN-0061`**,
-o sea cortando el canal de procesos vivos. Autorizado por el CEO, se implementó **grandfathering**:
-`requiresEditorialV2ForPublish(published_at)` exige v2 sólo en la primera publicación. Verificado
-contra las filas reales: ambas pueden republicarse, y una vacante nueva con el mismo contenido sigue
-bloqueada (contraprueba en el mismo script). El operador desde brief conserva v2 obligatorio porque
-siempre crea vacantes nuevas.
-
-**Guardrail nuevo:** el invariante central del dominio (HTML visible ≡ JSON-LD) no tenía test que lo
-defendiera —el schema se testeaba aislado y la página aislada—, así que agregar un párrafo sólo-schema
-pasaba en verde. Ahora hay un test que cruza ambos lados sobre el DOM renderizado.
-
-**Pendientes que quedan del lado de TASK-1741 (reportados, no corregidos):** editar `publicContent`
-de una vacante publicada v1 obliga a migrarla entera a v2; el read path v2 traga excepciones con
-`catch → null`, así que el día que exista contenido v2 una validación más estricta lo haría
-desaparecer de la página **sin señal**; y toda vacante nombra 8 marcas de partners sin el gate de
-vigencia por vacante que pide el charter, además de publicar beneficios sin su calificador
-"se formaliza según tu modalidad y país" — relevante para vinculación internacional.
-
-## 2026-08-17 — TASK-1741 tomada en develop tras auditoría paralela
-
-El operador autorizó expresamente ejecutar en el checkout compartido `develop`, sin cambiar de rama,
-y usar subagentes. Tres auditorías read-only revisaron contrato público/SEO y readiness UI. Antes del
-renderer se corrigieron los blockers de TASK-1740: la proyección pública ya no selecciona ni usa
-`internal_title`/`seniority`, `publicSeniority` es obligatorio al publicar, un opening publicado no
-puede invalidarse mediante PATCH, los bloques parciales no borran la prosa legacy y la compensación
-rechaza monedas/tipos falsos. Tests focales (53) y TypeScript verdes. TASK-1741 está ahora
-`in-progress`, `UI ready: yes`, con dirección durable `Editorial dossier`; implementación secuencial
-por solapamiento causal entre view model, copy, renderer y CSS. El formulario queda fuera de alcance.
-
-## 2026-08-17 — TASK-1740 code complete: contenido público estructurado + fundación JobPosting
-
-Slices 1-4 en `develop` local (4 commits, sin push). El opening gana `public_content_json`
-(`PublicOpeningContent` v1: promesa/outcomes/trabajo/essentials/learnables/evidencia/modelo
-remoto/proceso/beneficios/compensación estructurada; write 422 estricto, read leniente con fallback
-legacy de prosa) y `public_remote_eligible_countries` (ISO alpha-2 reales — `LATAM`/`Global` se
-rechazan, verificado en vivo contra PG). El detalle público emite canonical explícito siempre y
-`JobPosting` JSON-LD detrás de `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` (Vercel-only, OFF, en
-ledger), con builder fail-closed desde el MISMO payload visible: remota sin países o presencial sin
-city+country ⇒ sin schema (hoy NINGUNA vacante viva emite schema — ambas son `LATAM` sin país, y eso
-es lo correcto, no un bug). Sin directApply, sin validThrough, salario sólo estructurado; el retiro
-es el 404 del unpublish. Decisiones: omitir schema en vez de bloquear publish (bloquear rompería
-re-publicar los 2 openings vivos); `hiringOrganization` = marca Efeonce del brand SSOT
-(`EFEONCE_BRAND_NAME` nuevo). El PATCH interno transporta los campos sin cambio de ruta (parity).
-TASK-1741 quedó desbloqueada con fixture (`editorial-opening.fixture.ts`) y delta en su spec.
-
-**Actualización mismo día:** el CEO decidió **20 países** (toda Latinoamérica **excepto Cuba** + US +
-ES) y precisó la vía contractual: **Chile con contrato laboral local, fuera de Chile vía internacional
-con pago directo de Efeonce** (`international_internal`, sin EOR). Eso quedó en la elegibilidad
-estructurada Y en el contenido visible (`content.remoteModel`) de ambas vacantes — porque el país de
-la entidad **no va en `jobLocation`**: ponerlo ahí haría que Google dejara de tratar la vacante como
-remota y la mostrara como empleo presencial en Santiago. El anclaje contractual se declara en el
-contenido; la elegibilidad, en `applicantLocationRequirements`.
-
-**Precondición de secuencia entre los dos flags (la pregunta "¿no hay que prender el flag para 1741?"
-tiene respuesta doble):** TASK-1741 **no** necesita el flag de schema para desarrollarse — `content` y
-`remoteEligibleCountries` viajan en el payload público siempre, sin flag. Pero el orden inverso sí es
-obligatorio: **el renderer va primero**. Verificado que `view-model.ts` y
-`components/greenhouse/careers/**` todavía NO consumen `content`, mientras el builder de JSON-LD sí; por
-lo tanto prender `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED` antes de 1741 emitiría a Google el
-`remoteModel` (ya poblado en las 2 vacantes) sin estar visible en la página — la desalineación
-HTML↔schema que el propio dominio prohíbe, y una desviación de las guías de Google. Con el flag OFF no
-hay desalineación activa: el dato espera a su consumidor. Documentado como invariante duro en ADR,
-manual, ledger, ambas tasks y las skills.
-
-**El primer artefacto real destapó un bug del builder** (patrón real-artifact): un bloque estructurado
-PARCIAL —sólo `remoteModel`, que es exactamente el estado mientras el contenido editorial no se
-autora— hacía que la descripción del JSON-LD dejara de incluir la prosa del rol y quedara reducida a
-ese párrafo. Corregido: un bloque parcial **complementa** la prosa legacy y sólo un bloque con
-narrativa núcleo la reemplaza. Validado con el JSON-LD renderizado real de ambas vacantes (flag
-prendido en local y restaurado a OFF; cero campos requeridos faltantes). El `pnpm build` fue
-autorizado y salió verde. **Pendiente de rollout (bloquea `complete`):**
-push/release + flag staging→Rich Results Test→producción + smoke lifecycle desplegado — **retenido a
-propósito: el operador decidió que el release espera a TASK-1741 y viajan juntos.** Runbook: manual
-`operar-careers-publicas.md` §Contenido estructurado y schema de Google.
-
-## 2026-08-17 — Tasks creadas para vacantes públicas: contrato SEO primero, renderer después
-
-Se registraron `TASK-1740` y `TASK-1741` como una partición deliberada. `TASK-1740` es la base
-backend/data: modela contenido candidato-facing allowlist-safe, fallback legacy, lifecycle y
-canonical/`JobPosting` desde el mismo contenido visible; no toca el formulario ni habilita Indexing
-API sin autorización/quota. `TASK-1741` es solamente el consumer UI: renderer editorial incremental
-de `/public/careers/[publicId]`, detrás de flag y con GVC 1440/390, que preserva URL, formulario y
-exactamente los dos CTA existentes (hero verde y resumen azul; sin CTA final). Ambas exigen que
-remote/global use países elegibles reales y nunca invente salario, beneficios o condiciones de
-contrato. El wireframe es `docs/ui/wireframes/TASK-1741-public-careers-editorial-detail-renderer.md`.
-
-## 2026-08-17 — Ajustes razonables: ahora se pueden otorgar, y se pueden pedir
-
-Cierra la Open Question 7 del ADR de TASK-1719. `accommodations_json` estaba cableado end-to-end
-**en lectura** desde TASK-1360 —lector TS, predicado SQL de vencimiento, banner al candidato— pero
-**17 instancias, las 17 vacías**: nunca se le concedió un ajuste a nadie porque no se podía. La
-única palanca era alargar el límite de la plantilla, que se lo alarga a toda la cohorte. Pesa más
-desde que la prueba se manda en Preselección: se le pide trabajo a más gente.
-
-Decisiones que valen releer antes de tocar esto:
-
-- **El motivo NO se persiste, y es decisión, no omisión.** Un ajuste revela por naturaleza una
-  condición protegida; guardarlo crea el dato con el que después se discrimina. Se guarda sólo el
-  arreglo (minutos, quién, cuándo). La constancia narrativa va al expediente.
-- **Capability role-only (People), no la genérica de autorar.** En esta plataforma "usuario interno"
-  incluye diseñadores y colaboradores: con la genérica cualquiera concedería tiempo extra.
-- **Se cerró un contrato implícito**: la lectura aceptaba SEIS grafías del mismo hecho. Queda una.
-  Seguro de narrar porque 0 filas usaban ninguna.
-- **Divergencia latente encontrada al unificar**: el lector TS redondeaba y el SQL truncaba — un
-  valor fraccionario habría mostrado un contador y vencido con otro. Ambos truncan; hay test vivo.
-- **La otra mitad, que la doc daba por hecha sin serlo**: el correo NO invitaba a pedir el ajuste.
-  Uno que nadie sabe que puede pedir no es un ajuste, y quienes preguntan igual son los que ya se
-  sienten con derecho — el sesgo que esto corrige. Ahora lo invita en ambos idiomas y dice que no
-  hay que explicar por qué.
-
-Pendiente declarado: sin UI, sin aviso automático al candidato (avisar es acto humano, igual que en
-cancelación), y **sólo cubre tiempo extra** — formatos accesibles son trabajo de accesibilidad de la
-pantalla de rendición, no de este campo.
-
-## 2026-08-17 — La etapa canónica del candidate test es `shortlisted`, no `interview`
-
-Decidido con la lente de talent a pedido del operador, y verificado contra la base ANTES de
-argumentarlo: hay **0 postulaciones en `interview`** (42 `sourced`, 9 `shortlisted`, 7 `screening`),
-y las pruebas existentes se asignaron en `screening`/`shortlisted`. El ejemplo que yo había escrito
-en el manual (`triggerStage: "interview"`) habría configurado una automatización que no se dispara.
-
-Dos razones independientes, ambas en el invariante 21 del ADR: (a) la ganancia de validez está en
-**combinar** entrevista estructurada + muestra de trabajo, y esa ganancia sólo aparece si la prueba
-llega ANTES —si no, se entrevista a ciegas y la evidencia llega cuando ya no cambia ninguna
-pregunta—; (b) el momento del filtro es una decisión de **equidad**: una prueba no pagada aplicada
-temprano no sesga por el puntaje, sesga por quién logra completarla, y ese sesgo es invisible en las
-métricas de scoring porque esas personas nunca llegan a tener una.
-
-`screening` queda fuera del allowlist **a propósito**: no es candidate-facing, así que un assignment
-bloqueado ahí degradaría a silencio y rompería "ni cero ni dos". Hay test que lo fija con su razón.
-
-Sin cambio de schema: las dos policies de la base ya eran `shortlisted` (fixtures de test). Esas dos
-quedaron **`disabled` por el command gobernado** — eran las únicas de la base, ambas `enabled` +
-`on_stage_entry` sobre openings `LIVE-TEST`, o sea una mina para el canary.
-
-Pendiente que esta decisión vuelve más urgente: **el write path de ajustes razonables**. La doctrina
-exige poder dar tiempo extra o formato accesible; hoy el campo existe sin forma de escribirlo, así
-que no se puede acomodar a nadie sin alargar el límite para todos.
-
-## 2026-08-17 — Beneficios globales de Efeonce documentados para vacantes
-
-Las skills espejo de Talent y Payroll ahora comparten el `Efeonce Candidate Benefits Charter`: 15 días
-hábiles de vacaciones remuneradas más un día por cada año continuo cumplido hasta 20 para todos los
-colaboradores globales; dos días flotantes, 16 horas de atención médica, dos días de bienestar, duelo,
-deber cívico, matrimonio/unión civil, 10 semanas para la madre/persona que da a luz y 2 para el padre/progenitor no gestante (adopción/cuidado: 4/2), mudanza, desarrollo y apoyo para
-trabajo remoto/salud mental. Los feriados corporativos son los de Chile y van aparte de vacaciones; una cobertura preacordada recibe descanso compensatorio. La carta permite comunicar el baseline global en vacantes,
-pero prohíbe afirmar que todos los permisos ya se autogestionan o calculan en Greenhouse. Payroll/Legal debe
-incorporar cada beneficio al instrumento contractual o del proveedor según país/modalidad antes de operarlo.
-La carta ahora define año/prorrateo, carry-over, continuidad de servicio, familia, retorno postparto, equivalencia contractor y wallets: aprendizaje US$500/año, conectividad/coworking US$50/mes y salud mental US$300/año. El aporte de equipo (US$400/36 meses) sigue siendo política aprobada, pero se conversa en entrevista u oferta y no aparece en el copy estándar de vacantes. La ley local es overlay que puede mejorar, nunca reducir, el baseline. No hubo cambio de runtime, schema,
-contratos ni política configurada.
-
-## 2026-08-17 — Skill de Talent reforzada para vacantes públicas e inbound
-
-Las skills espejo `greenhouse-talent-people-operator` de Claude/Codex incorporan un protocolo
-evidence-led para vacantes públicas: evidence packet, benchmark de roles comparables, ledger de
-claims, estructura de conversión, medición por fuente y gates de publicación global/remota. La
-referencia nueva `references/inbound-recruiting-job-ad-research.md` ahora documenta el playbook
-completo: propuesta y prueba, realistic preview, experiencia de candidato, Talent Pool con
-consentimiento, compensación/condiciones como señales de confianza y experimentación por outcome,
-con fuerza y límites de la evidencia explícitos. No hubo cambio de runtime, schema, beneficios ni
-publicación de vacante. Pendiente operativo: completar los datos reales del Senior Visual Designer
-antes de redactar/publicar su opening.

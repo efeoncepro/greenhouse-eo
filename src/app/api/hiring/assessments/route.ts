@@ -3,23 +3,29 @@ import { NextResponse } from 'next/server'
 import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { can } from '@/lib/entitlements/runtime'
 import { hiringInvalidBodyResponse, toHiringErrorResponse } from '@/lib/hiring'
-import { assignCandidateTest, assignInterviewerScorecard, listAssessmentsForApplication } from '@/lib/hiring/assessment'
+import { assignInterviewerScorecard, listAssessmentsForApplication } from '@/lib/hiring/assessment'
 import { requireInternalTenantContext } from '@/lib/tenant/authorization'
 
 /**
  * TASK-1360 — `GET/POST /api/hiring/assessments`.
  * GET (read): `?applicationId=` lista las instancias de una postulación.
- * POST (author): asigna una instancia. `method=candidate_test` devuelve el token UNA vez (para el
- * link tokenizado que consume TASK-1363); `interviewer_scorecard` crea el scorecard del evaluador.
+ * POST (author): crea el scorecard del evaluador (`method=interviewer_scorecard`).
+ *
+ * **`method=candidate_test` quedó retirado (TASK-1747).** Devolvía el token crudo al caller y
+ * dejaba que éste eligiera plantilla, sin política ni fila de ledger: las instancias que creaba
+ * son invisibles para el ledger de asignación (ver `assignment-store.supersedeAssignmentsForAssessment`
+ * y `cancel.ts`). Sacarlo de la UI no habría cerrado nada — bajo Full API Parity el contrato es la
+ * capability, no la pantalla, y cualquier consumidor con `hiring.assessment.author` (Nexa, MCP, un
+ * script) podía seguir pidiendo el token. El camino canónico es propose→confirm en
+ * `POST /api/hiring/applications/[id]/assessment-assignment`, que resuelve la plantilla desde la
+ * policy de la vacante y NUNCA expone el token: el enlace viaja sólo por el correo al candidato.
  */
 export const dynamic = 'force-dynamic'
 
 interface AssignBody {
   applicationId?: string
-  templateId?: string
   method?: 'candidate_test' | 'interviewer_scorecard'
   evaluatorUserId?: string
-  timeLimitMinutes?: number
 }
 
 export async function GET(request: Request) {
@@ -82,20 +88,16 @@ export async function POST(request: Request) {
 return NextResponse.json(assessment, { status: 201 })
     }
 
-    if (!body.applicationId || !body.templateId) {
-      return NextResponse.json(
-        { error: 'applicationId y templateId son obligatorios.', code: 'hiring_invalid_input', actionable: false },
-        { status: 400 },
-      )
-    }
-
-    const result = await assignCandidateTest(
-      { applicationId: body.applicationId, templateId: body.templateId, timeLimitMinutes: body.timeLimitMinutes ?? null },
-      tenant.userId,
+    // Retirado: asignar un test al candidato pasa SIEMPRE por el camino gobernado.
+    return NextResponse.json(
+      {
+        error:
+          'Este camino para asignar tests quedó retirado. Asigna desde la ficha de la postulación, que aplica la política de la vacante y envía el enlace por correo.',
+        code: 'assessment_legacy_assignment_retired',
+        actionable: false,
+      },
+      { status: 410 },
     )
-
-    // El token crudo se devuelve UNA vez (para construir el link). No se persiste en claro.
-    return NextResponse.json({ assessment: result.assessment, token: result.token }, { status: 201 })
   } catch (error) {
     return toHiringErrorResponse(error, 'assessment_assign')
   }

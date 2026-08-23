@@ -26,6 +26,7 @@ vi.mock('@/lib/hiring/assessment/instances', () => ({
 
 import {
   sendHiringApplicationCreatedEmails,
+  sendHiringAssessmentAccessRotatedEmail,
   sendHiringAssessmentAssignedEmail,
   sendHiringAssessmentSubmittedInternalEmail,
   sendHiringDecisionEmail,
@@ -241,5 +242,111 @@ describe('TASK-1734 Slice 5 — hiring lifecycle emails anti-leak', () => {
         expect(rendered).not.toContain(word)
       }
     })
+  })
+})
+
+/**
+ * TASK-1757 — el aviso de rotación NUNCA puede llevar la credencial.
+ *
+ * El canal `secure_link` existe para entregar el acceso por una vía donde el operador VERIFICA
+ * IDENTIDAD. Si el correo de aviso llevara el enlace, cualquiera con acceso al buzón entraría sin
+ * esa verificación y el diseño entero se cae. Es una regla que hay que hacer cumplir con un test:
+ * agregar "y de paso mándale el link" es la cosa más natural del mundo para quien lea este código
+ * dentro de seis meses sin conocer el porqué.
+ */
+describe('TASK-1757 — aviso de rotación sin credencial', () => {
+  const TOKEN_SENTINEL = 'SENTINEL-TOKEN-jamas-en-el-aviso'
+
+  const rotationRow = (over: Record<string, unknown> = {}) => ({
+    channel: 'secure_link',
+    outcome: 'link_issued',
+    expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    assessment_status: 'in_progress',
+    effective_deadline_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+    candidate_email: 'candidata@example.com',
+    candidate_name: 'María González',
+    opening_title: 'Content Creator',
+    provider_block_status: null,
+    // Veneno: si alguien mapea la fila entera al contexto, el token viaja.
+    access_token: TOKEN_SENTINEL,
+    access_url: `https://greenhouse.efeoncepro.com/public/assessment/access#access=${TOKEN_SENTINEL}`,
+    token_hash: TOKEN_SENTINEL,
+    ...over,
+  })
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    process.env.HIRING_LIFECYCLE_EMAILS_ENABLED = 'true'
+    mocks.wasSent.mockResolvedValue(false)
+    mocks.sendEmail.mockResolvedValue({ status: 'sent', deliveryId: 'del-1' })
+  })
+
+  it('el payload enviado no contiene el token ni la URL por ningún lado', async () => {
+    mocks.query.mockResolvedValue([rotationRow()])
+
+    await sendHiringAssessmentAccessRotatedEmail('harc-1', { reasonCode: 'alternate_channel_requested' })
+
+    expect(mocks.sendEmail).toHaveBeenCalledTimes(1)
+
+    const serialized = JSON.stringify(mocks.sendEmail.mock.calls[0][0])
+
+    expect(serialized).not.toContain(TOKEN_SENTINEL)
+    expect(serialized).not.toContain('/public/assessment/access')
+    expect(serialized).not.toContain('#access=')
+  })
+
+  it('el correo renderizado tampoco lo contiene', async () => {
+    mocks.query.mockResolvedValue([rotationRow()])
+
+    await sendHiringAssessmentAccessRotatedEmail('harc-1', { reasonCode: 'alternate_channel_requested' })
+
+    const payload = mocks.sendEmail.mock.calls[0][0] as { context: Record<string, unknown> }
+    const rendered = await resolveTemplate('hiring_assessment_access_rotated', payload.context)
+
+    expect(JSON.stringify(rendered)).not.toContain(TOKEN_SENTINEL)
+    expect(rendered.text).not.toContain('#access=')
+  })
+
+  it('NO usa el carril token-sensitive: no hay credencial que ligar', async () => {
+    mocks.query.mockResolvedValue([rotationRow()])
+
+    await sendHiringAssessmentAccessRotatedEmail('harc-1', { reasonCode: 'alternate_channel_requested' })
+
+    expect(mocks.claimIntent).not.toHaveBeenCalled()
+  })
+
+  it('con el buzón bloqueado por el proveedor no se envía nada', async () => {
+    mocks.query.mockResolvedValue([rotationRow({ provider_block_status: 'complained' })])
+
+    const result = await sendHiringAssessmentAccessRotatedEmail('harc-1', { reasonCode: 'alternate_channel_requested' })
+
+    expect(mocks.sendEmail).not.toHaveBeenCalled()
+    expect(result).toContain('provider_blocked')
+  })
+
+  it('el canal de correo no genera un segundo mensaje', async () => {
+    mocks.query.mockResolvedValue([rotationRow({ channel: 'email', outcome: 'dispatch_accepted' })])
+
+    const result = await sendHiringAssessmentAccessRotatedEmail('harc-1', { reasonCode: 'alternate_channel_requested' })
+
+    expect(mocks.sendEmail).not.toHaveBeenCalled()
+    expect(result).toContain('not_secure_link')
+  })
+
+  it('la llave de dedupe es la RECUPERACIÓN, no el evento', async () => {
+    mocks.query.mockResolvedValue([rotationRow()])
+
+    // Un re-delivery del mismo evento trae un `_eventId` distinto. Si el dedupe colgara de él,
+    // el candidato recibiría el mismo aviso dos veces.
+    await sendHiringAssessmentAccessRotatedEmail('harc-1', {
+      reasonCode: 'alternate_channel_requested',
+      _eventId: 'outbox-distinto-cada-vez',
+    })
+
+    expect(mocks.wasSent).toHaveBeenCalledWith(
+      'hiring-assessment-access-rotated:harc-1',
+      'harc-1',
+      'candidata@example.com',
+    )
   })
 })

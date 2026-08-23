@@ -6,6 +6,27 @@
 
 > **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim.** Contrato: `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `GREENHOUSE_INTERNAL_IDENTITY_V1.md` + task-specs TASK-784/785/872. Dedup = Slice 4.
 
+### Hiring → Entra workforce provisioning invariants (TASK-1761, ADR Proposed 2026-08-21)
+
+Hasta aceptar `GREENHOUSE_HIRING_ENTRA_WORKFORCE_ACCOUNT_PROVISIONING_DECISION_V1.md`, no ejecutar writes Azure.
+Al implementar:
+
+- **NUNCA** usar email personal, UPN, alias o nombre como identity anchor ni criterio de auto-merge. Usar una ancla
+  opaca permanente 1:1 con el principal longitudinal; handoff/activation IDs sólo son causation por intento.
+- **NUNCA** traducir `Entra accountEnabled=false` a desactivar el principal Greenhouse completo. Candidate,
+  preboarding, workforce y Microsoft authentication son lifecycles distintos.
+- **NUNCA** tratar `/bulkUpload` `202` como provisioned. Persistir correlation y reconciliar provisioning logs hasta
+  terminal; timeout obliga readback antes de retry.
+- **NUNCA** agregar al scope SCIM, grupos o licencia antes de confirmar OID y bindearlo bajo CAS/uniqueness al mismo
+  `user_id`/`identity_profile_id`/member.
+- **NUNCA** habilitar cuenta Microsoft desde selección, handoff o `member.created`. Enablement exige
+  `workforce_enabled`, aprobación, capacidad y readback.
+- **NUNCA** cerrar sólo el alta. Cancelación pre-start, offboarding y rehire deben disable/revoke/remove access y
+  preservar portal/historia; no hard-delete automático.
+- **NUNCA** persistir o loggear password, TAP, tokens, certificado, raw bulk payload o provider error.
+- **SIEMPRE** probar el roundtrip Entra → SCIM y demostrar cero principal/member/role/evento duplicado.
+- **SIEMPRE** usar app/principal dedicado least-privilege y verificar drift de permissions/credentials.
+
 ### Person Legal Profile invariants (TASK-784, desde 2026-05-05)
 
 Toda surface que muestre o consuma identidad legal de una persona natural (RUT, documento de identidad, direccion legal/residencia) **debe** pasar por el modulo canonico `src/lib/person-legal-profile/`. Reemplaza el patron legacy donde `final_settlement_documents` hardcodea `taxId: null` y BigQuery `member_profiles.identity_document_*` era la unica fuente.

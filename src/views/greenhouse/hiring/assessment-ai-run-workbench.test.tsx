@@ -385,6 +385,28 @@ describe('TASK-1738 — honest provisional coverage (gates del confirm)', () => 
 })
 
 describe('TASK-1738 — flag OFF honesto y stale', () => {
+  // Caso fuente 2026-08-19: dos runs productivos con el 100% de sus ítems ya resueltos uno a uno
+  // quedaron incerrables. El flag protege aplicar el lote; sin lote no protege nada.
+  it('flag OFF SIN lote pendiente: el confirm queda operativo y la copy dice que no queda nada', async () => {
+    currentReview = buildReview({
+      coverage: {
+        ...buildReview().coverage,
+        scoringPending: 0,
+        mandatoryPending: 0,
+        samplePending: 0,
+        batchEligible: 0,
+      },
+    })
+
+    renderWorkbench({ confirmEnabled: false })
+
+    const confirmButton = await screen.findByRole('button', { name: /confirmar run/i })
+
+    expect(confirmButton).not.toBeDisabled()
+    expect(confirmButton.getAttribute('aria-describedby')).toBe('assessment-run-nothing-to-confirm')
+    expect(screen.getByText(/no queda nada por confirmar por lote/i)).toBeInTheDocument()
+  })
+
   it('flag OFF: alert confirmFlagOff + confirm no operativo; resolver items sigue disponible', async () => {
     currentReview = buildReview({
       coverage: { ...buildReview().coverage, mandatoryPending: 0, samplePending: 0 },

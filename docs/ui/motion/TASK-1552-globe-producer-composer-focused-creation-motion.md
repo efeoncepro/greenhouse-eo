@@ -1,5 +1,12 @@
 # TASK-1552 — Composer del Producer de Globe · Motion Contract
 
+## Delta 2026-08-21 — fondo transparente no agrega motion
+
+Seleccionar `backgroundMode` no anima el grupo ni el checkerboard. El feedback relevante ya existe: el estimate
+pasa a stale de forma sincrónica, conserva texto y opacidad reducida, y vuelve a vigente cuando llega el nuevo
+valor. Bajo `prefers-reduced-motion`, el cambio de selección es instantáneo y el significado permanece en el label
+`Fondo transparente` + `estimateStale`; el patrón visual nunca es el único portador.
+
 > **Migrado 2026-07-25** desde `TASK-1564`, retirada por duplicación. El dueño del composer es `TASK-1552`.
 
 

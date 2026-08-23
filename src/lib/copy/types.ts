@@ -16,6 +16,8 @@
  * Skill governance: ~/.claude/skills/greenhouse-ux-writing/skill.md
  */
 
+import type { HiringApplicationStage } from '@/types/hiring'
+
 /**
  * Locales soportados por la plataforma. `es-CL` es el default canónico
  * mientras Greenhouse opera como portal `es-only`. `en-US` queda como stub
@@ -25,6 +27,12 @@
  * crear `dictionaries/<locale>/index.ts` con paridad de namespaces.
  */
 export const SUPPORTED_LOCALES = ['es-CL', 'en-US'] as const
+
+import type { AssessmentAccessRotationNoticeSkip } from '@/lib/hiring/assessment/access-recovery/vocabulary'
+import type {
+  AssessmentAssignmentReasonCode,
+  AssessmentAssignmentResult,
+} from '@/types/hiring-assessment-policy'
 
 export type Locale = (typeof SUPPORTED_LOCALES)[number]
 
@@ -150,7 +158,9 @@ export interface HiringAssessmentCopy {
     cancelledDetail: string
     loadReviewPrompt: string
     noModules: string
+    competency: string
     objective: string
+    status: string
     scoreProgressLabel: string
     pending: string
     radarScoreLegend: string
@@ -291,6 +301,7 @@ export interface HiringAssessmentCopy {
     confirmRun: string
     confirming: string
     confirmed: string
+    nothingToConfirm: string
     cancelRun: string
     cancelDialogTitle: string
     cancelDialogBody: string
@@ -534,7 +545,13 @@ export interface HiringDeskCopy {
     appliedDaysAgo: string
     appliedDayUnit: string
     appliedDaysUnit: string
-    stages: Record<string, string>
+    /**
+     * TASK-1754 — indexado por el enum del dominio, NO por `string`. Como
+     * `Record<string, string>` una clave faltante no rompía nada: la columna se quedaba
+     * sin nombre en pantalla y nadie se enteraba hasta verla. Atado al enum, agregar o
+     * retirar una etapa obliga a decidir su nombre visible en el mismo cambio.
+     */
+    stages: Record<HiringApplicationStage, string>
   }
   application: {
     back: string
@@ -571,6 +588,134 @@ export interface HiringDeskCopy {
     scorecardFinalized: string
     documentsTitle: string
     revealConfirm: string
+    /**
+     * TASK-1747 — copy de recuperación de acceso al test.
+     *
+     * Recuperar rota la credencial del candidato: el enlace anterior deja de servir. Por eso el
+     * copy nunca promete recepción en bandeja (sólo el proveedor la confirma), nombra la causa
+     * exacta cuando no se puede recuperar en vez de un "no disponible" genérico, y advierte que
+     * el enlace se muestra una sola vez antes de mostrarlo.
+     */
+    /**
+     * TASK-1747 — copy de la asignación gobernada (propose→confirm).
+     *
+     * Reemplaza el camino legacy, donde el cliente elegía plantilla y recibía el token crudo. Acá
+     * el servidor decide por política y el operador confirma lo que vio. El copy nunca afirma que
+     * el correo salió: el resultado trae `deliveryStatus: 'pending'`, que NO significa enviado.
+     */
+    assignment: {
+      title: string
+      intro: string
+      previewTemplate: string
+      previewTimeLimitLabel: string
+      previewTimeLimit: string
+      previewNoTimeLimit: string
+      previewRecipientReady: string
+      previewRecipientNotReady: string
+      existingOpen: string
+      existingScored: string
+      confirm: string
+      confirming: string
+      proposing: string
+      previewBlockedTitle: string
+      /** Empty state: describe el estado. NO instruye una acción que el lector quizá no tiene. */
+      emptyBody: string
+      emptyBodyCanAssign: string
+      /**
+       * Atados a las uniones del DOMINIO, no a claves escritas a mano: un desenlace o un motivo
+       * nuevo en `hiring-assessment-policy` rompe el build acá en vez de resolverse a `undefined`
+       * y dejar al operador viendo un estado sin causa.
+       */
+      results: Record<AssessmentAssignmentResult['status'], string>
+      /**
+       * Una propuesta ya confirmada NO es un desenlace: el confirm original pudo terminar en
+       * cualquiera de los 6. Por eso vive fuera de `results` — la UI no puede afirmar en cuál.
+       */
+      resultAlreadyConfirmed: string
+      reasons: Record<AssessmentAssignmentReasonCode, string>
+      errorPolicyMissing: string
+      errorExpired: string
+      errorStale: string
+      errorNotConfirmable: string
+      errorGeneric: string
+      errorPermission: string
+      errorNotFound: string
+      errorConflict: string
+      errorSession: string
+      /** Fallas donde reintentar NO resuelve (`actionable: false` del contrato canónico). */
+      errorStructural: string
+    }
+    accessRecovery: {
+      cta: string
+      title: string
+      intro: string
+      channelLabel: string
+      channelEmail: string
+      channelEmailHelp: string
+      channelSecureLink: string
+      channelSecureLinkHelp: string
+      reasonLabel: string
+      reasons: {
+        candidate_reports_email_not_received: string
+        candidate_reports_link_invalid: string
+        alternate_channel_requested: string
+        provider_delivery_failed: string
+        token_expired_before_start: string
+      }
+      /**
+       * TASK-1757 — qué se le va a decir (o no) al candidato. Atado a la unión del dominio: un
+       * motivo de omisión nuevo rompe el build en vez de dejar al operador sin saber por qué la
+       * persona no se va a enterar.
+       */
+      noticeWillSend: string
+      noticeSkipTitle: string
+      noticeSkip: Record<AssessmentAccessRotationNoticeSkip, string>
+      confirm: string
+      confirming: string
+      emailQueued: string
+      emailPending: string
+      emailAlreadySent: string
+      linkCopyFailed: string
+      emailUnknown: string
+      emailFailed: string
+      emailExpiry: string
+      linkTitle: string
+      linkWarning: string
+      linkExpiry: string
+      linkCopy: string
+      linkCopied: string
+      linkAlreadyRevealed: string
+      quotaRemainingEmail: string
+      quotaExhaustedEmail: string
+      quotaExhaustedAll: string
+      cooldown: string
+      emailBlocked: string
+      emailMissing: string
+      unavailableTitle: string
+      unavailable: {
+        assessment_recovery_method_not_supported: string
+        assessment_recovery_application_closed: string
+        assessment_recovery_consent_withdrawn: string
+        assessment_recovery_invalid_state: string
+        assessment_recovery_time_elapsed: string
+        assessment_recovery_expired_after_start: string
+        assessment_recovery_expiry_not_proven: string
+        assessment_recovery_status_not_allowed: string
+        assessment_recovery_status_cancelled: string
+      }
+      errorGeneric: string
+      errorNotFound: string
+      errorRateLimited: string
+      errorIdempotencyConflict: string
+      errorRecipientChanged: string
+      errorConflict: string
+      errorPermission: string
+      errorSession: string
+      errorReadFailed: string
+      copyAriaLabel: string
+      dialogAriaLabel: string
+      statusAriaLive: string
+    }
     /**
      * TASK-1715 — copy del panel de Documentos. Separa las dos clases del modelo
      * canónico: un archivo se ABRE (autorizado ya por la capability de la pantalla)

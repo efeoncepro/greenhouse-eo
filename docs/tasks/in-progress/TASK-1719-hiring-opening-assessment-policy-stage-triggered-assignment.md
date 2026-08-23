@@ -252,6 +252,29 @@ completitud/evidencia sin crear una segunda tabla ni impedir que Hiring asigne t
      existe en el repo, reporta antes de continuar.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-22 — ADR del vocabulario de etapas y desenlace
+
+Se aceptó `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md` (`Accepted`), primer ADR del vocabulario del pipeline. Fija **dos ejes**:
+`stage` = dónde va la persona en el recorrido (6 valores, uno por columna; `closed` se queda y **es
+escribible**) y **desenlace** = cómo terminó (`selected`, `backup_selected`, `not_selected`, `rejected`,
+`withdrawn`, `unresponsive`) + **causa gobernada** obligatoria en `not_selected` (`capacity_filled`,
+`opening_closed`, `process_cancelled`). Invariante como `CHECK`: **`stage='closed'` ⟺ desenlace declarado**.
+El eje de desenlace lo implementa `TASK-1765`; la superficie del kanban, `TASK-1766`; el embudo de equidad,
+`TASK-1767`.
+
+**La doctrina que esta task escribió queda FALSA al ensancharse la etapa trigger.**
+
+El comentario de `src/types/hiring-assessment-policy.ts:19-42` justifica `shortlisted` como etapa canónica
+porque *«en `shortlisted` la población ya está acotada»* y *«en Preselección el pedido tiene contrapartida
+(avanzaste)»*. Al absorber `qualified`, **la población se ensancha y entra todo el que pase screening** —
+y el argumento de equidad, que es el que sostiene la decisión, deja de ser cierto (hallazgo H-12).
+
+Necesita reescribir ese comentario y revalidar la justificación cuando `TASK-1754` ejecute el colapso.
+**Dejarlo como está es exactamente la deriva silenciosa que produjo este incidente.**
+
+Nota verificada: el default de la policy **ya es `manual` + `draft`**, así que la pregunta abierta sobre
+invertirlo está mitigada y **no necesita task nueva**.
+
 ## Architecture Alignment
 
 Revisar y respetar:

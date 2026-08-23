@@ -19,6 +19,7 @@
 - [ ] Sitemap XML limpio (solo 200 indexables) y enviado a GSC
 - [ ] HTTPS sin mixed content; mobile parity
 - [ ] JSON-LD Organization + Article/Person válido (Rich Results Test)
+- [ ] JSON-LD serializado una vez: sin entidades HTML/doble escape; valores extraídos = contenido visible
 - [ ] Internal linking a páginas dinero (≤3 clicks del home)
 - [ ] (Sitio grande) logs sin desperdicio de rastreo
 
