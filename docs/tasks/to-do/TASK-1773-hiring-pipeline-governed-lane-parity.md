@@ -121,6 +121,16 @@ que ningún modelo escriba directo.
   en vez de inventar el suyo. Conviene coordinarlas, no secuenciarlas a ciegas.
 - `TASK-1767` — el embudo de equidad lee la causa gobernada; un lector federado le sirve.
 - `TASK-1718` — ya expone el packet de revisión en el mismo lane; su patrón de minimización aplica.
+- `TASK-1721`/`TASK-1722` — el recorrido de selección y su federación MCP. **No se solapan y hay que decir
+  por qué:** 1721 orquesta el camino POSITIVO (seleccionar → decidir → correo → handoff → activación) y su
+  confirm llama exclusivamente a `decideHiringApplication`; esta task federa el eje de desenlace COMPLETO,
+  los seis valores. Comparten el mismo command, así que el DTO del desenlace debe ser UNO: si 1773 llega
+  primero, 1722 lo consume; si llega 1722 primero, esta lo reusa. **NUNCA dos shapes del mismo desenlace.**
+- `TASK-1762`/`TASK-1763` — el cierre de cohorte por cupo escribe `not_selected` + `capacity_filled` en lote.
+  Es la MISMA causa gobernada que esta task expone para lectura. Cuando 1762 exista, decidir explícitamente
+  si el lane federa también el cierre masivo o sólo la decisión individual; no dejarlo implícito.
+- `TASK-1720` — federa assessment con el mismo loop `propose`/`confirm` en el mismo lane. Su forma manda:
+  esta task copia, no inventa una variante.
 
 ### Files owned
 
