@@ -732,9 +732,35 @@ así que ése es el eje equivocado.
 Las 32 de diferencia son las filas sintéticas archivadas como `closed` sin decisión. Cambiar el
 predicado hoy las devolvería al conteo de proceso activo — una regresión, no una mejora.
 
-**Condición de ejecución:** después del backfill de `TASK-1748` y del `CHECK` del invariante. Ahí
-`stage='closed'` ⟺ `decision IS NOT NULL`, los dos predicados se vuelven equivalentes y el cambio
-pasa a ser de claridad, sin efecto sobre los datos. Dueño natural: la task que cierre el eje viejo.
+**Condición de ejecución:** después del backfill de `TASK-1748` y del `CHECK` del invariante.
+**Dueña: `TASK-1772`.**
+
+> **Corrección 2026-08-22 a lo que decía este párrafo.** Afirmaba que tras el backfill «los dos
+> predicados se vuelven equivalentes y el cambio pasa a ser de claridad». **La equivalencia es cierta;
+> la conclusión no.** El backfill de `TASK-1748` no neutraliza las 32 filas: las devuelve a su etapa
+> previa —o a `sourced`— y les estampa `archived_at`. Con ellas en `sourced` y sin desenlace, los DOS
+> predicados las cuentan como proceso activo. Convergen, sí, **pero al valor equivocado**: migrar a
+> `decision IS NULL` habría adoptado el mismo defecto en los ocho callsites a la vez.
+>
+> El predicado correcto no es ninguno de los dos candidatos, y usa el tercer eje que nació en el
+> Slice 1 de esta misma task y que ningún consumidor incorporó:
+>
+> ```sql
+> decision IS NULL AND archived_at IS NULL
+> ```
+>
+> `stage` **sale** del predicado en vez de quedar como tercera condición: con el `CHECK` aplicado,
+> `stage='closed'` ⟺ `decision IS NOT NULL`, así que nombrarlo repite la primera condición; y sin el
+> `CHECK`, nombra justo el caso que no se quiere contar. En los dos mundos es ruido.
+>
+> El daño que evita no es aritmética de dashboard: `active_process` alimenta la proyección **buscable**
+> del Banco de Talento (`talent-pool/projection.ts:164`, `:185`, `:205`). Una persona **real** con una
+> postulación archivada —que el filtro de procedencia de `TASK-1748` no cubre, porque es real— quedaría
+> buscable e invitable por un registro que alguien retiró a propósito.
+>
+> Es el mismo error de categoría que esta task corrigió para `stage`/`decision`, una vuelta más arriba:
+> un solo predicado respondiendo tres preguntas —dónde va, cómo terminó, si se muestra— y por eso
+> ninguna bien.
 
 **Verificado que NO hay daño hoy** (contra la afirmación inicial de la auditoría): el `CASE` de
 `talent-pool/projection.ts` tiene **dos** ramas que devuelven `pool_eligible`, la 1.ª y la 3.ª, así
