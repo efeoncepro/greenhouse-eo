@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-011`
-- Status real: `in-progress 2026-08-23 — intake hecha, implementacion NO empezada. La colision con el Slice F de TASK-1754 se resolvio: esa task cerro y `assignment-policy/readers.ts` quedo commiteado en origin/develop`TASK-1754` Slice F tiene `assignment-policy/readers.ts` y `src/types/hiring.ts` modificados sin commitear en el checkout compartido, y esta task vive en esa misma superficie`
+- Status real: `in-progress 2026-08-23 — Slices 1 y 2 COMPLETOS y commiteados en develop local (617d18df7, 146242339), sin push. El Slice 3 (write path) espera dos decisiones del operador: la condicion de avance estricta y la autorizacion de migrate:up para el COMMENT. Las cuatro Open Questions quedaron resueltas con evidencia viva (ver Delta 2026-08-23)`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -56,6 +56,115 @@ señal**. Los Follow-ups de `TASK-1755` proponen una señal por antigüedad, no 
 la misma clave —como declara tu `Migration posture`— esa misma derivación cubre el carril manual contando
 por `attempt_seq`. Decláralo explícitamente para los dos carriles o declara por qué el manual queda fuera;
 no lo dejes implícito, que es como este hallazgo llegó hasta acá sin dueño.
+
+## Delta 2026-08-23 — dos premisas de esta spec ya eran falsas al empezar, y las cuatro Open Questions quedaron resueltas
+
+Recalibración hecha **antes** de escribir código, con medición contra la base compartida. Lo que
+sigue reemplaza lo que dicen las secciones de arriba donde se contradigan.
+
+### Premisa muerta 1 — el orden se invirtió: `TASK-1754` aterrizó primero
+
+La spec declara que esta task «va ANTES» del colapso de etapas. **Ya no.** `TASK-1754` está
+`complete` y su contract se aplicó: el `CHECK` de `stage` pasó de trece valores a seis. O sea que
+el carril automático corre hoy en producción sobre una etapa más ancha y **sin reversa**.
+
+Consecuencias concretas, para que nadie las re-derive:
+
+- La coordinación out-of-band con la sesión de `TASK-1754` **deja de ser bloqueante**: ya ocurrió.
+- La fila de la risk matrix «el colapso llega primero» pasó de riesgo a hecho consumado.
+- El `trigger_stage` del ledger es **otro enum** (`shortlisted|interview|manual`, su propio `CHECK`)
+  y el colapso no lo tocó.
+- La task **sigue siendo preventiva**: el colapso no generó callejones nuevos (ver premisa 2).
+
+### Premisa muerta 2 — las 4 filas ya no están «cerradas»
+
+La spec dice que las cuatro candidaturas en callejón están en `stage='closed'`. Medido el
+2026-08-23:
+
+| assignment | outcome_reason | stage | decision | archived_at | data_origin | policy |
+|---|---|---|---|---|---|---|
+| `hoaa-ca235cc0…` | `volume_cap` | `shortlisted` | `null` | 2026-08-19 | `smoke_test` | disabled |
+| `hoaa-eca09585…` | `volume_cap` | `shortlisted` | `null` | 2026-08-19 | `smoke_test` | disabled |
+| `hoaa-b75a80c9…` | `volume_cap` | `shortlisted` | `null` | 2026-08-19 | `smoke_test` | enabled |
+| `hoaa-dcd92523…` | `volume_cap` | `shortlisted` | `null` | 2026-08-19 | `smoke_test` | enabled |
+
+Causa: `TASK-1748` cambió el archivado para sellar `archived_at` en vez de escribir
+`stage='closed'` —archivar no declara desenlace— y eso las devolvió a su etapa previa.
+
+**La decisión no cambia: sin backfill**, siguen siendo humo. Pero la consecuencia de diseño sí es
+nueva y es load-bearing: hoy cumplen `stage = trigger_stage` con `decision IS NULL`, así que sin
+filtro de procedencia la métrica del Slice 1 **nacería en 2** y su steady = 0 sería inalcanzable el
+primer día. Una señal que nace amarilla nadie la vuelve a mirar. Por eso el reader excluye
+`data_origin <> 'real'` y `archived_at IS NOT NULL`, y **reporta el conteo excluido** para que la
+exclusión no sea un cap silencioso.
+
+Hallazgo colateral, fuera de scope y con ficha propia: `awaiting_terminal` vale **13** y **diez son
+de humo archivadas**. La señal vive en `warning` por datos de smoke. → **`ISSUE-162`**.
+
+### Las cuatro Open Questions, resueltas
+
+**1. ¿Quién dispara el supersede?** → **Command humano explícito** sobre una fila concreta, con
+`hiring.assessment.policy.govern` (que ya existe y ya está granteada, así que el guard de
+capability-grant-coverage no pide grant nuevo). Rechazados los otros dos: convertir el GET de
+reconciliación en ejecutor le cambia la naturaleza que su propio comentario declara, y hacerlo
+desde `assign` significa un supersede con `actorUserId: null` —el consumer reactivo del
+`ops-worker` corre así— con la cohorte entera como blast radius.
+
+**Quién ejecuta el intento siguiente: NADIE automáticamente.** El supersede devuelve la fila a
+`resolveApplicationsAwaitingAssignment` y el intento nuevo sale del camino gobernado de siempre
+(propose → confirm humano, o el próximo stage event). Queda declarado, que es lo que la spec pedía
+que no quedara implícito.
+
+**2. ¿Qué evidencia justifica superseder?** → `resolveAssignmentIntent` reusado vía el wrapper
+`resolveLiveAssignmentIntent`, bajo el `FOR UPDATE` de la policy, en el mismo instante y
+transacción del write. **La condición de avance es «hoy resolvería `assigned`», NO «difiere de lo
+registrado».** La lectura intuitiva es la segunda y está mal; la evidencia lo demuestra ejercitando
+el resolver real contra PostgreSQL sobre las cuatro filas:
+
+```
+hoaa-ca235cc0…  policy disabled  volume_cap → hoy blocked:policy_disabled   recuperable=false
+hoaa-eca09585…  policy disabled  volume_cap → hoy blocked:policy_disabled   recuperable=false
+hoaa-b75a80c9…  policy enabled   volume_cap → hoy assigned                  recuperable=true
+hoaa-dcd92523…  policy enabled   volume_cap → hoy assigned                  recuperable=true
+```
+
+Las dos primeras **difieren de lo registrado y siguen bloqueadas**: con el criterio laxo el command
+las habría liberado para volver a quemar la clave con otra razón — el bucle con otro nombre.
+
+**2b. `volume_cap` y su ventana móvil** → sin caso especial en el command: evaluar bajo el lock en
+el instante del write **es** el tratamiento. La cola del endpoint muestra una foto y lo declara; el
+write vuelve a mirar.
+
+**3. ¿Cómo se evita el bucle?** → `DEAD_END_RECOVERY_CAP = 3`, derivado del ledger contando filas
+superseded de la misma clave **con outcome recuperable** (las `cancelled` no cuentan: ésas las
+escribe el otro mecanismo, y sumarlas gastaría el tope con actos que no son recuperaciones). Sin
+columna nueva. Al agotarse, la clave exige intervención humana — espíritu `dead_letter`.
+
+`recoverable` y `blockedBy` se reportan **separados a propósito**: «la causa se corrigió **y** la
+autoridad se acabó» es un estado real (`recoverable: true, blockedBy: 'cap'`), y colapsarlos diría
+«la causa sigue aplicando», que mandaría a alguien a arreglar algo que ya está bien.
+
+**4. ¿Señal propia o métrica?** → Métrica dentro de `hiring.assessment.assignment_health`, que es
+el patrón del dominio y evita partir el espejo del invariante 19. Tres poblaciones distintas:
+`recoverable` alarma (`warning`), `cap_reached` es `error`, y `honest` **no alarma** — avisar de
+algo que nadie puede arreglar todavía entrena a ignorar el tablero. Más
+`dead_ends_evaluation_truncated`, porque el bound de la evaluación no puede ser un cap silencioso.
+
+### El carril manual queda fuera, con razón declarada
+
+Lo pedía el `## Delta 2026-08-22`. La derivación del tope vive en un helper reusable, pero **el
+comportamiento del carril manual no cambia en esta task**: (i) `attempt-retry.test.ts:531-543`
+afirma `[1,2]` como contrato de una task cerrada y en producción, y mutarlo desde otra task es
+cambiar un contrato ajeno sin su dueño; (ii) cada ciclo manual exige propose + confirm humanos, o
+sea ya está limitado por una persona, no por un bucle; (iii) el daño es acotado — no crea instancia
+ni manda correo. Queda como Follow-up con la derivación ya escrita.
+
+### Full API Parity — diferido explícitamente
+
+El command nace en el primitive (`src/lib/hiring/assessment/assignment-policy/**`) y la ruta es su
+consumer, así que la paridad existe por construcción y el loop `propose → confirm → execute` es
+apto para Nexa/MCP sin trabajo adicional. El carril `api/platform/app/*` **se difiere**, y se
+declara acá en vez de omitirse: omitirlo es lo que costó `TASK-1773`.
 
 ## Why This Task Exists
 
