@@ -2,7 +2,7 @@
 
 > **Ambiente:** producción (`/admin/operations`, señal `hiring.assessment.assignment_health`)
 > **Detectado:** 2026-08-23 por Claude (durante `TASK-1771` Slice 1)
-> **Estado:** open
+> **Estado:** open — **dueño declarado 2026-08-23: `TASK-1772`**, que absorbe este issue en su Slice 2b
 > **Severidad operativa:** baja en daño, alta en erosión — no rompe nada, entrena a ignorar el tablero
 
 ## Síntoma
@@ -78,6 +78,17 @@ El desglose está en la tabla de arriba. **No re-derivar el predicado de memoria
 medición de esta sesión usó una aproximación (`superseded_at IS NULL AND outcome IN
 ('blocked','held')`) que da **4** y responde otra pregunta — filas del ledger en callejón, no
 postulaciones sin resultado terminal. Los dos números son correctos y describen cosas distintas.
+
+## Dueño
+
+**`TASK-1772`** (`docs/tasks/to-do/TASK-1772-hiring-active-process-canonical-predicate.md`) cierra este issue
+dentro de su alcance, y no como trabajo aparte. La razón es que los dos predicados de acá son **la misma
+familia** que los ocho callsites que esa task ya venía a unificar: una definición de «postulación vigente»
+escrita a mano en cada consumidor. Arreglarlos por separado dejaría al dominio con un helper canónico nuevo y
+dos consumidores conservando su copia.
+
+Las dos condiciones de este issue viajan a su Acceptance Criteria: el reader y su espejo se mueven **en el
+mismo commit** (invariante 19), y la exclusión **se reporta** en vez de callarse.
 
 ## Relacionado
 

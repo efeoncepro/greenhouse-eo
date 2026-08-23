@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-011`
-- Status real: `Diseño — los dos conteos medidos contra PostgreSQL real 2026-08-22 (50 por etapa, 82 por desenlace); la deuda se declaró en TASK-1765 con una condición que se verificó incompleta`
+- Status real: `Diseno 2026-08-23 (2) — ALCANCE AMPLIADO: esta task cierra tambien ISSUE-162. Los ocho callsites originales deciden por listas literales de ETAPAS; la medicion del 2026-08-23 encontro una segunda familia que decide por decision IS NULL sin archived_at, y ahi viven los dos predicados del ISSUE-162. Los dos conteos originales medidos contra PostgreSQL real 2026-08-22 (50 por etapa, 82 por desenlace); awaiting_terminal = 13, de las cuales 10 son smoke archivadas`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -40,6 +40,73 @@ equivalentes **al valor equivocado**: los dos contarían como proceso activo 32 
 
 La respuesta correcta no es ninguno de los dos candidatos: **«proceso activo» son TRES ejes**, y el tercero
 —`archived_at`— nació el 2026-08-22 sin que ningún consumidor lo incorporara.
+
+
+## Delta 2026-08-23 (2) — esta task cierra también `ISSUE-162`, y su inventario estaba subdeclarado
+
+Medición hecha desde `TASK-1771`, que construyó su propio filtro de elegibilidad porque el canónico que esta
+task va a crear todavía no existía.
+
+### Hay DOS familias de callsites, no una
+
+El inventario original («ocho callsites en cuatro archivos») cubre los que deciden por **listas literales de
+etapas**. Existe una segunda familia que decide por `decision IS NULL` **sin `archived_at`**, y esa no estaba
+contada:
+
+```
+usos de `decision IS NULL`   menciones de archived_at   archivo
+         6                            0                 src/lib/hiring/assessment/assignment-policy/readers.ts
+         1                            0                 src/lib/reliability/queries/hiring-assessment-assignment-signals.ts
+         1                            0                 src/lib/hiring/store.ts
+         1                            0                 src/lib/hiring/documents/retention.ts
+         3                            1                 src/lib/reliability/queries/hiring-application-outcome-signals.ts
+```
+
+⚠️ **Eso es un `grep`, no una prueba, y esta task no puede tratarlo como tal.** La regla del dominio es
+explícita: verificar el predicado, no el conteo. Cada archivo exige leerse entero antes de decidir si es
+defecto:
+
+- **`documents/retention.ts` probablemente NO debe filtrar `archived_at`, y tocarlo sería el bug.** Archivar
+  no declara desenlace, así que no puede parar un reloj de retención: una postulación archivada cuyo
+  candidato tiene derecho a que sus documentos se purguen lo sigue teniendo. Retención responde a la
+  decisión, no a la visibilidad. **Confirmarlo leyendo el predicado y dejarlo escrito** — si no queda
+  declarado, el próximo barrido lo «arregla».
+- **`store.ts` y `hiring-application-outcome-signals.ts`**: leer y clasificar. Que uno mencione `archived_at`
+  una vez no prueba que lo aplique donde corresponde.
+
+### `ISSUE-162` es la novena y la décima ocurrencia, y se cierra acá
+
+`docs/issues/open/ISSUE-162-assignment-health-warning-por-datos-de-smoke.md`. Medido con el predicado copiado
+**verbatim** del archivo de la señal: `awaiting_terminal` = **13**, de las cuales **10 son `smoke_test`
+archivadas** y sólo 3 son reales. La señal `hiring.assessment.assignment_health` vive en `warning` por datos
+de humo, y las tres postulaciones reales que sí esperan quedan escondidas detrás del ruido.
+
+Se cierra dentro de esta task, no aparte, por una razón concreta: son **dos parches del mismo predicado**.
+Arreglarlos por separado deja al dominio con un helper canónico nuevo y dos consumidores que conservan su
+copia — exactamente el patrón §8 (SSOT) que esta task existe para cerrar.
+
+**Dos condiciones que NO son opcionales al cerrarlo** (salen del propio issue):
+
+1. **El reader y su espejo se mueven JUNTOS.** `resolveApplicationsAwaitingAssignment`
+   (`assignment-policy/readers.ts`) y la métrica `awaiting_terminal` de la señal son espejo declarado —
+   invariante 19 del ADR de assignment policy. Cambiar uno solo reintroduce el drift que ese invariante
+   existe para evitar, y ya pasó una vez con un bump de versión de policy.
+2. **La exclusión se REPORTA, no se calla.** Igual que `dead_ends_excluded_synthetic`: una métrica de
+   evidencia con el conteo excluido. Sin eso, un filtro de procedencia es indistinguible de un cap
+   silencioso y «0 esperando» deja de significar lo mismo.
+
+### Ya existe una implementación de referencia — consumirla, no copiarla
+
+`TASK-1771` dejó en `src/lib/hiring/assessment/assignment-policy/dead-ends.ts` exactamente este filtro:
+`${realOnlyPredicate('app')} AND app.archived_at IS NULL`, con su conteo excluido reportado aparte. **Lo
+escribió local porque el canónico no existía.** Cuando esta task cree `active-process.ts`, ese archivo debe
+pasar a consumirlo en vez de conservar su definición — si no, esta task nace con una novena copia.
+
+⚠️ **Ojo con la composición: son dos preguntas ortogonales, no una.** «Proceso activo» es
+`decision IS NULL AND archived_at IS NULL` (eje de desenlace + visibilidad); el filtro de `dead-ends.ts` es
+`data_origin = 'real' AND archived_at IS NULL` (procedencia + visibilidad). Comparten una mitad y difieren en
+la otra. El helper canónico debe exponerlas **componibles**, no fundidas en un solo predicado que responda
+las dos cosas a medias.
 
 ## Why This Task Exists
 
@@ -166,6 +233,10 @@ lista a mano.
 - `src/lib/hiring/talent-pool/commands.ts` (1 callsite)
 - `src/views/greenhouse/hiring/DemandDeskView.tsx` (1 callsite)
 - `src/lib/reliability/queries/hiring-active-process-drift.ts` (nuevo — la señal)
+- `src/lib/hiring/assessment/assignment-policy/readers.ts` (`ISSUE-162`: 6 usos de `decision IS NULL`)
+- `src/lib/reliability/queries/hiring-assessment-assignment-signals.ts` (`ISSUE-162`: el espejo `awaiting_terminal`)
+- `src/lib/hiring/assessment/assignment-policy/dead-ends.ts` (pasa a consumir el helper canónico)
+- `docs/issues/open/ISSUE-162-assignment-health-warning-por-datos-de-smoke.md` (se mueve a `resolved/` al cerrar)
 
 ## Current Repo State
 
@@ -234,6 +305,12 @@ lista a mano.
   desenlace / archivada.
 - **Slice 2 — migrar los ocho callsites.** Los cinco de `projection.ts`, el de `commands.ts`, el de
   `desk.ts` y el de `DemandDeskView.tsx`. Cero listas literales de etapas remanentes en esos archivos.
+- **Slice 2b — la segunda familia y el cierre de `ISSUE-162`.** Leer y clasificar los cinco archivos de la
+  tabla del Delta 2026-08-23 (2) **uno por uno, el predicado entero, no el `grep`**. Migrar los que sean
+  defecto; **declarar por escrito los que no lo son** (se espera que `documents/retention.ts` quede fuera:
+  archivar no puede parar un reloj de retención). Para `ISSUE-162`: mover el reader y su espejo **en el mismo
+  commit** (invariante 19) y agregar la métrica de evidencia con el conteo excluido. `dead-ends.ts` pasa a
+  consumir el helper canónico en vez de conservar su copia local.
 - **Slice 3 — la señal de drift.** `hiring.data_quality.active_process_predicate_drift`: compara el conteo
   del predicado canónico contra el conteo por etapa y reporta la diferencia. Steady 0 una vez migrado;
   cualquier valor distinto significa que alguien reintrodujo una lista a mano o que apareció un cuadrante
@@ -345,13 +422,24 @@ que dos definiciones coexisten, que es exactamente lo que la task viene a elimin
       migrado.
 - [ ] Los tres conteos están declarados antes y después contra PostgreSQL real, con la diferencia explicada.
 - [ ] El ADR del vocabulario declara el tercer eje.
+- [ ] Los cinco archivos de la segunda familia quedaron clasificados uno por uno, con el predicado leído
+      entero; los que NO son defecto están declarados por escrito con su razón.
+- [ ] `ISSUE-162` cerrado: `awaiting_terminal` deja de contar postulaciones archivadas o sintéticas, el
+      reader y su espejo se movieron **en el mismo commit**, y la exclusión se reporta como métrica de
+      evidencia en vez de callarse.
+- [ ] `awaiting_terminal` medido antes y después contra PostgreSQL real con el predicado copiado verbatim del
+      archivo de la señal. Esperado: de 13 a 3 — y si no da 3, el predicado no es el que se creía y no se
+      avanza.
+- [ ] `dead-ends.ts` consume el helper canónico; su definición local del filtro desapareció.
+- [ ] La suite de `TASK-1771` (`dead-ends.test.ts`, `supersede-dead-end.test.ts` y su gate vivo) sigue verde.
 - [ ] `pnpm task:lint --task TASK-1772` en `errors=0 warnings=0`.
 
 ## Verification
 
 - `pnpm local:check`
 - `pnpm test src/lib/hiring`
-- Readback contra PostgreSQL real de los tres conteos
+- Readback contra PostgreSQL real de los tres conteos + `awaiting_terminal` antes/después (13 → 3 esperado)
+- `npx vitest run src/lib/hiring/assessment src/lib/reliability` — la suite de `TASK-1771` no puede romperse
 - `pnpm build` con autorización del operador (gate de costo de máquina, caso a caso)
 
 ## Closing Protocol
@@ -360,7 +448,9 @@ que dos definiciones coexisten, que es exactamente lo que la task viene a elimin
 - [ ] `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` sincronizados
 - [ ] `Handoff.md` y `changelog.md` actualizados
 - [ ] Delta en el ADR y en la doc funcional
-- [ ] Chequeo de impacto cruzado sobre `TASK-1397`, `TASK-1754`, `TASK-1766`, `TASK-1768`
+- [ ] Chequeo de impacto cruzado sobre `TASK-1397`, `TASK-1754`, `TASK-1766`, `TASK-1768`, `TASK-1771`
+- [ ] `ISSUE-162` movido de `open/` a `resolved/` con su fecha y su verificación, y su fila del
+      `docs/issues/README.md` actualizada
 - [ ] `pnpm docs:closure-check` sin errores
 
 ## Follow-ups
