@@ -39,11 +39,26 @@ exportan como piezas nombradas: componerlas falla al compilar, recortar strings 
 Gate probado en las dos direcciones (falla sobre reintroducción, pasa sobre el árbol migrado).
 
 **🔴 Residuo pendiente en la base compartida, y es mío.** Mi primera corrida de live tests murió a
-mitad (proxy Cloud SQL caído) y dejó postulaciones de humo sin archivar; hoy `awaiting_terminal` mide
-**5** = 3 reales + 2 de residuo. El operador autorizó limpiarlo con el CLI gobernado, pero
-`hiring:data:purge-synthetic` **no tiene allowlist**: opera sobre las 43 postulaciones no-reales, 17
-fichas y 18 vacantes. **No lo ejecuté** — excede lo autorizado. Queda como decisión abierta: o se
-acota el alcance del CLI, o se autoriza la corrida completa.
+mitad (proxy Cloud SQL caído) y dejó 8 postulaciones de humo sin archivar
+(`EO-APP-0234`…`0241`, todas `smoke_test`); hoy `awaiting_terminal` mide **5** = 3 reales + 2 de
+residuo, y `assignment_dead_ends` mide 1 por la misma causa (`EO-APP-0241`, que NO es un callejón de
+una persona real). **No lo limpié**, y la razón cambió al verificarla:
+
+- Primero reporté que `hiring:data:purge-synthetic` **no tiene allowlist** y que por eso limpiarlo
+  excedía lo autorizado. **Eso es cierto del CLI y falso de la capacidad.**
+  `archiveSyntheticRecords` (`data-origin/purge.ts:236`) recibe allowlist en los tres niveles
+  —`applicationIds`, `candidateFacetIds`, `openingIds`— y su docstring dice literalmente *«Omitirlo
+  NO archiva ninguna: nada se escribe sin allowlist»*. Es el CLI el que le pasa el plan entero
+  (`purge-synthetic-hiring-data.ts:53-55`). Leí el CLI y concluí sobre la biblioteca.
+- Entonces **lo que el operador autorizó SÍ es ejecutable tal como lo autorizó**: archivar sólo esos
+  8 `applicationIds`, con actor + reason + audit. Queda pendiente sólo por coordinación de quién lo
+  corre (los fixtures son compartidos con los gates de la otra sesión), no por falta de capacidad.
+- **Sólo `applicationIds`**: no incluir fichas ni vacantes — `cndf-1c86e66f` la comparten tres de
+  ellas y es fixture vivo de los gates de assignment.
+
+Deuda derivada: el CLI debería exponer `--allowlist`. Un CLI que sólo sabe hacer «todo» sobre la
+única instancia Cloud SQL de dev/staging/producción obliga a un script ad-hoc para cada limpieza
+acotada.
 
 **Deuda destapada, sin dueño:** `assign.live.test.ts` y `propose-confirm.live.test.ts` crean fixtures
 **sin declarar `dataOrigin`**, así que nacen `real`. El gate `hiring-data-origin-gate` barre
