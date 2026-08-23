@@ -2,6 +2,57 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-23 — TASK-1772: los dos predicados convergieron, y convergieron al valor equivocado
+
+**Estado: `code complete, rollout pendiente`.** Slices 1-5 en `develop` local, **sin push**:
+`0794b6ff1`, `31f04ed42`, `03a33a55a`, `d430990df`, `1206c0f44`. `ISSUE-162` cerrado y movido a
+`resolved/`. La task ya está en `complete/` porque no depende de flags, migraciones ni deploy: es un
+cambio de LECTURA sin escrituras, y su efecto ya es visible contra la base compartida.
+
+**La condición que `TASK-1765` dejó escrita se cumplió, y su conclusión igual estaba mal.** Decía
+«cuando los dos predicados converjan, el cambio es puramente de claridad». Convergieron (82 y 82) — y
+convergieron contando como vivas 32 postulaciones archivadas. La respuesta no era ninguno de los dos
+candidatos: **son TRES ejes**, y el tercero (`archived_at`) nació el mismo día que el ADR sin que
+ningún consumidor lo incorporara. **Cuando una task deja una deuda con la condición «cuando A y B
+converjan esto es cosmético», la condición se verifica midiendo: dos predicados pueden converger y
+estar los dos mal.**
+
+**Daño real medido, no aritmética de dashboard:** 5 personas **reales** figuraban `active_process` en
+el Banco de Talento —o sea buscables e invitables— únicamente por una postulación archivada. Pasan a
+`needs_reconsent` (54 → 49).
+
+**Once copias, no ocho.** La spec contaba 8; la segunda familia agregó 2 más (`ISSUE-162`) y la
+onceava la encontró **calibrar el gate del Slice 4**, no un barrido manual: un docstring que se
+declaraba «espejo VERBATIM» de la señal y había dejado de serlo. Correr el gate y mirar qué encuentra
+completó un inventario que dos barridos manuales dejaron corto.
+
+**Un defecto que casi cometo dentro de su propio arreglo:** la primera versión le recortaba una mitad
+a la conjunción con `split(' AND ').at(-1)` para que `dead-ends.ts` compusiera sólo visibilidad. Eso
+sobrevive a que el predicado crezca un eje y suelta `archived_at` **en silencio**. Los ejes se
+exportan como piezas nombradas: componerlas falla al compilar, recortar strings no falla.
+
+**Declarados FUERA con su razón** (un `grep` es un inventario, no una prueba): `documents/retention.ts`
+—ese `NOT EXISTS` protege de la purga, migrarlo la haría más agresiva y borrar no es reversible—,
+`store.ts:1341` (guard de un write) y `hiring-application-outcome-signals.ts` (mide otra pregunta).
+
+**Readback:** `awaiting_terminal` 13 → 3 sobre base limpia; `drift` 0; Banco de Talento 54 → 49.
+Gate probado en las dos direcciones (falla sobre reintroducción, pasa sobre el árbol migrado).
+
+**🔴 Residuo pendiente en la base compartida, y es mío.** Mi primera corrida de live tests murió a
+mitad (proxy Cloud SQL caído) y dejó postulaciones de humo sin archivar; hoy `awaiting_terminal` mide
+**5** = 3 reales + 2 de residuo. El operador autorizó limpiarlo con el CLI gobernado, pero
+`hiring:data:purge-synthetic` **no tiene allowlist**: opera sobre las 43 postulaciones no-reales, 17
+fichas y 18 vacantes. **No lo ejecuté** — excede lo autorizado. Queda como decisión abierta: o se
+acota el alcance del CLI, o se autoriza la corrida completa.
+
+**Deuda destapada, sin dueño:** `assign.live.test.ts` y `propose-confirm.live.test.ts` crean fixtures
+**sin declarar `dataOrigin`**, así que nacen `real`. El gate `hiring-data-origin-gate` barre
+`scripts/` y `tests/e2e/`, **no** `src/**/*.live.test.ts`.
+
+**Gates:** `pnpm lint` y `pnpm typecheck` limpios · `hiring` + `reliability` 1.908 verdes ·
+`task:lint` `errors=0 warnings=0` · gate de source 0 hallazgos. `pnpm test` completo y `pnpm build`
+**no** se corrieron (el build consume ~30 GB y espera autorización del operador).
+
 ## 2026-08-23 — EPIC-042: el mockup aprobado ya gobierna la implementación futura de footers
 
 **Estado: documentación y skill completas; runtime sin cambios.** `TASK-1764` continúa como umbrella y la ADR
@@ -523,50 +574,3 @@ contrato. GVC local premium pasó desktop 1440 y mobile 390 con cero findings/ru
 medida: `scrollWidth === clientWidth`, wrapper `1×1`, `scrollHeight` 1549/2296. El scenario dejó de
 ignorar la tabla y el layout gate detecta `layout_out_of_flow_vertical_runaway`. Estado: **code complete,
 rollout pendiente**; no hubo push, deploy ni release en esta sesión.
-
-## 2026-08-19 (noche) — Release 1745/1746 en producción, y cuatro hallazgos que quedaron en tasks
-
-Sesión paralela a la de TASK-1747. Lo que sigue es lo que una sesión fresca necesita saber para no
-repetir trabajo ni reabrir decisiones ya tomadas.
-
-**El release está en producción y verificado.** `6f85644cd`, orchestrator run `32256882119` success,
-watchdog `drift_count=0`. El `ops-worker` muestra SHA distinto: es el change-gate, los árboles son
-idénticos, no es drift. Las dos migraciones están aplicadas con readback, el índice concurrente creado
-(`valid=true, ready=true`) y **20 bearers que estaban en claro en `delivery_payload` fueron saneados**.
-
-**El webhook de Resend funciona.** Nunca había existido — esa era la causa raíz de ISSUE-160. Probado
-con correo real: `email.sent` y `email.delivered` firmados en 45 s. Ya se puede responder "¿este correo
-llegó?" con `email_deliveries.provider_status` + `delivered_at`, que era imposible esta mañana.
-
-**Dos cosas que NO hay que deshacer.** El fix de Turnstile `ef30759a1` fue revertido en `a36967531`:
-el timeout de 15 s no se cancelaba al entrar el desafío interactivo, y el supuesto de dónde pinta
-Cloudflare quedó sin verificar. Y `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` sigue en `false`
-a propósito: hay `email.clicked` **firmados por webhook**, o sea el rewrite de links está ocurriendo
-hoy sobre correos de candidatos, y el bearer del cutover viaja en el fragmento.
-
-**Corrección de un error mío que quedó escrito antes:** dije que el tracking del apex "no medía nada"
-por faltarle `tracking_subdomain`. Es falso — ese campo es para un dominio de tracking propio, no un
-segundo candado. El flag solo basta. Corregido en la skill `resend-email-platform`, que además quedó
-espejada a `.codex` y protegida por el gate de espejos.
-
-**Cuatro tasks nuevas, todas con el análisis dentro:**
-
-- `TASK-1749` — tracking de marketing sobre dominio propio (bloqueada por el cutover)
-- `TASK-1750` — el desafío interactivo de Turnstile deja fuera a candidatos; su Slice 1 es **verificar
-  con la sitekey `3x00000000000000000000FF` antes de implementar**, que es lo que el intento revertido
-  se saltó
-- `TASK-1754` — las etapas del dominio son las que el operador puede elegir
-- Pendiente sin ID: invertir el default de la política de assessment + revisar plantilla por vacante
-
-**El hallazgo que más cuesta y por qué quedó como patrón.** `GREENHOUSE_CANONICAL_PATTERNS_V1.md` §9:
-_un estado que el sistema distingue, la superficie no puede colapsarlo_. Cinco casos del mismo día en
-cuatro dominios. El síntoma reconocible: **si responder "¿por qué no funcionó?" exige leer la base de
-datos para recuperar un dato que el runtime ya tenía, hubo colapso de estado.** Hoy pasó cinco veces y
-cada una costó horas.
-
-**Dominio `mail.efeoncepro.com`**: verificado, con SPF/DKIM/DMARC en PASS. Nace sin tracking y **nunca**
-debe configurársele un `tracking_subdomain` — es irreversible, sólo se cambia. Mover Hiring ahí es la
-salida limpia al problema del rewrite.
-
-**Estado del árbol:** producción corre `6f85644cd`; hay commits en `develop` sin push de las dos
-sesiones. No hay nada mío a medio camino.

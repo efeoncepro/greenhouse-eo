@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-011`
-- Status real: `Diseno 2026-08-23 (2) — ALCANCE AMPLIADO: esta task cierra tambien ISSUE-162. Los ocho callsites originales deciden por listas literales de ETAPAS; la medicion del 2026-08-23 encontro una segunda familia que decide por decision IS NULL sin archived_at, y ahi viven los dos predicados del ISSUE-162. Los dos conteos originales medidos contra PostgreSQL real 2026-08-22 (50 por etapa, 82 por desenlace); awaiting_terminal = 13, de las cuales 10 son smoke archivadas`
+- Status real: `IMPLEMENTADA 2026-08-23 — Slices 1-5 en develop local (0794b6ff1, 31f04ed42, 03a33a55a, d430990df, 1206c0f44). ISSUE-162 cerrado y movido a resolved/. Readback contra PG real: awaiting_terminal 13 → 3, drift 0, active_process del Banco de Talento 54 → 49. Sin push. Historial de diseno: Diseno 2026-08-23 (2) — ALCANCE AMPLIADO: esta task cierra tambien ISSUE-162. Los ocho callsites originales deciden por listas literales de ETAPAS; la medicion del 2026-08-23 encontro una segunda familia que decide por decision IS NULL sin archived_at, y ahi viven los dos predicados del ISSUE-162. Los dos conteos originales medidos contra PostgreSQL real 2026-08-22 (50 por etapa, 82 por desenlace); awaiting_terminal = 13, de las cuales 10 son smoke archivadas`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -126,6 +126,92 @@ pasar a consumirlo en vez de conservar su definición — si no, esta task nace 
 `data_origin = 'real' AND archived_at IS NULL` (procedencia + visibilidad). Comparten una mitad y difieren en
 la otra. El helper canónico debe exponerlas **componibles**, no fundidas en un solo predicado que responda
 las dos cosas a medias.
+
+## Delta de implementación — 2026-08-23
+
+### Lo que la medición cambió respecto de la spec
+
+**Los dos conteos de la spec caducaron entre que se escribió y que se ejecutó, y su predicción se
+cumplió.** La spec declara «50 por etapa, 82 por desenlace» (medido 2026-08-22). Readback del
+2026-08-23, ya con el backfill y el `CHECK` aplicados:
+
+```
+stage NOT IN ('rejected','withdrawn','closed')  →  82
+decision IS NULL                                 →  82   ← convergieron
+decision IS NULL AND archived_at IS NULL         →  50   ← el canónico
+```
+
+Convergieron al valor equivocado, exactamente como la spec anticipó. La premisa se confirma; sólo el
+número «50 por etapa» quedó viejo.
+
+**El inventario de la segunda familia venía de un `grep` que contó prosa.** La tabla del Delta
+2026-08-23 (2) dice «6 usos de `decision IS NULL`» en `readers.ts`. Leído entero: **2 en código**
+(`:162`, `:264`); los otros 4 son menciones dentro de comentarios. La conclusión no cambia — los dos
+son defecto y se migraron.
+
+### Una copia que la spec no contaba: la onceava
+
+El barrido de calibración del gate del Slice 4 encontró una copia más, en
+`assessment/assignment-policy/dead-end-supersede.live.test.ts`. Su docstring se declaraba **«espejo
+VERBATIM del predicado de `awaiting_terminal` de la señal»** y desde el Slice 2b ya no lo era. Una
+copia que se declara verbatim sin serlo miente justo donde el test cree estar midiendo lo mismo.
+Migrada.
+
+**Lección transferible:** el gate no sirvió sólo para prevenir a futuro; calibrarlo (correrlo y mirar
+qué encuentra) fue lo que completó el inventario que dos barridos manuales habían dejado corto.
+
+### Dos decisiones de diseño que la spec no anticipaba
+
+1. **`archived_at` no llegaba al VM.** `DemandDeskView.tsx` no podía preguntar por los tres ejes: la
+   columna existía en la base desde el 2026-08-22 y ningún consumidor podía verla. Se expuso en
+   `HIRING_APPLICATION_COLUMNS`, en la fila y en `HiringApplication`. `store.ts` y `types/hiring.ts`
+   entran a `Files owned` sin haber estado declarados.
+
+2. **El helper expone los ejes por separado, no sólo la conjunción.** `dead-ends.ts` necesita
+   componer visibilidad con procedencia y NO con desenlace. La primera implementación le recortaba
+   una mitad a la conjunción (`split(' AND ').at(-1)`); eso habría sobrevivido a que el predicado
+   crezca un eje y habría soltado `archived_at` **en silencio** — el defecto de esta task cometido en
+   su propia implementación. Se exportan `decidedOutcomePredicate` y `notArchivedPredicate` como
+   piezas nombradas: componerlas falla al compilar, recortar strings no falla.
+
+### La procedencia NO entró al reader de assignment, y hay evidencia detrás
+
+La spec y el `ISSUE-162` sugerían aplicar también `realOnlyPredicate` en `awaiting_terminal`. Se
+descartó: el gate vivo de `TASK-1771` (`dead-end-supersede.live.test.ts`, test «el ciclo completo: la policy en `draft` bloquea, habilitarla permite liberar, y la postulación vuelve a la cola») ejercita ese reader
+con `dataOrigin: 'smoke_test'` **no archivado** y asserta que lo devuelve. Filtrarla ahí rompería la
+única prueba de que liberar una clave la devuelve de verdad a la cola, y divergir del reader rompería
+el invariante 19. No hacía falta: las diez filas ruidosas eran archivadas, así que el eje de
+visibilidad las cubre entero.
+
+### Readback declarado
+
+| Métrica | Antes | Después |
+|---|---|---|
+| `awaiting_terminal` | 13 | **3** (+ 10 reportadas en `awaiting_terminal_excluded_archived`) |
+| `active_process_predicate_drift` | — | **0**, severity `ok` |
+| Membresías `active_process` del Banco de Talento | 54 | **49** |
+| Postulaciones en proceso activo (canónico) | — | 50 |
+
+Las 5 membresías que salen son exactamente las que el readback previo había aislado como activas
+únicamente por una postulación archivada.
+
+⚠️ **Nota de medición — el `13 → 3` es el número limpio, y hoy la base dice 5.** El `3` se capturó
+sobre la base sin residuo, antes de cualquier corrida de test de esta sesión, y es el que vale como
+criterio. Después: mis propios live tests dejaron residuo al morir el proxy Cloud SQL a mitad de
+corrida, y otra sesión aplicó marcado y purga de sintéticos en paralelo. Medición actual:
+
+```
+awaiting_terminal                    = 5     ← 3 reales + 2 de humo NO archivadas (residuo de gate)
+awaiting_terminal_excluded_archived  = 10
+```
+
+**El criterio NO se mueve a 5.** Los 2 extra son postulaciones `smoke_test` sin archivar, y el
+predicado no filtra procedencia a propósito (ver arriba); archivarlas o purgarlas las saca. Mover el
+criterio para que dé 5 sería editar el gate para que pase.
+
+Los totales absolutos del drift también se movieron por lo mismo (82/50 → 98/66). Lo que esta task
+cambia son las **diferencias**, y ésas se conservan: `drift` = 0 en todas las mediciones y la
+aritmética `canonical = outcome_only − archived_gap` cierra en todas.
 
 ## Why This Task Exists
 
@@ -432,26 +518,26 @@ que dos definiciones coexisten, que es exactamente lo que la task viene a elimin
 
 ## Acceptance Criteria
 
-- [ ] Existe `src/lib/hiring/active-process.ts` exportando el predicado SQL y el predicado TS.
-- [ ] Los cuatro cuadrantes están cubiertos por test unitario, nombrados como tales.
-- [ ] Los ocho callsites consumen el helper; `grep` de listas literales de etapas terminales en los cuatro
+- [x] Existe `src/lib/hiring/active-process.ts` exportando el predicado SQL y el predicado TS.
+- [x] Los cuatro cuadrantes están cubiertos por test unitario, nombrados como tales.
+- [x] Los ocho callsites consumen el helper; `grep` de listas literales de etapas terminales en los cuatro
       archivos devuelve cero.
-- [ ] La señal `hiring.data_quality.active_process_predicate_drift` existe, está en el registry y reporta 0.
-- [ ] El gate del Slice 4 falla sobre un archivo de prueba que reintroduce la lista, y pasa sobre el árbol
+- [x] La señal `hiring.data_quality.active_process_predicate_drift` existe, está en el registry y reporta 0.
+- [x] El gate del Slice 4 falla sobre un archivo de prueba que reintroduce la lista, y pasa sobre el árbol
       migrado.
-- [ ] Los tres conteos están declarados antes y después contra PostgreSQL real, con la diferencia explicada.
-- [ ] El ADR del vocabulario declara el tercer eje.
-- [ ] Los cinco archivos de la segunda familia quedaron clasificados uno por uno, con el predicado leído
+- [x] Los tres conteos están declarados antes y después contra PostgreSQL real, con la diferencia explicada.
+- [x] El ADR del vocabulario declara el tercer eje.
+- [x] Los cinco archivos de la segunda familia quedaron clasificados uno por uno, con el predicado leído
       entero; los que NO son defecto están declarados por escrito con su razón.
-- [ ] `ISSUE-162` cerrado: `awaiting_terminal` deja de contar postulaciones archivadas o sintéticas, el
+- [x] `ISSUE-162` cerrado: `awaiting_terminal` deja de contar postulaciones archivadas o sintéticas, el
       reader y su espejo se movieron **en el mismo commit**, y la exclusión se reporta como métrica de
       evidencia en vez de callarse.
-- [ ] `awaiting_terminal` medido antes y después contra PostgreSQL real con el predicado copiado verbatim del
+- [x] `awaiting_terminal` medido antes y después contra PostgreSQL real con el predicado copiado verbatim del
       archivo de la señal. Esperado: de 13 a 3 — y si no da 3, el predicado no es el que se creía y no se
       avanza.
-- [ ] `dead-ends.ts` consume el helper canónico; su definición local del filtro desapareció.
-- [ ] La suite de `TASK-1771` (`dead-ends.test.ts`, `supersede-dead-end.test.ts` y su gate vivo) sigue verde.
-- [ ] `pnpm task:lint --task TASK-1772` en `errors=0 warnings=0`.
+- [x] `dead-ends.ts` consume el helper canónico; su definición local del filtro desapareció.
+- [x] La suite de `TASK-1771` (`dead-ends.test.ts`, `supersede-dead-end.test.ts` y su gate vivo) sigue verde.
+- [x] `pnpm task:lint --task TASK-1772` en `errors=0 warnings=0`.
 
 ## Verification
 
@@ -463,14 +549,14 @@ que dos definiciones coexisten, que es exactamente lo que la task viene a elimin
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` a `complete` y archivo movido a `complete/`
-- [ ] `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` y `changelog.md` actualizados
-- [ ] Delta en el ADR y en la doc funcional
-- [ ] Chequeo de impacto cruzado sobre `TASK-1397`, `TASK-1754`, `TASK-1766`, `TASK-1768`, `TASK-1771`
-- [ ] `ISSUE-162` movido de `open/` a `resolved/` con su fecha y su verificación, y su fila del
+- [x] `Lifecycle` a `complete` y archivo movido a `complete/`
+- [x] `docs/tasks/README.md` y `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` y `changelog.md` actualizados
+- [x] Delta en el ADR y en la doc funcional
+- [x] Chequeo de impacto cruzado sobre `TASK-1397`, `TASK-1754`, `TASK-1766`, `TASK-1768`, `TASK-1771`
+- [x] `ISSUE-162` movido de `open/` a `resolved/` con su fecha y su verificación, y su fila del
       `docs/issues/README.md` actualizada
-- [ ] `pnpm docs:closure-check` sin errores
+- [x] `pnpm docs:closure-check` sin errores
 
 ## Follow-ups
 

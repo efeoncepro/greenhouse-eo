@@ -3,6 +3,27 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-23 — Cinco personas reales eran buscables en el Banco de Talento por una postulación que alguien había retirado
+
+- «Postulación en proceso activo» pasó a tener **una sola definición** en toda la plataforma, y son **tres
+  ejes, no uno**: el proceso no terminó (`decision`) **y** el registro no fue retirado de la vista
+  (`archived_at`). Antes, once lugares distintos respondían esa pregunta mirando la **etapa**, cada uno con su
+  propia lista escrita a mano.
+- Preguntar por etapa fallaba por una razón concreta: **archivar devuelve la postulación a su etapa anterior**.
+  Una postulación archivada volvía a verse «en Preseleccionado», así que seguía contando como viva. Medido: **5
+  personas reales** figuraban como «en proceso activo» en el Banco de Talento —y por lo tanto buscables e
+  invitables— únicamente por una postulación que alguien había archivado a propósito. Pasan a
+  `needs_reconsent`.
+- La señal de salud de la asignación de pruebas dejó de vivir en amarillo por datos de humo (`ISSUE-162`):
+  contaba **13** postulaciones esperando, de las cuales **10 eran de prueba, archivadas**. Ahora cuenta **3**,
+  que son las reales, y **reporta aparte** las 10 que excluyó — un filtro que no dice cuánto dejó fuera es
+  indistinguible de un tope silencioso.
+- Si ves un conteo de activas más bajo que ayer, es esto y no se perdió ningún dato: las postulaciones
+  archivadas siguen completas, sólo dejaron de contarse como procesos vivos. Cuántas son se lee en
+  `/admin/operations`.
+- Un gate de CI rechaza que alguien vuelva a escribir la lista a mano, y una señal de confiabilidad detecta en
+  runtime lo que el gate no alcanza a ver.
+
 ## 2026-08-23 — Los footers aprobados dejaron de depender de la imaginación del siguiente agente
 
 - El mockup aprobado ahora es el punto de partida obligatorio para implementar footers: conserva jerarquía,
@@ -937,27 +958,3 @@ aprobar y activar sigue siendo el flujo AEO con revisión humana, sin atajos.
 Verificado contra el mundo real: 16/16 checks contra PG incluyendo una autoría LLM real de 15
 preguntas evaluadas a mano, idempotencia que devuelve el mismo borrador sin segundo gasto, y el
 active previo intacto. Con esto TASK-1665 (el workbench visual) quedó sin bloqueos.
-
-## 2026-08-14 — Descubrir keywords deja de ser un viaje a otra herramienta (TASK-1664)
-
-El módulo SEO contestaba qué empujar de lo que ya aparece en Search Console; no contestaba cómo
-pasar de una hipótesis a un conjunto priorizado de términos. Hoy existe el primitive completo de
-**keyword discovery**: una corrida recibe hasta 10 seeds (manuales, de las consultas GSC, del set
-monitoreado o del dominio propio), las expande con DataForSEO Labs, deduplica y deja **candidatos**
-con procedencia trazable — y con volumen, intención y barrera de enlaces compuestos desde el store
-de mercado de TASK-1661, porque el `keyword_info` que viene inline y pagado en cada respuesta se
-persiste ahí mediante un writer canónico nuevo (`persistKeywordMarketData`) en vez de tirarse.
-`keyword_overview` quedó como top-up sólo del faltante: en el smoke real, el enriquecimiento costó
-**cero llamadas** porque el inline ya había dejado todo fresco.
-
-Las tres fronteras que la spec exigía quedaron en el código, no en la disciplina: el **costo se ve
-antes de gastar** (preview con fórmula, gate de entitlement y fence cada 10 llamadas); **descubrir
-no es seguir** (ninguna pieza escribe el set monitoreado; las decisiones son un log append-only y
-la promoción usa el command de tracking existente); y **repetir la pregunta no paga dos veces**
-(idempotencia por intent completo — el smoke lo midió: segunda corrida USD 0). Paridad completa en
-el mismo cambio: route admin, lane ecosystem (write sólo bindings internos), tools MCP con preview
-y confirmación humana obligatoria, y dos señales de confiabilidad nuevas.
-
-Verificado contra el mundo real, no contra mocks: sanity de 27 checks contra PG y una corrida live
-de Berel MX que costó **USD 0.0132** (estimado conservador 0.0612) y dejó 10 candidatos. Queda
-apagado por diseño: flag OFF en ambos runtimes y scheduler pausado hasta el sign-off de rollout.

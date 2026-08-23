@@ -2,7 +2,7 @@
 
 > **Ambiente:** producción (`/admin/operations`, señal `hiring.assessment.assignment_health`)
 > **Detectado:** 2026-08-23 por Claude (durante `TASK-1771` Slice 1)
-> **Estado:** open — **dueño declarado 2026-08-23: `TASK-1772`**, que absorbe este issue en su Slice 2b
+> **Estado:** **resuelto 2026-08-23** por `TASK-1772` Slice 2b (commit `03a33a55a`)
 > **Severidad operativa:** baja en daño, alta en erosión — no rompe nada, entrena a ignorar el tablero
 
 ## Síntoma
@@ -97,3 +97,57 @@ mismo commit** (invariante 19), y la exclusión **se reporta** en vez de callars
 - `TASK-1748` — archivado por `archived_at`. Correcto; este issue es su efecto colateral no visto.
 - `TASK-1739` — contrato de procedencia y `realOnlyPredicate`.
 - `docs/architecture/GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md` — invariante 19.
+
+
+---
+
+## Resolución — 2026-08-23 (`TASK-1772` Slice 2b, commit `03a33a55a`)
+
+### Qué se cambió
+
+`resolveApplicationsAwaitingAssignment` y su espejo `awaiting_terminal` consumen el predicado
+canónico `activeProcessPredicate` (`src/lib/hiring/active-process.ts`), que exige
+`decision IS NULL AND archived_at IS NULL`. Los dos se movieron **en el mismo commit**, que era la
+condición 1 de este issue (invariante 19 del ADR).
+
+La exclusión **no se calla**: viaja como métrica de evidencia `awaiting_terminal_excluded_archived`,
+condición 2 de este issue. Sin ese conteo, un filtro es indistinguible de un cap silencioso y
+«0 esperando» dejaría de significar lo mismo que significaba ayer sin que nadie pudiera notarlo.
+
+### Verificación contra PostgreSQL real
+
+Ejecutando la señal completa (`getHiringAssessmentAssignmentHealthSignal`) contra la base compartida:
+
+```
+awaiting_terminal                    = 3     (era 13)
+awaiting_terminal_excluded_archived  = 10
+```
+
+3 + 10 = 13. Las diez que salen son exactamente las `smoke_test` archivadas del cuadro de arriba, y
+las tres que quedan son las reales que sí esperan — las que estaban escondidas detrás del ruido.
+
+**Medición posterior el mismo día: 5.** No es una regresión del fix. Los 2 extra son postulaciones
+`smoke_test` **sin archivar**, residuo de corridas de gate vivo que no limpiaron (una por un proxy
+Cloud SQL caído a mitad de corrida). El predicado no filtra procedencia —a propósito, ver abajo— así
+que una fila de humo no archivada cuenta igual que una real, y eso es correcto: la reconciliación
+efectivamente la drenaría. La cifra que verifica este issue es el **3** sobre la base sin residuo.
+
+### Lo que NO se hizo, y por qué
+
+**La procedencia no entra en este predicado.** El issue proponía aplicar también `realOnlyPredicate`.
+Se descartó con evidencia: el gate vivo de `TASK-1771` (`dead-end-supersede.live.test.ts`, test «el ciclo completo: la policy en `draft` bloquea, habilitarla permite liberar, y la postulación vuelve a la cola»)
+ejercita este reader con `dataOrigin: 'smoke_test'` **no archivado** y asserta que lo devuelve.
+Filtrar procedencia acá rompería la única prueba que demuestra que liberar una clave la devuelve de
+verdad a la cola. Y como el reader no la filtra, la señal tampoco puede — divergir rompe el
+invariante 19, que es lo mismo que este issue vino a proteger.
+
+No hacía falta: las diez filas ruidosas eran archivadas, así que el eje de visibilidad las cubre
+entero. Donde la procedencia SÍ importa —la cola de callejones— se compone aparte, y su exclusión ya
+se reporta (`dead_ends_excluded_synthetic`).
+
+### La señal sigue en `warning`, y es honesto
+
+Post-fix la severidad no bajó a `ok`, pero por una razón distinta y accionable: `awaiting_terminal`
+= 3 (tres postulaciones reales que la reconciliación debe drenar) y `expired_open_proposals` = 6.
+Las dos son trabajo real. Lo que este issue reclamaba era una amarilla **por datos que nadie podía
+ir a arreglar**, y eso quedó cerrado.

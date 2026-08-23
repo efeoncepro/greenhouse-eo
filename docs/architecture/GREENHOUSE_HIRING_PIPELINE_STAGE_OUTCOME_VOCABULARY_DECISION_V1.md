@@ -421,3 +421,114 @@ La propia migración lleva su guarda de datos (aborta con `RAISE EXCEPTION` si a
 
 Mientras esa migración no corra, el estado correcto de la task es `code complete, rollout pendiente` — no `complete`.
 
+
+---
+
+## 19. Delta de implementación — 2026-08-23 (`TASK-1772`, el TERCER eje)
+
+### Lo que este ADR separó, y lo que no alcanzó a separar
+
+§3 y §4 partieron en dos un eje que estaba colapsado: **dónde va la persona** (`stage`) y **cómo
+terminó** (`decision`). Lo que no quedó declarado —porque `archived_at` nació en el Slice 1 de
+`TASK-1765`, el mismo día que este ADR se escribía— es que hay un **tercer eje ortogonal**:
+
+> **Eje 3 — Visibilidad: ¿el registro se muestra?** Lo responde `hiring_application.archived_at`.
+
+Es ortogonal a los otros dos **por contrato de este mismo ADR**: §12 prohíbe expresamente que
+archivar declare desenlace. Y ortogonal a la etapa por construcción: el backfill de `TASK-1748`
+devuelve la fila a su etapa previa y sella `archived_at`, en vez de escribir `stage='closed'`.
+
+### «Proceso activo» es la conjunción de dos ejes, y nunca fue el de etapa
+
+```sql
+decision IS NULL          -- el recorrido no ha terminado
+AND archived_at IS NULL   -- y el registro no fue retirado de la vista
+```
+
+`stage` **no participa**. Con el `CHECK` `hiring_application_closed_outcome_check` aplicado,
+`stage <> 'closed'` ⟺ `decision IS NULL`: nombrarlo sería repetir la primera condición. Y sin el
+`CHECK`, lo único que agregaría es la combinación que este predicado no quiere contar. En los dos
+mundos, `stage` es ruido.
+
+**Los cuatro cuadrantes:**
+
+| `decision` | `archived_at` | ¿activo? | caso real |
+|---|---|---|---|
+| `NULL` | `NULL` | **sí** | la persona está en el pipeline |
+| `NULL` | fecha | **no** | registro retirado de la vista sin declarar desenlace |
+| valor | `NULL` | no | el recorrido terminó |
+| valor | fecha | no | terminó y además se archivó |
+
+El **segundo** cuadrante es el que ningún consumidor cubría, y el que motivó la task.
+
+### La predicción de `TASK-1765` se cumplió, y su conclusión no
+
+`TASK-1765` midió los dos candidatos el 2026-08-22 y dejó la deuda condicionada: *«después del
+backfill y del `CHECK`, cuando los dos predicados se vuelven equivalentes y el cambio pasa a ser
+puramente de claridad»*. La primera mitad era cierta; la segunda no. Readback 2026-08-23:
+
+| Predicado | 2026-08-22 | 2026-08-23 (post backfill + `CHECK`) |
+|---|---|---|
+| `stage NOT IN ('rejected','withdrawn','closed')` | 50 | **82** |
+| `decision IS NULL` | 82 | **82** |
+| `decision IS NULL AND archived_at IS NULL` | — | **50** |
+
+Convergieron, exactamente como se predijo. Pero convergieron **al valor equivocado**: los dos
+contaban como «en proceso» 32 postulaciones que alguien archivó a propósito. Migrar del eje de etapa
+al de desenlace no habría sido un cambio de claridad — habría sido adoptar el mismo defecto en los
+ocho callsites a la vez.
+
+**Lección transferible:** cuando una task deja una deuda con la condición «cuando A y B converjan,
+el cambio es cosmético», la condición se verifica midiendo, no razonando. Dos predicados pueden
+converger y estar los dos mal.
+
+### Daño concreto, medido
+
+`talent-pool/projection.ts` deriva `lifecycle_status='active_process'` de este predicado, y
+`active_process` entra a la **proyección buscable** del Banco de Talento. Medición previa a la
+migración: **5 membresías de personas reales** eran `active_process` únicamente por una postulación
+archivada. Eran buscables e invitables por un registro retirado de la vista. Post-migración pasan a
+`needs_reconsent` (54 → 49).
+
+### Aplicado en código
+
+| Pieza | Ubicación |
+|---|---|
+| Predicado canónico `activeProcessPredicate` / `isActiveProcess`, con los dos ejes exportados por separado (`decidedOutcomePredicate`, `notArchivedPredicate`) para composición | `src/lib/hiring/active-process.ts` |
+| Los 8 callsites por lista literal de etapas | `desk.ts`, `talent-pool/projection.ts` (5), `talent-pool/commands.ts`, `DemandDeskView.tsx` |
+| La segunda familia (`decision IS NULL` sin `archived_at`) | `assessment/assignment-policy/readers.ts` (2), `reliability/queries/hiring-assessment-assignment-signals.ts` |
+| `archived_at` expuesto al VM para que la vista pueda preguntar por los tres ejes | `store.ts`, `types/hiring.ts` |
+| Señal `hiring.data_quality.active_process_predicate_drift`, steady 0 | `reliability/queries/hiring-active-process-drift.ts` |
+| Gate de source `pnpm hiring:active-process-gate` | `scripts/ci/hiring-active-process-gate.mjs` |
+
+### Sitios clasificados y declarados FUERA, con el predicado leído entero
+
+Un `grep` es un inventario, no una prueba. Estos tres usan `decision IS NULL` y **no** son el
+defecto:
+
+- **`documents/retention.ts`** — ese `NOT EXISTS` no es un reloj de retención (el reloj es
+  `closed_at`, que sale de `decision_at`): es un **guard que PROTEGE de la purga**. Agregarle
+  `archived_at IS NULL` invertiría su sentido — una postulación archivada por error pasaría de
+  bloquear el borrado a autorizarlo. Queda fuera por **asimetría de daño**: conservar documentos de
+  más es reversible, borrarlos no.
+- **`store.ts:1341`** — guard de concurrencia de un `UPDATE` (compare-and-set sobre el eje de
+  desenlace), no una lectura de «proceso activo». Cambiarlo alteraría el comportamiento de archivado.
+- **`reliability/queries/hiring-application-outcome-signals.ts`** — mide la bicondicional del cierre
+  (`stage='closed'` ⟺ desenlace). Su pregunta es otra.
+
+### Corrección al «Estado honesto al 2026-08-23» de §18
+
+Ese cuadro declara la migración `TASK-1754-stage-vocabulary-contract.sql.pending` como **no
+aplicada** y el `CHECK` de la base **«admitiendo trece valores»**. **Ya no es cierto.** Readback
+contra PostgreSQL real del 2026-08-23:
+
+```
+hiring_application_stage_check
+  CHECK (stage = ANY (ARRAY['sourced','screening','shortlisted','interview','decision_pending','closed']))
+hiring_application_closed_outcome_check
+  CHECK ((stage = 'closed') = (decision IS NOT NULL))
+```
+
+Seis valores, y el invariante de cierre enforceado. Las tres migraciones parqueadas corrieron.
+Queda escrito acá porque un cuadro de estado que caducó es indistinguible de uno vigente para quien
+lo lee después.
