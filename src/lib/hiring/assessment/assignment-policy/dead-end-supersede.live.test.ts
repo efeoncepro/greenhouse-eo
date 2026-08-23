@@ -8,6 +8,7 @@ import { createHiringApplication, createHiringOpening, createTalentDemand } from
 import { assignAssessmentFromPolicy } from './assign'
 import { countAssignedInWindow } from './assignment-store'
 import { resolveAssignmentDeadEndsForPolicy } from './dead-ends'
+import { activeProcessPredicate } from '../../active-process'
 import { resolveApplicationsAwaitingAssignment } from './readers'
 import { supersedeAssignmentDeadEnd } from './supersede-dead-end'
 
@@ -119,8 +120,11 @@ const readLedger = async (): Promise<LedgerSnapshot[]> =>
     [created.applicationId],
   )
 
-/** Espejo VERBATIM del predicado de `awaiting_terminal` de la señal, para medir el residuo real. */
 /**
+ * Espejo del predicado de `awaiting_terminal` de la señal, para medir el residuo real. Consume el
+ * predicado CANÓNICO de proceso activo (TASK-1772) en vez de reescribirlo: la señal lo migró, y una
+ * copia que dice «verbatim» sin serlo miente justo donde el test cree estar midiendo lo mismo.
+ *
  * Devuelve IDS, no un total. Un TOTAL global es incomparable entre el `beforeAll` y el `afterAll`
  * de un live test: los otros archivos de esta carpeta corren EN PARALELO contra esta misma base y
  * mueven la señal legítimamente, así que el assert fallaba por que el vecino hiciera lo correcto.
@@ -132,7 +136,7 @@ const listAwaitingTerminalApplicationIds = async (): Promise<Set<string>> => {
        FROM greenhouse_hiring.hiring_application app
        JOIN greenhouse_hiring.hiring_opening_assessment_policy p
          ON p.opening_id = app.opening_id AND p.state = 'enabled' AND p.mode = 'on_stage_entry'
-      WHERE app.decision IS NULL
+      WHERE ${activeProcessPredicate('app')}
         AND app.stage = p.trigger_stage
         AND NOT EXISTS (
               SELECT 1 FROM greenhouse_hiring.hiring_assessment a

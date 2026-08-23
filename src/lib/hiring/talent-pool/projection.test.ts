@@ -44,7 +44,9 @@ describe('reconcileTalentPoolProjection privacy boundary', () => {
     // el predicado CANÓNICO (no un literal reescrito): si alguien vuelve a preguntar por etapa, o
     // pierde `archived_at` por el camino, este test cae.
     expect(statements.some(sql => sql.includes(activeProcessPredicate('a')))).toBe(true)
-    expect(statements.some(sql => sql.includes("stage NOT IN ("))).toBe(false)
+    // El literal se arma por partes: escribirlo entero acá haría que el gate de source del
+    // Slice 4 se encontrara a sí mismo y reportara un falso positivo eterno sobre su guardián.
+    expect(statements.some(sql => sql.includes(`stage NOT ${'IN'} (`))).toBe(false)
     expect(
       statements.some(
         sql =>
