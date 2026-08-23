@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { countAssignmentDeadEnds } from '@/lib/hiring/assessment/assignment-policy/dead-ends'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import type { ReliabilitySignal } from '@/types/reliability'
@@ -46,6 +47,24 @@ import type { ReliabilitySignal } from '@/types/reliability'
 //    además se excluyen los últimos 15 minutos — contar una asignación de hace 30 segundos
 //    produciría una señal permanentemente amarilla, que es la forma más rápida de que nadie
 //    vuelva a mirarla.
+//
+// 5. CALLEJONES DEL CARRIL AUTOMÁTICO (TASK-1771) — filas vigentes con resultado recuperable
+//    (`blocked`/`held`/`stale`) de un origen NO manual, que ocupan la clave de idempotencia de
+//    una policy activa sin haber asignado nada.
+//
+//    Es el hueco que `blocked_last_24h` no cubre y no puede cubrir: esa métrica **no entra al
+//    cálculo de severidad** y caduca a las 24 horas, así que una clave quemada sale hasta de la
+//    evidencia mientras sigue bloqueando a la persona. `awaiting_terminal` tampoco la ve — la
+//    excluye por construcción, porque la fila del ledger existe.
+//
+//    ⚠️ El predicado NO se escribe acá: se importa de `countAssignmentDeadEnds`
+//    (`assignment-policy/dead-ends.ts`), que es el mismo que alimenta la cola del endpoint de
+//    reconciliación. Es el invariante 19 aplicado antes de que haya nada que reparar.
+//
+//    Excluye postulaciones sintéticas y archivadas, y reporta ese conteo aparte
+//    (`dead_ends_excluded_synthetic`): sin la exclusión la métrica nacería en 2 por datos de
+//    smoke y su steady = 0 sería inalcanzable — una señal que nace amarilla nadie la vuelve a
+//    mirar. Sin el reporte, la exclusión sería un cap silencioso.
 //
 // PII-free: sólo conteos. Nunca applicationId, nombre, correo ni token.
 // ══════════════════════════════════════════════════════════════════════════════
@@ -122,6 +141,8 @@ export const getHiringAssessmentAssignmentHealthSignal = async (): Promise<Relia
                  ))                                                    AS assigned_without_dispatch_24h`,
     )
 
+    const deadEndCounts = await countAssignmentDeadEnds()
+
     const row = rows[0] ?? {
       intent_at_rest: 0,
       awaiting_terminal: 0,
@@ -135,24 +156,28 @@ export const getHiringAssessmentAssignmentHealthSignal = async (): Promise<Relia
     const expiredProposals = Number(row.expired_open_proposals)
     const blocked = Number(row.blocked_last_24h)
     const assignedWithoutDispatch = Number(row.assigned_without_dispatch_24h)
+    const deadEnds = deadEndCounts.deadEnds
+    const deadEndsExcludedSynthetic = deadEndCounts.excludedSynthetic
 
     const severity =
       intentAtRest > 0
         ? 'error'
-        : awaiting > 0 || expiredProposals > 0 || assignedWithoutDispatch > 0
+        : deadEnds > 0 || awaiting > 0 || expiredProposals > 0 || assignedWithoutDispatch > 0
           ? 'warning'
           : 'ok'
 
     const summary =
       intentAtRest > 0
         ? `${intentAtRest} asignación(es) quedaron a medio registrar: el command murió entre el ledger y la instancia. Es un bug, no operación normal.`
-        : assignedWithoutDispatch > 0
-          ? `${assignedWithoutDispatch} asignación(es) de las últimas 24 h no tienen despacho de correo registrado.`
-          : awaiting > 0
-            ? `${awaiting} postulación(es) alcanzaron la etapa trigger sin resultado terminal en el ledger. La reconciliación debe drenarlas.`
-            : expiredProposals > 0
-              ? `${expiredProposals} propuesta(s) de asignación vencieron sin confirmarse ni cerrarse.`
-              : 'Toda asignación tiene resultado terminal, despacho registrado y no hay propuestas vencidas abiertas.'
+        : deadEnds > 0
+          ? `${deadEnds} asignación(es) automáticas quedaron en callejón: ocupan la clave sin haber asignado nada y no se liberan solas.`
+          : assignedWithoutDispatch > 0
+            ? `${assignedWithoutDispatch} asignación(es) de las últimas 24 h no tienen despacho de correo registrado.`
+            : awaiting > 0
+              ? `${awaiting} postulación(es) alcanzaron la etapa trigger sin resultado terminal en el ledger. La reconciliación debe drenarlas.`
+              : expiredProposals > 0
+                ? `${expiredProposals} propuesta(s) de asignación vencieron sin confirmarse ni cerrarse.`
+                : 'Toda asignación tiene resultado terminal, despacho registrado, no hay callejones vigentes ni propuestas vencidas abiertas.'
 
     return {
       signalId: HIRING_ASSESSMENT_ASSIGNMENT_HEALTH_SIGNAL_ID,
@@ -168,6 +193,8 @@ export const getHiringAssessmentAssignmentHealthSignal = async (): Promise<Relia
         { kind: 'metric', label: 'awaiting_terminal', value: String(awaiting) },
         { kind: 'metric', label: 'expired_open_proposals', value: String(expiredProposals) },
         { kind: 'metric', label: 'blocked_last_24h', value: String(blocked) },
+        { kind: 'metric', label: 'assignment_dead_ends', value: String(deadEnds) },
+        { kind: 'metric', label: 'dead_ends_excluded_synthetic', value: String(deadEndsExcludedSynthetic) },
         { kind: 'metric', label: 'assigned_without_dispatch_24h', value: String(assignedWithoutDispatch) },
         {
           kind: 'doc',

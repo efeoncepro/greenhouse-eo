@@ -7,6 +7,7 @@
 export * from './store'
 export * from './assignment-store'
 export * from './readers'
+export * from './dead-ends'
 export * from './commands'
 export * from './assign'
 export * from './proposal-digest'
