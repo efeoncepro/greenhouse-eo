@@ -28,6 +28,50 @@
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
+## Delta 2026-08-22 — el change-gate vigila 24 patrones y el worker importa 62 rutas
+
+Hallazgo del release `304371f73` (dominio Hiring), **medido, no deducido**. La sesión del release notó que
+el `ops-worker` quedó change-gated y el watchdog lo dio por bueno; esta vez era correcto, pero salió bien
+por suerte, no por diseño.
+
+**El dato duro** (imports reales de `services/ops-worker/*.ts` contra el bloque `paths:` de
+`.github/workflows/ops-worker-deploy.yml`):
+
+```
+rutas src/lib importadas por el worker : 62
+patrones vigilados por el change-gate  : 24
+IMPORTADAS PERO NO VIGILADAS           : 33
+```
+
+Entre las 33 hay piezas que no son periféricas: **`src/lib/postgres/client`** —la conexión canónica a la
+base—, `src/lib/db`, `src/lib/auth-secrets`, `hiring/assessment/ai/scoring-run/execute`, siete rutas de
+`finance/*`, ocho de `growth/seo/*` y cuatro de `commercial/*`.
+
+**La consecuencia es exactamente el modo de fallo que este archivo debería impedir:** un release que
+cambie, por ejemplo, `postgres/client.ts` **no dispara el deploy del worker**. El worker sigue sirviendo
+la versión vieja, el watchdog reporta `ok` y el manifest queda `released`. Nadie se entera — y esa es la
+diferencia con un deploy que falla, que sí avisa.
+
+**Matiz que corrige la formulación original del hallazgo:** se reportó como ejemplo
+`src/lib/hiring/talent-pool/**`, pero **ése sí está cubierto** (línea 47 del workflow). El defecto no es
+esa ruta: es que **la lista se escribe a mano y dejó de describir lo que el bundle realmente contiene**.
+Es la misma familia que `ISSUE-161` y que el falso positivo del `grep -c "on_hold"` del mismo día: un
+artefacto escrito a mano que se lee como si fuera el contrato real.
+
+**La verificación honesta no es la lista: es el grafo de imports o el diff real.** El comando que produce
+el conjunto verdadero:
+
+```bash
+grep -rhoE "@/lib/[a-zA-Z0-9._/-]+" services/ops-worker/*.ts | sed 's|@/lib/||' | sort -u
+```
+
+Propuesta de forma (no de implementación): **derivar** el bloque `paths:` del grafo de imports en vez de
+mantenerlo a mano, o —si eso es caro en Actions— un gate que compare ambos conjuntos y falle cuando el
+worker importe una ruta que el workflow no vigila. Lo segundo es barato y convierte el drift en ruido
+visible en vez de silencio.
+
+Aplica igual a los otros tres workers de Cloud Run: **no se verificó** si tienen el mismo hueco.
+
 ## Summary
 
 Hay **un solo** servicio Cloud Run `ops-worker` (efeonce-group/us-east4) que corre **todos** los Cloud Scheduler jobs reactivos de producción (`ops-reactive-*`, `ops-nubox-sync`, `ops-hubspot-companies-sync`, `ops-email-delivery-retry`, etc.) contra la **única** Cloud SQL compartida (`greenhouse-pg-dev`). Como `services/ops-worker/deploy.sh` usa el **mismo `SERVICE_NAME="ops-worker"`** para `ENV=staging` y `ENV=production`, y el push a develop deploya staging mientras el release `develop→main` deploya prod, **gana el último deploy**: entre un push a develop y el siguiente release prod, el worker que procesa datos productivos corre con **config de staging** (base URL `dev-greenhouse`, secret refs `...-staging`: Resend, NextAuth, Azure, Nubox).
