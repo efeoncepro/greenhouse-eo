@@ -61,6 +61,21 @@ El `assignment_dead_ends = 1` que otra sesión leyó como «apareció un callej�
 era `EO-APP-0241`, `smoke_test`, de este mismo residuo. Verificado por columnas nombradas antes de
 concluir.
 
+**Rollout VERIFICADO en runtime (2026-08-23T18:18Z), no sólo desplegado.** Push
+`099ada848..181aaf4f7`, CI 10/10 en verde incluidos los cuatro deploys de workers Cloud Run. El
+ops-worker corrió la projection del Banco de Talento con el predicado nuevo:
+
+```
+active_process = 47 · needs_reconsent = 26
+membresías active_process SÓLO por una postulación archivada = 0   ← el defecto, cerrado
+```
+
+⚠️ **No dio el 49 que anuncié, y la diferencia no es un error del cambio.** Entre la medición del
+dry-run y ésta se archivaron las 8 del residuo y otra sesión marcó fixtures como sintéticos, así
+que la población se movió por dos causas legítimas. Lo que vale como evidencia NO es el total sino
+el invariante: **cero** membresías activas por un registro archivado, medido directamente. Un total
+absoluto sobre una base que varias sesiones mutan no es reproducible; el invariante sí.
+
 **Deuda destapada, sin dueño:** `assign.live.test.ts` y `propose-confirm.live.test.ts` crean fixtures
 **sin declarar `dataOrigin`**, así que nacen `real`. El gate `hiring-data-origin-gate` barre
 `scripts/` y `tests/e2e/`, **no** `src/**/*.live.test.ts`.
@@ -581,12 +596,3 @@ un canary autenticado y facturable sobre `ref/still/openai-v2`, leer bytes/metad
 promoción/rollback. No actualizar evidencia de reader/canary histórico sin revalidación real. Pendientes adicionales
 quedan en `TASK-1552`, `TASK-1553` y `TASK-1633`: badge requested/effective en feed/viewer, GVC/canary live,
 promoción/rollback del modo preview y WebP sólo si se decide ampliar la ruta PNG actual.
-
-## 2026-08-20 — Hiring Evaluación: espacio vertical fantasma corregido localmente
-
-La tabla accesible del scorecard ya no recibe dimensiones de 1 px directamente: vive dentro de un
-wrapper genérico `1×1` clipado y conserva `caption`, encabezados `scope` y las cuatro columnas del
-contrato. GVC local premium pasó desktop 1440 y mobile 390 con cero findings/runtime errors; geometría
-medida: `scrollWidth === clientWidth`, wrapper `1×1`, `scrollHeight` 1549/2296. El scenario dejó de
-ignorar la tabla y el layout gate detecta `layout_out_of_flow_vertical_runaway`. Estado: **code complete,
-rollout pendiente**; no hubo push, deploy ni release en esta sesión.
