@@ -126,6 +126,28 @@ Orden obligatorio: índice con readback verde → migración → deploy de write
 monitoreo de `email.delivery.lifecycle_health`. El cutover de links públicos
 (`HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`) sigue **OFF**. No habilites una pieza aislada.
 
+## Gate previo al transporte token-sensitive (TASK-1746)
+
+El código que reserva un intent antes de rotar una credencial depende de un índice único creado fuera del
+migrator para no bloquear las escrituras del resto de correos. Antes de desplegar esos writers en cualquier
+entorno compartido, ejecuta con el rol operativo autorizado:
+
+```bash
+pnpm pg:connect --file scripts/operations/task-1746-create-token-intent-index.sql
+```
+
+El script es fail-closed: comprueba duplicados, rechaza un índice homónimo inválido o incompleto, usa
+`CREATE UNIQUE INDEX CONCURRENTLY`, repite el control de duplicados y finalmente exige que PostgreSQL reporte
+el índice como `unique`, `valid` y `ready`, con las tres columnas y el predicado esperados. Conserva esa salida
+como evidencia del rollout. Si el script falla, no despliegues los writers ni intentes crear el índice dentro
+de una migración transaccional. El sender outbound existente permanece operativo; corrige el preflight o sigue
+la instrucción explícita del script para retirar gobernadamente un índice inválido antes de reintentar.
+
+Orden obligatorio: índice con readback verde → migración → deploy de writers/rutas → smoke consentido →
+monitoreo de `email.delivery.lifecycle_health`. El código del recovery y de la sesión pública ya existe, pero
+el email de recovery nace deshabilitado, la UI operativa no está desplegada y el cutover de links públicos
+permanece OFF. No habilites una pieza aislada.
+
 ## Problemas comunes
 
 | Síntoma | Causa probable | Acción |
