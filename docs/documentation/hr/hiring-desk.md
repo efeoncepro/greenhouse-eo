@@ -1,9 +1,9 @@
 # Hiring Desk
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** con TASK-355 (previo al registro de metadatos)
-> **Ultima actualizacion:** 2026-08-23 por Claude (TASK-1754 Slice F — seis etapas; el desenlace en su propio eje)
+> **Ultima actualizacion:** 2026-08-23 por Codex (retorno contextual Application 360 → Pipeline)
 > **Documentacion tecnica:** [ADR del vocabulario de etapas y desenlaces](../../architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md) · [Arquitectura Hiring/ATS](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md)
 > **Manual de uso:** [Operar Hiring Desk](../../manual-de-uso/hr/operar-hiring-desk.md)
 
@@ -14,8 +14,8 @@ Hiring Desk es el espacio interno para operar la demanda de talento, el pipeline
 ## Superficies
 
 - **Demanda:** KPIs del pipeline, filtros y tabla de openings. `Nueva demanda` crea demanda + opening en borrador; publicar sigue siendo una acción explícita.
-- **Pipeline:** seis columnas, una por cada etapa del proceso. Una tarjeta representa una `HiringApplication`; se mueve arrastrándola o por el menú de etapa, y vuelve a su posición anterior si el guardado falla. Cerrar no es uno de esos movimientos: se declara en la decisión.
-- **Application 360:** resumen con PII enmascarada, assessment/scorecard advisory, documentos, decisión estructurada, handoff bridge hacia Activation Lane y actividad append-only.
+- **Pipeline:** seis columnas, una por cada etapa del proceso. Una tarjeta representa una `HiringApplication`; se mueve arrastrándola o por el menú de etapa, y vuelve a su posición anterior si el guardado falla. La vacante seleccionada vive también en `openingId` dentro de la URL, por lo que recargar, compartir o volver desde un detalle conserva el mismo scope. Cerrar no es uno de esos movimientos: se declara en la decisión.
+- **Application 360:** resumen con PII enmascarada, assessment/scorecard advisory, documentos, decisión estructurada, handoff bridge hacia Activation Lane y actividad append-only. La pestaña persistente `Pipeline` es el retorno a la vacante propietaria; al activarla, el Kanban vuelve a esa vacante y enfoca la tarjeta de origen sin ocultar a los demás postulantes.
 - **Publicación:** compara la verdad interna con el payload público allowlist y confirma publicar, pausar o cerrar.
 - **Distribución externa:** una vez que el opening está publicado, el equipo puede difundir su URL de postulación en canales aprobados. Es una actividad de inbound recruiting, no una segunda publicación de Hiring: no altera `HiringOpening`, no reemplaza el apply canónico y debe conservar evidencia de grupo/canal y estado de moderación.
 

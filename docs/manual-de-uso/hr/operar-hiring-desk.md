@@ -1,9 +1,9 @@
 # Operar Hiring Desk
 
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** con TASK-355 (previo al registro de metadatos)
-> **Ultima actualizacion:** 2026-08-23 por Claude (TASK-1754 Slice F — una etapa por columna; cerrar es decidir)
+> **Ultima actualizacion:** 2026-08-23 por Codex (retorno contextual Application 360 → Pipeline)
 > **Documentacion funcional:** [Hiring Desk](../../documentation/hr/hiring-desk.md) · [Desenlace de una postulación](../../documentation/hr/desenlace-de-una-postulacion.md)
 
 ## Antes de empezar
@@ -48,6 +48,11 @@ Esta separación permite que dos candidatos de la misma vacante tengan tokens, t
 2. Mueve una tarjeta arrastrándola a otra lane, o abre `⋮` y elige la etapa con teclado.
 3. Espera el feedback de guardado. Si aparece rollback, la tarjeta vuelve a la etapa anterior; reintenta cuando el servicio esté disponible.
 4. Para declarar el desenlace, abre la postulación y usa `Decidir`; no uses el arrastre para cerrar. Para **pausar** a alguien, deja su tarjeta en la columna «Decisión»: una pausa no es un cierre y no tiene desenlace.
+
+La vacante seleccionada queda en la URL. Cuando abras una tarjeta y estés en Application 360, usa la pestaña
+**← Pipeline** del encabezado para volver: Greenhouse abre el pipeline de esa misma vacante, desplaza el Kanban
+hacia la tarjeta y deja el foco allí. No necesitas volver a Demanda ni seleccionar la vacante otra vez. El
+retorno no recupera búsquedas anteriores, para que ningún filtro oculte postulantes del pipeline completo.
 
 **Las seis columnas son las seis etapas (TASK-1754).** Desde 2026-08-22 hay una etapa por columna:
 Sourced · Screening · **Evaluación** · Entrevista · Decisión · Cerrado. Antes el dominio tenía trece y

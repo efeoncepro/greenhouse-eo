@@ -15,7 +15,7 @@ export const scenario: CaptureScenario = {
   readiness: { selector: '[data-capture="hiring-application"]', absentSelectors: ['[data-testid="login-card"]'], waitForFonts: true, postReadyDelayMs: 400, timeout: 15000 },
   assertions: [{ kind: 'noLoginRedirect' }, { kind: 'noErrorBoundary' }],
   quality: {
-    layout: { enabled: true, includeSelector: 'body', ignoreSelectors: ['.ts-vertical-nav-root', '.ts-vertical-nav-container', '.ts-vertical-nav-bg-color-container', '.bs-full', '.MuiLinearProgress-bar'], allowHorizontalScrollSelectors: ['[role="region"]', '[data-capture="hiring-application-tabs"]'], minTargetSize: 20, failOnViolations: true },
+    layout: { enabled: true, includeSelector: 'body', ignoreSelectors: ['.ts-vertical-nav-root', '.ts-vertical-nav-container', '.ts-vertical-nav-bg-color-container', '.bs-full', '.MuiLinearProgress-bar'], allowHorizontalScrollSelectors: ['[role="region"]', '[data-capture="hiring-application-tabs"]', '[data-capture="hiring-tabs"]'], minTargetSize: 20, failOnViolations: true },
     accessibility: { enabled: true, includeSelector: 'body', failOnViolations: false },
     runtime: { failOnConsoleError: true, failOnPageError: true, failOnHydrationWarning: false },
     enterpriseRubric: { enabled: true, includeSelector: '[data-capture="hiring-application"]' },
@@ -33,5 +33,8 @@ export const scenario: CaptureScenario = {
     // TASK-1737 — el tab "Actividad" se convirtió en el Expediente real (timeline persistido).
     { kind: 'click', selector: 'button[role="tab"]:has-text("Expediente")' },
     { kind: 'mark', label: 'application-expediente', clipSelector: '[data-capture="hiring-application-panel-expediente"]', note: 'Expediente: timeline append-only de notas + eventos.' },
+    { kind: 'click', selector: 'a[data-parent-return="true"]' },
+    { kind: 'wait', selector: '[data-capture="hiring-pipeline-board"]', timeout: 15000 },
+    { kind: 'mark', label: 'pipeline-context-return', note: 'Retorno al pipeline de la vacante exacta; la tarjeta recupera foco sin filtrar el tablero.' },
   ],
 }

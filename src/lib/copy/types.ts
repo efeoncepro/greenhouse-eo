@@ -470,6 +470,7 @@ export interface HiringDeskCopy {
     loading: string
     noResults: string
     openApplication: string
+    returnToOpeningPipeline: string
     previous: string
     next: string
     agency: string

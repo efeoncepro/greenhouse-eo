@@ -3,6 +3,12 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-23 — Application 360 vuelve al pipeline de la vacante que corresponde
+
+- La pestaña `Pipeline` ahora funciona como retorno contextual desde cualquier postulación: deriva la vacante desde `application.openingId`, en vez de caer en la vacante más reciente.
+- La URL conserva el scope de vacante y, al regresar, el Kanban enfoca la tarjeta de origen sin aplicar filtros que oculten a otros postulantes.
+- La tarjeta y el hero comparten una View Transition breve; reduced motion conserva el mismo destino y foco sin animación. La validación local pasó en 1440 y 390 px, sin errores de consola, página, hidratación ni red.
+
 ## 2026-08-23 — Cinco personas reales eran buscables en el Banco de Talento por una postulación que alguien había retirado
 
 - «Postulación en proceso activo» pasó a tener **una sola definición** en toda la plataforma, y son **tres
@@ -936,25 +942,3 @@ oportunidad medida (lo que el sitio ya recibe y no sigue), el desempate usa la b
 canónica en vez del KD que colapsa en es-LATAM, y repetir el mismo intent en un mes nuevo vuelve a
 descubrir (antes quedaba congelado para siempre). Todo corregido el mismo día, antes de que el
 workbench (TASK-1665) congelara el contrato.
-
-## 2026-08-14 — Las keywords descubiertas ahora saben llegar a los motores de IA (TASK-1666)
-
-El mismo día que el discovery quedó operativo, se cerró el puente que faltaba hacia el otro
-internet de búsqueda: un operador selecciona hasta 20 candidatos de una corrida y pide un
-**borrador de grounded queries** para el grader AEO. La regla central es semántica: una keyword
-de Google no es una pregunta a ChatGPT — el sistema la usa como **tema de investigación** (dato
-delimitado, inmune a prompt injection) y redacta preguntas naturales con la identidad de marca ya
-autorizada del perfil. La prueba real lo mostró: de "recubrimiento epóxico" salió "qué tipos de
-recubrimientos existen para madera", no una copia; y ninguna pregunta de descubrimiento nombra la
-marca (la medición a ciegas sigue siendo a ciegas).
-
-La honestidad quedó cableada, no prometida: el modo `grounded_llm` sólo existe cuando la autoría
-usó de verdad el contexto (cerebro versionado aparte; el authoring sin contexto quedó byte a byte
-idéntico y probado); sin autoría disponible el borrador sale del baseline **y lo dice** con un
-aviso obligatorio. La trazabilidad viaja como referencias opacas (corrida, candidatos y hash
-verificable del contexto exacto) — jamás la keyword en logs. Y el puente sólo crea borradores:
-aprobar y activar sigue siendo el flujo AEO con revisión humana, sin atajos.
-
-Verificado contra el mundo real: 16/16 checks contra PG incluyendo una autoría LLM real de 15
-preguntas evaluadas a mano, idempotencia que devuelve el mismo borrador sin segundo gasto, y el
-active previo intacto. Con esto TASK-1665 (el workbench visual) quedó sin bloqueos.

@@ -15,6 +15,7 @@ export const hiringDesk: HiringDeskCopy = {
     loading: 'Cargando…',
     noResults: 'Sin resultados',
     openApplication: 'Abrir postulación',
+    returnToOpeningPipeline: 'Volver al pipeline de {opening}',
     previous: 'Anterior',
     next: 'Siguiente',
     agency: 'Agencia',

@@ -2,9 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from 'react'
 
-import NextLink from 'next/link'
-import { useRouter } from 'next/navigation'
-
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -22,6 +19,8 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
+import ViewTransitionLink from '@/components/greenhouse/motion/ViewTransitionLink'
+import useViewTransitionRouter from '@/hooks/useViewTransitionRouter'
 import type { HiringDeskCopy } from '@/lib/copy'
 import type {
   HiringApplicationStage,
@@ -32,6 +31,7 @@ import type {
 
 import HiringDeskFrame from './HiringDeskFrame'
 import { hiringRequest } from './hiring-client'
+import { buildHiringPipelineHref, hiringApplicationViewTransitionStyle } from './hiring-navigation'
 
 type LaneId = 'inbox' | 'screening' | 'shortlist' | 'interview' | 'decision' | 'outcome'
 
@@ -108,17 +108,19 @@ interface PipelineDeskViewProps {
   copy: HiringDeskCopy
   initialSnapshot: HiringDeskSnapshot
   initialOpeningId?: string
+  initialFocusApplicationId?: string
   simulateStageFailure?: boolean
 }
 
-const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateStageFailure = false }: PipelineDeskViewProps) => {
-  const router = useRouter()
+const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, initialFocusApplicationId, simulateStageFailure = false }: PipelineDeskViewProps) => {
+  const router = useViewTransitionRouter()
   const [applications, setApplications] = useState(initialSnapshot.applications)
   const [openingId, setOpeningId] = useState(initialOpeningId ?? initialSnapshot.openings[0]?.opening.openingId ?? '')
   const [query, setQuery] = useState('')
   const simulateFailure = simulateStageFailure
   const [savingIds, setSavingIds] = useState<Set<string>>(new Set())
   const [lastMovedId, setLastMovedId] = useState<string | null>(null)
+  const [returnedApplicationId, setReturnedApplicationId] = useState(initialFocusApplicationId ?? null)
   const [dragId, setDragId] = useState<string | null>(null)
   const [dragOverLane, setDragOverLane] = useState<LaneId | null>(null)
   const [toast, setToast] = useState<{ message: string; severity: 'success' | 'error' } | null>(null)
@@ -126,11 +128,20 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
   const [boardEdges, setBoardEdges] = useState({ start: false, end: false })
   const liveRef = useRef<HTMLDivElement>(null)
   const movedTimerRef = useRef<number | null>(null)
+  const returnTimerRef = useRef<number | null>(null)
+  const returnFrameRef = useRef<number | null>(null)
   const boardRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => () => {
     if (movedTimerRef.current != null) window.clearTimeout(movedTimerRef.current)
+    if (returnTimerRef.current != null) window.clearTimeout(returnTimerRef.current)
+    if (returnFrameRef.current != null) window.cancelAnimationFrame(returnFrameRef.current)
   }, [])
+
+  useEffect(() => {
+    setOpeningId(initialOpeningId ?? initialSnapshot.openings[0]?.opening.openingId ?? '')
+    setReturnedApplicationId(initialFocusApplicationId ?? null)
+  }, [initialFocusApplicationId, initialOpeningId, initialSnapshot.openings])
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase('es-CL')
@@ -148,6 +159,31 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
   const selectedOpening = openingOptions.find(({ opening }) => opening.openingId === openingId)
   const applicantCountLabel = filtered.length === 1 ? copy.pipeline.applicantLabel : copy.pipeline.applicantsLabel
   const sparsePipeline = filtered.length > 0 && filtered.length < 3
+
+  useEffect(() => {
+    if (!returnedApplicationId) return
+
+    returnFrameRef.current = window.requestAnimationFrame(() => {
+      const card = Array.from(document.querySelectorAll<HTMLElement>('[data-application-id]'))
+        .find(element => element.dataset.applicationId === returnedApplicationId)
+
+      if (!card) return
+
+      const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+      const target = card.querySelector<HTMLElement>('[data-capture="hiring-card-open"]')
+
+      card.scrollIntoView({
+        behavior: prefersReducedMotion ? 'auto' : 'smooth',
+        block: 'center',
+        inline: 'center',
+      })
+      target?.focus({ preventScroll: true })
+
+      returnTimerRef.current = window.setTimeout(() => {
+        setReturnedApplicationId(current => current === returnedApplicationId ? null : current)
+      }, 1400)
+    })
+  }, [filtered, returnedApplicationId])
 
   const updateBoardEdges = useCallback(() => {
     const board = boardRef.current
@@ -263,6 +299,7 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
   const card = (item: HiringDeskApplicationSummary) => {
     const saving = savingIds.has(item.application.applicationId)
     const moved = lastMovedId === item.application.applicationId
+    const returned = returnedApplicationId === item.application.applicationId
     const assessment = item.application.explainability?.assessment
     const testTag = assessment ? (item.application.score != null ? copy.pipeline.tagDelivered : copy.pipeline.tagAssigned) : null
     const source = item.application.source === 'public_careers' ? copy.pipeline.sourcePublicCareers : item.application.source.replaceAll('_', ' ')
@@ -272,6 +309,8 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
     return (
       <Paper
         data-capture='hiring-application-card'
+        data-application-id={item.application.applicationId}
+        style={hiringApplicationViewTransitionStyle(item.application.applicationId)}
         variant='outlined'
         draggable={!saving}
         onDragStart={(event) => handleCardDragStart(event, item)}
@@ -281,15 +320,17 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
           position: 'relative',
           minWidth: 0,
           borderRadius: `${theme.shape.customBorderRadius.md}px`,
-          borderColor: moved ? theme.palette.primary.main : theme.palette.divider,
+          borderColor: moved || returned ? theme.palette.primary.main : theme.palette.divider,
           backgroundColor: theme.palette.background.paper,
           overflow: 'hidden',
           boxShadow: saving ? theme.shadows[8] : `0 10px 28px ${alpha(theme.palette.common.black, 0.055)}`,
           opacity: saving || dragId === item.application.applicationId ? 0.5 : 1,
           cursor: saving ? 'progress' : 'grab',
-          animation: moved
-            ? 'ghHiringMoved 640ms cubic-bezier(.2,0,0,1)'
-            : 'ghHiringCardIn 240ms cubic-bezier(.2,0,0,1)',
+          animation: returned
+            ? 'ghHiringReturnFocus 1400ms cubic-bezier(.2,0,0,1)'
+            : moved
+              ? 'ghHiringMoved 640ms cubic-bezier(.2,0,0,1)'
+              : 'ghHiringCardIn 240ms cubic-bezier(.2,0,0,1)',
           transformOrigin: 'center top',
           transition: theme.transitions.create(['box-shadow', 'opacity', 'border-color', 'transform'], {
             duration: theme.transitions.duration.shorter,
@@ -348,10 +389,9 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
         </IconButton>
 
         <Box
-          component='button'
-          type='button'
+          component={ViewTransitionLink}
+          href={`/agency/hiring/applications/${item.application.applicationId}`}
           data-capture='hiring-card-open'
-          onClick={() => router.push(`/agency/hiring/applications/${item.application.applicationId}`)}
           aria-label={`${item.candidateName} · ${copy.common.openApplication}`}
           sx={(theme) => ({
             display: 'block',
@@ -457,7 +497,11 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
         <Select
           labelId='hiring-pipeline-opening-label'
           value={openingId}
-          onChange={(event) => setOpeningId(event.target.value)}
+          onChange={(event) => {
+            const nextOpeningId = event.target.value
+
+            router.replace(buildHiringPipelineHref(nextOpeningId), { scroll: false })
+          }}
           renderValue={(value) => {
             if (!value) return copy.pipeline.allOpenings
             if (!selectedOpening) return value
@@ -729,7 +773,7 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, simulateSta
           </MenuItem>
         ))}
         <Divider />
-        <MenuItem component={NextLink} href={menu ? `/agency/hiring/applications/${menu.application.application.applicationId}` : '/agency/hiring/pipeline'}>
+        <MenuItem component={ViewTransitionLink} href={menu ? `/agency/hiring/applications/${menu.application.application.applicationId}` : '/agency/hiring/pipeline'}>
           <i aria-hidden='true' className='tabler-user-search mie-2' /> {copy.common.openApplication}
         </MenuItem>
       </Menu>

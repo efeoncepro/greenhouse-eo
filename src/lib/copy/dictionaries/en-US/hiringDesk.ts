@@ -19,6 +19,7 @@ export const hiringDesk: HiringDeskCopy = {
     loading: 'Loading…',
     noResults: 'No results found.',
     openApplication: 'Open application',
+    returnToOpeningPipeline: 'Return to the {opening} pipeline',
     previous: 'Previous',
     next: 'Next',
     agency: 'Agency',

@@ -2,6 +2,15 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-23 — Hiring: retorno contextual Application 360 → Pipeline implementado localmente
+
+**Estado: `code complete, rollout pendiente`; sin commit, push ni release.** La pestaña persistente `Pipeline`
+ahora deriva `openingId` desde cualquier postulación, vuelve con `focusApplication`, enfoca la tarjeta sin
+restaurar filtros y usa View Transition tarjeta↔hero con reduced-motion equivalente. El selector de vacante
+sincroniza el scope en la URL. GVC local PASS en 1440/390 px:
+`.captures/2026-08-23T20-28-03_task355-hiring-application-360` (12 frames, video, cero errores runtime).
+Typecheck, ESLint y 10 tests focales limpios. Pendiente: commit/release cuando el operador lo autorice.
+
 ## 2026-08-23 — TASK-1772: los dos predicados convergieron, y convergieron al valor equivocado
 
 **Estado: `code complete, rollout pendiente`.** Slices 1-5 en `develop` local, **sin push**:
@@ -571,28 +580,3 @@ produce `no-op`. Ese análisis también expuso que **no existe ni un test** de `
 Estado: **documentación completa, ejecución no iniciada**. Ningún cambio de código, ninguna mutación de datos,
 ningún flag tocado. Siguiente paso: `TASK-1760` (cablear las projections de PPM y retenciones), único carril cuyo
 daño crece. Owner sin asignar.
-
-## 2026-08-21 — Transparencia GPT Image 2 code complete; rollout de Globe pendiente
-
-La documentación oficial completa de OpenAI quedó consolidada en
-`OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`: GPT Image 2 es el único miembro activo/recomendado y soporta
-`background=transparent` en preview con PNG/WebP. GPT Image 1.5, 1, 1 Mini y `chatgpt-image-latest` están deprecated
-con retiros en octubre/diciembre de 2026. Las skills `greenhouse-ai-image-generator` y
-`greenhouse-globe-model-fleet` quedaron corregidas y espejadas; el gate ahora valida también el bundle de imágenes.
-
-El helper Greenhouse ya conserva GPT Image 2, rechaza `transparent+jpeg`, evita pagar/descartar outputs múltiples,
-valida máscara/formato/dimensiones y no promete partial images sin transporte SSE. Globe transporta
-`backgroundMode` desde catálogo/shape hasta request, fingerprint, manifest y output; verifica alfa decodificado,
-expone el selector route-driven y usa checkerboard tokenizado. La ruta Globe queda probada localmente, sin deploy ni
-gasto desde ese runtime.
-
-El CLI canónico de Greenhouse completó además un canary facturable mínimo con `gpt-image-2`, PNG 1024×1024,
-`quality=low` y `background=transparent`: el archivo tiene cuatro canales, alfa real y 470.164 píxeles totalmente
-transparentes; la composición visual pasó sobre fondos claro y oscuro. Esta evidencia valida el helper Greenhouse,
-no el adapter/runtime autenticado de Globe.
-
-Estado: **code complete, rollout pendiente**. La variante transparente sigue Globe-gated hasta desplegar, ejecutar
-un canary autenticado y facturable sobre `ref/still/openai-v2`, leer bytes/metadata/cobro, capturar GVC y ejercer
-promoción/rollback. No actualizar evidencia de reader/canary histórico sin revalidación real. Pendientes adicionales
-quedan en `TASK-1552`, `TASK-1553` y `TASK-1633`: badge requested/effective en feed/viewer, GVC/canary live,
-promoción/rollback del modo preview y WebP sólo si se decide ampliar la ruta PNG actual.
