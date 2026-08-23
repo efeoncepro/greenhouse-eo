@@ -224,6 +224,10 @@ import { getHiringAssessmentAiRunSignals } from './queries/hiring-assessment-ai-
 // TASK-1736 Slice 4 — Candidate identity intake signals (moduleKey 'hiring').
 import { getHiringDataOriginDerivationDriftSignal } from './queries/hiring-data-origin-drift'
 import { getHiringActiveProcessPredicateDriftSignal } from './queries/hiring-active-process-drift'
+import {
+  getHiringCapacityClosurePartialFailedSignal,
+  getHiringCapacityClosureStuckSignal
+} from './queries/hiring-capacity-closure-signals'
 import { getHiringApplicationOutcomeDriftSignal } from './queries/hiring-application-outcome-signals'
 import { getHiringCandidateIdentitySignals } from './queries/hiring-candidate-identity-signals'
 import { getKnowledgeQuarantineCountSignal } from './queries/knowledge-quarantine-count'
@@ -735,6 +739,7 @@ interface ReliabilityOverviewSources {
   hiringDataOriginDrift?: ReliabilitySignal | null
   hiringApplicationOutcomeDrift?: ReliabilitySignal | null
   hiringActiveProcessPredicateDrift?: ReliabilitySignal | null
+  hiringCapacityClosure?: (ReliabilitySignal | null)[] | null
   workforceHiringActivationStuck?: ReliabilitySignal | null
   knowledgeSyncFailedSource?: ReliabilitySignal | null
   knowledgeNotionIngestDeadLetter?: ReliabilitySignal | null
@@ -1237,6 +1242,7 @@ export const buildReliabilityOverview = (
     ...(sources.hiringDataOriginDrift ? [sources.hiringDataOriginDrift] : []),
     ...(sources.hiringApplicationOutcomeDrift ? [sources.hiringApplicationOutcomeDrift] : []),
     ...(sources.hiringActiveProcessPredicateDrift ? [sources.hiringActiveProcessPredicateDrift] : []),
+    ...((sources.hiringCapacityClosure ?? []).filter(Boolean) as ReliabilitySignal[]),
     ...(sources.workforceHiringActivationStuck ? [sources.workforceHiringActivationStuck] : []),
     ...(sources.knowledgeSyncFailedSource ? [sources.knowledgeSyncFailedSource] : []),
     ...(sources.knowledgeNotionIngestDeadLetter ? [sources.knowledgeNotionIngestDeadLetter] : []),
@@ -1966,6 +1972,18 @@ export const getReliabilityOverview = async (
     preloadedSources.hiringActiveProcessPredicateDrift !== undefined
       ? preloadedSources.hiringActiveProcessPredicateDrift
       : await getHiringActiveProcessPredicateDriftSignal().catch(() => null)
+
+  // TASK-1762 Slice 3 — salud del cierre por capacidad. Dos señales que dicen cosas distintas: un
+  // run atascado es un problema de proceso (nadie recibió una decisión ya aprobada); items en
+  // cuarentena es un problema de datos (personas concretas quedaron sin desenlace tras un cierre
+  // confirmado). Un cierre parcial invisible es el riesgo que la matriz de la task nombra.
+  const hiringCapacityClosure =
+    preloadedSources.hiringCapacityClosure !== undefined
+      ? preloadedSources.hiringCapacityClosure
+      : await Promise.all([
+          getHiringCapacityClosureStuckSignal().catch(() => null),
+          getHiringCapacityClosurePartialFailedSignal().catch(() => null)
+        ])
 
   const knowledgeSyncFailedSource =
     preloadedSources.knowledgeSyncFailedSource !== undefined
@@ -2813,6 +2831,7 @@ export const getReliabilityOverview = async (
     hiringDataOriginDrift,
     hiringApplicationOutcomeDrift,
     hiringActiveProcessPredicateDrift,
+    hiringCapacityClosure,
     workforceHiringActivationStuck,
     knowledgeSyncFailedSource,
     knowledgeNotionIngestDeadLetter,
