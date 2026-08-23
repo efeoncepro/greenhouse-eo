@@ -159,6 +159,31 @@ Reparado en minutos ensanchando el `CHECK` (migración permisiva, riesgo cero, c
 - **SIEMPRE** agrupar el `contract` con los demás pasos irreversibles y ejecutarlo **después** de que
   el release lleve a producción el código que ya no escribe el valor.
 
+### Un `COMMENT` que afirma qué existe en el código caduca; uno que describe semántica, no (2026-08-23)
+
+Un comentario de columna vive en la base, y **la base es una sola para dev, staging y producción**
+corriendo versiones distintas del código. Por eso un comentario que afirma un hecho sobre el estado
+del código —sobre todo una **ausencia**— no puede ser cierto para los tres entornos a la vez, ni con
+el timing perfecto. Nace condenado a envejecer mal.
+
+**Caso fuente (2026-08-23, `TASK-1771`):** el comentario de
+`hiring_assessment_assignment.superseded_at` declaraba que «**NINGÚN** write path lo escribe
+todavía». Era cierto al escribirse y dejó de serlo al construirse el command. El reemplazo no
+cambia el hecho por otro hecho: describe **qué significa la columna y en qué se diferencian sus dos
+escritores** —uno conserva `outcome` porque es la explicación del bloqueo, el otro lo reescribe
+porque ahí el hecho sí cambió—. La semántica no caduca con un deploy.
+
+**⚠️ Reglas duras:**
+
+- **NUNCA** escribir en un `COMMENT` una afirmación sobre qué existe o falta en el código («todavía
+  nadie lo escribe», «pendiente de la Slice N», «se implementa en TASK-###»). Es un hecho volátil
+  guardado en el lugar más difícil de actualizar, y ningún gate lo revisa.
+- **SIEMPRE** describir el CONTRATO de la columna: qué significa el valor, quién puede escribirlo y
+  bajo qué invariante. Eso sigue siendo cierto en los tres entornos.
+- Si el comentario **nombra un símbolo del código** (una función, un command), esa referencia sí ata
+  el `COMMENT` al release que despliega ese símbolo — es un trade razonable porque ayuda a navegar,
+  pero **decide el momento de aplicar**: se aplica con —o después de— el release, nunca antes.
+
 ### Una migración committeada y sin aplicar es una mina (2026-08-22)
 
 `pnpm migrate:up` corre **todas** las pendientes en orden de timestamp. Una migración dejada

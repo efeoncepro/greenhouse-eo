@@ -26,6 +26,15 @@
 --   marker `-- Up Migration` no se ejecutó (bug de pre-up-marker) y la migración quedó registrada
 --   sin hacer nada.
 --
+-- POR QUÉ EL COMENTARIO NUEVO NO VUELVE A CADUCAR (el arreglo de fondo no es el timing, es el
+--   fraseo): el vigente afirma una AUSENCIA —«ningún write path lo escribe todavía»— y eso es un
+--   hecho sobre el estado del código guardado en una base que sirve a tres entornos con versiones
+--   distintas. No puede ser cierto para los tres a la vez ni con el timing perfecto. El nuevo
+--   describe SEMÁNTICA: qué significa la columna y en qué se diferencian sus dos escritores. Eso
+--   no caduca con un deploy. Lo único que lo ata al release es que NOMBRA `supersedeAssignmentDeadEnd`,
+--   y por eso —no por riesgo— la condición de arriba es estricta. Regla general en
+--   GREENHOUSE_DATABASE_TOOLING_V1.md (2026-08-23).
+--
 -- RIESGO: nulo sobre los datos. `COMMENT ON COLUMN` es metadata: no reescribe filas, no escanea
 --   la tabla y se revierte con otro COMMENT. Lo que sí exige cuidado es `migrate:up`, que aplica
 --   TODAS las pendientes: verificar `pnpm migrate:status` y no correr nada si aparece alguna ajena.
