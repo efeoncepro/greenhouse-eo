@@ -300,6 +300,85 @@ export const supersedeAssignmentsForAssessment = async (
   return rows.map(row => str(row.assignment_id))
 }
 
+
+/**
+ * TASK-1771 — Fila EXACTA del ledger bajo `FOR UPDATE`. El caller DEBE haber bloqueado antes la
+ * fila de policy: ése es el orden de locks del dominio (policy → ledger) y respetarlo es lo que
+ * evita el deadlock contra `assignAssessmentFromPolicy`, que toma los mismos dos en ese orden.
+ */
+export const lockAssignmentForUpdate = async (
+  client: PoolClient,
+  assignmentId: string,
+): Promise<AssessmentAssignmentRecord | null> => {
+  const rows = await runQuery<AssignmentRow>(
+    client,
+    `SELECT ${ASSIGNMENT_COLS} FROM greenhouse_hiring.hiring_assessment_assignment
+     WHERE assignment_id = $1 FOR UPDATE`,
+    [assignmentId],
+  )
+
+  return rows[0] ? normalizeAssignment(rows[0]) : null
+}
+
+/**
+ * TASK-1771 — Recuperaciones YA gastadas por una clave: filas superseded cuyo outcome sigue siendo
+ * recuperable. Es la derivación del tope anti-bucle, y no necesitó columna nueva porque el ledger
+ * ya la contiene.
+ *
+ * Las `cancelled` NO cuentan a propósito: ésas las escribe `supersedeAssignmentsForAssessment`
+ * —el otro mecanismo, el de la instancia que murió— y sumarlas gastaría el presupuesto de
+ * recuperación con actos que no son recuperaciones.
+ *
+ * **Es EL concepto de tope, no el del carril automático.** El carril manual no tiene techo hoy
+ * (`resolveAttemptSeq` devuelve `maxAttemptSeq + 1` sin límite) y cuando se le ponga uno, sale de
+ * acá contando por `attempt_seq` en vez de por supersede. Se deja escrito para que el próximo no
+ * derive una segunda definición del mismo concepto.
+ */
+export const countRecoveryAttemptsForKey = async (
+  client: PoolClient,
+  key: Omit<AssignmentKey, 'attemptSeq'>,
+): Promise<number> => {
+  const rows = await runQuery<{ total: unknown }>(
+    client,
+    `SELECT COUNT(*)::int AS total FROM greenhouse_hiring.hiring_assessment_assignment
+     WHERE application_id = $1 AND policy_id = $2 AND policy_version = $3 AND trigger_stage = $4
+       AND superseded_at IS NOT NULL
+       AND outcome = ANY($5::text[])`,
+    [key.applicationId, key.policyId, key.policyVersion, key.triggerStage, [...RECOVERABLE_ASSIGNMENT_OUTCOMES]],
+  )
+
+  return int(rows[0]?.total)
+}
+
+/**
+ * TASK-1771 — LIBERA la clave de idempotencia de una fila en callejón, y NADA MÁS.
+ *
+ * ⚠️ **Estampa `superseded_at` y CONSERVA `outcome` y `outcome_reason`.** Es la diferencia dura
+ * con `supersedeAssignmentsForAssessment`, que sí reescribe a `cancelled` — y ahí hace bien,
+ * porque el hecho cambió (la instancia murió). Acá el hecho NO cambia: el intento se bloqueó por
+ * `volume_cap`, eso pasó y sigue siendo cierto; lo único que deja de ser cierto es que esa fila
+ * tenga que ocupar la clave para siempre. Reescribir el outcome borraría la explicación de por qué
+ * se bloqueó, que es todo el valor de auditoría de la fila.
+ *
+ * Devuelve `false` cuando la fila ya estaba superseded: el `WHERE superseded_at IS NULL` lo
+ * convierte en un no-op observable en vez de un doble efecto.
+ */
+export const supersedeRecoverableAssignment = async (
+  client: PoolClient,
+  assignmentId: string,
+): Promise<boolean> => {
+  const rows = await runQuery<{ assignment_id: unknown }>(
+    client,
+    `UPDATE greenhouse_hiring.hiring_assessment_assignment
+       SET superseded_at = NOW(), updated_at = NOW()
+     WHERE assignment_id = $1 AND superseded_at IS NULL
+     RETURNING assignment_id`,
+    [assignmentId],
+  )
+
+  return rows.length > 0
+}
+
 /**
  * Cantidad de asignaciones EFECTIVAS de una policy en su ventana (D5.2). Un `held`/`blocked`
  * no gastó correo, así que no consume el cap.
