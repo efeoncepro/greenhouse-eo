@@ -65,14 +65,15 @@ describe.skipIf(!hasPgConfig)('TASK-1739 — apply/rollback del marcado (live PG
         fulfillmentMode: 'internal_hire',
         demandOrigin: 'capacity_gap',
         requestedRole: 'T1739 mark-live',
-      },
+              dataOrigin: 'real', // TASK-1739 — el test marca este registro: nace real A PROPOSITO
+},
       ACTOR,
     )
 
     created.demandIds.push(demand.demandId)
 
     const opening = await createHiringOpening(
-      { demandId: demand.demandId, internalTitle: 'T1739 mark-live' },
+      { demandId: demand.demandId, internalTitle: 'T1739 mark-live' , dataOrigin: 'real'},
       ACTOR,
     )
 
@@ -91,17 +92,35 @@ describe.skipIf(!hasPgConfig)('TASK-1739 — apply/rollback del marcado (live PG
   }
 
   it('el plan es READ-ONLY: correrlo no muta ninguna fila', async () => {
-    const before = await runGreenhousePostgresQuery<{ n: string }>(
-      `SELECT COUNT(*) AS n FROM greenhouse_hiring.hiring_opening WHERE data_origin <> 'real'`,
+    // Compara la PROCEDENCIA DE FILAS IDENTIFICADAS, no un total. Un `COUNT(*)` global no es
+    // comparable entre dos instantes: los live tests de este repo corren en paralelo contra UNA sola
+    // base, así que un archivo vecino creando su fixture movía el total y este gate fallaba por que
+    // el otro hiciera lo correcto. Releer los MISMOS ids prueba lo que el test dice probar —que el
+    // plan no muta— y es inmune a lo que nazca al lado mientras corre.
+    const snapshot = async (ids: string[]) =>
+      (
+        await runGreenhousePostgresQuery<{ opening_id: string; data_origin: string }>(
+          `SELECT opening_id, data_origin FROM greenhouse_hiring.hiring_opening
+            WHERE opening_id = ANY($1::text[]) ORDER BY opening_id`,
+          [ids],
+        )
+      )
+        .map(row => `${row.opening_id}:${row.data_origin}`)
+        .join('|')
+
+    const existing = await runGreenhousePostgresQuery<{ opening_id: string }>(
+      `SELECT opening_id FROM greenhouse_hiring.hiring_opening ORDER BY opening_id`,
     )
+
+    const ids = existing.map(row => row.opening_id)
+
+    const before = await snapshot(ids)
 
     const plan = await planSyntheticOriginMarking()
 
-    const after = await runGreenhousePostgresQuery<{ n: string }>(
-      `SELECT COUNT(*) AS n FROM greenhouse_hiring.hiring_opening WHERE data_origin <> 'real'`,
-    )
+    const after = await snapshot(ids)
 
-    expect(after[0].n).toBe(before[0].n)
+    expect(after).toBe(before)
     expect(plan.candidates.every(c => c.signals.length > 0)).toBe(true)
   })
 

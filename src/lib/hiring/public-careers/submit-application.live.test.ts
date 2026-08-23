@@ -66,7 +66,8 @@ describe.skipIf(!hasPgConfig)('submitPublicHiringApplication — live PG (TASK-1
         engagementType: 'on_going',
         fulfillmentMode: 'internal_hire',
         demandOrigin: 'capacity_gap',
-        requestedRole: 'T1367 LIVE Account Manager'
+        requestedRole: 'T1367 LIVE Account Manager',
+        dataOrigin: 'real', // TASK-1739 — publica: publishOpening rechaza vacantes no reales
       },
       'user-live-test'
     )
@@ -74,7 +75,7 @@ describe.skipIf(!hasPgConfig)('submitPublicHiringApplication — live PG (TASK-1
     state.demandId = demand.demandId
 
     const opening = await createHiringOpening(
-      { demandId: demand.demandId, internalTitle: 'T1367 LIVE internal' },
+      { demandId: demand.demandId, internalTitle: 'T1367 LIVE internal' , dataOrigin: 'real'},
       'user-live-test'
     )
 

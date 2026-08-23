@@ -52,12 +52,12 @@ describe.skipIf(!hasPgConfig)('assessment scoring + rollup — live PG (TASK-136
 
     // Fixture pipeline.
     const demand = await createTalentDemand(
-      { stakeholderType: 'internal', engagementType: 'on_going', fulfillmentMode: 'internal_hire', demandOrigin: 'capacity_gap', requestedRole: 'LIVE-TEST scoring' },
+      { stakeholderType: 'internal', engagementType: 'on_going', fulfillmentMode: 'internal_hire', demandOrigin: 'capacity_gap', requestedRole: 'LIVE-TEST scoring' , dataOrigin: 'smoke_test'},
       'user-live-test',
     )
 
     c.demandId = demand.demandId
-    const opening = await createHiringOpening({ demandId: demand.demandId, internalTitle: 'LIVE-TEST' }, 'user-live-test')
+    const opening = await createHiringOpening({ demandId: demand.demandId, internalTitle: 'LIVE-TEST' , dataOrigin: 'smoke_test'}, 'user-live-test')
 
     c.openingId = opening.openingId
     const facet = await reconcileCandidateFacet({ identityProfileId, source: 'manual' }, 'user-live-test')

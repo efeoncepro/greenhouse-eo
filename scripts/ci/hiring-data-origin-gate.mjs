@@ -25,6 +25,16 @@ const DECLARATION = 'dataOrigin'
 
 const SCANNED_PREFIXES = ['scripts/', 'tests/e2e/']
 
+/**
+ * Los `*.live.test.ts` de `src/**` fabrican datos contra la MISMA instancia que comparten dev,
+ * staging y producción, exactamente igual que un seed de `scripts/` — pero quedaban fuera del
+ * barrido, y ahí se coló el defecto que el gate existe para impedir: dos archivos creaban demanda y
+ * vacante sin declarar procedencia, así que nacían `real`. Mientras el teardown alcanza a correr no
+ * se nota; cuando muere a mitad —se cae el proxy, se aborta la corrida— lo que queda es
+ * indistinguible de un candidato de verdad. Un gate que no mira donde el dato NACE no es un gate.
+ */
+const isLiveTestFabricator = file => file.startsWith('src/') && file.endsWith('.live.test.ts')
+
 /** El propio gate y el módulo dueño del contrato quedan fuera: hablan del tema, no fabrican datos. */
 const EXEMPT = new Set(['scripts/ci/hiring-data-origin-gate.mjs'])
 
@@ -34,7 +44,7 @@ const listTrackedFiles = () =>
   execSync('git ls-files', { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
     .split('\n')
     .filter(Boolean)
-    .filter(file => SCANNED_PREFIXES.some(prefix => file.startsWith(prefix)))
+    .filter(file => SCANNED_PREFIXES.some(prefix => file.startsWith(prefix)) || isLiveTestFabricator(file))
     .filter(file => /\.(ts|tsx|mjs|js)$/.test(file))
     .filter(file => !EXEMPT.has(file))
 

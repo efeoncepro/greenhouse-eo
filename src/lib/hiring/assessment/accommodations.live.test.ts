@@ -156,6 +156,7 @@ describe.skipIf(!hasPgConfig || !canCleanUp)('assessment accommodations — live
         fulfillmentMode: 'internal_hire',
         demandOrigin: 'capacity_gap',
         requestedRole: 'LIVE-TEST AM (accommodations)',
+        dataOrigin: 'smoke_test', // TASK-1739 — fixture
       },
       'user-live-test',
     )
@@ -163,7 +164,7 @@ describe.skipIf(!hasPgConfig || !canCleanUp)('assessment accommodations — live
     created.demandId = demand.demandId
 
     const opening = await createHiringOpening(
-      { demandId: demand.demandId, internalTitle: 'LIVE-TEST opening (accommodations)' },
+      { demandId: demand.demandId, internalTitle: 'LIVE-TEST opening (accommodations)' , dataOrigin: 'smoke_test'},
       'user-live-test',
     )
 

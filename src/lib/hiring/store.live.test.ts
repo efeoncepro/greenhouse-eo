@@ -67,7 +67,8 @@ describe.skipIf(!hasPgConfig)('hiring store — live PG (TASK-353)', () => {
         fulfillmentMode: 'internal_hire',
         demandOrigin: 'capacity_gap',
         requestedRole: 'LIVE-TEST Account Manager',
-        requestedSkills: ['seo', 'copywriting']
+        requestedSkills: ['seo', 'copywriting'],
+        dataOrigin: 'real', // TASK-1739 — publica: publishOpening rechaza vacantes no reales
       },
       'user-live-test'
     )
@@ -77,7 +78,7 @@ describe.skipIf(!hasPgConfig)('hiring store — live PG (TASK-353)', () => {
     expect(demand.status).toBe('draft')
 
     const opening = await createHiringOpening(
-      { demandId: demand.demandId, internalTitle: 'LIVE-TEST internal codename', seniority: 'senior' },
+      { demandId: demand.demandId, internalTitle: 'LIVE-TEST internal codename', seniority: 'senior' , dataOrigin: 'real'},
       'user-live-test'
     )
 

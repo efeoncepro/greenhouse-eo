@@ -59,13 +59,13 @@ describe.skipIf(!hasPgConfig)('assessment hardening — live PG (TASK-1383)', ()
     )
 
     const demand = await createTalentDemand(
-      { stakeholderType: 'internal', engagementType: 'on_going', fulfillmentMode: 'internal_hire', demandOrigin: 'capacity_gap', requestedRole: 'HARD-1383' },
+      { stakeholderType: 'internal', engagementType: 'on_going', fulfillmentMode: 'internal_hire', demandOrigin: 'capacity_gap', requestedRole: 'HARD-1383' , dataOrigin: 'smoke_test'},
       'user-live-test',
     )
 
     ids.demandId = demand.demandId
 
-    const opening = await createHiringOpening({ demandId: demand.demandId, internalTitle: 'HARD-1383 opening' }, 'user-live-test')
+    const opening = await createHiringOpening({ demandId: demand.demandId, internalTitle: 'HARD-1383 opening' , dataOrigin: 'smoke_test'}, 'user-live-test')
 
     ids.openingId = opening.openingId
 

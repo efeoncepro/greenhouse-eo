@@ -154,6 +154,11 @@ describe.skipIf(!hasPgConfig || !canCleanUp)(
 
       expect(profiles.length).toBe(3)
 
+      // TASK-1739 — procedencia DECLARADA al NACER. Sin `dataOrigin` el registro nace `real`, o sea
+      // una vacante VISIBLE en la MISMA instancia que comparten dev, staging y producción. Y si el
+      // teardown muere a mitad (se cae el proxy, se aborta la corrida), lo que queda es
+      // indistinguible de un candidato de verdad: ninguna señal posterior recupera la procedencia
+      // con certeza. Declararlo acá es lo único que no depende de que la limpieza alcance a correr.
       const demand = await createTalentDemand(
         {
           stakeholderType: 'internal',
@@ -161,6 +166,7 @@ describe.skipIf(!hasPgConfig || !canCleanUp)(
           fulfillmentMode: 'internal_hire',
           demandOrigin: 'capacity_gap',
           requestedRole: 'LIVE-TEST AM (assignment proposal)',
+          dataOrigin: 'smoke_test',
         },
         ACTOR,
       )
@@ -168,7 +174,7 @@ describe.skipIf(!hasPgConfig || !canCleanUp)(
       created.demandId = demand.demandId
 
       const opening = await createHiringOpening(
-        { demandId: demand.demandId, internalTitle: 'LIVE-TEST opening (assignment proposal)' },
+        { demandId: demand.demandId, internalTitle: 'LIVE-TEST opening (assignment proposal)', dataOrigin: 'smoke_test' },
         ACTOR,
       )
 
