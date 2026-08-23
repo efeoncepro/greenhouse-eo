@@ -8295,6 +8295,33 @@ export interface GreenhouseHiringHiringOpeningAssessmentPolicyEvent {
   to_state: string;
 }
 
+export interface GreenhouseHiringHiringOpeningCapacity {
+  created_at: Generated<Timestamp>;
+  managed_since: Generated<Timestamp>;
+  opening_id: string;
+  policy_version: Generated<number>;
+  reason: string;
+  /**
+   * TASK-1762: retiro del opt-in. La fila NO se borra (es evidencia de una decisión humana); una fila retirada deja la vacante unmanaged otra vez.
+   */
+  retired_at: Timestamp | null;
+  retired_by_user_id: string | null;
+  retired_reason: string | null;
+  set_by_user_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHiringHiringOpeningCapacityEvent {
+  actor_user_id: string;
+  event_id: Generated<string>;
+  event_type: string;
+  new_seats: number | null;
+  occurred_at: Generated<Timestamp>;
+  opening_id: string;
+  previous_seats: number | null;
+  reason: string;
+}
+
 export interface GreenhouseHiringHiringQuestion {
   answer_key_json: Generated<Json>;
   competency_id: string;
@@ -12824,6 +12851,8 @@ export interface DB {
   "greenhouse_hiring.hiring_opening": GreenhouseHiringHiringOpening;
   "greenhouse_hiring.hiring_opening_assessment_policy": GreenhouseHiringHiringOpeningAssessmentPolicy;
   "greenhouse_hiring.hiring_opening_assessment_policy_event": GreenhouseHiringHiringOpeningAssessmentPolicyEvent;
+  "greenhouse_hiring.hiring_opening_capacity": GreenhouseHiringHiringOpeningCapacity;
+  "greenhouse_hiring.hiring_opening_capacity_event": GreenhouseHiringHiringOpeningCapacityEvent;
   "greenhouse_hiring.hiring_question": GreenhouseHiringHiringQuestion;
   "greenhouse_hiring.talent_demand": GreenhouseHiringTalentDemand;
   "greenhouse_hiring.talent_pool_access_audit": GreenhouseHiringTalentPoolAccessAudit;

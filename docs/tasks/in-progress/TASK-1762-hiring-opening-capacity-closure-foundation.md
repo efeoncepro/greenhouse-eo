@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -17,10 +17,10 @@
 - Motion: `none`
 - Backend impact: `migration|command|reader|sync`
 - Epic: `EPIC-011`
-- Status real: `ADR Proposed enmendado por el ADR de vocabulario (2026-08-22); implementación y rollout inexistentes`
+- Status real: `ADR Accepted 2026-08-23; implementación en curso desde Slice 1`
 - Rank: `TBD`
 - Domain: `hr|data|ops`
-- Blocked by: `aceptación de GREENHOUSE_HIRING_OPENING_CAPACITY_CLOSURE_DECISION_V1`
+- Blocked by: `none` — el ADR quedó `Accepted` el 2026-08-23 tras la enmienda de reconciliación de cupos
 - Nota de desbloqueo (2026-08-23): el eje de desenlace y la causa gobernada están en producción; sólo queda la decisión de arquitectura
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
@@ -44,6 +44,43 @@
 - Recordatorio del ADR §9: el desenlace de una cohorte cerrada por capacidad es `not_selected`, **no**
   `rejected`. Marcar 33 personas como rechazadas les atribuye un juicio que nadie emitió e infla la
   tasa de rechazo de su cohorte demográfica en el análisis de impacto adverso.
+
+## Delta 2026-08-23 — recalibración de baseline pre-ejecución (el gap declarado era falso)
+
+**La spec afirmaba «No existe capacidad por opening». Es falso, y la corrección cambia el diseño.**
+`hiring_opening.requested_seats` existe desde `TASK-353` (`INTEGER NOT NULL DEFAULT 1 CHECK (>= 1)`,
+migración `20260707235655376`), **el operador lo lee en la columna «Cupos» del Demand Desk**
+(`DemandDeskView.tsx:981`) **y lo edita en el campo «Cupos»** del formulario (`:1240`, `min 1 max 100`).
+Nada ramifica por él hoy: es descriptivo, sin consumidor de decisión.
+
+**Consecuencia de diseño, ya aplicada al ADR (`Accepted` 2026-08-23):** `hiring_opening_capacity`
+**NO guarda `target_seats`**. El conteo se queda donde ya vive y donde el operador ya lo ve; la tabla
+nueva declara sólo el **opt-in y su gobernanza** (`opening_id` PK, `managed_since`, `set_by_user_id`,
+`reason`, `policy_version`). `unmanaged` = **ausencia de fila de política**, no un `NULL` en el conteo.
+
+Razón: un `target_seats` propio sería un **segundo «Cupos»** decidiendo el cierre de una cohorte real
+mientras la pantalla que el operador usa muestra el primero. Es la falta que `arch-architect` marca como
+la más común (*extender, no paralelizar*) y la que este dominio ya corrigió tres veces (`sent` ≠ entregado;
+etapa ≠ desenlace; estado de la vacante ≠ desenlace de la persona).
+
+Se descartó también hacer la columna nullable: las filas vivas dicen `1` y **no se puede distinguir
+«alguien eligió 1» de «disparó el `DEFAULT 1`»**, así que no produce el `unmanaged` buscado.
+
+**Guarda que reemplaza al invariante «target_seats > 0; ausencia no se interpreta como uno»:** con
+política vigente, `requested_seats` sólo cambia por el command de capacidad (capability
+`hiring.opening.capacity.confirm` + audit); `updateHiringOpening` lo rechaza. Sin política, la columna
+conserva su comportamiento actual. Defensa en profundidad: guarda de aplicación + trigger + audit + señal.
+
+**Otros supuestos recalibrados:**
+
+- La spec cita «15 y 33 personas». Hoy (2026-08-23, PG real) son **36** en `EO-OPN-0061` y **14** en
+  `EO-OPN-0009`.
+- **Ambas openings tienen 0 `selected`**, así que la capacidad no puede estar llena y el canary de Slice 5
+  no es ejercitable sin seleccionar a alguien primero. No es agenda: condiciona el plan de rollout.
+- `TASK-1765` está `complete` y **en producción** desde el release `709e15f6688e`: `not_selected`,
+  `capacity_filled` y el `cause` de `decideHiringApplication` ya existen. Slice 3 los consume tal cual.
+- `TASK-1764` sigue `to-do`: sin ella el `EmailType` nuevo cae al perfil de footer legacy en silencio.
+  Bloquea **sólo** Slice 4, no Slices 1-3.
 
 ## Summary
 

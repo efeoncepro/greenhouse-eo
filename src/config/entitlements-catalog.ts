@@ -2210,6 +2210,12 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // TASK-1385 — AI assist del copy público de una vacante: proponer los public_* desde inputs
   // allowlist-safe (propose→confirm). Solo PROPONE; el confirm reusa hiring.opening.write.
   { key: 'hiring.opening.ai_assist', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
+  // TASK-1762 — cierre de vacante por capacidad. Dos capabilities separadas a propósito: LEER el
+  // preview de la cohorte es inocuo, CONFIRMAR el cierre es un efecto externo irreversible sobre
+  // decenas de personas. `confirm` gobierna además el único camino autorizado para cambiar
+  // `requested_seats` cuando la vacante tiene política vigente (guarda en base, TASK-451 pattern).
+  { key: 'hiring.opening.capacity.read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
+  { key: 'hiring.opening.capacity.confirm', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
   { key: 'hiring.application.read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
   { key: 'hiring.application.write', module: 'hiring', actions: ['create', 'update'] as const, defaultScope: 'tenant' },
   { key: 'hiring.application.decide', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
