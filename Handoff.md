@@ -215,11 +215,17 @@ propuesta**, no su digest: `templateStatus` no entra al material del digest, as�
 criterio un `blocked: template_inactive` quedaría irrecuperable.
 
 Sin migración: `attempt_seq`, el `CHECK (origin = 'manual' OR attempt_seq = 1)` y los `GRANT` por columna ya
-existían. Ledger append-only: cero `DELETE`, cero `UPDATE` destructivo. Estado: **code complete y verificado en
-runtime** — 8/8 en el test de reproducción, 472 verdes en `src/lib/hiring/assessment` y **3/3 del gate vivo contra
-PostgreSQL real** (policy `draft` bloquea → `markPolicyEnabled` → asigna en el intento 2, con las dos filas vigentes
-en la base), con teardown verificado sin residuo. No requiere flags, env vars ni backfill; entra por un deploy
-ordinario.
+existían. Ledger append-only: cero `DELETE`, cero `UPDATE` destructivo. Evidencia: 8/8 en el test de reproducción,
+472 verdes en `src/lib/hiring/assessment` y **3/3 del gate vivo contra PostgreSQL real** (policy `draft` bloquea →
+`markPolicyEnabled` → asigna en el intento 2, con las dos filas vigentes en la base), con teardown verificado sin
+residuo.
+
+Estado: **`code complete, rollout pendiente`**, no `complete`. Verificado, no supuesto:
+`git show origin/main:…/confirm-assignment.ts` no contiene el sentinel, o sea **el callejón sigue vivo en
+producción** — hoy confirmar con la política en `draft` todavía quema la llave de esa persona. La task se movió a
+`complete/` por error y se devolvió a `in-progress/`, quedando alineada con `TASK-1748`, `TASK-1754` y `TASK-1765`,
+que suben en el mismo release del dominio Hiring. Lo que falta es sólo el deploy: no hay flags, env vars, migración
+ni backfill que aplicar.
 
 **Sin backfill, decidido con el conteo real.** Las únicas 4 filas en callejón son del carril **automático**
 (`stage_auto` / `volume_cap`), sobre candidaturas `closed` con `data_origin='smoke_test'` —no son personas— y su
@@ -227,7 +233,10 @@ clave manual está libre. Ese carril no puede reintentar por `attempt_seq` (lo p
 declarada, `superseded_at` por reconciliación, no tiene write path: es el hueco de **`TASK-1771`**, que además
 hereda la restricción de orden respecto de `TASK-1754` que el Delta original le atribuía a esta task por error.
 
-Siguiente paso: incluirlo en un release normal. **`pnpm build` no se ejecutó, por decisión declarada:** el repo tiene
+Siguiente paso: que suba en el release del dominio Hiring y verificar el ciclo contra el deployment activo antes de
+mover la task a `complete/`. Nota para ese release: de las 7 postulaciones reales que esperan decisión de asignación
+de prueba, **las 4 manuales son exactamente la población que esta corrección desbloquea**.
+**`pnpm build` no se ejecutó, por decisión declarada:** el repo tiene
 hoy un error de tipos vivo de `TASK-1765` en `src/lib/hiring/store.ts` sobre el mismo checkout, así que el build
 fallaría por causa ajena, y el riesgo propio es bajo (server-only, sin JSX ni frontera cliente). Lo corre el release
 con el árbol limpio. `pnpm test` completo sí: **11.938 verdes, 0 fallos**.
@@ -569,24 +578,3 @@ ningún webhook, ningún flag movido. Orden en
 `docs/operations/runbooks/resend-email-lifecycle-rollout.md`, con dos scripts operacionales nuevos
 que se aplican DESPUÉS del deploy: el CONTRACT de credencial y el saneador de los bearers que
 quedaron en claro en `delivery_payload` desde el 12-ago.
-
-## 2026-08-19 — Ronda de documentación post-release: lo que quedó y la deuda que se hizo visible
-
-Tres subagentes cerraron los huecos que dejó el release de TASK-1739. Lo que el siguiente agente
-necesita saber:
-
-**El catálogo de patrones tiene un octavo.** Antes de inventar una forma propia para "declarar un hecho
-que no se puede inferir después", léelo: obliga a elegir entre propagar en transacción o hacer que los
-readers críticos lean la raíz.
-
-**El módulo Hiring emite 16 señales de reliability y sólo 5 estaban documentadas.** Ahora hay inventario
-con dueño; quedan 8 sin delta propio (`talent_pool.integrity`, `assessment.template_module_without_questions`,
-`assessment.assignment_health` y las 5 de `assessment_ai.*`). Ninguna está rota: es deuda documental.
-
-**Mover una task a `complete/` rompe punteros.** Cinco quedaron colgando, incluido uno dentro del reader
-de una señal productiva. Al cerrar una task, correr `grep -rn 'in-progress/TASK-####' src/ scripts/ docs/`
-antes de dar por terminado.
-
-**Deuda viva de TASK-1739** en `TASK-1748`: los readers del Banco de Talento no filtran por procedencia
-—hoy las 11 personas sintéticas quedan fuera por su `lifecycle_status`, no por el filtro—, el archivado
-escribe sólo sobre la postulación, y las 9 huérfanas del lane B siguen sin decisión.

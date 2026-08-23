@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `complete`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-011`
-- Status real: `Complete — verificado contra PostgreSQL real 2026-08-22; sin migración, sin flags, sin backfill`
+- Status real: `code complete, rollout pendiente — el fix NO está en producción; sube con el release del dominio Hiring`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -348,12 +348,36 @@ Ejecutada 2026-08-22:
   de `TASK-1765` en curso en otra sesión sobre el mismo checkout. Ningún error en los archivos de
   esta task.
 
+## Estado de rollout (2026-08-22)
+
+**`code complete, rollout pendiente`. NO está operativamente completa.**
+
+Verificado, no supuesto: `git show origin/main:…/confirm-assignment.ts | grep -c NEXT_ATTEMPT_AFTER_DEAD_END`
+→ **0**. `origin/main` sigue en `6f85644cd` (2026-08-19), así que **el callejón sigue vivo en
+producción**: hoy un operador que confirme con la política en `draft` todavía quema la llave de esa
+persona. Los commits están en `origin/develop`.
+
+Esta task se movió a `complete/` por error y se devolvió a `in-progress/`. El
+`Runtime Rollout Completion Gate` es explícito: código en `develop` no es capacidad disponible, y
+`code complete` no es `operationally complete`. Las otras tres tasks del mismo dominio cerradas hoy
+—`TASK-1748`, `TASK-1754`, `TASK-1765`— están en el mismo estado y suben en el mismo release.
+
+**Lo que falta es sólo el deploy.** No hay migración, flag, env var, backfill ni integración externa
+que verificar: el `CHECK`, `attempt_seq` y los grants ya estaban en la base desde `TASK-1719`.
+
+Condición de cierre: promovido a `main`, verificar contra el deployment activo que el ciclo
+`blocked → corregir la causa → asignar` funciona, y recién entonces mover a `complete/`.
+
+⚠️ Hay **7 postulaciones reales** esperando decisión de asignación de prueba (4 manuales, 3
+automáticas) registradas en `Handoff.md`. Son de Talento, no de esta task, pero las 4 manuales son
+justamente la población que esta corrección desbloquea.
+
 ## Closing Protocol
 
-- [x] Lifecycle y ubicación del archivo reflejan estado real.
+- [x] Lifecycle y ubicación del archivo reflejan estado real (`in-progress` = rollout pendiente).
 - [x] README y registry sincronizados.
 - [x] Handoff y changelog registran la evidencia runtime.
-- [x] `pnpm docs:closure-check` y `pnpm docs:context-check:strict` pasan al cierre.
+- [ ] `pnpm docs:closure-check` y `pnpm docs:context-check:strict` al mover a `complete/` post-release.
 
 ## Slice 3 — decisión sobre las filas existentes (evidencia 2026-08-22, PostgreSQL real)
 
