@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-011`
-- Status real: `Diseño — hueco verificado contra PostgreSQL real 2026-08-22; preventiva, sin backlog productivo que recuperar`
+- Status real: `in-progress 2026-08-23 — intake hecha, implementacion NO empezada. La colision con el Slice F de TASK-1754 se resolvio: esa task cerro y `assignment-policy/readers.ts` quedo commiteado en origin/develop`TASK-1754` Slice F tiene `assignment-policy/readers.ts` y `src/types/hiring.ts` modificados sin commitear en el checkout compartido, y esta task vive en esa misma superficie`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
