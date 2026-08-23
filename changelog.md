@@ -3,6 +3,23 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-23 — El dominio de Hiring reparado llegó a producción, y el reloj de retención con él
+
+- Las cuatro correcciones del día estaban `code complete, rollout pendiente`: el eje de desenlace, el colapso de
+  trece etapas a seis, el filtro de procedencia del Banco de Talento y el callejón del ledger de asignación de
+  pruebas. Ninguna servía de nada mientras producción siguiera corriendo el código anterior. Ahora corren.
+- Viajó dentro el fix de una regresión con implicación legal: el reloj de retención de la Ley 21.719 no
+  arrancaba para `not_selected`, la población más grande del pipeline. No estaba viva porque producción todavía
+  no podía escribir ese desenlace — **se habría vuelto viva en el mismo instante en que este release lo
+  habilitó**. Por eso no podía quedar para el siguiente.
+- Quedan tres migraciones escritas y revisadas que **no** viajaron: viven fuera de `migrations/` a propósito,
+  porque una migración committeada y sin aplicar bloquea a cualquiera que corra `migrate:up`, incluido quien
+  esté reparando un incidente. Corren después del release, en cadena, y cada una espera que el código del
+  eslabón anterior esté desplegado.
+- La lección que ordena esa cadena, y que ya costó un incidente: **«cero filas» no es «nadie lo escribe»**. Lo
+  que decide si un valor es alcanzable es el contrato de la superficie desplegada, nunca el contenido de la
+  tabla.
+
 ## 2026-08-22 — Mover a «Evaluación» ya no guarda una etapa distinta de la que muestra
 
 - El tablero mostraba seis columnas sobre trece etapas del dominio, y tres de ellas se veían todas como
@@ -959,21 +976,3 @@ drift propio de un baseline viejo; el estándar premium de UI incorpora que un s
 con fecha (uno vencido bloqueó cuatro días un trabajo ya terminado) y que ningún gate lee lo que la
 pantalla dice; y la skill de captura registra que una superficie gateada por organización exige la
 persona de esa organización, con la consulta que la encuentra.
-
-## 2026-08-12 — El portal SEO del cliente quedó cerrado, y su propio scorecard estaba equivocado
-
-`TASK-1310` cierra la cara cliente del módulo SEO: dashboard `/growth/seo` con Resumen, Evolución y
-Quadrant 360, más el informe `/growth/seo/report` en web e imprimible sobre el mismo modelo de
-artefacto que el AEO. Con ella el módulo tiene sus dos caras —las cuatro pestañas del operador y el
-portal del cliente— y la pata visible del criterio de paridad queda cubierta.
-
-El cierre empezó desmintiendo su propia evidencia: el scorecard vigente bloqueaba la task con 2.29
-sobre capturas tomadas nueve horas antes del commit que ejecutó la ronda premium, así que describía
-una interfaz que ya no existía. Medida de nuevo contra el código real —tres superficies, escritorio y
-móvil, con sesión de un cliente de verdad atravesando el gate por organización— las tres cierran sin
-un solo hallazgo de calidad y los cuatro gates de UI quedan en verde.
-
-En el camino aparecieron dos defectos que ningún gate podía ver porque ninguno es un error técnico:
-el informe anunciaba "Aún no hay una posición media para leer" con la posición impresa al lado, y el
-botón global de "volver arriba" no tenía nombre accesible en ninguna ruta del portal. Los dos
-salieron mirando las capturas, no leyendo los reportes.

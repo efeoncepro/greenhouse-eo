@@ -2,6 +2,35 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-23 — El dominio de Hiring está en producción; faltan tres migraciones y su autorización
+
+**Release verificado.** `304371f734076e2bfc96529712d2fa63a179bf84` (PR #205), orchestrator run `32610182477`
+success, manifest `304371f73407-ef375a47-…` en `released` (9m49s), watchdog `ok` con `drift_count=0`, health
+200. Un solo run, sin retry. Subieron TASK-1765, TASK-1754, TASK-1748 y TASK-1755, más el fix de la regresión
+de retención de la Ley 21.719 para `not_selected` — que se volvía viva justo cuando el release habilitaba el
+desenlace, así que viajó dentro.
+
+**Lo que falta, y por qué no lo hice.** Las tres migraciones de `docs/tasks/pending-migrations/` siguen sin
+correr. Sus dos precondiciones están **verificadas contra `origin/main`**, no contra el working tree: `main` ya
+no ofrece `on_hold` en el eje de Hiring (los hits que quedan son dos comentarios que documentan el retiro y un
+`case` del pipeline de servicios, otro enum), y el filtro de procedencia corre en los dos runtimes — en el
+`ops-worker` con código byte-idéntico, verificado con diff completo, no con la lista del change-gate. El orden
+es cadena: contract del enum → backfill → invariante, con readback esperado **`1 → 0`** (si sale 33, el backfill
+no corrió y se para). **Mutan la base compartida de producción y son irreversibles: esperan autorización
+directa del operador.** Mientras no corran, las cuatro tasks se quedan en `in-progress/`, que es su estado
+correcto.
+
+**Dos cosas del camino que valen para el próximo release.** El merge canónico `-X ours` resucitó cuatro
+archivos en su ubicación de lifecycle vieja (ISSUE-160 en `open/`, TASK-1745 en `in-progress/`, TASK-1747 y
+TASK-1748 en `to-do/`): no es el modify/delete conocido, y **las dos verificaciones duras no lo detectan porque
+son sobre código** — hay que buscar duplicados de lifecycle a mano. Y el bloqueador real estuvo antes del
+dispatch: staging en `Canceled` por los pushes docs-only del día, resuelto tocando un doc de
+`deployControlDocs` que el release necesitaba igual, no con un bypass.
+
+**El hueco del change-gate quedó medido por otra sesión** en la Delta de `TASK-930` (`72c681a3c`): 62 rutas que
+el `ops-worker` importa contra 24 vigiladas, 33 sin cubrir, incluida `src/lib/postgres/client`. Un release que
+toque una de esas puede dejar el worker viejo con el watchdog en `ok`.
+
 ## 2026-08-22 — TASK-1748: archivar dejó de fingir cierres, y el orden de sus slices no era preferencia
 
 Estado correcto: **`code complete, rollout pendiente`**. Slices 1 y 2 en `develop` local, sin push:
@@ -527,54 +556,3 @@ que hoy bloquea `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`.
 
 **Estado: TASK-1745 complete e ISSUE-160 resuelto. TASK-1746 sigue in-progress** — le faltan los dos smokes funcionales
 (requieren una candidata con consentimiento, decisión humana) y el flip de enlaces seguros. TASK-1747 quedó desbloqueada.
-
-## 2026-08-19 — Seis auditorías pararon el rollout de assessment antes de romper producción
-
-El bloque TASK-1745/1746 estaba por promoverse. Tres auditores independientes (arquitectura,
-talento, seguridad) lo revisaron antes; dos encontraron **el mismo P0 sin verse entre sí**, y una
-segunda ronda encontró un P0 en la propia corrección. Todo corregido en `5937f6e35`.
-
-**La migración de 1746 no era aplicable en NINGÚN orden.** El CHECK + trigger de
-`access_token_version_id` rompían el writer de `main` (23514 en toda asignación de test, en Vercel
-y en el ops-worker), y el código nuevo rompía sin la migración (42703). Medido contra la base real:
-22 assessments con token, los 22 de los últimos 30 días — el camino está vivo. Y hay **una sola
-instancia Cloud SQL** compartida prod/staging/local, así que aplicarla desde local es un cambio
-productivo inmediato. Partida en expand/contract.
-
-**El split sin enforcement seguía siendo el mismo P0.** `node-pg-migrate` aplica TODAS las
-pendientes en una transacción: dejar el CONTRACT en `migrations/` con un comentario de advertencia
-no impedía nada — el runner no lee comentarios. Vive en `scripts/operations/`, se aplica a mano.
-
-**Dos regresiones que golpeaban al candidato.** La sesión caducaba en el plazo para EMPEZAR, no en
-el de responder: quien abría el enlace poco antes del límite y arrancaba perdía la sesión a mitad
-del test. Y un enlace con el fragmento borrado por un reescritor dejaba al candidato fuera **sin
-producir un solo request** — indetectable. Ambas cerradas: deadline vivo + señal
-`hiring.assessment.access_never_exchanged` sobre un hecho durable.
-
-**El cap de recuperación cerraba la última puerta.** Contaba intentos FALLIDOS y compartía cuota
-con el enlace seguro: tres correos rebotados por un proveedor degradado dejaban al candidato sin
-NINGÚN canal por 24 h, con su plazo corriendo. Ahora sólo consume cuota lo que entregó algo, y cada
-canal tiene presupuesto propio.
-
-**`boundary-domain.test.ts` estaba ROJO en `HEAD`.** `hiring_assessment_public_session` nunca entró
-al allowlist del dominio. No lo vio nadie porque sólo aparece corriendo `src/lib/hiring` completo,
-no los tests focales del módulo. Lección: los gates focales no sustituyen al dominio.
-
-**Riesgos residuales declarados, NO cerrados** (ninguno bloquea el release, todos anteceden al flip):
-- `purge_expired_assessment_public_sessions` borra filas ACTIVAS por `expires_at`. Hoy es coherente
-  porque el trigger de refresh mantiene ese campo canónico; el día que el trigger no dispare, el
-  purge le corta el test al candidato sin dejar fila `expired` que lo explique. Hacerlo
-  deadline-aware.
-- La copy terminal ("Puede haber expirado o ya haberse usado") cubre seis causas distintas, cuatro
-  de ellas con el enlace VIVO. El bootstrap ya sabe cuándo faltó el fragmento y lo colapsa en el
-  mismo mensaje: distinguirlo da copy honesta **y** medición directa del reescritor.
-- `purge_assessment_access_recovery` no tiene ningún caller: la retención de 12 meses y el purgado
-  por retiro de consentimiento están declarados y nunca se ejecutan.
-- `--reporter=basic` da falso verde en vitest 4.1.0 (falla al cargar, exit 0). No está en ningún
-  gate; anotado para que no se introduzca.
-
-**Estado: code complete, rollout pendiente.** Nada aplicado: ninguna migración, ningún secreto,
-ningún webhook, ningún flag movido. Orden en
-`docs/operations/runbooks/resend-email-lifecycle-rollout.md`, con dos scripts operacionales nuevos
-que se aplican DESPUÉS del deploy: el CONTRACT de credencial y el saneador de los bearers que
-quedaron en claro en `delivery_payload` desde el 12-ago.
