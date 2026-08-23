@@ -11,6 +11,12 @@ import Link from '@mui/material/Link'
 import MenuItem from '@mui/material/MenuItem'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
@@ -31,6 +37,7 @@ const ARIA_PREVIEW_WIDTH = 'Ancho de la vista previa'
 const ARIA_DESKTOP_VIEW = 'Vista de escritorio'
 const ARIA_MOBILE_VIEW = 'Vista móvil'
 const ARIA_POLICY_MATRIX = 'Bloques permitidos por perfil de footer'
+const ARIA_SOCIAL_LINKS = 'Redes sociales de Efeonce'
 
 const PROFILE_ICONS: Record<FooterProfileId, string> = {
   internal_operational: 'tabler-settings-automation',
@@ -60,6 +67,7 @@ const FooterPreview = ({ profile, viewport }: { profile: FooterProfileMock; view
 
   return (
     <Box
+      id='email-footer-profile-preview'
       data-capture='email-footer-profile-preview'
       sx={{
         inlineSize: '100%',
@@ -105,7 +113,7 @@ const FooterPreview = ({ profile, viewport }: { profile: FooterProfileMock; view
           }}
         >
           <Stack spacing={2}>
-            <Typography variant='h6' sx={{ color: EMAIL_COLORS.text }}>
+            <Typography variant='h6' component='h3' sx={{ color: EMAIL_COLORS.text }}>
               Hola, Daniela
             </Typography>
             <Typography variant='body2' sx={{ color: EMAIL_COLORS.secondary }}>
@@ -148,95 +156,175 @@ const FooterPreview = ({ profile, viewport }: { profile: FooterProfileMock; view
               style={{ inlineSize: 96, blockSize: 'auto' }}
             />
           </Box>
-          <Typography variant='caption' sx={{ color: EMAIL_COLORS.secondary, display: 'block', mt: 3 }}>
+          <Typography
+            variant='body2'
+            sx={{ color: EMAIL_COLORS.secondary, display: 'block', maxInlineSize: 440, mt: 3, mx: 'auto' }}
+          >
             {profile.context}
           </Typography>
           {profile.help && (
-            <Typography variant='caption' sx={{ color: EMAIL_COLORS.secondary, display: 'block', mt: 1 }}>
-              {profile.help}
-            </Typography>
+            <Box
+              sx={{
+                maxInlineSize: 440,
+                mt: 1,
+                mx: 'auto',
+                ...(profile.helpTone === 'warning' && {
+                  px: 2,
+                  py: 1,
+                  bgcolor: EMAIL_COLORS.warningBg,
+                  borderRadius: theme => `${theme.shape.customBorderRadius.md}px`
+                })
+              }}
+            >
+              <Typography
+                variant='body2'
+                sx={{ color: profile.helpTone === 'warning' ? EMAIL_COLORS.warning : EMAIL_COLORS.secondary }}
+              >
+                {profile.help}
+              </Typography>
+            </Box>
           )}
           {profile.controls && (
-            <Stack
-              direction={viewport === 'desktop' ? 'row' : 'column'}
-              spacing={viewport === 'desktop' ? 1.5 : 1}
-              divider={viewport === 'desktop' ? <Box component='span'>·</Box> : undefined}
-              sx={{ mt: 1.5, justifyContent: 'center', alignItems: 'center' }}
+            <Box
+              component='ul'
+              sx={{
+                p: 0,
+                m: 0,
+                mt: 1.5,
+                display: 'flex',
+                listStyle: 'none',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: viewport === 'desktop' ? 'row' : 'column',
+                columnGap: 1.5,
+                rowGap: 0.5
+              }}
             >
               {profile.controls.map(control => (
-                <Typography
+                <Box
                   key={control}
-                  component='span'
-                  variant='caption'
                   sx={{
-                    color: EMAIL_COLORS.primaryHover,
-                    fontWeight: 600,
-                    textDecoration: 'underline',
-                    textUnderlineOffset: 2
+                    display: 'flex',
+                    alignItems: 'center',
+                    '&:not(:first-of-type)::before':
+                      viewport === 'desktop' ? { content: '"·"', mr: 1.5, color: EMAIL_COLORS.muted } : undefined
                   }}
+                  component='li'
                 >
-                  {control}
-                </Typography>
+                  <Link
+                    href='#email-footer-profile-preview'
+                    onClick={event => event.preventDefault()}
+                    aria-label={`${control} (enlace de muestra)`}
+                    variant='caption'
+                    sx={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      minBlockSize: theme => theme.spacing(6),
+                      color: EMAIL_COLORS.primaryHover,
+                      fontWeight: 600,
+                      textDecorationThickness: 'from-font',
+                      textUnderlineOffset: 2,
+                      '&:focus-visible': {
+                        borderRadius: 0.5,
+                        outline: `2px solid ${EMAIL_COLORS.primary}`,
+                        outlineOffset: 2
+                      }
+                    }}
+                  >
+                    {control}
+                  </Link>
+                </Box>
               ))}
-            </Stack>
+            </Box>
           )}
           {profile.socialLinks && (
-            <Stack
-              direction='row'
-              spacing={1}
+            <Box
+              component='ul'
               data-capture='email-footer-profile-social'
-              sx={{ mt: 2, justifyContent: 'center', color: EMAIL_COLORS.muted }}
+              aria-label={ARIA_SOCIAL_LINKS}
+              sx={{
+                p: 0,
+                m: 0,
+                mt: 2,
+                gap: 1,
+                display: 'flex',
+                listStyle: 'none',
+                justifyContent: 'center',
+                color: EMAIL_COLORS.muted
+              }}
             >
               {profile.socialLinks.map(social => (
-                <Link
-                  key={social.channel}
-                  href={social.url}
-                  target='_blank'
-                  rel='noreferrer'
-                  aria-label={social.label}
-                  title={social.label}
-                  underline='none'
-                  sx={{
-                    display: 'inline-grid',
-                    placeItems: 'center',
-                    inlineSize: 32,
-                    blockSize: 32,
-                    borderRadius: 9999,
-                    color: 'inherit',
-                    '&:hover': { color: EMAIL_COLORS.primary }
-                  }}
-                >
-                  <Image
-                    src={`/branding/email/footer/${social.channel}.png`}
-                    alt=''
-                    width={22}
-                    height={22}
-                    style={{ inlineSize: 22, blockSize: 22 }}
-                  />
-                </Link>
+                <Box component='li' key={social.channel}>
+                  <Link
+                    href={social.url}
+                    target='_blank'
+                    rel='noreferrer'
+                    aria-label={social.label}
+                    title={social.label}
+                    underline='none'
+                    sx={{
+                      display: 'inline-grid',
+                      placeItems: 'center',
+                      inlineSize: 32,
+                      blockSize: 32,
+                      borderRadius: 9999,
+                      color: 'inherit',
+                      '&:hover': { color: EMAIL_COLORS.primary },
+                      '&:focus-visible': {
+                        outline: `2px solid ${EMAIL_COLORS.primary}`,
+                        outlineOffset: 2
+                      }
+                    }}
+                  >
+                    <Image
+                      src={`/branding/email/footer/${social.channel}.png`}
+                      alt=''
+                      width={22}
+                      height={22}
+                      style={{ inlineSize: 22, blockSize: 22 }}
+                    />
+                  </Link>
+                </Box>
               ))}
-            </Stack>
+            </Box>
           )}
           {profile.legalLines && (
-            <Stack data-capture='email-footer-profile-legal' spacing={0.5} sx={{ mt: 2 }}>
+            <Box
+              component='ul'
+              data-capture='email-footer-profile-legal'
+              sx={{ p: 0, m: 0, mt: 2, mx: 'auto', maxInlineSize: 460, listStyle: 'none' }}
+            >
               {profile.legalLines.map((line, index) => (
-                <Typography
-                  key={line}
-                  variant='caption'
-                  sx={{ color: EMAIL_COLORS.muted, fontWeight: index === 0 ? 600 : 400 }}
-                >
-                  {line}
-                </Typography>
+                <Box component='li' key={line} sx={{ '& + &': { mt: 0.5 } }}>
+                  <Typography
+                    variant='caption'
+                    sx={{ color: EMAIL_COLORS.muted, display: 'block', fontWeight: index === 0 ? 600 : 400 }}
+                  >
+                    {line}
+                  </Typography>
+                </Box>
               ))}
-            </Stack>
+            </Box>
           )}
           {profile.legalNotice && (
-            <Typography variant='caption' sx={{ color: EMAIL_COLORS.muted, display: 'block', mt: 1.5 }}>
+            <Typography
+              variant='body2'
+              sx={{ color: EMAIL_COLORS.secondary, display: 'block', maxInlineSize: 440, mt: 1.5, mx: 'auto' }}
+            >
               {profile.legalNotice}
             </Typography>
           )}
           {profile.reference && (
-            <Typography variant='caption' sx={{ color: EMAIL_COLORS.muted, display: 'block', mt: 1 }}>
+            <Typography
+              variant='caption'
+              sx={{
+                color: EMAIL_COLORS.muted,
+                display: 'block',
+                mt: 1,
+                fontWeight: 600,
+                fontVariantNumeric: 'tabular-nums'
+              }}
+            >
               {profile.reference}
             </Typography>
           )}
@@ -341,7 +429,7 @@ const EmailFooterProfilesMockupView = () => {
             alignSelf: 'start'
           }}
         >
-          <Typography variant='subtitle2' sx={{ px: 1, mb: 1 }}>
+          <Typography variant='subtitle2' component='h2' sx={{ px: 1, mb: 1 }}>
             Selecciona un perfil
           </Typography>
           <Stack spacing={1}>
@@ -370,7 +458,11 @@ const EmailFooterProfilesMockupView = () => {
                     <i className={PROFILE_ICONS[profile.id]} aria-hidden='true' />
                   </Box>
                   <Box>
-                    <Typography variant='subtitle2' sx={{ color: selected ? 'primary.main' : 'text.primary' }}>
+                    <Typography
+                      variant='subtitle2'
+                      component='span'
+                      sx={{ color: selected ? 'primary.main' : 'text.primary' }}
+                    >
                       {profile.name}
                     </Typography>
                     <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 0.5 }}>
@@ -399,7 +491,9 @@ const EmailFooterProfilesMockupView = () => {
             sx={{ mb: 3, alignItems: { sm: 'center' }, justifyContent: 'space-between' }}
           >
             <Box>
-              <Typography variant='h6'>{selectedProfile.name}</Typography>
+              <Typography variant='h6' component='h2'>
+                {selectedProfile.name}
+              </Typography>
               <Typography variant='body2' color='text.secondary'>
                 {selectedProfile.description}
               </Typography>
@@ -408,7 +502,7 @@ const EmailFooterProfilesMockupView = () => {
               size='small'
               color='primary'
               variant='tonal'
-              label={viewport === 'desktop' ? '560 px' : '350 px'}
+              label={viewport === 'desktop' ? '560 px' : 'Máx. 350 px'}
             />
           </Stack>
           <FooterPreview profile={selectedProfile} viewport={viewport} />
@@ -425,70 +519,64 @@ const EmailFooterProfilesMockupView = () => {
           overflowX: 'auto'
         }}
       >
-        <Typography variant='h6'>Matriz de bloques permitidos</Typography>
+        <Typography variant='h6' component='h2'>
+          Matriz de bloques permitidos
+        </Typography>
         <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5, mb: 2 }}>
           Esta matriz gobierna qué puede aparecer. En marketing, las RRSS institucionales son obligatorias y sus
           destinos provienen del SSOT de marca Efeonce.
         </Typography>
-        <Box
-          role='table'
-          aria-label={ARIA_POLICY_MATRIX}
+        <Typography
+          id='email-footer-policy-matrix-scroll-hint'
+          variant='caption'
+          color='text.secondary'
+          sx={{ display: { xs: 'block', md: 'none' }, mb: 1 }}
+        >
+          Desplaza horizontalmente para revisar todas las columnas.
+        </Typography>
+        <TableContainer
+          tabIndex={0}
+          aria-describedby='email-footer-policy-matrix-scroll-hint'
           sx={{
-            minInlineSize: 760,
-            display: 'grid',
-            gridTemplateColumns: 'minmax(220px, 1.3fr) repeat(3, minmax(110px, 0.7fr)) minmax(220px, 1.4fr)'
+            '&:focus-visible': {
+              borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
+              outline: '2px solid',
+              outlineColor: 'primary.main',
+              outlineOffset: 2
+            }
           }}
         >
-          {['Perfil', 'RRSS', 'Baja', 'Identidad legal', 'Nota legal'].map(label => (
-            <Typography
-              key={label}
-              role='columnheader'
-              variant='caption'
-              sx={{ p: 1.5, fontWeight: 700, borderBlockEnd: '1px solid', borderColor: 'divider' }}
-            >
-              {label}
-            </Typography>
-          ))}
-          {FOOTER_PROFILE_MOCKS.flatMap(profile => [
-            <Typography
-              key={`${profile.id}-name`}
-              role='cell'
-              variant='body2'
-              sx={{ p: 1.5, fontWeight: 600, borderBlockEnd: '1px solid', borderColor: 'divider' }}
-            >
-              {profile.name}
-            </Typography>,
-            <Box
-              key={`${profile.id}-social`}
-              role='cell'
-              sx={{ p: 1.5, borderBlockEnd: '1px solid', borderColor: 'divider' }}
-            >
-              <BooleanMark value={profile.rules.social} />
-            </Box>,
-            <Box
-              key={`${profile.id}-unsubscribe`}
-              role='cell'
-              sx={{ p: 1.5, borderBlockEnd: '1px solid', borderColor: 'divider' }}
-            >
-              <BooleanMark value={profile.rules.unsubscribe} />
-            </Box>,
-            <Box
-              key={`${profile.id}-address`}
-              role='cell'
-              sx={{ p: 1.5, borderBlockEnd: '1px solid', borderColor: 'divider' }}
-            >
-              <BooleanMark value={profile.rules.postalAddress} />
-            </Box>,
-            <Typography
-              key={`${profile.id}-notice`}
-              role='cell'
-              variant='body2'
-              sx={{ p: 1.5, borderBlockEnd: '1px solid', borderColor: 'divider' }}
-            >
-              {profile.rules.legalNotice}
-            </Typography>
-          ])}
-        </Box>
+          <Table aria-label={ARIA_POLICY_MATRIX} sx={{ minInlineSize: 760 }}>
+            <TableHead>
+              <TableRow>
+                {['Perfil', 'RRSS', 'Baja', 'Identidad legal', 'Nota legal'].map(label => (
+                  <TableCell key={label} sx={{ fontWeight: 700 }}>
+                    {label}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {FOOTER_PROFILE_MOCKS.map(profile => (
+                <TableRow key={profile.id} sx={{ '&:last-child td, &:last-child th': { borderBlockEnd: 0 } }}>
+                  <TableCell component='th' scope='row' sx={{ fontWeight: 600 }}>
+                    {profile.name}
+                  </TableCell>
+                  <TableCell>
+                    <BooleanMark value={profile.rules.social} />
+                  </TableCell>
+                  <TableCell>
+                    <BooleanMark value={profile.rules.unsubscribe} />
+                  </TableCell>
+                  <TableCell>
+                    <BooleanMark value={profile.rules.postalAddress} />
+                  </TableCell>
+                  <TableCell>{profile.rules.legalNotice}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Paper>
     </Box>
   )

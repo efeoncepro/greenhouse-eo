@@ -122,6 +122,48 @@ internacional requiere validación con abogado habilitado en cada jurisdicción.
 - Access/security, Hiring externo y regulated transactional nunca comparten release de migración.
 - El legacy sólo puede retirarse con aceptación 30/30.
 
+### 7. Paquete visual y de contenido aprobado como punto de partida
+
+La lámina interna `/admin/emails/footer-profiles/mockup` fija el contrato de partida aprobado para implementar
+los footers gobernados. No es una exploración ni una alternativa pendiente de escoger. Su paquete de referencia es:
+
+- composición y jerarquía: `src/views/greenhouse/admin/email-footer-profiles/mockup/EmailFooterProfilesMockupView.tsx`;
+- perfiles y copy de muestra: `src/views/greenhouse/admin/email-footer-profiles/mockup/data.ts`;
+- identidad, mercados y destinos sociales: `src/config/efeonce-brand.ts`;
+- assets email-safe: `public/branding/email/footer/*`, reproducibles con
+  `scripts/email/generate-footer-assets.mjs`;
+- anatomía, copy ledger, responsive y verificación:
+  `docs/ui/wireframes/TASK-1764-email-footer-policy-profiles.md`;
+- dirección visual y anti-patterns:
+  `docs/ui/visual-directions/TASK-1764-email-footer-policy-profiles.md`.
+
+La implementación conserva esa jerarquía, densidad, espaciado, contraste, wordmark, iconografía social sólida,
+identidad legal y comportamiento desktop/mobile. Los fixtures del mockup sirven para probar la presentación; no
+se importan como policy ni sustituyen el registro exhaustivo por `EmailType`, el copy canónico o el operating entity
+server-side. Los cinco ejemplos visuales agrupan propósitos afines para comparar la anatomía; la policy mantiene
+la clasificación semántica exhaustiva de esta ADR.
+
+| Perfil visual del mockup  | `purpose` de policy representado                      | Diferencia que la implementación conserva                                           |
+| ------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Operación interna         | `internal_operational`                                | Referencia operativa sólo cuando existe                                             |
+| Acceso y seguridad        | `access_security`                                     | Ayuda/nota de seguridad sólo según policy                                           |
+| Relación y servicio       | `transactional_service`, `relationship_transactional` | Contexto y reply/help dependen del tipo, no del perfil visual                       |
+| Operaciones reguladas     | `regulated_transactional`                             | Nota, referencia y controles dependen de la obligación aplicable                    |
+| Marketing y suscripciones | `optional_subscription`, `commercial_marketing`       | Baja requerida en ambos; RRSS opcionales en suscripción y obligatorias en marketing |
+
+Una child task puede desviarse sólo por una limitación medida de cliente de correo, accesibilidad o dato runtime.
+Debe documentar el motivo, mostrar before/after y obtener aprobación; no reabre el diseño por preferencia del agente.
+
+La auditoría del mockup fijó además el contrato accesible de partida: contexto e instrucciones en el equivalente a
+14 px; controles y metadata no menores a 13 px; pesos 400/600; footer sin headings; listas nativas para controles,
+RRSS e identidad legal; targets mínimos de 24 px para texto y 32 × 32 px para RRSS; foco visible, wrap natural y
+contraste mínimo 4.5:1. La implementación email-safe preserva la intención con tablas y estilos inline, sin copiar
+primitives MUI ni la tabla de gobierno de la lámina.
+
+La paridad de una cohorte no se prueba sólo en el mockup web. Como mínimo se verifica el HTML de correo en Outlook
+Desktop para Windows (motor Word), Outlook Web, Gmail y un cliente WebKit, además del estado con imágenes
+bloqueadas. Las RRSS conservan nombre accesible y fallback textual cuando el asset no carga.
+
 ## Perfiles base
 
 | Purpose                      | Unsubscribe | RRSS                      | Identidad legal | Nota                        |

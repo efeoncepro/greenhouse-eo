@@ -3,6 +3,18 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-23 — Los footers aprobados dejaron de depender de la imaginación del siguiente agente
+
+- El mockup aprobado ahora es el punto de partida obligatorio para implementar footers: conserva jerarquía,
+  espaciado, contraste, wordmark Efeonce, identidad legal, iconos sociales y reglas responsive.
+- Los cinco perfiles visuales no borran la semántica: representan siete propósitos, y suscripción opcional no se
+  confunde con marketing aunque compartan anatomía.
+- La skill de email ya no infiere baja desde `broadcast`: unsubscribe y RRSS dependen de propósito y consentimiento.
+- La revisión final endureció tipografía, jerarquía semántica, listas, tabla de policy, targets, foco y contraste en
+  los cinco perfiles; los diez estados desktop/mobile quedaron sin overflow y GVC no registró errores runtime.
+- Cada cohorte deberá probar Outlook Desktop Windows, Outlook Web, Gmail, un cliente WebKit e imágenes bloqueadas.
+  El mockup sigue siendo diseño aprobado, no evidencia de envío, deploy o runtime.
+
 ## 2026-08-23 — Cuando el sistema intentaba mandar la prueba solo y se trababa, esa persona quedaba en un limbo que nadie veía
 
 - Si la prueba la asignaba una persona y se bloqueaba, corregir la causa y volver a proponer alcanzaba. Si la
@@ -31,8 +43,8 @@
 
 ## 2026-08-23 — Las trece etapas del pipeline quedaron en seis, y las que sobran ya no son etapas
 
-- El recorrido de una postulación se describía con trece etapas, y cinco de ellas no decían *dónde está* la
-  persona sino *cómo terminó*: «seleccionado», «rechazado», «retirado». Dos preguntas distintas contestadas
+- El recorrido de una postulación se describía con trece etapas, y cinco de ellas no decían _dónde está_ la
+  persona sino _cómo terminó_: «seleccionado», «rechazado», «retirado». Dos preguntas distintas contestadas
   con el mismo campo. Ahora el recorrido tiene seis etapas y el desenlace vive en su propio eje.
 - Otras dos, «calificado» y «revisión de cliente», se habían absorbido en «Evaluación» pero seguían existiendo
   por debajo: era el origen del bug que dejó quince vacantes con su política de pruebas bien configurada y
@@ -435,7 +447,7 @@
   sobre una vacante desechable propia, que se despublica sola.
 - **Expediente de evaluación (TASK-1735): el arreglo del truncado quedó probado con el caso real.** La nota
   posterior al fix persistió sus 8240 caracteres completos —termina en punto— contra los 8000 exactos de la
-  mutilada, y la vieja quedó enlazada como *versión superada*, no como vigente. El límite en base ya es 20000.
+  mutilada, y la vieja quedó enlazada como _versión superada_, no como vigente. El límite en base ya es 20000.
 - **Una señal que iba a mentir para siempre.** `evidence_coverage_gap` contaba TODAS las postulaciones, pero
   la evidencia sólo la escribe el intake público: cada postulación cargada a mano desde el desk (6 en 30 días)
   la habría dejado en `warning` de forma permanente, sobre la señal que justamente gatea este rollout.
@@ -607,10 +619,10 @@
 - Hiring: intake de identidad — normalización culturalmente segura del nombre (evidencia raw
   inmutable + display corregible + searchKey), reconciliación CAS del sticky name y corrección
   humana capability-gated. Flag OFF.
-> inicio ni usar una entrada histórica como contrato vigente sin contrastarla.
->
-> Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
-> `pnpm docs:context-rotate --apply`.
+  > inicio ni usar una entrada histórica como contrato vigente sin contrastarla.
+  >
+  > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
+  > `pnpm docs:context-rotate --apply`.
 
 ## 2026-08-16 — Pipeline Hiring contenido en un plano operacional
 
@@ -949,24 +961,3 @@ y confirmación humana obligatoria, y dos señales de confiabilidad nuevas.
 Verificado contra el mundo real, no contra mocks: sanity de 27 checks contra PG y una corrida live
 de Berel MX que costó **USD 0.0132** (estimado conservador 0.0612) y dejó 10 candidatos. Queda
 apagado por diseño: flag OFF en ambos runtimes y scheduler pausado hasta el sign-off de rollout.
-
-## 2026-08-13 — Berel se mide donde vive su mercado, y el país deja de elegirse en silencio
-
-Una pregunta del operador sobre un dato dudoso destapó dos problemas reales, y los dos quedaron
-resueltos el mismo día.
-
-**El primero era de datos.** El seguimiento SEO de Berel llevaba un año midiendo Chile — y Berel es
-una marca mexicana. Su propio nombre tiene 1.650 veces más búsquedas en México que en Chile, y nada
-en el dashboard lo delataba porque la serie se veía poblada y sana. La corrección respetó la regla
-de oro del histórico: no se reescribió nada. Se creó un target nuevo para México, el de Chile quedó
-pausado con su serie íntegra, y las 31 keywords se re-trackearon por el command canónico. La
-verificación con capturas reales contó el final de la historia: **Berel es #1 en México en sus
-términos de marca** — la marca siempre fue real; el país era el equivocado.
-
-**El segundo era de arquitectura, y era más profundo.** El módulo asumía que una organización tiene
-UN mercado, y esa suposición vivía escondida en un `LIMIT 1` copiado en cuatro lugares: con dos
-países activos, cada pantalla servía el más nuevo sin error, sin señal y sin decir cuál. Efeonce
-misma —que opera en Chile, México, Colombia y Perú— es el caso que ese código no sabía describir.
-Ahora la resolución vive en un solo lugar y dice la verdad: un mercado resuelve solo, varios exigen
-elegir (con la lista de opciones en la respuesta), y toda lectura declara qué país está sirviendo.
-Las posiciones de países distintos jamás se promedian: son experimentos distintos.

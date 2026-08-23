@@ -78,6 +78,13 @@ esta clasificación es dirección de producto, no una declaración de cumplimien
 
 - `TASK-1764` — policy, dirección visual, inventario, decomposición de cohorts y gates anti-big-bang.
 
+`TASK-1764` ya incluye una lámina aprobada en `/admin/emails/footer-profiles/mockup`. Su vista, fixtures, SSOT de
+marca, assets PNG y contratos UI son el baseline visual/de contenido para la foundation y cada cohorte. Las child
+tasks implementan paridad y evidencia; no vuelven a inventar el footer. La lámina no habilita runtime ni cambia la
+secuencia: legacy por defecto, foundation byte-idéntica y cohorts de una familia con máximo cuatro `EmailType`.
+La auditoría final de la lámina cubrió los cinco perfiles en desktop/mobile, contraste, targets, foco, orden de
+headings, listas/tablas nativas y GVC sin errores; esa evidencia cierra el diseño del mockup, no la foundation.
+
 ## Planned Child Lanes
 
 Los IDs se reservan sólo cuando la ADR esté aceptada y el gate anterior permita abrir la siguiente task:
@@ -120,6 +127,12 @@ delivery como sustituto del rollback visual por `EmailType`.
 - [ ] Todo footer gobernado muestra razón social, RUT y casa matriz resueltos desde el operating entity; la presencia
       operativa adicional sólo aparece en `full`, viene del SSOT de marca y ningún template hardcodea identidad
       legal o limita Efeonce a Chile.
+- [ ] Foundation y cohorts demuestran paridad con `/admin/emails/footer-profiles/mockup` en desktop y mobile,
+      incluidos jerarquía, espaciado, contraste, wordmark, identidad legal, RRSS elegibles y controles permitidos.
+- [ ] Cualquier desviación del mockup responde a una limitación medida de cliente de correo, accesibilidad o dato
+      runtime, queda documentada con before/after y recibe aprobación explícita.
+- [ ] Cada cohorte verifica Outlook Desktop Windows, Outlook Web, Gmail, un cliente WebKit e imágenes bloqueadas;
+      las RRSS mantienen nombre accesible y fallback textual.
 - [ ] Cada tipo declara `legalNoticePolicy`; no existe un disclaimer legal universal ni copy regulatorio inventado.
 - [ ] Los 30 tipos fueron aceptados individualmente antes de retirar el primitive legacy.
 - [ ] El runtime final conserva delivery ledger, suppression, reply-to, tracking y kill-switch canónicos sin duplicarlos.

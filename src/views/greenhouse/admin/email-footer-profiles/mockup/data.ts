@@ -19,6 +19,7 @@ export interface FooterProfileMock {
   description: string
   context: string
   help?: string
+  helpTone?: 'default' | 'warning'
   reference?: string
   socialLinks?: typeof EFEONCE_SOCIAL_LINKS
   controls?: readonly string[]
@@ -57,6 +58,7 @@ export const FOOTER_PROFILE_MOCKS: readonly FooterProfileMock[] = [
     description: 'Invitaciones, credenciales, recuperación de acceso y alertas de seguridad.',
     context: 'Enviado desde Greenhouse, la plataforma de Efeonce.',
     help: 'Si no solicitaste esta acción, repórtala de inmediato.',
+    helpTone: 'warning',
     controls: ['Reportar un problema de seguridad'],
     legalLines: ENTITY_LEGAL_LINES,
     rules: {

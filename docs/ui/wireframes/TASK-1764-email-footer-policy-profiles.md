@@ -10,6 +10,9 @@
 - Copy source: `src/lib/copy/dictionaries/*/emails.ts`
 - Primitive decision: `new` — `EmailFooter` gobernado por policy
 - UI ready target: `no`; cada child task logra readiness por cohorte
+- Approval state: `approved starting contract`
+- Reference route: `/admin/emails/footer-profiles/mockup`
+- Reference implementation: `src/views/greenhouse/admin/email-footer-profiles/mockup/{EmailFooterProfilesMockupView.tsx,data.ts}`
 
 ## Brief
 
@@ -58,14 +61,14 @@ desbordamiento. Se conserva una separación visual inequívoca entre firma y foo
 
 ## Visual Fidelity Mapping
 
-| Source cue                  | Greenhouse token / primitive / recipe                    | Intent preserved                                 | Literal value rejected                           |
-| --------------------------- | -------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------ |
-| Footer actual fuera de card | `EmailLayout` + `EMAIL_COLORS.background`                | separación cuerpo/metadata                       | nueva card de footer                             |
-| Wordmark Efeonce            | `public/branding/email/footer/efeonce-wordmark-gray.png` | masterbrand única y compatible con email         | filtro CSS sobre SVG o logo Greenhouse principal |
-| Motivo y ayuda              | `EMAIL_COLORS.secondary`                                 | contexto legible antes de la metadata legal      | un único gris para todo el footer                 |
-| Metadata legal              | `EMAIL_COLORS.muted` + peso 600/400                      | entidad visible; países/dirección subordinados   | gris por debajo de contraste AA                   |
-| Links                       | `EMAIL_COLORS.primaryHover` + underline                  | reconocibilidad y contraste AA a 13 px           | CTA tipo botón o azul `primary` bajo 4.5:1       |
-| RRSS                        | Font Awesome Brands sólido → PNG transparentes            | isotipos sólidos, redondeados y accesibles       | círculo añadido, outline, dibujo o icon font     |
+| Source cue                  | Greenhouse token / primitive / recipe                    | Intent preserved                               | Literal value rejected                           |
+| --------------------------- | -------------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------ |
+| Footer actual fuera de card | `EmailLayout` + `EMAIL_COLORS.background`                | separación cuerpo/metadata                     | nueva card de footer                             |
+| Wordmark Efeonce            | `public/branding/email/footer/efeonce-wordmark-gray.png` | masterbrand única y compatible con email       | filtro CSS sobre SVG o logo Greenhouse principal |
+| Motivo y ayuda              | `EMAIL_COLORS.secondary`                                 | contexto legible antes de la metadata legal    | un único gris para todo el footer                |
+| Metadata legal              | `EMAIL_COLORS.muted` + peso 600/400                      | entidad visible; países/dirección subordinados | gris por debajo de contraste AA                  |
+| Links                       | `EMAIL_COLORS.primaryHover` + underline                  | reconocibilidad y contraste AA a 13 px         | CTA tipo botón o azul `primary` bajo 4.5:1       |
+| RRSS                        | Font Awesome Brands sólido → PNG transparentes           | isotipos sólidos, redondeados y accesibles     | círculo añadido, outline, dibujo o icon font     |
 
 ## Layout Skeleton
 
@@ -117,6 +120,10 @@ El copy definitivo de cada child task se valida con el owner de dominio; esta um
 - Aria labels: texto visible describe controles; logotipos de RRSS son decorativos dentro de links cuyo accessible
   name es el nombre de la red
 - Focus notes: orden DOM identidad → contexto → controles → social opcional → legal
+- Semantic groups: controles, RRSS e identidad legal son listas nativas; la matriz de la lámina usa tabla nativa y
+  anuncia su desplazamiento horizontal en móvil
+- Touch targets: links funcionales tienen al menos 24 px de alto y los links sociales 32 × 32 px; todos conservan
+  foco visible
 - Color-independent state labels: todos los controles usan texto y underline; no dependen del color
 
 ## Implementation Mapping
@@ -136,6 +143,10 @@ El copy definitivo de cada child task se valida con el owner de dominio; esta um
   `scripts/email/generate-footer-assets.mjs`; `next/image`, icon fonts y filtros CSS pertenecen sólo al mockup y no
   cruzan al HTML del correo
 - GVC markers: `email-footer`, `email-signature`, `email-social-links`, `email-legal`, `email-unsubscribe`
+- Parity rule: el mockup aprobado gobierna jerarquía, espaciado, tipografía, color, responsive, legal y RRSS; sus
+  fixtures no se convierten en policy runtime ni reemplazan el operating entity/copy canónicos
+- Deviation rule: sólo una limitación medida de cliente de correo, accesibilidad o dato runtime permite desviarse;
+  la child task registra before/after, motivo y aprobación
 
 ## GVC Scenario Plan
 
@@ -153,6 +164,12 @@ El copy definitivo de cada child task se valida con el owner de dominio; esta um
 - Reduced-motion evidence: no motion
 - Review dossier: `required`
 - Baseline: requerido por `EmailType` antes de migrar
+- Client matrix: Outlook Desktop Windows (motor Word), Outlook Web, Gmail y un cliente WebKit
+- Images blocked: obligatorio; conserva contexto, identidad legal y fallback textual/accesible de RRSS
+- Profile mapping: operación interna → `internal_operational`; acceso y seguridad → `access_security`; relación y
+  servicio → `transactional_service|relationship_transactional`; operaciones reguladas →
+  `regulated_transactional`; marketing y suscripciones → `optional_subscription|commercial_marketing`, sin
+  perder la diferencia de RRSS opcionales versus obligatorias
 
 ## Design Decision Log
 

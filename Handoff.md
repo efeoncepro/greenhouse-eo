@@ -2,6 +2,24 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-23 — EPIC-042: el mockup aprobado ya gobierna la implementación futura de footers
+
+**Estado: documentación y skill completas; runtime sin cambios.** `TASK-1764` continúa como umbrella y la ADR
+sigue `Proposed`: todavía no existe la child foundation ejecutable ni se habilitó ningún footer gobernado.
+
+La ruta `/admin/emails/footer-profiles/mockup`, su vista/data, el SSOT de marca, los PNG transparentes y los
+contratos UI quedaron registrados como baseline aprobado. Los cinco perfiles visuales mapean a siete `purpose`;
+suscripción opcional y marketing conservan reglas distintas. Toda child futura debe demostrar paridad 720/390,
+Outlook Desktop Windows/OWA, Gmail, un cliente WebKit e imágenes bloqueadas, con fallback accesible de RRSS.
+
+La auditoría final cubrió 10 estados desktop/mobile: cero overflow, contraste mínimo 4.51:1, targets 24/32 px,
+foco visible, headings `h1 → h2 → h3`, listas/tablas nativas y GVC 1440/iPhone 13 sin errores de consola, página,
+hidratación o red. Esto valida el mockup local; no es evidencia de React Email ni de entrega.
+
+La skill espejo `greenhouse-email` ahora carga este contrato, corrige `broadcast !== marketing`, fija Efeonce como
+masterbrand y conserva rollout legacy/cohorts sin big bang. Siguiente paso: aceptar la ADR y recién entonces abrir
+la child foundation byte-idéntica; el mockup no prueba React Email, envío, deploy ni provider.
+
 ## 2026-08-23 — TASK-1771: el carril automático tiene reversa; el gate vivo casi manda un correo
 
 **Estado: `code complete, rollout pendiente`.** Slices 1-4 en `develop` local, sin push: `617d18df7`,
@@ -78,8 +96,7 @@ se pone verde al aplicar. Readback previo tomado: 13 valores, **0 filas** en las
 ## 2026-08-23 — El dominio de Hiring está en producción; faltan tres migraciones y su autorización
 
 **Release verificado.** `304371f734076e2bfc96529712d2fa63a179bf84` (PR #205), orchestrator run `32610182477`
-success, manifest `304371f73407-ef375a47-…` en `released` (9m49s), watchdog `ok` con `drift_count=0`, health
-200. Un solo run, sin retry. Subieron TASK-1765, TASK-1754, TASK-1748 y TASK-1755, más el fix de la regresión
+success, manifest `304371f73407-ef375a47-…` en `released` (9m49s), watchdog `ok` con `drift_count=0`, health 200. Un solo run, sin retry. Subieron TASK-1765, TASK-1754, TASK-1748 y TASK-1755, más el fix de la regresión
 de retención de la Ley 21.719 para `not_selected` — que se volvía viva justo cuando el release habilitaba el
 desenlace, así que viajó dentro.
 
@@ -223,7 +240,7 @@ queda y es escribible**, porque una columna terminal que no recibe tarjetas no e
 terminó (`selected`, `backup_selected`, `not_selected`, `rejected`, `withdrawn`, `unresponsive`) + causa gobernada
 obligatoria en `not_selected`. El invariante `stage='closed'` ⟺ desenlace declarado, como `CHECK` de base, vuelve
 **irrepresentables** los dos P0 de la auditoría en vez de parchearlos. Decisión del operador: el desenlace describe a
-la persona, **nunca el estado de la vacante** — cupo lleno o búsqueda cerrada son *causa* de «Sin selección», no
+la persona, **nunca el estado de la vacante** — cupo lleno o búsqueda cerrada son _causa_ de «Sin selección», no
 etiqueta. Enmienda `GREENHOUSE_HIRING_OPENING_CAPACITY_CLOSURE_DECISION_V1` (corregido en sitio, sigue `Proposed`).
 
 **La auditoría se equivocó cinco veces y está declarado.** 6 barridos automatizados levantaron 22 hallazgos; 5
@@ -231,8 +248,8 @@ verificadores adversariales después, ninguna conclusión estructural cayó pero
 sobredimensionadas y 2 evidencias declaradas eran falsas** — dos de ellas propias. H-03 y H-04 bajaron de P0; el
 veredicto de Full API Parity se reformuló (cumple la letra del ADR por su cláusula de deuda; incumple el patrón
 canónico §2, que no tiene escape, y el modelo correcto ya existe en el mismo dominio: `HiringHandoff`). El banner del
-encabezado declara **cuatro modos de fallo** para quien audite después; el cuarto —*verificar el contenido de la tabla
-cuando lo que gobierna es el código desplegado*— salió de **ejecutar** la auditoría, no de escribirla, y produjo un
+encabezado declara **cuatro modos de fallo** para quien audite después; el cuarto —_verificar el contenido de la tabla
+cuando lo que gobierna es el código desplegado_— salió de **ejecutar** la auditoría, no de escribirla, y produjo un
 break real de producción reparado en minutos (regla dura nueva en `GREENHOUSE_DATABASE_TOOLING_V1.md`).
 
 **Carril abierto:** `TASK-1765`…`TASK-1771` (`EPIC-011`), con 12 tasks vivas alineadas — 5 con el cuerpo reescrito
@@ -289,7 +306,7 @@ se habría vaciado en silencio (H-11).
 producción ~7 minutos**: hay UNA sola instancia de Cloud SQL, producción sirve `origin/main` —que todavía ofrece
 «Dejar en espera»— y la acción quedó en `23514`. Cero filas afectadas, reparado con forward fix permisivo. El
 readback previo era correcto pero sobre el eje equivocado: **«cero filas» no es «nadie lo escribe»**. La regla
-—*un contract de enum va DESPUÉS del release que retira el valor del código*— quedó en
+—_un contract de enum va DESPUÉS del release que retira el valor del código_— quedó en
 `GREENHOUSE_DATABASE_TOOLING_V1.md` y como enmienda al §14 del ADR. Segundo hallazgo: **no existe «migración
 escrita y sin aplicar» como estado seguro** — la del Slice 5 bloqueó la reparación urgente porque `migrate:up`
 corre todas las pendientes. Nace `docs/tasks/pending-migrations/`.
@@ -442,8 +459,7 @@ disable/revoke/remove group-license y no sólo flag OFF.
 
 Azure CLI fue read-only. El tenant tiene Entra P1 consumido 1/1, Microsoft 365 Business Premium consumido 6/6,
 ningún grupo con licencias y `Efeonce Group` no es security-enabled. La identidad inbound puede diseñarse, pero
-M365 readiness queda bloqueada/unknown hasta readback comercial y de assignment. TAP también quedó unknown por
-403. Estado: **diseño formalizado; ADR Proposed; ningún código/runtime/Azure mutado**. Siguiente paso: aceptar o
+M365 readiness queda bloqueada/unknown hasta readback comercial y de assignment. TAP también quedó unknown por 403. Estado: **diseño formalizado; ADR Proposed; ningún código/runtime/Azure mutado**. Siguiente paso: aceptar o
 ajustar el ADR y luego tomar TASK-1761 con goal + task hook.
 
 ## 2026-08-21 — Confiabilidad: hallazgos medidos contra runtime; dos umbrellas superseded por EPIC-041
@@ -534,6 +550,7 @@ segundo candado. El flag solo basta. Corregido en la skill `resend-email-platfor
 espejada a `.codex` y protegida por el gate de espejos.
 
 **Cuatro tasks nuevas, todas con el análisis dentro:**
+
 - `TASK-1749` — tracking de marketing sobre dominio propio (bloqueada por el cutover)
 - `TASK-1750` — el desafío interactivo de Turnstile deja fuera a candidatos; su Slice 1 es **verificar
   con la sitekey `3x00000000000000000000FF` antes de implementar**, que es lo que el intento revertido
@@ -542,7 +559,7 @@ espejada a `.codex` y protegida por el gate de espejos.
 - Pendiente sin ID: invertir el default de la política de assessment + revisar plantilla por vacante
 
 **El hallazgo que más cuesta y por qué quedó como patrón.** `GREENHOUSE_CANONICAL_PATTERNS_V1.md` §9:
-*un estado que el sistema distingue, la superficie no puede colapsarlo*. Cinco casos del mismo día en
+_un estado que el sistema distingue, la superficie no puede colapsarlo_. Cinco casos del mismo día en
 cuatro dominios. El síntoma reconocible: **si responder "¿por qué no funcionó?" exige leer la base de
 datos para recuperar un dato que el runtime ya tenía, hubo colapso de estado.** Hoy pasó cinco veces y
 cada una costó horas.
@@ -553,32 +570,3 @@ salida limpia al problema del rewrite.
 
 **Estado del árbol:** producción corre `6f85644cd`; hay commits en `develop` sin push de las dos
 sesiones. No hay nada mío a medio camino.
-
-## 2026-08-19 (noche) — TASK-1747 en curso, traspasada para una sesión nueva
-
-Slices 1 y 2 cerrados; Slice 3 sin empezar. El estado completo para tomarla en frío está en
-**`docs/tasks/in-progress/TASK-1747-…md` §Traspaso 2026-08-19** — commits, qué se revirtió y por qué,
-los 8 hallazgos de auditoría abiertos y las 3 decisiones que no hay que re-litigar.
-
-**Lo que la auditoría adversarial cambió, y vale más que el código entregado.** El Slice 2 bajaba al
-navegador el consentimiento de la candidata y el estado del proveedor de correo, con **ningún**
-componente leyéndolos: las props de un Client Component se serializan en el HTML se lean o no. Ningún
-gate lo veía — GVC no captura lo que no se pinta y el build no lo mira. Se revirtió el cableado; viaja
-con el slice que lo renderiza.
-
-**Y destapó un bug real de `TASK-1746` que ya estaba en producción:** el cooldown de recuperación era
-cross-canal en la lectura y por-canal en el comando. Un correo recién enviado apagaba el enlace seguro
-durante 60 s — exactamente ocultarle al candidato la única salida que le quedaba, que es lo que el
-comentario de ese bloque juraba evitar diciéndose "espejo EXACTO". Corregido en `2e2d4de86` con
-cooldown por canal y 4 tests. Lo que lo mantuvo vivo: al fixture del test le faltaba un campo, así que
-`Number(undefined)` daba `NaN` y el presupuesto del enlace seguro nunca se ejercitaba.
-
-**El copy también salió corregido de auditoría**, con tres hallazgos que verifiqué contra el código
-antes de aceptarlos: los motivos borraban el "reports" del enum (nadie puede afirmar que un correo NO
-llegó, y eso quedaba escrito en un ledger append-only); "la candidatura ya está cerrada" se le habría
-mostrado a alguien con decisión `selected`; y el mensaje de vencimiento describía 1 de sus 3 ramas, así
-que en las otras dos el operador seguía la instrucción y volvía a chocar.
-
-**Estado: nada de esto está en producción.** `develop` tiene además Sonnet 5 de vuelta en el scoring y
-la reconciliación del item del run, ambos sin promover. La promoción exige verificar que el ops-worker
-quede en el SHA nuevo: el scoring corre ahí, no en Vercel.
