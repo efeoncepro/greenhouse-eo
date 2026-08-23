@@ -2286,6 +2286,36 @@ Invariantes duros:
   sintética sin membresía dejó de ser un atraso. Los contadores de consentimiento y retiro **no** se
   filtran — la procedencia gobierna la visibilidad, jamás el consentimiento.
 
+#### Delta 2026-08-23 — la procedencia se declara al NACER, y hay un caso donde `real` es obligatorio
+
+- **El guardrail mira donde el dato NACE.** `hiring-data-origin-gate` barría `scripts/` y
+  `tests/e2e/`, pero no los `*.live.test.ts` de `src/**` — que fabrican datos contra la MISMA
+  instancia que comparten dev, staging y producción. Ahí se coló el defecto que el gate existe para
+  impedir: **19 sitios en 10 archivos** creaban demanda o vacante sin declarar `dataOrigin`, o sea
+  naciendo `real`. Mientras el teardown alcanza a correr no se nota; cuando muere a mitad —se cae el
+  proxy, se aborta la corrida— lo que queda es indistinguible de un candidato o un cargo de verdad,
+  y **ninguna señal posterior recupera la procedencia con certeza**.
+- **El gate exige que la procedencia esté DECLARADA, no un valor concreto.** Es deliberado: lo que se
+  persigue es el *default silencioso*, no el valor. Un `real` escrito a mano con su motivo al lado es
+  información; el default es la ausencia de información.
+- 🔴 **Ejercitar la publicación EXIGE fabricar una vacante genuinamente `real`.** No es descuido de
+  los tests: `publishOpening` rechaza toda vacante no-real (422), y esa guarda **no es negociable**
+  —una vacante de smoke publicada que atrape a un candidato externo lo deja **pinneado por FK**,
+  porque la evidencia de identidad es append-only y no se deshace—. Consecuencia: los tests de
+  publicación (`store`, `candidate-intake/canary`, `public-careers/submit-application`) y
+  `data-origin/mark` —que siembra real a propósito, porque su objeto de prueba es marcarlo— declaran
+  `dataOrigin: 'real'` **explícito y con su razón escrita**. **NUNCA** "corregirlos" a `smoke_test`:
+  rompe lo que prueban.
+- ⚠️ **Hueco conocido, sin dueño:** el único rastro que separa esas vacantes reales-por-necesidad de
+  una vacante de verdad es la **convención de autor** (`user-live-test`), que el detector usa como
+  señal alta. Es una convención **sin enforcement**: si alguien cambia el autor, el rastro se pierde
+  y esas filas quedan indistinguibles. Merece ser una condición verificable —gate o columna—, no un
+  acuerdo.
+- **Al escribir un `*.live.test.ts` de este dominio, nunca compares un `COUNT(*)` global entre dos
+  instantes.** Los archivos corren EN PARALELO contra una sola base: un total global lo mueve el
+  archivo vecino haciendo lo correcto, y el gate falla por el trabajo ajeno. Compara **ids** o relee
+  las MISMAS filas. Corregido así en `dead-end-supersede.live.test.ts` y en `mark.live.test.ts`.
+
 Flag `HIRING_SYNTHETIC_DATA_FILTER_ENABLED` (Vercel-only, default OFF) gatea sólo el filtro de desk y
 talent pool. Docs: funcional `docs/documentation/hr/procedencia-de-datos-hiring.md`; manual
 `docs/manual-de-uso/hr/operar-procedencia-de-datos-hiring.md`.
