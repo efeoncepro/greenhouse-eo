@@ -353,6 +353,12 @@ export interface HiringApplication {
   decision: HiringDecision | null
   /** TASK-1765 — causa del desenlace; no-null sólo con `decision === 'not_selected'`. */
   decisionCause: HiringDecisionCause | null
+  /**
+   * TASK-1772 — TERCER eje: `if el registro se muestra`. ORTOGONAL a `decision`: archivar NUNCA
+   * declara desenlace (ADR §12). Para preguntar «¿sigue en proceso?» usar `isActiveProcess`
+   * (`@/lib/hiring/active-process`), jamás esta columna ni `stage` por separado.
+   */
+  archivedAt: string | null
   decisionAt: string | null
   decisionBy: string | null
   selectedDestination: HiringFulfillmentMode | null

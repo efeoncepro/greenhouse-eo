@@ -410,6 +410,7 @@ export type HiringApplicationRow = {
   decision_cause: unknown
   decision_at: unknown
   decision_by: unknown
+  archived_at: unknown
   selected_destination: unknown
   tentative_start_date: unknown
   expected_legal_entity: unknown
@@ -443,6 +444,9 @@ export const normalizeHiringApplication = (row: HiringApplicationRow): HiringApp
   decisionCause: (toNullableStr(row.decision_cause) as HiringApplication['decisionCause']) ?? null,
   decisionAt: toTimestamp(row.decision_at),
   decisionBy: toNullableStr(row.decision_by),
+  // TASK-1772 — el TERCER eje viaja al VM porque la vista del desk tiene que poder preguntar
+  // «¿sigue en proceso?» sin volver a la base. Ortogonal a `decision`: archivar no declara desenlace.
+  archivedAt: toTimestamp(row.archived_at),
   selectedDestination: (toNullableStr(row.selected_destination) as HiringApplication['selectedDestination']) ?? null,
   tentativeStartDate: toDateString(row.tentative_start_date),
   expectedLegalEntity: toNullableStr(row.expected_legal_entity),
@@ -479,7 +483,7 @@ const CANDIDATE_FACET_COLUMNS = `
 export const HIRING_APPLICATION_COLUMNS = `
   application_id, public_id, opening_id, identity_profile_id, candidate_facet_id, owner_user_id, stage,
   score, match_score, blocking_issues, next_step_at, source, notes, candidate_message, explainability_json,
-  dedupe_fingerprint, decision, decision_cause, decision_at, decision_by, selected_destination,
+  dedupe_fingerprint, decision, decision_cause, decision_at, decision_by, archived_at, selected_destination,
   tentative_start_date, expected_legal_entity, expected_context, prerequisites_snapshot_json,
   created_by, created_at, updated_at`
 

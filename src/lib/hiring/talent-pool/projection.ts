@@ -4,6 +4,7 @@ import { withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
+import { activeProcessPredicate } from '../active-process'
 import { realOnlyPredicate } from '../data-origin/contracts'
 
 /**
@@ -44,12 +45,12 @@ export const reconcileTalentPoolProjection = async ({
       COUNT(*) FILTER (WHERE EXISTS (
         SELECT 1 FROM greenhouse_hiring.hiring_application a
         WHERE a.candidate_facet_id=cf.candidate_facet_id
-          AND a.stage NOT IN ('rejected','withdrawn','closed')
+          AND ${activeProcessPredicate('a')}
       ))::int AS active_process,
       COUNT(*) FILTER (WHERE NOT EXISTS (
         SELECT 1 FROM greenhouse_hiring.hiring_application a
         WHERE a.candidate_facet_id=cf.candidate_facet_id
-          AND a.stage NOT IN ('rejected','withdrawn','closed')
+          AND ${activeProcessPredicate('a')}
       ))::int AS needs_reconsent
     FROM greenhouse_hiring.candidate_facet cf ${REAL_PERSON_JOIN} WHERE cf.status='active'`)
 
@@ -61,10 +62,10 @@ export const reconcileTalentPoolProjection = async ({
       (candidate_facet_id,lifecycle_status,backfill_classification,created_by)
      SELECT cf.candidate_facet_id,
        CASE WHEN EXISTS (SELECT 1 FROM greenhouse_hiring.hiring_application a
-          WHERE a.candidate_facet_id=cf.candidate_facet_id AND a.stage NOT IN ('rejected','withdrawn','closed'))
+          WHERE a.candidate_facet_id=cf.candidate_facet_id AND ${activeProcessPredicate('a')})
          THEN 'active_process' ELSE 'needs_reconsent' END,
        CASE WHEN EXISTS (SELECT 1 FROM greenhouse_hiring.hiring_application a
-          WHERE a.candidate_facet_id=cf.candidate_facet_id AND a.stage NOT IN ('rejected','withdrawn','closed'))
+          WHERE a.candidate_facet_id=cf.candidate_facet_id AND ${activeProcessPredicate('a')})
          THEN 'active_process' ELSE 'needs_reconsent' END,
        $1
      FROM greenhouse_hiring.candidate_facet cf ${REAL_PERSON_JOIN} WHERE cf.status='active'
@@ -100,10 +101,15 @@ export const reconcileTalentPoolProjection = async ({
     const lifecycle = await client.query(
       `WITH membership_state AS (
         SELECT m.membership_id,
+          -- TASK-1772 -- has_active_application conserva su NOMBRE y su SIGNIFICADO; lo que cambia
+          -- es COMO se calcula. Antes preguntaba por etapa y por eso una postulacion ARCHIVADA
+          -- —retirada de la vista a proposito, sin declarar desenlace— seguia contando como viva y
+          -- dejaba la membresia en active_process, que entra a la proyeccion BUSCABLE del Banco de
+          -- Talento. Medido 2026-08-23: 5 membresias reales lo eran solo por eso.
           EXISTS (
             SELECT 1 FROM greenhouse_hiring.hiring_application a
             WHERE a.candidate_facet_id=m.candidate_facet_id
-              AND a.stage NOT IN ('rejected','withdrawn','closed')
+              AND ${activeProcessPredicate('a')}
           ) AS has_active_application,
           (
             SELECT ce.action FROM greenhouse_hiring.talent_pool_consent_event ce

@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { activeProcessPredicate } from './active-process'
 import { isHiringSyntheticDataFilterEnabled } from './data-origin/config'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import type {
@@ -101,8 +102,8 @@ export const getHiringDeskSnapshot = async (
     runGreenhousePostgresQuery<OpeningCountRow>(
       `SELECT opening_id,
               COUNT(*)::int AS application_count,
-              COUNT(*) FILTER (WHERE stage NOT IN ('rejected', 'withdrawn', 'closed'))::int AS active_application_count
-       FROM greenhouse_hiring.hiring_application${originWhere}
+              COUNT(*) FILTER (WHERE ${activeProcessPredicate('app')})::int AS active_application_count
+       FROM greenhouse_hiring.hiring_application app${originWhere}
        GROUP BY opening_id`,
     ),
     runGreenhousePostgresQuery<TotalsRow>(
