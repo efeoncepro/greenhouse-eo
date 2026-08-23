@@ -76,6 +76,13 @@ The engine (EPIC-011 / TASK-1360..1363) implements exactly the above. Map your w
 - **Rollup** — result per competency rolls into `hiring_application.score` (advisory); the human decides. Never feeds payroll/ICO.
 - **Interviewer scorecard** — the same engine records structured interview ratings (`method=interviewer_scorecard`).
 
+**Elegibilidad y etapa terminal (TASK-1754 Slice F).** Los tres guards de assessment que bloquean por «este
+recorrido terminó» —instancias, sesión pública y recuperación de acceso— leen hoy la **fuente única**
+`TERMINAL_APPLICATION_STAGES` (`src/types/hiring.ts`), hoy `{'closed'}`. Antes eran **tres copias verbatim**
+del mismo `Set`, cada una con cinco literales: tres oportunidades de que la próxima corrección alcanzara sólo
+a dos. **NUNCA** volver a declarar un conjunto terminal local, ni bloquear por etapa cuando lo que se quiere
+comprobar es el **desenlace** — son dos ejes distintos y los guards ya comprueban `decision` por separado.
+
 Detail + invariants: `references/greenhouse-runtime.md`.
 
 ### Cuándo se manda la prueba — `shortlisted`, y no es una decisión de eficiencia

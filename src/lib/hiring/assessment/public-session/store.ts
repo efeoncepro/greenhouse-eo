@@ -8,7 +8,8 @@ import {
 } from './abuse-guard'
 import type { PublicAssessmentSessionContext, PublicAssessmentSessionStatus } from './contracts'
 
-const TERMINAL_APPLICATION_STAGES = new Set(['selected', 'rejected', 'withdrawn', 'handoff_ready', 'closed'])
+import { TERMINAL_APPLICATION_STAGES } from '@/types/hiring'
+
 const OPEN_ASSESSMENT_STATUSES = new Set(['assigned', 'sent', 'in_progress'])
 
 interface AssessmentAccessRow {

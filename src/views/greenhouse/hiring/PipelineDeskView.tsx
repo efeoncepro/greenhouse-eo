@@ -80,22 +80,14 @@ export const stagesOfLane = (lane: LaneDefinition): readonly HiringApplicationSt
 export const LANES: LaneDefinition[] = [
   { id: 'inbox', stage: 'sourced', tone: 'primary', icon: 'tabler-sparkles' },
   { id: 'screening', stage: 'screening', tone: 'info', icon: 'tabler-scan' },
-  // `qualified` y `client_review` se absorbieron en `shortlisted` (Slice B). Siguen acá como
-  // históricas hasta el contract: `origin/main` todavía las escribe, y una tarjeta cuya etapa
-  // ningún carril agrupa aparece en la primera columna sin que nadie lo note.
-  { id: 'shortlist', stage: 'shortlisted', absorbs: ['qualified', 'client_review'], tone: 'secondary', icon: 'tabler-list-check' },
+  // Slice F — `qualified` y `client_review` ya no se absorben porque ya no existen: el contract las
+  // retiró del `CHECK` y ninguna fila puede volver a tenerlas. El `absorbs` desaparece con ellas.
+  { id: 'shortlist', stage: 'shortlisted', tone: 'secondary', icon: 'tabler-list-check' },
   { id: 'interview', stage: 'interview', tone: 'warning', icon: 'tabler-messages' },
   { id: 'decision', stage: 'decision_pending', tone: 'primary', icon: 'tabler-gavel' },
-  // Los cuatro espejos terminales y `handoff_ready` son históricos: el command de decisión ya
-  // escribe siempre `closed` (TASK-1765). Salen del enum en el Slice F, bloqueado hasta que el
-  // eje de desenlace esté verificado en producción.
-  {
-    id: 'outcome',
-    stage: 'closed',
-    absorbs: ['selected', 'backup', 'rejected', 'withdrawn', 'handoff_ready'],
-    tone: 'success',
-    icon: 'tabler-rosette-discount-check',
-  },
+  // Slice F — los cuatro espejos terminales y `handoff_ready` salieron del enum y del `CHECK`. El
+  // carril queda con UNA etapa, que era la condición de retiro de `pipeline-lane-contract.test.ts`.
+  { id: 'outcome', stage: 'closed', tone: 'success', icon: 'tabler-rosette-discount-check' },
 ]
 
 const laneForStage = (stage: HiringApplicationStage) =>

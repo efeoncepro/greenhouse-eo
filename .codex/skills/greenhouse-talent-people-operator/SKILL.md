@@ -177,11 +177,23 @@ the first ADR this vocabulary ever had).
 3. **`archived_at` — whether the record is displayed.** Born 2026-08-22, orthogonal to the other two:
    archiving does NOT declare an outcome.
 
-**Invariant** `stage='closed'` ⟺ outcome declared. **It is NOT enforced as a `CHECK` yet** — it is written and
-parked in `docs/tasks/pending-migrations/`, waiting for TASK-1748 to move its 32 synthetic rows. Same for the
-enum contracts: the database **still accepts the 13 old stages and `on_hold`, on purpose**, because a contract
-is applied only AFTER the release that removes the writer from deployed code. **NEVER** state this invariant
-in the present tense as if the database enforced it.
+**Three lists live in `src/types/hiring.ts`, and confusing them IS the bug (TASK-1754 Slice F).**
+
+- `HIRING_APPLICATION_STAGES` (**6**) — every stage the column admits. It went from 13 to 6 in Slice F, so it
+  is **no longer a mirror of the DB `CHECK`** (the `CHECK` is still wide, on purpose — see below).
+- `HIRING_PIPELINE_STAGES` (**5**: `sourced`, `screening`, `shortlisted`, `interview`, `decision_pending`) —
+  the subset a **stage change** may write. It is an **allowlist**, not a denylist, so a new stage is born
+  non-writable until someone adds it deliberately. `closed` is outside it on purpose: closing means declaring
+  an outcome, never dragging a card.
+- `TERMINAL_APPLICATION_STAGES` — the single source for "this journey ended", today `{'closed'}`. It replaced
+  **three verbatim copies** that lived in the assessment guards. **NEVER** re-declare a local terminal-stage
+  set, and **NEVER** widen `HIRING_PIPELINE_STAGES` to "unblock" a board gesture.
+
+**Invariant** `stage='closed'` ⟺ outcome declared. The code is ready and verified, but **it is NOT enforced as
+a `CHECK` yet** — the migration is written and parked in `docs/tasks/pending-migrations/`, waiting for operator
+authorization. Same for the enum contracts: the database **still accepts the old stages and `on_hold`, on
+purpose**, because a contract is applied only AFTER the release that removes the writer from deployed code.
+**NEVER** state this invariant in the present tense as if the database enforced it.
 
 - **NEVER** say `on_hold` is an outcome. A pause is not a closure: it is recorded by moving the **stage** to
   `decision_pending`. It survives in the `CHECK` only until the release.
@@ -196,6 +208,17 @@ in the present tense as if the database enforced it.
 - **NEVER** archive by writing `closed`, and never treat `handoff_ready` as a journey position — it is a state
   of the `handoff` aggregate, with its own state machine.
 - **NEVER** leave the cause as free text: the equity funnel and the email body branch on it.
+- **NEVER** conclude "nobody writes this value" from "zero rows". Reachability is derived from the **contract
+  of the deployed surface** (`origin/main`), never from the table's content. On 2026-08-22 a narrowed `CHECK`
+  met a production build that still painted the button, and every attempt died with `23514` (`ISSUE-161`).
+  A corollary that is not optional: there is **ONE Cloud SQL instance for dev, staging and production**, so
+  narrowing an enum "in dev" narrows production — the contract goes **after** the release that retires the
+  writers, never before.
+- **NEVER** take a `grep -c` of a literal as proof that something is written. Verify the predicate, not the
+  count: a hit on `stage = $n` in `store.ts` was a **list filter**, and a hit on `on_hold` in
+  `src/types/hiring.ts` was a **comment explaining its absence**. And `TALENT_DEMAND_STATUSES` has its own
+  `'qualified'`, which belongs to talent **demand**, not to applications — never sweep it while cleaning
+  application stages.
 
 ## Hiring lifecycle emails (TASK-1689 — LIVE en producción 2026-08-12)
 

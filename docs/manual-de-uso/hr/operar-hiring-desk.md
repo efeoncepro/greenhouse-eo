@@ -1,5 +1,11 @@
 # Operar Hiring Desk
 
+> **Tipo de documento:** Manual de uso (operador del portal)
+> **Version:** 1.1
+> **Creado:** con TASK-355 (previo al registro de metadatos)
+> **Ultima actualizacion:** 2026-08-23 por Claude (TASK-1754 Slice F — una etapa por columna; cerrar es decidir)
+> **Documentacion funcional:** [Hiring Desk](../../documentation/hr/hiring-desk.md) · [Desenlace de una postulación](../../documentation/hr/desenlace-de-una-postulacion.md)
+
 ## Antes de empezar
 
 Necesitas una vista `gestion.hiring*` asignada y las capabilities correspondientes a la acción. El acceso a la pantalla no sustituye el permiso de leer, escribir, publicar, evaluar o decidir.
@@ -52,6 +58,14 @@ disparaban, sin dejar rastro en pantalla.
 Lo que cambia para ti: **soltar una tarjeta en «Evaluación» ahora sí dispara la prueba** cuando la
 vacante tiene su política habilitada en modo automático. Antes no. Si mueves a alguien ahí y no quieres
 que reciba la prueba todavía, revisa el modo de la política de la vacante antes de soltar.
+
+**Y ya no hay columnas de desenlace.** «Seleccionado», «Reserva», «Rechazado», «Retirado» y «Listo
+para handoff» dejaron de ser columnas: describían cómo terminó un proceso, no dónde está la persona.
+Hoy todo proceso terminado queda en **«Cerrado»** y cómo terminó se declara aparte. Si arrastras una
+tarjeta hasta «Cerrado», el sistema no la mueve: te responde que cerrar exige declarar el desenlace y
+te lleva a la decisión formal. Para saber cómo terminó alguien que ya está en «Cerrado», abre su
+postulación y mira `Decisión`: ahí está el desenlace vigente y su historial. Paso a paso:
+[Cerrar una postulación](cerrar-una-postulacion.md).
 
 ## Revisar una postulación
 
@@ -180,6 +194,11 @@ Para pausar un tipo de correo, diagnosticar por qué no llegó o revisar el hist
 - **No ves Hiring Desk:** solicita la vista correspondiente; no se resuelve ampliando capabilities a ciegas.
 - **403 al operar:** falta la capability fina para esa acción.
 - **La tarjeta volvió:** el write de etapa falló y el rollback protegió el estado real.
+- **No te deja arrastrar a «Cerrado»:** es el comportamiento correcto, no una falla. Cerrar exige
+  declarar el desenlace; hazlo con `Decidir` dentro de la postulación.
+- **Desapareció la columna donde dejabas a los seleccionados o rechazados:** ya no existe. Esas cinco
+  columnas eran formas de terminar, no lugares del proceso: hoy todas caen en «Cerrado» y la
+  diferencia se lee en el desenlace de cada postulación.
 - **No hay plantilla/scorecard:** es un vacío real del motor de assessment, no datos de demostración.
 - **El candidato no puede enviar:** falta una respuesta guardada o el token no está `in_progress`; no fuerces submit desde SQL.
 - **El token no abre:** pudo expirar, ya haberse usado o no estar disponible. La UI pública no revela el motivo exacto por seguridad.

@@ -2,6 +2,36 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-23 — TASK-1754 Slice F: el contract está escrito y revisado; falta aplicarlo
+
+**Estado: `code complete, migración pendiente de aplicar`.** `pnpm pg:connect:migrate` quedó bloqueado por
+el clasificador de permisos y espera autorización del operador. **El `CHECK` de la base sigue admitiendo
+las trece etapas**; el candado de seis vive hoy sólo en la aplicación.
+
+**Lo que autorizó a angostar, y es el método que hay que reusar.** No fue contar filas — «cero filas» no es
+«nadie lo escribe» —, sino el contrato de la superficie desplegada: en `origin/main` hay **exactamente tres**
+escritores de `hiring_application.stage`, los tres acotados por tipo (`store.ts:1249` INSERT y `store.ts:1340`
+UPDATE vía `assertEnum(HIRING_PIPELINE_STAGES)`, y `decide.ts:299` vía `DECISION_STAGE[decision]` → siempre
+`closed`). La unión de lo escribible son los seis que quedan. El `stage = $n` de `store.ts:666` es un
+**filtro** de lista: el falso positivo típico de un grep laxo, y era justo la duda que quedaba abierta.
+
+**Lo que cambió además del enum 13 → 6.** `TERMINAL_APPLICATION_STAGES` nace como fuente única (antes tres
+copias verbatim en los guards de assessment). `STAGES_DOWNSTREAM_OF_TRIGGER` se **reescribió, no se podó**:
+`client_review` figuraba aguas abajo de `shortlisted` y el colapso la absorbió dentro, así que mandaba a la
+cola humana postulaciones que la reconciliación sí recupera.
+
+**Una deuda declarada a propósito.** `FAIRNESS_REPORTABLE_STAGES` conserva tres literales muertos porque
+`getSelectionFairness` usa `input.stage ?? 'selected'` como default y retirarlo rompería toda llamada sin
+etapa. Re-apuntar el cubo terminal al eje de desenlace cambia **qué mide** el four-fifths rule, y eso no cabe
+en un contract de vocabulario. Mitigación: el reader ahora falla ruidoso (`hiring_fairness_stage_retired`,
+422) en vez de devolver cero — un cero silencioso en una métrica de equidad se lee como «no hay impacto
+adverso», la conclusión contraria a la verdad. Condición de retiro en el ledger de flags: `TASK-1365` cierra
+**antes** de prender `HIRING_FAIRNESS_MONITOR_ENABLED`.
+
+**Gates:** `typecheck` limpio, `pnpm lint` limpio, suite del dominio 1.236 verdes. El guard derivado
+`stage-enum-check-parity.live.test.ts` **falla a propósito** ahora (enum 6 ≠ `CHECK` 13): es el readback que
+se pone verde al aplicar. Readback previo tomado: 13 valores, **0 filas** en las siete etapas retiradas.
+
 ## 2026-08-23 — El dominio de Hiring está en producción; faltan tres migraciones y su autorización
 
 **Release verificado.** `304371f734076e2bfc96529712d2fa63a179bf84` (PR #205), orchestrator run `32610182477`

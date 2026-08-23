@@ -6,10 +6,18 @@ Load whenever the work happens _inside_ the Greenhouse repo (not pure advisory).
 
 ## Pipeline vocabulary — code paths (TASK-1754 stage axis + TASK-1765 outcome axis)
 
-- `src/types/hiring.ts` holds **four** lists, and confusing them is the bug:
-  `HIRING_APPLICATION_STAGES` (the mirror of the DB `CHECK`, still wide on purpose until the contract),
-  `HIRING_PIPELINE_STAGES` (the subset a stage change may write; **allowlist, not denylist**),
-  `HIRING_DECISIONS` (6) and `HIRING_DECISION_CAUSES` (3).
+- `src/types/hiring.ts` holds **five** lists, and confusing them is the bug:
+  `HIRING_APPLICATION_STAGES` (**6** since TASK-1754 Slice F: `sourced`, `screening`, `shortlisted`,
+  `interview`, `decision_pending`, `closed` — it is **no longer the mirror of the DB `CHECK`**, which stays
+  wide on purpose until the contract), `HIRING_PIPELINE_STAGES` (**5** — the subset a stage change may write;
+  **allowlist, not denylist**; `closed` is outside it because closing is deciding),
+  `TERMINAL_APPLICATION_STAGES` (**fuente única** for "this journey ended", today `{'closed'}`; it replaced
+  three verbatim copies in `assessment/instances.ts`, `assessment/public-session/store.ts` and
+  `assessment/access-recovery/vocabulary.ts` — **never declare a local copy again**), `HIRING_DECISIONS` (6)
+  and `HIRING_DECISION_CAUSES` (3).
+- Two retirements, two different reasons — never conflate them: `qualified` and `client_review` were
+  **absorbed** into `shortlisted` (Slice B, in production); `selected`, `backup`, `rejected`, `withdrawn` and
+  `handoff_ready` were **outcome mirrors**, replaced by the `decision` axis of TASK-1765.
 - `src/lib/hiring/decide.ts` — `DECISION_STAGE` maps all six outcomes to `closed`; the command persists
   outcome **and** cause in one `UPDATE`, in the history and in `sameReplayPayload` (a different cause ⇒ 409).
 - `src/lib/hiring/store.ts` — the stage change cannot close, **by type**. The old four-literal denylist is
@@ -23,6 +31,10 @@ Load whenever the work happens _inside_ the Greenhouse repo (not pure advisory).
   release that removes the writer from `origin/main`. Reachability comes from the **deployed surface
   contract**, never from "zero rows" — there is ONE Cloud SQL instance shared by dev, staging and production,
   and applying a contract early broke «Dejar en espera» in production on 2026-08-22 (`ISSUE-161`).
+- **Verify the predicate, never the `grep -c`.** Counting a literal proves nothing about who writes it: a hit
+  on `stage = $n` in `store.ts` turned out to be a **list filter**, and a hit on `on_hold` in
+  `src/types/hiring.ts` was a **comment explaining its absence**. And `TALENT_DEMAND_STATUSES` carries its own
+  `'qualified'` — talent **demand**, a different domain; leave it alone when cleaning application stages.
 
 
 - Architecture: `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (+ its 2026-07-08 assessment delta).

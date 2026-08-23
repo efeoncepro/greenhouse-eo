@@ -3,6 +3,23 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-23 — Las trece etapas del pipeline quedaron en seis, y las que sobran ya no son etapas
+
+- El recorrido de una postulación se describía con trece etapas, y cinco de ellas no decían *dónde está* la
+  persona sino *cómo terminó*: «seleccionado», «rechazado», «retirado». Dos preguntas distintas contestadas
+  con el mismo campo. Ahora el recorrido tiene seis etapas y el desenlace vive en su propio eje.
+- Otras dos, «calificado» y «revisión de cliente», se habían absorbido en «Evaluación» pero seguían existiendo
+  por debajo: era el origen del bug que dejó quince vacantes con su política de pruebas bien configurada y
+  ninguna disparando.
+- El contract que retira los siete literales de la base **está escrito y revisado, y todavía no aplicado**:
+  espera autorización. Hasta entonces el candado de seis vive en la aplicación y la base sigue aceptando trece.
+- Un detalle que parecía poda y era corrección: el mapa de «etapas posteriores al gatillo» listaba «revisión de
+  cliente» como posterior a «Evaluación», cuando el colapso la había metido **dentro**. Mandaba a revisión
+  humana postulaciones que la reconciliación automática sí sabe recuperar.
+- Y una deuda que se declara en vez de esconderse: el monitor de equidad medía su cubo terminal en una etapa
+  que dejó de existir. En vez de devolver cero —que en una métrica de equidad se lee como «no hay impacto
+  adverso»— ahora falla ruidoso, y no se prende hasta que se le apunte al eje correcto.
+
 ## 2026-08-23 — El dominio de Hiring reparado llegó a producción, y el reloj de retención con él
 
 - Las cuatro correcciones del día estaban `code complete, rollout pendiente`: el eje de desenlace, el colapso de
@@ -957,22 +974,3 @@ preguntamos, preguntamos y no hay, demanda cero real— y con eso la segunda cor
 exactamente cero. Quedó también una observación honesta sin resolver: el proveedor devuelve
 dificultad 0 para cabeceras de alto volumen, y esa columna no se le muestra a un cliente hasta
 contrastarla con otra fuente.
-
-## 2026-08-13 — La credencial de partner entra al deck sin duplicar la contraportada
-
-El badge de HubSpot Solutions Partner apuntaba a una carpeta fuera del catálogo, y eso rompía la
-regla que mantiene los decks reproducibles: un catálogo tiene que renderizar igual en cualquier
-máquina, y una referencia que se sale funciona en el repo del autor y falla en el worker. El badge se
-mudó adentro del catálogo y ahora se pide por una clave cerrada, el mismo trato que los logos de
-cliente: una acreditación que no se tiene no se puede presentar por accidente.
-
-No hizo falta una contraportada nueva. La misma lámina ya sirve las dos versiones —con y sin
-credencial— porque el motor borra el elemento cuando el plan no lo declara; una segunda plantilla
-casi idéntica solo habría garantizado que las dos se separaran con el tiempo.
-
-Los aprendizajes quedaron escritos donde se van a leer: el runbook del gate visual explica por qué
-declarar un slot nuevo siempre mueve la imagen de referencia de esa lámina, y cómo distinguir un
-drift propio de un baseline viejo; el estándar premium de UI incorpora que un scorecard es una foto
-con fecha (uno vencido bloqueó cuatro días un trabajo ya terminado) y que ningún gate lee lo que la
-pantalla dice; y la skill de captura registra que una superficie gateada por organización exige la
-persona de esa organización, con la consulta que la encuentra.

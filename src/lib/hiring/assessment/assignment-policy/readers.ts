@@ -6,6 +6,7 @@ import type { PoolClient } from 'pg'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import type { OpeningAssessmentPolicy, OpeningAssessmentTriggerStage } from '@/types/hiring-assessment-policy'
+import type { HiringApplicationStage } from '@/types/hiring'
 
 import { PUBLIC_ASSESSMENT_QUESTION_RESOLUTION_SQL } from '../public-taking'
 import { findActivePolicyForOpening, getPolicyById } from './store'
@@ -207,9 +208,16 @@ export const resolveApplicationsAwaitingAssignment = async (
 //
 // Los espejos terminales sí se conservan mientras `TASK-1754` no los retire del enum de etapas:
 // siguen existiendo en filas históricas, y ésas sí pueden tener `decision IS NULL`.
-const STAGES_DOWNSTREAM_OF_TRIGGER: Record<OpeningAssessmentTriggerStage, readonly string[]> = {
-  shortlisted: ['client_review', 'interview', 'decision_pending', 'selected', 'backup', 'handoff_ready'],
-  interview: ['decision_pending', 'selected', 'backup', 'handoff_ready'],
+//
+// TASK-1754 Slice F — reescrito, no podado. `client_review` figuraba como aguas ABAJO de
+// `shortlisted`, y el colapso la absorbió DENTRO de `shortlisted`: dejarla habría contado como
+// «avanzó más allá del gatillo» a quien sigue exactamente en la etapa del gatillo, mandando a la
+// cola humana postulaciones que la reconciliación automática sí puede recuperar. Los espejos
+// terminales (`selected`, `backup`, `handoff_ready`) salen porque el contract del enum los volvió
+// irrepresentables: una fila no puede estar ahí ni histórica ni nuevamente.
+const STAGES_DOWNSTREAM_OF_TRIGGER: Record<OpeningAssessmentTriggerStage, readonly HiringApplicationStage[]> = {
+  shortlisted: ['interview', 'decision_pending'],
+  interview: ['decision_pending'],
 }
 
 export interface ApplicationMissedTrigger extends ApplicationAwaitingAssignment {

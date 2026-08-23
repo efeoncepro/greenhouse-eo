@@ -159,6 +159,84 @@ Este documento fija:
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
 
+## Delta 2026-08-23 — TASK-1754: el eje de ETAPA queda en seis valores y las etapas terminales tienen fuente única
+
+Cierra el eje que el delta de `TASK-1765` dejó abierto: allá quedó el DESENLACE, acá la ETAPA.
+Decisión, método de verificación y estado por pieza:
+[`GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1`](GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md)
+§3, §14.1 y §18.
+
+### El vocabulario vigente
+
+`HIRING_APPLICATION_STAGES` (`src/types/hiring.ts`) — **seis** valores, uno por columna del kanban:
+`sourced` · `screening` · `shortlisted` · `interview` · `decision_pending` · `closed`.
+
+Sobre ellos siguen valiendo los dos subconjuntos que ya existían: `HIRING_PIPELINE_STAGES` es lo
+escribible como cambio de etapa (los cinco primeros; `closed` sólo por command), y
+`DECISION_STAGE` mapea los seis desenlaces a `'closed'`.
+
+Los siete literales retirados salen **por dos razones distintas**, y mezclarlas confunde el modelo:
+
+| Salen | Razón |
+|---|---|
+| `qualified`, `client_review` | **Absorbidos** por `shortlisted`. El tablero mostraba seis columnas sobre trece etapas, y tres se veían como «Evaluación»: los movimientos humanos caían en `qualified`, que ninguna automatización vigila, mientras las quince políticas configuradas en `shortlisted` nunca disparaban |
+| `selected`, `backup`, `rejected`, `withdrawn`, `handoff_ready` | **Espejos terminales.** Dejaron de ser etapas al nacer el eje de desenlace: hoy todo recorrido terminado escribe `stage='closed'` y su desenlace vive en `decision` |
+
+### Fuente única de etapas terminales
+
+`TERMINAL_APPLICATION_STAGES` (`src/types/hiring.ts`) es un `ReadonlySet` con **una** etapa,
+`closed`. Antes eran **tres copias verbatim** del mismo `Set` —en `assessment/instances.ts`,
+`assessment/public-session/store.ts` y `assessment/access-recovery/vocabulary.ts`—, que hoy la
+importan. Se conserva aunque el `CHECK` del invariante de `TASK-1765` la vuelva redundante con la
+comprobación de `decision`: es la guarda que sigue siendo correcta si ese invariante se relaja.
+
+### Mapas de relaciones entre etapas: se revisan, no se podan
+
+`STAGES_DOWNSTREAM_OF_TRIGGER` (`assessment/assignment-policy/readers.ts`) quedó
+`shortlisted → [interview, decision_pending]` e `interview → [decision_pending]`, tipado con
+`HiringApplicationStage`. Fue **reescrito, no podado**: declaraba `client_review` como aguas
+**abajo** de `shortlisted` y el colapso la absorbió **dentro**, de modo que mandaba a la cola humana
+postulaciones que la reconciliación automática sí puede recuperar. Regla transferible: cuando un
+colapso fusiona dos literales, cualquier mapa de relaciones entre etapas se revisa entero — borrar el
+nombre no arregla una relación que cambió de sentido.
+
+### Deuda declarada — monitor de equidad
+
+`FAIRNESS_REPORTABLE_STAGES` **conserva** `qualified`, `client_review` y `selected` porque
+`getSelectionFairness` usa `input.stage ?? 'selected'` como default, y re-apuntar el cubo terminal al
+eje de desenlace cambia **qué mide** el four-fifths rule. El reader **falla ruidoso**
+(`hiring_fairness_stage_retired`, 422, `actionable: false`) en vez de devolver cero: un cero
+silencioso en una métrica de equidad se lee como «no hay impacto adverso», la conclusión contraria a
+la verdad. **Condición de retiro:** `TASK-1365` cierra **antes** de prender
+`HIRING_FAIRNESS_MONITOR_ENABLED` en producción. Detalle en el ADR §18.
+
+### Estado de rollout
+
+| Pieza | Estado |
+|---|---|
+| Enum TS en seis + los tres consumers apuntados a `TERMINAL_APPLICATION_STAGES` + mapa de aguas abajo reescrito | **aplicado** |
+| Contract del `CHECK` (`migrations/20260823104057405_task-1754-stage-vocabulary-contract.sql`) | **escrito y revisado, NO aplicado** — el `CHECK` de la base **sigue admitiendo trece valores** |
+
+Su autorización no vino de contar filas sino del **contrato de la superficie desplegada**: en
+`origin/main` (release `304371f73`) hay exactamente tres escritores de `hiring_application.stage`,
+los tres acotados por tipo, y la unión de lo escribible son los seis que quedan. El método completo,
+con su falso positivo típico (un `stage = $n` en un `WHERE` es filtro, no escritura), está en el
+ADR §14.1.
+
+### Invariantes operativos para agentes — Eje de etapa
+
+- **NUNCA** derivar la alcanzabilidad de un literal desde el contenido de la tabla. Se deriva de los
+  **escritores del release desplegado**; «cero filas» sólo dice que nadie lo escribió todavía.
+- **NUNCA** re-copiar el conjunto de etapas terminales: se importa `TERMINAL_APPLICATION_STAGES`.
+- **NUNCA** podar un literal fusionado de un mapa de relaciones entre etapas sin revisar si el
+  colapso cambió el sentido de la relación.
+- **NUNCA** retirar `qualified`, `client_review` o `selected` de `FAIRNESS_REPORTABLE_STAGES` ni
+  prender `HIRING_FAIRNESS_MONITOR_ENABLED` antes de que `TASK-1365` re-apunte el cubo terminal.
+- **NUNCA** asumir que un filtro por `stage` valida su valor: el lane programático de `TASK-1718`
+  lo acepta como string libre, así que un literal retirado devuelve **cero en silencio**.
+
+---
+
 ## Delta 2026-08-22 — TASK-1765: el eje de DESENLACE, su causa gobernada y el cierre como command
 
 Implementa `GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1` §4/§4.1/§5/§6. El
@@ -906,7 +984,7 @@ Debe capturar:
 - `openingId`
 - `personId`
 - `ownerUserId`
-- `stage`
+- `stage` — seis valores; ver `Lifecycle Model` y el delta de `TASK-1754`
 - `score`
 - `matchScore`
 - `blockingIssues`
@@ -1053,19 +1131,19 @@ Regla:
 
 ### HiringApplication lifecycle
 
+Seis etapas, una por columna del kanban. `closed` significa «el recorrido terminó» y el desenlace
+dice cómo — ver `HiringDecision` y el delta de `TASK-1754`.
+
 - `sourced`
 - `screening`
-- `qualified`
-- `shortlisted`
-- `client_review`
+- `shortlisted` — absorbió `qualified` y `client_review`; **dispara la policy de assessment**
 - `interview`
 - `decision_pending`
-- `selected`
-- `backup`
-- `rejected`
-- `withdrawn`
-- `handoff_ready`
-- `closed`
+- `closed` — escribible **sólo** por el command de decisión
+
+Los siete literales históricos (`qualified`, `client_review`, `selected`, `backup`, `rejected`,
+`withdrawn`, `handoff_ready`) salieron del enum TS. El `CHECK` de la base los angosta cuando corra
+`migrations/20260823104057405_task-1754-stage-vocabulary-contract.sql`, todavía sin aplicar.
 
 ### HiringHandoff lifecycle
 

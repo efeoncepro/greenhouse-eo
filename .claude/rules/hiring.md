@@ -17,8 +17,13 @@ Invoca la skill `greenhouse-talent-people-operator` y carga
 Lo que YA rige:
 
 - **NUNCA cerrar por `PATCH` de etapa.** Cerrar es decidir: pasa por `decideHiringApplication`, que
-  emite el evento, arranca el reloj de retención y elige el tipo de correo. `HIRING_PIPELINE_STAGES`
-  es el subconjunto **escribible** y no contiene `closed`.
+  emite el evento, arranca el reloj de retención y elige el tipo de correo.
+- **Tres listas en `src/types/hiring.ts`, y confundirlas ES el bug** (TASK-1754 Slice F):
+  `HIRING_APPLICATION_STAGES` (6, lo que admite la columna — ya **no** es el espejo del `CHECK`),
+  `HIRING_PIPELINE_STAGES` (5, el subconjunto **escribible** por un cambio de etapa; **allowlist**, y
+  no contiene `closed`) y `TERMINAL_APPLICATION_STAGES` (fuente única de «terminó», hoy `{'closed'}`;
+  antes eran tres copias verbatim). **NUNCA** declarar una copia local ni ensanchar el escribible para
+  destrabar un gesto del tablero.
 - **NUNCA `on_hold` como desenlace.** Una pausa no es un cierre: se registra dejando la etapa en
   `decision_pending`.
 - **NUNCA `rejected` para un cierre sin juicio sobre la persona.** Eso es `not_selected` + causa
@@ -30,6 +35,12 @@ Lo que YA rige:
 - **NUNCA archivar escribiendo `closed`.** `archived_at` es eje propio: archivar no declara desenlace.
 - **NUNCA aplicar un contract de enum antes del release** que retira el escritor de `origin/main`:
   hay UNA instancia Cloud SQL para dev/staging/producción (`ISSUE-161`).
+- **NUNCA deducir «nadie lo escribe» de «cero filas».** La alcanzabilidad sale del contrato de la
+  superficie desplegada, no del contenido de la tabla.
+- **NUNCA tomar un `grep -c` como prueba de escritura**: `stage = $n` en `store.ts` era un **filtro** de
+  lista y `on_hold` en `src/types/hiring.ts` era un **comentario** explicando su ausencia. Y
+  `TALENT_DEMAND_STATUSES` tiene su propio `'qualified'` — es demanda de talento, otro dominio: no
+  tocarlo al limpiar etapas de postulación.
 
 Lo PENDIENTE del release — **no afirmarlo en presente**: el `CHECK` del invariante
 `stage='closed'` ⟺ desenlace declarado, y los contract que retiran `on_hold` y las etapas viejas.

@@ -1,5 +1,12 @@
 # Hiring Desk
 
+> **Tipo de documento:** Documentacion funcional (lenguaje simple)
+> **Version:** 1.1
+> **Creado:** con TASK-355 (previo al registro de metadatos)
+> **Ultima actualizacion:** 2026-08-23 por Claude (TASK-1754 Slice F — seis etapas; el desenlace en su propio eje)
+> **Documentacion tecnica:** [ADR del vocabulario de etapas y desenlaces](../../architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md) · [Arquitectura Hiring/ATS](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md)
+> **Manual de uso:** [Operar Hiring Desk](../../manual-de-uso/hr/operar-hiring-desk.md)
+
 ## Qué es
 
 Hiring Desk es el espacio interno para operar la demanda de talento, el pipeline de postulaciones, la ficha 360 y la publicación de vacantes desde el dominio canónico Hiring / ATS. No crea candidatos, openings ni decisiones paralelos: consume `TalentDemand`, `HiringOpening` y `HiringApplication`.
@@ -7,7 +14,7 @@ Hiring Desk es el espacio interno para operar la demanda de talento, el pipeline
 ## Superficies
 
 - **Demanda:** KPIs del pipeline, filtros y tabla de openings. `Nueva demanda` crea demanda + opening en borrador; publicar sigue siendo una acción explícita.
-- **Pipeline:** seis lanes visuales sobre las etapas canónicas. Una tarjeta representa una `HiringApplication`; se mueve por drag o por menú de etapa y vuelve a su posición anterior si el write falla.
+- **Pipeline:** seis columnas, una por cada etapa del proceso. Una tarjeta representa una `HiringApplication`; se mueve arrastrándola o por el menú de etapa, y vuelve a su posición anterior si el guardado falla. Cerrar no es uno de esos movimientos: se declara en la decisión.
 - **Application 360:** resumen con PII enmascarada, assessment/scorecard advisory, documentos, decisión estructurada, handoff bridge hacia Activation Lane y actividad append-only.
 - **Publicación:** compara la verdad interna con el payload público allowlist y confirma publicar, pausar o cerrar.
 - **Distribución externa:** una vez que el opening está publicado, el equipo puede difundir su URL de postulación en canales aprobados. Es una actividad de inbound recruiting, no una segunda publicación de Hiring: no altera `HiringOpening`, no reemplaza el apply canónico y debe conservar evidencia de grupo/canal y estado de moderación.
@@ -109,6 +116,15 @@ declarada**: ninguna postulación conserva de cuál de las tres venía. Se acept
 dos absorbidas fue jamás elegible desde una superficie —los movimientos humanos a «Evaluación» caían
 todos en `qualified` sin que nadie pudiera elegirlo—, así que no había intención humana que preservar.
 
+Las otras cinco desaparecieron por una razón distinta: **dejaron de ser etapas y pasaron a ser
+desenlaces.** «Seleccionado», «Reserva», «Rechazado», «Retirado» y «Listo para handoff» contestaban
+*cómo terminó* un proceso, no *dónde está* la persona, y mientras vivieron como columnas las dos
+preguntas se pisaban. Hoy todo recorrido terminado queda en la etapa «Cerrado» y el desenlace se
+registra aparte, en su propio campo: eso es lo que permite responder «¿cómo terminó?» sin
+confundirlo con «¿dónde está?», y también la razón por la que cerrar exige declarar el desenlace en
+vez de arrastrar la tarjeta. Los seis desenlaces y sus efectos están en
+[Desenlace de una postulación](desenlace-de-una-postulacion.md).
+
 ### «Preselección» en el correo y «Evaluación» en el tablero son a propósito
 
 El correo de avance al candidato llama a `shortlisted` **«Preselección»** («Shortlist» en inglés),
@@ -124,13 +140,16 @@ una decisión del operador del 2026-08-22, por dos razones:
 Un agente que lea las dos capas y las «arregle» reintroduce esa colisión. La divergencia está anotada
 en el código, en los dos diccionarios de copy y acá.
 
-### Lo que todavía no está hecho
+### Estado a hoy (2026-08-23)
 
-Los cinco literales terminales del enum de etapas (`selected`, `backup`, `rejected`, `withdrawn`,
-`handoff_ready`) siguen existiendo aunque ninguna superficie los escriba: el command de decisión ya
-escribe siempre `closed`. Se retiran cuando el eje de desenlace (`TASK-1765`) esté verificado en
-producción — antes de eso se perdería el último discriminante de cómo terminó un proceso. Mientras
-tanto, el tablero los sigue agrupando en «Cerrado» para que ninguna tarjeta histórica desaparezca.
+**Ya rige** el vocabulario de seis: ninguna pantalla del portal puede dejar una postulación en una de
+las siete etapas retiradas, el cierre pasa siempre por la decisión formal, y las políticas de prueba
+configuradas en «Evaluación» por fin disparan. El tablero ya no necesita agrupar etapas viejas dentro
+de una columna: cada columna es exactamente una etapa.
+
+**Todavía no está aplicada** la restricción de la base de datos que angosta el vocabulario de trece a
+seis también abajo. Está escrita y revisada, y espera la autorización del operador para ejecutarse;
+hasta entonces el candado vive sólo en la aplicación, que es la que ya dejó de escribir esas etapas.
 
 > Detalle técnico: ADR `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md`
 > · enum en `src/types/hiring.ts` · nombres visibles en `src/lib/copy/dictionaries/{es-CL,en-US}/hiringDesk.ts`

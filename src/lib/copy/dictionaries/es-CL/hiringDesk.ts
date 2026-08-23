@@ -105,16 +105,9 @@ export const hiringDesk: HiringDeskCopy = {
     stages: {
       sourced: 'Sourced',
       screening: 'Screening',
-      qualified: 'Evaluación',
       shortlisted: 'Evaluación',
-      client_review: 'Evaluación',
       interview: 'Entrevista',
       decision_pending: 'Decisión',
-      selected: 'Cerrado',
-      backup: 'Cerrado',
-      rejected: 'Cerrado',
-      withdrawn: 'Cerrado',
-      handoff_ready: 'Cerrado',
       closed: 'Cerrado'
     }
   },

@@ -344,13 +344,14 @@ const DemandDeskView = ({
   )
 
   const pipelineMetrics = useMemo(() => {
-    const active = snapshot.applications.filter(
-      ({ application }) => !['rejected', 'withdrawn', 'closed'].includes(application.stage)
-    )
+    // Slice F — `rejected` y `withdrawn` salieron del enum de ETAPAS: hoy son desenlaces, y todo
+    // recorrido terminado vive en `stage='closed'`. Filtrarlos por etapa no excluía nada de más,
+    // pero sugería que una postulación rechazada podía no estar cerrada, que es justo la ambigüedad
+    // que el colapso retira.
+    const active = snapshot.applications.filter(({ application }) => application.stage !== 'closed')
 
-    const evaluation = active.filter(({ application }) =>
-      ['qualified', 'shortlisted', 'client_review'].includes(application.stage)
-    )
+    // `qualified` y `client_review` se absorbieron en `shortlisted`: la columna es una sola etapa.
+    const evaluation = active.filter(({ application }) => application.stage === 'shortlisted')
 
     const pendingDecision = active.filter(({ application }) => application.stage === 'decision_pending')
     const now = new Date()

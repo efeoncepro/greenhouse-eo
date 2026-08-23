@@ -154,6 +154,14 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   `.claude/skills/efeonce-mcp-platform/`; estas componen la skill dueña de cada provider y no duplican su policy.
   Las skills de arquitectura `software-architect-2026` y `arch-architect` deben cargar ese router antes de
   proponer una nueva surface, OAuth o binding cross-runtime.
+- Hiring/ATS separa **etapa** (¿dónde está?) de **desenlace** (¿cómo terminó?) y ésos son ejes ortogonales,
+  atados por el `CHECK` `(stage='closed') = (decision IS NOT NULL)`. `TASK-1754` dejó el vocabulario de etapas
+  en **seis** (`sourced`, `screening`, `shortlisted`, `interview`, `decision_pending`, `closed`) y `TASK-1765`
+  el de desenlaces en seis; `HIRING_PIPELINE_STAGES` (cinco) es el subconjunto escribible por un cambio de
+  etapa —`closed` no está: cerrar exige declarar el desenlace— y `TERMINAL_APPLICATION_STAGES` es la fuente
+  única de lo terminal. **Un contract de enum se aplica DESPUÉS del release que retira sus escritores, nunca
+  antes**, y la alcanzabilidad de un valor se deriva del contrato de la superficie desplegada, jamás del
+  conteo de filas (`ISSUE-161`). El contract de etapas está escrito y **pendiente de aplicar** al 2026-08-23.
 - Hiring/ATS declara la **procedencia del dato en su nacimiento** (`data_origin`, `TASK-1739`, en producción
   desde 2026-08-19): dos raíces —persona y demanda— con copia derivada por trigger en la postulación, default
   `real` porque omitir debe dejar el dato visible y nunca ocultarlo. Una vacante no real no se publica; el gold

@@ -2,6 +2,7 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { HiringValidationError } from '@/lib/hiring/errors'
+import { HIRING_APPLICATION_STAGES } from '@/types/hiring'
 
 import { requireHiringFairnessPolicy } from './config'
 import {
@@ -43,6 +44,20 @@ export const getSelectionFairness = async (
 
   if (!FAIRNESS_REPORTABLE_STAGES.includes(stage as FairnessReportableStage)) {
     throw new HiringValidationError('La etapa de fairness no es válida.', 'hiring_fairness_stage_invalid', 400)
+  }
+
+  // TASK-1754 Slice F — el contract del enum de etapas dejó a tres literales de
+  // `FAIRNESS_REPORTABLE_STAGES` fuera del dominio, y el default (`'selected'`) es uno de ellos.
+  // Sin esta guarda, prender el monitor devolvería CERO en silencio —no un error— porque la query
+  // filtra por una etapa que ninguna fila puede tener. Cero silencioso en una métrica de equidad se
+  // lee como «no hay impacto adverso», que es exactamente la conclusión contraria a la verdad.
+  // Falla ruidoso hasta que TASK-1365 re-apunte el cubo terminal al eje de desenlace.
+  if (!(HIRING_APPLICATION_STAGES as readonly string[]).includes(stage)) {
+    throw new HiringValidationError(
+      'Esa etapa dejó de existir tras el colapso del vocabulario: el monitor de equidad necesita apuntarse al eje de desenlace antes de medirla.',
+      'hiring_fairness_stage_retired',
+      422
+    )
   }
 
   const windowMonths = Math.min(Math.max(Math.trunc(input.windowMonths ?? 3), 1), 24)
