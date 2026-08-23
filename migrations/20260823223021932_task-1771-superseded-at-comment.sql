@@ -1,29 +1,4 @@
--- ═══════════════════════════════════════════════════════════════════════════════
--- TASK-1771 — El COMMENT de `superseded_at` dejó de ser cierto.
---
--- CONDICIÓN DE EJECUCIÓN (verificar ANTES de correrla, no es opcional):
---   El release que despliega `supersedeAssignmentDeadEnd` a producción ya ocurrió.
---   Verificar contra `origin/main`, NO contra el working tree:
---     git show origin/main:src/lib/hiring/assessment/assignment-policy/supersede-dead-end.ts
---   Si ese archivo no existe en `origin/main`, ESTA MIGRACIÓN NO VA TODAVÍA: el comentario
---   describiría una capacidad que el runtime desplegado no tiene, que es el error simétrico del
---   que ya se pagó en ISSUE-161 (angostar un CHECK contra un front-end que seguía ofreciendo el
---   valor). Hay UNA instancia Cloud SQL para dev, staging y producción.
---
--- POR QUÉ NO VIVE EN `migrations/`:
---   Porque no se aplica en la misma sesión que la escribe. Una migración committeada y sin
---   aplicar no espera su turno: la ejecuta el próximo `migrate:up` de cualquiera, sin su readback
---   y posiblemente en medio de un incidente. Regla del 2026-08-22.
---
--- READBACK ANTES:
---   SELECT col_description('greenhouse_hiring.hiring_assessment_assignment'::regclass,
---          (SELECT ordinal_position FROM information_schema.columns
---            WHERE table_schema='greenhouse_hiring' AND table_name='hiring_assessment_assignment'
---              AND column_name='superseded_at')::int);
---   Esperado: el texto que dice «NINGÚN write path lo escribe todavía (Slice 4)».
---
--- READBACK DESPUÉS: el mismo SELECT debe devolver el texto nuevo. Si devuelve el viejo, el
---   marker `-- Up Migration` no se ejecutó (bug de pre-up-marker) y la migración quedó registrada
+-- Up Migration` no se ejecutó (bug de pre-up-marker) y la migración quedó registrada
 --   sin hacer nada.
 --
 -- POR QUÉ EL COMENTARIO NUEVO NO VUELVE A CADUCAR (el arreglo de fondo no es el timing, es el
@@ -68,5 +43,9 @@ $$;
 
 -- Down Migration
 
+-- OJO: NO es el texto que traia el `.pending`. Ese restauraba la variante «NINGÚN write path lo
+-- escribe todavía (Slice 4)», que dejó de ser el comentario vigente: el readback previo a aplicar
+-- esta migración devolvió el texto de abajo, refinado despues de escribirse el parqueo. Un rollback
+-- al texto del `.pending` habria instalado un comentario que nunca existio en la base.
 COMMENT ON COLUMN greenhouse_hiring.hiring_assessment_assignment.superseded_at IS
-  'TASK-1719: reservado para el retry gobernado de un outcome terminal-pero-recuperable. NINGÚN write path lo escribe todavía (Slice 4). Hasta entonces, un outcome terminal congela ese (application, policy, versión, etapa, intento) y la recuperación es un command humano.';
+  'TASK-1719: libera la llave de idempotencia (application, policy, versión, etapa, intento). LO ESCRIBE el path de CANCELACIÓN (`supersedeAssignmentsForAssessment`, en la misma transacción que cancela la instancia), que además fija outcome=cancelled + outcome_reason=operator_cancelled. Cancelar libera DOS llaves: el índice de instancia abierta (estructural, `cancelled` está fuera de su predicado) y ésta (write explícito). El retry gobernado de un terminal-pero-recuperable (`held`/`blocked`/`stale`) por reconciliación sigue SIN write path: ese caso lo resuelve un command humano.';

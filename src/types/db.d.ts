@@ -8010,7 +8010,7 @@ export interface GreenhouseHiringHiringAssessmentAssignment {
   policy_id: string;
   policy_version: number;
   /**
-   * TASK-1719: libera la llave de idempotencia (application, policy, versión, etapa, intento). LO ESCRIBE el path de CANCELACIÓN (`supersedeAssignmentsForAssessment`, en la misma transacción que cancela la instancia), que además fija outcome=cancelled + outcome_reason=operator_cancelled. Cancelar libera DOS llaves: el índice de instancia abierta (estructural, `cancelled` está fuera de su predicado) y ésta (write explícito). El retry gobernado de un terminal-pero-recuperable (`held`/`blocked`/`stale`) por reconciliación sigue SIN write path: ese caso lo resuelve un command humano.
+   * TASK-1771: liberación gobernada de la clave de idempotencia. Lo escribe `supersedeAssignmentDeadEnd` (carril automático, resultado recuperable, capability hiring.assessment.policy.govern, tope de 3 por clave y condición de que la asignación HOY ocurriría) y `supersedeAssignmentsForAssessment` (cancelación de la instancia). El primero CONSERVA `outcome` y `outcome_reason` —son la explicación del bloqueo—; el segundo los reescribe a cancelled porque ahí el hecho sí cambió. NUNCA se recupera borrando filas: el ledger es append-only.
    */
   superseded_at: Timestamp | null;
   trigger_stage: string;

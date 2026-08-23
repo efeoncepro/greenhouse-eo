@@ -30,13 +30,22 @@ Guardarlas acá conserva la revisión y el contexto sin poner una mina en el cam
 
 ## Lote pendiente
 
-### TASK-1771 — `COMMENT` de `superseded_at` (agregado 2026-08-23)
+**VACÍO.** No hay ninguna migración parqueada esperando su condición.
 
-`TASK-1771-superseded-at-comment.sql.pending`. El comentario de la columna declara hoy que «NINGÚN write path
-lo escribe todavía», y `supersedeAssignmentDeadEnd` lo desmiente. **Condición: el release que despliega ese
-command a producción ya ocurrió**, verificado contra `origin/main` y no contra el working tree. Antes de eso
-el comentario describiría una capacidad que el runtime desplegado no tiene — el error simétrico de ISSUE-161.
-Riesgo sobre datos: nulo (es metadata). El cuidado va en `migrate:up`, que aplica todas las pendientes.
+### TASK-1771 — `COMMENT` de `superseded_at` — APLICADA 2026-08-23
+
+`20260823223021932_task-1771-superseded-at-comment`. Su condición —que el release con
+`supersedeAssignmentDeadEnd` ya estuviera en `origin/main`— se cumplió con el release `709e15f66`.
+
+Dos cosas que dejó y conviene no repetir:
+
+- **El readback previo NO coincidió con lo que este README anticipaba.** Esperaba «NINGÚN write path lo
+  escribe todavía (Slice 4)» y la base tenía un texto posterior, refinado después del parqueo. La
+  afirmación falsa seguía ahí, así que el Up no cambió; pero el **Down del `.pending` habría instalado
+  un comentario que nunca existió**. Se corrigió al aplicarla, restaurando el texto realmente vigente.
+  Lección: un `.pending` guarda una foto del día que se escribió — **releer la base antes de confiar en
+  su "esperado"**, sobre todo en el Down, que nadie mira hasta que hace falta.
+- `migrate:up` regenera `src/types/db.d.ts`: el comentario viaja a los tipos y va en el mismo commit.
 
 ### Lote histórico — post-release, en este orden
 
@@ -61,9 +70,17 @@ cualquier fila `on_hold` que producción siga escribiendo mientras `1` no se hay
 Y las dos comparten el mismo release, por razones distintas: `1` espera a que el código **deje de
 escribir** `on_hold`; `3` espera a que el código **empiece a filtrar** por procedencia.
 
-## Lote pendiente de TASK-1765 — post-release, en este orden
+## Lote histórico de TASK-1765 — APLICADO 2026-08-23
 
-Los dos son irreversibles y los dos exigen que el código ya esté en producción.
+Los tres se aplicaron en orden el 2026-08-23 (`20260823100709766`, `20260823100904211` +
+`…101647889-retry`, `20260823101823762`). Se conservan la tabla y la lección de abajo porque el
+razonamiento que las ordenó es la doctrina, no el trámite. **Ya no hay nada que ejecutar acá.**
+
+⚠️ La segunda perdió su marker `-- Up Migration` al copiarse y quedó **registrada sin ejecutar**; el
+`-retry` lleva el cuerpo real. Por eso el paso 4 exige readback DESPUÉS: es lo único que distingue
+«aplicada» de «anotada».
+
+Los tres eran irreversibles y los tres exigían que el código ya estuviera en producción.
 
 | # | Archivo | Condición de ejecución |
 |---|---|---|
