@@ -692,6 +692,59 @@ bicondicional: 32 filas `closed` sin desenlace (sintéticas, de `TASK-1748`) **m
 
 ---
 
+## Delta 2026-08-22 (cierre) — una regresión propia corregida y una deuda con condición
+
+### Regresión propia, CORREGIDA: el reloj de retención no cubría los desenlaces nuevos
+
+`refresh_assessment_access_recovery_retention_for_application` (trigger de `TASK-1746`) decidía la
+retención con listas de literales, y `not_selected`/`unresponsive` caían al `ELSE`, que pone **NULL**:
+el reloj de la Ley 21.719 **no arrancaba nunca** para ellos. Familia del H-01, y el mismo patrón de
+denylist que esta task vino a borrar del `PATCH`, sobreviviendo dentro de un trigger de PostgreSQL.
+
+Corregido en `migrations/20260823001108108_task-1765-recovery-retention-covers-all-outcomes.sql`,
+aplicado y verificado evaluando el `CASE` de la función **instalada** sobre los seis desenlaces:
+
+| Desenlace | Retención |
+|---|---|
+| `selected` | sin vencimiento (pasa a retención laboral) |
+| `backup_selected` | sin vencimiento — **explícito**, no por `ELSE` mudo; dueño `TASK-1744` (H-23) |
+| `rejected` · `withdrawn` · `not_selected` · `unresponsive` | **arranca el reloj +12 meses** |
+| sin desenlace | sin vencimiento (proceso vivo) |
+
+`hiring_assessment_access_recovery` tiene **0 filas**: el fix es preventivo. **No bloquea el release;
+tiene que ir DENTRO de él** — la regresión se vuelve viva en el instante en que el release habilite
+los desenlaces nuevos.
+
+### Deuda declarada, con su condición: los predicados de «proceso activo» preguntan por el eje viejo
+
+Cuatro consumidores infieren el desenlace desde la etapa —`talent-pool/projection.ts` (2 sitios),
+`talent-pool/commands.ts:272`, `desk.ts:104` y `DemandDeskView.tsx:348`— con
+`stage NOT IN ('rejected','withdrawn','closed')`. Tras el colapso, «cómo terminó» vive en `decision`,
+así que ése es el eje equivocado.
+
+**No se cambian todavía, y la razón es medible.** Readback 2026-08-22:
+
+| Predicado | Postulaciones «activas» |
+|---|---|
+| `stage NOT IN ('rejected','withdrawn','closed')` (actual) | **50** |
+| `decision IS NULL` (el «correcto») | **82** |
+
+Las 32 de diferencia son las filas sintéticas archivadas como `closed` sin decisión. Cambiar el
+predicado hoy las devolvería al conteo de proceso activo — una regresión, no una mejora.
+
+**Condición de ejecución:** después del backfill de `TASK-1748` y del `CHECK` del invariante. Ahí
+`stage='closed'` ⟺ `decision IS NOT NULL`, los dos predicados se vuelven equivalentes y el cambio
+pasa a ser de claridad, sin efecto sobre los datos. Dueño natural: la task que cierre el eje viejo.
+
+**Verificado que NO hay daño hoy** (contra la afirmación inicial de la auditoría): el `CASE` de
+`talent-pool/projection.ts` tiene **dos** ramas que devuelven `pool_eligible`, la 1.ª y la 3.ª, así
+que el consentimiento —no `has_active_application`— es lo que decide la elegibilidad. Una persona
+contratada que consintió ya era `pool_eligible` **antes** del colapso. El colapso nunca puede meter
+al Banco de Talento a quien no estuviera ya; sin consentimiento la mueve a `needs_reconsent`, que la
+saca de la proyección buscable. Es **más** protector, no menos.
+
+---
+
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule

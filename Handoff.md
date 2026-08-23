@@ -144,6 +144,30 @@ Siguiente paso: `TASK-1748` destraba el `CHECK` del invariante moviendo sus 32 f
 colapso de `TASK-1754`. Estado: **todo documental, sin push pendiente salvo los últimos commits**; ningún cambio de
 runtime salió de esta sesión.
 
+## 2026-08-22 (cierre) — TASK-1765: una regresión propia corregida antes del release
+
+Auditoría adversarial cruzada sobre el trabajo del día. **Un hallazgo real y mío, corregido:** el trigger de
+retención de recibos de recuperación de acceso (`TASK-1746`) decidía con listas de literales, y los dos
+desenlaces nuevos caían al `ELSE`, que pone **NULL** — el reloj de la Ley 21.719 no arrancaba nunca para
+`not_selected`, que es la población más grande. Familia del H-01, y el mismo patrón de denylist que esta task vino
+a borrar, sobreviviendo dentro de un trigger de PostgreSQL. Corregido con migración aplicada y verificada
+evaluando el `CASE` de la función instalada; `backup_selected` queda sin vencimiento **explícito** con dueño
+(`TASK-1744`, H-23) en vez de colarse por un `ELSE` mudo. **No bloquea el release: tiene que ir DENTRO de él**,
+porque la regresión se vuelve viva cuando el release habilite los desenlaces nuevos.
+
+**Dos hallazgos de la auditoría NO se sostuvieron al verificarlos** y quedaron documentados: el colapso de
+`DECISION_STAGE` no mete a nadie al Banco de Talento (el `CASE` tiene dos ramas que dan `pool_eligible`; el
+consentimiento decide, no `has_active_application`), y `withdrawn` no perdió su correo (ya era mudo por el
+early-return). Tres sí: retiré el guard `closed` que era inerte, endurecí el guard del mapa de correo para que
+itere el enum, y **honesté la doc funcional**, que afirmaba en presente un invariante todavía parqueado.
+
+**Deuda declarada con condición medible:** cuatro predicados de «proceso activo» preguntan por `stage` cuando el
+desenlace ya vive en `decision`. NO se cambian todavía: hoy darían 82 activas en vez de 50, porque las 32
+sintéticas archivadas volverían a contar. Sólo es seguro tras el backfill de `TASK-1748` y el `CHECK`.
+
+Estado: **code complete; tres migraciones parqueadas esperan el release** (contract del enum → backfill de 1748 →
+`CHECK` del invariante). Árbol e índice compartido limpios. Sin push.
+
 ## 2026-08-22 — TASK-1765 parte el pipeline en dos ejes; cerrar es decidir. Contract del enum, POST-RELEASE
 
 El pipeline de Hiring pasa a modelar **etapa** (dónde va la persona) y **desenlace** (cómo terminó su proceso) como
@@ -545,36 +569,6 @@ ningún webhook, ningún flag movido. Orden en
 `docs/operations/runbooks/resend-email-lifecycle-rollout.md`, con dos scripts operacionales nuevos
 que se aplican DESPUÉS del deploy: el CONTRACT de credencial y el saneador de los bearers que
 quedaron en claro en `delivery_payload` desde el 12-ago.
-
-## 2026-08-19 — Hallazgos post-Codex sobre el bloque 1745/1746: guard corregido y ledger reconciliado
-
-Codex cerró el paquete de recuperación de acceso (`5d5eb2f9c` + `f4b5f622f`). Una revisión posterior
-encontró tres cosas que no estaban en su alcance; las dos primeras ya quedaron corregidas en `b2ff2b33e`.
-
-**El guard de la migration de TASK-1746 tenía un hueco.** No verificaba la tabla de buckets ni las cuatro
-funciones de acceso público, que su propio Down sí dropea. La regla generalizada quedó en
-`GREENHOUSE_DATABASE_TOOLING_V1.md` §"El guard anti pre-up-marker debe ser simétrico con el Down". Como la
-migration **todavía no se aplica**, se corrigió en el archivo original: no hay forward-fix pendiente.
-
-**El ledger de flags mentía en dos filas.** Corregidas contra runtime real, no contra el doc:
-`HIRING_STAGE_TEST_ASSIGNMENT_ENABLED` está en `true` en la revisión activa `ops-worker-00585-nv6` (la fila
-del snapshot decía OFF), y `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` está `<NO SET>` en esa misma
-revisión — OFF de verdad, no sólo por default declarado — y ya tiene fila en `§ Pendientes de acción`.
-Nota operativa: la revisión activa ya no es la `00576-7zz` del flip original; el flag sobrevivió a deploys
-posteriores porque está declarado en `deploy.sh`, que es exactamente para lo que sirve declararlo ahí.
-
-**Riesgo abierto — `--reporter=basic` da falso verde.** En vitest 4.1.0 el reporter ya no existe: el comando
-falla al cargarlo y **sale con exit code 0**. Si alguien lo mete en un gate, ese gate pasa siempre. Los tests
-reales del dominio están verdes (439 pass, 42 skipped por falta de proxy PG). No se corrigió nada porque no
-está en ningún gate hoy; queda anotado para que nadie lo introduzca.
-
-**Estado del bloque: code complete, rollout pendiente.** Nada del rollout se ejecutó: ninguna migración
-aplicada, ningún secreto provisionado, el webhook de Resend sigue sin registrar y ningún flag cambió de
-estado. El orden completo está en `docs/operations/runbooks/resend-email-lifecycle-rollout.md` y el siguiente
-paso es suyo, no de código: aplicar las dos migraciones + el índice concurrente con readback.
-
-**Owner del siguiente paso: operador.** El rollout cruza Vercel, Cloud Run y un proveedor externo con gates
-humanos; no es candidato a automatización desatendida.
 
 ## 2026-08-19 — Ronda de documentación post-release: lo que quedó y la deuda que se hizo visible
 
