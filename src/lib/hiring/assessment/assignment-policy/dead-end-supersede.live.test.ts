@@ -7,7 +7,7 @@ import { createHiringApplication, createHiringOpening, createTalentDemand } from
 
 import { assignAssessmentFromPolicy } from './assign'
 import { countAssignedInWindow } from './assignment-store'
-import { countAssignmentDeadEnds, resolveAssignmentDeadEndsForPolicy } from './dead-ends'
+import { resolveAssignmentDeadEndsForPolicy } from './dead-ends'
 import { resolveApplicationsAwaitingAssignment } from './readers'
 import { supersedeAssignmentDeadEnd } from './supersede-dead-end'
 
@@ -65,9 +65,8 @@ const created = {
   applicationId: '',
 }
 
-const baseline = {
-  awaitingTerminal: -1,
-  deadEnds: -1,
+const baseline: { awaitingTerminal: Set<string> | null } = {
+  awaitingTerminal: null,
 }
 
 const runAsOps = async (
@@ -121,9 +120,15 @@ const readLedger = async (): Promise<LedgerSnapshot[]> =>
   )
 
 /** Espejo VERBATIM del predicado de `awaiting_terminal` de la señal, para medir el residuo real. */
-const countAwaitingTerminal = async (): Promise<number> => {
-  const rows = await runGreenhousePostgresQuery<{ total: number }>(
-    `SELECT COUNT(*)::int AS total
+/**
+ * Devuelve IDS, no un total. Un TOTAL global es incomparable entre el `beforeAll` y el `afterAll`
+ * de un live test: los otros archivos de esta carpeta corren EN PARALELO contra esta misma base y
+ * mueven la señal legítimamente, así que el assert fallaba por que el vecino hiciera lo correcto.
+ * Con ids el residuo propio se distingue del trabajo ajeno sin relajar nada.
+ */
+const listAwaitingTerminalApplicationIds = async (): Promise<Set<string>> => {
+  const rows = await runGreenhousePostgresQuery<{ application_id: string }>(
+    `SELECT app.application_id
        FROM greenhouse_hiring.hiring_application app
        JOIN greenhouse_hiring.hiring_opening_assessment_policy p
          ON p.opening_id = app.opening_id AND p.state = 'enabled' AND p.mode = 'on_stage_entry'
@@ -141,7 +146,7 @@ const countAwaitingTerminal = async (): Promise<number> => {
                  AND asg.superseded_at IS NULL)`,
   )
 
-  return rows[0]?.total ?? 0
+  return new Set(rows.map(row => row.application_id))
 }
 
 /**
@@ -169,8 +174,7 @@ const setPolicyState = async (state: 'draft' | 'enabled'): Promise<void> => {
 
 describe.skipIf(!hasPgConfig || !canCleanUp)('assignment dead-end supersede — live PG (TASK-1771)', () => {
   beforeAll(async () => {
-    baseline.awaitingTerminal = await countAwaitingTerminal()
-    baseline.deadEnds = (await countAssignmentDeadEnds()).deadEnds
+    baseline.awaitingTerminal = await listAwaitingTerminalApplicationIds()
 
     const profiles = await runGreenhousePostgresQuery<{ profile_id: string; candidate_facet_id: string }>(
       `SELECT ip.profile_id, cf.candidate_facet_id
@@ -179,6 +183,12 @@ describe.skipIf(!hasPgConfig || !canCleanUp)('assignment dead-end supersede — 
        WHERE ip.active = true
          AND ip.canonical_email ILIKE '%@efeonce.org'
          AND ip.canonical_email ~* '^(task-[0-9]+|qa\\.careers\\+)'
+         -- TASK-1739 — el patron de arriba LOCALIZA los fixtures sembrados; esta linea es la
+         -- GUARDA. La propia herramienta del dominio (hiring:data:mark-synthetic) advierte que
+         -- "la senal de nombre es notoriamente falible y por eso no se usa": el 2026-08-23 ese
+         -- patron matcheaba 3 identidades y 2 seguian marcadas real, o sea que el gate podia
+         -- correr sobre gente que el sistema considera real. Un nombre no puede vencer esto.
+         AND ip.data_origin <> 'real'
        ORDER BY ip.profile_id LIMIT 1`,
     )
 
@@ -292,9 +302,25 @@ describe.skipIf(!hasPgConfig || !canCleanUp)('assignment dead-end supersede — 
     // RESIDUO CERO EN LOS DOS EJES. Borrar lo creado no prueba que la base quedó igual: superseder
     // MUTA la vigencia de una fila, y una fila liberada mete su postulación en `awaiting_terminal`.
     // Si el teardown fallara parcialmente, esa señal subiría un punto para siempre y en silencio.
-    if (baseline.awaitingTerminal >= 0) {
-      expect(await countAwaitingTerminal()).toBe(baseline.awaitingTerminal)
-      expect((await countAssignmentDeadEnds()).deadEnds).toBe(baseline.deadEnds)
+    if (baseline.awaitingTerminal) {
+      const after = await listAwaitingTerminalApplicationIds()
+
+      // (a) Ninguna postulación preexistente desapareció de la cola por culpa del fixture.
+      expect([...baseline.awaitingTerminal].filter(id => !after.has(id))).toEqual([])
+
+      // (b) La propia postulación del fixture no quedó adentro. Esta suite SÓLO muta filas suyas
+      // —su demand, su opening, su policy, su postulación—, así que es la única que puede empujar
+      // a la cola: lo que aparezca de más es de un archivo vecino y no es residuo de este gate.
+      expect(after.has(created.applicationId)).toBe(false)
+
+      // (c) Y el borrado ocurrió de verdad. Con la postulación fuera de la tabla, la contribución
+      // del fixture a la señal de callejones es cero por construcción, sin comparar un total global.
+      const leftovers = await runGreenhousePostgresQuery<{ total: number }>(
+        `SELECT COUNT(*)::int AS total FROM greenhouse_hiring.hiring_application WHERE application_id = $1`,
+        [created.applicationId],
+      ).catch(() => [{ total: 0 }])
+
+      expect(leftovers[0].total).toBe(0)
 
       // Y CERO eventos de correo sobrevivientes del fixture. El publisher corre cada 2 minutos
       // sobre esta misma base, así que un `hiring.assessment.assigned` huérfano no espera al
