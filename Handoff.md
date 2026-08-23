@@ -38,27 +38,28 @@ exportan como piezas nombradas: componerlas falla al compilar, recortar strings 
 **Readback:** `awaiting_terminal` 13 → 3 sobre base limpia; `drift` 0; Banco de Talento 54 → 49.
 Gate probado en las dos direcciones (falla sobre reintroducción, pasa sobre el árbol migrado).
 
-**🔴 Residuo pendiente en la base compartida, y es mío.** Mi primera corrida de live tests murió a
-mitad (proxy Cloud SQL caído) y dejó 8 postulaciones de humo sin archivar
-(`EO-APP-0234`…`0241`, todas `smoke_test`); hoy `awaiting_terminal` mide **5** = 3 reales + 2 de
-residuo, y `assignment_dead_ends` mide 1 por la misma causa (`EO-APP-0241`, que NO es un callejón de
-una persona real). **No lo limpié**, y la razón cambió al verificarla:
+**Residuo RESUELTO, y el arreglo fue la capacidad, no la limpieza.** Mi primera corrida de live
+tests murió a mitad (proxy Cloud SQL caído) y dejó 8 postulaciones de humo sin archivar
+(`EO-APP-0234`…`0241`). Limpiarlas exigía mutar las 43 no-reales + 16 fichas + 18 vacantes, porque
+`--archive` mandaba el plan entero.
 
-- Primero reporté que `hiring:data:purge-synthetic` **no tiene allowlist** y que por eso limpiarlo
-  excedía lo autorizado. **Eso es cierto del CLI y falso de la capacidad.**
-  `archiveSyntheticRecords` (`data-origin/purge.ts:236`) recibe allowlist en los tres niveles
-  —`applicationIds`, `candidateFacetIds`, `openingIds`— y su docstring dice literalmente *«Omitirlo
-  NO archiva ninguna: nada se escribe sin allowlist»*. Es el CLI el que le pasa el plan entero
-  (`purge-synthetic-hiring-data.ts:53-55`). Leí el CLI y concluí sobre la biblioteca.
-- Entonces **lo que el operador autorizó SÍ es ejecutable tal como lo autorizó**: archivar sólo esos
-  8 `applicationIds`, con actor + reason + audit. Queda pendiente sólo por coordinación de quién lo
-  corre (los fixtures son compartidos con los gates de la otra sesión), no por falta de capacidad.
-- **Sólo `applicationIds`**: no incluir fichas ni vacantes — `cndf-1c86e66f` la comparten tres de
-  ellas y es fixture vivo de los gates de assignment.
+La capacidad ya existía y el CLI la pisaba: `ApplyPurgeInput` recibe allowlist en los tres niveles y
+su contrato dice «Omitirlo NO archiva ninguna». `a913a6998` hace que el CLI la respete —`--archive`
+EXIGE `--allowlist`, el plan completo queda tras un `--all` explícito— y mueve la validación a la
+biblioteca con 7 tests. El carril de BORRADO **no** acepta allowlist ni `--all`: archivar es
+reversible, borrar no, y ahí lo que decide no es QUÉ considerar sino SI califica.
 
-Deuda derivada: el CLI debería exponer `--allowlist`. Un CLI que sólo sabe hacer «todo» sobre la
-única instancia Cloud SQL de dev/staging/producción obliga a un script ad-hoc para cada limpieza
-acotada.
+Readback **medido** (2026-08-23T17:54:19Z), no esperado:
+
+| Métrica | Antes | Después |
+|---|---|---|
+| `awaiting_terminal` | 5 | **3** (+12 en `awaiting_terminal_excluded_archived`) |
+| `assignment_dead_ends` | 1 | **0** |
+| `active_process_predicate_drift` | 0 | **0** (`canonical` 50, `archived_gap` 40; 90 − 40 = 50) |
+
+El `assignment_dead_ends = 1` que otra sesión leyó como «apareció un callejón de una persona real»
+era `EO-APP-0241`, `smoke_test`, de este mismo residuo. Verificado por columnas nombradas antes de
+concluir.
 
 **Deuda destapada, sin dueño:** `assign.live.test.ts` y `propose-confirm.live.test.ts` crean fixtures
 **sin declarar `dataOrigin`**, así que nacen `real`. El gate `hiring-data-origin-gate` barre
