@@ -40,6 +40,7 @@ import {
   hiringAssessmentSubmittedInternalEmailProjection,
   hiringStageChangedCandidateCommsProjection,
 } from '@/lib/sync/projections/hiring-lifecycle-emails'
+import { HIRING_DECISIONS } from '@/types/hiring'
 
 const contextRow = (overrides: Record<string, unknown> = {}) => ({
   application_id: 'happ-1',
@@ -394,10 +395,20 @@ describe('TASK-1689 hiring lifecycle emails', () => {
 
   describe('decision', () => {
     it('only notifies selected/rejected', async () => {
-      // TASK-1765 — `not_selected` y `unresponsive` entran acá y son el corazón del caso: sin el
-      // mapa explícito, el ternario binario le habría mandado un correo de RECHAZO a quien nadie
-      // rechazó. `unresponsive` además NUNCA notifica por diseño (ADR §7.2).
-      for (const decision of ['backup_selected', 'not_selected', 'unresponsive', 'withdrawn', '']) {
+      // TASK-1765 — se itera `HIRING_DECISIONS`, NO un arreglo literal. Un literal sólo falla si
+      // alguien revierte al ternario; iterando el enum el test falla también cuando entra un
+      // desenlace NUEVO sin decidir su correo — que es el caso que de verdad muerde, y el mismo
+      // criterio de default-por-inclusión que gobierna `DECISION_STAGE`.
+      //
+      // `not_selected` es el corazón del caso: sin el mapa explícito, el ternario binario le habría
+      // mandado un correo de RECHAZO a quien nadie rechazó. `unresponsive` NUNCA notifica por diseño
+      // (ADR §7.2): a quien no declaró nada no se le escribe.
+      const silentDecisions = HIRING_DECISIONS.filter(d => d !== 'selected' && d !== 'rejected')
+
+      expect(silentDecisions).toContain('not_selected')
+      expect(silentDecisions).toContain('unresponsive')
+
+      for (const decision of [...silentDecisions, '']) {
         const msg = await sendHiringDecisionEmail('happ-1', { decision })
 
         expect(msg).toContain('no notifica')
