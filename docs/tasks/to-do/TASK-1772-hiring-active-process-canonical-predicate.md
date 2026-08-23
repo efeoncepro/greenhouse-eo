@@ -66,11 +66,30 @@ usos de `decision IS NULL`   menciones de archived_at   archivo
 explícita: verificar el predicado, no el conteo. Cada archivo exige leerse entero antes de decidir si es
 defecto:
 
-- **`documents/retention.ts` probablemente NO debe filtrar `archived_at`, y tocarlo sería el bug.** Archivar
-  no declara desenlace, así que no puede parar un reloj de retención: una postulación archivada cuyo
-  candidato tiene derecho a que sus documentos se purguen lo sigue teniendo. Retención responde a la
-  decisión, no a la visibilidad. **Confirmarlo leyendo el predicado y dejarlo escrito** — si no queda
-  declarado, el próximo barrido lo «arregla».
+- **`documents/retention.ts` queda FUERA — verificado leyendo el predicado entero (`retention.ts:88-94`).**
+
+  ⚠️ **La primera versión de este Delta daba la conclusión correcta con una razón que argumentaba lo
+  contrario** («archivar no puede parar un reloj de retención»). Queda escrito porque quien lea esto va a
+  re-derivar desde la razón, no desde la conclusión — y esa razón invita justo al cambio que hay que evitar.
+
+  **Ese `NOT EXISTS` no es un reloj: es un guard que PROTEGE de la purga.** El reloj es `closed_at`, que sale
+  de `decision_at` y corre igual pase lo que pase. Lo único que hace el `NOT EXISTS` es excluir de la lista de
+  vencidos a quien tenga **cualquier** postulación sin desenlace: no borres los documentos de alguien que
+  sigue en juego en otro proceso.
+
+  Migrarlo invierte el sentido:
+
+  | Postulación | Hoy | Con el helper canónico aplicado |
+  |---|---|---|
+  | archivada, sin desenlace | cuenta como viva → **bloquea la purga** | no cuenta → **la purga procede** |
+
+  Queda fuera por **asimetría de daño**: conservar documentos de más es reversible (se borran después);
+  borrarlos de más no lo es. Y el escenario es concreto — el único escritor de
+  `hiring_application.archived_at` es hoy `data-origin/purge.ts:285`, el CLI de purga de sintéticos
+  (verificado 2026-08-23), así que una postulación real archivada por error es un error de operación que
+  migrar este sitio convertiría en **borrado irreversible de documentos de un candidato real**.
+
+  Crédito: lo cazó la sesión que auditó este carril, leyendo el predicado en vez de aceptar la conclusión.
 - **`store.ts` y `hiring-application-outcome-signals.ts`**: leer y clasificar. Que uno mencione `archived_at`
   una vez no prueba que lo aplique donde corresponde.
 
