@@ -21,6 +21,8 @@ import {
   resolveHiringInternalNotificationsEmail,
 } from './config'
 import { resolveHiringApplicationEmailContext, type HiringApplicationEmailContext } from './recipient'
+import { isHiringCapacityFilledEmailEnabled } from './config'
+import { hasCurrentTalentPoolFutureConsent } from './talent-pool-consent'
 import { resolveCandidateFacingStageLabel } from './stage-policy'
 
 /**
@@ -346,6 +348,9 @@ export const sendHiringStageAdvancedEmail = async (
 const DECISION_EMAIL_TYPE: Record<string, EmailType | undefined> = {
   selected: 'hiring_decision_selected',
   rejected: 'hiring_decision_rejected',
+  // TASK-1762 — «sin selección». Tipo PROPIO, no el de descarte: un cierre por capacidad manda N
+  // correos de golpe y debe poder pausarse sin silenciar la decisión individual.
+  not_selected: 'hiring_decision_not_selected',
 }
 
 export const sendHiringDecisionEmail = async (
@@ -359,6 +364,12 @@ export const sendHiringDecisionEmail = async (
 
   if (!emailType) {
     return `hiring_application_decided_email no-op: decision ${decision || '(vacía)'} no notifica`
+  }
+
+  // TASK-1762 — segundo freno, independiente del master: se puede cerrar una cohorte SIN
+  // notificarla (canary) apagando sólo este flag. Un correo emitido no se retira.
+  if (emailType === 'hiring_decision_not_selected' && !isHiringCapacityFilledEmailEnabled()) {
+    return `hiring_application_decided_email no-op: HIRING_CAPACITY_FILLED_EMAIL_ENABLED apagado`
   }
 
   const ctx = await resolveHiringApplicationEmailContext(applicationId)
@@ -391,6 +402,11 @@ export const sendHiringDecisionEmail = async (
     context: {
       recipientName: ctx.candidateName ?? undefined,
       openingTitle: ctx.openingTitle,
+      // Se re-lee AHORA, no se arrastra del evento: el consentimiento es revocable y una promesa
+      // hecha con un permiso vencido es una promesa sin base. Sólo lo consume `not_selected`.
+      ...(emailType === 'hiring_decision_not_selected'
+        ? { talentPoolConsent: await hasCurrentTalentPoolFutureConsent(applicationId) }
+        : {}),
       locale: 'es',
     },
     sourceEventId: eventId,

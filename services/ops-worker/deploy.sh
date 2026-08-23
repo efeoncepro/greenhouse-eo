@@ -404,6 +404,30 @@ ENV_VARS="${ENV_VARS},GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED=${GROWTH_EBOOK_EMAIL_D
 HIRING_LIFECYCLE_EMAILS_ENABLED="${HIRING_LIFECYCLE_EMAILS_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},HIRING_LIFECYCLE_EMAILS_ENABLED=${HIRING_LIFECYCLE_EMAILS_ENABLED}"
 
+# TASK-1762 — Cierre de vacante por capacidad: ejecución del run y su correo de «sin selección».
+# El reconciler y el consumer del correo corren SOLO acá (lane ops-reactive-notifications):
+# prenderlos en Vercel no hace absolutamente nada, y dejaría la UI prometiendo un cierre que
+# nunca se ejecuta.
+#
+# Default OFF los dos, y por razones distintas:
+#
+# - HIRING_OPENING_CAPACITY_CLOSURE_ENABLED gobierna que el reconciler ejecute el run. Con él en
+#   false se pueden configurar políticas y ver previews, pero nadie cambia de estado.
+# - HIRING_CAPACITY_FILLED_EMAIL_ENABLED gobierna SÓLO el correo. Es un segundo freno sobre el
+#   primero: un cierre manda N correos de golpe (las vacantes vivas tienen 36 y 14 personas), y
+#   un correo emitido no se retira. Poder cerrar sin notificar —para un canary— exige que los dos
+#   flags sean independientes.
+#
+# El kill-switch por tipo en `email_type_config` es la TERCERA capa y es la que permite pausar
+# este correo sin silenciar el de decisión individual (`hiring_decision_rejected`).
+#
+# Declarativo acá para que `--set-env-vars` (destructivo) NO los borre en cada redeploy.
+# Rollback (<5min): `gcloud run services update ops-worker --update-env-vars <FLAG>=false`.
+HIRING_OPENING_CAPACITY_CLOSURE_ENABLED="${HIRING_OPENING_CAPACITY_CLOSURE_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},HIRING_OPENING_CAPACITY_CLOSURE_ENABLED=${HIRING_OPENING_CAPACITY_CLOSURE_ENABLED}"
+HIRING_CAPACITY_FILLED_EMAIL_ENABLED="${HIRING_CAPACITY_FILLED_EMAIL_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},HIRING_CAPACITY_FILLED_EMAIL_ENABLED=${HIRING_CAPACITY_FILLED_EMAIL_ENABLED}"
+
 # TASK-1746 — Cutover de links de assessment al exchange fragment→sesión HttpOnly.
 # Este sender corre sólo en ops-worker. Default OFF hasta aplicar migración, verificar routes
 # live, confirmar Resend click_tracking=false por API/readback y completar smoke del href.

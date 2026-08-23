@@ -4,6 +4,7 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 
 import { decideHiringApplication } from '../decide'
+import { isHiringOpeningCapacityClosureEnabled } from '../notifications/config'
 
 /**
  * TASK-1762 Slice 3 — reconciler del cierre por capacidad.
@@ -54,6 +55,12 @@ export const reconcileClosureRun = async (
   runId: string,
   actorUserId: string | null
 ): Promise<ReconcileClosureRunResult> => {
+  // Flag OFF: el run queda intacto y NADIE cambia de estado. No es un error ni consume reintentos
+  // — es la posición de reposo mientras el rollout no está autorizado.
+  if (!isHiringOpeningCapacityClosureEnabled()) {
+    return { runId, processed: 0, decided: 0, skipped: 0, failed: 0, quarantined: 0, finished: false }
+  }
+
   await runGreenhousePostgresQuery(
     `UPDATE greenhouse_hiring.hiring_opening_closure_run
         SET state = 'running', started_at = COALESCE(started_at, now())
