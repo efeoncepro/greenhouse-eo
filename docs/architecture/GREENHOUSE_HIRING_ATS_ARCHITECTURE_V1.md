@@ -215,7 +215,7 @@ la verdad. **Condición de retiro:** `TASK-1365` cierra **antes** de prender
 | Pieza | Estado |
 |---|---|
 | Enum TS en seis + los tres consumers apuntados a `TERMINAL_APPLICATION_STAGES` + mapa de aguas abajo reescrito | **aplicado** |
-| Contract del `CHECK` (`migrations/20260823104057405_task-1754-stage-vocabulary-contract.sql`) | **escrito y revisado, NO aplicado** — el `CHECK` de la base **sigue admitiendo trece valores** |
+| Contract del `CHECK` (`docs/tasks/pending-migrations/TASK-1754-stage-vocabulary-contract.sql.pending`) | **escrito y revisado, NO aplicado** — el `CHECK` de la base **sigue admitiendo trece valores** |
 
 Su autorización no vino de contar filas sino del **contrato de la superficie desplegada**: en
 `origin/main` (release `304371f73`) hay exactamente tres escritores de `hiring_application.stage`,
@@ -1143,7 +1143,7 @@ dice cómo — ver `HiringDecision` y el delta de `TASK-1754`.
 
 Los siete literales históricos (`qualified`, `client_review`, `selected`, `backup`, `rejected`,
 `withdrawn`, `handoff_ready`) salieron del enum TS. El `CHECK` de la base los angosta cuando corra
-`migrations/20260823104057405_task-1754-stage-vocabulary-contract.sql`, todavía sin aplicar.
+`docs/tasks/pending-migrations/TASK-1754-stage-vocabulary-contract.sql.pending`, todavía sin aplicar.
 
 ### HiringHandoff lifecycle
 

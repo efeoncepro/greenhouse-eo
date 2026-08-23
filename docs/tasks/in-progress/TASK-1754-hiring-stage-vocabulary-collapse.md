@@ -187,7 +187,7 @@ laxo, y queda cerrada.
 | `PipelineDeskView.tsx` | Los carriles pierden `absorbs`; el carril `outcome` queda con **una** etapa |
 | `DemandDeskView.tsx` | `active` pasa de `!['rejected','withdrawn','closed']` a `stage !== 'closed'`; `evaluation` pasa de `['qualified','shortlisted','client_review']` a `stage === 'shortlisted'` |
 | `instances.eligibility.test.ts` | Su caso «terminal stage» usaba `stage: 'rejected'`, que dejó de ser etapa; pasa a `'closed'` |
-| `migrations/20260823104057405_task-1754-stage-vocabulary-contract.sql` | Guarda de datos que aborta si queda una fila en etapa retirada · DDL que reemplaza el `CHECK` (13 → 6) · bloque anti pre-up-marker que lee `pg_get_constraintdef` y revienta si el `CHECK` todavía admite cualquiera de los siete |
+| `docs/tasks/pending-migrations/TASK-1754-stage-vocabulary-contract.sql.pending` | Guarda de datos que aborta si queda una fila en etapa retirada · DDL que reemplaza el `CHECK` (13 → 6) · bloque anti pre-up-marker que lee `pg_get_constraintdef` y revienta si el `CHECK` todavía admite cualquiera de los siete |
 
 ### Decisiones tomadas durante la ejecución, con su razón
 
@@ -232,7 +232,7 @@ laxo, y queda cerrada.
 
 ### Lo que queda, con su condición
 
-- **Aplicar la migración `20260823104057405_task-1754-stage-vocabulary-contract.sql`.** Es lo único
+- **Aplicar la migración `TASK-1754-stage-vocabulary-contract.sql.pending`.** Es lo único
   pendiente. Requiere autorización explícita del operador para `pnpm pg:connect:migrate`: el comando
   quedó bloqueado por el clasificador de permisos. **Antes de aplicarla, avisar a `TASK-1718`** — su
   lane programático acepta `stage` como string libre sin `assertEnum`, así que un filtro por un literal

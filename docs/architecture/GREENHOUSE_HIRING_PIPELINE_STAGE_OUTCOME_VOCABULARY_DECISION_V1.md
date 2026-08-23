@@ -417,7 +417,7 @@ La propia migración lleva su guarda de datos (aborta con `RAISE EXCEPTION` si a
 | Pieza | Estado |
 |---|---|
 | Enum TS en seis valores + los tres consumers apuntados a la fuente única + mapa de aguas abajo reescrito | **aplicado** — `typecheck` y `eslint` limpios, 1.236 tests del dominio verdes |
-| `migrations/20260823104057405_task-1754-stage-vocabulary-contract.sql` | **escrita y revisada, NO aplicada.** Espera autorización del operador: el `CHECK` de la base **sigue admitiendo trece valores** |
+| `docs/tasks/pending-migrations/TASK-1754-stage-vocabulary-contract.sql.pending` | **escrita y revisada, NO aplicada.** Espera autorización del operador: el `CHECK` de la base **sigue admitiendo trece valores** |
 
 Mientras esa migración no corra, el estado correcto de la task es `code complete, rollout pendiente` — no `complete`.
 

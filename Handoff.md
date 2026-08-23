@@ -8,25 +8,29 @@
 el clasificador de permisos y espera autorización del operador. **El `CHECK` de la base sigue admitiendo
 las trece etapas**; el candado de seis vive hoy sólo en la aplicación.
 
-**Lo que autorizó a angostar, y es el método que hay que reusar.** No fue contar filas — «cero filas» no es
-«nadie lo escribe» —, sino el contrato de la superficie desplegada: en `origin/main` hay **exactamente tres**
-escritores de `hiring_application.stage`, los tres acotados por tipo (`store.ts:1249` INSERT y `store.ts:1340`
-UPDATE vía `assertEnum(HIRING_PIPELINE_STAGES)`, y `decide.ts:299` vía `DECISION_STAGE[decision]` → siempre
-`closed`). La unión de lo escribible son los seis que quedan. El `stage = $n` de `store.ts:666` es un
-**filtro** de lista: el falso positivo típico de un grep laxo, y era justo la duda que quedaba abierta.
+**El método que autorizó a angostar, y que hay que reusar.** No fue contar filas —«cero filas» no es «nadie lo
+escribe»— sino el contrato de la superficie desplegada: en `origin/main` hay **tres** escritores de
+`hiring_application.stage`, los tres acotados por tipo (`store.ts:1249`/`1340` vía
+`assertEnum(HIRING_PIPELINE_STAGES)`; `decide.ts:299` vía `DECISION_STAGE` → siempre `closed`). La unión son los
+seis que quedan. El `stage = $n` de `store.ts:666` es un **filtro**, no una escritura: el falso positivo típico
+de un grep laxo.
 
 **Lo que cambió además del enum 13 → 6.** `TERMINAL_APPLICATION_STAGES` nace como fuente única (antes tres
 copias verbatim en los guards de assessment). `STAGES_DOWNSTREAM_OF_TRIGGER` se **reescribió, no se podó**:
 `client_review` figuraba aguas abajo de `shortlisted` y el colapso la absorbió dentro, así que mandaba a la
 cola humana postulaciones que la reconciliación sí recupera.
 
-**Una deuda declarada a propósito.** `FAIRNESS_REPORTABLE_STAGES` conserva tres literales muertos porque
-`getSelectionFairness` usa `input.stage ?? 'selected'` como default y retirarlo rompería toda llamada sin
-etapa. Re-apuntar el cubo terminal al eje de desenlace cambia **qué mide** el four-fifths rule, y eso no cabe
-en un contract de vocabulario. Mitigación: el reader ahora falla ruidoso (`hiring_fairness_stage_retired`,
-422) en vez de devolver cero — un cero silencioso en una métrica de equidad se lee como «no hay impacto
-adverso», la conclusión contraria a la verdad. Condición de retiro en el ledger de flags: `TASK-1365` cierra
-**antes** de prender `HIRING_FAIRNESS_MONITOR_ENABLED`.
+**Deuda declarada a propósito.** `FAIRNESS_REPORTABLE_STAGES` conserva tres literales muertos: son el default
+de `getSelectionFairness` (`input.stage ?? 'selected'`) y re-apuntar su cubo terminal cambia **qué mide** el
+four-fifths rule, lo que no cabe en un contract de vocabulario. Mitigación: falla ruidoso
+(`hiring_fairness_stage_retired`, 422) en vez de devolver cero, que en equidad se lee como «no hay impacto
+adverso». Condición en el ledger: `TASK-1365` cierra **antes** de prender `HIRING_FAIRNESS_MONITOR_ENABLED`.
+
+**Corrección posterior al commit (`ddb38d3a6`).** El `.sql` quedó dentro de `migrations/` porque la premisa
+era aplicarlo en la misma sesión; al bloquearse el comando esa premisa murió y el archivo pasó a ser una mina:
+una migración committeada y sin aplicar **no espera su turno** — el próximo `migrate:up` de cualquier sesión la
+aplica sin su readback. Movida a `docs/tasks/pending-migrations/` con su condición y su readback en el
+encabezado. **Regla: si no se aplica en la misma sesión que la escribe, no vive en `migrations/`.**
 
 **Gates:** `typecheck` limpio, `pnpm lint` limpio, suite del dominio 1.236 verdes. El guard derivado
 `stage-enum-check-parity.live.test.ts` **falla a propósito** ahora (enum 6 ≠ `CHECK` 13): es el readback que
