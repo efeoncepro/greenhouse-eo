@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-011`
-- Status real: `in-progress 2026-08-23 — Slices 1 y 2 COMPLETOS y commiteados en develop local (617d18df7, 146242339), sin push. El Slice 3 (write path) espera dos decisiones del operador: la condicion de avance estricta y la autorizacion de migrate:up para el COMMENT. Las cuatro Open Questions quedaron resueltas con evidencia viva (ver Delta 2026-08-23)`
+- Status real: `in-progress 2026-08-23 — CODE COMPLETE, ROLLOUT PENDIENTE. Slices 1-4 en develop local sin push (617d18df7, 146242339, d5914c841, 0f558666a). Gate vivo verde en dos corridas seguidas con residuo cero verificado en dos ejes. Falta: push/release, la Production verification sequence, y la migracion del COMMENT parqueada en pending-migrations con condicion de release. NO mover a complete hasta que el rollout ocurra`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -662,28 +662,80 @@ opera sobre candidatos reales desde el primer minuto.
 
 ## Acceptance Criteria
 
-- [ ] Una clave quemada del carril automático es visible desde el momento en que se quema: aparece en
+- [x] Una clave quemada del carril automático es visible desde el momento en que se quema: aparece en
       la cola de reconciliación y mueve la severidad de la señal.
-- [ ] La señal distingue «callejón honesto» (la causa sigue aplicando) de «callejón recuperable» (la
+- [x] La señal distingue «callejón honesto» (la causa sigue aplicando) de «callejón recuperable» (la
       causa ya no aplicaría hoy), y sólo la segunda alarma. Steady declarado = 0.
-- [ ] La evidencia que justifica superseder se resuelve contra el estado vigente **reusando**
+- [x] La evidencia que justifica superseder se resuelve contra el estado vigente **reusando**
       `resolveAssignmentIntent`, sin duplicar ninguna de sus condiciones.
-- [ ] El supersede estampa `superseded_at` y deja `outcome` y `outcome_reason` intactos, con test que
+- [x] El supersede estampa `superseded_at` y deja `outcome` y `outcome_reason` intactos, con test que
       lo afirma.
-- [ ] Existe un tope por clave y una condición de avance; ambos shippean en el mismo slice que el
+- [x] Existe un tope por clave y una condición de avance; ambos shippean en el mismo slice que el
       command, y hay un test que demuestra que el bucle supersede → blocked → supersede se detiene.
-- [ ] Superseder **no** manda correo ni crea instancia por sí mismo, y la task declara explícitamente
+- [x] Superseder **no** manda correo ni crea instancia por sí mismo, y la task declara explícitamente
       quién ejecuta el intento nuevo después.
-- [ ] El carril automático sigue sin poder escribir `attempt_seq > 1`: el `CHECK` y las dos guardas
+- [x] El carril automático sigue sin poder escribir `attempt_seq > 1`: el `CHECK` y las dos guardas
       de `assign.ts` quedan intactos.
-- [ ] Un resultado `assigned` vigente sigue sin poder superseder-se por esta vía.
-- [ ] El cap de volumen no libera presupuesto por un supersede: test de no-regresión sobre
+- [x] Un resultado `assigned` vigente sigue sin poder superseder-se por esta vía.
+- [x] El cap de volumen no libera presupuesto por un supersede: test de no-regresión sobre
       `countAssignedInWindow`.
-- [ ] El ciclo completo quedó ejercitado contra PostgreSQL real con teardown a residuo cero.
-- [ ] La decisión sobre las 4 filas `blocked` existentes quedó ejecutada y escrita (la evidencia de
+- [x] El ciclo completo quedó ejercitado contra PostgreSQL real con teardown a residuo cero.
+- [x] La decisión sobre las 4 filas `blocked` existentes quedó ejecutada y escrita (la evidencia de
       2026-08-22 dice **sin backfill**).
-- [ ] La suite de `TASK-1755` (`attempt-retry.test.ts` y su gate vivo) sigue verde: el carril manual
+- [x] La suite de `TASK-1755` (`attempt-retry.test.ts` y su gate vivo) sigue verde: el carril manual
       no cambia de comportamiento.
+
+
+## Delta de cierre 2026-08-23 — code complete, rollout pendiente
+
+Los cuatro slices están implementados y verificados en local. **El estado correcto NO es `complete`**: nada
+de esto corre todavía en producción, así que mover el lifecycle sería declarar operable algo que ningún
+operador puede usar.
+
+### Lo que quedó hecho
+
+| Slice | Commit | Qué |
+|---|---|---|
+| 1 | `617d18df7` | Reader de callejones + tercera cola en reconciliación + métrica en la señal |
+| 2 | `146242339` | `resolveLiveAssignmentIntent` + evaluación dry-run + tope derivado |
+| 3 | `d5914c841` | Command de supersede + ruta POST + evento de auditoría |
+| 4 | `0f558666a` | Gate vivo contra PostgreSQL real |
+
+Además: `ISSUE-162` (`9d1db5252`) y la recalibración de esta spec (`12868f9c7`).
+
+### Evidencia
+
+- Gate vivo: **dos corridas seguidas, ambas exit 0**, con `awaiting_terminal` = 13 antes de la primera y
+  después de la segunda, cero eventos `hiring.assessment.*` sobrevivientes y cero fixtures residuales.
+- Métricas nuevas en su steady: `assignment_dead_ends = 0`, `recoverable = 0`, `honest = 0`,
+  `cap_reached = 0`, `excluded_synthetic = 2`, `truncated = false`.
+- `pnpm lint` exit 0 · `pnpm typecheck` exit 0 · `src/lib/hiring` + `src/lib/reliability` **1.812 verdes**.
+  Todos leídos capturando el exit code directo, sin pipe de por medio.
+- Las 4 filas `blocked` siguen siendo 4, siguen siendo `smoke_test` y la cola las excluye. **Sin backfill**,
+  como declaraba la evidencia del 2026-08-22.
+
+### Lo que falta para `complete`
+
+1. Push + release. Nada de esto está desplegado.
+2. La `## Production verification sequence` completa, que sólo se puede ejecutar contra el runtime desplegado.
+3. La migración del `COMMENT` de `superseded_at`, parqueada en
+   `docs/tasks/pending-migrations/TASK-1771-superseded-at-comment.sql.pending` con su condición: **el release
+   que despliega el command ya ocurrió**, verificado contra `origin/main`. Antes de eso el comentario
+   describiría una capacidad que el runtime desplegado no tiene.
+4. `pnpm test` completo + `pnpm build` de producción como gate de cierre (el build consume ~30 GB y requiere
+   autorización del operador).
+
+### Advertencia para el próximo gate vivo de este dominio
+
+El gate de esta task **asignó de verdad** en una versión intermedia y dejó un `hiring.assessment.assigned` en
+estado `pending` —el evento del que cuelga el correo al candidato— apuntando a una instancia que el teardown ya
+había borrado. **El publisher del outbox corre cada 2 minutos sobre la base compartida por dev, staging y
+producción.** Se retiró a mano con verify-then-delete (confirmar `event_id`, estado `pending` e instancia
+inexistente, y sólo entonces borrar).
+
+La causa raíz no fue el teardown: el encabezado del test **afirmaba** que el gate nunca llegaba a `assigned`, y
+esa afirmación era cierta cuando se escribió y dejó de serlo cuando el escenario cambió. **Un comentario no es
+una guarda.** Quedó enforced: la policy se apaga antes del reintento y el test asserta cero instancias.
 
 ## Verification
 

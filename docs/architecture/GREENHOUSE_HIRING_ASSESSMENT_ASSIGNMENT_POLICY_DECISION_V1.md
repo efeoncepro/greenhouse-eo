@@ -214,6 +214,84 @@ en cancelación.
 
 ---
 
+
+## Delta 2026-08-23 — el carril automático tiene reversa (TASK-1771)
+
+El `## Delta 2026-08-22` cerró el callejón del carril MANUAL con `attempt_seq + 1`. El automático no podía
+usar esa salida —el `CHECK (origin = 'manual' OR attempt_seq = 1)` se la prohíbe por diseño, y ese límite de
+autoridad **no se relaja**— así que su reversa es la que la migración original ya había declarado y nadie
+había construido: **liberar la clave de idempotencia estampando `superseded_at`**.
+
+### Por qué el hueco era peor que "imposible": era invisible
+
+Una fila `blocked` del carril automático ocupa
+`(application, policy, versión, etapa, intento) WHERE superseded_at IS NULL` para siempre, y las **tres**
+superficies que deberían delatarlo callaban a la vez: `resolveApplicationsAwaitingAssignment` excluye a quien
+tenga fila vigente, la señal `hiring.assessment.assignment_health` es su espejo exacto, y `blocked_last_24h`
+**no entra al cálculo de severidad** y además caduca a las 24 horas. A las 24 h la clave quemada salía hasta
+de la evidencia mientras seguía bloqueando a la persona.
+
+### Invariantes nuevos
+
+1. **NUNCA copiar `supersedeAssignmentsForAssessment` para esto.** Ese path reescribe `outcome` a `cancelled`
+   y ahí hace bien —el hecho cambió, la instancia murió—. Acá el hecho **no** cambia: el intento se bloqueó
+   por `volume_cap`, eso pasó y sigue siendo cierto; lo único que deja de ser cierto es que esa fila tenga que
+   ocupar la clave. Reescribir el outcome borraría la explicación del bloqueo, que es todo el valor de
+   auditoría de la fila. El command estampa `superseded_at` y **nada más**, con un test que asserta que el
+   `UPDATE` no contiene `outcome =`.
+2. **La condición de avance es «hoy resolvería `assigned`», NUNCA «difiere del resultado registrado».** La
+   segunda es la lectura intuitiva y es incorrecta. Verificado contra PostgreSQL: hay filas que dicen
+   `volume_cap` y hoy evaluarían `blocked: policy_disabled`, porque su policy se apagó después. Con el
+   criterio laxo, liberar la clave la vuelve a quemar con otra razón —el bucle con otro nombre— y **cada
+   ciclo inútil consume una de las recuperaciones del tope**, así que le gasta el presupuesto a la persona a
+   la que dice ayudar.
+3. **La evidencia sale de `resolveAssignmentIntent`, reusado, NUNCA reimplementado.** El wrapper
+   `resolveLiveAssignmentIntent` carga el snapshot vigente y delega: una sola definición de las siete
+   condiciones. Con una copia, las dos divergen y el supersede empieza a reabrir claves que el assignment
+   vuelve a bloquear.
+4. **Se re-evalúa en el WRITE, no se reusa la evaluación que mostró la cola.** `volume_cap` se auto-cura con
+   una ventana MÓVIL, así que la foto de la pantalla puede caducar entre el clic y la escritura. La
+   evaluación corre bajo el `FOR UPDATE` de la policy, en el mismo instante del write.
+5. **Tope por clave** (`DEAD_END_RECOVERY_CAP = 3`), derivado del ledger contando filas superseded **con
+   outcome recuperable** — las `cancelled` no cuentan: ésas las escribe el otro mecanismo, y sumarlas gastaría
+   el presupuesto de recuperación con actos que no son recuperaciones. Sin columna nueva. Al agotarse, la
+   clave exige intervención humana (espíritu `dead_letter`). Es EL concepto de tope: cuando el carril manual
+   reciba el suyo, sale de la misma derivación contando por `attempt_seq`.
+6. **El supersede NO manda correo ni crea instancia.** Devuelve la fila a
+   `resolveApplicationsAwaitingAssignment`; el intento nuevo sale del camino gobernado de siempre, que es
+   donde vive la decisión de qué se le comunica al candidato. El invariante «ni cero ni dos correos» no se
+   toca.
+7. **NUNCA liberar presupuesto del cap de volumen.** `countAssignedInWindow` no filtra `superseded_at` a
+   propósito: el cap mide CORREOS SALIDOS, y superseder no des-envía nada.
+8. **La procedencia gobierna qué se MUESTRA, no qué puede hacer un humano autorizado.** La cola y la señal
+   excluyen `data_origin <> 'real'` y postulaciones archivadas —sin eso la métrica nacería en 2 por datos de
+   smoke y su steady = 0 sería inalcanzable el primer día—; el command **no** filtra procedencia, mismo
+   criterio con que retención y cumplimiento son ciegos a ella. La exclusión se **reporta**
+   (`dead_ends_excluded_synthetic`), nunca es silenciosa.
+9. **La señal distingue TRES poblaciones.** `recoverable` (la causa ya no aplicaría) alarma como `warning`;
+   `cap_reached` es `error`; y `honest` (la causa sigue vigente) **no alarma** — avisar de algo que nadie
+   puede arreglar todavía entrena a ignorar el tablero entero. Más `dead_ends_evaluation_truncated`, porque
+   el bound de la evaluación no puede ser un cap silencioso.
+
+### Advertencia para quien escriba el próximo gate vivo de este dominio
+
+El gate de esta task **asignó de verdad** en una de sus versiones intermedias: creó la instancia y publicó
+`hiring.assessment.assigned` en estado `pending` —el evento del que cuelga el correo al candidato— apuntando a
+una instancia que el teardown ya había borrado. **El publisher del outbox corre cada 2 minutos sobre la misma
+base compartida por dev, staging y producción**, así que la ventana no es teórica. Se retiró a mano con
+verify-then-delete.
+
+La causa raíz no fue el teardown: el encabezado del test **afirmaba** que el gate nunca llegaba a `assigned`,
+y esa afirmación era cierta cuando se escribió y dejó de serlo cuando el escenario cambió. **Un comentario no
+es una guarda.** Ahora está enforced: la policy se apaga antes del reintento y el test asserta cero
+instancias.
+
+Dos consecuencias operativas para cualquier gate vivo acá: recoger los `assessment_id` **antes** de borrar la
+postulación (caen por cascade, y con ellos se pierde el `aggregate_id` del evento), y **verificar residuo cero
+en dos ejes** — lo que creaste **y** las métricas globales que mutaste. Liberar una clave mete su postulación
+en `awaiting_terminal`, que es ciega a la procedencia (`ISSUE-162`), así que una corrida con residuo subiría
+esa señal de forma permanente y silenciosa.
+
 ## Decisión (resumen ejecutivo)
 
 Greenhouse vincula una `HiringOpening` a una plantilla de assessment mediante una **policy versionada**, y
@@ -354,9 +432,11 @@ nunca se había confirmado. Atarlo al digest sería peor y no equivalente — `t
 material del digest, así que activar una plantilla inactiva lo deja idéntico y un `blocked: template_inactive`
 quedaría en callejón permanente.
 
-**El carril automático NO tiene esta salida.** `stage_auto` no puede escribir `attempt_seq > 1` (lo prohíbe el
-`CHECK`), y su reversa declarada —`superseded_at` por reconciliación— **no tiene write path**. Ése es un hueco
-abierto, dueño `TASK-1771`.
+**El carril automático NO tiene esa salida, y por eso tiene la suya** (`TASK-1771`, ver
+`## Delta 2026-08-23`). `stage_auto` no puede escribir `attempt_seq > 1` —lo prohíbe el `CHECK`, y no se
+relaja— así que su reversa es liberar la clave que ocupa: `supersedeAssignmentDeadEnd` estampa
+`superseded_at` **conservando** `outcome` y `outcome_reason`, con capability de gobernanza, tope por clave y
+la condición de que la asignación HOY ocurriría. El hueco dejó de estar abierto.
 
 **Refactor de `assignCandidateTest`** (`instances.ts:237-303`): se extrae `insertCandidateTest(client, …)` con
 `ON CONFLICT` sobre el índice parcial **ya existente** `hiring_assessment_open_instance_unique_idx`

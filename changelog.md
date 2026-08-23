@@ -3,6 +3,32 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-23 — Cuando el sistema intentaba mandar la prueba solo y se trababa, esa persona quedaba en un limbo que nadie veía
+
+- Si la prueba la asignaba una persona y se bloqueaba, corregir la causa y volver a proponer alcanzaba. Si la
+  iba a mandar el sistema solo, el intento quedaba registrado **reservando el lugar de esa persona en esa
+  vacante** — a propósito, para que un error de configuración no le mande tres veces la misma prueba a alguien.
+  Pero ese lugar reservado no tenía forma de liberarse, y mientras siguiera ahí la postulación **desaparecía de
+  las listas de recuperación**: no porque estuviera resuelta, sino porque el sistema ya había anotado que lo
+  intentó.
+- Lo grave no era que fuera irreversible: era que **las tres superficies que debían delatarlo callaban a la
+  vez**. La cola la excluía, la señal del panel era su espejo exacto, y la métrica que sí la contaba no movía
+  la alarma y además caducaba a las 24 horas. A las 24 h el caso salía hasta de la evidencia mientras la
+  persona seguía trabada.
+- Ahora esas postulaciones aparecen en una lista propia y quien gobierna la prueba de la vacante puede liberar
+  el lugar. Con dos condiciones que la plataforma verifica sola: **sólo se libera si hoy la prueba SÍ se
+  mandaría** —liberar con la causa viva vuelve a bloquear en el acto y gasta uno de los tres intentos de
+  recuperación de esa persona— y **tres recuperaciones por persona y vacante**, tras las cuales el caso pide
+  revisión humana.
+- Liberar **no manda ningún correo**, no borra el motivo del bloqueo y no devuelve cupo al tope de envíos de la
+  vacante: ese tope cuenta correos que ya salieron, y liberar no des-envía nada.
+- El panel distingue dos cosas que no son lo mismo: la que ya se puede destrabar **alarma**, y la que sigue
+  bloqueada por una causa vigente **no** — avisar de algo que nadie puede arreglar todavía es la forma más
+  rápida de que el equipo deje de mirar el tablero.
+- **Todavía no está en producción.** El código está completo y verificado contra la base real; falta el
+  release. Y de paso quedó abierto `ISSUE-162`: la señal de salud vive en amarillo por diez postulaciones de
+  prueba archivadas, no por un defecto real.
+
 ## 2026-08-23 — Las trece etapas del pipeline quedaron en seis, y las que sobran ya no son etapas
 
 - El recorrido de una postulación se describía con trece etapas, y cinco de ellas no decían *dónde está* la
@@ -944,33 +970,3 @@ misma —que opera en Chile, México, Colombia y Perú— es el caso que ese có
 Ahora la resolución vive en un solo lugar y dice la verdad: un mercado resuelve solo, varios exigen
 elegir (con la lista de opciones en la respuesta), y toda lectura declara qué país está sirviendo.
 Las posiciones de países distintos jamás se promedian: son experimentos distintos.
-
-## 2026-08-13 — El módulo SEO deja de leer "volumen: sin dato", y un smoke real destapa una fuga de costo
-
-Durante meses la tabla de oportunidades mostraba las columnas de volumen y dificultad vacías, y eso
-se leía como "falta integrar DataForSEO". Era falso: la cañería estaba desde hace tiempo; lo que
-faltaba eran las columnas donde guardar el agua. Ahora existen, y `market` deja de estar cableado a
-"no disponible".
-
-La decisión de fondo no fue traer el dato sino **dónde vive**. El volumen de una keyword es un hecho
-de la keyword, el país y la fecha — no de si nosotros la seguimos ni de quién la descubrió: "pintura
-industrial" tiene el mismo volumen en Chile para todos los clientes de la cartera. Por eso la tabla
-no cuelga de un target ni del set monitoreado, y nace **multi-productor**: la captura de hoy la llena
-desde un endpoint, y el descubrimiento de keywords y el análisis de competencia que vienen después
-escribirán en la MISMA tabla el dato que ya viene incluido y pagado en sus propias respuestas.
-Guardarlo dos veces habría garantizado que dos pantallas mostraran cifras distintas para lo mismo
-dentro del mismo mes.
-
-La captura corre **una vez al mes**, porque el proveedor refresca una vez al mes: un cron diario
-pagaría treinta veces por el mismo número. Y nace con dos frenos independientes —el cron pausado y
-el flag apagado— porque a diferencia del resto del módulo, esta corrida le paga al proveedor por cada
-fila.
-
-**Lo que enseñó correrlo de verdad.** El smoke con dinero real (USD 0.05 en total) destapó un defecto
-que ningún test con mocks podía ver: una keyword que el proveedor **no tiene** no escribía fila, y
-como el chequeo previo mira filas, esas keywords nunca quedaban "ya consultadas" y se volvían a
-comprar en cada corrida, para siempre. El modelo correcto son tres estados y no dos —nunca
-preguntamos, preguntamos y no hay, demanda cero real— y con eso la segunda corrida pasó a costar
-exactamente cero. Quedó también una observación honesta sin resolver: el proveedor devuelve
-dificultad 0 para cabeceras de alto volumen, y esa columna no se le muestra a un cliente hasta
-contrastarla con otra fuente.

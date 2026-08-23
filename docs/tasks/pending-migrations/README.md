@@ -28,7 +28,17 @@ Guardarlas acá conserva la revisión y el contexto sin poner una mina en el cam
 4. Readback **antes**, `pnpm migrate:up`, readback **después**.
 5. Borrar el `.pending` en el mismo commit que agrega la migración real.
 
-## Lote pendiente — post-release, en este orden
+## Lote pendiente
+
+### TASK-1771 — `COMMENT` de `superseded_at` (agregado 2026-08-23)
+
+`TASK-1771-superseded-at-comment.sql.pending`. El comentario de la columna declara hoy que «NINGÚN write path
+lo escribe todavía», y `supersedeAssignmentDeadEnd` lo desmiente. **Condición: el release que despliega ese
+command a producción ya ocurrió**, verificado contra `origin/main` y no contra el working tree. Antes de eso
+el comentario describiría una capacidad que el runtime desplegado no tiene — el error simétrico de ISSUE-161.
+Riesgo sobre datos: nulo (es metadata). El cuidado va en `migrate:up`, que aplica todas las pendientes.
+
+### Lote histórico — post-release, en este orden
 
 El orden de abajo es **una sola cadena**, no tres listas independientes. Cada eslabón es la
 precondición del siguiente, y saltarse uno rompe el siguiente de forma observable:

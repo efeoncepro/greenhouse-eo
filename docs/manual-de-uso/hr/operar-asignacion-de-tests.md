@@ -1,9 +1,9 @@
 # Operar la asignación de tests por etapa
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-08-17 por Claude (TASK-1719)
-> **Última actualización:** 2026-08-22 por Claude (TASK-1755 — reintento tras corregir la causa)
+> **Última actualización:** 2026-08-23 por Claude (TASK-1771 — desatascar una asignación automática)
 > **Documentación funcional:** [`asignacion-de-tests-por-etapa.md`](../../documentation/hr/asignacion-de-tests-por-etapa.md)
 > **ADR:** [`GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md`](../../architecture/GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md)
 
@@ -115,6 +115,44 @@ La respuesta trae `outcome`:
 - Necesitas ser **People** (`EFEONCE_ADMIN`, `HR_MANAGER` o `EFEONCE_OPERATIONS`). No alcanza con
   poder autorar pruebas.
 
+## Paso a paso — desatascar una asignación automática bloqueada
+
+Cuando el sistema intenta mandar la prueba solo y algo lo bloquea, el intento queda registrado y
+**reserva el lugar** de esa persona en esa vacante. Eso evita que un error de configuración le mande
+la misma prueba tres veces a alguien, pero mientras el lugar siga reservado la postulación
+**desaparece de la lista de recuperación**. Este procedimiento lo libera.
+
+Necesitas `hiring.assessment.policy.govern` — la misma con la que se habilita la asignación
+automática. Es a propósito: quien puede prender el carril es quien puede desatascarlo.
+
+1. **Mira la lista.** La cola `deadEnds` del endpoint de reconciliación:
+
+   ```bash
+   pnpm staging:request /api/hiring/openings/<openingId>/assessment-policy/reconciliation
+   ```
+
+   Cada fila trae su evaluación: si hoy la prueba se mandaría o si la causa sigue viva.
+
+2. **Si dice que la causa sigue vigente, corrígela primero.** El campo te dice cuál es
+   (`policy_disabled`, `template_inactive`, `volume_cap`, `missing_email`…). Liberar sin corregir
+   **no funciona** —la plataforma lo rechaza— y si funcionara sería peor: volvería a bloquear en el
+   acto y habría gastado uno de los tres intentos de esa persona.
+
+3. **Libera el lugar** cuando la evaluación diga que hoy se mandaría:
+
+   ```bash
+   pnpm staging:request POST /api/hiring/openings/<openingId>/assessment-policy/reconciliation/supersede '{"assignmentId":"<hoaa-...>"}'
+   ```
+
+   La respuesta trae `recoveryCount` y `remainingRecoveries`. **Tres recuperaciones por persona y
+   vacante**; al agotarse, el caso pasa a revisión humana.
+
+4. **Manda la prueba por el camino normal.** Liberar **no manda ningún correo**: sólo devuelve la
+   postulación a la cola. El envío sigue siendo proponer → confirmar, con su vista previa.
+
+5. **Verifica.** La postulación debe reaparecer en `awaitingAssignment`, y el registro debe
+   conservar el motivo original del bloqueo — liberar no lo borra.
+
 ## Qué significan los estados
 
 | Estado | Qué pasó | Qué hacer |
@@ -169,6 +207,12 @@ El orden importa y ninguno de estos pasos es opcional:
   cohorte y rompe la comparabilidad. Para eso existe el ajuste razonable.
 - **No anotes el motivo del ajuste en el campo de nota de otra operación** (por ejemplo, cancelando
   y recreando con una nota). El motivo no va en ningún campo de la prueba.
+- **No liberes un lugar reservado sin haber corregido la causa.** La plataforma te lo va a
+  rechazar, y esa negativa es la protección: liberar y volver a bloquear gasta uno de los tres
+  intentos de recuperación de esa persona.
+- **No uses liberar como forma de "reenviar" una prueba.** No manda nada. Si el candidato perdió el
+  acceso a una prueba que YA recibió, eso es recuperación de acceso, otro procedimiento
+  (`recuperar-acceso-a-test-de-candidato.md`).
 
 ## Problemas comunes
 
@@ -181,6 +225,12 @@ El orden importa y ninguno de estos pasos es opcional:
   ```
   Esa lista tiene dos partes: las que todavía se pueden recuperar solas y las que ya avanzaron
   de etapa y necesitan que una persona decida.
+- **"El candidato entró a la etapa, no recibió nada y tampoco aparece esperando"**: es el caso de
+  esta versión. Su intento automático quedó registrado y reservó el lugar. Búscalo en la cola
+  `deadEnds` del mismo endpoint y sigue el procedimiento de desatasco.
+- **"Me rechaza liberar y dice que la causa sigue vigente"**: es correcto, no es un permiso que te
+  falte. La respuesta trae `liveReason` con la causa de HOY, que puede ser distinta de la
+  registrada — por ejemplo quedó anotado `volume_cap` y hoy la política está apagada. Corrige ésa.
 - **"Aparecen asignaciones a medio registrar"**: eso no debería ocurrir nunca. Es un error de la
   plataforma, no de operación. Escala en vez de intentar limpiarlo.
 

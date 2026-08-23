@@ -1,9 +1,9 @@
 # Asignación de tests por etapa
 
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-08-17 por Claude (TASK-1719)
-> **Última actualización:** 2026-08-22 por Claude (TASK-1755 — corregir la causa de un bloqueo devuelve la asignación)
+> **Última actualización:** 2026-08-23 por Claude (TASK-1771 — el carril automático también se puede desatascar)
 > **Documentación técnica:** [`GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md`](../../architecture/GREENHOUSE_HIRING_ASSESSMENT_ASSIGNMENT_POLICY_DECISION_V1.md)
 > **Manual de uso:** [`operar-asignacion-de-tests.md`](../../manual-de-uso/hr/operar-asignacion-de-tests.md)
 
@@ -176,6 +176,57 @@ tiempo que efectivamente tiene, nunca quién se lo dio ni por qué.
   persona decida. Avisarle a alguien "avanzaste" por algo de la semana pasada es peor que
   callar.
 
+## Cuando la asignación automática se queda atascada
+
+Hay una diferencia entre las dos formas de asignar que conviene conocer, porque cambia qué hacer
+cuando algo se traba.
+
+**Si la prueba la asignaste tú y se bloqueó**, corregir la causa y volver a proponer alcanza: la
+plataforma abre un intento nuevo. Eso ya funcionaba.
+
+**Si la prueba la iba a mandar el sistema solo y se bloqueó**, el intento queda registrado y ese
+registro **reserva el lugar de esa persona en esa vacante**. Es a propósito: evita que un error de
+configuración le mande la misma prueba tres veces a alguien. Pero mientras ese lugar siga reservado,
+la postulación **desaparece de las listas de recuperación** — no porque esté resuelta, sino porque
+el sistema ya anotó que lo intentó.
+
+Ése era el problema: la persona quedaba en un limbo que nadie veía.
+
+### Qué cambió
+
+Ahora esas postulaciones **aparecen en una lista propia**, y quien gobierna la prueba de la vacante
+puede **liberar el lugar reservado** para que la persona vuelva a la cola.
+
+Con dos condiciones que la plataforma verifica sola:
+
+1. **Sólo se libera si hoy la prueba SÍ se mandaría.** Si la causa del bloqueo sigue viva —la
+   política sigue apagada, la plantilla sigue inactiva, el tope de envíos sigue lleno—, la
+   plataforma no te deja liberar. No es una traba burocrática: liberar sin corregir vuelve a
+   bloquear en el acto y, peor, gasta uno de los tres intentos de recuperación de esa persona.
+2. **Tres recuperaciones por persona y vacante.** Al agotarlas, el caso pasa a requerir revisión
+   humana en vez de seguir girando.
+
+### Qué NO hace liberar el lugar
+
+- **No manda ningún correo.** Sólo devuelve la postulación a la cola; la prueba se manda después,
+  por el camino de siempre, con su confirmación.
+- **No borra el motivo del bloqueo.** El registro conserva por qué se bloqueó — es la única forma
+  de saber después qué pasó.
+- **No devuelve cupo** al tope de envíos de la vacante: ese tope cuenta correos que ya salieron, y
+  liberar un lugar no des-envía nada.
+
+### Cómo distinguir los dos casos que la lista muestra
+
+| Lo que ves | Qué significa | Qué hacer |
+|---|---|---|
+| **Se puede liberar** | La causa ya no aplica: hoy la prueba se mandaría | Liberar y confirmar el envío por el camino normal |
+| **La causa sigue vigente** | Sigue bloqueada por la misma razón u otra | **Corregir esa causa primero.** Liberar ahora no sirve de nada |
+| **Sin recuperaciones** | Agotó los tres intentos | Revisar el caso a mano: algo estructural está fallando |
+
+El panel de operaciones sólo se pone en amarillo por el **primer** caso. El segundo no alarma a
+propósito: avisar de algo que nadie puede arreglar todavía es la forma más rápida de que el equipo
+deje de mirar el tablero.
+
 ## Qué mirar cuando algo se ve raro
 
 La plataforma vigila sola tres cosas y las muestra en el panel de operaciones:
@@ -185,6 +236,7 @@ La plataforma vigila sola tres cosas y las muestra en el panel de operaciones:
 | Asignaciones a medio registrar | Un proceso murió a mitad de camino. **Nunca debería pasar** | Escalar: es un error de la plataforma, no de operación |
 | Postulaciones esperando su prueba | Llegaron a la etapa y no se les asignó nada | Revisar la lista de recuperación y asignar a mano |
 | Propuestas vencidas sin cerrar | Alguien abre la pantalla y no confirma | Fricción en la experiencia, no corrupción de datos |
+| Asignaciones automáticas atascadas | Reservaron el lugar de alguien y su causa ya no aplica | Liberarlas desde la lista y confirmar el envío |
 
 > Detalle técnico: política y ledger en `src/lib/hiring/assessment/assignment-policy/**`;
 > cancelación en `src/lib/hiring/assessment/cancel.ts`; decisión de comunicación en

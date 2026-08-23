@@ -2,6 +2,45 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-23 — TASK-1771: el carril automático tiene reversa; el gate vivo casi manda un correo
+
+**Estado: `code complete, rollout pendiente`.** Slices 1-4 en `develop` local, sin push: `617d18df7`,
+`146242339`, `d5914c841`, `0f558666a`. Más `ISSUE-162` (`9d1db5252`) y la recalibración de la spec
+(`12868f9c7`). Nada desplegado, así que la task **no se mueve a `complete`**.
+
+**Dos premisas de la spec estaban muertas al empezar, y las dos cambiaban decisiones.** La restricción de
+orden («va ANTES del colapso de `TASK-1754`») ya no aplica: esa task cerró y aplicó su contract. Y las 4 filas
+en callejón **ya no están `closed`** — `TASK-1748` cambió el archivado para sellar `archived_at` en vez de
+escribir la etapa, así que volvieron a cumplir `stage = trigger_stage`. La decisión no cambia (**sin
+backfill**, siguen siendo smoke), pero el filtro de procedencia del reader dejó de ser higiene: sin él la
+métrica nacía en 2 y su steady = 0 era inalcanzable el primer día.
+
+**La condición de avance es «hoy resolvería `assigned`», no «difiere de lo registrado»**, y no es preferencia.
+Ejercitando el resolver real contra PG sobre las cuatro filas: dos dicen `volume_cap` y hoy evaluarían
+`policy_disabled`. Con el criterio laxo el command las libera para volver a quemar la clave con otra razón —
+y cada ciclo inútil **gasta una de las tres recuperaciones de esa persona**, así que le consume el presupuesto
+a quien dice ayudar.
+
+**🔴 El gate vivo asignó de verdad en una versión intermedia** y dejó un `hiring.assessment.assigned` en
+estado `pending` —el evento del que cuelga el correo al candidato— apuntando a una instancia que el teardown
+ya había borrado. El publisher corre **cada 2 minutos sobre la base compartida**. Se retiró con
+verify-then-delete; readback posterior 0. La causa no fue el teardown: el encabezado del test **afirmaba** que
+nunca llegaba a `assigned`, y eso era cierto cuando se escribió. **Un comentario no es una guarda.** Quedó
+enforced (la policy se apaga antes del reintento + assert de cero instancias).
+
+**Un verde falso que vale para todos:** leí «exit 0» de `pnpm typecheck | grep | head` — era el exit del
+`head`. Un import roto pasó como verde. **Nunca leer el exit code de un comando encadenado.** Lo cacé por una
+ausencia en `git diff --cached --stat`, no por un gate.
+
+**Gates:** `pnpm lint` exit 0 · `pnpm typecheck` exit 0 · `src/lib/hiring` + `src/lib/reliability` 1.812
+verdes · gate vivo 2/2 en dos corridas seguidas, `awaiting_terminal` = 13 antes y después. `pnpm test`
+completo y `pnpm build` **no** se corrieron (el build consume ~30 GB y espera autorización).
+
+**Pendiente bloqueante para cerrar:** release + la `Production verification sequence` + la migración del
+`COMMENT` de `superseded_at`, parqueada en `docs/tasks/pending-migrations/` con su condición (**el release que
+despliega el command ya ocurrió**, verificado contra `origin/main`). Aplicarla antes describiría en la base una
+capacidad que el runtime desplegado no tiene — el error simétrico de `ISSUE-161`.
+
 ## 2026-08-23 — TASK-1754 Slice F: el contract está escrito y revisado; falta aplicarlo
 
 **Estado: `code complete, migración pendiente de aplicar`.** `pnpm pg:connect:migrate` quedó bloqueado por
@@ -543,50 +582,3 @@ que en las otras dos el operador seguía la instrucción y volvía a chocar.
 **Estado: nada de esto está en producción.** `develop` tiene además Sonnet 5 de vuelta en el scoring y
 la reconciliación del item del run, ambos sin promover. La promoción exige verificar que el ops-worker
 quede en el SHA nuevo: el scoring corre ahí, no en Vercel.
-
-## 2026-08-19 (tarde) — El rollout ya estaba hecho y la documentación decía lo contrario
-
-**Corrección de estado.** Las entradas de más abajo dicen "nada aplicado: ninguna migración, ningún secreto, ningún
-webhook, ningún flag". Eso dejó de ser cierto a las 13:00 UTC de hoy y **nadie actualizó los documentos**. El peligro no
-era cosmético: un agente siguiendo el runbook al pie habría creado un **segundo webhook** al mismo endpoint (eventos
-duplicados que el dedupe por `svix-id` NO detiene, porque son ids distintos) y publicado una **segunda versión del
-secreto**, rompiendo la verificación del webhook vivo. Corregidos: runbook, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1`,
-ledger de flags, `ISSUE-160`, `TASK-1749` y este Handoff.
-
-**Lo que faltaba de verdad, ya aplicado con readback.** El índice único `uq_email_deliveries_token_intent_v2` (los
-writers que rotan credenciales llevaban horas corriendo **sin** el backstop que el runbook exigía aplicar antes) y el
-CONTRACT de credencial. Sus tres precondiciones se verificaron una por una antes de tocar nada: código en `origin/main`,
-Vercel productivo posterior al merge, y ops-worker en `1438906b8` — un SHA de `develop` que **sí** incluye el writer. La
-confirmación empírica fue mejor que el chequeo de SHA: un assessment creado después del deploy ya nació con
-`access_token_version_id`, y 0 filas violaban el invariante. El guard se probó en transacción revertida y rechaza como
-debe.
-
-**La reconciliación destapó 44 correos que nunca llegaron** — 23 `suppressed` y 21 `bounced` — y después, al mirar los
-destinatarios, que **todos van a dominios internos de Efeonce**: `efeoncepro.com` (23), `efeonce.org` (13),
-`greenhouse.efeonce.org` (7), `efeonce.test` (1). **Cero externos.** Los 8 `hiring_assessment_assigned` fallidos son
-direcciones de prueba/QA, no candidatas. O sea: **el daño temido no ocurrió** y no hay cola de rescate para People.
-Casi lo reporto al revés — el conteo agregado parecía un incidente grave hasta que se miró a quién le llegaba. Lo que el
-dato sí muestra es datos sintéticos y de prueba transitando el pipeline de correo productivo, la misma clase de
-problema que `ISSUE-159`.
-
-**`email.suppressed` no estaba suscrito.** Los 8 eventos registrados omitían justo el noveno — y `recover-email.ts`
-consulta ese estado para bloquear un reenvío ciego. Un falso negativo silencioso en la puerta de recuperación. Ya son 9.
-
-**El smoke externo real ya está probado por tráfico productivo:** la cadena `email.sent` → `email.delivered` se observó
-firmada sobre un `hiring_assessment_assigned` a `gmail.com` — un candidato real, no una casilla interna. Y el
-`email.clicked` firmado sobre un assessment a `hotmail.com` es la **prueba dura** de que el rewrite de links de Resend
-ya opera sobre correos de candidatos: el gate de `click_tracking` que bloquea el flip de enlaces seguros no es teórico.
-
-**Huecos declarados, no cerrados:** 78 despachos de los últimos 30 días quedan sin lifecycle porque su último evento es
-de engagement (`opened`/`clicked`) y el reconciliador prefiere no inferir `delivered` — honesto, pero descarta una señal
-que el `opened` implica; 283 despachos fuera de la ventana de 30 días sin reconciliar por diseño;
-`redrivePendingResendWebhookEvents` sigue sin caller automático; no se ejercitó un replay real del proveedor.
-
-**`mail.efeoncepro.com`: el DNS está perfecto, Resend no lo confirma.** DKIM publicado con valor idéntico byte a byte,
-SPF y MX en su lugar; el dominio sigue `pending`. Aprendizaje operativo: **re-disparar `POST /verify` resetea los tres
-registros a `pending`** — hay que esperar, no reintentar. Cuando verifique, mover el remitente de Hiring ahí desbloquea
-el flip de enlaces seguros **sin** apagar el `click_tracking` del apex, que marketing usa. Es la salida limpia al gate
-que hoy bloquea `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`.
-
-**Estado: TASK-1745 complete e ISSUE-160 resuelto. TASK-1746 sigue in-progress** — le faltan los dos smokes funcionales
-(requieren una candidata con consentimiento, decisión humana) y el flip de enlaces seguros. TASK-1747 quedó desbloqueada.
