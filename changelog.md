@@ -3,6 +3,13 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-23 — Los follow-ups de Hiring quedaron vivos en producción
+
+- El eje de desenlace, el vocabulario de seis etapas, el filtro de procedencia del archivo sintético, el callejón de intentos del assessment y el predicado único de «proceso activo» pasaron a producción en el release `709e15f6688e` (PR #206, 140 archivos, 5 migraciones).
+- El monitor de equidad **sigue apagado a propósito**: su etapa por defecto quedó retirada por el contract nuevo, así que prenderlo hoy devolvería cero en silencio — y un cero silencioso en una métrica de equidad se lee como «no hay impacto adverso», que es lo contrario de lo que sabemos.
+- Producción quedó verificada más allá del health check: cero errores nuevos en Sentry, 321 eventos de outbox publicados desde el despliegue sin ninguno atascado, y las seis etapas renderizando en el pipeline con sesión real.
+- De paso se corrigieron dos instrucciones equivocadas de la propia documentación de release: la que verifica el worker de operaciones miraba una lista de rutas que ya no existe, y la receta del merge podía duplicar texto en los manuales sin que ninguna verificación lo notara.
+
 ## 2026-08-23 — Application 360 vuelve al pipeline de la vacante que corresponde
 
 - La pestaña `Pipeline` ahora funciona como retorno contextual desde cualquier postulación: deriva la vacante desde `application.openingId`, en vez de caer en la vacante más reciente.
@@ -930,15 +937,3 @@ falta hace.
 
 Salió de intentar construir el workbench de discovery (TASK-1665) y descubrir que dos de sus
 acciones citaban un contrato que no existía. Desbloquea la lente de Objetivos.
-
-## 2026-08-14 — La auditoría del oficio afinó el discovery y el puente antes de congelarlos (TASK-1664/1666)
-
-Una tri-auditoría con las skills de SEO/AEO revisó los dos cierres del día y encontró lo que los
-tests verdes no ven: el set "grounded" real había perdido una seed completa y traía un competidor
-con nombre y apellido. Ahora la cobertura por seed se **verifica** (el draft declara qué candidatos
-quedaron sin huella y lo advierte al revisor), los nombres literales se normalizan a placeholders,
-y un set degenerado cae honesto al baseline. En el discovery, el inbox ordena primero la
-oportunidad medida (lo que el sitio ya recibe y no sigue), el desempate usa la barrera de enlaces
-canónica en vez del KD que colapsa en es-LATAM, y repetir el mismo intent en un mes nuevo vuelve a
-descubrir (antes quedaba congelado para siempre). Todo corregido el mismo día, antes de que el
-workbench (TASK-1665) congelara el contrato.

@@ -252,6 +252,15 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   commit de squash. Estado de workers: `pnpm release:workers`. Contrato en
   `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` §check #4 + skill `greenhouse-production-release` (espejada
   `.claude`/`.codex`).
+- **Dos correcciones al procedimiento de release (2026-08-23, release `709e15f6688e`)**, aplicadas en
+  skill (ambos espejos) y runbook: (1) la lista de rutas para verificar el residual change-gated del
+  `ops-worker` **se lee del array `WORKER_RUNTIME_PATHS` de `.github/workflows/ops-worker-deploy.yml`,
+  nunca se transcribe** — la copia que arrastraban los docs tenía 7 entradas y omitía
+  `src/lib/reliability`, `src/lib/hiring/talent-pool` y `src/lib/sync`, devolviendo «vacío» sin haber
+  mirado; (2) en el merge canónico `main → develop`, con `main ⊆ develop` el default es **`-s ours`**,
+  no `-X ours`: éste último sólo decide los hunks en conflicto y puede **duplicar contenido documental
+  en silencio**, algo que las dos verificaciones duras no ven porque miran sólo rutas de código. La
+  auditoría correcta de un `-X ours` es `git diff HEAD@{1} HEAD --name-status` completo.
 - Staging/preview y producción tienen configuración separada. Flags, secrets y migraciones deben verificarse
   en cada runtime consumidor, no solo en Vercel.
 - El checkout compartido actual es el único entorno de ejecución autorizado. Nunca crear, usar ni tocar

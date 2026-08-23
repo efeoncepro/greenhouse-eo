@@ -239,11 +239,18 @@ Secuencia (comandos exactos + verificaciones en el runbook §2.4):
 ```bash
 # A — Gotcha #1: merge canónico en develop ANTES de crear el PR
 git fetch origin && git switch develop
-git merge origin/main -X ours --no-edit
-#   -X ours NO resuelve modify/delete: esos se deciden a mano, develop manda.
-#   git status --short | grep '^DU\|^UD'  →  git rm <ruta-que-main-resucita>
-git log origin/main --not HEAD --oneline                        # debe salir vacío
-git diff HEAD@{1} HEAD -- src/ scripts/ services/ migrations/   # debe salir vacío
+git log origin/main --not HEAD --oneline    # V1 PRIMERO: ¿main tiene commits propios?
+
+# V1 vacía (caso normal) → `-s ours` es el DEFAULT: árbol de develop EXACTO, nada que auditar.
+git merge origin/main -s ours --no-edit
+git diff HEAD@{1} HEAD --stat               # debe salir TOTALMENTE vacío
+
+# V1 NO vacía → recién ahí `-X ours`, y con auditoría COMPLETA (no sólo código):
+#   git merge origin/main -X ours --no-edit
+#   git status --short | grep '^DU\|^UD'   →  git rm <ruta-que-main-resucita>
+#   git diff HEAD@{1} HEAD --name-status    ← mirar TODO lo que trajo el merge
+#   git diff HEAD@{1} HEAD -- src/ scripts/ services/ migrations/   # debe salir vacío
+
 git push origin develop     # → el PR queda MERGEABLE
 
 # B — Gotcha #2: marker SOLO si el acoplamiento es real (ISSUE-114 resuelta 2026-08-08:
@@ -260,6 +267,14 @@ gh pr merge <pr> --squash --body "[release-coupled: <por qué conviven los domin
 # C — Gotcha #3: producir el smoke sobre main en vez de bypassearlo (~3 min)
 gh workflow run playwright.yml --ref main
 ```
+
+> 🔴 **Delta 2026-08-23 (release `709e15f6688e`): `-X ours` duplica contenido documental y las dos
+> verificaciones duras NO lo ven.** Salieron ambas vacías y el merge igual resucitó 8 archivos de
+> tasks en su ubicación de lifecycle vieja **y duplicó un bloque de 10 líneas de un manual que
+> `develop` ya tenía** — `-X ours` sólo decide los hunks en conflicto, y un hunk de `main` que
+> aplica limpio en otra parte del archivo entra como adición silenciosa. Las verificaciones miran
+> `src/ scripts/ services/ migrations/`, así que la prosa duplicada pasa. La que lo caza es
+> `git diff HEAD@{1} HEAD --name-status` completo. Por eso el default ahora es `-s ours`.
 
 Después: esperar `CI` + `CI Deep Verification` + Vercel `Ready` **para el SHA de
 `main`** + el smoke recién disparado; piso duro de **8 min** desde el push antes
@@ -287,8 +302,17 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
 3. **`playwright_smoke` (0 runs) + evidencia aún corriendo en el squash commit fresco de `main`.** El smoke corre en `develop` (ya verde); el commit de `main` no tiene su propio smoke. Antes del primer dispatch, esperar `CI`, `CI Deep Verification` y Vercel Production `READY` para el SHA exacto.
    **Resolución verificada 2026-08-06 — la alternativa HONESTA al bypass es producir el check:** `gh workflow run playwright.yml --ref main` sobre el SHA de `main` y esperar verde. Tardó **3m10s** (run `31057847351`). Ése es el costo total de no bypassear nada. Un `bypass_preflight_reason` forense (≥20 chars) queda reservado para cuando el smoke **falla por infraestructura** y el operador lo autoriza; nunca para ahorrarse 3 minutos, y nunca para cubrir checks pendientes o fallidos.
 
-4. **ops-worker puede quedar con GIT_SHA rezagado tras el release — NO es drift si el diff runtime está vacío.** `ops-worker-deploy` es *change-gated*: si ningún worker-runtime-path cambió desde `EXPECTED_SHA`, salta el rebuild (`deploy_needed=false`) y el servicio conserva el SHA del último deploy que sí tocó código de worker (código idéntico al target, por diseño — ver el step de worker-drift del workflow). Si el watchdog final marca solo `ops-worker`, comparar Cloud Run `GIT_SHA` contra `target_sha` en rutas runtime; si `git diff --name-only <cloud_run_git_sha> <target_sha> -- package.json pnpm-lock.yaml tsconfig.json services/ops-worker scripts/ops-worker src/lib/ops src/lib/release` no devuelve archivos y Cloud Run está `Ready=True`, parar: documenta residual de label y **NO** fuerces redeploy para "alinear el label". Los otros 3 workers sí redeployan al target.
-   **Delta 2026-08-06 — el watchdog YA clasifica bien este residual.** Hasta el release `503186d7147a` (2026-07-17) lo reportaba como `severity=error` por comparación mecánica de SHA, y cada agente tenía que refutarlo a mano. El fix vive en el commit `6f7e246ea` de `main`: en el release `70e912056273` el `ops-worker` quedó en `558558263e80` (un SHA de `develop` del mismo día), con diff de rutas runtime vacío y `Ready=True`, y el watchdog reportó **`drift_count=0`** explicándolo en su propio `detail` (`change-gated — rutas runtime sin cambios`). Consecuencia: si hoy ves `severity=error` por `ops-worker` con diff vacío, **no lo asumas benigno por costumbre** — verifica que estás corriendo el reader del `main` actual. El `git diff` de arriba sigue siendo la verificación que manda.
+4. **ops-worker puede quedar con GIT_SHA rezagado tras el release — NO es drift si el diff runtime está vacío.** `ops-worker-deploy` es *change-gated*: si ningún worker-runtime-path cambió desde `EXPECTED_SHA`, salta el rebuild (`deploy_needed=false`) y el servicio conserva el SHA del último deploy que sí tocó código de worker (código idéntico al target, por diseño — ver el step de worker-drift del workflow). Si el watchdog final marca solo `ops-worker`, comparar Cloud Run `GIT_SHA` contra `target_sha` en rutas runtime; si el diff **contra la lista real del gate** no devuelve archivos y Cloud Run está `Ready=True`, parar: documenta residual de label y **NO** fuerces redeploy para "alinear el label". Los otros 3 workers sí redeployan al target.
+   **Delta 2026-08-06 — el watchdog YA clasifica bien este residual.** Hasta el release `503186d7147a` (2026-07-17) lo reportaba como `severity=error` por comparación mecánica de SHA, y cada agente tenía que refutarlo a mano. El fix vive en el commit `6f7e246ea` de `main`: en el release `70e912056273` el `ops-worker` quedó en `558558263e80` (un SHA de `develop` del mismo día), con diff de rutas runtime vacío y `Ready=True`, y el watchdog reportó **`drift_count=0`** explicándolo en su propio `detail` (`change-gated — rutas runtime sin cambios`). Consecuencia: si hoy ves `severity=error` por `ops-worker` con diff vacío, **no lo asumas benigno por costumbre** — verifica que estás corriendo el reader del `main` actual. El `git diff` sigue siendo la verificación que manda — **pero con la lista correcta**: ver el aviso de abajo.
+   🔴 **La lista de rutas se LEE del workflow, nunca se transcribe (verificado 2026-08-23, release `709e15f6688e`).** El gate real es el array `WORKER_RUNTIME_PATHS` de `.github/workflows/ops-worker-deploy.yml`, hoy con ~28 entradas — incluye `src/lib/reliability`, `src/lib/hiring/talent-pool`, `src/lib/hiring/notifications`, `src/lib/hiring/assessment/public-session`, `src/lib/sync` y `src/lib/growth/forms`. La lista de 7 entradas que esta skill y el runbook arrastraban **no existe en ningún gate** (`src/lib/ops` y `scripts/ops-worker` ni siquiera figuran en el array). Con ella, un batch que tocaba tres rutas del gate real dio «vacío» sin haber mirado ninguna de las tres. Comando canónico:
+
+   ```bash
+   PATHS=$(sed -n '/WORKER_RUNTIME_PATHS=(/,/^          )/p' \
+     .github/workflows/ops-worker-deploy.yml | sed '1d;$d' | tr -d ' ')
+   git diff --name-only <cloud_run_git_sha> <target_sha> -- $PATHS
+   ```
+
+   Y antes de concluir «vacío», correr el mismo diff **sin** el `--` como sanity: un diff vacío porque el SHA no resolvió se ve idéntico a uno vacío porque no hay drift.
 
 5. **Vercel Ignored Build Step no aplica a production/main.** Desde 2026-07-08,
    `vercel.json` puede cancelar builds docs-only de `develop`/previews mediante

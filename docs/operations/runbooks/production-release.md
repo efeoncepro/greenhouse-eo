@@ -277,13 +277,34 @@ git status --short                    # árbol limpio; el checkout es compartido
 git fetch origin
 
 git switch develop
-git merge origin/main -X ours --no-edit
+git log origin/main --not HEAD --oneline    # V1 primero: ¿main tiene commits propios?
+
+# V1 VACÍA (el caso normal) → `-s ours` es el DEFAULT: árbol de develop EXACTO.
+git merge origin/main -s ours --no-edit
+git diff HEAD@{1} HEAD --stat               # debe salir TOTALMENTE vacío
+
+# V1 NO vacía → recién ahí `-X ours`, y con auditoría completa del resultado.
+#   git merge origin/main -X ours --no-edit
 ```
 
 `develop` es autoritativo: contiene todo `main` por construcción, porque los
-squash de `main` son DE commits de `develop`. `-X ours` resuelve los conflictos
-de contenido a favor de `develop` **automáticamente**, pero **no** resuelve los
-conflictos `modify/delete`: esos quedan detenidos y hay que decidirlos a mano.
+squash de `main` son DE commits de `develop`. Con `main ⊆ develop` (V1 vacía),
+`-s ours` deja el árbol de `develop` byte a byte y no hay nada que auditar.
+
+`-X ours` es la excepción, para cuando `main` sí tiene commits propios que
+conservar. Resuelve los conflictos de contenido a favor de `develop`
+**automáticamente**, pero **no** resuelve los conflictos `modify/delete`: esos
+quedan detenidos y hay que decidirlos a mano.
+
+> 🔴 **Delta 2026-08-23 (release `709e15f6688e`): las dos verificaciones duras de más abajo NO
+> cubren la duplicación de contenido documental, y `-X ours` puede producirla.** Ambas salieron
+> vacías y el merge igual había (a) resucitado 8 archivos de tasks en su ubicación de lifecycle
+> vieja y (b) **duplicado un bloque de 10 líneas del manual de Hiring Desk que `develop` ya tenía**.
+> Causa: `-X ours` sólo decide los hunks EN CONFLICTO; un hunk de `main` que aplica limpio en otra
+> parte del archivo entra como adición silenciosa. Las verificaciones no lo ven porque miran
+> `src/ scripts/ services/ migrations/`. La que sí lo caza es
+> `git diff HEAD@{1} HEAD --name-status` **completo** — mirar TODO lo que el merge tocó, no sólo el
+> código. Por eso el orden de arriba invierte el default a `-s ours`.
 
 **Caso real 2026-08-06 (modify/delete):** `TASK-1590` estaba **borrada** en
 `develop` (se había movido de `to-do/` a `in-progress/`) y **modificada** en
@@ -526,11 +547,31 @@ release sea runtime-equivalente. Antes de re-disparar workflows individuales,
 comparar el SHA servido por Cloud Run contra el target del release solo en las
 rutas runtime del worker:
 
+> ⚠️ **La lista de rutas NO se copia de este doc: se lee del workflow.** El gate real vive en
+> el array `WORKER_RUNTIME_PATHS` de `.github/workflows/ops-worker-deploy.yml` (hoy ~28 entradas,
+> entre ellas `src/lib/reliability`, `src/lib/hiring/talent-pool`, `src/lib/hiring/notifications`,
+> `src/lib/hiring/assessment/public-session`, `src/lib/sync`, `src/lib/growth/forms`). Este runbook
+> arrastró durante meses una lista de 7 entradas que **no existe en ningún gate** — `src/lib/ops` y
+> `scripts/ops-worker` ni siquiera figuran en el array real. Un diff con la lista corta devuelve
+> «vacío» sin haber mirado las rutas que sí importan, y ese vacío se lee como «no hay drift».
+> Verificado el 2026-08-23 (release `709e15f6688e`): el batch tocaba tres rutas del gate real y la
+> lista corta las omitía a las tres.
+
+Extraer la lista del workflow y usarla, en vez de transcribirla:
+
 ```bash
-git diff --name-only <cloud_run_git_sha> <release_target_sha> -- \
-  package.json pnpm-lock.yaml tsconfig.json \
-  services/ops-worker scripts/ops-worker src/lib/ops src/lib/release
+# 1) leer el array canónico (fuente única)
+sed -n '/WORKER_RUNTIME_PATHS=(/,/^          )/p' .github/workflows/ops-worker-deploy.yml
+
+# 2) diff con esa lista exacta
+PATHS=$(sed -n '/WORKER_RUNTIME_PATHS=(/,/^          )/p' \
+  .github/workflows/ops-worker-deploy.yml | sed '1d;$d' | tr -d ' ')
+git diff --name-only <cloud_run_git_sha> <release_target_sha> -- $PATHS
 ```
+
+**Sanity obligatorio antes de concluir «vacío»:** correr el mismo `git diff` sin el `--` para
+confirmar que los dos SHA existen y que el rango sí contiene cambios. Un `git diff` que devuelve
+vacío porque el SHA no resolvió se ve idéntico a uno que devuelve vacío porque no hay drift.
 
 Si el comando no devuelve archivos, el workflow summary indica
 `deploy_needed=false`, Cloud Run esta `Ready=True` y el resto del release esta

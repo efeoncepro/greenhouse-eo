@@ -2,6 +2,58 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-23 — Release a producción `709e15f6688e`: los follow-ups de Hiring quedaron vivos
+
+**Estado: `released`.** Manifest `709e15f6688e-639df794-8604-4053-8fcf-d2419cfedcc4`, orquestador
+`32668879867` (un solo run, sin retry), PR #206 squash a `main` como
+`709e15f6688e521549c0376f11b08340737f37a7`. 140 archivos, 73 de código, 5 migraciones. Segundo
+release del día, sobre el `304371f73407` de la madrugada.
+
+**Qué quedó vivo en producción:** contract del enum de decisión e invariante de cerrado (TASK-1765),
+contract del vocabulario de etapas (TASK-1754), backfill del archivo sintético sobre el eje nuevo y
+allowlist de la purga (TASK-1748), callejón de intentos en la asignación de assessment (TASK-1755),
+predicado canónico de proceso activo con su señal de reliability (TASK-1772) y las fronteras del
+EPIC-011 (TASK-1773).
+
+**Sin flags que prender.** `HIRING_FAIRNESS_MONITOR_ENABLED` **queda OFF a propósito**: TASK-1754
+Slice F le puso condición de retiro explícita hasta que cierre TASK-1365, porque su default
+`input.stage ?? 'selected'` apunta a una etapa que el contract retiró y devolvería **cero en
+silencio** en una métrica de equidad — que se lee como «no hay impacto adverso», la conclusión
+contraria a la verdad.
+
+**Evidencia de estabilidad (no sólo el health check):** watchdog 3/3 signals `ok` con
+`drift_count=0`; `/api/auth/health` 200 con los tres providers `ready`; Vercel
+`dpl_HRDEBU5MDSTswRjX6V6bWPGK4Det` Ready y aliased a `greenhouse.efeoncepro.com`; Sentry con **cero
+issues activos** en la ventana del release; **321 eventos de outbox `published`** desde el dispatch,
+sin `dead_letter` ni backlog >10min; **145 eventos reaccionados con `con_error=0`**. Los `degraded`
+del dashboard de operaciones se verificaron por timestamp y son fallos de **abril–mayo 2026** —
+deuda previa, no del release. `ops-worker` quedó change-gated en `181aaf4f75ca` con diff vacío
+contra la lista real del gate y `Ready=True`: residual de etiqueta, no drift.
+
+**Render verificado con sesión, no sólo con un 307.** Como el árbol de `main` y `develop` quedó
+idéntico (`b34bca9490…`), staging sirve el mismo código: `/agency/hiring/pipeline` responde HTTP 200
+sin marcadores de error y con las **seis etapas** de TASK-1754 en el HTML.
+
+**Dos defectos de la documentación de release corregidos en este mismo cierre:**
+
+1. **El comando que verifica el `ops-worker` usaba una lista de rutas que no existe en ningún gate.**
+   Skill y runbook arrastraban 7 entradas (`src/lib/ops` y `scripts/ops-worker` ni siquiera figuran
+   en el array real); el gate son las ~28 de `WORKER_RUNTIME_PATHS` en `ops-worker-deploy.yml`,
+   entre ellas `src/lib/reliability`, `src/lib/hiring/talent-pool` y `src/lib/sync` — **las tres
+   tocadas por este release**. La lista corta devolvía «vacío» sin haber mirado. Ahora el comando
+   **extrae la lista del workflow** y exige un sanity sin `--`, porque un diff vacío por SHA no
+   resuelto se ve igual que uno vacío por ausencia de drift.
+2. **`-X ours` duplicó contenido documental y las dos verificaciones duras no lo vieron.** Salieron
+   ambas vacías y el merge igual resucitó 8 tasks en su lifecycle viejo y duplicó un bloque de 10
+   líneas del manual de Hiring Desk que `develop` ya tenía: `-X ours` sólo decide los hunks en
+   conflicto, y uno de `main` que aplica limpio en otra parte entra como adición silenciosa. Se
+   resolvió con `git reset --hard HEAD@{1}` + `git merge origin/main -s ours`. **El default del Paso
+   A pasa a ser `-s ours` cuando `main ⊆ develop`**, y la auditoría correcta es
+   `git diff HEAD@{1} HEAD --name-status` completo, no sólo las rutas de código.
+
+Tiempos en `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` (~1h10m E2E, workflow 12m45s,
+manifest 9m50s). Skills Claude/Codex actualizadas en paridad total.
+
 ## 2026-08-23 — Hiring: retorno contextual Application 360 → Pipeline implementado localmente
 
 **Estado: `code complete, rollout pendiente`; sin commit, push ni release.** La pestaña persistente `Pipeline`
@@ -532,51 +584,3 @@ y recovery parcial. `backup_selected`/`on_hold` se muestran aparte. La frase de 
 consentimiento futuro vigente; `data_origin` no gatea comunicaciones. TASK-1689 queda histórica y TASK-1721 ahora
 apunta a estos owners. Estado: **diseño/documentación; ADR Proposed; sin código, migración, flag ni envío nuevo**.
 Siguiente paso: aceptar/ajustar el ADR, tomar TASK-1762 y después TASK-1763.
-
-## 2026-08-21 — TASK-1761 formaliza Hiring → Microsoft Entra; implementación bloqueada por ADR y gates P0
-
-Se creó `TASK-1761` dentro de `EPIC-011` y el ADR Proposed
-`GREENHOUSE_HIRING_ENTRA_WORKFORCE_ACCOUNT_PROVISIONING_DECISION_V1.md`. La decisión propone API-driven inbound
-provisioning con app dedicada: cuenta disabled-first desde `principal_bound`, reconciliación de provisioning logs,
-OID binding al mismo principal antes del SCIM de retorno, y enable/grupo/licencia sólo después de
-`workforce_enabled`, approval y capacidad verificada. TASK-1721 observa checkpoints; 770/1731 mantienen sus
-owners; 872 conserva Entra → Greenhouse; 1349 entrega el hecho de baja y 1761 compensa en Microsoft.
-
-Dos gates P0 salieron de la revisión adversarial: `src/lib/entra/profile-sync.ts` hoy convierte
-`accountEnabled=false` en `client_users.active=false`, por lo que una precreación segura podría apagar `/my`; y
-meter la cuenta al grupo SCIM antes de ligar el OID puede crear otro principal/member. Ambos se convirtieron en
-precondiciones de canary con negative/roundtrip tests. Email/UPN no son anchor; `202` no es éxito; rollback exige
-disable/revoke/remove group-license y no sólo flag OFF.
-
-Azure CLI fue read-only. El tenant tiene Entra P1 consumido 1/1, Microsoft 365 Business Premium consumido 6/6,
-ningún grupo con licencias y `Efeonce Group` no es security-enabled. La identidad inbound puede diseñarse, pero
-M365 readiness queda bloqueada/unknown hasta readback comercial y de assignment. TAP también quedó unknown por 403. Estado: **diseño formalizado; ADR Proposed; ningún código/runtime/Azure mutado**. Siguiente paso: aceptar o
-ajustar el ADR y luego tomar TASK-1761 con goal + task hook.
-
-## 2026-08-21 — Confiabilidad: hallazgos medidos contra runtime; dos umbrellas superseded por EPIC-041
-
-Codex venía reportando hace semanas dos hallazgos de confiabilidad (`wh-sub-notifications` con dead-letters `401` y
-dos handlers `contract_mrr_arr` fallidos). Al medirlos contra PostgreSQL el 2026-08-21 resultó que **son los dos
-menos urgentes**, que **siete hallazgos previos estaban mal calibrados o eran falsos positivos**, y que el problema
-más caro no aparecía en ningún reporte porque el módulo de confiabilidad lo muestra en verde.
-
-`TASK-1432` (2026-07-18) y `TASK-1710` (2026-08-15) describían el mismo incidente con un mes de diferencia, sin
-referenciarse, con cero commits y cero tasks hijas. Ambas quedan **superseded** por `EPIC-041`, que conserva el
-baseline medido y fechado, la tabla de falsos positivos y el orden de ejecución.
-
-Correcciones que importan para quien retome: el bridge income→HubSpot **nunca se terminó de construir** — su
-endpoint receptor `/invoices` no existe en ninguna rama y 80 de 84 incomes vienen de Nubox, que nunca traerá
-anchors; no hay `CLP 141.562.545` perdidos, hay ruido P3. La tasa PPM **es correcta** (`0,125%` confirmada por el
-operador); lo obsoleto es el campo `notes` de `ppm_rate_config`, que produjo una falsa alarma de P0. Las
-notificaciones **sí funcionan hoy** (7 días de actividad, 100% `sent`); los únicos avisos huérfanos son
-`member.created` y `compensation_version.created`, y el conteo dio 12 y **1** respectivamente, ambos sin eventos
-desde el 2026-06-26.
-
-Se descartó además un fix que parecía obvio: sacar `skipped` de `isSuccessOutcome` en `handler-health.ts` **no
-habría arreglado nada** — sólo 4 filas en toda la tabla empiezan con `skipped`, y los 9.001 falsos éxitos los
-produce `no-op`. Ese análisis también expuso que **no existe ni un test** de `recordHandlerOutcomes` ni de
-`classifyOutcome`, y que la llamada está envuelta en un `try/catch` que sólo hace `console.warn`.
-
-Estado: **documentación completa, ejecución no iniciada**. Ningún cambio de código, ninguna mutación de datos,
-ningún flag tocado. Siguiente paso: `TASK-1760` (cablear las projections de PPM y retenciones), único carril cuyo
-daño crece. Owner sin asignar.
