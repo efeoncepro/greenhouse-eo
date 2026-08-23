@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-011`
-- Status real: `Slices A-E en produccion (release 304371f73). Slice F EJECUTADO 2026-08-23 y code complete: enum en 6, copy, carriles, readers y migracion del contract escritos y verdes en local. La migracion NO esta aplicada: pnpm pg:connect:migrate quedo bloqueado por el clasificador de permisos y espera autorizacion del operador, asi que el CHECK de la base sigue admitiendo las 13 etapas`
+- Status real: `COMPLETA 2026-08-23 — Slices A-F. El contract se aplico contra la instancia compartida: el CHECK de stage paso de 13 a 6 valores y `stage-enum-check-parity.live.test.ts` pasa 4/4 (no skipped), o sea que el enum TS y el CHECK son el mismo contrato`
 - ADR: `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md`
 - Rank: `TBD`
 - Domain: `hr`
