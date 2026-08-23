@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-011`
-- Status real: `code complete, rollout pendiente` — Slices 1 y 2 en `develop` local; faltan los DOS runtimes (Vercel para los readers, `ops-worker` para la projection), que son la precondición de la migración parqueada. Slice 3 con doble bloqueo: sign-off del operador + esa migración.
+- Status real: `rollout COMPLETO 2026-08-23: Slices 1 y 2 en producción y backfill aplicado (32 sintéticas de `stage=closed` a `archived_at`, cero en closed)` — Slices 1 y 2 en `develop` local; faltan los DOS runtimes (Vercel para los readers, `ops-worker` para la projection), que son la precondición de la migración parqueada. Slice 3 con doble bloqueo: sign-off del operador + esa migración.
 - Rank: `TBD`
 - Domain: `hr|data`
 - Blocked by: `none` (DESBLOQUEADA 2026-08-22: `archived_at` ya existe en `hiring_application`. La relación se invirtió — ahora esta task **bloquea** el `CHECK` del invariante de `TASK-1765`, que espera a que sus 32 filas salgan de `closed`)

@@ -24,7 +24,8 @@
 - Status real: `Diseño — los dos conteos medidos contra PostgreSQL real 2026-08-22 (50 por etapa, 82 por desenlace); la deuda se declaró en TASK-1765 con una condición que se verificó incompleta`
 - Rank: `TBD`
 - Domain: `hr`
-- Blocked by: `TASK-1748` (su backfill mueve las 32 filas) y `TASK-1765` Slice 5 (el `CHECK` del invariante)
+- Blocked by: `none`
+- Nota de desbloqueo (2026-08-23): las dos dependencias cerraron — las 32 filas ya llevan `archived_at` y el `CHECK` del invariante está aplicado, así que los dos predicados convergen. Convergen al valor equivocado, que es exactamente lo que esta task corrige
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

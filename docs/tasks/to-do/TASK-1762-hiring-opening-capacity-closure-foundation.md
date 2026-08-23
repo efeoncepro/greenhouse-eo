@@ -20,7 +20,8 @@
 - Status real: `ADR Proposed enmendado por el ADR de vocabulario (2026-08-22); implementación y rollout inexistentes`
 - Rank: `TBD`
 - Domain: `hr|data|ops`
-- Blocked by: `TASK-1765 (eje de desenlace + causa gobernada); aceptación de GREENHOUSE_HIRING_OPENING_CAPACITY_CLOSURE_DECISION_V1`
+- Blocked by: `aceptación de GREENHOUSE_HIRING_OPENING_CAPACITY_CLOSURE_DECISION_V1`
+- Nota de desbloqueo (2026-08-23): el eje de desenlace y la causa gobernada están en producción; sólo queda la decisión de arquitectura
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

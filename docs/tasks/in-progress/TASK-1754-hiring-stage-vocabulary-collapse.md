@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-011`
-- Status real: `Slices A-E en develop y NO en produccion; expand APLICADO contra la instancia compartida (qualified 7 -> 0); Slice F bloqueado por TASK-1765 en produccion`
+- Status real: `Slices A-E en produccion (release 304371f73). Slice F DESBLOQUEADO 2026-08-23 —TASK-1765 Slice 5 aplicado— y NO ejecutado: el CHECK de stage sigue admitiendo las 13 etapas y la migracion del contract no esta escrita`
 - ADR: `docs/architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md`
 - Rank: `TBD`
 - Domain: `hr`

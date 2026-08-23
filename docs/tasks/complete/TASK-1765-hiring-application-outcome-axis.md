@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-011`
-- Status real: `Slices 1-3 + 6 aplicados 2026-08-22 (expand, command con causa, cierre por tipo, señal, docs). Slice 4 (contract del enum) y Slice 5 (CHECK del invariante) POST-RELEASE en docs/tasks/pending-migrations/`
+- Status real: `rollout COMPLETO 2026-08-23: Slice 4 (contract del enum, seis desenlaces) y Slice 5 (CHECK del invariante, readback 1 → 0) aplicados contra la instancia compartida`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
