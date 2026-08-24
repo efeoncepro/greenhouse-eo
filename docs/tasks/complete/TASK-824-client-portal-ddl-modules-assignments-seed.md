@@ -81,6 +81,27 @@ Cinco correcciones estructurales al spec V1.0 original (1 bloqueante + 4 polish)
 
 Spec arquitectónica `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` bump v1.1 → v1.2 con Delta correspondiente al §5.1 (rename + COMMENT canónico).
 
+## Delta 2026-08-24 — drift DB→TS detectado por su propio guard (la task está `complete`, el drift no)
+
+Hallazgo abierto desde `TASK-1130`. `data-sources/parity.live.test.ts` —el guard que esta task
+dejó— está **rojo**, y en la dirección más peligrosa de las dos:
+
+**Hay 3 `data_sources` sembrados en la base que el union TS no reconoce:** `commercial.proposals`,
+`growth.ai_visibility`, `growth.seo`.
+
+El drift TS→DB (código que declara algo que la base no tiene) falla al escribir y se nota. **Este es
+el inverso:** la base tiene habilitado algo que el código no sabe resolver, así que un portal cliente
+puede quedar con un módulo asignado que la aplicación no renderiza — y eso no falla en el escritor,
+falla frente al cliente.
+
+El mensaje del guard dice la salida: *«agregar al TS union o corregir seed via migration nueva»*. La
+decisión no es mecánica — hay que determinar, por cada uno, si el módulo debe existir para el portal
+(entonces va al union) o si el seed se adelantó a su consumidor (entonces se corrige el seed).
+
+**Esta task está `complete`, así que el trabajo no tiene dueño activo.** `TASK-1130` lo rastrea en su
+Slice 4 mientras tanto; si al tomarlo resulta ser más que un union, merece task propia. Reproducible:
+`pnpm test:live src/lib/client-portal` — falla también aislado, no es contención.
+
 ## Summary
 
 Crea el schema `greenhouse_client_portal` con 3 tablas (`modules`, `module_assignments`, `module_assignment_events`), append-only triggers, índices hot-path, 10 módulos seed canónicos, y extiende `engagement_commercial_terms` con columna `bundled_modules TEXT[]`. Incluye **parity test live TS↔DB** que cubre 3 arrays (`data_sources` + `view_codes` + `capabilities`) replicando el shape canónico TASK-611 `capabilities_registry`. Anti pre-up-marker check INSIDE la migration (TASK-838 pattern). Base estructural sobre la cual se construyen los slices 4-8.

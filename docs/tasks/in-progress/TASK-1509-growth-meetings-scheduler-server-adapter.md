@@ -25,6 +25,40 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-08-24 — `store.live.test.ts` afirma una precondición que la realidad ya invalidó
+
+Hallazgo abierto desde `TASK-1130` (rescope del carril de tests live). **No es un test roto ni un
+bug de este adapter: es un gate que quedó atado al estado que tenía la base el día que se escribió.**
+
+`store.live.test.ts` hace `expect(pausedAuthority).toBeNull()` — o sea, afirma que la superficie de
+agendamiento **no está configurada** antes de arrancar el escenario de carrera. Hoy **sí lo está**, y
+con datos productivos reales:
+
+```
+surfaceId:        fhsf-efeonce-lead-gen-web
+schedulerKey:     discovery
+fallbackUrl:      https://meetings.hubspot.com/efeoncepro/agenda-discovery
+origins:          efeoncepro.com · www.efeoncepro.com · el dominio de staging · shadow.local
+defaultTimezone:  America/Santiago
+```
+
+Nadie rompió nada: **alguien encendió el agendador, que era lo correcto, y el test seguía esperando
+el mundo anterior.**
+
+**La corrección barata es la equivocada.** Editar el valor esperado para que vuelva a verde deja el
+gate exactamente igual de frágil, y lo va a volver a romper el próximo cambio legítimo — pausar la
+superficie, agregar un origin, cambiar el `schedulerKey`. Es el patrón «el gate es el test de
+regresión del snapshot con que lo escribiste»: si un cambio correcto obliga a editar el gate, el
+problema está en el gate.
+
+**Las dos salidas que sí sostienen:** (a) que el test **fabrique su propia superficie** con un
+`surfaceId` propio y la limpie, en vez de asumir la ausencia de una ajena — es lo que ya hace su
+`cleanup()` para los otros ledgers; o (b) que **derive la precondición del mismo estado que el motor
+lee**, en vez de fijarla como literal.
+
+Reproducible con `pnpm test:live src/lib/growth/meetings` (proxy Cloud SQL arriba). Falla también
+aislado, así que no es contención.
+
 ## Summary
 
 Productiza el `conditional pass` de TASK-1366 como adapter server-side seguro sobre HubSpot Scheduler API. Entrega config/availability y un command de booking gobernado con origen/surface, Turnstile, rate limiting, idempotencia, atribución allowlisted, errores sanitizados y señales. Los defaults de código permanecen OFF; el piloto aislado `/agenda/` opera con flags de staging/Production ON.

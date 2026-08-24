@@ -2,6 +2,45 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-24 — TASK-1130 rescopada: la mitad estaba cerrada y la otra mitad creció
+
+**Estado: `to-do`, subida a P1.** No abrí ISSUE nuevo: el drift ya tenía dueña y era ella.
+
+**Re-medí en vez de copiar.** La task traía el diagnóstico de junio (19 fallos en 8 archivos). Hoy:
+`pnpm test` sin env = **0 fallos**; con `.env.local` sourceado = **23 fallos en 17 archivos**. Creció
+porque nacieron tests nuevos que asumen entorno limpio — que es el argumento de la task: **la
+fragilidad no se estabiliza, se acumula.**
+
+**Cerrado por `c28e8bead`:** carril `live` serializado, `pnpm test:live` con env acotado, contrato
+documentado. Marcado tachado en la task para que nadie lo rehaga. **El diseño que quedó NO es el que
+proponía** (no hay `GREENHOUSE_TEST_LIVE` ni scrub en `setup.ts`): en vez de limpiar el entorno
+después de contaminarlo, el runner no lo contamina. Eso protege al agente que usa `test:live`; **no**
+hace hermético a `pnpm test`, que es el corazón de la task y sigue intacto.
+
+**Slice 0 cerrado por hallazgo:** `EmailTemplateBaseline` estaba «pendiente de clasificar» desde
+junio. **Es fuga de entorno**, no drift de snapshot — el diff es un solo token,
+`…-greenhouse-public-media-prod` vs `…-dev`, por `GREENHOUSE_MEDIA_BUCKET`/`GREENHOUSE_PUBLIC_MEDIA_BUCKET`.
+
+**Cuatro categorías nuevas, con causa verificada archivo por archivo.** Dos hallazgos de la A no
+existían en junio y uno es serio: `growth/forms/pii/encryption.test.ts` verifica «sin key → throw,
+NUNCA degrada a sin-cifrado» y **resuelve** con el entorno cargado. Es un test de garantía de
+seguridad que el entorno silencia.
+
+**Categoría E, nueva:** con env sourceado `pnpm test` corre los dos proyectos —1600 unit + 44 live—
+y el proxy muere con `ECONNRESET`. Los mismos archivos pasan con `pnpm test:live`. Es la consecuencia
+directa de que `pnpm test` no sea hermético: con entorno limpio esos live se saltarían solos.
+
+**El drift creció 11× y ahora tiene dos direcciones.** TS→DB: 11 capabilities sin fila
+(growth/commercial/platform); junio reportaba 1. DB→TS, dirección nueva y más peligrosa: 3
+`data_sources` sembrados que el union TS no reconoce — un portal cliente puede tener un módulo que el
+código no resuelve. **No las sembré a ciegas**: el grant correcto lo sabe su dueño.
+
+**Hallazgos abiertos a sus dueños**, que es lo que hace accionable el rescope:
+`TASK-1509` (`in-progress`) recibió el Delta de la precondición vencida del agendador — el test
+afirma que la superficie no está configurada y hoy sí lo está con datos productivos reales; la
+corrección **no** es editar el esperado. `TASK-824` está `complete`, así que su drift quedó sin dueño
+activo: lo rastrea TASK-1130 hasta que alguien lo tome.
+
 ## 2026-08-23 — Los live tests dejan de pisarse: eran cuatro causas, y una la causaba yo
 
 **Estado: `complete`.** Sin rollout pendiente — es infraestructura de tests, no runtime.
@@ -548,22 +587,3 @@ no ofrezca `on_hold`; (2) `CHECK` del invariante, cuando `TASK-1748` mueva sus 3
 **33 → 0**, no 32 (la bicondicional se viola por los dos lados). `TASK-1748` quedó desbloqueada; `TASK-1744` pasa a
 depender de ella; el Slice F de `TASK-1754` sigue bloqueado. Siguiente paso: **`TASK-1748`**, y después el release
 que habilita las dos migraciones parqueadas. Sin push.
-
-## 2026-08-22 — El gate de `pnpm build` corrió y pasa: cierra el pendiente de TASK-1748/1754/1755
-
-El operador autorizó el build de producción, que las tres tasks de hiring de hoy declararon **NO ejecutado**
-(`TASK-1755` por un error de tipos ajeno que ya no existe; `TASK-1754` y `TASK-1748` por costo de máquina,
-con la puerta abierta a autorización posterior).
-
-**Resultado: verde.** `Compiled successfully in 27.8s`, exit 0, **0 errores**. Los 10 warnings del log son
-`npm warn Unknown env config` — ruido de `.npmrc`, ajeno al código. Corrido sobre `develop` ya sincronizado
-con `origin` (38 commits empujados, fast-forward, hook pre-push con lint + typecheck en verde).
-
-**Por qué importa que este gate corriera y no se delegara:** el build de producción es el único que atrapa
-violaciones de frontera `server-only`→cliente y dynamic imports rotos — clases de bug que `pnpm test` y
-`pnpm typecheck` no ven. Las tres tasks tocaron `src/lib/hiring/**` y una de ellas
-(`PipelineDeskView.tsx`, TASK-1754) tocó una superficie cliente.
-
-Con esto, **ninguna de las tres tiene gates mecánicos pendientes**. Lo que les falta es runtime, no
-verificación: las tres migraciones parqueadas en `docs/tasks/pending-migrations/` esperan el release, en el
-orden declarado en su README (contract del enum → backfill de 1748 → `CHECK` del invariante).
