@@ -1436,6 +1436,25 @@ Regla UI:
 - no una persona suelta
 - no un opening como pseudo-candidato
 
+Contrato de retorno contextual:
+
+- `openingId` selecciona la vacante y `focusApplication` es una pista efímera para regresar desde
+  Application 360 a la tarjeta exacta; no constituyen estado persistente ni una segunda fuente de verdad.
+- El reader resuelve primero `focusApplication` y fija fuera de los límites paginados la cadena exacta
+  postulación → vacante → demanda. El contexto de la postulación prevalece sobre un `openingId` contradictorio;
+  la política canónica de procedencia sigue aplicando y nunca se amplía por navegar.
+- Si el foco no existe o no es visible bajo la policy de procedencia vigente, la vista declara que no pudo
+  ubicarlo. Nunca enfoca silenciosamente otra tarjeta como si fuera la original.
+- Una vez consumido, `focusApplication` se retira de la URL sin crear una nueva entrada de historial. El enlace
+  durable sigue siendo el pipeline de la vacante; el foco sólo coordina scroll, focus visible y anuncio accesible.
+
+Brecha de conformidad conocida (2026-08-24): las consultas de aplicaciones del snapshot de Pipeline, incluido
+el lookup exacto de `focusApplication`, todavía no agregan `archived_at IS NULL`, por lo que una postulación
+archivada puede permanecer o reaparecer en el board aunque la cola secuencial sí la excluya. Esto contradice el
+eje canónico `archived_at` («si el registro se muestra») y no constituye una excepción al modelo. Hasta
+corregirlo, ningún consumidor debe interpretar el snapshot o el pin de foco como autorización para reexponer
+postulaciones archivadas.
+
 ### 4. Application 360
 
 Vista detallada de una application.
@@ -1449,6 +1468,19 @@ Bloques mínimos:
 - blockers
 - decision
 - handoff
+
+Contrato de revisión secuencial:
+
+- Anterior/Siguiente recorre sólo postulaciones no archivadas de la **misma vacante y etapa** que la postulación
+  abierta. El orden es estable: `created_at DESC, application_id ASC`; se recalcula en cada request y no persiste
+  un cursor que pueda quedar stale después de un cambio de etapa o archivado.
+- El reader de navegación devuelve únicamente identificadores, posición y total. Nunca incorpora score, afinidad,
+  ranking, recomendación IA, contacto ni otros datos del expediente; los readers de Application 360 conservan la
+  propiedad de PII, evaluaciones y ceguera anti-anclaje.
+- El retorno a Pipeline usa la pestaña existente con `openingId + focusApplication`, de modo transversal para
+  cualquier vacante. No agrega un botón paralelo ni obliga a reconstruir el camino pasando por Demand Desk.
+- La navegación a otra ficha protege borradores locales sin guardar antes de abandonar la postulación. Esta
+  protección es un contrato de interacción; no convierte el estado de formulario en estado del dominio Hiring.
 
 ### 5. Demand 360
 

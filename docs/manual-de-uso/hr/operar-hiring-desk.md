@@ -1,9 +1,9 @@
 # Operar Hiring Desk
 
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** con TASK-355 (previo al registro de metadatos)
-> **Ultima actualizacion:** 2026-08-24 por Codex (retorno durable y revisión secuencial)
+> **Ultima actualizacion:** 2026-08-24 por Codex (retorno contextual y revisión secuencial)
 > **Documentacion funcional:** [Hiring Desk](../../documentation/hr/hiring-desk.md) · [Desenlace de una postulación](../../documentation/hr/desenlace-de-una-postulacion.md)
 
 ## Antes de empezar
@@ -51,15 +51,18 @@ Esta separación permite que dos candidatos de la misma vacante tengan tokens, t
 
 La vacante seleccionada queda en la URL. Cuando abras una tarjeta y estés en Application 360, usa la pestaña
 **← Pipeline** del encabezado para volver: Greenhouse abre el pipeline de esa misma vacante, desplaza el Kanban
-hacia la tarjeta y deja el foco allí. No necesitas volver a Demanda ni seleccionar la vacante otra vez. El
-retorno no recupera búsquedas anteriores, para que ningún filtro oculte postulantes del pipeline completo.
+hacia la tarjeta y deja el foco allí. Funciona con cualquier vacante; no necesitas volver a Demanda ni seleccionar
+el opening otra vez. El retorno no recupera búsquedas anteriores, para que ningún filtro oculte postulantes del
+pipeline completo. Después de recuperar la tarjeta, el foco temporal desaparece de la URL; la vacante permanece.
 
 Si ves `Anterior` y `Siguiente` sobre las pestañas de Application 360, puedes revisar otra **postulación**
 de esa misma vacante y etapa sin regresar al Kanban. El contador indica tu posición en esa cola; no representa
 un ranking ni usa afinidad, score o IA. Una postulación archivada no entra. Si editaste Decisión, una
 corrección del scorecard o una nota del Expediente, Greenhouse te pide elegir entre seguir editando o descartar
 antes de cambiar. Si al volver la postulación ya no está disponible, Pipeline conserva una vacante válida y
-muestra un aviso; no selecciona silenciosamente a otra persona.
+muestra un aviso; no selecciona silenciosamente a otra persona. El diálogo de cambios pendientes protege estos
+saltos `Anterior`/`Siguiente`; antes de usar la pestaña Pipeline, termina o descarta cualquier edición local que
+todavía necesites conservar.
 
 **Las seis columnas son las seis etapas (TASK-1754).** Desde 2026-08-22 hay una etapa por columna:
 Sourced · Screening · **Evaluación** · Entrevista · Decisión · Cerrado. Antes el dominio tenía trece y
@@ -206,6 +209,9 @@ Para pausar un tipo de correo, diagnosticar por qué no llegó o revisar el hist
 - **No ves Hiring Desk:** solicita la vista correspondiente; no se resuelve ampliando capabilities a ciegas.
 - **403 al operar:** falta la capability fina para esa acción.
 - **La tarjeta volvió:** el write de etapa falló y el rollback protegió el estado real.
+- **Volviste al Pipeline pero apareció un aviso:** la postulación de origen pudo archivarse, cambiar de alcance o dejar de estar disponible para tu acceso. La vacante mostrada sigue siendo navegable; Greenhouse no sustituye la postulación por otra. Cierra el aviso y verifica el estado desde el pipeline o con quien administre el proceso.
+- **Una postulación archivada permanece o reaparece en el Pipeline:** no la interpretes como reactivada y no ejecutes movimientos ni decisiones desde esa tarjeta. Es una brecha conocida del snapshot de Pipeline; verifica el archivado en el registro fuente y escala la corrección antes del rollout.
+- **No aparecen `Anterior`/`Siguiente`:** no hay otra postulación no archivada en la misma vacante y etapa. No es un ranking incompleto ni una falla del buscador.
 - **No te deja arrastrar a «Cerrado»:** es el comportamiento correcto, no una falla. Cerrar exige
   declarar el desenlace; hazlo con `Decidir` dentro de la postulación.
 - **Desapareció la columna donde dejabas a los seleccionados o rechazados:** ya no existe. Esas cinco

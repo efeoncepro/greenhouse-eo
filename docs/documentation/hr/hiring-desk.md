@@ -1,9 +1,9 @@
 # Hiring Desk
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** con TASK-355 (previo al registro de metadatos)
-> **Ultima actualizacion:** 2026-08-24 por Codex (retorno durable y revisión secuencial)
+> **Ultima actualizacion:** 2026-08-24 por Codex (retorno contextual y revisión secuencial)
 > **Documentacion tecnica:** [ADR del vocabulario de etapas y desenlaces](../../architecture/GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md) · [Arquitectura Hiring/ATS](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md)
 > **Manual de uso:** [Operar Hiring Desk](../../manual-de-uso/hr/operar-hiring-desk.md)
 
@@ -15,7 +15,7 @@ Hiring Desk es el espacio interno para operar la demanda de talento, el pipeline
 
 - **Demanda:** KPIs del pipeline, filtros y tabla de openings. `Nueva demanda` crea demanda + opening en borrador; publicar sigue siendo una acción explícita.
 - **Pipeline:** seis columnas, una por cada etapa del proceso. Una tarjeta representa una `HiringApplication`; se mueve arrastrándola o por el menú de etapa, y vuelve a su posición anterior si el guardado falla. La vacante seleccionada vive también en `openingId` dentro de la URL, por lo que recargar, compartir o volver desde un detalle conserva el mismo scope. Cerrar no es uno de esos movimientos: se declara en la decisión.
-- **Application 360:** resumen con PII enmascarada, assessment/scorecard advisory, documentos, decisión estructurada, handoff bridge hacia Activation Lane y actividad append-only. La pestaña persistente `Pipeline` es el retorno a la vacante propietaria; al activarla, el Kanban vuelve a esa vacante y enfoca la tarjeta de origen sin ocultar a los demás postulantes. `Anterior` y `Siguiente` permiten revisar otra postulación de la misma vacante y etapa; nunca cruzan vacantes ni ordenan por score o IA. Una edición pendiente exige confirmar antes de salir.
+- **Application 360:** resumen con PII enmascarada, assessment/scorecard advisory, documentos, decisión estructurada, handoff bridge hacia Activation Lane y actividad append-only. Es un detalle hijo de Pipeline, no un workspace paralelo. La pestaña persistente `Pipeline` es el retorno a la vacante propietaria; al activarla, el Kanban vuelve a esa vacante y enfoca la tarjeta de origen sin ocultar a los demás postulantes. `Anterior` y `Siguiente` permiten revisar otra postulación de la misma vacante y etapa; nunca cruzan vacantes ni ordenan por score o IA. El guard de cambios pendientes se aplica a estos saltos secuenciales.
 - **Publicación:** compara la verdad interna con el payload público allowlist y confirma publicar, pausar o cerrar.
 - **Distribución externa:** una vez que el opening está publicado, el equipo puede difundir su URL de postulación en canales aprobados. Es una actividad de inbound recruiting, no una segunda publicación de Hiring: no altera `HiringOpening`, no reemplaza el apply canónico y debe conservar evidencia de grupo/canal y estado de moderación.
 
@@ -74,6 +74,22 @@ code-complete y pendiente de rollout: [Entrega y recuperación de acceso a tests
   equivale a “sin documentos”.
 - El desenlace no se alcanza arrastrando una tarjeta: los seis (Selección, Reserva, Sin selección, Descarte, Retiro, Sin respuesta) pasan por la decisión estructurada. «Dejar en espera» **ya no es un desenlace**: una pausa se registra dejando la tarjeta en «Decisión».
 - La revisión secuencial se ordena de forma cronológica estable dentro de `opening + stage`, excluye archivadas y devuelve sólo ids/posición. Es navegación operacional, no una recomendación sobre quién contratar.
+
+## Continuidad entre Application 360 y Pipeline
+
+- El retorno funciona igual para cualquier vacante. Su destino se deriva de la postulación abierta; no depende de una vacante fija ni del historial del navegador.
+- La pestaña `Pipeline` usa `/agency/hiring/pipeline?openingId=<openingId>&focusApplication=<applicationId>`. `openingId` conserva el alcance de la vacante y `focusApplication` sólo solicita recuperar la tarjeta de origen.
+- El reader incluye explícitamente la postulación, su opening y su demanda aunque hayan quedado fuera de los límites cronológicos de las listas. Después de desplazar y enfocar la tarjeta, el navegador consume `focusApplication` y deja una URL estable con sólo el alcance de la vacante.
+- El retorno abre el pipeline completo de esa vacante; no restaura una búsqueda previa que podría ocultar postulantes.
+- Si la postulación ya no es visible, Greenhouse elimina el foco inválido, mantiene una vacante disponible y muestra un aviso. Nunca enfoca ni presenta a otra persona como si fuera el origen.
+- La cola `Anterior`/`Siguiente` se limita a la misma vacante y etapa, excluye archivadas y sólo existe cuando hay más de una postulación elegible. El contador expresa posición dentro de esa cola, no prioridad.
+- Antes de un salto secuencial, los borradores locales de Decisión, corrección del scorecard o Expediente activan un diálogo para seguir editando o descartar y continuar. Este guard no convierte la cola en un flujo de guardado automático.
+- El nuevo título recibe foco al cambiar de postulación. Al volver al Kanban, la tarjeta recibe foco y el resultado se anuncia; en movimiento reducido se conserva esa semántica sin snapshots ni desplazamiento suave.
+
+**Brecha conocida (2026-08-24):** el snapshot del Pipeline todavía no filtra las postulaciones archivadas en
+su consulta general ni en el lookup de foco. Si una archivada permanece o reaparece en el board, no significa
+que se haya reactivado ni que vuelva a ser elegible; contradice el contrato de visibilidad y debe corregirse
+antes del rollout de este delta.
 
 ## Acceso
 

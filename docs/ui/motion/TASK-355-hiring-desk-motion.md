@@ -2,7 +2,7 @@
 
 ## Delta 2026-08-24 — Continuidad de ruta y foco
 
-Application 360 y su tarjeta comparten `view-transition-name` por `applicationId`: el detalle se contrae hacia la tarjeta exacta al volver. La vista de origen permanece estable mientras carga el reader de destino; después ocurre el morph y el Pipeline desplaza/focaliza la tarjeta con un contorno breve. `Anterior`/`Siguiente` usa la transición de ruta canónica, pero sin dramatizar ni comparar candidatos. Con reduced motion se omiten snapshots/animación y se conservan navegación, anuncio y foco.
+Application 360 y su tarjeta comparten `view-transition-name` por `applicationId`: el detalle se contrae hacia la tarjeta exacta al volver. La transición de ruta conserva el snapshot saliente mientras cambia la ruta; cuando el destino contiene la misma aplicación ocurre el morph y Pipeline desplaza/focaliza la tarjeta con un contorno breve. `Anterior`/`Siguiente` usa sólo el cross-fade canónico de ruta porque cambia de `applicationId`; no inventa una continuidad visual entre candidatos ni comunica comparación. Con reduced motion se omiten snapshots/animación y se conservan navegación, anuncio y foco.
 
 ## Meta
 
@@ -30,7 +30,7 @@ El movimiento en el desk confirma cambios de estado (mover una card de etapa, ap
 | M9 | Application 360 ↔ tarjeta | Morph compartido por `applicationId` | Abrir o volver por Pipeline |
 | M10 | Tarjeta recuperada | Scroll + foco determinista + contorno breve | Pipeline consume `focusApplication` |
 | M11 | Route tabs móviles | Scroll suave para mantener visible la ubicación activa | Cambia ruta o ancho disponible |
-| M12 | Anterior/Siguiente | Cross-fade de ruta; el nuevo título recibe foco | Revisión secuencial |
+| M12 | Anterior/Siguiente | Cross-fade root de ruta, sin morph candidato↔candidato; el nuevo título recibe foco | Revisión secuencial |
 
 ## Microinteraction States
 
@@ -42,6 +42,7 @@ El movimiento en el desk confirma cambios de estado (mover una card de etapa, ap
 ## Transition Specs
 
 - Duración: 150–300ms (feedback), nunca > 400ms. Easing desde tokens de motion (`MOTION_*`/`theme.axis.*`), NUNCA `ms`/curvas inline.
+- El grupo compartido `.hiring-application` dura 400 ms con easing emphasized; el root usa el contrato canónico de 200/260 ms. La documentación registra esos valores existentes, pero nuevas variaciones deben salir del contrato de motion, no de otro literal route-local.
 - El lift del drag y el resalte de drop-zone usan elevación/color tokenizados.
 - El optimistic move se asienta rápido; el rollback es visible (el usuario debe percibir que se revirtió).
 
@@ -81,6 +82,7 @@ El movimiento en el desk confirma cambios de estado (mover una card de etapa, ap
 - Capturar M1→M2 (drag→move), M4 (teclado move), M3 (rollback) y M7 (decidir) en desktop 1440 + mobile 390.
 - Verificar reduced-motion: move instantáneo, feedback (reposición + toast) conservado.
 - a11y: mover una card SOLO con teclado (sin drag) funciona. Consola limpia; `scrollWidth==clientWidth`.
+- Retorno/cola: `.captures/2026-08-24T12-19-59_task355-hiring-application-360` verifica desktop 1440 + mobile 390, 24 frames y video para `1 de 2 → 2 de 2 → Pipeline`, morph al mismo `applicationId`, foco final y runtime limpio. Enterprise rubric PASS. La captura conserva warnings de contraste/skeleton preexistentes; el DSL además reporta que no puede repetir por teclado el click una vez que la ruta cambió. La afordancia es un enlace nativo y el contrato de `href`/`aria-current` está probado, pero la evidencia GVC no incluye un replay de teclado separado.
 
 ## Design Decision Log
 
@@ -98,3 +100,4 @@ El movimiento en el desk confirma cambios de estado (mover una card de etapa, ap
 - [ ] Reduced-motion: cambios instantáneos, feedback esencial conservado.
 - [ ] Solo `opacity`/`transform`; sin reflow; board no re-renderiza todo en drag.
 - [ ] GVC micro-evidencia (drag/teclado/rollback/decidir) desktop+mobile + reduced-motion mirada.
+- [x] M9–M12 del retorno contextual y cola secuencial capturados en desktop + 390 px; reduced-motion está cubierto por el helper canónico y la media query global, sin afirmar replay GVC independiente.

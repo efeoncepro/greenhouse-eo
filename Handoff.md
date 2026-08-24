@@ -184,14 +184,17 @@ manifest 9m50s). Skills Claude/Codex actualizadas en paridad total.
 
 ## 2026-08-24 — Hiring: retorno durable y revisión secuencial implementados localmente
 
-**Estado: `code complete, rollout pendiente`; sin commit, push ni release en esta iteración.** La pestaña
+**Estado: commit `631b53c77` publicado en `origin/develop`; rollout detenido por brecha de conformidad.** La pestaña
 `Pipeline` sigue siendo el único retorno, pero ahora fija la postulación exacta fuera de límites, consume el
 foco de URL y degrada honestamente si el origen no resuelve. Application 360 agrega Anterior/Siguiente dentro
 de la misma vacante+etapa, excluye archivadas y protege cambios sin guardar; el orden es cronológico estable,
 nunca score/IA. GVC local PASS 1440/390 px en
 `.captures/2026-08-24T12-19-59_task355-hiring-application-360` (24 frames por viewport, videos, recorrido
 `1 de 2 → 2 de 2 → Pipeline`, morph y foco exacto; runtime 0/0/0/0). Build de producción, typecheck,
-ESLint focal y 13 tests focales verdes. Pendiente: commit/push/release sólo con autorización del operador.
+ESLint focal y 13 tests focales verdes. La auditoría posterior detectó que el snapshot de Pipeline y el lookup
+de foco no filtran `archived_at IS NULL`; una archivada puede reaparecer aunque la cola secuencial la excluya.
+Arquitectura, documentación funcional/manual/UI y skills Talent/Motion/GVC quedan sincronizadas. Pendiente:
+corregir y verificar ambos readers antes de autorizar release; este turno documental no modifica código.
 
 ## 2026-08-23 — TASK-1772: los dos predicados convergieron, y convergieron al valor equivocado
 

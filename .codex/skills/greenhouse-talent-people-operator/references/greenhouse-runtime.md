@@ -48,6 +48,26 @@ Load whenever the work happens _inside_ the Greenhouse repo (not pure advisory).
 - Store: `src/lib/hiring/**` (SQL-crudo + `HiringValidationError` + transactional outbox). API: `/api/hiring/**` (dual-gate: internal tenant + `can()`).
 - Capabilities: `hiring.{demand,opening,application}.*` (granted to internal roles only — NUNCA `client_*`).
 
+## Application 360 ↔ Pipeline — context and sequential review
+
+- `openingId` is the durable vacancy scope. `focusApplication` is an ephemeral return hint, never persisted
+  domain state or a second source of truth. Resolve the exact application first and let its
+  application→opening→demand chain win over a contradictory `openingId`; pin that chain outside ordinary list
+  limits without widening provenance or access policy.
+- A missing, archived or policy-invisible focus must degrade honestly: keep a valid pipeline scope, clear the
+  hint without adding browser history, and never focus or present another candidate as the origin. Verify the
+  archived predicate independently on both the sequential queue and the exact-focus path; satisfying one does
+  not make the other conformant.
+- Previous/Next is an operational queue limited to the same `opening_id + stage`, excluding archived rows and
+  ordered stably by `created_at DESC, application_id ASC`. Recompute it per request. Its reader returns only
+  ids, position and total — never PII, score, affinity, ranking, AI recommendation or dossier evidence — and
+  cannot bypass anti-anchoring readers.
+- The existing Pipeline tab is the canonical parent/return affordance. Programmatic navigation protects local
+  drafts before leaving; after return, exact scroll/focus and an accessible announcement restore orientation.
+  Those interaction states never become Hiring domain state.
+
+Technical canon: `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Pipeline Board / Application 360.
+
 ## Opening capacity closure — code paths (TASK-1762, code complete / rollout pendiente)
 
 - ADR `docs/architecture/GREENHOUSE_HIRING_OPENING_CAPACITY_CLOSURE_DECISION_V1.md` (`Accepted`, amended in

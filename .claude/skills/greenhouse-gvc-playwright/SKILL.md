@@ -1,6 +1,9 @@
 ---
 name: greenhouse-gvc-playwright
-description: Robust Playwright handling for Greenhouse Visual Capture (GVC), ad-hoc Playwright, and public WordPress/Elementor landing verification — how to observe before authoring and avoid fumbling selectors, waits, readiness, computed styles or captures. Invoke whenever you write or debug a `.scenario.ts`, run `pnpm fe:capture`, work on public-site/WordPress landings, drop to ad-hoc Playwright, or a capture comes back wrong (skeleton/login captured, selector timeout, flaky, clipped, "no encuentro el selector", Turbopack Compiling…). Distills the proven techniques from microsoft/webwright's `local_browser.py` (aria-tree observation, user-facing locators, layered timeouts, graceful degrade) + the Greenhouse-specific GVC/public-site gotchas. Triggers: "GVC", "fe:capture", "scenario", "Playwright", "WordPress landing", "public site", "Elementor", "selector", "readiness", "captura", "aria snapshot", "computed style", "no encuentro el selector", "captura sale mal", "skeleton", "clipSelector", "networkidle", "fullPage", "charts vacíos", "cards vacías en la captura", "qualityProfile", "qualityFindings", "runtimeSummary", "pageErrorCount", "visual_timeout", "layout_element_overflow", "storageState expirado", "grabó login", "has-text", "keyboard_focus_ring_missing", "focus trap", "startSelector", "requireVisibleFocusRing", "quality.keyboard", "sonda de teclado", "pdfViewerEnabled", "el assert nunca pasa", "clic en el botón equivocado".
+description: >-
+  Author and diagnose Greenhouse Visual Capture scenarios, ad-hoc Playwright checks, and public-site browser
+  verification. Use for GVC, fe:capture, scenario selectors, readiness, accessibility/runtime manifests,
+  route-transition evidence, expired auth, misleading screenshots, or flaky browser captures.
 type: reference
 ---
 
@@ -266,6 +269,13 @@ Webwright **ejecuta Python que el modelo escribe libremente** contra el browser.
 - `pnpm fe:capture:explore --route=/x --interaction 'hover:<selector>'` (repetible; `hover`|`focus`|`click` — read-only, NUNCA fill/press) — performa la acción y **mide los timings reales** del feedback por pixel-diff (TASK-1100): muestrea el clip del target y deriva `feedback`/`settled` (cualquier motion: CSS/framer-motion/GSAP). `--interaction-window=<ms>` (default 1000) para animaciones largas. Si no hay cambio visible → reporta honesto (`measuredTimings:false`).
 - `promote` auto-emite un step **`interaction` (V2)** por cada interacción observada con los `atMs` **medidos** (frames + keyboardEquivalent + `reducedMotion: 'capture'`); ajustas `intent`.
 - También puedes autorar el step `interaction` a mano o usar `pnpm fe:capture:micro`.
+
+**Interacciones que cambian de ruta:** el DSL captura primero los frames y después intenta
+`keyboardEquivalent` y el replay `reducedMotion`. Si el click ya navegó, el selector de origen dejó de existir;
+ese replay fallará por el harness aunque el enlace sea correcto. Nunca inventes una equivalencia sobre el nodo
+desaparecido ni presentes ese replay fallido como prueba de reduced-motion. Captura la transición de ruta y
+verifica por separado la semántica del enlace/teclado y el camino reducido, usando una variante que restablezca
+la ruta origen o un test focal reproducible.
 
 ---
 
