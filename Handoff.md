@@ -2,6 +2,48 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-24 — ISSUE-163 + TASK-1774: el mecanismo de baja tiene dueño
+
+**Sólo docs.** Continuación directa de la revisión de `TASK-1764`. Sin runtime tocado, sin push.
+
+**Barrido por dominio y superficie antes de reservar el ID** (la regla que evita duplicadas):
+ninguna task viva declara `Files owned` sobre `/api/account/email-preferences` ni `unsubscribe.ts`.
+`TASK-383` posee `delivery.ts` **sólo** para instrumentación Sentry. `TASK-1397` y `TASK-993`
+**dependen** de las primitivas, no las poseen. `TASK-1745` está `complete` y cubre entrega, no opt-out.
+
+**El origen no era una regresión.** `TASK-269` está `complete` con su criterio
+`- [ ] POST /api/account/email-preferences permite toggle…` **sin marcar** y sin la página de
+preferencias que su Slice planeaba. Por eso el registro correcto es `ISSUE-163` (defecto de runtime)
+con `TASK-1774` como dueña del fix — no un slice dentro de la umbrella de footers.
+
+**Decisión de diseño load-bearing de `TASK-1774`: el `GET` NO muta.** Los escáneres de seguridad
+corporativos prefetchean los enlaces de un correo; un `GET` que da de baja convierte ese prefetch en
+baja involuntaria. La confirmación intermedia elimina la clase entera. El one-click de RFC 8058 sí muta
+sin confirmar, porque es el contrato del estándar y lo dispara una acción deliberada en el cliente.
+
+**Partición declarada para no crear un cuarto decisor:** 1774 posee el MECANISMO; el registro de policy
+de la foundation de `EPIC-042` posee el DECISOR (mata el default `?? 'broadcast'` y colapsa los tres
+decisores actuales). Matar ese default sin registro dejaría el sistema sin decisor, así que **no**
+entró en 1774.
+
+**La superficie de preferencias por tipo quedó como lane 7 del epic, sin ID reservado.** Se declara
+explícitamente ahí porque un follow-up sin dueño es exactamente cómo se perdió la primera vez.
+
+**Tres Deltas de impacto cruzado:**
+- `TASK-1397` (Career Alerts) — `Blocked by: none` → `TASK-1774`. Declaraba que las primitivas proveen
+  «signed opt-out»; la mitad es falsa. Es la primera suscripción opt-in real del sistema, donde el
+  opt-out es la contrapartida del consentimiento que la propia task modela.
+- `TASK-1650` — el drift de dirección pasó de deuda de una superficie a **dependencia dura de
+  `EPIC-042`**: en cuanto una cohorte se promueva, esa dirección se imprime en correos productivos.
+- `TASK-993` — pregunta al Discovery: ¿destinatarios explícitos o lista? Define si depende de 1774.
+
+**Hallazgo preexistente NO tocado:** `TASK-993` da `errors=1 warnings=4` en `task:lint` por ser anterior
+a la plantilla vigente (no declara `Execution profile` ni `UI impact`). Verificado que es idéntico antes
+y después de mi Delta — no lo introduje y no lo arreglé; migrar esa task es trabajo aparte.
+
+**Gates:** `task:lint` 1764/1274/1774 `template=1 errors=0 warnings=0`; `docs:context-check:strict`
+verde tras rotar.
+
 ## 2026-08-24 — TASK-1764 revisada contra runtime: el gobierno sobrevive, las precondiciones no
 
 **Sólo docs.** `TASK-1764` sigue `to-do`; no se tocó runtime. Revisión con `arch-architect` +
@@ -546,46 +588,3 @@ skills espejadas `efeonce-public-site-wordpress`. Regla principal: conservarla c
 mantener `page_for_posts=0`, adaptar primero una copia/draft y preservar árbol, settings Elementor y metas Ohio;
 el futuro corte debe mantener una sola canónica `/blog/`. Dueño arquitectónico existente: Public Website Landing
 Control Plane. No se modificaron páginas, posts, opciones, formularios, caché ni archivos de Kinsta.
-
-## 2026-08-22 — El vocabulario de etapas de Hiring tiene su primer ADR; auditoría de 30 hallazgos verificada adversarialmente
-
-Sesión de diagnóstico y decisión, **cero código**. Partió de un síntoma acotado —la automatización de assessment no
-disparaba— y terminó en el primer ADR que el vocabulario del pipeline tiene: nació el 2026-07-07 con `TASK-353` **sin
-decisión registrada** (su spec no menciona la palabra `stage` ni una vez) y ninguna fila del índice de decisiones lo
-justificaba.
-
-**Arqueología del defecto.** Reconstruida del log append-only `hiring.application.stage_changed` (222.801 eventos) y
-del historial de `git`: el carril «Evaluación» nació el 2026-07-09 (`559f5654b`) tomando su nombre de `shortlisted` y
-escribiendo `qualified` — el defecto está en la **primera versión** del archivo, y el wireframe de `TASK-355` afirmaba
-`columnas = etapas canónicas` cuando eran 6 contra 13. Sobrevivió seis semanas porque nada automático miraba la etapa;
-se volvió caro el 2026-08-17, cuando la doctrina de selección —correcta— movió el disparador desde `interview`, la
-única alcanzable, hacia la que nunca lo fue. **Ningún operador escribió jamás `shortlisted`**: de las 27 escrituras
-históricas, 21 entraron por el INSERT (que no emite `stage_changed`) y ninguna es humana.
-
-**El ADR fija dos ejes.** `stage` = dónde va la persona en el recorrido (6 valores, uno por columna; `closed` **se
-queda y es escribible**, porque una columna terminal que no recibe tarjetas no es un kanban). **Desenlace** = cómo
-terminó (`selected`, `backup_selected`, `not_selected`, `rejected`, `withdrawn`, `unresponsive`) + causa gobernada
-obligatoria en `not_selected`. El invariante `stage='closed'` ⟺ desenlace declarado, como `CHECK` de base, vuelve
-**irrepresentables** los dos P0 de la auditoría en vez de parchearlos. Decisión del operador: el desenlace describe a
-la persona, **nunca el estado de la vacante** — cupo lleno o búsqueda cerrada son _causa_ de «Sin selección», no
-etiqueta. Enmienda `GREENHOUSE_HIRING_OPENING_CAPACITY_CLOSURE_DECISION_V1` (corregido en sitio, sigue `Proposed`).
-
-**La auditoría se equivocó cinco veces y está declarado.** 6 barridos automatizados levantaron 22 hallazgos; 5
-verificadores adversariales después, ninguna conclusión estructural cayó pero **5 afirmaciones estaban
-sobredimensionadas y 2 evidencias declaradas eran falsas** — dos de ellas propias. H-03 y H-04 bajaron de P0; el
-veredicto de Full API Parity se reformuló (cumple la letra del ADR por su cláusula de deuda; incumple el patrón
-canónico §2, que no tiene escape, y el modelo correcto ya existe en el mismo dominio: `HiringHandoff`). El banner del
-encabezado declara **cuatro modos de fallo** para quien audite después; el cuarto —_verificar el contenido de la tabla
-cuando lo que gobierna es el código desplegado_— salió de **ejecutar** la auditoría, no de escribirla, y produjo un
-break real de producción reparado en minutos (regla dura nueva en `GREENHOUSE_DATABASE_TOOLING_V1.md`).
-
-**Carril abierto:** `TASK-1765`…`TASK-1771` (`EPIC-011`), con 12 tasks vivas alineadas — 5 con el cuerpo reescrito
-porque su contrato contradecía el ADR (el Slice 2 de `TASK-1748` escribía `stage='closed'` al archivar, que es justo
-lo prohibido; `TASK-1763` mostraba «N personas serán rechazadas» en pantalla) y 7 con Delta de coordinación. Dos
-superficies no generaron ID y entraron como Delta a su dueño. Decisiones del operador registradas: el correo al
-candidato conserva **«Preselección»** como divergencia deliberada; el identificador se queda en `shortlisted`; y en
-agendamiento de entrevistas **el calendario manda** — Greenhouse agenda pero no es su dueño.
-
-Siguiente paso: `TASK-1748` destraba el `CHECK` del invariante moviendo sus 32 filas; `TASK-1771` va **antes** del
-colapso de `TASK-1754`. Estado: **todo documental, sin push pendiente salvo los últimos commits**; ningún cambio de
-runtime salió de esta sesión.

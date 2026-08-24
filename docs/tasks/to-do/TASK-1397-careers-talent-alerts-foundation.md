@@ -22,10 +22,30 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `agency|hr|growth|data`
-- Blocked by: `none`
+- Blocked by: `TASK-1774`
 - Branch: `Greenhouse develop; shared checkout; sin worktrees ni ramas por task`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Delta 2026-08-24 — el opt-out firmado que esta task asume no funciona
+
+`Blocked by` pasó de `none` a `TASK-1774`.
+
+Esta task declaraba en sus dependencias que `subscriptions.ts`, `unsubscribe.ts` y `delivery.ts` proveen
+«subscription, **signed opt-out** and delivery-ledger primitives». La verificación contra runtime del
+2026-08-24 (`ISSUE-163`) encontró que **la baja no es accionable por ningún método**: el enlace del pie
+responde `405`, el botón one-click de Gmail responde `500` y un `POST` bien formado responde `400`. El
+endpoint no tiene ningún consumer en `src/`.
+
+Por qué importa más acá que en cualquier otra task del dominio: **Career Alerts sería la primera
+suscripción opt-in real del sistema.** Una persona se anota voluntariamente para recibir avisos de
+vacantes; ahí el opt-out no es cosmético, es la contrapartida del consentimiento que esta misma task
+modela con snapshots auditables. Publicar la suscripción sobre una baja inerte sería capturar
+consentimiento sin entregar el mecanismo para retirarlo.
+
+Efecto sobre el alcance: ninguno. Esta task no cambia de forma ni gana slices — sólo deja de asumir que
+la primitiva está completa y espera a que `TASK-1774` la cierre. Su `emailType` es además el candidato
+más claro a `optional_subscription` en la policy de presentación de `EPIC-042`.
 
 ## Summary
 
@@ -161,7 +181,8 @@ Reglas obligatorias:
 - `hiring.opening.published` as the Hiring lifecycle seam.
 - Growth Forms supports public forms, consent snapshots, async submission and portable `<greenhouse-form>` rendering.
 - Talent Pool membership, purpose-scoped consent, contactability policy, tokenized self-service and invitation commands under `src/lib/hiring/talent-pool/**`.
-- `src/lib/email/subscriptions.ts`, `unsubscribe.ts` and `delivery.ts` provide subscription, signed opt-out and delivery-ledger primitives.
+- `src/lib/email/subscriptions.ts`, `unsubscribe.ts` and `delivery.ts` provide subscription and delivery-ledger
+  primitives. **La mitad de «signed opt-out» es falsa hoy** — ver Delta 2026-08-24 y `ISSUE-163`.
 
 ### Gap
 

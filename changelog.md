@@ -3,6 +3,14 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-24 — Queda registrado que nadie puede darse de baja de un correo, y quién lo va a arreglar
+
+- Se abrió el incidente que documenta el defecto: el enlace «Dejar de recibir estos correos» del pie **falla por los tres caminos posibles**, incluido el botón «Cancelar suscripción» que Gmail y Outlook muestran sobre el asunto. Ninguno da de baja a nadie.
+- **No es algo que se rompió después.** La capacidad se cerró así: la task que la construyó quedó marcada como terminada con su propio criterio sin cumplir y sin la página de preferencias que había planeado. El endpoint existe y no lo usa nadie.
+- Se creó la task que lo repara, con una decisión de diseño que vale nombrar: **hacer clic en el enlace no dará de baja de inmediato**, mostrará una confirmación. Los escáneres de seguridad de los correos corporativos abren los enlaces solos, así que un enlace que diera de baja al abrirse desuscribiría a gente que nunca lo tocó. El botón nativo del cliente de correo sí actúa directo, porque ahí la intención ya la expresó la persona.
+- También deja de guardar permisos de baja que nadie puede usar: hoy la liquidación de sueldo genera uno que dura un mes y no aparece en ninguna parte.
+- Tres tasks vecinas quedaron corregidas: los avisos de vacantes para el Banco de Talento —que serían la **primera suscripción voluntaria de verdad** del sistema— asumían que la baja funcionaba; el desalineamiento de la dirección de casa matriz dejó de ser deuda de una pantalla y pasó a bloquear todo el programa de correos; y el aviso de pagos a contractors quedó con una pregunta pendiente sobre a qué carril pertenece.
+
 ## 2026-08-24 — El rediseño de los pies de correo se revisó contra el sistema real, no contra su diseño
 
 - **El botón de "darse de baja" no funciona hoy.** El enlace del pie lleva a una dirección que el servidor no atiende, y el botón propio que Gmail muestra arriba del correo tampoco: los dos fallan. Además el sistema agrega ese enlace **solo, por accidente**, a cualquier correo enviado a más de una persona. La liquidación de sueldo llega a generar un permiso de baja de 30 días que nadie ve nunca. Arreglarlo pasa a ser condición previa del programa.
@@ -820,28 +828,3 @@ objetivas válidas y ninguna clave de respuesta o rúbrica en la proyección pú
 sintético sin correo completó además `assigned → in_progress → submitted`, probó el bloqueo por
 respuestas pendientes, guardó las 11 respuestas, auto-calificó una y dejó diez en cola humana; el
 fixture y sus eventos se eliminaron al terminar.
-
-## 2026-08-15 — El CV del candidato se puede leer (y el candado se movió a donde protege)
-
-El tab **Documentos** de la Application 360 pasó de mockup a superficie real. Antes mostraba tres
-filas escritas a mano y un "Revelar" que sólo movía un `useState`: el motivo se descartaba y la
-auditoría prometida no se escribía. Ahora consume el reader canónico en servidor y separa las dos
-clases del modelo de dominio: **un archivo se abre** (la capability de la pantalla ya autorizó) y **la
-identidad se revela** (capability propia + motivo + audit append-only, `TASK-1714`).
-
-El CV se lee **dentro del portal**, en un diálogo sobre un blob same-origin. Se descartó `react-pdf`
-con evidencia —no arranca bajo `next dev --webpack` porque `pdfjs-dist` v5 rompe el interop ESM, y aun
-funcionando cuesta ~400 KB para hacer lo que el navegador ya hace— y el hueco de móvil se cierra por
-**capacidad** (`navigator.pdfViewerEnabled`), no por viewport: cuando el navegador no embebe PDF, el
-diálogo lo dice y ofrece salida, en vez de un marco en blanco.
-
-Además dejan de aplastarse en "Enmascarado" los cuatro estados que el escáner sí distingue: un archivo
-bloqueado por el antivirus y un candidato que nunca adjuntó CV se veían idénticos, así que el
-reclutador culpaba al candidato por una falla del sistema.
-
-Impacto operativo: quien opera Hiring ya no necesita pedir el CV por fuera del portal, y People Ops
-tiene un camino auditado para el documento de identidad — antes ese dato salía por mail, sin
-capability, sin motivo y sin trail.
-
-Follow-up abierto: `TASK-1716` mide si el fallo de `react-pdf` alcanza producción (hoy sólo verificado
-en desarrollo) y unifica las **tres** implementaciones de visor que conviven en el repo.

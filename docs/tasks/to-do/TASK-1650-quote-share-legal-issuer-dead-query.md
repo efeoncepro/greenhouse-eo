@@ -25,6 +25,22 @@
 - Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 
+## Delta 2026-08-24 — deja de ser deuda de una superficie y bloquea un programa
+
+El drift de la dirección de casa matriz que esta task documenta —**tres fuentes, dos valores**: la base
+dice `of 05`, `DEFAULT_LEGAL_ENTITY` dice `of. 05` y la constante de marca dice `Of 1105`— pasó a ser
+**dependencia dura de `EPIC-042`**.
+
+Razón: la ADR de presentación de correo adoptó que **todo footer gobernado muestra razón social, RUT y
+casa matriz** resueltos desde el operating entity. En cuanto la primera cohorte se promueva, esa
+dirección se imprime en correos productivos y va a diferir de la lámina que el operador aprobó. Se leerá
+como defecto de implementación cuando en realidad es un dato desalineado desde abril.
+
+O sea: la Open Question de esta task —«¿oficina 05 o 1105?»— ya no bloquea sólo a la cotización
+compartida. Bloquea a toda cohorte de `EPIC-042` que imprima identidad legal, que son todas.
+
+Sigue necesitando **decisión humana**; no hay forma de resolverla desde el código.
+
 ## Summary
 
 La query que resuelve la entidad legal emisora de una cotización compartida selecciona dos

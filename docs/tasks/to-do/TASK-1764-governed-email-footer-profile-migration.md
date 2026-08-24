@@ -24,7 +24,7 @@
 - Status real: `Diseño aprobado; precondiciones de runtime abiertas (ver Delta 2026-08-24)`
 - Rank: `TBD`
 - Domain: `delivery|ui|content|agency`
-- Blocked by: `unsubscribe-mechanism-repair (ID por reservar)`
+- Blocked by: `TASK-1774`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -339,9 +339,11 @@ Las child tasks declararán ownership del código por cohort; esta umbrella no a
 Esta umbrella formaliza policy, dirección visual, cohorts, gates y child-task boundaries, y conserva el mockup local
 aprobado. No implementa el primitive React Email, policy runtime, cohorts, envío ni rollout.
 
-**Precondición fuera de esta umbrella (bloqueante):** el arreglo del mecanismo de unsubscribe —link, header
-one-click y handler— más el retiro del default `?? 'broadcast'`. No es trabajo de footer y no puede resolverse dentro
-de una cohorte de presentación; ver Delta 2026-08-24 §D1. Ninguna cohorte declara `required` antes de ese cierre.
+**Precondición fuera de esta umbrella (bloqueante): `TASK-1774`** — arreglo del mecanismo de unsubscribe (link,
+header one-click y handler), dueña de `ISSUE-163`. No es trabajo de footer y no puede resolverse dentro de una cohorte
+de presentación; ver Delta 2026-08-24 §D1. Ninguna cohorte declara `required` antes de ese cierre. El retiro del
+default `?? 'broadcast'` NO pertenece a `TASK-1774`: es del registro de policy de la foundation, porque matarlo sin
+registro dejaría el sistema sin decisor.
 
 Orden de child tasks obligatorio:
 

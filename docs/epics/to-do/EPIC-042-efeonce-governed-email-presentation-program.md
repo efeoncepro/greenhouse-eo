@@ -76,6 +76,7 @@ esta clasificación es dirección de producto, no una declaración de cumplimien
 
 ## Child Tasks
 
+- `TASK-1774` — reparación del mecanismo de baja (`ISSUE-163`). Carril 0, precondición bloqueante.
 - `TASK-1764` — policy, dirección visual, inventario, decomposición de cohorts y gates anti-big-bang.
 - `TASK-1274` — retiro del lockup `Efeonce Greenhouse`. **Reanclada al epic el 2026-08-24**: su Open Question
   ("decidir la marca canónica de los emails del portal") no está abierta — `EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md`
@@ -95,11 +96,11 @@ headings, listas/tablas nativas y GVC sin errores; esa evidencia cierra el dise�
 
 Los IDs se reservan sólo cuando la ADR esté aceptada y el gate anterior permita abrir la siguiente task:
 
-0. **Precondición bloqueante — arreglo del mecanismo de unsubscribe.** No es un carril de presentación y no puede
+0. **`TASK-1774` — arreglo del mecanismo de unsubscribe (precondición bloqueante).** Dueña de `ISSUE-163`. No es un carril de presentación y no puede
    resolverse dentro de una cohorte de footer: hoy el control no es accionable por ningún método (link GET → 405,
    POST one-click de RFC 8058 → 500, POST bien formado → 400) y el default `?? 'broadcast'` lo agrega solo a
    cualquier tipo enviado a más de un destinatario. Mientras no cierre, ningún `EmailType` puede declarar
-   `unsubscribePolicy='required'` y los criterios de salida de este epic no son alcanzables. ID por reservar.
+   `unsubscribePolicy='required'` y los criterios de salida de este epic no son alcanzables.
 0b. **Alineación de marca (`TASK-1274`).** Cambio de cadenas, sin estructura; rompe a propósito los 17 snapshots y
    los tests que hoy afirman el compuesto.
 1. Foundation compatible con output legacy byte-idéntico.
@@ -108,6 +109,10 @@ Los IDs se reservan sólo cuando la ADR esté aceptada y el gate anterior permit
 4. Access/security, Hiring externo y regulated transactional en releases separados.
 5. Suscripción opcional/marketing después de validar propósito, consentimiento y jurisdicción.
 6. Retiro del legacy después de aceptación 30/30.
+7. **Superficie gobernada de preferencias de correo (`ui-ux`, ID por reservar).** La página con toggles por tipo que
+   `TASK-269` planeó y cerró sin entregar — el hueco que originó `ISSUE-163`. `TASK-1774` entrega el mecanismo y una
+   confirmación mínima; esta lane entrega la superficie con su wireframe. Se declara acá explícitamente porque un
+   follow-up sin dueño es exactamente cómo se perdió la primera vez.
 
 ## Existing Related Work
 

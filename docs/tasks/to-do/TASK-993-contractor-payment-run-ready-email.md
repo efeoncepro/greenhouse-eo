@@ -22,6 +22,18 @@
 - Legacy ID: `optional`
 - GitHub Issue: `optional`
 
+## Delta 2026-08-24 — revisar en qué carril de baja cae este correo
+
+Esta task declara `src/lib/email/subscriptions.ts` entre sus dependencias. La verificación del
+2026-08-24 (`ISSUE-163`) encontró que el mecanismo de baja no es accionable por ningún método, y que la
+emisión del token no depende de si el template realmente muestra el control — así que hay tipos que
+persisten credenciales de 30 días sin exponerlas nunca.
+
+No cambia el alcance de esta task. Sí agrega una pregunta al Discovery de quien la tome: **¿este correo
+resuelve destinatarios explícitos o desde `email_subscriptions`?** Si es lo segundo, es una lista real y
+necesita salida real, o sea depende de `TASK-1774`. Si es lo primero, no debe emitir token ni header de
+baja, y hay que verificar que no lo esté haciendo por el default `?? 'broadcast'` del carril batch.
+
 ## Summary
 
 Cuando Finanzas ejecuta la corrida mensual de contractors y quedan ordenes de
