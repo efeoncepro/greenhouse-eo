@@ -25,12 +25,14 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const openingId = searchParams.get('openingId') || undefined
+    const focusApplicationId = searchParams.get('focusApplication') || undefined
     const query = searchParams.get('query') || undefined
     const openingLimit = Number(searchParams.get('openingLimit'))
     const applicationLimit = Number(searchParams.get('applicationLimit'))
 
     const snapshot = await getHiringDeskSnapshot({
       openingId,
+      focusApplicationId,
       query,
       ...(Number.isFinite(openingLimit) && openingLimit > 0 ? { openingLimit } : {}),
       ...(Number.isFinite(applicationLimit) && applicationLimit > 0 ? { applicationLimit } : {}),

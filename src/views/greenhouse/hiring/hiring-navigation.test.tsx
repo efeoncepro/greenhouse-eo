@@ -79,6 +79,7 @@ describe('Hiring — navegación contextual lista/detalle', () => {
     const scrollIntoView = vi.fn()
 
     HTMLElement.prototype.scrollIntoView = scrollIntoView
+    window.history.replaceState({}, '', '/agency/hiring/pipeline?openingId=opng-account-manager&focusApplication=happ-account')
     vi.spyOn(window, 'requestAnimationFrame').mockImplementation(callback => {
       callback(0)
 
@@ -160,5 +161,40 @@ describe('Hiring — navegación contextual lista/detalle', () => {
       block: 'center',
       inline: 'center'
     })
+    expect(window.location.pathname + window.location.search).toBe(
+      '/agency/hiring/pipeline?openingId=opng-account-manager'
+    )
+  })
+
+  it('consume un foco inválido y deja una recuperación estable dentro del pipeline', async () => {
+    window.history.replaceState({}, '', '/agency/hiring/pipeline?openingId=opng-content&focusApplication=happ-missing')
+
+    const snapshot = {
+      demands: [],
+      openings: [{
+        demand: { businessUnit: 'Growth' },
+        opening: {
+          openingId: 'opng-content',
+          publicId: 'EO-OPEN-1',
+          publicTitle: 'Content Creator',
+          internalTitle: 'Content Creator'
+        }
+      }],
+      applications: [],
+      totals: { openings: 1, applications: 0, publishedOpenings: 1, activeDemands: 1 }
+    } as unknown as HiringDeskSnapshot
+
+    renderWithTheme(
+      <PipelineDeskView
+        copy={esCL}
+        initialSnapshot={snapshot}
+        initialOpeningId='opng-content'
+        initialFocusUnavailable
+      />
+    )
+
+    expect(await screen.findByText(esCL.pipeline.returnUnavailableTitle)).toBeVisible()
+    expect(screen.getByText(esCL.pipeline.returnUnavailableBody)).toBeVisible()
+    expect(window.location.pathname + window.location.search).toBe('/agency/hiring/pipeline?openingId=opng-content')
   })
 })

@@ -3,6 +3,13 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-24 — Revisar postulaciones ya no obliga a entrar y salir del Pipeline
+
+- Application 360 permite pasar a la postulación anterior o siguiente de la **misma vacante y etapa**. La cola excluye archivadas y usa orden cronológico estable; no es un ranking y no consulta score, afinidad ni recomendaciones IA.
+- Si hay una decisión, corrección o nota sin guardar, Greenhouse pregunta antes de cambiar de postulación. En móvil el contador se compacta y la pestaña padre activa se mantiene visible.
+- Al volver por la pestaña `Pipeline`, Greenhouse recupera la postulación exacta incluso si quedó fuera del límite habitual, consume el foco temporal de la URL y deja la tarjeta enfocada. Si ya no existe, muestra una recuperación honesta en vez de seleccionar otra.
+- El recorrido `1 de 2 → 2 de 2 → Pipeline` pasó Playwright/GVC en 1440 y 390 px, con View Transition compartida y cero errores de consola, página, hidratación o red.
+
 ## 2026-08-23 — Los tests contra base real dejan de fallar por pisarse entre ellos
 
 - Los tests que corren contra la base de verdad ahora se ejecutan **de a uno**, no en paralelo: comparten una sola base con producción, así que correrlos a la vez hacía que se pisaran y fallaran sin motivo real.
@@ -854,37 +861,3 @@ direcciones y el historial y no se refresca ni con recarga forzada. El operador 
 ícono viejo aunque el servidor ya sirviera el nuevo. De ahí el invariante que quedó escrito: al
 verificar un favicon, no confiar en el navegador propio — verificar el `200 image/x-icon` en el
 runtime y contar los `link[rel*=icon]` en el DOM.
-
-## 2026-08-15 — Auditamos Descubrir con dos lentes y la pantalla dejó de prometer cosas que no cumplía (TASK-1665)
-
-La lente se cerró ayer con la captura verde y el build en verde. Igual la pasamos por dos auditorías
-independientes —una de arquitectura, otra del oficio SEO/AEO— y las dos dijeron lo mismo: el fondo
-está bien, lo que fallaba era **cableado**. Capacidades que el motor ya servía y la pantalla no
-pedía, y promesas que la interfaz hacía sin que el runtime las cumpliera.
-
-Tres importaban de verdad. La primera: cuando el sistema rechazaba una corrida —cupo agotado,
-proveedor caído—, el botón se ponía rojo y no decía por qué. El código tenía un comentario
-tranquilizador que aseguraba que el detalle «lo cuenta la banda de estado», pero cuando el rechazo
-ocurre no se crea ninguna corrida, así que esa banda sigue mostrando la anterior. El operador se
-quedaba sin saber si reintentar servía de algo. Ahora el mensaje exacto del servidor aparece en
-pantalla, y el consejo depende de la causa: reintentar sólo se ofrece cuando reintentar sirve.
-
-La segunda: la banda de costo prometía responder «¿me cabe en el presupuesto?» y siempre decía
-«cupo no disponible». El dato existía —el mismo control que autoriza el gasto lo devuelve— y nadie
-se lo pedía. La tercera: al declarar un objetivo, la tabla se actualizaba pero el panel de detalle
-se quedaba congelado en la foto vieja, mostrando los botones de gasto habilitados sobre algo que ya
-se había confirmado.
-
-Después vinieron diez más, del mismo tipo. La tabla decía «Candidatos (312)» y mostraba 50, sin
-avisar: ahora dice «50 de 312» y explica el resto. Una corrida en curso no se actualizaba sola, así
-que la barra animada no podía distinguir «sigue trabajando» de «se congeló». Un candidato ya
-descartado ofrecía un botón que el sistema iba a rechazar al confirmarlo. Y el símbolo `◑`, que
-significa «estimado de mercado», se estaba usando también en cifras de dinero —incluido el costo
-real ya cobrado—, lo que iba borrando la distinción entre lo estimado y lo medido que el resto de
-la pantalla defiende con cuidado.
-
-Lo que no era de esta pantalla quedó escrito como trabajo propio: los estados de candidato que hoy
-nadie puede alcanzar porque ningún proceso los registra, la paginación de verdad, las tres formas de
-partir una búsqueda que el motor soporta y la interfaz todavía no ofrece —incluida la que arranca
-desde lo que Search Console ya midió, que es la de mejor calidad—, y un par de detalles finos del
-generador de preguntas para motores de respuesta.

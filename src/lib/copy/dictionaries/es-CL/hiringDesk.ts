@@ -91,6 +91,9 @@ export const hiringDesk: HiringDeskCopy = {
     appliedDaysAgo: 'Postuló hace {days} {unit}',
     appliedDayUnit: 'día',
     appliedDaysUnit: 'días',
+    returnFocusedStatus: 'Volviste al Pipeline. Postulación de {candidate}, etapa {stage}.',
+    returnUnavailableTitle: 'La postulación ya no está visible en este pipeline',
+    returnUnavailableBody: 'Mostramos la vacante disponible. La postulación pudo archivarse, cambiar de alcance o dejar de estar disponible para tu acceso.',
     /**
      * TASK-1754 — las seis columnas del ADR (§3) son `sourced`, `screening`, `shortlisted`,
      * `interview`, `decision_pending` y `closed`. Las otras siete claves siguen acá porque el
@@ -130,6 +133,12 @@ export const hiringDesk: HiringDeskCopy = {
     residenceCountryLabel: 'País de residencia',
     notProvided: 'No informado',
     candidateMessageTitle: 'Mensaje del candidato',
+    queuePosition: 'Postulación {position} de {total}',
+    queuePositionCompact: '{position} de {total}',
+    leaveWithUnsavedTitle: '¿Salir sin guardar?',
+    leaveWithUnsavedBody: 'Hay cambios locales en esta postulación. Si continúas, se descartarán.',
+    keepEditing: 'Seguir editando',
+    discardAndContinue: 'Descartar y continuar',
     assessmentTitle: 'Assessment y scorecard',
     assessmentPending: 'Sin evaluación asignada',
     assignAssessment: 'Asignar test',

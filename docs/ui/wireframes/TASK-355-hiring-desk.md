@@ -1,5 +1,13 @@
 # TASK-355 — Hiring Desk Wireframe
 
+## Delta 2026-08-24 — Retorno durable y revisión secuencial
+
+- El retorno ya no depende del límite cronológico del snapshot: `focusApplication` fija la postulación exacta, deriva desde ella la vacante canónica y trae también su opening/demanda aunque hayan quedado fuera de los listados acotados. El parámetro de foco es efímero y se consume al recuperar la tarjeta.
+- Si la postulación ya no puede resolverse, Pipeline limpia el foco inválido y muestra una recuperación estable dentro de la vacante disponible; no cae en otra tarjeta ni afirma que encontró el origen.
+- Application 360 ofrece `Anterior` / `Siguiente` sólo cuando existe otra **postulación** no archivada en la misma vacante y etapa. El reader devuelve exclusivamente ids y posición, con orden cronológico estable; no usa score, afinidad ni sugerencias IA, preservando anti-anclaje.
+- Si hay cambios sin guardar en Decisión, scorecard o Expediente, la navegación secuencial exige confirmar el descarte. En 390 px el contador se compacta a `{position} de {total}` y las route tabs desplazan automáticamente el padre activo a una posición visible.
+- Decisión: `reuse + extend`. Se mantienen rutas completas y la pestaña Pipeline como retorno único; no nace sidecar, botón Volver ni ranking de candidatos.
+
 ## Delta 2026-08-23 — Retorno contextual Application 360 → Pipeline
 
 - `Application 360` es un detalle hijo de `Pipeline`, no una quinta surface hermana. La pestaña persistente `Pipeline` es el único retorno primario: en el detalle muestra flecha, conserva el label visible y su nombre accesible es `Volver al pipeline de {opening}`.
@@ -185,6 +193,7 @@ Copy `getMicrocopy(locale).hiringDesk`; tokens AXIS; charts (KPIs) ECharts→Ape
 - Evidencia posterior Demanda 2026-07-10: `task355-hiring-demand-desk` PASS desktop/mobile en `.captures/2026-07-10T09-35-01_task355-hiring-demand-desk` (KPIs con profundidad, toolbar izquierda/derecha alineado, tabla enterprise, responsive sin overflow de página).
 - Evidencia de recomposición Pipeline 2026-08-16: `task355-hiring-pipeline-board` PASS desktop/390 px en `.captures/2026-08-16T22-13-39_task355-hiring-pipeline-board` (scope de vacante contenido, toolbar y Kanban en un plano operacional, labels completos, teclado, rollback, reduced-motion y axe sin findings).
 - Evidencia de retorno contextual 2026-08-23: `task355-hiring-application-360` PASS desktop/390 px en `.captures/2026-08-23T20-28-03_task355-hiring-application-360` (12 frames + video; destino de vacante exacto, foco en tarjeta, pestaña activa visible, cero errores de consola/página/hidratación/red). Los warnings de contraste pertenecen a contenido preexistente de Application 360 y no al control de retorno.
+- Evidencia de retorno durable y cola 2026-08-24: `task355-hiring-application-360` PASS desktop/390 px en `.captures/2026-08-24T12-19-59_task355-hiring-application-360` (24 frames + videos; `1 de 2 → 2 de 2`, misma vacante/etapa, morph Application→Pipeline y foco en la segunda tarjeta; cero errores de consola, página, hidratación y red). Los warnings axe de contraste y el skeleton de Expediente son preexistentes y no pertenecen a los controles nuevos.
 - Auditoría de fidelidad canvas-only 2026-07-10: `.captures/task355-hiring-reference-canvas-2026-07-10T08-18-26-140Z/index.html` compara el `main` del HTML aprobado contra runtime Demand/Pipeline/Publication, excluyendo el chrome global Greenhouse por contrato.
 
 ## Design Decision Log
@@ -198,6 +207,7 @@ Copy `getMicrocopy(locale).hiringDesk`; tokens AXIS; charts (KPIs) ECharts→Ape
 - **Transición tabs:** las tabs son navegación real (`href`) para no perder robustez; el panel aplica entrada `ghHiringPanel` y `viewTransitionName='hiring-desk-panel'`, con reduced-motion sin animación.
 - **360 = hub** que embebe assessment (1363) + docs (1362) + decisión; IA propone→humano confirma; anti-anclaje.
 - **360 vuelve por Pipeline, no por un CTA paralelo:** el route tab persistente resuelve el padre con `openingId`, `focusApplication` reencuentra la tarjeta y el morph compartido preserva continuidad espacial con reduced-motion equivalente.
+- **La cola secuencial navega postulaciones, no personas ni rankings:** mismo `openingId` + misma `stage`, archivadas excluidas, orden estable por creación/id y payload limitado a ids/posición. Nunca cruza vacantes ni consulta score/afinidad.
 - **Decisión estructurada/contestable** (reason obligatorio) — fairness/AI-Act; scorecard advisory, nunca gate.
 - **Publication diff** anti-leak; publish refresca la careers (`revalidatePath`).
 - **Bilingüe** es-CL + en-US; **marca Greenhouse** (app interna, no Efeonce).

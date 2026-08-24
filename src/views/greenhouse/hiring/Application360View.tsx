@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 
 import NextLink from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
@@ -41,6 +41,7 @@ import {
   isCardDensityAtLeast,
   useContainerDensity,
 } from '@/components/greenhouse/primitives'
+import { visuallyHiddenSx } from '@/components/greenhouse/accessibility'
 import type { HiringAssessmentCopy, HiringDeskCopy } from '@/lib/copy'
 import { formatDate, formatDateTime } from '@/lib/format'
 import {
@@ -58,6 +59,7 @@ import type {
   DecideHiringApplicationResult,
   HiringDecision,
   HiringDecisionHistoryEntry,
+  HiringApplicationQueueNavigation,
   HiringDeskApplicationSummary,
   HiringFulfillmentMode,
 } from '@/types/hiring'
@@ -73,6 +75,7 @@ import type { HiringApplicationNote } from '@/types/hiring-application-notes'
 
 import HiringDeskFrame from './HiringDeskFrame'
 import { hiringApplicationViewTransitionStyle } from './hiring-navigation'
+import useViewTransitionRouter from '@/hooks/useViewTransitionRouter'
 import ApplicationDossierPanel from './ApplicationDossierPanel'
 import CandidateDocumentsPanel from './CandidateDocumentsPanel'
 import AssessmentCompetencyRadar from './AssessmentCompetencyRadar'
@@ -248,6 +251,7 @@ interface Application360ViewProps {
   copy: HiringDeskCopy
   assessmentCopy: HiringAssessmentCopy
   initialItem: HiringDeskApplicationSummary
+  queueNavigation: HiringApplicationQueueNavigation | null
   initialAssessments: Assessment[]
   /** TASK-1747 — la asignación gobernada la decide la política; el cliente ya no elige. */
   canAuthorAssessment: boolean
@@ -391,6 +395,7 @@ const Application360View = ({
   documents: candidateDocuments,
   documentsFailed,
   initialItem,
+  queueNavigation,
   initialAssessments,
   canAuthorAssessment,
   canRecoverAccessByEmail,
@@ -406,7 +411,7 @@ const Application360View = ({
   noteAuthorNames,
 }: Application360ViewProps) => {
   const searchParams = useSearchParams()
-  const router = useRouter()
+  const router = useViewTransitionRouter()
   const rawRequestedTab = searchParams.get('tab')
   const requestedTab = rawRequestedTab ? TAB_ALIASES[rawRequestedTab] ?? rawRequestedTab : null
   const initialTab: TabKey = TAB_KEYS.includes(requestedTab as TabKey) ? (requestedTab as TabKey) : 'overview'
@@ -460,6 +465,8 @@ const Application360View = ({
   const [showDecisionForm, setShowDecisionForm] = useState(!item.application.decision)
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<string | null>(null)
+  const [dossierDirty, setDossierDirty] = useState(false)
+  const [pendingQueueHref, setPendingQueueHref] = useState<string | null>(null)
   const idempotencyKeyRef = useRef<string | null>(null)
   const assignTriggerRef = useRef<HTMLButtonElement | null>(null)
 
@@ -483,6 +490,33 @@ const Application360View = ({
   const activationHref = handoff
     ? `/hr/onboarding?lane=hiring-activation&applicationId=${encodeURIComponent(item.application.applicationId)}&handoffId=${encodeURIComponent(handoff.handoffId)}`
     : `/hr/onboarding?lane=hiring-activation&applicationId=${encodeURIComponent(item.application.applicationId)}`
+
+  const decisionDirty = showDecisionForm && (
+    decision !== (item.application.decision ?? 'selected') ||
+    destination !== (item.application.selectedDestination ?? '') ||
+    startDate !== (item.application.tentativeStartDate ?? '') ||
+    legalEntity !== (item.application.expectedLegalEntity ?? '') ||
+    context !== (item.application.expectedContext ?? '') ||
+    reason.trim().length > 0 ||
+    evidence.trim().length > 0 ||
+    overrideAdvisory
+  )
+
+  const hasUnsavedWork = dossierDirty || decisionDirty || Object.keys(scoreDrafts).length > 0
+
+  const navigateToQueueApplication = (applicationId: string | null) => {
+    if (!applicationId) return
+
+    const href = `/agency/hiring/applications/${encodeURIComponent(applicationId)}`
+
+    if (hasUnsavedWork) {
+      setPendingQueueHref(href)
+
+      return
+    }
+
+    router.push(href)
+  }
 
   // TASK-1747 — camino gobernado propose→confirm (TASK-1719). Reemplaza el legacy
   // `POST /api/hiring/assessments`, que dejaba al cliente elegir plantilla y devolvía el token
@@ -1796,6 +1830,7 @@ const Application360View = ({
       noteAuthorNames={noteAuthorNames}
       onGoToScorecard={() => setApplicationTab('assessment')}
       onToast={setToast}
+      onDirtyChange={setDossierDirty}
     />
   )
 
@@ -1836,6 +1871,66 @@ const Application360View = ({
         />
       ))}
     </Tabs>
+  )
+
+  const queueNavigationControls = queueNavigation && queueNavigation.total > 1 ? (
+    <Stack
+      direction='row'
+      alignItems='center'
+      justifyContent='space-between'
+      spacing={1}
+      data-capture='hiring-application-queue-navigation'
+      data-queue-position={queueNavigation.position}
+      sx={{ minWidth: 0, py: 0.5 }}
+    >
+      <Button
+        size='small'
+        variant='text'
+        startIcon={<i aria-hidden='true' className='tabler-chevron-left' />}
+        disabled={!queueNavigation.previousApplicationId}
+        onClick={() => navigateToQueueApplication(queueNavigation.previousApplicationId)}
+      >
+        {copy.common.previous}
+      </Button>
+      <Typography
+        variant='caption'
+        color='text.secondary'
+        fontWeight={650}
+        textAlign='center'
+      >
+        <Box component='span' sx={visuallyHiddenSx}>
+          {copy.application.queuePosition
+            .replace('{position}', String(queueNavigation.position))
+            .replace('{total}', String(queueNavigation.total))}
+        </Box>
+        <Box component='span' aria-hidden='true' sx={{ display: { xs: 'inline', sm: 'none' }, whiteSpace: 'nowrap' }}>
+          {copy.application.queuePositionCompact
+            .replace('{position}', String(queueNavigation.position))
+            .replace('{total}', String(queueNavigation.total))}
+        </Box>
+        <Box component='span' aria-hidden='true' sx={{ display: { xs: 'none', sm: 'inline' }, whiteSpace: 'nowrap' }}>
+          {copy.application.queuePosition
+            .replace('{position}', String(queueNavigation.position))
+            .replace('{total}', String(queueNavigation.total))}
+        </Box>
+      </Typography>
+      <Button
+        size='small'
+        variant='text'
+        endIcon={<i aria-hidden='true' className='tabler-chevron-right' />}
+        disabled={!queueNavigation.nextApplicationId}
+        onClick={() => navigateToQueueApplication(queueNavigation.nextApplicationId)}
+      >
+        {copy.common.next}
+      </Button>
+    </Stack>
+  ) : null
+
+  const applicationSupporting = (
+    <Stack spacing={1} sx={{ minWidth: 0 }}>
+      {queueNavigationControls}
+      {applicationNavigation}
+    </Stack>
   )
 
   const lead = (
@@ -1885,7 +1980,7 @@ const Application360View = ({
           </GreenhouseButton>
         </Stack>
       }
-      supporting={applicationNavigation}
+      supporting={applicationSupporting}
       />
     </Box>
   )
@@ -2211,6 +2306,34 @@ const Application360View = ({
         <DialogTitle>{copy.application.confirmTitle}</DialogTitle>
         <DialogContent><Stack spacing={2}><Typography color='text.secondary'>{copy.application.confirmBody}</Typography><Alert severity={decision === 'rejected' ? 'error' : 'warning'}><Typography fontWeight={700}>{DECISION_OPTIONS.find((option) => option.value === decision)?.label}</Typography><Typography variant='body2'>{reason}</Typography></Alert></Stack></DialogContent>
         <DialogActions><Button onClick={() => setConfirmOpen(false)} disabled={deciding}>{copy.common.cancel}</Button><GreenhouseButton tone={decision === 'rejected' ? 'error' : 'primary'} disabled={deciding} onClick={() => void submitDecision()} leadingIcon={deciding ? <CircularProgress size={16} color='inherit' aria-label={copy.common.loading} /> : undefined}>{copy.common.confirm}</GreenhouseButton></DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={pendingQueueHref !== null}
+        onClose={() => setPendingQueueHref(null)}
+        fullWidth
+        maxWidth='xs'
+        aria-labelledby='hiring-application-unsaved-title'
+        {...dialogMotionProps}
+      >
+        <DialogTitle id='hiring-application-unsaved-title'>{copy.application.leaveWithUnsavedTitle}</DialogTitle>
+        <DialogContent>
+          <Typography color='text.secondary'>{copy.application.leaveWithUnsavedBody}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPendingQueueHref(null)}>{copy.application.keepEditing}</Button>
+          <GreenhouseButton
+            tone='error'
+            onClick={() => {
+              const href = pendingQueueHref
+
+              setPendingQueueHref(null)
+              if (href) router.push(href)
+            }}
+          >
+            {copy.application.discardAndContinue}
+          </GreenhouseButton>
+        </DialogActions>
       </Dialog>
 
       <Snackbar

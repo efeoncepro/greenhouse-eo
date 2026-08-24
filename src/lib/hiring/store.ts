@@ -510,6 +510,11 @@ export const listTalentDemands = async (filters: ListTalentDemandFilters = {}): 
     clauses.push(`data_origin = 'real'`)
   }
 
+  if (filters.demandId) {
+    values.push(filters.demandId)
+    clauses.push(`demand_id = $${values.length}`)
+  }
+
   if (filters.status) {
     values.push(filters.status)
     clauses.push(`status = $${values.length}`)
@@ -571,6 +576,11 @@ export const listHiringOpenings = async (filters: ListHiringOpeningFilters = {})
   // es el opt-in EXPLÍCITO; nunca se filtra por procedencia con un WHERE escrito a mano.
   if (!filters.includeSynthetic) {
     clauses.push(`data_origin = 'real'`)
+  }
+
+  if (filters.openingId) {
+    values.push(filters.openingId)
+    clauses.push(`opening_id = $${values.length}`)
   }
 
   if (filters.demandId) {
@@ -653,6 +663,11 @@ export const listHiringApplications = async (
   // es el opt-in EXPLÍCITO; nunca se filtra por procedencia con un WHERE escrito a mano.
   if (!filters.includeSynthetic) {
     clauses.push(`data_origin = 'real'`)
+  }
+
+  if (filters.applicationId) {
+    values.push(filters.applicationId)
+    clauses.push(`application_id = $${values.length}`)
   }
 
   if (filters.openingId) {

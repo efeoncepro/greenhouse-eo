@@ -1,9 +1,9 @@
 # Operar Hiring Desk
 
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** con TASK-355 (previo al registro de metadatos)
-> **Ultima actualizacion:** 2026-08-23 por Codex (retorno contextual Application 360 → Pipeline)
+> **Ultima actualizacion:** 2026-08-24 por Codex (retorno durable y revisión secuencial)
 > **Documentacion funcional:** [Hiring Desk](../../documentation/hr/hiring-desk.md) · [Desenlace de una postulación](../../documentation/hr/desenlace-de-una-postulacion.md)
 
 ## Antes de empezar
@@ -53,6 +53,13 @@ La vacante seleccionada queda en la URL. Cuando abras una tarjeta y estés en Ap
 **← Pipeline** del encabezado para volver: Greenhouse abre el pipeline de esa misma vacante, desplaza el Kanban
 hacia la tarjeta y deja el foco allí. No necesitas volver a Demanda ni seleccionar la vacante otra vez. El
 retorno no recupera búsquedas anteriores, para que ningún filtro oculte postulantes del pipeline completo.
+
+Si ves `Anterior` y `Siguiente` sobre las pestañas de Application 360, puedes revisar otra **postulación**
+de esa misma vacante y etapa sin regresar al Kanban. El contador indica tu posición en esa cola; no representa
+un ranking ni usa afinidad, score o IA. Una postulación archivada no entra. Si editaste Decisión, una
+corrección del scorecard o una nota del Expediente, Greenhouse te pide elegir entre seguir editando o descartar
+antes de cambiar. Si al volver la postulación ya no está disponible, Pipeline conserva una vacante válida y
+muestra un aviso; no selecciona silenciosamente a otra persona.
 
 **Las seis columnas son las seis etapas (TASK-1754).** Desde 2026-08-22 hay una etapa por columna:
 Sourced · Screening · **Evaluación** · Entrevista · Decisión · Cerrado. Antes el dominio tenía trece y

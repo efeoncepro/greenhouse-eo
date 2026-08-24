@@ -1,5 +1,9 @@
 # TASK-355 — Hiring Desk Motion Contract
 
+## Delta 2026-08-24 — Continuidad de ruta y foco
+
+Application 360 y su tarjeta comparten `view-transition-name` por `applicationId`: el detalle se contrae hacia la tarjeta exacta al volver. La vista de origen permanece estable mientras carga el reader de destino; después ocurre el morph y el Pipeline desplaza/focaliza la tarjeta con un contorno breve. `Anterior`/`Siguiente` usa la transición de ruta canónica, pero sin dramatizar ni comparar candidatos. Con reduced motion se omiten snapshots/animación y se conservan navegación, anuncio y foco.
+
 ## Meta
 
 - Task: `TASK-355`
@@ -23,6 +27,10 @@ El movimiento en el desk confirma cambios de estado (mover una card de etapa, ap
 | M6 | Reveal PII | Transición del estado masked→revealed (sin llamar la atención) | Reveal (post-motivo) |
 | M7 | Decisión / publish | Estado de carga del botón + confirmación al aplicar | Decidir / publicar |
 | M8 | Columna del kanban | Skeleton/shimmer al cargar postulantes | Pipeline loading |
+| M9 | Application 360 ↔ tarjeta | Morph compartido por `applicationId` | Abrir o volver por Pipeline |
+| M10 | Tarjeta recuperada | Scroll + foco determinista + contorno breve | Pipeline consume `focusApplication` |
+| M11 | Route tabs móviles | Scroll suave para mantener visible la ubicación activa | Cambia ruta o ancho disponible |
+| M12 | Anterior/Siguiente | Cross-fade de ruta; el nuevo título recibe foco | Revisión secuencial |
 
 ## Microinteraction States
 
@@ -52,6 +60,7 @@ El movimiento en el desk confirma cambios de estado (mover una card de etapa, ap
 - M2/M4 move → **cambio de columna instantáneo** (sin transición); el feedback de "se movió" se conserva vía el reposicionamiento + anuncio `aria-live`.
 - M3 rollback → sin animación de regreso, pero **el toast de error se conserva** (el feedback esencial nunca se pierde).
 - M5 tabs → corte directo. M8 skeleton → estático.
+- M9/M11/M12 → navegación inmediata sin snapshot, morph ni scroll suave; M10 conserva foco, anuncio y contorno estático perceptible.
 - El feedback esencial (movido / se revirtió / guardando / éxito) SIEMPRE sobrevive; solo se simplifica el adorno.
 
 ## Accessibility & Feedback

@@ -182,14 +182,16 @@ sin marcadores de error y con las **seis etapas** de TASK-1754 en el HTML.
 Tiempos en `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` (~1h10m E2E, workflow 12m45s,
 manifest 9m50s). Skills Claude/Codex actualizadas en paridad total.
 
-## 2026-08-23 — Hiring: retorno contextual Application 360 → Pipeline implementado localmente
+## 2026-08-24 — Hiring: retorno durable y revisión secuencial implementados localmente
 
-**Estado: `code complete, rollout pendiente`; sin commit, push ni release.** La pestaña persistente `Pipeline`
-ahora deriva `openingId` desde cualquier postulación, vuelve con `focusApplication`, enfoca la tarjeta sin
-restaurar filtros y usa View Transition tarjeta↔hero con reduced-motion equivalente. El selector de vacante
-sincroniza el scope en la URL. GVC local PASS en 1440/390 px:
-`.captures/2026-08-23T20-28-03_task355-hiring-application-360` (12 frames, video, cero errores runtime).
-Typecheck, ESLint y 10 tests focales limpios. Pendiente: commit/release cuando el operador lo autorice.
+**Estado: `code complete, rollout pendiente`; sin commit, push ni release en esta iteración.** La pestaña
+`Pipeline` sigue siendo el único retorno, pero ahora fija la postulación exacta fuera de límites, consume el
+foco de URL y degrada honestamente si el origen no resuelve. Application 360 agrega Anterior/Siguiente dentro
+de la misma vacante+etapa, excluye archivadas y protege cambios sin guardar; el orden es cronológico estable,
+nunca score/IA. GVC local PASS 1440/390 px en
+`.captures/2026-08-24T12-19-59_task355-hiring-application-360` (24 frames por viewport, videos, recorrido
+`1 de 2 → 2 de 2 → Pipeline`, morph y foco exacto; runtime 0/0/0/0). Build de producción, typecheck,
+ESLint focal y 13 tests focales verdes. Pendiente: commit/push/release sólo con autorización del operador.
 
 ## 2026-08-23 — TASK-1772: los dos predicados convergieron, y convergieron al valor equivocado
 

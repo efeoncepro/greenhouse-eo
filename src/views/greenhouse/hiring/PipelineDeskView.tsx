@@ -109,10 +109,18 @@ interface PipelineDeskViewProps {
   initialSnapshot: HiringDeskSnapshot
   initialOpeningId?: string
   initialFocusApplicationId?: string
+  initialFocusUnavailable?: boolean
   simulateStageFailure?: boolean
 }
 
-const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, initialFocusApplicationId, simulateStageFailure = false }: PipelineDeskViewProps) => {
+const PipelineDeskView = ({
+  copy,
+  initialSnapshot,
+  initialOpeningId,
+  initialFocusApplicationId,
+  initialFocusUnavailable = false,
+  simulateStageFailure = false,
+}: PipelineDeskViewProps) => {
   const router = useViewTransitionRouter()
   const [applications, setApplications] = useState(initialSnapshot.applications)
   const [openingId, setOpeningId] = useState(initialOpeningId ?? initialSnapshot.openings[0]?.opening.openingId ?? '')
@@ -121,6 +129,7 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, initialFocu
   const [savingIds, setSavingIds] = useState<Set<string>>(new Set())
   const [lastMovedId, setLastMovedId] = useState<string | null>(null)
   const [returnedApplicationId, setReturnedApplicationId] = useState(initialFocusApplicationId ?? null)
+  const [returnUnavailable, setReturnUnavailable] = useState(initialFocusUnavailable)
   const [dragId, setDragId] = useState<string | null>(null)
   const [dragOverLane, setDragOverLane] = useState<LaneId | null>(null)
   const [toast, setToast] = useState<{ message: string; severity: 'success' | 'error' } | null>(null)
@@ -141,7 +150,14 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, initialFocu
   useEffect(() => {
     setOpeningId(initialOpeningId ?? initialSnapshot.openings[0]?.opening.openingId ?? '')
     setReturnedApplicationId(initialFocusApplicationId ?? null)
-  }, [initialFocusApplicationId, initialOpeningId, initialSnapshot.openings])
+    setReturnUnavailable(initialFocusUnavailable)
+  }, [initialFocusApplicationId, initialFocusUnavailable, initialOpeningId, initialSnapshot.openings])
+
+  useEffect(() => {
+    if (!initialFocusUnavailable) return
+
+    window.history.replaceState(window.history.state, '', buildHiringPipelineHref(openingId || undefined))
+  }, [initialFocusUnavailable, openingId])
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase('es-CL')
@@ -167,7 +183,13 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, initialFocu
       const card = Array.from(document.querySelectorAll<HTMLElement>('[data-application-id]'))
         .find(element => element.dataset.applicationId === returnedApplicationId)
 
-      if (!card) return
+      if (!card) {
+        setReturnUnavailable(true)
+        setReturnedApplicationId(null)
+        window.history.replaceState(window.history.state, '', buildHiringPipelineHref(openingId || undefined))
+
+        return
+      }
 
       const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
       const target = card.querySelector<HTMLElement>('[data-capture="hiring-card-open"]')
@@ -178,12 +200,21 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, initialFocu
         inline: 'center',
       })
       target?.focus({ preventScroll: true })
+      const returnedItem = filtered.find(item => item.application.applicationId === returnedApplicationId)
+
+      if (returnedItem && liveRef.current) {
+        liveRef.current.textContent = copy.pipeline.returnFocusedStatus
+          .replace('{candidate}', returnedItem.candidateName)
+          .replace('{stage}', copy.pipeline.stages[returnedItem.application.stage])
+      }
+
+      window.history.replaceState(window.history.state, '', buildHiringPipelineHref(openingId || undefined))
 
       returnTimerRef.current = window.setTimeout(() => {
         setReturnedApplicationId(current => current === returnedApplicationId ? null : current)
       }, 1400)
     })
-  }, [filtered, returnedApplicationId])
+  }, [copy.pipeline.returnFocusedStatus, copy.pipeline.stages, filtered, openingId, returnedApplicationId])
 
   const updateBoardEdges = useCallback(() => {
     const board = boardRef.current
@@ -736,7 +767,21 @@ const PipelineDeskView = ({ copy, initialSnapshot, initialOpeningId, initialFocu
       <HiringDeskFrame
         surface='pipeline'
         copy={copy}
-        primary={content}
+        primary={(
+          <Stack spacing={2}>
+            {returnUnavailable ? (
+              <Alert
+                severity='info'
+                data-capture='hiring-pipeline-return-unavailable'
+                onClose={() => setReturnUnavailable(false)}
+              >
+                <Typography fontWeight={700}>{copy.pipeline.returnUnavailableTitle}</Typography>
+                <Typography variant='body2'>{copy.pipeline.returnUnavailableBody}</Typography>
+              </Alert>
+            ) : null}
+            {content}
+          </Stack>
+        )}
         secondaryActions={openingScope}
         meta={pipelineMeta}
       />

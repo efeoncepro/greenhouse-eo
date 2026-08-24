@@ -41,20 +41,51 @@ export default async function HiringPipelinePage({ searchParams }: Props) {
 
   const [locale, snapshot] = await Promise.all([
     getLocale(),
-    getHiringDeskSnapshot({ openingLimit: 80, applicationLimit: 120 }),
+    getHiringDeskSnapshot({
+      openingId: resolved?.openingId,
+      focusApplicationId: resolved?.focusApplication,
+      openingLimit: 80,
+      applicationLimit: 120,
+    }),
   ])
 
-  if (process.env.NODE_ENV !== 'production' && resolved?.captureApplication === 'first' && snapshot.applications[0]) {
-    redirect(`/agency/hiring/applications/${snapshot.applications[0].application.applicationId}`)
+  const focusedApplication = resolved?.focusApplication
+    ? snapshot.applications.find((entry) => entry.application.applicationId === resolved.focusApplication)
+    : undefined
+
+  const requestedOpening = resolved?.openingId
+    ? snapshot.openings.find((entry) => entry.opening.openingId === resolved.openingId)
+    : undefined
+
+  const initialOpeningId = focusedApplication?.application.openingId
+    ?? requestedOpening?.opening.openingId
+    ?? snapshot.openings[0]?.opening.openingId
+
+  const localCaptureEnabled = !process.env.VERCEL_ENV && process.env.NODE_ENV !== 'production'
+
+  const queueCaptureApplication = (resolved?.captureApplication === 'queue'
+    ? snapshot.applications.find((candidate, _index, candidates) => (
+        candidates.some((peer) => (
+          peer.application.applicationId !== candidate.application.applicationId
+          && peer.application.openingId === candidate.application.openingId
+          && peer.application.stage === candidate.application.stage
+          && !peer.application.archivedAt
+        ))
+      ))
+    : undefined) ?? snapshot.applications[0]
+
+  if (localCaptureEnabled && resolved?.captureApplication && queueCaptureApplication) {
+    redirect(`/agency/hiring/applications/${queueCaptureApplication.application.applicationId}`)
   }
 
   return (
     <PipelineDeskView
       copy={getMicrocopy(normalizeLocale(locale) ?? undefined).hiringDesk}
       initialSnapshot={snapshot}
-      initialOpeningId={resolved?.openingId}
-      initialFocusApplicationId={resolved?.focusApplication}
-      simulateStageFailure={process.env.NODE_ENV !== 'production' && resolved?.captureFailure === 'stage'}
+      initialOpeningId={initialOpeningId}
+      initialFocusApplicationId={focusedApplication?.application.applicationId}
+      initialFocusUnavailable={Boolean(resolved?.focusApplication && !focusedApplication)}
+      simulateStageFailure={localCaptureEnabled && resolved?.captureFailure === 'stage'}
     />
   )
 }

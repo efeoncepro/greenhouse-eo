@@ -2,7 +2,7 @@ import type { CaptureScenario } from '../lib/scenario'
 
 export const scenario: CaptureScenario = {
   name: 'task355-hiring-application-360',
-  route: '/agency/hiring/pipeline?captureApplication=first',
+  route: '/agency/hiring/pipeline?captureApplication=queue',
   mutating: true,
   safeForCapture: true,
   viewport: { width: 1440, height: 900 },
@@ -24,6 +24,10 @@ export const scenario: CaptureScenario = {
     { kind: 'press', key: 'Escape' },
     { kind: 'sleep', ms: 1000 },
     { kind: 'mark', label: 'application-overview', note: 'Header candidato, PII masked y affinity advisory.' },
+    { kind: 'mark', label: 'application-queue', clipSelector: '[data-capture="hiring-application-queue-navigation"]', note: 'Navegación secuencial neutral dentro de la misma vacante y etapa.' },
+    { kind: 'click', selector: '[data-capture="hiring-application-queue-navigation"] button:has-text("Siguiente")' },
+    { kind: 'wait', selector: '[data-capture="hiring-application-queue-navigation"][data-queue-position="2"]', timeout: 15000 },
+    { kind: 'mark', label: 'application-queue-next', clipSelector: '[data-capture="hiring-application-queue-navigation"]', note: 'Siguiente cambia de postulación sin salir de la vacante ni de la etapa.' },
     { kind: 'click', selector: 'button[role="tab"]:has-text("Evaluación")' },
     { kind: 'mark', label: 'application-assessment', clipSelector: '[data-capture="hiring-application-panel-assessment"]', note: 'Assessment real o estado degradado honesto.' },
     { kind: 'click', selector: 'button[role="tab"]:has-text("Documentos")' },
@@ -33,7 +37,20 @@ export const scenario: CaptureScenario = {
     // TASK-1737 — el tab "Actividad" se convirtió en el Expediente real (timeline persistido).
     { kind: 'click', selector: 'button[role="tab"]:has-text("Expediente")' },
     { kind: 'mark', label: 'application-expediente', clipSelector: '[data-capture="hiring-application-panel-expediente"]', note: 'Expediente: timeline append-only de notas + eventos.' },
-    { kind: 'click', selector: 'a[data-parent-return="true"]' },
+    {
+      kind: 'interaction',
+      interaction: {
+        name: 'application-to-pipeline-context-return',
+        intent: 'Verificar la continuidad espacial Application 360 → tarjeta del pipeline sin perder vacante ni foco.',
+        action: { kind: 'click', selector: 'a[data-parent-return="true"]' },
+        frames: [
+          { label: 'departure', atMs: 20, note: 'La pestaña Pipeline inicia el retorno contextual.' },
+          { label: 'route-pending', atMs: 3000, note: 'La vista de origen permanece estable mientras resuelve el reader de destino.' },
+          { label: 'shared-element', atMs: 6200, note: 'El hero y la tarjeta comparten identidad visual al montar el destino.' },
+          { label: 'settled', atMs: 7000, note: 'El pipeline de la vacante exacta queda estable y listo para recuperar foco.' },
+        ],
+      },
+    },
     { kind: 'wait', selector: '[data-capture="hiring-pipeline-board"]', timeout: 15000 },
     { kind: 'mark', label: 'pipeline-context-return', note: 'Retorno al pipeline de la vacante exacta; la tarjeta recupera foco sin filtrar el tablero.' },
   ],

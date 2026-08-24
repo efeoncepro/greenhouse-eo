@@ -436,6 +436,19 @@ export interface HiringDeskSnapshot {
   }
 }
 
+/**
+ * Navegación operacional entre postulaciones de una misma vacante y etapa.
+ * El orden es cronológico y estable; nunca usa score, afinidad ni sugerencias IA.
+ */
+export interface HiringApplicationQueueNavigation {
+  openingId: string
+  stage: HiringApplicationStage
+  position: number
+  total: number
+  previousApplicationId: string | null
+  nextApplicationId: string | null
+}
+
 // ── Public opening structured content (TASK-1740) ──
 // Bloque candidate-facing versionado; el validador canónico vive en
 // src/lib/hiring/public-careers/public-content.ts.
@@ -736,6 +749,7 @@ export interface ListTalentDemandFilters {
    * operativos no cuentan fantasmas. La procedencia es ortogonal a `source` (canal de llegada).
    */
   includeSynthetic?: boolean
+  demandId?: string
   status?: TalentDemandStatus
   stakeholderType?: TalentDemandStakeholderType
   organizationId?: string
@@ -751,6 +765,7 @@ export interface ListHiringOpeningFilters {
    * operativos no cuentan fantasmas. La procedencia es ortogonal a `source` (canal de llegada).
    */
   includeSynthetic?: boolean
+  openingId?: string
   demandId?: string
   status?: HiringOpeningStatus
   publicationStatus?: HiringOpeningPublicationStatus
@@ -765,6 +780,7 @@ export interface ListHiringApplicationFilters {
    * operativos no cuentan fantasmas. La procedencia es ortogonal a `source` (canal de llegada).
    */
   includeSynthetic?: boolean
+  applicationId?: string
   openingId?: string
   identityProfileId?: string
   stage?: HiringApplicationStage

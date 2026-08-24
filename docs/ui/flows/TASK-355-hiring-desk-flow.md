@@ -1,5 +1,9 @@
 # TASK-355 — Hiring Desk Flow Contract
 
+## Delta 2026-08-24 — Pipeline ↔ Application 360 sin pérdida de contexto
+
+`Pipeline → Application 360 → Pipeline` conserva la postulación como unidad de trabajo. La ruta hija permite avanzar a la postulación anterior/siguiente únicamente dentro de la misma vacante y etapa; cambios locales sin guardar interrumpen el salto con confirmación. Al volver, el reader fija la postulación exacta aunque quede fuera de la página cronológica, consume `focusApplication` tras enfocar la tarjeta y degrada con aviso estable si el origen dejó de existir. Ningún paso ordena por score o recomendación IA.
+
 ## Meta
 
 - Task: `TASK-355`
@@ -44,7 +48,8 @@ Demand Desk (N4) ──drilldown──▶ Pipeline Board (N4) ──mover etapa 
 
 - **Drilldown Demand→Pipeline/360/Publication** (N4): click en fila.
 - **Mover etapa** (N4/N6): drag OR **menú "Mover a etapa" (teclado)** → `updateHiringApplicationStage` optimista (rollback si falla). Anuncia el resultado (`aria-live`).
-- **Abrir 360** (N5): click card.
+- **Abrir 360** (N5): click card. `Anterior`/`Siguiente` recorre postulaciones no archivadas de la misma vacante+etapa en orden cronológico estable; nunca cruza scope ni rankea.
+- **Volver al Pipeline** (N5→N4): la pestaña persistente Pipeline lleva `openingId` + `focusApplication`; el destino consume el foco al encontrar/enfocar la tarjeta o muestra recuperación honesta si ya no existe.
 - **Asignar test** (N6): dialog → `assignCandidateTest` (1360); genera el link tokenizado.
 - **Revisar scorecard** (N8): tab Assessment; la IA muestra sugerencia → **confirmar/editar** (nunca auto; anti-anclaje independent-before-debrief).
 - **Decidir** (N9): form (avanzar/rechazar/hold + destino/fecha/entidad + **reason estructurado obligatorio**) → confirmación → `decideHiringApplication`.
@@ -74,6 +79,7 @@ opening publication: draft → published ⇄ paused → closed (Publication Desk
 
 - **Kanban NO drag-only** (2.5.7): menú "Mover a etapa" por teclado en cada card; foco visible; resultado anunciado (`aria-live`).
 - Tabs (360) = APG tabs; foco al `<h1>` al abrir la ficha.
+- La navegación secuencial conserva labels visibles, contador compacto a 390 px y guard de cambios sin guardar; al cambiar de postulación el nuevo `<h1>` recibe foco.
 - Decisión/reveal/publish = dialog accesible (foco atrapado, Esc, foco de retorno).
 - Reflow 320/200%; `prefers-reduced-motion` (drag/optimistic degradan a cambio inmediato).
 
@@ -97,6 +103,8 @@ opening publication: draft → published ⇄ paused → closed (Publication Desk
 |---|---|---|
 | Mover etapa falla | rollback visual + toast | optimistic con rollback |
 | Facet del 360 falla (PG blip) | ese bloque degradado honesto ("no disponible") | anti silent-catch (no `catch(()=>[])`) |
+| `focusApplication` no resuelve | aviso estable dentro del Pipeline y foco efímero consumido | no seleccionar otra tarjeta ni mantener URL inválida |
+| Hay edición local al usar Anterior/Siguiente | diálogo para seguir editando o descartar y continuar | nunca perder cambios en silencio |
 | Decidir sin reason | validación inline (reason obligatorio) | forms-ux |
 | Reveal sin capability | affordance oculto/deshabilitado + motivo | capability+audit |
 | Publicar con datos sensibles | el diff muestra solo allowlist; confirmación | anti-leak |
