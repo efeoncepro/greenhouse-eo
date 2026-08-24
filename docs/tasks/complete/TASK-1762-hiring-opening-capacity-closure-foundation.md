@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `migration|command|reader|sync`
 - Epic: `EPIC-011`
-- Status real: `ADR Accepted 2026-08-23; implementación en curso desde Slice 1`
+- Status real: `Slices 1-5 code complete 2026-08-23; rollout pendiente (flags OFF, correo apagado, canary no ejercitable)`
 - Rank: `TBD`
 - Domain: `hr|data|ops`
 - Blocked by: `none` — el ADR quedó `Accepted` el 2026-08-23 tras la enmienda de reconciliación de cupos
@@ -99,6 +99,44 @@ qué va uno en curso; no puede dispararlo. Es el mismo reparto que ya rige en el
 LLM propone y lee, el humano confirma en el endpoint de confirmación.
 
 La decisión individual (`decideHiringApplication`) conserva su propio contrato y no cambia acá.
+
+## Delta 2026-08-23 (3) — cierre: los 5 slices, y qué falta para que exista en runtime
+
+**`code complete, rollout pendiente`.** Nada de esto está encendido: los dos flags nacen OFF y el
+`EmailType` nuevo nace `enabled=false` por seed. Hoy no cambia nada para ningún candidato.
+
+| Slice | Qué quedó |
+|---|---|
+| 1 | Política de capacidad **sin conteo** + trigger de guarda sobre `requested_seats` + capabilities |
+| 2 | Preview con `effectDigest` + confirm durable con run/items + status reader |
+| 3 | Reconciler vía command canónico + presupuesto de reintentos + cuarentena + 2 señales |
+| 4 | `EmailType` propio + variante consent-aware + seed apagado + 2 flags en `ops-worker` |
+| 5 | Ruta `GET/POST /api/hiring/openings/[id]/capacity-closure` + doc funcional + manual |
+
+### Bloqueadores de rollout — reales, no de agenda
+
+1. **El canary NO es ejercitable hoy.** Las dos vacantes vivas tienen **0 `selected`**, así que la
+   capacidad nunca está llena y el confirm se niega con `hiring_opening_capacity_not_filled`, que es
+   la conducta correcta. Ejercitar el camino completo exige seleccionar a alguien primero.
+2. **`TASK-1764` sigue `to-do`.** Sin ella, `hiring_decision_not_selected` cae al perfil de footer
+   **legacy en silencio**. Bloquea el correo, no el cierre — por eso los flags son independientes.
+3. **Falta sign-off de Talent y Privacidad** sobre el copy y el gate de consentimiento.
+
+### Lo que NO se verificó, y hay que decirlo
+
+- **Ningún cierre real se ejecutó.** Los live tests del reconciler son read-only sobre datos de
+  candidatos a propósito: escribir un desenlace desde un test tocaría a una persona verdadera de las
+  ~50 de la base compartida, y el desenlace es append-only.
+- **Ningún correo se envió.** La variante nueva se ejercitó por registro y preview, nunca por entrega.
+- El readback de aceptación (`cero rejected`, `cero sin capacity_filled`) corre verde **sobre cero
+  items decididos**: prueba que el invariante no se viola, no que el camino funciona.
+
+### Follow-up abierto
+
+El seed de `TASK-1757` (`20260820045834971`) tiene el mismo `Down` con `DELETE` sobre una tabla
+fail-open. Su fila está hoy `enabled=true`, así que **no hay riesgo vivo** — borrarla la deja en el
+mismo estado efectivo. Es una trampa latente que se arma sólo si alguien pausa ese correo y después
+revierte la migración. Necesita forward fix propio; no se toca desde esta task.
 
 ## Summary
 

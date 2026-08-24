@@ -2,6 +2,60 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-23 — TASK-1762: el cierre por capacidad ya no marca a nadie como rechazado
+
+**Estado: `code complete, rollout pendiente`.** Slices 1–5 en `develop` local, **sin push**. Tres
+migraciones aplicadas y verificadas contra PG. **Los dos flags están OFF y el correo nace apagado**,
+así que hoy no cambia nada para nadie.
+
+**El hallazgo que cambió el diseño.** El ADR afirmaba que no existía fuente de verdad del número de
+cupos. Era falso: `hiring_opening.requested_seats` existe desde TASK-353 y **el operador la ve y la
+edita como «Cupos»** en el Demand Desk (`DemandDeskView.tsx:981` y `:1240`). Por eso
+`hiring_opening_capacity` **NO guarda conteo** — sólo el opt-in y su gobernanza — y `unmanaged` se
+expresa como ausencia de política vigente, no como un `NULL`. Un `target_seats` propio habría sido
+un segundo «Cupos» decidiendo el cierre de 36 personas mientras la pantalla muestra el primero. El
+ADR quedó enmendado en sitio y `Accepted`.
+
+**Lo construido:** política + preview con digest + confirm durable + reconciler + correo propio.
+El desenlace que escribe es `not_selected` + `capacity_filled`, **nunca `rejected`**. Un `EmailType`
+propio (`hiring_decision_not_selected`) con kill-switch independiente, y la promesa del Banco de
+Talento sólo con consentimiento **re-leído al enviar**.
+
+**Tres frenos independientes**, y la independencia es lo que permite un canary: cerrar la cohorte
+SIN notificarla. `HIRING_OPENING_CAPACITY_CLOSURE_ENABLED` (ejecución) ·
+`HIRING_CAPACITY_FILLED_EMAIL_ENABLED` (sólo correo) · fila de `email_type_config`. **Los dos flags
+viven en el `ops-worker`, no en Vercel.**
+
+**Dos bugs que sólo aparecieron ejecutando de verdad:**
+
+1. `runGreenhousePostgresQuery` devuelve el array **ya desempaquetado**: `.rows[0]` compila, pasa
+   typecheck y revienta en runtime. Lo cazó el live test corrido **con credenciales** — sin ellas
+   decía `skipped`, que a ojo se ve igual que verde.
+2. **El `Down` del seed hacía `DELETE`**, y con `checkEmailTypeEnabled` fail-open eso **encendía**
+   el correo en vez de deshacerlo — en el peor momento, porque uno hace rollback cuando algo ya va
+   mal. Hallazgo de `greenhouse-eo-e8` auditando. Corregido a `enabled = FALSE` antes de commitear.
+   **El defecto venía heredado del precedente TASK-1757, que copié fielmente** junto con su cita a
+   una función inexistente. Reusar un precedente transmite también sus defectos.
+
+**Bloqueadores reales del rollout, no agenda:**
+
+- **El canary no es ejercitable hoy**: las dos vacantes vivas tienen **0 `selected`**, así que la
+  capacidad nunca está llena y el confirm se niega correctamente.
+- **`TASK-1764` sigue `to-do`**: sin ella el `EmailType` nuevo cae al perfil de footer **legacy en
+  silencio**. Bloquea sólo el correo, no el cierre.
+- Falta sign-off de Talent y Privacidad sobre el copy y el gate de consentimiento.
+
+**Decisión tomada, antes implícita:** el cierre masivo **no se federa** como acción de agente. Bajo
+el AI Act, selección es alto riesgo con supervisión humana obligatoria. El carril expone `preview` y
+`status` como lecturas.
+
+**Deuda ajena señalada, no tocada:** el seed de TASK-1757 tiene el mismo `Down` con `DELETE`. e8
+midió que su fila está hoy `enabled=true`, así que **no hay riesgo vivo** —borrarla la deja en el
+mismo estado efectivo—: es una trampa latente que se arma sólo si alguien pausa ese correo y después
+revierte. Limpieza, no urgencia.
+
+Próximo paso: `TASK-1763` (consumer UI) recibe el DTO del preview y el command sin duplicar reglas.
+
 ## 2026-08-23 — Release a producción `709e15f6688e`: los follow-ups de Hiring quedaron vivos
 
 **Estado: `released`.** Manifest `709e15f6688e-639df794-8604-4053-8fcf-d2419cfedcc4`, orquestador
@@ -534,53 +588,3 @@ violaciones de frontera `server-only`→cliente y dynamic imports rotos — clas
 Con esto, **ninguna de las tres tiene gates mecánicos pendientes**. Lo que les falta es runtime, no
 verificación: las tres migraciones parqueadas en `docs/tasks/pending-migrations/` esperan el release, en el
 orden declarado en su README (contract del enum → backfill de 1748 → `CHECK` del invariante).
-
-## 2026-08-22 — EPIC-042/TASK-1764 gobiernan footers sin big bang; cero cambios de correo o runtime
-
-Se creó `EPIC-042`, su primera child `TASK-1764` y un ADR Proposed para dejar de improvisar footers sin poner en riesgo una de las
-superficies más estables del producto. Efeonce es siempre la masterbrand; Greenhouse sólo puede aparecer como su
-plataforma. Firma y footer quedan separados, prioridad de entrega no determina propósito y unsubscribe nace
-prohibido salvo suscripción opcional o marketing explícitamente clasificados.
-
-El contrato incluye además RRSS, dirección e información legal como bloques independientes: RRSS default `none`
-y sólo institucionales en suscripción/marketing; identidad `compact|entity|full` desde el operating entity; nota
-`none|security|privacy|regulated`, sin disclaimer universal. Full legal en marketing es baseline conservador sujeto
-a validación con abogado habilitado por jurisdicción, no una declaración de cumplimiento global.
-
-La task no posee código ni habilita un reemplazo global de `EmailLayout`. La primera child deberá introducir el
-contrato con output legacy byte-idéntico; las siguientes cubrirán una sola familia y máximo cuatro `EmailType`.
-Cada cohorte exige baseline, diff limitado al footer, previews 720/390 y sin imágenes, tests, aprobación explícita,
-canary consentido en cliente real y rollback por tipo. Access/security, Hiring externo y transaccionales regulados
-nunca comparten release. Estado: **diseño/documentación; ADR Proposed; ningún template, envío o runtime cambió**.
-Siguiente paso: revisar/aceptar el ADR y sólo entonces crear la child foundation dentro de `EPIC-042`; siguientes
-IDs libres `TASK-1772` y `EPIC-043` (actualizado 2026-08-22: `TASK-1765`…`TASK-1771` tomadas por el carril de desenlace).
-
-## 2026-08-21 — Correo de selección personalizado adopta una firma visual Efeonce; rollout pendiente
-
-`hiring_decision_selected` ahora separa asunto, preencabezado y título visible, confirma la elección sin declarar
-incorporación y explica `carta oferta → aceptación → contrato` con paridad HTML/texto plano. La primera propuesta
-3D, el bouquet genérico y la V3 corporativa abstracta quedaron rechazados. Diseño + Talent
-convergen en una V4 concreta: sobre abierto, tarjeta sin texto, check de confirmación y un destello naranja. No
-representa demografía, contrato ni onboarding, pesa 63.972 bytes y quedó en
-`gs://efeonce-group-greenhouse-public-media-prod/emails/hiring-selected-email-mail-icon-v4.png` con readback 200.
-
-Se retiró la tarjeta que repetía la vacante y la imagen permanece decorativa (`alt=""`). La decisión y los hitos
-documentales ahora guían la lectura con negritas visibles aplicadas a frases completas,
-y ambas variantes de decisión firman `Equipo de Talento · Efeonce`, alineadas con el Reply-To real. La variante de
-rechazo no consume la imagen. Capturas finales: `.captures/hiring-selected-email-hero/email-v6-720.png` y
-`.captures/hiring-selected-email-hero/email-v6-390.png`. Estado: **code complete, rollout pendiente**. No se envió ningún correo real ni se
-desplegó el cambio; el siguiente paso es incluirlo en un release normal y verificar un envío consentido en un
-cliente de correo real.
-
-## 2026-08-21 — TASK-1762/1763 formalizan cierre por cupos y correo empático; cero runtime nuevo
-
-Se crearon dos tasks bajo `EPIC-011` y un ADR Proposed. `TASK-1762` posee capacidad explícita separada de
-publicación, preview/confirm humano, run durable por item, decisión/evento canónicos y variantes de rechazo directo
-o vacante completada. `TASK-1763` es el consumer UI de Application 360 con dirección visual, wireframe y flow.
-
-La selección de una persona nunca auto-rechaza. Sólo un preview fresco y una confirmación explícita crean el run;
-el worker llama `decideHiringApplication` por cada application y el correo nace desde ese hecho, conservando dedupe
-y recovery parcial. `backup_selected`/`on_hold` se muestran aparte. La frase de Banco de Talentos sólo aparece con
-consentimiento futuro vigente; `data_origin` no gatea comunicaciones. TASK-1689 queda histórica y TASK-1721 ahora
-apunta a estos owners. Estado: **diseño/documentación; ADR Proposed; sin código, migración, flag ni envío nuevo**.
-Siguiente paso: aceptar/ajustar el ADR, tomar TASK-1762 y después TASK-1763.

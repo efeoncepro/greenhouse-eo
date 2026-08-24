@@ -3,6 +3,14 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-23 — Quien no queda porque el cupo lo tomó otro ya no figura como rechazado
+
+- El cierre de una vacante llena registra ahora **«sin selección»** con la causa «vacante completada», no un descarte. La diferencia no es de palabras: un descarte es un juicio sobre la persona, la deja fuera del Banco de Talento por defecto y **cuenta como rechazo en el análisis que mide si un proceso discrimina**.
+- El operador ve **exactamente a cuántas personas afectaría** antes de confirmar, agrupadas por cómo entrarían. Quien está en pausa o es respaldo **no entra** salvo que se pida: una la dejó esperando alguien a propósito, y con la otra hay un compromiso abierto.
+- Si el resumen cambió desde que se miró, el sistema **no deja confirmar**: estarías cerrando un grupo distinto del que aprobaste.
+- El correo tiene su propio texto y su propio interruptor, así que se puede pausar un cierre masivo **sin silenciar** los correos de decisión individual. La frase «mantendremos tu perfil» aparece **sólo** si esa persona lo autorizó, verificado en el momento de enviar.
+- Nada de esto está encendido todavía: el cierre y el correo nacen apagados, a la espera del sign-off de Talent y Privacidad.
+
 ## 2026-08-23 — Los follow-ups de Hiring quedaron vivos en producción
 
 - El eje de desenlace, el vocabulario de seis etapas, el filtro de procedencia del archivo sintético, el callejón de intentos del assessment y el predicado único de «proceso activo» pasaron a producción en el release `709e15f6688e` (PR #206, 140 archivos, 5 migraciones).
@@ -917,23 +925,3 @@ archivo. Ahora distingue teclas que navegan de teclas que activan.
 
 Evidencia: captura verde en 1440 y 390, scorecard 4,55. Queda el build de producción como último
 gate.
-
-## 2026-08-14 — El set monitoreado ahora sabe POR QUÉ una keyword está ahí (TASK-1659)
-
-Hasta hoy, "estoy en la 12 y quiero la 5" y "el cliente quiere rankear acá y estoy en la 60" eran
-la misma fila. Nada distinguía una **oportunidad** que se está empujando de un **objetivo**
-acordado con el cliente, así que un compromiso lejano se leía como fracaso permanente en cualquier
-lectura agregada y no existía narrativa de avance. Ahora cada membresía puede declarar su
-intención, con autor y fecha propios — y el autor del compromiso se guarda aparte de quién ejecutó
-el write, porque un agente puede declarar por encargo.
-
-Dos decisiones que valen más que la columna: **nada se backfilleó y el command no asume nada.**
-Marcar lo viejo como "oportunidad" habría afirmado que alguien lo clasificó, e inflado el conteo
-con filas que nadie miró; la ausencia se propaga honesta hasta la pantalla. Y **cambiar la
-intención no sobrescribe: cierra la membresía y abre otra**, porque el dato que sirve para reportar
-no es "esta keyword es un objetivo" sino "es objetivo desde marzo, y en marzo estaba en la 45".
-Reclasificar no consume cupo del techo, así que se puede hacer con el set lleno — que es cuando más
-falta hace.
-
-Salió de intentar construir el workbench de discovery (TASK-1665) y descubrir que dos de sus
-acciones citaban un contrato que no existía. Desbloquea la lente de Objetivos.
