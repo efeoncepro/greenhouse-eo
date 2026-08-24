@@ -79,6 +79,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "test": "vitest run",
+    "test:live": "node scripts/test-live.mjs",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:staging": "node scripts/playwright-staging.mjs",

@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { beforeEach, afterEach, describe, expect, it } from 'vitest'
 
 import {
   getEffectiveHiringAssessmentAiRunMode,
@@ -15,6 +15,16 @@ const ENV_KEYS = [
 ] as const
 
 describe('TASK-1742 assessment AI governed modes', () => {
+  // 🔴 El entorno se normaliza ANTES de cada test, no sólo después.
+  //
+  // Con sólo `afterEach`, este bloque asumía que el ambiente llegaba limpio — y no llega: correr
+  // los live tests en local exige `set -a; source .env.local`, que exporta las ~85 variables del
+  // archivo, entre ellas `HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED=true`. Con eso, «nace disabled»
+  // recibía `global_provisional` y fallaba. El test era verde o rojo según CÓMO se invocara la
+  // suite, que es la peor propiedad que puede tener una aserción.
+  //
+  // Un test que afirma un DEFAULT tiene que garantizar su precondición, nunca heredarla.
+  beforeEach(() => ENV_KEYS.forEach(key => delete process.env[key]))
   afterEach(() => ENV_KEYS.forEach(key => delete process.env[key]))
 
   it('nace disabled aunque no haya mode explícito', () => {
