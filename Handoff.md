@@ -37,9 +37,18 @@ explícitamente ahí porque un follow-up sin dueño es exactamente cómo se perd
   `EPIC-042`**: en cuanto una cohorte se promueva, esa dirección se imprime en correos productivos.
 - `TASK-993` — pregunta al Discovery: ¿destinatarios explícitos o lista? Define si depende de 1774.
 
-**Hallazgo preexistente NO tocado:** `TASK-993` da `errors=1 warnings=4` en `task:lint` por ser anterior
-a la plantilla vigente (no declara `Execution profile` ni `UI impact`). Verificado que es idéntico antes
-y después de mi Delta — no lo introduje y no lo arreglé; migrar esa task es trabajo aparte.
+**Hallazgo preexistente, corregido después a pedido del operador:** `TASK-993` daba `errors=1 warnings=4`
+en `task:lint` por ser anterior a la plantilla vigente (no declaraba `Execution profile` ni `UI impact`).
+Verificado primero que era idéntico antes y después de mi Delta — no lo introduje. Luego se completó al
+formato vigente: `backend-data`, `Backend impact: api|command|sync`, más contratos Modular Placement y
+Backend/Data. **Decisión de alcance dentro de esa corrección:** la afordancia visible del Slice 6 (botón
+«Reenviar email a Finanzas» en el modal de corrida mensual) **salió a follow-up `ui-ux` con ID por
+reservar**, en vez de escribirle un wireframe acá. Razón: el propio slice la modelaba como opcional
+(«otherwise leave UI minimal and rely on endpoint response»), el Goal decía «desde la UI **o** API», y el
+modelo operativo pide `backend-data` primero y `ui-ux` después. Inventar un doc de diseño para una acción
+secundaria, sin pasar por las skills de producto, habría sido exactamente el doc-para-pasar-el-gate que el
+contrato de tasks prohíbe. El endpoint se conserva completo. `task:lint` de las 7 tasks tocadas:
+`errors=0 warnings=0`.
 
 **Gates:** `task:lint` 1764/1274/1774 `template=1 errors=0 warnings=0`; `docs:context-check:strict`
 verde tras rotar.
