@@ -3,6 +3,13 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-24 — TeamBot deja de prometer una mención que Teams no soporta
+
+- Un anuncio real a `EO Team` demostró que usar el ID del chat como identidad de `@todos` no funciona: Teams aceptó el mensaje, pero mostró `todos` como texto común y no notificó colectivamente.
+- La capacidad oficial es más acotada: un bot puede mencionar personas explícitas en un chat grupal, pero no puede mencionar a todos. La causa no era idioma ni configuración del tenant.
+- Se corrigieron las skills, arquitectura, invariantes, runbook y `TASK-716`. El diseño futuro solo admite `none` o `explicit_users`; también conserva las Adaptive Cards sin `activity.text` para evitar la burbuja duplicada.
+- No se reintentó el envío. El soporte local especulativo de `--mention-all` fue retirado y no forma parte del runtime versionado.
+
 ## 2026-08-24 — Queda registrado que nadie puede darse de baja de un correo, y quién lo va a arreglar
 
 - Se abrió el incidente que documenta el defecto: el enlace «Dejar de recibir estos correos» del pie **falla por los tres caminos posibles**, incluido el botón «Cancelar suscripción» que Gmail y Outlook muestran sobre el asunto. Ninguno da de baja a nadie.
@@ -810,21 +817,3 @@ Security/Privacy/Talent/Identity/MCP. La evidencia visual se rehízo sobre un ha
 en producción, después de comprobar que una máscara de diff no anonimiza los píxeles ni el árbol de accesibilidad.
 También se retiró del theme la importación residual de Public Sans; el runtime conserva Poppins + Geist como familias
 canónicas.
-
-## 2026-08-15 — People queda avisado cuando un candidato termina su test
-
-El evento canónico `hiring.assessment.submitted` ahora tiene un consumer idempotente que prepara un
-correo interno a `people@efeoncepro.com` con candidato, vacante, hora de envío y acceso directo a la
-postulación. Sólo acepta `candidate_test` realmente completados, nunca scorecards, y no interpreta
-el resultado ni mueve al candidato de etapa. La migración quedó aplicada en Cloud SQL, la configuración
-`hiring_assessment_submitted_internal` está habilitada y el release `0fe2420ed894` terminó en el
-manifest `released` (run `31915501771`), con Vercel y watchdog verdes. No se ejercitó una entrega real
-de candidato en este release; People/Operations debe verificar la primera entrega futura sin hacer
-backfill del evento histórico.
-
-La revisión read-only del test vigente de Content Creator confirmó 11 preguntas sobre 8
-competencias, pesos que suman 100, límite de 90 minutos, cero prompts vacíos o duplicados, opciones
-objetivas válidas y ninguna clave de respuesta o rúbrica en la proyección pública. Un recorrido
-sintético sin correo completó además `assigned → in_progress → submitted`, probó el bloqueo por
-respuestas pendientes, guardó las 11 respuestas, auto-calificó una y dejó diez en cola humana; el
-fixture y sus eventos se eliminaron al terminar.

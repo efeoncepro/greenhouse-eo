@@ -2,6 +2,14 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-24 — TeamBot: `@todos` en chats grupales queda descartado
+
+Un envío real a `EO Team` confirmó que el contrato histórico era falso: Bot Framework aceptó `<at>todos</at>` con el `chatId` como `mentioned.id`, pero Teams publicó `todos` como texto plano en una burbuja separada, sin arroba ni notificación colectiva. La burbuja provino de combinar `activity.text` con la Adaptive Card.
+
+La documentación oficial de Microsoft establece que los bots en chats grupales admiten menciones a usuarios, pero no `@everyone`. Se corrigieron arquitectura, invariante Ops, runbook, `TASK-716`, contexto durable y las skills espejadas de plataforma/operación. El diseño de `TASK-716` ahora usa `none | explicit_users`; prohíbe `everyone_in_chat` y `mentioned.id=<chatId>`.
+
+**Estado:** corrección documental completa; el soporte local no confirmado de `--mention-all` se retiró antes del commit y no existe en el runtime versionado. No se realizó un segundo envío.
+
 ## 2026-08-24 — ISSUE-163 + TASK-1774: el mecanismo de baja tiene dueño
 
 **Sólo docs.** Continuación directa de la revisión de `TASK-1764`. Sin runtime tocado, sin push.
@@ -583,17 +591,3 @@ eje de desenlace. Hoy no muerde porque la tabla está vacía. Registrado en el �
 `pnpm build` NO se ejecutó: el operador respondió «no, salvo que lo autorices después» — postergado por costo
 de máquina, con la puerta abierta, **no** delegado al release; `pnpm test` completo 11.962 verdes, `pnpm lint` 0
 errores, `pnpm typecheck` limpio, GVC del tablero en desktop y 390 px mirado.
-
-## 2026-08-22 — Demo 35 queda estudiada y registrada; WordPress sigue intacto
-
-Inspección read-only de `Demo 35: Blog Magazine` (`page_id=225984`) para su posible adaptación como home del
-blog. El baseline vigente es 7 raíces, 113 nodos, 55 containers, 58 widgets y 15 `ohio_recent_posts`; catorce
-usan IDs fijos, cinco referencias son attachments, cuatro widgets ya renderizan vacíos y dos pierden un slot.
-La causa de que el layout parezca romperse al retirar Ohio es el wiring de contenido, no los containers.
-
-Contrato operativo nuevo:
-`docs/audits/public-site/2026-08-22-demo35-elementor-runtime-contract.md`. La landing quedó registrada en las
-skills espejadas `efeonce-public-site-wordpress`. Regla principal: conservarla como página Elementor normal,
-mantener `page_for_posts=0`, adaptar primero una copia/draft y preservar árbol, settings Elementor y metas Ohio;
-el futuro corte debe mantener una sola canónica `/blog/`. Dueño arquitectónico existente: Public Website Landing
-Control Plane. No se modificaron páginas, posts, opciones, formularios, caché ni archivos de Kinsta.

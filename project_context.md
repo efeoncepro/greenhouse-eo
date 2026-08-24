@@ -7,6 +7,8 @@ TypeScript. Este archivo contiene solo contratos durables y rutas de descubrimie
 rollout o bloqueo vive en [Handoff.md](Handoff.md); la historia pre-2026-07-19 quedó preservada en
 [`docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`](docs/operations/agent-context-history/2026-07-19/project_context.legacy.md).
 
+Los anuncios manuales de TeamBot usan `pnpm teams:announce`. En chats grupales, Teams admite menciones a usuarios explícitos pero **no** `@todos` / `@everyone`; el `chatId` nunca es una identidad mencionable. El contrato y el incidente verificado viven en [`docs/operations/manual-teams-announcements.md`](docs/operations/manual-teams-announcements.md).
+
 La migración de consumo privado de AXIS está cerrada para la operación interna/producción: el secreto activo
 vive en `efeonce-group`, el secreto legacy de `efeonce-globe` fue eliminado y el PAT legacy fue revocado. El
 PAT temporal aprobado para la migración permanece activo hasta su sustitución por una identidad de máquina

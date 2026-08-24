@@ -182,6 +182,7 @@ curl -X POST "https://smba.trafficmanager.net/teams/v3/conversations" \
 | 400 "The required permissions have not been consented to by the caller" on `installedApps` | Delegated CLI token lacks team-scope consent authority | Use Teams Desktop GUI to install + consent |
 | Admin Center "Permisos" tab shows RSC as "Sin consentir" | Expected; RSC consents at install time, not tenant-wide | Install in each team via Teams Desktop |
 | Inbound JWT validation fails | Wrong issuer / audience / clock skew / JWKS cache stale | Verify `iss ∈ {api.botframework.com, sts.windows.net/{tid}/}`, `aud === appId`, 60s clock tolerance, refresh JWKS |
+| `todos` / `everyone` renders as plain text in a group chat | Unsupported collective mention; `chatId` was used as a mention target | Do not retry with another localized label or ID. Group-chat bots support explicit user mentions, not `@everyone` |
 
 ## Mentions and push notifications
 
@@ -247,12 +248,13 @@ Verified rules (public commercial cloud, Bot Framework Connector):
 
 6. **DM 1:1 doesn't need `<at>`** — Teams already pings the recipient because it's a direct message.
 
-7. **Channel-wide mention** ("@channel"): `mentioned.id = "<channelId>"`, `mentioned.name = "<channelDisplayName>"`. Some tenants disable channel-wide mentions per-team in Settings → @mentions. If it doesn't work in a specific team, that's tenant config, not bot bug.
+7. **Group chats do not support `@everyone` / `@todos` from bots.** Microsoft documents that bots can mention users in group chats, but cannot mention everyone. Never encode the conversation `chatId` as `mentioned.id`: Bot Framework may accept the activity while Teams renders only plain text and sends no collective notification. Mention explicit members individually, or move the communication to a separately governed channel surface that supports the required audience semantics. Do not extrapolate Microsoft Graph team/channel mention schemas to Bot Framework group-chat activities.
 
 8. **Activity feed notification (the bell)** is a separate channel: via RSC `TeamsActivity.Send.Group`, endpoint `POST {serviceUrl}/v3/conversations/{convId}/activities` with `activityType: 'taskCreated'` (or custom). Useful when you want to notify the user in their feed without writing to the channel.
 
 ## Tooling and references
 
+- Microsoft Teams bot conversations and group-chat mention limitation: <https://learn.microsoft.com/microsoftteams/platform/bots/how-to/conversations/channel-and-group-conversations>
 - Microsoft Bot Framework Connector REST API: <https://learn.microsoft.com/azure/bot-service/rest-api/bot-framework-rest-connector-api-reference>
 - Resource-Specific Consent permissions catalog: <https://learn.microsoft.com/microsoftteams/platform/graph-api/rsc/resource-specific-consent>
 - Teams app manifest schema: <https://developer.microsoft.com/json-schemas/teams/v1.16/MicrosoftTeams.schema.json>

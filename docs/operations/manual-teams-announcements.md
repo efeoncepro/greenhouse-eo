@@ -73,6 +73,16 @@ pnpm teams:announce \
   --yes
 ```
 
+## Límite de `@todos` en chats grupales
+
+`EO Team` es un `chat_group`. TeamBot no puede generar una mención colectiva `@todos` / `@everyone` en esta superficie; Microsoft solo admite menciones a usuarios explícitos. No agregues `<at>todos</at>`, no uses el `recipientChatId` como `mentioned.id` y no interpretes un HTTP 2xx del Connector como confirmación de una mención.
+
+El fallo observado el 2026-08-24 es el comportamiento esperado del payload no soportado: Teams creó una burbuja separada con `todos` en texto plano y publicó la Adaptive Card, pero no mostró arroba ni notificó a todas las personas. La burbuja apareció porque `activity.text` viajó junto con la tarjeta.
+
+Para menciones válidas, incluye el nombre visible en el título o cuerpo y pasa una opción `--mention "Texto visible|entraObjectIdOrUpn|Nombre de perfil"` por persona. Si no se dispone de identidades verificadas, envía la tarjeta sin prometer notificación colectiva. No pruebes variantes en el chat público para descubrir capacidades.
+
+Fuente: [Microsoft Teams — channel and group chat conversations](https://learn.microsoft.com/microsoftteams/platform/bots/how-to/conversations/channel-and-group-conversations).
+
 ## Formato del body file
 
 - Separar párrafos con una línea en blanco.
