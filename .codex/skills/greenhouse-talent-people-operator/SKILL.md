@@ -31,6 +31,7 @@ This skill is a **decision aid, not legal advice**. For statutory pay, contract 
 | "cultura / operating code / performance review / valores en equipo"                                               | Efeonce Operating Code + People development                                                                                                                                                                                                                                    |
 | "headcount / capacity gap / build vs buy vs borrow / org design"                                                  | Workforce planning                                                                                                                                                                                                                                                             |
 | "design a squad / delivery pod for a client / RFP team section / staff augmentation / who staffs this engagement" | Client squad design (Talent-as-a-Service)                                                                                                                                                                                                                                      |
+| "cerrar la vacante / ya se llenaron los cupos / avisarle al resto de las candidaturas"                            | Opening capacity closure — governed `preview → confirm → run` (see the section below; outcome `not_selected` + `capacity_filled`, never `rejected`)                                                                                                                             |
 | any of the above **inside Greenhouse** (Hiring/ATS, assessment engine)                                            | + load `references/greenhouse-runtime.md`                                                                                                                                                                                                                                      |
 
 **Do NOT use for**: payroll amounts / tax / previsional (→ `greenhouse-payroll-auditor`), offer letters / employment contracts drafting (→ Workforce Contracting Studio + legal), cost/margin of a hire (→ `greenhouse-finance-accounting-operator`), the visual build of careers/assessment UI (→ product-design skills).
@@ -220,17 +221,70 @@ purpose**, because a contract is applied only AFTER the release that removes the
   `'qualified'`, which belongs to talent **demand**, not to applications — never sweep it while cleaning
   application stages.
 
+## Opening capacity closure — the seat count has ONE owner (TASK-1762)
+
+Closing a cohort because the vacancy filled its seats is a governed `preview → confirm → run`, never a batch
+`UPDATE`. ADR: `docs/architecture/GREENHOUSE_HIRING_OPENING_CAPACITY_CLOSURE_DECISION_V1.md` (`Accepted`,
+amended in place 2026-08-23). Foundation `src/lib/hiring/opening-capacity/**`, route
+`GET|POST /api/hiring/openings/{id}/capacity-closure`, capabilities `hiring.opening.capacity.read` and
+`hiring.opening.capacity.confirm`.
+
+- **The seat target already existed and it is `hiring_opening.requested_seats`** (`TASK-353`,
+  `INTEGER NOT NULL DEFAULT 1 CHECK (>= 1)`), which the operator reads in the «Cupos» column of the Demand
+  Desk (`DemandDeskView.tsx:981`) and edits in the «Cupos» field (`:1240`). **NEVER** open a second counter:
+  a `target_seats` of its own would decide whether dozens of real people get an email while the screen the
+  operator actually uses keeps showing the first number.
+- **The capacity policy stores NO count.** `greenhouse_hiring.hiring_opening_capacity` records the opt-in and
+  its governance only (`opening_id`, `managed_since`, `set_by_user_id`, `reason`, `policy_version`).
+  `unmanaged` is **the absence of a live policy row**, never a `NULL` in a count — and absence is never read
+  as "one seat". Occupied seats are derived from live `selected` decisions; no mutable counter is kept.
+- **With a live policy, `requested_seats` changes ONLY through the capacity command** (capability
+  `hiring.opening.capacity.confirm` + audit) and the generic `updateHiringOpening` rejects it; without a
+  policy the column keeps its current behaviour. Defence in depth: application guard + DB trigger + audit +
+  drift signal.
+- **The outcome is `not_selected` with cause `capacity_filled`, NEVER `rejected`** — the vocabulary rule
+  above, now with an implementation. The run writes one application at a time through the canonical
+  `decideHiringApplication` (outcome + cause + idempotency), never a mass `UPDATE`, and the email is born
+  from the persisted `hiring.application.decided` event, never emitted by the run.
+- **The cohort is exact:** only applications of that opening with no live terminal outcome.
+  `backup_selected` and pauses (stage `decision_pending` with no outcome declared) are shown apart and are
+  superseded only when the confirmation includes them explicitly. Other openings of the same person do not
+  change.
+- **The mass closure is NOT federated as an agent action** (resolved 2026-08-23, closing the question
+  `TASK-1773` left open). The governed lane exposes the cohort `preview` and the run `status` — reads. An
+  agent may explain how many people a closure would touch and how one in flight is going; **NEVER** let it
+  fire one: the gate is a human confirmation against a fresh digest, and under the AI Act selection is
+  high-risk with mandatory human oversight. The individual decision keeps its own contract.
+- **Publishing, capacity and communications are three axes.** Pausing or closing publication consumes no
+  seats and closes no application; selecting someone closes no cohort and notifies nobody.
+- "Mantendremos tu perfil" is claimed only when future-contact consent is live, re-read at send time.
+  `data_origin` never gates who receives the email; canaries use allowlisted recipients, not provenance
+  filters.
+
+**Estado (2026-08-23): `code complete, rollout pendiente` — nothing is on.** Both flags default OFF and live
+**only in the `ops-worker`** (`HIRING_OPENING_CAPACITY_CLOSURE_ENABLED` gates confirm/execution;
+`HIRING_CAPACITY_FILLED_EMAIL_ENABLED` gates only the email, so a cohort can be closed without notifying it),
+declared in `services/ops-worker/deploy.sh` — whose `--set-env-vars` is destructive — and the
+`email_type_config` row is seeded `enabled=false`. **No real closure has ever run and no email has ever been
+sent**; the acceptance readback (zero `rejected`) is green over **zero decided items**, which proves the
+invariant is not violated, not that the path works. Blockers: the canary is **not exercisable** — both live
+openings have **0 `selected`**, so capacity can never be full and confirm correctly refuses with
+`hiring_opening_capacity_not_filled`, and exercising it requires selecting someone first; `TASK-1764` is
+still `to-do`, so `hiring_decision_not_selected` falls to the legacy footer profile **silently**; and
+Talent + Privacy sign-off on the copy and the consent gate is missing. **NEVER** present this capability as
+operational.
+
 ## Hiring lifecycle emails (TASK-1689 — LIVE en producción 2026-08-12)
 
-The Hiring cycle emits 7 transactional emails as reactive consumers in the **ops-worker** (consumers `src/lib/sync/projections/hiring-lifecycle-emails.ts`; domain policy `src/lib/hiring/notifications/**`; templates `src/emails/Hiring*.tsx`):
+The Hiring cycle registers 8 transactional email types as reactive consumers in the **ops-worker** (consumers `src/lib/sync/projections/hiring-lifecycle-emails.ts`; domain policy `src/lib/hiring/notifications/**`; templates `src/emails/Hiring*.tsx`) — 7 live, and `hiring_decision_not_selected` (TASK-1762) born off:
 
 - `hiring.application.created` → internal alert to People (`HIRING_INTERNAL_NOTIFICATIONS_EMAIL`, default `people@efeoncepro.com`) + acknowledgement of receipt to the candidate.
 - `hiring.assessment.assigned` → assessment-link email **only when `method=candidate_test`** (interviewer scorecards NEVER email the candidate). The token-sensitive sender reserves a durable redacted intent before issuing the credential; the bearer never travels through generic outbox/delivery metadata, and assignment is not a resend mechanism.
 - `hiring.assessment.submitted` → internal alert to People **only when `method=candidate_test`**. It links to Application 360 for human review, never carries a score and never advances or decides the application.
 - `hiring.application.stage_changed` → progress email **only for candidate-facing stages** (allowlist: `shortlisted`="Preselección", `interview`="Entrevista"); internal stage names never reach candidate copy.
-- `hiring.application.decided` → **only 2 of the 6 outcomes write to the candidate today**: `selected` (congratulations) and `rejected` (thank-you; type `hiring_decision_rejected` is independently pausable). `not_selected`, `backup_selected` and `withdrawn` are designed but have **no template yet**, and `unresponsive` is silent **by design** — closing with any of those four sends the person NOTHING. The selector is an explicit map with a declared no-op (`DECISION_EMAIL_TYPE`, `src/lib/hiring/notifications/send.ts`): an outcome absent from it is born mute rather than inheriting its neighbour's type. **NEVER** reuse another outcome's `EmailType` to "at least notify".
+- `hiring.application.decided` → **only 2 of the 6 outcomes reach a candidate today**: `selected` (congratulations) and `rejected` (thank-you; type `hiring_decision_rejected` is independently pausable). `not_selected` **already has its own template and `EmailType`** (`hiring_decision_not_selected`, TASK-1762 — «esta vez elegimos a otra persona», consent-aware, distinct from the discard thank-you), but it is **born off**: its `email_type_config` row is seeded `enabled=false` and `HIRING_CAPACITY_FILLED_EMAIL_ENABLED` is OFF, so closing with it sends nothing yet. `backup_selected` and `withdrawn` are designed but have **no template yet**, and `unresponsive` is silent **by design**. The selector is an explicit map with a declared no-op (`DECISION_EMAIL_TYPE`, `src/lib/hiring/notifications/send.ts`): an outcome absent from it is born mute rather than inheriting its neighbour's type. **NEVER** reuse another outcome's `EmailType` to "at least notify" — **one `EmailType` per outcome, the cause modulates the BODY, never the type**: the system branches on that value in three places (per-type kill-switch in `email_type_config`, footer profile, and this selector), so collapsing two outcomes leaves a cohort closure and an individual discard under the same switch. The dedupe is **not** an argument here: it keys on `source_event_id + source_entity + recipient_email`, not on `EmailType`.
 
-Governance: flag `HIRING_LIFECYCLE_EMAILS_ENABLED` **ON in production since 2026-08-12** (rev `ops-worker-00548-x52`, default `true` in `services/ops-worker/deploy.sh`) — **it lives ONLY in the ops-worker** (flipping it in Vercel does nothing); per-type kill-switch in `greenhouse_notifications.email_type_config`; dedupe via `wasEmailAlreadySent`. EmailTypes: `hiring_application_received_internal`, `hiring_application_confirmation`, `hiring_assessment_assigned`, `hiring_assessment_submitted_internal`, `hiring_stage_advanced`, `hiring_decision_selected`, `hiring_decision_rejected`. The submitted-test alert shipped in production through release `0fe2420ed894` (orchestrator `31915501771`, manifest `released`, watchdog `ok`/`drift_count=0`); its live delivery has not yet been exercised with a real completed candidate test. Real E2E exercised (EO-APP-0090): 5 prior types `status=sent`; `hiring_decision_selected` is covered by tests until its first real use. Remaining open items: Legal/Privacy review of retention/notice, parser-level required flip for country, formal GVC scorecard.
+Governance: flag `HIRING_LIFECYCLE_EMAILS_ENABLED` **ON in production since 2026-08-12** (rev `ops-worker-00548-x52`, default `true` in `services/ops-worker/deploy.sh`) — **it lives ONLY in the ops-worker** (flipping it in Vercel does nothing); per-type kill-switch in `greenhouse_notifications.email_type_config`; dedupe via `wasEmailAlreadySent`. EmailTypes: `hiring_application_received_internal`, `hiring_application_confirmation`, `hiring_assessment_assigned`, `hiring_assessment_submitted_internal`, `hiring_stage_advanced`, `hiring_decision_selected`, `hiring_decision_rejected`, and `hiring_decision_not_selected` (registered by TASK-1762, seeded `enabled=false`, footer profile pending `TASK-1764` — until then it resolves to the legacy profile silently). The submitted-test alert shipped in production through release `0fe2420ed894` (orchestrator `31915501771`, manifest `released`, watchdog `ok`/`drift_count=0`); its live delivery has not yet been exercised with a real completed candidate test. Real E2E exercised (EO-APP-0090): 5 prior types `status=sent`; `hiring_decision_selected` is covered by tests until its first real use. Remaining open items: Legal/Privacy review of retention/notice, parser-level required flip for country, formal GVC scorecard.
 
 Docs: manual `docs/manual-de-uso/hr/operar-emails-ciclo-hiring.md` · functional `docs/documentation/hr/emails-ciclo-hiring.md` · architecture `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` (Delta 2026-08-12) · flag ledger `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
@@ -367,7 +421,10 @@ load-bearing in `templates/job-offer-recipe.md`. Builder `job-posting.ts` consum
 - **NEVER** anchor a test/live fixture on "the first active profile" of the database (`ISSUE-159`). There is
   **ONE Cloud SQL instance shared by dev, staging and production**: a fixture written that way fabricated a
   candidate facet and a Talent Pool membership **for a real collaborator**. Use the dedicated identity in
-  `src/lib/hiring/live-test-identity.ts`.
+  `src/lib/hiring/live-test-identity.ts` — and when the test **mutates** its subject, the shared identity is
+  no longer enough: derive a per-file one with `resolveLiveTestCandidateFixture(scope)`. Full contract
+  (runner, serialization, fixtures, the two failure modes that read as green) in §Live tests run against the
+  ONE shared database.
 
 **Estado**: **EN PRODUCCIÓN 2026-08-18** (release `fa54670470c1`) — editorial page + JSON-LD `JobPosting`,
 **both flags ON**, schema externally validated by validator.schema.org with **0 errors / 0 warnings**.
@@ -586,6 +643,46 @@ CLI: `pnpm hiring:data:mark-synthetic` and `pnpm hiring:data:purge-synthetic`; g
 Docs: architecture `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-18 · functional
 `docs/documentation/hr/procedencia-de-datos-hiring.md` · manual
 `docs/manual-de-uso/hr/operar-procedencia-de-datos-hiring.md`.
+
+## Live tests run against the ONE shared database (contract 2026-08-23)
+
+> Canon completo: [`LIVE_TESTS_AGENT_INVARIANTS.md`](../../../docs/architecture/agent-invariants/LIVE_TESTS_AGENT_INVARIANTS.md).
+> Se auto-carga por path (`.claude/rules/live-tests.md`) al tocar un `*.live.test.ts`, `vitest.config.ts`
+> o `scripts/test-live.mjs`. Lo de abajo es el resumen que necesita esta skill; el detalle vive allá.
+
+The `*.live.test.ts` of Hiring do not run against an ephemeral database: they run against the **single Cloud
+SQL instance shared by dev, staging and production**. Every rule below exists because of that.
+
+- **Run them with `pnpm test:live`** (`scripts/test-live.mjs`; filter by path, e.g.
+  `pnpm test:live src/lib/hiring/opening-capacity`). **NEVER** use `set -a; source .env.local; set +a` to
+  hand them credentials: that exports the ~85 variables of the file into the test process and **broke 15 unit
+  tests in 6 files across 4 domains** (secrets, cloud/billing, cloud/postgres, emails) which assert default
+  behaviour — "born disabled", "reports unconfigured without a token". The runner passes the
+  `GREENHOUSE_POSTGRES_` prefix and nothing else: **how to REACH the database, never how the app BEHAVES.** A
+  live test that also needs a flag declares it in its own invocation (`FLAG=1 pnpm test:live …`); **NEVER**
+  widen the allowlist with a `*_ENABLED`.
+- **They run serialized** (vitest project `live` with `fileParallelism: false`, `vitest.config.ts`), while the
+  ~1300 unit tests keep their per-file parallelism. **NEVER** "fix" a collision between live tests by
+  serializing the whole suite — the unit tests share nothing and should not pay for it.
+- **Isolate the subject by scope.** `resolveLiveTestCandidateFixture(scope)` and
+  `resolveLiveTestCandidateFixtures(scope, count)` (`src/lib/hiring/live-test-identity.ts`) derive a subject
+  of their own from a textual scope — use the test file name. Deterministic, idempotent under concurrency and
+  with no central registry to maintain. The SHARED subject (`resolveLiveTestIdentityProfileId`) is only valid
+  for a test that **does not mutate** its subject: three assignment-policy files resolving from the same
+  3-profile pool took the same two rows and invalidated each other's proposals — 6 red tests with
+  `assessment_assignment_proposal_stale` that read exactly like flakiness. **NEVER** patch that by splitting
+  the pool with `OFFSET` by index: the fourth file breaks it again. And **NEVER** anchor a fixture on "the
+  first active profile" (`ISSUE-159`).
+- **Two failure modes look like a green run, and both send the diagnosis to the wrong place:**
+  - **`skipped` reads identically to green** in the summary. Read the `passed` count, never the absence of
+    red; the runner fails hard on missing credentials precisely so the suite cannot skip silently.
+  - **A downed Cloud SQL proxy makes the tests PASS while the suite goes RED**: what cannot connect is the
+    teardown, so "5 passed / 1 failed" looks like a broken test. `pnpm test:live` preflights the TCP port for
+    that reason — when it complains, raise the proxy
+    (`cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev" --port 15432`), do not debug the test.
+- **A live test that writes an outcome touches a real person**, and the outcome is append-only. That is why
+  the capacity-closure reconciler's live tests are **read-only over candidate data on purpose** — and why
+  green live tests there never prove the write path was exercised.
 
 ## First reads (before acting inside Greenhouse)
 

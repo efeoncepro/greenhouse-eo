@@ -261,6 +261,12 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   no `-X ours`: éste último sólo decide los hunks en conflicto y puede **duplicar contenido documental
   en silencio**, algo que las dos verificaciones duras no ven porque miran sólo rutas de código. La
   auditoría correcta de un `-X ours` es `git diff HEAD@{1} HEAD --name-status` completo.
+- **Live tests (`*.live.test.ts`): `pnpm test:live`, nunca `source .env.local`.** Escriben sobre la ÚNICA
+  instancia Cloud SQL de dev/staging/prod, así que corren serializados (proyecto `live` en `vitest.config.ts`)
+  y su sujeto se deriva por `scope`, no de un pool compartido. Canon:
+  [`LIVE_TESTS_AGENT_INVARIANTS.md`](docs/architecture/agent-invariants/LIVE_TESTS_AGENT_INVARIANTS.md),
+  auto-cargado por `.claude/rules/live-tests.md`. **La regla vive en `AGENTS.md` y NO en `CLAUDE.md` por
+  decisión, no por olvido:** `CLAUDE.md` estaba a 18 tokens de su gate de presupuesto (34.982/35.000).
 - Staging/preview y producción tienen configuración separada. Flags, secrets y migraciones deben verificarse
   en cada runtime consumidor, no solo en Vercel.
 - El checkout compartido actual es el único entorno de ejecución autorizado. Nunca crear, usar ni tocar

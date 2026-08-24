@@ -3,6 +3,13 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-23 — Los tests contra base real dejan de fallar por pisarse entre ellos
+
+- Los tests que corren contra la base de verdad ahora se ejecutan **de a uno**, no en paralelo: comparten una sola base con producción, así que correrlos a la vez hacía que se pisaran y fallaran sin motivo real.
+- Cada archivo de test usa **su propio candidato de prueba** en vez de tomarlo de una bolsa común de tres, que era la causa de que tres archivos se estorbaran entre sí.
+- Hay un comando nuevo para correrlos (`pnpm test:live`) que **sólo entrega credenciales de base**. Antes, la forma habitual de dárselas volcaba toda la configuración local al proceso y rompía quince tests de otros equipos que no tenían nada que ver.
+- Dos fallas que engañaban ahora se declaran: un test saltado ya no se puede confundir con uno exitoso, y si falta el túnel a la base el comando lo dice de entrada en vez de fallar al final.
+
 ## 2026-08-23 — Quien no queda porque el cupo lo tomó otro ya no figura como rechazado
 
 - El cierre de una vacante llena registra ahora **«sin selección»** con la causa «vacante completada», no un descarte. La diferencia no es de palabras: un descarte es un juicio sobre la persona, la deja fuera del Banco de Talento por defecto y **cuenta como rechazo en el análisis que mide si un proceso discrimina**.
@@ -881,47 +888,3 @@ nadie puede alcanzar porque ningún proceso los registra, la paginación de verd
 partir una búsqueda que el motor soporta y la interfaz todavía no ofrece —incluida la que arranca
 desde lo que Search Console ya midió, que es la de mejor calidad—, y un par de detalles finos del
 generador de preguntas para motores de respuesta.
-
-## 2026-08-14 — Descubrir keywords deja de ser una API y se convierte en pantalla (TASK-1665)
-
-El motor de descubrimiento existía desde ayer y sólo se podía operar por API, Nexa o MCP. Ahora
-tiene cara: la lente **Descubrir** de `Growth > SEO > Keywords` — la misma ruta, el mismo permiso,
-el mismo Space; sólo `?view=discovery`.
-
-Lo interesante no es que ahora se vea, sino **qué se negó a suavizar al hacerse visible**. La banda
-de costo muestra la fórmula completa antes de confirmar, y el estimado es el peor caso a propósito:
-si la corrida sale más barata, esa diferencia no es crédito que puedas volver a gastar. El estimado
-de mercado (`◑`) y lo que Search Console midió de tu sitio (`●`) viven en columnas separadas y no se
-promedian nunca; donde no hay dato dice "Sin dato de mercado", no `0` — porque un cero se lee como
-"no hay demanda", y eso sería inventar. Y la columna que en toda herramienta se llama "dificultad"
-acá se llama **Barrera de enlaces**, en niveles: el índice crudo del proveedor colapsa a 0 en
-búsquedas en español de LATAM y se leería como "trivial" siendo falso.
-
-La decisión que más costó defender fue la más aburrida: **nada se pinta antes de que el command
-confirme**. `trackKeywords` responde HTTP 200 con la keyword rebotada por techo de cupo; tratar ese
-200 como éxito habría pintado "siguiendo" sobre un término que nadie mide, y el error sólo aparece
-cuando llega la factura. Por eso el resultado se lee y se anuncia **por término**, nunca como un
-"Listo" agregado. En la misma línea: ver y gastar son dos permisos, y sin el de gasto los botones no
-aparecen apagados — no aparecen.
-
-Cierra además una deuda que no era suya: no existía forma de conmutar lentes en una `page.tsx` del
-dashboard. Ahora existe, y `TASK-1660` la reusa en vez de inventarla de nuevo.
-
-**Delta 2026-08-15 — mirar los frames cambió cuatro cosas.** La pantalla pasaba lint, tipos, build y
-10.763 tests. Aun así, la primera captura real encontró que el botón `Detalles` rendía 3,71:1 sobre
-el tinte de hover de su propia fila —sobre blanco daba 4,59, o sea que el defecto sólo existía con el
-puntero encima— y que el panel de detalle apretaba cinco métricas en 460 px hasta convertir su texto
-de ayuda en una cinta vertical de una palabra por línea. Ninguna de las dos es detectable sin ojos.
-
-Lo interesante fue el arreglo del contraste: bajar el tono no alcanzaba (4,42) y la variante tonal
-del design system lo empeoró a 3,69 —pinta el azul principal sobre un tinte del mismo azul—, así que
-la salida fue sacar el color de la ecuación y dejar la affordance en el chevron y la columna. Los dos
-intentos fallidos quedaron escritos con su medición, para que nadie los repita.
-
-De paso apareció un desajuste en el propio verificador visual: su contrato decía que el teclado sobre
-interfaces que no mutan nada estaba permitido, pero rechazaba cualquier tecla. Eso empuja a declarar
-"esto sí muta" a un guion que no muta, y esa declaración apaga el resguardo para siempre en ese
-archivo. Ahora distingue teclas que navegan de teclas que activan.
-
-Evidencia: captura verde en 1440 y 390, scorecard 4,55. Queda el build de producción como último
-gate.

@@ -54,7 +54,14 @@ No inventes un sender, cliente Resend, endpoint de envío ni registry paralelo.
    sensible. Confirma que el evento merece email y no una superficie interna.
 2. Busca un template, bloque de copy, primitive, email type y caller reutilizable antes de agregar piezas.
 3. Extiende `EmailType` y sus sets/mapas relacionados solo cuando corresponda. La marca, prioridad,
-   token-sensitivity, reply-to y broadcast son contratos independientes.
+   token-sensitivity, reply-to y broadcast son contratos independientes. **`EmailType` no es una etiqueta
+   descriptiva: es el discriminante por el que el sistema ramifica** —kill-switch por tipo en
+   `email_type_config`, perfil de footer y selector del caller—, así que una variante que deba poder pausarse
+   sin silenciar a su vecina (un envío masivo frente al individual) necesita tipo propio. Reusar el del
+   vecino deja las dos bajo el mismo interruptor y firma en el log append-only un hecho falso sobre la
+   persona. El dedupe **no** es argumento: se resuelve por `source_event_id + source_entity +
+   recipient_email`, no por tipo. Un tipo nuevo nace con su fila de `email_type_config` (seed de migración,
+   normalmente `enabled=false`) y su perfil de footer declarado; sin el perfil cae al legacy en silencio.
 4. Clasifica la presentación por `EmailType`; si el trabajo toca footer, aplica la policy y el rollout de
    [references/footer-presentation.md](references/footer-presentation.md). Nunca infieras unsubscribe o RRSS desde
    `EmailPriority`.

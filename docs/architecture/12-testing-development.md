@@ -28,8 +28,11 @@ Este documento detalla el marco de pruebas, ciclo de desarrollo, migraciones de 
 ### 1.2 Comandos de Testing
 
 ```bash
-# Ejecutar suite completa
+# Ejecutar suite completa (proyecto `unit`, hermético, paralelo)
 pnpm test
+
+# Live tests contra PostgreSQL real (proyecto `live`, serializado)
+pnpm test:live
 
 # Modo watch (re-ejecuta al cambiar archivos)
 pnpm test:watch
@@ -46,6 +49,17 @@ pnpm test:coverage
 # Summary de observabilidad (lee inventory/results/coverage)
 pnpm test:observability:summary
 ```
+
+**Dos carriles, no uno.** `vitest.config.ts` define dos proyectos: `unit` (paralelo por archivo,
+excluye `**/*.live.test.ts`) y `live` (`fileParallelism: false`). Los live tests corren contra la
+única instancia Cloud SQL que comparten dev, staging y producción, así que el paralelismo por archivo
+ahí presupone un aislamiento inexistente.
+
+**Para correr live tests, usa `pnpm test:live`, nunca `set -a; source .env.local; set +a`**: sourcear
+el archivo exporta ~85 variables al proceso y rompe tests unitarios que afirman defaults. El contrato
+completo —fixtures por scope, y los dos modos de falla que se ven distinto de lo que son (`skipped`
+indistinguible de verde; proxy caído que deja los tests en verde y la suite en rojo)— vive en
+[`agent-invariants/LIVE_TESTS_AGENT_INVARIANTS.md`](agent-invariants/LIVE_TESTS_AGENT_INVARIANTS.md).
 
 ### 1.3 Source Of Truth Operativa
 

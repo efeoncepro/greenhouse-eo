@@ -48,6 +48,30 @@ Load whenever the work happens _inside_ the Greenhouse repo (not pure advisory).
 - Store: `src/lib/hiring/**` (SQL-crudo + `HiringValidationError` + transactional outbox). API: `/api/hiring/**` (dual-gate: internal tenant + `can()`).
 - Capabilities: `hiring.{demand,opening,application}.*` (granted to internal roles only — NUNCA `client_*`).
 
+## Opening capacity closure — code paths (TASK-1762, code complete / rollout pendiente)
+
+- ADR `docs/architecture/GREENHOUSE_HIRING_OPENING_CAPACITY_CLOSURE_DECISION_V1.md` (`Accepted`, amended in
+  place 2026-08-23: the policy carries **no seat count**).
+- `src/lib/hiring/opening-capacity/**` — `preview.ts` (cohort + `effectDigest`), `confirm.ts` (revalidates
+  version/digest under lock, persists run + items), `reconciler.ts` (executes each item through the canonical
+  `decideHiringApplication`, retry budget + quarantine), `readers.ts`, `status.ts`. Route
+  `src/app/api/hiring/openings/[id]/capacity-closure/route.ts`.
+- Tables: `greenhouse_hiring.hiring_opening_capacity` (policy: `opening_id`, `managed_since`,
+  `set_by_user_id`, `reason`, `policy_version` — **no count**), `hiring_opening_closure_run` and
+  `hiring_opening_closure_run_item`. The seat target stays in `hiring_opening.requested_seats` (TASK-353);
+  `unmanaged` = no live policy row.
+- Capabilities `hiring.opening.capacity.read` / `hiring.opening.capacity.confirm`. With a live policy,
+  `requested_seats` moves only through the capacity command — `updateHiringOpening` rejects it (app guard +
+  DB trigger + audit + drift signal).
+- Email: `hiring_decision_not_selected` in `src/lib/email/types.ts` + `DECISION_EMAIL_TYPE`
+  (`src/lib/hiring/notifications/send.ts`), consent re-read at send time. Flags
+  `HIRING_OPENING_CAPACITY_CLOSURE_ENABLED` and `HIRING_CAPACITY_FILLED_EMAIL_ENABLED`, both default OFF and
+  **only in `services/ops-worker/deploy.sh`** — flipping them in Vercel does nothing. `email_type_config`
+  seeded `enabled=false`.
+- Error codes to expect: `hiring_opening_capacity_not_filled`, `hiring_opening_closure_preview_stale`.
+- The live tests of the reconciler are **read-only over candidate data on purpose** (shared instance,
+  append-only outcome). Run them with `pnpm test:live` — see the live-test contract in the skill body.
+
 ## The assessment engine (EPIC-011 extension)
 
 - `TASK-1360` Assessment Engine — competency catalog (category × level), question bank (**answer_key sensitive, separate, never candidate-facing**), templates (compose per role; Account Manager seed), instances, objective + human scoring, competency-result rollup into `hiring_application` (**advisory**).

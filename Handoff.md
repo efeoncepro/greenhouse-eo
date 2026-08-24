@@ -2,6 +2,41 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-23 — Los live tests dejan de pisarse: eran cuatro causas, y una la causaba yo
+
+**Estado: `complete`.** Sin rollout pendiente — es infraestructura de tests, no runtime.
+
+El rojo que había reportado como «contención en la base compartida» tenía **cuatro causas
+independientes**, y la etiqueta que le puse escondía tres:
+
+1. **Pool de fixtures compartido.** Tres archivos de `assignment-policy` resolvían su sujeto con
+   `ORDER BY ip.profile_id LIMIT n` sobre un pool de **3 perfiles sintéticos**: tomaban los mismos y
+   se invalidaban las propuestas entre sí. Canónico nuevo: `resolveLiveTestCandidateFixture(scope)`
+   en `live-test-identity.ts` — el sujeto se DERIVA de un scope textual, así que un archivo nuevo
+   queda aislado sin coordinación. Se descartó serializar (castiga a toda la suite) y repartir con
+   `OFFSET` (se rompe con el cuarto archivo).
+2. **Paralelismo por archivo sobre UNA sola base.** Los live tests corren contra la única instancia
+   Cloud SQL que comparten dev/staging/prod. `vitest.config.ts` los separa en un proyecto `live` con
+   `fileParallelism: false`; los ~12.000 unitarios conservan su paralelismo.
+3. **Contaminación de entorno — la causaba mi propio método.** `set -a; source .env.local` exporta
+   ~85 variables y tumbaba **15 tests unitarios en 4 dominios ajenos** que afirman DEFAULTS. Nace
+   **`pnpm test:live`**, que pasa sólo acceso a base y **rechaza cualquier `*_ENABLED`**. El test que
+   afirmaba «nace disabled» ahora garantiza su precondición en `beforeEach` en vez de heredarla.
+4. **Proxy caído disfrazado de suite rota.** Sin Cloud SQL Proxy los tests **pasan** y la suite igual
+   sale roja, porque quien no conecta es el teardown. `test:live` hace preflight TCP.
+
+**Bug propio destapado por el parity test de TASK-611:** había agregado las dos capabilities de
+capacidad al catálogo TS **sin su fila en `capabilities_registry`** — justo lo que ese test existe
+para atrapar. Sembradas; el `Down` las deprecia, no las borra.
+
+**Evidencia:** `pnpm test` (CI, sin env) 1590 archivos / 12051 tests, 0 fallos. `pnpm test:live` 44
+archivos serializados: de 6 fallos intermitentes a **3 estables**.
+
+**Los 3 restantes NO son míos y fallan aislados también** — estaban escondidos en la sopa paralela y
+ahora son visibles y deterministas: 11 capabilities de growth/commercial/platform sin seed en
+`capabilities_registry`, 3 `data_sources` de client-portal (`TASK-824`) y una aserción propia de
+`TASK-1509`. Sin dueño asignado; candidatos a ISSUE si el operador lo decide.
+
 ## 2026-08-23 — TASK-1762: el cierre por capacidad ya no marca a nadie como rechazado
 
 **Estado: `code complete, rollout pendiente`.** Slices 1–5 en `develop` local, **sin push**. Tres
@@ -513,62 +548,6 @@ no ofrezca `on_hold`; (2) `CHECK` del invariante, cuando `TASK-1748` mueva sus 3
 **33 → 0**, no 32 (la bicondicional se viola por los dos lados). `TASK-1748` quedó desbloqueada; `TASK-1744` pasa a
 depender de ella; el Slice F de `TASK-1754` sigue bloqueado. Siguiente paso: **`TASK-1748`**, y después el release
 que habilita las dos migraciones parqueadas. Sin push.
-
-## 2026-08-22 — TASK-1755 destraba el callejón del ledger de asignación; sin migración, verificado contra PG real
-
-Un intento manual de asignar prueba que terminaba en `blocked`/`held`/`stale` ocupaba la clave de idempotencia del
-ledger de forma permanente: corregir la causa real —habilitar la política (que es el estado en que NACE toda
-política), activar la plantilla, registrar el correo— no devolvía la capacidad de asignar, porque el `INSERT` hacía
-`DO NOTHING` y el replay repetía el resultado viejo. `confirmAssessmentAssignment` ahora pide el intento siguiente y
-`assignAssessmentFromPolicy` lo resuelve contra el ledger bajo el `FOR UPDATE` de la policy, dentro de la misma
-transacción que ya tiene bloqueada la propuesta.
-
-Tres respuestas del resolver, y la tercera es la que evita el daño caro: sin intento vigente o vigente recuperable ⇒
-`max + 1` (monotónico contra toda la historia, superseded incluida); **cualquier otro resultado vigente ⇒ su mismo
-número**, para que el `ON CONFLICT` colisione y la respuesta sea el replay — un casillero libre junto a un `assigned`
-vivo le crearía una segunda prueba al mismo candidato. Lo que define un intento nuevo es la **identidad de la
-propuesta**, no su digest: `templateStatus` no entra al material del digest, así que con "digest distinto" como
-criterio un `blocked: template_inactive` quedaría irrecuperable.
-
-Sin migración: `attempt_seq`, el `CHECK (origin = 'manual' OR attempt_seq = 1)` y los `GRANT` por columna ya
-existían. Ledger append-only: cero `DELETE`, cero `UPDATE` destructivo. Evidencia: 8/8 en el test de reproducción,
-472 verdes en `src/lib/hiring/assessment` y **3/3 del gate vivo contra PostgreSQL real** (policy `draft` bloquea →
-`markPolicyEnabled` → asigna en el intento 2, con las dos filas vigentes en la base), con teardown verificado sin
-residuo.
-
-Estado: **`code complete, rollout pendiente`**, no `complete`. Verificado, no supuesto:
-`git show origin/main:…/confirm-assignment.ts` no contiene el sentinel, o sea **el callejón sigue vivo en
-producción** — hoy confirmar con la política en `draft` todavía quema la llave de esa persona. La task se movió a
-`complete/` por error y se devolvió a `in-progress/`, quedando alineada con `TASK-1748`, `TASK-1754` y `TASK-1765`,
-que suben en el mismo release del dominio Hiring. Lo que falta es sólo el deploy: no hay flags, env vars, migración
-ni backfill que aplicar.
-
-**Sin backfill, decidido con el conteo real.** Las únicas 4 filas en callejón son del carril **automático**
-(`stage_auto` / `volume_cap`), sobre candidaturas `closed` con `data_origin='smoke_test'` —no son personas— y su
-clave manual está libre. Ese carril no puede reintentar por `attempt_seq` (lo prohíbe el `CHECK`) y su reversa
-declarada, `superseded_at` por reconciliación, no tiene write path: es el hueco de **`TASK-1771`**, que además
-hereda la restricción de orden respecto de `TASK-1754` que el Delta original le atribuía a esta task por error.
-
-Siguiente paso: que suba en el release del dominio Hiring y verificar el ciclo contra el deployment activo antes de
-mover la task a `complete/`. Nota para ese release: de las 7 postulaciones reales que esperan decisión de asignación
-de prueba, **las 4 manuales son exactamente la población que esta corrección desbloquea**.
-**`pnpm build` no se ejecutó, por decisión declarada:** el repo tiene
-hoy un error de tipos vivo de `TASK-1765` en `src/lib/hiring/store.ts` sobre el mismo checkout, así que el build
-fallaría por causa ajena, y el riesgo propio es bajo (server-only, sin JSX ni frontera cliente). Lo corre el release
-con el árbol limpio. `pnpm test` completo sí: **11.938 verdes, 0 fallos**.
-
-> **Corrección 2026-08-22 (sesión de auditoría):** el error de tipos citado arriba **ya no existe** — `pnpm typecheck`
-> pasa limpio sobre este árbol. O sea que el bloqueo declarado para saltarse el build se disolvió. Ojo con la
-> conclusión: **typecheck limpio no es build verde** (el build de producción además atrapa violaciones de frontera
-> server-only→cliente y dynamic imports rotos), así que el gate sigue pendiente — lo que cambió es que ya no hay
-> causa ajena que lo justifique.
-
-Riesgo residual conocido: el blast radius es alto porque es el único camino que crea pruebas de candidato, y la
-defensa contra la doble prueba es la rama 3 del resolver más el índice único parcial — ambas cubiertas por test
-unitario y por el gate vivo. Hallazgo colateral abierto: 12 live tests de hiring fabrican vacantes sin declarar
-procedencia, así que nacen `real` y publicables en la base compartida; el gate no las ve porque sólo barre
-`scripts/` y `tests/e2e/`. El fixture de esta task ya quedó corregido; los otros 12 y la extensión del gate quedan
-propuestos como trabajo aparte.
 
 ## 2026-08-22 — El gate de `pnpm build` corrió y pasa: cierra el pendiente de TASK-1748/1754/1755
 

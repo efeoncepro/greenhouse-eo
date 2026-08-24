@@ -1,5 +1,27 @@
 # TASK-1130 — Vitest hermetic env baseline + live-lane separation
 
+## Delta 2026-08-23
+
+Parte del alcance de esta task quedó cerrada fuera de ella, por el commit `c28e8be`
+(`fix(test): los live tests dejan de pisarse — cuatro causas, no una`). Lo que ya existe:
+
+- **Carril live separado**: `vitest.config.ts` define dos proyectos, `unit` (paralelo, excluye
+  `**/*.live.test.ts`) y `live` (`fileParallelism: false`).
+- **`pnpm test:live` existe y está documentado** (`scripts/test-live.mjs`). El diseño que quedó **no
+  es** el que esta task proponía: no hay opt-in por `GREENHOUSE_TEST_LIVE=1` ni scrub global en
+  `src/test/setup.ts`. En vez de limpiar el entorno después de contaminarlo, el runner **no lo
+  contamina**: pasa sólo `GREENHOUSE_POSTGRES_*` + `GCP_PROJECT`/`GOOGLE_CLOUD_PROJECT`/
+  `GOOGLE_APPLICATION_CREDENTIALS`, con guarda que rechaza cualquier `*_ENABLED`/`*_RUN_MODE`.
+- **El contrato «unit hermético / live serializado» quedó documentado** en
+  `docs/architecture/agent-invariants/LIVE_TESTS_AGENT_INVARIANTS.md`.
+- **La premisa de la task cambió**: `source .env.local && pnpm test` deja de ser «el flujo normal del
+  dev para correr los live tests» y pasa a ser un anti-patrón explícito.
+
+Sigue abierto: la hermeticidad de `pnpm test` **por sí misma** (hoy la garantiza el runner, no el
+setup: sourcear `.env.local` a mano sigue rompiendo los mismos 15 tests unitarios), la clasificación
+de `EmailTemplateBaseline`, y el drift de capabilities sin seed. Revisar el alcance restante antes de
+tomarla.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

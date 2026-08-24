@@ -214,6 +214,14 @@ y [`GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`](docs/ui/GREENHOUSE_PREMIUM_U
   [`REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`](docs/architecture/agent-invariants/REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md).
 - No ejecutar comandos destructivos ni cambiar de branch en el checkout compartido sin autorización.
 - Validar proporcionalmente: tests/lint/build/manual/runtime según riesgo y dominio.
+- **Live tests (`*.live.test.ts`): `pnpm test:live`, NUNCA `set -a; source .env.local`.** Ese `source` exporta
+  las ~85 variables del archivo al proceso y tumba tests unitarios de otros dominios que afirman DEFAULTS
+  (secrets, cloud/billing, cloud/postgres, emails); `test:live` pasa **sólo acceso a base** y rechaza cualquier
+  `*_ENABLED`. Corren **serializados** entre sí (proyecto `live` en `vitest.config.ts`) porque comparten la
+  ÚNICA instancia Cloud SQL de dev/staging/prod. Dos modos de falla que engañan: **`skipped` se ve igual que
+  verde** —leer `passed`, nunca la ausencia de rojo—, y con el **Cloud SQL Proxy caído los tests PASAN y la
+  suite igual sale ROJA**, porque quien no conecta es el teardown. Fixtures: derivar el sujeto por `scope`
+  (`resolveLiveTestCandidateFixture`), nunca tomarlo de un pool compartido con `ORDER BY … LIMIT n`.
 - Implementaciones no triviales: `greenhouse-qa-release-auditor` + `pnpm qa:gates --changed`.
 - Cierre documental: `greenhouse-documentation-governor` + `pnpm docs:closure-check`.
 - Contexto/handoff: `pnpm docs:context-check:strict` antes de cerrar cambios a estos contratos. Si recomienda

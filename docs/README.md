@@ -92,6 +92,7 @@ Indice maestro de la documentacion no operativa del repo.
 - [GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md](architecture/GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md)
 - [GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md](architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md)
 - [12-testing-development.md](architecture/12-testing-development.md)
+- [Live Tests Agent Invariants](architecture/agent-invariants/LIVE_TESTS_AGENT_INVARIANTS.md)
 
 ### Documentation
 
