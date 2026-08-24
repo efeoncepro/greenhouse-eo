@@ -2,6 +2,57 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-24 — TASK-1764 revisada contra runtime: el gobierno sobrevive, las precondiciones no
+
+**Sólo docs.** `TASK-1764` sigue `to-do`; no se tocó runtime. Revisión con `arch-architect` +
+`greenhouse-email` + skills de marca, con cinco verificadores adversariales sobre el código real.
+
+**Lo que sobrevivió intacto:** legacy por defecto, cohorts ≤4 tipos, prohibición de big-bang sobre
+`EmailLayout`, rollback por tipo. Es la mayor parte del documento y es lo que contiene el blast
+radius. No lo toqué.
+
+**Lo que cambió — cinco precondiciones que el diseño daba por resueltas:**
+
+1. **El unsubscribe no es accionable por ningún método** (link GET → 405; POST one-click RFC 8058 →
+   500 por `request.json()` sobre form-urlencoded; POST bien formado → 400 porque lee `action`/
+   `emailType` del body y la URL los lleva en el query). No hay página, ni middleware, ni consumer del
+   endpoint. Y el default `?? 'broadcast'` lo agrega **solo** a cualquier tipo nuevo enviado a >1
+   destinatario: fail-open donde la ADR exige fail-closed. → precondición bloqueante, fuera de la
+   umbrella, **ID por reservar**.
+2. **Tres decisores** gobiernan el unsubscribe (`EMAIL_PRIORITY_MAP`, `BROADCAST_EMAIL_TYPES`, rama
+   batch/secuencial) y ya divergen: `weekly_executive_digest` lleva baja con varios destinatarios y no
+   la lleva con uno. Cero tests de coherencia; `EMAIL_PRIORITY_MAP` no aparece en ningún test del repo.
+3. **`en-US.emails` es alias del objeto es-CL** (`dictionaries/en-US/index.ts:37`), con comentario que
+   difiere la localización "a la child task del rollout de emails" — que es ésta. El bug ya es visible.
+   Mismo bug class que `TASK-1754` (Hiring Desk); su test de paridad es el molde.
+4. **Cero archivos de correo tocan identidad legal**, y el repo tiene **tres** políticas de ausencia
+   distintas (finiquito 409, contractors catch mudo, PDF footer degrada). Adoptada la tercera en la ADR.
+   `TASK-1650` (dirección `of 05` vs `Of 1105`) queda como dependencia dura del epic.
+5. **Multi-runtime:** 20 tipos ops-worker, 6 Vercel, 3 ambos, 1 sin emisor
+   (`payroll_liquidacion_v2`). Lo que migró en `TASK-254`/`773`/`775` fue el drenaje async, no "los
+   correos".
+
+**Marca — la pregunta no estaba abierta.** `EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md`
+(Accepted) ya la responde. `TASK-1274` planteaba "Efeonce **o** Greenhouse", que es un error de capa:
+Greenhouse **sí** es marca del portafolio (platform brand). Reanclada a `EPIC-042` como child 0, Open
+Question cerrada, regla dura corregida. Hallazgo que la abarata: `AGENCY_FROM_ADDRESS` y
+`DEFAULT_EMAIL_FROM` son **la misma dirección** y sólo difieren en display name — adoptar `Efeonce`
+como remitente único **borra** la bifurcación en vez de agregar lógica.
+
+**Dos supuestos míos que la verificación refutó, y el operador corrigió antes:** el masthead ya usa el
+wordmark de Efeonce en las 30 plantillas (la deuda es de copy, no de logo; y sí existe logo Greenhouse,
+en `public/images/greenhouse/SVG/`, usado en el sidebar); y el footer **sí** tiene red de regresión —
+vive en un archivo cubierto por `EmailLayout.test.tsx` y por los 17 snapshots de
+`EmailTemplateBaseline`. El hueco de cobertura es de **cuerpo** (11 plantillas), no de pie, y pertenece
+a las cohorts.
+
+**Decisiones abiertas del operador (bloquean ejecución, no redacción):** ID de la task de unsubscribe ·
+dirección `of 05` vs `Of 1105` (`TASK-1650`) · display name definitivo del remitente único ·
+`payroll_liquidacion_v2`, ¿futuro o huérfano?
+
+**Gates:** `task:lint` 1764/1274 `template=1 errors=0 warnings=0`; `ops:lint --changed` sin findings
+propios (los 14 warnings de epic son parity preexistente de otros epics).
+
 ## 2026-08-24 — TASK-1130 rescopada: la mitad estaba cerrada y la otra mitad creció
 
 **Estado: `to-do`, subida a P1.** No abrí ISSUE nuevo: el drift ya tenía dueña y era ella.
@@ -40,6 +91,20 @@ código no resuelve. **No las sembré a ciegas**: el grant correcto lo sabe su d
 afirma que la superficie no está configurada y hoy sí lo está con datos productivos reales; la
 corrección **no** es editar el esperado. `TASK-824` está `complete`, así que su drift quedó sin dueño
 activo: lo rastrea TASK-1130 hasta que alguien lo tome.
+
+## 2026-08-24 — Hiring: retorno durable y revisión secuencial implementados localmente
+
+**Estado: commit `631b53c77` publicado en `origin/develop`; rollout detenido por brecha de conformidad.** La pestaña
+`Pipeline` sigue siendo el único retorno, pero ahora fija la postulación exacta fuera de límites, consume el
+foco de URL y degrada honestamente si el origen no resuelve. Application 360 agrega Anterior/Siguiente dentro
+de la misma vacante+etapa, excluye archivadas y protege cambios sin guardar; el orden es cronológico estable,
+nunca score/IA. GVC local PASS 1440/390 px en
+`.captures/2026-08-24T12-19-59_task355-hiring-application-360` (24 frames por viewport, videos, recorrido
+`1 de 2 → 2 de 2 → Pipeline`, morph y foco exacto; runtime 0/0/0/0). Build de producción, typecheck,
+ESLint focal y 13 tests focales verdes. La auditoría posterior detectó que el snapshot de Pipeline y el lookup
+de foco no filtran `archived_at IS NULL`; una archivada puede reaparecer aunque la cola secuencial la excluya.
+Arquitectura, documentación funcional/manual/UI y skills Talent/Motion/GVC quedan sincronizadas. Pendiente:
+corregir y verificar ambos readers antes de autorizar release; este turno documental no modifica código.
 
 ## 2026-08-23 — Los live tests dejan de pisarse: eran cuatro causas, y una la causaba yo
 
@@ -181,20 +246,6 @@ sin marcadores de error y con las **seis etapas** de TASK-1754 en el HTML.
 
 Tiempos en `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` (~1h10m E2E, workflow 12m45s,
 manifest 9m50s). Skills Claude/Codex actualizadas en paridad total.
-
-## 2026-08-24 — Hiring: retorno durable y revisión secuencial implementados localmente
-
-**Estado: commit `631b53c77` publicado en `origin/develop`; rollout detenido por brecha de conformidad.** La pestaña
-`Pipeline` sigue siendo el único retorno, pero ahora fija la postulación exacta fuera de límites, consume el
-foco de URL y degrada honestamente si el origen no resuelve. Application 360 agrega Anterior/Siguiente dentro
-de la misma vacante+etapa, excluye archivadas y protege cambios sin guardar; el orden es cronológico estable,
-nunca score/IA. GVC local PASS 1440/390 px en
-`.captures/2026-08-24T12-19-59_task355-hiring-application-360` (24 frames por viewport, videos, recorrido
-`1 de 2 → 2 de 2 → Pipeline`, morph y foco exacto; runtime 0/0/0/0). Build de producción, typecheck,
-ESLint focal y 13 tests focales verdes. La auditoría posterior detectó que el snapshot de Pipeline y el lookup
-de foco no filtran `archived_at IS NULL`; una archivada puede reaparecer aunque la cola secuencial la excluya.
-Arquitectura, documentación funcional/manual/UI y skills Talent/Motion/GVC quedan sincronizadas. Pendiente:
-corregir y verificar ambos readers antes de autorizar release; este turno documental no modifica código.
 
 ## 2026-08-23 — TASK-1772: los dos predicados convergieron, y convergieron al valor equivocado
 
@@ -538,57 +589,3 @@ agendamiento de entrevistas **el calendario manda** — Greenhouse agenda pero n
 Siguiente paso: `TASK-1748` destraba el `CHECK` del invariante moviendo sus 32 filas; `TASK-1771` va **antes** del
 colapso de `TASK-1754`. Estado: **todo documental, sin push pendiente salvo los últimos commits**; ningún cambio de
 runtime salió de esta sesión.
-
-## 2026-08-22 (cierre) — TASK-1765: una regresión propia corregida antes del release
-
-Auditoría adversarial cruzada sobre el trabajo del día. **Un hallazgo real y mío, corregido:** el trigger de
-retención de recibos de recuperación de acceso (`TASK-1746`) decidía con listas de literales, y los dos
-desenlaces nuevos caían al `ELSE`, que pone **NULL** — el reloj de la Ley 21.719 no arrancaba nunca para
-`not_selected`, que es la población más grande. Familia del H-01, y el mismo patrón de denylist que esta task vino
-a borrar, sobreviviendo dentro de un trigger de PostgreSQL. Corregido con migración aplicada y verificada
-evaluando el `CASE` de la función instalada; `backup_selected` queda sin vencimiento **explícito** con dueño
-(`TASK-1744`, H-23) en vez de colarse por un `ELSE` mudo. **No bloquea el release: tiene que ir DENTRO de él**,
-porque la regresión se vuelve viva cuando el release habilite los desenlaces nuevos.
-
-**Dos hallazgos de la auditoría NO se sostuvieron al verificarlos** y quedaron documentados: el colapso de
-`DECISION_STAGE` no mete a nadie al Banco de Talento (el `CASE` tiene dos ramas que dan `pool_eligible`; el
-consentimiento decide, no `has_active_application`), y `withdrawn` no perdió su correo (ya era mudo por el
-early-return). Tres sí: retiré el guard `closed` que era inerte, endurecí el guard del mapa de correo para que
-itere el enum, y **honesté la doc funcional**, que afirmaba en presente un invariante todavía parqueado.
-
-**Deuda declarada con condición medible:** cuatro predicados de «proceso activo» preguntan por `stage` cuando el
-desenlace ya vive en `decision`. NO se cambian todavía: hoy darían 82 activas en vez de 50, porque las 32
-sintéticas archivadas volverían a contar. Sólo es seguro tras el backfill de `TASK-1748` y el `CHECK`.
-
-Estado: **code complete; tres migraciones parqueadas esperan el release** (contract del enum → backfill de 1748 →
-`CHECK` del invariante). Árbol e índice compartido limpios. Sin push.
-
-## 2026-08-22 — TASK-1765 parte el pipeline en dos ejes; cerrar es decidir. Contract del enum, POST-RELEASE
-
-El pipeline de Hiring pasa a modelar **etapa** (dónde va la persona) y **desenlace** (cómo terminó su proceso) como
-ejes ortogonales. Entran `not_selected` y `unresponsive`, nace `decision_cause` como enum gobernado obligatorio
-sólo en `not_selected`, y nace `archived_at` — el campo que `TASK-1748` necesitaba para dejar de archivar
-escribiendo `closed`. Cerrar deja de ser un cambio de etapa: la denylist del `PATCH` **se borró** y nace
-`HIRING_PIPELINE_STAGES`, que excluye `closed` por TIPO, así que un cierre por esa vía ni compila.
-
-Aplicado y verificado contra PG real: expand, command con causa en el mismo `UPDATE` (y en el replay: distinta
-causa ⇒ 409), colapso de `DECISION_STAGE` a `closed`, `PATCH` acotado, señal
-`hiring.application.closed_without_outcome` y las tres capas documentales. Dos regresiones se cerraron en el mismo
-cambio: el selector de correo era un ternario binario que le habría mandado un **correo de rechazo al primer
-`not_selected`**, y `STAGES_DOWNSTREAM_OF_TRIGGER` no listaba `closed`, así que la cola humana de triggers perdidos
-se habría vaciado en silencio (H-11).
-
-**Incidente y su lección, que vale más que la task.** El contract del enum (retirar `on_hold`) se aplicó y **rompió
-producción ~7 minutos**: hay UNA sola instancia de Cloud SQL, producción sirve `origin/main` —que todavía ofrece
-«Dejar en espera»— y la acción quedó en `23514`. Cero filas afectadas, reparado con forward fix permisivo. El
-readback previo era correcto pero sobre el eje equivocado: **«cero filas» no es «nadie lo escribe»**. La regla
-—_un contract de enum va DESPUÉS del release que retira el valor del código_— quedó en
-`GREENHOUSE_DATABASE_TOOLING_V1.md` y como enmienda al §14 del ADR. Segundo hallazgo: **no existe «migración
-escrita y sin aplicar» como estado seguro** — la del Slice 5 bloqueó la reparación urgente porque `migrate:up`
-corre todas las pendientes. Nace `docs/tasks/pending-migrations/`.
-
-Estado: **code complete parcial; dos migraciones POST-RELEASE pendientes**. (1) contract del enum, cuando `main` ya
-no ofrezca `on_hold`; (2) `CHECK` del invariante, cuando `TASK-1748` mueva sus 32 filas — readback esperado
-**33 → 0**, no 32 (la bicondicional se viola por los dos lados). `TASK-1748` quedó desbloqueada; `TASK-1744` pasa a
-depender de ella; el Slice F de `TASK-1754` sigue bloqueado. Siguiente paso: **`TASK-1748`**, y después el release
-que habilita las dos migraciones parqueadas. Sin push.

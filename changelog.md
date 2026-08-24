@@ -3,6 +3,15 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-24 — El rediseño de los pies de correo se revisó contra el sistema real, no contra su diseño
+
+- **El botón de "darse de baja" no funciona hoy.** El enlace del pie lleva a una dirección que el servidor no atiende, y el botón propio que Gmail muestra arriba del correo tampoco: los dos fallan. Además el sistema agrega ese enlace **solo, por accidente**, a cualquier correo enviado a más de una persona. La liquidación de sueldo llega a generar un permiso de baja de 30 días que nadie ve nunca. Arreglarlo pasa a ser condición previa del programa.
+- **La marca queda cerrada, no en discusión.** "Efeonce Greenhouse" no existe: Efeonce es la marca que lidera y Greenhouse es la plataforma, dos capas de la misma jerarquía y no dos opciones a elegir. Se corrigió el planteo excluyente que traía la task de marca, que ahora ejecuta la arquitectura ya aprobada en vez de reabrirla. Son cinco textos, ningún logo: el remitente, el tagline del pie, el texto alternativo del logo y los dos cuerpos de la invitación.
+- **Los correos en inglés muestran parte del pie en castellano.** El diccionario en inglés no tiene sección de correos: apunta al español por atajo, y ni el compilador ni las pruebas lo notan. Ya se ve en toda liquidación a colaboradores fuera de Chile.
+- **Los correos salen de dos lugares, no de uno.** Veinte tipos salen del servicio en la nube, seis salen del portal —los que uno espera en pantalla al apretar el botón— y tres salen de ambos. Para esos tres, actualizar un solo lado haría que el mismo documento llegue con dos pies distintos según si fue automático o reenviado a mano.
+- **Los datos legales del pie todavía no tienen camino ni política de respaldo.** Se adoptó la conducta que ya usan los PDF: si la base no responde, se usa el dato de respaldo y queda registrado; el RUT se omite antes que inventarse. Y la dirección de casa matriz tiene tres versiones distintas en el sistema, con una decisión pendiente que bloquea a todo el programa.
+- Se confirmó que el gobierno de la migración estaba bien: nada se cambia por herencia, cada tanda migra pocos tipos y cada una puede revertirse sola. También se corrigieron dos supuestos previos: el encabezado ya usa el logotipo de Efeonce en las treinta plantillas, y el pie sí tenía red de pruebas.
+
 ## 2026-08-24 — Revisar postulaciones ya no obliga a entrar y salir del Pipeline
 
 - Application 360 permite pasar a la postulación anterior o siguiente de la **misma vacante y etapa**. La cola excluye archivadas y usa orden cronológico estable; no es un ranking y no consulta score, afinidad ni recomendaciones IA.
@@ -836,29 +845,3 @@ capability, sin motivo y sin trail.
 
 Follow-up abierto: `TASK-1716` mide si el fallo de `react-pdf` alcanza producción (hoy sólo verificado
 en desarrollo) y unifica las **tres** implementaciones de visor que conviven en el repo.
-
-## 2026-08-15 — El portal dejó de mostrar el favicon de Vuexy antes del suyo
-
-Durante unas dos semanas, cada carga del portal pintaba primero el ícono morado del template Vuexy y
-recién después el isotipo de Greenhouse. El reporte llegó como "carga dos favicon", y la causa no
-estaba donde uno la buscaría: el HTML servido siempre estuvo limpio, con una sola declaración
-apuntando al SVG correcto.
-
-Lo que pasó es que a fines de julio se borró el `favicon.ico` heredado de Vuexy —correcto— pero no se
-lo reemplazó. La marca quedó declarada sólo como SVG desde el código del layout, y `/favicon.ico`
-empezó a responder 404 devolviendo, además, la página de not-found completa: 105 KB de HTML en cada
-carga del portal, para una ruta que el navegador pide de forma implícita **siempre**, sin importar lo
-que declare el `<head>`. Mientras ese 404 resolvía y el navegador lo descartaba, la pestaña mostraba
-el ícono que tuviera guardado de antes.
-
-El arreglo pasa los tres íconos a la convención de archivos de Next (`favicon.ico` multi-tamaño,
-`icon.svg`, `apple-icon.png`), los genera desde el SVG de marca con `pnpm branding:favicon`, y saca
-la declaración duplicada del layout: teniéndola en ambos lados, compiten. Next ahora emite los links
-solo, con huella de contenido, así que un cambio futuro del asset invalida el caché por sí mismo.
-
-Vale la pena registrar por qué el síntoma sobrevivió a un primer intento de arreglo. Los navegadores
-guardan los favicons en una base propia, separada del caché de páginas, que alimenta la barra de
-direcciones y el historial y no se refresca ni con recarga forzada. El operador seguía viendo el
-ícono viejo aunque el servidor ya sirviera el nuevo. De ahí el invariante que quedó escrito: al
-verificar un favicon, no confiar en el navegador propio — verificar el `200 image/x-icon` en el
-runtime y contar los `link[rel*=icon]` en el DOM.
