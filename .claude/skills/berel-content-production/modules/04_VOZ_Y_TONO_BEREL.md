@@ -247,6 +247,64 @@ detectadas al auditar un texto que "sonaba bien":
 | Dosis del nombre del producto | El nombre completo va **una sola vez**; después "la pintura", "el esmalte". **Contarlo antes de cerrar, incluido el CTA** |
 | Definición extractable | Secciones que abren con un fragmento suelto en vez de **una frase que se pueda citar sola** |
 
+### El cierre mecánico: lo que se revisa con grep, no a ojo
+
+🔴 **Esto no reemplaza la relectura de arriba: la precede.** El orden es **grep primero, relectura
+después**, porque el barrido encuentra en segundos lo que la relectura no ve y despeja el ruido para
+que el ojo humano se dedique a lo que sí necesita criterio (arco, ritmo, mexicanidad, si el claim
+corresponde a la línea).
+
+En la producción de septiembre 2026 este barrido —corrido con grep, no a ojo— atrapó en textos que ya
+"sonaban bien": *perfecto* dos veces e *impecable* una en un artículo, *perfectamente* en otro, un
+artículo 277 palabras bajo el piso de extensión y un tutorial sin BerelTip. Ninguna se había visto
+releyendo.
+
+| Qué se busca | Comando | Qué significa un hallazgo |
+|---|---|---|
+| **1 · Palabras vetadas como comodín** (lista completa en [Léxico](#léxico)) | `grep -niE "\b(ideal\|perfect[oa]s?\|perfectamente\|impecable\|la mejor opción\|máxima calidad)\b" ARCHIVO` | ⚠️ **Candidatas a revisar, no fallas automáticas.** El veto es contra usarlas *como comodín sin dato detrás*: `la mejor época del año para pintar` es legítimo; `la mejor pintura` no. El grep localiza, el criterio lo pones tú |
+| **2 · Léxico no mexicano** | `grep -niE "\b(salón\|gotelé\|plaste\|pintura plástica\|enlucido\|brochada\|carta de colores\|cerradura)\b" ARCHIVO` | 🔴 **Cualquier hallazgo es falla.** Son términos de España o formas que en México no se usan |
+| **3 · El lector metido en el "nosotros"** | `grep -niE "\b(seamos claros\|vamos por partes\|veamos\|analicemos)\b" ARCHIVO` | El "nosotros" está reservado a la marca; estos giros meten al lector adentro |
+| **4 · HEX o RGB de color de pintura en el cuerpo** | `grep -nE "#[0-9A-Fa-f]{6}\|rgb\(" ARCHIVO` | 🔴 **Todo hallazgo debe estar dentro de una ficha de banner**, donde el HEX es instrucción para diseño. **Uno solo en el cuerpo publicable es falla dura** — lineamiento del cliente, no preferencia nuestra |
+| **5 · Enlaces prohibidos** | `grep -nE "/search\|\?q=" ARCHIVO` | Cualquier hallazgo es falla: `robots.txt` bloquea esas rutas |
+| **6 · Dosis del nombre de producto** | `for p in Berelinte "Kalos Tone" "Multitono Pro" Insignia "Esmalte Summa" Berelex; do echo -n "$p: "; grep -oi "$p" ARCHIVO \| wc -l; done` | El nombre completo va **una sola vez** y después "la pintura" o "el esmalte". ⚠️ **Descuenta las apariciones dentro de una URL y dentro de una tabla de datos** — una fila comparativa no es repetición promocional. Cuenta las visibles en prosa |
+| **7 · Extensión real del cuerpo** | El conteo debe **excluir callouts, tablas y el bloque de metadatos** | Con `wc -w` sobre el archivo completo el resultado **miente**: infla el número y te hace creer que llegaste al piso |
+
+**8 · Lo que se verifica mirando, porque ningún grep lo ve:**
+
+- que exista el **BerelTip** en piezas de registro técnico o tutorial;
+- que la **respuesta directa extractable de 40 a 55 palabras** esté justo después del gancho;
+- que el **CTA traiga las tres acciones** y no un enlace suelto;
+- que el **cierre retome la escena de apertura**.
+
+Barrido completo sobre un archivo (copiable):
+
+```bash
+ARCHIVO="ruta/al/articulo.md"
+
+echo "== 1. Palabras vetadas (revisar, no falla automática) =="
+grep -niE "\b(ideal|perfect[oa]s?|perfectamente|impecable|la mejor opción|máxima calidad)\b" "$ARCHIVO"
+
+echo "== 2. Léxico no mexicano (cualquier hallazgo = falla) =="
+grep -niE "\b(salón|gotelé|plaste|pintura plástica|enlucido|brochada|carta de colores|cerradura)\b" "$ARCHIVO"
+
+echo "== 3. Lector metido en el 'nosotros' =="
+grep -niE "\b(seamos claros|vamos por partes|veamos|analicemos)\b" "$ARCHIVO"
+
+echo "== 4. HEX/RGB (solo válido dentro de ficha de banner) =="
+grep -nE "#[0-9A-Fa-f]{6}|rgb\(" "$ARCHIVO"
+
+echo "== 5. Enlaces prohibidos (robots.txt) =="
+grep -nE "/search|\?q=" "$ARCHIVO"
+
+echo "== 6. Dosis del nombre de producto (descontar URLs y tablas) =="
+for p in Berelinte "Kalos Tone" "Multitono Pro" Insignia "Esmalte Summa" Berelex; do
+  echo -n "$p: "; grep -oi "$p" "$ARCHIVO" | wc -l
+done
+
+echo "== 7. Extensión del cuerpo (sin tablas, callouts ni metadatos) =="
+sed '/^---$/,/^---$/d' "$ARCHIVO" | grep -vE '^\s*(\||>|#|!\[|\[)' | wc -w
+```
+
 ## Checklist de publicación (estándar de la marca)
 
 - [ ] Gancho con micro-escena que nombra el deseo o miedo del lector

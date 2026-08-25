@@ -77,6 +77,17 @@ De las 69, el ciclo mensual usa estas:
 | `Tarea principal` ⇄ `Subtareas` | relation self | jerarquía nativa de subtareas |
 | `Resumen` | text | 1-2 líneas: formato + eje del copy + destino |
 
+🔴 **Las fórmulas tampoco se pueden CONSULTAR.** `notion-query-data-sources` las rechaza con
+`no such column` — no distingue entre una columna inexistente y una calculada, así que el error
+parece un nombre mal escrito cuando en realidad es una fórmula. Caso vivo: `"Responsable (texto)"`
+falla; hay que pedir la propiedad **relation** que la alimenta, `Responsables`.
+
+💡 **Cómo descubrir el esquema real en una sola llamada.** Antes de escribir cualquier consulta,
+`SELECT * FROM "collection://<id>" LIMIT 1` devuelve una fila con **todos** los nombres de columna
+tal como los espera la API, incluidos los campos de fecha desdoblados (`date:Fecha límite:start`,
+`date:Fecha límite:is_datetime`). Sale más barato que adivinar y encadenar tres errores de
+validación.
+
 🔴 **Las 22 propiedades de tipo fórmula no se editan.** Toda la capa de RpA, urgencia, freeze/thaw y
 performance es **calculada**. Tampoco se tocan las de integración con Frame.io
 (`Frame Asset ID`, `Frame Comments`, `Frame Versions`, `Last Frame Comment*`, `URL Frame.io`), que

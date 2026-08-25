@@ -162,7 +162,12 @@ Del estándar editorial de la marca (→ [`04_VOZ_Y_TONO_BEREL.md`](04_VOZ_Y_TON
   `twitter:description`.
 - **Jerarquía limpia:** un solo H1, H2 por sección, H3 por subtema. **Nunca saltos H1→H4** ni
   encabezados vacíos del CMS.
-- **Extensión:** 900-1.200+ palabras de **cuerpo útil**, no relleno.
+- **Extensión:** 900-1.200+ palabras de **cuerpo útil**, no relleno. ⚠️ **Ese rango es un piso
+  histórico, no el tamaño real de una pieza con fan-out.** Cuando el brief pide 12 H2 con su cápsula
+  autocontenida, la estructura sola ya empuja el cuerpo a **1.800-3.000 palabras** — así salieron las
+  tres de septiembre 2026 (N31 ~3.000, N32 ~2.240, N33 ~1.800). **Manda el piso que declare el
+  brief**, y si el brief no declara ninguno, manda la estructura: recortar a 1.200 una pieza de 12 H2
+  significa dejar cápsulas cojas, que es justo lo que rompe la recuperación por pasajes.
 - **AEO:** definiciones canónicas "X es Y" en la primera frase de cada sección · FAQ con respuesta
   directa en la primera línea · tablas comparativas y listas reales (los LLM las extraen con
   facilidad) · datos verificables y citables.
