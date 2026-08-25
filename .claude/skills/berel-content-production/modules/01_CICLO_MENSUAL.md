@@ -43,6 +43,24 @@ nada—, pero sí unificar de ahí en adelante.
 En **Modalidad B** no hay contenido anterior que rescatar ni página publicada que auditar, así que
 la página lleva solo **dos desplegables**: `🧭 Plan editorial y SEO` y `✍️ Artículo V1`.
 
+🔴 **El primer desplegable de la Modalidad B a veces ya viene escrito, y entonces no se duplica.**
+Cuando la pieza nace de un **brief editorial** producido aguas arriba, la página del Content Hub ya
+llega con un desplegable `📋 Brief SEO/AEO — [tema]`. **Ese brief ES el primer desplegable: no se
+crea un `🧭 Plan editorial y SEO` aparte ni se resume el brief dentro de él.** El artículo cuelga
+debajo como `✍️ Artículo V1` y su callout de procedencia cita las secciones del brief que usó
+(`§4 fan-out`, `§5 estructura`, `§7 producto`, `§8 enlazado`, `§9 on-page`).
+
+Lo que cambia el número de desplegables **es el origen de la pieza**, no una preferencia de formato:
+
+| Cómo nació la pieza | Desplegables | Primero |
+|---|---|---|
+| **A** · reescritura de una URL publicada | **4** | `Contenido anterior del artículo` |
+| **B** · pieza nueva que investigamos nosotros | **2** | `🧭 Plan editorial y SEO` (lo escribimos) |
+| **B** · pieza nueva que llega con brief | **2** | `📋 Brief SEO/AEO` (ya está escrito) |
+
+Verificado en el lote de septiembre 2026 (N31, N32, N33): los tres llegaron con brief y ninguno
+necesitó plan editorial propio.
+
 ---
 
 ## Fase 1 · Identificar los artículos del mes
