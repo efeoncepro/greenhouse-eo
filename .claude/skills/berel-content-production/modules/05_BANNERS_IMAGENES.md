@@ -74,6 +74,12 @@ Diseño entrega **master + variantes**:
 🔴 **Una sola pieza por artículo lleva 🔁.** Dos marcas anulan el propósito: el derivado social
 deja de tener un master único y diseño produce dos veces lo mismo con criterios distintos.
 
+## 🔴 La infografía NO usa esta ficha
+
+Los campos de abajo son la ficha de **N1, N3 y N4**. **La infografía (normalmente N2 🔁) lleva otra
+ficha, más exigente**: 9 secciones + tabla de contenido por módulo, con todo el copy literal
+→ [`11_FICHA_DE_PRODUCCION_INFOGRAFIA.md`](11_FICHA_DE_PRODUCCION_INFOGRAFIA.md).
+
 ## Los campos obligatorios de la ficha
 
 Cada imagen se documenta con **todos** estos campos. La ficha se escribe en el cuerpo de la
@@ -137,6 +143,8 @@ Corolarios que el origen declara explícitamente:
 - Excepción de lenguaje en fichas de banner → [`04_VOZ_Y_TONO_BEREL.md`](04_VOZ_Y_TONO_BEREL.md)
 - 🔴 **Los formatos con los que diseño produce una infografía** →
   [`10_FORMATOS_DE_INFOGRAFIA.md`](10_FORMATOS_DE_INFOGRAFIA.md)
+- 🔴 **La ficha propia de la infografía** →
+  [`11_FICHA_DE_PRODUCCION_INFOGRAFIA.md`](11_FICHA_DE_PRODUCCION_INFOGRAFIA.md)
 - Oficio de imagen editorial y su contrato HTML/SEO → `seo-aeo/references/editorial-image-seo.md`
 - Dirección de arte y sistema visual editorial →
   `content-marketing-studio/references/agentic-editorial-visual-system.md`

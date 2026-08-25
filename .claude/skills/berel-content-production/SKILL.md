@@ -63,6 +63,7 @@ guía de voz y tono, y la guía de carga al CMS.
 ├─ Subir o reescribir el artículo en el CMS Drupal ............................ modules/08_PUBLICACION_CMS_DRUPAL
 ├─ Lo que el cliente pidió explícitamente (y dónde corrige la guía de voz) .... modules/09_RECOMENDACIONES_DEL_CLIENTE
 ├─ Qué FORMATO usa una infografía (los 5 del equipo de diseño + la paleta) .... modules/10_FORMATOS_DE_INFOGRAFIA
+├─ Cómo se llena la FICHA de la infografía (orden de producción para diseño) .. modules/11_FICHA_DE_PRODUCCION_INFOGRAFIA
 ├─ Qué NO hacer (errores ya cometidos en este cliente) ....................... ANTIPATTERNS
 ├─ Vocabulario del cliente y de su sistema ................................... GLOSSARY
 ├─ De dónde salió cada regla, con page id y fecha de extracción .............. SOURCES
@@ -125,7 +126,13 @@ guía de voz y tono, y la guía de carga al CMS.
     Señalización · Tipos de Color · Técnica-Foto · Técnica-Gráfica— y **la ficha nombra el formato Y
     la variante**. Son los que diseño ya tiene resueltos; sin declararlo, improvisan. Aplica **solo a
     infografías**: el hero y el cierre se rigen por la otra base, `Formatos de Diseño`. (`10`)
-21. 🔴 **En infografía, el rojo es `#B3153A` (Rojo Editorial), no el rojo corporativo.** El
+21. 🔴 **La infografía usa OTRA ficha.** N1, N3 y N4 llevan la ficha de 13 campos de la Spec para
+    imágenes; **la infografía lleva la ficha de 9 secciones + tabla de contenido por módulo** — es
+    una **orden de producción**, no un resumen: todo texto va **literal**, cada módulo con su
+    producto/dato/ícono/asset asignados, y lo no confirmado se escribe
+    `PENDIENTE DE CONFIRMACIÓN — NO INCLUIR EN ARTE`. Prueba de aceptación: **un diseñador que no
+    leyó el artículo puede producirla sin reinterpretar**. (`11`)
+22. 🔴 **En infografía, el rojo es `#B3153A` (Rojo Editorial), no el rojo corporativo.** El
     corporativo se reserva a branding institucional. Y ojo: el HEX de la **paleta de acento** SÍ va
     en la ficha —es instrucción de diseño—; lo que nunca sale al público es el HEX de un **color de
     pintura**. Son cosas distintas. (`10`, `09`)

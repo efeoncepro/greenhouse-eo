@@ -33,6 +33,7 @@ arriba.
 | 📣 **Playbook Derivados Sociales** | `f58f34efd1e04043b9982b932a034464` | `06` | ~6.600 car. |
 | 📤 **Cómo subir un artículo (CMS Drupal)** | `4ed619156c0e4f6a89fb83b78ea6c0ad` | `08` | ~5.500 car. — de la capacitación del 21-08-2026 |
 | 🔍 **Enlaces `search?q=` — impacto en SEO y AEO** | `38739c2fefe780b3aa6bde8f422fc748` | `04` | el respaldo del *porqué* de la regla de enlazado |
+| 📝 **Fichas para Gráficos** | `3c739c2fefe7803d9958cd74648cb036` | `11` | Base `Flujos de Trabajo`. **Cómo se llena la ficha de una infografía** |
 | 🖼️ **Formatos: Tipos de Infografías** (base) | `collection://06d39c2f-efe7-82be-99f6-87b9e8e34745` | `10` | **6 filas, extraídas completas el 2026-08-25** |
 | 📆 **Content Hub** (base) | `35f39c2fefe7808186efc6ec63475640` | `07` | 123 filas · 18 propiedades |
 | **Tareas** (base) | `35c39c2fefe780c9bc37e811a7b95a7c` | `07` | 283 filas · 69 propiedades |

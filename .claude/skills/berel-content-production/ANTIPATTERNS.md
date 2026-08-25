@@ -122,6 +122,18 @@
   nombres, códigos, logo y branding se agregan después en Illustrator. (→ `10`)
 - **Aplicar el catálogo de infografías a un hero o a un cierre.** Esas piezas se rigen por la otra
   base, `Formatos de Diseño`. (→ `10`)
+- 🔴 **Escribir la ficha de una infografía con los 13 campos de la Spec.** La infografía lleva su
+  propia ficha de 9 secciones + tabla por módulo. (→ `11`)
+- 🔴 **Describir un texto en vez de escribirlo.** "Un título que hable del rendimiento" no es un
+  título: diseño no redacta. (→ `11`)
+- **Listar productos sin decir en qué módulo va cada uno**, o poner el nombre del producto donde iba
+  el nombre del PNG. Son columnas distintas a propósito. (→ `11`)
+- **Deducir un dato técnico para no dejar un hueco.** Lo no confirmado se escribe
+  `PENDIENTE DE CONFIRMACIÓN — NO INCLUIR EN ARTE`. (→ `11`)
+- **Usar "por ejemplo", "puede llevar", "algo como" o "etc." en un elemento obligatorio.** Deja la
+  decisión en manos de quien no tiene el contexto. (→ `11`)
+- **Mezclar copy con instrucción visual en el mismo campo.** Dirección visual dice *cómo se ve*; la
+  tabla de contenido dice *qué contiene*. (→ `11`)
 
 ## Operación en Notion
 
