@@ -9,20 +9,104 @@
    para la reescritura.
 2. Basarla en: el contenido anterior + las recomendaciones de ambos análisis + la guía de Voz y Tono
    y demás páginas de la wiki (paleta vigente, keywords, recomendaciones SEO).
-3. **Verificar cada enlace** navegando al sitio antes de dejarlo en el texto (extracción completa,
-   una URL a la vez). 🔴 **El sitio NUNCA devuelve 404:** una ruta inexistente responde 200 con un
-   shell vacío, así que **el código de estado no prueba nada**. Compara contra una ruta de control
-   inventada y mira si la página trae `<title>` propio; si no lo trae y pesa lo mismo que el control,
-   **no existe**. Sustituye por una alternativa verificada.
-   ⚠️ **Índices que NO existen** (verificado 2026-08-25): `/tutoriales` y `/articulos` a secas. Los
-   índices reales son **`/inspiracion/tutoriales`** y **`/inspiracion/articulos`**; las piezas
-   individuales sí viven en `/articulos/<slug>` y `/tutoriales/<slug>`.
+3. **Verificar cada enlace** antes de dejarlo en el texto, con el protocolo de dos pasos
+   (sitemap → ruta de control) → [§ Verificación de enlaces](#verificación-de-enlaces). 🔴 **El sitio
+   NUNCA devuelve 404**, así que el código de estado no prueba nada.
 4. Controlar la longitud contra la guía y el plan SEO; si excede mucho, **proponer** qué recortar
    (FAQ redundantes, pasos fusionables) **sin ejecutarlo salvo pedido**.
 5. **Releer antes de cerrar.** Una errata en el cuerpo publicable obliga a una edición extra y le
    resta credibilidad al entregable; revisar sobre todo **nombres de producto, de color y
    tecnicismos**.
 6. Al terminar, `Estado` del artículo a **`En revisión`**.
+
+## Verificación de enlaces
+
+🔴 **berel.com NUNCA devuelve 404.** Una ruta inexistente responde **200 con un shell vacío**: el
+código de estado no prueba nada. El protocolo tiene dos pasos y van **en este orden**.
+
+### Paso 1 — Buscar la URL en el sitemap
+
+Los sitemaps son la **lista autoritativa** de URLs del sitio, y buscar ahí es **más barato y más
+confiable que adivinar una ruta y probarla**. Verificados el 2026-08-25:
+
+| Sitemap | Qué lista |
+|---|---|
+| `https://berel.com/sitemap-productos.xml` | Fichas de producto |
+| `https://berel.com/sitemap-articulos.xml` | Artículos y piezas editoriales |
+| `https://berel.com/sitemap-colores.xml` | Familias de color |
+
+Si la URL no aparece en el sitemap, **no la inventes**: no existe.
+
+### Paso 2 — Confirmar la candidata contra una ruta de control
+
+Sigue siendo **obligatorio**, aunque la URL haya salido del sitemap. Navega la candidata y una ruta
+de control inventada —p. ej. `https://berel.com/productos/arquitectonico/esto-no-existe-xyz123`— y
+compara la extracción completa:
+
+| Señal | Ruta de control (no existe) | Página real |
+|---|---|---|
+| `<title>` | ausente | propio de la página |
+| `meta description` | ausente | presente |
+| `<h1>` | cero | propio |
+| Texto extraído | **684 caracteres** (solo navegación y pie) | **más de 2.000 caracteres** |
+
+Medidos el 2026-08-25: la ficha de Berelinte trae **4.699 caracteres**; el tutorial de baño, **5.231**.
+Si la candidata no trae `<title>` propio y pesa lo mismo que el control, **no existe**: sustitúyela
+por una alternativa verificada y deja el pendiente en el callout ⚠️.
+
+### URLs verificadas el 2026-08-25 — listas para reusar
+
+Fichas de producto, todas bajo `https://berel.com/productos/arquitectonico/`:
+
+| Producto | Ruta |
+|---|---|
+| Berelinte | `vinilacrilicas/berelinte` |
+| Kalos Tone | `vinilacrilicas/kalos-tone` |
+| Multitono Pro | `vinilacrilicas/multitono-pro` |
+| Insignia | `vinilacrilicas/insignia` |
+| Esmalte Summa (semimate) | `esmaltes/esmalte-summa-2` |
+| Sellador (acrílico, Serie 580) | `primarios/sellador` |
+| Fondo Noxid (primario anticorrosivo) | `primarios/fondo-noxid` |
+| Pintura para Pisos | `decorativos/pintura-para-pisos` |
+
+Rutas de navegación, bajo `https://berel.com/`:
+
+| Ruta | Estado |
+|---|---|
+| `consejos-para-pintar` | Existe — hub de la serie |
+| `tutoriales/como-transformar-tu-bano-con-pintura` | Existe |
+| `inspiracion/salas` | Existe |
+| `inspiracion/banos` | ⚠️ **NO existe** — devuelve el shell de control |
+| `tutoriales` y `articulos` a secas | ⚠️ **NO existen** como índices. Los índices reales son `inspiracion/tutoriales` e `inspiracion/articulos`; las piezas individuales sí viven en `articulos/<slug>` y `tutoriales/<slug>` |
+
+🔴 **Que exista `/inspiracion/salas` no implica que existan sus hermanas.** Cada ruta de una familia
+se verifica por separado.
+
+### 🔴 Sufijos de variante: enlaza al acabado, no al nombre
+
+El CMS de Berel publica **una URL distinta por acabado**, con sufijo numérico, y **los datos técnicos
+difieren entre ellas**. Verificado el 2026-08-25:
+
+| Producto | Variantes publicadas |
+|---|---|
+| Esmalte Summa | `esmalte-summa` (Mate) · `-0` (Brillante) · `-1` (Satinado) · `-2` (Semimate) |
+| Sellador | `sellador` (Acrílico, Serie 580) · `-0` (Vinil-Acrílico, Serie 570) · `-1` (Vinílico) · más `sellador-max`, `sellador-green`, `sellador-invisible`, `sellador-anti-salitre` |
+| Berelinte · Kalos Tone | cada uno tiene además su `-0` |
+
+🔴 **Enlazar al nombre de producto no basta: el enlace va a la variante cuyo dato sostiene lo que
+afirma el texto.** Si el párrafo habla de acabado semimate, el destino es `esmalte-summa-2`, no
+`esmalte-summa`; si cita la Serie 580, es `sellador`, no `sellador-0`. Cruza siempre el dato del
+cuerpo con el de la ficha antes de fijar la URL. El modo de falla concreto está documentado en
+[`../ANTIPATTERNS.md`](../ANTIPATTERNS.md).
+
+⚠️ **No existe ningún "Sellador 5x1"** en el sitemap. Si aparece mencionado, es memoria, no catálogo.
+
+### Auditoría anti-canibalización: sobre el HTML completo
+
+Cuando el brief pide verificar que **ningún artículo existente use ya la frase objetivo**, no basta
+con mirar `title`, `H1` y `meta description`: la frase puede estar enterrada en el cuerpo. Busca la
+**frase literal en todo el HTML** de cada página candidata, **con y sin tilde**. Así se cerró esa
+verificación para los tres artículos de sala en septiembre 2026.
 
 ## Estructura obligatoria del bloque
 
@@ -50,7 +134,8 @@ Dentro del desplegable, **siempre en este orden**:
   `pasteles` `rojos` `verdes`. **No hay ninguna otra.**
   🔴 **Nunca la búsqueda del sitio:** `robots.txt` trae `Disallow: /search` y `Disallow: /*?q=`.
 - **Productos enlazados a su ficha real** (`berel.com/productos/...`) o a la categoría; **nunca al
-  Home, nunca a `/search?q=` y nunca a URLs del backend/CMS**.
+  Home, nunca a `/search?q=` y nunca a URLs del backend/CMS**. 🔴 Y a la **variante** correcta, no al
+  nombre genérico → [§ Sufijos de variante](#-sufijos-de-variante-enlaza-al-acabado-no-al-nombre).
 - Siempre con **anchor descriptivo**; nunca la URL cruda como texto del enlace.
 - Incluir **FAQ**, **tabla comparativa** cuando aplique, y la **firma de cierre** de la marca.
 - **Especificar los banners dentro de la reescritura** siguiendo la Spec para imágenes: posición
@@ -61,9 +146,10 @@ Dentro del desplegable, **siempre en este orden**:
 
 - Si el sitio **no confirma** la URL, enlazar la **familia de color** o la **categoría de producto**,
   y dejar el pendiente en el callout ⚠️. 🔴 **Nunca la búsqueda del sitio como respaldo.**
-- Si un **producto no tiene ficha pública localizable**: citarlo con su nombre y número de serie
-  confirmados en el catálogo, enlazar el catálogo general y dejar el pendiente en el callout ⚠️.
-  **Nunca inventar una URL de ficha.**
+- Si un **producto no tiene ficha pública localizable** —no aparece en `sitemap-productos.xml` y la
+  candidata pesa como el control—: citarlo con su nombre y número de serie confirmados en el
+  catálogo, enlazar el catálogo general y dejar el pendiente en el callout ⚠️. **Nunca inventar una
+  URL de ficha**, ni deducir un sufijo de variante que no viste en el sitemap.
 - Si una fuente de la wiki está **vacía o sin permisos de lectura**, **decirlo explícitamente en el
   entregable** en lugar de rellenar el hueco con supuestos.
 

@@ -64,6 +64,7 @@ guía de voz y tono, y la guía de carga al CMS.
 ├─ Lo que el cliente pidió explícitamente (y dónde corrige la guía de voz) .... modules/09_RECOMENDACIONES_DEL_CLIENTE
 ├─ Qué FORMATO usa una infografía (los 5 del equipo de diseño + la paleta) .... modules/10_FORMATOS_DE_INFOGRAFIA
 ├─ Cómo se llena la FICHA de la infografía (orden de producción para diseño) .. modules/11_FICHA_DE_PRODUCCION_INFOGRAFIA
+├─ Datos de ficha ya verificados (rendimiento, COV, costos) — NO reinvestigar . modules/12_DATOS_VERIFICADOS_DEL_CATALOGO
 ├─ Qué NO hacer (errores ya cometidos en este cliente) ....................... ANTIPATTERNS
 ├─ Vocabulario del cliente y de su sistema ................................... GLOSSARY
 ├─ De dónde salió cada regla, con page id y fecha de extracción .............. SOURCES

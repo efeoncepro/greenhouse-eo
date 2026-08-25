@@ -19,6 +19,21 @@
   sin herramienta van marcados como **estimación**. (→ `02`)
 - **Elegir una fuente cuando dos se contradicen.** Ninguna entra: van al callout de discrepancia y se
   reportan al cliente. (→ `01`)
+- 🔴 **Tomar el brief como verificado.** *Caso real:* un brief de septiembre 2026 afirmaba que el COV
+  de Berelinte se declara *"menor a 50 g/L"* cuando la ficha dice `< 50 g/L`, con símbolo; daba por
+  buena una cita de ficha que todavía había que confirmar y proponía enlaces a fichas de producto
+  **sin dar una sola URL**. Un brief es una hipótesis de trabajo bien hecha, **no una fuente** —sus
+  propios bloques de supuestos suelen decirlo, y se leen por encima—. **Todo dato que vaya entre
+  comillas se confirma contra la ficha vigente antes de escribirlo**; si el brief marca un supuesto,
+  es una tarea, no una nota al pie. (→ `12`, `02`)
+- 🔴 **Inventar un dato porque el hueco es incómodo.** *Caso real:* dos artículos de septiembre 2026
+  necesitaban el tiempo de espera entre manos y **ese dato no existe en ninguna ficha de Berel**: el
+  campo viene vacío en el CMS en todos los productos revisados. Era tentador poner "espera 4 horas"
+  porque suena razonable y nadie lo notaría. Un número inventado en una guía técnica de un fabricante
+  es exactamente el tipo de error que el lector **sí** comprueba, y encima lo hereda cada pieza
+  siguiente del cluster. **Publica el dato que sí existe** —el secado libre al tacto—, explica por
+  qué no es lo mismo, da criterios prácticos que no dependan del reloj y **declara el hueco en el
+  callout de pendientes**. (→ `12`, `03`)
 - **Prometer lo que el cliente no respaldó** — ahorros, porcentajes de eficiencia, garantías. Sin
   documento, no se escribe. (→ `01`, `09`)
 - **Rellenar con supuestos una fuente vacía de la wiki.** Hay **siete páginas vacías** y varias son
@@ -43,6 +58,15 @@
 ## Enlazado
 
 - 🔴 **Enlazar un color a la búsqueda de _otro_ color.** Error real detectado en auditoría. (→ `02`)
+- 🔴 **Enlazar el nombre del producto en vez de la variante que sostiene el claim.** *Caso real:* el
+  brief pedía citar que el *Esmalte Summa* tiene "más de 900 colores" y enlazarlo, pero el CMS
+  publica **una URL por acabado**: la URL base del producto declara *"Disponible en 2 colores:
+  Chocolate y Negro"*, y el claim de 900+ solo lo sostienen las variantes **brillante** y
+  **semimate**. El enlace habría llevado al lector —y a un motor de respuesta— a una página que
+  **contradice la frase que acababa de leer**: es peor que no enlazar, porque destruye la
+  credibilidad justo donde intentabas construirla. **Cruza cada claim con la URL exacta que vas a
+  enlazar, no con la familia de producto**; si ninguna variante lo sostiene, el claim no se publica.
+  (→ `12`, `03`)
 - **Enlazar un producto a la búsqueda del sitio o al Home.** Los productos **sí tienen ficha
   pública**: la asimetría con los colores es deliberada. (→ `04`)
 - **Contar los enlaces de búsqueda como enlazado interno.** Son páginas de resultados: sirven como
@@ -171,6 +195,21 @@
   imagen de producto de esa sección. (→ `09`)
 - 🔴 **Copiar las credenciales del CMS fuera de Notion** — a este repo, a un log, a un commit o a un
   prompt. **Nunca.** (→ `08`)
+
+## Selección de tema y medición
+
+- 🔴 **Descartar un tema porque no tiene impresiones.** *Caso real:* el tema de sala tenía **147
+  impresiones y cero clics** en 23 días, el último lugar de su serie, y por eso estuvo a punto de
+  caerse — hasta que el propio brief desarmó el razonamiento: **no hay impresiones porque no existe
+  la página**, no al revés. El argumento es circular: no hay contenido, luego no hay impresiones,
+  luego se concluye que no vale la pena crear contenido. Y el filtro de *striking distance* sirve
+  para empujar páginas que **ya** rankean: un tema sin pieza que funcione no puede aparecer en ese
+  filtro por construcción. **Para contenido nuevo, la evidencia es el volumen del cluster y la
+  debilidad del SERP, no la línea base propia.** (→ `01`, `02`)
+- **Medir el resultado contra el volumen estimado en vez de contra la línea base.** La medición
+  posterior se hace **contra esa línea base** —las impresiones que la página tenía antes, cero si no
+  existía—. Comparar el resultado con el volumen estimado fabrica un fracaso donde puede haber un
+  éxito. (→ `02`)
 
 ## Reporte
 

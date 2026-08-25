@@ -164,6 +164,38 @@ solución y el gancho con micro-escena; lo que se recorta es la **densidad figur
   (`berel.com/tutoriales`); su template permite **anexar/taguear productos y colores utilizados** y
   **dividir el contenido por pasos**.
 
+## Hallazgos abiertos hacia el cliente (septiembre 2026)
+
+> **Qué es esto:** lo que salió de producir los artículos de septiembre 2026 y **le toca resolver a
+> Berel, no a nosotros**. No son tareas del equipo de contenidos: son **hallazgos reportables** al
+> cliente —errores en su sitio, huecos de insumo y decisiones que solo él puede tomar—. Repórtalos
+> con el avance del ciclo y **no los resuelvas por tu cuenta**: varios frenan producción mientras
+> sigan abiertos.
+
+- **Error de copy en `/inspiracion/salas`.** El segundo párrafo de esa página, que es de **salas**,
+  termina diciendo *"…ideas de pintura para la cocina"*. Es un copy-paste desde la página de
+  cocinas. La página hermana `/inspiracion/recamaras` sí tiene el suyo correcto.
+- 🔴 **Los hubs `/inspiracion/*` no sirven su contenido.** `/inspiracion/salas` existe y tiene texto
+  propio, pero su feed de tarjetas ("Todos · Artículos · Tutoriales · Videos · Combinaciones")
+  **solo carga en cliente**: en el HTML servido no hay ni una tarjeta. Para un buscador o un motor
+  de respuestas, la página son dos párrafos. **Mientras siga así, enlazar a un hub de espacio le
+  pasa autoridad a una página que no la devuelve.**
+- **`/inspiracion/banos` no existe**, aunque sus hermanas sí. Que exista una categoría en la sección
+  Inspiración **no implica que existan las demás**: verifica la URL antes de enlazarla.
+- **Títulos que no coinciden con su H1.** El artículo del Mundial tiene `title` genérico (*"Renueva
+  tu sala"*) y un H1 largo y específico. Son **dos señales distintas para el mismo documento**.
+- 🔴 **Faltan nombres y códigos de color del catálogo vigente.** El cliente pide recomendar colores
+  con **nombre + código alfanumérico**, pero las piezas de septiembre solo pudieron usar familias
+  enlazadas. Mientras no llegue el catálogo, las fichas de infografía salen con celdas marcadas
+  `PENDIENTE DE CONFIRMACIÓN — NO INCLUIR EN ARTE`, y **eso frena producción de diseño**.
+- 🔴 **Falta definir la autoría.** El estándar de citabilidad exige atribuir cada pieza a **un
+  especialista identificable de Berel**, no a "Equipo Berel". **Nadie ha nombrado a esa persona.**
+- **Recordatorio del arreglo pendiente en el origen:** la Fase 8 del **Playbook Producción** en
+  Notion sigue nombrando la tarea de Instagram como *"Instagram Post estático"*, cuando el cliente
+  ya decidió que solo publicará historias. Mientras diga eso, **el siguiente ciclo vuelve a nacer
+  mal**. Detalle y tabla de precedencia →
+  [`06_DERIVADOS_SOCIALES.md`](06_DERIVADOS_SOCIALES.md).
+
 ## Cross-links
 
 - Voz, arco y léxico (lo que estas peticiones refinan) → [`04_VOZ_Y_TONO_BEREL.md`](04_VOZ_Y_TONO_BEREL.md)

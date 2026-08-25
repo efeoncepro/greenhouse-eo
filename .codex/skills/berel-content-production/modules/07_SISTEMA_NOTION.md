@@ -17,6 +17,11 @@
 ⚠️ Dos rarezas reales, no erratas: el **título de la base Content Hub lleva un espacio al final**
 (`📆 Content Hub `) y la propiedad `Días de retraso ` de `Tareas` **también termina en espacio**.
 
+🔴 **Las dos bases no nombran igual su propiedad de título.** En `Tareas` se llama
+**`Nombre de tarea`**; en `Content Hub` se llama **`Nombre`** a secas. Escribir `Nombre` al crear una
+tarea **falla** —ya costó una llamada perdida—, y el nombre correcto no se adivina por analogía entre
+bases: **mira el esquema de la base que vas a escribir antes de escribirla.**
+
 ## `Content Hub` — las propiedades que se tocan al producir
 
 | Propiedad | Tipo | Valores |
@@ -36,6 +41,16 @@
 | `Subítem` | relation self | — |
 | `Pilar JTBD` · `Buyer Persona` · `Email Marketing` · `Calendario de Contenidos` | relation | ecosistema aguas arriba |
 | `🎬 Estado de video` | select | `⚪ Sin video` · `🟡 Planeado` · `🔵 En producción` · `🟢 Publicado` |
+
+### 🔴 `Tipo` no tiene opción para Pinterest — se omite la propiedad, no se sustituye
+
+Las 12 opciones listadas arriba son **todas** las que existen. **Pinterest no está entre ellas.** En el
+subítem de Pinterest **omite la propiedad `Tipo` por completo**: una fila sin `Tipo` es un dato
+faltante, honesto y corregible.
+
+**Nunca** la rellenes con la opción más parecida (`Instagram`, `Publicación patrocinada`, lo que sea):
+eso mete **un dato falso en la base para siempre** y ninguna vista lo va a delatar. Si el equipo quiere
+que Pinterest tenga tipo, la decisión es **agregar la opción al esquema**, no forzar la más cercana.
 
 **Flujo real de `Estado`:** `Idea` → `En curso` → `En revisión` → `En feedback` → `Aprobado` →
 `Publicado`, con `Bloqueado` y `Archivado` como salidas. (El orden que devuelve Notion para el grupo
@@ -88,6 +103,29 @@ artículo) y una fila en `Tareas` (hija de la tarea del artículo). **Es por dis
 accidental: la primera lo muestra en el ecosistema de la pieza, la segunda lo pone en el flujo de
 producción.
 
+### Cómo cuelgan las 8 subtareas de un artículo (verificado sobre el lote de septiembre)
+
+Un artículo genera **8 subtareas**: 4 banners + 4 derivados sociales. Las 8 se cuelgan del artículo
+**escribiendo `Tarea principal`** —la propiedad del lado hijo—, **no `Subtareas`** desde el padre. Y
+las 8 llevan **además** la relación `Artículo (Content Hub)` apuntando a la fila del artículo.
+
+| Pieza | Patrón de `Nombre de tarea` | Detalle verificado |
+|---|---|---|
+| Banners | `Banner N# - [nombre de la pieza]` | el **N2 lleva 🔁 al final del nombre** |
+| Sociales | `Social N## - Derivado: [Canal] — [Tema]` | el `N##` es el número **del artículo**, no de la pieza |
+
+### La relación tarea↔subítem es bidireccional y se ve doble — es esperado
+
+`Tareas` (en el Content Hub) es la **inversa** de `Artículo (Content Hub)` (en la base `Tareas`): son
+los dos lados de la misma relación, no dos relaciones distintas.
+
+Consecuencia observada: al vincular un **subítem** del Content Hub con su tarea social, esa tarea pasa
+a mostrar **dos** entradas en `Artículo (Content Hub)` — el artículo **y** su propio subítem.
+
+🔴 **No es un error de quien lo creó: es el esquema.** No lo "arregles" borrando una de las dos: ambas
+son relaciones legítimas. Si algún día ese doble molesta en las vistas, la salida es **una propiedad de
+relación distinta** para el vínculo tarea↔subítem — nunca borrar.
+
 ## ⚠️ La trazabilidad artículo→arte hoy se sostiene por convención de nombres, no por la relación
 
 Cobertura real medida el 2026-08-25:
@@ -101,7 +139,9 @@ Entre las que salieron sin vínculo hay tareas `Banner N1…N4` — **literalmen
 artículo**. Hoy la trazabilidad la sostiene el `N##` del nombre: **si alguien renombra, se pierde**.
 
 **Qué hacer con eso:** al crear tareas nuevas, **poblar siempre `Artículo (Content Hub)`** —también
-en los banners, no solo en los derivados. No es opcional aunque el nombre ya lleve el `N##`.
+en los banners, no solo en los derivados. No es opcional aunque el nombre ya lleve el `N##`. Es
+exactamente lo que se hizo en el lote de septiembre: **las 8 subtareas del artículo llevan el vínculo**,
+además de su `Tarea principal`.
 
 ## Formato en Notion (reglas que evitan pérdida de texto)
 
@@ -110,11 +150,19 @@ en los banners, no solo en los derivados. No es opcional aunque el nombre ya lle
   viñetas, no en tabla.
 - Evitar los símbolos `<`, `≤` y `~` sueltos en el cuerpo: escribirlos en palabras — "menos de
   50 g/L", "hasta 200 KB", "más de 60.000 ciclos".
+- **Cuando el símbolo sí va** —datos de ficha técnica, donde la prosa estorba— **escápalo a mano**:
+  `\>` y `\<`. Así se escriben `\> 60,000 ciclos` y `\< 50 g/L`.
+- **`\#Berel` lleva su barra a propósito.** Sin ella Notion lee el hashtag como **encabezado** y te
+  come la línea entera.
 - Los **encabezados desplegables** se crean como `# Título {toggle="true"}` con todo su contenido
   **indentado un tabulador**.
-- **Notion canoniza parte del formato al guardar** (tablas, escapes, negritas pegadas a código).
-  Son cosméticos **para el lector, NO para el editor**: 🔴 **el texto guardado ≠ el texto que
-  enviaste** — una tabla queda con un `<tr>` y un `<td>` por línea. **Antes de cualquier edición
+- 🔴 **El tabulador es load-bearing.** Un tabulador que se pierde **saca del desplegable todo lo que
+  viene después** —queda suelto al final de la página— **y la edición reporta éxito igual**. Aplica
+  también a los **hijos de un `<callout>`**. Nadie te va a avisar: la única defensa es releer el
+  render y confirmar que el contenido sigue dentro del toggle.
+- **Notion canoniza parte del formato al guardar** (tablas, autolinks, escapes, negritas pegadas a
+  código o a enlaces — inventario abajo). Son cosméticos **para el lector, NO para el editor**:
+  🔴 **el texto guardado ≠ el texto que enviaste.** **Antes de cualquier edición
   anclada sobre contenido ya guardado, relee la página y copia el ancla del estado actual.** Si la
   edición devuelve `No matches found`, **el ancla es el problema: relee, no reintentes**. Y no
   intentes "arreglar" la canonización: solo se vuelve a editar si hay un cambio real de contenido.
@@ -126,6 +174,27 @@ en los banners, no solo en los derivados. No es opcional aunque el nombre ya lle
   necesita la URL del anterior.
 - 🔴 **No borrar nunca contenido existente.** Los análisis, el contenido rescatado y las
   reescrituras se **agregan** como secciones desplegables nuevas.
+
+### Los artefactos de serialización, uno por uno
+
+Todos observados en vivo. Ninguno cambia lo que **ve el lector**; todos cambian el markdown, y por eso
+todos rompen un ancla escrita "de memoria":
+
+| Artefacto | Enviaste | Notion guardó |
+|---|---|---|
+| Tablas canonizadas | una fila en una línea | un `<tr>` y un `<td>` **por línea** |
+| Autolink de dominios | `berel.com` como texto plano | `[berel.com](http://berel.com)` |
+| Negrita + código inline | ``**Rojo Editorial `#B3153A`**`` | ``**Rojo Editorial ****`#B3153A`**`` |
+| Negrita + enlace | `**[Verdes](url)**` | `[**Verdes**](url)` |
+
+A eso se suman **escapes que Notion agrega solo**: la **barra vertical** pasa a `\|` y el **signo
+dólar** pasa a `\$`. Ojo con el autolink: el texto visible no cambia, pero el dominio **ahora es un
+enlace `http://`**.
+
+🔴 **Conclusión operativa: un `diff` byte a byte contra lo que enviaste va a mostrar diferencias
+aunque no se haya perdido nada.** No verifiques igualdad de markdown — **verifica el contenido
+renderizado**: que las tablas estén completas, que los callouts conserven sus hijos, que nada haya
+quedado fuera del desplegable.
 
 ## ⚠️ Deriva observada: el esqueleto real del artículo no es el documentado
 

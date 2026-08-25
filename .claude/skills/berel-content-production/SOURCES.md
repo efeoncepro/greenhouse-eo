@@ -121,6 +121,25 @@ y declara **1.400-1.800 palabras**.
 |---|---|---|
 | **2026-08-25** | **Instagram: solo historias, sin posts estáticos** | La Fase 8 del `Playbook Producción` (`3b239c2fefe780ceb71dff4f5bed4646`), que sigue nombrando la tarea como "Instagram Post estático". **Pendiente de corregir en Notion.** |
 
+## Verificación en vivo del catálogo público (2026-08-25)
+
+Aparte de la wiki de Notion, el **2026-08-25** se verificó **en vivo el catálogo público de Berel**
+para fijar los datos técnicos que cada artículo del cluster vuelve a necesitar. El resultado está
+transcrito en el módulo [`12_DATOS_VERIFICADOS_DEL_CATALOGO.md`](modules/12_DATOS_VERIFICADOS_DEL_CATALOGO.md).
+
+**Método:** recorrido del **sitemap oficial** más una **ruta de control** para confirmar que lo
+servido coincidía con el payload del CMS (de ahí salen los campos vacíos de la §3 del módulo `12`).
+
+| Qué se cubrió | Alcance |
+|---|---|
+| Fichas de producto | **8** — Berelinte, Berelinte-0, Kalos Tone, Multitono Pro, Insignia, Sellador, y las variantes de Esmalte Summa |
+| Artículos de sala | **3** |
+| Rutas de navegación | **3** |
+
+🔴 **Lo que caduca antes:** las cifras de **costo de pintar en México** (§5 del módulo `12`) son de
+**agosto de 2026** y hay que **reverificarlas si la publicación se corre más de ~60 días**. Los datos
+de ficha (rendimiento, lavabilidad, COV, colores) caducan solo si Berel cambia la ficha.
+
 ## Método de extracción
 
 Extraído vía el conector MCP de Notion, verbatim, el **2026-08-25**. Los snapshots que reportó el

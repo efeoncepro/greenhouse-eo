@@ -1,7 +1,7 @@
 # Estructura canónica del brief editorial SEO/AEO — V1
 
 > **Tipo de documento:** contrato de proceso
-> **Versión:** 1.1 · **Creado:** 2026-08-25 · **Última actualización:** 2026-08-25
+> **Versión:** 1.2 · **Creado:** 2026-08-25 · **Última actualización:** 2026-08-25
 > **Dueño del oficio:** `content-marketing-studio` ([`templates/content-brief.md`](../../.codex/skills/content-marketing-studio/templates/content-brief.md)) + `copywriting` (titulares) + `seo-aeo` (descubribilidad y citabilidad)
 > **Metodología del research que lo alimenta:** [`SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md`](SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md)
 > **Cómo se deposita en el sistema del cliente:** [`producir-serie-de-briefs-seo.md`](../manual-de-uso/growth/producir-serie-de-briefs-seo.md)
@@ -52,9 +52,12 @@ orden de lectura y lo que se vuelve bloqueante.
 **Lo que esta adaptación agrega, y por qué:**
 
 - **Bloque 8, respaldo de producto** — no existe en la plantilla genérica porque ahí el cliente es
-  Efeonce. Con un fabricante de por medio, el claim de ficha es bloqueante (modelo operativo §6).
-- **Techo duro de caracteres y bloqueantes arriba** — son reglas de forma, no bloques: nacen del
-  error que abre este documento.
+  Efeonce. Con un fabricante de por medio, el claim de ficha es bloqueante (modelo operativo §6), y
+  cada producto viaja con la URL de su ficha verificada.
+- **Bloque 0, bloqueantes de arranque** — la plantilla genérica reparte advertencias por el cuerpo;
+  acá son una tabla accionable con dueño, arriba de todo.
+- **Techo duro de caracteres** — es regla de forma, no bloque: nace del error que abre este
+  documento.
 - **Marca de evidencia dato por dato** — MEDIDO / OBSERVADO / ESTIMADO / INFERIDO / REPORTADO
   (modelo operativo §2). La plantilla genérica pide factcheck; acá el marcado viaja visible al brief.
 - **Los cuatro titulares como bloque propio** — la plantilla pide un título de trabajo; acá se
@@ -67,7 +70,20 @@ Query Fan-Out— y su lugar natural son los bloques **7** y **9**. Este document
 del contrato** (qué bloques, en qué orden, con qué techo); esa plantilla gobierna **la calidad de lo
 que va adentro**.
 
-## La estructura — 11 bloques, ninguno de más de ~10 líneas
+## La estructura — bloque 0 + 11 bloques, ninguno de más de ~10 líneas
+
+### 0. Bloqueantes de arranque
+Va **antes que todo lo demás**, en tabla, con tres columnas: **qué bloquea**, **quién lo cierra**
+(cliente / producción / redactor) y **tipo** (decisión, verificación, investigación, aprobación).
+
+| Qué bloquea | Quién lo cierra | Tipo |
+|---|---|---|
+| Enunciado accionable, uno por fila | cliente · producción · redactor | decisión · verificación · investigación · aprobación |
+
+**Un bloqueante no es un supuesto.** El supuesto describe un límite del análisis y vive en el anexo;
+el bloqueante exige una acción de alguien antes de escribir. Nueve advertencias repartidas entre el
+cuerpo y el cierre del brief no son bloqueantes: son ruido que quien redacta tiene que extraer y
+ordenar a mano antes de poder empezar. Cada fila nombra a su dueño; sin dueño no es un bloqueante.
 
 ### 1. La pieza en una línea
 Qué es, para quién, y qué se lleva el lector. Si no cabe en una línea, el tema no está decidido.
@@ -101,6 +117,12 @@ escribirse todavía. Si la pieza pertenece a un ciclo anual de marca, la bidirec
 Los H2 como pregunta literal, en orden, y **el objeto citable** (tabla, checklist, matriz) con su
 ancla estable. Lista, no prosa.
 
+**Todo elemento que el brief pide y cuyo dato no aporta se marca como investigación asignada al
+redactor, con su fuente esperada**, y viaja al bloque 0 con tipo *investigación*. Pedir "tiempos
+concretos en horas", "un rango de costo por metro cuadrado" o "tres paletas nombradas" sin aportar
+ninguno y sin declararlo deja el hueco para que quien redacta lo descubra a mitad del texto. Un dato
+faltante declarado es gestionable; uno implícito termina siendo un número inventado.
+
 **El `unbrand test` puede fallar de forma legítima, y entonces cambia la métrica, no el objeto.** El
 método de utilidad citable exige que el objeto siga sirviendo sin logo ni CTA. Cuando el objeto **es
 la entidad de marca** —un léxico propietario, una nomenclatura, un índice con nombre—, quitarle la
@@ -111,7 +133,13 @@ bloque 3 y en el bloque 11.
 
 ### 8. Respaldo de producto
 Los datos que hacen falta y de dónde salen. **Si la ficha no lo declara literalmente, el H2 no se
-escribe.** Lo que falte va como bloqueante de arranque con dueño.
+escribe.** Lo que falte va al bloque 0 con dueño.
+
+**Todo producto mencionado llega con la URL de su ficha, verificada.** Nombrar el producto y hasta
+proponer el texto del ancla, pero sin la URL, traslada la verificación a quien redacta: una pasada
+contra el sitemap por producto y por pieza. Y cuando el brief pide citar un dato de la ficha, **la
+URL tiene que ser la de la variante que sostiene ese dato**. Si el claim solo lo declara una variante
+concreta y la URL base lo contradice, sin la URL correcta en el brief el error se publica.
 
 **Separa lo que el brief propone de lo que la ficha declara.** En un brief con dato de fabricante
 conviven dos cosas que no se pueden confundir: la **propuesta editorial** (qué producto va en qué
@@ -132,7 +160,8 @@ falla se declara fallado con su razón** —y si el fallo es legítimo (bloque 7
 métrica que lo reemplaza, escrita ahí mismo—. Un gate marcado verde para que cuadre no es un gate.
 
 ### Anexo (fuera del brief, enlazado)
-Research, SERP, competencia, evidencia, supuestos y límites. **Se enlaza, no se transcribe.**
+Research, SERP, competencia, evidencia, supuestos y límites. **Se enlaza, no se transcribe.** Los
+**supuestos** viven acá; lo que exige una acción antes de escribir sube al bloque 0.
 
 ## Reglas de forma
 
@@ -142,9 +171,14 @@ Research, SERP, competencia, evidencia, supuestos y límites. **Se enlaza, no se
 3. **Tablas para datos, listas para instrucciones, prosa solo para el ángulo.**
 4. **Marca de evidencia** (MEDIDO / OBSERVADO / ESTIMADO / INFERIDO / REPORTADO) en cada dato
    citado. El dato vive en el anexo; el brief cita la conclusión con su marca.
-5. **Los bloqueantes van arriba**, antes del bloque 1, no enterrados al final.
+5. **Los bloqueantes van en el bloque 0**, en tabla con dueño y tipo, no repartidos por el cuerpo ni
+   enterrados al final. Separados de los supuestos, que son otra cosa y viven en el anexo.
 6. **El brief se escribe después del research, nunca antes**, y **nunca sin el chequeo de
    canibalización a nivel de CONTENIDO** — no de slug. Ver el modelo operativo §5.
+7. **Ningún producto se nombra sin la URL de su ficha verificada**, y el dato que se cita sale de la
+   URL de la variante que lo declara.
+8. **Lo que el brief pide y no aporta se declara investigación**, con dueño y fuente esperada. No
+   hay elementos pedidos en silencio.
 
 ## Antipatrones
 
@@ -156,6 +190,13 @@ Research, SERP, competencia, evidencia, supuestos y límites. **Se enlaza, no se
   autoridad.
 - **Declarar "el tema está libre" sin haber leído el contenido** de las piezas adyacentes.
 - **Enterrar los bloqueantes** al final, donde quien redacta los ve cuando ya empezó.
+- **Confundir supuestos con bloqueantes.** El supuesto se lee; el bloqueante se cierra, y tiene dueño.
+- **Nombrar un producto sin la URL de su ficha.** Quien redacta termina verificando contra el sitemap
+  lo que el brief ya sabía.
+- **Citar un dato de ficha con la URL base cuando solo lo sostiene una variante.** La URL base lo
+  contradice y el error se publica.
+- **Pedir un dato que el brief no aporta sin marcarlo como investigación.** El hueco aparece a mitad
+  del texto y se rellena inventando.
 - **Forzar el verde de un gate que falla por construcción.** Declararlo fallado y explicar por qué es
   más honesto y más útil; lo que cambia es la medición, no el objeto.
 - **Publicar como declarado por ficha lo que el brief propuso.** Si la columna no dice "propuesto",
