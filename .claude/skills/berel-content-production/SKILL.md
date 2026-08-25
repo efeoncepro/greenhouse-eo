@@ -155,9 +155,13 @@ documento desactualizado.
 
 | Tema | Fuente A | Fuente B |
 |---|---|---|
-| **Canal 2 del set social** | Playbook Derivados: **Instagram Story**, secuencia de 3-4 stories 9:16 | Playbook Producción F8: **Instagram Post estático**, `Diseño gráfico` |
 | **Esqueleto del artículo** | Playbook: 4 desplegables (modalidad A) o 2 (modalidad B) | El artículo real observado: **3 desplegables** (`Research` · `Plan Editorial SEO/AEO` · `✍️ Artículo V1`) |
 | **Longitud objetivo** | Guía editorial: **900-1.200+** palabras | Artículo de referencia: declara **1.400-1.800**, entregó ~1.500 |
+
+✅ **El conflicto de Instagram quedó resuelto el 2026-08-25:** Berel decidió que **no publica posts
+estáticos en Instagram, solo historias**. Rige el Playbook de Derivados (secuencia de 3-4 stories
+9:16). 🔴 **La Fase 8 del Playbook Producción en Notion sigue desactualizada** y hay que corregirla:
+es la que crea las tareas. Detalle y consecuencia sobre el master 🔁 en `06`.
 
 Y dos más donde **sí hay resolución**, porque el cliente habló después (detalle en `09`): las
 **series de producto** (Voz y Tono las quiere en el nombre completo; el cliente las prohíbe en el

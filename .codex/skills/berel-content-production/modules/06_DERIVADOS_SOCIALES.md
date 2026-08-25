@@ -92,22 +92,24 @@ Además, en la misma edición:
 
 → Plantillas por canal: [`../templates/copy-derivado-social.md`](../templates/copy-derivado-social.md)
 
-## ⚠️ Conflicto declarado en el origen — Instagram: ¿Story o Post estático?
+## ✅ Instagram es Story, no post estático — decisión del cliente (2026-08-25)
 
-Las dos páginas de la wiki **no coinciden**, y el conflicto es del origen, no de la lectura:
+**Berel decidió que no publicará posts estáticos en Instagram: solo historias.** Eso cierra la
+divergencia que arrastraban los dos playbooks de la wiki.
 
-| Fuente | Canal 2 del set |
-|---|---|
-| **Playbook Derivados Sociales** (Fases 1 y 2) | **Instagram Story** — secuencia de 3-4 stories 9:16 |
-| **Playbook Producción** (Fase 8, naming de las tareas) | **Instagram Post estático**, `Tipo de entregable: Diseño gráfico` |
+| Fuente | Qué decía | Estado |
+|---|---|---|
+| **Playbook Derivados Sociales** | canal 2 = **Instagram Story**, secuencia de 3-4 stories 9:16 | ✅ **es lo que rige** |
+| **Playbook Producción**, Fase 8 | canal 2 = "Instagram Post estático", `Diseño gráfico` | ❌ **desactualizado** |
 
-🔴 **No lo resuelvas por tu cuenta ni elijas en silencio.** El entregable cambia por completo: una
-secuencia interactiva de stories no es un post estático, ni en producción ni en medición.
-**Pregunta cuál rige antes de redactar** y, cuando el cliente o el operador lo decida, corrige la
-página que quedó desactualizada — no dejes las dos versiones conviviendo.
+🔴 **Queda un arreglo pendiente en el origen:** la Fase 8 del **Playbook Producción** en Notion
+sigue nombrando la tarea como *"Instagram Post estático"*. Hay que corregirla ahí — el playbook
+crea las tareas, así que mientras diga eso, el siguiente ciclo vuelve a nacer mal.
 
-Nota menor, probablemente intencional y no un conflicto: la **tarea** de Pinterest lleva 📍 y el
-**subítem** del Content Hub lleva 📌. Son dos objetos distintos.
+**Consecuencia sobre el master 🔁 que conviene no perder de vista:** la variante **4:5** de la Spec
+**no desaparece** — deja de servir a Instagram y **pasa a ser la de Facebook**, que publica en ese
+formato. La variante de Instagram es la **9:16**. Las cuatro adaptaciones siguen siendo las mismas;
+lo que cambió es **quién consume cada una**.
 
 ## Reglas de voz no negociables (valen para todos los canales)
 

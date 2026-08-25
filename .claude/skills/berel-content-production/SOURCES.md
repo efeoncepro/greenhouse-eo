@@ -114,6 +114,12 @@ es el artículo más completo de la base y el mejor modelo vivo de estructura, t
 ⚠️ Es también de donde salen dos de las divergencias declaradas en `SKILL.md`: usa **3 desplegables**
 y declara **1.400-1.800 palabras**.
 
+## Decisiones del cliente posteriores a la extracción
+
+| Fecha | Decisión | Qué invalida |
+|---|---|---|
+| **2026-08-25** | **Instagram: solo historias, sin posts estáticos** | La Fase 8 del `Playbook Producción` (`3b239c2fefe780ceb71dff4f5bed4646`), que sigue nombrando la tarea como "Instagram Post estático". **Pendiente de corregir en Notion.** |
+
 ## Método de extracción
 
 Extraído vía el conector MCP de Notion, verbatim, el **2026-08-25**. Los snapshots que reportó el
