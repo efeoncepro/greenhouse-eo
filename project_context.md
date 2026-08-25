@@ -24,7 +24,7 @@ La dirección de producto móvil de Globe es continuity-first y native-first seg
 
 Las decisiones de arquitectura de Globe se enrutan por el overlay `.claude/skills/arch-architect/globe-overlay.md`
 (pinned decisions G1–G10, los dos bug class canonizados y cómo condiciona un modelo generativo). Decide la FORMA;
-la skill espejo `greenhouse-globe` (`.claude/` + `.codex/`, paridad verificada por `pnpm skills:mirrors`) llena la
+la skill espejo `greenhouse-globe` (`.claude/` + `.codex/`) llena la
 implementación. Cada ruta ejecutable publica un contrato creativo versionado y autocontenido —operación, slots con
 rol, combinaciones, controles con mecanismo y forma de valor, contrato de salida— según
 [ADR-022](docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_CREATIVE_CONTRACT_DECISION_V1.md): el contrato
@@ -298,7 +298,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo crear o modificar templates, footers y hero images de email | skill espejo `greenhouse-email` + `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`; delivery/provider se opera por separado con `resend-email-platform` y visuales GPT Image 2 con `greenhouse-ai-image-generator` |
 | Cómo diseñar, construir, auditar o mejorar dashboards en Google Data Studio (antes Looker Studio) | skill espejo `.codex/skills/google-data-studio/SKILL.md` + `.claude/skills/google-data-studio/SKILL.md`; usar `inspect` por defecto y validar modelado, filtros, browser, permisos y sharing desde sus references |
 | Cómo modelar Efeonce Group, Media & Distribution, Growth Platform, AEO y Search Visibility 360 | `docs/business-models/README.md` + `.codex/skills/efeonce-business-model-operator/SKILL.md` + modelos vigentes |
-| Qué contenido escribir para un cliente de SEO y cómo entregarlo | `docs/operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md` (runbook y oficio `seo-aeo` enlazados ahí). Striking distance ya implementado en `/admin/growth/seo/keywords` (`TASK-1308`); verificar habilitación por organización |
+| Qué contenido escribir para un cliente de SEO y cómo entregarlo | `docs/operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md`. Striking distance ya está en `/admin/growth/seo/keywords` (`TASK-1308`); verificar habilitación por org |
 | Cómo leer un site audit de crawler sin mentir el diagnóstico (orden de hallazgos, laboratorio vs campo, techo del crawl, huecos de cobertura AEO) | `.codex/skills/seo-aeo/modules/01_SEO_TECHNICAL.md` §8 + `.claude/skills/dataforseo-operator/references/04-onpage.md` §11 + `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.6 |
 | Cómo reconciliar el costo del AI Visibility Grader | `docs/audits/cloud-cost/AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md` + documentación funcional/runbook del grader |
 | Cómo evaluar el portafolio de partners/providers de IA | `.codex/skills/efeonce-business-model-operator/SKILL.md` + `.codex/skills/efeonce-customer-model-operator/SKILL.md` + audit comercial fechado; economics y routing directo/Fal en `design-studio` y `motion-design-studio` |

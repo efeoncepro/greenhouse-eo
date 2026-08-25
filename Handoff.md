@@ -23,6 +23,10 @@
 
 **Verificación.** Cinco briefs verificados en el sistema del cliente por un agente distinto al que los escribió, sobre una lista cerrada de puntos. Las rutas, readers, componentes y tasks citados se comprobaron en disco. No se ejecutó ningún gate de runtime porque el cambio no toca runtime.
 
+**Deriva de espejos: resuelta estructuralmente, no a mano.** `seo-aeo` y `seo-aeo-practice` quedaron reconciliadas byte a byte y **registradas en el manifiesto de `scripts/skills/validate-mirrored-skills.mjs`** (8 → 10 skills). Ese gate ya corría en `local:check`, así que la protección es de pre-push y no depende de que alguien se acuerde; se verificó con un test negativo (drift introducido a propósito → exit 1). Al reconciliar se descubrió que la dirección del drift era la inversa de la supuesta: en `seo-aeo` la copia `.codex` era superconjunto estricto y la de Claude había perdido contenido; en `seo-aeo-practice` se eliminaron siete afirmaciones falsas de la copia `.codex` sobre el alcance comercial de un cliente real.
+
+**Pendiente de decisión del operador, no resuelto:** `.../seo-aeo-practice/modules/03_OFERTA.md` (líneas 55, 207, 245) sigue afirmando que el AEO «lo regalamos adentro», **idéntico en ambas copias**, así que no era drift y quedó fuera del alcance de esta pasada. Contradice la corrección del 2026-08-15 en el mismo sentido que lo que se limpió, pero sus frases son afirmaciones generales sobre la arquitectura de la oferta y no sobre el cliente del caso: no se sabe si la generalización es falsa o si solo lo era la inferencia sobre ese cliente. Resolverlo cambia cómo la práctica cotiza a toda la cartera.
+
 ## 2026-08-24 — TeamBot: `@todos` en chats grupales queda descartado
 
 Un envío real a `EO Team` confirmó que el contrato histórico era falso: Bot Framework aceptó `<at>todos</at>` con el `chatId` como `mentioned.id`, pero Teams publicó `todos` como texto plano en una burbuja separada, sin arroba ni notificación colectiva. La burbuja provino de combinar `activity.text` con la Adaptive Card.

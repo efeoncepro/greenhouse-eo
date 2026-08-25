@@ -1,7 +1,7 @@
 # SEO Editorial Prioritization Operating Model V1
 
 > **Tipo de documento:** Modelo operativo (proceso repetible, agnóstico al cliente).
-> **Versión:** 1.0 · **Fecha:** 2026-08-25.
+> **Versión:** 1.1 · **Fecha:** 2026-08-25.
 > **Ámbito:** cómo Efeonce ejecuta un research de SEO/AEO y una priorización editorial para un cliente
 > con blog activo, de punta a punta: insumos, carriles, intake del sistema editorial, secuencia,
 > criterio de descarte, producción de briefs, entrega, verificación y medición.
@@ -124,6 +124,77 @@ disponible es corta —en el caso fuente eran 23 días desde el arranque de la s
 límite explícito**: con esa ventana no se lee estacionalidad, no hay interanual y no se puede separar tendencia de
 ruido. Cuando falte historia, el backfill histórico tiene su propio manual
 ([`backfill-historico-gsc.md`](../manual-de-uso/growth/backfill-historico-gsc.md)).
+
+### 2.2 El camino a la herramienta interna — y qué parte ya existe
+
+**La dependencia de la herramienta de terceros (nivel 2) es transitoria.** El módulo SEO de
+Greenhouse tiene proveedor propio —**DataForSEO**, con transporte único, allowlist cerrado de
+familias y ledger de gasto canónico ([`src/lib/ai/dataforseo.ts`](../../src/lib/ai/dataforseo.ts),
+familias en [`dataforseo-families.ts`](../../src/lib/ai/dataforseo-families.ts))— y ya cubre buena
+parte de las preguntas del research. Lo que sigue es el mapa honesto de qué está construido y qué
+no, para decidir caso a caso en vez de asumir en cualquiera de las dos direcciones.
+
+Lo que existe hoy bajo [`src/lib/growth/seo/`](../../src/lib/growth/seo/):
+
+- **Hecho de mercado por keyword** — `keyword-market-data.ts` + `keyword-market-data-batch.ts`:
+  volumen, dificultad, CPC, intención, `core_keyword` y barrera de enlaces del top-10, con frescura
+  mensual y pre-check que evita volver a comprar lo vigente.
+- **Descubrimiento de candidatas** — `keyword-discovery/`: expansión de semillas por cuatro métodos
+  (`keyword_suggestions`, `related_keywords`, `keyword_ideas`, `keywords_for_site`). Descubrir no es
+  seguir: la promoción a keyword seguida es un command posterior y explícito.
+- **Perfil de enlaces del dominio propio** — `backlinks/`: serie semanal con dominios de referencia,
+  backlinks totales, `domain_rank` en escala 0–100 y un proxy de toxicidad.
+- **Posición propia en el tiempo** — `rank-capture.ts`, `rank-capture-batch.ts` y
+  `rank-evolution-reader.ts`: la SERP del cliente medida día a día, append-only.
+- **Cockpit y rendimiento** — `overview/` (KPIs y serie de visibilidad) y `performance/`.
+- **Auditoría técnica del sitio** — `site-audit/` (crawl on-page).
+- **Control de costo por proveedor** — `provider-pricing.ts` y `provider-spend.ts` más el gate de
+  entitlement: el gasto se estima y se frena **antes** de la llamada, atribuido a la organización.
+- **Dato medido propio** — `gsc-daily-materializer.ts`, `gsc-backfill.ts` y
+  `keyword-opportunities-reader.ts` (§2.1).
+
+Dos nombres que engañan, y conviene decirlos antes de la tabla:
+
+- **`gap/` no es el gap de keywords contra competidores.** Es el cruce SEO×AEO del quadrant 360
+  ([`read-seo-aeo-gap.ts`](../../src/lib/growth/seo/gap/read-seo-aeo-gap.ts)): rankeas pero no te
+  citan, te citan pero no rankeas. El gap competitivo de keywords (`domain_intersection`) figura como
+  **pendiente** en la arquitectura del módulo.
+- **El mercado es una dimensión explícita, no un supuesto.** Cada target declara su par
+  `(país, idioma)` y el read path se niega a elegir callado cuando hay varios
+  ([`resolve-target.ts`](../../src/lib/growth/seo/resolve-target.ts)). Es el equivalente interno de
+  fijar la base regional de la herramienta externa (§5.1).
+
+#### Tabla de correspondencia
+
+Para cada pregunta del research (§5.1): qué reporte externo la contesta hoy y qué capacidad interna
+la contesta o la contestaría.
+
+| Pregunta del research | Reporte externo (caso fuente) | Capacidad interna | Estado |
+|---|---|---|---|
+| ¿Cuánta autoridad y cuántos enlaces tiene **el dominio propio**? | `domain_rank` · `backlinks_overview` | `backlinks/capture.ts` + `backlinks/reader.ts` — serie semanal de dominios de referencia, backlinks, `domain_rank` 0–100 y toxicidad | **ya cubierto internamente** |
+| ¿Cuánta autoridad tiene **un competidor**? | los mismos dos, sobre otro dominio | ninguna: el capture cuelga de `seo_targets` —el dominio de la organización cliente— y no existe la noción de dominio competidor; abrir un target por competidor mezclaría la serie del cliente y su presupuesto | **sin cobertura interna todavía** |
+| ¿Contra quién se compite de verdad? | `domain_organic_organic` | los competidores hoy se **declaran** en el perfil AEO (`competitorsDeclared`, `src/lib/growth/ai-visibility/`); no se derivan del solapamiento orgánico | **sin cobertura interna todavía** |
+| ¿Qué páginas **propias** cargan el peso del tráfico? | `domain_organic_unique` | `seo_gsc_daily` + `performance/read-performance.ts` — y es **medido**, no estimado: mejor insumo que el externo | **ya cubierto internamente** |
+| ¿Qué tipo de contenido gana enlaces en la categoría? | `backlinks_pages` | el snapshot guarda el perfil agregado del dominio y el delta new/lost, no el desglose por página; y no alcanza dominios ajenos | **sin cobertura interna todavía** |
+| ¿Dónde hay demanda que el cliente no captura? (Carril B) | `domain_domains` con sintaxis de gap | `domain_intersection` está declarado como fuente válida de la tabla de mercado, pero su productor (TASK-1662) figura **pendiente** en la arquitectura del módulo | **sin cobertura interna todavía** (pendiente con dueño declarado) |
+| ¿Cuánto vale una lista concreta de keywords? | `phrase_these` | `keyword-market-data.ts` + `keyword-market-data-batch.ts` (`keyword_overview`: volumen, dificultad, CPC, intención, barrera de enlaces) | **ya cubierto internamente** |
+| ¿Cuál es el universo semántico y las variantes del tema? | `phrase_related` · `phrase_fullsearch` | `keyword-discovery/` con `related_keywords`, `keyword_suggestions` y `keyword_ideas` | **ya cubierto internamente** |
+| ¿Cuáles son las preguntas del mapa de Query Fan-Out? | `phrase_questions` | discovery devuelve long-tail con volumen, pero su enum de métodos está cerrado y **ninguno corta por forma interrogativa**: el mapa hay que armarlo a mano sobre la salida | **parcialmente cubierto** |
+| ¿Quién ocupa el SERP de la consulta que pienso atacar? | `phrase_organic` | el módulo **sí paga la SERP** (`rank-capture.ts` llama `/v3/serp/google/organic/live/advanced`), pero el parser persiste solo la posición del dominio propio, su URL y los tipos de features presentes: los dominios del resto del top se descartan | **parcialmente cubierto** (el dato se compra y no se guarda) |
+| ¿Cómo evoluciona la posición propia día a día? | no se corrió en el caso fuente | `rank-capture*.ts` + `rank-evolution-reader.ts` — serie append-only por keyword × motor × dispositivo | **ya cubierto internamente** (la interna cubre más que el uso externo) |
+
+#### La regla de decisión
+
+**Cuando la capacidad interna cubre la pregunta, se usa la interna.** No por preferencia de
+plataforma: porque el dato queda **versionado** (append-only, con su `as-of`), **auditable por el
+cliente** desde su propia superficie, con **costo controlado y atribuido** a su organización antes de
+gastarlo, y **sin depender de la cuota compartida de un tercero** que se agota a mitad del trabajo
+(§7). La herramienta externa queda para lo que la interna no cubre todavía.
+
+**Y cada uso de la herramienta externa es una señal de backlog de producto.** Si un research vuelve a
+apoyarse en el mismo reporte externo ciclo tras ciclo, eso no es una preferencia metodológica: es una
+capacidad faltante con demanda demostrada. Se registra como tal —igual que el antipatrón 9 del §11
+registra el caso inverso, reimplementar a mano lo que el portal ya tiene—.
 
 ---
 
@@ -260,6 +331,66 @@ inexistentes devolvían HTTP 200 (un chequeo por status code no las detecta), y 
 apuntaba a una ruta bloqueada por `robots.txt`. Ninguno de esos defectos aparece en una herramienta de
 keywords. Un tema con demanda publicado sobre una arquitectura que no lo expone no es una oportunidad:
 es trabajo que se pierde.
+
+### 5.1 El toolkit del research — qué se corre y para qué
+
+Cuando el research corre por el camino de fallback (§1.1), el nivel 2 de los insumos se obtiene con
+una herramienta de terceros. Acá queda la secuencia real ejecutada en el caso fuente con el MCP de
+Semrush. **Los nombres de reporte pertenecen a esa herramienta y cambian si se cambia de proveedor;
+el orden de las preguntas, no.** Lo que la capacidad interna de Greenhouse ya cubre de esta lista
+—y lo que todavía no— está en la tabla de correspondencia del §2.2.
+
+**Flujo obligatorio de la herramienta, en este orden:** *discovery tool → `get_report_schema` →
+`execute_report`*. Nunca se llama `execute_report` a ciegas: el esquema declara los parámetros
+válidos y evita quemar cuota en llamadas mal formadas. Y **la base regional se declara explícita en
+cada llamada** (en el caso fuente, `mx`): un reporte corrido contra la base por defecto responde
+sobre otro mercado, y ese error no se ve en la salida.
+
+Los reportes, agrupados por la pregunta que contestan:
+
+**1. Dimensionar al competidor y a uno mismo** — `domain_rank` (Authority Score, keywords orgánicas,
+tráfico, valor) y `backlinks_overview` (dominios de referencia, backlinks, authority). Es el marco de
+toda la priorización, no un adorno de contexto: en el caso fuente el cliente estaba **18 puntos de
+Authority Score debajo del líder de categoría** (39 contra 57), y de ahí sale la conclusión
+estratégica —no va a ganar por autoridad, tiene que ganar por profundidad—. Sin este paso el backlog
+se arma como si el sitio pudiera competir de igual a igual. Alimenta el paso 2 de la secuencia.
+
+**2. Descubrir contra quién se compite de verdad** — `domain_organic_organic`: competidores por
+solapamiento real de keywords, no por la lista que el cliente tiene en la cabeza. Casi siempre
+corrige la lista declarada.
+
+**3. Ver qué páginas cargan el peso** — `domain_organic_unique` (páginas por tráfico) y
+`backlinks_pages` (páginas por dominios de referencia). No son el mismo reporte con otro orden: el
+segundo contesta algo que el primero no puede, **qué tipo de contenido gana enlaces en esa
+categoría**, y eso decide formato, no solo tema.
+
+**4. Encontrar la demanda no capturada** — `domain_domains` con la sintaxis de gap: keywords donde
+rankea uno o varios competidores y el cliente no. Es la materia prima del **Carril B** (§3).
+
+**5. Dimensionar un tema candidato** — `phrase_these` para métricas en lote de una lista concreta,
+`phrase_related` para el universo semántico del tema y `phrase_fullsearch` para variantes exactas. El
+descuento de las variantes que son la misma demanda se hace acá, al leer, no al presentar (§9.6).
+
+**6. Construir el mapa de Query Fan-Out** — `phrase_questions`: las consultas en forma de pregunta,
+con su volumen. Son la materia prima **literal** de los H2 del brief: se usan como pregunta, no
+parafraseadas.
+
+**7. Verificar la intención antes de comprometerse** — `phrase_organic`, para ver quién ocupa el SERP
+de la consulta que se piensa atacar. Es el paso que evita comprometer un slot con una consulta cuya
+intención no era la supuesta: en el caso fuente confirmó dos trampas de intención (SERP de diseño
+gráfico y de referencia educativa, no de hogar) y, corrido sobre la consulta correcta, destapó que se
+había descartado mal una familia entera de temas por haber leído el SERP de una consulta prima
+(§11.5).
+
+Dos advertencias gobiernan todo este toolkit. Ya están escritas en otra parte del modelo y acá solo
+se referencian:
+
+- **Los reportes pesados se cobran por línea devuelta** —relacionadas y preguntas, 40 unidades por
+  línea en el caso fuente— y **ante cuota se reintenta en serie, no se relanza la flota**: §7,
+  "Dos lecciones operativas", y §11.8.
+- **El SERP que devuelven estos reportes es una foto, no una serie temporal** (§2, nivel 3). Sirve
+  para decidir intención y formato hoy; no sirve como línea base ni como medición de resultado —eso
+  sale del dato medido (§10)—.
 
 ---
 

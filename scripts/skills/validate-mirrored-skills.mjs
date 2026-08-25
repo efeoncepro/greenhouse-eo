@@ -81,6 +81,27 @@ const mirroredSkills = [
     codex: '.codex/skills/greenhouse-talent-people-operator',
     claude: '.claude/skills/greenhouse-talent-people-operator',
   },
+  {
+    /*
+     * Las dos SEO entran el 2026-08-25 tras reconciliarlas a mano. Estuvieron divergiendo en
+     * silencio: `seo-aeo` ni siquiera tenia copia `.claude` versionada — vivia fuera de git — y la
+     * copia que un agente cargaba estaba MAS VIEJA que la versionada, sin nada que lo delatara.
+     * `seo-aeo-practice` era peor: la copia `.codex` afirmaba que el AEO de un cliente real iba
+     * regalado cuando esta contratado y pagado, asi que un agente razonaba sobre un alcance
+     * comercial falso. Un espejo que nadie valida diverge en silencio, y en una skill comercial
+     * el drift no es cosmetico: se le cobra mal a un cliente.
+     */
+    id: 'seo-aeo',
+    mode: 'byte-identical',
+    codex: '.codex/skills/seo-aeo',
+    claude: '.claude/skills/seo-aeo',
+  },
+  {
+    id: 'seo-aeo-practice',
+    mode: 'byte-identical',
+    codex: '.codex/skills/seo-aeo-practice',
+    claude: '.claude/skills/seo-aeo-practice',
+  },
 ]
 
 const filesIn = root => {

@@ -5,6 +5,10 @@
 > (1) niveles de volatilidad por tema, (2) fuentes canónicas, (3) protocolo de
 > refresh, (4) datos clave verificados con su fecha.
 
+> **Delta 2026-07-18:** API de Search Console, Platform Properties y mecanismos
+> de discovery/indexación verificados contra fuentes oficiales. Ver
+> `references/google-search-console-api-indexing.md`.
+
 > **Delta 2026-08-21:** Google Search Central cambió la extracción JSON-LD a una
 > sola pasada de HTML unescaping. Se fijaron alcance, serialización canónica,
 > detección de doble escape y medición en `modules/01_SEO_TECHNICAL.md` §5.
@@ -30,6 +34,9 @@ memoria en un entregable.
 - [RFC 8259 §7](https://www.rfc-editor.org/rfc/rfc8259.html#section-7) y
   [W3C JSON-LD 1.1 §7](https://www.w3.org/TR/json-ld11/#embedding-json-ld-in-html-documents)
   — escapes JSON/Unicode y JSON-LD embebido como data block.
+- Search Console Help + API (`support.google.com/webmasters` y
+  `developers.google.com/webmaster-tools`) — propiedades, Search Analytics, URL
+  Inspection y sitemaps. Platform Properties y su paridad API son 🔴 volátiles.
 - Google Search Status Dashboard — ranking updates confirmados.
 - Search Quality Rater Guidelines (PDF oficial) — E-E-A-T.
 - `web.dev` / Chrome — Core Web Vitals, CrUX.
@@ -54,7 +61,9 @@ memoria en un entregable.
 3. Al detectar un cambio material, actualiza el módulo + el sello `as-of` + esta
    lista de datos clave. Registra qué cambió.
 4. Mantén el GLOSSARY al día cuando aparezcan/mueran términos (p.ej. SGE → AIO).
-5. Para cambios de parser, separa el anuncio observado de la inferencia SEO:
+5. Para GSC/API, reverifica scopes, endpoints y Platform Properties antes de
+   cada implementación; la disponibilidad en UI no implica paridad API.
+6. Para cambios de parser, separa el anuncio observado de la inferencia SEO:
    prueba el HTML live y los valores extraídos antes de afirmar impacto.
 
 ## 4. Datos clave verificados (as-of 2026-06, con fuente)
