@@ -44,7 +44,7 @@ saber qué imagen es la adecuada.
 |---|---|---|
 | N1 | Portada / Hero emocional | `Banner N1 - Portada (Hero [escena])` |
 | N2 | Infografía resumen — **base de adaptación social 🔁** · 🔴 **declara formato + variante** (`10`) | `Banner N2 - Infografía: [tema]` |
-| N3 | Comparativa / didáctico / paso a paso | `Banner N3 - [Tipo]: [tema]` |
+| N3 | Comparativa / didáctico / paso a paso — 🔴 **casi siempre es infografía**: declara formato + variante (`10`) y usa la ficha de producción (`11`) | `Banner N3 - [Tipo]: [tema]` |
 | N4 | Cierre inspiracional | `Banner N4 - Cierre: [tema]` |
 
 **Especificaciones estándar.** Tamaño estándar del blog **1408 × 768 px**; peso objetivo
@@ -67,7 +67,7 @@ Diseño entrega **master + variantes**:
 | Formato | Relación · medida |
 |---|---|
 | Pin de Pinterest | 2:3 · 1000 × 1500 |
-| Post de Instagram | 4:5 · 1080 × 1350 (apto para carrusel) |
+| Facebook | 4:5 · 1080 × 1350 (apto para carrusel) — ⚠️ era la de Instagram hasta la decisión del cliente del 2026-08-25; Instagram pasó a 9:16 |
 | Historia de Instagram | 9:16 · 1080 × 1920 |
 | Reel | 9:16 (video) |
 
@@ -76,9 +76,13 @@ deja de tener un master único y diseño produce dos veces lo mismo con criterio
 
 ## 🔴 La infografía NO usa esta ficha
 
-Los campos de abajo son la ficha de **N1, N3 y N4**. **La infografía (normalmente N2 🔁) lleva otra
-ficha, más exigente**: 9 secciones + tabla de contenido por módulo, con todo el copy literal
+Los campos de abajo son la ficha de las piezas **fotográficas**: el hero y el cierre.
+🔴 **Cualquier banner que sea INFOGRAFÍA lleva otra ficha, más exigente** —9 secciones + tabla de
+contenido por módulo, con todo el copy literal— **y eso incluye al N3 cuando resuelve como
+comparativa, didáctica o paso a paso**, no solo al N2
 → [`11_FICHA_DE_PRODUCCION_INFOGRAFIA.md`](11_FICHA_DE_PRODUCCION_INFOGRAFIA.md).
+El campo `→ Tipo de gráfico` de abajo solo se usa si la pieza **no** es infografía; si lo es, el
+formato y la variante viven en `Tipo de gráfico` y `Sistema / estructura` de la ficha `11`.
 
 ## Los campos obligatorios de la ficha
 

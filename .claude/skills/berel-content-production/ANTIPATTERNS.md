@@ -142,6 +142,9 @@
   sigue. Por eso los metadatos van en viñetas. (→ `07`)
 - **Reintentar corregir la canonización de Notion.** Al guardar, Notion normaliza tablas, escapes y
   negritas. Es cosmético: **no se reintenta**. (→ `07`)
+- 🔴 **Anclar una edición en el texto que TÚ enviaste en vez de en el guardado.** Notion expande las
+  tablas a un `<tr>`/`<td>` por línea, así que el reemplazo falla con `No matches found`. Se relee la
+  página y se copia el ancla del estado actual. (→ `07`)
 - **Reescribir la página entera** en vez de hacer reemplazos pequeños anclados en texto copiado
   literal. (→ `07`)
 - **Editar una propiedad fórmula, el bloque Frame.io o `[GH] RpA v2`.** Son calculadas o son
@@ -174,7 +177,8 @@
 - 🔴 **Entregar un conteo sin el motivo del bloqueo.** El avance se reporta en **tres grupos**:
   listos · faltantes con su bloqueo · fuera de alcance. *Un conteo sin el motivo no sirve para
   decidir nada.* (→ `01`)
-- **Resolver en silencio un conflicto entre dos documentos del cliente.** Hay tres abiertos: se
-  pregunta cuál rige y se corrige el que quedó viejo. (→ `SKILL.md`)
+- **Resolver en silencio un conflicto entre dos documentos del cliente.** Quedan **dos** abiertos
+  —esqueleto del artículo y longitud objetivo—: se pregunta cuál rige y se corrige el que quedó
+  viejo. El de Instagram ya se cerró. (→ `SKILL.md`, `06`)
 - **Lanzar búsqueda y extracción en paralelo.** Una de las dos se cae y se pierde el resultado.
   (→ `01`)

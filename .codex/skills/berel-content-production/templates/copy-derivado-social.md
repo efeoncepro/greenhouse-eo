@@ -29,8 +29,9 @@ Todas las tareas abren con el mismo callout de cabecera:
 
 ## Instagram Story 📱 — 3-4 stories 9:16 (1080 × 1920)
 
-> ⚠️ Canal en conflicto entre los dos playbooks del cliente (Story vs. Post estático).
-> **Confirmar cuál rige antes de redactar** — ver `SKILL.md`.
+> ✅ **Instagram = Story.** Decisión del cliente del 2026-08-25: no publica posts estáticos.
+> Secuencia de 3-4 historias 9:16. ⚠️ La Fase 8 del Playbook Producción en Notion sigue diciendo
+> "Post estático" y hay que corregirla allá.
 
 ```markdown
 # ✍️ Secuencia propuesta

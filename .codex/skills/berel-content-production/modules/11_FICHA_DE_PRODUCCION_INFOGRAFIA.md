@@ -5,10 +5,17 @@
 
 ## 🔴 Qué ficha usa cada banner
 
-| Pieza | Ficha que se escribe en el cuerpo de la subtarea |
+🔴 **Se indexa por ROL de la pieza, nunca por su número.** Un N3 puede ser infografía; si lo es,
+lleva esta ficha aunque no sea el N2.
+
+| Rol de la pieza | Ficha que se escribe en el cuerpo de la subtarea |
 |---|---|
-| **N1 hero · N3 · N4 cierre** | La ficha de **13 campos** de la Spec para imágenes → [`05_BANNERS_IMAGENES.md`](05_BANNERS_IMAGENES.md) |
-| **La INFOGRAFÍA (normalmente N2 🔁)** | 🔴 **Esta ficha**: 9 secciones + **tabla de contenido por módulo** |
+| **Hero** (típicamente N1) · **cierre** (típicamente N4) · cualquier pieza **fotográfica** | La ficha de **13 campos** de la Spec → [`05_BANNERS_IMAGENES.md`](05_BANNERS_IMAGENES.md) |
+| **INFOGRAFÍA** — resumen 🔁 (típicamente N2) **y también comparativa / didáctica / paso a paso** (con frecuencia el N3) | 🔴 **Esta ficha**: 9 secciones + **tabla de contenido por módulo** |
+
+**Cómo se decide en dos segundos:** ¿la pieza *organiza información* —pasos, comparación, cálculo,
+categorías, señalización sobre una foto—? Es infografía → esta ficha. ¿*Muestra una escena*? Es
+fotográfica → los 13 campos.
 
 La infografía necesita más porque **es la única pieza donde el diseñador reconstruye información**:
 en un hero interpreta una escena, aquí tiene que colocar textos, datos y productos exactos. Si algo

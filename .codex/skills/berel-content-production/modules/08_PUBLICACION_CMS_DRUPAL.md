@@ -13,8 +13,9 @@ Un artículo no se sube si no está **aprobado por el cliente** en el Content Hu
 ### Antes de empezar
 
 - [ ] Artículo **aprobado por el cliente** en el Content Hub
-- [ ] **Acceso al CMS** — URL, usuario y contraseña viven en la sección `Acceso CMS` de la wiki de
-      Berel. 🔴 **Nunca copiar esas credenciales fuera de Notion, y jamás a este repo, a un log, a un
+- [ ] **Acceso al CMS** — URL, usuario y contraseña viven en la página **`Accesos CMS`**
+      (`37339c2fefe780cd8335f9d55d9f9230`) de la wiki de Berel. *(La guía del CMS la llama "Acceso
+      CMS" en singular; la página se llama en plural.)* 🔴 **Nunca copiar esas credenciales fuera de Notion, y jamás a este repo, a un log, a un
       commit ni a un prompt.**
 - [ ] **Imágenes cargadas** en la carpeta de OneDrive del mes (p. ej. "Artículos de agosto"). La
       imagen de portada es la que **dice "portada" en el nombre del archivo**.
@@ -56,7 +57,11 @@ Un artículo no se sube si no está **aprobado por el cliente** en el Content Hu
      campo no está claro, mantener el original.**
    - Borrar los textos antiguos y pegar la reescritura desde Notion, por tramos.
    - **Borrar las imágenes antiguas una a una** y reemplazarlas por las nuevas de OneDrive.
-3. 🔴 **Conservar siempre** el texto final **"Pinta con confianza, pinta con Berel"**.
+3. 🔴 **Conservar siempre el texto final del cierre de marca.** ⚠️ **Ojo, dos formas distintas en
+   los documentos del cliente:** esta guía del CMS lo transcribe como *"Pinta con confianza, pinta
+   con Berel"*, pero **`6. Voz y Tono` declara la forma canónica como "Pinta con Confianza. Pinta
+   con Berel." — con punto, sin coma y con mayúsculas** (→ `04`). **Escribe la de Voz y Tono**, que
+   es la que fija la nomenclatura oficial, y no repliques la variante de esta página.
 4. **La imagen de portada va justo después del título** — por eso en Notion la imagen aparece en ese
    orden.
 5. **No agregar:** el bloque de TikTok de Berel · ningún contenido marcado como **"no se publica"**

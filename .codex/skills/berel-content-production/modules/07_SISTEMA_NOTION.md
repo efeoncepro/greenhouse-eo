@@ -112,9 +112,12 @@ en los banners, no solo en los derivados. No es opcional aunque el nombre ya lle
   50 g/L", "hasta 200 KB", "más de 60.000 ciclos".
 - Los **encabezados desplegables** se crean como `# Título {toggle="true"}` con todo su contenido
   **indentado un tabulador**.
-- **Notion canoniza parte del formato al guardar** (tablas, escapes, negritas pegadas a código). Son
-  cambios **cosméticos**: **no reintentar corregirlos**. Solo se vuelve a editar si hay un cambio
-  real de contenido.
+- **Notion canoniza parte del formato al guardar** (tablas, escapes, negritas pegadas a código).
+  Son cosméticos **para el lector, NO para el editor**: 🔴 **el texto guardado ≠ el texto que
+  enviaste** — una tabla queda con un `<tr>` y un `<td>` por línea. **Antes de cualquier edición
+  anclada sobre contenido ya guardado, relee la página y copia el ancla del estado actual.** Si la
+  edición devuelve `No matches found`, **el ancla es el problema: relee, no reintentes**. Y no
+  intentes "arreglar" la canonización: solo se vuelve a editar si hay un cambio real de contenido.
 - **Editar con reemplazos pequeños anclados en texto copiado literalmente de la página.** No
   reescribir la página entera.
 - Las relaciones (`Proyecto`, `Tarea principal`, `Artículo (Content Hub)`, `Responsables`) se pasan

@@ -24,7 +24,8 @@
 | **`N##`** | Número del artículo en la parrilla. **Continuo entre meses**, nunca reinicia. Es lo que hoy sostiene la trazabilidad artículo→arte |
 | **`N1…N4`** | Los cuatro banners **dentro** de un artículo: portada/hero · infografía · comparativa/didáctico · cierre |
 | **🔁** | Marca de la **imagen base de adaptación social**. **Una sola por artículo**, casi siempre la infografía N2. De ella salen las cuatro variantes sociales |
-| **Ficha de contenido** | La tabla de 13 campos que describe un banner. Vive en el cuerpo de la subtarea y **se escribe al crearla** |
+| **Ficha de contenido** | La tabla de **13 campos** que describe un banner **fotográfico** (hero, cierre). Vive en el cuerpo de la subtarea y **se escribe al crearla** |
+| **Ficha de producción de infografía** | La otra ficha: **9 secciones + tabla por módulo**, con todo el copy literal. La usa **cualquier banner que sea infografía**, no solo el N2 |
 | **Derivado social** | Pieza atomizada del artículo para una red. El set son 4 canales. Existe **dos veces**: como fila hija en Content Hub y como subtarea en Tareas |
 | **Callout de procedencia** | Encabezado del bloque de reescritura: de qué análisis y qué fuentes sale, y la convención de niveles usada |
 | **Callout de pendientes ⚠️** | Cierre obligatorio de toda reescritura: lo que quedó sin verificar |
@@ -42,7 +43,7 @@
 | **`Artículo (Content Hub)`** | La relación que une las dos bases. Hoy **poblada a medias** (96 de 283) |
 | **`[GH] RpA v2`** | Writeback de Greenhouse. **Read-only del lado de Notion** |
 | **Encabezado desplegable** | `# Título {toggle="true"}` con su contenido indentado un tabulador. Es como se estructura la página del artículo |
-| **Canonización** | Notion normaliza tablas, escapes y negritas al guardar. Es cosmético: **no se reintenta corregir** |
+| **Canonización** | Notion normaliza tablas, escapes y negritas al guardar. Cosmético para el lector, **no para el editor**: el texto guardado deja de coincidir con el enviado, así que toda edición anclada se relee antes |
 
 ## Voz y estructura editorial
 

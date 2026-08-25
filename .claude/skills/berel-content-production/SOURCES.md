@@ -40,7 +40,8 @@ arriba.
 
 ## 🔴 Páginas que el proceso cita y que están VACÍAS
 
-Verificado el 2026-08-25. **Cuatro de ellas son insumo declarado del Playbook.** No busques ahí la
+Verificado el 2026-08-25. **Dos de ellas —`Keywords` y `Recomendaciones SEO Adicionales`— son
+insumo declarado del Playbook**, y son justo las que un agente abriría primero. No busques ahí la
 metodología: no está.
 
 | Página | Page ID | Estado |

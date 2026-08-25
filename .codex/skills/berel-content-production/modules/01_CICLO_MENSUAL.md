@@ -203,10 +203,26 @@ En la base `Tareas`, una tarea por artículo **por producir**:
 Todas con `Proyecto` = proyecto del mes, `Tarea principal` = tarea del artículo, `Responsables` =
 diseñador, `Estado` = `Sin empezar`.
 
-- **Banners** — `Tipo de entregable`: `Diseño gráfico` · `Fecha límite`: ~2.ª semana del mes →
-  [`05_BANNERS_IMAGENES.md`](05_BANNERS_IMAGENES.md)
-- **Derivados sociales** — `Fecha límite`: después de los banners (~2 días) · con relación
-  `Artículo (Content Hub)` → [`06_DERIVADOS_SOCIALES.md`](06_DERIVADOS_SOCIALES.md)
+| Subtarea | `Tipo de entregable` | `Fecha límite` |
+|---|---|---|
+| **Banners N1–N4** | `Diseño gráfico` | ~2.ª semana del mes |
+| Social **Facebook** · **Instagram Story** · **Pinterest Pin** | `Diseño gráfico` | banners + ~2 días |
+| Social **Reel/TikTok/Short** | `Video` • `Motion graphics` | banners + ~2 días |
+
+🔴 **`Artículo (Content Hub)` se puebla en TODAS, también en los banners** — no solo en los
+derivados. Hoy 187 de 283 tareas no lo tienen y la trazabilidad artículo→arte cuelga del `N##` del
+nombre: si alguien renombra, se pierde (→ [`07_SISTEMA_NOTION.md`](07_SISTEMA_NOTION.md)).
+
+🔴 **Dos numeraciones distintas que no se mezclan:** el **banner numera la PIEZA** (`Banner N1`…
+`Banner N4`, reinicia en cada artículo) y el **artículo y el social numeran el ARTÍCULO** (`Artículo
+N30`, `Social N30`, continuo entre meses). Nunca `Banner N30-1`.
+
+**`Responsables` = el diseñador del ciclo.** No lo inventes: **míralo en las subtareas del artículo
+anterior** y usa el mismo, salvo que el operador diga otra cosa.
+
+Detalle de fichas por pieza → [`05_BANNERS_IMAGENES.md`](05_BANNERS_IMAGENES.md) ·
+[`11_FICHA_DE_PRODUCCION_INFOGRAFIA.md`](11_FICHA_DE_PRODUCCION_INFOGRAFIA.md) · copy social →
+[`06_DERIVADOS_SOCIALES.md`](06_DERIVADOS_SOCIALES.md)
 
 ## Fase 9 · Íconos
 
@@ -219,7 +235,7 @@ Aplicar a **todas** las tareas creadas:
 | Banner | 🖼️ |
 | Social Instagram | 📱 |
 | Social Facebook | 🔲 |
-| Social Pinterest | 📍 |
+| Social Pinterest | 📍 ⚠️ el de la **tarea**; el **subítem** del Content Hub lleva 📌 (`06`) |
 | Social Reel/TikTok/Short | ▶️ |
 
 ## Fase 10 · Estados y cierre del ciclo

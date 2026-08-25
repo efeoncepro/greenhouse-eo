@@ -104,15 +104,19 @@ Esta es la precisión que el Playbook de Producción no alcanza a dar y que camb
 | | Cómo se enlaza | Por qué |
 |---|---|---|
 | **Producto** | A su **ficha real** (`berel.com/productos/...`) o a la categoría `berel.com/productos`. **Nunca al Home ni a `/search?q=`** | Los productos **sí tienen ficha pública** |
-| **Color** | **1.º** la página de **paleta o artículo** que sí rankea (hub & spoke) · **2.º** `berel.com/colores` si la intención es *dónde ver/comprar* color · **3.º y último recurso** `berel.com/search?q=<nombre del color>` | 🔴 **Berel no tiene página pública por color.** El catálogo `berel.com/colores` es un explorador por familia que **no genera URL por tono**. Usar `search` no es un atajo nuestro —es lo que Berel hace en sus propios artículos—, pero **es la peor de las tres opciones** |
+| **Color** | **1.º** la página de **paleta o artículo** que sí rankea (hub & spoke) · **2.º** `berel.com/colores/<familia>` · 🔴 **NUNCA la búsqueda del sitio** | **Berel no tiene página pública por tono**, pero **sí por familia**. Verificado en `sitemap-colores.xml` el 2026-08-25: existen exactamente **nueve** — `amarillos` · `azules` · `cafes` · `grises` · `morados` · `naranjas` · `pasteles` · `rojos` · `verdes`. Ninguna otra |
 
 Siempre con **anchor descriptivo** —nunca la URL cruda como texto del enlace— y CTA que lleve
 exactamente a donde promete.
 
-⚠️ **Matiz que hay que sostener a la vez:** un enlace de búsqueda es un destino **tolerado para un
-color**, pero en la auditoría **no cuenta como enlazado interno** (es una página de resultados)
-→ [`02_ANALISIS_AUDITORIA.md`](02_ANALISIS_AUDITORIA.md). Las dos cosas son verdad y no se
-contradicen: se usa cuando no hay alternativa, y no se contabiliza como si fuera una ficha.
+🔴 **En auditoría, un color enlazado a la búsqueda no es un enlace débil: es un DEFECTO que se
+reporta.** El destino está bloqueado por `robots.txt` → [`02_ANALISIS_AUDITORIA.md`](02_ANALISIS_AUDITORIA.md).
+
+⚠️ **Cuatro de las nueve familias tienen la canónica rota.** Verificado el 2026-08-25: `amarillos`,
+`azules`, `morados` y `verdes` renderizan **sin `<title>`** y con `canonical` literal
+`https://berel.comundefined`. Están en el sitemap y se autoanulan. **Se pueden seguir enlazando
+—son el destino correcto— pero hay que levantarlo como pendiente técnico**, porque hoy esa autoridad
+no vuelve.
 
 **Por qué es la peor opción, documentado por el cliente** (`38739c2fefe780b3aa6bde8f422fc748`): las
 páginas de búsqueda interna **no se indexan** (Google recomienda bloquearlas), **desperdician link
@@ -220,7 +224,7 @@ RGB es de **consumo interno para diseño**.
 | Mexicanidad real (textura, herrería, talavera, gastronomía) | Reducir "lo mexicano" a verde-blanco-rojo o folclore de postal |
 | Cerrar el círculo emocional + síntesis + CTA | Cerrar solo con "Pinta con Confianza. Pinta con Berel." |
 | Tablas, listas y FAQ extractables | Enumeraciones largas escondidas en prosa |
-| Enlaces internos a fichas reales con anchor descriptivo | Enlazar al Home, o a `/search?q=` **cuando sí existe ficha real**; alt de imagen con URLs |
+| Enlaces internos a fichas reales con anchor descriptivo | Enlazar al Home, o a `/search?q=` **cuando sí existe ficha real**; alt de imagen con URLs — ⚠️ *verbatim de Voz y Tono; el matiz "cuando sí existe ficha real" quedó superado: `robots.txt` bloquea `/search`, así que **nunca**, exista ficha o no* |
 | Emoción contenida y editorial | Urgencia, escasez, slang juvenil o **emojis en el cuerpo del artículo** |
 | Hablar solo de Berel y del lector | Mencionar o comparar con la competencia |
 

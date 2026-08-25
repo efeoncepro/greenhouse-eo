@@ -86,53 +86,60 @@ guía de voz y tono, y la guía de carga al CMS.
 5. 🔴 **Nunca RGB ni HEX en el cuerpo publicable.** Los colores se nombran **nombre + código
    alfanumérico**. El Catálogo RGB es de consumo interno para diseño — es lineamiento del cliente.
    (`03`, `04`)
-6. 🔴 **Productos a ficha real; colores a la búsqueda del sitio.** No es simetría arbitraria:
-   **Berel no tiene página pública por color**, y por eso ahí la búsqueda es legítima; para producto
-   **nunca** lo es. (`04`)
-7. 🔴 **La voz es la de Berel, en español de México.** El default es-CL del repositorio **no aplica**
+6. 🔴 **NUNCA enlaces a la búsqueda del sitio.** El `robots.txt` de berel.com trae
+   `Disallow: /search` y `Disallow: /*?q=` (verificado en vivo el 2026-08-25): ese enlace manda al
+   lector y al crawler a una ruta bloqueada. **Productos → su ficha real; colores → `/colores/<familia>`**,
+   que sí existe y está en el sitemap. (`04`)
+8. 🔴 **El sitio NUNCA devuelve 404.** Una ruta inexistente responde 200 con un shell vacío, así que
+   **el código de estado no prueba nada**: un enlace roto se ve como página cargada. Para verificar,
+   compara contra una ruta de control inventada — si el `<title>` falta y el peso coincide con el
+   control, la ruta no existe. (`03`)
+8. 🔴 **La voz es la de Berel, en español de México.** El default es-CL del repositorio **no aplica**
    y el "nosotros" es del cliente, no de Efeonce. La mexicanidad **se muestra en los objetos, no se
    anuncia** — salvo en las fichas de banner, que son instrucción para diseño. (`04`)
-8. 🔴 **Ningún texto se cierra sin la auditoría de voz.** "Suena bien" no es criterio: se revisa
+9. 🔴 **Ningún texto se cierra sin la auditoría de voz.** "Suena bien" no es criterio: se revisa
    contra la lista de fallas típicas, que son de **detalle**, no de tono general. (`04`)
-9. 🔴 **ALT, nombre de archivo y posición se declaran UNA vez** —en la reescritura— y la ficha del
+10. 🔴 **ALT, nombre de archivo y posición se declaran UNA vez** —en la reescritura— y la ficha del
    banner los **copia**. No se reinventan. Las notas para Dev listan solo imágenes que existen.
    (`03`, `05`)
-10. 🔴 **La Spec para imágenes manda sobre cualquier otro documento**, incluido el Playbook de
+11. 🔴 **La Spec para imágenes manda sobre cualquier otro documento**, incluido el Playbook de
     Producción, si difieren. Y hay que corregir el que divergió. (`05`)
-11. 🔴 **Distinguir verificado de estimado, siempre.** Volúmenes de búsqueda y comparaciones de
+12. 🔴 **Distinguir verificado de estimado, siempre.** Volúmenes de búsqueda y comparaciones de
     competencia sin herramienta van marcados como **estimación**. (`02`)
-12. 🔴 **Los pendientes se declaran.** *Un pendiente declarado es gestionable; uno omitido se publica
+13. 🔴 **Los pendientes se declaran.** *Un pendiente declarado es gestionable; uno omitido se publica
     como error.* Callout de pendientes obligatorio al cierre de cada reescritura. (`03`)
-13. 🔴 **No declarar que algo no existe solo porque no se encontró.** Un listado paginado de catálogo
+14. 🔴 **No declarar que algo no existe solo porque no se encontró.** Un listado paginado de catálogo
     **no es un índice completo**: probar el patrón de URL, buscar en el sitio y, si sigue sin
     aparecer, **preguntarle al cliente**. (`01`)
-14. 🔴 **Al reportar avance, tres grupos:** listos · faltantes **con el motivo del bloqueo** · fuera
+15. 🔴 **Al reportar avance, tres grupos:** listos · faltantes **con el motivo del bloqueo** · fuera
     de alcance. *Un conteo sin el motivo no sirve para decidir nada.* (`01`)
-15. 🔴 **Navegar el sitio de a una llamada por vez.** Lanzar búsqueda y extracción en paralelo hace
+16. 🔴 **Navegar el sitio de a una llamada por vez.** Lanzar búsqueda y extracción en paralelo hace
     que una de las dos se caiga y se pierda el resultado. (`01`, `02`)
-16. 🔴 **La petición fechada del cliente le gana a la guía general.** `Recomendaciones Cliente`
+17. 🔴 **La petición fechada del cliente le gana a la guía general.** `Recomendaciones Cliente`
     recoge revisiones explícitas —varias de agosto 2026, algunas marcadas como reincidentes— que
     **refinan y en dos puntos corrigen** `6. Voz y Tono`. Ante conflicto, manda lo que pidió el
     cliente, y hay que corregir la guía vieja. (`09`)
-17. 🔴 **La marca habla en primera persona del plural.** *Creamos*, *nuestra paleta*, *nuestro blog*
+18. 🔴 **La marca habla en primera persona del plural.** *Creamos*, *nuestra paleta*, *nuestro blog*
     — **nunca "Berel ofrece…"**. Única excepción: ALT y schema, donde la marca va en tercera persona
     por SEO/AEO. (`09`)
-18. 🔴 **Sin series de producto en el cuerpo** (*Serie 800*, *Serie 2300*): son nomenclatura de
+19. 🔴 **Sin series de producto en el cuerpo** (*Serie 800*, *Serie 2300*): son nomenclatura de
     catálogo técnico y solo viven en fichas y notas para Dev — **también en tablas, listas de
     materiales y CTA**. Confirmado por el cliente en agosto 2026. (`09`)
-19. 🔴 **Ningún CTA apunta al Home**, y **el texto visible de un enlace nunca es la URL**. Regla
+20. 🔴 **Ningún CTA apunta al Home**, y **el texto visible de un enlace nunca es la URL**. Regla
     reincidente: el cliente ya la marcó dos veces. (`09`)
-20. 🔴 **Toda infografía se produce con uno de los cinco formatos del equipo de diseño** —Pasos ·
+21. 🔴 **Toda infografía se produce con uno de los cinco formatos del equipo de diseño** —Pasos ·
     Señalización · Tipos de Color · Técnica-Foto · Técnica-Gráfica— y **la ficha nombra el formato Y
     la variante**. Son los que diseño ya tiene resueltos; sin declararlo, improvisan. Aplica **solo a
     infografías**: el hero y el cierre se rigen por la otra base, `Formatos de Diseño`. (`10`)
-21. 🔴 **La infografía usa OTRA ficha.** N1, N3 y N4 llevan la ficha de 13 campos de la Spec para
-    imágenes; **la infografía lleva la ficha de 9 secciones + tabla de contenido por módulo** — es
+22. 🔴 **La ficha la decide QUÉ ES la pieza, no su número.** Cualquier banner que sea **infografía**
+    —típicamente el N2, y **con frecuencia también el N3**, cuyo rol de "comparativa / didáctico /
+    paso a paso" es la definición misma de los formatos *Pasos* y *Técnica – Gráfica*— lleva la
+    **ficha de 9 secciones + tabla de contenido por módulo**; el resto lleva los 13 campos. Es
     una **orden de producción**, no un resumen: todo texto va **literal**, cada módulo con su
     producto/dato/ícono/asset asignados, y lo no confirmado se escribe
     `PENDIENTE DE CONFIRMACIÓN — NO INCLUIR EN ARTE`. Prueba de aceptación: **un diseñador que no
     leyó el artículo puede producirla sin reinterpretar**. (`11`)
-22. 🔴 **En infografía, el rojo es `#B3153A` (Rojo Editorial), no el rojo corporativo.** El
+23. 🔴 **En infografía, el rojo es `#B3153A` (Rojo Editorial), no el rojo corporativo.** El
     corporativo se reserva a branding institucional. Y ojo: el HEX de la **paleta de acento** SÍ va
     en la ficha —es instrucción de diseño—; lo que nunca sale al público es el HEX de un **color de
     pintura**. Son cosas distintas. (`10`, `09`)
@@ -149,7 +156,7 @@ guía de voz y tono, y la guía de carga al CMS.
 
 ## ⚠️ Conflictos abiertos en el origen — no los resuelvas en silencio
 
-Tres divergencias **reales entre documentos del cliente**, verificadas el 2026-08-25. No están
+Dos divergencias **reales entre documentos del cliente**, verificadas el 2026-08-25. No están
 resueltas y **no te toca resolverlas por tu cuenta**: pregunta cuál rige y luego corrige el
 documento desactualizado.
 
@@ -173,7 +180,9 @@ cliente pidió lenguaje más plano → **ante la duda, escribe más plano**).
 Verificado el 2026-08-25 en la wiki. **No busques ahí la metodología: no está.**
 
 `Keywords / Intención de Búsqueda` · `Redacción` · `Recomendaciones SEO Adicionales` ·
-`Programacion` · `Product Placement en Imagenes` → **vacías**.
+`Programacion` · `Product Placement en Imagenes` · `Color de año` · `Copy` → **las siete, vacías**.
+⚠️ `Color de año` importa: el Color del Año es tema vivo, y quien la abra buscando doctrina no
+encuentra nada.
 `Sobre la marca` → **plantilla por defecto de Notion**, cero contenido Berel.
 `Brief/Estructura` → ~380 caracteres: es **un prompt suelto** cuyos bloques de referencia están
 vacíos.

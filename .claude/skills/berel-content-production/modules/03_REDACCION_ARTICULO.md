@@ -10,8 +10,13 @@
 2. Basarla en: el contenido anterior + las recomendaciones de ambos análisis + la guía de Voz y Tono
    y demás páginas de la wiki (paleta vigente, keywords, recomendaciones SEO).
 3. **Verificar cada enlace** navegando al sitio antes de dejarlo en el texto (extracción completa,
-   una URL a la vez). Si una URL devuelve 404 o solo búsqueda, **sustituirla por una alternativa
-   verificada**.
+   una URL a la vez). 🔴 **El sitio NUNCA devuelve 404:** una ruta inexistente responde 200 con un
+   shell vacío, así que **el código de estado no prueba nada**. Compara contra una ruta de control
+   inventada y mira si la página trae `<title>` propio; si no lo trae y pesa lo mismo que el control,
+   **no existe**. Sustituye por una alternativa verificada.
+   ⚠️ **Índices que NO existen** (verificado 2026-08-25): `/tutoriales` y `/articulos` a secas. Los
+   índices reales son **`/inspiracion/tutoriales`** y **`/inspiracion/articulos`**; las piezas
+   individuales sí viven en `/articulos/<slug>` y `/tutoriales/<slug>`.
 4. Controlar la longitud contra la guía y el plan SEO; si excede mucho, **proponer** qué recortar
    (FAQ redundantes, pasos fusionables) **sin ejecutarlo salvo pedido**.
 5. **Releer antes de cerrar.** Una errata en el cuerpo publicable obliga a una edición extra y le
@@ -39,10 +44,11 @@ Dentro del desplegable, **siempre en este orden**:
   (p. ej. `Nombre 1-2804D`).
 - 🔴 **Nunca RGB ni HEX en el cuerpo publicable.** Son solo referencia interna para diseño. El
   Catálogo RGB es de consumo interno.
-- **Colores enlazados:** 🔴 **Berel no tiene página pública por color** — el catálogo
-  `berel.com/colores` es un explorador por familia que no genera URL por tono. Orden de preferencia:
-  **paleta o artículo propio que rankee** → `berel.com/colores` cuando la intención es dónde ver o
-  comprar → y **solo como último recurso** la búsqueda del sitio, **verificada**.
+- **Colores enlazados:** **Berel no tiene página por tono, pero sí por familia.** Orden:
+  **paleta o artículo propio que rankee** → **`berel.com/colores/<familia>`**. Las nueve verificadas
+  en `sitemap-colores.xml` el 2026-08-25: `amarillos` `azules` `cafes` `grises` `morados` `naranjas`
+  `pasteles` `rojos` `verdes`. **No hay ninguna otra.**
+  🔴 **Nunca la búsqueda del sitio:** `robots.txt` trae `Disallow: /search` y `Disallow: /*?q=`.
 - **Productos enlazados a su ficha real** (`berel.com/productos/...`) o a la categoría; **nunca al
   Home, nunca a `/search?q=` y nunca a URLs del backend/CMS**.
 - Siempre con **anchor descriptivo**; nunca la URL cruda como texto del enlace.
@@ -53,8 +59,8 @@ Dentro del desplegable, **siempre en este orden**:
 
 ### Cuando el dato no está firme
 
-- Si el sitio **no confirma** un enlace de color/producto, usar `/search?q=<término>` verificado como
-  respaldo.
+- Si el sitio **no confirma** la URL, enlazar la **familia de color** o la **categoría de producto**,
+  y dejar el pendiente en el callout ⚠️. 🔴 **Nunca la búsqueda del sitio como respaldo.**
 - Si un **producto no tiene ficha pública localizable**: citarlo con su nombre y número de serie
   confirmados en el catálogo, enlazar el catálogo general y dejar el pendiente en el callout ⚠️.
   **Nunca inventar una URL de ficha.**
