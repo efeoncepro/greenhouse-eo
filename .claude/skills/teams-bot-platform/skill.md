@@ -107,6 +107,10 @@ The Greenhouse Teams Bot (TASK-671) implements all of the above. Use it as a sta
 | Deploy workflow | `.github/workflows/azure-teams-bot-deploy.yml` |
 | Runbook | `docs/operations/azure-teams-bot.md` |
 
+### Manual generic 1:1 boundary
+
+Greenhouse currently has no generic DM CLI: `pnpm teams:announce` is group/channel-only, and the existing 1:1 payment CLI belongs to Payroll. An approved one-off may temporarily bridge through the canonical dispatcher and audit writers, but it must retain Entra revalidation, `--dry-run`/explicit confirmation, deterministic idempotency, duplicate checks, card-only payloads, and `source_sync_runs`. Do not introduce raw Connector HTTP or a personal Teams connector as a parallel path. Recurring DMs belong in Notification Hub with `dynamic_user`.
+
 ## Day 1 deploy runbook (interactive)
 
 Follow this once per environment.

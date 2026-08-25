@@ -188,6 +188,21 @@ For `payRegime = 'international'` or `payrollVia = 'deel'`:
 - Europe is outside TASK-905 Americas V1 approved seed. Spain/Europe must resolve `needs_tax_review` until a Europe-specific catalog is legally approved.
 - Never apply a treaty zero/reduced withholding rate without residence certificate, no-PE/base-fixed declaration, beneficiary eligibility, service category, period, and evidence snapshot.
 
+## Leave and Anniversary Communication Reconciliation
+
+Before approving or explaining vacation entitlement—especially for `contractor`, `eor`, or Deel profiles—reconcile all of these independently:
+
+1. canonical `hire_date` in both BigQuery and PostgreSQL;
+2. `contract_type`, `pay_regime`, `payroll_via`, and jurisdiction;
+3. the leave policy actually selected by the resolver;
+4. materialized allowance, used, reserved, and current balance;
+5. the applicable agreement, provider rules, and candidate benefits charter;
+6. the exact case-specific instruction or communication, if one exists.
+
+Never substitute compensation `effective_from`, record creation time, or synchronization timestamps for `hire_date`. Updating `hire_date` does not prove that leave balances were recalculated. A sent message proves what was communicated, not what the runtime calculates or what the governing agreement grants.
+
+If those layers disagree, document the drift and route the policy decision to People/Payroll/Legal before changing a balance or generalizing the case. Use `docs/audits/payroll/CONTRACTOR_VACATION_ANNIVERSARY_AUDIT_2026-08-25.md` as the source case.
+
 ## Known Payroll Audit Watchlist
 
 When auditing current code, check these areas first:

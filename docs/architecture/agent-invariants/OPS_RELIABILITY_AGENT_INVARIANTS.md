@@ -25,7 +25,10 @@
   - runtime: `src/lib/communications/manual-teams-announcements.ts`
   - destinos registrados: `src/config/manual-teams-announcements.ts`
   - guardrails: `--dry-run` primero, `--yes` para enviar, `--body-file` con párrafos separados por línea en blanco, CTA `https` obligatorio
-  - para futuras peticiones del tipo "envía este mensaje por Greenhouse/TeamBot", reutilizar este helper antes de crear scripts temporales o usar el conector personal de Teams
+  - para futuras peticiones del tipo "envía este mensaje por Greenhouse/TeamBot" a un grupo/canal, reutilizar este helper antes de crear scripts temporales o usar el conector personal de Teams
+  - el helper no crea DMs genéricos; para 1:1 usar primero el CLI dueño del dominio si existe
+  - si no existe un CLI de dominio, solo se admite un puente temporal acotado sobre `sendViaBotFramework` y los writers canónicos de auditoría, con identidad Entra revalidada, `dry-run`/confirmación, `sourceObjectId` determinístico, deduplicación y `source_sync_runs`; nunca HTTP crudo ni el conector personal
+  - una ejecución `succeeded` prueba aceptación del transporte, no lectura ni renderizado confirmado
 - Chats verificados:
   - `EO Team`: `19:1e085e8a02d24cc7a0244490e5d00fb0@thread.v2`.
   - `Sky - Efeonce | Shared`: `19:bf42622ef7b44d139cd4659e8aa22e81@thread.v2`.

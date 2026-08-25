@@ -194,6 +194,22 @@ void (async () => {
 '
 ```
 
+## Generic 1:1 Messages (HR/People and other one-offs)
+
+`pnpm teams:announce` only targets registered group/channel destinations; it cannot create a generic DM. A domain-specific 1:1 CLI must be used when one exists. The payment CLI below is payment-only and must not be repurposed for leave, anniversaries, performance, or other HR messages.
+
+Until a governed generic 1:1 CLI exists, an explicitly approved one-off may use a task-scoped temporary script only when it:
+
+1. calls `sendViaBotFramework` and the canonical `writeTeamsSendRunStart` / `writeTeamsSendRunOutcome` audit writers;
+2. resolves the recipient in Microsoft Entra immediately before send and requires `accountEnabled=true`;
+3. uses `recipient_kind='chat_1on1'` with the raw Entra Object ID, never `29:`;
+4. sends an Adaptive Card without a mention and without `activity.text`;
+5. preserves paragraphs as separate `TextBlock`s;
+6. enforces mutually exclusive `--dry-run` / `--yes`, deterministic `sourceObjectId`, duplicate checks, and a `source_sync_runs` outcome;
+7. never sends through personal Teams connectors or raw Bot Framework HTTP.
+
+For HR/People copy, verify every date, balance, entitlement, and policy claim against the owning data/contract before sending. A `succeeded` audit row proves transport acceptance, not read receipt or rendered confirmation. Recurring messages must converge to Notification Hub with `dynamic_user`.
+
 ## Payment Announcements 1:1 (nómina / honorarios)
 
 There is a **dedicated CLI** for 1:1 "payment done" cards to the team via the TeamBot — separate from `teams:announce` (which only targets group/channel destinations `eo-team` / release channel and CANNOT DM). Use this for "avísale al equipo que su nómina/honorarios ya se depositó".

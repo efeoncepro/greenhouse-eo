@@ -217,6 +217,14 @@ No todos los contratos usan la misma logica:
 - `Honorarios` no se interpreta automaticamente como vacaciones legales
 - `Contractor` y `EOR` pueden quedar sujetos a politica externa o sin saldo legal equivalente dentro del portal
 
+### Caso operativo acotado 2026-08-25 — contractors Deel y primer aniversario
+
+La comunicación aprobada para Melkin Hernandez y Andrés Carlosama vinculó 15 días remunerados al primer aniversario de cada persona. Esta instrucción individual **no reemplaza la política global** ni prueba que el cálculo actual la implemente.
+
+En la verificación del caso, ambos perfiles `contractor` + `international` + `deel` mostraban 15 días disponibles, incluso Andrés antes de cumplir un año. Ese resultado tampoco coincide por sí solo con la carta global de beneficios, que describe una base anual prorrateada y progresión por antigüedad. El detalle y el dueño de conciliación están en [`CONTRACTOR_VACATION_ANNIVERSARY_AUDIT_2026-08-25`](../../audits/payroll/CONTRACTOR_VACATION_ANNIVERSARY_AUDIT_2026-08-25.md).
+
+Hasta resolver el drift, no comuniques un derecho usando solo el saldo visible. Verifica `hire_date`, régimen, proveedor, política seleccionada, acuerdo aplicable y carta de beneficios. Una comunicación aprobada es evidencia de lo informado, no evidencia del algoritmo de cálculo.
+
 Por eso HR puede ver en la pantalla administrativa una explicacion basica de la politica aplicada a cada saldo.
 
 ### Transiciones contractor a dependent mid-year (TASK-895, V1.1a)

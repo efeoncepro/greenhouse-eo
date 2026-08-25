@@ -3,6 +3,13 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-25 — El caso de vacaciones por aniversario no se convierte en política global
+
+- Se documentaron las fechas de ingreso verificadas de Melkin Hernandez (`2025-07-15`) y Andrés Carlosama (`2025-11-11`), junto con la comunicación individual aprobada que vinculó 15 días remunerados al primer aniversario.
+- La auditoría deja explícito el drift: el runtime actual muestra 15 días a ambos, la carta global describe base anual prorrateada más progresión y la instrucción individual usa otro hito. People, Payroll y Legal deben decidir el contrato antes de cambiar cálculos o saldos.
+- El aprendizaje operativo de TeamBot quedó en arquitectura, runbook, invariantes y skills: `pnpm teams:announce` no crea DMs; un one-off genérico solo puede usar el dispatcher y audit writers canónicos con identidad Entra revalidada, confirmación, idempotencia y auditoría. Los mensajes recurrentes pertenecen a Notification Hub.
+- Se aclaró en el manual de ficha laboral que `hire_date` no se infiere desde compensación/creación y que guardarla no recalcula automáticamente Leave.
+
 ## 2026-08-25 — La metodología de priorización editorial SEO queda escrita, y aparece un motor que ya existía sin usarse
 
 - **La lección más cara: Greenhouse ya calculaba lo que se reconstruyó a mano.** `/admin/growth/seo/keywords` (`TASK-1308`) expone el mismo score de striking distance que el reader canónico `keyword-opportunities-reader.ts` (`TASK-1302`) — clics incrementales contra la curva de CTR de la propia organización, con la canibalización ya separada como consolidación y no como optimización. La capacidad estaba construida, la conexión de Search Console del cliente llevaba semanas acumulando, y nadie la había corrido para esa cuenta. Quedó como antipatrón: verificar no solo que la capacidad exista, sino que esté **habilitada para la organización** — la página está gateada por flag y por entitlement, así que «existe» y «está encendida para este cliente» son dos hechos distintos.
@@ -19,7 +26,6 @@
 - **Cuatro antipatrones nuevos, todos con caso propio.** Un grep de patrón de nombre no es un inventario —un regex anclado a la convención vieja devolvió cero para el mes que usaba otra y se concluyó que los entregables no existían—; el peso en caracteres no mide la calidad de una sección —se llamó «flaca» a una capa que era checklist y tabla, el formato más denso que hay—; una keyword con dificultad sospechosamente baja se verifica en SERP antes de fijarse como objetivo; y un hallazgo de inventario local no es una acusación de proceso: puede ser sincronización de almacenamiento y se reverifica con el equipo dueño antes de reportarlo al cliente.
 - **La trampa de Notion que rompe un entregable devolviendo éxito.** Al depositar un brief dentro de un encabezado desplegable, se escribe la tabla en markdown de tuberías y Notion la guarda como HTML **cuyo envoltorio no hereda el tabulador** — desde ahí, todo lo que sigue queda fuera del desplegable, y la escritura reporta éxito. Tampoco se puede prefijar con tabulador una línea que empiece con sintaxis de lista numerada: Notion la reparsea, descarta el tabulador y arrastra la cola. El cierre es un conteo mecánico, y el fetch devuelve los saltos de línea escapados, así que un patrón ingenuo reporta cero secciones y parece que la página está vacía.
 - **`content-marketing-studio` entra al manifiesto de espejos y traía deriva ya committeada.** Cuatro archivos divergían entre las dos copias, uno con un puntero que resolvía a una ruta inexistente. Reconciliado y registrado: el gate de pre-push cubre ahora 11 skills.
-
 
 ## 2026-08-24 — TeamBot deja de prometer una mención que Teams no soporta
 
@@ -784,21 +790,3 @@ workers Ready y watchdog `aggregateSeverity=ok`/`drift_count=0`. El endpoint tok
 un candidato real durante el flip; el primer correo real debe verificarse con un candidato de prueba controlado.
 El opt-in futuro sigue siendo explícito, versionado y revocable; la revisión jurídica formal de copy, TTL y retención
 queda como sign-off residual si la política interna la exige.
-
-## 2026-08-16 — Cuenta candidata y `/my` longitudinal quedan formalizados en EPIC-011
-
-Se aceptó la arquitectura para que una persona postule, reclame una cuenta y use `/my` antes de ser colaborador,
-sin recrear su identidad ni copiar su ficha al ser seleccionada. El mismo principal y `identity_profile_id`
-persisten; `candidate_facet` y `member` pueden coexistir y la activación laboral agrega capabilities sobre la misma
-cuenta. `/my` pasa conceptualmente de “workspace de member” a espacio personal compuesto por capabilities, pero el
-runtime actual permanece sin cambios hasta implementar las tasks.
-
-El perfil profesional reusable será person-scoped —skills, herramientas, idiomas, certificaciones, links,
-portfolio, evidencia y CV versionado— mientras cada `hiring_application` conserva su propio status publicado, CV
-snapshot, respuestas del rol y expectativa económica. El estado candidato nunca deriva stages/notas/scores crudos
-y una actualización del perfil no reescribe evidencia histórica.
-
-Se agregaron el ADR y la arquitectura canónica, se actualizó `EPIC-011` y se registró el grafo `TASK-1727`–
-`TASK-1733`: identidad/sesión, professional profile, application self-service, `/my` UI, activation continuity,
-People 360 reader y People 360 UI. Las tasks UI tienen direction/wireframe/flow/motion iniciales y permanecen
-`UI ready: no`; no se implementó código, schema, migración, flag ni rollout.

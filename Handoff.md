@@ -2,6 +2,16 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-25 — Vacaciones contractor por aniversario y mensajes TeamBot 1:1
+
+**Sólo documentación y skills en esta pasada; no se cambió runtime.** Se documentó el caso acotado de Melkin Hernandez (`hire_date=2025-07-15`) y Andrés Carlosama (`hire_date=2025-11-11`), ambos `contractor` + `international` + `deel`. Sus perfiles muestran 15 días disponibles, 0 usados y 0 reservados. Nexa ya les comunicó individualmente que los 15 días se vinculan al primer aniversario, con Daniela como supervisora inmediata y al menos cinco días hábiles de anticipación.
+
+**Drift abierto:** el runtime entrega hoy 15 días fijos incluso a Andrés antes del aniversario; la carta global de beneficios describe 15 días anuales prorrateados y progresión por antigüedad; la comunicación aprobada del caso usa el primer aniversario. No se generalizó ninguna de las tres como política nueva. Auditoría: `docs/audits/payroll/CONTRACTOR_VACATION_ANNIVERSARY_AUDIT_2026-08-25.md`.
+
+**TeamBot:** `pnpm teams:announce` sigue siendo group/channel-only y el CLI 1:1 existente es exclusivo de pagos. Para un one-off genérico aprobado, las skills y el runbook admiten únicamente un puente temporal sobre el dispatcher/audit writers canónicos, con Entra revalidado, card-only, preview/confirmación, idempotencia, deduplicación y `source_sync_runs`. `succeeded` no es read receipt. Los mensajes recurrentes convergen a Notification Hub `dynamic_user`.
+
+**Pendiente con dueño:** People + Payroll + Legal deben decidir la política contractual de vacaciones para contractors Deel; después corresponde corregir precedencia/cálculo, reconciliar saldos y alinear carta, acuerdos y copy. No se abrió ADR porque aún no hay decisión aceptada.
+
 ## 2026-08-25 — Metodología SEO editorial documentada + caso de cliente; el motor ya existía
 
 **Sólo docs y skills.** Sin runtime tocado. Origen: un research completo de SEO/AEO para un cliente de la práctica, ejecutado de punta a punta en esta sesión (diagnóstico competitivo, línea base medida en Search Console, backlog de striking distance, cinco briefs editoriales depositados en el sistema editorial del cliente).
@@ -33,7 +43,6 @@
 **Alcance del encargo confirmado, cambia entregables futuros.** El canal social del cliente existe pero **lo opera otra agencia**: Efeonce entrega insumo (texto e imagen) y no publica. Por eso el plan de distribución es un paquete de handoff y no una parrilla, y la medición social no es nativa.
 
 **Verificación.** Depósito comprobado por conteo mecánico (13 secciones dentro del desplegable, 38 tablas con envoltorio indentado, 725 filas intactas). **Dos ediciones intermedias sacaron contenido del desplegable devolviendo éxito**: se detectaron por el conteo, no a ojo. Gate de espejos verde con 11 skills (`content-marketing-studio` traía deriva committeada, reconciliada y registrada). Sin gate de runtime.
-
 
 ## 2026-08-24 — TeamBot: `@todos` en chats grupales queda descartado
 
@@ -539,53 +548,3 @@ dispatch: staging en `Canceled` por los pushes docs-only del día, resuelto toca
 **El hueco del change-gate quedó medido por otra sesión** en la Delta de `TASK-930` (`72c681a3c`): 62 rutas que
 el `ops-worker` importa contra 24 vigiladas, 33 sin cubrir, incluida `src/lib/postgres/client`. Un release que
 toque una de esas puede dejar el worker viejo con el watchdog en `ok`.
-
-## 2026-08-22 — TASK-1748: archivar dejó de fingir cierres, y el orden de sus slices no era preferencia
-
-Estado correcto: **`code complete, rollout pendiente`**. Slices 1 y 2 en `develop` local, sin push:
-`1d0b4e32a`, `b0415ef50`, `5fd8e5245`, `afed7098f`. `pnpm test` completo → **11.960 verdes**; `pnpm lint` y
-`pnpm typecheck` → 0 errores; `pnpm build` **no** se corrió (pendiente de autorización del operador, ~30 GB).
-
-**Lo que cambió.** `archiveSyntheticRecords` archivaba escribiendo `stage='closed'`, y ese `UPDATE` es el origen
-de las 32 filas `closed` sin desenlace que ensuciaron el diagnóstico de la auditoría del vocabulario. Ahora
-escribe `archived_at` —eje propio— y cubre las tres entidades sobre allowlist explícita. El Banco de Talento
-filtra por procedencia, con el predicado viajando por JOIN a `identity_profiles` porque `candidate_facet` no
-tiene `data_origin` propio.
-
-**El hallazgo que reordena el trabajo, y la spec decía lo contrario.** El `Slice 1` y el `Slice 2` **no son
-independientes**. La migración del Slice 2 devuelve las 32 filas fuera de `closed`; el predicado
-`stage NOT IN ('rejected','withdrawn','closed')` de `talent-pool/projection.ts` pasa entonces a dar
-`has_active_application = true` para sus 11 fichas, la projection las reclasifica a `active_process` —que sí es
-servible— y esa projection corre **cada 5 minutos** por Cloud Scheduler. Sin el filtro desplegado arriba, la
-migración **causa** el defecto que la task vino a cerrar. Por eso quedó parqueada en
-`docs/tasks/pending-migrations/` con condición de **código desplegado en los dos runtimes** (Vercel para los
-readers, `ops-worker` para la projection), no de datos.
-
-**Dos reglas nuevas que valen fuera de esta task:**
-
-- **Se filtran los caminos que CREAN; el que CORRIGE converge.** La primera versión excluía las membresías
-  sintéticas del `UPDATE` de ciclo de vida, y eso no las excluía: las **congelaba**. Una congelada en
-  `pool_eligible` habría quedado visible para siempre sin que ninguna corrida pudiera sacarla.
-- **Un filtro nuevo puede sacar de su steady a una señal que no tocaste.** `hiring.talent_pool.integrity` cuenta
-  fichas activas «aún no proyectadas»; desde que la projection no proyecta sintéticos a propósito, esa premisa
-  es falsa y la señal habría quedado en `warning` permanente — una alarma que no puede volver a cero entrena a
-  ignorar el tablero.
-
-**Trampa cara, verificada en `src/lib/postgres/client.ts` junto con la sesión de TASK-1765/1754:** anidar
-`withGreenhousePostgresTransaction` **no aísla nada**. El helper llama `acquireGreenhouseTransactionClient()`
-incondicionalmente, así que la transacción de adentro toma otra conexión y hace su propio `COMMIT`; el
-`ROLLBACK` de afuera no la alcanza. Envolví un `reconcileTalentPoolProjection({apply:true})` creyendo que se
-revertía y **commiteó contra la base compartida**. Efecto medido: idéntico a un tick del cron (441 filas de
-evidencia borradas y reinsertadas iguales, 0 membresías creadas, 0 reclasificadas). Sin daño, verificado
-post-corrida.
-
-**Siguiente paso:** el release. Después, en este orden: aplicar la migración parqueada del cambio de eje →
-readback (`0` no-real en `closed`, invariante 33 → 1) → correr el archivado de 11 fichas + 14 vacantes por CLI →
-recién ahí el `CHECK` de `TASK-1765`. El `Slice 3` (lane B, borrado irreversible) tiene **doble bloqueo**:
-sign-off del operador y esa migración — hoy el plan reporta `deletable=0` porque las 32 siguen en `closed` y el
-lane exige `stage='sourced'`.
-
-**Deuda abierta que toca este dominio:** 12 live tests de hiring crean vacantes sin declarar `dataOrigin`, así
-que nacen `real` y publicables en la base compartida; `pnpm hiring:data-origin-gate` no las ve porque sólo barre
-`scripts/` y `tests/e2e/`. Dos perfiles de identidad sintéticos (`identity-live-test-hiring-fixture` y el smoke
-de TASK-354) siguen marcados `real` y esperan el marcado gobernado. Queda propuesto como trabajo aparte.

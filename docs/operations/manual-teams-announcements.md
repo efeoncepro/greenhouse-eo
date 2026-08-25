@@ -204,6 +204,23 @@ Reglas para los 1:1:
 - La crítica debe ser operativa, no personal: separar calidad, plazos, capacidad y sistema de trabajo.
 - Para casos sensibles, nombrar el problema con honestidad y empatía; evitar exposición innecesaria y cerrar con una acción concreta.
 
+### Mensajes individuales HR/People fuera de pagos
+
+`pnpm teams:announce` solo resuelve destinos grupales/canales registrados; no es un CLI genérico para DMs. El CLI de pagos 1:1 tampoco debe reutilizarse para aniversarios, vacaciones u otras comunicaciones HR.
+
+Mientras no exista un CLI gobernado para mensajes individuales genéricos, un envío manual aprobado puede usar un script temporal y acotado que llame al dispatcher canónico `sendViaBotFramework`. Ese puente debe cumplir todo lo siguiente:
+
+- aprobar el texto completo antes del envío;
+- resolver nuevamente la identidad en Microsoft Entra y exigir `accountEnabled=true`;
+- usar `recipient_kind='chat_1on1'` y Microsoft Entra Object ID crudo;
+- enviar una Adaptive Card sin mención y sin `activity.text`;
+- preservar cada párrafo como `TextBlock` separado para mantener legibilidad;
+- exigir `--dry-run` o `--yes`, nunca ambos, y bloquear el envío real sin `--yes`;
+- usar `sourceObjectId` determinístico, revisar duplicados y registrar inicio/resultado en `greenhouse_sync.source_sync_runs`;
+- usar los helpers canónicos de transporte y auditoría, nunca HTTP Bot Framework crudo ni el conector personal de Teams.
+
+Para comunicaciones HR, verifica antes las afirmaciones de fechas, saldos y política contra sus fuentes dueñas. Un resultado `succeeded` prueba aceptación por el transporte y auditoría, no lectura ni renderizado confirmado. Si el mensaje será recurrente, debe converger a Notification Hub con `dynamic_user`, no permanecer como script temporal.
+
 ## Menciones reales en Adaptive Cards
 
 Para arrobar de verdad dentro del card, usar `--mention` con este formato:
