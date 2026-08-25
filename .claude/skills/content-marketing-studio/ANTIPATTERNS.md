@@ -9,6 +9,14 @@ Lo que NO se hace. Si te sorprendes haciendo esto, para.
 - **Content-for-content's-sake.** Volumen para "estar presentes", sin insight ni JTBD. Multiplica ruido.
 - **Piezas huérfanas.** Contenido que no pertenece a ningún pillar/cluster ni etapa de funnel. (→ `01`)
 - **Cadencia heroica insostenible.** Prometer 5 posts/semana que el equipo no puede mantener; se colapsa en un mes. Cadencia sostenible > volumen. (→ `01`, `02`)
+- 🔴 **Transcribir el research al brief.** Volcar el dossier dentro del brief lo vuelve
+  inutilizable para redactar: **brief = contrato de la pieza (techo 12.000 caracteres), dossier
+  = anexo enlazado**. El brief **cita y enlaza** la evidencia, no la copia. Y antes de inventar
+  una estructura, usa la plantilla que ya existe. (→ `templates/content-brief.md`,
+  `docs/operations/SEO_CONTENT_BRIEF_STRUCTURE_V1.md`)
+- **Tratar una entidad recurrente de marca como pieza de calendario.** Color del año, informe
+  anual, ranking, premio: es un **clúster que compone cada año**, no un artículo estacional
+  al que se le baja prioridad. (→ `01`)
 
 ## Barra de calidad
 
@@ -16,6 +24,11 @@ Lo que NO se hace. Si te sorprendes haciendo esto, para.
 - **AI slop.** Publicar output IA crudo, con voz de nadie y claims sin verificar. (→ `07`)
 - **Vanity sobre negocio.** Optimizar likes/tráfico e ignorar influenced pipeline. (→ `06`)
 - **Sin factcheck.** Publicar datos/claims sin verificar (mata citabilidad y confianza). (→ `02`, `07`)
+- 🔴 **Confundir lo EDITORIAL PROPUESTO con lo DECLARABLE por ficha.** En un brief con dato de
+  fabricante conviven dos cosas distintas: lo que el brief **propone editorialmente** y lo que
+  la **ficha declara**. Rotula la columna como *«propuesto»* — si no, se publica como
+  especificación del fabricante. Regla que esto refuerza: **si la ficha no lo declara
+  literalmente, el H2 no se escribe.** (→ `02`, `seo-aeo/modules/05_OFFPAGE_AUTHORITY.md`)
 
 ## Distribución y multiplicación
 

@@ -2,7 +2,8 @@
 
 > Carga este módulo para: confianza y autoridad de marca/autor, construcción de
 > entidad y Knowledge Graph, y el listón elevado de verticales YMYL
-> (finanzas/salud/legal). Sello: as-of 2026-06.
+> (finanzas/salud/legal). Sello: as-of 2026-06; **ciclo de entidad recurrente**
+> as-of 2026-08-25.
 
 ## E-E-A-T: qué es y qué NO es
 
@@ -64,6 +65,43 @@ marca correlacionan ~3× más con visibilidad IA que los backlinks** (data 2026)
 6. **Knowledge Panel** — el objetivo visible: que Google muestre un panel de tu
    marca. Se gana con entidad sólida + notability + datos estructurados, no se
    solicita directamente (puedes *reclamar* uno existente).
+
+### 🔴 El ciclo de entidad recurrente: un clúster que compone, no una pieza de calendario
+
+> Doctrina as-of 2026-08-25, deducida de un ciclo real que se estaba tratando al revés.
+
+Si la marca tiene una **entidad propia que se repite cada año** —color del año, informe
+anual, ranking, premio, índice—, **no es un artículo estacional: es un clúster que compone
+autoridad cada año**. Y es el único territorio del mapa que **ningún competidor puede
+disputar**, porque la entidad lleva el nombre de la marca: un tema genérico se pelea con todo
+el mercado; la entidad propia sólo se pelea consigo misma.
+
+🔴 **Nombra el error, porque es fácil de cometer:** clasificar ese territorio como *«masa de
+calendario, difícil de convertir en autoridad»* y descartarlo. Es exactamente al revés — **ahí
+vive la gravedad de marca**. Caso fuente: un ciclo anual de tres ediciones donde la ficha del
+año vigente tenía **cero enlaces editoriales entrantes y cero salientes**.
+
+**Kit reutilizable del ciclo.** La cadencia es **relativa al anuncio**, no a fechas de
+calendario — así el mismo kit sirve cualquier año y en cualquier mercado:
+
+| Hito | Pieza | Para qué |
+|---|---|---|
+| **D−30** | arreglar/reservar el **slug destino** | que la ficha nazca en una URL viva y enlazable, no en un slug que después haya que renombrar |
+| **D+0** | **ficha ancla** de la entidad, en generación nueva | el hogar canónico de la edición |
+| **D+2** | **aplicación profesional** | prueba de uso para el comprador técnico |
+| **D+30** | **satélite de espíritu anclado a estacionalidad** | ⭐ el eslabón que ningún ciclo hizo bien y **el que produce capilaridad** (vínculo vinculante: `02_SEO_CONTENT.md`) |
+| **D+75** | **paleta / desarrollo mayor** | profundidad del territorio |
+| **D+150** | **tendencia cultural** | co-ocurrencia fuera de la categoría |
+| **D+240** | **segundo desarrollo** | sostiene el clúster hasta el ciclo siguiente |
+
+🔴 **Bidireccionalidad obligatoria.** Cada satélite enlaza a la ficha ancla **y** la ficha
+enlaza de vuelta; y la **ficha del año N enlaza a la del año N−1, y al revés**. Sin ese
+encadenamiento cada edición nace sola, no hereda nada de la anterior y el ciclo **no compone**:
+es publicar tres veces la misma entidad desde cero.
+
+⚠️ Un módulo global (pie de página, carrusel de «relacionados») **no cuenta como ese
+enlace** — y hace creer que el encadenamiento existe cuando no existe. Cómo medirlo bien:
+`05_OFFPAGE_AUTHORITY.md` (*capilaridad editorial*).
 
 ### Entidad de autor (personal branding para E-E-A-T)
 Para verticales de expertise, los **autores** también son entidades. Construye:

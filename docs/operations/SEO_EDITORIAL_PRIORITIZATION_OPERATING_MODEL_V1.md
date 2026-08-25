@@ -1,7 +1,7 @@
 # SEO Editorial Prioritization Operating Model V1
 
 > **Tipo de documento:** Modelo operativo (proceso repetible, agnóstico al cliente).
-> **Versión:** 1.2 · **Fecha:** 2026-08-25.
+> **Versión:** 1.3 · **Fecha:** 2026-08-25.
 > **Ámbito:** cómo Efeonce ejecuta un research de SEO/AEO y una priorización editorial para un cliente
 > con blog activo, de punta a punta: insumos, carriles, intake del sistema editorial, secuencia,
 > criterio de descarte, producción de briefs, entrega, atomización y distribución, verificación y
@@ -356,6 +356,31 @@ competidora**. Queda una pieza nueva con ángulo propio más un enlace interno q
 existe, en vez de dos páginas del mismo sitio disputándose la misma consulta: es el caso *consolidar* del
 §3, prevenido antes de nacer.
 
+#### El gate de canibalización se corre sobre el CONTENIDO, y es obligatorio
+
+**Ningún tema se propone sin este chequeo, y el chequeo no se hace sobre slugs.** Barrer el inventario
+por patrón de URL y concluir "territorio libre" es el mismo antipatrón que barrer una carpeta por
+patrón de nombre (§12.10): responde por el nombre de la pieza, no por lo que dice su cuerpo.
+
+Qué encuentra un barrido de contenido que uno de slug no puede ver:
+
+- **Temas cubiertos y dispersos.** Media docena de piezas con el mismo H2 y sin hogar canónico: el
+  territorio ya está ocupado por la casa y además está desordenado. La salida es **consolidar** (§3),
+  no publicar una séptima pieza.
+- **El objeto citable que ya está publicado.** En el caso fuente, la tabla que se iba a proponer como
+  "objeto citable inexistente" ya estaba publicada verbatim en una pieza propia.
+
+Cómo se corre, en tres pasos:
+
+1. **Leer el cuerpo** de las piezas adyacentes — no su título, no su URL.
+2. **Contar términos del concepto**, no del slug, en el corpus completo.
+3. **Declarar qué sinónimos se probaron.** Concluir una ausencia desde un solo eje de búsqueda no vale.
+
+Corolario que paga solo: contar términos del concepto en **todo** el corpus revela **huecos de
+vocabulario** que ningún keyword tool muestra — palabras centrales del territorio del cliente con
+**cero** menciones después de años publicando sobre ese territorio. Eso es materia prima de Carril B
+con evidencia propia, no una corazonada.
+
 ### 5.1 El toolkit del research — qué se corre y para qué
 
 Cuando el research corre por el camino de fallback (§1.1), el nivel 2 de los insumos se obtiene con
@@ -444,6 +469,39 @@ cliente la mueve fuera de la ventana, el claim diferenciador puede dejar de ser 
 de ángulo. Eso se escala al operador **antes** de escribir el brief, con las dos opciones y su
 consecuencia editorial explícita (§4.1 — el calendario lo dicta el cliente).
 
+#### 5.2.1 El hito anual no es una pieza de calendario: es un clúster que compone
+
+Cuando el cliente tiene una **entidad propia que vuelve cada año** —el color del año, el informe
+anual, un ranking, un premio, un índice—, ese territorio no es "un artículo estacional más": es un
+**clúster que compone autoridad ciclo tras ciclo**, y ningún competidor puede disputárselo, porque la
+entidad es suya. Es el principio #1 del oficio: **los motores razonan por entidades, no por
+keywords** (`seo-aeo`).
+
+**El error a nombrar, porque se cometió:** clasificar el territorio de la entidad como *"masa de
+calendario, difícil de convertir en autoridad"* y descartarlo. Es exactamente al revés — **ahí vive
+la gravedad de marca del cliente**. Una pieza de calendario se consume y muere; una edición de la
+entidad hereda la autoridad de todas las anteriores, siempre que esté encadenada.
+
+**El kit reutilizable del ciclo.** La cadencia es **relativa al anuncio**, no a un mes fijo del
+calendario, y se replica igual cada año:
+
+| Momento | Pieza | Para qué |
+|---|---|---|
+| `D-30` | arreglar o reservar el **slug destino** | la ficha nace en una URL estable; renombrarla después rompe el encadenado y deja soft 404 (§5.4) |
+| `D+0` | **ficha ancla** de la edición nueva | el objeto canónico de la entidad ese año |
+| `D+2` | **aplicación profesional** | traduce la entidad al trabajo de quien la usa |
+| `D+30` | **satélite de espíritu, anclado a estacionalidad** (§5.5) | el eslabón que casi ningún ciclo hace bien — y el que produce capilaridad |
+| `D+75` | paleta o desarrollo mayor | profundidad del territorio |
+| `D+150` | tendencia cultural | ensancha el territorio más allá del producto |
+| `D+240` | segundo desarrollo | sostiene el ciclo hasta la edición siguiente |
+
+**Bidireccionalidad obligatoria.** Cada pieza del kit enlaza a la ficha ancla, y la ficha ancla
+enlaza de vuelta a cada satélite. Y hay un enlace que casi nunca existe y es justamente el que
+compone: **la ficha del año N enlaza a la del año N−1, y la del año N−1 a la del N**. Sin ese
+eslabón no hay clúster, hay ediciones sueltas con el mismo nombre, cada una arrancando de cero.
+Cuando la medición del §5.4 devuelve la ficha de la entidad con **cero entrantes y cero salientes
+editoriales**, el diagnóstico es ese: la entidad está huérfana en su propio sitio.
+
 ### 5.3 El pre-emptor de tesis no está en el mapa competitivo
 
 Quien gana la **tesis** puede no ser competidor de categoría: una agencia de tendencias, un medio, un
@@ -462,6 +520,56 @@ Si la respuesta es sí, se derivan tres consecuencias y las tres se escriben en 
 3. **Aparece un riesgo nuevo que hay que medir: que un motor de respuesta atribuya el concepto a la marca
    equivocada.** Deja de ser una preocupación difusa y entra como **métrica AEO explícita** del ciclo
    (§11).
+
+### 5.4 El grafo de enlaces internos se mide sobre el cuerpo editorial, no sobre el total
+
+El enlazado interno es **precondición de autoridad**: sin él, una pieza nueva rinde menos que arreglar
+una que ya existe, y por eso el grafo se mide **antes** de decidir el ciclo. **Pero el conteo bruto
+miente.**
+
+**La trampa, verificada:** un módulo global —pie de página, carrusel de "relacionados", bloque de
+plantilla— inyecta los mismos destinos en **todas** las páginas del sitio. Ese enlace no es señal
+editorial: es mobiliario. En el caso fuente infló el conteo **~2,6×** y fabricó "hubs" que no
+existían.
+
+**Método correcto: descartar todo enlace que aparezca en más de la mitad de las páginas** —eso es
+chrome— y medir solo el enlazado del cuerpo. Las métricas que quedan son cuatro:
+
+- enlaces editoriales **por pieza**;
+- **porcentaje de piezas sin ningún entrante** editorial;
+- porcentaje sin saliente, y máximo de salientes por pieza;
+- **porcentaje del enlazado editorial que apunta a soft 404** — el residuo típico de un cambio de
+  slugs que nadie propagó a los enlaces.
+
+La corrección cambia el diagnóstico entero, no lo matiza: en el caso fuente 112 enlaces "totales"
+eran **43 editoriales**, un "72% sin entrantes" era **86%**, y de tres "sumideros" solo **uno** era
+real — los otros dos eran destinos cableados en la plantilla.
+
+**Y la consecuencia operativa es la opuesta a la que sugiere el conteo bruto.** A un destino cableado
+en la plantilla **no se le dan más salidas: se le quitan entradas**. La corrección es reemplazar la
+terna fija del módulo global por un **módulo contextual dirigido por el mapa de clúster**, para que
+el enlace vuelva a ser señal. Es un hallazgo del sistema del cliente: se **reporta con su corrección
+propuesta, no se corrige de oficio** (§4.3 y §8.2).
+
+### 5.5 La estacionalidad tiene que ser vinculante, no una efeméride genérica
+
+Una fecha con volumen no es, por sí sola, una oportunidad. **La estacionalidad sirve a la autoridad
+solo si ata con la marca Y con el concepto de la pieza.** Test de vínculo, en este orden:
+
+1. ¿el ritual **es** el concepto de la pieza, o solo coincide en el mes?
+2. ¿su paleta, su materia o su práctica son las del producto del cliente?
+3. ¿hay **demanda medida**, con SERP verificado?
+4. ¿queda hueco después de leer el contenido propio (gate de canibalización, §5)?
+
+**Preferir el marco reutilizable sobre la efeméride puntual.** Una pieza atada a una fecha **caduca**
+y hay que rehacerla cada año; un **marco de temporada** se recicla, se actualiza y acumula — y es lo
+que produce capilaridad. Entre "qué hacer el día X" y "cómo se prepara la casa para la temporada", la
+segunda es la que compone. Es también la que alimenta el eslabón `D+30` del kit anual (§5.2.1).
+
+⚠️ **Volumen alto con vínculo débil es una trampa, no una oportunidad.** Un ritual muy buscado puede
+tener SERP de receta, de trámite de gobierno o de retail: territorio ajeno donde el cliente no tiene
+por qué ganar. Se verifica el SERP de **la consulta que se piensa atacar**, siempre (antipatrones 5
+y 12).
 
 ---
 
@@ -500,6 +608,13 @@ sino **por qué**.
   impresa—, copiar el formato no reproduce el resultado. Se descarta como modelo y se dice por qué, en vez
   de dejar en el brief una aspiración que nadie puede ejecutar.
 
+**Y el activo propietario más desaprovechado suele estar en el catálogo, no en el laboratorio.** Un
+nombre propio del cliente que carga significado cultural —un color, un modelo, una línea bautizada con
+el nombre de un objeto o una práctica cotidiana— es un dato que **ningún competidor puede publicar**, y
+casi nunca está contado. Antes de pedir un dato nuevo, inventariar los nombres propios que el cliente
+ya tiene. ⚠️ Y verificar que **un mismo código no aparezca con dos nombres** en piezas distintas: eso
+disuelve la entidad justo donde debería concentrarse.
+
 **El claim de producto bloquea el H2, no solo la frase.** La regla 1 de este capítulo se aplica también a
 la estructura: *si la ficha no lo declara literalmente, el H2 no se escribe*. No se rellena con lógica de
 oficio ("todo producto de esta familia se comporta así") ni con la ficha de otra marca; una palabra cambia
@@ -507,10 +622,42 @@ el claim. Un H2 que depende de un dato que el cliente todavía no entregó queda
 como tal** en el brief, con el dato faltante identificado y su dueño — no se redacta a la espera de que
 aparezca.
 
+**Y se separa lo que el brief PROPONE de lo que la ficha DECLARA.** Cuando el brief propone una
+aplicación editorial junto al dato del fabricante —qué producto para qué uso, qué color en qué muro—,
+las dos cosas terminan conviviendo en la misma tabla y se confunden con facilidad. La columna de la
+propuesta se rotula **"propuesto"**, explícito. Sin ese rótulo, la pieza publica como especificación
+del fabricante algo que decidió quien escribió el brief. La forma exacta está en
+[`SEO_CONTENT_BRIEF_STRUCTURE_V1.md`](SEO_CONTENT_BRIEF_STRUCTURE_V1.md) §8.
+
+**El `unbrand test` puede fallar de forma legítima.** El método de utilidad citable exige que el objeto
+siga sirviendo sin logo ni CTA. Pero cuando el objeto **es la entidad de marca** —un léxico
+propietario, una nomenclatura, un índice con nombre—, quitarle la marca lo vacía: el gate falla **por
+construcción**. La lectura correcta no es "arreglarlo" ni marcarlo verde para que cuadre: es que la
+pieza **construye entidad, no utilidad neutra**, y por lo tanto **se mide distinto** (§11). Declararlo
+fallado y explicar por qué es más honesto —y más útil para quien redacta— que forzar el verde.
+
 **Y hay que declarar si el estándar propuesto es paridad o mejora.** Antes de presentar una capa como
 hueco a tapar, revisar si la edición anterior del propio cliente la tenía. Si no la tenía, no se está
 corrigiendo una carencia: se está **subiendo el estándar propio**. Decirlo cambia la conversación con el
 cliente —de reproche a propuesta— y cambia contra qué se compara el resultado.
+
+### 6.2 Si se cae el porqué de una pieza, se reabre la decisión
+
+Un tema entra al backlog por una razón concreta: demanda medida, hueco competitivo, potencial de
+enlace, respaldo de producto. **Cuando el research mata esa razón, la pieza vuelve a cero — no a otro
+ángulo.**
+
+El error a evitar es el reflejo de salvarla: se propuso un tema por volumen y potencial de enlace, el
+chequeo mató ese ángulo, y en vez de preguntarse **si la pieza seguía teniendo sentido** se le buscó un
+ángulo nuevo para conservar el slot. Eso **es** publicar por publicar, con un racional nuevo puesto
+encima. La pregunta correcta cuando muere el porqué es *¿esta pieza todavía debe existir?*, y la
+respuesta puede ser **no**: el slot se llena con otra cosa del backlog, que para eso está priorizado.
+
+**Y hay una razón de descarte que no es de SEO.** Si el tema le habla a **un comprador distinto** del
+resto del blog, la decisión es **comercial**, no editorial: puede ser una apuesta deliberada del
+cliente o una desviación de foco, y quien tiene ese dato es él. **Si no lo tienes, dilo y escálalo; no
+lo asumas en ninguna de las dos direcciones.** Se trata como la señal de producto del §6: se entrega
+en el canal de negocio, no se resuelve dentro del calendario editorial.
 
 ---
 
@@ -529,7 +676,8 @@ Patrón que funcionó y se adopta como estándar del modelo:
 4. **Guardrails anti-sobredeclaración explícitos en el encargo.** No basta con que el dossier sea
    correcto: el encargo debe prohibir de forma nominal las formas de exagerar — sumar volúmenes de
    variantes como demanda limpia, declarar más posiciones de las que se enumeran, convertir un techo en
-   pronóstico, escribir un claim que no esté en ficha.
+   pronóstico, escribir un claim que no esté en ficha, **transcribir el research dentro del brief en
+   vez de enlazarlo** (§8).
 5. **Una pasada de verificación adversarial al final, por un agente distinto al que escribió.** El
    verificador no revisa su propio trabajo y su encargo es refutar, no confirmar.
 
@@ -589,9 +737,14 @@ ese runbook es una lista de conteos y no un juicio a ojo.
    piezas, incluidos claims de producto no respaldados por ficha y afirmaciones de SERP que declaraban
    más posiciones de las que enumeraban.
 
-La forma de cada brief —secciones, orden, nivel de detalle— sale de la plantilla de la skill `seo-aeo`,
+La forma de cada brief —qué bloques, en qué orden y con qué techo de extensión— vive en
+[`SEO_CONTENT_BRIEF_STRUCTURE_V1.md`](SEO_CONTENT_BRIEF_STRUCTURE_V1.md), que fija además la frontera
+que este proceso rompió una vez: **el brief cita la conclusión y enlaza la evidencia, no la
+transcribe**, con techo duro de 12.000 caracteres. El dossier del §7 es el anexo, nunca el brief. El
+checklist de oficio de citabilidad que se llena **dentro** de sus bloques de estructura y
+descubribilidad es la plantilla de la skill `seo-aeo`,
 [`templates/content-brief-aeo.md`](../../.codex/skills/seo-aeo/templates/content-brief-aeo.md). Este
-documento no la duplica.
+documento no duplica ninguna de las dos.
 
 ---
 
@@ -723,6 +876,13 @@ la marca equivocada es un resultado negativo que ninguna métrica de posición m
 a los motores por el concepto y registrando la marca citada, con la misma disciplina de ventana y `as-of`
 que el resto de la medición.
 
+**Métrica cuando la pieza construye entidad de marca.** Si el objeto citable **es** la entidad —y por
+eso el `unbrand test` falló por construcción (§6.1)—, el KPI no son los backlinks al objeto: son las
+**menciones y las citas del léxico propietario**, que para visibilidad en motores de respuesta pesan del
+orden de **3× más** que un backlink (`seo-aeo` #3). Se declara así en el brief, con la misma disciplina
+de ventana y `as-of`. Cambiar la métrica no es bajar la vara: es medir lo que la pieza efectivamente
+mueve.
+
 **Unidad de agregación.** Para striking distance la unidad correcta es el par `(query, página)`. Sumar
 impresiones por query **infla**, porque una búsqueda donde aparecen varias páginas del sitio genera una
 fila por página: en el caso fuente una consulta de marca aparecía con 300 páginas y sumaba 86.282
@@ -738,9 +898,10 @@ esas consultas incluye variantes que son la misma demanda y no es una cifra limp
 
 ## 12. Antipatrones
 
-Trece reglas: los ocho errores de método observados y corregidos en el primer ciclo del caso fuente (1 a
-8), la regla de plataforma que ese mismo caso destapó (9) y cuatro errores de método del ciclo siguiente
-(10 a 13). Se enuncian como reglas del modelo.
+Dieciocho reglas: los ocho errores de método observados y corregidos en el primer ciclo del caso fuente
+(1 a 8), la regla de plataforma que ese mismo caso destapó (9), cuatro errores de método del ciclo
+siguiente (10 a 13) y cinco del ciclo de autoridad temática y entidad (14 a 18). Se enuncian como reglas
+del modelo.
 
 1. **No se usan impresiones de Search Console para juzgar contenido nuevo.** Es razonamiento circular:
    striking distance filtra páginas que ya rankean, y un tema sin contenido no puede aparecer ahí por
@@ -772,7 +933,10 @@ Trece reglas: los ocho errores de método observados y corregidos en el primer c
 10. **Un grep de patrón de nombre no es un inventario.** Un regex anclado a la convención vieja devuelve
     cero para el período que ya migró a otra, y la conclusión "los entregables desaparecieron" resulta
     falsa: existían, con otro nombre y otra extensión. **Para concluir una ausencia hay que cambiar el eje
-    de búsqueda —carpeta, extensión, fecha— y nombrar explícitamente dónde no se miró.**
+    de búsqueda —carpeta, extensión, fecha— y nombrar explícitamente dónde no se miró.** Su variante en
+    contenido es la misma trampa con otra piel: **un barrido por patrón de slug no prueba que un tema
+    esté libre.** La canibalización se verifica leyendo el cuerpo y contando términos del concepto (§5,
+    gate de canibalización).
 11. **El peso en caracteres no mide la calidad de una sección.** Llamar "flaca" a una capa del entregable
     porque ocupa poco del documento confunde formato con cobertura: una checklist y una tabla son el
     formato más denso que existe. **Se mide cobertura de decisiones, no volumen de texto.**
@@ -785,6 +949,27 @@ Trece reglas: los ocho errores de método observados y corregidos en el primer c
     ser sincronización de almacenamiento, no un incumplimiento de entrega. **Se reverifica con el equipo
     dueño antes de reportarlo al cliente**, y se redacta como observación con su incertidumbre declarada,
     no como conclusión.
+14. **Cuando muere el porqué de una pieza, no se le busca otro ángulo.** La razón por la que un tema
+    entró al backlog es parte de la decisión: si el research la mata, la pieza vuelve a cero y el slot
+    se reabre. Salvarla con un ángulo nuevo es publicar por publicar con un racional puesto encima. Y si
+    el tema le habla a otro comprador, la decisión es **comercial**: se escala, no se asume (§6.2).
+15. **El concepto no es el titular.** Un titular **promete**; el concepto solo **nombra**. Poner la
+    etiqueta del ángulo en el lugar del título —y apilarle modificadores que no agregan nada— produce un
+    nombre que describe el trabajo interno en vez de convocar al lector.
+16. **No se mete taxonomía interna en el nombre visible.** "Nodo consolidador —", "Pillar —",
+    "Satélite 3" son etiquetas de arquitectura: van en el bloque de arquitectura del brief, nunca en el
+    título que ve el cliente ni en el que verá el lector.
+17. **No se repite el mismo titular en las cuatro superficies.** H1, SEO title, OG y slug comparten
+    tesis y hacen trabajos distintos; el slug no intenta ser headline (`copywriting/03` §6).
+18. **No se des-escapa el HTML de un sitio moderno para leerlo.** Dos lecturas falsas salen de ahí, y
+    las dos parecen hallazgos:
+    - **Schema fantasma.** El payload de una app React/Next trae objetos propios de la aplicación con
+      su propio `@type`; al des-escapar aparecen como si fueran datos estructurados. En el caso fuente
+      se "encontró" un `@type` inválido nueve veces por página cuando en el HTML crudo había **cero**.
+      Se extrae **solo** `<script type="application/ld+json">`, **sin des-escapar**. Y se distingue
+      **inválido → retirar** de **ausente (cero bloques) → agregar**: piden acciones opuestas.
+    - **Conteos de palabras inflados ~3×**, porque el payload duplica el contenido. Se cuenta sobre el
+      `<main>` renderizado.
 
 ---
 
@@ -809,6 +994,8 @@ Trece reglas: los ocho errores de método observados y corregidos en el primer c
   [`conexion-search-console.md`](../documentation/growth/conexion-search-console.md) ·
   [`operar-serie-search-console.md`](../manual-de-uso/growth/operar-serie-search-console.md) ·
   [`seguir-keywords-oportunidades-seo.md`](../manual-de-uso/growth/seguir-keywords-oportunidades-seo.md).
+- **Estructura del brief (forma, techo y frontera con el dossier):**
+  [`SEO_CONTENT_BRIEF_STRUCTURE_V1.md`](SEO_CONTENT_BRIEF_STRUCTURE_V1.md).
 - **Producción y entrega de la serie:** runbook
   [`producir-serie-de-briefs-seo.md`](../manual-de-uso/growth/producir-serie-de-briefs-seo.md)
   (verificación mecánica del depósito, indentación de toggles y tablas, inventario de assets del

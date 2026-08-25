@@ -24,6 +24,14 @@ Auditorías de búsqueda orgánica y AEO — de Efeonce y de clientes a los que 
   (MEDIDO: 4 dominios vivos y basura, contra los 25 que estimaba Semrush) y **cero notas de prensa mexicanas fechadas** de su hito anual.
   Bloqueante con reloj propio: la URL destino ya devuelve HTTP 200 vacío. **Caduca por diseño** — el claim diferenciador muere cuando Comex publique.
 
+- [Berel — arquitectura de autoridad del blog y plan editorial de octubre — 2026-08-25](BEREL_ARQUITECTURA_AUTORIDAD_2026-08-25.md) —
+  el mismo cliente, la **segunda mitad de la sesión**: cómo está conectado (o no) el corpus y qué se planificó para octubre. El grafo medido con el filtro de chrome
+  aplicado da **0,38 enlaces editoriales por artículo, 86% de las piezas sin entrante y 16–23% del enlazado hacia soft 404** — el conteo bruto mentía porque un destino
+  está cableado en 113 de 113 páginas. Ese mismo destino es **la ficha del color del año, que tiene cero entrantes y cero salientes editoriales**: la entidad más valiosa
+  de la marca es la pieza más aislada del sitio, y **las dos mejores piezas del ciclo creen estar enlazadas y no lo están**. Incluye el hueco de vocabulario medido
+  (`ofrenda` 0 menciones en 113 artículos), el léxico propietario del catálogo, los entregables de octubre y **un riesgo de claim de salud en una página ya publicada**,
+  que es lo único del documento que no espera calendario editorial. **Corrige §8.1 del research del color** y declara dos discrepancias de conteo sin resolver.
+
 - [Berel — diagnóstico de búsqueda orgánica y arquitectura de contenido — 2026-08-25](BEREL_SEO_DIAGNOSTIC_2026-08-25.md) —
   cliente cuyo blog opera Efeonce. Tráfico ~90% de marca; un solo activo editorial sostiene 14 keywords no-marca
   en top 3; ausente del top 10 de los 7 espacios del hogar; 10 defectos de arquitectura verificados, el techo lo

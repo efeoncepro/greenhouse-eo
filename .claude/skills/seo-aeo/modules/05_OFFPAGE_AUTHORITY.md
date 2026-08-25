@@ -2,7 +2,8 @@
 
 > Carga para: backlinks, digital PR, brand SERP, menciones sin enlace, y el peso
 > creciente de Reddit/foros/UGC y comunidades. Sello: as-of 2026-06; auditoría del
-> **motor de enlaces** y regla dura del **claim de producto** as-of 2026-08-25.
+> **motor de enlaces** y regla dura del **claim de producto** as-of 2026-08-25;
+> **capilaridad editorial** y **unbrand test que falla legítimamente** as-of 2026-08-25.
 
 ## Cambio de paradigma 2026: de "links" a "presencia"
 
@@ -61,6 +62,21 @@ Regla: **caso real -> objeto reutilizable -> evidencia/límites -> superficie en
 distribución ganada -> medición**. No prometer backlinks y no usar compra, intercambio o outreach masivo como
 sustituto de utilidad editorial.
 
+#### El `unbrand test` puede fallar legítimamente — y eso cambia la MEDICIÓN, no el objeto
+
+El método exige que el objeto **siga sirviendo sin logo ni CTA**. **Pero cuando el objeto ES la
+entidad de marca** —un léxico propietario, una nomenclatura, un índice con nombre—, quitarle la
+marca lo vacía: **el gate falla por construcción**, y no hay nada que arreglar.
+
+La lectura correcta no es «arréglalo», y tampoco marcarlo verde para que cuadre. Es que **la
+pieza es construcción de entidad, no utilidad neutra** y, por lo tanto, **se mide por menciones
+y citas del léxico, no por backlinks al objeto** — que es exactamente el **principio #3** de
+esta skill: las menciones de marca correlacionan **~3× más** que los backlinks con visibilidad
+IA. Medir esa pieza por backlinks la declara fracasada mientras cumple su función.
+
+✅ **Declarar el gate fallado y explicar por qué es más honesto y más útil que forzar el
+verde.** El objeto no cambia; cambia la métrica de éxito, y eso se escribe en el brief.
+
 ### La capa que gana enlaces es la que sólo el cliente puede escribir
 
 Antes de proponer «hagamos contenido enlazable», **audita POR QUÉ gana enlaces la
@@ -91,6 +107,33 @@ resultado que depende de una capacidad ausente. Nombra la asimetría en vez de c
 hueco: estás **subiendo el estándar**. Decirlo cambia la conversación — de «nos falta
 algo» a «vamos a hacer algo que no habíamos hecho», y cambia también quién tiene que
 aprobar el esfuerzo extra.
+
+## Capilaridad: mide el grafo de enlaces EDITORIALES, no el total
+
+> Medido as-of 2026-08-25 sobre el blog de un cliente. El grafo interno es **precondición de
+> autoridad**: sin él, cada pieza nueva rinde menos que arreglar una existente. **Pero el
+> conteo bruto miente.**
+
+🔴 **Trampa verificada:** un **módulo global** —pie de página, carrusel de «relacionados», terna
+fija de plantilla— inyecta **los mismos destinos en todas las páginas**. Eso **infla el conteo
+~2,6×** y **fabrica «hubs» que no existen**.
+
+**Método correcto:** descarta los enlaces que aparecen en **más del 50% de las páginas** (eso
+es *chrome*, no editorial) y mide **sólo el cuerpo**.
+
+Medido en el caso fuente: **112 enlaces «totales» → 43 editoriales**; «72% de las piezas sin
+entrantes» → **86%**; **tres «sumideros» → uno solo real**, los otros dos eran destinos
+cableados en la plantilla.
+
+🎯 **La consecuencia operativa es OPUESTA según el tipo de destino.** A una pieza editorial sin
+entradas se le **dan entradas**. A un **destino cableado** en plantilla no se le dan salidas:
+**se le quitan las entradas**, reemplazando la terna fija por un **módulo contextual dirigido
+por el mapa de clúster**. Confundirlos empeora el grafo mientras el dashboard mejora.
+
+⚠️ **Y mide siempre cuántos enlaces internos apuntan a un soft 404.** Un overhaul de slugs deja
+enlaces vivos hacia destinos muertos y nadie lo nota: en el caso fuente, **~16–23% del enlazado
+editorial**. Un enlace roto no transfiere nada **y además rompe el encadenamiento del ciclo de
+entidad** (`03_EEAT_ENTITY.md`) — la pieza cree estar enlazada y no lo está.
 
 ## Brand SERP (lo que sale al buscar tu marca)
 

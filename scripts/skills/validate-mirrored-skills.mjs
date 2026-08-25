@@ -118,6 +118,23 @@ const mirroredSkills = [
     codex: '.codex/skills/content-marketing-studio',
     claude: '.claude/skills/content-marketing-studio',
   },
+  {
+    /*
+     * Entra el 2026-08-25 tras reconciliarla a mano. Los dos bundles ya existian y nadie los
+     * validaba: la unica divergencia era el frontmatter de `SKILL.md`, y era la que mas duele —
+     * la copia `.codex` conservaba una `description` de una linea, sin `user-invocable` ni
+     * `argument-hint`, sin el router de speaker (voz institucional Efeonce vs voz autoral de
+     * Julio Reyes) y sin ninguno de los triggers. Un frontmatter pobre no falla con error: la
+     * skill simplemente NO SE CARGA cuando el operador pide "headline", "storytelling" o "voz
+     * de Julio", asi que un agente que entrara por Codex escribia copy firmado sin el sistema
+     * de voz del autor y sin saber que existia. Se adopto el frontmatter completo de `.claude`
+     * (el resto de los 30 archivos ya era byte-identico).
+     */
+    id: 'copywriting',
+    mode: 'byte-identical',
+    codex: '.codex/skills/copywriting',
+    claude: '.claude/skills/copywriting',
+  },
 ]
 
 const filesIn = root => {

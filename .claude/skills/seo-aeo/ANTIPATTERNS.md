@@ -105,12 +105,19 @@ contrafactual, el número describe un patrón — no prueba un lift.** Decláral
   forma fiable. Decisión consciente, no default (`01_SEO_TECHNICAL.md`).
 - **Afirmar datos volátiles de memoria** — features de motores y cifras cambian.
   Reverifica con WebSearch (`SOURCES.md`).
+- 🔴 **Salvarle el ángulo a una pieza cuyo porqué se cayó.** Si la razón por la que la pieza
+  existía —volumen, potencial de enlace, hueco de territorio— **muere en la auditoría**, la
+  pieza **vuelve a cero, no a otro ángulo**. Buscarle un ángulo nuevo para conservar el slot
+  **ES publicar por publicar**, con la coartada de un análisis. **Reabre la decisión.**
+  ⚠️ Y ojo con el caso vecino: una pieza que le habla a **otro comprador** que el resto del
+  blog no es una decisión de SEO, es **comercial**. Si no tienes ese dato, **dilo — no lo
+  asumas**.
 
 ## Anti-patrones de inventario y de lectura de evidencia (as-of 2026-08-25)
 
-> Los cinco salen de una misma sesión de research de cliente. Ninguno es black-hat:
-> los cinco se cometen **creyendo que se está siendo riguroso**, y los cinco terminan
-> en una afirmación falsa dentro de un entregable.
+> Los siete salen de sesiones de research de cliente. Ninguno es black-hat: los siete se
+> cometen **creyendo que se está siendo riguroso**, y los siete terminan en una afirmación
+> falsa dentro de un entregable.
 
 ### 1. Un grep de patrón de nombre no es un inventario
 
@@ -165,6 +172,25 @@ difícil de deshacer, y el costo de verificar es una pregunta.
   trabajo de un equipo.
 - ✅ **Reverifica con el equipo dueño** antes de que salga del borrador. Si igual entra
   al entregable, entra marcado como **OBSERVADO / pendiente de confirmar**, con dueño.
+
+### 6. No des-escapes el payload para buscar JSON-LD
+
+Leyendo un sitio Next.js, el **payload RSC trae objetos de la propia app con su propio
+`@type`**. Al des-escapar el HTML aparecen como si fueran schema: en el caso fuente se
+«encontró» un `"@type"` inválido **9 veces por página** y en el **HTML crudo hay cero**.
+
+- 🔴 **NUNCA** des-escapes el HTML para buscar `@type`. Extrae **sólo** los bloques
+  `<script type="application/ld+json">`, **sin des-escapar**.
+- 🔴 **Y distingue las dos conclusiones, porque piden acciones opuestas:** **inválido →
+  retirar**; **ausente (cero bloques) → agregar**. Confundirlas hace recomendar que se borre
+  algo que no existe, y deja sin recomendar lo único que faltaba.
+
+### 7. Los conteos de palabras sobre el payload salen ~3× inflados
+
+El payload **duplica el contenido**, así que cualquier conteo hecho sobre él exagera el largo
+de la pieza — y con él el diagnóstico de «profundidad», «thin content» o «cumple el brief».
+
+- ✅ Cuenta sobre el **`<main>` renderizado**, no sobre la respuesta cruda.
 
 ## Señal de alarma transversal
 

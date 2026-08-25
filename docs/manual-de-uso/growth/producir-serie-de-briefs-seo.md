@@ -1,12 +1,12 @@
 # Producir una serie de briefs editoriales SEO/AEO en el Content Hub de un cliente
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-08-25 por Claude
 > **Última actualización:** 2026-08-25 por Claude
 > **Módulo:** Growth / SEO — producción editorial para clientes
 > **Ruta en portal:** ninguna. La operación ocurre en el sistema editorial del **cliente** (Notion u otro), no en Greenhouse. Greenhouse aporta el dato medido (Search Console).
-> **Documentación relacionada:** [modelo operativo de priorización editorial](../../operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md) · skill `seo-aeo` ([módulo 02 — contenido](../../../.codex/skills/seo-aeo/modules/02_SEO_CONTENT.md), [módulo 07 — medición](../../../.codex/skills/seo-aeo/modules/07_MEASUREMENT.md)) · [plantilla del brief](../../../.codex/skills/seo-aeo/templates/content-brief-aeo.md) · [caso fuente](../../audits/seo/BEREL_SEO_DIAGNOSTIC_2026-08-25.md)
+> **Documentación relacionada:** [modelo operativo de priorización editorial](../../operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md) · [estructura canónica del brief](../../operations/SEO_CONTENT_BRIEF_STRUCTURE_V1.md) · skill `seo-aeo` ([módulo 02 — contenido](../../../.codex/skills/seo-aeo/modules/02_SEO_CONTENT.md), [módulo 07 — medición](../../../.codex/skills/seo-aeo/modules/07_MEASUREMENT.md)) · [plantilla del brief](../../../.codex/skills/seo-aeo/templates/content-brief-aeo.md) · [caso fuente](../../audits/seo/BEREL_SEO_DIAGNOSTIC_2026-08-25.md)
 
 ## Para qué sirve
 
@@ -20,7 +20,8 @@ Sirve igual si escribes tú solo o si repartes el trabajo entre varios agentes. 
 |---|---|
 | Por qué se prioriza un tema y no otro; los dos carriles; las trampas de medición de Search Console | Skill `seo-aeo`, [módulo 02](../../../.codex/skills/seo-aeo/modules/02_SEO_CONTENT.md) y [módulo 07](../../../.codex/skills/seo-aeo/modules/07_MEASUREMENT.md) |
 | El proceso de research de punta a punta (insumos, jerarquía de confianza, secuencia, antipatrones) | [`SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md`](../../operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md) |
-| Qué secciones lleva un brief y en qué orden | [`templates/content-brief-aeo.md`](../../../.codex/skills/seo-aeo/templates/content-brief-aeo.md) de la skill `seo-aeo` |
+| Qué bloques lleva un brief, en qué orden y con qué techo de extensión | [`SEO_CONTENT_BRIEF_STRUCTURE_V1.md`](../../operations/SEO_CONTENT_BRIEF_STRUCTURE_V1.md) — 11 bloques, bloqueantes arriba, techo duro de 12.000 caracteres y la frontera brief/dossier |
+| El checklist de oficio de citabilidad que va **dentro** de los bloques de estructura y descubribilidad | [`templates/content-brief-aeo.md`](../../../.codex/skills/seo-aeo/templates/content-brief-aeo.md) de la skill `seo-aeo` |
 | El caso fuente con sus cifras y hallazgos | [`docs/audits/seo/BEREL_SEO_DIAGNOSTIC_2026-08-25.md`](../../audits/seo/BEREL_SEO_DIAGNOSTIC_2026-08-25.md) |
 
 ## Antes de empezar
@@ -148,7 +149,9 @@ de medición están en el [modelo operativo](../../operations/SEO_EDITORIAL_PRIO
 
 ### 5. Escribir el brief en la página del slot
 
-Un brief, una página, **una sola manos escribiendo**. Si repartes el trabajo, el paralelismo es **por pieza**, nunca por sección de una misma pieza.
+Un brief, una página, **una sola mano escribiendo**. Si repartes el trabajo, el paralelismo es **por pieza**, nunca por sección de una misma pieza.
+
+⚠️ **Antes de abrir el sistema del cliente, mide el largo del brief.** El techo es **12.000 caracteres** ([estructura canónica del brief](../../operations/SEO_CONTENT_BRIEF_STRUCTURE_V1.md)). Se cuenta sobre el texto que vas a escribir —mecánicamente, no a ojo— y se hace **antes** de la escritura. Si se pasa del techo, no recortes frases al final: lo que sobra es research infiltrado y su lugar es el anexo enlazado. Descubrirlo después obliga a reescribir la página completa en el sistema del cliente, que es justo el trabajo que este runbook trata de no generar. De referencia: un brief bien construido con esos once bloques cabe en ~10.000 caracteres sin recortar nada.
 
 #### a) Confirma que la página está en blanco
 
@@ -161,6 +164,7 @@ El brief es largo. Si lo escribes suelto, el calendario del cliente queda ilegib
 La sintaxis de Notion para eso es un encabezado con el atributo `toggle`:
 
 ```
+Brief editorial de <título del artículo>. El contenido completo va en el desplegable.
 # Brief editorial — <título del artículo> {toggle="true"}
 	## 1. Definición del artículo
 	Primer párrafo del brief.
@@ -181,11 +185,18 @@ Así se ve el error:
 Primer párrafo del brief.         ← también fuera
 ```
 
-Un tabulador por nivel. Si una sección tiene sub-bloques, se indenta lo que corresponda, pero **ninguna línea del brief puede quedar en columna cero** salvo la línea del propio encabezado desplegable.
+Un tabulador por nivel. Si una sección tiene sub-bloques, se indenta lo que corresponda, pero **ninguna línea del brief puede quedar en columna cero** salvo dos: la línea de preámbulo que abre la página y la del propio encabezado desplegable (ver más abajo por qué el preámbulo es obligatorio).
 
 ⚠️ **Escribes la tabla en markdown de tuberías, pero Notion la guarda como HTML — y el envoltorio NO hereda el tabulador.** Esto es lo que hace la trampa invisible: tú escribes `| Campo | Quién |` correctamente indentado, la escritura devuelve éxito, y al releer la página aparece como `<table>` **en columna cero**. Desde ahí, todo lo que sigue quedó fuera del desplegable. **Después de insertar cualquier tabla dentro de un desplegable, relee y corrige el tabulador del envoltorio.** No es opcional y no hay aviso.
 
 ⚠️ **El tabulador lo llevan las etiquetas envolventes, no las filas.** `<table>` y `</table>` se indentan con TAB —son hijos del desplegable—; `<tr>` y `<td>` van en **columna cero**. Y cuidado con el alcance del error: quitarle el TAB al envoltorio de una tabla **no rompe solo esa tabla, dedenta todo lo que viene después de ella**. Media sección más abajo el brief sale del desplegable, y la escritura te devolvió éxito.
+
+🔴 **Nunca edites el TEXTO de un encabezado desplegable con search-replace.** Es la trampa que más trabajo bueno destruye. Notion reescribe el bloque como **encabezado plano**, pierde el atributo `{toggle="true"}` y **deja huérfanos a todos los hijos**: el brief entero queda desplegado en el calendario del cliente. Y la escritura, otra vez, devuelve éxito.
+
+- **Para renombrar, se cambia la propiedad `Nombre` de la página**, no el encabezado. Y eso es el paso 6: requiere autorización.
+- **Si ya se rompió, la reparación es una sola escritura atómica** — un `replace_content` que reconstruya el encabezado desplegable y toda la indentación de una vez. **Nunca parches sucesivos** sobre los bloques sueltos: cada parche parcial deja la página en un estado intermedio distinto y termina siendo más difícil ver qué falta que reescribirla completa.
+
+⚠️ **El desplegable no puede ser el primer bloque de la página.** Notion se lo come como título y el brief queda sin contenedor. Necesita una línea de preámbulo antes; con una sola línea basta.
 
 ⚠️ **No prefijes con TAB una línea que empiece con sintaxis de lista numerada** (`1.`, `2.`) dentro de un bloque nuevo. Notion la reparsea, **descarta el tabulador y se lleva consigo la cola** de lo que venía detrás. Si necesitas esa numeración adentro del desplegable, conviértela en negrita: `**1.**` seguido del texto.
 
@@ -208,7 +219,7 @@ Con el texto ya des-escapado, tres conteos. Los tres son mecánicos: esto no se 
 | Qué cuentas | Valor esperado |
 |---|---|
 | Secciones del brief **dentro** del desplegable | Todas las de la plantilla, ninguna menos |
-| Líneas de texto **sin** tabulador | Solo la línea del encabezado desplegable, más lo que ya existía en la página antes de que escribieras |
+| Líneas de texto **sin** tabulador | Solo dos —la de preámbulo y la del encabezado desplegable—, más lo que ya existía en la página antes de que escribieras |
 | Filas de cada tabla | El mismo número que escribiste, tabla por tabla |
 
 Si el conteo de líneas sin tabulador es mayor al esperado, la indentación se perdió en algún punto —casi siempre en el envoltorio de una tabla o en una lista numerada— y hay que **reescribir la página completa**, no parchar la sección que se ve mal.
@@ -261,7 +272,9 @@ Se corre sobre el **set completo**, no pieza por pieza: la mitad de los hallazgo
 | Fila con tema ya definido y estado avanzado | Pieza en curso del cliente | No tocar |
 | El desplegable aparece vacío y el brief se ve suelto debajo | **La indentación se perdió.** La escritura reportó éxito igual | Reescribir la página con los hijos indentados con tabulador |
 | El brief empieza dentro del desplegable y a media página se sale | Le faltó el tabulador al envoltorio `<table>`/`</table>` de una tabla, y eso dedentó todo lo que venía después | Reescribir la página completa con el envoltorio indentado y `<tr>`/`<td>` en columna cero |
-| El conteo de líneas sin tabulador da más de una | **Hay contenido fuera del desplegable**, aunque a simple vista se vea bien | Reescribir la página completa. No parchar la sección visible |
+| El desplegable desapareció y el brief quedó desplegado entero, con su título como texto plano | **Se editó el texto del encabezado desplegable.** Notion lo convirtió en encabezado plano, perdió `{toggle="true"}` y orfanó a los hijos | Reparar con **una sola escritura atómica** que reconstruya encabezado e indentación. Para renombrar, la propiedad `Nombre` de la página — nunca el encabezado |
+| El primer bloque del brief se ve como título de la página en vez de como desplegable | El desplegable quedó como **primer bloque** y Notion lo absorbió | Reescribir con una línea de preámbulo antes del desplegable |
+| El conteo de líneas sin tabulador da más de dos | **Hay contenido fuera del desplegable**, aunque a simple vista se vea bien | Reescribir la página completa. No parchar la sección visible |
 | La carpeta de entregables de un slot del cliente está vacía | **Hallazgo, no incumplimiento.** Puede ser sincronización de almacenamiento pendiente | Reverificar con el equipo dueño antes de reportarlo al operador o al cliente |
 | Una celda de tabla muestra caracteres de marcado en vez de formato | Limitación conocida de la conversión a tabla nativa | Reescribir esa celda en texto plano. No es un error a reintentar |
 | Propiedad de relación vacía en todas las filas del cliente | El cliente no usa esa relación (puede incluso apuntar a una base que no es suya) | Dejarla vacía. Llenarla no está autorizado |
@@ -275,6 +288,9 @@ Se corre sobre el **set completo**, no pieza por pieza: la mitad de los hallazgo
 - **No dejes que nadie invente una cifra.** Si el dato no está en el dossier, en el brief se declara **no verificado**. Un número plausible es peor que un hueco declarado: nadie lo va a auditar.
 - **No escribas un claim de producto que la ficha del fabricante no declare.** Y cuidado con los parecidos: dos propiedades técnicas con nombres similares no son la misma propiedad, y la diferencia llega al cliente.
 - **No aceptes la causa que reporta el mensaje de error de una herramienta sin verificarla.** Los mensajes mienten sobre su propia causa. La regla práctica: si ese mismo reporte funcionó antes en la misma sesión, no es un problema de plan ni de permisos — es cuota.
+- **No edites el texto de un encabezado desplegable con search-replace.** Notion lo convierte en encabezado plano y deja huérfano el brief completo. Para renombrar se cambia la propiedad `Nombre` de la página, y eso requiere autorización.
+- **No arregles un desplegable roto con parches.** Una sola escritura atómica que reconstruya encabezado e indentación. Los parches sucesivos dejan estados intermedios y esconden lo que falta.
+- **No escribas en el sistema del cliente un brief que no cabe.** Mide los caracteres antes: pasado el techo de 12.000, lo que sobra es research y su lugar es el anexo enlazado.
 - **No dejes metadata de producción dentro del brief entregable.** Números de slot, referencias al encargo, "según lo que me pediste", voz en primera persona del agente. El brief lo lee un redactor del cliente, no tú.
 - **No confíes en que "la escritura devolvió éxito" significa "quedó bien".** En este flujo casi todos los errores devuelven éxito: la indentación perdida, la fecha sin el formato expandido, la tabla con formato crudo. Solo la relectura **con conteo** lo prueba.
 - **No inventes la convención de assets del cliente.** Se deriva de sus entregables reales, barriendo por carpeta y por extensión. Un plan de distribución escrito en tu vocabulario obliga a traducir a quien produce.
@@ -289,6 +305,8 @@ Se corre sobre el **set completo**, no pieza por pieza: la mitad de los hallazgo
 | El brief se ve completo pero el desplegable está vacío | Los hijos no se indentaron con tabulador | Reescribir la página completa con la indentación correcta. Verificar de nuevo con una relectura |
 | El fetch de verificación devuelve el brief, pero mi conteo dice cero secciones | La respuesta trae los saltos de línea como `\n` **escapados**, y el regex no encuentra ninguno | Des-escapar los saltos antes de contar. Es un falso negativo: no reescribas la página por esto |
 | El brief entra bien al desplegable y a partir de cierta tabla todo queda afuera | Al envoltorio `<table>`/`</table>` le faltó el tabulador, y eso dedentó el resto del documento | Reescribir la página completa: envoltorio con TAB, `<tr>`/`<td>` en columna cero |
+| El brief se ve completo pero el desplegable ya no existe y todo quedó plano | Se editó el **texto** del encabezado desplegable con search-replace | Una sola `replace_content` que reconstruya el desplegable y la indentación completa. No parchar bloque por bloque |
+| El brief quedó enorme dentro del calendario del cliente | Se escribió el **dossier** en vez del brief: pasó el techo de 12.000 caracteres | Medir el largo antes de escribir, mover el detalle al anexo enlazado y reescribir la página completa |
 | Una lista numerada perdió la indentación y arrastró lo que venía detrás | Notion reparsea una línea que empieza con `1.` dentro de un bloque nuevo y descarta el tabulador | Convertir la numeración a negrita (`**1.**`) y reescribir la página |
 | El plan de distribución usa nombres de slots que el cliente no reconoce | Se inventó una convención en vez de derivarla de sus entregables | Inventariar por carpeta y extensión, derivar la convención real y reescribir el plan con su vocabulario |
 | El inventario de assets dice que faltan los entregables de un mes | Se buscó por patrón de nombre y ese mes usa otra convención — o hay sincronización pendiente | Barrer por carpeta y extensión; si igual faltan, reverificar con el equipo dueño antes de reportarlo |
@@ -304,8 +322,9 @@ Se corre sobre el **set completo**, no pieza por pieza: la mitad de los hallazgo
 
 ## Referencias técnicas
 
-- Modelo operativo del research: [`docs/operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md`](../../operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md) — §2 insumos, jerarquía de confianza y marcado de evidencia · §3 los dos carriles · §4 intake del sistema editorial · §5 secuencia del research (5.2 la pieza-hito anual y su claim perecedero, 5.3 el pre-emptor de tesis) · §6 respaldo de producto · §7 producción con subagentes · §9 atomización y distribución · §10 checklist de cierre · §12 antipatrones.
+- Modelo operativo del research: [`docs/operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md`](../../operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md) — §2 insumos, jerarquía de confianza y marcado de evidencia · §3 los dos carriles · §4 intake del sistema editorial · §5 secuencia del research (gate de canibalización a nivel de contenido, 5.2 la pieza-hito anual y su claim perecedero —5.2.1 el hito como clúster que compone y su kit reutilizable—, 5.3 el pre-emptor de tesis, 5.4 el grafo de enlaces editoriales, 5.5 la estacionalidad vinculante) · §6 respaldo de producto (6.2 cuando se cae el porqué de una pieza) · §7 producción con subagentes · §9 atomización y distribución · §10 checklist de cierre · §12 antipatrones.
 - Skill `seo-aeo`: [módulo 02 — contenido y topical authority](../../../.codex/skills/seo-aeo/modules/02_SEO_CONTENT.md) · [módulo 07 — medición](../../../.codex/skills/seo-aeo/modules/07_MEASUREMENT.md).
-- Plantilla del brief: [`templates/content-brief-aeo.md`](../../../.codex/skills/seo-aeo/templates/content-brief-aeo.md) de la skill `seo-aeo`.
+- Estructura del brief (bloques, techo de extensión y frontera con el dossier): [`docs/operations/SEO_CONTENT_BRIEF_STRUCTURE_V1.md`](../../operations/SEO_CONTENT_BRIEF_STRUCTURE_V1.md).
+- Checklist de citabilidad que va dentro de esos bloques: [`templates/content-brief-aeo.md`](../../../.codex/skills/seo-aeo/templates/content-brief-aeo.md) de la skill `seo-aeo`.
 - Caso fuente (auditoría del cliente, estado observado en su fecha): [`docs/audits/seo/BEREL_SEO_DIAGNOSTIC_2026-08-25.md`](../../audits/seo/BEREL_SEO_DIAGNOSTIC_2026-08-25.md). Una auditoría documenta un estado en una fecha y no se asume vigente por existir — ver [`docs/audits/README.md`](../../audits/README.md).
 - Conectar la fuente del dato medido: [Conectar Search Console a una marca](conectar-search-console.md) · [Operar la serie diaria de Search Console](operar-serie-search-console.md).

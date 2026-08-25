@@ -38,6 +38,9 @@ honestidad legítima** — solo una estaba enferma.
   "revolucionario" sin evidencia. Muestra, no digas: un dato/caso vence a diez adjetivos.
 - **Enterrar la gran idea.** El one thing escondido en el párrafo 4. El headline y el lead
   cargan el 80% (`03`); no desperdicies el frente.
+- **Titular que nombra en vez de prometer** — el concepto/ángulo puesto en el lugar del
+  título, taxonomía interna en el nombre visible (`Pillar —`, `Satélite 3`), o el mismo
+  titular repetido en H1 + SEO + OG + slug. Los cuatro, con sus casos, en `03` §6.b.
 - **No editar.** Entregar el primer borrador. El craft ocurre al cortar: ritmo, concisión,
   power words (`07`). Cada palabra se gana su lugar.
 

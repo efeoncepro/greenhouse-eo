@@ -91,6 +91,25 @@ Responder `sí` a todo:
 
 Si falla `use`, `unbrand` o `evidence`, no presentar la pieza como diseñada para link earning.
 
+### Excepción del `unbrand test`: cuando el objeto ES la entidad de marca (as-of 2026-08-25)
+
+Hay un caso en que el `unbrand test` **falla legítimamente y no hay nada que arreglar**: cuando
+el objeto **es** la entidad de marca — un léxico propietario, una nomenclatura, un índice con
+nombre. Quitarle la marca lo vacía, así que **el gate falla por construcción**.
+
+La lectura correcta **no** es «arréglalo», y tampoco marcarlo verde para que el cuadro cierre:
+
+- La pieza es **construcción de entidad**, no utilidad neutra. Sigue siendo legítima.
+- **Cambia la MEDICIÓN, no el objeto:** se mide por **menciones y citas del léxico**, no por
+  **backlinks al objeto**. Coherente con `seo-aeo`: las menciones de marca correlacionan **~3×
+  más** que los backlinks con visibilidad IA. Medirla por backlinks la declara fracasada
+  mientras cumple su función.
+- **Declarar el gate fallado y explicar por qué** es más honesto y más útil que forzar el verde.
+  Se escribe en el brief, junto a la métrica de éxito que sí aplica.
+
+⚠️ La excepción es **estrecha**: aplica cuando la marca **es** el objeto, no cuando la pieza
+simplemente tiene logo y CTA. En ese segundo caso el gate falla de verdad y hay que arreglarlo.
+
 ## Producción
 
 1. Fijar la gran idea y el usuario de la cita en el content brief.

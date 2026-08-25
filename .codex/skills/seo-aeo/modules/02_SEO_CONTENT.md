@@ -6,7 +6,8 @@
 > totales de clúster, lectura de SERP por eje y operación editorial.
 > Sello: as-of 2026-06; método de striking distance **medido** as-of 2026-08-05;
 > doctrina de los dos carriles y trampas de agregación **medidas** as-of 2026-08;
-> pre-producción (pieza-hito anual, canibalización interna, pre-emptor de tesis)
+> pre-producción (pieza-hito anual, canibalización interna, pre-emptor de tesis,
+> **estacionalidad vinculante**, **gate de canibalización leyendo contenido**)
 > as-of 2026-08-25.
 
 ## Principio raíz: intención > keyword
@@ -120,6 +121,28 @@ mercado) y convierte la pieza vecina en **destino de enlace, no en competidora**
 Caso fuente (research de cliente, 2026-08): el concepto clave del racional ya era
 keyword de una pieza propia publicada **5 semanas antes**.
 
+🔴 **El barrido se hace leyendo CONTENIDO. Un grep de slug no es un inventario.** Es la misma
+clase de error que `ANTIPATTERNS.md` (*un grep de patrón de nombre no es un inventario*), y
+acá cuesta un entregable entero: en el caso fuente se barrieron **113 artículos por patrón de
+slug**, se concluyó «territorio libre», y **el cuerpo decía otra cosa**.
+
+- Un tema puede estar **cubierto y disperso**: seis piezas con el mismo `H2` y **sin hogar
+  canónico**. El slug no lo delata; el cuerpo sí. Eso no es territorio libre — es un pillar
+  que falta.
+- El «objeto citable que no existe» **puede estar ya publicado verbatim** en una pieza vieja.
+  Proponerlo como novedad quema la credibilidad del brief completo.
+
+**Gate obligatorio antes de proponer cualquier tema:** leer el **cuerpo** de las piezas
+adyacentes y **contar términos del concepto**, no del slug. Y **declarar qué sinónimos se
+probaron** — concluir ausencia desde un solo eje de búsqueda no vale.
+
+🎯 **Corolario que rinde solo:** contar términos del concepto en **TODO el corpus** revela
+**huecos de vocabulario que ningún keyword tool muestra**. Medido en el caso fuente: tres
+términos centrales del territorio de hospitalidad (`ofrenda`, `sobremesa`, `mesa compartida`)
+tenían **0 menciones en 113 artículos**, en una marca que llevaba **tres años publicando sobre
+ese territorio**. Un hueco así no aparece en volumen ni en dificultad: aparece contando
+palabras propias.
+
 📏 **Es un chequeo distinto de la canibalización de GSC** (*Canibalización: no se
 descarta, se separa*, abajo). Esa mide **dos URLs vivas compitiendo por una query
 medida**; ésta es **pre-producción**: evita crear la segunda URL. Una es
@@ -142,6 +165,29 @@ mecanismo**, antes? — no la misma keyword. Si la respuesta es sí:
 - **riesgo nuevo que sí hay que medir:** que un motor de respuesta **atribuya el
   concepto a la marca equivocada** → se agrega como métrica AEO explícita
   (`04_AEO_GEO.md`).
+
+### Estacionalidad VINCULANTE, no efeméride genérica
+
+La estacionalidad sirve a la autoridad **sólo si ata con la marca Y con el concepto de la
+pieza**. Colgarse de una fecha porque «tiene volumen en octubre» produce una pieza que caduca
+y no compone.
+
+**Test de vínculo, en este orden** (si falla uno, la estacionalidad no es la palanca):
+
+1. **¿El ritual ES el concepto?** — no «coincide en el calendario con»: lo *encarna*.
+2. **¿Su paleta / materia / gesto es la del producto?** — el puente material, no el temático.
+3. **¿Hay demanda medida, con SERP verificado?** — no volumen estimado a secas.
+4. **¿Queda hueco leyendo el contenido propio?** — el gate de canibalización de arriba.
+
+🎯 **Y prefiere el marco reutilizable sobre la efeméride puntual.** Una pieza atada a **una
+fecha caduca**; un **marco de temporada se recicla y se actualiza cada año** — y eso es lo que
+produce capilaridad y lo que convierte el satélite estacional en el eslabón del ciclo de
+entidad (`03_EEAT_ENTITY.md`, *kit del ciclo*, hito **D+30**).
+
+⚠️ **Volumen alto con vínculo débil es trampa.** Un ritual muy buscado puede tener SERP de
+**receta, de organismo público o de retail** — territorio ajeno, donde la marca no compite
+aunque rankee. **Verifica el SERP siempre** (*Verifica el SERP del eje que vas a atacar*,
+abajo).
 
 ## Contenido programático (programmatic SEO)
 
@@ -372,6 +418,10 @@ cola de días recientes **todavía se está consolidando** → `07_MEASUREMENT.m
   avisarle a quien opera los canales donde ese copy sigue vivo.
 - Abandonar un ángulo porque otro publicó la tesis primero, **sin verificar si ese
   pre-emptor compite en búsqueda** (ganar la tesis ≠ ganar el SERP).
+- Declarar «territorio libre» tras barrer el corpus **por patrón de slug**, sin leer el cuerpo
+  ni contar términos del concepto — y sin declarar qué sinónimos se probaron.
+- Colgar una pieza de una efeméride **sin vínculo con la marca y con el concepto**, o atarla a
+  una fecha puntual pudiendo construir un **marco de temporada** reciclable.
 
 > **Cross-refs:** estructura para ser citado → `04_AEO_GEO.md`. Autoría/E-E-A-T
 > → `03_EEAT_ENTITY.md`. Medir decay/posiciones → `07_MEASUREMENT.md`. Trampas de

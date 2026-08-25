@@ -4,10 +4,11 @@
 
 - Tipo: auditoría de cliente — research de una **pieza-hito anual** (color del año), su ángulo editorial, su mapa competitivo y su plan de lanzamiento
 - Cliente: **Berel** (`berel.com`), fabricante mexicano de pintura arquitectónica. Efeonce le opera el blog.
-- Fecha: 2026-08-25 · Versión: 1.0
+- Fecha: 2026-08-25 · Versión: **1.1** (2026-08-25 — se corrige §8.1: el eslabón editorial 2025 → 2026 **no existe**, era el pie de página global; se agrega el enlace al documento de arquitectura de autoridad, que mide el grafo y el estado de la entidad. El resto del cuerpo no cambió)
 - Scope: el material del cliente y su cobertura, la decisión de ángulo, el mapa competitivo de "color del año" en México, el calendario del ciclo 2027, la demanda medida de la familia cromática, el estado de enlaces y de prensa, la deuda técnica de rutas que toca el lanzamiento, la convención de assets y el modelo de canal, el entregable y sus bloqueantes
 - Método: PDF del racional del cliente (OneDrive del Squad) · DataForSEO (volúmenes base MX y backlinks, consultas del 2026-08-25 con costo registrado) · Search Console `sc-domain:berel.com` vía la conexión de Greenhouse · inspección directa de HTML con `curl`/fetch sobre `berel.com` y sobre los sitios de la categoría · `datePublished` de JSON-LD y datelines de comunicados como fuente primaria de fechas · Notion (Content Hub de Berel) · Teams (confirmaciones del operador)
 - Verdict: **la categoría entera está vacía de contenido y la ventana del ciclo 2027 está abierta hoy.** Berel tiene el mejor activo técnico de la categoría en México y, aun así, **no tiene un solo enlace editorial** y **su hito anual nunca ha generado una nota de prensa mexicana fechada**. El trabajo del 2027 no es escribir mejor: es dejar de lanzar al vacío y llegar antes que Comex.
+- Documento hermano nuevo: [**Arquitectura de autoridad del blog y plan editorial de octubre**](BEREL_ARQUITECTURA_AUTORIDAD_2026-08-25.md) — mide el grafo de enlaces internos con el filtro de chrome aplicado y encuentra que **la ficha ancla del color 2026 tiene cero entrantes y cero salientes editoriales**: la entidad está huérfana. **Corrige la acción 4 de §8.1 de este documento** y aporta el kit de ciclo de seis piezas que sirve de molde del 2027 en adelante.
 - Relación con el diagnóstico general: este documento es **hermano** de [`BEREL_SEO_DIAGNOSTIC_2026-08-25.md`](BEREL_SEO_DIAGNOSTIC_2026-08-25.md), no lo reemplaza. Aquel documenta la línea base del dominio, la arquitectura del sitio y los cinco briefs de espacios (N29–N33). Este documenta **una sola pieza** —el slot N28— porque tiene research competitivo propio, calendario propio con fecha de caducidad, plan de PR y plan de distribución que ninguna otra pieza del ciclo tiene.
 - Documento interno de Efeonce sobre un cliente. **No es una propuesta comercial** y no está redactado para entregarse al cliente tal cual.
 
@@ -356,7 +357,7 @@ Las cortas **no están enlazadas desde ningún lado** y **no están en ningún s
 1. **Arreglar el soft 404 genérico ANTES de la publicación.** Es el bloqueante duro.
 2. `301` de `/color-berel-2026` y `/color-berel-2025` a sus `/articulos/…`.
 3. Publicar en **`/articulos/color-berel-2027`** — el patrón que el nav, el `llms.txt` y el sitemap ya reconocen. **No crear ruta corta.**
-4. Encadenar 2026 → 2027 (el 2025 ya enlaza al 2026).
+4. **Encadenar los tres ciclos, no solo 2026 → 2027.** 🔴 **Corrección (v1.1):** este documento decía *"el 2025 ya enlaza al 2026"*. **Es falso.** Lo que parecía ese eslabón era **el pie de página global**, presente en 113 de 113 artículos. MEDIDO: `/articulos/color-berel-2026` tiene **cero entrantes y cero salientes editoriales** y **ningún satélite del ciclo Pitaya enlaza a su propia ficha ancla**. Detalle y grafo completo en [`BEREL_ARQUITECTURA_AUTORIDAD_2026-08-25.md`](BEREL_ARQUITECTURA_AUTORIDAD_2026-08-25.md) §5.
 5. **Actualizar el hub `/articulos/colores-de-temporada`**, que es la página con más impresiones del ciclo (**6.116**, MEDIDO), sigue mostrando *Paraíso Mexicano* como paleta vigente y **enlaza a un solo artículo**. Como no hay índice de blog navegable, **ese hub es la única vía real de descubrimiento interno.**
 
 ### 8.2 Familias de color: cuatro de nueve están rotas
