@@ -3,6 +3,15 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-25 — La metodología de priorización editorial SEO queda escrita, y aparece un motor que ya existía sin usarse
+
+- **La lección más cara: Greenhouse ya calculaba lo que se reconstruyó a mano.** `/admin/growth/seo/keywords` (`TASK-1308`) expone el mismo score de striking distance que el reader canónico `keyword-opportunities-reader.ts` (`TASK-1302`) — clics incrementales contra la curva de CTR de la propia organización, con la canibalización ya separada como consolidación y no como optimización. La capacidad estaba construida, la conexión de Search Console del cliente llevaba semanas acumulando, y nadie la había corrido para esa cuenta. Quedó como antipatrón: verificar no solo que la capacidad exista, sino que esté **habilitada para la organización** — la página está gateada por flag y por entitlement, así que «existe» y «está encendida para este cliente» son dos hechos distintos.
+- **Se separaron dos carriles que se venían mezclando.** Striking distance contesta *qué página existente empujo*; el volumen de una herramienta externa contesta *dónde hay demanda que no capturo*. Usar impresiones de Search Console para descartar contenido nuevo es razonamiento circular: un tema sin contenido no puede aparecer en un filtro que exige estar rankeando. La regla previa de «no priorices por volumen de terceros teniendo GSC propio» quedó acotada a la priorización de páginas existentes, que es donde aplica.
+- **Tres trampas de lectura de Search Console quedaron documentadas con medición.** La posición promedio no es interpretable sin un piso mínimo de impresiones, y el diagnóstico real es la brecha entre volumen estimado e impresiones entregadas. Con dimensiones consulta+página los sitelinks inflan los agregados: una query de marca sumaba 86.282 impresiones repartidas en 300 páginas. Y la curva de CTR se deriva del propio sitio, porque el benchmark de industria no describe un vertical donde la posición 1 rinde 4,25%.
+- **Nuevo modelo operativo y nuevo runbook.** `SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md` cubre el proceso de punta a punta —intake del sistema editorial del cliente, los dos carriles, respaldo de producto, producción con subagentes, entrega y medición— con el camino primario apuntando al producto y el proceso manual declarado como fallback. `producir-serie-de-briefs-seo.md` es el paso a paso de producir y depositar una serie de briefs en el sistema editorial de un cliente, incluida la sintaxis de encabezado desplegable y la regla de concurrencia.
+- **El caso del cliente quedó en `docs/audits/seo/`** con su línea base medida, el backlog de los dos carriles y los defectos de arquitectura de su sitio ordenados por impacto. La recomendación de mayor retorno no requiere construir nada ni que el cliente toque su sitio: correr la superficie que ya existe.
+- **La skill `seo-aeo` entró al repo por el lado de Claude.** Estaba versionada solo como `.codex/skills/seo-aeo` porque una sesión de Codex commiteó su copia; la de Claude vivía a nivel de usuario, fuera de git, y se habría perdido al cambiar de máquina. Ahora están las dos, con 24 de 27 archivos idénticos. Tres siguen divergiendo y necesitan fusión con criterio, no copia.
+
 ## 2026-08-24 — TeamBot deja de prometer una mención que Teams no soporta
 
 - Un anuncio real a `EO Team` demostró que usar el ID del chat como identidad de `@todos` no funciona: Teams aceptó el mensaje, pero mostró `todos` como texto común y no notificó colectivamente.
@@ -784,36 +793,3 @@ Se agregaron el ADR y la arquitectura canónica, se actualizó `EPIC-011` y se r
 `TASK-1733`: identidad/sesión, professional profile, application self-service, `/my` UI, activation continuity,
 People 360 reader y People 360 UI. Las tasks UI tienen direction/wireframe/flow/motion iniciales y permanecen
 `UI ready: no`; no se implementó código, schema, migración, flag ni rollout.
-
-## 2026-08-16 — Banco de Talento person-first con autoservicio, Desk y paridad para agentes
-
-Greenhouse ya tiene operativa en producción interna la fundación canónica del Banco de Talento: una sola ficha por persona,
-consentimiento/purpose versionado, evidencia estructurada con lineage, disponibilidad, retiro, búsqueda y una
-invitación gobernada `propose → confirm`. El backfill de desarrollo incorporó 52 perfiles históricos sin inventar
-permiso futuro: 50 permanecen limitados a su proceso vigente y 2 requieren nuevo consentimiento.
-
-La experiencia tiene dos caras separadas. El candidato puede confirmar interés futuro, actualizar disponibilidad o
-retirarse mediante un enlace acotado; People opera un workspace propio en Hiring Desk con filtros, coverage,
-freshness, ficha lateral y acceso exacto a Application 360. Ninguna de las dos superficies rankea, decide, mueve
-etapas, asigna tests ni copia CV/contacto al índice.
-
-La misma lectura existe como App API y como provider read-only live para `mcp.efeonce.org`, con identidad humana
-delegada, capability, propósito fijo, DTO allowlisted y audit sin contenido. El canary OAuth obtuvo `200` en search y
-profile; un cliente separado sin scope Hiring obtuvo `403`. Projection/search/MCP están ON. El recontacto y el
-autoservicio externos permanecen OFF hasta aprobación People + Legal/Privacy de copy, propósito, TTL y retención.
-
-El release inicial `a369165dfb2d`/run `31941320983` dejó búsqueda, proyección y MCP operativos. La promoción ampliada
-`6b78b040252d`/release `6b78b040252d-d0d36c25-3634-4567-8be5-a807272e0ccb`/run `31949566099` terminó
-`released`; Vercel, health, los cuatro workers y el watchdog quedaron verdes, con cero migraciones pendientes.
-Durante el canary se detectó que la policy OAuth persistía `revalidateAfterSeconds=0` aunque el parser exige mínimo
-`15`; una migración aditiva lo corrigió y agregó una prueba sobre el parser real antes de la promoción final. La
-auditoría Talent posterior endureció además el rate guard público: IP ausente usa un bucket opaco compartido y una
-caída del store niega la solicitud, en vez de abrir ilimitadamente el autoservicio futuro.
-
-El operador ya puede abrir el CV exacto desde el sidecar del Banco. El packet agent-safe de TASK-1718 —reader por
-postulación, proyección PDF minimizada, App API, OAuth/capability separados, auditoría y dos tools MCP read-only—
-está desplegado pero completamente apagado, sin backfill ni lectura de CV real hasta completar sign-offs
-Security/Privacy/Talent/Identity/MCP. La evidencia visual se rehízo sobre un harness sintético que no existe
-en producción, después de comprobar que una máscara de diff no anonimiza los píxeles ni el árbol de accesibilidad.
-También se retiró del theme la importación residual de Public Sans; el runtime conserva Poppins + Geist como familias
-canónicas.

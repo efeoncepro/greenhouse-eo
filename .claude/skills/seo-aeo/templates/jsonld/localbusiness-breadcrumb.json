@@ -1,0 +1,42 @@
+{
+  "//": "Dos plantillas: LocalBusiness (para SEO local — usa el subtipo más específico, p.ej. ProfessionalService, Restaurant) y BreadcrumbList (señala jerarquía, gana sitelinks de breadcrumb). Inclúyelas como dos <script> separados.",
+
+  "localBusiness": {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "@id": "https://EXAMPLE.com/#localbusiness",
+    "name": "NOMBRE",
+    "image": "https://EXAMPLE.com/img/local.jpg",
+    "url": "https://EXAMPLE.com",
+    "telephone": "+56-2-0000-0000",
+    "priceRange": "$$",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "CALLE Y NÚMERO",
+      "addressLocality": "Santiago",
+      "addressRegion": "Región Metropolitana",
+      "postalCode": "0000000",
+      "addressCountry": "CL"
+    },
+    "geo": { "@type": "GeoCoordinates", "latitude": -33.4489, "longitude": -70.6693 },
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "09:00",
+        "closes": "18:00"
+      }
+    ],
+    "sameAs": ["https://www.linkedin.com/company/PERFIL"]
+  },
+
+  "breadcrumb": {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://EXAMPLE.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Categoría", "item": "https://EXAMPLE.com/categoria/" },
+      { "@type": "ListItem", "position": 3, "name": "Página actual", "item": "https://EXAMPLE.com/categoria/pagina/" }
+    ]
+  }
+}

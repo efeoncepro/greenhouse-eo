@@ -2,6 +2,27 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-25 — Metodología SEO editorial documentada + caso de cliente; el motor ya existía
+
+**Sólo docs y skills.** Sin runtime tocado. Origen: un research completo de SEO/AEO para un cliente de la práctica, ejecutado de punta a punta en esta sesión (diagnóstico competitivo, línea base medida en Search Console, backlog de striking distance, cinco briefs editoriales depositados en el sistema editorial del cliente).
+
+**El hallazgo que reordena el trabajo futuro.** El carril de striking distance **no era una capacidad por construir**: `keyword-opportunities-reader.ts` (`TASK-1302`) ya calcula el mismo score —clics incrementales contra la curva de CTR de la propia organización— y `/admin/growth/seo/keywords` (`TASK-1308`) ya lo expone, con la canibalización marcada aparte como caso de consolidación. Se reimplementó a mano con un script desechable antes de descubrirlo. La conexión de Search Console del cliente estaba activa y acumulando desde el 2026-07-31, y nadie había corrido la superficie para esa cuenta. La página está gateada por `isSeoModuleEnabled` + `enforceSeoRunEntitlement`, así que la verificación correcta tiene dos partes: que la capacidad exista **y** que esté habilitada para la organización.
+
+**Qué se escribió y quién es dueño de qué** (separación deliberada para no duplicar):
+- Oficio → skill `seo-aeo`, `modules/02` y `modules/07` (dos carriles, tres trampas de GSC, curva propia, inflación de clústeres) + la gotcha de que el mensaje de cuota agotada de Semrush MCP afirma falta de acceso al plan.
+- Proceso → `docs/operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md` (488 líneas).
+- Operación paso a paso → `docs/manual-de-uso/growth/producir-serie-de-briefs-seo.md`.
+- Caso de cliente → `docs/audits/seo/BEREL_SEO_DIAGNOSTIC_2026-08-25.md` (491 líneas) + `docs/audits/seo/README.md` + registro en el índice de auditorías.
+- Venta y estado de cuenta → skill `seo-aeo-practice`, `efeonce/ESTADO_ACTUAL.md`.
+
+**Riesgo documental abierto: dos skills con copias divergentes en el repo.**
+- `seo-aeo` entró ahora al lado Claude (nunca había estado versionada ahí; vivía a nivel de usuario, fuera de git). Quedaron 24 de 27 archivos idénticos entre `.claude` y `.codex`. **Siguen divergiendo `SKILL.md`, `SOURCES.md` y `modules/01_SEO_TECHNICAL.md`**, con contenido propio en ambas direcciones — la copia Claude trae un sello de frescura más nuevo (extracción JSON-LD de Google verificada 2026-08-21) que la de Codex no tiene. Reconciliarlos es una fusión con criterio, no una copia.
+- `seo-aeo-practice` diverge desde antes: 390 líneas en `.claude` contra 246 en `.codex`. **La copia de Codex no tiene la corrección estructural del 2026-08-15 sobre el alcance del cliente** y sigue afirmando algo que esa corrección declaró invertido. Quedó una advertencia en su encabezado. Un agente que cargue la copia de Codex razonará sobre un alcance equivocado con un cliente real.
+
+**Pendiente, con dueño.** (a) Reconciliar las dos skills — decisión del operador, no se forzó. (b) Correr `/admin/growth/seo/keywords` para el cliente y usar esa cifra como oficial en vez del script ad-hoc. (c) En el sistema editorial del cliente quedan sin definir el estado de lifecycle de los cinco slots y sus enlaces; se dejaron intactos a propósito.
+
+**Verificación.** Cinco briefs verificados en el sistema del cliente por un agente distinto al que los escribió, sobre una lista cerrada de puntos. Las rutas, readers, componentes y tasks citados se comprobaron en disco. No se ejecutó ningún gate de runtime porque el cambio no toca runtime.
+
 ## 2026-08-24 — TeamBot: `@todos` en chats grupales queda descartado
 
 Un envío real a `EO Team` confirmó que el contrato histórico era falso: Bot Framework aceptó `<at>todos</at>` con el `chatId` como `mentioned.id`, pero Teams publicó `todos` como texto plano en una burbuja separada, sin arroba ni notificación colectiva. La burbuja provino de combinar `activity.text` con la Adaptive Card.
@@ -556,38 +577,3 @@ lane exige `stage='sourced'`.
 que nacen `real` y publicables en la base compartida; `pnpm hiring:data-origin-gate` no las ve porque sólo barre
 `scripts/` y `tests/e2e/`. Dos perfiles de identidad sintéticos (`identity-live-test-hiring-fixture` y el smoke
 de TASK-354) siguen marcados `real` y esperan el marcado gobernado. Queda propuesto como trabajo aparte.
-
-## 2026-08-22 — TASK-1754 colapsa el eje de etapa: expand APLICADO en base, código NO en producción
-
-Estado correcto: **`code complete, rollout pendiente`**, y la asimetría importa. El expand de datos sí está
-aplicado contra la instancia compartida —que es producción—; el código no. La mitigación `4e1566d9a` sigue sin
-subir, así que **hoy en producción arrastrar a «Evaluación» todavía escribe `qualified` y sigue sin disparar**.
-
-Slices A–E en `develop` local, sin push: `a0cee45b0` (paridad estructural: `satisfies` contra el enum del
-dominio en los dos disparadores, `Record<HiringApplicationStage, string>` en el mapa de copy, muere el cast de
-`stage-comms/decide.ts`), `c27ad6432` (paridad enum ↔ `CHECK` derivada de los dos lados contra PG real),
-`a9926e981` (expand: `qualified` 7 → 0, `shortlisted` 4 → 11, total 83 sin cambio; `HIRING_PIPELINE_STAGES`
-pierde los dos literales **antes** que el `CHECK`), `f5ca4b4f9` (`en-US` redefine `stages`; heredaba castellano
-por spread sin línea que mirar en ningún diff), `1047f5ee6` (el carril declara UNA etapa; lo que agrupa se
-separó en `absorbs`), `b2fbabd80` (el tablero renderizado con cada diccionario).
-
-**Riesgo residual y siguiente paso operativo: hay 7 postulaciones REALES esperando decisión de asignación.** La
-migración por SQL no emite `stage_changed`, así que no recibieron correo ni prueba — pero sí aparecen en la cola
-de reconciliación de su vacante, que deriva del estado vigente y no del evento. Están en dos vacantes: 4 bajo
-policy `enabled/manual` y 3 bajo `enabled/on_stage_entry`. **Avisarle a Talento.**
-
-**El Slice F (contract) queda bloqueado por dos condiciones independientes**, y confundirlas es cómo se rompió
-producción esta mañana: el release que retira los escritores tiene que estar en producción, y `TASK-1765` tiene
-que estar verificada ahí antes de tocar los cuatro espejos terminales. Antes de ejecutarlo, avisarle a
-`TASK-1718`: su lane programático acepta `stage` como string libre sin `assertEnum`, así que un filtro por un
-literal retirado pasará a devolver cero en silencio.
-
-**Hallazgo entregado a `TASK-1765`, no cerrado acá:** el trigger
-`refresh_assessment_access_recovery_retention_for_application` ramifica por `stage` y por `decision`, y sus ramas
-de `decision` **no cubren `backup_selected`, `not_selected` ni `unresponsive`**. La rama `ELSE` deja
-`retention_expires_at` en `NULL` — sin vencimiento en absoluto — y `not_selected` es la población más grande del
-eje de desenlace. Hoy no muerde porque la tabla está vacía. Registrado en el §17 del ADR del vocabulario.
-
-`pnpm build` NO se ejecutó: el operador respondió «no, salvo que lo autorices después» — postergado por costo
-de máquina, con la puerta abierta, **no** delegado al release; `pnpm test` completo 11.962 verdes, `pnpm lint` 0
-errores, `pnpm typecheck` limpio, GVC del tablero en desktop y 390 px mirado.

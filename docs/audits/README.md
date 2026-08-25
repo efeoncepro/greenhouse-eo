@@ -22,6 +22,7 @@ Indice de auditorias tecnicas y operativas versionadas dentro de `docs/`.
 - [Globe frente a Higgsfield y Magnific — benchmark comparativo — 2026-08-05](competitive-ui/GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05.md)
 - [Hiring — quality assurance de selección y capacidad — 2026-07-30](hiring/GREENHOUSE_HIRING_QUALITY_ASSURANCE_AUDIT_2026-07-30.md)
 - [Hiring — vocabulario de etapas del pipeline — 2026-08-22](hiring/GREENHOUSE_HIRING_STAGE_VOCABULARY_AUDIT_2026-08-22.md) — 30 hallazgos, verificación adversarial completa; 17 particiones del mismo enum; el enum no tiene ADR
+- [Berel — diagnóstico SEO de cliente — 2026-08-25](seo/BEREL_SEO_DIAGNOSTIC_2026-08-25.md) — tráfico ~90% de marca; un activo editorial sostiene 14 keywords no-marca en top 3; 10 defectos de arquitectura, el techo lo fija que el sitio no permite encontrar sus 115 artículos; el carril de striking distance ya es operable en `/admin/growth/seo/keywords` y nadie lo había corrido para la cuenta
 
 - [Design Tokens](design-tokens/README.md)
 - [Cloud Cost](cloud-cost/README.md)
@@ -32,5 +33,6 @@ Indice de auditorias tecnicas y operativas versionadas dentro de `docs/`.
 - [Notion](notion/README.md)
 - [Payroll](payroll/README.md)
 - [Public Site](public-site/README.md)
+- [SEO](seo/README.md)
 - [Reliability](reliability/README.md)
 - [Sentry](sentry/README.md)
