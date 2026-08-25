@@ -120,6 +120,21 @@ const mirroredSkills = [
   },
   {
     /*
+     * Entra el 2026-08-25, el mismo dia que nace. Es una skill de CLIENTE: transcribe el proceso de
+     * produccion editorial que Berel y Efeonce acordaron y que hasta hoy solo vivia en el Notion del
+     * cliente. Un espejo que diverge aca no es cosmetico: los dos agentes producirian el articulo de
+     * un cliente real con reglas distintas sobre su voz, sus enlaces, sus claims de producto y su
+     * licencia de imagen — y el entregable sale con el nombre de Efeonce. Ademas declara conflictos
+     * abiertos entre documentos del cliente que NINGUN agente debe resolver por su cuenta: si una
+     * copia pierde esa advertencia, ese agente elige en silencio.
+     */
+    id: 'berel-content-production',
+    mode: 'byte-identical',
+    codex: '.codex/skills/berel-content-production',
+    claude: '.claude/skills/berel-content-production',
+  },
+  {
+    /*
      * Entra el 2026-08-25 tras reconciliarla a mano. Los dos bundles ya existian y nadie los
      * validaba: la unica divergencia era el frontmatter de `SKILL.md`, y era la que mas duele —
      * la copia `.codex` conservaba una `description` de una linea, sin `user-invocable` ni

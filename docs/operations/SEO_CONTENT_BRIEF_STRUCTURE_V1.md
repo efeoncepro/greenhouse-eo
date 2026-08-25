@@ -5,6 +5,9 @@
 > **Dueño del oficio:** `content-marketing-studio` ([`templates/content-brief.md`](../../.codex/skills/content-marketing-studio/templates/content-brief.md)) + `copywriting` (titulares) + `seo-aeo` (descubribilidad y citabilidad)
 > **Metodología del research que lo alimenta:** [`SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md`](SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md)
 > **Cómo se deposita en el sistema del cliente:** [`producir-serie-de-briefs-seo.md`](../manual-de-uso/growth/producir-serie-de-briefs-seo.md)
+> **Qué pasa DESPUÉS del brief (cliente Berel):** la skill `berel-content-production` — ciclo mensual
+> de producción, redacción, banners, derivados sociales y carga al CMS. Este documento cierra en el
+> brief; esa skill lo toma desde ahí.
 
 ## El error que este documento corrige
 
