@@ -33,6 +33,7 @@ arriba.
 | 📣 **Playbook Derivados Sociales** | `f58f34efd1e04043b9982b932a034464` | `06` | ~6.600 car. |
 | 📤 **Cómo subir un artículo (CMS Drupal)** | `4ed619156c0e4f6a89fb83b78ea6c0ad` | `08` | ~5.500 car. — de la capacitación del 21-08-2026 |
 | 🔍 **Enlaces `search?q=` — impacto en SEO y AEO** | `38739c2fefe780b3aa6bde8f422fc748` | `04` | el respaldo del *porqué* de la regla de enlazado |
+| 🖼️ **Formatos: Tipos de Infografías** (base) | `collection://06d39c2f-efe7-82be-99f6-87b9e8e34745` | `10` | **6 filas, extraídas completas el 2026-08-25** |
 | 📆 **Content Hub** (base) | `35f39c2fefe7808186efc6ec63475640` | `07` | 123 filas · 18 propiedades |
 | **Tareas** (base) | `35c39c2fefe780c9bc37e811a7b95a7c` | `07` | 283 filas · 69 propiedades |
 
@@ -56,6 +57,29 @@ metodología: no está.
 
 **En la práctica, lo que el Playbook promete que sale de "Keywords" y "Recomendaciones SEO" sale de
 `6. Voz y Tono` §6 y de `Recomendaciones Cliente`.**
+
+## Los formatos de infografía, uno por uno
+
+Todos extraídos verbatim el 2026-08-25 y transcritos en el módulo `10`:
+
+| Formato | Page ID |
+|---|---|
+| 🔢 Infografía: Pasos | `37639c2fefe780d69508d9285dde2b01` |
+| ↗️ Señalizacion | `3c339c2fefe78000bcdcd43f2711a44d` |
+| 🌈 Tipos de Color | `3c339c2fefe780f68582d6927e0ef018` |
+| 📚 Técnica - Foto | `3c339c2fefe780baac4dfc02b132dc1f` |
+| ℹ️ Técnica - Gráfica | `3c639c2fefe780e6abf0fe9eeeecbff4` |
+| 🎨 Paleta de acento para infografías | `3c639c2fefe7807fbc9df1e6d9855fe5` |
+
+**Base hermana `Formatos de Diseño`** (`collection://36439c2f-efe7-817e-ae29-000b1ca94687`) — **NO
+son infografías**; gobiernan hero, cierre y piezas de producto. Solo se leyó una de las cuatro:
+
+| Formato | Page ID | Estado |
+|---|---|---|
+| 🎨 Muestrario de Paletas | `37639c2fefe780989444e04daa7bacc9` | **leído**, resumido en `10` |
+| Product Placement | `36439c2fefe78159bd79c02a5bc3302e` | no extraído |
+| Antes y después | `37639c2fefe780488bbcf7ebb7738dad` | no extraído |
+| Residenciales / Inspiracional | `37639c2fefe78054a5f9dfbebde656c6` | no extraído |
 
 ## Material que existe y esta skill todavía no cubre
 

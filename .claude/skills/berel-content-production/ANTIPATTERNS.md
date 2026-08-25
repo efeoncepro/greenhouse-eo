@@ -108,6 +108,20 @@
 - **Párrafos dentro de la imagen.** Solo título y etiquetas. (→ `05`)
 - **Publicar un gráfico de la Paleta Frida Kahlo sin el logo de la licencia oficial.** Es obligación
   de licencia. (→ `09`)
+- 🔴 **Pedir una infografía sin nombrar formato ni variante.** Diseño tiene cinco formatos resueltos;
+  una ficha que no elige uno los obliga a improvisar y la pieza se sale del sistema. (→ `10`)
+- **Elegir el formato equivocado por no leer el contenido.** Si es secuencia cronológica es Pasos; si
+  hay que ubicar algo en un espacio es Señalización; si el protagonista es el color aplicado es Tipos
+  de Color. Una comparativa metida en Pasos no se entiende. (→ `10`)
+- 🔴 **Usar el rojo corporativo como acento recurrente en una infografía.** El acento es **Rojo
+  Editorial `#B3153A`**; el corporativo se reserva a branding institucional. (→ `10`)
+- **Confundir las dos reglas de HEX.** El HEX de la paleta de acento SÍ va en la ficha —es
+  instrucción de diseño—; el HEX de un color de pintura nunca sale al público. Negarse a poner el
+  acento por "la regla del HEX" bloquea a diseño sin motivo. (→ `10`, `09`)
+- **Pedirle texto a la IA en un Muestrario de Paletas.** La imagen base sale **limpia y sin texto**:
+  nombres, códigos, logo y branding se agregan después en Illustrator. (→ `10`)
+- **Aplicar el catálogo de infografías a un hero o a un cierre.** Esas piezas se rigen por la otra
+  base, `Formatos de Diseño`. (→ `10`)
 
 ## Operación en Notion
 

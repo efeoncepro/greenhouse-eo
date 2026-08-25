@@ -62,6 +62,7 @@ guía de voz y tono, y la guía de carga al CMS.
 ├─ Propiedades exactas, jerarquías, formato Notion, qué NO tocar .............. modules/07_SISTEMA_NOTION
 ├─ Subir o reescribir el artículo en el CMS Drupal ............................ modules/08_PUBLICACION_CMS_DRUPAL
 ├─ Lo que el cliente pidió explícitamente (y dónde corrige la guía de voz) .... modules/09_RECOMENDACIONES_DEL_CLIENTE
+├─ Qué FORMATO usa una infografía (los 5 del equipo de diseño + la paleta) .... modules/10_FORMATOS_DE_INFOGRAFIA
 ├─ Qué NO hacer (errores ya cometidos en este cliente) ....................... ANTIPATTERNS
 ├─ Vocabulario del cliente y de su sistema ................................... GLOSSARY
 ├─ De dónde salió cada regla, con page id y fecha de extracción .............. SOURCES
@@ -120,6 +121,14 @@ guía de voz y tono, y la guía de carga al CMS.
     materiales y CTA**. Confirmado por el cliente en agosto 2026. (`09`)
 19. 🔴 **Ningún CTA apunta al Home**, y **el texto visible de un enlace nunca es la URL**. Regla
     reincidente: el cliente ya la marcó dos veces. (`09`)
+20. 🔴 **Toda infografía se produce con uno de los cinco formatos del equipo de diseño** —Pasos ·
+    Señalización · Tipos de Color · Técnica-Foto · Técnica-Gráfica— y **la ficha nombra el formato Y
+    la variante**. Son los que diseño ya tiene resueltos; sin declararlo, improvisan. Aplica **solo a
+    infografías**: el hero y el cierre se rigen por la otra base, `Formatos de Diseño`. (`10`)
+21. 🔴 **En infografía, el rojo es `#B3153A` (Rojo Editorial), no el rojo corporativo.** El
+    corporativo se reserva a branding institucional. Y ojo: el HEX de la **paleta de acento** SÍ va
+    en la ficha —es instrucción de diseño—; lo que nunca sale al público es el HEX de un **color de
+    pintura**. Son cosas distintas. (`10`, `09`)
 
 ## Lo que NO se toca
 
@@ -175,7 +184,7 @@ supuestos.
 | **Oficio por red social + programación** | entrega el copy y las specs del átomo | **`social-media-studio`** |
 | **Operar Notion** (API, límites, sync, writeback) | dice qué se llena y dónde | **`notion-platform`** |
 | **Métricas `[GH]`, RpA, ICO** | no las toca | **`greenhouse-ico`** |
-| **Dirección de arte y generación de imagen** | escribe la ficha del banner | `design-studio` · `greenhouse-ai-image-generator` |
+| **Dirección de arte y generación de imagen** | escribe la ficha del banner **con formato y variante declarados** (`10`) | `design-studio` · `greenhouse-ai-image-generator` |
 | **Research y priorización editorial que precede al ciclo** | consume su salida | `docs/operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md` |
 | **Estructura del brief** | consume su salida | `docs/operations/SEO_CONTENT_BRIEF_STRUCTURE_V1.md` |
 | **Derechos de uso de la licencia Frida Kahlo en gráficos** | exige el logo oficial en toda pieza | `legal-privacy-ip-operator` si aparece cualquier duda de alcance |

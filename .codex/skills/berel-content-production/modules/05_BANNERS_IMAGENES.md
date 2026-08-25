@@ -43,7 +43,7 @@ saber qué imagen es la adecuada.
 | # | Rol | Naming de la subtarea |
 |---|---|---|
 | N1 | Portada / Hero emocional | `Banner N1 - Portada (Hero [escena])` |
-| N2 | Infografía resumen — **base de adaptación social 🔁** | `Banner N2 - Infografía: [tema]` |
+| N2 | Infografía resumen — **base de adaptación social 🔁** · 🔴 **declara formato + variante** (`10`) | `Banner N2 - Infografía: [tema]` |
 | N3 | Comparativa / didáctico / paso a paso | `Banner N3 - [Tipo]: [tema]` |
 | N4 | Cierre inspiracional | `Banner N4 - Cierre: [tema]` |
 
@@ -84,7 +84,7 @@ subtarea **en el mismo momento en que se crea**: una subtarea de banner sin fich
 | **→ Nombre y Número del artículo** | `Artículo N## — [Título]`, para que la pieza sea rastreable a su tarea principal |
 | **→ Nombre del Banner** | `N# — [Nombre de la pieza]`. En N1 anotar que también sirve de `og:image`; en N2 marcar 🔁 |
 | **→ Formato** | Dimensiones exactas, `.webp`, peso máximo, `loading="lazy"` sí/no, variantes derivadas y punto focal |
-| **→ Tipo de gráfico** | Fotográfico / diseño informativo / comparativo / didáctico, con la nota de estilo o luz |
+| **→ Tipo de gráfico** | Fotográfico / diseño informativo / comparativo / didáctico, con la nota de estilo o luz. 🔴 **Si la pieza es una INFOGRAFÍA, aquí se nombra el formato Y la variante** del catálogo del equipo de diseño: `Infografía — [Pasos \| Señalización \| Tipos de Color \| Técnica-Foto \| Técnica-Gráfica] · variante [...]` → [`10_FORMATOS_DE_INFOGRAFIA.md`](10_FORMATOS_DE_INFOGRAFIA.md) |
 | **→ Objetivo (permanencia)** | **comprender** · **retener y compartir** · **cerrar la emoción**. Campo obligatorio: si no cumple ninguna, la pieza sobra |
 | **→ Descripción detallada de la imagen** | **Dos bloques obligatorios.** *Qué debe verse:* la escena concreta —encuadre, luz, elementos, qué sí y qué no aparece— de modo que diseño pueda producirla **sin leer el artículo completo**. *Intención:* qué debe lograr en el lector y por qué esa sección del texto la necesita. Aquí se demuestra que el banner es contextual |
 | **→ Color pintura Berel** | Nombre + código alfanumérico de cada color. **Nunca** inventar HEX/RGB: si no hay acceso al catálogo, escribir "Tonos reales: Catálogo RGB interno" |
@@ -127,6 +127,7 @@ Corolarios que el origen declara explícitamente:
 - [ ] Imágenes del artículo en el tamaño estándar 1408 × 768 px
 - [ ] Formatos `.webp`, peso menos de 200 KB, lazy-load (LCP sin lazy)
 - [ ] Cada ficha declara su objetivo de permanencia y su justificación anti banner-blindness
+- [ ] 🔴 Si la pieza es infografía: formato y variante declarados, y el acento usa Rojo Editorial `#B3153A` o la paleta complementaria, nunca el rojo corporativo
 
 ## Cross-links
 
@@ -134,6 +135,8 @@ Corolarios que el origen declara explícitamente:
 - Dónde se especifica el banner dentro del texto → [`03_REDACCION_ARTICULO.md`](03_REDACCION_ARTICULO.md)
 - Qué pasa con la pieza 🔁 después → [`06_DERIVADOS_SOCIALES.md`](06_DERIVADOS_SOCIALES.md)
 - Excepción de lenguaje en fichas de banner → [`04_VOZ_Y_TONO_BEREL.md`](04_VOZ_Y_TONO_BEREL.md)
+- 🔴 **Los formatos con los que diseño produce una infografía** →
+  [`10_FORMATOS_DE_INFOGRAFIA.md`](10_FORMATOS_DE_INFOGRAFIA.md)
 - Oficio de imagen editorial y su contrato HTML/SEO → `seo-aeo/references/editorial-image-seo.md`
 - Dirección de arte y sistema visual editorial →
   `content-marketing-studio/references/agentic-editorial-visual-system.md`
