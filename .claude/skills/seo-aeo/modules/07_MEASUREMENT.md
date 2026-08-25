@@ -5,7 +5,8 @@
 > Regla de oro: **mide o no existió**. Sello: as-of 2026-06; frescura y
 > agregación de GSC **medidas** as-of 2026-08-05; trampas de lectura de GSC
 > (piso de impresiones, doble conteo por sitelinks, curva de CTR propia, largo
-> de la serie) **medidas** as-of 2026-08.
+> de la serie) **medidas** as-of 2026-08; **medición no nativa** (canal operado por
+> un tercero) as-of 2026-08-25.
 
 ## PARTE A — Medición SEO clásica
 
@@ -168,6 +169,36 @@ que la página vaya a llegar ahí. Preséntalo como techo, jamás como forecast.
 - Database `cl` para Chile; el mercado correcto por cliente.
 - Métricas norte: visibilidad orgánica, nº de keywords en top-3/top-10, tráfico
   orgánico estimado, share of voice vs. competidores.
+
+### Medición no nativa: cuando el canal lo opera otro
+
+Si el canal existe pero **lo opera un tercero** (otra agencia, el equipo interno del
+cliente, un partner), **no tienes acceso nativo a su analítica**. Eso no es una excusa
+para no medir: es una **decisión de método que se declara ANTES de comprometer la
+métrica**.
+
+**Sólo hay dos vías, y hay que decir cuál se está usando:**
+
+| Vía | Qué entrega | Qué exige | Límite honesto |
+|---|---|---|---|
+| **A. Pedir el reporte** a quien publica | métricas nativas de la plataforma (alcance, guardados, clics salientes) | acuerdo de cadencia + formato **antes** del ciclo; dependes de que lo entreguen | llega tarde o no llega; no puedes auditar cómo se extrajo |
+| **B. Inferir por tráfico de referencia** al destino | sesiones y conversión atribuidas a ese origen en GA4 | que el destino sea una **URL propia** y que la fuente/medio se distinga | **subestima siempre** — no ve la impresión, ni el guardado, ni el clic que no llegó |
+
+🔴 **Declara cuál de las dos antes de comprometer la métrica.** Mezclarlas —o cambiar
+de una a otra a mitad del período— produce una serie que no compara consigo misma, y
+esa serie **va a un reporte de cliente**.
+
+⚠️ **La vía B no sustituye a la A.** Es un piso, no una equivalencia: si el reporte
+nativo dice 40.000 impresiones y GA4 dice 120 sesiones, ninguno de los dos está mal —
+están midiendo cosas distintas. Preséntalos como **dos planos separados**, nunca como
+un embudo (misma regla de no-agregación que *external search vs. platform search*,
+`../content-marketing-studio/modules/05_DISTRIBUTION_AMPLIFICATION.md`).
+
+🎯 **Y el objetivo propio cambia de unidad.** Si no publicas, **no puedes comprometer
+cobertura de publicación**. El objetivo que sí es tuyo y sí es auditable es
+**cobertura de insumo entregado**: cuántas piezas del paquete se entregaron completas,
+a tiempo y en la convención acordada. Comprometer publicaciones sobre un canal que no
+operas es prometer el trabajo de otro.
 
 ## PARTE B — Share of Voice en LLMs (medición AEO)
 

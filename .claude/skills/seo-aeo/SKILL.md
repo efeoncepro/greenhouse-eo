@@ -115,6 +115,8 @@ decláralo. Ramifica la recomendación según las respuestas.
 | Rastreo, indexación, velocidad (CWV), JSON-LD, sitemaps, render JS, **crawlers IA** | `modules/01_SEO_TECHNICAL.md` |
 | Intent, topical authority, pillar/cluster, programmatic, decay, canibalización | `modules/02_SEO_CONTENT.md` |
 | Confianza/autoridad de marca y autor, **entidad/Knowledge Graph**, YMYL | `modules/03_EEAT_ENTITY.md` |
+| **Pieza-hito anual** (color del año, informe, ranking, premio): cadencia propia + de mercado, ventana de publicación y **claim perecedero** con tarea de retiro; **canibalización interna** y **pre-emptor de tesis** antes de fijar el ángulo | `modules/02_SEO_CONTENT.md` (+ `modules/04_AEO_GEO.md` si otra marca publicó el mismo concepto: **atribución equivocada**) |
+| **El canal lo opera un tercero** (otra agencia / el equipo del cliente): medición no nativa, objetivo de *cobertura de insumo entregado* y paquete de handoff | `modules/07_MEASUREMENT.md` + `../content-marketing-studio/modules/05_DISTRIBUTION_AMPLIFICATION.md` |
 | **Ser citado por IA**: fan-out, chunking, citabilidad, prompt research, llms.txt, por-motor | `modules/04_AEO_GEO.md` ⭐ |
 | Backlinks, digital PR, brand SERP, menciones, **Reddit/UGC** | `modules/05_OFFPAGE_AUTHORITY.md` |
 | Google Business Profile / local pack, multirregión, hreflang, localización | `modules/06_LOCAL_INTERNATIONAL.md` |

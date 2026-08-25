@@ -1,7 +1,7 @@
 # Producir una serie de briefs editoriales SEO/AEO en el Content Hub de un cliente
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-08-25 por Claude
 > **Última actualización:** 2026-08-25 por Claude
 > **Módulo:** Growth / SEO — producción editorial para clientes
@@ -10,7 +10,7 @@
 
 ## Para qué sirve
 
-Un cliente tiene su calendario editorial en su propio sistema (Notion, en el caso fuente) y hay que dejar ahí una serie de briefs listos para que alguien los redacte. Este manual es la secuencia mecánica de esa entrega: leer el sistema del cliente sin romperlo, encontrar los espacios vacíos del calendario, preparar el insumo compartido, escribir cada brief dentro de la página que le corresponde y verificar que quedó bien.
+Un cliente tiene su calendario editorial en su propio sistema (Notion, en el caso fuente) y hay que dejar ahí una serie de briefs listos para que alguien los redacte. Este manual es la secuencia mecánica de esa entrega: leer el sistema del cliente sin romperlo, encontrar los espacios vacíos del calendario, preparar el insumo compartido, derivar la convención de assets del cliente cuando el brief lleva plan de distribución, escribir cada brief dentro de la página que le corresponde y **verificar con conteos** que quedó bien.
 
 Sirve igual si escribes tú solo o si repartes el trabajo entre varios agentes. De hecho el runbook está diseñado para lo segundo: casi todos los pasos existen para que varias manos escribiendo en paralelo produzcan piezas **consistentes entre sí** y no cinco versiones distintas de los mismos números.
 
@@ -33,6 +33,7 @@ Sirve igual si escribes tú solo o si repartes el trabajo entre varios agentes. 
 | **Search Console del cliente conectado en Greenhouse** | La línea base **medida** de cada tema (impresiones, clics, posición) | La marca aparece con conexión activa; ver [Conectar Search Console a una marca](conectar-search-console.md) |
 | Una **herramienta de keywords** (volumen y dificultad de terceros) | La demanda que el cliente **todavía no tiene**, que por construcción no puede salir de Search Console | Un reporte de prueba devuelve datos |
 | El **inventario del sitio del cliente** (URLs de contenido, fichas de producto, hubs) | Saber qué ya existe, qué canibaliza y a qué se enlaza | Una lista de URLs verificada contra el sitio, no contra un documento |
+| El **repositorio de entregables del cliente** de ciclos anteriores (piezas gráficas, video, banners) — solo si el brief lleva plan de distribución | Derivar la convención de nombres y de slots del cliente en vez de inventar una propia | Puedes listar el contenido de las carpetas de los últimos ciclos, no solo buscar por nombre de archivo |
 
 ### La autorización, que no es un trámite
 
@@ -108,9 +109,44 @@ Y una regla escrita **dentro** del archivo, en las primeras líneas:
 
 **Por qué existe el dossier:** evita que cada persona o agente re-investigue lo mismo (y llegue a números levemente distintos), evita que alguien rellene un hueco con una cifra inventada, y hace que las piezas de la serie sean **comparables entre sí**, que es parte del entregable. Sin dossier, cinco briefs son cinco investigaciones sueltas que se contradicen en el pie de página.
 
-> El detalle de qué insumo pesa más que cuál, y la secuencia del research que produce este archivo, están en el [modelo operativo](../../operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md), §2 y §4.
+> El detalle de qué insumo pesa más que cuál —incluido el marcado de evidencia MEDIDO / OBSERVADO / ESTIMADO / INFERIDO / REPORTADO, que **viaja al brief dato por dato**— y la secuencia del research que produce este archivo, están en el [modelo operativo](../../operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md), §2 y §5.
 
-### 4. Escribir el brief en la página del slot
+### 4. Inventariar los entregables del cliente y derivar la convención de assets
+
+**Solo si el brief lleva plan de distribución o atomización** (piezas derivadas: posts, carruseles,
+banners, video corto). Si el encargo es únicamente el artículo, sáltate este paso.
+
+La regla: **la convención la pone el cliente y tú la descubres**. No se inventa un esquema propio de
+nombres ni de slots — un plan escrito en tu vocabulario obliga a traducir a quien produce y se abandona
+en el primer ciclo.
+
+**a) Barre por carpeta y por extensión, nunca por patrón de nombre.** Lista el contenido completo de las
+carpetas de entregables de los últimos ciclos y agrúpalo por período. Un `grep` anclado a la convención
+de nombres vieja devuelve **cero** para el mes que ya migró a otra, y te va a hacer concluir que los
+entregables desaparecieron cuando están ahí, con otro nombre y otra extensión. Para afirmar una ausencia
+hay que cambiar el eje de búsqueda y decir explícitamente dónde no miraste.
+
+**b) Deriva la convención.** Qué código lleva cada slot, cuántas piezas trae un ciclo completo, cuál es
+portada y cuál es cierre, a qué canal va cada una.
+
+**c) Anota la degradación, si la hay** — y casi siempre la hay: un código de slot que desaparece, el
+conteo de piezas que baja, dos o tres convenciones conviviendo el mismo mes, un canal que se encoge
+mientras otro crece, la carpeta de un slot importante vacía. Es **un hallazgo para el operador, no una
+corrección tuya**. Y antes de reportarlo, reverifícalo con el equipo dueño: una carpeta vacía puede ser
+sincronización de almacenamiento pendiente y no una entrega incumplida. Un hallazgo de inventario local
+no es una acusación de proceso.
+
+**d) Amarra cada pieza derivada a la sección del brief de donde sale su contenido.** Sin esa referencia,
+quien diseña inventa el mensaje. Y si la sección de origen es un H2 condicionado a un dato que todavía no
+llegó, la pieza derivada queda condicionada igual.
+
+**e) Si el canal lo publica otro** (otra agencia, el equipo del cliente), lo que entregas no es una
+parrilla: es un **paquete de insumo**, campo por campo — imagen, título, descripción, URL de destino,
+texto alternativo, tablero o categoría sugerida y fecha **sugerida**, no comprometida. Y no prometas
+cobertura de publicación: tu objetivo medible es el insumo entregado. El fundamento y las consecuencias
+de medición están en el [modelo operativo](../../operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md) §9.
+
+### 5. Escribir el brief en la página del slot
 
 Un brief, una página, **una sola manos escribiendo**. Si repartes el trabajo, el paralelismo es **por pieza**, nunca por sección de una misma pieza.
 
@@ -147,20 +183,35 @@ Primer párrafo del brief.         ← también fuera
 
 Un tabulador por nivel. Si una sección tiene sub-bloques, se indenta lo que corresponda, pero **ninguna línea del brief puede quedar en columna cero** salvo la línea del propio encabezado desplegable.
 
+⚠️ **Escribes la tabla en markdown de tuberías, pero Notion la guarda como HTML — y el envoltorio NO hereda el tabulador.** Esto es lo que hace la trampa invisible: tú escribes `| Campo | Quién |` correctamente indentado, la escritura devuelve éxito, y al releer la página aparece como `<table>` **en columna cero**. Desde ahí, todo lo que sigue quedó fuera del desplegable. **Después de insertar cualquier tabla dentro de un desplegable, relee y corrige el tabulador del envoltorio.** No es opcional y no hay aviso.
+
+⚠️ **El tabulador lo llevan las etiquetas envolventes, no las filas.** `<table>` y `</table>` se indentan con TAB —son hijos del desplegable—; `<tr>` y `<td>` van en **columna cero**. Y cuidado con el alcance del error: quitarle el TAB al envoltorio de una tabla **no rompe solo esa tabla, dedenta todo lo que viene después de ella**. Media sección más abajo el brief sale del desplegable, y la escritura te devolvió éxito.
+
+⚠️ **No prefijes con TAB una línea que empiece con sintaxis de lista numerada** (`1.`, `2.`) dentro de un bloque nuevo. Notion la reparsea, **descarta el tabulador y se lleva consigo la cola** de lo que venía detrás. Si necesitas esa numeración adentro del desplegable, conviértela en negrita: `**1.**` seguido del texto.
+
 #### c) Escribe con `notion-update-page`
 
 El contenido completo del brief, en una sola escritura, sobre la página del slot.
 
 #### d) Regla dura: **no cambies el título ni las propiedades**
 
-Solo se agrega contenido al cuerpo. El título de relleno se queda como está y las propiedades no se tocan en este paso — aunque el título diga "Artículo nuevo" y a ti te duela. Cambiarlos es el paso 5, requiere autorización, y ocurre **después**.
+Solo se agrega contenido al cuerpo. El título de relleno se queda como está y las propiedades no se tocan en este paso — aunque el título diga "Artículo nuevo" y a ti te duela. Cambiarlos es el paso 6, requiere autorización, y ocurre **después**.
 
-#### e) Verificación obligatoria, en el momento
+#### e) Verificación obligatoria, en el momento — y mecánica, no de confianza
 
-`notion-fetch` sobre la página que acabas de escribir y revisa dos cosas:
+`notion-fetch` sobre la página que acabas de escribir.
 
-1. **El desplegable está bien formado**: existe un solo encabezado desplegable de nivel 1 y el contenido está adentro.
-2. **Ninguna línea quedó en columna cero**: si ves secciones del brief como bloques de primer nivel de la página, la indentación se perdió y hay que reescribir.
+⚠️ **Primero, des-escapa los saltos de línea de la respuesta.** El fetch devuelve el contenido con los saltos como `\n` **literales, escapados**. Un regex que busque `^` o saltos reales va a reportar **cero secciones** y te va a hacer concluir que la página quedó vacía cuando está perfecta. Es un falso negativo que cuesta una reescritura completa e innecesaria.
+
+Con el texto ya des-escapado, tres conteos. Los tres son mecánicos: esto no se revisa a ojo.
+
+| Qué cuentas | Valor esperado |
+|---|---|
+| Secciones del brief **dentro** del desplegable | Todas las de la plantilla, ninguna menos |
+| Líneas de texto **sin** tabulador | Solo la línea del encabezado desplegable, más lo que ya existía en la página antes de que escribieras |
+| Filas de cada tabla | El mismo número que escribiste, tabla por tabla |
+
+Si el conteo de líneas sin tabulador es mayor al esperado, la indentación se perdió en algún punto —casi siempre en el envoltorio de una tabla o en una lista numerada— y hay que **reescribir la página completa**, no parchar la sección que se ve mal.
 
 No delegues esta verificación al final del lote. Se hace pieza por pieza, apenas escrita.
 
@@ -168,7 +219,7 @@ No delegues esta verificación al final del lote. Se hace pieza por pieza, apena
 
 Las tablas en texto se convierten a **tablas nativas de Notion**. El formato **dentro de las celdas** (negritas, código, enlaces) puede quedar como texto crudo, mostrando los caracteres de marcado en vez de aplicarlos. No es un error de tu escritura ni algo que se arregle reintentando. Si el contenido de una celda depende del formato para entenderse, cámbialo por texto plano que se lea bien sin él.
 
-### 5. Llenar las propiedades
+### 6. Llenar las propiedades
 
 **Solo si el operador lo autorizó explícitamente** (paso "Antes de empezar"). Si no, sáltate esta sección: el entregable son los briefs en el cuerpo, y las propiedades las llena el cliente.
 
@@ -178,7 +229,7 @@ Si está autorizado, dos reglas:
 
 **Respeta las convenciones que el cliente ya usa.** Antes de escribir un valor, mira cómo están llenas las filas existentes del cliente: qué formato usa en los títulos, qué valor de estado corresponde a "brief listo", cómo escribe las fechas. Se sigue su convención, no la tuya, aunque la suya sea peor.
 
-### 6. La pasada de verificación adversarial
+### 7. La pasada de verificación adversarial
 
 La revisa **un agente o una persona distinta de quien escribió**, en **solo lectura**, contra una lista cerrada. El encargo es **refutar, no confirmar**: quien verifica no busca aprobar el trabajo, busca romperlo.
 
@@ -197,7 +248,7 @@ La lista cerrada:
 | 7 | **Agregaciones infladas** | Pares singular/plural que son la misma demanda sumados como si fueran dos; valores idénticos repetidos que delatan agrupación por rangos de la fuente |
 | 8 | **Metadata de producción filtrada** | Números de slot, referencias al encargo o voz en primera persona del agente dentro del brief |
 
-Los puntos 2 a 7 son el checklist de cierre del [modelo operativo](../../operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md) §7, donde está el fundamento de cada uno. Los puntos 1 y 8 son propios de esta entrega.
+Los puntos 2 a 7 son el checklist de cierre del [modelo operativo](../../operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md) §10, donde está el fundamento de cada uno. Los puntos 1 y 8 son propios de esta entrega.
 
 Se corre sobre el **set completo**, no pieza por pieza: la mitad de los hallazgos solo aparecen al comparar dos briefs entre sí.
 
@@ -209,6 +260,9 @@ Se corre sobre el **set completo**, no pieza por pieza: la mitad de los hallazgo
 | Fila con título de relleno pero **con** contenido en el cuerpo | **No es un slot.** Hay trabajo de alguien adentro | Preguntar al operador. No escribir encima |
 | Fila con tema ya definido y estado avanzado | Pieza en curso del cliente | No tocar |
 | El desplegable aparece vacío y el brief se ve suelto debajo | **La indentación se perdió.** La escritura reportó éxito igual | Reescribir la página con los hijos indentados con tabulador |
+| El brief empieza dentro del desplegable y a media página se sale | Le faltó el tabulador al envoltorio `<table>`/`</table>` de una tabla, y eso dedentó todo lo que venía después | Reescribir la página completa con el envoltorio indentado y `<tr>`/`<td>` en columna cero |
+| El conteo de líneas sin tabulador da más de una | **Hay contenido fuera del desplegable**, aunque a simple vista se vea bien | Reescribir la página completa. No parchar la sección visible |
+| La carpeta de entregables de un slot del cliente está vacía | **Hallazgo, no incumplimiento.** Puede ser sincronización de almacenamiento pendiente | Reverificar con el equipo dueño antes de reportarlo al operador o al cliente |
 | Una celda de tabla muestra caracteres de marcado en vez de formato | Limitación conocida de la conversión a tabla nativa | Reescribir esa celda en texto plano. No es un error a reintentar |
 | Propiedad de relación vacía en todas las filas del cliente | El cliente no usa esa relación (puede incluso apuntar a una base que no es suya) | Dejarla vacía. Llenarla no está autorizado |
 | Un dato que necesitas y no está en el dossier | **Estado válido**, no un hueco a rellenar | Escribir "no verificado" en el brief, o verificarlo y agregarlo al dossier antes de citarlo |
@@ -222,13 +276,22 @@ Se corre sobre el **set completo**, no pieza por pieza: la mitad de los hallazgo
 - **No escribas un claim de producto que la ficha del fabricante no declare.** Y cuidado con los parecidos: dos propiedades técnicas con nombres similares no son la misma propiedad, y la diferencia llega al cliente.
 - **No aceptes la causa que reporta el mensaje de error de una herramienta sin verificarla.** Los mensajes mienten sobre su propia causa. La regla práctica: si ese mismo reporte funcionó antes en la misma sesión, no es un problema de plan ni de permisos — es cuota.
 - **No dejes metadata de producción dentro del brief entregable.** Números de slot, referencias al encargo, "según lo que me pediste", voz en primera persona del agente. El brief lo lee un redactor del cliente, no tú.
-- **No confíes en que "la escritura devolvió éxito" significa "quedó bien".** En este flujo casi todos los errores devuelven éxito: la indentación perdida, la fecha sin el formato expandido, la tabla con formato crudo. Solo la relectura lo prueba.
+- **No confíes en que "la escritura devolvió éxito" significa "quedó bien".** En este flujo casi todos los errores devuelven éxito: la indentación perdida, la fecha sin el formato expandido, la tabla con formato crudo. Solo la relectura **con conteo** lo prueba.
+- **No inventes la convención de assets del cliente.** Se deriva de sus entregables reales, barriendo por carpeta y por extensión. Un plan de distribución escrito en tu vocabulario obliga a traducir a quien produce.
+- **No concluyas una ausencia desde un `grep` por patrón de nombre.** Cambia el eje de búsqueda y di dónde no miraste. La convención pudo cambiar y tu regex está anclado a la vieja.
+- **No reportes un hueco de inventario como incumplimiento del equipo.** Reverifícalo primero con quien lo produce: puede ser sincronización de almacenamiento.
+- **No prometas cobertura de publicación en un canal que publica otro.** Lo que puedes comprometer es el insumo entregado; la fecha que propones es sugerida, no comprometida.
 
 ## Problemas comunes
 
 | Síntoma | Causa probable | Qué hacer |
 |---|---|---|
 | El brief se ve completo pero el desplegable está vacío | Los hijos no se indentaron con tabulador | Reescribir la página completa con la indentación correcta. Verificar de nuevo con una relectura |
+| El fetch de verificación devuelve el brief, pero mi conteo dice cero secciones | La respuesta trae los saltos de línea como `\n` **escapados**, y el regex no encuentra ninguno | Des-escapar los saltos antes de contar. Es un falso negativo: no reescribas la página por esto |
+| El brief entra bien al desplegable y a partir de cierta tabla todo queda afuera | Al envoltorio `<table>`/`</table>` le faltó el tabulador, y eso dedentó el resto del documento | Reescribir la página completa: envoltorio con TAB, `<tr>`/`<td>` en columna cero |
+| Una lista numerada perdió la indentación y arrastró lo que venía detrás | Notion reparsea una línea que empieza con `1.` dentro de un bloque nuevo y descarta el tabulador | Convertir la numeración a negrita (`**1.**`) y reescribir la página |
+| El plan de distribución usa nombres de slots que el cliente no reconoce | Se inventó una convención en vez de derivarla de sus entregables | Inventariar por carpeta y extensión, derivar la convención real y reescribir el plan con su vocabulario |
+| El inventario de assets dice que faltan los entregables de un mes | Se buscó por patrón de nombre y ese mes usa otra convención — o hay sincronización pendiente | Barrer por carpeta y extensión; si igual faltan, reverificar con el equipo dueño antes de reportarlo |
 | La fecha no aparece en la fila aunque la escritura fue exitosa | Se escribió el nombre pelado de la propiedad en vez del formato expandido `date:<Propiedad>:start` | Reescribir la propiedad con el formato expandido |
 | Un agente reporta que "el plan no incluye acceso" a la herramienta de keywords | **Cuota agotada**, no límite de plan. El mensaje de error miente sobre su causa | Verificar si el mismo reporte funcionó antes en la sesión. Si sí, es cuota: reintentar **en serie**, nunca relanzando la flota en paralelo |
 | Se agotó la cuota a mitad del lote | Varios agentes pidiendo reportes caros a la vez (los que devuelven listas se cobran por línea) | Reintentar en serie, y en el próximo lote sacar los reportes caros al dossier, hechos una sola vez |
@@ -241,7 +304,7 @@ Se corre sobre el **set completo**, no pieza por pieza: la mitad de los hallazgo
 
 ## Referencias técnicas
 
-- Modelo operativo del research: [`docs/operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md`](../../operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md) — §2 insumos y jerarquía de confianza, §3 los dos carriles, §4 secuencia, §6 producción con subagentes, §7 checklist de cierre, §9 antipatrones.
+- Modelo operativo del research: [`docs/operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md`](../../operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md) — §2 insumos, jerarquía de confianza y marcado de evidencia · §3 los dos carriles · §4 intake del sistema editorial · §5 secuencia del research (5.2 la pieza-hito anual y su claim perecedero, 5.3 el pre-emptor de tesis) · §6 respaldo de producto · §7 producción con subagentes · §9 atomización y distribución · §10 checklist de cierre · §12 antipatrones.
 - Skill `seo-aeo`: [módulo 02 — contenido y topical authority](../../../.codex/skills/seo-aeo/modules/02_SEO_CONTENT.md) · [módulo 07 — medición](../../../.codex/skills/seo-aeo/modules/07_MEASUREMENT.md).
 - Plantilla del brief: [`templates/content-brief-aeo.md`](../../../.codex/skills/seo-aeo/templates/content-brief-aeo.md) de la skill `seo-aeo`.
 - Caso fuente (auditoría del cliente, estado observado en su fecha): [`docs/audits/seo/BEREL_SEO_DIAGNOSTIC_2026-08-25.md`](../../audits/seo/BEREL_SEO_DIAGNOSTIC_2026-08-25.md). Una auditoría documenta un estado en una fecha y no se asume vigente por existir — ver [`docs/audits/README.md`](../../audits/README.md).

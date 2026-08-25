@@ -4,8 +4,11 @@ Auditorías de búsqueda orgánica y AEO — de Efeonce y de clientes a los que 
 
 ## Regla de uso
 
-- Toda cifra lleva declarada su naturaleza: **MEDIDO** (Search Console), **ESTIMADO** (Semrush u otra
-  fuente de terceros) u **OBSERVADO** (SERP en vivo o HTML del sitio, una foto de un momento).
+- Toda cifra lleva declarada su naturaleza: **MEDIDO** (Search Console, o una consulta directa a la API de un
+  proveedor con fecha y costo registrados), **ESTIMADO** (Semrush u otra fuente de terceros) u **OBSERVADO**
+  (SERP en vivo o HTML del sitio, una foto de un momento). Cuando el research incluye fechas de mercado o
+  afirmaciones de terceros, se agregan **INFERIDO** (deducción sobre lo observado) y **REPORTADO** (un tercero
+  lo afirma y no se pudo verificar de primera fuente). Un dato REPORTADO o INFERIDO nunca se presenta como verificado.
 - Estas auditorías documentan el estado de un sitio en una fecha. Los defectos de arquitectura caducan
   en cuanto el equipo dueño del sitio lo toca; las líneas base caducan con las semanas. Revalidar antes de consumir.
 - El oficio vive en la skill `seo-aeo`; el proceso repetible en
@@ -13,6 +16,13 @@ Auditorías de búsqueda orgánica y AEO — de Efeonce y de clientes a los que 
   el uso comercial en la skill `seo-aeo-practice`. Estas auditorías son **evidencia de caso**, no doctrina.
 
 ## Auditorías
+
+- [Berel — Color del Año 2027 "Bien y de Buenas": research, ángulo y plan de lanzamiento — 2026-08-25](BEREL_COLOR_DEL_ANO_2027_2026-08-25.md) —
+  el mismo cliente, su **pieza-hito anual** (slot N28). El competidor más peligroso era una pieza propia de cinco semanas antes;
+  una agencia de tendencias pre-emptó la tesis seis semanas antes; la categoría entera en México está vacía de contenido y el único
+  competidor real muestra el color del año pasado. Berel tiene el mejor activo técnico de la categoría y **cero enlaces editoriales**
+  (MEDIDO: 4 dominios vivos y basura, contra los 25 que estimaba Semrush) y **cero notas de prensa mexicanas fechadas** de su hito anual.
+  Bloqueante con reloj propio: la URL destino ya devuelve HTTP 200 vacío. **Caduca por diseño** — el claim diferenciador muere cuando Comex publique.
 
 - [Berel — diagnóstico de búsqueda orgánica y arquitectura de contenido — 2026-08-25](BEREL_SEO_DIAGNOSTIC_2026-08-25.md) —
   cliente cuyo blog opera Efeonce. Tráfico ~90% de marca; un solo activo editorial sostiene 14 keywords no-marca

@@ -3,7 +3,8 @@
 > Contrasta toda táctica agresiva contra este archivo ANTES de recomendarla.
 > Efeonce/Greenhouse no hace black-hat: el riesgo (penalización, daño
 > reputacional, pérdida de confianza de modelos IA) no compensa el atajo.
-> Sello: as-of 2026-06.
+> Sello: as-of 2026-06; anti-patrones de **inventario y lectura de evidencia**
+> as-of 2026-08-25.
 
 ## 🔴 Sobre-declarar una cifra (el error más caro del oficio)
 
@@ -104,6 +105,66 @@ contrafactual, el número describe un patrón — no prueba un lift.** Decláral
   forma fiable. Decisión consciente, no default (`01_SEO_TECHNICAL.md`).
 - **Afirmar datos volátiles de memoria** — features de motores y cifras cambian.
   Reverifica con WebSearch (`SOURCES.md`).
+
+## Anti-patrones de inventario y de lectura de evidencia (as-of 2026-08-25)
+
+> Los cinco salen de una misma sesión de research de cliente. Ninguno es black-hat:
+> los cinco se cometen **creyendo que se está siendo riguroso**, y los cinco terminan
+> en una afirmación falsa dentro de un entregable.
+
+### 1. Un grep de patrón de nombre no es un inventario
+
+Un regex anclado a la convención vieja (`^N##_`) devolvió **cero** para el mes que ya
+usaba otra convención, y se concluyó que los entregables **habían desaparecido**.
+Existían: otra extensión, otro nombre.
+
+- 🔴 **NUNCA** concluyas ausencia desde un solo eje de búsqueda. «Pocos resultados» no
+  es «hay pocos»: puede ser «buscaste por el eje equivocado».
+- ✅ Para concluir ausencia, **cambia el eje** (barre por carpeta y por extensión, no
+  por patrón de nombre) **y nombra dónde no miraste**.
+
+### 2. El peso en caracteres no mide la calidad de una sección
+
+Se calificó de «flaca» una capa AEO porque **pesaba 8% del documento**; eran checklist
+y tabla — el formato **más denso que existe**. El texto corrido pesa más y decide
+menos.
+
+- 🔴 **NUNCA** midas la solidez de una sección por volumen de texto.
+- ✅ Mide **cobertura de decisiones**: cuántas preguntas accionables deja resueltas.
+
+### 3. Descartar una oportunidad leyendo el SERP de la keyword equivocada
+
+Una familia entera se descartó por el SERP de un término de **referencia de código**,
+cuando el término con **intención comercial** tenía otra cara.
+→ Método completo, con la tabla del caso medido, en `02_SEO_CONTENT.md`
+(*Verifica el SERP del eje que vas a atacar, no el de su prima léxica*).
+
+- 🔴 El matiz que se suma acá: el error **no es sólo elegir mal el objetivo**, es
+  **descartar** — un falso negativo no deja rastro en ningún backlog, así que nadie lo
+  audita después. Verifica el eje **antes de matar una familia**, no sólo antes de
+  atacarla.
+
+### 4. Una dificultad sospechosamente baja se verifica en SERP antes de fijarse como objetivo
+
+Un KD anómalamente bajo para el volumen que declara suele ser **demanda de
+referencia** (códigos de color, muestrarios, tablas de equivalencia), no demanda del
+tema. Es fácil de ganar y no le sirve al negocio.
+
+- 🔴 **NUNCA** fijes como objetivo una keyword por su dificultad sin haber mirado su
+  SERP real.
+- ✅ Hasta verificarla, entra al plan como **oportunidad condicionada**, nunca como
+  objetivo comprometido. La condición y su dueño se escriben junto a la fila.
+
+### 5. Un hallazgo de inventario local no es una acusación de proceso
+
+Carpetas vacías o cruzadas pueden ser **sincronización de almacenamiento**, no
+incumplimiento de entrega. Reportarlo al cliente como incumplimiento es un daño
+difícil de deshacer, y el costo de verificar es una pregunta.
+
+- 🔴 **NUNCA** conviertas una observación de sistema de archivos en un juicio sobre el
+  trabajo de un equipo.
+- ✅ **Reverifica con el equipo dueño** antes de que salga del borrador. Si igual entra
+  al entregable, entra marcado como **OBSERVADO / pendiente de confirmar**, con dueño.
 
 ## Señal de alarma transversal
 

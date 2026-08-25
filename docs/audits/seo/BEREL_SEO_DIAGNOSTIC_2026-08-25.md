@@ -4,12 +4,13 @@
 
 - Tipo: auditoría de cliente (búsqueda orgánica, arquitectura de contenido y línea base medida)
 - Cliente: **Berel** (`berel.com`), fabricante mexicano de pintura arquitectónica. Efeonce le opera el blog.
-- Fecha: 2026-08-25
+- Fecha: 2026-08-25 · Versión: **1.1** (2026-08-25 — se agrega el enlace al research del Color del Año 2027, que se documentó aparte; el cuerpo del diagnóstico no cambió)
 - Scope: perfil de dominio y catálogo, panorama competitivo en México, línea base medida en Search Console, backlog de striking distance, arquitectura e indexabilidad del sitio, historia de la estrategia editorial y los cinco briefs entregados
 - Método: Semrush (base `mx`, agosto 2026) · Search Console `sc-domain:berel.com` vía la conexión de Greenhouse · inspección directa de HTML de `berel.com` con `curl`/fetch · SERP en vivo · Notion (Content Hub de Berel y documentos de propuesta)
 - Ventana medida: **2026-07-31 a 2026-08-22 (23 días, 151.782 filas)**
 - Verdict: **el techo de Berel no está en la cantidad de artículos, está en que el sitio no permite encontrarlos.** Existe un activo editorial que prueba que el modelo funciona y nunca se replicó; existen 115 artículos que ninguna URL del sitio lista.
 - Hallazgo de operación de cuenta: **el carril de striking distance de §5 no es una capacidad por construir — está terminada y operable hoy en el portal, la conexión de Search Console del cliente lleva activa desde el 31 de julio, y nadie la había corrido para esta cuenta** (§5.0).
+- Documento hermano: [**Color del Año 2027 "Bien y de Buenas"**](BEREL_COLOR_DEL_ANO_2027_2026-08-25.md) — el research, el ángulo editorial, el mapa competitivo de la categoría, el calendario del ciclo 2027, el plan de PR y el plan de distribución de la pieza-hito anual (slot N28). Va aparte porque tiene research competitivo propio y un calendario con fecha de caducidad; **corrige dos cifras de este diagnóstico y amplía el defecto D-04** (§8.1).
 - Documento interno de Efeonce sobre un cliente. **No es una propuesta comercial** y no está redactado para entregarse al cliente tal cual.
 
 > ## Convención de evidencia — leer antes de citar cualquier cifra
@@ -399,6 +400,20 @@ Los cinco cuelgan de `/consejos-para-pintar`, **el único hub bien construido de
 - **Baño — no entra.** Ya está ganado por el tutorial (§4.4). Un artículo nuevo sobre baño competiría con las catorce posiciones que ya existen; sería crear un caso de D-05 a mano.
 - **Exteriores — no entra.** Ya hay **7 activos** sobre el tema. El trabajo ahí es **reposicionar y consolidar, no agregar**; entra al carril B, no al carril de contenido nuevo.
 
+### 8.1 El sexto slot: N28 — Color del Año 2027
+
+El mismo Content Hub tiene un sexto slot con la misma fecha de publicación, **N28 "Color del año 2027"**, que en el momento de este diagnóstico estaba en estado `Idea` con el cuerpo en blanco y la nota *"pendiente de tema/material del cliente"*. El material del cliente llegó el **2026-08-24** y el brief se entregó el 2026-08-25.
+
+N28 **no es un sexto artículo de espacios**: es la **pieza-hito anual de la marca**, con research competitivo propio (el ciclo global de "color del año"), calendario de mercado con fecha de caducidad, plan de PR y plan de distribución. Por eso se documentó en un archivo aparte: [**BEREL_COLOR_DEL_ANO_2027_2026-08-25.md**](BEREL_COLOR_DEL_ANO_2027_2026-08-25.md).
+
+**Dos cifras de este diagnóstico quedan corregidas ahí**, y un defecto queda ampliado. Hay que consumir la versión corregida:
+
+| Dónde | Lo que dice este diagnóstico | Qué cambia |
+|---|---|---|
+| **§3.4** — corrección | `/articulos/como-el-color-afecta-la-percepcion-del-espacio` tiene **25 dominios de referencia** (ESTIMADO, Semrush) | **MEDIDO con DataForSEO: 4 dominios de referencia vivos, y son basura.** Berel **no tiene un solo enlace editorial**. La brecha con Comex es mayor de la que dice §3.4 |
+| **§9** — corrección | la demanda de la familia de color se descarta como tema de blog por SERP de referencia | el criterio se mantiene, pero **`color del año 2027` ya tiene 90/mes MEDIDO** (DataForSEO), contra el *"sin volumen todavía"* ESTIMADO que circulaba en el research base |
+| **D-04** — ampliación | el soft 404 con HTTP 200 se documenta como defecto genérico del sitio | tiene un caso con **reloj propio**: los pares de rutas del color del año son **soft 404 huérfanos** que acumulan 3.107 impresiones, y **`/articulos/color-berel-2027` y `/color-berel-2027` YA devuelven 200 con título vacío** antes de que exista el artículo |
+
 ---
 
 ## 9. Hipótesis descartadas con datos
@@ -484,6 +499,7 @@ Lo que **no** se verificó, declarado para que nadie lo asuma cubierto:
 
 ## Referencias
 
+- Research de la pieza-hito anual del cliente: [`BEREL_COLOR_DEL_ANO_2027_2026-08-25.md`](BEREL_COLOR_DEL_ANO_2027_2026-08-25.md).
 - Oficio y doctrina de método: skill `seo-aeo`, módulos [`02_SEO_CONTENT`](../../../.codex/skills/seo-aeo/modules/02_SEO_CONTENT.md) (contenido, topical authority, intención) y [`07_MEASUREMENT`](../../../.codex/skills/seo-aeo/modules/07_MEASUREMENT.md) (Search Console, striking distance, curvas de CTR).
 - Proceso repetible de priorización editorial: [`docs/operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md`](../../operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md).
 - Uso comercial del diagnóstico (pricing, encuadre, upsell): skill [`seo-aeo-practice`](../../../.claude/skills/seo-aeo-practice).

@@ -102,6 +102,22 @@ const mirroredSkills = [
     codex: '.codex/skills/seo-aeo-practice',
     claude: '.claude/skills/seo-aeo-practice',
   },
+  {
+    /*
+     * Entra el 2026-08-25: los dos bundles existian desde julio y NADIE los validaba, asi que ya
+     * habian divergido en cuatro archivos sin que ningun gate lo delatara. La copia `.claude`
+     * mandaba a una skill de Claude a leer `.codex/skills/seo-aeo/references/...` (el arbol del
+     * OTRO agente), y la copia `.codex` apuntaba el canon de content-to-capability a
+     * `../../docs/`, que resuelve a `.codex/docs/` y NO EXISTE. Un pointer roto en una skill de
+     * ejecucion no se cae con error: el agente sigue sin el canon y produce el entregable igual.
+     * Se reconcilio a mano (frontmatter completo + pointer repo-root a docs/ + pointers a
+     * seo-aeo en forma relativa, que resuelve correcto desde AMBAS copias) antes de registrarla.
+     */
+    id: 'content-marketing-studio',
+    mode: 'byte-identical',
+    codex: '.codex/skills/content-marketing-studio',
+    claude: '.claude/skills/content-marketing-studio',
+  },
 ]
 
 const filesIn = root => {

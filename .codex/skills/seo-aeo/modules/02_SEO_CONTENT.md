@@ -5,7 +5,9 @@
 > priorización** (empujar lo que existe vs. cubrir lo que falta), inflación de
 > totales de clúster, lectura de SERP por eje y operación editorial.
 > Sello: as-of 2026-06; método de striking distance **medido** as-of 2026-08-05;
-> doctrina de los dos carriles y trampas de agregación **medidas** as-of 2026-08.
+> doctrina de los dos carriles y trampas de agregación **medidas** as-of 2026-08;
+> pre-producción (pieza-hito anual, canibalización interna, pre-emptor de tesis)
+> as-of 2026-08-25.
 
 ## Principio raíz: intención > keyword
 
@@ -69,6 +71,77 @@ cluster**:
 6. **Autoría visible** — byline con credenciales (`03_EEAT_ENTITY.md`).
 7. **Frescura** — fecha de actualización honesta; contenido <2 meses gana ~28%
    más citas IA.
+
+## Pre-producción de una pieza: hito anual, canibalización interna y pre-emptor de tesis
+
+> Los tres chequeos que se corren **antes** de fijar el ángulo. Ninguno mira el
+> keyword: uno mira el calendario, otro mira el propio sitio y el tercero mira
+> quién ya publicó la misma idea. Doctrina as-of 2026-08-25.
+
+### La pieza-hito anual (no es un artículo más)
+
+Un cliente puede tener una pieza que es **hito anual de marca** — color del año,
+informe anual, ranking, premio. Se planifica distinto: exige **cuatro análisis** que
+un artículo normal no necesita.
+
+| Análisis | Qué se mide | Fuente que vale |
+|---|---|---|
+| **1. Cadencia propia** | cuándo publicó el cliente sus ediciones anteriores | el `datePublished` del **JSON-LD** de esas ediciones, no la fecha visible |
+| **2. Cadencia del mercado** | cuándo publica cada competidor su edición | **fuente primaria**: el dateline del comunicado, **no** la fecha de la nota que lo cubre |
+| **3. La ventana** | dónde cae la fecha propia respecto de los demás | publicar **entre el competidor directo y el referente global** maximiza estar ya publicado cuando se armen los compilados |
+| **4. El claim perecedero** | qué afirmación de la pieza caduca | ver el contrato de abajo |
+
+🔴 **Contrato del claim perecedero.** «Primera marca de X en anunciar Y» es verdad
+**hoy**. Todo claim perecedero se documenta con **su condición de caducidad** y **una
+tarea de retiro con fecha**, en tres lugares: **la pieza**, **el plan de PR** y **los
+assets ya distribuidos**. Un claim que caduca sin retirarse **es un pasivo**, no un
+diferenciador vencido: sigue publicado afirmando algo falso.
+
+⚠️ Si el canal lo opera un tercero, el retiro **hay que comunicárselo a quien
+publica** — tiene copy vivo. Esa comunicación es un **entregable**, no un
+recordatorio (`../content-marketing-studio/modules/05_DISTRIBUTION_AMPLIFICATION.md`).
+
+⚠️ Si la fecha de publicación está en conflicto entre dos fuentes del encargo (la
+propiedad de la tarea dice una y el cuerpo dice otra), es un **bloqueante**, no un
+detalle: una de las dos fechas puede **invalidar el claim diferenciador** completo.
+
+### Canibalización INTERNA antes de proponer el ángulo
+
+El reflejo es mirar competidores. **El competidor más peligroso suele ser una pieza
+propia reciente.**
+
+**Protocolo:** barre los artículos del propio cliente de **los últimos 3 meses** y
+compara **conceptos**, no keywords — un H2 y una palabra del cuerpo pueden ya haber
+ocupado el territorio sin que ninguna herramienta de keywords lo delate.
+
+**Salida:** busca **el eje del material fuente que nadie ocupó** (ni el cliente ni el
+mercado) y convierte la pieza vecina en **destino de enlace, no en competidora**.
+
+Caso fuente (research de cliente, 2026-08): el concepto clave del racional ya era
+keyword de una pieza propia publicada **5 semanas antes**.
+
+📏 **Es un chequeo distinto de la canibalización de GSC** (*Canibalización: no se
+descarta, se separa*, abajo). Esa mide **dos URLs vivas compitiendo por una query
+medida**; ésta es **pre-producción**: evita crear la segunda URL. Una es
+consolidación, la otra es prevención.
+
+### El pre-emptor de tesis no está en el mapa competitivo
+
+Quien te gana la tesis **puede no ser competidor de categoría**: una agencia de
+tendencias, un medio, un forecaster.
+
+**Búsqueda obligatoria:** ¿alguien más publicó este **MISMO concepto, con el mismo
+mecanismo**, antes? — no la misma keyword. Si la respuesta es sí:
+
+- el cliente **no puede presentar el concepto como hallazgo propio**, y eso **se dice
+  en el brief**;
+- **pero verifica si el pre-emptor compite en búsqueda.** Una landing de captura de
+  77 palabras sin JSON-LD **gana la narrativa y no gana el buscador**.
+  🎯 **Ganar la tesis ≠ ganar el SERP**, y confundirlo hace abandonar un ángulo que
+  estaba libre en el único terreno que se estaba disputando;
+- **riesgo nuevo que sí hay que medir:** que un motor de respuesta **atribuya el
+  concepto a la marca equivocada** → se agrega como métrica AEO explícita
+  (`04_AEO_GEO.md`).
 
 ## Contenido programático (programmatic SEO)
 
@@ -291,6 +364,14 @@ cola de días recientes **todavía se está consolidando** → `07_MEASUREMENT.m
   la query que efectivamente se va a atacar.
 - Inventar un formato nuevo cuando el propio sitio ya tiene un activo que sostiene
   posiciones no-marca y nadie lo replicó a las demás variantes del eje.
+- Proponer el ángulo de una pieza mirando sólo competidores, sin barrer las piezas
+  propias de los últimos 3 meses **por concepto** (canibalización interna, arriba).
+- Tratar un hito anual de marca como un artículo más: sin cadencia propia, cadencia
+  de mercado, ventana ni condición de caducidad del claim.
+- Dejar un **claim perecedero** publicado sin tarea de retiro con fecha — y sin
+  avisarle a quien opera los canales donde ese copy sigue vivo.
+- Abandonar un ángulo porque otro publicó la tesis primero, **sin verificar si ese
+  pre-emptor compite en búsqueda** (ganar la tesis ≠ ganar el SERP).
 
 > **Cross-refs:** estructura para ser citado → `04_AEO_GEO.md`. Autoría/E-E-A-T
 > → `03_EEAT_ENTITY.md`. Medir decay/posiciones → `07_MEASUREMENT.md`. Trampas de

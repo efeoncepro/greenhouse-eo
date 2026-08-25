@@ -40,7 +40,7 @@ variantes responsive/theme exactas, carga `references/deterministic-editorial-in
 gobierna el encoding cuando la visualización analítica lo requiere.
 Para Efeonce, cargar además `efeonce/EFEONCE_EDITORIAL_INFOGRAPHIC_SYSTEM.md`: gobierna paleta, shell de marca,
 arquetipos, sello `efeoncepro.com`, SVG directo y benchmark de shareability.
-Si la pieza se integrará en web, cargar también `.codex/skills/seo-aeo/references/editorial-image-seo.md` y el canon
+Si la pieza se integrará en web, cargar también `../seo-aeo/references/editorial-image-seo.md` y el canon
 `docs/operations/public-site-content-factory/EDITORIAL_INFOGRAPHIC_OPERATING_MODEL_V1.md`: body SVG,
 featured/OG raster, footer-only, descripción larga, legibilidad CSS y estados por canal son contratos distintos.
 Para una portada/hero que “parece producto”, el mismo gate sigue vigente: si contiene gráficos o copy exactos,
@@ -88,7 +88,10 @@ precio por crédito ni equivalencias por pieza.
 ├─ Operar el motor: workflow, roles, gobernanza, brand safety, SLAs de contenido .... 02_CONTENT_OPS_PIPELINE
 ├─ Elegir/armar un formato a fondo (blog, ebook, newsletter, webinar, video, pod) .. 03_FORMATS
 ├─ Multiplicar: atomizar 1 pilar en N átomos por canal, reciclar evergreen ......... 04_REPURPOSING_ENGINE
+├─ Derivar la convención/slots del cliente antes de atomizar (y su degradación) .... 04_REPURPOSING_ENGINE
 ├─ Distribuir/amplificar una pieza (owned/earned/paid, syndication, comunidades) ... 05_DISTRIBUTION_AMPLIFICATION
+├─ El canal lo opera un TERCERO: paquete de insumo, medición no nativa ............. 05_DISTRIBUTION_AMPLIFICATION
+├─ Una red social ocupa varias posiciones de página 1: superficie de búsqueda ...... 05_DISTRIBUTION_AMPLIFICATION
 ├─ Medir contenido→pipeline (leading/lagging, influenced pipeline, content ROI) .... 06_MEASUREMENT
 ├─ Producir con IA sin slop (Content Factory, fidelidad de voz, gobernanza) ........ 07_AI_CONTENT
 ├─ Diseñar/producir el sistema visual editorial, hero/body/OG y Media Library ..... references/agentic-editorial-visual-system

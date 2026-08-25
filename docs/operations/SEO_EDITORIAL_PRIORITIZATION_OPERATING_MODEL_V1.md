@@ -1,10 +1,11 @@
 # SEO Editorial Prioritization Operating Model V1
 
 > **Tipo de documento:** Modelo operativo (proceso repetible, agnóstico al cliente).
-> **Versión:** 1.1 · **Fecha:** 2026-08-25.
+> **Versión:** 1.2 · **Fecha:** 2026-08-25.
 > **Ámbito:** cómo Efeonce ejecuta un research de SEO/AEO y una priorización editorial para un cliente
 > con blog activo, de punta a punta: insumos, carriles, intake del sistema editorial, secuencia,
-> criterio de descarte, producción de briefs, entrega, verificación y medición.
+> criterio de descarte, producción de briefs, entrega, atomización y distribución, verificación y
+> medición.
 > **No gobierna:** el **oficio** (doctrina de striking distance, trampas de Search Console, citabilidad
 > AEO, schema, Query Fan-Out) — eso vive en la skill `seo-aeo`, módulos
 > [`02_SEO_CONTENT.md`](../../.codex/skills/seo-aeo/modules/02_SEO_CONTENT.md) y
@@ -80,6 +81,14 @@ debe dejar visible cuál sostiene cada afirmación.
 **Regla de honestidad (dura):** nunca presentar una estimación como medición. Un volumen de herramienta
 es demanda *estimada*; una impresión de Search Console es demanda *observada*. Cuando ambas conviven en
 la misma tabla, se rotulan por separado. Cuando la conclusión depende de la estimación, se dice.
+
+**Marcado de evidencia, y su viaje al entregable.** La jerarquía de la tabla se opera con un vocabulario
+cerrado de cinco marcas — **MEDIDO · OBSERVADO · ESTIMADO · INFERIDO · REPORTADO** — y ese marcado **no se
+queda en el research: viaja al brief, dato por dato**. Un dato REPORTADO (lo afirmó alguien) o INFERIDO (lo
+dedujimos nosotros) nunca se presenta como verificado en la pieza que el cliente va a leer. Corolario
+directo: la sección de límites del brief **transcribe los huecos del research sin maquillar** — qué no se
+pudo medir, qué herramienta quedó sin cuota y qué queda condicionado a un dato que todavía no llegó. Un
+hueco declarado es entregable honesto; un hueco tapado es un pasivo. Se verifica en el cierre (§10.8).
 
 **Regla de vigencia:** la documentación interna se lee como **historia de la estrategia**, no como
 estado. En el caso fuente, la serie por espacios ya estaba propuesta en un pitch anterior y diagnosticada
@@ -193,7 +202,7 @@ gastarlo, y **sin depender de la cuota compartida de un tercero** que se agota a
 
 **Y cada uso de la herramienta externa es una señal de backlog de producto.** Si un research vuelve a
 apoyarse en el mismo reporte externo ciclo tras ciclo, eso no es una preferencia metodológica: es una
-capacidad faltante con demanda demostrada. Se registra como tal —igual que el antipatrón 9 del §11
+capacidad faltante con demanda demostrada. Se registra como tal —igual que el antipatrón 9 del §12
 registra el caso inverso, reimplementar a mano lo que el portal ya tiene—.
 
 ---
@@ -332,6 +341,21 @@ apuntaba a una ruta bloqueada por `robots.txt`. Ninguno de esos defectos aparece
 keywords. Un tema con demanda publicado sobre una arquitectura que no lo expone no es una oportunidad:
 es trabajo que se pierde.
 
+#### El competidor más peligroso suele ser una pieza propia reciente
+
+Al validar un **ángulo** —no un tema, un ángulo— el reflejo es mirar competidores. Antes de eso hay que
+**barrer las piezas propias del cliente de los últimos tres meses y comparar conceptos, no keywords**: un
+H2 y una palabra del cuerpo bastan para que el territorio ya esté ocupado por la casa. Una comparación por
+keyword no lo detecta, porque la pieza vecina puede estar sosteniendo el concepto sin usar el término. En
+el caso fuente, el concepto central del racional ya era keyword de una pieza propia publicada cinco
+semanas antes.
+
+Cuando el solapamiento existe, la salida no es cambiar de tema: es **buscar el eje del material fuente que
+nadie ocupó** —ni el cliente ni el mercado— y **convertir la pieza vecina en destino de enlace, no en
+competidora**. Queda una pieza nueva con ángulo propio más un enlace interno que refuerza la que ya
+existe, en vez de dos páginas del mismo sitio disputándose la misma consulta: es el caso *consolidar* del
+§3, prevenido antes de nacer.
+
 ### 5.1 El toolkit del research — qué se corre y para qué
 
 Cuando el research corre por el camino de fallback (§1.1), el nivel 2 de los insumos se obtiene con
@@ -369,7 +393,7 @@ rankea uno o varios competidores y el cliente no. Es la materia prima del **Carr
 
 **5. Dimensionar un tema candidato** — `phrase_these` para métricas en lote de una lista concreta,
 `phrase_related` para el universo semántico del tema y `phrase_fullsearch` para variantes exactas. El
-descuento de las variantes que son la misma demanda se hace acá, al leer, no al presentar (§9.6).
+descuento de las variantes que son la misma demanda se hace acá, al leer, no al presentar (§10.6).
 
 **6. Construir el mapa de Query Fan-Out** — `phrase_questions`: las consultas en forma de pregunta,
 con su volumen. Son la materia prima **literal** de los H2 del brief: se usan como pregunta, no
@@ -380,17 +404,64 @@ de la consulta que se piensa atacar. Es el paso que evita comprometer un slot co
 intención no era la supuesta: en el caso fuente confirmó dos trampas de intención (SERP de diseño
 gráfico y de referencia educativa, no de hogar) y, corrido sobre la consulta correcta, destapó que se
 había descartado mal una familia entera de temas por haber leído el SERP de una consulta prima
-(§11.5).
+(§12.5).
 
 Dos advertencias gobiernan todo este toolkit. Ya están escritas en otra parte del modelo y acá solo
 se referencian:
 
 - **Los reportes pesados se cobran por línea devuelta** —relacionadas y preguntas, 40 unidades por
   línea en el caso fuente— y **ante cuota se reintenta en serie, no se relanza la flota**: §7,
-  "Dos lecciones operativas", y §11.8.
+  "Tres lecciones operativas", y §12.8.
 - **El SERP que devuelven estos reportes es una foto, no una serie temporal** (§2, nivel 3). Sirve
   para decidir intención y formato hoy; no sirve como línea base ni como medición de resultado —eso
-  sale del dato medido (§10)—.
+  sale del dato medido (§11)—.
+
+### 5.2 Cuando la pieza es un hito anual de marca
+
+Algunos clientes tienen una pieza que no es un artículo más: es un **hito anual de marca** —el color del
+año, el informe anual, un ranking, un premio—. Se reconoce porque tiene ediciones anteriores, porque el
+mercado publica su equivalente en la misma temporada y porque el cliente la usa como ancla de campaña.
+Esa pieza exige cuatro análisis que un artículo normal no necesita, y los cuatro son del research, no de
+la redacción.
+
+1. **La cadencia propia del cliente.** Cuándo publicó sus ediciones anteriores. El dato duro sale del
+   `datePublished` del JSON-LD de esas páginas, no de la fecha visible del artículo — que muchas veces es
+   la de la última edición en el CMS.
+2. **La cadencia del mercado.** Cuándo publica cada competidor y cada referente, **con fuente primaria**:
+   el dateline del comunicado, no la fecha de la nota que lo cubre. La nota puede ser semanas posterior y
+   corre toda la ventana hacia adelante.
+3. **La ventana.** Con las dos cadencias sobre la mesa se elige la fecha. Publicar **entre el competidor
+   directo y el referente global** maximiza la probabilidad de ser una fuente **ya existente** cuando el
+   mercado arme sus compilados — que es el momento en que la categoría gana enlaces.
+4. **El claim perecedero.** Un hito anual casi siempre habilita un claim del tipo "primera marca de X en
+   anunciar Y". Es verdad **hoy**, y la regla es dura: **todo claim perecedero se documenta con su
+   condición de caducidad y una tarea de retiro con fecha**. El retiro alcanza tres lugares — la pieza
+   publicada, el material de PR y **los assets ya distribuidos** (§9.2 cuando los publica un tercero). Un
+   claim que caduca sin retirarse deja de ser diferenciador y pasa a ser un pasivo.
+
+La fecha de un hito anual es además un **bloqueante de decisión, no un detalle de calendario**: si el
+cliente la mueve fuera de la ventana, el claim diferenciador puede dejar de ser verdad y la pieza cambia
+de ángulo. Eso se escala al operador **antes** de escribir el brief, con las dos opciones y su
+consecuencia editorial explícita (§4.1 — el calendario lo dicta el cliente).
+
+### 5.3 El pre-emptor de tesis no está en el mapa competitivo
+
+Quien gana la **tesis** puede no ser competidor de categoría: una agencia de tendencias, un medio, un
+forecaster. El mapa competitivo del paso 2 no lo va a mostrar, porque no compite por las mismas keywords
+ni vende lo mismo. Falta entonces una búsqueda explícita: **¿alguien publicó ya este mismo concepto, con
+el mismo mecanismo, antes que nosotros?** — el mismo *concepto*, no la misma keyword.
+
+Si la respuesta es sí, se derivan tres consecuencias y las tres se escriben en el brief:
+
+1. **El cliente no puede presentar el concepto como hallazgo propio.** Se dice en el brief, para que nadie
+   redacte una primicia que no lo es.
+2. **Ganar la tesis no es ganar el SERP.** Hay que verificar si el pre-emptor **compite en búsqueda**: una
+   landing de captura de menos de cien palabras y sin datos estructurados gana la narrativa y no gana el
+   buscador. La conclusión editorial es distinta según cuál de las dos cosas pasó, y la diferencia se mide,
+   no se supone.
+3. **Aparece un riesgo nuevo que hay que medir: que un motor de respuesta atribuya el concepto a la marca
+   equivocada.** Deja de ser una preocupación difusa y entra como **métrica AEO explícita** del ciclo
+   (§11).
 
 ---
 
@@ -415,6 +486,32 @@ En el caso fuente, dos temas con demanda limpia y SERP flojo se descartaron exac
 (18.100 + 1.900 en `acabado chukum`, la página informacional #1 del líder de categoría). Ambos se
 pasaron como señal de producto.
 
+### 6.1 La capa que gana enlaces es la que solo el cliente puede escribir
+
+El respaldo de producto no solo evita tráfico que no convierte: **es la materia prima de la única capa que
+gana enlaces de forma replicable**. Por eso, cuando el research identifica la página que concentra los
+dominios de referencia de la categoría (§5.1, reporte 3), la pregunta correcta no es *cuál* gana enlaces
+sino **por qué**.
+
+- Si los gana por **profundidad de fuente primaria** —un dato propietario, una cifra con su unidad, un
+  consejo honesto que puede frenar una venta—, ese es el motor y es replicable: el cliente lo puede
+  escribir porque es dueño del dato.
+- Si los gana por **músculo que el cliente no tiene** —un evento físico, PR sostenido, una publicación
+  impresa—, copiar el formato no reproduce el resultado. Se descarta como modelo y se dice por qué, en vez
+  de dejar en el brief una aspiración que nadie puede ejecutar.
+
+**El claim de producto bloquea el H2, no solo la frase.** La regla 1 de este capítulo se aplica también a
+la estructura: *si la ficha no lo declara literalmente, el H2 no se escribe*. No se rellena con lógica de
+oficio ("todo producto de esta familia se comporta así") ni con la ficha de otra marca; una palabra cambia
+el claim. Un H2 que depende de un dato que el cliente todavía no entregó queda **condicionado y nominado
+como tal** en el brief, con el dato faltante identificado y su dueño — no se redacta a la espera de que
+aparezca.
+
+**Y hay que declarar si el estándar propuesto es paridad o mejora.** Antes de presentar una capa como
+hueco a tapar, revisar si la edición anterior del propio cliente la tenía. Si no la tenía, no se está
+corrigiendo una carencia: se está **subiendo el estándar propio**. Decirlo cambia la conversación con el
+cliente —de reproche a propuesta— y cambia contra qué se compara el resultado.
+
 ---
 
 ## 7. Producción de briefs con subagentes
@@ -436,7 +533,7 @@ Patrón que funcionó y se adopta como estándar del modelo:
 5. **Una pasada de verificación adversarial al final, por un agente distinto al que escribió.** El
    verificador no revisa su propio trabajo y su encargo es refutar, no confirmar.
 
-### Dos lecciones operativas
+### Tres lecciones operativas
 
 - **Los agentes reportan de buena fe la causa que les da el mensaje de error de la herramienta.** Hay que
   verificarla. En el caso fuente, al agotarse la cuota de unidades de API, el proveedor respondía que *el
@@ -445,6 +542,15 @@ Patrón que funcionó y se adopta como estándar del modelo:
 - **Una flota en paralelo puede agotar la cuota de la API a mitad del trabajo.** Los reportes caros
   (relacionadas, preguntas) se cobran por línea devuelta. Cuando la cuota es el cuello de botella,
   **reintentar en serie**, no relanzar la flota.
+- **Un agente que no entrega no es un agente que entregó vacío.** En el caso fuente un agente construyó
+  tablas completas **atribuyéndolas a subagentes que nunca entregaron reporte**, y después se autocorrigió
+  retirando alrededor de una docena de afirmaciones. Tres defensas, en este orden: (a) **exigir el marcado
+  de evidencia por afirmación** (§2), que obliga a declarar de dónde salió cada fila y hace visible la que
+  no tiene origen; (b) **contar las salidas recibidas** contra las encargadas antes de integrar nada (la
+  nota de abajo); (c) cuando un agente **corrige la premisa del encargo**, verificarlo tú mismo antes de
+  aceptarlo o de rechazarlo — en ese mismo caso, dos agentes reemplazaron las tablas inventadas con dato
+  observado, el resultado contradecía la premisa que el orquestador les había dado, y el resultado era el
+  bueno.
 
 > Contexto de fondo: una flota parcial es una falla silenciosa — un lote que termina "completo" con
 > agentes caídos adentro se ve igual que un lote sano. Contar salidas, no confiar en el estado agregado.
@@ -454,8 +560,9 @@ Patrón que funcionó y se adopta como estándar del modelo:
 ## 8. La entrega — depositar los briefs en el sistema del cliente
 
 Contrato de alcance y de seguridad. **El paso a paso concreto vive en el runbook**
-[`producir-serie-de-briefs-seo.md`](../manual-de-uso/growth/producir-serie-de-briefs-seo.md) (en
-publicación al momento de escribir este modelo); acá van solo las reglas que no dependen del sistema.
+[`producir-serie-de-briefs-seo.md`](../manual-de-uso/growth/producir-serie-de-briefs-seo.md); acá van
+solo las reglas que no dependen del sistema — incluida la **verificación mecánica** del depósito, que en
+ese runbook es una lista de conteos y no un juicio a ojo.
 
 1. **La unidad de entrega es el slot, no el documento suelto.** Un brief entregado es un brief
    depositado en el slot que le corresponde dentro del sistema del cliente, con su fecha y su ubicación.
@@ -478,7 +585,7 @@ publicación al momento de escribir este modelo); acá van solo las reglas que n
 
 5. **Verificación adversarial de cierre.** Un agente **distinto al que escribió** revisa estructura,
    consistencia de cifras entre piezas de la serie y coherencia de las reglas comunes, con el checklist
-   del §9. No es un trámite: en el caso fuente esa pasada encontró defectos reales en **todas** las
+   del §10. No es un trámite: en el caso fuente esa pasada encontró defectos reales en **todas** las
    piezas, incluidos claims de producto no respaldados por ficha y afirmaciones de SERP que declaraban
    más posiciones de las que enumeraban.
 
@@ -488,7 +595,71 @@ documento no la duplica.
 
 ---
 
-## 9. Verificación y cierre
+## 9. Atomización y distribución
+
+El entregable no termina en el artículo. Cuando el ciclo incluye **piezas derivadas** —posts, carruseles,
+banners, video corto— la atomización es parte del brief y tiene sus propias reglas. Ninguna de las tres es
+una decisión de diseño: dos salen del intake (la convención del cliente y quién opera el canal) y una del
+research (que una plataforma sea superficie de búsqueda).
+
+### 9.1 La convención de assets se deriva del cliente, nunca se inventa
+
+Antes de escribir un plan de atomización hay que **inventariar los entregables reales del cliente** de los
+ciclos anteriores y derivar de ahí su **convención de nombres y sus slots**. El plan se escribe en el
+vocabulario del cliente, no en uno propio: un plan con nombres nuevos obliga a traducir a quien produce, y
+se abandona en el primer ciclo.
+
+Reglas del inventario:
+
+- **Un grep de patrón de nombre no es un inventario** (§12.10). Se barre **por carpeta y por extensión**,
+  no por patrón de nombre: si la convención cambió, un regex anclado a la vieja devuelve cero para el
+  período que ya migró y concluye una ausencia que no existe.
+- **Detectar la degradación de la convención**, que casi siempre está y casi nunca está reportada: un
+  código de slot que desaparece, el conteo de piezas por ciclo que baja, dos o tres convenciones
+  conviviendo el mismo mes, slots que se encogen mientras otros crecen. Es un hallazgo del intake y se
+  trata como los del §4.3 — **se reporta, no se corrige de oficio**, y con la cautela del §12.13 antes de
+  llevarlo al cliente.
+- **Cada pieza derivada se amarra a la sección del brief de donde sale su contenido.** Sin esa ancla,
+  diseño inventa el mensaje y la pieza derivada deja de decir lo que dice el artículo.
+- **Un slot condicionado a un dato no verificado se condiciona igual que su H2** (§6.1). Si el H2 no se
+  escribe hasta que llegue la ficha, la pieza derivada de ese H2 tampoco: se declara condicionada, con el
+  dato faltante nombrado.
+
+### 9.2 Cuando el canal lo opera un tercero: el modelo de handoff
+
+Un canal puede existir y **no operarlo Efeonce**: lo publica otra agencia, o el propio equipo del cliente.
+En ese caso el entregable **no es una parrilla, es un paquete de insumo**, y esa diferencia tiene cuatro
+consecuencias que se declaran por escrito antes de comprometer nada.
+
+- **Tabla campo por campo de lo que sí es responsabilidad propia:** imagen, título, descripción, URL de
+  destino, texto alternativo, tablero o categoría sugerida y fecha **sugerida**. Sugerida, no comprometida
+  — la fecha efectiva la decide quien publica.
+- **No se promete cobertura de publicación.** El objetivo propio medible es la **cobertura de insumo
+  entregado**; cuántas de esas piezas llegaron a publicarse no está bajo control propio y no puede ser el
+  KPI del servicio.
+- **La medición no es nativa.** Hay dos caminos y solo dos: pedirle el reporte a quien publica, o inferir
+  por tráfico de referencia hacia la URL de destino. **Se declara cuál de los dos antes de comprometer la
+  métrica**, porque miden cosas distintas y ninguno se improvisa a posteriori.
+- **El retiro de un claim perecedero (§5.2) hay que comunicárselo a quien publica**, que tiene copy vivo
+  con ese claim adentro. Esa comunicación es **un entregable con fecha y destinatario**, no un
+  recordatorio.
+
+### 9.3 Una red social puede ser una superficie de búsqueda
+
+Si al leer el SERP del vertical (§5.1, reporte 7) aparece una plataforma —Pinterest, YouTube, Reddit—
+ocupando **varias posiciones de la primera página**, esa plataforma deja de ser "un canal social" y pasa a
+ser **una segunda superficie de búsqueda**. Es un hallazgo del research, no una decisión de social media, y
+cambia cómo se escribe la pieza derivada:
+
+- el **título y la descripción** en esa plataforma se escriben con **la consulta**, no con el nombre de la
+  campaña;
+- el **destino** es la URL canónica del artículo, no una landing paralela;
+- el **tablero o playlist** se organiza por **tema perenne**, no por año, porque la superficie sigue
+  devolviendo esa pieza ciclos después.
+
+---
+
+## 10. Verificación y cierre
 
 Checklist obligatorio antes de dar por cerrada la serie; es el que ejecuta la pasada adversarial del
 §8.5. Se corre sobre el set completo, no pieza por pieza.
@@ -508,6 +679,10 @@ Checklist obligatorio antes de dar por cerrada la serie; es el que ejecuta la pa
    valores idénticos repetidos que huelen a agrupación por bucket de la fuente se señalan.
 7. **Cada dato interno citado fue re-verificado** contra el sitio o el runtime, no contra el documento
    que lo afirmaba.
+8. **Cada dato del brief lleva su marca de evidencia** (§2) y la sección de límites transcribe los huecos
+   del research **sin maquillar**: qué no se pudo medir, qué herramienta quedó sin cuota y qué H2 o pieza
+   derivada queda condicionada a un dato que todavía no llegó. Un dato REPORTADO o INFERIDO presentado sin
+   su marca es un hallazgo, aunque sea correcto.
 
 Cierre documental: el diagnóstico del cliente vive en `docs/audits/seo/` (una auditoría documenta el
 estado observado en una fecha y no se asume vigente por existir — ver
@@ -516,7 +691,7 @@ la doctrina nueva que emerja va a la skill `seo-aeo`, no acá.
 
 ---
 
-## 10. Cómo se mide el resultado
+## 11. Cómo se mide el resultado
 
 Tres reglas de medición. La instrumentación y el detalle metodológico están en el módulo
 [`07_MEASUREMENT.md`](../../.codex/skills/seo-aeo/modules/07_MEASUREMENT.md).
@@ -541,6 +716,13 @@ Tres reglas de medición. La instrumentación y el detalle metodológico están 
    otras páginas del propio sitio. Es un resultado neutro o negativo disfrazado de crecimiento, y se
    reporta como tal.
 
+**Métrica AEO cuando hubo un pre-emptor de tesis.** Si el research encontró que alguien publicó el mismo
+concepto antes (§5.3), la medición del ciclo incorpora una pregunta extra: **¿a qué marca le atribuyen el
+concepto los motores de respuesta?** No basta con que la pieza rankee — que un motor atribuya el concepto a
+la marca equivocada es un resultado negativo que ninguna métrica de posición muestra. Se mide preguntándole
+a los motores por el concepto y registrando la marca citada, con la misma disciplina de ventana y `as-of`
+que el resto de la medición.
+
 **Unidad de agregación.** Para striking distance la unidad correcta es el par `(query, página)`. Sumar
 impresiones por query **infla**, porque una búsqueda donde aparecen varias páginas del sitio genera una
 fila por página: en el caso fuente una consulta de marca aparecía con 300 páginas y sumaba 86.282
@@ -554,10 +736,11 @@ esas consultas incluye variantes que son la misma demanda y no es una cifra limp
 
 ---
 
-## 11. Antipatrones
+## 12. Antipatrones
 
-Ocho errores de método observados y corregidos en el caso fuente, más una novena regla de plataforma que
-el mismo caso destapó. Se enuncian como reglas del modelo.
+Trece reglas: los ocho errores de método observados y corregidos en el primer ciclo del caso fuente (1 a
+8), la regla de plataforma que ese mismo caso destapó (9) y cuatro errores de método del ciclo siguiente
+(10 a 13). Se enuncian como reglas del modelo.
 
 1. **No se usan impresiones de Search Console para juzgar contenido nuevo.** Es razonamiento circular:
    striking distance filtra páginas que ya rankean, y un tema sin contenido no puede aparecer ahí por
@@ -586,6 +769,22 @@ el mismo caso destapó. Se enuncian como reglas del modelo.
    dos hechos distintos. Un motor que existe y nadie usó para el cliente se ve, desde el research, igual
    que un motor que no existe. En el caso fuente se recalculó a mano un score que el reader canónico ya
    producía.
+10. **Un grep de patrón de nombre no es un inventario.** Un regex anclado a la convención vieja devuelve
+    cero para el período que ya migró a otra, y la conclusión "los entregables desaparecieron" resulta
+    falsa: existían, con otro nombre y otra extensión. **Para concluir una ausencia hay que cambiar el eje
+    de búsqueda —carpeta, extensión, fecha— y nombrar explícitamente dónde no se miró.**
+11. **El peso en caracteres no mide la calidad de una sección.** Llamar "flaca" a una capa del entregable
+    porque ocupa poco del documento confunde formato con cobertura: una checklist y una tabla son el
+    formato más denso que existe. **Se mide cobertura de decisiones, no volumen de texto.**
+12. **Una dificultad sospechosamente baja se verifica en el SERP antes de fijarse como objetivo.** Puede
+    ser demanda de referencia —códigos, muestrarios, nomenclatura— y no demanda del tema. Hasta
+    verificarla, la keyword entra al backlog como **oportunidad condicionada**, nunca como objetivo
+    comprometido. Es el vecino del antipatrón 5: allá se lee el SERP del eje equivocado, acá se cree una
+    métrica sin leer ningún SERP.
+13. **Un hallazgo de inventario local no es una acusación de proceso.** Una carpeta vacía o cruzada puede
+    ser sincronización de almacenamiento, no un incumplimiento de entrega. **Se reverifica con el equipo
+    dueño antes de reportarlo al cliente**, y se redacta como observación con su incertidumbre declarada,
+    no como conclusión.
 
 ---
 
@@ -612,7 +811,8 @@ el mismo caso destapó. Se enuncian como reglas del modelo.
   [`seguir-keywords-oportunidades-seo.md`](../manual-de-uso/growth/seguir-keywords-oportunidades-seo.md).
 - **Producción y entrega de la serie:** runbook
   [`producir-serie-de-briefs-seo.md`](../manual-de-uso/growth/producir-serie-de-briefs-seo.md)
-  (en publicación al momento de escribir este modelo) · plantilla de brief
+  (verificación mecánica del depósito, indentación de toggles y tablas, inventario de assets del
+  cliente) · plantilla de brief
   [`templates/content-brief-aeo.md`](../../.codex/skills/seo-aeo/templates/content-brief-aeo.md).
 - **Producción de la pieza:**
   [`AGENTIC_BLOGPOST_END_TO_END_RUNBOOK_V1.md`](public-site-content-factory/AGENTIC_BLOGPOST_END_TO_END_RUNBOOK_V1.md).

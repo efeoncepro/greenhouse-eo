@@ -1,7 +1,8 @@
 # 05 · Off-page / Autoridad (Digital PR + Reddit/UGC)
 
 > Carga para: backlinks, digital PR, brand SERP, menciones sin enlace, y el peso
-> creciente de Reddit/foros/UGC y comunidades. Sello: as-of 2026-06.
+> creciente de Reddit/foros/UGC y comunidades. Sello: as-of 2026-06; auditoría del
+> **motor de enlaces** y regla dura del **claim de producto** as-of 2026-08-25.
 
 ## Cambio de paradigma 2026: de "links" a "presencia"
 
@@ -59,6 +60,37 @@ objetivo sea que colegas, medios o especialistas compartan, mencionen, enlacen o
 Regla: **caso real -> objeto reutilizable -> evidencia/límites -> superficie enlazable -> revisión por pares ->
 distribución ganada -> medición**. No prometer backlinks y no usar compra, intercambio o outreach masivo como
 sustituto de utilidad editorial.
+
+### La capa que gana enlaces es la que sólo el cliente puede escribir
+
+Antes de proponer «hagamos contenido enlazable», **audita POR QUÉ gana enlaces la
+pieza que los gana**. La pregunta no es *qué formato tiene*, es *qué la hace
+irreemplazable*.
+
+**Si los gana por profundidad de fuente primaria** — dato propietario, cifra con
+unidad, consejo honesto que **puede frenar la venta** — ese es el motor **replicable**,
+porque la materia prima ya está dentro del cliente y nadie más la tiene.
+
+🔴 **Si los gana por músculo que el cliente no tiene, no se copia el motor.** Evento
+físico, PR sostenido con redacciones, publicación impresa: replicar eso es prometer un
+resultado que depende de una capacidad ausente. Nombra la asimetría en vez de copiarla.
+
+**Regla dura del claim de producto:**
+
+> **Si la ficha no lo declara literalmente, el H2 no se escribe.**
+
+- **NUNCA** rellenes una especificación con lógica de oficio («si es esmalte, entonces
+  el brillo será…»). **Una palabra cambia el claim** y el claim es responsabilidad
+  legal del cliente, no criterio editorial.
+- **NUNCA** completes con la ficha de **otra marca** del mismo segmento.
+- Si el dato no está, el H2 queda **condicionado y bloqueante**, con dueño y fecha —
+  no se publica a medias ni se sustituye por prosa vaga.
+
+⚠️ **Verifica si el estándar que estás proponiendo es paridad o mejora.** Si la
+**edición anterior del propio cliente tampoco tenía esa capa**, no estás tapando un
+hueco: estás **subiendo el estándar**. Decirlo cambia la conversación — de «nos falta
+algo» a «vamos a hacer algo que no habíamos hecho», y cambia también quién tiene que
+aprobar el esfuerzo extra.
 
 ## Brand SERP (lo que sale al buscar tu marca)
 

@@ -64,6 +64,81 @@ Reporta por separado: **external search**, **platform search/recommendation** y 
 impresiones de Google, feeds y búsqueda interna como una misma audiencia ni atribuyas causalidad comercial sólo
 porque una plataforma reporta alcance.
 
+### Cuando una red social ES una superficie de búsqueda
+
+El caso anterior es «esta pieza también se encuentra». Éste es más fuerte y cambia el
+copy: **si el SERP del vertical muestra a una plataforma ocupando varias posiciones de
+la primera página** (Pinterest, YouTube, Reddit, TikTok), esa plataforma dejó de ser
+«un canal social» y pasó a ser **una segunda superficie de búsqueda** del mismo
+mercado.
+
+**Cómo se verifica:** corre el SERP de las queries reales del vertical y **cuenta
+cuántas posiciones de la página 1 pertenecen a la plataforma**. Medido en el caso
+fuente (vertical de pintura/decoración MX, 2026-08): Pinterest ocupaba **#1, #9 y #10**
+en una query de color por espacio, y YouTube **#8 y #10** en una query de producto. Una
+posición es anécdota; tres es una superficie.
+
+**Qué cambia operativamente:**
+
+| Decisión | Canal social | Superficie de búsqueda |
+|---|---|---|
+| **Título** | nombre de la campaña, gancho de marca | **la consulta** que la gente teclea |
+| **Descripción** | caption de feed | respuesta autocontenida a esa consulta |
+| **Destino** | landing de campaña, link-in-bio | la **URL canónica** de la pieza |
+| **Tablero / playlist** | por campaña o por mes | por **tema perenne**, nunca por año |
+
+⚠️ **El «nunca por año» es la que más se pierde.** Un tablero «Tendencias 2027» deja
+de recibir tráfico en enero de 2028; el mismo contenido en un tablero por tema sigue
+capturando la consulta perenne y **acumula** autoridad de la superficie en vez de
+reiniciarla cada ciclo.
+
+📏 Esto **no** convierte la plataforma en canonical editorial (regla de arriba): el
+destino sigue siendo la URL propia. Cambia **cómo se escribe la pieza en la
+plataforma**, no dónde vive la verdad. Táctica de SERP y verificación del eje →
+`../seo-aeo/modules/02_SEO_CONTENT.md`.
+
+## Cuando el canal lo opera OTRO: el modelo de handoff (as-of 2026-08-25)
+
+El canal existe, la cuenta existe, pero **la opera un tercero** — otra agencia, el
+equipo interno del cliente, un partner. No es un canal *owned* con menos acceso: es
+**otro modelo de entregable**.
+
+🔴 **El entregable no es una parrilla, es un paquete de insumo.** Una parrilla implica
+que tú decides y publicas. Acá no haces ni lo uno ni lo otro, y presentarla como
+parrilla crea una expectativa que no puedes sostener.
+
+### Tabla campo por campo (qué SÍ es responsabilidad propia)
+
+| Campo | Responsabilidad | Nota |
+|---|---|---|
+| **Imagen** | propia | en la convención de assets del cliente (`04`) |
+| **Título** | propia | escrito para la superficie, no para la campaña (ver abajo) |
+| **Descripción** | propia | autocontenida; no depende de un caption que tú no controlas |
+| **URL de destino** | propia | la **canónica**, verificada viva antes de entregar |
+| **Alt** | propia | accesibilidad + descubribilidad |
+| **Tablero / categoría sugerida** | propia, **sugerida** | quien publica puede reubicarla |
+| **Fecha** | propia, **sugerida — nunca comprometida** | no controlas el calendario de publicación |
+| **Publicación** | **de un tercero** | — |
+| **Métricas nativas** | **de un tercero** | ver medición, abajo |
+
+### Las tres consecuencias que se declaran
+
+1. **No prometas cobertura de publicación.** El objetivo que sí es tuyo y sí es
+   auditable es **cobertura de insumo entregado**: cuántas piezas del paquete salieron
+   completas, a tiempo y en la convención acordada. Comprometer publicaciones sobre un
+   canal que no operas es prometer el trabajo de otro.
+2. **La medición no es nativa.** Sólo hay dos vías: **pedirle el reporte a quien
+   publica**, o **inferir por tráfico de referencia** al destino. 🔴 **Declara cuál de
+   las dos ANTES de comprometer la métrica** — mezclarlas, o cambiar de una a otra a
+   mitad del período, produce una serie que no compara consigo misma y que igual va a
+   un reporte de cliente. Método y límites de cada vía →
+   `../seo-aeo/modules/07_MEASUREMENT.md`.
+3. **El retiro de un claim perecedero hay que comunicárselo a quien publica.** Tiene
+   copy vivo con ese claim adentro. **Esa comunicación es un entregable con dueño y
+   fecha, no un recordatorio** — si no sale, el claim caducado sigue publicado en un
+   canal que tú no puedes editar. Contrato del claim perecedero →
+   `../seo-aeo/modules/02_SEO_CONTENT.md`.
+
 ## Distribución para clientes (agencia)
 
 Cuando el studio produce contenido para un cliente de Efeonce, el POE se ejecuta en los **canales del cliente** (su newsletter, sus redes, su PR), respetando su brand safety. La doctrina de servicio/ICP es de `efeonce-agency`.
@@ -77,9 +152,13 @@ Cuando el studio produce contenido para un cliente de Efeonce, el POE se ejecuta
 - [ ] Canal-market fit validado (audiencia presente + nativo producible).
 - [ ] Cada pieza social clasificada por rol y relación: cluster node federado o activation asset.
 - [ ] External search, platform discovery y progreso posterior conservan fuentes y denominadores separados.
+- [ ] Toda plataforma que ocupe **varias posiciones de página 1** en el SERP del vertical se trata como superficie de búsqueda: título con la consulta, destino canónico, tablero por tema perenne.
+- [ ] Si el canal lo opera un tercero: **paquete de insumo** campo por campo (fecha **sugerida**), objetivo de **cobertura de insumo entregado** y **vía de medición declarada** (reporte del tercero o tráfico de referencia).
+- [ ] Comunicación del **retiro de claims perecederos** a quien publica, con dueño y fecha.
 
 ## Cross-links
 
 - Átomos a distribuir → `04`; formatos → `03`; medir el rendimiento → `06`.
 - Paid → `digital-marketing`; social → `social-media-studio`; email → `greenhouse-email`; citabilidad/PR técnico → `seo-aeo`; economía de canal → `growth-marketing-cro`.
+- Medición no nativa (canal operado por un tercero) y contrato del claim perecedero → `../seo-aeo/modules/07_MEASUREMENT.md` y `../seo-aeo/modules/02_SEO_CONTENT.md`.
 - Artefacto → `templates/distribution-plan.md`.

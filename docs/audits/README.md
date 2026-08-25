@@ -23,6 +23,7 @@ Indice de auditorias tecnicas y operativas versionadas dentro de `docs/`.
 - [Hiring — quality assurance de selección y capacidad — 2026-07-30](hiring/GREENHOUSE_HIRING_QUALITY_ASSURANCE_AUDIT_2026-07-30.md)
 - [Hiring — vocabulario de etapas del pipeline — 2026-08-22](hiring/GREENHOUSE_HIRING_STAGE_VOCABULARY_AUDIT_2026-08-22.md) — 30 hallazgos, verificación adversarial completa; 17 particiones del mismo enum; el enum no tiene ADR
 - [Berel — diagnóstico SEO de cliente — 2026-08-25](seo/BEREL_SEO_DIAGNOSTIC_2026-08-25.md) — tráfico ~90% de marca; un activo editorial sostiene 14 keywords no-marca en top 3; 10 defectos de arquitectura, el techo lo fija que el sitio no permite encontrar sus 115 artículos; el carril de striking distance ya es operable en `/admin/growth/seo/keywords` y nadie lo había corrido para la cuenta
+- [Berel — Color del Año 2027 — research, ángulo y plan de lanzamiento — 2026-08-25](seo/BEREL_COLOR_DEL_ANO_2027_2026-08-25.md) — la pieza-hito anual del mismo cliente; el competidor más peligroso era una pieza propia y la tesis la pre-emptó una agencia de tendencias; la categoría en México está vacía de contenido, Berel no tiene un solo enlace editorial ni una nota de prensa mexicana fechada de su hito anual, y la URL destino ya devuelve HTTP 200 vacío. Documento que caduca por diseño
 
 - [Design Tokens](design-tokens/README.md)
 - [Cloud Cost](cloud-cost/README.md)

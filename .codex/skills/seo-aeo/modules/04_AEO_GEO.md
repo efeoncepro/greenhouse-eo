@@ -5,7 +5,7 @@
 > **citabilidad**, **prompt/answer-space research**, `llms.txt`, y tácticas
 > **por-motor** (AI Overviews/AI Mode, ChatGPT Search, Perplexity, Gemini,
 > Copilot). Sello: as-of 2026-06 — **reverifica con WebSearch antes de afirmar
-> cifras o features**.
+> cifras o features**; riesgo de **atribución equivocada** as-of 2026-08-25.
 
 ## Vocabulario (fíjalo)
 - **AEO** (Answer Engine Optimization) y **GEO** (Generative Engine
@@ -145,6 +145,39 @@ mueven la aguja en GEO; algunos la bajan.)
   visibilidad IA (`05_OFFPAGE_AUTHORITY.md`).
 - **Schema/JSON-LD** como hechos legibles por máquina (`01` + `templates/`).
 
+### Atribución equivocada: que el motor le dé tu concepto a otra marca
+
+Riesgo AEO que no aparece en ningún panel estándar y que hay que **medir explícitamente**
+cuando dos o más marcas publican **el mismo concepto** (misma tesis, mismo mecanismo,
+nombres distintos). El motor no está eligiendo un ranking: está **sintetizando**, y al
+sintetizar **atribuye**. Puede atribuirle el concepto a quien lo publicó primero, a
+quien tiene más autoridad de entidad, o a quien lo nombró de forma más recuperable —
+y ninguna de las tres tiene que ser tu cliente.
+
+**Cómo se mide** (se agrega al panel de prompts de `07_MEASUREMENT.md`):
+
+1. Corre los prompts del concepto **sin nombrar ninguna marca** («¿qué marca propuso
+   <concepto> para <año>?», «¿de quién es <tesis>?»).
+2. Registra, por respuesta: **a qué marca se le atribuye** el concepto, **si tu cliente
+   aparece**, y **en qué papel** (autor del concepto vs. mención lateral).
+3. Reporta como **tasa de atribución correcta** — no como *presence*. Aparecer citado
+   en una respuesta que le atribuye el concepto a otro **no es una victoria**: es
+   exactamente el fallo que se está midiendo.
+
+⚠️ **No lo confundas con Share of Voice.** SoV pregunta *cuánto apareces*; esto
+pregunta *de quién dice el motor que es la idea*. Un SoV alto con atribución
+equivocada es el peor resultado posible: financiaste la autoridad de otro.
+
+🎯 **Palanca correctiva:** entidad + fuente primaria, no volumen. Que el concepto sea
+recuperable **atado a la marca** — nombre propio del concepto, definición
+autocontenida en la propia URL canónica, `datePublished` verificable, autoría visible
+y menciones off-site que nombren ambos juntos (`03_EEAT_ENTITY.md`, `05`). Publicar
+más piezas sobre el concepto **sin** amarrar la entidad refuerza el concepto, no la
+atribución.
+
+📏 El chequeo previo es de pre-producción: **¿alguien publicó este mismo concepto con
+el mismo mecanismo antes?** → `02_SEO_CONTENT.md` (*pre-emptor de tesis*).
+
 ## PROMPT / ANSWER-SPACE RESEARCH (la nueva keyword research)
 
 La gente le *pregunta* a los LLMs distinto de cómo *teclea* en Google (más
@@ -204,6 +237,8 @@ LLMs. **Realidad 2026, sin endulzar:**
 - No cubrir el espacio de fan-out (solo la keyword principal).
 - Generar a escala con IA sin datos propios (cero citas + riesgo penalización).
 - No medir Share of Voice IA (no sabes si funciona).
+- No medir **atribución** cuando otra marca publicó el mismo concepto: un SoV alto con
+  el concepto atribuido a otro se lee como éxito y es el peor resultado.
 
 > **Cross-refs:** topical authority que alimenta el fan-out → `02_SEO_CONTENT.md`.
 > Entidad/Knowledge Graph → `03_EEAT_ENTITY.md`. Reddit/UGC/menciones → `05`.
