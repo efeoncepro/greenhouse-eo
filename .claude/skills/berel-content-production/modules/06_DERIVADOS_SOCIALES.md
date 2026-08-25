@@ -5,6 +5,25 @@
 > registro de cada red. La Modulación es la norma; el Playbook solo dice **dónde** y **cuándo** se
 > aplica.
 
+## 🔴 Efeonce entrega el insumo; no publica
+
+**Los canales de Berel los opera otra agencia.** Efeonce provee el paquete —copy, guion, specs,
+imagen y URL de destino— para que ellos publiquen. Consecuencias que no se negocian:
+
+- El entregable **nunca es una parrilla de publicación**: es un **paquete de handoff**. Las fechas
+  que se proponen son **sugeridas, no comprometidas**.
+- **No prometas cobertura de publicación.** El objetivo propio es **cobertura de insumo entregado**.
+- **La medición social no es nativa:** o se pide el reporte a quien publica, o se infiere por tráfico
+  de referencia al destino. No presentes métricas de la cuenta como propias.
+- 🔴 **Cuando caduca un claim, hay que avisarle a quien publica**, porque tiene copy vivo en la
+  cuenta.
+- Del lado del cliente: **avisar cuando los artículos estén cargados en el CMS con sus imágenes** y
+  **decir qué artículos tendrán material social**, para que el cliente programe y agregue en Notion
+  las fechas tentativas de posteo (→ [`09_RECOMENDACIONES_DEL_CLIENTE.md`](09_RECOMENDACIONES_DEL_CLIENTE.md)).
+
+Modelo de handoff completo: `content-marketing-studio/modules/05_DISTRIBUTION_AMPLIFICATION.md`
+(§"El canal lo opera un TERCERO").
+
 ## Prerrequisito obligatorio
 
 El artículo debe estar **escrito** (Reescritura V1 o Artículo V1) y su **Banner N2 🔁 especificado**.
