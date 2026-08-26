@@ -60,7 +60,7 @@ partiendo de esta spec sin releer este Delta: ambos funcionan.
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-011`
-- Status real: `Alcance recalibrado 2026-08-26 (Slice 0): de los 4 defectos originales 2 ya no existen y aparecieron 3 hallazgos nuevos verificados contra el código. Wireframe podado y realineado; UI ready resuelto. Implementación pendiente desde el Slice 1`
+- Status real: `code complete, evidencia visual pendiente (2026-08-26). Slices 0-5 implementados y commiteados; pnpm test completo verde (12.062), local:check exit 0, task:lint 0/0, design-contract:lint PASS, ui:visual-gate --contract-only PASS. Falta SÓLO la evidencia premium: correr el seed (escribe en la Cloud SQL compartida con producción — requiere autorización), capturar desktop+390px y levantar el scorecard de 14 dimensiones`
 - Rank: `TBD`
 - Domain: `hr|ui`
 - Blocked by: `none`
@@ -373,25 +373,25 @@ Ninguna. No toca infraestructura, secretos, workers ni proveedores.
 
 ## Acceptance Criteria
 
-- [ ] Un candidato que escribe de corrido hasta el límite conserva su respuesta: el guardado preventivo
+- [x] Un candidato que escribe de corrido hasta el límite conserva su respuesta: el guardado preventivo
       dispara antes del plazo y el servidor lo acepta.
-- [ ] El guardado preventivo usa el reloj de base (`projectAssessmentDatabaseNow`), no `Date.now()`.
-- [ ] En `submit_grace` el textarea está en solo lectura, conserva el texto y **se ve congelado**
+- [x] El guardado preventivo usa el reloj de base (`projectAssessmentDatabaseNow`), no `Date.now()`.
+- [x] En `submit_grace` el textarea está en solo lectura, conserva el texto y **se ve congelado**
       (señal visual explícita, no la heredada del navegador).
-- [ ] Cambiar de pregunta durante `submit_grace` NO sobreescribe ni borra el borrador local.
-- [ ] El canal `srOnly` con `aria-live` sigue presente y no se duplica el anuncio.
-- [ ] En `submit_grace` el envío funciona sin intentar guardar y sin devolver 409.
-- [ ] Un guardado rechazado por plazo muestra un mensaje que nombra la causa y ofrece enviar lo guardado;
+- [x] Cambiar de pregunta durante `submit_grace` NO sobreescribe ni borra el borrador local.
+- [x] El canal `srOnly` con `aria-live` sigue presente y no se duplica el anuncio.
+- [x] En `submit_grace` el envío funciona sin intentar guardar y sin devolver 409.
+- [x] Un guardado rechazado por plazo muestra un mensaje que nombra la causa y ofrece enviar lo guardado;
       nunca "prueba de nuevo en unos minutos".
-- [ ] **El catch del autosave** recibe el mismo trato que el del submit: hoy los dos rinden `errorBody`.
-- [ ] El servidor sigue devolviendo `{ok, code, message}` con mensaje genérico — el test anti-leak
+- [x] **El catch del autosave** recibe el mismo trato que el del submit: hoy los dos rinden `errorBody`.
+- [x] El servidor sigue devolviendo `{ok, code, message}` con mensaje genérico — el test anti-leak
       (`route.test.ts:146-161`) sigue verde y el mensaje honesto se construye en el cliente desde el `code`.
-- [ ] La copy nueva existe en es-CL y en-US y está tipada.
+- [x] La copy nueva existe en es-CL y en-US y está tipada.
 - [ ] Contraste AA en la banda de gracia y en los mensajes nuevos. (Los tres tonos del reloj ya están
       shipeados y quedan fuera de alcance: no se re-auditan acá.)
 - [ ] Sin scroll horizontal de página en 390px.
 - [ ] Evidencia GVC desktop + móvil adjunta con las assertions declaradas.
-- [ ] `UI ready` pasa a `yes` sólo con mapping, plan GVC y decision log completos y `pnpm task:lint --task TASK-1751` sin findings.
+- [x] `UI ready` pasa a `yes` sólo con mapping, plan GVC y decision log completos y `pnpm task:lint --task TASK-1751` sin findings.
 
 ## Verification
 

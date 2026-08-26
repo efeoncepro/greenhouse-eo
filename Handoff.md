@@ -12,6 +12,16 @@
 
 **Gates abiertos del cliente:** N48 es archivo de 2024 y requiere vigencia/derechos; N49 requiere revisión institucional y no admite CTA comercial; N50 espera confirmar consolidación y canónica. No se produjo arte, no se publicó en CMS y no se programaron redes. Evidencia: [`auditoría fechada`](docs/audits/seo/BEREL_NOVEMBER_DECEMBER_2026_CONTENT_PRODUCTION_2026-08-26.md).
 
+## 2026-08-26 — TASK-1751: la rendición del assessment deja de perder respuestas
+
+**Estado: `code complete, evidencia visual pendiente`.** Slices 0-5 commiteados, sin push. `pnpm test` completo verde (12.062), `local:check` exit 0, `task:lint` 0/0, `design-contract:lint` PASS, `ui:visual-gate --contract-only` PASS.
+
+**Lo único que falta, y por qué no lo hice:** la evidencia premium exige correr `scripts/hiring/_seed-task-1751-gvc.ts`, que **escribe en la Cloud SQL compartida con producción**. Es una mutación que corresponde autorizar aparte, no arrastrar dentro de un slice. El seed está committeado, lintado, tipado y con `--cleanup`; usa helpers canónicos, deriva su sujeto con `resolveLiveTestCandidateFixture` (ISSUE-159) y declara `data_origin='smoke_test'` (TASK-1739). Después de correrlo: capturar desktop+390px y levantar el scorecard de 14 dimensiones.
+
+**No re-descubrir:** de los 4 defectos declarados **2 no existían** (el reloj ya era `sticky`; los avisos nunca fueron sólo `srOnly`), y la copy que el wireframe proponía —«puedes enviar lo que alcanzaste a guardar»— es **falsa**: el servidor exige la evaluación completa, así que con faltantes enviar es imposible y el CTA no se renderiza. Detalle en el `## Delta 2026-08-26` de la spec.
+
+**Riesgo residual:** el guardado preventivo nunca se ejercitó contra runtime real; su respaldo son tests unitarios más el test del borde `answer_deadline − ε` que esta task agregó porque no existía.
+
 ## 2026-08-26 — Hiring: auditoría de estado real y corrección de la contabilidad documental
 
 **Sólo documentación; runtime intacto.** Detalle completo, método y hechos verificados: [`auditoría fechada`](docs/audits/hiring/GREENHOUSE_HIRING_DOMAIN_STATE_AUDIT_2026-08-26.md).
@@ -488,42 +498,3 @@ hidratación o red. Esto valida el mockup local; no es evidencia de React Email 
 La skill espejo `greenhouse-email` ahora carga este contrato, corrige `broadcast !== marketing`, fija Efeonce como
 masterbrand y conserva rollout legacy/cohorts sin big bang. Siguiente paso: aceptar la ADR y recién entonces abrir
 la child foundation byte-idéntica; el mockup no prueba React Email, envío, deploy ni provider.
-
-## 2026-08-23 — TASK-1771: el carril automático tiene reversa; el gate vivo casi manda un correo
-
-**Estado: `code complete, rollout pendiente`.** Slices 1-4 en `develop` local, sin push: `617d18df7`,
-`146242339`, `d5914c841`, `0f558666a`. Más `ISSUE-162` (`9d1db5252`) y la recalibración de la spec
-(`12868f9c7`). Nada desplegado, así que la task **no se mueve a `complete`**.
-
-**Dos premisas de la spec estaban muertas al empezar, y las dos cambiaban decisiones.** La restricción de
-orden («va ANTES del colapso de `TASK-1754`») ya no aplica: esa task cerró y aplicó su contract. Y las 4 filas
-en callejón **ya no están `closed`** — `TASK-1748` cambió el archivado para sellar `archived_at` en vez de
-escribir la etapa, así que volvieron a cumplir `stage = trigger_stage`. La decisión no cambia (**sin
-backfill**, siguen siendo smoke), pero el filtro de procedencia del reader dejó de ser higiene: sin él la
-métrica nacía en 2 y su steady = 0 era inalcanzable el primer día.
-
-**La condición de avance es «hoy resolvería `assigned`», no «difiere de lo registrado»**, y no es preferencia.
-Ejercitando el resolver real contra PG sobre las cuatro filas: dos dicen `volume_cap` y hoy evaluarían
-`policy_disabled`. Con el criterio laxo el command las libera para volver a quemar la clave con otra razón —
-y cada ciclo inútil **gasta una de las tres recuperaciones de esa persona**, así que le consume el presupuesto
-a quien dice ayudar.
-
-**🔴 El gate vivo asignó de verdad en una versión intermedia** y dejó un `hiring.assessment.assigned` en
-estado `pending` —el evento del que cuelga el correo al candidato— apuntando a una instancia que el teardown
-ya había borrado. El publisher corre **cada 2 minutos sobre la base compartida**. Se retiró con
-verify-then-delete; readback posterior 0. La causa no fue el teardown: el encabezado del test **afirmaba** que
-nunca llegaba a `assigned`, y eso era cierto cuando se escribió. **Un comentario no es una guarda.** Quedó
-enforced (la policy se apaga antes del reintento + assert de cero instancias).
-
-**Un verde falso que vale para todos:** leí «exit 0» de `pnpm typecheck | grep | head` — era el exit del
-`head`. Un import roto pasó como verde. **Nunca leer el exit code de un comando encadenado.** Lo cacé por una
-ausencia en `git diff --cached --stat`, no por un gate.
-
-**Gates:** `pnpm lint` exit 0 · `pnpm typecheck` exit 0 · `src/lib/hiring` + `src/lib/reliability` 1.812
-verdes · gate vivo 2/2 en dos corridas seguidas, `awaiting_terminal` = 13 antes y después. `pnpm test`
-completo y `pnpm build` **no** se corrieron (el build consume ~30 GB y espera autorización).
-
-**Pendiente bloqueante para cerrar:** release + la `Production verification sequence` + la migración del
-`COMMENT` de `superseded_at`, parqueada en `docs/tasks/pending-migrations/` con su condición (**el release que
-despliega el command ya ocurrió**, verificado contra `origin/main`). Aplicarla antes describiría en la base una
-capacidad que el runtime desplegado no tiene — el error simétrico de `ISSUE-161`.
