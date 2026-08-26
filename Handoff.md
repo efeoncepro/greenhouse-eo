@@ -14,9 +14,9 @@
 
 ## 2026-08-26 — TASK-1751: la rendición del assessment deja de perder respuestas
 
-**Estado: `code complete, evidencia visual pendiente`.** Slices 0-5 commiteados, sin push. `pnpm test` completo verde (12.062), `local:check` exit 0, `task:lint` 0/0, `design-contract:lint` PASS, `ui:visual-gate --contract-only` PASS.
+**Estado: `complete`.** Sin push. `pnpm test` completo verde (12.062), `local:check` exit 0, los cuatro gates de UI en PASS, scorecard 4.54.
 
-**Lo único que falta, y por qué no lo hice:** la evidencia premium exige correr `scripts/hiring/_seed-task-1751-gvc.ts`, que **escribe en la Cloud SQL compartida con producción**. Es una mutación que corresponde autorizar aparte, no arrastrar dentro de un slice. El seed está committeado, lintado, tipado y con `--cleanup`; usa helpers canónicos, deriva su sujeto con `resolveLiveTestCandidateFixture` (ISSUE-159) y declara `data_origin='smoke_test'` (TASK-1739). Después de correrlo: capturar desktop+390px y levantar el scorecard de 14 dimensiones.
+**Lo que dejó la captura premium, y es el argumento a favor de correrla:** cuatro defectos que ningún test veía — contraste AA pre-existente de 2.43:1 en el contador, el placeholder haciendo de **nombre accesible** del textarea (anti-patrón de años), un ícono de «enviar» sobre un mensaje de «no puedes enviar», y la superficie sin declarar su recipe. Un quinto hallazgo era del gate, no del código: el stepper ya vive en un scroller contenido, así que se declaró la excepción en vez de romper el patrón. Seed ejecutado y limpiado, residuo verificado en cero.
 
 **No re-descubrir:** de los 4 defectos declarados **2 no existían** (el reloj ya era `sticky`; los avisos nunca fueron sólo `srOnly`), y la copy que el wireframe proponía —«puedes enviar lo que alcanzaste a guardar»— es **falsa**: el servidor exige la evaluación completa, así que con faltantes enviar es imposible y el CTA no se renderiza. Detalle en el `## Delta 2026-08-26` de la spec.
 

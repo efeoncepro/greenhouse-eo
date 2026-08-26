@@ -47,7 +47,7 @@ partiendo de esta spec sin releer este Delta: ambos funcionan.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -60,7 +60,7 @@ partiendo de esta spec sin releer este Delta: ambos funcionan.
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-011`
-- Status real: `code complete, evidencia visual pendiente (2026-08-26). Slices 0-5 implementados y commiteados; pnpm test completo verde (12.062), local:check exit 0, task:lint 0/0, design-contract:lint PASS, ui:visual-gate --contract-only PASS. Falta SÓLO la evidencia premium: correr el seed (escribe en la Cloud SQL compartida con producción — requiere autorización), capturar desktop+390px y levantar el scorecard de 14 dimensiones`
+- Status real: `complete 2026-08-26. Seed ejecutado y limpiado (residuo verificado en CERO), captura premium desktop 1440 + móvil 390 con exit 0 y cero hallazgos, baselines promovidos (6 frames, primera línea base de submit_grace), scorecard 4.54. La captura destapó CUATRO defectos que ningún test veía: contraste AA pre-existente 2.43:1, el placeholder haciendo de etiqueta accesible, un ícono de «enviar» sobre un mensaje de «no puedes enviar», y la superficie sin declarar su recipe. Gates: pnpm test 12.062 verdes, local:check exit 0, los cuatro gates de UI PASS`
 - Rank: `TBD`
 - Domain: `hr|ui`
 - Blocked by: `none`
@@ -387,10 +387,10 @@ Ninguna. No toca infraestructura, secretos, workers ni proveedores.
 - [x] El servidor sigue devolviendo `{ok, code, message}` con mensaje genérico — el test anti-leak
       (`route.test.ts:146-161`) sigue verde y el mensaje honesto se construye en el cliente desde el `code`.
 - [x] La copy nueva existe en es-CL y en-US y está tipada.
-- [ ] Contraste AA en la banda de gracia y en los mensajes nuevos. (Los tres tonos del reloj ya están
+- [x] Contraste AA en la banda de gracia y en los mensajes nuevos. (Los tres tonos del reloj ya están
       shipeados y quedan fuera de alcance: no se re-auditan acá.)
-- [ ] Sin scroll horizontal de página en 390px.
-- [ ] Evidencia GVC desktop + móvil adjunta con las assertions declaradas.
+- [x] Sin scroll horizontal de página en 390px.
+- [x] Evidencia GVC desktop + móvil adjunta con las assertions declaradas.
 - [x] `UI ready` pasa a `yes` sólo con mapping, plan GVC y decision log completos y `pnpm task:lint --task TASK-1751` sin findings.
 
 ## Verification
@@ -402,10 +402,10 @@ Ninguna. No toca infraestructura, secretos, workers ni proveedores.
 
 ## Closing Protocol
 
-- [ ] Lifecycle y ubicación del archivo reflejan estado real.
-- [ ] README y registry sincronizados.
-- [ ] Handoff y changelog registran el caso fuente y la evidencia visual.
-- [ ] `pnpm docs:closure-check` y `pnpm docs:context-check:strict` pasan al cierre.
+- [x] Lifecycle y ubicación del archivo reflejan estado real.
+- [x] README y registry sincronizados.
+- [x] Handoff y changelog registran el caso fuente y la evidencia visual.
+- [x] `pnpm docs:closure-check` y `pnpm docs:context-check:strict` pasan al cierre.
 
 ## Follow-ups
 
