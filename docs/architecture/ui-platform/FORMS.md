@@ -84,6 +84,75 @@ Loading skeleton para resolución de sesión:
 4. **Validación** → `@hookform/resolvers` con schemas inline (no Zod — no está instalado)
 
 
+## Estado de un control — nombre accesible y campo congelado (TASK-1751)
+
+Tres contratos de control de formulario, **domain-free**, medidos en vivo el 2026-08-26 sobre la
+superficie de rendición de assessment. Los tres pasaban `lint`, `typecheck`, `build` y la suite del
+dominio en verde; ninguno era visible leyendo el diff.
+
+### 1. Un `placeholder` NUNCA es el nombre accesible de un campo
+
+El `placeholder` es **texto de ejemplo dentro de la caja**: desaparece al primer carácter, no lo
+anuncian todos los modos de lectura y no sobrevive al autocompletado. Un control cuya única
+identificación es el placeholder **no tiene nombre accesible** — para un lector de pantalla es "campo
+de texto, sin etiqueta".
+
+- **SIEMPRE** todo control de formulario declara su nombre por `<label for>` (o label envolvente) o,
+  cuando la composición no admite label visible, por `aria-label` / `aria-labelledby` propio.
+- **El `placeholder` queda para el EJEMPLO DE FORMATO** (`+56 9 1234 5678`, `nombre@empresa.cl`),
+  nunca para decir qué es el campo.
+- El texto del nombre es **copy**: sale de `src/lib/copy/*` como cualquier string visible (bilingüe
+  donde la superficie lo sea), no un literal en JSX.
+
+**Cómo se descubre (y por qué llevaba años sin verse):** mientras el placeholder está presente, axe
+resuelve el nombre accesible desde él y el check `label` pasa. El defecto sólo se destapó al **ocultar
+el placeholder en solo lectura** — un campo congelado no puede invitar a escribir — y ahí el textarea
+se quedó sin ningún nombre y axe lo marcó. Corolario: **un check `label` verde no prueba que exista
+una etiqueta**; prueba que existe *algún* texto del que colgar el nombre, y el placeholder es el peor.
+
+> Evidencia: `src/components/greenhouse/hiring/assessment/AssessmentTakingClient.tsx:743-744`
+> (`aria-label` propio + placeholder condicionado a que el campo sea editable).
+
+### 2. Un campo congelado necesita señal visual PROPIA
+
+Al pasar un control de `disabled` a `readOnly`, **el gris lo ponía el navegador**: era el estilo de UA
+para `:disabled`, no una regla del módulo. Con `readOnly` ese estilo desaparece y el campo **parece
+editable** — invita a escribir y no responde.
+
+- Si un módulo/`sx` **no declara `:disabled`, tampoco declara `:read-only`**. Hay que agregar la regla
+  explícita al hacer el cambio; no hay herencia entre ambos estados.
+- La señal es del estado, no decorativa: fondo alterno, borde distinto (p. ej. `dashed`), texto
+  secundario, `cursor: default` y `resize: none` en un `textarea`.
+- Sigue siendo **contenido legible**: el contraste del texto congelado responde al piso AA (4.5:1),
+  no al token `--text-disabled`.
+
+> Evidencia: `src/components/greenhouse/hiring/assessment/AssessmentTaking.module.css:627`
+> (`.textArea:read-only`, agregada junto con el cambio de `disabled` → `readOnly`).
+
+### 3. `readOnly` sobre `disabled` es una decisión de accesibilidad, no de estilo
+
+`disabled` saca el control del **tab order** y lo marca como no disponible: no se puede enfocar,
+seleccionar ni copiar con el teclado, y los modos de interacción de lector de pantalla lo saltan.
+Para un campo cuyo contenido el usuario **debe poder releer o copiar** — una respuesta ya escrita, un
+dato calculado, un valor congelado por una ventana de tiempo — `disabled` es la opción **incorrecta**:
+le esconde su propio dato.
+
+| Intención | Atributo |
+|---|---|
+| El valor debe poder leerse/copiarse, pero no editarse | `readOnly` |
+| El control no aplica en este estado y su valor no importa | `disabled` |
+
+**Matiz de spec HTML (no es una inconsistencia — hay que declararlo):** `readonly` **no aplica** a
+`<input type="checkbox">`, `type="radio"`, `range`, `color`, `file` ni a los `type` de botón. En un
+grupo mixto, la forma correcta es **asimétrica**: `readOnly` en los campos de texto y `disabled` en
+las opciones. Al escribir esa asimetría, dejarla comentada — de lo contrario el siguiente lector la
+"unifica" y rompe la lectura del texto.
+
+> Evidencia: mismo componente — `readOnly` en el `textarea`
+> (`AssessmentTakingClient.tsx:746`) y `disabled` en las opciones `checkbox`/`radio`
+> (`AssessmentTakingClient.tsx:701,728`).
+
+
 ## Calendar Architecture
 
 ### Capacidad disponible (sin usar)

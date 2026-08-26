@@ -104,6 +104,33 @@ const loadData = useCallback(async () => {
 ) : /* render normal data */}
 ```
 
+### Una acción que no puede tener efecto no se ofrece (TASK-1751)
+
+Un control **deshabilitado sigue siendo una oferta**: comunica "esto se puede hacer, todavía no", e
+invita a buscar cómo habilitarlo. Cuando la acción **no puede tener efecto en ningún camino desde este
+estado**, la oferta es falsa y desvía al usuario de la acción que sí corresponde.
+
+- **Si la acción es imposible en este estado → no renderizar el control.** El mensaje que explica por
+  qué (banda, `EmptyState`, `Alert`) es lo que ocupa ese lugar, y dice qué hacer en su lugar.
+- **Si la acción es posible pero falta un requisito que el usuario puede resolver acá → `disabled`**
+  con el requisito dicho a la vista (helper text, validación, contador). El deshabilitado sólo se
+  justifica cuando el camino a habilitarlo es visible en la misma pantalla.
+- **Nunca deshabilitar en lugar de explicar.** Un control gris sin causa a la vista es la peor de las
+  dos: ni ejecuta ni informa.
+
+Aplica igual al botón **"Reintentar"** del bloque de error de arriba: el contrato canónico de error de
+API expone `actionable` justamente para esto — con `actionable: false` la causa es estructural
+(identidad no enlazada, permiso revocado, configuración faltante) y reintentar **no puede** resolverla,
+así que el CTA no se renderiza y el `EmptyState` queda con la acción real (contactar a quien
+corresponda). Contrato: `src/lib/api/canonical-error-response.ts` + `parse-error-response.ts` (ver
+`CLAUDE.md` § *Canonical API error response contract*). El snippet de arriba renderiza "Reintentar"
+incondicionalmente porque su `catch` sólo cubre fallas de red — en cuanto una vista propague `code` /
+`actionable`, el CTA pasa a ser condicional.
+
+> Evidencia: `src/components/greenhouse/hiring/assessment/AssessmentTakingClient.tsx:764` — con
+> respuestas faltantes dentro de la ventana de gracia, el CTA de envío **no se renderiza**; la banda
+> de estado explica por qué y la banda misma cambia de texto según la rama.
+
 ### Mutation feedback (toasts)
 
 Toda mutación (POST, PATCH, PUT, DELETE) debe mostrar feedback via toast:

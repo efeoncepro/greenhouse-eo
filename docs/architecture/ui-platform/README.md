@@ -49,10 +49,11 @@ componentes MUI/Vuexy a Globe ni conviertas el Lab en una dependencia de runtime
 | Experiencia conversacional de Nexa (shell canónico + coreografía + contratos surfaceContext/renderPlan/evidence + feature-primitives + cómo agregar un dominio) | [CONVERSATIONAL_EXPERIENCE.md](./CONVERSATIONAL_EXPERIENCE.md) |
 | Estado de servidor (React Query) y de cliente | [STATE.md](./STATE.md) |
 | Formularios, calendario, fechas, rich text, drag&drop, file upload | [FORMS.md](./FORMS.md) |
+| Estado de un control: nombre accesible (el `placeholder` NO es etiqueta), señal visual del campo congelado, `readOnly` vs `disabled` | [FORMS.md § Estado de un control](./FORMS.md#estado-de-un-control--nombre-accesible-y-campo-congelado-task-1751) |
 | Tablas operativas + densidad + TanStack | [TABLES.md](./TABLES.md) |
 | Motion (CSS Tier 1 / framer-motion / GSAP Motion Primitive) | [MOTION.md](./MOTION.md) |
 | i18n (next-intl, locales, RTL-ready) | [I18N.md](./I18N.md) |
-| Error handling & feedback, breadcrumbs, progressive disclosure, tabs que navegan a rutas hermanas (Route Tabs) | [PATTERNS.md](./PATTERNS.md) |
+| Error handling & feedback, breadcrumbs, progressive disclosure, tabs que navegan a rutas hermanas (Route Tabs), cuándo NO ofrecer una acción (en vez de deshabilitarla) | [PATTERNS.md](./PATTERNS.md) |
 | Pasar un color del theme a un chart ApexCharts sin que reviente bajo `cssVariables` (`resolveApexColor`) | [PRIMITIVES.md § ApexCharts Runtime Wrapper](./PRIMITIVES.md#apexcharts-runtime-wrapper) |
 | Implementar mocks de Claude Design (.dc.html) — tabla mock→tokens + checklist | [CLAUDE_DESIGN_TO_GREENHOUSE_BRIDGE.md](./CLAUDE_DESIGN_TO_GREENHOUSE_BRIDGE.md) |
 | Gobernanza de vistas (route groups + authorizedViews + entitlements) | [GOVERNANCE.md](./GOVERNANCE.md) |

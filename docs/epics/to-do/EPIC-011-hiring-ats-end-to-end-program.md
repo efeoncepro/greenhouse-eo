@@ -302,10 +302,20 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   11 personas sintéticas quedan fuera por su `lifecycle_status`, no por el filtro), el archivado escribe sólo sobre la
   postulación cuando la spec definía tres entidades, y las 9 huérfanas del lane B siguen sin decisión. Sin efecto
   visible hoy; se escriben porque una deuda que no duele es la que se olvida.
-- `TASK-1751` — El candidato no ve su reloj ni entiende por qué no puede enviar: el temporizador de la rendición no
-  sigue el scroll, los avisos de 5 y 1 minuto son `srOnly` (invisibles para quien ve), la gracia de 30 minutos se rompe
-  con texto sin guardar y el error final manda a reintentar algo imposible. Caso real medido sobre una candidata que
-  perdió una respuesta escrita teniendo 26 minutos de gracia disponibles.
+- `TASK-1751` — **La fase de gracia deja de prometer lo que el servidor no puede aceptar.** **✓ complete (2026-08-26,
+  en `develop`; sin promover a producción).** Caso real: una candidata perdió una respuesta escrita teniendo 26 minutos
+  de gracia disponibles. **Alcance real ≠ alcance declarado:** de los cuatro defectos que la spec listaba el 2026-08-19,
+  **dos fueron refutados contra el código** — el reloj ya seguía el scroll (`sticky`, arreglado 2h43m después de crearse
+  la task) y los avisos de 5 y 1 minuto nunca fueron sólo `srOnly` (existe un canal visible en paralelo dentro del
+  reloj). Quedaron los dos del **guardado**, que son el daño real: guardado preventivo en la ventana previa al plazo
+  (el flush *al cruzar* es imposible por construcción, no un pendiente), gracia honesta (sin CTA de envío cuando el
+  servidor no puede aceptarlo, con conteo de guardadas derivado en cliente), error que nombra su causa en vez de mandar
+  a reintentar lo imposible, y textarea en `readOnly` —no `disabled`— para no sacar el texto del árbol de
+  accesibilidad. La evidencia visual —primera línea base de `submit_grace`, desktop 1440 + móvil 390— destapó **cuatro
+  defectos más que ningún test veía**, dos de ellos **pre-existentes**: contraste 2.43:1 del contador de caracteres y
+  el `placeholder` haciendo de nombre accesible del campo. Contrato e invariantes:
+  [`GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1`](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md)
+  § Delta 2026-08-26.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
 

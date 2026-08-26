@@ -176,6 +176,63 @@ ops-worker, so legacy links remain the sender's behavior.
 Docs: `docs/documentation/hr/entrega-y-recuperacion-de-acceso-a-tests.md` and
 `docs/manual-de-uso/hr/recuperar-acceso-a-test-de-candidato.md`.
 
+### Assessment taking surface — timing, grace and honest errors (TASK-1746 timing + TASK-1751)
+
+Component `src/components/greenhouse/hiring/assessment/AssessmentTakingClient.tsx` + its CSS module
+`AssessmentTaking.module.css`. Public, unauthenticated, single task, deadline running.
+
+- **Completeness gate (server).** `submitPublicAssessmentWithClient`
+  (`src/lib/hiring/assessment/public-taking.ts:651-657`) lists questions and responses and throws
+  `assessment_incomplete` (400, `missingQuestionId` in details — internal, never public) if any question has
+  no saved response, or if there are no questions. The client derives `canSubmitEverything` from
+  `assessment.responses` (`AssessmentTakingClient.tsx:255`) and hides the submit CTA during grace when it is
+  false (`:764`). **Never add a completeness field to the public DTO**: its allowlists are exactly tested
+  (`route.test.ts` forbidden-keys sweep).
+- **Preventive save.** `PREEMPTIVE_SAVE_WINDOW_SECONDS = 30`, `PREEMPTIVE_SAVE_INTERVAL_MS = 5000` (`:77-78`);
+  the effect at `:371-391` fires once on entering the window and then on a fixed interval, reading
+  `answerRef` so keystrokes do not restart it (restarting it would reproduce the debounce defect it exists to
+  fix). Only armed when `timing.answerDeadlineAt` exists — with no explicit limit, `remainingSeconds` counts
+  toward the 24 h close, which is not the deadline that closes saving.
+- **The deadline cut is `>=` with no epsilon** (`src/lib/hiring/assessment/instances.ts:578`, DB clock
+  canonical), so a flush fired AT the boundary always loses. Both sides are tested in
+  `instances.deadline.test.ts`: `deadline − 1s` must be accepted (the edge the preventive save depends on),
+  `>=` must be rejected.
+- **Draft preservation.** `draftsRef` (`:192`, `:289-295`) stores the answer of the question being left and
+  prefers it over the server value on return. Before, the same effect silently overwrote the draft with the
+  server answer — empty when it had never been saved.
+- **Error codes → message.** `AssessmentRequestError` keeps the `code` and nothing else (`:104`);
+  `messageForCode` (`:118`) maps to four buckets by what the person **can do**, not one per code:
+  `assessment_not_open` → the answer deadline passed, copy your text; `assessment_incomplete` → answers
+  missing, contact whoever sent it; everything else → the generic retryable message. The server `message` is
+  generic by design (`src/app/api/public/assessment/[token]/route.ts:24-34`) and pinned by the anti-leak test
+  (`route.test.ts:146-161`) — the truth is composed here, never by loosening the public boundary. Form
+  precedent: `src/components/greenhouse/careers/TalentPoolSelfServiceClient.tsx:84-89`.
+- **Copy keys** added to `HiringAssessmentCopy['taking']` (`src/lib/copy/types.ts`) in both dictionaries:
+  `graceBodyComplete`, `graceBodyIncomplete`, `graceSavedCount`, `saveClosedBody`, `submitIncompleteBody`,
+  `answerFieldLabel`. `taking.retry` still has **no consumer**: this screen renders errors as text and has no
+  retry CTA to hide, so the "no Reintentar where retry cannot work" contract holds by construction.
+- **A11y + visual, all found by the FIRST premium capture of this surface** — GVC scenario
+  `scripts/frontend/scenarios/task1751-assessment-grace.scenario.ts`, seed
+  `scripts/hiring/_seed-task-1751-gvc.ts`, scorecard `docs/ui/reviews/TASK-1751-assessment-grace.scorecard.json`
+  (4.54 avg, floor 4.4 in `depth` with a declared `nextAction`):
+  - `readOnly` instead of `disabled` on the frozen textarea (`:746`) + the `.textArea:read-only` rule that
+    repaints the "frozen" signal the browser used to give for free (`AssessmentTaking.module.css:627`).
+  - `aria-label={copy.taking.answerFieldLabel}` and placeholder only while answerable (`:743-746`) — the
+    textarea had no accessible name for years, leaning on its placeholder.
+  - `.characterCount` moved from `--text-disabled` (2.43:1 vs white, axe `serious`) to `--text-secondary`
+    (`AssessmentTaking.module.css:646`). It is secondary text, not disabled text. Pre-existing defect.
+  - Banner icon `tabler-send` → `tabler-clock-exclamation` (`:633`): a paper plane over a message that says
+    you cannot send. No gate detects that; only looking at the frame does.
+  - `data-surface-recipe='candidate-assessment-taking'` declared at the surface root (`:630`), and the GVC
+    rubric points at that root — scoping it to a child card left the marker outside its own scope.
+- **The stepper's horizontal drag is the correct pattern, not a defect.** `.steps` already declares
+  `overflow-x: auto` (`AssessmentTaking.module.css:418-423`); the scenario declares
+  `allowHorizontalScrollSelectors` (`:66`) instead of breaking a contained scroller to satisfy the checker.
+  The real contract — the PAGE must not scroll horizontally at 390px — was verified and holds.
+- Behavior tests: `AssessmentTakingClient.honest-errors.test.tsx` (no submit offer when incomplete; the saved
+  count is declared; an expired deadline names the cause instead of inviting a retry; a real system failure
+  keeps the generic message) and `AssessmentTakingClient.timing-contract.test.ts`.
+
 ## The handoff (decision → downstream runtime, TASK-356 ✓ complete)
 
 - **Trigger**: `hiring.application.decided` with `decision='selected'` materializes a `HiringHandoff` via the reactive consumer `hiring_handoff_materialize` (domain `people`, runs in ops-worker; **no flag** — a no-op would be terminal in `outbox_reactive_log`). **The other FIVE outcomes never create a handoff** (`backup_selected`, `not_selected`, `rejected`, `withdrawn`, `unresponsive`) — `on_hold` is no longer among them: it stopped being an outcome in the 2026-08-22 ADR and is now recorded as the stage `decision_pending`. a re-decision that revokes a selection cancels a pending handoff or blocks an approved one (`decision_revoked`).

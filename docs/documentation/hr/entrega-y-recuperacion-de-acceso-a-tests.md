@@ -1,9 +1,9 @@
 # Entrega y recuperación de acceso a tests
 
 > **Tipo de documento:** Documentación funcional
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-08-19 por Codex (TASK-1745, TASK-1746, ISSUE-160)
-> **Última actualización:** 2026-08-20 por Claude (TASK-1747, TASK-1757)
+> **Última actualización:** 2026-08-26 por Claude (TASK-1751 — la gracia permite enviar sólo si la evaluación quedó completa)
 > **Estado operativo:** la recuperación (comando, permisos y correo al candidato) está en producción
 > desde el 2026-08-19. La superficie del operador en Application 360 y el aviso de rotación al
 > candidato están en `develop`/staging; su promoción a producción es un paso aparte. La sesión pública
@@ -113,8 +113,11 @@ respondiendo. El aviso cubre ese hueco.
 
 Antes de comenzar, la vigencia corresponde al acceso. Al comenzar, el plazo de respuestas se calcula desde
 `started_at` con el tiempo efectivo y accommodations. Después existe una gracia de 30 minutos que congela
-respuestas nuevas pero permite enviar las ya guardadas. Un assessment sin límite usa una ventana operativa de
-24 horas desde el inicio. El reloj canónico es el de base de datos.
+respuestas nuevas y permite enviar **sólo si la evaluación quedó completa**: el servidor exige todas las
+respuestas guardadas, así que con alguna faltante el envío es imposible y la superficie no lo ofrece. Un
+assessment sin límite usa una ventana operativa de 24 horas desde el inicio y por lo tanto no tiene fase de
+gracia. El reloj canónico es el de base de datos. El detalle de lo que ve y puede hacer el candidato durante
+esa ventana vive en [Rendición del test por el candidato](rendicion-del-test-por-el-candidato.md).
 
 ## Sesión pública y corte gradual
 
@@ -143,6 +146,8 @@ UI operativa y monitoreo. Código listo no equivale a capacidad activa.
 ## Referencias
 
 - Manual: [Recuperar acceso al test de un candidato](../../manual-de-uso/hr/recuperar-acceso-a-test-de-candidato.md)
+- Funcional: [Rendición del test por el candidato](rendicion-del-test-por-el-candidato.md) — qué pasa
+  del lado del candidato mientras rinde: guardado, fase de gracia y mensajes de error
 - Emails: [Emails del Ciclo de Hiring](emails-ciclo-hiring.md)
 - Asignación: [Asignación de Tests por Etapa](asignacion-de-tests-por-etapa.md)
 - Arquitectura: [GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md)

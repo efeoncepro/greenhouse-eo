@@ -148,6 +148,18 @@ Use the People guide at `docs/documentation/hr/efeonce-operating-code-hiring-onb
 - **NEVER** put a padlock on a file the screen's own capability already authorized to read. Security theatre trains the operator to click through the gates that do protect something.
 - **NEVER** collapse `quarantined`, `pending`, `legacy_unscanned` and absence into one message, and **NEVER** render a reader failure as "sin documentos" — say it failed and offer Reintentar.
 - **SIEMPRE** keep a revealed identity value in component memory only: a remount re-masks and demands a new reveal, which writes another audit entry, so the trail reflects real accesses instead of open sessions.
+- **NEVER** let a `placeholder` be a field's accessible name. A placeholder is an example, it vanishes the
+  moment someone types, and several screen readers never announce it — a field whose only name is its
+  placeholder is a field nobody can identify. Every input carries its own `<label>` or `aria-label`, from
+  `src/lib/copy` and bilingual like the rest of the surface. This is not hypothetical: the assessment
+  textarea leaned on its placeholder for **years**, and it only surfaced when hiding the placeholder in
+  read-only made axe's `label` check fail (`AssessmentTakingClient.tsx:743-746`). Two of the four defects the
+  first premium capture of that surface found were pre-existing and invisible to every test in the repo —
+  which is the argument for running the visual gate on any candidate-facing screen, not just new ones.
+- **NEVER** promise a candidate an action the server cannot accept — a partial submit, a save after the
+  deadline, a retry of something structurally impossible. Read the server gate first (§Assessment taking) and
+  either offer the action or name the real cause and the real remedy; never both, and never a "Reintentar"
+  where retrying cannot work.
 - **NEVER** create/open/publish a Greenhouse vacancy by SQL or ad hoc UI state. Use Hiring writers (`createTalentDemand` → `createHiringOpening` → `updateHiringOpening` → `publishOpening`) and record `public_id`, public URL and apply URL.
 - **NEVER** improvise public role seniority. Efeonce publishes exactly `Junior`, `Semi-senior`, `Senior` or `Lead`;
   `Intermedio` is skill proficiency and `L1/L2/L3` remain internal assessment vocabulary. An explicit level in the
@@ -364,6 +376,47 @@ a `develop` SHA is never an ancestor even when its content is live — compare t
 Functional doc: `docs/documentation/hr/entrega-y-recuperacion-de-acceso-a-tests.md`; manual:
 `docs/manual-de-uso/hr/recuperar-acceso-a-test-de-candidato.md`; runtime detail:
 `references/greenhouse-runtime.md` §Assessment delivery, recovery and public session.
+
+## Assessment taking — the candidate's side of the clock (TASK-1746 timing + TASK-1751 grace)
+
+The taking surface is public, unauthenticated, single-task and runs against a deadline. Every statement it
+makes is a promise the server has to be able to keep, and the failure mode of this screen is not a crash —
+it is a lie the candidate believes until it is too late to act on it.
+
+- **NEVER tell a candidate to "send whatever you managed to save".** Submit demands the assessment
+  **complete**: `submitPublicAssessmentWithClient` throws `assessment_incomplete` when any question has no
+  saved response (`src/lib/hiring/assessment/public-taking.ts:651-657`). During grace with answers missing,
+  submitting is **impossible**, so the surface derives completeness client-side from `responses`
+  (`src/components/greenhouse/hiring/assessment/AssessmentTakingClient.tsx:255`) and does not render the submit CTA at all (`:764`) — an offer that
+  cannot be honored is worse than no offer. Verify that gate before writing any banner, email or reply that
+  hints at a partial submit. This was the subtle lie that almost shipped.
+- **Autosave is a debounce, and a debounce restarts on every keystroke.** Whoever types without pausing
+  never fires it: they do not lose the last few milliseconds, they can lose the entire answer. That is why a
+  **forced preventive save** runs inside the last 30 s before the ANSWER deadline, on a fixed interval, reading
+  from a ref so typing cannot restart it (`AssessmentTakingClient.tsx:77-78`, `:371-391`). It extends no
+  deadline: it saves text written **in time**, earlier.
+- **NEVER "fix" that with a flush AT the deadline.** It cannot work: the client clock sits ≥1 RTT behind the
+  DB clock, which is canonical, and the cut is `nowMs >= answerDeadline` with no epsilon
+  (`src/lib/hiring/assessment/instances.ts:578`). A save fired on crossing arrives after the boundary and is
+  rejected. The only save that survives is the preventive one. The boundary is tested from both sides
+  (`instances.deadline.test.ts`: `deadline − 1s` accepted, `>=` rejected).
+- **A frozen field is `readOnly`, never `disabled` — that is accessibility, not styling.** `readOnly` keeps
+  focus, keyboard reach, screen-reader reading and copying, which is the whole point of a phase whose message
+  is "copy your text before you leave". `disabled` drops the field out of the tab order and, in several
+  readers, out of the accessible tree: the candidate whose time ran out can no longer reach their own words.
+  The "frozen" visual signal then becomes the author's job, because the browser's grey left with `disabled`
+  (`src/components/greenhouse/hiring/assessment/AssessmentTaking.module.css:627`).
+- **The public endpoint's `message` is generic ON PURPOSE and stays generic.** Validation errors answer
+  `{ok, code, message}` with `message = 'No pudimos procesar la solicitud.'`
+  (`src/app/api/public/assessment/[token]/route.ts:24-34`), pinned by an anti-leak test
+  (`route.test.ts:146-161`). NEVER loosen it "so the error tells the truth" — that weakens an unauthenticated
+  boundary. The truth is built **in the client, from the `code`**: `assessment_not_open` and
+  `assessment_incomplete` name the cause and never send anyone to retry the impossible; everything else keeps
+  the generic message, which is the legitimate retryable case
+  (`AssessmentTakingClient.tsx:104-131`).
+
+Runtime detail — constants, refs, copy keys and the visual evidence: `references/greenhouse-runtime.md`
+§Assessment taking surface.
 
 ## Candidate contact completeness (TASK-1688 — LIVE en producción 2026-08-12)
 

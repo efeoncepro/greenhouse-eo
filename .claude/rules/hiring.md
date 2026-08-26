@@ -55,3 +55,21 @@ presente es correcto, y `docs/tasks/pending-migrations/` está **vacía** (sólo
 
 La regla del `NUNCA` de más arriba **no se relaja**: sigue prohibido aplicar un contract antes del
 release que retira su escritor. Lo que cambió es el hecho, no el invariante.
+
+## Evaluación pública — el plazo y la completitud (TASK-1746/1751)
+
+Estas dos viven bajo `src/lib/hiring/assessment/**`, así que se tocan desde acá y el daño es al candidato:
+
+- **NUNCA relajar la exigencia de evaluación COMPLETA para enviar.** `submitPublicAssessmentWithClient`
+  (`public-taking.ts:651-657`) lanza `assessment_incomplete` si falta cualquier respuesta. Con faltantes,
+  enviar es **imposible** — así que ninguna superficie, correo ni respuesta puede prometer «envía lo que
+  alcanzaste a guardar» sin verificar antes esta compuerta. La UI lo deriva de `responses` y directamente no
+  renderiza el CTA.
+- **NUNCA mover el corte del plazo ni intentar un flush AL cumplirse.** El corte es `nowMs >= answerDeadline`
+  sin epsilon, contra el reloj de la DB, que es el canónico (`instances.ts:578`). El cliente va ≥1 RTT atrás:
+  lo que se dispara al cruzar llega tarde y se rechaza. Lo que salva texto es el guardado **preventivo**,
+  antes del plazo — y no extiende nada. El borde `deadline − 1s` tiene test propio; no romperlo.
+- **NUNCA aflojar el `message` genérico del endpoint público «para que el error diga la verdad».** El
+  contrato es `{ok, code, message}` con mensaje genérico, fijado por test anti-leak; la frontera es pública y
+  sin autenticación. El `code` es lo que viaja, y la verdad se construye en el cliente desde ese `code`.
+  Si necesitas un caso nuevo, **agrega un `code`**, nunca prosa al `message`.

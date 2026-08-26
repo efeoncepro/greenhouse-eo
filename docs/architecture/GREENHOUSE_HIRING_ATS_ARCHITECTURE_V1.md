@@ -159,6 +159,123 @@ Este documento fija:
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
 
+## Delta 2026-08-26 — TASK-1751: la fase de gracia deja de prometer lo que el servidor no puede aceptar
+
+La rendición del candidato entra en `submit_grace` al cruzar `answerDeadline` y sigue viva hasta
+`closeDeadline`. La fase existe desde `TASK-1363`; lo que se fija acá es **qué puede ofrecer esa fase**,
+porque prometía un envío que el servidor rechaza y un reintento que nunca podía funcionar.
+
+Precisión de alcance, porque la premisa escrita el 2026-08-19 no se sostuvo entera: de los cuatro defectos
+que la task declaraba, **dos fueron refutados contra el código** — el reloj ya seguía el scroll (`.sessionBar`
+es `sticky` desde `bc69e5a75`) y los avisos de 5 y 1 minuto nunca fueron sólo `srOnly` (hay un canal visible
+en paralelo dentro del reloj). Los dos que quedaron en pie son los del **guardado**, y son el daño real del
+caso fuente. El Delta de la task dueña conserva la refutación con su verificación.
+
+### El envío exige la evaluación COMPLETA, y eso decide qué puede ofrecer la superficie
+
+`submitPublicAssessmentWithClient` (`public-taking.ts:651-657`) lanza `assessment_incomplete` (400) ante
+cualquier pregunta del set público sin respuesta guardada. No es una validación de UI adelantada al servidor:
+es el servidor. Y durante la gracia ya no se puede guardar nada nuevo, así que **con respuestas faltantes
+enviar es imposible** — por eso el CTA de envío **no se renderiza** en esa rama
+(`AssessmentTakingClient.tsx:764`). Ofrecer el botón sería repetir exactamente la mentira que la task vino a
+corregir: un affordance que el servidor va a rechazar.
+
+La completitud se deriva **en cliente** desde `responses` (`savedAnswerCount` / `canSubmitEverything`,
+`AssessmentTakingClient.tsx:254-255`). No hay campo nuevo en el DTO público: sus tres bloques declaran
+allowlists **exactos** afirmados por `public-boundary.test.ts:199-224` (`assessment`, cada `response`, `timing`),
+y ensanchar la frontera pública para ahorrarse un `filter` en el cliente es el peor de los dos costos.
+
+### El guardado se protege ANTES del plazo, porque reaccionar al cruce es imposible por construcción
+
+El autosave de texto abierto es un debounce que **se reinicia con cada tecla**: quien escribe de corrido sin
+pausar nunca lo dispara, y no pierde los últimos milisegundos sino la respuesta entera. La protección es una
+ventana preventiva (`PREEMPTIVE_SAVE_WINDOW_SECONDS = 30`, intervalo fijo de 5 s leyendo del ref para que
+escribir no reinicie el intervalo). **No extiende ningún plazo**: guarda antes, texto escrito a tiempo.
+
+El flush reactivo —guardar *al cruzar* `answerDeadline`— es **imposible por construcción**, y conviene dejarlo
+escrito para que nadie lo reintente como si fuera el arreglo obvio:
+
+- el ancla temporal del cliente es `timing.databaseNowAt`, que el servidor toma **al construir la respuesta**,
+  mientras que la referencia monotónica (`window.performance.now()`) se fija en el cliente **después** de la
+  latencia (`AssessmentTakingClient.tsx:258-270`). El reloj del cliente va detrás del servidor ≥1 RTT;
+- el corte del servidor es `nowMs >= Date.parse(answer)` (`instances.ts:578-580`), **sin epsilon**.
+
+Un guardado disparado por el cruce sale, en el mejor caso, con el plazo ya cumplido: llega a `assessment_not_open`.
+Lo implementable es preventivo, nunca reactivo.
+
+### El mensaje genérico del endpoint público es la decisión correcta; la verdad se construye en el cliente
+
+El endpoint público responde `{ok, code, message}` con `message` **genérico a propósito** —es una superficie sin
+autenticación— y el test anti-leak lo fija (`route.test.ts:146-161`: sólo esas tres claves, `message` constante,
+ni el `message` interno ni los `details` viajan). La tentación al arreglar un error mudo es aflojar ese `message`
+"para que diga la verdad": eso debilita la frontera pública y filtra estado interno del assessment a quien tenga
+el token.
+
+La verdad se construye **en el cliente, desde el `code`**, agrupada por lo que la persona puede hacer y no por
+código: `assessment_not_open` y `assessment_incomplete` son los dos casos donde reintentar **no puede funcionar
+nunca**, y cada uno nombra su causa y su salida real; todo lo demás —red, 429, fallo de sistema— conserva el
+mensaje reintentable. Es el noveno patrón canónico aplicado al cliente en vez de al DTO, porque acá el DTO no
+puede ensancharse.
+
+### `readOnly` sobre `disabled` en el campo congelado es accesibilidad, no estilo
+
+Durante la gracia todo control se congela — eso no cambia. Lo que cambia es **cómo**: el textarea pasa a
+`readOnly` (`AssessmentTakingClient.tsx:746`) porque `disabled` lo saca del tab order y saca su contenido del
+árbol de accesibilidad; durante la gracia eso significa que quien usa lector de pantalla **no puede releer lo
+que escribió**, justo cuando el mensaje le pide copiar su texto antes de salir. Congelar es obligatorio; ocultar
+el texto, no.
+
+La asimetría con radio/checkbox es **deliberada y es el contrato**: `readonly` no aplica a
+`<input type="radio|checkbox">` por spec HTML, así que esos dos conservan `disabled`. El test de contrato afirma
+exactamente dos `disabled={!canAnswer}` más el `readOnly`
+(`AssessmentTakingClient.timing-contract.test.ts:12-24`): la cuenta baja de 3 a 2 a propósito, y verla bajar no
+es una regresión. Como `disabled` lo pintaba el navegador y este módulo nunca tuvo `.textArea:disabled`, la señal
+visual de campo congelado se repuso explícitamente (`.textArea:read-only`).
+
+### Lo que sólo se ve mirando el frame
+
+La primera captura premium de esta superficie destapó cuatro defectos que ningún test veía, y dos de ellos eran
+**pre-existentes**, no introducidos por la task: el contador de caracteres usaba `--text-disabled` (2.43:1 contra
+blanco, bajo el 4.5:1 de AA, `serious` en axe) siendo texto secundario y no deshabilitado; y el textarea se
+apoyaba en el `placeholder` como nombre accesible —el anti-patrón que la propia guía de UX writing prohíbe—, lo
+que quedó al descubierto recién al ocultar el placeholder en solo lectura, porque un campo congelado no puede
+invitar a escribir. Los otros dos: el ícono de la banda era un avión de papel (`tabler-send`) sobre un texto que
+dice que **no** se puede enviar, y la superficie no declaraba su recipe de composición. Regla transferible: en
+una superficie candidate-facing, la evidencia visual no es la formalidad del cierre — es el único gate que ve
+contradicciones de significado y contraste.
+
+### Invariantes operativos para agentes — Rendición del candidato: gracia y guardado
+
+- **NUNCA** ofrecer "enviar lo que alcanzaste a guardar" sin verificar completitud: el servidor exige la
+  evaluación **completa** (`assessment_incomplete`), y durante la gracia lo faltante ya no se puede guardar. Si
+  el envío no puede prosperar, el CTA no se renderiza.
+- **NUNCA** agregar al DTO público un campo derivable de lo que ya viaja. Los bloques `assessment`, `responses`
+  y `timing` tienen allowlists exactos testeados; la completitud se deriva en cliente.
+- **NUNCA** intentar un flush "al cruzar el plazo": el cliente va ≥1 RTT detrás del servidor y el corte de
+  `instances.ts` es `>=` sin epsilon. La única protección implementable es **preventiva** (guardar antes), y no
+  extiende ningún plazo.
+- **NUNCA** aflojar el `message` genérico del endpoint público para "que diga la verdad". La verdad se construye
+  en el cliente desde el `code`; el mensaje del servidor está fijado por un test anti-leak.
+- **NUNCA** mostrar un camino de reintento para `assessment_not_open` ni `assessment_incomplete`: reintentar no
+  puede funcionar nunca, y ofrecerlo esconde la salida real (pedir que le repongan el acceso).
+- **NUNCA** convertir el `readOnly` del textarea congelado en `disabled` "por consistencia": saca el contenido
+  del árbol de accesibilidad. La asimetría con radio/checkbox es el contrato, no una excepción olvidada.
+- **NUNCA** cerrar un cambio en esta superficie sólo con tests verdes: dos de los cuatro defectos visuales que la
+  captura destapó eran pre-existentes y ninguno era detectable sin mirar el frame.
+
+### Estado de rollout
+
+| Pieza | Estado |
+|---|---|
+| Guardado preventivo, gracia honesta (CTA condicional + conteo derivado), error que nombra su causa, `readOnly` accesible y sus tests de contrato | **en `develop`** — commits `67c6d2688`…`06622b5e6` |
+| Evidencia visual `submit_grace` (desktop 1440 + móvil 390, 6 frames, primera línea base de la fase) + scorecard 4.54 | **capturada y promovida a baseline** |
+| Promoción a producción | **pendiente** — al 2026-08-26 el árbol de `origin/main` conserva la versión anterior del cliente, del módulo CSS y del diccionario de copy |
+
+Follow-up declarado por el propio scorecard (no resuelto): el anillo de foco de la card compite con el tono de
+la banda durante la gracia. Queda escrito en `nextAction`, no cerrado a ojo.
+
+---
+
 ## Delta 2026-08-23 — TASK-1754: el eje de ETAPA queda en seis valores y las etapas terminales tienen fuente única
 
 Cierra el eje que el delta de `TASK-1765` dejó abierto: allá quedó el DESENLACE, acá la ETAPA.
