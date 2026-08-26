@@ -627,10 +627,10 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
           </div>
           {timeNote ? <span className={styles.srOnly} aria-live='polite'>{timeNote}</span> : null}
         </div>
-        <main className={styles.mainStack}>
+        <main className={styles.mainStack} data-surface-recipe='candidate-assessment-taking'>
           {timingPhase === 'submit_grace' ? (
             <div className={styles.accommodationBanner} role='status' data-capture='assessment-grace-banner'>
-              <i className='tabler-send' aria-hidden='true' />
+              <i className='tabler-clock-exclamation' aria-hidden='true' />
               <span>
                 <strong>{copy.taking.submitGraceNotice}</strong>{' '}
                 {canSubmitEverything ? copy.taking.graceBodyComplete : copy.taking.graceBodyIncomplete}{' '}
@@ -740,7 +740,8 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
                       className={styles.textArea}
                       value={typeof answer.text === 'string' ? answer.text : ''}
                       onChange={(event) => updateAnswer({ text: event.target.value.slice(0, 6000) })}
-                      placeholder={copy.taking.textareaPlaceholder}
+                      aria-label={copy.taking.answerFieldLabel}
+                      placeholder={canAnswer ? copy.taking.textareaPlaceholder : undefined}
                       maxLength={6000}
                       readOnly={!canAnswer}
                     />

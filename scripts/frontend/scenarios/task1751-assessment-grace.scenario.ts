@@ -59,6 +59,11 @@ export const scenario: CaptureScenario = {
       includeSelector: 'body',
       minTargetSize: 24,
       failOnViolations: true,
+      // El stepper es un scroller contenido legítimo (`.steps` declara `overflow-x: auto`), y con 11
+      // preguntas sus botones quedan fuera de vista DENTRO de su contenedor. El contrato del repo es que
+      // la PÁGINA nunca scrollee en horizontal, no que ningún hijo salga del viewport; sin esto el gate
+      // presionaría a romper el patrón correcto.
+      allowHorizontalScrollSelectors: ['[class*="steps"]'],
     },
     runtime: {
       failOnConsoleError: true,
@@ -87,7 +92,9 @@ export const scenario: CaptureScenario = {
     },
     enterpriseRubric: {
       enabled: true,
-      includeSelector: '[data-capture="assessment-question"]',
+      // La rúbrica evalúa LA SUPERFICIE, no una tarjeta dentro de ella: el `data-surface-recipe` vive en
+      // la raíz, y acotar la rúbrica a un hijo lo dejaba fuera de su propio alcance.
+      includeSelector: '[data-surface-recipe="candidate-assessment-taking"]',
       failOnViolations: true,
       placeholderTerms: ['lorem', 'fake', 'todo'],
       expectedDataCaptureRegions: [

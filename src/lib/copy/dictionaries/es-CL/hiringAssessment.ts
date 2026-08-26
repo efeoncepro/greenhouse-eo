@@ -46,6 +46,7 @@ export const hiringAssessment: HiringAssessmentCopy = {
     graceSavedCount: 'Guardadas: {saved} de {total}.',
     saveClosedBody: 'Se cumplió el plazo para responder, así que esta respuesta no alcanzó a guardarse. Tu texto sigue en pantalla: cópialo antes de salir.',
     submitIncompleteBody: 'Quedaron respuestas sin guardar, así que la evaluación no se puede enviar. Escríbele a quien te la envió.',
+    answerFieldLabel: 'Tu respuesta',
     timeWarningFive: 'Quedan 5 minutos',
     timeWarningOne: 'Queda 1 minuto',
     textareaPlaceholder: 'Escribe tu respuesta con el mayor contexto útil posible…',

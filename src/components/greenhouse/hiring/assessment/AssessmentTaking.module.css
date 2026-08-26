@@ -638,8 +638,13 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 14%, transparent);
 }
 
+/*
+ * TASK-1751 — `--text-disabled` daba 2.43:1 contra el blanco, bajo el 4.5:1 de AA (axe, serious).
+ * El contador NO está deshabilitado: es texto secundario, y ese es su token. Defecto PRE-EXISTENTE,
+ * destapado por la primera captura premium de esta superficie.
+ */
 .characterCount {
-  color: var(--text-disabled);
+  color: var(--text-secondary);
   font-size: 0.8125rem;
   text-align: right;
 }

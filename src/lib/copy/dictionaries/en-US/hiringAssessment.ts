@@ -46,6 +46,7 @@ export const hiringAssessment: HiringAssessmentCopy = {
     graceSavedCount: 'Saved: {saved} of {total}.',
     saveClosedBody: 'The time to answer ran out, so this answer was not saved. Your text is still on screen: copy it before you leave.',
     submitIncompleteBody: 'Some answers were not saved, so the assessment cannot be submitted. Reach out to whoever sent it to you.',
+    answerFieldLabel: 'Your answer',
     timeWarningFive: '5 minutes left',
     timeWarningOne: '1 minute left',
     textareaPlaceholder: 'Write your answer with as much useful context as possible…',
