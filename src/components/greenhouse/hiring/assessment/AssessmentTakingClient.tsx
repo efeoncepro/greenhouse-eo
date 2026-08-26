@@ -63,6 +63,20 @@ const optionLabel = (option: unknown, index: number): string => {
   return `Opción ${index + 1}`
 }
 
+/**
+ * Ventana de guardado preventivo, en segundos antes del plazo de RESPUESTA.
+ *
+ * El autosave es un debounce que se reinicia con cada tecla, así que quien escribe de corrido sin pausar
+ * nunca lo dispara: no pierde los últimos milisegundos, puede perder la respuesta entera. Dentro de esta
+ * ventana forzamos el guardado ignorando el debounce.
+ *
+ * NO extiende ningún plazo: guarda ANTES, texto escrito a tiempo. Un flush disparado AL cruzar el plazo
+ * es imposible —el cliente va atrás del servidor ≥1 RTT y el corte de `instances.ts` es `>=` sin epsilon—,
+ * y por eso esto es preventivo y no reactivo. Ver TASK-1751.
+ */
+const PREEMPTIVE_SAVE_WINDOW_SECONDS = 30
+const PREEMPTIVE_SAVE_INTERVAL_MS = 5000
+
 const answerKey = (answer: Record<string, unknown>) => JSON.stringify(answer)
 
 const isAnswered = (question: PublicAssessmentQuestion | undefined, answer: Record<string, unknown>) => {
@@ -129,6 +143,7 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
   const cardRef = useRef<HTMLElement | null>(null)
   const currentQuestionIdRef = useRef<string | null>(null)
   const lastSavedRef = useRef<Record<string, string>>({})
+  const answerRef = useRef(answer)
   const saveTimerRef = useRef<number | null>(null)
   const saveFeedbackTimerRef = useRef<number | null>(null)
 
@@ -278,6 +293,36 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [answer, canAnswer, currentQuestion?.questionId])
+
+  useEffect(() => {
+    answerRef.current = answer
+  }, [answer])
+
+  /**
+   * ¿Estamos cerca del plazo de RESPUESTA? Sólo aplica cuando hay límite explícito: sin límite el
+   * `remainingSeconds` cuenta hacia el cierre de 24 h, que no es el plazo que cierra el guardado.
+   */
+  const inPreemptiveSaveWindow = Boolean(
+    canAnswer &&
+    assessment?.timing.answerDeadlineAt &&
+    remainingSeconds != null &&
+    remainingSeconds <= PREEMPTIVE_SAVE_WINDOW_SECONDS,
+  )
+
+  useEffect(() => {
+    if (!inPreemptiveSaveWindow || !currentQuestion) return undefined
+
+    // Uno inmediato al entrar a la ventana, y después a intervalo fijo. Lee del ref para que escribir
+    // NO reinicie el intervalo: reiniciarlo con cada tecla reproduciría el defecto del debounce.
+    void saveAnswer(currentQuestion, answerRef.current)
+
+    const id = window.setInterval(() => {
+      void saveAnswer(currentQuestion, answerRef.current)
+    }, PREEMPTIVE_SAVE_INTERVAL_MS)
+
+    return () => window.clearInterval(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inPreemptiveSaveWindow, currentQuestion?.questionId])
 
   const start = async () => {
     if (!consent) return
