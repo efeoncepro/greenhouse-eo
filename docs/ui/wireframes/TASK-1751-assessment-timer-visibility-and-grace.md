@@ -293,7 +293,7 @@ Decisiones que esto fija:
 
 ## GVC Scenario Plan
 
-- **Scenario file:** `scripts/frontend/scenarios/task1751-assessment-grace.scenario.ts`
+- Scenario file: `scripts/frontend/scenarios/task1751-assessment-grace.scenario.ts`
 - Quality profile: premium
 - **Viewports:** variante `desktop` 1440 + variante `mobile` 390
 - **Reduced motion:** `reducedMotionCheck: true`
