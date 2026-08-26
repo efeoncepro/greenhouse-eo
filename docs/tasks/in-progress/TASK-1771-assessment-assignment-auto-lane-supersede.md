@@ -716,12 +716,13 @@ Además: `ISSUE-162` (`9d1db5252`) y la recalibración de esta spec (`12868f9c7`
 
 ### Lo que falta para `complete`
 
-1. Push + release. Nada de esto está desplegado.
+1. ~~Push + release~~ → **HECHO**: viajó en `709e15f66` (2026-08-23). Verificado blob a blob contra
+   `origin/main` el 2026-08-26 (`supersede-dead-end.ts` + la ruta `…/reconciliation/supersede/route.ts`).
 2. La `## Production verification sequence` completa, que sólo se puede ejecutar contra el runtime desplegado.
-3. La migración del `COMMENT` de `superseded_at`, parqueada en
-   `docs/tasks/pending-migrations/TASK-1771-superseded-at-comment.sql.pending` con su condición: **el release
-   que despliega el command ya ocurrió**, verificado contra `origin/main`. Antes de eso el comentario
-   describiría una capacidad que el runtime desplegado no tiene.
+   **Este es el pendiente real.**
+3. ~~La migración del `COMMENT` de `superseded_at`, parqueada~~ → **APLICADA** (`d793b2444`, con readback
+   antes/después); `docs/tasks/pending-migrations/` quedó vacía. Su condición —que el release que despliega
+   el command ya hubiera ocurrido— se cumplió.
 4. `pnpm test` completo + `pnpm build` de producción como gate de cierre (el build consume ~30 GB y requiere
    autorización del operador).
 

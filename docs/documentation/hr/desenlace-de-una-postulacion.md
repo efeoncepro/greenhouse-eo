@@ -109,7 +109,8 @@ señal «Desenlace del pipeline: cierres sin desenlace declarado».
 > Detalle técnico: el eje de desenlace vive en `greenhouse_hiring.hiring_application`
 > (`decision`, `decision_cause`) y su único escritor es `decideHiringApplication`
 > (`src/lib/hiring/decide.ts`). El `CHECK` del invariante `stage='closed'` ⟺ desenlace declarado está
-> escrito y **pendiente de aplicar** en `docs/tasks/pending-migrations/`. Ver
+> **aplicado el 2026-08-23** (`hiring_application_closed_outcome_check`,
+> `migrations/20260823101823762_task-1765-closed-invariant.sql`). Ver
 > [la arquitectura](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md).
 
 ## Qué cuenta como «proceso activo», y qué no

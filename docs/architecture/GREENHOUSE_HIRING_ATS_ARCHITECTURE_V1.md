@@ -215,7 +215,7 @@ la verdad. **Condición de retiro:** `TASK-1365` cierra **antes** de prender
 | Pieza | Estado |
 |---|---|
 | Enum TS en seis + los tres consumers apuntados a `TERMINAL_APPLICATION_STAGES` + mapa de aguas abajo reescrito | **aplicado** |
-| Contract del `CHECK` (`docs/tasks/pending-migrations/TASK-1754-stage-vocabulary-contract.sql.pending`) | **escrito y revisado, NO aplicado** — el `CHECK` de la base **sigue admitiendo trece valores** |
+| Contract del `CHECK` (`migrations/20260823111250596_task-1754-stage-vocabulary-contract.sql`, commit `50b742341`) | **APLICADO 2026-08-23** — el `CHECK` de la base quedó en los **seis** valores, así que `HIRING_APPLICATION_STAGES` vuelve a ser su espejo |
 
 Su autorización no vino de contar filas sino del **contrato de la superficie desplegada**: en
 `origin/main` (release `304371f73`) hay exactamente tres escritores de `hiring_application.stage`,
@@ -333,9 +333,11 @@ fila de `email_type_config` y su seed en el `ops-worker` (**NO** en Vercel).
 | Escritor de `archived_at` (`archiveSyntheticRecords`, `TASK-1748`) | **code complete** — sin desplegar |
 | Backfill de las 32 filas sintéticas de `closed` a `archived_at` | **pendiente** — espera al despliegue del filtro de `TASK-1748` |
 
-Las pendientes viven en `docs/tasks/pending-migrations/` con su condición de ejecución declarada, y
-su orden es **una sola cadena**: contract del enum → filtro de `TASK-1748` desplegado → backfill del
-eje de archivado → `CHECK` del invariante.
+**La cadena completa se ejecutó el 2026-08-23, en ese orden**: contract del enum → filtro de
+`TASK-1748` desplegado → backfill del eje de archivado → `CHECK` del invariante.
+`docs/tasks/pending-migrations/` quedó **vacía** (sólo su `README`). La condición que gobernaba la
+cadena —aplicar un contract sólo DESPUÉS del release que retira su escritor (`ISSUE-161`)— se
+cumplió y **sigue vigente como regla**: lo que cambió es el hecho, no el invariante.
 
 ### Invariantes operativos para agentes — Eje de desenlace
 
@@ -1142,8 +1144,8 @@ dice cómo — ver `HiringDecision` y el delta de `TASK-1754`.
 - `closed` — escribible **sólo** por el command de decisión
 
 Los siete literales históricos (`qualified`, `client_review`, `selected`, `backup`, `rejected`,
-`withdrawn`, `handoff_ready`) salieron del enum TS. El `CHECK` de la base los angosta cuando corra
-`docs/tasks/pending-migrations/TASK-1754-stage-vocabulary-contract.sql.pending`, todavía sin aplicar.
+`withdrawn`, `handoff_ready`) salieron del enum TS, y el `CHECK` de la base los angostó el 2026-08-23
+con `migrations/20260823111250596_task-1754-stage-vocabulary-contract.sql` (commit `50b742341`).
 
 ### HiringHandoff lifecycle
 

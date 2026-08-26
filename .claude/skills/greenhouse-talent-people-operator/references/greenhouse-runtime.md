@@ -26,9 +26,10 @@ Load whenever the work happens _inside_ the Greenhouse repo (not pure advisory).
 - Signal `hiring.application.closed_without_outcome`
   (`src/lib/reliability/queries/hiring-application-outcome-signals.ts`) exists **before** the `CHECK`, to
   measure the drift the `CHECK` will later make impossible.
-- **Parked, NOT applied**: `docs/tasks/pending-migrations/` holds the outcome-enum contract (drops `on_hold`),
-  the `closed ⟺ outcome` invariant and the synthetic-archive backfill. Precondition for all of them: the
-  release that removes the writer from `origin/main`. Reachability comes from the **deployed surface
+- **APPLIED 2026-08-23, and `docs/tasks/pending-migrations/` is now EMPTY** (only its `README`): the
+  outcome-enum contract (dropped `on_hold`), the `closed ⟺ outcome` invariant
+  (`hiring_application_closed_outcome_check`) and the synthetic-archive backfill all landed, after the release
+  that removed the writers from `origin/main`. The precondition held; the rule below is why it held. Reachability comes from the **deployed surface
   contract**, never from "zero rows" — there is ONE Cloud SQL instance shared by dev, staging and production,
   and applying a contract early broke «Dejar en espera» in production on 2026-08-22 (`ISSUE-161`).
 - **Verify the predicate, never the `grep -c`.** Counting a literal proves nothing about who writes it: a hit
@@ -123,11 +124,12 @@ Operational sequence:
 
 ### Assessment delivery, recovery and public session (TASK-1745/1746/1747/1757)
 
-**Runtime status (2026-08-20).** Provider lifecycle (1745) and the recovery command + capabilities + candidate
+**Runtime status (re-verified 2026-08-26).** Provider lifecycle (1745) and the recovery command + capabilities + candidate
 email (1746) are **in production since 2026-08-19**: migration and index `uq_email_deliveries_token_intent_v2`
 applied, `email_type_config.hiring_assessment_access_recovery = true`. The Application 360 surface (1747) and
-the rotation notice (1757) are **on `develop`/staging only** — promotion is a separate step and neither has
-been exercised against a real rotation. `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` still defaults OFF in
+the rotation notice (1757) **are also in production** (release `709e15f66`, 2026-08-23; verified blob-by-blob
+against `origin/main` on 2026-08-26) — what remains is that **neither has been exercised against a real
+rotation**: the pending item is evidence, not promotion. `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` still defaults OFF in
 ops-worker, so legacy links remain the sender's behavior.
 
 - Global lifecycle: historical `sent` = provider accepted dispatch, never inbox delivery. Signed provider

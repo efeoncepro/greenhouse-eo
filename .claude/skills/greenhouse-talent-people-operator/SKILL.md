@@ -180,8 +180,9 @@ the first ADR this vocabulary ever had).
 
 **Three lists live in `src/types/hiring.ts`, and confusing them IS the bug (TASK-1754 Slice F).**
 
-- `HIRING_APPLICATION_STAGES` (**6**) — every stage the column admits. It went from 13 to 6 in Slice F, so it
-  is **no longer a mirror of the DB `CHECK`** (the `CHECK` is still wide, on purpose — see below).
+- `HIRING_APPLICATION_STAGES` (**6**) — every stage the column admits. It went from 13 to 6 in Slice F, and
+  the DB `CHECK` followed on 2026-08-23 (`50b742341`), so it **is the mirror again**. The bug was the
+  interval in which it was NOT — never assume the two are in sync, verify.
 - `HIRING_PIPELINE_STAGES` (**5**: `sourced`, `screening`, `shortlisted`, `interview`, `decision_pending`) —
   the subset a **stage change** may write. It is an **allowlist**, not a denylist, so a new stage is born
   non-writable until someone adds it deliberately. `closed` is outside it on purpose: closing means declaring
@@ -190,14 +191,20 @@ the first ADR this vocabulary ever had).
   **three verbatim copies** that lived in the assessment guards. **NEVER** re-declare a local terminal-stage
   set, and **NEVER** widen `HIRING_PIPELINE_STAGES` to "unblock" a board gesture.
 
-**Invariant** `stage='closed'` ⟺ outcome declared. The code is ready and verified, but **it is NOT enforced as
-a `CHECK` yet** — the migration is written and parked in `docs/tasks/pending-migrations/`, waiting for operator
-authorization. Same for the enum contracts: the database **still accepts the old stages and `on_hold`, on
-purpose**, because a contract is applied only AFTER the release that removes the writer from deployed code.
-**NEVER** state this invariant in the present tense as if the database enforced it.
+**Invariant** `stage='closed'` ⟺ outcome declared. **The database ENFORCES it since 2026-08-23** —
+`hiring_application_closed_outcome_check` (`migrations/20260823101823762_task-1765-closed-invariant.sql`,
+commit `b270478f4`). The two enum contracts landed the same day: `decision` is now exactly the six outcomes
+(`…_task-1765-decision-enum-contract.sql`, `on_hold` retired) and `stage` exactly the six stages
+(`…_task-1754-stage-vocabulary-contract.sql`, thirteen → six). **`docs/tasks/pending-migrations/` is EMPTY**
+(only its `README`).
+
+⚠️ Corrected 2026-08-26: this passage used to say the opposite, in the present tense, months after the fact.
+The **rule** it protected does NOT relax — a contract is applied only AFTER the release that removes the
+writer from deployed code (`ISSUE-161`), and there is ONE Cloud SQL instance for dev/staging/production. What
+changed is the fact, not the invariant. **NEVER** cite a parked migration without listing the directory first.
 
 - **NEVER** say `on_hold` is an outcome. A pause is not a closure: it is recorded by moving the **stage** to
-  `decision_pending`. It survives in the `CHECK` only until the release.
+  `decision_pending`. It **no longer survives in the `CHECK`**: the contract of 2026-08-23 retired it.
 - **NEVER** label a person with the state of the vacancy. Capacity filled / opening closed / process
   cancelled are the **cause** of `not_selected`, never an outcome and **never `rejected`** — `rejected` is a
   judgement about the person, and applying it to a cohort nobody judged inflates that cohort's rejection rate
@@ -347,9 +354,13 @@ rolled out together.
   all 8 candidate-facing types); before TASK-1757 there was none, and replies fell into the provider's
   verified sending address that nobody reads — while several of those emails explicitly ask for a reply.
 
-**Estado**: recovery command, capabilities and candidate email are **in production since 2026-08-19**. The
-Application 360 surface (TASK-1747) and the rotation notice (TASK-1757) are **on `develop`/staging**;
-promotion to production is a separate step, and neither has been exercised against a real rotation yet.
+**Estado (verificado contra `origin/main` el 2026-08-26)**: recovery command, capabilities and candidate email
+are **in production since 2026-08-19**, and the Application 360 surface (TASK-1747) and the rotation notice
+(TASK-1757) **are ALSO in production** — they travelled in `709e15f66` (2026-08-23). What is still true is that
+**neither has been exercised against a real rotation**, and that is the actual pending item: evidence, not
+promotion. ⚠️ Do not infer "not deployed" from `git merge-base --is-ancestor`: `main` promotes by **squash**, so
+a `develop` SHA is never an ancestor even when its content is live — compare the blob per path
+(`git ls-tree origin/main -- <path>`).
 Functional doc: `docs/documentation/hr/entrega-y-recuperacion-de-acceso-a-tests.md`; manual:
 `docs/manual-de-uso/hr/recuperar-acceso-a-test-de-candidato.md`; runtime detail:
 `references/greenhouse-runtime.md` §Assessment delivery, recovery and public session.
