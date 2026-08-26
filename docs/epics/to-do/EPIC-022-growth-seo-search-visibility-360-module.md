@@ -225,6 +225,16 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1708` — [creada 2026-08-15, backend-data] Estacionalidad: la serie de 12 meses que ya viene
   en `keyword_info`.
 - `TASK-1709` — [creada 2026-08-15, backend-data] Carril de diagnóstico de prospecto SEO.
+- `TASK-1775` — [creada 2026-08-26, backend-data] **Foto de dominio + trayectoria competitiva.** El
+  sujeto que el módulo no sabe describir: hoy los KPIs sólo cubren el recorte seguido. `labs`
+  (`domain_rank_overview` mensual · `historical_rank_overview` una vez por sujeto, cuesta 10× ·
+  `bulk_traffic_estimation` para screening). Replica el patrón multi-productor de `TASK-1661`.
+- `TASK-1776` — [creada 2026-08-26, backend-data] **Visibilidad por URL / subdominio / subcarpeta.**
+  Una capacidad con resolver de sujeto, no tres módulos. Tercer productor de la tabla de mercado: el
+  `keyword_info` de `ranked_keywords` viene inline y ya pagado. Cierra el lado ◑ de `TASK-1313`.
+- `TASK-1777` — [creada 2026-08-26, backend-data] **Detalle nominal del perfil de enlaces.** Hijas
+  por FK del snapshot de `TASK-1304`; el drill-down corre SÓLO donde el `new_lost_delta` ya
+  persistido indica movimiento. Sin scheduler nuevo.
 - `TASK-1671` — [creada 2026-08-15, ui-ux] **Superficie de los hallazgos de sitio.** Estaba
   reservada desde el 2026-08-11 y la resolución de secuencia la destapó como **el bloqueante real**:
   `TASK-1670` nace con flag OFF y no se prende hasta que esta esté desplegada. Habilita el flip y es
