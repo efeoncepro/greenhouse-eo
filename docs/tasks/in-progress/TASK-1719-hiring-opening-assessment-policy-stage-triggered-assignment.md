@@ -198,7 +198,7 @@ vacante pública de que el proceso incluye evaluación.
 - Motion: `none`
 - Backend impact: `command|sync`
 - Epic: `EPIC-011`
-- Status real: `Diseño; command base y correo existen, falta policy vacante-test y automatización`
+- Status real: `EN PRODUCCIÓN desde 2026-08-18, no «Diseño» (línea corregida 2026-08-26 tras verificación contra runtime). Slices 0-5 implementados y desplegados; HIRING_STAGE_TEST_ASSIGNMENT_ENABLED=true en el ops-worker (declarado en deploy.sh, re-verificado en la revisión activa ops-worker-00594-2tp); backlog drenado 17-ago y policy del canary EO-OPN-0009 en on_stage_entry+enabled. Falta SÓLO escribir la evidencia del monitor de 7 días: la ventana ya transcurrió. TASK-1603 es ajena y ya declarada no-bloqueante`
 - Rank: `TBD`
 - Domain: `hr|data|ops`
 - Blocked by: `none`

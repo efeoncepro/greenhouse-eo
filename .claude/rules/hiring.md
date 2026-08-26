@@ -19,7 +19,8 @@ Lo que YA rige:
 - **NUNCA cerrar por `PATCH` de etapa.** Cerrar es decidir: pasa por `decideHiringApplication`, que
   emite el evento, arranca el reloj de retención y elige el tipo de correo.
 - **Tres listas en `src/types/hiring.ts`, y confundirlas ES el bug** (TASK-1754 Slice F):
-  `HIRING_APPLICATION_STAGES` (6, lo que admite la columna — ya **no** es el espejo del `CHECK`),
+  `HIRING_APPLICATION_STAGES` (6, lo que admite la columna — vuelve a ser el espejo del `CHECK`
+  desde que el Slice F aplicó el contract; el bug fue el intervalo en que NO lo era),
   `HIRING_PIPELINE_STAGES` (5, el subconjunto **escribible** por un cambio de etapa; **allowlist**, y
   no contiene `closed`) y `TERMINAL_APPLICATION_STAGES` (fuente única de «terminó», hoy `{'closed'}`;
   antes eran tres copias verbatim). **NUNCA** declarar una copia local ni ensanchar el escribible para
@@ -42,6 +43,15 @@ Lo que YA rige:
   `TALENT_DEMAND_STATUSES` tiene su propio `'qualified'` — es demanda de talento, otro dominio: no
   tocarlo al limpiar etapas de postulación.
 
-Lo PENDIENTE del release — **no afirmarlo en presente**: el `CHECK` del invariante
-`stage='closed'` ⟺ desenlace declarado, y los contract que retiran `on_hold` y las etapas viejas.
-Viven en `docs/tasks/pending-migrations/`. Hoy la base acepta el vocabulario viejo **a propósito**.
+El release YA ocurrió (`709e15f66`, 2026-08-23). Estos tres **están aplicados** — afirmarlos en
+presente es correcto, y `docs/tasks/pending-migrations/` está **vacía** (sólo su `README`):
+
+- `CHECK` del invariante `stage='closed'` ⟺ desenlace declarado →
+  `migrations/20260823101823762_task-1765-closed-invariant.sql`.
+- contract del enum de `decision`, seis desenlaces →
+  `migrations/20260823100709766_task-1765-decision-enum-contract.sql`.
+- contract del vocabulario de **etapas**, de trece a seis (retira `on_hold` y las viejas) →
+  `migrations/20260823111250596_task-1754-stage-vocabulary-contract.sql`.
+
+La regla del `NUNCA` de más arriba **no se relaja**: sigue prohibido aplicar un contract antes del
+release que retira su escritor. Lo que cambió es el hecho, no el invariante.

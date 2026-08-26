@@ -228,6 +228,11 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `TASK-1755` — Assessment Assignment Attempt Recovery: permite reintento gobernado tras un intento `blocked`.
 - `TASK-1756` — Dossier Partial Evidence Disclosure: impide recomendaciones silenciosas sobre evidencia incompleta.
 - `TASK-1757` — Assessment Access Rotation Candidate Notice: avisa una rotación sin filtrar la credencial.
+- `TASK-1771` — Assessment Assignment Auto-Lane Supersede: el carril automático recupera la clave ocupada
+  estampando `superseded_at` sin perder `outcome`/`outcome_reason`, con tope por clave y condición de avance
+  estricta. **En producción** desde el release `709e15f66` (2026-08-23); falta su verification sequence.
+- `TASK-1772` — Hiring Active Process Canonical Predicate: predicado único de «proceso activo». **✓ complete**,
+  salió en el mismo release `709e15f66`.
 - `TASK-1732` — Identity-First People 360 Hiring Journey Reader: historia pre/post-member, paginada y allowlisted.
 - `TASK-1733` — People 360 Longitudinal Hiring History UI: timeline/detail interno sobre TASK-1732.
 - `TASK-1734` — Assessment AI Scoring at Scale + Operator-Only Exception Review: run asíncrono por assessment,

@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-011`
-- Status real: `Los 5 slices cerrados y auditados; falta ejercitar en staging las ramas no capturables`
+- Status real: `Los 5 slices cerrados y auditados, y EL CÓDIGO ESTÁ EN origin/main (verificado 2026-08-26: AssessmentRecoveryCluster.tsx + copy accessRecovery en ambos diccionarios) — no es «code-complete localmente». Faltan: re-auditar los 8 hallazgos que este doc lista como ABIERTOS (al menos 3 los cerró el Slice 4 y la lista no se actualizó: es triage, no código), la oclusión de la mascota de Nexa sobre el cluster a 390px (el gate de layout no detecta oclusión) y canonizar el error del POST, que devuelve {ok:false, code} sin prose es-CL ni actionable. Los 17 checkboxes sin marcar contradicen este estado y hay que reconciliarlos`
 - Rank: `TBD`
 - Domain: `hr|ui|delivery`
 - Blocked by: `TASK-1746`

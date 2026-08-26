@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-011`
-- Status real: `in-progress 2026-08-23 — CODE COMPLETE, ROLLOUT PENDIENTE. Slices 1-4 en develop local sin push (617d18df7, 146242339, d5914c841, 0f558666a). Gate vivo verde en dos corridas seguidas con residuo cero verificado en dos ejes. Falta: push/release, la Production verification sequence, y la migracion del COMMENT parqueada en pending-migrations con condicion de release. NO mover a complete hasta que el rollout ocurra`
+- Status real: `EN PRODUCCIÓN desde el release 709e15f66 (2026-08-23); línea corregida 2026-08-26 — decía «en develop local sin push» y era falso. Verificado blob a blob contra origin/main: supersede-dead-end.ts y la ruta assessment-policy/reconciliation/supersede/route.ts están idénticas en main (los 4 SHAs no son ancestros porque main promueve por squash, no porque falte el código). La migración del COMMENT TAMBIÉN se aplicó (d793b2444, con readback antes/después) y pending-migrations quedó vacía. Falta SÓLO: la Production verification sequence completa (8 pasos; el 8 es monitor 7 días desde el 08-23) y el gate pnpm test + pnpm build, que requiere autorización por consumo de memoria`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
