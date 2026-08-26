@@ -24,7 +24,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth`
-- Blocked by: `none`
+- Blocked by: `TASK-1697`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -39,6 +39,63 @@ y **76,7%** contra los dólares realmente medidos en `greenhouse_growth.seo_prov
 (`serp` USD 1,3440 sobre USD 1,7525 totales, ventana 2026-08-06→15). El rank capture sigue siendo,
 por lejos, la parte dominante de la factura variable, y la regla dura de esta task —cero captura
 recurrente sobre un prospecto— no depende del porcentaje.
+
+## Delta 2026-08-26 — la evidencia de sitio ENTRA al carril, delegada y con robots respetado
+
+Cambia el alcance: el diagnóstico de prospecto deja de ser sólo de mercado y suma **evidencia
+técnica del sitio**. Es una decisión del operador (2026-08-26), y estas son sus condiciones.
+
+**Por qué la prohibición original no era una política de producto.** La regla decía "nunca fetchea el
+sitio del prospecto", pero su razón, escrita en la propia risk matrix, era **SSRF** — no la ética de
+rastrear a alguien que no lo pidió. Y la prohibición dejaba al carril SEO sin algo que **el carril
+AEO de al lado ya hace en producción**: el grader público fetchea el sitio del prospecto desde
+`src/lib/growth/ai-visibility/probes/safe-fetch.ts` (`TASK-1266`), un lector read-only con guarda
+SSRF, User-Agent de cortesía que **nos identifica**, timeout, tope de 1 MiB y redirect acotado al
+mismo host registrable. La asimetría no tenía defensa: el mismo prospecto recibía probes por un
+carril y no por el otro.
+
+**Qué cambia y qué no.**
+
+- **NO cambia**: este módulo **sigue sin importar `safe-fetch`** y sigue sin construir una URL de red
+  por su cuenta. La superficie SSRF no se duplica.
+- **SÍ cambia**: el colector **pide** evidencia de sitio a los primitives dueños del fetch. Dos
+  carriles complementarios, ambos ya gobernados y **ninguno exige herramienta nueva**:
+  - **Sustrato propio** (`TASK-1697`, `@/lib/growth/site-substrate`): lectura puntual de `robots.txt`,
+    JSON-LD, sitemap y HTML. Costo de proveedor **USD 0**, latencia de segundos. Es el carril por
+    defecto del diagnóstico de prospecto.
+  - **OnPage de DataForSEO** (familia ya permitida): crawl del sitio a USD 0,000125/página cuando el
+    diagnóstico amerite profundidad. Task-based async, así que corre en el ops-worker.
+- **Blocker nuevo y real**: `Blocked by: TASK-1697`. Hoy el fetcher vive dentro de
+  `ai-visibility/probes/**` y `growth/seo` no puede importarlo sin abrir un deep import cross-dominio
+  — que es justo lo que la lint rule angosta de 1697 nace prohibiendo. **Sin 1697, la forma correcta
+  de esta capacidad no existe**, y la forma incorrecta (copiar el fetcher, o importar cruzado) crea
+  la deuda que 1697 existe para cerrar. 1697 es `P0` y `to-do`.
+
+**Dónde queda la línea ética y legal, ahora que sí rastreamos.** Rastrear superficies públicas
+respetando `robots.txt` es la conducta normal de cualquier crawler. Lo indefendible es **evadir un
+bloqueo explícito de alguien con quien todavía no tenemos relación comercial**. Por eso:
+
+- OnPage respeta `robots.txt` por defecto (`robots_txt_merge_mode: merge`) y **ese default no se
+  toca**. `override` + `custom_robots_txt` quedan prohibidos en este carril.
+- `switch_pool` e `ip_pool_for_scan` (pools de proxy para sortear bloqueos) quedan prohibidos.
+- El `custom_user_agent` **nunca** oculta quiénes somos: se identifica igual que el UA de cortesía
+  del grader. Si el prospecto revisa sus logs antes de que hablemos, debe poder ver que fuimos
+  nosotros y por qué.
+- 🔴 **Un bloqueo es un hallazgo, no un obstáculo.** Si el crawl vuelve `forbidden_robots`,
+  `forbidden_meta_tag` o `forbidden_http_header` (`summary.extended_crawl_status`), eso **es** el
+  dato: se persiste como hecho con su lente y se reporta. Es además el punto ciego más caro que
+  `TASK-1670` existe para cerrar — un sitio que bloquea a los crawlers de IA hoy puntúa 95/100.
+
+**Herramientas nuevas: ninguna.** Se evaluó sumar un scraper externo tipo Apify y se **descarta**:
+todo lo que aportaría ya existe dos veces (render headless vía `enable_browser_rendering` de OnPage;
+lectura puntual vía el sustrato propio), y su valor diferencial real —rotación de proxies para
+rastrear a quien te bloquea— es exactamente la conducta que este delta prohíbe. Sumarlo abriría una
+sexta familia fuera del allowlist, con secreto, breaker y dimensión de gasto propios, para comprar
+una capacidad que no queremos usar.
+
+**Slice nuevo**: `Slice 2b — Evidencia de sitio delegada`, entre el colector de mercado y la
+derivación. Su orden es load-bearing: 2b no puede empezar antes de que `TASK-1697` haya extraído el
+sustrato.
 
 ## Summary
 
@@ -78,7 +135,9 @@ Fuente: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit
 - Tier `prospect` en el resolver de entitlement SEO, con **tope duro en USD por diagnóstico** y
   gasto atribuido y visible en el ledger canónico, sin abrir un segundo almacén de gasto.
 - Colector de prospecto que produce evidencia usando **sólo** fuentes que no requieren acceso del
-  cliente, y que **nunca** fetchea el sitio del prospecto ni el de su competencia.
+  cliente, y que **nunca fetchea por su cuenta**: la evidencia de sitio se pide a los primitives
+  dueños del fetch (sustrato SSRF-guarded de `TASK-1697` · OnPage), jamás con un `fetch` propio.
+  Ver `## Delta 2026-08-26`.
 - Diagnóstico expuesto por contrato gobernado (reader + command, Full API Parity: app · Nexa ·
   ecosystem/MCP), con toda cifra marcada `◑ estimado` y con su `capturedAt`.
 - Encadenamiento comercial declarado y verificable: Grader mide → este diagnóstico cuantifica la
@@ -167,6 +226,13 @@ Reglas obligatorias:
 - `src/lib/growth/seo/register-provider-spend.ts` — el runtime que corra este carril DEBE importarlo
   o `postDataForSeoTask` lanza en la primera llamada que gasta.
 - `src/lib/growth/seo/provider-pricing.ts` — tabla de costo para el preview y el tope.
+- **`TASK-1697`** (`P0`, `to-do`) — extracción del sustrato de sitio a `@/lib/growth/site-substrate`
+  (fetcher con guarda SSRF + parseo HTML) con shim de re-export y lint rule angosta. **Blocker duro**
+  del `Slice 2b`: sin él, la evidencia de sitio sólo se puede obtener con un deep import cross-dominio
+  a `ai-visibility/probes/**`, que es precisamente lo que 1697 nace prohibiendo. Ver `## Delta 2026-08-26`.
+- `src/lib/growth/ai-visibility/probes/safe-fetch.ts` (`TASK-1266`) — **precedente y origen** del
+  sustrato, no dependencia de import: es el fetcher que hoy ya rastrea sitios de prospectos por el
+  carril AEO. Flag `GROWTH_AI_VISIBILITY_PROBES_ENABLED`: staging ON, producción OFF.
 
 ### Blocks / Impacts
 
@@ -403,6 +469,19 @@ Reglas obligatorias:
 - Idempotencia por `(dominio, mercado, idioma, fecha)`: repetir devuelve lo existente con USD 0.
 - Registro del gasto vía el recorder existente (import obligatorio de `register-provider-spend`).
 
+### Slice 2b — Evidencia de sitio delegada (agregado por el `Delta 2026-08-26`)
+
+- Consumo del sustrato de `TASK-1697` (`@/lib/growth/site-substrate`) para `robots.txt`, presencia de
+  JSON-LD, sitemap y HTML de la home del prospecto. **Cero costo de proveedor.**
+- Carril OnPage opcional por diagnóstico, apagado por defecto, con su costo dentro del **mismo tope
+  duro en USD** del diagnóstico: el preview lo suma antes de la primera llamada, no después.
+- Postura de cortesía verificable por test: `robots_txt_merge_mode` nunca `override`, sin
+  `custom_robots_txt`, sin `switch_pool`, sin `ip_pool_for_scan`, y UA identificable.
+- `extended_crawl_status` de bloqueo se persiste como **hecho** (`forbidden_robots`,
+  `forbidden_meta_tag`, `forbidden_http_header`), no como error de la corrida ni como `magnitude: 0`.
+- Test de frontera que falla si este módulo importa `safe-fetch` o `ai-visibility/probes/**`
+  directamente: la delegación es el contrato, no una convención.
+
 ### Slice 3 — Derivación: hechos con lente, sin veredicto
 
 - `derive.ts` convierte la evidencia cruda en hechos tipados: superficie ranqueada, distancia a la
@@ -449,7 +528,12 @@ Reglas obligatorias:
   existente; este carril no crea orgs, ni assignments, ni targets.
 - **Hand-off comercial automático a HubSpot.** El evento outbox se emite; su consumer (crear/asociar
   lead) es task aparte con su propio gate de consentimiento, igual que TASK-1279.
-- **Fetch propio del sitio del prospecto o de su competencia** — prohibido por regla dura.
+- **Un `fetch` propio dentro de este colector** — prohibido por regla dura. La evidencia de sitio
+  **sí** entra al carril, pero **delegada** al primitive dueño (ver `## Delta 2026-08-26`): este
+  módulo no importa `safe-fetch` ni construye una URL de red por su cuenta.
+- **Evadir un bloqueo del prospecto**: `robots_txt_merge_mode: override`, `custom_robots_txt`,
+  `switch_pool`, `ip_pool_for_scan` y todo `custom_user_agent` que oculte quiénes somos quedan
+  **prohibidos** en este carril. Un bloqueo es un hallazgo, no un obstáculo.
 - **Keyword gap para clientes con target** (`TASK-1662`) y **cola priorizada** (`TASK-1669`).
 
 ## Detailed Spec
@@ -556,15 +640,21 @@ los saltos (crear lead, adjuntar la Radiografía, generar la propuesta) es traba
 
 ### Slice ordering hard rule
 
-- Slice 1 (schema + tier + tope + flag) → Slice 2 (colector) → Slice 3 (derivación) → Slice 4
-  (contrato + lanes + capability) → Slice 5 (evidencia + docs).
+- Slice 1 (schema + tier + tope + flag) → Slice 2 (colector de mercado) → Slice 2b (evidencia de
+  sitio delegada) → Slice 3 (derivación) → Slice 4 (contrato + lanes + capability) → Slice 5
+  (evidencia + docs).
 - **Slice 1 DEBE shippear antes que Slice 2.** El tope por diagnóstico es la única defensa contra el
   sobregiro documentado del chokepoint mensual; un colector sin tope es un grifo abierto sobre un
   presupuesto que se lee una vez.
 - **Slice 3 DEBE shippear antes que Slice 4.** El contrato de salida sin lente obligatoria es la
   forma exacta de `ISSUE-154`, y una vez que un consumer lo lee, quitársela es breaking.
+- 🔴 **Slice 2b NO puede empezar antes de que `TASK-1697` haya extraído el sustrato.** Es el único
+  blocker externo de esta task. Empezarlo antes obliga a un deep import cross-dominio a
+  `ai-visibility/probes/**` o a copiar el fetcher: las dos formas crean la deuda que 1697 existe para
+  cerrar, y la segunda además duplica una superficie SSRF. Si 1697 no está, **el resto de la task
+  avanza sin 2b** y la evidencia de sitio se suma después — 2b no bloquea a Slice 3.
 - Slice 5 al final y con flag ON sólo en staging hasta que la corrida real cuadre costo previsto vs
-  medido.
+  medido. El costo de OnPage del `Slice 2b`, si el diagnóstico lo activó, entra en ese cuadre.
 
 ### Risk matrix
 
@@ -575,7 +665,7 @@ los saltos (crear lead, adjuntar la Radiografía, generar la propuesta) es traba
 | Un estimado se lee como dato medido del prospecto y viaja a una propuesta | comercial / reputación | high | `lens` con CHECK de un solo valor + `capturedAt NOT NULL` + el contrato sin campo de veredicto + test que rechaza un hecho sin lente | Revisión del artefacto en el cierre + gate de contrato |
 | El artefacto declara sano un sitio invisible para la IA | comercial / reputación | medium | La cara visible queda fuera de alcance y bloqueada tras `TASK-1670`; el derivador no emite veredicto de salud | Revisión humana del primer artefacto real |
 | Alguien "mejora" el carril agregando captura recurrente sobre prospectos | finance | medium | Regla dura en la arquitectura + ausencia deliberada de `next_run_at`/scheduler + test que falla si aparece un job que lea la tabla | Aparición de una fila con más de una corrida automática |
-| Cross-host fetch del sitio del prospecto/competencia levantando la guarda SSRF | legal / seguridad | low | `resolveProbeUrl` intacto; el colector no importa `safe-fetch`; revisión de imports en el PR | Lint/import review; cualquier import de `probes/` desde `seo/prospect/` |
+| Cross-host fetch del sitio del prospecto/competencia levantando la guarda SSRF | legal / seguridad | low | El colector **sigue sin importar `safe-fetch`**: delega en el sustrato de `TASK-1697`, que ya trae guarda SSRF, UA de cortesía identificable, timeout, tope de bytes y redirect acotado al mismo host. Lint rule angosta de `TASK-1697` + revisión de imports en el PR | Lint/import review; cualquier import de `probes/` desde `seo/prospect/` |
 | Dos colectores de competidores (esta task y `TASK-1662`) | growth / mantenimiento | medium | Declarar la dirección de reuso en Discovery ANTES de escribir código; un solo primitive de competidores | Revisión cruzada al cerrar cualquiera de las dos |
 | El miembro nuevo de `SeoTier` rompe un `switch` exhaustivo en un consumer | runtime | low | `pnpm typecheck` señala todos los callsites; barrido explícito en Slice 1 | Build rojo |
 

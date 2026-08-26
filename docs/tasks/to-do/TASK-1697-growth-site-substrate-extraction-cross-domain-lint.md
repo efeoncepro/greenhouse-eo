@@ -262,6 +262,11 @@ Reglas obligatorias:
 - **`TASK-1701`** (`to-do`, análisis de contenido por URL): es el tercer consumidor externo del
   sustrato y el disparo legítimo del movimiento (§5.3 de la auditoría). Nace apuntando a
   `growth/site-substrate/`, no a `probes/` — y la rule angosta se lo impone.
+- **`TASK-1709`** (`to-do`, diagnóstico de prospecto) — **cuarto consumidor externo, agregado
+  2026-08-26.** Su `Delta 2026-08-26` levantó la prohibición de fetch sobre el sitio del prospecto y
+  la reemplazó por delegación: su `Slice 2b` consume `@/lib/growth/site-substrate` y **declara esta
+  task como su único blocker externo** (`Blocked by: TASK-1697`). Refuerza la prioridad `P0`: sin la
+  extracción, la evidencia de sitio del carril comercial no tiene forma correcta de existir.
 - **`TASK-1695`** (`to-do`, autoría grounded): **ya no está bloqueada por esta task.** Con el recorte,
   la mitad A **no toca** `grounded-query-bridge.ts` ni `grounded-query-reader.ts`. El bloqueo se
   invierte: `TASK-1713` declara `Blocked by: TASK-1695`, porque su reescritura al barrel debe
