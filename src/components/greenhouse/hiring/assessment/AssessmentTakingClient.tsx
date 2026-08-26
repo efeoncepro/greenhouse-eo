@@ -94,6 +94,46 @@ const responseAnswerFor = (assessment: PublicAssessmentView | null, question: Pu
   return assessment.responses.find((response) => response.questionId === question.questionId)?.answer ?? {}
 }
 
+/**
+ * TASK-1751 — El `code` es lo ÚNICO que sobrevive del error, y hay que conservarlo.
+ *
+ * El servidor devuelve `{ok, code, message}` con `message` GENÉRICO a propósito: es un endpoint público
+ * sin autenticación y el test anti-leak (`route.test.ts:146-161`) lo fija. Aflojar ese mensaje para que
+ * «diga la verdad» debilitaría la frontera pública. La verdad se construye acá, desde el `code`.
+ */
+class AssessmentRequestError extends Error {
+  readonly code: string | undefined
+
+  constructor(code: string | undefined) {
+    super(code ?? 'assessment_request_failed')
+    this.name = 'AssessmentRequestError'
+    this.code = code
+  }
+}
+
+/**
+ * Cuatro mensajes agrupados por lo que la persona PUEDE HACER, no siete por código.
+ * Precedente de forma: `TalentPoolSelfServiceClient.tsx:84-89` (misma clase de superficie pública).
+ */
+const messageForCode = (code: string | undefined, copy: AssessmentTakingClientProps['copy']): string => {
+  // Se cumplió el plazo de respuesta. Reintentar no puede funcionar nunca.
+  if (code === 'assessment_not_open') return copy.taking.saveClosedBody
+
+  // Faltan respuestas: el servidor exige la evaluación completa. Tampoco se resuelve reintentando.
+  if (code === 'assessment_incomplete') return copy.taking.submitIncompleteBody
+
+  // Todo lo demás —fallo real de sistema, red, 429— sí es reintentable: su caso legítimo.
+  return copy.taking.errorBody
+}
+
+/*
+ * Nota deliberada: NO se agrega un CTA de "Reintentar". Esta pantalla hoy no tiene ninguno —el error se
+ * pinta como texto— y el contrato de jerarquía de acciones sólo exige que no aparezca donde reintentar no
+ * puede funcionar (`assessment_not_open`, `assessment_incomplete`). Eso se cumple por construcción.
+ * Introducir el botón sería superficie nueva fuera del alcance de esta task; la clave `taking.retry`
+ * sigue existiendo sin consumer, esperando a quien lo diseñe.
+ */
+
 const apiRequest = async (
   token: string | undefined,
   expectedAssessmentPublicId: string,
@@ -111,10 +151,15 @@ const apiRequest = async (
     body: JSON.stringify(requestBody),
   })
 
-  const payload = await response.json() as { ok: boolean; assessment?: PublicAssessmentView; message?: string }
+  const payload = await response.json() as {
+    ok: boolean
+    assessment?: PublicAssessmentView
+    message?: string
+    code?: string
+  }
 
   if (!response.ok || !payload.ok || !payload.assessment) {
-    throw new Error(payload.message ?? 'assessment_request_failed')
+    throw new AssessmentRequestError(payload.code)
   }
 
   return payload.assessment
@@ -290,9 +335,11 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
       }, 1800)
 
       return updated
-    } catch {
+    } catch (error) {
+      const code = error instanceof AssessmentRequestError ? error.code : undefined
+
       setSaveState('error')
-      setFieldError(copy.taking.errorBody)
+      setFieldError(messageForCode(code, copy))
 
       return null
     }
@@ -403,9 +450,11 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
 
       setAssessment(updated)
       setSubmitOpen(false)
-    } catch {
+    } catch (error) {
+      const code = error instanceof AssessmentRequestError ? error.code : undefined
+
       setSubmitOpen(false)
-      setFieldError(copy.taking.errorBody)
+      setFieldError(messageForCode(code, copy))
     } finally {
       setSubmitting(false)
     }
