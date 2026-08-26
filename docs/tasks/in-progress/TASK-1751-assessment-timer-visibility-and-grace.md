@@ -47,20 +47,20 @@ partiendo de esta spec sin releer este Delta: ambos funcionan.
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `interaction`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1751-assessment-timer-visibility-and-grace.md`
-- Flow: `none`
+- Flow: `docs/ui/flows/TASK-1751-assessment-grace-flow.md`
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-011`
-- Status real: `Diseño listo — wireframe con caso fuente medido; sin implementar`
+- Status real: `Alcance recalibrado 2026-08-26 (Slice 0): de los 4 defectos originales 2 ya no existen y aparecieron 3 hallazgos nuevos verificados contra el código. Wireframe podado y realineado; UI ready resuelto. Implementación pendiente desde el Slice 1`
 - Rank: `TBD`
 - Domain: `hr|ui`
 - Blocked by: `none`
@@ -128,7 +128,7 @@ Reglas obligatorias:
 ### Depends on
 
 - `src/components/greenhouse/hiring/assessment/AssessmentTakingClient.tsx`
-- `src/components/greenhouse/hiring/assessment/AssessmentTakingClient.module.css`
+- `src/components/greenhouse/hiring/assessment/AssessmentTaking.module.css`
 - `src/lib/hiring/assessment/public-taking.ts` — sólo como lectura del contrato de timing
 
 ### Blocks / Impacts
@@ -140,7 +140,7 @@ Reglas obligatorias:
 ### Files owned
 
 - `src/components/greenhouse/hiring/assessment/AssessmentTakingClient.tsx`
-- `src/components/greenhouse/hiring/assessment/AssessmentTakingClient.module.css`
+- `src/components/greenhouse/hiring/assessment/AssessmentTaking.module.css`
 - `src/lib/copy/dictionaries/es-CL/hiringAssessment.ts` y su par `en-US`
 - `src/lib/copy/types.ts` — sólo las keys nuevas
 - El escenario GVC de la rendición
@@ -276,20 +276,39 @@ Reglas obligatorias:
 
 ## Scope
 
-- **Slice 1 — Reloj sticky.** `position: sticky` en `.sessionBar` con `z-index` sobre el contenido,
-  `scroll-margin-top` en los controles y verificación en 390px de que no tapa el enunciado.
-- **Slice 2 — Avisos visibles.** Banda `role='status'` con `timeWarningFive` / `timeWarningOne`,
-  conservando el `srOnly` con `aria-live`. Contraste AA en los tres tonos.
-- **Slice 3 — Gracia honesta.** En `submit_grace`: textarea `readOnly` con contenido preservado,
-  banda que explica el estado y declara cuántas respuestas quedaron guardadas, envío que no intenta guardar.
-- **Slice 4 — Copy de plazo cerrado.** Keys nuevas en los tres archivos de copy; el 409
-  `assessment_not_open` deja de renderizar `errorBody` genérico.
-- **Slice 5 — Evidencia.** Escenario GVC desktop + móvil con las assertions declaradas.
+> **Alcance recalibrado el 2026-08-26 (Slice 0).** Los Slices 1 y 2 originales —reloj sticky y avisos
+> visibles— se retiraron porque ya están implementados o nunca fueron defecto (ver `## Delta 2026-08-26`).
+> Los slices se renumeraron y se incorporaron los hallazgos del discovery.
+
+- **Slice 0 — Recalibración del contrato.** Podar spec y wireframe al alcance real, corregir el path del
+  módulo CSS y el del escenario GVC, resolver `UI ready`. Sin código de runtime.
+- **Slice 1 — Guardado preventivo por umbral.** El autosave es un debounce que **se reinicia con cada
+  tecla**: quien escribe de corrido sin pausar no guarda nada y puede perder la respuesta entera. Al cruzar
+  un umbral de tiempo restante, forzar un guardado inmediato y reducir el debounce para lo que reste.
+  Reusa `saveAnswer`; el reloj es `projectAssessmentDatabaseNow`, **nunca** `Date.now()`.
+- **Slice 2 — Gracia sin trampa.** En `submit_grace`: textarea `readOnly` con contenido preservado y su
+  señal visual explícita (`.textArea` no tiene variante `:disabled` propia, así que el gris lo pone hoy el
+  navegador y se pierde), banda que explica el estado y declara cuántas respuestas quedaron guardadas
+  —derivado en cliente desde `assessment.responses`, **nunca** un campo nuevo en el DTO—, envío que no
+  intenta guardar, y **navegación entre preguntas gateada** para que un clic no sobreescriba el borrador.
+- **Slice 3 — Copy bilingüe.** Keys nuevas en `es-CL` + `en-US` + `types.ts`. Va antes del Slice 4 porque
+  el mapeo de errores la consume. El tipo `HiringAssessmentCopy` obliga las dos lenguas.
+- **Slice 4 — Errores honestos.** Mapa `code → copy` en el cliente siguiendo el precedente de
+  `TalentPoolSelfServiceClient.tsx:84-89`. Cubre **los dos catches** (submit y autosave), no sólo el del
+  submit. Cuatro mensajes agrupados por lo que la persona puede hacer, no siete por código.
+- **Slice 5 — Tests y evidencia.** Actualizar deliberadamente el contract test, cubrir el borde
+  `answer_deadline − ε` que hoy no tiene test, autorar el escenario GVC real con seed de fase de gracia.
 
 ## Out of Scope
 
 - Cambiar la duración del límite base o de la gracia de 30 minutos.
-- Autoguardado mientras se escribe (follow-up declarado, con su propio riesgo de contrato).
+- Autoguardado **continuo** mientras se escribe (follow-up declarado, con su propio riesgo de contrato).
+  ⚠️ **No confundir con el Slice 1**: el guardado preventivo por umbral dispara UNA vez antes del plazo
+  sobre texto escrito a tiempo, y no cambia el contrato de guardado ni relaja `answerDeadline`.
+- **Flush disparado AL cruzar `answerDeadline`.** Verificado imposible: el cliente va atrás del servidor
+  ≥1 RTT por construcción (el ancla se toma al construir la respuesta, la monotónica se fija tras la
+  latencia) y el corte del guardado es `>=` sin epsilon (`instances.ts:578-580`). Llegaría siempre tarde
+  y cobraría 409. Por eso el Slice 1 es preventivo y no reactivo.
 - El mensaje `invalidBody` del enlace no disponible.
 - Cualquier superficie de operador, incluido el workbench de revisión.
 - Extender plazos de un test concreto: eso ya existe como adaptación gobernada.
@@ -354,15 +373,22 @@ Ninguna. No toca infraestructura, secretos, workers ni proveedores.
 
 ## Acceptance Criteria
 
-- [ ] El reloj permanece visible tras hacer scroll hasta el final del enunciado, en desktop y en 390px.
-- [ ] El aviso de 5 minutos y el de 1 minuto son visibles sin lector de pantalla.
+- [ ] Un candidato que escribe de corrido hasta el límite conserva su respuesta: el guardado preventivo
+      dispara antes del plazo y el servidor lo acepta.
+- [ ] El guardado preventivo usa el reloj de base (`projectAssessmentDatabaseNow`), no `Date.now()`.
+- [ ] En `submit_grace` el textarea está en solo lectura, conserva el texto y **se ve congelado**
+      (señal visual explícita, no la heredada del navegador).
+- [ ] Cambiar de pregunta durante `submit_grace` NO sobreescribe ni borra el borrador local.
 - [ ] El canal `srOnly` con `aria-live` sigue presente y no se duplica el anuncio.
-- [ ] En `submit_grace` el textarea está en solo lectura y conserva el texto que el candidato escribió.
 - [ ] En `submit_grace` el envío funciona sin intentar guardar y sin devolver 409.
 - [ ] Un guardado rechazado por plazo muestra un mensaje que nombra la causa y ofrece enviar lo guardado;
       nunca "prueba de nuevo en unos minutos".
+- [ ] **El catch del autosave** recibe el mismo trato que el del submit: hoy los dos rinden `errorBody`.
+- [ ] El servidor sigue devolviendo `{ok, code, message}` con mensaje genérico — el test anti-leak
+      (`route.test.ts:146-161`) sigue verde y el mensaje honesto se construye en el cliente desde el `code`.
 - [ ] La copy nueva existe en es-CL y en-US y está tipada.
-- [ ] Contraste AA en los tres tonos del reloj y en las bandas.
+- [ ] Contraste AA en la banda de gracia y en los mensajes nuevos. (Los tres tonos del reloj ya están
+      shipeados y quedan fuera de alcance: no se re-auditan acá.)
 - [ ] Sin scroll horizontal de página en 390px.
 - [ ] Evidencia GVC desktop + móvil adjunta con las assertions declaradas.
 - [ ] `UI ready` pasa a `yes` sólo con mapping, plan GVC y decision log completos y `pnpm task:lint --task TASK-1751` sin findings.
@@ -390,5 +416,16 @@ Ninguna. No toca infraestructura, secretos, workers ni proveedores.
 
 ## Open Questions
 
-- ¿La banda de gracia debe declarar cuántas respuestas quedaron sin responder, o sólo cuántas se
-  guardaron? Declarar las faltantes es más honesto pero puede leerse como reproche.
+**Resueltas en el Slice 0 (2026-08-26):**
+
+- *¿Flush al cruzar el plazo?* → **No**: imposible por construcción (ver `## Out of Scope`). Se sustituye
+  por guardado preventivo por umbral, que no relaja ningún plazo.
+- *¿La banda declara las respuestas faltantes o sólo las guardadas?* → **Sólo las guardadas.** El objetivo
+  de la banda es que "enviar" sea una decisión informada, no auditar a la persona en el peor momento del
+  proceso. El conteo de faltantes ya lo bloquea el propio submit con su mensaje propio.
+
+**Abierta, para el Slice 5:**
+
+- ¿El gate visual corre premium completo o `--contract-only`? El cambio visible es un textarea en solo
+  lectura, una banda y unos mensajes; forzar la fase de gracia en una captura exige sembrar datos. La
+  decisión debe quedar **declarada en la task**, nunca saltada en silencio.
