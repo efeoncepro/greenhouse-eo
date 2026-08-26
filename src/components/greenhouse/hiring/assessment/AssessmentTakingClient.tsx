@@ -144,6 +144,7 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
   const currentQuestionIdRef = useRef<string | null>(null)
   const lastSavedRef = useRef<Record<string, string>>({})
   const answerRef = useRef(answer)
+  const draftsRef = useRef<Record<string, Record<string, unknown>>>({})
   const saveTimerRef = useRef<number | null>(null)
   const saveFeedbackTimerRef = useRef<number | null>(null)
 
@@ -199,6 +200,15 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
   const answeredIds = useMemo(() => new Set(assessment?.responses.map((response) => response.questionId).filter(Boolean) ?? []), [assessment?.responses])
   const progressPercent = questions.length === 0 ? 0 : ((step + 1) / questions.length) * 100
 
+  /**
+   * TASK-1751: el servidor EXIGE la evaluación completa para aceptar el envío
+   * (`public-taking.ts:651-657`). Si falta una respuesta, enviar es imposible — y prometerlo sería
+   * repetir la misma mentira que esta task viene a arreglar. Se deriva en cliente desde `responses`:
+   * NUNCA un campo nuevo en el DTO público, que tiene allowlists exactos testeados.
+   */
+  const savedAnswerCount = questions.filter((question) => answeredIds.has(question.questionId)).length
+  const canSubmitEverything = questions.length > 0 && savedAnswerCount === questions.length
+
   useEffect(() => {
     if (!started || submitted) return undefined
 
@@ -222,14 +232,23 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
   useEffect(() => {
     if (!started || !currentQuestion) return
 
-    const questionChanged = currentQuestionIdRef.current !== currentQuestion.questionId
+    const previousQuestionId = currentQuestionIdRef.current
+    const questionChanged = previousQuestionId !== currentQuestion.questionId
 
     currentQuestionIdRef.current = currentQuestion.questionId
 
     if (!questionChanged) return
 
+    // TASK-1751: el borrador de la pregunta que se abandona se PRESERVA. Antes se perdía en silencio —
+    // al volver, esta misma línea lo pisaba con el valor del servidor (vacío si nunca se guardó).
+    if (previousQuestionId) draftsRef.current[previousQuestionId] = answerRef.current
+
     if (saveFeedbackTimerRef.current) window.clearTimeout(saveFeedbackTimerRef.current)
-    setAnswer(responseAnswerFor(assessment, currentQuestion))
+
+    const storedDraft = draftsRef.current[currentQuestion.questionId]
+    const serverAnswer = responseAnswerFor(assessment, currentQuestion)
+
+    setAnswer(storedDraft && isAnswered(currentQuestion, storedDraft) ? storedDraft : serverAnswer)
     setFieldError(null)
     setSaveState('idle')
     window.requestAnimationFrame(() => cardRef.current?.focus({ preventScroll: true }))
@@ -561,9 +580,13 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
         </div>
         <main className={styles.mainStack}>
           {timingPhase === 'submit_grace' ? (
-            <div className={styles.accommodationBanner} role='status'>
+            <div className={styles.accommodationBanner} role='status' data-capture='assessment-grace-banner'>
               <i className='tabler-send' aria-hidden='true' />
-              <strong>{copy.taking.submitGraceNotice}</strong>
+              <span>
+                <strong>{copy.taking.submitGraceNotice}</strong>{' '}
+                {canSubmitEverything ? copy.taking.graceBodyComplete : copy.taking.graceBodyIncomplete}{' '}
+                {formatTemplate(copy.taking.graceSavedCount, { saved: savedAnswerCount, total: questions.length })}
+              </span>
             </div>
           ) : null}
           <div className={styles.wizardHeader}>
@@ -670,7 +693,7 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
                       onChange={(event) => updateAnswer({ text: event.target.value.slice(0, 6000) })}
                       placeholder={copy.taking.textareaPlaceholder}
                       maxLength={6000}
-                      disabled={!canAnswer}
+                      readOnly={!canAnswer}
                     />
                     <span className={styles.characterCount}>
                       {formatTemplate(copy.taking.characterCount, { count: typeof answer.text === 'string' ? answer.text.length : 0, max: 6000 })}
@@ -688,11 +711,13 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
                 >
                   {copy.taking.previous}
                 </button>
-                <button className={styles.primaryButton} type='button' data-capture='assessment-next' onClick={() => void goNext()}>
-                  {timingPhase === 'submit_grace' || step === questions.length - 1
-                    ? copy.taking.submit
-                    : copy.taking.next}
-                </button>
+                {timingPhase === 'submit_grace' && !canSubmitEverything ? null : (
+                  <button className={styles.primaryButton} type='button' data-capture='assessment-next' onClick={() => void goNext()}>
+                    {timingPhase === 'submit_grace' || step === questions.length - 1
+                      ? copy.taking.submit
+                      : copy.taking.next}
+                  </button>
+                )}
               </div>
               <div className={styles.saveState} role='status' aria-live='polite'>
                 {saveState === 'saving' ? <i className={`tabler-loader-2 ${styles.saveIcon} ${styles.saveIconPending}`} aria-hidden='true' /> : null}

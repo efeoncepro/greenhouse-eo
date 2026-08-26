@@ -617,6 +617,21 @@
   line-height: 1.55;
 }
 
+/*
+ * TASK-1751 — El campo congelado NECESITA señal propia.
+ *
+ * Antes usaba `disabled`, y el gris lo ponía el navegador: este módulo nunca tuvo `.textArea:disabled`.
+ * Al pasar a `readOnly` —que conserva foco, lectura y copia, y por eso es la decisión de accesibilidad
+ * correcta durante la gracia— esa señal desaparece y el campo parece editable. Esta regla la repone.
+ */
+.textArea:read-only {
+  border-style: dashed;
+  color: var(--text-secondary);
+  background: var(--surface-alt);
+  cursor: default;
+  resize: none;
+}
+
 .textArea:focus {
   border-color: var(--primary);
   outline: none;

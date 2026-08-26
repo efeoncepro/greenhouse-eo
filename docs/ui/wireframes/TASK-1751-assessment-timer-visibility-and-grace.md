@@ -192,7 +192,8 @@ Todo en `src/lib/copy/dictionaries/es-CL/hiringAssessment.ts` + par `en-US` + ti
 | Key | Estado | Texto propuesto |
 |---|---|---|
 | `graceTitle` | nueva | `El tiempo para responder terminó` |
-| `graceBody` | nueva | `Ya no puedes editar ni agregar respuestas, pero todavía puedes enviar lo que alcanzaste a guardar.` |
+| `graceBodyComplete` | nueva | `Ya no puedes editar ni agregar respuestas. Todas quedaron guardadas: todavía puedes enviar la evaluación.` |
+| `graceBodyIncomplete` | nueva | `Ya no puedes editar ni agregar respuestas, y quedaron algunas sin guardar. Escríbele a quien te contactó para retomar la evaluación.` |
 | `graceSavedCount` | nueva | `Guardadas: {saved} de {total}.` |
 | `saveClosedTitle` | nueva | `Tu tiempo de respuesta terminó` |
 | `saveClosedBody` | nueva | `No pudimos guardar esta respuesta porque el plazo se cumplió. Tu texto sigue en pantalla: cópialo si lo necesitas. Puedes enviar lo que ya está guardado.` |
@@ -212,7 +213,8 @@ Seis estados, cada uno con copy visible y comportamiento de recuperación declar
 | ready | `answering` | Reloj con cuenta regresiva, insignia de aviso en `warning`/`critical`, textarea editable, chip "Guardado" del autosave | Ninguna necesaria. El guardado preventivo actúa solo, sin pedirle nada a la persona |
 | loading | resolución de token | `loadingTitle` / `loadingBody` ya existentes | Ninguna: es transitorio. Si falla, cae a error |
 | empty | evaluación sin preguntas | `noQuestionsTitle` / `noQuestionsBody` ya existentes | Sin acción del candidato; la salida es el contacto humano |
-| partial | `submit_grace` | Banda con `graceTitle` + `graceBody` + `graceSavedCount`; textarea en solo lectura con el texto **preservado y visible**; CTA de envío habilitado | **Copiar el texto** y **enviar lo guardado**. Ambas posibles, ambas ofrecidas. Nunca "reintentar" |
+| partial | `submit_grace`, todas guardadas | Banda con `graceTitle` + `graceBodyComplete` + `graceSavedCount`; textarea en solo lectura con el texto **preservado y visible**; CTA de envío presente | **Copiar el texto** y **enviar**. Ambas posibles, ambas ofrecidas. Nunca "reintentar" |
+| partial | `submit_grace`, faltan respuestas | Banda con `graceTitle` + `graceBodyIncomplete` + `graceSavedCount`; textarea en solo lectura; **el CTA de envío NO se renderiza** | Copiar el texto y **contactar a quien la envió**. Enviar es imposible: el servidor exige la evaluación completa |
 | error | cualquiera | Distinto por causa: `saveClosedBody` si venció el plazo; `submitIncompleteBody` si faltan respuestas; `errorBody` genérico **sólo** en fallo real de sistema | Reintentar **sólo** en el genérico y en el 429. En los otros la recuperación es enviar lo guardado |
 | denied | token inválido, rotado o consumido | `invalidTitle` / `invalidBody` ya existentes | Ninguna en pantalla: la salida es el contacto humano. **No** se ofrece reintentar |
 
@@ -244,6 +246,12 @@ Decisiones que esto fija:
 - La banda declara cuántas respuestas se guardaron, para que "enviar" sea una decisión informada. El
   conteo se **deriva en cliente** desde `assessment.responses`; **nunca** un campo nuevo en el DTO
   (`public-boundary.test.ts:199-224` afirma allowlists exactos).
+- 🔴 **La banda es condicional a la completitud, y esto corrige el contrato original.** El servidor
+  **exige la evaluación COMPLETA** para aceptar el envío (`public-taking.ts:651-657`: cualquier pregunta
+  sin respuesta lanza `assessment_incomplete`). Por lo tanto *"puedes enviar lo que alcanzaste a guardar"*
+  **es falso** cuando falta alguna: prometerlo sería repetir, más sutil, la misma mentira que esta task
+  viene a arreglar. Con faltantes, el CTA de envío **no se renderiza** y la banda dirige al contacto
+  humano, que es la única salida real.
 - El paso entre preguntas **no puede sobreescribir** el borrador.
 
 ## Accessibility Contract

@@ -130,6 +130,11 @@ export interface HiringAssessmentCopy {
     timeToAnswer: string
     timeToSubmit: string
     submitGraceNotice: string
+    graceBodyComplete: string
+    graceBodyIncomplete: string
+    graceSavedCount: string
+    saveClosedBody: string
+    submitIncompleteBody: string
     timeWarningFive: string
     timeWarningOne: string
     textareaPlaceholder: string
