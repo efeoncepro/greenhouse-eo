@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-011`
-- Status real: `Desplegado y con schema aplicado (migración + índice + CONTRACT + canal email habilitado) — faltan los smokes funcionales y el flip de enlaces seguros (bloqueado por un TERCERO: click_tracking=true en efeoncepro.com, salida limpia = mail.efeoncepro.com, pending del lado de Resend). TERCER PENDIENTE no declarado en esta línea (agregado 2026-08-26): los tres riesgos residuales del Delta 2026-08-19 siguen vivos, y el grave es que purge_assessment_access_recovery existe en DB con CERO callers en código (verificado) — la retención de 12 meses y el purgado por retiro de consentimiento NUNCA se ejecutan`
+- Status real: `Desplegado y con schema aplicado (migración + índice + CONTRACT + canal email habilitado) — faltan los smokes funcionales y el flip de enlaces seguros (bloqueado por un TERCERO: click_tracking=true en efeoncepro.com, salida limpia = mail.efeoncepro.com, pending del lado de Resend). TERCER PENDIENTE: de los tres riesgos residuales del Delta 2026-08-19, el GRAVE quedó CERRADO el 2026-08-26 — purge_assessment_access_recovery tenía la función y no tenía quién la llamara, así que el retiro de consentimiento no tenía vía de ejercicio. Ahora existe el primitive src/lib/hiring/assessment/access-recovery-retention.ts y el CLI gobernado pnpm hiring:assessment:purge-access-recovery (plan read-only → allowlist humana → apply con actor), plan ejercitado contra PostgreSQL real. Siguen vivos los otros dos: el purgado de sesiones públicas que borra por expires_at y no por deadline, y la copy terminal que colapsa seis causas`
 - Rank: `TBD`
 - Domain: `hr|identity|delivery`
 - Blocked by: `none`

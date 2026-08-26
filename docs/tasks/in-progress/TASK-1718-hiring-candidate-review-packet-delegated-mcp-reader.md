@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-011`
-- Status real: `Operativa en producción para uso interno delegado: reader/proyección/provider ON, App API exacta y dos tools MCP verificadas con OAuth real sobre una application exacta; chunks/hash y deny no autenticado verdes. Permanece in-progress hasta documentar sign-offs Privacy/Security/Talent/Identity/MCP, prueba revoked/base-only y rollback/revocación ejercitados. PENDIENTE DE CÓDIGO no declarado antes (agregado 2026-08-26): el hallazgo H-10 del Delta 2026-08-22 sigue sin arreglar — el filtro stage entra como texto libre (stage as never en candidate-review/readers.ts:97, sin validar contra el enum en app-hiring-candidate-review.ts:206) y ante un literal inexistente responde 200 {items:[]}. B2B continúa fuera de alcance.`
+- Status real: `Operativa en producción para uso interno delegado: reader/proyección/provider ON, App API exacta y dos tools MCP verificadas con OAuth real sobre una application exacta; chunks/hash y deny no autenticado verdes. Permanece in-progress hasta documentar sign-offs Privacy/Security/Talent/Identity/MCP, prueba revoked/base-only y rollback/revocación ejercitados. H-10 CERRADO el 2026-08-26: el filtro stage se valida contra HIRING_APPLICATION_STAGES en el READER (no en la ruta, para que lo hereden todos los consumidores) y una etapa inexistente devuelve 400 hiring_application_stage_invalid nombrando las válidas, fallando ANTES de consultar la base. B2B continúa fuera de alcance.`
 - Rank: `TBD`
 - Domain: `hr|platform|identity|data`
 - Blocked by: `none`
