@@ -3,6 +3,18 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-26 — La contabilidad de Hiring mentía: el dominio está más avanzado que sus documentos
+
+- **Auditoría con cinco verificadores en paralelo, cada hallazgo re-verificado a mano contra el runtime** (git, `vercel env ls`, `gcloud run services describe`) antes de escribirse. El patrón de fondo: casi nada de Hiring falta por construirse; faltaba por contabilizarse. Sin cambios de runtime en esta pasada.
+- **La regla que envenenaba a los agentes.** `.claude/rules/hiring.md` se auto-carga al tocar `src/lib/hiring/**` y afirmaba **en presente** que el `CHECK` del invariante `stage='closed'` ⟺ desenlace seguía parqueado en `docs/tasks/pending-migrations/`. Se aplicó el 2026-08-23 (`b270478f4`) y esa carpeta sólo tiene su `README`. Corregido, con las tres migraciones nombradas por ruta; además `HIRING_APPLICATION_STAGES` volvió a ser el espejo del `CHECK` desde que el Slice F de `TASK-1754` lo bajó de trece a seis. El `NUNCA` de fondo —no aplicar un contract antes del release que retira su escritor— **no se relaja**: cambió el hecho, no el invariante.
+- **Un flag encendido en producción que el ledger daba por apagado.** `HIRING_VACANCY_AI_ENABLED` lleva **41 días ON en Production** y está **ausente en staging**; el ledger decía "OFF en todos los environments". Y el orden de sus precondiciones quedó invertido: se declaró "flip staging + smoke, después prod", y ocurrió prod ON **sin que el smoke de staging ocurriera nunca**. Queda registrado como deuda abierta, no como diseño.
+- **La trampa que explicaba casi toda la confusión.** `main` promueve por **squash merge**, así que los SHAs de `develop` nunca son ancestros aunque su contenido esté desplegado. Leer `rev-list --count origin/main..origin/develop` como "trabajo sin desplegar" produjo el diagnóstico falso de que `TASK-1771` esperaba release: está en producción desde `709e15f66` (2026-08-23), verificado blob a blob. El gap real de código es `TASK-1762`, cuyas cuatro migraciones **ya se aplicaron** a la instancia Cloud SQL compartida — schema por delante del código, mitigado porque sus flags nacen OFF.
+- **Ocho entradas falsas en `docs/tasks/README.md`**, corregidas: `1771` y `1755` como "no están en main" (ambas desplegadas), `1748` y `1771` con migraciones "parqueadas" (las dos aplicadas), `1754` con el Slice F "no ejecutado" (`50b742341`), `1719` con "falta rollout" (ejecutado el 08-18), `1747` marcada `to-do` estando `in-progress` y en producción, y `1757` "apagado esperando sign-off" con el flag ON desde el 08-20. Seis líneas `Status real` de las specs quedaron alineadas con el runtime.
+- **Tres pendientes que ninguna línea declaraba.** `TASK-1718`: el fix H-10 sigue sin escribirse — el filtro `stage` entra como texto libre (`stage as never`) y ante un literal inexistente responde `200 {items:[]}`. `TASK-1746`: `purge_assessment_access_recovery` existe en DB con **cero callers**, o sea la retención de 12 meses y el purgado por retiro de consentimiento **nunca se ejecutan** — es el único hallazgo con filo legal. `TASK-1742`: el canary se declaró verde el 08-18 y al día siguiente entraron dos fixes correctivos al mismo carril, sin registro de re-verificación.
+- **Una task perdió la mitad de su premisa.** `TASK-1751` declaraba cuatro defectos en la rendición del candidato; **dos no son ciertos**: el reloj ya es `sticky` (`bc69e5a75`, arreglado 2h43m después de crearse la task) y los avisos de 5 y 1 minuto **nunca fueron sólo `srOnly`** — la insignia visible `.timerBadge` convive con el canal de lector de pantalla desde el ship original del 2026-07-13. Quedan los **dos del guardado**, que son el daño real del caso fuente: el borrador en vuelo se pierde al entrar en gracia (falta el *flush*, no "congelar mejor") y el error final manda a reintentar algo imposible. La spec lleva `NUNCA` explícito de no "arreglar" lo que funciona.
+- **Un fail-closed que parecía un olvido.** `HIRING_ASSESSMENT_AI_PROMOTION_EVIDENCE_DIGEST` está ausente en los tres runtimes **por diseño**: el digest *es* la evidencia de promoción y sin él el modo degrada a `global_provisional`. Quedó anotado con su `NUNCA` — declararlo para "destrabar" la policy de excepciones vaciaría el gate.
+- **Aprendizaje transversal registrado:** un `Status real` es una afirmación con fecha de caducidad. Cinco de siete tasks `in-progress` del dominio lo tenían stale, y el `README` estaba peor que las specs. Existe precedente del mismo fix (`4a1011286`).
+
 ## 2026-08-26 — Octubre de Berel queda convertido en un proyecto creativo trazable
 
 - El proyecto [`Produccion Creativa - Octubre 26`](https://app.notion.com/p/3c839c2fefe7813c9450e2f35cb4021e) quedó `En curso` con ocho artículos `N35–N42`, 32 banners, 32 paquetes sociales y 32 subítems en Content Hub: 72 tareas relacionadas al proyecto, conforme a la aceptación `9A` / `4A`.
@@ -782,11 +794,3 @@ Se agregó a `EPIC-011` una task backend-critical para separar el nombre submitt
 person-first normalizado/corregible y una search key versionada; ambas entradas públicas deberán usar el mismo
 primitive. La remediación histórica queda limitada a ADR y sign-offs previos, detector read-only, dry-run,
 allowlist humana, compare-and-set, audit y rollback ensayado. No hubo implementación, migración ni cambios de datos.
-
-## 2026-08-16 — Sincronización documental y de skills del Talent Pool
-
-Después del rollout productivo se auditó todo el contrato construido en la sesión: arquitectura Hiring, API reference,
-manual operativo, EPIC-011/038, TASK-1718/1723/1724/1725, ledgers de flags/releases, `project_context` y README/registry.
-Las skills espejo `.codex`/`.claude` de Talent, MCP y release quedaron alineadas con el runtime real. Se preservaron los
-límites: CV/review por MCP y automatización de tests continúan OFF; invite/self-service sólo operan mediante consentimiento
-explícito, confirmación tokenizada y rollback por flags. Sin cambios de código ni schema en este barrido.

@@ -1,5 +1,44 @@
 # TASK-1751 — El candidato no ve su reloj ni entiende por qué no puede enviar
 
+## Delta 2026-08-26 — dos de los cuatro defectos NO son ciertos; verificado contra el código
+
+Auditoría del dominio Hiring, con verificación adversarial y re-comprobación manual. **La mitad de
+la premisa de esta task es falsa hoy, y una de esas mitades nunca fue cierta.** Quien la tome debe
+leer esto antes que el `Summary`, que quedó escrito el 2026-08-19 y no se actualizó.
+
+- **(a) «el reloj no sigue el scroll» → YA ARREGLADO.** `.sessionBar` es `position: sticky` con
+  `inset-block-start: var(--careers-header-height, 65px)` y `scroll-margin-block-start: 156px`
+  (`AssessmentTaking.module.css:86-98`, comentario que cita esta misma task). Lo cerró `bc69e5a75`
+  el 2026-08-19 a las 18:58 — **2h43m después** de crearse esta task (`23f51afc8`, 16:15). Nadie
+  actualizó la spec.
+- **(b) «los avisos de 5 y 1 minuto son `srOnly`, invisibles» → REFUTADO: nunca fue cierto.** Hay
+  **dos** canales, no uno. El `srOnly`+`aria-live` es el anuncio puntual para lector de pantalla, y
+  en paralelo existe una insignia **visible** dentro del reloj: `timerVisualNote`
+  (`AssessmentTakingClient.tsx:183`) renderizada en `.timerBadge` (`:505`), clase que **no** está
+  oculta (`AssessmentTaking.module.css:176-181`), más el cambio de tono del card a warning/critical.
+  `git log -L 183,183` la sitúa desde el ship original `9b69ca7cd` (2026-07-13), o sea **antes** de
+  escribirse esta task; `git show 23f51afc8` confirma que ya estaba ese día.
+
+**Lo que queda, y es el daño real del caso fuente:**
+
+- **(c) la gracia se rompe con texto sin guardar → SIGUE ABIERTO.** Al entrar en `submit_grace`,
+  `canAnswer` pasa a `false` y todo se congela **sin flush del borrador en vuelo** (el autosave de
+  `open_text` tiene debounce de 450 ms): `AssessmentTakingClient.tsx:162` lo define, `:234` descarta
+  el save, `:268` apaga el efecto de autosave, `:359` impide hasta actualizar el estado y `:626`
+  deja el textarea `disabled` en vez de `readOnly`. No es regresión accidental: el congelamiento
+  está testeado como intencional (`AssessmentTakingClient.timing-contract.test.ts:12-17`). **Lo que
+  falta es el flush al cruzar `answerDeadline`, no «congelar mejor».**
+- **(d) el error final manda a reintentar lo imposible → SIGUE ABIERTO.** El submit revienta con
+  `assessment_incomplete` (`public-taking.ts:654-658`) y el cliente lo colapsa al genérico
+  (`AssessmentTakingClient.tsx:342-344` → `errorBody`, `hiringAssessment.ts:13`). Reintentar no
+  puede funcionar nunca: la pregunta queda pendiente para siempre porque ya no se puede guardar.
+
+**Consecuencia para el alcance:** esta task deja de ser «cuatro protecciones fallaron» y pasa a ser
+**dos**, las dos del guardado. La banda visible fuera del card sigue siendo una mejora defendible
+—hoy el aviso vive dentro del reloj— pero es decisión de diseño, **no un defecto**, y el plan de
+GVC/scenario debe recortarse en consecuencia. **NUNCA** «arreglar» `.timerBadge` ni el `srOnly`
+partiendo de esta spec sin releer este Delta: ambos funcionan.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -121,9 +160,11 @@ Reglas obligatorias:
 
 ### Gap
 
-- `.sessionBar` (`AssessmentTakingClient.module.css:86-97`) no declara `position: sticky`; el reloj
-  sale del viewport al hacer scroll.
-- El aviso de 5 y 1 minuto se renderiza sólo en `.srOnly` (`:514`, clase en `:718-725`): invisible.
+- ~~`.sessionBar` no declara `position: sticky`~~ → **CERRADO por `bc69e5a75` (2026-08-19)**: hoy es
+  `sticky` con offset de header y `scroll-margin-block-start`. Ver Delta 2026-08-26.
+- ~~El aviso de 5 y 1 minuto se renderiza sólo en `.srOnly`: invisible~~ → **REFUTADO, nunca fue
+  cierto**: la insignia visible `.timerBadge` convive con el canal `srOnly` desde `9b69ca7cd`
+  (2026-07-13). Ver Delta 2026-08-26.
 - Durante `submit_grace` el textarea sigue editable y el envío intenta guardar, chocando contra el
   409 `assessment_not_open` de `src/lib/hiring/assessment/instances.ts:577-579`.
 - No existe copy que distinga "se cerró el plazo de respuesta" del error genérico `errorBody`

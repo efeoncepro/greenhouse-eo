@@ -2,6 +2,20 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-26 — Hiring: auditoría de estado real y corrección de la contabilidad documental
+
+**Sólo documentación; runtime intacto.** Detalle completo, método y hechos verificados: [`auditoría fechada`](docs/audits/hiring/GREENHOUSE_HIRING_DOMAIN_STATE_AUDIT_2026-08-26.md).
+
+**El error que hay que no repetir.** `main` promueve por **squash**, así que los SHAs de `develop` no quedan como ancestros aunque el contenido esté desplegado. Leer `rev-list --count origin/main..origin/develop` como «trabajo sin desplegar» produjo un diagnóstico falso. Para saber si algo está en producción, comparar **blobs por ruta**, no contar commits. Último release: `709e15f66` (2026-08-23).
+
+**Estado real:** las 7 tasks `in-progress` no tienen código pendiente salvo dos fixes puntuales; lo que falta es evidencia y verificación. `TASK-1771` está en producción y sólo debe su verification sequence; `TASK-1719` sólo la evidencia del monitor de 7 días (ventana ya transcurrida); `TASK-1757`, una sola rotación real.
+
+**Corregido:** `.claude/rules/hiring.md` (auto-load, afirmaba en presente un `CHECK` aplicado el 08-23), el ledger de flags, ocho entradas de `docs/tasks/README.md`, seis `Status real`, la paridad de `Child Tasks` de `EPIC-011` y el alcance de `TASK-1751`, que perdió la mitad de su premisa.
+
+**Pendiente con dueño, por retorno:** (1) `TASK-1746` — `purge_assessment_access_recovery` con **cero callers**: la retención de 12 meses no se ejecuta; único hallazgo con filo legal. (2) `TASK-1718` — el fix H-10 sigue sin escribirse. (3) `TASK-1742` — re-verificar el canary tras los fixes del 08-19. (4) `HIRING_VACANCY_AI_ENABLED` — ON en Production hace 41 días **sin** el smoke de staging que era su precondición: decidir si se corre o se declara superado. (5) `TASK-1747` — re-auditar sus 8 hallazgos «abiertos»; es triage, no código.
+
+**Verificación.** `pnpm ops:lint --changed`: 6 tasks `errors=0 warnings=0`, warning de paridad de `EPIC-011` cerrado. `pnpm task:lint --task TASK-1751` verde. Sin gate de runtime: el cambio no toca runtime.
+
 ## 2026-08-26 — Berel: producción creativa de octubre creada y auditada en Notion
 
 **Estado vivo:** [`Produccion Creativa - Octubre 26`](https://app.notion.com/p/3c839c2fefe7813c9450e2f35cb4021e) está `En curso`: 8 artículos N35–N42, 32 banners, 32 derivados y 32 subítems sociales. Fechas: 7, 14 y 16 de octubre, respectivamente.
@@ -58,7 +72,6 @@
 **🔴 Lo único que no espera calendario editorial:** un artículo **ya publicado** del cliente sobre recámaras infantiles afirma que un producto *«no tiene olor, es anti-viral, anti-bacterial y anti-hongos»* y que otro *«resiste más de 60,000 ciclos de lavado»*, **sin método ni norma**. Son claims de salud en una página viva. Verificado en ficha: plomo y COV < 50 g/L. Los dos claims publicados: **SIN DATO**. Revisar contra ficha y retirar si no los sostiene.
 
 **Pendiente del cliente:** fichas técnicas por línea (sin ellas dos piezas no se publican y esperan) · un mismo código de color con dos nombres distintos en artículos distintos · el destino `/articulos/color-berel-2027` devolviendo 200 con título vacío · leer el estudio de Profeco antes de citarlo. **Sin GSC en toda la pasada:** el carril de striking distance sigue sin correr para esta cuenta, así que toda la priorización es de demanda de terceros. **Semrush inoperante** (5 intentos en serie, sin poder distinguir cuota de plan).
-
 
 ## 2026-08-24 — TeamBot: `@todos` en chats grupales queda descartado
 
@@ -502,65 +515,3 @@ completo y `pnpm build` **no** se corrieron (el build consume ~30 GB y espera au
 `COMMENT` de `superseded_at`, parqueada en `docs/tasks/pending-migrations/` con su condición (**el release que
 despliega el command ya ocurrió**, verificado contra `origin/main`). Aplicarla antes describiría en la base una
 capacidad que el runtime desplegado no tiene — el error simétrico de `ISSUE-161`.
-
-## 2026-08-23 — TASK-1754 Slice F: el contract está escrito y revisado; falta aplicarlo
-
-**Estado: `code complete, migración pendiente de aplicar`.** `pnpm pg:connect:migrate` quedó bloqueado por
-el clasificador de permisos y espera autorización del operador. **El `CHECK` de la base sigue admitiendo
-las trece etapas**; el candado de seis vive hoy sólo en la aplicación.
-
-**El método que autorizó a angostar, y que hay que reusar.** No fue contar filas —«cero filas» no es «nadie lo
-escribe»— sino el contrato de la superficie desplegada: en `origin/main` hay **tres** escritores de
-`hiring_application.stage`, los tres acotados por tipo (`store.ts:1249`/`1340` vía
-`assertEnum(HIRING_PIPELINE_STAGES)`; `decide.ts:299` vía `DECISION_STAGE` → siempre `closed`). La unión son los
-seis que quedan. El `stage = $n` de `store.ts:666` es un **filtro**, no una escritura: el falso positivo típico
-de un grep laxo.
-
-**Lo que cambió además del enum 13 → 6.** `TERMINAL_APPLICATION_STAGES` nace como fuente única (antes tres
-copias verbatim en los guards de assessment). `STAGES_DOWNSTREAM_OF_TRIGGER` se **reescribió, no se podó**:
-`client_review` figuraba aguas abajo de `shortlisted` y el colapso la absorbió dentro, así que mandaba a la
-cola humana postulaciones que la reconciliación sí recupera.
-
-**Deuda declarada a propósito.** `FAIRNESS_REPORTABLE_STAGES` conserva tres literales muertos: son el default
-de `getSelectionFairness` (`input.stage ?? 'selected'`) y re-apuntar su cubo terminal cambia **qué mide** el
-four-fifths rule, lo que no cabe en un contract de vocabulario. Mitigación: falla ruidoso
-(`hiring_fairness_stage_retired`, 422) en vez de devolver cero, que en equidad se lee como «no hay impacto
-adverso». Condición en el ledger: `TASK-1365` cierra **antes** de prender `HIRING_FAIRNESS_MONITOR_ENABLED`.
-
-**Corrección posterior al commit (`ddb38d3a6`).** El `.sql` quedó dentro de `migrations/` porque la premisa
-era aplicarlo en la misma sesión; al bloquearse el comando esa premisa murió y el archivo pasó a ser una mina:
-una migración committeada y sin aplicar **no espera su turno** — el próximo `migrate:up` de cualquier sesión la
-aplica sin su readback. Movida a `docs/tasks/pending-migrations/` con su condición y su readback en el
-encabezado. **Regla: si no se aplica en la misma sesión que la escribe, no vive en `migrations/`.**
-
-**Gates:** `typecheck` limpio, `pnpm lint` limpio, suite del dominio 1.236 verdes. El guard derivado
-`stage-enum-check-parity.live.test.ts` **falla a propósito** ahora (enum 6 ≠ `CHECK` 13): es el readback que
-se pone verde al aplicar. Readback previo tomado: 13 valores, **0 filas** en las siete etapas retiradas.
-
-## 2026-08-23 — El dominio de Hiring está en producción; faltan tres migraciones y su autorización
-
-**Release verificado.** `304371f734076e2bfc96529712d2fa63a179bf84` (PR #205), orchestrator run `32610182477`
-success, manifest `304371f73407-ef375a47-…` en `released` (9m49s), watchdog `ok` con `drift_count=0`, health 200. Un solo run, sin retry. Subieron TASK-1765, TASK-1754, TASK-1748 y TASK-1755, más el fix de la regresión
-de retención de la Ley 21.719 para `not_selected` — que se volvía viva justo cuando el release habilitaba el
-desenlace, así que viajó dentro.
-
-**Lo que falta, y por qué no lo hice.** Las tres migraciones de `docs/tasks/pending-migrations/` siguen sin
-correr. Sus dos precondiciones están **verificadas contra `origin/main`**, no contra el working tree: `main` ya
-no ofrece `on_hold` en el eje de Hiring (los hits que quedan son dos comentarios que documentan el retiro y un
-`case` del pipeline de servicios, otro enum), y el filtro de procedencia corre en los dos runtimes — en el
-`ops-worker` con código byte-idéntico, verificado con diff completo, no con la lista del change-gate. El orden
-es cadena: contract del enum → backfill → invariante, con readback esperado **`1 → 0`** (si sale 33, el backfill
-no corrió y se para). **Mutan la base compartida de producción y son irreversibles: esperan autorización
-directa del operador.** Mientras no corran, las cuatro tasks se quedan en `in-progress/`, que es su estado
-correcto.
-
-**Dos cosas del camino que valen para el próximo release.** El merge canónico `-X ours` resucitó cuatro
-archivos en su ubicación de lifecycle vieja (ISSUE-160 en `open/`, TASK-1745 en `in-progress/`, TASK-1747 y
-TASK-1748 en `to-do/`): no es el modify/delete conocido, y **las dos verificaciones duras no lo detectan porque
-son sobre código** — hay que buscar duplicados de lifecycle a mano. Y el bloqueador real estuvo antes del
-dispatch: staging en `Canceled` por los pushes docs-only del día, resuelto tocando un doc de
-`deployControlDocs` que el release necesitaba igual, no con un bypass.
-
-**El hueco del change-gate quedó medido por otra sesión** en la Delta de `TASK-930` (`72c681a3c`): 62 rutas que
-el `ops-worker` importa contra 24 vigiladas, 33 sin cubrir, incluida `src/lib/postgres/client`. Un release que
-toque una de esas puede dejar el worker viejo con el watchdog en `ok`.
