@@ -262,6 +262,15 @@ Reglas obligatorias:
 - **`TASK-1701`** (`to-do`, análisis de contenido por URL): es el tercer consumidor externo del
   sustrato y el disparo legítimo del movimiento (§5.3 de la auditoría). Nace apuntando a
   `growth/site-substrate/`, no a `probes/` — y la rule angosta se lo impone.
+- 🔴 **`TASK-1778`** (`P1`, dueña de `ISSUE-164`) — **precede a esta task, y el orden es load-bearing.**
+  Una auditoría del 2026-08-26 encontró que `probes/safe-fetch.ts` —el archivo exacto que esta task
+  mueve— promete en su cabecera una contención de redirects que no implementa y valida el host sin
+  resolver DNS. El valor entero de esta task es ser un `git mv` verificable donde **ningún dependiente
+  cambia una línea**; mover un archivo con un defecto de seguridad conocido lo consagraría como *"el
+  sustrato canónico"* con el defecto adentro, y mezclar el fix aquí destruiría la propiedad que hace
+  revisable a esta task. Son dos cambios de naturaleza opuesta sobre el mismo archivo: uno mueve sin
+  cambiar comportamiento, el otro cambia comportamiento sin mover. Si por secuencia real esta task
+  entrara primero, 1778 aplica sobre la ubicación nueva sin cambiar su alcance.
 - **`TASK-1709`** (`to-do`, diagnóstico de prospecto) — **cuarto consumidor externo, agregado
   2026-08-26.** Su `Delta 2026-08-26` levantó la prohibición de fetch sobre el sitio del prospecto y
   la reemplazó por delegación: su `Slice 2b` consume `@/lib/growth/site-substrate` y **declara esta

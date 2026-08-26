@@ -86,6 +86,15 @@ bloqueo explícito de alguien con quien todavía no tenemos relación comercial*
   dato: se persiste como hecho con su lente y se reporta. Es además el punto ciego más caro que
   `TASK-1670` existe para cerrar — un sitio que bloquea a los crawlers de IA hoy puntúa 95/100.
 
+⚠️ **Corrección de alcance (misma fecha).** Las cuatro reglas de arriba son verdad **para el carril
+OnPage**, donde el proveedor respeta `robots.txt` por default y lo único que hacemos es no
+desactivarlo. Para el **sustrato propio** son hoy una afirmación sin mecanismo: `safe-fetch` lee
+`/robots.txt` para *analizarlo* y no existe ningún camino de código que lo *obedezca*. Cerrar esa
+brecha es el `Slice 4` de **`TASK-1778`**, que además arregla dos defectos de seguridad y uno de
+exactitud del mismo fetcher (`ISSUE-164`). Hasta que 1778 cierre, **este carril sólo puede prometer
+respeto de `robots.txt` sobre la evidencia obtenida por OnPage** — no sobre la del sustrato. Decir lo
+contrario en un documento comercial sería exactamente el patrón que este delta dice combatir.
+
 **Herramientas nuevas: ninguna.** Se evaluó sumar un scraper externo tipo Apify y se **descarta**:
 todo lo que aportaría ya existe dos veces (render headless vía `enable_browser_rendering` de OnPage;
 lectura puntual vía el sustrato propio), y su valor diferencial real —rotación de proxies para
@@ -481,6 +490,9 @@ Reglas obligatorias:
   `forbidden_meta_tag`, `forbidden_http_header`), no como error de la corrida ni como `magnitude: 0`.
 - Test de frontera que falla si este módulo importa `safe-fetch` o `ai-visibility/probes/**`
   directamente: la delegación es el contrato, no una convención.
+- 🔴 La promesa de `robots.txt` sobre el carril del sustrato **no se escribe en ningún entregable
+  comercial** hasta que `TASK-1778` (`Slice 4`) le ponga mecanismo. Mientras tanto, el criterio de
+  cortesía de este slice cubre **sólo** el carril OnPage.
 
 ### Slice 3 — Derivación: hechos con lente, sin veredicto
 

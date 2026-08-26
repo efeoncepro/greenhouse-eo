@@ -7,7 +7,7 @@
 ## Status
 
 - Lifecycle: `to-do`
-- Priority: `P2`
+- Priority: `P1`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
@@ -26,6 +26,32 @@
 - Branch: `task/TASK-1281-growth-ai-visibility-headless-probe-runtime`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Delta 2026-08-26 — sube a `P1`: el probe no dice "no pude ver", dice "no tienes"
+
+Cambia **sólo la prioridad** (`P2 → P1`). El alcance, el diseño y los slices quedan intactos.
+
+La razón es una consecuencia que la task no había explicitado. Los dos probes que esta task desbloquea
+(`core_web_vitals`, `webmcp_tools`) degradan hoy **honestamente** a `skipped/no_headless`: dicen que no
+pudieron medir, y eso está bien. Pero los probes de **presencia** que corren sobre el mismo HTML —
+JSON-LD, `potentialAction`, landmarks— **no son headless-dependientes**, así que no degradan: leen el
+HTML servido y concluyen.
+
+Sobre un sitio client-rendered (React/Vue/Next sin SSR) ese HTML es un shell vacío. El probe no
+reporta "no pude ver": reporta **"no tiene datos estructurados"**. Lo mismo con todo schema inyectado
+por Google Tag Manager, que es un patrón habitual en clientes con equipo de marketing.
+
+Por qué importa ahora y no antes: el `Delta 2026-08-26` de `TASK-1709` habilitó usar este sustrato en
+el **diagnóstico comercial de prospectos**. Un falso negativo que antes vivía en un informe interno
+ahora viaja a un documento que le entregamos a alguien que todavía no es cliente, y cuyo equipo
+técnico puede refutarlo abriendo el inspector. Es el peor lugar posible para equivocarse.
+
+`TASK-1778` cierra el defecto **hermano** (truncado silencioso, misma clase: afirmar ausencia sin
+haber podido mirar) y agrega el rastro `truncated` para que los probes de presencia degraden en vez de
+concluir. Esta task cierra la otra mitad. Ninguna de las dos sustituye a la otra: una es "no vi todo
+el HTML", la otra es "el HTML que vi no es el que ve el usuario".
+
+Revertir esta prioridad es de una línea si el operador prefiere otra secuencia.
 
 ## Summary
 
