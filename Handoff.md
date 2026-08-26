@@ -2,6 +2,16 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-26 — Berel: noviembre y diciembre quedan producidos y atomizados
+
+**Estado vivo observado:** [`Noviembre 26`](https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6) contiene N43–N47 y 45 tareas; [`Diciembre 26`](https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0), N48–N50 y 27 tareas. En conjunto: 8 reescrituras, 32 banners, 32 derivados y 32 subítems sociales.
+
+**QA de Notion:** cuatro derivados por artículo; tareas sociales `Sin empezar`, subítems `En curso`; fechas sociales 15 de noviembre y 13 de diciembre. Se compararon los 32 pares tarea/subítem y los 32 conservaron igualdad exacta de cuerpo, además de proyecto, tarea principal y relaciones inversas.
+
+**Drift vivo de calendario:** la relectura posterior devolvió las 40 tareas preexistentes de artículo/banner —25 de noviembre y 15 de diciembre— en `Listo para diseñar` con fecha `2026-09-11`. Contradice los meses del proyecto. No se corrigió porque esta pasada solo autoriza repo/docs; Operaciones de contenido debe confirmar la fecha y, si corresponde, restaurarla por la vía canónica con lectura posterior.
+
+**Gates abiertos del cliente:** N48 es archivo de 2024 y requiere vigencia/derechos; N49 requiere revisión institucional y no admite CTA comercial; N50 espera confirmar consolidación y canónica. No se produjo arte, no se publicó en CMS y no se programaron redes. Evidencia: [`auditoría fechada`](docs/audits/seo/BEREL_NOVEMBER_DECEMBER_2026_CONTENT_PRODUCTION_2026-08-26.md).
+
 ## 2026-08-26 — Hiring: auditoría de estado real y corrección de la contabilidad documental
 
 **Sólo documentación; runtime intacto.** Detalle completo, método y hechos verificados: [`auditoría fechada`](docs/audits/hiring/GREENHOUSE_HIRING_DOMAIN_STATE_AUDIT_2026-08-26.md).
@@ -39,6 +49,7 @@
 **El hallazgo que reordena el trabajo futuro.** El carril de striking distance **no era una capacidad por construir**: `keyword-opportunities-reader.ts` (`TASK-1302`) ya calcula el mismo score —clics incrementales contra la curva de CTR de la propia organización— y `/admin/growth/seo/keywords` (`TASK-1308`) ya lo expone, con la canibalización marcada aparte como caso de consolidación. Se reimplementó a mano con un script desechable antes de descubrirlo. La conexión de Search Console del cliente estaba activa y acumulando desde el 2026-07-31, y nadie había corrido la superficie para esa cuenta. La página está gateada por `isSeoModuleEnabled` + `enforceSeoRunEntitlement`, así que la verificación correcta tiene dos partes: que la capacidad exista **y** que esté habilitada para la organización.
 
 **Qué se escribió y quién es dueño de qué** (separación deliberada para no duplicar):
+
 - Oficio → skill `seo-aeo`, `modules/02` y `modules/07` (dos carriles, tres trampas de GSC, curva propia, inflación de clústeres) + la gotcha de que el mensaje de cuota agotada de Semrush MCP afirma falta de acceso al plan.
 - Proceso → `docs/operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md` (488 líneas).
 - Operación paso a paso → `docs/manual-de-uso/growth/producir-serie-de-briefs-seo.md`.
@@ -69,7 +80,7 @@
 
 **Dónde quedó:** modelo operativo **v1.3** · **`SEO_CONTENT_BRIEF_STRUCTURE_V1.md`** (nuevo, techo 12.000 car.) · runbook **v1.2** · caso **`BEREL_ARQUITECTURA_AUTORIDAD_2026-08-25.md`** (nuevo) + los dos audits hermanos actualizados · oficio en `seo-aeo`, `content-marketing-studio` y `copywriting`, **esta última registrada por primera vez en el manifiesto de espejos (11→12)**: su copia `.codex` no cargaba la skill por frontmatter incompleto, y eso no falla con error. Detalle temático en el changelog del día.
 
-**🔴 Lo único que no espera calendario editorial:** un artículo **ya publicado** del cliente sobre recámaras infantiles afirma que un producto *«no tiene olor, es anti-viral, anti-bacterial y anti-hongos»* y que otro *«resiste más de 60,000 ciclos de lavado»*, **sin método ni norma**. Son claims de salud en una página viva. Verificado en ficha: plomo y COV < 50 g/L. Los dos claims publicados: **SIN DATO**. Revisar contra ficha y retirar si no los sostiene.
+**🔴 Lo único que no espera calendario editorial:** un artículo **ya publicado** del cliente sobre recámaras infantiles afirma que un producto _«no tiene olor, es anti-viral, anti-bacterial y anti-hongos»_ y que otro _«resiste más de 60,000 ciclos de lavado»_, **sin método ni norma**. Son claims de salud en una página viva. Verificado en ficha: plomo y COV < 50 g/L. Los dos claims publicados: **SIN DATO**. Revisar contra ficha y retirar si no los sostiene.
 
 **Pendiente del cliente:** fichas técnicas por línea (sin ellas dos piezas no se publican y esperan) · un mismo código de color con dos nombres distintos en artículos distintos · el destino `/articulos/color-berel-2027` devolviendo 200 con título vacío · leer el estudio de Profeco antes de citarlo. **Sin GSC en toda la pasada:** el carril de striking distance sigue sin correr para esta cuenta, así que toda la priorización es de demanda de terceros. **Semrush inoperante** (5 intentos en serie, sin poder distinguir cuota de plan).
 
@@ -109,6 +120,7 @@ entró en 1774.
 explícitamente ahí porque un follow-up sin dueño es exactamente cómo se perdió la primera vez.
 
 **Tres Deltas de impacto cruzado:**
+
 - `TASK-1397` (Career Alerts) — `Blocked by: none` → `TASK-1774`. Declaraba que las primitivas proveen
   «signed opt-out»; la mitad es falsa. Es la primera suscripción opt-in real del sistema, donde el
   opt-out es la contrapartida del consentimiento que la propia task modela.
@@ -426,11 +438,11 @@ reversible, borrar no, y ahí lo que decide no es QUÉ considerar sino SI califi
 
 Readback **medido** (2026-08-23T17:54:19Z), no esperado:
 
-| Métrica | Antes | Después |
-|---|---|---|
-| `awaiting_terminal` | 5 | **3** (+12 en `awaiting_terminal_excluded_archived`) |
-| `assignment_dead_ends` | 1 | **0** |
-| `active_process_predicate_drift` | 0 | **0** (`canonical` 50, `archived_gap` 40; 90 − 40 = 50) |
+| Métrica                          | Antes | Después                                                 |
+| -------------------------------- | ----- | ------------------------------------------------------- |
+| `awaiting_terminal`              | 5     | **3** (+12 en `awaiting_terminal_excluded_archived`)    |
+| `assignment_dead_ends`           | 1     | **0**                                                   |
+| `active_process_predicate_drift` | 0     | **0** (`canonical` 50, `archived_gap` 40; 90 − 40 = 50) |
 
 El `assignment_dead_ends = 1` que otra sesión leyó como «apareció un callejón de una persona real»
 era `EO-APP-0241`, `smoke_test`, de este mismo residuo. Verificado por columnas nombradas antes de

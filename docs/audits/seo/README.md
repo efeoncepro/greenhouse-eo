@@ -17,6 +17,11 @@ Auditorías de búsqueda orgánica y AEO — de Efeonce y de clientes a los que 
 
 ## Auditorías
 
+- [Berel — producción editorial de noviembre y diciembre 2026 — 2026-08-26](BEREL_NOVEMBER_DECEMBER_2026_CONTENT_PRODUCTION_2026-08-26.md) —
+  cierre observado de ocho reescrituras `N43–N50`: 72 tareas entre ambos proyectos, 32 subítems sociales y
+  paridad exacta en los 32 pares tarea/subítem. Conserva gates de archivo y derechos para N48, tratamiento
+  institucional no comercial para N49 y consolidación canónica para N50.
+
 - [Berel — producción editorial de octubre 2026 — 2026-08-26](BEREL_OCTOBER_2026_CONTENT_PRODUCTION_2026-08-26.md) —
   auditoría de cierre del proyecto creativo en Notion: ocho artículos `N35–N42`, 72 tareas y 32 subítems sociales;
   documenta la corrección de 54 fechas alteradas por automatización, la producción completa de N41–N42 y el gate

@@ -52,15 +52,15 @@ emojis · hashtags y keywords · CTA · surface del contenido.
 
 ## Matriz rápida por canal
 
-| Canal | Rol en el ecosistema | Registro dominante | Formato estrella | Emojis | CTA típico |
-|---|---|---|---|---|---|
-| **Facebook** | Comunidad y alcance amplio (35+), tráfico al blog | Editorial-conversacional | Post con imagen/carrusel + historia breve | 0-2, opcionales | Pregunta a la comunidad + enlace |
-| **Instagram** | Vitrina visual aspiracional, inspiración de color | Inspiracional editorial | Carrusel educativo, Reel de transformación, Stories | Sí, con criterio | "Guarda", "desliza", link en bio |
-| **Pinterest** | Buscador visual, planeación de proyecto, SEO evergreen | Técnico-descriptivo + keyword | Pin vertical 2:3 con título keyword-first | Mínimos o ninguno | "Guarda para tu proyecto", enlace a ficha |
-| **TikTok** | Descubrimiento orgánico, audiencia joven | Técnico-cercano, manos a la obra | Video vertical con gancho en 1-2 s | Sí, nativos | "Comenta", "sigue para más" |
-| **YouTube** | Tutoriales profundos, autoridad de oficio, SEO de video | Técnico-tutorial (Don Bere / BerelTip) | Tutorial paso a paso + Shorts | Pocos | "Suscríbete", "guía completa en nuestro blog" |
-| **LinkedIn** | B2B, distribuidores, gremio profesional, marca | Profesional-humano, basado en datos | Post con dato/caso + reflexión | Mínimos | "Conoce la línea", "hablemos" |
-| **Email / WhatsApp** | Relación directa, retención, lanzamientos (CRM) | Editorial cálido, directo y útil | Asunto-gancho + un CTA principal | 0-1 | Un solo CTA claro |
+| Canal                | Rol en el ecosistema                                    | Registro dominante                     | Formato estrella                                    | Emojis            | CTA típico                                    |
+| -------------------- | ------------------------------------------------------- | -------------------------------------- | --------------------------------------------------- | ----------------- | --------------------------------------------- |
+| **Facebook**         | Comunidad y alcance amplio (35+), tráfico al blog       | Editorial-conversacional               | Post con imagen/carrusel + historia breve           | 0-2, opcionales   | Pregunta a la comunidad + enlace              |
+| **Instagram**        | Vitrina visual aspiracional, inspiración de color       | Inspiracional editorial                | Carrusel educativo, Reel de transformación, Stories | Sí, con criterio  | "Guarda", "desliza", link en bio              |
+| **Pinterest**        | Buscador visual, planeación de proyecto, SEO evergreen  | Técnico-descriptivo + keyword          | Pin vertical 2:3 con título keyword-first           | Mínimos o ninguno | "Guarda para tu proyecto", enlace a ficha     |
+| **TikTok**           | Descubrimiento orgánico, audiencia joven                | Técnico-cercano, manos a la obra       | Video vertical con gancho en 1-2 s                  | Sí, nativos       | "Comenta", "sigue para más"                   |
+| **YouTube**          | Tutoriales profundos, autoridad de oficio, SEO de video | Técnico-tutorial (Don Bere / BerelTip) | Tutorial paso a paso + Shorts                       | Pocos             | "Suscríbete", "guía completa en nuestro blog" |
+| **LinkedIn**         | B2B, distribuidores, gremio profesional, marca          | Profesional-humano, basado en datos    | Post con dato/caso + reflexión                      | Mínimos           | "Conoce la línea", "hablemos"                 |
+| **Email / WhatsApp** | Relación directa, retención, lanzamientos (CRM)         | Editorial cálido, directo y útil       | Asunto-gancho + un CTA principal                    | 0-1               | Un solo CTA claro                             |
 
 **Pinterest no es una red social: es un buscador visual.** La gente llega con intención de planear
 un proyecto, el contenido vive meses o años y es una de las mejores fuentes de tráfico evergreen al
@@ -74,12 +74,12 @@ Se identifican en la base `Tareas` filtrando por la relación `Artículo (Conten
 Hay artículos con menos de cuatro: **confirmar con el usuario cuáles existen antes de redactar y
 avisar si falta alguno del set.**
 
-| Canal | Secciones del cuerpo de la tarea | Claves del registro |
-|---|---|---|
-| **Facebook** 🔲 | `✍️ Copy propuesto (caption)` · `🎨 Indicaciones visuales` · `✅ Notas de voz aplicadas` | Gancho micro-escena **antes del "ver más"**, 1-3 párrafos, pregunta a la comunidad + enlace, 0-2 emojis, 1-3 hashtags. Formato 4:5 |
-| **Instagram Story** 📱 | `✍️ Secuencia propuesta` (tabla: Story · Visual · Texto en pantalla · Interacción) · `✅ Notas de voz` | 3-4 stories 9:16: encuesta gancho → "esto o aquello" de color → BerelTip → CTA con sticker de enlace. **Interacción primero, venta nunca** |
-| **Reel/TikTok/Short** ▶️ | `🎬 Guion` (tabla: Escena · Tiempo · Video · Texto en pantalla · VO/Audio, **5 escenas de 20 a 30 s**) · `✍️ Caption propuesto` · `✅ Notas de voz` | Gancho en 1-2 s, texto en pantalla, 3-5 hashtags, CTA "comenta" + link en bio |
-| **Pinterest Pin** 📍 | `✍️ Copy propuesto` (título, descripción, overlay) · `📋 Especificaciones` · `✅ Notas de voz` | Título keyword-first de **hasta 100 caracteres**, descripción de **100 a 200** con keywords naturales, **sin emojis ni hashtags**, CTA "Guarda para tu proyecto". Pin 2:3 (1000 × 1500) desde el Banner N2 🔁 |
+| Canal                    | Secciones del cuerpo de la tarea                                                                                                                    | Claves del registro                                                                                                                                                                                           |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Facebook** 🔲          | `✍️ Copy propuesto (caption)` · `🎨 Indicaciones visuales` · `✅ Notas de voz aplicadas`                                                            | Gancho micro-escena **antes del "ver más"**, 1-3 párrafos, pregunta a la comunidad + enlace, 0-2 emojis, 1-3 hashtags. Formato 4:5                                                                            |
+| **Instagram Story** 📱   | `✍️ Secuencia propuesta` (tabla: Story · Visual · Texto en pantalla · Interacción) · `✅ Notas de voz`                                              | 3-4 stories 9:16: encuesta gancho → "esto o aquello" de color → BerelTip → CTA con sticker de enlace. **Interacción primero, venta nunca**                                                                    |
+| **Reel/TikTok/Short** ▶️ | `🎬 Guion` (tabla: Escena · Tiempo · Video · Texto en pantalla · VO/Audio, **5 escenas de 20 a 30 s**) · `✍️ Caption propuesto` · `✅ Notas de voz` | Gancho en 1-2 s, texto en pantalla, 3-5 hashtags, CTA "comenta" + link en bio                                                                                                                                 |
+| **Pinterest Pin** 📍     | `✍️ Copy propuesto` (título, descripción, overlay) · `📋 Especificaciones` · `✅ Notas de voz`                                                      | Título keyword-first de **hasta 100 caracteres**, descripción de **100 a 200** con keywords naturales, **sin emojis ni hashtags**, CTA "Guarda para tu proyecto". Pin 2:3 (1000 × 1500) desde el Banner N2 🔁 |
 
 Cada tarea lleva un **callout de cabecera** que enlaza al artículo y cita la Modulación por canal.
 
@@ -97,13 +97,13 @@ Además, en la misma edición:
 **Berel decidió que no publicará posts estáticos en Instagram: solo historias.** Eso cierra la
 divergencia que arrastraban los dos playbooks de la wiki.
 
-| Fuente | Qué decía | Estado |
-|---|---|---|
+| Fuente                          | Qué decía                                                    | Estado                |
+| ------------------------------- | ------------------------------------------------------------ | --------------------- |
 | **Playbook Derivados Sociales** | canal 2 = **Instagram Story**, secuencia de 3-4 stories 9:16 | ✅ **es lo que rige** |
-| **Playbook Producción**, Fase 8 | canal 2 = "Instagram Post estático", `Diseño gráfico` | ❌ **desactualizado** |
+| **Playbook Producción**, Fase 8 | canal 2 = "Instagram Post estático", `Diseño gráfico`        | ❌ **desactualizado** |
 
 🔴 **Queda un arreglo pendiente en el origen:** la Fase 8 del **Playbook Producción** en Notion
-sigue nombrando la tarea como *"Instagram Post estático"*. Hay que corregirla ahí — el playbook
+sigue nombrando la tarea como _"Instagram Post estático"_. Hay que corregirla ahí — el playbook
 crea las tareas, así que mientras diga eso, el siguiente ciclo vuelve a nacer mal.
 
 **Consecuencia sobre el master 🔁 que conviene no perder de vista:** la variante **4:5** de la Spec
@@ -144,20 +144,52 @@ anuncio.
 Cada derivado se registra como **subítem del artículo**, para que el hub muestre el ecosistema
 completo de cada pieza:
 
-| Campo | Valor |
-|---|---|
-| `tecnicas` (título vivo del Content Hub) | `Derivado social — [Canal]: [Tema]` |
-| Ícono | Facebook 🔲 · Instagram Story 📱 · Reel ▶️ · Pinterest 📌 |
-| `ítem principal` | La fila del artículo (**es lo que lo hace subítem**) |
-| `Tareas` | La tarea del derivado en la base Tareas |
-| `Tipo` | Facebook → `Facebook` · Story → `Instagram` · Reel → `Video` • `Instagram` · Pinterest → **sin opción disponible (se deja vacío)** |
-| `Estado` | `En curso` cuando el copy ya está redactado; `Publicado` • `Enlace` cuando la pieza salga |
-| `Fecha límite` | La misma de la tarea del derivado |
-| Cuerpo | Callout 🔁 que enlaza al artículo y a la tarea + **el copy completo volcado** (mismas secciones), para poder trabajar desde el hub o desde la tarea con el mismo contenido |
+| Campo                                    | Valor                                                                                                                                                                      |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tecnicas` (título vivo del Content Hub) | `Derivado social — [Canal]: [Tema]`                                                                                                                                        |
+| Ícono                                    | Facebook 🔲 · Instagram Story 📱 · Reel ▶️ · Pinterest 📌                                                                                                                  |
+| `ítem principal`                         | La fila del artículo (**es lo que lo hace subítem**)                                                                                                                       |
+| `Tareas`                                 | La tarea del derivado en la base Tareas                                                                                                                                    |
+| `Tipo`                                   | Facebook → `Facebook` · Story → `Instagram` · Reel → `Video` • `Instagram` · Pinterest → **sin opción disponible (se deja vacío)**                                         |
+| `Estado`                                 | `En curso` cuando el copy ya está redactado; `Publicado` • `Enlace` cuando la pieza salga                                                                                  |
+| `Fecha límite`                           | La misma de la tarea del derivado                                                                                                                                          |
+| Cuerpo                                   | Callout 🔁 que enlaza al artículo y a la tarea + **el copy completo volcado** (mismas secciones), para poder trabajar desde el hub o desde la tarea con el mismo contenido |
 
 Al escribir `Tareas` en el subítem se actualiza la relación inversa `Artículo (Content Hub)` de la
 tarea social. Por eso la tarea queda relacionada con **dos filas legítimas**: el artículo padre y su
 subítem social. La verificación debe aceptar ambas; borrar una para "deduplicar" rompe el ecosistema.
+
+### Escritura determinística para paridad exacta
+
+La tarea debe enlazar a su subítem y el subítem debe enlazar a la tarea. Como la URL de la tarea no
+existe antes de crearla, el depósito correcto es de dos fases:
+
+1. Crear la tarea con propiedades finales y un cuerpo inicial que ya enlace el artículo.
+2. Con la URL devuelta, construir **una sola cadena final**: callout con artículo + tarea y el copy
+   completo del canal.
+3. Crear el subítem con esa cadena final y la relación `Tareas`.
+4. Reemplazar el cuerpo de la tarea con **la misma cadena**, sin regenerar el copy.
+5. Hacer `fetch` de ambos registros y comparar el contenido completo. El cierre es `4A/4A` pares
+   iguales para `A` artículos; revisar una muestra no prueba el lote.
+
+Una respuesta `success`, los conteos correctos o la relación inversa completa no prueban igualdad de
+contenido. Notion puede normalizar bloques o una automatización puede editar propiedades después de
+la escritura; la lectura fresca es parte del entregable.
+
+### Gates editoriales que viajan al derivado
+
+El artículo puede estar escrito y aun así no estar habilitado para distribución. El gate se copia en
+el callout de **la tarea y el subítem**, y prevalece sobre el CTA normal del canal:
+
+| Caso                                        | Tratamiento obligatorio                                                                                                                                    |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Aniversario, cifra o edición pasada         | Declarar `Archivo YYYY`; no presentar como actualidad; validar fecha y derechos de escudos, fotografías, uniformes o assets de terceros antes de producir  |
+| Conmemoración institucional o tema sensible | Revisión humana del equipo responsable; CTA informativo; sin venta, producto, consignas inventadas, apropiación ni imágenes de personas sin consentimiento |
+| Reescritura destinada a consolidarse        | Enlazar solo a la canónica propuesta si ya existe; no programar hasta que Editorial confirme consolidación, redirección y URL final                        |
+| URL planificada o soft-404                  | Puede figurar como destino previsto en el brief, pero no se activa ni se programa hasta superar QA live                                                    |
+
+El gate no se "resuelve" suavizando el copy: se conserva visible hasta que el dueño indicado lo
+retire con evidencia.
 
 ## Checklist de cierre por artículo
 
@@ -169,7 +201,9 @@ subítem social. La verificación debe aceptar ambas; borrar una para "deduplica
 - [ ] Producto nombrado una sola vez por pieza
 - [ ] Un subítem por derivado en el Content Hub, con relación a su tarea y copy volcado
 - [ ] Segunda lectura confirma que el cuerpo del subítem coincide exactamente con el de su tarea social
+- [ ] La comparación cubrió los `4A` pares del lote, no solo una muestra
 - [ ] Estados: tarea en `Sin empezar` para diseño, subítem en `En curso`
+- [ ] Piezas históricas, sensibles, consolidadas o con soft-404 conservan su gate visible
 - [ ] Gancho en la primera línea / primer segundo
 - [ ] Emojis, hashtags y longitud según las reglas del canal
 - [ ] Sin superlativos vacíos, urgencia, competencia ni clichés de mexicanidad
