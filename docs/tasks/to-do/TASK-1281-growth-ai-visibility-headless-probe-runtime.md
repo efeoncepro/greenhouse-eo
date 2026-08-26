@@ -7,7 +7,7 @@
 ## Status
 
 - Lifecycle: `to-do`
-- Priority: `P1`
+- Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
@@ -27,31 +27,40 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
-## Delta 2026-08-26 — sube a `P1`: el probe no dice "no pude ver", dice "no tienes"
+## Delta 2026-08-26 — se revierte a `P2`: subirla era tratar el síntoma
 
-Cambia **sólo la prioridad** (`P2 → P1`). El alcance, el diseño y los slices quedan intactos.
+**Corrección de una decisión mía de esta misma fecha.** Había subido esta task a `P1` argumentando que
+sobre un sitio client-rendered los probes de presencia afirman ausencia. El hallazgo es correcto; la
+conclusión era errónea. Vuelve a `P2` y el defecto se cierra en `TASK-1778`. Razones, en orden:
 
-La razón es una consecuencia que la task no había explicitado. Los dos probes que esta task desbloquea
-(`core_web_vitals`, `webmcp_tools`) degradan hoy **honestamente** a `skipped/no_headless`: dicen que no
-pudieron medir, y eso está bien. Pero los probes de **presencia** que corren sobre el mismo HTML —
-JSON-LD, `potentialAction`, landmarks— **no son headless-dependientes**, así que no degradan: leen el
-HTML servido y concluyen.
+**1. Esta task reduce la frecuencia del defecto, no su clase.** Aun con Chromium: una página detrás de
+login, un render que excede el timeout, un error de JS, un muro de consentimiento o un challenge de
+bot devuelven DOM vacío o parcial con `res.ok === true`, y el probe sigue emitiendo `score: 0` con
+*"La home no publica ningún JSON-LD"*. Se habría pagado un runtime de Chromium en Cloud Run y el falso
+negativo sobreviviría — **más raro, que es peor**: deja de sospecharse.
 
-Sobre un sitio client-rendered (React/Vue/Next sin SSR) ese HTML es un shell vacío. El probe no
-reporta "no pude ver": reporta **"no tiene datos estructurados"**. Lo mismo con todo schema inyectado
-por Google Tag Manager, que es un patrón habitual en clientes con equipo de marketing.
+**2. El defecto es una línea de contrato, no una capacidad ausente.**
+`structural/json-ld.ts:20-38` distingue dos estados: `!res.ok → failed/score: null` (correcto) y
+`res.ok` + cero bloques → `succeeded/score: 0`. El comentario de cabecera lo dice literal:
+*"Ausencia MEDIDA → score 0 (gap real)"*. **`res.ok` se está leyendo como "observé la página" cuando
+sólo significa "recibí bytes".** Ahí está el bug, en una condición, no en la falta de un navegador.
 
-Por qué importa ahora y no antes: el `Delta 2026-08-26` de `TASK-1709` habilitó usar este sustrato en
-el **diagnóstico comercial de prospectos**. Un falso negativo que antes vivía en un informe interno
-ahora viaja a un documento que le entregamos a alguien que todavía no es cliente, y cuyo equipo
-técnico puede refutarlo abriendo el inspector. Es el peor lugar posible para equivocarse.
+**3. El patrón correcto ya existe en el mismo directorio.** `NO_HEADLESS_OUTCOME` → `skipped/no_headless`
+es exactamente *"no pude observar, no afirmo"*, y está aplicado a los probes headless-dependientes y
+**no** a los de presencia. Cerrar el defecto extiende un primitive canónico; no inventa ninguno.
 
-`TASK-1778` cierra el defecto **hermano** (truncado silencioso, misma clase: afirmar ausencia sin
-haber podido mirar) y agrega el rastro `truncated` para que los probes de presencia degraden en vez de
-concluir. Esta task cierra la otra mitad. Ninguna de las dos sustituye a la otra: una es "no vi todo
-el HTML", la otra es "el HTML que vi no es el que ve el usuario".
+**4. Hoy hay UNA sola capa decidiendo "no tiene JSON-LD"** — el regex sobre lo que llegó. Ninguna capa
+pregunta si eso que llegó es la página. Es defense-in-depth ausente justo donde la salida es
+client-facing.
 
-Revertir esta prioridad es de una línea si el operador prefiere otra secuencia.
+**5. Subirla a `P1` adelantaba un costo real de infraestructura sobre una premisa falsa.** Chromium en
+Cloud Run tiene memoria, cold start y costo por corrida. Esta task debe priorizarse por su propio
+mérito —cobertura y CWV de campo—, no por un bug que no arregla.
+
+Qué queda: `TASK-1778` toma el invariante *"un probe de presencia nunca concluye ausencia sin evidencia
+de que pudo observar"*, que es la misma clase que su `truncated` y vive en el mismo par de archivos.
+Con eso cerrado, esta task recupera su naturaleza: una mejora de exactitud y cobertura, no un
+prerrequisito de corrección.
 
 ## Summary
 

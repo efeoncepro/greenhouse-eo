@@ -78,8 +78,10 @@ precisamente la ventana. La fecha límite no es una alerta: es el flip.
   la URL inicial y en cada redirect.
 - Tope de tamaño que **realmente acote la memoria** (lectura por stream, corte duro) y que **deje
   rastro** cuando trunca, para que el probe degrade honestamente en vez de afirmar ausencia.
-- `robots.txt` obedecido por el fetcher propio, o la promesa de `TASK-1709` acotada explícitamente al
-  carril OnPage. Una de las dos, nunca ninguna.
+- `robots.txt` **obedecido** por el fetcher propio (decidido 2026-08-26), matcheando nuestro propio
+  token de UA y jamás los de los bots de IA que auditamos.
+- Un probe de presencia **nunca** concluye ausencia sin evidencia de que pudo observar: `res.ok` deja
+  de leerse como *"observé la página"*.
 - Cero regresión de cobertura: los redirects legítimos que hoy funcionan —`http → https`,
   `apex ↔ www`— **deben seguir funcionando**. Un fix de seguridad que bloquea medio internet cambia un
   riesgo por una caída de exactitud.
@@ -307,6 +309,17 @@ Reglas obligatorias:
   `truncated === true`, en vez de reportar "no tiene".
 - El mismo arreglo de lectura aplicado a `entity-fetch.ts:107-108`: es el mismo defecto y el
   `Solution Quality Contract` pide cerrar la causa compartida, no un callsite.
+- 🔴 **Invariante de observabilidad (decidido 2026-08-26, absorbido desde `TASK-1281`).** El truncado
+  es un caso particular de una clase mayor: **un probe de presencia jamás concluye ausencia sin
+  evidencia de que pudo observar**. Hoy `structural/json-ld.ts:20-38` lee `res.ok` como *"observé la
+  página"* cuando sólo significa *"recibí bytes"*, y su propio comentario declara la suposición
+  (*"Ausencia MEDIDA → score 0"*). Se agrega `observable: boolean` al resultado, alimentado por
+  señales baratas y **asimétricas por diseño — sólo pueden RETIRAR una afirmación, nunca agregar
+  una**: `truncated === true`; cuerpo bajo un umbral tras retirar `script`/`style`; raíz única vacía
+  (`<div id="root">`, `<div id="__next">`); `<noscript>` pidiendo habilitar JS; razón texto/markup
+  cercana a cero. Con `observable === false` los probes de presencia degradan a `skipped` con razón
+  explícita, **nunca** `score: 0`. Es el mismo primitive que `NO_HEADLESS_OUTCOME` ya aplica a los
+  probes headless-dependientes, extendido a los que hoy no lo tienen.
 
 ### Slice 4 — `robots.txt` obedecido, o la promesa acotada
 
@@ -317,8 +330,15 @@ Reglas obligatorias:
   prohibida.
 - 🔴 **El propio `/robots.txt` siempre es alcanzable** — pedirlo es cómo se conoce la política, y su
   contenido sigue siendo un hallazgo válido aunque prohíba todo lo demás.
-- Si el equipo decide NO implementar la obediencia, este slice se sustituye por acotar la promesa en
-  `TASK-1709` al carril OnPage. **Una de las dos, nunca ninguna.**
+- 🔴 **Decidido 2026-08-26: se implementa la obediencia.** El razonamiento completo está en
+  `Detailed Spec` §5. El slice deja de ser condicional.
+- 🔴 **Se matchea NUESTRO token de UA (`GreenhouseAEOGrader`), nunca los tokens de los bots de IA que
+  auditamos**, con fallback a `*`. Un sitio con `User-agent: GPTBot / Disallow: /` y `User-agent: * /
+  Allow: /` **debe seguir siendo legible por nosotros**, y *"bloqueas GPTBot"* sigue siendo el
+  hallazgo. Matchearnos contra esos grupos —o "actuar como" GPTBot para probar— nos dejaría fuera de
+  **exactamente los sitios cuyo bloqueo es lo más valioso que tenemos para decir**.
+- Un `Disallow` que nos alcanza produce **hallazgo**, no fallo: *"no pudimos leer el sitio porque tu
+  `robots.txt` lo prohíbe"*, con su lente. Misma asimetría que el resto de la task.
 
 ### Slice 5 — Evidencia real y cierre
 
@@ -408,6 +428,37 @@ encontré" no significa "no está" — significa "no miré todo".
 Por eso `truncated` no puede quedarse en el fetcher: tiene que llegar al probe, y el probe tiene que
 degradar a `skipped` con razón explícita. Es el mismo invariante que el grader ya sostiene con
 `score: null ≠ 0`, aplicado un nivel más abajo. Sin esto, el resto del Slice 3 es cosmético.
+
+### 5. Por qué obedecemos `robots.txt` (decidido, no opcional)
+
+Cuatro razones, la primera decisiva:
+
+1. **Vendemos higiene de crawlers.** La práctica AEO de Efeonce le dice al cliente *"permite retrieval,
+   decide training según tu postura de licenciamiento"* y le entrega el `robots.txt` recomendado. Un
+   proveedor de ese consejo que ignora `robots.txt` es autorrefutable, y la asimetría reputacional es
+   brutal: si el dev del prospecto lo nota en sus logs, la historia se escribe sola.
+2. **Precedente en nuestra propia categoría.** El escándalo público de Perplexity por no honrar
+   `robots.txt` es reciente, caro y del mismo rubro. No hay que descubrirlo por cuenta propia.
+3. **Obedecer cuesta ≈ 0.** El `robots.txt` **ya se descarga** para el probe que lo analiza: obedecerlo
+   es un predicado sobre un objeto que ya tenemos en memoria. Cero requests extra, cero latencia extra.
+4. **La cobertura perdida también es ≈ 0, y hay dato.** El estudio Rutgers/Wharton (dic-2025) mide que
+   los publishers que bloquearon crawlers de IA perdieron **−23,1% de tráfico total sin reducir de
+   forma fiable las citas**: bloquear es net-negativo, y por eso es raro entre sitios que quieren ser
+   encontrados — que es exactamente el perfil de un prospecto nuestro. Y el sitio que **sí** bloquea
+   todo es aquel cuyo bloqueo es el titular del diagnóstico.
+
+Dos excepciones que hacen que la regla funcione:
+
+- **`/robots.txt` siempre es alcanzable.** Por definición no está gobernado por sí mismo: no se puede
+  conocer la política sin leerla.
+- **El matching es contra nuestro propio token**, con fallback a `*` — ver `Slice 4`. Es la trampa de
+  diseño de este slice: matchearnos contra los grupos de los bots que auditamos crearía un bucle
+  autodestructivo en el que **cuanto peor la postura AEO del sitio, menos podríamos diagnosticarla**.
+
+Nota de honestidad: `ANTIPATTERNS.md` de la skill `seo-aeo` **no cubre** esta decisión — no hay
+guardrail escrito sobre ética de rastreo. El juicio se apoya en el módulo `01_SEO_TECHNICAL.md` §6
+(familias de bots, dato Rutgers/Wharton) y en la exposición comercial, y queda registrado acá para que
+el siguiente agente no tenga que rederivarlo.
 
 ## Rollout Plan & Risk Matrix
 
@@ -546,6 +597,7 @@ degradar a `skipped` con razón explícita. Es el mismo invariante que el grader
 
 ## Open Questions
 
-- Slice 4: ¿implementamos obediencia de `robots.txt` en el fetcher propio, o acotamos la promesa de `TASK-1709` al carril OnPage? Decisión de producto, no técnica.
+- ~~Slice 4: ¿obediencia de `robots.txt` o acotar la promesa?~~ **Resuelto 2026-08-26: se implementa la obediencia** (`Detailed Spec` §5).
+- ¿El umbral de la heurística de shell del `Slice 3` produce falsos `observable: false` sobre sitios legítimamente minimalistas? Mitigado por la asimetría (sólo retira afirmaciones), pero conviene calibrarlo contra sitios reales de la cartera antes del flip.
 - ¿El tope por defecto queda en 4 MiB? Con lectura por stream el número deja de ser crítico, pero fija cuánto texto ve un probe de presencia.
 - ¿Aparece algún caso real de redirect legítimo a otro subdominio del mismo dominio registrable? Si sí, la regla conservadora del §2 necesita la Public Suffix List.
