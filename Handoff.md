@@ -2,6 +2,12 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-26 — Berel: producción creativa de octubre creada y auditada en Notion
+
+**Estado vivo:** [`Produccion Creativa - Octubre 26`](https://app.notion.com/p/3c839c2fefe7813c9450e2f35cb4021e) está `En curso`: 8 artículos N35–N42, 32 banners, 32 derivados y 32 subítems sociales. Fechas: 7, 14 y 16 de octubre, respectivamente.
+
+**Evidencia y siguiente paso:** producción editorial N35–N42 completa para revisión. La lectura final corrigió 54 fechas y validó las 18 filas nuevas más la paridad de 8 tareas/subítems. N41–N42 aún son soft-404: bloquear enlaces, CMS y redes hasta QA. Detalle: [`auditoría fechada`](docs/audits/seo/BEREL_OCTOBER_2026_CONTENT_PRODUCTION_2026-08-26.md).
+
 ## 2026-08-25 — Vacaciones contractor por aniversario y mensajes TeamBot 1:1
 
 **Sólo documentación y skills en esta pasada; no se cambió runtime.** Se documentó el caso acotado de Melkin Hernandez (`hire_date=2025-07-15`) y Andrés Carlosama (`hire_date=2025-11-11`), ambos `contractor` + `international` + `deel`. Sus perfiles muestran 15 días disponibles, 0 usados y 0 reservados. Nexa ya les comunicó individualmente que los 15 días se vinculan al primer aniversario, con Daniela como supervisora inmediata y al menos cinco días hábiles de anticipación.

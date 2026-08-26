@@ -1,32 +1,43 @@
 # 07 · El sistema del cliente en Notion
 
-> Estructura verificada contra el workspace **efeonce** el **2026-08-25**. Los nombres de propiedad
+> Estructura verificada contra el workspace **efeonce** el **2026-08-26**. Los nombres de propiedad
 > están **exactos**, con sus mayúsculas, acentos y rarezas. Si cambian, esta página miente: revalidar
 > antes de escribir.
 
-## Las dos bases
+## Las tres bases del ciclo
 
-| | `Tareas` | `📆 Content Hub ` |
-|---|---|---|
-| Page ID | `35c39c2fefe780c9bc37e811a7b95a7c` | `35f39c2fefe7808186efc6ec63475640` |
-| Data source | `collection://35c39c2f-efe7-8139-8448-000b7ed67b13` | `collection://35f39c2f-efe7-8141-8653-000b87e9ec93` |
-| Propiedades | **69** (22 de ellas fórmulas) | **18** |
-| Volumen (2026-08-25) | 283 filas | 123 filas |
-| Título | `Nombre de tarea` | `Nombre` |
+| | `Proyectos` | `Tareas` | `📆 Content Hub ` |
+|---|---|---|---|
+| Page ID | — | `35c39c2fefe780c9bc37e811a7b95a7c` | `35f39c2fefe7808186efc6ec63475640` |
+| Data source | `collection://35c39c2f-efe7-818f-bfc5-000bbf660c0f` | `collection://35c39c2f-efe7-8139-8448-000b7ed67b13` | `collection://35f39c2f-efe7-8141-8653-000b87e9ec93` |
+| Título | `Nombre del proyecto` | `Nombre de tarea` | `tecnicas` |
 
 ⚠️ Dos rarezas reales, no erratas: el **título de la base Content Hub lleva un espacio al final**
 (`📆 Content Hub `) y la propiedad `Días de retraso ` de `Tareas` **también termina en espacio**.
 
-🔴 **Las dos bases no nombran igual su propiedad de título.** En `Tareas` se llama
-**`Nombre de tarea`**; en `Content Hub` se llama **`Nombre`** a secas. Escribir `Nombre` al crear una
-tarea **falla** —ya costó una llamada perdida—, y el nombre correcto no se adivina por analogía entre
-bases: **mira el esquema de la base que vas a escribir antes de escribirla.**
+🔴 **Las tres bases no nombran igual su propiedad de título.** En `Proyectos` se llama
+`Nombre del proyecto`; en `Tareas`, `Nombre de tarea`; y el esquema vivo del Content Hub devuelve
+`tecnicas`. No uses el nombre documentado en una extracción anterior ni lo adivines por analogía:
+**mira el esquema de la base que vas a escribir inmediatamente antes de escribirla.**
+
+## `Proyectos` — el contenedor mensual obligatorio
+
+| Propiedad | Cómo se llena |
+|---|---|
+| `Nombre del proyecto` | `Produccion Creativa - [Mes] [AA]` |
+| `Estado` | `Planificación` al montar; `En curso` cuando la producción ya empezó |
+| `Propietario` | responsable del ciclo, tomado del proyecto o artículo anterior si no hay instrucción nueva |
+| `Fechas` | primer día → último día del mes |
+| `Resumen` | alcance cuantificado: artículos, banners, derivados y bloqueos |
+
+Antes de crear uno, buscar por mes y año. Después, toda tarea principal y subtarea lleva `Proyecto`:
+un conjunto de tareas planas sin proyecto **no constituye el ciclo mensual**.
 
 ## `Content Hub` — las propiedades que se tocan al producir
 
 | Propiedad | Tipo | Valores |
 |---|---|---|
-| `Nombre` | title | — |
+| `tecnicas` | title | — |
 | `Estado` | status | **to_do:** `Idea` · **in_progress:** `Bloqueado`, `En feedback`, `En curso`, `En revisión`, `Aprobado` · **complete:** `Publicado`, `Archivado` |
 | `Tipo` | multi_select | `Publicación de blog` · `Podcast` · `Video` · `Tweet` · `Facebook` · `Instagram` · `Publicación patrocinada` · `Serie de Artículos` · `Ebook` · `Storytime` · `Newsletter` · `Pillar Page` |
 | `Responsable` | person | — |
@@ -87,6 +98,20 @@ falla; hay que pedir la propiedad **relation** que la alimenta, `Responsables`.
 tal como los espera la API, incluidos los campos de fecha desdoblados (`date:Fecha límite:start`,
 `date:Fecha límite:is_datetime`). Sale más barato que adivinar y encadenar tres errores de
 validación.
+
+### 🔴 Verificación en dos lecturas frente a automatizaciones
+
+Una respuesta exitosa de creación prueba que Notion aceptó el payload, **no que el valor seguirá
+igual**. Automatizaciones del workspace pueden reemplazar `Fecha límite` o `Estado` después de la
+escritura.
+
+1. Releer al terminar cada nivel: proyecto → principales → banners → sociales → subítems.
+2. Al cerrar el lote, ejecutar una **segunda consulta fresca** y comprobar conteos, relaciones,
+   `Responsables`, `Tipo de entregable`, fechas y estados.
+3. Comparar con el calendario interno: artículo semana 1 → banners semana 2 → sociales dos días
+   después; proyecto `En curso` cuando ya hay producción.
+4. Si la automatización cambió un valor, restaurarlo por la vía canónica y volver a leer. No reportar
+   como terminado hasta que la lectura final refleje el estado honesto.
 
 🔴 **Las 22 propiedades de tipo fórmula no se editan.** Toda la capa de RpA, urgencia, freeze/thaw y
 performance es **calculada**. Tampoco se tocan las de integración con Frame.io

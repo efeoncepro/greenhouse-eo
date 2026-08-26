@@ -17,6 +17,11 @@ Auditorías de búsqueda orgánica y AEO — de Efeonce y de clientes a los que 
 
 ## Auditorías
 
+- [Berel — producción editorial de octubre 2026 — 2026-08-26](BEREL_OCTOBER_2026_CONTENT_PRODUCTION_2026-08-26.md) —
+  auditoría de cierre del proyecto creativo en Notion: ocho artículos `N35–N42`, 72 tareas y 32 subítems sociales;
+  documenta la corrección de 54 fechas alteradas por automatización, la producción completa de N41–N42 y el gate
+  de soft-404 que impide activar enlaces, CMS y redes antes del QA público.
+
 - [Berel — Color del Año 2027 "Bien y de Buenas": research, ángulo y plan de lanzamiento — 2026-08-25](BEREL_COLOR_DEL_ANO_2027_2026-08-25.md) —
   el mismo cliente, su **pieza-hito anual** (slot N28). El competidor más peligroso era una pieza propia de cinco semanas antes;
   una agencia de tendencias pre-emptó la tesis seis semanas antes; la categoría entera en México está vacía de contenido y el único

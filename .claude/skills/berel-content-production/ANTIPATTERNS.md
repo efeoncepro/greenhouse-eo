@@ -175,11 +175,25 @@
   writeback de Greenhouse. (→ `07`)
 - **Crear la subtarea antes que la tarea, o la tarea antes que el proyecto.** Cada nivel necesita la
   URL del anterior. (→ `07`)
+- 🔴 **Crear todas las tareas pero omitir el proyecto mensual.** El proyecto es el contenedor del
+  ciclo y todas las principales y subtareas deben relacionarse con él. Una lista plana no permite
+  auditar alcance, calendario ni estado. (→ `01`, `07`)
 - **Dejar `Artículo (Content Hub)` vacío en un banner** porque el nombre ya lleva el `N##`. Hoy 187
   de 283 tareas no tienen el vínculo y la trazabilidad se sostiene por convención de nombres: **si
   alguien renombra, se pierde**. (→ `07`)
 - **Reiniciar la numeración `N##` cada mes.** Es continua entre meses. (→ `01`)
 - **Mover el estado de artículos ya publicados o sin tema.** No se tocan. (→ `01`)
+- **Meter filas `Idea` de artículos nuevos dentro de una ejecución limitada a reescrituras.** Se
+  conservan para Modalidad B; compartir mes no amplía por sí solo el alcance. (→ `01`)
+- 🔴 **Dar por buena la respuesta de escritura sin una segunda lectura.** Automatizaciones de Notion
+  pueden sobrescribir fecha o estado después del alta. La evidencia de cierre es una consulta fresca
+  del lote completo, no el payload aceptado. (→ `01`, `07`)
+- 🔴 **Clasificar como reescritura una canónica planificada porque devuelve HTTP 200.** En Berel una
+  ruta inexistente responde con shell vacío; sin `title`, H1 y cuerpo sigue siendo Modalidad B y sus
+  enlaces entrantes/sociales permanecen bloqueados hasta QA live. (→ `01`, `03`)
+- 🔴 **Forzar `vinílica` / `acrílica` / `esmalte` como categorías excluyentes.** Mezcla resina, base,
+  familia y función, y produce recomendaciones falsas. Ordenar por superficie, exposición, función y
+  ficha concreta. (→ `03`, `12`)
 
 ## Publicación en el CMS
 

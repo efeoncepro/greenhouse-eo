@@ -66,9 +66,12 @@ necesitó plan editorial propio.
 ## Fase 1 · Identificar los artículos del mes
 
 1. Consultar el Content Hub filtrando por `Fecha de publicación` dentro del mes objetivo.
-2. Separar en dos grupos: **ya publicados** (pertenecen al ciclo anterior, no se les crea tarea
-   nueva) y **por producir** (entran al proyecto del mes).
-3. Verificar que cada artículo por producir tenga `Enlace`. Si falta:
+2. Separar primero por **alcance pedido**: reescrituras · artículos nuevos · ya publicados fuera del
+   ciclo. Una fila `Idea` que pertenece al bloque de artículos nuevos **no entra por arrastre en una
+   ejecución limitada a reescrituras**; se conserva intacta para la Modalidad B.
+3. Dentro del alcance, usar `Enlace` para decidir la modalidad, **no para decidir si la fila existe**:
+   con `Enlace` → A · Reescritura; sin `Enlace` → B · Artículo nuevo. Si una fila anunciada como
+   reescritura no tiene el enlace esperado:
    - Buscar en **Teams** los mensajes de quien planifica el contenido (suele compartir el plan
      mensual con los enlaces).
    - Si tampoco aparece ahí, **reportar al usuario qué filas quedaron sin enlace y continuar con el
@@ -194,7 +197,9 @@ editoriales. Además, propio de esta modalidad:
 
 ## Fase 6 · Crear el proyecto del mes
 
-En la base **Proyectos**:
+En la base **Proyectos**. El proyecto mensual es el **contenedor obligatorio** del ciclo, no una
+tarjeta decorativa: antes de crear tareas, buscar si ya existe el proyecto del mismo mes para no
+duplicarlo; luego relacionar con él la tarea principal y las ocho subtareas de cada artículo.
 
 | Campo | Valor |
 |---|---|
@@ -203,6 +208,10 @@ En la base **Proyectos**:
 | Estado | `Planificación` |
 | Propietario | Responsable del ciclo |
 | Fechas | Primer día → último día del mes |
+
+El estado inicial es `Planificación`. En cuanto exista producción real —por ejemplo, artículos ya
+escritos o tareas listas para revisión— se mueve a `En curso`; dejarlo en `Planificación` con trabajo
+activo comunica un estado falso.
 
 ## Fase 7 · Tareas principales (una por artículo)
 
@@ -242,6 +251,22 @@ Detalle de fichas por pieza → [`05_BANNERS_IMAGENES.md`](05_BANNERS_IMAGENES.m
 [`11_FICHA_DE_PRODUCCION_INFOGRAFIA.md`](11_FICHA_DE_PRODUCCION_INFOGRAFIA.md) · copy social →
 [`06_DERIVADOS_SOCIALES.md`](06_DERIVADOS_SOCIALES.md)
 
+### Aritmética de aceptación del lote
+
+Para `A` artículos ya escritos dentro del alcance, el proyecto debe terminar con:
+
+- `A` tareas principales;
+- `4A` tareas de banner;
+- `4A` tareas de derivados sociales;
+- `4A` subítems sociales en el Content Hub;
+- `9A` tareas totales relacionadas al proyecto.
+
+**Fixture verificado, octubre 2026:** `A = 8`, artículos `N35–N42` → **72 tareas** en el proyecto:
+8 principales + 32 banners + 32 sociales, más 32 subítems sociales en el Content Hub. El lote se
+produjo en dos pasadas: seis reescrituras `N35–N40` y, después de validar sus briefs y canónicas
+planificadas, dos artículos nuevos `N41–N42` por Modalidad B. Calendario interno del fixture:
+artículos **7 de octubre**, banners **14 de octubre**, sociales **16 de octubre**.
+
 ## Fase 9 · Íconos
 
 Aplicar a **todas** las tareas creadas:
@@ -271,19 +296,25 @@ final del mes**.
 Mover el estado **solo** donde se cumple la condición: los artículos ya publicados de ciclos
 anteriores y los que siguen sin tema **no se tocan**.
 
+🔴 **El éxito de una escritura no cierra la verificación.** Algunas automatizaciones de Notion pueden
+reescribir `Fecha límite` o `Estado` después de crear la página. Hacer una primera lectura de control
+al terminar cada nivel y una **segunda lectura fresca al cerrar el lote**; verificar proyecto,
+relaciones, responsables, tipo de entregable, fecha y estado contra el calendario interno. El valor
+guardado en esa segunda lectura es la evidencia, no el payload enviado.
+
 🔴 **Al reportar avance, separar siempre en tres grupos:** **listos** · **faltantes con el motivo del
 bloqueo** · **fuera de alcance** (ya publicados). *Un conteo sin el motivo del bloqueo no sirve para
 decidir nada.*
 
 ## Checklist de cierre del mes
 
-- [ ] Todos los artículos del mes identificados y con `Enlace` (o faltantes reportados)
+- [ ] Todos los artículos del mes identificados, modalidad asignada y enlaces faltantes de reescrituras reportados
 - [ ] `Contenido anterior del artículo` rescatado en cada página
 - [ ] `Análisis SEO/AEO` y `Análisis de contenido` completos
 - [ ] Cada análisis verificado contra el HTML de la URL publicada, con su sección de verificación fechada
 - [ ] Errores de producción detectados en el sitio reportados al usuario por separado
 - [ ] Reescritura agregada sin borrar el contenido previo, con enlaces verificados y sin RGB en el cuerpo
-- [ ] Proyecto mensual creado (🎨, `Planificación`, fechas del mes)
+- [ ] Proyecto mensual creado (🎨, fechas del mes y estado real: `Planificación` o `En curso`)
 - [ ] Una tarea principal por artículo, numeración continua, relacionada al Content Hub
 - [ ] 4 banners + 4 derivados **solo** en artículos ya escritos (el resto sin subtareas o en `Bloqueado`)
 - [ ] Cada subtarea de banner tiene su Ficha de contenido completa, derivada del artículo final
@@ -297,6 +328,8 @@ decidir nada.*
 - [ ] Texto releído: sin erratas en nombres de producto ni de color
 - [ ] `Estado` de cada artículo reescrito movido a `En revisión`
 - [ ] `Estado` del proyecto del mes actualizado
+- [ ] Segunda lectura del lote confirma fechas y estados después de las automatizaciones de Notion
+- [ ] Conteo de aceptación: `9A` tareas en el proyecto y `4A` subítems sociales para `A` artículos escritos
 - [ ] Avance reportado en tres grupos
 - [ ] Texto auditado contra la guía de Voz y Tono, con la lista de fallas típicas
 
@@ -310,3 +343,4 @@ decidir nada.*
 - [ ] Ningún claim sin respaldo documental del cliente
 - [ ] Plan de enlaces **entrantes** desde artículos existentes
 - [ ] Fila del Content Hub renombrada si traía un marcador de "por desarrollar"
+- [ ] Canónica planificada marcada como destino futuro si todavía es soft-404; ningún enlace entrante ni derivado se activa antes del QA live

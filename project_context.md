@@ -103,12 +103,9 @@ volver a leer `seo_v1` sería reabrir una ventana cerrada. Contrato en
 [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §9 (§17
 contrata el seam de extracción hacia Wave). Los reads del módulo son readers canónicos consumer-agnósticos —
 `readKeywordOpportunities` y `readSeoAeoGap` (este último cruza SEO↔AEO respetando el boundary de §1.1) —
-expuestos por el lane ecosystem `/api/platform/ecosystem/growth/seo/*` y sus MCP tools (hoy **10 de
-lectura + 2 de escritura**); regla
-durable del módulo: **todo reader SEO nuevo expone su MCP tool en el mismo PR**. Desde 2026-08-06 ese camino
-está **vivo en producción y federado en `mcp.efeonce.org`** (TASK-1645 + TASK-1647 complete; provider
-`greenhouse-seo` en el gateway, revisión `efeonce-mcp-gateway-00012-dkj`): preguntar por MCP por la
-visibilidad 360 de una org entitled devuelve su quadrant real, y una org fuera del binding falla cerrada.
+expuestos por el lane ecosystem `/api/platform/ecosystem/growth/seo/*` y sus MCP tools; **todo reader SEO
+nuevo expone su tool en el mismo PR**. Desde 2026-08-06 el camino está **vivo en producción y federado en
+`mcp.efeonce.org`** mediante el provider `greenhouse-seo`; el acceso per-org falla cerrado.
 El flag `GROWTH_SEO_ENABLED` es **multi-runtime** — Vercel (lane) + `ops-worker` (materializer GSC);
 prenderlo en uno solo deja el otro camino muerto. Su primera captura corre live
 desde 2026-08-05: la serie propia de
@@ -121,6 +118,10 @@ manifest released): el scheduler `ops-seo-rank-capture` captura posiciones a dia
 acumula desde 2026-08-06 (día-1: Berel, 31 keywords), con la señal `seo.rank.capture_lag` en Growth Health.
 `TASK-1653` (guard de paridad del gateway), `TASK-1307` (performance) y `TASK-1304` (site audit +
 backlinks) están **complete**.
+
+Berel se opera desde Notion con la skill espejo `berel-content-production`; la modalidad se decide por
+contenido público vivo —no por HTTP 200 ni por un `Enlace` planificado— y el cierre relee relaciones,
+conteos, fechas, estados y paridad tarea/subítem porque las automatizaciones pueden cambiar lo escrito.
 
 ### Lectura mínima obligatoria
 

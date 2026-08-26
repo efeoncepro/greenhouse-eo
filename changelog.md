@@ -3,6 +3,12 @@
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
 
+## 2026-08-26 — Octubre de Berel queda convertido en un proyecto creativo trazable
+
+- El proyecto [`Produccion Creativa - Octubre 26`](https://app.notion.com/p/3c839c2fefe7813c9450e2f35cb4021e) quedó `En curso` con ocho artículos `N35–N42`, 32 banners, 32 paquetes sociales y 32 subítems en Content Hub: 72 tareas relacionadas al proyecto, conforme a la aceptación `9A` / `4A`.
+- Además de las seis reescrituras, se normalizaron los briefs y se redactaron los artículos nuevos N41 —paleta de la mesa mexicana— y N42 —pintura por superficie—, cada uno con cuatro banners y cuatro derivados completos. La segunda lectura confirmó las 18 filas nuevas y la igualdad exacta tarea ↔ subítem en los ocho sociales.
+- Se restauraron 54 fechas de N35–N40 que automatizaciones de Notion habían movido al `2026-09-04`; la consulta final devolvió 8 artículos al 7 de octubre, 32 banners al 14 y 32 sociales al 16. Las canónicas de N41–N42 siguen como soft-404 y permanecen bloqueadas para enlaces entrantes, CMS y redes hasta QA live. Evidencia: [`auditoría de producción de octubre`](docs/audits/seo/BEREL_OCTOBER_2026_CONTENT_PRODUCTION_2026-08-26.md).
+
 ## 2026-08-25 — El caso de vacaciones por aniversario no se convierte en política global
 
 - Se documentaron las fechas de ingreso verificadas de Melkin Hernandez (`2025-07-15`) y Andrés Carlosama (`2025-11-11`), junto con la comunicación individual aprobada que vinculó 15 días remunerados al primer aniversario.
@@ -34,7 +40,6 @@
 - **Dos antipatrones de criterio y cuatro de craft.** Si se cae la razón por la que existe una pieza, **la decisión vuelve a cero, no a otro ángulo** — buscarle un ángulo nuevo para salvarla es publicar por publicar; y un tema que le habla a otro comprador es decisión comercial, no de SEO. En titulación: poner el **concepto** en el lugar del título (el ángulo nombra, el titular promete), meter taxonomía interna en el nombre visible, repetir el mismo titular en las cuatro superficies, y desaprovechar el activo más citable que suele tener un catálogo — **un nombre propio con carga cultural que nadie contó**.
 - **Tres trampas más de herramienta, todas devolviendo éxito.** En Notion: **nunca editar el texto de un encabezado desplegable con search-replace** —destruye el toggle y orfana a todos los hijos; para renombrar se cambia la propiedad `Nombre` de la página— y el desplegable **no puede ser el primer bloque**. Leyendo un sitio Next.js: **no des-escapar el payload para buscar `@type`**, porque los objetos de la app aparecen como si fueran schema (se «encontró» un tipo inválido nueve veces por página que en el HTML crudo no existe); y los conteos de palabras sobre el payload salen **~3× inflados**.
 - **`copywriting` entra al manifiesto de espejos (12 skills) y traía deriva que no fallaba con error.** La copia de `.codex` tenía una `description` de una línea, sin `user-invocable` ni triggers: la skill simplemente **no se cargaba** cuando alguien pedía un headline o la voz del autor. Un agente entrando por Codex escribía copy firmado sin el sistema de voz, sin saber que existía.
-
 
 ## 2026-08-24 — TeamBot deja de prometer una mención que Teams no soporta
 
@@ -785,17 +790,3 @@ manual operativo, EPIC-011/038, TASK-1718/1723/1724/1725, ledgers de flags/relea
 Las skills espejo `.codex`/`.claude` de Talent, MCP y release quedaron alineadas con el runtime real. Se preservaron los
 límites: CV/review por MCP y automatización de tests continúan OFF; invite/self-service sólo operan mediante consentimiento
 explícito, confirmación tokenizada y rollback por flags. Sin cambios de código ni schema en este barrido.
-
-## 2026-08-16 — Talent Pool self-service e invitación gobernada habilitados en producción
-
-Por autorización explícita del CEO, los flags `HIRING_TALENT_POOL_SELF_SERVICE_ENABLED` y
-`HIRING_TALENT_POOL_INVITE_ENABLED` quedaron en `true` en Vercel Production y el consumer de confirmación quedó
-declarado en `ops-worker`. El cambio se promovió por PR #197 y el orquestador `31953851353`, con preflight break-glass
-auditado por el único archivo `services/ops-worker/deploy.sh` que toca `cloud_release`; no hubo migraciones nuevas.
-
-Evidencia live: Vercel redeploy `dpl_CTxG3tx66S159tazMSyNiGSmqzHJ` `READY`, health 200, CI/CI Deep/Playwright verdes,
-workers Ready y watchdog `aggregateSeverity=ok`/`drift_count=0`. El endpoint tokenizado conserva el anti-oracle
-`404 talent_pool_link_unavailable` para tokens inválidos y la API interna sin sesión responde `401`. No se envió correo a
-un candidato real durante el flip; el primer correo real debe verificarse con un candidato de prueba controlado.
-El opt-in futuro sigue siendo explícito, versionado y revocable; la revisión jurídica formal de copy, TTL y retención
-queda como sign-off residual si la política interna la exige.

@@ -146,7 +146,7 @@ completo de cada pieza:
 
 | Campo | Valor |
 |---|---|
-| Nombre | `Derivado social — [Canal]: [Tema]` |
+| `tecnicas` (título vivo del Content Hub) | `Derivado social — [Canal]: [Tema]` |
 | Ícono | Facebook 🔲 · Instagram Story 📱 · Reel ▶️ · Pinterest 📌 |
 | `ítem principal` | La fila del artículo (**es lo que lo hace subítem**) |
 | `Tareas` | La tarea del derivado en la base Tareas |
@@ -155,15 +155,20 @@ completo de cada pieza:
 | `Fecha límite` | La misma de la tarea del derivado |
 | Cuerpo | Callout 🔁 que enlaza al artículo y a la tarea + **el copy completo volcado** (mismas secciones), para poder trabajar desde el hub o desde la tarea con el mismo contenido |
 
+Al escribir `Tareas` en el subítem se actualiza la relación inversa `Artículo (Content Hub)` de la
+tarea social. Por eso la tarea queda relacionada con **dos filas legítimas**: el artículo padre y su
+subítem social. La verificación debe aceptar ambas; borrar una para "deduplicar" rompe el ecosistema.
+
 ## Checklist de cierre por artículo
 
 - [ ] Derivados identificados y confirmados con el usuario (avisado si falta algún canal del set)
 - [ ] Copy redactado en el cuerpo de cada tarea, con callout de cabecera y notas de voz aplicadas
 - [ ] Propiedad `Resumen` llena en cada tarea
 - [ ] Regla del posesivo aplicada ("nuestro blog") y sin claims sin respaldo del Lab
-- [ ] Enlaces verificados: artículo real, nunca `/search?q=`
+- [ ] Enlaces verificados: artículo real o canónica planificada con gate explícito de no programación; nunca `/search?q=`
 - [ ] Producto nombrado una sola vez por pieza
 - [ ] Un subítem por derivado en el Content Hub, con relación a su tarea y copy volcado
+- [ ] Segunda lectura confirma que el cuerpo del subítem coincide exactamente con el de su tarea social
 - [ ] Estados: tarea en `Sin empezar` para diseño, subítem en `En curso`
 - [ ] Gancho en la primera línea / primer segundo
 - [ ] Emojis, hashtags y longitud según las reglas del canal

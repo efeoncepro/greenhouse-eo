@@ -144,6 +144,10 @@ Dentro del desplegable, **siempre en este orden**:
 
 ### Cuando el dato no está firme
 
+- Una **canónica planificada** puede declararse en los metadatos del artículo nuevo y en el callout
+  de procedencia de sus derivados, pero no se trata como página publicada. Si devuelve el shell de
+  soft-404, mantener un gate literal: **no activar enlaces entrantes ni programar derivados hasta
+  comprobar `title`, H1, cuerpo, canonical y schema en la ruta pública**.
 - Si el sitio **no confirma** la URL, enlazar la **familia de color** o la **categoría de producto**,
   y dejar el pendiente en el callout ⚠️. 🔴 **Nunca la búsqueda del sitio como respaldo.**
 - Si un **producto no tiene ficha pública localizable** —no aparece en `sitemap-productos.xml` y la
@@ -152,6 +156,14 @@ Dentro del desplegable, **siempre en este orden**:
   URL de ficha**, ni deducir un sufijo de variante que no viste en el sitemap.
 - Si una fuente de la wiki está **vacía o sin permisos de lectura**, **decirlo explícitamente en el
   entregable** en lugar de rellenar el hueco con supuestos.
+
+### Cuando los nombres de producto se traslapan
+
+No asumir que `vinílica`, `acrílica` y `esmalte` son tres cajas excluyentes. Antes de construir una
+comparativa, abrir las fichas concretas y separar cuatro preguntas: **qué superficie declara, qué
+exposición admite, qué función cumple y qué preparación exige**. Una resina o una base no sustituyen
+la aplicación declarada. Si la clasificación inicial del brief contradice las fichas, corregir el
+brief y explicar el cambio en la procedencia del artículo.
 
 ## Estándares on-page que la pieza debe cumplir
 

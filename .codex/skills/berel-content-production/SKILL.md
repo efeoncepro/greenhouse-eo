@@ -43,8 +43,10 @@ guía de voz y tono, y la guía de carga al CMS.
 
 ## Cómo se usa (router)
 
-1. **Determina la modalidad** antes de cualquier otra cosa: ¿la fila del Content Hub tiene `Enlace`?
-   Sí → **A · Reescritura**. No → **B · Artículo nuevo**. Cambia todo lo anterior a la Fase 6.
+1. **Determina la modalidad** antes de cualquier otra cosa: ¿la fila del Content Hub tiene `Enlace`
+   **y la ruta contiene un artículo vivo**? Sí → **A · Reescritura**. Sin enlace, o con una canónica
+   planificada que todavía devuelve el shell vacío de soft-404 → **B · Artículo nuevo**. El campo y
+   el HTTP 200 no bastan; deben existir `title`, H1 y cuerpo editorial. Cambia todo lo anterior a la Fase 6.
 2. Carga **solo** el módulo de la fase en la que estás.
 3. Aplica las **reglas duras** de abajo — son las que se rompen en la práctica.
 4. Cierra con el **artefacto** (`templates/`) y deja el estado movido en Notion.
@@ -91,7 +93,7 @@ guía de voz y tono, y la guía de carga al CMS.
    `Disallow: /search` y `Disallow: /*?q=` (verificado en vivo el 2026-08-25): ese enlace manda al
    lector y al crawler a una ruta bloqueada. **Productos → su ficha real; colores → `/colores/<familia>`**,
    que sí existe y está en el sitemap. (`04`)
-8. 🔴 **El sitio NUNCA devuelve 404.** Una ruta inexistente responde 200 con un shell vacío, así que
+7. 🔴 **El sitio NUNCA devuelve 404.** Una ruta inexistente responde 200 con un shell vacío, así que
    **el código de estado no prueba nada**: un enlace roto se ve como página cargada. Para verificar,
    compara contra una ruta de control inventada — si el `<title>` falta y el peso coincide con el
    control, la ruta no existe. (`03`)
@@ -144,6 +146,11 @@ guía de voz y tono, y la guía de carga al CMS.
     corporativo se reserva a branding institucional. Y ojo: el HEX de la **paleta de acento** SÍ va
     en la ficha —es instrucción de diseño—; lo que nunca sale al público es el HEX de un **color de
     pintura**. Son cosas distintas. (`10`, `09`)
+24. 🔴 **No convertir etiquetas comerciales en una taxonomía química excluyente.** `Vinílica`,
+    `acrílica`, `esmalte`, `base agua` y `base solvente` pueden describir capas distintas del mismo
+    producto: existen pinturas vinil-acrílicas y esmaltes acrílicos. Para comparar o recomendar,
+    ordenar por **superficie → exposición → función → ficha específica**; nunca deducir el uso a
+    partir de una sola palabra del nombre. (`03`, `12`)
 
 ## Lo que NO se toca
 
