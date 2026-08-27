@@ -75,3 +75,46 @@ export const GROWTH_SEO_KEYWORD_DISCOVERY_FLAG = 'GROWTH_SEO_KEYWORD_DISCOVERY_E
 /** Gate del keyword discovery. Default OFF: prenderlo compromete gasto de proveedor. */
 export const isSeoKeywordDiscoveryEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
   isTrue(env[GROWTH_SEO_KEYWORD_DISCOVERY_FLAG])
+
+/**
+ * TASK-1775 — Captura mensual de la foto de dominio (DataForSEO Labs `domain_rank_overview`
+ * sobre el target y sus competidores declarados).
+ *
+ * ⚠️ **Se lee SOLO en el ops-worker** — la captura es lo único que gatea y vive ahí (el hook
+ * de spend está cableado en ese entrypoint). Prenderlo en Vercel es INERTE, y creer que se
+ * prendió porque aparece en Vercel es el fallo silencioso que documenta el ledger de flags.
+ * SoT declarativo: `services/ops-worker/deploy.sh` (su `--set-env-vars` es destructivo);
+ * efecto inmediato con `gcloud run services update ... --update-env-vars`.
+ *
+ * Además el Cloud Scheduler `ops-seo-domain-overview` nace PAUSADO: dos frenos independientes,
+ * igual que el market-data de TASK-1661. Es SUBORDINADO a `GROWTH_SEO_ENABLED`.
+ * Registrar cambios en docs/operations/FEATURE_FLAG_STATE_LEDGER.md.
+ */
+export const GROWTH_SEO_DOMAIN_OVERVIEW_FLAG = 'GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED'
+
+/** Gate de la foto de dominio. Default OFF: prenderlo compromete gasto de proveedor. */
+export const isSeoDomainOverviewEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_SEO_DOMAIN_OVERVIEW_FLAG])
+
+/**
+ * TASK-1709 — Diagnóstico de prospecto (tier `prospect`, corrida única). Default OFF.
+ *
+ * 🔴 **Prender esto habilita un command que GASTA** (~USD 0,25 por diagnóstico, Labs +
+ * Backlinks live), con tope duro por diagnóstico (`GROWTH_SEO_PROSPECT_DIAGNOSTIC_CEILING_USD`)
+ * y tope diario por actor. Con el flag OFF, `runProspectDiagnostic` devuelve `disabled`
+ * sin una sola llamada al proveedor.
+ *
+ * ⚠️ **Runtime: Vercel ÚNICAMENTE (V1).** La corrida es inline en el command (todas las
+ * fuentes son live: Labs, Backlinks, reads OnPage post-crawl y el sustrato propio) — no
+ * hay batch en el ops-worker, no hay Cloud Scheduler, y NO DEBE haberlo: la captura
+ * recurrente sobre un prospecto está prohibida por regla dura de la task; un scheduler
+ * que lea `seo_prospect_diagnostics` es una regresión, no una mejora.
+ *
+ * Es SUBORDINADO a `GROWTH_SEO_ENABLED`: con el módulo apagado no hay diagnóstico aunque
+ * este flag esté ON. Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md.
+ */
+export const GROWTH_SEO_PROSPECT_DIAGNOSTIC_FLAG = 'GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED'
+
+/** Gate del diagnóstico de prospecto. Default OFF: prenderlo compromete gasto por corrida. */
+export const isSeoProspectDiagnosticEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isSeoModuleEnabled(env) && isTrue(env[GROWTH_SEO_PROSPECT_DIAGNOSTIC_FLAG])

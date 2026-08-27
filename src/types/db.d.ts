@@ -7589,6 +7589,36 @@ export interface GreenhouseGrowthSeoKeywordSets {
   seo_target_id: string;
 }
 
+export interface GreenhouseGrowthSeoProspectDiagnosticFacts {
+  captured_at: Timestamp;
+  created_at: Generated<Timestamp>;
+  detail_json: Generated<Json>;
+  diagnostic_id: string;
+  fact_id: Generated<string>;
+  kind: string;
+  lens: Generated<string>;
+  magnitude: Numeric | null;
+  source: string;
+}
+
+export interface GreenhouseGrowthSeoProspectDiagnostics {
+  competitor_domains: Generated<string[]>;
+  completed_at: Timestamp | null;
+  cost_ceiling_usd: Numeric;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  diagnostic_id: Generated<string>;
+  failure_reason: string | null;
+  forecast_cost_usd: Numeric;
+  language_code: string;
+  location_code: number;
+  market: string;
+  provider_cost_usd: Numeric | null;
+  root_domain: string;
+  run_date: Generated<Timestamp>;
+  status: Generated<string>;
+}
+
 export interface GreenhouseGrowthSeoProviderSpendDaily {
   call_count: Generated<number>;
   created_at: Generated<Timestamp>;
@@ -12843,6 +12873,8 @@ export interface DB {
   "greenhouse_growth.seo_keyword_market_data": GreenhouseGrowthSeoKeywordMarketData;
   "greenhouse_growth.seo_keyword_set_members": GreenhouseGrowthSeoKeywordSetMembers;
   "greenhouse_growth.seo_keyword_sets": GreenhouseGrowthSeoKeywordSets;
+  "greenhouse_growth.seo_prospect_diagnostic_facts": GreenhouseGrowthSeoProspectDiagnosticFacts;
+  "greenhouse_growth.seo_prospect_diagnostics": GreenhouseGrowthSeoProspectDiagnostics;
   "greenhouse_growth.seo_provider_spend_daily": GreenhouseGrowthSeoProviderSpendDaily;
   "greenhouse_growth.seo_rank_snapshots": GreenhouseGrowthSeoRankSnapshots;
   "greenhouse_growth.seo_site_audit_findings": GreenhouseGrowthSeoSiteAuditFindings;
