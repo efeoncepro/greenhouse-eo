@@ -109,7 +109,9 @@ contrafactual, el número describe un patrón — no prueba un lift.** Decláral
   presenta con el user-agent de un bot ajeno (GPTBot/PerplexityBot/etc.): los
   WAFs verifican por reverse-DNS y el costo reputacional es real. Un Disallow
   que te alcanza es un hallazgo (`blocked_robots`), no una barrera a saltar.
-  Referencia viva: fetcher de probes de Greenhouse — TASK-1778 (2026-08-27).
+  Referencia viva: sustrato de fetch de sitios de Greenhouse
+  (`@/lib/growth/site-substrate`, TASK-1697) — endurecido por TASK-1778
+  (2026-08-27).
 - **Afirmar datos volátiles de memoria** — features de motores y cifras cambian.
   Reverifica con WebSearch (`SOURCES.md`).
 - 🔴 **Salvarle el ángulo a una pieza cuyo porqué se cayó.** Si la razón por la que la pieza

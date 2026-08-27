@@ -504,7 +504,7 @@ Ver el **[manual](radiografia-aeo-manual.md)**. Resumen: `openssl rand -hex 6` +
 
 ## Follow-ups
 
-- **Probe a nivel de artículo en el AI Visibility Grader.** Hoy los probes son **site-level**. No existe *"dame la URL de un artículo y evalúa su capa AEO"*. Esa capacidad convertiría esta muestra estática en una **herramienta** — y ya existe la mitad del motor (`src/lib/growth/ai-visibility/probes/html.ts` sabe extraer y aplanar JSON-LD).
+- **Probe a nivel de artículo en el AI Visibility Grader.** Hoy los probes son **site-level**. No existe *"dame la URL de un artículo y evalúa su capa AEO"*. Esa capacidad convertiría esta muestra estática en una **herramienta** — y ya existe la mitad del motor (`src/lib/growth/site-substrate/html.ts` sabe extraer y aplanar JSON-LD — sustrato de sitio extraído por TASK-1697, 2026-08-27, consumible vía `@/lib/growth/site-substrate`).
 - **Versión genérica sin marca de cliente**, indexable, como activo de captación en Think.
 - **Pantalla ⑤ "Cómo se mide"** — los 8 indicadores que promete la oferta. Cierra el ciclo: propuesta → pieza → capa → distribución → **prueba**.
 - **Un segundo payload comercial real.** Ya existe una fixture no publicada para probar el motor/gate sin IDs de SKY, pero falta una muestra completa de otro cliente para validar contenido, marca, imágenes, venta y operación end-to-end.

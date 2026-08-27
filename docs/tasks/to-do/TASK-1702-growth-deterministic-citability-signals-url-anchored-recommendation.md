@@ -132,7 +132,9 @@ Reglas obligatorias:
   `pendingFields` (verificado, `contracts.ts:45`).
 - `src/lib/growth/ai-visibility/scoring/` — motor de scoring versionado del grader. Se respeta su
   contrato de reproducibilidad; no se modifica su fórmula desde acá.
-- `src/lib/growth/site-substrate/` — creado por `TASK-1701`.
+- `src/lib/growth/site-substrate/` — ya existe: creado por `TASK-1697` (2026-08-27). Barrel
+  `@/lib/growth/site-substrate` (`createSiteFetcher`, `html.ts`, `robots-policy.ts`; los nombres
+  `Probe*` sobreviven como alias en los shims de `ai-visibility/probes/**`).
 
 ### Blocks / Impacts
 
@@ -167,8 +169,9 @@ Reglas obligatorias:
 - `src/lib/growth/ai-visibility/fix-it/contracts.ts:45` — `pendingFields: string[]`, el mecanismo
   honesto que hoy sostiene el hueco.
 - `src/lib/growth/ai-visibility/scoring/` — motor con `score_version` y reproducibilidad garantizada.
-- `src/lib/growth/ai-visibility/probes/html.ts` — `extractJsonLdBlocks` y parseo tolerante, base de
-  varias señales.
+- `src/lib/growth/site-substrate/html.ts` — `extractJsonLdBlocks` y parseo tolerante, base de
+  varias señales (casa canónica desde `TASK-1697`, 2026-08-27; el path viejo
+  `ai-visibility/probes/html.ts` queda como re-export shim).
 - Cápsula de respuesta: el fix-it ya la escribe ("40-60 palabras"), como craft, no como señal medida.
 
 ### Gap

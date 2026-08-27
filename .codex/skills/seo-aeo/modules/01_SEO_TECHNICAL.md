@@ -258,7 +258,8 @@ Sitemap: https://EXAMPLE.com/sitemap_index.xml
 ```
 
 > **Ética de rastreo del tooling propio (TASK-1778, 2026-08-27):** el fetcher
-> propio de Greenhouse (probes del AI Visibility Grader) obedece el `robots.txt`
+> propio de Greenhouse (sustrato `@/lib/growth/site-substrate` desde TASK-1697,
+> consumido por los probes del AI Visibility Grader) obedece el `robots.txt`
 > del sitio auditado matcheando **su propio token** (`GreenhouseAEOGrader`,
 > fallback `*`) — jamás actúa con el token de un bot de terceros ni lo suplanta.
 > Un sitio con `User-agent: GPTBot / Disallow: /` sigue siendo legible para

@@ -123,8 +123,10 @@ diagnóstico → acción.
 - **Probes read-only sobre superficies públicas de terceros** — nunca autenticar,
   mutar ni tocar endpoints privados del sitio analizado (cuando se mide a un
   cliente o prospecto).
-- **El fetcher de probes obedece `robots.txt` y no suplanta bots** (TASK-1778,
-  2026-08-27): matchea **su propio token** (`GreenhouseAEOGrader`, fallback `*`),
+- **El fetcher de sitios obedece `robots.txt` y no suplanta bots** (TASK-1778,
+  2026-08-27; casa canónica `@/lib/growth/site-substrate` desde TASK-1697 —
+  `ai-visibility/probes/**` es privado del grader y el deep import desde otro
+  dominio rompe el build): matchea **su propio token** (`GreenhouseAEOGrader`, fallback `*`),
   nunca los tokens de los bots de IA auditados — un sitio con `User-agent: GPTBot
   / Disallow: /` sigue siendo legible para nosotros y "bloqueas GPTBot" es el
   hallazgo; un Disallow que sí nos alcanza → `blocked_robots` (hallazgo, no
