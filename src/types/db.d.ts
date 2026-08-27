@@ -7719,6 +7719,44 @@ export interface GreenhouseGrowthSeoTargets {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseGrowthSeoUrlVisibilitySnapshots {
+  capture_date: Timestamp;
+  captured_at: Generated<Timestamp>;
+  captured_by_organization_id: string;
+  created_at: Generated<Timestamp>;
+  language_code: string;
+  location_code: string;
+  normalized_subject: string;
+  organic_count: number | null;
+  organic_estimated_paid_traffic_cost: Numeric | null;
+  organic_etv: Numeric | null;
+  organic_is_down: number | null;
+  organic_is_lost: number | null;
+  organic_is_new: number | null;
+  organic_is_up: number | null;
+  organic_pos_1: number | null;
+  organic_pos_11_20: number | null;
+  organic_pos_2_3: number | null;
+  organic_pos_21_30: number | null;
+  organic_pos_31_40: number | null;
+  organic_pos_4_10: number | null;
+  organic_pos_41_50: number | null;
+  organic_pos_51_60: number | null;
+  organic_pos_61_70: number | null;
+  organic_pos_71_80: number | null;
+  organic_pos_81_90: number | null;
+  organic_pos_91_100: number | null;
+  paid_count: number | null;
+  paid_etv: Numeric | null;
+  provider_cost: Generated<Numeric>;
+  raw_subject: string;
+  source_endpoint: string;
+  subject_kind: string;
+  top_keywords: Json | null;
+  total_ranked_keywords: number | null;
+  url_visibility_id: Generated<string>;
+}
+
 export interface GreenhouseHiringAssessmentFairness {
   advanced_count: number | null;
   category_key: string | null;
@@ -12917,6 +12955,7 @@ export interface DB {
   "greenhouse_growth.seo_site_audit_findings": GreenhouseGrowthSeoSiteAuditFindings;
   "greenhouse_growth.seo_site_audit_runs": GreenhouseGrowthSeoSiteAuditRuns;
   "greenhouse_growth.seo_targets": GreenhouseGrowthSeoTargets;
+  "greenhouse_growth.seo_url_visibility_snapshots": GreenhouseGrowthSeoUrlVisibilitySnapshots;
   "greenhouse_hiring.assessment_fairness": GreenhouseHiringAssessmentFairness;
   "greenhouse_hiring.candidate_document_review_projection": GreenhouseHiringCandidateDocumentReviewProjection;
   "greenhouse_hiring.candidate_facet": GreenhouseHiringCandidateFacet;
