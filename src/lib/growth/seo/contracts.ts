@@ -300,6 +300,12 @@ export const SEO_DOMAIN_OVERVIEW_SNAPSHOT_CAPTURED_EVENT = 'growth.seo.domain_ov
 /** Aggregate type del evento de foto de dominio (identity: `seo_target_id`). */
 export const SEO_DOMAIN_OVERVIEW_AGGREGATE_TYPE = 'seo_target'
 
+/**
+ * TASK-1776 — Evento de captura de visibilidad por sujeto-página
+ * (`seo_url_visibility_snapshots`). Payload con coordenadas; el consumer re-lee PG.
+ */
+export const SEO_URL_VISIBILITY_SNAPSHOT_CAPTURED_EVENT = 'growth.seo.url_visibility.snapshot_captured'
+
 /** Estados del run de audit (CHECK de TASK-1299). `running` es el único no-terminal. */
 export type SeoSiteAuditRunStatus = 'running' | 'succeeded' | 'degraded' | 'failed'
 

@@ -97,6 +97,21 @@ export const isSeoDomainOverviewEnabled = (env: NodeJS.ProcessEnv = process.env)
   isTrue(env[GROWTH_SEO_DOMAIN_OVERVIEW_FLAG])
 
 /**
+ * TASK-1776 — Visibilidad de mercado por URL/subdominio/subcarpeta (`ranked_keywords` sobre
+ * el target y sus competidores + primitives on-demand `relevant_pages`/`subdomains`).
+ *
+ * ⚠️ **Se lee SOLO en el ops-worker** (la captura vive ahí; en Vercel es inerte). SoT
+ * declarativo: `services/ops-worker/deploy.sh`; efecto inmediato con `--update-env-vars`.
+ * El Cloud Scheduler `ops-seo-url-visibility` nace PAUSADO: dos frenos independientes.
+ * Es SUBORDINADO a `GROWTH_SEO_ENABLED`. Registrar cambios en el ledger de flags.
+ */
+export const GROWTH_SEO_URL_VISIBILITY_FLAG = 'GROWTH_SEO_URL_VISIBILITY_ENABLED'
+
+/** Gate de la visibilidad por sujeto-página. Default OFF: prenderlo compromete gasto. */
+export const isSeoUrlVisibilityEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_SEO_URL_VISIBILITY_FLAG])
+
+/**
  * TASK-1709 — Diagnóstico de prospecto (tier `prospect`, corrida única). Default OFF.
  *
  * 🔴 **Prender esto habilita un command que GASTA** (~USD 0,25 por diagnóstico, Labs +
