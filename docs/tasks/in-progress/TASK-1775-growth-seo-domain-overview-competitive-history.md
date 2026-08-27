@@ -1,5 +1,42 @@
 # TASK-1775 — Growth SEO: foto de dominio + trayectoria competitiva (Labs)
 
+## Delta 2026-08-27 — implementación (code complete, rollout pendiente)
+
+Slices 1–6a implementados y verificados local + PG real. Decisiones de ejecución que ajustan la spec:
+
+- **Lane app NO se crea** (la spec pedía confirmarlo en Discovery): no existe `api/platform/app/growth/**`
+  y los 14 readers SEO precedentes son ecosystem-only por mandato del dominio (reader nuevo = lane
+  ecosystem + tool MCP en el mismo PR). Parity queda servido por ecosystem + MCP + consumo server-side
+  directo del reader — mismo contrato que TASK-1661.
+- **`etv` NO es USD**: la spec rotulaba el DTO `estimatedTrafficValueUsd`; el `etv` del proveedor es
+  *estimated traffic volume* (tráfico estimado). El DTO separa `organicEtv` (volumen) de
+  `organicEstimatedTrafficCostUsd` (USD de `estimated_paid_traffic_cost`).
+- **Evento con prefijo del dominio**: `growth.seo.domain_overview.snapshot_captured` (la spec decía
+  `seo.…`; la convención vigente del catálogo prefija `growth.`). Constante en `contracts.ts` (seam §17.3).
+- **Frescura por `source_endpoint`**: la foto mensual sólo considera fresca una fila de
+  `domain_rank_overview` (una de screening la ahogaría); el screening acepta cualquier source. No estaba
+  en la spec y es necesario porque los tres productores comparten tabla y clave.
+- **Cadencia día 16 09:00 CLT** (OQ3): misma frescura mid-month que el día 15 de
+  `ops-seo-keyword-market-data`, sin apilar gasto en la misma fecha.
+- **Screening en la misma tabla** (OQ1): con NULLs en lo que `bulk_traffic_estimation` no puebla.
+- **Tope del backfill** (OQ2): default duro USD 5/corrida, sobre-escribible con `--max-usd`; el primer
+  `--apply` sigue exigiendo confirmación del operador (§Out-of-band).
+- **La allowlist del backfill FILTRA el universo** target+competidores; no permite colar dominios
+  arbitrarios (un dominio ajeno se compra desde su propio target).
+- `Files owned` decía `…_task-1776-…` para la migración (typo): quedó `20260827190156045_task-1775-seo-domain-overview.sql`.
+  Se agregan además a los archivos tocados: `src/lib/api-platform/resources/ecosystem-growth-seo.ts`
+  (el lane vive ahí, la route es thin), `src/lib/reliability/queries/seo-domain-overview-staleness.ts`
+  (+ registry + overview + test) y `scripts/growth/_sanity-task-1775-domain-overview.ts` (gate TASK-893).
+- **Convivencia con TASK-1709 (sesión paralela, mismo día):** archivos compartidos inseparables por
+  hunk viajaron cruzados y declarados en los mensajes de commit de ambas sesiones (`flags.ts` +
+  `provider-pricing.ts` en commits de 1709; los deltas MCP/lane de prospect en el Slice 5 de esta).
+- **Sin boundary test `ALLOWED_WRITE_TARGETS`** en `growth/**` (verificado): el ítem condicional no aplica.
+
+**Rollout pendiente (checkpoint del operador — gasta dinero real):** smoke live contra DataForSEO con
+un sujeto (secuencia del runbook §Paso a paso), flag ON multi-runtime + despausar scheduler, canary de
+la tool MCP en staging y federación en el gateway `efeonce-mcp`. Hasta entonces: flag OFF, scheduler
+declarado pausado, cero gasto.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -21,7 +58,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `code complete, rollout pendiente`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -258,23 +295,23 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface y consumidores están nombrados con paths reales.
-- [ ] Invariantes de datos, boundary de tenant y postura de idempotencia están explícitos.
-- [ ] La tabla nueva queda declarada en el allowlist de destinos de escritura del dominio si existe boundary test.
-- [ ] Postura de migración/backfill/rollback explícita y proporcional al riesgo.
-- [ ] Evidencia runtime/DB listada para todo cambio más allá de docs.
-- [ ] Errores canónicos, postura de audit/signal y cero fuga de datos sensibles.
+- [x] Source of truth, contract surface y consumidores están nombrados con paths reales.
+- [x] Invariantes de datos, boundary de tenant y postura de idempotencia están explícitos.
+- [x] La tabla nueva queda declarada en el allowlist de destinos de escritura del dominio si existe boundary test.
+- [x] Postura de migración/backfill/rollback explícita y proporcional al riesgo.
+- [x] Evidencia runtime/DB listada para todo cambio más allá de docs.
+- [x] Errores canónicos, postura de audit/signal y cero fuga de datos sensibles.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica en el primitive (`src/lib/growth/seo/domain-overview/**`), no en la UI.
-- [ ] Modelada como command/reader sobre el sujeto "dominio", no como handler de pantalla.
-- [ ] Read expuesto como reader canónico; los writes son commands con entitlement, idempotencia por frescura, outbox y errores canónicos.
-- [ ] Capability + grant a ≥1 rol real en el MISMO PR, con el coverage test verde.
-- [ ] Camino programático declarado: `api/platform/ecosystem` + tool MCP en esta misma task.
-- [ ] Los writes son aptos para `propose → confirm → execute`: el LLM propone la corrida, un humano confirma el gasto.
-- [ ] Un primitive, muchos consumers: cero derivación duplicada en app/Nexa/MCP.
-- [ ] Parity check = SÍ.
+- [x] Lógica en el primitive (`src/lib/growth/seo/domain-overview/**`), no en la UI.
+- [x] Modelada como command/reader sobre el sujeto "dominio", no como handler de pantalla.
+- [x] Read expuesto como reader canónico; los writes son commands con entitlement, idempotencia por frescura, outbox y errores canónicos.
+- [x] Capability + grant a ≥1 rol real en el MISMO PR, con el coverage test verde. (Se reutiliza `growth.seo.observation.read`, ya granteada; sin capability nueva.)
+- [x] Camino programático declarado: `api/platform/ecosystem` + tool MCP en esta misma task.
+- [x] Los writes son aptos para `propose → confirm → execute`: el LLM propone la corrida, un humano confirma el gasto.
+- [x] Un primitive, muchos consumers: cero derivación duplicada en app/Nexa/MCP.
+- [x] Parity check = SÍ.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -527,19 +564,19 @@ Sin `capturedBy`. Sin cruce con GSC. Si el sujeto no tiene snapshot, el reader d
 
 ## Acceptance Criteria
 
-- [ ] La migración crea `seo_domain_overview_snapshots` con clave única `(normalized_domain, location_code, language_code, capture_date)`, trigger anti UPDATE/DELETE y GRANT a `greenhouse_runtime`, y su bloque DO aborta si algo no quedó creado.
-- [ ] `captured_by_organization_id` existe en la tabla, **no** está en la clave única y **no** aparece en ningún DTO devuelto por el reader; hay un test que lo prueba.
+- [x] La migración crea `seo_domain_overview_snapshots` con clave única `(normalized_domain, location_code, language_code, capture_date)`, trigger anti UPDATE/DELETE y GRANT a `greenhouse_runtime`, y su bloque DO aborta si algo no quedó creado.
+- [x] `captured_by_organization_id` existe en la tabla, **no** está en la clave única y **no** aparece en ningún DTO devuelto por el reader; hay un test que lo prueba.
 - [ ] `captureDomainOverview` salta sujetos frescos sin pegar el proveedor: correrlo dos veces seguidas registra USD 0 en la segunda, verificado con el `cost` real del proveedor y no sólo con mocks.
 - [ ] Un sujeto que el proveedor no conoce deja fila con métricas `NULL` y no vuelve a comprarse en la corrida siguiente.
-- [ ] `backfillDomainRankHistory` no gasta sin `--apply`, respeta un tope duro en USD y es resumible.
-- [ ] `estimateDomainTraffic` acepta hasta 1.000 dominios en un request y escribe en la misma tabla.
-- [ ] `readDomainOverview` devuelve `no_market_data` para un sujeto sin snapshot: no hay ceros fantasma.
-- [ ] Toda métrica del DTO viaja con `lens: 'estimated'` y `capturedAt`.
+- [x] `backfillDomainRankHistory` no gasta sin `--apply`, respeta un tope duro en USD y es resumible.
+- [x] `estimateDomainTraffic` acepta hasta 1.000 dominios en un request y escribe en la misma tabla.
+- [x] `readDomainOverview` devuelve `no_market_data` para un sujeto sin snapshot: no hay ceros fantasma.
+- [x] Toda métrica del DTO viaja con `lens: 'estimated'` y `capturedAt`.
 - [ ] La tool `get_seo_domain_overview` responde por el lane ecosystem con un canary verde en staging.
-- [ ] La capability nueva tiene grant a ≥1 rol real en el mismo PR y el coverage test pasa.
-- [ ] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` y `pnpm docs:closure-check` pasa.
+- [x] La capability nueva tiene grant a ≥1 rol real en el mismo PR y el coverage test pasa.
+- [x] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` y `pnpm docs:closure-check` pasa.
 - [ ] El scheduler `ops-seo-domain-overview` quedó creado y su estado (pausado o activo) está declarado en el runbook.
-- [ ] Ninguna consulta nueva mezcla esta tabla con `seo_gsc_daily` en un mismo agregado.
+- [x] Ninguna consulta nueva mezcla esta tabla con `seo_gsc_daily` en un mismo agregado.
 
 ## Verification
 

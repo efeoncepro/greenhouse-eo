@@ -2,6 +2,46 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-27 — Gemini Omni 1.1 investigado; migración P0 definida, sin rollout
+
+**Estado: investigación y contrato documental completos; runtime no modificado.** Google lanzó Gemini Omni 1.1
+Flash con dos superficies no intercambiables: Developer API usa `gemini-omni-1.1-flash` y Google Cloud usa
+`gemini-omni-1.1-flash-preview`. El modelo anterior `gemini-omni-flash-preview` tiene shutdown anunciado para
+el 2026-09-30 en Gemini API. La evidencia oficial, sus contradicciones y límites quedaron en
+`docs/audits/creative-studio/GEMINI_OMNI_1_1_PROVIDER_RESEARCH_2026-08-27.md`; la candidatura machine-readable,
+en `GEMINI_OMNI_1_1_VIDEO_ROUTE_CARD_V1.json`; las skills de model fleet y motion quedaron espejadas.
+
+**Siguiente unidad ejecutable:** `TASK-1781` (P0, `to-do`) debe entregar primero paridad 720p de la ruta
+vigente y luego separar referencias, first/last frame, edición, extensión y output shapes. No hereda canary,
+rate, terms, rights ni promotion del modelo anterior. Exige cuota y endpoint live, costo medido, C2PA en bytes,
+canary facturable desde Producer, readback y rollback. Hasta entonces Omni 1.1 permanece `gated`: no hubo spend,
+deploy, cambio de binding, generación live ni lectura que pruebe disponibilidad en Globe.
+
+## 2026-08-27 — TASK-1775: la foto de dominio quedó code complete, rollout pendiente
+
+**Estado: `code complete, rollout pendiente`; sin push.** Los 6 slices implementados sobre `develop`:
+tabla multi-productor `seo_domain_overview_snapshots` (clave sin org, append-only, migración aplicada
+y verificada por `information_schema`), colector mensual `captureDomainOverview` (target +
+competidores, frescura filtrada por `source_endpoint`, NULL-row para sujeto desconocido), backfill
+histórico resumible con tope duro USD (default 5, runner `--dry-run`/`--apply`), screening
+`estimateDomainTraffic`, reader `readDomainOverview` + lane ecosystem + tool MCP
+`get_seo_domain_overview`, y señal `seo.domain_overview.stale_subjects`. 49 tests focales verdes +
+sanity SQL contra PG real (gate TASK-893) verde.
+
+**Lo que falta para operarlo (checkpoint del operador — GASTA dinero real):** (1) smoke live contra
+DataForSEO con UN sujeto comparando `cost` vs estimado + re-corrida a USD 0; (2) flag
+`GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED` ON multi-runtime (deploy.sh + `--update-env-vars`, **sólo
+ops-worker**) + despausar `ops-seo-domain-overview` (nace PAUSADO, día 16); (3) canary de la tool MCP
+en staging + federación en `efeonce-mcp`; (4) confirmar el tope USD del primer `--apply` del backfill.
+Runbook completo: `docs/manual-de-uso/growth/operar-foto-de-dominio-seo.md`.
+
+**No re-descubrir:** el lane app NO se crea (el dominio es ecosystem-only, 14 readers precedentes);
+`etv` es tráfico estimado, NO dólares (la spec lo rotulaba mal — corregido en el DTO); la autoridad
+canónica de superficie sigue siendo `seo_backlink_snapshots.domain_rank` porque `domain_rank_overview`
+no devuelve authority score (desambiguación registrada en arch §4.2). Convivencia con la sesión
+paralela de TASK-1709: deltas de archivos compartidos viajaron cruzados y declarados en los commits
+de ambas.
+
 ## 2026-08-27 — TASK-1697 cerrada: el sustrato de sitio tiene dueño, carta y detector
 
 **Estado: `complete`; gates verdes (12.144 tests full + build de producción + lint con la rule activa + worker gates).** `src/lib/growth/site-substrate/` nace por `git mv` con diff puro (site-fetch/html/robots-policy/read-body + contratos `Site*` + barrel); shims en `probes/` = cero dependientes de producción modificados. Lint rule `greenhouse/growth-substrate-boundary` en `error` desde commit-1, cero exenciones: `probes/**` privado del dominio AEO, el sustrato no importa `growth/*`. Desviaciones registradas en el task file (read-body viaja al sustrato; el flag del fetcher vive en `site-fetch.ts` re-exportado por `flags.ts`; el meta-test anti-divergencia sigue al archivo movido).
@@ -321,52 +361,3 @@ código no resuelve. **No las sembré a ciegas**: el grant correcto lo sabe su d
 afirma que la superficie no está configurada y hoy sí lo está con datos productivos reales; la
 corrección **no** es editar el esperado. `TASK-824` está `complete`, así que su drift quedó sin dueño
 activo: lo rastrea TASK-1130 hasta que alguien lo tome.
-
-## 2026-08-24 — Hiring: retorno durable y revisión secuencial implementados localmente
-
-**Estado: commit `631b53c77` publicado en `origin/develop`; rollout detenido por brecha de conformidad.** La pestaña
-`Pipeline` sigue siendo el único retorno, pero ahora fija la postulación exacta fuera de límites, consume el
-foco de URL y degrada honestamente si el origen no resuelve. Application 360 agrega Anterior/Siguiente dentro
-de la misma vacante+etapa, excluye archivadas y protege cambios sin guardar; el orden es cronológico estable,
-nunca score/IA. GVC local PASS 1440/390 px en
-`.captures/2026-08-24T12-19-59_task355-hiring-application-360` (24 frames por viewport, videos, recorrido
-`1 de 2 → 2 de 2 → Pipeline`, morph y foco exacto; runtime 0/0/0/0). Build de producción, typecheck,
-ESLint focal y 13 tests focales verdes. La auditoría posterior detectó que el snapshot de Pipeline y el lookup
-de foco no filtran `archived_at IS NULL`; una archivada puede reaparecer aunque la cola secuencial la excluya.
-Arquitectura, documentación funcional/manual/UI y skills Talent/Motion/GVC quedan sincronizadas. Pendiente:
-corregir y verificar ambos readers antes de autorizar release; este turno documental no modifica código.
-
-## 2026-08-23 — Los live tests dejan de pisarse: eran cuatro causas, y una la causaba yo
-
-**Estado: `complete`.** Sin rollout pendiente — es infraestructura de tests, no runtime.
-
-El rojo que había reportado como «contención en la base compartida» tenía **cuatro causas
-independientes**, y la etiqueta que le puse escondía tres:
-
-1. **Pool de fixtures compartido.** Tres archivos de `assignment-policy` resolvían su sujeto con
-   `ORDER BY ip.profile_id LIMIT n` sobre un pool de **3 perfiles sintéticos**: tomaban los mismos y
-   se invalidaban las propuestas entre sí. Canónico nuevo: `resolveLiveTestCandidateFixture(scope)`
-   en `live-test-identity.ts` — el sujeto se DERIVA de un scope textual, así que un archivo nuevo
-   queda aislado sin coordinación. Se descartó serializar (castiga a toda la suite) y repartir con
-   `OFFSET` (se rompe con el cuarto archivo).
-2. **Paralelismo por archivo sobre UNA sola base.** Los live tests corren contra la única instancia
-   Cloud SQL que comparten dev/staging/prod. `vitest.config.ts` los separa en un proyecto `live` con
-   `fileParallelism: false`; los ~12.000 unitarios conservan su paralelismo.
-3. **Contaminación de entorno — la causaba mi propio método.** `set -a; source .env.local` exporta
-   ~85 variables y tumbaba **15 tests unitarios en 4 dominios ajenos** que afirman DEFAULTS. Nace
-   **`pnpm test:live`**, que pasa sólo acceso a base y **rechaza cualquier `*_ENABLED`**. El test que
-   afirmaba «nace disabled» ahora garantiza su precondición en `beforeEach` en vez de heredarla.
-4. **Proxy caído disfrazado de suite rota.** Sin Cloud SQL Proxy los tests **pasan** y la suite igual
-   sale roja, porque quien no conecta es el teardown. `test:live` hace preflight TCP.
-
-**Bug propio destapado por el parity test de TASK-611:** había agregado las dos capabilities de
-capacidad al catálogo TS **sin su fila en `capabilities_registry`** — justo lo que ese test existe
-para atrapar. Sembradas; el `Down` las deprecia, no las borra.
-
-**Evidencia:** `pnpm test` (CI, sin env) 1590 archivos / 12051 tests, 0 fallos. `pnpm test:live` 44
-archivos serializados: de 6 fallos intermitentes a **3 estables**.
-
-**Los 3 restantes NO son míos y fallan aislados también** — estaban escondidos en la sopa paralela y
-ahora son visibles y deterministas: 11 capabilities de growth/commercial/platform sin seed en
-`capabilities_registry`, 3 `data_sources` de client-portal (`TASK-824`) y una aserción propia de
-`TASK-1509`. Sin dueño asignado; candidatos a ISSUE si el operador lo decide.

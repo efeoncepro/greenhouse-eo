@@ -43,6 +43,7 @@ El schema `greenhouse_growth` guarda dos familias de tablas con reglas distintas
 | `seo_site_audit_runs` | Una fila por crawl técnico del sitio (health score, páginas crawleadas, estado `running/succeeded/degraded/failed`). |
 | `seo_site_audit_findings` | Los hallazgos de cada crawl (URL, tipo de problema, severidad `critical/warning/notice`). |
 | `seo_backlink_snapshots` | Snapshot semanal del perfil de enlaces (dominios referentes, total de backlinks, domain rank, share tóxico). |
+| `seo_domain_overview_snapshots` | La foto de un **dominio completo** (del cliente o de un competidor): keywords ranqueadas totales, tráfico orgánico estimado, distribución del top-100 y su trayectoria mensual. Clave **sin organización**: lo que pagó una org le sirve a toda la cartera (TASK-1775). |
 
 La separación importa porque el negocio de cada familia es distinto: la configuración responde "¿qué estamos midiendo y desde cuándo?"; las mediciones responden "¿qué pasó cada día?". Un snapshot jamás se corrige — si una captura salió mal, se degrada o se marca, pero la historia no se reescribe.
 
@@ -192,6 +193,33 @@ las pestañas hermanas aparecen deshabilitadas hasta que existan).
 > Detalle tecnico: la surface es consumidora de solo lectura de los readers gobernados de
 > `src/lib/growth/seo/**`. El mismo calculo de KPIs lo consumen Nexa y el lane MCP
 > (`get_seo_overview_kpis`) por construccion — no hay una segunda implementacion.
+
+## La foto de dominio y la trayectoria competitiva (TASK-1775)
+
+Hasta esta capacidad, el módulo sólo describía **el recorte seguido**: las keywords que alguien
+decidió trackear más lo que Search Console mide del propio dominio. Un dominio con 4.000 keywords
+ranqueadas del que seguimos 31 se veía como un dominio de 31 keywords, y de un competidor no se
+veía nada. La foto de dominio cierra ese hueco con tres corridas sobre la misma tabla:
+
+- **La foto mensual** (`domain_rank_overview`, cron `ops-seo-domain-overview` día 16): cuántas
+  keywords ranquea el dominio en total, cuánto tráfico estima el mercado, cómo se distribuye su
+  top-100 y su momentum — del target **y de cada competidor declarado**.
+- **La trayectoria histórica** (`historical_rank_overview`, corrida manual **una sola vez por
+  sujeto** porque cuesta 10× el resto): el pasado del dominio desde 2020-10, para poder mostrarle
+  a un cliente nuevo si venía subiendo o cayendo antes de llegar.
+- **El screening de cartera** (`bulk_traffic_estimation`): de una lista de hasta 1.000 dominios,
+  cuáles son grandes de verdad — antes de gastar en el detalle de cada uno.
+
+Reglas de honestidad: toda cifra viaja marcada **◑ estimada** con su fecha de captura; un dominio
+sin dato responde "sin datos de mercado", nunca un cero; y nada de esta tabla se mezcla con las
+series medidas de Search Console. La **autoridad** de dominio para superficies sigue siendo una
+sola: el `domain_rank` del snapshot de enlaces (esta capa no crea una segunda).
+
+Se consume por el reader canónico (`readDomainOverview`), el lane ecosystem
+(`/api/platform/ecosystem/growth/seo/domain-overview`) y la tool MCP `get_seo_domain_overview`.
+Operación paso a paso: [Operar la foto de dominio SEO](../../manual-de-uso/growth/operar-foto-de-dominio-seo.md).
+
+> Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md §4.2](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) (`seo_domain_overview_snapshots`, patrón multi-productor) y spec `docs/tasks/TASK_ID_REGISTRY.md → TASK-1775 (spec en la carpeta de su lifecycle vigente)`.
 
 ## Que NO existe todavia
 

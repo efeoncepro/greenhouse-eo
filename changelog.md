@@ -7,6 +7,20 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-27 — Gemini Omni 1.1 entra al gobierno de la flota, no al runtime
+
+- Investigación oficial de Gemini Omni 1.1 Flash: se separan Developer API (`gemini-omni-1.1-flash`, modelo listado Stable) y Google Cloud (`gemini-omni-1.1-flash-preview`, Pre-GA), ambas sobre Interactions `v1beta`; se documentan capacidades, precios, cuotas, residencia, retención, C2PA, restricciones regionales y contradicciones del proveedor.
+- `TASK-1781` queda creada como P0 para migrar antes del shutdown anunciado de `gemini-omni-flash-preview` el 2026-09-30 y expandir capacidades por rutas/output shapes independientes, sin heredar evidencia del modelo anterior.
+- Nueva route card candidata y actualización espejada de `greenhouse-globe-model-fleet` y las referencias Omni de `motion-design-studio`. Sin cambio de binding, deploy, gasto, canary ni promoción: 1.1 sigue `gated` hasta readback live.
+
+## 2026-08-27 — El módulo SEO aprende a describir un dominio completo
+
+- `TASK-1775` (code complete, rollout pendiente): nace `greenhouse_growth.seo_domain_overview_snapshots` — la foto de dominio (keywords ranqueadas totales, tráfico estimado, distribución top-100, momentum) del target Y de sus competidores, con trayectoria mensual desde 2020-10. Multi-productor con clave sin organización (patrón `seo_keyword_market_data`): lo que pagó una org sirve a toda la cartera.
+- Tres colectores sobre el mismo writer: la foto mensual (`domain_rank_overview`, cron `ops-seo-domain-overview` día 16 — **nace pausado**, flag `GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED` default OFF sólo ops-worker), el backfill histórico de una sola vez por sujeto (10× el costo; runner `--dry-run` default + tope duro USD) y el screening de cartera (1.000 dominios ~USD 0.13).
+- Reader `readDomainOverview` con `lens: 'estimated'` + `capturedAt` en toda cifra y `no_market_data` sin ceros fantasma; lane ecosystem `/growth/seo/domain-overview` + tool MCP `get_seo_domain_overview`; señal `seo.domain_overview.stale_subjects` (steady 0, con estado "sin rollout" honesto).
+- Decisión registrada en arch §4.2: `domain_rank_overview` NO devuelve authority score — la autoridad canónica de superficie sigue siendo `seo_backlink_snapshots.domain_rank`, sin segunda cifra que compita.
+- El encendido queda como checkpoint del operador (smoke live que gasta + flag multi-runtime + despausar); runbook `docs/manual-de-uso/growth/operar-foto-de-dominio-seo.md`.
+
 ## 2026-08-27 — El sustrato de sitio gana dueño propio y frontera con detector
 
 - `TASK-1697` (mitad A, complete): el fetcher SSRF-guarded + parseo HTML/robots sale de las tripas del grader a `src/lib/growth/site-substrate/` (git mv, diff puro, shims — cero dependientes modificados) con carta verificable por test de allowlist: no importa `growth/*`, no persiste, dice cómo se OBTIENE la evidencia y nunca cómo se JUZGA.
@@ -770,29 +784,3 @@
   vacío y ningún agente puede llenarlo.
 - Hiring: el expediente ya no trunca en silencio (límite **20.000**, error explícito en vez de
   recorte) y la nota reparada se lee como historia con chip **"Versión superada"**.
-
-## 2026-08-17 — Workbench de scoring IA + escala explícita de criterios (TASK-1738, TASK-1734)
-
-- Hiring: el **workbench de revisión del scoring IA** queda operable desde la card del assessment
-  en la Application 360 — cobertura honesta sticky, cola por riesgo, muestra ciega real (la
-  propuesta no llega al navegador) y confirmación con manifest. Revisar deja de ser solo API.
-- Hiring: **la escala de `perCriterion` ahora es explícita.** Los criterios son aportes ponderados
-  que suman el score global (`18 / 25`), no notas independientes: el prompt lo pide
-  (`...scoring.v2`), el contrato lo valida y el router de riesgo compara contra lo que el contrato
-  garantiza. La señal `per_criterion_contradictory` disparaba en 11 de 14 items reales — justo en
-  las respuestas buenas — y dejaba muerto el carril por lote; ahora dispara en 2, que son
-  contradicciones reales.
-- Hiring: el resumen del manifest dejó de mostrar siempre 100% (`{a}/{a}`) y las frases
-  load-bearing del workbench pasaron a tinta AA.
-
-## 2026-08-16 — Tab Expediente en la Application 360 (TASK-1737)
-
-- Hiring: el tab "Actividad" pasa a ser **Expediente** — timeline de notas persistidas con
-  provenance del agente intercalado con eventos de etapa, composer tipado y flujo
-  propose → editar → confirmar/rechazar del análisis IA. Deep-links `?tab=activity` intactos.
-- Hiring: **gate anti-anclaje cerrado server-side.** Un evaluador con scorecard propio abierto
-  deja de recibir el análisis IA y las notas de evaluación ajenas — el filtro vive en el reader
-  con el MISMO predicado del anti-anclaje de ratings; sus notas propias y las `general` ajenas
-  siempre pasan. La ceguera no es de la pantalla: cualquier consumer futuro la hereda.
-- Rollout gated: flag `HIRING_EVALUATION_DOSSIER_AI_ENABLED` sigue OFF en producción (la UI lo
-  declara honestamente); evidencia visual del panel de propuesta pendiente de staging.

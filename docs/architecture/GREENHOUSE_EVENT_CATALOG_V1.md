@@ -1333,3 +1333,14 @@ Las constantes viven en el dominio (`src/lib/growth/seo/keyword-discovery/contra
 **Payload v1**: `{ diagnosticId, rootDomain, market, factCount, actualCostUsd, actor }` — coordenadas y resumen, nunca los hechos: cualquier consumer futuro **re-lee PG** por `diagnosticId`.
 
 El sujeto NO tiene organización (es un dominio prospecto), así que el payload no lleva `organizationId` del sujeto — el gasto queda atribuido en el ledger a la org canónica de Efeonce como costo de adquisición. La constante vive en el dominio (`src/lib/growth/seo/prospect/contracts.ts`) — mismo seam §17.3. **NUNCA** un consumer de este evento puede re-disparar un diagnóstico: la captura recurrente sobre prospectos está prohibida por regla dura del carril.
+
+## Delta 2026-08-27 — TASK-1775: `growth.seo.domain_overview.snapshot_captured` (foto de dominio)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `growth.seo.domain_overview.snapshot_captured` | v1 | `seo_target` (`seot-{uuid}`) | command `captureDomainOverview` (`src/lib/growth/seo/domain-overview/capture.ts`), tras persistir los snapshots del ciclo (sólo si `captured > 0` o `noMarketData > 0` — algo cambió de verdad); también `backfillDomainRankHistory` (`domain-overview/history-backfill.ts`) al cierre de una corrida con filas escritas | ninguno todavía — rastro de auditoría de una corrida que COMPROMETE GASTO; sin mirror BQ declarado en V1 |
+
+**Payload v1 (captura)**: `{ seoTargetId, organizationId, captureDate, subjects, captured, noMarketData, costUsd, actor: 'ops_worker' }`.
+**Payload v1 (backfill)**: mismo shape con `captureDate: null`, `snapshotsWritten` y `actor: 'history_backfill_runner'` — coordenadas y resumen, nunca las métricas: cualquier consumer futuro **re-lee PG** por `(seoTargetId → dominios → seo_domain_overview_snapshots)`.
+
+El screening (`estimateDomainTraffic`) **no emite**: es una corrida on-demand sin downstream declarado, y su rastro de gasto ya queda en `seo_provider_spend_daily` por construcción. La constante vive en el dominio (`src/lib/growth/seo/contracts.ts`) — mismo seam de extracción §17.3.
