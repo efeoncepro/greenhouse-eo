@@ -29,7 +29,7 @@ mejor combinación de diferenciación, capacidad documentada y potencial de expa
 | Beachhead | Buyer primario | Trigger | Oferta de entrada | Core posterior | Expansión natural |
 |---|---|---|---|---|---|
 | **AI Visibility & Search** | CMO, Head of Digital, Growth | La marca no aparece o aparece mal en motores de IA y búsqueda | **AI Visibility / Surround Discovery Diagnostic** | Search Visibility 360 | Web Experience, Measurement, Content/Creative, RevOps |
-| **Revenue Operations & HubSpot** | CMO, CRO, Director Comercial, RevOps | CRM fragmentado, pipeline poco confiable, marketing y ventas desalineados | **RevOps Diagnostic** | CRM & HubSpot Architecture + Implementation | Managed CRM Ops, Customer Agent, CRM Intelligence, Growth Strategy |
+| **Revenue Operations & CRM** | CMO, CRO, Director Comercial, RevOps | CRM fragmentado, pipeline poco confiable, marketing y ventas desalineados | **RevOps & CRM Diagnostic** | CRM Architecture + provider-fit implementation | Managed CRM Ops, Customer/Revenue Agents, CRM Intelligence, Growth Strategy |
 | **Performance & Commerce** | CMO, Head of Growth, E-commerce, Media lead | Inversión dispersa, señal débil, CAC/ROAS sin conexión con margen o ventas | **Performance & Commerce Diagnostic** | Growth Activation / Managed Performance & Commerce | Creative Performance, Retail Media, RevOps, Web/CRO, Influence |
 | **Creative Velocity & Production** | CMO, Brand Manager, Head of Creative | El negocio necesita más output, consistencia y velocidad sin ampliar indefinidamente el equipo interno | **Creative Velocity Diagnostic** o **Content Capture / Run-and-Gun Sprint** | Managed Creative Capacity / Content & Social Operations | Campaign Systems, Run-and-Gun, Globe/Creative Studio, Media & Distribution |
 
@@ -74,13 +74,21 @@ La expansión ocurre cuando el diagnóstico identifica gaps de entity clarity, c
 pipeline. Wave lidera la línea digital; Creative Services, RevOps & CRM y Media & Distribution se componen sin absorber
 su ownership.
 
-### Revenue Operations & HubSpot
+### Revenue Operations & CRM
 
-`RevOps Diagnostic → CRM & HubSpot Architecture → Implementation → Managed CRM Operations → Customer Agent / CRM Intelligence`
+`RevOps & CRM Diagnostic → provider-fit architecture → HubSpot-first | Salesforce-first | híbrido gobernado → implementation → Managed CRM Operations → Customer/Revenue Agents + CRM Intelligence`
 
-HubSpot puede aportar licencia, referral o acceso administrado cuando los términos lo permiten. La oferta de Efeonce
-continúa siendo arquitectura, implementación, operación, evidencia y expansión; Kortex habilita inteligencia y delivery
-programático. No se vende HubSpot como sustituto de la práctica.
+El diagnóstico es provider-neutral y provider-transparent. HubSpot-first prioriza demand generation B2B, adopción y
+time-to-value; Salesforce-first prioriza continuidad de base instalada, complejidad enterprise y marketing B2C
+multicanal; un híbrido HubSpot Marketing Hub + Salesforce CRM sólo se recomienda con fuente de verdad, lifecycle,
+consentimiento, attribution y sync explícitos. La oferta de Efeonce continúa siendo arquitectura, implementación,
+operación, evidencia y expansión; Kortex habilita inteligencia y delivery programático. No se vende un provider como
+sustituto de la práctica. Evidencia fechada:
+[`CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md`](../audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md).
+
+Dentro de Salesforce, el discovery debe distinguir **CRM core**, **Marketing Cloud Engagement** y **Marketing Cloud
+Next**. Engagement y Next coexisten, pero no comparten runtime/API ni implican migración automática. El catálogo y
+las ofertas viven en [`docs/services/salesforce/`](../services/salesforce/README.md).
 
 ### Performance & Commerce
 
@@ -102,7 +110,7 @@ en otra marca.
 | Beachhead | Motion inicial | Artefacto de conversión | Owner de ejecución |
 |---|---|---|---|
 | AI Visibility & Search | Wedge-led, content/SEO/AEO + sales-assisted | Grader, Snapshot o Diagnostic | `seo-aeo` + `commercial-expert` |
-| RevOps & HubSpot | Partner-led / sales-assisted / expansion-led | CRM Gap Analysis, portal assessment o propuesta de arquitectura | `hubspot-solutions-partner` + `commercial-expert` |
+| RevOps & CRM | Partner-led / sales-assisted / expansion-led | CRM Fit Diagnostic, portal assessment o propuesta de arquitectura | skill del provider aplicable + `commercial-expert` |
 | Performance & Commerce | Account-based, diagnostic-led | Investment & Signal Diagnostic | `digital-marketing` + `commercial-expert` |
 | Creative Velocity & Production | Proof-led, referral/ABM y Sample Sprint | Creative Velocity Audit, Capture Day o Run-and-Gun Sprint | `creative-practice` + `commercial-expert` |
 

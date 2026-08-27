@@ -12,9 +12,16 @@ La relación comercial se ordena así: **Efeonce** (marca paraguas) → **RevOps
 observabilidad cuando forma parte del engagement. HubSpot no reemplaza a Efeonce y Kortex no equivale a toda la
 práctica.
 
+HubSpot as a Service es el carril **HubSpot-first** de la práctica, no la taxonomía completa de RevOps & CRM. Debe
+entrar después de un diagnóstico provider-fit. Si el cliente requiere continuidad de una base Salesforce,
+complejidad enterprise o marketing B2C multicanal, la recomendación puede ser Salesforce-first; una arquitectura
+híbrida HubSpot Marketing Hub + Salesforce CRM exige source of truth, lifecycle, consentimiento, attribution,
+deduplicación y sync explícitos. Canon de posicionamiento:
+[`CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md`](../../audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md).
+
 El recorrido de oferta es:
 
-1. **RevOps Diagnostic / Discovery & Assessment** — entender outcomes, procesos, stack, datos, riesgos y quick wins.
+1. **RevOps & CRM Diagnostic / Discovery & Assessment** — entender outcomes, procesos, stack, datos, riesgos, quick wins y fit de provider sin presuponer HubSpot.
 2. **CRM & HubSpot Architecture** — diseñar modelo de datos, lifecycle, pipelines, integraciones, gobierno y medición.
 3. **HubSpot Implementation** — implementar por fases y workstreams aprobados, con migración, automatización,
    integraciones, documentación y enablement.

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Salesforce CRM Practice"
+  short_description: "Opera y vende Salesforce CRM con gobierno"
+  default_prompt: "Usa $salesforce-crm-practice para evaluar el encaje y proponer una solución Salesforce CRM gobernada."
+policy:
+  allow_implicit_invocation: true

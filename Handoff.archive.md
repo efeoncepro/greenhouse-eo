@@ -17,6 +17,10 @@ No volver a pegar historia completa en este índice.
 
 Punteros, no contenido: el detalle canónico de cada una vive en la spec de su task.
 
+- **EPIC-042 / TASK-1764 — baseline aprobado de footers** (2026-08-23). Documentación y skill
+  completas; runtime intacto, ADR `Proposed` y child foundation pendiente. Canon:
+  `docs/tasks/to-do/TASK-1764-governed-email-footer-profile-migration.md`.
+
 - **TASK-1302 — serie GSC propia LIVE** (2026-08-05). 26.192 filas reales de
   `sc-domain:berel.com` materializadas, scheduler `ops-seo-gsc-snapshot` ACTIVO, 375
   keywords en striking-distance. El rollout destapó dos defectos invisibles en tests: el

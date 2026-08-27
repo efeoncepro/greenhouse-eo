@@ -72,7 +72,8 @@ reunión.
 
 **Por qué funciona y no es un truco:** empiezas **regalando algo verdadero y verificable**. El gap no es
 opinable — le muestras el output real de los motores. Y aterriza justo donde HubSpot es **Leader del MQ de
-B2B Marketing Automation, 5.º año** ✅ — no en el cuadrante donde es Niche Player.
+B2B Marketing Automation 2025, 5.º año** ✅ — no como ranking universal ni sustituto del MQ de CRM Sales 2026,
+donde es Challenger.
 
 **Anclaje de industria (dato de HubSpot, citable):** **tráfico orgánico −27% interanual · tráfico de referencia
 desde IA ×3.** Tu vendor te está financiando el argumento de miedo, y encima es cierto.

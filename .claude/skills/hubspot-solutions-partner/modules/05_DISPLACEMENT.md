@@ -7,10 +7,11 @@
 
 ## 0. Las tres verdades incómodas — internalízalas o pierdes
 
-**1. HubSpot es *Niche Player* en el Gartner MQ de Sales Force Automation 2025.** ✅
-Leaders: Salesforce, Microsoft, Oracle. Visionaries: **Zoho** (por encima de HubSpot). *Cautions* de Gartner:
-guided selling **"static"**, IA predictiva limitada, brecha entre el foco SMB y el buyer enterprise.
-Es Leader en el MQ de **B2B Marketing Automation**, 5.º año — **otro reporte**. Nombra siempre cuál.
+**1. HubSpot es *Challenger* en el Gartner MQ de CRM Sales Platforms 2026.** ✅
+Avanzó desde Niche Player en Sales Force Automation 2025. Salesforce y Microsoft son Leaders; **Zoho también es
+Challenger** después de haber sido Visionary. HubSpot conserva el liderazgo del MQ de **B2B Marketing Automation
+Platforms 2025**, 5.º año — **otro mercado**. Salesforce compite además en Multichannel Marketing Hubs 2025,
+donde HubSpot no fue incluido. Nombra siempre reporte, año y job evaluado.
 
 **2. Contra Microsoft, Zoho, Pipedrive y Odoo, HubSpot NO gana por precio.** ✅
 D365 Sales Enterprise es **USD 105/usuario/mes vs USD 150 de HubSpot**, ambos verificados en fuente primaria.
@@ -68,19 +69,18 @@ consultores USD 100-USD 500/h · add-ons (CPQ, doc gen, e-sign) **USD 20-USD 100
 
 ### Dónde HubSpot PIERDE — descalifica
 ✅ CPQ y quoting complejo, territorios, forecasting multinivel, revenue recognition · extensibilidad profunda
-(Apex, AppExchange) · predictive AI y guided selling (**Gartner lo dice literal: "static"**) · modelos de datos
-B2B muy complejos.
+(Apex, AppExchange) · modelos de datos B2B muy complejos · account management/customer success y analytics más
+profundos. La caution “guided selling static” pertenece al reporte SFA 2025 y no se presenta como evaluación 2026.
 
 ### Las 3 objeciones — y el rebate
 
-**「HubSpot es Niche Player en el Gartner MQ. Salesforce es Leader.」**
+**「HubSpot es Challenger en CRM Sales. Salesforce es Leader.」**
 > **No lo niegues. Reencuádralo.**
-> *"Correcto, y Gartner explica por qué: ese MQ evalúa al comprador de sales-force-automation pura, y el
-> propio Gartner cita como caution la brecha entre el foco SMB de HubSpot y ese buyer. **El mismo Gartner
-> nos puso Leader en B2B Marketing Automation por 5.º año consecutivo.** La pregunta para ustedes es cuál de
-> los dos cuadrantes describe su problema: ¿necesitan territory management y CPQ de ocho niveles, o necesitan
-> que marketing y ventas operen sobre el mismo dato con adopción real? **Si es lo primero, honestamente
-> Salesforce es mejor.** Si es lo segundo, el MQ de SFA no es el reporte que deberían estar leyendo."*
+> *"Correcto: Salesforce es Leader y HubSpot Challenger en CRM Sales 2026. El mismo Gartner mantiene a HubSpot
+> como Leader 2025 en B2B Marketing Automation. La pregunta no es qué logo queda más arriba en abstracto, sino
+> cuál mercado describe su problema: ¿complejidad enterprise, territorio y B2C multicanal, o demand generation
+> B2B con adopción y time-to-value? Si es lo primero, recomendamos Salesforce. Si es lo segundo, evaluamos
+> HubSpot. Nuestro diagnóstico ocurre antes de elegir el provider."*
 
 **「HubSpot no escala.」** → § 7.
 
@@ -169,9 +169,10 @@ no como un SaaS.
 **Descalifica si:** corren **D365 Finance/Supply Chain (ERP)**. El CRM en el mismo Dataverse es un argumento
 arquitectónico legítimo. **Retírate.**
 
-**Su mejor carta, y es cierta:** ✅ Microsoft es **Leader del MQ de SFA — 15.º año consecutivo**.
-**Tu respuesta:** *"Cierto, en SFA. En B2B Marketing Automation el Leader es HubSpot, 5.º año. **Y ustedes
-están comprando marketing.**"*
+**Su mejor carta, y es cierta:** ✅ Microsoft es **Leader del MQ de CRM Sales Platforms 2026**.
+**Tu respuesta:** *"Cierto en CRM Sales 2026. Si están comprando CRM enterprise, ese dato importa. Si el job es
+demand generation B2B, comparemos las capacidades y el fit del MQ de B2B Marketing Automation 2025. No elegimos
+el reporte después de elegir el provider."*
 
 ---
 
@@ -187,7 +188,7 @@ Enterprise→Ultimate). **Si citas "Professional" en 2026, quedas desactualizado
 
 **Zoho** ⚠️: performance se degrada notoriamente con volumen · límites de concurrencia de API restringen la
 automatización al escalar · webhooks **sin retry handling** → data perdida · soporte inconsistente · UI cargada.
-✅ **PERO Gartner lo puso Visionary en el MQ de SFA — por encima de HubSpot. Ya no es un juguete.**
+✅ **PERO Gartner lo puso Challenger en CRM Sales Platforms 2026, igual que HubSpot. Ya no es un juguete.**
 
 **Pipedrive**: es un **pipeline tracker excelente**, no una plataforma de cliente. Sin marketing automation
 seria, sin servicio, sin CMS. El argumento no es *"Pipedrive es malo"* — es:

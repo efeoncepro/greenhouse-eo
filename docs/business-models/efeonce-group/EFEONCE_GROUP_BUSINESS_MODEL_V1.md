@@ -22,7 +22,7 @@
 | Creative Services | Business line / practice | branding, creatividad, contenido y operaciones creativas; Globe / Creative Studio como product brand cuando aplica | see current model |
 | Media & Distribution | Business line / practice | tres soluciones de distribución y siete capacidades de delivery; Reach como product brand cuando aplica | see `MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1` |
 | Digital Services & Engineering | Business line / practice | Search Visibility 360, web para humanos/buscadores/agentes, measurement, sistemas de agentes y automatización; Wave como product brand | Proposed; ver modelo propio |
-| RevOps & CRM | Business line / practice | CRM, HubSpot, implementación, managed ops e inteligencia; Kortex como product brand | hypothesis / map |
+| RevOps & CRM | Business line / practice | diagnóstico provider-fit; carriles HubSpot-first, Salesforce-first e híbrido; implementación, managed ops e inteligencia; Kortex como product brand | hypothesis / map |
 | Greenhouse | Platform/control plane | operación, cliente, métricas y memoria | runtime-dependent |
 | Kortex | Product/platform capability | CRM e inteligencia comercial | runtime-dependent |
 | Verk | Product/platform capability | contenido, distribución y data/AI tooling | runtime-dependent |

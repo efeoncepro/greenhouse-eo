@@ -28,7 +28,7 @@ Efeonce Group
         │   ├── Digital Services & Engineering
         │   │   └── Search Visibility 360, web, measurement, agentes e integraciones
         │   ├── RevOps & CRM
-        │   │   └── HubSpot, CRM Intelligence, implementación y Managed Ops
+        │   │   └── diagnóstico provider-fit, HubSpot-first, Salesforce-first, híbrido gobernado, CRM Intelligence, implementación y Managed Ops
         │   ├── Media & Distribution
         │   │   └── medios, PR, influencers y amplificación
         │   └── Growth Strategy & Measurement

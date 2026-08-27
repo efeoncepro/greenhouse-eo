@@ -1,0 +1,4 @@
+interface:
+  display_name: "Salesforce Marketing Cloud Next"
+  short_description: "Opera y vende Marketing Cloud Next con gobierno"
+  default_prompt: "Usa $salesforce-marketing-cloud-next para evaluar, diseñar u ofertar Marketing Cloud Next con evidencia de edición, datos, consentimiento y coexistencia."

@@ -56,11 +56,12 @@ clusters profundizan.**
 
 ## Why This Task Exists
 
-**Tres razones, todas verificadas el 2026-07-13.**
+**Tres razones, verificadas el 2026-07-13 y actualizadas el 2026-08-27.**
 
 **1. La página viva afirma cosas falsas.** Auditoría desde la fuente (REST autenticado + Playwright):
-dice *"Líder en CRM según Gartner"* — cuando HubSpot es **Niche Player** en el MQ de *Sales Force Automation*
-(Leaders: Salesforce, Microsoft, Oracle) — y afirma **ISO 27001** de HubSpot, que **HubSpot no reclama para sí**
+dice *"Líder en CRM según Gartner"* — claim que sigue siendo falso: HubSpot avanzó de **Niche Player** en
+*Sales Force Automation* 2025 a **Challenger** en *CRM Sales Platforms* 2026; Salesforce y Microsoft son
+Leaders — y afirma **ISO 27001** de HubSpot, que **HubSpot no reclama para sí**
 (solo su infra AWS). Un CIO verifica lo primero en dos minutos; un equipo de seguridad pide el certificado del
 segundo. **En los dos casos el que queda desacreditado es Efeonce.** Además tiene un botón *"Más testimonios"*
 que apunta a **`themeforest.net`** (leftover del tema Ohio), describe Hubs con nombres **retirados**
@@ -119,7 +120,8 @@ Hub Pro = **31% del año 1**). **El HubSpot directo no puede igualarlo.** Hoy la
 **Contenido**
 
 1. **Vende la plataforma completa** (Smart CRM + 6 Hubs + Breeze). **NUNCA se estrecha a un Hub.**
-2. **Ningún claim que HubSpot no haga.** ❌ *"Líder en CRM según Gartner"* · ❌ Forrester Wave (no verificable
+2. **Ningún claim que HubSpot no haga.** ❌ *"Líder en CRM según Gartner"* — en Gartner 2026 es **Challenger**
+   de *CRM Sales Platforms*, después de ser Niche Player en 2025 · ❌ Forrester Wave (no verificable
    2026) · ❌ **ISO 27001** de HubSpot · ❌ residencia de datos en LATAM · ❌ *"flota de agentes de IA"*
    (**solo 3 Breeze Agents en GA**). ✅ **"Leader en B2B Marketing Automation (Gartner, 5.º año)"** ·
    **SOC 2 Type II + SOC 3**. Fuente: `hubspot-solutions-partner/SOURCES.md` § *Datos que NO se citan*.

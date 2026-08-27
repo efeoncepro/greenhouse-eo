@@ -150,6 +150,30 @@ const mirroredSkills = [
     codex: '.codex/skills/copywriting',
     claude: '.claude/skills/copywriting',
   },
+  {
+    // El contrato CRM combina operación segura y venta consultiva. Los dos agentes deben
+    // conservar los mismos límites de producto, claims de partnership y gates de mutación.
+    id: 'salesforce-crm-practice',
+    mode: 'byte-identical',
+    codex: '.codex/skills/salesforce-crm-practice',
+    claude: '.claude/skills/salesforce-crm-practice',
+  },
+  {
+    // Engagement sigue siendo un producto vigente y puede coexistir con Next. El espejo evita
+    // que un agente lo trate como legacy o convierta una recomendación comercial en una mutación.
+    id: 'salesforce-marketing-cloud-engagement',
+    mode: 'byte-identical',
+    codex: '.codex/skills/salesforce-marketing-cloud-engagement',
+    claude: '.claude/skills/salesforce-marketing-cloud-engagement',
+  },
+  {
+    // Marketing Cloud Next cambia rápido y depende de Data 360, consentimiento y ediciones.
+    // Un único bundle compartido protege el release ledger y los claims de disponibilidad.
+    id: 'salesforce-marketing-cloud-next',
+    mode: 'byte-identical',
+    codex: '.codex/skills/salesforce-marketing-cloud-next',
+    claude: '.claude/skills/salesforce-marketing-cloud-next',
+  },
 ]
 
 const filesIn = root => {

@@ -7,10 +7,9 @@
 
 ## ⚠️ Antes de entrar — las tres trampas
 
-1. 🔴 **"HubSpot es Leader en Gartner" → di CUÁL.** Es **Niche Player en el MQ de Sales Force Automation
-   2025** (Leaders: Salesforce, Microsoft, Oracle; **Zoho es Visionary, por encima**).
-   Es **Leader en B2B Marketing Automation, 5.º año** ✅ — **ese** es tu reporte.
-   **El AE de Salesforce va a llegar con la lámina del primero.**
+1. 🔴 **"HubSpot es Leader en Gartner" → di CUÁL Y DE QUÉ AÑO.** Es **Challenger en CRM Sales Platforms
+   2026** junto con Zoho; Salesforce y Microsoft son Leaders. Es **Leader en B2B Marketing Automation 2025,
+   5.º año** ✅. Salesforce participa además en Multichannel Marketing Hubs 2025; HubSpot no fue incluido.
 2. 🔴 **"Leader en el Forrester Wave 2026" → NO lo cites.** ❌ No verificado. La landing de HubSpot que lo
    promociona **cita el Wave de 2024**.
 3. 🔴 **Contra Microsoft, Zoho, Pipedrive y Odoo → NO pelees el precio. Pierdes.**
@@ -50,7 +49,7 @@ SUS 3 OBJECIONES         →  MI REBATE
 
 | Contra | El golpe |
 |---|---|
-| **Salesforce** — Gartner | *"Correcto, en el MQ de **SFA**. El mismo Gartner nos puso **Leader en B2B Marketing Automation, 5.º año**. ¿Cuál de los dos cuadrantes describe **su** problema? **Si necesitan CPQ de ocho niveles y territorios, honestamente Salesforce es mejor.**"* |
+| **Salesforce** — Gartner | *"Correcto: Salesforce es Leader y HubSpot Challenger en **CRM Sales 2026**; HubSpot es Leader en **B2B Marketing Automation 2025**. ¿Su problema es complejidad enterprise/B2C multicanal o demand generation B2B y adopción? Nuestro diagnóstico elige el provider después de responder eso."* |
 | **Salesforce** — TCO | *"El delta no está en la licencia. Está en el **admin**."* 🔴 **Pero pregunta primero si ya lo tienen** |
 | **Salesforce** — onboarding | *"Yo les digo **hoy** cuánto cuesta arrancar: USD 3.500, publicado. **Ellos les dicen 'contacta ventas'.**"* |
 | **Salesforce** — Agentforce | *"Ellos cobran **USD 0,10 por acción**. Nosotros **USD 0,50 por conversación RESUELTA**. **Pagan cuando funciona, no cuando lo intenta.** Pregúntenle a su AE cuánto será su factura de Flex Credits el mes 14. **No lo sabe.**"* |

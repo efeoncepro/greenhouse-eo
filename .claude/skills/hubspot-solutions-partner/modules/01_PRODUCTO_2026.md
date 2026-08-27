@@ -20,7 +20,7 @@
 | Producto | Qué hace | Por qué te importa comercialmente |
 |---|---|---|
 | **Smart CRM** | Sistema de registro base | Se vende standalone (USD 20/USD 50/USD 75 por seat) |
-| **Marketing Hub** | Demand gen, automation, campañas, email, **AEO** | 🎯 **Tu punta de lanza.** Es donde HubSpot es Leader de Gartner hace 5 años |
+| **Marketing Hub** | Demand gen, automation, campañas, email, **AEO** | 🎯 **Tu punta de lanza B2B.** HubSpot es Leader del Gartner MQ de B2B Marketing Automation 2025 por 5.º año; no extrapolar a CRM Sales o multicanal B2C |
 | **Sales Hub** | Pipeline, secuencias, forecasting, **Smart Deal Progression (GA)** | Aterriza después del marketing, no antes |
 | **Service Hub** | Help desk, SLAs, KB, **Customer Agent** | Expansión natural post-implementación |
 | **Content Hub** | CMS, blog, landings, memberships, multisite | |

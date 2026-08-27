@@ -123,7 +123,7 @@ Una sola marca lidera toda la relación externa: **Efeonce es la marca paraguas*
 | **Creative Services** | **Globe / Creative Studio** | Branding, contenido, campañas, audiovisual y producción creativa productizada. |
 | **Media & Distribution** | **Reach, Verk, Greenhouse** | Tres soluciones comerciales de distribución; Reach es product brand habilitadora. |
 | **Digital Services & Engineering** | **Wave** | Search Visibility 360, web, measurement, agentes, integraciones y automatización. |
-| **RevOps & CRM** | **Kortex** + HubSpot | CRM, implementación, automatización e inteligencia comercial. |
+| **RevOps & CRM** | **Kortex** + HubSpot/Salesforce según fit | Diagnóstico de arquitectura, CRM, implementación, automatización e inteligencia comercial. |
 | **Control plane / experiencia** | **Greenhouse** | Operación, cliente, memoria, medición y convergencia del ecosistema. |
 
 > Implicación de producto: Greenhouse puede organizar internamente por líneas de negocio, product brands, ownership y delivery. La experiencia de cara al cliente debe liderar con "Efeonce" como marca paraguas y mostrar la product brand solo cuando aporte claridad. No expongas líneas o marcas como proveedores contractuales separados.

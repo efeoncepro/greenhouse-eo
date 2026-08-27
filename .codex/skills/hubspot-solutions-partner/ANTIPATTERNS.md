@@ -8,7 +8,7 @@ Cada uno de estos costó algo real. Están ordenados por lo que cuesta el error.
 
 | Anti-patrón | Qué pasa | Qué hacer |
 |---|---|---|
-| **Decir "HubSpot es Leader en el Gartner MQ"** sin decir cuál | Es **Niche Player en el MQ de Sales Force Automation 2025**. El AE de Salesforce llega con esa lámina impresa. Si te toma por sorpresa, perdiste el deal y la credibilidad en la misma frase | Nombra el reporte: **Leader en B2B Marketing Automation, 5.º año** ✅. Y ten el rebate del MQ de SFA preparado → `modules/05` |
+| **Decir "HubSpot es Leader en el Gartner MQ"** sin decir cuál y de qué año | Es **Challenger en CRM Sales Platforms 2026** y fue Niche Player en SFA 2025. Salesforce puede llegar con CRM Sales o Multichannel Marketing Hubs | Nombra mercado + año: **Leader en B2B Marketing Automation 2025, 5.º año**; Challenger en CRM Sales 2026. Diagnostica el job antes de usar el badge → `modules/05` |
 | **Citar "HubSpot Leader en el Forrester Wave 2026"** | ❌ **No está verificado.** La landing de HubSpot que lo promociona cita, al abrirla, el Wave de **2024** | No lo cites. Si el prospecto lo trae: *"te lo confirmo por escrito"* — y confírmalo |
 | **Inventar un número porque el vendor no lo publica** | Adobe no publica el precio de Marketo. Si inventas uno y el prospecto ya cotizó, quedas como mentiroso o como ignorante | **"No lo publican"** *es* el argumento: *"Adobe no te dice cuánto cuesta hasta que entres a un ciclo de 3 meses. Yo tengo el precio en la web."* |
 | **Citar el estudio TCO de Aptitude 8 como dato de 2026** | Es de **diciembre de 2022**. Un comité que lo googlea te descubre | Direccional, nunca como dato duro |
@@ -34,10 +34,10 @@ Cada uno de estos costó algo real. Están ordenados por lo que cuesta el error.
 
 | Anti-patrón | Por qué pierdes |
 |---|---|
-| **Entrar a enterprise vendiendo el CRM** | Ahí HubSpot es **Niche Player** y Salesforce/Microsoft/Oracle son Leaders. **Entra por marketing y AEO**, donde HubSpot es Leader hace 5 años → `modules/07` |
+| **Entrar a enterprise con HubSpot decidido de antemano** | HubSpot es Challenger en CRM Sales 2026; Salesforce/Microsoft son Leaders y Salesforce cubre además multicanal B2C. Un badge de marketing B2B no resuelve el fit enterprise | Entra con diagnóstico `Revenue Operations & CRM`: HubSpot-first, Salesforce-first o híbrido gobernado → `modules/05` |
 | **Pelear por precio contra Microsoft** | D365 Sales Enterprise es **USD 105/usr/mes vs USD 150 de HubSpot** ✅, ambos verificados. **Pierdes.** El eje es adopción y time-to-value |
 | **Pelear por precio contra Zoho/Pipedrive/Odoo** | Pierdes **3× a 4×**. El único eje que funciona es **el techo**: qué pasa en 18 meses cuando necesiten marketing automation, servicio y atribución sobre el mismo dato |
-| **Subestimar a Zoho** | Gartner lo puso **Visionary en el MQ de SFA — por encima de HubSpot**. Ya no es un juguete |
+| **Subestimar a Zoho** | Gartner lo puso **Challenger en CRM Sales Platforms 2026**, en el mismo cuadrante que HubSpot. Ya no es un juguete |
 | **Presentar el TCO contra Salesforce sin preguntar por el admin** | El delta lo hace el **admin**, no la licencia (USD 162k vs USD 189k = solo 17%). Si ya tienen admin en planilla, **medio argumento se cae**. Pregúntalo en discovery, no en la propuesta |
 | **Comparar el TCO contra la lista de Salesforce** | Salesforce descuenta **20-40%** en enterprise sin despeinarse. Prepara el TCO contra **su cotización real** |
 | **Vender features a quien no tiene CRM** | No está comparando features: **no está comparando nada.** Está evaluando si vale la pena el dolor del cambio. **Tu competidor es la indecisión** → `modules/05` § Sin CRM |

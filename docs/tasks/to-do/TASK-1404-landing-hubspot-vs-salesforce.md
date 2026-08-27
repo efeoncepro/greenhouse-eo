@@ -30,6 +30,10 @@
 >
 > 🔴 **La pieza más débil del hub — y ahora sabemos exactamente por qué.** Ver el delta.
 
+> **Actualización 2026-08-27:** Gartner ubicó a HubSpot como **Challenger** en *CRM Sales Platforms* 2026,
+> después de avanzar desde Niche Player en *Sales Force Automation* 2025. La apertura conserva la honestidad,
+> pero ya no presenta el dato 2025 como posición vigente.
+
 ## 🔴 Delta 2026-07-13 — de landing a artículo, y una advertencia
 
 **Era** una landing en `/servicios/hubspot/hubspot-vs-salesforce/`. **Ahora es un post del blog:**
@@ -69,10 +73,10 @@ escribimos a él — **es parte del argumento.**
 Publica **la comparación creíble donde los dos vendors son parte interesada**. Para el comité que decide —
 **CFO, RevOps y CIO**.
 
-**Abre con la verdad incómoda para nuestro propio lado:** **Gartner puso a HubSpot en Niche Players** del MQ de
-*Sales Force Automation* 2025; los Leaders son **Salesforce, Microsoft y Oracle**. *(Y HubSpot **es** Leader del
-MQ de **B2B Marketing Automation**, 5.º año. **Son dos reportes distintos** — y la mitad de los partners los
-mezcla, a propósito.)*
+**Abre con la verdad incómoda para nuestro propio lado:** **Gartner ubicó a HubSpot como Challenger** del MQ de
+*CRM Sales Platforms* 2026, después de avanzar desde Niche Player en 2025; Salesforce y Microsoft son Leaders.
+*(Y HubSpot **es** Leader del MQ de **B2B Marketing Automation** 2025, 5.º año. **Son dos reportes distintos**
+— y la mitad de los partners los mezcla, a propósito.)*
 
 Después, **el TCO a 3 años con supuestos declarados** (HubSpot ≈ USD 295k · Salesforce ≈ USD 611k) — **y la
 honestidad que nadie pone: el delta no lo hace la licencia** (USD 162k vs 189k = **solo 17%**). **Lo hace el
@@ -138,8 +142,9 @@ en el mercado que haga eso.
 
 **El dato**
 
-1. 🔴 **Se abre con el dato que juega en nuestra contra.** **Niche Player** en el MQ de *SFA* 2025 ✅ (Leaders:
-   Salesforce, Microsoft, Oracle) — **y el contexto: Leader en el MQ de B2B Marketing Automation, 5.º año** ✅.
+1. 🔴 **Se abre con el dato que juega en nuestra contra.** **Challenger** en el MQ de *CRM Sales Platforms*
+   2026 ✅, con avance desde Niche Player en 2025 (Salesforce y Microsoft son Leaders) — **y el contexto:
+   Leader en el MQ de B2B Marketing Automation 2025, 5.º año** ✅.
    **Son dos reportes distintos, y se dice.** 🔴 **NUNCA *"Líder en CRM según Gartner"*.**
 2. 🔴 **NUNCA el Forrester Wave 2026** — **no es verificable** (la landing de HubSpot que lo promociona cita, al
    abrirla, el Wave de **Q3 2024**).
@@ -170,7 +175,7 @@ en el mercado que haga eso.
 
 11. 🔴 **Los dos movimientos son la pieza. Si se ablandan, la pieza no vale nada.**
     Frente a veinte millones de páginas iguales, **nuestra única diferencia real son dos gestos**:
-    **(a)** abrir con el **Niche Player** de Gartner, y **(b)** declarar que **nuestro propio argumento del TCO
+    **(a)** abrir con el **Challenger** de Gartner y su avance desde Niche Player, y **(b)** declarar que **nuestro propio argumento del TCO
     se cae** si ya tienes un admin de Salesforce.
     🎯 **Es exactamente lo que se ablanda en la última revisión** — alguien va a decir *"¿no suena muy negativo
     abrir así?"*. **La respuesta es no, y es la única razón por la que el texto existe.**
@@ -429,11 +434,11 @@ Detalle completo en `docs/ui/wireframes/TASK-1404-landing-hubspot-vs-salesforce.
 
 ### La apertura (la mitad de la pieza)
 
-> **Gartner puso a HubSpot en *Niche Players*** del Magic Quadrant de **Sales Force Automation 2025**.
-> Los *Leaders* son **Salesforce, Microsoft y Oracle**. ✅
+> **Gartner ubicó a HubSpot como *Challenger*** del Magic Quadrant de **CRM Sales Platforms 2026**, después de
+> avanzar desde Niche Player en 2025. Los *Leaders* son **Salesforce y Microsoft**. ✅
 >
 > **Y el contexto, que también es cierto:** HubSpot **es Leader** del Magic Quadrant de **B2B Marketing
-> Automation**, **5.º año consecutivo**. ✅ **Son dos reportes distintos.**
+> Automation 2025**, **5.º año consecutivo**. ✅ **Son dos reportes distintos.**
 > 🎯 **La mitad de los partners de HubSpot los mezcla y dice "líder según Gartner". Eso es falso, y se verifica
 > en dos minutos.**
 
@@ -494,7 +499,8 @@ Post nuevo. Riesgo técnico bajo. 🔴 **Riesgo legal y reputacional: el más al
 ## Acceptance Criteria
 
 - [ ] El post responde **200** en `/hubspot/hubspot-vs-salesforce/` (categoría `hubspot`, Gutenberg).
-- [ ] 🎯 **Abre con la verdad incómoda** (Niche Player en SFA) **y su contexto** (Leader en B2B MA, 5.º año),
+- [ ] 🎯 **Abre con la verdad incómoda** (Challenger en CRM Sales Platforms 2026, después de Niche Player en
+      2025) **y su contexto** (Leader en B2B MA 2025, 5.º año),
       **dicho que son reportes distintos**. 🔴 **Sin suavizar** *(regla 11)*.
 - [ ] 🔴 **`"Líder en CRM"` y `Forrester` NO existen en el DOM.** **`Pardot` no aparece con "muerto/obsoleto".**
 - [ ] 🎯 **El TCO tiene sus supuestos declarados** (y en el `<caption>` de la tabla).

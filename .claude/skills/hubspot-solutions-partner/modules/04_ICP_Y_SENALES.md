@@ -96,7 +96,7 @@ los dos te toca antes de invertir en el deal.**
 | Rol | Qué le importa | Qué le dices | Qué NO le dices |
 |---|---|---|---|
 | **CMO / VP Marketing** | Pipeline, atribución, velocidad, no depender de IT | Loop Marketing, AEO, time-to-value | Detalles de arquitectura |
-| **CRO / VP Ventas** | Adopción del equipo, forecast confiable | *"Sus vendedores lo van a usar"*. El caso 48%→94% | Que Gartner los puso Niche Player en SFA |
+| **CRO / VP Ventas** | Adopción del equipo, forecast confiable | *"Sus vendedores lo van a usar"*. El caso 48%→94% | Que Gartner ubica a Salesforce como Leader y a HubSpot como Challenger en CRM Sales 2026 |
 | **RevOps** | **Es tu champion o tu verdugo.** Le importa el modelo de datos y no volver a migrar en 2 años | Los límites reales, **por escrito**. **La honestidad acá te compra el deal** | Nunca le mientas. Te va a verificar |
 | **IT / Seguridad** | SOC 2, SSO, sandboxes, API, residencia | Trust Center, el calendario público de deprecación | 🔴 **Nunca afirmes ISO 27001.** Te van a pedir el certificado |
 | **CFO** | TCO, no la licencia | **El costo del admin.** Ese es el número | El TCO contra la lista de Salesforce (van a descontar) |

@@ -20,6 +20,7 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Payroll receipts + Legal docs/Finiquito | `greenhouse-payroll-auditor` | `architecture/agent-invariants/PAYROLL_LEGAL_DOCS_AGENT_INVARIANTS.md` |
 | Notion sync / integrations | `notion-platform` | `architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` |
 | HubSpot bridge / services intake | `hubspot-greenhouse-bridge` | `architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md` |
+| Salesforce CRM / Marketing Cloud Engagement / Marketing Cloud Next · operar o vender | `salesforce-crm-practice`, `salesforce-marketing-cloud-engagement` o `salesforce-marketing-cloud-next` según producto | `services/salesforce/README.md` + `services/salesforce/SALESFORCE_PRODUCT_AND_OFFERING_MAP_V1.md` + `operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md`; no confundir Consulting Partner con Cloud Reseller ni Engagement con Next |
 | Business model, customer model, packaging, pricing, unit economics | `efeonce-business-model-operator` + `efeonce-customer-model-operator` + `efeonce-pricing-operator` + práctica dueña | `business-models/README.md` + modelo vigente + Finance/Legal/Product según corresponda; customer model gobierna ICP/JTBD/buying group; `creative-practice` conserva Creative Studio |
 | Capital, inversión y fundraising | `efeonce-investor-readiness` + `efeonce-agency` + Finance/Legal | `strategy/EFEONCE_CAPITAL_AND_INVESTMENT_STRATEGY_V1.md` + `strategy/ASAAS_MANIFESTO_V1.md`; no emitir, endeudar, transferir IP ni crear spinout sin aprobación proporcional |
 | Integraciones/infra (signature/observability/postgres-pooling) | — | `architecture/agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md` |
@@ -70,7 +71,7 @@ Vercel/`ops-worker`/Cloud Run directo).
 ### Business Context Pack
 
 - `docs/context/` es el context pack de negocio, marca, GTM, producto y experiencia cliente de Efeonce/Greenhouse. Empezar por `docs/context/00_INDEX.md`.
-- Usarlo antes de proponer o construir features que toquen producto, UX/copy, naming, metricas, HubSpot/Account 360, onboarding/cliente, GTM, marca o estrategia comercial.
+- Usarlo antes de proponer o construir features que toquen producto, UX/copy, naming, metricas, HubSpot/Account 360, Salesforce, onboarding/cliente, GTM, marca o estrategia comercial.
 - Carga selectiva: `05_voz-tono-estilo.md` para copy visible, `06_glosario-metricas.md` para metricas/naming, `07_ico.md` para ICO, `08_estrategia-comercial.md` para prioridad comercial, `09_marca-agencia.md` para marca Efeonce, `10_experiencia-cliente.md` para journey/onboarding y `11_hubspot-bowtie.md` para sync/lifecycle HubSpot.
 - El context pack alinea el negocio; no reemplaza arquitectura vigente, runtime real, `DESIGN.md`, specs tecnicas ni contratos de datos. Si hay drift, prevalece el contrato tecnico verificado y se documenta.
 

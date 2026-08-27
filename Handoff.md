@@ -2,6 +2,18 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-27 — Tres skills Salesforce cubren operación y venta consultiva
+
+**Estado: `complete` local; sin runtime ni push.** Quedaron creadas y espejadas las skills de Salesforce CRM, Marketing Cloud Engagement y Marketing Cloud Next, con modos `operate`, `sell` y coexistencia donde aplica. El catálogo vive en [`docs/services/salesforce/README.md`](docs/services/salesforce/README.md) y el fundamento en [`SALESFORCE_PRACTICE_SKILL_FOUNDATION_2026-08-27.md`](docs/audits/commercial/SALESFORCE_PRACTICE_SKILL_FOUNDATION_2026-08-27.md).
+
+**Límite comercial vivo:** la aceptación histórica como Provisional Consulting Partner no prueba el estado actual, tier, certificaciones, SPPA ni Cloud Reseller. Antes de claims, cotización oficial, co-sell o reventa, hacer readback primario en Partner Community/contrato vigente. Ninguna skill autoriza mutaciones por inferencia.
+
+## 2026-08-27 — RevOps & CRM adopta posicionamiento provider-fit
+
+**Estado: `complete`; sin runtime ni push.** Efeonce vende **Revenue Operations & CRM**, con diagnóstico HubSpot-first, Salesforce-first o híbrido. Gartner se separa por mercado; los casos chilenos de Salesforce prueban presencia, no market share.
+
+**Pendiente:** las relaciones de partner declaradas por el CEO requieren readback primario antes de claims externos. Antes de mover inversión o certificaciones, medir 24 meses de pipeline, win/loss, margen, demanda y capacidad. Audit: [`CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md`](docs/audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md).
+
 ## 2026-08-27 — Gobernanza de contexto: dos fallos históricos reconciliados localmente
 
 **Estado: `complete` local; sin push.** Los runs fallidos se reprodujeron por SHA y no compartían causa: `CLAUDE.md governance` de `72c18c4` (run `32989156138`) tenía 2 líneas históricas huérfanas; `Agent Context Governance` de `c0af0da` (run `32989424731`) rechazaba `project_context.md` con ~20.418/12.000 tokens.
@@ -498,21 +510,3 @@ absoluto sobre una base que varias sesiones mutan no es reproducible; el invaria
 **Gates:** `pnpm lint` y `pnpm typecheck` limpios · `hiring` + `reliability` 1.908 verdes ·
 `task:lint` `errors=0 warnings=0` · gate de source 0 hallazgos. `pnpm test` completo y `pnpm build`
 **no** se corrieron (el build consume ~30 GB y espera autorización del operador).
-
-## 2026-08-23 — EPIC-042: el mockup aprobado ya gobierna la implementación futura de footers
-
-**Estado: documentación y skill completas; runtime sin cambios.** `TASK-1764` continúa como umbrella y la ADR
-sigue `Proposed`: todavía no existe la child foundation ejecutable ni se habilitó ningún footer gobernado.
-
-La ruta `/admin/emails/footer-profiles/mockup`, su vista/data, el SSOT de marca, los PNG transparentes y los
-contratos UI quedaron registrados como baseline aprobado. Los cinco perfiles visuales mapean a siete `purpose`;
-suscripción opcional y marketing conservan reglas distintas. Toda child futura debe demostrar paridad 720/390,
-Outlook Desktop Windows/OWA, Gmail, un cliente WebKit e imágenes bloqueadas, con fallback accesible de RRSS.
-
-La auditoría final cubrió 10 estados desktop/mobile: cero overflow, contraste mínimo 4.51:1, targets 24/32 px,
-foco visible, headings `h1 → h2 → h3`, listas/tablas nativas y GVC 1440/iPhone 13 sin errores de consola, página,
-hidratación o red. Esto valida el mockup local; no es evidencia de React Email ni de entrega.
-
-La skill espejo `greenhouse-email` ahora carga este contrato, corrige `broadcast !== marketing`, fija Efeonce como
-masterbrand y conserva rollout legacy/cohorts sin big bang. Siguiente paso: aceptar la ADR y recién entonces abrir
-la child foundation byte-idéntica; el mockup no prueba React Email, envío, deploy ni provider.

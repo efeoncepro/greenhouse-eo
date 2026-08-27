@@ -2,6 +2,25 @@
 
 > Ventana reciente de cambios internos reales. El historial completo y verificable se consulta en
 > [docs/changelog/internal/README.md](docs/changelog/internal/README.md). No cargar snapshots completos al
+> inicio ni usar una entrada histórica como contrato vigente sin contrastarla.
+>
+> Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
+> `pnpm docs:context-rotate --apply`.
+
+## 2026-08-27 — Nace la práctica Salesforce operable y vendible
+
+- Se crearon tres skills espejadas y gateadas: `salesforce-crm-practice`, `salesforce-marketing-cloud-engagement` y `salesforce-marketing-cloud-next`.
+- Cada skill separa `operate` de `sell`, incluye discovery, fit, arquitectura, propuesta/SOW, operación administrada y gates explícitos para claims, licencias, partnership, consentimiento y mutaciones.
+- Marketing Cloud Engagement se documenta como producto vigente y coexistente; Marketing Cloud Next como producto nativo de Salesforce Platform/Data 360. No se promete migración automática, paridad ni reemplazo universal.
+- La práctica comercial quedó bajo **Revenue Operations & CRM** con catálogo de ofertas, mapa de productos y evidencia fechada. No hubo acceso a tenants, cambios de configuración, ventas, cotizaciones oficiales, claims públicos ni runtime.
+
+## 2026-08-27 — RevOps & CRM deja de confundirse con un único provider
+
+- Se verificó la posición Gartner por mercado y año: HubSpot es Leader en B2B Marketing Automation 2025 por quinto año, y Challenger en CRM Sales Platforms 2026 después de avanzar desde Niche Player en 2025. Zoho también es Challenger en CRM Sales 2026. Ya no se usa un supuesto cuadrante único de “CRM”.
+- La señal enterprise chilena de Salesforce quedó sustentada con casos públicos de Enel Chile, Abastible y Colbún, pero se clasificó con confianza media: demuestra presencia, no market share ni desplazamiento general de HubSpot.
+- La práctica se normalizó como **Revenue Operations & CRM**, con diagnóstico provider-neutral y tres carriles: HubSpot-first, Salesforce-first e híbrido gobernado. La inversión futura debe decidirse con 24 meses de pipeline, win/loss, margen, demanda y capacidad, no con un badge de analista.
+- La declaración del CEO de que Efeonce es partner de HubSpot y Salesforce quedó en el registry como evidencia interna pendiente de readback primario. No autoriza claims externos, tier, certificación ni co-sell.
+- Se actualizaron contexto GTM, modelo de negocio, beachheads, catálogo HubSpot, tasks/wireframes activos y las skills espejadas `hubspot-solutions-partner` y `efeonce-agency`. Sin cambios de runtime, clientes, licencias, programas de partner ni sitio público. Evidencia: [`CRM Platform Positioning — Gartner + señal enterprise Chile`](docs/audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md).
 
 ## 2026-08-26 — Noviembre y diciembre de Berel quedan listos para revisión y producción creativa
 
@@ -780,22 +799,3 @@
 - Hiring: intake de identidad — normalización culturalmente segura del nombre (evidencia raw
   inmutable + display corregible + searchKey), reconciliación CAS del sticky name y corrección
   humana capability-gated. Flag OFF.
-  > inicio ni usar una entrada histórica como contrato vigente sin contrastarla.
-  >
-  > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
-  > `pnpm docs:context-rotate --apply`.
-
-## 2026-08-16 — Pipeline Hiring contenido en un plano operacional
-
-- El selector de vacante y el conteo se integran al encabezado canónico; búsqueda, ayuda y Kanban comparten una
-  sola superficie blanca, con lanes tonales internas y tarjetas como elementos dominantes.
-- El selector conserva títulos completos en 390 px; se corrigieron nombres accesibles y contraste del scope.
-- Evidencia local desktop/mobile: `.captures/2026-08-16T22-13-39_task355-hiring-pipeline-board` (0 findings GVC).
-
-## 2026-08-16 — Radar de assessment legible y honesto
-
-- Application 360 reemplaza el radar SVG manual por Recharts sobre el wrapper tipográfico canónico.
-- Los ejes muestran etiquetas humanas sin cortar palabras; una guía visible conserva los nombres completos,
-  puntajes y objetivos, con leyenda explícita y adaptación a 390 px.
-- Un scorecard parcial ya no convierte competencias pendientes en cero ni dibuja un perfil engañoso.
-- Evidencia local desktop/mobile: `.captures/2026-08-16T19-02-20_task1363-assessment-radar-runtime`.
