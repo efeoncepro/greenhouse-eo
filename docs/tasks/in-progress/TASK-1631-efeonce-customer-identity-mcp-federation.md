@@ -703,6 +703,29 @@ production secrets, client registrations and the first customer onboarding conse
 - [ ] Handoff and changelog record the accepted implementation and live evidence.
 - [ ] Access, revocation, error redaction and rollback evidence are retained.
 
+## Delta 2026-08-26 — Growth SEO/AEO depende de esta task y ella no lo declara
+
+Barrido verificado: esta task **no menciona «seo» ni «aeo» ni una sola vez**. El dominio SEO sí declara
+la dependencia hacia afuera —en `src/mcp/greenhouse/server.ts`, en el cliente HTTP del lane, en el
+recurso ecosystem y en la entrada de paridad del gateway— pero acá no aparece como consumer ni en
+criterios de aceptación.
+
+**El riesgo concreto:** `prepare_seo_grounded_queries` y `get_seo_grounded_query_draft` están
+*fail-closed* con la identidad máquina compartida, devolviendo `aeo_forbidden` (403). El bloqueo real
+no es un scope de Entra sino una **capability**: `growth.ai_visibility.prompt_set.manage`, que la
+identidad de máquina no tiene. Como la regla de esta task es que *la autoridad la califica el issuer*,
+**esta task podría cerrarse completa y dejar esas dos tools igual de bloqueadas**, porque el grant fino
+no vendría con ella.
+
+Línea a agregar en `Blocks / Impacts`:
+
+> Growth SEO/AEO: `prepare_seo_grounded_queries` y `get_seo_grounded_query_draft` están fail-closed
+> (`aeo_forbidden`) esperando grants por usuario. El cierre de esta task debe declarar si las habilita
+> o si requiere una task propia de grants `growth.ai_visibility.*` — el silencio dejaría dos tools
+> vivas y permanentemente bloqueadas.
+
+Origen: `docs/audits/platform/2026-08-26-openseo-competitive-teardown-growth-seo-aeo.md` §7.3.
+
 ## Follow-ups
 
 - La task `ui-ux` dependiente de la superficie de login `auth.efeonce.org` nace al cierre del Slice 0 con

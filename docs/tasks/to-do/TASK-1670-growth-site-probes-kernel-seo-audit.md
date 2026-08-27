@@ -599,6 +599,33 @@ eso el consumidor UI es prerequisito del flip del flag.
       faltante pasa a existir)
 - [ ] `FEATURE_FLAG_STATE_LEDGER.md` con el flag y su runtime
 
+## Delta 2026-08-26 — el chequeo de borde, como está escrito, no es implementable y además contradice una postura declarada
+
+Dos bloqueadores externos, verificados contra el código:
+
+1. **`ProbeFetchInit` no acepta override de User-Agent.** El UA es constante de módulo
+   (`safe-fetch.ts:25`, `COURTESY_USER_AGENT`) y el contrato sólo expone `accept`, `timeoutMs` y
+   `maxBytes`. Esta task declara **cero ediciones sobre `ai-visibility/**`**, y `TASK-1697` prohíbe
+   tocar comportamiento en su diff de movimiento. El parámetro se agrega en **`TASK-1778` Slice 4b**,
+   que es la task que sí cambia comportamiento sobre ese archivo.
+2. 🔴 **La postura contradice el Slice 1.** `TASK-1778` declara que matchea **nuestro** token de UA y
+   **nunca** los de los bots de IA que auditamos — *«o "actuar como" GPTBot para probar»* está
+   explícitamente descartado: es suplantación, algunos WAF la verifican por DNS inverso, y aparecer
+   como evasor tiene costo reputacional. El Slice 1 de esta task dice hacer `GET` del home **con UA
+   de un bot de retrieval**. Las dos no pueden ser ciertas.
+
+**Corrección de alcance:** el chequeo de borde se hace con **nuestro token variado**, y lo que mide es
+si el borde nos trata distinto que a un navegador — no si podemos hacernos pasar por otro. Si el
+negocio necesita responder *«¿está ChatGPT bloqueado en este sitio?»* con certeza, eso se responde
+leyendo `robots.txt` y las reglas del WAF cuando el cliente las comparte, no suplantando.
+
+**Y el sitemap cross-host.** `resolveProbeUrl` exige igualdad exacta de hostname, así que un sitemap
+declarado como `https://www.ejemplo.com/sitemap.xml` con target `ejemplo.com` devuelve `blocked` y el
+chequeo reporta «no verificado» sobre un sitemap sano. `TASK-1778` Slice 1 ya lo resuelve aceptando la
+familia `apex ↔ www`; esta task lo **consume**, no lo implementa.
+
+Origen: `docs/audits/platform/2026-08-26-openseo-competitive-teardown-growth-seo-aeo.md` §3.9.
+
 ## Follow-ups
 
 - `TASK-1671` `[por crear]` — consumer UI de los hallazgos de sitio en `/admin/growth/seo/audit`.

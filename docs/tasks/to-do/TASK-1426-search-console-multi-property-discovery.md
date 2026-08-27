@@ -405,6 +405,35 @@ Slice 0 → Slice 1 → Slice 2. Slice 3 puede empezar tras Slice 1. Slice 4 req
 - [ ] Invocar `greenhouse-documentation-governor` y ejecutar cierre documental.
 - [ ] Declarar honestamente `complete`, `code complete, rollout pendiente` o `operativamente bloqueado` según canary/scheduler/producción.
 
+## Delta 2026-08-26 — la cuota de URL Inspection está declarada como postura, no como mecanismo
+
+Esta task ya tiene URL Inspection en alcance (Slice 3, con contrato de función y un código de error
+`quota_exceeded`). Lo que **no** tiene es el mecanismo: barrido del cuerpo por `2000`, `ledger`,
+`preview` y `fence` → **cero coincidencias**.
+
+La API de URL Inspection tiene cuota dura de **2.000 inspecciones por día y por propiedad**. Eso es
+poco cuando el consumidor es un agente en bucle, y es cuota **del cliente**, no nuestra: agotarla le
+deja la herramienta inservible el resto del día. El precedente a no imitar es OpenSEO, que expone la
+misma API por MCP y no tiene un solo contador en 1.537 archivos — su único freno es un tope de 10 URLs
+por llamada y un mensaje reactivo cuando Google devuelve 429.
+
+Lo que falta agregar al Slice 3:
+
+- Ledger de consumo por `(organization_id, site_url, día)`, con el mismo patrón de incremento atómico
+  que `seo_provider_spend_daily` — pero contando **llamadas**, no dólares: es cuota, no dinero.
+- Techo configurable **por debajo** de las 2.000, para dejar margen al uso manual del cliente.
+- `preview` que responda cuántas inspecciones costaría la operación pedida **sin gastarlas**.
+- Fence dentro del bucle, no sólo antes: el mismo patrón que ya usan `keyword-market-data.ts` y
+  `rank-history-seed.ts` para el presupuesto en dólares.
+- Y la tool MCP correspondiente debe declarar la cuota en su descripción y exigir el preview, igual
+  que `discover_seo_keywords` hace con el gasto.
+
+**Nota de secuencia:** el Slice 3 declara poder empezar tras el Slice 1, así que es extraíble como
+task propia si el paquete multi-property se demora. Extraído, opera sobre la conexión de propiedad
+única vigente y no sobre el `bindingId` del Slice 1 — declararlo antes de partir.
+
+Origen: `docs/audits/platform/2026-08-26-openseo-competitive-teardown-growth-seo-aeo.md` §7.3.
+
 ## Follow-ups
 
 - Task `ui-ux` para administrar website + Platform Properties en Account 360, sólo después del backend y con wireframe/flow/GVC.

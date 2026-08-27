@@ -351,6 +351,32 @@ otra clase de blast-radius y otra task.
 - [ ] `docs/tasks/README.md` quedó sincronizado con el cierre
 - [ ] `Handoff.md` quedó actualizado
 
+## Delta 2026-08-26 — falta el drift de SCHEMA, que el guard actual no puede ver
+
+El guard compara **nombres** de tools: `matchAll(/registerTool\(\s*'([a-z0-9_]*seo[a-z0-9_]*)'/g)`
+sobre el texto de `src/mcp.ts`. Eso deja un segundo punto ciego, además del de dirección única que
+esta task ya declara: **una tool puede estar federada con el nombre correcto y el contrato
+equivocado**, y el guard sale verde.
+
+**Caso vivo, verificado.** `TASK-1659` está `complete` y su cuerpo declara: *«Los 3 lanes aceptan el
+parámetro: app-lane, ecosystem y **las 2 tools MCP**»*. El `inputSchema` de `track_seo_keywords` en el
+gateway es `z.object({ organizationId, keywords }).strict()` — **sin `intent` ni `intentDeclaredBy`**.
+El MCP interno sí los tiene, y el lane ecosystem los acepta. Consecuencia con `.strict()`: un agente
+externo que mande `intent` recibe error de validación; si no lo manda, se escribe `NULL` — que es
+exactamente *«fabricar una clasificación que nadie hizo»*, el defecto que `TASK-1659` existe para
+evitar. Un compromiso de una task cerrada quedó incumplido en la frontera pública.
+
+**Slice a agregar:**
+
+### Slice 4 — Paridad de schema, no sólo de nombre
+
+- El guard compara el `inputSchema` de cada tool federada contra el del MCP interno, no sólo su nombre.
+- Una divergencia deliberada se declara con razón, igual que una exclusión: el silencio no es válido.
+- Cerrar el caso vivo: `track_seo_keywords` en el gateway gana `intent` e `intentDeclaredBy`, y su
+  descripción incorpora el outcome `intent_changed` que hoy le falta.
+
+Origen: `docs/audits/platform/2026-08-26-openseo-competitive-teardown-growth-seo-aeo.md` §3.12.
+
 ## Follow-ups
 
 - Generalizar el guard corregido a los demás providers del gateway, si el patrón resulta.
