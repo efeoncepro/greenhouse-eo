@@ -281,6 +281,25 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getSeoKeywordMarketData(args)
   )
 
+  // TASK-1775 — foto de dominio ◑: la pregunta que abre toda reunión de SEO ("¿cómo estamos
+  // contra ellos?" / "¿venimos subiendo o bajando?"), del target O de un competidor.
+  server.registerTool(
+    'get_seo_domain_overview',
+    {
+      title: 'Get SEO Domain Overview',
+      description:
+        'Get the domain-level photo + monthly trajectory of the organization SEO target domain (default) or one of its declared competitors (pass subject=<domain>): total ranked keywords in the top-100, estimated monthly organic traffic volume (etv), estimated USD cost of buying that traffic in Ads, top-100 position distribution, rank momentum, and up to 72 months of history. All figures are market ESTIMATES from the DataForSEO Labs snapshot (lens=estimated, refreshed monthly), NOT measured Search Console data: never average or mix them with GSC series. etv is estimated traffic VOLUME, not dollars and not measured visits. Every figure carries capturedAt — always report the as-of date. When data.ok is false report the errorCode honestly (no_market_data means the subject has no snapshot yet — a state, not a zero). The market (country+language) comes from the organization SEO target; pass market=<ISO-2|location_code> when the organization has more than one.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(2).max(12).optional(),
+        subject: z.string().trim().min(3).max(255).optional(),
+        months: z.number().int().positive().max(72).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoDomainOverview(args)
+  )
+
   server.registerTool(
     'get_seo_visibility_360',
     {
@@ -545,6 +564,39 @@ export const createGreenhouseMcpServer = (
       outputSchema: greenhouseMcpToolOutputSchema
     },
     async args => handlers.prepareSeoGroundedQueries(args)
+  )
+
+  // TASK-1709 — diagnóstico de prospecto (lectura + disparo). Sólo bindings `internal`.
+  server.registerTool(
+    'get_seo_prospect_diagnostic',
+    {
+      title: 'Get SEO Prospect Diagnostic',
+      description:
+        'Read SEO prospect diagnostics (a one-shot, provider-only diagnostic of a domain WITHOUT client access). Pass diagnosticId for full facts, or rootDomain/limit to list. Every figure is ESTIMATED (external provider, with capturedAt) — always report the lens and the as-of date, NEVER present a figure as measured, and NEVER assert the site is healthy: the diagnostic enumerates quantified loss, it does not certify health.',
+      inputSchema: {
+        diagnosticId: z.string().trim().min(1).optional(),
+        rootDomain: z.string().trim().min(4).optional(),
+        limit: z.number().int().min(1).max(100).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoProspectDiagnostic(args)
+  )
+
+  server.registerTool(
+    'run_seo_prospect_diagnostic',
+    {
+      title: 'Run SEO Prospect Diagnostic',
+      description:
+        'Run a ONE-SHOT SEO diagnostic of a prospect domain (no client access needed). THIS SPENDS REAL MONEY (~USD 0.25 per run, hard per-diagnostic ceiling + daily per-actor cap enforced server-side). Propose the exact domain and market to the human and get explicit confirmation BEFORE calling — never trigger this on your own initiative. Idempotent per domain/market/day: repeating the same subject the same day returns the existing diagnostic with USD 0 spent. There is NO recurring capture on prospects: re-running another day is a new human decision that passes every ceiling again.',
+      inputSchema: {
+        rootDomain: z.string().trim().min(4),
+        market: z.string().trim().min(2).max(2),
+        competitorDomains: z.array(z.string().trim().min(4)).max(5).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.runSeoProspectDiagnostic(args)
   )
 
   // Resource addressable: el mismo documento read-only por URI estable.

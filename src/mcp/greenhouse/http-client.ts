@@ -182,6 +182,16 @@ export class GreenhouseApiPlatformClient {
     })
   }
 
+  // TASK-1775 — foto de dominio ◑ (target o competidor) + trayectoria mensual.
+  async getSeoDomainOverview(input: { organizationId?: string; market?: string; subject?: string; months?: number }) {
+    return this.request('/api/platform/ecosystem/growth/seo/domain-overview', {
+      organizationId: input.organizationId,
+      market: input.market,
+      subject: input.subject,
+      months: input.months
+    })
+  }
+
   async getSeoVisibility360(input: { organizationId?: string; market?: string }) {
     return this.request('/api/platform/ecosystem/growth/seo/visibility-360', {
       organizationId: input.organizationId
@@ -384,6 +394,37 @@ export class GreenhouseApiPlatformClient {
           methods: input.methods,
           idempotencyKey: input.idempotencyKey,
           preview: input.preview
+        }
+      }
+    )
+  }
+
+  /**
+   * TASK-1709 — lectura de diagnósticos de prospecto. Sólo bindings `internal` en el lane
+   * (inteligencia de adquisición de Efeonce, jamás client-facing).
+   */
+  async getSeoProspectDiagnostic(input: { diagnosticId?: string; rootDomain?: string; limit?: number }) {
+    return this.request('/api/platform/ecosystem/growth/seo/prospect-diagnostic', {
+      diagnosticId: input.diagnosticId,
+      rootDomain: input.rootDomain,
+      limit: input.limit
+    })
+  }
+
+  /**
+   * TASK-1709 — disparar un diagnóstico de prospecto (COMMAND: compromete gasto real con
+   * tope duro por diagnóstico). Sólo bindings `internal`.
+   */
+  async runSeoProspectDiagnostic(input: { rootDomain: string; market: string; competitorDomains?: string[] }) {
+    return this.request(
+      '/api/platform/ecosystem/growth/seo/prospect-diagnostic',
+      {},
+      {
+        method: 'POST',
+        body: {
+          rootDomain: input.rootDomain,
+          market: input.market,
+          competitorDomains: input.competitorDomains
         }
       }
     )
