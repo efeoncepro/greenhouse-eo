@@ -150,11 +150,15 @@ Atenuantes reales, que hay que decir para no inflar la severidad:
 
 - **Seguridad**: alcance a superficies internas desde un input controlado por terceros, con el cuerpo
   de la respuesta viajando al resultado del probe (que se persiste y puede llegar a un informe).
-- **Ambiente**: staging hoy. **Producción no está expuesta**: ambos consumers del fetcher
-  (`probes/gatherer` vía `TASK-1266` y `brand-intelligence/fetch-site-content` vía `TASK-1288`) están
-  **`true` en la revisión activa `ops-worker-00595-4q2`**, verificado con `gcloud run services
-  describe` el 2026-08-27. La fila `prod: OFF` del `FEATURE_FLAG_STATE_LEDGER.md` era el artefacto
-  documental que originó la mala clasificación.
+- **Ambiente**: 🔴 **producción SÍ estuvo expuesta.** Ambos consumers del fetcher
+  (`probes/gatherer` vía `TASK-1266` y `brand-intelligence/fetch-site-content` vía `TASK-1288`)
+  estaban **`true` en la revisión activa `ops-worker-00595-4q2`**, verificado con
+  `gcloud run services describe` el 2026-08-27. La fila `prod: OFF` del
+  `FEATURE_FLAG_STATE_LEDGER.md` era el artefacto documental que originó la mala clasificación.
+  ⚠️ Esta viñeta conservó hasta el 2026-08-27 el encabezado de la v1 (*"staging hoy; producción no
+  está expuesta"*) pegado a la corrección de su propio cuerpo, y afirmaba lo contrario de lo que
+  demostraba. Se corrige acá para que el registro histórico no contradiga el hallazgo: es la sección
+  que alguien va a leer la próxima vez que el patrón se repita.
 - **Comercial**: bloquea declarar el fetcher apto para uso sobre prospectos, que es justo lo que
   `TASK-1709` (`Delta 2026-08-26`) acaba de habilitar por delegación.
 - **Confianza en los comentarios del repo**: una cabecera que afirma una contención inexistente es
