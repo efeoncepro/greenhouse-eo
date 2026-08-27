@@ -204,6 +204,7 @@ import {
 } from './queries/seo-keyword-discovery-health'
 import { getSeoMarketDataFreshnessSignal } from './queries/seo-market-data-freshness'
 import { getSeoDomainOverviewStalenessSignal } from './queries/seo-domain-overview-staleness'
+import { getSeoUrlVisibilityStalenessSignal } from './queries/seo-url-visibility-staleness'
 import { getSeoRankCaptureLagSignal } from './queries/seo-rank-capture-lag'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
 import { getKnowledgeNotionIngestDeadLetterSignal } from './queries/knowledge-notion-ingest-dead-letter'
@@ -699,6 +700,7 @@ interface ReliabilityOverviewSources {
   seoRankCaptureLag?: ReliabilitySignal | null
   seoMarketDataFreshness?: ReliabilitySignal | null
   seoDomainOverviewStaleness?: ReliabilitySignal | null
+  seoUrlVisibilityStaleness?: ReliabilitySignal | null
   seoAuditStuckTasks?: ReliabilitySignal | null
   seoKeywordDiscoveryStuckRuns?: ReliabilitySignal | null
   seoKeywordDiscoveryProviderErrors?: ReliabilitySignal | null
@@ -1162,6 +1164,7 @@ export const buildReliabilityOverview = (
     ...(sources.seoRankCaptureLag ? [sources.seoRankCaptureLag] : []),
     ...(sources.seoMarketDataFreshness ? [sources.seoMarketDataFreshness] : []),
     ...(sources.seoDomainOverviewStaleness ? [sources.seoDomainOverviewStaleness] : []),
+    ...(sources.seoUrlVisibilityStaleness ? [sources.seoUrlVisibilityStaleness] : []),
     ...(sources.seoAuditStuckTasks ? [sources.seoAuditStuckTasks] : []),
     ...(sources.seoKeywordDiscoveryStuckRuns ? [sources.seoKeywordDiscoveryStuckRuns] : []),
     ...(sources.seoKeywordDiscoveryProviderErrors ? [sources.seoKeywordDiscoveryProviderErrors] : []),
@@ -1704,6 +1707,11 @@ export const getReliabilityOverview = async (
     preloadedSources.seoDomainOverviewStaleness !== undefined
       ? preloadedSources.seoDomainOverviewStaleness
       : await getSeoDomainOverviewStalenessSignal().catch(() => null)
+
+  const seoUrlVisibilityStaleness =
+    preloadedSources.seoUrlVisibilityStaleness !== undefined
+      ? preloadedSources.seoUrlVisibilityStaleness
+      : await getSeoUrlVisibilityStalenessSignal().catch(() => null)
 
   const seoAuditStuckTasks =
     preloadedSources.seoAuditStuckTasks !== undefined
@@ -2812,6 +2820,7 @@ export const getReliabilityOverview = async (
     seoRankCaptureLag,
     seoMarketDataFreshness,
     seoDomainOverviewStaleness,
+    seoUrlVisibilityStaleness,
     seoAuditStuckTasks,
     seoProspectCostOverrun,
     seoKeywordDiscoveryStuckRuns,
