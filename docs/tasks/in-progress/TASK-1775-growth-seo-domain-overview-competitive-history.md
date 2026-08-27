@@ -37,6 +37,20 @@ un sujeto (secuencia del runbook §Paso a paso), flag ON multi-runtime + despaus
 la tool MCP en staging y federación en el gateway `efeonce-mcp`. Hasta entonces: flag OFF, scheduler
 declarado pausado, cero gasto.
 
+### Evidencia de rollout 2026-08-27 (smoke live autorizado por el operador)
+
+- Flag ON (declarativo + `--update-env-vars`, revisión activa verificada). Dry-run: USD 0.02424
+  estimado, cero llamadas. **Corrida real: USD 0.02424 — idéntico al estimado.** Resultado de
+  negocio inmediato: `berel.com` ranquea **773 keywords con ETV ~135.013** en MX (235 en #1);
+  `efeoncepro.com` 5 keywords en CL. **Re-corrida: USD 0 con ambos `fresh`** (el pre-check de
+  frescura filtrado por `source_endpoint` funcionó contra el proveedor real).
+- Scheduler `ops-seo-domain-overview` **despausado (ENABLED)**. Lane ecosystem canary verde en
+  staging (binding `efeonce-mcp-gateway`, `servedMarket=MX`). Señal
+  `seo.domain_overview.stale_subjects` en steady `ok` ("al día en 2 sujetos").
+- Pendiente para `complete`: pase develop→main (lanes a producción) + federación de
+  `get_seo_domain_overview` en `efeonce-mcp` (post-release, coordinado con la sesión de release).
+  El backfill histórico (`--apply`) sigue disponible bajo demanda con su tope; no se corrió.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

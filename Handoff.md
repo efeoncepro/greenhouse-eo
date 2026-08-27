@@ -2,6 +2,28 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-27 — La tríada SEO quedó OPERANDO: smokes live verdes, flags ON, schedulers activos
+
+**Estado: 1775/1776/1777 con rollout ejecutado y verificado contra runtime; siguen `in-progress`
+sólo por la federación MCP post-release (la mueve la sesión de release `greenhouse-eo-c1`).**
+Autorización del operador en este hilo; gasto real total del rollout: **USD 0.30** (1777: 0.1818 ·
+1775: 0.0242 · 1776: 0.0366 + 0.0552). Todo flip declarativo en `deploy.sh` **y** aplicado con
+`--update-env-vars`, verificado en la revisión activa (`ops-worker-00603-ngj`).
+
+**Evidencia clave (detalle por task en sus files):** re-corridas a **USD 0** en las tres (frescura/
+veredicto contra proveedor real); subfolder `berel.com/productos` con **100/100 URLs bajo la ruta**;
+**210 filas de mercado gratis** escritas por el tercer productor; drill-down de enlaces con hallazgo
+nominal real (Berel perdió `apps.apple.com`); `berel.com` = 773 kw ranqueadas / ETV ~135k MX vs las
+31 seguidas — el argumento comercial de la capa entera. Los 3 lanes canarieados verdes en staging
+(binding `efeonce-mcp-gateway`) y las 3 señales en steady `ok`. Schedulers día 16 y 17 **ENABLED**;
+1777 viaja en el batch semanal (próximo ciclo natural lunes 2026-08-31 — ahí se observa el
+`skipped_no_movement` a USD 0 que el smoke no pudo producir por ser todo first_time).
+
+**Coordinación:** la sesión `greenhouse-eo-c1` corre el pase develop→main (con bypass documentado de
+`db_migrations`: instancia única, las 10 ya aplicadas) y post-release federa las 5 tools nuevas en
+`efeonce-mcp` + flip de `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` en Vercel Production. La
+evidencia de costos de este bloque es el insumo para que mueva las tasks a `complete`.
+
 ## 2026-08-27 — TASK-1652 en ejecución: corrección request AI Mode del AEO grader
 
 **Estado: in-progress en `develop`, local-first.** Los 3 defectos confirmados en Discovery contra
@@ -251,53 +273,3 @@ esté en producción con su flag ON.
 **TeamBot:** `pnpm teams:announce` sigue siendo group/channel-only y el CLI 1:1 existente es exclusivo de pagos. Para un one-off genérico aprobado, las skills y el runbook admiten únicamente un puente temporal sobre el dispatcher/audit writers canónicos, con Entra revalidado, card-only, preview/confirmación, idempotencia, deduplicación y `source_sync_runs`. `succeeded` no es read receipt. Los mensajes recurrentes convergen a Notification Hub `dynamic_user`.
 
 **Pendiente con dueño:** People + Payroll + Legal deben decidir la política contractual de vacaciones para contractors Deel; después corresponde corregir precedencia/cálculo, reconciliar saldos y alinear carta, acuerdos y copy. No se abrió ADR porque aún no hay decisión aceptada.
-
-## 2026-08-25 — Metodología SEO editorial documentada + caso de cliente; el motor ya existía
-
-**Sólo docs y skills.** Sin runtime tocado. Origen: un research completo de SEO/AEO para un cliente de la práctica, ejecutado de punta a punta en esta sesión (diagnóstico competitivo, línea base medida en Search Console, backlog de striking distance, cinco briefs editoriales depositados en el sistema editorial del cliente).
-
-**El hallazgo que reordena el trabajo futuro.** El carril de striking distance **no era una capacidad por construir**: `keyword-opportunities-reader.ts` (`TASK-1302`) ya calcula el mismo score —clics incrementales contra la curva de CTR de la propia organización— y `/admin/growth/seo/keywords` (`TASK-1308`) ya lo expone, con la canibalización marcada aparte como caso de consolidación. Se reimplementó a mano con un script desechable antes de descubrirlo. La conexión de Search Console del cliente estaba activa y acumulando desde el 2026-07-31, y nadie había corrido la superficie para esa cuenta. La página está gateada por `isSeoModuleEnabled` + `enforceSeoRunEntitlement`, así que la verificación correcta tiene dos partes: que la capacidad exista **y** que esté habilitada para la organización.
-
-**Qué se escribió y quién es dueño de qué** (separación deliberada para no duplicar):
-
-- Oficio → skill `seo-aeo`, `modules/02` y `modules/07` (dos carriles, tres trampas de GSC, curva propia, inflación de clústeres) + la gotcha de que el mensaje de cuota agotada de Semrush MCP afirma falta de acceso al plan.
-- Proceso → `docs/operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md` (488 líneas).
-- Operación paso a paso → `docs/manual-de-uso/growth/producir-serie-de-briefs-seo.md`.
-- Caso de cliente → `docs/audits/seo/BEREL_SEO_DIAGNOSTIC_2026-08-25.md` (491 líneas) + `docs/audits/seo/README.md` + registro en el índice de auditorías.
-- Venta y estado de cuenta → skill `seo-aeo-practice`, `efeonce/ESTADO_ACTUAL.md`.
-
-**Deriva de skills, resuelta.** `seo-aeo` no estaba versionada del lado Claude (vivía a nivel de usuario, fuera de git) y `seo-aeo-practice` divergía desde antes. Al reconciliarlas byte a byte se descubrió que **la dirección del drift era la inversa de la supuesta**: en `seo-aeo` la copia `.codex` era superconjunto estricto y la de Claude había perdido contenido; en `seo-aeo-practice` se eliminaron siete afirmaciones falsas de la copia `.codex` sobre el alcance comercial de un cliente real. Ambas quedaron **registradas en el manifiesto de `scripts/skills/validate-mirrored-skills.mjs`**, que ya corría en `local:check`: la protección es de pre-push y no depende de que alguien se acuerde (verificado con un test negativo).
-
-**Pendiente, con dueño.** (a) Reconciliar las dos skills — decisión del operador, no se forzó. (b) Correr `/admin/growth/seo/keywords` para el cliente y usar esa cifra como oficial en vez del script ad-hoc. (c) En el sistema editorial del cliente quedan sin definir el estado de lifecycle de los cinco slots y sus enlaces; se dejaron intactos a propósito.
-
-**Verificación.** Cinco briefs verificados en el sistema del cliente por un agente distinto al que los escribió, sobre una lista cerrada de puntos. Las rutas, readers, componentes y tasks citados se comprobaron en disco. No se ejecutó ningún gate de runtime porque el cambio no toca runtime.
-
-**Pendiente de decisión del operador:** `seo-aeo-practice/modules/03_OFERTA.md` (líneas 55, 207, 245) sigue afirmando que el AEO «lo regalamos adentro», **idéntico en ambas copias** — no era drift, así que quedó fuera del alcance de esa pasada. Contradice la corrección del 2026-08-15, pero sus frases son generales sobre la arquitectura de la oferta y no sobre el cliente del caso: no se sabe si la generalización es falsa o si sólo lo era la inferencia. **Resolverlo cambia cómo la práctica cotiza a toda la cartera.**
-
-**Corrección que hay que registrar porque se afirmó de más.** Se presentó la cadencia propia del cliente como argumento de la ventana, con tres fechas. Al reverificar en vivo, una **no existe** (su ruta es otro soft 404, 200 sin `<title>` ni JSON-LD) y las dos reales están a **dos meses** de distancia: no hay patrón propio. La ventana se sostiene, pero **exclusivamente** por el calendario del mercado, verificado con fuente primaria. Corregido en el caso, el modelo operativo y el brief.
-
-**Qué se escribió** (misma separación de carriles): oficio → `seo-aeo` (`modules/02`, `04`, `05`, `07`, `ANTIPATTERNS.md`); atomización → `content-marketing-studio` (`modules/04`, `05`); proceso → modelo operativo **v1.2** (§9 nueva, renumeración de las tres últimas); operación → runbook **v1.1**; caso → `docs/audits/seo/BEREL_COLOR_DEL_ANO_2027_2026-08-25.md`, aparte del diagnóstico porque **caduca por fecha dura** (diagnóstico a v1.1 con el puntero). Detalle temático en el changelog del mismo día.
-
-**Cinco bloqueantes abiertos, todos del lado del cliente** — fecha contradictoria entre la propiedad de la tarea y su cuerpo (la tardía invalida el claim diferenciador) · el material dice «candidato», la confirmación llegó verbal · falta la ficha técnica, que **bloquea cuatro H2** y no sale del sitio público (verificado: el código no existe, la ruta de producto no resuelve) · falta quién firma · la URL de destino **ya devuelve 200 con título vacío**. Detalle y dueño en el caso.
-
-**Alcance del encargo confirmado, cambia entregables futuros.** El canal social del cliente existe pero **lo opera otra agencia**: Efeonce entrega insumo (texto e imagen) y no publica. Por eso el plan de distribución es un paquete de handoff y no una parrilla, y la medición social no es nativa.
-
-**Verificación.** Depósito comprobado por conteo mecánico (13 secciones dentro del desplegable, 38 tablas con envoltorio indentado, 725 filas intactas). **Dos ediciones intermedias sacaron contenido del desplegable devolviendo éxito**: se detectaron por el conteo, no a ojo. Gate de espejos verde. Sin gate de runtime.
-
-**El hallazgo de fondo:** la entidad de marca recurrente del cliente (su color del año) tiene su ficha ancla con **cero enlaces editoriales entrantes y cero salientes**; ningún satélite enlaza a su ficha y ningún ciclo encadena al siguiente. Lo que parecía enlazado era el **pie de página global**, presente en 113/113 páginas. Eso reencuadró la entidad de «pieza de calendario» a **clúster que compone autoridad cada año**, con su kit reutilizable ya escrito.
-
-**🔴 Corrección a un número que reporté como medido.** Dije «0,38 enlaces editoriales por artículo». Al intentar replicar el grafo desde el dataset intermedio **la cifra filtrada no es reproducible**: da 112 enlaces y los porcentajes previos al filtro. Lo cualitativo se sostiene con ambos conteos —el grafo está roto y la entidad está huérfana de cualquier forma— pero **la cifra fina no se le pasa al cliente** hasta rehacer la extracción declarando el criterio exacto de «cuerpo editorial». Queda como límite y recomendación en el audit.
-
-**Dónde quedó:** modelo operativo **v1.3** · **`SEO_CONTENT_BRIEF_STRUCTURE_V1.md`** (nuevo, techo 12.000 car.) · runbook **v1.2** · caso **`BEREL_ARQUITECTURA_AUTORIDAD_2026-08-25.md`** (nuevo) + los dos audits hermanos actualizados · oficio en `seo-aeo`, `content-marketing-studio` y `copywriting`, **esta última registrada por primera vez en el manifiesto de espejos (11→12)**: su copia `.codex` no cargaba la skill por frontmatter incompleto, y eso no falla con error. Detalle temático en el changelog del día.
-
-**🔴 Lo único que no espera calendario editorial:** un artículo **ya publicado** del cliente sobre recámaras infantiles afirma que un producto _«no tiene olor, es anti-viral, anti-bacterial y anti-hongos»_ y que otro _«resiste más de 60,000 ciclos de lavado»_, **sin método ni norma**. Son claims de salud en una página viva. Verificado en ficha: plomo y COV < 50 g/L. Los dos claims publicados: **SIN DATO**. Revisar contra ficha y retirar si no los sostiene.
-
-**Pendiente del cliente:** fichas técnicas por línea (sin ellas dos piezas no se publican y esperan) · un mismo código de color con dos nombres distintos en artículos distintos · el destino `/articulos/color-berel-2027` devolviendo 200 con título vacío · leer el estudio de Profeco antes de citarlo. **Sin GSC en toda la pasada:** el carril de striking distance sigue sin correr para esta cuenta, así que toda la priorización es de demanda de terceros. **Semrush inoperante** (5 intentos en serie, sin poder distinguir cuota de plan).
-
-## 2026-08-24 — TeamBot: `@todos` en chats grupales queda descartado
-
-Un envío real a `EO Team` confirmó que el contrato histórico era falso: Bot Framework aceptó `<at>todos</at>` con el `chatId` como `mentioned.id`, pero Teams publicó `todos` como texto plano en una burbuja separada, sin arroba ni notificación colectiva. La burbuja provino de combinar `activity.text` con la Adaptive Card.
-
-La documentación oficial de Microsoft establece que los bots en chats grupales admiten menciones a usuarios, pero no `@everyone`. Se corrigieron arquitectura, invariante Ops, runbook, `TASK-716`, contexto durable y las skills espejadas de plataforma/operación. El diseño de `TASK-716` ahora usa `none | explicit_users`; prohíbe `everyone_in_chat` y `mentioned.id=<chatId>`.
-
-**Estado:** corrección documental completa; el soporte local no confirmado de `--mention-all` se retiró antes del commit y no existe en el runtime versionado. No se realizó un segundo envío.

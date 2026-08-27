@@ -38,6 +38,20 @@ enriquecimiento no sube el `cost`), flag ON multi-runtime + despausar `ops-seo-u
 canary de la tool MCP en staging + federación en `efeonce-mcp`, y confirmación del `limit` default.
 Hasta entonces: flag OFF, scheduler declarado pausado, cero gasto.
 
+### Evidencia de rollout 2026-08-27 (smoke live autorizado por el operador)
+
+- Flag ON (declarativo + `--update-env-vars`, revisión activa verificada). Dry-run USD 0.048
+  estimado → **batch real USD 0.0366** con **90 filas de mercado escritas gratis** (85 Berel +
+  5 Efeonce — el beneficio de cartera del tercer productor, ya medible). **Re-corrida: USD 0.**
+- Smoke de los cuatro `subject_kind`: `domain` (batch) · `subfolder` `berel.com/productos` →
+  **197 keywords y 100/100 URLs del detalle bajo la ruta** (el filtro `relative_url` verificado
+  contra el proveedor real) · `url` `/ubica-tienda` → 60 keywords · `subdomain` `www.berel.com`
+  → `no_market_data` honesto con fila NULL. Costo del tramo: USD 0.0552 + 120 filas de mercado.
+- Scheduler `ops-seo-url-visibility` **despausado (ENABLED)**. Lane canary verde en staging
+  (`mode=subject`, `servedMarket=MX`). Señal `seo.url_visibility.stale_subjects` en steady `ok`.
+- Pendiente para `complete`: pase develop→main + federación de `get_seo_url_visibility` en
+  `efeonce-mcp` (post-release).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

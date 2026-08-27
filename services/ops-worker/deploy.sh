@@ -799,7 +799,9 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED=${GROWTH_SEO_KEYWOR
 # Es SUBORDINADO: con `GROWTH_SEO_ENABLED=false` la captura no corre aunque éste esté ON.
 # Rollback (<5 min): volver a `false` acá + `--update-env-vars` — deja de gastar de inmediato
 # y las filas capturadas quedan (la tabla es append-only).
-GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED="${GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED:-false}"
+# **ON desde 2026-08-27** (autorización del operador; dry-run + corrida real + re-corrida a
+# USD 0 verificados el mismo día; scheduler despausado tras el smoke).
+GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED="${GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED=${GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED}"
 
 # TASK-1776 — Visibilidad de mercado por sujeto-página (`ranked_keywords` sobre el dominio del
@@ -812,7 +814,10 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED=${GROWTH_SEO_DOMAIN_OVE
 # ⚠️ Lo lee SOLO el ops-worker (en Vercel es inerte). Declararlo acá es obligatorio —
 # `--set-env-vars` es destructivo y lo borraría en el próximo deploy, en silencio.
 # Es SUBORDINADO a `GROWTH_SEO_ENABLED`. Rollback (<5 min): `false` acá + `--update-env-vars`.
-GROWTH_SEO_URL_VISIBILITY_ENABLED="${GROWTH_SEO_URL_VISIBILITY_ENABLED:-false}"
+# **ON desde 2026-08-27** (autorización del operador; dry-run + corrida real con los cuatro
+# subject_kind + enriquecimiento de mercado a costo 0 + re-corrida a USD 0 verificados;
+# scheduler despausado tras el smoke).
+GROWTH_SEO_URL_VISIBILITY_ENABLED="${GROWTH_SEO_URL_VISIBILITY_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_URL_VISIBILITY_ENABLED=${GROWTH_SEO_URL_VISIBILITY_ENABLED}"
 
 # TASK-1777 — Drill-down nominal del perfil de enlaces (paso post-batch del snapshot semanal
@@ -826,7 +831,9 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_URL_VISIBILITY_ENABLED=${GROWTH_SEO_URL_VISIBIL
 # ⚠️ Lo lee SOLO el ops-worker. Declararlo acá es obligatorio (`--set-env-vars` destructivo).
 # Es SUBORDINADO a `GROWTH_SEO_ENABLED`. Rollback (<5 min): `false` + `--update-env-vars` —
 # el batch semanal vuelve a su comportamiento actual sin tocar el cron ni redeployar.
-GROWTH_SEO_BACKLINK_DETAIL_ENABLED="${GROWTH_SEO_BACKLINK_DETAIL_ENABLED:-false}"
+# **ON desde 2026-08-27** (autorización del operador; smoke live verificado el mismo día:
+# drill-down sobre los snapshots del 2026-08-24 con first_time, re-corrida a USD 0).
+GROWTH_SEO_BACKLINK_DETAIL_ENABLED="${GROWTH_SEO_BACKLINK_DETAIL_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_BACKLINK_DETAIL_ENABLED=${GROWTH_SEO_BACKLINK_DETAIL_ENABLED}"
 
 # TASK-1664 — keyword discovery (DataForSEO Labs Live: seed expansion + enrichment).

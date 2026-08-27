@@ -44,6 +44,23 @@ CON movimiento (filas hijas + `cost` vs estimado) y otro SIN movimiento (USD 0 e
 canary de la tool MCP en staging + federación `efeonce-mcp` + confirmar umbrales/limit. Hasta
 entonces: flag OFF, cero gasto, el batch semanal intacto.
 
+### Evidencia de rollout 2026-08-27 (smoke live autorizado por el operador)
+
+- Flag ON (declarativo + `--update-env-vars`, revisión `ops-worker-00603-ngj` verificada).
+  Drill-down sobre los snapshots del 2026-08-24 **ya pagados** (el capture hizo skip a USD 0):
+  2 targets `drilled` por `first_time` — Efeonce USD 0.0739 (28 dominios, 9 anchors), Berel
+  USD 0.1079 (197 dominios, 77 anchors). **Total USD 0.1818 vs ~0.19 estimado.**
+- **Re-corrida: USD 0** (`detailPass.snapshots: 0` — el veredicto ancla la idempotencia).
+  Filas verificadas en PG: 225 dominios (72 `present` / 120 `new` / 33 `lost` — Berel perdió
+  `apps.apple.com`, un hallazgo nominal real), `rank` 100% en escala 0-100, 86 anchors.
+- Lane canary verde en staging (`state=available`, `capturedAt=2026-08-24`). Señal
+  `seo.backlink.detail_drilldown_failed` en steady `ok` (2 evaluados, 2 drilled, 0 fallidos).
+- El caso `skipped_no_movement` a USD 0 no pudo producirse en el smoke (ambos targets eran
+  `first_time`): se observa en el primer ciclo natural del lunes 2026-08-31 — anotado en el
+  ledger como verificación pendiente, cubierto por test mientras tanto.
+- Pendiente para `complete`: pase develop→main + federación de `get_seo_backlink_detail` en
+  `efeonce-mcp` (post-release).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
