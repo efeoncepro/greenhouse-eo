@@ -6,6 +6,10 @@ export type ApiPlatformErrorCode =
   | 'consumer_expired'
   | 'consumer_not_active'
   | 'forbidden'
+  // TASK-1773 — la propuesta de desenlace caducó: alguien decidió, archivó o movió la postulación
+  // entre `propose` y `confirm`. Es 409 y NO se aplana a `bad_request`: el consumer debe distinguir
+  // «tu payload está mal» de «el mundo cambió, vuelve a proponer».
+  | 'hiring_decision_proposal_stale'
   | 'idempotency_conflict'
   | 'idempotency_in_progress'
   | 'internal_error'
