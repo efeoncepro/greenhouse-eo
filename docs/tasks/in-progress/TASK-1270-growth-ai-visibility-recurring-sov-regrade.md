@@ -137,7 +137,12 @@ Reglas obligatorias:
 ### Migration, backfill and rollout
 
 - Migration posture: `additive` (opt-in flag + cadence column en `grader_profiles`).
-- Default state: staging `flag ON` (`GROWTH_AI_VISIBILITY_REGRADE_ENABLED`) tras rollout develop; production `flag OFF`; opt-in vacío por defecto.
+- 🔴 **CORREGIDO 2026-08-26 — el gate de producción que esta task describe no existe.** El ops-worker
+  es **un servicio único compartido staging+prod**: no hay un valor «production» separado que flipear.
+  `services/ops-worker/deploy.sh:626-627` fija `REGRADE_ENABLED=true` y `SCHEDULER_PAUSED=false` en la
+  rama `production`. Cualquiera que espere ese «flip a prod con cooldown» esperaría indefinidamente
+  mientras el re-grade ya corre. Default real: flag ON, scheduler despausado, opt-in vacío — el freno
+  efectivo es el opt-in vacío, no el flag.
 - Backfill plan: N/A (cadencia prospectiva).
 - Rollback path: flag OFF + deshabilitar Cloud Scheduler job + redeploy.
 - External coordination: Cloud Scheduler job en GCP (staging + prod) + budget sign-off.

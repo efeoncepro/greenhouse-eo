@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-020`
-- Status real: `Diseno`
+- Status real: `Live en producción desde 2026-08-07 — pendiente el protocolo de cierre`
 - Rank: `TBD`
 - Domain: `growth|integrations|identity|data`
 - Blocked by: `none`

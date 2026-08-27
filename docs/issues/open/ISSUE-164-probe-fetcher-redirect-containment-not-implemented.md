@@ -1,16 +1,43 @@
 # ISSUE-164 — El fetcher de probes promete una contención de redirects que no implementa
 
 > **Estado:** open
-> **Ambiente:** staging (`GROWTH_AI_VISIBILITY_PROBES_ENABLED` y `GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_ENABLED` están **ON en staging y OFF en producción**)
+> **Ambiente:** 🔴 **ops-worker vivo** — los tres flags de probes están `true` en la revisión activa (verificado 2026-08-26, ver Delta)
 > **Detectado:** 2026-08-26, por auditoría de código al evaluar el fetcher para uso comercial sobre prospectos
-> **Severidad:** alta (SSRF con exfiltración potencial hacia el resultado del probe) — **mitigada hoy** porque ningún consumer está prendido en producción
+> **Severidad:** alta (SSRF con exfiltración potencial hacia el resultado del probe) — **la mitigación declarada en la v1 de este issue NO se sostiene**
 > **Dominio:** Growth / AI Visibility Grader · sustrato de sitio
 > **Task relacionada:** `TASK-1778` (fix + endurecimiento del fetcher)
 
-⚠️ **Esto NO es un incidente vivo.** No hay explotación observada ni exposición en producción. Se
-documenta como issue —y no como task de hardening— porque es un **defecto del código actual**, no
-trabajo planificado, y porque su ventana de corrección tiene una fecha dura: el flip a producción de
-cualquiera de los dos flags. Registrarlo después de ese flip sería tarde.
+## 🔴 Delta 2026-08-26 — la premisa de mitigación era falsa
+
+La v1 de este issue afirmaba que los flags estaban *"ON en staging y OFF en producción"* y concluía
+*"NO es un incidente vivo… ningún consumer está prendido en producción"*. **Ambas cosas son falsas.**
+
+Consulta a la revisión activa del ops-worker (`gcloud run services describe ops-worker
+--region us-east4 --project efeonce-group`, 2026-08-26):
+
+```
+GROWTH_AI_VISIBILITY_PROBES_ENABLED        = true
+GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED = true
+GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_ENABLED = true
+```
+
+Y `services/ops-worker/deploy.sh:623,625,628` los declara `"true"` también en la rama `production`,
+bajo el comentario *"PRODUCTION — espeja staging … todo activo en prod"*.
+
+**De dónde salió el error, porque importa más que el error:** la v1 tomó el estado de
+`FEATURE_FLAG_STATE_LEDGER.md`, cuya tabla `§ Snapshot` se generó con `vercel env ls`. En esa fuente
+un flag ausente se lee como «OFF en producción» — pero **estos flags se leen en el ops-worker, no en
+Vercel**, así que su ausencia del listado nunca significó OFF. El defecto documental del ledger
+degradó la clasificación de severidad de un problema de seguridad. Ese defecto está descrito en
+`docs/audits/platform/2026-08-26-openseo-competitive-teardown-growth-seo-aeo.md` §3.11.
+
+**Qué cambia y qué no.** Cambia la ventana: no hay «flip futuro» que esperar, el fetcher ya atiende
+tráfico. **No** cambia la superficie de ataque, que sigue siendo acotada: el target es el dominio del
+propio cliente, cargado por un operador, no input de un atacante anónimo. El escenario real es un
+dominio sujeto comprometido —o un prospecto hostil en el carril comercial— que responda `302` hacia
+una dirección interna: el body se lee hasta 1 MiB y **se persiste como evidencia del probe**.
+
+**No hay explotación observada.** Lo que se retira es la afirmación de que no puede haberla.
 
 ## Síntoma
 

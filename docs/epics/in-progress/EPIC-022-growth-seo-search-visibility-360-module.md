@@ -2,14 +2,22 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Diseño`
+- Status real: `En producción — 21 hijas complete, 7 crons activos`
 - Rank: `TBD`
 - Domain: `cross-domain`
-- Owner: `unassigned`
+- Owner: `Julio Reyes`
+
+> **Corrección de estado 2026-08-26.** Este epic declaraba `Lifecycle: to-do`, `Status real: Diseño`
+> y `Owner: unassigned` mientras **siete crons suyos corren en producción** (`ops-seo-rank-capture`,
+> `gsc-snapshot`, `audit-enqueue`, `audit-collect`, `backlink-capture`, `keyword-market-data`,
+> `keyword-discovery-drain`, declarados en `services/ops-worker/deploy.sh`) y 21 tasks hijas están
+> `complete`. Un epic «en diseño» con dinero corriendo a diario en DataForSEO es la peor forma de
+> drift documental: cualquiera que lo lea para decidir prioridades parte de un mapa falso.
+> Origen: `docs/audits/platform/2026-08-26-openseo-competitive-teardown-growth-seo-aeo.md` §7.5.
 - Branch: `epic/EPIC-022-growth-seo-search-visibility-360-module`
 - GitHub Issue: `none`
 

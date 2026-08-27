@@ -205,7 +205,27 @@ _(Agrega acá cualquier flag que dejes code-complete sin prender. Si está vací
 
 ## § Snapshot de estado por environment
 
-> Snapshot **2026-06-18** vía `vercel env ls`. Un flag **ausente** de una columna = NO seteado = OFF/default en ese environment. **Verdad live: `vercel env ls`.**
+> ### 🔴 Cómo leer esta tabla (corregido 2026-08-26)
+>
+> Snapshot **2026-06-18** generado con `vercel env ls`. **Esa procedencia la vuelve inválida para
+> todo flag que no se lea en Vercel**, y buena parte de este ledger no se lee en Vercel.
+>
+> **La regla «ausente = OFF» sólo aplica a flags de Vercel.** Para un flag del **ops-worker**, su
+> ausencia de `vercel env ls` no significa nada: su fuente de verdad declarativa es
+> `services/ops-worker/deploy.sh` y su verdad live es
+> `gcloud run services describe ops-worker --region us-east4 --project efeonce-group`. Además el
+> ops-worker es **un servicio único compartido staging+prod**: para sus flags no existe «prod vs
+> staging», así que una celda `Production = —` sobre un flag suyo es literalmente un error de
+> categoría, no un dato.
+>
+> **Esto ya causó daño.** `ISSUE-164` (SSRF en el fetcher de probes) se clasificó como *«no es un
+> incidente vivo, ningún consumer está prendido en producción»* leyendo estas celdas. Los tres flags
+> de probes están `true` en la revisión activa del ops-worker, verificado el 2026-08-26. El defecto
+> documental degradó la severidad de un problema de seguridad.
+>
+> **Antes de tomar una decisión de rollout con esta tabla:** identifica primero **dónde se lee** el
+> flag (`grep -rn "<FLAG>" src/ services/`) y consulta la fuente que corresponda. Toda celda sin una
+> nota de «verificado con <comando> el <fecha>» es una conjetura de junio.
 
 | Flag | Production | staging | Preview/dev | Owner |
 |---|---|---|---|---|
@@ -268,6 +288,7 @@ _(Agrega acá cualquier flag que dejes code-complete sin prender. Si está vací
 | `CAREERS_NATIVE_GROWTH_FORM_ENABLED` | ✅ (2026-07-14, release `a3b5ea3adb30-afed291d-c084-4192-aed9-5de9905b8a64`, deployment `dpl_7Wpv3vSPoDXnTQq8Za2Xfw2ZHkt2`, HTTP/API/visual smoke PASS) | ✅ (2026-07-13, deployment `greenhouse-ldqkedyia`, GVC/API/submit smoke PASS) | — | TASK-1373 (cutover visual de apply a `<greenhouse-form>`; rollback: apagar/remover flag + redeploy para volver al custom form) |
 | `HIRING_HANDOFF_BRIDGES_ENABLED` | ✅ (2026-07-14, Vercel `dpl_Grm71rLhwyyURq9ar7jf87i7DGzF` + ops-worker `00488-fvl`; smoke API) | ✅ (2026-07-13, redeploy `greenhouse-ird9fygnf`) | — | TASK-356 (materializer siempre-ON sin flag; el flag gatea solo readers/bridges) |
 | `HIRING_ACTIVATION_ENABLED` | ✅ (2026-07-14, Vercel `dpl_Grm71rLhwyyURq9ar7jf87i7DGzF`; smoke API) | ✅ (2026-07-13, redeploy `greenhouse-ird9fygnf`; smoke API) | — | TASK-770/TASK-1400 (bridge hiring→HRIS; se apila sobre el flag de 356) |
+| 🔴 **BLOQUE GRADER — las celdas `Production = —` de aquí abajo son FALSAS.** Estos flags se leen en el **ops-worker**, cuya rama `production` de `deploy.sh:607-631` los declara `"true"` con el comentario *"PRODUCTION — espeja staging … todo activo en prod"*. Verificado contra la revisión activa el 2026-08-26 para `PROBES`, `ENTITY_PROBES` y `BRAND_INTELLIGENCE`: los tres `true`. **No planifiques un rollout AEO con esta columna.** | 🔴 | 🔴 | 🔴 | corrección 2026-08-26 |
 | `GROWTH_AI_VISIBILITY_GRADER_ENABLED` | — | ✅ (2026-06-24) | — | TASK-1226 |
 | `GROWTH_AI_VISIBILITY_OPENAI_ENABLED` | — | ✅ (2026-06-24, smoke real local OK) | — | TASK-1226 |
 | `GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED` | — | ✅ (2026-06-24, smoke real local OK) | — | TASK-1226 |

@@ -195,7 +195,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `migrations/[nueva]-task-1662-seo-competitors.sql`
+- `migrations/[nueva]-task-1662-seo-competitors-authorship.sql` (**`ALTER TABLE`**, la tabla ya existe — ver §Gap)
 - `src/lib/growth/seo/competitors.ts`
 - `src/lib/growth/seo/keyword-gap-reader.ts`
 
@@ -209,7 +209,12 @@ Reglas obligatorias:
 
 ### Gap
 
-- No hay modelo de competidor: ninguna tabla, ningún command, ningún reader
+- 🔴 **CORREGIDO 2026-08-26 — la tabla SÍ existe.** `greenhouse_growth.seo_competitors` fue creada
+  por `migrations/20260805134439202_task-1299-growth-seo-schema.sql:59-76`, con índice único parcial
+  de vigencia y trigger anti-DELETE. Lo que **no** existe es su command, su reader ni sus columnas de
+  autoría. **Su migración debe ser `ALTER`, nunca `CREATE`**: un `CREATE TABLE IF NOT EXISTS` haría
+  **no-op en silencio**, esta task cerraría en verde y `declared_by` nunca existiría. Y ojo con el
+  dueño: `TASK-1699` (P0) ya reclama darle su primer consumer, así que el orden importa
 - No hay cobertura de keywords de terceros
 - No hay cruce ni priorización
 

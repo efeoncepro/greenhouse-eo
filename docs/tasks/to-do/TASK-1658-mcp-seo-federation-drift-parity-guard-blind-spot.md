@@ -40,7 +40,7 @@ mira el lado por el que entra el error es peor que no tener guard: da confianza 
 `efeonce-mcp/src/providers/greenhouse-seo-tool-parity.ts` declara su propia regla en el
 comentario de cabecera: *"si una tool interna de Greenhouse NO debe federarse, va en EXCLUSIONS
 con razón — nunca simplemente ausente"*. Hoy `GREENHOUSE_SEO_TOOL_EXCLUSIONS` está **vacío** y
-`EXPECTED_GREENHOUSE_SEO_TOOLS` cubre 8 de las 11 tools SEO que registra
+`EXPECTED_GREENHOUSE_SEO_TOOLS` cubre 13 de las 16 tools SEO que registra (**recontado 2026-08-26**; el «8 de 11» original era de otra fecha y subestimaba el gap)
 `src/mcp/greenhouse/server.ts`. Las 3 ausentes no son una decisión documentada: son un olvido.
 
 El problema de fondo no son las 3 tools —son de `TASK-1306`/`TASK-1307` y federarlas es
@@ -94,7 +94,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `src/mcp/greenhouse/server.ts` — las 11 tools SEO ya registradas (`TASK-1306`/`1307`/`1308`/`1645`)
+- `src/mcp/greenhouse/server.ts` — las **16** tools SEO ya registradas (12 lecturas + 4 escrituras) (`TASK-1306`/`1307`/`1308`/`1645`)
 - `src/app/api/platform/ecosystem/growth/seo/**` — el lane que las 3 tools necesitarían; **[verificar]**
   si existe endpoint ecosystem para overview-kpis / performance / performance-catalog, o si hay que
   crearlo (cambia el Effort de `Bajo` a `Medio`)
