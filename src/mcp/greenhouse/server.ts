@@ -322,6 +322,23 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getSeoUrlVisibility(args)
   )
 
+  // TASK-1777 — el detalle que hace accionable el snapshot de enlaces: nombres, no conteos.
+  server.registerTool(
+    'get_seo_backlink_detail',
+    {
+      title: 'Get SEO Backlink Detail',
+      description:
+        'Get the actionable backlink detail behind the weekly aggregate snapshot: WHICH referring domains link to the organization SEO target (with rank 0-100 and per-domain spam score), which domains are NEW or LOST in the window (with a sample link and anchor — enough to write a recovery email), the anchor-text profile, and a server-derived anchor over-optimization reading (dominant anchor share + brand/generic/url/exact mix). CRITICAL: the response has THREE distinct states — "available" (detail exists), "skipped_no_movement" (the profile was STABLE that week, so no detail was purchased: report it as a positive finding, NEVER as missing data), and "drilldown_failed" (we tried and do not know what moved: report honestly). The anchor over-optimization metric is SEPARATE from toxic_share (spam-score proxy) — they answer different questions and are never interchangeable. Pass captureDate=YYYY-MM-DD for a specific week; default is the latest evaluated snapshot.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(2).max(12).optional(),
+        captureDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoBacklinkDetail(args)
+  )
+
   server.registerTool(
     'get_seo_visibility_360',
     {

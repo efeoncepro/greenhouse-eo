@@ -214,6 +214,15 @@ export class GreenhouseApiPlatformClient {
     })
   }
 
+  // TASK-1777 — detalle nominal de enlaces (tres estados; el skip es información).
+  async getSeoBacklinkDetail(input: { organizationId?: string; market?: string; captureDate?: string }) {
+    return this.request('/api/platform/ecosystem/growth/seo/backlink-detail', {
+      organizationId: input.organizationId,
+      market: input.market,
+      captureDate: input.captureDate
+    })
+  }
+
   async getSeoVisibility360(input: { organizationId?: string; market?: string }) {
     return this.request('/api/platform/ecosystem/growth/seo/visibility-360', {
       organizationId: input.organizationId

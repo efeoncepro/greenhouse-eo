@@ -16,6 +16,7 @@ import {
   type ReadUrlVisibilityResult,
   type ReadVisibilityConcentrationResult
 } from '@/lib/growth/seo/url-visibility/reader'
+import { readBacklinkDetail, type BacklinkDetailResult } from '@/lib/growth/seo/backlinks/detail-reader'
 import { isVisibilitySubjectKind } from '@/lib/growth/seo/url-visibility/resolve-subject'
 import {
   SEO_DISCOVERY_ACTION_KINDS,
@@ -739,6 +740,49 @@ export const getEcosystemSeoBacklinkProfilePayload = async ({
   const rangeDays = Number.isFinite(rawRange) && rawRange > 0 ? Math.floor(rawRange) : undefined
 
   const result = await readBacklinkProfile(subject.seoTargetId, rangeDays ? { rangeDays } : {})
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+export type EcosystemSeoBacklinkDetailPayload = BacklinkDetailResult | SeoTargetNotConfiguredPayload
+
+/**
+ * GET /api/platform/ecosystem/growth/seo/backlink-detail — TASK-1777.
+ *
+ * El detalle nominal del perfil de enlaces con sus TRES estados distinguibles: `available`
+ * (hay drill-down), `skipped_no_movement` ("el perfil estuvo estable" — afirmación positiva,
+ * no un hueco) y `drilldown_failed` (se intentó y falló). Passthrough del reader canónico;
+ * la derivación de sobre-optimización de anchors viaja YA calculada — ningún consumer la
+ * recalcula. `?captureDate=YYYY-MM-DD` fija la semana; default: la más reciente evaluada.
+ */
+export const getEcosystemSeoBacklinkDetailPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<EcosystemSeoBacklinkDetailPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const url = new URL(request.url)
+  const rawDate = url.searchParams.get('captureDate')
+  const captureDate = rawDate && /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : undefined
+
+  const result = await readBacklinkDetail(subject.seoTargetId, captureDate ? { captureDate } : {})
 
   return {
     data: result,

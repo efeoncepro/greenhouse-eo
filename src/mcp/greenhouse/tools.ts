@@ -193,6 +193,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'getSeoKeywordMarketData'
   | 'getSeoDomainOverview'
   | 'getSeoUrlVisibility'
+  | 'getSeoBacklinkDetail'
   | 'getSeoKeywordDiscovery'
   | 'discoverSeoKeywords'
   | 'getSeoGroundedQueryDraft'
@@ -506,6 +507,44 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         )
       },
       () => client.getSeoUrlVisibility(input)
+    )
+  },
+  async getSeoBacklinkDetail(input: { organizationId?: string; market?: string; captureDate?: string }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          state?: string
+          captureDate?: string
+          domains?: unknown[]
+          newDomains?: number
+          lostDomains?: number
+          anchorProfile?: { dominantAnchor?: string | null; dominantShare?: number | null }
+        }
+
+        if (data.ok === false) {
+          return `SEO backlink detail unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        if (data.state === 'skipped_no_movement') {
+          // Afirmación POSITIVA: el perfil estuvo estable. Jamás reportarlo como "sin datos".
+          return `Backlink profile was STABLE for the week of ${String(data.captureDate ?? 'unknown')} — no drill-down was purchased because nothing moved. That is a finding, not missing data (${result.requestId}).`
+        }
+
+        if (data.state === 'drilldown_failed') {
+          return `Backlink detail drill-down FAILED for the week of ${String(data.captureDate ?? 'unknown')} — we do not know what moved. Report this honestly; never present it as "stable" (${result.requestId}).`
+        }
+
+        const domains = Array.isArray(data.domains) ? data.domains.length : 0
+
+        return (
+          `Backlink detail for week ${String(data.captureDate ?? 'unknown')}: ${domains} referring domain(s) ` +
+          `(${String(data.newDomains ?? 0)} new, ${String(data.lostDomains ?? 0)} lost), dominant anchor ` +
+          `"${String(data.anchorProfile?.dominantAnchor ?? 'n/a')}" at ${String(data.anchorProfile?.dominantShare ?? 'n/a')} share (${result.requestId}).`
+        )
+      },
+      () => client.getSeoBacklinkDetail(input)
     )
   },
   async getSeoVisibility360(input: { organizationId?: string; market?: string }) {
