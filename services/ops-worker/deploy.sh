@@ -802,6 +802,19 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED=${GROWTH_SEO_KEYWOR
 GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED="${GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED:-false}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED=${GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED}"
 
+# TASK-1776 — Visibilidad de mercado por sujeto-página (`ranked_keywords` sobre el dominio del
+# target + competidores; primitives on-demand relevant_pages/subdomains).
+#
+# 🔴 **OFF por defecto.** Cada sujeto cuesta task setup + hasta `GROWTH_SEO_URL_VISIBILITY_ROW_LIMIT`
+# filas (default 100 → ~USD 0.024/sujeto). Nace apagado y sólo se enciende tras el smoke real
+# con los cuatro subject_kind + autorización del operador (TASK-1776 Slice 6).
+#
+# ⚠️ Lo lee SOLO el ops-worker (en Vercel es inerte). Declararlo acá es obligatorio —
+# `--set-env-vars` es destructivo y lo borraría en el próximo deploy, en silencio.
+# Es SUBORDINADO a `GROWTH_SEO_ENABLED`. Rollback (<5 min): `false` acá + `--update-env-vars`.
+GROWTH_SEO_URL_VISIBILITY_ENABLED="${GROWTH_SEO_URL_VISIBILITY_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},GROWTH_SEO_URL_VISIBILITY_ENABLED=${GROWTH_SEO_URL_VISIBILITY_ENABLED}"
+
 # TASK-1664 — keyword discovery (DataForSEO Labs Live: seed expansion + enrichment).
 # 🔴 Prenderlo habilita corridas que GASTAN (cada request y cada fila cuestan) — pero SOLO
 # corridas encoladas explícitamente por un operador/agente con entitlement: no existe enqueue
@@ -1408,6 +1421,22 @@ upsert_scheduler_job \
   '{}' \
   "true"
 echo "  -> ops-seo-domain-overview: 0 9 16 * * PAUSADO (foto de dominio mensual, TASK-1775 — despausar sólo tras smoke real + autorización del operador)"
+
+# Visibilidad por sujeto-página — TASK-1776.
+#
+# ⚠️ MENSUAL (las bases Labs se refrescan por ciclo). Día 17 a propósito: no apilar gasto de
+# proveedor con keyword-market-data (día 15) ni con la foto de dominio (día 16).
+#
+# 🔴 NACE PAUSADO y el flag `GROWTH_SEO_URL_VISIBILITY_ENABLED` nace en `false`: dos frenos
+# independientes (patrón TASK-1661/1775). Antes de despausar: dry-run (`{"dryRun": true}`),
+# smoke real con los cuatro subject_kind y autorización del operador.
+upsert_scheduler_job \
+  "ops-seo-url-visibility" \
+  "0 9 17 * *" \
+  "/seo/url-visibility/capture-batch" \
+  '{}' \
+  "true"
+echo "  -> ops-seo-url-visibility: 0 9 17 * * PAUSADO (visibilidad por sujeto-página mensual, TASK-1776 — despausar sólo tras smoke real + autorización del operador)"
 
 # TASK-1664 — drain de corridas de keyword discovery (Labs Live, bajo demanda del operador).
 # Cada 10 minutos alcanza de sobra: el enqueue es humano/agente (no hay cadencia diaria en V1)
