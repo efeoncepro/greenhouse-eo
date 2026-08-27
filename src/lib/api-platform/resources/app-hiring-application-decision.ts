@@ -26,13 +26,26 @@ const string = (body: CommandBody, key: string) => (typeof body[key] === 'string
 const idempotencyKey = (request: Request, body: CommandBody) =>
   request.headers.get('idempotency-key')?.trim() || string(body, 'idempotencyKey')
 
-/** Traduce el error de dominio al del lane sin filtrar detalle interno. */
+/**
+ * Traduce el error de dominio al del lane sin filtrar detalle interno.
+ *
+ * 🔴 Mapea por CÓDIGO de dominio, no por status. El command emite TRES 409 distintos y cada uno tiene una
+ * acción distinta para quien llama; colapsarlos por `statusCode === 409` fue un defecto de la primera
+ * versión de este archivo — la misma clase que TASK-1751 corrigió del lado del candidato.
+ */
+const DOMAIN_409_CODES: Record<string, 'hiring_decision_proposal_stale' | 'hiring_decision_idempotency_conflict' | 'hiring_opening_not_open_for_decision'> = {
+  hiring_decision_proposal_stale: 'hiring_decision_proposal_stale',
+  hiring_decision_idempotency_conflict: 'hiring_decision_idempotency_conflict',
+  hiring_opening_not_open_for_decision: 'hiring_opening_not_open_for_decision',
+}
+
 const run = async <T>(operation: () => Promise<T>): Promise<T> => {
   try {
     return await operation()
   } catch (error) {
     if (isHiringError(error)) {
       const statusCode = error.statusCode ?? 400
+      const domainCode = (error as { code?: string }).code ?? ''
 
       throw new ApiPlatformError(error.message, {
         statusCode,
@@ -42,7 +55,7 @@ const run = async <T>(operation: () => Promise<T>): Promise<T> => {
             : statusCode === 403
               ? 'forbidden'
               : statusCode === 409
-                ? 'hiring_decision_proposal_stale'
+                ? (DOMAIN_409_CODES[domainCode] ?? 'hiring_decision_proposal_stale')
                 : 'bad_request',
       })
     }
@@ -126,6 +139,10 @@ export const confirmAppHiringApplicationDecision = async ({
     cause: (string(body, 'cause') || null) as HiringDecisionCause | null,
     reason: { summary: string(body, 'reasonSummary') },
     idempotencyKey: idempotencyKey(request, body),
+    // Sin esto, `selected` y `backup_selected` fallaban SIEMPRE por este carril: el command exige
+    // destino para ambos (`assertDestination`), y el adaptador no lo reenviaba. Dos de los seis
+    // desenlaces quedaban inalcanzables por la ruta que existe para alcanzarlos.
+    selectedDestination: (string(body, 'selectedDestination') || null) as DecideHiringApplicationInput['selectedDestination'],
   } satisfies DecideHiringApplicationInput
 
   return run(() =>

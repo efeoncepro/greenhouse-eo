@@ -6,10 +6,15 @@ export type ApiPlatformErrorCode =
   | 'consumer_expired'
   | 'consumer_not_active'
   | 'forbidden'
-  // TASK-1773 — la propuesta de desenlace caducó: alguien decidió, archivó o movió la postulación
-  // entre `propose` y `confirm`. Es 409 y NO se aplana a `bad_request`: el consumer debe distinguir
-  // «tu payload está mal» de «el mundo cambió, vuelve a proponer».
+  // TASK-1773 — los TRES 409 del carril de desenlace, cada uno con su código. Aplanarlos a uno fue un
+  // defecto real de la primera versión de este adaptador, y es la misma clase que TASK-1751 corrigió del
+  // lado del candidato: cinco causas rindiendo un mensaje. Cada una tiene una acción distinta.
+  //   · la propuesta caducó (alguien decidió/archivó entre `propose` y `confirm`) → volver a proponer
+  //   · misma clave de idempotencia con otro payload → NO es replay, es conflicto: revisar qué se manda
+  //   · la vacante ya está cerrada/cancelada → seleccionar ahí es imposible, no hay reintento que sirva
   | 'hiring_decision_proposal_stale'
+  | 'hiring_decision_idempotency_conflict'
+  | 'hiring_opening_not_open_for_decision'
   | 'idempotency_conflict'
   | 'idempotency_in_progress'
   | 'internal_error'

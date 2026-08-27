@@ -99,11 +99,35 @@ describe('TASK-1773 — el lane app del eje de desenlace', () => {
     })
   })
 
-  it('una propuesta caducada llega como 409 propio, no aplanada a bad_request', async () => {
-    mocks.confirm.mockRejectedValue({ code: 'hiring_decision_proposal_stale', statusCode: 409, message: 'cambió' })
+  it('🔴 los TRES 409 del dominio conservan su código: no se aplanan a uno', async () => {
+    // Defecto real de la primera versión de este adaptador: mapeaba por `statusCode === 409` y los tres
+    // rendían `hiring_decision_proposal_stale`. Cada uno tiene una acción distinta para quien llama —
+    // volver a proponer, revisar el payload, o aceptar que no hay reintento posible.
+    const cases = [
+      'hiring_decision_proposal_stale',
+      'hiring_decision_idempotency_conflict',
+      'hiring_opening_not_open_for_decision'
+    ] as const
 
-    await expect(
-      confirmAppHiringApplicationDecision({ context: context(), request: request(), applicationId: 'app-1', body: {} })
-    ).rejects.toMatchObject({ errorCode: 'hiring_decision_proposal_stale' })
+    for (const code of cases) {
+      mocks.confirm.mockRejectedValue({ code, statusCode: 409, message: 'conflicto' })
+
+      await expect(
+        confirmAppHiringApplicationDecision({ context: context(), request: request(), applicationId: 'app-1', body: {} })
+      ).rejects.toMatchObject({ errorCode: code })
+    }
+  })
+
+  it('🔴 reenvía `selectedDestination`: sin él, `selected` era inalcanzable por esta ruta', async () => {
+    await confirmAppHiringApplicationDecision({
+      context: context(),
+      request: request(),
+      applicationId: 'app-1',
+      body: { decision: 'selected', reasonSummary: 'avanza', effectDigest: 'hdp-x', selectedDestination: 'internal_hire' }
+    })
+
+    expect(mocks.confirm).toHaveBeenCalledWith(
+      expect.objectContaining({ input: expect.objectContaining({ selectedDestination: 'internal_hire' }) })
+    )
   })
 })
