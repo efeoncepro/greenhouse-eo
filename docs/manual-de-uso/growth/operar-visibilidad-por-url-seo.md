@@ -22,8 +22,10 @@ exacta en una SERP concreta; la de Search Console es un promedio ponderado por i
 ## Antes de empezar
 
 - Módulo SEO activo + org con `seo_v2` vigente. Sujetos del cron: dominio del target + competidores.
-- **Rollout al crearse esta capacidad:** flag `GROWTH_SEO_URL_VISIBILITY_ENABLED` en `false` y
-  scheduler `ops-seo-url-visibility` **pausado** (dos frenos).
+- **Rollout vigente (2026-08-27, smoke live autorizado):** flag
+  `GROWTH_SEO_URL_VISIBILITY_ENABLED=true` en el ops-worker (deploy.sh + revisión activa
+  verificada) y scheduler `ops-seo-url-visibility` **ACTIVO** (`ENABLED`, día 17 de cada mes
+  09:00). El ciclo mensual corre solo.
 - **La clase del sujeto se DECLARA, nunca se infiere**: `ejemplo.cl/blog` puede ser subcarpeta o
   URL exacta y sólo quien pide la corrida sabe cuál quiso.
 

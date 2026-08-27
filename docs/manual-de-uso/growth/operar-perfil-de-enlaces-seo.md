@@ -21,7 +21,12 @@ estuvo estable"), no un hueco.
 
 - El snapshot semanal ya corre solo: cron `ops-seo-backlink-capture` (lunes 07:00 CLT, ACTIVO).
 - **El detalle NO tiene cron propio**: es un paso del mismo batch, detrás de
-  `GROWTH_SEO_BACKLINK_DETAIL_ENABLED` (nace OFF). No hay scheduler nuevo que crear.
+  `GROWTH_SEO_BACKLINK_DETAIL_ENABLED` (**ON desde 2026-08-27**, smoke live autorizado; deploy.sh
+  + revisión activa verificada). No hay scheduler nuevo que crear.
+- **Verificación pendiente (lunes 2026-08-31, primer ciclo natural con el flag ON):** confirmar
+  que targets sin movimiento salen `skipped_no_movement` a USD 0 — receta SQL en el Delta (3) de
+  `docs/tasks/in-progress/TASK-1777-growth-seo-backlink-profile-drilldown.md`. Hasta entonces el
+  estado es `code complete, rollout parcialmente verificado`.
 - Umbrales y limit (fijan el costo anual — confirmarlos antes del flip):
   `GROWTH_SEO_BACKLINK_DRILLDOWN_MIN_BACKLINK_MOVEMENT` (default 10),
   `…_MIN_REFDOMAIN_MOVEMENT` (default 3), `GROWTH_SEO_BACKLINK_DETAIL_ROW_LIMIT` (default 100).

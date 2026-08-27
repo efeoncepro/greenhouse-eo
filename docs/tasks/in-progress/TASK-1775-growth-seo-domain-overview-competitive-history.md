@@ -51,6 +51,14 @@ declarado pausado, cero gasto.
   `get_seo_domain_overview` en `efeonce-mcp` (post-release, coordinado con la sesión de release).
   El backfill histórico (`--apply`) sigue disponible bajo demanda con su tope; no se corrió.
 
+## Delta 2026-08-27 (2) — federación al gateway ya escrita
+
+- La federación de `get_seo_domain_overview` en `efeonce-mcp` ya está escrita (bajo
+  `efeonce.mcp.read`, con guard de paridad bidireccional y canary; code complete en 4 commits
+  locales de `efeonce-mcp`, deploy del gateway pendiente POST-release develop→main) — cerrado por
+  trabajo en TASK-1658. Lo que sigue pendiente para `complete` de esta task es el pase
+  develop→main + deploy del gateway + verificación `tools/list` 13→21.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -580,16 +588,17 @@ Sin `capturedBy`. Sin cruce con GSC. Si el sujeto no tiene snapshot, el reader d
 
 - [x] La migración crea `seo_domain_overview_snapshots` con clave única `(normalized_domain, location_code, language_code, capture_date)`, trigger anti UPDATE/DELETE y GRANT a `greenhouse_runtime`, y su bloque DO aborta si algo no quedó creado.
 - [x] `captured_by_organization_id` existe en la tabla, **no** está en la clave única y **no** aparece en ningún DTO devuelto por el reader; hay un test que lo prueba.
-- [ ] `captureDomainOverview` salta sujetos frescos sin pegar el proveedor: correrlo dos veces seguidas registra USD 0 en la segunda, verificado con el `cost` real del proveedor y no sólo con mocks.
-- [ ] Un sujeto que el proveedor no conoce deja fila con métricas `NULL` y no vuelve a comprarse en la corrida siguiente.
+- [x] `captureDomainOverview` salta sujetos frescos sin pegar el proveedor: correrlo dos veces seguidas registra USD 0 en la segunda, verificado con el `cost` real del proveedor y no sólo con mocks. *(Smoke 2026-08-27: re-corrida USD 0 con ambos `fresh`.)*
+- [ ] Un sujeto que el proveedor no conoce deja fila con métricas `NULL` y no vuelve a comprarse en la corrida siguiente. *(Cubierto por unit test; no observado en runtime — ambos sujetos del smoke eran conocidos. Se observa cuando entre un dominio sin datos, o con una verificación puntual barata.)*
 - [x] `backfillDomainRankHistory` no gasta sin `--apply`, respeta un tope duro en USD y es resumible.
 - [x] `estimateDomainTraffic` acepta hasta 1.000 dominios en un request y escribe en la misma tabla.
 - [x] `readDomainOverview` devuelve `no_market_data` para un sujeto sin snapshot: no hay ceros fantasma.
 - [x] Toda métrica del DTO viaja con `lens: 'estimated'` y `capturedAt`.
-- [ ] La tool `get_seo_domain_overview` responde por el lane ecosystem con un canary verde en staging.
+- [x] La tool `get_seo_domain_overview` responde por el lane ecosystem con un canary verde en staging. *(Smoke 2026-08-27: binding `efeonce-mcp-gateway`, `servedMarket=MX`.)*
 - [x] La capability nueva tiene grant a ≥1 rol real en el mismo PR y el coverage test pasa.
 - [x] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` y `pnpm docs:closure-check` pasa.
-- [ ] El scheduler `ops-seo-domain-overview` quedó creado y su estado (pausado o activo) está declarado en el runbook.
+- [x] El scheduler `ops-seo-domain-overview` quedó creado y su estado (pausado o activo) está declarado en el runbook. *(Creado, ACTIVO desde 2026-08-27; runbook actualizado al estado vigente.)*
+- [ ] Cierre operativo: pase develop→main con los lanes en producción + deploy del gateway con la federación de `TASK-1658` (dueña) verificado con `tools/list` 13→21.
 - [x] Ninguna consulta nueva mezcla esta tabla con `seo_gsc_daily` en un mismo agregado.
 
 ## Verification

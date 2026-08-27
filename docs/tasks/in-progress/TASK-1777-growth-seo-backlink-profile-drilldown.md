@@ -61,6 +61,42 @@ entonces: flag OFF, cero gasto, el batch semanal intacto.
 - Pendiente para `complete`: pase develop→main + federación de `get_seo_backlink_detail` en
   `efeonce-mcp` (post-release).
 
+## Delta 2026-08-27 (3) — veredicto de auditoría: `code complete, rollout parcialmente verificado`
+
+- Auditoría del release (sesión coordinadora) sobre la evidencia del smoke: los criterios de costo
+  se cumplieron **salvo uno** — el predicado de movimiento (`skipped_no_movement` a USD 0) nunca se
+  ejercitó en runtime porque ambos targets eran `first_time`. La re-corrida a USD 0 falsa la
+  compuerta de **idempotencia** (veredicto único por snapshot), que es un predicado DISTINTO al de
+  movimiento: son dos compuertas y sólo una quedó observada. Exposición si el predicado estuviera
+  roto: ~USD 0.18 por lunes (~USD 9/año), acotada y observable.
+- **Decisión: el flag queda ON a propósito** — el ciclo natural del lunes **2026-08-31 07:00 CLT**
+  (`ops-seo-backlink-capture`) es el experimento que falta. Verificación (cualquier sesión, 1 min):
+
+  ```sql
+  SELECT d.outcome, d.trigger_reason, d.provider_cost_usd, s.captured_at::date
+  FROM greenhouse_growth.seo_backlink_drilldowns d
+  JOIN greenhouse_growth.seo_backlink_snapshots s ON s.id = d.snapshot_id
+  WHERE s.captured_at::date = '2026-08-31'
+  ORDER BY d.created_at;
+  ```
+
+  Sano: `skipped_no_movement` (o `skipped_partial`) con `provider_cost_usd = 0` para targets sin
+  delta vs la línea base drilleada del 24/27-08; `drilled` sólo con movimiento real sobre umbrales
+  (10 dominios / 3 posiciones, knobs por env). Cross-check: `seo_provider_spend_daily` de ese día
+  para backlinks suma 0 salvo drills legítimos. Si aparece `drilled` sin movimiento, el sospechoso
+  es `shouldDrillDownBacklinks` (`src/lib/growth/seo/backlinks/should-drill-down.ts`, predicado
+  puro con tests de tabla) — comparar contra el summary previo que recibió.
+- Esta verificación NO bloquea el pase develop→main; sólo bloquea marcar esta task `complete`.
+  Mientras tanto los criterios de arriba quedan con su estado real (uno pendiente, anotado).
+
+## Delta 2026-08-27 (2) — federación al gateway ya escrita
+
+- La federación de `get_seo_backlink_detail` en `efeonce-mcp` ya está escrita (bajo
+  `efeonce.mcp.read`, con guard de paridad bidireccional y canary; code complete en `efeonce-mcp`
+  local, deploy del gateway pendiente POST-release develop→main) — cerrado por trabajo en
+  TASK-1658. Pendiente para `complete` de esta task: pase develop→main + deploy del gateway +
+  verificación `tools/list` 13→21.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -551,15 +587,16 @@ especialista: "no pasó nada" y "no sabemos qué pasó" son conclusiones opuesta
 - [x] `shouldDrillDownBacklinks` es un predicado puro sin acceso a red ni DB, con tests de tabla sobre los cinco casos: sin movimiento, bajo umbral, sobre umbral, primera vez y snapshot `partial`.
 - [x] Un snapshot `partial` **no** dispara drill-down.
 - [x] La migración crea ambas tablas con FK a `seo_backlink_snapshots`, CHECK cerrado de `movement`, claves únicas, triggers anti UPDATE/DELETE y GRANT; el bloque DO aborta si algo no quedó creado.
-- [ ] Un target sin movimiento registra **USD 0** en `seo_provider_spend_daily`, verificado en el smoke real y no sólo con mocks.
-- [ ] Un target con movimiento deja filas en ambas tablas hijas y su `cost` real coincide con el estimado dentro del margen declarado.
+- [ ] Un target sin movimiento registra **USD 0** en `seo_provider_spend_daily`, verificado en el smoke real y no sólo con mocks. *(Pendiente de runtime: no pudo producirse en el smoke del 2026-08-27 — ambos targets eran `first_time`. Se observa en el primer ciclo natural del lunes 2026-08-31; receta de verificación en el Delta (3) abajo.)*
+- [x] Un target con movimiento deja filas en ambas tablas hijas y su `cost` real coincide con el estimado dentro del margen declarado. *(Smoke 2026-08-27: 225 referring domains + 86 anchors; USD 0.1818 real vs ~0.19 estimado.)*
 - [x] Todo `rank` persistido está en escala 0–100.
 - [x] `spam_score` de enlace y `backlinks_spam_score` de perfil viven en columnas distintas y `toxic_share` del padre no se recalcula.
 - [x] `readBacklinkDetail` distingue `available`, `skipped_no_movement` y `drilldown_failed` como estados separados.
 - [x] `readBacklinkProfile` devuelve exactamente el mismo shape que antes de esta task, probado con test de regresión.
 - [x] Un drill-down fallido deja veredicto `failed`, emite la señal y no fabrica filas. (El snapshot padre es append-only y no muta; el veredicto persistido es lo que lo declara.)
 - [x] La derivación de sobre-optimización de anchors vive en el primitive, no en ningún consumer.
-- [ ] La tool `get_seo_backlink_detail` responde por el lane ecosystem con canary verde en staging.
+- [x] La tool `get_seo_backlink_detail` responde por el lane ecosystem con canary verde en staging. *(Smoke 2026-08-27: `state=available`, `capturedAt=2026-08-24`.)*
+- [ ] Cierre operativo: pase develop→main con los lanes en producción + deploy del gateway con la federación de `TASK-1658` (dueña) verificado con `tools/list` 13→21.
 - [x] La capability tiene grant a ≥1 rol real en el mismo PR y el coverage test pasa.
 - [x] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` y `pnpm docs:closure-check` pasa.
 - [x] No se creó ningún Cloud Scheduler job nuevo.

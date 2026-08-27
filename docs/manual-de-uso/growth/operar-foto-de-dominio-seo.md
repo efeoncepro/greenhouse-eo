@@ -21,8 +21,11 @@ grafica junto a datos ● medidos de Search Console.
 - El módulo SEO debe estar activo (`GROWTH_SEO_ENABLED=true`) y la org con assignment `seo_v2` vigente.
 - Los sujetos salen de `seo_targets` (dominio del cliente) + `seo_competitors` (vigentes). Un
   dominio que no está declarado como target o competidor no se captura en el ciclo mensual.
-- **Estado de rollout al crearse esta capacidad:** flag `GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED` en
-  `false` y scheduler `ops-seo-domain-overview` **pausado** (dos frenos). Ver "Encendido" abajo.
+- **Estado de rollout vigente (2026-08-27, smoke live autorizado):** flag
+  `GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED=true` en el ops-worker (declarado en `deploy.sh` + revisión
+  activa verificada) y scheduler `ops-seo-domain-overview` **ACTIVO** (`ENABLED`, día 16 de cada
+  mes 09:00). El ciclo mensual corre solo; "Encendido" abajo queda como referencia del
+  procedimiento.
 
 ## Las tres corridas y su costo
 

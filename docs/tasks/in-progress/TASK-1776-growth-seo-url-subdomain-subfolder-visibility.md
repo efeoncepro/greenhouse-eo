@@ -52,6 +52,14 @@ Hasta entonces: flag OFF, scheduler declarado pausado, cero gasto.
 - Pendiente para `complete`: pase develop→main + federación de `get_seo_url_visibility` en
   `efeonce-mcp` (post-release).
 
+## Delta 2026-08-27 (2) — federación al gateway ya escrita
+
+- La federación de `get_seo_url_visibility` en `efeonce-mcp` ya está escrita (bajo
+  `efeonce.mcp.read`, con guard de paridad bidireccional — incluye `market` en el schema público —
+  y canary; code complete en `efeonce-mcp` local, deploy del gateway pendiente POST-release
+  develop→main) — cerrado por trabajo en TASK-1658. Pendiente para `complete` de esta task:
+  pase develop→main + deploy del gateway + verificación `tools/list` 13→21.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -524,14 +532,15 @@ keyword discovery.
 - [x] `resolveVisibilitySubject` produce la misma clave para `https://ejemplo.cl/guia`, `ejemplo.cl/guia/` y `www.ejemplo.cl/guia`, probado con tests de tabla.
 - [x] La migración crea la tabla con `subject_kind` bajo CHECK cerrado de cuatro valores, clave única sobre el sujeto normalizado, trigger anti UPDATE/DELETE y GRANT; el bloque DO aborta si algo no quedó creado.
 - [x] `captureUrlVisibility` opera las cuatro clases de sujeto con un solo colector.
-- [ ] Un sujeto `subfolder` devuelve sólo URLs bajo esa ruta, verificado contra el proveedor real.
-- [ ] El `keyword_info` inline queda escrito en `seo_keyword_market_data` vía `persistKeywordMarketData`, sin duplicados y **sin incrementar el costo del proveedor**, probado en el smoke real.
+- [x] Un sujeto `subfolder` devuelve sólo URLs bajo esa ruta, verificado contra el proveedor real. *(Smoke 2026-08-27: `berel.com/productos` → 100/100 URLs del detalle bajo la ruta.)*
+- [x] El `keyword_info` inline queda escrito en `seo_keyword_market_data` vía `persistKeywordMarketData`, sin duplicados y **sin incrementar el costo del proveedor**, probado en el smoke real. *(Smoke 2026-08-27: 210 filas de mercado con `providerCostUsd=0`.)*
 - [x] Ninguna derivación de barrera de enlaces usa `keyword_difficulty`.
-- [ ] Correr la captura dos veces seguidas dentro del ciclo registra USD 0 en la segunda, verificado con el `cost` real.
-- [ ] Un sujeto que el proveedor no conoce deja fila con NULLs y no se re-compra.
+- [x] Correr la captura dos veces seguidas dentro del ciclo registra USD 0 en la segunda, verificado con el `cost` real. *(Smoke 2026-08-27: re-corrida USD 0.)*
+- [x] Un sujeto que el proveedor no conoce deja fila con NULLs y no se re-compra. *(Smoke 2026-08-27: `www.berel.com` → `no_market_data` honesto con fila NULL; re-corrida USD 0.)*
 - [x] `readUrlVisibility` devuelve `no_market_data` para sujeto sin snapshot; cero ceros fantasma.
 - [x] Toda cifra del DTO viaja con lente `◑` y `capturedAt`; `captured_by_organization_id` no aparece, probado con test.
-- [ ] La tool `get_seo_url_visibility` responde por el lane ecosystem con canary verde en staging.
+- [x] La tool `get_seo_url_visibility` responde por el lane ecosystem con canary verde en staging. *(Smoke 2026-08-27: `mode=subject`, `servedMarket=MX`.)*
+- [ ] Cierre operativo: pase develop→main con los lanes en producción + deploy del gateway con la federación de `TASK-1658` (dueña) verificado con `tools/list` 13→21.
 - [x] La capability tiene grant a ≥1 rol real en el mismo PR y el coverage test pasa.
 - [x] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` y `pnpm docs:closure-check` pasa.
 - [x] Ninguna consulta nueva hace JOIN, VIEW o FK entre `seo_*` y `grader_*`.
