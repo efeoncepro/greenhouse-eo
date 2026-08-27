@@ -8,8 +8,9 @@ Load whenever the work happens _inside_ the Greenhouse repo (not pure advisory).
 
 - `src/types/hiring.ts` holds **five** lists, and confusing them is the bug:
   `HIRING_APPLICATION_STAGES` (**6** since TASK-1754 Slice F: `sourced`, `screening`, `shortlisted`,
-  `interview`, `decision_pending`, `closed` — it is **no longer the mirror of the DB `CHECK`**, which stays
-  wide on purpose until the contract), `HIRING_PIPELINE_STAGES` (**5** — the subset a stage change may write;
+  `interview`, `decision_pending`, `closed` — **it is the mirror of the DB `CHECK` again** since the Slice F
+  contract landed on 2026-08-23 (`50b742341`); the bug was the interval in which it was NOT, so never assume
+  the two are in sync — verify), `HIRING_PIPELINE_STAGES` (**5** — the subset a stage change may write;
   **allowlist, not denylist**; `closed` is outside it because closing is deciding),
   `TERMINAL_APPLICATION_STAGES` (**fuente única** for "this journey ended", today `{'closed'}`; it replaced
   three verbatim copies in `assessment/instances.ts`, `assessment/public-session/store.ts` and
@@ -92,6 +93,48 @@ Technical canon: `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §
 - Error codes to expect: `hiring_opening_capacity_not_filled`, `hiring_opening_closure_preview_stale`.
 - The live tests of the reconciler are **read-only over candidate data on purpose** (shared instance,
   append-only outcome). Run them with `pnpm test:live` — see the live-test contract in the skill body.
+
+## Individual decision parity — code paths (TASK-1773)
+
+- `src/lib/hiring/decision-parity.ts` — `readHiringApplicationOutcome` (PII-free outcome view: stage,
+  `decision`, `decisionCause`, `decidedAt/By`, `archivedAt`, `closed`), `proposeHiringApplicationDecision`
+  (**reads and computes, never mutates**; returns `effectDigest` + `current` + `alreadyClosed`) and
+  `confirmHiringApplicationDecision` (recomputes the digest against the state of *now*, then delegates to
+  `decideHiringApplication`). `Migration: none` on purpose — the guard is a digest, **not a table**.
+- The digest is `hdp-<sha256:24>` over `applicationId | stage | decision | decisionCause | archivedAt |
+  proposed decision | proposed cause`. It includes the **current** state deliberately: if someone decides
+  in between, the recomputed print differs. Mismatch ⇒ `HiringValidationError`
+  **`hiring_decision_proposal_stale` (409)**. Revalidation runs **before** the write and **outside** the
+  command's transaction — the command keeps its own `FOR UPDATE` and `idempotencyKey` replay, which is
+  where the fine-grained race was always covered.
+- `src/lib/api-platform/resources/app-hiring-application-decision.ts` — the `app` lane adapter.
+  `assertInternalCapability(context, 'read'|'execute')` (internal tenant + `hiring.application.decide`) and
+  `assertConfirmationIsHuman(context)`, which rejects `authSource === 'sister_platform_oauth'` with 403.
+  Routes: `src/app/api/platform/app/hiring/applications/[applicationId]/{outcome,decision/propose,decision/confirm}/route.ts`
+  (route keys `platform.app.hiring.application.outcome.get` / `.decision.propose` / `.decision.confirm`).
+  `idempotency-key` header wins over the body field.
+- `src/lib/api-platform/core/errors.ts` — `hiring_decision_proposal_stale` is its own
+  `ApiPlatformErrorCode`, **not flattened to `bad_request`**: the consumer must tell "your payload is
+  wrong" from "the world changed, propose again".
+- `src/lib/nexa/actions/hiring-decision.ts` — action `decide_hiring_application`, `sensitivity: 'high'`,
+  `expirationSeconds: 300`, `requiredCapability: 'hiring.application.decide'`, registered in
+  `src/lib/nexa/actions/registry.ts`. `proposeOrBlock` is shared by `buildPreview` and `execute`: it throws
+  `NexaActionBlockedError` with a Hiring Desk deep link when `alreadyClosed`, so **execute re-proposes at
+  the point of mutation**. Idempotency key is derived from the digest (`nexa-<effectDigest>`). Flag
+  `isNexaHiringActionsEnabled` (`NEXA_HIRING_ACTIONS_ENABLED`, `src/lib/nexa/flags.ts`, Vercel-only,
+  default OFF) on top of the master `NEXA_ACTION_RUNTIME_ENABLED`.
+- `src/lib/hiring/capability-parity-manifest.ts` + `.test.ts` — the parity guard. The test greps
+  `src/app` and `src/lib` for `can(subject, 'hiring.*', …)` and asserts: nothing undeclared, every
+  `federated` entry's `evidence` path **exists on disk**, every non-federated entry carries a `reason`, and
+  no dead entries accumulate. Adding a hiring capability without a manifest row **breaks the build**.
+  Only `can()` capabilities belong here — a delegated OAuth scope (`efeonce.mcp.hiring.read`, checked via
+  `oauthCapabilities.includes(...)` in `src/lib/sister-platforms/mcp-token-exchange.ts`) is a different
+  authorization plane and must stay out.
+- Tests to keep green when touching this lane:
+  `src/lib/hiring/decision-parity.test.ts`,
+  `src/lib/api-platform/resources/app-hiring-application-decision.test.ts`,
+  `src/lib/nexa/actions/hiring-decision.test.ts`,
+  `src/lib/hiring/capability-parity-manifest.test.ts`.
 
 ## The assessment engine (EPIC-011 extension)
 

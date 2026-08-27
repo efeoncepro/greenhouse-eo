@@ -293,6 +293,63 @@ still `to-do`, so `hiring_decision_not_selected` falls to the legacy footer prof
 Talent + Privacy sign-off on the copy and the consent gate is missing. **NEVER** present this capability as
 operational.
 
+## Closing an application is federated — the individual decision has a governed lane (TASK-1773)
+
+The outcome axis is operable from **three consumers over ONE primitive**: the portal, the `app` lane
+(`GET …/hiring/applications/{id}/outcome`, `POST …/decision/propose`, `POST …/decision/confirm`) and the
+Nexa governed action `decide_hiring_application`. Contract in
+`docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Delta 2026-08-26; code in
+`src/lib/hiring/decision-parity.ts`, `src/lib/api-platform/resources/app-hiring-application-decision.ts`,
+`src/lib/nexa/actions/hiring-decision.ts`.
+
+- **A lane is an ADAPTER.** It validates transport and authorization, translates the domain error and
+  delegates. **NEVER** re-implement a decision rule outside `decideHiringApplication` — mandatory cause on
+  `not_selected` and forbidden on the other five, stage destination, idempotency, append-only history, the
+  event and the email-type choice all live in the command. If a consumer needs a rule the command lacks,
+  the rule goes to the command, where every consumer shares it. A rule written into an adapter is a rule
+  the UI would not have.
+- **Authorization is the real capability, never a parallel one.** `hiring.application.decide` (`read` for
+  the outcome, `execute` for propose/confirm) plus `tenantType === 'efeonce_internal'`.
+- 🔴 **The proposal is EPHEMERAL — NEVER create a table for it.** The guard is a **digest of the current
+  state** that `propose` computes and `confirm` recomputes against the state of *now*; if someone decided,
+  archived or moved the application in between, the prints differ and confirmation fails with **409
+  `hiring_decision_proposal_stale`**. The contrast with the Talent Pool is deliberate: an **invitation** is
+  persisted because it IS an entity with its own lifecycle; a **decision proposal** is not — it is born and
+  dies inside one human gesture. Persisting it buys a table to clean and an orphanable state, for nothing.
+- 🔴 **Nexa's authority is DELIBERATELY narrower than the portal's: it closes an OPEN application and never
+  re-decides a closed one.** The reason is mechanical — the shared Nexa action contract
+  (`NexaActionPreviewResult` = `{title, summary, metrics}`) cannot carry state from preview to execute, so
+  the print does not survive the trip, and without it a late confirmation could silently overwrite someone
+  else's decision (the command allows re-deciding on purpose, because a human may change their mind).
+  Rather than weakening the guard or widening a contract six other actions carry, the agent's authority was
+  narrowed and `execute` **re-proposes at the point of mutation**. **NEVER** widen the shared preview
+  contract for one consumer, and never present the chat as a place to reverse an outcome — that is a Hiring
+  Desk gesture.
+- 🔴 **Confirming is fail-closed for delegated agents.** `confirm` rejects `authSource ===
+  'sister_platform_oauth'` with 403. A delegated token may **read** the outcome and **propose** a decision;
+  confirming requires a human session. This is not an oversight: `efeonce.mcp.hiring.write` **does not
+  exist in code** — proposed in TASK-1720/1722 as a blast-radius class and blocked until the revocable
+  grant of **TASK-1631**. Same split as the rest of Hiring: the agent proposes and reads, the human
+  confirms. **NEVER** wire a delegated write scope into this lane before that grant.
+- 🔴 **Every `hiring.*` capability checked with `can()` must declare its parity** in
+  `src/lib/hiring/capability-parity-manifest.ts` as `federated` (with `evidence` = an `app` lane route the
+  test verifies exists), `deliberately-internal` (with a reason) or `pending` (with a reason). Adding one
+  without declaring it **breaks the test**, which is the point: the hole this closed was not a missing
+  route, it was that **nobody asked the question** — four tasks shipped the outcome axis portal-only and
+  none declared parity pending. The manifest does not say what *must* be federated; it says someone thought
+  about it and wrote down why. A silent capability is the failure mode.
+- ⚠️ **NEVER put a delegated OAuth scope in that manifest.** `hiring.candidate.review.read` is a scope
+  verified with `oauthCapabilities.includes(...)`, not a `can()` capability — **two different authorization
+  planes**, and conflating them is the error the guard itself exposed while being written. The review route
+  is already covered by `hiring.application.read`.
+- 🔴 **The MASS capacity closure is still NOT federated** (`TASK-1762`). This lane covers the **individual**
+  decision. Of a cohort an agent reads `preview` and `status` and explains; **never** fires one — see
+  §Opening capacity closure above.
+
+**Flag `NEXA_HIRING_ACTIONS_ENABLED` is born OFF** (Vercel-only reader; also requires the master
+`NEXA_ACTION_RUNTIME_ENABLED`). Flipping it needs sign-off: under the AI Act selection is high-risk with
+mandatory human oversight. Check the live value before describing this lane as available.
+
 ## Hiring lifecycle emails (TASK-1689 — LIVE en producción 2026-08-12)
 
 The Hiring cycle registers 8 transactional email types as reactive consumers in the **ops-worker** (consumers `src/lib/sync/projections/hiring-lifecycle-emails.ts`; domain policy `src/lib/hiring/notifications/**`; templates `src/emails/Hiring*.tsx`) — 7 live, and `hiring_decision_not_selected` (TASK-1762) born off:

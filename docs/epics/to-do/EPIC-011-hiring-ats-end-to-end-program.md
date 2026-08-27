@@ -461,6 +461,33 @@ declarado, como `CHECK` de base.
   agravante es que **ninguna de las cuatro tasks del eje lo declaró como pendiente**: la pregunta
   obligatoria del principio no se hizo en ninguna, ni en la auditoría que las revisó. Su Slice 5 es el
   guard que impide que la clase vuelva. *Bloqueada por nada: 1765 ya está en producción.*
+  **Estado: `code complete, rollout pendiente` (2026-08-26).** Lo que quedó escrito en `develop`:
+  - Tres rutas bajo `src/app/api/platform/app/hiring/applications/[applicationId]/`: `GET outcome`
+    (los tres ejes —etapa, desenlace+causa, archivado— sin PII), `POST decision/propose` (lee y
+    calcula, NO muta) y `POST decision/confirm`. Capability `hiring.application.decide`, la que ya
+    existía: sin capability nueva, sin migración, sin evento nuevo, sin flag sobre las rutas.
+  - El guard es un **digest sin persistencia**: `propose` calcula la huella del estado actual más el
+    efecto propuesto y `confirm` la recalcula, fallando con **409 `hiring_decision_proposal_stale`**
+    si el mundo cambió entre medio. Se eligió así porque una propuesta de decisión no es una entidad
+    —a diferencia de la invitación del Banco de Talento, que sí persiste en `talent_pool_invitation`—
+    y porque la spec declara `Migration: none`. Ese 409 se agregó al enum `ApiPlatformErrorCode` en
+    vez de aplanarse a `bad_request`.
+  - **Confirmar es fail-closed para agentes delegados**: un token `sister_platform_oauth` lee y
+    propone, pero no confirma, porque `efeonce.mcp.hiring.write` no existe y queda bloqueado hasta
+    `TASK-1631`.
+  - Nexa recibió la acción `decide_hiring_application`, con autoridad más angosta que el portal: se
+    niega a re-decidir una postulación ya cerrada. Su flag `NEXA_HIRING_ACTIONS_ENABLED` **nace OFF**
+    en todos los environments y tiene fila en el ledger; prenderlo exige sign-off (bajo el AI Act la
+    selección es alto riesgo con supervisión humana obligatoria).
+  - Slice 5 dejó el manifiesto `src/lib/hiring/capability-parity-manifest.ts`: toda capability
+    `hiring.*` chequeada con `can()` declara `federated` / `deliberately-internal` / `pending`, y
+    agregar una sin declararlo rompe el test. Deja además **18 capabilities `hiring.*` en `pending`**,
+    que son el barrido del follow-up.
+  - **Falta para cerrar**: nada está desplegado (los commits siguen sin push), no hay evidencia de
+    runtime contra staging para las tres rutas, y el flag de Nexa sigue apagado. El cierre MASIVO por
+    capacidad no se federa (decisión de `TASK-1762`) y eso NO es un pendiente.
+  - Contrato publicado en `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml` (registro real del lane)
+    + delta en `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`.
 
 Dos superficies **no** generaron ID nuevo y entraron como Delta a su dueño: el archivado que escribía `closed`
 (`TASK-1748`) y el arranque del reloj de retención (`TASK-1744`).

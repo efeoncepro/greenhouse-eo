@@ -49,6 +49,95 @@ Runtime: capabilities y schema vivos desde el 2026-08-19; Application 360 es el 
 
 ---
 
+## Delta 2026-08-26 — el eje de desenlace de Hiring gana carril gobernado (TASK-1773)
+
+Tres rutas nuevas bajo `src/app/api/platform/app/hiring/applications/[applicationId]/`:
+`GET outcome`, `POST decision/propose` y `POST decision/confirm`. Cierran una brecha de Full API
+Parity: el cierre de una postulación se entregó completo y operable **sólo desde el portal** — ni
+`api/platform/app/**`, ni MCP, ni Nexa lo alcanzaban.
+
+Capability: `hiring.application.decide`, la que ya existía. Sin capability nueva, sin migración, sin
+evento nuevo, sin feature flag sobre las rutas.
+
+### El guard es un digest, no una entidad
+
+El lane `app` de Hiring ya tenía un `propose`/`confirm`: el del Banco de Talento, que **persiste** su
+propuesta en `talent_pool_invitation`. Este NO. La diferencia no es de estilo:
+
+- Una invitación **es** una entidad con ciclo de vida propio, así que tiene fila.
+- Una propuesta de decisión **no lo es**: nace y muere dentro de un gesto humano.
+
+Por eso el guard es una huella del **estado actual más el efecto propuesto**: `propose` la calcula,
+`confirm` la recalcula contra el estado de AHORA y falla si no coincide. Nada se persiste, y la task
+conserva `Migration: none`. La huella incluye el estado actual a propósito: si otra persona decide
+entre medio, la confirmación falla en vez de pisar en silencio una decisión ajena.
+
+La revalidación va **antes** de abrir transacción; el `FOR UPDATE` y el replay por `idempotencyKey`
+del command canónico siguen cubriendo la carrera fina donde siempre estuvieron.
+
+🔴 **Ese 409 tiene código propio.** `hiring_decision_proposal_stale` se agregó al enum
+`ApiPlatformErrorCode` (`src/lib/api-platform/core/errors.ts`) en vez de aplanarse a `bad_request`,
+porque son dos cosas distintas para el consumer: «tu payload está mal» se corrige reescribiendo el
+request; «el mundo cambió» se corrige volviendo a proponer. Un solo código habría hecho indistinguible
+el reintento correcto del inútil.
+
+Contrapartida a tener presente: el adapter traduce **todo** 409 del dominio a ese código, así que
+también llegan con él la reutilización de una clave de idempotencia con otro payload y la selección
+contra un opening cerrado.
+
+### Confirmar es fail-closed para agentes delegados
+
+Un bearer `sister_platform_oauth` puede LEER el desenlace y PROPONER una decisión; **no puede
+confirmar**. El motivo es mecánico y no de criterio: `efeonce.mcp.hiring.write` no existe en código y
+queda bloqueado hasta el grant revocable de TASK-1631. La confirmación exige sesión humana
+(`cookie_session` o `first_party_app`).
+
+Es el mismo reparto que ya rige en el resto de Hiring —el agente propone y lee, el humano confirma— y
+es la forma correcta de expresar una capacidad todavía no federable: el carril existe, y la puerta de
+escritura está cerrada explícitamente en vez de ausente.
+
+### El lane es adaptador, no dueño de reglas
+
+`src/lib/api-platform/resources/app-hiring-application-decision.ts` valida transporte y autorización y
+delega. Toda la validación de decisión —causa obligatoria en `not_selected` y prohibida en el resto,
+destino, idempotencia, historial append-only— vive en `decideHiringApplication` y ahí se queda. Un
+efecto verificable de esa disciplina: la validación del par desenlace/causa aparece en `confirm`
+(422 con código `bad_request`), nunca en `propose`, porque `propose` no reimplementa el command.
+
+El adapter mapea los errores por CÓDIGO de dominio, no por status: los tres 409 del command
+—propuesta caducada, conflicto de idempotencia y vacante cerrada— conservan cada uno el suyo. Mapear
+por `statusCode` los colapsaba en uno, que es la misma clase de defecto que TASK-1751 corrigió del lado
+del candidato; se detectó justamente al documentar este contrato.
+
+### El guard que impide que la clase vuelva
+
+El hueco no fue que faltara una ruta: fue que **nadie se hizo la pregunta de parity**, ni las cuatro
+tasks del eje ni la auditoría que las revisó. `src/lib/hiring/capability-parity-manifest.ts` convierte
+esa pregunta en un paso obligatorio: toda capability `hiring.*` chequeada con `can()` debe aparecer
+con estado `federated` (con evidencia de ruta), `deliberately-internal` (con razón) o `pending` (con
+la task dueña o el bloqueo). Agregar una capability sin declararlo rompe el test.
+
+No declara si algo *debe* federarse — declara que alguien lo pensó y dejó escrito el porqué. Sólo
+capabilities de `can()`, nunca scopes OAuth delegados: son dos planos de autorización distintos.
+
+### Consumers y estado
+
+Nexa recibió la acción gobernada `decide_hiring_application`
+(`src/lib/nexa/actions/hiring-decision.ts`), que delega en el mismo primitive. Su autoridad es
+deliberadamente **más angosta que la del portal**: se niega a re-decidir una postulación que ya tiene
+desenlace, porque el contrato compartido `NexaActionPreviewResult` no puede cargar el digest del
+preview al execute. El flag `NEXA_HIRING_ACTIONS_ENABLED` nace OFF y su fila está en el ledger.
+
+El cierre MASIVO por capacidad **no** se federa (decisión de TASK-1762): esta capacidad decide UNA
+postulación.
+
+Estado: code complete en `develop` y **sin desplegar**. No hay evidencia de runtime contra staging ni
+producción, y el flag de Nexa está apagado en todos los environments. Contrato publicado en
+[`docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml`](../api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml),
+que es el registro real de este lane.
+
+---
+
 ## Delta 2026-08-14 — intención declarada en el body de `keywords/track` (TASK-1659)
 
 `POST /api/platform/ecosystem/growth/seo/keywords/track` acepta dos campos opcionales más:

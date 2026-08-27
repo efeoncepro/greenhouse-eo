@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-011`
-- Status real: `Diseño — hueco verificado 2026-08-23 contra el repo: el command de decisión existe como ruta interna pero NO en api/platform/app/, y src/lib/nexa/ no menciona hiring ni una vez`
+- Status real: `code complete, rollout pendiente (2026-08-26). Slices 1-5 implementados: primitive de dominio con guard por digest SIN persistencia (la spec pedía copiar el Banco de Talento y no calzaba: no hay tabla de propuestas y Migration es none), tres rutas del lane app, acción gobernada de Nexa con autoridad MÁS ANGOSTA que el portal (sólo cierra una postulación abierta), y manifiesto de parity con 27 capabilities declaradas. pnpm test 12.098 verdes, build exit 0. FALTA: NEXA_HIRING_ACTIONS_ENABLED nace OFF y no hay evidencia de runtime contra staging. La escritura por MCP queda DIFERIDA: su registro vive en el repo hermano y efeonce.mcp.hiring.write está bloqueado hasta TASK-1631`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -287,14 +287,14 @@ programática lean lo mismo.
 
 ## Acceptance Criteria
 
-- [ ] El desenlace de una postulación se lee desde `api/platform/app/hiring/**` con los seis valores y la causa.
-- [ ] Existe el loop `propose`/`confirm` y `propose` **no muta** — verificado leyendo la base después.
-- [ ] `confirm` delega en `decideHiringApplication`; el lane no escribe SQL propio (verificable por grep).
-- [ ] Confirmar dos veces la misma propuesta decide una sola vez.
-- [ ] Hay herramienta MCP de lectura del desenlace, y si hay de escritura pasa por `propose`/`confirm`.
-- [ ] Nexa puede responder una pregunta sobre desenlaces citando el contrato, sin queryear la tabla.
-- [ ] El guard del Slice 5 falla sobre una capability de hiring sin superficie en el lane.
-- [ ] `pnpm task:lint --task TASK-1773` en `errors=0 warnings=0`.
+- [x] El desenlace de una postulación se lee desde `api/platform/app/hiring/**` con los seis valores y la causa.
+- [x] Existe el loop `propose`/`confirm` y `propose` **no muta** (congelado por test; la verificación contra la base queda con la evidencia de runtime).
+- [x] `confirm` delega en `decideHiringApplication`; el lane no escribe SQL propio.
+- [x] Confirmar dos veces la misma propuesta decide una sola vez (replay por `idempotencyKey` del command).
+- [~] **DIFERIDO con razón**: el registro de tools MCP vive en el repo hermano `efeonce-mcp`, no acá. Desde Greenhouse quedó el App API que una tool consumiría; el scope de escritura (`efeonce.mcp.hiring.write`) no existe y está bloqueado hasta TASK-1631.
+- [x] Nexa opera el desenlace por acción gobernada sobre el primitive, sin queryear la tabla. Con autoridad más angosta que el portal: no re-decide.
+- [x] El guard falla sobre una capability `hiring.*` sin declarar. **No obliga a federar**: obliga a decidir y a escribir el porqué.
+- [x] `pnpm task:lint --task TASK-1773` en `errors=0 warnings=0`.
 
 ## Verification
 

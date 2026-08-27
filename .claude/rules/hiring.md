@@ -73,3 +73,31 @@ Estas dos viven bajo `src/lib/hiring/assessment/**`, así que se tocan desde ac�
   contrato es `{ok, code, message}` con mensaje genérico, fijado por test anti-leak; la frontera es pública y
   sin autenticación. El `code` es lo que viaja, y la verdad se construye en el cliente desde ese `code`.
   Si necesitas un caso nuevo, **agrega un `code`**, nunca prosa al `message`.
+
+## Desenlace federado — el carril gobernado y su guard (TASK-1773)
+
+Cerrar una postulación ya NO se opera sólo desde el portal: además del desk hay lane `app`
+(`…/hiring/applications/{id}/{outcome,decision/propose,decision/confirm}`) y acción de Nexa
+(`decide_hiring_application`). Los tres delegan en `decideHiringApplication`.
+
+- **NUNCA reimplementar una regla de decisión fuera del command.** Causa obligatoria/prohibida, destino
+  de etapa, idempotencia, historial, evento y tipo de correo viven ahí. Un lane es un ADAPTADOR; si un
+  consumer necesita una regla que el command no tiene, la regla va al command.
+- 🔴 **NUNCA crear una tabla de propuestas de decisión.** El guard de `decision-parity.ts` es un **digest
+  del estado actual** que `propose` calcula y `confirm` revalida (409 `hiring_decision_proposal_stale`);
+  `Migration: none` a propósito. El Banco de Talento persiste sus invitaciones porque una **invitación**
+  ES una entidad con ciclo de vida; una **propuesta de decisión** nace y muere dentro de un gesto humano.
+- 🔴 **Toda capability `hiring.*` chequeada con `can()` DEBE declarar su parity** en
+  `src/lib/hiring/capability-parity-manifest.ts` (`federated` con `evidence` = ruta del lane `app` que el
+  test verifica que exista · `deliberately-internal` con razón · `pending` con razón). Agregar una sin
+  declararla **rompe el test**, y esa es la intención: el hueco no fue una ruta faltante, fue que nadie se
+  hizo la pregunta. **NUNCA** meter ahí un scope OAuth delegado (`oauthCapabilities.includes(...)`): son
+  dos planos de autorización distintos.
+- **Confirmar es fail-closed para agentes delegados**: `authSource === 'sister_platform_oauth'` → 403.
+  Un token delegado lee y propone; confirmar exige sesión humana hasta el grant de `TASK-1631`.
+- **Nexa cierra una postulación ABIERTA, nunca re-decide una cerrada** (el contrato compartido de acciones
+  no transporta la huella del preview al execute). Y el cierre **MASIVO** por capacidad sigue **sin
+  federarse** (`TASK-1762`): de una cohorte un agente lee y explica, jamás dispara.
+
+`NEXA_HIRING_ACTIONS_ENABLED` nace **OFF** (Vercel-only, sobre el master `NEXA_ACTION_RUNTIME_ENABLED`):
+`code complete, rollout pendiente`. No describir este carril como operativo sin verificar el valor vivo.

@@ -2470,3 +2470,111 @@ Invariantes duros:
 Flag `HIRING_SYNTHETIC_DATA_FILTER_ENABLED` (Vercel-only, default OFF) gatea sólo el filtro de desk y
 talent pool. Docs: funcional `docs/documentation/hr/procedencia-de-datos-hiring.md`; manual
 `docs/manual-de-uso/hr/operar-procedencia-de-datos-hiring.md`.
+
+## Delta 2026-08-26 — TASK-1773: el eje de desenlace gana carril gobernado (`code complete, rollout pendiente`)
+
+Cerrar una postulación se podía operar **sólo desde el portal**: ni `api/platform/app/**`, ni MCP, ni
+Nexa. Violación directa de Full API Parity, y el agravante es que ninguna de las cuatro tasks del eje
+de desenlace (`TASK-1748`, `TASK-1754`, `TASK-1762`, `TASK-1765`) lo declaró como pendiente — tampoco
+la auditoría que las revisó. Esta task federa la decisión **INDIVIDUAL** y deja un guard para que la
+omisión no pueda repetirse en silencio.
+
+Código: `src/lib/hiring/decision-parity.ts` (propose/confirm + lectura del desenlace),
+`src/lib/api-platform/resources/app-hiring-application-decision.ts` (adaptador del lane `app`),
+`src/lib/nexa/actions/hiring-decision.ts` (acción gobernada),
+`src/lib/hiring/capability-parity-manifest.ts` (guard de parity). Rutas del lane `app`:
+`GET …/hiring/applications/{applicationId}/outcome`, `POST …/decision/propose`, `POST …/decision/confirm`.
+
+### El lane es un ADAPTADOR, no una segunda implementación
+
+- **Ninguna regla de decisión se reimplementa fuera de `decideHiringApplication`.** Causa obligatoria en
+  `not_selected` y prohibida en los otros cinco, destino de etapa, idempotencia, historial append-only,
+  evento y elección del tipo de correo siguen viviendo en el command, y ahí se quedan. El recurso del
+  lane valida transporte y autorización, traduce el error de dominio y delega; la acción de Nexa hace lo
+  mismo. **NUNCA** agregar a un adaptador una regla de negocio que la UI no tendría: si un consumer la
+  necesita, va al command, donde la comparten todos.
+- Autorización del lane: `tenantType === 'efeonce_internal'` **más** la capability real
+  `hiring.application.decide` (`read` para la lectura, `execute` para propose/confirm). No una capability
+  paralela «de agente».
+
+### La propuesta es EFÍMERA, no una entidad — `Migration: none`
+
+- El guard es un **digest del estado actual** (`hdp-<sha256:24>` sobre `applicationId | stage | decision |
+  decisionCause | archivedAt | desenlace propuesto | causa propuesta`) que `propose` calcula y `confirm`
+  **recalcula contra el estado de AHORA**. Si alguien decidió, archivó o movió la postulación entre medio,
+  las huellas no coinciden y la confirmación falla con **409 `hiring_decision_proposal_stale`**.
+- 🔴 **NUNCA crear una tabla de propuestas de decisión.** El contraste con el Banco de Talento es
+  deliberado: allá la invitación se persiste (`talent_pool_invitation`) porque **una invitación ES una
+  entidad con ciclo de vida propio** —se envía, se acepta, caduca, se audita—. Una propuesta de decisión
+  no lo es: **nace y muere dentro de un gesto humano**. Persistirla agregaría una tabla que habría que
+  limpiar y un estado que puede quedar huérfano, a cambio de nada.
+- La revalidación va **antes** de la escritura y **fuera** de la transacción del command: si el estado
+  cambió, se falla sin abrir transacción. El `FOR UPDATE` y el replay por `idempotencyKey` del command
+  siguen cubriendo la carrera fina donde siempre estuvieron.
+- El código de error **no se aplana a `bad_request`**: se agregó `hiring_decision_proposal_stale` al enum
+  `ApiPlatformErrorCode` para que el consumer distinga «tu payload está mal» de «el mundo cambió, vuelve
+  a proponer».
+
+### Nexa tiene autoridad MÁS ANGOSTA que el portal
+
+- 🔴 **Nexa sólo cierra una postulación ABIERTA; re-decidir una cerrada es humano.** El prólogo
+  compartido por `buildPreview` y `execute` propone y bloquea con `NexaActionBlockedError` + deep link al
+  Hiring Desk cuando `alreadyClosed`.
+- **El motivo es mecánico, no filosófico**, y conviene registrarlo porque explica por qué NO se resolvió
+  de otra forma: el contrato compartido de acciones de Nexa (`NexaActionPreviewResult` =
+  `{title, summary, metrics}`) **no puede cargar estado del preview al execute**, así que la huella no
+  sobrevive el viaje. Sin ella, una confirmación tardía podría pisar en silencio una decisión que otra
+  persona tomó entre medio — y el command permite re-decidir a propósito, porque un humano puede cambiar
+  de opinión.
+- **Se acotó la autoridad del agente en vez de debilitar el guard o de tocar el contrato compartido**,
+  que cargan otras seis acciones. El `execute` **RE-PROPONE en el punto de mutación**: si alguien decidió
+  entre el preview y el confirm, `alreadyClosed` bloquea ahí. Mismo resultado que habría dado la huella,
+  sin ensanchar la superficie. **NUNCA** «arreglar» esto ensanchando `NexaActionPreviewResult` para un
+  solo consumer.
+- Ventana corta a propósito (`expirationSeconds: 300`), `sensitivity: 'high'`, capability real
+  `hiring.application.decide` y `tenantType === 'efeonce_internal'`.
+
+### Confirmar es fail-closed para agentes delegados
+
+- 🔴 **`confirm` rechaza `authSource === 'sister_platform_oauth'` con 403.** Un token delegado puede
+  **leer** el desenlace y **proponer** una decisión; **confirmar exige sesión humana**.
+- No es una omisión: **`efeonce.mcp.hiring.write` no existe en código**. Está propuesto en
+  `TASK-1720`/`TASK-1722` como clase de blast-radius y permanece bloqueado hasta el grant revocable de
+  `TASK-1631`. Es el mismo reparto que rige en el resto de Hiring: el agente propone y lee, el humano
+  confirma. **NUNCA** cablear un scope de escritura delegado a este carril antes de ese grant.
+
+### El manifiesto de parity vuelve obligatoria la pregunta
+
+- `src/lib/hiring/capability-parity-manifest.ts` obliga a que **toda capability `hiring.*` que el código
+  chequee con `can()`** aparezca declarada como `federated` (con `evidence` = ruta del lane `app`, que el
+  test verifica que **exista**), `deliberately-internal` (con razón) o `pending` (con razón). El test
+  barre el código y rompe si hay una sin declarar, si una `federated` apunta a una ruta inexistente, si
+  una no-federada calla su razón, o si el manifiesto acumula entradas muertas.
+- **No declara si algo DEBE federarse**: declara que alguien lo pensó y dejó escrito el porqué. Un
+  `deliberately-internal` honesto vale tanto como un `federated`; **lo inaceptable es el silencio**, que
+  es exactamente como nació este hueco.
+- ⚠️ **NUNCA meter un scope OAuth delegado en ese manifiesto.** `hiring.candidate.review.read` NO va ahí:
+  es un scope que se verifica con `oauthCapabilities.includes(...)`, no una capability de `can()`. **Son
+  dos planos de autorización distintos** y mezclarlos es el error que el propio guard destapó al
+  escribirse. La ruta de review ya queda cubierta por `hiring.application.read`.
+- **NUNCA** agregar una capability de hiring sin declarar su parity en el mismo PR — el test rompe, y
+  esa es la intención.
+
+### Lo que esta task NO federa
+
+- 🔴 **El cierre MASIVO por capacidad sigue sin federarse** (`TASK-1762`, resuelto 2026-08-23). Su gate es
+  una confirmación humana contra un digest fresco, y bajo el AI Act la selección es alto riesgo con
+  supervisión obligatoria. El carril gobernado de la cohorte expone `preview` y `status` — **lecturas**:
+  un agente puede explicar a cuántas personas tocaría un cierre y cómo va uno en vuelo, **jamás
+  dispararlo**. Esta task cubre la decisión **individual**, que conserva su propio contrato.
+- Las capabilities marcadas `pending` en el manifiesto **no tienen carril** y así está declarado; no
+  asumir que existe uno por analogía con éstas.
+
+### Estado — `code complete, rollout pendiente`
+
+`NEXA_HIRING_ACTIONS_ENABLED` **nace OFF en todos los environments** (runtime lector: **Vercel
+únicamente**, `src/lib/nexa/flags.ts`; fila registrada en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`)
+y depende además del master `NEXA_ACTION_RUNTIME_ENABLED`. Prender exige sign-off: bajo el AI Act la
+selección es alto riesgo con supervisión humana obligatoria. **Falta evidencia de runtime contra
+staging** — el lane `app` y la acción de Nexa están cubiertos por tests, no por un ejercicio real contra
+el deployment activo. **NUNCA** presentar este carril como operativo.
