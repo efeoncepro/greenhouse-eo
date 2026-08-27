@@ -24,7 +24,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth`
-- Blocked by: `TASK-1697`
+- Blocked by: `none` — `TASK-1697` cerró 2026-08-27: el sustrato existe en `@/lib/growth/site-substrate` con carta + lint
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -65,7 +65,9 @@ carril y no por el otro.
     defecto del diagnóstico de prospecto.
   - **OnPage de DataForSEO** (familia ya permitida): crawl del sitio a USD 0,000125/página cuando el
     diagnóstico amerite profundidad. Task-based async, así que corre en el ops-worker.
-- **Blocker nuevo y real**: `Blocked by: TASK-1697`. Hoy el fetcher vive dentro de
+- **Blocker (RESUELTO 2026-08-27 — `TASK-1697` complete: el sustrato existe, con carta y lint;
+  esta task consume `@/lib/growth/site-substrate` por el barrel)**: ~~`Blocked by: TASK-1697`~~. Cuando
+  se escribió este delta el fetcher vivía dentro de
   `ai-visibility/probes/**` y `growth/seo` no puede importarlo sin abrir un deep import cross-dominio
   — que es justo lo que la lint rule angosta de 1697 nace prohibiendo. **Sin 1697, la forma correcta
   de esta capacidad no existe**, y la forma incorrecta (copiar el fetcher, o importar cruzado) crea

@@ -1,5 +1,13 @@
 # TASK-1670 — Growth: hallazgos de sitio (crawlers IA, JSON-LD, sitemap) en el audit SEO
 
+## Delta 2026-08-27 (2) — DESBLOQUEADA: TASK-1697 cerró (Slices 1+2 y también 3+4)
+
+El sustrato existe en `@/lib/growth/site-substrate` (barrel: `createSiteFetcher`,
+`resolveSubjectSite`, parseo HTML/robots, tipos `Site*`) con carta verificable y la lint rule
+`greenhouse/growth-substrate-boundary` en `error` — el deep import a `ai-visibility/probes/**`
+que esta task podía escribir mañana hoy rompe el build. Esta task consume el sustrato por el
+barrel; su bloqueante de CIERRE sigue siendo `TASK-1671` (el flip, no el merge).
+
 ## Delta 2026-08-27 — el chequeo de borde vuelve a ser implementable: TASK-1778 Slice 4b entregó el override
 
 - `ProbeFetchInit.userAgent` existe (TASK-1778, **ya desplegada**: rollout ejecutado 2026-08-27 en el

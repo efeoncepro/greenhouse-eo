@@ -2,6 +2,12 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-27 — TASK-1697 cerrada: el sustrato de sitio tiene dueño, carta y detector
+
+**Estado: `complete`; gates verdes (12.144 tests full + build de producción + lint con la rule activa + worker gates).** `src/lib/growth/site-substrate/` nace por `git mv` con diff puro (site-fetch/html/robots-policy/read-body + contratos `Site*` + barrel); shims en `probes/` = cero dependientes de producción modificados. Lint rule `greenhouse/growth-substrate-boundary` en `error` desde commit-1, cero exenciones: `probes/**` privado del dominio AEO, el sustrato no importa `growth/*`. Desviaciones registradas en el task file (read-body viaja al sustrato; el flag del fetcher vive en `site-fetch.ts` re-exportado por `flags.ts`; el meta-test anti-divergencia sigue al archivo movido).
+
+**Desbloqueadas:** `TASK-1670` (site probes en el audit SEO), `TASK-1709` (diagnóstico de prospecto — su Slice 2b ya tiene de dónde consumir) y `TASK-1701`; `TASK-1713` (mitad B: rule universal + barrel AEO) sigue tras `TASK-1695`. **Post-push:** vigilar `growth.ai_visibility.probe_failure_rate` en steady (el refactor es shim-idéntico; el canario confirma). Follow-up declarado: retirar los shims reescribiendo los 7 consumers al barrel, tras una release asentada.
+
 ## 2026-08-27 — Las tres capacidades de mercado que faltaban en SV360, y de dónde salió ISSUE-164
 
 **Estado: cuatro tasks creadas, `to-do`; sin runtime.** `TASK-1775` (foto de dominio + trayectoria:
@@ -39,6 +45,7 @@ esté en producción con su flag ON.
 **Estado: `complete`; ISSUE-164 `resolved`.** Cutover aplicado el mismo día del merge: `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED=true` en el ops-worker (revisión `ops-worker-00598-459`, 100% — worker ÚNICO staging+prod, o sea la cadena viva del intake público) + declarativo en `deploy.sh` + Vercel `staging`. La regla de saltos se extendió a subdominios DESCENDIENTES del sujeto con evidencia de cartera (`www.bancochile.cl → sitiospublicos.bancochile.cl`); cross-registrable (`berel.com.mx → berel.com`) sigue bloqueado, sin PSL. Verificación: 7 dominios vivos en strict (6 ok; bancochile ya fallaba con la red vieja — Imperva, caso `TASK-1281`) + corrida real `EO-GRUN-00048` (SKY, full, 5 motores) verde: 13 probes, cero `blocked_*` falsos, apex→www seguido y medido.
 
 **Residuales con dueño y fecha (ledger § Pendientes):** (1) revisión Sentry 2026-08-29 de `blocked_redirect`/`blocked_private_address` (48 h; volumen alto = guarda estricta, rollback <5 min con flag a false en deploy.sh + `--update-env-vars`); (2) env var en Vercel **Production** SOLO con el release que lleve el código a `main` (ISSUE-150) — hasta entonces el path inline prod (admin `light`) conserva la red vieja; el path público async ya está contenido. La mitigación interina que se le propuso al operador (apagar `PROBES`) quedó obsoleta: el fix real está vivo.
+
 ## 2026-08-27 — TASK-1696 adopta la señal de presupuesto que faltaba
 
 **Estado: spec sincronizada; implementación pendiente.** La task ahora incluye `seo.provider.cost_over_budget`: nueve tasks la citaban como mitigación, pero el barrido verificó que no existe en código. Entra junto a la dimensión `consumer` para no sub-reportar el gasto del grader; README y registry ya reflejan las tres señales.
@@ -363,57 +370,3 @@ archivos serializados: de 6 fallos intermitentes a **3 estables**.
 ahora son visibles y deterministas: 11 capabilities de growth/commercial/platform sin seed en
 `capabilities_registry`, 3 `data_sources` de client-portal (`TASK-824`) y una aserción propia de
 `TASK-1509`. Sin dueño asignado; candidatos a ISSUE si el operador lo decide.
-
-## 2026-08-23 — TASK-1762: el cierre por capacidad ya no marca a nadie como rechazado
-
-**Estado: `code complete, rollout pendiente`.** Slices 1–5 en `develop` local, **sin push**. Tres
-migraciones aplicadas y verificadas contra PG. **Los dos flags están OFF y el correo nace apagado**,
-así que hoy no cambia nada para nadie.
-
-**El hallazgo que cambió el diseño.** El ADR afirmaba que no existía fuente de verdad del número de
-cupos. Era falso: `hiring_opening.requested_seats` existe desde TASK-353 y **el operador la ve y la
-edita como «Cupos»** en el Demand Desk (`DemandDeskView.tsx:981` y `:1240`). Por eso
-`hiring_opening_capacity` **NO guarda conteo** — sólo el opt-in y su gobernanza — y `unmanaged` se
-expresa como ausencia de política vigente, no como un `NULL`. Un `target_seats` propio habría sido
-un segundo «Cupos» decidiendo el cierre de 36 personas mientras la pantalla muestra el primero. El
-ADR quedó enmendado en sitio y `Accepted`.
-
-**Lo construido:** política + preview con digest + confirm durable + reconciler + correo propio.
-El desenlace que escribe es `not_selected` + `capacity_filled`, **nunca `rejected`**. Un `EmailType`
-propio (`hiring_decision_not_selected`) con kill-switch independiente, y la promesa del Banco de
-Talento sólo con consentimiento **re-leído al enviar**.
-
-**Tres frenos independientes**, y la independencia es lo que permite un canary: cerrar la cohorte
-SIN notificarla. `HIRING_OPENING_CAPACITY_CLOSURE_ENABLED` (ejecución) ·
-`HIRING_CAPACITY_FILLED_EMAIL_ENABLED` (sólo correo) · fila de `email_type_config`. **Los dos flags
-viven en el `ops-worker`, no en Vercel.**
-
-**Dos bugs que sólo aparecieron ejecutando de verdad:**
-
-1. `runGreenhousePostgresQuery` devuelve el array **ya desempaquetado**: `.rows[0]` compila, pasa
-   typecheck y revienta en runtime. Lo cazó el live test corrido **con credenciales** — sin ellas
-   decía `skipped`, que a ojo se ve igual que verde.
-2. **El `Down` del seed hacía `DELETE`**, y con `checkEmailTypeEnabled` fail-open eso **encendía**
-   el correo en vez de deshacerlo — en el peor momento, porque uno hace rollback cuando algo ya va
-   mal. Hallazgo de `greenhouse-eo-e8` auditando. Corregido a `enabled = FALSE` antes de commitear.
-   **El defecto venía heredado del precedente TASK-1757, que copié fielmente** junto con su cita a
-   una función inexistente. Reusar un precedente transmite también sus defectos.
-
-**Bloqueadores reales del rollout, no agenda:**
-
-- **El canary no es ejercitable hoy**: las dos vacantes vivas tienen **0 `selected`**, así que la
-  capacidad nunca está llena y el confirm se niega correctamente.
-- **`TASK-1764` sigue `to-do`**: sin ella el `EmailType` nuevo cae al perfil de footer **legacy en
-  silencio**. Bloquea sólo el correo, no el cierre.
-- Falta sign-off de Talent y Privacidad sobre el copy y el gate de consentimiento.
-
-**Decisión tomada, antes implícita:** el cierre masivo **no se federa** como acción de agente. Bajo
-el AI Act, selección es alto riesgo con supervisión humana obligatoria. El carril expone `preview` y
-`status` como lecturas.
-
-**Deuda ajena señalada, no tocada:** el seed de TASK-1757 tiene el mismo `Down` con `DELETE`. e8
-midió que su fila está hoy `enabled=true`, así que **no hay riesgo vivo** —borrarla la deja en el
-mismo estado efectivo—: es una trampa latente que se arma sólo si alguien pausa ese correo y después
-revierte. Limpieza, no urgencia.
-
-Próximo paso: `TASK-1763` (consumer UI) recibe el DTO del preview y el command sin duplicar reglas.

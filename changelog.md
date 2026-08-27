@@ -7,6 +7,12 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-27 — El sustrato de sitio gana dueño propio y frontera con detector
+
+- `TASK-1697` (mitad A, complete): el fetcher SSRF-guarded + parseo HTML/robots sale de las tripas del grader a `src/lib/growth/site-substrate/` (git mv, diff puro, shims — cero dependientes modificados) con carta verificable por test de allowlist: no importa `growth/*`, no persiste, dice cómo se OBTIENE la evidencia y nunca cómo se JUZGA.
+- Lint rule nueva `greenhouse/growth-substrate-boundary` en `error` desde commit-1 sin exenciones: `ai-visibility/probes/**` pasa a ser privado del dominio AEO (la puerta externa es el sustrato) — el deep import que TASK-1670/1701 podían escribir mañana hoy rompe el build. La rule universal de fronteras `growth/*` queda declarada de `TASK-1713` (30 deep imports vivos la harían nacer sucia).
+- Desbloquea a `TASK-1670`, `TASK-1701` y `TASK-1709` (el carril comercial de diagnóstico de prospectos ya tiene de dónde consumir la evidencia de sitio).
+
 ## 2026-08-27 — El fetcher de sitios de terceros deja de prometer garantías que no implementa
 
 - `TASK-1778` (Slices 1–4b, code complete): el único fetcher con el que Greenhouse lee sitios de terceros (grader AEO público + brand intelligence + diagnóstico de prospectos) gana mecanismo para sus cuatro garantías: contención de redirects por salto acotada a la familia del sujeto (`apex↔www`, upgrade `http→https`), guarda DNS pre-conexión contra rangos no públicos, tope de memoria real por stream con truncado rastreable, y obediencia de `robots.txt` matcheando nuestro token — jamás los bots de IA que auditamos.
@@ -790,9 +796,3 @@
   siempre pasan. La ceguera no es de la pantalla: cualquier consumer futuro la hereda.
 - Rollout gated: flag `HIRING_EVALUATION_DOSSIER_AI_ENABLED` sigue OFF en producción (la UI lo
   declara honestamente); evidencia visual del panel de propuesta pendiente de staging.
-
-## 2026-08-16 — Identidad de intake canonicalizada completa (TASK-1736)
-
-- Hiring: cierre del trío del día — TASK-1736 complete con remediación gobernada
-  (dry-run → allowlist humana → apply CAS → rollback real), señales de reliability y
-  runbook. Flag OFF; 4 nombres históricos esperan la allowlist del operador.

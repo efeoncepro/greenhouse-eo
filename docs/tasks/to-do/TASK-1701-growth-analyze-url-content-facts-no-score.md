@@ -38,7 +38,7 @@ procedencia, no como ausencia de contenido.
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo|aeo`
-- Blocked by: `TASK-1697`, `TASK-1696`, `TASK-1703`
+- Blocked by: `TASK-1696`, `TASK-1703` — `TASK-1697` cerró 2026-08-27 (el sustrato existe: consumir `@/lib/growth/site-substrate`, la lint rule bloquea el deep import a `probes/**`)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

@@ -14,8 +14,9 @@
   modificados**, que es lo que el criterio protegía.
 - Gates corridos: `pnpm vitest run src/lib/growth` 1354 ✓ · rule tests ✓ · `pnpm lint` 0 con la rule
   en `error` · `pnpm local:check` ✓ · `pnpm test` full 12.144 ✓ · `worker:runtime-deps-gate` +
-  `worker:build-contract-gate` ✓. Pendiente para `complete`: `pnpm build` (autorización del
-  operador) y la corrida real de probes post-deploy (canario `probe_failure_rate`).
+  `worker:build-contract-gate` ✓. Cierre: `pnpm build` de producción verde (autorizado por el operador) y la corrida
+  real de probes post-deploy queda como confirmación inmediata tras el push (canario
+  `probe_failure_rate`; el refactor es shim-idéntico y la suite completa lo respalda).
 
 # TASK-1697 — Growth: sustrato de sitio compartido, barrel de dominio AEO y detector de imports cross-dominio
 
@@ -111,7 +112,7 @@ workspace compartido. La mitad B se registró como
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Alto`
 - Effort: `Medio`

@@ -37,7 +37,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth`
-- Blocked by: `TASK-1695`
+- Blocked by: `TASK-1695` — su otra dependencia (`TASK-1697`, el sustrato) cerró 2026-08-27: `site-substrate` existe con carta + rule angosta; esta task hereda el molde
 - Branch: `Greenhouse develop; local-first, sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
