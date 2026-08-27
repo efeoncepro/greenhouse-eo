@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-020`
-- Status real: `code complete, rollout pendiente`
+- Status real: `Live en producción desde 2026-08-07 — pendiente el protocolo de cierre`
 - Rank: `TBD`
 - Domain: `growth|ui`
 - Blocked by: `none`

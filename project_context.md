@@ -7,6 +7,8 @@ TypeScript. Este archivo contiene solo contratos durables y rutas de descubrimie
 rollout o bloqueo vive en [Handoff.md](Handoff.md); la historia pre-2026-07-19 quedó preservada en
 [`docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`](docs/operations/agent-context-history/2026-07-19/project_context.legacy.md).
 
+Los anuncios grupales de TeamBot usan `pnpm teams:announce`; admiten menciones explícitas, no `@todos` ni DMs. Un 1:1 manual aprobado usa el dispatcher/audit canónicos, identidad Entra revalidada e idempotencia; lo recurrente converge a Notification Hub. Contrato: [`manual-teams-announcements.md`](docs/operations/manual-teams-announcements.md).
+
 La migración de consumo privado de AXIS está cerrada para la operación interna/producción: el secreto activo
 vive en `efeonce-group`, el secreto legacy de `efeonce-globe` fue eliminado y el PAT legacy fue revocado. El
 PAT temporal aprobado para la migración permanece activo hasta su sustitución por una identidad de máquina
@@ -22,7 +24,7 @@ La dirección de producto móvil de Globe es continuity-first y native-first seg
 
 Las decisiones de arquitectura de Globe se enrutan por el overlay `.claude/skills/arch-architect/globe-overlay.md`
 (pinned decisions G1–G10, los dos bug class canonizados y cómo condiciona un modelo generativo). Decide la FORMA;
-la skill espejo `greenhouse-globe` (`.claude/` + `.codex/`, paridad verificada por `pnpm skills:mirrors`) llena la
+la skill espejo `greenhouse-globe` (`.claude/` + `.codex/`) llena la
 implementación. Cada ruta ejecutable publica un contrato creativo versionado y autocontenido —operación, slots con
 rol, combinaciones, controles con mecanismo y forma de valor, contrato de salida— según
 [ADR-022](docs/architecture/creative-studio/EFEONCE_GLOBE_ROUTE_CREATIVE_CONTRACT_DECISION_V1.md): el contrato
@@ -60,6 +62,8 @@ Seedance 2.0/R2V, GPT Image 2, Seedream 5 Pro, Nano Banana 2/Pro y Kling 3.0. �
 PNG/WebP. Globe ya la declara y verifica en código para su ruta PNG mediante `backgroundMode` y alfa decodificado,
 pero la variante continúa gated hasta deploy, canary facturable, readback y promoción/rollback; la matriz canónica
 vive en [`OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`](docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md).
+`TASK-1781` gobierna Omni 1.1: Developer `gemini-omni-1.1-flash` y Cloud
+`gemini-omni-1.1-flash-preview` no se colapsan; siguen gated hasta canary/readback y el modelo anterior cierra el 2026-09-30.
 Seedream T2I, GPT Image 2 y Nano Banana 2/Pro están disponibles
 según el reader live; Seedream Edit queda `gated` por binding deshabilitado. Seedream Lite, edición de OpenAI/Nano
 Banana y video-to-image de Nano Banana permanecen como superficies no públicas hasta tener ruta, binding, canary y
@@ -101,12 +105,9 @@ volver a leer `seo_v1` sería reabrir una ventana cerrada. Contrato en
 [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §9 (§17
 contrata el seam de extracción hacia Wave). Los reads del módulo son readers canónicos consumer-agnósticos —
 `readKeywordOpportunities` y `readSeoAeoGap` (este último cruza SEO↔AEO respetando el boundary de §1.1) —
-expuestos por el lane ecosystem `/api/platform/ecosystem/growth/seo/*` y sus MCP tools (hoy **10 de
-lectura + 2 de escritura**); regla
-durable del módulo: **todo reader SEO nuevo expone su MCP tool en el mismo PR**. Desde 2026-08-06 ese camino
-está **vivo en producción y federado en `mcp.efeonce.org`** (TASK-1645 + TASK-1647 complete; provider
-`greenhouse-seo` en el gateway, revisión `efeonce-mcp-gateway-00012-dkj`): preguntar por MCP por la
-visibilidad 360 de una org entitled devuelve su quadrant real, y una org fuera del binding falla cerrada.
+expuestos por el lane ecosystem `/api/platform/ecosystem/growth/seo/*` y sus MCP tools; **todo reader SEO
+nuevo expone su tool en el mismo PR**. Desde 2026-08-06 el camino está **vivo en producción y federado en
+`mcp.efeonce.org`** mediante el provider `greenhouse-seo`; el acceso per-org falla cerrado.
 El flag `GROWTH_SEO_ENABLED` es **multi-runtime** — Vercel (lane) + `ops-worker` (materializer GSC);
 prenderlo en uno solo deja el otro camino muerto. Su primera captura corre live
 desde 2026-08-05: la serie propia de
@@ -119,6 +120,12 @@ manifest released): el scheduler `ops-seo-rank-capture` captura posiciones a dia
 acumula desde 2026-08-06 (día-1: Berel, 31 keywords), con la señal `seo.rank.capture_lag` en Growth Health.
 `TASK-1653` (guard de paridad del gateway), `TASK-1307` (performance) y `TASK-1304` (site audit +
 backlinks) están **complete**.
+
+Berel se opera desde Notion con la skill espejo `berel-content-production`; la modalidad se decide por
+contenido público vivo —no por HTTP 200 ni por un `Enlace` planificado— y el cierre relee relaciones,
+conteos, fechas, estados y paridad tarea/subítem porque las automatizaciones pueden cambiar lo escrito. La
+paridad social se deposita en dos fases usando una sola cadena final; piezas históricas, sensibles, destinadas a
+consolidación o con soft-404 conservan un gate visible y no se programan hasta la validación dueña.
 
 ### Lectura mínima obligatoria
 
@@ -252,6 +259,21 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   commit de squash. Estado de workers: `pnpm release:workers`. Contrato en
   `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` §check #4 + skill `greenhouse-production-release` (espejada
   `.claude`/`.codex`).
+- **Dos correcciones al procedimiento de release (2026-08-23, release `709e15f6688e`)**, aplicadas en
+  skill (ambos espejos) y runbook: (1) la lista de rutas para verificar el residual change-gated del
+  `ops-worker` **se lee del array `WORKER_RUNTIME_PATHS` de `.github/workflows/ops-worker-deploy.yml`,
+  nunca se transcribe** — la copia que arrastraban los docs tenía 7 entradas y omitía
+  `src/lib/reliability`, `src/lib/hiring/talent-pool` y `src/lib/sync`, devolviendo «vacío» sin haber
+  mirado; (2) en el merge canónico `main → develop`, con `main ⊆ develop` el default es **`-s ours`**,
+  no `-X ours`: éste último sólo decide los hunks en conflicto y puede **duplicar contenido documental
+  en silencio**, algo que las dos verificaciones duras no ven porque miran sólo rutas de código. La
+  auditoría correcta de un `-X ours` es `git diff HEAD@{1} HEAD --name-status` completo.
+- **Live tests (`*.live.test.ts`): `pnpm test:live`, nunca `source .env.local`.** Escriben sobre la ÚNICA
+  instancia Cloud SQL de dev/staging/prod, así que corren serializados (proyecto `live` en `vitest.config.ts`)
+  y su sujeto se deriva por `scope`, no de un pool compartido. Canon:
+  [`LIVE_TESTS_AGENT_INVARIANTS.md`](docs/architecture/agent-invariants/LIVE_TESTS_AGENT_INVARIANTS.md),
+  auto-cargado por `.claude/rules/live-tests.md`. **La regla vive en `AGENTS.md` y NO en `CLAUDE.md` por
+  decisión, no por olvido:** `CLAUDE.md` estaba a 18 tokens de su gate de presupuesto (34.982/35.000).
 - Staging/preview y producción tienen configuración separada. Flags, secrets y migraciones deben verificarse
   en cada runtime consumidor, no solo en Vercel.
 - El checkout compartido actual es el único entorno de ejecución autorizado. Nunca crear, usar ni tocar
@@ -263,14 +285,14 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 
 ## Sources of truth por pregunta
 
-| Pregunta                                   | Fuente primaria                                                                                    |
-| ------------------------------------------ | -------------------------------------------------------------------------------------------------- |
-| Qué hago ahora                             | `Handoff.md` + artefacto activo                                                                    |
-| Qué existe y qué contrato gobierna         | `docs/architecture/**`, ADRs y código/runtime                                                      |
-| Por qué se decidió                         | `docs/architecture/DECISIONS_INDEX.md` + ADR                                                       |
-| Cómo se ejecuta una unidad de trabajo      | `docs/tasks/TASK_PROCESS.md` / modelo de issue/epic/mini-task                                      |
-| Qué pasó históricamente                    | task/issue/commit y snapshots bajo `agent-context-history/`                                        |
-| Qué ofrece/opera Efeonce                   | `docs/services/README.md`                                                                          |
+| Pregunta | Fuente primaria |
+|---|---|
+| Qué hago ahora | `Handoff.md` + artefacto activo |
+| Qué existe y qué contrato gobierna | `docs/architecture/**`, ADRs y código/runtime |
+| Por qué se decidió | `docs/architecture/DECISIONS_INDEX.md` + ADR |
+| Cómo se ejecuta una unidad de trabajo | `docs/tasks/TASK_PROCESS.md` / modelo de issue/epic/mini-task |
+| Qué pasó históricamente | task/issue/commit y snapshots bajo `agent-context-history/` |
+| Qué ofrece/opera Efeonce | `docs/services/README.md` |
 | Cómo se presenta Efeonce para capital, inversión y fundraising | `docs/strategy/EFEONCE_CAPITAL_AND_INVESTMENT_STRATEGY_V1.md` + [`ASAAS_MANIFESTO_V1.md`](strategy/ASAAS_MANIFESTO_V1.md) |
 | Cómo preparar investor readiness y fundraising | `.codex/skills/efeonce-investor-readiness/SKILL.md` + estrategia de capital + Finance/Legal |
 | Cómo diseñar/auditar customer models, business models, pricing y unit economics | `.codex/skills/efeonce-customer-model-operator/SKILL.md` + `.codex/skills/efeonce-business-model-operator/SKILL.md` + `.codex/skills/efeonce-pricing-operator/SKILL.md` + `docs/business-models/README.md` + Finance/Legal |
@@ -281,6 +303,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo crear o modificar templates, footers y hero images de email | skill espejo `greenhouse-email` + `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`; delivery/provider se opera por separado con `resend-email-platform` y visuales GPT Image 2 con `greenhouse-ai-image-generator` |
 | Cómo diseñar, construir, auditar o mejorar dashboards en Google Data Studio (antes Looker Studio) | skill espejo `.codex/skills/google-data-studio/SKILL.md` + `.claude/skills/google-data-studio/SKILL.md`; usar `inspect` por defecto y validar modelado, filtros, browser, permisos y sharing desde sus references |
 | Cómo modelar Efeonce Group, Media & Distribution, Growth Platform, AEO y Search Visibility 360 | `docs/business-models/README.md` + `.codex/skills/efeonce-business-model-operator/SKILL.md` + modelos vigentes |
+| Qué contenido escribir para un cliente de SEO y cómo entregarlo | `docs/operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md`. Striking distance ya está en `/admin/growth/seo/keywords` (`TASK-1308`); verificar habilitación por org. Forma del brief: `SEO_CONTENT_BRIEF_STRUCTURE_V1.md` |
 | Cómo leer un site audit de crawler sin mentir el diagnóstico (orden de hallazgos, laboratorio vs campo, techo del crawl, huecos de cobertura AEO) | `.codex/skills/seo-aeo/modules/01_SEO_TECHNICAL.md` §8 + `.claude/skills/dataforseo-operator/references/04-onpage.md` §11 + `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.6 |
 | Cómo reconciliar el costo del AI Visibility Grader | `docs/audits/cloud-cost/AI_VISIBILITY_GRADER_COST_RECONCILIATION_2026-07-27.md` + documentación funcional/runbook del grader |
 | Cómo evaluar el portafolio de partners/providers de IA | `.codex/skills/efeonce-business-model-operator/SKILL.md` + `.codex/skills/efeonce-customer-model-operator/SKILL.md` + audit comercial fechado; economics y routing directo/Fal en `design-studio` y `motion-design-studio` |
@@ -291,7 +314,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo gobernar derechos, consentimiento, provenance, providers, no-training, retención, contratos y entrega enterprise de creatividad generativa | `docs/architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md` + `.codex/skills/greenhouse-ai-creative-rights-governance/SKILL.md` + `.codex/skills/greenhouse-ai-creative-rights-governance/references/` + Creative Services/Creative Studio docs + `legal-privacy-ip-operator` |
 | Cómo se estructura, vende y opera Social Media, incluido el beachhead B2B experto, Social Search + SEO/AEO y el squad humano | `docs/business-models/creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md` + `docs/services/creative-services/EFEONCE_SOCIAL_MEDIA_PRODUCT_SERVICE_CONTRACT_V1.md` + `.codex/skills/social-media-studio/SKILL.md` |
 | Cómo se estructura y vende Media & Distribution, sus tres soluciones, Performance & Commerce, capacidades de delivery, Influencers/UGC y el rol de Reach | `docs/services/media-distribution/README.md` + `docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md` + `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md` + `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md` + `docs/audits/commercial/CREATOR_INFLUENCE_CONTENT_MARKET_RESEARCH_2026-07-29.md` + `docs/audits/commercial/CREATOR_INFLUENCE_PERFUME_ATHLETES_CHILE_SIMULATION_2026-07-29.md` |
-| Cómo se estructura y vende RevOps & CRM/HubSpot, y cómo usar los brochures comerciales como insumo sin volverlos canon | `docs/services/hubspot-as-a-service/README.md` + `docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md` + skills `hubspot-as-a-service` y `hubspot-solutions-partner` |
+| Cómo se estructura y vende Revenue Operations & CRM, cómo elegir HubSpot-first, Salesforce-first o híbrido, y cómo usar benchmarks/brochures sin volverlos canon | `docs/audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md` + `docs/services/hubspot-as-a-service/README.md` + `docs/services/salesforce/README.md` + skills del provider; para Salesforce distinguir CRM core, Marketing Cloud Engagement y Marketing Cloud Next. Claims, certificaciones y reventa se leen del registry y requieren evidencia primaria antes de uso externo |
 | Cómo construir y cerrar una licitación client-facing con Artifact Composer, desde evidencia y narrativa hasta deck auditado y Proposal versionada | `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md` + `docs/commercial/tenders/PROPOSAL_STUDIO_CLOSURE_SCHEMA.md` + `docs/architecture/GREENHOUSE_AGENTIC_QUOTATION_ORCHESTRATION_DECISION_V1.md` + `docs/audits/commercial/EFEONCE_SERVICE_PRICING_LEARNINGS_AND_GUARDRAILS_2026-07-31.md` + expedientes aprobados + skills `greenhouse-public-private-tenders` y `deck-studio`; separar fuentes y gobernanza técnica/económica sin imponer artefactos físicos distintos, derivar todo precio del quote congelado, declarar IVA, pasar `pnpm tender:canonical-gate <slug>` y no emitir stubs/HOLD como oferta |
 | Cómo descubrir y calificar oportunidades privadas de Wherex antes de abrir un bid | `docs/manual-de-uso/comercial/revisar-licitaciones-wherex-con-chrome.md` + skill `greenhouse-public-private-tenders` → `wherex-radar-chrome-playwright.md`; `pnpm wherex:radar` usa un perfil Chrome aislado y credencial local `.auth/` con `0600`, revisa Nueva + Editando y lee ficha/adjuntos antes del fit. El dictamen también exige revisar descripción/comentarios generales y Centro de mensajes → Preguntas, aunque el reporte no los haya capturado; para una candidata autorizada, `--tender-id <ID> --archive-originals <carpeta>` archiva únicamente descargas nativas y nunca elude el visor protegido; las candidatas elegidas verifican/crean empresa, deal y asociación por MCP HubSpot mediante confirmaciones explícitas; no ejecuta acciones comerciales |
 | Cómo funcionan partnerships/providers, licencias, co-selling, capability enablement y captura de valor en Efeonce | `docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md` + `docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md` + `docs/audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md` + `efeonce-business-model-operator` |
@@ -308,8 +331,8 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo se administran los créditos y las capabilities de los usuarios de Globe (y por qué la llave de aprobación nunca sale de su runtime) | `docs/architecture/creative-studio/EFEONCE_GLOBE_GREENHOUSE_ADMINISTRATION_DECISION_V1.md` (ADR-015) + `TASK-1566` + `.claude/rules/globe-administration.md` |
 | Cómo debe razonar, documentar y autoevaluarse el arquitecto Codex | skill `software-architect-2026` + `docs/architecture/GREENHOUSE_SOFTWARE_ARCHITECT_SKILL_GOVERNANCE_V1.md` + `evals/software-architect-2026/` |
 | Cómo opera el scheduler nativo, su booking/medición y la plataforma portable de Forms/CTAs/Meetings | `docs/architecture/GREENHOUSE_GROWTH_MEETINGS_SCHEDULER_ARCHITECTURE_V1.md` + `docs/architecture/GREENHOUSE_EFEONCE_EMBED_RUNTIME_DELIVERY_DECISION_V2.md` + `docs/architecture/GREENHOUSE_EFEONCE_EMBED_RUNTIME_ARCHITECTURE_V1.md` + skill `greenhouse-growth-meetings` |
-| Qué significa para producto/negocio        | `docs/context/00_INDEX.md` + docs funcionales                                                      |
-| Cómo lo opera una persona/agente           | `docs/manual-de-uso/**` y runbook aplicable                                                        |
+| Qué significa para producto/negocio | `docs/context/00_INDEX.md` + docs funcionales |
+| Cómo lo opera una persona/agente | `docs/manual-de-uso/**` y runbook aplicable |
 
 ## Loop operativo vigente
 

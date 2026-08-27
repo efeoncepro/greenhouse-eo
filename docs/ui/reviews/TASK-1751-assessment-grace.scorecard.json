@@ -1,0 +1,86 @@
+{
+  "taskId": "TASK-1751",
+  "scenario": "task1751-assessment-grace",
+  "surface": "hiring.assessment.submit-grace",
+  "verdict": "pass-local",
+  "reviewedAt": "2026-08-26",
+  "reviewer": "claude-opus-5 (frames mirados: desktop 1440 + mobile 390 del capture premium; el review destapó dos defectos que ningún gate detecta — ver iconography y typography)",
+  "evidence": {
+    "desktop": ".captures/2026-08-26T21-27-51_task1751-assessment-grace/01-desktop/frames/01-grace-banner.png",
+    "mobile": ".captures/2026-08-26T21-27-51_task1751-assessment-grace/02-mobile/frames/01-grace-banner.png",
+    "dossier": ".captures/2026-08-26T21-27-51_task1751-assessment-grace/review-dossier.md"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.6,
+      "rationale": "En `answering` el momento dominante es el reloj; al entrar en gracia el traspaso a la banda es deliberado y funciona: la persona necesita entender el cambio de reglas antes que seguir mirando el contador. Un solo h-flow (barra de sesión → banda → progreso → pregunta), y la banda queda sobre el fold en ambos viewports.",
+      "evidence": "01-desktop/frames/01-grace-banner.png"
+    },
+    "proportions": {
+      "score": 4.5,
+      "rationale": "El campo congelado CONSERVA su altura en vez de colapsar — decisión, no descuido: que el texto siga visible es el punto de la fase. Card de pregunta con ancho acotado y el enunciado a ~75 caracteres por línea.",
+      "evidence": "01-desktop/frames/02-grace-readonly-answer.png"
+    },
+    "rhythm": {
+      "score": 4.5,
+      "rationale": "Escala 4n constante entre regiones; la banda respeta el mismo ritmo vertical que el resto del stack, sin abrir un bloque de aire propio.",
+      "evidence": "01-desktop/frames/01-grace-banner.png"
+    },
+    "density": {
+      "score": 4.5,
+      "rationale": "Densidad baja a propósito: es una superficie de una sola tarea bajo presión de tiempo. En 390px todo apila y el stepper de 11 pasos arrastra DENTRO de su contenedor (`overflow-x: auto`) sin empujar la página.",
+      "evidence": "02-mobile/frames/01-grace-banner.png"
+    },
+    "depth": {
+      "score": 4.4,
+      "rationale": "Elevación mínima y contenida: la banda es tonal, no elevada, y la card de pregunta usa borde en vez de sombra. Sin card-on-card. Pierde décimas porque el borde de foco azul de la card compite con el tono de advertencia de la banda cuando ambos coexisten.",
+      "evidence": "01-desktop/frames/01-grace-banner.png",
+      "nextAction": "El borde de foco azul de la card de pregunta y el tono de advertencia de la banda coexisten y compiten por el mismo significado ('mírame'). Subir esta dimensión exige decidir cuál manda durante la gracia: lo más probable es suprimir el anillo de foco de la card mientras la banda está presente, porque en esa fase la card ya no es el lugar donde se actúa. Es cambio de estado visual, no de layout, y queda como follow-up declarado en vez de resolverse a ojo dentro de esta task."
+    },
+    "surfaceEconomy": {
+      "score": 4.7,
+      "rationale": "Exactamente TRES superficies contained en el first fold —barra de sesión, banda, card de pregunta—, que es el techo declarado en el wireframe. Ninguna es wrapper decorativo, y la banda REEMPLAZA al aviso inline de guardado durante la gracia en vez de sumarse.",
+      "evidence": "01-desktop/frames/01-grace-banner.png"
+    },
+    "visualImpact": {
+      "score": 4.5,
+      "rationale": "El cambio de estado se lee de un vistazo sin necesidad de leer: tono de advertencia, ícono de reloj y campo con borde discontinuo. Para una superficie pública de una sola tarea, el impacto correcto es legibilidad inmediata del estado, no espectáculo — y eso se cumple en ambos viewports.",
+      "evidence": "02-mobile/frames/01-grace-banner.png"
+    },
+    "typography": {
+      "score": 4.5,
+      "rationale": "La banda usa negrita sólo en la frase invariante ('el tiempo terminó') y peso normal en la parte condicional, así que la jerarquía interna refleja qué es hecho y qué es consecuencia. El contador de caracteres subió de `--text-disabled` a `--text-secondary`: no está deshabilitado, es secundario.",
+      "evidence": "01-desktop/frames/02-grace-readonly-answer.png"
+    },
+    "color": {
+      "score": 4.6,
+      "rationale": "El tono de advertencia carga significado —no es error: el sistema no falló, se cumplió un plazo— y contrasta con el azul de la card activa. axe limpio en los tres frames tras corregir el contraste 2.43:1 del contador, que era un defecto PRE-EXISTENTE destapado por esta primera captura premium.",
+      "evidence": "01-desktop/frames/01-grace-banner.png"
+    },
+    "iconography": {
+      "score": 4.5,
+      "rationale": "Corregido en el loop de review: la banda usaba `tabler-send` —un avión de papel— sobre un mensaje que dice que NO se puede enviar. Ningún gate lo detecta; sólo mirar el frame. Ahora es `tabler-clock-exclamation`, que es el hecho real y sirve a las dos ramas del mensaje.",
+      "evidence": "01-desktop/frames/01-grace-banner.png"
+    },
+    "responsive": {
+      "score": 4.6,
+      "rationale": "390px verificado con evidencia de ancho: cero scroll horizontal de página. El stepper de 11 pasos arrastra dentro de su propio contenedor, que es el patrón correcto del repo; el gate se ajustó para no presionar a romperlo.",
+      "evidence": "02-mobile/frames/01-grace-banner.png"
+    },
+    "motion": {
+      "score": 4.5,
+      "rationale": "La fase no introduce movimiento propio: el único elemento vivo es la cuenta regresiva, que ya existía. `reducedMotionCheck` verde. En una pantalla con plazo corriendo, no agregar animación es la decisión correcta.",
+      "evidence": "01-desktop/frames/01-grace-banner.png"
+    },
+    "fidelity": {
+      "score": 4.6,
+      "rationale": "Implementa el wireframe recalibrado, incluida la corrección que el propio review forzó: la banda es CONDICIONAL a la completitud porque el servidor exige la evaluación completa, y con faltantes el CTA de envío no se renderiza. La copy renderizada es literalmente la del Copy Ledger.",
+      "evidence": "01-desktop/frames/01-grace-banner.png"
+    },
+    "genericTemplateResistance": {
+      "score": 4.6,
+      "rationale": "Nada acá es plantilla: el campo congelado con borde discontinuo, el conteo de guardadas, la ausencia deliberada del CTA y el ícono de reloj son decisiones de ESTE problema. Una plantilla genérica habría dejado el botón deshabilitado y un 'algo salió mal'.",
+      "evidence": "01-desktop/frames/02-grace-readonly-answer.png"
+    }
+  }
+}

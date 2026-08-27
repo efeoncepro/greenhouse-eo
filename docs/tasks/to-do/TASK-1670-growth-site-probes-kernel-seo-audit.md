@@ -1,5 +1,30 @@
 # TASK-1670 — Growth: hallazgos de sitio (crawlers IA, JSON-LD, sitemap) en el audit SEO
 
+## Delta 2026-08-27 (2) — DESBLOQUEADA: TASK-1697 cerró (Slices 1+2 y también 3+4)
+
+El sustrato existe en `@/lib/growth/site-substrate` (barrel: `createSiteFetcher`,
+`resolveSubjectSite`, parseo HTML/robots, tipos `Site*`) con carta verificable y la lint rule
+`greenhouse/growth-substrate-boundary` en `error` — el deep import a `ai-visibility/probes/**`
+que esta task podía escribir mañana hoy rompe el build. Esta task consume el sustrato por el
+barrel; su bloqueante de CIERRE sigue siendo `TASK-1671` (el flip, no el merge).
+
+## Delta 2026-08-27 — el chequeo de borde vuelve a ser implementable: TASK-1778 Slice 4b entregó el override
+
+- `ProbeFetchInit.userAgent` existe (TASK-1778, **ya desplegada**: rollout ejecutado 2026-08-27 en el
+  ops-worker con `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` ON, también ON en Vercel staging): el
+  chequeo de borde se
+  implementa variando **nuestro** token (p.ej. `GreenhouseAEOGrader-EdgeCheck/1.0`), y lo que se mide
+  es si el borde nos trata **distinto**, no si podemos hacernos pasar por otro bot. Suplantar
+  `GPTBot`/`OAI-SearchBot` sigue prohibido (postura declarada en el contrato del fetcher).
+- El punto del sitemap del Delta 2026-08-26 también quedó resuelto: `resolveProbeUrl` ya acepta la
+  **familia del sujeto** (`apex ↔ www` + upgrade `http → https`) **y los subdominios descendientes
+  del sujeto** (regla extendida con evidencia real de cartera:
+  `www.bancochile.cl → 301 → sitiospublicos.bancochile.cl`), así que un `<loc>` en `www.` sobre
+  sujeto apex ya no reporta «no verificado» falso.
+- Ojo adicional heredado de 1778: el fetcher ahora **obedece `robots.txt`** (matching contra nuestro
+  token, fallback `*`). Un chequeo de esta task sobre una ruta que el sitio nos prohíba volverá
+  `blocked_robots` — eso es un hallazgo del carril, no un bug del kernel.
+
 ## Delta 2026-08-15 (2) — decisión de secuencia verificada: se desbloquea parcialmente, y dos correcciones de oficio
 
 Cuatro especialistas resolvieron la secuencia del lote. Cuatro cambios, en orden de peso.
@@ -598,6 +623,33 @@ eso el consumidor UI es prerequisito del flip del flag.
 - [ ] `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.6 actualizado (la cobertura declarada como
       faltante pasa a existir)
 - [ ] `FEATURE_FLAG_STATE_LEDGER.md` con el flag y su runtime
+
+## Delta 2026-08-26 — el chequeo de borde, como está escrito, no es implementable y además contradice una postura declarada
+
+Dos bloqueadores externos, verificados contra el código:
+
+1. **`ProbeFetchInit` no acepta override de User-Agent.** El UA es constante de módulo
+   (`safe-fetch.ts:25`, `COURTESY_USER_AGENT`) y el contrato sólo expone `accept`, `timeoutMs` y
+   `maxBytes`. Esta task declara **cero ediciones sobre `ai-visibility/**`**, y `TASK-1697` prohíbe
+   tocar comportamiento en su diff de movimiento. El parámetro se agrega en **`TASK-1778` Slice 4b**,
+   que es la task que sí cambia comportamiento sobre ese archivo.
+2. 🔴 **La postura contradice el Slice 1.** `TASK-1778` declara que matchea **nuestro** token de UA y
+   **nunca** los de los bots de IA que auditamos — *«o "actuar como" GPTBot para probar»* está
+   explícitamente descartado: es suplantación, algunos WAF la verifican por DNS inverso, y aparecer
+   como evasor tiene costo reputacional. El Slice 1 de esta task dice hacer `GET` del home **con UA
+   de un bot de retrieval**. Las dos no pueden ser ciertas.
+
+**Corrección de alcance:** el chequeo de borde se hace con **nuestro token variado**, y lo que mide es
+si el borde nos trata distinto que a un navegador — no si podemos hacernos pasar por otro. Si el
+negocio necesita responder *«¿está ChatGPT bloqueado en este sitio?»* con certeza, eso se responde
+leyendo `robots.txt` y las reglas del WAF cuando el cliente las comparte, no suplantando.
+
+**Y el sitemap cross-host.** `resolveProbeUrl` exige igualdad exacta de hostname, así que un sitemap
+declarado como `https://www.ejemplo.com/sitemap.xml` con target `ejemplo.com` devuelve `blocked` y el
+chequeo reporta «no verificado» sobre un sitemap sano. `TASK-1778` Slice 1 ya lo resuelve aceptando la
+familia `apex ↔ www`; esta task lo **consume**, no lo implementa.
+
+Origen: `docs/audits/platform/2026-08-26-openseo-competitive-teardown-growth-seo-aeo.md` §3.9.
 
 ## Follow-ups
 

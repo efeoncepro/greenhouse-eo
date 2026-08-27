@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { isFixItArtifactsEnabled, isGraderEnabled, isProviderFlagEnabled } from '../flags'
+import {
+  isFixItArtifactsEnabled,
+  isGraderEnabled,
+  isProbeFetchStrictNetworkEnabled,
+  isProviderFlagEnabled
+} from '../flags'
 
 const env = (overrides: Record<string, string>): NodeJS.ProcessEnv => ({ ...overrides }) as NodeJS.ProcessEnv
 
@@ -8,6 +13,12 @@ describe('growth/ai-visibility — feature flags (default OFF)', () => {
   it('grader OFF por defecto (sin env)', () => {
     expect(isGraderEnabled(env({}))).toBe(false)
     expect(isProviderFlagEnabled('openai', env({}))).toBe(false)
+  })
+
+  it('TASK-1778 · strict network OFF por defecto, ON sólo con "true" exacto (independiente del grader)', () => {
+    expect(isProbeFetchStrictNetworkEnabled(env({}))).toBe(false)
+    expect(isProbeFetchStrictNetworkEnabled(env({ GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED: '1' }))).toBe(false)
+    expect(isProbeFetchStrictNetworkEnabled(env({ GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED: 'true' }))).toBe(true)
   })
 
   it('grader solo ON con "true" exacto', () => {

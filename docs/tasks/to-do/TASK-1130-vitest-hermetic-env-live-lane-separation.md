@@ -1,5 +1,79 @@
 # TASK-1130 — Vitest hermetic env baseline + live-lane separation
 
+## Delta 2026-08-24 — rescope con evidencia re-medida (la task sigue viva, con la mitad cerrada)
+
+**Medición de hoy, no de junio.** El diagnóstico original (2026-06-15) reportaba **19 fallos en 8
+archivos**. Re-medido hoy con `set -a && source .env.local && set +a && pnpm test`: **23 fallos en
+17 archivos**. Creció porque nacieron tests nuevos que asumen entorno limpio — que es exactamente el
+argumento de esta task: **la fragilidad no se estabiliza sola, se acumula**.
+
+### Lo que SÍ quedó cerrado (fuera de esta task, commit `c28e8bead`)
+
+- **Carril live separado.** `vitest.config.ts` define dos proyectos: `unit` (paralelo, excluye
+  `**/*.live.test.ts`) y `live` (`fileParallelism: false`). Los live corren serializados entre sí.
+- **`pnpm test:live`** (`scripts/test-live.mjs`): pasa **sólo acceso a base**
+  (`GREENHOUSE_POSTGRES_*` + `GCP_PROJECT`/`GOOGLE_CLOUD_PROJECT`/`GOOGLE_APPLICATION_CREDENTIALS`),
+  con guarda anti-erosión que rechaza `*_ENABLED`/`*_RUN_MODE`, y preflight TCP del Cloud SQL Proxy.
+- **El contrato quedó documentado** en `docs/architecture/agent-invariants/LIVE_TESTS_AGENT_INVARIANTS.md`,
+  con auto-carga por path (`.claude/rules/live-tests.md`), y la regla dura en `AGENTS.md`.
+- **Fixtures aislados por scope** (`resolveLiveTestCandidateFixture`), que cerró la causa por la que
+  tres archivos de `assignment-policy` se pisaban.
+
+**El diseño que quedó NO es el que esta task proponía**, y la diferencia importa para el alcance que
+sigue: no hay `GREENHOUSE_TEST_LIVE=1` ni scrub en `src/test/setup.ts`. En vez de **limpiar el
+entorno después de contaminarlo**, el runner **no lo contamina**. Eso resuelve *cómo corre un
+agente los live tests*; **no** resuelve la hermeticidad de `pnpm test`, que es el corazón de la task.
+
+### La premisa cambió, y a favor
+
+`source .env.local && pnpm test` dejó de ser «el flujo normal del dev para correr los live tests» y
+pasó a ser un **anti-patrón explícito y documentado**. Eso baja la probabilidad del daño, pero **no
+lo elimina**: `pnpm test` sigue produciendo un resultado distinto según el shell, y esa es
+precisamente la propiedad que esta task existe para matar. Un contrato documentado que depende de
+que nadie se equivoque no es una garantía: es una expectativa.
+
+### Evidencia fresca — los 23 fallos, 4 categorías
+
+Reproducido 2026-08-24 con `set -a && source .env.local && set +a && pnpm test`
+(baseline limpio: `pnpm test` sin env = **1590 archivos / 12.051 tests / 0 fallos**).
+
+**Categoría A — fuga de entorno en tests unitarios (8 archivos). El scrub los resuelve.**
+
+| Archivo | Causa raíz exacta, verificada |
+|---|---|
+| `src/emails/EmailTemplateBaseline.test.tsx` (4) | **CLASIFICADO — era el «pendiente de clasificar» desde junio.** Es fuga, no drift de snapshot. El diff es **un solo token**: el snapshot dice `…-greenhouse-public-media-prod` y con `.env.local` renderiza `…-dev`. Lo causan `GREENHOUSE_MEDIA_BUCKET` / `GREENHOUSE_PUBLIC_MEDIA_BUCKET`, ambas `…-dev` en el archivo local. **Slice 0 queda cerrado por este hallazgo.** |
+| `src/lib/secrets/secret-manager.test.ts` | env var presente → `resolveSecret` retorna `'env'` en vez de `'unconfigured'` (incluye los casos TASK-870 de shape regex). |
+| `src/lib/cloud/postgres.test.ts` | `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` presente → connector «activo» → falta el risk esperado. |
+| `src/lib/cloud/vercel-billing.test.ts` | **NUEVO desde junio.** «returns not_configured without calling Vercel when token or team scope is missing» — el token real está presente. |
+| `src/lib/cloud/github-billing.test.ts` | **NUEVO desde junio.** «keeps thresholds unconfigured when budget env vars are absent» — las vars de budget están presentes. |
+| `src/lib/growth/ai-visibility/__tests__/brand-intelligence.test.ts` | **NUEVO desde junio.** «degrada honesto con flag OFF (default)» espera `null` y recibe un resultado real: el flag está ON en `.env.local`. |
+| `src/lib/growth/forms/pii/__tests__/encryption.test.ts` | **NUEVO desde junio, y es el más grave de la categoría.** «sin key configurada → throw explícito (NUNCA degrada a sin-cifrado)» **resuelve en vez de rechazar**, porque la key está presente. Es un test de una garantía de seguridad, y el entorno lo silencia. |
+| `src/lib/delivery/task-display.test.ts` (3) | Categoría C del diagnóstico viejo: `ECONNREFUSED 127.0.0.1:15432`. Gatea por presencia de `GREENHOUSE_POSTGRES_HOST` y confunde «env presente» con «DB alcanzable». **No es un `*.live.test.ts`**, así que el carril nuevo no lo cubre: sigue corriendo en `unit`. |
+
+**Categoría B — drift real (2 archivos). El guard funcionando; NO lo arregla el scrub.**
+
+| Archivo | Estado verificado 2026-08-24 |
+|---|---|
+| `src/lib/capabilities-registry/parity.live.test.ts` | **11 capabilities** en el catálogo TS sin fila en `greenhouse_core.capabilities_registry`: `commercial.quote.simulate`; 8 de `growth.ai_visibility.*` (`fix_it.generate`, `lead.open`, `lead_handoff.execute`, `report.publish`, `report.read`, `report.read_client`, `report.review`) + `growth.forms.lead_pii.reveal`; y 2 de `platform.public_site.*` (`bridge.inspect`, `comparison_table.author`). Junio reportaba **1**: el drift creció 11×. Las 2 de `hiring.opening.capacity.*` que faltaban se sembraron en `20260824010948152` (TASK-1762). |
+| `src/lib/client-portal/data-sources/parity.live.test.ts` | **Drift inverso, no estaba en el diagnóstico de junio**: 3 `data_sources` sembrados en DB que el union TS no reconoce — `commercial.proposals`, `growth.ai_visibility`, `growth.seo`. Un portal cliente podría tener habilitado un módulo que el código no sabe resolver. Dueño: `TASK-824`. |
+
+**Categoría D — precondición vencida (1 archivo). Nueva, y es otra clase.**
+
+| Archivo | Causa |
+|---|---|
+| `src/lib/growth/meetings/__tests__/store.live.test.ts` | Afirma que la superficie de agendamiento **no está configurada** (`expect(pausedAuthority).toBeNull()`) y hoy **sí lo está**: devuelve `surfaceId: fhsf-efeonce-lead-gen-web`, `schedulerKey: discovery`, `fallbackUrl` de HubSpot y los dominios reales de `efeoncepro.com`. No se rompió nada: **alguien encendió el agendador, que era lo correcto, y el test seguía esperando el mundo anterior.** Es el patrón «el gate es el test de regresión del snapshot con que lo escribiste» — un cambio legítimo lo pone rojo, y la salida barata (editar el esperado) lo deja igual de frágil. Dueño: `TASK-1509`. |
+
+**Categoría E — contención de recursos bajo `pnpm test` (5 archivos live de hiring).**
+
+Con `.env.local` sourceado, `pnpm test` corre **los dos proyectos**: los ~1600 archivos unit y los 44
+live a la vez. El proxy Cloud SQL no aguanta y los live mueren con `ECONNRESET`. Los **mismos
+archivos pasan con `pnpm test:live`** (44 archivos, 3 fallos, todos de Categorías B y D). No es un
+defecto de esos tests: es la consecuencia directa de que `pnpm test` no sea hermético — con el
+entorno limpio, esos live tests **se saltarían solos** y el problema no existiría.
+
+**Esto es lo que convierte el Slice 1 en la pieza que falta y no en una mejora opcional.**
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -9,12 +83,12 @@
 ## Status
 
 - Lifecycle: `to-do`
-- Priority: `P2`
+- Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Rescopada 2026-08-24: Slices 0/2/5 cerrados por c28e8bead; el baseline hermetico (Slice 1) sigue intacto y con evidencia re-medida`
 - Rank: `TBD`
 - Domain: `platform|ops`
 - Blocked by: `none`
@@ -24,7 +98,7 @@
 
 ## Summary
 
-`pnpm test` no es hermético: su resultado depende del entorno del shell. En CI (sin `.env.local`) pasa; pero el flujo normal del dev para correr los live-DB tests (`source .env.local && pnpm test`) filtra el entorno runtime real al proceso y rompe **19 tests** en 8 archivos. Esta task hace `pnpm test` determinista pase lo que pase en el shell, separa los live-DB/cloud tests en un carril explícito opt-in, y atiende un drift real de capability que el guard live destapa.
+`pnpm test` no es hermético: su resultado depende del entorno del shell. Sin `.env.local` da **0 fallos**; con `.env.local` sourceado da **23 fallos en 17 archivos** (re-medido 2026-08-24; en junio eran 19 en 8 — crece con cada test nuevo que asume entorno limpio). La separación de carriles y el runner acotado ya están hechos (`c28e8bead`); lo que falta es el baseline hermético del carril `unit`, que es lo único que hace `pnpm test` determinista pase lo que pase en el shell. Atiende además el drift que los guards live destapan, hoy en dos direcciones.
 
 ## Why This Task Exists
 
@@ -38,11 +112,11 @@ Esto se detectó al cerrar TASK-1106: el gate canónico (`pnpm test` sin sourcea
 
 ## Goal
 
-- `pnpm test` produce el mismo resultado con shell limpio o con `.env.local` sourceado (determinismo / hermeticidad).
-- Los unit tests nunca dependen del entorno runtime ambiente (secretos, Postgres, GCP).
-- Los live-DB/cloud tests corren en un carril explícito y documentado (opt-in), y **skipean limpio** (no `ECONNREFUSED`, no llamadas reales) cuando no se opta.
-- El drift real de capability que destapa `capabilities-registry/parity.live` queda resuelto o documentado con dueño.
-- El modelo "unit lane hermético / live lane opt-in" queda documentado para que no se reintroduzca la fragilidad.
+- `pnpm test` produce el mismo resultado con shell limpio o con `.env.local` sourceado. **Métrica dura: hoy 0 vs 23.**
+- Los unit tests nunca dependen del entorno runtime ambiente (secretos, Postgres, GCP, flags de comportamiento).
+- Los live tests **skipean limpio** en el carril default (no `ECONNREFUSED`, no `ECONNRESET`, no llamadas reales), en vez de correr y morir por contención con los ~1600 unit.
+- El drift que destapan los guards live queda **abierto a su dueño** en las dos direcciones (TS→DB y DB→TS), no sembrado a ciegas desde acá.
+- ✅ El modelo «unit hermético / live serializado» ya quedó documentado (`LIVE_TESTS_AGENT_INVARIANTS.md` + auto-carga por path); al cerrar Slice 1 se le agrega el mecanismo del scrub.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -148,41 +222,88 @@ Reproducido con `set -a && source .env.local && set +a && pnpm test`:
 
 ## Scope
 
-### Slice 0 — Confirmar EmailTemplateBaseline + inventario del gating live
+> **Rescope 2026-08-24.** Los Slices 0 y 2 quedaron cerrados por `c28e8bead`; se conservan tachados
+> para que nadie los rehaga ni los dé por pendientes. El corazón de la task —Slice 1— sigue intacto
+> y hoy tiene más evidencia que cuando se escribió.
 
-- Capturar el error real de `EmailTemplateBaseline.test.tsx` (4) → clasificar A (fuga) o drift de snapshot aparte.
-- Enumerar los archivos que duplican el predicado de gating live (`requiresLiveDb` inline) para decidir si se canoniza un helper compartido.
+### ~~Slice 0 — Confirmar EmailTemplateBaseline + inventario del gating live~~ ✅ CERRADO 2026-08-24
 
-### Slice 1 — Hermetic env baseline (carril default)
+`EmailTemplateBaseline` **es Categoría A (fuga de entorno)**, no drift de snapshot: el diff es un
+solo token (`…-media-prod` esperado vs `…-media-dev` renderizado), causado por
+`GREENHOUSE_MEDIA_BUCKET`/`GREENHOUSE_PUBLIC_MEDIA_BUCKET`. El scrub lo resuelve; **no** hay que
+regenerar el snapshot. El inventario del gating live quedó cubierto por el carril `live` del
+`vitest.config.ts`, que selecciona por nombre de archivo en vez de por predicado duplicado.
 
-- En `src/test/setup.ts`: si `GREENHOUSE_TEST_LIVE !== '1'`, scrubear del `process.env` la **clase** de variables runtime de Greenhouse antes de que corran los tests:
-  - `GREENHOUSE_POSTGRES_*` (config DB + gate live)
-  - secretos por patrón: `*_API_KEY`, `*_SECRET`, `*_SECRET_REF`, `*_TOKEN`, `*_PASSWORD`, `*_SIGNING_SECRET`, `*_CLIENT_SECRET`, `*_DSN`
-  - GCP/Vertex/ADC: `GOOGLE_APPLICATION_CREDENTIALS`, `GOOGLE_CLOUD_PROJECT`, `GCP_PROJECT`, `GCLOUD_PROJECT`, `VERTEX_*`, `GREENHOUSE_IMAGE_PROVIDER`
-  - `RESEND_*`, `VERCEL` (cuando lo setea `.env`/`.env.production.local`, no cuando lo stubea un test)
-- El scrub debe ejecutarse ANTES de cargar los módulos de test (setupFiles corre antes que los test files) y NO tocar internals de Node/Vitest.
-- Mantener una allowlist mínima de "no scrubear" si emerge un caso legítimo (documentado).
+### Slice 1 — Hermetic env baseline (el corazón de la task, INTACTO)
 
-### Slice 2 — `vi.stubEnv` auto-restore + carril live
+Sigue siendo el único cambio que hace `pnpm test` **determinista pase lo que pase en el shell**. El
+runner nuevo protege al agente que usa `pnpm test:live`; no protege al que sourcea `.env.local` y
+corre `pnpm test`, que hoy obtiene 23 fallos ajenos.
 
-- `vitest.config.ts`: `test.unstubEnvs: true` + `test.unstubGlobals: true` (primitiva hermética canónica; `vi.stubEnv`/`vi.stubGlobal` se auto-restauran entre tests).
-- `package.json`: script `test:live` = `GREENHOUSE_TEST_LIVE=1 bash scripts/ci/vitest-with-log.sh` (o equivalente) — corre el carril live con el flag que desactiva el scrub. Documentar que requiere proxy arriba + `.env.local` sourceada.
-- (Opcional, si Slice 0 lo justifica) helper canónico `src/test/live-db.ts` (`requiresLiveDb()`/`describeLiveDb`) que dedup el predicado y, además del env, considere el flag `GREENHOUSE_TEST_LIVE`. Migrar al menos los archivos del set fallido; el resto oportunista.
+- En `src/test/setup.ts`, scrubear del `process.env` la **clase** de variables runtime de Greenhouse
+  antes de que corran los tests. Set mínimo verificado hoy contra los 8 archivos de Categoría A:
+  - `GREENHOUSE_POSTGRES_*` (config DB + el gate que confunde «env presente» con «DB alcanzable»)
+  - `GREENHOUSE_MEDIA_BUCKET`, `GREENHOUSE_PUBLIC_MEDIA_BUCKET` **(hallazgo nuevo: sin estas dos,
+    `EmailTemplateBaseline` sigue rojo)**
+  - secretos por patrón: `*_API_KEY`, `*_SECRET`, `*_SECRET_REF`, `*_TOKEN`, `*_PASSWORD`,
+    `*_SIGNING_SECRET`, `*_CLIENT_SECRET`, `*_DSN`
+  - flags de comportamiento: `*_ENABLED`, `*_RUN_MODE` **(hallazgo nuevo: son los que rompen
+    `brand-intelligence` y la familia `HIRING_ASSESSMENT_AI_*`)**
+  - GCP/Vertex/ADC: `GOOGLE_APPLICATION_CREDENTIALS`, `GOOGLE_CLOUD_PROJECT`, `GCP_PROJECT`,
+    `GCLOUD_PROJECT`, `VERTEX_*`, `GREENHOUSE_IMAGE_PROVIDER`
+  - `RESEND_*`, `VERCEL`
+- **Cómo se selecciona el carril, ahora que `GREENHOUSE_TEST_LIVE` ya no existe:** el scrub aplica
+  al proyecto `unit`. La forma canónica de expresarlo es un `setupFiles` propio del proyecto `unit`
+  ⚠️ **con el detalle que ya costó una iteración: NO redeclarar el `setupFiles` heredado** —
+  `extends: true` ya lo aplica, y duplicarlo hace que MSW reviente con «Invariant Violation».
+  El proyecto `live` no scrubea nada; su hermeticidad la da `scripts/test-live.mjs`.
+- El scrub corre ANTES de cargar los módulos de test y NO toca internals de Node/Vitest.
+- Allowlist mínima documentada si emerge un caso legítimo.
 
-### Slice 3 — Residual per-test (solo si el scrub no cubre algún caso A)
+**Criterio de aceptación duro y medible:** `pnpm test` y `set -a && source .env.local && set +a &&
+pnpm test` producen **el mismo resultado**, y ese resultado es 0 fallos. Hoy: 0 vs 23.
 
-- Si algún unit test sigue dependiendo de un var específico, convertirlo a `vi.stubEnv` explícito (declara su entorno). NO debe ser la regla — el scrub global es el lever principal.
+### ~~Slice 2 — `vi.stubEnv` auto-restore + carril live~~ ✅ CERRADO EN PARTE
 
-### Slice 4 — Categoría B (capability drift)
+El carril live existe (`vitest.config.ts` + `pnpm test:live`). **Queda vivo un residuo pequeño:**
+`test.unstubEnvs: true` + `test.unstubGlobals: true` no se aplicaron, y son la primitiva que hace
+que `vi.stubEnv`/`vi.stubGlobal` se auto-restauren entre tests. Es complementario al scrub: el scrub
+limpia el entorno **heredado**, esto limpia el **fabricado por un test que se olvidó de restaurar**.
 
-- Identificar la capability en TS sin seed en DB (correr `parity.live` en carril live con DB).
-- Si es seed faltante legítimo → migración de seed siguiendo el patrón TASK-827/873/935 (registry + grant en `runtime.ts` mismo PR + `capability-grant-coverage.test`). **Mostrar la migración al operador antes de aplicar** (gobernanza).
-- Si la posee una task in-progress → documentar el hallazgo en esa task (Delta) y dejar el seed a su dueña.
+### Slice 3 — Residual per-test (sólo si el scrub no cubre algún caso A)
 
-### Slice 5 — Documentación del contrato
+Sin cambios. Si algún unit test sigue dependiendo de una var específica, que la declare con
+`vi.stubEnv`. No debe ser la regla: el scrub global es la palanca.
 
-- Doc del modelo "unit lane hermético / live lane opt-in" (`docs/architecture/` o `docs/operations/`) + comentario load-bearing en `src/test/setup.ts`.
-- Nota en `CLAUDE.md`/`AGENTS.md` si el contrato amerita invariante duro (cómo correr live tests: `pnpm test:live` con proxy).
+### Slice 4 — Categoría B (drift), ampliado 11× y ahora con DOS direcciones
+
+- **TS → DB (11 capabilities).** Junio reportaba 1. Cada una pertenece a la task que la agregó:
+  `commercial.quote.simulate` (comercial), 8 de `growth.*`, 2 de `platform.public_site.*`. **No
+  sembrarlas a ciegas desde acá**: el patrón TASK-873/935 exige registry + grant en `runtime.ts` en
+  el mismo PR + `capability-grant-coverage.test`, y el grant correcto lo sabe su dueño. Lo que sí
+  corresponde a esta task es **abrir el hallazgo a cada dueño** y dejar el guard rojo hasta entonces.
+  Precedente ejecutable: `20260824010948152` (TASK-1762 sembró las suyas, con Down que **depreca**
+  en vez de borrar, porque borrar dejaría huérfano cualquier grant que las citara).
+- **DB → TS (3 data_sources), dirección nueva.** `commercial.proposals`, `growth.ai_visibility`,
+  `growth.seo` están sembrados en DB y el union TS no los reconoce. Dueño: `TASK-824`. Es más
+  peligroso que el inverso: un portal cliente puede tener habilitado un módulo que el código no
+  resuelve.
+
+### Slice 5 — Documentación del contrato ✅ CERRADO 2026-08-23
+
+`LIVE_TESTS_AGENT_INVARIANTS.md` + `.claude/rules/live-tests.md` (auto-carga por path) + regla dura
+en `AGENTS.md` + pointer en `project_context.md`. **`CLAUDE.md` quedó fuera por decisión registrada,
+no por olvido**: estaba a 18 tokens de su gate de presupuesto (34.982/35.000). Al cerrar Slice 1,
+actualizar el doc con el mecanismo del scrub.
+
+### Slice 6 — Precondiciones vencidas (Categoría D) — NUEVO
+
+`growth/meetings/__tests__/store.live.test.ts` afirma que una superficie de agendamiento no está
+configurada, y hoy sí lo está con datos productivos reales. **No corresponde editar el valor
+esperado**: eso deja el gate igual de frágil y lo volverá a romper el próximo cambio legítimo. La
+corrección es **derivar la precondición del mismo estado que el motor lee**, o que el test fabrique
+su propia superficie en vez de asumir la ausencia de una ajena. Dueño: `TASK-1509`; esta task lo
+documenta y le abre el hallazgo.
 
 ## Out of Scope
 

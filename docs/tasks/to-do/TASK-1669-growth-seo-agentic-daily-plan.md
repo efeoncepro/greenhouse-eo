@@ -868,6 +868,27 @@ command. Si se desea convertir feedback en evaluación offline, debe existir tas
 - [ ] Se ejecutó chequeo cruzado con 1664–1668, Nexa, MCP, AI governance y Full API Parity.
 - [ ] La evidencia demuestra que el plan es advisory y que no existe write autónomo.
 
+## Delta 2026-08-26 — la parity plana de SEO hacia Nexa no es esta task, y conviene decirlo
+
+Verificado: `src/lib/nexa/nexa-tools.ts` tiene 13 function declarations y **cero del dominio SEO/AEO**;
+el registry de acciones gobernadas tampoco tiene ninguna. Esta task posee los cuatro archivos de Nexa
+y agrega **una** tool, `get_seo_daily_plan` — que es un **agente compuesto con ordenamiento gobernado**,
+no la familia de readers.
+
+Son dos cosas distintas y conviene no mezclarlas:
+
+- **Esta task**: un plan diario compuesto, que además ya cedió su ordenamiento a la cola de `TASK-1700`
+  y arrastra sus dependencias.
+- **Parity plana**: exponer a Nexa los readers SEO que ya existen y ya viajan por MCP, sin LLM en el
+  medio. Por el criterio literal del ADR de Full API Parity, hoy el módulo SEO **no es
+  parity-complete**: tiene UI y MCP, no tiene el consumer que declaramos North Star.
+
+Meterlas juntas haría que la parity plana herede los bloqueos de esta task sobre `TASK-1700`,
+`TASK-1659` y `TASK-1660` — tres dependencias que no necesita. La recomendación es una task hermana
+con `Blocked by: TASK-1669` sólo por propiedad de archivos, no por lógica.
+
+Origen: `docs/audits/platform/2026-08-26-openseo-competitive-teardown-growth-seo-aeo.md` §3.5.
+
 ## Follow-ups
 
 - `TASK-1665` puede incorporar un panel/sidecar visual de plan diario cuando existan wireframe, flow,

@@ -24,6 +24,21 @@ const run = async (ctx: ProbeContext): Promise<ProbeOutcome> => {
     }
   }
 
+  // TASK-1778 — el score es una suma de PRESENCIAS de landmarks: sobre un cuerpo truncado
+  // o un shell de render JS, cada landmark "faltante" sería un falso negativo. Skipped.
+  if (res.truncated === true || res.observable === false) {
+    return {
+      status: 'skipped',
+      score: null,
+      reason:
+        res.truncated === true
+          ? 'HTML truncado al tope de lectura: no se pueden evaluar landmarks sin ver el documento completo.'
+          : 'La home servida es un shell de render JS sin contenido observable: los landmarks reales viven en el render.',
+      evidence: { truncated: res.truncated === true, observable: res.observable !== false },
+      errorCode: res.truncated === true ? 'truncated_body' : 'not_observable'
+    }
+  }
+
   const dom = analyzeDomSemantics(res.body)
 
   // Señales ponderadas (suma 100): main 25, nav 15, header 10, footer 10, h1 20, title 10, meta 10.

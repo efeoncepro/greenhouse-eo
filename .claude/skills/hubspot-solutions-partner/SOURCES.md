@@ -28,15 +28,24 @@ y que le hacen perder el deal y la credibilidad en la misma frase.
 
 - ✅ **Gartner MQ *B2B Marketing Automation Platforms*, publicado 2025-09-23: HubSpot es Leader, 5.º año
   consecutivo.** Verdadero. Úsalo. Es *el* reporte que respalda la tesis de esta skill.
-- ✅ **Gartner MQ *Sales Force Automation Platforms* 2025: HubSpot está en NICHE PLAYERS.**
-  Leaders = **Salesforce, Microsoft, Oracle**. Challengers = SAP, Pegasystems.
-  Visionaries = **Zoho**, Creatio. Niche = **HubSpot**, SugarCRM, monday.com, Vtiger.
-  *Cautions* de Gartner sobre HubSpot: guided selling **"static"**, **IA predictiva limitada**, y la
-  **brecha entre su foco SMB y el comprador enterprise** que evalúa ese MQ.
+- ✅ **Gartner MQ *CRM Sales Platforms*, publicado 2026-08-06: HubSpot está en CHALLENGERS.** Avanzó desde
+  Niche Player en *Sales Force Automation Platforms* 2025. Salesforce y Microsoft son Leaders. Zoho también
+  pasó a Challenger desde Visionary. El cambio de nombre aumenta el peso de IA predictiva/generativa/agéntica,
+  gobierno y productividad del seller.
+- ✅ **Gartner MQ *Multichannel Marketing Hubs* 2025:** Salesforce fue evaluado; HubSpot no aparece en la lista
+  de vendors. Esta superficie representa mejor grandes operaciones B2C, journeys, personalización y ejecución
+  multicanal. No extrapoles el liderazgo B2B de HubSpot a este mercado.
 
-> **Un AE de Salesforce va a llegar con esa lámina impresa.** El rebate está en
-> `modules/05_DISPLACEMENT.md` § Salesforce → Objeción 1. **No lo niegues: reencuádralo.**
-> Y nota que **Zoho está por encima de HubSpot** en ese cuadrante. No lo subestimes en la reunión.
+> **Un AE de Salesforce puede llegar con CRM Sales o Multichannel Marketing Hubs.** El rebate está en
+> `modules/05_DISPLACEMENT.md` § Salesforce → Objeción 1. **No lo niegues ni uses otro MQ como distracción:**
+> identifica qué mercado representa el job del cliente. Zoho está en el mismo cuadrante Challenger de CRM Sales
+> 2026; no lo subestimes.
+
+Fuentes verificadas 2026-08-27: [Gartner B2B Marketing Automation 2025](https://www.gartner.com/en/documents/6970466) ·
+[Gartner CRM Sales 2026](https://www.gartner.com/en/documents/8230961) ·
+[Critical Capabilities CRM Sales 2026](https://www.gartner.com/en/documents/8243193) ·
+[Gartner Multichannel Marketing Hubs 2025](https://www.gartner.com/en/documents/6975966) ·
+[audit Efeonce Gartner + Chile](../../../docs/audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md).
 
 ### 2. "HubSpot es Leader en el Forrester Wave" — **NO verificado para 2026**
 
@@ -373,7 +382,7 @@ descuento de partner, el **neto** puede caer bajo USD 400 y pierdes el waiver �
 | Agentforce | **USD 125** usr/mes add-on · Flex Credits **USD 500/100k** (acción = 20 créditos = **USD 0,10**) | ⚠️ |
 | **Adobe Marketo** | ❌ **NO publica precios.** Cobra **por tamaño de base de datos, no por uso** ✅ | ✅ el modelo / ❌ el precio |
 | **Microsoft D365 Sales EE** | **USD 105,00** usr/mes · Customer Insights **USD 1.000/mes attach** (usuarios ilimitados) | ✅ **fuente primaria** |
-| **Zoho CRM Enterprise** | ~USD 40 usr/mes · **Visionary en el MQ SFA — por encima de HubSpot** | ⚠️ / ✅ el MQ |
+| **Zoho CRM Enterprise** | ~USD 40 usr/mes · **Challenger en el MQ CRM Sales Platforms 2026, igual que HubSpot** | ⚠️ precio / ✅ cuadrante |
 | **Pipedrive Premium** | ~USD 49 seat/mes. ⚠️ **Renombró sus tiers en jul-2025** (Essential→Lite, Professional→Premium) | ⚠️ |
 | **Odoo Custom** | ~USD 13,60 usr/mes ✅ · implementación real en Chile **USD 20-50k** ⚠️ · **32 partners certificados en Chile** ⚠️ | ✅/⚠️ |
 

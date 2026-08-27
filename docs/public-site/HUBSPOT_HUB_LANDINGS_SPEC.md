@@ -6,7 +6,7 @@
 > **Arquitectura:** [PDR-013](decisions/PDR-013-hub-hubspot-pillar-cluster-arquitectura.md) ·
 > **Posicionamiento:** [PDR-006](decisions/PDR-006-landing-hubspot-agentic-platform-posicionamiento.md) ·
 > **Dominio:** skill `hubspot-solutions-partner` (`SOURCES.md` = qué se puede afirmar).
-> **As-of:** 2026-07-13.
+> **As-of:** 2026-08-27. La posición Gartner fue actualizada contra *CRM Sales Platforms* 2026.
 
 ---
 
@@ -51,7 +51,8 @@ de resultados, no hay vacío: hay **saturación** — y entonces la pieza necesi
 
 1. **La postura, siempre:** *"Antes de venderte HubSpot, te mostramos si te sirve."* **Evidencia antes que promesa.**
 2. **Cada página dice cuándo HubSpot NO sirve** para ese caso. No es un gesto: es lo que gana a RevOps.
-3. 🔴 **Claims prohibidos:** *"Líder en CRM según Gartner"* (es **Niche Player** en el MQ de SFA) · Forrester
+3. 🔴 **Claims prohibidos:** *"Líder en CRM según Gartner"* (es **Challenger** en el MQ de CRM Sales Platforms
+   2026; avanzó desde Niche Player en SFA 2025) · Forrester
    Wave · **ISO 27001** de HubSpot · residencia de datos en LATAM · *"flota de agentes"* (**solo 3 en GA**).
    ✅ Sí: *"Leader en B2B Marketing Automation (Gartner, 5.º año)"* · **SOC 2 Type II + SOC 3**.
 4. 🔴 **Nomenclatura 2026:** **Revenue Hub** (ex-Commerce) · **Data Hub** (ex-Operations) · **UNBOUND**
@@ -251,7 +252,7 @@ Y si el problema cambia en dos años, acá estamos."*
 > "material de ventas" al CFO antes de que lea una palabra**, saboteando la tesis del texto.
 >
 > 🔴 **Su condición de existencia:** frente a esas 20,8M de páginas, **la única diferencia son dos gestos** —
-> **abrir con el Niche Player de Gartner** y **declarar que nuestro propio TCO se cae** si ya tienes un admin de
+> **abrir con el Challenger de Gartner — y el avance desde Niche Player en 2025 —** y **declarar que nuestro propio TCO se cae** si ya tienes un admin de
 > Salesforce. 🎯 **Si se ablandan, esto es la 4.001 del montón, y lo correcto es no publicarlo.**
 > **Categoría `hubspot`, Gutenberg. Task: TASK-1404.** *(Y el blog **no** la exime de la pasada legal: el folder
 > no cambia el marco de la publicidad comparativa.)*
@@ -265,10 +266,10 @@ Y si el problema cambia en dos años, acá estamos."*
 
 **Secciones:**
 
-1. 🔴 **La verdad incómoda primero** — **Gartner puso a HubSpot en Niche Players** del MQ de *Sales Force
-   Automation* 2025. Los Leaders son **Salesforce, Microsoft y Oracle**. *"Si tu comité compra por Magic
-   Quadrant, empieza por saber esto."* **Y HubSpot es Leader del MQ de B2B Marketing Automation, 5.º año.
-   Son dos reportes distintos.**
+1. 🔴 **La verdad incómoda primero** — **Gartner ubicó a HubSpot como Challenger** del MQ de *CRM Sales
+   Platforms* 2026, después de avanzar desde Niche Player en 2025. Salesforce y Microsoft son Leaders.
+   *"Si tu comité compra por Magic Quadrant, empieza por saber esto."* **Y HubSpot es Leader del MQ de B2B
+   Marketing Automation 2025, 5.º año. Son dos reportes distintos.**
 2. **El TCO a 3 años, con supuestos declarados** — HubSpot ≈ USD 295k · Salesforce ≈ USD 611k *(30 usuarios,
    lista sin descuento)*. 🔴 **Y la honestidad que nadie pone:** *"el delta no lo hace la licencia (USD 162k
    vs 189k = 17%). Lo hace el **admin**. **Si ya tienes un admin de Salesforce en planilla, la mitad de este

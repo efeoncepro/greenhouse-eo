@@ -63,6 +63,20 @@ const optionLabel = (option: unknown, index: number): string => {
   return `Opción ${index + 1}`
 }
 
+/**
+ * Ventana de guardado preventivo, en segundos antes del plazo de RESPUESTA.
+ *
+ * El autosave es un debounce que se reinicia con cada tecla, así que quien escribe de corrido sin pausar
+ * nunca lo dispara: no pierde los últimos milisegundos, puede perder la respuesta entera. Dentro de esta
+ * ventana forzamos el guardado ignorando el debounce.
+ *
+ * NO extiende ningún plazo: guarda ANTES, texto escrito a tiempo. Un flush disparado AL cruzar el plazo
+ * es imposible —el cliente va atrás del servidor ≥1 RTT y el corte de `instances.ts` es `>=` sin epsilon—,
+ * y por eso esto es preventivo y no reactivo. Ver TASK-1751.
+ */
+const PREEMPTIVE_SAVE_WINDOW_SECONDS = 30
+const PREEMPTIVE_SAVE_INTERVAL_MS = 5000
+
 const answerKey = (answer: Record<string, unknown>) => JSON.stringify(answer)
 
 const isAnswered = (question: PublicAssessmentQuestion | undefined, answer: Record<string, unknown>) => {
@@ -79,6 +93,46 @@ const responseAnswerFor = (assessment: PublicAssessmentView | null, question: Pu
 
   return assessment.responses.find((response) => response.questionId === question.questionId)?.answer ?? {}
 }
+
+/**
+ * TASK-1751 — El `code` es lo ÚNICO que sobrevive del error, y hay que conservarlo.
+ *
+ * El servidor devuelve `{ok, code, message}` con `message` GENÉRICO a propósito: es un endpoint público
+ * sin autenticación y el test anti-leak (`route.test.ts:146-161`) lo fija. Aflojar ese mensaje para que
+ * «diga la verdad» debilitaría la frontera pública. La verdad se construye acá, desde el `code`.
+ */
+class AssessmentRequestError extends Error {
+  readonly code: string | undefined
+
+  constructor(code: string | undefined) {
+    super(code ?? 'assessment_request_failed')
+    this.name = 'AssessmentRequestError'
+    this.code = code
+  }
+}
+
+/**
+ * Cuatro mensajes agrupados por lo que la persona PUEDE HACER, no siete por código.
+ * Precedente de forma: `TalentPoolSelfServiceClient.tsx:84-89` (misma clase de superficie pública).
+ */
+const messageForCode = (code: string | undefined, copy: AssessmentTakingClientProps['copy']): string => {
+  // Se cumplió el plazo de respuesta. Reintentar no puede funcionar nunca.
+  if (code === 'assessment_not_open') return copy.taking.saveClosedBody
+
+  // Faltan respuestas: el servidor exige la evaluación completa. Tampoco se resuelve reintentando.
+  if (code === 'assessment_incomplete') return copy.taking.submitIncompleteBody
+
+  // Todo lo demás —fallo real de sistema, red, 429— sí es reintentable: su caso legítimo.
+  return copy.taking.errorBody
+}
+
+/*
+ * Nota deliberada: NO se agrega un CTA de "Reintentar". Esta pantalla hoy no tiene ninguno —el error se
+ * pinta como texto— y el contrato de jerarquía de acciones sólo exige que no aparezca donde reintentar no
+ * puede funcionar (`assessment_not_open`, `assessment_incomplete`). Eso se cumple por construcción.
+ * Introducir el botón sería superficie nueva fuera del alcance de esta task; la clave `taking.retry`
+ * sigue existiendo sin consumer, esperando a quien lo diseñe.
+ */
 
 const apiRequest = async (
   token: string | undefined,
@@ -97,10 +151,15 @@ const apiRequest = async (
     body: JSON.stringify(requestBody),
   })
 
-  const payload = await response.json() as { ok: boolean; assessment?: PublicAssessmentView; message?: string }
+  const payload = await response.json() as {
+    ok: boolean
+    assessment?: PublicAssessmentView
+    message?: string
+    code?: string
+  }
 
   if (!response.ok || !payload.ok || !payload.assessment) {
-    throw new Error(payload.message ?? 'assessment_request_failed')
+    throw new AssessmentRequestError(payload.code)
   }
 
   return payload.assessment
@@ -129,6 +188,8 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
   const cardRef = useRef<HTMLElement | null>(null)
   const currentQuestionIdRef = useRef<string | null>(null)
   const lastSavedRef = useRef<Record<string, string>>({})
+  const answerRef = useRef(answer)
+  const draftsRef = useRef<Record<string, Record<string, unknown>>>({})
   const saveTimerRef = useRef<number | null>(null)
   const saveFeedbackTimerRef = useRef<number | null>(null)
 
@@ -184,6 +245,15 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
   const answeredIds = useMemo(() => new Set(assessment?.responses.map((response) => response.questionId).filter(Boolean) ?? []), [assessment?.responses])
   const progressPercent = questions.length === 0 ? 0 : ((step + 1) / questions.length) * 100
 
+  /**
+   * TASK-1751: el servidor EXIGE la evaluación completa para aceptar el envío
+   * (`public-taking.ts:651-657`). Si falta una respuesta, enviar es imposible — y prometerlo sería
+   * repetir la misma mentira que esta task viene a arreglar. Se deriva en cliente desde `responses`:
+   * NUNCA un campo nuevo en el DTO público, que tiene allowlists exactos testeados.
+   */
+  const savedAnswerCount = questions.filter((question) => answeredIds.has(question.questionId)).length
+  const canSubmitEverything = questions.length > 0 && savedAnswerCount === questions.length
+
   useEffect(() => {
     if (!started || submitted) return undefined
 
@@ -207,14 +277,23 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
   useEffect(() => {
     if (!started || !currentQuestion) return
 
-    const questionChanged = currentQuestionIdRef.current !== currentQuestion.questionId
+    const previousQuestionId = currentQuestionIdRef.current
+    const questionChanged = previousQuestionId !== currentQuestion.questionId
 
     currentQuestionIdRef.current = currentQuestion.questionId
 
     if (!questionChanged) return
 
+    // TASK-1751: el borrador de la pregunta que se abandona se PRESERVA. Antes se perdía en silencio —
+    // al volver, esta misma línea lo pisaba con el valor del servidor (vacío si nunca se guardó).
+    if (previousQuestionId) draftsRef.current[previousQuestionId] = answerRef.current
+
     if (saveFeedbackTimerRef.current) window.clearTimeout(saveFeedbackTimerRef.current)
-    setAnswer(responseAnswerFor(assessment, currentQuestion))
+
+    const storedDraft = draftsRef.current[currentQuestion.questionId]
+    const serverAnswer = responseAnswerFor(assessment, currentQuestion)
+
+    setAnswer(storedDraft && isAnswered(currentQuestion, storedDraft) ? storedDraft : serverAnswer)
     setFieldError(null)
     setSaveState('idle')
     window.requestAnimationFrame(() => cardRef.current?.focus({ preventScroll: true }))
@@ -256,9 +335,11 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
       }, 1800)
 
       return updated
-    } catch {
+    } catch (error) {
+      const code = error instanceof AssessmentRequestError ? error.code : undefined
+
       setSaveState('error')
-      setFieldError(copy.taking.errorBody)
+      setFieldError(messageForCode(code, copy))
 
       return null
     }
@@ -278,6 +359,36 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [answer, canAnswer, currentQuestion?.questionId])
+
+  useEffect(() => {
+    answerRef.current = answer
+  }, [answer])
+
+  /**
+   * ¿Estamos cerca del plazo de RESPUESTA? Sólo aplica cuando hay límite explícito: sin límite el
+   * `remainingSeconds` cuenta hacia el cierre de 24 h, que no es el plazo que cierra el guardado.
+   */
+  const inPreemptiveSaveWindow = Boolean(
+    canAnswer &&
+    assessment?.timing.answerDeadlineAt &&
+    remainingSeconds != null &&
+    remainingSeconds <= PREEMPTIVE_SAVE_WINDOW_SECONDS,
+  )
+
+  useEffect(() => {
+    if (!inPreemptiveSaveWindow || !currentQuestion) return undefined
+
+    // Uno inmediato al entrar a la ventana, y después a intervalo fijo. Lee del ref para que escribir
+    // NO reinicie el intervalo: reiniciarlo con cada tecla reproduciría el defecto del debounce.
+    void saveAnswer(currentQuestion, answerRef.current)
+
+    const id = window.setInterval(() => {
+      void saveAnswer(currentQuestion, answerRef.current)
+    }, PREEMPTIVE_SAVE_INTERVAL_MS)
+
+    return () => window.clearInterval(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inPreemptiveSaveWindow, currentQuestion?.questionId])
 
   const start = async () => {
     if (!consent) return
@@ -339,9 +450,11 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
 
       setAssessment(updated)
       setSubmitOpen(false)
-    } catch {
+    } catch (error) {
+      const code = error instanceof AssessmentRequestError ? error.code : undefined
+
       setSubmitOpen(false)
-      setFieldError(copy.taking.errorBody)
+      setFieldError(messageForCode(code, copy))
     } finally {
       setSubmitting(false)
     }
@@ -514,11 +627,15 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
           </div>
           {timeNote ? <span className={styles.srOnly} aria-live='polite'>{timeNote}</span> : null}
         </div>
-        <main className={styles.mainStack}>
+        <main className={styles.mainStack} data-surface-recipe='candidate-assessment-taking'>
           {timingPhase === 'submit_grace' ? (
-            <div className={styles.accommodationBanner} role='status'>
-              <i className='tabler-send' aria-hidden='true' />
-              <strong>{copy.taking.submitGraceNotice}</strong>
+            <div className={styles.accommodationBanner} role='status' data-capture='assessment-grace-banner'>
+              <i className='tabler-clock-exclamation' aria-hidden='true' />
+              <span>
+                <strong>{copy.taking.submitGraceNotice}</strong>{' '}
+                {canSubmitEverything ? copy.taking.graceBodyComplete : copy.taking.graceBodyIncomplete}{' '}
+                {formatTemplate(copy.taking.graceSavedCount, { saved: savedAnswerCount, total: questions.length })}
+              </span>
             </div>
           ) : null}
           <div className={styles.wizardHeader}>
@@ -623,9 +740,10 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
                       className={styles.textArea}
                       value={typeof answer.text === 'string' ? answer.text : ''}
                       onChange={(event) => updateAnswer({ text: event.target.value.slice(0, 6000) })}
-                      placeholder={copy.taking.textareaPlaceholder}
+                      aria-label={copy.taking.answerFieldLabel}
+                      placeholder={canAnswer ? copy.taking.textareaPlaceholder : undefined}
                       maxLength={6000}
-                      disabled={!canAnswer}
+                      readOnly={!canAnswer}
                     />
                     <span className={styles.characterCount}>
                       {formatTemplate(copy.taking.characterCount, { count: typeof answer.text === 'string' ? answer.text.length : 0, max: 6000 })}
@@ -643,11 +761,13 @@ const AssessmentTakingClient = ({ copy, initialAssessment, token }: AssessmentTa
                 >
                   {copy.taking.previous}
                 </button>
-                <button className={styles.primaryButton} type='button' data-capture='assessment-next' onClick={() => void goNext()}>
-                  {timingPhase === 'submit_grace' || step === questions.length - 1
-                    ? copy.taking.submit
-                    : copy.taking.next}
-                </button>
+                {timingPhase === 'submit_grace' && !canSubmitEverything ? null : (
+                  <button className={styles.primaryButton} type='button' data-capture='assessment-next' onClick={() => void goNext()}>
+                    {timingPhase === 'submit_grace' || step === questions.length - 1
+                      ? copy.taking.submit
+                      : copy.taking.next}
+                  </button>
+                )}
               </div>
               <div className={styles.saveState} role='status' aria-live='polite'>
                 {saveState === 'saving' ? <i className={`tabler-loader-2 ${styles.saveIcon} ${styles.saveIconPending}`} aria-hidden='true' /> : null}

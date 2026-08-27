@@ -140,6 +140,35 @@ Full-loop scenarios declare `qualityProfile: 'premium'` and include:
 
 `fullPage` does not prove overflow safety. Measure the DOM.
 
+### A gate that demands breaking the correct pattern is misconfigured
+
+A finding is a hypothesis, not a verdict. Before changing the product, decide which of the two is
+wrong: the code, or the scenario that measures it. **Flattening a canonical pattern to satisfy a
+check is a regression that ships green** — the gate goes quiet and the platform loses the pattern.
+
+- If the flagged construct is the repo's canonical answer for that problem, the fix is to **declare
+  the exemption in the scenario, with the reason written next to it**, and to state which real
+  contract still holds and how it was verified.
+- If you cannot name the canonical pattern the code is following, that is the answer: the gate is
+  right.
+
+Precedent (`TASK-1751`, 2026-08-26): the layout check reported the stepper buttons as outside the
+viewport at 390px. Their container already declares `overflow-x: auto` — a **contained scroller**,
+which is the repo's canonical containment for wide content (see the horizontal-scroll containment
+invariant in `docs/architecture/agent-invariants/UI_PLATFORM_AGENT_INVARIANTS.md`). The real contract
+is that the **page** never scrolls horizontally, not that no child ever exceeds the viewport; it was
+measured and holds. The resolution was `allowHorizontalScrollSelectors` in the scenario, not a
+flattened scroller.
+
+**The option is not discoverable, so it is documented here.** The scenario key is
+`allowHorizontalScrollSelectors` (`scripts/frontend/lib/scenario.ts:98`); it is renamed to
+`allowHScrollSelectors` when handed to the in-page probe (`scripts/frontend/lib/layout-integrity.ts:220`,
+consumed at `:39,:49`). Reading the analyzer therefore teaches you the **wrong** name for authoring.
+Writing the internal name in a scenario is caught by `tsc` (`TS2353`, excess property) — verified —
+but only because every scenario annotates `export const scenario: CaptureScenario`. A scenario literal
+that loses that annotation loses the check too, and the misspelled key would then be dropped in
+silence. Keep the annotation; use the scenario-side name.
+
 ## Visual Quality Scorecard
 
 Review actual dossier/captures and score 1–5:

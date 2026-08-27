@@ -1,0 +1,22 @@
+# Glosario
+
+- **MCE / Engagement:** Salesforce Marketing Cloud Engagement.
+- **MID:** identificador de una cuenta o Business Unit en Engagement.
+- **Enterprise account:** cuenta superior que gobierna Business Units según la configuración contratada.
+- **Business Unit (BU):** partición organizativa con usuarios, contenido, datos, configuración y límites propios o compartidos.
+- **Contact Key / Subscriber Key:** identificador durable que vincula al individuo entre canales y tablas; no equivale necesariamente al email.
+- **All Contacts / All Subscribers:** poblaciones sistémicas distintas; su relación afecta conteo, estado y supresión.
+- **Data Extension (DE):** tabla de datos usada para segmentación, personalización, importación o automatización.
+- **Sendable DE:** DE vinculada a un Contact Key para envíos.
+- **Publication List:** preferencia o suscripción por categoría dentro de un contexto de envío.
+- **Journey Builder:** orquestación de experiencias multietapa dirigidas por eventos y datos.
+- **Automation Studio:** automatizaciones programadas o disparadas para archivos, SQL, imports, extracts, scripts y envíos.
+- **Content Builder:** gestión de activos, plantillas y contenido reutilizable.
+- **Marketing Cloud Connect:** integración administrada entre Engagement y Salesforce CRM.
+- **SAP:** Sender Authentication Package; conjunto contratado de capacidades de autenticación y branding de envío.
+- **Engagement+:** oferta que combina capacidades de Engagement con acceso definido a capacidades de la nueva generación; verifica edición y contrato.
+- **Marketing Cloud Next:** nueva generación construida sobre Salesforce Platform y Data 360; no es sinónimo de Engagement.
+- **Account Engagement:** automatización B2B antes llamada Pardot; producto distinto.
+- **Data 360:** plataforma de datos de Salesforce, antes Data Cloud; no sustituye automáticamente el modelo de datos de Engagement.
+- **Personalization:** decisión y personalización en tiempo real; producto separado.
+- **Marketing Intelligence:** medición y armonización de marketing, antes Datorama; producto separado.

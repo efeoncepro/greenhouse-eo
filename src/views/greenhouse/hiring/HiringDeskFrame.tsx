@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
 import ButtonBase from '@mui/material/ButtonBase'
@@ -46,27 +46,67 @@ const NAV_ITEMS = [
 const HiringDeskFrame = ({ surface, copy, primary, lead, aside, action, secondaryActions, meta, applicationContext }: HiringDeskFrameProps) => {
   const isApplication = surface === 'application'
   const activeSurface = (isApplication ? 'pipeline' : surface) as keyof typeof copy.navigation
+  const navigationRef = useRef<HTMLElement | null>(null)
+  const [navigationEdges, setNavigationEdges] = useState({ start: false, end: false })
+
+  const updateNavigationEdges = useCallback(() => {
+    const navigationElement = navigationRef.current
+
+    if (!navigationElement) return
+
+    const maxScrollLeft = navigationElement.scrollWidth - navigationElement.clientWidth
+
+    setNavigationEdges({
+      start: navigationElement.scrollLeft > 2,
+      end: navigationElement.scrollLeft < maxScrollLeft - 2,
+    })
+  }, [])
+
+  useEffect(() => {
+    const navigationElement = navigationRef.current
+
+    if (!navigationElement) return
+
+    const activeItem = navigationElement.querySelector<HTMLElement>(`[data-tab="${activeSurface}"]`)
+    const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+
+    activeItem?.scrollIntoView?.({
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      block: 'nearest',
+      inline: 'center',
+    })
+    updateNavigationEdges()
+
+    const resizeObserver = new ResizeObserver(updateNavigationEdges)
+
+    resizeObserver.observe(navigationElement)
+
+    return () => resizeObserver.disconnect()
+  }, [activeSurface, updateNavigationEdges])
 
   const navigation = (
-    <Box
-      component='nav'
-      aria-label={copy.title}
-      data-capture='hiring-tabs'
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 0.5,
-        inlineSize: '100%',
-        maxInlineSize: '100%',
-        minBlockSize: 42,
-        overflowX: 'auto',
-        overflowY: 'hidden',
-        scrollbarWidth: 'none',
-        WebkitOverflowScrolling: 'touch',
-        '&::-webkit-scrollbar': { display: 'none' }
-      }}
-    >
-      {NAV_ITEMS.map(item => {
+    <Box sx={{ position: 'relative', minWidth: 0, maxInlineSize: '100%', overflow: 'hidden' }}>
+      <Box
+        ref={navigationRef}
+        component='nav'
+        aria-label={copy.title}
+        data-capture='hiring-tabs'
+        onScroll={updateNavigationEdges}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.5,
+          inlineSize: '100%',
+          maxInlineSize: '100%',
+          minBlockSize: 42,
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          scrollbarWidth: 'none',
+          WebkitOverflowScrolling: 'touch',
+          '&::-webkit-scrollbar': { display: 'none' }
+        }}
+      >
+        {NAV_ITEMS.map(item => {
         const active = item.key === surface || (isApplication && item.key === 'pipeline')
         const isApplicationParent = isApplication && item.key === 'pipeline' && applicationContext
 
@@ -120,7 +160,34 @@ const HiringDeskFrame = ({ surface, copy, primary, lead, aside, action, secondar
             {copy.navigation[item.key]}
           </ButtonBase>
         )
-      })}
+        })}
+      </Box>
+      {navigationEdges.start ? (
+        <Box
+          aria-hidden='true'
+          sx={theme => ({
+            position: 'absolute',
+            insetBlock: 0,
+            insetInlineStart: 0,
+            inlineSize: 24,
+            pointerEvents: 'none',
+            background: `linear-gradient(90deg, ${theme.palette.background.paper}, transparent)`,
+          })}
+        />
+      ) : null}
+      {navigationEdges.end ? (
+        <Box
+          aria-hidden='true'
+          sx={theme => ({
+            position: 'absolute',
+            insetBlock: 0,
+            insetInlineEnd: 0,
+            inlineSize: 40,
+            pointerEvents: 'none',
+            background: `linear-gradient(270deg, ${theme.palette.background.paper}, transparent)`,
+          })}
+        />
+      ) : null}
     </Box>
   )
 

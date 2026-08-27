@@ -1,5 +1,13 @@
 # TASK-355 — Hiring Desk Wireframe
 
+## Delta 2026-08-24 — Retorno contextual y revisión secuencial
+
+- El retorno ya no depende del límite cronológico del snapshot: `focusApplication` fija la postulación exacta, deriva desde ella la vacante canónica y trae también su opening/demanda aunque hayan quedado fuera de los listados acotados. El parámetro de foco es efímero y se consume al recuperar la tarjeta.
+- Si la postulación ya no puede resolverse, Pipeline limpia el foco inválido y muestra una recuperación estable dentro de la vacante disponible; no cae en otra tarjeta ni afirma que encontró el origen.
+- Application 360 ofrece `Anterior` / `Siguiente` sólo cuando existe otra **postulación** no archivada en la misma vacante y etapa. El reader devuelve exclusivamente ids y posición, con orden cronológico estable; no usa score, afinidad ni sugerencias IA, preservando anti-anclaje.
+- Si hay cambios sin guardar en Decisión, scorecard o Expediente, la navegación secuencial exige confirmar el descarte. En 390 px el contador se compacta a `{position} de {total}` y las route tabs desplazan automáticamente el padre activo a una posición visible.
+- Decisión: `reuse + extend`. Se mantienen rutas completas y la pestaña Pipeline como retorno único; no nace sidecar, botón Volver ni ranking de candidatos.
+
 ## Delta 2026-08-23 — Retorno contextual Application 360 → Pipeline
 
 - `Application 360` es un detalle hijo de `Pipeline`, no una quinta surface hermana. La pestaña persistente `Pipeline` es el único retorno primario: en el detalle muestra flecha, conserva el label visible y su nombre accesible es `Volver al pipeline de {opening}`.
@@ -24,7 +32,7 @@
 ## Meta
 
 - Task: `TASK-355`
-- Superficie: Hiring Desk interno (`(dashboard)`, con sesión) — shell común + 4 workspaces
+- Superficie: Hiring Desk interno (`(dashboard)`, con sesión) — shell común + 3 workspaces hermanos y Application 360 como detalle hijo de Pipeline
 - Nodos del master flow: N4 (bandeja) · N5 (ficha 360) · N6 (asignar test) · N8 (review scorecard) · N9 (decisión) — ver `docs/ui/flows/EPIC-011-hiring-ats-UI-FLOW.md`
 - UI rigor: `ui-platform`
 - Ruta: `src/app/(dashboard)/agency/hiring/**` (NO `[lang]`). Marca: **Greenhouse** (app interna, no Efeonce institucional).
@@ -48,7 +56,8 @@ El "control room" del ATS: un reclutador/hiring manager opera el pipeline de pun
 ├──────────────────────────────────────────────────────────────────────────┤
 │  Canvas interno Hiring Desk — aquí sí manda el HTML Claude Design aprobado│
 │  Hiring Desk    [Demanda] [Pipeline] [Publicación]                       │
-│  <región activa: Demand Desk | Pipeline Board | Publication Desk | 360>   │
+│  <región activa: Demand Desk | Pipeline Board | Publication Desk>         │
+│                  └─ Application 360 es detalle hijo del Pipeline          │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -88,12 +97,14 @@ El "control room" del ATS: un reclutador/hiring manager opera el pipeline de pun
   click card → Application 360
 ```
 
-### Surface 3 — Application 360 (N5/N8/N9) `/agency/hiring/[applicationId]`
+### Detail hijo — Application 360 (N5/N8/N9) `/agency/hiring/applications/[applicationId]`
 
 ```
 ┌───────────────────────────────────────────────────────────────────┐
-│  ← Volver   {Candidato}  · {Rol}  · etapa: Assessment  [Decidir ▾] │  detail shell (patrón Placement)
-│  [Overview] [Assessment] [Documentos] [Decisión] [Actividad]       │  tabs
+│  {Candidato}  · {Rol}  · etapa: Evaluación          [Decidir ▾]     │  detail shell
+│  [Anterior]   Postulación 1 de 2   [Siguiente]                       │  misma opening + stage
+│  [Demanda] [← Pipeline] [Publicación] [Banco de talento]            │  Pipeline = padre/retorno único
+│  [Resumen] [Evaluación] [Documentos] [Decisión] [Expediente]        │  tabs del detalle
 ├───────────────────────────────────────────────────────────────────┤
 │  OVERVIEW: perfil (masked), fuente=public_careers, links portafolio│
 │  ─────────────────────────────────────────────────────────────────│
@@ -130,12 +141,16 @@ El "control room" del ATS: un reclutador/hiring manager opera el pipeline de pun
 | `hiringDesk.nav.demand` | Demanda | Shell |
 | `hiringDesk.nav.pipeline` | Pipeline | Shell; en Application 360 actúa como ubicación padre |
 | `hiringDesk.common.returnToOpeningPipeline` | Volver al pipeline de {opening} | Nombre accesible del retorno contextual |
+| `hiringDesk.pipeline.returnFocusedStatus` | Volviste al Pipeline. Postulación de {candidate}, etapa {stage}. | Anuncio al recuperar la tarjeta |
+| `hiringDesk.pipeline.returnUnavailableTitle` | La postulación ya no está visible en este pipeline | Fallback honesto |
 | `hiringDesk.nav.publication` | Publicación | Shell |
 | `hiringDesk.demand.newCta` | Nueva demanda | Demand |
 | `hiringDesk.pipeline.moveTo` | Mover a etapa | Kanban (teclado) |
 | `hiringDesk.a360.tab.assessment` | Evaluación | 360 |
 | `hiringDesk.a360.ai_suggested` | Sugerencia IA — confirma o edita | 360 |
 | `hiringDesk.a360.reveal` | Revelar (requiere motivo) | 360 docs |
+| `hiringDesk.a360.queuePosition` | Postulación {position} de {total} | Cola secuencial; variante compacta en 390 px |
+| `hiringDesk.a360.leaveWithUnsavedTitle` | ¿Salir sin guardar? | Guard de Anterior/Siguiente |
 | `hiringDesk.decision.reason` | Motivo de la decisión | Decisión |
 | `hiringDesk.decision.confirm` | Confirmar decisión | Decisión |
 | `hiringDesk.pub.publish` | Publicar vacante | Publication |
@@ -146,14 +161,15 @@ El "control room" del ATS: un reclutador/hiring manager opera el pipeline de pun
 | Surface | Estados |
 |---|---|
 | Demand Desk | loading (skeletons) · loaded · empty (sin demandas) · empty-filtered · error |
-| Pipeline Board | loading · columnas · **columna vacía** ("Sin postulantes en esta etapa") · **drag-active** · **optimistic-moving** · **rollback** ("No se pudo mover, se revirtió") · error |
-| Application 360 | por tab: loading · loaded · **degradado honesto** (facet que falla, no `catch(()=>[])`); assessment: pending-human-rating · AI-suggested · scored; docs: masked · revealed |
+| Pipeline Board | loading · columnas · **columna vacía** ("Sin postulantes en esta etapa") · **drag-active** · **optimistic-moving** · **rollback** ("No se pudo mover, se revirtió") · **retorno enfocado** · **foco no disponible con aviso estable** · error |
+| Application 360 | por tab: loading · loaded · **degradado honesto** (facet que falla, no `catch(()=>[])`); cola: única · anterior/siguiente · guard de borrador; assessment: pending-human-rating · AI-suggested · scored; docs: masked · revealed |
 | Publication Desk | diff · sin-cambios · publish-confirm · error |
 
 ## Accessibility Contract (WCAG 2.2 AA)
 
 - **Kanban NO drag-only** (2.5.7): cada card tiene menú "Mover a etapa" operable por teclado; foco + `aria` correctos; el drag es aditivo. Optimistic move anuncia el resultado (`aria-live`).
 - Tabs (360) = APG tabs pattern; detail shell con foco al `<h1>` al abrir.
+- La cola anuncia la posición completa aunque a 390 px muestre el contador compacto. Al cambiar de postulación, el nuevo `<h1>` recibe foco; al volver, la tarjeta recuperada recibe foco y `aria-live` anuncia candidato y etapa.
 - Decisión + reveal + publish = confirmaciones accesibles (`role=alertdialog`/dialog, foco atrapado, Esc cierra).
 - Reveal de PII: el estado masked/revealed se anuncia; el motivo es requerido.
 - Reflow 320/200%; target ≥24px; `prefers-reduced-motion` (drag/optimistic sin motion cuando reduce).
@@ -185,6 +201,7 @@ Copy `getMicrocopy(locale).hiringDesk`; tokens AXIS; charts (KPIs) ECharts→Ape
 - Evidencia posterior Demanda 2026-07-10: `task355-hiring-demand-desk` PASS desktop/mobile en `.captures/2026-07-10T09-35-01_task355-hiring-demand-desk` (KPIs con profundidad, toolbar izquierda/derecha alineado, tabla enterprise, responsive sin overflow de página).
 - Evidencia de recomposición Pipeline 2026-08-16: `task355-hiring-pipeline-board` PASS desktop/390 px en `.captures/2026-08-16T22-13-39_task355-hiring-pipeline-board` (scope de vacante contenido, toolbar y Kanban en un plano operacional, labels completos, teclado, rollback, reduced-motion y axe sin findings).
 - Evidencia de retorno contextual 2026-08-23: `task355-hiring-application-360` PASS desktop/390 px en `.captures/2026-08-23T20-28-03_task355-hiring-application-360` (12 frames + video; destino de vacante exacto, foco en tarjeta, pestaña activa visible, cero errores de consola/página/hidratación/red). Los warnings de contraste pertenecen a contenido preexistente de Application 360 y no al control de retorno.
+- Evidencia de retorno contextual y cola 2026-08-24: `task355-hiring-application-360` PASS desktop/390 px en `.captures/2026-08-24T12-19-59_task355-hiring-application-360` (24 frames + videos; `1 de 2 → 2 de 2`, misma vacante/etapa, morph Application→Pipeline y foco en la segunda tarjeta; cero errores de consola, página, hidratación y red; enterprise rubric PASS). Persisten warnings de contraste y skeleton del contenido preexistente. El DSL también avisa que no puede reejecutar por teclado el mismo click después de cambiar de ruta; la afordancia es un enlace nativo y su `href`/`aria-current` están cubiertos por test, pero esa captura no constituye replay de teclado independiente.
 - Auditoría de fidelidad canvas-only 2026-07-10: `.captures/task355-hiring-reference-canvas-2026-07-10T08-18-26-140Z/index.html` compara el `main` del HTML aprobado contra runtime Demand/Pipeline/Publication, excluyendo el chrome global Greenhouse por contrato.
 
 ## Design Decision Log
@@ -198,6 +215,7 @@ Copy `getMicrocopy(locale).hiringDesk`; tokens AXIS; charts (KPIs) ECharts→Ape
 - **Transición tabs:** las tabs son navegación real (`href`) para no perder robustez; el panel aplica entrada `ghHiringPanel` y `viewTransitionName='hiring-desk-panel'`, con reduced-motion sin animación.
 - **360 = hub** que embebe assessment (1363) + docs (1362) + decisión; IA propone→humano confirma; anti-anclaje.
 - **360 vuelve por Pipeline, no por un CTA paralelo:** el route tab persistente resuelve el padre con `openingId`, `focusApplication` reencuentra la tarjeta y el morph compartido preserva continuidad espacial con reduced-motion equivalente.
+- **La cola secuencial navega postulaciones, no personas ni rankings:** mismo `openingId` + misma `stage`, archivadas excluidas, orden estable por creación/id y payload limitado a ids/posición. Nunca cruza vacantes ni consulta score/afinidad.
 - **Decisión estructurada/contestable** (reason obligatorio) — fairness/AI-Act; scorecard advisory, nunca gate.
 - **Publication diff** anti-leak; publish refresca la careers (`revalidatePath`).
 - **Bilingüe** es-CL + en-US; **marca Greenhouse** (app interna, no Efeonce).
@@ -212,5 +230,5 @@ Copy `getMicrocopy(locale).hiringDesk`; tokens AXIS; charts (KPIs) ECharts→Ape
 - [ ] viewCodes `gestion.hiring*` con ruta alcanzable (reachability) mismo PR; `role_view_fallback=0`.
 - [ ] PII masked/reveal (capability+reason+audit); Publication solo allowlist; publish → `revalidatePath`.
 - [ ] Readers del 360 anti silent-catch (degradación honesta).
-- [x] GVC desktop+mobile mirado; `scrollWidth==clientWidth`; consola limpia en canvas TASK-355. Evidencia local vigente: `.captures/2026-07-10T09-35-01_task355-hiring-demand-desk` + `.captures/2026-07-10T09-05-35_task355-hiring-pipeline-board` + `.captures/2026-07-10T09-07-55_task355-hiring-tabs-transition`; warnings axe restantes pertenecen al chrome global preexistente, no al card nesting corregido.
+- [x] GVC desktop+mobile mirado; retorno contextual y cola verificados en `.captures/2026-08-24T12-19-59_task355-hiring-application-360`; `scrollWidth==clientWidth` y consola limpia. Queda explícito el warning de replay por teclado del DSL, sin confundirlo con una falla del enlace nativo.
 - [ ] `UI ready: yes` solo con lo anterior + `pnpm task:lint --task TASK-355` sin findings.

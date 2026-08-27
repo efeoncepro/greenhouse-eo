@@ -32,6 +32,12 @@ export type EmailType =
   | 'hiring_stage_advanced'
   | 'hiring_decision_selected'
   | 'hiring_decision_rejected'
+  // TASK-1762 — «sin selección»: la vacante se llenó y esta persona no quedó. Es un EmailType
+  // PROPIO y no una variante de `rejected` porque el tipo es un DISCRIMINANTE por el que el
+  // sistema ramifica: kill-switch por tipo en `email_type_config` y perfil de footer resuelto por
+  // EmailType. Lo operativo lo sella: un cierre por capacidad manda N correos de golpe y debe
+  // poder pausarse SIN silenciar el correo de decisión individual.
+  | 'hiring_decision_not_selected'
   | 'hiring_talent_pool_verification'
 
 export type EmailDeliveryStatus =
@@ -98,6 +104,7 @@ export const EMAIL_PRIORITY_MAP: Record<string, EmailPriority> = {
   hiring_stage_advanced: 'transactional',
   hiring_decision_selected: 'transactional',
   hiring_decision_rejected: 'transactional',
+  hiring_decision_not_selected: 'transactional',
   hiring_talent_pool_verification: 'transactional'
 }
 
@@ -228,6 +235,7 @@ export const CANDIDATE_REPLY_TO_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<Em
   'hiring_stage_advanced',
   'hiring_decision_selected',
   'hiring_decision_rejected',
+  'hiring_decision_not_selected',
   'hiring_talent_pool_verification'
 ])
 export const AGENCY_BRANDED_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<EmailType>([
@@ -244,6 +252,7 @@ export const AGENCY_BRANDED_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<EmailT
   'hiring_stage_advanced',
   'hiring_decision_selected',
   'hiring_decision_rejected',
+  'hiring_decision_not_selected',
   'hiring_talent_pool_verification'
 ])
 

@@ -5,19 +5,58 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   test: {
     environment: 'node',
-    include: [
-      'src/**/*.test.ts',
-      'src/**/*.test.tsx',
-      'src/**/*.spec.ts',
-      'src/**/*.spec.tsx',
-      'scripts/**/*.test.ts',
-      'scripts/**/*.test.tsx',
-      'scripts/**/*.spec.ts',
-      'scripts/**/*.spec.tsx',
-      'services/**/*.test.ts',
-      'services/**/*.spec.ts'
-    ],
+    // `include` vive en cada proyecto, no acá: heredado desde la raíz haría que un mismo archivo
+    // corriera en los DOS proyectos (verificado — `config.test.ts` aparecía bajo `unit` y `live`).
     setupFiles: ['src/test/setup.ts'],
+
+    /**
+     * Los `*.live.test.ts` corren SERIALIZADOS entre sí; el resto conserva paralelismo por archivo.
+     *
+     * Por qué (2026-08-23): los live tests no corren contra bases efímeras — corren contra la
+     * ÚNICA instancia Cloud SQL que comparten dev, staging y producción. El paralelismo por archivo
+     * de vitest presupone un aislamiento que ahí no existe: dos archivos que tocan la misma
+     * plantilla, la misma vacante o el mismo candidato se pisan, y el síntoma no es un error claro
+     * sino un `..._stale` intermitente que parece flakiness y se "arregla" con un rerun.
+     *
+     * La alternativa —`fileParallelism: false` global— serializaría también los ~1300 tests
+     * unitarios, que no comparten nada y no tienen por qué pagar el problema de sus vecinos.
+     *
+     * Escala sin coordinación: un archivo `*.live.test.ts` nuevo entra al proyecto serializado por
+     * su nombre, sin registro que mantener ni índices que repartir.
+     */
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'unit',
+          include: [
+            'src/**/*.test.ts',
+            'src/**/*.test.tsx',
+            'src/**/*.spec.ts',
+            'src/**/*.spec.tsx',
+            'scripts/**/*.test.ts',
+            'scripts/**/*.test.tsx',
+            'scripts/**/*.spec.ts',
+            'scripts/**/*.spec.tsx',
+            'services/**/*.test.ts',
+            'services/**/*.spec.ts'
+          ],
+          // `setupFiles` NO se redeclara: `extends: true` ya lo hereda de la raíz. Declararlo acá
+          // lo aplica DOS veces y MSW revienta con «Invariant Violation» al hacer `listen()` sobre
+          // un server ya escuchando.
+          exclude: ['**/node_modules/**', '**/*.live.test.ts']
+        }
+      },
+      {
+        extends: true,
+        test: {
+          name: 'live',
+          include: ['src/**/*.live.test.ts', 'scripts/**/*.live.test.ts', 'services/**/*.live.test.ts'],
+          exclude: ['**/node_modules/**'],
+          fileParallelism: false
+        }
+      }
+    ],
 
     // Raised from Vitest default (5s) to give React component suites headroom
     // under v8 coverage instrumentation on GitHub runners. Multi-step dialog/form

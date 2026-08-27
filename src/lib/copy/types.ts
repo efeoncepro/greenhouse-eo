@@ -130,6 +130,12 @@ export interface HiringAssessmentCopy {
     timeToAnswer: string
     timeToSubmit: string
     submitGraceNotice: string
+    graceBodyComplete: string
+    graceBodyIncomplete: string
+    graceSavedCount: string
+    saveClosedBody: string
+    submitIncompleteBody: string
+    answerFieldLabel: string
     timeWarningFive: string
     timeWarningOne: string
     textareaPlaceholder: string
@@ -546,6 +552,9 @@ export interface HiringDeskCopy {
     appliedDaysAgo: string
     appliedDayUnit: string
     appliedDaysUnit: string
+    returnFocusedStatus: string
+    returnUnavailableTitle: string
+    returnUnavailableBody: string
     /**
      * TASK-1754 — indexado por el enum del dominio, NO por `string`. Como
      * `Record<string, string>` una clave faltante no rompía nada: la columna se quedaba
@@ -572,6 +581,12 @@ export interface HiringDeskCopy {
     residenceCountryLabel: string
     notProvided: string
     candidateMessageTitle: string
+    queuePosition: string
+    queuePositionCompact: string
+    leaveWithUnsavedTitle: string
+    leaveWithUnsavedBody: string
+    keepEditing: string
+    discardAndContinue: string
     assessmentTitle: string
     assessmentPending: string
     assignAssessment: string

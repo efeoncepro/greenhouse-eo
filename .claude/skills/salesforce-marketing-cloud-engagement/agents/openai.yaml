@@ -1,0 +1,6 @@
+interface:
+  display_name: "Salesforce Marketing Cloud Engagement"
+  short_description: "Opera y vende Marketing Cloud Engagement"
+  default_prompt: "Usa $salesforce-marketing-cloud-engagement para evaluar, diseñar u ofrecer una solución de Marketing Cloud Engagement."
+policy:
+  allow_implicit_invocation: true

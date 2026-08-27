@@ -281,6 +281,64 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getSeoKeywordMarketData(args)
   )
 
+  // TASK-1775 — foto de dominio ◑: la pregunta que abre toda reunión de SEO ("¿cómo estamos
+  // contra ellos?" / "¿venimos subiendo o bajando?"), del target O de un competidor.
+  server.registerTool(
+    'get_seo_domain_overview',
+    {
+      title: 'Get SEO Domain Overview',
+      description:
+        'Get the domain-level photo + monthly trajectory of the organization SEO target domain (default) or one of its declared competitors (pass subject=<domain>): total ranked keywords in the top-100, estimated monthly organic traffic volume (etv), estimated USD cost of buying that traffic in Ads, top-100 position distribution, rank momentum, and up to 72 months of history. All figures are market ESTIMATES from the DataForSEO Labs snapshot (lens=estimated, refreshed monthly), NOT measured Search Console data: never average or mix them with GSC series. etv is estimated traffic VOLUME, not dollars and not measured visits. Every figure carries capturedAt — always report the as-of date. When data.ok is false report the errorCode honestly (no_market_data means the subject has no snapshot yet — a state, not a zero). The market (country+language) comes from the organization SEO target; pass market=<ISO-2|location_code> when the organization has more than one.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(2).max(12).optional(),
+        subject: z.string().trim().min(3).max(255).optional(),
+        months: z.number().int().positive().max(72).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoDomainOverview(args)
+  )
+
+  // TASK-1776 — el sujeto PÁGINA: qué ranquea una URL/subcarpeta/subdominio (propio o de un
+  // competidor) y qué páginas concentran el tráfico de un host.
+  server.registerTool(
+    'get_seo_url_visibility',
+    {
+      title: 'Get SEO URL Visibility',
+      description:
+        'Get what a specific page, subfolder, subdomain or domain ranks for in the market snapshot (DataForSEO Labs ranked_keywords): total ranked keywords, top-100 position distribution, estimated traffic volume (etv), momentum, and the purchased top-N keyword detail. Pass subject=<value> plus kind=domain|subdomain|subfolder|url (the kind is DECLARED, never inferred; defaults to the organization SEO target domain). Alternative mode: concentration=url|subdomain (optional domain=<host>) returns which pages or subdomains concentrate the estimated traffic of a host. All figures are market ESTIMATES (lens=estimated, monthly refresh) with capturedAt — always report the as-of date, never mix or average with measured GSC data, and a no_market_data answer means the subject has no snapshot yet (a state, not a zero). The market comes from the organization SEO target; pass market=<ISO-2|location_code> when the organization has more than one.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(2).max(12).optional(),
+        subject: z.string().trim().min(3).max(512).optional(),
+        kind: z.enum(['domain', 'subdomain', 'subfolder', 'url']).optional(),
+        months: z.number().int().positive().max(36).optional(),
+        concentration: z.enum(['url', 'subdomain']).optional(),
+        domain: z.string().trim().min(3).max(255).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoUrlVisibility(args)
+  )
+
+  // TASK-1777 — el detalle que hace accionable el snapshot de enlaces: nombres, no conteos.
+  server.registerTool(
+    'get_seo_backlink_detail',
+    {
+      title: 'Get SEO Backlink Detail',
+      description:
+        'Get the actionable backlink detail behind the weekly aggregate snapshot: WHICH referring domains link to the organization SEO target (with rank 0-100 and per-domain spam score), which domains are NEW or LOST in the window (with a sample link and anchor — enough to write a recovery email), the anchor-text profile, and a server-derived anchor over-optimization reading (dominant anchor share + brand/generic/url/exact mix). CRITICAL: the response has THREE distinct states — "available" (detail exists), "skipped_no_movement" (the profile was STABLE that week, so no detail was purchased: report it as a positive finding, NEVER as missing data), and "drilldown_failed" (we tried and do not know what moved: report honestly). The anchor over-optimization metric is SEPARATE from toxic_share (spam-score proxy) — they answer different questions and are never interchangeable. Pass captureDate=YYYY-MM-DD for a specific week; default is the latest evaluated snapshot.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(2).max(12).optional(),
+        captureDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoBacklinkDetail(args)
+  )
+
   server.registerTool(
     'get_seo_visibility_360',
     {
@@ -545,6 +603,39 @@ export const createGreenhouseMcpServer = (
       outputSchema: greenhouseMcpToolOutputSchema
     },
     async args => handlers.prepareSeoGroundedQueries(args)
+  )
+
+  // TASK-1709 — diagnóstico de prospecto (lectura + disparo). Sólo bindings `internal`.
+  server.registerTool(
+    'get_seo_prospect_diagnostic',
+    {
+      title: 'Get SEO Prospect Diagnostic',
+      description:
+        'Read SEO prospect diagnostics (a one-shot, provider-only diagnostic of a domain WITHOUT client access). Pass diagnosticId for full facts, or rootDomain/limit to list. Every figure is ESTIMATED (external provider, with capturedAt) — always report the lens and the as-of date, NEVER present a figure as measured, and NEVER assert the site is healthy: the diagnostic enumerates quantified loss, it does not certify health.',
+      inputSchema: {
+        diagnosticId: z.string().trim().min(1).optional(),
+        rootDomain: z.string().trim().min(4).optional(),
+        limit: z.number().int().min(1).max(100).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoProspectDiagnostic(args)
+  )
+
+  server.registerTool(
+    'run_seo_prospect_diagnostic',
+    {
+      title: 'Run SEO Prospect Diagnostic',
+      description:
+        'Run a ONE-SHOT SEO diagnostic of a prospect domain (no client access needed). THIS SPENDS REAL MONEY (~USD 0.25 per run, hard per-diagnostic ceiling + daily per-actor cap enforced server-side). Propose the exact domain and market to the human and get explicit confirmation BEFORE calling — never trigger this on your own initiative. Idempotent per domain/market/day: repeating the same subject the same day returns the existing diagnostic with USD 0 spent. There is NO recurring capture on prospects: re-running another day is a new human decision that passes every ceiling again.',
+      inputSchema: {
+        rootDomain: z.string().trim().min(4),
+        market: z.string().trim().min(2).max(2),
+        competitorDomains: z.array(z.string().trim().min(4)).max(5).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.runSeoProspectDiagnostic(args)
   )
 
   // Resource addressable: el mismo documento read-only por URI estable.

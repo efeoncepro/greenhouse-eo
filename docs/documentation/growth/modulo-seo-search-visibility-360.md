@@ -43,6 +43,8 @@ El schema `greenhouse_growth` guarda dos familias de tablas con reglas distintas
 | `seo_site_audit_runs` | Una fila por crawl técnico del sitio (health score, páginas crawleadas, estado `running/succeeded/degraded/failed`). |
 | `seo_site_audit_findings` | Los hallazgos de cada crawl (URL, tipo de problema, severidad `critical/warning/notice`). |
 | `seo_backlink_snapshots` | Snapshot semanal del perfil de enlaces (dominios referentes, total de backlinks, domain rank, share tóxico). |
+| `seo_domain_overview_snapshots` | La foto de un **dominio completo** (del cliente o de un competidor): keywords ranqueadas totales, tráfico orgánico estimado, distribución del top-100 y su trayectoria mensual. Clave **sin organización**: lo que pagó una org le sirve a toda la cartera (TASK-1775). |
+| `seo_url_visibility_snapshots` | Lo mismo a nivel de **página**: qué keywords ranquea una URL, subcarpeta o subdominio (propio o de un competidor) y qué páginas concentran el tráfico de un host. Una sola tabla para las cuatro clases de sujeto, con la clase declarada — no adivinada (TASK-1776). |
 
 La separación importa porque el negocio de cada familia es distinto: la configuración responde "¿qué estamos midiendo y desde cuándo?"; las mediciones responden "¿qué pasó cada día?". Un snapshot jamás se corrige — si una captura salió mal, se degrada o se marca, pero la historia no se reescribe.
 
@@ -193,9 +195,82 @@ las pestañas hermanas aparecen deshabilitadas hasta que existan).
 > `src/lib/growth/seo/**`. El mismo calculo de KPIs lo consumen Nexa y el lane MCP
 > (`get_seo_overview_kpis`) por construccion — no hay una segunda implementacion.
 
+## La foto de dominio y la trayectoria competitiva (TASK-1775)
+
+Hasta esta capacidad, el módulo sólo describía **el recorte seguido**: las keywords que alguien
+decidió trackear más lo que Search Console mide del propio dominio. Un dominio con 4.000 keywords
+ranqueadas del que seguimos 31 se veía como un dominio de 31 keywords, y de un competidor no se
+veía nada. La foto de dominio cierra ese hueco con tres corridas sobre la misma tabla:
+
+- **La foto mensual** (`domain_rank_overview`, cron `ops-seo-domain-overview` día 16): cuántas
+  keywords ranquea el dominio en total, cuánto tráfico estima el mercado, cómo se distribuye su
+  top-100 y su momentum — del target **y de cada competidor declarado**.
+- **La trayectoria histórica** (`historical_rank_overview`, corrida manual **una sola vez por
+  sujeto** porque cuesta 10× el resto): el pasado del dominio desde 2020-10, para poder mostrarle
+  a un cliente nuevo si venía subiendo o cayendo antes de llegar.
+- **El screening de cartera** (`bulk_traffic_estimation`): de una lista de hasta 1.000 dominios,
+  cuáles son grandes de verdad — antes de gastar en el detalle de cada uno.
+
+Reglas de honestidad: toda cifra viaja marcada **◑ estimada** con su fecha de captura; un dominio
+sin dato responde "sin datos de mercado", nunca un cero; y nada de esta tabla se mezcla con las
+series medidas de Search Console. La **autoridad** de dominio para superficies sigue siendo una
+sola: el `domain_rank` del snapshot de enlaces (esta capa no crea una segunda).
+
+Se consume por el reader canónico (`readDomainOverview`), el lane ecosystem
+(`/api/platform/ecosystem/growth/seo/domain-overview`) y la tool MCP `get_seo_domain_overview`.
+Operación paso a paso: [Operar la foto de dominio SEO](../../manual-de-uso/growth/operar-foto-de-dominio-seo.md).
+
+> Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md §4.2](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) (`seo_domain_overview_snapshots`, patrón multi-productor) y spec `docs/tasks/TASK_ID_REGISTRY.md → TASK-1775 (spec en la carpeta de su lifecycle vigente)`.
+
+## La visibilidad por página: URL, subcarpeta y subdominio (TASK-1776)
+
+El trabajo editorial se decide a nivel de página, y hasta esta capacidad el módulo sólo sabía
+hablar de dominios y de keywords sueltas. Ahora puede responder, para **cualquier** dominio:
+
+- **"¿Por qué keywords entra tráfico a esta página?"** — la captura por sujeto (`ranked_keywords`)
+  con la clase declarada: dominio, subdominio, subcarpeta o URL exacta. Lo que Semrush vende como
+  tres reportes separados acá es una sola capacidad con un resolver de sujeto.
+- **"¿Qué páginas del competidor concentran su tráfico?"** y **"¿cuál de sus subdominios pesa?"** —
+  colectores bajo demanda (`relevant_pages` / `subdomains`) que dejan cada página y subdominio como
+  medición propia consultable.
+- **Bono de cartera:** cada fila comprada trae el dato de mercado de su keyword (volumen, CPC,
+  competencia) ya pagado, y el colector lo deposita en la tabla de mercado compartida con costo
+  cero — una corrida sobre un cliente deja fresco mercado que otro habría tenido que comprar.
+
+Las mismas reglas de honestidad de toda la serie: cifras **◑ estimadas** con fecha, "sin datos de
+mercado" en vez de ceros, y la posición de mercado jamás se promedia con la posición medida de
+Search Console. Se consume por `readUrlVisibility`/`readVisibilityConcentration`, el lane ecosystem
+(`/growth/seo/url-visibility`) y la tool MCP `get_seo_url_visibility`.
+Operación: [Operar la visibilidad por URL](../../manual-de-uso/growth/operar-visibilidad-por-url-seo.md).
+
+> Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md §4.2 y §15](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md).
+
+## El detalle de enlaces accionable (TASK-1777)
+
+El snapshot semanal de enlaces decía "perdiste 12 dominios referentes esta semana" — una frase con
+la que un cliente no puede hacer nada. El detalle nominal agrega los **nombres**: qué dominio
+enlazó, cuál se cayó (con una muestra del enlace y su texto — suficiente para escribir el correo
+de recuperación) y con qué anchors te enlazan.
+
+La regla de oro es de costo: **el detalle sólo se compra donde el agregado se movió**. Cada semana
+el sistema evalúa el snapshot y deja un veredicto: si el perfil estuvo estable, no se gasta nada y
+eso queda registrado como afirmación positiva ("no pasó nada"), distinta de "no sabemos qué pasó"
+(un intento fallido, que enciende una alerta). Las tres lecturas posibles nunca se confunden.
+
+Trae además una lectura nueva: la **sobre-optimización de anchors** — si el 60% de tus enlaces
+llegan con el mismo texto exacto, eso parece manipulación aunque los dominios sean impecables. Es
+una métrica separada de la toxicidad por spam score (miden cosas distintas, con remedios
+distintos) y viaja ya calculada a todas las superficies.
+
+Se consume por `readBacklinkDetail`, el lane ecosystem (`/growth/seo/backlink-detail`) y la tool
+MCP `get_seo_backlink_detail`.
+Operación: [Operar el perfil de enlaces SEO](../../manual-de-uso/growth/operar-perfil-de-enlaces-seo.md).
+
+> Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md §4.2](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) (tablas hijas del snapshot + condición de disparo).
+
 ## Que NO existe todavia
 
-Lo siguiente aún no está construido (las series que ya se llenan: Search Console live; rankings live desde el 2026-08-06). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP live en producción desde el 2026-08-06**: lane ecosystem + 3 tools read-only (`get_seo_entitlement`, `get_seo_keyword_opportunities`, `get_seo_visibility_360`) en el MCP interno de Greenhouse (TASK-1645, ver el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8) **y federadas al gateway público `mcp.efeonce.org`** (TASK-1647). La lectura funcional completa de esa capacidad está en [Search Visibility 360 por MCP](search-visibility-360-por-mcp.md). Pendiente:
+Lo siguiente aún no está construido (las series que ya se llenan: Search Console live; rankings live desde el 2026-08-06). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP live en producción desde el 2026-08-06** (TASK-1645, que partió con 3 tools read-only): hoy el MCP interno de Greenhouse sirve **21 tools SEO (16 lecturas + 5 escrituras)** — inventario vigente y estado de despliegue en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8 — **todas federadas al gateway público `mcp.efeonce.org`** (TASK-1647 abrió la federación; TASK-1658 la completó con guard de paridad bidireccional; la revisión productiva del gateway sirve 13 hasta el deploy post-release develop→main). La lectura funcional completa de esa capacidad está en [Search Visibility 360 por MCP](search-visibility-360-por-mcp.md). Pendiente:
 
 | Falta | Task que lo trae |
 |---|---|

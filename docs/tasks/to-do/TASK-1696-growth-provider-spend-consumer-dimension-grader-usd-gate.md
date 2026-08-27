@@ -571,7 +571,15 @@ infraestructura de proveedor, no dominio.
   `succeeded / total` de `provider_observations` en ventana móvil, **con corte por provider** —
   el número global (68%) esconde que `google_ai_overview` está en 29%. Umbrales declarados en la
   spec del signal, con el baseline medido 2026-08-15 como punto de partida honesto, no como meta.
-- Ambas registradas en `src/lib/reliability/signals.ts` y visibles bajo el rollup `growth`
+- 🔴 `seo.provider.cost_over_budget` (kind `budget`, steady = 0) — **la señal que nueve tasks ya
+  citan como construida y que no existe.** Alerta cuando el gasto acumulado del período se acerca al
+  presupuesto de la organización, **antes** de que el gate empiece a rechazar corridas con
+  `budget_exhausted`. Hoy el sobregiro sólo se manifiesta como corridas que fallan, sin aviso previo.
+  Entra en esta task y no en una propia porque **necesita la dimensión de consumidor de Slice 1 para
+  ser correcta**: una alarma que sólo ve el gasto `seo` sub-reportaría exactamente el 87,5% del
+  gasto del grader que esta task acaba de atribuir. Umbral declarado en la spec del signal, no
+  hardcodeado; severidad `warning` al acercarse, `error` al agotar.
+- Las tres registradas en `src/lib/reliability/signals.ts` y visibles bajo el rollup `growth`
   (`registry.ts`), con `filesOwned` actualizado.
 - Fecha canónica en SQL: `(CURRENT_DATE - X)::int` para días entre fechas; **jamás**
   `EXTRACT(EPOCH FROM (date - date))`.
@@ -900,6 +908,34 @@ observaciones-a-dólares. Declararlo en el docstring de la query evita que algui
 - **`serp.requiresOrganization`**: evaluar si conviene un tercer estado
   (`optional_with_reason`) que obligue al caller a declarar *por qué* no hay organización, en vez de
   permitir el silencio.
+
+## Delta 2026-08-26
+
+**Esta task adopta `seo.provider.cost_over_budget`, que nueve tasks dan por construida y no existe.**
+
+Barrido verificado: `grep -rIn "cost_over_budget" src services migrations scripts` devuelve **cero**.
+La señal aparece en la columna de mitigación de la tabla de riesgos de `TASK-1300`, `1301`, `1302`,
+`1303`, `1304`, `1308`, `1309`, `1651` y `1664` — ocho de ellas ya `complete` — y el riesgo que dice
+mitigar es siempre el mismo y es el #1 del módulo: *«Costo DataForSEO desbocado»*.
+
+La atribución es **circular**: 1300 dice que la materializa 1303, 1301 dice que la materializa 1303,
+1304 dice que la agrega 1303 — y 1303 dice que sus datos *«alimentan `seo.provider.cost_over_budget`
+(TASK-1301/1300)»*. Cada una cerró apuntando a la otra. Peor: `TASK-1664` **ya lo había detectado por
+escrito** (*«La señal … citada por la spec no existe en código»*) y aun así cerró volviendo a citarla
+en su propia tabla de riesgos.
+
+**Matiz que evita sobredimensionarlo:** el control duro sí existe. `enforceSeoRunEntitlement` bloquea
+antes de gastar y dos callers re-consultan el gate dentro del bucle, así que el sobregiro intra-batch
+está cubierto. Lo que falta es la **detección temprana**, y por eso entra como señal y no como gate.
+
+**Por qué acá y no en una task nueva:** la alarma necesita la dimensión `consumer` de Slice 1 para no
+sub-reportar el gasto del grader, y esta task ya toca `signals.ts` en Slice 5. Crearle una task propia
+la haría depender de ésta para ser correcta, que es la definición de un slice mal extraído.
+
+Al cerrar esta task, corregir la tabla de riesgos de las nueve que la citan: hasta hoy declaran una
+mitigación que no existía.
+
+Origen: `docs/audits/platform/2026-08-26-openseo-competitive-teardown-growth-seo-aeo.md` §3.10.
 
 ## Open Questions
 

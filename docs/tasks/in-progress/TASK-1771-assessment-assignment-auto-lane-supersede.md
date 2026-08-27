@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-011`
-- Status real: `in-progress 2026-08-23 — CODE COMPLETE, ROLLOUT PENDIENTE. Slices 1-4 en develop local sin push (617d18df7, 146242339, d5914c841, 0f558666a). Gate vivo verde en dos corridas seguidas con residuo cero verificado en dos ejes. Falta: push/release, la Production verification sequence, y la migracion del COMMENT parqueada en pending-migrations con condicion de release. NO mover a complete hasta que el rollout ocurra`
+- Status real: `EN PRODUCCIÓN desde el release 709e15f66 (2026-08-23); línea corregida 2026-08-26 — decía «en develop local sin push» y era falso. Verificado blob a blob contra origin/main: supersede-dead-end.ts y la ruta assessment-policy/reconciliation/supersede/route.ts están idénticas en main (los 4 SHAs no son ancestros porque main promueve por squash, no porque falte el código). La migración del COMMENT TAMBIÉN se aplicó (d793b2444, con readback antes/después) y pending-migrations quedó vacía. Falta SÓLO: la Production verification sequence completa (8 pasos; el 8 es monitor 7 días desde el 08-23) y el gate pnpm test + pnpm build, que requiere autorización por consumo de memoria`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
@@ -716,12 +716,13 @@ Además: `ISSUE-162` (`9d1db5252`) y la recalibración de esta spec (`12868f9c7`
 
 ### Lo que falta para `complete`
 
-1. Push + release. Nada de esto está desplegado.
+1. ~~Push + release~~ → **HECHO**: viajó en `709e15f66` (2026-08-23). Verificado blob a blob contra
+   `origin/main` el 2026-08-26 (`supersede-dead-end.ts` + la ruta `…/reconciliation/supersede/route.ts`).
 2. La `## Production verification sequence` completa, que sólo se puede ejecutar contra el runtime desplegado.
-3. La migración del `COMMENT` de `superseded_at`, parqueada en
-   `docs/tasks/pending-migrations/TASK-1771-superseded-at-comment.sql.pending` con su condición: **el release
-   que despliega el command ya ocurrió**, verificado contra `origin/main`. Antes de eso el comentario
-   describiría una capacidad que el runtime desplegado no tiene.
+   **Este es el pendiente real.**
+3. ~~La migración del `COMMENT` de `superseded_at`, parqueada~~ → **APLICADA** (`d793b2444`, con readback
+   antes/después); `docs/tasks/pending-migrations/` quedó vacía. Su condición —que el release que despliega
+   el command ya hubiera ocurrido— se cumplió.
 4. `pnpm test` completo + `pnpm build` de producción como gate de cierre (el build consume ~30 GB y requiere
    autorización del operador).
 

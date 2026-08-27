@@ -27,6 +27,50 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-08-27 — evidencia real nueva del rollout de `TASK-1778`
+
+Durante la verificación del cutover de `TASK-1778` (7 dominios vivos de cartera en modo strict),
+`www.bancochile.cl` — perfil vivo — resultó **ilegible para el fetcher HTTP estático**: muro
+Imperva/Incapsula con loop de cookies (302 a sí mismo), que falla igual con la red vieja y con la
+nueva (no es regresión del endurecimiento). Es exactamente la clase de sitio que el renderer
+headless de esta task habilitaría leer. Origen de la evidencia: `TASK-1778`
+(`docs/tasks/complete/TASK-1778-growth-probe-fetcher-hardening-commercial-grade.md`).
+
+## Delta 2026-08-26 — se revierte a `P2`: subirla era tratar el síntoma
+
+**Corrección de una decisión mía de esta misma fecha.** Había subido esta task a `P1` argumentando que
+sobre un sitio client-rendered los probes de presencia afirman ausencia. El hallazgo es correcto; la
+conclusión era errónea. Vuelve a `P2` y el defecto se cierra en `TASK-1778`. Razones, en orden:
+
+**1. Esta task reduce la frecuencia del defecto, no su clase.** Aun con Chromium: una página detrás de
+login, un render que excede el timeout, un error de JS, un muro de consentimiento o un challenge de
+bot devuelven DOM vacío o parcial con `res.ok === true`, y el probe sigue emitiendo `score: 0` con
+*"La home no publica ningún JSON-LD"*. Se habría pagado un runtime de Chromium en Cloud Run y el falso
+negativo sobreviviría — **más raro, que es peor**: deja de sospecharse.
+
+**2. El defecto es una línea de contrato, no una capacidad ausente.**
+`structural/json-ld.ts:20-38` distingue dos estados: `!res.ok → failed/score: null` (correcto) y
+`res.ok` + cero bloques → `succeeded/score: 0`. El comentario de cabecera lo dice literal:
+*"Ausencia MEDIDA → score 0 (gap real)"*. **`res.ok` se está leyendo como "observé la página" cuando
+sólo significa "recibí bytes".** Ahí está el bug, en una condición, no en la falta de un navegador.
+
+**3. El patrón correcto ya existe en el mismo directorio.** `NO_HEADLESS_OUTCOME` → `skipped/no_headless`
+es exactamente *"no pude observar, no afirmo"*, y está aplicado a los probes headless-dependientes y
+**no** a los de presencia. Cerrar el defecto extiende un primitive canónico; no inventa ninguno.
+
+**4. Hoy hay UNA sola capa decidiendo "no tiene JSON-LD"** — el regex sobre lo que llegó. Ninguna capa
+pregunta si eso que llegó es la página. Es defense-in-depth ausente justo donde la salida es
+client-facing.
+
+**5. Subirla a `P1` adelantaba un costo real de infraestructura sobre una premisa falsa.** Chromium en
+Cloud Run tiene memoria, cold start y costo por corrida. Esta task debe priorizarse por su propio
+mérito —cobertura y CWV de campo—, no por un bug que no arregla.
+
+Qué queda: `TASK-1778` toma el invariante *"un probe de presencia nunca concluye ausencia sin evidencia
+de que pudo observar"*, que es la misma clase que su `truncated` y vive en el mismo par de archivos.
+Con eso cerrado, esta task recupera su naturaleza: una mejora de exactitud y cobertura, no un
+prerrequisito de corrección.
+
 ## Summary
 
 TASK-1266 dejó listos dos probes headless-dependientes (`core_web_vitals` y `webmcp_tools`) detrás de una seam de inyección `HeadlessRenderer` que hoy resuelve `null` → ambos degradan a `skipped/no_headless`. Esta task implementa el `HeadlessRenderer` concreto (Chromium + Lighthouse) en el ops-worker Cloud Run y lo inyecta en el path async del gatherer, activando la medición real de Core Web Vitals + detección de tools WebMCP. NO toca el substrate de probes, el scoring ni el report contract.

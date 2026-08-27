@@ -88,7 +88,7 @@
 | Rol | Qué le importa | 🔴 Qué NO le digas |
 |---|---|---|
 | **CMO** | Pipeline, atribución, velocidad | Arquitectura |
-| **CRO** | Adopción, forecast | Que Gartner los puso Niche Player en SFA |
+| **CRO** | Adopción, forecast | Que Gartner ubica a Salesforce como Leader y a HubSpot como Challenger en CRM Sales 2026 |
 | **RevOps** | El modelo de datos. **No volver a migrar en 2 años** | 🔴 **Nunca le mientas. Te va a verificar** |
 | **IT / Seguridad** | SOC 2, SSO, sandboxes, API, residencia | 🔴 **Nunca afirmes ISO 27001** |
 | **CFO** | **El costo del admin.** Ese es el número | El TCO contra la *lista* de Salesforce (van a descontar) |

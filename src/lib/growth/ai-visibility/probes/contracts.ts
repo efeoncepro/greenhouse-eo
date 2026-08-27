@@ -92,36 +92,22 @@ export interface ProbeResult extends ProbeOutcome {
 }
 
 // ── Fetcher (read-only, SSRF-guarded) ────────────────────────────────────────
+//
+// TASK-1697 — los tipos del fetcher viven en `@/lib/growth/site-substrate/contracts.ts`
+// (extraídos con el sustrato); acá quedan como ALIAS re-exportados para que ningún
+// dependiente del dominio AEO cambie una línea. Documentación canónica: el sustrato.
 
-export type ProbeFetchErrorCode = 'timeout' | 'network' | 'blocked' | 'too_large' | 'http_error'
+import type {
+  SiteFetchErrorCode,
+  SiteFetchInit,
+  SiteFetchResult,
+  SiteFetcher
+} from '@/lib/growth/site-substrate/contracts'
 
-/** Respuesta normalizada del fetcher. NUNCA lanza: un fallo se refleja en `ok=false` + `errorCode`. */
-export interface ProbeFetchResult {
-  ok: boolean
-  /** HTTP status; 0 si fue error de red/timeout/bloqueo antes de respuesta. */
-  status: number
-  /** URL final (tras redirects), para evidencia/diagnóstico. */
-  url: string
-  /** Cuerpo de texto acotado (truncado a un máximo defensivo). */
-  body: string
-  contentType: string | null
-  errorCode: ProbeFetchErrorCode | null
-}
-
-export interface ProbeFetchInit {
-  /** Acepta override del Accept header (p.ej. application/xml para sitemap). */
-  accept?: string
-  /** Timeout por request (ms). El fetcher impone un tope defensivo. */
-  timeoutMs?: number
-  /** Máximo de bytes a leer del body (defensa anti-payload gigante). */
-  maxBytes?: number
-}
-
-/**
- * Fetcher acotado al dominio del run. Resuelve `path` relativo contra el baseUrl del
- * sujeto y rechaza cross-host / hosts no públicos (SSRF). Inyectable para tests.
- */
-export type ProbeFetcher = (path: string, init?: ProbeFetchInit) => Promise<ProbeFetchResult>
+export type ProbeFetchErrorCode = SiteFetchErrorCode
+export type ProbeFetchResult = SiteFetchResult
+export type ProbeFetchInit = SiteFetchInit
+export type ProbeFetcher = SiteFetcher
 
 // ── Entity API fetcher (terceros, host-allowlisted; TASK-1267) ────────────────
 
@@ -135,6 +121,8 @@ export interface EntityFetchResult {
   /** Cuerpo de texto acotado (truncado a un máximo defensivo). */
   body: string
   errorCode: EntityFetchErrorCode | null
+  /** TASK-1778 — `true` cuando el body fue cortado al tope (aditivo: opcional, default false). */
+  truncated?: boolean
 }
 
 export interface EntityFetchInit {

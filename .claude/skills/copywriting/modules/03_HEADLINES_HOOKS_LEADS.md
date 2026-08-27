@@ -69,6 +69,29 @@ problema que el lector reconoce, no lo conviertas en peaje de entrada. El métod
 taxonomía vive en `content-marketing-studio/references/metadata-translation-method.md`; `seo-aeo` gobierna la
 decisión final de intent y runtime.
 
+## 6.b Antipatrones de titulación (auditados en vivo, as-of 2026-08-25)
+
+Los cuatro salen de titulares reales que llegaron a un entregable. Ninguno es un error de
+gusto: los cuatro se cometen **teniendo el análisis bien hecho**.
+
+- 🔴 **Poner el CONCEPTO en el lugar del título.** El ángulo **no es** un titular: un titular
+  **promete**; el concepto sólo **nombra**. Caso auditado: el título era **la etiqueta del
+  ángulo**, más tres modificadores apilados que no agregaban nada. Si el titular se lee como el
+  nombre interno de la idea, todavía no hay titular.
+- 🔴 **Meter taxonomía interna en el nombre visible** — *«Nodo consolidador —»*, *«Pillar —»*,
+  *«Satélite 3»*. **La arquitectura va en el brief, no en el título que ve el cliente** (y menos
+  en el que ve el lector).
+- 🔴 **Repetir el mismo titular en las cuatro superficies.** Es §6 de este módulo, y se sigue
+  cometiendo: **H1, SEO title, OG y slug comparten tesis y hacen trabajos distintos**. El
+  **slug no intenta ser headline** — identifica el tema de forma estable.
+- 🎯 **El activo más desaprovechado suele ser un nombre propio del catálogo del cliente.**
+  Nombres de producto con carga cultural que **nadie contó**: son propietarios (ningún
+  competidor puede usarlos), ya están en el catálogo y **cargan significado** que un adjetivo
+  no compra. Antes de inventar una metáfora, **inventaria los nombres propios que el cliente ya
+  tiene**. ⚠️ Y verifica que un mismo ítem no viaje con **dos nombres distintos** entre piezas:
+  eso disuelve la entidad justo donde debería concentrarse
+  (`seo-aeo/modules/03_EEAT_ENTITY.md`).
+
 ## 7. El lead (lo segundo más importante)
 
 El **lead** = los primeros párrafos tras el headline. Su trabajo: **ganar el siguiente párrafo**.
@@ -97,7 +120,10 @@ El **lead** = los primeros párrafos tras el headline. Su trabajo: **ganar el si
 - [ ] 10–25 variantes generadas; elegida la mejor.
 - [ ] Pasa ≥3 de las 4 U's; ultra-específica.
 - [ ] Beneficio + curiosidad + relevancia al momento.
-- [ ] H1, SEO title y OG title comparten tesis, pero cumplen trabajos distintos.
+- [ ] H1, SEO title y OG title comparten tesis, pero cumplen trabajos distintos; el slug
+      identifica el tema y no intenta ser headline.
+- [ ] El titular **promete**; no es la etiqueta del concepto ni carga taxonomía interna
+      (`Pillar —`, `Satélite 3`).
 - [ ] La jerga no desplaza el problema que el lector ya reconoce.
 - [ ] Lead con slippery slide (gana el siguiente párrafo).
 - [ ] (Email) subject con "tu/ahora", específico, sin clickbait.

@@ -164,6 +164,7 @@ mueve, y este es el orden"* sí.
 | 🎯 **El arsenal Y CÓMO SE USA CADA ACTIVO** — la cadena Semrush → Grader → Fix-It → reporte → portal *(auditado contra el repo)* | **`modules/12_ACTIVOS.md`** |
 | 🔴 **El estado real de la práctica** — Berel, SKY, el Grader, **cero casos citables** | **`efeonce/ESTADO_ACTUAL.md`** |
 | **Qué se puede afirmar y con qué evidencia** *(+ § Datos que NO se citan)* | **`SOURCES.md`** |
+| 🔴 **BENCHMARK de la competencia** *(set de 4 archivos; entra siempre por el principal, que es el índice)* — lo que **NO** podemos decir (**F-01…F-14**), lo que **SÍ** (**S-01…S-11**), **lo que descubrió sobre nosotros** (N-01…N-06) y los **errores que circulan**. **Cárgalo ANTES de escribir cualquier diferenciador técnico, de citar cobertura LATAM, precio de competencia o robustez de medición.** `as-of 2026-08-15`, **caduca 2026-11-15** | **`references/BENCHMARK_SUITES_AEO_2026-08.md`** → hermanos: `BENCHMARK_METODOS_TRANSPARENCIA_2026-08.md` · `BENCHMARK_VENDORS_PUREPLAYS_2026-08.md` · `BENCHMARK_VENDORS_INCUMBENTES_2026-08.md` · `BENCHMARK_PRECIOS_LATAM_2026-08.md` |
 
 | 🔴 **Lo que NUNCA se hace** *(+ los bugs vivos de Efeonce marcados 🩸)* | **`ANTIPATTERNS.md`** |
 | **El vocabulario de la práctica** *(loaded cost, piso, la cuña, la cicatriz, el puente…)* | **`GLOSSARY.md`** |
@@ -198,7 +199,7 @@ En una categoría de humo, **la honestidad es el producto** (§0) — y ésta es
 
 **Live:** `think.efeoncepro.com/muestras/<slug>-<token>` · runtime en el repo **`efeonce-think`** (NO `greenhouse-eo`) · **el cliente es un payload JSON, cero código.**
 
-**Cadena comercial:** **Grader mide → Radiografía demuestra → propuesta/deck convierte → servicio opera.** Si el prospecto todavía no tiene diagnóstico, primero Grader. Si ya vio un score y pregunta *"¿cómo se arregla?"*, entra la Radiografía. En licitaciones y QBR se registra como evidencia `client_facing` sólo si el enlace tokenizado puede viajar al comité.
+**Cadena comercial:** **Grader mide → diagnóstico SEO de prospecto cuantifica (§4c) → Radiografía demuestra → propuesta/deck convierte → servicio opera.** Si el prospecto todavía no tiene evidencia, primero Grader. Si ya vio un score y pregunta *"¿cómo se arregla?"*, entra la Radiografía. En licitaciones y QBR se registra como evidencia `client_facing` sólo si el enlace tokenizado puede viajar al comité.
 
 **Dos trabajos — no los confundas:**
 
@@ -222,6 +223,42 @@ En una categoría de humo, **la honestidad es el producto** (§0) — y ésta es
 🔴 **NUNCA** prometer el rich snippet de FAQ de Google (restringido desde 2023 a gobierno/salud). 🔴 **NUNCA** dejar que la pieza cite **nuestra propia oferta** ni narre su interfaz: **se defiende sola**. 🔴 **Gate humano:** el operador elige el ángulo del artículo.
 
 **Cargar al tocarla:** `docs/think/radiografia-aeo-architecture.md` (invariantes vigentes + gate de 46 asserts) · `docs/think/radiografia-aeo-manual.md` (cómo se crea la del siguiente cliente) · `docs/documentation/comercial/radiografia-aeo-muestra-de-trabajo.md` (encuadre funcional) · `docs/manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md` (playbook comercial).
+
+---
+
+## 4c. 🎯 El diagnóstico SEO de prospecto — cuantificar la pérdida SIN pedir acceso (TASK-1709)
+
+**Qué es:** el eslabón 2 de la cadena de §4b. Después de la sorpresa del Grader y ANTES de la
+Radiografía, corre un diagnóstico interno que cuantifica la pérdida orgánica del dominio del
+prospecto **con dato del proveedor, sin pedirle acceso** (~USD 0,25/corrida, tope duro). Entrega
+hechos con fecha, TODOS lente `◑ estimada`: superficie ranqueada, keywords en primera página y a
+corta distancia, **citas en AI Overviews**, tráfico estimado (ETV), competidores reales del SERP,
+link gap y evidencia técnica del sitio. Corrida real verificada 2026-08-27 (skyairline.com, CL):
+769 keywords top-10, 231 citas en AI Overviews, link gap 14 dominios, 0 JSON-LD, 0 sitemap —
+costo real USD 0,1991.
+
+**Cuándo usarlo:** el prospecto ya vio el score del Grader y falta ponerle **magnitud** al problema
+antes de demostrar el arreglo con la Radiografía. Un bloqueo de rastreo es un hallazgo, no un
+obstáculo.
+
+**3 prohibiciones comerciales:**
+1. 🔴 **NUNCA presentar un estimado como medido** — sin GSC del prospecto, todo es `◑ estimada`.
+2. 🔴 **NUNCA declarar el sitio "sano"** — el contrato de salida no tiene score ni veredicto.
+3. 🔴 **NUNCA cifras de industria ni lifts** — solo hechos del dominio, con fecha. Y NUNCA
+   captura recurrente sobre un no-cliente.
+
+**Operación:** capability `growth.seo.prospect_diagnostic.run` (solo admin/account) · lane
+`POST /api/admin/growth/seo/prospect-diagnostic` · MCP `get_seo_prospect_diagnostic` /
+`run_seo_prospect_diagnostic` (con confirmación humana previa obligatoria). Flag
+`GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` hoy OFF en todos los ambientes (code-complete). Ambas
+tools quedaron federadas al gateway público `mcp.efeonce.org` por TASK-1658 (deploy del gateway
+pendiente post-release); `run_` exige el scope `efeonce.mcp.seo.write`, NO cableado al cliente
+PKCE público — fail-closed hasta TASK-1631. El flag OFF es un estado legítimo para el canary,
+no un fallo.
+
+**Cargar al usarlo:** `docs/manual-de-uso/comercial/diagnostico-seo-prospecto-en-venta.md`
+(playbook comercial) · `docs/documentation/growth/diagnostico-seo-prospecto.md` (funcional) ·
+`docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` (Delta 2026-08-27).
 
 ---
 

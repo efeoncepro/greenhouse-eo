@@ -1,5 +1,15 @@
 # TASK-1314 — Growth SEO: Pillar-Cluster Health / Topical Authority
 
+## Delta 2026-08-27
+
+- **`TASK-1777` quedó `code complete` (rollout pendiente):** el detalle de qué enlaza a una página
+  ya tiene fuente — `seo_backlink_referring_domains`/`seo_backlink_anchors` (hijas del snapshot
+  semanal) vía `readBacklinkDetail` (`src/lib/growth/seo/backlinks/detail-reader.ts`). Cuando esta
+  task necesite "qué enlaza a la pillar", consume ese reader; el drill-down es condicional al
+  movimiento del agregado (no incondicional) y `page_intersection` sigue siendo el follow-up
+  declarado para comparar dos pillar pages.
+
+
 ## Delta 2026-08-06
 
 - **El bloqueador TASK-1304 quedó code complete** (smoke E2E real): el audit OnPage materializa

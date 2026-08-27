@@ -1,5 +1,16 @@
 # TASK-1313 — Growth SEO: Unified Page/Cluster Visibility 360 Read
 
+## Delta 2026-08-27
+
+- **El lado ◑ de mercado por URL YA TIENE FUENTE** — `TASK-1776` quedó `code complete` (rollout
+  pendiente): `greenhouse_growth.seo_url_visibility_snapshots` + reader `readUrlVisibility`
+  (`src/lib/growth/seo/url-visibility/reader.ts`) entregan, por URL/subcarpeta/subdominio de
+  CUALQUIER dominio, keywords ranqueadas, distribución top-100, ETV y detalle top-N. Esta task
+  COMPONE, no captura: consume ese reader para la mitad de mercado y cruza con GSC/AEO **en
+  memoria por `organization_id` + URL normalizada** (la normalización canónica del sujeto es
+  `resolveVisibilitySubject` — no inventar una segunda). Las posiciones ◑ y ● jamás se promedian.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

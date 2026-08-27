@@ -60,8 +60,9 @@
 
 | Término | Qué es |
 |---|---|
-| **MQ de SFA** | *Magic Quadrant, Sales Force Automation.* 🔴 **HubSpot es Niche Player** aquí. Leaders: Salesforce, Microsoft, Oracle. **Zoho es Visionary — por encima de HubSpot** |
-| **MQ de B2B Marketing Automation** | ✅ **HubSpot es Leader, 5.º año consecutivo.** Este es *tu* reporte |
+| **MQ de CRM Sales Platforms** | Sucesor 2026 del MQ de Sales Force Automation. **HubSpot y Zoho son Challengers; Salesforce y Microsoft, Leaders.** Evalúa CRM de ventas, IA y ejecución; no “CRM general” |
+| **MQ de B2B Marketing Automation** | En la edición 2025, **HubSpot es Leader, 5.º año consecutivo.** Úsalo sólo para demand generation/marketing B2B y nombra el año |
+| **MQ de Multichannel Marketing Hubs** | Orquestación B2C multicanal a escala. Salesforce fue evaluado en 2025; HubSpot no fue incluido. Puede describir mejor a grandes empresas de retail, banca, utilities o telecom |
 | **Agentforce** | La capa de agentes de Salesforce. **USD 125/usr/mes** o **Flex Credits** (USD 0,10/acción). Se le pega **al modelo de precio**, no al modelo |
 | **MCAE / Pardot / Account Engagement** | La marketing automation B2B de Salesforce. ❌ **No está muerta** — no digas que lo está |
 | **Marketo Engage** | La de Adobe. ❌ **No publica precios.** 🎯 Cobra **por tamaño de base de datos, no por uso** — ese es tu mejor ángulo |

@@ -1,9 +1,9 @@
 # Flota de modelos del Producer — disponibilidad por workspace
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-07-25 por Claude (TASK-1554)
-> **Ultima actualizacion:** 2026-08-05 por Claude (TASK-1641)
+> **Ultima actualizacion:** 2026-08-27 por Codex (TASK-1781; investigación, sin rollout)
 > **Documentacion tecnica:** [`GLOBE_MODEL_FLEET_STATUS.md`](../../operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md) · [`EFEONCE_GLOBE_CREATIVE_STUDIO_ARCHITECTURE_V1.md`](../../architecture/EFEONCE_GLOBE_CREATIVE_STUDIO_ARCHITECTURE_V1.md)
 
 ## Qué resuelve
@@ -14,6 +14,23 @@ usar yo, ahora, en este espacio de trabajo?"**
 
 Son preguntas diferentes. Un modelo puede estar integrado y probado y aun así no estar habilitado
 para tu workspace. La flota es el dato que responde la segunda.
+
+## Gemini Omni 1.1 no aparece por el solo hecho de haberse anunciado
+
+Google lanzó **Gemini Omni 1.1 Flash** el 2026-08-27, pero el anuncio no modifica automáticamente la
+flota de Globe. Además, Google usa dos identidades distintas: `gemini-omni-1.1-flash` en Gemini Developer
+API y `gemini-omni-1.1-flash-preview` en Google Cloud. No se pueden intercambiar ni heredar la evaluación,
+el costo, los términos o el canary del modelo anterior. Google también fijó el retiro de
+`gemini-omni-flash-preview` para el 2026-09-30 en Gemini API.
+
+El proveedor documenta generación 360p/720p/1080p/4K —1080p y 4K son escalados—, primer y último cuadro,
+referencias de video, edición y extensión. Para Globe, cada combinación puede requerir una ruta y una forma
+de salida propias. Antes de mostrar cualquiera como disponible hay que verificar cuota, endpoint y auth,
+precio real, derechos, credenciales C2PA en los bytes, canary facturable y promoción con readback.
+
+Hasta que `TASK-1781` entregue esas pruebas y `globe.producer.fleet.list` confirme el estado, Omni 1.1 es
+un **candidato del proveedor**, no una capacidad operativa de Globe. La llegada de 1.1 tampoco reescribe las
+piezas, canaries ni atestaciones históricas de Omni Flash.
 
 ## Los tres estados
 

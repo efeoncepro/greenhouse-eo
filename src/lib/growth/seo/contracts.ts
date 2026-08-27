@@ -291,6 +291,27 @@ export const SEO_SITE_AUDIT_COMPLETED_EVENT = 'growth.seo.site_audit.completed'
 /** Evento de captura de backlink snapshot (dispara el mirror BQ reactivo). */
 export const SEO_BACKLINK_SNAPSHOT_CAPTURED_EVENT = 'growth.seo.backlink_snapshot.captured'
 
+/**
+ * TASK-1777 — Evento del drill-down nominal de enlaces (rastro de una corrida que gasta,
+ * con el motivo del disparo en el payload). El consumer re-lee PG.
+ */
+export const SEO_BACKLINK_DETAIL_CAPTURED_EVENT = 'growth.seo.backlink.detail_captured'
+
+/**
+ * TASK-1775 — Evento de captura de la foto de dominio (`seo_domain_overview_snapshots`).
+ * Payload con coordenadas (target, org, fecha, conteos); el consumer re-lee PG.
+ */
+export const SEO_DOMAIN_OVERVIEW_SNAPSHOT_CAPTURED_EVENT = 'growth.seo.domain_overview.snapshot_captured'
+
+/** Aggregate type del evento de foto de dominio (identity: `seo_target_id`). */
+export const SEO_DOMAIN_OVERVIEW_AGGREGATE_TYPE = 'seo_target'
+
+/**
+ * TASK-1776 — Evento de captura de visibilidad por sujeto-página
+ * (`seo_url_visibility_snapshots`). Payload con coordenadas; el consumer re-lee PG.
+ */
+export const SEO_URL_VISIBILITY_SNAPSHOT_CAPTURED_EVENT = 'growth.seo.url_visibility.snapshot_captured'
+
 /** Estados del run de audit (CHECK de TASK-1299). `running` es el único no-terminal. */
 export type SeoSiteAuditRunStatus = 'running' | 'succeeded' | 'degraded' | 'failed'
 

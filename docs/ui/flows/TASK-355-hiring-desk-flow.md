@@ -1,5 +1,9 @@
 # TASK-355 — Hiring Desk Flow Contract
 
+## Delta 2026-08-24 — Pipeline ↔ Application 360 sin pérdida de contexto
+
+`Pipeline → Application 360 → Pipeline` conserva la postulación como unidad de trabajo. La ruta hija permite avanzar a la postulación anterior/siguiente únicamente dentro de la misma vacante y etapa; cambios locales sin guardar interrumpen el salto con confirmación. Al volver, el reader fija la postulación exacta aunque quede fuera de la página cronológica, consume `focusApplication` tras enfocar la tarjeta y degrada con aviso estable si el origen dejó de existir. Ningún paso ordena por score o recomendación IA.
+
 ## Meta
 
 - Task: `TASK-355`
@@ -18,7 +22,7 @@ El reclutador opera el pipeline de punta a punta bajo la shell `Hiring Desk`: pu
 |---|---|---|
 | Demand Desk | `/agency/hiring` | N4 |
 | Pipeline Board | `/agency/hiring/pipeline` | N4/N6 |
-| Application 360 | `/agency/hiring/[applicationId]` | N5/N8/N9 |
+| Application 360 | `/agency/hiring/applications/[applicationId]` | N5/N8/N9 |
 | Publication Desk | `/agency/hiring/publication` | N-publish |
 
 ## Flow Map
@@ -44,7 +48,8 @@ Demand Desk (N4) ──drilldown──▶ Pipeline Board (N4) ──mover etapa 
 
 - **Drilldown Demand→Pipeline/360/Publication** (N4): click en fila.
 - **Mover etapa** (N4/N6): drag OR **menú "Mover a etapa" (teclado)** → `updateHiringApplicationStage` optimista (rollback si falla). Anuncia el resultado (`aria-live`).
-- **Abrir 360** (N5): click card.
+- **Abrir 360** (N5): click card. `Anterior`/`Siguiente` recorre postulaciones no archivadas de la misma vacante+etapa en orden cronológico estable; nunca cruza scope ni rankea.
+- **Volver al Pipeline** (N5→N4): la pestaña persistente Pipeline lleva `openingId` + `focusApplication`; el reader fija postulación/opening/demanda fuera de los límites paginados, el destino consume el foco con `history.replaceState` al encontrar/enfocar la tarjeta y conserva sólo `openingId`. Si ya no existe, limpia el foco, conserva una vacante válida y muestra recuperación honesta.
 - **Asignar test** (N6): dialog → `assignCandidateTest` (1360); genera el link tokenizado.
 - **Revisar scorecard** (N8): tab Assessment; la IA muestra sugerencia → **confirmar/editar** (nunca auto; anti-anclaje independent-before-debrief).
 - **Decidir** (N9): form (avanzar/rechazar/hold + destino/fecha/entidad + **reason estructurado obligatorio**) → confirmación → `decideHiringApplication`.
@@ -65,15 +70,17 @@ opening publication: draft → published ⇄ paused → closed (Publication Desk
 
 ## Routing Contract
 
-- `src/app/(dashboard)/agency/hiring/**` (NUNCA `[lang]`). Shell `CompositionShell`; rutas hermanas Demand/Pipeline/Publication + `[applicationId]`.
+- `src/app/(dashboard)/agency/hiring/**` (NUNCA `[lang]`). Shell `CompositionShell`; rutas hermanas Demand/Pipeline/Publication + detalle hijo `applications/[applicationId]`.
 - **viewCodes `gestion.hiring*` seedeados con ruta alcanzable en el MISMO PR** (`VIEW_REGISTRY` + migration + `route-reachability-manifest`, TASK-827/982); NUNCA un viewCode sin ruta (dispara `role_view_fallback`).
-- Deep links estables (compartibles); el 360 abre como ruta hija (o sidecar sobre el pipeline).
+- Deep links estables (compartibles); el 360 abre como ruta hija completa del Pipeline, no como sidecar.
 - Bilingüe es-CL + en-US vía `getLocale()` + `getMicrocopy(locale)`; sin segmento de URL de locale.
 
 ## Focus & Accessibility
 
 - **Kanban NO drag-only** (2.5.7): menú "Mover a etapa" por teclado en cada card; foco visible; resultado anunciado (`aria-live`).
 - Tabs (360) = APG tabs; foco al `<h1>` al abrir la ficha.
+- La navegación secuencial conserva labels visibles, contador compacto a 390 px y guard de cambios sin guardar; al cambiar de postulación el nuevo `<h1>` recibe foco.
+- El retorno contextual enfoca la tarjeta exacta y anuncia candidato/etapa. El foco de URL es efímero; `openingId` permanece como alcance recargable/compartible.
 - Decisión/reveal/publish = dialog accesible (foco atrapado, Esc, foco de retorno).
 - Reflow 320/200%; `prefers-reduced-motion` (drag/optimistic degradan a cambio inmediato).
 
@@ -97,6 +104,8 @@ opening publication: draft → published ⇄ paused → closed (Publication Desk
 |---|---|---|
 | Mover etapa falla | rollback visual + toast | optimistic con rollback |
 | Facet del 360 falla (PG blip) | ese bloque degradado honesto ("no disponible") | anti silent-catch (no `catch(()=>[])`) |
+| `focusApplication` no resuelve | aviso estable dentro del Pipeline y foco efímero consumido | no seleccionar otra tarjeta ni mantener URL inválida |
+| Hay edición local al usar Anterior/Siguiente | diálogo para seguir editando o descartar y continuar | nunca perder cambios en silencio |
 | Decidir sin reason | validación inline (reason obligatorio) | forms-ux |
 | Reveal sin capability | affordance oculto/deshabilitado + motivo | capability+audit |
 | Publicar con datos sensibles | el diff muestra solo allowlist; confirmación | anti-leak |
@@ -105,6 +114,7 @@ opening publication: draft → published ⇄ paused → closed (Publication Desk
 
 - `hiring-demand-desk` · `hiring-pipeline-board` (drag + teclado + optimistic/rollback + columna vacía) · `hiring-application-360` (tabs + assessment embed + docs masked/reveal + decisión) · `hiring-publication-desk` (diff + publish).
 - Checks: `scrollWidth==clientWidth` (1440 + 390), consola limpia, reduced-motion, **a11y kanban teclado (axe)**, foco correcto. Datos reales vía 353/1367.
+- Evidencia del delta 2026-08-24: `.captures/2026-08-24T12-19-59_task355-hiring-application-360`, desktop 1440 + mobile 390, 24 frames y video; verifica `1 de 2 → 2 de 2 → Pipeline`, foco en la segunda tarjeta y runtime sin errores de consola/página/hidratación/red. Enterprise rubric PASS. Persisten warnings de contraste/skeleton preexistentes y el DSL no logra reejecutar por teclado el click después del cambio de ruta; el enlace nativo y su contrato `href`/`aria-current` están cubiertos por test, no por un replay de teclado independiente en esta captura.
 
 ## Design Decision Log
 
@@ -118,4 +128,5 @@ opening publication: draft → published ⇄ paused → closed (Publication Desk
 - [ ] viewCodes con ruta alcanzable mismo PR (`role_view_fallback=0`).
 - [ ] Publish → `revalidatePath('/public/careers')`; diff anti-leak; PII masked/reveal.
 - [ ] a11y (kanban teclado, tabs, dialogs) + GVC desktop+mobile.
+- [x] Retorno transversal por `openingId` + foco efímero, fallback honesto y cola misma vacante/etapa verificados en desktop + 390 px.
 - [ ] `## Delta` en el master flow si cambia un nodo/regla.

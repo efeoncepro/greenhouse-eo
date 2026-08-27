@@ -177,7 +177,7 @@ contornos cuando la fidelidad tipográfica sea crítica. Conservar ALT/caption e
 - Mantener raster dedicado para featured, OG/Twitter y canales con soporte SVG inconsistente.
 - Indexación es asíncrona; el gate de publicación prueba rastreabilidad, no presencia garantizada en Google.
 
-Contrato ampliado: `.codex/skills/seo-aeo/references/editorial-image-seo.md`.
+Contrato ampliado: `../../seo-aeo/references/editorial-image-seo.md`.
 
 ### Vía raster
 

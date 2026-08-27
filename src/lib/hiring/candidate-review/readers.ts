@@ -6,6 +6,7 @@ import { listAssessmentsForApplication } from '../assessment'
 import { resolveHiringApplicationDocuments } from '../documents'
 import { HiringNotFoundError, HiringValidationError } from '../errors'
 import { getHiringApplicationById, getHiringOpeningById, listHiringApplications } from '../store'
+import { HIRING_APPLICATION_STAGES, type HiringApplicationStage } from '@/types/hiring'
 import {
   CANDIDATE_REVIEW_PURPOSES,
   type CandidateReviewApplicationList,
@@ -88,13 +89,35 @@ export const listCandidateReviewApplications = async ({
 }): Promise<CandidateReviewApplicationList> => {
   const boundedLimit = Math.min(Math.max(limit, 1), 50)
   const boundedOffset = Math.max(offset, 0)
+
+  /**
+   * TASK-1718 H-10 — Una etapa inexistente NO puede responder `200 {items: []}`.
+   *
+   * El filtro entraba como texto libre (`stage as never`), así que `stage=entrevista` —en español, mal
+   * escrito, o una etapa retirada— devolvía cero postulaciones con éxito. Una lista vacía y «esa etapa no
+   * existe» se ven idénticas, y acá el consumidor es un AGENTE: un humano sospecharía de un cero redondo,
+   * un agente lo reporta como hecho.
+   *
+   * Va en el reader y no en la ruta a propósito: así lo heredan todos los consumidores (App API, MCP,
+   * cualquiera que venga) en vez de validarse una vez por puerta.
+   */
+  const normalizedStage = stage?.trim()
+
+  if (normalizedStage && !HIRING_APPLICATION_STAGES.includes(normalizedStage as HiringApplicationStage)) {
+    throw new HiringValidationError(
+      `La etapa "${normalizedStage}" no existe. Las válidas son: ${HIRING_APPLICATION_STAGES.join(', ')}.`,
+      'hiring_application_stage_invalid',
+      400
+    )
+  }
+
   const opening = await getHiringOpeningById(openingId)
 
   if (!opening) throw new HiringNotFoundError('La vacante no existe.', 'hiring_opening_not_found')
 
   const applications = await listHiringApplications({
     openingId,
-    ...(stage ? { stage: stage as never } : {}),
+    ...(normalizedStage ? { stage: normalizedStage as HiringApplicationStage } : {}),
     limit: boundedLimit + 1,
     offset: boundedOffset
   })

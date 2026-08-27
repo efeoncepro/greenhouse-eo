@@ -135,3 +135,5 @@ public/growth-cta/BUILDINFO.json
 *.synthetic-origin-allowlist.json
 # TASK-1772 — allowlists de purga acotada (ids de registros; se podan a mano, no se commitean)
 *.synthetic-purge-allowlist.json
+# TASK-1746 — allowlists de purga de auditoría de recuperación de acceso (ids de postulación; no se commitean)
+*.access-recovery-purge-allowlist.json

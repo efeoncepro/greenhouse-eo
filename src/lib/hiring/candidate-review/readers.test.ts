@@ -20,7 +20,7 @@ vi.mock('../store', () => ({
 vi.mock('../assessment', () => ({ listAssessmentsForApplication: mocks.listAssessments }))
 vi.mock('../documents', () => ({ resolveHiringApplicationDocuments: mocks.documents }))
 
-import { getCandidateReviewPacket } from './readers'
+import { getCandidateReviewPacket, listCandidateReviewApplications } from './readers'
 
 const application = {
   applicationId: 'application-1',
@@ -105,5 +105,39 @@ describe('candidate review packet reader', () => {
         expectedContentHash: 'b'.repeat(64)
       })
     ).rejects.toMatchObject({ code: 'candidate_review_stale', statusCode: 409 })
+  })
+})
+
+describe('TASK-1718 H-10 — una etapa inexistente no puede responder con éxito', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mocks.getOpening.mockResolvedValue({ openingId: 'opening-1', internalTitle: 'Content Creator' })
+    mocks.listApplications.mockResolvedValue([])
+  })
+
+  it('rechaza una etapa que no existe y nombra las válidas', async () => {
+    // Antes devolvía `200 {items: []}`: una lista vacía y "esa etapa no existe" se ven idénticas, y el
+    // consumidor de este reader es un AGENTE — un humano sospecharía de un cero redondo, un agente lo
+    // reporta como hecho.
+    await expect(
+      listCandidateReviewApplications({ openingId: 'opening-1', stage: 'entrevista' })
+    ).rejects.toMatchObject({ code: 'hiring_application_stage_invalid' })
+
+    // Y falla ANTES de consultar: no se gasta un viaje a la base por una pregunta mal formulada.
+    expect(mocks.listApplications).not.toHaveBeenCalled()
+  })
+
+  it('acepta una etapa válida del enum canónico', async () => {
+    await listCandidateReviewApplications({ openingId: 'opening-1', stage: 'shortlisted' })
+
+    expect(mocks.listApplications).toHaveBeenCalledWith(
+      expect.objectContaining({ openingId: 'opening-1', stage: 'shortlisted' })
+    )
+  })
+
+  it('sin filtro de etapa no valida nada y lista todo', async () => {
+    await listCandidateReviewApplications({ openingId: 'opening-1' })
+
+    expect(mocks.listApplications).toHaveBeenCalledWith(expect.not.objectContaining({ stage: expect.anything() }))
   })
 })

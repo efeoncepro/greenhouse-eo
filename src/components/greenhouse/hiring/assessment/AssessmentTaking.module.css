@@ -617,14 +617,34 @@
   line-height: 1.55;
 }
 
+/*
+ * TASK-1751 — El campo congelado NECESITA señal propia.
+ *
+ * Antes usaba `disabled`, y el gris lo ponía el navegador: este módulo nunca tuvo `.textArea:disabled`.
+ * Al pasar a `readOnly` —que conserva foco, lectura y copia, y por eso es la decisión de accesibilidad
+ * correcta durante la gracia— esa señal desaparece y el campo parece editable. Esta regla la repone.
+ */
+.textArea:read-only {
+  border-style: dashed;
+  color: var(--text-secondary);
+  background: var(--surface-alt);
+  cursor: default;
+  resize: none;
+}
+
 .textArea:focus {
   border-color: var(--primary);
   outline: none;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 14%, transparent);
 }
 
+/*
+ * TASK-1751 — `--text-disabled` daba 2.43:1 contra el blanco, bajo el 4.5:1 de AA (axe, serious).
+ * El contador NO está deshabilitado: es texto secundario, y ese es su token. Defecto PRE-EXISTENTE,
+ * destapado por la primera captura premium de esta superficie.
+ */
 .characterCount {
-  color: var(--text-disabled);
+  color: var(--text-secondary);
   font-size: 0.8125rem;
   text-align: right;
 }

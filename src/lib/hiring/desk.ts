@@ -2,8 +2,10 @@ import 'server-only'
 
 import { activeProcessPredicate } from './active-process'
 import { isHiringSyntheticDataFilterEnabled } from './data-origin/config'
+import { realOnlyPredicate } from './data-origin/contracts'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import type {
+  HiringApplicationQueueNavigation,
   HiringDeskApplicationSummary,
   HiringDeskOpeningSummary,
   HiringDeskSnapshot,
@@ -15,7 +17,7 @@ import {
   listTalentDemands,
 } from './store'
 
-interface HiringDeskSnapshotInput {
+export interface HiringDeskSnapshotInput {
   /**
    * TASK-1739 — opt-in explícito para ver también datos no reales. Default: el desk NO cuenta
    * fantasmas. Mientras `HIRING_SYNTHETIC_DATA_FILTER_ENABLED` esté OFF el filtro no se aplica y el
@@ -23,6 +25,8 @@ interface HiringDeskSnapshotInput {
    */
   includeSynthetic?: boolean
   openingId?: string
+  /** Postulación que debe viajar en el snapshot aunque quede fuera del límite cronológico. */
+  focusApplicationId?: string
   query?: string
   openingLimit?: number
   applicationLimit?: number
@@ -55,10 +59,30 @@ type TotalsRow = {
   active_demands: string | number
 }
 
+type QueueNavigationRow = {
+  position: string | number
+  total: string | number
+  previous_application_id: string | null
+  next_application_id: string | null
+}
+
 const clampLimit = (value: number | undefined, fallback: number) =>
   Math.max(1, Math.min(value ?? fallback, 120))
 
 const toCount = (value: string | number | undefined) => Number(value ?? 0)
+
+const mergeUniqueBy = <T,>(items: readonly T[], pinned: readonly T[], key: (item: T) => string): T[] => {
+  const seen = new Set<string>()
+
+  return [...pinned, ...items].filter((item) => {
+    const value = key(item)
+
+    if (seen.has(value)) return false
+    seen.add(value)
+
+    return true
+  })
+}
 
 const initialsForName = (name: string) =>
   name
@@ -92,28 +116,57 @@ export const getHiringDeskSnapshot = async (
   const includeSynthetic = input.includeSynthetic ?? !isHiringSyntheticDataFilterEnabled()
   // Los dos agregados corren sobre SQL propio: si el filtro no viajara también acá, los KPIs
   // seguirían contando lo que las listas ya no muestran — el desk mostraría totales que no cuadran.
-  const originFilter = includeSynthetic ? '' : ` AND data_origin = 'real'`
-  const originWhere = includeSynthetic ? '' : ` WHERE data_origin = 'real'`
+  const originFilter = includeSynthetic ? '' : ` AND ${realOnlyPredicate('entity')}`
+  const originWhere = includeSynthetic ? '' : ` WHERE ${realOnlyPredicate('entity')}`
 
-  const [demands, openings, applications, counts, totals] = await Promise.all([
+  const focusedApplications = input.focusApplicationId
+    ? await listHiringApplications({
+        applicationId: input.focusApplicationId,
+        includeSynthetic,
+        limit: 1,
+      })
+    : []
+
+  const focusedApplication = focusedApplications[0]
+  const effectiveOpeningId = focusedApplication?.openingId ?? input.openingId
+
+  const [listedDemands, listedOpenings, listedApplications, focusedOpenings, counts, totals] = await Promise.all([
     listTalentDemands({ limit: 120, includeSynthetic }),
     listHiringOpenings({ limit: openingLimit, includeSynthetic }),
-    listHiringApplications({ openingId: input.openingId, limit: applicationLimit, includeSynthetic }),
+    listHiringApplications({ openingId: effectiveOpeningId, limit: applicationLimit, includeSynthetic }),
+    effectiveOpeningId
+      ? listHiringOpenings({ openingId: effectiveOpeningId, limit: 1, includeSynthetic })
+      : Promise.resolve([]),
     runGreenhousePostgresQuery<OpeningCountRow>(
       `SELECT opening_id,
               COUNT(*)::int AS application_count,
-              COUNT(*) FILTER (WHERE ${activeProcessPredicate('app')})::int AS active_application_count
-       FROM greenhouse_hiring.hiring_application app${originWhere}
+              COUNT(*) FILTER (WHERE ${activeProcessPredicate('entity')})::int AS active_application_count
+       FROM greenhouse_hiring.hiring_application entity${originWhere}
        GROUP BY opening_id`,
     ),
     runGreenhousePostgresQuery<TotalsRow>(
       `SELECT
-         (SELECT COUNT(*) FROM greenhouse_hiring.hiring_opening${originWhere})::int AS openings,
-         (SELECT COUNT(*) FROM greenhouse_hiring.hiring_application${originWhere})::int AS applications,
-         (SELECT COUNT(*) FROM greenhouse_hiring.hiring_opening WHERE publication_status = 'published'${originFilter})::int AS published_openings,
-         (SELECT COUNT(*) FROM greenhouse_hiring.talent_demand WHERE status NOT IN ('fulfilled', 'cancelled')${originFilter})::int AS active_demands`,
+         (SELECT COUNT(*) FROM greenhouse_hiring.hiring_opening entity${originWhere})::int AS openings,
+         (SELECT COUNT(*) FROM greenhouse_hiring.hiring_application entity${originWhere})::int AS applications,
+         (SELECT COUNT(*) FROM greenhouse_hiring.hiring_opening entity WHERE publication_status = 'published'${originFilter})::int AS published_openings,
+         (SELECT COUNT(*) FROM greenhouse_hiring.talent_demand entity WHERE status NOT IN ('fulfilled', 'cancelled')${originFilter})::int AS active_demands`,
     ),
   ])
+
+  const focusedOpening = focusedOpenings[0]
+
+  const focusedDemands = focusedOpening
+    ? await listTalentDemands({ demandId: focusedOpening.demandId, limit: 1, includeSynthetic })
+    : []
+
+  const demands = mergeUniqueBy(listedDemands, focusedDemands, (demand) => demand.demandId)
+  const openings = mergeUniqueBy(listedOpenings, focusedOpenings, (opening) => opening.openingId)
+
+  const applications = mergeUniqueBy(
+    listedApplications,
+    focusedApplication && focusedApplication.openingId === effectiveOpeningId ? [focusedApplication] : [],
+    (application) => application.applicationId,
+  )
 
   const demandById = new Map(demands.map((demand) => [demand.demandId, demand]))
   const openingById = new Map(openings.map((opening) => [opening.openingId, opening]))
@@ -209,5 +262,55 @@ export const getHiringDeskSnapshot = async (
       publishedOpenings: toCount(total?.published_openings),
       activeDemands: toCount(total?.active_demands),
     },
+  }
+}
+
+/**
+ * Cola neutral para review secuencial. Se limita a la misma vacante + etapa y excluye archivados.
+ * La consulta devuelve sólo ids/posición: el reader 360 sigue siendo dueño de PII, scores y ceguera.
+ */
+export const getHiringApplicationQueueNavigation = async (
+  applicationId: string,
+): Promise<HiringApplicationQueueNavigation | null> => {
+  const includeSynthetic = !isHiringSyntheticDataFilterEnabled()
+  const [application] = await listHiringApplications({ applicationId, includeSynthetic, limit: 1 })
+
+  if (!application || application.archivedAt) return null
+
+  const originFilter = includeSynthetic ? '' : ` AND ${realOnlyPredicate('app')}`
+
+  const rows = await runGreenhousePostgresQuery<QueueNavigationRow>(
+    `WITH ordered AS (
+       SELECT application_id,
+              ROW_NUMBER() OVER (ORDER BY created_at DESC, application_id ASC)::int AS position,
+              COUNT(*) OVER ()::int AS total
+       FROM greenhouse_hiring.hiring_application app
+       WHERE app.opening_id = $1
+         AND app.stage = $2
+         AND app.archived_at IS NULL${originFilter}
+     )
+     SELECT current.position,
+            current.total,
+            prev_item.application_id AS previous_application_id,
+            next_item.application_id AS next_application_id
+     FROM ordered current
+     LEFT JOIN ordered prev_item ON prev_item.position = current.position - 1
+     LEFT JOIN ordered next_item ON next_item.position = current.position + 1
+     WHERE current.application_id = $3
+     LIMIT 1`,
+    [application.openingId, application.stage, application.applicationId],
+  )
+
+  const row = rows[0]
+
+  if (!row) return null
+
+  return {
+    openingId: application.openingId,
+    stage: application.stage,
+    position: toCount(row.position),
+    total: toCount(row.total),
+    previousApplicationId: row.previous_application_id,
+    nextApplicationId: row.next_application_id,
   }
 }

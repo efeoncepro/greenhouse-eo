@@ -7,6 +7,7 @@ import { ROLE_CODES } from '@/config/role-codes'
 import { isNexaActionRuntimeEnabled } from '../flags'
 import { authorQuoteAction } from './author-quote'
 import { isNexaActionBlockedError } from './blocked-error'
+import { decideHiringApplicationAction } from './hiring-decision'
 import { markNotificationsReadAction } from './pilot-mark-notifications-read'
 import {
   attachProposalRfpAction,
@@ -76,7 +77,10 @@ const NEXA_ACTION_REGISTRY: Record<string, NexaActionDefinition<any>> = {
   [registerProposalAction.actionKey]: registerProposalAction,
   [attachProposalRfpAction.actionKey]: attachProposalRfpAction,
   [recordProposalEvidenceAction.actionKey]: recordProposalEvidenceAction,
-  [requestProposalRenderAction.actionKey]: requestProposalRenderAction
+  [requestProposalRenderAction.actionKey]: requestProposalRenderAction,
+  // TASK-1773 — el eje de desenlace deja de operarse sólo desde el portal. Autoridad más angosta que
+  // la de la UI: Nexa cierra una postulación abierta, nunca re-decide una cerrada.
+  [decideHiringApplicationAction.actionKey]: decideHiringApplicationAction
 }
 
 /** Las 4 del Proposal Studio, para que el tool describa exactamente lo que el registry expone. */

@@ -217,7 +217,10 @@ describe('TASK-1266 · createProbeFetcher', () => {
     expect(res.errorCode).toBe('http_error')
   })
 
-  it('no lee body si content-length excede el tope', async () => {
+  it('TASK-1778 · un content-length mentiroso no blanquea el body: se lee por stream hasta el tope', async () => {
+    // Contrato viejo: content-length > tope → body '' + too_large (aunque ok=true), y el
+    // probe leía ese vacío como "observé la página sin nada" → falso negativo. Contrato
+    // nuevo: la lectura por stream lee lo que realmente llega, con corte duro + rastro.
     const fetchImpl = (async () =>
       new Response('x'.repeat(50), {
         status: 200,
@@ -227,8 +230,20 @@ describe('TASK-1266 · createProbeFetcher', () => {
     const fetcher = createProbeFetcher('https://example.com', { fetchImpl })
     const res = await fetcher('/', { maxBytes: 1000 })
 
-    expect(res.errorCode).toBe('too_large')
-    expect(res.body).toBe('')
+    expect(res.errorCode).toBeNull()
+    expect(res.body).toBe('x'.repeat(50))
+    expect(res.truncated).toBe(false)
+  })
+
+  it('TASK-1778 · un body sobre el tope se corta con rastro (truncated: true), nunca como completo', async () => {
+    const fetchImpl = (async () => new Response('y'.repeat(5000), { status: 200 })) as unknown as typeof fetch
+
+    const fetcher = createProbeFetcher('https://example.com', { fetchImpl })
+    const res = await fetcher('/', { maxBytes: 1000 })
+
+    expect(res.ok).toBe(true)
+    expect(res.body).toBe('y'.repeat(1000))
+    expect(res.truncated).toBe(true)
   })
 
   it('traduce error de red a errorCode network sin lanzar', async () => {

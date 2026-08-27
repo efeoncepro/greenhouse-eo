@@ -439,6 +439,33 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
         source: 'role'
       })
     }
+
+    // TASK-1709 — Diagnóstico de prospecto. `run` compromete gasto real de adquisición
+    // (~USD 0,25 por corrida con tope duro): SOLO admin y AM lo disparan. `read` se
+    // extiende a operaciones (leer un diagnóstico no gasta).
+    if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT)) {
+      addEntitlement(entries, {
+        module: 'growth',
+        capability: 'growth.seo.prospect_diagnostic.run',
+        action: 'execute',
+        scope: 'tenant',
+        source: 'role'
+      })
+    }
+
+    if (
+      hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+      hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT) ||
+      hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)
+    ) {
+      addEntitlement(entries, {
+        module: 'growth',
+        capability: 'growth.seo.prospect_diagnostic.read',
+        action: 'read',
+        scope: 'tenant',
+        source: 'role'
+      })
+    }
   }
 
   // TASK-1229 — Growth Forms engine. Operación interna del motor de formularios
@@ -531,7 +558,7 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
   ) {
     const hiringSource: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
 
-    const HIRING_READ_CAPS = ['hiring.demand.read', 'hiring.opening.read', 'hiring.application.read'] as const
+    const HIRING_READ_CAPS = ['hiring.demand.read', 'hiring.opening.read', 'hiring.application.read', 'hiring.opening.capacity.read'] as const
 
     for (const capability of HIRING_READ_CAPS) {
       addEntitlement(entries, { module: 'hiring', capability, action: 'read', scope: 'tenant', source: hiringSource })
@@ -638,6 +665,23 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       module: 'hiring',
       capability: 'hiring.assessment.fairness_read',
       action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    // TASK-1762 — confirmar el cierre de una vacante por capacidad. Entra a este tier
+    // (role-only, SIN routeGroup `internal`) por la misma razón que `reveal_identity`: todo
+    // tenant interno porta ese routeGroup, así que incluirlo dejaría a `collaborator`,
+    // `designer` y `people_viewer` cerrando cohortes. Y el efecto acá no es leer PII: es
+    // registrar el desenlace de decenas de candidaturas reales y —en Slice 4— disparar sus
+    // correos. Es irreversible: no se deshace una comunicación ya emitida.
+    //
+    // La misma capability gobierna el único camino autorizado para cambiar `requested_seats`
+    // cuando la vacante tiene política vigente (la guarda vive además en un trigger de base).
+    addEntitlement(entries, {
+      module: 'hiring',
+      capability: 'hiring.opening.capacity.confirm',
+      action: 'execute',
       scope: 'tenant',
       source: 'role'
     })

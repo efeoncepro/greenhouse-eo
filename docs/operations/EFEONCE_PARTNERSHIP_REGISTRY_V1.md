@@ -2,7 +2,7 @@
 
 > **Estado:** `Activo — requiere actualización por evidencia`
 > **Owner:** Strategy + Commercial + práctica dueña + Finance/Legal
-> **Última revisión:** 2026-08-05
+> **Última revisión:** 2026-08-27
 > **Empresa:** Efeonce Group SpA · RUT 77.357.182-1 · 55 personas · Santiago, Chile
 > **Contacto operativo:** Julio César Reyes Rangel, CEO · `julio.reyes@efeonce.org`
 
@@ -42,8 +42,8 @@ estado por relación, la evidencia observable y el siguiente paso.
 | **ElevenLabs** | Commercial Partner Program — Systems Integrator | **Postulación enviada y confirmada** | Voz, agentes conversacionales, dubbing y localización | Esperar discovery y eventual acuerdo comercial | Confirmación web; auditoría comercial 2026-07-26 |
 | **Black Forest Labs / FLUX** | Creator Program | **Postulación enviada y confirmada** | Capability creativa y acceso temprano | Esperar contacto; no presentarlo como reseller/co-sell | Confirmación web; auditoría comercial 2026-07-26 |
 | **AWS** | AWS Partner Central | **Bloqueado**: verificación de identidad pendiente | Rail cloud para clientes AWS-first | Completar documento + selfie y luego onboarding empresarial; owner: Julio | Auditoría comercial 2026-07-26 |
-| **Salesforce** | Consulting Partner | **Bloqueado**: acuerdo y usuario no confirmados | CRM enterprise potencial | Completar aceptación y verificar usuario sólo si existe oportunidad concreta | Auditoría comercial 2026-07-26 |
-| **HubSpot** | Solutions/Services Partner | Relación comercial listada en el modelo; estado contractual actual no revalidado en este corte | RevOps, CRM e implementación | Revalidar tier, portal, certificaciones y derechos antes de usar claim externo | Modelo Partner & Provider Layer V1 |
+| **Salesforce** | Consulting Partner; Cloud Reseller no confirmado | **Aceptación histórica como Provisional Consulting Partner (2025-03-11); estado vigente y SPPA pendientes de readback** | Carril Salesforce-first: CRM core, Agentforce, Marketing Cloud Engagement/Next y servicios enterprise/B2C | Recuperar Partner Community; verificar Partner Account, SPPA, tier, certificaciones, Demo/Dev/Trial y track Cloud Reseller antes de claim o reventa; owner: Julio + RevOps & CRM | Correo Salesforce 2025-03-11 registrado en LIC-6533 + declaración del operador 2026-08-27 |
+| **HubSpot** | Solutions/Services Partner | Partnership declarado por el CEO; estado contractual/tier actual no revalidado en este corte | Carril HubSpot-first de RevOps & CRM, demand generation B2B e implementación | Revalidar tier, portal, certificaciones y derechos antes de usar claim externo | Declaración del operador 2026-08-27 + modelo Partner & Provider Layer V1 |
 | **Lovable** | Lovable Partner Program | **Postulación pendiente** | Prototipado y accelerated delivery | Follow-up o cerrar como experimento; owner: Product/Commercial | Auditoría comercial 2026-07-26 |
 | **HeyGen** | Agency Certification / waitlist | **No iniciado**: enlace de Typeform observado como incorrecto | Avatar, video y localización | Encontrar formulario vigente o solicitar acceso al Agency Group | Auditoría comercial 2026-07-26 |
 | **Microsoft AI Cloud** | Partner ecosystem | **No iniciado / target** | Azure AI y clientes Microsoft-first | No abrir hasta existir oportunidad, owner y economics claros | Modelo Partner & Provider Layer V1 |

@@ -159,6 +159,123 @@ Este documento fija:
 - Domain: `agency` + `people` + `hris` + `staff augmentation` + `finance` + `capacity`
 - Date: `2026-04-11`
 
+## Delta 2026-08-26 — TASK-1751: la fase de gracia deja de prometer lo que el servidor no puede aceptar
+
+La rendición del candidato entra en `submit_grace` al cruzar `answerDeadline` y sigue viva hasta
+`closeDeadline`. La fase existe desde `TASK-1363`; lo que se fija acá es **qué puede ofrecer esa fase**,
+porque prometía un envío que el servidor rechaza y un reintento que nunca podía funcionar.
+
+Precisión de alcance, porque la premisa escrita el 2026-08-19 no se sostuvo entera: de los cuatro defectos
+que la task declaraba, **dos fueron refutados contra el código** — el reloj ya seguía el scroll (`.sessionBar`
+es `sticky` desde `bc69e5a75`) y los avisos de 5 y 1 minuto nunca fueron sólo `srOnly` (hay un canal visible
+en paralelo dentro del reloj). Los dos que quedaron en pie son los del **guardado**, y son el daño real del
+caso fuente. El Delta de la task dueña conserva la refutación con su verificación.
+
+### El envío exige la evaluación COMPLETA, y eso decide qué puede ofrecer la superficie
+
+`submitPublicAssessmentWithClient` (`public-taking.ts:651-657`) lanza `assessment_incomplete` (400) ante
+cualquier pregunta del set público sin respuesta guardada. No es una validación de UI adelantada al servidor:
+es el servidor. Y durante la gracia ya no se puede guardar nada nuevo, así que **con respuestas faltantes
+enviar es imposible** — por eso el CTA de envío **no se renderiza** en esa rama
+(`AssessmentTakingClient.tsx:764`). Ofrecer el botón sería repetir exactamente la mentira que la task vino a
+corregir: un affordance que el servidor va a rechazar.
+
+La completitud se deriva **en cliente** desde `responses` (`savedAnswerCount` / `canSubmitEverything`,
+`AssessmentTakingClient.tsx:254-255`). No hay campo nuevo en el DTO público: sus tres bloques declaran
+allowlists **exactos** afirmados por `public-boundary.test.ts:199-224` (`assessment`, cada `response`, `timing`),
+y ensanchar la frontera pública para ahorrarse un `filter` en el cliente es el peor de los dos costos.
+
+### El guardado se protege ANTES del plazo, porque reaccionar al cruce es imposible por construcción
+
+El autosave de texto abierto es un debounce que **se reinicia con cada tecla**: quien escribe de corrido sin
+pausar nunca lo dispara, y no pierde los últimos milisegundos sino la respuesta entera. La protección es una
+ventana preventiva (`PREEMPTIVE_SAVE_WINDOW_SECONDS = 30`, intervalo fijo de 5 s leyendo del ref para que
+escribir no reinicie el intervalo). **No extiende ningún plazo**: guarda antes, texto escrito a tiempo.
+
+El flush reactivo —guardar *al cruzar* `answerDeadline`— es **imposible por construcción**, y conviene dejarlo
+escrito para que nadie lo reintente como si fuera el arreglo obvio:
+
+- el ancla temporal del cliente es `timing.databaseNowAt`, que el servidor toma **al construir la respuesta**,
+  mientras que la referencia monotónica (`window.performance.now()`) se fija en el cliente **después** de la
+  latencia (`AssessmentTakingClient.tsx:258-270`). El reloj del cliente va detrás del servidor ≥1 RTT;
+- el corte del servidor es `nowMs >= Date.parse(answer)` (`instances.ts:578-580`), **sin epsilon**.
+
+Un guardado disparado por el cruce sale, en el mejor caso, con el plazo ya cumplido: llega a `assessment_not_open`.
+Lo implementable es preventivo, nunca reactivo.
+
+### El mensaje genérico del endpoint público es la decisión correcta; la verdad se construye en el cliente
+
+El endpoint público responde `{ok, code, message}` con `message` **genérico a propósito** —es una superficie sin
+autenticación— y el test anti-leak lo fija (`route.test.ts:146-161`: sólo esas tres claves, `message` constante,
+ni el `message` interno ni los `details` viajan). La tentación al arreglar un error mudo es aflojar ese `message`
+"para que diga la verdad": eso debilita la frontera pública y filtra estado interno del assessment a quien tenga
+el token.
+
+La verdad se construye **en el cliente, desde el `code`**, agrupada por lo que la persona puede hacer y no por
+código: `assessment_not_open` y `assessment_incomplete` son los dos casos donde reintentar **no puede funcionar
+nunca**, y cada uno nombra su causa y su salida real; todo lo demás —red, 429, fallo de sistema— conserva el
+mensaje reintentable. Es el noveno patrón canónico aplicado al cliente en vez de al DTO, porque acá el DTO no
+puede ensancharse.
+
+### `readOnly` sobre `disabled` en el campo congelado es accesibilidad, no estilo
+
+Durante la gracia todo control se congela — eso no cambia. Lo que cambia es **cómo**: el textarea pasa a
+`readOnly` (`AssessmentTakingClient.tsx:746`) porque `disabled` lo saca del tab order y saca su contenido del
+árbol de accesibilidad; durante la gracia eso significa que quien usa lector de pantalla **no puede releer lo
+que escribió**, justo cuando el mensaje le pide copiar su texto antes de salir. Congelar es obligatorio; ocultar
+el texto, no.
+
+La asimetría con radio/checkbox es **deliberada y es el contrato**: `readonly` no aplica a
+`<input type="radio|checkbox">` por spec HTML, así que esos dos conservan `disabled`. El test de contrato afirma
+exactamente dos `disabled={!canAnswer}` más el `readOnly`
+(`AssessmentTakingClient.timing-contract.test.ts:12-24`): la cuenta baja de 3 a 2 a propósito, y verla bajar no
+es una regresión. Como `disabled` lo pintaba el navegador y este módulo nunca tuvo `.textArea:disabled`, la señal
+visual de campo congelado se repuso explícitamente (`.textArea:read-only`).
+
+### Lo que sólo se ve mirando el frame
+
+La primera captura premium de esta superficie destapó cuatro defectos que ningún test veía, y dos de ellos eran
+**pre-existentes**, no introducidos por la task: el contador de caracteres usaba `--text-disabled` (2.43:1 contra
+blanco, bajo el 4.5:1 de AA, `serious` en axe) siendo texto secundario y no deshabilitado; y el textarea se
+apoyaba en el `placeholder` como nombre accesible —el anti-patrón que la propia guía de UX writing prohíbe—, lo
+que quedó al descubierto recién al ocultar el placeholder en solo lectura, porque un campo congelado no puede
+invitar a escribir. Los otros dos: el ícono de la banda era un avión de papel (`tabler-send`) sobre un texto que
+dice que **no** se puede enviar, y la superficie no declaraba su recipe de composición. Regla transferible: en
+una superficie candidate-facing, la evidencia visual no es la formalidad del cierre — es el único gate que ve
+contradicciones de significado y contraste.
+
+### Invariantes operativos para agentes — Rendición del candidato: gracia y guardado
+
+- **NUNCA** ofrecer "enviar lo que alcanzaste a guardar" sin verificar completitud: el servidor exige la
+  evaluación **completa** (`assessment_incomplete`), y durante la gracia lo faltante ya no se puede guardar. Si
+  el envío no puede prosperar, el CTA no se renderiza.
+- **NUNCA** agregar al DTO público un campo derivable de lo que ya viaja. Los bloques `assessment`, `responses`
+  y `timing` tienen allowlists exactos testeados; la completitud se deriva en cliente.
+- **NUNCA** intentar un flush "al cruzar el plazo": el cliente va ≥1 RTT detrás del servidor y el corte de
+  `instances.ts` es `>=` sin epsilon. La única protección implementable es **preventiva** (guardar antes), y no
+  extiende ningún plazo.
+- **NUNCA** aflojar el `message` genérico del endpoint público para "que diga la verdad". La verdad se construye
+  en el cliente desde el `code`; el mensaje del servidor está fijado por un test anti-leak.
+- **NUNCA** mostrar un camino de reintento para `assessment_not_open` ni `assessment_incomplete`: reintentar no
+  puede funcionar nunca, y ofrecerlo esconde la salida real (pedir que le repongan el acceso).
+- **NUNCA** convertir el `readOnly` del textarea congelado en `disabled` "por consistencia": saca el contenido
+  del árbol de accesibilidad. La asimetría con radio/checkbox es el contrato, no una excepción olvidada.
+- **NUNCA** cerrar un cambio en esta superficie sólo con tests verdes: dos de los cuatro defectos visuales que la
+  captura destapó eran pre-existentes y ninguno era detectable sin mirar el frame.
+
+### Estado de rollout
+
+| Pieza | Estado |
+|---|---|
+| Guardado preventivo, gracia honesta (CTA condicional + conteo derivado), error que nombra su causa, `readOnly` accesible y sus tests de contrato | **en `develop`** — commits `67c6d2688`…`06622b5e6` |
+| Evidencia visual `submit_grace` (desktop 1440 + móvil 390, 6 frames, primera línea base de la fase) + scorecard 4.54 | **capturada y promovida a baseline** |
+| Promoción a producción | **pendiente** — al 2026-08-26 el árbol de `origin/main` conserva la versión anterior del cliente, del módulo CSS y del diccionario de copy |
+
+Follow-up declarado por el propio scorecard (no resuelto): el anillo de foco de la card compite con el tono de
+la banda durante la gracia. Queda escrito en `nextAction`, no cerrado a ojo.
+
+---
+
 ## Delta 2026-08-23 — TASK-1754: el eje de ETAPA queda en seis valores y las etapas terminales tienen fuente única
 
 Cierra el eje que el delta de `TASK-1765` dejó abierto: allá quedó el DESENLACE, acá la ETAPA.
@@ -215,7 +332,7 @@ la verdad. **Condición de retiro:** `TASK-1365` cierra **antes** de prender
 | Pieza | Estado |
 |---|---|
 | Enum TS en seis + los tres consumers apuntados a `TERMINAL_APPLICATION_STAGES` + mapa de aguas abajo reescrito | **aplicado** |
-| Contract del `CHECK` (`docs/tasks/pending-migrations/TASK-1754-stage-vocabulary-contract.sql.pending`) | **escrito y revisado, NO aplicado** — el `CHECK` de la base **sigue admitiendo trece valores** |
+| Contract del `CHECK` (`migrations/20260823111250596_task-1754-stage-vocabulary-contract.sql`, commit `50b742341`) | **APLICADO 2026-08-23** — el `CHECK` de la base quedó en los **seis** valores, así que `HIRING_APPLICATION_STAGES` vuelve a ser su espejo |
 
 Su autorización no vino de contar filas sino del **contrato de la superficie desplegada**: en
 `origin/main` (release `304371f73`) hay exactamente tres escritores de `hiring_application.stage`,
@@ -333,9 +450,11 @@ fila de `email_type_config` y su seed en el `ops-worker` (**NO** en Vercel).
 | Escritor de `archived_at` (`archiveSyntheticRecords`, `TASK-1748`) | **code complete** — sin desplegar |
 | Backfill de las 32 filas sintéticas de `closed` a `archived_at` | **pendiente** — espera al despliegue del filtro de `TASK-1748` |
 
-Las pendientes viven en `docs/tasks/pending-migrations/` con su condición de ejecución declarada, y
-su orden es **una sola cadena**: contract del enum → filtro de `TASK-1748` desplegado → backfill del
-eje de archivado → `CHECK` del invariante.
+**La cadena completa se ejecutó el 2026-08-23, en ese orden**: contract del enum → filtro de
+`TASK-1748` desplegado → backfill del eje de archivado → `CHECK` del invariante.
+`docs/tasks/pending-migrations/` quedó **vacía** (sólo su `README`). La condición que gobernaba la
+cadena —aplicar un contract sólo DESPUÉS del release que retira su escritor (`ISSUE-161`)— se
+cumplió y **sigue vigente como regla**: lo que cambió es el hecho, no el invariante.
 
 ### Invariantes operativos para agentes — Eje de desenlace
 
@@ -1142,8 +1261,8 @@ dice cómo — ver `HiringDecision` y el delta de `TASK-1754`.
 - `closed` — escribible **sólo** por el command de decisión
 
 Los siete literales históricos (`qualified`, `client_review`, `selected`, `backup`, `rejected`,
-`withdrawn`, `handoff_ready`) salieron del enum TS. El `CHECK` de la base los angosta cuando corra
-`docs/tasks/pending-migrations/TASK-1754-stage-vocabulary-contract.sql.pending`, todavía sin aplicar.
+`withdrawn`, `handoff_ready`) salieron del enum TS, y el `CHECK` de la base los angostó el 2026-08-23
+con `migrations/20260823111250596_task-1754-stage-vocabulary-contract.sql` (commit `50b742341`).
 
 ### HiringHandoff lifecycle
 
@@ -1436,6 +1555,25 @@ Regla UI:
 - no una persona suelta
 - no un opening como pseudo-candidato
 
+Contrato de retorno contextual:
+
+- `openingId` selecciona la vacante y `focusApplication` es una pista efímera para regresar desde
+  Application 360 a la tarjeta exacta; no constituyen estado persistente ni una segunda fuente de verdad.
+- El reader resuelve primero `focusApplication` y fija fuera de los límites paginados la cadena exacta
+  postulación → vacante → demanda. El contexto de la postulación prevalece sobre un `openingId` contradictorio;
+  la política canónica de procedencia sigue aplicando y nunca se amplía por navegar.
+- Si el foco no existe o no es visible bajo la policy de procedencia vigente, la vista declara que no pudo
+  ubicarlo. Nunca enfoca silenciosamente otra tarjeta como si fuera la original.
+- Una vez consumido, `focusApplication` se retira de la URL sin crear una nueva entrada de historial. El enlace
+  durable sigue siendo el pipeline de la vacante; el foco sólo coordina scroll, focus visible y anuncio accesible.
+
+Brecha de conformidad conocida (2026-08-24): las consultas de aplicaciones del snapshot de Pipeline, incluido
+el lookup exacto de `focusApplication`, todavía no agregan `archived_at IS NULL`, por lo que una postulación
+archivada puede permanecer o reaparecer en el board aunque la cola secuencial sí la excluya. Esto contradice el
+eje canónico `archived_at` («si el registro se muestra») y no constituye una excepción al modelo. Hasta
+corregirlo, ningún consumidor debe interpretar el snapshot o el pin de foco como autorización para reexponer
+postulaciones archivadas.
+
 ### 4. Application 360
 
 Vista detallada de una application.
@@ -1449,6 +1587,19 @@ Bloques mínimos:
 - blockers
 - decision
 - handoff
+
+Contrato de revisión secuencial:
+
+- Anterior/Siguiente recorre sólo postulaciones no archivadas de la **misma vacante y etapa** que la postulación
+  abierta. El orden es estable: `created_at DESC, application_id ASC`; se recalcula en cada request y no persiste
+  un cursor que pueda quedar stale después de un cambio de etapa o archivado.
+- El reader de navegación devuelve únicamente identificadores, posición y total. Nunca incorpora score, afinidad,
+  ranking, recomendación IA, contacto ni otros datos del expediente; los readers de Application 360 conservan la
+  propiedad de PII, evaluaciones y ceguera anti-anclaje.
+- El retorno a Pipeline usa la pestaña existente con `openingId + focusApplication`, de modo transversal para
+  cualquier vacante. No agrega un botón paralelo ni obliga a reconstruir el camino pasando por Demand Desk.
+- La navegación a otra ficha protege borradores locales sin guardar antes de abandonar la postulación. Esta
+  protección es un contrato de interacción; no convierte el estado de formulario en estado del dominio Hiring.
 
 ### 5. Demand 360
 
@@ -2319,3 +2470,111 @@ Invariantes duros:
 Flag `HIRING_SYNTHETIC_DATA_FILTER_ENABLED` (Vercel-only, default OFF) gatea sólo el filtro de desk y
 talent pool. Docs: funcional `docs/documentation/hr/procedencia-de-datos-hiring.md`; manual
 `docs/manual-de-uso/hr/operar-procedencia-de-datos-hiring.md`.
+
+## Delta 2026-08-26 — TASK-1773: el eje de desenlace gana carril gobernado (`code complete, rollout pendiente`)
+
+Cerrar una postulación se podía operar **sólo desde el portal**: ni `api/platform/app/**`, ni MCP, ni
+Nexa. Violación directa de Full API Parity, y el agravante es que ninguna de las cuatro tasks del eje
+de desenlace (`TASK-1748`, `TASK-1754`, `TASK-1762`, `TASK-1765`) lo declaró como pendiente — tampoco
+la auditoría que las revisó. Esta task federa la decisión **INDIVIDUAL** y deja un guard para que la
+omisión no pueda repetirse en silencio.
+
+Código: `src/lib/hiring/decision-parity.ts` (propose/confirm + lectura del desenlace),
+`src/lib/api-platform/resources/app-hiring-application-decision.ts` (adaptador del lane `app`),
+`src/lib/nexa/actions/hiring-decision.ts` (acción gobernada),
+`src/lib/hiring/capability-parity-manifest.ts` (guard de parity). Rutas del lane `app`:
+`GET …/hiring/applications/{applicationId}/outcome`, `POST …/decision/propose`, `POST …/decision/confirm`.
+
+### El lane es un ADAPTADOR, no una segunda implementación
+
+- **Ninguna regla de decisión se reimplementa fuera de `decideHiringApplication`.** Causa obligatoria en
+  `not_selected` y prohibida en los otros cinco, destino de etapa, idempotencia, historial append-only,
+  evento y elección del tipo de correo siguen viviendo en el command, y ahí se quedan. El recurso del
+  lane valida transporte y autorización, traduce el error de dominio y delega; la acción de Nexa hace lo
+  mismo. **NUNCA** agregar a un adaptador una regla de negocio que la UI no tendría: si un consumer la
+  necesita, va al command, donde la comparten todos.
+- Autorización del lane: `tenantType === 'efeonce_internal'` **más** la capability real
+  `hiring.application.decide` (`read` para la lectura, `execute` para propose/confirm). No una capability
+  paralela «de agente».
+
+### La propuesta es EFÍMERA, no una entidad — `Migration: none`
+
+- El guard es un **digest del estado actual** (`hdp-<sha256:24>` sobre `applicationId | stage | decision |
+  decisionCause | archivedAt | desenlace propuesto | causa propuesta`) que `propose` calcula y `confirm`
+  **recalcula contra el estado de AHORA**. Si alguien decidió, archivó o movió la postulación entre medio,
+  las huellas no coinciden y la confirmación falla con **409 `hiring_decision_proposal_stale`**.
+- 🔴 **NUNCA crear una tabla de propuestas de decisión.** El contraste con el Banco de Talento es
+  deliberado: allá la invitación se persiste (`talent_pool_invitation`) porque **una invitación ES una
+  entidad con ciclo de vida propio** —se envía, se acepta, caduca, se audita—. Una propuesta de decisión
+  no lo es: **nace y muere dentro de un gesto humano**. Persistirla agregaría una tabla que habría que
+  limpiar y un estado que puede quedar huérfano, a cambio de nada.
+- La revalidación va **antes** de la escritura y **fuera** de la transacción del command: si el estado
+  cambió, se falla sin abrir transacción. El `FOR UPDATE` y el replay por `idempotencyKey` del command
+  siguen cubriendo la carrera fina donde siempre estuvieron.
+- El código de error **no se aplana a `bad_request`**: se agregó `hiring_decision_proposal_stale` al enum
+  `ApiPlatformErrorCode` para que el consumer distinga «tu payload está mal» de «el mundo cambió, vuelve
+  a proponer».
+
+### Nexa tiene autoridad MÁS ANGOSTA que el portal
+
+- 🔴 **Nexa sólo cierra una postulación ABIERTA; re-decidir una cerrada es humano.** El prólogo
+  compartido por `buildPreview` y `execute` propone y bloquea con `NexaActionBlockedError` + deep link al
+  Hiring Desk cuando `alreadyClosed`.
+- **El motivo es mecánico, no filosófico**, y conviene registrarlo porque explica por qué NO se resolvió
+  de otra forma: el contrato compartido de acciones de Nexa (`NexaActionPreviewResult` =
+  `{title, summary, metrics}`) **no puede cargar estado del preview al execute**, así que la huella no
+  sobrevive el viaje. Sin ella, una confirmación tardía podría pisar en silencio una decisión que otra
+  persona tomó entre medio — y el command permite re-decidir a propósito, porque un humano puede cambiar
+  de opinión.
+- **Se acotó la autoridad del agente en vez de debilitar el guard o de tocar el contrato compartido**,
+  que cargan otras seis acciones. El `execute` **RE-PROPONE en el punto de mutación**: si alguien decidió
+  entre el preview y el confirm, `alreadyClosed` bloquea ahí. Mismo resultado que habría dado la huella,
+  sin ensanchar la superficie. **NUNCA** «arreglar» esto ensanchando `NexaActionPreviewResult` para un
+  solo consumer.
+- Ventana corta a propósito (`expirationSeconds: 300`), `sensitivity: 'high'`, capability real
+  `hiring.application.decide` y `tenantType === 'efeonce_internal'`.
+
+### Confirmar es fail-closed para agentes delegados
+
+- 🔴 **`confirm` rechaza `authSource === 'sister_platform_oauth'` con 403.** Un token delegado puede
+  **leer** el desenlace y **proponer** una decisión; **confirmar exige sesión humana**.
+- No es una omisión: **`efeonce.mcp.hiring.write` no existe en código**. Está propuesto en
+  `TASK-1720`/`TASK-1722` como clase de blast-radius y permanece bloqueado hasta el grant revocable de
+  `TASK-1631`. Es el mismo reparto que rige en el resto de Hiring: el agente propone y lee, el humano
+  confirma. **NUNCA** cablear un scope de escritura delegado a este carril antes de ese grant.
+
+### El manifiesto de parity vuelve obligatoria la pregunta
+
+- `src/lib/hiring/capability-parity-manifest.ts` obliga a que **toda capability `hiring.*` que el código
+  chequee con `can()`** aparezca declarada como `federated` (con `evidence` = ruta del lane `app`, que el
+  test verifica que **exista**), `deliberately-internal` (con razón) o `pending` (con razón). El test
+  barre el código y rompe si hay una sin declarar, si una `federated` apunta a una ruta inexistente, si
+  una no-federada calla su razón, o si el manifiesto acumula entradas muertas.
+- **No declara si algo DEBE federarse**: declara que alguien lo pensó y dejó escrito el porqué. Un
+  `deliberately-internal` honesto vale tanto como un `federated`; **lo inaceptable es el silencio**, que
+  es exactamente como nació este hueco.
+- ⚠️ **NUNCA meter un scope OAuth delegado en ese manifiesto.** `hiring.candidate.review.read` NO va ahí:
+  es un scope que se verifica con `oauthCapabilities.includes(...)`, no una capability de `can()`. **Son
+  dos planos de autorización distintos** y mezclarlos es el error que el propio guard destapó al
+  escribirse. La ruta de review ya queda cubierta por `hiring.application.read`.
+- **NUNCA** agregar una capability de hiring sin declarar su parity en el mismo PR — el test rompe, y
+  esa es la intención.
+
+### Lo que esta task NO federa
+
+- 🔴 **El cierre MASIVO por capacidad sigue sin federarse** (`TASK-1762`, resuelto 2026-08-23). Su gate es
+  una confirmación humana contra un digest fresco, y bajo el AI Act la selección es alto riesgo con
+  supervisión obligatoria. El carril gobernado de la cohorte expone `preview` y `status` — **lecturas**:
+  un agente puede explicar a cuántas personas tocaría un cierre y cómo va uno en vuelo, **jamás
+  dispararlo**. Esta task cubre la decisión **individual**, que conserva su propio contrato.
+- Las capabilities marcadas `pending` en el manifiesto **no tienen carril** y así está declarado; no
+  asumir que existe uno por analogía con éstas.
+
+### Estado — `code complete, rollout pendiente`
+
+`NEXA_HIRING_ACTIONS_ENABLED` **nace OFF en todos los environments** (runtime lector: **Vercel
+únicamente**, `src/lib/nexa/flags.ts`; fila registrada en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`)
+y depende además del master `NEXA_ACTION_RUNTIME_ENABLED`. Prender exige sign-off: bajo el AI Act la
+selección es alto riesgo con supervisión humana obligatoria. **Falta evidencia de runtime contra
+staging** — el lane `app` y la acción de Nexa están cubiertos por tests, no por un ejercicio real contra
+el deployment activo. **NUNCA** presentar este carril como operativo.

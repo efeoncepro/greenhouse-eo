@@ -29,6 +29,15 @@ const collectSourceFiles = (dir: string): string[] => {
 /** Tablas donde el dominio hiring PUEDE escribir (SoT del boundary; extender con criterio). */
 const ALLOWED_WRITE_TARGETS = new Set([
   // Aggregates propios del dominio (TASK-353/355/356/1360/1361).
+  // TASK-1762 — cierre de vacante por capacidad. Las tres son aggregates propios del dominio y
+  // ninguna sale de `greenhouse_hiring`: la politica es el opt-in gobernado (no guarda cupos: ese
+  // dato vive en `hiring_opening.requested_seats` y tiene un solo dueno), y el run/items son la
+  // bitacora que hace recuperable un cierre parcial. El efecto sobre cada candidatura NO se escribe
+  // desde aca: pasa por `decideHiringApplication`, que es lo que preserva historia y evento.
+  'greenhouse_hiring.hiring_opening_capacity',
+  'greenhouse_hiring.hiring_opening_capacity_event',
+  'greenhouse_hiring.hiring_opening_closure_run',
+  'greenhouse_hiring.hiring_opening_closure_run_item',
   'greenhouse_hiring.talent_demand',
   'greenhouse_hiring.hiring_opening',
   'greenhouse_hiring.candidate_facet',

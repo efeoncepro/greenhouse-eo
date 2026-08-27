@@ -1323,3 +1323,40 @@ La constante del event type vive en el dominio (`src/lib/growth/seo/contracts.ts
 🔴 **Por qué el outbox NO despacha el run.** En el dominio SEO el disparo de todo batch es **Cloud Scheduler → HTTP al ops-worker** (rank capture, audits, backlinks, GSC, market data); el drain de discovery (`ops-seo-keyword-discovery-drain` → `POST /seo/keyword-discovery/drain`, claim `pending → running` atómico) sigue exactamente ese patrón. Un consumer reactivo de `requested` sería un mecanismo de despacho nuevo en el dominio, con su propia semántica de retry compitiendo con la del claim. Los eventos existen porque una corrida COMPROMETE GASTO y la pregunta de auditoría es "¿quién la pidió, cuánto se estimó y en qué terminó?" — el run responde el estado actual; los eventos responden la historia.
 
 Las constantes viven en el dominio (`src/lib/growth/seo/keyword-discovery/contracts.ts`) — mismo seam de extracción §17.3.
+
+## Delta 2026-08-27 — TASK-1709: `growth.seo.prospect_diagnostic.completed` (diagnóstico de prospecto)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `growth.seo.prospect_diagnostic.completed` | v1 | `seo_prospect_diagnostic` (`seopd-{uuid}`) | `finalizeProspectDiagnostic` (`src/lib/growth/seo/prospect/store.ts`), **dentro de la misma transacción** que inserta los hechos y marca el run `completed` | ninguno todavía — el hand-off comercial (crear/asociar lead en HubSpot con gate de consentimiento, patrón TASK-1279) es task aparte |
+
+**Payload v1**: `{ diagnosticId, rootDomain, market, factCount, actualCostUsd, actor }` — coordenadas y resumen, nunca los hechos: cualquier consumer futuro **re-lee PG** por `diagnosticId`.
+
+El sujeto NO tiene organización (es un dominio prospecto), así que el payload no lleva `organizationId` del sujeto — el gasto queda atribuido en el ledger a la org canónica de Efeonce como costo de adquisición. La constante vive en el dominio (`src/lib/growth/seo/prospect/contracts.ts`) — mismo seam §17.3. **NUNCA** un consumer de este evento puede re-disparar un diagnóstico: la captura recurrente sobre prospectos está prohibida por regla dura del carril.
+
+## Delta 2026-08-27 — TASK-1775: `growth.seo.domain_overview.snapshot_captured` (foto de dominio)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `growth.seo.domain_overview.snapshot_captured` | v1 | `seo_target` (`seot-{uuid}`) | command `captureDomainOverview` (`src/lib/growth/seo/domain-overview/capture.ts`), tras persistir los snapshots del ciclo (sólo si `captured > 0` o `noMarketData > 0` — algo cambió de verdad); también `backfillDomainRankHistory` (`domain-overview/history-backfill.ts`) al cierre de una corrida con filas escritas | ninguno todavía — rastro de auditoría de una corrida que COMPROMETE GASTO; sin mirror BQ declarado en V1 |
+
+**Payload v1 (captura)**: `{ seoTargetId, organizationId, captureDate, subjects, captured, noMarketData, costUsd, actor: 'ops_worker' }`.
+**Payload v1 (backfill)**: mismo shape con `captureDate: null`, `snapshotsWritten` y `actor: 'history_backfill_runner'` — coordenadas y resumen, nunca las métricas: cualquier consumer futuro **re-lee PG** por `(seoTargetId → dominios → seo_domain_overview_snapshots)`.
+
+El screening (`estimateDomainTraffic`) **no emite**: es una corrida on-demand sin downstream declarado, y su rastro de gasto ya queda en `seo_provider_spend_daily` por construcción. La constante vive en el dominio (`src/lib/growth/seo/contracts.ts`) — mismo seam de extracción §17.3.
+
+## Delta 2026-08-27 — TASK-1777: `growth.seo.backlink.detail_captured` (drill-down nominal de enlaces)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `growth.seo.backlink.detail_captured` | v1 | `seo_target` (`seot-{uuid}`) | pase `runBacklinkDetailPass` → `executeDrillDown` (`src/lib/growth/seo/backlinks/detail-capture.ts`), tras persistir veredicto + filas hijas en la misma transacción (sólo outcome `drilled`) | ninguno todavía — rastro de auditoría de un gasto CONDICIONAL |
+
+**Payload v1**: `{ seoTargetId, organizationId, backlinkSnapshotId, captureDate, triggerReason, referringDomainRows, anchorRows, costUsd, actor }` — el `triggerReason` (`first_time` / `backlink_movement` / `referring_domain_movement`) es la parte auditable de la política de gasto: responde "¿por qué se compró este detalle?". Los outcomes `skipped_*` y `failed` **no emiten** (no compraron nada o no completaron) — quedan en el veredicto persistido (`seo_backlink_drilldowns`) y en la señal `seo.backlink.detail_drilldown_failed`. La constante vive en el dominio (`contracts.ts`) — seam §17.3.
+
+## Delta 2026-08-27 — TASK-1776: `growth.seo.url_visibility.snapshot_captured` (visibilidad por sujeto-página)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `growth.seo.url_visibility.snapshot_captured` | v1 | `seo_target` (`seot-{uuid}`) cuando la corrida es target-bound (batch mensual); `organization` (`organization_id`) para corridas on-demand sin target | command `captureUrlVisibility` (`src/lib/growth/seo/url-visibility/capture.ts`), tras persistir snapshots de la corrida (sólo si `captured > 0` o `noMarketData > 0`) | ninguno todavía — rastro de auditoría de una corrida que COMPROMETE GASTO |
+
+**Payload v1**: `{ organizationId, seoTargetId, locationCode, languageCode, subjects, captured, noMarketData, marketRowsWritten, costUsd, actor: 'ops_worker' }` — coordenadas y resumen, nunca las keywords: cualquier consumer futuro **re-lee PG**. `marketRowsWritten` registra el efecto lateral del tercer productor (el `keyword_info` inline escrito al mercado con costo 0). Los colectores de concentración (`relevant_pages`/`subdomains`) **no emiten**: on-demand sin downstream, gasto en el ledger por construcción. La constante vive en el dominio (`contracts.ts`) — seam §17.3.

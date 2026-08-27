@@ -21,10 +21,10 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-042`
-- Status real: `Diseño aprobado; foundation pendiente`
+- Status real: `Diseño aprobado; precondiciones de runtime abiertas (ver Delta 2026-08-24)`
 - Rank: `TBD`
 - Domain: `delivery|ui|content|agency`
-- Blocked by: `none`
+- Blocked by: `TASK-1774`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -54,6 +54,29 @@ defecto y promover un conjunto pequeño de tipos sólo después de evidencia pro
   producto o fuente operativa.
 - Migrar por cohorts pequeñas, reversibles y verificadas, sin cambiar el footer global por herencia.
 
+## Delta 2026-08-24 — verificación contra runtime
+
+Revisión con `arch-architect` + `greenhouse-email` + skills de marca, ejercitando el runtime real en vez de la
+documentación. El gobierno de la migración se confirma y no cambia: legacy por defecto, cohorts de máximo cuatro
+tipos, prohibición de big-bang y rollback por tipo siguen siendo la forma correcta. Lo que cambia es lo que la
+implementación debe cerrar **antes** de promover un tipo. Detalle en
+`GREENHOUSE_EMAIL_PRESENTATION_POLICY_DECISION_V1.md` §`Delta 2026-08-24`.
+
+| Hallazgo | Efecto sobre esta task |
+|---|---|
+| El mecanismo de baja no es accionable por ningún método (link GET → 405, one-click POST → 500, POST → 400) y el default `?? 'broadcast'` lo agrega solo en el carril batch | Precondición bloqueante fuera de la umbrella; ningún tipo declara `required` antes |
+| Tres decisores gobiernan el unsubscribe y ya divergen; cero tests de coherencia | Entregable de foundation |
+| `en-US.emails` es un alias del objeto es-CL; el bug ya es visible en correos en inglés | Entregable de foundation |
+| Cero archivos de correo tocan identidad legal; hay tres políticas de ausencia distintas en el repo | Entregable de foundation + decisión adoptada en la ADR |
+| El envío es multi-runtime: 20 worker, 6 Vercel, 3 ambos, 1 sin emisor | Secuencia de despliegue, rollback y canary |
+| El lockup `Efeonce Greenhouse` sobrevive en cinco cadenas | Child task 0 (`TASK-1274` reanclada) |
+
+Correcciones a supuestos previos de esta task, verificadas: el masthead **ya** usa el wordmark de Efeonce en las 30
+plantillas —la deuda de marca es de copy, no de logo, y Greenhouse sí es una marca del portafolio (platform brand)—;
+y el footer **sí** tiene red de regresión, porque vive en un solo archivo cubierto por `EmailLayout.test.tsx` y por
+los 17 snapshots de `EmailTemplateBaseline`. El hueco de cobertura es de cuerpo (11 plantillas sin caso), no de pie,
+y pertenece a las cohorts, no a la foundation.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
      "Que necesito entender antes de planificar?"
@@ -70,6 +93,7 @@ Revisar y respetar:
 - `docs/epics/to-do/EPIC-042-efeonce-governed-email-presentation-program.md`
 - `docs/architecture/GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md`
 - `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`
+- `docs/architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md`
 - `docs/context/05_voz-tono-estilo.md`
 - `docs/context/09_marca-agencia.md`
 - `src/views/greenhouse/admin/email-footer-profiles/mockup/EmailFooterProfilesMockupView.tsx`
@@ -79,10 +103,20 @@ Revisar y respetar:
 
 Reglas obligatorias:
 
-- **Efeonce es siempre la marca principal.** Greenhouse sólo se nombra como plataforma/producto de Efeonce.
+- **Efeonce lidera; Greenhouse es la platform brand, nunca un lockup compuesto.** Son capas distintas de la misma
+  jerarquía, no alternativas excluyentes. Efeonce lidera la identidad remitente y visual; Greenhouse se nombra en
+  sintaxis de endoso cuando aporta claridad (`Enviado desde Greenhouse, la plataforma de Efeonce`). **`Efeonce
+  Greenhouse` queda prohibido en cualquier superficie**, con o sin `™`. Canon:
+  `EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md` §4 + `09_marca-agencia.md` §Arquitectura de marca.
+- **Nombrar Greenhouse a quien no usa la plataforma no aclara: confunde.** La audiencia es dimensión de policy, no
+  preferencia local del template.
 - `EmailPriority` no determina propósito ni footer: `broadcast !== marketing`.
 - Todo tipo nace con política de unsubscribe `forbidden`; sólo una clasificación explícita como suscripción
   opcional o marketing puede cambiarla a `required`.
+- **Ningún tipo puede declarar `required` mientras el mecanismo de baja no funcione en sus tres capas** (link GET,
+  header one-click RFC 8058 y handler). Hoy no funciona en ninguna; ver Delta 2026-08-24.
+- **El registro de policy es el único decisor del unsubscribe.** `BROADCAST_EMAIL_TYPES`, el gate del carril batch y
+  el default `?? 'broadcast'` se derivan de él, se retiran, o rompen el build por divergencia.
 - Firma y footer son bloques distintos. Un template no inventa personas, equipos, reply-to ni identidad legal.
 - RRSS nacen deshabilitadas y sólo se permiten en suscripción/marketing; son obligatorias en marketing y consumen
   YouTube, Instagram, LinkedIn y Threads desde `EFEONCE_SOCIAL_LINKS`. Dirección e identidad legal vienen del
@@ -152,6 +186,14 @@ Las child tasks declararán ownership del código por cohort; esta umbrella no a
 - No hay cutover por tipo: modificar el layout compartido puede alterar 28 templates simultáneamente.
 - El mockup todavía no es un primitive React Email ni está conectado a una policy exhaustiva por `EmailType`;
   sus fixtures de aprobación no son un SSOT runtime.
+- El mecanismo de baja no es accionable por ningún método y el sistema lo agrega por defecto al carril batch.
+- Tres decisores gobiernan hoy el unsubscribe (`EMAIL_PRIORITY_MAP`, `BROADCAST_EMAIL_TYPES`, rama batch/secuencial)
+  sin ningún test de coherencia entre ellos.
+- El namespace `emails` de `en-US` es un alias del objeto es-CL; el tipo queda satisfecho y el build verde.
+- Ningún archivo de `src/lib/email/**` ni `src/emails/**` toca identidad legal, y no existe política de ausencia.
+- El envío es multi-runtime: 20 tipos salen del ops-worker, 6 de Vercel, 3 de ambos y 1 no tiene emisor.
+- La cadena `Efeonce Greenhouse` sobrevive en remitente, tagline, alt del logo y dos cuerpos de invitación, con tres
+  comentarios en el código que ya la declaran deuda y un test que la prohíbe sólo en una superficie.
 
 ## Modular Placement Contract
 
@@ -297,10 +339,26 @@ Las child tasks declararán ownership del código por cohort; esta umbrella no a
 Esta umbrella formaliza policy, dirección visual, cohorts, gates y child-task boundaries, y conserva el mockup local
 aprobado. No implementa el primitive React Email, policy runtime, cohorts, envío ni rollout.
 
+**Precondición fuera de esta umbrella (bloqueante): `TASK-1774`** — arreglo del mecanismo de unsubscribe (link,
+header one-click y handler), dueña de `ISSUE-163`. No es trabajo de footer y no puede resolverse dentro de una cohorte
+de presentación; ver Delta 2026-08-24 §D1. Ninguna cohorte declara `required` antes de ese cierre. El retiro del
+default `?? 'broadcast'` NO pertenece a `TASK-1774`: es del registro de policy de la foundation, porque matarlo sin
+registro dejaría el sistema sin decisor.
+
 Orden de child tasks obligatorio:
 
+0. Alineación de marca (`TASK-1274`, reanclada al epic): retirar el lockup `Efeonce Greenhouse` de los cinco sitios.
+   Es cambio de cadenas, no de estructura; rompe a propósito los 17 snapshots y los tests que hoy lo afirman.
 1. Foundation compatible: baseline exhaustivo, policy registry y primitive con `legacy` como default; cero bytes
-   visibles modificados.
+   visibles modificados. Entregables adicionales no negociables, todos verificables sin promover ningún tipo:
+   (a) test de coherencia policy ↔ `EMAIL_PRIORITY_MAP` ↔ carril de envío, molde `candidate-reply-to.test.ts`;
+   (b) `dictionaries/en-US/emails.ts` real + test de paridad por mecánica, molde
+   `hiring-desk-stage-locale-parity.test.ts`;
+   (c) hidratación de la identidad legal en el contexto antes de `resolveTemplate`, con la degradación del
+   `efeonce-pdf-footer` portada tal cual y señal de observabilidad al degradar;
+   (d) índice único parcial sobre `is_operating_entity = TRUE`;
+   (e) absorción de `AGENCY_BRANDED_EMAIL_TYPES` como dimensión `audience` de la policy —no borrarlo: hoy marca
+   exactamente a los destinatarios que no usan la plataforma.
 2. Canary interno: uno a cuatro tipos internos de bajo riesgo.
 3. Transaccionales de producto por familia y máximo cuatro tipos por task.
 4. Access/security, Hiring externo y regulated transactional en tasks separadas; nunca comparten release.
@@ -369,6 +427,9 @@ migrando otra familia.
 | Marketing disfrazado de servicio | content/compliance  | medium       | no promotional content + revisión legal por jurisdicción | subject/body contiene promoción en perfil transactional |
 | Marca Greenhouse paralela        | agency/UI           | medium       | Efeonce única masterbrand + snapshot assertion           | masthead/footer principal dice Greenhouse               |
 | Cliente de correo rompe layout   | email UI            | medium       | inline/table-safe + canary real por cohorte              | overflow, links ilegibles o imágenes bloqueadas         |
+| Skew entre runtimes emisores     | delivery            | high         | mapear runtimes por tipo; desplegar y revertir en todos  | el mismo tipo rinde dos footers según automático vs reenvío |
+| Footer es-CL a destinatario en inglés | content/i18n   | high         | `en-US/emails.ts` real + test de paridad por mecánica    | copy del diccionario sale en castellano con locale `en` |
+| Identidad legal stale o divergente | legal/content     | medium       | operating entity + cierre previo de `TASK-1650`          | la dirección del correo no coincide con la lámina aprobada |
 
 ### Feature flags / cutover
 
@@ -380,7 +441,7 @@ asignación explícita. El kill-switch existente puede detener despacho, pero no
 | Slice           | Rollback                                                                        | Tiempo     | Reversible? |
 | --------------- | ------------------------------------------------------------------------------- | ---------- | ----------- |
 | Foundation      | revert del child commit; output legacy debe ser byte-idéntico                   | un release | sí          |
-| Cohort por tipo | restaurar asignación `legacy` sólo para esos tipos y redeploy del runtime dueño | un release | sí          |
+| Cohort por tipo | restaurar asignación `legacy` sólo para esos tipos y redeploy de **todos** los runtimes emisores | un release | sí |
 | Retiro legacy   | no inicia sin 30/30 tipos aceptados; revert restaura primitive legacy           | un release | sí          |
 
 ### Production verification sequence
@@ -391,9 +452,17 @@ asignación explícita. El kill-switch existente puede detener despacho, pero no
 4. Renderizar la matriz mínima: Outlook Desktop Windows (motor Word), Outlook Web, Gmail y un cliente WebKit.
 5. Bloquear imágenes y verificar lectura, identidad y fallback textual/accesible de RRSS.
 6. Obtener aprobación explícita del operador para esa cohorte.
-7. Desplegar sólo la cohorte y realizar un canary consentido; no enviar correos reales por inferencia.
-8. Verificar proveedor, cliente real, links, reply-to y ausencia/presencia correcta de unsubscribe.
-9. Documentar aceptación o rollback antes de abrir la siguiente child task.
+7. Mapear los runtimes emisores de cada tipo de la cohorte antes de desplegar. El envío ocurre en el proceso que
+   invoca `sendEmail`: 20 tipos salen del ops-worker, 6 de Vercel y 3 de ambos. `payroll_export`, `payroll_receipt` y
+   `notification` exigen los dos despliegues; un despliegue parcial hace que el mismo documento salga con dos footers
+   según haya sido automático o reenviado a mano.
+8. Desplegar la cohorte en **todos** sus runtimes emisores y realizar un canary consentido; no enviar correos reales
+   por inferencia. Ejercitar además el carril de reintento del admin y `/api/admin/emails/preview`, que re-renderizan
+   cualquier tipo desde Vercel.
+9. Verificar proveedor, cliente real, links, reply-to y ausencia/presencia correcta de unsubscribe.
+10. Verificar identidad legal contra la base, no contra el fixture: razón social, RUT y casa matriz deben coincidir
+    con el operating entity vigente, y la degradación a constantes debe haber emitido señal si ocurrió.
+11. Documentar aceptación o rollback antes de abrir la siguiente child task.
 
 ### Out-of-band coordination required
 
@@ -410,7 +479,10 @@ asignación explícita. El kill-switch existente puede detener despacho, pero no
 
 ## Acceptance Criteria
 
-- [ ] La ADR fija Efeonce como única marca principal y Greenhouse como plataforma/producto.
+- [ ] La ADR fija Efeonce como marca que lidera y Greenhouse como platform brand nombrable por endoso, alineada a
+      `EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md`.
+- [ ] El lockup `Efeonce Greenhouse` no existe en ninguna superficie de correo: remitente, tagline, alt del logo y los
+      dos cuerpos de invitación (es-CL y en-US).
 - [ ] La policy separa `EmailPriority`, propósito, audience, reply, firma y unsubscribe.
 - [ ] La policy incluye `socialLinksPolicy`, `legalIdentityMode` y `legalNoticePolicy` con defaults fail-closed.
 - [ ] `unsubscribe` nace `forbidden` y sólo `optional_subscription|commercial_marketing` permiten `required`.
@@ -423,7 +495,9 @@ asignación explícita. El kill-switch existente puede detener despacho, pero no
 - [ ] Todos los perfiles gobernados usan `legalIdentityMode='entity'` como mínimo; `full` agrega países y privacidad,
       pero nunca elimina razón social, RUT o casa matriz.
 - [ ] No existe disclaimer legal universal; security/privacy/regulated se prueban por policy y propósito.
-- [ ] Los 30 `EmailType` están inventariados y asignados a una cohorte, sin promoverlos todavía.
+- [ ] Los 30 `EmailType` están inventariados y asignados a una cohorte, sin promoverlos todavía. El inventario
+      declara el runtime emisor de cada uno y registra que `payroll_liquidacion_v2` tiene template y preview pero
+      **ningún emisor**: se resuelve si es futuro o quedó huérfano antes de clasificarlo.
 - [ ] Existe una child task foundation cuyo criterio principal es output byte-idéntico para los 28 templates.
 - [ ] Cada child task posterior cubre una sola familia y máximo cuatro tipos.
 - [ ] Ninguna child task puede comenzar hasta cerrar evidencia y canary de la anterior.
@@ -446,6 +520,16 @@ asignación explícita. El kill-switch existente puede detener despacho, pero no
 - [ ] Wordmark e íconos sociales usan PNG transparentes reproducibles mediante
       `scripts/email/generate-footer-assets.mjs`; el HTML del correo no depende de `next/image`, icon fonts, SVG
       remoto ni filtros CSS.
+- [ ] El mecanismo de baja funciona en sus tres capas y el default `?? 'broadcast'` fue retirado, antes de que
+      cualquier tipo declare `required`.
+- [ ] Existe un test que rompe el build si la policy, `EMAIL_PRIORITY_MAP` y el carril de envío divergen sobre qué
+      tipo lleva unsubscribe.
+- [ ] Existe `dictionaries/en-US/emails.ts` real, el alias a es-CL fue retirado y un test de paridad detecta por
+      mecánica que ambas claves vuelvan a ser el mismo objeto.
+- [ ] La identidad legal se hidrata en el contexto antes de `resolveTemplate`, degrada a las constantes de marca con
+      señal observable, y el RUT se omite cuando falta en vez de inventarse.
+- [ ] `TASK-1650` está cerrada antes de promover cualquier cohorte que imprima casa matriz.
+- [ ] Cada cohorte declara sus runtimes emisores y demuestra despliegue y rollback en todos ellos.
 - [ ] La umbrella sólo puede cerrar cuando todas las child tasks estén cerradas con rollout honesto o formalmente retiradas.
 
 ## Verification
@@ -477,5 +561,11 @@ asignación explícita. El kill-switch existente puede detener despacho, pero no
 
 ## Open Questions
 
-- Qué tipos de digest son servicio necesario y cuáles son suscripción opcional; resolver por propósito real.
+- `weekly_executive_digest` es el caso que fuerza la definición: hoy lleva baja cuando va a varios destinatarios y
+  no la lleva cuando va a uno. Clasificarlo resuelve de paso el contrato de los digest.
 - Qué canal de soporte/reply está atendido para cada familia; no mostrar uno sin readback operativo.
+- Casa matriz: `of 05` (base) u `Of 1105` (constante de marca y lámina aprobada). Decisión del operador, dueña
+  `TASK-1650`. Bloquea toda cohorte que imprima identidad legal.
+- Display name definitivo del remitente único (`Efeonce`), y su aplicación en Vercel y ops-worker como cambio de env
+  var verificado en ambos.
+- `payroll_liquidacion_v2`: ¿tipo futuro o huérfano? Hoy nadie lo emite.

@@ -17,6 +17,7 @@ For Azure Bot Service, Teams manifest, RSC consent, inbound actions, or platform
 - **A real CLI send requires `--yes`.** Do not bypass the confirmation gate.
 - **Do not send raw Bot Framework payloads as the normal path.** Use `pnpm teams:announce`; use direct payloads only for diagnosis or while improving the CLI.
 - **Do not add `activity.text` when sending an Adaptive Card announcement.** Teams renders it as a separate duplicate bubble above the card.
+- **Do not promise or attempt `@todos`, `@everyone`, or another collective mention in a group chat.** Microsoft Teams bots support explicit user mentions there, but not `@everyone`. A payload with `<at>todos</at>` and `mentioned.id=<chatId>` is accepted by the Connector but renders as plain text and does not notify the group.
 - **For Adaptive Card mentions, do not use `29:<aadObjectId>`.** Use Microsoft Entra Object ID or UPN as `mentioned.id`.
 - **Do not expose secrets, bearer tokens, or client secrets.** Report IDs, run IDs, fingerprints, and status only.
 
@@ -127,6 +128,7 @@ Canonical card shape:
 
 1. Draft the body in a temporary markdown/text file. Separate paragraphs with a blank line.
 2. Use `--mention "Texto visible|entraObjectIdOrUpn|Nombre de perfil"` for each real mention.
+   For a group-wide announcement, either send without a collective mention or resolve and mention the intended members individually. Do not synthesize `@todos` from the chat id.
 3. Run `--dry-run`.
 4. Inspect destination, normalized paragraphs, mentions, CTA, and fingerprint.
 5. For public/group destinations, get explicit operator confirmation if the exact final content was not already approved.
@@ -191,6 +193,22 @@ void (async () => {
 })().catch(e => { console.error(e instanceof Error ? e.message : String(e)); process.exitCode = 1; });
 '
 ```
+
+## Generic 1:1 Messages (HR/People and other one-offs)
+
+`pnpm teams:announce` only targets registered group/channel destinations; it cannot create a generic DM. A domain-specific 1:1 CLI must be used when one exists. The payment CLI below is payment-only and must not be repurposed for leave, anniversaries, performance, or other HR messages.
+
+Until a governed generic 1:1 CLI exists, an explicitly approved one-off may use a task-scoped temporary script only when it:
+
+1. calls `sendViaBotFramework` and the canonical `writeTeamsSendRunStart` / `writeTeamsSendRunOutcome` audit writers;
+2. resolves the recipient in Microsoft Entra immediately before send and requires `accountEnabled=true`;
+3. uses `recipient_kind='chat_1on1'` with the raw Entra Object ID, never `29:`;
+4. sends an Adaptive Card without a mention and without `activity.text`;
+5. preserves paragraphs as separate `TextBlock`s;
+6. enforces mutually exclusive `--dry-run` / `--yes`, deterministic `sourceObjectId`, duplicate checks, and a `source_sync_runs` outcome;
+7. never sends through personal Teams connectors or raw Bot Framework HTTP.
+
+For HR/People copy, verify every date, balance, entitlement, and policy claim against the owning data/contract before sending. A `succeeded` audit row proves transport acceptance, not read receipt or rendered confirmation. Recurring messages must converge to Notification Hub with `dynamic_user`.
 
 ## Payment Announcements 1:1 (nómina / honorarios)
 
@@ -259,6 +277,7 @@ Excluded / not reachable at that time: **Valentina Hoyos** (operator excluded), 
 - **Name appears as plain text instead of mention:** for Adaptive Cards, use Entra Object ID or UPN, not `29:<aadObjectId>`; ensure `<at>Visible Text</at>` exactly matches `msteams.entities[].text`.
 - **Mention still plain text:** user may not be in the chat/team, or Teams client rendered fallback. Test in 1:1, then validate membership before public send.
 - **CLI rejects mention:** the visible text must appear exactly in the title or body; `29:` IDs are intentionally blocked for Adaptive Cards.
+- **`todos` / `everyone` appears as plain text:** this is the expected failure mode of an unsupported group-chat collective mention, not a tenant toggle. Do not retry with another label or use the chat id as a mention target.
 - **Need platform auth/RSC/manifest fixes:** switch to `teams-bot-platform`.
 
 ## Closure

@@ -162,6 +162,17 @@ export const isEntityProbesEnabled = (env: NodeJS.ProcessEnv = process.env): boo
   isProbesEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_ENTITY_PROBES_FLAG])
 
 /**
+ * TASK-1778 — Endurecimiento de RED del probe fetcher (ISSUE-164). TASK-1697: el flag es
+ * DEL FETCHER y viajó con él al sustrato (`@/lib/growth/site-substrate`); acá queda el
+ * re-export para los consumers históricos del dominio. ⚠️ DUAL-LOCATION (Vercel +
+ * ops-worker); ON desde el cutover 2026-08-27 (ledger: FEATURE_FLAG_STATE_LEDGER.md).
+ */
+export {
+  GROWTH_PROBE_FETCH_STRICT_NETWORK_FLAG,
+  isProbeFetchStrictNetworkEnabled
+} from '@/lib/growth/site-substrate'
+
+/**
  * TASK-1269 — Fix-It Artifacts (JSON-LD / llms.txt / content briefs).
  * Default OFF: los endpoints de generación no entregan artefactos hasta revisión
  * de copy/legal. Gateado además por el kill switch global del grader. La generación

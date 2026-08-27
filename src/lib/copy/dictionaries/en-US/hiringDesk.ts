@@ -64,6 +64,9 @@ export const hiringDesk: HiringDeskCopy = {
     appliedDaysAgo: 'Applied {days} {unit} ago',
     appliedDayUnit: 'day',
     appliedDaysUnit: 'days',
+    returnFocusedStatus: 'Back in Pipeline. {candidate} application, {stage} stage.',
+    returnUnavailableTitle: 'This application is no longer visible in this pipeline',
+    returnUnavailableBody: 'We opened the available vacancy. The application may have been archived, moved out of scope, or become unavailable for your access.',
     /**
      * TASK-1754 — `stages` se REDEFINE acá, no se hereda.
      *
@@ -98,6 +101,12 @@ export const hiringDesk: HiringDeskCopy = {
     residenceCountryLabel: 'Country of residence',
     notProvided: 'Not provided',
     candidateMessageTitle: 'Candidate message',
+    queuePosition: 'Application {position} of {total}',
+    queuePositionCompact: '{position} of {total}',
+    leaveWithUnsavedTitle: 'Leave without saving?',
+    leaveWithUnsavedBody: 'This application has local changes. They will be discarded if you continue.',
+    keepEditing: 'Keep editing',
+    discardAndContinue: 'Discard and continue',
     overview: 'Overview',
     assessment: 'Assessment',
     documents: 'Documents',

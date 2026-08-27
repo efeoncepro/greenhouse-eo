@@ -140,7 +140,7 @@ Ponlo en el checklist de cierre, junto a la firma del SOW.
 
 | Objeción | Respuesta | Detalle |
 |---|---|---|
-| **"HubSpot es Niche Player en Gartner"** | **No lo niegues — reencuádralo.** *"Correcto, en el MQ de Sales Force Automation. El mismo Gartner nos puso **Leader en B2B Marketing Automation, 5.º año**. ¿Cuál de los dos cuadrantes describe su problema?"* | `modules/05` § 2 |
+| **"Salesforce es Leader y HubSpot Challenger en Gartner"** | **No lo niegues ni uses otro MQ como distracción.** *"Correcto en CRM Sales 2026; HubSpot es Leader en B2B Marketing Automation 2025. Primero definamos si su job es enterprise/B2C multicanal o demand generation B2B y adopción; después recomendamos provider."* | `modules/05` § 2 |
 | **"HubSpot no escala"** | *"'No escala' es una afirmación **sin unidades**. Díganme el número, y si no les damos el ancho **se los digo en esta reunión y no les vendo**."* | `modules/05` § 7 |
 | **"Es más caro que [Microsoft/Zoho/Odoo]"** | **Es cierto. No pelees el precio.** Cambia el eje a adopción, time-to-value y profundidad de marketing | `modules/05` § 4-6 |
 | **"Ya tenemos Salesforce, el costo de cambiar es alto"** | *"El costo de **quedarse** también. ¿Cuánto les cuesta el admin al año? ¿Y los add-ons?"* — **pero primero verifica si ya tienen el admin** | `modules/10` § 1 |

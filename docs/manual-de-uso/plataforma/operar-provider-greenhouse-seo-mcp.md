@@ -1,9 +1,9 @@
 # Operar el provider Greenhouse-SEO del MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-08-06 por Claude (TASK-1647)
-> **Ultima actualizacion:** 2026-08-14 por Claude (allowlist a 13 tools con TASK-1664/1666 — 9 lectura + 4 escritura; producción sigue en 9 hasta el próximo dispatch; 3 tools internas sin federar)
+> **Ultima actualizacion:** 2026-08-27 por Claude (TASK-1658: allowlist a 21 tools — 16 lectura + 5 escritura; guard de paridad bidireccional; producción sigue en 13 hasta el deploy post-release)
 > **Endpoint canonico:** `https://mcp.efeonce.org/mcp`
 > **Documentacion funcional:** [Search Visibility 360 por MCP](../../documentation/growth/search-visibility-360-por-mcp.md)
 > **Runbook tecnico:** [Efeonce MCP Platform Runbook](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Greenhouse-SEO
@@ -13,9 +13,12 @@
 Este manual es para el operador que necesita **verificar, diagnosticar o apagar** el provider `greenhouse-seo`
 del gateway MCP de Efeonce — lo que un cliente MCP puede hacer contra `mcp.efeonce.org`.
 
-El allowlist federado tiene **13 tools** (fuente de verdad: el allowlist de paridad
-`src/providers/greenhouse-seo-tool-parity.ts` del repo `efeonce-mcp`, cuyo test rompe el CI si diverge
-de lo realmente registrado en el gateway):
+El allowlist federado tiene **21 tools** (fuente de verdad: el espejo `GREENHOUSE_SEO_TOOL_INVENTORY`
+del guard de paridad `src/providers/greenhouse-seo-tool-parity.ts` del repo `efeonce-mcp` — desde
+TASK-1658 el guard es **bidireccional**: nombre + claves exactas del inputSchema interno + clase
+`writes` + paridad de schema + `annotations` obligatorias, con introspección runtime del server; el
+test rompe el CI si diverge en cualquiera de las dos direcciones. Interino hasta que TASK-1780 lo
+reemplace por el manifiesto canónico de Greenhouse):
 
 | Tool | Qué es |
 |---|---|
@@ -28,26 +31,32 @@ de lo realmente registrado en el gateway):
 | `get_seo_backlink_profile` | Serie semanal del perfil de enlaces |
 | `get_seo_keyword_discovery` | Corridas y candidatos de keyword discovery — lente ◑ + GSC ● separadas (TASK-1664) |
 | `get_seo_grounded_query_draft` | Draft de grounded queries AEO con provenance y `groundingMode` honesto (TASK-1666) |
+| `get_seo_overview_kpis` | KPIs norte del cockpit Overview, **medidos** GSC (TASK-1306; federada por TASK-1658) |
+| `get_seo_performance` | Serie diaria + standing de un set de keywords/URLs (TASK-1307; federada por TASK-1658) |
+| `get_seo_performance_catalog` | Ítems comparables de la pantalla Rendimiento (TASK-1307; federada por TASK-1658) |
+| `get_seo_domain_overview` | Foto de dominio ◑ estimada, acepta competidores (TASK-1775; federada por TASK-1658) |
+| `get_seo_url_visibility` | Visibilidad ◑ por dominio/subdominio/subcarpeta/URL declarada (TASK-1776; federada por TASK-1658) |
+| `get_seo_backlink_detail` | Detalle nominal del perfil de enlaces, tres estados honestos (TASK-1777; federada por TASK-1658) |
+| `get_seo_prospect_diagnostic` | Diagnóstico de prospecto ya corrido, todo ◑ con fecha (TASK-1709; federada por TASK-1658) |
 | `track_seo_keywords` ✍️ | **Escribe**: mete keywords al ciclo diario y compromete gasto recurrente |
 | `untrack_seo_keywords` ✍️ | **Escribe**: el reverso, cierra la ventana sin borrar historia |
 | `discover_seo_keywords` ✍️ | **Escribe y GASTA por corrida** (Labs Live factura por llamada y por fila); preview + confirmación humana antes de encolar; async (TASK-1664) |
 | `prepare_seo_grounded_queries` ✍️ | **Escribe** un DRAFT AEO (no gasta proveedor, jamás aprueba/activa); con la identidad máquina compartida responde `aeo_forbidden` fail-closed hasta TASK-1631 (TASK-1666) |
+| `run_seo_prospect_diagnostic` ✍️ | **Escribe y GASTA por corrida**: diagnóstico único sobre un prospecto, con confirmación humana previa; flag `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` OFF = estado legítimo (TASK-1709; federada por TASK-1658) |
 
-⚠️ **Estado de despliegue (2026-08-14):** el gateway **en producción** todavía corre la revisión de
-**9 tools**; las 4 de TASK-1664/1666 están commiteadas en `efeonce-mcp` (canary verde contra staging) y
-su deploy se despacha **junto al próximo release develop→main** de Greenhouse — antes responderían 404
-upstream porque el lane no está en producción (lección TASK-1661). Si un cliente externo no las ve,
-ese es el estado esperado, no una falla.
+⚠️ **Estado de despliegue (2026-08-27):** el gateway **en producción** todavía corre la revisión de
+**13 tools**; las 8 de TASK-1658 están commiteadas en `efeonce-mcp` (4 commits locales sin push; canary
+verde) y su deploy se despacha **junto al próximo release develop→main** de Greenhouse — antes
+responderían 404 upstream porque los lanes de TASK-1775/1776/1777/1709 no están en producción
+(lección TASK-1661). Verificación post-deploy: `tools/list` sube exactamente 13→21 + canary completo.
+Si un cliente externo no las ve antes de eso, es el estado esperado, no una falla.
 
-⚠️ **`get_seo_overview_kpis`, `get_seo_performance` y `get_seo_performance_catalog` NO están
-federadas**: existen en el MCP interno de Greenhouse pero no en el gateway. La federación es por
-allowlist explícito con revisión humana por tool (decisión TASK-1647: nunca auto-federación). Si un
-cliente externo las pide, la respuesta correcta es "todavía no está federada", no "está caída".
-
-⚠️ **Las cuatro de escritura no comparten el scope de lectura.** Viven en `efeonce.mcp.seo.write`
-(constante `SEO_WRITE_SCOPE` en `src/config.ts` del gateway) porque comprometen gasto recurrente del
-proveedor, y el lane las acepta solo desde bindings de scope `internal`. Un `403 insufficient_scope`
-sobre ellas con el scope base es el comportamiento correcto.
+⚠️ **Las cinco de escritura no comparten el scope de lectura.** Viven en `efeonce.mcp.seo.write`
+(la lista se DERIVA del inventario — `GREENHOUSE_SEO_WRITE_TOOLS` — y el gate HTTP de scopes en
+`src/app.ts` la consume; ya no hay lista a mano) porque comprometen gasto del proveedor, y el lane
+las acepta solo desde bindings de scope `internal`. Un `403 insufficient_scope` sobre ellas con el
+scope base es el comportamiento correcto. El scope NO está cableado al cliente PKCE público —
+fail-closed hasta TASK-1631.
 
 No cubre el uso conversacional (para eso está la doc funcional) ni el gateway completo (para eso está
 [Operar Efeonce MCP Gateway](operar-efeonce-mcp-gateway.md)).
@@ -212,11 +221,12 @@ respuesta real era `no_seo_data`, eso es un bug del consumidor, no del provider.
 
 **401 anónimo con `WWW-Authenticate`** no es una falla: es el comportamiento correcto del resource server.
 
-**403 `insufficient_scope`.** Depende de qué tool. Las **9 de lectura** viven en el scope base
-`efeonce.mcp.read` — no tienen scope de lectura propio. Las **4 de escritura** (`track_seo_keywords` /
-`untrack_seo_keywords` / `discover_seo_keywords` / `prepare_seo_grounded_queries`) exigen
-`efeonce.mcp.seo.write`, un scope aparte: un cliente con solo el scope base recibe `403` sobre ellas
-**y eso es correcto**, no una falla. Ojo con `prepare_seo_grounded_queries`: aun con el scope de
+**403 `insufficient_scope`.** Depende de qué tool. Las **16 de lectura** viven en el scope base
+`efeonce.mcp.read` — no tienen scope de lectura propio. Las **5 de escritura** (`track_seo_keywords` /
+`untrack_seo_keywords` / `discover_seo_keywords` / `prepare_seo_grounded_queries` /
+`run_seo_prospect_diagnostic` — la lista la deriva el gate HTTP de `GREENHOUSE_SEO_WRITE_TOOLS`)
+exigen `efeonce.mcp.seo.write`, un scope aparte: un cliente con solo el scope base recibe `403` sobre
+ellas **y eso es correcto**, no una falla. Ojo con `prepare_seo_grounded_queries`: aun con el scope de
 escritura, la identidad máquina compartida recibe `aeo_forbidden` del upstream — es el fail-closed
 documentado hasta TASK-1631, no un problema de scope. Si un cliente tiene el scope que
 corresponde y aun así recibe `403`, revisa el consentimiento de la aplicación en Entra antes de tocar
@@ -237,7 +247,7 @@ Tres niveles, de menor a mayor alcance. Elige el mínimo que resuelva el problem
 **1. Apagar solo el provider SEO del gateway.** El resto del gateway (Globe, OAuth, front door) sigue operando.
 
 - Pon `GREENHOUSE_SEO_PROVIDER_ENABLED=false` en las variables del repo `efeonce-mcp` y redespliega por el
-  workflow. Todas las tools SEO federadas (13 en el allowlist; 9 en la revisión productiva actual)
+  workflow. Todas las tools SEO federadas (21 en el allowlist; 13 en la revisión productiva actual)
   pasan a `503 greenhouse_seo_policy_blocked`.
 - Alternativa inmediata: mover 100% del tráfico a la revisión previa verificada del gateway.
   **[verificar]** la revisión previa exacta no quedó registrada en esta sesión; obtenla con

@@ -346,6 +346,22 @@ Reglas obligatorias:
 - Vocabulario explícitamente disjunto del de `TASK-1670`: ausencia de JSON-LD vs calidad del JSON-LD.
 - Cada bloque detrás de su propio flag, default OFF.
 
+### Slice 2b — Cosechador `domain_info`: los checks sitewide que ya recibimos y tiramos
+
+- `parseOnPageSummary` (`src/lib/growth/seo/site-audit/collect.ts:94-115`) lee hoy sólo
+  `crawl_progress`, `crawl_status.pages_crawled`, `page_metrics.onpage_score` y
+  `extended_crawl_status`. **`summary.domain_info` llega en la misma respuesta y se descarta entero.**
+- Materializar sus `checks` sitewide como hallazgos de **sitio**: `test_page_not_found` (soft-404),
+  `test_https_redirect`, `test_www_redirect`, `test_canonicalization`, `test_directory_browsing`, y
+  la expiración del certificado SSL.
+- **Costo incremental cero**: no agrega una llamada al proveedor, sólo deja de tirar campos del
+  payload que ya se pagó. Es exactamente la doctrina de esta task.
+- `issue_type` **disjuntos de `TASK-1670`**, que trae sus propios hallazgos de sitio por fetch propio.
+  Coordinar el vocabulario antes de escribir: dos motores no pueden emitir el mismo `issue_type`.
+- Estos hallazgos son de sitio, no de página, así que heredan el eje de alcance y la superficie de
+  `TASK-1671`. Verificar que el `priorityScore` —que divide por esfuerzo y multiplica por páginas
+  afectadas— no se les aplique con un `?? 1` implícito.
+
 ### Slice 3 — Integración al ciclo, con degradación honesta
 
 - Los cosechadores corren dentro de la MISMA transacción del collect, después de `summary`/`pages`.
@@ -362,6 +378,30 @@ Reglas obligatorias:
 - Filas en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` con runtime declarado (**ops-worker**, no
   Vercel).
 - Documentación funcional + manual proporcionales.
+
+## Delta 2026-08-26 (2) — el motivo de parada del crawl, que hoy es un proxy que miente
+
+El reporte **sí** declara que describe una muestra —`SiteAuditView.tsx:440,566` lo hace desde
+`TASK-1309`, que está `complete`— pero descansa en el proxy `report.run.crawledPages === crawlPageCap`.
+Ese proxy falla en las dos direcciones: **falso positivo** en un sitio de exactamente 100 páginas, y
+**falso negativo** cuando el crawl para por presupuesto, por error del proveedor o por cualquier
+motivo que no sea el tope.
+
+`collect.ts:104-110` no lee `crawl_status.crawl_stop_reason` ni `pages_in_queue`, y `:296` persiste
+sólo `crawled_pages`. Los dos campos llegan en la misma respuesta que ya se paga — misma doctrina que
+el resto de esta task.
+
+Barrido verificado: `crawl_stop_reason`, `pages_in_queue`, `crawlPageCap` y
+`SITE_AUDIT_MAX_CRAWL_PAGES` no aparecen en **ninguna** task viva ni completa.
+
+- Persistir ambos campos en `seo_site_audit_runs` (migración aditiva) y exponerlos en el reader.
+- ⚠️ **La mitad de UI no es de esta task.** Reemplazar el proxy en `SiteAuditView.tsx` toca un archivo
+  que posee `TASK-1671`, que además está rediseñando esa superficie. Va como task `ui-ux` posterior,
+  **después** de 1671, o se le reescribe el render de KPIs a quien lo está rehaciendo.
+- Y es bloqueante moral de `TASK-1672`/`1673`: un documento firmado y compartido con el cliente que
+  no declara con precisión que describe una muestra es peor que no tener documento.
+
+Origen: `docs/audits/platform/2026-08-26-openseo-competitive-teardown-growth-seo-aeo.md` §3.7.
 
 ## Out of Scope
 

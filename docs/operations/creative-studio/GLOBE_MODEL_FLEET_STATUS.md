@@ -98,6 +98,26 @@ es `routeId + capability + provider + model + version/endpoint + region + comple
 
 ## Identidades exactas de video auditadas (2026-08-04)
 
+### Gemini Omni 1.1 Flash — candidato de migración (2026-08-27)
+
+Google lanzó Gemini Omni 1.1 Flash el 2026-08-27 y anunció shutdown de `gemini-omni-flash-preview` para el
+2026-09-30 en Gemini API. La documentación de proveedor expone **dos identidades no intercambiables**:
+
+- Developer API / AI Studio: `gemini-omni-1.1-flash`, Interactions `v1beta`, API key; modelo listado Stable.
+- Cloud / Agent Platform: `gemini-omni-1.1-flash-preview`, Interactions `v1beta1`, ADC/WIF, región `global`,
+  Pre-GA/Preview y fixed quota declarada.
+
+Ambas están **`gated`/no integradas en Globe**. Este ledger no cambia la ruta vigente ni su estado live. 1.1
+documenta 360p/720p/1080p/4K (los dos últimos como upscale), first/last frame, referencias de video, edit y extend
+hasta 40 s; cada operación/output shape requiere identidad, rate, terms, evaluation y canary propios. La migración
+y expansión pertenecen a `TASK-1781`; la evidencia documental vive en
+[`GEMINI_OMNI_1_1_PROVIDER_RESEARCH_2026-08-27.md`](../../audits/creative-studio/GEMINI_OMNI_1_1_PROVIDER_RESEARCH_2026-08-27.md)
+y la candidatura machine-readable en
+[`GEMINI_OMNI_1_1_VIDEO_ROUTE_CARD_V1.json`](../../architecture/creative-studio/model-fleet/routes/GEMINI_OMNI_1_1_VIDEO_ROUTE_CARD_V1.json).
+
+No se consultó el reader live ni se gastó en un canary 1.1 durante esta investigación. La disponibilidad vigente
+sigue resolviéndose exclusivamente por `globe.producer.fleet.list`.
+
 Las fichas machine-readable enlazadas por la skill compartida son [`Omni`](../../architecture/creative-studio/model-fleet/routes/GEMINI_OMNI_VIDEO_ROUTE_CARD_V1.json),
 [`Veo 3.1`](../../architecture/creative-studio/model-fleet/routes/VEO_3_1_VIDEO_ROUTE_CARD_V1.json) y
 [`Seedance 2.0`](../../architecture/creative-studio/model-fleet/routes/SEEDANCE_2_VIDEO_ROUTE_CARD_V1.json). La auditoría del runtime deja estas

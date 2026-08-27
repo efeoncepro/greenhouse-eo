@@ -2,6 +2,9 @@
 name: content-marketing-studio
 description: >-
   Studio de ejecución del motor de contenidos 2026. Operacionaliza estrategia editorial y produce, opera, atomiza, distribuye y mide blog/pillar, ebook/whitepaper, case study, newsletter, webinar, video y podcast. Incluye Content Engineering para diseñar contenido como sistema de conocimiento y experiencia de comprensión/decisión, sistema visual editorial, infografías determinísticas con entrega SVG directa o raster basada en evidencia y Método de utilidad citable para link earning, backlinks, menciones y contenido que terceros puedan compartir, enlazar o citar. Encadena conversión a `growth-marketing-cro`, descubribilidad a `seo-aeo`, palabras a `copywriting`, social a `social-media-studio` y publicación a su skill dueña. Usar para estrategia/calendario editorial, pillar/cluster, topical authority, content ops, repurposing, distribución, content brief, experiencias de contenido, contenido interactivo, newsletter, lead magnet, case study, thought leadership, infografía editorial, diagrama SVG, visualización exacta de datos/copy, linkable assets, contenido enlazable/citable, content ROI, AI content, content factory y content-led growth.
+type: skill
+user-invocable: true
+argument-hint: "[etapa del content engine o pregunta concreta]"
 ---
 
 # Content Marketing Studio — el estudio del motor de contenidos (2026)
@@ -10,9 +13,7 @@ description: >-
 
 ## Cuándo invocar (y cuándo no)
 
-Para Efeonce, el contenido puede convertirse en capacidad de producto. Cargar [`Efeonce Content-to-Capability
-Loop V1`](../../docs/strategy/EFEONCE_CONTENT_TO_CAPABILITY_LOOP_V1.md) cuando una pieza, workshop o learn moment
-deba pasar de autoridad editorial a aplicación contextual, evidencia y memoria.
+Para Efeonce, el contenido puede convertirse en capacidad de producto. Cargar `docs/strategy/EFEONCE_CONTENT_TO_CAPABILITY_LOOP_V1.md` cuando una pieza, workshop o learn moment deba pasar de autoridad editorial a aplicación contextual, evidencia y memoria.
 
 **Invocar** para: operacionalizar una estrategia editorial (pillars→clusters→calendario), diseñar/operar el pipeline de producción, atomizar una pieza pilar en N átomos, decidir formato y su anatomía, planificar distribución de una pieza, montar la medición contenido→pipeline, o gobernar un content engine (roles, cadencia, brand safety, IA sin slop).
 
@@ -87,7 +88,10 @@ precio por crédito ni equivalencias por pieza.
 ├─ Operar el motor: workflow, roles, gobernanza, brand safety, SLAs de contenido .... 02_CONTENT_OPS_PIPELINE
 ├─ Elegir/armar un formato a fondo (blog, ebook, newsletter, webinar, video, pod) .. 03_FORMATS
 ├─ Multiplicar: atomizar 1 pilar en N átomos por canal, reciclar evergreen ......... 04_REPURPOSING_ENGINE
+├─ Derivar la convención/slots del cliente antes de atomizar (y su degradación) .... 04_REPURPOSING_ENGINE
 ├─ Distribuir/amplificar una pieza (owned/earned/paid, syndication, comunidades) ... 05_DISTRIBUTION_AMPLIFICATION
+├─ El canal lo opera un TERCERO: paquete de insumo, medición no nativa ............. 05_DISTRIBUTION_AMPLIFICATION
+├─ Una red social ocupa varias posiciones de página 1: superficie de búsqueda ...... 05_DISTRIBUTION_AMPLIFICATION
 ├─ Medir contenido→pipeline (leading/lagging, influenced pipeline, content ROI) .... 06_MEASUREMENT
 ├─ Producir con IA sin slop (Content Factory, fidelidad de voz, gobernanza) ........ 07_AI_CONTENT
 ├─ Diseñar/producir el sistema visual editorial, hero/body/OG y Media Library ..... references/agentic-editorial-visual-system

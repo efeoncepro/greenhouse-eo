@@ -1,7 +1,7 @@
 # Manual — Correr el AI Visibility Grader (smoke + endpoint)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.14 · **Ultima actualizacion:** 2026-07-27 por Codex (reconciliacion de costo por run)
+> **Version:** 1.15 · **Ultima actualizacion:** 2026-08-27 por Claude (TASK-1652 — sanity de AI Mode + semántica del `skipped:no_ai_overview_block`)
 >
 > **Para que sirve:** ejecutar una corrida acotada (low-volume) del AI Visibility Grader contra los answer engines, para validar el motor end-to-end. Por defecto usa un proveedor simulado (no gasta dinero); con flags + secrets corre proveedores reales. Dos caminos: el **CLI** (`pnpm growth:ai-visibility:smoke`, local/dev) y el **endpoint interno** (`/api/admin/growth/ai-visibility/runs`, mismo primitive, apto staging).
 
@@ -22,7 +22,7 @@ Antes de una corrida real:
 ## Estado actual del rollout (2026-06-29)
 
 - **staging:** grader ON. El worker efectivo (`ops-worker-00418-2m6`) tiene `GRADER`, OpenAI, Anthropic, Perplexity, Gemini, Google AI Overview, probes, agentic readiness, entity probes, email, HubSpot y re-grade ON. Gemini usa **Gemini 3** (`gemini-3-flash-preview` via Vertex grounding; ajustable con `GREENHOUSE_GEMINI_GROUNDED_MODEL` sin redeploy).
-- **Google AI Overview / AI Mode (TASK-1265):** ON en staging via DataForSEO. Usa `DATAFORSEO_API_LOGIN` + `DATAFORSEO_API_PASSWORD_SECRET_REF`; no scrapea Google directo. Si Google/DataForSEO no devuelve bloque AI Mode, la observation queda `skipped:no_ai_overview_block`, no `succeeded` vacío. DataForSEO reporta costo por request, no por tokens.
+- **Google AI Overview / AI Mode (TASK-1265):** ON en staging via DataForSEO. Usa `DATAFORSEO_API_LOGIN` + `DATAFORSEO_API_PASSWORD_SECRET_REF`; no scrapea Google directo. Si Google/DataForSEO no devuelve bloque AI Mode, la observation queda `skipped:no_ai_overview_block`, no `succeeded` vacío. Desde TASK-1652 (2026-08-27) ese skip queda **reservado a tasks realmente ejecutadas** (`status_code=20000`): un fallo per-task del proveedor se registra `failed:provider_error` con el código en `usage.dataforseo_status_code`. DataForSEO reporta costo por request, no por tokens.
 - **ejecución async (TASK-1234): ON en staging.** `GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED=true` (environment `staging`). El endpoint **encola** el run (responde HTTP 202 + runId) y el worker Cloud Run (`ops-worker`, scheduler `ops-growth-grader-drain` cada 5 min) lo ejecuta sin límite de tiempo. Esto es lo único que permite correr runs `full`/`internal_audit` multi-provider (que antes morían por el timeout de la función Vercel). Verificado end-to-end: un run `full` real corrió ~12 min sin timeout. Con la flag OFF el endpoint vuelve a ejecutar inline (sólo `light`/OpenAI cabe).
 - **producción:** OFF (follow-up pesado: migración `greenhouse_growth` + capabilities seed vía release control plane develop→main + env prod + sign-off). El worker es compartido staging+prod, pero el drain hace **no-op prod-safe** mientras el grader esté OFF en prod.
 - **Perplexity:** ON en el worker de staging desde 2026-06-29 (`GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED=true`, revision `ops-worker-00418-2m6`) y persistido en `services/ops-worker/deploy.sh` con default staging ON / prod OFF. Pendiente recomendado: smoke async low-volume con `onlyProviders:['perplexity']` para confirmar observation nueva drenada por el worker.
@@ -88,9 +88,31 @@ gcloud run services describe ops-worker \
 
 En las observations, `status=skipped` + `reason=missing_secret` significa drift de configuración del
 runtime que ejecutó el run. No equivale a "Google no mostró AI Overview". Un `skipped:no_ai_overview_block`
-sí es una degradación honesta válida: DataForSEO respondió, pero no encontró bloque AI Overview para
-esa consulta. Para cerrar TASK-1341, un smoke provider-scoped debe terminar en `succeeded` o
-`skipped:no_ai_overview_block`, nunca en `missing_secret`.
+sí es una degradación honesta válida: DataForSEO **ejecutó** la consulta (task `status_code=20000`) y no
+encontró bloque AI Overview. Desde TASK-1652 (2026-08-27) el adapter valida el `status_code` de cada task
+(HTTP 200 del batch no basta): un task fallido queda `failed:provider_error` con el código en
+`usage.dataforseo_status_code` — antes esos fallos se disfrazaban de `no_ai_overview_block` (60
+observaciones históricas 2026-06-29→2026-07-17 eran falsos negativos 40501/40201). Para cerrar TASK-1341,
+un smoke provider-scoped debe terminar en `succeeded` o `skipped:no_ai_overview_block`, nunca en
+`missing_secret`.
+
+#### Sanity rápido del provider `google_ai_overview` (TASK-1652)
+
+Para validar el adapter de AI Mode contra DataForSEO real sin levantar todo el pipeline del grader:
+
+```bash
+# Dry-run (no gasta, no llama al proveedor)
+npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/_sanity-task-1652-ai-mode-smoke.ts
+
+# Llamada real (~USD 0,004 por llamada); --market acepta el ISO-2 productivo (CL/MX/CO/PE/US)
+npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/_sanity-task-1652-ai-mode-smoke.ts --spend --market=CL
+```
+
+Requiere `.env.local` con `DATAFORSEO_API_LOGIN` + `DATAFORSEO_API_PASSWORD_SECRET_REF` y ADC de gcloud
+vigente. **PASS** = el task del proveedor vuelve `status_code=20000` y la observación termina `succeeded`
+o en un skip honesto (`skipped:no_ai_overview_block` de una consulta realmente ejecutada). Cualquier
+`failed:provider_error`/`failed:invalid_response` es defecto de request/parsing o del proveedor, no un
+"no apareces".
 
 ### 3. Usar el endpoint interno (mismo primitive — apto staging)
 

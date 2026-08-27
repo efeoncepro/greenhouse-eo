@@ -19,6 +19,7 @@ import {
   type EntityFetchInit,
   type EntityFetchResult
 } from './contracts'
+import { readBodyWithCap } from './read-body'
 
 const DEFAULT_TIMEOUT_MS = 8000
 const MAX_TIMEOUT_MS = 15000
@@ -95,23 +96,29 @@ export const createEntityApiFetcher = (
 
       // Redirect manual (3xx): no perseguimos cross-host. Lo reflejamos como http_error.
       if (response.status >= 300 && response.status < 400) {
-        return { ok: false, status: response.status, body: '', errorCode: 'http_error' }
+        void response.body?.cancel().catch(() => {})
+
+        return { ok: false, status: response.status, body: '', errorCode: 'http_error', truncated: false }
       }
 
       const declaredLength = Number(response.headers.get('content-length') ?? '')
 
       if (Number.isFinite(declaredLength) && declaredLength > maxBytes) {
-        return { ok: response.ok, status: response.status, body: '', errorCode: 'too_large' }
+        void response.body?.cancel().catch(() => {})
+
+        return { ok: response.ok, status: response.status, body: '', errorCode: 'too_large', truncated: true }
       }
 
-      const raw = await response.text()
-      const body = raw.length > maxBytes ? raw.slice(0, maxBytes) : raw
+      // TASK-1778 — lectura por stream con corte duro: el tope protege memoria de verdad
+      // (incluso en respuestas chunked sin content-length) y el corte deja rastro.
+      const { body, truncated } = await readBodyWithCap(response, maxBytes)
 
       return {
         ok: response.ok,
         status: response.status,
         body,
-        errorCode: response.ok ? null : 'http_error'
+        errorCode: response.ok ? null : 'http_error',
+        truncated
       }
     } catch (error) {
       const isTimeout = error instanceof Error && error.name === 'TimeoutError'

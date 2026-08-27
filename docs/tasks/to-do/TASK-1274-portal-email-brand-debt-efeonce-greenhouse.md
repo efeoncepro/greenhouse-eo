@@ -18,8 +18,8 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
-- Epic: `none`
-- Status real: `Diseno`
+- Epic: `EPIC-042`
+- Status real: `Decision cerrada por arquitectura de portafolio; ejecucion pendiente`
 - Rank: `TBD`
 - Domain: `content|platform`
 - Blocked by: `none`
@@ -28,6 +28,45 @@
 - GitHub Issue: `none`
 
 > Nota UI: la task cambia VALORES de strings de marca (display name del remitente, tagline del masthead, alt text) en templates de email ya existentes. No introduce ni reestructura ninguna superficie, layout ni primitive → `UI impact: none` con rationale. El copy visible se valida con `greenhouse-ux-writing` en implementación.
+
+## Delta 2026-08-24 — pregunta de marca cerrada; alcance corregido
+
+Reanclada a `EPIC-042` como child 0. Dos cambios:
+
+1. **La Open Question no estaba abierta.** `EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md` (Accepted,
+   2026-07-26) ya define la jerarquía y sus reglas: liderar con Efeonce para la relación, y nombrar la product o
+   platform brand sólo cuando mejora la comprensión. `GREENHOUSE_EMAIL_PRESENTATION_POLICY_DECISION_V1.md` §1 la
+   aplica al correo. Esta task ejecuta esa decisión.
+2. **El planteo "Efeonce **o** Greenhouse" era un error de capa**, no una disyuntiva real. Greenhouse sí es una marca
+   del portafolio —la platform brand del control plane—; lo que no es, es una masterbrand paralela. Regla dura
+   corregida arriba.
+
+**Alcance verificado — cinco cadenas, ninguna estructural:**
+
+| # | Dónde | Hoy |
+|---|---|---|
+| 1 | Remitente de plataforma (`DEFAULT_EMAIL_FROM`, `src/lib/resend.ts`) | `Efeonce Greenhouse <greenhouse@efeoncepro.com>` |
+| 2 | Tagline del footer (`dictionaries/es-CL/emails.ts` → `layout.tagline`) | `Efeonce Greenhouse™ · Empower your Growth` |
+| 3 | Alt del logo (`layout.logoAlt`) | `Efeonce Greenhouse — Plataforma de gestión` |
+| 4 | Cuerpo de la invitación es-CL (`emails.ts`) | `… en Efeonce Greenhouse™, la plataforma de gestión y operaciones.` |
+| 5 | Cuerpo de la invitación en-US (`src/emails/InvitationEmail.tsx`) | `…'s team on Efeonce Greenhouse™, the management and operations platform.` |
+
+**Simplificación que trae el cambio (verificada):** `AGENCY_FROM_ADDRESS` es `'Efeonce <greenhouse@efeoncepro.com>'` y
+`DEFAULT_EMAIL_FROM` es `'Efeonce Greenhouse <greenhouse@efeoncepro.com>'` — **la misma dirección**, sólo cambia el
+display name. Al adoptar `Efeonce` como remitente único, `resolveEmailFromAddress` queda como identidad y la
+bifurcación de remitente desaparece. `AGENCY_BRANDED_EMAIL_TYPES` **no se borra**: se asciende a la dimensión
+`audience` de la policy de presentación (marca exactamente a los destinatarios que no usan la plataforma), y sigue
+siendo el superconjunto de `CANDIDATE_REPLY_TO_EMAIL_TYPES` para reply-to.
+
+**Notas de ejecución:**
+
+- El masthead **no cambia**: las 30 plantillas ya renderizan el wordmark de Efeonce en ambas ramas de `brand`. La
+  deuda es de copy, no de logo.
+- El cambio rompe a propósito `src/emails/components/EmailLayout.test.tsx` (que hoy afirma el compuesto) y los 17
+  snapshots de `EmailTemplateBaseline`. Actualizarlos es parte del mismo commit; no es regresión.
+- `EMAIL_FROM` es env var viva en **dos runtimes**: Vercel y ops-worker. Aplicar en ambos y verificar en la revisión
+  activa, no sólo en el ledger.
+- El copy visible se valida con `greenhouse-ux-writing` antes de commitear.
 
 ## Summary
 
@@ -39,7 +78,8 @@ Deuda histórica de marca. El operador la señaló al revisar el email del AI Vi
 
 ## Goal
 
-- Decidir la marca canónica de los emails del portal (Open Question — brand owner).
+- ~~Decidir la marca canónica de los emails del portal (Open Question — brand owner).~~ **Cerrada 2026-08-24**:
+  `EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md` (Accepted) ya fija la regla. Esta task ejecuta, no decide.
 - Reemplazar "Efeonce Greenhouse" por la marca decidida en los 3 sitios de código + copy.
 - Actualizar el valor live de `EMAIL_FROM` en todos los environments (Vercel + ops-worker) sin romper el envío.
 - No tocar el lead magnet de Efeonce (TASK-1250) ni los PDFs/portal cliente.
@@ -58,7 +98,14 @@ Revisar y respetar:
 
 Reglas obligatorias:
 
-- **NUNCA** usar el string compuesto "Efeonce Greenhouse" (no es una marca). Es Efeonce (agencia) O Greenhouse (plataforma).
+- **NUNCA** usar el string compuesto "Efeonce Greenhouse", con o sin `™`. El compuesto fusiona dos capas de la
+  jerarquía de marca en una tercera que no existe en ninguna.
+- **NO son alternativas excluyentes.** Efeonce es la masterbrand y Greenhouse es la *platform brand* del control
+  plane: capas distintas de la misma jerarquía (`Efeonce → línea de negocio → product/platform brand → oferta`).
+  Efeonce **lidera** la identidad remitente y visual; Greenhouse se nombra **por endoso** cuando aporta claridad
+  (`Enviado desde Greenhouse, la plataforma de Efeonce`). Canon:
+  `EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md` §4 + `docs/context/09_marca-agencia.md`.
+- Nombrar Greenhouse a un destinatario que **no usa la plataforma** (candidato, prospecto) no aclara: confunde.
 - **NO** tocar el path del lead magnet (TASK-1250): los `AGENCY_BRANDED_EMAIL_TYPES` deben seguir enviando como **Efeonce** vía `resolveEmailFromAddress`. Esta task cambia SOLO el sender de **plataforma** (`getEmailFromAddress()` / `DEFAULT_EMAIL_FROM`) y el masthead/tagline por defecto.
 - Todo copy visible nuevo pasa por `greenhouse-ux-writing` (tono es-CL).
 

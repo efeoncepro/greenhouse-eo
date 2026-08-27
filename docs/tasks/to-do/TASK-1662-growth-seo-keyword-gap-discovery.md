@@ -1,8 +1,25 @@
 # TASK-1662 — Growth SEO: keyword gap — qué rankea la competencia y el cliente no
 
+## Delta 2026-08-27
+
+- **`TASK-1775` quedó `code complete` (rollout pendiente):** ya existen la tabla multi-productor
+  `greenhouse_growth.seo_domain_overview_snapshots`, el writer `persistDomainOverviewSnapshots` y el
+  reader `readDomainOverview` (`src/lib/growth/seo/domain-overview/**`). Cuando esta task quiera dar
+  contexto de tamaño al gap ("el competidor ranquea 4.000 keywords"), consume ese reader — no
+  re-deriva la foto de dominio ni llama `domain_rank_overview` por su cuenta.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
+
+## Delta 2026-08-27
+
+- **El colector de competidores del proveedor lo estrenó `TASK-1709`** (diagnóstico de prospecto):
+  `competitors_domain` + `backlinks/competitors` + `domain_intersection` viven en
+  `src/lib/growth/seo/prospect/collect.ts` con su forecast en `prospect/contracts.ts`. Esta task
+  **consume/extrae ese primitive** al aterrizar (o generaliza los payloads a un módulo compartido) —
+  **nunca un segundo colector** de los mismos endpoints. Decisión declarada en el Discovery de 1709.
 
 ## Status
 
@@ -195,7 +212,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `migrations/[nueva]-task-1662-seo-competitors.sql`
+- `migrations/[nueva]-task-1662-seo-competitors-authorship.sql` (**`ALTER TABLE`**, la tabla ya existe — ver §Gap)
 - `src/lib/growth/seo/competitors.ts`
 - `src/lib/growth/seo/keyword-gap-reader.ts`
 
@@ -209,7 +226,12 @@ Reglas obligatorias:
 
 ### Gap
 
-- No hay modelo de competidor: ninguna tabla, ningún command, ningún reader
+- 🔴 **CORREGIDO 2026-08-26 — la tabla SÍ existe.** `greenhouse_growth.seo_competitors` fue creada
+  por `migrations/20260805134439202_task-1299-growth-seo-schema.sql:59-76`, con índice único parcial
+  de vigencia y trigger anti-DELETE. Lo que **no** existe es su command, su reader ni sus columnas de
+  autoría. **Su migración debe ser `ALTER`, nunca `CREATE`**: un `CREATE TABLE IF NOT EXISTS` haría
+  **no-op en silencio**, esta task cerraría en verde y `declared_by` nunca existiría. Y ojo con el
+  dueño: `TASK-1699` (P0) ya reclama darle su primer consumer, así que el orden importa
 - No hay cobertura de keywords de terceros
 - No hay cruce ni priorización
 

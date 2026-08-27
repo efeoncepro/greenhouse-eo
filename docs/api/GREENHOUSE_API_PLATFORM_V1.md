@@ -120,6 +120,8 @@ Endpoints:
 - `POST /api/platform/app/hiring/talent-pool/:id/invite/propose|confirm`
 - `GET /api/platform/app/hiring/applications/review`
 - `GET /api/platform/app/hiring/applications/:applicationId/review-packet`
+- `GET /api/platform/app/hiring/applications/:applicationId/outcome`
+- `POST /api/platform/app/hiring/applications/:applicationId/decision/propose|confirm`
 
 #### Hiring Talent Pool
 
@@ -140,6 +142,41 @@ TASK-1718 agrega un carril delegado separado para revisar una application exacta
 chunk de CV minimizado, hash y trust boundary. Exige `hiring.application.read` +
 `hiring.candidate.review.read`, purpose cerrado y OAuth client independiente. Sus rutas existen pero permanecen OFF
 hasta el rollout Privacy/Security; nunca amplían search/profile ni entregan contacto o respuestas del test.
+
+#### Hiring — eje de desenlace (TASK-1773)
+
+Tres rutas nuevas dan contrato programático al cierre de una postulación, que hasta entonces sólo se podía operar
+desde el portal. La capability es la misma del portal, `hiring.application.decide`; no hay capability nueva,
+migración ni evento nuevo, y ninguna de las tres está detrás de un feature flag.
+
+- `GET …/outcome` — proyecta los tres ejes: `stage`, el desenlace declarado con su causa gobernada, y
+  `archivedAt`, que es ortogonal (archivar nunca declara desenlace). Sin PII del candidato. Exige tenant
+  `efeonce_internal` + `hiring.application.decide` acción `read`.
+- `POST …/decision/propose` — lee y calcula; **nunca muta**. Devuelve el estado actual, el par desenlace/causa
+  propuesto y un `effectDigest`. Exige la acción `execute`.
+- `POST …/decision/confirm` — recalcula el digest contra el estado de AHORA y delega en `decideHiringApplication`,
+  el mismo command del portal. Toda la validación de decisión vive ahí; el lane no agrega ninguna regla.
+
+El guard es un **digest sin persistencia**, no una fila. El Banco de Talento persiste sus invitaciones porque una
+invitación es una entidad con ciclo de vida propio; una propuesta de decisión no lo es. Si alguien decide, archiva
+o mueve la postulación entre `propose` y `confirm`, las huellas no coinciden y la confirmación falla con **409
+`hiring_decision_proposal_stale`** — código propio del enum `ApiPlatformErrorCode`, no aplanado a `bad_request`,
+para que el consumer distinga «tu payload está mal» de «el mundo cambió, vuelve a proponer». El adapter mapea por
+CÓDIGO de dominio, no por status: los otros dos conflictos conservan el suyo —`hiring_decision_idempotency_conflict`
+(misma clave de idempotencia con otro payload) y `hiring_opening_not_open_for_decision` (seleccionar contra una
+vacante cerrada)— porque cada uno tiene una acción distinta para quien llama. La validación del par desenlace/causa aparece en `confirm`
+(422 con código `bad_request`), nunca en `propose`.
+
+**Confirmar es fail-closed para agentes delegados.** Un bearer `sister_platform_oauth` puede leer y proponer, pero
+no confirmar: `efeonce.mcp.hiring.write` no existe en código y queda bloqueado hasta el grant revocable de
+TASK-1631. La confirmación exige sesión humana (`cookie_session` o `first_party_app`). La clave de idempotencia es
+obligatoria (header `Idempotency-Key` o `idempotencyKey` en el body).
+
+El adapter reenvía `decision`, `cause`, `reasonSummary`, `selectedDestination` y la clave de idempotencia.
+`selectedDestination` es obligatorio para `selected` y `backup_selected` (el command lo exige); omitirlo devuelve
+400 `hiring_destination_required`.
+
+Estado: code complete en `develop` y **sin desplegar**. No hay evidencia de runtime contra staging ni producción.
 
 #### Organization Compact Signals
 

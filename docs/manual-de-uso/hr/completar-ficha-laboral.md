@@ -115,6 +115,18 @@ Hay dos rutas equivalentes:
 4. Resuelve los blockers desde Workforce Activation y solo despues ejecuta
    **"Completar ficha"**.
 
+### Registrar o corregir la fecha de ingreso
+
+La fecha de ingreso debe provenir del contrato o de una confirmación explícita de People. No la infieras desde la creación del usuario, el alta en SCIM, una fecha de compensación ni el primer movimiento de nómina.
+
+La edición de HR Profile usa la ruta canónica `PATCH /api/hr/core/members/[memberId]/profile` con `hireDate` en formato `YYYY-MM-DD`. Después de guardar:
+
+1. verifica la fecha en `greenhouse.team_members.hire_date`;
+2. verifica la misma fecha en `greenhouse_core.members.hire_date`;
+3. revisa por separado la política y el saldo de Leave.
+
+Guardar `hire_date` sincroniza el dato laboral, pero **no recalcula ni corrige automáticamente** saldos de vacaciones ya materializados. Si el saldo o una comunicación no coincide con el contrato aplicable, escala a People/Payroll antes de ajustarlo.
+
 ## Que pasa despues
 
 Cuando completas la ficha:

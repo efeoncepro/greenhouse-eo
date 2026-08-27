@@ -39,14 +39,18 @@ para separar capacidades reutilizables de claims, precios y disponibilidad que n
 
 ## 0. La tesis — dónde se pelea y dónde no
 
-**No vendas HubSpot donde HubSpot es Niche Player. Véndelo donde es número uno.**
+**No vendas HubSpot como respuesta universal. Véndelo donde el job y el segmento prueban el fit.**
 
-Gartner 2025 pone a HubSpot en **Niche Players** del MQ de *Sales Force Automation* (Leaders: Salesforce,
-Microsoft, Oracle) y en **Leaders** del MQ de *B2B Marketing Automation* por **5.º año consecutivo**.
-Los dos datos son ciertos y son reportes distintos. Un AE de Salesforce va a llegar con el primero impreso.
+El Gartner MQ de *CRM Sales Platforms* 2026 ubica a HubSpot como **Challenger**, un avance desde Niche Player en
+el MQ de *Sales Force Automation* 2025. En el MQ de *B2B Marketing Automation Platforms* 2025 sigue como
+**Leader por 5.º año consecutivo**. Salesforce participa además en *Multichannel Marketing Hubs*, superficie
+enterprise/B2C donde HubSpot no fue incluido en 2025. Son mercados distintos; nunca conviertas uno en ranking de
+“CRM general”.
 
-Es el terreno donde el argumento de HubSpot es defendible frente a un comité, y es exactamente lo que
-Efeonce **es** (agencia / Growth OS, no un integrador de CRM).
+Efeonce vende **Revenue Operations & CRM** con diagnóstico provider-fit: HubSpot-first para demand generation B2B,
+adopción y time-to-value; Salesforce-first para base instalada, complejidad enterprise y B2C multicanal; híbrido
+gobernado cuando conservar Salesforce como CRM y usar HubSpot para marketing B2B tenga una justificación explícita.
+Esta skill opera sólo el carril HubSpot; no decide el stack antes del diagnóstico.
 
 ### 🔴 Pero vendes la PLATAFORMA, no un Hub
 
@@ -100,7 +104,8 @@ retainer de Managed CRM Ops.
 **Evidencia**
 1. **NUNCA** afirmes un dato de producto, precio, comisión o política del programa **de memoria**.
    El programa cambió **tres veces materialmente solo en 2026**. Verifica contra `SOURCES.md` y su `as-of`.
-2. **NUNCA** digas "HubSpot es Leader en el Gartner MQ" sin decir **cuál MQ**. Es *Niche Player* en SFA 2025.
+2. **NUNCA** digas "HubSpot es Leader en el Gartner MQ" sin decir **cuál MQ y año**. Es *Challenger* en CRM
+   Sales Platforms 2026 y Leader en B2B Marketing Automation Platforms 2025; SFA 2025 es historia comparativa.
 3. **NUNCA** cites "HubSpot Leader en el Forrester Wave 2026". **No está verificado** — la landing de HubSpot
    que lo promociona cita, al abrirla, el Wave de **Q3 2024**. Ver `SOURCES.md` § *Datos que NO se citan*.
 

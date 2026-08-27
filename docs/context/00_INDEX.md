@@ -25,6 +25,7 @@
 | Definir Content Engineering, una Pillar Experience o un cluster federado | `09_marca-agencia` + `docs/public-site/decisions/PDR-017-content-engineering-territorio-editorial.md` + `docs/public-site/decisions/PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md` + skill `content-marketing-studio` |
 | Diseñar la experiencia/onboarding del cliente en el portal | `10_experiencia-cliente` |
 | Tocar el sync con HubSpot, Account 360, lifecycle stages o properties | `11_hubspot-bowtie` |
+| Operar o vender Salesforce CRM, Marketing Cloud Engagement o Marketing Cloud Next | `docs/services/salesforce/README.md` + skill Salesforce dueña; partnership/licensing desde el registry |
 | Definir ICP, buyer persona, JTBD o prioridad por job del cliente | `13_icp-buyer-personas-jtbd` |
 | Evaluar ASaaS, tiers, switching cost, self-service o monetizacion | `14_modelo-negocio-asaas` |
 | Entender el panorama competitivo, el benchmark de industria (Barómetro La Vulca), quiénes son los competidores en Chile y el baseline para mejorar la agencia | `15_panorama-competitivo-benchmark-industria` |

@@ -21,7 +21,13 @@ Indice de auditorias tecnicas y operativas versionadas dentro de `docs/`.
 - [Higgsfield y Magnific — auditoría de UI y workflow — 2026-08-04](competitive-ui/COMPETITIVE_UI_AUDIT_HIGGSFIELD_MAGNIFIC_2026-08-04.md)
 - [Globe frente a Higgsfield y Magnific — benchmark comparativo — 2026-08-05](competitive-ui/GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05.md)
 - [Hiring — quality assurance de selección y capacidad — 2026-07-30](hiring/GREENHOUSE_HIRING_QUALITY_ASSURANCE_AUDIT_2026-07-30.md)
+- [Hiring — estado real del dominio vs. su contabilidad documental — 2026-08-26](hiring/GREENHOUSE_HIRING_DOMAIN_STATE_AUDIT_2026-08-26.md) — el dominio está más avanzado que sus docs; la cuenta de commits no mide despliegue (squash); un flag ON en prod hace 41 días dado por OFF
 - [Hiring — vocabulario de etapas del pipeline — 2026-08-22](hiring/GREENHOUSE_HIRING_STAGE_VOCABULARY_AUDIT_2026-08-22.md) — 30 hallazgos, verificación adversarial completa; 17 particiones del mismo enum; el enum no tiene ADR
+- [Berel — diagnóstico SEO de cliente — 2026-08-25](seo/BEREL_SEO_DIAGNOSTIC_2026-08-25.md) — tráfico ~90% de marca; un activo editorial sostiene 14 keywords no-marca en top 3; 10 defectos de arquitectura, el techo lo fija que el sitio no permite encontrar sus 115 artículos; el carril de striking distance ya es operable en `/admin/growth/seo/keywords` y nadie lo había corrido para la cuenta
+- [Berel — Color del Año 2027 — research, ángulo y plan de lanzamiento — 2026-08-25](seo/BEREL_COLOR_DEL_ANO_2027_2026-08-25.md) — la pieza-hito anual del mismo cliente; el competidor más peligroso era una pieza propia y la tesis la pre-emptó una agencia de tendencias; la categoría en México está vacía de contenido, Berel no tiene un solo enlace editorial ni una nota de prensa mexicana fechada de su hito anual, y la URL destino ya devuelve HTTP 200 vacío. Documento que caduca por diseño
+- [Berel — arquitectura de autoridad del blog y plan editorial de octubre — 2026-08-25](seo/BEREL_ARQUITECTURA_AUTORIDAD_2026-08-25.md) — el corpus del mismo cliente no está conectado: 0,38 enlaces editoriales por artículo y 86% de las piezas sin entrante; el conteo bruto mentía porque un destino está cableado en 113 de 113 páginas — y ese destino es la ficha del color del año, que tiene cero entrantes y cero salientes editoriales. Incluye el hueco de vocabulario medido, el léxico propietario del catálogo, el estado real de los slots de octubre, los entregables y un riesgo de claim de salud en una página ya publicada
+- [Berel — producción editorial de noviembre y diciembre 2026 — 2026-08-26](seo/BEREL_NOVEMBER_DECEMBER_2026_CONTENT_PRODUCTION_2026-08-26.md) — ocho reescrituras `N43–N50`, 72 tareas en los dos proyectos, 32 subítems sociales y paridad exacta 32/32; N48–N50 conservan gates editoriales antes de distribución
+- [OpenSEO frente a Growth SEO/AEO — teardown competitivo — 2026-08-26](platform/2026-08-26-openseo-competitive-teardown-growth-seo-aeo.md) — el repo SEO open source que se viralizó, leído en código y no en README; el espejo dio ocho hallazgos propios: una guarda de redirects afirmada que el mecanismo no sostiene, el servidor MCP interno que se anuncia read-only y escribe, el AEO sin lane ecosystem, Nexa sin una sola capacidad SEO, y autoridad de dominio que pagamos y no pintamos. Incluye plan en tres olas y el veredicto sobre el Domain Rating de Ahrefs, cuyo endpoint gratuito ya exige llave
 
 - [Design Tokens](design-tokens/README.md)
 - [Cloud Cost](cloud-cost/README.md)
@@ -32,5 +38,6 @@ Indice de auditorias tecnicas y operativas versionadas dentro de `docs/`.
 - [Notion](notion/README.md)
 - [Payroll](payroll/README.md)
 - [Public Site](public-site/README.md)
+- [SEO](seo/README.md)
 - [Reliability](reliability/README.md)
 - [Sentry](sentry/README.md)

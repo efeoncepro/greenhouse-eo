@@ -21,7 +21,19 @@ const EMPHASIS_STYLE = {
 interface HiringDecisionEmailProps {
   recipientName?: string
   openingTitle?: string
-  variant?: 'selected' | 'rejected'
+  /**
+   * TASK-1762 — `not_selected` NO es una variante suave de `rejected`, y por eso tiene su propio
+   * cuerpo. En un descarte hubo un juicio sobre la persona; en una «sin selección» por capacidad
+   * no lo hubo — la vacante se llenó. Reusar el agradecimiento del descarte le contaría una
+   * historia falsa a alguien a quien nadie descartó.
+   */
+  variant?: 'selected' | 'rejected' | 'not_selected'
+  /**
+   * TASK-1762 — sólo con consentimiento de contacto futuro VIGENTE se promete el Banco de Talento.
+   * Sin él, el correo no hace la promesa ni crea un opt-in implícito: afirmar «mantendremos tu
+   * perfil» sin base es prometer un tratamiento de datos que nadie autorizó.
+   */
+  talentPoolConsent?: boolean
   locale?: 'es' | 'en'
 }
 
@@ -29,12 +41,43 @@ export default function HiringDecisionEmail({
   recipientName = 'María González',
   openingTitle = 'Content Creator',
   variant = 'selected',
+  talentPoolConsent = false,
   locale = 'es',
 }: HiringDecisionEmailProps) {
   const isSelected = variant === 'selected'
+  const isNotSelected = variant === 'not_selected'
   const firstName = recipientName?.split(' ')[0]
 
-  const t =
+  const notSelectedCopy =
+    locale === 'en'
+      ? {
+          preview: (title: string) => `An update about your application to ${title}.`,
+          heading: 'About your application',
+          greeting: (n?: string) => (n ? `Hi ${n},` : 'Hi,'),
+          body1: (title: string) =>
+            `Thank you for the time and interest you put into your application to «${title}» at Efeonce. The position has been filled: this time we chose another candidate.`,
+          body2: talentPoolConsent
+            ? 'It was not a decision about your work. Since you agreed to it, we will keep your profile so we can reach out when an opening closer to your experience opens up.'
+            : 'It was not a decision about your work: there was a limited number of openings and they are now taken. We would be glad to see you apply to future openings closer to your profile.',
+          body3: null,
+          closing: 'Thank you for the interest you put into this process.',
+        }
+      : {
+          preview: (title: string) => `Una actualización sobre tu postulación a ${title}.`,
+          heading: 'Sobre tu postulación',
+          greeting: (n?: string) => (n ? `Hola ${n},` : 'Hola,'),
+          body1: (title: string) =>
+            `Gracias por el tiempo y el interés que pusiste en tu postulación a «${title}» en Efeonce. La vacante ya quedó cubierta: esta vez elegimos a otra persona.`,
+          // La diferencia entre las dos frases NO es de tono: la primera promete un tratamiento de
+          // datos y la segunda no. Sólo se promete cuando hay consentimiento vigente.
+          body2: talentPoolConsent
+            ? 'No fue una decisión sobre tu trabajo. Como nos diste tu autorización, mantendremos tu perfil para escribirte cuando se abra una vacante más cercana a tu experiencia.'
+            : 'No fue una decisión sobre tu trabajo: había un número acotado de cupos y ya quedaron tomados. Nos encantaría verte postular a futuras vacantes que se acerquen más a tu perfil.',
+          body3: null,
+          closing: 'Gracias por el interés que pusiste en este proceso.',
+        }
+
+  const binaryCopy =
     locale === 'en'
       ? isSelected
         ? {
@@ -84,6 +127,8 @@ export default function HiringDecisionEmail({
             body3: null,
             closing: 'Agradecemos de verdad tu interés en trabajar con nosotros.',
           }
+
+  const t = isNotSelected ? notSelectedCopy : binaryCopy
 
   return (
     <EmailLayout previewText={t.preview(openingTitle)} locale={locale} brand='efeonce'>

@@ -199,7 +199,7 @@ tercero — pero prueba que **existe**, no que **opere a escala**).
 |---|---|
 | **"HubSpot Solutions Partner Gold"** | ✅ **Cierto** (portal Partner). 🔴 **Condición: revisar el 2027-01-15** — el Gold está acreditado hasta esa fecha y hoy Efeonce está bajo el umbral de puntos totales. **Si baja de tier, el badge sale de la página ese día** (riesgo de compliance del programa) |
 | **"Leader en B2B Marketing Automation (Gartner, 5.º año)"** | ✅ **Cierto y citable** |
-| ~~"Líder en CRM según Gartner"~~ | 🔴 **FALSO.** HubSpot es **Niche Player** en el MQ de *Sales Force Automation* 2025 (Leaders: Salesforce, Microsoft, Oracle; **Zoho está por encima**) |
+| ~~"Líder en CRM según Gartner"~~ | 🔴 **FALSO.** HubSpot es **Challenger** en el MQ de *CRM Sales Platforms* 2026, después de avanzar desde Niche Player en 2025. Salesforce y Microsoft son Leaders. |
 | ~~"Leader en Forrester Wave"~~ | ❌ **No verificable para 2026** (la landing de HubSpot que lo promociona cita el Wave de **2024**) |
 | ~~"ISO 27001"~~ | 🔴 **HubSpot NO la reclama para sí** — su página dice que la tienen sus **proveedores cloud (AWS)**. ✅ Correcto: **SOC 2 Type II + SOC 3** |
 | ~~"Datacenters regionales"~~ como feature | ⚠️ **NO hay datacenter en LATAM.** Es un **descalificador**, no una ventaja |

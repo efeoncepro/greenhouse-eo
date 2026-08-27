@@ -81,6 +81,99 @@ const mirroredSkills = [
     codex: '.codex/skills/greenhouse-talent-people-operator',
     claude: '.claude/skills/greenhouse-talent-people-operator',
   },
+  {
+    /*
+     * Las dos SEO entran el 2026-08-25 tras reconciliarlas a mano. Estuvieron divergiendo en
+     * silencio: `seo-aeo` ni siquiera tenia copia `.claude` versionada — vivia fuera de git — y la
+     * copia que un agente cargaba estaba MAS VIEJA que la versionada, sin nada que lo delatara.
+     * `seo-aeo-practice` era peor: la copia `.codex` afirmaba que el AEO de un cliente real iba
+     * regalado cuando esta contratado y pagado, asi que un agente razonaba sobre un alcance
+     * comercial falso. Un espejo que nadie valida diverge en silencio, y en una skill comercial
+     * el drift no es cosmetico: se le cobra mal a un cliente.
+     */
+    id: 'seo-aeo',
+    mode: 'byte-identical',
+    codex: '.codex/skills/seo-aeo',
+    claude: '.claude/skills/seo-aeo',
+  },
+  {
+    id: 'seo-aeo-practice',
+    mode: 'byte-identical',
+    codex: '.codex/skills/seo-aeo-practice',
+    claude: '.claude/skills/seo-aeo-practice',
+  },
+  {
+    /*
+     * Entra el 2026-08-25: los dos bundles existian desde julio y NADIE los validaba, asi que ya
+     * habian divergido en cuatro archivos sin que ningun gate lo delatara. La copia `.claude`
+     * mandaba a una skill de Claude a leer `.codex/skills/seo-aeo/references/...` (el arbol del
+     * OTRO agente), y la copia `.codex` apuntaba el canon de content-to-capability a
+     * `../../docs/`, que resuelve a `.codex/docs/` y NO EXISTE. Un pointer roto en una skill de
+     * ejecucion no se cae con error: el agente sigue sin el canon y produce el entregable igual.
+     * Se reconcilio a mano (frontmatter completo + pointer repo-root a docs/ + pointers a
+     * seo-aeo en forma relativa, que resuelve correcto desde AMBAS copias) antes de registrarla.
+     */
+    id: 'content-marketing-studio',
+    mode: 'byte-identical',
+    codex: '.codex/skills/content-marketing-studio',
+    claude: '.claude/skills/content-marketing-studio',
+  },
+  {
+    /*
+     * Entra el 2026-08-25, el mismo dia que nace. Es una skill de CLIENTE: transcribe el proceso de
+     * produccion editorial que Berel y Efeonce acordaron y que hasta hoy solo vivia en el Notion del
+     * cliente. Un espejo que diverge aca no es cosmetico: los dos agentes producirian el articulo de
+     * un cliente real con reglas distintas sobre su voz, sus enlaces, sus claims de producto y su
+     * licencia de imagen — y el entregable sale con el nombre de Efeonce. Ademas declara conflictos
+     * abiertos entre documentos del cliente que NINGUN agente debe resolver por su cuenta: si una
+     * copia pierde esa advertencia, ese agente elige en silencio.
+     */
+    id: 'berel-content-production',
+    mode: 'byte-identical',
+    codex: '.codex/skills/berel-content-production',
+    claude: '.claude/skills/berel-content-production',
+  },
+  {
+    /*
+     * Entra el 2026-08-25 tras reconciliarla a mano. Los dos bundles ya existian y nadie los
+     * validaba: la unica divergencia era el frontmatter de `SKILL.md`, y era la que mas duele —
+     * la copia `.codex` conservaba una `description` de una linea, sin `user-invocable` ni
+     * `argument-hint`, sin el router de speaker (voz institucional Efeonce vs voz autoral de
+     * Julio Reyes) y sin ninguno de los triggers. Un frontmatter pobre no falla con error: la
+     * skill simplemente NO SE CARGA cuando el operador pide "headline", "storytelling" o "voz
+     * de Julio", asi que un agente que entrara por Codex escribia copy firmado sin el sistema
+     * de voz del autor y sin saber que existia. Se adopto el frontmatter completo de `.claude`
+     * (el resto de los 30 archivos ya era byte-identico).
+     */
+    id: 'copywriting',
+    mode: 'byte-identical',
+    codex: '.codex/skills/copywriting',
+    claude: '.claude/skills/copywriting',
+  },
+  {
+    // El contrato CRM combina operación segura y venta consultiva. Los dos agentes deben
+    // conservar los mismos límites de producto, claims de partnership y gates de mutación.
+    id: 'salesforce-crm-practice',
+    mode: 'byte-identical',
+    codex: '.codex/skills/salesforce-crm-practice',
+    claude: '.claude/skills/salesforce-crm-practice',
+  },
+  {
+    // Engagement sigue siendo un producto vigente y puede coexistir con Next. El espejo evita
+    // que un agente lo trate como legacy o convierta una recomendación comercial en una mutación.
+    id: 'salesforce-marketing-cloud-engagement',
+    mode: 'byte-identical',
+    codex: '.codex/skills/salesforce-marketing-cloud-engagement',
+    claude: '.claude/skills/salesforce-marketing-cloud-engagement',
+  },
+  {
+    // Marketing Cloud Next cambia rápido y depende de Data 360, consentimiento y ediciones.
+    // Un único bundle compartido protege el release ledger y los claims de disponibilidad.
+    id: 'salesforce-marketing-cloud-next',
+    mode: 'byte-identical',
+    codex: '.codex/skills/salesforce-marketing-cloud-next',
+    claude: '.claude/skills/salesforce-marketing-cloud-next',
+  },
 ]
 
 const filesIn = root => {

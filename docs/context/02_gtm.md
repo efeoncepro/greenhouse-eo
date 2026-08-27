@@ -47,7 +47,7 @@ Efeonce organiza el portfolio en líneas de negocio/prácticas. Las product bran
 | **Creative Services** | Globe / Creative Studio, Greenhouse, ICO | Express | branding, campañas, contenido y producción |
 | **Media & Distribution** | Reach, Verk, Greenhouse | Amplify | estrategia de distribución; performance y commerce; influence, earned y partnerships |
 | **Digital Services & Engineering** | Wave, Greenhouse | Transversal | visibilidad, web, measurement, agentes e integraciones |
-| **RevOps & CRM** | Kortex, HubSpot, Greenhouse | Tailor + Evolve | licencias, implementación, managed ops e inteligencia CRM |
+| **RevOps & CRM** | Kortex, HubSpot, Salesforce, Greenhouse | Tailor + Evolve | diagnóstico provider-fit, licencias cuando apliquen, implementación, managed ops e inteligencia CRM |
 
 **Taxonomía comercial:** la relación separa **modelo de delivery** (Managed Squad, Staff Augmentation, Studio
 Access o híbrido por lanes), **forma de engagement** (On-Going, On-Demand o Sample Sprint) y, cuando aplica
@@ -57,16 +57,26 @@ Augmentation mantiene perfiles bajo dirección del cliente vía Deel; no es un M
 
 ---
 
-## CRM Solutions (cuatro capas)
+## CRM Solutions (cuatro capas + tres carriles)
 
 Articula toda la oferta CRM como sistema completo, de la licencia a la inteligencia:
 
-1. **Licencias** — venta/gestión de licencias HubSpot. Efeonce como Solutions Partner. → revenue: referral fee + margen.
-2. **Implementación** — onboarding, migración, pipelines, properties, workflows, integraciones, training. Deployment programático con **Kortex**. → proyecto on-demand.
+1. **Licencias** — venta/gestión de licencias HubSpot o Salesforce sólo cuando el programa y los derechos vigentes lo permiten. → revenue: referral/reseller fee + margen, separado del servicio.
+2. **Implementación** — onboarding, migración, pipelines, modelo de datos, workflows, integraciones y training sobre el provider elegido. Deployment programático con **Kortex** cuando aplica. → proyecto on-demand.
 3. **Managed CRM Ops** — operación continua post-implementación. → retainer. **Vive en Greenhouse (dashboard del cliente) + Kortex.**
 4. **CRM Intelligence** — CRM Advisor (agente Claude dentro de HubSpot), auditorías, scoring, recomendaciones. → premium tier.
 
-Flywheel: licencia → implementación (Kortex) → managed ops (Greenhouse) → intelligence (Kortex) → contenido para pipeline (Verk) → expansión de licencia.
+Flywheel: diagnóstico → arquitectura provider-fit → licencia cuando aplica → implementación (Kortex cuando aplica) → managed ops (Greenhouse) → intelligence (Kortex) → contenido para pipeline (Verk) → expansión.
+
+Tres carriles evitan extrapolar un benchmark a todo el mercado: **HubSpot-first** para demand generation B2B,
+adopción y time-to-value; **Salesforce-first** para base instalada, complejidad enterprise y B2C multicanal; e
+**híbrido gobernado** cuando HubSpot Marketing Hub conserva a Salesforce como CRM y quedan explícitos source of
+truth, lifecycle, consentimiento, attribution y sync. Canon y evidencia:
+[`CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md`](../audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md).
+
+El carril Salesforce separa tres superficies: CRM core, Marketing Cloud Engagement y Marketing Cloud Next. No se
+vende “Marketing Cloud” como producto genérico ni se promete que Next reemplaza Engagement. Canon operativo y
+comercial: [`docs/services/salesforce/README.md`](../services/salesforce/README.md).
 
 ---
 

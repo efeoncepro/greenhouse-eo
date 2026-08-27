@@ -8,8 +8,9 @@ Load whenever the work happens _inside_ the Greenhouse repo (not pure advisory).
 
 - `src/types/hiring.ts` holds **five** lists, and confusing them is the bug:
   `HIRING_APPLICATION_STAGES` (**6** since TASK-1754 Slice F: `sourced`, `screening`, `shortlisted`,
-  `interview`, `decision_pending`, `closed` — it is **no longer the mirror of the DB `CHECK`**, which stays
-  wide on purpose until the contract), `HIRING_PIPELINE_STAGES` (**5** — the subset a stage change may write;
+  `interview`, `decision_pending`, `closed` — **it is the mirror of the DB `CHECK` again** since the Slice F
+  contract landed on 2026-08-23 (`50b742341`); the bug was the interval in which it was NOT, so never assume
+  the two are in sync — verify), `HIRING_PIPELINE_STAGES` (**5** — the subset a stage change may write;
   **allowlist, not denylist**; `closed` is outside it because closing is deciding),
   `TERMINAL_APPLICATION_STAGES` (**fuente única** for "this journey ended", today `{'closed'}`; it replaced
   three verbatim copies in `assessment/instances.ts`, `assessment/public-session/store.ts` and
@@ -26,9 +27,10 @@ Load whenever the work happens _inside_ the Greenhouse repo (not pure advisory).
 - Signal `hiring.application.closed_without_outcome`
   (`src/lib/reliability/queries/hiring-application-outcome-signals.ts`) exists **before** the `CHECK`, to
   measure the drift the `CHECK` will later make impossible.
-- **Parked, NOT applied**: `docs/tasks/pending-migrations/` holds the outcome-enum contract (drops `on_hold`),
-  the `closed ⟺ outcome` invariant and the synthetic-archive backfill. Precondition for all of them: the
-  release that removes the writer from `origin/main`. Reachability comes from the **deployed surface
+- **APPLIED 2026-08-23, and `docs/tasks/pending-migrations/` is now EMPTY** (only its `README`): the
+  outcome-enum contract (dropped `on_hold`), the `closed ⟺ outcome` invariant
+  (`hiring_application_closed_outcome_check`) and the synthetic-archive backfill all landed, after the release
+  that removed the writers from `origin/main`. The precondition held; the rule below is why it held. Reachability comes from the **deployed surface
   contract**, never from "zero rows" — there is ONE Cloud SQL instance shared by dev, staging and production,
   and applying a contract early broke «Dejar en espera» in production on 2026-08-22 (`ISSUE-161`).
 - **Verify the predicate, never the `grep -c`.** Counting a literal proves nothing about who writes it: a hit
@@ -47,6 +49,92 @@ Load whenever the work happens _inside_ the Greenhouse repo (not pure advisory).
   - `hiring_handoff` (TASK-356, ✓ complete) — the explicit boundary object decision→downstream. UNIQUE per application, anchored to `decision_id` (supersede), state-machine `pending→approved→[in_setup]→completed` + `blocked`/`cancelled`, append-only `hiring_handoff_audit`.
 - Store: `src/lib/hiring/**` (SQL-crudo + `HiringValidationError` + transactional outbox). API: `/api/hiring/**` (dual-gate: internal tenant + `can()`).
 - Capabilities: `hiring.{demand,opening,application}.*` (granted to internal roles only — NUNCA `client_*`).
+
+## Application 360 ↔ Pipeline — context and sequential review
+
+- `openingId` is the durable vacancy scope. `focusApplication` is an ephemeral return hint, never persisted
+  domain state or a second source of truth. Resolve the exact application first and let its
+  application→opening→demand chain win over a contradictory `openingId`; pin that chain outside ordinary list
+  limits without widening provenance or access policy.
+- A missing, archived or policy-invisible focus must degrade honestly: keep a valid pipeline scope, clear the
+  hint without adding browser history, and never focus or present another candidate as the origin. Verify the
+  archived predicate independently on both the sequential queue and the exact-focus path; satisfying one does
+  not make the other conformant.
+- Previous/Next is an operational queue limited to the same `opening_id + stage`, excluding archived rows and
+  ordered stably by `created_at DESC, application_id ASC`. Recompute it per request. Its reader returns only
+  ids, position and total — never PII, score, affinity, ranking, AI recommendation or dossier evidence — and
+  cannot bypass anti-anchoring readers.
+- The existing Pipeline tab is the canonical parent/return affordance. Programmatic navigation protects local
+  drafts before leaving; after return, exact scroll/focus and an accessible announcement restore orientation.
+  Those interaction states never become Hiring domain state.
+
+Technical canon: `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` §Pipeline Board / Application 360.
+
+## Opening capacity closure — code paths (TASK-1762, code complete / rollout pendiente)
+
+- ADR `docs/architecture/GREENHOUSE_HIRING_OPENING_CAPACITY_CLOSURE_DECISION_V1.md` (`Accepted`, amended in
+  place 2026-08-23: the policy carries **no seat count**).
+- `src/lib/hiring/opening-capacity/**` — `preview.ts` (cohort + `effectDigest`), `confirm.ts` (revalidates
+  version/digest under lock, persists run + items), `reconciler.ts` (executes each item through the canonical
+  `decideHiringApplication`, retry budget + quarantine), `readers.ts`, `status.ts`. Route
+  `src/app/api/hiring/openings/[id]/capacity-closure/route.ts`.
+- Tables: `greenhouse_hiring.hiring_opening_capacity` (policy: `opening_id`, `managed_since`,
+  `set_by_user_id`, `reason`, `policy_version` — **no count**), `hiring_opening_closure_run` and
+  `hiring_opening_closure_run_item`. The seat target stays in `hiring_opening.requested_seats` (TASK-353);
+  `unmanaged` = no live policy row.
+- Capabilities `hiring.opening.capacity.read` / `hiring.opening.capacity.confirm`. With a live policy,
+  `requested_seats` moves only through the capacity command — `updateHiringOpening` rejects it (app guard +
+  DB trigger + audit + drift signal).
+- Email: `hiring_decision_not_selected` in `src/lib/email/types.ts` + `DECISION_EMAIL_TYPE`
+  (`src/lib/hiring/notifications/send.ts`), consent re-read at send time. Flags
+  `HIRING_OPENING_CAPACITY_CLOSURE_ENABLED` and `HIRING_CAPACITY_FILLED_EMAIL_ENABLED`, both default OFF and
+  **only in `services/ops-worker/deploy.sh`** — flipping them in Vercel does nothing. `email_type_config`
+  seeded `enabled=false`.
+- Error codes to expect: `hiring_opening_capacity_not_filled`, `hiring_opening_closure_preview_stale`.
+- The live tests of the reconciler are **read-only over candidate data on purpose** (shared instance,
+  append-only outcome). Run them with `pnpm test:live` — see the live-test contract in the skill body.
+
+## Individual decision parity — code paths (TASK-1773)
+
+- `src/lib/hiring/decision-parity.ts` — `readHiringApplicationOutcome` (PII-free outcome view: stage,
+  `decision`, `decisionCause`, `decidedAt/By`, `archivedAt`, `closed`), `proposeHiringApplicationDecision`
+  (**reads and computes, never mutates**; returns `effectDigest` + `current` + `alreadyClosed`) and
+  `confirmHiringApplicationDecision` (recomputes the digest against the state of *now*, then delegates to
+  `decideHiringApplication`). `Migration: none` on purpose — the guard is a digest, **not a table**.
+- The digest is `hdp-<sha256:24>` over `applicationId | stage | decision | decisionCause | archivedAt |
+  proposed decision | proposed cause`. It includes the **current** state deliberately: if someone decides
+  in between, the recomputed print differs. Mismatch ⇒ `HiringValidationError`
+  **`hiring_decision_proposal_stale` (409)**. Revalidation runs **before** the write and **outside** the
+  command's transaction — the command keeps its own `FOR UPDATE` and `idempotencyKey` replay, which is
+  where the fine-grained race was always covered.
+- `src/lib/api-platform/resources/app-hiring-application-decision.ts` — the `app` lane adapter.
+  `assertInternalCapability(context, 'read'|'execute')` (internal tenant + `hiring.application.decide`) and
+  `assertConfirmationIsHuman(context)`, which rejects `authSource === 'sister_platform_oauth'` with 403.
+  Routes: `src/app/api/platform/app/hiring/applications/[applicationId]/{outcome,decision/propose,decision/confirm}/route.ts`
+  (route keys `platform.app.hiring.application.outcome.get` / `.decision.propose` / `.decision.confirm`).
+  `idempotency-key` header wins over the body field.
+- `src/lib/api-platform/core/errors.ts` — `hiring_decision_proposal_stale` is its own
+  `ApiPlatformErrorCode`, **not flattened to `bad_request`**: the consumer must tell "your payload is
+  wrong" from "the world changed, propose again".
+- `src/lib/nexa/actions/hiring-decision.ts` — action `decide_hiring_application`, `sensitivity: 'high'`,
+  `expirationSeconds: 300`, `requiredCapability: 'hiring.application.decide'`, registered in
+  `src/lib/nexa/actions/registry.ts`. `proposeOrBlock` is shared by `buildPreview` and `execute`: it throws
+  `NexaActionBlockedError` with a Hiring Desk deep link when `alreadyClosed`, so **execute re-proposes at
+  the point of mutation**. Idempotency key is derived from the digest (`nexa-<effectDigest>`). Flag
+  `isNexaHiringActionsEnabled` (`NEXA_HIRING_ACTIONS_ENABLED`, `src/lib/nexa/flags.ts`, Vercel-only,
+  default OFF) on top of the master `NEXA_ACTION_RUNTIME_ENABLED`.
+- `src/lib/hiring/capability-parity-manifest.ts` + `.test.ts` — the parity guard. The test greps
+  `src/app` and `src/lib` for `can(subject, 'hiring.*', …)` and asserts: nothing undeclared, every
+  `federated` entry's `evidence` path **exists on disk**, every non-federated entry carries a `reason`, and
+  no dead entries accumulate. Adding a hiring capability without a manifest row **breaks the build**.
+  Only `can()` capabilities belong here — a delegated OAuth scope (`efeonce.mcp.hiring.read`, checked via
+  `oauthCapabilities.includes(...)` in `src/lib/sister-platforms/mcp-token-exchange.ts`) is a different
+  authorization plane and must stay out.
+- Tests to keep green when touching this lane:
+  `src/lib/hiring/decision-parity.test.ts`,
+  `src/lib/api-platform/resources/app-hiring-application-decision.test.ts`,
+  `src/lib/nexa/actions/hiring-decision.test.ts`,
+  `src/lib/hiring/capability-parity-manifest.test.ts`.
 
 ## The assessment engine (EPIC-011 extension)
 
@@ -79,11 +167,12 @@ Operational sequence:
 
 ### Assessment delivery, recovery and public session (TASK-1745/1746/1747/1757)
 
-**Runtime status (2026-08-20).** Provider lifecycle (1745) and the recovery command + capabilities + candidate
+**Runtime status (re-verified 2026-08-26).** Provider lifecycle (1745) and the recovery command + capabilities + candidate
 email (1746) are **in production since 2026-08-19**: migration and index `uq_email_deliveries_token_intent_v2`
 applied, `email_type_config.hiring_assessment_access_recovery = true`. The Application 360 surface (1747) and
-the rotation notice (1757) are **on `develop`/staging only** — promotion is a separate step and neither has
-been exercised against a real rotation. `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` still defaults OFF in
+the rotation notice (1757) **are also in production** (release `709e15f66`, 2026-08-23; verified blob-by-blob
+against `origin/main` on 2026-08-26) — what remains is that **neither has been exercised against a real
+rotation**: the pending item is evidence, not promotion. `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED` still defaults OFF in
 ops-worker, so legacy links remain the sender's behavior.
 
 - Global lifecycle: historical `sent` = provider accepted dispatch, never inbox delivery. Signed provider
@@ -129,6 +218,63 @@ ops-worker, so legacy links remain the sender's behavior.
 
 Docs: `docs/documentation/hr/entrega-y-recuperacion-de-acceso-a-tests.md` and
 `docs/manual-de-uso/hr/recuperar-acceso-a-test-de-candidato.md`.
+
+### Assessment taking surface — timing, grace and honest errors (TASK-1746 timing + TASK-1751)
+
+Component `src/components/greenhouse/hiring/assessment/AssessmentTakingClient.tsx` + its CSS module
+`AssessmentTaking.module.css`. Public, unauthenticated, single task, deadline running.
+
+- **Completeness gate (server).** `submitPublicAssessmentWithClient`
+  (`src/lib/hiring/assessment/public-taking.ts:651-657`) lists questions and responses and throws
+  `assessment_incomplete` (400, `missingQuestionId` in details — internal, never public) if any question has
+  no saved response, or if there are no questions. The client derives `canSubmitEverything` from
+  `assessment.responses` (`AssessmentTakingClient.tsx:255`) and hides the submit CTA during grace when it is
+  false (`:764`). **Never add a completeness field to the public DTO**: its allowlists are exactly tested
+  (`route.test.ts` forbidden-keys sweep).
+- **Preventive save.** `PREEMPTIVE_SAVE_WINDOW_SECONDS = 30`, `PREEMPTIVE_SAVE_INTERVAL_MS = 5000` (`:77-78`);
+  the effect at `:371-391` fires once on entering the window and then on a fixed interval, reading
+  `answerRef` so keystrokes do not restart it (restarting it would reproduce the debounce defect it exists to
+  fix). Only armed when `timing.answerDeadlineAt` exists — with no explicit limit, `remainingSeconds` counts
+  toward the 24 h close, which is not the deadline that closes saving.
+- **The deadline cut is `>=` with no epsilon** (`src/lib/hiring/assessment/instances.ts:578`, DB clock
+  canonical), so a flush fired AT the boundary always loses. Both sides are tested in
+  `instances.deadline.test.ts`: `deadline − 1s` must be accepted (the edge the preventive save depends on),
+  `>=` must be rejected.
+- **Draft preservation.** `draftsRef` (`:192`, `:289-295`) stores the answer of the question being left and
+  prefers it over the server value on return. Before, the same effect silently overwrote the draft with the
+  server answer — empty when it had never been saved.
+- **Error codes → message.** `AssessmentRequestError` keeps the `code` and nothing else (`:104`);
+  `messageForCode` (`:118`) maps to four buckets by what the person **can do**, not one per code:
+  `assessment_not_open` → the answer deadline passed, copy your text; `assessment_incomplete` → answers
+  missing, contact whoever sent it; everything else → the generic retryable message. The server `message` is
+  generic by design (`src/app/api/public/assessment/[token]/route.ts:24-34`) and pinned by the anti-leak test
+  (`route.test.ts:146-161`) — the truth is composed here, never by loosening the public boundary. Form
+  precedent: `src/components/greenhouse/careers/TalentPoolSelfServiceClient.tsx:84-89`.
+- **Copy keys** added to `HiringAssessmentCopy['taking']` (`src/lib/copy/types.ts`) in both dictionaries:
+  `graceBodyComplete`, `graceBodyIncomplete`, `graceSavedCount`, `saveClosedBody`, `submitIncompleteBody`,
+  `answerFieldLabel`. `taking.retry` still has **no consumer**: this screen renders errors as text and has no
+  retry CTA to hide, so the "no Reintentar where retry cannot work" contract holds by construction.
+- **A11y + visual, all found by the FIRST premium capture of this surface** — GVC scenario
+  `scripts/frontend/scenarios/task1751-assessment-grace.scenario.ts`, seed
+  `scripts/hiring/_seed-task-1751-gvc.ts`, scorecard `docs/ui/reviews/TASK-1751-assessment-grace.scorecard.json`
+  (4.54 avg, floor 4.4 in `depth` with a declared `nextAction`):
+  - `readOnly` instead of `disabled` on the frozen textarea (`:746`) + the `.textArea:read-only` rule that
+    repaints the "frozen" signal the browser used to give for free (`AssessmentTaking.module.css:627`).
+  - `aria-label={copy.taking.answerFieldLabel}` and placeholder only while answerable (`:743-746`) — the
+    textarea had no accessible name for years, leaning on its placeholder.
+  - `.characterCount` moved from `--text-disabled` (2.43:1 vs white, axe `serious`) to `--text-secondary`
+    (`AssessmentTaking.module.css:646`). It is secondary text, not disabled text. Pre-existing defect.
+  - Banner icon `tabler-send` → `tabler-clock-exclamation` (`:633`): a paper plane over a message that says
+    you cannot send. No gate detects that; only looking at the frame does.
+  - `data-surface-recipe='candidate-assessment-taking'` declared at the surface root (`:630`), and the GVC
+    rubric points at that root — scoping it to a child card left the marker outside its own scope.
+- **The stepper's horizontal drag is the correct pattern, not a defect.** `.steps` already declares
+  `overflow-x: auto` (`AssessmentTaking.module.css:418-423`); the scenario declares
+  `allowHorizontalScrollSelectors` (`:66`) instead of breaking a contained scroller to satisfy the checker.
+  The real contract — the PAGE must not scroll horizontally at 390px — was verified and holds.
+- Behavior tests: `AssessmentTakingClient.honest-errors.test.tsx` (no submit offer when incomplete; the saved
+  count is declared; an expired deadline names the cause instead of inviting a retry; a real system failure
+  keeps the generic message) and `AssessmentTakingClient.timing-contract.test.ts`.
 
 ## The handoff (decision → downstream runtime, TASK-356 ✓ complete)
 

@@ -15,7 +15,7 @@
   - Resolver primero el `chatId`/conversation id exacto (`teams_notification_channels.recipient_chat_id`, conversation reference cache o Teams connector `_resolve_chat`).
   - Enviar `POST {serviceUrl}/v3/conversations/{encodeURIComponent(chatId)}/activities`.
   - Usar failover de service URL: `https://smba.trafficmanager.net/teams`, `/amer`, `/emea`, `/apac`.
-- Para group chats con `@todos`, usar `textFormat: "xml"`, `<at>todos</at>` y mention entity con `mentioned.id = chatId`, `mentioned.name = "todos"`. El transcript puede mostrar `todos` sin arroba; si importa la notificación real, verificar en Teams.
+- En group chats, TeamBot **no puede mencionar a todos**: Microsoft admite menciones de usuarios, pero no `@everyone`. Nunca usar el `chatId` como `mentioned.id` ni enviar `<at>todos</at>`; el Connector puede aceptar la actividad aunque Teams la degrade a texto plano, sin arroba ni notificación colectiva. Para alertar, mencionar personas explícitas con identidades Entra/UPN verificadas o usar otra superficie gobernada.
 - Para chats individuales ya instalados por usuario, **no crear 1:1 a ciegas con AAD Object ID**. Resolver el `oneOnOne` existente y postear ahí. El intento `members: [{ id: "29:<aadObjectId>" }]` puede fallar con `403 Failed to decrypt pairwise id` aunque el usuario exista.
 - En 1:1 no hace falta mencionar al destinatario; Teams notifica el chat. Para smoke scripts locales con imports server-side, usar `npx tsx --require ./scripts/lib/server-only-shim.cjs ...`.
 - Producto/UI: cualquier canal manual debe converger con Notification Hub / `TASK-716` (intent/outbox, preview, aprobación, idempotencia, retries, audit, delivery status y permisos `views` + `entitlements`), no con un textbox que postea directo a Teams.
@@ -25,7 +25,10 @@
   - runtime: `src/lib/communications/manual-teams-announcements.ts`
   - destinos registrados: `src/config/manual-teams-announcements.ts`
   - guardrails: `--dry-run` primero, `--yes` para enviar, `--body-file` con párrafos separados por línea en blanco, CTA `https` obligatorio
-  - para futuras peticiones del tipo "envía este mensaje por Greenhouse/TeamBot", reutilizar este helper antes de crear scripts temporales o usar el conector personal de Teams
+  - para futuras peticiones del tipo "envía este mensaje por Greenhouse/TeamBot" a un grupo/canal, reutilizar este helper antes de crear scripts temporales o usar el conector personal de Teams
+  - el helper no crea DMs genéricos; para 1:1 usar primero el CLI dueño del dominio si existe
+  - si no existe un CLI de dominio, solo se admite un puente temporal acotado sobre `sendViaBotFramework` y los writers canónicos de auditoría, con identidad Entra revalidada, `dry-run`/confirmación, `sourceObjectId` determinístico, deduplicación y `source_sync_runs`; nunca HTTP crudo ni el conector personal
+  - una ejecución `succeeded` prueba aceptación del transporte, no lectura ni renderizado confirmado
 - Chats verificados:
   - `EO Team`: `19:1e085e8a02d24cc7a0244490e5d00fb0@thread.v2`.
   - `Sky - Efeonce | Shared`: `19:bf42622ef7b44d139cd4659e8aa22e81@thread.v2`.

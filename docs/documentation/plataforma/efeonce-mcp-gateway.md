@@ -14,11 +14,13 @@ independiente que autentica al cliente y delega cada lectura al producto dueño.
 La primera capacidad activa fue `globe.producer.fleet.list`. Permite consultar las rutas de modelos disponibles de
 Globe para el workspace interno autorizado. El gateway no recrea catálogo, routing ni reglas de Globe.
 
-Desde el 6 de agosto de 2026 hay una **segunda capacidad federada**: Search Visibility 360 de Greenhouse, con tres
-consultas de solo lectura sobre el estado del módulo SEO de una organización, sus oportunidades de keyword medidas
-y el cruce entre posición orgánica y citabilidad en motores de IA. Igual que con Globe, el gateway no recrea
-lógica: transporta la pregunta y Greenhouse decide qué se puede ver. Detalle funcional en
-[Search Visibility 360 por MCP](../growth/search-visibility-360-por-mcp.md).
+Desde el 6 de agosto de 2026 hay una **segunda capacidad federada**: Search Visibility 360 de Greenhouse. Partió
+con tres consultas de solo lectura y creció hasta cubrir, desde el 27 de agosto (TASK-1658), **el inventario SEO
+completo del MCP interno: 21 tools (16 lecturas + 5 escrituras gobernadas)** — la revisión productiva del gateway
+sirve 13 hasta el deploy posterior al próximo release de Greenhouse. Igual que con Globe, el gateway no recrea
+lógica: transporta la pregunta y Greenhouse decide qué se puede ver. El inventario vigente y su estado de
+despliegue viven en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8; detalle
+funcional en [Search Visibility 360 por MCP](../growth/search-visibility-360-por-mcp.md).
 
 ## Cómo se comporta
 
@@ -37,9 +39,11 @@ Disponible hoy:
 
 - `globe.capabilities.list` para discovery.
 - `globe.producer.fleet.list` para disponibilidad de rutas de Globe.
-- `get_seo_entitlement`, `get_seo_keyword_opportunities` y `get_seo_visibility_360` para Search Visibility 360 de
-  Greenhouse, bajo el permiso base de conexión. Son de lectura: no configuran mediciones, no disparan capturas y
-  no gastan presupuesto de proveedor. Cada una queda acotada por el módulo SEO asignado a la organización.
+- las tools SEO de Search Visibility 360 de Greenhouse: las lecturas (`get_seo_*`) bajo el permiso base de
+  conexión — no configuran mediciones, no disparan capturas ni gastan presupuesto de proveedor — y las cinco
+  escrituras gobernadas bajo un permiso de escritura propio (`efeonce.mcp.seo.write`) que NO está cableado al
+  cliente público: hoy responden fail-closed. Cada tool queda acotada por el módulo SEO asignado a la
+  organización. Inventario exacto en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8.
 
 No disponible:
 
@@ -55,8 +59,10 @@ El servicio está operativo sólo para el tenant interno de Entra. La autorizaci
 una capability de lectura y un binding de workspace exacto. Esto evita que una conexión MCP sea un bypass de
 los permisos de Globe.
 
-El gateway maneja tres permisos, no dos: el permiso base de conexión, el permiso de lectura de Globe y un tercer
-permiso de escritura interna para el fondeo de créditos, que sólo se publica cuando su interruptor está encendido.
+El gateway maneja cinco permisos: el permiso base de conexión, el permiso de lectura de Globe, el permiso de
+escritura interna para el fondeo de créditos, el permiso de escritura SEO (`efeonce.mcp.seo.write`) y el permiso
+de lectura de Hiring — cada permiso condicionado sólo se publica cuando su interruptor está encendido (detalle en
+el ADR de plataforma MCP).
 
 Antes de entregar acceso a clientes, Efeonce debe implementar entitlements por tenant/capability y demostrar una
 identidad que reciba sólo el permiso base cuando no tiene Globe. Al cliente Entra interno actual se le entregan

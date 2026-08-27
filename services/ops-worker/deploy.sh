@@ -404,6 +404,30 @@ ENV_VARS="${ENV_VARS},GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED=${GROWTH_EBOOK_EMAIL_D
 HIRING_LIFECYCLE_EMAILS_ENABLED="${HIRING_LIFECYCLE_EMAILS_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},HIRING_LIFECYCLE_EMAILS_ENABLED=${HIRING_LIFECYCLE_EMAILS_ENABLED}"
 
+# TASK-1762 — Cierre de vacante por capacidad: ejecución del run y su correo de «sin selección».
+# El reconciler y el consumer del correo corren SOLO acá (lane ops-reactive-notifications):
+# prenderlos en Vercel no hace absolutamente nada, y dejaría la UI prometiendo un cierre que
+# nunca se ejecuta.
+#
+# Default OFF los dos, y por razones distintas:
+#
+# - HIRING_OPENING_CAPACITY_CLOSURE_ENABLED gobierna que el reconciler ejecute el run. Con él en
+#   false se pueden configurar políticas y ver previews, pero nadie cambia de estado.
+# - HIRING_CAPACITY_FILLED_EMAIL_ENABLED gobierna SÓLO el correo. Es un segundo freno sobre el
+#   primero: un cierre manda N correos de golpe (las vacantes vivas tienen 36 y 14 personas), y
+#   un correo emitido no se retira. Poder cerrar sin notificar —para un canary— exige que los dos
+#   flags sean independientes.
+#
+# El kill-switch por tipo en `email_type_config` es la TERCERA capa y es la que permite pausar
+# este correo sin silenciar el de decisión individual (`hiring_decision_rejected`).
+#
+# Declarativo acá para que `--set-env-vars` (destructivo) NO los borre en cada redeploy.
+# Rollback (<5min): `gcloud run services update ops-worker --update-env-vars <FLAG>=false`.
+HIRING_OPENING_CAPACITY_CLOSURE_ENABLED="${HIRING_OPENING_CAPACITY_CLOSURE_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},HIRING_OPENING_CAPACITY_CLOSURE_ENABLED=${HIRING_OPENING_CAPACITY_CLOSURE_ENABLED}"
+HIRING_CAPACITY_FILLED_EMAIL_ENABLED="${HIRING_CAPACITY_FILLED_EMAIL_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},HIRING_CAPACITY_FILLED_EMAIL_ENABLED=${HIRING_CAPACITY_FILLED_EMAIL_ENABLED}"
+
 # TASK-1746 — Cutover de links de assessment al exchange fragment→sesión HttpOnly.
 # Este sender corre sólo en ops-worker. Default OFF hasta aplicar migración, verificar routes
 # live, confirmar Resend click_tracking=false por API/readback y completar smoke del href.
@@ -626,6 +650,16 @@ GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED="${GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABL
 GROWTH_AI_VISIBILITY_PROBES_ENABLED="${GROWTH_AI_VISIBILITY_PROBES_ENABLED:-${DEFAULT_GROWTH_PROBES_ENABLED}}"
 GROWTH_AI_VISIBILITY_AGENTIC_READINESS_ENABLED="${GROWTH_AI_VISIBILITY_AGENTIC_READINESS_ENABLED:-${DEFAULT_GROWTH_AGENTIC_READINESS_ENABLED}}"
 GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED="${GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED:-${DEFAULT_GROWTH_ENTITY_PROBES_ENABLED}}"
+# TASK-1778 — Endurecimiento de RED del probe fetcher (ISSUE-164): redirect containment por
+# salto (familia + subdominios descendientes del sujeto) + guarda DNS. ON desde el cutover
+# 2026-08-27 (worker ÚNICO compartido staging+prod: este default cubre el path async de ambos,
+# que es la cadena viva del intake público). Evidencia pre-flip: 7 dominios reales de cartera
+# en strict (6 ok; bancochile ya fallaba igual con la red vieja — Imperva, caso TASK-1281).
+# Rollback <5 min: default a false + `gcloud run services update --update-env-vars ...=false`
+# (los deploy.sh usan --set-env-vars destructivo: cambiar SIEMPRE ambos). El resto del
+# endurecimiento (stream cap + truncated + robots obedecido) NO lleva flag. DUAL-LOCATION:
+# también se lee en Vercel (staging env ON; prod se prende con el release que lleve el código).
+GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED="${GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED:-true}"
 GROWTH_AI_VISIBILITY_REGRADE_ENABLED="${GROWTH_AI_VISIBILITY_REGRADE_ENABLED:-${DEFAULT_GROWTH_REGRADE_ENABLED}}"
 GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE="${GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE:-5}"
 GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD="${GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD:-50}"
@@ -666,6 +700,7 @@ ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED=${GROWTH_AI_VISIBI
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_PROBES_ENABLED=${GROWTH_AI_VISIBILITY_PROBES_ENABLED}"
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_AGENTIC_READINESS_ENABLED=${GROWTH_AI_VISIBILITY_AGENTIC_READINESS_ENABLED}"
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED=${GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED=${GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED}"
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_REGRADE_ENABLED=${GROWTH_AI_VISIBILITY_REGRADE_ENABLED}"
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_ENABLED=${GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_ENABLED}"
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED=${GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED}"
@@ -749,6 +784,57 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_ENABLED=${GROWTH_SEO_ENABLED}"
 # Alcance efectivo: orgs con assignment vigente Y keywords en el set — hoy sólo Berel (~USD 0.016/mes).
 GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED="${GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED=${GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED}"
+
+# TASK-1775 — Foto de dominio mensual (DataForSEO Labs `domain_rank_overview` sobre el target
+# y sus competidores declarados).
+#
+# 🔴 **OFF por defecto.** Habilita una corrida que le PAGA AL PROVEEDOR por cada sujeto
+# (~USD 0.0121 por dominio: task setup 0.012 + 1 fila 0.00012). Nace apagado y sólo se
+# enciende tras el smoke real con UN sujeto + autorización del operador (TASK-1775 Slice 6).
+#
+# ⚠️ Lo lee SOLO el ops-worker (la captura vive acá; en Vercel es inerte). Declararlo acá y
+# no sólo con `gcloud run services update` es obligatorio — `--set-env-vars` es destructivo
+# y lo borraría en el próximo deploy, en silencio (CLAUDE.md §Feature Flag State Ledger).
+#
+# Es SUBORDINADO: con `GROWTH_SEO_ENABLED=false` la captura no corre aunque éste esté ON.
+# Rollback (<5 min): volver a `false` acá + `--update-env-vars` — deja de gastar de inmediato
+# y las filas capturadas quedan (la tabla es append-only).
+# **ON desde 2026-08-27** (autorización del operador; dry-run + corrida real + re-corrida a
+# USD 0 verificados el mismo día; scheduler despausado tras el smoke).
+GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED="${GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED=${GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED}"
+
+# TASK-1776 — Visibilidad de mercado por sujeto-página (`ranked_keywords` sobre el dominio del
+# target + competidores; primitives on-demand relevant_pages/subdomains).
+#
+# 🔴 **OFF por defecto.** Cada sujeto cuesta task setup + hasta `GROWTH_SEO_URL_VISIBILITY_ROW_LIMIT`
+# filas (default 100 → ~USD 0.024/sujeto). Nace apagado y sólo se enciende tras el smoke real
+# con los cuatro subject_kind + autorización del operador (TASK-1776 Slice 6).
+#
+# ⚠️ Lo lee SOLO el ops-worker (en Vercel es inerte). Declararlo acá es obligatorio —
+# `--set-env-vars` es destructivo y lo borraría en el próximo deploy, en silencio.
+# Es SUBORDINADO a `GROWTH_SEO_ENABLED`. Rollback (<5 min): `false` acá + `--update-env-vars`.
+# **ON desde 2026-08-27** (autorización del operador; dry-run + corrida real con los cuatro
+# subject_kind + enriquecimiento de mercado a costo 0 + re-corrida a USD 0 verificados;
+# scheduler despausado tras el smoke).
+GROWTH_SEO_URL_VISIBILITY_ENABLED="${GROWTH_SEO_URL_VISIBILITY_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},GROWTH_SEO_URL_VISIBILITY_ENABLED=${GROWTH_SEO_URL_VISIBILITY_ENABLED}"
+
+# TASK-1777 — Drill-down nominal del perfil de enlaces (paso post-batch del snapshot semanal
+# de TASK-1304; SIN scheduler nuevo — reusa `ops-seo-backlink-capture` 0 7 * * 1).
+#
+# 🔴 **OFF por defecto.** Habilita gasto CONDICIONAL: el pase sólo compra detalle donde el
+# predicado `shouldDrillDownBacklinks` ve movimiento (o primera vez); un target estable
+# registra `skipped_no_movement` a costo cero. Se enciende sólo tras el smoke real
+# (target con movimiento gasta ~USD 0.05-0.10; target estable gasta USD 0) + autorización.
+#
+# ⚠️ Lo lee SOLO el ops-worker. Declararlo acá es obligatorio (`--set-env-vars` destructivo).
+# Es SUBORDINADO a `GROWTH_SEO_ENABLED`. Rollback (<5 min): `false` + `--update-env-vars` —
+# el batch semanal vuelve a su comportamiento actual sin tocar el cron ni redeployar.
+# **ON desde 2026-08-27** (autorización del operador; smoke live verificado el mismo día:
+# drill-down sobre los snapshots del 2026-08-24 con first_time, re-corrida a USD 0).
+GROWTH_SEO_BACKLINK_DETAIL_ENABLED="${GROWTH_SEO_BACKLINK_DETAIL_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},GROWTH_SEO_BACKLINK_DETAIL_ENABLED=${GROWTH_SEO_BACKLINK_DETAIL_ENABLED}"
 
 # TASK-1664 — keyword discovery (DataForSEO Labs Live: seed expansion + enrichment).
 # 🔴 Prenderlo habilita corridas que GASTAN (cada request y cada fila cuestan) — pero SOLO
@@ -1337,6 +1423,41 @@ upsert_scheduler_job \
   '{}' \
   "false"
 echo "  -> ops-seo-keyword-market-data: 0 8 15 * * ACTIVO (captura mensual de mercado, TASK-1661 — despausado 2026-08-13 tras dry-run + corrida real verificada + autorización del operador)"
+
+# Foto de dominio — TASK-1775.
+#
+# ⚠️ MENSUAL: las bases Labs del proveedor se refrescan por ciclo (~mensual); un cron más
+# frecuente pagaría varias veces por el mismo número. Día 16 y no 15 a propósito: misma
+# frescura mid-month que documenta el proveedor, sin apilar gasto de proveedor en la misma
+# fecha que `ops-seo-keyword-market-data`.
+#
+# 🔴 NACE PAUSADO y además el flag `GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED` nace en `false`:
+# son DOS frenos independientes, porque esta corrida GASTA (patrón TASK-1661). Antes de
+# despausar: correr el dry-run (`{"dryRun": true}`), mirar el costo estimado y tener la
+# autorización del operador (TASK-1775 Slice 6).
+upsert_scheduler_job \
+  "ops-seo-domain-overview" \
+  "0 9 16 * *" \
+  "/seo/domain-overview/capture-batch" \
+  '{}' \
+  "false"
+echo "  -> ops-seo-domain-overview: 0 9 16 * * ACTIVO (foto de dominio mensual, TASK-1775 — despausado 2026-08-27 tras dry-run + corrida real + re-corrida USD 0 + autorización del operador)"
+
+# Visibilidad por sujeto-página — TASK-1776.
+#
+# ⚠️ MENSUAL (las bases Labs se refrescan por ciclo). Día 17 a propósito: no apilar gasto de
+# proveedor con keyword-market-data (día 15) ni con la foto de dominio (día 16).
+#
+# 🔴 NACE PAUSADO y el flag `GROWTH_SEO_URL_VISIBILITY_ENABLED` nace en `false`: dos frenos
+# independientes (patrón TASK-1661/1775). Antes de despausar: dry-run (`{"dryRun": true}`),
+# smoke real con los cuatro subject_kind y autorización del operador.
+upsert_scheduler_job \
+  "ops-seo-url-visibility" \
+  "0 9 17 * *" \
+  "/seo/url-visibility/capture-batch" \
+  '{}' \
+  "false"
+echo "  -> ops-seo-url-visibility: 0 9 17 * * ACTIVO (visibilidad por sujeto-página mensual, TASK-1776 — despausado 2026-08-27 tras smoke con los cuatro subject_kind + autorización del operador)"
 
 # TASK-1664 — drain de corridas de keyword discovery (Labs Live, bajo demanda del operador).
 # Cada 10 minutos alcanza de sobra: el enqueue es humano/agente (no hay cadencia diaria en V1)

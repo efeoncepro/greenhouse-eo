@@ -22,7 +22,8 @@ direcciones antes de leer una palabra** — **saboteando la tesis del texto**, q
 el dato que nos hace daño"*.
 
 🔴 **La condición de existencia (regla dura 11 de la task):** frente a veinte millones de páginas iguales,
-**nuestra única diferencia son dos gestos** — **abrir con el Niche Player de Gartner** y **declarar que nuestro
+**nuestra única diferencia son dos gestos** — **abrir con el Challenger de Gartner y su avance desde Niche
+Player en 2025** y **declarar que nuestro
 propio argumento del TCO se cae** si ya tienes un admin de Salesforce.
 🎯 **Es exactamente lo que alguien va a querer suavizar en la última revisión.**
 **Si se suaviza cualquiera de los dos, esta pieza es la 4.001 del montón — y entonces lo correcto es no publicarla.**
@@ -59,7 +60,7 @@ propio argumento del TCO se cae** si ya tienes un admin de Salesforce.
      Salesforce en la casa.**
 - **User moment:** 🎯 *"tengo dos vendedores diciéndome cosas opuestas y los dos tienen un PDF que lo prueba."*
   **Está buscando a alguien sin incentivo — y sabe que no lo va a encontrar.** Y entonces encuentra a un
-  **partner de HubSpot** que abre diciendo **que Gartner puso a HubSpot en Niche Players**.
+  **partner de HubSpot** que abre diciendo **que Gartner ubicó a HubSpot como Challenger, no Leader**.
 - **Job to be done:** **defender la decisión ante su directorio sin quedar expuesto.**
   🎯 **No está eligiendo un CRM: está protegiendo su carrera.** Todo el copy vive de esa lectura.
 - **Primary decision signal:** 🎯 **que traigamos el dato que juega en nuestra contra, primero y sin
@@ -72,8 +73,9 @@ propio argumento del TCO se cae** si ya tienes un admin de Salesforce.
 
 ## 🔴 Reglas duras del contenido
 
-1. 🔴 **Se abre con el dato que juega en nuestra contra.** **Niche Player** en el MQ de *SFA* 2025 ✅ (Leaders:
-   Salesforce, Microsoft, Oracle) — **y el contexto: Leader en el MQ de B2B Marketing Automation, 5.º año** ✅.
+1. 🔴 **Se abre con el dato que juega en nuestra contra.** **Challenger** en el MQ de *CRM Sales Platforms*
+   2026 ✅, después de Niche Player en 2025 (Salesforce y Microsoft son Leaders) — **y el contexto: Leader en
+   el MQ de B2B Marketing Automation 2025, 5.º año** ✅.
    **Son dos reportes distintos, y se dice.** 🔴 **NUNCA *"Líder en CRM según Gartner"*.**
 2. 🔴 **NUNCA el Forrester Wave 2026** — **no es verificable** (la landing de HubSpot que lo promociona cita, al
    abrirla, el Wave de **Q3 2024**).
@@ -94,7 +96,8 @@ propio argumento del TCO se cae** si ya tienes un admin de Salesforce.
 
 ### 🔴 Reglas duras de forma *(absorbidas del flow y el motion, que ya no existen como docs)*
 
-11. 🔴 **La condición de existencia:** los **dos gestos** — abrir con el **Niche Player** y declarar que **el
+11. 🔴 **La condición de existencia:** los **dos gestos** — abrir con el **Challenger** y su avance desde Niche
+    Player en 2025, y declarar que **el
     propio TCO se cae** con un admin de Salesforce — **son la pieza**. 🎯 **Si se ablandan, esto es la 4.001 de
     veinte millones, y lo correcto es no publicarlo.**
 12. 🔴 **El TCO es una tabla, no un gráfico. Cero barras que crecen, cero charts, cero contadores.**
@@ -119,7 +122,7 @@ propio argumento del TCO se cae** si ya tienes un admin de Salesforce.
 |---|---|---|---|---|
 | **0** | **Cabecera del post** | Título · 🔴 **byline con credencial** · **fecha de publicación + de revisión** · categoría `hubspot` | Tema del blog | 🎯 **El byline es parte del argumento** |
 | **1** | **Hero — la promesa** | 🎯 H1 = *"HubSpot o Salesforce: la comparación que ninguno de los dos te va a dar."* Sub: *"Somos partner de HubSpot. **Y vamos a empezar por lo que juega en nuestra contra.**"* + **`as-of`** | `modern-ui` editorial header. **Sin logos** | SPEC § 5 |
-| **2** | 🎯 **LA VERDAD INCÓMODA, PRIMERO** *(SIGNATURE)* | **La región que compra toda la credibilidad de la página.** *"**Gartner puso a HubSpot en Niche Players** del Magic Quadrant de Sales Force Automation 2025. Los Leaders son **Salesforce, Microsoft y Oracle**. Si tu comité compra por Magic Quadrant, **empieza por saber esto**."* Y el contexto: *"HubSpot **sí es Leader** del Magic Quadrant de **B2B Marketing Automation**, quinto año consecutivo. **Son dos reportes distintos — y la mitad de los partners los mezcla a propósito.**"* | Truth band, texto servido | ✅ verificado |
+| **2** | 🎯 **LA VERDAD INCÓMODA, PRIMERO** *(SIGNATURE)* | **La región que compra toda la credibilidad de la página.** *"**Gartner ubicó a HubSpot como Challenger** del Magic Quadrant de CRM Sales Platforms 2026, después de avanzar desde Niche Player en 2025. Salesforce y Microsoft son Leaders. Si tu comité compra por Magic Quadrant, **empieza por saber esto**."* Y el contexto: *"HubSpot **sí es Leader** del Magic Quadrant de **B2B Marketing Automation 2025**, quinto año consecutivo. **Son dos reportes distintos — y la mitad de los partners los mezcla a propósito.**"* | Truth band, texto servido | ✅ verificado al 2026-08-27 |
 | **3** | 🎯 **EL TCO A 3 AÑOS — con sus supuestos Y su límite** | `<table>`: HubSpot ≈ **USD 295k** · Salesforce ≈ **USD 611k**. **Supuestos declarados arriba** (30 usuarios · lista sin descuento · 3 años · qué incluye). 🔴 **Y en la misma región, sin suavizar:** *"el delta **no lo hace la licencia** — USD 162k vs 189k es **solo 17%**. **Lo hace el admin.** Si ya tienes un admin de Salesforce en planilla, **la mitad de este argumento se te cae.**"* | 🎯 **Tabla + la frase del admin, DENTRO de la región** | `templates/tco-3y.md` |
 | **4** | 🔴 **Dónde gana Salesforce** *(obligatoria)* | **Sin adornos, sin ironía, sin "pero".** CPQ complejo · territorios · forecasting multinivel · extensibilidad (Apex, AppExchange) · modelos de datos B2B muy complejos. 🎯 *"Si tu caso está acá, Salesforce es la respuesta correcta. Te lo decimos aunque vendamos lo otro."* | Balance band | Regla dura 7 |
 | **5** | **Dónde gana HubSpot** | Costo de administración · **adopción** (⚠️ *el 38% de los fracasos de CRM son de adopción, no de tecnología*) · time-to-value · **marketing como ciudadano de primera** (y acá **sí** es Leader) | Balance band | `modules/05` |
@@ -151,10 +154,10 @@ propio argumento del TCO se cae** si ya tienes un admin de Salesforce.
 |---|---|---|---|
 | `hs.vs.h1` | 1 | **"HubSpot o Salesforce: la comparación que ninguno de los dos te va a dar."** | 🎯 La promesa es **la fuente**, no el veredicto |
 | `hs.vs.sub` | 1 | "Somos **HubSpot Solutions Partner**. **Y vamos a empezar por lo que juega en nuestra contra.**" | 🎯 **La frase que compra la página entera** |
-| `hs.vs.asof` | 1 | "Datos verificados el **{FECHA}** en las páginas oficiales de HubSpot y Salesforce, y en el Magic Quadrant 2025. Los precios de lista cambian: **confírmalos antes de decidir.**" | 🔴 Visible. **Es la defensa legal y la credibilidad, a la vez** |
+| `hs.vs.asof` | 1 | "Datos verificados el **{FECHA}** en las páginas oficiales de HubSpot y Salesforce, y en los Magic Quadrant citados con mercado y año. Los precios de lista cambian: **confírmalos antes de decidir.**" | 🔴 Visible. **Es la defensa legal y la credibilidad, a la vez** |
 | 🎯 `hs.vs.gartner.title` | **2** | **"Empecemos por lo que nos juega en contra."** | 🎯 **El título más valioso del hub** |
-| 🎯 `hs.vs.gartner.body` | **2** | "**Gartner puso a HubSpot en el cuadrante de *Niche Players*** del Magic Quadrant de **Sales Force Automation 2025**. Los *Leaders* son **Salesforce, Microsoft y Oracle**. Si tu comité decide por Magic Quadrant, **empieza por saber esto — porque el vendedor de Salesforce va a llegar con ese gráfico impreso, y va a tener razón.**" | ✅ verificado. 🔴 **Sin peros. Sin suavizar. Sin "pero en realidad…"** |
-| 🎯 `hs.vs.gartner.contexto` | **2** | "**Y ahora el contexto, que también es cierto:** HubSpot **sí es Leader** del Magic Quadrant de **B2B Marketing Automation**, por **quinto año consecutivo**. **Son dos reportes distintos, sobre dos cosas distintas.** La mitad de los partners de HubSpot los mezcla y dice *'líder según Gartner'*. **Eso es falso, y se verifica en dos minutos.**" | ✅ verificado. 🎯 **Denunciar el truco de nuestros propios colegas es lo que nos separa de ellos** |
+| 🎯 `hs.vs.gartner.body` | **2** | "**Gartner ubicó a HubSpot como *Challenger*** del Magic Quadrant de **CRM Sales Platforms 2026**, después de avanzar desde Niche Player en 2025. Los *Leaders* son **Salesforce y Microsoft**. Si tu comité decide por Magic Quadrant, **empieza por saber esto — porque el vendedor de Salesforce va a llegar con ese gráfico impreso, y va a tener razón en esa categoría.**" | ✅ verificado al 2026-08-27. 🔴 **Sin peros. Sin suavizar. Sin "pero en realidad…"** |
+| 🎯 `hs.vs.gartner.contexto` | **2** | "**Y ahora el contexto, que también es cierto:** HubSpot **sí es Leader** del Magic Quadrant de **B2B Marketing Automation 2025**, por **quinto año consecutivo**. **Son dos reportes distintos, sobre dos cosas distintas.** La mitad de los partners de HubSpot los mezcla y dice *'líder según Gartner'*. **Eso es falso, y se verifica en dos minutos.**" | ✅ verificado. 🎯 **Denunciar el truco de nuestros propios colegas es lo que nos separa de ellos** |
 | 🎯 `hs.vs.tco.title` | **3** | **"El costo real a tres años."** | Sin adjetivos |
 | 🔴 `hs.vs.tco.supuestos` | **3** | "**Supuestos, declarados:** 30 usuarios · precio de **lista, sin descuento** · **3 años** · incluye licencias, onboarding y el costo del administrador · **no incluye** integraciones custom ni migración de datos. **Cambia un supuesto y cambia el número. Por eso te lo mostramos completo.**" | 🔴 **Arriba de la tabla, no debajo** |
 | 🎯 `hs.vs.tco.limite` | **3** | "**Y ahora la parte que ningún partner te va a decir:** el delta **no lo hace la licencia**. HubSpot ≈ **USD 162k**, Salesforce ≈ **USD 189k** — **solo 17% de diferencia**. **Lo que hace la diferencia es el administrador.** Salesforce necesita uno dedicado; HubSpot, en general, no. 🔴 **Si ya tienes un admin de Salesforce en planilla, la mitad de este argumento se te cae.** Y preferimos decírtelo nosotros a que lo descubras tú en la última reunión." | 🎯 **La frase más importante de la página.** 🔴 **En la misma región. Sin suavizar. Sin nota al pie** |
@@ -278,7 +281,8 @@ Cero form.**
 
 ## Acceptance Checklist
 
-- [ ] 🎯 **Abre con la verdad incómoda** (Niche Player en SFA) **y su contexto** (Leader en B2B MA, 5.º año),
+- [ ] 🎯 **Abre con la verdad incómoda** (Challenger en CRM Sales Platforms 2026, después de Niche Player en
+      2025) **y su contexto** (Leader en B2B MA 2025, 5.º año),
       dicho que **son reportes distintos**.
 - [ ] 🔴 **`"Líder en CRM"` y `Forrester` no existen en el DOM.** **`Pardot` no aparece con "muerto/obsoleto".**
 - [ ] 🎯 **El TCO tiene sus supuestos declarados arriba** (y en el `<caption>` de la tabla).

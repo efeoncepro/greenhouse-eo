@@ -7435,6 +7435,49 @@ export interface GreenhouseGrowthSearchConsoleOauthStates {
   state_id: Generated<string>;
 }
 
+export interface GreenhouseGrowthSeoBacklinkAnchors {
+  anchor: string;
+  anchor_text_hash: string;
+  backlink_anchor_id: Generated<string>;
+  backlink_snapshot_id: string;
+  backlink_spam_score: Numeric | null;
+  backlinks: Int8 | null;
+  created_at: Generated<Timestamp>;
+  first_seen: Timestamp | null;
+  rank: Numeric | null;
+  referring_domains: number | null;
+}
+
+export interface GreenhouseGrowthSeoBacklinkDrilldowns {
+  anchor_rows: Generated<number>;
+  backlink_drilldown_id: Generated<string>;
+  backlink_snapshot_id: string;
+  created_at: Generated<Timestamp>;
+  error_code: string | null;
+  outcome: string;
+  provider_cost: Generated<Numeric>;
+  referring_domain_rows: Generated<number>;
+  trigger_reason: string;
+}
+
+export interface GreenhouseGrowthSeoBacklinkReferringDomains {
+  backlink_ref_domain_id: Generated<string>;
+  backlink_snapshot_id: string;
+  backlink_spam_score: Numeric | null;
+  backlinks_to_target: Int8 | null;
+  created_at: Generated<Timestamp>;
+  first_seen: Timestamp | null;
+  lost_date: Timestamp | null;
+  movement: string;
+  normalized_referring_domain: string;
+  rank: Numeric | null;
+  referring_domain: string;
+  sample_anchor: string | null;
+  sample_dofollow: boolean | null;
+  sample_url_from: string | null;
+  sample_url_to: string | null;
+}
+
 export interface GreenhouseGrowthSeoBacklinkSnapshots {
   backlink_snapshot_id: Generated<string>;
   backlinks_total: Int8 | null;
@@ -7455,6 +7498,42 @@ export interface GreenhouseGrowthSeoCompetitors {
   effective_to: Timestamp | null;
   seo_competitor_id: Generated<string>;
   seo_target_id: string;
+}
+
+export interface GreenhouseGrowthSeoDomainOverviewSnapshots {
+  capture_date: Timestamp;
+  captured_at: Generated<Timestamp>;
+  captured_by_organization_id: string;
+  created_at: Generated<Timestamp>;
+  domain: string;
+  domain_overview_id: Generated<string>;
+  language_code: string;
+  location_code: string;
+  normalized_domain: string;
+  organic_count: number | null;
+  organic_estimated_paid_traffic_cost: Numeric | null;
+  organic_etv: Numeric | null;
+  organic_is_down: number | null;
+  organic_is_lost: number | null;
+  organic_is_new: number | null;
+  organic_is_up: number | null;
+  organic_pos_1: number | null;
+  organic_pos_11_20: number | null;
+  organic_pos_2_3: number | null;
+  organic_pos_21_30: number | null;
+  organic_pos_31_40: number | null;
+  organic_pos_4_10: number | null;
+  organic_pos_41_50: number | null;
+  organic_pos_51_60: number | null;
+  organic_pos_61_70: number | null;
+  organic_pos_71_80: number | null;
+  organic_pos_81_90: number | null;
+  organic_pos_91_100: number | null;
+  paid_count: number | null;
+  paid_estimated_paid_traffic_cost: Numeric | null;
+  paid_etv: Numeric | null;
+  provider_cost: Generated<Numeric>;
+  source_endpoint: string;
 }
 
 export interface GreenhouseGrowthSeoGscDaily {
@@ -7589,6 +7668,36 @@ export interface GreenhouseGrowthSeoKeywordSets {
   seo_target_id: string;
 }
 
+export interface GreenhouseGrowthSeoProspectDiagnosticFacts {
+  captured_at: Timestamp;
+  created_at: Generated<Timestamp>;
+  detail_json: Generated<Json>;
+  diagnostic_id: string;
+  fact_id: Generated<string>;
+  kind: string;
+  lens: Generated<string>;
+  magnitude: Numeric | null;
+  source: string;
+}
+
+export interface GreenhouseGrowthSeoProspectDiagnostics {
+  competitor_domains: Generated<string[]>;
+  completed_at: Timestamp | null;
+  cost_ceiling_usd: Numeric;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  diagnostic_id: Generated<string>;
+  failure_reason: string | null;
+  forecast_cost_usd: Numeric;
+  language_code: string;
+  location_code: number;
+  market: string;
+  provider_cost_usd: Numeric | null;
+  root_domain: string;
+  run_date: Generated<Timestamp>;
+  status: Generated<string>;
+}
+
 export interface GreenhouseGrowthSeoProviderSpendDaily {
   call_count: Generated<number>;
   created_at: Generated<Timestamp>;
@@ -7651,6 +7760,44 @@ export interface GreenhouseGrowthSeoTargets {
   seo_target_id: Generated<string>;
   status: Generated<string>;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthSeoUrlVisibilitySnapshots {
+  capture_date: Timestamp;
+  captured_at: Generated<Timestamp>;
+  captured_by_organization_id: string;
+  created_at: Generated<Timestamp>;
+  language_code: string;
+  location_code: string;
+  normalized_subject: string;
+  organic_count: number | null;
+  organic_estimated_paid_traffic_cost: Numeric | null;
+  organic_etv: Numeric | null;
+  organic_is_down: number | null;
+  organic_is_lost: number | null;
+  organic_is_new: number | null;
+  organic_is_up: number | null;
+  organic_pos_1: number | null;
+  organic_pos_11_20: number | null;
+  organic_pos_2_3: number | null;
+  organic_pos_21_30: number | null;
+  organic_pos_31_40: number | null;
+  organic_pos_4_10: number | null;
+  organic_pos_41_50: number | null;
+  organic_pos_51_60: number | null;
+  organic_pos_61_70: number | null;
+  organic_pos_71_80: number | null;
+  organic_pos_81_90: number | null;
+  organic_pos_91_100: number | null;
+  paid_count: number | null;
+  paid_etv: Numeric | null;
+  provider_cost: Generated<Numeric>;
+  raw_subject: string;
+  source_endpoint: string;
+  subject_kind: string;
+  top_keywords: Json | null;
+  total_ranked_keywords: number | null;
+  url_visibility_id: Generated<string>;
 }
 
 export interface GreenhouseHiringAssessmentFairness {
@@ -8010,7 +8157,7 @@ export interface GreenhouseHiringHiringAssessmentAssignment {
   policy_id: string;
   policy_version: number;
   /**
-   * TASK-1719: libera la llave de idempotencia (application, policy, versión, etapa, intento). LO ESCRIBE el path de CANCELACIÓN (`supersedeAssignmentsForAssessment`, en la misma transacción que cancela la instancia), que además fija outcome=cancelled + outcome_reason=operator_cancelled. Cancelar libera DOS llaves: el índice de instancia abierta (estructural, `cancelled` está fuera de su predicado) y ésta (write explícito). El retry gobernado de un terminal-pero-recuperable (`held`/`blocked`/`stale`) por reconciliación sigue SIN write path: ese caso lo resuelve un command humano.
+   * TASK-1771: liberación gobernada de la clave de idempotencia. Lo escribe `supersedeAssignmentDeadEnd` (carril automático, resultado recuperable, capability hiring.assessment.policy.govern, tope de 3 por clave y condición de que la asignación HOY ocurriría) y `supersedeAssignmentsForAssessment` (cancelación de la instancia). El primero CONSERVA `outcome` y `outcome_reason` —son la explicación del bloqueo—; el segundo los reescribe a cancelled porque ahí el hecho sí cambió. NUNCA se recupera borrando filas: el ledger es append-only.
    */
   superseded_at: Timestamp | null;
   trigger_stage: string;
@@ -8293,6 +8440,65 @@ export interface GreenhouseHiringHiringOpeningAssessmentPolicyEvent {
   policy_version: number;
   reason_code: string | null;
   to_state: string;
+}
+
+export interface GreenhouseHiringHiringOpeningCapacity {
+  created_at: Generated<Timestamp>;
+  managed_since: Generated<Timestamp>;
+  opening_id: string;
+  policy_version: Generated<number>;
+  reason: string;
+  /**
+   * TASK-1762: retiro del opt-in. La fila NO se borra (es evidencia de una decisión humana); una fila retirada deja la vacante unmanaged otra vez.
+   */
+  retired_at: Timestamp | null;
+  retired_by_user_id: string | null;
+  retired_reason: string | null;
+  set_by_user_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseHiringHiringOpeningCapacityEvent {
+  actor_user_id: string;
+  event_id: Generated<string>;
+  event_type: string;
+  new_seats: number | null;
+  occurred_at: Generated<Timestamp>;
+  opening_id: string;
+  previous_seats: number | null;
+  reason: string;
+}
+
+export interface GreenhouseHiringHiringOpeningClosureRun {
+  cohort_size: number;
+  completed_at: Timestamp | null;
+  confirmed_by_user_id: string;
+  created_at: Generated<Timestamp>;
+  /**
+   * TASK-1762: huella de la cohorte exacta que el humano aprobo. Un preview vencido no puede confirmar.
+   */
+  effect_digest: string;
+  idempotency_key: string;
+  included_backup: Generated<boolean>;
+  included_paused: Generated<boolean>;
+  occupied_seats: number;
+  opening_id: string;
+  run_id: Generated<string>;
+  started_at: Timestamp | null;
+  state: Generated<string>;
+  target_seats: number;
+}
+
+export interface GreenhouseHiringHiringOpeningClosureRunItem {
+  application_id: string;
+  attempts: Generated<number>;
+  cohort_category: string;
+  decided_at: Timestamp | null;
+  item_id: Generated<string>;
+  last_error_code: string | null;
+  run_id: string;
+  state: Generated<string>;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseHiringHiringQuestion {
@@ -12775,8 +12981,12 @@ export interface DB {
   "greenhouse_growth.provider_observations": GreenhouseGrowthProviderObservations;
   "greenhouse_growth.search_console_connections": GreenhouseGrowthSearchConsoleConnections;
   "greenhouse_growth.search_console_oauth_states": GreenhouseGrowthSearchConsoleOauthStates;
+  "greenhouse_growth.seo_backlink_anchors": GreenhouseGrowthSeoBacklinkAnchors;
+  "greenhouse_growth.seo_backlink_drilldowns": GreenhouseGrowthSeoBacklinkDrilldowns;
+  "greenhouse_growth.seo_backlink_referring_domains": GreenhouseGrowthSeoBacklinkReferringDomains;
   "greenhouse_growth.seo_backlink_snapshots": GreenhouseGrowthSeoBacklinkSnapshots;
   "greenhouse_growth.seo_competitors": GreenhouseGrowthSeoCompetitors;
+  "greenhouse_growth.seo_domain_overview_snapshots": GreenhouseGrowthSeoDomainOverviewSnapshots;
   "greenhouse_growth.seo_gsc_daily": GreenhouseGrowthSeoGscDaily;
   "greenhouse_growth.seo_keyword_discovery_actions": GreenhouseGrowthSeoKeywordDiscoveryActions;
   "greenhouse_growth.seo_keyword_discovery_candidates": GreenhouseGrowthSeoKeywordDiscoveryCandidates;
@@ -12784,11 +12994,14 @@ export interface DB {
   "greenhouse_growth.seo_keyword_market_data": GreenhouseGrowthSeoKeywordMarketData;
   "greenhouse_growth.seo_keyword_set_members": GreenhouseGrowthSeoKeywordSetMembers;
   "greenhouse_growth.seo_keyword_sets": GreenhouseGrowthSeoKeywordSets;
+  "greenhouse_growth.seo_prospect_diagnostic_facts": GreenhouseGrowthSeoProspectDiagnosticFacts;
+  "greenhouse_growth.seo_prospect_diagnostics": GreenhouseGrowthSeoProspectDiagnostics;
   "greenhouse_growth.seo_provider_spend_daily": GreenhouseGrowthSeoProviderSpendDaily;
   "greenhouse_growth.seo_rank_snapshots": GreenhouseGrowthSeoRankSnapshots;
   "greenhouse_growth.seo_site_audit_findings": GreenhouseGrowthSeoSiteAuditFindings;
   "greenhouse_growth.seo_site_audit_runs": GreenhouseGrowthSeoSiteAuditRuns;
   "greenhouse_growth.seo_targets": GreenhouseGrowthSeoTargets;
+  "greenhouse_growth.seo_url_visibility_snapshots": GreenhouseGrowthSeoUrlVisibilitySnapshots;
   "greenhouse_hiring.assessment_fairness": GreenhouseHiringAssessmentFairness;
   "greenhouse_hiring.candidate_document_review_projection": GreenhouseHiringCandidateDocumentReviewProjection;
   "greenhouse_hiring.candidate_facet": GreenhouseHiringCandidateFacet;
@@ -12824,6 +13037,10 @@ export interface DB {
   "greenhouse_hiring.hiring_opening": GreenhouseHiringHiringOpening;
   "greenhouse_hiring.hiring_opening_assessment_policy": GreenhouseHiringHiringOpeningAssessmentPolicy;
   "greenhouse_hiring.hiring_opening_assessment_policy_event": GreenhouseHiringHiringOpeningAssessmentPolicyEvent;
+  "greenhouse_hiring.hiring_opening_capacity": GreenhouseHiringHiringOpeningCapacity;
+  "greenhouse_hiring.hiring_opening_capacity_event": GreenhouseHiringHiringOpeningCapacityEvent;
+  "greenhouse_hiring.hiring_opening_closure_run": GreenhouseHiringHiringOpeningClosureRun;
+  "greenhouse_hiring.hiring_opening_closure_run_item": GreenhouseHiringHiringOpeningClosureRunItem;
   "greenhouse_hiring.hiring_question": GreenhouseHiringHiringQuestion;
   "greenhouse_hiring.talent_demand": GreenhouseHiringTalentDemand;
   "greenhouse_hiring.talent_pool_access_audit": GreenhouseHiringTalentPoolAccessAudit;

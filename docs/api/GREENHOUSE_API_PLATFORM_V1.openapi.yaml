@@ -342,6 +342,98 @@ components:
             projectedAt: { type: [string, 'null'], format: date-time }
             extractionVersion: { type: [string, 'null'] }
             redactionPolicyVersion: { type: [string, 'null'] }
+    HiringApplicationOutcome:
+      type: object
+      additionalProperties: false
+      required: [applicationId, openingId, stage, decision, decisionCause, decidedAt, decidedBy, archivedAt, closed]
+      description: >
+        TASK-1773. Outcome projection of one application, without candidate PII. `archivedAt` is a
+        third, orthogonal axis: archiving never declares an outcome.
+      properties:
+        applicationId: { type: string }
+        openingId: { type: string }
+        stage: { type: string }
+        decision:
+          type: [string, 'null']
+          enum: [selected, backup_selected, not_selected, rejected, withdrawn, unresponsive, null]
+        decisionCause:
+          type: [string, 'null']
+          enum: [capacity_filled, opening_closed, process_cancelled, null]
+          description: Governed enum, never free text. Non-null only when `decision` is `not_selected`.
+        decidedAt: { type: [string, 'null'], format: date-time }
+        decidedBy: { type: [string, 'null'] }
+        archivedAt: { type: [string, 'null'], format: date-time }
+        closed:
+          type: boolean
+          description: '`stage === ''closed''`, which the database guarantees to be equivalent to a declared outcome.'
+    HiringDecisionProposeCommand:
+      type: object
+      additionalProperties: false
+      required: [decision]
+      properties:
+        decision:
+          type: string
+          enum: [selected, backup_selected, not_selected, rejected, withdrawn, unresponsive]
+        cause:
+          type: [string, 'null']
+          enum: [capacity_filled, opening_closed, process_cancelled, null]
+    HiringDecisionProposal:
+      type: object
+      additionalProperties: false
+      required: [applicationId, effectDigest, current, proposed, alreadyClosed]
+      properties:
+        applicationId: { type: string }
+        effectDigest:
+          type: string
+          pattern: '^hdp-[a-f0-9]{24}$'
+          description: >
+            Fingerprint of the current state plus the proposed effect. Not persisted anywhere;
+            `confirm` recomputes it and rejects the write when it no longer matches.
+        current: { $ref: '#/components/schemas/HiringApplicationOutcome' }
+        proposed:
+          type: object
+          additionalProperties: false
+          required: [decision, cause]
+          properties:
+            decision: { type: string }
+            cause: { type: [string, 'null'] }
+        alreadyClosed:
+          type: boolean
+          description: >
+            `true` when the application already has an outcome, so confirming re-decides it instead
+            of closing it for the first time. The Nexa action refuses this case; this lane does not.
+    HiringDecisionConfirmCommand:
+      type: object
+      additionalProperties: false
+      required: [decision, effectDigest, reasonSummary]
+      properties:
+        decision:
+          type: string
+          enum: [selected, backup_selected, not_selected, rejected, withdrawn, unresponsive]
+        cause:
+          type: [string, 'null']
+          enum: [capacity_filled, opening_closed, process_cancelled, null]
+        effectDigest: { type: string, pattern: '^hdp-[a-f0-9]{24}$' }
+        reasonSummary:
+          type: string
+          minLength: 8
+          maxLength: 1600
+          description: Human, defensible reason. The canonical command rejects anything shorter than 8 characters.
+        idempotencyKey:
+          type: string
+          minLength: 1
+          maxLength: 160
+          description: Fallback when the `Idempotency-Key` header is absent. One of the two is mandatory.
+    HiringDecisionResult:
+      type: object
+      required: [application, decisionEntry, idempotentReplay]
+      description: >
+        Canonical command result. `application` is the full `HiringApplication` aggregate — not the
+        PII-minimized outcome projection — and `decisionEntry` is the append-only history entry.
+      properties:
+        application: { type: object }
+        decisionEntry: { type: object }
+        idempotentReplay: { type: boolean }
     PlatformHealthV1:
       type: object
       required:
@@ -1032,6 +1124,114 @@ paths:
           content: { application/json: { schema: { allOf: [{ $ref: '#/components/schemas/PlatformEnvelope' }, { type: object, properties: { data: { $ref: '#/components/schemas/CandidateReviewPacket' } } }] } } }
         '409': { description: Content hash changed; restart packet read }
         '503': { description: Candidate review reader disabled }
+  /api/platform/app/hiring/applications/{applicationId}/outcome:
+    get:
+      summary: Read the three outcome axes of one application
+      description: |
+        TASK-1773. Projects the three axes of a single application: `stage` (where the person is),
+        the declared outcome plus its governed cause, and the orthogonal `archivedAt` — archiving
+        never declares an outcome. `closed` mirrors `stage === 'closed'`, which the database
+        guarantees to be equivalent to having a declared outcome. The projection carries no
+        candidate PII.
+
+        Requires an `efeonce_internal` tenant plus `hiring.application.decide` with action `read`.
+        A delegated `sister_platform_oauth` bearer may read it. There is no feature flag on this
+        route.
+
+        Status: code-complete on `develop` and not deployed; no runtime evidence yet.
+      security: [{ appBearer: [] }]
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - { in: path, name: applicationId, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Application outcome projection
+          content: { application/json: { schema: { allOf: [{ $ref: '#/components/schemas/PlatformEnvelope' }, { type: object, properties: { data: { $ref: '#/components/schemas/HiringApplicationOutcome' } } }] } } }
+        '400': { description: Empty application id }
+        '401': { description: Missing or invalid session/bearer }
+        '403': { description: Non-internal tenant, or `hiring.application.decide` read denied }
+        '404': { description: Application not found }
+        '429': { description: Rate limit exceeded }
+  /api/platform/app/hiring/applications/{applicationId}/decision/propose:
+    post:
+      summary: Propose an outcome without mutating the application
+      description: |
+        TASK-1773. Reads the application and returns its current outcome, the proposed
+        `decision`/`cause` pair and an `effectDigest` — a fingerprint of the CURRENT state plus the
+        proposed effect. It never writes.
+
+        The proposal is deliberately ephemeral. Unlike a Talent Pool invitation (which persists in
+        `talent_pool_invitation` because an invitation is an entity with its own lifecycle), a
+        decision proposal is not an entity: nothing is stored, and the task ships with
+        `Migration: none`. The digest is what `confirm` recomputes to detect that the world moved.
+
+        The decision/cause pairing is NOT validated here — that validation lives in the canonical
+        command and therefore surfaces on `confirm`.
+
+        Requires an `efeonce_internal` tenant plus `hiring.application.decide` with action
+        `execute`. A delegated `sister_platform_oauth` bearer MAY propose.
+
+        Status: code-complete on `develop` and not deployed; no runtime evidence yet.
+      security: [{ appBearer: [] }]
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - { in: path, name: applicationId, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/HiringDecisionProposeCommand' } } }
+      responses:
+        '200':
+          description: Proposal computed; nothing was written
+          content: { application/json: { schema: { allOf: [{ $ref: '#/components/schemas/PlatformEnvelope' }, { type: object, properties: { data: { $ref: '#/components/schemas/HiringDecisionProposal' } } }] } } }
+        '400': { description: Empty application id }
+        '401': { description: Missing or invalid session/bearer }
+        '403': { description: Non-internal tenant, or `hiring.application.decide` execute denied }
+        '404': { description: Application not found }
+        '429': { description: Rate limit exceeded }
+  /api/platform/app/hiring/applications/{applicationId}/decision/confirm:
+    post:
+      summary: Confirm a proposed outcome through the canonical command
+      description: |
+        TASK-1773. Recomputes the `effectDigest` against the state of NOW; when it matches, it
+        delegates to `decideHiringApplication` — the same command the portal uses. Every decision
+        rule (cause required on `not_selected` and forbidden on the other five outcomes,
+        destination, idempotent replay, append-only history, `FOR UPDATE`) stays in that command;
+        this lane adds none.
+
+        FAIL-CLOSED for delegated agents: a `sister_platform_oauth` bearer may read and propose but
+        NEVER confirm. `efeonce.mcp.hiring.write` does not exist in code and remains blocked until
+        the revocable grant of TASK-1631, so confirming requires a human session
+        (`cookie_session` or `first_party_app`).
+
+        An idempotency key is mandatory: send the `Idempotency-Key` header or `idempotencyKey` in
+        the body (up to 160 characters). The canonical command rejects an empty one.
+
+        Known boundary of this adapter: it forwards only `decision`, `cause`, `reasonSummary` and
+        the idempotency key, and `selectedDestination`, which the command requires for `selected` and
+        `backup_selected`.
+
+
+        Status: code-complete on `develop` and not deployed; no runtime evidence yet.
+      security: [{ appBearer: [] }]
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - { in: path, name: applicationId, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/HiringDecisionConfirmCommand' } } }
+      responses:
+        '200':
+          description: Outcome declared, or idempotently replayed
+          content: { application/json: { schema: { allOf: [{ $ref: '#/components/schemas/PlatformEnvelope' }, { type: object, properties: { data: { $ref: '#/components/schemas/HiringDecisionResult' } } }] } } }
+        '400': { description: '`bad_request` — missing/oversized idempotency key, reason summary under 8 characters, invalid decision or cause, or missing destination for `selected`/`backup_selected`' }
+        '401': { description: Missing or invalid session/bearer }
+        '403': { description: '`forbidden` — non-internal tenant, execute capability denied, or a delegated agent attempting to confirm' }
+        '404': { description: Application not found }
+        '409': { description: '`hiring_decision_proposal_stale` — the digest no longer matches, so someone decided, archived or moved the application in between. The adapter maps every domain 409 to this code, which also covers reusing an idempotency key with a different payload and selecting against a closed/cancelled opening' }
+        '422': { description: 'Cause pairing violated (required on `not_selected`, forbidden otherwise). Emitted with error code `bad_request`' }
+        '429': { description: Rate limit exceeded }
   /api/platform/app/sessions/current:
     delete:
       summary: Revoke the current first-party app session

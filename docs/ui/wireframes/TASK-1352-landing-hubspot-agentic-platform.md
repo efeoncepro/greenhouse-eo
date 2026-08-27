@@ -40,8 +40,9 @@
 
 1. **Vende la plataforma completa** — Smart CRM + los 6 Hubs + Breeze. **NUNCA se estrecha a un Hub.**
    Una página que orbita AEO **es una landing de AEO con logo de HubSpot**.
-2. **Ningún claim que HubSpot no haga:** ❌ *"Líder en CRM según Gartner"* (es **Niche Player** en el MQ de
-   *Sales Force Automation*) · ❌ Forrester Wave · ❌ **ISO 27001** (HubSpot no la reclama; solo su infra AWS) ·
+2. **Ningún claim que HubSpot no haga:** ❌ *"Líder en CRM según Gartner"* (es **Challenger** en el MQ de
+   *CRM Sales Platforms* 2026; avanzó desde Niche Player en 2025) · ❌ Forrester Wave · ❌ **ISO 27001**
+   (HubSpot no la reclama; solo su infra AWS) ·
    ❌ residencia de datos en LATAM · ❌ *"flota de agentes de IA"* (**solo 3 Breeze Agents en GA**).
    ✅ Sí: **"Leader en B2B Marketing Automation (Gartner, 5.º año)"** · **SOC 2 Type II + SOC 3**.
 3. **"HubSpot Solutions Partner Gold"** ✅ es cierto — 🔴 **revisar el 2027-01-15** (si baja de tier, sale).

@@ -1,0 +1,23 @@
+{
+  "//": "Plantilla FAQPage — alta sinergia AEO: cada Q&A es un chunk autocontenido y citable. Las respuestas deben existir VISIBLES en la página (marcar contenido oculto = violación). Nota: Google restringió el rich result de FAQ (2023) a sitios gov/health; marca igual por la capa de entidad/IA, pero no prometas el snippet visual sin verificar elegibilidad.",
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿PREGUNTA 1 (tal como la haría el usuario)?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "RESPUESTA DIRECTA Y AUTOCONTENIDA DE 40–60 PALABRAS. Responde primero, explica después. Incluye un dato/fuente si aplica."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿PREGUNTA 2?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "RESPUESTA DIRECTA Y AUTOCONTENIDA."
+      }
+    }
+  ]
+}

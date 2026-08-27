@@ -17,13 +17,42 @@
 - Motion: `docs/ui/motion/TASK-1763-hiring-capacity-closure-confirmation-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-011`
-- Status real: `Diseño; depende del contrato backend de TASK-1762`
+- Status real: `Diseño; el contrato backend ya existe y quedó code complete el 2026-08-23`
 - Rank: `TBD`
 - Domain: `hr|ui`
-- Blocked by: `TASK-1762`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Delta 2026-08-23 — TASK-1762 cerró: esto es lo que recibes, y lo que NO debes reimplementar
+
+El contrato ya existe y esta task **lo consume, no lo recalcula**:
+
+- **Reader** `previewOpeningCapacityClosure(openingId)` → `OpeningClosurePreview` con cupos, las tres
+  categorías de la cohorte, el conteo de excluidas y el `effectDigest`.
+- **Command** `confirmOpeningCapacityClosure({ openingId, effectDigest, idempotencyKey, ... })`.
+- **Status** `readClosureRunStatus` / `readLatestClosureRunForOpening` → conteos por estado.
+- **Ruta** `GET`/`POST /api/hiring/openings/[id]/capacity-closure`.
+- **Capabilities** `hiring.opening.capacity.read` (ver) y `...confirm` (ejecutar), separadas: la UI
+  debe mostrar el resumen a quien sólo lee, y ocultar el botón a quien no puede confirmar.
+
+**Tres cosas que la UI NO decide, porque ya están decididas:**
+
+1. **Quién entra.** `paused` y `backup` NO entran por defecto. La UI las muestra como categorías
+   separadas y **con su razón visible** —una está en pausa deliberada, la otra tiene un compromiso
+   abierto—, nunca como un checkbox suelto que invite a marcar todo.
+2. **El digest.** Se pasa tal como vino del preview. Si el confirm devuelve
+   `hiring_opening_closure_preview_stale`, la respuesta correcta es **recargar el resumen y que la
+   persona vuelva a mirarlo**, jamás reintentar con el digest nuevo automáticamente: eso convertiría
+   la protección en un trámite.
+3. **El número de cupos.** Sale de la vacante (`requested_seats`, el campo «Cupos» del Demand Desk).
+   **NUNCA** mostrar un conteo propio ni derivar uno: la task previa existe justamente para que haya
+   un solo dueño de ese número.
+
+**Y lo que la UI sí tiene que resolver bien:** que el operador entienda *a cuántas personas reales*
+va a afectar antes de confirmar. El conteo es el momento visual dominante de esa pantalla, no un
+dato secundario — 36 personas y 3 personas exigen la misma confirmación y merecen distinta pausa.
 
 ## Summary
 

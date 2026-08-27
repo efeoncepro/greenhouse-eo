@@ -3018,3 +3018,47 @@ export const GH_GROWTH_SEO_AUDIT_ISSUES: Readonly<
   no_encoding_meta_tag: { label: 'Sin meta de codificación', effort: 'low', value: 'low', hint: 'La página no declara su codificación de caracteres.' },
   deprecated_html_tags: { label: 'Etiquetas HTML obsoletas', effort: 'medium', value: 'low', hint: 'El marcado usa etiquetas que el estándar ya retiró.' }
 }
+
+/**
+ * TASK-1709 — Diagnóstico SEO de prospecto (tier `prospect`).
+ *
+ * Registro comercial FORMAL (usted/institucional): estos labels alimentan el contrato
+ * de salida cuyo destino final es un artefacto client-facing para un prospecto con el
+ * que aún no hay relación comercial. Regla dura del carril: toda cifra es estimada y
+ * lo dice — la lente no tiene variante "medido" acá a propósito (no existe Search
+ * Console de un prospecto), y NINGÚN label afirma salud ni emite veredicto.
+ */
+export const GH_GROWTH_SEO_PROSPECT = {
+  lens: {
+    estimated: 'Estimado · fuente externa',
+    estimatedHint:
+      'Dato estimado por un proveedor externo a partir de información pública, con su fecha de captura. No es una medición del sitio.'
+  },
+  status: {
+    running: 'En proceso',
+    completed: 'Completado',
+    failed: 'No completado',
+    cost_blocked: 'Detenido por tope de costo'
+  } as const,
+  statusHint: {
+    cost_blocked:
+      'El costo previsto del diagnóstico supera el tope autorizado. No se realizó ninguna consulta al proveedor.'
+  },
+  factKinds: {
+    ranked_keywords_total: 'Búsquedas donde el dominio aparece',
+    ranked_keywords_top10: 'Búsquedas en primera página',
+    striking_distance_keywords: 'Búsquedas a corta distancia de la primera página',
+    ai_overview_citations: 'Citas en AI Overviews de Google',
+    estimated_monthly_traffic: 'Tráfico orgánico mensual estimado',
+    competitors_identified: 'Competidores identificados en el mercado de búsqueda',
+    link_gap_referring_domains: 'Dominios que enlazan a la competencia y no al sitio',
+    site_robots_txt: 'Archivo robots.txt',
+    site_jsonld_blocks: 'Datos estructurados en la portada',
+    site_sitemap: 'Mapa del sitio (sitemap.xml)',
+    site_home_observability: 'Portada legible para sistemas automatizados',
+    site_crawl_blocked: 'Acceso de rastreo restringido por el sitio',
+    onpage_critical_findings: 'Páginas cubiertas por auditoría técnica previa'
+  } as const,
+  magnitudePending: 'Sin dato',
+  capturedAtLabel: 'Capturado el'
+} as const

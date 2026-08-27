@@ -38,6 +38,20 @@ const run = async (ctx: ProbeContext): Promise<ProbeOutcome> => {
   const actionTypes = [...new Set(nodes.flatMap(actionTypesOf))]
 
   if (actionTypes.length === 0) {
+    // TASK-1778 — ausencia sólo es medible sobre un documento completo y observable.
+    if (res.truncated === true || res.observable === false) {
+      return {
+        status: 'skipped',
+        score: null,
+        reason:
+          res.truncated === true
+            ? 'HTML truncado al tope de lectura: no se puede afirmar ausencia de potentialAction sin ver el documento completo.'
+            : 'La home servida es un shell de render JS sin contenido observable: no se puede afirmar ausencia de potentialAction.',
+        evidence: { truncated: res.truncated === true, observable: res.observable !== false },
+        errorCode: res.truncated === true ? 'truncated_body' : 'not_observable'
+      }
+    }
+
     return {
       status: 'succeeded',
       score: 0,

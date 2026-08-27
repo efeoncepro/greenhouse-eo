@@ -115,7 +115,8 @@ Meterlo en el pillar es explicarlo en el vacío. **Acá aterriza solo.**
    🔴 **El fee de onboarding del bundle Customer Platform NO está publicado** → se declara como tal.
    🔴 **Los contactos de marketing adicionales:** las fuentes públicas **discrepan 10×** → **no se cotiza de
    memoria**; se explica el **mecanismo** (saltos escalonados) sin inventar el monto del tramo.
-4. 🔴 **Claims prohibidos** (heredados del hub): *"Líder en CRM según Gartner"* · Forrester Wave · **ISO 27001**
+4. 🔴 **Claims prohibidos** (heredados del hub): *"Líder en CRM según Gartner"* — en 2026 figura como
+   Challenger de CRM Sales Platforms · Forrester Wave · **ISO 27001**
    de HubSpot · residencia de datos en LATAM · *"flota de agentes"*.
 5. 🔴 **Nomenclatura 2026:** **Revenue Hub** (ex-Commerce) · **Data Hub** (ex-Operations) · **UNBOUND**.
    **HubSpot ya no se llama CRM:** *Agentic Customer Platform*.

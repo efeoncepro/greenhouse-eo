@@ -1411,7 +1411,7 @@ Se agrega `google_ai_overview` como quinto provider gobernado del grader. El obj
 - **Contrato de provider:** `google_ai_overview` queda registrado en los enums TS, registry, policy resolver, cost estimator, normalizer/provider labels, smoke fake adapters y en los CHECK constraints DB de `greenhouse_growth.provider_observations.provider` + `greenhouse_growth.normalized_findings.provider`.
 - **Flag y rollout:** `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED` nace default OFF. Sin master flag, provider flag o secret, el adapter devuelve `skipped` canonico y no llama DataForSEO.
 - **Degradacion honesta:** HTTP 200 sin bloque AI Overview / AI Mode se persiste como `skipped:no_ai_overview_block`, nunca como `succeeded` vacio. El cost estimator conserva `usage.dataforseo_cost_usd` tambien en ese caso porque DataForSEO cobra por request.
-- **Idioma/mercado:** DataForSEO documenta AI Mode como English-only hoy; el adapter manda `language_code='en'` y conserva `location_name` desde el market del run. El keyword se normaliza y acota antes de enviar.
+- **Idioma/mercado:** DataForSEO documenta AI Mode como English-only hoy; el adapter manda `language_code='en'` y conserva `location_name` desde el market del run *(superseded 2026-08-27 por TASK-1652: el market ISO-2 ahora se traduce con el mapa market→`location_code`; ver Delta correspondiente)*. El keyword se normaliza y acota antes de enviar.
 - **Parser lock:** hay test focal para `ai_overview`, `ai_overview_element`, referencias heterogeneas (`references`/`links`/`sources`) y golden eval nuevo para una cita owned de `efeoncepro.com`.
 
 Estado operativo: code complete local/dev. Pendiente para cerrar runtime: aplicar migracion en ambientes, deploy con flag OFF, flip staging low-volume, smoke real con observation/citas en PG y decidir rotacion de la credencial DataForSEO antes de produccion porque fue compartida inicialmente en captura/chat.
@@ -2066,3 +2066,76 @@ Growth/AEO, redeploy `greenhouse-ic8cg4ery`) **y en staging** (parity flip 2026-
 - **Retries con backoff exponencial + jitter** en el web-search-adapter, y clasificación `rate_limited` desde message/code para SDKs sin httpStatus (Vertex `RESOURCE_EXHAUSTED`); rate_limited thrown ahora reintenta.
 - **Versionado:** `normalized_finding_v2` + `ai_visibility_score_v2`; el findingId default incorpora la versión (el PK colisionaba entre versiones en re-score). Filas/scores v1 conviven como historia; `getNormalizedFindings` devuelve la versión más nueva por (prompt, provider). Snapshots públicos inmutables.
 - **Evidencia:** re-score live `EO-GRUN-00045` → `citation_quality 0 → 90.9`, overall `52.5 → 73.3` con las mismas citas. Spec: `docs/tasks/complete/TASK-1390-ai-visibility-grader-issue-120-pipeline-fixes.md` + `docs/issues/resolved/ISSUE-120-*.md`.
+
+## Delta 2026-08-27 — TASK-1778 (ISSUE-164): postura de red del sustrato de sitio (rollout ejecutado)
+
+El fetcher único con el que Greenhouse lee sitios de terceros (`probes/safe-fetch.ts`, consumido por el gatherer de
+probes y por `brand-intelligence/fetch-site-content`) pasa de tener garantías afirmadas a tener garantías con mecanismo:
+
+- **Contención de redirects** (gated por `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED`, ON desde 2026-08-27 en el
+  ops-worker y Vercel staging — ver el bullet de Estado): `redirect: 'manual'`
+  + bucle propio con tope (`MAX_REDIRECTS=5`), revalidando cada `Location` contra el sujeto — su familia (mismo host,
+  `apex ↔ www`), sus subdominios **descendientes** (sufijo anclado al host completo; evidencia rollout 2026-08-27:
+  `www.bancochile.cl → sitiospublicos.bancochile.cl`, perfil vivo) y upgrade `http → https`; todo lo demás (otro dominio
+  registrable incluido: `berel.com.mx → berel.com` se bloquea) → `blocked_redirect` con el cuerpo del destino **no
+  leído**. El ancla al host propio evita razonar eTLD+1: la PSL queda descartada con evidencia, no como follow-up.
+- **Guarda DNS** (mismo flag): resolución A/AAAA (`node:dns/promises`) antes de conectar, en la URL inicial y en cada
+  salto; cualquier dirección resuelta en rango no público (incl. IPv4-mapped IPv6) → `blocked_private_address`. La ventana
+  TOCTOU entre resolver y conectar queda documentada como riesgo residual aceptado; la mitigación real (pin de la IP
+  resuelta) es follow-up declarado de la task.
+- **Tope de bytes real + truncado con rastro** (sin flag): lectura por stream con corte duro (`read-body.ts`, compartida
+  con `entity-fetch.ts` — misma causa, un solo fix), default 4 MiB. `ProbeFetchResult.truncated` viaja al probe, y
+  `observable` retira la afirmación de ausencia sobre shells de render JS (señales asimétricas: solo retiran, nunca
+  agregan). Los probes de presencia (`json_ld`, `structured_actions`, `dom_semantics`) degradan a `skipped` con
+  `truncated_body`/`not_observable` en vez de reportar "no tiene" — el mismo invariante `score: null ≠ 0`, un nivel más
+  abajo. Encontrar en un cuerpo parcial sigue siendo prueba (la asimetría corre en una sola dirección).
+- **robots.txt obedecido** (sin flag): `robots-policy.ts` (parser conservador: longest-match, `*`/`$`, ante ambigüedad
+  permitir) se consulta una vez por sujeto reusando la misma descarga que analiza el probe de robots. El matching es
+  contra **nuestro** token (`GreenhouseAEOGrader`), jamás los de los bots de IA auditados; `/robots.txt` siempre es
+  alcanzable; un `Disallow` que nos alcanza produce `blocked_robots` (hallazgo, no fallo). `ProbeFetchInit.userAgent`
+  permite variar nuestro token (p.ej. edge-check), NUNCA suplantar el crawler de un tercero.
+- **Observabilidad:** rechazos de guarda a Sentry nivel `info` con `source: growth_ai_visibility_probe_fetch` y
+  `reason: blocked_redirect|blocked_private_address|blocked_robots`; sin cuerpo ni URL interna en el resultado.
+- **Estado (rollout ejecutado 2026-08-27):** suite adversarial (`__tests__/probes-safe-fetch-hardening.test.ts`,
+  incluye test anti-divergencia cabecera↔código) + cutover aplicado. `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` está
+  **ON en el ops-worker** (revisión `ops-worker-00598-459`, 100% tráfico; worker único compartido staging+prod → cubre
+  el path async del intake público, la cadena real del ISSUE-164) con default declarativo `true` en
+  `services/ops-worker/deploy.sh`, y **ON en Vercel `staging`**. Vercel Production queda para el próximo release
+  develop→main (regla ISSUE-150: el lector aún no está en `main`; hasta entonces el path inline de prod — runs `light`
+  de admin, no el intake público — conserva la red vieja). Evidencia: corrida real `EO-GRUN-00048` (SKY, full, 5
+  motores) `succeeded` con el flag ON — 13 probes, cero `blocked_redirect`/`blocked_private_address` falsos, apex→www
+  seguido y medido — más 7 dominios vivos de cartera en strict (6 ok; `www.bancochile.cl` falla igual que con la red
+  vieja — muro Imperva/Incapsula con loop de cookies, NO regresión; evidencia para TASK-1281 headless). `ISSUE-164`
+  quedó `resolved` (2026-08-27). Residuales fechados (revisión Sentry de `blocked_*` el 2026-08-29 + flip de la env var
+  en Vercel Production con el release) viven en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` § Pendientes.
+
+## Delta 2026-08-27 — TASK-1697: el sustrato de sitio sale de `probes/` a `growth/site-substrate` (con shims)
+
+- **El sustrato es un primitive con dueño propio:** `src/lib/growth/site-substrate/` (`site-fetch.ts` —ex
+  `probes/safe-fetch.ts`—, `html.ts`, `robots-policy.ts`, `read-body.ts`, `contracts.ts`, barrel `index.ts`),
+  movido con `git mv` y **diff puro** (fuera de renombres `Probe*`→`Site*` sólo cambió la cabecera y la
+  reubicación del flag reader `isProbeFetchStrictNetworkEnabled`, que es del fetcher y viaja con él). Regla de
+  corte: **se comparte cómo se OBTIENE la evidencia; nunca cómo se JUZGA** — scoring, probes, prompts y review
+  gates se quedan en el dominio AEO.
+- **Ningún dependiente cambió una línea:** `probes/safe-fetch.ts`, `probes/html.ts`, `probes/read-body.ts`,
+  `probes/robots-policy.ts` y el bloque de tipos de `probes/contracts.ts` quedaron como re-export shims (alias,
+  cero lógica). Retirarlos reescribiendo los consumers al barrel es follow-up declarado de la task.
+- **`ai-visibility/probes/**` es PRIVADO del dominio, con detector:** lint rule
+  `greenhouse/growth-substrate-boundary` en `error` desde commit-1 (cero violaciones, cero exenciones) — nadie
+  fuera de `ai-visibility/**` importa `probes/**`; la puerta para consumidores externos (SEO site-audit
+  TASK-1670, análisis de contenido TASK-1701, diagnóstico de prospecto TASK-1709) es
+  `@/lib/growth/site-substrate`. La carta del sustrato (no importa `growth/*`, no persiste, única transversal
+  `@/lib/observability/capture`) la verifican la misma rule + el test de frontera por allowlist.
+- Consumers del grader siguen intactos por los shims; canario: `growth.ai_visibility.probe_failure_rate`.
+  Detalle y mitad B (rule universal + barrel AEO): `TASK-1713`.
+
+## Delta 2026-08-27 — TASK-1652 request correctness AI Mode (location_code + gate per-task + wrapper de citas)
+
+El adapter `google_ai_overview` (`providers/google-ai-overview-adapter.ts`) tenía tres defectos de correctitud de request/parsing, corregidos y verificados con smoke live (commits `bc2dd0f99`…`b06f5cd20`):
+
+- **Location:** el market ISO-2 productivo (CL/MX/CO/PE/US) caía verbatim en `location_name` y DataForSEO fallaba per-task (error `40501`) bajo HTTP 200. Ahora hay mapa cerrado exportado `GOOGLE_AI_MODE_MARKET_LOCATION_CODES = { CL: 2152, MX: 2484, CO: 2170, PE: 2604, US: 2840 }` (códigos verificados en vivo contra `GET /v3/serp/google/locations/{cc}`, endpoint gratuito), con fallback observable a US (`captureWithDomain` nivel warning) para ISO-2 no mapeado; un nombre completo ("Chile") sigue pasando como `location_name`.
+- **Gate per-task:** HTTP 200 ≠ éxito. Solo un task con `status_code === 20000` avanza al parser; `!= 20000` → observación `failed:provider_error` con el código en `usage.dataforseo_status_code`; task/status ausente (shape roto) → `failed:invalid_response`. **Invariante nueva:** `skipped:no_ai_overview_block` queda RESERVADO para tasks `20000` realmente ejecutadas sin bloque AI.
+- **Citas anidadas:** el parser desciende un nivel (acotado, no recursivo) a los elementos `ai_overview_element` / `ai_overview_table_element` / `ai_overview_expanded_element` dentro del item `ai_overview`, recolectando sus `references[]`/`links[]` con dedupe por URL (`buildCitations`); el texto principal prefiere el `markdown` del bloque padre (los textos anidados duplicarían el hash). Verificado contra sandbox y payload live: el proveedor duplica las references en el nivel superior (top ⊇ anidadas), así que el descenso es defensa sin doble conteo.
+- **Hallazgo del smoke live — wrapper de citas:** Google envuelve TODAS las references de AI Mode en redirects propios — `domain` llega como `google.com`/`www.google.com` y `url` como `https://google.com/goto?url=<token opaco>` (o `/searchviewer`), no decodificable client-side; la identidad real de la fuente viene SOLO en el campo `source` (a veces domain-shaped como `agenciagrowth.cl`, a veces nombre de marca como `Bigbuda`). Sin manejo, toda cita se atribuía a google.com y el SoV de citabilidad quedaba envenenado. El adapter deriva el dominio real de `source` cuando es domain-shaped (`normalizeDomain`); las refs de marca no atribuible se DESCARTAN honesto (nunca atribuir a google.com) y se cuentan dedupeadas por URL en `usage.dataforseo_citations_unattributable`. Payload live real: 27 refs únicas → 2 atribuibles (`metrix.digital`, `agenciagrowth.cl`), 25 no atribuibles. Implicación para atribución URL-level futura (TASK-1311, ya tiene Delta): las `url` persistidas de este provider son punteros al wrapper, no la página citada.
+- **Dimensionamiento histórico** (query read-only sobre `greenhouse_growth.provider_observations`): 60 observaciones históricas `skipped:no_ai_overview_block` (2026-06-29 → 2026-07-17) eran falsos negativos con task fallido (54 con `40501`, 6 con `40201`). Regrade DESCARTADO: los tasks nunca se ejecutaron (nada que reinterpretar) y río abajo skipped/failed se excluyen por igual.
+- **Estado:** AIO en producción sigue OFF (gated por TASK-1341); el fix llega inerte a producción hasta ese rollout. AI Mode sigue English-only (`language_code='en'`). Smoke sanity: `scripts/growth/_sanity-task-1652-ai-mode-smoke.ts` (dry por defecto; `--spend` ejecuta una llamada real ~USD 0,004). Spec: `docs/tasks/complete/TASK-1652-aeo-grader-dataforseo-ai-mode-request-correctness.md`.

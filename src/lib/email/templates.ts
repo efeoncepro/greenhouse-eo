@@ -2133,6 +2133,12 @@ registerTemplate('hiring_stage_advanced', (context: HiringStageAdvancedContext) 
 interface HiringDecisionContext extends EmailTemplateContext {
   recipientName?: string
   openingTitle: string
+  /**
+   * TASK-1762 — sólo `hiring_decision_not_selected` lo consume. `true` únicamente cuando el
+   * consentimiento de contacto futuro está VIGENTE al momento de enviar: la promesa del Banco de
+   * Talento se afirma o se calla, nunca se insinúa.
+   */
+  talentPoolConsent?: boolean
   locale?: 'es' | 'en'
 }
 
@@ -2199,6 +2205,58 @@ registerTemplate('hiring_decision_rejected', (context: HiringDecisionContext) =>
       isEn
         ? `Thank you for the time you put into your application to «${context.openingTitle}» at Efeonce. After completing the process, we decided not to move forward on this occasion. We would be glad to see you apply to future openings closer to your profile.`
         : `Gracias por el tiempo que pusiste en tu postulación a «${context.openingTitle}» en Efeonce. Después de completar el proceso, decidimos no avanzar en esta oportunidad. Nos encantaría verte postular a futuras vacantes que se acerquen más a tu perfil.`,
+      '',
+      isEn ? 'Talent Team' : 'Equipo de Talento',
+      'Efeonce · efeoncepro.com'
+    ].join('\n')
+  }
+})
+
+/**
+ * TASK-1762 — «sin selección»: la vacante se llenó y esta persona no quedó.
+ *
+ * Tipo PROPIO, no una variante de `hiring_decision_rejected`, porque el EmailType es un
+ * discriminante por el que el sistema ramifica: kill-switch independiente en `email_type_config`
+ * y perfil de footer resuelto por tipo. Operativamente decide: un cierre por capacidad manda N
+ * correos de golpe y tiene que poder pausarse SIN silenciar el correo de decisión individual.
+ *
+ * El cuerpo NO revela el literal del desenlace, ni score, ni razón de evaluación: dice que la
+ * vacante quedó cubierta, que es el hecho, sin convertirlo en un juicio sobre la persona.
+ */
+registerTemplate('hiring_decision_not_selected', (context: HiringDecisionContext) => {
+  const isEn = context.locale === 'en'
+
+  const first = context.recipientName?.split(' ')[0]
+
+  const consent = context.talentPoolConsent === true
+
+  return {
+    subject: isEn
+      ? `${first ? `${first}, ` : ''}about your application to «${context.openingTitle}» — Efeonce`
+      : `${first ? `${first}, ` : ''}sobre tu postulación a «${context.openingTitle}» — Efeonce`,
+    react: HiringDecisionEmail({
+      recipientName: context.recipientName,
+      openingTitle: context.openingTitle,
+      variant: 'not_selected',
+      talentPoolConsent: consent,
+      locale: context.locale ?? 'es'
+    }),
+    text: [
+      isEn ? 'About your application' : 'Sobre tu postulación',
+      '',
+      isEn
+        ? `Thank you for the time and interest you put into your application to «${context.openingTitle}» at Efeonce. The position has been filled: this time we chose another candidate.`
+        : `Gracias por el tiempo y el interés que pusiste en tu postulación a «${context.openingTitle}» en Efeonce. La vacante ya quedó cubierta: esta vez elegimos a otra persona.`,
+      '',
+      // La versión texto plano respeta el MISMO gate de consentimiento que el HTML. Divergir acá
+      // sería prometer por un canal lo que se calla en el otro.
+      consent
+        ? isEn
+          ? 'It was not a decision about your work. Since you agreed to it, we will keep your profile so we can reach out when an opening closer to your experience opens up.'
+          : 'No fue una decisión sobre tu trabajo. Como nos diste tu autorización, mantendremos tu perfil para escribirte cuando se abra una vacante más cercana a tu experiencia.'
+        : isEn
+          ? 'It was not a decision about your work: there was a limited number of openings and they are now taken. We would be glad to see you apply to future openings closer to your profile.'
+          : 'No fue una decisión sobre tu trabajo: había un número acotado de cupos y ya quedaron tomados. Nos encantaría verte postular a futuras vacantes que se acerquen más a tu perfil.',
       '',
       isEn ? 'Talent Team' : 'Equipo de Talento',
       'Efeonce · efeoncepro.com'
@@ -2399,6 +2457,30 @@ registerPreviewMeta('hiring_decision_selected', {
   propsSchema: [
     { key: 'recipientName', label: 'Nombre del candidato', type: 'text' },
     { key: 'openingTitle', label: 'Vacante', type: 'text' },
+    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] }
+  ]
+})
+
+// TASK-1762 — «sin selección» por vacante completada. El label del vecino
+// (`hiring_decision_rejected`) dice «candidato no seleccionado» y es engañoso desde que existe el
+// eje de desenlace: ese template es el DESCARTE. Acá se nombran por lo que son para que un
+// operador que abre el catálogo no envíe el correo equivocado.
+registerPreviewMeta('hiring_decision_not_selected', {
+  label: 'Hiring — sin selección (vacante completada)',
+  description:
+    'La vacante se llenó y esta persona no quedó. NO es un descarte: nadie la juzgó. La promesa del Banco de Talento aparece sólo con consentimiento vigente.',
+  domain: 'hr',
+  supportsLocale: true,
+  defaultProps: {
+    recipientName: 'María González',
+    openingTitle: 'Content Creator',
+    talentPoolConsent: false,
+    locale: 'es'
+  },
+  propsSchema: [
+    { key: 'recipientName', label: 'Nombre del candidato', type: 'text' },
+    { key: 'openingTitle', label: 'Vacante', type: 'text' },
+    { key: 'talentPoolConsent', label: 'Consentimiento futuro vigente', type: 'boolean' },
     { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] }
   ]
 })

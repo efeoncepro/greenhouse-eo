@@ -228,6 +228,11 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
 - `TASK-1755` — Assessment Assignment Attempt Recovery: permite reintento gobernado tras un intento `blocked`.
 - `TASK-1756` — Dossier Partial Evidence Disclosure: impide recomendaciones silenciosas sobre evidencia incompleta.
 - `TASK-1757` — Assessment Access Rotation Candidate Notice: avisa una rotación sin filtrar la credencial.
+- `TASK-1771` — Assessment Assignment Auto-Lane Supersede: el carril automático recupera la clave ocupada
+  estampando `superseded_at` sin perder `outcome`/`outcome_reason`, con tope por clave y condición de avance
+  estricta. **En producción** desde el release `709e15f66` (2026-08-23); falta su verification sequence.
+- `TASK-1772` — Hiring Active Process Canonical Predicate: predicado único de «proceso activo». **✓ complete**,
+  salió en el mismo release `709e15f66`.
 - `TASK-1732` — Identity-First People 360 Hiring Journey Reader: historia pre/post-member, paginada y allowlisted.
 - `TASK-1733` — People 360 Longitudinal Hiring History UI: timeline/detail interno sobre TASK-1732.
 - `TASK-1734` — Assessment AI Scoring at Scale + Operator-Only Exception Review: run asíncrono por assessment,
@@ -297,10 +302,20 @@ Este epic fija la secuencia obligatoria y los gates entre tasks para que el mód
   11 personas sintéticas quedan fuera por su `lifecycle_status`, no por el filtro), el archivado escribe sólo sobre la
   postulación cuando la spec definía tres entidades, y las 9 huérfanas del lane B siguen sin decisión. Sin efecto
   visible hoy; se escriben porque una deuda que no duele es la que se olvida.
-- `TASK-1751` — El candidato no ve su reloj ni entiende por qué no puede enviar: el temporizador de la rendición no
-  sigue el scroll, los avisos de 5 y 1 minuto son `srOnly` (invisibles para quien ve), la gracia de 30 minutos se rompe
-  con texto sin guardar y el error final manda a reintentar algo imposible. Caso real medido sobre una candidata que
-  perdió una respuesta escrita teniendo 26 minutos de gracia disponibles.
+- `TASK-1751` — **La fase de gracia deja de prometer lo que el servidor no puede aceptar.** **✓ complete (2026-08-26,
+  en `develop`; sin promover a producción).** Caso real: una candidata perdió una respuesta escrita teniendo 26 minutos
+  de gracia disponibles. **Alcance real ≠ alcance declarado:** de los cuatro defectos que la spec listaba el 2026-08-19,
+  **dos fueron refutados contra el código** — el reloj ya seguía el scroll (`sticky`, arreglado 2h43m después de crearse
+  la task) y los avisos de 5 y 1 minuto nunca fueron sólo `srOnly` (existe un canal visible en paralelo dentro del
+  reloj). Quedaron los dos del **guardado**, que son el daño real: guardado preventivo en la ventana previa al plazo
+  (el flush *al cruzar* es imposible por construcción, no un pendiente), gracia honesta (sin CTA de envío cuando el
+  servidor no puede aceptarlo, con conteo de guardadas derivado en cliente), error que nombra su causa en vez de mandar
+  a reintentar lo imposible, y textarea en `readOnly` —no `disabled`— para no sacar el texto del árbol de
+  accesibilidad. La evidencia visual —primera línea base de `submit_grace`, desktop 1440 + móvil 390— destapó **cuatro
+  defectos más que ningún test veía**, dos de ellos **pre-existentes**: contraste 2.43:1 del contador de caracteres y
+  el `placeholder` haciendo de nombre accesible del campo. Contrato e invariantes:
+  [`GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1`](../../architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md)
+  § Delta 2026-08-26.
 - `TASK-356` — Handoff, reactive events/signals and downstream bridges.
 - `TASK-770` — HRIS/People activation closure for `internal_hire`.
 
@@ -446,6 +461,33 @@ declarado, como `CHECK` de base.
   agravante es que **ninguna de las cuatro tasks del eje lo declaró como pendiente**: la pregunta
   obligatoria del principio no se hizo en ninguna, ni en la auditoría que las revisó. Su Slice 5 es el
   guard que impide que la clase vuelva. *Bloqueada por nada: 1765 ya está en producción.*
+  **Estado: `code complete, rollout pendiente` (2026-08-26).** Lo que quedó escrito en `develop`:
+  - Tres rutas bajo `src/app/api/platform/app/hiring/applications/[applicationId]/`: `GET outcome`
+    (los tres ejes —etapa, desenlace+causa, archivado— sin PII), `POST decision/propose` (lee y
+    calcula, NO muta) y `POST decision/confirm`. Capability `hiring.application.decide`, la que ya
+    existía: sin capability nueva, sin migración, sin evento nuevo, sin flag sobre las rutas.
+  - El guard es un **digest sin persistencia**: `propose` calcula la huella del estado actual más el
+    efecto propuesto y `confirm` la recalcula, fallando con **409 `hiring_decision_proposal_stale`**
+    si el mundo cambió entre medio. Se eligió así porque una propuesta de decisión no es una entidad
+    —a diferencia de la invitación del Banco de Talento, que sí persiste en `talent_pool_invitation`—
+    y porque la spec declara `Migration: none`. Ese 409 se agregó al enum `ApiPlatformErrorCode` en
+    vez de aplanarse a `bad_request`.
+  - **Confirmar es fail-closed para agentes delegados**: un token `sister_platform_oauth` lee y
+    propone, pero no confirma, porque `efeonce.mcp.hiring.write` no existe y queda bloqueado hasta
+    `TASK-1631`.
+  - Nexa recibió la acción `decide_hiring_application`, con autoridad más angosta que el portal: se
+    niega a re-decidir una postulación ya cerrada. Su flag `NEXA_HIRING_ACTIONS_ENABLED` **nace OFF**
+    en todos los environments y tiene fila en el ledger; prenderlo exige sign-off (bajo el AI Act la
+    selección es alto riesgo con supervisión humana obligatoria).
+  - Slice 5 dejó el manifiesto `src/lib/hiring/capability-parity-manifest.ts`: toda capability
+    `hiring.*` chequeada con `can()` declara `federated` / `deliberately-internal` / `pending`, y
+    agregar una sin declararlo rompe el test. Deja además **18 capabilities `hiring.*` en `pending`**,
+    que son el barrido del follow-up.
+  - **Falta para cerrar**: nada está desplegado (los commits siguen sin push), no hay evidencia de
+    runtime contra staging para las tres rutas, y el flag de Nexa sigue apagado. El cierre MASIVO por
+    capacidad no se federa (decisión de `TASK-1762`) y eso NO es un pendiente.
+  - Contrato publicado en `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml` (registro real del lane)
+    + delta en `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`.
 
 Dos superficies **no** generaron ID nuevo y entraron como Delta a su dueño: el archivado que escribía `closed`
 (`TASK-1748`) y el arranque del reloj de retención (`TASK-1744`).

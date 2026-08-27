@@ -204,7 +204,7 @@ descripción larga/texto cercano y la página canónica llevan la semántica.
 
 Verificar GET `200`, `Content-Type: image/svg+xml`, dimensiones, crawlability y robots. Mantener
 featured/OG/Twitter como raster social-safe. Ver
-`.codex/skills/seo-aeo/references/editorial-image-seo.md`.
+`../../seo-aeo/references/editorial-image-seo.md`.
 
 ## 7. Light, dark y responsive
 

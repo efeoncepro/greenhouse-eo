@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-011`
-- Status real: `Operativa en producción y en observación: global_provisional activo para todas las vacantes, worker/scheduler saludables y canary exacto verde; lifecycle permanece in-progress hasta registrar cooldown, rollback/residual cero y sign-offs/risk acceptance trazables`
+- Status real: `Operativa en producción y en observación: global_provisional activo para todas las vacantes, worker/scheduler saludables y canary exacto verde; lifecycle permanece in-progress hasta registrar cooldown, rollback/residual cero y sign-offs/risk acceptance trazables. SALVEDAD agregada 2026-08-26: la afirmación «canary exacto verde» tiene corte al 2026-08-18 y AL DÍA SIGUIENTE entraron dos fixes correctivos al mismo carril (c7474b068 «dejar cerrar un run cuyo trabajo humano ya terminó» y 05a5daf48 «Sonnet 5 vuelve a calificar candidatos»); no hay registro de que el canary se re-verificara después. Re-verificarlo es pendiente de cierre`
 - Rank: `1`
 - Domain: `hr`
 - Blocked by: `none`

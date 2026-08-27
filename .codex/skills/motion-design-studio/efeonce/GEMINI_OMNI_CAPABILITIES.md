@@ -8,6 +8,14 @@
 > **Regla de volatilidad:** el modelo está en `PUBLIC_PREVIEW` (lanzado 2026-06-30). Todo lo marcado `⚠️ volátil` cambia semana a semana; reverifica antes de comprometer costo o pipeline. Google promete "longer durations / higher res coming soon", así que los techos (720p / 3–10 s) son lo primero que se moverá.
 > **Regla de honestidad:** distingo entre lo que **verificamos en vivo (✅)**, lo que está **documentado por Google (📄)**, lo que es **marketing/visión de terceros no confirmado (📣)** y lo que **no probamos (⬜)**. Varios sitios de terceros venden "4K nativo con audio y lip-sync en un solo pase" — eso es la **visión del modelo full**, NO el preview Flash que corre hoy (720p, sin lip-sync verificado). No confundas la valla publicitaria con el runtime. Ojo: las verificaciones ✅ de 2026-07-05 se hicieron sobre `generateContent` (ya retirado); la **capacidad** persiste, pero el **método** migró a Interactions — reverifica el shape antes de cablear.
 
+> **Delta 2026-08-27 — 1.1 reemplaza el techo documental, no la evidencia runtime.** Gemini Omni 1.1 Flash
+> documenta 360p/720p/1080p/4K (1080p/4K upscaled), first/last frame, hasta tres referencias de video breves,
+> edición y extensión hasta 40 s. Developer API usa `gemini-omni-1.1-flash`; Cloud usa
+> `gemini-omni-1.1-flash-preview`. Audio input, PayGo, región no-global y algunos límites cambian o se contradicen
+> entre superficies. Hasta que `TASK-1781` cierre probes y canaries, todas estas capacidades son **📄 proveedor**,
+> no ✅ Globe. El modelo anterior tiene shutdown anunciado para el 2026-09-30. No prometas 4K nativo, GA global,
+> SLA, audio reference ni disponibilidad en Producer.
+
 ---
 
 ## PARTE A — Catálogo exhaustivo de capacidades

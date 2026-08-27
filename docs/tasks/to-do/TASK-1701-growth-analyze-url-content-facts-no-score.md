@@ -6,6 +6,20 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-27 — el sustrato a heredar fue endurecido por `TASK-1778`
+
+`probes/safe-fetch.ts` quedó endurecido y desplegado con el endurecimiento comercial (`ISSUE-164`
+resuelto; rollout ejecutado 2026-08-27): tope real de 4 MiB por stream con rastro
+`truncated`/`observable`, `robots.txt` obedecido con nuestro
+UA (`probes/robots-policy.ts`), y — gated por `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (ON en el
+ops-worker y Vercel staging; prod Vercel con el próximo release) — contención de redirects a la
+familia del sujeto + subdominios descendientes + guarda DNS anti-SSRF.
+`ProbeFetchErrorCode` suma `blocked_redirect`/`blocked_private_address`/`blocked_robots`. Las
+referencias de línea de este doc (`safe-fetch.ts:72`, `:58-79`) quedaron desplazadas: la guarda
+cross-host sigue viva en `resolveProbeUrl` y ahora también revalida cada salto de redirect.
+`UrlFetchFacts` debe modelar estos hechos (`truncated`, `observable`, bloqueo por robots) como
+procedencia, no como ausencia de contenido.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -24,7 +38,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo|aeo`
-- Blocked by: `TASK-1697`, `TASK-1696`, `TASK-1703`
+- Blocked by: `TASK-1696`, `TASK-1703` — `TASK-1697` cerró 2026-08-27 (el sustrato existe: consumir `@/lib/growth/site-substrate`, la lint rule bloquea el deep import a `probes/**`)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

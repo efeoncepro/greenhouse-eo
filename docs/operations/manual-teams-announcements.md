@@ -73,6 +73,16 @@ pnpm teams:announce \
   --yes
 ```
 
+## Límite de `@todos` en chats grupales
+
+`EO Team` es un `chat_group`. TeamBot no puede generar una mención colectiva `@todos` / `@everyone` en esta superficie; Microsoft solo admite menciones a usuarios explícitos. No agregues `<at>todos</at>`, no uses el `recipientChatId` como `mentioned.id` y no interpretes un HTTP 2xx del Connector como confirmación de una mención.
+
+El fallo observado el 2026-08-24 es el comportamiento esperado del payload no soportado: Teams creó una burbuja separada con `todos` en texto plano y publicó la Adaptive Card, pero no mostró arroba ni notificó a todas las personas. La burbuja apareció porque `activity.text` viajó junto con la tarjeta.
+
+Para menciones válidas, incluye el nombre visible en el título o cuerpo y pasa una opción `--mention "Texto visible|entraObjectIdOrUpn|Nombre de perfil"` por persona. Si no se dispone de identidades verificadas, envía la tarjeta sin prometer notificación colectiva. No pruebes variantes en el chat público para descubrir capacidades.
+
+Fuente: [Microsoft Teams — channel and group chat conversations](https://learn.microsoft.com/microsoftteams/platform/bots/how-to/conversations/channel-and-group-conversations).
+
 ## Formato del body file
 
 - Separar párrafos con una línea en blanco.
@@ -193,6 +203,23 @@ Reglas para los 1:1:
 - Usar emojis con moderación (`📊`, `✨`, `🎯`, `⚠️` cuando aplique) y **negritas** para KPIs, fortalezas y oportunidades.
 - La crítica debe ser operativa, no personal: separar calidad, plazos, capacidad y sistema de trabajo.
 - Para casos sensibles, nombrar el problema con honestidad y empatía; evitar exposición innecesaria y cerrar con una acción concreta.
+
+### Mensajes individuales HR/People fuera de pagos
+
+`pnpm teams:announce` solo resuelve destinos grupales/canales registrados; no es un CLI genérico para DMs. El CLI de pagos 1:1 tampoco debe reutilizarse para aniversarios, vacaciones u otras comunicaciones HR.
+
+Mientras no exista un CLI gobernado para mensajes individuales genéricos, un envío manual aprobado puede usar un script temporal y acotado que llame al dispatcher canónico `sendViaBotFramework`. Ese puente debe cumplir todo lo siguiente:
+
+- aprobar el texto completo antes del envío;
+- resolver nuevamente la identidad en Microsoft Entra y exigir `accountEnabled=true`;
+- usar `recipient_kind='chat_1on1'` y Microsoft Entra Object ID crudo;
+- enviar una Adaptive Card sin mención y sin `activity.text`;
+- preservar cada párrafo como `TextBlock` separado para mantener legibilidad;
+- exigir `--dry-run` o `--yes`, nunca ambos, y bloquear el envío real sin `--yes`;
+- usar `sourceObjectId` determinístico, revisar duplicados y registrar inicio/resultado en `greenhouse_sync.source_sync_runs`;
+- usar los helpers canónicos de transporte y auditoría, nunca HTTP Bot Framework crudo ni el conector personal de Teams.
+
+Para comunicaciones HR, verifica antes las afirmaciones de fechas, saldos y política contra sus fuentes dueñas. Un resultado `succeeded` prueba aceptación por el transporte y auditoría, no lectura ni renderizado confirmado. Si el mensaje será recurrente, debe converger a Notification Hub con `dynamic_user`, no permanecer como script temporal.
 
 ## Menciones reales en Adaptive Cards
 

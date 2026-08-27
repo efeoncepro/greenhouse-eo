@@ -335,6 +335,10 @@ export default [
       'greenhouse/no-inline-facet-visibility-check': 'error',
       'greenhouse/cloud-run-services-must-init-sentry': 'error',
       'greenhouse/no-cross-domain-import-from-client-portal': 'error',
+      // TASK-1697 — frontera angosta del sustrato de sitio: probes/** privado del
+      // dominio AEO + site-substrate sin imports de growth/*. Error desde commit-1
+      // (cero violaciones verificadas); la rule universal es de TASK-1713.
+      'greenhouse/growth-substrate-boundary': 'error',
       // TASK-1033 — views/app/components NO importan @floating-ui/* directo;
       // consumir GreenhouseFloatingSurface. Mode `error` desde commit-1 (cero
       // violaciones en superficies de producto: pilotos migrados; el resto son
@@ -671,6 +675,19 @@ export default [
     ],
     rules: {
       'greenhouse/no-cross-domain-import-from-client-portal': 'off'
+    }
+  },
+
+  // TASK-1697 — la rule growth-substrate-boundary se desactiva SOLO en sus propios
+  // archivos (el rule file cita los patrones que persigue). El dominio AEO y el
+  // sustrato NO necesitan exención: la rule ya modela sus direcciones legítimas.
+  {
+    files: [
+      'eslint-plugins/greenhouse/rules/growth-substrate-boundary.mjs',
+      'eslint-plugins/greenhouse/rules/__tests__/growth-substrate-boundary.test.mjs'
+    ],
+    rules: {
+      'greenhouse/growth-substrate-boundary': 'off'
     }
   },
 

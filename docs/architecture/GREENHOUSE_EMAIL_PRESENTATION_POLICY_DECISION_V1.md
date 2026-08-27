@@ -7,6 +7,7 @@
 - **Reversibility:** two-way-but-slow
 - **Confidence:** high en marca y separación semántica; medium en clasificación final de cada tipo
 - **Validated as of:** 2026-08-23
+- **Runtime verification:** 2026-08-24 — ver §`Delta 2026-08-24`
 - **Implementation umbrella:** `TASK-1764`
 - **Program epic:** `EPIC-042`
 
@@ -22,12 +23,32 @@ La deuda no justifica un big bang: email es una superficie estable y de alto bla
 
 ## Decision
 
-### 1. Efeonce es la única marca principal
+### 1. Efeonce lidera; Greenhouse es platform brand, nunca lockup compuesto
 
-Todos los correos usan Efeonce como identidad remitente y visual. Greenhouse no es una segunda marca ni una opción
-equivalente: es la plataforma de Efeonce y sólo puede aparecer como descriptor de producto o fuente operativa.
+Fuente canónica: `docs/architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md` (Accepted, 2026-07-26)
++ `docs/context/09_marca-agencia.md` §`Arquitectura de marca`.
 
-Patrón permitido: `Generado desde Greenhouse, la plataforma de Efeonce`.
+Greenhouse **sí** es una marca del portafolio: es la *platform brand* del control plane. Lo que no es, es una
+masterbrand paralela ni una alternativa excluyente a Efeonce — son capas distintas de la misma jerarquía
+(`Efeonce → línea de negocio → product/platform brand → oferta`). Plantear "Efeonce **o** Greenhouse" es un error de
+capa, no una decisión pendiente.
+
+Reglas aplicadas al correo:
+
+- **Efeonce lidera siempre** la identidad remitente y visual (regla 1 de la arquitectura: liderar con Efeonce para la
+  relación, la propuesta, el contrato y la cuenta).
+- **Greenhouse se nombra cuando aporta claridad** (regla 2), en sintaxis de endoso y nunca como remitente.
+  Patrón permitido: `Enviado desde Greenhouse, la plataforma de Efeonce`.
+- **`Efeonce Greenhouse` queda prohibido en cualquier superficie de correo.** El compuesto fusiona dos capas de la
+  jerarquía en una tercera que no existe en ninguna; el `™` agrava el error al reclamar marca registrada sobre ese
+  nombre inexistente.
+- Nombrar Greenhouse a un destinatario que **no usa la plataforma** (candidato, prospecto) no aclara: confunde. La
+  audiencia es una dimensión de la policy, no una preferencia local del template.
+
+Consecuencia técnica verificada: `AGENCY_FROM_ADDRESS` (`'Efeonce <greenhouse@efeoncepro.com>'`) y
+`DEFAULT_EMAIL_FROM` (`'Efeonce Greenhouse <greenhouse@efeoncepro.com>'`) son **la misma dirección**; sólo difiere el
+display name. Al adoptar `Efeonce` como remitente único, la bifurcación de remitente desaparece por construcción en
+vez de agregarse lógica nueva.
 
 ### 2. Footer, firma y entrega son contratos separados
 
@@ -52,7 +73,7 @@ La policy separará como mínimo:
 - `signaturePolicy`: none, institutional team o runtime owner verificado;
 - `unsubscribePolicy`: forbidden o required;
 - `socialLinksPolicy`: none o institutional;
-- `legalIdentityMode`: compact, entity o full;
+- `legalIdentityMode`: entity o full (no existe `compact` — ver §5);
 - `legalNoticePolicy`: none, security, privacy o regulated;
 - `rollout`: legacy o governed-v1.
 
@@ -100,8 +121,9 @@ internacional requiere validación con abogado habilitado en cada jurisdicción.
 - RRSS usan las cuatro cuentas oficiales desde `EFEONCE_SOCIAL_LINKS` —YouTube, Instagram, LinkedIn y Threads—. Los
   íconos son secundarios, monocromáticos, con nombre accesible y fallback textual. No se agregan parámetros de
   tracking por inferencia.
-- `legalIdentityMode='compact'` muestra Efeonce; `entity` agrega razón social, identificador tributario y casa
-  matriz; `full` agrega una lista compacta de países y privacidad. La lista se presenta como
+- `legalIdentityMode='entity'` muestra razón social, identificador tributario y casa matriz; `full` agrega una lista
+  compacta de países y privacidad. **No existe un modo `compact`**: ningún perfil gobernado puede mostrar menos que
+  `entity`, así que un tercer valor sería inalcanzable por construcción e invitaría a usarlo "para los internos". La lista se presenta como
   `Chile · Estados Unidos · Colombia · México · Perú`, sin el rótulo `Operación en`; declara presencia de marca,
   no entidades legales locales. La dirección de casa matriz no limita el alcance geográfico de Efeonce. Los datos
   provienen del operating entity y el SSOT de marca, nunca de literales JSX.
@@ -175,6 +197,94 @@ bloqueadas. Las RRSS conservan nombre accesible y fallback textual cuando el ass
 | `internal_operational`       | forbidden   | none                      | entity          | none                        |
 | `optional_subscription`      | required    | institutional opcional    | full            | privacy                     |
 | `commercial_marketing`       | required    | institutional obligatorio | full            | privacy                     |
+
+## Delta 2026-08-24 — verificación contra runtime
+
+La ADR se escribió sobre el diseño. Esta verificación ejercitó el runtime real y encontró cuatro precondiciones que
+la decisión daba por resueltas y no lo estaban. Ninguna invalida la decisión de fondo (perfiles semánticos + bloques
+componibles + rollout por tipo); todas cambian lo que la implementación debe cerrar **antes** de promover un tipo.
+
+### D1. `unsubscribePolicy` gobierna un control que hoy no es accionable
+
+`generateUnsubscribeUrl` emite un `<a href>` (GET) contra `/api/account/email-preferences`, que sólo exporta `POST`;
+no existe página intermedia, middleware ni consumer del endpoint. Además `delivery.ts` envía
+`List-Unsubscribe-Post: List-Unsubscribe=One-Click` (RFC 8058), y ese POST también falla: el handler hace
+`request.json()` sobre un body `form-urlencoded`, y lee `action`/`emailType` del body mientras la URL los lleva en el
+query.
+
+Y el default del sistema es **fail-open en la dimensión donde esta ADR exige fail-closed**: `delivery.ts` resuelve la
+prioridad con `?? 'broadcast'`, así que un `EmailType` nuevo ausente de `EMAIL_PRIORITY_MAP` y enviado a más de un
+destinatario recibe token de 30 días y headers de baja automáticamente.
+
+**Precondición:** ningún tipo puede declarar `unsubscribePolicy='required'` mientras el mecanismo no funcione en las
+tres capas (link, header one-click, handler). Corregir el default `?? 'broadcast'` es parte de esa precondición.
+
+### D2. La política de unsubscribe tiene hoy tres decisores, no uno
+
+`BROADCAST_EMAIL_TYPES` gobierna sólo el carril de un destinatario. El carril batch genera `unsubscribeUrl` **sin
+gate** y se elige por `priority === 'broadcast' && recipients.length > 1`. Resultado observable:
+`weekly_executive_digest` lleva baja cuando va a varios destinatarios y no la lleva cuando va a uno — la política
+legal del mensaje depende del largo del array.
+
+**Regla:** el registro de policy es el único decisor. `BROADCAST_EMAIL_TYPES` y el gate del carril batch se derivan
+de él o se retiran; un test de coherencia debe romper el build si divergen. Molde existente:
+`src/lib/email/candidate-reply-to.test.ts` (`CANDIDATE_REPLY_TO ⊆ AGENCY_BRANDED`).
+
+### D3. La identidad legal no tiene camino ni política de ausencia
+
+Ningún archivo bajo `src/lib/email/**` ni `src/emails/**` toca hoy razón social, RUT o dirección. El patrón canónico
+existe fuera del correo y se porta, no se diseña: el `await getOperatingEntityIdentity()` vive en el builder
+server-side y el componente recibe `{legalName, taxId, legalAddress}` como prop opcional
+(`src/lib/finance/pdf/efeonce-pdf-footer.tsx`). `resolveTemplate` es síncrono, así que la identidad debe estar en el
+contexto antes del render.
+
+Lo que la ADR no decidía y ahora debe decidir: **qué pasa cuando el resolver devuelve `null`.** Hoy el repo tiene
+tres conductas distintas para el mismo caso — el finiquito lanza 409, el reporte de contractors hace `catch` mudo, y
+el footer PDF degrada a la constante de marca. Se adopta la tercera: **degradación honesta a
+`EFEONCE_LEGAL_NAME_FALLBACK` / `EFEONCE_LEGAL_ADDRESS_FALLBACK`**, porque no entregar un `access_security` es peor
+resultado que imprimir un dato de respaldo correcto. La degradación emite señal; no es silenciosa.
+
+**Asimetría del RUT (decisión):** el footer PDF omite el RUT cuando falta, en vez de imprimir uno posiblemente
+equivocado; el mockup lo pinta siempre desde `EFEONCE_TAX_ID_FALLBACK`. Manda la conducta del PDF — **el RUT no tiene
+constante de respaldo**: si falta, la línea se imprime sin RUT. `legalIdentityMode='entity'` exige razón social y
+casa matriz; el RUT es obligatorio cuando existe, no inventado cuando no.
+
+**Dependencia externa:** existe drift documentado de la dirección de casa matriz entre la base (`of 05`), el
+`DEFAULT_LEGAL_ENTITY` de quote-share (`of. 05`) y la constante de marca (`Of 1105`) — `TASK-1650`. Ninguna cohorte
+que imprima identidad legal puede promoverse antes de cerrarlo, o el correo imprimirá una dirección distinta a la de
+la lámina aprobada y parecerá un defecto de implementación.
+
+**Robustez del resolver:** `getOperatingEntityIdentity()` hace `LIMIT 1` sin `ORDER BY` sobre
+`is_operating_entity = TRUE` y no hay restricción en el esquema que impida dos filas marcadas. La unicidad la
+sostiene hoy una migración de 2026-04-02, no el schema. Se agrega índice único parcial en la foundation.
+
+### D4. El envío es multi-runtime, y tres tipos salen de ambos
+
+El envío ocurre en el proceso que invoca `sendEmail`; no hay delegación entre runtimes. Reparto verificado sobre los
+30 tipos: **20 sólo desde el ops-worker** (proyecciones reactivas del outbox), **6 sólo desde Vercel**
+(`password_reset`, `magic_link`, `verify_email`, `invitation`, `quote_share`,
+`hiring_assessment_access_recovery` — envíos síncronos que el usuario espera en el mismo request, y cuatro de ellos
+token-sensitive), **3 desde ambos** (`payroll_export`, `payroll_receipt`, `notification`: emisión automática en el
+worker, reenvío manual del admin en Vercel) y **1 sin emisor** (`payroll_liquidacion_v2`: tiene template y preview,
+no lo manda nadie).
+
+Lo que se migró a Cloud Run (`TASK-254`/`773`/`775`) fue el **drenaje asíncrono**, no "los correos". El catálogo ya lo
+declara: *"el contrato ya no vive solo en Vercel"*.
+
+**Regla:** promover un tipo exige desplegar **todos** los runtimes que lo emiten, y el rollback también. Para los tres
+híbridos, un despliegue parcial hace que el mismo documento salga con dos footers según haya sido automático o
+reenviado a mano. El carril de reintento y `/api/admin/emails/preview` re-renderizan **cualquier** tipo desde Vercel.
+
+### D5. Paridad de idioma: el diccionario no tiene inglés y el tipo no lo detecta
+
+`dictionaries/en-US/index.ts` hace `emails: esCLEmails` — el namespace `emails` de en-US **es** el objeto español,
+por alias, con el comentario *"Email localization is intentionally deferred to the email rollout child task"*. El
+tipo queda satisfecho y el build verde. Consecuencia ya observable: los correos que hoy salen en inglés (toda
+liquidación a colaborador no-Chile; remittance de contractors) imprimen en castellano lo que venga del diccionario.
+
+**Regla:** todo copy de footer gobernado resuelto vía `getMicrocopy` exige `dictionaries/en-US/emails.ts` real y
+retirar el alias. Se agrega test de paridad que se apoya en la mecánica del defecto (detectar que ambas claves sean
+el mismo objeto), molde: `src/lib/copy/hiring-desk-stage-locale-parity.test.ts` (`TASK-1754`).
 
 ## Alternatives Considered
 

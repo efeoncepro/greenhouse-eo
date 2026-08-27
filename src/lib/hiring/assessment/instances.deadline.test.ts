@@ -97,6 +97,40 @@ describe('TASK-1746 assessment deadline primitives', () => {
     expect(query.mock.calls.some(call => String(call[0]).includes('hiring_assessment_response'))).toBe(false)
   })
 
+  it('accepts a save one second before the answer deadline — el borde que el guardado preventivo necesita', async () => {
+    // TASK-1751: el Slice 1 fuerza un guardado dentro de la ventana previa al plazo. Si ese borde no
+    // acepta, el guardado preventivo no sirve de nada. El caso `>=` ya está cubierto arriba; este es el
+    // lado contrario, que no tenía test: a `deadline - 1s` la respuesta TIENE que entrar.
+    const query = vi.fn(async (sql: string) => {
+      if (sql.includes('effective_expiry')) return { rows: [row()] }
+
+      if (sql.includes('AS answer_deadline')) {
+        return { rows: [{
+          status: 'in_progress', answer_deadline: '2026-08-19T10:45:00.000Z',
+          close_deadline: '2026-08-19T11:15:00.000Z', database_now: '2026-08-19T10:44:59.000Z',
+        }] }
+      }
+
+      if (sql.includes('FROM greenhouse_hiring.hiring_question')) return { rows: [{ type: 'open_text' }] }
+
+      if (sql.includes('hiring_assessment_response')) {
+        return { rows: [{ response_id: 'resp-1', assessment_id: 'asmt-1', question_id: 'q-1' }] }
+      }
+
+      return { rows: [] }
+    })
+
+    const client = { query } as unknown as PoolClient
+
+    const result = await saveResponseWithClient(client, {
+      assessmentId: 'asmt-1', competencyId: 'cmp-1', questionId: 'q-1',
+      questionType: 'open_text', answer: { text: 'respuesta escrita a tiempo' },
+    })
+
+    expect(result).toMatchObject({ outcome: 'ok' })
+    expect(query.mock.calls.some(call => String(call[0]).includes('hiring_assessment_response'))).toBe(true)
+  })
+
   it('allows no-limit saves before the canonical 24-hour close deadline', async () => {
     const query = vi.fn(async (sql: string) => {
       if (sql.includes('effective_expiry')) return { rows: [row({ time_limit_minutes: null })] }

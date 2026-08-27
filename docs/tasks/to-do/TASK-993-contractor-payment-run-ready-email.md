@@ -13,14 +13,50 @@
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
+- Execution profile: `backend-data`
+- UI impact: `none`
+- UI ready: `n/a`
+- Wireframe: `none`
+- Flow: `none`
+- Motion: `none`
+- Backend impact: `api|command|sync`
 - Epic: `EPIC-013`
 - Status real: `Diseno`
 - Rank: `TBD`
-- Domain: `finance|communications|reliability|ui`
+- Domain: `finance|communications|reliability`
 - Blocked by: `none`
-- Branch: `task/TASK-993-contractor-payment-run-ready-email`
-- Legacy ID: `optional`
-- GitHub Issue: `optional`
+- Branch: `Greenhouse develop; shared checkout; sin worktrees ni ramas por task`
+- Legacy ID: `none`
+- GitHub Issue: `none`
+
+## Delta 2026-08-24 — revisar en qué carril de baja cae este correo
+
+Esta task declara `src/lib/email/subscriptions.ts` entre sus dependencias. La verificación del
+2026-08-24 (`ISSUE-163`) encontró que el mecanismo de baja no es accionable por ningún método, y que la
+emisión del token no depende de si el template realmente muestra el control — así que hay tipos que
+persisten credenciales de 30 días sin exponerlas nunca.
+
+Agrega una pregunta al Discovery de quien la tome: **¿este correo resuelve destinatarios explícitos o
+desde `email_subscriptions`?** Si es lo segundo, es una lista real y necesita salida real, o sea depende
+de `TASK-1774`. Si es lo primero, no debe emitir token ni header de baja, y hay que verificar que no lo
+esté haciendo por el default `?? 'broadcast'` del carril batch.
+
+### Corrección de formato y split de la afordancia visible
+
+La task es anterior a la plantilla vigente: su `## Status` no declaraba `Execution profile`, `UI impact`,
+`UI ready`, `Wireframe`, `Flow`, `Motion` ni `Backend impact`, y `pnpm task:lint` la reportaba con
+`errors=1 warnings=4`. Quedó completada como `backend-data`.
+
+**La afordancia visible del Slice 6 sale de esta task.** El propio Slice la modelaba como opcional
+(*«otherwise leave UI minimal and rely on endpoint response»*) y el Goal decía «desde la UI **o** API».
+Eso es exactamente el caso donde el modelo operativo pide dos tasks secuenciadas: primero `backend-data`
+para el endpoint gobernado, después `ui-ux` para la ruta visible, con su wireframe y su plan de GVC.
+
+Se separa, no se descarta: el Slice 6 conserva el endpoint completo —que es lo que hace la capacidad
+operable por Full API Parity— y el botón dentro del modal de corrida mensual queda declarado en
+`## Follow-ups` con su superficie y su contrato. Escribir acá un wireframe para una acción secundaria
+sin pasar por las skills de diseño habría sido un doc para pasar el gate, que es justo lo que el
+contrato de tasks prohíbe.
 
 ## Summary
 
@@ -255,6 +291,77 @@ Docs to update:
      aprobado. Ejecuta un slice, verifica, commitea, y avanza.
      ═══════════════════════════════════════════════════════════ -->
 
+## Modular Placement Contract
+
+- Topology impact: `worker`
+- Current home: `src/lib/contractor-engagements/**`, `src/lib/sync/projections/**` y `src/emails/**` en el runtime compartido; el envío corre en el ops-worker
+- Future candidate home: `remain-shared`
+- Boundary: la corrida publica evento canónico; la projection reactiva es el único emisor del correo; el endpoint de reenvío no reejecuta la corrida
+- Server/browser split: `server-only` de punta a punta; no hay contrato browser-safe en esta task
+- Build impact: `none`
+- Extraction blocker: `none`
+
+## Backend/Data Contract
+
+### Backend/data brief
+
+- Backend rigor: `backend-standard`
+- Impacto principal: `sync`
+- Source of truth afectado: `greenhouse_sync.contractor_payment_runs` (la corrida y su estado terminal) y las órdenes preparadas que referencia
+- Consumidores afectados: responsables de Finanzas por correo; el endpoint de reenvío; observabilidad admin
+- Runtime target: `worker` para el envío reactivo; `production` para el endpoint de reenvío
+
+### Contract surface
+
+- Contrato existente a respetar: `sendEmail` de `src/lib/email/delivery.ts`; el catálogo de `EmailType`; el patrón de projection reactiva sobre outbox; `canonicalErrorResponse` para el endpoint
+- Contrato nuevo o modificado: evento canónico de corrida completada, `EmailType` nuevo `contractor_payment_run_ready`, y el endpoint de reenvío
+- Backward compatibility: `compatible` — la capacidad es aditiva; ninguna corrida existente cambia de comportamiento
+- Full API parity: el reenvío nace como command server-side con su endpoint; la UI futura es un consumer más y no reimplementa la lógica
+
+### Data model and invariants
+
+- Entidades/tablas/views afectadas: `greenhouse_sync.contractor_payment_runs`, el ledger de entrega de correo, `email_subscriptions` para la resolución de destinatarios
+- Invariantes que no se pueden romper:
+  - Descargar el reporte manualmente **nunca** dispara correo: el disparador es la corrida terminal, no una lectura.
+  - El reenvío nunca reejecuta `prepareMonthlyContractorPaymentRun` ni crea órdenes.
+  - Una corrida sin órdenes preparadas no genera correo.
+  - Una misma corrida no genera dos correos automáticos.
+- Write-target allowlist: `N/A` — el dominio no tiene boundary test de destinos de escritura
+- Tenant/space boundary: alcance Finanzas interno; el endpoint valida que la corrida pertenece al scope pedido
+- Idempotency/concurrency: clave de idempotencia por `paymentRunId`; el reenvío manual se marca con `manual_resend` y actor, para distinguirlo del automático en el ledger
+- Audit/outbox/history: evento en el outbox + ledger de entrega existente; no se crea tabla de auditoría nueva
+
+### Migration, backfill and rollout
+
+- Migration posture: `additive`
+- Default state: `flag OFF` hasta verificar en staging con una corrida real
+- Backfill plan: `N/A` — no se emiten correos por corridas pasadas
+- Rollback path: `flag off` y, si hiciera falta, `revert PR + redeploy`
+- External coordination: el flag se lee en el **ops-worker**, no en Vercel; declarar la fila en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` y aplicarlo en `services/ops-worker/deploy.sh` además de en vivo
+
+### Security and access
+
+- Auth/access gate: sesión Finanzas + capability para el endpoint de reenvío; la projection corre en el worker sin sesión
+- Sensitive data posture: la nómina de contractors es dato sensible; los adjuntos van sólo a destinatarios resueltos por suscripción, nunca por parámetro del request
+- Error contract: `canonicalErrorResponse`; ningún error crudo ni detalle de proveedor al cliente
+- Abuse/rate-limit posture: el reenvío es idempotente por corrida y está detrás de capability; declarar si además necesita rate-limit, con razón
+
+### Runtime evidence
+
+- Local checks: tests de la projection, del resolver de destinatarios y del endpoint
+- DB/runtime checks: readback de la corrida terminal y del ledger de entrega tras un envío real
+- Integration checks: correo recibido con ambos adjuntos, verificado en un cliente real
+- Reliability signals/logs: señal de corrida terminal sin correo entregado
+- Production verification sequence: ver `## Rollout Plan & Risk Matrix`
+
+### Acceptance criteria additions
+
+- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
+- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+
 ## Scope
 
 ### Slice 1 — Event contract + run completion publisher
@@ -385,7 +492,7 @@ Docs to update:
   - email provider failure -> throw, retry, dead-letter if persistent.
 - Register projection in `src/lib/sync/projections/index.ts`.
 
-### Slice 6 — Manual resend API + UI affordance
+### Slice 6 — Manual resend API
 
 - Add a resend endpoint, proposed:
   `POST /api/finance/contractor-payables/monthly-run/[paymentRunId]/resend-ready-email`.
@@ -399,16 +506,12 @@ Docs to update:
   - validate `prepared_order_ids.length > 0`.
   - send with `manual_resend` delivery source and actor user ID.
   - return recipients count, delivery IDs/statuses, and artifact filenames.
-- UI:
-  - after successful monthly run modal, show secondary action
-    `Reenviar email a Finanzas` only if run has `paymentRunId` and prepared
-    orders.
-  - in workbench, expose last run delivery status if cheap to read; otherwise
-    leave UI minimal and rely on endpoint response.
-  - no duplicate primary action: "Iniciar corrida mensual" remains the main
-    action; resend is contextual.
 - Manual resend must never re-run `prepareMonthlyContractorPaymentRun` and never
   create payment orders.
+- **La afordancia visible NO entra en este slice** (ver Delta 2026-08-24). El endpoint deja la capacidad
+  operable por contrato gobernado; el botón dentro del modal de corrida mensual es task `ui-ux` propia,
+  declarada en `## Follow-ups`. El endpoint debe responder lo suficiente para que esa UI futura no tenga
+  que recomputar nada: destinatarios, delivery IDs con estado y nombres de artefactos.
 
 ### Slice 7 — Reliability signal + admin observability
 
@@ -658,7 +761,7 @@ why. Do not rely on both silently.
 | Slice 3 | Disable `email_type_config` or remove template registration via revert | <5 min | si |
 | Slice 4 | Deactivate subscribers in `greenhouse_notifications.email_subscriptions` | <5 min | si |
 | Slice 5 | Disable projection via flag/email type config; revert registration if needed | <5 min | si |
-| Slice 6 | Revert route/UI; no data mutation beyond email logs | <10 min | si |
+| Slice 6 | Revert route; no data mutation beyond email logs | <10 min | si |
 | Slice 7 | Remove signal wiring or let it report zero once projection disabled | <10 min | si |
 | Slice 8 | Docs rollback not required; update with corrected state if behavior changes | n/a | si |
 
@@ -746,6 +849,19 @@ why. Do not rely on both silently.
   - test-send from `/admin/emails/preview`;
   - real run sends to subscribers;
   - attachments open and match report period.
+
+## Follow-ups
+
+- **Afordancia visible de reenvío (`ui-ux`, ID por reservar).** Acción secundaria `Reenviar email a
+  Finanzas` dentro del modal de éxito de la corrida mensual en
+  `src/views/greenhouse/finance/contractor-payments/ContractorPaymentsWorkbenchView.tsx`, visible sólo
+  cuando la corrida tiene `paymentRunId` y órdenes preparadas. No compite con la acción primaria
+  «Iniciar corrida mensual»: es contextual. Opcionalmente muestra el estado de la última entrega si
+  leerlo es barato. Consume el endpoint del Slice 6 y no recomputa nada. Requiere wireframe, contrato
+  UI/UX y plan de GVC propios; salió de esta task en el Delta 2026-08-24 para no escribir un doc de
+  diseño con el único fin de pasar el gate.
+- Resolver, en Discovery, si este correo resuelve destinatarios explícitos o desde
+  `email_subscriptions`. Si es lista real, depende de `TASK-1774`.
 
 ## Closing Protocol
 

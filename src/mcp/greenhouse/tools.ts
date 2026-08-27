@@ -191,10 +191,15 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'trackSeoKeywords'
   | 'untrackSeoKeywords'
   | 'getSeoKeywordMarketData'
+  | 'getSeoDomainOverview'
+  | 'getSeoUrlVisibility'
+  | 'getSeoBacklinkDetail'
   | 'getSeoKeywordDiscovery'
   | 'discoverSeoKeywords'
   | 'getSeoGroundedQueryDraft'
   | 'prepareSeoGroundedQueries'
+  | 'getSeoProspectDiagnostic'
+  | 'runSeoProspectDiagnostic'
 >) => ({
   async getContext() {
     return callReadTool(
@@ -428,6 +433,118 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         return `Market data (estimated, DataForSEO Labs) for ${found}/${rows.length} keyword(s), as-of ${asOf}. Missing keywords were never queried — do NOT report them as zero (${result.requestId}).`
       },
       () => client.getSeoKeywordMarketData(input)
+    )
+  },
+  async getSeoDomainOverview(input: { organizationId?: string; market?: string; subject?: string; months?: number }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          overview?: {
+            subject?: string
+            capturedAt?: string
+            organicKeywords?: number | null
+            organicEtv?: number | null
+            history?: unknown[]
+          }
+        }
+
+        if (data.ok === false) {
+          return `SEO domain overview unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const overview = data.overview ?? {}
+        const history = Array.isArray(overview.history) ? overview.history.length : 0
+
+        // El as-of viaja SIEMPRE, y la lente es estimada: jamás presentarla como medición GSC.
+        return (
+          `Domain overview (estimated, DataForSEO Labs) for ${String(overview.subject ?? 'unknown')}: ` +
+          `${String(overview.organicKeywords ?? 'unknown')} ranked keywords, estimated traffic volume ` +
+          `${String(overview.organicEtv ?? 'unknown')}, ${history} history month(s), as-of ${String(overview.capturedAt ?? 'unknown')}. ` +
+          `All figures are market ESTIMATES — never averaged with measured GSC data (${result.requestId}).`
+        )
+      },
+      () => client.getSeoDomainOverview(input)
+    )
+  },
+  async getSeoUrlVisibility(input: {
+    organizationId?: string
+    market?: string
+    subject?: string
+    kind?: string
+    months?: number
+    concentration?: string
+    domain?: string
+  }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          mode?: string
+          visibility?: { subject?: string; kind?: string; totalRankedKeywords?: number | null; capturedAt?: string }
+          concentration?: { domain?: string; items?: unknown[]; capturedAt?: string }
+        }
+
+        if (data.ok === false) {
+          return `SEO URL visibility unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        if (data.mode === 'concentration') {
+          const items = Array.isArray(data.concentration?.items) ? data.concentration.items.length : 0
+
+          return `Traffic concentration (estimated, DataForSEO Labs) for ${String(data.concentration?.domain ?? 'unknown')}: top ${items} subject(s) by estimated traffic, as-of ${String(data.concentration?.capturedAt ?? 'unknown')}. Never mix with measured GSC data (${result.requestId}).`
+        }
+
+        const visibility = data.visibility ?? {}
+
+        // El as-of viaja SIEMPRE y la lente es estimada — jamás presentarla como medición GSC.
+        return (
+          `URL visibility (estimated, DataForSEO Labs) for ${String(visibility.kind ?? '?')} ${String(visibility.subject ?? 'unknown')}: ` +
+          `${String(visibility.totalRankedKeywords ?? 'unknown')} ranked keywords in the market snapshot, as-of ${String(visibility.capturedAt ?? 'unknown')}. ` +
+          `Positions here are exact-SERP estimates — never average them with GSC measured positions (${result.requestId}).`
+        )
+      },
+      () => client.getSeoUrlVisibility(input)
+    )
+  },
+  async getSeoBacklinkDetail(input: { organizationId?: string; market?: string; captureDate?: string }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          state?: string
+          captureDate?: string
+          domains?: unknown[]
+          newDomains?: number
+          lostDomains?: number
+          anchorProfile?: { dominantAnchor?: string | null; dominantShare?: number | null }
+        }
+
+        if (data.ok === false) {
+          return `SEO backlink detail unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        if (data.state === 'skipped_no_movement') {
+          // Afirmación POSITIVA: el perfil estuvo estable. Jamás reportarlo como "sin datos".
+          return `Backlink profile was STABLE for the week of ${String(data.captureDate ?? 'unknown')} — no drill-down was purchased because nothing moved. That is a finding, not missing data (${result.requestId}).`
+        }
+
+        if (data.state === 'drilldown_failed') {
+          return `Backlink detail drill-down FAILED for the week of ${String(data.captureDate ?? 'unknown')} — we do not know what moved. Report this honestly; never present it as "stable" (${result.requestId}).`
+        }
+
+        const domains = Array.isArray(data.domains) ? data.domains.length : 0
+
+        return (
+          `Backlink detail for week ${String(data.captureDate ?? 'unknown')}: ${domains} referring domain(s) ` +
+          `(${String(data.newDomains ?? 0)} new, ${String(data.lostDomains ?? 0)} lost), dominant anchor ` +
+          `"${String(data.anchorProfile?.dominantAnchor ?? 'n/a')}" at ${String(data.anchorProfile?.dominantShare ?? 'n/a')} share (${result.requestId}).`
+        )
+      },
+      () => client.getSeoBacklinkDetail(input)
     )
   },
   async getSeoVisibility360(input: { organizationId?: string; market?: string }) {
@@ -914,6 +1031,62 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         } It is a DRAFT pending human review; approval uses the existing AEO command and this tool never activates anything (${result.requestId}).`
       },
       () => client.prepareSeoGroundedQueries(input)
+    )
+  },
+
+  // TASK-1709 — diagnóstico de prospecto: lectura + disparo (gasto real, tope duro).
+  async getSeoProspectDiagnostic(input: { diagnosticId?: string; rootDomain?: string; limit?: number }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          diagnostic?: { diagnosticId?: string; facts?: unknown[] }
+          diagnostics?: unknown[]
+        }
+
+        if (data.ok === false) {
+          return `SEO prospect diagnostics unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        if (data.diagnostic) {
+          return `Loaded prospect diagnostic ${String(data.diagnostic.diagnosticId ?? '?')} with ${String(
+            data.diagnostic.facts?.length ?? 0
+          )} fact(s). Every figure is ESTIMATED (provider data, with capturedAt); this diagnostic NEVER asserts a site is healthy (${result.requestId}).`
+        }
+
+        return `Loaded ${String(data.diagnostics?.length ?? 0)} prospect diagnostic(s) (${result.requestId}).`
+      },
+      () => client.getSeoProspectDiagnostic(input)
+    )
+  },
+
+  async runSeoProspectDiagnostic(input: { rootDomain: string; market: string; competitorDomains?: string[] }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          reused?: boolean
+          forecastUsd?: number
+          diagnostic?: { diagnosticId?: string; facts?: unknown[]; cost?: { actualUsd?: number | null } }
+        }
+
+        if (data.ok === false) {
+          return `SEO prospect diagnostic rejected (${String(data.errorCode ?? 'unknown')}). No provider call was made and nothing was spent (${result.requestId}).`
+        }
+
+        if (data.reused) {
+          return `Prospect diagnostic already existed for this domain/market today: returned diagnostic ${String(
+            data.diagnostic?.diagnosticId ?? '?'
+          )} with USD 0 spent (idempotency) (${result.requestId}).`
+        }
+
+        return `Prospect diagnostic ${String(data.diagnostic?.diagnosticId ?? '?')} completed with ${String(
+          data.diagnostic?.facts?.length ?? 0
+        )} fact(s); actual provider cost USD ${String(data.diagnostic?.cost?.actualUsd ?? '?')}. All figures are ESTIMATED and the diagnostic never asserts site health (${result.requestId}).`
+      },
+      () => client.runSeoProspectDiagnostic(input)
     )
   }
 })

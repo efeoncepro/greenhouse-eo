@@ -7,6 +7,18 @@ import { readSeoAeoGap } from '@/lib/growth/seo/gap/read-seo-aeo-gap'
 import { normalizeMarketKeyword, readKeywordMarketDataForTarget } from '@/lib/growth/seo/keyword-market-data'
 import { readKeywordOpportunities } from '@/lib/growth/seo/keyword-opportunities-reader'
 import {
+  readDomainOverviewForTarget,
+  type ReadDomainOverviewResult
+} from '@/lib/growth/seo/domain-overview/reader'
+import {
+  readUrlVisibility,
+  readVisibilityConcentration,
+  type ReadUrlVisibilityResult,
+  type ReadVisibilityConcentrationResult
+} from '@/lib/growth/seo/url-visibility/reader'
+import { readBacklinkDetail, type BacklinkDetailResult } from '@/lib/growth/seo/backlinks/detail-reader'
+import { isVisibilitySubjectKind } from '@/lib/growth/seo/url-visibility/resolve-subject'
+import {
   SEO_DISCOVERY_ACTION_KINDS,
   SEO_DISCOVERY_SOURCE_KINDS,
   type SeoDiscoveryActionKind,
@@ -51,6 +63,9 @@ import type {
 } from '@/lib/growth/seo/contracts'
 import { resolveSeoEntitlement, type SeoTier } from '@/lib/growth/seo/entitlement'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
+import { runProspectDiagnostic, type RunProspectDiagnosticResult } from '@/lib/growth/seo/prospect/command'
+import { listProspectDiagnostics, readProspectDiagnostic } from '@/lib/growth/seo/prospect/reader'
+import type { ProspectDiagnostic } from '@/lib/growth/seo/prospect/contracts'
 
 /**
  * TASK-1645 — Lane ecosystem del módulo SEO (downstream de API Platform, consumido por
@@ -120,6 +135,8 @@ const resolveOrganizationId = (
 interface SeoLaneSubject {
   organizationId: string
   seoTargetId: string | null
+  /** Dominio del target resuelto (TASK-1776: sujeto default de la visibilidad por página). */
+  rootDomain: string | null
   tier: SeoTier | null
   /**
    * Mercado que ESTA respuesta sirve (ISSUE-153). Toda respuesta del lane lo declara: un
@@ -176,12 +193,13 @@ const resolveSeoLaneSubject = async (
   }
 
   if (resolution.status === 'none') {
-    return { organizationId, seoTargetId: null, tier: entitlement.tier, servedMarket: null }
+    return { organizationId, seoTargetId: null, rootDomain: null, tier: entitlement.tier, servedMarket: null }
   }
 
   return {
     organizationId,
     seoTargetId: resolution.target.seoTargetId,
+    rootDomain: resolution.target.rootDomain,
     tier: entitlement.tier,
     servedMarket: describeMarket(resolution.target)
   }
@@ -341,6 +359,197 @@ export const getEcosystemSeoKeywordMarketDataPayload = async ({
       })
     },
     meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+export type EcosystemSeoDomainOverviewPayload =
+  | {
+      ok: true
+      measurementKind: 'estimated_market'
+      source: 'dataforseo_labs'
+      overview: ReadDomainOverviewResult & { ok: true }
+    }
+  | { ok: false; errorCode: 'disabled' | 'no_market_data'; status: null }
+  | SeoTargetNotConfiguredPayload
+
+/**
+ * GET /api/platform/ecosystem/growth/seo/domain-overview — TASK-1775.
+ *
+ * Foto + trayectoria del dominio del target (default) o de un competidor (`?subject=`), con
+ * la lente ◑ `estimated` y su `capturedAt`. El DTO sale del reader canónico, que NUNCA
+ * selecciona `captured_by_organization_id`.
+ */
+export const getEcosystemSeoDomainOverviewPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<EcosystemSeoDomainOverviewPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const url = new URL(request.url)
+  const requestedSubject = url.searchParams.get('subject')?.trim() || undefined
+  const monthsRaw = url.searchParams.get('months')
+  const historyMonths = monthsRaw && Number.isFinite(Number(monthsRaw)) ? Number(monthsRaw) : undefined
+
+  const result = await readDomainOverviewForTarget(subject.seoTargetId, {
+    subject: requestedSubject,
+    historyMonths
+  })
+
+  if (!result) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  if (!result.ok) {
+    // Degradación honesta: sujeto sin snapshot = no_market_data, jamás ceros fantasma.
+    return {
+      data: { ok: false, errorCode: 'no_market_data', status: null },
+      meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+    }
+  }
+
+  return {
+    data: {
+      ok: true,
+      measurementKind: 'estimated_market',
+      source: 'dataforseo_labs',
+      overview: result
+    },
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+export type EcosystemSeoUrlVisibilityPayload =
+  | {
+      ok: true
+      measurementKind: 'estimated_market'
+      source: 'dataforseo_labs'
+      mode: 'subject'
+      visibility: ReadUrlVisibilityResult & { ok: true }
+    }
+  | {
+      ok: true
+      measurementKind: 'estimated_market'
+      source: 'dataforseo_labs'
+      mode: 'concentration'
+      concentration: ReadVisibilityConcentrationResult & { ok: true }
+    }
+  | { ok: false; errorCode: 'disabled' | 'no_market_data' | 'invalid_subject' | 'invalid_kind'; status: null }
+  | SeoTargetNotConfiguredPayload
+
+/**
+ * GET /api/platform/ecosystem/growth/seo/url-visibility — TASK-1776.
+ *
+ * Dos modos sobre el mismo hecho:
+ *   - sujeto (`?subject=&kind=domain|subdomain|subfolder|url[&months=]`): la foto + trayectoria
+ *     de una página/subcarpeta/subdominio/dominio, propio o de un competidor. Default: el
+ *     dominio del target (`kind=domain`).
+ *   - concentración (`?concentration=url|subdomain[&domain=]`): qué páginas o subdominios
+ *     concentran el tráfico estimado de un host.
+ */
+export const getEcosystemSeoUrlVisibilityPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<EcosystemSeoUrlVisibilityPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request)
+
+  if (!subject.seoTargetId || !subject.servedMarket) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const url = new URL(request.url)
+
+  const meta = {
+    module: 'growth.seo',
+    tier: subject.tier,
+    organizationId: subject.organizationId,
+    servedMarket: subject.servedMarket
+  }
+
+  const rootDomain = subject.rootDomain
+
+  if (!rootDomain) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const concentration = url.searchParams.get('concentration')
+
+  if (concentration) {
+    if (concentration !== 'url' && concentration !== 'subdomain') {
+      return { data: { ok: false, errorCode: 'invalid_kind', status: null }, meta }
+    }
+
+    const result = await readVisibilityConcentration({
+      domain: url.searchParams.get('domain')?.trim() || rootDomain,
+      kind: concentration,
+      locationCode: subject.servedMarket.locationCode,
+      languageCode: subject.servedMarket.languageCode
+    })
+
+    if (!result.ok) {
+      return { data: { ok: false, errorCode: result.reason, status: null }, meta }
+    }
+
+    return {
+      data: { ok: true, measurementKind: 'estimated_market', source: 'dataforseo_labs', mode: 'concentration', concentration: result },
+      meta
+    }
+  }
+
+  const requestedKind = url.searchParams.get('kind')?.trim() || 'domain'
+
+  if (!isVisibilitySubjectKind(requestedKind)) {
+    return { data: { ok: false, errorCode: 'invalid_kind', status: null }, meta }
+  }
+
+  const monthsRaw = url.searchParams.get('months')
+
+  const result = await readUrlVisibility({
+    subject: url.searchParams.get('subject')?.trim() || rootDomain,
+    kind: requestedKind,
+    keepQuery: url.searchParams.get('keepQuery') === 'true',
+    locationCode: subject.servedMarket.locationCode,
+    languageCode: subject.servedMarket.languageCode,
+    historyMonths: monthsRaw && Number.isFinite(Number(monthsRaw)) ? Number(monthsRaw) : undefined
+  })
+
+  if (!result.ok) {
+    // Degradación honesta: sujeto sin snapshot = no_market_data, jamás ceros fantasma.
+    return { data: { ok: false, errorCode: result.reason, status: null }, meta }
+  }
+
+  return {
+    data: { ok: true, measurementKind: 'estimated_market', source: 'dataforseo_labs', mode: 'subject', visibility: result },
+    meta
   }
 }
 
@@ -531,6 +740,49 @@ export const getEcosystemSeoBacklinkProfilePayload = async ({
   const rangeDays = Number.isFinite(rawRange) && rawRange > 0 ? Math.floor(rawRange) : undefined
 
   const result = await readBacklinkProfile(subject.seoTargetId, rangeDays ? { rangeDays } : {})
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+export type EcosystemSeoBacklinkDetailPayload = BacklinkDetailResult | SeoTargetNotConfiguredPayload
+
+/**
+ * GET /api/platform/ecosystem/growth/seo/backlink-detail — TASK-1777.
+ *
+ * El detalle nominal del perfil de enlaces con sus TRES estados distinguibles: `available`
+ * (hay drill-down), `skipped_no_movement` ("el perfil estuvo estable" — afirmación positiva,
+ * no un hueco) y `drilldown_failed` (se intentó y falló). Passthrough del reader canónico;
+ * la derivación de sobre-optimización de anchors viaja YA calculada — ningún consumer la
+ * recalcula. `?captureDate=YYYY-MM-DD` fija la semana; default: la más reciente evaluada.
+ */
+export const getEcosystemSeoBacklinkDetailPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<EcosystemSeoBacklinkDetailPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const url = new URL(request.url)
+  const rawDate = url.searchParams.get('captureDate')
+  const captureDate = rawDate && /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : undefined
+
+  const result = await readBacklinkDetail(subject.seoTargetId, captureDate ? { captureDate } : {})
 
   return {
     data: result,
@@ -1238,4 +1490,113 @@ export const getEcosystemSeoGroundedQueryDraftPayload = async ({
     data: result,
     meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
   }
+}
+
+/**
+ * ═══ TASK-1709 — Lane ecosystem del diagnóstico de prospecto ═══
+ *
+ * El sujeto de este carril NO tiene organización (es un dominio prospecto), así que acá
+ * no corre `resolveSeoLaneSubject`: el boundary es el SCOPE del binding. SOLO bindings
+ * `internal` — leer y disparar: la data de prospección es inteligencia de adquisición de
+ * Efeonce y jamás se sirve a un binding cliente; y el write compromete gasto real (tope
+ * duro por diagnóstico + tope diario por actor, ambos dentro del command canónico).
+ */
+
+export interface EcosystemSeoProspectDiagnosticReadPayload {
+  ok: boolean
+  errorCode?: 'disabled'
+  diagnostic?: ProspectDiagnostic
+  diagnostics?: ProspectDiagnostic[]
+}
+
+export const getEcosystemSeoProspectDiagnosticPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<EcosystemSeoProspectDiagnosticReadPayload>> => {
+  if (context.binding.greenhouseScopeType !== 'internal') {
+    throw new ApiPlatformError('Prospect diagnostics are not available for the resolved binding scope.', {
+      statusCode: 403,
+      errorCode: 'scope_not_allowed'
+    })
+  }
+
+  const url = new URL(request.url)
+  const diagnosticId = url.searchParams.get('diagnosticId')
+
+  if (diagnosticId) {
+    const result = await readProspectDiagnostic({ diagnosticId })
+
+    if (!result.ok) {
+      if (result.errorCode === 'disabled') {
+        return { data: { ok: false, errorCode: 'disabled' }, meta: { module: 'growth.seo' } }
+      }
+
+      throw new ApiPlatformError('Prospect diagnostic not found.', {
+        statusCode: 404,
+        errorCode: 'not_found'
+      })
+    }
+
+    return { data: { ok: true, diagnostic: result.data }, meta: { module: 'growth.seo' } }
+  }
+
+  const limitParam = Number.parseInt(url.searchParams.get('limit') ?? '', 10)
+
+  const result = await listProspectDiagnostics({
+    limit: Number.isFinite(limitParam) ? limitParam : undefined,
+    rootDomain: url.searchParams.get('rootDomain') ?? undefined
+  })
+
+  if (!result.ok) {
+    return { data: { ok: false, errorCode: 'disabled' }, meta: { module: 'growth.seo' } }
+  }
+
+  return { data: { ok: true, diagnostics: result.data }, meta: { module: 'growth.seo' } }
+}
+
+export interface EcosystemSeoProspectDiagnosticBody {
+  rootDomain?: unknown
+  market?: unknown
+  competitorDomains?: unknown
+}
+
+export const runEcosystemSeoProspectDiagnosticPayload = async ({
+  context,
+  body
+}: {
+  context: ApiPlatformRequestContext
+  body: EcosystemSeoProspectDiagnosticBody | null
+}): Promise<ApiPlatformSuccessResult<RunProspectDiagnosticResult>> => {
+  if (context.binding.greenhouseScopeType !== 'internal') {
+    throw new ApiPlatformError('Running prospect diagnostics is not allowed for the resolved binding scope.', {
+      statusCode: 403,
+      errorCode: 'scope_not_allowed'
+    })
+  }
+
+  if (!body || typeof body.rootDomain !== 'string' || typeof body.market !== 'string') {
+    throw new ApiPlatformError('A "rootDomain" and a "market" are required.', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
+  const competitorDomains = Array.isArray(body.competitorDomains)
+    ? body.competitorDomains.filter((domain): domain is string => typeof domain === 'string').slice(0, 5)
+    : undefined
+
+  // El actor es el consumidor máquina; la confirmación humana ocurre ANTES, en la
+  // superficie que propone (propose → confirm → execute) — la description de la MCP
+  // tool lo exige. La procedencia queda auditable en created_by.
+  const result = await runProspectDiagnostic({
+    rootDomain: body.rootDomain,
+    market: body.market,
+    competitorDomains,
+    actor: `mcp:${context.consumer.publicId}`
+  })
+
+  return { data: result, meta: { module: 'growth.seo' } }
 }

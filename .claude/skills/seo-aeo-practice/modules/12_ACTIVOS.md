@@ -58,6 +58,15 @@ producto con mejor ROI de la práctica.**
 
 ## 2. 🔴 SEO — el hueco
 
+> **Delta 2026-08-27 — TASK-1709: diagnóstico SEO de prospecto (eslabón 2 de la cadena de venta).**
+> Nuevo activo interno pre-firma: cuantifica la pérdida orgánica del dominio del prospecto con dato del
+> proveedor, **sin pedirle acceso** (~USD 0,25/corrida, tope duro; todo lente `◑ estimada`, sin score ni
+> veredicto). Capability `growth.seo.prospect_diagnostic.run` (admin/account) · lane
+> `POST /api/admin/growth/seo/prospect-diagnostic` · MCP `get_seo_prospect_diagnostic` /
+> `run_seo_prospect_diagnostic` (confirmación humana previa). Flag `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED`
+> hoy OFF en todos los ambientes (code-complete). Cómo usarlo en venta: `SKILL.md` §4c + manual
+> `docs/manual-de-uso/comercial/diagnostico-seo-prospecto-en-venta.md`.
+
 **EPIC-022 "Search Visibility 360" pasó de fundación a motor en un día (delta 2026-08-05, fin de jornada):
 COMPLETE — TASK-1299 (schema `greenhouse_growth.seo_*` — 8 tablas config + serie temporal append-only por
 `capture_date`), TASK-1301 (5 capabilities `growth.seo.*` + módulo per-org — **hoy la clave viva es `seo_v2`**, ver delta abajo — + chokepoint único

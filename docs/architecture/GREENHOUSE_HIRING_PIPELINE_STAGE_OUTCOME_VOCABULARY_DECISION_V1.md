@@ -312,12 +312,22 @@ Trampa del método, que hay que nombrar porque es la que se comete: **un `grep` 
 | §7.3 | El selector de `EmailType` pasa a mapa explícito con no-op declarado: un desenlace sin tipo propio nace mudo | `src/lib/hiring/notifications/send.ts` |
 | — | Señal `hiring.application.closed_without_outcome`, que nace **antes** que el `CHECK` para medir el drift que ese `CHECK` va a impedir | `src/lib/reliability/queries/hiring-application-outcome-signals.ts` |
 
-### Pendiente, con condición de ejecución declarada
+### APLICADO el 2026-08-23 — la condición se cumplió
 
-Ambas viven en `docs/tasks/pending-migrations/` y **no** en `migrations/` — ver ahí el porqué.
+Ambas nacieron en `docs/tasks/pending-migrations/` y **no** en `migrations/`, exactamente para esperar
+su condición. La condición se cumplió con el release `709e15f66` y las dos migraron a `migrations/`:
 
-1. **Contract del enum de desenlaces** (retirar `on_hold` del `CHECK`) — cuando `origin/main` ya no ofrezca «Dejar en espera».
-2. **§5, el `CHECK` del invariante** `(stage='closed') = (decision IS NOT NULL)` — cuando `TASK-1748` haya movido sus 32 filas sintéticas. Readback esperado: **33 → 0**.
+1. **Contract del enum de desenlaces** (retiró `on_hold` del `CHECK`) — `origin/main` ya no ofrecía
+   «Dejar en espera». `migrations/20260823100709766_task-1765-decision-enum-contract.sql`; el `CHECK`
+   quedó en los seis desenlaces.
+2. **§5, el `CHECK` del invariante** `(stage='closed') = (decision IS NOT NULL)` — `TASK-1748` ya había
+   movido sus 32 filas sintéticas. `migrations/20260823101823762_task-1765-closed-invariant.sql`
+   (commit `b270478f4`).
+
+`docs/tasks/pending-migrations/` está **vacía** (sólo su `README`). ⚠️ Corregido el 2026-08-26: esta
+sección siguió diciendo «pendiente» durante tres días y la afirmación se propagó a la doc funcional,
+a la arquitectura del dominio, a la regla auto-cargable y a una skill espejada. **La regla de
+secuencia no se relaja** (`ISSUE-161`); lo que caducó fue el hecho.
 
 ### Enmienda a §14 — el orden vale para CUALQUIER enum, no sólo para el de etapas
 
@@ -417,9 +427,9 @@ La propia migración lleva su guarda de datos (aborta con `RAISE EXCEPTION` si a
 | Pieza | Estado |
 |---|---|
 | Enum TS en seis valores + los tres consumers apuntados a la fuente única + mapa de aguas abajo reescrito | **aplicado** — `typecheck` y `eslint` limpios, 1.236 tests del dominio verdes |
-| `docs/tasks/pending-migrations/TASK-1754-stage-vocabulary-contract.sql.pending` | **escrita y revisada, NO aplicada.** Espera autorización del operador: el `CHECK` de la base **sigue admitiendo trece valores** |
+| `migrations/20260823111250596_task-1754-stage-vocabulary-contract.sql` (commit `50b742341`) | **APLICADA 2026-08-23** con autorización del operador: el `CHECK` de la base quedó en los **seis** valores |
 
-Mientras esa migración no corra, el estado correcto de la task es `code complete, rollout pendiente` — no `complete`.
+Con esa migración corrida, `TASK-1754` pasó a `complete`. La regla que la gobernó sigue en pie: mientras un contract no corra, el estado correcto es `code complete, rollout pendiente` — no `complete`.
 
 
 ---

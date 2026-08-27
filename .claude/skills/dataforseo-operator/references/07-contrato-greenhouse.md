@@ -76,7 +76,7 @@ Importadores directos de `@/lib/ai/dataforseo*`:
 
 Menciones sin llamada (comentarios/contratos): `src/lib/growth/seo/{entitlement,contracts,keyword-opportunities-reader}.ts`, `src/lib/growth/seo/gap/read-seo-aeo-gap.ts`, `src/config/entitlements-catalog.ts:2189`, `src/lib/growth/ai-visibility/contracts.ts`, `cost.ts`.
 
-⚠️ **Delta 2026-08-14 — `labs/onpage` YA tienen consumer runtime productivo** (esta sección decía lo contrario hasta TASK-1303/1304), y `labs` ya tiene **DOS**: `src/lib/growth/seo/rank-history-seed.ts` (semilla histórica) y `src/lib/growth/seo/keyword-market-data.ts` (TASK-1661, mensual — §5c). `onpage` = `src/lib/growth/seo/site-audit/**`; `serp` lo consume `rank-capture.ts` (cron `ops-seo-rank-capture`, 05:00 CLT en ops-worker). `backlinks`/`domain` siguen sin consumer productivo — y ojo: el perfil de enlaces que Greenhouse usa hoy **NO** sale de la familia `backlinks`, sale del `avg_backlinks_info` que `labs` regala en la misma respuesta ya pagada (§5c).
+⚠️ **Delta 2026-08-14 — `labs/onpage` YA tienen consumer runtime productivo** (esta sección decía lo contrario hasta TASK-1303/1304), y `labs` ya tiene **DOS**: `src/lib/growth/seo/rank-history-seed.ts` (semilla histórica) y `src/lib/growth/seo/keyword-market-data.ts` (TASK-1661, mensual — §5c). `onpage` = `src/lib/growth/seo/site-audit/**`; `serp` lo consume `rank-capture.ts` (cron `ops-seo-rank-capture`, 05:00 CLT en ops-worker). `backlinks` estrenó su primer consumer productivo el 2026-08-27 (carril `prospect`, §5d); `domain` sigue sin consumer — y ojo: el perfil de enlaces que Greenhouse usa para keywords **NO** sale de la familia `backlinks`, sale del `avg_backlinks_info` que `labs` regala en la misma respuesta ya pagada (§5c).
 
 ## §5b El write que compromete gasto SIN llamar al proveedor (TASK-1308 · TASK-1659)
 
@@ -137,6 +137,28 @@ La primera versión no escribía nada en el caso del medio. Como el pre-check mi
 🔴 **Mercado explícito (ISSUE-153).** Resolver el target de una organización pasa SIEMPRE por `src/lib/growth/seo/resolve-target.ts` (`resolveSeoTargetForMarket` / `resolveUnambiguousSeoTarget`); **NUNCA** SQL inline con `ORDER BY created_at DESC LIMIT 1` en un consumer — eso servía un país al azar sin declararlo, y con Berel operando CL+MX el mismo reader devolvía dos verdades distintas según el orden de inserción. Con varios mercados activos y sin selector el lane responde `409 multiple_markets` con la lista; toda respuesta declara `meta.servedMarket`.
 
 **Contratos programáticos (Full API Parity):** lane ecosystem `GET /api/platform/ecosystem/growth/seo/keyword-market-data` + tool MCP **`get_seo_keyword_market_data`** federada en el gateway `mcp.efeonce.org` (lectura, scope `efeonce.mcp.read` — **sin scope nuevo en Entra**, por la cláusula 2 de la regla auto-load: el scope es por CLASE de blast-radius, no por capability). Señal de fiabilidad: `src/lib/reliability/queries/seo-market-data-freshness.ts` (con el flag OFF, cobertura parcial es lo ESPERADO, no una alerta).
+
+## §5d Delta 2026-08-27 — carril `prospect` (TASK-1709): consumer nuevo, corrida única inline
+
+`src/lib/growth/seo/prospect/**` — command `runProspectDiagnostic`. Diagnóstico SEO de prospecto (org NO cliente): **corrida ÚNICA inline en Vercel, JAMÁS scheduler/cron sobre prospectos** — nada recurrente toca `seo_prospect_diagnostics`. Estrena 4 endpoints que el repo no usaba, sobre familias YA permitidas (`labs`, `backlinks` — cero familias nuevas en el allowlist):
+
+| Endpoint | Límites / params clave |
+|---|---|
+| `/v3/dataforseo_labs/google/ranked_keywords/live` | `item_types: ['organic','ai_overview_reference']`, limit 1000 |
+| `/v3/dataforseo_labs/google/competitors_domain/live` | limit 25 |
+| `/v3/backlinks/competitors/live` | limit 100, `exclude_large_domains: true` |
+| `/v3/backlinks/domain_intersection/live` | `targets` = hasta 5 competidores, `exclude_targets` = el prospecto, limit 500 |
+
+Reglas del carril (detalle en el delta canónico, no acá):
+
+- 🔴 **Tope duro POR DIAGNÓSTICO, distinto del tope mensual per-org de §4:** `enforceProspectDiagnosticBudget` (`src/lib/growth/seo/entitlement.ts`) valida **ANTES de la primera llamada** contra el **forecast del CONJUNTO** de las 4 llamadas (~USD 0,205) — no llamada a llamada. Presupuesto efectivo = min(`GROWTH_SEO_PROSPECT_DIAGNOSTIC_CEILING_USD`, default 1.00; restante mensual de Efeonce). Corrida real medida: USD 0,1991 (skyairline.com CL, 2026-08-27).
+- **Atribución = ADQUISICIÓN de Efeonce:** el ledger (§4) recibe el gasto en la org canónica `EO-ORG-0007`, resuelta server-side por public_id — **NUNCA** atribuido al prospecto (no es cliente, no tiene entitlement).
+- **Pricing backlinks** agregado a `src/lib/growth/seo/provider-pricing.ts`: `BACKLINKS_TASK_SETUP_USD = 0.02`, `BACKLINKS_RESULT_ROW_USD = 0.00003`.
+- **Idempotencia** por (dominio, mercado, idioma, día): repetir el mismo día devuelve lo existente con USD 0.
+- **Cortesía:** cero `robots_txt_merge_mode: override`, cero `switch_pool`/`ip_pool_for_scan`, UA identificable; un bloqueo del sitio es un **HALLAZGO persistido**, no un obstáculo. La evidencia de sitio se delega al sustrato `@/lib/growth/site-substrate` — jamás fetch propio.
+- **Salida sin juicio:** toda cifra es lente `estimated` con `captured_at` (CHECK de un solo valor); el contrato de salida NO tiene score/veredicto/benchmark/lift.
+
+Delta canónico completo: `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` → "## Delta 2026-08-27 — tier `prospect`".
 
 ## §6 Secretos / env
 

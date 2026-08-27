@@ -10,6 +10,22 @@ De **$6.9M a $15–25M CLP/mes** en revenue recurrente (base actual: retainer Sk
 
 La ambición de escala es **LATAM-first, global-ready**: ganar reconocimiento regional fuerte primero, pero construir método, producto, idioma y pruebas para atender diversos mercados. El argumento comercial no debe limitarse a "somos una agencia LATAM"; LATAM es prueba de ejecución multi-país. La categoría entendible es **AI-enabled marketing and growth systems company**; en venta se expresa como **Integrated Growth Partner**. Efeonce combina personas, product services, plataformas y agentes. **ASaaS** es el modelo y **Growth Operating System** la visión: co-creación convertida en software, método, datos y memoria acumulada.
 
+### Tesis RevOps & CRM — provider-fit
+
+Efeonce no se posiciona como una agencia HubSpot que ocasionalmente implementa otro CRM. La práctica es **Revenue
+Operations & CRM** y diagnostica antes de elegir provider:
+
+- **HubSpot-first:** demand generation B2B, adopción, equipos pequeños/medianos y time-to-value.
+- **Salesforce-first:** base instalada, complejidad enterprise, alto volumen B2C y journeys multicanal.
+- **Híbrido gobernado:** HubSpot Marketing Hub + Salesforce CRM sólo cuando existe una fuente de verdad y ownership
+  explícitos para lifecycle, consentimiento, attribution, deduplicación y sync.
+
+El liderazgo de HubSpot en Gartner B2B Marketing Automation 2025 no se extrapola a CRM Sales 2026 —donde es
+Challenger— ni a Multichannel Marketing Hubs 2025, donde no fue incluido. La presencia pública de Salesforce en
+grandes empresas chilenas es señal de mercado, no market share demostrado. Antes de reasignar inversión o capacidad,
+medir 24 meses de pipeline, win/loss, segmento, margen, demanda y expansión por provider. Evidencia:
+[`CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md`](../audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md).
+
 ---
 
 ## El ecosistema de producto como activo comercial
@@ -60,7 +76,7 @@ No más leads: cada propuesta enviada debe tener probabilidad real de cierre. El
 | Fase Loop | Etapa | Rol del producto |
 |---|---|---|
 | **Express** | Posicionamiento (thought leadership + AEO) | Narrativa ASaaS con 3 plataformas. |
-| **Tailor** | Calificación + diagnóstico (scorecard) | Surround Map (Verk) o audit HubSpot (Kortex) pre-pitch. |
+| **Tailor** | Calificación + diagnóstico (scorecard) | Surround Map (Verk) o CRM Fit Diagnostic provider-neutral (Kortex cuando aplica). |
 | **Amplify** | Propuesta (datos, no slides) | Ecosistema como diferenciador: "tres plataformas, no un deck". |
 | **Evolve** | Cierre + expansión (Revenue Enabled report a 90 días) | Feedback Reviews desde Greenhouse. Cross-sell por Pulse + Verk + Kortex. |
 
@@ -93,7 +109,7 @@ El diferenciador real no es ningún servicio individual — es escalar dentro de
 | **Feedback Reviews desde Greenhouse** | 0 | 1/cuenta/mes | 1/cuenta/mes | Greenhouse |
 | **Cross-sell detectado por Pulse + Verk + Kortex** | N/A | 1/cuenta/Q | 2/cuenta/Q | Greenhouse + Verk + Kortex |
 | Surround Maps activos en Verk | 0 | 2 | 4+ | Verk |
-| Auditorías HubSpot vía Kortex | 1 | 3 | 5+ | Kortex |
+| Diagnósticos CRM provider-fit vía Kortex | 1 | 3 | 5+ | Kortex |
 
 > Los KPIs de adopción del producto no son métricas de tecnología — son **indicadores de profundidad de relación**. Un cliente que usa Greenhouse + Verk + Kortex tiene un switching cost que hace irracional cambiarse.
 

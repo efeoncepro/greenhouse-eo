@@ -3,6 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 
+import { resolveLiveTestCandidateFixtures } from '../../live-test-identity'
 import { createHiringApplication, createHiringOpening, createTalentDemand } from '../../store'
 
 import { confirmAssessmentAssignment } from './confirm-assignment'
@@ -136,21 +137,11 @@ describe.skipIf(!hasPgConfig || !canCleanUp)(
       // Los `t872p-*@efeoncepro.com` quedan fuera aposta: son los que toma `assign.live.test.ts`.
       // Si el filtro deja de encontrar 3, el test FALLA fuerte acá — nunca degrada a personas
       // reales en silencio.
-      const profiles = await runGreenhousePostgresQuery<{ profile_id: string; candidate_facet_id: string }>(
-        `SELECT ip.profile_id, cf.candidate_facet_id
-         FROM greenhouse_core.identity_profiles ip
-         JOIN greenhouse_hiring.candidate_facet cf ON cf.identity_profile_id = ip.profile_id
-         WHERE ip.active = true
-           AND ip.canonical_email ILIKE '%@efeonce.org'
-           AND ip.canonical_email ~* '^(task-[0-9]+|qa\\.careers\\+)'
-           -- TASK-1739 — el patron de arriba LOCALIZA los fixtures sembrados; esta linea es la
-           -- GUARDA. La propia herramienta del dominio (hiring:data:mark-synthetic) advierte que
-           -- "la senal de nombre es notoriamente falible y por eso no se usa": el 2026-08-23 ese
-           -- patron matcheaba 3 identidades y 2 seguian marcadas real, o sea que el gate podia
-           -- correr sobre gente que el sistema considera real. Un nombre no puede vencer esto.
-           AND ip.data_origin <> 'real'
-         ORDER BY ip.profile_id LIMIT 3`,
-      )
+      // Fixture AISLADO por archivo (2026-08-23): antes esto tomaba `ORDER BY ip.profile_id LIMIT n`
+      // sobre un pool compartido de 3 perfiles sintéticos, y los tres archivos de assignment-policy
+      // tomaban los mismos. En paralelo se pisaban y las propuestas se invalidaban entre sí. Razón
+      // completa en `live-test-identity.ts`.
+      const profiles = await resolveLiveTestCandidateFixtures('assignment-propose-confirm', 3)
 
       expect(profiles.length).toBe(3)
 
@@ -184,8 +175,8 @@ describe.skipIf(!hasPgConfig || !canCleanUp)(
         const application = await createHiringApplication(
           {
             openingId: opening.openingId,
-            identityProfileId: profile.profile_id,
-            candidateFacetId: profile.candidate_facet_id,
+            identityProfileId: profile.profileId,
+            candidateFacetId: profile.candidateFacetId,
             stage: 'shortlisted',
           },
           ACTOR,

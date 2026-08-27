@@ -369,6 +369,14 @@ Implementar DESDE el wireframe + flow + master flow. Reusar primitives canónico
 - Gates focales: ESLint, typecheck, `ui:code-lint`, `design:lint`, `task:lint`, route reachability y `git diff --check` verdes. Sin cambios de datos, API, acceso, flags ni runtime remoto.
 - El primer build quedó transitoriamente bloqueado por un cambio concurrente ajeno en `Application360ViewProps`; una vez estabilizado ese trabajo, el rerun completo de `pnpm build` cerró verde sin modificar su scope.
 
+### Evidence 2026-08-24 — Retorno durable y revisión secuencial
+
+- `focusApplication` fija la postulación exacta y trae su opening/demanda fuera de los límites cronológicos; Pipeline deriva desde ella el scope canónico, consume el foco tras recuperar la tarjeta y degrada con aviso estable si no resuelve.
+- Application 360 navega Anterior/Siguiente sólo entre postulaciones no archivadas de la misma vacante+etapa, en orden `created_at DESC, application_id ASC`; el reader devuelve ids/posición y no consulta scores ni IA. Decisión, scorecard y Expediente protegen cambios locales con confirmación antes de saltar.
+- GVC local `.captures/2026-08-24T12-19-59_task355-hiring-application-360`: 24 frames + video por viewport en 1440/390 px; recorrido real `1 de 2 → 2 de 2 → Pipeline`, foco en la segunda tarjeta, route tab activo visible y morph compartido. Runtime 0 errores de consola/página/hidratación/red; enterprise rubric PASS. Warnings axe de contraste y skeleton de Expediente son preexistentes; la violación ARIA detectada en la primera pasada del contador responsive quedó corregida y ausente en este rerun. El DSL también avisa que no puede repetir la interacción por teclado después del cambio de ruta; la equivalencia pertenece al enlace nativo y su contrato `href`/nombre accesible queda cubierto por test.
+- Build de producción, typecheck, ESLint focal y 13 tests focales verdes. Sin schema, migración, flag, acceso, write command ni rollout remoto; ADR no requerido porque extiende readers/rutas existentes sin cambiar source of truth ni UI platform.
+- Commit `631b53c77` publicado en `origin/develop`. Auditoría documental posterior detectó una brecha de conformidad no cubierta por esos tests: el snapshot de Pipeline y su lookup exacto todavía no filtran `archived_at IS NULL`, aunque la cola Anterior/Siguiente sí excluye archivadas. No promover este delta hasta corregir y verificar ambos caminos.
+
 ## Verification
 
 - `pnpm ui:wireframe-check --task TASK-355` + `pnpm ui:flow-check --task TASK-355` + `pnpm ui:motion-check --task TASK-355`

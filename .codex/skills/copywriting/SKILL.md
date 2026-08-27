@@ -1,6 +1,44 @@
 ---
 name: copywriting
-description: Escribe, estructura, afina y audita copy persuasivo y narrativo. Use for headlines, hooks, landing pages, ads, email, social, CTAs, storytelling, voz y tono, edición humana de copy con IA y la frontera de Studio Credits; gobierna el craft, no pricing ni estrategia de canal.
+description: >-
+  Skill experta y robusta del CRAFT de escritura persuasiva y narrativa —
+  técnicas, frameworks, storytelling, voz y edición — al estado del arte 2026.
+  Úsala para escribir, estructurar, afinar o auditar cualquier texto que deba
+  persuadir, vender, contar o mover a la acción. Cubre fundamentos + proceso
+  (research/voice-of-customer, big idea, claridad>ingenio), frameworks de copy
+  (AIDA, PAS, PASTOR, BAB, FAB, 4 Ps, QUEST — y cómo elegir por nivel de
+  consciencia de la audiencia), headlines/hooks/leads (Ogilvy, Caples, las 4 U's,
+  fórmulas, subject lines), storytelling y narrativa (StoryBrand SB7 cliente=héroe,
+  Hero's Journey, before-after-bridge, brand narrative, casos como historia),
+  persuasión y psicología (Cialdini 7 principios, sesgos, manejo de objeciones,
+  urgencia ética), sistemas de voz y tono (4 dimensiones NN/g, tone-mapping,
+  consistencia, craft bilingüe es-CL/en-US), craft y mecánica (ritmo/cadencia,
+  retórica, power words, concisión, show-don't-tell, voz activa, edición), copy por
+  formato (sales page/VSL, landing/hero, ad copy, email/secuencias, social,
+  tagline/slogan, microcopy craft, CTA) y copywriting asistido por IA (anti
+  AI-slop/homogenización, fidelidad de voz, barra de edición humana). Es la capa de
+  CRAFT que las demás skills invocan: las otras deciden QUÉ decir, DÓNDE y SI
+  convierte; esta decide CÓMO escribirlo para que impacte. Sinergia/hand-offs:
+  gobernanza de microcopy/a11y/tokenización → greenhouse-ux-writing
+  (repo: greenhouse-ux-content-accessibility) + src/lib/copy; qué convierte + A/B
+  testing → growth-marketing-cro; arquitectura de mensaje/canal → digital-marketing;
+  SEO/AEO/GEO → seo-aeo; doctrina de marca/voz → efeonce-agency + docs/context/05;
+  plantillas/entrega de email → greenhouse-email; tipografía → typography-design.
+  Incluye overlay Efeonce con router de speaker: voz institucional Efeonce ("7
+  creencias contrarias", "Empower your Growth") y voz autoral de Julio Reyes para
+  piezas firmadas, Marketing con Manzanitas y thought leadership personal, más el
+  método de authoring agentic con autor humano responsable. Triggers:
+  "copywriting", "copy", "redacción", "redactar",
+  "escribir texto", "headline", "titular", "gancho", "hook", "lead", "storytelling",
+  "narrativa", "storybrand", "AIDA", "PAS", "PASTOR", "framework de copy", "value
+  proposition", "propuesta de valor", "tagline", "slogan", "eslogan", "sales page",
+  "carta de ventas", "VSL", "email copy", "subject line", "asunto", "CTA", "llamado
+  a la acción", "voz de marca", "tono", "tone of voice", "persuasión", "objeciones",
+  "power words", "swipe file", "editar copy", "reescribir", "AI slop", "copy con IA",
+  "Julio Reyes", "voz de Julio", "mi brand voice", "Marketing con Manzanitas",
+  "con manzanitas", "artículo firmado", "authoring agentic", "autoría con IA".
+user-invocable: true
+argument-hint: "[qué escribir/afinar o pregunta de craft — ej: 'headline para /aeo-2', 'la carta de ventas del grader', 'storytelling de la marca', 'auditar este copy']"
 ---
 
 # Copywriting — el craft de escribir para persuadir y narrar (2026)

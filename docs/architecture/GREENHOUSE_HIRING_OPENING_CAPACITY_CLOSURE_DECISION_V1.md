@@ -2,23 +2,25 @@
 
 ## Status
 
-- Status: `Proposed`
+- Status: `Accepted`
 - Date: `2026-08-21`
 - Owner: `Hiring / Talent / Platform`
 - Scope: `opening capacity, application disposition, candidate communications, outbox, Hiring Desk`
 - Reversibility: `two-way-but-slow`
 - Confidence: `high` en la separación de responsabilidades; `medium` en el primer rollout de cohortes
-- Validated as of: `2026-08-21`
+- Validated as of: `2026-08-23`
 - Implementation: `TASK-1762` foundation + `TASK-1763` UI consumer
 - Amended by: [`GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1`](GREENHOUSE_HIRING_PIPELINE_STAGE_OUTCOME_VOCABULARY_DECISION_V1.md) (`Accepted` 2026-08-22, §9). Este documento seguía `Proposed`, así que la enmienda se aplicó **en sitio** — no hay versión superseded. **El desenlace de una cohorte cerrada por capacidad es `not_selected` con causa `capacity_filled`, NUNCA `rejected`**: `rejected` es un juicio sobre la persona, y aplicarlo a quien nadie juzgó le atribuye una causa falsa en el registro, la deja fuera del Talent Pool por defecto y distorsiona el análisis de impacto adverso. El nombre de la causa se conserva tal como este ADR ya lo especificaba.
 
 ## Context
 
-`TASK-1689` ya envía un correo individual cuando una decisión `rejected` queda persistida. No existe, en cambio,
-una fuente de verdad para el número de cupos de una vacante, un cierre explícito de cohorte ni una forma segura de
-cerrar y notificar a las candidaturas restantes cuando el último cupo se ocupa. `hiring_opening.status` gobierna
-publicación/lifecycle, no capacidad; inferir cupos desde ese estado mezclaría dos conceptos y haría imposible
-explicar o recuperar un cierre parcial.
+`TASK-1689` ya envía un correo individual cuando una decisión `rejected` queda persistida. **El número de cupos
+sí existe** y es `hiring_opening.requested_seats` (`INTEGER NOT NULL DEFAULT 1 CHECK (>= 1)`, `TASK-353`): el
+operador lo lee en la columna «Cupos» del Demand Desk y lo edita en el campo «Cupos» del formulario. Lo que no
+existe es **gobernanza sobre ese número** —opt-in explícito, capability, audit— ni un cierre explícito de cohorte
+ni una forma segura de cerrar y notificar a las candidaturas restantes cuando el último cupo se ocupa.
+`hiring_opening.status` gobierna publicación/lifecycle, no capacidad; inferir cupos desde ese estado mezclaría dos
+conceptos y haría imposible explicar o recuperar un cierre parcial.
 
 El efecto es sensible: una confirmación puede cambiar múltiples decisiones y enviar comunicaciones externas que no
 se pueden retirar. La selección de una persona no demuestra por sí sola que no queden cupos, y el consentimiento de
@@ -26,9 +28,24 @@ Banco de Talentos no puede inventarse para suavizar el correo.
 
 ## Decision
 
-1. **Capacidad explícita y separada.** Cada opening que use esta capacidad declara un objetivo positivo de cupos.
-   La ausencia de política significa `unmanaged`, nunca “un cupo”. Los cupos ocupados se calculan desde decisiones
-   vigentes `selected`; no se mantiene un contador mutable paralelo.
+1. **Capacidad explícita y separada — pero con UN SOLO dueño del número (enmienda 2026-08-23).** El objetivo de
+   cupos **sigue siendo `hiring_opening.requested_seats`**; esta capacidad **NO crea un segundo contador**. Lo que
+   se declara explícitamente es la **política**: una fila en `hiring_opening_capacity` que registra el opt-in y su
+   gobernanza (actor, momento, razón, versión) y **no guarda ningún conteo**. Por lo tanto `unmanaged` se expresa
+   como **ausencia de fila de política**, nunca como un `NULL` en el conteo — y la ausencia jamás se interpreta
+   como “un cupo”. Los cupos ocupados se calculan desde decisiones vigentes `selected`; no se mantiene un contador
+   mutable paralelo.
+
+   **Por qué no una columna `target_seats` propia.** El operador ya ve y edita ese número bajo la etiqueta
+   «Cupos» (`DemandDeskView`, columna y formulario). Un segundo conteo en otra tabla decidiría el cierre de una
+   cohorte real mientras la pantalla que el operador usa seguiría mostrando el primero: divergencia silenciosa en
+   el dato que determina si decenas de personas reciben un correo. Es la misma clase de defecto que este dominio
+   ya corrigió tres veces (`sent` ≠ entregado; etapa ≠ desenlace; estado de la vacante ≠ desenlace de la persona).
+
+   **Guarda de gobernanza.** Con política vigente, `requested_seats` sólo cambia por el command de capacidad
+   —capability `hiring.opening.capacity.confirm` + audit—, y el camino genérico `updateHiringOpening` lo rechaza.
+   Defensa en profundidad: guarda de aplicación + trigger en base + audit + señal de deriva. Sin política vigente,
+   la columna conserva exactamente su comportamiento actual.
 2. **Publicación, capacidad y comunicaciones son ejes distintos.** Pausar/cerrar publicación no consume cupos ni
    cierra candidaturas. Seleccionar no cierra la cohorte ni envía comunicaciones masivas.
 3. **Flujo `preview → confirm → execute`.** Un reader re-lee opening, cupos, decisiones y comunicaciones y produce
@@ -56,8 +73,10 @@ Banco de Talentos no puede inventarse para suavizar el correo.
 ## Runtime Contract
 
 - Foundation: `src/lib/hiring/opening-capacity/**` con reader de preview, command de confirmación, store y eventos.
-- Persistencia aditiva: `greenhouse_hiring.hiring_opening_capacity`,
+- Persistencia aditiva: `greenhouse_hiring.hiring_opening_capacity` (**política sin conteo**: `opening_id` PK,
+  `managed_since`, `set_by_user_id`, `reason`, `policy_version`),
   `greenhouse_hiring.hiring_opening_closure_run` y `greenhouse_hiring.hiring_opening_closure_run_item`.
+  El objetivo de cupos se lee de `hiring_opening.requested_seats`; **ninguna tabla nueva lo duplica**.
 - Decisión individual: `src/lib/hiring/decide.ts`; se extiende con **desenlace explícito** + causa allowlisted, actor
   e idempotencia, no se reemplaza. Hoy no acepta ninguno de los dos ejes: los provee el ADR del vocabulario y su task
   dueña (`TASK-1765`), y este dominio los consume.
@@ -85,6 +104,8 @@ Banco de Talentos no puede inventarse para suavizar el correo.
 | Usar `hiring_opening.status='closed'` como capacidad llena | Rechazada: publicación/lifecycle no representa número de cupos. |
 | Un `UPDATE ... WHERE opening_id` más envío batch | Rechazada: evita el command/audit por aplicación, dificulta retries y deja cierres parciales opacos. |
 | Marcar la cohorte como `rejected` con causa `capacity_filled` | Rechazada por la enmienda: el correo suavizado no repara el registro. `rejected` sesga a cualquier revisor futuro, saca a la persona del Talent Pool e infla la tasa de rechazo de su cohorte demográfica en el análisis de impacto adverso. |
+| Una columna `target_seats` propia en `hiring_opening_capacity` | Rechazada (2026-08-23): duplicaría el número que el operador ya ve y edita como «Cupos» en el Demand Desk. Dos dueños del mismo dato en el mismo agregado, divergiendo en silencio, justo en el valor que decide si una cohorte real recibe correo. La política declara el opt-in; el conteo se queda donde ya vive. |
+| Hacer `requested_seats` nullable para expresar `unmanaged` | Rechazada: las filas vivas dicen `1` y **no hay forma de distinguir «alguien eligió 1» de «disparó el `DEFAULT 1`»**, así que no produce el `unmanaged` buscado y mutaría datos existentes sobre una suposición. La ausencia de fila de política lo expresa sin tocar nada. |
 | Sólo mejorar el template de descarte | Insuficiente: no resuelve cierre, cohorte, idempotencia ni consentimiento. |
 | Run durable por item sobre commands existentes | Aceptada: conserva un hecho por aplicación, retry seguro y trazabilidad. |
 

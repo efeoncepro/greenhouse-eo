@@ -1,11 +1,28 @@
 # GREENHOUSE_TEAMS_BOT_INTERACTION_V1
 
 > **Tipo de documento:** Spec arquitectura canónica
-> **Versión:** 1.4
+> **Versión:** 1.6
 > **Creado:** 2026-04-26 por TASK-671 (Claude)
-> **Última actualización:** 2026-06-08 por Codex — bump a v1.4 con smoke de menciones reales en Adaptive Cards
+> **Última actualización:** 2026-08-25 por Codex — bump a v1.6; delimita mensajes manuales 1:1 genéricos
 > **Estado:** vigente
 > **Specs relacionadas:** `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` v1.2 (transport), `GREENHOUSE_NOTIFICATION_HUB_V1.md` (orquestador upstream — TASK-690)
+
+## Delta v1.6 (2026-08-25 — boundary de mensajes manuales 1:1 genéricos)
+
+- **Capacidad actual:** `pnpm teams:announce` opera destinos grupales/canales registrados; no crea DMs genéricos. El CLI 1:1 existente pertenece exclusivamente a anuncios de pago.
+- **Puente manual acotado:** mientras no exista un CLI gobernado, un script temporal puede llamar al dispatcher y a los writers de auditoría canónicos si incorpora preview/confirmación, identidad Entra revalidada, idempotencia, deduplicación y audit trail. No se autoriza un transporte paralelo, HTTP crudo ni el conector personal.
+- **Shape 1:1:** `recipient_kind='chat_1on1'`, Entra Object ID sin `29:`, card-only, sin mención y sin `activity.text`.
+- **Evidencia:** `succeeded` en `source_sync_runs` demuestra aceptación del transporte, no lectura ni renderizado confirmado.
+- **Destino arquitectónico:** cualquier comunicación recurrente debe modelarse como intent/outbox de Notification Hub y resolver al destinatario con `dynamic_user`; el script temporal no es una nueva API de plataforma.
+
+## Delta v1.5 (2026-08-24 — límite real de menciones colectivas en chats grupales)
+
+- **Limitación confirmada:** los bots en chats grupales pueden mencionar usuarios explícitos, pero Microsoft Teams no admite `@everyone` / `@todos` para esa superficie.
+- **Payload inválido retirado:** `<at>todos</at>` con `mentioned.id=<chatId>` no representa a la audiencia. El Connector puede responder 2xx y persistir la actividad, pero Teams la muestra como texto plano y no genera una notificación colectiva.
+- **No es configuración del tenant ni localización:** cambiar `todos` por `everyone`, reutilizar el conversation id o reintentar no agrega la capacidad.
+- **Burbuja separada:** cuando una Adaptive Card se acompaña con `activity.text`, Teams muestra ese texto sobre la tarjeta. Por eso las cards siguen siendo attachments-only y las menciones válidas se declaran dentro de `card.msteams.entities`.
+- **Contrato operativo:** un anuncio a un chat grupal se envía sin mención colectiva o con menciones individuales resueltas por Entra Object ID/UPN. Las menciones de equipo/canal de Microsoft Graph pertenecen a otra superficie y esquema; no se extrapolan al Bot Framework group chat.
+- Fuente vendor: [Channel and group chat conversations with a Microsoft Teams bot](https://learn.microsoft.com/microsoftteams/platform/bots/how-to/conversations/channel-and-group-conversations).
 
 ## Delta v1.4 (2026-06-08 — menciones reales en Adaptive Cards)
 

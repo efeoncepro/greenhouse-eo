@@ -71,13 +71,13 @@ queda en la auditoría fechada de programas de partners, no en este modelo.
 
 | Provider / relación | Rol actual en el portafolio | Ofertas que puede habilitar |
 |---|---|---|
-| **HubSpot** | Plataforma CRM y partnership comercial de RevOps & CRM | Licencias, RevOps Diagnostic, arquitectura, implementación, Managed CRM Ops, Customer Agent y CRM Intelligence |
+| **HubSpot** | Plataforma para el carril HubSpot-first de RevOps & CRM; relación comercial sujeta al estado verificable del registry | Licencias, RevOps & CRM Diagnostic, arquitectura, implementación, Managed CRM Ops, Customer Agent y CRM Intelligence B2B |
 | **OpenAI** | Provider de modelos, agentes y soluciones enterprise | Sistemas de agentes, copilots, automatización, integraciones y advisory |
 | **Claude / Anthropic** | Provider de razonamiento y agentes | Agentes especializados, knowledge systems, workflows y soluciones con mayor control |
 | **Google Cloud / Vertex AI** | Rail enterprise, datos, cloud y modelos | Arquitectura cloud, AI enterprise, seguridad, datos y despliegue |
 | **Microsoft AI Cloud** | Rail enterprise para clientes Microsoft-first | Azure AI, Copilot, integraciones Microsoft y transformación empresarial |
 | **AWS** | Rail cloud para clientes AWS-first | Arquitectura, datos, agentes, integración y operación sobre AWS |
-| **Salesforce** | Plataforma CRM enterprise potencialmente complementaria | Advisory, integración, implementación y Managed CRM si se abre una práctica con owner y economics propios |
+| **Salesforce** | Plataforma del carril Salesforce-first de RevOps & CRM; aceptación histórica como Provisional Consulting Partner y estado vigente pendiente de readback primario en el registry | CRM core, Agentforce, Marketing Cloud Engagement/Next, advisory, arquitectura, integración, implementación y Managed Ops; licencia/reventa sólo con track contractual verificable |
 | **Adobe** | Experience, content y marketing enterprise | Implementación, integración, content operations y personalización |
 | **Lovable** | Acelerador de prototipado y construcción | Discovery técnico, prototipos, MVPs y accelerated delivery; no es pilar estratégico por sí solo |
 | **Runway, FLUX, ElevenLabs, BytePlus** | Capabilities creativas de video, imagen, voz y generación | Producción audiovisual, localización, voice agents y Creative Operations |

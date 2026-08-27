@@ -2,6 +2,19 @@
 
 > Artefacto de `02`. Nada entra a DRAFT sin brief. El craft lo ejecuta `copywriting`.
 
+> 🔴 **Brief ≠ dossier de research. Son dos artefactos, y esta plantilla es corta a propósito.**
+> - **Brief** = el **contrato de la pieza**, para **quien redacta**. **Techo duro: 12.000
+>   caracteres.** Vive en el slot de la pieza.
+> - **Dossier** = la **evidencia**, para quien decide y audita. Es un **anexo enlazado**.
+> - **El brief cita y enlaza la evidencia; NO la transcribe.** Un brief de 12.000 *palabras*
+>   **no se puede usar para redactar** — el caso fuente entregó briefs de **27.000 a 70.000
+>   caracteres** teniendo esta plantilla disponible y sin usarla, replicando la estructura de
+>   otro brief inventado. Prueba de que el techo alcanza: el brief siguiente salió en **10.035
+>   caracteres sin recortar nada al final**; el recorte fue **de diseño**.
+> - **Estándar canónico de estructura** (11 bloques, los bloqueantes arriba):
+>   `docs/operations/SEO_CONTENT_BRIEF_STRUCTURE_V1.md`. Si el encargo es de contenido SEO,
+>   ese documento manda sobre la forma; esta plantilla es su versión mínima.
+
 ## Qué y para qué
 - **Título de trabajo:**
 - **Objetivo + etapa de funnel:**

@@ -1,0 +1,22 @@
+{
+  "//": "Plantilla Person — entidad de autor para E-E-A-T. Úsala en la página de perfil del autor. knowsAbout + sameAs + credenciales construyen la entidad del experto que firma el contenido.",
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": "https://EXAMPLE.com/autores/nombre-autor/#person",
+  "name": "NOMBRE COMPLETO",
+  "url": "https://EXAMPLE.com/autores/nombre-autor/",
+  "image": "https://EXAMPLE.com/img/autor.jpg",
+  "jobTitle": "CARGO",
+  "worksFor": { "@id": "https://EXAMPLE.com/#organization" },
+  "alumniOf": "UNIVERSIDAD / INSTITUCIÓN",
+  "knowsAbout": ["ÁREA DE EXPERTISE 1", "ÁREA 2", "ÁREA 3"],
+  "hasCredential": {
+    "@type": "EducationalOccupationalCredential",
+    "credentialCategory": "CERTIFICACIÓN / TÍTULO"
+  },
+  "sameAs": [
+    "https://www.linkedin.com/in/PERFIL",
+    "https://twitter.com/PERFIL",
+    "https://scholar.google.com/citations?user=XXXX"
+  ]
+}

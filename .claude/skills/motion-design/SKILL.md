@@ -25,6 +25,7 @@ Single import barrel: **`@/components/greenhouse/motion`** (`src/components/gree
 | A **declarative** entrance / stagger / scroll-reveal / timeline | `<Motion kind='…' \| variant='…'>` from `@/components/greenhouse/motion` | The cinematic/orchestration primitive. GSAP under the hood. |
 | An **imperative** GSAP escape hatch | `useGreenhouseGSAP(build, { scope, dependencies })` | The ONLY sanctioned way product code touches GSAP. Reduced-motion baked in via `gsap.matchMedia`. |
 | **Same-document route** transition | `ViewTransitionLink` from `@/components/greenhouse/motion` (drop-in `next/link`) | Wraps `document.startViewTransition`. TASK-525. |
+| **Programmatic route** transition | `useViewTransitionRouter` from `@/hooks/useViewTransitionRouter` | Wraps `push`/`replace`/`back`; use after any dirty-state guard resolves. |
 | The raw VT helper (non-link swaps) | `startViewTransition`, `supportsViewTransitions` from `@/lib/motion/view-transition` | Falls back to synchronous update when unsupported. |
 | **Reduced-motion** (React state, live) | `useReducedMotion` from `@/hooks/useReducedMotion` | Use in components choosing a CSS class / conditional render. |
 | **Reduced-motion** (sync read / conditions) | `prefersReducedMotion()`, `MOTION_MEDIA_CONDITIONS` from `@/components/greenhouse/motion` | Non-GSAP code paths + matchMedia strings. GSAP paths get `reduced` for free from `useGreenhouseGSAP`. |
@@ -86,7 +87,9 @@ The `<Motion>` variant builders use `gsap.fromTo(hidden → visible)` with `clea
 
 ## 4. View transitions — `ViewTransitionLink`, not a framework component
 
-For internal nav that should morph: swap `next/link` → `ViewTransitionLink` (preserves prefetch, hover, ref forwarding; skips modifier/middle clicks). For non-link DOM swaps (tab content, drawer-driven detail): wrap the state mutation in `startViewTransition(() => setState(...))`. Cross-fade is the default; directional slide only when forward/back semantics are unambiguous (wizard steps). Style via `::view-transition-old(root)` / `::view-transition-new(root)` with token durations.
+For internal nav that should morph: swap `next/link` → `ViewTransitionLink` (preserves prefetch, hover, ref forwarding; skips modifier/middle clicks). For navigation triggered after client logic, use `useViewTransitionRouter`; resolve any unsaved-change/dirty guard **before** calling it, so a cancelled departure never starts a transition. For non-link DOM swaps (tab content, drawer-driven detail): wrap the state mutation in `startViewTransition(() => setState(...))`.
+
+Cross-fade is the default. Use shared-element continuity only when both routes represent the **same stable entity**, with a deterministic entity-derived `view-transition-name`; never morph candidate A into candidate B or imply comparison between records. Directional slide applies only when forward/back semantics are unambiguous (wizard steps). After a route return, scroll to and focus the exact destination plus announce the restored context: this is navigation semantics, not decorative motion. The canonical helpers already fall back to an immediate swap when unsupported or reduced-motion is active; keep focus and announcements in that path. Style via `::view-transition-old(root)` / `::view-transition-new(root)` with token durations.
 
 > The old overlay claimed "Next.js 16 native `<ViewTransition>` in layout.tsx." The real, shipped mechanism is `ViewTransitionLink` + the `@/lib/motion/view-transition` helper. Use those.
 

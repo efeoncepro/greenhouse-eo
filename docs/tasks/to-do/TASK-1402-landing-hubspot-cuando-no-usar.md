@@ -123,7 +123,8 @@ disfrazado de renuncia** — y funciona porque **la renuncia es real**.
 4. 🔴 **ISO 27001, con precisión quirúrgica.** ✅ **HubSpot NO reclama ISO 27001 para sí mismo** (su página dice
    que la tiene su infra cloud — AWS). ✅ **Sí tiene SOC 2 Type II + SOC 3.**
    **Exagerarlo = mentimos. Omitirlo = le fallamos justo al lector que vino por esto.**
-5. 🔴 **Claims prohibidos:** *"Líder en CRM según Gartner"* · Forrester Wave · ISO 27001 de HubSpot ·
+5. 🔴 **Claims prohibidos:** *"Líder en CRM según Gartner"* — en 2026 figura como Challenger de CRM Sales
+   Platforms · Forrester Wave · ISO 27001 de HubSpot ·
    residencia LATAM · *"flota de agentes"*.
 6. 🔴 **Nomenclatura 2026:** **Revenue Hub** · **Data Hub** · **UNBOUND**. HubSpot = **Agentic Customer Platform**.
 7. 🔴 **Los límites tienen fecha.** HubSpot los sube. **`dateModified` + `as-of` visible + revisión trimestral.**

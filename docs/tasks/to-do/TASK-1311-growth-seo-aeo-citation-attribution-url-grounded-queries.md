@@ -4,6 +4,21 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-27 — corrección upstream del parser de citas (TASK-1652) + hallazgo del wrapper
+
+Cerrado por TASK-1652: el adapter `google_ai_overview` ahora (a) envía `location_code` válido con
+markets ISO-2 (antes cada run productivo fallaba per-task y persistía 0 citas), (b) clasifica
+honesto por `status_code` per-task, y (c) desciende a las `references[]` anidadas de los
+`ai_overview_element`. **Hallazgo live que ESTA task debe heredar:** Google envuelve TODAS las
+references de AI Mode en redirects propios — `domain: google.com`, `url: google.com/goto?url=<token
+opaco>` (no decodificable client-side); la identidad real viene SOLO en `source` (a veces dominio,
+a veces nombre de marca). Las citas persistidas ahora traen el dominio real cuando `source` es
+domain-shaped; las de marca no atribuible se descartan y se cuentan en
+`usage.dataforseo_citations_unattributable` (en el payload live real: 25 de 27 refs únicas). Para el
+nivel URL de este alcance, las `url` de `google_ai_overview` son punteros al wrapper, NO la URL de
+la página citada — la atribución URL-level de este provider requerirá resolver el redirect o apoyarse
+en `title`/`source`; dimensionar eso acá, no asumir URLs limpias.
+
 ## Delta 2026-08-15 — el alcance sube a URLs de TERCEROS, no sólo al dominio propio
 
 Fuente: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` (§3.2 brecha A4:

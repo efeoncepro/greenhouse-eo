@@ -26,20 +26,20 @@
 
 Crear una superficie de Greenhouse para redactar, previsualizar, aprobar y enviar comunicaciones manuales al equipo por Microsoft Teams usando el bot Greenhouse/Nexa. El humano decide contenido, destino, momento y mención; el sistema automatiza validación, auditoría, idempotencia, dispatch, retries, estado de entrega y observabilidad.
 
-El MVP apunta a `EO Team` como canal `teams_bot` de group chat, con soporte explícito para `@todos` y con diseño preparado para crecer a múltiples canales, audiencias, plantillas, programación y Notification Hub.
+El MVP apunta a `EO Team` como destino `teams_bot` de group chat, con menciones opcionales a personas explícitas y diseño preparado para crecer a múltiples canales, audiencias, plantillas, programación y Notification Hub. TeamBot no promete `@todos`: Microsoft Teams no admite `@everyone` para bots en chats grupales.
 
 ## Why This Task Exists
 
 El smoke del 2026-04-28 confirmó que Greenhouse ya puede publicar en el chat grupal `EO Team` desde el Bot Framework como remitente `Greenhouse`. El mensaje de prueba de Nexa funcionó y el transcript de Teams lo mostró como `[Greenhouse]`.
 
-Ese aprendizaje desbloquea una capacidad operativa clara: que Admin/Nexa pueda iniciar comunicaciones generales desde Greenhouse sin depender de un humano copiando texto en Teams. El riesgo es que una implementación ingenua sea solo un textbox que postea al chat, sin permisos finos, sin confirmación de `@todos`, sin historial ni control de duplicados. Esta task formaliza la capacidad como una superficie institucional robusta y escalable.
+Ese aprendizaje desbloquea una capacidad operativa clara: que Admin/Nexa pueda iniciar comunicaciones generales desde Greenhouse sin depender de un humano copiando texto en Teams. El riesgo es que una implementación ingenua sea solo un textbox que postea al chat, sin permisos finos, sin gobierno de menciones individuales, sin historial ni control de duplicados. Esta task formaliza la capacidad como una superficie institucional robusta y escalable.
 
 ## Goal
 
 - Crear una UI de comunicaciones manuales para `EO Team` con composer, preview, confirmación y historial.
 - Modelar el flujo como `manual request -> intent/outbox -> delivery adapter`, no como POST directo bloqueante desde la UI.
 - Separar explícitamente qué queda manual y qué queda automatizado.
-- Soportar `@todos` de forma controlada, auditable y verificable.
+- Soportar menciones individuales de forma controlada, auditable y verificable, y representar honestamente que el chat grupal no dispone de una mención colectiva mediante bot.
 - Registrar permisos en ambos planos: `views` para la surface visible y `entitlements` para publicar/aprobar/administrar.
 - Converger con `Notification Hub` y `Teams Bot` sin crear un canal paralelo difícil de retirar.
 
@@ -76,7 +76,7 @@ Reglas obligatorias:
 - `routeGroups`: usar `admin` como carril broad. No crear un route group nuevo.
 - `startup policy`: no cambia.
 - Todo envío debe tener audit trail: autor, aprobador si aplica, canal, texto, modo de mención, idempotency key, correlation id, Teams activity id, estado final y error redactado.
-- `@todos` requiere protección adicional: preview, confirmación explícita y política de aprobación/configuración por canal.
+- Las menciones requieren preview, identidades verificadas y política de aprobación/configuración por canal. `@todos` / `@everyone` queda prohibido para destinos `chat_group` porque Teams no lo soporta mediante bot.
 - No loggear secretos, tokens ni payloads potencialmente sensibles sin pasar por redacción.
 - Si la implementación extiende `teams_notification_channels`, debe preservar `provisioning_status` y los patrones de `pending_setup` / `configured_but_failing`.
 
@@ -160,7 +160,7 @@ Reglas obligatorias:
 
 - No existe una surface para comunicaciones manuales.
 - No existe un canal registry de anuncios manuales para `EO Team`.
-- El sender actual postea Adaptive Cards; no tiene un contrato formal para mensajes de texto con menciones reales (`@todos`) en group chat.
+- El sender actual postea Adaptive Cards y permite menciones individuales, pero la feature todavía no gobierna resolución de audiencia, preview, aprobación ni historial.
 - No hay flujo de draft/approval/publish para mensajes institucionales.
 - No hay audit trail específico para comunicaciones manuales.
 - No hay rate limiting/cooldown ni política de doble confirmación para menciones amplias.
@@ -220,7 +220,8 @@ Reglas obligatorias:
     - `approver_user_id text NULL`
     - `status text` (`draft` | `pending_approval` | `queued` | `sent` | `failed` | `cancelled`)
     - `message_plaintext text`
-    - `mention_mode text` (`none` | `everyone_in_chat` | `channel`)
+    - `mention_mode text` (`none` | `explicit_users`)
+    - `mention_targets_json jsonb` con identidades individuales resueltas y texto visible
     - `preview_json jsonb`
     - `idempotency_key text UNIQUE`
     - `correlation_id text`
@@ -235,26 +236,14 @@ Reglas obligatorias:
   - `communications.manual_announcement.requested`
   - payload sin secretos y con `announcementId`, `channelCode`, `mentionMode`, `authorUserId`.
 
-### Slice 3 — Teams Text + Mention Adapter
+### Slice 3 — Teams Mention Adapter
 
-- Extender el Bot Framework Connector para soportar actividad textual además de Adaptive Card:
-  - `postChatTextMessage({ chatId, text, entities, textFormat })`
-  - `postChannelTextMessage({ channelId, teamId, text, entities, textFormat })`
-- Agregar contrato tipado:
-  - `TeamsMentionMode = 'none' | 'everyone_in_chat' | 'channel'`
-  - `TeamsTextActivity`
-  - `TeamsMentionEntity`
-- Implementar `@todos` para group chat basado en el aprendizaje verificado:
-  - `text` contiene `<at>todos</at>`
-  - `textFormat='xml'`
-  - `entities[].type='mention'`
-  - `entities[].text='<at>todos</at>'`
-  - `entities[].mentioned.name='todos'`
-  - `entities[].mentioned.id` usa el `chatId` del group chat cuando `mention_mode='everyone_in_chat'`
-- Mantener fallback explícito:
-  - si Teams devuelve 2xx pero no se puede confirmar mención real desde API, el historial debe marcar `mentionVerification='unverified'`, no prometer push.
-  - si el tenant deshabilita group/channel mentions, registrar `configured_but_failing` o error claro según corresponda.
-- Tests unitarios con fetch mock validando body exacto de la actividad, sin exponer token.
+- Reutilizar las menciones de Adaptive Card ya verificadas: `<at>Visible Text</at>` en el card y entidad correspondiente en `card.msteams.entities[]` con Microsoft Entra Object ID o UPN.
+- Agregar contrato tipado para `TeamsMentionMode = 'none' | 'explicit_users'` y targets individuales normalizados.
+- Resolver y validar que cada identidad pertenezca a la audiencia antes de publicar; nunca aceptar IDs `29:<aadObjectId>` en Adaptive Cards.
+- Rechazar `@todos`, `@everyone`, `everyone_in_chat` y cualquier entidad cuyo `mentioned.id` sea el `chatId`. No agregar `activity.text` a una Adaptive Card para intentar activar una mención.
+- Si Teams devuelve 2xx, registrar transporte aceptado y `activityId`; eso no prueba que una mención inválida haya sido resuelta ni que exista push.
+- Tests unitarios con fetch mock validando el card y sus entidades individuales; el criterio final de una mención real requiere smoke autorizado con una persona explícita.
 
 ### Slice 4 — Backend API
 
@@ -297,10 +286,10 @@ Reglas obligatorias:
 - UI principal:
   - Composer con selector de canal.
   - Campo de mensaje.
-  - Segment control de mención: `Sin mención` / `@todos`.
+  - Control de mención: `Sin mención` / `Personas específicas`.
   - Preview del mensaje como lo verá Teams.
   - Estado del canal (`ready`, `pending_setup`, `configured_but_failing`, `disabled`).
-  - Confirmación explícita para `@todos`.
+  - Confirmación explícita de las personas que recibirán mención.
   - Botón `Guardar borrador`, `Enviar prueba` si aplica, `Publicar`.
   - Si la política requiere aprobación: `Enviar a aprobación` y sección de aprobación.
 - Historial:
@@ -317,7 +306,7 @@ Reglas obligatorias:
 
 - Rate limits:
   - máximo configurable por usuario/canal por ventana.
-  - cooldown separado para `@todos`.
+  - cooldown separado para anuncios con menciones.
   - bloqueo de doble click/retry mediante idempotency key.
 - Validaciones:
   - longitud máxima de mensaje.
@@ -329,7 +318,7 @@ Reglas obligatorias:
   - publicar/cancelar/aprobar/reintentar son acciones separadas.
   - errores técnicos se redactan.
 - Policy:
-  - `@todos` debe exigir doble confirmación en UI.
+  - cada mención debe mostrar identidad y texto visible en el preview; no se permite una audiencia colectiva sintética.
   - canales con `manual_send_policy='four_eyes_for_broadcast'` requieren aprobación para `mention_mode!='none'`.
 
 ### Slice 8 — Observability + Docs
@@ -341,7 +330,7 @@ Reglas obligatorias:
   - `docs/documentation/plataforma/manual-communications.md`
   - explicar qué es manual, qué se automatiza, quién puede enviar y cómo se audita.
 - Documentación operativa:
-  - actualizar `docs/operations/azure-teams-bot.md` con nota de `@todos` en group chat y smoke esperado.
+  - actualizar `docs/operations/azure-teams-bot.md` con el límite de menciones colectivas en group chat y el smoke esperado para usuarios explícitos.
 - Changelog:
   - actualizar `changelog.md` cuando la feature cambie comportamiento real.
   - evaluar `docs/changelog/CLIENT_CHANGELOG.md` solo si se expone fuera del equipo interno Efeonce.
@@ -357,6 +346,44 @@ Reglas obligatorias:
 - Crear plantillas comerciales/client-facing.
 - Enviar archivos o imágenes.
 
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+- Foundation de Notification Hub y acceso antes de UI/dispatch.
+- Adapter y contratos de menciones individuales antes de habilitar publicación.
+- `@todos`, `@everyone` y `everyone_in_chat` no forman parte de ningún rollout.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigación | Signal de alerta |
+| --- | --- | --- | --- | --- |
+| Prometer una notificación colectiva no soportada | Teams Bot | medium | Rechazar audiencia sintética y permitir solo identidades explícitas | `todos`/`everyone` aparece como texto plano |
+| Duplicar mensajes por retries o doble click | Notification Hub | medium | Intent/outbox e idempotency key | Más de un `activityId` por anuncio |
+| Mencionar a una persona incorrecta | Identity/Teams | low | Resolver Entra/UPN, preview y confirmación | Texto visible no coincide con la entidad |
+| Publicar sin autoridad | Access | low | `views` + entitlements + audit | Actor sin capability crea intent |
+
+### Feature flags / cutover
+
+La superficie nace deshabilitada por canal mediante `manual_send_enabled=false`. El cutover habilita primero drafts/preview, después un destino interno con `mention_mode='none'` y finalmente menciones individuales verificadas. No existe cutover para mención colectiva en chat grupal.
+
+### Rollback plan per slice
+
+- Deshabilitar el canal manual impide nuevos intents sin borrar historial.
+- Pausar el consumer conserva drafts y queued requests para reconciliación.
+- Revertir UI no modifica deliveries ya persistidas.
+
+### Production verification sequence
+
+1. Validar permisos, preview, idempotencia y redacción sin enviar.
+2. Enviar un anuncio autorizado sin menciones al destino interno.
+3. Probar una mención individual solo con persona y copy aprobados; comprobar render visual además de `activityId`.
+4. Verificar historial, métricas y retry sin repetir una entrega exitosa.
+
+### Out-of-band coordination required
+
+La habilitación por canal y cualquier smoke público requieren aprobación del operador. No se usa el chat grupal para descubrir capacidades del vendor.
+
 ## Detailed Spec
 
 ### Manual vs Automatizado
@@ -367,7 +394,7 @@ Debe quedar así:
 | --- | --- | --- |
 | Elección de destino | El operador elige canal permitido | Sistema filtra canales por permisos, estado y policy |
 | Redacción | El operador escribe el mensaje | Sistema valida longitud, sanitiza y detecta secretos obvios |
-| Mención | El operador decide `none` o `@todos` | Sistema aplica confirmación, policy, entidad Teams correcta |
+| Mención | El operador decide `none` o personas específicas | Sistema resuelve identidades, aplica confirmación y rechaza audiencias colectivas sintéticas |
 | Preview | El operador revisa | Sistema renderiza shape final y muestra riesgos |
 | Aprobación | Humano aprueba si policy lo exige | Sistema bloquea self-approval cuando corresponde |
 | Publicación | Humano confirma publicar | Sistema crea intent/outbox idempotente |
@@ -402,7 +429,7 @@ Evento outbox:
   "payload": {
     "announcementId": "<announcementId>",
     "channelCode": "eo-team-announcements",
-    "mentionMode": "everyone_in_chat",
+    "mentionMode": "explicit_users",
     "authorUserId": "<userId>",
     "correlationId": "manual-announcement:<announcementId>"
   }
@@ -418,29 +445,16 @@ Notification Hub mapping objetivo:
 - `domain='platform'`
 - `dedup_key=sha256(event_type + channelCode + announcementId)`
 
-### Teams @todos Contract
+### Teams group-chat mention contract
 
-El implementation plan debe validar este contrato contra Teams real:
+Microsoft documenta que los bots en chats grupales admiten menciones a usuarios, pero no `@everyone`. El contrato de esta task es:
 
-```json
-{
-  "type": "message",
-  "textFormat": "xml",
-  "text": "Hola, <at>todos</at><br/>Mensaje...",
-  "entities": [
-    {
-      "type": "mention",
-      "text": "<at>todos</at>",
-      "mentioned": {
-        "id": "<chatId>",
-        "name": "todos"
-      }
-    }
-  ]
-}
-```
+- `mention_mode='none'`: Adaptive Card attachments-only, sin `activity.text`.
+- `mention_mode='explicit_users'`: cada nombre visible aparece como `<at>Visible Text</at>` dentro de la tarjeta y tiene una entidad pareja en `card.msteams.entities[]` con Entra Object ID o UPN.
+- `@todos`, `@everyone`, `everyone_in_chat` y `mentioned.id=<chatId>` se rechazan antes del dispatch.
+- Un HTTP 2xx confirma que el Connector aceptó la actividad; no demuestra por sí solo resolución de menciones ni notificación.
 
-Nota: el transcript puede renderizarlo como `todos` sin `@`; la validación real debe revisar delivery status y un smoke visual/manual cuando se toque esta zona.
+Fuente: [Microsoft Teams — channel and group chat conversations](https://learn.microsoft.com/microsoftteams/platform/bots/how-to/conversations/channel-and-group-conversations).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -455,12 +469,12 @@ Nota: el transcript puede renderizarlo como `todos` sin `@`; la validación real
 - [ ] `admin.communications` existe en `entitlements-catalog` con acciones `read`, `create`, `approve`, `manage`.
 - [ ] `EO Team` está modelado como canal manual `eo-team-announcements` en `teams_notification_channels` o registry equivalente sin hardcode en UI.
 - [ ] Un admin autorizado puede crear un draft, previsualizarlo y publicarlo sin bloquear la UI durante el dispatch.
-- [ ] Un envío con `@todos` exige confirmación explícita y respeta la policy de aprobación.
+- [ ] Un envío puede mencionar personas explícitas con identidades verificadas; el backend rechaza `@todos` / `@everyone` y el uso del `chatId` como mention target.
 - [ ] Doble click / retry del request HTTP no duplica el mensaje en Teams.
 - [ ] El mensaje se envía desde Greenhouse/Nexa via Bot Framework, no desde el usuario humano ni desde Graph.
 - [ ] El historial muestra estado, actor, canal, mention mode, timestamp y Teams activity id o error redactado.
 - [ ] Los errores de Teams quedan observables en `source_sync_runs` y en la UI.
-- [ ] Rate limit/cooldown bloquea ráfagas manuales, especialmente con `@todos`.
+- [ ] Rate limit/cooldown bloquea ráfagas manuales, especialmente cuando el anuncio incluye menciones.
 - [ ] Secrets/tokens obvios en el mensaje son bloqueados antes de publicar.
 - [ ] Tests cubren permisos, validaciones, idempotencia y shape del payload Teams con mention entity.
 - [ ] Documentación funcional y handoff quedan actualizados.
@@ -473,7 +487,7 @@ Nota: el transcript puede renderizarlo como `todos` sin `@`; la validación real
 - `pnpm staging:request POST /api/admin/communications/...` para el happy path de staging cuando exista endpoint.
 - Smoke manual o Playwright sobre `/admin/communications`.
 - Smoke real Teams con `mention_mode='none'`.
-- Smoke real Teams con `mention_mode='everyone_in_chat'`, validando que el mensaje aparece desde `Greenhouse` y que el historial captura `activityId`.
+- Smoke real Teams con `mention_mode='explicit_users'` y una persona autorizada, validando la mención visual y que el historial captura `activityId`.
 
 ## Closing Protocol
 
@@ -486,7 +500,7 @@ Cerrar una task es obligatorio y forma parte de Definition of Done. Si la implem
 - [ ] `changelog.md` quedó actualizado si cambió comportamiento, estructura o protocolo visible.
 - [ ] `docs/changelog/CLIENT_CHANGELOG.md` fue evaluado; actualizar solo si se comunica fuera del equipo interno.
 - [ ] `docs/documentation/plataforma/manual-communications.md` creado o actualizado.
-- [ ] `docs/operations/azure-teams-bot.md` actualizado si se confirmó/ajustó el contrato de `@todos`.
+- [ ] `docs/operations/azure-teams-bot.md` actualizado si se ajustó el contrato de menciones o su limitación colectiva.
 - [ ] Se ejecutó chequeo de impacto cruzado sobre `TASK-690`, `TASK-691`, `TASK-692`, `TASK-693` y `TASK-695`.
 - [ ] Se documentó si la implementación vive ya sobre Notification Hub o si queda un adapter temporal con plan de convergencia.
 
@@ -500,13 +514,19 @@ Cerrar una task es obligatorio y forma parte de Definition of Done. Si la implem
 - Multi-canal: email + in-app + Teams desde el mismo anuncio.
 - Cliente-facing announcements con release channels y cohortes.
 
+## Delta 2026-08-24
+
+- Un envío real a `EO Team` falsó la hipótesis histórica: `<at>todos</at>` con `mentioned.id=<chatId>` fue aceptado por Bot Framework, pero Teams mostró `todos` como texto plano en una burbuja separada y no mencionó a la audiencia.
+- La documentación oficial confirma que los bots en chats grupales soportan menciones de usuarios, pero no `@everyone`. Se eliminó `everyone_in_chat` del diseño y se reemplazó por `explicit_users`.
+- La burbuja separada provino de combinar `activity.text` con la Adaptive Card. El contrato vuelve a attachments-only y conserva menciones individuales dentro de `card.msteams.entities`.
+
 ## Delta 2026-04-28
 
-- Task creada a partir del smoke exitoso del Bot Framework contra el chat `EO Team`, donde Greenhouse/Nexa publicó un mensaje manual inicial. El diseño conserva el aprendizaje técnico de `@todos`, pero exige formalizarlo como adapter auditable antes de abrirlo en UI.
+- Task creada a partir del smoke exitoso del Bot Framework contra el chat `EO Team`, donde Greenhouse/Nexa publicó un mensaje manual inicial. Ese smoke verificó el transporte y el remitente, no una mención colectiva; el Delta 2026-08-24 corrige esa extrapolación.
 
 ## Open Questions
 
-- ¿La primera versión debe permitir self-publish sin aprobación para mensajes sin `@todos`, o todo anuncio debe pasar por four-eyes?
+- ¿La primera versión debe permitir self-publish sin aprobación para mensajes sin menciones, o todo anuncio debe pasar por four-eyes?
 - ¿`/admin/communications` debe vivir como subpestaña de `Admin > Notificaciones` o como surface propia en Admin Center?
 - ¿Se quiere exponer `Enviar prueba` en MVP o reservarlo para usuarios con `admin.communications:manage`?
 - ¿El copy público debe decir siempre `Nexa` aunque el remitente técnico sea `Greenhouse`, o conviene configurar el sender label por canal?

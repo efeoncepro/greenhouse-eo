@@ -88,6 +88,7 @@ export interface ApplicationDossierPanelProps {
   noteAuthorNames: Record<string, string>
   onGoToScorecard: () => void
   onToast: (message: string) => void
+  onDirtyChange?: (dirty: boolean) => void
 }
 
 const NOTE_COLLAPSE_THRESHOLD = 600
@@ -572,7 +573,8 @@ const ApplicationDossierPanel = ({
   canAnnotate,
   noteAuthorNames,
   onGoToScorecard,
-  onToast
+  onToast,
+  onDirtyChange,
 }: ApplicationDossierPanelProps) => {
   const expediente = copy.application.expediente
 
@@ -615,6 +617,15 @@ const ApplicationDossierPanel = ({
   const [statusMessage, setStatusMessage] = useState('')
 
   const editTriggerRef = useRef<HTMLButtonElement | null>(null)
+
+  useEffect(() => {
+    const editedProposalChanged = editing && editedBody !== (proposalBodyMd ?? '')
+    const dirty = composerBody.trim().length > 0 || editedProposalChanged || rejectReason.trim().length > 0
+
+    onDirtyChange?.(dirty)
+
+    return () => onDirtyChange?.(false)
+  }, [composerBody, editedBody, editing, onDirtyChange, proposalBodyMd, rejectReason])
 
   const notesEndpoint = `/api/hiring/applications/${encodeURIComponent(applicationId)}/notes`
   const dossierEndpoint = `/api/hiring/applications/${encodeURIComponent(applicationId)}/dossier`

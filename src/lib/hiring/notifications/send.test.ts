@@ -403,9 +403,16 @@ describe('TASK-1689 hiring lifecycle emails', () => {
       // `not_selected` es el corazón del caso: sin el mapa explícito, el ternario binario le habría
       // mandado un correo de RECHAZO a quien nadie rechazó. `unresponsive` NUNCA notifica por diseño
       // (ADR §7.2): a quien no declaró nada no se le escribe.
-      const silentDecisions = HIRING_DECISIONS.filter(d => d !== 'selected' && d !== 'rejected')
+      //
+      // **Delta TASK-1762:** `not_selected` YA tiene tipo propio (`hiring_decision_not_selected`),
+      // así que salió de la lista de mudos por ausencia de mapa. Sigue sin escribirle a nadie, pero
+      // por un motivo distinto y explícito: su flag `HIRING_CAPACITY_FILLED_EMAIL_ENABLED` nace OFF.
+      // La distinción importa — «mudo porque nadie decidió su correo» y «silenciado por un freno
+      // deliberado» son estados diferentes, y colapsarlos escondería el día que el freno se caiga.
+      const silentDecisions = HIRING_DECISIONS.filter(
+        d => d !== 'selected' && d !== 'rejected' && d !== 'not_selected'
+      )
 
-      expect(silentDecisions).toContain('not_selected')
       expect(silentDecisions).toContain('unresponsive')
 
       for (const decision of [...silentDecisions, '']) {
@@ -414,6 +421,13 @@ describe('TASK-1689 hiring lifecycle emails', () => {
         expect(msg).toContain('no notifica')
       }
 
+      // `not_selected` es mudo por su freno, no por falta de mapa: el mensaje lo dice con todas
+      // sus letras en vez de disfrazarse de «no notifica».
+      const notSelectedMsg = await sendHiringDecisionEmail('happ-1', { decision: 'not_selected' })
+
+      expect(notSelectedMsg).toContain('HIRING_CAPACITY_FILLED_EMAIL_ENABLED')
+
+      // Lo que este test protege de verdad, y sigue intacto: NADIE sale notificado.
       expect(mockSendEmail).not.toHaveBeenCalled()
     })
 

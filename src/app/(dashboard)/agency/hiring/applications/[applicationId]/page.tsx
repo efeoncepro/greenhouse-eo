@@ -6,7 +6,11 @@ import type { Metadata } from 'next'
 
 import Application360View from '@/views/greenhouse/hiring/Application360View'
 import { can } from '@/lib/entitlements/runtime'
-import { getHiringApplicationById, getHiringDeskSnapshot } from '@/lib/hiring'
+import {
+  getHiringApplicationById,
+  getHiringApplicationQueueNavigation,
+  getHiringDeskSnapshot,
+} from '@/lib/hiring'
 import { listHiringApplicationNotes, type HiringApplicationNotesView } from '@/lib/hiring/application-notes'
 import {
   buildCandidateDocumentsViewModel,
@@ -73,9 +77,15 @@ export default async function HiringApplicationPage({ params }: Props) {
   const canRevealAccessLink = can(tenant, 'hiring.assessment.reveal_access_link', 'execute', 'tenant')
   const canRecoverAccess = canRecoverAccessByEmail || canRevealAccessLink
 
-  const [locale, snapshot, assessments, handoff, documents, notesView] = await Promise.all([
+  const [locale, snapshot, queueNavigation, assessments, handoff, documents, notesView] = await Promise.all([
     getLocale(),
-    getHiringDeskSnapshot({ openingId: application.openingId, openingLimit: 80, applicationLimit: 120 }),
+    getHiringDeskSnapshot({
+      openingId: application.openingId,
+      focusApplicationId: applicationId,
+      openingLimit: 80,
+      applicationLimit: 120,
+    }),
+    getHiringApplicationQueueNavigation(applicationId),
     canReadAssessment ? listAssessmentsForApplication(applicationId) : Promise.resolve([]),
     getHiringHandoffByApplicationId(applicationId),
     canReadDocuments
@@ -147,9 +157,11 @@ export default async function HiringApplicationPage({ params }: Props) {
 
   return (
     <Application360View
+      key={applicationId}
       copy={getMicrocopy(normalizeLocale(locale) ?? undefined).hiringDesk}
       assessmentCopy={getMicrocopy(normalizeLocale(locale) ?? undefined).hiringAssessment}
       initialItem={item}
+      queueNavigation={queueNavigation}
       initialAssessments={assessments}
       canAuthorAssessment={canAuthorAssessment}
       canRecoverAccessByEmail={canRecoverAccessByEmail}

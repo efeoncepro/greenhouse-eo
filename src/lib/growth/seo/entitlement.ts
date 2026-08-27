@@ -72,7 +72,13 @@ export const SEO_MODULE_KEY = 'seo_v2' as const
  */
 export const SEO_MODULE_KEYS_READ: readonly string[] = ['seo_v2']
 
-export type SeoTier = 'contracted' | 'trial' | 'pilot'
+/**
+ * `prospect` (TASK-1709) es el tier de ADQUISICIÓN: el sujeto es un dominio sin org ni
+ * `module_assignments`, así que NUNCA sale de `resolveTier` (no está en `VALID_TIERS`;
+ * un assignment no puede declararlo). Se resuelve únicamente por
+ * `resolveProspectDiagnosticEntitlement`, con tope POR DIAGNÓSTICO — no mensual.
+ */
+export type SeoTier = 'contracted' | 'trial' | 'pilot' | 'prospect'
 
 export type SeoBlockedReason =
   | 'no_entitlement'
@@ -403,6 +409,150 @@ export const enforceSeoRunEntitlement = async (
     tier: entitlement.tier,
     allowanceRemaining: entitlement.allowanceRemaining,
     budgetRemainingUsd: entitlement.budgetRemainingUsd,
+    blockedReason: null
+  }
+}
+
+/**
+ * TASK-1709 — Tier `prospect`: tope duro POR DIAGNÓSTICO (no mensual).
+ *
+ * El sujeto del diagnóstico es un dominio sin organización, así que el entitlement no
+ * sale de `module_assignments`. El gasto es COSTO DE ADQUISICIÓN de Efeonce: se atribuye
+ * a su organización canónica (resuelta server-side por `public_id`, nunca un UUID literal
+ * en el colector) y queda acotado dos veces —
+ *
+ *   presupuesto_diagnóstico = min(GROWTH_SEO_PROSPECT_DIAGNOSTIC_CEILING_USD,
+ *                                 presupuesto_restante_del_mes_de_Efeonce)
+ *
+ * — de modo que N prospectos jamás pueden gastar más que el presupuesto mensual de la
+ * propia org de Efeonce, y un diagnóstico individual jamás más que su tope. La validación
+ * es contra el costo del CONJUNTO COMPLETO de llamadas ANTES de la primera (el límite
+ * documentado del gate mensual — sobregiro 3× medido — no se hereda acá).
+ */
+
+/** `public_id` de la organización canónica de Efeonce (verificada viva 2026-08-27). */
+export const EFEONCE_CANONICAL_ORG_PUBLIC_ID = 'EO-ORG-0007'
+
+/** Knob de configuración con default (NO es un flag `*_ENABLED`). */
+export const resolveProspectDiagnosticCeilingUsd = (env: NodeJS.ProcessEnv = process.env): number =>
+  toPositiveFloat(env.GROWTH_SEO_PROSPECT_DIAGNOSTIC_CEILING_USD, 1)
+
+/** Tope diario de diagnósticos por actor (freno de abuso, knob con default). */
+export const resolveProspectDiagnosticDailyActorCap = (env: NodeJS.ProcessEnv = process.env): number =>
+  toPositiveInt(env.GROWTH_SEO_PROSPECT_DIAGNOSTIC_DAILY_ACTOR_CAP, 10)
+
+export type ProspectDiagnosticBlockedReason = 'no_entitlement' | 'budget_exhausted' | 'cost_blocked'
+
+export interface ProspectDiagnosticEntitlement {
+  tier: Extract<SeoTier, 'prospect'>
+  /** Org canónica de Efeonce a la que se atribuye el gasto de adquisición. */
+  acquisitionOrganizationId: string | null
+  ceilingUsd: number
+  efeonceBudgetRemainingUsd: number
+  /** min(ceiling, presupuesto restante del mes de Efeonce). */
+  effectiveBudgetUsd: number
+  blockedReason: Extract<ProspectDiagnosticBlockedReason, 'no_entitlement' | 'budget_exhausted'> | null
+}
+
+interface CanonicalOrgRow extends Record<string, unknown> {
+  organization_id: string
+}
+
+/**
+ * Resuelve el entitlement del tier `prospect`. NO exige `module_assignments` para el
+ * sujeto (un prospecto no tiene org); el presupuesto sale del entitlement de la org
+ * canónica de Efeonce, que sí es per-org.
+ */
+export const resolveProspectDiagnosticEntitlement = async (
+  env: NodeJS.ProcessEnv = process.env
+): Promise<ProspectDiagnosticEntitlement> => {
+  const ceilingUsd = resolveProspectDiagnosticCeilingUsd(env)
+
+  const orgRows = await runGreenhousePostgresQuery<CanonicalOrgRow>(
+    `SELECT organization_id
+       FROM greenhouse_core.organizations
+      WHERE public_id = $1
+      LIMIT 1`,
+    [EFEONCE_CANONICAL_ORG_PUBLIC_ID]
+  )
+
+  const acquisitionOrganizationId = orgRows[0]?.organization_id ?? null
+
+  if (!acquisitionOrganizationId) {
+    return {
+      tier: 'prospect',
+      acquisitionOrganizationId: null,
+      ceilingUsd,
+      efeonceBudgetRemainingUsd: 0,
+      effectiveBudgetUsd: 0,
+      blockedReason: 'no_entitlement'
+    }
+  }
+
+  const efeonce = await resolveSeoEntitlement(acquisitionOrganizationId, env)
+
+  if (!efeonce.hasModule || efeonce.blockedReason === 'expired') {
+    return {
+      tier: 'prospect',
+      acquisitionOrganizationId,
+      ceilingUsd,
+      efeonceBudgetRemainingUsd: efeonce.budgetRemainingUsd,
+      effectiveBudgetUsd: 0,
+      blockedReason: 'no_entitlement'
+    }
+  }
+
+  const effectiveBudgetUsd = Math.min(ceilingUsd, efeonce.budgetRemainingUsd)
+
+  return {
+    tier: 'prospect',
+    acquisitionOrganizationId,
+    ceilingUsd,
+    efeonceBudgetRemainingUsd: efeonce.budgetRemainingUsd,
+    effectiveBudgetUsd,
+    blockedReason: effectiveBudgetUsd <= 0 ? 'budget_exhausted' : null
+  }
+}
+
+export interface ProspectDiagnosticGate {
+  allowed: boolean
+  acquisitionOrganizationId: string | null
+  effectiveBudgetUsd: number
+  blockedReason: ProspectDiagnosticBlockedReason | null
+}
+
+/**
+ * Chokepoint del tope por diagnóstico: valida el costo previsto del CONJUNTO completo
+ * de llamadas ANTES de la primera. Si no cabe → `cost_blocked` y CERO llamadas.
+ */
+export const enforceProspectDiagnosticBudget = async (
+  forecastUsd: number,
+  env: NodeJS.ProcessEnv = process.env
+): Promise<ProspectDiagnosticGate> => {
+  const entitlement = await resolveProspectDiagnosticEntitlement(env)
+
+  if (entitlement.blockedReason) {
+    return {
+      allowed: false,
+      acquisitionOrganizationId: entitlement.acquisitionOrganizationId,
+      effectiveBudgetUsd: entitlement.effectiveBudgetUsd,
+      blockedReason: entitlement.blockedReason
+    }
+  }
+
+  if (!Number.isFinite(forecastUsd) || forecastUsd < 0 || forecastUsd > entitlement.effectiveBudgetUsd) {
+    return {
+      allowed: false,
+      acquisitionOrganizationId: entitlement.acquisitionOrganizationId,
+      effectiveBudgetUsd: entitlement.effectiveBudgetUsd,
+      blockedReason: 'cost_blocked'
+    }
+  }
+
+  return {
+    allowed: true,
+    acquisitionOrganizationId: entitlement.acquisitionOrganizationId,
+    effectiveBudgetUsd: entitlement.effectiveBudgetUsd,
     blockedReason: null
   }
 }

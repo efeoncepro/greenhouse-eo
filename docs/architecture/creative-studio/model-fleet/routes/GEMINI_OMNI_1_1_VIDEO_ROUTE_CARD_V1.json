@@ -1,0 +1,258 @@
+{
+  "schemaVersion": "model-route-card.v1",
+  "cardId": "route-card/gemini-omni-1-1-video",
+  "snapshot": {
+    "observedAt": "2026-08-27",
+    "maxAgeDays": 14,
+    "revalidateBeforeUse": true
+  },
+  "authority": {
+    "availabilityReader": "efeonce-globe:globe.producer.fleet.list",
+    "humanLedger": "docs/operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md",
+    "providerEvidence": "Google Gemini Developer API and Gemini Enterprise Agent Platform documentation, pricing, terms and deprecations observed 2026-08-27"
+  },
+  "modelFamily": {
+    "publicName": "Gemini Omni 1.1 Flash",
+    "familyKey": "gemini-omni-1-1-video",
+    "modality": "video",
+    "globeStatus": "gated",
+    "summary": "Provider-supported 1.1 generation and editing family. No 1.1 route, binding, canary or availability is claimed in Globe.",
+    "integrationDecision": "TASK-1781 resolves Developer API versus Cloud identity and delivers 720p replacement parity before any new operation or output shape. Never inherit evidence from gemini-omni-flash-preview."
+  },
+  "evidence": [
+    {
+      "id": "provider-announcement",
+      "authority": "provider_primary",
+      "kind": "launch-announcement",
+      "observedAt": "2026-08-27",
+      "reference": "https://blog.google/innovation-and-ai/technology/developers-tools/build-with-gemini-omni-1-1-flash/",
+      "revalidateBeforeUse": true,
+      "ttlDays": 30,
+      "note": "Launch date and provider claims for extension, first-last frames, 360p, 4K and video references."
+    },
+    {
+      "id": "cloud-model",
+      "authority": "provider_primary",
+      "kind": "cloud-model-card",
+      "observedAt": "2026-08-27",
+      "reference": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/omni-1-1-flash",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Cloud identity gemini-omni-1.1-flash-preview, Preview stage, global region, limits and capabilities."
+    },
+    {
+      "id": "developer-omni",
+      "authority": "provider_primary",
+      "kind": "developer-api-guide",
+      "observedAt": "2026-08-27",
+      "reference": "https://ai.google.dev/gemini-api/docs/omni",
+      "revalidateBeforeUse": true,
+      "ttlDays": 14,
+      "note": "Developer identity gemini-omni-1.1-flash, Interactions, resolution and operation-specific constraints."
+    },
+    {
+      "id": "provider-pricing",
+      "authority": "provider_primary",
+      "kind": "cloud-pricing",
+      "observedAt": "2026-08-27",
+      "reference": "https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing",
+      "revalidateBeforeUse": true,
+      "ttlDays": 7,
+      "note": "Token rates by input, text output and video resolution. Billing receipt remains unverified."
+    },
+    {
+      "id": "provider-terms",
+      "authority": "provider_primary",
+      "kind": "preview-and-service-terms",
+      "observedAt": "2026-08-27",
+      "reference": "https://cloud.google.com/terms/genai-preview-products",
+      "revalidateBeforeUse": true,
+      "ttlDays": 30,
+      "note": "Commercial use exception for the named Preview offer remains subject to the applicable agreement and legal review."
+    },
+    {
+      "id": "provider-deprecations",
+      "authority": "provider_primary",
+      "kind": "model-lifecycle",
+      "observedAt": "2026-08-27",
+      "reference": "https://ai.google.dev/gemini-api/docs/deprecations",
+      "revalidateBeforeUse": true,
+      "ttlDays": 7,
+      "note": "Developer 1.1 release and 2026-09-30 shutdown of gemini-omni-flash-preview."
+    },
+    {
+      "id": "provider-c2pa",
+      "authority": "provider_primary",
+      "kind": "content-credentials",
+      "observedAt": "2026-08-27",
+      "reference": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/content-credentials",
+      "revalidateBeforeUse": true,
+      "ttlDays": 30,
+      "note": "Cloud lists automatic C2PA signing; bytes have not been inspected by Efeonce."
+    },
+    {
+      "id": "research-ledger",
+      "authority": "repo_primary",
+      "kind": "dated-provider-research",
+      "observedAt": "2026-08-27",
+      "reference": "docs/audits/creative-studio/GEMINI_OMNI_1_1_PROVIDER_RESEARCH_2026-08-27.md",
+      "revalidateBeforeUse": false,
+      "note": "Claim ledger, contradictions, risk and integration gates."
+    },
+    {
+      "id": "task-1781",
+      "authority": "repo_primary",
+      "kind": "implementation-task",
+      "observedAt": "2026-08-27",
+      "reference": "docs/tasks/to-do/TASK-1781-globe-gemini-omni-1-1-migration-and-capability-expansion.md",
+      "revalidateBeforeUse": false,
+      "note": "Owns exact identity, integration, evaluation, promotion, sunset and readback."
+    }
+  ],
+  "routes": [
+    {
+      "routeId": "ref/motion/reference-v1",
+      "kind": "standard",
+      "capability": "video-generate",
+      "operation": "create",
+      "provider": "vertex-omni",
+      "model": "gemini-omni-1.1-flash-preview",
+      "version": "1.1-preview",
+      "identityState": "resolved",
+      "endpointId": "vertex.omni-1-1.reference-to-video",
+      "region": "global",
+      "completionDriver": "poll",
+      "lifecycle": "gated",
+      "exposure": {
+        "governed": "candidate",
+        "reader": "unknown",
+        "producerUi": "not-exposed",
+        "externalRollout": "gated"
+      },
+      "inputs": [
+        { "slot": "references", "role": "reference", "mediaType": "image", "cardinality": { "min": 1, "max": 10 }, "mechanism": "provider-documented; Globe replacement contract must preserve or narrow the current route" },
+        { "slot": "prompt", "role": "direction", "mediaType": "text", "required": true, "valueShape": "text" }
+      ],
+      "controls": [
+        { "name": "duration", "owner": "outputShape", "valueShape": "integer(3..10 seconds)", "mechanism": "provider documentation; unverified in Globe" },
+        { "name": "aspect-ratio", "owner": "outputShape", "valueShape": "enum(16:9|9:16)", "mechanism": "response_format.aspect_ratio" },
+        { "name": "resolution", "owner": "outputShape", "valueShape": "enum(360p|720p|1080p|4k)", "mechanism": "720p replacement first; all other shapes require independent rate and output verification" }
+      ],
+      "output": {
+        "mediaType": "video",
+        "mimeTypes": ["video/mp4"],
+        "audio": "provider documents generated speech, music and effects; exact stream is unverified",
+        "resolution": "360p|720p|1080p|4k; 1080p and 4k are documented as upscaled",
+        "durableAuthority": "Globe private ingest, hash, inspection and governance after a future canary"
+      },
+      "transport": {
+        "kind": "Gemini Enterprise Agent Platform Interactions API v1beta1",
+        "auth": "server-side ADC/WIF",
+        "requestMode": "synchronous or background interaction; exact Globe mode undecided",
+        "endpointSource": "governed allowlist after TASK-1781 probe",
+        "browserAccess": "forbidden"
+      },
+      "completion": {
+        "driver": "poll",
+        "providerOperation": "interaction status/readback",
+        "resultAuthority": "Globe result driver after provider response and private ingest",
+        "recovery": "persist opaque interaction id; read back before retry; no cross-surface fallback"
+      },
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["cloud-model", "provider-announcement"] },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["task-1781", "research-ledger"] },
+        "adapter_wired": { "state": "not_started", "evidenceRefs": ["task-1781"], "note": "No 1.1 model identity is wired in Globe." },
+        "transport_verified": { "state": "unknown", "evidenceRefs": ["cloud-model", "task-1781"], "note": "No authenticated 1.1 probe or interaction exists in Globe." },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["cloud-model", "provider-c2pa"], "note": "No 1.1 bytes, MIME, codec, audio, dimensions or C2PA were inspected." },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["provider-pricing", "task-1781"], "note": "Published price is not a billing receipt or Globe settlement." },
+        "rights_verified": { "state": "unknown", "evidenceRefs": ["provider-terms", "task-1781"], "note": "No immutable model-exact terms attestation or derived policy exists." },
+        "evaluated": { "state": "not_started", "evidenceRefs": ["task-1781"] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": ["task-1781"] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": ["task-1781"] },
+        "available": { "state": "gated", "evidenceRefs": ["task-1781"], "note": "Only globe.producer.fleet.list can establish availability after promotion." }
+      },
+      "evidenceRefs": ["cloud-model", "provider-pricing", "provider-terms", "provider-deprecations", "provider-c2pa", "research-ledger", "task-1781"],
+      "blockers": [
+        "Resolve fixed quota and authenticated access in the efeonce-globe project.",
+        "Prove exact request, response, completion, bytes, billing, rights and retention without inheriting the prior model evidence.",
+        "Complete evaluation, canary, promotion and live fleet readback before availability claims."
+      ]
+    }
+  ],
+  "providerSurfaces": [
+    {
+      "surfaceId": "gemini-developer-omni-1-1",
+      "provider": "gemini-developer-api",
+      "endpointId": "gemini.interactions.omni-1-1",
+      "status": "candidate",
+      "modes": ["text-to-video", "image-to-video", "reference-to-video", "first-last-frame", "edit", "extend"],
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["developer-omni", "provider-deprecations"] },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["task-1781"] },
+        "adapter_wired": { "state": "not_started", "evidenceRefs": ["task-1781"] },
+        "transport_verified": { "state": "unknown", "evidenceRefs": ["developer-omni"], "note": "API-key surface has no Globe probe." },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["developer-omni"], "note": "No retained bytes exist." },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["provider-pricing"], "note": "Developer SKU and receipt are unresolved." },
+        "rights_verified": { "state": "unknown", "evidenceRefs": ["provider-terms"], "note": "Developer terms/retention require separate attestation." },
+        "evaluated": { "state": "not_started", "evidenceRefs": ["task-1781"] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": ["task-1781"] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": ["task-1781"] },
+        "available": { "state": "gated", "evidenceRefs": ["task-1781"], "note": "Candidate surface only." }
+      },
+      "evidenceRefs": ["developer-omni", "provider-deprecations", "research-ledger", "task-1781"],
+      "note": "Stable model label does not make the v1beta Interactions endpoint, retention, SLA or Globe integration equivalent to Cloud."
+    },
+    {
+      "surfaceId": "omni-1-1-expanded-operations",
+      "provider": "vertex-omni",
+      "endpointId": "vertex.omni-1-1.operations",
+      "status": "candidate",
+      "modes": ["text-to-video", "image-to-video", "video-reference", "first-last-frame", "edit", "extend", "360p", "1080p-upscaled", "4k-upscaled"],
+      "cables": {
+        "provider_supported": { "state": "verified", "evidenceRefs": ["cloud-model", "provider-announcement"] },
+        "contract_declared": { "state": "proposed", "evidenceRefs": ["task-1781", "research-ledger"] },
+        "adapter_wired": { "state": "not_started", "evidenceRefs": ["task-1781"] },
+        "transport_verified": { "state": "unknown", "evidenceRefs": ["cloud-model"], "note": "Each operation requires its own probe and route identity." },
+        "output_verified": { "state": "unknown", "evidenceRefs": ["cloud-model", "provider-c2pa"], "note": "No operation or output shape has Efeonce bytes." },
+        "billing_verified": { "state": "unknown", "evidenceRefs": ["provider-pricing"], "note": "Rates vary by shape and remain unverified in settlement." },
+        "rights_verified": { "state": "unknown", "evidenceRefs": ["provider-terms"], "note": "Each adopted route needs exact terms and policy evidence." },
+        "evaluated": { "state": "not_started", "evidenceRefs": ["task-1781"] },
+        "canary_passed": { "state": "not_started", "evidenceRefs": ["task-1781"] },
+        "promoted": { "state": "not_promoted", "evidenceRefs": ["task-1781"] },
+        "available": { "state": "gated", "evidenceRefs": ["task-1781"], "note": "No expanded operation is a Globe route." }
+      },
+      "evidenceRefs": ["cloud-model", "provider-announcement", "provider-pricing", "provider-c2pa", "research-ledger", "task-1781"],
+      "note": "Provider capability is not a Globe capability. Split adopted operations and output shapes into exact route contracts."
+    }
+  ],
+  "implementationChecklist": [
+    {
+      "id": "surface-and-identity",
+      "status": "open",
+      "ownerBoundary": "TASK-1781 discovery and Globe provider adapter",
+      "evidenceRefs": ["cloud-model", "developer-omni", "task-1781"],
+      "note": "Probe both official IDs on their own surfaces; select without aliasing."
+    },
+    {
+      "id": "replacement-parity",
+      "status": "blocked",
+      "ownerBoundary": "Globe route catalog, runner, rights, evaluation and promotion",
+      "evidenceRefs": ["provider-deprecations", "task-1781"],
+      "note": "Blocked until access/quota and exact request contract are verified."
+    },
+    {
+      "id": "expanded-operations",
+      "status": "deferred",
+      "ownerBoundary": "TASK-1573, TASK-1633 and operation-specific Globe routes",
+      "evidenceRefs": ["research-ledger", "task-1781"],
+      "note": "Do not let new capabilities block 720p replacement parity."
+    },
+    {
+      "id": "sunset-and-live-readback",
+      "status": "open",
+      "ownerBoundary": "Globe operations and model fleet control plane",
+      "evidenceRefs": ["provider-deprecations", "task-1781"],
+      "note": "Cut over before shutdown, preserve history, exercise rollback and verify the live reader."
+    }
+  ]
+}
