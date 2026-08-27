@@ -308,7 +308,7 @@ export const readVisibilityConcentration = async (input: {
         AND language_code = $5
         AND (organic_etv IS NOT NULL OR organic_count IS NOT NULL OR total_ranked_keywords IS NOT NULL)
       ORDER BY normalized_subject, capture_date DESC`,
-    [input.kind, normalizedDomain, input.kind === 'url' ? '/%' : ' ', input.locationCode, input.languageCode]
+    [input.kind, normalizedDomain, input.kind === 'url' ? '/%' : null, input.locationCode, input.languageCode]
   )
 
   if (rows.length === 0) return { ok: false, reason: 'no_market_data' }
