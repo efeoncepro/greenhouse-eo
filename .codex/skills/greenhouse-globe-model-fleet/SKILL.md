@@ -158,6 +158,12 @@ las rutas de video ya encontradas en el runtime y conserva las variantes que tod
 - [`GEMINI_OMNI_VIDEO_ROUTE_CARD_V1.json`](../../../docs/architecture/creative-studio/model-fleet/routes/GEMINI_OMNI_VIDEO_ROUTE_CARD_V1.json)
   — `ref/motion/reference-v1`, `gemini-omni-flash-preview` `preview`, Vertex Interactions, región `global`,
   `reference-to-video`, completion `poll`.
+- [`GEMINI_OMNI_1_1_VIDEO_ROUTE_CARD_V1.json`](../../../docs/architecture/creative-studio/model-fleet/routes/GEMINI_OMNI_1_1_VIDEO_ROUTE_CARD_V1.json)
+  — candidatura fechada de Gemini Omni 1.1 Flash. Distingue la identidad Developer API
+  `gemini-omni-1.1-flash` de la identidad Cloud/Agent Platform `gemini-omni-1.1-flash-preview`; ambas están
+  `gated` en Globe hasta completar `TASK-1781`. El modelo vigente `gemini-omni-flash-preview` conserva su
+  evidencia histórica y tiene shutdown anunciado para el 2026-09-30: no heredes su canary, rate, rights ni
+  promotion a 1.1.
 - [`VEO_3_1_VIDEO_ROUTE_CARD_V1.json`](../../../docs/architecture/creative-studio/model-fleet/routes/VEO_3_1_VIDEO_ROUTE_CARD_V1.json)
   — `ref/video/frames-v1`, `veo-3.1-generate-001` `3.1`, Vertex `predictLongRunning`, región `us-central1`,
   primer cuadro y último cuadro opcional, completion `poll`.
@@ -175,6 +181,20 @@ La misma separación aplica a Veo: el adapter genérico contiene `veo-3.1-fast-g
 de `ref/video/frames-v1` usa exactamente `veo-3.1-generate-001`. Omni tiene una ruta pública de referencias de imagen;
 las capacidades de video-reference o edición stateful del proveedor quedan como superficies diferidas hasta tener
 routeId, contrato, evidencia, canary y readback propios.
+
+### Gemini Omni 1.1 Flash — delta 2026-08-27
+
+Google documenta 1.1 por dos superficies con madurez, auth, límites y retención distintos. Nunca las trates como
+aliases. La Developer API usa `generativelanguage.googleapis.com/v1beta/interactions` + API key y el ID sin
+`-preview`; Cloud usa `aiplatform.googleapis.com/v1beta1/projects/{project}/locations/global/interactions` +
+ADC/WIF y el ID `-preview`. El modelo Developer figura estable, pero Interactions sigue en `v1beta`; Cloud es
+Pre-GA/Preview. Conserva `providerSurface`/endpoint/model ID en la identidad y en la evidencia.
+
+Capacidades oficiales —360p/720p/1080p/4K, first/last frame, video references, edit y extend— no amplían la ruta
+existente. 1080p/4K son outputs upscaled según la referencia técnica; `video-extend` llega hasta 40 s acumulados;
+audio input, PayGo y residencia regional tienen contradicciones documentales. Cada operación/shape exige route
+contract, rate, rights, evaluation y canary propios. Investigación y gates:
+[`GEMINI_OMNI_1_1_PROVIDER_RESEARCH_2026-08-27.md`](../../../docs/audits/creative-studio/GEMINI_OMNI_1_1_PROVIDER_RESEARCH_2026-08-27.md).
 
 ## Inventario inicial auditado: imagen, Seedream y Nano Banana
 

@@ -62,6 +62,8 @@ Seedance 2.0/R2V, GPT Image 2, Seedream 5 Pro, Nano Banana 2/Pro y Kling 3.0. 鈥
 PNG/WebP. Globe ya la declara y verifica en c贸digo para su ruta PNG mediante `backgroundMode` y alfa decodificado,
 pero la variante contin煤a gated hasta deploy, canary facturable, readback y promoci贸n/rollback; la matriz can贸nica
 vive en [`OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`](docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md).
+`TASK-1781` gobierna Omni 1.1: Developer `gemini-omni-1.1-flash` y Cloud
+`gemini-omni-1.1-flash-preview` no se colapsan; siguen gated hasta canary/readback y el modelo anterior cierra el 2026-09-30.
 Seedream T2I, GPT Image 2 y Nano Banana 2/Pro est谩n disponibles
 seg煤n el reader live; Seedream Edit queda `gated` por binding deshabilitado. Seedream Lite, edici贸n de OpenAI/Nano
 Banana y video-to-image de Nano Banana permanecen como superficies no p煤blicas hasta tener ruta, binding, canary y

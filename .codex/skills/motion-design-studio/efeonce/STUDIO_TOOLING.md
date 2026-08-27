@@ -47,6 +47,14 @@
 
 ## Vertex (efeonce-group) — Gemini Omni video-gen (VERIFICADO en vivo 2026-07-05)
 
+> **⛔ HISTÓRICO, NO EJECUTABLE (actualizado 2026-08-27).** El bloque hasta “UI-heavy motion” conserva la
+> evidencia del spot de julio, pero su endpoint `:generateContent`, payload `responseModalities`, auth y techo
+> 720p ya no son el contrato vigente. Omni migró a Interactions el 2026-07-20. Para ejecutar, usa
+> `GEMINI_OMNI_VERTEX.md`; para Globe, route card + reader live. Gemini Omni 1.1 Flash usa IDs distintos por
+> superficie (`gemini-omni-1.1-flash` Developer API; `gemini-omni-1.1-flash-preview` Cloud), añade
+> 360p/first-last/video references/edit/extend/1080p/4K-upscaled y permanece `gated` hasta `TASK-1781`. El modelo
+> anterior tiene shutdown anunciado para el 2026-09-30. No heredes canary, rate, rights ni promotion.
+
 Gemini Omni + Veo corren en **Vertex del proyecto `efeonce-group`**. Receta **probada generando video real**
 (spot AEO Grader, toma de 10s 720p en ~40s):
 

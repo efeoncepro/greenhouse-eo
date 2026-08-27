@@ -5,6 +5,16 @@
 > **Idioma:** es-CL neutro (tuteo).
 > **Regla de uso:** el modelo está en **PUBLIC_PREVIEW**. Todo dato marcado `(as-of 2026-07 — reverificar)` es volátil: confírmalo contra la fuente antes de comprometer costo o pipeline. Google lanzó el modelo el **2026-06-30**; el contrato cambia semana a semana.
 
+> **Actualización 2026-08-27 — Gemini Omni 1.1 Flash.** Google lanzó 1.1 y anunció shutdown de
+> `gemini-omni-flash-preview` para el 2026-09-30. Hay dos contratos oficiales que **no son aliases**:
+> Developer API `gemini-omni-1.1-flash` sobre `generativelanguage.googleapis.com/v1beta/interactions` con API
+> key, y Cloud/Agent Platform `gemini-omni-1.1-flash-preview` sobre
+> `aiplatform.googleapis.com/v1beta1/.../interactions` con ADC/WIF. El primero figura Stable, aunque Interactions
+> continúa `v1beta`; el segundo es Pre-GA/Preview. 1.1 añade 360p, first/last frame, referencias de video,
+> edición, extensión hasta 40 s y outputs 1080p/4K **upscaled**. Nada está probado en Globe: aplica
+> `TASK-1781` y la route card 1.1; no heredes canary, rate, rights, retention ni promotion de julio. Fuente
+> consolidada: `docs/audits/creative-studio/GEMINI_OMNI_1_1_PROVIDER_RESEARCH_2026-08-27.md`.
+
 > **Actualización 2026-07-20 — Omni migró a la Interactions API.** `gemini-omni-flash-preview` **ya no es invocable por `generateContent`**: ese método devuelve `400 "gemini-omni-flash-preview is only supported in the Interactions API and cannot be called directly via generateContent."` Todo el contrato `:generateContent` + `responseModalities:["TEXT","VIDEO"]` que describía la versión anterior de este doc quedó **STALE**. El modelo ahora corre sobre `/interactions` en **dos superficies distintas y NO intercambiables**:
 > 1. **Vertex AI KEYLESS (GEAP)** — `POST …/v1beta1/projects/{project}/locations/{global|us-central1}/interactions`, auth **ADC/WIF Bearer** (sin API key, sin `x-goog-user-project`; el proyecto va en el path). Sirve **solo GENERACIÓN** (`text_to_video`, `image_to_video`). **No** sirve edición stateful: `previous_interaction_id` → `400 "…do not support previous_interaction_id"` y `GET /interactions/{id}` → `500`.
 > 2. **Gemini API (generativelanguage) con API KEY** — `POST https://generativelanguage.googleapis.com/v1beta/interactions?key=API_KEY`. **Rechaza OAuth** (`403 ACCESS_TOKEN_SCOPE_INSUFFICIENT`): exige API key. Sirve la **Interactions API completa**, incluida la **EDICIÓN stateful** (`previous_interaction_id` + `store:true`).
