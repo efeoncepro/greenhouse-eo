@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `to-do`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
