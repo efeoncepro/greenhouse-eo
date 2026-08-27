@@ -772,22 +772,3 @@
   roles creativos senior, aplicación de baja fricción, candidate experience, Talent Pool consentido,
   compensación, distribución y experimentación por quality-of-hire. Sin cambio de runtime ni de
   política de beneficios.
-
-## 2026-08-17 — Cierre del programa Hiring: Expediente + Scoring IA + Identidad (TASK-1734/1735/1736/1737/1738)
-
-- Hiring: cierre documental del programa. Las 5 tasks quedan `complete` con estado honesto y las
-  dos ADRs pasan a **`Accepted`** — la decisión fue autorizada por el CEO e implementada.
-  **Aceptar no es prender:** el rollout de cada flag manda y vive en el ledger.
-- Hiring: **remediación de nombres EJECUTADA** el 2026-08-16 — 3 personas reales corregidas
-  (Valentina Villa, Stana Medina, Aldo Romano) con actor + razón en auditoría, 2 perfiles QA
-  podados a mano. Los docs que citaban "4 propuestas = 2 humanos" quedaron corregidos.
-- Hiring: `HIRING_EVALUATION_DOSSIER_AI_ENABLED` y
-  `HIRING_CANDIDATE_IDENTITY_NORMALIZATION_ENABLED` quedan **ON en staging** (2026-08-16, CEO) y
-  **OFF en producción**. El ledger decía OFF en todos lados: corregido contra `vercel env ls`.
-- Hiring: **el gate del gold set ya no está bloqueado por instrumento, sino por volumen.** El
-  muestreo real encontró **11 respuestas humanas calificadas contra un piso de 49**: falta DATA,
-  no personas. El carril uno-a-uno es el modo correcto hoy porque es el que genera esa materia
-  prima; el instrumento (muestreo estratificado + rúbrica BARS + protocolo en ciego) se entrega
-  vacío y ningún agente puede llenarlo.
-- Hiring: el expediente ya no trunca en silencio (límite **20.000**, error explícito en vez de
-  recorte) y la nota reparada se lee como historia con chip **"Versión superada"**.
