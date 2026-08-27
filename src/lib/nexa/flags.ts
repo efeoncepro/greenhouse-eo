@@ -83,6 +83,15 @@ export const isNexaQuoteAuthorActionEnabled = (): boolean =>
 export const isNexaProposalActionsEnabled = (): boolean =>
   process.env.NEXA_PROPOSAL_ACTIONS_ENABLED === 'true'
 
+/**
+ * TASK-1773 — que Nexa pueda cerrar una postulación. Default OFF.
+ *
+ * Bajo el AI Act la selección es alto riesgo con supervisión humana obligatoria, así que este carril
+ * nace apagado y se prende con sign-off, no por defecto.
+ */
+export const isNexaHiringActionsEnabled = (): boolean =>
+  process.env.NEXA_HIRING_ACTIONS_ENABLED === 'true'
+
 // TASK-1087 — Prompts sugeridos data-aware (Tier 2). Default OFF: con OFF, los prompts del chat
 // flotante se quedan en Tier 1/1.5 (plantillas por ruta + nombre real de la entidad), byte-idéntico
 // al comportamiento previo. Con ON, el panel consulta `GET /api/nexa/suggested-prompts` y, si hay
