@@ -2,6 +2,38 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-27 — Las tres capacidades de mercado que faltaban en SV360, y de dónde salió ISSUE-164
+
+**Estado: cuatro tasks creadas, `to-do`; sin runtime.** `TASK-1775` (foto de dominio + trayectoria:
+`domain_rank_overview` mensual · `historical_rank_overview` como backfill único porque cuesta 10× ·
+`bulk_traffic_estimation`), `TASK-1776` (visibilidad por URL/subdominio/subcarpeta: **una** capacidad
+con resolver de sujeto, no tres módulos — lo que Semrush vende como tres áreas es un endpoint con el
+`target` cambiado) y `TASK-1777` (detalle nominal de enlaces, con el drill-down condicionado al
+`new_lost_delta` que lleva meses persistido sin un solo lector). Ninguna amplía el allowlist de
+familias DataForSEO: los diez endpoints son `labs` y `backlinks`. `TASK-1776` nace como **tercer
+productor** de `seo_keyword_market_data` — el `keyword_info` viene inline y ya pagado en
+`ranked_keywords`.
+
+**El origen de `ISSUE-164`.** El barrido salió de preguntar si podíamos dejar de pagar Semrush. Al
+habilitar la evidencia de sitio sobre prospectos (`Delta 2026-08-26` de `TASK-1709`: la prohibición
+de fetch propio era por SSRF, no por política, y se reemplazó por delegación), la auditoría del
+fetcher destapó cuatro defectos y dos eran de seguridad. La premisa inicial del issue —"staging ON,
+prod OFF, no es incidente vivo"— **era falsa**: salió de leer el `FEATURE_FLAG_STATE_LEDGER`, cuyo
+snapshot se generaba con `vercel env ls`, estructuralmente ciego a los flags del ops-worker. La
+corrigió `greenhouse-eo-a4`; su propia corrección conservaba una segunda afirmación falsa (que el
+target era el dominio de un cliente cargado por un operador) y se cerró con la cadena verificada del
+intake público anónimo. **Lección portátil: medir el interruptor no es medir el alcance.**
+
+**Decisiones de oficio tomadas y registradas en `TASK-1778`:** se obedece `robots.txt` matcheando
+**nuestro** token con fallback a `*`, jamás los grupos de los bots auditados — matchearnos contra
+ellos nos dejaría fuera justo de los sitios cuyo bloqueo es el hallazgo más valioso. Y `TASK-1281`
+**no** sube de prioridad: Chromium reduce la frecuencia del falso negativo, no su clase; el defecto
+es que `res.ok` se lee como *"observé la página"* cuando sólo significa *"recibí bytes"*, y ese
+invariante se absorbió en `TASK-1778`.
+
+**Pendiente:** decisión del operador sobre la mitigación interina mientras el fix de `TASK-1778` no
+esté en producción con su flag ON.
+
 ## 2026-08-27 — TASK-1778: el fetcher de probes queda defendible (code complete, rollout pendiente)
 
 **Estado: `code complete, rollout pendiente`; task `in-progress`, rama `develop`, sin push.** Slices 1–4b implementados (commit `f876e7b0b`): contención de redirects por salto + guarda DNS tras `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (default OFF, declarado en `deploy.sh` + ledger), stream cap 4 MiB con `truncated`/`observable` y probes de presencia degradando honesto, `robots.txt` obedecido con NUESTRO token (jamás los bots auditados), `ProbeFetchInit.userAgent` con postura anti-suplantación. Suite adversarial (34 tests) + anti-divergencia de cabecera; 692 tests del dominio + `local:check` verdes.
@@ -386,55 +418,3 @@ mismo estado efectivo—: es una trampa latente que se arma sólo si alguien pau
 revierte. Limpieza, no urgencia.
 
 Próximo paso: `TASK-1763` (consumer UI) recibe el DTO del preview y el command sin duplicar reglas.
-
-## 2026-08-23 — Release a producción `709e15f6688e`: los follow-ups de Hiring quedaron vivos
-
-**Estado: `released`.** Manifest `709e15f6688e-639df794-8604-4053-8fcf-d2419cfedcc4`, orquestador
-`32668879867` (un solo run, sin retry), PR #206 squash a `main` como
-`709e15f6688e521549c0376f11b08340737f37a7`. 140 archivos, 73 de código, 5 migraciones. Segundo
-release del día, sobre el `304371f73407` de la madrugada.
-
-**Qué quedó vivo en producción:** contract del enum de decisión e invariante de cerrado (TASK-1765),
-contract del vocabulario de etapas (TASK-1754), backfill del archivo sintético sobre el eje nuevo y
-allowlist de la purga (TASK-1748), callejón de intentos en la asignación de assessment (TASK-1755),
-predicado canónico de proceso activo con su señal de reliability (TASK-1772) y las fronteras del
-EPIC-011 (TASK-1773).
-
-**Sin flags que prender.** `HIRING_FAIRNESS_MONITOR_ENABLED` **queda OFF a propósito**: TASK-1754
-Slice F le puso condición de retiro explícita hasta que cierre TASK-1365, porque su default
-`input.stage ?? 'selected'` apunta a una etapa que el contract retiró y devolvería **cero en
-silencio** en una métrica de equidad — que se lee como «no hay impacto adverso», la conclusión
-contraria a la verdad.
-
-**Evidencia de estabilidad (no sólo el health check):** watchdog 3/3 signals `ok` con
-`drift_count=0`; `/api/auth/health` 200 con los tres providers `ready`; Vercel
-`dpl_HRDEBU5MDSTswRjX6V6bWPGK4Det` Ready y aliased a `greenhouse.efeoncepro.com`; Sentry con **cero
-issues activos** en la ventana del release; **321 eventos de outbox `published`** desde el dispatch,
-sin `dead_letter` ni backlog >10min; **145 eventos reaccionados con `con_error=0`**. Los `degraded`
-del dashboard de operaciones se verificaron por timestamp y son fallos de **abril–mayo 2026** —
-deuda previa, no del release. `ops-worker` quedó change-gated en `181aaf4f75ca` con diff vacío
-contra la lista real del gate y `Ready=True`: residual de etiqueta, no drift.
-
-**Render verificado con sesión, no sólo con un 307.** Como el árbol de `main` y `develop` quedó
-idéntico (`b34bca9490…`), staging sirve el mismo código: `/agency/hiring/pipeline` responde HTTP 200
-sin marcadores de error y con las **seis etapas** de TASK-1754 en el HTML.
-
-**Dos defectos de la documentación de release corregidos en este mismo cierre:**
-
-1. **El comando que verifica el `ops-worker` usaba una lista de rutas que no existe en ningún gate.**
-   Skill y runbook arrastraban 7 entradas (`src/lib/ops` y `scripts/ops-worker` ni siquiera figuran
-   en el array real); el gate son las ~28 de `WORKER_RUNTIME_PATHS` en `ops-worker-deploy.yml`,
-   entre ellas `src/lib/reliability`, `src/lib/hiring/talent-pool` y `src/lib/sync` — **las tres
-   tocadas por este release**. La lista corta devolvía «vacío» sin haber mirado. Ahora el comando
-   **extrae la lista del workflow** y exige un sanity sin `--`, porque un diff vacío por SHA no
-   resuelto se ve igual que uno vacío por ausencia de drift.
-2. **`-X ours` duplicó contenido documental y las dos verificaciones duras no lo vieron.** Salieron
-   ambas vacías y el merge igual resucitó 8 tasks en su lifecycle viejo y duplicó un bloque de 10
-   líneas del manual de Hiring Desk que `develop` ya tenía: `-X ours` sólo decide los hunks en
-   conflicto, y uno de `main` que aplica limpio en otra parte entra como adición silenciosa. Se
-   resolvió con `git reset --hard HEAD@{1}` + `git merge origin/main -s ours`. **El default del Paso
-   A pasa a ser `-s ours` cuando `main ⊆ develop`**, y la auditoría correcta es
-   `git diff HEAD@{1} HEAD --name-status` completo, no sólo las rutas de código.
-
-Tiempos en `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` (~1h10m E2E, workflow 12m45s,
-manifest 9m50s). Skills Claude/Codex actualizadas en paridad total.
