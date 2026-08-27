@@ -2,6 +2,10 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-27 — TASK-1696 adopta la señal de presupuesto que faltaba
+
+**Estado: spec sincronizada; implementación pendiente.** La task ahora incluye `seo.provider.cost_over_budget`: nueve tasks la citaban como mitigación, pero el barrido verificó que no existe en código. Entra junto a la dimensión `consumer` para no sub-reportar el gasto del grader; README y registry ya reflejan las tres señales.
+
 ## 2026-08-27 — Tres skills Salesforce cubren operación y venta consultiva
 
 **Estado: `complete` local; sin runtime ni push.** Quedaron creadas y espejadas las skills de Salesforce CRM, Marketing Cloud Engagement y Marketing Cloud Next, con modos `operate`, `sell` y coexistencia donde aplica. El catálogo vive en [`docs/services/salesforce/README.md`](docs/services/salesforce/README.md) y el fundamento en [`SALESFORCE_PRACTICE_SKILL_FOUNDATION_2026-08-27.md`](docs/audits/commercial/SALESFORCE_PRACTICE_SKILL_FOUNDATION_2026-08-27.md).

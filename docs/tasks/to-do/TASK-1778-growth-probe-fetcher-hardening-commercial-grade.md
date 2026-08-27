@@ -340,6 +340,24 @@ Reglas obligatorias:
 - Un `Disallow` que nos alcanza produce **hallazgo**, no fallo: *"no pudimos leer el sitio porque tu
   `robots.txt` lo prohíbe"*, con su lente. Misma asimetría que el resto de la task.
 
+### Slice 4b — Override de User-Agent, con la postura declarada
+
+- `ProbeFetchInit` gana `userAgent?: string`, **aditivo**, con default `COURTESY_USER_AGENT`. Hoy el
+  UA es constante de módulo (`safe-fetch.ts:25`) y no hay forma de variarlo por llamada.
+- 🔴 **La postura, que es lo que esta task aporta y no el parámetro:** el override sirve para variar
+  **nuestro propio token** (por ejemplo `GreenhouseAEOGrader-EdgeCheck/1.0`), **NUNCA** para
+  presentarse como el crawler de un tercero. Suplantar `GPTBot` u `OAI-SearchBot` es suplantación de
+  identidad, algunos WAF la verifican por DNS inverso, y aparecer como evasor tiene costo
+  reputacional para el dominio desde el que auditamos. Es coherente con la regla ya declarada en
+  esta misma task de matchear sólo nuestro token en `robots.txt`.
+- **Desbloquea a `TASK-1670`**, cuyo chequeo de acceso en el borde hoy no es implementable: esa task
+  declara cero ediciones sobre `ai-visibility/**` y `TASK-1697` prohíbe tocar el UA en su diff de
+  movimiento. Este es el único lugar donde el cambio cabe.
+- ⚠️ Consecuencia para `TASK-1670`: su Slice 1, tal como está escrito, hace `GET` del home **con UA
+  de un bot de retrieval**. Eso contradice la postura de arriba. Al cerrar esta task, dejarle un
+  `## Delta` a 1670 con la corrección: el chequeo de borde se hace con nuestro token variado, y lo
+  que se mide es si el borde nos trata distinto, no si podemos hacernos pasar por otro.
+
 ### Slice 5 — Evidencia real y cierre
 
 - Suite adversarial: redirect a IP privada, a host público distinto, cadena que excede el tope de

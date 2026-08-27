@@ -346,6 +346,22 @@ Reglas obligatorias:
 - Vocabulario explícitamente disjunto del de `TASK-1670`: ausencia de JSON-LD vs calidad del JSON-LD.
 - Cada bloque detrás de su propio flag, default OFF.
 
+### Slice 2b — Cosechador `domain_info`: los checks sitewide que ya recibimos y tiramos
+
+- `parseOnPageSummary` (`src/lib/growth/seo/site-audit/collect.ts:94-115`) lee hoy sólo
+  `crawl_progress`, `crawl_status.pages_crawled`, `page_metrics.onpage_score` y
+  `extended_crawl_status`. **`summary.domain_info` llega en la misma respuesta y se descarta entero.**
+- Materializar sus `checks` sitewide como hallazgos de **sitio**: `test_page_not_found` (soft-404),
+  `test_https_redirect`, `test_www_redirect`, `test_canonicalization`, `test_directory_browsing`, y
+  la expiración del certificado SSL.
+- **Costo incremental cero**: no agrega una llamada al proveedor, sólo deja de tirar campos del
+  payload que ya se pagó. Es exactamente la doctrina de esta task.
+- `issue_type` **disjuntos de `TASK-1670`**, que trae sus propios hallazgos de sitio por fetch propio.
+  Coordinar el vocabulario antes de escribir: dos motores no pueden emitir el mismo `issue_type`.
+- Estos hallazgos son de sitio, no de página, así que heredan el eje de alcance y la superficie de
+  `TASK-1671`. Verificar que el `priorityScore` —que divide por esfuerzo y multiplica por páginas
+  afectadas— no se les aplique con un `?? 1` implícito.
+
 ### Slice 3 — Integración al ciclo, con degradación honesta
 
 - Los cosechadores corren dentro de la MISMA transacción del collect, después de `summary`/`pages`.

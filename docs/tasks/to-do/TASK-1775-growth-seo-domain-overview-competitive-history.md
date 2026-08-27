@@ -343,6 +343,25 @@ Reglas obligatorias:
 - Deltas en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §3 y §4.2, runbook
   `docs/manual-de-uso/growth/operar-foto-de-dominio-seo.md`, doc funcional, `Handoff.md`, `changelog.md`.
 
+## Delta 2026-08-26 — desambiguar las dos autoridades de dominio
+
+Al cerrar esta task van a coexistir **dos mediciones distintas del mismo concepto**, y hoy ninguna
+task declara cuál manda en superficie:
+
+- `seo_backlink_snapshots.domain_rank` — familia `backlinks`, cadencia **semanal**, **ya vivo desde
+  2026-08-06** (`TASK-1304`), pedido en escala 0–100 (`backlinks/capture.ts:206`,
+  `rank_scale: 'one_hundred'`) justamente para ser comparable a DR/DA. Hoy **no se pinta en ninguna
+  superficie**: `domainRank` aparece sólo bajo `src/lib/growth/seo/**`.
+- El authority que **esta task crea** — familia `labs`, cadencia **mensual**, lente `estimated` (`◑`).
+
+Esta task declara cuál es la canónica para superficie y cuál queda como señal interna. **Jamás se
+promedian ni se grafican en la misma serie**, por la misma regla que esta task ya aplica al cruce con
+GSC. Sin esa declaración, la task `ui-ux` que dibuje autoridad hereda dos cifras de proveedores
+distintos, cadencias distintas y escalas potencialmente distintas, sin contrato que las ordene — y la
+elegirá quien implemente, en silencio.
+
+Origen: `docs/audits/platform/2026-08-26-openseo-competitive-teardown-growth-seo-aeo.md` §4.1.
+
 ## Out of Scope
 
 - **Cualquier superficie visible.** Esta task no dibuja pantalla; la cara la construye una task
