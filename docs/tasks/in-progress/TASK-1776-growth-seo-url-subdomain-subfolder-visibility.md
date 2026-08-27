@@ -1,5 +1,43 @@
 # TASK-1776 — Growth SEO: visibilidad de mercado por URL, subdominio y subcarpeta
 
+## Delta 2026-08-27 — implementación (code complete, rollout pendiente)
+
+Slices 1–6a implementados y verificados local + PG real (mismo día que TASK-1775, misma sesión).
+Decisiones de ejecución que ajustan la spec:
+
+- **`[confirmar en Discovery]` resueltos con la doc oficial (WebFetch 2026-08-27):**
+  el filtro de subcarpeta es `ranked_serp_element.serp_item.relative_url` (documentado explícito
+  con ejemplo); una URL como `target` va **CON esquema** — sin él el proveedor devuelve el dominio
+  ENTERO y lo cobra (gotcha nuevo, ahora en el resolver y en la reference de Labs); y el agregado
+  `result[].metrics` cubre el SET COMPLETO del sujeto independiente del `limit` — la foto no
+  depende del detalle comprado, así que el snapshot guarda el agregado + `top_keywords` JSONB.
+- **OQ1 (`limit` default):** 100 filas/sujeto vía knob `GROWTH_SEO_URL_VISIBILITY_ROW_LIMIT`
+  (~USD 0.024/sujeto); el operador lo confirma antes del flip (flag OFF igual).
+- **OQ2:** la clase la declara el caller (`kind` requerido en `resolveVisibilitySubject`), jamás
+  se infiere; forma que no calza con la clase = `kind_shape_mismatch` explícito.
+- **OQ3:** `subdomains`/`relevant_pages` NO corren automáticos — primitives on-demand; el batch
+  mensual captura `kind=domain` del target + competidores (cron día 17, no apila con día 15/16).
+- **La spec no declaraba el expand del CHECK** de `seo_keyword_market_data.source_endpoint`: sin
+  él, el tercer productor (`ranked_keywords`) violaría el constraint. Va en la misma migración
+  (nombre verificado contra `pg_constraint`).
+- **Lane app NO se crea** (dominio ecosystem-only — misma decisión documentada en TASK-1775);
+  capability reutilizada `growth.seo.observation.read` (grant vigente).
+- Evento con prefijo del dominio: `growth.seo.url_visibility.snapshot_captured`; los colectores
+  de concentración no emiten (on-demand, sin downstream; gasto en el ledger por construcción).
+- `Files owned` decía `…_task-1777-…` para la migración (typo): quedó
+  `20260827194219636_task-1776-seo-url-visibility.sql`. Se agregan `persist.ts` (writer simétrico
+  al de domain-overview), `src/lib/api-platform/resources/ecosystem-growth-seo.ts` (el lane vive
+  ahí; además `SeoLaneSubject` gana `rootDomain`), `keyword-market-data.ts` (tipo + header del
+  writer compartido), la señal en `src/lib/reliability/**` y el sanity
+  `scripts/growth/_sanity-task-1776-url-visibility.ts`.
+- **Sin boundary test `ALLOWED_WRITE_TARGETS`** en `growth/**` (verificado en 1775): no aplica.
+
+**Rollout pendiente (checkpoint del operador — gasta dinero real):** smoke live con los cuatro
+`subject_kind` (incluye verificar que un `subfolder` devuelve sólo URLs bajo su ruta y que el
+enriquecimiento no sube el `cost`), flag ON multi-runtime + despausar `ops-seo-url-visibility`,
+canary de la tool MCP en staging + federación en `efeonce-mcp`, y confirmación del `limit` default.
+Hasta entonces: flag OFF, scheduler declarado pausado, cero gasto.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -21,7 +59,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `code complete, rollout pendiente`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -239,23 +277,23 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface y consumidores nombrados con paths reales.
-- [ ] Invariantes, boundary de tenant e idempotencia explícitos.
-- [ ] Tabla nueva declarada en el allowlist de destinos de escritura del dominio si existe boundary test.
-- [ ] Postura de migración/backfill/rollback explícita.
-- [ ] Evidencia runtime/DB listada.
-- [ ] Errores canónicos y cero fuga de datos sensibles.
+- [x] Source of truth, contract surface y consumidores nombrados con paths reales.
+- [x] Invariantes, boundary de tenant e idempotencia explícitos.
+- [x] Tabla nueva declarada en el allowlist de destinos de escritura del dominio si existe boundary test.
+- [x] Postura de migración/backfill/rollback explícita.
+- [x] Evidencia runtime/DB listada.
+- [x] Errores canónicos y cero fuga de datos sensibles.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica en el primitive, no en la UI.
-- [ ] Modelada como command/reader sobre el sujeto "página", no como handler de pantalla.
-- [ ] Read como reader canónico; write como command con entitlement, idempotencia, outbox y errores canónicos.
-- [ ] Capability + grant a ≥1 rol real en el MISMO PR con coverage test verde.
-- [ ] Camino programático declarado: ecosystem + MCP en esta misma task.
-- [ ] Write apto para `propose → confirm → execute`.
-- [ ] Un primitive, muchos consumers.
-- [ ] Parity check = SÍ.
+- [x] Lógica en el primitive, no en la UI.
+- [x] Modelada como command/reader sobre el sujeto "página", no como handler de pantalla.
+- [x] Read como reader canónico; write como command con entitlement, idempotencia, outbox y errores canónicos.
+- [x] Capability + grant a ≥1 rol real en el MISMO PR con coverage test verde. (Se reutiliza `growth.seo.observation.read`, ya granteada.)
+- [x] Camino programático declarado: ecosystem + MCP en esta misma task.
+- [x] Write apto para `propose → confirm → execute`.
+- [x] Un primitive, muchos consumers.
+- [x] Parity check = SÍ.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -469,20 +507,20 @@ keyword discovery.
 
 ## Acceptance Criteria
 
-- [ ] `resolveVisibilitySubject` produce la misma clave para `https://ejemplo.cl/guia`, `ejemplo.cl/guia/` y `www.ejemplo.cl/guia`, probado con tests de tabla.
-- [ ] La migración crea la tabla con `subject_kind` bajo CHECK cerrado de cuatro valores, clave única sobre el sujeto normalizado, trigger anti UPDATE/DELETE y GRANT; el bloque DO aborta si algo no quedó creado.
-- [ ] `captureUrlVisibility` opera las cuatro clases de sujeto con un solo colector.
+- [x] `resolveVisibilitySubject` produce la misma clave para `https://ejemplo.cl/guia`, `ejemplo.cl/guia/` y `www.ejemplo.cl/guia`, probado con tests de tabla.
+- [x] La migración crea la tabla con `subject_kind` bajo CHECK cerrado de cuatro valores, clave única sobre el sujeto normalizado, trigger anti UPDATE/DELETE y GRANT; el bloque DO aborta si algo no quedó creado.
+- [x] `captureUrlVisibility` opera las cuatro clases de sujeto con un solo colector.
 - [ ] Un sujeto `subfolder` devuelve sólo URLs bajo esa ruta, verificado contra el proveedor real.
 - [ ] El `keyword_info` inline queda escrito en `seo_keyword_market_data` vía `persistKeywordMarketData`, sin duplicados y **sin incrementar el costo del proveedor**, probado en el smoke real.
-- [ ] Ninguna derivación de barrera de enlaces usa `keyword_difficulty`.
+- [x] Ninguna derivación de barrera de enlaces usa `keyword_difficulty`.
 - [ ] Correr la captura dos veces seguidas dentro del ciclo registra USD 0 en la segunda, verificado con el `cost` real.
 - [ ] Un sujeto que el proveedor no conoce deja fila con NULLs y no se re-compra.
-- [ ] `readUrlVisibility` devuelve `no_market_data` para sujeto sin snapshot; cero ceros fantasma.
-- [ ] Toda cifra del DTO viaja con lente `◑` y `capturedAt`; `captured_by_organization_id` no aparece, probado con test.
+- [x] `readUrlVisibility` devuelve `no_market_data` para sujeto sin snapshot; cero ceros fantasma.
+- [x] Toda cifra del DTO viaja con lente `◑` y `capturedAt`; `captured_by_organization_id` no aparece, probado con test.
 - [ ] La tool `get_seo_url_visibility` responde por el lane ecosystem con canary verde en staging.
-- [ ] La capability tiene grant a ≥1 rol real en el mismo PR y el coverage test pasa.
-- [ ] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` y `pnpm docs:closure-check` pasa.
-- [ ] Ninguna consulta nueva hace JOIN, VIEW o FK entre `seo_*` y `grader_*`.
+- [x] La capability tiene grant a ≥1 rol real en el mismo PR y el coverage test pasa.
+- [x] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` y `pnpm docs:closure-check` pasa.
+- [x] Ninguna consulta nueva hace JOIN, VIEW o FK entre `seo_*` y `grader_*`.
 
 ## Verification
 

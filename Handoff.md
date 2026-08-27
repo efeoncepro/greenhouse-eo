@@ -38,6 +38,30 @@ rate, terms, rights ni promotion del modelo anterior. Exige cuota y endpoint liv
 canary facturable desde Producer, readback y rollback. Hasta entonces Omni 1.1 permanece `gated`: no hubo spend,
 deploy, cambio de binding, generación live ni lectura que pruebe disponibilidad en Globe.
 
+## 2026-08-27 — TASK-1776: la visibilidad por página quedó code complete, rollout pendiente
+
+**Estado: `code complete, rollout pendiente`; sin push.** Misma sesión que TASK-1775, mismo patrón:
+`seo_url_visibility_snapshots` (multi-productor, clave con `subject_kind` CHECK cerrado y SIN org;
+migración aplicada que ADEMÁS expandió el CHECK de `seo_keyword_market_data.source_endpoint` con
+`ranked_keywords`), resolver de sujeto DECLARADO (`resolveVisibilitySubject` — jamás inferir la
+clase), captura `captureUrlVisibility` (la foto sale del agregado `metrics` del proveedor, el
+`limit`/knob sólo acota el detalle `top_keywords`), colectores on-demand `relevant_pages`/`subdomains`,
+**tercer productor del mercado** (el `keyword_info` inline se escribe con el writer compartido a
+costo 0, filtrado por frescura), reader + lane ecosystem `/growth/seo/url-visibility` (modos subject
+y concentration) + tool MCP `get_seo_url_visibility`, señal `seo.url_visibility.stale_subjects`.
+37 tests del paquete + sanity SQL vivo contra PG (6 frentes) verdes.
+
+**Checkpoint del operador (gasta):** smoke live con los cuatro `subject_kind` (verificando que un
+`subfolder` devuelve sólo URLs bajo su ruta y que el enriquecimiento NO sube el `cost`), flag
+`GROWTH_SEO_URL_VISIBILITY_ENABLED` ON (sólo ops-worker) + despausar `ops-seo-url-visibility`
+(día 17), canary MCP staging + federación `efeonce-mcp`, y confirmar el `limit` default (100).
+Runbook: `docs/manual-de-uso/growth/operar-visibilidad-por-url-seo.md`.
+
+**No re-descubrir:** una URL como `target` del proveedor va CON esquema (sin él devuelve el dominio
+entero y lo cobra — gotcha 10 nuevo en la reference de Labs); la subcarpeta es host + filtro
+server-side `relative_url` (gratis, confirmado contra la doc); `page_intersection` quedó fuera por
+diseño (follow-up de TASK-1314). `TASK-1313` ya tiene su lado ◑ (delta escrito en su spec).
+
 ## 2026-08-27 — TASK-1775: la foto de dominio quedó code complete, rollout pendiente
 
 **Estado: `code complete, rollout pendiente`; sin push.** Los 6 slices implementados sobre `develop`:
@@ -292,54 +316,3 @@ contrato de tasks prohíbe. El endpoint se conserva completo. `task:lint` de las
 
 **Gates:** `task:lint` 1764/1274/1774 `template=1 errors=0 warnings=0`; `docs:context-check:strict`
 verde tras rotar.
-
-## 2026-08-24 — TASK-1764 revisada contra runtime: el gobierno sobrevive, las precondiciones no
-
-**Sólo docs.** `TASK-1764` sigue `to-do`; no se tocó runtime. Revisión con `arch-architect` +
-`greenhouse-email` + skills de marca, con cinco verificadores adversariales sobre el código real.
-
-**Lo que sobrevivió intacto:** legacy por defecto, cohorts ≤4 tipos, prohibición de big-bang sobre
-`EmailLayout`, rollback por tipo. Es la mayor parte del documento y es lo que contiene el blast
-radius. No lo toqué.
-
-**Lo que cambió — cinco precondiciones que el diseño daba por resueltas:**
-
-1. **El unsubscribe no es accionable por ningún método** (link GET → 405; POST one-click RFC 8058 →
-   500 por `request.json()` sobre form-urlencoded; POST bien formado → 400 porque lee `action`/
-   `emailType` del body y la URL los lleva en el query). No hay página, ni middleware, ni consumer del
-   endpoint. Y el default `?? 'broadcast'` lo agrega **solo** a cualquier tipo nuevo enviado a >1
-   destinatario: fail-open donde la ADR exige fail-closed. → precondición bloqueante, fuera de la
-   umbrella, **ID por reservar**.
-2. **Tres decisores** gobiernan el unsubscribe (`EMAIL_PRIORITY_MAP`, `BROADCAST_EMAIL_TYPES`, rama
-   batch/secuencial) y ya divergen: `weekly_executive_digest` lleva baja con varios destinatarios y no
-   la lleva con uno. Cero tests de coherencia; `EMAIL_PRIORITY_MAP` no aparece en ningún test del repo.
-3. **`en-US.emails` es alias del objeto es-CL** (`dictionaries/en-US/index.ts:37`), con comentario que
-   difiere la localización "a la child task del rollout de emails" — que es ésta. El bug ya es visible.
-   Mismo bug class que `TASK-1754` (Hiring Desk); su test de paridad es el molde.
-4. **Cero archivos de correo tocan identidad legal**, y el repo tiene **tres** políticas de ausencia
-   distintas (finiquito 409, contractors catch mudo, PDF footer degrada). Adoptada la tercera en la ADR.
-   `TASK-1650` (dirección `of 05` vs `Of 1105`) queda como dependencia dura del epic.
-5. **Multi-runtime:** 20 tipos ops-worker, 6 Vercel, 3 ambos, 1 sin emisor
-   (`payroll_liquidacion_v2`). Lo que migró en `TASK-254`/`773`/`775` fue el drenaje async, no "los
-   correos".
-
-**Marca — la pregunta no estaba abierta.** `EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md`
-(Accepted) ya la responde. `TASK-1274` planteaba "Efeonce **o** Greenhouse", que es un error de capa:
-Greenhouse **sí** es marca del portafolio (platform brand). Reanclada a `EPIC-042` como child 0, Open
-Question cerrada, regla dura corregida. Hallazgo que la abarata: `AGENCY_FROM_ADDRESS` y
-`DEFAULT_EMAIL_FROM` son **la misma dirección** y sólo difieren en display name — adoptar `Efeonce`
-como remitente único **borra** la bifurcación en vez de agregar lógica.
-
-**Dos supuestos míos que la verificación refutó, y el operador corrigió antes:** el masthead ya usa el
-wordmark de Efeonce en las 30 plantillas (la deuda es de copy, no de logo; y sí existe logo Greenhouse,
-en `public/images/greenhouse/SVG/`, usado en el sidebar); y el footer **sí** tiene red de regresión —
-vive en un archivo cubierto por `EmailLayout.test.tsx` y por los 17 snapshots de
-`EmailTemplateBaseline`. El hueco de cobertura es de **cuerpo** (11 plantillas), no de pie, y pertenece
-a las cohorts.
-
-**Decisiones abiertas del operador (bloquean ejecución, no redacción):** ID de la task de unsubscribe ·
-dirección `of 05` vs `Of 1105` (`TASK-1650`) · display name definitivo del remitente único ·
-`payroll_liquidacion_v2`, ¿futuro o huérfano?
-
-**Gates:** `task:lint` 1764/1274 `template=1 errors=0 warnings=0`; `ops:lint --changed` sin findings
-propios (los 14 warnings de epic son parity preexistente de otros epics).

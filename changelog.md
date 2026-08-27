@@ -20,6 +20,13 @@
 - `TASK-1781` queda creada como P0 para migrar antes del shutdown anunciado de `gemini-omni-flash-preview` el 2026-09-30 y expandir capacidades por rutas/output shapes independientes, sin heredar evidencia del modelo anterior.
 - Nueva route card candidata y actualización espejada de `greenhouse-globe-model-fleet` y las referencias Omni de `motion-design-studio`. Sin cambio de binding, deploy, gasto, canary ni promoción: 1.1 sigue `gated` hasta readback live.
 
+## 2026-08-27 — El módulo SEO aprende a hablar de páginas, no sólo de dominios
+
+- `TASK-1776` (code complete, rollout pendiente): nace `greenhouse_growth.seo_url_visibility_snapshots` — qué ranquea una URL, subcarpeta o subdominio de CUALQUIER dominio, y qué páginas/subdominios concentran su tráfico. La tríada que Semrush vende como tres reportes es acá UNA capacidad con resolver de sujeto **declarado** (la clase jamás se infiere).
+- La foto sale del agregado del proveedor (set completo); el `limit` (knob, default 100) sólo acota el detalle comprado y es la palanca de costo. Gotchas verificados contra la doc: URL como target va CON esquema (sin él el proveedor devuelve y cobra el dominio entero); subcarpeta = host + filtro server-side gratis.
+- **Tercer productor del mercado compartido**: el `keyword_info` que viene ya pagado en cada fila se deposita en `seo_keyword_market_data` vía el writer canónico con costo 0 (la migración expandió su CHECK) — una corrida sobre un cliente deja fresco mercado para toda la cartera.
+- Cron `ops-seo-url-visibility` (día 17) **nace pausado** con flag `GROWTH_SEO_URL_VISIBILITY_ENABLED` OFF (sólo ops-worker); reader + lane ecosystem + tool MCP `get_seo_url_visibility`; señal `seo.url_visibility.stale_subjects`. El encendido queda como checkpoint del operador; runbook `docs/manual-de-uso/growth/operar-visibilidad-por-url-seo.md`.
+
 ## 2026-08-27 — El módulo SEO aprende a describir un dominio completo
 
 - `TASK-1775` (code complete, rollout pendiente): nace `greenhouse_growth.seo_domain_overview_snapshots` — la foto de dominio (keywords ranqueadas totales, tráfico estimado, distribución top-100, momentum) del target Y de sus competidores, con trayectoria mensual desde 2020-10. Multi-productor con clave sin organización (patrón `seo_keyword_market_data`): lo que pagó una org sirve a toda la cartera.
@@ -763,12 +770,3 @@
   aprendizaje (US$500/año), conectividad/coworking (US$50/mes) y salud mental (US$300/año). El aporte de
   equipo (US$400/36 meses) continúa como política, pero se revela durante entrevista u oferta, no en el copy
   estándar de vacantes. Sin cambio de runtime, schema, contratos ni configuración de permisos.
-
-## 2026-08-17 — Vacantes públicas e inbound recruiting reforzados en la skill de Talent
-
-- Las skills espejo de Talent para Claude/Codex ahora exigen evidence packet, benchmark actual,
-  claim ledger y condiciones explícitas para roles remotos/globales antes de redactar una vacante.
-  La nueva referencia documenta evidencia y límites para atracción, realistic preview, inclusividad,
-  roles creativos senior, aplicación de baja fricción, candidate experience, Talent Pool consentido,
-  compensación, distribución y experimentación por quality-of-hire. Sin cambio de runtime ni de
-  política de beneficios.

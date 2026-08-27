@@ -44,6 +44,7 @@ El schema `greenhouse_growth` guarda dos familias de tablas con reglas distintas
 | `seo_site_audit_findings` | Los hallazgos de cada crawl (URL, tipo de problema, severidad `critical/warning/notice`). |
 | `seo_backlink_snapshots` | Snapshot semanal del perfil de enlaces (dominios referentes, total de backlinks, domain rank, share tóxico). |
 | `seo_domain_overview_snapshots` | La foto de un **dominio completo** (del cliente o de un competidor): keywords ranqueadas totales, tráfico orgánico estimado, distribución del top-100 y su trayectoria mensual. Clave **sin organización**: lo que pagó una org le sirve a toda la cartera (TASK-1775). |
+| `seo_url_visibility_snapshots` | Lo mismo a nivel de **página**: qué keywords ranquea una URL, subcarpeta o subdominio (propio o de un competidor) y qué páginas concentran el tráfico de un host. Una sola tabla para las cuatro clases de sujeto, con la clase declarada — no adivinada (TASK-1776). |
 
 La separación importa porque el negocio de cada familia es distinto: la configuración responde "¿qué estamos midiendo y desde cuándo?"; las mediciones responden "¿qué pasó cada día?". Un snapshot jamás se corrige — si una captura salió mal, se degrada o se marca, pero la historia no se reescribe.
 
@@ -220,6 +221,29 @@ Se consume por el reader canónico (`readDomainOverview`), el lane ecosystem
 Operación paso a paso: [Operar la foto de dominio SEO](../../manual-de-uso/growth/operar-foto-de-dominio-seo.md).
 
 > Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md §4.2](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) (`seo_domain_overview_snapshots`, patrón multi-productor) y spec `docs/tasks/TASK_ID_REGISTRY.md → TASK-1775 (spec en la carpeta de su lifecycle vigente)`.
+
+## La visibilidad por página: URL, subcarpeta y subdominio (TASK-1776)
+
+El trabajo editorial se decide a nivel de página, y hasta esta capacidad el módulo sólo sabía
+hablar de dominios y de keywords sueltas. Ahora puede responder, para **cualquier** dominio:
+
+- **"¿Por qué keywords entra tráfico a esta página?"** — la captura por sujeto (`ranked_keywords`)
+  con la clase declarada: dominio, subdominio, subcarpeta o URL exacta. Lo que Semrush vende como
+  tres reportes separados acá es una sola capacidad con un resolver de sujeto.
+- **"¿Qué páginas del competidor concentran su tráfico?"** y **"¿cuál de sus subdominios pesa?"** —
+  colectores bajo demanda (`relevant_pages` / `subdomains`) que dejan cada página y subdominio como
+  medición propia consultable.
+- **Bono de cartera:** cada fila comprada trae el dato de mercado de su keyword (volumen, CPC,
+  competencia) ya pagado, y el colector lo deposita en la tabla de mercado compartida con costo
+  cero — una corrida sobre un cliente deja fresco mercado que otro habría tenido que comprar.
+
+Las mismas reglas de honestidad de toda la serie: cifras **◑ estimadas** con fecha, "sin datos de
+mercado" en vez de ceros, y la posición de mercado jamás se promedia con la posición medida de
+Search Console. Se consume por `readUrlVisibility`/`readVisibilityConcentration`, el lane ecosystem
+(`/growth/seo/url-visibility`) y la tool MCP `get_seo_url_visibility`.
+Operación: [Operar la visibilidad por URL](../../manual-de-uso/growth/operar-visibilidad-por-url-seo.md).
+
+> Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md §4.2 y §15](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md).
 
 ## Que NO existe todavia
 

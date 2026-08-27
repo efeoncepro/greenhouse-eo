@@ -1344,3 +1344,11 @@ El sujeto NO tiene organización (es un dominio prospecto), así que el payload 
 **Payload v1 (backfill)**: mismo shape con `captureDate: null`, `snapshotsWritten` y `actor: 'history_backfill_runner'` — coordenadas y resumen, nunca las métricas: cualquier consumer futuro **re-lee PG** por `(seoTargetId → dominios → seo_domain_overview_snapshots)`.
 
 El screening (`estimateDomainTraffic`) **no emite**: es una corrida on-demand sin downstream declarado, y su rastro de gasto ya queda en `seo_provider_spend_daily` por construcción. La constante vive en el dominio (`src/lib/growth/seo/contracts.ts`) — mismo seam de extracción §17.3.
+
+## Delta 2026-08-27 — TASK-1776: `growth.seo.url_visibility.snapshot_captured` (visibilidad por sujeto-página)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `growth.seo.url_visibility.snapshot_captured` | v1 | `seo_target` (`seot-{uuid}`) cuando la corrida es target-bound (batch mensual); `organization` (`organization_id`) para corridas on-demand sin target | command `captureUrlVisibility` (`src/lib/growth/seo/url-visibility/capture.ts`), tras persistir snapshots de la corrida (sólo si `captured > 0` o `noMarketData > 0`) | ninguno todavía — rastro de auditoría de una corrida que COMPROMETE GASTO |
+
+**Payload v1**: `{ organizationId, seoTargetId, locationCode, languageCode, subjects, captured, noMarketData, marketRowsWritten, costUsd, actor: 'ops_worker' }` — coordenadas y resumen, nunca las keywords: cualquier consumer futuro **re-lee PG**. `marketRowsWritten` registra el efecto lateral del tercer productor (el `keyword_info` inline escrito al mercado con costo 0). Los colectores de concentración (`relevant_pages`/`subdomains`) **no emiten**: on-demand sin downstream, gasto en el ledger por construcción. La constante vive en el dominio (`contracts.ts`) — seam §17.3.
