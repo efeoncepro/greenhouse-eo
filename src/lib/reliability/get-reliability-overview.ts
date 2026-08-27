@@ -197,11 +197,13 @@ import { getGrowthAiVisibilityEntitlementSignals } from './queries/growth-ai-vis
 import { getGrowthAiVisibilityRegradeSignals } from './queries/growth-ai-visibility-regrade-signals'
 import { getGrowthSearchConsoleTokenHealthSignal } from './queries/growth-search-console-token-health'
 import { getSeoAuditStuckTasksSignal } from './queries/seo-audit-stuck-tasks'
+import { getSeoProspectCostOverrunSignal } from './queries/seo-prospect-cost-overrun'
 import {
   getSeoKeywordDiscoveryProviderErrorsSignal,
   getSeoKeywordDiscoveryStuckRunsSignal
 } from './queries/seo-keyword-discovery-health'
 import { getSeoMarketDataFreshnessSignal } from './queries/seo-market-data-freshness'
+import { getSeoDomainOverviewStalenessSignal } from './queries/seo-domain-overview-staleness'
 import { getSeoRankCaptureLagSignal } from './queries/seo-rank-capture-lag'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
 import { getKnowledgeNotionIngestDeadLetterSignal } from './queries/knowledge-notion-ingest-dead-letter'
@@ -696,9 +698,12 @@ interface ReliabilityOverviewSources {
   growthSearchConsoleTokenHealth?: ReliabilitySignal | null
   seoRankCaptureLag?: ReliabilitySignal | null
   seoMarketDataFreshness?: ReliabilitySignal | null
+  seoDomainOverviewStaleness?: ReliabilitySignal | null
   seoAuditStuckTasks?: ReliabilitySignal | null
   seoKeywordDiscoveryStuckRuns?: ReliabilitySignal | null
   seoKeywordDiscoveryProviderErrors?: ReliabilitySignal | null
+  /** TASK-1709 — sobrecosto en diagnósticos de prospecto (steady 0). */
+  seoProspectCostOverrun?: ReliabilitySignal | null
 
   /** TASK-1201 — Finance AI anomaly-materialization staleness (heartbeat del SoT de signals). */
   financeAiStaleMaterialization?: ReliabilitySignal | null
@@ -1156,9 +1161,11 @@ export const buildReliabilityOverview = (
     ...(sources.growthSearchConsoleTokenHealth ? [sources.growthSearchConsoleTokenHealth] : []),
     ...(sources.seoRankCaptureLag ? [sources.seoRankCaptureLag] : []),
     ...(sources.seoMarketDataFreshness ? [sources.seoMarketDataFreshness] : []),
+    ...(sources.seoDomainOverviewStaleness ? [sources.seoDomainOverviewStaleness] : []),
     ...(sources.seoAuditStuckTasks ? [sources.seoAuditStuckTasks] : []),
     ...(sources.seoKeywordDiscoveryStuckRuns ? [sources.seoKeywordDiscoveryStuckRuns] : []),
     ...(sources.seoKeywordDiscoveryProviderErrors ? [sources.seoKeywordDiscoveryProviderErrors] : []),
+    ...(sources.seoProspectCostOverrun ? [sources.seoProspectCostOverrun] : []),
     // TASK-812 — Previred/LRE artifact registry drift.
     ...(sources.payrollComplianceExportDrift ? [sources.payrollComplianceExportDrift] : []),
     // TASK-863 V1.5.2 — Final settlement PDF status drift (DB document_status vs
@@ -1693,10 +1700,21 @@ export const getReliabilityOverview = async (
       ? preloadedSources.seoMarketDataFreshness
       : await getSeoMarketDataFreshnessSignal().catch(() => null)
 
+  const seoDomainOverviewStaleness =
+    preloadedSources.seoDomainOverviewStaleness !== undefined
+      ? preloadedSources.seoDomainOverviewStaleness
+      : await getSeoDomainOverviewStalenessSignal().catch(() => null)
+
   const seoAuditStuckTasks =
     preloadedSources.seoAuditStuckTasks !== undefined
       ? preloadedSources.seoAuditStuckTasks
       : await getSeoAuditStuckTasksSignal().catch(() => null)
+
+  // TASK-1709 — sobrecosto en diagnósticos de prospecto (steady 0).
+  const seoProspectCostOverrun =
+    preloadedSources.seoProspectCostOverrun !== undefined
+      ? preloadedSources.seoProspectCostOverrun
+      : await getSeoProspectCostOverrunSignal().catch(() => null)
 
   // TASK-1664 — keyword discovery: corridas atascadas + fallas de proveedor (24h).
   const seoKeywordDiscoveryStuckRuns =
@@ -2793,7 +2811,9 @@ export const getReliabilityOverview = async (
     growthSearchConsoleTokenHealth,
     seoRankCaptureLag,
     seoMarketDataFreshness,
+    seoDomainOverviewStaleness,
     seoAuditStuckTasks,
+    seoProspectCostOverrun,
     seoKeywordDiscoveryStuckRuns,
     seoKeywordDiscoveryProviderErrors,
     payrollComplianceExportDrift,
