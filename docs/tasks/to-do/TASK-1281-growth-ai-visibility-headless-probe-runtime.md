@@ -27,6 +27,15 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-08-27 — evidencia real nueva del rollout de `TASK-1778`
+
+Durante la verificación del cutover de `TASK-1778` (7 dominios vivos de cartera en modo strict),
+`www.bancochile.cl` — perfil vivo — resultó **ilegible para el fetcher HTTP estático**: muro
+Imperva/Incapsula con loop de cookies (302 a sí mismo), que falla igual con la red vieja y con la
+nueva (no es regresión del endurecimiento). Es exactamente la clase de sitio que el renderer
+headless de esta task habilitaría leer. Origen de la evidencia: `TASK-1778`
+(`docs/tasks/complete/TASK-1778-growth-probe-fetcher-hardening-commercial-grade.md`).
+
 ## Delta 2026-08-26 — se revierte a `P2`: subirla era tratar el síntoma
 
 **Corrección de una decisión mía de esta misma fecha.** Había subido esta task a `P1` argumentando que

@@ -2,12 +2,16 @@
 
 ## Delta 2026-08-27 — el chequeo de borde vuelve a ser implementable: TASK-1778 Slice 4b entregó el override
 
-- `ProbeFetchInit.userAgent` existe (code complete en `develop`, TASK-1778): el chequeo de borde se
+- `ProbeFetchInit.userAgent` existe (TASK-1778, **ya desplegada**: rollout ejecutado 2026-08-27 en el
+  ops-worker con `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` ON, también ON en Vercel staging): el
+  chequeo de borde se
   implementa variando **nuestro** token (p.ej. `GreenhouseAEOGrader-EdgeCheck/1.0`), y lo que se mide
   es si el borde nos trata **distinto**, no si podemos hacernos pasar por otro bot. Suplantar
   `GPTBot`/`OAI-SearchBot` sigue prohibido (postura declarada en el contrato del fetcher).
 - El punto del sitemap del Delta 2026-08-26 también quedó resuelto: `resolveProbeUrl` ya acepta la
-  **familia del sujeto** (`apex ↔ www` + upgrade `http → https`), así que un `<loc>` en `www.` sobre
+  **familia del sujeto** (`apex ↔ www` + upgrade `http → https`) **y los subdominios descendientes
+  del sujeto** (regla extendida con evidencia real de cartera:
+  `www.bancochile.cl → 301 → sitiospublicos.bancochile.cl`), así que un `<loc>` en `www.` sobre
   sujeto apex ya no reporta «no verificado» falso.
 - Ojo adicional heredado de 1778: el fetcher ahora **obedece `robots.txt`** (matching contra nuestro
   token, fallback `*`). Un chequeo de esta task sobre una ruta que el sitio nos prohíba volverá

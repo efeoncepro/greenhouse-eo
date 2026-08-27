@@ -6,10 +6,13 @@
 
 ## Delta 2026-08-27 — fetcher endurecido por `TASK-1778`
 
-El fetcher SSRF-guarded que esta task reusa quedó code complete en develop con el endurecimiento
-comercial (`ISSUE-164`): tope real de 4 MiB por stream + rastro `truncated`/`observable`,
-`robots.txt` obedecido con nuestro UA (`probes/robots-policy.ts`), y contención de redirects +
-guarda DNS gated por `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (default OFF, cutover pendiente).
+El fetcher SSRF-guarded que esta task reusa quedó endurecido y desplegado con el endurecimiento
+comercial (`ISSUE-164` resuelto; rollout ejecutado 2026-08-27): tope real de 4 MiB por stream +
+rastro `truncated`/`observable`,
+`robots.txt` obedecido con nuestro UA (`probes/robots-policy.ts`), y contención de redirects
+(familia + subdominios descendientes) +
+guarda DNS gated por `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (ON en el ops-worker y Vercel
+staging; prod Vercel con el próximo release).
 Los probes nuevos de author/trust deben heredar la misma degradación honesta que los probes de
 presencia: sobre cuerpo `truncated` o shell no `observable`, `skipped` con `errorCode`
 (`truncated_body`/`not_observable`), nunca afirmar ausencia; un `blocked_robots` es hallazgo, no

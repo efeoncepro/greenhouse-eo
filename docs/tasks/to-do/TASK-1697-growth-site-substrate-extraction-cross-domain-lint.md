@@ -3,7 +3,8 @@
 ## Delta 2026-08-27 — `TASK-1778` aterrizó: el archivo que esta task mueve ya está endurecido
 
 El orden load-bearing declarado en Dependencies se cumplió: `TASK-1778` dejó `probes/safe-fetch.ts`
-code complete en develop (2026-08-27). Consecuencias para esta task:
+endurecido y **desplegado** (2026-08-27: rollout ejecutado en el ops-worker + Vercel staging;
+`TASK-1778` complete, `ISSUE-164` resolved). Consecuencias para esta task:
 
 1. **El sustrato a mover creció**: existe `probes/robots-policy.ts` (parser conservador de
    `robots.txt`, consumido por el fetcher) y debe viajar junto con `safe-fetch.ts`.
@@ -12,8 +13,9 @@ code complete en develop (2026-08-27). Consecuencias para esta task:
    `observable`, y `ProbeFetchInit` suma `userAgent`.
 3. **El comportamiento actual ya no es el descrito abajo**: tope de bytes real por stream (subió de
    1 MiB a 4 MiB), `robots.txt` obedecido con nuestro UA (`GreenhouseAEOGrader`), y — gated por
-   `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (default OFF, cutover pendiente) — `redirect: 'manual'`
-   con contención a la familia del sujeto + guarda DNS anti-SSRF. El fetcher ahora lee ese env flag:
+   `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (ON en el ops-worker y Vercel staging desde
+   2026-08-27; prod Vercel con el próximo release) — `redirect: 'manual'` con contención a la
+   familia del sujeto + subdominios descendientes + guarda DNS anti-SSRF. El fetcher ahora lee ese env flag:
    la regla "cero flags de dominio" del sustrato debe interpretarse como "cero flags de dominio
    *grader*"; el flag de red es del propio fetcher y viaja con él.
 4. La regla de "diff puro" del `git mv` se compara contra este estado nuevo del archivo, y las
@@ -236,7 +238,7 @@ Reglas obligatorias:
 - **NUNCA se toca la lógica de la guarda SSRF.** Esta task **mueve** `safe-fetch.ts` (+
   `robots-policy.ts`), no lo mejora: los hosts no públicos, el timeout, el tope de bytes por stream,
   el User-Agent, la obediencia a `robots.txt` y la contención de redirects + guarda DNS que
-  `TASK-1778` dejó code complete (2026-08-27) quedan byte por byte. Cualquier mejora es
+  `TASK-1778` dejó desplegada (rollout 2026-08-27) quedan byte por byte. Cualquier mejora es
   otra task, con su propio diff legible.
 - **NUNCA se cruza el bloqueo cross-host de `resolveProbeUrl`** (`safe-fetch.ts:58-79`). Fetchear el
   sitio de un competidor es una decisión legal y reputacional, no de implementación (§4 de la
@@ -282,8 +284,8 @@ Reglas obligatorias:
 - **`TASK-1701`** (`to-do`, análisis de contenido por URL): es el tercer consumidor externo del
   sustrato y el disparo legítimo del movimiento (§5.3 de la auditoría). Nace apuntando a
   `growth/site-substrate/`, no a `probes/` — y la rule angosta se lo impone.
-- 🔴 **`TASK-1778`** (`P1`, dueña de `ISSUE-164`) — **precedía a esta task, y el orden se cumplió:
-  aterrizó code complete en develop el 2026-08-27** (ver Delta 2026-08-27 arriba). La auditoría del
+- **`TASK-1778`** (`complete`, dueña de `ISSUE-164` — resolved) — **precedía a esta task, y el orden se
+  cumplió: aterrizó y se desplegó el 2026-08-27** (ver Delta 2026-08-27 arriba). La auditoría del
   2026-08-26 había encontrado que `probes/safe-fetch.ts` —el archivo exacto que esta task mueve—
   prometía en su cabecera una contención de redirects que no implementaba y validaba el host sin
   resolver DNS; ese fix ya vive en el archivo, así que esta task mueve el sustrato **ya endurecido**
@@ -327,7 +329,8 @@ Reglas obligatorias:
 - **El sustrato, puro y probado.** `probes/safe-fetch.ts` (`import 'server-only'`, hosts no públicos,
   timeout 8s/20s máx; desde `TASK-1778` 2026-08-27: tope 4 MiB con corte real por stream + rastro
   `truncated`/`observable`, `robots.txt` obedecido vía `probes/robots-policy.ts`, y — gated por
-  `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` — redirects contenidos a la familia del sujeto + guarda
+  `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED`, ON en el ops-worker y Vercel staging — redirects
+  contenidos a la familia del sujeto + subdominios descendientes + guarda
   DNS) y `probes/html.ts` (parseo tolerante de JSON-LD, `potentialAction`, landmarks DOM; sin
   una sola línea de `import`). Cobertura en
   `src/lib/growth/ai-visibility/__tests__/probes-substrate.test.ts`.

@@ -132,8 +132,12 @@ diagnóstico → acción.
   a `skipped` (`truncated_body`/`not_observable`) en vez de reportar ausencia
   falsa cuando el body se trunca (tope real 4 MiB por stream) o la página es un
   shell JS. El endurecimiento de red (contención de redirects a la familia del
-  sujeto + guarda DNS anti-rangos privados) viaja gated por
-  `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (default OFF, cutover pendiente).
+  sujeto — mismo host, apex↔www y **subdominios descendientes del sujeto** —
+  + guarda DNS anti-rangos privados) viaja gated por
+  `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED`: **ON desde 2026-08-27 en el
+  ops-worker compartido staging+prod** (cubre el path async del intake público);
+  en Vercel Production entra con el próximo release — hasta entonces solo el
+  path inline de prod (runs `light` admin) conserva la red vieja.
 - **Public-safe** en cualquier artefacto del lead magnet: sin raw provider text,
   sin claims de ranking garantizado, sin internal reasons.
 - **Si Efeonce/Greenhouse adopta WebMCP propio:** las tools de write van por el

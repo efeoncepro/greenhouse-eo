@@ -95,14 +95,16 @@ exactitud del mismo fetcher (`ISSUE-164`). Hasta que 1778 cierre, **este carril 
 respeto de `robots.txt` sobre la evidencia obtenida por OnPage** — no sobre la del sustrato. Decir lo
 contrario en un documento comercial sería exactamente el patrón que este delta dice combatir.
 
-> **Actualización 2026-08-27 (TASK-1778 Slice 4 code complete).** El mecanismo ya existe: el fetcher
-> propio **obedece** `robots.txt` (`robots-policy.ts`, matching contra NUESTRO token con fallback
-> `*`, `/robots.txt` siempre alcanzable, `Disallow` que nos alcanza → `blocked_robots` = hallazgo).
-> La obediencia viaja **sin flag** — apenas el código de 1778 esté desplegado en el runtime que
-> ejecute este carril, la promesa de robots cubre AMBOS carriles (OnPage + sustrato). Precisión: lo
-> que sigue gated por `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (default OFF, cutover pendiente)
-> es el endurecimiento de RED (redirects + DNS), no robots. Verificar deploy antes de escribir la
-> promesa ampliada en un entregable comercial.
+> **Actualización 2026-08-27 (TASK-1778 desplegada — rollout ejecutado).** El mecanismo existe Y está
+> corriendo: el fetcher propio **obedece** `robots.txt` (`robots-policy.ts`, matching contra NUESTRO
+> token con fallback `*`, `/robots.txt` siempre alcanzable, `Disallow` que nos alcanza →
+> `blocked_robots` = hallazgo). La obediencia viaja **sin flag** y el código ya está desplegado en el
+> ops-worker (el runtime del path async): **la promesa de robots cubre hoy AMBOS carriles (OnPage +
+> sustrato) en ese path.** El endurecimiento de RED (redirects + DNS), gated por
+> `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED`, también está ON en el ops-worker y Vercel staging. La
+> única salvedad restante para un entregable comercial: el path **inline** de Vercel Production
+> (runs `light` de admin, no el intake público) conserva la red vieja hasta el próximo release
+> develop→main.
 
 **Herramientas nuevas: ninguna.** Se evaluó sumar un scraper externo tipo Apify y se **descarta**:
 todo lo que aportaría ya existe dos veces (render headless vía `enable_browser_rendering` de OnPage;
@@ -499,9 +501,11 @@ Reglas obligatorias:
   `forbidden_meta_tag`, `forbidden_http_header`), no como error de la corrida ni como `magnitude: 0`.
 - Test de frontera que falla si este módulo importa `safe-fetch` o `ai-visibility/probes/**`
   directamente: la delegación es el contrato, no una convención.
-- 🔴 La promesa de `robots.txt` sobre el carril del sustrato **no se escribe en ningún entregable
-  comercial** hasta que `TASK-1778` (`Slice 4`) le ponga mecanismo. Mientras tanto, el criterio de
-  cortesía de este slice cubre **sólo** el carril OnPage.
+- La promesa de `robots.txt` sobre el carril del sustrato **ya tiene mecanismo desplegado**:
+  `TASK-1778` (`Slice 4`) lo entregó y el rollout se ejecutó el 2026-08-27 en el ops-worker (path
+  async). El criterio de cortesía cubre ambos carriles en ese path; la única salvedad para un
+  entregable comercial es el path inline de Vercel Production hasta el próximo release (ver la
+  Actualización 2026-08-27 arriba).
 
 ### Slice 3 — Derivación: hechos con lente, sin veredicto
 

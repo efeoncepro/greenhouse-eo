@@ -2067,12 +2067,13 @@ Growth/AEO, redeploy `greenhouse-ic8cg4ery`) **y en staging** (parity flip 2026-
 - **Versionado:** `normalized_finding_v2` + `ai_visibility_score_v2`; el findingId default incorpora la versión (el PK colisionaba entre versiones en re-score). Filas/scores v1 conviven como historia; `getNormalizedFindings` devuelve la versión más nueva por (prompt, provider). Snapshots públicos inmutables.
 - **Evidencia:** re-score live `EO-GRUN-00045` → `citation_quality 0 → 90.9`, overall `52.5 → 73.3` con las mismas citas. Spec: `docs/tasks/complete/TASK-1390-ai-visibility-grader-issue-120-pipeline-fixes.md` + `docs/issues/resolved/ISSUE-120-*.md`.
 
-## Delta 2026-08-27 — TASK-1778 (ISSUE-164): postura de red del sustrato de sitio (code complete; cutover del flag pendiente)
+## Delta 2026-08-27 — TASK-1778 (ISSUE-164): postura de red del sustrato de sitio (rollout ejecutado)
 
 El fetcher único con el que Greenhouse lee sitios de terceros (`probes/safe-fetch.ts`, consumido por el gatherer de
 probes y por `brand-intelligence/fetch-site-content`) pasa de tener garantías afirmadas a tener garantías con mecanismo:
 
-- **Contención de redirects** (gated por `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED`, default OFF): `redirect: 'manual'`
+- **Contención de redirects** (gated por `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED`, ON desde 2026-08-27 en el
+  ops-worker y Vercel staging — ver el bullet de Estado): `redirect: 'manual'`
   + bucle propio con tope (`MAX_REDIRECTS=5`), revalidando cada `Location` contra el sujeto — su familia (mismo host,
   `apex ↔ www`), sus subdominios **descendientes** (sufijo anclado al host completo; evidencia rollout 2026-08-27:
   `www.bancochile.cl → sitiospublicos.bancochile.cl`, perfil vivo) y upgrade `http → https`; todo lo demás (otro dominio
@@ -2095,7 +2096,15 @@ probes y por `brand-intelligence/fetch-site-content`) pasa de tener garantías a
   permite variar nuestro token (p.ej. edge-check), NUNCA suplantar el crawler de un tercero.
 - **Observabilidad:** rechazos de guarda a Sentry nivel `info` con `source: growth_ai_visibility_probe_fetch` y
   `reason: blocked_redirect|blocked_private_address|blocked_robots`; sin cuerpo ni URL interna en el resultado.
-- **Estado:** code complete con suite adversarial (`__tests__/probes-safe-fetch-hardening.test.ts`, incluye test
-  anti-divergencia cabecera↔código). El cierre real es el cutover del flag (staging → corrida real sobre apex→www,
-  http→https y sitio >4 MiB → producción); hasta entonces ISSUE-164 permanece `open`. Ledger:
-  `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` § Pendientes.
+- **Estado (rollout ejecutado 2026-08-27):** suite adversarial (`__tests__/probes-safe-fetch-hardening.test.ts`,
+  incluye test anti-divergencia cabecera↔código) + cutover aplicado. `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` está
+  **ON en el ops-worker** (revisión `ops-worker-00598-459`, 100% tráfico; worker único compartido staging+prod → cubre
+  el path async del intake público, la cadena real del ISSUE-164) con default declarativo `true` en
+  `services/ops-worker/deploy.sh`, y **ON en Vercel `staging`**. Vercel Production queda para el próximo release
+  develop→main (regla ISSUE-150: el lector aún no está en `main`; hasta entonces el path inline de prod — runs `light`
+  de admin, no el intake público — conserva la red vieja). Evidencia: corrida real `EO-GRUN-00048` (SKY, full, 5
+  motores) `succeeded` con el flag ON — 13 probes, cero `blocked_redirect`/`blocked_private_address` falsos, apex→www
+  seguido y medido — más 7 dominios vivos de cartera en strict (6 ok; `www.bancochile.cl` falla igual que con la red
+  vieja — muro Imperva/Incapsula con loop de cookies, NO regresión; evidencia para TASK-1281 headless). `ISSUE-164`
+  quedó `resolved` (2026-08-27). Residuales fechados (revisión Sentry de `blocked_*` el 2026-08-29 + flip de la env var
+  en Vercel Production con el release) viven en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` § Pendientes.
