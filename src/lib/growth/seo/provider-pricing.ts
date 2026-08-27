@@ -32,3 +32,25 @@ export const LABS_TASK_SETUP_USD = 0.012
  * corrida sale del campo `cost` que devuelve el proveedor y queda en el ledger.
  */
 export const LABS_RESULT_ROW_USD = 0.00012
+
+/**
+ * Grupo CARO de Labs: los históricos cuestan 10× el resto (`historical_rank_overview`,
+ * `historical_bulk_traffic_estimation`). Es la asimetría que dicta el diseño de TASK-1775:
+ * el histórico se compra UNA vez por sujeto vía runner con tope duro, jamás en un cron.
+ */
+export const LABS_HISTORICAL_TASK_SETUP_USD = 0.12
+
+/** Costo por fila devuelta del grupo histórico (una fila = un mes de un dominio). */
+export const LABS_HISTORICAL_RESULT_ROW_USD = 0.0012
+
+/**
+ * Backlinks API (TASK-1709): mismo modelo dual que Labs pero con sus propios precios.
+ * Verificado contra `.claude/skills/dataforseo-operator/references/03-backlinks.md` +
+ * la arquitectura del módulo §6 ("Backlinks $0.02/req + $0.00003/fila", as-of 2026-06).
+ */
+
+/** Costo fijo por request a un endpoint Backlinks. */
+export const BACKLINKS_TASK_SETUP_USD = 0.02
+
+/** Costo por fila devuelta de un endpoint Backlinks. */
+export const BACKLINKS_RESULT_ROW_USD = 0.00003
