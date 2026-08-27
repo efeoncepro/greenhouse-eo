@@ -34,7 +34,7 @@ Al investigar por qué el informe salió `insufficient_data` (run `EO-GRUN-00032
 - `openai` → **succeeded** (6 respuestas reales, prompt pack `archetype-retail_ecommerce.v1`).
 - `gemini` → **failed** `provider_error` (este issue, Vertex).
 - `perplexity` → **skipped `missing_secret`** ← nuevo hallazgo.
-- `google_ai_overview` → **skipped `no_ai_overview_block`** (legítimo: Google no mostró AIO para esas queries).
+- `google_ai_overview` → **skipped `no_ai_overview_block`** (legítimo: Google no mostró AIO para esas queries). *(Nota 2026-08-27: TASK-1652 mostró que los `skipped:no_ai_overview_block` de esa ventana (2026-06-29→2026-07-17) eran falsos negativos — el task de DataForSEO fallaba `40501`/`40201` bajo HTTP 200 por el `location_name` ISO-2 inválido; la consulta nunca se ejecutó. El adapter ya valida `status_code` per-task y mapea market→`location_code`.)*
 
 Con 1 solo provider, el gate de calidad no computa score → no hay informe → `unavailable`. **Root cause de Perplexity (patrón DUAL-LOCATION):** el flag `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED` estaba ON en el ops-worker, y el secret `greenhouse-perplexity-api-key` existe en Secret Manager + `PERPLEXITY_API_KEY_SECRET_REF` estaba wireado en **Vercel** — pero **NO en `services/ops-worker/deploy.sh`** (declaraba OpenAI/Anthropic, nunca Perplexity). El run async corre en el ops-worker → `resolveSecret('PERPLEXITY_API_KEY')` no encontraba el ref → `missing_secret` → skip.
 

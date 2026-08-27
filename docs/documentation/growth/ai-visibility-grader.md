@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.24
+> **Version:** 1.25
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — Growth vive como seccion del dominio Comercial en el menu)
+> **Ultima actualizacion:** 2026-08-27 por Claude (TASK-1652 — corrección de ubicación, fallo honesto y fuente real de las citas en Google AI Mode)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -54,7 +54,7 @@ Referencia comercial: [Usar la Radiografía AEO en venta y educación](../../man
 ## Estados de una observacion
 
 - `succeeded`: el provider respondio.
-- `skipped`: el provider esta apagado, sin credenciales o la superficie no devolvio bloque de respuesta para esa query. En Google AI Overview / AI Mode esto se guarda como `no_ai_overview_block`, nunca como exito vacio.
+- `skipped`: el provider esta apagado, sin credenciales o la superficie no devolvio bloque de respuesta para esa query. En Google AI Overview / AI Mode esto se guarda como `no_ai_overview_block`, nunca como exito vacio. Desde TASK-1652 (2026-08-27), ese estado queda **reservado a consultas que Google/DataForSEO realmente ejecutaron**: un fallo del proveedor ya no se disfraza de "Google no mostró bloque AI", se registra como `failed`.
 - `failed` / `rate_limited`: hubo un error o limite de uso.
 
 ## Por que no consume secretos por defecto
@@ -100,7 +100,7 @@ Hay primitives server-side gobernados y todos los entrypoints consumen esos cami
 - **staging:** grader encendido. El worker efectivo (`ops-worker-00418-2m6`) tiene OpenAI + Anthropic + Perplexity + Gemini + Google AI Overview + probes + entity probes + email + HubSpot + re-grade encendidos. Gemini usa **Gemini 3** (`gemini-3-flash-preview` vía Vertex) y el modelo es ajustable por env.
 - **producción:** apagado — el encendido es un proceso aparte (migración + release controlado) que se hará después.
 - **Perplexity:** encendido en el ops-worker de staging desde el 2026-06-29 (`GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED=true`, revision `ops-worker-00418-2m6`). `services/ops-worker/deploy.sh` queda persistido con default staging ON / production OFF, para que futuros redeploys no lo apaguen. Falta un smoke async low-volume post-flip para capturar una observation nueva del worker.
-- **Google AI Overviews / AI Mode (surface AI Search):** **encendido + verificado en staging (TASK-1265, 2026-06-28).** Usa DataForSEO como fuente gobernada, sin scraping directo de Google. Smoke real verde end-to-end (observación `succeeded` con 27 citas en PG, ejecutada por el worker real). Está disponible en los 3 entrypoints de análisis (público / cliente / operador) por construcción. Si DataForSEO no trae bloque de AI Overview/AI Mode, la observación queda `skipped:no_ai_overview_block` (es "no apareces", no un fallo). El costo se mide por request reportado por DataForSEO. DataForSEO documenta AI Mode como English-only hoy, así que el adapter manda `language_code=en` y conserva mercado/location para segmentar. **Producción:** apagado (gated por el launch) + rotar la credencial DataForSEO antes de prod.
+- **Google AI Overviews / AI Mode (surface AI Search):** **encendido + verificado en staging (TASK-1265, 2026-06-28).** Usa DataForSEO como fuente gobernada, sin scraping directo de Google. Smoke real verde end-to-end (observación `succeeded` con 27 citas en PG, ejecutada por el worker real). Está disponible en los 3 entrypoints de análisis (público / cliente / operador) por construcción. Si DataForSEO no trae bloque de AI Overview/AI Mode, la observación queda `skipped:no_ai_overview_block` (es "no apareces", no un fallo). El costo se mide por request reportado por DataForSEO. DataForSEO documenta AI Mode como English-only hoy, así que el adapter manda `language_code=en` y conserva mercado/location para segmentar. **Producción:** apagado (gated por el launch) + rotar la credencial DataForSEO antes de prod. **Delta TASK-1652 (2026-08-27):** los runs con mercados ISO-2 (CL/MX/CO/PE/US) ahora consultan Google con el **código de ubicación correcto** (antes el código de país caía crudo en el request y DataForSEO fallaba en silencio bajo HTTP 200); un fallo del proveedor **ya no se reporta como "Google no mostró bloque AI"** — ese estado queda reservado a consultas realmente ejecutadas; y las citas de Google AI Mode ahora **identifican la fuente real** cuando Google la expone (Google envuelve todas las citas en redirects propios, así que las que entrega solo como nombre de marca no se atribuyen a ningún dominio y quedan contadas aparte en la telemetría del run).
 - **DB staging/dev auditada:** 24 runs, 266 provider observations, 60 findings, 10 scores, 8 reports, 7 reviews, 23 probe results, 1 lead y 1 email dispatch. No hay perfiles org-bound opt-in para re-grade (`opt_in_profiles=0`, `due_profiles=0`).
 - **Prompt pack v2 (TASK-1249):** existe como versión seleccionable (corrige el prompt p12, que nombraba sectores y ensuciaba las marcas de control). El **default sigue siendo v1** hasta una validación real; v2 es opt-in.
 - **Pesos del score:** se mantiene **V1** (decisión documentada — el set de calibración es muy chico para reajustar pesos sin sobreajustar; detalle en `GREENHOUSE_AI_VISIBILITY_GRADER_CALIBRATION_V1.md` §Delta 2026-06-27).

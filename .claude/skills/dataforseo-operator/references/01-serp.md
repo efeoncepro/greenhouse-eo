@@ -121,8 +121,10 @@ Fuentes: [ai_mode/overview](https://docs.dataforseo.com/v3/serp-google-ai_mode-o
   - `ai_overview_element` (title, text, markdown, links, images, **references**)
   - `ai_overview_video_element`, `ai_overview_table_element` (markdown + tabla headers/rows + references), `ai_overview_expanded_element`, `ai_overview_shopping`, `ai_overview_paid`.
 - **`references[]`**: `type: ai_overview_reference`, **`source`, `domain`, `url`, `title`, `text`** → la unidad atómica para medir citabilidad/menciones de marca.
+  - ⚠️ **En la práctica (verificado contra respuesta live real, as-of 2026-08-27 — NO está en la doc del proveedor):** `domain` y `url` NO identifican la fuente citada — Google envuelve TODAS las references en redirects propios (`domain=google.com`/`www.google.com`, `url=https://google.com/goto?url=<token opaco>` o `/searchviewer`, no decodificable client-side). La identidad real viene SOLO en `source` (a veces domain-shaped, a veces nombre de marca). Para atribución, derivar dominio de `source`; una ref cuya `source` es solo marca no es atribuible a dominio (ver gotcha 11).
 - `links[]`: `link_element` con title/description/url/domain · `images[]`: `images_element` con alt/url/image_url.
 - Gotcha declarado por la doc: se ignora personalización/historial; verificar contra incógnito.
+- **Fallo per-task bajo HTTP 200:** un `location_name` inválido (p. ej. un ISO-2 crudo como `"CL"`) produce task-level `40501` con `result: null` dentro de un batch HTTP 200 — de ahí el gate per-task por `status_code=20000` del adapter Greenhouse (TASK-1652).
 
 ### 4.2 AI Overview dentro de Organic
 
@@ -182,6 +184,7 @@ Fuente: [serp/locations](https://docs.dataforseo.com/v3/serp-se-locations/) (as-
 8. **Regular ≠ Advanced**: si mides share of voice o features, regular no basta (no trae snippets/elementos extra).
 9. **URLs de doc**: los slugs canónicos usan guiones (`serp-google-ai_mode-overview`); varias URLs "de carpeta" devuelven 404.
 10. **Postback timeout**: 10 s para responder o se aborta la conexión; diseñar el receptor como ack-rápido + proceso async (patrón outbox).
+11. **AI Mode: `references[].domain/url` son el redirect de Google, NO la fuente** (as-of 2026-08-27, verificado contra respuesta live real — la doc oficial describe `references[]` con source/domain/url/title/text sin advertirlo): TODAS las references llegan con `domain=google.com` y `url` de tipo `google.com/goto?url=<token opaco>` (o `/searchviewer`). Atribuir por `domain`/`url` asigna el 100% de la citabilidad a google.com. La fuente real vive SOLO en `source` — y solo cuando es domain-shaped; cuando es nombre de marca (`"Bigbuda"`) la ref no es atribuible a dominio. En un payload live real: 27 refs únicas → 2 atribuibles por `source`, 25 no atribuibles. Complemento del gate per-task: un `location_name` inválido devuelve `40501` per-task con `result: null` bajo HTTP 200 batch — validar `status_code=20000` por task antes de parsear.
 
 ---
 
