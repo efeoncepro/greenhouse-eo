@@ -596,7 +596,7 @@ especialista: "no pasó nada" y "no sabemos qué pasó" son conclusiones opuesta
 - [x] Un drill-down fallido deja veredicto `failed`, emite la señal y no fabrica filas. (El snapshot padre es append-only y no muta; el veredicto persistido es lo que lo declara.)
 - [x] La derivación de sobre-optimización de anchors vive en el primitive, no en ningún consumer.
 - [x] La tool `get_seo_backlink_detail` responde por el lane ecosystem con canary verde en staging. *(Smoke 2026-08-27: `state=available`, `capturedAt=2026-08-24`.)*
-- [ ] Cierre operativo: pase develop→main con los lanes en producción + deploy del gateway con la federación de `TASK-1658` (dueña) verificado con `tools/list` 13→21.
+- [x] Cierre operativo: pase develop→main con los lanes en producción + deploy del gateway con la federación de `TASK-1658` (dueña) verificado con `tools/list` 13→21. *(2026-08-27: release `cc73c74789ce` → lanes en producción; gateway `efeonce-mcp-gateway-00023-zt2` desplegado; `tools/list` autenticado observado: **21 tools SEO** — `get_seo_backlink_detail` incluida. Lo único que mantiene la task abierta es el criterio del predicado de movimiento, lunes 2026-08-31.)*
 - [x] La capability tiene grant a ≥1 rol real en el mismo PR y el coverage test pasa.
 - [x] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` y `pnpm docs:closure-check` pasa.
 - [x] No se creó ningún Cloud Scheduler job nuevo.
