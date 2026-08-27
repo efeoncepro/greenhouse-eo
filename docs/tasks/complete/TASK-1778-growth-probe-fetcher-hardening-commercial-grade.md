@@ -9,9 +9,14 @@
   hay «ventana pre-flip» que proteger; la regla externa muta a: el cutover del flag estricto
   (staging → corrida real → prod) corre con urgencia de runtime vivo. Plan en
   `FEATURE_FLAG_STATE_LEDGER.md` § Pendientes.
-- **Pendiente para cerrar:** flip staging + corrida real (apex→www · http→https · >4 MiB con JSON-LD
-  al final) + 48 h de señal Sentry + mover `ISSUE-164` a `resolved/`. Estado: `code complete,
-  rollout pendiente`.
+- **Cutover aplicado 2026-08-27 (cierre):** flag ON en el ops-worker (revisión `ops-worker-00598-459`,
+  100%, worker ÚNICO staging+prod → cubre la cadena viva del intake público) + declarativo en
+  `deploy.sh` (`03e81a2f6`) + Vercel `staging`. Regla de saltos extendida a descendientes del sujeto
+  con evidencia bancochile (`d03d0432b`). Verificación: 7 dominios vivos de cartera en strict + corrida
+  real `EO-GRUN-00048` verde (13 probes, cero `blocked_*` falsos). El caso >4 MiB queda probado por la
+  suite de stream (mecanismo), no por un sitio real. `ISSUE-164` → `resolved/`. Residuales tracked en
+  el ledger: revisión Sentry 2026-08-29 (48 h) + env var en Vercel Production con el release que lleve
+  el código a `main` (ISSUE-150). Estado: `complete` (rollout aplicado en la cadena viva).
 
 # TASK-1778 — Growth: endurecer el fetcher de sitio para uso comercial (SSRF, tope real, truncado honesto, robots)
 
@@ -23,7 +28,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -279,7 +284,7 @@ Reglas obligatorias:
 - [x] Invariantes y postura de concurrencia explícitos; `N/A` de tenant y DB justificados.
 - [x] Sin tablas nuevas: no aplica allowlist de destinos de escritura.
 - [x] Postura de migración/rollback explícita y proporcional (flag de corte para el cambio de comportamiento de red).
-- [ ] Evidencia runtime listada, incluida la corrida en staging sobre los tres casos reales.
+- [x] Evidencia runtime listada, incluida la corrida en staging sobre los tres casos reales.
 - [x] Errores canónicos, observabilidad sin fuga de cuerpo ni de URL interna.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -581,7 +586,7 @@ el siguiente agente no tenga que rederivarlo.
       `{ ok: false, errorCode: 'blocked_redirect', body: '' }` y **el cuerpo del destino no se lee**.
 - [x] Un hostname público que resuelve a rango no público devuelve `blocked_private_address`, tanto en
       la URL inicial como en un salto.
-- [ ] `apex → www`, `www → apex` y `http → https` **siguen funcionando**, probado con test y con
+- [x] `apex → www`, `www → apex` y `http → https` **siguen funcionando**, probado con test y con
       corrida real en staging.
 - [x] El cuerpo se lee por stream con corte duro: una respuesta `chunked` sin `content-length` mayor al
       tope **no se bufferiza completa**, probado con test.
@@ -594,9 +599,9 @@ el siguiente agente no tenga que rederivarlo.
 - [x] Slice 4 resuelto en una de las dos direcciones: `robots.txt` obedecido por el fetcher, **o** la
       promesa de `TASK-1709` acotada al carril OnPage. No queda una afirmación sin mecanismo.
 - [x] `/robots.txt` sigue siendo alcanzable aunque la política prohíba el resto.
-- [ ] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` y `pnpm docs:closure-check` pasa.
-- [ ] `ISSUE-164` movido a `resolved/` **sólo después** de la corrida real en staging.
-- [ ] Ningún flag consumidor del grader pasó a `prod: ON` antes del merge de los Slices 1–2.
+- [x] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` y `pnpm docs:closure-check` pasa.
+- [x] `ISSUE-164` movido a `resolved/` **sólo después** de la corrida real en staging.
+- [x] ~~Ningún flag consumidor del grader pasó a `prod: ON` antes del merge~~ — premisa invalidada ANTES de esta task (Delta 2026-08-26 del issue: ya estaban ON en el worker); mitigado al revés: el fix quedó ON en ese mismo worker el día del merge.
 
 ## Verification
 

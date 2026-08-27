@@ -11,7 +11,8 @@
 
 - `TASK-1778` (Slices 1–4b, code complete): el único fetcher con el que Greenhouse lee sitios de terceros (grader AEO público + brand intelligence + diagnóstico de prospectos) gana mecanismo para sus cuatro garantías: contención de redirects por salto acotada a la familia del sujeto (`apex↔www`, upgrade `http→https`), guarda DNS pre-conexión contra rangos no públicos, tope de memoria real por stream con truncado rastreable, y obediencia de `robots.txt` matcheando nuestro token — jamás los bots de IA que auditamos.
 - Un probe de presencia ya no puede afirmar «no tiene datos estructurados» sobre un cuerpo truncado o un shell de render JS: degrada a `skipped` con razón explícita (`truncated_body`/`not_observable`), el mismo invariante `null ≠ 0` un nivel más abajo.
-- El endurecimiento de red queda tras `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (default OFF, dual-location Vercel + ops-worker) como kill switch de cobertura; el resto viaja sin flag. `ISSUE-164` permanece abierto hasta la corrida real en staging — ese cutover es el cierre real, no el merge.
+- El endurecimiento de red queda tras `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (dual-location Vercel + ops-worker) como kill switch de cobertura; el resto viaja sin flag.
+- **Cutover aplicado el mismo día:** flag ON en el ops-worker compartido staging+prod (la cadena viva del intake público) + declarativo en `deploy.sh` + Vercel staging; la regla de saltos se extendió a subdominios descendientes del sujeto con evidencia real de cartera (bancochile). Corrida real `EO-GRUN-00048` verde con cero bloqueos falsos → `ISSUE-164` resuelto. Residuales en el ledger: revisión Sentry 48 h (2026-08-29) y env var en Vercel Production con el release que lleve el código a `main`.
 
 ## 2026-08-27 — Nace la práctica Salesforce operable y vendible
 

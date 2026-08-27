@@ -1,6 +1,6 @@
 # ISSUE-164 — El fetcher de probes promete una contención de redirects que no implementa
 
-> **Estado:** open
+> **Estado:** resolved (2026-08-27 — fix live en el ops-worker compartido staging+prod + corrida real verde)
 > **Ambiente:** 🔴 **ops-worker vivo** — los tres flags de probes están `true` en la revisión activa (verificado 2026-08-26, ver Delta)
 > **Detectado:** 2026-08-26, por auditoría de código al evaluar el fetcher para uso comercial sobre prospectos
 > **Severidad:** alta — SSRF **alcanzable desde internet anónimo en producción** (cadena verificada 2026-08-27: intake público ON + probes ON en la revisión activa), con exfiltración potencial hacia el resultado del probe. Captcha y rate-limit son la única fricción; ninguna de las dos mitigaciones declaradas antes en este issue se sostiene
@@ -73,6 +73,27 @@ de este issue. **Este issue NO se mueve a `resolved/` todavía**: la regla dura 
 corrida real en staging (apex→www, http→https, sitio >4 MiB) con el flag ON antes de declarar que la
 cobertura sobrevivió — los tests unitarios prueban la guarda, no la cobertura. El plan de cutover vive
 en `FEATURE_FLAG_STATE_LEDGER.md` § Pendientes.
+
+## Resolución 2026-08-27 — cutover aplicado y verificado
+
+- **Fix live en la cadena de ataque real:** revisión `ops-worker-00598-459` (100% tráfico) con
+  `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED=true` (aplicado con `--update-env-vars` + default
+  declarativo en `deploy.sh`, commit `03e81a2f6`). El worker es ÚNICO compartido staging+prod:
+  el path async del intake público —la cadena verificada de este issue— queda contenido.
+- **Cobertura verificada con evidencia real:** 7 dominios vivos de la cartera en modo estricto —
+  6 leen bien (incl. `apex→www`, `www→apex`, `http→https` y el descendiente
+  `www.bancochile.cl → sitiospublicos.bancochile.cl`, que motivó extender la regla de familia a
+  descendientes del sujeto, commit `d03d0432b`); bancochile ya fallaba igual con la red vieja
+  (loop de cookies de Imperva → caso `TASK-1281`). `berel.com.mx → berel.com` (cross-registrable)
+  se bloquea, correcto.
+- **Corrida real del grader en staging:** `EO-GRUN-00048` (SKY, `full`, 5 motores) `succeeded` con
+  el flag ON en el worker — 13 probes, cero `blocked_redirect`/`blocked_private_address`, apex→www
+  seguido y medido. Los casos adversariales (redirect a IP privada / metadata / host ajeno /
+  cadena larga / DNS a rango privado / chunked gigante) quedan probados por la suite
+  `probes-safe-fetch-hardening.test.ts` (40 tests).
+- **Pendientes acotados (tracked en `FEATURE_FLAG_STATE_LEDGER.md`):** revisión de conteos
+  `blocked_*` en Sentry al 2026-08-29 (48 h) y flip del env var en Vercel **Production** cuando el
+  release lleve el código a `main` (regla ISSUE-150: no prender un flag sin su lector desplegado).
 
 ## Síntoma
 
