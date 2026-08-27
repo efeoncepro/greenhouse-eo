@@ -5,6 +5,12 @@
  * ausencia de structured data es causa estructural de baja `entity_clarity`: los motores
  * no entienden quién es la marca. Ausencia MEDIDA → score 0 (gap real); HTML no accesible
  * (red/timeout/no-200) → null (no medido).
+ *
+ * TASK-1778 — un probe de PRESENCIA jamás concluye ausencia sin evidencia de que pudo
+ * observar: `res.ok` significa "recibí bytes", no "observé la página". Sobre un cuerpo
+ * truncado o un shell de render JS (`observable === false`), "no encontré" se degrada a
+ * `skipped` con razón explícita — NUNCA score 0. Encontrar en un cuerpo parcial SÍ es
+ * prueba (la asimetría corre en una sola dirección).
  */
 
 import { type Probe, type ProbeContext, type ProbeOutcome } from '../contracts'
@@ -32,6 +38,20 @@ const run = async (ctx: ProbeContext): Promise<ProbeOutcome> => {
   const types = [...new Set(nodes.flatMap(jsonLdTypes))]
 
   if (nodes.length === 0) {
+    // Ausencia sólo es medible sobre un documento completo y observable (TASK-1778).
+    if (res.truncated === true || res.observable === false) {
+      return {
+        status: 'skipped',
+        score: null,
+        reason:
+          res.truncated === true
+            ? 'HTML truncado al tope de lectura: no se puede afirmar ausencia de JSON-LD sin ver el documento completo.'
+            : 'La home servida es un shell de render JS sin contenido observable: no se puede afirmar ausencia de JSON-LD.',
+        evidence: { truncated: res.truncated === true, observable: res.observable !== false },
+        errorCode: res.truncated === true ? 'truncated_body' : 'not_observable'
+      }
+    }
+
     return {
       status: 'succeeded',
       score: 0,

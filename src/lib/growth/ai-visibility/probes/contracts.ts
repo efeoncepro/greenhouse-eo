@@ -93,7 +93,24 @@ export interface ProbeResult extends ProbeOutcome {
 
 // ── Fetcher (read-only, SSRF-guarded) ────────────────────────────────────────
 
-export type ProbeFetchErrorCode = 'timeout' | 'network' | 'blocked' | 'too_large' | 'http_error'
+/**
+ * Vocabulario cerrado de fallo del fetcher (TASK-1778 agrega los `blocked_*` finos):
+ *  - `blocked` — guard de entrada (URL inválida, host no público literal, cross-host).
+ *  - `blocked_redirect` — un salto de redirect salió de la familia del sujeto / excedió el tope.
+ *  - `blocked_private_address` — el hostname resolvió (DNS) a una dirección no pública.
+ *  - `blocked_robots` — el `robots.txt` del sujeto prohíbe la ruta a NUESTRO user-agent
+ *    (hallazgo, no fallo: "no pudimos leer porque tu robots.txt lo prohíbe").
+ *  - `too_large` — legacy (pre-streaming); el fetcher ya no lo emite, se conserva por compat.
+ */
+export type ProbeFetchErrorCode =
+  | 'timeout'
+  | 'network'
+  | 'blocked'
+  | 'blocked_redirect'
+  | 'blocked_private_address'
+  | 'blocked_robots'
+  | 'too_large'
+  | 'http_error'
 
 /** Respuesta normalizada del fetcher. NUNCA lanza: un fallo se refleja en `ok=false` + `errorCode`. */
 export interface ProbeFetchResult {
@@ -106,6 +123,25 @@ export interface ProbeFetchResult {
   body: string
   contentType: string | null
   errorCode: ProbeFetchErrorCode | null
+  /**
+   * TASK-1778 — `true` cuando el body fue cortado al tope de bytes. ADITIVO: opcional con
+   * default `false` (ausente = no truncado) para no romper mocks/consumers existentes; el
+   * fetcher real SIEMPRE lo setea. Un probe de PRESENCIA jamás concluye ausencia sobre un
+   * cuerpo truncado: "no encontré" en un body parcial significa "no miré todo", no "no está".
+   * Los probes leen `truncated === true`.
+   */
+  truncated?: boolean
+  /**
+   * TASK-1778 — ¿la respuesta permite AFIRMAR ausencia? Señales baratas y ASIMÉTRICAS por
+   * diseño (sólo pueden RETIRAR una afirmación, nunca agregar una): truncado, shell JS vacío
+   * (`<div id="root">` único, `<noscript>` pidiendo JS, razón texto/markup ≈ 0). ADITIVO:
+   * opcional con default `true` (ausente = observable); el fetcher real SIEMPRE lo setea.
+   * Con `observable === false` los probes de presencia degradan a `skipped`, NUNCA
+   * `score: 0` — el mismo primitive que `NO_HEADLESS_OUTCOME` aplica a los headless.
+   * Los probes leen `observable === false` (nunca `!observable`, que trataría `undefined`
+   * como no-observable e invertiría el default).
+   */
+  observable?: boolean
 }
 
 export interface ProbeFetchInit {
@@ -115,6 +151,15 @@ export interface ProbeFetchInit {
   timeoutMs?: number
   /** Máximo de bytes a leer del body (defensa anti-payload gigante). */
   maxBytes?: number
+  /**
+   * TASK-1778 — Override del User-Agent, para variar NUESTRO propio token (p.ej.
+   * `GreenhouseAEOGrader-EdgeCheck/1.0`). NUNCA para presentarse como el crawler de un
+   * tercero (GPTBot/OAI-SearchBot/PerplexityBot…): suplantar la identidad de otro bot es
+   * evasión verificable (WAFs validan por reverse-DNS) y costo reputacional del dominio
+   * auditor. Coherente con el matching de robots.txt: se matchea nuestro token, jamás
+   * los de los bots que auditamos. Default: `COURTESY_USER_AGENT`.
+   */
+  userAgent?: string
 }
 
 /**
@@ -135,6 +180,8 @@ export interface EntityFetchResult {
   /** Cuerpo de texto acotado (truncado a un máximo defensivo). */
   body: string
   errorCode: EntityFetchErrorCode | null
+  /** TASK-1778 — `true` cuando el body fue cortado al tope (aditivo: opcional, default false). */
+  truncated?: boolean
 }
 
 export interface EntityFetchInit {

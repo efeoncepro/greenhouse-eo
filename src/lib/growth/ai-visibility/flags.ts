@@ -162,6 +162,24 @@ export const isEntityProbesEnabled = (env: NodeJS.ProcessEnv = process.env): boo
   isProbesEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_ENTITY_PROBES_FLAG])
 
 /**
+ * TASK-1778 — Endurecimiento de RED del probe fetcher (ISSUE-164): redirect containment
+ * (`redirect: 'manual'` + revalidación por salto acotada a la familia del sujeto) + guarda
+ * de host que RESUELVE DNS antes de conectar. Default OFF: con el flag apagado el fetcher
+ * conserva el comportamiento de red actual (`redirect: 'follow'`, sin resolución DNS) —
+ * kill switch en segundos si la guarda recorta cobertura real (apex↔www) sin revert ni
+ * redeploy. ⚠️ DUAL-LOCATION: el fetcher corre en Vercel (path inline `light`) y en el
+ * ops-worker (path async `full`); prenderlo es multi-runtime (deploy.sh + Vercel).
+ * El resto del endurecimiento de TASK-1778 (tope por stream + truncado con rastro +
+ * obediencia de robots.txt) NO lleva flag: un truncado silencioso no tiene modo "menos
+ * correcto" que valga la pena conservar.
+ * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
+ */
+export const GROWTH_PROBE_FETCH_STRICT_NETWORK_FLAG = 'GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED'
+
+export const isProbeFetchStrictNetworkEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_PROBE_FETCH_STRICT_NETWORK_FLAG])
+
+/**
  * TASK-1269 — Fix-It Artifacts (JSON-LD / llms.txt / content briefs).
  * Default OFF: los endpoints de generación no entregan artefactos hasta revisión
  * de copy/legal. Gateado además por el kill switch global del grader. La generación

@@ -2,6 +2,10 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-27 — TASK-1778 en ejecución: endurecer el fetcher de probes (ISSUE-164)
+
+**Estado: in-progress, rama `develop`, local-first sin push.** Objetivo: contención real de redirects + guarda DNS (flag `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED`, default OFF), tope de bytes por stream con `truncated`/`observable` honestos, obediencia de `robots.txt` con nuestro token de UA, y override de UA con postura declarada. Premisa corregida en Discovery: los flags consumidores YA están `true` en la revisión activa del ops-worker (Delta del issue), así que el fix corre con urgencia de runtime vivo, no de ventana pre-flip.
+
 ## 2026-08-27 — TASK-1696 adopta la señal de presupuesto que faltaba
 
 **Estado: spec sincronizada; implementación pendiente.** La task ahora incluye `seo.provider.cost_over_budget`: nueve tasks la citaban como mitigación, pero el barrido verificó que no existe en código. Entra junto a la dimensión `consumer` para no sub-reportar el gasto del grader; README y registry ya reflejan las tres señales.
