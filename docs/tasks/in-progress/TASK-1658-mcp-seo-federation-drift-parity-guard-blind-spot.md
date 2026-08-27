@@ -1,15 +1,68 @@
 # TASK-1658 — Drift de federación MCP del módulo SEO + punto ciego del guard de paridad
 
+## Delta 2026-08-27 — implementación ejecutada; code complete, rollout pendiente
+
+**El drift había crecido de 3 a 8 mientras la task esperaba en to-do** — la mejor evidencia de su
+propia premisa. Recuento por introspección runtime (no a mano): el MCP interno tiene **21 tools SEO**
+(16 lecturas + 5 escrituras); el gateway federaba 13. Las 8 ausentes: las 3 originales + 
+`get_seo_domain_overview` (TASK-1775), `get_seo_url_visibility` (TASK-1776), `get_seo_backlink_detail`
+(TASK-1777) y el par `get_/run_seo_prospect_diagnostic` (TASK-1709). Todas tenían lane ecosystem.
+
+**Ejecutado (repo `efeonce-mcp`, commits `f1a2b44` → `9e9666c` → `9480c10` → `093f970`, local sin push):**
+
+1. **Slice 1 — guard bidireccional**: `GREENHOUSE_SEO_TOOL_INVENTORY` (espejo committeado, opción (b)
+   de la spec, con claves de inputSchema + clase `writes`) + `computeSeoToolParityFindings` como
+   función pura + introspección RUNTIME del server real (reemplaza el regex sobre fuente) + 7 tests de
+   regresión sintéticos del poder de detección. **Corrido contra el estado real ANTES de federar
+   (regla de orden de la spec): 29 findings, cada uno nombrando su tool** — 8 `undeclared_in_gateway`,
+   8 `schema_mismatch`, 13 `annotations_missing`. Evidencia en el commit `f1a2b44`.
+2. **Slice 2 — federación de las 8** (decisión: federar, no excluir — todas con lane vigente, cero
+   cambios en Entra). `run_seo_prospect_diagnostic` = 4.º write bajo `efeonce.mcp.seo.write` (misma
+   clase de blast-radius "compromete gasto del proveedor"), fail-closed en el cliente PKCE público
+   hasta TASK-1631. La lista de writes del gate HTTP ahora se DERIVA del inventario
+   (`GREENHOUSE_SEO_WRITE_TOOLS`) — el write N+1 hereda el challenge 403 sin tocar `app.ts`.
+3. **Slice 4 — paridad de schema**: el guard encontró que la divergencia era mucho mayor que el caso
+   TASK-1659: 9 de 13 tools divergían (`intent`/`intentDeclaredBy` en track; `market` ausente en 5
+   lecturas — una org multi-mercado era INOPERABLE desde el front door, 409 irresoluble; 6 filtros de
+   `keyword_discovery`; 2 claves de `discover`). Todas cerradas por passthrough; descripción de track
+   incorpora `intent_changed` (espejo del MCP interno).
+4. **Slice 5 — annotations en las 21**: `readOnlyHint: false` en toda tool que escriba o COMPRE datos
+   (untrack además `destructiveHint: true` — corta una serie y los días no se recuperan). El guard las
+   exige.
+5. **Slice 3 — canary**: allow para las 6 lecturas org-scoped nuevas (performance usa ítems REALES del
+   catálogo), deny anti-oracle por cada una, prospecto con flag-off como estado legítimo y el write
+   ejercitado SIN gastar (dominio inválido). Suite gateway 67/67 + `pnpm check` verde.
+
+**Decisión de forma del guard (Discovery, con arch-architect):** opción (b) — espejo en el gateway.
+El lado Greenhouse (manifiesto vivo + CI que falla donde NACE la tool) es territorio de `TASK-1780`
+(contraparte declarada), que reemplaza este espejo como fuente del guard. Residual documentado: el
+espejo puede quedar atrás hasta ese reemplazo; mitigación = paso 1 del protocolo de federación.
+
+**Evidencia de cableado (pre-deploy):** producción `entitlement` 200 JSON `ok:true` con el consumer
+token real y los headers exactos del provider; staging: los 5 lanes nuevos responden
+`401 missing_token` con el envelope del lane (ruta desplegada + machine-auth activa).
+
+**Rollout pendiente (bloqueado en secuencia, no en código):**
+1. Release develop→main de Greenhouse lleva los lanes nuevos a producción (coordinado con la sesión
+   de release; desplegar el gateway ANTES daría 404 upstream — lección TASK-1661).
+2. Deploy del gateway (`efeonce-mcp` main → Cloud Run) — 4 commits listos, sin push.
+3. Verificación de producción de la Zone 3: `tools/list` sube exactamente en 8 (13→21) + canary
+   completo contra producción + confirmar que ninguna tool preexistente cambió de forma ni de scope.
+
+Docs sincronizados: runbook MCP (inventario 21 + estado de despliegue), ambos bundles
+`efeonce-mcp-platform` (byte-idénticos), `.claude/rules/growth-seo.md` (federar es parte de "listo" +
+espejo como paso 1), `efeonce-mcp/AGENTS.md` (protocolo de paridad bidireccional).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
-- Effort: `Bajo`
+- Effort: `Medio` (recalibrado 2026-08-27: 8 tools, no 3, + paridad de schema ×9)
 - Type: `implementation`
 - Execution profile: `backend-data`
 - UI impact: `none`
@@ -326,16 +379,19 @@ otra clase de blast-radius y otra task.
 
 ## Acceptance Criteria
 
-- [ ] Toda tool SEO de `src/mcp/greenhouse/server.ts` está en `EXPECTED_GREENHOUSE_SEO_TOOLS` **o**
-      en `GREENHOUSE_SEO_TOOL_EXCLUSIONS` con razón escrita; ninguna ausente
-- [ ] El guard compara contra el inventario real de Greenhouse, no sólo contra lo registrado en
-      el gateway
-- [ ] Existe un test que agrega una tool no declarada y verifica que el guard **falla**
-- [ ] El mensaje de fallo del guard nombra la tool, no un conteo
-- [ ] Las tools federadas tienen cobertura allow + deny anti-oracle en el canary
-- [ ] Ningún scope nuevo en Entra, y ningún cambio al `requiredResourceAccess` de ningún cliente
-- [ ] El inventario de tools quedó sincronizado en runbook, ambos bundles de la skill y las skills
-      comerciales que citan el conteo
+- [x] Toda tool SEO de `src/mcp/greenhouse/server.ts` está en `EXPECTED_GREENHOUSE_SEO_TOOLS` **o**
+      en `GREENHOUSE_SEO_TOOL_EXCLUSIONS` con razón escrita; ninguna ausente (las 21 federadas)
+- [x] El guard compara contra el inventario real de Greenhouse (`GREENHOUSE_SEO_TOOL_INVENTORY`,
+      espejo committeado; fuente viva → TASK-1780), no sólo contra lo registrado en el gateway
+- [x] Existe un test que agrega una tool no declarada y verifica que el guard **falla** (7 tests de
+      regresión sintéticos + corrida rojo-real con 29 findings antes de federar)
+- [x] El mensaje de fallo del guard nombra la tool, no un conteo
+- [x] Las tools federadas tienen cobertura allow + deny anti-oracle en el canary (verificación
+      contra PRODUCCIÓN pendiente del deploy — ver rollout)
+- [x] Ningún scope nuevo en Entra, y ningún cambio al `requiredResourceAccess` de ningún cliente
+      (el 4.º write reusa `efeonce.mcp.seo.write`, NO cableado al cliente público)
+- [x] El inventario de tools quedó sincronizado en runbook, ambos bundles de la skill (byte-idénticos)
+      y `.claude/rules/growth-seo.md`; las skills comerciales no citaban conteo (verificado)
 
 ## Verification
 

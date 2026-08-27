@@ -282,11 +282,16 @@ Delega en el lane ecosystem de Greenhouse (`/api/platform/ecosystem/growth/seo/*
 per-org `seo_v2`, el 404 anti-oracle y las degradaciones honestas. Los payloads se pasan tal cual (`data` del
 envelope del lane), así que un cliente MCP ve exactamente los mismos shapes que la UI y Nexa.
 
-Tools publicadas. Las de **lectura** van bajo el **scope base** `efeonce.mcp.read`; las **cuatro de escritura**
-(TASK-1308/1664/1666) exigen el scope propio del dominio `efeonce.mcp.seo.write` — un token de lectura jamás debe
-poder comprometer gasto DataForSEO en la cuenta de un cliente. La lista canónica y el guard que impide
-olvidar una tool viven en `src/providers/greenhouse-seo-tool-parity.ts` del repo `efeonce-mcp` (allowlist
-explícito: revisión humana por tool en la frontera pública, NUNCA auto-federación).
+Tools publicadas — **el inventario COMPLETO del MCP interno de Greenhouse (21 tools SEO) está federado**
+(TASK-1658 cerró el drift de 8 tools que vivían adentro sin federar ni excluir). Las de **lectura** van bajo el
+**scope base** `efeonce.mcp.read`; las **cinco de escritura** (TASK-1308/1664/1666/1709) exigen el scope propio
+del dominio `efeonce.mcp.seo.write` — un token de lectura jamás debe poder comprometer gasto DataForSEO. La lista
+canónica y el guard bidireccional viven en `src/providers/greenhouse-seo-tool-parity.ts` del repo `efeonce-mcp`
+(allowlist explícito: revisión humana por tool en la frontera pública, NUNCA auto-federación). Desde TASK-1658 el
+guard además verifica **paridad de schema** (las claves del inputSchema del gateway contra el MCP interno;
+divergencia sólo con razón declarada) y **annotations** (`readOnlyHint: false` en toda tool que escriba o compre
+datos del proveedor), y falla nombrando la tool cuando una tool interna de Greenhouse no está ni federada ni
+excluida (la dirección que antes era invisible).
 
 | Tool | Recurso del lane | Scope |
 | --- | --- | --- |
@@ -296,20 +301,34 @@ explícito: revisión humana por tool en la frontera pública, NUNCA auto-federa
 | `get_seo_rank_evolution` | `GET .../growth/seo/rank-evolution` | `efeonce.mcp.read` |
 | `get_seo_site_audit_report` | `GET .../growth/seo/site-audit-report` | `efeonce.mcp.read` |
 | `get_seo_backlink_profile` | `GET .../growth/seo/backlink-profile` | `efeonce.mcp.read` |
+| `get_seo_backlink_detail` | `GET .../growth/seo/backlink-detail` | `efeonce.mcp.read` |
 | `get_seo_keyword_market_data` | `GET .../growth/seo/keyword-market-data` | `efeonce.mcp.read` |
 | `get_seo_keyword_discovery` | `GET .../growth/seo/keyword-discovery` | `efeonce.mcp.read` |
 | `get_seo_grounded_query_draft` | `GET .../growth/seo/grounded-queries` | `efeonce.mcp.read` |
+| `get_seo_overview_kpis` | `GET .../growth/seo/overview-kpis` | `efeonce.mcp.read` |
+| `get_seo_performance` | `GET .../growth/seo/performance` | `efeonce.mcp.read` |
+| `get_seo_performance_catalog` | `GET .../growth/seo/performance-catalog` | `efeonce.mcp.read` |
+| `get_seo_domain_overview` | `GET .../growth/seo/domain-overview` | `efeonce.mcp.read` |
+| `get_seo_url_visibility` | `GET .../growth/seo/url-visibility` | `efeonce.mcp.read` |
+| `get_seo_prospect_diagnostic` | `GET .../growth/seo/prospect-diagnostic` | `efeonce.mcp.read` |
 | `track_seo_keywords` | `POST .../growth/seo/keywords/track` | `efeonce.mcp.seo.write` |
 | `untrack_seo_keywords` | `POST .../growth/seo/keywords/untrack` | `efeonce.mcp.seo.write` |
 | `discover_seo_keywords` | `POST .../growth/seo/keyword-discovery` | `efeonce.mcp.seo.write` |
 | `prepare_seo_grounded_queries` | `POST .../growth/seo/grounded-queries` | `efeonce.mcp.seo.write` |
+| `run_seo_prospect_diagnostic` | `POST .../growth/seo/prospect-diagnostic` | `efeonce.mcp.seo.write` |
 
-> Estado de despliegue 2026-08-14: la revisión **productiva** del gateway sirve las 9 tools previas;
-> las 4 de TASK-1664/1666 (`get_seo_keyword_discovery`, `discover_seo_keywords`,
-> `get_seo_grounded_query_draft`, `prepare_seo_grounded_queries`) están en el allowlist con canary
-> verde contra staging y su deploy se despacha junto al próximo release develop→main de Greenhouse.
-> `prepare_seo_grounded_queries` responde además `aeo_forbidden` fail-closed para la identidad
-> máquina compartida hasta TASK-1631.
+> Estado de despliegue 2026-08-27: la revisión **productiva** del gateway sirve las 13 tools previas;
+> las 8 de TASK-1658 (`get_seo_overview_kpis`, `get_seo_performance`, `get_seo_performance_catalog`,
+> `get_seo_domain_overview`, `get_seo_url_visibility`, `get_seo_backlink_detail`,
+> `get_seo_prospect_diagnostic`, `run_seo_prospect_diagnostic`) están en el allowlist con suite verde
+> (67/67, guard de paridad incluido) y evidencia de cableado: lane `entitlement` productivo 200 JSON con
+> el consumer token real, y los 5 lanes nuevos vivos en staging (401 `missing_token` del envelope del
+> lane = ruta desplegada + machine-auth activa). Su deploy se despacha DESPUÉS del próximo release
+> develop→main de Greenhouse (antes daría 404 upstream — lección TASK-1661); el run completo del canary
+> contra producción es parte de esa verificación. `prepare_seo_grounded_queries` responde además
+> `aeo_forbidden` fail-closed para la identidad máquina compartida hasta TASK-1631, y el par de
+> prospecto queda detrás de `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` (hoy OFF en todos los ambientes —
+> el canary trata esa respuesta honesta como estado, no como fallo).
 
 **Granularidad del scope: un scope por CLASE DE BLAST-RADIUS, nunca uno por capability.** `efeonce.mcp.seo.write`
 es del DOMINIO (`…seo.write`), no de la capability (`…seo.keywords.track`): un scope por capability convertiría

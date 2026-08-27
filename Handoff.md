@@ -2,6 +2,27 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-27 — TASK-1658: federación SEO completa en el gateway + guard bidireccional (code complete, rollout pendiente)
+
+**La federación MCP que la tríada dejó pendiente ya está ESCRITA** (la entrada de abajo decía "la
+mueve la sesión de release" — la absorbió TASK-1658): 4 commits locales en `efeonce-mcp` main
+(`f1a2b44`…`093f970`, **sin push**). El drift real era 8 tools, no 3 (creció mientras la task
+esperaba): las 3 originales + domain-overview/url-visibility/backlink-detail (tríada) + el par
+prospect (1709). Todas federadas; `run_seo_prospect_diagnostic` = 4.º write bajo
+`efeonce.mcp.seo.write` fail-closed. El guard ahora es bidireccional (espejo de las 21 + paridad de
+schema + annotations, introspección runtime) y se probó ROJO contra el drift real antes de federar
+(29 findings nombrando cada tool). De paso cerró 9 divergencias de schema vivas: el `intent` de
+TASK-1659 en `track_seo_keywords` y el `market` ausente en 5 lecturas (una org multi-mercado era
+inoperable desde el front door).
+
+**Rollout pendiente (secuencia acordada con `greenhouse-eo-c1`):** 1) release develop→main lleva los
+lanes nuevos a prod; 2) push + deploy del gateway (antes = 404 upstream, lección TASK-1661); 3)
+`tools/list` sube 13→21 + canary completo contra prod (`scripts/greenhouse-seo-canary.mjs`, ya cubre
+las 21 sin gastar; flag-off del prospecto = estado legítimo). Evidencia pre-deploy: entitlement prod
+200 JSON con el consumer token real; los 5 lanes nuevos vivos en staging (401 `missing_token` del
+envelope). Riesgo conocido: el espejo del gateway puede quedar atrás hasta que `TASK-1780` lo
+reemplace por el manifiesto vivo (su caso de evidencia quedó stale — delta anotado allá).
+
 ## 2026-08-27 — La tríada SEO quedó OPERANDO: smokes live verdes, flags ON, schedulers activos
 
 **Estado: 1775/1776/1777 con rollout ejecutado y verificado contra runtime; siguen `in-progress`
@@ -270,13 +291,3 @@ esté en producción con su flag ON.
 **Estado vivo:** [`Produccion Creativa - Octubre 26`](https://app.notion.com/p/3c839c2fefe7813c9450e2f35cb4021e) está `En curso`: 8 artículos N35–N42, 32 banners, 32 derivados y 32 subítems sociales. Fechas: 7, 14 y 16 de octubre, respectivamente.
 
 **Evidencia y siguiente paso:** producción editorial N35–N42 completa para revisión. La lectura final corrigió 54 fechas y validó las 18 filas nuevas más la paridad de 8 tareas/subítems. N41–N42 aún son soft-404: bloquear enlaces, CMS y redes hasta QA. Detalle: [`auditoría fechada`](docs/audits/seo/BEREL_OCTOBER_2026_CONTENT_PRODUCTION_2026-08-26.md).
-
-## 2026-08-25 — Vacaciones contractor por aniversario y mensajes TeamBot 1:1
-
-**Sólo documentación y skills en esta pasada; no se cambió runtime.** Se documentó el caso acotado de Melkin Hernandez (`hire_date=2025-07-15`) y Andrés Carlosama (`hire_date=2025-11-11`), ambos `contractor` + `international` + `deel`. Sus perfiles muestran 15 días disponibles, 0 usados y 0 reservados. Nexa ya les comunicó individualmente que los 15 días se vinculan al primer aniversario, con Daniela como supervisora inmediata y al menos cinco días hábiles de anticipación.
-
-**Drift abierto:** el runtime entrega hoy 15 días fijos incluso a Andrés antes del aniversario; la carta global de beneficios describe 15 días anuales prorrateados y progresión por antigüedad; la comunicación aprobada del caso usa el primer aniversario. No se generalizó ninguna de las tres como política nueva. Auditoría: `docs/audits/payroll/CONTRACTOR_VACATION_ANNIVERSARY_AUDIT_2026-08-25.md`.
-
-**TeamBot:** `pnpm teams:announce` sigue siendo group/channel-only y el CLI 1:1 existente es exclusivo de pagos. Para un one-off genérico aprobado, las skills y el runbook admiten únicamente un puente temporal sobre el dispatcher/audit writers canónicos, con Entra revalidado, card-only, preview/confirmación, idempotencia, deduplicación y `source_sync_runs`. `succeeded` no es read receipt. Los mensajes recurrentes convergen a Notification Hub `dynamic_user`.
-
-**Pendiente con dueño:** People + Payroll + Legal deben decidir la política contractual de vacaciones para contractors Deel; después corresponde corregir precedencia/cálculo, reconciliar saldos y alinear carta, acuerdos y copy. No se abrió ADR porque aún no hay decisión aceptada.

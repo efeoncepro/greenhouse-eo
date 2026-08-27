@@ -1,5 +1,19 @@
 # TASK-1780 — El inventario de tools MCP es un manifiesto, no dos listas
 
+## Delta 2026-08-27 — TASK-1658 ejecutada: el caso vivo de las 3 tools ya no existe
+
+- `TASK-1658` federó las **8** tools que estaban ausentes (el drift había crecido de 3 a 8) y dejó el
+  guard del gateway **bidireccional**: `GREENHOUSE_SEO_TOOL_INVENTORY` (espejo committeado en
+  `efeonce-mcp`, con claves de inputSchema + clase `writes`) + paridad de schema + annotations
+  obligatorias, con introspección runtime del server.
+- **La "Evidencia de cierre" del Slice 3 quedó stale**: al correr el guard hoy ya NO detecta tools
+  invisibles (están federadas). La evidencia de esta task debe usar el caso sintético del test de
+  regresión de `efeonce-mcp/test/greenhouse-seo-tool-parity.test.ts` (agregar una tool al manifiesto
+  sin federar → rojo nombrándola), no el caso real ya corregido.
+- El espejo del gateway es el dato que esta task reemplaza como fuente del guard (Slice 3): el shape
+  que el guard consume hoy (`tool` + `inputKeys` + `writes`) es exactamente lo que el manifiesto
+  canónico debe publicar como mínimo.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
