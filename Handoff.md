@@ -2,6 +2,45 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-27 — Release a producción ejecutado: carril Growth SEO completo (sesión de coordinación)
+
+**Manifest `released`.** `main` = `cc73c74789ce9e667096d5316e9d991fd4a2186a`, release_id
+`cc73c74789ce-dbce65f2-303b-4528-bef3-f4edd022a880`, run `33123977671`, todos los jobs verdes
+(Azure con su `Skip Bicep deploy (no diff)` esperado, post-release health check verde). Producción
+responde 200 en `/api/auth/health` con los 3 providers `ready`.
+
+**Flags prendidos**: `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` (Vercel, sign-off comercial otorgado) y
+`GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (Vercel Production). Redeploy `greenhouse-if2u2c8ys`.
+`pnpm flags:audit --strict`: 0 flags ON sin lector en `main`, 0 con lector divergente.
+
+**Rollout de la tríada, verificado antes del pase**: los 3 flags ON en la revisión activa del
+ops-worker y los 3 schedulers `ENABLED`; smokes live por USD 0,2958 (total del día USD 1,0176,
+cruzado contra `seo_provider_spend_daily`). Se atajó un bug real: `deploy.sh` conservaba el 5.º arg
+de `upsert_scheduler_job` en `"true"`, así que el siguiente deploy habría **re-pausado los
+schedulers en silencio** (fallo silencioso versión scheduler); corregido en `7c1a44962` y verificado
+post-deploy.
+
+**PENDIENTES que quedan abiertos:**
+
+1. **Deploy del gateway MCP (TASK-1658).** Los lanes ya están en `main`, así que la federación ya no
+   daría 404 upstream. Faltan: push de los 5 commits de `efeonce-mcp` (`f1a2b44`…`220e916`, árbol
+   limpio), deploy del gateway, `tools/list` 13→21 y canary completo contra producción. **La sesión
+   que lo tenía (`greenhouse-eo-f7`) terminó antes de que el manifest cerrara**, así que esto no
+   tiene dueño activo. El flag de prospect está **ON**, no OFF — el canary debe esperar ON.
+2. **TASK-1777 sigue `rollout parcialmente verificado`.** El veredicto `skipped_no_movement` no pudo
+   observarse (ambos targets del smoke eran `first_time`, así que el predicado sólo podía dar
+   `drilled`). La re-corrida a USD 0 falsa la idempotencia por snapshot, que es una compuerta
+   distinta. Verificación en el ciclo natural del **lunes 2026-08-31** post 07:00 CLT
+   (`ops-seo-backlink-capture`); la consulta está en el task file. Exposición si el predicado
+   fallara: ~USD 0,18 por ciclo semanal.
+3. **TASK-1775/1776 no se mueven a `complete` todavía**: su propio checkbox de cierre operativo exige
+   el deploy del gateway con la federación verificada (`tools/list` 13→21), que es el pendiente 1.
+4. **Revisión Sentry del 2026-08-29** para `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (punto 1 de su
+   fila en el ledger): conteos `blocked_redirect`/`blocked_private_address`.
+5. **Watchdog en falso positivo (TASK-920).** Reporta DRIFT comparando contra un commit del 2026-07-30
+   y su `recommended_action` propone redeployar un SHA viejo sobre workers correctos. **No obedecerlo.**
+   La fuente autoritativa es `pnpm release:workers`.
+
 ## 2026-08-27 — TASK-1658: federación SEO completa en el gateway + guard bidireccional (code complete, rollout pendiente)
 
 **La federación MCP que la tríada dejó pendiente ya está ESCRITA** (la entrada de abajo decía "la
@@ -285,9 +324,3 @@ esté en producción con su flag ON.
 **Pendiente con dueño, por retorno:** (1) `TASK-1746` — `purge_assessment_access_recovery` con **cero callers**: la retención de 12 meses no se ejecuta; único hallazgo con filo legal. (2) `TASK-1718` — el fix H-10 sigue sin escribirse. (3) `TASK-1742` — re-verificar el canary tras los fixes del 08-19. (4) `HIRING_VACANCY_AI_ENABLED` — ON en Production hace 41 días **sin** el smoke de staging que era su precondición: decidir si se corre o se declara superado. (5) `TASK-1747` — re-auditar sus 8 hallazgos «abiertos»; es triage, no código.
 
 **Verificación.** `pnpm ops:lint --changed`: 6 tasks `errors=0 warnings=0`, warning de paridad de `EPIC-011` cerrado. `pnpm task:lint --task TASK-1751` verde. Sin gate de runtime: el cambio no toca runtime.
-
-## 2026-08-26 — Berel: producción creativa de octubre creada y auditada en Notion
-
-**Estado vivo:** [`Produccion Creativa - Octubre 26`](https://app.notion.com/p/3c839c2fefe7813c9450e2f35cb4021e) está `En curso`: 8 artículos N35–N42, 32 banners, 32 derivados y 32 subítems sociales. Fechas: 7, 14 y 16 de octubre, respectivamente.
-
-**Evidencia y siguiente paso:** producción editorial N35–N42 completa para revisión. La lectura final corrigió 54 fechas y validó las 18 filas nuevas más la paridad de 8 tareas/subítems. N41–N42 aún son soft-404: bloquear enlaces, CMS y redes hasta QA. Detalle: [`auditoría fechada`](docs/audits/seo/BEREL_OCTOBER_2026_CONTENT_PRODUCTION_2026-08-26.md).
