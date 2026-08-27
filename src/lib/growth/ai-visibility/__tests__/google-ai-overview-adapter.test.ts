@@ -280,6 +280,125 @@ describe('growth/ai-visibility — Google AI Overview adapter', () => {
     expect(obs.errorCode).toBe('invalid_response')
   })
 
+  it('parser lock (shape real sandbox): references anidadas en ai_overview_element llegan a citations sin duplicar', () => {
+    // Fixture derivado de una respuesta REAL del sandbox AI Mode (2026-08-27): el item
+    // `ai_overview` trae `markdown` + `references[]` top-level + `items[]` anidados de tipo
+    // `ai_overview_element`, cada uno con sus propias `references[]` (shape doc §4.1:
+    // type/position/source/domain/url/title/text). El proveedor DUPLICA referencias arriba
+    // (top ⊇ anidadas en el sandbox), pero el descenso cubre el caso donde una referencia
+    // solo existe anidada.
+    const parsed = parseDataForSeoGoogleAiModeBlock([
+      {
+        id: 'task-1',
+        status_code: 20000,
+        result: [
+          {
+            keyword: 'which agencies are recommended for enterprise growth in chile',
+            type: 'ai_mode',
+            item_types: ['ai_overview'],
+            items: [
+              {
+                type: 'ai_overview',
+                rank_group: 1,
+                rank_absolute: 1,
+                position: 'left',
+                markdown: 'Enterprise growth agencies in Chile include Efeonce, known for ASaaS operations.',
+                references: [
+                  {
+                    type: 'ai_overview_reference',
+                    position: 'right',
+                    source: 'Efeonce',
+                    domain: 'efeoncepro.com',
+                    url: 'https://efeoncepro.com/',
+                    title: 'Efeonce — Agencia',
+                    text: 'Efeonce is an enterprise growth agency…'
+                  }
+                ],
+                items: [
+                  {
+                    type: 'ai_overview_element',
+                    position: 'left',
+                    title: 'Top agencies',
+                    text: 'Efeonce and Cebra lead the enterprise segment.',
+                    markdown: null,
+                    links: null,
+                    images: null,
+                    references: [
+                      {
+                        type: 'ai_overview_reference',
+                        position: 'left',
+                        source: 'Efeonce',
+                        domain: 'efeoncepro.com',
+                        url: 'https://efeoncepro.com/',
+                        title: 'Efeonce — Agencia',
+                        text: 'Efeonce is an enterprise growth agency…'
+                      },
+                      {
+                        type: 'ai_overview_reference',
+                        position: 'left',
+                        source: 'Cebra',
+                        domain: 'cebra.cl',
+                        url: 'https://www.cebra.cl/casos',
+                        title: 'Casos — Cebra',
+                        text: 'Casos de éxito de Cebra…'
+                      }
+                    ]
+                  },
+                  {
+                    type: 'ai_overview_table_element',
+                    position: 'left',
+                    markdown: '| Agency | Focus |',
+                    references: [
+                      {
+                        type: 'ai_overview_reference',
+                        position: 'left',
+                        source: 'Clutch',
+                        domain: 'clutch.co',
+                        url: 'https://clutch.co/cl/agencies',
+                        title: 'Top Chile Agencies',
+                        text: 'Directory of agencies in Chile…'
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ])
+
+    // Texto: SOLO el markdown del bloque padre (los textos anidados duplicarían el hash).
+    expect(parsed.text).toBe('Enterprise growth agencies in Chile include Efeonce, known for ASaaS operations.')
+
+    // Citas: top-level + anidadas (element y table), dedupe por URL (efeoncepro.com aparece
+    // arriba Y anidada — una sola vez).
+    expect(parsed.citations.map(c => c.domain)).toEqual(['efeoncepro.com', 'cebra.cl', 'clutch.co'])
+  })
+
+  it('parser: bloque ai_overview sin markdown usa el texto de los elementos anidados', () => {
+    const parsed = parseDataForSeoGoogleAiModeBlock([
+      {
+        status_code: 20000,
+        result: [
+          {
+            items: [
+              {
+                type: 'ai_overview',
+                items: [
+                  { type: 'ai_overview_element', text: 'Nested answer fragment about Efeonce.', references: [] },
+                  { type: 'ai_overview_expanded_element', text: 'Expanded detail fragment.' }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ])
+
+    expect(parsed.text).toBe('Nested answer fragment about Efeonce.\n\nExpanded detail fragment.')
+  })
+
   it('parser lock: acepta ai_overview_element y referencias heterogeneas', () => {
     const parsed = parseDataForSeoGoogleAiModeBlock([
       {

@@ -9,8 +9,9 @@ código + apéndice live de DataForSEO (`location_code` verificados: CL=2152, MX
 PE=2604, US=2840) + sandbox AI Mode (el proveedor duplica `references[]` top-level ⊇ anidadas →
 fix (3) es defensa con dedupe existente). Plan: Slice 1 mapa market→location_code + gate per-task
 `status_code`; Slice 2 descenso anidado + fixture shape real; Slice 3 smoke live + dimensionamiento
-histórico en staging PG. Drift detectado: el SKILL.md de `dataforseo-operator` tiene todas las
-cifras `$0.xxxx` corrompidas como `TASK-1652.xxxx` (search-replace accidental) — corregir al cierre.
+histórico en staging PG. (Falso positivo descartado: las cifras `$0.xxxx` del SKILL.md de
+`dataforseo-operator` se veían corrompidas solo en el RENDER de la Skill tool — sustitución
+posicional `$0` por el primer token de los args; el archivo en disco está intacto.)
 
 ## 2026-08-27 — TASK-1709: el módulo SEO aprende a hablarle a quien no firmó
 

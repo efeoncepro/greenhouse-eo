@@ -123,6 +123,27 @@ const collectCitationCandidates = (record: UnknownRecord): Array<{ url: string; 
 const readItemText = (item: UnknownRecord): string | null =>
   readString(item, ['markdown', 'text', 'content', 'answer', 'description', 'title'])
 
+/**
+ * TASK-1652 — Tipos de elementos anidados dentro del item `ai_overview` que cargan
+ * `references[]`/`links[]` propias (doc AI Mode §4.1). Descenso ACOTADO a un nivel
+ * (el shape documentado no anida más), nunca recursión ilimitada.
+ */
+const NESTED_AI_ELEMENT_TYPES = new Set(['ai_overview_element', 'ai_overview_table_element', 'ai_overview_expanded_element'])
+
+const collectNestedAiElements = (item: UnknownRecord): UnknownRecord[] => {
+  const nested: UnknownRecord[] = []
+
+  for (const sub of asArray(item.items)) {
+    const subRecord = asRecord(sub)
+
+    if (subRecord && NESTED_AI_ELEMENT_TYPES.has(readString(subRecord, ['type']) ?? '')) {
+      nested.push(subRecord)
+    }
+  }
+
+  return nested
+}
+
 export const parseDataForSeoGoogleAiModeBlock = (tasks: unknown[]): ParsedAiModeBlock => {
   const items = collectResultItems(tasks)
 
@@ -132,8 +153,36 @@ export const parseDataForSeoGoogleAiModeBlock = (tasks: unknown[]): ParsedAiMode
     return type === 'ai_overview' || type === 'ai_overview_element' || type === 'ai_mode'
   })
 
-  const textParts = aiItems.map(readItemText).filter((text): text is string => Boolean(text))
-  const citationCandidates = aiItems.flatMap(collectCitationCandidates)
+  const textParts: string[] = []
+  const citationCandidates: Array<{ url: string; title?: string | null; domain?: string | null }> = []
+
+  for (const item of aiItems) {
+    const nested = collectNestedAiElements(item)
+    const ownText = readItemText(item)
+
+    if (ownText) {
+      // El `markdown` del bloque padre ya contiene el answer completo — los textos
+      // anidados serían duplicado dentro del hash/excerpt.
+      textParts.push(ownText)
+    } else {
+      for (const sub of nested) {
+        const subText = readItemText(sub)
+
+        if (subText) {
+          textParts.push(subText)
+        }
+      }
+    }
+
+    // Citas: nivel superior + elementos anidados. El proveedor puede duplicar las
+    // references arriba (observado en sandbox: top ⊇ anidadas) — `buildCitations`
+    // dedupea por URL, así que recolectar ambos niveles nunca doble-cuenta.
+    citationCandidates.push(...collectCitationCandidates(item))
+
+    for (const sub of nested) {
+      citationCandidates.push(...collectCitationCandidates(sub))
+    }
+  }
 
   return {
     text: textParts.length > 0 ? textParts.join('\n\n') : null,
