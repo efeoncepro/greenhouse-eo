@@ -2108,3 +2108,23 @@ probes y por `brand-intelligence/fetch-site-content`) pasa de tener garantías a
   vieja — muro Imperva/Incapsula con loop de cookies, NO regresión; evidencia para TASK-1281 headless). `ISSUE-164`
   quedó `resolved` (2026-08-27). Residuales fechados (revisión Sentry de `blocked_*` el 2026-08-29 + flip de la env var
   en Vercel Production con el release) viven en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` § Pendientes.
+
+## Delta 2026-08-27 — TASK-1697: el sustrato de sitio sale de `probes/` a `growth/site-substrate` (con shims)
+
+- **El sustrato es un primitive con dueño propio:** `src/lib/growth/site-substrate/` (`site-fetch.ts` —ex
+  `probes/safe-fetch.ts`—, `html.ts`, `robots-policy.ts`, `read-body.ts`, `contracts.ts`, barrel `index.ts`),
+  movido con `git mv` y **diff puro** (fuera de renombres `Probe*`→`Site*` sólo cambió la cabecera y la
+  reubicación del flag reader `isProbeFetchStrictNetworkEnabled`, que es del fetcher y viaja con él). Regla de
+  corte: **se comparte cómo se OBTIENE la evidencia; nunca cómo se JUZGA** — scoring, probes, prompts y review
+  gates se quedan en el dominio AEO.
+- **Ningún dependiente cambió una línea:** `probes/safe-fetch.ts`, `probes/html.ts`, `probes/read-body.ts`,
+  `probes/robots-policy.ts` y el bloque de tipos de `probes/contracts.ts` quedaron como re-export shims (alias,
+  cero lógica). Retirarlos reescribiendo los consumers al barrel es follow-up declarado de la task.
+- **`ai-visibility/probes/**` es PRIVADO del dominio, con detector:** lint rule
+  `greenhouse/growth-substrate-boundary` en `error` desde commit-1 (cero violaciones, cero exenciones) — nadie
+  fuera de `ai-visibility/**` importa `probes/**`; la puerta para consumidores externos (SEO site-audit
+  TASK-1670, análisis de contenido TASK-1701, diagnóstico de prospecto TASK-1709) es
+  `@/lib/growth/site-substrate`. La carta del sustrato (no importa `growth/*`, no persiste, única transversal
+  `@/lib/observability/capture`) la verifican la misma rule + el test de frontera por allowlist.
+- Consumers del grader siguen intactos por los shims; canario: `growth.ai_visibility.probe_failure_rate`.
+  Detalle y mitad B (rule universal + barrel AEO): `TASK-1713`.

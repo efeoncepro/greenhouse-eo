@@ -911,8 +911,19 @@ runbook de extracción, no deuda oculta.
   declarada (ni `grader_*`, ni core adicional, ni delivery/finance/payroll). Cruces = por `organization_id` en
   derived reads.
 - **NUNCA** importar desde `src/lib/growth/seo/**` módulos de otros dominios de Greenhouse, salvo primitives
-  transversales canónicas (postgres client, entitlements runtime, copy, observabilidad). El grafo de imports del
-  dominio debe poder cortarse con el seam.
+  transversales canónicas (postgres client, entitlements runtime, copy, observabilidad) **y el sustrato de
+  sitio `@/lib/growth/site-substrate`** (TASK-1697: fetcher SSRF-guarded + parseo HTML/robots, con carta
+  verificable — no importa `growth/*`, no persiste; dice cómo se OBTIENE la evidencia, nunca cómo se JUZGA).
+  El grafo de imports del dominio debe poder cortarse con el seam.
+  - **Detector real (TASK-1697):** la lint rule `greenhouse/growth-substrate-boundary` (en `error`, cero
+    exenciones) vigila las dos fronteras que HOY tienen cero violaciones: nadie fuera de
+    `ai-visibility/**` importa `ai-visibility/probes/**` (la puerta externa es el sustrato), y
+    `site-substrate/**` no importa `@/lib/growth/*`. Segunda capa: el test de frontera por allowlist
+    `site-substrate/__tests__/package-boundary.test.ts`.
+  - ⚠️ **El detector UNIVERSAL de deep imports `growth/*` todavía NO existe** — no leer esta regla como si
+    ya estuviera cubierta: al 2026-08-15 hay **30 deep imports cross-dominio vivos, 18 fuera del par
+    `seo↔ai-visibility`**, y legalizarlos exige decidir la superficie pública de `forms`/`meetings`/
+    `public-submission`. Dueña: `TASK-1713` (rule `no-cross-domain-import-in-growth` + barrel AEO).
 - **SIEMPRE** que un consumer nuevo necesite datos SEO (UI, Nexa, MCP, sister platform), entrar por los readers
   canónicos o el lane ecosystem — nunca SQL directo cross-dominio. El lane ecosystem es el contrato que sobrevive
   la extracción.

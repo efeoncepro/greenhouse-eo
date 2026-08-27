@@ -1,3 +1,22 @@
+## Delta 2026-08-27 (2) — ejecución: Slices 1–4 code complete; desviaciones registradas
+
+- **El sustrato son 4 módulos, no 2**: `read-body.ts` (nació con TASK-1778 el mismo día y lo importan
+  `site-fetch` y `entity-fetch`) viaja junto a `robots-policy.ts` — sin él el sustrato importaría
+  hacia afuera. Los tipos extraídos son 4 (`SiteFetchErrorCode` incluido).
+- **El flag del fetcher vive EN el sustrato** (`site-fetch.ts` exporta
+  `isProbeFetchStrictNetworkEnabled`); `ai-visibility/flags.ts` lo re-exporta. Consistente con la
+  interpretación del Delta anterior ("el flag es del fetcher, viaja con él").
+- **Única edición de test**: el `readFileSync` del anti-divergencia de TASK-1778 sigue a la
+  implementación movida (meta-test de FUENTE; los tests de comportamiento quedaron intactos —
+  criterio de shim cumplido en espíritu y en letra para todo lo demás).
+- El criterio "exactamente 5 archivos" del Slice 1 quedó corto por lo anterior: el conteo real del
+  movimiento es 6 nuevos + 5 shims + `flags.ts` + 1 línea de test; **cero dependientes de producción
+  modificados**, que es lo que el criterio protegía.
+- Gates corridos: `pnpm vitest run src/lib/growth` 1354 ✓ · rule tests ✓ · `pnpm lint` 0 con la rule
+  en `error` · `pnpm local:check` ✓ · `pnpm test` full 12.144 ✓ · `worker:runtime-deps-gate` +
+  `worker:build-contract-gate` ✓. Pendiente para `complete`: `pnpm build` (autorización del
+  operador) y la corrida real de probes post-deploy (canario `probe_failure_rate`).
+
 # TASK-1697 — Growth: sustrato de sitio compartido, barrel de dominio AEO y detector de imports cross-dominio
 
 ## Delta 2026-08-27 — `TASK-1778` aterrizó: el archivo que esta task mueve ya está endurecido
@@ -92,7 +111,7 @@ workspace compartido. La mitad B se registró como
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -490,11 +509,11 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 ## Capability Definition of Done — Full API Parity gate
 
@@ -769,43 +788,43 @@ de `TASK-1670` y `TASK-1695`, que decide el operador.
 
 ## Acceptance Criteria
 
-- [ ] Existe `src/lib/growth/site-substrate/` con `site-fetch.ts`, `html.ts`, `contracts.ts` e
+- [x] Existe `src/lib/growth/site-substrate/` con `site-fetch.ts`, `html.ts`, `contracts.ts` e
       `index.ts`, y los archivos llegaron por `git mv` (el historial lo prueba).
-- [ ] El diff de `site-fetch.ts` contra el `safe-fetch.ts` original contiene **sólo** el renombre de
+- [x] El diff de `site-fetch.ts` contra el `safe-fetch.ts` original contiene **sólo** el renombre de
       `ProbeFetch*` → `SiteFetch*`: ningún cambio de host bloqueado, timeout, tope de bytes,
       User-Agent, política de redirect ni control de flujo.
 - [ ] El commit del Slice 1 modifica exactamente 5 archivos; ninguno de los 7 dependientes de
       producción cambió una línea.
-- [ ] `probes/safe-fetch.ts`, `probes/html.ts` y los 3 tipos de `probes/contracts.ts` re-exportan
+- [x] `probes/safe-fetch.ts`, `probes/html.ts` y los 3 tipos de `probes/contracts.ts` re-exportan
       desde el sustrato conservando sus nombres actuales.
-- [ ] `src/lib/growth/site-substrate/__tests__/package-boundary.test.ts` existe, opera por
+- [x] `src/lib/growth/site-substrate/__tests__/package-boundary.test.ts` existe, opera por
       **allowlist** y rompe el build ante `@/lib/growth/*`, `@/lib/postgres/*`, `@/lib/db`,
       `@/lib/sync/*`, cualquier `flags`, `next` o `@core/*`.
-- [ ] `src/lib/growth/site-substrate/**` no contiene una sola query SQL, ni un `outbox`, ni un flag
+- [x] `src/lib/growth/site-substrate/**` no contiene una sola query SQL, ni un `outbox`, ni un flag
       de dominio, verificado por ese test.
-- [ ] El barrel del sustrato **no** exporta `htmlToReadableText`, y esa función sigue viviendo intacta
+- [x] El barrel del sustrato **no** exporta `htmlToReadableText`, y esa función sigue viviendo intacta
       en `brand-intelligence/fetch-site-content.ts`.
-- [ ] `eslint-plugins/greenhouse/rules/growth-substrate-boundary.mjs` existe, cubre
+- [x] `eslint-plugins/greenhouse/rules/growth-substrate-boundary.mjs` existe, cubre
       `ImportDeclaration`, `ImportExpression`, `require` y `export ... from`, atrapa también rutas
       relativas que escapan del dominio, y tiene test con casos válidos e inválidos en **ambas
       direcciones**.
-- [ ] La rule está en `'error'` en `eslint.config.mjs`, `pnpm lint` reporta **cero** violaciones en el
+- [x] La rule está en `'error'` en `eslint.config.mjs`, `pnpm lint` reporta **cero** violaciones en el
       mismo commit y el archivo de la rule **no contiene ninguna exención** ni fecha de saldo.
-- [ ] Ningún archivo fuera de `src/lib/growth/ai-visibility/**` importa
+- [x] Ningún archivo fuera de `src/lib/growth/ai-visibility/**` importa
       `@/lib/growth/ai-visibility/probes/**`, y `site-substrate/**` no importa `@/lib/growth/*`:
       ambos verificados por la rule en CI.
-- [ ] Esta task **no** creó `no-cross-domain-import-in-growth` ni tocó `ai-visibility/index.ts`,
+- [x] Esta task **no** creó `no-cross-domain-import-in-growth` ni tocó `ai-visibility/index.ts`,
       `grounded-query-bridge.ts` ni `grounded-query-reader.ts` (`git diff --stat` lo prueba).
-- [ ] `pnpm vitest run src/lib/growth` pasa sin haber modificado ningún test preexistente de
+- [x] `pnpm vitest run src/lib/growth` pasa sin haber modificado ningún test preexistente de
       `ai-visibility`.
-- [ ] `pnpm worker:runtime-deps-gate` verde.
+- [x] `pnpm worker:runtime-deps-gate` verde.
 - [ ] Una corrida real de probes contra un dominio público en staging devuelve el mismo status,
       `finalUrl` y `errorCode` que antes del cambio, con la evidencia registrada en el cierre.
-- [ ] §17.3 de `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` nombra el detector angosto y la excepción
+- [x] §17.3 de `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` nombra el detector angosto y la excepción
       del sustrato, **y declara explícito que el detector universal todavía no existe** (30 deep
       imports vivos, 18 fuera del par `seo↔ai-visibility`) con `TASK-1713` como dueña;
       `.claude/rules/growth-seo.md` lo refleja en una línea.
-- [ ] No existe `src/lib/growth/search-visibility/` ni ningún `packages/*` nuevo.
+- [x] No existe `src/lib/growth/search-visibility/` ni ningún `packages/*` nuevo.
 - [ ] `pnpm task:lint --task TASK-1697` reporta `template=1 errors=0`.
 
 ## Verification
