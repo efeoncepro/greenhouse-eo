@@ -20,7 +20,7 @@ import {
   type GrowthAiVisibilityProviderObservation
 } from '../contracts'
 import { isGraderEnabled, isProviderFlagEnabled } from '../flags'
-import { boundedExcerpt, buildCitations, sha256Hex } from '../observation'
+import { boundedExcerpt, buildCitations, normalizeDomain, sha256Hex } from '../observation'
 import {
   buildFailedObservation,
   buildSkippedObservation,
@@ -39,6 +39,13 @@ type UnknownRecord = Record<string, unknown>
 interface ParsedAiModeBlock {
   text: string | null
   citations: GrowthAiVisibilityCitation[]
+  /**
+   * TASK-1652 — references reales cuyo `domain`/`url` apuntan al wrapper de Google
+   * (`google.com/goto`/`searchviewer`) y cuyo `source` es un nombre de marca no
+   * convertible a dominio. Se DESCARTAN (atribuirlas a google.com sería falso) pero
+   * se cuentan para observabilidad en `usage`.
+   */
+  unattributableCitations: number
 }
 
 const asRecord = (value: unknown): UnknownRecord | null =>
@@ -92,8 +99,37 @@ const collectResultItems = (tasks: unknown[]): UnknownRecord[] => {
   return items
 }
 
-const collectCitationCandidates = (record: UnknownRecord): Array<{ url: string; title?: string | null; domain?: string | null }> => {
-  const candidates: Array<{ url: string; title?: string | null; domain?: string | null }> = []
+/**
+ * TASK-1652 (verificado contra respuesta live 2026-08-27) — Google envuelve TODAS las
+ * references de AI Mode en redirects propios: `domain` llega como `google.com` y `url`
+ * como `google.com/goto?url=<token opaco>` / `google.com/searchviewer`. La identidad
+ * real de la fuente viene SOLO en `source` — a veces dominio (`agenciagrowth.cl`),
+ * a veces marca (`Bigbuda`). Sin este manejo, cada cita se atribuía a google.com y el
+ * SoV de citabilidad quedaba envenenado (la marca jamás aparecería citada).
+ */
+const GOOGLE_REDIRECT_HOSTS = new Set(['google.com', 'www.google.com'])
+
+const isGoogleRedirectWrapper = (url: string, rawDomain: string | null): boolean => {
+  if (rawDomain && GOOGLE_REDIRECT_HOSTS.has(rawDomain.trim().toLowerCase())) {
+    return true
+  }
+
+  try {
+    return GOOGLE_REDIRECT_HOSTS.has(new URL(url).hostname.toLowerCase())
+  } catch {
+    return false
+  }
+}
+
+interface CitationCollection {
+  candidates: Array<{ url: string; title?: string | null; domain?: string | null }>
+  /** URLs de refs envueltas sin dominio derivable — el caller dedupea (top ⊇ anidadas). */
+  unattributableUrls: string[]
+}
+
+const collectCitationCandidates = (record: UnknownRecord): CitationCollection => {
+  const candidates: CitationCollection['candidates'] = []
+  const unattributableUrls: string[] = []
 
   for (const key of ['references', 'links', 'sources']) {
     for (const entry of asArray(record[key])) {
@@ -109,15 +145,35 @@ const collectCitationCandidates = (record: UnknownRecord): Array<{ url: string; 
         continue
       }
 
+      const rawDomain = readString(entryRecord, ['domain', 'source_domain', 'host'])
+
+      if (isGoogleRedirectWrapper(url, rawDomain)) {
+        // El dominio real solo puede salir de `source`. Marca no domain-shaped →
+        // descartar honesto (nunca atribuir a google.com) + contar para telemetría.
+        const sourceDomain = normalizeDomain(readString(entryRecord, ['source']))
+
+        if (!sourceDomain) {
+          unattributableUrls.push(url)
+          continue
+        }
+
+        candidates.push({
+          url,
+          title: readString(entryRecord, ['title', 'text', 'source']) ?? undefined,
+          domain: sourceDomain
+        })
+        continue
+      }
+
       candidates.push({
         url,
         title: readString(entryRecord, ['title', 'text', 'source']) ?? undefined,
-        domain: readString(entryRecord, ['domain', 'source_domain', 'host'])
+        domain: rawDomain
       })
     }
   }
 
-  return candidates
+  return { candidates, unattributableUrls }
 }
 
 const readItemText = (item: UnknownRecord): string | null =>
@@ -155,6 +211,17 @@ export const parseDataForSeoGoogleAiModeBlock = (tasks: unknown[]): ParsedAiMode
 
   const textParts: string[] = []
   const citationCandidates: Array<{ url: string; title?: string | null; domain?: string | null }> = []
+  const unattributableUrls = new Set<string>()
+
+  const collectFrom = (record: UnknownRecord) => {
+    const collection = collectCitationCandidates(record)
+
+    citationCandidates.push(...collection.candidates)
+
+    for (const url of collection.unattributableUrls) {
+      unattributableUrls.add(url)
+    }
+  }
 
   for (const item of aiItems) {
     const nested = collectNestedAiElements(item)
@@ -175,18 +242,19 @@ export const parseDataForSeoGoogleAiModeBlock = (tasks: unknown[]): ParsedAiMode
     }
 
     // Citas: nivel superior + elementos anidados. El proveedor puede duplicar las
-    // references arriba (observado en sandbox: top ⊇ anidadas) — `buildCitations`
+    // references arriba (observado en sandbox y live: top ⊇ anidadas) — `buildCitations`
     // dedupea por URL, así que recolectar ambos niveles nunca doble-cuenta.
-    citationCandidates.push(...collectCitationCandidates(item))
+    collectFrom(item)
 
     for (const sub of nested) {
-      citationCandidates.push(...collectCitationCandidates(sub))
+      collectFrom(sub)
     }
   }
 
   return {
     text: textParts.length > 0 ? textParts.join('\n\n') : null,
-    citations: buildCitations(citationCandidates)
+    citations: buildCitations(citationCandidates),
+    unattributableCitations: unattributableUrls.size
   }
 }
 
@@ -399,7 +467,14 @@ export const createGoogleAiOverviewProviderAdapter = (): ProviderAdapter => ({
         answerTextHash: sha256Hex(parsed.text),
         answerExcerpt: boundedExcerpt(parsed.text),
         citations: parsed.citations,
-        usage,
+        usage: {
+          ...usage,
+          // Refs envueltas por Google sin dominio derivable desde `source` — se descartan
+          // (nunca atribuir a google.com); el conteo queda observable para dimensionar.
+          ...(parsed.unattributableCitations > 0
+            ? { dataforseo_citations_unattributable: parsed.unattributableCitations }
+            : {})
+        },
         latencyMs: result.latencyMs,
         rawEvidencePointer: null
       })

@@ -399,6 +399,108 @@ describe('growth/ai-visibility — Google AI Overview adapter', () => {
     expect(parsed.text).toBe('Nested answer fragment about Efeonce.\n\nExpanded detail fragment.')
   })
 
+  it('parser (wrapper real de Google): dominio desde source, marca no atribuible se descarta y se cuenta', () => {
+    // Fixture derivado de la respuesta LIVE real (2026-08-27): Google envuelve TODAS las
+    // references en redirects propios (`domain: google.com`, `url: google.com/goto?url=<token>`)
+    // y la identidad real solo viene en `source` — a veces dominio, a veces marca.
+    const wrappedRef = (source: string, token: string) => ({
+      type: 'ai_overview_reference',
+      position: 'right',
+      source,
+      domain: 'google.com',
+      url: `https://google.com/goto?url=${token}`,
+      title: `${source} — página citada`,
+      text: 'Extracto de la fuente…'
+    })
+
+    const parsed = parseDataForSeoGoogleAiModeBlock([
+      {
+        status_code: 20000,
+        result: [
+          {
+            items: [
+              {
+                type: 'ai_overview',
+                markdown: 'Recommended agencies include several established firms.',
+                references: [
+                  wrappedRef('agenciagrowth.cl', 'tokenA'),
+                  wrappedRef('www.metrix.digital', 'tokenB'),
+                  wrappedRef('Bigbuda', 'tokenC'),
+                  wrappedRef('Google', 'tokenD')
+                ],
+                items: [
+                  {
+                    type: 'ai_overview_element',
+                    text: 'Fragment.',
+                    // La misma ref envuelta duplicada anidada (top ⊇ anidadas, observado live):
+                    // ni doble cita ni doble conteo de no-atribuibles.
+                    references: [wrappedRef('agenciagrowth.cl', 'tokenA'), wrappedRef('Bigbuda', 'tokenC')]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ])
+
+    // Dominio real derivado de `source` (nunca google.com); marcas no atribuibles descartadas.
+    expect(parsed.citations.map(c => c.domain)).toEqual(['agenciagrowth.cl', 'metrix.digital'])
+    expect(parsed.citations.every(c => c.domain !== 'google.com')).toBe(true)
+
+    // Bigbuda + Google descartadas, dedupeadas por URL (la anidada repetida no suma).
+    expect(parsed.unattributableCitations).toBe(2)
+  })
+
+  it('adapter: usage expone dataforseo_citations_unattributable cuando hay refs envueltas sin dominio', async () => {
+    enable()
+    mockConfigured.mockResolvedValue(true)
+    mockPost.mockResolvedValue({
+      ok: true,
+      httpStatus: 200,
+      endpoint: '/v3/serp/google/ai_mode/live/advanced',
+      tasks: [
+        {
+          id: 'task-1',
+          status_code: 20000,
+          result: [
+            {
+              items: [
+                {
+                  type: 'ai_overview',
+                  markdown: 'Answer with wrapped references.',
+                  references: [
+                    {
+                      source: 'agenciagrowth.cl',
+                      domain: 'google.com',
+                      url: 'https://google.com/goto?url=tokenA',
+                      title: 'Fuente atribuible'
+                    },
+                    {
+                      source: 'Bigbuda',
+                      domain: 'google.com',
+                      url: 'https://google.com/goto?url=tokenC',
+                      title: 'Fuente no atribuible'
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      cost: 0.004,
+      latencyMs: 900,
+      secretSource: 'secret_manager'
+    })
+
+    const obs = await createGoogleAiOverviewProviderAdapter().runPrompt({ ...PROMPT, market: 'CL' }, ctx())
+
+    expect(obs.status).toBe('succeeded')
+    expect(obs.citations.map(c => c.domain)).toEqual(['agenciagrowth.cl'])
+    expect(obs.usage.dataforseo_citations_unattributable).toBe(1)
+  })
+
   it('parser lock: acepta ai_overview_element y referencias heterogeneas', () => {
     const parsed = parseDataForSeoGoogleAiModeBlock([
       {
