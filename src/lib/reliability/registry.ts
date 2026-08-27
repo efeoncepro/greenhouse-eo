@@ -620,7 +620,8 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'src/lib/reliability/queries/seo-audit-stuck-tasks.ts',
       'src/lib/reliability/queries/seo-keyword-discovery-health.ts',
       'src/lib/reliability/queries/seo-domain-overview-staleness.ts',
-      'src/lib/reliability/queries/seo-url-visibility-staleness.ts'
+      'src/lib/reliability/queries/seo-url-visibility-staleness.ts',
+      'src/lib/reliability/queries/seo-backlink-drilldown-failures.ts'
     ],
     expectedSignalKinds: ['data_quality', 'runtime', 'cost_guard', 'posture', 'test_lane', 'drift'],
     incidentDomainTag: 'growth'
