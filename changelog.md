@@ -795,13 +795,3 @@
 - Hiring: cierre del trío del día — TASK-1736 complete con remediación gobernada
   (dry-run → allowlist humana → apply CAS → rollback real), señales de reliability y
   runbook. Flag OFF; 4 nombres históricos esperan la allowlist del operador.
-
-## 2026-08-16 — Scoring IA de assessments a escala (TASK-1734) + intake de identidad (TASK-1736 S0-S2)
-
-- Hiring: run asíncrono gobernado de scoring IA por assessment — propone todos los scores
-  abiertos, enruta por riesgo (mandatory/muestra ciega estructural/batch), confirmación humana
-  por lote con manifest auditable; gate de promoción bloqueante hasta gold set humano. Flags
-  OFF; rollout por runbook.
-- Hiring: intake de identidad — normalización culturalmente segura del nombre (evidencia raw
-  inmutable + display corregible + searchKey), reconciliación CAS del sticky name y corrección
-  humana capability-gated. Flag OFF.
