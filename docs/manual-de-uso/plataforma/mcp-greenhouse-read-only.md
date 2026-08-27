@@ -1,9 +1,9 @@
 # MCP Greenhouse Read-Only
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.7
+> **Version:** 1.8
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-08-14 por Claude (TASK-1664/1666: inventario a 16 tools SEO — 12 lectura + 4 escritura; allowlist federado 13, producción del gateway aún en 9)
+> **Ultima actualizacion:** 2026-08-27 por Claude (TASK-1775: inventario a 17 tools SEO — 13 lectura + 4 escritura con `get_seo_domain_overview`; allowlist federado sigue en 13)
 > **Modulo:** plataforma / MCP
 > **Ruta en portal:** `N/A` (server MCP local `stdio` o remoto HTTP)
 > **Documentacion relacionada:** [API Platform Ecosystem](../../documentation/plataforma/api-platform-ecosystem.md), [Platform Health API](../../documentation/plataforma/platform-health-api.md), [GREENHOUSE_MCP_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md)
@@ -200,12 +200,12 @@ Reglas que el agente debe respetar:
 - Un documento marcado como "no usado por agentes", borrador, deprecado o no-interno **no aparece** (responde `404` por id, o simplemente no entra en la búsqueda). Lo que queda fuera por política se **cuenta** sin mostrar su contenido.
 - Es **read-only**: estas tools nunca crean, editan ni publican conocimiento.
 
-### 8. SEO / Search Visibility 360 (TASK-1645 · 1303 · 1304 · 1306 · 1307 · 1308 · 1661 · 1664 · 1666)
+### 8. SEO / Search Visibility 360 (TASK-1645 · 1303 · 1304 · 1306 · 1307 · 1308 · 1661 · 1664 · 1666 · 1775)
 
-Hoy son **16 tools SEO: 12 de lectura y 4 de escritura**. Las de escritura son la excepción al
+Hoy son **17 tools SEO: 13 de lectura y 4 de escritura**. Las de escritura son la excepción al
 carácter read-only del resto de este MCP y están marcadas como tales.
 
-**Lectura (12):**
+**Lectura (13):**
 
 - `get_seo_entitlement`
 - `get_seo_keyword_opportunities`
@@ -219,6 +219,7 @@ carácter read-only del resto de este MCP y están marcadas como tales.
 - `get_seo_backlink_profile`
 - `get_seo_keyword_discovery` (TASK-1664)
 - `get_seo_grounded_query_draft` (TASK-1666)
+- `get_seo_domain_overview` (TASK-1775)
 
 **Escritura (4):**
 
@@ -244,6 +245,7 @@ Qué entregan:
 - `get_seo_site_audit_report` (TASK-1304) devuelve el **audit técnico del sitio**: health score sitewide (0–100), páginas crawleadas y findings agrupados por severidad (`critical`/`warning`/`notice`) con `issueType` estable (p. ej. `is_4xx_code`, `no_description`, `has_micromarkup_errors`). Un run `running` significa "crawl en curso" (hecho, no error); un `succeeded` con 0 findings significa sitio técnicamente limpio. Parámetro opcional `auditRunId` para leer un run histórico puntual.
 - `get_seo_backlink_profile` (TASK-1304) devuelve la **serie semanal del perfil de enlaces**: dominios referentes, backlinks totales, rank del dominio 0–100 (comparable a DR/DA), `toxicShare` (0–1, proxy del spam score del perfil entrante) y delta new/lost de la ventana de 30 días del proveedor. Parámetro opcional `rangeDays` (default 365).
 - `get_seo_keyword_discovery` (TASK-1664) lee las corridas de descubrimiento de keywords y, con `runId`, sus **candidatos compuestos**: procedencia (seed, endpoint, rank) + lente de mercado **◑ estimada** (volumen, dificultad, intención, CPC, nivel de competencia, barrera de enlaces) + demanda **● medida** del propio sitio (GSC) como campo separado + estado de tracking y última acción. Un candidato es una **sugerencia**, no una keyword seguida: promoverlo pasa por `track_seo_keywords` con su propio disclosure de gasto. Filtros: `status`, `sourceEndpoint`, `query`, `intent`, `minSearchVolume`, `maxDifficulty`, `excludeTracked` (solo lo accionable), `limit`/`cursor`.
+- `get_seo_domain_overview` (TASK-1775) devuelve la **foto de dominio ◑ estimada** (rank del proveedor, keywords posicionadas y `etv` = **volumen** de tráfico estimado, nunca dólares — el USD es `estimated_paid_traffic_cost`) con `capturedAt` siempre declarado; acepta `subject=` para leer el dominio de un **competidor**. `no_market_data` es un estado honesto (el proveedor no conoce ese dominio), jamás ceros. Es lectura pura: no dispara capturas ni gasta proveedor (la captura mensual está **code complete, rollout pendiente** — flag OFF + scheduler pausado — así que puede no haber foto todavía).
 - `get_seo_grounded_query_draft` (TASK-1666) lee un **borrador** de grounded queries AEO creado desde candidatos de discovery, con su provenance opaca (`seo.discovery.*`) y el `groundingMode` honesto: `grounded_llm` = las preguntas se autoraron CON el contexto SEO; `baseline_fallback` = baseline genérico del arquetipo, NO específico de los candidatos (el aviso viaja en `fallbackNotice` y se reporta siempre). Un draft **nunca está activo**: la aprobación es del flujo de revisión AEO existente.
 
 Reglas que el agente debe respetar:
@@ -254,7 +256,7 @@ Reglas que el agente debe respetar:
 - **Los dos ejes del 360 nunca se promedian**: rankeo y citabilidad son verdades ortogonales de motores distintos.
 - **En `get_seo_rank_evolution`, `position: null` en una fecha significa que el dominio no rankeó ese día.** Es una medición válida, no un error ni un hueco a rellenar. Y esa serie (DataForSEO) **nunca se promedia** con la serie de GSC — son fuentes distintas.
 - **Medido ● y estimado ◑ nunca se promedian ni se sustituyen.** El volumen de mercado de `get_seo_keyword_market_data` es una estimación del mercado; las impresiones de `get_seo_keyword_opportunities` son la demanda medida de ESE sitio. Son dos hechos distintos y ambos ciertos.
-- **Las 12 tools de lectura son read-only**: no disparan capturas ni gastan presupuesto de proveedor.
+- **Las 13 tools de lectura son read-only**: no disparan capturas ni gastan presupuesto de proveedor.
 - **El par track/untrack compromete gasto recurrente.** `track_seo_keywords` factura cada keyword al proveedor en **cada ciclo diario** hasta que alguien la saque, así que la lista exacta se propone al humano y se confirma **antes** de llamarla — nunca especulativamente. Ambas son idempotentes y devuelven un **outcome por keyword** (`tracked` / `already_tracked` / `intent_changed` / `capacity_exceeded` / `invalid`, y `untracked` / `not_tracked` / `invalid`): reportar `data.ok` sin leer ese arreglo describe un cambio que puede no haber ocurrido. El lane acepta las 4 tools de escritura **solo desde bindings de scope `internal`**.
 - **`discover_seo_keywords` gasta al encolar, no al seguir.** Cada corrida paga a DataForSEO por llamada y por fila devuelta: primero `preview: true`, se muestra la fórmula de costo estimado al humano y se confirma ANTES de encolar — nunca especulativamente. La corrida es **async** (el 202 solo significa "encolada durable"): los candidatos se consultan después con `get_seo_keyword_discovery` + `runId`, y declarar resultados recién encolada la corrida describe datos que aún no existen. Es idempotente **dentro del ciclo mensual del proveedor** (mismo intent = misma corrida sin gastar de nuevo; un mes nuevo permite corrida fresca). Encolar **jamás auto-trackea**.
 - **`prepare_seo_grounded_queries` escribe un draft, nunca activa.** Se propone al humano la selección exacta de candidatos (≤20) y se confirma antes de llamar. El resultado declara `groundingMode` honesto, y desde la auditoría 2026-08-14 también la **cobertura por seed** (`seedCoverage`): si algún candidato quedó sin huella temática, viaja `coverageNotice` y se reporta al revisor — la etiqueta grounded se verifica, no se asume. Con la identidad máquina compartida el upstream responde `aeo_forbidden` fail-closed hasta TASK-1631.
@@ -274,7 +276,7 @@ y **su deploy se despacha junto al próximo release develop→main** de Greenhou
 404 upstream porque el lane no está en producción — lección TASK-1661).
 
 **Qué NO está federado todavía** y por ahora vive solo en este MCP interno: `get_seo_overview_kpis`,
-`get_seo_performance` y `get_seo_performance_catalog`. La federación es por **allowlist explícito con
+`get_seo_performance`, `get_seo_performance_catalog` y `get_seo_domain_overview` (TASK-1775). La federación es por **allowlist explícito con
 revisión humana por tool** (decisión TASK-1647: nunca auto-federación), así que la ausencia es un
 pendiente declarado, no un bug. Lectura funcional en
 [Search Visibility 360 por MCP](../../documentation/growth/search-visibility-360-por-mcp.md); operación en

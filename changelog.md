@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-27 — El módulo SEO gana el tier `prospect`: diagnóstico sin contrato y sin acceso del cliente (TASK-1709)
+
+- Nuevo carril de adquisición `src/lib/growth/seo/prospect/**`: una corrida ÚNICA por dominio con tope duro POR DIAGNÓSTICO (min(USD 1,00, restante mensual de Efeonce), validado contra el forecast del conjunto ANTES de la primera llamada), idempotencia por dominio/mercado/día (repetir = USD 0), y gasto de adquisición atribuido a `EO-ORG-0007` en el ledger único. Estrena 4 endpoints de familias ya permitidas (`ranked_keywords` +`ai_overview_reference`, `competitors_domain`, `backlinks/competitors`, `domain_intersection`) — el colector de competidores que `TASK-1662` consumirá.
+- Todo hecho nace con lente `estimated` + `captured_at` (CHECK de un solo valor) y el contrato de salida no tiene score/veredicto/benchmark/lift; la evidencia de sitio se delega al sustrato (`site-substrate`, USD 0) y un bloqueo del sitio es un hallazgo, no un obstáculo. Cero captura recurrente sobre prospectos (sin cron/scheduler; test fuente + DO guard).
+- Full API Parity mismo PR: lane app + lane ecosystem (`internal`-only) + MCP `get/run_seo_prospect_diagnostic`; capabilities `growth.seo.prospect_diagnostic.{run,read}` seedeadas + granteadas; señal `growth.seo.prospect_diagnostic.cost_overrun` (steady 0); evento `growth.seo.prospect_diagnostic.completed`.
+- Corrida real verificada (skyairline.com CL): forecast USD 0,205 vs real 0,1991, ledger Δ exacto, idempotencia USD 0, cost_blocked con cero llamadas. Flag `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` default OFF (Vercel V1); ON sólo con decisión del operador.
+
 ## 2026-08-27 — Gemini Omni 1.1 entra al gobierno de la flota, no al runtime
 
 - Investigación oficial de Gemini Omni 1.1 Flash: se separan Developer API (`gemini-omni-1.1-flash`, modelo listado Stable) y Google Cloud (`gemini-omni-1.1-flash-preview`, Pre-GA), ambas sobre Interactions `v1beta`; se documentan capacidades, precios, cuotas, residencia, retención, C2PA, restricciones regionales y contradicciones del proveedor.

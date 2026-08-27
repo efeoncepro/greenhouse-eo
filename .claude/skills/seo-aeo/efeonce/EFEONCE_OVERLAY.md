@@ -110,6 +110,15 @@ no reemplaza al Grader. La cadena correcta es: **Grader diagnostica → Radiogra
 demuestra → propuesta/deck convierte → servicio opera**. Runtime en
 `efeonce-think`; documentación y manual comercial en `greenhouse-eo`.
 
+Entre Grader y Radiografía vive el **diagnóstico SEO de prospecto** (TASK-1709,
+dominio `growth`, interno admin/account, flag hoy OFF): cuantifica la pérdida
+orgánica del dominio del prospecto con dato del proveedor, sin pedirle acceso,
+todo lente `◑ estimada` y sin score ni veredicto. Cadena vigente: **Grader mide →
+diagnóstico cuantifica → Radiografía demuestra → propuesta cierra**. Pointers:
+`docs/documentation/growth/diagnostico-seo-prospecto.md` ·
+`docs/manual-de-uso/comercial/diagnostico-seo-prospecto-en-venta.md` · detalle
+skill↔producto en `AI_VISIBILITY_GRADER.md` (delta 2026-08-27).
+
 > **Cross-refs:** núcleo en `../SKILL.md` + `../modules/*`. Ejecución del sitio →
 > skill `efeonce-public-site-wordpress`. Guardrails → `../ANTIPATTERNS.md`.
 > Grader / dominio growth → `AI_VISIBILITY_GRADER.md`.

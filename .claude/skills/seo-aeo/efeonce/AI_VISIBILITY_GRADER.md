@@ -47,6 +47,20 @@ El **AI Visibility Grader** y la **Radiografía AEO** no compiten:
 
 Regla para agentes: si el comprador ya vio un score o un informe y pregunta *"¿y cómo se arregla?"*, el siguiente activo es la Radiografía, no otro dashboard. Si la conversación empieza sin evidencia, primero corre o revisa el Grader.
 
+> **Delta 2026-08-27 (TASK-1709) — el Grader ya no está solo en la etapa pre-firma.**
+> El producto Greenhouse que operacionaliza esta skill ganó un segundo eslabón: el
+> **diagnóstico SEO de prospecto** (dominio `growth`, capability
+> `growth.seo.prospect_diagnostic.run`, solo admin/account; flag
+> `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED`, hoy OFF en todos los ambientes).
+> Encadenamiento comercial vigente: (1) el Grader mide si la IA lo menciona →
+> (2) el diagnóstico cuantifica la pérdida orgánica del dominio con dato del
+> proveedor, sin pedirle acceso al prospecto (~USD 0,25/corrida, tope duro;
+> todo lente `◑ estimada`, sin score ni veredicto) → (3) la Radiografía AEO
+> demuestra cómo se arregla → (4) la propuesta cierra. Docs canónicos:
+> `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` (Delta 2026-08-27) ·
+> `docs/documentation/growth/diagnostico-seo-prospecto.md` ·
+> `docs/manual-de-uso/comercial/diagnostico-seo-prospecto-en-venta.md`.
+
 La Radiografía vive en `think.efeoncepro.com/muestras/<slug>-<token>` y su runtime está en `efeonce-think`; en `greenhouse-eo` sólo viven el gobierno documental y los playbooks. Manual comercial: `docs/manual-de-uso/comercial/usar-radiografia-aeo-en-venta.md`. Manual técnico/runtime: `docs/think/radiografia-aeo-manual.md`.
 
 ## Reporte público final: contrato de facts (live, as-of 2026-07-04)
