@@ -192,6 +192,28 @@ export class GreenhouseApiPlatformClient {
     })
   }
 
+  // TASK-1776 — visibilidad ◑ por sujeto-página (URL/subdominio/subcarpeta/dominio) o
+  // concentración de tráfico de un host.
+  async getSeoUrlVisibility(input: {
+    organizationId?: string
+    market?: string
+    subject?: string
+    kind?: string
+    months?: number
+    concentration?: string
+    domain?: string
+  }) {
+    return this.request('/api/platform/ecosystem/growth/seo/url-visibility', {
+      organizationId: input.organizationId,
+      market: input.market,
+      subject: input.subject,
+      kind: input.kind,
+      months: input.months,
+      concentration: input.concentration,
+      domain: input.domain
+    })
+  }
+
   async getSeoVisibility360(input: { organizationId?: string; market?: string }) {
     return this.request('/api/platform/ecosystem/growth/seo/visibility-360', {
       organizationId: input.organizationId

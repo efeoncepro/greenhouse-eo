@@ -11,6 +11,13 @@ import {
   type ReadDomainOverviewResult
 } from '@/lib/growth/seo/domain-overview/reader'
 import {
+  readUrlVisibility,
+  readVisibilityConcentration,
+  type ReadUrlVisibilityResult,
+  type ReadVisibilityConcentrationResult
+} from '@/lib/growth/seo/url-visibility/reader'
+import { isVisibilitySubjectKind } from '@/lib/growth/seo/url-visibility/resolve-subject'
+import {
   SEO_DISCOVERY_ACTION_KINDS,
   SEO_DISCOVERY_SOURCE_KINDS,
   type SeoDiscoveryActionKind,
@@ -127,6 +134,8 @@ const resolveOrganizationId = (
 interface SeoLaneSubject {
   organizationId: string
   seoTargetId: string | null
+  /** Dominio del target resuelto (TASK-1776: sujeto default de la visibilidad por página). */
+  rootDomain: string | null
   tier: SeoTier | null
   /**
    * Mercado que ESTA respuesta sirve (ISSUE-153). Toda respuesta del lane lo declara: un
@@ -183,12 +192,13 @@ const resolveSeoLaneSubject = async (
   }
 
   if (resolution.status === 'none') {
-    return { organizationId, seoTargetId: null, tier: entitlement.tier, servedMarket: null }
+    return { organizationId, seoTargetId: null, rootDomain: null, tier: entitlement.tier, servedMarket: null }
   }
 
   return {
     organizationId,
     seoTargetId: resolution.target.seoTargetId,
+    rootDomain: resolution.target.rootDomain,
     tier: entitlement.tier,
     servedMarket: describeMarket(resolution.target)
   }
@@ -421,6 +431,124 @@ export const getEcosystemSeoDomainOverviewPayload = async ({
       overview: result
     },
     meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+export type EcosystemSeoUrlVisibilityPayload =
+  | {
+      ok: true
+      measurementKind: 'estimated_market'
+      source: 'dataforseo_labs'
+      mode: 'subject'
+      visibility: ReadUrlVisibilityResult & { ok: true }
+    }
+  | {
+      ok: true
+      measurementKind: 'estimated_market'
+      source: 'dataforseo_labs'
+      mode: 'concentration'
+      concentration: ReadVisibilityConcentrationResult & { ok: true }
+    }
+  | { ok: false; errorCode: 'disabled' | 'no_market_data' | 'invalid_subject' | 'invalid_kind'; status: null }
+  | SeoTargetNotConfiguredPayload
+
+/**
+ * GET /api/platform/ecosystem/growth/seo/url-visibility — TASK-1776.
+ *
+ * Dos modos sobre el mismo hecho:
+ *   - sujeto (`?subject=&kind=domain|subdomain|subfolder|url[&months=]`): la foto + trayectoria
+ *     de una página/subcarpeta/subdominio/dominio, propio o de un competidor. Default: el
+ *     dominio del target (`kind=domain`).
+ *   - concentración (`?concentration=url|subdomain[&domain=]`): qué páginas o subdominios
+ *     concentran el tráfico estimado de un host.
+ */
+export const getEcosystemSeoUrlVisibilityPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<EcosystemSeoUrlVisibilityPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request)
+
+  if (!subject.seoTargetId || !subject.servedMarket) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const url = new URL(request.url)
+
+  const meta = {
+    module: 'growth.seo',
+    tier: subject.tier,
+    organizationId: subject.organizationId,
+    servedMarket: subject.servedMarket
+  }
+
+  const rootDomain = subject.rootDomain
+
+  if (!rootDomain) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const concentration = url.searchParams.get('concentration')
+
+  if (concentration) {
+    if (concentration !== 'url' && concentration !== 'subdomain') {
+      return { data: { ok: false, errorCode: 'invalid_kind', status: null }, meta }
+    }
+
+    const result = await readVisibilityConcentration({
+      domain: url.searchParams.get('domain')?.trim() || rootDomain,
+      kind: concentration,
+      locationCode: subject.servedMarket.locationCode,
+      languageCode: subject.servedMarket.languageCode
+    })
+
+    if (!result.ok) {
+      return { data: { ok: false, errorCode: result.reason, status: null }, meta }
+    }
+
+    return {
+      data: { ok: true, measurementKind: 'estimated_market', source: 'dataforseo_labs', mode: 'concentration', concentration: result },
+      meta
+    }
+  }
+
+  const requestedKind = url.searchParams.get('kind')?.trim() || 'domain'
+
+  if (!isVisibilitySubjectKind(requestedKind)) {
+    return { data: { ok: false, errorCode: 'invalid_kind', status: null }, meta }
+  }
+
+  const monthsRaw = url.searchParams.get('months')
+
+  const result = await readUrlVisibility({
+    subject: url.searchParams.get('subject')?.trim() || rootDomain,
+    kind: requestedKind,
+    keepQuery: url.searchParams.get('keepQuery') === 'true',
+    locationCode: subject.servedMarket.locationCode,
+    languageCode: subject.servedMarket.languageCode,
+    historyMonths: monthsRaw && Number.isFinite(Number(monthsRaw)) ? Number(monthsRaw) : undefined
+  })
+
+  if (!result.ok) {
+    // Degradación honesta: sujeto sin snapshot = no_market_data, jamás ceros fantasma.
+    return { data: { ok: false, errorCode: result.reason, status: null }, meta }
+  }
+
+  return {
+    data: { ok: true, measurementKind: 'estimated_market', source: 'dataforseo_labs', mode: 'subject', visibility: result },
+    meta
   }
 }
 

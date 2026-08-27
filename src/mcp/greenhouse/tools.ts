@@ -192,6 +192,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'untrackSeoKeywords'
   | 'getSeoKeywordMarketData'
   | 'getSeoDomainOverview'
+  | 'getSeoUrlVisibility'
   | 'getSeoKeywordDiscovery'
   | 'discoverSeoKeywords'
   | 'getSeoGroundedQueryDraft'
@@ -464,6 +465,47 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         )
       },
       () => client.getSeoDomainOverview(input)
+    )
+  },
+  async getSeoUrlVisibility(input: {
+    organizationId?: string
+    market?: string
+    subject?: string
+    kind?: string
+    months?: number
+    concentration?: string
+    domain?: string
+  }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          mode?: string
+          visibility?: { subject?: string; kind?: string; totalRankedKeywords?: number | null; capturedAt?: string }
+          concentration?: { domain?: string; items?: unknown[]; capturedAt?: string }
+        }
+
+        if (data.ok === false) {
+          return `SEO URL visibility unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        if (data.mode === 'concentration') {
+          const items = Array.isArray(data.concentration?.items) ? data.concentration.items.length : 0
+
+          return `Traffic concentration (estimated, DataForSEO Labs) for ${String(data.concentration?.domain ?? 'unknown')}: top ${items} subject(s) by estimated traffic, as-of ${String(data.concentration?.capturedAt ?? 'unknown')}. Never mix with measured GSC data (${result.requestId}).`
+        }
+
+        const visibility = data.visibility ?? {}
+
+        // El as-of viaja SIEMPRE y la lente es estimada — jamás presentarla como medición GSC.
+        return (
+          `URL visibility (estimated, DataForSEO Labs) for ${String(visibility.kind ?? '?')} ${String(visibility.subject ?? 'unknown')}: ` +
+          `${String(visibility.totalRankedKeywords ?? 'unknown')} ranked keywords in the market snapshot, as-of ${String(visibility.capturedAt ?? 'unknown')}. ` +
+          `Positions here are exact-SERP estimates — never average them with GSC measured positions (${result.requestId}).`
+        )
+      },
+      () => client.getSeoUrlVisibility(input)
     )
   },
   async getSeoVisibility360(input: { organizationId?: string; market?: string }) {

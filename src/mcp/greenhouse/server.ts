@@ -300,6 +300,28 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getSeoDomainOverview(args)
   )
 
+  // TASK-1776 — el sujeto PÁGINA: qué ranquea una URL/subcarpeta/subdominio (propio o de un
+  // competidor) y qué páginas concentran el tráfico de un host.
+  server.registerTool(
+    'get_seo_url_visibility',
+    {
+      title: 'Get SEO URL Visibility',
+      description:
+        'Get what a specific page, subfolder, subdomain or domain ranks for in the market snapshot (DataForSEO Labs ranked_keywords): total ranked keywords, top-100 position distribution, estimated traffic volume (etv), momentum, and the purchased top-N keyword detail. Pass subject=<value> plus kind=domain|subdomain|subfolder|url (the kind is DECLARED, never inferred; defaults to the organization SEO target domain). Alternative mode: concentration=url|subdomain (optional domain=<host>) returns which pages or subdomains concentrate the estimated traffic of a host. All figures are market ESTIMATES (lens=estimated, monthly refresh) with capturedAt — always report the as-of date, never mix or average with measured GSC data, and a no_market_data answer means the subject has no snapshot yet (a state, not a zero). The market comes from the organization SEO target; pass market=<ISO-2|location_code> when the organization has more than one.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(2).max(12).optional(),
+        subject: z.string().trim().min(3).max(512).optional(),
+        kind: z.enum(['domain', 'subdomain', 'subfolder', 'url']).optional(),
+        months: z.number().int().positive().max(36).optional(),
+        concentration: z.enum(['url', 'subdomain']).optional(),
+        domain: z.string().trim().min(3).max(255).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoUrlVisibility(args)
+  )
+
   server.registerTool(
     'get_seo_visibility_360',
     {
