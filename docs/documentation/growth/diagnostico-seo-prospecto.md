@@ -54,7 +54,10 @@ de un prospecto, así que no hay ningún dato medido):
 - Operadores internos (roles admin y account) desde el contrato programático
   (`POST /api/admin/growth/seo/prospect-diagnostic` con `{ rootDomain, market }`).
 - Agentes vía MCP (`run_seo_prospect_diagnostic`) — siempre con confirmación humana previa,
-  porque cada corrida compromete dinero real.
+  porque cada corrida compromete dinero real. Ambas tools (`get_` y `run_`) están además
+  federadas al gateway público `mcp.efeonce.org` desde 2026-08-27 (TASK-1658; deploy del
+  gateway pendiente post-release): `run_` exige el scope `efeonce.mcp.seo.write`, que NO está
+  cableado al cliente público — fail-closed hasta TASK-1631.
 - Mercados habilitados: CL, MX, CO, PE, AR, ES, US.
 
 > Detalle técnico: primitives en `src/lib/growth/seo/prospect/`, flag

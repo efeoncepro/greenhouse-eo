@@ -287,7 +287,13 @@ de los readers) + **3 MCP tools read-only** en `src/mcp/greenhouse/**`: `get_seo
 chokepoint como lectura, SIN anti-oracle por diseño — visibilidad operativa). Regla vigente
 (mandato del operador): **todo reader SEO/E-E-A-T futuro expone su MCP tool en el MISMO PR**
 (criterio de aceptación en TASK-1303/1304/1311/1312/1313/1314/1317). La federación al gateway
-`mcp.efeonce.org` es `TASK-1647` (adapter delgado del provider; canaries antes de discovery).
+`mcp.efeonce.org` la abrió `TASK-1647` (adapter delgado del provider; canaries antes de discovery) y
+la completó `TASK-1658` (2026-08-27): las **21 tools SEO del MCP interno (16 lecturas + 5
+escrituras) están federadas** con guard de paridad **bidireccional** en el gateway (espejo
+`GREENHOUSE_SEO_TOOL_INVENTORY` + paridad de schema + `annotations` obligatorias; interino hasta que
+`TASK-1780` lo reemplace por el manifiesto canónico de Greenhouse). Estado de despliegue: code
+complete en `efeonce-mcp` local; la revisión productiva del gateway sirve 13 tools hasta el deploy
+post-release develop→main (`tools/list` 13→21).
 
 **Delta 2026-08-07 (TASK-1308) — el lane SEO deja de ser sólo lectura.** `keywords/track` y
 `keywords/untrack` son sus **dos primeros commands**: van por `runEcosystemCommandRoute`, no por el

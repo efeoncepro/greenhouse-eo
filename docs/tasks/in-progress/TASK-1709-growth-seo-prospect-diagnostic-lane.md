@@ -119,6 +119,15 @@ una capacidad que no queremos usar.
 derivación. Su orden es load-bearing: 2b no puede empezar antes de que `TASK-1697` haya extraído el
 sustrato.
 
+## Delta 2026-08-27 — el par de tools MCP quedó federado al gateway público
+
+- `get_seo_prospect_diagnostic` y `run_seo_prospect_diagnostic` quedaron federadas en el gateway
+  `efeonce-mcp` (code complete, deploy pendiente post-release develop→main) — cerrado por trabajo
+  en TASK-1658. `run_` entra como 4.º write bajo `efeonce.mcp.seo.write` (misma clase de
+  blast-radius: compromete gasto del proveedor), fail-closed en el cliente PKCE público hasta
+  TASK-1631. El canary del gateway trata `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` OFF como estado
+  legítimo, no como fallo.
+
 ## Summary
 
 El módulo SEO sólo sabe hablarle a un cliente que ya firmó: sus tres tiers
