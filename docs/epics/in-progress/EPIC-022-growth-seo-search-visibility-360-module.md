@@ -237,7 +237,14 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1707` — [creada 2026-08-15, backend-data] Rollout del re-grade recurrente multi-runtime.
 - `TASK-1708` — [creada 2026-08-15, backend-data] Estacionalidad: la serie de 12 meses que ya viene
   en `keyword_info`.
-- `TASK-1709` — [creada 2026-08-15, backend-data] Carril de diagnóstico de prospecto SEO.
+- `TASK-1709` — [creada 2026-08-15, **complete 2026-08-27**, backend-data] Carril de diagnóstico
+  de prospecto SEO. El modelo de entitlement ganó el **tier `prospect`** (cuarto miembro de
+  `SeoTier`, el único que NO sale de `module_assignments`): tope duro POR DIAGNÓSTICO
+  (`min(ceiling default 1,00, restante mensual de Efeonce)`) + tope diario por actor. El gasto de
+  adquisición queda como **línea propia** en el mismo ledger (`seo_provider_spend_daily`, atribuido
+  a `EO-ORG-0007`): el margen por org del epic sigue medible porque prospección y servicio no se
+  mezclan. Estrenó además el colector de competidores (`competitors_domain` + `backlinks/competitors`
+  + `domain_intersection`) que `TASK-1662` consumirá.
 - `TASK-1775` — [creada 2026-08-26, backend-data] **Foto de dominio + trayectoria competitiva.** El
   sujeto que el módulo no sabe describir: hoy los KPIs sólo cubren el recorte seguido. `labs`
   (`domain_rank_overview` mensual · `historical_rank_overview` una vez por sujeto, cuesta 10× ·

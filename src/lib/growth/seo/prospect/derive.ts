@@ -11,6 +11,7 @@
  */
 
 import type { ProspectFact } from './contracts'
+import { PROSPECT_RANKED_KEYWORDS_LIMIT } from './contracts'
 import type { ProspectMarketEvidence } from './collect'
 
 const asRecord = (value: unknown): Record<string, unknown> | null =>
@@ -75,7 +76,10 @@ export const deriveProspectMarketFacts = (
         kind: 'ranked_keywords_total',
         magnitude: organic.length,
         source: 'labs_ranked_keywords',
-        detail: {}
+        // El limit del colector es una COTA de costo: si la respuesta llegó llena, el
+        // conteo es un PISO de la superficie real, y el detalle lo declara (honestidad
+        // verificada en la corrida real de SKY: 1000/1000 items → sampleCapped).
+        detail: { sampleCapped: evidence.rankedKeywords.items.length >= PROSPECT_RANKED_KEYWORDS_LIMIT }
       }),
       make({
         kind: 'ranked_keywords_top10',

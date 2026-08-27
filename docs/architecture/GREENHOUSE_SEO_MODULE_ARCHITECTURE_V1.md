@@ -9,6 +9,47 @@ Documento maestro del módulo SEO. Contrato técnico + de negocio del que deriva
 
 ---
 
+## Delta 2026-08-27 — tier `prospect`: el módulo aprende a hablarle a quien no firmó (TASK-1709)
+
+El SEO gana su carril de ADQUISICIÓN: `runProspectDiagnostic` corre un diagnóstico ÚNICO sobre
+cualquier dominio usando sólo fuentes que no piden acceso a nadie (`ranked_keywords` con
+`ai_overview_reference` · `competitors_domain` · `backlinks/competitors` + `domain_intersection` —
+esta task estrena el colector de competidores; `TASK-1662` lo consumirá) + evidencia de sitio
+**delegada** al sustrato (`@/lib/growth/site-substrate`: home/JSON-LD/robots/sitemap, USD 0) +
+reads OnPage post-crawl gratis si ya existe crawl del dominio. Primitives en
+`src/lib/growth/seo/prospect/**`; lanes app + ecosystem (`internal`-only ambos verbos) + MCP tools
+`get_seo_prospect_diagnostic` / `run_seo_prospect_diagnostic` en el mismo PR.
+
+**Reglas duras del carril (violarlas es regresión, no mejora):**
+
+- **NUNCA captura recurrente sobre un prospecto**: sin `next_run_at`, sin cron, sin scheduler que
+  lea `seo_prospect_diagnostics` (test fuente `prospect-boundary.test.ts` + DO guard en la
+  migración). Re-correr = disparo humano que vuelve a pasar por todos los topes. La corrida V1 es
+  **inline en Vercel** (todas las fuentes live) — el ops-worker NO participa.
+- **Tope duro POR DIAGNÓSTICO**, no mensual: `enforceProspectDiagnosticBudget` valida el forecast
+  del CONJUNTO antes de la primera llamada; presupuesto efectivo =
+  `min(GROWTH_SEO_PROSPECT_DIAGNOSTIC_CEILING_USD (default 1,00), restante del mes de Efeonce)`.
+  No cabe → `cost_blocked` con CERO llamadas. + tope diario por actor (default 10).
+- **El gasto es costo de adquisición de Efeonce**: se atribuye a la org canónica `EO-ORG-0007`
+  (resuelta server-side por `public_id`) en el ledger único `seo_provider_spend_daily`. Cero
+  segundo almacén de gasto; el margen por cliente no se contamina.
+- **Toda cifra es `◑ estimada` y lo dice**: `lens` con CHECK de un solo valor + `captured_at NOT
+  NULL`; `magnitude: null` = no medido, JAMÁS 0. **El contrato de salida NO tiene campo de score,
+  veredicto, salud, benchmark ni lift** — el diagnóstico enumera pérdida cuantificada, nunca
+  certifica que un sitio está sano (un audit no detecta bloqueo a crawlers IA: un sitio invisible
+  puede puntuar 95/100).
+- **Un bloqueo es un hallazgo** (`site_crawl_blocked` / `extended_crawl_status` prohibido), nunca
+  un obstáculo a evadir: cero `robots_txt_merge_mode: override`, cero proxy pools, UA siempre
+  identificable (postura verificada por test negativo).
+- **Idempotencia por (dominio, mercado, idioma, día)** vía índice único parcial: repetir el mismo
+  día devuelve lo existente con USD 0. `SeoTier` gana `prospect` pero NO está en `VALID_TIERS`: un
+  `module_assignment` jamás lo declara.
+
+Señal: `growth.seo.prospect_diagnostic.cost_overrun` (steady 0). Evento:
+`growth.seo.prospect_diagnostic.completed` (in-tx, sin consumer; hand-off HubSpot = task aparte).
+La cara visible (artefacto/PDF/short-link) sigue fuera: `TASK-1672`/`TASK-1673`, bloqueadas tras
+`TASK-1670` (§3.4 C8 de la auditoría). Capabilities en §9.
+
 ## Delta 2026-08-14 — el dato de mercado por keyword está VIVO (TASK-1661 `complete`, release `3754a17d3b1d`)
 
 El módulo dejó de ser ciego a la demanda que no mide Search Console. `greenhouse_growth.seo_keyword_market_data`
@@ -127,6 +168,7 @@ Se envuelven en una sola narrativa de producto: **Search Visibility 360** = los 
 | | Topical authority / cluster gaps | DataForSEO Labs (`competitors_domain`, `keyword_gap`) + cálculo |
 | | Backlink profile + digital-PR gaps | DataForSEO **Backlinks** (`backlinks`, `referring_domains`) |
 | **3 · Medición** | Rank tracking + evolución temporal | **GSC** (real-user) + DataForSEO Labs/SERP (scraped) — §5 |
+| | **Foto de dominio + trayectoria competitiva** (keywords ranqueadas totales, ETV, distribución top-100, momentum — del target Y de competidores; TASK-1775) | DataForSEO Labs (`domain_rank_overview` mensual · `historical_rank_overview` backfill único 10× · `bulk_traffic_estimation` screening ~USD 0.13/1.000 dominios) — §4.2 `seo_domain_overview_snapshots` |
 | | Visibility score / SoV orgánico | cálculo propio sobre Labs + GSC |
 | | Movers / oportunidades / dashboard | cálculo propio (snapshots PG/BQ) |
 
@@ -171,6 +213,9 @@ Se envuelven en una sola narrativa de producto: **Search Visibility 360** = los 
   - 🔴 **NO cuelga de `seo_targets` ni de `seo_keyword_set_members`.** El volumen es un hecho de `(keyword, país, idioma, as-of)` con frescura **mensual**, no una propiedad de una keyword seguida: "pintura industrial" tiene el mismo volumen en Chile para toda la cartera. Por eso la tabla nace **MULTI-PRODUCTOR** — TASK-1661 la llena desde `keyword_overview`; `TASK-1664` escribirá el `keyword_info` que ya viene **inline y pagado** en las respuestas de discovery y `TASK-1662` lo mismo desde `domain_intersection`. Una keyword candidata **todavía no es de nadie**: colgarla de un target la volvería inexpresable.
   - 🔴 **`organization_id` NO está en la clave única**: viaja como `captured_by_organization_id`, que es **atribución** de quién pagó la captura, no aislamiento de tenant — este dato no es del cliente, y dejarlo fuera de la clave permite que lo que pagó una org sirva a otra sin volver a gastar (es lo que abarata el top-up de 1664/1662 a escala de cartera). La dirección elegida es la **reversible**: la clave sin org es **más estricta** que la que la incluye, así que relajarla después es seguro (toda fila existente satisface la laxa); al revés habría que **borrar** duplicados y la tabla es append-only. 🔴 `captured_by_organization_id` **NUNCA** viaja en un DTO client-facing: expuesto, dejaría inferir por frescura qué keywords sigue otra organización.
   - **`location_code` es `TEXT`, no `INTEGER`** — espeja `seo_targets.location_code` (verificado contra PG real: es `text`, con valores como `'2152'`). La conversión a número ocurre **sólo en la frontera del proveedor**.
+
+- `seo_domain_overview_snapshots` — el hecho de **dominio** (TASK-1775, migración `20260827190156045`; append-only con trigger anti UPDATE/DELETE). `normalized_domain` + `domain` crudo, `location_code` TEXT, `language_code`, `capture_date`, `source_endpoint` CHECK(`domain_rank_overview|historical_rank_overview|bulk_traffic_estimation`), distribución de posiciones top-100 (`organic_pos_1…organic_pos_91_100`), `organic_count` (keywords ranqueadas), `organic_etv` (**estimated traffic VOLUME — tráfico estimado, NO dólares**; el USD es `organic_estimated_paid_traffic_cost`), momentum (`is_new/up/down/lost`) y el espejo pago. **Idempotencia por `UNIQUE (normalized_domain, location_code, language_code, capture_date)`** — mismo contrato multi-productor que `seo_keyword_market_data`: clave **sin organización** (la foto de `competidor.cl` es el mismo hecho para toda la cartera; la segunda captura del mes no gasta), `captured_by_organization_id` como atribución que **NUNCA** viaja en un DTO client-facing, dirección reversible. Tres productores comparten el writer `persistDomainOverviewSnapshots`: la foto mensual (cron `ops-seo-domain-overview`, día 16, flag `GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED` **sólo ops-worker**), el backfill histórico (runner `--dry-run`/`--apply` con tope duro USD — 10× el Labs normal, se compra UNA vez por sujeto; filas con `capture_date` = primer día del mes histórico) y el screening bulk (sólo `etv`+`count`, resto NULL — jamás finge ser la foto). 🔴 **Pre-check de FRESCURA por `source_endpoint`**: la foto mensual sólo considera fresca una fila de `domain_rank_overview` (una de screening, más pobre, la ahogaría); el screening acepta cualquiera. 🔴 **Sujeto que el proveedor no conoce deja fila con NULLs** (invariante TASK-1661: sin ella se re-compra para siempre). El reader canónico es `readDomainOverview` (`domain-overview/reader.ts`): toda cifra con `lens: 'estimated'` + `capturedAt`, `no_market_data` sin ceros fantasma, y **jamás** en el mismo agregado que `seo_gsc_daily`.
+  - 🔴 **Desambiguación de las dos autoridades de dominio (decisión 2026-08-27, TASK-1775).** Coexisten dos mediciones cercanas: `seo_backlink_snapshots.domain_rank` (familia `backlinks`, semanal, escala 0–100 pedida con `rank_scale: 'one_hundred'` para ser comparable a DR/DA) y esta tabla. **`domain_rank_overview` NO devuelve ningún score de autoridad** (verificado contra la doc oficial 2026-08-27): la "foto" es distribución de posiciones + counts + ETV. Por lo tanto **la autoridad canónica para superficie es `seo_backlink_snapshots.domain_rank`** — única cifra de authority del módulo, sin competidor — y esta tabla aporta las dimensiones complementarias (tamaño en keywords, tráfico estimado, trayectoria). Cadencias y proveedor distintos: **jamás se promedian ni se grafican en la misma serie**, la misma regla que rige el cruce con GSC.
 
 **Decisión temporal:** snapshots = event rows append-only keyed por `capture_date` (mediciones, no supersede). Config = membership append-only con `effective_from/to` (términos). Reads temporales: `ORDER BY capture_date DESC` sobre la ventana caliente; índice compuesto `(seo_target_id, keyword, capture_date DESC)`.
 
@@ -374,7 +419,16 @@ growth.seo.audit.run            (execute, tenant)  disparar site audit — set o
 growth.seo.observation.read     (read, tenant)     rank/backlink/audit reads — set interno base
 growth.seo.report.read_client   (read, own)        gate del report cliente (client_* scope own)
 growth.seo.entitlement.manage   (execute, tenant)  SOLO EFEONCE_ADMIN + EFEONCE_ACCOUNT (espejo AEO)
+growth.seo.prospect_diagnostic.run  (execute, tenant)  disparar diagnóstico de prospecto (GASTA) — SOLO EFEONCE_ADMIN + EFEONCE_ACCOUNT (TASK-1709)
+growth.seo.prospect_diagnostic.read (read, tenant)     leer diagnósticos de prospecto — + EFEONCE_OPERATIONS (TASK-1709)
 ```
+
+**Tier `prospect` (TASK-1709):** cuarto miembro de `SeoTier`, y el único que NO sale de
+`module_assignments` — el sujeto es un dominio sin org. Se resuelve exclusivamente por
+`resolveProspectDiagnosticEntitlement` (presupuesto = min(tope por diagnóstico, restante mensual de
+Efeonce `EO-ORG-0007`)); no está en `VALID_TIERS`, así que un assignment que declare
+`seo_tier: prospect` cae al fallback conservador. La autorización del carril es del ACTOR interno
+(capabilities de arriba), jamás del sujeto; un diagnóstico de prospecto no se sirve al portal cliente.
 
 **Acceso per-org vía `module_assignments`** (no por rol — lección TASK-1248), con `module_key='seo_v2'` seedeado en `greenhouse_client_portal.modules` (la FK del catálogo lo exige; tier=addon, `data_sources=['growth.seo']` con parity al union `ClientPortalDataSource`; con los dos `view_codes` de cliente desde TASK-1310 — la fila `seo_v1` original nació con `view_codes=[]` y sigue en el catálogo como historia append-only, ver §10.7). El tier vive en `metadata_json.seo_tier` (`contracted|trial|pilot`; override de cupo pilot vía `metadata_json.seo_audit_runs_per_month`). Las **4 puertas**: operador (`entitlement.manage`, interno, todas las orgs), contratado (assignment activo → observación + report), trial/PLG (assignment con quota cap + expiry), público (quick-check rate-limited de 1 dominio, diferida — reusa el patrón `public-submission` + `grader_leads`).
 

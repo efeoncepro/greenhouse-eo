@@ -1,8 +1,25 @@
 # TASK-1662 — Growth SEO: keyword gap — qué rankea la competencia y el cliente no
 
+## Delta 2026-08-27
+
+- **`TASK-1775` quedó `code complete` (rollout pendiente):** ya existen la tabla multi-productor
+  `greenhouse_growth.seo_domain_overview_snapshots`, el writer `persistDomainOverviewSnapshots` y el
+  reader `readDomainOverview` (`src/lib/growth/seo/domain-overview/**`). Cuando esta task quiera dar
+  contexto de tamaño al gap ("el competidor ranquea 4.000 keywords"), consume ese reader — no
+  re-deriva la foto de dominio ni llama `domain_rank_overview` por su cuenta.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
+
+## Delta 2026-08-27
+
+- **El colector de competidores del proveedor lo estrenó `TASK-1709`** (diagnóstico de prospecto):
+  `competitors_domain` + `backlinks/competitors` + `domain_intersection` viven en
+  `src/lib/growth/seo/prospect/collect.ts` con su forecast en `prospect/contracts.ts`. Esta task
+  **consume/extrae ese primitive** al aterrizar (o generaliza los payloads a un módulo compartido) —
+  **nunca un segundo colector** de los mismos endpoints. Decisión declarada en el Discovery de 1709.
 
 ## Status
 

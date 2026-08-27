@@ -133,7 +133,6 @@ export const collectProspectSiteEvidence = async (subject: ProspectSubject): Pro
 
 interface PriorCrawlRow extends Record<string, unknown> {
   provider_task_id: string
-  organization_id: string
 }
 
 /**
@@ -145,8 +144,10 @@ export const collectProspectOnPageEvidence = async (
   subject: ProspectSubject,
   acquisitionOrganizationId: string
 ): Promise<ProspectFact[]> => {
+  // SQL ejercitado contra PG real (gate TASK-893): `seo_site_audit_runs` NO tiene
+  // organization_id — el dominio sale del JOIN con el target dueño del crawl.
   const rows = await runGreenhousePostgresQuery<PriorCrawlRow>(
-    `SELECT r.provider_task_id, r.organization_id
+    `SELECT r.provider_task_id
        FROM greenhouse_growth.seo_site_audit_runs r
        JOIN greenhouse_growth.seo_targets t ON t.seo_target_id = r.seo_target_id
       WHERE t.root_domain = $1
