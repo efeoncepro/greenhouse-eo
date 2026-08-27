@@ -171,7 +171,7 @@ describe('growth/ai-visibility — Google AI Overview adapter', () => {
       ok: true,
       httpStatus: 200,
       endpoint: '/v3/serp/google/ai_mode/live/advanced',
-      tasks: [{ id: 'task-1', result: [{ items: [{ type: 'organic', title: 'SERP result' }] }] }],
+      tasks: [{ id: 'task-1', status_code: 20000, result: [{ items: [{ type: 'organic', title: 'SERP result' }] }] }],
       cost: 0.004,
       latencyMs: 800,
       secretSource: 'secret_manager'
@@ -184,6 +184,100 @@ describe('growth/ai-visibility — Google AI Overview adapter', () => {
     expect(obs.answerExcerpt).toBeNull()
     expect(obs.citations).toEqual([])
     expect(obs.usage.dataforseo_cost_usd).toBe(0.004)
+  })
+
+  it('market ISO-2 mapeado (CL) -> location_code numerico, nunca location_name crudo', async () => {
+    enable()
+    mockConfigured.mockResolvedValue(true)
+    mockPost.mockResolvedValue({
+      ok: true,
+      httpStatus: 200,
+      endpoint: '/v3/serp/google/ai_mode/live/advanced',
+      tasks: dataForSeoTasksWithAiBlock(),
+      cost: 0.004,
+      latencyMs: 1100,
+      secretSource: 'secret_manager'
+    })
+
+    const obs = await createGoogleAiOverviewProviderAdapter().runPrompt({ ...PROMPT, market: 'CL' }, ctx())
+
+    expect(obs.status).toBe('succeeded')
+    expect(captureSpy).not.toHaveBeenCalled()
+
+    const sentTask = mockPost.mock.calls[0][0].tasks[0]
+
+    expect(sentTask.location_code).toBe(2152)
+    expect(sentTask.location_name).toBeUndefined()
+  })
+
+  it('market ISO-2 sin mapear -> fallback US observado, nunca el codigo crudo', async () => {
+    enable()
+    mockConfigured.mockResolvedValue(true)
+    mockPost.mockResolvedValue({
+      ok: true,
+      httpStatus: 200,
+      endpoint: '/v3/serp/google/ai_mode/live/advanced',
+      tasks: dataForSeoTasksWithAiBlock(),
+      cost: 0.004,
+      latencyMs: 1100,
+      secretSource: 'secret_manager'
+    })
+
+    await createGoogleAiOverviewProviderAdapter().runPrompt({ ...PROMPT, market: 'BR' }, ctx())
+
+    const sentTask = mockPost.mock.calls[0][0].tasks[0]
+
+    expect(sentTask.location_code).toBe(2840)
+    expect(sentTask.location_name).toBeUndefined()
+    expect(captureSpy).toHaveBeenCalledTimes(1)
+    expect(captureSpy.mock.calls[0][2]).toMatchObject({ level: 'warning', extra: expect.objectContaining({ market: 'BR' }) })
+  })
+
+  it('task DataForSEO con status_code != 20000 -> failed provider_error, NUNCA skip honesto', async () => {
+    enable()
+    mockConfigured.mockResolvedValue(true)
+    mockPost.mockResolvedValue({
+      ok: true,
+      httpStatus: 200,
+      endpoint: '/v3/serp/google/ai_mode/live/advanced',
+      tasks: [
+        {
+          id: 'task-1',
+          status_code: 40501,
+          status_message: 'Invalid Field: location_name.',
+          result: null
+        }
+      ],
+      cost: 0,
+      latencyMs: 300,
+      secretSource: 'secret_manager'
+    })
+
+    const obs = await createGoogleAiOverviewProviderAdapter().runPrompt({ ...PROMPT, market: 'CL' }, ctx())
+
+    expect(obs.status).toBe('failed')
+    expect(obs.errorCode).toBe('provider_error')
+    expect(obs.usage.dataforseo_status_code).toBe(40501)
+    expect(captureSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('respuesta ok sin task o sin status_code -> failed invalid_response (shape roto, no skip)', async () => {
+    enable()
+    mockConfigured.mockResolvedValue(true)
+    mockPost.mockResolvedValue({
+      ok: true,
+      httpStatus: 200,
+      endpoint: '/v3/serp/google/ai_mode/live/advanced',
+      tasks: [{ id: 'task-1', result: [{ items: [] }] }],
+      cost: 0,
+      latencyMs: 250,
+      secretSource: 'secret_manager'
+    })
+
+    const obs = await createGoogleAiOverviewProviderAdapter().runPrompt({ ...PROMPT, market: 'CL' }, ctx())
+
+    expect(obs.status).toBe('failed')
+    expect(obs.errorCode).toBe('invalid_response')
   })
 
   it('parser lock: acepta ai_overview_element y referencias heterogeneas', () => {

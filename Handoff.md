@@ -2,6 +2,16 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-27 — TASK-1652 en ejecución: corrección request AI Mode del AEO grader
+
+**Estado: in-progress en `develop`, local-first.** Los 3 defectos confirmados en Discovery contra
+código + apéndice live de DataForSEO (`location_code` verificados: CL=2152, MX=2484, CO=2170,
+PE=2604, US=2840) + sandbox AI Mode (el proveedor duplica `references[]` top-level ⊇ anidadas →
+fix (3) es defensa con dedupe existente). Plan: Slice 1 mapa market→location_code + gate per-task
+`status_code`; Slice 2 descenso anidado + fixture shape real; Slice 3 smoke live + dimensionamiento
+histórico en staging PG. Drift detectado: el SKILL.md de `dataforseo-operator` tiene todas las
+cifras `$0.xxxx` corrompidas como `TASK-1652.xxxx` (search-replace accidental) — corregir al cierre.
+
 ## 2026-08-27 — TASK-1709: el módulo SEO aprende a hablarle a quien no firmó
 
 **Estado: code complete + runtime verificado contra proveedor real; flag OFF en todos los
