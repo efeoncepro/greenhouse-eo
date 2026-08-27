@@ -101,8 +101,27 @@ El código pasa `redirect: 'follow'` (línea 100) y usa `const finalUrl = respon
 `isNonPublicHost`, que corre únicamente sobre la URL inicial (línea 70). Un target que responda 302
 hacia una IP interna sería seguido.
 
-**Riesgo hoy:** bajo — el target es el dominio del propio cliente, cargado por un operador.
-**Riesgo mañana:** `TASK-1697` promueve este archivo a primitive compartido de tres consumidores.
+🔴 **CORREGIDO 2026-08-26 — mi evaluación de riesgo era falsa.** Escribí *«riesgo bajo, el target es
+el dominio del propio cliente cargado por un operador»*. La sesión dueña de `ISSUE-164` lo refutó y
+verifiqué su cadena en código: **el input es anónimo, no de operador.**
+
+1. El intake público está **vivo en producción**: `create-public-run.ts:67` evalúa el flag y devuelve
+   `disabled` (→404) **antes** de validar en `:71` (→400), así que un `400` sólo es alcanzable con el
+   flag encendido — y eso es lo que responde `greenhouse.efeoncepro.com` a un POST con cuerpo vacío.
+2. Esa ruta es **sin sesión** y acepta un `websiteUrl` arbitrario. Su propio docblock la declara
+   *«Único WRITE público del dominio. SIN sesión»*.
+3. `run-engine.ts:332` llama `gatherRunProbes` como post-step **incondicional**, sin filtro por
+   profundidad: un run público `light` pasa por el mismo gatherer.
+
+Cadena real: **POST anónimo → run encolado → ops-worker → `gatherRunProbes` → `createProbeFetcher` →
+redirect seguido sin revalidar → destino elegido por el emisor, fetcheado desde dentro del worker de
+producción.** La fricción que queda —captcha, rate-limit, presupuesto global— es fricción de bot, no
+control de acceso.
+
+**Consecuencia para el alcance del fix:** con target semi-confiable, revalidar cada salto se siente
+opcional. Con input anónimo, los Slices 1–2 de `TASK-1778` son la prioridad y el resto puede esperar.
+
+**Riesgo mañana, además:** `TASK-1697` promueve este archivo a primitive compartido de tres consumidores.
 
 Es exactamente el patrón *«una guarda es una afirmación hasta que el mecanismo la sostenga»*.
 Contraste: OpenSEO revalida SSRF **en cada salto** y hace DNS-over-HTTPS sobre la URL de arranque
