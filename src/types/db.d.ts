@@ -7435,6 +7435,49 @@ export interface GreenhouseGrowthSearchConsoleOauthStates {
   state_id: Generated<string>;
 }
 
+export interface GreenhouseGrowthSeoBacklinkAnchors {
+  anchor: string;
+  anchor_text_hash: string;
+  backlink_anchor_id: Generated<string>;
+  backlink_snapshot_id: string;
+  backlink_spam_score: Numeric | null;
+  backlinks: Int8 | null;
+  created_at: Generated<Timestamp>;
+  first_seen: Timestamp | null;
+  rank: Numeric | null;
+  referring_domains: number | null;
+}
+
+export interface GreenhouseGrowthSeoBacklinkDrilldowns {
+  anchor_rows: Generated<number>;
+  backlink_drilldown_id: Generated<string>;
+  backlink_snapshot_id: string;
+  created_at: Generated<Timestamp>;
+  error_code: string | null;
+  outcome: string;
+  provider_cost: Generated<Numeric>;
+  referring_domain_rows: Generated<number>;
+  trigger_reason: string;
+}
+
+export interface GreenhouseGrowthSeoBacklinkReferringDomains {
+  backlink_ref_domain_id: Generated<string>;
+  backlink_snapshot_id: string;
+  backlink_spam_score: Numeric | null;
+  backlinks_to_target: Int8 | null;
+  created_at: Generated<Timestamp>;
+  first_seen: Timestamp | null;
+  lost_date: Timestamp | null;
+  movement: string;
+  normalized_referring_domain: string;
+  rank: Numeric | null;
+  referring_domain: string;
+  sample_anchor: string | null;
+  sample_dofollow: boolean | null;
+  sample_url_from: string | null;
+  sample_url_to: string | null;
+}
+
 export interface GreenhouseGrowthSeoBacklinkSnapshots {
   backlink_snapshot_id: Generated<string>;
   backlinks_total: Int8 | null;
@@ -12938,6 +12981,9 @@ export interface DB {
   "greenhouse_growth.provider_observations": GreenhouseGrowthProviderObservations;
   "greenhouse_growth.search_console_connections": GreenhouseGrowthSearchConsoleConnections;
   "greenhouse_growth.search_console_oauth_states": GreenhouseGrowthSearchConsoleOauthStates;
+  "greenhouse_growth.seo_backlink_anchors": GreenhouseGrowthSeoBacklinkAnchors;
+  "greenhouse_growth.seo_backlink_drilldowns": GreenhouseGrowthSeoBacklinkDrilldowns;
+  "greenhouse_growth.seo_backlink_referring_domains": GreenhouseGrowthSeoBacklinkReferringDomains;
   "greenhouse_growth.seo_backlink_snapshots": GreenhouseGrowthSeoBacklinkSnapshots;
   "greenhouse_growth.seo_competitors": GreenhouseGrowthSeoCompetitors;
   "greenhouse_growth.seo_domain_overview_snapshots": GreenhouseGrowthSeoDomainOverviewSnapshots;
