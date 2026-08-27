@@ -1440,8 +1440,8 @@ upsert_scheduler_job \
   "0 9 16 * *" \
   "/seo/domain-overview/capture-batch" \
   '{}' \
-  "true"
-echo "  -> ops-seo-domain-overview: 0 9 16 * * PAUSADO (foto de dominio mensual, TASK-1775 — despausar sólo tras smoke real + autorización del operador)"
+  "false"
+echo "  -> ops-seo-domain-overview: 0 9 16 * * ACTIVO (foto de dominio mensual, TASK-1775 — despausado 2026-08-27 tras dry-run + corrida real + re-corrida USD 0 + autorización del operador)"
 
 # Visibilidad por sujeto-página — TASK-1776.
 #
@@ -1456,8 +1456,8 @@ upsert_scheduler_job \
   "0 9 17 * *" \
   "/seo/url-visibility/capture-batch" \
   '{}' \
-  "true"
-echo "  -> ops-seo-url-visibility: 0 9 17 * * PAUSADO (visibilidad por sujeto-página mensual, TASK-1776 — despausar sólo tras smoke real + autorización del operador)"
+  "false"
+echo "  -> ops-seo-url-visibility: 0 9 17 * * ACTIVO (visibilidad por sujeto-página mensual, TASK-1776 — despausado 2026-08-27 tras smoke con los cuatro subject_kind + autorización del operador)"
 
 # TASK-1664 — drain de corridas de keyword discovery (Labs Live, bajo demanda del operador).
 # Cada 10 minutos alcanza de sobra: el enqueue es humano/agente (no hay cadencia diaria en V1)
