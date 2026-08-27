@@ -377,6 +377,21 @@ evitar. Un compromiso de una task cerrada quedó incumplido en la frontera públ
 
 Origen: `docs/audits/platform/2026-08-26-openseo-competitive-teardown-growth-seo-aeo.md` §3.12.
 
+### Slice 5 — Annotations: declarar el blast radius de las 13 tools SEO federadas
+
+Verificado en `~/Documents/efeonce-mcp/src/mcp.ts`: los cinco bloques de `annotations` del archivo
+están **todos** en tools de Globe y Hiring (líneas 154, 224, 267, 311, 355). Las SEO arrancan en la
+421 y **ninguna de las 13 declara `annotations`**. `discover_seo_keywords`, que quema presupuesto del
+proveedor, viaja sin `readOnlyHint: false`.
+
+- Las 13 ganan `annotations`. `readOnlyHint: false` en **toda tool que compre datos**, aunque no mute
+  estado propio: gastar dinero es efecto secundario, no lectura. Ese es el criterio, no si escribe en
+  nuestra base.
+- El parity guard las **exige**: una tool federada sin annotations es un hallazgo, igual que una sin
+  entrada en la lista esperada. Si no, la próxima nace sin ellas y nadie lo ve.
+- Entra acá y no en task propia porque esta task ya posee `src/mcp.ts` y
+  `greenhouse-seo-tool-parity.ts`, y porque el guard que lo exige es el mismo que esta task corrige.
+
 ## Follow-ups
 
 - Generalizar el guard corregido a los demás providers del gateway, si el patrón resulta.
