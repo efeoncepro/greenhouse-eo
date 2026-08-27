@@ -105,12 +105,57 @@ describe('TASK-1778 · redirect containment (strict)', () => {
     expect(calls).not.toContain('https://evil.test/landing')
   })
 
-  it('redirect a otro subdominio del mismo dominio registrable → blocked_redirect (regla conservadora)', async () => {
+  it('redirect a un subdominio DESCENDIENTE del sujeto SIGUE funcionando (evidencia bancochile 2026-08-27)', async () => {
+    // Caso real de la cartera: www.bancochile.cl → 301 → sitiospublicos.bancochile.cl.
     const { fetcher } = strictFetcher({
-      'https://example.com/': () => redirect('https://app.example.com/')
+      'https://example.com/': () => redirect('https://sitiospublicos.example.com/personas', 301),
+      'https://sitiospublicos.example.com/personas': () => html('portal personas')
     })
 
-    expect((await fetcher('/')).errorCode).toBe('blocked_redirect')
+    const res = await fetcher('/')
+
+    expect(res.ok).toBe(true)
+    expect(res.body).toBe('portal personas')
+  })
+
+  it('el sufijo de descendiente se ancla con punto: hosts parecidos NO pasan', async () => {
+    for (const evil of ['https://evilexample.com/', 'https://example.com.evil.test/']) {
+      const { fetcher, calls } = strictFetcher({
+        'https://example.com/': () => redirect(evil)
+      })
+
+      expect((await fetcher('/')).errorCode).toBe('blocked_redirect')
+      expect(calls).not.toContain(evil)
+    }
+  })
+
+  it('otro dominio registrable sigue bloqueado aunque comparta marca (berel.com.mx → berel.com)', async () => {
+    const berelFetcher = createProbeFetcher('https://berel.com.mx', {
+      fetchImpl: routedFetch({
+        'https://berel.com.mx/': () => redirect('https://berel.com/', 301)
+      }).impl,
+      strictNetwork: true,
+      lookupImpl: lookupPublic
+    })
+
+    expect((await berelFetcher('/')).errorCode).toBe('blocked_redirect')
+  })
+
+  it('un salto a subdominio descendiente TAMBIÉN pasa por la guarda DNS', async () => {
+    const lookupByHost = async (hostname: string) =>
+      hostname === 'interno.example.com' ? [{ address: '10.9.9.9', family: 4 }] : PUBLIC_ADDR
+
+    const { impl } = routedFetch({
+      'https://example.com/': () => redirect('https://interno.example.com/', 301)
+    })
+
+    const fetcher = createProbeFetcher('https://example.com', {
+      fetchImpl: impl,
+      strictNetwork: true,
+      lookupImpl: lookupByHost
+    })
+
+    expect((await fetcher('/')).errorCode).toBe('blocked_private_address')
   })
 
   it('cadena que excede MAX_REDIRECTS → blocked_redirect', async () => {

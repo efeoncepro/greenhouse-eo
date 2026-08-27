@@ -2073,10 +2073,11 @@ El fetcher único con el que Greenhouse lee sitios de terceros (`probes/safe-fet
 probes y por `brand-intelligence/fetch-site-content`) pasa de tener garantías afirmadas a tener garantías con mecanismo:
 
 - **Contención de redirects** (gated por `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED`, default OFF): `redirect: 'manual'`
-  + bucle propio con tope (`MAX_REDIRECTS=5`), revalidando cada `Location` contra la **familia del sujeto** — mismo host,
-  `apex ↔ www`, upgrade `http → https`; todo lo demás (otros subdominios incluidos) → `blocked_redirect` con el cuerpo del
-  destino **no leído**. La familia (y no igualdad exacta de hostname) es deliberada: preserva los redirects más comunes de
-  la web sin razonar eTLD+1 (la PSL queda como follow-up con evidencia).
+  + bucle propio con tope (`MAX_REDIRECTS=5`), revalidando cada `Location` contra el sujeto — su familia (mismo host,
+  `apex ↔ www`), sus subdominios **descendientes** (sufijo anclado al host completo; evidencia rollout 2026-08-27:
+  `www.bancochile.cl → sitiospublicos.bancochile.cl`, perfil vivo) y upgrade `http → https`; todo lo demás (otro dominio
+  registrable incluido: `berel.com.mx → berel.com` se bloquea) → `blocked_redirect` con el cuerpo del destino **no
+  leído**. El ancla al host propio evita razonar eTLD+1: la PSL queda descartada con evidencia, no como follow-up.
 - **Guarda DNS** (mismo flag): resolución A/AAAA (`node:dns/promises`) antes de conectar, en la URL inicial y en cada
   salto; cualquier dirección resuelta en rango no público (incl. IPv4-mapped IPv6) → `blocked_private_address`. La ventana
   TOCTOU entre resolver y conectar queda documentada como riesgo residual aceptado; la mitigación real (pin de la IP

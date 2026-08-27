@@ -13,8 +13,10 @@ import 'server-only'
  *
  *  - Contención de redirects (flag `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED`):
  *    `redirect: 'manual'` + bucle propio con tope `MAX_REDIRECTS`, revalidando CADA
- *    `Location` contra la familia del sujeto (mismo host, `apex ↔ www`, upgrade
- *    `http → https`; downgrade y todo otro host → `blocked_redirect`, cuerpo NO leído).
+ *    `Location` contra el sujeto: su familia (mismo host, `apex ↔ www`), sus
+ *    subdominios DESCENDIENTES (sufijo anclado al host completo; evidencia bancochile),
+ *    y upgrade `http → https`. Downgrade, otros dominios registrables y todo lo demás
+ *    → `blocked_redirect`, cuerpo NO leído.
  *  - Guarda de host que RESUELVE DNS (mismo flag): `node:dns/promises` antes de conectar;
  *    si ALGUNA dirección resuelta cae en rango no público → `blocked_private_address`,
  *    en la URL inicial y en cada salto. Riesgo residual aceptado: entre resolver y
@@ -151,6 +153,22 @@ const familyHost = (host: string): string => {
 
 const isSubjectFamilyHost = (host: string, subjectHost: string): boolean =>
   familyHost(host) === familyHost(subjectHost)
+
+/**
+ * Destino de redirect permitido: la familia del sujeto, o un DESCENDIENTE del host del
+ * sujeto (evidencia 2026-08-27: `www.bancochile.cl` → 301 → `sitiospublicos.bancochile.cl`,
+ * perfil real de la cartera). El sufijo se ancla al host COMPLETO del sujeto (sin `www.`),
+ * así que no requiere la Public Suffix List y no abre dominios registrables ajenos:
+ * `berel.com.mx → berel.com` sigue bloqueado. Un descendiente comparte el dominio de
+ * confianza del propio sujeto, y cada salto pasa igual por la guarda DNS.
+ */
+const isAllowedRedirectHost = (host: string, subjectHost: string): boolean => {
+  if (isSubjectFamilyHost(host, subjectHost)) return true
+
+  const h = host.toLowerCase().replace(/\.$/, '')
+
+  return h.endsWith(`.${familyHost(subjectHost)}`)
+}
 
 /**
  * Resuelve la URL del probe contra el baseUrl: exige http(s), host público y host dentro
@@ -340,7 +358,7 @@ export const createProbeFetcher = (baseUrl: string, deps: ProbeFetcherDeps = {})
             !validProtocol ||
             downgrade ||
             isNonPublicHost(next.hostname) ||
-            !isSubjectFamilyHost(next.hostname, base.hostname)
+            !isAllowedRedirectHost(next.hostname, base.hostname)
           ) {
             return blockedResult(target.toString(), 'blocked_redirect', next.hostname)
           }
