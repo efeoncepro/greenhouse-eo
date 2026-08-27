@@ -7457,6 +7457,42 @@ export interface GreenhouseGrowthSeoCompetitors {
   seo_target_id: string;
 }
 
+export interface GreenhouseGrowthSeoDomainOverviewSnapshots {
+  capture_date: Timestamp;
+  captured_at: Generated<Timestamp>;
+  captured_by_organization_id: string;
+  created_at: Generated<Timestamp>;
+  domain: string;
+  domain_overview_id: Generated<string>;
+  language_code: string;
+  location_code: string;
+  normalized_domain: string;
+  organic_count: number | null;
+  organic_estimated_paid_traffic_cost: Numeric | null;
+  organic_etv: Numeric | null;
+  organic_is_down: number | null;
+  organic_is_lost: number | null;
+  organic_is_new: number | null;
+  organic_is_up: number | null;
+  organic_pos_1: number | null;
+  organic_pos_11_20: number | null;
+  organic_pos_2_3: number | null;
+  organic_pos_21_30: number | null;
+  organic_pos_31_40: number | null;
+  organic_pos_4_10: number | null;
+  organic_pos_41_50: number | null;
+  organic_pos_51_60: number | null;
+  organic_pos_61_70: number | null;
+  organic_pos_71_80: number | null;
+  organic_pos_81_90: number | null;
+  organic_pos_91_100: number | null;
+  paid_count: number | null;
+  paid_estimated_paid_traffic_cost: Numeric | null;
+  paid_etv: Numeric | null;
+  provider_cost: Generated<Numeric>;
+  source_endpoint: string;
+}
+
 export interface GreenhouseGrowthSeoGscDaily {
   capture_date: Timestamp;
   clicks: Generated<number>;
@@ -12866,6 +12902,7 @@ export interface DB {
   "greenhouse_growth.search_console_oauth_states": GreenhouseGrowthSearchConsoleOauthStates;
   "greenhouse_growth.seo_backlink_snapshots": GreenhouseGrowthSeoBacklinkSnapshots;
   "greenhouse_growth.seo_competitors": GreenhouseGrowthSeoCompetitors;
+  "greenhouse_growth.seo_domain_overview_snapshots": GreenhouseGrowthSeoDomainOverviewSnapshots;
   "greenhouse_growth.seo_gsc_daily": GreenhouseGrowthSeoGscDaily;
   "greenhouse_growth.seo_keyword_discovery_actions": GreenhouseGrowthSeoKeywordDiscoveryActions;
   "greenhouse_growth.seo_keyword_discovery_candidates": GreenhouseGrowthSeoKeywordDiscoveryCandidates;
