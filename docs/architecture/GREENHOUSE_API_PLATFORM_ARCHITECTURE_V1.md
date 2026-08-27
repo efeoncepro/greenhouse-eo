@@ -109,6 +109,11 @@ El adapter mapea los errores por CÓDIGO de dominio, no por status: los tres 409
 por `statusCode` los colapsaba en uno, que es la misma clase de defecto que TASK-1751 corrigió del lado
 del candidato; se detectó justamente al documentar este contrato.
 
+**Orden obligatorio al federar un lane nuevo hacia MCP** (lección `TASK-1661`): la tool se registra en el
+gateway `efeonce-mcp` **DESPUÉS** de que el release lleve la ruta a `main`, nunca antes. Registrarla contra un
+lane que sólo existe en `develop` no falla al registrar: falla al usarse, con **404 upstream**. Aplica a
+cualquier ruta de este documento que se federe, no sólo a las de Hiring.
+
 ### El guard que impide que la clase vuelva
 
 El hueco no fue que faltara una ruta: fue que **nadie se hizo la pregunta de parity**, ni las cuatro

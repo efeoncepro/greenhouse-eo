@@ -291,7 +291,13 @@ programática lean lo mismo.
 - [x] Existe el loop `propose`/`confirm` y `propose` **no muta** (congelado por test; la verificación contra la base queda con la evidencia de runtime).
 - [x] `confirm` delega en `decideHiringApplication`; el lane no escribe SQL propio.
 - [x] Confirmar dos veces la misma propuesta decide una sola vez (replay por `idempotencyKey` del command).
-- [~] **DIFERIDO con razón**: el registro de tools MCP vive en el repo hermano `efeonce-mcp`, no acá. Desde Greenhouse quedó el App API que una tool consumiría; el scope de escritura (`efeonce.mcp.hiring.write`) no existe y está bloqueado hasta TASK-1631.
+- [~] **DIFERIDO con razón**: el registro de tools MCP vive en el repo hermano `efeonce-mcp`, no acá. Desde
+      Greenhouse quedó el App API que una tool consumiría; el scope de escritura (`efeonce.mcp.hiring.write`)
+      no existe y está bloqueado hasta TASK-1631.
+      🔴 **Orden obligatorio cuando se federe** (lección `TASK-1661`, aportada por la sesión que implementó la
+      tríada SEO): la tool se registra en el gateway **DESPUÉS** de que el release lleve estos lanes a `main`,
+      nunca antes. Federar contra un lane que todavía vive sólo en `develop` responde **404 upstream** — el
+      gateway no falla al registrar, falla al usarse, que es el peor momento para enterarse.
 - [x] Nexa opera el desenlace por acción gobernada sobre el primitive, sin queryear la tabla. Con autoridad más angosta que el portal: no re-decide.
 - [x] El guard falla sobre una capability `hiring.*` sin declarar. **No obliga a federar**: obliga a decidir y a escribir el porqué.
 - [x] `pnpm task:lint --task TASK-1773` en `errors=0 warnings=0`.
