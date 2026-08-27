@@ -2066,3 +2066,35 @@ Growth/AEO, redeploy `greenhouse-ic8cg4ery`) **y en staging** (parity flip 2026-
 - **Retries con backoff exponencial + jitter** en el web-search-adapter, y clasificación `rate_limited` desde message/code para SDKs sin httpStatus (Vertex `RESOURCE_EXHAUSTED`); rate_limited thrown ahora reintenta.
 - **Versionado:** `normalized_finding_v2` + `ai_visibility_score_v2`; el findingId default incorpora la versión (el PK colisionaba entre versiones en re-score). Filas/scores v1 conviven como historia; `getNormalizedFindings` devuelve la versión más nueva por (prompt, provider). Snapshots públicos inmutables.
 - **Evidencia:** re-score live `EO-GRUN-00045` → `citation_quality 0 → 90.9`, overall `52.5 → 73.3` con las mismas citas. Spec: `docs/tasks/complete/TASK-1390-ai-visibility-grader-issue-120-pipeline-fixes.md` + `docs/issues/resolved/ISSUE-120-*.md`.
+
+## Delta 2026-08-27 — TASK-1778 (ISSUE-164): postura de red del sustrato de sitio (code complete; cutover del flag pendiente)
+
+El fetcher único con el que Greenhouse lee sitios de terceros (`probes/safe-fetch.ts`, consumido por el gatherer de
+probes y por `brand-intelligence/fetch-site-content`) pasa de tener garantías afirmadas a tener garantías con mecanismo:
+
+- **Contención de redirects** (gated por `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED`, default OFF): `redirect: 'manual'`
+  + bucle propio con tope (`MAX_REDIRECTS=5`), revalidando cada `Location` contra la **familia del sujeto** — mismo host,
+  `apex ↔ www`, upgrade `http → https`; todo lo demás (otros subdominios incluidos) → `blocked_redirect` con el cuerpo del
+  destino **no leído**. La familia (y no igualdad exacta de hostname) es deliberada: preserva los redirects más comunes de
+  la web sin razonar eTLD+1 (la PSL queda como follow-up con evidencia).
+- **Guarda DNS** (mismo flag): resolución A/AAAA (`node:dns/promises`) antes de conectar, en la URL inicial y en cada
+  salto; cualquier dirección resuelta en rango no público (incl. IPv4-mapped IPv6) → `blocked_private_address`. La ventana
+  TOCTOU entre resolver y conectar queda documentada como riesgo residual aceptado; la mitigación real (pin de la IP
+  resuelta) es follow-up declarado de la task.
+- **Tope de bytes real + truncado con rastro** (sin flag): lectura por stream con corte duro (`read-body.ts`, compartida
+  con `entity-fetch.ts` — misma causa, un solo fix), default 4 MiB. `ProbeFetchResult.truncated` viaja al probe, y
+  `observable` retira la afirmación de ausencia sobre shells de render JS (señales asimétricas: solo retiran, nunca
+  agregan). Los probes de presencia (`json_ld`, `structured_actions`, `dom_semantics`) degradan a `skipped` con
+  `truncated_body`/`not_observable` en vez de reportar "no tiene" — el mismo invariante `score: null ≠ 0`, un nivel más
+  abajo. Encontrar en un cuerpo parcial sigue siendo prueba (la asimetría corre en una sola dirección).
+- **robots.txt obedecido** (sin flag): `robots-policy.ts` (parser conservador: longest-match, `*`/`$`, ante ambigüedad
+  permitir) se consulta una vez por sujeto reusando la misma descarga que analiza el probe de robots. El matching es
+  contra **nuestro** token (`GreenhouseAEOGrader`), jamás los de los bots de IA auditados; `/robots.txt` siempre es
+  alcanzable; un `Disallow` que nos alcanza produce `blocked_robots` (hallazgo, no fallo). `ProbeFetchInit.userAgent`
+  permite variar nuestro token (p.ej. edge-check), NUNCA suplantar el crawler de un tercero.
+- **Observabilidad:** rechazos de guarda a Sentry nivel `info` con `source: growth_ai_visibility_probe_fetch` y
+  `reason: blocked_redirect|blocked_private_address|blocked_robots`; sin cuerpo ni URL interna en el resultado.
+- **Estado:** code complete con suite adversarial (`__tests__/probes-safe-fetch-hardening.test.ts`, incluye test
+  anti-divergencia cabecera↔código). El cierre real es el cutover del flag (staging → corrida real sobre apex→www,
+  http→https y sitio >4 MiB → producción); hasta entonces ISSUE-164 permanece `open`. Ledger:
+  `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` § Pendientes.

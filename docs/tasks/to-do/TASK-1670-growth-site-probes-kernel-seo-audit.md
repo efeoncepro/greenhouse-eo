@@ -1,5 +1,18 @@
 # TASK-1670 — Growth: hallazgos de sitio (crawlers IA, JSON-LD, sitemap) en el audit SEO
 
+## Delta 2026-08-27 — el chequeo de borde vuelve a ser implementable: TASK-1778 Slice 4b entregó el override
+
+- `ProbeFetchInit.userAgent` existe (code complete en `develop`, TASK-1778): el chequeo de borde se
+  implementa variando **nuestro** token (p.ej. `GreenhouseAEOGrader-EdgeCheck/1.0`), y lo que se mide
+  es si el borde nos trata **distinto**, no si podemos hacernos pasar por otro bot. Suplantar
+  `GPTBot`/`OAI-SearchBot` sigue prohibido (postura declarada en el contrato del fetcher).
+- El punto del sitemap del Delta 2026-08-26 también quedó resuelto: `resolveProbeUrl` ya acepta la
+  **familia del sujeto** (`apex ↔ www` + upgrade `http → https`), así que un `<loc>` en `www.` sobre
+  sujeto apex ya no reporta «no verificado» falso.
+- Ojo adicional heredado de 1778: el fetcher ahora **obedece `robots.txt`** (matching contra nuestro
+  token, fallback `*`). Un chequeo de esta task sobre una ruta que el sitio nos prohíba volverá
+  `blocked_robots` — eso es un hallazgo del carril, no un bug del kernel.
+
 ## Delta 2026-08-15 (2) — decisión de secuencia verificada: se desbloquea parcialmente, y dos correcciones de oficio
 
 Cuatro especialistas resolvieron la secuencia del lote. Cuatro cambios, en orden de peso.

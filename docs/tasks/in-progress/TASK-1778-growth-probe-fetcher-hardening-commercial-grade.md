@@ -1,3 +1,18 @@
+## Delta 2026-08-27 — Slices 1–4b code complete en `develop`; el cierre real es el cutover
+
+- Implementado (commit `f876e7b0b`): contención de redirects + guarda DNS (tras el flag, default OFF),
+  stream cap + `truncated` + `observable` con probes de presencia degradando honesto, `robots-policy.ts`
+  obedecido con NUESTRO token, `ProbeFetchInit.userAgent` con la postura declarada, suite adversarial
+  (34 tests) + anti-divergencia de cabecera. `pnpm local:check` + 692 tests del dominio en verde.
+- **Premisa del `Why` corregida por los Deltas 2026-08-26/27 del issue:** los flags consumidores YA
+  están `true` en la revisión activa del ops-worker de producción y el intake público está vivo — no
+  hay «ventana pre-flip» que proteger; la regla externa muta a: el cutover del flag estricto
+  (staging → corrida real → prod) corre con urgencia de runtime vivo. Plan en
+  `FEATURE_FLAG_STATE_LEDGER.md` § Pendientes.
+- **Pendiente para cerrar:** flip staging + corrida real (apex→www · http→https · >4 MiB con JSON-LD
+  al final) + 48 h de señal Sentry + mover `ISSUE-164` a `resolved/`. Estado: `code complete,
+  rollout pendiente`.
+
 # TASK-1778 — Growth: endurecer el fetcher de sitio para uso comercial (SSRF, tope real, truncado honesto, robots)
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -8,7 +23,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -260,12 +275,12 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface y consumidores nombrados con paths reales.
-- [ ] Invariantes y postura de concurrencia explícitos; `N/A` de tenant y DB justificados.
-- [ ] Sin tablas nuevas: no aplica allowlist de destinos de escritura.
-- [ ] Postura de migración/rollback explícita y proporcional (flag de corte para el cambio de comportamiento de red).
+- [x] Source of truth, contract surface y consumidores nombrados con paths reales.
+- [x] Invariantes y postura de concurrencia explícitos; `N/A` de tenant y DB justificados.
+- [x] Sin tablas nuevas: no aplica allowlist de destinos de escritura.
+- [x] Postura de migración/rollback explícita y proporcional (flag de corte para el cambio de comportamiento de red).
 - [ ] Evidencia runtime listada, incluida la corrida en staging sobre los tres casos reales.
-- [ ] Errores canónicos, observabilidad sin fuga de cuerpo ni de URL interna.
+- [x] Errores canónicos, observabilidad sin fuga de cuerpo ni de URL interna.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -560,25 +575,25 @@ el siguiente agente no tenga que rederivarlo.
 
 ## Acceptance Criteria
 
-- [ ] `safe-fetch.ts` usa `redirect: 'manual'` con bucle propio y tope de saltos; cada `Location` se
+- [x] `safe-fetch.ts` usa `redirect: 'manual'` con bucle propio y tope de saltos; cada `Location` se
       revalida antes de seguirse.
-- [ ] Un redirect a IP privada, a `169.254.169.254` o a un host público distinto devuelve
+- [x] Un redirect a IP privada, a `169.254.169.254` o a un host público distinto devuelve
       `{ ok: false, errorCode: 'blocked_redirect', body: '' }` y **el cuerpo del destino no se lee**.
-- [ ] Un hostname público que resuelve a rango no público devuelve `blocked_private_address`, tanto en
+- [x] Un hostname público que resuelve a rango no público devuelve `blocked_private_address`, tanto en
       la URL inicial como en un salto.
 - [ ] `apex → www`, `www → apex` y `http → https` **siguen funcionando**, probado con test y con
       corrida real en staging.
-- [ ] El cuerpo se lee por stream con corte duro: una respuesta `chunked` sin `content-length` mayor al
+- [x] El cuerpo se lee por stream con corte duro: una respuesta `chunked` sin `content-length` mayor al
       tope **no se bufferiza completa**, probado con test.
-- [ ] `ProbeFetchResult.truncated` existe, es aditivo con default `false`, y llega hasta el probe.
-- [ ] Un probe de **presencia** con `truncated === true` degrada a `skipped` con razón explícita y
+- [x] `ProbeFetchResult.truncated` existe, es aditivo con default `false`, y llega hasta el probe.
+- [x] Un probe de **presencia** con `truncated === true` degrada a `skipped` con razón explícita y
       **nunca** reporta ausencia.
-- [ ] El mismo arreglo de lectura está aplicado en `entity-fetch.ts`.
-- [ ] La cabecera de `safe-fetch.ts` describe exactamente lo que el código hace, y existe un test que
+- [x] El mismo arreglo de lectura está aplicado en `entity-fetch.ts`.
+- [x] La cabecera de `safe-fetch.ts` describe exactamente lo que el código hace, y existe un test que
       falla si vuelven a divergir.
-- [ ] Slice 4 resuelto en una de las dos direcciones: `robots.txt` obedecido por el fetcher, **o** la
+- [x] Slice 4 resuelto en una de las dos direcciones: `robots.txt` obedecido por el fetcher, **o** la
       promesa de `TASK-1709` acotada al carril OnPage. No queda una afirmación sin mecanismo.
-- [ ] `/robots.txt` sigue siendo alcanzable aunque la política prohíba el resto.
+- [x] `/robots.txt` sigue siendo alcanzable aunque la política prohíba el resto.
 - [ ] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` y `pnpm docs:closure-check` pasa.
 - [ ] `ISSUE-164` movido a `resolved/` **sólo después** de la corrida real en staging.
 - [ ] Ningún flag consumidor del grader pasó a `prod: ON` antes del merge de los Slices 1–2.

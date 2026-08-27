@@ -2,9 +2,11 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-## 2026-08-27 — TASK-1778 en ejecución: endurecer el fetcher de probes (ISSUE-164)
+## 2026-08-27 — TASK-1778: el fetcher de probes queda defendible (code complete, rollout pendiente)
 
-**Estado: in-progress, rama `develop`, local-first sin push.** Objetivo: contención real de redirects + guarda DNS (flag `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED`, default OFF), tope de bytes por stream con `truncated`/`observable` honestos, obediencia de `robots.txt` con nuestro token de UA, y override de UA con postura declarada. Premisa corregida en Discovery: los flags consumidores YA están `true` en la revisión activa del ops-worker (Delta del issue), así que el fix corre con urgencia de runtime vivo, no de ventana pre-flip.
+**Estado: `code complete, rollout pendiente`; task `in-progress`, rama `develop`, sin push.** Slices 1–4b implementados (commit `f876e7b0b`): contención de redirects por salto + guarda DNS tras `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (default OFF, declarado en `deploy.sh` + ledger), stream cap 4 MiB con `truncated`/`observable` y probes de presencia degradando honesto, `robots.txt` obedecido con NUESTRO token (jamás los bots auditados), `ProbeFetchInit.userAgent` con postura anti-suplantación. Suite adversarial (34 tests) + anti-divergencia de cabecera; 692 tests del dominio + `local:check` verdes.
+
+**Riesgo vivo:** los flags consumidores YA están `true` en el ops-worker de producción y el intake público responde (Delta 2026-08-26/27 de `ISSUE-164`) — el fetcher atiende tráfico HOY con la red vieja hasta el cutover. **Próximo paso (requiere push/deploy):** flip del flag en staging (Vercel + ops-worker `--update-env-vars` + default de `deploy.sh`) → corrida real sobre apex→www · http→https · sitio >4 MiB → 48 h de `blocked_*` en Sentry → prod → mover `ISSUE-164` a `resolved/`. `pnpm build` de cierre pendiente de autorización del operador (regla de memoria: no correrlo de rutina). Convivencia multi-sesión: la task fue devuelta a `to-do` por error por otra sesión (`fce17b868`) y re-reclamada; ownership avisado por mensaje cross-session.
 
 ## 2026-08-27 — TASK-1696 adopta la señal de presupuesto que faltaba
 

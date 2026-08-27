@@ -63,6 +63,17 @@ no control de acceso.
 
 **No hay explotación observada.** Lo que se retira es la afirmación de que no puede haberla.
 
+## Delta 2026-08-27 — fix code complete en `develop`; el issue queda abierto hasta la corrida real en staging
+
+`TASK-1778` implementó los Slices 1–4b (commit `f876e7b0b`): `redirect: 'manual'` + revalidación por
+salto acotada a la familia del sujeto, guarda DNS pre-conexión (ambos tras
+`GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED`, default OFF), lectura por stream con `truncated`/`observable`
+y `robots.txt` obedecido (sin flag), con suite adversarial que cubre los casos de la `## Verificación`
+de este issue. **Este issue NO se mueve a `resolved/` todavía**: la regla dura de la task exige la
+corrida real en staging (apex→www, http→https, sitio >4 MiB) con el flag ON antes de declarar que la
+cobertura sobrevivió — los tests unitarios prueban la guarda, no la cobertura. El plan de cutover vive
+en `FEATURE_FLAG_STATE_LEDGER.md` § Pendientes.
+
 ## Síntoma
 
 El fetcher declara en su cabecera una garantía de seguridad que el código no cumple:

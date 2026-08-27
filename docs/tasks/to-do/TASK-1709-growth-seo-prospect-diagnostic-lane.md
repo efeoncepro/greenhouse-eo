@@ -95,6 +95,15 @@ exactitud del mismo fetcher (`ISSUE-164`). Hasta que 1778 cierre, **este carril 
 respeto de `robots.txt` sobre la evidencia obtenida por OnPage** — no sobre la del sustrato. Decir lo
 contrario en un documento comercial sería exactamente el patrón que este delta dice combatir.
 
+> **Actualización 2026-08-27 (TASK-1778 Slice 4 code complete).** El mecanismo ya existe: el fetcher
+> propio **obedece** `robots.txt` (`robots-policy.ts`, matching contra NUESTRO token con fallback
+> `*`, `/robots.txt` siempre alcanzable, `Disallow` que nos alcanza → `blocked_robots` = hallazgo).
+> La obediencia viaja **sin flag** — apenas el código de 1778 esté desplegado en el runtime que
+> ejecute este carril, la promesa de robots cubre AMBOS carriles (OnPage + sustrato). Precisión: lo
+> que sigue gated por `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (default OFF, cutover pendiente)
+> es el endurecimiento de RED (redirects + DNS), no robots. Verificar deploy antes de escribir la
+> promesa ampliada en un entregable comercial.
+
 **Herramientas nuevas: ninguna.** Se evaluó sumar un scraper externo tipo Apify y se **descarta**:
 todo lo que aportaría ya existe dos veces (render headless vía `enable_browser_rendering` de OnPage;
 lectura puntual vía el sustrato propio), y su valor diferencial real —rotación de proxies para
