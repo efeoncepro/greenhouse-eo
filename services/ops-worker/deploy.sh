@@ -651,13 +651,15 @@ GROWTH_AI_VISIBILITY_PROBES_ENABLED="${GROWTH_AI_VISIBILITY_PROBES_ENABLED:-${DE
 GROWTH_AI_VISIBILITY_AGENTIC_READINESS_ENABLED="${GROWTH_AI_VISIBILITY_AGENTIC_READINESS_ENABLED:-${DEFAULT_GROWTH_AGENTIC_READINESS_ENABLED}}"
 GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED="${GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED:-${DEFAULT_GROWTH_ENTITY_PROBES_ENABLED}}"
 # TASK-1778 — Endurecimiento de RED del probe fetcher (ISSUE-164): redirect containment por
-# salto + guarda DNS. Default false en AMBOS branches hasta el cutover (staging real run →
-# prod); con false el fetcher conserva la red previa (kill switch de cobertura). El resto del
+# salto (familia + subdominios descendientes del sujeto) + guarda DNS. ON desde el cutover
+# 2026-08-27 (worker ÚNICO compartido staging+prod: este default cubre el path async de ambos,
+# que es la cadena viva del intake público). Evidencia pre-flip: 7 dominios reales de cartera
+# en strict (6 ok; bancochile ya fallaba igual con la red vieja — Imperva, caso TASK-1281).
+# Rollback <5 min: default a false + `gcloud run services update --update-env-vars ...=false`
+# (los deploy.sh usan --set-env-vars destructivo: cambiar SIEMPRE ambos). El resto del
 # endurecimiento (stream cap + truncated + robots obedecido) NO lleva flag. DUAL-LOCATION:
-# también se lee en Vercel (path inline). Al flipear: editar este default Y aplicar en vivo
-# con `gcloud run services update --update-env-vars` (los deploy.sh usan --set-env-vars
-# destructivo; sólo lo segundo desaparece en el próximo deploy).
-GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED="${GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED:-false}"
+# también se lee en Vercel (staging env ON; prod se prende con el release que lleve el código).
+GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED="${GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED:-true}"
 GROWTH_AI_VISIBILITY_REGRADE_ENABLED="${GROWTH_AI_VISIBILITY_REGRADE_ENABLED:-${DEFAULT_GROWTH_REGRADE_ENABLED}}"
 GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE="${GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE:-5}"
 GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD="${GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD:-50}"
