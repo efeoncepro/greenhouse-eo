@@ -92,81 +92,22 @@ export interface ProbeResult extends ProbeOutcome {
 }
 
 // ── Fetcher (read-only, SSRF-guarded) ────────────────────────────────────────
+//
+// TASK-1697 — los tipos del fetcher viven en `@/lib/growth/site-substrate/contracts.ts`
+// (extraídos con el sustrato); acá quedan como ALIAS re-exportados para que ningún
+// dependiente del dominio AEO cambie una línea. Documentación canónica: el sustrato.
 
-/**
- * Vocabulario cerrado de fallo del fetcher (TASK-1778 agrega los `blocked_*` finos):
- *  - `blocked` — guard de entrada (URL inválida, host no público literal, cross-host).
- *  - `blocked_redirect` — un salto de redirect salió de la familia del sujeto / excedió el tope.
- *  - `blocked_private_address` — el hostname resolvió (DNS) a una dirección no pública.
- *  - `blocked_robots` — el `robots.txt` del sujeto prohíbe la ruta a NUESTRO user-agent
- *    (hallazgo, no fallo: "no pudimos leer porque tu robots.txt lo prohíbe").
- *  - `too_large` — legacy (pre-streaming); el fetcher ya no lo emite, se conserva por compat.
- */
-export type ProbeFetchErrorCode =
-  | 'timeout'
-  | 'network'
-  | 'blocked'
-  | 'blocked_redirect'
-  | 'blocked_private_address'
-  | 'blocked_robots'
-  | 'too_large'
-  | 'http_error'
+import type {
+  SiteFetchErrorCode,
+  SiteFetchInit,
+  SiteFetchResult,
+  SiteFetcher
+} from '@/lib/growth/site-substrate/contracts'
 
-/** Respuesta normalizada del fetcher. NUNCA lanza: un fallo se refleja en `ok=false` + `errorCode`. */
-export interface ProbeFetchResult {
-  ok: boolean
-  /** HTTP status; 0 si fue error de red/timeout/bloqueo antes de respuesta. */
-  status: number
-  /** URL final (tras redirects), para evidencia/diagnóstico. */
-  url: string
-  /** Cuerpo de texto acotado (truncado a un máximo defensivo). */
-  body: string
-  contentType: string | null
-  errorCode: ProbeFetchErrorCode | null
-  /**
-   * TASK-1778 — `true` cuando el body fue cortado al tope de bytes. ADITIVO: opcional con
-   * default `false` (ausente = no truncado) para no romper mocks/consumers existentes; el
-   * fetcher real SIEMPRE lo setea. Un probe de PRESENCIA jamás concluye ausencia sobre un
-   * cuerpo truncado: "no encontré" en un body parcial significa "no miré todo", no "no está".
-   * Los probes leen `truncated === true`.
-   */
-  truncated?: boolean
-  /**
-   * TASK-1778 — ¿la respuesta permite AFIRMAR ausencia? Señales baratas y ASIMÉTRICAS por
-   * diseño (sólo pueden RETIRAR una afirmación, nunca agregar una): truncado, shell JS vacío
-   * (`<div id="root">` único, `<noscript>` pidiendo JS, razón texto/markup ≈ 0). ADITIVO:
-   * opcional con default `true` (ausente = observable); el fetcher real SIEMPRE lo setea.
-   * Con `observable === false` los probes de presencia degradan a `skipped`, NUNCA
-   * `score: 0` — el mismo primitive que `NO_HEADLESS_OUTCOME` aplica a los headless.
-   * Los probes leen `observable === false` (nunca `!observable`, que trataría `undefined`
-   * como no-observable e invertiría el default).
-   */
-  observable?: boolean
-}
-
-export interface ProbeFetchInit {
-  /** Acepta override del Accept header (p.ej. application/xml para sitemap). */
-  accept?: string
-  /** Timeout por request (ms). El fetcher impone un tope defensivo. */
-  timeoutMs?: number
-  /** Máximo de bytes a leer del body (defensa anti-payload gigante). */
-  maxBytes?: number
-  /**
-   * TASK-1778 — Override del User-Agent, para variar NUESTRO propio token (p.ej.
-   * `GreenhouseAEOGrader-EdgeCheck/1.0`). NUNCA para presentarse como el crawler de un
-   * tercero (GPTBot/OAI-SearchBot/PerplexityBot…): suplantar la identidad de otro bot es
-   * evasión verificable (WAFs validan por reverse-DNS) y costo reputacional del dominio
-   * auditor. Coherente con el matching de robots.txt: se matchea nuestro token, jamás
-   * los de los bots que auditamos. Default: `COURTESY_USER_AGENT`.
-   */
-  userAgent?: string
-}
-
-/**
- * Fetcher acotado al dominio del run. Resuelve `path` relativo contra el baseUrl del
- * sujeto y rechaza cross-host / hosts no públicos (SSRF). Inyectable para tests.
- */
-export type ProbeFetcher = (path: string, init?: ProbeFetchInit) => Promise<ProbeFetchResult>
+export type ProbeFetchErrorCode = SiteFetchErrorCode
+export type ProbeFetchResult = SiteFetchResult
+export type ProbeFetchInit = SiteFetchInit
+export type ProbeFetcher = SiteFetcher
 
 // ── Entity API fetcher (terceros, host-allowlisted; TASK-1267) ────────────────
 

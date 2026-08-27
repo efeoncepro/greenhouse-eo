@@ -558,10 +558,9 @@ describe('TASK-1778 · user-agent override', () => {
 // ── Anti-divergencia cabecera ↔ código ───────────────────────────────────────
 
 describe('TASK-1778 · la cabecera de safe-fetch describe lo que el código hace', () => {
-  const source = readFileSync(
-    join(__dirname, '..', 'probes', 'safe-fetch.ts'),
-    'utf-8'
-  )
+  // TASK-1697: el fetcher vive en el sustrato (`site-substrate/site-fetch.ts`); el shim
+  // `probes/safe-fetch.ts` sólo re-exporta. El anti-divergencia audita la IMPLEMENTACIÓN.
+  const source = readFileSync(join(__dirname, '..', '..', 'site-substrate', 'site-fetch.ts'), 'utf-8')
 
   it('cada garantía declarada tiene su mecanismo en el archivo', () => {
     // Contención de redirects → redirect manual + tope de saltos.
