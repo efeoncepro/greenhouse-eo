@@ -38,6 +38,32 @@ rate, terms, rights ni promotion del modelo anterior. Exige cuota y endpoint liv
 canary facturable desde Producer, readback y rollback. Hasta entonces Omni 1.1 permanece `gated`: no hubo spend,
 deploy, cambio de binding, generación live ni lectura que pruebe disponibilidad en Globe.
 
+## 2026-08-27 — TASK-1777: el detalle de enlaces quedó code complete, rollout pendiente
+
+**Estado: `code complete, rollout pendiente`; commits en develop, push a decisión del operador.**
+Cierra la tercera capacidad de la tríada anti-Semrush: el detalle NOMINAL detrás del snapshot
+semanal de enlaces. Tres tablas hijas del snapshot (jamás del target): `seo_backlink_drilldowns`
+(el VEREDICTO — decisión de ejecución: sin persistirlo no se distingue "no pasó nada" de "no
+sabemos qué pasó" ni se ancla el a-lo-sumo-una-vez), `seo_backlink_referring_domains` (movement
+`present|new|lost` con muestra accionable) y `seo_backlink_anchors`. El corazón es la CONDICIÓN DE
+DISPARO (`shouldDrillDownBacklinks`, predicado puro testeado antes que el código que gasta): el
+drill-down corre como paso post-batch del cron semanal EXISTENTE (sin scheduler nuevo), sólo donde
+el `new_lost_delta` ya persistido muestra movimiento; `partial` no dispara jamás. Sobre-optimización
+de anchors como métrica nueva separada de `toxic_share` (no se toca); reader de TRES estados;
+shape de `readBacklinkProfile` inmutable (test de regresión). 40 tests del paquete + señal
+`seo.backlink.detail_drilldown_failed` + sanity SQL vivo con transacción + ROLLBACK (cero residuo
+en la serie real; el CHECK de movement rechazó un cuarto valor en vivo).
+
+**Checkpoint del operador (gasta):** flag `GROWTH_SEO_BACKLINK_DETAIL_ENABLED` ON (sólo
+ops-worker) + smoke con un target CON movimiento y otro SIN (USD 0 verificado en ledger) + canary
+MCP + confirmar umbrales (`…MIN_BACKLINK_MOVEMENT=10` / `…MIN_REFDOMAIN_MOVEMENT=3` /
+`…ROW_LIMIT=100`). Runbook: `docs/manual-de-uso/growth/operar-perfil-de-enlaces-seo.md`.
+
+**No re-descubrir:** el gate bloqueado NO escribe veredicto (re-evaluable al renovarse el mes);
+`new` manda sobre `present` y `lost` sólo si el dominio ya no está (el delta cuenta backlinks, no
+dominios); sin backfill histórico por diseño (la ventana del proveedor ya pasó). `TASK-1314` ya
+tiene el "qué enlaza a la pillar" (delta escrito en su spec).
+
 ## 2026-08-27 — TASK-1776: la visibilidad por página quedó code complete, rollout pendiente
 
 **Estado: `code complete, rollout pendiente`; sin push.** Misma sesión que TASK-1775, mismo patrón:
@@ -264,55 +290,3 @@ Un envío real a `EO Team` confirmó que el contrato histórico era falso: Bot F
 La documentación oficial de Microsoft establece que los bots en chats grupales admiten menciones a usuarios, pero no `@everyone`. Se corrigieron arquitectura, invariante Ops, runbook, `TASK-716`, contexto durable y las skills espejadas de plataforma/operación. El diseño de `TASK-716` ahora usa `none | explicit_users`; prohíbe `everyone_in_chat` y `mentioned.id=<chatId>`.
 
 **Estado:** corrección documental completa; el soporte local no confirmado de `--mention-all` se retiró antes del commit y no existe en el runtime versionado. No se realizó un segundo envío.
-
-## 2026-08-24 — ISSUE-163 + TASK-1774: el mecanismo de baja tiene dueño
-
-**Sólo docs.** Continuación directa de la revisión de `TASK-1764`. Sin runtime tocado, sin push.
-
-**Barrido por dominio y superficie antes de reservar el ID** (la regla que evita duplicadas):
-ninguna task viva declara `Files owned` sobre `/api/account/email-preferences` ni `unsubscribe.ts`.
-`TASK-383` posee `delivery.ts` **sólo** para instrumentación Sentry. `TASK-1397` y `TASK-993`
-**dependen** de las primitivas, no las poseen. `TASK-1745` está `complete` y cubre entrega, no opt-out.
-
-**El origen no era una regresión.** `TASK-269` está `complete` con su criterio
-`- [ ] POST /api/account/email-preferences permite toggle…` **sin marcar** y sin la página de
-preferencias que su Slice planeaba. Por eso el registro correcto es `ISSUE-163` (defecto de runtime)
-con `TASK-1774` como dueña del fix — no un slice dentro de la umbrella de footers.
-
-**Decisión de diseño load-bearing de `TASK-1774`: el `GET` NO muta.** Los escáneres de seguridad
-corporativos prefetchean los enlaces de un correo; un `GET` que da de baja convierte ese prefetch en
-baja involuntaria. La confirmación intermedia elimina la clase entera. El one-click de RFC 8058 sí muta
-sin confirmar, porque es el contrato del estándar y lo dispara una acción deliberada en el cliente.
-
-**Partición declarada para no crear un cuarto decisor:** 1774 posee el MECANISMO; el registro de policy
-de la foundation de `EPIC-042` posee el DECISOR (mata el default `?? 'broadcast'` y colapsa los tres
-decisores actuales). Matar ese default sin registro dejaría el sistema sin decisor, así que **no**
-entró en 1774.
-
-**La superficie de preferencias por tipo quedó como lane 7 del epic, sin ID reservado.** Se declara
-explícitamente ahí porque un follow-up sin dueño es exactamente cómo se perdió la primera vez.
-
-**Tres Deltas de impacto cruzado:**
-
-- `TASK-1397` (Career Alerts) — `Blocked by: none` → `TASK-1774`. Declaraba que las primitivas proveen
-  «signed opt-out»; la mitad es falsa. Es la primera suscripción opt-in real del sistema, donde el
-  opt-out es la contrapartida del consentimiento que la propia task modela.
-- `TASK-1650` — el drift de dirección pasó de deuda de una superficie a **dependencia dura de
-  `EPIC-042`**: en cuanto una cohorte se promueva, esa dirección se imprime en correos productivos.
-- `TASK-993` — pregunta al Discovery: ¿destinatarios explícitos o lista? Define si depende de 1774.
-
-**Hallazgo preexistente, corregido después a pedido del operador:** `TASK-993` daba `errors=1 warnings=4`
-en `task:lint` por ser anterior a la plantilla vigente (no declaraba `Execution profile` ni `UI impact`).
-Verificado primero que era idéntico antes y después de mi Delta — no lo introduje. Luego se completó al
-formato vigente: `backend-data`, `Backend impact: api|command|sync`, más contratos Modular Placement y
-Backend/Data. **Decisión de alcance dentro de esa corrección:** la afordancia visible del Slice 6 (botón
-«Reenviar email a Finanzas» en el modal de corrida mensual) **salió a follow-up `ui-ux` con ID por
-reservar**, en vez de escribirle un wireframe acá. Razón: el propio slice la modelaba como opcional
-(«otherwise leave UI minimal and rely on endpoint response»), el Goal decía «desde la UI **o** API», y el
-modelo operativo pide `backend-data` primero y `ui-ux` después. Inventar un doc de diseño para una acción
-secundaria, sin pasar por las skills de producto, habría sido exactamente el doc-para-pasar-el-gate que el
-contrato de tasks prohíbe. El endpoint se conserva completo. `task:lint` de las 7 tasks tocadas:
-`errors=0 warnings=0`.
-
-**Gates:** `task:lint` 1764/1274/1774 `template=1 errors=0 warnings=0`; `docs:context-check:strict`
-verde tras rotar.

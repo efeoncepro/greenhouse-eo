@@ -1345,6 +1345,14 @@ El sujeto NO tiene organización (es un dominio prospecto), así que el payload 
 
 El screening (`estimateDomainTraffic`) **no emite**: es una corrida on-demand sin downstream declarado, y su rastro de gasto ya queda en `seo_provider_spend_daily` por construcción. La constante vive en el dominio (`src/lib/growth/seo/contracts.ts`) — mismo seam de extracción §17.3.
 
+## Delta 2026-08-27 — TASK-1777: `growth.seo.backlink.detail_captured` (drill-down nominal de enlaces)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `growth.seo.backlink.detail_captured` | v1 | `seo_target` (`seot-{uuid}`) | pase `runBacklinkDetailPass` → `executeDrillDown` (`src/lib/growth/seo/backlinks/detail-capture.ts`), tras persistir veredicto + filas hijas en la misma transacción (sólo outcome `drilled`) | ninguno todavía — rastro de auditoría de un gasto CONDICIONAL |
+
+**Payload v1**: `{ seoTargetId, organizationId, backlinkSnapshotId, captureDate, triggerReason, referringDomainRows, anchorRows, costUsd, actor }` — el `triggerReason` (`first_time` / `backlink_movement` / `referring_domain_movement`) es la parte auditable de la política de gasto: responde "¿por qué se compró este detalle?". Los outcomes `skipped_*` y `failed` **no emiten** (no compraron nada o no completaron) — quedan en el veredicto persistido (`seo_backlink_drilldowns`) y en la señal `seo.backlink.detail_drilldown_failed`. La constante vive en el dominio (`contracts.ts`) — seam §17.3.
+
 ## Delta 2026-08-27 — TASK-1776: `growth.seo.url_visibility.snapshot_captured` (visibilidad por sujeto-página)
 
 | Evento | Versión | Aggregate | Emisor | Consumer |

@@ -20,6 +20,13 @@
 - `TASK-1781` queda creada como P0 para migrar antes del shutdown anunciado de `gemini-omni-flash-preview` el 2026-09-30 y expandir capacidades por rutas/output shapes independientes, sin heredar evidencia del modelo anterior.
 - Nueva route card candidata y actualización espejada de `greenhouse-globe-model-fleet` y las referencias Omni de `motion-design-studio`. Sin cambio de binding, deploy, gasto, canary ni promoción: 1.1 sigue `gated` hasta readback live.
 
+## 2026-08-27 — El perfil de enlaces gana nombres propios, con el gasto condicionado al movimiento
+
+- `TASK-1777` (code complete, rollout pendiente): el snapshot semanal de enlaces decía "perdiste 12 dominios" sin decir CUÁLES. Nacen las tablas hijas del snapshot con el detalle accionable: qué dominio enlazó/se cayó (con muestra del enlace y anchor — suficiente para el correo de recuperación) y el perfil de anchors con una lectura de **sobre-optimización** nueva y separada de `toxic_share` (miden cosas distintas; ninguna reemplaza a la otra).
+- El corazón no es el endpoint sino la **condición de disparo**: el drill-down corre como paso del cron semanal existente (sin scheduler nuevo) y SOLO donde el `new_lost_delta` ya persistido muestra movimiento — un target estable registra su veredicto a USD 0, y ese veredicto persistido (`seo_backlink_drilldowns`) es lo que permite al reader distinguir "el perfil estuvo estable" (hallazgo positivo) de "no sabemos qué pasó" (drill-down fallido, señal en rojo).
+- `rank` siempre en escala 0-100; el movimiento nominal se pide sólo en la dirección que el delta indica; el shape de `readBacklinkProfile` queda intacto (test de regresión). Lane ecosystem `/growth/seo/backlink-detail` + tool MCP `get_seo_backlink_detail` + señal `seo.backlink.detail_drilldown_failed`.
+- Flag `GROWTH_SEO_BACKLINK_DETAIL_ENABLED` nace OFF (sólo ops-worker); el encendido es checkpoint del operador. Runbook `docs/manual-de-uso/growth/operar-perfil-de-enlaces-seo.md`. Con esto, las tres capacidades por las que hoy se paga Semrush (dominio · página · enlaces) quedan code-complete en Greenhouse.
+
 ## 2026-08-27 — El módulo SEO aprende a hablar de páginas, no sólo de dominios
 
 - `TASK-1776` (code complete, rollout pendiente): nace `greenhouse_growth.seo_url_visibility_snapshots` — qué ranquea una URL, subcarpeta o subdominio de CUALQUIER dominio, y qué páginas/subdominios concentran su tráfico. La tríada que Semrush vende como tres reportes es acá UNA capacidad con resolver de sujeto **declarado** (la clase jamás se infiere).
@@ -757,16 +764,3 @@
   `hiring.assessment.template_module_without_questions` para que la clase no vuelva a pasar inadvertida.
 - Runtime: la asignación automática nace **apagada** (`HIRING_STAGE_TEST_ASSIGNMENT_ENABLED`, sólo
   ops-worker). Con el flag OFF el comportamiento visible es el mismo de antes.
-
-## 2026-08-17 — Baseline global de beneficios para vacantes Efeonce documentado en las skills
-
-- Las skills espejo de Talent y Payroll incorporan el `Efeonce Candidate Benefits Charter` para comunicar en
-  todas las vacantes una política global: 15 días hábiles de vacaciones remuneradas más un día por cada año
-  continuo cumplido hasta 20, dos días flotantes, 16 horas de atención médica, dos días de bienestar, duelo,
-  deber cívico, matrimonio/unión civil, 10 semanas para la madre/persona que da a luz y 2 para el padre/progenitor no gestante (adopción/cuidado: 4/2), mudanza, desarrollo, apoyo remoto y feriados corporativos chilenos aparte de vacaciones.
-  La ley local puede mejorar ese piso, nunca reducirlo. La carta diferencia esta política candidato-facing del
-  runtime actual de Leave y del instrumento contractual/proveedor que Payroll/Legal debe validar. También
-  define devengo, arrastre, familia, retorno postparto, cobertura, equivalencia contractor y wallets de
-  aprendizaje (US$500/año), conectividad/coworking (US$50/mes) y salud mental (US$300/año). El aporte de
-  equipo (US$400/36 meses) continúa como política, pero se revela durante entrevista u oferta, no en el copy
-  estándar de vacantes. Sin cambio de runtime, schema, contratos ni configuración de permisos.

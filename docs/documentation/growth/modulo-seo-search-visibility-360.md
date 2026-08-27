@@ -245,6 +245,29 @@ Operación: [Operar la visibilidad por URL](../../manual-de-uso/growth/operar-vi
 
 > Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md §4.2 y §15](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md).
 
+## El detalle de enlaces accionable (TASK-1777)
+
+El snapshot semanal de enlaces decía "perdiste 12 dominios referentes esta semana" — una frase con
+la que un cliente no puede hacer nada. El detalle nominal agrega los **nombres**: qué dominio
+enlazó, cuál se cayó (con una muestra del enlace y su texto — suficiente para escribir el correo
+de recuperación) y con qué anchors te enlazan.
+
+La regla de oro es de costo: **el detalle sólo se compra donde el agregado se movió**. Cada semana
+el sistema evalúa el snapshot y deja un veredicto: si el perfil estuvo estable, no se gasta nada y
+eso queda registrado como afirmación positiva ("no pasó nada"), distinta de "no sabemos qué pasó"
+(un intento fallido, que enciende una alerta). Las tres lecturas posibles nunca se confunden.
+
+Trae además una lectura nueva: la **sobre-optimización de anchors** — si el 60% de tus enlaces
+llegan con el mismo texto exacto, eso parece manipulación aunque los dominios sean impecables. Es
+una métrica separada de la toxicidad por spam score (miden cosas distintas, con remedios
+distintos) y viaja ya calculada a todas las superficies.
+
+Se consume por `readBacklinkDetail`, el lane ecosystem (`/growth/seo/backlink-detail`) y la tool
+MCP `get_seo_backlink_detail`.
+Operación: [Operar el perfil de enlaces SEO](../../manual-de-uso/growth/operar-perfil-de-enlaces-seo.md).
+
+> Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md §4.2](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) (tablas hijas del snapshot + condición de disparo).
+
 ## Que NO existe todavia
 
 Lo siguiente aún no está construido (las series que ya se llenan: Search Console live; rankings live desde el 2026-08-06). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP live en producción desde el 2026-08-06**: lane ecosystem + 3 tools read-only (`get_seo_entitlement`, `get_seo_keyword_opportunities`, `get_seo_visibility_360`) en el MCP interno de Greenhouse (TASK-1645, ver el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8) **y federadas al gateway público `mcp.efeonce.org`** (TASK-1647). La lectura funcional completa de esa capacidad está en [Search Visibility 360 por MCP](search-visibility-360-por-mcp.md). Pendiente:

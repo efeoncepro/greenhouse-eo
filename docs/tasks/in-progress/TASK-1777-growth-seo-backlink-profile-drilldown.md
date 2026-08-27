@@ -1,5 +1,49 @@
 # TASK-1777 — Growth SEO: perfil de enlaces accionable (quién enlazó, quién se cayó, con qué anchor)
 
+## Delta 2026-08-27 — implementación (code complete, rollout pendiente)
+
+Slices 1–6a implementados y verificados local + PG real (misma sesión que TASK-1775/1776).
+Decisiones de ejecución que ajustan la spec:
+
+- **Se agrega una TERCERA tabla no declarada: `seo_backlink_drilldowns`** (el veredicto de cada
+  evaluación, una fila por snapshot). Sin persistir el veredicto no se puede (a) distinguir
+  `skipped_no_movement` de `drilldown_failed` — los tres estados del reader son contrato — ni
+  (b) anclar el "a lo sumo una vez por snapshot". Registra también los skips: "el perfil estuvo
+  estable" queda con fecha, no como ausencia. `skipped_partial` existe como outcome propio en el
+  veredicto (auditable) y colapsa a `skipped_no_movement` en el contrato del reader.
+- **Gate bloqueado NO escribe veredicto**: el snapshot queda re-evaluable cuando el presupuesto
+  mensual se renueve (escribirlo lo quemaría para siempre por la regla de una-vez).
+- **OQ1 (umbrales):** knobs `GROWTH_SEO_BACKLINK_DRILLDOWN_MIN_BACKLINK_MOVEMENT=10`,
+  `…_MIN_REFDOMAIN_MOVEMENT=3`, `GROWTH_SEO_BACKLINK_DETAIL_ROW_LIMIT=100`; el operador los
+  confirma antes del flip (flag OFF igual).
+- **OQ2 (espejo BQ de hijas):** diferido — el agregado ya se espeja y el detalle es ventana
+  caliente PG; el follow-up declarado queda vigente.
+- **OQ3 (primera vez al prender):** aplica de inmediato a toda la cartera — acotado (~USD 0.1 por
+  target; hoy 2 targets) y escalonable con `maxSnapshots` si la cartera crece. Documentado en el
+  runbook.
+- **Regla de precedencia del movimiento** (no estaba en la spec y la fusión la exige): `new`
+  manda sobre `present`; `lost` sólo si el dominio YA NO está en presentes; un dominio presente
+  que perdió UN enlace sigue `present` y conserva la muestra del enlace caído como contexto —
+  el delta del proveedor cuenta backlinks, no dominios.
+- **`skipped_partial` vs primera vez:** el snapshot `partial` NO dispara ni siquiera en primera
+  vez (la regla de partial va primero, a propósito).
+- La migración en `Files owned` decía `task-1778` (typo): quedó
+  `20260827203319906_task-1777-seo-backlink-detail.sql`. Se agregan la señal en
+  `src/lib/reliability/**`, el sanity `scripts/growth/_sanity-task-1777-backlink-detail.ts`
+  (con transacción + ROLLBACK deliberado — un snapshot sintético committeado contaminaría la
+  serie real) y `src/lib/api-platform/resources/ecosystem-growth-seo.ts` (el lane vive ahí).
+- Evento con prefijo del dominio: `growth.seo.backlink.detail_captured` (sólo outcome `drilled`;
+  los skips/failed quedan en el veredicto + señal). Capability reutilizada
+  `growth.seo.observation.read`; lane app no se crea (dominio ecosystem-only).
+- **El drift de la skill `dataforseo-operator`** ("backlinks sin consumer") declarado en la nota
+  de esta spec **ya fue corregido** en el cierre documental de TASK-1775 (2026-08-27, mismo día).
+
+**Rollout pendiente (checkpoint del operador — gasta dinero real):** flag ON multi-runtime
+(`deploy.sh` + `--update-env-vars`, sólo ops-worker; sin scheduler nuevo) + smoke con un target
+CON movimiento (filas hijas + `cost` vs estimado) y otro SIN movimiento (USD 0 en el ledger) +
+canary de la tool MCP en staging + federación `efeonce-mcp` + confirmar umbrales/limit. Hasta
+entonces: flag OFF, cero gasto, el batch semanal intacto.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -8,7 +52,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +65,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `code complete, rollout pendiente`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -245,23 +289,23 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface y consumidores nombrados con paths reales.
-- [ ] Invariantes, boundary de tenant e idempotencia explícitos.
-- [ ] Tablas nuevas declaradas en el allowlist de destinos de escritura del dominio si existe boundary test.
-- [ ] Postura de migración/backfill/rollback explícita.
-- [ ] Evidencia runtime/DB listada.
-- [ ] Errores canónicos, degradación honesta y cero fuga de datos sensibles.
+- [x] Source of truth, contract surface y consumidores nombrados con paths reales.
+- [x] Invariantes, boundary de tenant e idempotencia explícitos.
+- [x] Tablas nuevas declaradas en el allowlist de destinos de escritura del dominio si existe boundary test.
+- [x] Postura de migración/backfill/rollback explícita.
+- [x] Evidencia runtime/DB listada.
+- [x] Errores canónicos, degradación honesta y cero fuga de datos sensibles.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica en el primitive, no en la UI.
-- [ ] Modelada como command/reader sobre el snapshot, no como handler de pantalla.
-- [ ] Read como reader canónico; write como command con entitlement, idempotencia, outbox y errores canónicos.
-- [ ] Capability + grant a ≥1 rol real en el MISMO PR con coverage test verde.
-- [ ] Camino programático declarado: ecosystem + MCP en esta misma task.
-- [ ] Write apto para `propose → confirm → execute`.
-- [ ] Un primitive, muchos consumers.
-- [ ] Parity check = SÍ.
+- [x] Lógica en el primitive, no en la UI.
+- [x] Modelada como command/reader sobre el snapshot, no como handler de pantalla.
+- [x] Read como reader canónico; write como command con entitlement, idempotencia, outbox y errores canónicos.
+- [x] Capability + grant a ≥1 rol real en el MISMO PR con coverage test verde. (Se reutiliza `growth.seo.observation.read`, ya granteada.)
+- [x] Camino programático declarado: ecosystem + MCP en esta misma task.
+- [x] Write apto para `propose → confirm → execute`.
+- [x] Un primitive, muchos consumers.
+- [x] Parity check = SÍ.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -487,21 +531,21 @@ especialista: "no pasó nada" y "no sabemos qué pasó" son conclusiones opuesta
 
 ## Acceptance Criteria
 
-- [ ] `shouldDrillDownBacklinks` es un predicado puro sin acceso a red ni DB, con tests de tabla sobre los cinco casos: sin movimiento, bajo umbral, sobre umbral, primera vez y snapshot `partial`.
-- [ ] Un snapshot `partial` **no** dispara drill-down.
-- [ ] La migración crea ambas tablas con FK a `seo_backlink_snapshots`, CHECK cerrado de `movement`, claves únicas, triggers anti UPDATE/DELETE y GRANT; el bloque DO aborta si algo no quedó creado.
+- [x] `shouldDrillDownBacklinks` es un predicado puro sin acceso a red ni DB, con tests de tabla sobre los cinco casos: sin movimiento, bajo umbral, sobre umbral, primera vez y snapshot `partial`.
+- [x] Un snapshot `partial` **no** dispara drill-down.
+- [x] La migración crea ambas tablas con FK a `seo_backlink_snapshots`, CHECK cerrado de `movement`, claves únicas, triggers anti UPDATE/DELETE y GRANT; el bloque DO aborta si algo no quedó creado.
 - [ ] Un target sin movimiento registra **USD 0** en `seo_provider_spend_daily`, verificado en el smoke real y no sólo con mocks.
 - [ ] Un target con movimiento deja filas en ambas tablas hijas y su `cost` real coincide con el estimado dentro del margen declarado.
-- [ ] Todo `rank` persistido está en escala 0–100.
-- [ ] `spam_score` de enlace y `backlinks_spam_score` de perfil viven en columnas distintas y `toxic_share` del padre no se recalcula.
-- [ ] `readBacklinkDetail` distingue `available`, `skipped_no_movement` y `drilldown_failed` como estados separados.
-- [ ] `readBacklinkProfile` devuelve exactamente el mismo shape que antes de esta task, probado con test de regresión.
-- [ ] Un drill-down fallido deja el snapshot `partial`, emite la señal y no fabrica filas.
-- [ ] La derivación de sobre-optimización de anchors vive en el primitive, no en ningún consumer.
+- [x] Todo `rank` persistido está en escala 0–100.
+- [x] `spam_score` de enlace y `backlinks_spam_score` de perfil viven en columnas distintas y `toxic_share` del padre no se recalcula.
+- [x] `readBacklinkDetail` distingue `available`, `skipped_no_movement` y `drilldown_failed` como estados separados.
+- [x] `readBacklinkProfile` devuelve exactamente el mismo shape que antes de esta task, probado con test de regresión.
+- [x] Un drill-down fallido deja veredicto `failed`, emite la señal y no fabrica filas. (El snapshot padre es append-only y no muta; el veredicto persistido es lo que lo declara.)
+- [x] La derivación de sobre-optimización de anchors vive en el primitive, no en ningún consumer.
 - [ ] La tool `get_seo_backlink_detail` responde por el lane ecosystem con canary verde en staging.
-- [ ] La capability tiene grant a ≥1 rol real en el mismo PR y el coverage test pasa.
-- [ ] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` y `pnpm docs:closure-check` pasa.
-- [ ] No se creó ningún Cloud Scheduler job nuevo.
+- [x] La capability tiene grant a ≥1 rol real en el mismo PR y el coverage test pasa.
+- [x] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` y `pnpm docs:closure-check` pasa.
+- [x] No se creó ningún Cloud Scheduler job nuevo.
 
 ## Verification
 

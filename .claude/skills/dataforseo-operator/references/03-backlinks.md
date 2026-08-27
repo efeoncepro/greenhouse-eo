@@ -161,6 +161,8 @@ Fuente: <https://dataforseo.com/pricing/backlinks/backlinks> + <https://datafors
 6. **Content-level intelligence** — `domain_pages_summary/live` sobre un competidor muestra QUÉ páginas suyas atraen links (link-earning assets) → informa la estrategia de contenido linkable propia.
 7. **Pipeline económico tipo embudo**: `index` (gratis, sanity) → bulk (barrido 1 000 targets) → summary (targets interesantes) → backlinks/anchors/intersections (drill-down) — minimiza filas pagadas por insight.
 
+> **As-of 2026-08-27 (TASK-1777):** el patrón del punto 3 —monitoreo new/lost barato + drill-down sólo donde hubo movimiento— quedó **IMPLEMENTADO en Greenhouse** como paso condicional del batch semanal `ops-seo-backlink-capture` (predicado `shouldDrillDownBacklinks` sobre el `new_lost_delta` ya persistido; `referring_domains/live` + `anchors/live` + `backlinks/live` en `mode: one_per_domain` filtrado `is_new`/`is_lost`, `rank_scale: one_hundred`), con **veredicto persistido por snapshot** (`seo_backlink_drilldowns`: `drilled|skipped_no_movement|skipped_partial|failed`) y **tres estados de lectura** (`available` · `skipped_no_movement` como afirmación positiva de estabilidad · `drilldown_failed`). Code complete, rollout pendiente (flag `GROWTH_SEO_BACKLINK_DETAIL_ENABLED` OFF). Detalle del contrato en el SKILL.md (§Estado del runtime) y `.claude/rules/growth-seo.md`.
+
 ---
 
 ## 9. Fuentes (todas fetcheadas 2026-08-06)
