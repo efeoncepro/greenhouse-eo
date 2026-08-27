@@ -270,7 +270,7 @@ Operación: [Operar el perfil de enlaces SEO](../../manual-de-uso/growth/operar-
 
 ## Que NO existe todavia
 
-Lo siguiente aún no está construido (las series que ya se llenan: Search Console live; rankings live desde el 2026-08-06). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP live en producción desde el 2026-08-06**: lane ecosystem + 3 tools read-only (`get_seo_entitlement`, `get_seo_keyword_opportunities`, `get_seo_visibility_360`) en el MCP interno de Greenhouse (TASK-1645, ver el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8) **y federadas al gateway público `mcp.efeonce.org`** (TASK-1647). La lectura funcional completa de esa capacidad está en [Search Visibility 360 por MCP](search-visibility-360-por-mcp.md). Pendiente:
+Lo siguiente aún no está construido (las series que ya se llenan: Search Console live; rankings live desde el 2026-08-06). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP live en producción desde el 2026-08-06** (TASK-1645, que partió con 3 tools read-only): hoy el MCP interno de Greenhouse sirve **19 tools SEO** — inventario vigente y estado de despliegue en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8 — con **13 federadas al gateway público `mcp.efeonce.org`** (TASK-1647). La lectura funcional completa de esa capacidad está en [Search Visibility 360 por MCP](search-visibility-360-por-mcp.md). Pendiente:
 
 | Falta | Task que lo trae |
 |---|---|

@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso
 > **Version:** 2.0
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-08-27 por Claude (TASK-1777: inventario a 19 tools SEO — 15 lectura + 4 escritura con `get_seo_backlink_detail`; allowlist federado sigue en 13)
+> **Ultima actualizacion:** 2026-08-27 por Claude (TASK-1777: inventario a 19 tools SEO — 15 lectura + 4 escritura con `get_seo_backlink_detail`; allowlist federado sigue en 13, ya desplegado en producción — estado verificado en §8)
 > **Modulo:** plataforma / MCP
 > **Ruta en portal:** `N/A` (server MCP local `stdio` o remoto HTTP)
 > **Documentacion relacionada:** [API Platform Ecosystem](../../documentation/plataforma/api-platform-ecosystem.md), [Platform Health API](../../documentation/plataforma/platform-health-api.md), [GREENHOUSE_MCP_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md)
@@ -274,10 +274,14 @@ lectura federadas (`get_seo_entitlement`, `get_seo_keyword_opportunities`, `get_
 `get_seo_keyword_market_data`, `get_seo_keyword_discovery`, `get_seo_grounded_query_draft`) y las 4 de
 escritura (`track_seo_keywords`, `untrack_seo_keywords`, `discover_seo_keywords`,
 `prepare_seo_grounded_queries`). Es el mismo lane y el mismo entitlement: el gateway solo transporta.
-⚠️ **Estado de despliegue (2026-08-14):** el gateway **en producción** aún sirve la revisión anterior
-(9 tools); las 4 de TASK-1664/1666 están commiteadas en `efeonce-mcp` con canary verde contra staging
-y **su deploy se despacha junto al próximo release develop→main** de Greenhouse (antes, responderían
-404 upstream porque el lane no está en producción — lección TASK-1661).
+✅ **Estado de despliegue (verificado 2026-08-27):** el gateway **en producción** ya sirve las
+**13 tools federadas** — el deploy Cloud Run del 2026-08-18 incluye las 4 de TASK-1664/1666 en el
+allowlist de paridad, y los lanes upstream de TASK-1661/1664/1666 están promovidos a `main`
+(verificado por blob de ruta contra `origin/main`, no por ancestry). Lo que sigue **fuera de
+producción** son los lanes de la tríada TASK-1775/1776/1777 y del carril de prospecto TASK-1709:
+sus rutas no existen todavía en `main`, así que sus tools —que además no están federadas (párrafo
+siguiente)— solo operan contra staging/local hasta el próximo release develop→main (lección
+TASK-1661: federar o apuntar a producción antes de promover el lane responde 404 upstream).
 
 **Qué NO está federado todavía** y por ahora vive solo en este MCP interno: `get_seo_overview_kpis`,
 `get_seo_performance`, `get_seo_performance_catalog`, `get_seo_domain_overview` (TASK-1775),
@@ -294,7 +298,7 @@ Este MCP no hace lo siguiente:
 - no crea subscriptions
 - no actualiza subscriptions
 - no reintenta deliveries
-- no hace writes **salvo** las dos excepciones gobernadas del §8 (`track_seo_keywords` / `untrack_seo_keywords`, TASK-1308), que exigen binding `internal`, entitlement, techo de capacidad e idempotencia; fuera de ese par, este MCP no escribe nada
+- no hace writes **salvo** las cuatro excepciones gobernadas del §8 (`track_seo_keywords` / `untrack_seo_keywords`, TASK-1308; `discover_seo_keywords`, TASK-1664; `prepare_seo_grounded_queries`, TASK-1666), que exigen binding `internal`, entitlement y sus disclosures propios (techo de capacidad e idempotencia en track/untrack; preview + confirmación de costo en discover; draft-nunca-activa en prepare); fuera de esas cuatro, este MCP no escribe nada
 - no consulta rutas legacy como source primaria
 - no expone OAuth hosted/multiusuario
 - no expone ICO por MCP todavía
