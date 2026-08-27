@@ -22,19 +22,33 @@ post-deploy.
 
 **PENDIENTES que quedan abiertos:**
 
-1. **Deploy del gateway MCP (TASK-1658).** Los lanes ya están en `main`, así que la federación ya no
-   daría 404 upstream. Faltan: push de los 5 commits de `efeonce-mcp` (`f1a2b44`…`220e916`, árbol
-   limpio), deploy del gateway, `tools/list` 13→21 y canary completo contra producción. **La sesión
-   que lo tenía (`greenhouse-eo-f7`) terminó antes de que el manifest cerrara**, así que esto no
-   tiene dueño activo. El flag de prospect está **ON**, no OFF — el canary debe esperar ON.
+1. **Deploy del gateway MCP (TASK-1658) — EJECUTADO 2026-08-27, con UN hueco de verificación.**
+   La sesión dueña (`greenhouse-eo-f7`) terminó antes de que el manifest cerrara, así que lo tomó la
+   sesión de coordinación. Hecho: `pnpm check` verde en `efeonce-mcp` (67/67 tests, formato,
+   typecheck, build) → push de los 5 commits (`85b65cb`..`220e916`) → `deploy.yml`
+   (`workflow_dispatch`, exposure `public-oauth` + ingress `internal-and-cloud-load-balancing`,
+   idénticos a la postura previa) run `33125750952` success → revisión **`efeonce-mcp-gateway-00023-zt2`**
+   `Ready=True` (antes `00022-xsn`) → `https://mcp.efeonce.org/health` HTTP 200.
+   Canary `greenhouse-seo-canary.mjs` contra `https://greenhouse.efeoncepro.com`: **todo verde** para
+   Efeonce y Berel — incluidas las 3 tools nuevas (domain-overview, url-visibility, backlink-detail),
+   los 14 deny anti-oracle en 404 y las validaciones en 400, sin gasto.
+   ⚠️ **Lo que NO quedó verificado: el `tools/list` 13→21 del gateway.** El canary importa el provider
+   desde `dist` y lo ejercita **localmente** contra los lanes de producción — prueba que los lanes y el
+   flag funcionan en prod, **no** que el gateway desplegado exponga las 21 tools. La observación directa
+   exige el flujo OAuth interactivo (`tools/list` sin auth devuelve 401 `authorization_required`,
+   fail-closed correcto), que un agente no debe ejecutar. Evidencia indirecta disponible: `src/mcp.ts`
+   declara 21 nombres de tool SEO y el guard de paridad bidireccional pasa en verde.
+   **Pendiente para el operador: correr `pnpm oauth:canary` (login interactivo) y confirmar 21.**
 2. **TASK-1777 sigue `rollout parcialmente verificado`.** El veredicto `skipped_no_movement` no pudo
    observarse (ambos targets del smoke eran `first_time`, así que el predicado sólo podía dar
    `drilled`). La re-corrida a USD 0 falsa la idempotencia por snapshot, que es una compuerta
    distinta. Verificación en el ciclo natural del **lunes 2026-08-31** post 07:00 CLT
    (`ops-seo-backlink-capture`); la consulta está en el task file. Exposición si el predicado
    fallara: ~USD 0,18 por ciclo semanal.
-3. **TASK-1775/1776 no se mueven a `complete` todavía**: su propio checkbox de cierre operativo exige
-   el deploy del gateway con la federación verificada (`tools/list` 13→21), que es el pendiente 1.
+3. **TASK-1775/1776 siguen `in-progress`**: su checkbox de cierre operativo exige el deploy del
+   gateway **con la federación verificada vía `tools/list` 13→21**. El deploy ya está hecho (pendiente 1);
+   falta sólo esa observación autenticada. Con ella, ambas pasan a `complete` sin más trabajo.
+   TASK-1658 queda igual: rollout ejecutado, verificación de inventario pendiente.
 4. **Revisión Sentry del 2026-08-29** para `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (punto 1 de su
    fila en el ledger): conteos `blocked_redirect`/`blocked_private_address`.
 5. **Watchdog en falso positivo (TASK-920).** Reporta DRIFT comparando contra un commit del 2026-07-30
