@@ -3,7 +3,7 @@
 > **Estado:** open
 > **Ambiente:** 🔴 **ops-worker vivo** — los tres flags de probes están `true` en la revisión activa (verificado 2026-08-26, ver Delta)
 > **Detectado:** 2026-08-26, por auditoría de código al evaluar el fetcher para uso comercial sobre prospectos
-> **Severidad:** alta (SSRF con exfiltración potencial hacia el resultado del probe) — **la mitigación declarada en la v1 de este issue NO se sostiene**
+> **Severidad:** alta — SSRF **alcanzable desde internet anónimo en producción** (cadena verificada 2026-08-27: intake público ON + probes ON en la revisión activa), con exfiltración potencial hacia el resultado del probe. Captcha y rate-limit son la única fricción; ninguna de las dos mitigaciones declaradas antes en este issue se sostiene
 > **Dominio:** Growth / AI Visibility Grader · sustrato de sitio
 > **Task relacionada:** `TASK-1778` (fix + endurecimiento del fetcher)
 
@@ -31,11 +31,35 @@ Vercel**, así que su ausencia del listado nunca significó OFF. El defecto docu
 degradó la clasificación de severidad de un problema de seguridad. Ese defecto está descrito en
 `docs/audits/platform/2026-08-26-openseo-competitive-teardown-growth-seo-aeo.md` §3.11.
 
-**Qué cambia y qué no.** Cambia la ventana: no hay «flip futuro» que esperar, el fetcher ya atiende
-tráfico. **No** cambia la superficie de ataque, que sigue siendo acotada: el target es el dominio del
-propio cliente, cargado por un operador, no input de un atacante anónimo. El escenario real es un
-dominio sujeto comprometido —o un prospecto hostil en el carril comercial— que responda `302` hacia
-una dirección interna: el body se lee hasta 1 MiB y **se persiste como evidencia del probe**.
+**Qué cambia.** Cambia la ventana —no hay «flip futuro» que esperar, el fetcher ya atiende tráfico—
+y **también cambia la superficie de ataque**, en contra de lo que afirmó la corrección intermedia de
+este issue.
+
+🔴 **El target NO es «el dominio del propio cliente cargado por un operador»: es input anónimo de
+internet.** Verificado 2026-08-27, tres eslabones encadenados:
+
+1. **El intake público está VIVO en producción.** `POST /api/public/growth/ai-visibility/run` con
+   cuerpo `{}` contra `greenhouse.efeoncepro.com` devuelve **`400`**, no `404`. El orden importa:
+   `create-public-run.ts:67` evalúa `isPublicIntakeEnabled()` **antes** de validar nada y devuelve
+   `disabled → 404` si el flag está OFF. Un `400` sólo es alcanzable con el flag **ON**.
+2. **La ruta es sin sesión y acepta un `websiteUrl` arbitrario.** Es, por diseño, el único write
+   público del dominio (`route.ts:10-15`): cualquiera en internet elige el dominio que se va a
+   fetchear.
+3. **El run público SÍ ejecuta los probes.** `run-engine.ts:332` llama `await gatherRunProbes(...)`
+   como post-step **incondicional**, sin filtro por profundidad: un run `public_diagnostic`+`light`
+   pasa por el mismo gatherer que cualquier otro. Y `ops-worker-00595-4q2` —la revisión activa— tiene
+   `GROWTH_AI_VISIBILITY_PROBES_ENABLED=true`.
+
+Cadena completa, toda verificada: **POST anónimo → run encolado → ops-worker → `gatherRunProbes` →
+`createProbeFetcher` → `redirect: 'follow'` sin revalidación → destino elegido por el atacante,
+fetcheado desde dentro del worker de producción.** El body se lee hasta 1 MiB y **se persiste como
+evidencia del probe**; por el carril `brand-intelligence` además se extrae a texto legible y se le
+pasa a un LLM, que es un camino plausible —no verificado— hacia el informe publicado.
+
+**Fricción real que queda en pie** (no autorización, pero sí barrera): el intake público tiene
+captcha, rate-limit y presupuesto global (`route.ts:12`). El `400` de la sonda llegó antes del
+captcha porque el cuerpo iba vacío. Un atacante debe pasar captcha por intento — fricción de bot,
+no control de acceso.
 
 **No hay explotación observada.** Lo que se retira es la afirmación de que no puede haberla.
 
@@ -96,7 +120,9 @@ Atenuantes reales, que hay que decir para no inflar la severidad:
   de la respuesta viajando al resultado del probe (que se persiste y puede llegar a un informe).
 - **Ambiente**: staging hoy. **Producción no está expuesta**: ambos consumers del fetcher
   (`probes/gatherer` vía `TASK-1266` y `brand-intelligence/fetch-site-content` vía `TASK-1288`) están
-  `prod: OFF` según `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+  **`true` en la revisión activa `ops-worker-00595-4q2`**, verificado con `gcloud run services
+  describe` el 2026-08-27. La fila `prod: OFF` del `FEATURE_FLAG_STATE_LEDGER.md` era el artefacto
+  documental que originó la mala clasificación.
 - **Comercial**: bloquea declarar el fetcher apto para uso sobre prospectos, que es justo lo que
   `TASK-1709` (`Delta 2026-08-26`) acaba de habilitar por delegación.
 - **Confianza en los comentarios del repo**: una cabecera que afirma una contención inexistente es
