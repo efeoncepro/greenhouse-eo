@@ -18,6 +18,7 @@
 //   - no-extract-epoch-from-date-subtraction        (TASK-893 hotfix #3) — bloquea EXTRACT(EPOCH FROM (X - Y)) cuando X o Y es DATE (rompe runtime PG)
 //   - no-inline-ftr-calculation                     (TASK-909) — prohibe recomputar el veredicto FTR inline; usar helper canonical calculateFtr
 //   - no-dynamic-app-react-apexcharts               — ApexCharts wrapper owns the only ssr:false dynamic boundary
+//   - growth-substrate-boundary                     (TASK-1697) — probes/** privado del dominio AEO; site-substrate no importa growth/*
 
 import noRawTableWithoutShell from './rules/no-raw-table-without-shell.mjs'
 import noHardcodedFontfamily from './rules/no-hardcoded-fontfamily.mjs'
@@ -28,6 +29,7 @@ import noUntokenizedFxMath from './rules/no-untokenized-fx-math.mjs'
 import noUntokenizedExpenseTypeForAnalytics from './rules/no-untokenized-expense-type-for-analytics.mjs'
 import noInlineFacetVisibilityCheck from './rules/no-inline-facet-visibility-check.mjs'
 import cloudRunServicesMustInitSentry from './rules/cloud-run-services-must-init-sentry.mjs'
+import growthSubstrateBoundary from './rules/growth-substrate-boundary.mjs'
 import noCrossDomainImportFromClientPortal from './rules/no-cross-domain-import-from-client-portal.mjs'
 import noUntokenizedBusinessLineBranching from './rules/no-untokenized-business-line-branching.mjs'
 import noClientPortalViewVisibilityBypass from './rules/no-client-portal-view-visibility-bypass.mjs'
@@ -50,6 +52,7 @@ const plugin = {
     version: '1.15.0'
   },
   rules: {
+    'growth-substrate-boundary': growthSubstrateBoundary,
     'no-raw-table-without-shell': noRawTableWithoutShell,
     'no-hardcoded-fontfamily': noHardcodedFontfamily,
     'no-untokenized-copy': noUntokenizedCopy,
