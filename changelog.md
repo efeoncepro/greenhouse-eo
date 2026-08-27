@@ -7,6 +7,11 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-27 — El provider Google AI Mode del AEO grader deja de mentir "sin bloque AI" (TASK-1652)
+
+- Los runs productivos del grader (market ISO-2) fallaban per-task en DataForSEO por `location_name` inválido y el fallo se clasificaba `skipped:no_ai_overview_block` — 60 observaciones históricas eran ese falso negativo (54 con el error exacto `40501`). Fix: mapa cerrado market→`location_code` verificado en vivo (CL=2152, MX=2484, CO=2170, PE=2604, US=2840) + gate per-task por `status_code` (el skip honesto queda reservado para tasks `20000` realmente ejecutadas). Regrade descartado con evidencia: los tasks fallidos nunca se ejecutaron y río abajo skip/failed pesan igual.
+- El parser ahora desciende a las `references[]` anidadas de los `ai_overview_element` (dedupe por URL), y el smoke live destapó que Google envuelve TODA reference en redirects propios (`domain: google.com` + `goto?url=<token>`): la atribución ahora deriva el dominio real desde `source` cuando es domain-shaped y descarta honesto (contado en `usage.dataforseo_citations_unattributable`) lo no atribuible — antes todo el SoV de citabilidad se atribuía a google.com. Herencia declarada en `TASK-1311`. AIO producción sigue OFF (TASK-1341).
+
 ## 2026-08-27 — El módulo SEO gana el tier `prospect`: diagnóstico sin contrato y sin acceso del cliente (TASK-1709)
 
 - Nuevo carril de adquisición `src/lib/growth/seo/prospect/**`: una corrida ÚNICA por dominio con tope duro POR DIAGNÓSTICO (min(USD 1,00, restante mensual de Efeonce), validado contra el forecast del conjunto ANTES de la primera llamada), idempotencia por dominio/mercado/día (repetir = USD 0), y gasto de adquisición atribuido a `EO-ORG-0007` en el ledger único. Estrena 4 endpoints de familias ya permitidas (`ranked_keywords` +`ai_overview_reference`, `competitors_domain`, `backlinks/competitors`, `domain_intersection`) — el colector de competidores que `TASK-1662` consumirá.
@@ -742,25 +747,3 @@
   no hay que explicar por qué. Sin esa línea sólo preguntan quienes ya se sienten con derecho a
   hacerlo, que es justo el sesgo que el ajuste existe para corregir.
 - Otorgarlo requiere ser People: no alcanza con poder autorar evaluaciones.
-
-## 2026-08-17 — TASK-1719: la vacante declara su prueba y una sola pieza decide qué recibe el candidato
-
-- **La vacante declara su plantilla una vez y Greenhouse la resuelve sola.** Quien asigna ya no elige
-  plantilla: confirma. El camino manual es proponer→confirmar, atado por una huella del efecto que se
-  mostró y con vencimiento de 30 minutos **enforceado server-side** — si algo cambia en el medio o
-  pasa demasiado tiempo, el confirmar se rechaza en vez de ejecutar algo distinto de lo aprobado.
-- **Un avance de etapa produce UNA comunicación: ni cero ni dos.** El consumer
-  `hiring_stage_changed_candidate_comms` **reemplaza** a `hiring_stage_changed_email` (TASK-1689) y
-  decide: correo de la prueba si se asigna, aviso genérico si la asignación se detuvo. Nunca se le
-  promete al candidato una prueba que no existe. La etapa que se comunica es la vigente en la base,
-  nunca la del payload — el consumer reactivo coalescea y pierde las intermedias.
-- **Cancelar una prueba no iniciada libera el cupo** y permite reasignar: es recuperación real, no
-  sólo un cierre. El enlace muere de inmediato y responde igual que cualquier enlace inválido. Si el
-  correo ya había salido, la plataforma lo declara para que una persona avise — no manda correcciones
-  automáticas sin texto aprobado. Una prueba cancelada no entra al expediente de evaluación.
-- **Se archivaron dos plantillas de Content Creator que eran irrenderizables** (una entregaba 5
-  preguntas para 8 módulos, con 45% del peso sin instrumento). El módulo sin preguntas no desaparecía:
-  el candidato veía la sección vacía y el examen encogido se enviaba sin error. Señal nueva
-  `hiring.assessment.template_module_without_questions` para que la clase no vuelva a pasar inadvertida.
-- Runtime: la asignación automática nace **apagada** (`HIRING_STAGE_TEST_ASSIGNMENT_ENABLED`, sólo
-  ops-worker). Con el flag OFF el comportamiento visible es el mismo de antes.

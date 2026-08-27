@@ -1,5 +1,53 @@
 # TASK-1652 — AEO Grader: corrección del request AI Mode DataForSEO (location ISO-2 + gate per-task + citas anidadas)
 
+## Cierre 2026-08-27 — evidencia y decisiones
+
+**Commits:** `bc2dd0f99` (Slice 1: mapa market→`location_code` + gate per-task), `63d01db49`
+(Slice 2: descenso anidado + fixture shape real), `6b6c5d200` (Slice 2b: atribución bajo el wrapper
+de Google + smoke live). Local-first, sin push.
+
+**Open Questions resueltas en Discovery:**
+
+- `location_code` verificados EN VIVO contra `GET /v3/serp/google/locations/{cc}`: CL=2152,
+  MX=2484, CO=2170, PE=2604, US=2840 — los candidatos eran exactos.
+- El proveedor SÍ duplica `references[]` en el nivel superior del item `ai_overview` (sandbox y
+  live: top ⊇ anidadas) → el descenso quedó como defensa con dedupe por URL (`buildCitations`).
+
+**Hallazgo nuevo del smoke live (Slice 2b, no estaba en la spec):** Google envuelve TODAS las
+references de AI Mode en redirects propios (`domain: google.com`, `url: google.com/goto?url=<token
+opaco>`); la identidad real de la fuente viene SOLO en `source` (a veces dominio, a veces marca).
+Sin manejo, cada cita quedaba atribuida a `google.com` y el SoV de citabilidad quedaba envenenado.
+Fix en el mismo adapter: dominio derivado de `source` cuando es domain-shaped; marca no atribuible
+se descarta honesto y se cuenta en `usage.dataforseo_citations_unattributable` (dedupe por URL).
+Verificado contra el payload live guardado: 2 citas con dominio real (`metrix.digital`,
+`agenciagrowth.cl`), 25 no-atribuibles contadas. Herencia declarada en TASK-1311 (las `url`
+persistidas de este provider son punteros al wrapper, no la página citada).
+
+**Smoke live (Slice 3):** `scripts/growth/_sanity-task-1652-ai-mode-smoke.ts --spend --market=CL`
+→ PASS: task `20000`, estado `succeeded`, answer real de agencias chilenas, citas con dominios
+reales. Gasto total del smoke: ~USD 0,008 (2 llamadas AI Mode live).
+
+**Dimensionamiento histórico (query read-only sobre `greenhouse_growth.provider_observations`):**
+
+| status | error_code | `usage->>'dataforseo_status_code'` | n | rango |
+|---|---|---|---|---|
+| skipped | no_ai_overview_block | `40501` | 54 | 2026-06-29 → 2026-07-17 |
+| skipped | no_ai_overview_block | `40201` | 6 | 2026-06-29 |
+| succeeded | — | `20000` | 30 | 2026-06-28 → 2026-08-27 |
+
+**60 observaciones históricas** eran falsos negativos (task fallido clasificado como "Google no
+mostró bloque AI"), 54 por el error exacto de location ISO-2 (`40501`). **Decisión de regrade:
+DESCARTADO.** Los tasks fallidos nunca se ejecutaron — no hay data que reinterpretar (un regrade no
+resucita respuestas que no existieron), y río abajo `skipped` y `failed` se excluyen por igual
+(`citation-breakdown` solo consume `succeeded`), así que los scores entregados no cambiarían. El
+daño era diagnóstico y queda corregido hacia adelante.
+
+**Rollout:** cambio activo al mergear bajo los flags existentes; AIO en producción sigue OFF
+(gated por TASK-1341) — el fix llega inerte a producción hasta ese rollout, como declara la spec.
+`pnpm build` de producción pendiente del pase de release coordinado (sesión `greenhouse-eo-c1`),
+que corre su propio preflight; suite full `pnpm test` verde local.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -8,7 +56,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
@@ -21,7 +69,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-020`
-- Status real: `Diseno`
+- Status real: `Implementada y verificada live (2026-08-27)`
 - Rank: `TBD`
 - Domain: `growth|ai|integrations`
 - Blocked by: `none`
@@ -167,11 +215,11 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 ## Capability Definition of Done — Full API Parity gate
 
@@ -267,14 +315,14 @@ N/A — repo-only change (credenciales y deploy guard son de TASK-1341).
 
 ## Acceptance Criteria
 
-- [ ] Un run con `market: 'CL'` envía a DataForSEO un task con `location_code` numérico válido de Chile (test con assert del payload; código verificado contra el apéndice locations).
-- [ ] Market no mapeado cae al fallback documentado con `captureWithDomain` informativo (test).
-- [ ] Un task DataForSEO con `status_code != 20000` produce observación `failed` con el `status_code` en `usage`; NUNCA `skipped:no_ai_overview_block` (test con fixture `40501`).
-- [ ] Un task `20000` sin bloque AI sigue produciendo `skipped:no_ai_overview_block` (regresión cubierta).
-- [ ] Las `references[]` anidadas en elementos internos del bloque `ai_overview` aparecen en `observation.citations`, sin duplicados (test con fixture derivado de una respuesta real/sandbox).
-- [ ] Smoke staging/local: observación real con `dataforseo_status_code = 20000` y estado `succeeded` o skip honesto, con market ISO-2.
-- [ ] Query de dimensionamiento histórico ejecutada en staging y resultado documentado en esta task (Delta o sección de cierre).
-- [ ] `## Delta` agregado en TASK-1311 notificando la corrección upstream del parser de citas.
+- [x] Un run con `market: 'CL'` envía a DataForSEO un task con `location_code` numérico válido de Chile (test con assert del payload; código verificado contra el apéndice locations).
+- [x] Market no mapeado cae al fallback documentado con `captureWithDomain` informativo (test).
+- [x] Un task DataForSEO con `status_code != 20000` produce observación `failed` con el `status_code` en `usage`; NUNCA `skipped:no_ai_overview_block` (test con fixture `40501`).
+- [x] Un task `20000` sin bloque AI sigue produciendo `skipped:no_ai_overview_block` (regresión cubierta).
+- [x] Las `references[]` anidadas en elementos internos del bloque `ai_overview` aparecen en `observation.citations`, sin duplicados (test con fixture derivado de una respuesta real/sandbox).
+- [x] Smoke staging/local: observación real con `dataforseo_status_code = 20000` y estado `succeeded` o skip honesto, con market ISO-2.
+- [x] Query de dimensionamiento histórico ejecutada en staging y resultado documentado en esta task (Delta o sección de cierre).
+- [x] `## Delta` agregado en TASK-1311 notificando la corrección upstream del parser de citas.
 
 ## Verification
 
@@ -286,13 +334,13 @@ N/A — repo-only change (credenciales y deploy guard son de TASK-1341).
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (mínimo: TASK-1311, TASK-1341)
-- [ ] Decisión de regrade histórico registrada (hacer follow-up task o descartar con el dato del dimensionamiento)
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (mínimo: TASK-1311, TASK-1341)
+- [x] Decisión de regrade histórico registrada (hacer follow-up task o descartar con el dato del dimensionamiento)
 
 ## Follow-ups
 

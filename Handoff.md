@@ -24,16 +24,23 @@ nominal real (Berel perdió `apps.apple.com`); `berel.com` = 773 kw ranqueadas /
 `efeonce-mcp` + flip de `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` en Vercel Production. La
 evidencia de costos de este bloque es el insumo para que mueva las tasks a `complete`.
 
-## 2026-08-27 — TASK-1652 en ejecución: corrección request AI Mode del AEO grader
+## 2026-08-27 — TASK-1652 COMPLETE: el provider AI Mode del grader deja de mentir "sin bloque AI"
 
-**Estado: in-progress en `develop`, local-first.** Los 3 defectos confirmados en Discovery contra
-código + apéndice live de DataForSEO (`location_code` verificados: CL=2152, MX=2484, CO=2170,
-PE=2604, US=2840) + sandbox AI Mode (el proveedor duplica `references[]` top-level ⊇ anidadas →
-fix (3) es defensa con dedupe existente). Plan: Slice 1 mapa market→location_code + gate per-task
-`status_code`; Slice 2 descenso anidado + fixture shape real; Slice 3 smoke live + dimensionamiento
-histórico en staging PG. (Falso positivo descartado: las cifras `$0.xxxx` del SKILL.md de
-`dataforseo-operator` se veían corrompidas solo en el RENDER de la Skill tool — sustitución
-posicional `$0` por el primer token de los args; el archivo en disco está intacto.)
+**Estado: `complete` en `develop`, local-first, SIN push (commits `bc2dd0f99` + `63d01db49` +
+`6b6c5d200`); la sesión de release `greenhouse-eo-c1` audita antes del pase.** Los 3 defectos de la
+spec cerrados + un 4.º que solo el smoke live destapó: Google envuelve TODAS las references de
+AI Mode en redirects propios (`domain: google.com`, `goto?url=<token opaco>`) — el dominio real se
+deriva ahora de `source` y lo no atribuible se descarta contado en
+`usage.dataforseo_citations_unattributable` (antes TODO el SoV de citabilidad se atribuía a
+google.com). Dimensionamiento: **60 observaciones históricas** eran falsos negativos (54 con el
+`40501` exacto de location ISO-2); **regrade DESCARTADO** — los tasks nunca se ejecutaron y
+skip/failed pesan igual río abajo. Smoke real PASS (task `20000` + `succeeded`, ~USD 0,008 total).
+Suite full verde (12.311); `pnpm build` prod queda al preflight del release (restricción de memoria
+del equipo). AIO producción sigue OFF (TASK-1341). Herencia declarada en TASK-1311 (las `url` de
+este provider son punteros al wrapper, no la página citada — su atribución URL-level debe
+dimensionarlo). (Aprendizaje de sesión: las cifras `$0.xxxx` de un SKILL.md se ven corrompidas en
+el RENDER de la Skill tool por sustitución posicional `$0` — verificar drift de skills en disco,
+nunca desde el cuerpo renderizado.)
 
 ## 2026-08-27 — TASK-1709: el módulo SEO aprende a hablarle a quien no firmó
 
