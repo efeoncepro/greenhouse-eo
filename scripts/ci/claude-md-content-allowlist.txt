@@ -173,3 +173,10 @@ Toda surface que renderice atajos top-level de navegación (header `<ShortcutsDr
 # máquina bloqueando es una afirmación falsa. Ambos retiros son obligatorios, no cosméticos.
 - **Regla**: migración ANTES del deploy, siempre. Columnas nullable primero, constraints después.
 **Defense in depth (CI gate, en construcción — Fase 2 de ISSUE-068)**: `scripts/ci/migration-marker-gate.mjs` detectará automáticamente migrations con sección Up vacía + sección Down con DDL keywords. Modo blocking en PRs. Hasta que aplique, la regla anterior es enforcement humano + code review.
+
+# 2026-08-27: el commit 433a2d4cc (práctica Salesforce) reescribió la línea del
+# Business Context Pack agregando "Salesforce" a la enumeración de features que
+# gatillan la carga del pack. Reword legítimo y aditivo: la línea vigente en
+# CLAUDE.md §Business Context Pack contiene todo el contenido original + el
+# trigger nuevo. No hay pérdida.
+- Usarlo antes de proponer o construir features que toquen producto, UX/copy, naming, metricas, HubSpot/Account 360, onboarding/cliente, GTM, marca o estrategia comercial.
