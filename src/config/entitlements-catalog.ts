@@ -2198,6 +2198,11 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   { key: 'growth.seo.observation.read', module: 'growth', actions: ['read'] as const, defaultScope: 'tenant' },
   { key: 'growth.seo.report.read_client', module: 'growth', actions: ['read'] as const, defaultScope: 'own' },
   { key: 'growth.seo.entitlement.manage', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  // TASK-1709 — Diagnóstico de prospecto (tier `prospect`). El sujeto no tiene org:
+  // la autorización es del ACTOR interno. `run` compromete gasto real (~USD 0,25/corrida)
+  // → SOLO EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT; `read` además EFEONCE_OPERATIONS.
+  { key: 'growth.seo.prospect_diagnostic.run', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'growth.seo.prospect_diagnostic.read', module: 'growth', actions: ['read'] as const, defaultScope: 'tenant' },
   // TASK-353 — Hiring / ATS domain foundation. 8 capabilities V1 del dominio de
   // fulfillment de talento. `publish` y `decide` se modelan como verbo `execute`
   // (gobernanza: publicar un opening / decidir una postulación son commands, no CRUD).

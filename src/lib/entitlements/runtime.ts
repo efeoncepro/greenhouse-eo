@@ -439,6 +439,33 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
         source: 'role'
       })
     }
+
+    // TASK-1709 — Diagnóstico de prospecto. `run` compromete gasto real de adquisición
+    // (~USD 0,25 por corrida con tope duro): SOLO admin y AM lo disparan. `read` se
+    // extiende a operaciones (leer un diagnóstico no gasta).
+    if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT)) {
+      addEntitlement(entries, {
+        module: 'growth',
+        capability: 'growth.seo.prospect_diagnostic.run',
+        action: 'execute',
+        scope: 'tenant',
+        source: 'role'
+      })
+    }
+
+    if (
+      hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+      hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT) ||
+      hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)
+    ) {
+      addEntitlement(entries, {
+        module: 'growth',
+        capability: 'growth.seo.prospect_diagnostic.read',
+        action: 'read',
+        scope: 'tenant',
+        source: 'role'
+      })
+    }
   }
 
   // TASK-1229 — Growth Forms engine. Operación interna del motor de formularios

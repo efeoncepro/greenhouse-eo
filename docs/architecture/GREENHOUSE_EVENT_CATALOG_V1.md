@@ -1323,3 +1323,13 @@ La constante del event type vive en el dominio (`src/lib/growth/seo/contracts.ts
 🔴 **Por qué el outbox NO despacha el run.** En el dominio SEO el disparo de todo batch es **Cloud Scheduler → HTTP al ops-worker** (rank capture, audits, backlinks, GSC, market data); el drain de discovery (`ops-seo-keyword-discovery-drain` → `POST /seo/keyword-discovery/drain`, claim `pending → running` atómico) sigue exactamente ese patrón. Un consumer reactivo de `requested` sería un mecanismo de despacho nuevo en el dominio, con su propia semántica de retry compitiendo con la del claim. Los eventos existen porque una corrida COMPROMETE GASTO y la pregunta de auditoría es "¿quién la pidió, cuánto se estimó y en qué terminó?" — el run responde el estado actual; los eventos responden la historia.
 
 Las constantes viven en el dominio (`src/lib/growth/seo/keyword-discovery/contracts.ts`) — mismo seam de extracción §17.3.
+
+## Delta 2026-08-27 — TASK-1709: `growth.seo.prospect_diagnostic.completed` (diagnóstico de prospecto)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `growth.seo.prospect_diagnostic.completed` | v1 | `seo_prospect_diagnostic` (`seopd-{uuid}`) | `finalizeProspectDiagnostic` (`src/lib/growth/seo/prospect/store.ts`), **dentro de la misma transacción** que inserta los hechos y marca el run `completed` | ninguno todavía — el hand-off comercial (crear/asociar lead en HubSpot con gate de consentimiento, patrón TASK-1279) es task aparte |
+
+**Payload v1**: `{ diagnosticId, rootDomain, market, factCount, actualCostUsd, actor }` — coordenadas y resumen, nunca los hechos: cualquier consumer futuro **re-lee PG** por `diagnosticId`.
+
+El sujeto NO tiene organización (es un dominio prospecto), así que el payload no lleva `organizationId` del sujeto — el gasto queda atribuido en el ledger a la org canónica de Efeonce como costo de adquisición. La constante vive en el dominio (`src/lib/growth/seo/prospect/contracts.ts`) — mismo seam §17.3. **NUNCA** un consumer de este evento puede re-disparar un diagnóstico: la captura recurrente sobre prospectos está prohibida por regla dura del carril.

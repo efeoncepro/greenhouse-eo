@@ -154,6 +154,10 @@ export type CanonicalErrorCode =
   | 'seo_discovery_invalid_input'
   | 'seo_discovery_run_not_found'
   | 'seo_grounded_query_not_found'
+  // Growth SEO — diagnóstico de prospecto (TASK-1709).
+  | 'seo_prospect_invalid_input'
+  | 'seo_prospect_cost_blocked'
+  | 'seo_prospect_diagnostic_not_found'
   // Proposal Studio F0 (TASK-1392).
   | 'proposal_not_found'
   | 'proposal_invalid_input'
@@ -691,6 +695,24 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   seo_discovery_run_not_found: {
     status: 404,
     message: 'La corrida de discovery no existe para esta organización.',
+    actionable: false
+  },
+  // TASK-1709 — diagnóstico de prospecto: dominio o mercado fuera del vocabulario del carril.
+  seo_prospect_invalid_input: {
+    status: 400,
+    message: 'Revisa la solicitud: el dominio no es válido o el mercado no está habilitado para diagnósticos.',
+    actionable: true
+  },
+  // TASK-1709 — el costo previsto supera el tope autorizado: estado declarado, cero llamadas
+  // al proveedor. Reintentar no resuelve (el tope es configuración, no un blip).
+  seo_prospect_cost_blocked: {
+    status: 429,
+    message: 'El costo previsto del diagnóstico supera el tope autorizado. No se realizó ninguna consulta al proveedor.',
+    actionable: false
+  },
+  seo_prospect_diagnostic_not_found: {
+    status: 404,
+    message: 'El diagnóstico de prospecto no existe.',
     actionable: false
   },
   // TASK-1666 — anti-oracle del puente grounded: perfil, candidato o draft ajeno "no existe".
