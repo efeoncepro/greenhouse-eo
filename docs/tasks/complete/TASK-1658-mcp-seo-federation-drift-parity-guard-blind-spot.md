@@ -59,7 +59,7 @@ espejo como paso 1), `efeonce-mcp/AGENTS.md` (protocolo de paridad bidireccional
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio` (recalibrado 2026-08-27: 8 tools, no 3, + paridad de schema ×9)
@@ -402,10 +402,10 @@ otra clase de blast-radius y otra task.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` quedó sincronizado con el cierre
-- [ ] `Handoff.md` quedó actualizado
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` quedó sincronizado con el cierre
+- [x] `Handoff.md` quedó actualizado
 
 ## Delta 2026-08-26 — falta el drift de SCHEMA, que el guard actual no puede ver
 

@@ -22,33 +22,35 @@ post-deploy.
 
 **PENDIENTES que quedan abiertos:**
 
-1. **Deploy del gateway MCP (TASK-1658) — EJECUTADO 2026-08-27, con UN hueco de verificación.**
-   La sesión dueña (`greenhouse-eo-f7`) terminó antes de que el manifest cerrara, así que lo tomó la
-   sesión de coordinación. Hecho: `pnpm check` verde en `efeonce-mcp` (67/67 tests, formato,
-   typecheck, build) → push de los 5 commits (`85b65cb`..`220e916`) → `deploy.yml`
-   (`workflow_dispatch`, exposure `public-oauth` + ingress `internal-and-cloud-load-balancing`,
-   idénticos a la postura previa) run `33125750952` success → revisión **`efeonce-mcp-gateway-00023-zt2`**
-   `Ready=True` (antes `00022-xsn`) → `https://mcp.efeonce.org/health` HTTP 200.
-   Canary `greenhouse-seo-canary.mjs` contra `https://greenhouse.efeoncepro.com`: **todo verde** para
-   Efeonce y Berel — incluidas las 3 tools nuevas (domain-overview, url-visibility, backlink-detail),
-   los 14 deny anti-oracle en 404 y las validaciones en 400, sin gasto.
-   ⚠️ **Lo que NO quedó verificado: el `tools/list` 13→21 del gateway.** El canary importa el provider
-   desde `dist` y lo ejercita **localmente** contra los lanes de producción — prueba que los lanes y el
-   flag funcionan en prod, **no** que el gateway desplegado exponga las 21 tools. La observación directa
-   exige el flujo OAuth interactivo (`tools/list` sin auth devuelve 401 `authorization_required`,
-   fail-closed correcto), que un agente no debe ejecutar. Evidencia indirecta disponible: `src/mcp.ts`
-   declara 21 nombres de tool SEO y el guard de paridad bidireccional pasa en verde.
-   **Pendiente para el operador: correr `pnpm oauth:canary` (login interactivo) y confirmar 21.**
+1. **Deploy del gateway MCP (TASK-1658) — CERRADO 2026-08-27.** Lo tomó la sesión de coordinación
+   porque su sesión dueña terminó antes de que el manifest cerrara. `pnpm check` verde (67/67) →
+   push `85b65cb`..`220e916` → `deploy.yml` run `33125750952` success → revisión
+   **`efeonce-mcp-gateway-00023-zt2`** `Ready` → `mcp.efeonce.org/health` 200.
+   **`tools/list` autenticado observado: 21 tools SEO** (antes 13), con las 8 recién federadas
+   presentes. Canary del provider contra producción verde para Efeonce y Berel.
+   **Hallazgo del cierre: el `oauth:canary` tenía un punto ciego de inventario.** Ejercitaba
+   `tools/call` sobre tools puntuales y nunca `tools/list`, así que una tool que quedara fuera del
+   server pasaba invisible mientras las probadas siguieran verdes — el mismo drift que el guard de
+   paridad detecta, pero del lado del runtime desplegado. Se le agregó la aserción de inventario
+   (`toolsTotal`/`seoToolsTotal`/`seoTools`), commit `4058a07` en `efeonce-mcp`. El charset del
+   nombre incluye el punto a propósito: las tools no-SEO son punteadas
+   (`hiring.talent_pool.search`) y sin él el total excluye Globe y Hiring en silencio.
+
 2. **TASK-1777 sigue `rollout parcialmente verificado`.** El veredicto `skipped_no_movement` no pudo
    observarse (ambos targets del smoke eran `first_time`, así que el predicado sólo podía dar
    `drilled`). La re-corrida a USD 0 falsa la idempotencia por snapshot, que es una compuerta
    distinta. Verificación en el ciclo natural del **lunes 2026-08-31** post 07:00 CLT
    (`ops-seo-backlink-capture`); la consulta está en el task file. Exposición si el predicado
    fallara: ~USD 0,18 por ciclo semanal.
-3. **TASK-1775/1776 siguen `in-progress`**: su checkbox de cierre operativo exige el deploy del
-   gateway **con la federación verificada vía `tools/list` 13→21**. El deploy ya está hecho (pendiente 1);
-   falta sólo esa observación autenticada. Con ella, ambas pasan a `complete` sin más trabajo.
-   TASK-1658 queda igual: rollout ejecutado, verificación de inventario pendiente.
+3. **TASK-1775, TASK-1776 y TASK-1658 → `complete` (2026-08-27).** Lifecycle, carpeta, README y
+   `TASK_ID_REGISTRY` sincronizados; `task:lint` 0/0 en las tres. Queda **un solo checkbox abierto en
+   1775**, honestamente anotado por su autor: "un sujeto que el proveedor no conoce deja fila con
+   métricas NULL" está cubierto por unit test pero no observado en runtime (ambos sujetos del smoke
+   eran conocidos). Es residual declarado, no bloqueador oculto; se observa cuando entre un dominio
+   sin datos. El caso análogo SÍ se observó en 1776 (`no_market_data` honesto con fila NULL en un
+   subdominio). De paso se actualizó el delta de `TASK-1313`, que declaraba a 1776 como "rollout
+   pendiente".
+
 4. **Revisión Sentry del 2026-08-29** para `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (punto 1 de su
    fila en el ledger): conteos `blocked_redirect`/`blocked_private_address`.
 5. **Watchdog en falso positivo (TASK-920).** Reporta DRIFT comparando contra un commit del 2026-07-30

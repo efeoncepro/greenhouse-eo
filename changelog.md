@@ -7,6 +7,12 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-27 — Gateway MCP desplegado y cierre de la tríada SEO (TASK-1658/1775/1776)
+
+- Federación en producción: revisión `efeonce-mcp-gateway-00023-zt2`, `tools/list` autenticado observado en **21 tools SEO** (antes 13), con las 8 recién federadas presentes. Canary del provider verde contra producción para Efeonce y Berel.
+- **El `oauth:canary` tenía un punto ciego de inventario y se cerró**: ejercitaba `tools/call` sobre tools puntuales y nunca `tools/list`, así que una tool que quedara fuera del server pasaba invisible mientras las probadas siguieran verdes. Ahora asserta el inventario (`efeonce-mcp` commit `4058a07`). El charset del nombre incluye el punto a propósito — las tools no-SEO son punteadas (`hiring.talent_pool.search`) y sin él el total excluía Globe y Hiring en silencio, reportando el conteo SEO como si fuera el total.
+- `TASK-1658`, `TASK-1775` y `TASK-1776` pasan a `complete` con `task:lint` 0/0. Queda un residual declarado en 1775 (sujeto desconocido → fila NULL: cubierto por unit test, no observado en runtime) y la verificación del lunes 2026-08-31 para `TASK-1777`.
+
 ## 2026-08-27 — Release a producción del carril Growth SEO (TASK-1652/1658/1709/1775/1776/1777)
 
 - Promovido `develop`→`main` como **un solo release**: PR #207, 632 archivos, 10 migraciones, target `cc73c74789ce`, release_id `cc73c74789ce-dbce65f2-303b-4528-bef3-f4edd022a880`, orquestador `33123977671`, manifest **`released`** en 9 min 40 s sin retry ni gate colgado. Llegan a producción los lanes ecosystem de la tríada SEO, el lane de diagnóstico de prospecto, la corrección del request AI Mode del grader y la federación MCP; más el cierre de hiring que quedaba en develop.
@@ -727,15 +733,3 @@
   (ambas son remotas `LATAM` sin país declarado) — comportamiento correcto por diseño.
 - Estado: `code complete, rollout pendiente` (países por confirmar con People/Legal, flag
   staging→Rich Results→prod). TASK-1741 (renderer editorial) queda desbloqueada con fixture.
-
-## 2026-08-17 — Backlog de Careers: contenido público/JobPosting y renderer editorial separados
-
-- Se registran `TASK-1740` y `TASK-1741` para mejorar el detalle de una vacante sin una regresión de
-  aplicación. La primera posee proyección pública allowlist-safe, fallback legacy, lifecycle,
-  canonical y `JobPosting` coherente con el HTML visible; no implementa Indexing API ni inventa
-  países, salario, beneficios o `directApply`.
-- La segunda consume ese contrato para un renderer `Editorial dossier` incremental de
-  `/public/careers/[publicId]`, con baseline/GVC desktop+móvil y flag reversible. El formulario no
-  cambia y se conservan exactamente los CTA existentes del hero y resumen; no se añade CTA final.
-- Sin cambio runtime: son tasks de diseño/ejecución futura. El contrato de contenido y el schema se
-  implementan antes del render.

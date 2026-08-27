@@ -68,7 +68,7 @@ Hasta entonces: flag OFF, scheduler declarado pausado, cero gasto.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -540,7 +540,7 @@ keyword discovery.
 - [x] `readUrlVisibility` devuelve `no_market_data` para sujeto sin snapshot; cero ceros fantasma.
 - [x] Toda cifra del DTO viaja con lente `◑` y `capturedAt`; `captured_by_organization_id` no aparece, probado con test.
 - [x] La tool `get_seo_url_visibility` responde por el lane ecosystem con canary verde en staging. *(Smoke 2026-08-27: `mode=subject`, `servedMarket=MX`.)*
-- [ ] Cierre operativo: pase develop→main con los lanes en producción + deploy del gateway con la federación de `TASK-1658` (dueña) verificado con `tools/list` 13→21.
+- [x] Cierre operativo: pase develop→main con los lanes en producción + deploy del gateway con la federación de `TASK-1658` (dueña) verificado con `tools/list` 13→21. *(2026-08-27: release `cc73c74789ce` → lanes en producción; gateway `efeonce-mcp-gateway-00023-zt2` desplegado; `tools/list` autenticado observado: **21 tools SEO** — antes 13.)*
 - [x] La capability tiene grant a ≥1 rol real en el mismo PR y el coverage test pasa.
 - [x] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` y `pnpm docs:closure-check` pasa.
 - [x] Ninguna consulta nueva hace JOIN, VIEW o FK entre `seo_*` y `grader_*`.
@@ -557,16 +557,16 @@ keyword discovery.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` quedó sincronizado con el cierre
-- [ ] `Handoff.md` quedó actualizado
-- [ ] `changelog.md` quedó actualizado
-- [ ] se ejecutó chequeo de impacto cruzado sobre `TASK-1313`, `TASK-1662`, `TASK-1312`, `TASK-1314` y `TASK-1775`
-- [ ] delta en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §15 y §4.2
-- [ ] delta en `TASK-1313` declarando que su lado de mercado ya tiene fuente
-- [ ] runbook `docs/manual-de-uso/growth/operar-visibilidad-por-url-seo.md` creado
-- [ ] doc funcional del módulo actualizada
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` quedó sincronizado con el cierre
+- [x] `Handoff.md` quedó actualizado
+- [x] `changelog.md` quedó actualizado
+- [x] se ejecutó chequeo de impacto cruzado sobre `TASK-1313`, `TASK-1662`, `TASK-1312`, `TASK-1314` y `TASK-1775`
+- [x] delta en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §15 y §4.2
+- [x] delta en `TASK-1313` declarando que su lado de mercado ya tiene fuente *(actualizado 2026-08-27 al estado `complete` con el rollout ejecutado)*
+- [x] runbook `docs/manual-de-uso/growth/operar-visibilidad-por-url-seo.md` creado
+- [x] doc funcional del módulo actualizada
 
 ## Follow-ups
 
