@@ -6,6 +6,18 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-27 — el sustrato a heredar fue endurecido por `TASK-1778`
+
+`probes/safe-fetch.ts` quedó code complete en develop con el endurecimiento comercial (`ISSUE-164`):
+tope real de 4 MiB por stream con rastro `truncated`/`observable`, `robots.txt` obedecido con nuestro
+UA (`probes/robots-policy.ts`), y — gated por `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (default
+OFF, cutover pendiente) — contención de redirects a la familia del sujeto + guarda DNS anti-SSRF.
+`ProbeFetchErrorCode` suma `blocked_redirect`/`blocked_private_address`/`blocked_robots`. Las
+referencias de línea de este doc (`safe-fetch.ts:72`, `:58-79`) quedaron desplazadas: la guarda
+cross-host sigue viva en `resolveProbeUrl` y ahora también revalida cada salto de redirect.
+`UrlFetchFacts` debe modelar estos hechos (`truncated`, `observable`, bloqueo por robots) como
+procedencia, no como ausencia de contenido.
+
 ## Status
 
 - Lifecycle: `to-do`

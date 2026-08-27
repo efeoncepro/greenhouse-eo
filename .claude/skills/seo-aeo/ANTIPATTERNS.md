@@ -103,6 +103,13 @@ contrafactual, el número describe un patrón — no prueba un lift.** Decláral
 - **Ignorar el costo de bloquear bots IA** — bloquear retrieval bots = salir de
   esas respuestas; data 2026: bloquear → −23.1% tráfico sin reducir citas de
   forma fiable. Decisión consciente, no default (`01_SEO_TECHNICAL.md`).
+- **Auditar ignorando robots.txt o suplantando crawlers de terceros** — el
+  tooling propio de auditoría obedece el `robots.txt` del sujeto matcheando su
+  propio token (en Greenhouse: `GreenhouseAEOGrader`, fallback `*`) y jamás se
+  presenta con el user-agent de un bot ajeno (GPTBot/PerplexityBot/etc.): los
+  WAFs verifican por reverse-DNS y el costo reputacional es real. Un Disallow
+  que te alcanza es un hallazgo (`blocked_robots`), no una barrera a saltar.
+  Referencia viva: fetcher de probes de Greenhouse — TASK-1778 (2026-08-27).
 - **Afirmar datos volátiles de memoria** — features de motores y cifras cambian.
   Reverifica con WebSearch (`SOURCES.md`).
 - 🔴 **Salvarle el ángulo a una pieza cuyo porqué se cayó.** Si la razón por la que la pieza

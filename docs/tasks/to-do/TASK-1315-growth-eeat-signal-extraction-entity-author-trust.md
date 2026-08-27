@@ -4,6 +4,17 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-08-27 — fetcher endurecido por `TASK-1778`
+
+El fetcher SSRF-guarded que esta task reusa quedó code complete en develop con el endurecimiento
+comercial (`ISSUE-164`): tope real de 4 MiB por stream + rastro `truncated`/`observable`,
+`robots.txt` obedecido con nuestro UA (`probes/robots-policy.ts`), y contención de redirects +
+guarda DNS gated por `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (default OFF, cutover pendiente).
+Los probes nuevos de author/trust deben heredar la misma degradación honesta que los probes de
+presencia: sobre cuerpo `truncated` o shell no `observable`, `skipped` con `errorCode`
+(`truncated_body`/`not_observable`), nunca afirmar ausencia; un `blocked_robots` es hallazgo, no
+fallo. `entity-fetch.ts` también lee por stream y reporta `truncated`.
+
 ## Status
 
 - Lifecycle: `to-do`

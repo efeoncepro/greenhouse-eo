@@ -1,5 +1,24 @@
 # TASK-1697 — Growth: sustrato de sitio compartido, barrel de dominio AEO y detector de imports cross-dominio
 
+## Delta 2026-08-27 — `TASK-1778` aterrizó: el archivo que esta task mueve ya está endurecido
+
+El orden load-bearing declarado en Dependencies se cumplió: `TASK-1778` dejó `probes/safe-fetch.ts`
+code complete en develop (2026-08-27). Consecuencias para esta task:
+
+1. **El sustrato a mover creció**: existe `probes/robots-policy.ts` (parser conservador de
+   `robots.txt`, consumido por el fetcher) y debe viajar junto con `safe-fetch.ts`.
+2. **El contrato creció**: `ProbeFetchErrorCode` suma `blocked_redirect` / `blocked_private_address` /
+   `blocked_robots` (`too_large` queda legacy en el fetcher), `ProbeFetchResult` suma `truncated` +
+   `observable`, y `ProbeFetchInit` suma `userAgent`.
+3. **El comportamiento actual ya no es el descrito abajo**: tope de bytes real por stream (subió de
+   1 MiB a 4 MiB), `robots.txt` obedecido con nuestro UA (`GreenhouseAEOGrader`), y — gated por
+   `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (default OFF, cutover pendiente) — `redirect: 'manual'`
+   con contención a la familia del sujeto + guarda DNS anti-SSRF. El fetcher ahora lee ese env flag:
+   la regla "cero flags de dominio" del sustrato debe interpretarse como "cero flags de dominio
+   *grader*"; el flag de red es del propio fetcher y viaja con él.
+4. La regla de "diff puro" del `git mv` se compara contra este estado nuevo del archivo, y las
+   referencias de línea de este doc (`safe-fetch.ts:58-79`, `:72`, `:81-88`) quedaron desplazadas.
+
 ## Delta 2026-08-15 (2) — decisión de secuencia verificada: esta task se recorta a la **mitad A**
 
 Cuatro especialistas resolvieron la secuencia del lote. Esta task **se parte**, y se queda con la
@@ -214,9 +233,10 @@ Reglas obligatorias:
   invalide reportes AEO ya entregados a clientes. Es una puerta de una sola dirección.
 - **El sustrato NO importa nada de `growth/*` y NO persiste nada.** Cero Postgres, cero outbox, cero
   flags de dominio. Verificable por lint + test de frontera; si lo necesita, no es del sustrato.
-- **NUNCA se toca la lógica de la guarda SSRF.** Esta task **mueve** `safe-fetch.ts`, no lo mejora:
-  los hosts no públicos, el timeout, el tope de bytes, el User-Agent de cortesía y el
-  `redirect: 'follow'` acotado al mismo host registrable quedan byte por byte. Cualquier mejora es
+- **NUNCA se toca la lógica de la guarda SSRF.** Esta task **mueve** `safe-fetch.ts` (+
+  `robots-policy.ts`), no lo mejora: los hosts no públicos, el timeout, el tope de bytes por stream,
+  el User-Agent, la obediencia a `robots.txt` y la contención de redirects + guarda DNS que
+  `TASK-1778` dejó code complete (2026-08-27) quedan byte por byte. Cualquier mejora es
   otra task, con su propio diff legible.
 - **NUNCA se cruza el bloqueo cross-host de `resolveProbeUrl`** (`safe-fetch.ts:58-79`). Fetchear el
   sitio de un competidor es una decisión legal y reputacional, no de implementación (§4 de la
@@ -262,15 +282,13 @@ Reglas obligatorias:
 - **`TASK-1701`** (`to-do`, análisis de contenido por URL): es el tercer consumidor externo del
   sustrato y el disparo legítimo del movimiento (§5.3 de la auditoría). Nace apuntando a
   `growth/site-substrate/`, no a `probes/` — y la rule angosta se lo impone.
-- 🔴 **`TASK-1778`** (`P1`, dueña de `ISSUE-164`) — **precede a esta task, y el orden es load-bearing.**
-  Una auditoría del 2026-08-26 encontró que `probes/safe-fetch.ts` —el archivo exacto que esta task
-  mueve— promete en su cabecera una contención de redirects que no implementa y valida el host sin
-  resolver DNS. El valor entero de esta task es ser un `git mv` verificable donde **ningún dependiente
-  cambia una línea**; mover un archivo con un defecto de seguridad conocido lo consagraría como *"el
-  sustrato canónico"* con el defecto adentro, y mezclar el fix aquí destruiría la propiedad que hace
-  revisable a esta task. Son dos cambios de naturaleza opuesta sobre el mismo archivo: uno mueve sin
-  cambiar comportamiento, el otro cambia comportamiento sin mover. Si por secuencia real esta task
-  entrara primero, 1778 aplica sobre la ubicación nueva sin cambiar su alcance.
+- 🔴 **`TASK-1778`** (`P1`, dueña de `ISSUE-164`) — **precedía a esta task, y el orden se cumplió:
+  aterrizó code complete en develop el 2026-08-27** (ver Delta 2026-08-27 arriba). La auditoría del
+  2026-08-26 había encontrado que `probes/safe-fetch.ts` —el archivo exacto que esta task mueve—
+  prometía en su cabecera una contención de redirects que no implementaba y validaba el host sin
+  resolver DNS; ese fix ya vive en el archivo, así que esta task mueve el sustrato **ya endurecido**
+  (incluido `probes/robots-policy.ts`) sin mezclar fix y movimiento. El valor entero de esta task
+  sigue siendo un `git mv` verificable donde **ningún dependiente cambia una línea**.
 - **`TASK-1709`** (`to-do`, diagnóstico de prospecto) — **cuarto consumidor externo, agregado
   2026-08-26.** Su `Delta 2026-08-26` levantó la prohibición de fetch sobre el sitio del prospecto y
   la reemplazó por delegación: su `Slice 2b` consume `@/lib/growth/site-substrate` y **declara esta
@@ -307,8 +325,10 @@ Reglas obligatorias:
 ### Already exists
 
 - **El sustrato, puro y probado.** `probes/safe-fetch.ts` (`import 'server-only'`, hosts no públicos,
-  timeout 8s/20s máx, tope 1 MiB, User-Agent de cortesía, redirect acotado al mismo host
-  registrable) y `probes/html.ts` (parseo tolerante de JSON-LD, `potentialAction`, landmarks DOM; sin
+  timeout 8s/20s máx; desde `TASK-1778` 2026-08-27: tope 4 MiB con corte real por stream + rastro
+  `truncated`/`observable`, `robots.txt` obedecido vía `probes/robots-policy.ts`, y — gated por
+  `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` — redirects contenidos a la familia del sujeto + guarda
+  DNS) y `probes/html.ts` (parseo tolerante de JSON-LD, `potentialAction`, landmarks DOM; sin
   una sola línea de `import`). Cobertura en
   `src/lib/growth/ai-visibility/__tests__/probes-substrate.test.ts`.
 - **Los 3 tipos del fetcher** ya están separados en `probes/contracts.ts:99-124`

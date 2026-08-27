@@ -257,6 +257,14 @@ Allow: /
 Sitemap: https://EXAMPLE.com/sitemap_index.xml
 ```
 
+> **Ética de rastreo del tooling propio (TASK-1778, 2026-08-27):** el fetcher
+> propio de Greenhouse (probes del AI Visibility Grader) obedece el `robots.txt`
+> del sitio auditado matcheando **su propio token** (`GreenhouseAEOGrader`,
+> fallback `*`) — jamás actúa con el token de un bot de terceros ni lo suplanta.
+> Un sitio con `User-agent: GPTBot / Disallow: /` sigue siendo legible para
+> nosotros; "bloqueas GPTBot" es el hallazgo. Un Disallow que sí nos alcanza →
+> `blocked_robots` (hallazgo, no fallo).
+
 ## 7. Otros técnicos que importan
 
 - **HTTPS** — requisito básico. Mixed content rompe confianza y features.

@@ -123,6 +123,17 @@ diagnóstico → acción.
 - **Probes read-only sobre superficies públicas de terceros** — nunca autenticar,
   mutar ni tocar endpoints privados del sitio analizado (cuando se mide a un
   cliente o prospecto).
+- **El fetcher de probes obedece `robots.txt` y no suplanta bots** (TASK-1778,
+  2026-08-27): matchea **su propio token** (`GreenhouseAEOGrader`, fallback `*`),
+  nunca los tokens de los bots de IA auditados — un sitio con `User-agent: GPTBot
+  / Disallow: /` sigue siendo legible para nosotros y "bloqueas GPTBot" es el
+  hallazgo; un Disallow que sí nos alcanza → `blocked_robots` (hallazgo, no
+  fallo). Los probes de presencia (JSON-LD, potentialAction, landmarks) degradan
+  a `skipped` (`truncated_body`/`not_observable`) en vez de reportar ausencia
+  falsa cuando el body se trunca (tope real 4 MiB por stream) o la página es un
+  shell JS. El endurecimiento de red (contención de redirects a la familia del
+  sujeto + guarda DNS anti-rangos privados) viaja gated por
+  `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (default OFF, cutover pendiente).
 - **Public-safe** en cualquier artefacto del lead magnet: sin raw provider text,
   sin claims de ranking garantizado, sin internal reasons.
 - **Si Efeonce/Greenhouse adopta WebMCP propio:** las tools de write van por el
