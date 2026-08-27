@@ -36,6 +36,26 @@
 > **Regla heredada del antecedente:** si el código dice otra cosa que este documento, manda el
 > código y se corrige el documento.
 
+> ### 🔴 Correcciones a la v1 de este documento (2026-08-26, misma fecha)
+>
+> Una pasada de reconciliación contra las **76 tasks** del carril —no las ~35 que estimé— encontró
+> cuatro errores en la primera versión. Se corrigen en línea; se listan acá para que nadie cite la
+> versión vieja:
+>
+> 1. **§3.1 no es un hallazgo nuevo.** La guarda de redirects ya estaba archivada como `ISSUE-164`
+>    (`open`, detectada el mismo día) con `TASK-1778` como fix, que además cubre más: tope de saltos
+>    con revalidación de cada `Location`, y resolución DNS.
+> 2. **§3.7 afirmaba que el reporte «no puede decir que describe una muestra». Es falso.**
+>    `SiteAuditView.tsx:440,566` ya lo declara desde `TASK-1309` (`complete`), con copy dedicado. Lo
+>    que falta es precisión: descansa en el proxy `crawledPages === crawlPageCap`, que da falso
+>    positivo con un sitio de exactamente 100 páginas y falso negativo si el crawl paró por otra razón.
+> 3. **Medir móvil ya está implementado.** `SUPPORTED_DEVICES` incluye `mobile` y el batch acepta el
+>    parámetro; `DEFAULT_DEVICES = ['desktop']` es una **decisión de gasto** (cada device duplica el
+>    costo), no un gap de ingeniería.
+> 4. **El techo de gasto server-side ya existe para SEO.** `enforceSeoRunEntitlement` valida
+>    `estimatedCostUsd` contra `budgetRemainingUsd`, y dos callers re-consultan el gate dentro del
+>    bucle. El hueco real es otro, y está en §3.10.
+
 ---
 
 ## 1. Por qué se hizo esta auditoría
@@ -71,7 +91,7 @@ se depende de su MCP. Se le roban decisiones de diseño, que es legal y gratis.
 
 Ocho. Ninguno depende de OpenSEO; aparecieron al mirar nuestra superficie con los mismos ojos.
 
-### 3.1 🔴 El fetcher de probes promete un límite de redirects que no implementa — **Clase A**
+### 3.1 🔴 El fetcher de probes promete un límite de redirects que no implementa — **Clase A** · *ya archivado*
 
 `src/lib/growth/ai-visibility/probes/safe-fetch.ts:10` afirma en su docstring:
 *«`redirect: 'follow'` acotado al mismo registrable host (no se persigue cross-host)»*.
@@ -87,6 +107,11 @@ hacia una IP interna sería seguido.
 Es exactamente el patrón *«una guarda es una afirmación hasta que el mecanismo la sostenga»*.
 Contraste: OpenSEO revalida SSRF **en cada salto** y hace DNS-over-HTTPS sobre la URL de arranque
 (Clase B).
+
+**Ya tiene dueño, y no es de esta auditoría.** `ISSUE-164` lo documenta con la misma evidencia y
+`TASK-1778` es su fix, con alcance mayor: tope de saltos revalidando cada `Location`, más resolución
+DNS. Esta auditoría lo redescubrió; el crédito es de la pasada que lo archivó primero. Lo que falta
+es **ejecución, no alcance**.
 
 ### 3.2 🔴 El servidor MCP interno se anuncia como read-only y escribe — **Clase A**
 
@@ -163,10 +188,12 @@ prompts. Lo único que cruza a MCP es el score agregado dentro de `get_seo_visib
    cliente móvil-first medimos el SERP equivocado, y no hay palanca de cadencia (05:00 diarias para
    todos) para bajar costo.
 
-**Clase B, del mismo eje:** descartamos entero `summary.domain_info` de OnPage, que ya recibimos y
-parseamos —trae soft-404, redirect www/https, canonicalización, directory browsing y expiración del
-certificado SSL—; y persistimos `crawled_pages` pero no `crawl_stop_reason`, así que con techo de
-100 páginas **el reporte no puede decir que describe una muestra**.
+**Clase A, corregido respecto de la v1:** descartamos entero `summary.domain_info` de OnPage, que ya
+recibimos y parseamos —trae soft-404, redirect www/https, canonicalización, directory browsing y
+expiración del certificado SSL; cero menciones en las 76 tasks del carril—. En cambio, la
+declaración de muestra **sí existe** (`SiteAuditView.tsx:440,566`, desde `TASK-1309`): lo que falta
+es reemplazar su proxy `crawledPages === crawlPageCap` por el `crawl_stop_reason` real, que hoy no
+se persiste.
 
 ### 3.8 🟡 Divergencia de veredicto entre nuestros dos motores — **Clase A la frontera, Clase B los pesos**
 
@@ -199,6 +226,72 @@ su severidad con su propia versión.
 - **`resolveProbeUrl` exige igualdad exacta de hostname** (línea 57). Un sitemap declarado como
   `https://www.ejemplo.com/sitemap.xml` con target `ejemplo.com` devuelve `blocked`. `www` vs apex
   es el caso probable, no el borde.
+
+### 3.10 🔴 La señal que nueve tasks citan como mitigación del riesgo #1, y no existe — **Clase A**
+
+`seo.provider.cost_over_budget` tiene **cero ocurrencias** en `src`, `services`, `migrations` y
+`scripts`. Está citada en la columna de mitigación de la tabla de riesgos de **nueve tasks, ocho ya
+cerradas**: `TASK-1300`, `1301`, `1302`, `1303`, `1304`, `1308`, `1309`, `1664` y `1651`. El riesgo
+que dice mitigar es siempre el mismo, y es el #1 del módulo: *«Costo DataForSEO desbocado»*.
+
+**La atribución es circular:** 1300 dice que la materializa 1303, 1301 dice que la materializa 1303,
+1304 dice que la agrega 1303 — y 1303 dice que sus datos *«alimentan `seo.provider.cost_over_budget`
+(TASK-1301/1300)»*. Cada una cerró apuntando a la otra.
+
+**Y ya se detectó una vez sin cerrarse.** `TASK-1664` dice textualmente *«La señal
+`seo.provider.cost_over_budget` citada por la spec no existe en código»*, y aun así cerró volviendo a
+citarla en su propia tabla de riesgos.
+
+**Matiz que evita sobrevenderlo:** el control duro sí existe. `enforceSeoRunEntitlement` bloquea
+antes de gastar, y dos callers re-consultan el gate dentro del bucle, así que el sobregiro
+intra-batch está cubierto. Lo que falta es la **detección temprana**: hoy el sobregiro se manifiesta
+como corridas que empiezan a fallar con `budget_exhausted`, sin alarma previa. Las señales que sí
+existen son otras cuatro: `seo.rank.capture_lag`, `seo.audit.stuck_tasks`,
+`seo.market_data.freshness` y `seo.keyword_discovery.*`.
+
+**Y el techo no cubre el AEO.** `TASK-1300` dejó declarado al cerrar que el gasto de perfiles AEO
+ligados a un cliente **no entra en su presupuesto**, porque `ProviderAdapterContext` no transporta la
+organización. El gate existe para SEO y no aplica al grader.
+
+### 3.11 🟡 El snapshot del ledger de flags está estructuralmente invertido para el AEO — **Clase A**
+
+La tabla `§ Snapshot` del `FEATURE_FLAG_STATE_LEDGER.md` se generó con `vercel env ls`, donde un flag
+ausente se lee como «OFF en producción». Pero **casi todo el stack AEO se lee en el ops-worker, no en
+Vercel**: su ausencia del listado de Vercel nunca significó OFF. La rama `production` de
+`services/ops-worker/deploy.sh` los declara `"true"` con el comentario explícito *«PRODUCTION —
+espeja staging … todo activo en prod»*.
+
+Resultado: ~20 celdas que dicen «OFF en prod» son falsas. No son veinte errores sueltos: es **un solo
+defecto de método replicado**. El caso más caro es `CATEGORY_GUARD`, que el ledger da por «OFF en
+todos los environments» siendo un guard que **bloquea runs** y está ON en ambas ramas — leer mal esa
+fila cambia la interpretación de un síntoma en vivo.
+
+Corolario para cualquier rollout: **para un flag del ops-worker no existe «prod vs staging»** — es un
+servicio único. `TASK-1270` describe una «Production verification sequence» con flip y cooldown que
+esa topología no puede tener; alguien podría esperar ese flip indefinidamente mientras el re-grade ya
+corre.
+
+### 3.12 🟡 Defectos estructurales del backlog — **Clase A**
+
+Salieron al construir el grafo de dependencias sobre las 59 tasks del carril (76 por grep amplio):
+
+- **Un compromiso incumplido en una task cerrada.** `TASK-1659` (`complete`) declara *«Los 3 lanes
+  aceptan el parámetro: app-lane, ecosystem y **las 2 tools MCP**»*. El `inputSchema` de
+  `track_seo_keywords` en el gateway no tiene `intent`. Con `.strict()`, un agente externo que lo
+  mande recibe error de validación; si no lo manda, escribe `NULL` — justo lo que esa task existe
+  para evitar. Sus checkboxes de aceptación siguen sin marcar.
+- **Una mina de migración.** `TASK-1662` afirma *«No hay modelo de competidor: ninguna tabla»* y
+  planea `migrations/[nueva]-task-1662-seo-competitors.sql`. La tabla existe desde la migración de
+  `TASK-1299`, creada con `CREATE TABLE IF NOT EXISTS`. Un `CREATE ... IF NOT EXISTS` nuevo haría
+  **no-op en silencio**, la task cerraría en verde y `declared_by` nunca existiría.
+- **Trabajo duplicado, no conflicto.** `TASK-1660` y `TASK-1690` declaran el mismo cambio sobre
+  `select-featured-series.ts`: dejar de ordenar por mejor posición y ordenar por clics en juego.
+- **Un ciclo declarado** entre `TASK-1700` y `TASK-1669` (artefacto ↔ código), con resolución escrita
+  en el cuerpo pero campos de header que se contradicen: un ordenador automático se traba.
+- **Diez colisiones de archivos owned**, incluida una donde `TASK-1269` está **en vuelo** y no sabe
+  que colisiona con `TASK-1702` sobre `fix-it/**`.
+- **Siete tasks con `Blocked by: none`** contradiciendo dependencias duras declaradas en su propio
+  cuerpo. Y sólo **2 de 59** usan la disciplina de declarar «archivos que modifico sin poseer».
 
 ## 4. Lo adoptable
 
@@ -264,64 +357,88 @@ Ordenado por lo que resuelve hoy. Todo Clase B en cuanto a cómo lo hace OpenSEO
 
 ## 7. El plan
 
-Tres olas. **Ninguna task fue creada ni modificada al escribir este documento.** Los IDs nuevos se
-reservan al ejecutar, barriendo el registry por dominio y superficie (el más alto hoy es
-`TASK-1779`).
+**Reescrito tras la reconciliación.** La v1 repartía trabajo sobre tasks cuyo cuerpo no se había
+leído. Esta versión sale de leer las 59 tasks del carril y su grafo de dependencias declarado.
+**Ninguna task fue creada ni modificada.**
 
-### Ola 0 — Correcciones de contrato y seguridad
+### 7.1 Lo que NO hay que hacer, porque ya tiene dueño
 
-Va **antes** de que arranque el trabajo de hallazgos de sitio, porque dos de estos son bloqueadores
-de `TASK-1670` y uno toca un archivo que está por volverse primitive compartido.
-
-| # | Qué | Dónde | Dueño |
-|---|---|---|---|
-| 0.1 | Hacer real la guarda de redirects: revalidar host y `isNonPublicHost` en cada salto, o pasar a `redirect: 'manual'` con validación explícita | `ai-visibility/probes/safe-fetch.ts` | Task nueva, o `TASK-1697` si absorbe el sustrato |
-| 0.2 | Override de User-Agent en `ProbeFetchInit` + **decisión de postura** sobre presentarse como crawler de un tercero | `ai-visibility/probes/{contracts,safe-fetch}.ts` | Ampliar `TASK-1697`; desbloquea `TASK-1670` |
-| 0.3 | Resolver el sitemap cross-host (`www` vs apex) en `resolveProbeUrl` | mismo | `TASK-1670` |
-| 0.4 | Corregir la etiqueta del servidor MCP interno: renombrar y reescribir instructions declarando las cuatro escrituras y el gasto | `src/mcp/greenhouse/server.ts` | Task nueva (chica) |
-| 0.5 | Confirmar en Vercel Production el estado real de los flags de probes del AEO y corregir el ledger | `FEATURE_FLAG_STATE_LEDGER.md` | Higiene, sin task |
-
-**Evidencia de cierre:** test que ejercite un 302 hacia host distinto y hacia IP privada; el
-chequeo de borde implementable; `vercel env ls` contrastado contra el ledger.
-
-### Ola 1 — Producto: lo que más retorno da por unidad de esfuerzo
-
-| # | Qué | Cómo | Dónde | Dueño |
-|---|---|---|---|---|
-| 1.1 | **Inspección de URL de GSC, con cuota gobernada** | `inspectUrl` en el api-client + ledger de consumo por `(org, site_url, día)` con techo bajo los 2.000/día + preview + fence. Reader → lane ecosystem → tool MCP en el mismo PR | `growth/search-console/**`, `ecosystem/growth/seo/` | **Extraer de `TASK-1426`** como task propia; el paquete multi-property es Effort Alto y arrastra incógnitas |
-| 1.2 | **Pintar la autoridad de dominio que ya capturamos** | El dato ya está en `seo_backlink_snapshots`; falta llevarlo al VM y a la vista | `growth/seo/backlinks/reader.ts` + vistas | Absorber en `TASK-1775` o `TASK-1777` — **no crear task propia** |
-| 1.3 | **Cosechar `summary.domain_info`** (soft-404, redirect www/https, canonicalización, directory browsing, expiración SSL) | Ya lo recibimos y lo descartamos en el parser. Costo incremental cero | `growth/seo/site-audit/collect.ts` | Ampliar `TASK-1705`; alimenta el eje de sitio de `TASK-1671` |
-| 1.4 | **Persistir `crawl_stop_reason` + `pages_in_queue`** y declarar la muestra en el reporte | Columnas nuevas + copy | `site-audit/**`, reporte | **Bloqueante moral de `TASK-1672/1673`**: un documento firmado que no declara que describe una muestra es peor que no tenerlo |
-| 1.5 | **Techo de gasto obligatorio y verificado** encima del `preview` existente | Parámetro obligatorio, re-estimado en `enforceSeoRunEntitlement` al ejecutar | `growth/seo/entitlement.ts`, `keyword-discovery/**` | Task nueva; se relaciona con `TASK-1706` |
-| 1.6 | **`country` + `device` en la serie GSC, y medir móvil** | Dimensión adicional en el request; evaluar tabla agregada aparte en vez de ampliar el grano (producto cartesiano sobre `query×page`). Y quitar el default de solo-desktop en rank capture | `gsc-daily-materializer.ts`, `rank-capture.ts` | Task nueva; «cómo nos va en MX vs CL» es pregunta semanal de cliente |
-| 1.7 | **Annotations en las 13 tools SEO del gateway** | `readOnlyHint: false` en todo lo que compre datos | `efeonce-mcp/src/mcp.ts` | Absorber en `TASK-1658` junto al drift de federación |
-
-### Ola 2 — Estructural
-
-| # | Qué | Por qué ahora no antes |
+| Ítem de la v1 | Dueño real | Estado |
 |---|---|---|
-| 2.1 | **Memoria de proyecto compartida** — contexto, competidores, páginas clave y log de research, con procedencia `user \| nexa \| mcp` | Es la pieza de mayor valor de todo el análisis, pero toca el modelo de datos y necesita decidir su frontera con `brand_intelligence` del AEO y con `competitors_declared`. Le da dueño canónico a `seo_competitors`, hoy huérfana |
-| 2.2 | **Mover la frontera entre motores al hecho, no al fetch** — evidencia compartida sin veredicto, severidad propia por motor | Depende de que la Ola 0 desbloquee el sustrato. Extiende §5.3 de la auditoría del 2026-08-15, que hoy solo cubre análisis de contenido |
-| 2.3 | **Lane ecosystem del AEO + federación de sus tools** | Es la brecha con más valor comercial, y la más grande en esfuerzo |
-| 2.4 | **Skill de dominio con nota de superficie** que conozca las 16 tools por nombre y sirva igual al agente externo y a Nexa | Cierra la brecha de parity de §3.5 sin construir nada «Nexa-específico» |
-| 2.5 | **Tercer eje de valor de negocio en oportunidades**: `estimatedClickGain × tasa de conversión` | Depende de GA4 a runtime (`TASK-1284`) |
-| 2.6 | **GA4 a runtime, alcance cerrado** | Hoy GA4 es cero: existe `runRealtimeReport` pero **no `runReport` histórico**, y sus únicos consumidores son dos scripts CLI. Sin esto la cadena de valor termina en el clic y nunca llega al dinero, y el tráfico desde motores de IA no se mide en ningún lado. Reordenar `TASK-1284`: measurement health primero, que es lo más barato y valida todo lo demás |
+| Guarda de redirects del fetcher | `ISSUE-164` + `TASK-1778` | Archivado con más alcance. Falta ejecución |
+| Sitemap cross-host `www` ↔ apex | `TASK-1778` Slice 1 | Ya especificado, con el porqué de no usar eTLD+1 |
+| Adoptar `seo_competitors` | `TASK-1699` (P0) | Ya la reclama por nombre y le pone el primer consumer |
+| Inspección de URL de GSC | `TASK-1426` | En alcance con contrato de función — pero sin mecanismo de cuota (ver 7.3) |
+| Lane ecosystem del AEO | Deuda declarada en `TASK-1645` | *«task hermana si se prioriza»*; sin task creada |
+| Medir móvil | — | Ya implementado. Es decisión de gasto (2× por device), no ingeniería |
+| Techo de gasto server-side (SEO) | `TASK-1301` | Ya existe con presupuesto por tier y fence intra-batch |
 
-### Higiene, sin task
+### 7.2 La secuencia, justificada por el grafo y no por opinión
 
-- `EPIC-022` dice `Lifecycle: to-do` / `Status: Diseño` con **seis crons suyos en producción** desde
-  el 6 de agosto. `TASK-1282` está `in-progress` con `Status real: Diseño` y el flag ON en Vercel
-  prod y en el ops-worker.
-- `TASK-1658` tiene el conteo desactualizado (dice 8 de 11; es 13 de 16).
+El criterio de orden es **irreversibilidad y conteo de desbloqueo**, no prioridad declarada. Un
+reader malo se arregla con un deploy; un snapshot append-only malo ya viajó.
 
-### Decisión pendiente, que no es de código
+| # | Unidad | Por qué va acá |
+|---|---|---|
+| 1 | **`TASK-1778`** — endurecer el fetcher | Raíz de **9** tasks, y habilita el flip a producción de dos flags del grader. Único orden declarado como load-bearing en dos direcciones |
+| 2 | **`TASK-1696`** — dimensión consumer + gate USD | P0, raíz de **8**. Seis tasks encienden gasto recurrente detrás de ella. Su gate nace en shadow, así que no frena a nadie mientras se calibra |
+| 3 | **`TASK-1697` slices 1–2** — `git mv` del sustrato | Horas de trabajo, y sólo después de 1778. Abre el carril de auditoría entero |
+| 4 | **`TASK-1694`** — contrato de candidato | **Irreversible si llega tarde**: sin dedup, el primer snapshot de 1700 congela la misma keyword hasta cuatro veces |
+| 5 | **`TASK-1692`** — writers del ledger de decisiones | Segundo bloqueador de 1700 y comparte cuatro archivos con 1694: encadenarla evita el rebase |
+| 6 | **`TASK-1699`** — persistir el top-N ya pagado | P0, raíz de 6. Debe preceder a 1704 (mismo `rank-capture.ts`) y le da a 1662 su supuesto más frágil medido |
+| 7 | **`country` + `device` en GSC, como slice de `TASK-1655`** | Mismo argumento de irreversibilidad: cambia la unique key de la tabla que 1700 snapshotea. Después es re-backfill de 16 meses |
+| 8 | **`TASK-1670`** — hallazgos de sitio | Desbloqueado por (3). Esfuerzo bajo, raíz de la cadena de auditoría |
+| 9 | **`TASK-1671`** — superficie de hallazgos | Es la condición del flip del flag de 1670. **Van juntas o no van** |
+| 10 | **`TASK-1700`** — cola priorizada | Cierra el carril con sus tres bloqueadores resueltos y resuelve el ciclo con 1669 en la dirección correcta |
 
-Hoy conectamos Search Console con **un grant de operador interno de Efeonce**
-(`command.ts:129` → `buildOperatorSearchConsoleSecretId`), reusado entre todas las orgs. La variante
-per-org (`buildSearchConsoleSecretId`) está escrita y sin usar. Para clientes enterprise, hoy el
-cliente **no puede otorgar con su propia cuenta ni revocarnos sin afectar a los demás**, y revocar
-el grant del operador tumba a todos. Multi-property amplifica el riesgo, así que conviene decidirlo
-antes de `TASK-1426`.
+### 7.3 Ampliaciones concretas a tasks existentes
+
+| Task | Qué agregarle |
+|---|---|
+| `TASK-1778` | El override de User-Agent en `ProbeFetchInit` (aditivo, default actual). **Y la postura**: sirve para variar *nuestro propio* token, nunca para presentarse como el crawler de un tercero |
+| `TASK-1670` | Corregir su chequeo de borde: como está escrito hace `GET` con UA de un bot de retrieval, lo que **contradice la postura de 1778**. Es decisión, no implementación |
+| `TASK-1426` | El mecanismo de cuota que hoy no tiene: ledger por `(organization_id, site_url, día)` con techo bajo las 2.000/día, preview obligatorio y fence |
+| `TASK-1705` | Cosechador de `summary.domain_info` — costo incremental cero, cero menciones en las 76 tasks |
+| `TASK-1658` | Recontar (15 tools por nombre hoy, no 11) y agregar un slice de **paridad de schema**, no sólo de nombre |
+| `TASK-1631` | Declarar a Growth SEO/AEO como consumer: hoy no menciona «seo» ni «aeo» una sola vez, y podría cerrarse sin desbloquear `prepare_seo_grounded_queries` |
+| `TASK-1775` | Desambiguar las **dos autoridades de dominio** que van a coexistir: el `domain_rank` semanal vivo y el authority mensual estimado que esa task crea |
+
+### 7.4 Tasks nuevas, con su forma
+
+| Qué | Perfil | Notas |
+|---|---|---|
+| Señal `seo.provider.cost_over_budget` + atribución de gasto del AEO | `backend-data` | Cierra §3.10. La atribución AEO es la mitad más grande |
+| Etiqueta honesta del servidor MCP interno | `backend-data`, chica | No la absorbe 1658: distinto repo, distinto gate |
+| Annotations en las 13 tools SEO del gateway | chica, repo `efeonce-mcp` | Tampoco va en 1658: mezcla dos contratos y rompe su orden de slices |
+| `crawl_stop_reason` + `pages_in_queue` | `backend-data`, chica | Reemplaza el proxy, no crea la declaración |
+| Pintar `domainRank` | **`ui-ux`** | 1775 y 1777 son `backend-data` con out-of-scope duro sobre superficie |
+| Preview obligatorio y atado a la corrida | `backend-data` | El gate ya valida; falta que el preview sea mecanismo y que lo ejecutado quede atado a lo aprobado |
+| Lane ecosystem del AEO | partir en **A lectura** (Medio) y **B escritura** (Alto) | B bloqueada por `TASK-1696` y `TASK-1631` |
+| Tools SEO para Nexa | `backend-data` | **No** es una skill: Nexa no lee `.claude/skills/` |
+
+### 7.5 Higiene documental, sin task
+
+Ordenada por cuánto engaña a quien la lea:
+
+1. **La columna de `§ Snapshot` del ledger** — separar por **runtime**, no por environment (§3.11).
+2. **`CATEGORY_GUARD`** — dice «OFF en todos los environments» siendo un guard que bloquea runs.
+3. **`EPIC-022`** — `to-do` / `Diseño` / `Owner: unassigned` con 21 hijas completas y 7 crons activos.
+4. **`TASK-1270`** — borrar la secuencia de flip a prod: describe un gate que la topología de servicio único no puede tener.
+5. **`TASK-1282` y `TASK-1283`** — live en producción desde el 7 de agosto con `Status real: Diseño`.
+6. **`TASK-1662`** — su §Gap y su migración `[nueva]` son la mina de §3.12.
+7. **`TASK-1708`** — bloqueada por nada real; su `Blocked by` es stale.
+8. **`TASK-1660` vs `TASK-1690`** — decidir cuál hace el cambio; hoy lo declaran las dos.
+9. **La nota de inventario de tools** en la skill del gateway dice «9 reads + 2 writes»; son 16.
+
+### 7.6 Decisiones que no son de código
+
+- **Token de operador vs grant per-cliente en Search Console.** Hoy un solo refresh token de una
+  persona es la llave de todas las propiedades conectadas. Si esa persona se va o revoca, caen todas
+  las orgs juntas. La variante per-org está escrita y sin usar. Decidir **antes** de `TASK-1426`.
+- **Postura de User-Agent** (§7.3).
+- **`TASK-1269` vs `TASK-1702`** sobre `fix-it/**`: 1269 está en vuelo y no sabe que colisiona.
+- **Dónde vive la memoria de proyecto.** No pertenece a EPIC-020/021/022: meterla ahí le pone un
+  epic prestado. Si es para el carril agéntico, cuelga de `TASK-1669`, después de `TASK-1700`.
 
 ## 8. Lo que quedó fuera del plan, a propósito
 
