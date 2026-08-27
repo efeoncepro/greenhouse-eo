@@ -292,6 +292,12 @@ export const SEO_SITE_AUDIT_COMPLETED_EVENT = 'growth.seo.site_audit.completed'
 export const SEO_BACKLINK_SNAPSHOT_CAPTURED_EVENT = 'growth.seo.backlink_snapshot.captured'
 
 /**
+ * TASK-1777 — Evento del drill-down nominal de enlaces (rastro de una corrida que gasta,
+ * con el motivo del disparo en el payload). El consumer re-lee PG.
+ */
+export const SEO_BACKLINK_DETAIL_CAPTURED_EVENT = 'growth.seo.backlink.detail_captured'
+
+/**
  * TASK-1775 — Evento de captura de la foto de dominio (`seo_domain_overview_snapshots`).
  * Payload con coordenadas (target, org, fecha, conteos); el consumer re-lee PG.
  */

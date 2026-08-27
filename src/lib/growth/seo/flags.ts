@@ -112,6 +112,22 @@ export const isSeoUrlVisibilityEnabled = (env: NodeJS.ProcessEnv = process.env):
   isTrue(env[GROWTH_SEO_URL_VISIBILITY_FLAG])
 
 /**
+ * TASK-1777 — Drill-down nominal del perfil de enlaces (paso post-batch del snapshot
+ * semanal de TASK-1304; SIN scheduler nuevo — un cron aparte desincronizaría el detalle de
+ * su snapshot padre).
+ *
+ * ⚠️ **Se lee SOLO en el ops-worker** (el pase vive en el batch semanal; en Vercel es
+ * inerte). SoT declarativo: `services/ops-worker/deploy.sh`; efecto inmediato con
+ * `--update-env-vars`. Es SUBORDINADO a `GROWTH_SEO_ENABLED`. Registrar cambios en el
+ * ledger de flags.
+ */
+export const GROWTH_SEO_BACKLINK_DETAIL_FLAG = 'GROWTH_SEO_BACKLINK_DETAIL_ENABLED'
+
+/** Gate del drill-down de enlaces. Default OFF: prenderlo compromete gasto condicional. */
+export const isSeoBacklinkDetailEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_SEO_BACKLINK_DETAIL_FLAG])
+
+/**
  * TASK-1709 — Diagnóstico de prospecto (tier `prospect`, corrida única). Default OFF.
  *
  * 🔴 **Prender esto habilita un command que GASTA** (~USD 0,25 por diagnóstico, Labs +

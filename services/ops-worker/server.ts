@@ -134,6 +134,7 @@ import { runRankCaptureBatch } from '@/lib/growth/seo/rank-capture-batch'
 import { runSiteAuditEnqueueBatch } from '@/lib/growth/seo/site-audit/enqueue-batch'
 import { collectSiteAuditRuns } from '@/lib/growth/seo/site-audit/collect'
 import { runBacklinkCaptureBatch } from '@/lib/growth/seo/backlinks/capture'
+import { runBacklinkDetailPass } from '@/lib/growth/seo/backlinks/detail-capture'
 import { runKeywordMarketDataBatch } from '@/lib/growth/seo/keyword-market-data-batch'
 import { runDomainOverviewBatch } from '@/lib/growth/seo/domain-overview/capture'
 import { runUrlVisibilityBatch } from '@/lib/growth/seo/url-visibility/capture'
@@ -2067,7 +2068,35 @@ const handleSeoBacklinkCaptureBatch = async (req: IncomingMessage, res: ServerRe
       )
     }
 
-    json(res, 200, { ok: true, ...summary })
+    // TASK-1777 — pase de drill-down nominal DESPUÉS del batch (mismo ciclo semanal, sin
+    // scheduler nuevo). Doble gate: el módulo + `GROWTH_SEO_BACKLINK_DETAIL_ENABLED`
+    // (default OFF); el pase sólo gasta donde `shouldDrillDownBacklinks` lo autoriza.
+    let detailPass: Awaited<ReturnType<typeof runBacklinkDetailPass>> | null = null
+
+    try {
+      detailPass = await runBacklinkDetailPass({ captureDate })
+
+      if ('snapshots' in detailPass) {
+        console.log(
+          `[ops-worker] backlink detail pass — snapshots=${detailPass.snapshots} drilled=${detailPass.drilled} ` +
+          `skipped=${detailPass.skipped} blocked=${detailPass.budgetBlocked} failed=${detailPass.failed} ` +
+          `cost=$${detailPass.costUsd.toFixed(4)}`
+        )
+
+        if (detailPass.failed > 0) {
+          captureMessageWithDomain(
+            `[TASK-1777] drill-down de enlaces falló en ${detailPass.failed} snapshot(s)`,
+            'growth',
+            { level: 'warning', tags: { source: 'ops_worker_seo_backlink_detail_pass' } }
+          )
+        }
+      }
+    } catch (error) {
+      // El pase de detalle jamás tumba el batch del snapshot: se reporta y sigue.
+      captureWithDomain(error, 'growth', { tags: { source: 'ops_worker_seo_backlink_detail_pass' } })
+    }
+
+    json(res, 200, { ok: true, ...summary, detailPass })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown SEO backlink capture error'
 

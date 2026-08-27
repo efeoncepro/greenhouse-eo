@@ -815,6 +815,20 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED=${GROWTH_SEO_DOMAIN_OVE
 GROWTH_SEO_URL_VISIBILITY_ENABLED="${GROWTH_SEO_URL_VISIBILITY_ENABLED:-false}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_URL_VISIBILITY_ENABLED=${GROWTH_SEO_URL_VISIBILITY_ENABLED}"
 
+# TASK-1777 — Drill-down nominal del perfil de enlaces (paso post-batch del snapshot semanal
+# de TASK-1304; SIN scheduler nuevo — reusa `ops-seo-backlink-capture` 0 7 * * 1).
+#
+# 🔴 **OFF por defecto.** Habilita gasto CONDICIONAL: el pase sólo compra detalle donde el
+# predicado `shouldDrillDownBacklinks` ve movimiento (o primera vez); un target estable
+# registra `skipped_no_movement` a costo cero. Se enciende sólo tras el smoke real
+# (target con movimiento gasta ~USD 0.05-0.10; target estable gasta USD 0) + autorización.
+#
+# ⚠️ Lo lee SOLO el ops-worker. Declararlo acá es obligatorio (`--set-env-vars` destructivo).
+# Es SUBORDINADO a `GROWTH_SEO_ENABLED`. Rollback (<5 min): `false` + `--update-env-vars` —
+# el batch semanal vuelve a su comportamiento actual sin tocar el cron ni redeployar.
+GROWTH_SEO_BACKLINK_DETAIL_ENABLED="${GROWTH_SEO_BACKLINK_DETAIL_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},GROWTH_SEO_BACKLINK_DETAIL_ENABLED=${GROWTH_SEO_BACKLINK_DETAIL_ENABLED}"
+
 # TASK-1664 — keyword discovery (DataForSEO Labs Live: seed expansion + enrichment).
 # 🔴 Prenderlo habilita corridas que GASTAN (cada request y cada fila cuestan) — pero SOLO
 # corridas encoladas explícitamente por un operador/agente con entitlement: no existe enqueue
