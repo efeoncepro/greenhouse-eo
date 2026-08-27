@@ -135,6 +135,7 @@ import { runSiteAuditEnqueueBatch } from '@/lib/growth/seo/site-audit/enqueue-ba
 import { collectSiteAuditRuns } from '@/lib/growth/seo/site-audit/collect'
 import { runBacklinkCaptureBatch } from '@/lib/growth/seo/backlinks/capture'
 import { runKeywordMarketDataBatch } from '@/lib/growth/seo/keyword-market-data-batch'
+import { runDomainOverviewBatch } from '@/lib/growth/seo/domain-overview/capture'
 import { drainKeywordDiscoveryRuns } from '@/lib/growth/seo/keyword-discovery/runner'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { drainAssessmentAiScoringRuns } from '@/lib/hiring/assessment/ai/scoring-run/execute'
@@ -2123,6 +2124,55 @@ const handleSeoKeywordMarketDataCaptureBatch = async (req: IncomingMessage, res:
   }
 }
 
+// ─── /seo/domain-overview/capture-batch ─────────────────────────────────────
+//
+// TASK-1775 — foto MENSUAL de dominio (DataForSEO Labs `domain_rank_overview`) sobre el
+// target de cada org elegible y sus competidores declarados.
+//
+// 🔴 Este handler GASTA. Doble gate: el módulo (`GROWTH_SEO_ENABLED`) y el flag propio
+// (`GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED`, default OFF), que el command verifica por dentro.
+// `{"dryRun": true}` reporta qué sujetos se comprarían y cuánto, sin llamar al proveedor.
+const handleSeoDomainOverviewCaptureBatch = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+  const maxTargets = typeof body.maxTargets === 'number' && body.maxTargets > 0 ? Math.floor(body.maxTargets) : undefined
+  const dryRun = body.dryRun === true
+
+  if (!isSeoModuleEnabled()) {
+    json(res, 200, { ok: true, skipped: 'seo_module_disabled', targets: 0, captured: 0 })
+
+    return
+  }
+
+  console.log(`[ops-worker] POST /seo/domain-overview/capture-batch — dryRun=${dryRun} maxTargets=${maxTargets ?? 'all'}`)
+
+  try {
+    const summary = await runDomainOverviewBatch({ maxTargets, dryRun })
+
+    console.log(
+      `[ops-worker] /seo/domain-overview/capture-batch done — dryRun=${summary.dryRun} ` +
+      `targets=${summary.targets} captured=${summary.captured} skipped=${summary.skipped} ` +
+      `blocked=${summary.blocked} failed=${summary.failed} costUsd=${summary.costUsd}`
+    )
+
+    // Elegibles > 0 con 0 capturados y fallas del proveedor NO es éxito silencioso.
+    if (!summary.dryRun && summary.failed > 0) {
+      captureMessageWithDomain(
+        `[TASK-1775] foto de dominio falló en ${summary.failed} target(s)`,
+        'growth',
+        { level: 'warning', tags: { source: 'ops_worker_seo_domain_overview' } }
+      )
+    }
+
+    json(res, 200, { ok: true, ...summary })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown SEO domain overview error'
+
+    console.error('[ops-worker] /seo/domain-overview/capture-batch failed:', message)
+    captureWithDomain(error, 'growth', { tags: { source: 'ops_worker_seo_domain_overview' } })
+    json(res, 502, { error: message })
+  }
+}
+
 // ─── /seo/keyword-discovery/drain ───────────────────────────────────────────
 //
 // TASK-1664 — drena corridas de keyword discovery `pending` (DataForSEO Labs Live).
@@ -2978,6 +3028,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/seo/keyword-market-data/capture-batch') {
       await handleSeoKeywordMarketDataCaptureBatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/seo/domain-overview/capture-batch') {
+      await handleSeoDomainOverviewCaptureBatch(req, res)
 
       return
     }

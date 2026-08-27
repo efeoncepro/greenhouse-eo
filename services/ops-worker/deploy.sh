@@ -785,6 +785,23 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_ENABLED=${GROWTH_SEO_ENABLED}"
 GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED="${GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED=${GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED}"
 
+# TASK-1775 — Foto de dominio mensual (DataForSEO Labs `domain_rank_overview` sobre el target
+# y sus competidores declarados).
+#
+# 🔴 **OFF por defecto.** Habilita una corrida que le PAGA AL PROVEEDOR por cada sujeto
+# (~USD 0.0121 por dominio: task setup 0.012 + 1 fila 0.00012). Nace apagado y sólo se
+# enciende tras el smoke real con UN sujeto + autorización del operador (TASK-1775 Slice 6).
+#
+# ⚠️ Lo lee SOLO el ops-worker (la captura vive acá; en Vercel es inerte). Declararlo acá y
+# no sólo con `gcloud run services update` es obligatorio — `--set-env-vars` es destructivo
+# y lo borraría en el próximo deploy, en silencio (CLAUDE.md §Feature Flag State Ledger).
+#
+# Es SUBORDINADO: con `GROWTH_SEO_ENABLED=false` la captura no corre aunque éste esté ON.
+# Rollback (<5 min): volver a `false` acá + `--update-env-vars` — deja de gastar de inmediato
+# y las filas capturadas quedan (la tabla es append-only).
+GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED="${GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED=${GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED}"
+
 # TASK-1664 — keyword discovery (DataForSEO Labs Live: seed expansion + enrichment).
 # 🔴 Prenderlo habilita corridas que GASTAN (cada request y cada fila cuestan) — pero SOLO
 # corridas encoladas explícitamente por un operador/agente con entitlement: no existe enqueue
@@ -1372,6 +1389,25 @@ upsert_scheduler_job \
   '{}' \
   "false"
 echo "  -> ops-seo-keyword-market-data: 0 8 15 * * ACTIVO (captura mensual de mercado, TASK-1661 — despausado 2026-08-13 tras dry-run + corrida real verificada + autorización del operador)"
+
+# Foto de dominio — TASK-1775.
+#
+# ⚠️ MENSUAL: las bases Labs del proveedor se refrescan por ciclo (~mensual); un cron más
+# frecuente pagaría varias veces por el mismo número. Día 16 y no 15 a propósito: misma
+# frescura mid-month que documenta el proveedor, sin apilar gasto de proveedor en la misma
+# fecha que `ops-seo-keyword-market-data`.
+#
+# 🔴 NACE PAUSADO y además el flag `GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED` nace en `false`:
+# son DOS frenos independientes, porque esta corrida GASTA (patrón TASK-1661). Antes de
+# despausar: correr el dry-run (`{"dryRun": true}`), mirar el costo estimado y tener la
+# autorización del operador (TASK-1775 Slice 6).
+upsert_scheduler_job \
+  "ops-seo-domain-overview" \
+  "0 9 16 * *" \
+  "/seo/domain-overview/capture-batch" \
+  '{}' \
+  "true"
+echo "  -> ops-seo-domain-overview: 0 9 16 * * PAUSADO (foto de dominio mensual, TASK-1775 — despausar sólo tras smoke real + autorización del operador)"
 
 # TASK-1664 — drain de corridas de keyword discovery (Labs Live, bajo demanda del operador).
 # Cada 10 minutos alcanza de sobra: el enqueue es humano/agente (no hay cadencia diaria en V1)
