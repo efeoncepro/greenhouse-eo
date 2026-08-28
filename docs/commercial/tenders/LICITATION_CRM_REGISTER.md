@@ -176,6 +176,25 @@ Deal para cada ID. `gh_idempotency_key` no fue poblado en estos cinco Deals dura
 write posterior cierre esa brecha, la deduplicación operativa debe consultar obligatoriamente el ID exacto antes de
 cualquier retry.
 
+### Segundo lote MCP promovido y verificado — 2026-08-28
+
+| ID | Evidencia de alcance | HubSpot live | Próximo control |
+| --- | --- | --- | --- |
+| `875-6-LP26` | Marketing digital B2B para InvestChile: pauta, HubSpot, WordPress→HubSpot, CRO, SEO/AEO/GEO, analítica y tres perfiles con dedicación definida | Deal `64481242885` ↔ Company nueva `57907401372`; `Strategic Bets` · `newbusiness` · `default/qualifiedtobuy`; CLP 225.000.000 | Mapear jefe full-time, analista y full-stack; reunir certificaciones vigentes y cartas B2B |
+| `1007793-16-LE26` | Campaña integral de admisión por 9 meses; marketing, pauta, audiovisual, diseño y web; exige equipo presencial y experiencia educacional acreditable | Deal `64483101221` ↔ Company existente `34959053323`; `Core Pipeline` · `existingbusiness` · `default/qualifiedtobuy`; CLP 23.438.000 | Validar contratos educacionales ≥ CLP 5.000.000, cinco perfiles y capacidad de presencia en Los Lagos |
+| `2465-18-RFI26` | Consulta de mercado por planificación y difusión en siete plataformas, dashboard, acompañamiento 24/7 y horizonte de 36 meses | Deal `64481086492` ↔ Company existente `31776227440`; `Core Pipeline` · `existingbusiness` · `default/qualifiedtobuy`; monto y `closedate` no informados | Preparar respuesta de mercado y vigilar la licitación derivada |
+| `1878-9-LP26` | Campaña de posicionamiento turístico de Magallanes; estrategia, producción y ejecución de medios | Deal `64465215819` ↔ Company existente `31640422315`; `Core Pipeline` · `existingbusiness` · `default/qualifiedtobuy`; CLP 146.051.371 | Resolver experiencia, equipo, medios y plazo de preparación antes del cierre |
+| `1498185-35-LE26` | Dos líneas independientes de monitoreo de medios y redes sociales por 12 meses; experiencia aporta puntaje pero no es excluyente | Deal `64474119987` ↔ Company existente `52875089791`; `Core Pipeline` · `existingbusiness` · `default/qualifiedtobuy`; CLP 10.500.000 | Definir plataforma propia/partner y línea ofertable; cierre urgente |
+| `1305527-35-COT26` | Ticketera SaaS para tres agentes por 12 meses; migración Freshdesk ≥95 %, capacitación, SLA 99,5 % y multas | Deal `64471694515` ↔ Company nueva `57888044943`; `Strategic Bets` · `newbusiness` · `default/qualifiedtobuy`; CLP 4.500.000 | Confirmar solución/licencias, margen y capacidad de migración antes del cierre |
+| `1725-193-LE26` | Estrategia y plan de medios nacional para Mes de la Música; bolsa máxima CLP 71.000.000, reporting y restricciones de comisión | Deal `64498934284` ↔ Company existente `31209274438`; `Core Pipeline` · `existingbusiness` · `default/qualifiedtobuy` | Resolver acreditación de medios, comisión, 40 % local y cashflow |
+| `2099-45-LE26` | Gestión de campaña comunicacional SEREMI Magallanes; experiencia exige facturas de medios y favorece contratación regional | Deal `64471076758` ↔ Company existente `32340888618`; `Core Pipeline` · `existingbusiness` · `default/closedlost`; CLP 26.000.000 | `No bid`: no existen facturas acreditables de medios contratados; conservar seguimiento documental |
+
+Las ocho búsquedas previas por `id_de_licitacion` y `gh_idempotency_key` devolvieron cero Deals. Después del write,
+el readback devolvió un Deal por código, las ocho llaves técnicas pobladas y las ocho asociaciones Deal ↔ Company.
+No se crearon contactos. Una automatización de HubSpot marcó temporalmente las Companies nuevas como clientes y
+movió sus Deals a `Core Pipeline`; el readback detectó la deriva y restituyó InvestChile y SLEP del Pino a
+`Strategic Bets`, conforme a la relación comercial previa verificada.
+
 ## Protocolo de actualización
 
 Actualiza este registro inmediatamente después de cualquiera de estos hitos:
