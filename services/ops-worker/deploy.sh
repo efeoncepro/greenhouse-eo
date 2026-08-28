@@ -423,9 +423,21 @@ ENV_VARS="${ENV_VARS},HIRING_LIFECYCLE_EMAILS_ENABLED=${HIRING_LIFECYCLE_EMAILS_
 #
 # Declarativo acá para que `--set-env-vars` (destructivo) NO los borre en cada redeploy.
 # Rollback (<5min): `gcloud run services update ops-worker --update-env-vars <FLAG>=false`.
-HIRING_OPENING_CAPACITY_CLOSURE_ENABLED="${HIRING_OPENING_CAPACITY_CLOSURE_ENABLED:-false}"
+#
+# ⚠️ 2026-08-27 — AMBOS PASAN A `true` POR AUTORIZACIÓN EXPLÍCITA DEL CEO, como override del gate
+#   que el ledger declaraba (sign-off de Talent/Privacidad + TASK-1764 + canary con destinatarios
+#   allowlisted). Qué pasó de verdad al momento del flip: NO salió ningún correo, porque el envío
+#   seguía doblemente frenado por debajo — las vacantes vivas tienen 0 `selected`, así que la
+#   capacidad nunca se llena y el `confirm` se niega correctamente; y el tipo de correo
+#   `hiring_decision_not_selected` sigue `enabled=FALSE` por seed en PG (ese seed NO se tocó, y es
+#   la tercera capa: `resolveEmailTypeConfig` es fail-open, así que la fila es lo que sostiene el
+#   freno).
+#   Lo que este override NO resuelve: TASK-1764. Sin ella, el tipo nuevo cae al perfil de footer
+#   legacy **en silencio** cuando el correo efectivamente salga. Antes de habilitar el tipo en
+#   `email_type_config`, cerrar TASK-1764 o aceptar ese footer a sabiendas.
+HIRING_OPENING_CAPACITY_CLOSURE_ENABLED="${HIRING_OPENING_CAPACITY_CLOSURE_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},HIRING_OPENING_CAPACITY_CLOSURE_ENABLED=${HIRING_OPENING_CAPACITY_CLOSURE_ENABLED}"
-HIRING_CAPACITY_FILLED_EMAIL_ENABLED="${HIRING_CAPACITY_FILLED_EMAIL_ENABLED:-false}"
+HIRING_CAPACITY_FILLED_EMAIL_ENABLED="${HIRING_CAPACITY_FILLED_EMAIL_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},HIRING_CAPACITY_FILLED_EMAIL_ENABLED=${HIRING_CAPACITY_FILLED_EMAIL_ENABLED}"
 
 # TASK-1746 — Cutover de links de assessment al exchange fragment→sesión HttpOnly.
