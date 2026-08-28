@@ -27,18 +27,18 @@ la de oportunidades.
 
 - Módulo SEO activo (`GROWTH_SEO_ENABLED=true`) y org con assignment `seo_v2` vigente.
 - **Un competidor es un hecho declarado por un humano** (autor + fecha + procedencia quedan en la
-  fila). La propuesta puede venir de una máquina — el top-N de TASK-1699 (ya implementado; su
-  serie arranca con el primer deploy del worker post-release) o el diagnóstico de prospecto —,
+  fila). La propuesta puede venir de una máquina — el top-N de TASK-1699 (vivo; día 1 de su
+  serie: 2026-08-29) o el diagnóstico de prospecto —,
   pero la declaración no se automatiza: un competidor mal elegido invalida todo el análisis río
   abajo.
 - **Declarar es un compromiso de gasto**: la captura de cobertura paga ~USD 0,15 por competidor por
   ciclo mensual (2 llamadas `domain_intersection`, row limit 500). Techo por target:
   `GROWTH_SEO_COMPETITORS_PER_TARGET` (default 5).
-- **Estado de rollout vigente (2026-08-28, autorización plena del operador):** flag
-  `GROWTH_SEO_COMPETITOR_GAP_ENABLED` **ON declarativo** (`:-true` en `services/ops-worker/deploy.sh`),
-  efectivo con el primer deploy del worker post-release (la revisión activa no tiene el endpoint).
-  Scheduler `ops-seo-competitor-coverage` (`0 9 18 * *`) **PAUSADO hasta ese deploy** (despausarlo
-  antes haría que Cloud Scheduler golpee un 404). La secuencia de encendido YA corrió: competidor
+- **Estado de rollout vigente (2026-08-28, tarde):** flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED`
+  **ON y VIVO** — el Ops Worker Deploy del push a develop dejó la revisión activa
+  (`ops-worker-00610-kc8`) con el código y el flag; endpoint verificado con dry-run real (cero
+  gasto). Scheduler `ops-seo-competitor-coverage` (`0 9 18 * *`) **ENABLED** (despausado tras la
+  verificación). La secuencia de encendido YA corrió: competidor
   real declarado (Berel MX → `comex.com.mx`, autoría del operador, evidencia
   `BEREL_SEO_DIAGNOSTIC_2026-08-25`) + dry-run + **primera corrida real USD 0,1076 con Δ exacto en
   el ledger** (697 filas de cobertura, 640 de mercado gratis, gap derivado 357/54/269-excluidas).

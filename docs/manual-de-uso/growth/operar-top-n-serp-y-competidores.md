@@ -25,12 +25,11 @@ cliente**: es comparativa competitiva (auditoría §7) — uso interno de Efeonc
 ## Antes de empezar
 
 - Módulo SEO activo (`GROWTH_SEO_ENABLED=true`) y org con assignment `seo_v2`.
-- **Estado de rollout vigente (2026-08-28):** `code complete, rollout pendiente` — el flag
-  `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` quedó **ON declarativo** en
-  `services/ops-worker/deploy.sh`, pero la escritura vive en el cron del **ops-worker
-  desplegado**, que no tiene este código hasta el release develop→main. **El día 1 de la
-  serie será el día del primer deploy del worker.** La lectura en Vercel necesita además la
-  env var (va con el release).
+- **Estado de rollout vigente (2026-08-28, tarde):** flag `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED`
+  **ON y VIVO en el worker** (revisión activa `ops-worker-00610-kc8`, deployada desde develop el
+  mismo día). **El día 1 de la serie es el 2026-08-29** (cron 05:00 CLT); el top-N del 28 y
+  anteriores no existe y no se recompra — estructural. Lectura: staging Vercel ON (custom env
+  `staging`); Production se prende con el release en curso.
 - Un dominio en el top-N es una **observación**; "X es competidor" es una **declaración
   humana** (TASK-1662). El descubrimiento propone, nunca declara.
 
@@ -72,10 +71,10 @@ curl -s -X POST "$BASE/api/admin/growth/seo/competitors/declare" \
 Declarar es un **compromiso de gasto** (la cobertura del gap de TASK-1662 paga por cada
 competidor vigente por ciclo). Un agente jamás declara por su cuenta.
 
-### Secuencia de encendido (rollout, post-release)
+### Secuencia de encendido (rollout) — pasos 1–2 COMPLETADOS el 2026-08-28
 
-1. Release develop→main + deploy del ops-worker (deploy.sh ya declara el flag ON).
-2. Verificar en la revisión ACTIVA que `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED=true`.
+1. ✅ Deploy del ops-worker (llegó con el push a develop; deploy.sh declara el flag ON).
+2. ✅ Verificado en la revisión ACTIVA (`ops-worker-00610-kc8`): `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED=true`.
 3. Dejar correr el cron `ops-seo-rank-capture` (05:00 CLT). Verificar: ~20 filas por
    keyword del día; exactamente una `is_own_domain=true` donde rankeamos (su `rankGroup`
    coincide con `seo_rank_snapshots.position`); 🔴 **`provider_cost` del día IDÉNTICO al

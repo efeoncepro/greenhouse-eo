@@ -21,11 +21,20 @@ contra PG real** con rollback transaccional (cero residuo en tabla append-only).
 clave: CERO ALTER a `seo_competitors` (la autoría ya era de 1662); la evidencia viaja compacta en
 `proposal_ref`.
 
-**Próximo paso (post-release, misma ventana que 1662):** deploy del worker → verificar flag en la
-revisión activa → corrida del cron con `provider_cost` IDÉNTICO al baseline (prueba del costo cero)
-→ re-run no-op → env var en Vercel → señal en verde → a ≥5 días, revisar candidatos de Berel con el
-operador ANTES de declarar. Docs/skills sincronizados post-1662 por 3 subagentes (dataforseo-operator
-+ efeonce-mcp-platform con espejos verificados, rules, arch doc, épico).
+**Corrección de supuesto (mismo día, tarde) + estado VIVO:** el Ops Worker Deploy corre en cada push
+a develop (el worker es un servicio único compartido) — "efectivo post-release" era falso para el
+worker. La revisión activa `ops-worker-00610-kc8` YA lleva el código y AMBOS flags en `true`
+(verificado con gcloud + dry-run real del endpoint de cobertura: `eligible:0` por frescura, cero
+gasto). Scheduler `ops-seo-competitor-coverage` **ENABLED** (despausado tras esa verificación).
+Vercel staging: `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED=true` agregada (custom env `staging`).
+🔴 **El día 1 de la serie del top-N es el 2026-08-29** (cron 05:00 CLT). **Próximo paso:**
+(1) 2026-08-29 tras el cron: ~20 filas/keyword + `provider_cost` IDÉNTICO al baseline + re-run
+no-op + señal `seo.serp_top_results.coverage` en verde; (2) release develop→main EN CURSO por la
+sesión hermana greenhouse-eo-6c (freeze de develop aceptado; le pedí prender
+`GROWTH_SEO_SERP_TOP_RESULTS_ENABLED=true` en Vercel Production con el release); (3) post-release:
+deploy del gateway `efeonce-mcp` (6 tools) + push de los commits docs-only locales; (4) ≈2026-09-02
+(≥5 días de serie): revisar candidatos de `readSerpCompetitorCandidates` con el operador ANTES de
+declarar. Docs/skills sincronizados post-1662 y post-1699 por 6 subagentes con espejos verificados.
 
 ## 2026-08-28 — TASK-1662: keyword gap competitivo — code complete, rollout pendiente
 

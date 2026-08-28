@@ -15,9 +15,10 @@
   snapshot de rank y con fallback que jamás pierde la medición pagada. Encima: descubrimiento de
   competidores por recurrencia medida (propose→confirm hacia `declareCompetitors` de TASK-1662),
   lanes sólo-internal, 2 tools MCP federadas (inventario a 27) y señal de cobertura con pérdida
-  irrecuperable declarada. Flag dual-runtime ON declarativo; **la serie arranca con el primer deploy
-  del worker post-release — cada día sin release pierde el top-N de ese día para siempre**. Sanity
-  9/9 contra PG real con rollback sin residuo.
+  irrecuperable declarada. Flag dual-runtime **ON y VIVO en el worker el mismo día** (el
+  Ops Worker Deploy corre en cada push a develop; revisión `ops-worker-00610-kc8` verificada) —
+  **día 1 de la serie: 2026-08-29**; el scheduler de cobertura de competidores quedó ENABLED tras
+  verificar el endpoint con dry-run real. Sanity 9/9 contra PG real con rollback sin residuo.
 
 ## 2026-08-28 — TASK-1662: keyword gap competitivo (code complete, rollout pendiente)
 
