@@ -86,21 +86,27 @@ import {
 
 const subject = { userId: 'user-1', roleCodes: ['efeonce_admin'] } as never
 
-const candidateView = (overrides: Record<string, unknown> = {}) => ({
-  candidateId: 'seokdc-1',
-  runId: 'seokdr-1',
-  keyword: 'pintura para piso',
-  normalizedKeyword: 'pintura para piso',
-  sourceEndpoint: 'keyword_suggestions',
-  sourceRank: 1,
-  capturedAt: '2026-08-14T12:00:00.000Z',
-  coreKeyword: 'pintura para piso',
-  intent: 'commercial',
-  searchVolume: 1000,
-  difficulty: 10,
-  latestAction: null,
-  ...overrides
-})
+const candidateView = (overrides: Record<string, unknown> = {}) => {
+  const base = {
+    candidateId: 'seokdc-1',
+    runId: 'seokdr-1',
+    keyword: 'pintura para piso',
+    normalizedKeyword: 'pintura para piso',
+    sourceEndpoint: 'keyword_suggestions',
+    sourceRank: 1,
+    capturedAt: '2026-08-14T12:00:00.000Z',
+    coreKeyword: 'pintura para piso',
+    intent: 'commercial',
+    searchVolume: 1000,
+    difficulty: 10,
+    latestAction: null,
+    ...overrides
+  }
+
+  // TASK-1694: el reader colapsa por keyword; `candidateIds` lleva TODAS las procedencias.
+  // Por default una sola, igual que un candidato hallado por un único método.
+  return { candidateIds: [base.candidateId], ...base }
+}
 
 const draftRow = (overrides: Record<string, unknown> = {}) => ({
   setId: 'set-1',
@@ -269,6 +275,37 @@ describe('createGroundedQueryDraft — gates', () => {
     const result = await createGroundedQueryDraft({ ...baseInput, candidateIds: ['seokdc-1', 'seokdc-ajeno'] })
 
     expect(result).toEqual({ ok: false, errorCode: 'candidate_not_found', status: 404 })
+  })
+
+  it('TASK-1694: un id de procedencia NO representativa sigue resolviendo tras el colapso', async () => {
+    // La keyword la hallaron dos métodos; el reader la sirve como UNA fila cuyo representante
+    // es `seokdc-1`. Seleccionar por la otra procedencia es legítimo y no puede dar 404.
+    state.discovery = {
+      ok: true,
+      run: { runId: 'seokdr-1', seoTargetId: 'seot-1' },
+      candidates: [candidateView({ candidateIds: ['seokdc-1', 'seokdc-2'] })]
+    }
+
+    const result = await createGroundedQueryDraft({ ...baseInput, candidateIds: ['seokdc-2'] })
+
+    expect(result).toMatchObject({ ok: true })
+  })
+
+  it('TASK-1694: dos procedencias de la MISMA keyword son una sola intención en el contexto', async () => {
+    state.discovery = {
+      ok: true,
+      run: { runId: 'seokdr-1', seoTargetId: 'seot-1' },
+      candidates: [candidateView({ candidateIds: ['seokdc-1', 'seokdc-2'] })]
+    }
+
+    const result = await createGroundedQueryDraft({ ...baseInput, candidateIds: ['seokdc-1', 'seokdc-2'] })
+
+    expect(result).toMatchObject({ ok: true })
+
+    const call = state.authorCalls.at(-1) as { seoContext: { candidates: unknown[] } }
+
+    // Una keyword, una pregunta: duplicarla pediría dos veces lo mismo al autor.
+    expect(call.seoContext.candidates).toHaveLength(1)
   })
 
   it('run de otro target → cross_tenant', async () => {

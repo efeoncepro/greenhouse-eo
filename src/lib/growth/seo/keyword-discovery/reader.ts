@@ -11,6 +11,15 @@
  *
  * La ausencia de mercado no elimina la fila ni la convierte en cero: viaja como `null` +
  * `marketAvailability`.
+ *
+ * 🔴 **Cardinalidad (TASK-1694): un candidato es UNA KEYWORD NORMALIZADA, no una fila de
+ * procedencia.** La keyword es la unidad que se puntúa, la que recibe una `evidence_ref` y la
+ * que un humano decide; que dos métodos la hayan encontrado viaja como `provenance[]` +
+ * `candidateIds[]`, no como dos renglones. `totalCandidates` cuenta keywords distintas. Ningún
+ * consumer aguas abajo —la cola priorizada de TASK-1700, Nexa, MCP, el lane ecosystem— puede
+ * tratar una procedencia como candidato propio: en un aggregate append-only eso persistiría la
+ * misma decisión hasta cuatro veces, con cuatro scores y cuatro compromisos de gasto sobre una
+ * sola intención.
  */
 
 import 'server-only'
@@ -54,11 +63,33 @@ export interface SeoDiscoveryRunView {
   completedAt: string | null
 }
 
-export interface SeoDiscoveryCandidateView {
+/**
+ * UNA fila de procedencia: el hecho de que ESTE endpoint encontró la keyword en ESTA posición
+ * desde ESTAS seeds. Se conserva íntegra — el colapso es de presentación, no de datos.
+ */
+export interface SeoDiscoveryCandidateProvenance {
   candidateId: string
+  sourceEndpoint: SeoDiscoveryMethod
+  sourceRank: number | null
+  seedKeywords: string[]
+  capturedAt: string
+}
+
+export interface SeoDiscoveryCandidateView {
+  /** Procedencia REPRESENTATIVA (menor `sourceRank`, desempate `candidateId` asc). */
+  candidateId: string
+  /**
+   * TODAS las filas de procedencia fusionadas, en orden determinista. Es lo que hace seguro el
+   * colapso: las acciones se siguen registrando por fila y el bridge AEO sigue seleccionando
+   * por id, así que un consumer debe poder alcanzar cada procedencia de la keyword que el
+   * operador decidió.
+   */
+  candidateIds: string[]
+  provenance: SeoDiscoveryCandidateProvenance[]
   runId: string
   keyword: string
   normalizedKeyword: string
+  /** Escalares de la procedencia REPRESENTATIVA; el conjunto completo vive en `provenance`. */
   sourceEndpoint: SeoDiscoveryMethod
   sourceRank: number | null
   seedKeywords: string[]
@@ -135,6 +166,7 @@ export type ReadKeywordDiscoveryResult =
       /** Presente sólo cuando se pidió `runId`. */
       run: SeoDiscoveryRunView | null
       candidates: SeoDiscoveryCandidateView[]
+      /** Keywords normalizadas DISTINTAS (TASK-1694), no filas de procedencia. */
       totalCandidates: number
       nextCursor: string | null
       marketAvailability: 'available' | 'unavailable'
@@ -370,13 +402,68 @@ export const readKeywordDiscovery = async (
 
   const seedSet = new Set(runView.seeds.map(seed => seed.normalizedKeyword))
 
-  let candidates: SeoDiscoveryCandidateView[] = candidateRows.map(row => {
+  // ── Colapso por keyword normalizada (TASK-1694) ──────────────────────────────────
+  //
+  // 🔴 La unidad de DECISIÓN es la keyword, no la fila de procedencia. Que dos métodos la hayan
+  // encontrado es un hecho de cómo la conocimos, no dos oportunidades: servirla como dos
+  // renglones da dos estados, dos `latestAction` y dos CTA de gasto recurrente sobre una sola
+  // intención — y aguas abajo, en un aggregate append-only (TASK-1700), congela esa duplicación
+  // con dos scores y dos compromisos. La cardinalidad es contrato del reader, no convención de
+  // la UI. La procedencia se conserva íntegra en `provenance` y la fila en base no se toca.
+  const byNormalizedKeyword = new Map<string, typeof candidateRows>()
+
+  for (const row of candidateRows) {
+    const group = byNormalizedKeyword.get(row.normalized_keyword)
+
+    if (group) group.push(row)
+    else byNormalizedKeyword.set(row.normalized_keyword, [row])
+  }
+
+  // Orden total explícito: sin él la paginación por offset se vuelve inestable entre páginas
+  // (una keyword podría aparecer en dos, o en ninguna). `sourceRank` nulo va al final.
+  const provenanceOrder = (a: (typeof candidateRows)[number], b: (typeof candidateRows)[number]) => {
+    const rankA = a.source_rank ?? Number.POSITIVE_INFINITY
+    const rankB = b.source_rank ?? Number.POSITIVE_INFINITY
+
+    if (rankA !== rankB) return rankA - rankB
+
+    return a.candidate_id < b.candidate_id ? -1 : 1
+  }
+
+  let candidates: SeoDiscoveryCandidateView[] = [...byNormalizedKeyword.values()].map(group => {
+    const provenanceRows = [...group].sort(provenanceOrder)
+    const row = provenanceRows[0]
+
     const datum = market.byKeyword.get(row.normalized_keyword) ?? null
-    const action = actionByCandidate.get(row.candidate_id) ?? null
     const gsc = gscByKeyword.get(row.normalized_keyword) ?? null
+
+    // `latestAction` = la más reciente entre TODAS las filas fusionadas: el reader sigue siendo
+    // la autoridad de "esta keyword ya se decidió" aunque la acción se haya registrado sobre
+    // una sola de sus procedencias.
+    const action = provenanceRows
+      .map(candidate => actionByCandidate.get(candidate.candidate_id) ?? null)
+      .reduce<(typeof actionRows)[number] | null>((latest, current) => {
+        if (!current) return latest
+        if (!latest) return current
+
+        if (current.created_at.getTime() !== latest.created_at.getTime()) {
+          return current.created_at > latest.created_at ? current : latest
+        }
+
+        // Empate exacto de timestamp: desempate estable por id, jamás por orden de llegada.
+        return current.candidate_id < latest.candidate_id ? current : latest
+      }, null)
 
     return {
       candidateId: row.candidate_id,
+      candidateIds: provenanceRows.map(candidate => candidate.candidate_id),
+      provenance: provenanceRows.map(candidate => ({
+        candidateId: candidate.candidate_id,
+        sourceEndpoint: candidate.source_endpoint as SeoDiscoveryMethod,
+        sourceRank: candidate.source_rank,
+        seedKeywords: Array.isArray(candidate.seed_keywords_json) ? (candidate.seed_keywords_json as string[]) : [],
+        capturedAt: candidate.captured_at.toISOString()
+      })),
       runId: row.run_id,
       keyword: row.keyword,
       normalizedKeyword: row.normalized_keyword,

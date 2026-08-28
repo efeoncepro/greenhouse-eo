@@ -221,16 +221,31 @@ export const createGroundedQueryDraft = async (
     return fail('cross_tenant', 404)
   }
 
-  const byId = new Map(discovery.candidates.map(candidate => [candidate.candidateId, candidate]))
+  // 🔴 TASK-1694: el reader colapsa por keyword normalizada, así que un `candidateId` puede ser
+  // CUALQUIERA de las procedencias fusionadas — no sólo la representativa. Indexar sólo por
+  // `candidate.candidateId` dejaría sin resolver una selección legítima hecha sobre la fila que
+  // no quedó de representante.
+  const byId = new Map<string, SeoDiscoveryCandidateView>()
+
+  for (const candidate of discovery.candidates) {
+    for (const provenanceId of candidate.candidateIds) byId.set(provenanceId, candidate)
+  }
 
   // Todos los IDs pedidos deben existir en ESA corrida de ESA org; sin revelar cuál falló.
+  //
+  // Dos ids de la MISMA keyword son una sola intención: se colapsan acá igual que en el reader.
+  // Duplicar la keyword en el contexto le pediría al autor generar dos veces la misma pregunta.
   const selected: SeoDiscoveryCandidateView[] = []
+  const seenKeywords = new Set<string>()
 
   for (const candidateId of candidateIds) {
     const candidate = byId.get(candidateId)
 
     if (!candidate) return fail('candidate_not_found', 404)
 
+    if (seenKeywords.has(candidate.normalizedKeyword)) continue
+
+    seenKeywords.add(candidate.normalizedKeyword)
     selected.push(candidate)
   }
 

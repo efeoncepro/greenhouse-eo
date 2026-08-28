@@ -357,6 +357,214 @@ describe('readKeywordDiscovery — orden y filtros', () => {
     expect(result.candidates.map(candidate => candidate.candidateId)).toEqual(['seokdc-1'])
   })
 
+  describe('TASK-1694 — un candidato es una keyword, no una fila de procedencia', () => {
+    const twoProvenances = () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({
+          candidate_id: 'seokdc-rel',
+          normalized_keyword: 'pintura epoxica',
+          keyword: 'pintura epoxica',
+          source_endpoint: 'related_keywords',
+          source_rank: 7,
+          seed_keywords_json: ['pintura']
+        }),
+        candidateRow({
+          candidate_id: 'seokdc-sug',
+          normalized_keyword: 'pintura epoxica',
+          keyword: 'pintura epoxica',
+          source_endpoint: 'keyword_suggestions',
+          source_rank: 2,
+          seed_keywords_json: ['pintura industrial']
+        })
+      ]
+    }
+
+    it('la misma keyword hallada por dos métodos colapsa a UNA fila con las dos procedencias', async () => {
+      twoProvenances()
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates).toHaveLength(1)
+      expect(result.totalCandidates).toBe(1)
+
+      const [candidate] = result.candidates
+
+      expect(candidate.candidateIds).toEqual(['seokdc-sug', 'seokdc-rel'])
+      expect(candidate.provenance).toHaveLength(2)
+      // Representante = menor sourceRank; los escalares apuntan a él.
+      expect(candidate.candidateId).toBe('seokdc-sug')
+      expect(candidate.sourceEndpoint).toBe('keyword_suggestions')
+      expect(candidate.sourceRank).toBe(2)
+      // La procedencia viaja íntegra, con sus seeds propias por fila.
+      expect(candidate.provenance.map(entry => entry.sourceEndpoint)).toEqual([
+        'keyword_suggestions',
+        'related_keywords'
+      ])
+      expect(candidate.provenance[1].seedKeywords).toEqual(['pintura'])
+    })
+
+    it('con sourceRank empatado desempata el candidateId ascendente', async () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'seokdc-z', normalized_keyword: 'kw', keyword: 'kw', source_rank: 3 }),
+        candidateRow({
+          candidate_id: 'seokdc-a',
+          normalized_keyword: 'kw',
+          keyword: 'kw',
+          source_endpoint: 'related_keywords',
+          source_rank: 3
+        })
+      ]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].candidateId).toBe('seokdc-a')
+      expect(result.candidates[0].candidateIds).toEqual(['seokdc-a', 'seokdc-z'])
+    })
+
+    it('un sourceRank nulo nunca gana la representación frente a uno medido', async () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'seokdc-a', normalized_keyword: 'kw', keyword: 'kw', source_rank: null }),
+        candidateRow({
+          candidate_id: 'seokdc-z',
+          normalized_keyword: 'kw',
+          keyword: 'kw',
+          source_endpoint: 'related_keywords',
+          source_rank: 9
+        })
+      ]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].candidateId).toBe('seokdc-z')
+    })
+
+    it('latestAction es la MÁS RECIENTE entre todas las procedencias fusionadas', async () => {
+      twoProvenances()
+      state.actions = [
+        {
+          candidate_id: 'seokdc-rel',
+          action_kind: 'selected_for_target',
+          actor: 'user-2',
+          created_at: new Date('2026-08-15T10:00:00Z')
+        },
+        {
+          candidate_id: 'seokdc-sug',
+          action_kind: 'dismissed',
+          actor: 'user-1',
+          created_at: new Date('2026-08-14T10:00:00Z')
+        }
+      ]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      // La decisión se registró sobre la procedencia que NO quedó de representante y aun así
+      // manda: el reader sigue siendo la autoridad de "esta keyword ya se decidió".
+      expect(result.candidates[0].latestAction).toMatchObject({ kind: 'selected_for_target', actor: 'user-2' })
+    })
+
+    it('el filtro sourceEndpoint deja la procedencia restringida a lo pedido', async () => {
+      twoProvenances()
+      // El filtro es SQL-side: el mock devuelve sólo lo que ese endpoint produjo.
+      state.candidates = state.candidates.filter(row => row.source_endpoint === 'related_keywords')
+
+      const result = await readKeywordDiscovery({
+        organizationId: 'org-1',
+        runId: 'seokdr-1',
+        sourceEndpoint: 'related_keywords'
+      })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].candidateIds).toEqual(['seokdc-rel'])
+    })
+
+    it('dos lecturas idénticas devuelven el mismo representante y el mismo orden', async () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'seokdc-b1', normalized_keyword: 'kw b', keyword: 'kw b', source_rank: 4 }),
+        candidateRow({ candidate_id: 'seokdc-a1', normalized_keyword: 'kw a', keyword: 'kw a', source_rank: 1 }),
+        candidateRow({
+          candidate_id: 'seokdc-a2',
+          normalized_keyword: 'kw a',
+          keyword: 'kw a',
+          source_endpoint: 'keyword_ideas',
+          source_rank: 6
+        })
+      ]
+
+      const first = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+      const second = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(first.ok && second.ok).toBe(true)
+
+      if (!first.ok || !second.ok) return
+
+      expect(first.candidates.map(candidate => candidate.candidateId)).toEqual(
+        second.candidates.map(candidate => candidate.candidateId)
+      )
+      expect(first.candidates.map(candidate => candidate.candidateIds)).toEqual(
+        second.candidates.map(candidate => candidate.candidateIds)
+      )
+    })
+
+    it('la unión de todas las páginas coincide con totalCandidates, sin repetidos ni faltantes', async () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'c1', normalized_keyword: 'kw 1', keyword: 'kw 1', source_rank: 1 }),
+        candidateRow({ candidate_id: 'c1b', normalized_keyword: 'kw 1', keyword: 'kw 1', source_rank: 5 }),
+        candidateRow({ candidate_id: 'c2', normalized_keyword: 'kw 2', keyword: 'kw 2', source_rank: 2 }),
+        candidateRow({ candidate_id: 'c3', normalized_keyword: 'kw 3', keyword: 'kw 3', source_rank: 3 })
+      ]
+
+      const page1 = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1', limit: 2 })
+
+      expect(page1.ok).toBe(true)
+
+      if (!page1.ok) return
+
+      expect(page1.totalCandidates).toBe(3)
+      expect(page1.nextCursor).toBe('2')
+
+      const page2 = await readKeywordDiscovery({
+        organizationId: 'org-1',
+        runId: 'seokdr-1',
+        limit: 2,
+        cursor: page1.nextCursor
+      })
+
+      expect(page2.ok).toBe(true)
+
+      if (!page2.ok) return
+
+      const union = [...page1.candidates, ...page2.candidates].map(candidate => candidate.normalizedKeyword)
+
+      expect(page2.nextCursor).toBeNull()
+      expect(new Set(union).size).toBe(3)
+      expect(union).toHaveLength(page1.totalCandidates)
+    })
+  })
+
   describe('TASK-1694 — la barrera de enlaces decide; la dificultad cruda ya no', () => {
     const threeBarriers = () => {
       state.runs = [runRow()]
