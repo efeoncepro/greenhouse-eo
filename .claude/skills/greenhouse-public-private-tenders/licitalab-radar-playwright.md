@@ -105,17 +105,17 @@ proyección CRM del lifecycle, no la fuente de documentos ni del score.
 Antes de cada operación relee esquema, pipelines, stages y opciones live del portal Efeonce. Snapshot observado el
 2026-08-28 en portal `48713323`:
 
-| Propiedad                               | Semántica                                                                                      |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `id_de_licitacion`                      | Código externo exacto. Es la clave funcional del proceso, pero HubSpot no la marca unique.     |
-| `ficha_de_licitacion`                   | URL directa de LicitaLAB para abrir la ficha/postulación.                                      |
-| `fecha_de_cierre_de_licitacion`         | Deadline oficial de presentación, convertido desde la timezone de la fuente.                   |
-| `closedate`                             | Fecha esperada de resolución/cierre comercial; nunca se copia desde el deadline.               |
-| `modalidad_de_venta`                    | `Licitación` o `Compra ágil`, según el procedimiento público observado.                        |
-| `dealtype`                              | `newbusiness` o `existingbusiness`, según la relación vigente con la cuenta.                   |
-| `pipeline_bucket`                       | `Core Pipeline`, `Strategic Bets` u `Opportunistic / Administrative`.                          |
-| `pipeline` / `dealstage`                | Pipeline y etapa live; no los deduzcas desde documentación histórica.                          |
-| `gh_idempotency_key` / `gh_deal_origin` | Control técnico de retries y origen; el bridge debe admitir el carril público antes de usarlo. |
+| Propiedad                               | Semántica                                                                                                                                                                           |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id_de_licitacion`                      | Código externo exacto. Es la clave funcional del proceso, pero HubSpot no la marca unique.                                                                                          |
+| `ficha_de_licitacion`                   | URL directa de LicitaLAB para abrir la ficha/postulación.                                                                                                                           |
+| `fecha_de_cierre_de_licitacion`         | Deadline oficial de presentación, convertido desde la timezone de la fuente.                                                                                                        |
+| `closedate`                             | Fecha esperada de resolución/cierre comercial; nunca se copia desde el deadline.                                                                                                    |
+| `modalidad_de_venta`                    | `Licitación` o `Compra ágil`, según el procedimiento público observado.                                                                                                             |
+| `dealtype`                              | `newbusiness` o `existingbusiness`, según la relación vigente con la cuenta.                                                                                                        |
+| `pipeline_bucket`                       | `Core Pipeline`, `Strategic Bets` u `Opportunistic / Administrative`.                                                                                                               |
+| `pipeline` / `dealstage`                | Pipeline y etapa live; no los deduzcas desde documentación histórica.                                                                                                               |
+| `gh_idempotency_key` / `gh_deal_origin` | La llave de idempotencia es obligatoria. En carga manual MCP, `gh_deal_origin` queda vacío mientras su enum sólo admita `greenhouse_quote_builder`; nunca escribas un origen falso. |
 
 `closedate` y `fecha_de_cierre_de_licitacion` representan hechos distintos. En el snapshot, 97 de 99 deals con
 enlace LicitaLAB caían en días diferentes; una coincidencia histórica no autoriza a acoplarlos.
@@ -189,14 +189,23 @@ la confirmación:
 4. cuando corresponda, asegura Contact ↔ Company y Contact ↔ Deal;
 5. relee el deal y cada asociación. Un create 2xx sin readback no cierra el flujo.
 
-#### Estado del bridge observado
+#### Writer manual MCP y estado del bridge observado
 
-El `POST /deals` actual ya deduplica por `gh_idempotency_key`, exige una Company y asegura Deal ↔ Company más un
-contacto opcional. Sin embargo, el contrato vigente sólo admite `origin='greenhouse_quote_builder'` y no acepta
-`id_de_licitacion`, `ficha_de_licitacion`, `fecha_de_cierre_de_licitacion`, `modalidad_de_venta` ni
-`pipeline_bucket`; tampoco crea/resuelve Company o asegura Contact ↔ Company. Esto es una brecha a implementar, no
-una capacidad shipped. Hasta extender bridge + contrato + cliente + tests + readback live, usa este bloque como
-contrato objetivo y no como autorización para escribir por un bypass.
+Para promociones manuales confirmadas, el MCP de HubSpot es un writer gobernado válido: aplica confirmación,
+crea/actualiza Company y Deal, agrega asociaciones y permite readback. La promoción live del 2026-08-28 demostró
+FECI `64461187076`, ProChile `64482163516` y Defensoría `64471071912`. En esos Deals, la idempotencia vive en
+`gh_idempotency_key`; `gh_deal_origin` queda vacío porque su enum sólo admite `greenhouse_quote_builder`. No omitas
+los campos operativos ni uses ese valor falso para una licitación.
+
+Un segundo lote live creó UOH `64466117716`, Beneficios Estudiantiles `64482321775`, Campaña VCM `64466272830`,
+Valparaíso `64469214508` y RFI JUNJI `64469523247`. Los cinco quedaron únicos por `id_de_licitacion` y asociados a
+su Company, pero la carga aprobada no pobló `gh_idempotency_key`: es una brecha de esos registros, no una licencia
+para omitirla. Antes de cualquier retry, busca siempre por ambas llaves; si falta la técnica, detén el create y
+actualiza el registro existente bajo confirmación.
+
+El `POST /deals` del bridge sigue siendo el carril para automatización, pero aún sólo admite
+`origin='greenhouse_quote_builder'` y no acepta el set completo de campos de licitación ni crea/resuelve Company.
+Esa es una brecha de automatización; no bloquea una carga manual por MCP con confirmación y readback.
 
 El snapshot de calidad es evidencia fechada, no invariante: 129 deals tenían ID de licitación; 99 enlazaban a
 LicitaLAB; no aparecieron IDs duplicados normalizados; 86 de esos 99 no tenían contactos asociados. Repite el audit

@@ -6,7 +6,8 @@
 
 - Inicio del registro operativo: **2026-08-28**.
 - Última actualización documentada: **2026-08-28, America/Santiago**.
-- Universo inicial: tres oportunidades recomendadas obtenidas en modo read-only desde LicitaLAB.
+- Universo documentado: diez oportunidades revisadas desde LicitaLAB; ocho cuentan con Deal HubSpot verificado.
+- Screening comparativo: [`LICITALAB_SCREENING_2026-08-28.md`](LICITALAB_SCREENING_2026-08-28.md).
 - El snapshot histórico previo identificó 99 deals vinculados a LicitaLAB en HubSpot. Esos registros **no fueron migrados ni enumerados aquí**; siguen consultándose en HubSpot.
 - Una fila en este archivo no demuestra que la oferta fue enviada. `Postulada` requiere comprobante, fecha/hora y fuente verificable.
 
@@ -49,8 +50,15 @@ Si una fuente no fue releída, usa `No verificado`; nunca interpretes una celda 
 | ID                | Oportunidad / organismo                                                                         | Modalidad             |           Monto | Cierre oficial       | Estado operativo | Decisión                                              | Postulación                                       | HubSpot                                                                                                                                                                        |
 | ----------------- | ----------------------------------------------------------------------------------------------- | --------------------- | --------------: | -------------------- | ---------------- | ----------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `1098710-22-LP26` | Campaña Festival de Ciencia y Tecnología 2026 / Subsecretaría de Ciencia                        | Licitación pública LP | CLP 250.000.000 | 2026-09-16 15:00 CLT | `Preparación`    | GO para evaluación; GO final de postulación pendiente | No postulada al corte 2026-08-28; sin comprobante | [Deal 64461187076](https://app.hubspot.com/contacts/48713323/record/0-3/64461187076) · [Company 57870164778](https://app.hubspot.com/contacts/48713323/record/0-2/57870164778) |
-| `4841-69-COT26`   | Revista Conserva N.° 27 y requerimientos CNCR / Servicio Nacional del Patrimonio Cultural       | Compra Ágil           |   CLP 2.400.000 | 2026-08-31 12:00 CLT | `Radar`          | Bid/no-bid pendiente                                  | No verificada                                     | No promovida                                                                                                                                                                   |
-| `1082957-26-LE26` | Piezas gráficas y audiovisuales para ProChile / Dirección General de Promoción de Exportaciones | Licitación pública LE |  CLP 42.000.000 | 2026-08-31 15:01 CLT | `Radar`          | Bid/no-bid pendiente                                  | No verificada                                     | No promovida                                                                                                                                                                   |
+| `1062018-22-L126` | Diseño gráfico Informe Anual DDN / Defensoría de los Derechos de la Niñez                       | Licitación pública L1 |   CLP 7.000.000 | 2026-08-31 16:30 CLT | `Preparación`    | GO condicionado; gates técnicos/económicos pendientes | No verificada                                     | [Deal 64471071912](https://app.hubspot.com/contacts/48713323/record/0-3/64471071912) · [Company 57878590071](https://app.hubspot.com/contacts/48713323/record/0-2/57878590071) |
+| `1082957-26-LE26` | Piezas gráficas y audiovisuales para ProChile / Dirección General de Promoción de Exportaciones | Licitación pública LE |  CLP 42.000.000 | 2026-08-31 15:01 CLT | `Preparación`    | GO condicionado; staffing declarado, gates pendientes | No verificada                                     | [Deal 64482163516](https://app.hubspot.com/contacts/48713323/record/0-3/64482163516) · [Company 31209269815](https://app.hubspot.com/contacts/48713323/record/0-2/31209269815) |
+| `564162-108-L126` | Campaña digital Despega USACH 2026 / Universidad de Santiago de Chile                           | Licitación pública L1 |   CLP 3.500.000 | 2026-09-02 15:00 CLT | `Screening`      | No-bid recomendado; decisión humana pendiente         | No verificada                                     | No promovida                                                                                                                                                                   |
+| `4841-69-COT26`   | Revista Conserva N.° 27 y requerimientos CNCR / Servicio Nacional del Patrimonio Cultural       | Compra Ágil           |   CLP 2.400.000 | 2026-08-31 12:00 CLT | `Screening`      | No-bid recomendado; decisión humana pendiente         | No verificada                                     | No promovida                                                                                                                                                                   |
+| `889473-1673-COT26` | Creación y mantención de página web / Universidad de O'Higgins                                 | Compra Ágil           |   CLP 7.000.000 | 2026-08-31 10:00 CLT | `Preparación`    | GO para preparar; admisibilidad y margen pendientes   | No verificada                                     | [Deal 64466117716](https://app.hubspot.com/contacts/48713323/record/0-3/64466117716) · [Company 57899319173](https://app.hubspot.com/contacts/48713323/record/0-2/57899319173) |
+| `1205889-3-LE26`  | Estrategia de medios Beneficios Estudiantiles 2027 / Ministerio de Educación                    | Licitación pública LE |  CLP 64.000.000 | 2026-09-08 15:01 CLT | `Preparación`    | GO para preparar; validar medios, garantía y margen    | No verificada                                     | [Deal 64482321775](https://app.hubspot.com/contacts/48713323/record/0-3/64482321775) · [Company 46499468091](https://app.hubspot.com/contacts/48713323/record/0-2/46499468091) |
+| `918434-14-LP26`  | Campaña Nacional VCM 2026 / Ministerio de la Mujer y la Equidad de Género                        | Licitación pública LP | CLP 350.000.000 | 2026-09-28 20:00 CLT | `Preparación`    | GO para preparar; acreditar campañas de gran escala   | No verificada                                     | [Deal 64466272830](https://app.hubspot.com/contacts/48713323/record/0-3/64466272830) · [Company 31163122599](https://app.hubspot.com/contacts/48713323/record/0-2/31163122599) |
+| `2427-73-LE26`    | Marketing digital para redes sociales / Municipalidad de Valparaíso                             | Licitación pública LE |  CLP 14.000.000 | 2026-09-03 16:00 CLT | `Preparación`    | GO para preparar; acreditar contratos y margen         | No verificada                                     | [Deal 64469214508](https://app.hubspot.com/contacts/48713323/record/0-3/64469214508) · [Company 32039105348](https://app.hubspot.com/contacts/48713323/record/0-2/32039105348) |
+| `1595-19-RFI26`   | RFI Software Gestión de Tickets / JUNJI                                                          | Consulta al mercado   |   No informado  | 2026-09-09 12:00 CLT | `Preparación`    | GO para responder RFI; definir plataforma/alianza      | No verificada                                     | [Deal 64469523247](https://app.hubspot.com/contacts/48713323/record/0-3/64469523247) · [Company 57892355617](https://app.hubspot.com/contacts/48713323/record/0-2/57892355617) |
 
 ## Fichas activas
 
@@ -83,7 +91,7 @@ Si una fuente no fue releída, usa `No verificado`; nunca interpretes una celda 
 | Dominio              | `minciencia.gob.cl`                                                                                                                                          |
 | Deal                 | [Subsecretaría de Ciencia - Campaña Festival de Ciencia y Tecnología 2026 · `64461187076`](https://app.hubspot.com/contacts/48713323/record/0-3/64461187076) |
 | Pipeline / stage     | `default` / `qualifiedtobuy` — Calificado para comprar                                                                                                       |
-| Bucket               | `Strategic Bets`                                                                                                                                             |
+| Bucket               | `Strategic Bets`, corregido mediante MCP y verificado live el 2026-08-28                                                                                     |
 | Tipo / canal / línea | `newbusiness` / `Mercado público` / `efeonce_digital`                                                                                                        |
 | Owner                | Julio Reyes Rangel · `75788512`                                                                                                                              |
 | ID licitación        | `1098710-22-LP26`                                                                                                                                            |
@@ -102,25 +110,71 @@ Si una fuente no fue releída, usa `No verificado`; nunca interpretes una celda 
 | Monto                    | CLP 2.400.000                                                                                                   |
 | Cierre oficial observado | 2026-08-31 12:00 CLT                                                                                            |
 | Score LicitaLAB          | 80 %; señal de discovery                                                                                        |
-| Estado / decisión        | `Radar` / bid-no-bid pendiente                                                                                  |
+| Estado / decisión        | `Screening` / no-bid recomendado; decisión humana pendiente                                                     |
 | Postulación              | No verificada                                                                                                   |
 | HubSpot                  | No promovida; para una Compra Ágil nueva, `pipeline_bucket` sigue `policy_required` hasta decisión del operador |
-| Próximo control          | Leer bases y validar admisibilidad, alcance, loaded cost, margen y capacidad antes de decidir                   |
+| Próximo control          | Confirmar portfolio/cartas, cuantificar alcance y demostrar margen; si falla un gate, cerrar como `No bid`      |
 
 ### `1082957-26-LE26` — Piezas gráficas y audiovisuales para ProChile
 
-| Campo                    | Valor al corte                                                                                                       |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------- |
-| Organismo                | Dirección General de Promoción de Exportaciones (ProChile)                                                           |
-| Región                   | Región Metropolitana de Santiago                                                                                     |
-| Modalidad                | Licitación pública (`LE`)                                                                                            |
-| Monto                    | CLP 42.000.000                                                                                                       |
-| Cierre oficial observado | 2026-08-31 15:01 CLT                                                                                                 |
-| Score LicitaLAB          | 80 %; señal de discovery                                                                                             |
-| Estado / decisión        | `Radar` / bid-no-bid pendiente                                                                                       |
-| Postulación              | No verificada                                                                                                        |
-| HubSpot                  | No promovida; buscar la Company live y deduplicar antes de crear cualquier deal                                      |
-| Próximo control          | Leer bases y validar admisibilidad, entregables, volumen, derechos, loaded cost, margen y capacidad antes de decidir |
+| Campo                    | Valor al corte                                                                                                                                                                                                                                                         |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Organismo                | Dirección General de Promoción de Exportaciones (ProChile)                                                                                                                                                                                                             |
+| Región                   | Región Metropolitana de Santiago                                                                                                                                                                                                                                       |
+| Modalidad                | Licitación pública (`LE`)                                                                                                                                                                                                                                              |
+| Monto                    | CLP 42.000.000                                                                                                                                                                                                                                                         |
+| Cierre oficial observado | 2026-08-31 15:01 CLT                                                                                                                                                                                                                                                   |
+| Score LicitaLAB          | 80 %; señal de discovery                                                                                                                                                                                                                                               |
+| Estado / decisión        | `Preparación` / GO condicionado; equipo disponible declarado por el operador, acreditación y margen pendientes                                                                                                                                                         |
+| Postulación              | No verificada                                                                                                                                                                                                                                                          |
+| HubSpot                  | [Deal `64482163516`](https://app.hubspot.com/contacts/48713323/record/0-3/64482163516) asociado a [Company `31209269815`](https://app.hubspot.com/contacts/48713323/record/0-2/31209269815); `Core Pipeline`, `existingbusiness`, `default/qualifiedtobuy` verificados |
+| Próximo control          | Nominar/acreditar seis profesionales, validar capacidad sin afectar Sky y demostrar margen positivo                                                                                                                                                                    |
+
+### `1062018-22-L126` — Diseño gráfico Informe Anual DDN
+
+| Campo                    | Valor al corte                                                                                                                                                                                                                                                              |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Organismo                | Defensoría de los Derechos de la Niñez                                                                                                                                                                                                                                      |
+| Región                   | Región Metropolitana de Santiago                                                                                                                                                                                                                                            |
+| Modalidad                | Licitación pública (`L1`)                                                                                                                                                                                                                                                   |
+| Monto                    | CLP 7.000.000 con impuestos                                                                                                                                                                                                                                                 |
+| Cierre oficial observado | 2026-08-31 16:30 CLT                                                                                                                                                                                                                                                        |
+| Score LicitaLAB          | 80 %; señal de discovery                                                                                                                                                                                                                                                    |
+| Estado / decisión        | `Preparación` / GO condicionado; gates técnicos y económicos pendientes                                                                                                                                                                                                     |
+| Postulación              | No verificada                                                                                                                                                                                                                                                               |
+| HubSpot                  | [Deal `64471071912`](https://app.hubspot.com/contacts/48713323/record/0-3/64471071912) asociado a la nueva [Company `57878590071`](https://app.hubspot.com/contacts/48713323/record/0-2/57878590071); `Strategic Bets`, `newbusiness`, `default/qualifiedtobuy` verificados |
+| Próximo control          | Validar portfolio, prueba, capacidad y margen; la Company conserva RUT `62.000.410-3` y queda separada de Subsecretaría                                                                                                                                                     |
+
+### `564162-108-L126` — Campaña digital Despega USACH 2026
+
+| Campo                    | Valor al corte                                                                                                 |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| Organismo                | Universidad de Santiago de Chile                                                                               |
+| Región                   | Región Metropolitana de Santiago                                                                               |
+| Modalidad                | Licitación pública (`L1`)                                                                                      |
+| Monto                    | CLP 3.500.000 con impuestos                                                                                    |
+| Cierre oficial observado | 2026-09-02 15:00 CLT                                                                                           |
+| Score LicitaLAB          | 82 %; señal de discovery                                                                                       |
+| Estado / decisión        | `Screening` / no-bid recomendado; decisión humana pendiente                                                    |
+| Postulación              | No verificada                                                                                                  |
+| HubSpot                  | No promovida; buscar la Company live y deduplicar antes de crear cualquier deal                                |
+| Próximo control          | Reconsiderar sólo con operación ultraliviana y valor de credencial explícito; por rentabilidad aislada, no-bid |
+
+### Nuevas promociones verificadas — 2026-08-28
+
+| ID | Evidencia de alcance | HubSpot live | Próximo control |
+| --- | --- | --- | --- |
+| `889473-1673-COT26` | Sitio a medida, CMS, UX, SEO, VPS, SSL/WAF y mantención anual; entrega máxima de 90 días hábiles | `Strategic Bets` · `newbusiness` · `default/qualifiedtobuy`; cierre comercial no informado | Preparar cotización excluyente y validar capacidad/margen antes del cierre |
+| `1205889-3-LE26` | Estrategia y ejecución de medios por aproximadamente 40 días; presupuesto máximo CLP 64.000.000 y comisión de agencia máxima 3 % | `Core Pipeline` · `existingbusiness` · `default/qualifiedtobuy`; `closedate` 2026-10-27 15:10 CLT | Validar garantía, cashflow, plan de medios y antecedentes |
+| `918434-14-LP26` | Campaña nacional integral; 60 % medios y 40 % producción; propuesta creativa pondera 70 puntos | `Core Pipeline` · `existingbusiness` · `default/qualifiedtobuy`; `closedate` 2026-10-05 18:00 CLT | Acreditar campañas comparables sobre CLP 100.000.000 y preparar briefing/pitch |
+| `2427-73-LE26` | Gestión de avisaje Meta/YouTube con piezas entregadas por el municipio; experiencia evaluable sobre CLP 5.000.000 | `Core Pipeline` · `existingbusiness` · `default/qualifiedtobuy`; `closedate` 2026-12-09 18:00 CLT | Reunir contratos acreditables y validar margen por gestión |
+| `1595-19-RFI26` | Consulta al mercado por plataforma de tickets a 36 meses, Teams/Bot IA, Power BI y aproximadamente 45.000 tickets anuales | `Strategic Bets` · `newbusiness` · `default/qualifiedtobuy`; monto y cierre comercial no informados | Definir solución/partner y responder costos, arquitectura y experiencia |
+
+Las cinco asociaciones Deal ↔ Company fueron releídas live. No se asociaron contactos: no existe evidencia de que
+los contactos disponibles participen en estos procesos. La búsqueda exacta por `id_de_licitacion` devolvió un único
+Deal para cada ID. `gh_idempotency_key` no fue poblado en estos cinco Deals durante la carga aprobada; hasta que un
+write posterior cierre esa brecha, la deduplicación operativa debe consultar obligatoriamente el ID exacto antes de
+cualquier retry.
 
 ## Protocolo de actualización
 

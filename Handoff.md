@@ -4,14 +4,25 @@
 
 ## 2026-08-28 — LicitaLAB MCP + radar Playwright documentados en skills Codex/Claude
 
-**Estado: `complete`, discovery read-only + primera promoción CRM verificada.** El MCP OAuth expone cinco tools
+**Estado: `complete`, discovery read-only + ocho promociones CRM verificadas.** El MCP OAuth expone cinco tools
 read-only y el radar autenticado mantiene credencial/perfil/reporte ignorados bajo `.auth/` con modo `0600`; su
-canary paginado leyó 45 oportunidades. Las skills espejadas separan discovery web, evidencia MCP y promoción humana.
+canary paginado leyó 45 oportunidades y el barrido ampliado posterior leyó 163. Las skills espejadas separan discovery web, evidencia MCP y promoción humana.
 La prueba aprobada creó Company `57870164778` y deal `64461187076` para `1098710-22-LP26`, en
 `default/qualifiedtobuy`, `Strategic Bets`, CLP 250.000.000; el readback probó Deal↔Company y
-`num_associated_deals=1`, sin contacto ficticio. `gh_commercial_party_id` sigue vacío y el bridge no admite aún
-`public_tender`; automatizar nuevas altas requiere la extensión gobernada. Cada write conserva búsqueda de
-duplicados, confirmación y readback.
+`num_associated_deals=1`, sin contacto ficticio. La misma carga manual gobernada por MCP promovió después ProChile
+como deal `64482163516` asociado a Company existente `31209269815` y Defensoría como deal `64471071912` asociado a
+la Company separada `57878590071`; las búsquedas por `gh_idempotency_key` devolvieron una fila por licitación.
+ProChile es cliente vigente (`hs_current_customer=yes`), por eso quedó `Core Pipeline`/`existingbusiness`; Defensoría
+quedó `Strategic Bets`/`newbusiness`. `gh_deal_origin` permanece vacío en las tres porque su enum sólo admite
+`greenhouse_quote_builder`: nunca escribir un origen falso. El bridge no admite aún `public_tender`; esa brecha
+bloquea automatización, no cargas manuales MCP con confirmación, asociación y readback.
+Una promoción posterior creó cinco Deals adicionales, todos con búsqueda exacta por ID y asociación releída:
+UOH `64466117716` ↔ `57899319173`, Beneficios Estudiantiles `64482321775` ↔ Ministerio de Educación
+`46499468091`, Campaña VCM `64466272830` ↔ Ministerio de la Mujer `31163122599`, marketing Valparaíso
+`64469214508` ↔ `32039105348` y RFI JUNJI `64469523247` ↔ `57892355617`. UOH y JUNJI quedaron
+`Strategic Bets`/`newbusiness`; las tres cuentas existentes quedaron `Core Pipeline`/`existingbusiness`. No se
+asociaron contactos no confirmados. Brecha honesta: estos cinco Deals tienen un único `id_de_licitacion`, pero
+`gh_idempotency_key` no fue poblado en la carga aprobada; completar esa propiedad requiere un write posterior.
 **Frontera corregida por el operador:** LicitaLAB ve licitaciones públicas solamente; toda fila mantiene
 `public_opportunity` y sólo se promueve con `origin='public_tender'`. Nunca se usa para discovery privado ni se
 mezcla con Wherex, Ariba, Coupa u otros portales corporativos. Estado rápido de bid, CRM y postulación:
@@ -584,15 +595,3 @@ canónica de superficie sigue siendo `seo_backlink_snapshots.domain_rank` porque
 no devuelve authority score (desambiguación registrada en arch §4.2). Convivencia con la sesión
 paralela de TASK-1709: deltas de archivos compartidos viajaron cruzados y declarados en los commits
 de ambas.
-
-## 2026-08-27 — TASK-1697 cerrada: el sustrato de sitio tiene dueño, carta y detector
-
-**Estado: `complete`; gates verdes (12.144 tests full + build de producción + lint con la rule activa + worker gates).** `src/lib/growth/site-substrate/` nace por `git mv` con diff puro (site-fetch/html/robots-policy/read-body + contratos `Site*` + barrel); shims en `probes/` = cero dependientes de producción modificados. Lint rule `greenhouse/growth-substrate-boundary` en `error` desde commit-1, cero exenciones: `probes/**` privado del dominio AEO, el sustrato no importa `growth/*`. Desviaciones registradas en el task file (read-body viaja al sustrato; el flag del fetcher vive en `site-fetch.ts` re-exportado por `flags.ts`; el meta-test anti-divergencia sigue al archivo movido).
-
-**Desbloqueadas:** `TASK-1670` (site probes en el audit SEO), `TASK-1709` (diagnóstico de prospecto — su Slice 2b ya tiene de dónde consumir) y `TASK-1701`; `TASK-1713` (mitad B: rule universal + barrel AEO) sigue tras `TASK-1695`. **Post-push:** vigilar `growth.ai_visibility.probe_failure_rate` en steady (el refactor es shim-idéntico; el canario confirma). Follow-up declarado: retirar los shims reescribiendo los 7 consumers al barrel, tras una release asentada.
-
-## 2026-08-27 — TASK-1778 cerrada: el fetcher de probes quedó defendible Y desplegado
-
-**Estado: `complete`; ISSUE-164 `resolved`.** Cutover aplicado el mismo día del merge: `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED=true` en el ops-worker (revisión `ops-worker-00598-459`, 100% — worker ÚNICO staging+prod, o sea la cadena viva del intake público) + declarativo en `deploy.sh` + Vercel `staging`. La regla de saltos se extendió a subdominios DESCENDIENTES del sujeto con evidencia de cartera (`www.bancochile.cl → sitiospublicos.bancochile.cl`); cross-registrable (`berel.com.mx → berel.com`) sigue bloqueado, sin PSL. Verificación: 7 dominios vivos en strict (6 ok; bancochile ya fallaba con la red vieja — Imperva, caso `TASK-1281`) + corrida real `EO-GRUN-00048` (SKY, full, 5 motores) verde: 13 probes, cero `blocked_*` falsos, apex→www seguido y medido.
-
-**Residuales con dueño y fecha (ledger § Pendientes):** (1) revisión Sentry 2026-08-29 de `blocked_redirect`/`blocked_private_address` (48 h; volumen alto = guarda estricta, rollback <5 min con flag a false en deploy.sh + `--update-env-vars`); (2) env var en Vercel **Production** SOLO con el release que lleve el código a `main` (ISSUE-150) — hasta entonces el path inline prod (admin `light`) conserva la red vieja; el path público async ya está contenido. La mitigación interina que se le propuso al operador (apagar `PROBES`) quedó obsoleta: el fix real está vivo.

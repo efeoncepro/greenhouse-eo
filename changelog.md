@@ -28,7 +28,8 @@
   idempotentes sin contactos ficticios, URL directa, y separación de `fecha_de_cierre_de_licitacion` versus
   `closedate`. La precedencia es cliente existente → Core; nueva cuenta por Licitación → Strategic Bets; Compra
   Ágil nueva queda `policy_required`. El bridge actual todavía no transporta esos campos ni resuelve todas las
-  identidades/asociaciones; es contrato objetivo, no capacidad desplegada.
+  identidades/asociaciones; es contrato objetivo para automatización. La carga manual confirmada usa el MCP de
+  HubSpot como writer gobernado y no queda bloqueada por esa brecha.
 - La etapa inicial quedó fijada por metadata live: una candidata aprobada entra a `Pipeline de ventas`
   (`default`) en `Calificado para comprar` (`qualifiedtobuy`), nunca en `Cita programada`; las filas crudas del
   radar permanecen fuera del CRM. La skill documenta el avance técnico→muestra opcional→precio→formalización→cierre
@@ -38,8 +39,20 @@
   y deal `64461187076`, asociado en `default/qualifiedtobuy`, `Strategic Bets`, CLP 250.000.000, con deadline y
   adjudicación separados. La Company terminó con `num_associated_deals=1`; no se inventó contacto.
   `gh_commercial_party_id` permanece vacío y la automatización por bridge continúa pendiente.
+- La promoción manual se amplió con ProChile (`deal 64482163516` ↔ Company `31209269815`) y Defensoría
+  (`deal 64471071912` ↔ Company nueva `57878590071`). ProChile quedó `Core Pipeline`/`existingbusiness` porque la
+  Company es cliente vigente; Defensoría quedó `Strategic Bets`/`newbusiness`. Ambas usan
+  `default/qualifiedtobuy`, conservan fechas separadas y tienen una sola coincidencia por `gh_idempotency_key`.
+  `gh_deal_origin` queda vacío: el enum live sólo admite `greenhouse_quote_builder` y nunca se etiqueta una
+  licitación con un origen falso.
+- El radar ampliado leyó 163 oportunidades y se promovieron otras cinco con Company y asociación verificadas:
+  UOH/web (`64466117716`), Beneficios Estudiantiles/medios (`64482321775`), Campaña VCM (`64466272830`),
+  Valparaíso/paid media (`64469214508`) y JUNJI/RFI ticketing (`64469523247`). Cada búsqueda por
+  `id_de_licitacion` devolvió una sola fila; no se asociaron contactos sin evidencia. Los cinco nuevos Deals no
+  recibieron `gh_idempotency_key` en la carga aprobada, por lo que esa propiedad queda como brecha explícita y no
+  como garantía supuesta.
 - Se creó `docs/commercial/tenders/LICITATION_CRM_REGISTER.md` como índice operativo compartido para Codex y
-  Claude, inicializado con las tres recomendadas del radar. Registra decisión, postulación, fechas, IDs/enlaces y
+  Claude, actualizado con diez oportunidades y ocho Deals verificados. Registra decisión, postulación, fechas, IDs/enlaces y
   asociaciones sin desplazar las fuentes autoritativas; el histórico de 99 deals permanece sólo en HubSpot.
 - El patrón se extendió a `docs/commercial/CRM_DEAL_REGISTER.md`: vista transversal para negocios Core, Strategic
   Bets y otros orígenes, con una fila sólo después de verificar el Deal en HubSpot. Las licitaciones promovidas se
