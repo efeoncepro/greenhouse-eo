@@ -35,6 +35,10 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+// `import type` pleno: `contracts.ts` es la hoja sin `server-only` y la UI lo importa, así que
+// el tipo vive allá y este módulo lo consume — nunca al revés.
+import type { SeoCtrCurveSource } from './contracts'
+
 /** Un bucket de la curva CON su muestra — sin la muestra no se puede juzgar si sirve. */
 export interface SeoCtrCurveBucket {
   impressions: number
@@ -147,16 +151,6 @@ export const isCurveUsableAtPosition = (
 
   return bucket.impressions >= floor.minBucketImpressions && bucket.clicks >= floor.minBucketClicks
 }
-
-/**
- * Procedencia del CTR esperado. Tres estados, NUNCA dos.
- *
- * `unusable` y `fallback` producen el mismo número prestado, pero son hechos distintos y el
- * contrato los separa: en `unusable` **vimos** esa posición y la muestra no alcanza; en
- * `fallback` **nunca la observamos**. Colapsarlos reintroduciría, en el contrato, la misma
- * confusión de ausencia que el guard original tenía en el código.
- */
-export type SeoCtrCurveSource = 'org_measured' | 'unusable' | 'fallback'
 
 export interface SeoExpectedCtrVerdict {
   /** Posición para la que se resolvió el CTR esperado (bucket entero). */

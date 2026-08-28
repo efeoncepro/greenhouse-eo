@@ -9,6 +9,7 @@ import {
   SEO_CTR_CURVE_SQL,
   type SeoOrgCtrCurve
 } from '../ctr-curve'
+import { isCurveUsableAtPosition as isCurveUsableForScore } from '../work-queue/priority-score'
 import { getPriorityScoreConfig } from '../work-queue/score-versions'
 
 const curveOf = (buckets: Record<number, { impressions: number; clicks: number }>): SeoOrgCtrCurve => {
@@ -62,15 +63,48 @@ const EFEONCE_CURVE = curveOf({
 
 describe('TASK-1792 — el piso de muestra', () => {
   /**
-   * Paridad con `work-queue/score-versions.ts`. El umbral se ADOPTA de ahí; este test existe
-   * para que moverlo de un solo lado sea imposible en silencio, que es el modo de divergencia
-   * que la matriz de riesgo de la task nombra.
+   * Paridad con `work-queue/`. El umbral se ADOPTA de ahí; estos dos tests existen para que
+   * moverlo de un solo lado sea imposible en silencio — el modo de divergencia que la matriz
+   * de riesgo de la task nombra.
    */
   it('adopta el umbral de score-versions, no propone uno propio', () => {
     const config = getPriorityScoreConfig()
 
     expect(SEO_CTR_CURVE_SAMPLE_FLOOR.minBucketImpressions).toBe(config.curveMinBucketImpressions)
     expect(SEO_CTR_CURVE_SAMPLE_FLOOR.minBucketClicks).toBe(config.curveMinBucketClicks)
+  })
+
+  /**
+   * 🔴 La paridad que de verdad importa es la del **PREDICADO**, no la de los números sueltos.
+   *
+   * Si mañana una versión del score agrega una tercera condición —un mínimo de días con datos,
+   * por ejemplo— un test que sólo compare `1000` y `5` seguiría verde con los dos lados ya
+   * divergidos. Comparar el VEREDICTO sobre una matriz de curvas fixture no tiene ese agujero:
+   * cubre las fronteras de cada dimensión y los dos casos reales medidos contra PG.
+   *
+   * (Crédito del matiz: `greenhouse-eo-56`, dueña de `TASK-1700`, al acordar el mecanismo.)
+   */
+  it('el VEREDICTO coincide con el del score en toda la matriz de fronteras', () => {
+    const fixtures: Array<{ label: string; curve: SeoOrgCtrCurve }> = [
+      { label: 'berel.com real', curve: BEREL_CURVE },
+      { label: 'efeoncepro.com real', curve: EFEONCE_CURVE },
+      { label: 'bucket ausente', curve: new Map() },
+      { label: 'justo en ambos pisos', curve: curveOf({ 5: { impressions: 1000, clicks: 5 } }) },
+      { label: 'un clic bajo el piso', curve: curveOf({ 5: { impressions: 1000, clicks: 4 } }) },
+      { label: 'una impresión bajo el piso', curve: curveOf({ 5: { impressions: 999, clicks: 5 } }) },
+      { label: 'muchísima impresión, cero clics', curve: curveOf({ 5: { impressions: 500_000, clicks: 0 } }) },
+      { label: 'muchos clics, muestra chica', curve: curveOf({ 5: { impressions: 40, clicks: 6 } }) },
+      { label: 'bucket vacío', curve: curveOf({ 5: { impressions: 0, clicks: 0 } }) }
+    ]
+
+    for (const { label, curve } of fixtures) {
+      for (const position of [1, 5, 8, 20]) {
+        expect(
+          isCurveUsableAtPosition(curve, position),
+          `veredicto divergente en "${label}" posición ${position}: el reader y el score dejaron de responder lo mismo. Unifica el predicado o declara la divergencia.`
+        ).toBe(isCurveUsableForScore(curve, position))
+      }
+    }
   })
 
   it('exige impresiones Y clics: mucha impresión con cero clics no sirve', () => {

@@ -59,6 +59,32 @@ export interface SearchConsoleActiveOrg {
  */
 export type SeoMarketAvailability = 'available' | 'unavailable'
 
+/**
+ * TASK-1792 — Procedencia del CTR esperado con que se computó `estimatedClickGain`.
+ *
+ * 🔴 **Tres estados, NUNCA dos.** `unusable` y `fallback` producen el mismo número prestado
+ * de la curva pública, pero son hechos distintos y el contrato los separa: en `unusable`
+ * **vimos** esa posición y la muestra no alcanza para afirmar un CTR; en `fallback` **nunca
+ * la observamos**. Colapsarlos reintroduciría en el contrato la misma confusión de ausencia
+ * que produjo el defecto (`0` medido leído como «CTR esperado 0»).
+ *
+ * Sólo `org_measured` significa que el techo salió de la medición del propio sitio. Ningún
+ * consumidor —pantalla, lane ecosystem o tool MCP— puede leer el techo sin saber de dónde
+ * salió.
+ */
+export type SeoCtrCurveSource = 'org_measured' | 'unusable' | 'fallback'
+
+/**
+ * TASK-1792 — Criterio con el que la lente devuelve ordenadas las oportunidades.
+ *
+ * 🔴 **Ordenar por un campo que no discrimina es no ordenar.** Cuando la curva propia no es
+ * utilizable en la posición objetivo —o cuando la ganancia estimada resulta idéntica en todas
+ * las filas— el techo deja de ser un criterio y la lente ordena por `measured_demand`
+ * (impresiones × cercanía a página 1, **todo medido**) y lo DECLARA acá. La alternativa
+ * —ordenar igual y callarlo— es la que dejó la pantalla sin orden sin que nadie lo notara.
+ */
+export type SeoKeywordOpportunityOrder = 'estimated_click_gain' | 'measured_demand'
+
 export interface KeywordOpportunity {
   keyword: string
   /** Página que hoy rankea para la keyword (la mejor posicionada de la ventana). */
@@ -114,6 +140,31 @@ export type KeywordOpportunitiesResult =
       /** Umbral de impresiones efectivamente aplicado (percentil resuelto sobre los datos). */
       impressionsThreshold: number
       market: SeoMarketAvailability
+      /**
+       * TASK-1792 — Posición a la que se aspira llegar; define el CTR objetivo del score.
+       *
+       * Viaja en el contrato porque los tres consumers usan hoy el default y ninguno lo pasa:
+       * sin declararlo, un techo se lee sin saber contra qué posición se calculó.
+       */
+      targetPosition: number
+      /**
+       * CTR esperado en `targetPosition`, el que multiplica el techo de cada fila.
+       *
+       * 🔴 Cuando `ctrCurveSource` es `org_measured` este valor **no puede ser 0**: el piso de
+       * muestra lo hace imposible, y el módulo degrada a `unusable` antes que emitirlo.
+       */
+      expectedCtrAtTarget: number
+      ctrCurveSource: SeoCtrCurveSource
+      /**
+       * Muestra del bucket objetivo de la curva propia. `null` SÓLO cuando nunca observamos esa
+       * posición.
+       *
+       * Las dos dimensiones viajan juntas a propósito: un escalar volvería a sugerir que las
+       * impresiones bastan para juzgar la muestra, que es exactamente el error de origen — la
+       * precisión de un estimador de tasa la gobiernan los **éxitos**, no los ensayos.
+       */
+      curveSampleSize: { impressions: number; clicks: number } | null
+      orderedBy: SeoKeywordOpportunityOrder
       opportunities: KeywordOpportunity[]
     }
   | { ok: false; errorCode: SeoDegradationCode | 'target_not_found'; status: SearchConsoleConnectionStatus | null }

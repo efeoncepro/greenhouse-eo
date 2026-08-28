@@ -15,7 +15,7 @@ const state = {
   target: [{ organization_id: 'org-1' }] as Array<{ organization_id: string }>,
   threshold: '10',
   opportunities: [] as Array<Record<string, string>>,
-  curve: [] as Array<{ position_bucket: string; ctr: string }>,
+  curve: [] as Array<{ position_bucket: string; impressions: string; clicks: string }>,
   /** TASK-1661 — capturas de mercado (lente ◑). Vacío = nunca se consultó. */
   marketData: [] as Array<Record<string, unknown>>,
   thrown: null as Error | null
@@ -39,6 +39,22 @@ vi.mock('@/lib/postgres/client', () => ({
 vi.mock('@/lib/observability/capture', () => ({ captureWithDomain: () => undefined }))
 
 import { readKeywordOpportunities } from '../keyword-opportunities-reader'
+
+/**
+ * TASK-1792 — un bucket de la curva CON su muestra. El reader ya no puede leer un CTR sin
+ * saber sobre cuántas impresiones y clics se calculó.
+ */
+const curveBucket = (position: number, impressions: number, clicks: number) => ({
+  position_bucket: String(position),
+  impressions: String(impressions),
+  clicks: String(clicks)
+})
+
+/** Bucket objetivo SANO: la muestra de `berel.com` en la posición 5 (PG, 2026-08-28). */
+const usableTargetBucket = (ctr: number) => curveBucket(5, 100_000, Math.round(100_000 * ctr))
+
+/** 🔴 Bucket objetivo REAL de `efeoncepro.com`: 75 impresiones, 0 clics. El que rompía la lente. */
+const efeonceTargetBucket = () => curveBucket(5, 75, 0)
 
 const opportunityRow = (overrides: Partial<Record<string, string>> = {}) => ({
   keyword: 'zapatos rojos',
@@ -165,7 +181,7 @@ describe('readKeywordOpportunities — contrato', () => {
 describe('readKeywordOpportunities — score', () => {
   it('estima la ganancia con la curva de CTR de la PROPIA organización', async () => {
     // La org convierte 10% en posición 5; la keyword hoy convierte 5% (70/1400).
-    state.curve = [{ position_bucket: '5', ctr: '0.10' }]
+    state.curve = [usableTargetBucket(0.1)]
     state.opportunities = [opportunityRow()]
 
     const result = await readKeywordOpportunities('seot-1')
@@ -176,7 +192,7 @@ describe('readKeywordOpportunities — score', () => {
   })
 
   it('nunca produce una ganancia negativa cuando la keyword ya supera el CTR objetivo', async () => {
-    state.curve = [{ position_bucket: '5', ctr: '0.01' }]
+    state.curve = [usableTargetBucket(0.01)]
     state.opportunities = [opportunityRow()]
 
     const result = await readKeywordOpportunities('seot-1')
@@ -186,7 +202,7 @@ describe('readKeywordOpportunities — score', () => {
   })
 
   it('ordena por ganancia estimada, no por impresiones brutas', async () => {
-    state.curve = [{ position_bucket: '5', ctr: '0.20' }]
+    state.curve = [usableTargetBucket(0.2)]
     state.opportunities = [
       // Muchas impresiones pero ya convierte bien ⇒ poco que ganar.
       opportunityRow({ keyword: 'mucho-trafico', impressions: '1000', clicks: '190' }),
@@ -262,5 +278,115 @@ describe('readKeywordOpportunities — señales de calidad', () => {
       expect(result.windowDays).toBe(14)
       expect(result.impressionsThreshold).toBeGreaterThanOrEqual(10)
     }
+  })
+})
+
+/**
+ * TASK-1792 — el orden es honesto o dice que no lo es.
+ *
+ * El defecto original no producía un orden malo: producía la AUSENCIA de orden, sin que nada
+ * fallara. Estos tests fijan que la lente nunca vuelva a ordenar por un campo que no
+ * discrimina sin declararlo.
+ */
+describe('readKeywordOpportunities — honestidad del orden y de la curva (TASK-1792)', () => {
+  it('con curva utilizable ordena por ganancia y lo declara', async () => {
+    state.curve = [usableTargetBucket(0.2)]
+    state.opportunities = [
+      opportunityRow({ keyword: 'mucho-trafico', impressions: '1000', clicks: '190' }),
+      opportunityRow({ keyword: 'gran-upside', impressions: '900', clicks: '9' })
+    ]
+
+    const result = await readKeywordOpportunities('seot-1')
+
+    expect(result.ok).toBe(true)
+
+    if (result.ok) {
+      expect(result.ctrCurveSource).toBe('org_measured')
+      expect(result.orderedBy).toBe('estimated_click_gain')
+      expect(result.opportunities[0]?.keyword).toBe('gran-upside')
+      expect(result.curveSampleSize).toEqual({ impressions: 100_000, clicks: 20_000 })
+    }
+  })
+
+  /**
+   * 🔴 EL CASO QUE ROMPÍA LA PANTALLA, con la curva real medida contra PG.
+   *
+   * Antes: `targetCtr = 0` → ganancia 0 en las 24 filas → `.sort()` no-op. Ahora la lente
+   * declara `unusable` y ordena por demanda medida.
+   */
+  it('con el bucket 75/0 de efeoncepro.com declara `unusable` y NO colapsa la ganancia a cero', async () => {
+    state.curve = [efeonceTargetBucket()]
+    state.opportunities = [
+      opportunityRow({ keyword: 'lejos-pero-masivo', impressions: '900', clicks: '0', weighted_position: '20' }),
+      opportunityRow({ keyword: 'cerca-de-pagina-1', impressions: '500', clicks: '0', weighted_position: '8' })
+    ]
+
+    const result = await readKeywordOpportunities('seot-1')
+
+    expect(result.ok).toBe(true)
+
+    if (result.ok) {
+      expect(result.ctrCurveSource).toBe('unusable')
+      expect(result.orderedBy).toBe('measured_demand')
+      // La muestra viaja, para que el consumidor pueda decir POR QUÉ no alcanza.
+      expect(result.curveSampleSize).toEqual({ impressions: 75, clicks: 0 })
+      // El anti-assert del reader: ni el CTR objetivo ni las ganancias colapsan a cero.
+      expect(result.expectedCtrAtTarget).toBeGreaterThan(0)
+      expect(result.opportunities.every(row => row.estimatedClickGain > 0)).toBe(true)
+      // Y el orden es el declarado: cercanía a página 1 vence al volumen bruto.
+      expect(result.opportunities[0]?.keyword).toBe('cerca-de-pagina-1')
+    }
+  })
+
+  /**
+   * El segundo modo de colapso: la curva SÍ es utilizable, pero todas las filas ya convierten
+   * por encima de la media objetivo, así que el `Math.max(0, …)` las deja a todas en 0. Un
+   * `.sort()` sobre varianza cero preserva el orden de entrada y finge haber ordenado.
+   */
+  it('si la ganancia no discrimina, ordena por el criterio secundario y lo declara', async () => {
+    state.curve = [usableTargetBucket(0.01)]
+    state.opportunities = [
+      opportunityRow({ keyword: 'lejos', impressions: '900', clicks: '450', weighted_position: '20' }),
+      opportunityRow({ keyword: 'cerca', impressions: '500', clicks: '250', weighted_position: '8' })
+    ]
+
+    const result = await readKeywordOpportunities('seot-1')
+
+    expect(result.ok).toBe(true)
+
+    if (result.ok) {
+      // La curva sí sirve — lo que no discrimina es el campo.
+      expect(result.ctrCurveSource).toBe('org_measured')
+      expect(result.opportunities.every(row => row.estimatedClickGain === 0)).toBe(true)
+      // 🔴 El invariante: varianza cero ⇒ jamás se declara orden por ganancia.
+      expect(result.orderedBy).toBe('measured_demand')
+      expect(result.opportunities[0]?.keyword).toBe('cerca')
+    }
+  })
+
+  it('sin ningún bucket en la posición objetivo declara `fallback`, no `unusable`', async () => {
+    state.curve = [curveBucket(12, 5000, 50)]
+    state.opportunities = [opportunityRow()]
+
+    const result = await readKeywordOpportunities('seot-1')
+
+    expect(result.ok).toBe(true)
+
+    if (result.ok) {
+      // Nunca observamos esa posición ≠ la observamos y no alcanza.
+      expect(result.ctrCurveSource).toBe('fallback')
+      expect(result.curveSampleSize).toBeNull()
+      expect(result.orderedBy).toBe('measured_demand')
+    }
+  })
+
+  it('declara la posición objetivo contra la que se calculó el techo', async () => {
+    state.curve = [usableTargetBucket(0.1)]
+    state.opportunities = [opportunityRow()]
+
+    const result = await readKeywordOpportunities('seot-1')
+
+    expect(result.ok).toBe(true)
+    if (result.ok) expect(result.targetPosition).toBe(5)
   })
 })

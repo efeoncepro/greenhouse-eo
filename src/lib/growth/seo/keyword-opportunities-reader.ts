@@ -36,7 +36,8 @@ import 'server-only'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
-import { type KeywordOpportunitiesResult, type KeywordOpportunity } from './contracts'
+import { type KeywordOpportunitiesResult, type KeywordOpportunity, type SeoKeywordOpportunityOrder } from './contracts'
+import { readOrgCtrCurve, resolveExpectedCtrAtPosition } from './ctr-curve'
 import { normalizeMarketKeyword, readKeywordMarketData } from './keyword-market-data'
 
 const DEFAULT_WINDOW_DAYS = 28
@@ -46,7 +47,23 @@ const DEFAULT_MAX_POSITION = 20
 const DEFAULT_TARGET_POSITION = 5
 /** Percentil de impresiones dentro de la propia org. */
 const DEFAULT_IMPRESSIONS_PERCENTILE = 0.75
-/** Piso absoluto: bajo esto la "posición media" no es estadísticamente interpretable. */
+/**
+ * Piso absoluto de la LENTE: bajo esto la "posición media" no es estadísticamente
+ * interpretable, así que la keyword no entra al striking-distance.
+ *
+ * 🔴 **NO es el piso de validez de la curva de CTR, y jamás vuelve a serlo (TASK-1792).**
+ * Son dos preguntas estadísticas distintas y este número sólo responde la primera:
+ *
+ * - «¿es interpretable la posición media?» → 10 basta (mismo uso legítimo en
+ *   `gap/read-seo-aeo-gap.ts`).
+ * - «¿es estimable el CTR en este bucket?» → necesita ~1.000 impresiones **y** clics, porque
+ *   la precisión de un estimador de tasa la gobiernan los éxitos, no los ensayos. Un bucket
+ *   con 10 impresiones y 0 clics es compatible con cualquier CTR entre 0% y 26%.
+ *
+ * Reutilizar este 10 para la segunda pregunta fue la mitad del defecto original, y nada en el
+ * código marcaba que la misma constante respondía dos cosas. Ese piso vive ahora en
+ * `ctr-curve.ts`, adoptado de la config versionada del score.
+ */
 const MIN_IMPRESSIONS_FLOOR = 10
 const DEFAULT_LIMIT = 50
 
@@ -120,56 +137,30 @@ interface OpportunityRow extends Record<string, unknown> {
 }
 
 /**
- * Curva de CTR por posición **de la propia organización**.
+ * Criterio SECUNDARIO de orden: impresiones × cercanía a página 1. **Todo medido.**
  *
- * Se prefiere sobre cualquier tabla de industria porque incorpora automáticamente cómo
- * los AI Overviews están deprimiendo el CTR en ESE sitio y vertical. Devuelve un mapa
- * posición-entera → CTR observado.
- */
-const readOrgCtrCurve = async (organizationId: string, windowDays: number): Promise<Map<number, number>> => {
-  const rows = await runGreenhousePostgresQuery<{ position_bucket: string; ctr: string }>(
-    `SELECT ROUND(position)::int AS position_bucket,
-            (SUM(clicks)::numeric / NULLIF(SUM(impressions), 0)) AS ctr
-       FROM greenhouse_growth.seo_gsc_daily
-      WHERE organization_id = $1
-        AND capture_date >= (CURRENT_DATE - $2::int)
-        AND position > 0
-      GROUP BY ROUND(position)::int
-     HAVING SUM(impressions) >= $3`,
-    [organizationId, windowDays, MIN_IMPRESSIONS_FLOOR]
-  )
-
-  const curve = new Map<number, number>()
-
-  for (const row of rows) {
-    const ctr = Number(row.ctr)
-
-    if (Number.isFinite(ctr)) curve.set(Number(row.position_bucket), ctr)
-  }
-
-  return curve
-}
-
-/**
- * CTR esperado en una posición, con fallback monótono.
+ * Se usa cuando el techo estimado no puede ordenar —porque la curva propia no es utilizable
+ * en la posición objetivo, o porque la ganancia salió idéntica en todas las filas— y la lente
+ * lo DECLARA en `orderedBy`. Ambos factores salen de GSC: las impresiones son demanda medida
+ * y la posición es la ponderada de la ventana. No hay nada estimado acá, que es justamente por
+ * qué sirve de respaldo.
  *
- * Si la org todavía no tiene datos propios para esa posición se usa la curva pública de
- * referencia — marcada como aproximación, no como medición. Nunca devuelve un CTR
- * objetivo menor al actual (eso produciría una "oportunidad" negativa).
+ * La cercanía es lineal sobre el rango de la lente y acotada a [0,1]: una keyword en la
+ * posición 8 está más cerca del empujón a top-5 que una en la 20, con las mismas impresiones.
  */
-const FALLBACK_CTR_CURVE: Record<number, number> = {
-  1: 0.27, 2: 0.15, 3: 0.11, 4: 0.08, 5: 0.06,
-  6: 0.05, 7: 0.04, 8: 0.03, 9: 0.027, 10: 0.025
+const measuredDemandRank = (
+  opportunity: Pick<KeywordOpportunity, 'impressions' | 'position'>,
+  minPosition: number,
+  maxPosition: number
+): number => {
+  const span = Math.max(1, maxPosition + 1 - minPosition)
+  const proximity = Math.min(1, Math.max(0, (maxPosition + 1 - opportunity.position) / span))
+
+  return opportunity.impressions * proximity
 }
 
-const expectedCtrAt = (position: number, curve: Map<number, number>): number => {
-  const bucket = Math.max(1, Math.round(position))
-  const measured = curve.get(bucket)
-
-  if (typeof measured === 'number') return measured
-
-  return FALLBACK_CTR_CURVE[bucket] ?? 0.02
-}
+/** `true` cuando el campo no discrimina: todas las filas llevan el mismo valor. */
+const hasNoVariance = (values: number[]): boolean => values.length > 1 && values.every(value => value === values[0])
 
 /**
  * Lee las oportunidades striking-distance de un `seo_target`.
@@ -223,18 +214,29 @@ export const readKeywordOpportunities = async (
     )
 
     const rawThreshold = Number(thresholdRows[0]?.threshold ?? 0)
-    const impressionsThreshold = Math.max(MIN_IMPRESSIONS_FLOOR, Number.isFinite(rawThreshold) ? Math.round(rawThreshold) : MIN_IMPRESSIONS_FLOOR)
+
+    const impressionsThreshold = Math.max(
+      MIN_IMPRESSIONS_FLOOR,
+      Number.isFinite(rawThreshold) ? Math.round(rawThreshold) : MIN_IMPRESSIONS_FLOOR
+    )
 
     // Nota date-math (gate TASK-893): `capture_date` es DATE. No se usa
     // EXTRACT(EPOCH FROM (a - b)) en ningún punto — sólo comparación contra
     // `CURRENT_DATE - $n::int`, que es la forma segura sobre columnas DATE.
-    const rows = await runGreenhousePostgresQuery<OpportunityRow>(
-      SEO_KEYWORD_OPPORTUNITIES_SQL,
-      [organizationId, windowDays, minPosition, maxPosition, impressionsThreshold, limit]
-    )
+    const rows = await runGreenhousePostgresQuery<OpportunityRow>(SEO_KEYWORD_OPPORTUNITIES_SQL, [
+      organizationId,
+      windowDays,
+      minPosition,
+      maxPosition,
+      impressionsThreshold,
+      limit
+    ])
 
     const curve = await readOrgCtrCurve(organizationId, windowDays)
-    const targetCtr = expectedCtrAt(targetPosition, curve)
+    // TASK-1792 — el veredicto DECLARA de dónde sale el CTR objetivo y con qué muestra, en vez
+    // de que el consumidor lo infiera de la presencia de una clave en un `Map`.
+    const ctrVerdict = resolveExpectedCtrAtPosition(curve, targetPosition)
+    const targetCtr = ctrVerdict.expectedCtr
 
     // TASK-1661 — enriquecimiento de mercado (lente ◑ estimada). Se pide SÓLO por las keywords
     // que el striking-distance ya seleccionó: una selección explícita y acotada, nunca una
@@ -246,40 +248,62 @@ export const readKeywordOpportunities = async (
       languageCode: target.language_code
     })
 
-    const opportunities: KeywordOpportunity[] = rows
-      .map(row => {
-        const impressions = Number(row.impressions)
-        const clicks = Number(row.clicks)
-        const position = Number(row.weighted_position)
-        const competingPages = Number(row.competing_pages)
-        const ctr = impressions > 0 ? clicks / impressions : 0
+    const scored: KeywordOpportunity[] = rows.map(row => {
+      const impressions = Number(row.impressions)
+      const clicks = Number(row.clicks)
+      const position = Number(row.weighted_position)
+      const competingPages = Number(row.competing_pages)
+      const ctr = impressions > 0 ? clicks / impressions : 0
 
-        // Ausencia en el Map = "no lo consultamos", que se proyecta `null`. NUNCA 0: el
-        // contrato separa "sin dato" de "nadie lo busca" y colapsarlos borraría esa diferencia.
-        const market = marketData.byKeyword.get(normalizeMarketKeyword(row.keyword ?? ''))
+      // Ausencia en el Map = "no lo consultamos", que se proyecta `null`. NUNCA 0: el
+      // contrato separa "sin dato" de "nadie lo busca" y colapsarlos borraría esa diferencia.
+      const market = marketData.byKeyword.get(normalizeMarketKeyword(row.keyword ?? ''))
 
-        return {
-          keyword: row.keyword ?? '',
-          page: row.page,
-          position: Number(position.toFixed(2)),
-          impressions,
-          clicks,
-          ctr: Number(ctr.toFixed(6)),
-          // Nunca negativo: si la keyword ya convierte mejor que la media de la posición
-          // objetivo, la ganancia estimada es 0, no un número que invita a "optimizar".
-          estimatedClickGain: Math.round(impressions * Math.max(0, targetCtr - ctr)),
-          quickWin: position <= 10,
-          cannibalized: competingPages > 1,
-          competingPages,
-          searchVolume: market?.searchVolume ?? null,
-          difficulty: market?.keywordDifficulty ?? null,
-          // Derivada del perfil de enlaces del top-10, NO de `difficulty` — ese índice colapsa
-          // a 0 en SERPs es-LATAM y no discrimina (ISSUE-152 delta 2026-08-14).
-          linkBarrier:
-            marketData.linkBarrierByKeyword.get(normalizeMarketKeyword(row.keyword ?? '')) ?? 'unknown'
-        }
-      })
-      .sort((a, b) => b.estimatedClickGain - a.estimatedClickGain)
+      return {
+        keyword: row.keyword ?? '',
+        page: row.page,
+        position: Number(position.toFixed(2)),
+        impressions,
+        clicks,
+        ctr: Number(ctr.toFixed(6)),
+        // Nunca negativo: si la keyword ya convierte mejor que la media de la posición
+        // objetivo, la ganancia estimada es 0, no un número que invita a "optimizar".
+        estimatedClickGain: Math.round(impressions * Math.max(0, targetCtr - ctr)),
+        quickWin: position <= 10,
+        cannibalized: competingPages > 1,
+        competingPages,
+        searchVolume: market?.searchVolume ?? null,
+        difficulty: market?.keywordDifficulty ?? null,
+        // Derivada del perfil de enlaces del top-10, NO de `difficulty` — ese índice colapsa
+        // a 0 en SERPs es-LATAM y no discrimina (ISSUE-152 delta 2026-08-14).
+        linkBarrier: marketData.linkBarrierByKeyword.get(normalizeMarketKeyword(row.keyword ?? '')) ?? 'unknown'
+      }
+    })
+
+    // ── TASK-1792: el orden es honesto o dice que no lo es ────────────────────
+    //
+    // Dos motivos, uno por cada forma en que el techo deja de ser un criterio:
+    //
+    // 1. La curva propia no es utilizable en la posición objetivo. El techo existe, pero sale
+    //    de una tabla prestada: sirve para mostrarlo declarado, no para decidir qué va arriba.
+    // 2. La curva SÍ es utilizable y aun así la ganancia salió idéntica en todas las filas —
+    //    por ejemplo, todas ya convierten por encima de la media de la posición objetivo, así
+    //    que todas colapsan a 0 por el `Math.max(0, …)`. Un `.sort()` sobre un campo de
+    //    varianza cero es un no-op: preserva el orden de entrada y finge haber ordenado.
+    //
+    // En ambos casos la lente ordena por demanda MEDIDA y lo declara en `orderedBy`. Ordenar
+    // igual y callarlo es exactamente lo que dejó la pantalla sin orden sin que nadie lo notara.
+    const orderedBy: SeoKeywordOpportunityOrder =
+      ctrVerdict.source === 'org_measured' && !hasNoVariance(scored.map(row => row.estimatedClickGain))
+        ? 'estimated_click_gain'
+        : 'measured_demand'
+
+    const opportunities =
+      orderedBy === 'estimated_click_gain'
+        ? [...scored].sort((a, b) => b.estimatedClickGain - a.estimatedClickGain)
+        : [...scored].sort(
+            (a, b) => measuredDemandRank(b, minPosition, maxPosition) - measuredDemandRank(a, minPosition, maxPosition)
+          )
 
     return {
       ok: true,
@@ -287,6 +311,11 @@ export const readKeywordOpportunities = async (
       seoTargetId,
       windowDays,
       impressionsThreshold,
+      targetPosition: ctrVerdict.targetPosition,
+      expectedCtrAtTarget: ctrVerdict.expectedCtr,
+      ctrCurveSource: ctrVerdict.source,
+      curveSampleSize: ctrVerdict.sampleSize,
+      orderedBy,
       // TASK-1661: deja de estar cableado. `available` cuando hay al menos una captura de
       // mercado para las keywords de esta lectura; `unavailable` cuando no se ha consultado
       // nada todavía. El striking-distance NO depende de esto — se calcula con datos MEDIDOS
