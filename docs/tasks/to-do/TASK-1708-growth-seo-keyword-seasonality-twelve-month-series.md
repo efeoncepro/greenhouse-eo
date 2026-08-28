@@ -1,5 +1,18 @@
 # TASK-1708 — Estacionalidad: persistir la serie de 12 meses que ya viene en `keyword_info`
 
+## Delta 2026-08-28 (release a producción) — el contrato de referencia ya está desplegado
+
+El release `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208, run `33178544139`,
+manifest `released`, watchdog `ok` / `drift_count=0`) llevó a producción el contrato «persistir
+payload ya pagado» de `TASK-1699` que esta task imita: tabla `seo_serp_top_results` (migración
+aplicada, `pnpm pg:connect:status` → `No migrations to run!`) y el parser hermano cableado tras
+`GROWTH_SEO_SERP_TOP_RESULTS_ENABLED`, ON en la revisión activa del ops-worker
+`ops-worker-00610-kc8` y en Vercel Production.
+
+La frase «gated por el primer deploy del worker post-release» del Delta anterior queda **cerrada**:
+ese deploy ocurrió. Lo que sigue abierto en 1699 es la verificación del día 1 de la serie
+(2026-08-29), no su despliegue.
+
 ## Delta 2026-08-28
 
 - El bloqueante `TASK-1699` quedó **code complete, rollout pendiente** (`in-progress/`, en develop

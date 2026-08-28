@@ -1,5 +1,18 @@
 # TASK-1652 — AEO Grader: corrección del request AI Mode DataForSEO (location ISO-2 + gate per-task + citas anidadas)
 
+## Delta 2026-08-28 (release a producción) — el fix llegó a producción, todavía inerte
+
+El paso a producción `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208,
+release_id `c983be7f18e6-92b1b327-a1c9-4e7a-85dc-6a5e300f4e32`, run `33178544139`, manifest
+`released`, watchdog `ok` / `drift_count=0`) llevó a producción el `google-ai-overview-adapter.ts`
+con el mapa `market → location_code`, el gate per-task y el descenso de citas de esta task, ya
+rebasado sobre TASK-1696 (`family: 'serp'`, `consumer: 'aeo'`, `organizationId` server-side).
+
+**Nada cambia en el comportamiento observable todavía**, tal como declara el `## Rollout` de esta
+task: el AIO en producción sigue **OFF**, gated por `TASK-1341`. El fix llega inerte y se activa
+cuando ese rollout ocurra. Se registra acá sólo para que nadie lo busque en `main` y concluya que
+falta desplegarlo.
+
 ## Delta 2026-08-27
 
 - `google-ai-overview-adapter.ts` —el archivo que esta task corrigió— migró de

@@ -1,5 +1,24 @@
 # TASK-1780 — El inventario de tools MCP es un manifiesto, no dos listas
 
+## Delta 2026-08-28 (release a producción) — el espejo se volvió a editar a mano: de 21 a 27
+
+El deploy del gateway `mcp.efeonce.org` (revisión `efeonce-mcp-gateway-00024-8b8`), coordinado con
+el release `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208, run `33178544139`,
+manifest `released`), subió el inventario federado de **21 a 27 tools SEO** — entran
+`get_seo_provider_spend`, `get_seo_keyword_gap`, `declare_seo_competitors`,
+`retire_seo_competitors`, `get_seo_serp_top_results` y `get_seo_competitor_candidates`.
+
+**Por qué importa para esta task:** el espejo `GREENHOUSE_SEO_TOOL_INVENTORY` hubo que actualizarlo
+**a mano por segunda vez en dos semanas** (3 → 8 → 6 tools nuevas). Es la evidencia recurrente de la
+premisa: mientras el manifiesto canónico no exista, cada tool nueva paga un peaje manual en el repo
+del gateway, y el guard sólo puede comparar contra lo que alguien recordó copiar. El registry
+interno declara hoy **26 tools SEO** en `src/mcp/greenhouse/server.ts`; el gateway federa 27
+(incluye `get_seo_provider_spend`, que consume el lane ecosystem directo). Cualquier cifra de
+superficie que esta task cite debe releerse del código, nunca del cuerpo de una spec.
+
+La «Evidencia de cierre» del Slice 3 sigue debiendo usar el caso sintético del test de regresión
+—no un caso real—, como ya declaró el Delta 2026-08-27.
+
 ## Delta 2026-08-27 — TASK-1658 ejecutada: el caso vivo de las 3 tools ya no existe
 
 - `TASK-1658` federó las **8** tools que estaban ausentes (el drift había crecido de 3 a 8) y dejó el

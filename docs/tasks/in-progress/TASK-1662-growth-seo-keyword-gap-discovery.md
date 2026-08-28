@@ -1,5 +1,35 @@
 # TASK-1662 — Growth SEO: keyword gap — qué rankea la competencia y el cliente no
 
+## Delta 2026-08-28 (release a producción) — Slices 1–3 en runtime real; sigue abierta por el Slice 4
+
+El paso a producción `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208,
+release_id `c983be7f18e6-92b1b327-a1c9-4e7a-85dc-6a5e300f4e32`, run `33178544139`, manifest
+`released`, watchdog `ok` / `drift_count=0`) cerró el bloque «Post-release» del Delta anterior:
+
+- **Migración aplicada** — `20260828113457119` (ALTER de autoría de `seo_competitors` +
+  `seo_competitor_coverage_runs` + `seo_competitor_keyword_coverage`) está en la instancia única de
+  Cloud SQL: `pnpm pg:connect:status` → `No migrations to run!`.
+- **Endpoint del worker vivo** — el ops-worker desplegado ya trae
+  `/seo/competitor-coverage/capture-batch`; `GROWTH_SEO_COMPETITOR_GAP_ENABLED` está ON y presente
+  en la **revisión activa** `ops-worker-00610-kc8`.
+- **Scheduler despausado** — `ops-seo-competitor-coverage` quedó `ENABLED` (ya no da 404 upstream,
+  que era el motivo de la pausa).
+- **Federación del gateway ejecutada** — `mcp.efeonce.org` revisión
+  `efeonce-mcp-gateway-00024-8b8`: inventario **21 → 27 tools SEO**, entran `get_seo_keyword_gap`,
+  `declare_seo_competitors` y `retire_seo_competitors` (más las 3 de TASK-1696/1699). Canary de
+  cierre verde contra producción; cero cambios en Entra.
+
+**Por qué esta task NO pasa a `complete`:**
+
+- 🔴 **El Slice 4 (emisión a la cola de trabajo) sigue BLOQUEADO por `TASK-1700` (`to-do`)**, y el
+  bloqueo es de diseño: el materializer de la cola es quien consume `readKeywordGap` y activa el
+  origen `competitor_gap`. Ese aggregate no existe todavía, así que no hay dónde emitir.
+- Queda además medir el **costo del segundo ciclo** de cobertura (ahora que el scheduler corre solo)
+  antes de declarar competidores adicionales — el techo `GROWTH_SEO_COMPETITORS_PER_TARGET` protege
+  el gasto, pero la decisión de subir el número es del operador.
+
+Estado honesto: **`Slices 1–3 operativos en producción; Slice 4 bloqueado por TASK-1700`**.
+
 ## Delta 2026-08-28 (2) — TASK-1699 implementada: el competidor ya se DESCUBRE, no se pide
 
 `readSerpCompetitorCandidates` (`src/lib/growth/seo/competitor-discovery.ts`) existe: propone

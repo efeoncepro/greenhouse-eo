@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.12
+> **Version:** 1.13
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-14 por Claude (TASK-1661 + follow-ups: las columnas de mercado se llenan solas, la captura es mensual y acotada con simulacro de costo previo, "Dificultad" pasa a ser **Barrera de enlaces** en niveles con "Sin dato" como estado propio, todo dato de mercado viaja con su fecha, y cada respuesta declara el país que muestra — incluida la corrección del caso Berel (ISSUE-152/153); delta previo 2026-08-09 TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee)
+> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1699 + TASK-1662 + TASK-1696 vivos en producción con el release `c983be7f18e6`: el módulo ya guarda quién más aparece en tu SERP, compara contra un competidor declarado y anota quién consumió cada dólar del proveedor; delta previo 2026-08-14 por Claude (TASK-1661 + follow-ups: las columnas de mercado se llenan solas, la captura es mensual y acotada con simulacro de costo previo, "Dificultad" pasa a ser **Barrera de enlaces** en niveles con "Sin dato" como estado propio, todo dato de mercado viaja con su fecha, y cada respuesta declara el país que muestra — incluida la corrección del caso Berel (ISSUE-152/153); delta previo 2026-08-09 TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee))
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -268,9 +268,50 @@ Operación: [Operar el perfil de enlaces SEO](../../manual-de-uso/growth/operar-
 
 > Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md §4.2](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) (tablas hijas del snapshot + condición de disparo).
 
+## Quien mas aparece en tu SERP, y en que te gana (TASK-1699 + TASK-1662)
+
+Hasta ahora el módulo respondía "en qué posición estás". Desde el 2026-08-28 responde también
+**quién más está ahí** y **qué búsquedas gana un competidor donde tú no apareces**. Son dos piezas
+distintas, con una regla común: la máquina **propone**, la persona **declara**.
+
+**El contexto del SERP, gratis.** Cada mañana, al medir tus rankings, el sistema ya compraba la
+página completa de resultados y se quedaba sólo con tu línea. Ahora guarda las 20 posiciones de esa
+misma respuesta: **sin una sola llamada nueva y sin un peso extra de costo**. Con esa serie el
+sistema puede decir "este dominio apareció en 7 de tus keywords, 12 días de los últimos 30" y
+sugerirlo como posible competidor — pero **nunca lo declara solo**: un competidor es una decisión
+con nombre y fecha, tomada por una persona.
+
+> ⚠️ Esta serie **no se puede recuperar hacia atrás**. El resultado de búsqueda de ayer no se vuelve
+> a comprar. Cada día con la captura apagada es un día que no existe nunca más. El primer día de la
+> serie es el **2026-08-29**: antes de esa fecha las pantallas y lecturas responden correctamente
+> "sin datos todavía", que es distinto de "apagado".
+
+**El gap contra un competidor declarado.** Una vez al mes, para cada competidor que alguien declaró
+a mano, el sistema pregunta dos cosas: qué búsquedas gana ese competidor donde tu marca **no
+aparece** (eso es contenido que falta) y en cuáles aparecen los dos pero él está mejor (eso es
+optimización). El resultado se **calcula al momento de leerlo**, nunca se congela, y **descarta
+toda búsqueda donde ya tienes tráfico medido en Search Console**: si el dato medido existe, gana
+sobre la estimación.
+
+Primera corrida real (Grupo Berel México contra un competidor declarado): costó **USD 0,11** y
+devolvió **357 búsquedas de contenido faltante**, 54 donde el competidor rankea mejor y 269
+descartadas por tener tráfico medido propio.
+
+**Quién consumió cada dólar.** El registro de gasto del proveedor pasó a anotar, en cada fila, si el
+dólar lo gastó el motor SEO o el motor de IA, y si la cifra es una factura o una estimación. Es un
+único registro (una factura de proveedor es una sola); lo que se separó es **el presupuesto de cada
+motor**, para que el consumo de uno no bloquee al otro por sorpresa.
+
+**Estado (2026-08-28):** las tres capacidades están **vivas en producción**. La comparación
+competitiva es información interna de Efeonce y **no se muestra al cliente**. El tope de gasto en
+dólares del motor de IA quedó **en observación, sin bloquear**: mide y avisa, pero todavía no corta
+— prenderlo es una decisión del operador después de un mes de medición.
+
+> Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) (Delta 2026-08-28 + §4.2 + §8).
+
 ## Que NO existe todavia
 
-Lo siguiente aún no está construido (las series que ya se llenan: Search Console live; rankings live desde el 2026-08-06). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP live en producción desde el 2026-08-06** (TASK-1645, que partió con 3 tools read-only): hoy el MCP interno de Greenhouse sirve **22 tools SEO (17 lecturas + 5 escrituras)** — inventario vigente y estado de despliegue en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8 — **todas federadas al gateway público `mcp.efeonce.org`** (TASK-1647 abrió la federación; TASK-1658 la completó con guard de paridad bidireccional, dejándola en 21; TASK-1696 sumó `get_seo_provider_spend` como lectura 17). La revisión productiva del gateway sirve **21**: la tool 22 espera el deploy posterior al release develop→main que lleve su lane a producción. La lectura funcional completa de esa capacidad está en [Search Visibility 360 por MCP](search-visibility-360-por-mcp.md). Pendiente:
+Lo siguiente aún no está construido (las series que ya se llenan: Search Console live; rankings live desde el 2026-08-06). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP live en producción desde el 2026-08-06** (TASK-1645, que partió con 3 tools read-only): hoy el MCP interno de Greenhouse sirve **27 tools SEO (20 lecturas + 7 escrituras)** as-of 2026-08-28 (TASK-1647 abrió la federación al gateway público `mcp.efeonce.org`; TASK-1658 la completó con guard de paridad bidireccional; TASK-1696 sumó `get_seo_provider_spend`; TASK-1662 sumó `declare_seo_competitors` / `retire_seo_competitors` + `get_seo_keyword_gap`; TASK-1699 sumó `get_seo_serp_top_results` + `get_seo_competitor_candidates`). Sus lanes están en producción desde el release `c983be7f18e6` (2026-08-28). ⚠️ **El inventario interno y lo que sirve la revisión desplegada del gateway son dos números distintos**: el estado de despliegue vigente vive en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8, no acá. La lectura funcional completa de esa capacidad está en [Search Visibility 360 por MCP](search-visibility-360-por-mcp.md). Pendiente:
 
 | Falta | Task que lo trae |
 |---|---|

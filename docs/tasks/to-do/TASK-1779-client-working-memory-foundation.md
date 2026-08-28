@@ -1,5 +1,16 @@
 # TASK-1779 — Memoria de trabajo del cliente (fundación transversal)
 
+## Delta 2026-08-28 (release a producción) — `seo_competitors` y el top-N ya viven en producción
+
+El release `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208, run `33178544139`,
+manifest `released`, watchdog `ok` / `drift_count=0`) aplicó en la instancia única de Cloud SQL las
+migraciones de `TASK-1662` (autoría de `seo_competitors`) y `TASK-1699` (`seo_serp_top_results`), y
+desplegó sus lanes: `pnpm pg:connect:status` → `No migrations to run!`.
+
+Para esta task sólo refuerza el invariante que ya declara: **la fila canónica de competidor existe,
+tiene autoría y corre en producción**. Las notas de working memory cuelgan de esa fila; esta task
+sigue sin crear, alterar ni escribir `greenhouse_growth.seo_competitors`.
+
 ## Delta 2026-08-28
 
 - `TASK-1699` quedó **code complete, rollout pendiente** (`in-progress/`, en develop `fdfdedbe5`) y

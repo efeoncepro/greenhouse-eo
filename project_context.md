@@ -264,10 +264,11 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   `ops-worker` **se lee del array `WORKER_RUNTIME_PATHS` de `.github/workflows/ops-worker-deploy.yml`,
   nunca se transcribe** — la copia que arrastraban los docs tenía 7 entradas y omitía
   `src/lib/reliability`, `src/lib/hiring/talent-pool` y `src/lib/sync`, devolviendo «vacío» sin haber
-  mirado; (2) en el merge canónico `main → develop`, con `main ⊆ develop` el default es **`-s ours`**,
-  no `-X ours`: éste último sólo decide los hunks en conflicto y puede **duplicar contenido documental
-  en silencio**, algo que las dos verificaciones duras no ven porque miran sólo rutas de código. La
-  auditoría correcta de un `-X ours` es `git diff HEAD@{1} HEAD --name-status` completo.
+  mirado; (2) merge canónico `main → develop`: **`-s ours`** por default; `-X ours` es excepción
+  (duplica bitácora, resucita tasks y hasta código en silencio; auditoría `--name-status` COMPLETO).
+  **Delta 2026-08-28 (`c983be7f18e6`): la estrategia se decide CLASIFICANDO lo que `main` tiene de
+  más, no contándolo** — con squash-merge `git log origin/main --not HEAD` nunca viene vacío. Árbol
+  de decisión completo en el runbook §2.4 Paso A.
 - **Live tests (`*.live.test.ts`): `pnpm test:live`, nunca `source .env.local`.** Escriben sobre la ÚNICA
   instancia Cloud SQL de dev/staging/prod, así que corren serializados (proyecto `live` en `vitest.config.ts`)
   y su sujeto se deriva por `scope`, no de un pool compartido. Canon:

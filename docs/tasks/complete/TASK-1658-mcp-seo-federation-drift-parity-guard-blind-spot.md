@@ -1,5 +1,27 @@
 # TASK-1658 — Drift de federación MCP del módulo SEO + punto ciego del guard de paridad
 
+## Delta 2026-08-28 (release a producción) — el rollout de 3 pasos quedó ejecutado
+
+Los tres pasos del bloque «Rollout pendiente (bloqueado en secuencia, no en código)» se ejecutaron:
+
+1. **Release develop→main** `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208, release_id
+   `c983be7f18e6-92b1b327-a1c9-4e7a-85dc-6a5e300f4e32`, run `33178544139`, manifest `released`,
+   watchdog `ok` / `drift_count=0`) llevó los lanes ecosystem a producción — el orden de la lección
+   TASK-1661 se respetó: Greenhouse primero, gateway después.
+2. **Deploy del gateway** `efeonce-mcp` → Cloud Run: revisión `efeonce-mcp-gateway-00024-8b8`.
+3. **Verificación de producción**: canary de cierre verde completo contra producción, sin cambios en
+   Entra.
+
+**Ajuste de la cifra de cierre:** la Zone 3 de esta task esperaba `tools/list` subiendo exactamente
+en 8 (13→21). El deploy real cerró en **27**, porque en la misma ventana entraron las 6 tools de
+`TASK-1696`/`TASK-1662`/`TASK-1699` (`get_seo_provider_spend`, `get_seo_keyword_gap`,
+`declare_seo_competitors`, `retire_seo_competitors`, `get_seo_serp_top_results`,
+`get_seo_competitor_candidates`). El 13→21 de esta task se cumplió; el salto a 27 es trabajo vecino
+federado en el mismo deploy, no drift.
+
+**El residual sigue vigente:** el espejo `GREENHOUSE_SEO_TOOL_INVENTORY` se actualizó otra vez a
+mano para llegar a 27 — exactamente el costo recurrente que `TASK-1780` existe para eliminar.
+
 ## Delta 2026-08-27 — implementación ejecutada; code complete, rollout pendiente
 
 **El drift había crecido de 3 a 8 mientras la task esperaba en to-do** — la mejor evidencia de su

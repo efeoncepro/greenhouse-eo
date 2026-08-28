@@ -25,6 +25,16 @@
   `declare_seo_competitors`, `retire_seo_competitors`, `get_seo_serp_top_results` y
   `get_seo_competitor_candidates`, sin un solo cambio en Entra — los writes viajan en el scope
   `efeonce.mcp.seo.write` existente y siguen fail-closed hasta TASK-1631.
+- **Corregida la regla del merge canónico en los 5 lugares que la prescribían** (runbook, playbook,
+  las dos skills espejadas de release y el manual del orchestrator, que contradecía al resto). Ya no
+  cuenta V1: la clasifica. Sólo squashes de release ⇒ `-s ours`; un hotfix cuyo contenido no volvió a
+  `develop` ⇒ parar y reconciliarlo. Cuarta verificación nueva (`--diff-filter=A`) y `-X ours`
+  degradado a excepción con auditoría completa obligatoria.
+- Barrido documental post-release: gateway MCP a 27 tools en skills/runbook/manuales, estado de flags
+  por runtime en arquitectura del módulo SEO + rules + skills `dataforseo-operator` + EPIC-022, y
+  deltas 2026-08-28 en 15 tasks con impacto cruzado. `TASK-1699` y `TASK-1662` quedan a propósito en
+  `in-progress`: la serie del top-N no arranca hasta el 2026-08-29 y el Slice 4 de 1662 sigue
+  bloqueado por `TASK-1700`.
 - Hallazgo de proceso: la regla del merge canónico del runbook (`-s ours` sólo si V1 está vacía)
   está mal formulada para un flujo con squash-merge, donde V1 nunca está vacía. `-X ours` volvió a
   duplicar contenido documental y a resucitar tasks en un lifecycle viejo **con la V2 vacía**; la

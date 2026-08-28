@@ -1,5 +1,46 @@
 # TASK-1699 — Growth SEO: persistir el top-N del SERP que ya se paga
 
+## Delta 2026-08-28 (release a producción) — el rollout dejó de estar bloqueado; queda la verificación del día 1
+
+El paso a producción `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208,
+release_id `c983be7f18e6-92b1b327-a1c9-4e7a-85dc-6a5e300f4e32`, run `33178544139`, manifest
+`released`, watchdog `ok` / `drift_count=0`) llevó este código al runtime real.
+
+**Cerrado por el release (pasos de la `### Production verification sequence`):**
+
+- **Paso 1** — la migración `20260828124352232` está aplicada en la instancia única de Cloud SQL:
+  `pnpm pg:connect:status` → `No migrations to run!`.
+- **Pasos 2–4** — el ops-worker desplegado ya trae el código y el flag:
+  `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` está ON y presente en la **revisión activa**
+  `ops-worker-00610-kc8` (runtime de escritura).
+- **Paso 3** — el sanity `_sanity-serp-top-results.ts` ya se había corrido 9/9 contra PG real
+  (Delta anterior); el release no lo invalida.
+- **Paso 7** — el flag quedó ON también en **Vercel Production** (runtime de lectura), aplicado con
+  este release + redeploy `greenhouse-aj0ng1mfw`. Verificado con el canary de producción:
+  `serp-top-results` respondió `ok:true` (**no** `disabled`) con `rows:[]` — vacío esperado, porque
+  la serie todavía no tiene su primer día.
+- **Federación** — el gateway `mcp.efeonce.org` se desplegó (revisión
+  `efeonce-mcp-gateway-00024-8b8`): el inventario pasó de **21 a 27 tools SEO** y entraron
+  `get_seo_serp_top_results` y `get_seo_competitor_candidates` (junto con las 4 de TASK-1662/1696).
+  Canary de cierre verde contra producción, cero cambios en Entra.
+
+**Por qué esta task NO pasa a `complete`:**
+
+- **Paso 5 (🔴 el criterio duro de esta task) sigue abierto.** El **día 1 de la serie es el
+  2026-08-29**, tras la corrida del cron `ops-seo-rank-capture` de las 05:00 CLT. Recién ahí se
+  puede verificar (a) ~20 filas por keyword, (b) exactamente una fila `is_own_domain = true` con
+  `rank_group` coincidiendo con `seo_rank_snapshots.position`, y (c) que el `provider_cost` del día
+  es **idéntico** al baseline — la prueba de que el costo marginal es cero. La serie **no es
+  backfilleable**.
+- **Paso 6** — el no-op de la re-corrida del mismo día sólo se puede ejercitar con datos del día 1.
+- **Paso 8** — `seo.serp_top_results.coverage` no puede evaluarse en verde antes de la primera
+  escritura; hoy reporta el estado pre-rollout honesto.
+- **Paso 9** — a **≥5 días** (≈2026-09-02) hay que correr `readSerpCompetitorCandidates` sobre el
+  target de Berel y **revisar los candidatos con el operador** antes de declarar competidores. Es
+  una decisión de negocio que compromete gasto futuro, no un botón técnico.
+
+Estado honesto: **`code complete, rollout desplegado, verificación del día 1 pendiente`**.
+
 ## Delta 2026-08-28 — Slices 1–5 implementados; estado `code complete, rollout pendiente`
 
 **Recalibraciones declaradas antes de ejecutar** (la spec era pre-1662/1696):

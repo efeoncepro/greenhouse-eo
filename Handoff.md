@@ -46,6 +46,33 @@ vacía?» sino **«¿aporta `main` contenido propio?»**, que se responde con
 `git diff --diff-filter=A --name-only origin/develop origin/main` (vacío ⇒ `-s ours` es seguro y
 pierde nada). Candidato a corregir en el runbook, el playbook y las dos skills espejadas.
 
+**Corrección aplicada al control plane (misma sesión).** La regla del merge canónico quedó
+reescrita en los 5 lugares que la prescribían: `docs/operations/runbooks/production-release.md`
+(§2.4 Paso A + gotchas #1/#5), `docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md`,
+las dos skills espejadas `{.claude,.codex}/skills/greenhouse-production-release/SKILL.md` y
+`docs/manual-de-uso/plataforma/release-orchestrator.md` (que seguía prescribiendo `-X ours` como
+resolución y contradecía al resto). La regla ya no cuenta V1: la **clasifica** — sólo squashes de
+release ⇒ `-s ours`; un hotfix cuyo contenido no volvió a `develop` ⇒ PARAR y reconciliarlo por su
+camino canónico. Se agregó una cuarta verificación (`git diff --diff-filter=A --name-only
+origin/develop origin/main`, archivos que existen sólo en `main`) y `-X ours` quedó degradado a
+excepción con auditoría `--name-status` completa obligatoria. Los conflictos `modify/delete`
+(TASK-1590) y `rename/rename` (TASK-1658, hoy) quedaron reencuadrados: sólo existen en el camino
+excepcional, porque `-s ours` no produce conflictos.
+
+**Follow-up recomendado, NO ejecutado:** el arreglo durable de esto no es prosa sino un gate —
+un `pnpm release:merge-canonical` que clasifique V1 contra `release_manifests`, elija la estrategia
+y se **niegue** ante un commit que no reconozca. Tres releases seguidos (2026-08-06, 08-23, 08-28)
+pisaron la misma clase de bug con la mitigación ya documentada. Queda como TASK por registrar.
+
+**Barrido documental post-release (4 subagentes, particiones disjuntas).** Gateway MCP a 27 tools en
+skills/runbook/manuales/doc funcional; estado de flags por runtime en la arquitectura del módulo
+SEO, `.claude/rules/growth-seo.md`, skills `dataforseo-operator` y EPIC-022; deltas 2026-08-28 en
+15 tasks con barrido de impacto cruzado. **`TASK-1699` y `TASK-1662` se dejaron deliberadamente en
+`in-progress`**: la primera porque el día 1 de la serie es el 2026-08-29 y su verificación no ha
+ocurrido; la segunda porque su Slice 4 sigue bloqueado por `TASK-1700`. `pnpm task:lint --changed`
+y `pnpm ops:lint --changed` con `errors=0` (los 13 warnings de epic-child-parity son preexistentes
+de otros épicos; EPIC-022 no aparece).
+
 **Coordinación:** el freeze de `develop` se acordó por mensaje con las 2 sesiones locales activas
 (`greenhouse-eo-87`, dueña de TASK-1662/1699, y `greenhouse-eo-92`), que confirmaron qué flags
 prender y cuáles no. Ambas terminaron antes del cierre, así que **el aviso de levantar el freeze

@@ -1,5 +1,27 @@
 # TASK-1700 — Growth SEO: la cola priorizada de trabajo es un aggregate persistido con score versionado
 
+## Delta 2026-08-28 (release a producción) — la cadena de productores del origen `competitor_gap` ya corre en runtime
+
+El release `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208, release_id
+`c983be7f18e6-92b1b327-a1c9-4e7a-85dc-6a5e300f4e32`, run `33178544139`, manifest `released`,
+watchdog `ok` / `drift_count=0`) invalida el supuesto de los dos Deltas anteriores de que la cadena
+está «en código pero no desplegada»:
+
+- Migraciones de `TASK-1662` y `TASK-1699` aplicadas en la instancia única de Cloud SQL
+  (`pnpm pg:connect:status` → `No migrations to run!`).
+- `GROWTH_SEO_COMPETITOR_GAP_ENABLED` y `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` ON en la revisión
+  activa del ops-worker `ops-worker-00610-kc8`; el segundo también en Vercel Production (lectura),
+  verificado con canary (`serp-top-results` → `ok:true`).
+- Scheduler `ops-seo-competitor-coverage` `ENABLED`.
+- `get_seo_keyword_gap`, `get_seo_serp_top_results` y `get_seo_competitor_candidates` federadas en
+  `mcp.efeonce.org` (revisión `efeonce-mcp-gateway-00024-8b8`, inventario 21 → 27 tools SEO).
+
+**Consecuencia para esta task:** el origen `competitor_gap` ya no nace desactivado «porque no hay
+productor desplegado» — el productor existe y corre. Sigue en pie, en cambio, la **maduración de la
+serie**: el día 1 del top-N es el **2026-08-29** (cron 05:00 CLT) y `readSerpCompetitorCandidates`
+necesita **≥5 días** de captura antes de proponer candidatos. El `Blocked by` no cambia:
+`TASK-1694` sigue siendo el bloqueo DURO.
+
 ## Delta 2026-08-28 — el origen `competitor_gap` ya tiene contrato de productor (TASK-1662)
 
 `readKeywordGap` (`src/lib/growth/seo/keyword-gap-reader.ts`) existe y entrega exactamente lo

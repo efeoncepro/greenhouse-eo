@@ -1,5 +1,16 @@
 # TASK-1661 — Growth SEO: capability de datos de mercado por keyword (volumen + dificultad)
 
+## Delta 2026-08-28 (release a producción) — la exposición en producción ya ocurrió
+
+El `Status real` de esta task declaraba «exposición en producción pendiente del próximo release».
+Ese release ocurrió: `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208, release_id
+`c983be7f18e6-92b1b327-a1c9-4e7a-85dc-6a5e300f4e32`, run `33178544139`, manifest `released`,
+watchdog `ok` / `drift_count=0`), seguido del deploy del gateway `mcp.efeonce.org` (revisión
+`efeonce-mcp-gateway-00024-8b8`), en ese orden — la lección de secuencia que dejó esta misma task.
+Canary de cierre verde contra producción.
+
+`Status real` actualizado en consecuencia.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -19,7 +30,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Complete (staging+worker); exposicion en produccion pendiente del proximo release`
+- Status real: `Complete y expuesto en produccion (release c983be7f, 2026-08-28)`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`

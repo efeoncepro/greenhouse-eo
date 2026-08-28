@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso / runbook
 > **Version:** 1.4
 > **Creado:** 2026-08-06 por Claude (TASK-1647)
-> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1662+1699: allowlist a 27 tools — 20 lectura + 7 escritura; producción sirve 21 hasta el deploy post-release)
+> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1662+1699 desplegadas: 27 tools — 20 lectura + 7 escritura — federadas Y sirviendo en producción; revisión `efeonce-mcp-gateway-00024-8b8`)
 > **Endpoint canonico:** `https://mcp.efeonce.org/mcp`
 > **Documentacion funcional:** [Search Visibility 360 por MCP](../../documentation/growth/search-visibility-360-por-mcp.md)
 > **Runbook tecnico:** [Efeonce MCP Platform Runbook](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Greenhouse-SEO
@@ -39,28 +39,42 @@ reemplace por el manifiesto canónico de Greenhouse):
 | `get_seo_backlink_detail` | Detalle nominal del perfil de enlaces, tres estados honestos (TASK-1777; federada por TASK-1658) |
 | `get_seo_prospect_diagnostic` | Diagnóstico de prospecto ya corrido, todo ◑ con fecha (TASK-1709; federada por TASK-1658) |
 | `get_seo_provider_spend` | Gasto DataForSEO del mes por organización, cortado por **consumidor** (`seo` / `aeo`) y por **base de costo** (`invoiced` / `estimated`, declarando versión de la tabla de precios) — nunca un total único. 🔴 **solo bindings `internal`**: es lo que nos cuesta servir al cliente, no lo que el cliente consumió (TASK-1696) |
+| `get_seo_keyword_gap` | Gap competitivo **derivado a la lectura** (`content_gap` / `ranks_worse`, `declaredTargets` aparte, exclusión por GSC medido, factores con `sin_dato` honesto). No ordena: el orden lo manda la cola de TASK-1700. 🔴 **solo bindings `internal` SIN organización**: la comparación competitiva jamás se expone al cliente (TASK-1662) |
+| `get_seo_serp_top_results` | Serie fechada del top-N del SERP que la captura diaria de rank **ya paga** (costo marginal cero). ⚠️ **La serie NO es backfilleable**: el SERP de ayer no se puede recomprar, así que la ausencia de fechas viejas es estructural, nunca un bug a arreglar. 🔴 **solo bindings `internal` SIN organización** (TASK-1699) |
+| `get_seo_competitor_candidates` | La mitad **PROPONE** del loop de competidores: candidatos por recurrencia **medida** (umbrales versionados 3kw/5días/30d) con evidencia y un `proposalRef` sugerido. El EXECUTE es `declare_seo_competitors`, y sólo tras confirmación humana llevando ese `proposalRef` textual — un agente jamás declara directo desde los candidatos. Lista vacía con serie joven (<5 días) es el resultado esperado, no un error. 🔴 **solo bindings `internal` SIN organización** (TASK-1699) |
 | `track_seo_keywords` ✍️ | **Escribe**: mete keywords al ciclo diario y compromete gasto recurrente |
 | `untrack_seo_keywords` ✍️ | **Escribe**: el reverso, cierra la ventana sin borrar historia |
 | `discover_seo_keywords` ✍️ | **Escribe y GASTA por corrida** (Labs Live factura por llamada y por fila); preview + confirmación humana antes de encolar; async (TASK-1664) |
 | `prepare_seo_grounded_queries` ✍️ | **Escribe** un DRAFT AEO (no gasta proveedor, jamás aprueba/activa); con la identidad máquina compartida responde `aeo_forbidden` fail-closed hasta TASK-1631 (TASK-1666) |
 | `run_seo_prospect_diagnostic` ✍️ | **Escribe y GASTA por corrida**: diagnóstico único sobre un prospecto, con confirmación humana previa; flag `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` OFF = estado legítimo (TASK-1709; federada por TASK-1658) |
+| `declare_seo_competitors` ✍️ | **Escribe y COMPROMETE GASTO DIFERIDO**: la cobertura mensual factura ~USD 0,11 por competidor cada ciclo hasta que alguien lo retire. Techo gobernado por target (default 5), resultados **por dominio** (`declared`/`already_declared`/`capacity_exceeded`/`invalid`), autoría humana obligatoria + `proposalRef` opaco (TASK-1662) |
+| `retire_seo_competitors` ✍️ | **Escribe**: el reverso append-only — cierra `effective_to` con su propia autoría de retiro y corta el gasto del ciclo siguiente. Nunca borra (TASK-1662) |
 
-⚠️ **Estado de despliegue (2026-08-28).** No confundir el **allowlist federado** (27, tras TASK-1662/1699) con lo que la
-**revisión productiva del gateway** sirve (21):
+✅ **Estado de despliegue (2026-08-28): allowlist federado = desplegado, 27 tools.** El rollout que
+estos docs listaban como pendiente **ya se ejecutó**; no queda ninguna tool esperando deploy.
 
-- El rollout de TASK-1658 **ya se ejecutó**: la revisión `efeonce-mcp-gateway-00023-zt2`
-  (2026-08-27) llevó `tools/list` de 13 a 21. Los 4 commits de TASK-1658 están pusheados a `main`.
-- Falta la tool 22, `get_seo_provider_spend` (commit `1a51461` en `main`, CI verde). El deploy del
-  gateway es `workflow_dispatch` **manual** y no se disparó con el push; además su lane
-  `/api/platform/ecosystem/growth/seo/provider-spend` está en `develop`, **no en `main`** de
-  Greenhouse.
-- Por lo tanto el deploy va **DESPUÉS** del release develop→main. Dispararlo antes deja la tool
-  respondiendo **404 upstream** (precedente literal de TASK-1661).
+- `origin/main` de `efeonce-mcp` pasó de `8f1ae34` a `92e7197` (los dos commits que estaban locales:
+  `8215ab5` de TASK-1662 y `92e7197` de TASK-1699), CI verde. Workflow "Deploy Cloud Run" run
+  `33180234265` en `success`, sin compuerta de aprobación.
+- **Revisión activa: `efeonce-mcp-gateway-00024-8b8`** (`Ready=True`, 100% del tráfico, imagen
+  taggeada al SHA exacto `92e71971899c6468fc111f7614b89ea6602ac0aa`). Reemplaza a
+  `efeonce-mcp-gateway-00023-zt2`, que servía 21. La diferencia son exactamente 6 tools:
+  `get_seo_provider_spend`, `get_seo_keyword_gap`, `declare_seo_competitors`,
+  `retire_seo_competitors`, `get_seo_serp_top_results`, `get_seo_competitor_candidates`.
+- Front door verificado en vivo: `GET /.well-known/oauth-protected-resource` → 200; `POST /mcp` sin
+  token → 401 (fail-closed).
+- Canary de cierre verde completo contra **producción** (`scripts/greenhouse-seo-canary.mjs` con
+  `GREENHOUSE_ECOSYSTEM_API_URL=https://greenhouse.efeoncepro.com`, org Berel
+  `org-32333527-02a8-487b-819e-6f76a761777d`): las 20 lecturas ✓, todos los denies `404` anti-oracle ✓,
+  las 7 escrituras ejercitadas en su puerta sin escribir ni gastar ✓.
+- Los 4 lanes internal-only nuevos respondieron ok contra producción: `serp-top-results` con
+  `rows: []` (array vacío **esperado** — el día 1 de la serie es 2026-08-29), `competitor-candidates`
+  con `candidates: []` (esperado con serie joven <5 días), `keyword-gap` con 1 competidor declarado,
+  `provider-spend` ✓.
+- **CERO cambios en Entra.** Las dos escrituras nuevas viajan en el scope `efeonce.mcp.seo.write` que
+  ya existía, así que siguen live-but-fail-closed hasta TASK-1631 igual que las demás.
 
-Verificación post-deploy: `tools/list` sube exactamente 21→22 + canary completo. Si un cliente
-externo no ve `get_seo_provider_spend` antes de eso, es el estado esperado, no una falla.
-
-⚠️ **Las cinco de escritura no comparten el scope de lectura.** Viven en `efeonce.mcp.seo.write`
+⚠️ **Las siete de escritura no comparten el scope de lectura.** Viven en `efeonce.mcp.seo.write`
 (la lista se DERIVA del inventario — `GREENHOUSE_SEO_WRITE_TOOLS` — y el gate HTTP de scopes en
 `src/app.ts` la consume; ya no hay lista a mano) porque comprometen gasto del proveedor, y el lane
 las acepta solo desde bindings de scope `internal`. Un `403 insufficient_scope` sobre ellas con el
@@ -256,10 +270,12 @@ Tres niveles, de menor a mayor alcance. Elige el mínimo que resuelva el problem
 **1. Apagar solo el provider SEO del gateway.** El resto del gateway (Globe, OAuth, front door) sigue operando.
 
 - Pon `GREENHOUSE_SEO_PROVIDER_ENABLED=false` en las variables del repo `efeonce-mcp` y redespliega por el
-  workflow. Todas las tools SEO federadas (21 en el allowlist; 13 en la revisión productiva actual)
-  pasan a `503 greenhouse_seo_policy_blocked`.
-- Alternativa inmediata: mover 100% del tráfico a la revisión previa verificada del gateway.
-  **[verificar]** la revisión previa exacta no quedó registrada en esta sesión; obtenla con
+  workflow. Todas las tools SEO federadas (27 en el allowlist, las mismas 27 en la revisión productiva
+  `efeonce-mcp-gateway-00024-8b8`) pasan a `503 greenhouse_seo_policy_blocked`.
+- Alternativa inmediata: mover 100% del tráfico a la revisión previa verificada del gateway. Al
+  2026-08-28 la activa es `efeonce-mcp-gateway-00024-8b8` y la previa verificada es
+  `efeonce-mcp-gateway-00023-zt2` (servía 21 tools, sin las 6 de TASK-1696/1662/1699). Confirma
+  siempre contra el runtime antes de mover tráfico:
   `gcloud run revisions list --service=efeonce-mcp-gateway --region=southamerica-west1 --project=efeonce-group`.
 
 **2. Apagar el módulo SEO completo en Greenhouse.** `GROWTH_SEO_ENABLED=false`. Ojo: es **multi-runtime**.
