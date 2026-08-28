@@ -1550,13 +1550,21 @@ echo "  -> ops-seo-competitor-coverage: 0 9 18 * * PAUSADO (cobertura de competi
 # 2026-08-14 tras el smoke live verificado + autorización del operador. El drain con cola
 # vacía es no-op (cero llamadas, cero costo): el gasto sólo ocurre cuando alguien encola una
 # corrida, que ya pasó preview + gate de entitlement.
+#
+# Cadencia */2 (bajada de */10 el 2026-08-28, autorización del operador): `Descubrir` es un
+# workbench INTERACTIVO — el operador encola y espera mirando "En cola". Con */10 la espera media
+# era 5 min y el peor caso 10, cuando la corrida en sí tarda segundos (1 llamada al proveedor). El
+# */10 no compraba nada: el drain con cola vacía es no-op, así que correrlo 5× más seguido no gasta
+# ni un centavo más — es el mismo razonamiento por el que `ops-outbox-publish` ya usa */2.
+# Seguro a esta cadencia porque el claim es un UPDATE condicional (`WHERE status='pending'`
+# ... RETURNING): un segundo worker matchea cero filas y responde `busy` sin tocar al proveedor.
 upsert_scheduler_job \
   "ops-seo-keyword-discovery-drain" \
-  "*/10 * * * *" \
+  "*/2 * * * *" \
   "/seo/keyword-discovery/drain" \
   '{}' \
   "false"
-echo "  -> ops-seo-keyword-discovery-drain: */10 * * * * ACTIVO (keyword discovery, TASK-1664 — despausado 2026-08-14 tras smoke live + autorización del operador)"
+echo "  -> ops-seo-keyword-discovery-drain: */2 * * * * ACTIVO (keyword discovery, TASK-1664 — despausado 2026-08-14; cadencia bajada de */10 a */2 el 2026-08-28)"
 
 # Email deliverability monitor — TASK-775 Slice 2.
 #

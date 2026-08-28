@@ -58,6 +58,20 @@
   Bets y otros orígenes, con una fila sólo después de verificar el Deal en HubSpot. Las licitaciones promovidas se
   sincronizan en ambos registros por `deal_id`; las oportunidades todavía en radar permanecen sólo en bid desk.
 
+## 2026-08-28 — El drain de keyword discovery baja de 10 a 2 minutos
+
+- `ops-seo-keyword-discovery-drain` pasa de `*/10` a `*/2`. `Descubrir` es un workbench
+  interactivo: el operador encolaba y esperaba **5 minutos de media, 10 en el peor caso**, cuando la
+  corrida en sí tarda segundos. El `*/10` no compraba nada — el drain con cola vacía es no-op, así
+  que correrlo 5× más seguido **no gasta un centavo más**. Es la cadencia que `ops-outbox-publish`
+  ya usaba por el mismo motivo.
+- Seguro a esta cadencia: el claim de la corrida es un `UPDATE` condicional
+  (`WHERE status='pending' … RETURNING`), así que un segundo worker matchea cero filas y responde
+  `busy` sin tocar al proveedor.
+- Aplicado en los dos lugares (SoT `services/ops-worker/deploy.sh` + `gcloud scheduler jobs update`).
+  ⚠️ `main` todavía declara `*/10`: hasta el próximo release, un deploy del worker desde `main`
+  revertiría el schedule en silencio. Documentado en el Handoff.
+
 ## 2026-08-28 — Release a producción `e82c18579b05`: el contrato de discovery corregido, vivo
 
 - Paso a producción de **TASK-1694** y **TASK-1692** (PR #209, 30 archivos de código, **cero
@@ -799,17 +813,3 @@
   declarada, no ausencia en producción.
 - **Cinco punteros quedaron rotos** al mover TASK-1739 a `complete/`, uno de ellos dentro de una señal
   de reliability que corre en producción. Corregidos.
-
-## 2026-08-19 — On-Going y On-Demand ya comparten una ontología sin confundir engagement con proyecto
-
-- Se formalizó `Organization → Engagement → Project/Campaign → Task`: la organización y su Space conservan la
-  relación y memoria; el engagement gobierna contrato, capacidad, economics y cierre; proyectos/campañas siguen
-  siendo contenedores de tareas para ejecutar trabajo del cliente.
-- Un engagement On-Going puede producir múltiples proyectos/campañas y uno On-Demand puede contener uno o varios;
-  On-Demand describe un compromiso acotado, no un proyecto pequeño ni un retainer corto.
-- La venta se activa hacia Delivery mediante una Ficha de Activación que referencia quote/SOW/contrato, y crea sólo
-  la diferencia sobre el workspace durable. La Gantt es opcional y se deriva de Projects/Tasks.
-- `Product Service` no se usa como sinónimo de todo lo vendido: campaña audiovisual, plan de medios, brandbook y
-  otros servicios/deliverables conservan su categoría y nivel real de productización.
-- El contrato queda `Proposed` y sin cambio de runtime. La forma física sobre `services`, Notion, HubSpot, Finance,
-  equipos y Client Portal requiere cohortes reales, task y ADR antes de implementarse.

@@ -30,6 +30,25 @@ mezcla con Wherex, Ariba, Coupa u otros portales corporativos. Estado rápido de
 `docs/commercial/CRM_DEAL_REGISTER.md`. Ambos son índices fechados y siempre requieren readback live; una
 licitación promovida se sincroniza por `deal_id`, mientras el radar sin Deal permanece sólo en bid desk.
 
+## 2026-08-28 — Drain de keyword discovery: `*/10` → `*/2` (⚠️ con ventana de reversión abierta)
+
+Bajada de cadencia del scheduler `ops-seo-keyword-discovery-drain` (us-east4), autorizada por el
+operador. `Descubrir` es un workbench INTERACTIVO: con `*/10` la espera media era 5 min y el peor
+caso 10, cuando la corrida en sí tarda segundos. El `*/10` no compraba nada — el drain con cola
+vacía es no-op, así que correrlo 5× más seguido no gasta un centavo más. Es el mismo razonamiento
+por el que `ops-outbox-publish` ya usa `*/2`. Seguro a esta cadencia: el claim es un `UPDATE`
+condicional (`WHERE status='pending' … RETURNING`), así que un segundo worker matchea cero filas.
+
+**Aplicado en los DOS lugares**, como manda la regla de Cloud Run: `services/ops-worker/deploy.sh`
+(SoT) + `gcloud scheduler jobs update` para efecto inmediato (verificado: `*/2`, `ENABLED`).
+
+🔴 **VENTANA ABIERTA hasta el próximo release:** `origin/main` todavía declara `*/10`, y
+`upsert_scheduler_job` corre en cada deploy del worker. **Si el ops-worker se despliega desde `main`
+antes de que este cambio se promueva, el schedule vuelve a `*/10` en silencio** — el mismo bug class
+del ebook (rev `00470` → `00473`). No amerita un release propio (regla dura: si es demasiado trivial
+para un manifest, es demasiado trivial para `main`); lo cierra el próximo release regular. Si alguien
+ve `*/10` de vuelta, es esto y no un rollback deliberado.
+
 ## 2026-08-28 (2.º release del día) — TASK-1694 + TASK-1692 EN PRODUCCIÓN
 
 Release `e82c18579b05` (manifest `e82c18579b05-0ab096eb-628a-4d41-9b96-dc82064a21f7`, run
@@ -568,18 +587,3 @@ verde). Hallazgos reales para la licitación SKY: 769 kw top-10, 231 citas AI Ov
 ON sólo con decisión del operador (staging para uso interno; Production exige sign-off comercial —
 fila en el ledger de flags). La cara visible sigue siendo `TASK-1672`/`1673` tras `TASK-1670`.
 `TASK-1662` consumirá el colector de competidores que esta task estrenó (delta declarado).
-
-## 2026-08-27 — Gemini Omni 1.1 investigado; migración P0 definida, sin rollout
-
-**Estado: investigación y contrato documental completos; runtime no modificado.** Google lanzó Gemini Omni 1.1
-Flash con dos superficies no intercambiables: Developer API usa `gemini-omni-1.1-flash` y Google Cloud usa
-`gemini-omni-1.1-flash-preview`. El modelo anterior `gemini-omni-flash-preview` tiene shutdown anunciado para
-el 2026-09-30 en Gemini API. La evidencia oficial, sus contradicciones y límites quedaron en
-`docs/audits/creative-studio/GEMINI_OMNI_1_1_PROVIDER_RESEARCH_2026-08-27.md`; la candidatura machine-readable,
-en `GEMINI_OMNI_1_1_VIDEO_ROUTE_CARD_V1.json`; las skills de model fleet y motion quedaron espejadas.
-
-**Siguiente unidad ejecutable:** `TASK-1781` (P0, `to-do`) debe entregar primero paridad 720p de la ruta
-vigente y luego separar referencias, first/last frame, edición, extensión y output shapes. No hereda canary,
-rate, terms, rights ni promotion del modelo anterior. Exige cuota y endpoint live, costo medido, C2PA en bytes,
-canary facturable desde Producer, readback y rollback. Hasta entonces Omni 1.1 permanece `gated`: no hubo spend,
-deploy, cambio de binding, generación live ni lectura que pruebe disponibilidad en Globe.
