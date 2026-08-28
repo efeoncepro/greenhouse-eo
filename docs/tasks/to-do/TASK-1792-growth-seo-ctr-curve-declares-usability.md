@@ -34,6 +34,10 @@ para **toda** la lente y el `.sort()` por ese campo es un no-op: la pantalla de 
 ordena mal, no ordena**. Esta task hace que la curva declare si es utilizable y que la lente, cuando
 no lo es, ordene por un criterio declarado en vez de fabricar un cero creíble.
 
+🔴 **Bloquea el cutover de `TASK-1700`**: su plan de rollback devuelve la lente a este reader, así
+que hasta que los Slices 1 y 2 estén en `main`, revertir la cola priorizada aterriza en una lente
+que no ordena. Los Slices 1 y 2 son el mínimo que levanta ese bloqueo.
+
 ## Why This Task Exists
 
 El defecto no es un error de cálculo: es una **confusión de ausencia** con consecuencias silenciosas.
@@ -151,9 +155,14 @@ Reglas obligatorias:
   posición objetivo"* — afirma una comparación que no se hizo) y `sortedByGain` (*"Ordenadas por
   ganancia estimada: lo de arriba es lo que más rinde"* — promete un orden que no ocurre). Se le
   escribe un `## Delta` en el mismo commit que crea esta task.
-- **`TASK-1700`** — su plan de rollback aterriza en este reader. Al cerrar esta task, ese rollback
-  deja de degradar. Coordinación de umbral: esta task **adopta** su `isCurveUsableAtPosition` como
-  referencia, no propone un valor propio.
+- 🔴 **`TASK-1700` — ordenamiento duro, no coordinación blanda: esta task debe cerrar ANTES del
+  cutover del consumer (su Slice 7).** Su plan de rollback declarado es *"flag a `false` en Vercel +
+  redeploy → la lente vuelve al reader legacy"*. Mientras este reader siga fabricando el cero, esa
+  red de seguridad **aterriza en una lente que no ordena**, y el revert cambiaría un problema por
+  otro sin que nadie lo note — que es exactamente la propiedad que hace peligroso a este defecto.
+  Un rollback cuyo destino no está verificado no es un rollback: es una suposición. Coordinación de
+  umbral: esta task **adopta** su `isCurveUsableAtPosition` como referencia, no propone un valor
+  propio.
 - **`TASK-1708`** (`:424`) ya cita las constantes de módulo de este reader como el defecto que evita
   replicar; al cerrar esta task, esa cita se actualiza a la forma versionada.
 - Tool MCP `get_seo_keyword_opportunities` (`src/mcp/greenhouse/server.ts:250-264`): hoy le promete
@@ -449,6 +458,10 @@ presentarlo como techo y no como promesa.
 - **Slice 4 es independiente y puede ir después de Slice 2**, pero no antes: recalibrar el fallback
   mientras el guard sigue anulándolo no cambia nada observable.
 - Slice 3 no puede ir antes que Slice 2 (retirar la curva privada sin consumidor la deja huérfana).
+- 🔴 **Cross-task: Slices 1 y 2 de esta task deben estar en `main` ANTES del cutover del consumer de
+  `TASK-1700` (su Slice 7).** No es preferencia de secuencia: el rollback de 1700 devuelve la lente a
+  este reader, así que hasta que Slice 2 cierre, ese revert deja al operador sin orden y sin aviso.
+  Los Slices 1 y 2 son suficientes para levantar el bloqueo — 3 y 4 pueden ir después.
 
 ### Risk matrix
 
