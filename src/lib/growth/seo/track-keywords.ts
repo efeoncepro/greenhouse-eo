@@ -60,6 +60,8 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
+import { appendDiscoveryActionTx } from './keyword-discovery/queue'
+
 import {
   SEO_KEYWORD_SET_UPDATED_EVENT,
   SEO_RANK_SNAPSHOT_AGGREGATE_TYPE,
@@ -142,6 +144,18 @@ export interface TrackKeywordsOptions {
    * defecto es `actor`.
    */
   intentDeclaredBy?: string
+  /**
+   * TASK-1692 — de qué candidato de discovery nació esta promoción.
+   *
+   * OPCIONAL: quien no la declara se comporta exactamente como antes. Quien SÍ la declara
+   * obtiene una fila `promoted_to_tracking` en el ledger de decisiones, escrita en la MISMA
+   * transacción que abre la membresía — o pasan las dos cosas, o no pasa ninguna.
+   *
+   * Responde la pregunta que ningún otro store contesta: *esta membresía nació de ESTE
+   * candidato, de ESTA corrida, decidida por ESTA persona*. No es un segundo almacén de "esta
+   * keyword se está midiendo" — eso lo sigue diciendo `seo_keyword_set_members`.
+   */
+  discoveryProvenance?: { candidateId: string; runId: string }
   env?: NodeJS.ProcessEnv
 }
 
@@ -171,6 +185,11 @@ export interface ApplyKeywordTrackingInput {
   intentDeclaredBy?: string
   /** Keywords ya normalizadas y deduplicadas, con su validez resuelta. */
   requested: Array<{ keyword: string; valid: boolean }>
+  /**
+   * TASK-1692 — procedencia de discovery ya VALIDADA por el caller (el candidato existe y es
+   * de esta organización). Cuando viene, el ledger se escribe dentro de esta transacción.
+   */
+  discoveryProvenance?: { candidateId: string; runId: string }
 }
 
 export interface ApplyKeywordTrackingResult {
@@ -389,6 +408,47 @@ export const applyKeywordTracking = async (
     )
   }
 
+  // ── TASK-1692 — la decisión queda registrada donde nace, no donde se reporta ──────
+  //
+  // 🔴 Dentro de ESTA transacción: o hay membresía y fila, o no hay ninguna. Si el writer
+  // viviera en el consumer, entre la llamada que abre la membresía y la que la registra habría
+  // una red — y cuando se cae queda el compromiso de gasto hecho y la decisión sin autor.
+  if (input.discoveryProvenance) {
+    for (const outcome of outcomes) {
+      // Sólo hubo promoción en estos tres. `capacity_exceeded` e `invalid` NO dejan fila:
+      // registrar un intento fallido como decisión de promoción sería exactamente la clase de
+      // mentira que el ledger existe para evitar.
+      if (outcome.status !== 'tracked' && outcome.status !== 'already_tracked' && outcome.status !== 'intent_changed') {
+        continue
+      }
+
+      const appended = await appendDiscoveryActionTx(client, {
+        organizationId: input.organizationId,
+        candidateId: input.discoveryProvenance.candidateId,
+        actionKind: 'promoted_to_tracking',
+        actor: input.actor,
+        // Clave derivada del outcome DURABLE: dos decisiones distintas sobre el mismo candidato
+        // (seguir, y después reclasificar) son dos hechos y dejan dos filas.
+        idempotencyKey: `promoted:${keywordSetId}:${input.discoveryProvenance.candidateId}:${outcome.status}`,
+        metadata: {
+          outcome: outcome.status,
+          // La ausencia de `intent` se escribe como AUSENCIA, jamás como default: asumir
+          // `opportunity` afirmaría una clasificación que nadie hizo (invariante TASK-1659).
+          ...(outcome.intent ? { intent: outcome.intent } : {}),
+          keywordSetId,
+          runId: input.discoveryProvenance.runId
+        }
+      })
+
+      if (!appended.ok) {
+        // Falla CERRADA. La procedencia se validó antes de abrir la transacción, así que un
+        // fallo acá es un problema real — y una membresía cuya procedencia no se puede probar
+        // es peor que ninguna membresía: sería atribución sin respaldo en un log de auditoría.
+        throw new Error(`seo_discovery_action_append_failed:${appended.errorCode}`)
+      }
+    }
+  }
+
   return { keywordSetId, outcomes, activeKeywordCount, intentChangedCount }
 }
 
@@ -460,6 +520,27 @@ export const trackKeywords = async (
       return { ok: false, errorCode: 'no_entitlement', status: null }
     }
 
+    // TASK-1692 — la procedencia se valida ANTES de abrir la transacción, igual que el target y
+    // el entitlement. Así el append de adentro no puede fallar por tenant, y quien declaró una
+    // procedencia inválida recibe un código que dice qué pasó en vez de un `query_failed`.
+    if (options.discoveryProvenance) {
+      const candidateId = options.discoveryProvenance.candidateId.trim()
+
+      const candidates = candidateId
+        ? await runGreenhousePostgresQuery<{ candidate_id: string }>(
+            `SELECT candidate_id
+               FROM greenhouse_growth.seo_keyword_discovery_candidates
+              WHERE candidate_id = $1
+                AND organization_id = $2`,
+            [candidateId, target.organization_id]
+          )
+        : []
+
+      if (!candidates[0]) {
+        return { ok: false, errorCode: 'invalid_discovery_provenance', status: null }
+      }
+    }
+
     const result = await withTransaction(client =>
       applyKeywordTracking(client, {
         seoTargetId,
@@ -470,7 +551,8 @@ export const trackKeywords = async (
         source,
         intent: options.intent,
         intentDeclaredBy: options.intentDeclaredBy,
-        requested
+        requested,
+        ...(options.discoveryProvenance ? { discoveryProvenance: options.discoveryProvenance } : {})
       })
     )
 

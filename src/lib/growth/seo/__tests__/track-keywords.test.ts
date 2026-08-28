@@ -31,7 +31,13 @@ const state = {
   calls: [] as QueryCall[],
   outboxEvents: [] as Array<Record<string, unknown>>,
   thrown: null as Error | null,
-  captured: [] as unknown[]
+  captured: [] as unknown[],
+  /** TASK-1692 — `false` = el candidato declarado no existe o no es de la org. */
+  discoveryCandidateVisible: true,
+  /** TASK-1692 — filas escritas al ledger de decisiones, con sus params. */
+  ledgerInserts: [] as unknown[][],
+  /** TASK-1692 — simula un fallo duro del append para probar la atomicidad. */
+  ledgerThrows: false
 }
 
 /**
@@ -46,6 +52,12 @@ vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: async (sql: string, params: unknown[]) => {
     state.calls.push({ sql, params })
     if (state.thrown) throw state.thrown
+
+    // TASK-1692 — preflight de procedencia: sin rutear por SQL, el mock devolvía la fila del
+    // TARGET para cualquier consulta y el chequeo de tenant pasaba siempre (falso verde).
+    if (sql.includes('seo_keyword_discovery_candidates')) {
+      return state.discoveryCandidateVisible ? [{ candidate_id: params[0] }] : []
+    }
 
     return state.target
   }
@@ -86,6 +98,19 @@ vi.mock('@/lib/db', () => ({
           const inserted = keywordsParam(params).length
 
           return { rows: [], rowCount: state.insertRowCount ?? inserted }
+        }
+
+        // TASK-1692 — el ledger de decisiones, dentro de ESTA transacción.
+        if (sql.includes('seo_keyword_discovery_candidates')) {
+          return { rows: state.discoveryCandidateVisible ? [{ candidate_id: params[0] }] : [], rowCount: 1 }
+        }
+
+        if (sql.includes('INSERT INTO greenhouse_growth.seo_keyword_discovery_actions')) {
+          if (state.ledgerThrows) throw new Error('connection terminated')
+
+          state.ledgerInserts.push(params)
+
+          return { rows: [{ action_id: `seokda-${state.ledgerInserts.length}` }], rowCount: 1 }
         }
 
         return { rows: [], rowCount: 0 }
@@ -137,6 +162,9 @@ beforeEach(() => {
   state.outboxEvents = []
   state.thrown = null
   state.captured = []
+  state.discoveryCandidateVisible = true
+  state.ledgerInserts = []
+  state.ledgerThrows = false
 })
 
 describe('trackKeywords — puertas de acceso', () => {
@@ -455,6 +483,107 @@ describe('trackKeywords — intención declarada (TASK-1659)', () => {
     const event = state.outboxEvents[0] as { payload: Record<string, unknown> }
 
     expect(event.payload).toMatchObject({ trackedCount: 0, intentChangedCount: 1, declaredIntent: 'target' })
+  })
+})
+
+describe('TASK-1692 — la promoción desde un candidato deja su huella, en la misma transacción', () => {
+  const provenance = { env: ENV_ON, discoveryProvenance: { candidateId: 'seokdc-1', runId: 'seokdr-1' } }
+
+  /** `metadata_json` es el param 6 del INSERT al ledger. */
+  const metadataOf = (index = 0) => JSON.parse(String(state.ledgerInserts[index]?.[5] ?? '{}'))
+
+  it('sin procedencia declarada NO escribe nada: el caller viejo se comporta igual', async () => {
+    const result = await trackKeywords('seot-1', ['pintura'], 'user-1', { env: ENV_ON })
+
+    expect(result.ok).toBe(true)
+    expect(state.ledgerInserts).toHaveLength(0)
+  })
+
+  it('con procedencia escribe promoted_to_tracking con el outcome real', async () => {
+    const result = await trackKeywords('seot-1', ['pintura'], 'user-1', { ...provenance, intent: 'target' })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) return
+
+    expect(state.ledgerInserts).toHaveLength(1)
+    // Param 3 = action_kind.
+    expect(state.ledgerInserts[0][2]).toBe('promoted_to_tracking')
+    expect(metadataOf()).toEqual({
+      outcome: 'tracked',
+      intent: 'target',
+      keywordSetId: 'seoks-1',
+      runId: 'seokdr-1'
+    })
+  })
+
+  it('🔴 la ausencia de intención se escribe como AUSENCIA, jamás como default', async () => {
+    // Quien no declara intención no clasifica (invariante TASK-1659): asumir `opportunity`
+    // afirmaría una clasificación que nadie hizo e inflaría el KPI de oportunidades.
+    await trackKeywords('seot-1', ['pintura'], 'user-1', provenance)
+
+    expect(Object.keys(metadataOf())).not.toContain('intent')
+  })
+
+  it('already_tracked SÍ deja fila: alguien decidió, aunque el set no se mueva', async () => {
+    state.activeKeywords = ['pintura']
+
+    await trackKeywords('seot-1', ['pintura'], 'user-1', provenance)
+
+    expect(metadataOf()).toMatchObject({ outcome: 'already_tracked' })
+  })
+
+  it('🔴 capacity_exceeded NO deja fila: no hubo promoción que registrar', async () => {
+    // Techo lleno: la keyword rebota. Registrar un intento fallido como decisión de promoción
+    // sería exactamente la clase de mentira que el ledger existe para evitar.
+    state.activeKeywords = Array.from({ length: 3 }, (_, i) => `kw-${i}`)
+
+    const result = await trackKeywords('seot-1', ['pintura nueva'], 'user-1', {
+      ...provenance,
+      env: envWithCapacity(3)
+    })
+
+    expect(result.ok).toBe(true)
+
+    if (!result.ok) return
+
+    expect(result.outcomes[0].status).toBe('capacity_exceeded')
+    expect(state.ledgerInserts).toHaveLength(0)
+  })
+
+  it('la clave de idempotencia sale del outcome durable (set + outcome), no del actor', async () => {
+    await trackKeywords('seot-1', ['pintura'], 'user-1', provenance)
+
+    // Param 5 = idempotency_key.
+    expect(String(state.ledgerInserts[0][4])).toBe('promoted:seoks-1:seokdc-1:tracked')
+  })
+
+  it('🔴 una procedencia que no se puede probar falla CERRADA, antes de escribir nada', async () => {
+    state.discoveryCandidateVisible = false
+
+    const result = await trackKeywords('seot-1', ['pintura'], 'user-1', provenance)
+
+    // Una membresía atribuida a un candidato que no se puede verificar sería atribución
+    // cross-tenant en un log de auditoría: peor que no tener la membresía.
+    expect(result).toMatchObject({ ok: false, errorCode: 'invalid_discovery_provenance' })
+
+    // Y falla ANTES de la transacción: ni membresía ni ledger.
+    expect(state.ledgerInserts).toHaveLength(0)
+    expect(
+      state.calls.some(call => call.sql.includes('INSERT INTO greenhouse_growth.seo_keyword_set_members'))
+    ).toBe(false)
+  })
+
+  it('🔴 atomicidad: si el append falla, la promoción entera se cae — no queda media verdad', async () => {
+    state.ledgerThrows = true
+
+    const result = await trackKeywords('seot-1', ['pintura'], 'user-1', provenance)
+
+    // El append vive DENTRO de la transacción que abre la membresía: su error la aborta. Es el
+    // punto entero de la task — mover el writer adentro es lo que elimina la falla parcial en
+    // la que quedaba el gasto comprometido y la decisión sin autor.
+    expect(result).toMatchObject({ ok: false, errorCode: 'query_failed' })
+    expect(state.captured).toHaveLength(1)
   })
 })
 

@@ -817,6 +817,13 @@ export type TrackKeywordsResult =
         | 'target_not_active'
         | 'no_entitlement'
         | 'no_keywords'
+        /**
+         * TASK-1692 — se declaró una procedencia de discovery que no se pudo probar (el
+         * candidato no existe o no es de esta organización). Falla CERRADA: escribir una
+         * membresía atribuida a un candidato que no se puede verificar sería atribución
+         * cross-tenant en un log de auditoría. Sólo alcanza a quien declara procedencia.
+         */
+        | 'invalid_discovery_provenance'
         | 'query_failed'
       status: null
     }

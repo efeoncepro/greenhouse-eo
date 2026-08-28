@@ -1001,6 +1001,13 @@ export interface EcosystemSeoTrackKeywordsBody {
    * `actor` sigue siendo la máquina (procedencia real del write); esto es la autoría humana.
    */
   intentDeclaredBy?: unknown
+  /**
+   * TASK-1692 — de qué candidato de discovery nació la promoción. Opcional; si se declara, el
+   * primitive escribe la fila del ledger DENTRO de la misma transacción que abre la membresía.
+   * El consumer NUNCA escribe el ledger por su cuenta.
+   */
+  discoveryCandidateId?: unknown
+  discoveryRunId?: unknown
 }
 
 export const trackEcosystemSeoKeywordsPayload = async ({
@@ -1062,10 +1069,24 @@ export const trackEcosystemSeoKeywordsPayload = async ({
   // verdad sobre quién comprometió el gasto para poder auditarlo después.
   // `publicId` y no `consumerId`: la procedencia queda legible para quien audite el gasto
   // sin tener que resolver un id interno contra otra tabla.
+  // TASK-1692 — los DOS campos o ninguno: una procedencia a medias no identifica la decisión.
+  const discoveryCandidateId = typeof body?.discoveryCandidateId === 'string' ? body.discoveryCandidateId.trim() : ''
+  const discoveryRunId = typeof body?.discoveryRunId === 'string' ? body.discoveryRunId.trim() : ''
+
+  if (Boolean(discoveryCandidateId) !== Boolean(discoveryRunId)) {
+    throw new ApiPlatformError('"discoveryCandidateId" and "discoveryRunId" must be provided together.', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
   const result = await trackKeywords(subject.seoTargetId, keywords, `mcp:${context.consumer.publicId}`, {
     source: 'mcp',
     ...(intent ? { intent } : {}),
-    ...(intent && intentDeclaredBy ? { intentDeclaredBy } : {})
+    ...(intent && intentDeclaredBy ? { intentDeclaredBy } : {}),
+    ...(discoveryCandidateId && discoveryRunId
+      ? { discoveryProvenance: { candidateId: discoveryCandidateId, runId: discoveryRunId } }
+      : {})
   })
 
   return {

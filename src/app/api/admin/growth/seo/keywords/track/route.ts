@@ -30,6 +30,13 @@ interface TrackKeywordsBody {
   keywords?: unknown
   /** TASK-1659 — `target` | `opportunity`. Opcional: quien no declara, no clasifica. */
   intent?: unknown
+  /**
+   * TASK-1692 — de qué candidato de discovery nació la promoción. Opcional y en pareja: si se
+   * declara, `trackKeywords` escribe la fila del ledger dentro de su propia transacción. Esta
+   * ruta NUNCA encadena un `record_action` para "reportar" lo que el command ya hizo.
+   */
+  discoveryCandidateId?: unknown
+  discoveryRunId?: unknown
 }
 
 /** El contrato del primitive se traduce 1:1 a códigos canónicos: sin prosa inventada acá. */
@@ -39,6 +46,7 @@ const ERROR_CODE_MAP: Record<string, CanonicalErrorCode> = {
   target_not_active: 'seo_target_not_active',
   no_entitlement: 'seo_not_entitled',
   no_keywords: 'seo_keywords_invalid_input',
+  invalid_discovery_provenance: 'seo_keywords_invalid_input',
   query_failed: 'internal_error'
 }
 
@@ -84,9 +92,22 @@ export async function POST(request: Request) {
   const intent = body.intent
 
   try {
+    // Los DOS campos o ninguno: una procedencia a medias no identifica la decisión.
+    const discoveryCandidateId = typeof body.discoveryCandidateId === 'string' ? body.discoveryCandidateId.trim() : ''
+    const discoveryRunId = typeof body.discoveryRunId === 'string' ? body.discoveryRunId.trim() : ''
+
+    if (Boolean(discoveryCandidateId) !== Boolean(discoveryRunId)) {
+      return canonicalErrorResponse('seo_keywords_invalid_input', {
+        extra: { reason: 'incomplete_discovery_provenance', required: ['discoveryCandidateId', 'discoveryRunId'] }
+      })
+    }
+
     const result = await trackKeywords(seoTargetId, keywords, tenant.userId, {
       source: 'operator_ui',
-      ...(intent ? { intent } : {})
+      ...(intent ? { intent } : {}),
+      ...(discoveryCandidateId && discoveryRunId
+        ? { discoveryProvenance: { candidateId: discoveryCandidateId, runId: discoveryRunId } }
+        : {})
     })
 
     if (!result.ok) {
