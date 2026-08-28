@@ -870,6 +870,20 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_URL_VISIBILITY_ENABLED=${GROWTH_SEO_URL_VISIBIL
 GROWTH_SEO_COMPETITOR_GAP_ENABLED="${GROWTH_SEO_COMPETITOR_GAP_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_COMPETITOR_GAP_ENABLED=${GROWTH_SEO_COMPETITOR_GAP_ENABLED}"
 
+# TASK-1699 — Persistencia del top-N del SERP que el rank capture YA paga (costo marginal
+# CERO: cero llamadas nuevas, cero cambio de depth/flags). Gatea la ESCRITURA dentro del
+# batch diario `ops-seo-rank-capture` — sin scheduler nuevo.
+#
+# 🔴 ON declarativo desde el nacimiento, A DIFERENCIA de sus hermanos de gasto: cada día
+# con este flag apagado en el worker es un día de serie PERDIDO PARA SIEMPRE (el SERP de
+# ayer no se recompra; ~620 observaciones de mercado/día se disuelven). Efectivo con el
+# primer deploy del worker que incluya el código (post-release develop→main). La LECTURA
+# se gatea con la misma var en Vercel (agregar con el release). Este archivo es el SoT
+# declarativo del lado worker. Es SUBORDINADO a `GROWTH_SEO_ENABLED`.
+# Rollback (<5 min): `false` acá + `--update-env-vars` — la captura de rank NO se afecta.
+GROWTH_SEO_SERP_TOP_RESULTS_ENABLED="${GROWTH_SEO_SERP_TOP_RESULTS_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},GROWTH_SEO_SERP_TOP_RESULTS_ENABLED=${GROWTH_SEO_SERP_TOP_RESULTS_ENABLED}"
+
 # TASK-1777 — Drill-down nominal del perfil de enlaces (paso post-batch del snapshot semanal
 # de TASK-1304; SIN scheduler nuevo — reusa `ops-seo-backlink-capture` 0 7 * * 1).
 #

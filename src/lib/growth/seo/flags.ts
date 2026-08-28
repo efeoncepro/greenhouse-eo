@@ -168,3 +168,24 @@ export const GROWTH_SEO_COMPETITOR_GAP_FLAG = 'GROWTH_SEO_COMPETITOR_GAP_ENABLED
 /** Gate de la cobertura de competidores. Default OFF: prenderlo empieza a gastar. */
 export const isSeoCompetitorGapEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
   isTrue(env[GROWTH_SEO_COMPETITOR_GAP_FLAG])
+
+/**
+ * TASK-1699 — Persistencia del top-N del SERP que el rank capture YA paga (costo marginal
+ * CERO: cero llamadas nuevas, cero cambio de depth/flags de la compra).
+ *
+ * ⚠️ **DUAL-RUNTIME**: el ops-worker lo lee para la ESCRITURA (dentro del batch del cron
+ * `ops-seo-rank-capture` — es el runtime que importa: sin él no hay serie) y Vercel para la
+ * LECTURA de los lanes (que no expongan una tabla vacía). SoT declarativo:
+ * `services/ops-worker/deploy.sh` + env var en Vercel; efecto inmediato con
+ * `--update-env-vars`. Es SUBORDINADO a `GROWTH_SEO_ENABLED`. Registrar cambios en el
+ * ledger de flags.
+ *
+ * 🔴 Cada día con este flag apagado en el worker es un día de serie PERDIDO PARA SIEMPRE
+ * (el SERP de ayer no se recompra) — por eso, a diferencia de sus hermanos de gasto, el
+ * default declarativo va ON apenas el código llegue al worker.
+ */
+export const GROWTH_SEO_SERP_TOP_RESULTS_FLAG = 'GROWTH_SEO_SERP_TOP_RESULTS_ENABLED'
+
+/** Gate de la persistencia del top-N. No gasta: gatea escritura ya pagada y lectura. */
+export const isSeoSerpTopResultsEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_SEO_SERP_TOP_RESULTS_FLAG])

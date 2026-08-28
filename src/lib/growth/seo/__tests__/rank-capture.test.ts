@@ -58,6 +58,18 @@ vi.mock('@/lib/postgres/client', () => ({
   }
 }))
 
+// TASK-1699 — rank-capture ahora importa `withTransaction` (@/lib/db) y el módulo
+// serp-top-results para el top-N. Mocks de carga: el camino con flag OFF no los usa.
+vi.mock('@/lib/db', () => ({
+  withTransaction: async (callback: (client: unknown) => Promise<unknown>) =>
+    callback({ query: async () => ({ rows: [], rowCount: 1 }) })
+}))
+
+vi.mock('../serp-top-results', () => ({
+  parseSerpTopResults: () => [],
+  persistSerpTopResults: async () => ({ rowsWritten: 0 })
+}))
+
 const gateMock = vi.fn()
 
 vi.mock('../entitlement', () => ({
@@ -78,7 +90,9 @@ vi.mock('@/lib/sync/publish-event', () => ({
 }))
 
 vi.mock('../flags', () => ({
-  isSeoModuleEnabled: () => true
+  isSeoModuleEnabled: () => true,
+  // TASK-1699 — flag OFF en estas suites: el camino legacy queda idéntico.
+  isSeoSerpTopResultsEnabled: () => false
 }))
 
 vi.mock('@/lib/observability/capture', () => ({
