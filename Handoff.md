@@ -40,6 +40,15 @@ atribuir, sin que ningún test lo notara. El adapter registra el contador por im
 documentado como puerta que **no atribuye**, y con guard que rompe el build si alguien vuelve a
 comprar por ahí.
 
+🔴 **Dependencia de ORDEN para federar la tool MCP (precedente TASK-1661, ya nos pasó una vez).**
+`get_seo_provider_spend` está en `main` de `efeonce-mcp` (commit `1a51461`), pero **el deploy del
+gateway es `workflow_dispatch` manual — el push NO desplegó nada**. Y el lane que la tool consume,
+`/api/platform/ecosystem/growth/seo/provider-spend`, **está en `develop`, NO en `main` de
+Greenhouse** (verificado con `git ls-tree -r origin/main`). Disparar `Deploy Cloud Run` del gateway
+ANTES del release dejaría la tool respondiendo **404 upstream** en `mcp.efeonce.org`: el guard de
+paridad quedaría verde y la tool rota. **El deploy del gateway va DESPUÉS del release que lleve el
+lane a `main`**, nunca antes.
+
 **Pendiente de rollout, con dueño:** (1) prender `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED` en
 Vercel **y** en el ops-worker (`deploy.sh` + `--update-env-vars`, los dos pasos) y verificarlo en la
 **revisión activa** de Cloud Run; (2) observar un mes calendario de `wouldBlock` por tier; (3)
