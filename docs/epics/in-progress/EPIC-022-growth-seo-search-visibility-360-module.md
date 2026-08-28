@@ -330,6 +330,9 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
   mezclan. Estrenó además el colector de competidores (`competitors_domain` + `backlinks/competitors`
   + `domain_intersection`) que `TASK-1662` consume desde su implementación (2026-08-28) como
   propuesta de declaración (`proposal_ref`).
+- `TASK-1791` — [creada 2026-08-27, backend-data] **Señal de pertinencia del candidato.** Dos
+  productores de candidatos y ninguno declara pertinencia; un término ajeno pasa todos los checks.
+  Señal con evidencia, nunca filtro. Composición en memoria: `grader_brand_intelligence` es `grader_*`.
 - `TASK-1784` — [creada 2026-08-27, backend-data] **Ruteo de selección en la superficie MCP.** Seis de
   las 20 tools contestan la misma pregunta; el eval de selección va primero y puede cerrar la task.
 - `TASK-1785` — [creada 2026-08-27, backend-data] **La lente como campo del contrato, no como
