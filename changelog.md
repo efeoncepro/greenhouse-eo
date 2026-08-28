@@ -9,10 +9,12 @@
 
 ## 2026-08-28 — MCP oficial de LicitaLAB documentado y gateado para Codex y Claude
 
-- La skill espejada `greenhouse-public-private-tenders` incorpora el companion `licitalab-mcp.md` con endpoint
-  OAuth, inventario live de cinco tools read-only, recetas por oportunidad/proveedor/documentos, estados RAG,
-  límites y canary verificado. El bundle entra a `pnpm skills:mirrors` para impedir que Codex y Claude operen
-  licitaciones reales con contratos distintos.
+- La skill espejada `greenhouse-public-private-tenders` incorpora el companion `licitalab-mcp.md` en
+  [Codex](.codex/skills/greenhouse-public-private-tenders/licitalab-mcp.md) y
+  [Claude](.claude/skills/greenhouse-public-private-tenders/licitalab-mcp.md), con endpoint OAuth, inventario live
+  de cinco tools read-only, recetas por oportunidad/proveedor/documentos, estados RAG, límites y canary verificado.
+  El bundle entra a `pnpm skills:mirrors` para impedir que ambos agentes operen licitaciones reales con contratos
+  distintos.
 
 ## 2026-08-28 — TASK-1694: en descubrimiento SEO, un candidato es una keyword y la dificultad cruda deja de decidir
 
@@ -748,14 +750,3 @@
   continuar de inmediato con el deadline expresado en hora de Chile.
 - El command está validado localmente, pero sigue inaccesible: el tipo de correo está OFF y faltan la sesión
   HttpOnly, API autorizada, migraciones, índice y smokes antes de cualquier activación.
-
-## 2026-08-19 — Los correos con enlaces de acceso ya no dependen de reintentos ciegos
-
-- Reset de contraseña, invitaciones, verificaciones, magic links, tests y acceso a Talent Pool comparten ahora
-  una protección global: el sistema guarda una intención redactada antes de emitir la credencial y nunca
-  persiste el enlace secreto para reconstruirlo después.
-- Dos workers concurrentes o un replay del mismo evento no pueden rotar dos veces el acceso. Si el proveedor
-  rechaza el correo se registra como fallo; si lo aceptó pero faltó confirmación local, se registra como incierto
-  y requiere recuperación explícita en vez de afirmar que no salió o reenviarlo automáticamente.
-- El cambio está validado localmente por Arquitectura, Talento y Seguridad. Todavía no está activo: primero se
-  instalará el índice concurrente con readback verde, sin pausar el resto del correo del sistema.
