@@ -120,6 +120,7 @@ export type CanonicalErrorCode =
   | 'aeo_business_model_unconfirmed'
   | 'aeo_quota_exhausted'
   | 'aeo_cost_blocked'
+  | 'aeo_budget_exhausted'
   | 'aeo_assignment_invalid_tier'
   | 'aeo_assignment_invalid_input'
   | 'aeo_assignment_website_required'
@@ -543,6 +544,17 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   aeo_cost_blocked: {
     status: 429,
     message: 'El análisis AEO no está disponible temporalmente por alta demanda. Intenta más tarde.',
+    actionable: false
+  },
+  // TASK-1696 — presupuesto EN DÓLARES de la organización agotado en el período. Distinto de
+  // `aeo_quota_exhausted` (se acabaron los análisis incluidos) y de `aeo_cost_blocked` (backstop
+  // global de plataforma): acá el cupo de corridas puede seguir vivo y lo que se agotó es el
+  // dinero. `actionable: false` — reintentar no lo resuelve; el período se renueva o se amplía el
+  // plan, y ambas cosas las hace una persona.
+  aeo_budget_exhausted: {
+    status: 429,
+    message:
+      'Se agotó el presupuesto de análisis AEO de tu organización para este período. Se renueva el próximo mes o puedes ampliarlo con Efeonce.',
     actionable: false
   },
   aeo_assignment_invalid_tier: {

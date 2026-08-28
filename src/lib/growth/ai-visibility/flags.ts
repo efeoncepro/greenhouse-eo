@@ -286,6 +286,24 @@ export interface AeoAllowanceConfig {
   contractedRunsPerMonth: number
   pilotRunsPerMonth: number
   trialGlobalMonthlyBudgetUsd: number
+  /**
+   * TASK-1696 — Tope de DINERO por organización y mes, por tier. Espejo del lado SEO
+   * (`GROWTH_SEO_*_MONTHLY_BUDGET_USD`), que ya demostró que un cupo de corridas NO acota dólares:
+   * 20 runs/mes × el techo por run del modo `full` (USD 2) son USD 40/mes/org que hoy nadie mira.
+   *
+   * ⚠️ Los defaults NACEN DELIBERADAMENTE HOLGADOS y no bloquean a nadie: el gate arranca en
+   * shadow porque no sabemos cuál es el tope correcto. Lo medido hasta 2026-08-15 no alcanza para
+   * elegirlo (el 87,5% del gasto histórico del grader no tiene organización atribuida, así que el
+   * numerador de cualquier tope calculado hoy sería gasto de dueño desconocido), y el camino
+   * público del lead magnet comparte el motor: un tope mal calibrado no degrada un tablero, corta
+   * captación. Calibrarlos es la salida del ciclo de shadow, no una decisión de esta task.
+   *
+   * NO son flags: son knobs de configuración override-ables por env sin deploy, mismo criterio
+   * que los `GROWTH_SEO_*_PER_MONTH` — no van al ledger de feature flags.
+   */
+  contractedMonthlyBudgetUsd: number
+  pilotMonthlyBudgetUsd: number
+  trialMonthlyBudgetUsd: number
 }
 
 const toPositiveInt = (value: string | undefined, fallback: number): number => {
@@ -304,8 +322,48 @@ export const resolveAeoAllowanceConfig = (env: NodeJS.ProcessEnv = process.env):
   trialRunsPerMonth: toPositiveInt(env.GROWTH_AI_VISIBILITY_TRIAL_RUNS_PER_MONTH, 1),
   contractedRunsPerMonth: toPositiveInt(env.GROWTH_AI_VISIBILITY_CONTRACTED_RUNS_PER_MONTH, 20),
   pilotRunsPerMonth: toPositiveInt(env.GROWTH_AI_VISIBILITY_PILOT_RUNS_PER_MONTH, 3),
-  trialGlobalMonthlyBudgetUsd: toPositiveFloat(env.GROWTH_AI_VISIBILITY_TRIAL_GLOBAL_MONTHLY_BUDGET_USD, 25)
+  trialGlobalMonthlyBudgetUsd: toPositiveFloat(env.GROWTH_AI_VISIBILITY_TRIAL_GLOBAL_MONTHLY_BUDGET_USD, 25),
+  // Defaults por encima del peor caso EXIGIBLE de hoy (20 runs × USD 2 = USD 40/mes en
+  // `contracted`), a propósito: en shadow tienen que dejar pasar todo para que `wouldBlock` mida
+  // la realidad en vez de la restricción.
+  contractedMonthlyBudgetUsd: toPositiveFloat(env.GROWTH_AI_VISIBILITY_CONTRACTED_MONTHLY_BUDGET_USD, 60),
+  pilotMonthlyBudgetUsd: toPositiveFloat(env.GROWTH_AI_VISIBILITY_PILOT_MONTHLY_BUDGET_USD, 10),
+  trialMonthlyBudgetUsd: toPositiveFloat(env.GROWTH_AI_VISIBILITY_TRIAL_MONTHLY_BUDGET_USD, 3)
 })
+
+/**
+ * TASK-1696 — Gate de presupuesto AEO per-org, en DOS etapas independientes.
+ *
+ * `ENABLED` (default OFF): el chokepoint computa `resolveAeoBudget`, registra `wouldBlock` y
+ * alimenta la señal. NO bloquea. `ENFORCED` (default OFF) es SUBORDINADO: sólo con las dos en ON
+ * el chokepoint rechaza con `budget_exhausted`.
+ *
+ * 🔴 Son dos y no una porque el camino público del lead magnet comparte el motor del grader. Un
+ * único flag obligaría a elegir entre "medir" y "no cortar captación"; separados, se mide un ciclo
+ * mensual completo con el tope puesto y sin consecuencia, y el flip a enforce es una decisión de
+ * producto con datos propios encima.
+ *
+ * ⚠️ MULTI-RUNTIME: se leen en **Vercel** (runs de portal y el camino público) y en el
+ * **ops-worker** (drain async + re-grade recurrente). Declararlos en un solo runtime deja la mitad
+ * del gate muerta. El SoT del worker es `services/ops-worker/deploy.sh`, cuyos `--set-env-vars` son
+ * DESTRUCTIVOS: aplicarlos sólo en vivo con `--update-env-vars` los borra en el próximo deploy, en
+ * silencio. Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
+ */
+export const GROWTH_AI_VISIBILITY_BUDGET_GATE_FLAG = 'GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED'
+
+export const GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED_FLAG =
+  'GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED'
+
+/** Shadow: computa y registra el presupuesto AEO. NO bloquea. Default OFF. */
+export const isAeoBudgetGateEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_AI_VISIBILITY_BUDGET_GATE_FLAG])
+
+/**
+ * Enforce: bloquea cuando el presupuesto se agotó. Default OFF y SUBORDINADO al anterior —
+ * prenderlo solo no hace nada, porque sin el shadow no hay cómputo que consultar.
+ */
+export const isAeoBudgetGateEnforced = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isAeoBudgetGateEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED_FLAG])
 
 export interface RecurringRegradeConfig {
   batchSize: number

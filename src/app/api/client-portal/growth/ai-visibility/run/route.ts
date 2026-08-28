@@ -34,7 +34,8 @@ const BLOCK_TO_CANONICAL: Record<RequestRunBlockedReason, CanonicalErrorCode> = 
   category_unresolved: 'aeo_category_unresolved',
   business_model_unconfirmed: 'aeo_business_model_unconfirmed',
   quota_exhausted: 'aeo_quota_exhausted',
-  cost_blocked: 'aeo_cost_blocked'
+  cost_blocked: 'aeo_cost_blocked',
+  budget_exhausted: 'aeo_budget_exhausted'
 }
 
 export async function POST() {

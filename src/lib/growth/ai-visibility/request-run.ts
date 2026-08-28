@@ -23,10 +23,16 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
+import { resolveAeoBudget } from './budget'
 import { isRunCategoryBlocked } from './category-guard'
 import { enqueueGraderDiagnostic, type RunGraderDiagnosticInput } from './commands'
 import { resolveAeoEntitlement, type AeoTier } from './entitlement'
-import { isGraderEnabled, isPortalRunEnabled, isTrialTierEnabled } from './flags'
+import {
+  isAeoBudgetGateEnabled,
+  isGraderEnabled,
+  isPortalRunEnabled,
+  isTrialTierEnabled
+} from './flags'
 import { getOrganizationCommercialFacts } from './operator/organization-commercial-facts'
 import { assertSubjectGradeable } from './operator/subject-gradeable'
 import { getGraderProfileForOrganization, type GraderProfileRow, type GraderRunSource } from './store'
@@ -39,6 +45,12 @@ export type RequestRunBlockedReason =
   | 'business_model_unconfirmed'
   | 'quota_exhausted'
   | 'cost_blocked'
+  /**
+   * TASK-1696 — Presupuesto en DÓLARES de la organización agotado. Distinto de `cost_blocked`,
+   * que es el backstop GLOBAL del tier trial: éste es per-org y no se alcanza hasta que el flag
+   * de enforce esté prendido (el gate nace en shadow).
+   */
+  | 'budget_exhausted'
 
 export type RequestRunResult =
   | {
@@ -124,6 +136,44 @@ export const requestGraderRunForOrganization = async (input: {
 
   if (entitlement.blockedReason === 'trial_budget_exhausted') {
     return { status: 'blocked', reason: 'cost_blocked' }
+  }
+
+  // TASK-1696 — Gate de dinero per-org, EN SHADOW por defecto.
+  //
+  // Con `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED` en ON se computa y se registra lo que HABRÍA
+  // pasado; sólo con `..._ENFORCED` también en ON se bloquea. La separación no es prudencia
+  // genérica: el camino público del lead magnet comparte este motor, así que un tope mal
+  // calibrado no degrada un tablero, corta captación — y hoy no sabemos cuál es el tope correcto
+  // (el 87,5% del gasto histórico del grader no tenía organización atribuida, así que el
+  // numerador de cualquier cálculo de hoy sería gasto de dueño desconocido).
+  //
+  // Se computa DESPUÉS de las puertas de entitlement y ANTES del claim: bloquear por presupuesto
+  // no debe consumir allowance, y medir `wouldBlock` sobre organizaciones sin entitlement sería
+  // ruido (ésas ya salieron por `not_entitled`).
+  if (isAeoBudgetGateEnabled(env)) {
+    const budget = await resolveAeoBudget(input.organizationId, env)
+
+    if (budget.wouldBlock) {
+      // El registro ocurre SIEMPRE que el shadow esté prendido, bloquee o no: es el dato que el
+      // ciclo mensual necesita para proponer un tope. `level: 'warning'` y no error — en shadow
+      // esto es una observación esperada, no un fallo.
+      captureWithDomain(new Error('growth ai-visibility budget would block run'), 'growth', {
+        level: 'warning',
+        tags: { source: 'aeo_budget_gate', enforced: String(budget.enforced) },
+        extra: {
+          organizationId: input.organizationId,
+          tier: budget.tier,
+          budgetCapUsd: budget.budgetCapUsd,
+          invoicedUsedUsd: budget.invoicedUsedUsd,
+          estimatedUsedUsd: budget.estimatedUsedUsd,
+          budgetUsedUsd: budget.budgetUsedUsd
+        }
+      })
+
+      if (budget.enforced) {
+        return { status: 'blocked', reason: 'budget_exhausted' }
+      }
+    }
   }
 
   const profile = await getGraderProfileForOrganization(input.organizationId)
