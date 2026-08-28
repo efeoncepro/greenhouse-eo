@@ -198,6 +198,9 @@ import { getGrowthAiVisibilityRegradeSignals } from './queries/growth-ai-visibil
 import { getGrowthSearchConsoleTokenHealthSignal } from './queries/growth-search-console-token-health'
 import { getSeoAuditStuckTasksSignal } from './queries/seo-audit-stuck-tasks'
 import { getSeoProspectCostOverrunSignal } from './queries/seo-prospect-cost-overrun'
+import { getGrowthDataForSeoSpendLedgerDriftSignal } from './queries/growth-dataforseo-spend-ledger-drift'
+import { getGrowthAiVisibilityObservationYieldSignal } from './queries/growth-ai-visibility-observation-yield'
+import { getSeoProviderCostOverBudgetSignal } from './queries/seo-provider-cost-over-budget'
 import {
   getSeoKeywordDiscoveryProviderErrorsSignal,
   getSeoKeywordDiscoveryStuckRunsSignal
@@ -708,6 +711,10 @@ interface ReliabilityOverviewSources {
   seoKeywordDiscoveryProviderErrors?: ReliabilitySignal | null
   /** TASK-1709 — sobrecosto en diagnósticos de prospecto (steady 0). */
   seoProspectCostOverrun?: ReliabilitySignal | null
+  // TASK-1696 — gasto del grader sin contabilizar, rendimiento de la matriz y sobregiro per-org.
+  growthDataForSeoSpendLedgerDrift?: ReliabilitySignal | null
+  growthAiVisibilityObservationYield?: ReliabilitySignal | null
+  seoProviderCostOverBudget?: ReliabilitySignal | null
 
   /** TASK-1201 — Finance AI anomaly-materialization staleness (heartbeat del SoT de signals). */
   financeAiStaleMaterialization?: ReliabilitySignal | null
@@ -1172,6 +1179,9 @@ export const buildReliabilityOverview = (
     ...(sources.seoKeywordDiscoveryStuckRuns ? [sources.seoKeywordDiscoveryStuckRuns] : []),
     ...(sources.seoKeywordDiscoveryProviderErrors ? [sources.seoKeywordDiscoveryProviderErrors] : []),
     ...(sources.seoProspectCostOverrun ? [sources.seoProspectCostOverrun] : []),
+    ...(sources.growthDataForSeoSpendLedgerDrift ? [sources.growthDataForSeoSpendLedgerDrift] : []),
+    ...(sources.growthAiVisibilityObservationYield ? [sources.growthAiVisibilityObservationYield] : []),
+    ...(sources.seoProviderCostOverBudget ? [sources.seoProviderCostOverBudget] : []),
     // TASK-812 — Previred/LRE artifact registry drift.
     ...(sources.payrollComplianceExportDrift ? [sources.payrollComplianceExportDrift] : []),
     // TASK-863 V1.5.2 — Final settlement PDF status drift (DB document_status vs
@@ -1731,6 +1741,24 @@ export const getReliabilityOverview = async (
     preloadedSources.seoProspectCostOverrun !== undefined
       ? preloadedSources.seoProspectCostOverrun
       : await getSeoProspectCostOverrunSignal().catch(() => null)
+
+  // TASK-1696 — el gasto del grader que no llegaba al ledger, el rendimiento real de la matriz de
+  // observaciones (que el agregado escondía) y el sobregiro per-org que nueve tasks daban por
+  // construido y no existía.
+  const growthDataForSeoSpendLedgerDrift =
+    preloadedSources.growthDataForSeoSpendLedgerDrift !== undefined
+      ? preloadedSources.growthDataForSeoSpendLedgerDrift
+      : await getGrowthDataForSeoSpendLedgerDriftSignal().catch(() => null)
+
+  const growthAiVisibilityObservationYield =
+    preloadedSources.growthAiVisibilityObservationYield !== undefined
+      ? preloadedSources.growthAiVisibilityObservationYield
+      : await getGrowthAiVisibilityObservationYieldSignal().catch(() => null)
+
+  const seoProviderCostOverBudget =
+    preloadedSources.seoProviderCostOverBudget !== undefined
+      ? preloadedSources.seoProviderCostOverBudget
+      : await getSeoProviderCostOverBudgetSignal().catch(() => null)
 
   // TASK-1664 — keyword discovery: corridas atascadas + fallas de proveedor (24h).
   const seoKeywordDiscoveryStuckRuns =
@@ -2832,6 +2860,9 @@ export const getReliabilityOverview = async (
     seoBacklinkDrilldownFailures,
     seoAuditStuckTasks,
     seoProspectCostOverrun,
+    growthDataForSeoSpendLedgerDrift,
+    growthAiVisibilityObservationYield,
+    seoProviderCostOverBudget,
     seoKeywordDiscoveryStuckRuns,
     seoKeywordDiscoveryProviderErrors,
     payrollComplianceExportDrift,
