@@ -365,7 +365,8 @@ describe('readKeywordOpportunities — honestidad del orden y de la curva (TASK-
   })
 
   it('sin ningún bucket en la posición objetivo declara `fallback`, no `unusable`', async () => {
-    state.curve = [curveBucket(12, 5000, 50)]
+    // Sitio sin señal ni para estimar un nivel: 2 clics no escalan nada.
+    state.curve = [curveBucket(12, 500, 2)]
     state.opportunities = [opportunityRow()]
 
     const result = await readKeywordOpportunities('seot-1')
@@ -376,6 +377,31 @@ describe('readKeywordOpportunities — honestidad del orden y de la curva (TASK-
       // Nunca observamos esa posición ≠ la observamos y no alcanza.
       expect(result.ctrCurveSource).toBe('fallback')
       expect(result.curveSampleSize).toBeNull()
+      expect(result.orderedBy).toBe('measured_demand')
+    }
+  })
+
+  /**
+   * TASK-1792 Slice 4 — el estado que cierra el salto entre «curva propia» y «tabla prestada».
+   *
+   * El bucket objetivo no alcanza, pero el AGREGADO del sitio sí tiene muestra para estimar un
+   * parámetro: se presta la forma de la referencia y se escala al nivel medido de este sitio.
+   * Un parámetro medido en vez de veinte prestados.
+   */
+  it('con bucket objetivo insuficiente pero nivel estimable, declara la curva calibrada', async () => {
+    state.curve = [efeonceTargetBucket(), curveBucket(3, 20_000, 600)]
+    state.opportunities = [opportunityRow()]
+
+    const result = await readKeywordOpportunities('seot-1')
+
+    expect(result.ok).toBe(true)
+
+    if (result.ok) {
+      expect(result.ctrCurveSource).toBe('org_level_reference_shape')
+      // La muestra del bucket objetivo viaja igual: es lo que explica por qué no se midió ahí.
+      expect(result.curveSampleSize).toEqual({ impressions: 75, clicks: 0 })
+      expect(result.expectedCtrAtTarget).toBeGreaterThan(0)
+      // Sigue sin ordenar por un techo prestado, por muy calibrado que esté.
       expect(result.orderedBy).toBe('measured_demand')
     }
   })

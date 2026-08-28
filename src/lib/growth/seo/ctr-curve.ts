@@ -167,28 +167,173 @@ export interface SeoExpectedCtrVerdict {
    * impresiones bastan para juzgar la muestra, que es justo el error de origen.
    */
   sampleSize: { impressions: number; clicks: number } | null
+  /** Nivel con que se escaló la forma de referencia, y de dónde salió. */
+  level: SeoCtrLevelEstimate
 }
 
 /**
- * Curva pública de referencia, usada cuando la propia no puede hablar en esa posición.
+ * Curva de CTR de REFERENCIA por posición, usada cuando la propia no puede hablar.
  *
- * ⚠️ Marcada como APROXIMACIÓN, jamás como medición: quien la consuma lo sabe por
- * `source`, que nunca dice `org_measured` cuando el número sale de acá.
+ * ═══ Procedencia, porque un número sin origen no es una referencia ═══
+ *
+ * Son los CTR MEDIDOS sobre filas **no-marca** de un sitio real en un vertical deprimido por
+ * AI Overviews, documentados con su as-of (2026-08) en la skill `seo-aeo`,
+ * `modules/07_MEASUREMENT.md`. Reemplazan la tabla pública que vivía acá
+ * (`{1: 0.27, 2: 0.15, … 5: 0.06}`), que estaba calibrada para una SERP que ya no existe.
+ *
+ * ═══ Por qué se presta la FORMA y se estima el NIVEL ═══
+ *
+ * Comparadas normalizando la posición 1 a 1,00, las tres curvas disponibles el 2026-08-28
+ * coinciden en su decaimiento:
+ *
+ * | Fuente                          | p1   | p2   | p3   | p4   | p5   |
+ * |---------------------------------|------|------|------|------|------|
+ * | Tabla pública (la que estaba)   | 1,00 | 0,56 | 0,41 | 0,30 | 0,22 |
+ * | `berel.com` medida (PG, 28d)    | 1,00 | 0,67 | 0,53 | 0,29 | 0,21 |
+ * | No-marca medida (skill, 2026-08)| 1,00 | 0,72 | 0,54 | 0,32 | 0,26 |
+ *
+ * Lo que divergía no era la forma: era el NIVEL. Posición 1 en **27%** (tabla pública) contra
+ * **4,72%** (Berel) y **4,25%** (skill) — dos sitios medidos independientes en el mismo orden
+ * de magnitud, y un orden de magnitud por debajo del benchmark de industria. En la posición
+ * objetivo por defecto (5) eso es 6% declarado contra ~1% medido: **cualquier organización que
+ * cayera al fallback recibía techos inflados ~6×.**
+ *
+ * De ahí la forma del Slice 4: **un nivel es 1 parámetro; una curva por posición son ~20.** Se
+ * estima el nivel del sitio desde su propio agregado —cuando hay muestra para uno— y se presta
+ * la forma, en vez de estimar veinte cosas desde datos que no sostienen ni una.
+ *
+ * ⚠️ Valores CRUDOS a propósito: la tabla es verificable contra su fuente, y la monotonía se
+ * fuerza en código (`buildExpectedCtrCurve`) donde se puede ver. Las posiciones 10–12 de la
+ * medición repuntan (0,31 → 0,35 → 0,40) por ruido de muestra chica; congelar acá la versión
+ * ya suavizada escondería que la corrección existe.
  */
-const FALLBACK_CTR_CURVE: Record<number, number> = {
-  1: 0.27,
-  2: 0.15,
-  3: 0.11,
-  4: 0.08,
-  5: 0.06,
-  6: 0.05,
-  7: 0.04,
-  8: 0.03,
-  9: 0.027,
-  10: 0.025
+const REFERENCE_CTR_CURVE: Record<number, number> = {
+  1: 0.0425, 2: 0.0305, 3: 0.0229, 4: 0.0135, 5: 0.0112, 6: 0.008,
+  7: 0.0057, 8: 0.0049, 9: 0.0031, 10: 0.0035, 11: 0.0035, 12: 0.004
 }
 
-const FALLBACK_CTR_TAIL = 0.02
+/** Última posición con medición propia en la referencia. */
+const REFERENCE_LAST_POSITION = 12
+
+/**
+ * Piso de muestra para estimar el NIVEL del sitio (un solo parámetro).
+ *
+ * `minClicks = 30`: el error relativo de un conteo es ≈ 1/√k, así que 30 clics dan ~18% —
+ * suficiente para escalar una curva, lejos de suficiente para dibujarla. `minImpressions`
+ * acompaña para que el denominador no sea ruido.
+ *
+ * Deliberadamente MÁS BAJO que el piso por bucket (1.000/5): estimar un parámetro sobre el
+ * agregado del sitio necesita mucha menos muestra que estimar veinte por posición. Fundir los
+ * dos pisos sería repetir el error de origen — una constante respondiendo dos preguntas.
+ */
+const LEVEL_ESTIMATION_FLOOR = { minClicks: 30, minImpressions: 1000 } as const
+
+/**
+ * Cómo se obtuvo el nivel con que se escala la forma de referencia.
+ *
+ * `org_level` = estimado del agregado propio del sitio · `reference` = no había muestra para
+ * un nivel, así que la referencia va a su nivel nativo.
+ */
+export type SeoCtrLevelBasis = 'org_level' | 'reference'
+
+export interface SeoCtrLevelEstimate {
+  /** Factor de escala sobre la forma de referencia. `1` = la referencia a su nivel nativo. */
+  level: number
+  basis: SeoCtrLevelBasis
+  totalImpressions: number
+  totalClicks: number
+}
+
+const referenceCtrAt = (position: number): number =>
+  REFERENCE_CTR_CURVE[Math.min(Math.max(1, position), REFERENCE_LAST_POSITION)] ??
+  REFERENCE_CTR_CURVE[REFERENCE_LAST_POSITION]
+
+/**
+ * Estima el NIVEL del sitio: cuánto se separa su CTR del de la curva de referencia.
+ *
+ * Es la estimación de máxima verosimilitud del factor de escala bajo un modelo de tasa: el
+ * cociente entre los clics REALES del sitio y los que la referencia predice para SU
+ * distribución de impresiones por posición. Un solo parámetro, del agregado — no una curva.
+ *
+ * ⚠️ El agregado incluye filas de MARCA, cuya explosión por sitelinks infla las posiciones
+ * 1–2. El oficio pide estimar sobre no-marca; ese filtro es un defecto independiente con su
+ * propio follow-up, y se declara acá para que el nivel no se lea libre de ese sesgo.
+ */
+export const estimateOrgCtrLevel = (curve: SeoOrgCtrCurve): SeoCtrLevelEstimate => {
+  let totalImpressions = 0
+  let totalClicks = 0
+  let predictedClicks = 0
+
+  for (const [position, bucket] of curve) {
+    totalImpressions += bucket.impressions
+    totalClicks += bucket.clicks
+    predictedClicks += bucket.impressions * referenceCtrAt(position)
+  }
+
+  const estimable =
+    totalClicks >= LEVEL_ESTIMATION_FLOOR.minClicks &&
+    totalImpressions >= LEVEL_ESTIMATION_FLOOR.minImpressions &&
+    predictedClicks > 0
+
+  if (!estimable) {
+    return { level: 1, basis: 'reference', totalImpressions, totalClicks }
+  }
+
+  return { level: totalClicks / predictedClicks, basis: 'org_level', totalImpressions, totalClicks }
+}
+
+export interface SeoExpectedCtrCurve {
+  /** CTR esperado por posición, ya monótono no creciente. */
+  byPosition: Map<number, number>
+  level: SeoCtrLevelEstimate
+}
+
+/** Techo de posiciones a construir: más allá el número no lo consume nadie. */
+const MAX_BUILT_POSITION = 100
+
+/**
+ * Construye la curva de CTR esperado EXPUESTA: una sola curva, sin saltos.
+ *
+ * El defecto de forma que cierra: el híbrido anterior devolvía la medición propia cuando el
+ * bucket existía y la tabla pública cuando no, sin transición. Con la curva real de
+ * `efeoncepro.com` eso producía **bucket 8 en 0,0000 y bucket 9 en ~0,027** — dos órdenes de
+ * magnitud entre posiciones adyacentes, que ninguna SERP tiene.
+ *
+ * Acá cada posición se resuelve así, en orden:
+ *
+ * 1. Medición propia, si el bucket tiene muestra suficiente **y** su CTR es mayor a cero.
+ * 2. Forma de referencia × nivel del sitio (o × 1 si no hay muestra para un nivel).
+ *
+ * Y al final se fuerza **monótona no creciente**: mezclar buckets medidos con buckets prestados
+ * puede producir repuntes que no describen ningún comportamiento —la posición 6 no convierte
+ * mejor que la 5—, y la propia referencia repunta en 10–12 por ruido de muestra chica.
+ */
+export const buildExpectedCtrCurve = (
+  curve: SeoOrgCtrCurve,
+  floor: SeoCtrCurveSampleFloor = SEO_CTR_CURVE_SAMPLE_FLOOR
+): SeoExpectedCtrCurve => {
+  const level = estimateOrgCtrLevel(curve)
+  const observedMax = curve.size > 0 ? Math.max(...curve.keys()) : 0
+  const lastPosition = Math.min(MAX_BUILT_POSITION, Math.max(REFERENCE_LAST_POSITION, observedMax))
+  const byPosition = new Map<number, number>()
+
+  let ceiling = Number.POSITIVE_INFINITY
+
+  for (let position = 1; position <= lastPosition; position += 1) {
+    const bucket = curve.get(position)
+
+    const usesOwnMeasurement =
+      bucket !== undefined && bucket.ctr > 0 && isCurveUsableAtPosition(curve, position, floor)
+
+    const raw = usesOwnMeasurement ? bucket.ctr : referenceCtrAt(position) * level.level
+
+    // Monotonía por mínimo corrido: una posición nunca puede prometer más CTR que la anterior.
+    ceiling = Math.min(ceiling, raw)
+    byPosition.set(position, ceiling)
+  }
+
+  return { byPosition, level }
+}
 
 /**
  * Resuelve el CTR esperado en una posición, DECLARANDO de dónde salió y con qué muestra.
@@ -208,18 +353,32 @@ export const resolveExpectedCtrAtPosition = (
   const targetPosition = Math.max(1, Math.round(position))
   const bucket = curve.get(targetPosition)
   const sampleSize = bucket ? { impressions: bucket.impressions, clicks: bucket.clicks } : null
-  const borrowed = FALLBACK_CTR_CURVE[targetPosition] ?? FALLBACK_CTR_TAIL
+  const expected = buildExpectedCtrCurve(curve, floor)
+  const expectedCtr = expected.byPosition.get(targetPosition) ?? referenceCtrAt(targetPosition)
 
   if (bucket && isCurveUsableAtPosition(curve, targetPosition, floor) && bucket.ctr > 0) {
-    return { targetPosition, expectedCtr: bucket.ctr, source: 'org_measured', sampleSize }
+    return { targetPosition, expectedCtr, source: 'org_measured', sampleSize, level: expected.level }
+  }
+
+  // El número salió de la forma de referencia. Si además se pudo estimar el nivel del sitio,
+  // está CALIBRADO a este sitio y eso es un hecho distinto de una tabla prestada tal cual.
+  if (expected.level.basis === 'org_level') {
+    return {
+      targetPosition,
+      expectedCtr,
+      source: 'org_level_reference_shape',
+      sampleSize,
+      level: expected.level
+    }
   }
 
   return {
     targetPosition,
-    expectedCtr: borrowed,
+    expectedCtr,
     // Vimos la posición pero la muestra no alcanza (`unusable`) vs nunca la observamos
     // (`fallback`). Mismo número prestado, hechos distintos.
     source: bucket ? 'unusable' : 'fallback',
-    sampleSize
+    sampleSize,
+    level: expected.level
   }
 }

@@ -68,11 +68,16 @@ export type SeoMarketAvailability = 'available' | 'unavailable'
  * la observamos**. Colapsarlos reintroduciría en el contrato la misma confusión de ausencia
  * que produjo el defecto (`0` medido leído como «CTR esperado 0»).
  *
- * Sólo `org_measured` significa que el techo salió de la medición del propio sitio. Ningún
- * consumidor —pantalla, lane ecosystem o tool MCP— puede leer el techo sin saber de dónde
- * salió.
+ * Sólo `org_measured` significa que el techo salió de la medición del propio sitio EN ESA
+ * POSICIÓN. `org_level_reference_shape` es el estado intermedio que cierra el salto entre
+ * «curva propia» y «tabla prestada»: la forma la presta la referencia y el NIVEL se estima del
+ * agregado del propio sitio — un parámetro medido en vez de veinte prestados. `unusable` y
+ * `fallback` son la referencia a su nivel nativo, porque no hubo muestra ni para un parámetro.
+ *
+ * Ningún consumidor —pantalla, lane ecosystem o tool MCP— puede leer el techo sin saber de
+ * dónde salió.
  */
-export type SeoCtrCurveSource = 'org_measured' | 'unusable' | 'fallback'
+export type SeoCtrCurveSource = 'org_measured' | 'org_level_reference_shape' | 'unusable' | 'fallback'
 
 /**
  * TASK-1792 — Criterio con el que la lente devuelve ordenadas las oportunidades.

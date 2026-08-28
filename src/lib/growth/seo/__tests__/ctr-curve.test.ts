@@ -3,6 +3,8 @@ import { describe, expect, it, vi } from 'vitest'
 vi.mock('server-only', () => ({}))
 
 import {
+  buildExpectedCtrCurve,
+  estimateOrgCtrLevel,
   isCurveUsableAtPosition,
   resolveExpectedCtrAtPosition,
   SEO_CTR_CURVE_SAMPLE_FLOOR,
@@ -199,5 +201,88 @@ describe('TASK-1792 — el SQL de la curva', () => {
   it('no hace date-math prohibida sobre columnas DATE', () => {
     expect(SEO_CTR_CURVE_SQL).not.toMatch(/EXTRACT\s*\(\s*EPOCH/i)
     expect(SEO_CTR_CURVE_SQL).toMatch(/CURRENT_DATE - \$2::int/)
+  })
+})
+
+/**
+ * TASK-1792 Slice 4 — la curva expuesta es UNA sola, sin saltos, y calibrada al sitio.
+ */
+describe('TASK-1792 — la recalibración y la curva continua', () => {
+  it('el fallback ya no infla ~6× el techo de la posición objetivo', () => {
+    // La tabla anterior declaraba 6% en posición 5. Dos sitios medidos independientes dan ~1%.
+    const borrowed = resolveExpectedCtrAtPosition(new Map(), 5)
+
+    expect(borrowed.source).toBe('fallback')
+    expect(borrowed.expectedCtr).toBeCloseTo(0.0112, 4)
+    // El número viejo queda fuera por un factor de 5, no por redondeo.
+    expect(borrowed.expectedCtr).toBeLessThan(0.06 / 4)
+  })
+
+  it('la curva expuesta es monótona no creciente, con curva sana y con curva rota', () => {
+    for (const [label, curve] of [
+      ['berel.com', BEREL_CURVE],
+      ['efeoncepro.com', EFEONCE_CURVE],
+      ['sin datos', new Map()]
+    ] as const) {
+      const { byPosition } = buildExpectedCtrCurve(curve)
+      const positions = [...byPosition.keys()].sort((a, b) => a - b)
+
+      expect(positions.length).toBeGreaterThan(0)
+
+      for (let i = 1; i < positions.length; i += 1) {
+        const previous = byPosition.get(positions[i - 1]!)!
+        const current = byPosition.get(positions[i]!)!
+
+        expect(current, `${label}: la posición ${positions[i]} promete más CTR que la ${positions[i - 1]}`).
+          toBeLessThanOrEqual(previous)
+      }
+    }
+  })
+
+  /**
+   * 🔴 El salto que cerró el Slice 4. El híbrido anterior devolvía la medición propia cuando el
+   * bucket existía y la tabla pública cuando no: con la curva de efeoncepro eso daba bucket 8
+   * en 0,0000 y bucket 9 en ~0,027 — dos órdenes de magnitud entre posiciones adyacentes.
+   */
+  it('no presenta saltos de orden de magnitud entre buckets adyacentes', () => {
+    for (const curve of [BEREL_CURVE, EFEONCE_CURVE]) {
+      const { byPosition } = buildExpectedCtrCurve(curve)
+      const positions = [...byPosition.keys()].sort((a, b) => a - b)
+
+      for (let i = 1; i < positions.length; i += 1) {
+        const previous = byPosition.get(positions[i - 1]!)!
+        const current = byPosition.get(positions[i]!)!
+
+        if (previous <= 0) continue
+
+        expect(current / previous, `salto de orden de magnitud entre ${positions[i - 1]} y ${positions[i]}`).
+          toBeGreaterThan(0.1)
+      }
+    }
+  })
+
+  it('estima el nivel del sitio cuando hay muestra, y lo declara cuando no', () => {
+    // 2 clics no escalan nada: la referencia va a su nivel nativo.
+    expect(estimateOrgCtrLevel(EFEONCE_CURVE).basis).toBe('reference')
+    expect(estimateOrgCtrLevel(EFEONCE_CURVE).level).toBe(1)
+
+    // berel.com: 14.385 clics reales. El nivel sale del agregado, un parámetro.
+    const berel = estimateOrgCtrLevel(BEREL_CURVE)
+
+    expect(berel.basis).toBe('org_level')
+    // La referencia le queda casi calzada — corrobora la elección de la forma prestada.
+    expect(berel.level).toBeGreaterThan(0.5)
+    expect(berel.level).toBeLessThan(2)
+  })
+
+  /**
+   * Criterio de aceptación duro: con la organización SANA nada se mueve. Si el orden o los
+   * techos de berel.com cambian, la corrección rompió a quien ya estaba bien.
+   */
+  it('con berel.com el techo de la posición objetivo NO cambia: sigue siendo su medición', () => {
+    const verdict = resolveExpectedCtrAtPosition(BEREL_CURVE, 5)
+
+    expect(verdict.source).toBe('org_measured')
+    expect(verdict.expectedCtr).toBeCloseTo(370 / 37_600, 6)
   })
 })
