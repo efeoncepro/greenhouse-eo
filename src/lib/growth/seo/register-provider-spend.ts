@@ -21,6 +21,9 @@ import { setDataForSeoSpendRecorder } from '@/lib/ai/dataforseo'
 
 import { recordSeoProviderSpend } from './provider-spend'
 
-setDataForSeoSpendRecorder(async ({ organizationId, family, cost }) => {
-  await recordSeoProviderSpend({ organizationId, family, cost })
+setDataForSeoSpendRecorder(async ({ organizationId, family, cost, consumer }) => {
+  // TASK-1696 — el consumidor viaja desde el CALLER por el transporte, no se decide acá. Este
+  // registro es un puente entre dos capas; inventarle un valor sería la forma más silenciosa de
+  // atribuirle a un servicio el gasto de otro.
+  await recordSeoProviderSpend({ organizationId, family, cost, consumer })
 })

@@ -233,6 +233,7 @@ export const seedRankHistory = async (
     try {
       const response = await postDataForSeoTask({
         family: 'labs',
+        consumer: 'seo',
         endpoint: '/v3/dataforseo_labs/google/historical_serps/live',
         organizationId: target.organization_id,
         tasks: [

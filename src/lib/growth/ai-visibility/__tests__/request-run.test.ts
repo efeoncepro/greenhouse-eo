@@ -33,7 +33,10 @@ vi.mock('../flags', () => ({
   isGraderEnabled: () => state.graderEnabled,
   // TASK-1288 — guard de categoría OFF en estos tests (default productivo); su cobertura
   // específica vive en category-guard.test.ts.
-  isCategoryGuardEnabled: () => false
+  isCategoryGuardEnabled: () => false,
+  // TASK-1696 — gate de presupuesto APAGADO en estos tests: ejercitan las puertas de
+  // entitlement/allowance, no el shadow del presupuesto (que tiene su propio test).
+  isAeoBudgetGateEnabled: () => budgetGateEnabled
 }))
 
 vi.mock('../entitlement', () => ({
@@ -66,6 +69,13 @@ vi.mock('@/lib/sync/publish-event', () => ({
 
     return 'outbox-1'
   }
+}))
+
+let budgetGateEnabled = false
+let budgetState = { wouldBlock: false, enforced: false, tier: 'contracted', budgetCapUsd: 60, invoicedUsedUsd: 0, estimatedUsedUsd: 0, budgetUsedUsd: 0 }
+
+vi.mock('../budget', () => ({
+  resolveAeoBudget: async () => budgetState
 }))
 
 vi.mock('@/lib/observability/capture', () => ({ captureWithDomain: vi.fn() }))
@@ -256,5 +266,60 @@ describe('requestGraderRunAsOperator', () => {
 
     expect(r).toEqual({ status: 'blocked', reason: 'business_model_unconfirmed' })
     expect(spies.enqueue).not.toHaveBeenCalled()
+  })
+})
+
+describe('gate de presupuesto AEO en shadow (TASK-1696)', () => {
+  beforeEach(() => {
+    budgetGateEnabled = false
+    budgetState = {
+      wouldBlock: false,
+      enforced: false,
+      tier: 'contracted',
+      budgetCapUsd: 60,
+      invoicedUsedUsd: 0,
+      estimatedUsedUsd: 0,
+      budgetUsedUsd: 0
+    }
+  })
+
+  it('con el shadow prendido y enforce APAGADO, un run que superaría el tope SE EJECUTA', async () => {
+    budgetGateEnabled = true
+    budgetState = { ...budgetState, wouldBlock: true, enforced: false, budgetUsedUsd: 99 }
+
+    const result = await requestGraderRunForOrganization({
+      organizationId: 'org-1',
+      requestedBy: 'user-1'
+    })
+
+    // Es el contrato entero del shadow: se registra lo que habría pasado y no se corta nada.
+    // El camino público del lead magnet comparte este motor; bloquear sin calibrar corta captación.
+    expect(result.status).toBe('accepted')
+  })
+
+  it('con enforce PRENDIDO, el mismo run se bloquea con budget_exhausted', async () => {
+    budgetGateEnabled = true
+    budgetState = { ...budgetState, wouldBlock: true, enforced: true, budgetUsedUsd: 99 }
+
+    const result = await requestGraderRunForOrganization({
+      organizationId: 'org-1',
+      requestedBy: 'user-1'
+    })
+
+    expect(result).toEqual({ status: 'blocked', reason: 'budget_exhausted' })
+  })
+
+  it('con el gate apagado no se consulta el presupuesto', async () => {
+    budgetGateEnabled = false
+    budgetState = { ...budgetState, wouldBlock: true, enforced: true }
+
+    const result = await requestGraderRunForOrganization({
+      organizationId: 'org-1',
+      requestedBy: 'user-1'
+    })
+
+    // `wouldBlock: true` + `enforced: true` y aun así pasa: sin el flag de shadow el resolver ni
+    // se llama. Dos condiciones independientes, no una.
+    expect(result.status).toBe('accepted')
   })
 })

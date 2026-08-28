@@ -1,5 +1,14 @@
 # TASK-1353 — HubSpot Portal Grader — foundation `growth.hubspot_portal` (Fase 1, slice-scoped)
 
+## Delta 2026-08-27
+
+- El precedente a espejar se partió en dos: `resolveAeoEntitlement` conserva su contrato —cupo de
+  corridas, sin campos de dinero— y el presupuesto vive en un resolver aparte, `resolveAeoBudget`
+  (`src/lib/growth/ai-visibility/budget.ts`) — cambiado por TASK-1696. Un espejo que copie sólo el
+  entitlement se queda sin gate de gasto.
+- La razón del corte es reusable para esta task: cupo mensual de corridas y gasto acumulado son dos
+  decisiones con ciclos de vida distintos, y acoplarlas en un solo objeto las hace ilegibles.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

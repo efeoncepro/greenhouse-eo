@@ -58,9 +58,10 @@ const main = async () => {
       const orgId = org.organization_id
 
       // 1. Tres llamadas de la MISMA familia/día acumulan en una sola fila.
-      await client.query(SEO_PROVIDER_SPEND_UPSERT_SQL, [orgId, 'labs', 0.01])
-      await client.query(SEO_PROVIDER_SPEND_UPSERT_SQL, [orgId, 'labs', 0.02])
-      await client.query(SEO_PROVIDER_SPEND_UPSERT_SQL, [orgId, 'labs', 0.005])
+      // TASK-1696 — el UPSERT productivo declara consumidor y base de costo.
+      await client.query(SEO_PROVIDER_SPEND_UPSERT_SQL, [orgId, 'labs', 0.01, 'seo', 'invoiced', null])
+      await client.query(SEO_PROVIDER_SPEND_UPSERT_SQL, [orgId, 'labs', 0.02, 'seo', 'invoiced', null])
+      await client.query(SEO_PROVIDER_SPEND_UPSERT_SQL, [orgId, 'labs', 0.005, 'seo', 'invoiced', null])
 
       const labs = (
         await client.query<{ call_count: number; provider_cost_usd: string }>(
@@ -79,7 +80,7 @@ const main = async () => {
       ])
 
       // 2. Otra familia el mismo día NO comparte fila: el grano por familia es real.
-      await client.query(SEO_PROVIDER_SPEND_UPSERT_SQL, [orgId, 'backlinks', 0.02])
+      await client.query(SEO_PROVIDER_SPEND_UPSERT_SQL, [orgId, 'backlinks', 0.02, 'seo', 'invoiced', null])
 
       const perFamily = (
         await client.query<{ family: string; cost: string }>(
@@ -101,8 +102,8 @@ const main = async () => {
       try {
         await client.query(
           `INSERT INTO greenhouse_growth.seo_provider_spend_daily
-             (organization_id, family, spend_date, call_count, provider_cost_usd)
-           VALUES ($1, 'keywords_data', CURRENT_DATE, 1, 0.01)`,
+             (organization_id, family, spend_date, call_count, provider_cost_usd, consumer, cost_basis)
+           VALUES ($1, 'keywords_data', CURRENT_DATE, 1, 0.01, 'seo', 'invoiced')`,
           [orgId]
         )
         await client.query('RELEASE SAVEPOINT familia_invalida')
@@ -142,14 +143,23 @@ const main = async () => {
     if (!passed) failures += 1
   }
 
+  // ⚠️ TASK-1696 — el residuo se mide SOBRE LA ORGANIZACIÓN Y EL DÍA que este script tocó, no
+  // sobre la tabla entera: el ledger ya tiene gasto productivo real (el cron diario de rank
+  // capture escribe todos los días). Un `COUNT(*) = 0` global fallaría por dato legítimo y
+  // enseñaría a ignorar el check.
   const residue = await runGreenhousePostgresQuery<{ n: string }>(
-    `SELECT COUNT(*)::text AS n FROM greenhouse_growth.seo_provider_spend_daily`
+    `SELECT COUNT(*)::text AS n
+       FROM greenhouse_growth.seo_provider_spend_daily
+      WHERE organization_id = $1
+        AND spend_date = CURRENT_DATE
+        AND family IN ('labs', 'backlinks')`,
+    [org.organization_id]
   )
 
   const clean = residue[0]?.n === '0'
 
   checks.push(['cero residuo tras el rollback', clean])
-  console.log(`${clean ? '✓' : '✗'} cero residuo tras el rollback (${residue[0]?.n} filas)`)
+  console.log(`${clean ? '✓' : '✗'} cero residuo tras el rollback (${residue[0]?.n} filas de prueba)`)
 
   if (!clean) failures += 1
 

@@ -52,6 +52,8 @@ const main = async () => {
       mode: 'light'
     },
     createProviderAdapterContext({
+      // TASK-1696 — smoke sobre perfil sin organización: gasto no atribuible, sin fila en el ledger.
+      organizationId: null,
       providerPolicyVersion: 'sanity.task-1652',
       promptPackVersion: 'sanity.task-1652',
       timeoutMs: 30_000,

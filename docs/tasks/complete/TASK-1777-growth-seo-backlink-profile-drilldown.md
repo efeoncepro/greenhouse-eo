@@ -61,6 +61,15 @@ entonces: flag OFF, cero gasto, el batch semanal intacto.
 - Pendiente para `complete`: pase develop→main + federación de `get_seo_backlink_detail` en
   `efeonce-mcp` (post-release).
 
+## Delta 2026-08-27 (4) — cierre por decisión del operador; F1 con fecha
+
+- El operador decidió cerrar la task hoy: el rollout está completo (flag ON en revisión activa,
+  lane en producción con el release `cc73c74789ce`, `get_seo_backlink_detail` entre las 21 tools
+  observadas en el gateway) y el único criterio sin observar — el predicado de movimiento — pasa
+  de bloqueante a **follow-up F1 con fecha y dueño** (lunes 2026-08-31; ver `## Follow-ups`).
+  La cláusula del Delta (3) "sólo bloquea marcar esta task complete" queda superseded por esta
+  decisión; la receta de verificación del Delta (3) sigue siendo la vigente.
+
 ## Delta 2026-08-27 (3) — veredicto de auditoría: `code complete, rollout parcialmente verificado`
 
 - Auditoría del release (sesión coordinadora) sobre la evidencia del smoke: los criterios de costo
@@ -105,7 +114,7 @@ entonces: flag OFF, cero gasto, el batch semanal intacto.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -118,7 +127,7 @@ entonces: flag OFF, cero gasto, el batch semanal intacto.
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `code complete, rollout pendiente`
+- Status real: `complete — rollout ejecutado y verificado (flag ON, lane en producción, tool federada); verificación del predicado de movimiento diferida al follow-up F1 (2026-08-31) por decisión del operador`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -587,7 +596,7 @@ especialista: "no pasó nada" y "no sabemos qué pasó" son conclusiones opuesta
 - [x] `shouldDrillDownBacklinks` es un predicado puro sin acceso a red ni DB, con tests de tabla sobre los cinco casos: sin movimiento, bajo umbral, sobre umbral, primera vez y snapshot `partial`.
 - [x] Un snapshot `partial` **no** dispara drill-down.
 - [x] La migración crea ambas tablas con FK a `seo_backlink_snapshots`, CHECK cerrado de `movement`, claves únicas, triggers anti UPDATE/DELETE y GRANT; el bloque DO aborta si algo no quedó creado.
-- [ ] Un target sin movimiento registra **USD 0** en `seo_provider_spend_daily`, verificado en el smoke real y no sólo con mocks. *(Pendiente de runtime: no pudo producirse en el smoke del 2026-08-27 — ambos targets eran `first_time`. Se observa en el primer ciclo natural del lunes 2026-08-31; receta de verificación en el Delta (3) abajo.)*
+- [ ] Un target sin movimiento registra **USD 0** en `seo_provider_spend_daily`, verificado en el smoke real y no sólo con mocks. *(No pudo producirse en el smoke del 2026-08-27 — ambos targets eran `first_time`; cubierto por tests de tabla del predicado puro. **Diferido por decisión del operador (2026-08-27) al follow-up F1**: se observa en el primer ciclo natural del lunes 2026-08-31 con la receta del Delta (3). Precedente del patrón: TASK-1775 cerró con su criterio de fila NULL igualmente diferido a observación natural.)*
 - [x] Un target con movimiento deja filas en ambas tablas hijas y su `cost` real coincide con el estimado dentro del margen declarado. *(Smoke 2026-08-27: 225 referring domains + 86 anchors; USD 0.1818 real vs ~0.19 estimado.)*
 - [x] Todo `rank` persistido está en escala 0–100.
 - [x] `spam_score` de enlace y `backlinks_spam_score` de perfil viven en columnas distintas y `toxic_share` del padre no se recalcula.
@@ -596,7 +605,7 @@ especialista: "no pasó nada" y "no sabemos qué pasó" son conclusiones opuesta
 - [x] Un drill-down fallido deja veredicto `failed`, emite la señal y no fabrica filas. (El snapshot padre es append-only y no muta; el veredicto persistido es lo que lo declara.)
 - [x] La derivación de sobre-optimización de anchors vive en el primitive, no en ningún consumer.
 - [x] La tool `get_seo_backlink_detail` responde por el lane ecosystem con canary verde en staging. *(Smoke 2026-08-27: `state=available`, `capturedAt=2026-08-24`.)*
-- [ ] Cierre operativo: pase develop→main con los lanes en producción + deploy del gateway con la federación de `TASK-1658` (dueña) verificado con `tools/list` 13→21.
+- [x] Cierre operativo: pase develop→main con los lanes en producción + deploy del gateway con la federación de `TASK-1658` (dueña) verificado con `tools/list` 13→21. *(2026-08-27: release `cc73c74789ce` → lanes en producción; gateway `efeonce-mcp-gateway-00023-zt2` desplegado; `tools/list` autenticado observado: **21 tools SEO** — `get_seo_backlink_detail` incluida. Lo único que mantiene la task abierta es el criterio del predicado de movimiento, lunes 2026-08-31.)*
 - [x] La capability tiene grant a ≥1 rol real en el mismo PR y el coverage test pasa.
 - [x] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` y `pnpm docs:closure-check` pasa.
 - [x] No se creó ningún Cloud Scheduler job nuevo.
@@ -613,19 +622,25 @@ especialista: "no pasó nada" y "no sabemos qué pasó" son conclusiones opuesta
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` quedó sincronizado con el cierre
-- [ ] `Handoff.md` quedó actualizado
-- [ ] `changelog.md` quedó actualizado
-- [ ] se ejecutó chequeo de impacto cruzado sobre `TASK-1662`, `TASK-1709`, `TASK-1314` y `TASK-1775`
-- [ ] delta en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §3 y §4.2
-- [ ] runbook `docs/manual-de-uso/growth/operar-perfil-de-enlaces-seo.md` creado
-- [ ] doc funcional del módulo actualizada
-- [ ] corregida la línea de la skill `dataforseo-operator` que afirma que la familia `backlinks` no tiene consumer
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` quedó sincronizado con el cierre
+- [x] `Handoff.md` quedó actualizado
+- [x] `changelog.md` quedó actualizado
+- [x] se ejecutó chequeo de impacto cruzado sobre `TASK-1662`, `TASK-1709`, `TASK-1314` y `TASK-1775` (deltas dejados el 2026-08-27 durante la implementación)
+- [x] delta en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §3 y §4.2
+- [x] runbook `docs/manual-de-uso/growth/operar-perfil-de-enlaces-seo.md` creado
+- [x] doc funcional del módulo actualizada
+- [x] corregida la línea de la skill `dataforseo-operator` que afirma que la familia `backlinks` no tiene consumer
 
 ## Follow-ups
 
+- **F1 (con fecha, dueño: operador/primera sesión del lunes 2026-08-31):** verificar el primer
+  ciclo natural con el flag ON — targets sin movimiento deben salir `skipped_no_movement` con
+  `provider_cost_usd = 0` (query lista en el Delta (3); cross-check `seo_provider_spend_daily`).
+  Si aparece `drilled` sin movimiento: abrir `ISSUE-###`, apagar `GROWTH_SEO_BACKLINK_DETAIL_ENABLED`
+  (rollback <5 min declarado en el runbook) y corregir `shouldDrillDownBacklinks` con sus tests
+  de tabla como red. Exposición si se ignora: ~USD 0.18/semana.
 - Task `ui-ux` que dibuje el detalle de enlaces con sus tres estados y el perfil de anchors.
 - Evaluar el espejo BQ de las tablas hijas si el histórico caliente en PostgreSQL crece por encima de la ventana declarada.
 - Evaluar `timeseries_new_lost_summary` para la línea de tiempo larga del perfil, que el proveedor sirve desde 2019 y hoy no se usa.

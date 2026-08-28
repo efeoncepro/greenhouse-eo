@@ -1,5 +1,18 @@
 # TASK-1706 — Growth SEO: el alta de una keyword es un compromiso de gasto y pasa por el presupuesto
 
+## Delta 2026-08-27
+
+- Confirmado el `Blocked by: none`: TASK-1696 cerró hoy. El ledger del que este gate saca la tarifa
+  medida ganó `consumer`, así que la lectura de la familia `serp` debe filtrar `consumer = 'seo'` o
+  mezclará las llamadas del grader AEO en la tarifa del rank capture — cambiado por TASK-1696. El
+  fragmento canónico `buildSeoProviderSpendMonthlySumSql` ya trae el filtro.
+- Colisión de vocabulario a evitar: el ledger tiene ahora una columna `cost_basis` con valores
+  `invoiced` | `estimated` (facturado por el proveedor vs. estimado con tabla de precios), distinta
+  del `costBasis: 'measured' | 'list_estimate'` que esta task declara en su outcome. No reusar el
+  nombre sin decir cuál de los dos se está hablando.
+- Sigue vigente el invariante «el gate proyecta, no debita»: TASK-1696 no agregó escritores al
+  ledger fuera del transporte.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -24,7 +37,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo`
-- Blocked by: `TASK-1696`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

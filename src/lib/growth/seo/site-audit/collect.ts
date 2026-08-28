@@ -205,6 +205,7 @@ const collectOneRun = async (auditRunId: string): Promise<CollectRunResult> =>
     try {
       summaryResult = await postDataForSeoTask({
         family: 'onpage',
+        consumer: 'seo',
         endpoint: ONPAGE_SUMMARY_ENDPOINT,
         tasks: [{ id: run.provider_task_id }],
         organizationId: run.organization_id
@@ -268,6 +269,7 @@ const collectOneRun = async (auditRunId: string): Promise<CollectRunResult> =>
       try {
         const pagesResult = await postDataForSeoTask({
           family: 'onpage',
+          consumer: 'seo',
           endpoint: ONPAGE_PAGES_ENDPOINT,
           tasks: [{ id: run.provider_task_id, limit: SITE_AUDIT_PAGES_READ_LIMIT }],
           organizationId: run.organization_id

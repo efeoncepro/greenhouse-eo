@@ -1,5 +1,24 @@
 # TASK-1779 — Memoria de trabajo del cliente (fundación transversal)
 
+## Delta 2026-08-28
+
+- `TASK-1699` quedó **code complete, rollout pendiente** (`in-progress/`, en develop `fdfdedbe5`) y
+  la coordinación de orden anticipada acá quedó resuelta: su modelo aterrizó con **cero ALTER a
+  `seo_competitors`** (la autoría del ALTER quedó en `TASK-1662`, ya implementada); 1699 aporta la
+  tabla nueva `seo_serp_top_results` y el descubrimiento `readSerpCompetitorCandidates` (propose;
+  el execute es `declareCompetitors` de 1662). `seo_competitors` ya no está huérfana: tiene
+  escritor y consumidores en código. Las notas de competidor de esta task cuelgan de esa forma ya
+  declarada — cerrado por TASK-1699/TASK-1662.
+
+## Delta 2026-08-27
+
+- La descripción del ledger quedó incompleta: `greenhouse_growth.seo_provider_spend_daily` ya no
+  registra sólo `organización × familia × día` — ganó `consumer` (`seo` | `aeo`), `cost_basis`
+  (`invoiced` | `estimated`) y `price_table_version`, y su clave única es de seis columnas
+  `NULLS NOT DISTINCT` — cambiado por TASK-1696.
+- El hueco que esta task nombra **sigue abierto**: el ledger ahora dice cuánto y quién consumió, pero
+  sigue sin decir **qué** se compró. La dimensión de consumidor no es memoria de trabajo.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

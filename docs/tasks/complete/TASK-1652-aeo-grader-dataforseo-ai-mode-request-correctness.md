@@ -1,5 +1,19 @@
 # TASK-1652 — AEO Grader: corrección del request AI Mode DataForSEO (location ISO-2 + gate per-task + citas anidadas)
 
+## Delta 2026-08-27
+
+- `google-ai-overview-adapter.ts` —el archivo que esta task corrigió— migró de
+  `postDataForSeoSerpLiveAdvanced` a `postDataForSeoTask`, pasando `family: 'serp'`,
+  `consumer: 'aeo'` y `organizationId` derivado server-side de `grader_profiles.organization_id` —
+  cambiado por TASK-1696. El mapa `market → location_code`, el gate per-task y el descenso de citas
+  de esta task se conservan intactos.
+- Queda stale su §Contract surface: `postDataForSeoSerpLiveAdvanced` ya no es el contrato del
+  adapter. El wrapper histórico quedó congelado —`consumer: 'aeo'` fijo, sin atribución de gasto— con
+  un guard test (`src/lib/ai/__tests__/dataforseo-legacy-wrapper-guard.test.ts`) que rompe el build
+  si un consumer nuevo entra por ahí — cambiado por TASK-1696.
+- Si quedara trabajo en vuelo sobre este adapter, rebasar sobre TASK-1696 antes de tocarlo: los dos
+  diffs caen sobre las mismas líneas de la llamada al transporte.
+
 ## Cierre 2026-08-27 — evidencia y decisiones
 
 **Commits:** `bc2dd0f99` (Slice 1: mapa market→`location_code` + gate per-task), `63d01db49`

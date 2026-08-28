@@ -11,9 +11,28 @@ import 'server-only'
 import {
   DATAFORSEO_DEFAULT_AI_MODE_ENDPOINT,
   isDataForSeoConfigured,
-  postDataForSeoSerpLiveAdvanced
+  postDataForSeoTask
 } from '@/lib/ai/dataforseo'
 import { captureWithDomain } from '@/lib/observability/capture'
+/**
+ * TASK-1696 — Registro del contador de gasto EN ESTE MÓDULO, por efecto de import.
+ *
+ * 🔴 Sin esta línea, pasar `organizationId` desde acá LANZA en Vercel. `postDataForSeoTask`
+ * falla fuerte cuando hay organización y el runtime no registró el recorder (guard deliberado de
+ * TASK-1300: es preferible romper a gastar sin contabilizar). Hoy el recorder se registra en el
+ * entrypoint del ops-worker, pero el grader TAMBIÉN corre inline en Vercel
+ * (`/api/admin/growth/ai-visibility/runs` → `runGraderDiagnostic` → `executeGraderRun`). El throw
+ * lo atraparía el `catch` de abajo y se convertiría en una observación `failed`: el grader
+ * perdería AI Mode exactamente para los perfiles de cliente que esta task existe para atribuir,
+ * en silencio y sin que ningún test lo note.
+ *
+ * Registrarlo acá lo hace runtime-agnóstico: donde se pueda cargar el adapter, el contador existe.
+ * Es el mismo patrón de `growth/seo/prospect/collect.ts`, y es el ÚNICO import de este dominio
+ * hacia `growth/seo` — deliberado, porque el ledger de gasto ES compartido por transporte entre
+ * los dos dominios (una factura de proveedor es una sola) y este módulo es su registro, no lógica
+ * de dominio SEO.
+ */
+import '@/lib/growth/seo/register-provider-spend'
 
 import {
   type GrowthAiVisibilityCitation,
@@ -382,7 +401,16 @@ export const createGoogleAiOverviewProviderAdapter = (): ProviderAdapter => ({
         })
       })
 
-      const result = await postDataForSeoSerpLiveAdvanced({
+      const result = await postDataForSeoTask({
+        family: 'serp',
+        // TASK-1696 — el gasto de AI Mode entra al ledger como AEO. `organizationId` viene del
+        // perfil (null = prospecto público, caso legítimo: no hay fila y queda contado como no
+        // atribuible en la señal de drift). Se llama al transporte canónico en vez del wrapper
+        // histórico del AEO (congelado en `src/lib/ai/dataforseo.ts`) porque ése no acepta
+        // organización: comprar por ahí dejaba el gasto fuera del ledger aunque el perfil sí
+        // tuviera cliente.
+        consumer: 'aeo',
+        ...(context.organizationId ? { organizationId: context.organizationId } : {}),
         endpoint: DATAFORSEO_DEFAULT_AI_MODE_ENDPOINT,
         timeoutMs: context.timeoutMs,
         tasks: [

@@ -282,8 +282,9 @@ Delega en el lane ecosystem de Greenhouse (`/api/platform/ecosystem/growth/seo/*
 per-org `seo_v2`, el 404 anti-oracle y las degradaciones honestas. Los payloads se pasan tal cual (`data` del
 envelope del lane), así que un cliente MCP ve exactamente los mismos shapes que la UI y Nexa.
 
-Tools publicadas — **el inventario COMPLETO del MCP interno de Greenhouse (21 tools SEO) está federado**
-(TASK-1658 cerró el drift de 8 tools que vivían adentro sin federar ni excluir). Las de **lectura** van bajo el
+Tools publicadas — **el inventario COMPLETO del MCP interno de Greenhouse (27 tools SEO: 20 lecturas + 7 escrituras) está federado**
+(TASK-1658 cerró el drift de 8 tools que vivían adentro sin federar ni excluir, dejándolo en 21; TASK-1696 sumó
+`get_seo_provider_spend` como lectura 17). Las de **lectura** van bajo el
 **scope base** `efeonce.mcp.read`; las **cinco de escritura** (TASK-1308/1664/1666/1709) exigen el scope propio
 del dominio `efeonce.mcp.seo.write` — un token de lectura jamás debe poder comprometer gasto DataForSEO. La lista
 canónica y el guard bidireccional viven en `src/providers/greenhouse-seo-tool-parity.ts` del repo `efeonce-mcp`
@@ -311,21 +312,21 @@ excluida (la dirección que antes era invisible).
 | `get_seo_domain_overview` | `GET .../growth/seo/domain-overview` | `efeonce.mcp.read` |
 | `get_seo_url_visibility` | `GET .../growth/seo/url-visibility` | `efeonce.mcp.read` |
 | `get_seo_prospect_diagnostic` | `GET .../growth/seo/prospect-diagnostic` | `efeonce.mcp.read` |
+| `get_seo_provider_spend` | `GET .../growth/seo/provider-spend` | `efeonce.mcp.read` (bindings `internal` únicamente) |
 | `track_seo_keywords` | `POST .../growth/seo/keywords/track` | `efeonce.mcp.seo.write` |
 | `untrack_seo_keywords` | `POST .../growth/seo/keywords/untrack` | `efeonce.mcp.seo.write` |
 | `discover_seo_keywords` | `POST .../growth/seo/keyword-discovery` | `efeonce.mcp.seo.write` |
 | `prepare_seo_grounded_queries` | `POST .../growth/seo/grounded-queries` | `efeonce.mcp.seo.write` |
 | `run_seo_prospect_diagnostic` | `POST .../growth/seo/prospect-diagnostic` | `efeonce.mcp.seo.write` |
 
-> Estado de despliegue 2026-08-27: la revisión **productiva** del gateway sirve las 13 tools previas;
-> las 8 de TASK-1658 (`get_seo_overview_kpis`, `get_seo_performance`, `get_seo_performance_catalog`,
-> `get_seo_domain_overview`, `get_seo_url_visibility`, `get_seo_backlink_detail`,
-> `get_seo_prospect_diagnostic`, `run_seo_prospect_diagnostic`) están en el allowlist con suite verde
-> (67/67, guard de paridad incluido) y evidencia de cableado: lane `entitlement` productivo 200 JSON con
-> el consumer token real, y los 5 lanes nuevos vivos en staging (401 `missing_token` del envelope del
-> lane = ruta desplegada + machine-auth activa). Su deploy se despacha DESPUÉS del próximo release
-> develop→main de Greenhouse (antes daría 404 upstream — lección TASK-1661); el run completo del canary
-> contra producción es parte de esa verificación. `prepare_seo_grounded_queries` responde además
+> Estado de despliegue 2026-08-28 — **inventario interno (27: 20 lecturas + 7 escrituras, tras TASK-1662/1699) ≠ desplegado en el gateway productivo (21)**:
+> el rollout de TASK-1658 ya se ejecutó y la revisión `efeonce-mcp-gateway-00023-zt2` (2026-08-27) llevó
+> `tools/list` de 13 a 21, con los 4 commits pusheados a `main` de `efeonce-mcp`. Falta desplegar la tool 22,
+> `get_seo_provider_spend` (TASK-1696, commit `1a51461` en `main`, CI verde): el deploy del gateway es
+> `workflow_dispatch` **manual** y no se disparó con el push, y su lane
+> `/api/platform/ecosystem/growth/seo/provider-spend` está en `develop`, **no en `main`** de Greenhouse. Su
+> deploy se despacha DESPUÉS del próximo release develop→main (antes daría 404 upstream — lección
+> TASK-1661); la verificación es `tools/list` 21→22 + el run completo del canary contra producción. `prepare_seo_grounded_queries` responde además
 > `aeo_forbidden` fail-closed para la identidad máquina compartida hasta TASK-1631, y el par de
 > prospecto queda detrás de `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` (hoy OFF en todos los ambientes —
 > el canary trata esa respuesta honesta como estado, no como fallo).

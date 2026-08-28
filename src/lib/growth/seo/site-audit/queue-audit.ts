@@ -188,6 +188,7 @@ export const queueSiteAudit = async (
   try {
     const result = await postDataForSeoTask({
       family: 'onpage',
+      consumer: 'seo',
       endpoint: ONPAGE_TASK_POST_ENDPOINT,
       tasks: [crawlTask],
       organizationId: target.organization_id

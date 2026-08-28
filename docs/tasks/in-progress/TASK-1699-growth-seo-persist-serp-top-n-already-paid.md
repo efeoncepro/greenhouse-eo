@@ -1,5 +1,83 @@
 # TASK-1699 — Growth SEO: persistir el top-N del SERP que ya se paga
 
+## Delta 2026-08-28 — Slices 1–5 implementados; estado `code complete, rollout pendiente`
+
+**Recalibraciones declaradas antes de ejecutar** (la spec era pre-1662/1696):
+(1) CERO ALTER a `seo_competitors` — la autoría la dejó TASK-1662 con modelo más rico
+(`declared_by/at/source` + `proposal_ref` + retiro con autoría); la evidencia de recurrencia viaja
+COMPACTA en `proposal_ref` (`serp_top:v1:<dominio>:kw=N:days=M:med=P:win=Wd`), re-computable siempre
+desde la tabla del top-N — no se persiste un segundo almacén de la evidencia.
+(2) `declareSeoCompetitors`/`retireSeoCompetitors` NO se crearon: existen como
+`declareCompetitors`/`retireCompetitors` (TASK-1662) y el Slice 4 quedó acotado al reader proponedor.
+(3) El delta a TASK-1696 es obsoleto (está `complete`; este trabajo se construyó encima).
+(4) La tensión "misma transacción" vs "el fallo no impide el snapshot" se resolvió: intento atómico
+(`withTransaction` con ambos INSERTs) y fallback observado que escribe el snapshot solo.
+(5) Los lanes ecosystem son **sólo-internal 404 anti-oracle** (§7: dato competitivo) — divergencia
+deliberada respecto de la prosa de la spec, consistente con provider-spend y keyword-gap.
+
+**Implementado en `develop` (local, sin push):**
+
+- **Slice 1** — migración `20260828124352232`: `seo_serp_top_results` append-only ESTRICTO
+  (trigger anti UPDATE/DELETE, GRANTs sólo SELECT+INSERT), UNIQUE por ranura `rank_absolute`
+  (jamás `rank_group`), índices de serie y recurrencia. Aplicada contra PG real.
+- **Slice 2** — `serp-top-results.ts`: `parseSerpTopResults` puro (hermano del parser existente;
+  `normalizeDomain`/`extractHost`/`isOwnDomain` EXPORTADOS de rank-capture, no duplicados) +
+  `persistSerpTopResults` (UNNEST multi-fila + DO NOTHING, tope 30). Open Questions resueltas con
+  la propuesta de la spec: todos los `item_type`; título completo con cap defensivo 2048; sin filtro
+  de plataformas en V1.
+- **Slice 3** — cableado en `captureRankSnapshot` tras flag `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED`
+  (dual-runtime, ON declarativo `:-true` en `deploy.sh` — cada día apagado pierde la serie de ese
+  día): tx atómica snapshot+top-N con fallback observado; test del fallo simulado; test de
+  no-regresión EXACTA de `buildSerpTask` (costo marginal CERO); fila dual en el ledger de flags.
+- **Slice 4** — `competitor-discovery.ts`: `readSerpCompetitorCandidates` (umbrales versionados
+  30d/3kw/5días como constantes exportadas; excluye `is_own_domain` y no-orgánicos;
+  `alreadyDeclared` + `proposalRef` sugerido) — PROPONE; el execute es `declareCompetitors`
+  existente. `readSerpTopResults` con `hasMore` declarado.
+- **Slice 5** — lanes admin + ecosystem (sólo-internal) + tools MCP `get_seo_serp_top_results` /
+  `get_seo_competitor_candidates` + señal `seo.serp_top_results.coverage` (pre-rollout honesto;
+  `error` = escritura muerta con pérdida irrecuperable) + federación en `efeonce-mcp` (commit local
+  `92e7197`; inventario 27 tools = 20 lecturas + 7 writes; deploy post-release).
+- **Evidencia**: tests focales 25 nuevos + suites growth/mcp/reliability verdes; sanity
+  `_sanity-serp-top-results.ts` **9/9 contra PG real** (INSERT productivo, DO NOTHING por ranura,
+  trigger append-only, percentile_cont/HAVING/DATE−int reales, rollback transaccional CERO residuo).
+
+**Rollout pendiente (por diseño, no por omisión):** la escritura vive en el cron del ops-worker
+desplegado, que no tiene este código hasta el release develop→main. **El día 1 de la serie es el
+día del primer deploy del worker** — pasos 2–9 de la Production verification sequence (corrida real
+con `provider_cost` idéntico al baseline, re-run no-op, env var Vercel, señal en verde, candidatos a
+≥5 días) quedan para esa ventana. Cada día sin release pierde el top-N de ese día (el pre-check de
+idempotencia impide re-capturar sin recomprar).
+
+## Delta 2026-08-28 — el command de declaración YA EXISTE (TASK-1662): consumirlo, no recrearlo
+
+`TASK-1662` aterrizó primero la mitad "declaración" de esta task:
+
+- `seo_competitors` ya NO es huérfana ni carece de autoría: la migración `20260828113457119`
+  agregó `declared_by/declared_at/declared_source` (CHECK acoplado, vocabulario canónico),
+  `proposal_ref` **OPACA** y `retired_by/retired_reason` (CHECK con `effective_to`).
+- Los commands gobernados existen: `declareCompetitors`/`retireCompetitors`
+  (`src/lib/growth/seo/competitors.ts`), con techo `GROWTH_SEO_COMPETITORS_PER_TARGET`,
+  outcome por ítem, outbox `growth.seo.competitor.{declared,retired}` y 3 lanes
+  (admin + ecosystem internal-only + MCP `declare/retire_seo_competitors`).
+
+**Lo que esta task conserva** es su núcleo irrecuperable: persistir el top-N ya pagado +
+el **reader de candidatos** por recurrencia medida. Su forma propose→confirm se completa
+llamando `declareCompetitors(..., { proposalRef: '<referencia opaca al top-N>' })` — el
+`proposal_ref` existe exactamente para eso. **NUNCA** crear un segundo command de
+declaración ni tocar las columnas de autoría: `competitor-discovery.ts` queda acotado al
+reader proponedor.
+
+## Delta 2026-08-27
+
+- TASK-1696 ya aterrizó en `src/lib/growth/seo/rank-capture.ts`: la llamada al transporte declara
+  ahora `consumer: 'seo'`. El conflicto de merge que esta task anticipa es real pero acotado —los
+  diffs siguen cayendo en zonas distintas del archivo (parser vs. llamada)— y el orden correcto es
+  rebasar sobre TASK-1696 antes de tocarlo.
+- El ledger `seo_provider_spend_daily` ganó `consumer`, `cost_basis` y `price_table_version`, y su
+  clave única pasó a seis columnas `NULLS NOT DISTINCT` — cambiado por TASK-1696. Persistir el top-N
+  que ya se paga no agrega llamadas, pero cualquier llamada nueva al transporte debe declarar
+  `consumer`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -8,7 +86,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Alto`
 - Effort: `Medio`

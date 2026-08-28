@@ -31,6 +31,7 @@ import {
   type DataForSeoSerpTask
 } from '@/lib/ai/dataforseo'
 import { getSantiagoDateParts } from '@/lib/calendar/business-time'
+import { withTransaction } from '@/lib/db'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
@@ -44,7 +45,11 @@ import {
   type SeoRankDevice
 } from './contracts'
 import { enforceSeoRunEntitlement } from './entitlement'
-import { isSeoModuleEnabled } from './flags'
+import { isSeoModuleEnabled, isSeoSerpTopResultsEnabled } from './flags'
+// TASK-1699 — el hermano del parser: segunda lectura de la MISMA respuesta ya pagada.
+// Import circular benigno con serp-top-results (que importa normalizeDomain de acá):
+// ambos usos son a call-time, nunca en la inicialización del módulo.
+import { parseSerpTopResults, persistSerpTopResults } from './serp-top-results'
 
 /**
  * Estimación conservadora por llamada SERP live/advanced con los parámetros de captura.
@@ -132,7 +137,7 @@ export const resolveSantiagoCaptureDate = (at?: Date): string => {
   return `${parts.year}-${month}-${day}`
 }
 
-const normalizeDomain = (raw: string): string => {
+export const normalizeDomain = (raw: string): string => {
   let value = raw.trim().toLowerCase()
 
   value = value.replace(/^[a-z][a-z0-9+.-]*:\/\//, '')
@@ -142,7 +147,7 @@ const normalizeDomain = (raw: string): string => {
   return value
 }
 
-const extractHost = (url: string): string | null => {
+export const extractHost = (url: string): string | null => {
   try {
     return normalizeDomain(new URL(url.startsWith('http') ? url : `https://${url}`).hostname)
   } catch {
@@ -150,7 +155,7 @@ const extractHost = (url: string): string | null => {
   }
 }
 
-const isOwnDomain = (candidate: string, rootDomain: string): boolean =>
+export const isOwnDomain = (candidate: string, rootDomain: string): boolean =>
   candidate === rootDomain || candidate.endsWith(`.${rootDomain}`)
 
 // Clave de combo sin colisiones (una keyword puede contener cualquier separador plano).
@@ -259,41 +264,55 @@ const mapBlockedReason = (
   return 'no_entitlement'
 }
 
-const insertSnapshot = async (input: {
-  seoTargetId: string
-  keyword: string
-  engine: string
-  device: SeoRankDevice
-  captureDate: string
-  position: number | null
-  url: string | null
-  serpFeatures: string[]
-  providerCostUsd: number
-  sourceRunId: string
-}): Promise<void> => {
+interface SnapshotClient {
+  query: (sql: string, params?: unknown[]) => Promise<unknown>
+}
+
+const insertSnapshot = async (
+  input: {
+    seoTargetId: string
+    keyword: string
+    engine: string
+    device: SeoRankDevice
+    captureDate: string
+    position: number | null
+    url: string | null
+    serpFeatures: string[]
+    providerCostUsd: number
+    sourceRunId: string
+  },
+  // TASK-1699 — opcional: cuando el top-N está activo, el snapshot viaja en la MISMA
+  // transacción que sus filas de contexto. Sin cliente, INSERT suelto como siempre.
+  client?: SnapshotClient
+): Promise<void> => {
   // El trigger anti-mutation de TASK-1299 bloquea UPDATE siempre: DO NOTHING es la única
   // resolución de conflicto posible y actúa solo como guardia de carrera (el pre-check ya
   // filtró los combos existentes).
-  await runGreenhousePostgresQuery(
-    `INSERT INTO greenhouse_growth.seo_rank_snapshots (
+  const sql = `INSERT INTO greenhouse_growth.seo_rank_snapshots (
        seo_target_id, keyword, engine, device, capture_date,
        position, url, serp_features, provider_cost, source_run_id
      )
      VALUES ($1, $2, $3, $4, $5::date, $6, $7, $8::jsonb, $9, $10)
-     ON CONFLICT (seo_target_id, keyword, engine, device, capture_date) DO NOTHING`,
-    [
-      input.seoTargetId,
-      input.keyword,
-      input.engine,
-      input.device,
-      input.captureDate,
-      input.position,
-      input.url,
-      JSON.stringify(input.serpFeatures),
-      input.providerCostUsd,
-      input.sourceRunId
-    ]
-  )
+     ON CONFLICT (seo_target_id, keyword, engine, device, capture_date) DO NOTHING`
+
+  const params = [
+    input.seoTargetId,
+    input.keyword,
+    input.engine,
+    input.device,
+    input.captureDate,
+    input.position,
+    input.url,
+    JSON.stringify(input.serpFeatures),
+    input.providerCostUsd,
+    input.sourceRunId
+  ]
+
+  if (client) {
+    await client.query(sql, params)
+  } else {
+    await runGreenhousePostgresQuery(sql, params)
+  }
 }
 
 /**
@@ -472,6 +491,7 @@ export const captureRankSnapshot = async (
       // (límite documentado en dataforseo-families).
       const result = await postDataForSeoTask({
         family: 'serp',
+        consumer: 'seo',
         endpoint: DATAFORSEO_DEFAULT_ORGANIC_ENDPOINT,
         tasks: [buildSerpTask(combo.keyword, target, combo.device as Exclude<SeoRankDevice, 'tablet'>)],
         organizationId: target.organization_id
@@ -510,7 +530,7 @@ export const captureRankSnapshot = async (
       const cost = typeof result.cost === 'number' && Number.isFinite(result.cost) ? result.cost : 0
       const observation = parseSerpRankObservation(result.tasks, target.root_domain)
 
-      await insertSnapshot({
+      const snapshotInput = {
         seoTargetId,
         keyword: combo.keyword,
         engine: combo.engine,
@@ -521,7 +541,46 @@ export const captureRankSnapshot = async (
         serpFeatures: observation.serpFeatures,
         providerCostUsd: cost,
         sourceRunId
-      })
+      }
+
+      // TASK-1699 — el top-N que esta MISMA respuesta ya pagó, tras flag. Camino feliz:
+      // snapshot + contexto ATÓMICOS (no existe un día con snapshot y sin top-N por una
+      // caída a mitad de camino). Camino de fallo: la persistencia del top-N JAMÁS tumba
+      // la medición pagada — se observa y el snapshot entra solo, como siempre.
+      let snapshotPersisted = false
+
+      if (isSeoSerpTopResultsEnabled()) {
+        const topRows = parseSerpTopResults(result.tasks, target.root_domain)
+
+        if (topRows.length > 0) {
+          try {
+            await withTransaction(async client => {
+              await insertSnapshot(snapshotInput, client)
+              await persistSerpTopResults(client, {
+                seoTargetId,
+                keyword: combo.keyword,
+                engine: combo.engine,
+                device: combo.device,
+                captureDate,
+                sourceRunId,
+                rows: topRows
+              })
+            })
+            snapshotPersisted = true
+          } catch (error) {
+            // Perder la fila de contexto es malo; perder ADEMÁS la medición pagada es
+            // peor. Mismo criterio que el spend recorder del transporte.
+            captureWithDomain(error, 'growth', {
+              tags: { source: 'seo_serp_top_results' },
+              extra: { seoTargetId, keyword: combo.keyword, device: combo.device, captureDate }
+            })
+          }
+        }
+      }
+
+      if (!snapshotPersisted) {
+        await insertSnapshot(snapshotInput)
+      }
 
       outcomes.push({
         ...combo,

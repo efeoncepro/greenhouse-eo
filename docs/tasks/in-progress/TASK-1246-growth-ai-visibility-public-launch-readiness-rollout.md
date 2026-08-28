@@ -1,5 +1,17 @@
 # TASK-1246 — Growth AI Visibility: Public Launch Readiness + Rollout
 
+## Delta 2026-08-27
+
+- Existe gate de presupuesto per-org para el grader y **nace en shadow**: con
+  `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED` en ON calcula `wouldBlock`, lo registra y alimenta la
+  señal, sin bloquear; sólo con `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED` también en ON rechaza
+  con `budget_exhausted`. Ambos default OFF en los dos runtimes — cerrado por TASK-1696.
+- El flip a enforce es **decisión de producto, no un paso técnico de rollout**: el camino público del
+  lead magnet comparte el motor del grader, así que un tope mal calibrado no degrada un tablero,
+  corta captación.
+- El tope por tier sale de un ciclo mensual completo de shadow. Hasta que ese ciclo cierre, esta task
+  no debe contar el gate como parte de "listo para público" ni prenderlo por defecto en el rollout.
+
 ## Delta 2026-08-05 — el sign-off de consent tiene un hueco concreto: `ISSUE-142`
 
 El residuo "sign-off legal de consent" de esta task dejó de ser genérico. Verificado contra producción:

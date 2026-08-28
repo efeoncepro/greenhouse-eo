@@ -435,6 +435,7 @@ export const captureUrlVisibility = async (input: {
 
       const response = await postDataForSeoTask({
         family: 'labs',
+        consumer: 'seo',
         endpoint: '/v3/dataforseo_labs/google/ranked_keywords/live',
         organizationId: input.organizationId,
         tasks: [task]

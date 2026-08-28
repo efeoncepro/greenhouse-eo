@@ -248,6 +248,7 @@ export const estimateDomainTraffic = async (input: {
     try {
       const response = await postDataForSeoTask({
         family: 'labs',
+        consumer: 'seo',
         endpoint: '/v3/dataforseo_labs/google/bulk_traffic_estimation/live',
         organizationId: input.organizationId,
         tasks: [

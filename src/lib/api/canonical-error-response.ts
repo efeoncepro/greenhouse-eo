@@ -120,6 +120,7 @@ export type CanonicalErrorCode =
   | 'aeo_business_model_unconfirmed'
   | 'aeo_quota_exhausted'
   | 'aeo_cost_blocked'
+  | 'aeo_budget_exhausted'
   | 'aeo_assignment_invalid_tier'
   | 'aeo_assignment_invalid_input'
   | 'aeo_assignment_website_required'
@@ -145,6 +146,7 @@ export type CanonicalErrorCode =
   | 'seo_target_not_active'
   | 'seo_not_entitled'
   | 'seo_keywords_invalid_input'
+  | 'seo_competitors_invalid_input'
   | 'seo_audit_already_running'
   | 'seo_audit_already_captured_today'
   | 'seo_quota_exhausted'
@@ -545,6 +547,17 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     message: 'El análisis AEO no está disponible temporalmente por alta demanda. Intenta más tarde.',
     actionable: false
   },
+  // TASK-1696 — presupuesto EN DÓLARES de la organización agotado en el período. Distinto de
+  // `aeo_quota_exhausted` (se acabaron los análisis incluidos) y de `aeo_cost_blocked` (backstop
+  // global de plataforma): acá el cupo de corridas puede seguir vivo y lo que se agotó es el
+  // dinero. `actionable: false` — reintentar no lo resuelve; el período se renueva o se amplía el
+  // plan, y ambas cosas las hace una persona.
+  aeo_budget_exhausted: {
+    status: 429,
+    message:
+      'Se agotó el presupuesto de análisis AEO de tu organización para este período. Se renueva el próximo mes o puedes ampliarlo con Efeonce.',
+    actionable: false
+  },
   aeo_assignment_invalid_tier: {
     status: 400,
     message: 'El tier AEO no es válido. Usa trial, contracted, pilot o none.',
@@ -653,6 +666,12 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   seo_keywords_invalid_input: {
     status: 400,
     message: 'Revisa las keywords: llegaron vacías o con un formato que no podemos seguir.',
+    actionable: true
+  },
+  // Growth SEO — commands de competidores (TASK-1662).
+  seo_competitors_invalid_input: {
+    status: 400,
+    message: 'Revisa los dominios: llegaron vacíos o con un formato que no es un dominio declarable.',
     actionable: true
   },
   // Growth SEO — command `queueSiteAudit` (TASK-1309). Los dos primeros NO son fallas: el

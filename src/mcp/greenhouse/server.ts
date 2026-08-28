@@ -516,6 +516,96 @@ export const createGreenhouseMcpServer = (
     async args => handlers.untrackSeoKeywords(args)
   )
 
+  // TASK-1662 — competidores declarados: el gap competitivo parte de acá.
+  server.registerTool(
+    'declare_seo_competitors',
+    {
+      title: 'Declare SEO Competitors',
+      description:
+        'Declare competitor domains for an organization so they enter the competitor keyword-gap coverage cycle. THIS WRITES AND COMMITS RECURRING SPEND: every active competitor is billed to the provider on every coverage cycle (once the coverage flag is ON) until it is retired, so propose the exact domains to the human and get confirmation BEFORE calling this — a competitor is a DECLARED classification with a human author, never an inference, and a wrongly chosen competitor invalidates every downstream gap analysis. If the candidates came from a machine proposal (SERP top-N, prospect diagnostic), pass proposalRef with the opaque evidence reference; leave it out for direct declarations. Idempotent: an already-declared domain returns already_declared and costs nothing. There is a governed per-target ceiling; domains beyond it return capacity_exceeded and are NOT declared — report those back verbatim. Read the per-domain outcomes array (declared | already_declared | capacity_exceeded | invalid), never just data.ok. When data.ok is false, report the errorCode (disabled, target_not_found, target_not_active, no_entitlement, no_domains, query_failed) honestly.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        domains: z.array(z.string().trim().min(1)).min(1).max(10),
+        proposalRef: z.string().trim().min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.declareSeoCompetitors(args)
+  )
+
+  // TASK-1662 — el reverso del write: lo que hace reversible el gasto de cobertura.
+  server.registerTool(
+    'retire_seo_competitors',
+    {
+      title: 'Retire SEO Competitors',
+      description:
+        'Retire declared competitor domains for an organization so they leave the keyword-gap coverage cycle and stop consuming provider budget. THIS WRITES. It does NOT delete history: the validity window is closed with the retiring actor recorded, captured coverage is preserved, and the same domain can be declared again later (a new window starts). Idempotent: a domain that was not declared returns not_declared and changes nothing. Pass an optional reason for the audit trail. Read the per-domain outcomes array (retired | not_declared | invalid), never just data.ok. When data.ok is false, report the errorCode (disabled, target_not_found, no_entitlement, no_domains, query_failed) honestly.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        domains: z.array(z.string().trim().min(1)).min(1).max(10),
+        reason: z.string().trim().min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.retireSeoCompetitors(args)
+  )
+
+  // TASK-1662 — lectura del gap competitivo derivado.
+  server.registerTool(
+    'get_seo_keyword_gap',
+    {
+      title: 'Get SEO Keyword Gap',
+      description:
+        'Read the competitor keyword gap for an organization: keywords a DECLARED competitor ranks for, derived at read time from dated coverage inputs (ESTIMATED provider lens, ◑). The contract separates three things that must never be merged: content_gap (client absent from the provider SERP — new-content opportunity), ranks_worse (client ranks but below the competitor — optimization, already covered by the opportunities surface), and declaredTargets (keywords a human declared as client commitments — report them as commitments in progress with their declaration date, NEVER as new findings). Keywords with measured GSC impressions in the window are EXCLUDED by design (the measured lens wins; their count travels in excluded.measuredInGsc). Every row carries factors with provenance (estimated volume, cpcUsd, link barrier, SERP features, attainable position band) and a missing factor is declared sin_dato/null — never zero, never "low". 🔴 THIS READER DOES NOT RANK: rows come in neutral alphabetical order; do not present them as a priority list or coin a score — prioritization is owned by the SEO work queue. Coverage may be no_coverage (competitor declared but never captured) or stale — say so honestly. Optional seoCompetitorId narrows to one competitor; market (ISO-2 or location_code) for multi-market organizations.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1),
+        market: z.string().trim().min(1).optional(),
+        seoCompetitorId: z.string().trim().min(1).optional(),
+        limit: z.number().int().min(1).max(1000).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoKeywordGap(args)
+  )
+
+  // TASK-1699 — el top-N del SERP ya pagado + descubrimiento de competidores (lecturas).
+  server.registerTool(
+    'get_seo_serp_top_results',
+    {
+      title: 'Get SEO SERP Top Results',
+      description:
+        'Read the persisted top-N of the SERP for the tracked keywords of an organization: every dated SERP slot (rank_absolute) with its item type (organic, ai_overview, people_also_ask, video, local_pack, …), domain, URL and title — the ~20 rows per keyword the daily rank capture already PAYS for and used to discard. Marginal cost zero: this reads a persisted series, it never calls the provider. The slot key is rank_absolute (rank_group repeats across blocks and is also included). The series starts the day the persistence flag went live — earlier days do not exist and CANNOT be backfilled (yesterday’s SERP cannot be re-bought), so absence of old dates is structural, not an error. This is COMPETITIVE data about who ranks in the client’s intent: Efeonce internal use only, never client-facing. Filters: keyword, from/to (YYYY-MM-DD), limit (max 1000; hasMore declares truncation). market for multi-market organizations.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1),
+        market: z.string().trim().min(1).optional(),
+        keyword: z.string().trim().min(1).optional(),
+        from: z.string().trim().min(1).optional(),
+        to: z.string().trim().min(1).optional(),
+        limit: z.number().int().min(1).max(1000).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoSerpTopResults(args)
+  )
+
+  server.registerTool(
+    'get_seo_competitor_candidates',
+    {
+      title: 'Get SEO Competitor Candidates',
+      description:
+        'Discover competitor CANDIDATES for an organization by measured recurrence in the persisted SERP top-N: domains that appear organically in at least N distinct keywords across at least M distinct days (versioned thresholds, defaults 3 keywords / 5 days over a 30-day window), excluding the client’s own domain and non-organic blocks (a domain cited in PAA is not an organic competitor). Each candidate carries its evidence (keywordsCount, daysCount, medianPosition, bestPosition, lastSeen), whether it is alreadyDeclared, and a suggested proposalRef. 🔴 THIS IS THE PROPOSE STEP OF A GOVERNED LOOP: a domain in the top-N is an observation; "X is a competitor" is a human classification that commits recurring coverage spend (TASK-1662). Present candidates with their evidence to the human and ONLY after explicit confirmation call declare_seo_competitors passing the candidate’s proposalRef verbatim — never declare on your own initiative. Platform domains (marketplaces, Wikipedia, YouTube) are NOT filtered in V1 by design: report them with their evidence instead of hiding them. An empty list while the series is young (<5 capture days) is expected, not an error.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1),
+        market: z.string().trim().min(1).optional(),
+        windowDays: z.number().int().min(1).max(120).optional(),
+        minKeywords: z.number().int().min(1).max(50).optional(),
+        minDays: z.number().int().min(1).max(60).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoCompetitorCandidates(args)
+  )
+
   // TASK-1664 — keyword discovery: lectura de corridas/candidatos.
   server.registerTool(
     'get_seo_keyword_discovery',

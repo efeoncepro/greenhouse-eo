@@ -363,6 +363,98 @@ export class GreenhouseApiPlatformClient {
   }
 
   /**
+   * TASK-1662 — declara competidores de un target (write, sólo bindings `internal`).
+   *
+   * Compromiso de gasto diferido: la captura de cobertura paga por cada competidor vigente
+   * en cada ciclo. `proposalRef` viaja OPACA cuando la declaración confirma una propuesta de
+   * máquina; se omite del body si no la hay.
+   */
+  async declareSeoCompetitors(input: { organizationId?: string; domains: string[]; proposalRef?: string }) {
+    return this.request(
+      '/api/platform/ecosystem/growth/seo/competitors/declare',
+      {},
+      {
+        method: 'POST',
+        body: {
+          organizationId: input.organizationId,
+          domains: input.domains,
+          ...(input.proposalRef ? { proposalRef: input.proposalRef } : {})
+        }
+      }
+    )
+  }
+
+  /**
+   * TASK-1662 — gap competitivo derivado (lectura; lane sólo-internal con 404 anti-oracle:
+   * la comparativa competitiva jamás se expone al cliente).
+   */
+  async getSeoKeywordGap(input: {
+    organizationId: string
+    market?: string
+    seoCompetitorId?: string
+    limit?: number
+  }) {
+    return this.request('/api/platform/ecosystem/growth/seo/keyword-gap', {
+      organizationId: input.organizationId,
+      market: input.market,
+      seoCompetitorId: input.seoCompetitorId,
+      limit: input.limit
+    })
+  }
+
+  /** TASK-1699 — serie del top-N del SERP ya pagado (lane sólo-internal, 404 anti-oracle). */
+  async getSeoSerpTopResults(input: {
+    organizationId: string
+    market?: string
+    keyword?: string
+    from?: string
+    to?: string
+    limit?: number
+  }) {
+    return this.request('/api/platform/ecosystem/growth/seo/serp-top-results', {
+      organizationId: input.organizationId,
+      market: input.market,
+      keyword: input.keyword,
+      from: input.from,
+      to: input.to,
+      limit: input.limit === undefined ? undefined : String(input.limit)
+    })
+  }
+
+  /** TASK-1699 — candidatos a competidor por recurrencia (el PROPOSE; el execute es declare). */
+  async getSeoCompetitorCandidates(input: {
+    organizationId: string
+    market?: string
+    windowDays?: number
+    minKeywords?: number
+    minDays?: number
+  }) {
+    return this.request('/api/platform/ecosystem/growth/seo/competitor-candidates', {
+      organizationId: input.organizationId,
+      market: input.market,
+      windowDays: input.windowDays === undefined ? undefined : String(input.windowDays),
+      minKeywords: input.minKeywords === undefined ? undefined : String(input.minKeywords),
+      minDays: input.minDays === undefined ? undefined : String(input.minDays)
+    })
+  }
+
+  /** TASK-1662 — el reverso: cierra la vigencia del competidor y corta su gasto de cobertura. */
+  async retireSeoCompetitors(input: { organizationId?: string; domains: string[]; reason?: string }) {
+    return this.request(
+      '/api/platform/ecosystem/growth/seo/competitors/retire',
+      {},
+      {
+        method: 'POST',
+        body: {
+          organizationId: input.organizationId,
+          domains: input.domains,
+          ...(input.reason ? { reason: input.reason } : {})
+        }
+      }
+    )
+  }
+
+  /**
    * TASK-1664 — lectura de corridas y candidatos de keyword discovery. Con `runId` incluye
    * los candidatos compuestos (mercado ◑ + GSC ● + tracking + última acción).
    */

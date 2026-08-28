@@ -68,8 +68,9 @@ export const MARKET_DATA_FRESHNESS_DAYS = 30
  * Endpoints autorizados a escribir esta tabla (espeja el CHECK de la migración; expand
  * TASK-1776 `20260827194219636`). Productores vivos: TASK-1661 (`keyword_overview`),
  * TASK-1664 (discovery: suggestions/related/ideas/for_site), TASK-1776 (`ranked_keywords` —
- * el `keyword_info` viene inline y YA PAGADO en cada fila de visibilidad por URL);
- * TASK-1662 (`domain_intersection`) sigue pendiente.
+ * el `keyword_info` viene inline y YA PAGADO en cada fila de visibilidad por URL) y
+ * TASK-1662 (`domain_intersection` — productor #4 VIVO desde 2026-08-28: el `keyword_data`
+ * inline del gap competitivo, costo 0).
  */
 export type SeoMarketDataSourceEndpoint =
   | 'keyword_overview'
@@ -442,7 +443,8 @@ const loadFreshKeywords = loadFreshMarketKeywords
  * `seo_keyword_market_data` (TASK-1661 productor #1 vía `keyword_overview`; TASK-1664
  * productor #2 con el `keyword_info` inline de discovery; TASK-1776 productor #3 con el
  * `keyword_data.keyword_info` inline de `ranked_keywords` — costo 0, ya pagado en la fila
- * de visibilidad; TASK-1662 productor #4 futuro).
+ * de visibilidad; TASK-1662 productor #4 VIVO desde 2026-08-28 con el `keyword_data`
+ * inline de `domain_intersection` — costo 0, ya pagado en el gap competitivo).
  *
  * Contrato del hecho:
  * - append-only con `ON CONFLICT ... DO NOTHING` (el trigger de la tabla prohíbe UPDATE);
@@ -671,6 +673,7 @@ export const captureKeywordMarketData = async (
     try {
       const response = await postDataForSeoTask({
         family: 'labs',
+        consumer: 'seo',
         endpoint: '/v3/dataforseo_labs/google/keyword_overview/live',
         organizationId: target.organization_id,
         tasks: [

@@ -2,7 +2,7 @@
 
 > **Estado:** `Activo — requiere actualización por evidencia`
 > **Owner:** Strategy + Commercial + práctica dueña + Finance/Legal
-> **Última revisión:** 2026-08-27
+> **Última revisión:** 2026-08-28
 > **Empresa:** Efeonce Group SpA · RUT 77.357.182-1 · 55 personas · Santiago, Chile
 > **Contacto operativo:** Julio César Reyes Rangel, CEO · `julio.reyes@efeonce.org`
 
@@ -30,7 +30,7 @@ estado por relación, la evidencia observable y el siguiente paso.
 
 ## Registro consolidado
 
-| Relación | Programa o vía | Estado al 2026-08-05 | Rol para Efeonce | Próximo paso / owner | Evidencia |
+| Relación | Programa o vía | Estado al 2026-08-28 | Rol para Efeonce | Próximo paso / owner | Evidencia |
 | --- | --- | --- | --- | --- | --- |
 | **Google Cloud** | Google Cloud Partner Network / Partner Network Hub | **Partner registrado**. Todas las rutas visibles aparecen como `Registrado`; debida diligencia `En curso`; no hay nivel Select/Premier/Diamond activo | Rail enterprise, Cloud/AI, Services y posible Co-sell | Completar due diligence y revisar requisitos de nivel; owner: Julio | [ficha detallada](#google-cloud) |
 | **Google for Education / Chrome** | Partner Advantage / Chrome y soluciones de administración | Onboarding iniciado; credenciales y autorizaciones no confirmadas | Educación, Chrome Enterprise y distribución | Verificar si sigue siendo una vía estratégica separada de Google Cloud | Correo de Arthur Guedes, 2025-11-17 |
@@ -39,6 +39,8 @@ estado por relación, la evidencia observable y el siguiente paso.
 | **OpenAI** | Solution/partner route | **Postulación pendiente** | Agentes, automatización e integraciones | Esperar respuesta y hacer seguimiento; owner: Julio | Auditoría comercial 2026-07-26; mailbox |
 | **BytePlus / ByteDance** | Partner Network — Agency + Reseller | **Bloqueado**: formulario preparado, CAPTCHA pendiente; no hay aceptación confirmada | Distribución y servicios para Seedance/Seedream | Completar CAPTCHA, revisar términos, soporte, economics y continuidad; owner: Julio | Auditoría comercial 2026-07-26; correo de Ingram Micro |
 | **Runway** | Enterprise contact / Creative Partners | **Postulación enviada** para Enterprise; Creative Partners no confirmado por error HTTP 504 | Video generativo y Creative Operations | Esperar respuesta Enterprise; reintentar Creative Partners sólo si sigue siendo necesario | Confirmación web; auditoría comercial 2026-07-26 |
+| **Higgsfield** | Consulta B2B/studio partnership por Enterprise Sales | **Postulación enviada y confirmada** el 2026-08-28. La vía pública para agencias es una evaluación comercial caso a caso; el programa de afiliados es separado | Producción generativa de video, imagen y audio para Creative Operations y clientes enterprise en LATAM | Esperar discovery; validar workspace multi-cliente, billing consolidado, referral/reseller, API, créditos demo, co-marketing, soporte y piloto antes de cualquier claim; owner: Julio + Creative Practice | [Auditoría y constancia 2026-08-28](../audits/commercial/HIGGSFIELD_MAGNIFIC_AGENCY_PARTNERSHIP_OUTREACH_2026-08-28.md) |
+| **Magnific** | Enterprise contact → AI Partnerships | **Postulación y outreach especializado enviados** el 2026-08-28. Susana Lazcano, Enterprise BDR EMEA & LATAM, derivó a `ai-partnerships@magnific.com`; Efeonce envió el correo con Susana en copia. Todavía no hay aceptación ni términos | Upscaling, enhancement y finish creativo para Creative Operations y clientes enterprise en LATAM | Esperar respuesta de AI Partnerships; después validar enablement, workspace/billing multi-cliente, referral/reseller, API o licencia ad hoc, créditos demo, co-marketing, soporte y piloto antes de cualquier claim; owner: Julio + Creative Practice | [Auditoría y constancia 2026-08-28](../audits/commercial/HIGGSFIELD_MAGNIFIC_AGENCY_PARTNERSHIP_OUTREACH_2026-08-28.md); Outlook `Enterprise Magnific` + `Agency partnership opportunity — Efeonce x Magnific in LATAM`, 2026-08-28 |
 | **ElevenLabs** | Commercial Partner Program — Systems Integrator | **Postulación enviada y confirmada** | Voz, agentes conversacionales, dubbing y localización | Esperar discovery y eventual acuerdo comercial | Confirmación web; auditoría comercial 2026-07-26 |
 | **Black Forest Labs / FLUX** | Creator Program | **Postulación enviada y confirmada** | Capability creativa y acceso temprano | Esperar contacto; no presentarlo como reseller/co-sell | Confirmación web; auditoría comercial 2026-07-26 |
 | **AWS** | AWS Partner Central | **Bloqueado**: verificación de identidad pendiente | Rail cloud para clientes AWS-first | Completar documento + selfie y luego onboarding empresarial; owner: Julio | Auditoría comercial 2026-07-26 |
@@ -161,5 +163,6 @@ evidencia; la auditoría se conserva como fotografía histórica.
 
 - [`Efeonce Partner & Provider Layer Operating Model V1`](../business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md)
 - [`AI Partner Program Applications — 2026-07-26`](../audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md)
+- [`Higgsfield + Magnific — agency partnership outreach 2026-08-28`](../audits/commercial/HIGGSFIELD_MAGNIFIC_AGENCY_PARTNERSHIP_OUTREACH_2026-08-28.md)
 - [Google Cloud Partner Network](https://cloud.google.com/partners)
 - [Google Cloud Partner Network Hub](https://partners.cloud.google.com/)

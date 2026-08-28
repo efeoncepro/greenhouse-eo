@@ -1,5 +1,26 @@
 # TASK-1704 — Cadencia y muestreo declarados: AIO no diario, N≥3 donde la calibración lo exige
 
+## Delta 2026-08-28
+
+- El bloqueante `TASK-1699` quedó **code complete, rollout pendiente** (`in-progress/`, en develop
+  `fdfdedbe5`): el parseo del top-N ya no vive en `parseSerpRankObservation` sino en el parser
+  hermano `parseSerpTopResults`, cableado en el rank capture tras `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED`
+  con tx atómica + fallback. La colisión de writer anticipada en §Risk map queda resuelta: 1699
+  llegó primero, así que esta task adapta su slice de writer a esa forma ya declarada — cerrado por
+  TASK-1699.
+- Las rutas `docs/tasks/to-do/TASK-1699-...` citadas en este archivo quedaron stale: la spec vive
+  en `docs/tasks/in-progress/`.
+
+## Delta 2026-08-27
+
+- El bloqueante `TASK-1696` está **code complete**: el ledger distingue `seo` de `aeo` y
+  `resolveAeoBudget` mide el gasto per-org del grader, así que el ahorro del lado (a) y el gasto
+  extra del lado (b) ya son comparables en la misma moneda — cerrado por TASK-1696.
+- Precisión al leer ese gasto: `resolveAeoBudget` reporta **facturado** (ledger, `consumer='aeo'`,
+  `cost_basis='invoiced'`) y **estimado** (LLM propios) por separado, y le resta al estimado la
+  porción DataForSEO para no contar dos veces el mismo dólar — cambiado por TASK-1696.
+- La ruta declarada en §Depends on quedó stale: TASK-1696 ya no vive en `docs/tasks/to-do/`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -24,7 +45,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth`
-- Blocked by: `TASK-1696, TASK-1699, TASK-1703`
+- Blocked by: `TASK-1699, TASK-1703`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

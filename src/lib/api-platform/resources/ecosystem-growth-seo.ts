@@ -40,15 +40,29 @@ import { readGroundedQueryDraft, type ReadGroundedQueryDraftResult } from '@/lib
 import { type TenantEntitlementSubject } from '@/lib/entitlements/types'
 import type { SeoSearchIntent } from '@/lib/growth/seo/keyword-market-data'
 import { resolveSeoTargetForMarket, type SeoMarketTarget } from '@/lib/growth/seo/resolve-target'
+import {
+  readSeoProviderSpendByConsumer,
+  type SeoProviderSpendByConsumerResult
+} from '@/lib/growth/seo/provider-spend'
 import { readSeoPerformance } from '@/lib/growth/seo/performance/read-performance'
 import { readSeoPerformanceCatalog } from '@/lib/growth/seo/performance/read-performance-catalog'
 import { readRankEvolution } from '@/lib/growth/seo/rank-evolution-reader'
 import { readSeoOverviewKpis } from '@/lib/growth/seo/overview/read-overview-kpis'
 import { readSiteAuditReport } from '@/lib/growth/seo/site-audit/reader'
 import { trackKeywords, untrackKeywords } from '@/lib/growth/seo/track-keywords'
+import { declareCompetitors, retireCompetitors } from '@/lib/growth/seo/competitors'
+import { readKeywordGap, type KeywordGapResult } from '@/lib/growth/seo/keyword-gap-reader'
+import {
+  readSerpCompetitorCandidates,
+  readSerpTopResults,
+  type ReadSerpTopResultsResult,
+  type SerpCompetitorCandidatesResult
+} from '@/lib/growth/seo/competitor-discovery'
 import { isSeoKeywordIntent, SEO_KEYWORD_INTENTS } from '@/lib/growth/seo/contracts'
 import type {
   BacklinkProfileResult,
+  DeclareCompetitorsResult,
+  RetireCompetitorsResult,
   KeywordOpportunitiesResult,
   RankEvolutionResult,
   SeoAeoGapResult,
@@ -1124,6 +1138,309 @@ export const untrackEcosystemSeoKeywordsPayload = async ({
 }
 
 /**
+ * ═══ TASK-1662 — competidores declarados en el lane ecosystem ═══
+ *
+ * Mismo listón que track/untrack: declarar un competidor es un COMPROMISO DE GASTO DIFERIDO
+ * (la captura de cobertura paga por cada competidor vigente en cada ciclo), así que ambos
+ * commands aceptan **sólo bindings de scope `internal`** — un binding org-scoped (cliente)
+ * no hace crecer su propia factura, y además el listado de competidores es información
+ * comercial sensible que no cruza el boundary de org (auditoría §7: la comparativa
+ * competitiva no se expone al cliente).
+ *
+ * Las defensas viven en los commands (`declareCompetitors`/`retireCompetitors`): autoría
+ * obligatoria, techo por target, idempotencia, normalización, outbox. Este lane sólo deriva
+ * el sujeto máquina y traduce el contrato.
+ */
+
+export interface EcosystemSeoCompetitorsBody {
+  organizationId?: unknown
+  domains?: unknown
+  /** Referencia OPACA a la propuesta de máquina (p. ej. top-N de TASK-1699). Nunca FK. */
+  proposalRef?: unknown
+  reason?: unknown
+}
+
+export const declareEcosystemSeoCompetitorsPayload = async ({
+  context,
+  request,
+  body
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+  body: EcosystemSeoCompetitorsBody | null
+}): Promise<ApiPlatformSuccessResult<DeclareCompetitorsResult | SeoTargetNotConfiguredPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  if (context.binding.greenhouseScopeType !== 'internal') {
+    throw new ApiPlatformError('Declaring SEO competitors is not allowed for the resolved binding scope.', {
+      statusCode: 403,
+      errorCode: 'scope_not_allowed'
+    })
+  }
+
+  const requestedOrganizationId = typeof body?.organizationId === 'string' ? body.organizationId : null
+
+  const domains = Array.isArray(body?.domains)
+    ? body.domains.filter((item): item is string => typeof item === 'string')
+    : []
+
+  if (domains.length === 0) {
+    throw new ApiPlatformError('A non-empty "domains" array is required.', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
+  const proposalRef = typeof body?.proposalRef === 'string' ? body.proposalRef.trim() : ''
+
+  const subject = await resolveSeoLaneSubject(context, request, requestedOrganizationId)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  // El actor es el CONSUMIDOR máquina — procedencia auditable del compromiso de gasto.
+  const result = await declareCompetitors(subject.seoTargetId, domains, `mcp:${context.consumer.publicId}`, {
+    source: 'mcp',
+    ...(proposalRef ? { proposalRef } : {})
+  })
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+export const retireEcosystemSeoCompetitorsPayload = async ({
+  context,
+  request,
+  body
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+  body: EcosystemSeoCompetitorsBody | null
+}): Promise<ApiPlatformSuccessResult<RetireCompetitorsResult | SeoTargetNotConfiguredPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  if (context.binding.greenhouseScopeType !== 'internal') {
+    throw new ApiPlatformError('Retiring SEO competitors is not allowed for the resolved binding scope.', {
+      statusCode: 403,
+      errorCode: 'scope_not_allowed'
+    })
+  }
+
+  const requestedOrganizationId = typeof body?.organizationId === 'string' ? body.organizationId : null
+
+  const domains = Array.isArray(body?.domains)
+    ? body.domains.filter((item): item is string => typeof item === 'string')
+    : []
+
+  if (domains.length === 0) {
+    throw new ApiPlatformError('A non-empty "domains" array is required.', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
+  const reason = typeof body?.reason === 'string' ? body.reason.trim() : ''
+
+  const subject = await resolveSeoLaneSubject(context, request, requestedOrganizationId)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const result = await retireCompetitors(subject.seoTargetId, domains, `mcp:${context.consumer.publicId}`, {
+    ...(reason ? { reason } : {})
+  })
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+/**
+ * ═══ TASK-1662 — keyword gap competitivo en el lane ecosystem (lectura) ═══
+ *
+ * 🔴 **Sólo bindings `internal` SIN organización**, con 404 anti-oracle (mismo contrato que
+ * el gasto de proveedor): la comparativa competitiva NO se expone al cliente (auditoría §7)
+ * y el listado de competidores es información comercial sensible que no cruza el boundary
+ * de org. Un binding org-scoped no debe poder ni confirmar que el recurso existe.
+ */
+
+export const getEcosystemSeoKeywordGapPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<KeywordGapResult | SeoTargetNotConfiguredPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  if (context.binding.greenhouseScopeType !== 'internal' || context.binding.organizationId) {
+    throw new ApiPlatformError('SEO resource not found for the resolved scope.', {
+      statusCode: 404,
+      errorCode: 'not_found'
+    })
+  }
+
+  const url = new URL(request.url)
+  const organizationId = (url.searchParams.get('organizationId') ?? '').trim()
+
+  if (!organizationId) {
+    throw new ApiPlatformError('organizationId is required for internal bindings.', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
+  const seoCompetitorId = (url.searchParams.get('seoCompetitorId') ?? '').trim()
+  const rawLimit = Number.parseInt(url.searchParams.get('limit') ?? '', 10)
+
+  const subject = await resolveSeoLaneSubject(context, request, organizationId)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const result = await readKeywordGap(subject.seoTargetId, {
+    ...(seoCompetitorId ? { seoCompetitorId } : {}),
+    ...(Number.isFinite(rawLimit) && rawLimit > 0 ? { limit: rawLimit } : {})
+  })
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+/**
+ * ═══ TASK-1699 — top-N del SERP + candidatos a competidor en el lane ecosystem ═══
+ *
+ * 🔴 **Sólo bindings `internal` SIN organización, 404 anti-oracle** — el top-N del SERP de
+ * las keywords de un cliente es DATO COMPETITIVO (quién ranquea en su intención) y §7 de la
+ * auditoría prohíbe la comparativa competitiva client-facing. Mismo contrato que el gasto
+ * de proveedor y el keyword gap.
+ */
+
+const requireInternalSeoBinding = (context: ApiPlatformRequestContext, request: Request): string => {
+  if (context.binding.greenhouseScopeType !== 'internal' || context.binding.organizationId) {
+    throw new ApiPlatformError('SEO resource not found for the resolved scope.', {
+      statusCode: 404,
+      errorCode: 'not_found'
+    })
+  }
+
+  const url = new URL(request.url)
+  const organizationId = (url.searchParams.get('organizationId') ?? '').trim()
+
+  if (!organizationId) {
+    throw new ApiPlatformError('organizationId is required for internal bindings.', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
+  return organizationId
+}
+
+export const getEcosystemSeoSerpTopResultsPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<ReadSerpTopResultsResult | SeoTargetNotConfiguredPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  const organizationId = requireInternalSeoBinding(context, request)
+  const url = new URL(request.url)
+
+  const keyword = (url.searchParams.get('keyword') ?? '').trim()
+  const from = (url.searchParams.get('from') ?? '').trim()
+  const to = (url.searchParams.get('to') ?? '').trim()
+  const rawLimit = Number.parseInt(url.searchParams.get('limit') ?? '', 10)
+
+  const subject = await resolveSeoLaneSubject(context, request, organizationId)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const result = await readSerpTopResults(subject.seoTargetId, {
+    ...(keyword ? { keyword } : {}),
+    ...(from ? { from } : {}),
+    ...(to ? { to } : {}),
+    ...(Number.isFinite(rawLimit) && rawLimit > 0 ? { limit: rawLimit } : {})
+  })
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+export const getEcosystemSeoCompetitorCandidatesPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<SerpCompetitorCandidatesResult | SeoTargetNotConfiguredPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  const organizationId = requireInternalSeoBinding(context, request)
+  const url = new URL(request.url)
+
+  const rawWindow = Number.parseInt(url.searchParams.get('windowDays') ?? '', 10)
+  const rawMinKeywords = Number.parseInt(url.searchParams.get('minKeywords') ?? '', 10)
+  const rawMinDays = Number.parseInt(url.searchParams.get('minDays') ?? '', 10)
+
+  const subject = await resolveSeoLaneSubject(context, request, organizationId)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const result = await readSerpCompetitorCandidates(subject.seoTargetId, {
+    ...(Number.isFinite(rawWindow) && rawWindow > 0 ? { windowDays: rawWindow } : {}),
+    ...(Number.isFinite(rawMinKeywords) && rawMinKeywords > 0 ? { minKeywords: rawMinKeywords } : {}),
+    ...(Number.isFinite(rawMinDays) && rawMinDays > 0 ? { minDays: rawMinDays } : {})
+  })
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+/**
  * ═══ TASK-1664 — keyword discovery en el lane ecosystem ═══
  *
  * Passthrough de los primitives `readKeywordDiscovery` / `queueKeywordDiscovery` /
@@ -1599,4 +1916,60 @@ export const runEcosystemSeoProspectDiagnosticPayload = async ({
   })
 
   return { data: result, meta: { module: 'growth.seo' } }
+}
+
+export type EcosystemSeoProviderSpendPayload =
+  | ({ ok: true } & SeoProviderSpendByConsumerResult)
+  | { ok: false; errorCode: 'disabled'; status: null }
+
+/**
+ * TASK-1696 — GET /api/platform/ecosystem/growth/seo/provider-spend
+ *
+ * Gasto de proveedor del mes por organización, cortado por CONSUMIDOR (`seo` | `aeo`) y por BASE
+ * DE COSTO (facturado | estimado). Passthrough del reader canónico
+ * `readSeoProviderSpendByConsumer` — un primitive, muchos consumers: ninguna pantalla ni tool
+ * suma gasto con SQL propio.
+ *
+ * 🔴 SÓLO BINDINGS `internal`, y no es una restricción de permisos sino de NATURALEZA DEL DATO:
+ * esto es lo que a Efeonce le CUESTA servir a un cliente, no algo que el cliente haya consumido.
+ * Un binding org-scoped que leyera su propia fila estaría leyendo nuestra estructura de costos.
+ * El resto del lane resuelve la organización desde el binding cuando es org-scoped; acá esa
+ * misma resolución sería la fuga. Por eso se rechaza antes de tocar el dominio, con 404
+ * anti-oracle en vez de 403: un binding de cliente no debe aprender siquiera que el recurso
+ * existe.
+ */
+export const getEcosystemSeoProviderSpendPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<EcosystemSeoProviderSpendPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  if (context.binding.greenhouseScopeType !== 'internal' || context.binding.organizationId) {
+    throw new ApiPlatformError('SEO resource not found for the resolved scope.', {
+      statusCode: 404,
+      errorCode: 'not_found'
+    })
+  }
+
+  const url = new URL(request.url)
+  const organizationId = (url.searchParams.get('organizationId') ?? '').trim()
+
+  if (!organizationId) {
+    throw new ApiPlatformError('organizationId is required for internal bindings.', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
+  const result = await readSeoProviderSpendByConsumer(organizationId)
+
+  return {
+    data: { ok: true, ...result },
+    meta: { module: 'growth.seo', organizationId }
+  }
 }

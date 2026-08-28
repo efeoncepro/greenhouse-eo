@@ -190,6 +190,11 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'getSeoBacklinkProfile'
   | 'trackSeoKeywords'
   | 'untrackSeoKeywords'
+  | 'declareSeoCompetitors'
+  | 'retireSeoCompetitors'
+  | 'getSeoKeywordGap'
+  | 'getSeoSerpTopResults'
+  | 'getSeoCompetitorCandidates'
   | 'getSeoKeywordMarketData'
   | 'getSeoDomainOverview'
   | 'getSeoUrlVisibility'
@@ -850,6 +855,205 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         }).`
       },
       () => client.untrackSeoKeywords(input)
+    )
+  },
+  /**
+   * TASK-1662 — declarar competidores. Write con gasto diferido: el resumen enumera el
+   * outcome POR dominio para que un rebote por techo llegue al usuario con esas palabras.
+   */
+  async declareSeoCompetitors(input: { organizationId?: string; domains: string[]; proposalRef?: string }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          outcomes?: Array<{ domain: string; status: string }>
+          activeCompetitorCount?: number
+          capacity?: number
+        }
+
+        if (data.ok === false) {
+          return `SEO competitor declaration rejected (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const outcomes = Array.isArray(data.outcomes) ? data.outcomes : []
+        const count = (status: string) => outcomes.filter(outcome => outcome.status === status).length
+        const rejected = count('capacity_exceeded')
+
+        return `SEO competitors: ${count('declared')} newly declared, ${count(
+          'already_declared'
+        )} already declared, ${rejected} rejected (ceiling full), ${count('invalid')} invalid. The target now has ${String(
+          data.activeCompetitorCount ?? '?'
+        )}/${String(data.capacity ?? '?')} active competitors, each billed per coverage cycle once the flag is ON${
+          rejected > 0 ? ' — report the rejected domains instead of claiming they were declared' : ''
+        } (${result.requestId}).`
+      },
+      () => client.declareSeoCompetitors(input)
+    )
+  },
+  /** TASK-1662 — el reverso: retirar competidores (cierra vigencia, corta gasto futuro). */
+  async retireSeoCompetitors(input: { organizationId?: string; domains: string[]; reason?: string }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          outcomes?: Array<{ domain: string; status: string }>
+          activeCompetitorCount?: number
+          capacity?: number
+        }
+
+        if (data.ok === false) {
+          return `SEO competitor retirement rejected (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const outcomes = Array.isArray(data.outcomes) ? data.outcomes : []
+        const count = (status: string) => outcomes.filter(outcome => outcome.status === status).length
+
+        return `SEO competitors: ${count('retired')} retired, ${count(
+          'not_declared'
+        )} were not declared, ${count('invalid')} invalid. The target now has ${String(
+          data.activeCompetitorCount ?? '?'
+        )}/${String(data.capacity ?? '?')} active competitors. Captured coverage history is preserved (${result.requestId}).`
+      },
+      () => client.retireSeoCompetitors(input)
+    )
+  },
+  /**
+   * TASK-1662 — lectura del gap competitivo DERIVADO. El summary declara la lente (◑) y
+   * que el reader no ordena: reportar el gap como ranking sería acuñar la prioridad que la
+   * cola (TASK-1700) todavía no computó.
+   */
+  async getSeoKeywordGap(input: { organizationId: string; market?: string; seoCompetitorId?: string; limit?: number }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          competitors?: Array<{
+            competitor?: { competitorDomain?: string }
+            coverage?: {
+              state?: string
+              stale?: boolean
+              contentGap?: unknown[]
+              ranksWorse?: unknown[]
+              declaredTargets?: unknown[]
+              excluded?: { measuredInGsc?: number; clientBetterOrEqual?: number }
+            }
+          }>
+        }
+
+        if (data.ok === false) {
+          return `SEO keyword gap unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const competitors = Array.isArray(data.competitors) ? data.competitors : []
+
+        if (competitors.length === 0) {
+          return `No declared competitors for this organization — declare one with declare_seo_competitors before reading the gap (${result.requestId}).`
+        }
+
+        const parts = competitors.map(entry => {
+          const domain = entry.competitor?.competitorDomain ?? '?'
+          const coverage = entry.coverage
+
+          if (!coverage || coverage.state !== 'available') {
+            return `${domain}: no coverage captured yet (needs a coverage run)`
+          }
+
+          const contentGap = coverage.contentGap?.length ?? 0
+          const ranksWorse = coverage.ranksWorse?.length ?? 0
+          const targets = coverage.declaredTargets?.length ?? 0
+          const measured = coverage.excluded?.measuredInGsc ?? 0
+
+          return `${domain}: ${contentGap} content gaps (client absent), ${ranksWorse} ranking worse, ${targets} already declared targets (commitments, NOT findings), ${measured} excluded because the client already has measured GSC impressions${coverage.stale ? ' [STALE coverage]' : ''}`
+        })
+
+        return `SEO competitor keyword gap (ESTIMATED provider lens, derived at read): ${parts.join(
+          '; '
+        )}. Rows are alphabetical facts with per-factor provenance — this reader does NOT rank; prioritization belongs to the SEO work queue (${result.requestId}).`
+      },
+      () => client.getSeoKeywordGap(input)
+    )
+  },
+  /** TASK-1699 — serie del top-N del SERP ya pagado (dato competitivo, uso interno). */
+  async getSeoSerpTopResults(input: {
+    organizationId: string
+    market?: string
+    keyword?: string
+    from?: string
+    to?: string
+    limit?: number
+  }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          rows?: Array<{ captureDate?: string; isOwnDomain?: boolean }>
+          hasMore?: boolean
+        }
+
+        if (data.ok === false) {
+          return `SEO SERP top results unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const rows = Array.isArray(data.rows) ? data.rows : []
+        const dates = [...new Set(rows.map(row => row.captureDate).filter(Boolean))]
+        const own = rows.filter(row => row.isOwnDomain).length
+
+        return `SEO SERP top results: ${rows.length} row(s) across ${dates.length} capture day(s), ${own} own-domain row(s)${
+          data.hasMore ? ' (more beyond the limit — narrow with keyword/from/to)' : ''
+        }. Each row is a dated SERP slot (rank_absolute) with its item type and domain — competitive material for Efeonce internal use, never client-facing (${result.requestId}).`
+      },
+      () => client.getSeoSerpTopResults(input)
+    )
+  },
+  /**
+   * TASK-1699 — candidatos a competidor. El summary declara el loop: esto PROPONE con
+   * evidencia medida; declarar es del humano vía declare_seo_competitors.
+   */
+  async getSeoCompetitorCandidates(input: {
+    organizationId: string
+    market?: string
+    windowDays?: number
+    minKeywords?: number
+    minDays?: number
+  }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          windowDays?: number
+          candidates?: Array<{ domain?: string; keywordsCount?: number; daysCount?: number; alreadyDeclared?: boolean }>
+        }
+
+        if (data.ok === false) {
+          return `SEO competitor candidates unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const candidates = Array.isArray(data.candidates) ? data.candidates : []
+
+        if (candidates.length === 0) {
+          return `No competitor candidates cleared the recurrence thresholds in the ${String(
+            data.windowDays ?? '?'
+          )}-day window (the top-N series may still be accumulating — it needs ~5 capture days). This is a measured fact, not an error (${result.requestId}).`
+        }
+
+        const top = candidates
+          .slice(0, 5)
+          .map(
+            candidate =>
+              `${candidate.domain} (${candidate.keywordsCount} kw / ${candidate.daysCount} days${candidate.alreadyDeclared ? ', already declared' : ''})`
+          )
+          .join('; ')
+
+        return `SEO competitor candidates (measured recurrence, window ${String(data.windowDays ?? '?')}d): ${String(
+          candidates.length
+        )} candidate(s) — top: ${top}. These are PROPOSALS with evidence: to act, present them to the human and only after explicit confirmation call declare_seo_competitors passing each candidate's proposalRef verbatim — never declare on your own (${result.requestId}).`
+      },
+      () => client.getSeoCompetitorCandidates(input)
     )
   },
   /**

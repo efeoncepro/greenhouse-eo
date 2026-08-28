@@ -67,7 +67,7 @@ declarado pausado, cero gasto.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -598,7 +598,7 @@ Sin `capturedBy`. Sin cruce con GSC. Si el sujeto no tiene snapshot, el reader d
 - [x] La capability nueva tiene grant a ≥1 rol real en el mismo PR y el coverage test pasa.
 - [x] El flag tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` y `pnpm docs:closure-check` pasa.
 - [x] El scheduler `ops-seo-domain-overview` quedó creado y su estado (pausado o activo) está declarado en el runbook. *(Creado, ACTIVO desde 2026-08-27; runbook actualizado al estado vigente.)*
-- [ ] Cierre operativo: pase develop→main con los lanes en producción + deploy del gateway con la federación de `TASK-1658` (dueña) verificado con `tools/list` 13→21.
+- [x] Cierre operativo: pase develop→main con los lanes en producción + deploy del gateway con la federación de `TASK-1658` (dueña) verificado con `tools/list` 13→21. *(2026-08-27: release `cc73c74789ce` → lanes en producción; gateway `efeonce-mcp-gateway-00023-zt2` desplegado; `tools/list` autenticado observado: **21 tools SEO** — antes 13.)*
 - [x] Ninguna consulta nueva mezcla esta tabla con `seo_gsc_daily` en un mismo agregado.
 
 ## Verification
@@ -613,15 +613,15 @@ Sin `capturedBy`. Sin cruce con GSC. Si el sujeto no tiene snapshot, el reader d
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` quedó sincronizado con el cierre
-- [ ] `Handoff.md` quedó actualizado
-- [ ] `changelog.md` quedó actualizado
-- [ ] se ejecutó chequeo de impacto cruzado sobre `TASK-1662`, `TASK-1709`, `TASK-1776` y `TASK-1777`
-- [ ] delta en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §3 (mapa de capacidades) y §4.2 (modelo de datos)
-- [ ] runbook `docs/manual-de-uso/growth/operar-foto-de-dominio-seo.md` creado
-- [ ] doc funcional del módulo actualizada con la capacidad nueva
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` quedó sincronizado con el cierre
+- [x] `Handoff.md` quedó actualizado
+- [x] `changelog.md` quedó actualizado
+- [x] se ejecutó chequeo de impacto cruzado sobre `TASK-1662`, `TASK-1709`, `TASK-1776` y `TASK-1777`
+- [x] delta en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §3 (mapa de capacidades) y §4.2 (modelo de datos)
+- [x] runbook `docs/manual-de-uso/growth/operar-foto-de-dominio-seo.md` creado
+- [x] doc funcional del módulo actualizada con la capacidad nueva
 
 ## Follow-ups
 

@@ -423,9 +423,21 @@ ENV_VARS="${ENV_VARS},HIRING_LIFECYCLE_EMAILS_ENABLED=${HIRING_LIFECYCLE_EMAILS_
 #
 # Declarativo acá para que `--set-env-vars` (destructivo) NO los borre en cada redeploy.
 # Rollback (<5min): `gcloud run services update ops-worker --update-env-vars <FLAG>=false`.
-HIRING_OPENING_CAPACITY_CLOSURE_ENABLED="${HIRING_OPENING_CAPACITY_CLOSURE_ENABLED:-false}"
+#
+# ⚠️ 2026-08-27 — AMBOS PASAN A `true` POR AUTORIZACIÓN EXPLÍCITA DEL CEO, como override del gate
+#   que el ledger declaraba (sign-off de Talent/Privacidad + TASK-1764 + canary con destinatarios
+#   allowlisted). Qué pasó de verdad al momento del flip: NO salió ningún correo, porque el envío
+#   seguía doblemente frenado por debajo — las vacantes vivas tienen 0 `selected`, así que la
+#   capacidad nunca se llena y el `confirm` se niega correctamente; y el tipo de correo
+#   `hiring_decision_not_selected` sigue `enabled=FALSE` por seed en PG (ese seed NO se tocó, y es
+#   la tercera capa: `resolveEmailTypeConfig` es fail-open, así que la fila es lo que sostiene el
+#   freno).
+#   Lo que este override NO resuelve: TASK-1764. Sin ella, el tipo nuevo cae al perfil de footer
+#   legacy **en silencio** cuando el correo efectivamente salga. Antes de habilitar el tipo en
+#   `email_type_config`, cerrar TASK-1764 o aceptar ese footer a sabiendas.
+HIRING_OPENING_CAPACITY_CLOSURE_ENABLED="${HIRING_OPENING_CAPACITY_CLOSURE_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},HIRING_OPENING_CAPACITY_CLOSURE_ENABLED=${HIRING_OPENING_CAPACITY_CLOSURE_ENABLED}"
-HIRING_CAPACITY_FILLED_EMAIL_ENABLED="${HIRING_CAPACITY_FILLED_EMAIL_ENABLED:-false}"
+HIRING_CAPACITY_FILLED_EMAIL_ENABLED="${HIRING_CAPACITY_FILLED_EMAIL_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},HIRING_CAPACITY_FILLED_EMAIL_ENABLED=${HIRING_CAPACITY_FILLED_EMAIL_ENABLED}"
 
 # TASK-1746 — Cutover de links de assessment al exchange fragment→sesión HttpOnly.
@@ -666,6 +678,24 @@ GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD="${GROWTH_AI_VISIBILITY_REGRADE_
 GROWTH_AI_VISIBILITY_REGRADE_SCHEDULER_PAUSED="${GROWTH_AI_VISIBILITY_REGRADE_SCHEDULER_PAUSED:-${DEFAULT_GROWTH_REGRADE_SCHEDULER_PAUSED}}"
 GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_ENABLED="${GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_ENABLED:-${DEFAULT_GROWTH_BRAND_INTELLIGENCE_ENABLED}}"
 GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED="${GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED:-${DEFAULT_GROWTH_CATEGORY_GUARD_ENABLED}}"
+# TASK-1696 — Gate de presupuesto AEO per-org, en DOS etapas. `ENABLED` computa y registra lo que
+# HABRÍA pasado (shadow); `ENFORCED`, subordinado, bloquea. Ambos default OFF: el camino público
+# del lead magnet comparte el motor del grader, así que un tope mal calibrado no degrada un
+# tablero, corta captación — y el tope correcto es la SALIDA de un ciclo mensual de shadow, no un
+# supuesto de hoy.
+#
+# ⚠️ DUAL-LOCATION: el run async del grader y el re-grade recurrente ejecutan en ESTE worker,
+# así que sin los flags acá el gate queda muerto en la mitad async aunque Vercel los tenga ON.
+# Declarativo para que --set-env-vars (destructivo) NO los borre en cada redeploy.
+# Rollback (<5 min): `false` acá + `gcloud run services update ops-worker --update-env-vars ...=false`.
+GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED="${GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED:-false}"
+GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED="${GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED:-false}"
+# Knobs de tope por tier (NO son flags; override sin deploy, mismo criterio que los
+# GROWTH_SEO_*_MONTHLY_BUDGET_USD). Nacen holgados a propósito: en shadow tienen que dejar pasar
+# todo para que `wouldBlock` mida la realidad y no la restricción.
+GROWTH_AI_VISIBILITY_CONTRACTED_MONTHLY_BUDGET_USD="${GROWTH_AI_VISIBILITY_CONTRACTED_MONTHLY_BUDGET_USD:-60}"
+GROWTH_AI_VISIBILITY_PILOT_MONTHLY_BUDGET_USD="${GROWTH_AI_VISIBILITY_PILOT_MONTHLY_BUDGET_USD:-10}"
+GROWTH_AI_VISIBILITY_TRIAL_MONTHLY_BUDGET_USD="${GROWTH_AI_VISIBILITY_TRIAL_MONTHLY_BUDGET_USD:-3}"
 GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED="${GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED:-${DEFAULT_GROWTH_ARCHETYPE_PROMPTS_ENABLED}}"
 GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED="${GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED:-${DEFAULT_GROWTH_PROMPT_AUTHORING_ENABLED}}"
 # TASK-1267 — KG api key (eje entity). Opcional: sólo se appendea + bindea si viene poblada
@@ -704,6 +734,11 @@ ENV_VARS="${ENV_VARS},GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED=${GROWTH_PROBE_F
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_REGRADE_ENABLED=${GROWTH_AI_VISIBILITY_REGRADE_ENABLED}"
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_ENABLED=${GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_ENABLED}"
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED=${GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED=${GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED=${GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_CONTRACTED_MONTHLY_BUDGET_USD=${GROWTH_AI_VISIBILITY_CONTRACTED_MONTHLY_BUDGET_USD}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_PILOT_MONTHLY_BUDGET_USD=${GROWTH_AI_VISIBILITY_PILOT_MONTHLY_BUDGET_USD}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_TRIAL_MONTHLY_BUDGET_USD=${GROWTH_AI_VISIBILITY_TRIAL_MONTHLY_BUDGET_USD}"
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED=${GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED}"
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED=${GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED}"
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE=${GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE}"
@@ -819,6 +854,35 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED=${GROWTH_SEO_DOMAIN_OVE
 # scheduler despausado tras el smoke).
 GROWTH_SEO_URL_VISIBILITY_ENABLED="${GROWTH_SEO_URL_VISIBILITY_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_URL_VISIBILITY_ENABLED=${GROWTH_SEO_URL_VISIBILITY_ENABLED}"
+
+# TASK-1662 — Cobertura de keywords de competidores declarados (keyword gap competitivo,
+# DataForSEO Labs `domain_intersection`, 2 llamadas por competidor por ciclo mensual).
+#
+# Este flag se lee SOLO acá (en Vercel es inerte) y este archivo es su SoT declarativo —
+# `--set-env-vars` es destructivo y lo borraría en el próximo deploy.
+# Es SUBORDINADO a `GROWTH_SEO_ENABLED`. Rollback (<5 min): `false` acá + `--update-env-vars`.
+# **ON desde 2026-08-28** (autorización plena del operador; secuencia verificada ese día:
+# competidor real declarado con autoría —Berel MX → comex.com.mx, evidencia
+# BEREL_SEO_DIAGNOSTIC_2026-08-25— + dry-run USD 0,144 estimado + primera corrida real
+# USD 0,1076 con Δ EXACTO en el ledger, 697 filas de cobertura + 640 de mercado gratis).
+# Efectivo con el primer deploy del worker que incluya el endpoint (post-release); el
+# scheduler queda PAUSADO hasta entonces (ver abajo). Costo ~USD 0,11-0,15/competidor/ciclo.
+GROWTH_SEO_COMPETITOR_GAP_ENABLED="${GROWTH_SEO_COMPETITOR_GAP_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},GROWTH_SEO_COMPETITOR_GAP_ENABLED=${GROWTH_SEO_COMPETITOR_GAP_ENABLED}"
+
+# TASK-1699 — Persistencia del top-N del SERP que el rank capture YA paga (costo marginal
+# CERO: cero llamadas nuevas, cero cambio de depth/flags). Gatea la ESCRITURA dentro del
+# batch diario `ops-seo-rank-capture` — sin scheduler nuevo.
+#
+# 🔴 ON declarativo desde el nacimiento, A DIFERENCIA de sus hermanos de gasto: cada día
+# con este flag apagado en el worker es un día de serie PERDIDO PARA SIEMPRE (el SERP de
+# ayer no se recompra; ~620 observaciones de mercado/día se disuelven). Efectivo con el
+# primer deploy del worker que incluya el código (post-release develop→main). La LECTURA
+# se gatea con la misma var en Vercel (agregar con el release). Este archivo es el SoT
+# declarativo del lado worker. Es SUBORDINADO a `GROWTH_SEO_ENABLED`.
+# Rollback (<5 min): `false` acá + `--update-env-vars` — la captura de rank NO se afecta.
+GROWTH_SEO_SERP_TOP_RESULTS_ENABLED="${GROWTH_SEO_SERP_TOP_RESULTS_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},GROWTH_SEO_SERP_TOP_RESULTS_ENABLED=${GROWTH_SEO_SERP_TOP_RESULTS_ENABLED}"
 
 # TASK-1777 — Drill-down nominal del perfil de enlaces (paso post-batch del snapshot semanal
 # de TASK-1304; SIN scheduler nuevo — reusa `ops-seo-backlink-capture` 0 7 * * 1).
@@ -1458,6 +1522,25 @@ upsert_scheduler_job \
   '{}' \
   "false"
 echo "  -> ops-seo-url-visibility: 0 9 17 * * ACTIVO (visibilidad por sujeto-página mensual, TASK-1776 — despausado 2026-08-27 tras smoke con los cuatro subject_kind + autorización del operador)"
+
+# TASK-1662 — cobertura mensual de keywords de competidores declarados (keyword gap).
+# Día 18: cadencia mensual en día propio para no apilar gasto con los jobs SEO de los
+# días 15/16/17 (mercado / foto de dominio / visibilidad por sujeto).
+#
+# 🔴 PAUSADO hasta el primer deploy del worker que incluya `/seo/competitor-coverage/
+# capture-batch` (post-release develop→main): despausarlo antes haría que Cloud Scheduler
+# golpee un 404 en la revisión vigente. La secuencia de verificación YA corrió el
+# 2026-08-28 con autorización plena (dry-run + primera corrida real USD 0,1076 verificada
+# en el ledger, un competidor de una org), así que al despausar sólo falta confirmar que
+# el endpoint responde en la revisión activa. El payload vacío usa el default
+# `maxCompetitors=1` (V1: un competidor a la vez).
+upsert_scheduler_job \
+  "ops-seo-competitor-coverage" \
+  "0 9 18 * *" \
+  "/seo/competitor-coverage/capture-batch" \
+  '{}' \
+  "true"
+echo "  -> ops-seo-competitor-coverage: 0 9 18 * * PAUSADO (cobertura de competidores mensual, TASK-1662 — despausar sólo tras dry-run + primera corrida verificada + autorización)"
 
 # TASK-1664 — drain de corridas de keyword discovery (Labs Live, bajo demanda del operador).
 # Cada 10 minutos alcanza de sobra: el enqueue es humano/agente (no hay cadencia diaria en V1)

@@ -497,6 +497,7 @@ const executeDrillDown = async (
 
     const domainsResult = await postDataForSeoTask({
       family: 'backlinks',
+      consumer: 'seo',
       endpoint: BACKLINKS_REFERRING_DOMAINS_ENDPOINT,
       organizationId: snapshot.organization_id,
       tasks: [{ ...commonParams, order_by: ['rank,desc'] }]
@@ -522,6 +523,7 @@ const executeDrillDown = async (
 
     const anchorsResult = await postDataForSeoTask({
       family: 'backlinks',
+      consumer: 'seo',
       endpoint: BACKLINKS_ANCHORS_ENDPOINT,
       organizationId: snapshot.organization_id,
       tasks: [{ ...commonParams, order_by: ['backlinks,desc'] }]
@@ -553,6 +555,7 @@ const executeDrillDown = async (
     if (newBacklinks > 0) {
       const newResult = await postDataForSeoTask({
         family: 'backlinks',
+        consumer: 'seo',
         endpoint: BACKLINKS_BACKLINKS_ENDPOINT,
         organizationId: snapshot.organization_id,
         tasks: [
@@ -572,6 +575,7 @@ const executeDrillDown = async (
     if (lostBacklinks > 0) {
       const lostResult = await postDataForSeoTask({
         family: 'backlinks',
+        consumer: 'seo',
         endpoint: BACKLINKS_BACKLINKS_ENDPOINT,
         organizationId: snapshot.organization_id,
         tasks: [

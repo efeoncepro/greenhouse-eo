@@ -1,5 +1,20 @@
 # TASK-1707 — Rollout del re-grade recurrente AEO, multi-runtime y con opt-in gobernado
 
+## Delta 2026-08-27
+
+- El bloqueante `TASK-1696` está **code complete** y su gate nace en shadow, que es lo que esta task
+  declaró suficiente: antes de inscribir un perfil hace falta **ver** el gasto, no frenarlo —
+  cerrado por TASK-1696.
+- Los dos flags del gate, `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED` y
+  `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED`, ya están declarativos en
+  `services/ops-worker/deploy.sh` (ambos default OFF) y con fila en el ledger de flags — cambiado
+  por TASK-1696. Entran al mismo mapa multi-runtime que esta task gobierna: prenderlos sólo en
+  Vercel deja el re-grade del worker sin gate.
+- Punto ciego anotado en el cierre de TASK-1696: `pnpm flags:audit` **no ve** estos dos flags —su
+  regex busca `process.env.X_ENABLED` literal y `ai-visibility/flags.ts` los lee por constante—, así
+  que reporta "0 sin registrar" sin haberlos mirado. El ledger es el SSOT humano.
+- La ruta declarada en §Depends on quedó stale: TASK-1696 ya no vive en `docs/tasks/to-do/`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -24,7 +39,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth`
-- Blocked by: `TASK-1696, TASK-1704`
+- Blocked by: `TASK-1704`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

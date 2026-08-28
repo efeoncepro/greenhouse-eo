@@ -9,7 +9,10 @@ const mockPost = vi.fn()
 vi.mock('@/lib/ai/dataforseo', () => ({
   DATAFORSEO_DEFAULT_AI_MODE_ENDPOINT: '/v3/serp/google/ai_mode/live/advanced',
   isDataForSeoConfigured: () => mockConfigured(),
-  postDataForSeoSerpLiveAdvanced: (input: unknown) => mockPost(input)
+  // TASK-1696 — el adapter compra por el transporte canónico (acepta organización y consumidor),
+  // no por el wrapper congelado del AEO.
+  postDataForSeoTask: (input: unknown) => mockPost(input),
+  setDataForSeoSpendRecorder: () => undefined
 }))
 
 const captureSpy = vi.fn()
@@ -37,6 +40,7 @@ const PROMPT: GrowthAiVisibilityPromptInput = {
 
 const ctx = (): ProviderAdapterContext =>
   createProviderAdapterContext({
+    organizationId: null,
     providerPolicyVersion: 'policy.v1',
     promptPackVersion: 'prompt-pack.v1',
     timeoutMs: 20_000,

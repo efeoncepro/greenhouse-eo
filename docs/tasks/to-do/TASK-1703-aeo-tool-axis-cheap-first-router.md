@@ -1,5 +1,13 @@
 # TASK-1703 — Router cheap-first del eje HERRAMIENTA (y sólo del eje herramienta)
 
+## Delta 2026-08-27
+
+- El bloqueante `TASK-1696` está **code complete**: el ledger tiene dimensión de consumidor y
+  `resolveAeoBudget` mide el gasto en dólares por organización — cerrado por TASK-1696. El gate nace
+  en shadow (calcula, registra y emite señal sin bloquear), que es justo lo que esta task necesita:
+  al cambiar el proveedor por defecto el gasto se mueve y ahora se ve.
+- La ruta declarada en §Depends on quedó stale: TASK-1696 ya no vive en `docs/tasks/to-do/`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -24,7 +32,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth`
-- Blocked by: `TASK-1696`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

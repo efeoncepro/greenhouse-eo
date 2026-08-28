@@ -64,8 +64,10 @@ declaran dependencia, fallback, sustitución y límites.
 | Rail enterprise | Cloud, seguridad, procurement, datos y despliegue para clientes corporativos | Se selecciona por requisitos del cliente y continuidad operativa |
 | Experimento | Prototipado, acceso temprano, creator program o hipótesis de mercado | No entra en promesas de producción hasta validar demanda, soporte y economics |
 
-Un programa iniciado o una postulación enviada no equivale a partnership aprobado. El estado vigente por proveedor
-queda en la auditoría fechada de programas de partners, no en este modelo.
+Un programa iniciado o una postulación enviada no equivale a partnership aprobado. Una consulta B2B o enterprise
+también puede ser sólo una vía comercial evaluada caso a caso, aunque el formulario permita elegir `partnership`.
+El estado vigente por proveedor vive en el registro maestro; las auditorías fechadas conservan la evidencia y el
+contexto de cada investigación o envío, no el estado vigente.
 
 ## 5. Mapa de composición
 
@@ -81,6 +83,7 @@ queda en la auditoría fechada de programas de partners, no en este modelo.
 | **Adobe** | Experience, content y marketing enterprise | Implementación, integración, content operations y personalización |
 | **Lovable** | Acelerador de prototipado y construcción | Discovery técnico, prototipos, MVPs y accelerated delivery; no es pilar estratégico por sí solo |
 | **Runway, FLUX, ElevenLabs, BytePlus** | Capabilities creativas de video, imagen, voz y generación | Producción audiovisual, localización, voice agents y Creative Operations |
+| **Higgsfield y Magnific** | Providers de producción generativa y finish creativo; consultas de partnership enviadas, sin aprobación comercial todavía | Video, imagen, audio, upscale/enhance y Creative Operations para cuentas enterprise; cualquier referral, reseller, co-sell o beneficio de canal queda sujeto a respuesta y términos verificables |
 
 La tabla describe composición potencial, no aprobación comercial, exclusividad, certificación, reseller rights ni
 disponibilidad técnica. Esas propiedades se validan por provider y por oferta.
@@ -121,6 +124,8 @@ Antes de usar un provider en una propuesta o publicarlo como partner, registrar:
 El estado vigente por relación vive en el [`Efeonce Partnership Registry V1`](../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md).
 La auditoría [`AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md`](../audits/commercial/AI_PARTNER_PROGRAM_APPLICATIONS_2026-07-26.md)
 se conserva como fotografía histórica de las postulaciones de IA y no debe usarse como estado actual sin revalidación.
+La constancia [`HIGGSFIELD_MAGNIFIC_AGENCY_PARTNERSHIP_OUTREACH_2026-08-28.md`](../audits/commercial/HIGGSFIELD_MAGNIFIC_AGENCY_PARTNERSHIP_OUTREACH_2026-08-28.md)
+documenta la investigación y los dos envíos más recientes, mientras el registry conserva su estado operativo.
 No declarar como aprobado un programa sólo porque se haya enviado un formulario o exista una cuenta de partner.
 
 El modelo permanece `Approved for validation`: todavía requiere validar por relación casos de uso repetibles,

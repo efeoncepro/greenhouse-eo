@@ -2,8 +2,9 @@
 
 ## Delta 2026-08-27
 
-- **El lado ◑ de mercado por URL YA TIENE FUENTE** — `TASK-1776` quedó `code complete` (rollout
-  pendiente): `greenhouse_growth.seo_url_visibility_snapshots` + reader `readUrlVisibility`
+- **El lado ◑ de mercado por URL YA TIENE FUENTE** — `TASK-1776` quedó **`complete`** (rollout ejecutado 2026-08-27:
+  flag ON en el ops-worker, scheduler `ops-seo-url-visibility` ACTIVO, lane en producción con el
+  release `cc73c74789ce` y tool federada en el gateway): `greenhouse_growth.seo_url_visibility_snapshots` + reader `readUrlVisibility`
   (`src/lib/growth/seo/url-visibility/reader.ts`) entregan, por URL/subcarpeta/subdominio de
   CUALQUIER dominio, keywords ranqueadas, distribución top-100, ETV y detalle top-N. Esta task
   COMPONE, no captura: consume ese reader para la mitad de mercado y cruza con GSC/AEO **en

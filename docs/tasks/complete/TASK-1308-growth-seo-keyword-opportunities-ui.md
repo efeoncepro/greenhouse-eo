@@ -1,5 +1,19 @@
 # TASK-1308 — Growth SEO: Keyword Opportunities UI
 
+## Delta 2026-08-27 — la señal de presupuesto que esta task citaba no existía
+
+- Su tabla de riesgos cita `seo.provider.cost_over_budget` como señal de alerta de los reads live-per-view a DataForSEO.
+- **No existía en código cuando esta task cerró.** Barrido verificado:
+  `grep -rIn "cost_over_budget" src services migrations scripts` devolvía cero. La atribución entre
+  tasks era circular — cada una la daba por materializada por otra.
+- **La materializó TASK-1696** (`src/lib/reliability/queries/seo-provider-cost-over-budget.ts`,
+  visible en `/admin/operations` bajo el rollup `growth`): avisa `warning` al 80% del tope del
+  período y `error` al agotarlo, es decir **antes** de que el gate empiece a rechazar corridas con
+  `budget_exhausted`. Desde hoy la mitigación citada es real.
+- Matiz que evita sobredimensionarlo: el control **duro** sí existía —`enforceSeoRunEntitlement`
+  bloquea antes de gastar—; lo que faltaba era la detección temprana. La tabla de riesgos no se
+  reescribe: este delta es la corrección.
+
 ## Delta 2026-08-07 — la cabecera de esta pantalla cambió de patrón por el trabajo de TASK-1307 (commit 67c2d1218)
 
 Delta informativo posterior al cierre: **el lifecycle sigue `complete`**, no reabre la task y **no

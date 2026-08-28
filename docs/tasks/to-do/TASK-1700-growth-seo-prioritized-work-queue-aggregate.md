@@ -1,5 +1,39 @@
 # TASK-1700 — Growth SEO: la cola priorizada de trabajo es un aggregate persistido con score versionado
 
+## Delta 2026-08-28 — el origen `competitor_gap` ya tiene contrato de productor (TASK-1662)
+
+`readKeywordGap` (`src/lib/growth/seo/keyword-gap-reader.ts`) existe y entrega exactamente lo
+que este aggregate necesita para el origen `competitor_gap`: hechos + factores con
+procedencia y fecha (`searchVolume` ◑, `cpcUsd`, `linkBarrier`, `serpFeatures` como lista,
+`attainablePositionBand` `link_barrier_v1`), en orden NEUTRAL y **sin score propio** — la
+combinación y los pesos siguen siendo de esta cola (`priority_score_version`). Detalles que
+esta task debe respetar al consumirlo:
+
+- `evidence_ref` opaca: `seo:competitor_gap:<coverage_run_id>` (el reader expone
+  `coverage.coverageRunId`); nunca FK/JOIN a las tablas de cobertura.
+- El reader YA excluye keywords con impresiones GSC (28d) — el invariante "sin demanda
+  medida no hay score" recibe del gap sólo candidatos banda 3 (o banda 2 si la cola decide
+  re-medir), jamás duplicados de `gsc_striking_distance`.
+- `declaredTargets` NO entra como hallazgo del gap: es el origen `declared_target`.
+- `coverage.state = 'no_coverage'` o `stale: true` ⇒ `origin_health_json.competitor_gap`
+  `degraded/down` con razón; el rollout de cobertura sigue gated (flag OFF, TASK-1662
+  `code complete, rollout pendiente`), así que el origen nace declarado y desactivado tal
+  como esta spec ya manda.
+
+## Delta 2026-08-28 — TASK-1699 quedó code complete: el origen `competitor_gap` tiene TODA su cadena de productores en código
+
+`TASK-1699` quedó **code complete, rollout pendiente** (`in-progress/`, en develop `fdfdedbe5`):
+tabla `seo_serp_top_results` append-only, parser hermano `parseSerpTopResults` con costo marginal
+cero, cableado en el rank capture tras `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` (ON declarativo), y
+`readSerpCompetitorCandidates` — el **PROPOSE** del loop de competidores (recurrencia medida,
+umbrales versionados 30d/3kw/5días, `proposalRef` `serp_top:v1:*`; el execute es
+`declareCompetitors` de `TASK-1662` tras confirmación humana). Con eso el origen `competitor_gap`
+tiene toda su cadena de productores en código: descubrimiento (1699) → declaración (1662) →
+cobertura (1662) → `readKeywordGap`. La **activación** del origen sigue gated por el rollout: la
+serie del top-N arranca con el primer deploy del worker post-release y los candidatos necesitan
+≥5 días de serie; la cobertura del gap sigue tras su propio flag. El bloqueo de `Blocked by` por
+`TASK-1699` puede considerarse **satisfecho en código** — lo que falta es rollout, no task.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -24,7 +58,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo`
-- Blocked by: `TASK-1694` (bloqueo DURO) · `TASK-1692` · `TASK-1699` (sólo para el origen `competitor_gap`; los otros cuatro orígenes no la necesitan)
+- Blocked by: `TASK-1694` (bloqueo DURO) · `TASK-1692` · `TASK-1699` (sólo para el origen `competitor_gap`; los otros cuatro orígenes no la necesitan — satisfecho en código desde 2026-08-28, ver Delta)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

@@ -509,6 +509,7 @@ export const backfillDomainRankHistory = async (input: HistoryRangeInput): Promi
     try {
       const response = await postDataForSeoTask({
         family: 'labs',
+        consumer: 'seo',
         endpoint: '/v3/dataforseo_labs/google/historical_rank_overview/live',
         organizationId: plan.organizationId,
         tasks: [

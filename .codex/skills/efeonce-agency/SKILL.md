@@ -18,7 +18,10 @@ Esta skill es el **router + doctrina destilada** del context pack de negocio de 
 La capa de partnerships y providers es transversal al portfolio: Efeonce puede vender licencias cuando los términos lo
 permiten, pero también advisory, implementación, operación, Product Services e IP propia. Para clasificar un partner o
 provider carga [`EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md`](../../docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md);
-no confundas provider, partnership aprobado, product brand ni línea de negocio.
+para su estado vigente carga [`EFEONCE_PARTNERSHIP_REGISTRY_V1.md`](../../docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md).
+No confundas provider, formulario enviado, partnership aprobado, product brand ni línea de negocio. Una categoría
+`partnership` dentro de un formulario Enterprise sólo prueba la vía solicitada, no reseller, co-selling, tier,
+certificación ni revenue share.
 
 **Fuente de verdad = `docs/context/` (archivos `00`–`14`).** Esta skill NO los reemplaza: los resume y enruta. Ante cualquier conflicto, mandan los docs `docs/context/*` y, sobre arquitectura/runtime/contratos, manda el contrato técnico verificado (regla del `CLAUDE.md`). Empezar siempre por `docs/context/00_INDEX.md`.
 
@@ -214,6 +217,7 @@ El copy es producto: un microcopy genérico rompe la marca tanto como un bug rom
 | Diseñar la experiencia/onboarding del cliente | `10_experiencia-cliente` |
 | Tocar sync HubSpot, Account 360, lifecycle stages o properties | `11_hubspot-bowtie` |
 | Operar o vender Salesforce CRM, Marketing Cloud Engagement o Marketing Cloud Next | `docs/services/salesforce/README.md` + skill Salesforce dueña + partnership registry |
+| Investigar, solicitar o declarar un partnership/provider | `docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md` + `docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md`; conservar la investigación/envío en una auditoría fechada |
 | Definir ICP, buyer persona, JTBD o prioridad por job del cliente | `13_icp-buyer-personas-jtbd` |
 | Evaluar ASaaS, tiers, switching cost, self-service o monetización | `efeonce-business-model-operator` + `14_modelo-negocio-asaas` |
 | Definir Business Model/packaging/credits de Creative Studio | `efeonce-business-model-operator` + `14_modelo-negocio-asaas` + `03_ecosistema-producto` + `docs/business-models/creative-studio/*` + skill `creative-practice` |

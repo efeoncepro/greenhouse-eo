@@ -1,5 +1,22 @@
 # TASK-1708 — Estacionalidad: persistir la serie de 12 meses que ya viene en `keyword_info`
 
+## Delta 2026-08-28
+
+- El bloqueante `TASK-1699` quedó **code complete, rollout pendiente** (`in-progress/`, en develop
+  `fdfdedbe5`): el contrato de "persistir payload ya pagado" que esta task debía imitar ya aterrizó
+  (tabla `seo_serp_top_results` append-only estricto + parser hermano `parseSerpTopResults` a costo
+  marginal cero, probado por test de no-regresión). El `[verificar]` de §Depends on queda resuelto:
+  el archivo existe y su forma es la referencia. La activación de la serie top-N sigue gated por el
+  primer deploy del worker post-release — cerrado por TASK-1699.
+
+## Delta 2026-08-27
+
+- El transporte `postDataForSeoTask` ahora **exige** `consumer`: la captura de la serie declara
+  `consumer: 'seo'` — cambiado por TASK-1696.
+- El ledger ganó `consumer`, `cost_basis` y `price_table_version`, y su clave única pasó a seis
+  columnas `NULLS NOT DISTINCT` — cambiado por TASK-1696. La verificación «el gasto no subió» sigue
+  siendo válida, pero se lee por `(consumer, family, cost_basis)`, no por familia sola.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

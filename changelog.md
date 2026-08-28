@@ -7,6 +7,84 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-28 — TASK-1699: el top-N del SERP ya pagado deja de tirarse (code complete, rollout pendiente)
+
+- El rank capture diario compra el SERP completo (`depth 20`) y descartaba ~19 de 20 filas. Ahora
+  `seo_serp_top_results` (append-only estricto, ranura `rank_absolute`) las persiste con **costo
+  marginal CERO** (test de no-regresión sobre `buildSerpTask`), en la misma transacción que el
+  snapshot de rank y con fallback que jamás pierde la medición pagada. Encima: descubrimiento de
+  competidores por recurrencia medida (propose→confirm hacia `declareCompetitors` de TASK-1662),
+  lanes sólo-internal, 2 tools MCP federadas (inventario a 27) y señal de cobertura con pérdida
+  irrecuperable declarada. Flag dual-runtime **ON y VIVO en el worker el mismo día** (el
+  Ops Worker Deploy corre en cada push a develop; revisión `ops-worker-00610-kc8` verificada) —
+  **día 1 de la serie: 2026-08-29**; el scheduler de cobertura de competidores quedó ENABLED tras
+  verificar el endpoint con dry-run real. Sanity 9/9 contra PG real con rollback sin residuo.
+
+## 2026-08-28 — TASK-1662: keyword gap competitivo (code complete, rollout pendiente)
+
+- El módulo SEO gana la fundación de su tercera pregunta ("¿qué me estoy perdiendo entero?"):
+  competidores DECLARADOS con autoría acoplada por CHECK (`declareCompetitors`/`retireCompetitors`,
+  techo por target, outbox `growth.seo.competitor.*`, 3 lanes + tools MCP federadas en local),
+  captura de cobertura vía `labs/domain_intersection` (flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED`
+  OFF + scheduler `ops-seo-competitor-coverage` pausado; run ledger anti fuga de re-compra;
+  mercado compartido productor #4 a costo 0) y `readKeywordGap` que DERIVA el gap al leer:
+  exclusión por GSC medido, contenido vs optimización vs objetivos declarados, factores con
+  `sin_dato` y **sin orden propio** (la cola de TASK-1700 es la autoridad de orden). Migración
+  `20260828113457119` aplicada; sanity 22/22 contra PG real. Slice 4 (emisión a la cola)
+  bloqueado por TASK-1700; rollout con autorización del operador
+  (`docs/manual-de-uso/growth/operar-gap-competitivo-seo.md`).
+
+## 2026-08-28 — Outreach de partnership para agencias con Higgsfield y Magnific
+
+- Investigación vigente y formularios enterprise enviados a ambos providers para explorar un partnership de agencia
+  orientado a clientes enterprise en LATAM. Las dos páginas confirmaron recepción; el registry mantiene el estado
+  `Postulación enviada`, sin inferir reseller, co-selling, certificación ni economics hasta recibir evidencia
+  contractual. Constancia: `docs/audits/commercial/HIGGSFIELD_MAGNIFIC_AGENCY_PARTNERSHIP_OUTREACH_2026-08-28.md`.
+- Magnific respondió mediante su Enterprise BDR EMEA & LATAM y derivó la conversación a
+  `ai-partnerships@magnific.com`. La ruta oficial queda verificada, pero el estado comercial no cambia a partnership
+  activo hasta recibir aceptación y términos. El outreach especializado quedó enviado desde Outlook Web, con Susana
+  en copia y la firma configurada de Julio.
+
+## 2026-08-27 — TASK-1696: el ledger de gasto aprende quién gastó y de qué tipo es el dólar
+
+- `greenhouse_growth.seo_provider_spend_daily` gana `consumer` (`seo`|`aeo`), `cost_basis`
+  (`invoiced`|`estimated`) y `price_table_version` acoplado por CHECK. Clave única de seis columnas
+  con `NULLS NOT DISTINCT`. **Un solo ledger**: lo que se separa es el resolver de presupuesto.
+- El grader AEO deja de comprar fuera del ledger: `postDataForSeoTask` exige `consumer`, el adapter
+  de AI Mode migró del wrapper congelado al transporte canónico y `ProviderAdapterContext` lleva la
+  organización derivada del perfil, server-side.
+- `resolveAeoBudget` da presupuesto en dólares per-org al grader, con las dos monedas separadas y
+  restando la porción DataForSEO del estimado para no contarla dos veces. Gate **en shadow**: dos
+  flags, ambos OFF.
+- Tres señales nuevas en `/admin/operations`: `growth.dataforseo.spend_ledger_drift`,
+  `growth.ai_visibility.observation_yield` y `seo.provider.cost_over_budget` — esta última la
+  citaban nueve tasks como mitigación y no existía en código.
+- Documentación sincronizada: arquitectura (módulo SEO §1.1/§6/§9/§13.1, grader, control plane de
+  reliability), doc funcional + manual nuevos en `docs/{documentation,manual-de-uso}/growth/`, la
+  rule de auto-load `.claude/rules/growth-seo.md` y la skill `dataforseo-operator` con su espejo
+  Codex (cuerpo idéntico, verificado a mano: el validador de espejos NO cubre esta skill).
+
+## 2026-08-27 — TASK-1777 complete: la tríada anti-Semrush queda cerrada entera
+
+- El operador decidió cerrar TASK-1777 con su rollout ya ejecutado (flag ON, lane en producción,
+  `get_seo_backlink_detail` entre las 21 tools del gateway) y el único criterio no observado —
+  predicado de movimiento a USD 0 — convertido en follow-up F1 con fecha y dueño (lunes
+  2026-08-31, receta SQL en el Delta (3) del task file). Con esto 1775/1776/1777 + 1658 están
+  `complete`; gasto total del rollout de la tríada: USD 0.2958.
+
+## 2026-08-27 — Gateway MCP desplegado y cierre de la tríada SEO (TASK-1658/1775/1776)
+
+- Federación en producción: revisión `efeonce-mcp-gateway-00023-zt2`, `tools/list` autenticado observado en **21 tools SEO** (antes 13), con las 8 recién federadas presentes. Canary del provider verde contra producción para Efeonce y Berel.
+- **El `oauth:canary` tenía un punto ciego de inventario y se cerró**: ejercitaba `tools/call` sobre tools puntuales y nunca `tools/list`, así que una tool que quedara fuera del server pasaba invisible mientras las probadas siguieran verdes. Ahora asserta el inventario (`efeonce-mcp` commit `4058a07`). El charset del nombre incluye el punto a propósito — las tools no-SEO son punteadas (`hiring.talent_pool.search`) y sin él el total excluía Globe y Hiring en silencio, reportando el conteo SEO como si fuera el total.
+- `TASK-1658`, `TASK-1775` y `TASK-1776` pasan a `complete` con `task:lint` 0/0. Queda un residual declarado en 1775 (sujeto desconocido → fila NULL: cubierto por unit test, no observado en runtime) y la verificación del lunes 2026-08-31 para `TASK-1777`.
+
+## 2026-08-27 — Release a producción del carril Growth SEO (TASK-1652/1658/1709/1775/1776/1777)
+
+- Promovido `develop`→`main` como **un solo release**: PR #207, 632 archivos, 10 migraciones, target `cc73c74789ce`, release_id `cc73c74789ce-dbce65f2-303b-4528-bef3-f4edd022a880`, orquestador `33123977671`, manifest **`released`** en 9 min 40 s sin retry ni gate colgado. Llegan a producción los lanes ecosystem de la tríada SEO, el lane de diagnóstico de prospecto, la corrección del request AI Mode del grader y la federación MCP; más el cierre de hiring que quedaba en develop.
+- **Flags prendidos con el release** (ambos requerían que su lector estuviera en `main`, regla ISSUE-150 — verificado x0 antes y x1/x2/x3 después): `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` (Vercel, sign-off comercial del operador) y `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (Vercel Production; en ops-worker ya estaba ON). Redeploy `greenhouse-if2u2c8ys` porque Vercel congela env vars al build; `pnpm flags:audit --strict` cierra en 0/0.
+- **Los 3 gotchas del squash-merge se pre-emptaron, no se sufrieron**: merge canónico `-s ours` con ambas verificaciones vacías; el push a develop se bundleó con una edición del `FEATURE_FLAG_STATE_LEDGER` (está en `deployControlDocs` y fuerza el build de staging, evitando el `vercel_readiness` en exit 1); el Playwright smoke sobre `main` se produjo en 3 min en vez de taparlo con bypass. El `bypass_preflight_reason` quedó reservado para `db_migrations`, único dominio irreversible real, con razón auditable (migraciones ya aplicadas en la instancia única Cloud SQL).
+- ⚠️ **El watchdog post-release recomendó una regresión.** Reportó DRIFT en 3 workers comparando contra `gh=6f7e246ea888` (commit del 2026-07-30, ancestro del target) y propuso redeployar `hubspot-greenhouse-integration` con ese `expected_sha` — pisar código correcto con código de un mes atrás. No se ejecutó: `pnpm release:workers` (lee Cloud Run, fuente autoritativa) mostró 3/4 workers exactamente en el target y el `ops-worker` en change-gate legítimo, verificado con las **28 rutas reales** leídas del workflow y diff vacío. Es la clase de falso positivo abierta hasta TASK-920.
+
 ## 2026-08-27 — El provider Google AI Mode del AEO grader deja de mentir "sin bloque AI" (TASK-1652)
 
 - Los runs productivos del grader (market ISO-2) fallaban per-task en DataForSEO por `location_name` inválido y el fallo se clasificaba `skipped:no_ai_overview_block` — 60 observaciones históricas eran ese falso negativo (54 con el error exacto `40501`). Fix: mapa cerrado market→`location_code` verificado en vivo (CL=2152, MX=2484, CO=2170, PE=2604, US=2840) + gate per-task por `status_code` (el skip honesto queda reservado para tasks `20000` realmente ejecutadas). Regrade descartado con evidencia: los tasks fallidos nunca se ejecutaron y río abajo skip/failed pesan igual.
@@ -638,112 +716,3 @@
 - **Lo que todavía no cambia**: nueve registros de prueba quedan archivados en vez de borrados, a la
   espera de una decisión explícita. No aparecen en ninguna pantalla, así que borrarlos es prolijidad,
   no necesidad.
-
-## 2026-08-18 — Evaluación provisional automática y CV por MCP interno
-
-- Los assessments elegibles de cualquier vacante generan ahora evaluación IA provisional en segundo plano para
-  operadores. No cambia el score efectivo y el postulante no recibe resultado, rationale ni estado de revisión.
-- El expediente auto-propone análisis con CV procesado + assessment puntuado; la confirmación sigue siendo humana.
-- Los agentes internos pueden leer el review packet exacto por MCP con CV minimizado/redactado y ligado a hash.
-  Sin contacto, PDF crudo, ranking, decisiones, writes ni acceso B2B.
-- La UI operator-only quedó compactada y validada GVC 4,82/5; su último ajuste visual aún espera promoción
-  ordinaria. TASK-1742/1718 conservan observación, rollback y firmas pendientes.
-
-## 2026-08-18 — Un dato de prueba de Hiring ya no puede hacerse pasar por un candidato real
-
-- **La procedencia ahora es un hecho declarado, no una adivinanza.** Cada persona y cada vacante dice
-  si representa algo del mundo real, y la postulación lo hereda de ambas. Antes la única forma de
-  distinguir un seed de un candidato era adivinar por el nombre, y esa adivinanza falla en las dos
-  direcciones: hay una respuesta REAL de un candidato que dice "pequeñas pruebas o pilotos" y que un
-  barrido por regex habría borrado como basura.
-- **Omitir la declaración deja el dato visible, nunca oculto.** Es deliberado: la suciedad es molesta
-  y evidente; perder un candidato real sería grave e invisible.
-- **Una vacante de prueba ya no se puede publicar.** Ocho llegaron a estar publicadas en el careers
-  real y que ningún candidato externo postulara fue suerte. La guarda bloqueó el día uno al smoke que
-  las creaba, que además nunca limpiaba lo que dejaba.
-- **La IA deja de poder calibrarse contra respuestas inventadas.** El gold set excluye datos sintéticos
-  sin interruptor para volver atrás: es evidencia de un gate de promoción, no una preferencia.
-- **El desk podrá dejar de contar fantasmas**, detrás de un flag que nace apagado y con aviso previo a
-  HR, porque 12 de 14 vacantes son sintéticas y sin contexto eso se lee como pérdida de datos.
-
-## 2026-08-18 — Los dos flags que quedaron "ON con pendiente" ya tienen su verificación hecha
-
-- **Canary de identidad del intake (TASK-1736), ejecutado y verde.** Los 5 puntos del runbook contra PG
-  real: la evidencia guarda el nombre EXACTO como lo escribió la persona, la clasifica `degenerate_lower`
-  y propone la versión capitalizada; la Person queda con esa propuesta y no con el verbatim; el audit
-  registra `reconcile/applied`; un segundo envío en MAYÚSCULAS no duplica a la persona y deja el outcome
-  del CAS; un reenvío idéntico no agrega evidencia. **Cero correos** emitidos.
-- **El canary NO se corre contra una vacante real, y ahora el runbook lo dice.** Hacerlo mete un candidato
-  falso en el pipeline de una vacante viva (llevaban 15 y 33 candidatos) y dispara el aviso a People. Peor:
-  la evidencia es **append-only por grant**, así que ese candidato falso **no se puede borrar** — queda
-  pinneado por FK hasta que un humano purgue con perfil `ops`. El carril correcto es un live test opt-in
-  sobre una vacante desechable propia, que se despublica sola.
-- **Expediente de evaluación (TASK-1735): el arreglo del truncado quedó probado con el caso real.** La nota
-  posterior al fix persistió sus 8240 caracteres completos —termina en punto— contra los 8000 exactos de la
-  mutilada, y la vieja quedó enlazada como _versión superada_, no como vigente. El límite en base ya es 20000.
-- **Una señal que iba a mentir para siempre.** `evidence_coverage_gap` contaba TODAS las postulaciones, pero
-  la evidencia sólo la escribe el intake público: cada postulación cargada a mano desde el desk (6 en 30 días)
-  la habría dejado en `warning` de forma permanente, sobre la señal que justamente gatea este rollout.
-
-## 2026-08-18 — Careers público en producción: una vacante que se lee como una oferta, y que Google entiende
-
-- **Lo que ve ahora un candidato.** El detalle de una vacante dejó de ser un bloque de prosa con
-  requisitos: hoy abre con la promesa del rol y sigue con qué resultados se esperan, cómo es el trabajo
-  real, qué es imprescindible, qué es deseable y **qué puede aprender ahí** — separado a propósito, para
-  que nadie se autodescarte por algo que el rol enseña. Lee además cuánto dura el proceso y **en qué
-  plazo tendrá respuesta: 3 a 4 semanas**, avance o no. Y ve la vinculación sin letra chica: en Chile
-  contrato laboral local; fuera de Chile, vía internacional con pago directo de Efeonce, sobre 20 países
-  elegibles (toda Latinoamérica salvo Cuba, más Estados Unidos y España). Las dos vacantes vivas ya están
-  escritas así.
-- **Lo que ve Google.** Cada vacante publicada emite `JobPosting` estructurado, construido desde el mismo
-  contenido visible en la página — nunca desde datos que la persona no puede leer. El schema **pasó la
-  validación externa de `validator.schema.org` con 0 errores y 0 advertencias**. Una vacante remota sin
-  países declarados sigue sin emitir schema, a propósito: es preferible no aparecer a aparecerle a alguien
-  a quien no podemos contratar. Pausar o cerrar una vacante la retira del aire y del schema en el mismo acto.
-- **Republicar una vacante viva ya no la saca del aire.** La barra editorial se exige al publicar por
-  primera vez, no al volver a publicar: antes, pausar una vacante con postulantes en proceso la habría
-  dejado en 404 hasta reescribir su contenido completo.
-
-## 2026-08-17 — TASK-1740: una vacante pública tiene contenido estructurado y schema honesto
-
-- **El contenido candidate-facing deja de vivir sólo en prosa parseada.** Un opening puede declarar
-  el bloque versionado `PublicOpeningContent` v1 (promesa, resultados, trabajo, essentials/learnables,
-  evidencia, modelo remoto, proceso, beneficios y compensación estructurada opcional). Se escribe por
-  el command canónico con validación estricta (422); su ausencia degrada al fallback legacy de prosa,
-  nunca a huecos. La allowlist pública sigue siendo la única puerta al navegador (anti-leak extendido).
-- **El schema de Google nace del mismo contenido visible y es fail-closed.** Canonical explícito en
-  toda leaf publicada; `JobPosting` JSON-LD detrás de `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED`
-  (Vercel-only, nace OFF). Remoto exige países elegibles ISO reales
-  (`public_remote_eligible_countries` — `LATAM`/`Global` se rechazan como país); híbrido/presencial
-  exige ciudad+país; salario sólo desde compensación estructurada; nunca `directApply` ni
-  `validThrough`. Pausar/cerrar retira URL y schema (404). Hoy ninguna vacante viva emite schema
-  (ambas son remotas `LATAM` sin país declarado) — comportamiento correcto por diseño.
-- Estado: `code complete, rollout pendiente` (países por confirmar con People/Legal, flag
-  staging→Rich Results→prod). TASK-1741 (renderer editorial) queda desbloqueada con fixture.
-
-## 2026-08-17 — Backlog de Careers: contenido público/JobPosting y renderer editorial separados
-
-- Se registran `TASK-1740` y `TASK-1741` para mejorar el detalle de una vacante sin una regresión de
-  aplicación. La primera posee proyección pública allowlist-safe, fallback legacy, lifecycle,
-  canonical y `JobPosting` coherente con el HTML visible; no implementa Indexing API ni inventa
-  países, salario, beneficios o `directApply`.
-- La segunda consume ese contrato para un renderer `Editorial dossier` incremental de
-  `/public/careers/[publicId]`, con baseline/GVC desktop+móvil y flag reversible. El formulario no
-  cambia y se conservan exactamente los CTA existentes del hero y resumen; no se añade CTA final.
-- Sin cambio runtime: son tasks de diseño/ejecución futura. El contrato de contenido y el schema se
-  implementan antes del render.
-
-## 2026-08-17 — Se pueden otorgar ajustes razonables en las evaluaciones
-
-- **Tiempo extra para quien lo necesita.** Hasta ahora el campo existía en el sistema pero **nadie
-  podía escribirlo**: 17 evaluaciones, las 17 sin ajuste, porque no había forma de concederlo. La
-  única salida era alargar el límite de la plantilla, que se lo alarga a todos. Ahora People puede
-  conceder entre 1 y 180 minutos a una persona concreta, **incluso mientras está rindiendo** — el
-  contador se le alarga en el momento.
-- **El motivo no se guarda, a propósito.** Un ajuste revela una condición de salud o discapacidad:
-  dato protegido. Guardarlo sería crear el registro con el que después se discrimina. Se guarda sólo
-  el arreglo. La constancia narrativa va al expediente de evaluación, que tiene su propio control.
-- **El correo de la prueba ahora invita a pedirlo**, en español e inglés, y dice explícitamente que
-  no hay que explicar por qué. Sin esa línea sólo preguntan quienes ya se sienten con derecho a
-  hacerlo, que es justo el sesgo que el ajuste existe para corregir.
-- Otorgarlo requiere ser People: no alcanza con poder autorar evaluaciones.

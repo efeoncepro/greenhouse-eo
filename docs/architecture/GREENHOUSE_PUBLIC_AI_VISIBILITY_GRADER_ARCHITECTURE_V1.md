@@ -572,6 +572,14 @@ Adapter responsibilities:
 - Emit reliability/cost signals for every attempted call, including skipped calls caused by flags, policy or budget.
 - Never write to HubSpot or public reports directly; adapters only produce evidence.
 
+**Atribución del gasto de proveedor comprado (TASK-1696, vigente).** El adapter que le **compra** a un proveedor externo con factura —hoy sólo `google_ai_overview`, que le paga a DataForSEO— no puede gastar fuera del ledger:
+
+- `ProviderAdapterContext` transporta **`organizationId: string | null`**, derivado **exclusivamente server-side** de `grader_profiles.organization_id` en `run-engine.ts`. **NUNCA** del payload del run: el gasto atribuido a la organización equivocada es peor que el no atribuido, porque no se ve. `null` es un **estado legítimo**, no un fallo — el grader corre sobre prospectos públicos que no son clientes.
+- El adapter de AI Mode compra por el **transporte canónico** `postDataForSeoTask` declarando `consumer: 'aeo'` + la organización del perfil, de modo que su gasto entra al ledger único `greenhouse_growth.seo_provider_spend_daily` atribuido al cliente cuando existe. El wrapper histórico `postDataForSeoSerpLiveAdvanced` queda **congelado** y es, por definición, la puerta que **no atribuye**; un guard rompe el build si otro módulo vuelve a comprar por ahí.
+- El adapter **registra el contador de gasto por import de efecto** (`import '@/lib/growth/seo/register-provider-spend'`). Sin ese registro el transporte **lanza** cuando viene organización, y como el grader también corre **inline en Vercel** (`/api/admin/growth/ai-visibility/runs`) y no sólo en el ops-worker, el `catch` del adapter convertiría ese throw en una observación `failed`: el grader perdería AI Mode justamente para los perfiles de cliente que la atribución existe para cobrar, sin que ningún test lo note.
+- Sin organización **no hay fila** (el ledger tiene FK a `greenhouse_core.organizations`, y forzar una organización sintética sería peor que el hueco), pero la llamada **sí** queda contada en la señal `growth.dataforseo.spend_ledger_drift` como no atribuible. "No está en el ledger" nunca significa "no ocurrió".
+- Los otros cuatro adapters (OpenAI, Anthropic, Perplexity, Gemini) **no compran a DataForSEO**: su costo es estimado y vive en `grader_runs.estimated_cost_usd`. Esa asimetría —lado comprado con ledger escrito por el transporte, lado construido con estimador escrito por el mismo código que gasta— es la razón de las columnas `cost_basis`/`price_table_version` del ledger.
+
 Provider execution modes:
 
 | Mode | Prompt count | Provider count | Public behavior | Intended use |
@@ -873,6 +881,13 @@ Planned signals:
 | `growth.ai_visibility.prompt_pack_eval_regression` | quality | 0 active regressions. |
 | `growth.ai_visibility.archetype_coverage_gap` | quality | 0 gaps — cada arquetipo cubre su buyer-intent (TASK-1292). |
 | `growth.ai_visibility.provider_latency_p95` | performance | Within public UX budget. |
+| `growth.ai_visibility.observation_yield` | data_quality | **Vive** (TASK-1696). Rendimiento `succeeded / total` de `provider_observations` en ventana móvil de 30 días, **cortado por proveedor**. |
+| `growth.dataforseo.spend_ledger_drift` | data_quality | **Vive** (TASK-1696). Steady = 0. Observaciones de AI Mode que compraron y no dejaron llamada contabilizada. |
+
+Las dos señales vivas son la contrapartida observable de la atribución de §8.2.1:
+
+- **`growth.ai_visibility.observation_yield` corta por proveedor a propósito: el agregado esconde el problema.** Un 68% global se lee como aceptable mientras un proveedor concreto está en 29%, y ése es justamente el que la task instrumentó económicamente. Un proveedor sin observaciones en la ventana reporta `unknown`, **nunca 0%**: "no se intentó" no es "salió mal". Límite declarado: mide sobre las observaciones que **existen**, así que no ve los pares `(prompt, proveedor)` que nunca se intentaron — un 100% significa "todo lo que se intentó salió bien", jamás "se intentó todo". El baseline medido el 2026-08-15 excluyendo tráfico de prueba (239 de 665 observaciones `skipped`/`failed` = 35,9%; `google_ai_overview` en 78,5%) es punto de partida honesto, **no meta**.
+- **`growth.dataforseo.spend_ledger_drift` trata las dos causas distinto porque no son lo mismo.** Un perfil **público sin organización** es una ausencia legítima y sale `warning`; un perfil **con organización** sin llamada contabilizada es un bug del camino de atribución —se le está gastando plata a un cliente sin cargarla a su presupuesto— y sale `error`. Compara **conteo de llamadas, no dólares**: el `cost` que devuelve DataForSEO es del **batch**, no de la tarea, así que una comparación de montos sería aritmética sobre una unidad equivocada.
 
 ### 15.2 SLOs
 
@@ -936,6 +951,27 @@ Controls:
 - queue pauses when cost threshold is exceeded.
 
 V1 should not commit to exact dollar estimates until provider pricing and prompt counts are validated in the first task. The architecture requires cost telemetry per run from the first implementation slice.
+
+### 17.1 Presupuesto en dólares por organización — `resolveAeoBudget` (TASK-1696)
+
+**El problema que cierra:** `resolveAeoEntitlement` cuenta **corridas**, y su único tope en USD es un backstop **global y sólo del tier `trial`**. Una organización `contracted` no tenía ningún gate de dinero: su límite eran 20 corridas al mes, y **un conteo de corridas no acota dólares** — 20 × el techo por run del modo `full` (USD 2,00) son USD 40/mes/org que nadie miraba.
+
+`resolveAeoBudget(organizationId, env?)` (`src/lib/growth/ai-visibility/budget.ts`) es el espejo de la mitad de presupuesto de `resolveSeoEntitlement`, y queda como **resolver aparte a propósito**: `resolveAeoEntitlement` **no gana campos de dinero**. Cupo mensual de corridas y gasto acumulado son dos decisiones con ciclos de vida distintos (una se resetea contando runs, la otra sumando dólares que llegan del proveedor con retraso); acoplarlas en un solo contrato haría que cambiar una moviera la otra.
+
+🔴 **Las dos monedas nunca se mezclan, y no es estética — es anti doble conteo.** `AeoBudgetState` reporta `invoicedUsedUsd` (ledger, `consumer='aeo'`, `cost_basis='invoiced'`) y `estimatedUsedUsd` (los LLM propios) **siempre por separado**, y `budgetUsedUsd` es una suma declarada, nunca una cifra opaca. La razón es un defecto real: `estimateObservationCostUsd` devuelve, para `google_ai_overview`, el costo **real** que DataForSEO cobró, así que `grader_runs.estimated_cost_usd` **ya contiene** los mismos dólares que el ledger guarda como facturados. Sumar los dos lados crudos habría contado ese gasto **dos veces** y agotado el presupuesto a la mitad, en silencio. Por eso la query **resta** la porción DataForSEO de cada run, y lo estimado queda siendo lo que de verdad es: el gasto de los LLM propios. Verificado contra PostgreSQL real: USD 7,2419 bruto − USD 0,112 de DataForSEO = **USD 7,1299 de LLM**.
+
+**El gate nace en shadow, con dos flags independientes** (ambos default OFF, leídos en **Vercel y en el ops-worker**):
+
+| Flag | Efecto |
+| --- | --- |
+| `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED` | Computa `resolveAeoBudget` en el chokepoint, registra `wouldBlock` y alimenta la señal. **No bloquea.** |
+| `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED` | Subordinado al anterior. Sólo con **los dos** en ON el chokepoint bloquea con `blockedReason: 'budget_exhausted'`. |
+
+Los topes por tier son **knobs, no flags**: `GROWTH_AI_VISIBILITY_{CONTRACTED,PILOT,TRIAL}_MONTHLY_BUDGET_USD` (60 / 10 / 3), y nacen holgados a propósito para que `wouldBlock` mida la realidad y no la restricción.
+
+**Por qué shadow y no enforce.** No se sabe cuál es el tope correcto y los datos disponibles son demasiado pocos y demasiado sesgados para elegirlo: el 87,5% de los dólares históricos del grader no tiene organización atribuida, así que el numerador de cualquier tope calculado hoy sería, en su mayor parte, gasto del que no se sabe de quién es. Y **el camino público del lead magnet comparte el motor**: un tope mal calibrado no degrada un tablero interno, corta captación. La secuencia es hacer visible primero, medir un ciclo mensual completo de `wouldBlock`, y recién entonces decidir el tope — decisión comercial del operador, no constante técnica.
+
+`budget_exhausted` entra al enum de bloqueo con **código canónico propio**: es per-org y distinto de `quota_exhausted` (se acabaron los análisis incluidos) y de `cost_blocked` (backstop global diario del camino público).
 
 ## 18. Rollout strategy
 

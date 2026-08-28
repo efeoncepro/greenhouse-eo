@@ -214,6 +214,7 @@ const runConcentrationCapture = async (input: {
   try {
     const response = await postDataForSeoTask({
       family: 'labs',
+      consumer: 'seo',
       endpoint: input.endpoint,
       organizationId: input.organizationId,
       tasks: [

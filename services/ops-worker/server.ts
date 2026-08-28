@@ -138,6 +138,7 @@ import { runBacklinkDetailPass } from '@/lib/growth/seo/backlinks/detail-capture
 import { runKeywordMarketDataBatch } from '@/lib/growth/seo/keyword-market-data-batch'
 import { runDomainOverviewBatch } from '@/lib/growth/seo/domain-overview/capture'
 import { runUrlVisibilityBatch } from '@/lib/growth/seo/url-visibility/capture'
+import { runCompetitorCoverageBatch } from '@/lib/growth/seo/competitor-coverage'
 import { drainKeywordDiscoveryRuns } from '@/lib/growth/seo/keyword-discovery/runner'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { drainAssessmentAiScoringRuns } from '@/lib/hiring/assessment/ai/scoring-run/execute'
@@ -2252,6 +2253,62 @@ const handleSeoUrlVisibilityCaptureBatch = async (req: IncomingMessage, res: Ser
   }
 }
 
+// ─── /seo/competitor-coverage/capture-batch ─────────────────────────────────
+//
+// TASK-1662 — cobertura MENSUAL de keywords de competidores declarados (DataForSEO Labs
+// `domain_intersection`, 2 llamadas por competidor: gap de contenido + solapamiento).
+//
+// 🔴 Este handler GASTA. Doble gate: el módulo (`GROWTH_SEO_ENABLED`) y el flag propio
+// (`GROWTH_SEO_COMPETITOR_GAP_ENABLED`, default OFF), que el command verifica por dentro.
+// V1: `maxCompetitors` default 1 — el costo real se mide con UN competidor antes de
+// escalar. `{"dryRun": true}` reporta qué se compraría y cuánto, sin llamar al proveedor.
+const handleSeoCompetitorCoverageCaptureBatch = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  const maxCompetitors =
+    typeof body.maxCompetitors === 'number' && body.maxCompetitors > 0 ? Math.floor(body.maxCompetitors) : undefined
+
+  const dryRun = body.dryRun === true
+
+  if (!isSeoModuleEnabled()) {
+    json(res, 200, { ok: true, skipped: 'seo_module_disabled', eligible: 0, captured: 0 })
+
+    return
+  }
+
+  console.log(
+    `[ops-worker] POST /seo/competitor-coverage/capture-batch — dryRun=${dryRun} maxCompetitors=${maxCompetitors ?? 1}`
+  )
+
+  try {
+    const summary = await runCompetitorCoverageBatch({ maxCompetitors, dryRun })
+
+    console.log(
+      `[ops-worker] /seo/competitor-coverage/capture-batch done — status=${summary.status} ` +
+      `eligible=${summary.eligible} attempted=${summary.attempted} captured=${summary.captured} ` +
+      `skippedFresh=${summary.skippedFresh} blocked=${summary.budgetBlocked} failed=${summary.failed} ` +
+      `costUsd=${summary.providerCostUsd}`
+    )
+
+    // Elegibles con fallas del proveedor NO es éxito silencioso.
+    if (!dryRun && summary.failed > 0) {
+      captureMessageWithDomain(
+        `[TASK-1662] cobertura de competidores falló en ${summary.failed} competidor(es)`,
+        'growth',
+        { level: 'warning', tags: { source: 'ops_worker_seo_competitor_coverage' } }
+      )
+    }
+
+    json(res, 200, { ok: true, ...summary })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown SEO competitor coverage error'
+
+    console.error('[ops-worker] /seo/competitor-coverage/capture-batch failed:', message)
+    captureWithDomain(error, 'growth', { tags: { source: 'ops_worker_seo_competitor_coverage' } })
+    json(res, 502, { error: message })
+  }
+}
+
 // ─── /seo/keyword-discovery/drain ───────────────────────────────────────────
 //
 // TASK-1664 — drena corridas de keyword discovery `pending` (DataForSEO Labs Live).
@@ -3119,6 +3176,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/seo/url-visibility/capture-batch') {
       await handleSeoUrlVisibilityCaptureBatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/seo/competitor-coverage/capture-batch') {
+      await handleSeoCompetitorCoverageCaptureBatch(req, res)
 
       return
     }

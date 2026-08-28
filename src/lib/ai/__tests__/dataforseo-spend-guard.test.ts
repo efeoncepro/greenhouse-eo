@@ -37,6 +37,7 @@ describe('postDataForSeoTask — guardas antes de gastar', () => {
     await expect(
       postDataForSeoTask({
         family: 'labs',
+        consumer: 'seo',
         endpoint: '/v3/dataforseo_labs/google/keyword_ideas/live',
         tasks: [{ keyword: 'x' }],
         organizationId: 'org-1'
@@ -49,7 +50,7 @@ describe('postDataForSeoTask — guardas antes de gastar', () => {
 
     await expect(
       // @ts-expect-error — el tipo ya lo prohíbe; se prueba la defensa de runtime para callers JS.
-      postDataForSeoTask({ family: 'backlinks', endpoint: '/v3/backlinks/summary/live', tasks: [] })
+      postDataForSeoTask({ family: 'backlinks', consumer: 'seo', endpoint: '/v3/backlinks/summary/live', tasks: [] })
     ).rejects.toThrow(/exige organizationId/)
   })
 
@@ -60,6 +61,7 @@ describe('postDataForSeoTask — guardas antes de gastar', () => {
     await expect(
       postDataForSeoTask({
         family: 'serp',
+        consumer: 'seo',
         endpoint: '/v3/serp/google/organic/live/advanced',
         tasks: [{ keyword: 'x' }],
         organizationId: 'org-1'
@@ -73,6 +75,7 @@ describe('postDataForSeoTask — guardas antes de gastar', () => {
 
     const result = await postDataForSeoTask({
       family: 'serp',
+      consumer: 'seo',
       endpoint: '/v3/serp/google/ai_mode/live/advanced',
       tasks: [{ keyword: 'x' }]
     })
@@ -91,7 +94,7 @@ describe('postDataForSeoTask — guardas antes de gastar', () => {
     }) as typeof fetch
 
     await expect(
-      postDataForSeoTask({ family: 'serp', endpoint: '/v3/dataforseo_labs/x', tasks: [] })
+      postDataForSeoTask({ family: 'serp', consumer: 'seo', endpoint: '/v3/dataforseo_labs/x', tasks: [] })
     ).rejects.toThrow(/familia "serp"/)
 
     expect(fetched).toBe(false)
@@ -100,7 +103,7 @@ describe('postDataForSeoTask — guardas antes de gastar', () => {
 
 describe('postDataForSeoTask — contabilización', () => {
   it('registra el gasto en el transporte, sin que el caller tenga que acordarse', async () => {
-    const recorded: Array<{ organizationId: string; family: string; cost: number }> = []
+    const recorded: Array<{ organizationId: string; family: string; cost: number; consumer: string }> = []
 
     setDataForSeoSpendRecorder(async input => {
       recorded.push(input)
@@ -111,12 +114,13 @@ describe('postDataForSeoTask — contabilización', () => {
 
     await postDataForSeoTask({
       family: 'labs',
+      consumer: 'seo',
       endpoint: '/v3/dataforseo_labs/google/keyword_ideas/live',
       tasks: [{ keyword: 'x' }],
       organizationId: 'org-42'
     })
 
-    expect(recorded).toEqual([{ organizationId: 'org-42', family: 'labs', cost: 0.0125 }])
+    expect(recorded).toEqual([{ organizationId: 'org-42', family: 'labs', cost: 0.0125, consumer: 'seo' }])
   })
 
   it('un fallo al contabilizar NO invalida el resultado que el proveedor ya cobró', async () => {
@@ -129,6 +133,7 @@ describe('postDataForSeoTask — contabilización', () => {
 
     const result = await postDataForSeoTask({
       family: 'labs',
+      consumer: 'seo',
       endpoint: '/v3/dataforseo_labs/google/keyword_ideas/live',
       tasks: [{ keyword: 'x' }],
       organizationId: 'org-1'
@@ -151,6 +156,7 @@ describe('postDataForSeoTask — contabilización', () => {
 
     await postDataForSeoTask({
       family: 'labs',
+      consumer: 'seo',
       endpoint: '/v3/dataforseo_labs/google/keyword_ideas/live',
       tasks: [],
       organizationId: 'org-1'
@@ -167,6 +173,7 @@ describe('postDataForSeoTask — degradación honesta', () => {
 
     const result = await postDataForSeoTask({
       family: 'labs',
+      consumer: 'seo',
       endpoint: '/v3/dataforseo_labs/google/keyword_ideas/live',
       tasks: [],
       organizationId: 'org-1'
@@ -194,6 +201,7 @@ describe('postDataForSeoTask — degradación honesta', () => {
     for (let attempt = 0; attempt < 5; attempt += 1) {
       await postDataForSeoTask({
         family: 'labs',
+        consumer: 'seo',
         endpoint: '/v3/dataforseo_labs/google/keyword_ideas/live',
         tasks: [],
         organizationId: 'org-1'
@@ -204,6 +212,7 @@ describe('postDataForSeoTask — degradación honesta', () => {
 
     const result = await postDataForSeoTask({
       family: 'labs',
+      consumer: 'seo',
       endpoint: '/v3/dataforseo_labs/google/keyword_ideas/live',
       tasks: [],
       organizationId: 'org-1'
@@ -220,10 +229,36 @@ describe('postDataForSeoTask — degradación honesta', () => {
 
     const serp = await postDataForSeoTask({
       family: 'serp',
+      consumer: 'seo',
       endpoint: '/v3/serp/google/ai_mode/live/advanced',
       tasks: [{ keyword: 'x' }]
     })
 
     expect(serp.ok).toBe(true)
+  })
+})
+
+describe('el consumidor declarado por el caller llega al contador (TASK-1696)', () => {
+  it('una llamada `serp` del grader se contabiliza como AEO, no como SEO', async () => {
+    // Es el hecho que cierra el punto ciego: la familia `serp` la compran los dos servicios, y sin
+    // esta propagación el gasto del grader se descontaría del presupuesto SEO del cliente.
+    const recorded: Array<{ consumer: string; family: string }> = []
+
+    setDataForSeoSpendRecorder(async input => {
+      recorded.push({ consumer: input.consumer, family: input.family })
+    })
+
+    globalThis.fetch = (async () =>
+      new Response(JSON.stringify({ tasks: [{ id: '1' }], cost: 0.004 }), { status: 200 })) as typeof fetch
+
+    await postDataForSeoTask({
+      family: 'serp',
+      consumer: 'aeo',
+      endpoint: '/v3/serp/google/ai_mode/live/advanced',
+      tasks: [{ keyword: 'pinturas' }],
+      organizationId: 'org-cliente'
+    })
+
+    expect(recorded).toEqual([{ consumer: 'aeo', family: 'serp' }])
   })
 })

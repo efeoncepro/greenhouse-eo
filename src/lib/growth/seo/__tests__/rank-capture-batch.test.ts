@@ -21,6 +21,18 @@ vi.mock('@/lib/postgres/client', () => ({
   }
 }))
 
+// TASK-1699 — rank-capture ahora importa `withTransaction` (@/lib/db) y el módulo
+// serp-top-results para el top-N. Mocks de carga: el camino con flag OFF no los usa.
+vi.mock('@/lib/db', () => ({
+  withTransaction: async (callback: (client: unknown) => Promise<unknown>) =>
+    callback({ query: async () => ({ rows: [], rowCount: 1 }) })
+}))
+
+vi.mock('../serp-top-results', () => ({
+  parseSerpTopResults: () => [],
+  persistSerpTopResults: async () => ({ rowsWritten: 0 })
+}))
+
 const captureMock = vi.fn()
 
 vi.mock('../rank-capture', () => ({

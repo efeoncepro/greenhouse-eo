@@ -28,6 +28,13 @@ vi.mock('@/lib/postgres/client', () => ({
   }
 }))
 
+// TASK-1699 — rank-capture (en el grafo de imports de esta suite) ahora carga `@/lib/db`
+// y el módulo serp-top-results. Mocks de CARGA: esta suite no ejercita ese camino.
+vi.mock('@/lib/db', () => ({
+  withTransaction: async (callback: (client: unknown) => Promise<unknown>) =>
+    callback({ query: async () => ({ rows: [], rowCount: 1 }) })
+}))
+
 const bqQueryMock = vi.fn()
 
 vi.mock('@/lib/bigquery', () => ({
