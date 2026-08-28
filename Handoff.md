@@ -30,6 +30,26 @@ mezcla con Wherex, Ariba, Coupa u otros portales corporativos. Estado rápido de
 `docs/commercial/CRM_DEAL_REGISTER.md`. Ambos son índices fechados y siempre requieren readback live; una
 licitación promovida se sincroniza por `deal_id`, mientras el radar sin Deal permanece sólo en bid desk.
 
+## 2026-08-28 — Hueco abierto SIN DUEÑO: el candidato de discovery no declara pertinencia
+
+**Documentado en el repo, no sólo acá:** `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §7 → *"Hallazgo
+abierto (2026-08-28)"*, con la evidencia medida y el alcance recomendado. Este Handoff rota; ese doc
+no. Tres sesiones (`greenhouse-eo-63`, `-fa`, `-6c`) lo verificaron de forma independiente el mismo
+día por caminos distintos — si el registro viviera sólo en una bitácora, la cuarta lo vuelve a
+descubrir pagando otra vez.
+
+Resumen: el candidato no lleva señal de marca/categoría/relevancia (ni en la tabla ni en el DTO), así
+que 50 keywords de consumidor sobre ChatGPT pasaron todos los checks para un target que vende AEO
+B2B. 🔴 **El vector estructural es `TASK-1662`, no la expansión de seeds**: en el gap competitivo las
+seeds las elige el competidor, así que no hay operador a quien pedirle que elija mejor. Urge antes de
+`TASK-1700`: su score append-only heredaría el orden por volumen y congelaría lo irrelevante arriba.
+
+**Estado de la task:** SIN LEVANTAR y sin dueño. Tres sesiones lo escalamos a nuestros operadores a
+la vez, con riesgo real de duplicado. Regla acordada entre las tres: **la levanta quien reciba el
+"sí" primero y lo avisa por mensaje**. Siguiente ID libre `TASK-1791` (`greenhouse-eo-6c` tomó la
+1790). Alcance en el que las tres coincidimos: **señal con evidencia, no filtro** — un filtro duro
+descartaría long-tail legítimo en silencio.
+
 ## 2026-08-28 — Drain de keyword discovery: `*/10` → `*/2` (⚠️ con ventana de reversión abierta)
 
 Bajada de cadencia del scheduler `ops-seo-keyword-discovery-drain` (us-east4), autorizada por el
@@ -566,24 +586,3 @@ este provider son punteros al wrapper, no la página citada — su atribución U
 dimensionarlo). (Aprendizaje de sesión: las cifras `$0.xxxx` de un SKILL.md se ven corrompidas en
 el RENDER de la Skill tool por sustitución posicional `$0` — verificar drift de skills en disco,
 nunca desde el cuerpo renderizado.)
-
-## 2026-08-27 — TASK-1709: el módulo SEO aprende a hablarle a quien no firmó
-
-**Estado: code complete + runtime verificado contra proveedor real; flag OFF en todos los
-environments (por diseño).** Tier `prospect` vivo en `src/lib/growth/seo/prospect/**`: corrida ÚNICA
-inline en Vercel con tope duro POR DIAGNÓSTICO (min(USD 1,00, restante mensual de Efeonce), validado
-contra el forecast del CONJUNTO antes de la primera llamada), gasto de adquisición atribuido a
-`EO-ORG-0007` en el ledger único, hechos con lente `estimated`+`captured_at` (CHECK de un solo
-valor), cero score/veredicto, evidencia de sitio delegada al sustrato, contrato en las 3 lanes
-(app + ecosystem `internal`-only + MCP `get/run_seo_prospect_diagnostic`) y capabilities con grant
-mismo PR. **Sanity live 10/10** (`scripts/growth/_sanity-task-1709-prospect-diagnostic.ts --spend`):
-corrida real skyairline.com CL — forecast USD 0,205 vs real 0,1991, ledger Δ exacto, idempotencia
-USD 0, `cost_blocked` con cero llamadas. El gate TASK-893 destapó en vivo que `seo_site_audit_runs`
-no tiene `organization_id` (primera corrida falló failed-closed, liberó el slot, fix + reintento
-verde). Hallazgos reales para la licitación SKY: 769 kw top-10, 231 citas AI Overview, 0 JSON-LD,
-0 sitemap.
-
-**Pendiente de rollout (no bloquea el cierre de código):** flag `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED`
-ON sólo con decisión del operador (staging para uso interno; Production exige sign-off comercial —
-fila en el ledger de flags). La cara visible sigue siendo `TASK-1672`/`1673` tras `TASK-1670`.
-`TASK-1662` consumirá el colector de competidores que esta task estrenó (delta declarado).

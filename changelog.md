@@ -58,6 +58,20 @@
   Bets y otros orígenes, con una fila sólo después de verificar el Deal en HubSpot. Las licitaciones promovidas se
   sincronizan en ambos registros por `deal_id`; las oportunidades todavía en radar permanecen sólo en bid desk.
 
+## 2026-08-28 — Documentado un hueco abierto: el candidato de discovery no declara pertinencia
+
+- Auditando la salida del smoke apareció que el candidato **no transporta ninguna señal de marca,
+  categoría ni relevancia** — ni en la tabla ni en el DTO. Consecuencia medida: 50 keywords de
+  consumidor sobre ChatGPT (`chatgpt en linea`, `chatgpt rojo`) pasaron **todos** los checks para un
+  target que vende servicios AEO B2B.
+- 🔴 El vector estructural no es elegir mal la seed: es **`TASK-1662`**. En el gap competitivo los
+  candidatos salen de dominios del competidor, así que **las seeds las elige él**, y sirve segmentos
+  que el cliente no. Ahí no hay operador a quien educar.
+- Urge antes de `TASK-1700`: el orden por defecto pondera volumen, y su aggregate es append-only —
+  un score que herede esa señal congela lo irrelevante arriba.
+- **Sin task asignada.** Queda escrito en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §7 (no sólo en
+  una bitácora que rota) porque tres sesiones lo verificaron por separado el mismo día.
+
 ## 2026-08-28 — El drain de keyword discovery baja de 10 a 2 minutos
 
 - `ops-seo-keyword-discovery-drain` pasa de `*/10` a `*/2`. `Descubrir` es un workbench
@@ -799,17 +813,3 @@
   segunda era la equivocada. Y `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`, code-complete sin prender,
   sólo estaba en el snapshot y no en `§ Pendientes de acción`, que es donde la regla del propio ledger lo
   exige. Ambas corregidas contra runtime, no contra memoria.
-
-## 2026-08-19 — Un patrón nuevo en el catálogo, y una señal que nadie había registrado
-
-- **Octavo patrón canónico: "hecho declarado al nacer + copia derivada donde se filtra + obligación de
-  propagar".** Cruzó el umbral de tres dominios que el propio catálogo exige (Hiring, Knowledge y
-  Finance), y su valor no es describir lo que ya hacíamos: es forzar una decisión explícita. O te
-  obligas a propagar en la misma transacción y con señal de divergencia —y entonces los readers pueden
-  confiar en la copia—, o no te obligas y los readers críticos leen la raíz. Lo prohibido es el tercer
-  camino: filtrar por una copia que nadie se comprometió a mantener.
-- **Once señales del módulo Hiring estaban vivas en runtime pero sin documentar** en el control plane;
-  ahora hay inventario con la task dueña de cada una. Ocho siguen sin delta propio: deuda documental
-  declarada, no ausencia en producción.
-- **Cinco punteros quedaron rotos** al mover TASK-1739 a `complete/`, uno de ellos dentro de una señal
-  de reliability que corre en producción. Corregidos.

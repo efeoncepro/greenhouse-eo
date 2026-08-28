@@ -923,6 +923,19 @@ endpoints — filtraba una condición que ya era verdadera. Donde el volumen nul
   cuatro métodos. Los datos dicen que sigue sin ser alcanzable desde suggestions/ideas — no por el
   filtro, sino por lo que el índice del proveedor contiene.
 
+### Hallazgo lateral del smoke — sin dueño (2026-08-28)
+
+Auditando la salida de las tres corridas apareció un hueco que **no es de esta task** y que quedó
+documentado en el lugar canónico para que no se redescubra:
+`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §7 → *"Hallazgo abierto (2026-08-28) — el candidato NO
+transporta ninguna señal de pertinencia"*.
+
+Resumen: el candidato no lleva señal de marca/categoría/relevancia, así que 50 keywords de consumidor
+sobre ChatGPT pasaron todos los checks para un target que vende AEO B2B. El vector estructural es
+`TASK-1662` (en el gap competitivo las seeds las elige el competidor, no el operador), y urge antes
+de `TASK-1700` porque su score append-only heredaría el orden por volumen. Sin task asignada al
+cierre de ésta; tres sesiones lo verificaron de forma independiente el mismo día.
+
 ### Pendientes de rollout
 
 1. **Corrida real de smoke con gasto** (~USD 0,013) en un mercado es-LATAM ralo con la política

@@ -441,6 +441,44 @@ cablea al cliente público compartido"; el camino correcto es `TASK-1631`).
     corrida productiva, 10 candidatos de un solo método): el colapso es preventivo y llega antes
     del primer snapshot de `TASK-1700`, que es exactamente su razón de ser.
 
+  **Hallazgo abierto (2026-08-28) — el candidato NO transporta ninguna señal de pertinencia, y hay
+  DOS productores que la necesitan.** Sin dueño todavía; documentado acá para que no se
+  redescubra. Verificado de forma independiente por tres sesiones el mismo día.
+
+  - **El hecho.** `greenhouse_growth.seo_keyword_discovery_candidates` tiene ocho columnas de
+    sustancia (`keyword`, `normalized_keyword`, `seed_keywords_json`, `source_endpoint`,
+    `source_rank`, `captured_at`, `market_source`, `raw_payload_hash`) y **ninguna de marca,
+    categoría ni relevancia**; el DTO tampoco. Un candidato completamente ajeno al negocio pasa
+    TODOS los checks del módulo: tiene volumen, intención, `core_keyword` y barrera de enlaces.
+  - **Evidencia medida.** Corrida real `seokdr-82396674` (`keyword_ideas`, Chile, target
+    `seot-efeonce-own-brand` — agencia B2B que vende AEO): 50 candidatos de consumidor sobre
+    ChatGPT como producto (`chatgpt en linea` vol 480, `dueño de chatgpt` 90, `chatgpt rojo` 10,
+    `compartir suscripciones chatgpt`). Cero relación con el negocio, cero checks en rojo. Causa:
+    `keyword_ideas` resuelve una CATEGORÍA desde las seeds y **no exige que la contengan**, así que
+    una seed con entidad dominante resuelve a esa entidad. Contraste del mismo día: la corrida
+    `seokdr-7851e49c` (`keyword_suggestions`, seed = categoría de producto sin marca) devolvió una
+    escalera de long-tail comercial impecable.
+  - 🔴 **El vector estructural NO es la expansión de seeds: es `TASK-1662`.** En el gap competitivo
+    los candidatos salen de `domain_intersection` sobre dominios del competidor, y **nadie eligió
+    esas seeds — las eligió el competidor**, que sirve segmentos y mercados que el cliente no. En
+    la expansión, una seed mala es error de uso y se corrige educando al operador; en el gap **no
+    hay a quién pedirle que elija mejor**. Eso mueve la defensa de "validar la seed" a "el
+    candidato debe transportar una señal de pertinencia", que es otro problema y otro tamaño.
+  - **Por qué urge antes de `TASK-1700`.** El orden por defecto del reader pondera volumen
+    descendente. Un `priority_score` que herede esa señal pone `chatgpt en linea` (480) por encima
+    de un término pertinente con volumen 10 — y la cola es un aggregate **append-only**, así que
+    ese score queda escrito y no se corrige hacia adelante. Misma clase de problema que TASK-1694
+    cerró (duplicados y barrera engañosa congelados en el primer snapshot), por otra puerta.
+  - **Materia prima disponible, sin consumir.** `getActiveBrandIntelligence`
+    (`ai-visibility/brand-intelligence/store.ts`) expone `categoryLabel` y `businessModel` por
+    perfil. El único archivo de `growth/seo/**` que la toca es `grounded-query-bridge.ts` — el
+    puente AEO, no discovery. ⚠️ Consumirla desde discovery exige respetar el boundary §1.1: cruce
+    en memoria por `organization_id`, jamás JOIN/VIEW/FK entre `seo_*` y `grader_*`.
+  - **Alcance recomendado: SEÑAL, no filtro.** Hermana de `clusterConflict` — advertencia con
+    evidencia, tres estados, y `unknown` que jamás se lee como `clear`. Un filtro duro en discovery
+    descartaría long-tail legítimo **en silencio**, y ese error es invisible; la advertencia deja la
+    decisión donde corresponde. Quien ordena (`TASK-1700`) o promueve a tracking la consume.
+
   **Delta TASK-1692 (2026-08-28) — el ledger de decisiones lo escribe el primitive que produce el
   hecho, jamás el consumer.** Sin migración, sin flag, sin capability nueva.
 
