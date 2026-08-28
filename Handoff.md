@@ -2,6 +2,17 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-28 — Higgsfield y Magnific: solicitudes de partnership para agencias enviadas
+
+**Estado: `Postulación enviada`; respuesta comercial pendiente.** Higgsfield confirmó la consulta B2B/studio por
+Enterprise Sales y Magnific confirmó la categoría `Partnership or education program inquiries`. Ambas solicitudes
+presentaron a Efeonce como agencia con diversos clientes enterprise en LATAM y pidieron evaluar enablement,
+workspaces/billing multi-cliente, referral/reseller, API, créditos demo, co-marketing, soporte y piloto.
+
+**Límite y continuidad:** ninguna confirmación equivale a aceptación, reseller, co-selling, certificación ni revenue
+share. Revisar las respuestas en Outlook, clasificar su alcance y actualizar el registry antes de cualquier claim o
+oferta. Evidencia: [`HIGGSFIELD_MAGNIFIC_AGENCY_PARTNERSHIP_OUTREACH_2026-08-28.md`](docs/audits/commercial/HIGGSFIELD_MAGNIFIC_AGENCY_PARTNERSHIP_OUTREACH_2026-08-28.md).
+
 ## 2026-08-28 — TASK-1696: cierre documental del inventario MCP y dos gates ciegos con task
 
 **Hallazgo que corrige un dato vencido, no una omisión.** Cinco docs declaraban que la revisión
@@ -404,13 +415,3 @@ esté en producción con su flag ON.
 **Drift vivo de calendario:** la relectura posterior devolvió las 40 tareas preexistentes de artículo/banner —25 de noviembre y 15 de diciembre— en `Listo para diseñar` con fecha `2026-09-11`. Contradice los meses del proyecto. No se corrigió porque esta pasada solo autoriza repo/docs; Operaciones de contenido debe confirmar la fecha y, si corresponde, restaurarla por la vía canónica con lectura posterior.
 
 **Gates abiertos del cliente:** N48 es archivo de 2024 y requiere vigencia/derechos; N49 requiere revisión institucional y no admite CTA comercial; N50 espera confirmar consolidación y canónica. No se produjo arte, no se publicó en CMS y no se programaron redes. Evidencia: [`auditoría fechada`](docs/audits/seo/BEREL_NOVEMBER_DECEMBER_2026_CONTENT_PRODUCTION_2026-08-26.md).
-
-## 2026-08-26 — TASK-1773: el eje de desenlace gana carril gobernado
-
-**Estado: `code complete, rollout pendiente`.** Sin push. `pnpm test` 12.098 verdes, `build` exit 0, `local:check` exit 0, `task:lint` 0/0.
-
-**Lo que falta para operarlo:** `NEXA_HIRING_ACTIONS_ENABLED` nace OFF (prenderlo exige sign-off: bajo el AI Act la selección es alto riesgo con supervisión obligatoria) y falta ejercitar el loop contra staging con la persona agente de menor privilegio. La escritura por MCP queda **diferida con razón**: su registro vive en el repo hermano `efeonce-mcp` y `efeonce.mcp.hiring.write` está bloqueado hasta `TASK-1631`.
-
-**No re-descubrir:** la spec pedía copiar el patrón del Banco de Talento y **no calza** —no hay tabla de propuestas de decisión y `Migration: none`—, por eso el guard es un digest efímero. Y Nexa tiene autoridad más angosta que el portal a propósito: sólo cierra una postulación abierta, porque su contrato de acciones no puede cargar la huella del preview al execute.
-
-**Lo que queda visible y con nombre:** el manifiesto de parity declara **18 capabilities `hiring.*` sin carril**. Es el barrido que la propia task pedía en sus Follow-ups.

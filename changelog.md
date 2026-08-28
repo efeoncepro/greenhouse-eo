@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-28 — Outreach de partnership para agencias con Higgsfield y Magnific
+
+- Investigación vigente y formularios enterprise enviados a ambos providers para explorar un partnership de agencia
+  orientado a clientes enterprise en LATAM. Las dos páginas confirmaron recepción; el registry mantiene el estado
+  `Postulación enviada`, sin inferir reseller, co-selling, certificación ni economics hasta recibir evidencia
+  contractual. Constancia: `docs/audits/commercial/HIGGSFIELD_MAGNIFIC_AGENCY_PARTNERSHIP_OUTREACH_2026-08-28.md`.
+
 ## 2026-08-27 — TASK-1696: el ledger de gasto aprende quién gastó y de qué tipo es el dólar
 
 - `greenhouse_growth.seo_provider_spend_daily` gana `consumer` (`seo`|`aeo`), `cost_basis`
@@ -705,22 +712,3 @@
   sin interruptor para volver atrás: es evidencia de un gate de promoción, no una preferencia.
 - **El desk podrá dejar de contar fantasmas**, detrás de un flag que nace apagado y con aviso previo a
   HR, porque 12 de 14 vacantes son sintéticas y sin contexto eso se lee como pérdida de datos.
-
-## 2026-08-18 — Los dos flags que quedaron "ON con pendiente" ya tienen su verificación hecha
-
-- **Canary de identidad del intake (TASK-1736), ejecutado y verde.** Los 5 puntos del runbook contra PG
-  real: la evidencia guarda el nombre EXACTO como lo escribió la persona, la clasifica `degenerate_lower`
-  y propone la versión capitalizada; la Person queda con esa propuesta y no con el verbatim; el audit
-  registra `reconcile/applied`; un segundo envío en MAYÚSCULAS no duplica a la persona y deja el outcome
-  del CAS; un reenvío idéntico no agrega evidencia. **Cero correos** emitidos.
-- **El canary NO se corre contra una vacante real, y ahora el runbook lo dice.** Hacerlo mete un candidato
-  falso en el pipeline de una vacante viva (llevaban 15 y 33 candidatos) y dispara el aviso a People. Peor:
-  la evidencia es **append-only por grant**, así que ese candidato falso **no se puede borrar** — queda
-  pinneado por FK hasta que un humano purgue con perfil `ops`. El carril correcto es un live test opt-in
-  sobre una vacante desechable propia, que se despublica sola.
-- **Expediente de evaluación (TASK-1735): el arreglo del truncado quedó probado con el caso real.** La nota
-  posterior al fix persistió sus 8240 caracteres completos —termina en punto— contra los 8000 exactos de la
-  mutilada, y la vieja quedó enlazada como _versión superada_, no como vigente. El límite en base ya es 20000.
-- **Una señal que iba a mentir para siempre.** `evidence_coverage_gap` contaba TODAS las postulaciones, pero
-  la evidencia sólo la escribe el intake público: cada postulación cargada a mano desde el desk (6 en 30 días)
-  la habría dejado en `warning` de forma permanente, sobre la señal que justamente gatea este rollout.

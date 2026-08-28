@@ -25,11 +25,13 @@ sin influencia y valor operativo sin evidencia ejecutiva.
 
 ## Patrón reutilizable para benchmarks de GTM creativo
 
-Para benchmarks como Higgsfield, separar siempre wedge, activación, workflow, agency-led adoption, enterprise
+Para benchmarks como Higgsfield o Magnific, separar siempre wedge, activación, workflow, agency-led adoption, enterprise
 expansion, ecosystem distribution y servicios humanos. No convertir logos, casos, creator programs, plugins o
 integraciones en partnerships, PMF o revenue sin evidencia contractual/operativa. El output debe traducir cada patrón
-como `adoptar | adaptar | descartar` para Efeonce y enlazar el audit fechado
-`docs/audits/commercial/HIGGSFIELD_PARTNERSHIP_AND_VERTICAL_EXPANSION_RESEARCH_2026-07-29.md` cuando aplique.
+como `adoptar | adaptar | descartar` para Efeonce. Para partnership de agencias, distinguir programa público,
+affiliate/creator, contacto Enterprise, formulario enviado y aceptación contractual; enlazar
+`docs/audits/commercial/HIGGSFIELD_MAGNIFIC_AGENCY_PARTNERSHIP_OUTREACH_2026-08-28.md` y los benchmarks de cada
+provider cuando apliquen.
 
 ## Regla #0 — evidencia con fecha, nunca memoria
 
