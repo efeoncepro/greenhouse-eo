@@ -7871,6 +7871,51 @@ export interface GreenhouseGrowthSeoUrlVisibilitySnapshots {
   url_visibility_id: Generated<string>;
 }
 
+export interface GreenhouseGrowthSeoWorkQueueDecisions {
+  decided_at: Generated<Timestamp>;
+  decided_by: string;
+  decision: string;
+  decision_id: Generated<string>;
+  item_id: string | null;
+  normalized_keyword: string;
+  note: string | null;
+  organization_id: string;
+  origin: string;
+  seo_target_id: string;
+  snapshot_id: string | null;
+}
+
+export interface GreenhouseGrowthSeoWorkQueueItems {
+  evidence_ref: string;
+  item_id: Generated<string>;
+  normalized_keyword: string;
+  origin: string;
+  priority_score: Numeric | null;
+  priority_score_version: string;
+  rank_in_snapshot: number;
+  recommended_verb: string;
+  score_band: number;
+  score_basis: string;
+  score_breakdown_json: Json;
+  snapshot_id: string;
+  source_score_version: string | null;
+  target_url: string | null;
+}
+
+export interface GreenhouseGrowthSeoWorkQueueSnapshots {
+  computed_at: Generated<Timestamp>;
+  expires_at: Timestamp;
+  input_snapshot_hash: string;
+  item_count: number;
+  materialized_by: string;
+  organization_id: string;
+  origin_health_json: Json;
+  priority_score_version: string;
+  seo_target_id: string;
+  snapshot_id: Generated<string>;
+  window_days: number;
+}
+
 export interface GreenhouseHiringAssessmentFairness {
   advanced_count: number | null;
   category_key: string | null;
@@ -13076,6 +13121,9 @@ export interface DB {
   "greenhouse_growth.seo_site_audit_runs": GreenhouseGrowthSeoSiteAuditRuns;
   "greenhouse_growth.seo_targets": GreenhouseGrowthSeoTargets;
   "greenhouse_growth.seo_url_visibility_snapshots": GreenhouseGrowthSeoUrlVisibilitySnapshots;
+  "greenhouse_growth.seo_work_queue_decisions": GreenhouseGrowthSeoWorkQueueDecisions;
+  "greenhouse_growth.seo_work_queue_items": GreenhouseGrowthSeoWorkQueueItems;
+  "greenhouse_growth.seo_work_queue_snapshots": GreenhouseGrowthSeoWorkQueueSnapshots;
   "greenhouse_hiring.assessment_fairness": GreenhouseHiringAssessmentFairness;
   "greenhouse_hiring.candidate_document_review_projection": GreenhouseHiringCandidateDocumentReviewProjection;
   "greenhouse_hiring.candidate_facet": GreenhouseHiringCandidateFacet;
