@@ -92,6 +92,27 @@ export const DATAFORSEO_FAMILIES = {
  *    de alcance). Si buscabas `/v3/keywords_data/.../search_volume/live`, el equivalente
  *    dentro del allowlist es `labs` (`keyword_ideas` lo trae inline).
  */
+/**
+ * TASK-1696 — QUIÉN consumió el dólar que se le pagó a DataForSEO.
+ *
+ * Vive acá, junto al registry de familias, porque lo necesitan los dos extremos de la cadena:
+ * el TRANSPORTE (que es el único que escribe gasto) y el writer del ledger en el dominio growth.
+ * Ponerlo del lado de growth obligaría al transporte a importar hacia arriba e invertiría la
+ * dirección de la dependencia que TASK-1300 fijó a propósito (growth conoce a `ai`, nunca al revés).
+ *
+ * ⚠️ NO es lo mismo que la FAMILIA. La familia dice QUÉ se compró (`serp`, `labs`, `backlinks`…);
+ * el consumidor dice PARA QUÉ SERVICIO. La familia `serp` la compran los dos: el rank capture
+ * diario del módulo SEO y el adapter de AI Mode del grader AEO. Sin esta dimensión, el gasto del
+ * grader se descontaría del presupuesto SEO del cliente y nadie podría separarlos después.
+ *
+ * Vocabulario CERRADO y espejado por CHECK en la base
+ * (`migrations/20260828015655472_task-1696-seo-provider-spend-consumer-dimension.sql`); la paridad
+ * la sostiene un test que rompe el build.
+ */
+export const DATAFORSEO_SPEND_CONSUMERS = ['seo', 'aeo'] as const
+
+export type DataForSeoSpendConsumer = (typeof DATAFORSEO_SPEND_CONSUMERS)[number]
+
 export type DataForSeoFamily = keyof typeof DATAFORSEO_FAMILIES
 
 export const DATAFORSEO_FAMILY_NAMES = Object.keys(DATAFORSEO_FAMILIES) as DataForSeoFamily[]

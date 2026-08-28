@@ -11,6 +11,25 @@ import 'server-only'
 import type { DataForSeoFamily } from '@/lib/ai/dataforseo-families'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+/**
+ * TASK-1696 — De qué TIPO es el dólar de la fila.
+ *
+ * `invoiced`: lo cobró el proveedor y lo leyó el transporte de su respuesta. Es lo único que
+ * existe hoy en la tabla.
+ * `estimated`: lo calculamos nosotros con una tabla de precios referencial (el caso que viene:
+ * gasto de tokens LLM con presupuesto per-org). Un dólar estimado NUNCA puede entrar sin declarar
+ * con qué versión de tabla se estimó — la base lo acopla por CHECK.
+ *
+ * Sumar los dos tipos en una sola cifra y presentarla como un número solo no produce un dato
+ * degradado, produce un dato FALSO: nadie podría responder después "¿esto lo facturó el proveedor
+ * o lo estimamos?". Por eso todo reader del ledger corta por esta columna en vez de agregarla.
+ *
+ * Vocabulario CERRADO y espejado por CHECK en la base; la paridad la sostiene un test.
+ */
+export const SEO_PROVIDER_SPEND_COST_BASES = ['invoiced', 'estimated'] as const
+
+export type SeoProviderSpendCostBasis = (typeof SEO_PROVIDER_SPEND_COST_BASES)[number]
+
 export interface RecordSeoProviderSpendInput {
   organizationId: string
   family: DataForSeoFamily

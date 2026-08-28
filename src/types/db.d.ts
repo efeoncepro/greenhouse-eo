@@ -7700,9 +7700,12 @@ export interface GreenhouseGrowthSeoProspectDiagnostics {
 
 export interface GreenhouseGrowthSeoProviderSpendDaily {
   call_count: Generated<number>;
+  consumer: Generated<string>;
+  cost_basis: Generated<string>;
   created_at: Generated<Timestamp>;
   family: string;
   organization_id: string;
+  price_table_version: string | null;
   provider_cost_usd: Generated<Numeric>;
   spend_date: Timestamp;
   spend_id: Generated<string>;
