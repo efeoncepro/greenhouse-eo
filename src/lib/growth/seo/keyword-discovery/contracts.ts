@@ -288,3 +288,54 @@ export const estimateDiscoveryCost = (input: {
       `peor caso — el top-up de enriquecimiento sólo compra lo que falte en el store de mercado`
   }
 }
+
+// ─── Barrera de enlaces como filtro decisional (TASK-1694) ──────────────────────────
+
+/**
+ * Vocabulario CERRADO del filtro de barrera de enlaces.
+ *
+ * `unknown` NO está: no es un nivel, es la AUSENCIA del dato. Un filtro que lo dejara pasar
+ * afirmaría una oportunidad que nadie midió — la doctrina del dominio es que "Sin dato" jamás
+ * se lee como "Baja" (ISSUE-152). Para incluir lo no medido el caller lo pide EXPLÍCITO con
+ * `includeUnknownBarrier`, y así queda dicho en su propia petición.
+ *
+ * El orden `low < medium < high` es el mismo de `LINK_BARRIER_SORT` en el reader; la
+ * derivación de los umbrales vive SOLO en `deriveLinkBarrier` (`keyword-market-data.ts`).
+ */
+export type SeoDiscoveryLinkBarrierFilterLevel = 'low' | 'medium' | 'high'
+
+export const SEO_DISCOVERY_LINK_BARRIER_FILTER_LEVELS: readonly SeoDiscoveryLinkBarrierFilterLevel[] = [
+  'low',
+  'medium',
+  'high'
+]
+
+/** Guard puro para validar un valor de borde (query param, body HTTP, argumento MCP). */
+export const isDiscoveryLinkBarrierFilterLevel = (value: unknown): value is SeoDiscoveryLinkBarrierFilterLevel =>
+  typeof value === 'string' && (SEO_DISCOVERY_LINK_BARRIER_FILTER_LEVELS as readonly string[]).includes(value)
+
+/**
+ * Filtros que el contrato ACEPTA pero ya NO aplica, declarados en la respuesta.
+ *
+ * Entre las dos formas de equivocarse —devolver de más y decirlo, o devolver el subconjunto
+ * equivocado en silencio— el contrato elige la primera: un caller que recibe más filas Y la
+ * razón puede corregir; uno que recibe menos filas creyendo que filtró, no.
+ */
+export interface SeoDiscoveryIgnoredFilter {
+  filter: string
+  reason: string
+  /** Filtro canónico que lo reemplaza, o `null` si no hay equivalente. */
+  replacement: string | null
+}
+
+/**
+ * `maxDifficulty` se acepta y no decide: `keyword_difficulty` tiene piso duro en su fórmula y
+ * colapsa a 0 en SERPs es-LATAM (ISSUE-152 — `pintura` marca KD 0 con 135.000 búsquedas/mes en
+ * MX), así que filtrar por ella entrega keywords de barrera Alta a quien creyó pedir lo fácil.
+ * Se declara en vez de eliminarse porque tres consumers vivos ya lo mandan.
+ */
+export const SEO_DISCOVERY_MAX_DIFFICULTY_IGNORED: SeoDiscoveryIgnoredFilter = {
+  filter: 'maxDifficulty',
+  reason: 'non_decisional_link_barrier_is_canonical',
+  replacement: 'maxLinkBarrier'
+}

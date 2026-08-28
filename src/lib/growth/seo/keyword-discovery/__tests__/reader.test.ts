@@ -357,6 +357,140 @@ describe('readKeywordDiscovery — orden y filtros', () => {
     expect(result.candidates.map(candidate => candidate.candidateId)).toEqual(['seokdc-1'])
   })
 
+  describe('TASK-1694 — la barrera de enlaces decide; la dificultad cruda ya no', () => {
+    const threeBarriers = () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'seokdc-low', keyword: 'kw low', normalized_keyword: 'kw low' }),
+        candidateRow({ candidate_id: 'seokdc-high', keyword: 'kw high', normalized_keyword: 'kw high' }),
+        candidateRow({ candidate_id: 'seokdc-unknown', keyword: 'kw unknown', normalized_keyword: 'kw unknown' }),
+        candidateRow({ candidate_id: 'seokdc-nomarket', keyword: 'kw nomarket', normalized_keyword: 'kw nomarket' })
+      ]
+      marketMock.mockResolvedValue({
+        market: 'available',
+        byKeyword: new Map([
+          ['kw low', datum('kw low', { coreKeyword: null })],
+          ['kw high', datum('kw high', { coreKeyword: null })],
+          ['kw unknown', datum('kw unknown', { coreKeyword: null })]
+        ]),
+        linkBarrierByKeyword: new Map([
+          ['kw low', 'low'],
+          ['kw high', 'high'],
+          ['kw unknown', 'unknown']
+        ]),
+        freshness: { freshKeywords: 3, latestCaptureDate: '2026-08-13' }
+      })
+    }
+
+    it('maxLinkBarrier excluye la barrera Alta y deja pasar low/medium', async () => {
+      threeBarriers()
+
+      const result = await readKeywordDiscovery({
+        organizationId: 'org-1',
+        runId: 'seokdr-1',
+        maxLinkBarrier: 'medium'
+      })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates.map(candidate => candidate.candidateId)).toEqual(['seokdc-low'])
+    })
+
+    it('🔴 "Sin dato" no es "Baja": unknown y sin-fila-de-mercado quedan fuera por default', async () => {
+      threeBarriers()
+
+      const result = await readKeywordDiscovery({
+        organizationId: 'org-1',
+        runId: 'seokdr-1',
+        maxLinkBarrier: 'high'
+      })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      // 'high' es el techo MÁS permisivo del vocabulario y aun así no arrastra lo no medido.
+      expect(result.candidates.map(candidate => candidate.candidateId).sort()).toEqual(['seokdc-high', 'seokdc-low'])
+    })
+
+    it('includeUnknownBarrier explícito incorpora lo no medido (unknown y sin fila)', async () => {
+      threeBarriers()
+
+      const result = await readKeywordDiscovery({
+        organizationId: 'org-1',
+        runId: 'seokdr-1',
+        maxLinkBarrier: 'low',
+        includeUnknownBarrier: true
+      })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates.map(candidate => candidate.candidateId).sort()).toEqual([
+        'seokdc-low',
+        'seokdc-nomarket',
+        'seokdc-unknown'
+      ])
+    })
+
+    it('maxDifficulty ya no reduce filas y viaja declarado en ignoredFilters', async () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'seokdc-facil', keyword: 'facil', normalized_keyword: 'facil' }),
+        candidateRow({ candidate_id: 'seokdc-dificil', keyword: 'dificil', normalized_keyword: 'dificil' })
+      ]
+      marketMock.mockResolvedValue({
+        market: 'available',
+        byKeyword: new Map([
+          ['facil', datum('facil', { keywordDifficulty: 5, coreKeyword: null })],
+          ['dificil', datum('dificil', { keywordDifficulty: 90, coreKeyword: null })]
+        ]),
+        linkBarrierByKeyword: new Map(),
+        freshness: { freshKeywords: 2, latestCaptureDate: '2026-08-13' }
+      })
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1', maxDifficulty: 20 })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      // Fail-safe: devuelve MÁS de lo pedido y lo dice, en vez del subconjunto equivocado en silencio.
+      expect(result.totalCandidates).toBe(2)
+      expect(result.ignoredFilters).toEqual([
+        { filter: 'maxDifficulty', reason: 'non_decisional_link_barrier_is_canonical', replacement: 'maxLinkBarrier' }
+      ])
+    })
+
+    it('sin maxDifficulty el contrato no anuncia filtros ignorados', async () => {
+      state.runs = [runRow()]
+      state.candidates = [candidateRow()]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.ignoredFilters).toEqual([])
+    })
+
+    it('el historial de corridas (sin runId) también declara el filtro ignorado', async () => {
+      state.runs = [runRow()]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', maxDifficulty: 20 })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.ignoredFilters).toHaveLength(1)
+    })
+  })
+
   it('pagina con limit + cursor y reporta el total', async () => {
     state.runs = [runRow()]
     state.candidates = [

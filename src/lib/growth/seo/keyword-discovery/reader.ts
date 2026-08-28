@@ -19,8 +19,11 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import {
   MAX_GSC_SEED_WINDOW_DAYS,
+  SEO_DISCOVERY_MAX_DIFFICULTY_IGNORED,
   type SeoDiscoveryActionKind,
   type SeoDiscoveryErrorCode,
+  type SeoDiscoveryIgnoredFilter,
+  type SeoDiscoveryLinkBarrierFilterLevel,
   type SeoDiscoveryMethod,
   type SeoDiscoveryRunStatus,
   type SeoDiscoverySourceKind
@@ -94,7 +97,26 @@ export interface ReadKeywordDiscoveryInput {
   query?: string
   intent?: SeoSearchIntent
   minSearchVolume?: number
+  /**
+   * ⚠️ DEPRECADO Y NO DECISIONAL (TASK-1694). Se acepta para no romper a los consumers que ya
+   * lo aprendieron, pero NO filtra: `keyword_difficulty` colapsa a 0 en SERPs es-LATAM
+   * (ISSUE-152), así que filtrar por él devuelve keywords de barrera Alta a quien creyó pedir
+   * lo fácil. Mandarlo aparece declarado en `ignoredFilters`. El filtro canónico de dificultad
+   * es {@link ReadKeywordDiscoveryInput.maxLinkBarrier}.
+   */
   maxDifficulty?: number
+  /**
+   * Barrera de enlaces MÁXIMA aceptada (`low < medium < high`), derivada por
+   * `deriveLinkBarrier` sobre el perfil real de enlaces del top-10 — la contrapartida canónica
+   * de `maxDifficulty`. Un valor fuera del vocabulario cerrado se ignora y se declara.
+   */
+  maxLinkBarrier?: SeoDiscoveryLinkBarrierFilterLevel
+  /**
+   * Incluye en el resultado de un filtro de barrera los candidatos SIN dato medido
+   * (`unknown`, o sin fila de mercado). Default `false`: "Sin dato" no es "Baja", y dejarlo
+   * pasar por omisión afirmaría una oportunidad que nadie midió.
+   */
+  includeUnknownBarrier?: boolean
   /**
    * TASK-1666 — selección explícita de candidatos (requiere `runId`). SQL-side y tenant-safe:
    * un ID ajeno simplemente no aparece — el caller decide si la ausencia es error.
@@ -120,6 +142,12 @@ export type ReadKeywordDiscoveryResult =
       marketFreshness: string | null
       /** Disclosure fijo: seguir una keyword compromete gasto recurrente (rank capture diario). */
       trackingCostDisclosure: string
+      /**
+       * Filtros que el caller mandó y el contrato NO aplicó, con su razón y su reemplazo.
+       * Siempre presente (`[]` cuando no aplica): un filtro ignorado en silencio es peor que
+       * uno rechazado, porque el caller cree que decidió con menos ruido del que recibió.
+       */
+      ignoredFilters: SeoDiscoveryIgnoredFilter[]
     }
   | { ok: false; errorCode: SeoDiscoveryErrorCode }
 
@@ -197,6 +225,11 @@ export const readKeywordDiscovery = async (
   const limit = Math.min(MAX_DISCOVERY_READ_LIMIT, Math.max(1, Math.floor(input.limit ?? DEFAULT_DISCOVERY_READ_LIMIT)))
   const offset = input.cursor ? Math.max(0, Number.parseInt(input.cursor, 10) || 0) : 0
 
+  // Se declara sólo si el caller LO MANDÓ: anunciar un filtro ignorado que nadie pidió sería
+  // ruido, y la lista existe para que quien se equivocó pueda corregir.
+  const ignoredFilters: SeoDiscoveryIgnoredFilter[] =
+    typeof input.maxDifficulty === 'number' ? [SEO_DISCOVERY_MAX_DIFFICULTY_IGNORED] : []
+
   // Historial de corridas (tenant-safe SIEMPRE por org; target opcional).
   const runRows = await runGreenhousePostgresQuery<RunRow>(
     `SELECT run_id, seo_target_id, source_kind, status, location_code, language_code,
@@ -231,7 +264,8 @@ export const readKeywordDiscovery = async (
       nextCursor: null,
       marketAvailability: 'unavailable',
       marketFreshness: null,
-      trackingCostDisclosure: TRACKING_COST_DISCLOSURE
+      trackingCostDisclosure: TRACKING_COST_DISCLOSURE,
+      ignoredFilters
     }
   }
 
@@ -381,10 +415,21 @@ export const readKeywordDiscovery = async (
     )
   }
 
-  if (typeof input.maxDifficulty === 'number') {
-    candidates = candidates.filter(
-      candidate => candidate.difficulty !== null && candidate.difficulty <= (input.maxDifficulty as number)
-    )
+  // ⚠️ `maxDifficulty` NO se aplica (TASK-1694): se acepta, se ignora y se declara en
+  // `ignoredFilters`. Filtrar por `keyword_difficulty` en es-LATAM entrega barrera Alta a quien
+  // pidió lo fácil (ISSUE-152). El filtro canónico es la barrera de enlaces.
+  if (input.maxLinkBarrier) {
+    const ceiling = LINK_BARRIER_SORT[input.maxLinkBarrier]
+
+    candidates = candidates.filter(candidate => {
+      // Sin fila de mercado (`null`) y con fila sin perfil de enlaces (`unknown`) son dos formas
+      // del MISMO hecho para esta decisión: nadie midió la barrera. Ninguna pasa por omisión.
+      if (candidate.linkBarrier === null || candidate.linkBarrier === 'unknown') {
+        return input.includeUnknownBarrier === true
+      }
+
+      return LINK_BARRIER_SORT[candidate.linkBarrier] <= ceiling
+    })
   }
 
   if (input.excludeTracked) {
@@ -446,6 +491,7 @@ export const readKeywordDiscovery = async (
     nextCursor,
     marketAvailability: market.market,
     marketFreshness: market.freshness.latestCaptureDate,
-    trackingCostDisclosure: TRACKING_COST_DISCLOSURE
+    trackingCostDisclosure: TRACKING_COST_DISCLOSURE,
+    ignoredFilters
   }
 }
