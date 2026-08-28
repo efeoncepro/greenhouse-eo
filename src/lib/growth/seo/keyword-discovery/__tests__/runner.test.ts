@@ -345,6 +345,34 @@ describe('runKeywordDiscovery — ejecución', () => {
     expect(overviewInserts[0].params[4]).toBeNull()
   })
 
+  it('TASK-1694: los cuatro métodos compran con la MISMA política — ningún payload lleva filters', async () => {
+    state.claim = claimedRun({
+      methods_json: [
+        { method: 'keyword_suggestions', resultsPerCall: 50 },
+        { method: 'related_keywords', resultsPerCall: 50 },
+        { method: 'keyword_ideas', resultsPerCall: 50 },
+        { method: 'keywords_for_site', resultsPerCall: 50 }
+      ]
+    })
+    providerMock.mockResolvedValue(providerOk([providerItem('pintura industrial')]))
+
+    await runKeywordDiscovery('seokdr-1')
+
+    const payloads = providerMock.mock.calls.map(call => (call[0] as { tasks: Record<string, unknown>[] }).tasks[0])
+
+    const endpoints = providerMock.mock.calls.map(call => (call[0] as { endpoint: string }).endpoint)
+
+    // Los CUATRO métodos de expansión se ejercitan de verdad: sin esto la aserción de abajo
+    // pasaría en vacío con una sola llamada.
+    for (const method of ['keyword_suggestions', 'related_keywords', 'keyword_ideas', 'keywords_for_site']) {
+      expect(endpoints.some(endpoint => endpoint.includes(method))).toBe(true)
+    }
+
+    // El filtro provider-side no bajaba el techo de costo (`limit` ya lo acota): sólo cambiaba
+    // QUÉ filas se compraban por el mismo precio, y en un mercado ralo se comía el long-tail.
+    for (const payload of payloads) expect(payload).not.toHaveProperty('filters')
+  })
+
   it('ninguna pieza del runner escribe seo_keyword_set_members', async () => {
     providerMock.mockResolvedValue(providerOk([providerItem('pintura para piso')]))
 

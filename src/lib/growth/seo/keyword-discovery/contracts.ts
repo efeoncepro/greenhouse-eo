@@ -339,3 +339,41 @@ export const SEO_DISCOVERY_MAX_DIFFICULTY_IGNORED: SeoDiscoveryIgnoredFilter = {
   reason: 'non_decisional_link_barrier_is_canonical',
   replacement: 'maxLinkBarrier'
 }
+
+// ─── Política de inclusión del borde de adquisición (TASK-1694) ─────────────────────
+
+/**
+ * Qué filas COMPRA un método de expansión.
+ *
+ * - `all` — se compra lo que el endpoint devuelva, con `limit` como único techo.
+ * - `positive_volume_only` — el proveedor descarta server-side lo que no tiene volumen estimado.
+ *
+ * 🔴 Los cuatro adapters usan `all` desde TASK-1694, y no es una preferencia estética.
+ * DataForSEO cobra por fila devuelta y `limit` acota las filas devueltas, así que el filtro
+ * provider-side **no baja el techo de costo de la llamada**: cambia qué filas se compran por el
+ * mismo precio. En un mercado grueso da lo mismo; en uno ralo —el caso fuente de ISSUE-152— el
+ * filtro gasta el `limit` descartando justo el long-tail emergente que discovery existe para
+ * encontrar. Y contradecía, en el borde de adquisición, la doctrina "ausencia ≠ 0" que el resto
+ * del pipeline sostiene con tres estados explícitos. El equivalente honesto ya existe aguas
+ * abajo: `minSearchVolume` en el contrato de lectura, que el operador ve, elige y puede quitar.
+ */
+export type SeoDiscoveryVolumePolicy = 'all' | 'positive_volume_only'
+
+export const SEO_DISCOVERY_DEFAULT_VOLUME_POLICY: SeoDiscoveryVolumePolicy = 'all'
+
+/**
+ * Política con la que se compró ANTES de TASK-1694, por método.
+ *
+ * Una corrida vieja no registró su política en `methods_json`, así que leerla con el default
+ * nuevo reescribiría su historia: diría que compró long-tail sin volumen cuando el proveedor
+ * ya lo había descartado. El default de lectura REPRODUCE lo que pasó, no lo que pasaría hoy.
+ */
+export const SEO_DISCOVERY_HISTORICAL_VOLUME_POLICY: Record<SeoDiscoveryMethod, SeoDiscoveryVolumePolicy> = {
+  keyword_suggestions: 'positive_volume_only',
+  keyword_ideas: 'positive_volume_only',
+  related_keywords: 'all',
+  keywords_for_site: 'all'
+}
+
+export const isDiscoveryVolumePolicy = (value: unknown): value is SeoDiscoveryVolumePolicy =>
+  value === 'all' || value === 'positive_volume_only'

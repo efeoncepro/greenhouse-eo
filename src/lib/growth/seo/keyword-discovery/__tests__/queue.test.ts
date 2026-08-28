@@ -253,6 +253,24 @@ describe('queueKeywordDiscovery — enqueue transaccional', () => {
     expect(client).toBeDefined()
   })
 
+  it('TASK-1694: el snapshot de la corrida registra la política de inclusión por método', async () => {
+    await queueKeywordDiscovery(baseInput)
+
+    const insert = state.calls.find(call =>
+      call.sql.includes('INSERT INTO greenhouse_growth.seo_keyword_discovery_runs')
+    )
+
+    const methodsJson = insert?.params.find(
+      param => typeof param === 'string' && param.includes('"method"')
+    ) as string
+
+    // Sin la política persistida, una corrida vieja deja de ser interpretable tras un cambio:
+    // nadie sabría si el long-tail sin volumen faltó porque no existía o porque no se compró.
+    expect(JSON.parse(methodsJson)).toEqual([
+      expect.objectContaining({ method: 'keyword_suggestions', volumePolicy: 'all' })
+    ])
+  })
+
   it('auditoría SEO: la key auto derivada cambia con el ciclo mensual (mismo intent, otro mes)', async () => {
     const autoKeyOf = () => {
       const insert = state.calls.find(

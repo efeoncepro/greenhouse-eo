@@ -532,6 +532,55 @@ describe('readKeywordDiscovery — orden y filtros', () => {
     })
   })
 
+  describe('TASK-1694 — la política de inclusión de la corrida es interpretable después', () => {
+    it('una corrida NUEVA expone la política que registró su snapshot', async () => {
+      state.runs = [
+        runRow({
+          methods_json: [
+            { method: 'keyword_suggestions', resultsPerCall: 50, volumePolicy: 'all' },
+            { method: 'related_keywords', resultsPerCall: 50, volumePolicy: 'all' }
+          ]
+        })
+      ]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.runs[0].methods.map(spec => spec.volumePolicy)).toEqual(['all', 'all'])
+    })
+
+    it('🔴 una corrida ANTERIOR sin el campo se lee con el default HISTÓRICO por método', async () => {
+      state.runs = [
+        runRow({
+          methods_json: [
+            { method: 'keyword_suggestions', resultsPerCall: 50 },
+            { method: 'keyword_ideas', resultsPerCall: 50 },
+            { method: 'related_keywords', resultsPerCall: 50 },
+            { method: 'keywords_for_site', resultsPerCall: 50 }
+          ]
+        })
+      ]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      // El default de lectura REPRODUCE la historia, no la reescribe: sugerencias e ideas sí
+      // filtraban en el proveedor; relacionadas y dominio no.
+      expect(result.runs[0].methods.map(spec => spec.volumePolicy)).toEqual([
+        'positive_volume_only',
+        'positive_volume_only',
+        'all',
+        'all'
+      ])
+    })
+  })
+
   describe('TASK-1694 — un candidato es una keyword, no una fila de procedencia', () => {
     const twoProvenances = () => {
       state.runs = [runRow()]

@@ -28,14 +28,17 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import {
   MAX_GSC_SEED_WINDOW_DAYS,
+  SEO_DISCOVERY_HISTORICAL_VOLUME_POLICY,
   SEO_DISCOVERY_MAX_DIFFICULTY_IGNORED,
+  isDiscoveryVolumePolicy,
   type SeoDiscoveryActionKind,
   type SeoDiscoveryErrorCode,
   type SeoDiscoveryIgnoredFilter,
   type SeoDiscoveryLinkBarrierFilterLevel,
   type SeoDiscoveryMethod,
   type SeoDiscoveryRunStatus,
-  type SeoDiscoverySourceKind
+  type SeoDiscoverySourceKind,
+  type SeoDiscoveryVolumePolicy
 } from './contracts'
 import type { ResolvedDiscoverySeed } from './queue'
 import type { SeoLinkBarrierLevel } from '../contracts'
@@ -51,7 +54,12 @@ export interface SeoDiscoveryRunView {
   locationCode: string
   languageCode: string
   seeds: ResolvedDiscoverySeed[]
-  methods: Array<{ method: SeoDiscoveryMethod; resultsPerCall: number }>
+  /**
+   * Métodos con los que se compró, con la política de inclusión de ESA corrida (TASK-1694).
+   * Una corrida anterior sin el campo se lee con el default HISTÓRICO por método: el reader
+   * reproduce lo que pasó, no lo que pasaría hoy.
+   */
+  methods: Array<{ method: SeoDiscoveryMethod; resultsPerCall: number; volumePolicy: SeoDiscoveryVolumePolicy }>
   estimatedCostUsd: number
   actualCostUsd: number | null
   providerCalls: number
@@ -250,9 +258,17 @@ const toRunView = (row: RunRow): SeoDiscoveryRunView => {
       ? (row.seed_inputs_json as { seeds?: ResolvedDiscoverySeed[] })
       : {}
 
-  const methods = Array.isArray(row.methods_json)
-    ? (row.methods_json as Array<{ method: SeoDiscoveryMethod; resultsPerCall: number }>)
+  const rawMethods = Array.isArray(row.methods_json)
+    ? (row.methods_json as Array<{ method: SeoDiscoveryMethod; resultsPerCall: number; volumePolicy?: unknown }>)
     : []
+
+  const methods = rawMethods.map(spec => ({
+    method: spec.method,
+    resultsPerCall: spec.resultsPerCall,
+    volumePolicy: isDiscoveryVolumePolicy(spec.volumePolicy)
+      ? spec.volumePolicy
+      : (SEO_DISCOVERY_HISTORICAL_VOLUME_POLICY[spec.method] ?? 'all')
+  }))
 
   return {
     runId: row.run_id,

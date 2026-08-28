@@ -23,6 +23,7 @@ import {
   DEFAULT_DISCOVERY_RESULTS_PER_CALL,
   MAX_DISCOVERY_SEEDS,
   MAX_GSC_SEED_WINDOW_DAYS,
+  SEO_DISCOVERY_DEFAULT_VOLUME_POLICY,
   SEO_DISCOVERY_METHODS,
   SEO_KEYWORD_DISCOVERY_AGGREGATE_TYPE,
   SEO_KEYWORD_DISCOVERY_REQUESTED_EVENT,
@@ -537,8 +538,15 @@ export const queueKeywordDiscovery = async (
     ...(methods.some(spec => spec.method === 'keywords_for_site') ? { targetDomain: target.rootDomain } : {})
   })
 
+  // TASK-1694: la política de inclusión viaja en el snapshot de la corrida. Sin ella, una
+  // corrida vieja deja de ser interpretable después de un cambio de política: nadie podría
+  // saber si el long-tail sin volumen faltó porque no existía o porque no se compró.
   const methodsJson = JSON.stringify(
-    methods.map(spec => ({ method: spec.method, resultsPerCall: spec.resultsPerCall }))
+    methods.map(spec => ({
+      method: spec.method,
+      resultsPerCall: spec.resultsPerCall,
+      volumePolicy: SEO_DISCOVERY_DEFAULT_VOLUME_POLICY
+    }))
   )
 
   return withGreenhousePostgresTransaction(async client => {

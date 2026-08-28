@@ -10,6 +10,14 @@
  * El parser reusa `parseKeywordOverviewItem` (TASK-1661): los items de discovery traen el
  * MISMO bloque `keyword_info`/`keyword_properties`/`search_intent_info`/`avg_backlinks_info`
  * ya pagado, y proyectarlo con otra pieza duplicaría el shape del proveedor en dos lugares.
+ *
+ * 🔴 **Política de inclusión ÚNICA y declarada (TASK-1694):** los cuatro adapters de expansión
+ * compran con `SEO_DISCOVERY_DEFAULT_VOLUME_POLICY` (`all`) — ninguno lleva `filters` de
+ * `search_volume`. Antes sugerencias e ideas filtraban server-side `> 0` y relacionadas/dominio
+ * no: dos semánticas de inclusión conviviendo sin declararse, que era un accidente del path del
+ * filtro y no una decisión. El razonamiento de por qué `all` vive en el contrato, junto a la
+ * constante; la corrida persiste su política en `methods_json` para seguir siendo interpretable
+ * después de un cambio.
  */
 
 import 'server-only'
@@ -169,8 +177,7 @@ export const callKeywordSuggestions = (
       exact_match: false,
       include_serp_info: false,
       include_clickstream_data: false,
-      limit: input.limit,
-      filters: [['keyword_info.search_volume', '>', 0]]
+      limit: input.limit
     },
     context
   )
@@ -214,8 +221,7 @@ export const callKeywordIdeas = (
       closely_variants: false,
       include_serp_info: false,
       include_clickstream_data: false,
-      limit: input.limit,
-      filters: [['keyword_info.search_volume', '>', 0]]
+      limit: input.limit
     },
     context
   )
