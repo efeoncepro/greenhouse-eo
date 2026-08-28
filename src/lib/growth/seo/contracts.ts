@@ -866,3 +866,90 @@ export type UntrackKeywordsResult =
       errorCode: 'disabled' | 'target_not_found' | 'no_entitlement' | 'no_keywords' | 'query_failed'
       status: null
     }
+
+/**
+ * ═══ TASK-1662 — Competidores declarados + keyword gap competitivo ═══
+ *
+ * Un competidor es una CLASIFICACIÓN CON AUTOR, nunca una inferencia: la propuesta puede
+ * venir de una máquina (top-N de TASK-1699, colector prospect de TASK-1709), pero la fila
+ * sólo existe cuando un humano la declara — un competidor mal elegido invalida todo el
+ * análisis río abajo. `proposal_ref` guarda, OPACA, la evidencia de la propuesta.
+ *
+ * 🔴 Declarar un competidor es un COMPROMISO DE GASTO DIFERIDO (misma clase que seguir una
+ * keyword): la captura de cobertura paga al proveedor por cada competidor vigente en cada
+ * ciclo. Por eso el command lleva techo gobernado por target, outcome por ítem y su reverso
+ * (`retireCompetitor`) en el mismo PR.
+ */
+
+export const SEO_COMPETITOR_DECLARED_EVENT = 'growth.seo.competitor.declared'
+export const SEO_COMPETITOR_RETIRED_EVENT = 'growth.seo.competitor.retired'
+
+export type SeoCompetitorDeclareStatus =
+  /** Competidor declarado: entra al ciclo de cobertura cuando el flag esté ON. */
+  | 'declared'
+  /** Ya había una declaración vigente del mismo dominio. No-op idempotente. */
+  | 'already_declared'
+  /** El techo de competidores por target está lleno. Retirar uno antes de declarar otro. */
+  | 'capacity_exceeded'
+  /** El dominio no se pudo normalizar a algo declarable. */
+  | 'invalid'
+
+export interface SeoCompetitorDeclareOutcome {
+  /** Dominio NORMALIZADO (lowercase, sin scheme/path/www). */
+  domain: string
+  status: SeoCompetitorDeclareStatus
+  seoCompetitorId?: string
+}
+
+export type SeoCompetitorRetireStatus =
+  /** Vigencia cerrada. La cobertura ya capturada queda (append-only), deja de recapturarse. */
+  | 'retired'
+  /** No había declaración vigente de ese dominio. Cero writes. */
+  | 'not_declared'
+  | 'invalid'
+
+export interface SeoCompetitorRetireOutcome {
+  domain: string
+  status: SeoCompetitorRetireStatus
+}
+
+export interface SeoCompetitorSummary {
+  seoCompetitorId: string
+  competitorDomain: string
+  declaredBy: string
+  declaredAt: string
+  declaredSource: SeoKeywordTrackSource
+  /** Referencia opaca a la propuesta de máquina que originó la declaración; null = directa. */
+  proposalRef: string | null
+}
+
+export type SeoCompetitorCommandErrorCode =
+  | 'disabled'
+  | 'target_not_found'
+  | 'target_not_active'
+  | 'no_entitlement'
+  | 'no_domains'
+  | 'query_failed'
+
+export type DeclareCompetitorsResult =
+  | {
+      ok: true
+      seoTargetId: string
+      organizationId: string
+      outcomes: SeoCompetitorDeclareOutcome[]
+      /** Competidores vigentes DESPUÉS del command (lo que se pagará por ciclo de cobertura). */
+      activeCompetitorCount: number
+      capacity: number
+    }
+  | { ok: false; errorCode: SeoCompetitorCommandErrorCode; status: null }
+
+export type RetireCompetitorsResult =
+  | {
+      ok: true
+      seoTargetId: string
+      organizationId: string
+      outcomes: SeoCompetitorRetireOutcome[]
+      activeCompetitorCount: number
+      capacity: number
+    }
+  | { ok: false; errorCode: Exclude<SeoCompetitorCommandErrorCode, 'target_not_active'>; status: null }

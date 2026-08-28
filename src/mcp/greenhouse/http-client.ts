@@ -363,6 +363,44 @@ export class GreenhouseApiPlatformClient {
   }
 
   /**
+   * TASK-1662 — declara competidores de un target (write, sólo bindings `internal`).
+   *
+   * Compromiso de gasto diferido: la captura de cobertura paga por cada competidor vigente
+   * en cada ciclo. `proposalRef` viaja OPACA cuando la declaración confirma una propuesta de
+   * máquina; se omite del body si no la hay.
+   */
+  async declareSeoCompetitors(input: { organizationId?: string; domains: string[]; proposalRef?: string }) {
+    return this.request(
+      '/api/platform/ecosystem/growth/seo/competitors/declare',
+      {},
+      {
+        method: 'POST',
+        body: {
+          organizationId: input.organizationId,
+          domains: input.domains,
+          ...(input.proposalRef ? { proposalRef: input.proposalRef } : {})
+        }
+      }
+    )
+  }
+
+  /** TASK-1662 — el reverso: cierra la vigencia del competidor y corta su gasto de cobertura. */
+  async retireSeoCompetitors(input: { organizationId?: string; domains: string[]; reason?: string }) {
+    return this.request(
+      '/api/platform/ecosystem/growth/seo/competitors/retire',
+      {},
+      {
+        method: 'POST',
+        body: {
+          organizationId: input.organizationId,
+          domains: input.domains,
+          ...(input.reason ? { reason: input.reason } : {})
+        }
+      }
+    )
+  }
+
+  /**
    * TASK-1664 — lectura de corridas y candidatos de keyword discovery. Con `runId` incluye
    * los candidatos compuestos (mercado ◑ + GSC ● + tracking + última acción).
    */

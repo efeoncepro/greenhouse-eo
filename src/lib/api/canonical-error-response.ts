@@ -146,6 +146,7 @@ export type CanonicalErrorCode =
   | 'seo_target_not_active'
   | 'seo_not_entitled'
   | 'seo_keywords_invalid_input'
+  | 'seo_competitors_invalid_input'
   | 'seo_audit_already_running'
   | 'seo_audit_already_captured_today'
   | 'seo_quota_exhausted'
@@ -665,6 +666,12 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   seo_keywords_invalid_input: {
     status: 400,
     message: 'Revisa las keywords: llegaron vacías o con un formato que no podemos seguir.',
+    actionable: true
+  },
+  // Growth SEO — commands de competidores (TASK-1662).
+  seo_competitors_invalid_input: {
+    status: 400,
+    message: 'Revisa los dominios: llegaron vacíos o con un formato que no es un dominio declarable.',
     actionable: true
   },
   // Growth SEO — command `queueSiteAudit` (TASK-1309). Los dos primeros NO son fallas: el

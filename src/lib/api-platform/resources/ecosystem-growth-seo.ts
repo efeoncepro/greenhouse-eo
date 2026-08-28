@@ -50,9 +50,12 @@ import { readRankEvolution } from '@/lib/growth/seo/rank-evolution-reader'
 import { readSeoOverviewKpis } from '@/lib/growth/seo/overview/read-overview-kpis'
 import { readSiteAuditReport } from '@/lib/growth/seo/site-audit/reader'
 import { trackKeywords, untrackKeywords } from '@/lib/growth/seo/track-keywords'
+import { declareCompetitors, retireCompetitors } from '@/lib/growth/seo/competitors'
 import { isSeoKeywordIntent, SEO_KEYWORD_INTENTS } from '@/lib/growth/seo/contracts'
 import type {
   BacklinkProfileResult,
+  DeclareCompetitorsResult,
+  RetireCompetitorsResult,
   KeywordOpportunitiesResult,
   RankEvolutionResult,
   SeoAeoGapResult,
@@ -1120,6 +1123,139 @@ export const untrackEcosystemSeoKeywordsPayload = async ({
   }
 
   const result = await untrackKeywords(subject.seoTargetId, keywords, `mcp:${context.consumer.publicId}`)
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+/**
+ * ═══ TASK-1662 — competidores declarados en el lane ecosystem ═══
+ *
+ * Mismo listón que track/untrack: declarar un competidor es un COMPROMISO DE GASTO DIFERIDO
+ * (la captura de cobertura paga por cada competidor vigente en cada ciclo), así que ambos
+ * commands aceptan **sólo bindings de scope `internal`** — un binding org-scoped (cliente)
+ * no hace crecer su propia factura, y además el listado de competidores es información
+ * comercial sensible que no cruza el boundary de org (auditoría §7: la comparativa
+ * competitiva no se expone al cliente).
+ *
+ * Las defensas viven en los commands (`declareCompetitors`/`retireCompetitors`): autoría
+ * obligatoria, techo por target, idempotencia, normalización, outbox. Este lane sólo deriva
+ * el sujeto máquina y traduce el contrato.
+ */
+
+export interface EcosystemSeoCompetitorsBody {
+  organizationId?: unknown
+  domains?: unknown
+  /** Referencia OPACA a la propuesta de máquina (p. ej. top-N de TASK-1699). Nunca FK. */
+  proposalRef?: unknown
+  reason?: unknown
+}
+
+export const declareEcosystemSeoCompetitorsPayload = async ({
+  context,
+  request,
+  body
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+  body: EcosystemSeoCompetitorsBody | null
+}): Promise<ApiPlatformSuccessResult<DeclareCompetitorsResult | SeoTargetNotConfiguredPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  if (context.binding.greenhouseScopeType !== 'internal') {
+    throw new ApiPlatformError('Declaring SEO competitors is not allowed for the resolved binding scope.', {
+      statusCode: 403,
+      errorCode: 'scope_not_allowed'
+    })
+  }
+
+  const requestedOrganizationId = typeof body?.organizationId === 'string' ? body.organizationId : null
+
+  const domains = Array.isArray(body?.domains)
+    ? body.domains.filter((item): item is string => typeof item === 'string')
+    : []
+
+  if (domains.length === 0) {
+    throw new ApiPlatformError('A non-empty "domains" array is required.', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
+  const proposalRef = typeof body?.proposalRef === 'string' ? body.proposalRef.trim() : ''
+
+  const subject = await resolveSeoLaneSubject(context, request, requestedOrganizationId)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  // El actor es el CONSUMIDOR máquina — procedencia auditable del compromiso de gasto.
+  const result = await declareCompetitors(subject.seoTargetId, domains, `mcp:${context.consumer.publicId}`, {
+    source: 'mcp',
+    ...(proposalRef ? { proposalRef } : {})
+  })
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+export const retireEcosystemSeoCompetitorsPayload = async ({
+  context,
+  request,
+  body
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+  body: EcosystemSeoCompetitorsBody | null
+}): Promise<ApiPlatformSuccessResult<RetireCompetitorsResult | SeoTargetNotConfiguredPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  if (context.binding.greenhouseScopeType !== 'internal') {
+    throw new ApiPlatformError('Retiring SEO competitors is not allowed for the resolved binding scope.', {
+      statusCode: 403,
+      errorCode: 'scope_not_allowed'
+    })
+  }
+
+  const requestedOrganizationId = typeof body?.organizationId === 'string' ? body.organizationId : null
+
+  const domains = Array.isArray(body?.domains)
+    ? body.domains.filter((item): item is string => typeof item === 'string')
+    : []
+
+  if (domains.length === 0) {
+    throw new ApiPlatformError('A non-empty "domains" array is required.', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
+  const reason = typeof body?.reason === 'string' ? body.reason.trim() : ''
+
+  const subject = await resolveSeoLaneSubject(context, request, requestedOrganizationId)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const result = await retireCompetitors(subject.seoTargetId, domains, `mcp:${context.consumer.publicId}`, {
+    ...(reason ? { reason } : {})
+  })
 
   return {
     data: result,

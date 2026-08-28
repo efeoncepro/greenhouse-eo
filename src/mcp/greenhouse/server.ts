@@ -516,6 +516,40 @@ export const createGreenhouseMcpServer = (
     async args => handlers.untrackSeoKeywords(args)
   )
 
+  // TASK-1662 — competidores declarados: el gap competitivo parte de acá.
+  server.registerTool(
+    'declare_seo_competitors',
+    {
+      title: 'Declare SEO Competitors',
+      description:
+        'Declare competitor domains for an organization so they enter the competitor keyword-gap coverage cycle. THIS WRITES AND COMMITS RECURRING SPEND: every active competitor is billed to the provider on every coverage cycle (once the coverage flag is ON) until it is retired, so propose the exact domains to the human and get confirmation BEFORE calling this — a competitor is a DECLARED classification with a human author, never an inference, and a wrongly chosen competitor invalidates every downstream gap analysis. If the candidates came from a machine proposal (SERP top-N, prospect diagnostic), pass proposalRef with the opaque evidence reference; leave it out for direct declarations. Idempotent: an already-declared domain returns already_declared and costs nothing. There is a governed per-target ceiling; domains beyond it return capacity_exceeded and are NOT declared — report those back verbatim. Read the per-domain outcomes array (declared | already_declared | capacity_exceeded | invalid), never just data.ok. When data.ok is false, report the errorCode (disabled, target_not_found, target_not_active, no_entitlement, no_domains, query_failed) honestly.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        domains: z.array(z.string().trim().min(1)).min(1).max(10),
+        proposalRef: z.string().trim().min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.declareSeoCompetitors(args)
+  )
+
+  // TASK-1662 — el reverso del write: lo que hace reversible el gasto de cobertura.
+  server.registerTool(
+    'retire_seo_competitors',
+    {
+      title: 'Retire SEO Competitors',
+      description:
+        'Retire declared competitor domains for an organization so they leave the keyword-gap coverage cycle and stop consuming provider budget. THIS WRITES. It does NOT delete history: the validity window is closed with the retiring actor recorded, captured coverage is preserved, and the same domain can be declared again later (a new window starts). Idempotent: a domain that was not declared returns not_declared and changes nothing. Pass an optional reason for the audit trail. Read the per-domain outcomes array (retired | not_declared | invalid), never just data.ok. When data.ok is false, report the errorCode (disabled, target_not_found, no_entitlement, no_domains, query_failed) honestly.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        domains: z.array(z.string().trim().min(1)).min(1).max(10),
+        reason: z.string().trim().min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.retireSeoCompetitors(args)
+  )
+
   // TASK-1664 — keyword discovery: lectura de corridas/candidatos.
   server.registerTool(
     'get_seo_keyword_discovery',

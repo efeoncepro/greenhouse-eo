@@ -190,6 +190,8 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'getSeoBacklinkProfile'
   | 'trackSeoKeywords'
   | 'untrackSeoKeywords'
+  | 'declareSeoCompetitors'
+  | 'retireSeoCompetitors'
   | 'getSeoKeywordMarketData'
   | 'getSeoDomainOverview'
   | 'getSeoUrlVisibility'
@@ -850,6 +852,68 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         }).`
       },
       () => client.untrackSeoKeywords(input)
+    )
+  },
+  /**
+   * TASK-1662 — declarar competidores. Write con gasto diferido: el resumen enumera el
+   * outcome POR dominio para que un rebote por techo llegue al usuario con esas palabras.
+   */
+  async declareSeoCompetitors(input: { organizationId?: string; domains: string[]; proposalRef?: string }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          outcomes?: Array<{ domain: string; status: string }>
+          activeCompetitorCount?: number
+          capacity?: number
+        }
+
+        if (data.ok === false) {
+          return `SEO competitor declaration rejected (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const outcomes = Array.isArray(data.outcomes) ? data.outcomes : []
+        const count = (status: string) => outcomes.filter(outcome => outcome.status === status).length
+        const rejected = count('capacity_exceeded')
+
+        return `SEO competitors: ${count('declared')} newly declared, ${count(
+          'already_declared'
+        )} already declared, ${rejected} rejected (ceiling full), ${count('invalid')} invalid. The target now has ${String(
+          data.activeCompetitorCount ?? '?'
+        )}/${String(data.capacity ?? '?')} active competitors, each billed per coverage cycle once the flag is ON${
+          rejected > 0 ? ' — report the rejected domains instead of claiming they were declared' : ''
+        } (${result.requestId}).`
+      },
+      () => client.declareSeoCompetitors(input)
+    )
+  },
+  /** TASK-1662 — el reverso: retirar competidores (cierra vigencia, corta gasto futuro). */
+  async retireSeoCompetitors(input: { organizationId?: string; domains: string[]; reason?: string }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          outcomes?: Array<{ domain: string; status: string }>
+          activeCompetitorCount?: number
+          capacity?: number
+        }
+
+        if (data.ok === false) {
+          return `SEO competitor retirement rejected (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const outcomes = Array.isArray(data.outcomes) ? data.outcomes : []
+        const count = (status: string) => outcomes.filter(outcome => outcome.status === status).length
+
+        return `SEO competitors: ${count('retired')} retired, ${count(
+          'not_declared'
+        )} were not declared, ${count('invalid')} invalid. The target now has ${String(
+          data.activeCompetitorCount ?? '?'
+        )}/${String(data.capacity ?? '?')} active competitors. Captured coverage history is preserved (${result.requestId}).`
+      },
+      () => client.retireSeoCompetitors(input)
     )
   },
   /**
