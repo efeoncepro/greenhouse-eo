@@ -169,6 +169,15 @@ export interface SeoAeoGapLenses {
     overallScore: number
     /** `overallScore >= umbral de citabilidad` (documentado en el clasificador). */
     cited: boolean
+    /**
+     * TASK-1700 — `grader_scores.score_version` del score que se leyó.
+     *
+     * Aditivo y obligatorio para el consumidor de la cola: un item con `origin='aeo_gap'`
+     * no puede persistirse sin él (CHECK `seo_work_queue_items_aeo_requires_source_version`).
+     * Sin esta versión, una recalibración del grader movería filas de la cola sin que nadie
+     * pueda decir por qué — el mismo agujero que `priority_score_version` cierra del lado SEO.
+     */
+    scoreVersion: string
   }
 }
 

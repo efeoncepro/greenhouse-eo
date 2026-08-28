@@ -52,10 +52,13 @@ const seoRow = (keyword: string, position: number, impressions = 100) => ({
   clicks: '10'
 })
 
-const aeoRow = (score: number) => ({
+const aeoRow = (score: number, scoreVersion: string | null = 'grader-score-v1') => ({
   run_id: 'grun-1',
   finished_at: '2026-08-01T12:00:00.000Z',
-  overall_score: String(score)
+  overall_score: String(score),
+  // TASK-1700 — la cola persiste esta versión como `source_score_version` y su CHECK la
+  // exige, así que el reader degrada honestamente si el run no la trae.
+  score_version: scoreVersion
 })
 
 beforeEach(() => {
@@ -119,6 +122,19 @@ describe('readSeoAeoGap', () => {
     expect(r).toEqual({ ok: false, errorCode: 'no_aeo_data', status: null })
   })
 
+  it('run sin score_version → no_aeo_data (TASK-1700: la cola no puede persistirlo)', async () => {
+    // El CHECK `seo_work_queue_items_aeo_requires_source_version` rechaza un item de
+    // `aeo_gap` sin versión de origen. Degradar acá es mejor que fabricar una versión o
+    // reventar aguas abajo: sin ella nadie podría explicar por qué se movió una fila de la
+    // cola tras una recalibración del grader.
+    state.seoRows = [seoRow('agencia growth', 2, 900)]
+    state.aeoRows = [aeoRow(72, null)]
+
+    const r = await readSeoAeoGap('seot-1', {}, ENV_ON)
+
+    expect(r).toEqual({ ok: false, errorCode: 'no_aeo_data', status: null })
+  })
+
   it('ambos lados → cruce en memoria con quadrants por keyword + domainQuadrant', async () => {
     state.seoRows = [
       seoRow('agencia growth', 2, 500), // página 1 → con score 72: dominante
@@ -138,7 +154,8 @@ describe('readSeoAeoGap', () => {
       latestRunId: 'grun-1',
       latestRunAt: '2026-08-01T12:00:00.000Z',
       overallScore: 72,
-      cited: true
+      cited: true,
+      scoreVersion: 'grader-score-v1'
     })
     expect(r.quadrants).toEqual([
       { keyword: 'agencia growth', rankPosition: 2, aeoScore: 72, quadrant: 'dominante' },

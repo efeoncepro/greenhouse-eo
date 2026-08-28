@@ -48,7 +48,8 @@ const gap: SeoAeoGapReady = {
     latestRunId: 'run-demo',
     latestRunAt: '2026-05-30T12:00:00.000Z',
     overallScore: 42,
-    cited: false
+    cited: false,
+    scoreVersion: 'grader-score-v1'
   },
   quadrants: [
     { keyword: 'software de marketing', rankPosition: 8, aeoScore: 42, quadrant: 'riesgo' },

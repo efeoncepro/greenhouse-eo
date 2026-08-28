@@ -82,7 +82,10 @@ export const SEO_CLIENT_MOCK_SURFACE: SeoClientSurfaceRead = {
       latestRunId: 'run-task-1310-visual-qa',
       latestRunAt: '2026-08-07T12:00:00.000Z',
       overallScore: 42,
-      cited: false
+      cited: false,
+      // TASK-1700 — el contrato la exige: la cola persiste esta versión como
+      // `source_score_version` y sin ella no puede escribir un item de `aeo_gap`.
+      scoreVersion: 'grader-score-v1'
     },
     domainQuadrant: 'riesgo',
     quadrants: [

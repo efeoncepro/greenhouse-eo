@@ -106,6 +106,15 @@ export interface SeoWorkQueueScoreBreakdown {
   incrementalClicks: number | null
   /** Por qué cayó a esta banda, en una frase corta y accionable. */
   basisReason: string
+  /**
+   * Otros orígenes que también señalaron ESTE MISMO sujeto y quedaron suprimidos por
+   * precedencia de acción.
+   *
+   * No se pierden: un sujeto es UNA decisión, pero la evidencia de por qué aparece sigue
+   * siendo de varios motores. Suprimir sin dejar rastro convertiría la deduplicación en una
+   * pérdida de información silenciosa.
+   */
+  alsoSurfacedBy?: Array<{ origin: SeoWorkQueueOrigin; verb: SeoWorkQueueVerb }>
 }
 
 /** Una entrada de trabajo, tal como se persiste. */
