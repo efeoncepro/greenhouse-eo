@@ -246,7 +246,12 @@ export const executeClaimedGraderRun = async (
     providerPolicyVersion: policy.policyVersion,
     promptPackVersion: run.promptPackVersion,
     timeoutMs: policy.perCallTimeoutMs,
-    maxRetries: policy.maxRetriesPerCall
+    maxRetries: policy.maxRetriesPerCall,
+    // TASK-1696 — la organización del gasto sale del PERFIL cargado server-side (`getGraderProfile`
+    // arriba), NUNCA de `run.*`: las columnas de atribución del run las escribe el chokepoint y
+    // podrían no existir (un run de operador o interno). El perfil es el ancla verdadera del
+    // vínculo con el cliente (TASK-1243), y es nullable a propósito: prospecto público = null.
+    organizationId: profile.organizationId ?? null
   })
 
   const observations: GrowthAiVisibilityProviderObservation[] = []

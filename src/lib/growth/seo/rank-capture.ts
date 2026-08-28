@@ -472,6 +472,7 @@ export const captureRankSnapshot = async (
       // (límite documentado en dataforseo-families).
       const result = await postDataForSeoTask({
         family: 'serp',
+        consumer: 'seo',
         endpoint: DATAFORSEO_DEFAULT_ORGANIC_ENDPOINT,
         tasks: [buildSerpTask(combo.keyword, target, combo.device as Exclude<SeoRankDevice, 'tablet'>)],
         organizationId: target.organization_id

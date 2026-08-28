@@ -22,6 +22,7 @@ const deterministicContext = (): ProviderAdapterContext => {
   let counter = 0
 
   return createProviderAdapterContext({
+    organizationId: null,
     providerPolicyVersion: 'policy.v1',
     promptPackVersion: 'prompt-pack.v1',
     timeoutMs: 20_000,

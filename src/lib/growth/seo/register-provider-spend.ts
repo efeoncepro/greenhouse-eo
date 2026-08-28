@@ -21,10 +21,9 @@ import { setDataForSeoSpendRecorder } from '@/lib/ai/dataforseo'
 
 import { recordSeoProviderSpend } from './provider-spend'
 
-setDataForSeoSpendRecorder(async ({ organizationId, family, cost }) => {
-  // TASK-1696 — `consumer` fijo en 'seo' MIENTRAS el transporte no lo declare (Slice 3). Hoy todo
-  // lo que llega acá viene de los caminos SEO: el grader compra por fuera del ledger, que es el
-  // hueco que la task cierra. Cuando el transporte propague el consumidor real, este literal
-  // desaparece — no es un default, es el estado verificable de este commit.
-  await recordSeoProviderSpend({ organizationId, family, cost, consumer: 'seo' })
+setDataForSeoSpendRecorder(async ({ organizationId, family, cost, consumer }) => {
+  // TASK-1696 — el consumidor viaja desde el CALLER por el transporte, no se decide acá. Este
+  // registro es un puente entre dos capas; inventarle un valor sería la forma más silenciosa de
+  // atribuirle a un servicio el gasto de otro.
+  await recordSeoProviderSpend({ organizationId, family, cost, consumer })
 })

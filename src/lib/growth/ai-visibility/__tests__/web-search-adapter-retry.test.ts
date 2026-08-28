@@ -32,6 +32,7 @@ const PROMPT: GrowthAiVisibilityPromptInput = {
 
 const ctx = (maxRetries = 2): ProviderAdapterContext =>
   createProviderAdapterContext({
+    organizationId: null,
     providerPolicyVersion: 'policy.v1',
     promptPackVersion: 'prompt-pack.v1',
     timeoutMs: 20_000,

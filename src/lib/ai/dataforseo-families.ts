@@ -24,14 +24,17 @@ export interface DataForSeoFamilyDefinition {
    * tipo obliga a pasar `organizationId` — el gasto no rastreado se vuelve imposible por
    * construcción, no por disciplina del caller.
    *
-   * ⚠️ `serp` queda en `false` por una limitación ACTUAL, no porque su gasto no sea
-   * atribuible. `grader_profiles.organization_id` existe y es NULLABLE (TASK-1243): un perfil
-   * del grader puede ser público/prospecto (sin org) o estar ligado a una organización
-   * cliente. Pero `ProviderAdapterContext` no transporta la organización hoy, así que el
-   * adapter AEO no tiene con qué atribuir ni siquiera cuando el perfil sí tiene org.
-   * Consecuencia viva: **el gasto AEO de perfiles ligados a un cliente no entra en el
-   * presupuesto de ese cliente.** Cerrarlo exige llevar la organización al contexto del
-   * adapter — trabajo del dominio AEO, registrado como follow-up en TASK-1300.
+   * ⚠️ `serp` queda en `false` POR DISEÑO, no por deuda — y desde TASK-1696 esa distinción es
+   * verificable, no una promesa. La atribución YA existe: `ProviderAdapterContext` transporta la
+   * organización derivada de `grader_profiles.organization_id` (TASK-1243) y el adapter de AI
+   * Mode la pasa al transporte, así que el gasto del grader sobre un perfil ligado a un cliente
+   * entra al ledger con `consumer='aeo'`.
+   *
+   * Lo que NO se puede hacer es exigirla: el grader corre sobre prospectos PÚBLICOS que no son
+   * clientes, y ésos legítimamente no tienen organización. Poner esto en `true` "para cerrar la
+   * deuda" rompería el camino público del lead magnet en la primera llamada. El tipo no puede
+   * exigir lo que el dominio permite que falte; el gasto sin organización queda contado como no
+   * atribuible en `growth.dataforseo.spend_ledger_drift`, nunca invisible.
    */
   requiresOrganization: boolean
   /** Para qué se usa; sirve de documentación en el propio registry. */
@@ -42,7 +45,8 @@ export const DATAFORSEO_FAMILIES = {
   serp: {
     prefix: '/v3/serp/',
     requiresOrganization: false,
-    purpose: 'SERP en vivo (AI Mode / organic). Lo consume el AEO grader sobre prospectos.'
+    purpose:
+      'SERP en vivo (AI Mode / organic). Familia COMPARTIDA: la compran el rank capture del módulo SEO y el adapter de AI Mode del grader AEO — por eso `consumer` es requerido en el transporte.'
   },
   labs: {
     prefix: '/v3/dataforseo_labs/',

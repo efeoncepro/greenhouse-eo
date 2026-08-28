@@ -671,6 +671,7 @@ export const captureKeywordMarketData = async (
     try {
       const response = await postDataForSeoTask({
         family: 'labs',
+        consumer: 'seo',
         endpoint: '/v3/dataforseo_labs/google/keyword_overview/live',
         organizationId: target.organization_id,
         tasks: [

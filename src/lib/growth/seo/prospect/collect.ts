@@ -65,6 +65,7 @@ const runCall = async ({ family, endpoint, payload, source, organizationId }: Ru
   try {
     const response = await postDataForSeoTask({
       family: family as Exclude<DataForSeoFamily, 'serp'>,
+      consumer: 'seo',
       endpoint,
       organizationId,
       tasks: [{ ...payload, tag: `task-1709-prospect` }]

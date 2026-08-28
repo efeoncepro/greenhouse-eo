@@ -111,6 +111,7 @@ const runCall = async (
 ): Promise<DiscoveryCallOutcome> => {
   const response = await postDataForSeoTask({
     family: 'labs',
+    consumer: 'seo',
     endpoint,
     organizationId: context.organizationId,
     tasks: [{ ...payload, tag: context.tag }]

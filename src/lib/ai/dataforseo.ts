@@ -7,7 +7,8 @@ import { dataForSeoBreaker, isProviderHealthFailure } from './dataforseo-breaker
 import {
   DATAFORSEO_FAMILIES,
   normalizeEndpoint,
-  type DataForSeoFamily
+  type DataForSeoFamily,
+  type DataForSeoSpendConsumer
 } from './dataforseo-families'
 
 const DATAFORSEO_API_BASE_URL = 'https://api.dataforseo.com'
@@ -111,6 +112,8 @@ export type DataForSeoSpendRecorder = (input: {
   organizationId: string
   family: DataForSeoFamily
   cost: number
+  /** TASK-1696 — quién consumió el dólar. Lo declara el caller; el transporte sólo lo transporta. */
+  consumer: DataForSeoSpendConsumer
 }) => Promise<void>
 
 let spendRecorder: DataForSeoSpendRecorder | null = null
@@ -127,10 +130,17 @@ export const setDataForSeoSpendRecorder = (recorder: DataForSeoSpendRecorder | n
  * atribuible, y "el caller se acuerda de pasarlo" es justo la disciplina que falla en
  * silencio. El tipo lo vuelve imposible; el runtime lo revalida por si el caller es JS.
  *
- * ⚠️ Que `serp` lo tenga opcional NO significa que su gasto sea inatribuible por naturaleza
- * — un perfil del grader puede estar ligado a una organización cliente (TASK-1243). Es una
- * limitación actual del contexto del adapter AEO; ver la nota en `dataforseo-families.ts`.
- * Cuando `serp` reciba `organizationId`, se contabiliza igual que las demás sin más cambios.
+ * ⚠️ Que `serp` lo tenga opcional NO significa que su gasto sea inatribuible por naturaleza: el
+ * grader corre sobre prospectos PÚBLICOS que no son clientes, y ésos legítimamente no tienen
+ * organización. Cuando el perfil sí la tiene (TASK-1243), el adapter la pasa y el gasto se
+ * contabiliza igual que el de las demás familias.
+ *
+ * TASK-1696 — `consumer` es REQUERIDO en las dos variantes, y no por simetría: `serp` es la
+ * familia COMPARTIDA (la compran el rank capture del módulo SEO y el adapter de AI Mode del
+ * grader AEO). Un default silencioso haría que el gasto del grader se descuente del presupuesto
+ * SEO del cliente sin que nada falle — el modo de falla exacto que esta dimensión cierra. Que sea
+ * obligatorio en las cuatro familias SEO, donde hoy no hay ambigüedad, es lo que impide que la
+ * próxima familia (p. ej. `ai_optimization`) herede un default que ya no le corresponde.
  */
 export type DataForSeoTaskInput =
   | {
@@ -139,6 +149,7 @@ export type DataForSeoTaskInput =
       tasks: DataForSeoSerpTask[]
       timeoutMs?: number
       organizationId?: string
+      consumer: DataForSeoSpendConsumer
     }
   | {
       family: Exclude<DataForSeoFamily, 'serp'>
@@ -147,6 +158,7 @@ export type DataForSeoTaskInput =
       tasks: DataForSeoTaskPayload[]
       timeoutMs?: number
       organizationId: string
+      consumer: DataForSeoSpendConsumer
     }
 
 /**
@@ -259,7 +271,7 @@ export const postDataForSeoTask = async (input: DataForSeoTaskInput): Promise<Da
     // gastar sin quedar contabilizada por olvidar el registro.
     if (cost !== null && cost > 0 && input.organizationId && spendRecorder) {
       try {
-        await spendRecorder({ organizationId: input.organizationId, family, cost })
+        await spendRecorder({ organizationId: input.organizationId, family, cost, consumer: input.consumer })
       } catch (error) {
         // Un fallo al contabilizar NUNCA invalida un resultado que el proveedor ya cobró:
         // se observa y se sigue. Perder el dato del contador es malo; perder el resultado
@@ -299,6 +311,14 @@ export const postDataForSeoTask = async (input: DataForSeoTaskInput): Promise<Da
  * Contrato histórico del AEO. Se conserva su firma y su shape de retorno; internamente delega
  * en el transporte compartido con la familia `serp`. No agregar parámetros acá: los consumers
  * nuevos usan `postDataForSeoTask`.
+ *
+ * 🔴 TASK-1696 — ESTA PUERTA NO ATRIBUYE GASTO, Y ESO YA NO ES UNA LIMITACIÓN NEUTRA. No acepta
+ * `organizationId`, así que todo lo que compre por acá queda fuera del ledger aunque el perfil
+ * tenga organización; y declara `consumer: 'aeo'` fijo porque el único uso que le queda es de ese
+ * lado. Su único consumer productivo —el adapter de AI Mode del grader— MIGRÓ a
+ * `postDataForSeoTask` justamente para poder atribuir. Un consumer nuevo que entre por acá
+ * reabre el punto ciego en silencio; el guard
+ * `src/lib/ai/__tests__/dataforseo-legacy-wrapper-guard.test.ts` lo rompe en build.
  */
 export const postDataForSeoSerpLiveAdvanced = async (input: {
   endpoint: string
@@ -307,6 +327,7 @@ export const postDataForSeoSerpLiveAdvanced = async (input: {
 }): Promise<DataForSeoSerpResult> =>
   postDataForSeoTask({
     family: 'serp',
+    consumer: 'aeo',
     endpoint: input.endpoint,
     tasks: input.tasks,
     ...(input.timeoutMs === undefined ? {} : { timeoutMs: input.timeoutMs })

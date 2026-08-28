@@ -209,6 +209,7 @@ export const captureBacklinkSnapshot = async (
 
     const summaryResult = await postDataForSeoTask({
       family: 'backlinks',
+      consumer: 'seo',
       endpoint: BACKLINKS_SUMMARY_ENDPOINT,
       tasks: [summaryTask],
       organizationId: target.organization_id
@@ -247,6 +248,7 @@ export const captureBacklinkSnapshot = async (
   try {
     const deltaResult = await postDataForSeoTask({
       family: 'backlinks',
+      consumer: 'seo',
       endpoint: BACKLINKS_BULK_NEW_LOST_ENDPOINT,
       tasks: [{ targets: [target.root_domain] }],
       organizationId: target.organization_id
