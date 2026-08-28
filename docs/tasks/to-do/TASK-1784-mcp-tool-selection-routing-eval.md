@@ -65,8 +65,8 @@ también es valioso y cuesta poco descubrirlo.
 
 ## Goal
 
-- Baseline **medido** de precisión de selección sobre preguntas reales de operador, antes de tocar
-  una sola descripción.
+- Baseline **medido** de precisión de selección —de tool **y de mercado**, por separado— sobre
+  preguntas reales de operador en los cinco mercados productivos, antes de tocar una sola descripción.
 - Bloque de ruteo (`Úsala cuando… · Prefiere X si… · NO la uses para…`) en las tools que compiten por
   la misma intención, sin borrar ni fusionar ninguna.
 - Delta medido post-cambio y **gate de regresión**: la precisión de selección no puede bajar cuando
@@ -236,12 +236,28 @@ Reglas obligatorias:
 
 ### Slice 1 — Baseline medido (va PRIMERO, y puede refutar la task)
 
-- Fixture de **30–50 preguntas reales de operador en es-CL** (`"¿cómo va Berel este mes?"`,
-  `"¿qué keywords perdimos?"`, `"¿de qué tamaño es este competidor?"`, `"¿esta guía está
-  funcionando?"`), cada una con la tool esperada **y su justificación de una línea**.
+- Fixture de **40–60 preguntas reales de operador** (`"¿cómo va Berel este mes?"`, `"¿qué keywords
+  perdimos?"`, `"¿de qué tamaño es este competidor?"`, `"¿esta guía está funcionando?"`), cada una
+  con la tool esperada, **el mercado esperado** y su justificación de una línea.
+- 🔴 **Cobertura de los cinco mercados productivos, no sólo Chile:** `CL` · `MX` · `CO` · `PE` · `US`
+  (mapa cerrado ISO-2 → `location_code` cerrado por `TASK-1652`). Las preguntas van en la variante
+  que corresponde —**es-CL, es-MX, es-CO, es-PE y en-US**—, porque el registro cambia el vocabulario
+  con el que se pide lo mismo: *"posicionamiento"* vs *"posicionamiento SEO"* vs *"rankings"*, y en
+  en-US directamente otro léxico. Un fixture monolingüe mide la selección de un solo mercado y la
+  declara general.
 - Runner que, dado el catálogo actual de descripciones, mide precisión de selección.
 - 🔴 **Si el baseline ya es alto, la task se cierra acá con el número como entregable.** Mejor
   descubrirlo con un fixture que con prosa.
+
+### Slice 1b — La dimensión que no es "cuál tool", sino "cuál mercado"
+
+- Casos donde la tool correcta es obvia y **el parámetro `market` es la trampa**: una organización con
+  targets en más de un mercado, y una pregunta que no lo declara.
+- 🔴 **Comportamiento esperado ante ambigüedad: preguntar o usar el mercado declarado del target —
+  NUNCA elegir uno en silencio.** El fixture marca como fallo la elección silenciosa aunque acierte.
+- Casos con nombre de marca que sugiere un país distinto al del target (ver `Detailed Spec §4`).
+- Se mide por separado de la selección de tool: son dos precisiones distintas y colapsarlas esconde
+  la peor.
 
 ### Slice 2 — Bloque de ruteo en las seis que compiten
 
@@ -315,12 +331,34 @@ Un ruteo mal escrito puede empujar al agente hacia una tool que **gasta** (`run_
 **no llamar a la tool cara** —o pedir confirmación— para que la mejora de selección no se pague en
 factura.
 
+### 4. El error de mercado es más caro que el error de tool, y ya nos pasó
+
+Elegir la tool equivocada da una respuesta con la lente equivocada: es malo y es visible. Elegir la
+tool **correcta** con el mercado equivocado da una respuesta **perfectamente formada y sobre otro
+país**: es peor, porque nada en la salida delata el error.
+
+No es hipotético. `ISSUE-152` (2026-08-13): el target de **Berel —marca mexicana— estaba midiendo
+Chile**, y acumuló **238 snapshots a lo largo de un año contra el SERP equivocado**. Se corrigió
+creando `seot-berel-mx` con `location_code` 2484 y pausando el chileno, porque los snapshots son
+append-only y mutar el país habría dejado un año de mediciones chilenas colgando de una fila que
+**afirma** ser México.
+
+Ese es exactamente el modo de fallo que un fixture monolingüe y mono-mercado no puede detectar. Por
+eso el Slice 1b existe y se mide aparte: la precisión de selección de tool puede ser 100% mientras la
+de mercado es 60%, y el promedio escondería justo la mitad cara.
+
+Adyacente y con la misma raíz: el defecto (1) de `TASK-1652` era que el adapter pasaba el market
+ISO-2 verbatim donde DataForSEO espera nombre completo o `location_code`. El mapa cerrado que esa
+task dejó (`CL`/`MX`/`CO`/`PE`/`US`) es la fuente de verdad que este fixture debe respetar.
+
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
 
 - 🔴 **Slice 1 va primero y puede terminar la task.** Escribir descripciones antes de medir destruye
   el baseline.
+- Slice 1b va con Slice 1: el baseline debe incluir la precisión de mercado desde el principio, o el
+  delta final no puede desagregarse.
 - Slice 2 → Slice 3 (medir el delta exige el cambio aplicado).
 - Slice 4 puede correr en paralelo con Slice 3.
 - Slice 5 al final.
@@ -333,6 +371,8 @@ factura.
 | El ruteo empuja al agente hacia tools que gastan | provider budget | medium | Casos explícitos en el fixture donde lo correcto es NO llamar a la cara | Alza en `seo_provider_spend_daily` sin cambio de operación |
 | El gateway queda con descripciones viejas y sirve un mapa desactualizado | MCP / paridad | medium | Slice 4 extiende el guard de 1658 a `description` | Hallazgo del guard de paridad |
 | El eval se vuelve un test de regresión del catálogo del día que se escribió, y toda tool nueva lo "rompe" por hacer lo correcto | CI / mantenimiento | medium | La regla es actualizar el fixture al agregar una tool, y está escrita en el doc de invariantes. Si un cambio legítimo obliga a editar el gate, está mal el gate | Editar expectativas para poner el build en verde |
+| El fixture cubre sólo Chile y declara general una precisión que no lo es; el error de mercado queda invisible | eval / credibilidad | **high** | Slice 1b con los cinco mercados productivos y medición separada de la precisión de mercado; precedente `ISSUE-152` citado en la spec | Precisión de tool alta con quejas de cliente sobre cifras que no reconoce |
+| El agente elige un mercado en silencio cuando la organización tiene más de un target | growth / credibilidad | medium | El fixture marca la elección silenciosa como fallo aunque acierte; lo correcto es preguntar o usar el declarado | Respuestas sobre el país equivocado sin advertencia |
 | Descripciones muy largas degradan la selección en vez de mejorarla | eval | low | El bloque de ruteo es de formato fijo y acotado; el Slice 3 lo mide | Delta negativo |
 
 ### Feature flags / cutover
@@ -369,7 +409,10 @@ Sin flag — additive, cutover inmediato. Una descripción no tiene modo "apagad
 
 ## Acceptance Criteria
 
-- [ ] Existe un fixture de 30–50 preguntas reales en es-CL con su tool esperada y justificación.
+- [ ] Existe un fixture de 40–60 preguntas reales con su tool esperada, su **mercado esperado** y justificación.
+- [ ] El fixture cubre los **cinco mercados productivos** (`CL`, `MX`, `CO`, `PE`, `US`) en sus variantes es-CL/es-MX/es-CO/es-PE/en-US, y respeta el mapa cerrado ISO-2 → `location_code` de `TASK-1652`.
+- [ ] La precisión de **mercado** se mide y reporta **por separado** de la precisión de tool; no se promedian.
+- [ ] Ante una organización con más de un target y una pregunta sin mercado, elegir uno en silencio cuenta como **fallo** aunque acierte.
 - [ ] El baseline se midió y quedó registrado **antes** de modificar una sola descripción.
 - [ ] Las seis tools que compiten tienen bloque de ruteo con el formato fijo.
 - [ ] Cero tools borradas, fusionadas o renombradas.
