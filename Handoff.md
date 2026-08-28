@@ -4,13 +4,13 @@
 
 ## 2026-08-28 — Higgsfield y Magnific: solicitudes de partnership para agencias enviadas
 
-**Estado: `Postulación enviada`; respuesta comercial pendiente.** Higgsfield confirmó la consulta B2B/studio por
-Enterprise Sales y Magnific confirmó la categoría `Partnership or education program inquiries`. Ambas solicitudes
-presentaron a Efeonce como agencia con diversos clientes enterprise en LATAM y pidieron evaluar enablement,
-workspaces/billing multi-cliente, referral/reseller, API, créditos demo, co-marketing, soporte y piloto.
+**Estado: `Postulación enviada`; respuesta de Higgsfield y evaluación de Magnific pendientes.** Higgsfield confirmó la
+consulta B2B/studio por Enterprise Sales. Magnific respondió: Susana Lazcano, Enterprise BDR EMEA & LATAM, derivó la
+solicitud al canal oficial `ai-partnerships@magnific.com`. El outreach directo se envió el 2026-08-28 desde Outlook
+Web, con Susana en copia y la firma configurada `Julio`; readback del mensaje enviado observado a las 10:44 UTC.
 
-**Límite y continuidad:** ninguna confirmación equivale a aceptación, reseller, co-selling, certificación ni revenue
-share. Revisar las respuestas en Outlook, clasificar su alcance y actualizar el registry antes de cualquier claim o
+**Límite y continuidad:** la derivación y el outreach enviado no equivalen a aceptación, reseller, co-selling,
+certificación ni revenue share. Revisar las respuestas en Outlook y actualizar el registry antes de cualquier claim u
 oferta. Evidencia: [`HIGGSFIELD_MAGNIFIC_AGENCY_PARTNERSHIP_OUTREACH_2026-08-28.md`](docs/audits/commercial/HIGGSFIELD_MAGNIFIC_AGENCY_PARTNERSHIP_OUTREACH_2026-08-28.md).
 
 ## 2026-08-28 — TASK-1696: cierre documental del inventario MCP y dos gates ciegos con task

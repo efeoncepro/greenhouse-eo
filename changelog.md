@@ -13,6 +13,10 @@
   orientado a clientes enterprise en LATAM. Las dos páginas confirmaron recepción; el registry mantiene el estado
   `Postulación enviada`, sin inferir reseller, co-selling, certificación ni economics hasta recibir evidencia
   contractual. Constancia: `docs/audits/commercial/HIGGSFIELD_MAGNIFIC_AGENCY_PARTNERSHIP_OUTREACH_2026-08-28.md`.
+- Magnific respondió mediante su Enterprise BDR EMEA & LATAM y derivó la conversación a
+  `ai-partnerships@magnific.com`. La ruta oficial queda verificada, pero el estado comercial no cambia a partnership
+  activo hasta recibir aceptación y términos. El outreach especializado quedó enviado desde Outlook Web, con Susana
+  en copia y la firma configurada de Julio.
 
 ## 2026-08-27 — TASK-1696: el ledger de gasto aprende quién gastó y de qué tipo es el dólar
 

@@ -1,7 +1,7 @@
 # Higgsfield + Magnific — investigación y outreach de partnership para agencias
 
 > **Fecha de corte:** 2026-08-28
-> **Estado:** dos postulaciones enviadas y confirmadas; evaluación y aceptación pendientes
+> **Estado:** Higgsfield en espera; Magnific derivó la consulta a su equipo AI Partnerships; aceptación pendiente
 > **Owner:** Julio Reyes + Creative Practice + Commercial
 > **Límite:** esta constancia no autoriza claims de partner, reseller, co-selling, certificación ni beneficios económicos
 
@@ -17,6 +17,18 @@ contactó a ambos desde sus rutas oficiales enterprise. Las dos páginas confirm
   `Partnership or education program inquiries`.
 
 Por tanto, el estado defendible de ambas relaciones es `Postulación enviada`, no `Partnership activo`.
+
+## Respuesta de Magnific — 2026-08-28
+
+Susana Lazcano, Enterprise BDR para EMEA y LATAM, respondió desde un dominio corporativo de Magnific y recomendó
+contactar directamente a `ai-partnerships@magnific.com`, indicando que ese equipo puede atender la solicitud. Esta
+derivación confirma una ruta oficial especializada, pero no demuestra aceptación, modelo de canal ni beneficios.
+
+Se envió un outreach en inglés dirigido a AI Partnerships, con Susana en copia, que propone un piloto acotado para
+uno o dos workflows enterprise en LATAM y solicita conversación sobre enablement, administración/facturación
+multi-cliente, referral/reseller/deal registration, API/licencia, créditos demo, co-marketing, soporte y términos de
+datos/IP. El envío salió desde `jreyes@efeoncepro.com` mediante Outlook Web, con la firma configurada `Julio`, y quedó
+verificado en el buzón a las 10:44 UTC con el asunto `Agency partnership opportunity — Efeonce x Magnific in LATAM`.
 
 ## Evidencia pública revisada
 
@@ -54,8 +66,8 @@ credenciales ni payloads sensibles en el repositorio.
 
 ## Próximo paso y gates
 
-1. Revisar Outlook por una respuesta comercial de cada provider y asociarla a esta relación.
-2. Clasificar la respuesta: discovery, aceptación, contrato, rechazo o derivación a affiliate/creator/enterprise.
+1. Esperar la respuesta de `ai-partnerships@magnific.com` y seguir revisando Outlook por una respuesta de Higgsfield.
+2. Clasificar cada respuesta: discovery, aceptación, contrato, rechazo o derivación a affiliate/creator/enterprise.
 3. Antes de declarar o vender el partnership, verificar por escrito: alcance, territorios, referral/reseller/co-sell,
    deal registration, billing, soporte, API, datos/IP, derechos comerciales, marca, economics y terminación.
 4. Si sólo ofrecen Enterprise o affiliate, mantener `Provider en uso` o la vía correspondiente; no traducirla a
