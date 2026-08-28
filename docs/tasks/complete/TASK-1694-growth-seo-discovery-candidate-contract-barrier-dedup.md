@@ -1,5 +1,21 @@
 # TASK-1694 — Growth SEO: el contrato de candidatos de discovery decide con la barrera correcta, una fila por keyword y una política de inclusión declarada
 
+## Delta 2026-08-28 — la mitad de gateway quedó `rollout pendiente`
+
+Detectado al inventariar la superficie federada. La revisión productiva del gateway es
+`efeonce-mcp-gateway-00024-8b8` (SHA `92e7197`). El commit que federa el contrato corregido de
+`get_seo_keyword_discovery` — `807fb76` en `efeoncepro/efeonce-mcp` — **está local, sin push**
+(`git rev-list --count origin/main..HEAD` = 1), por lo tanto sin desplegar.
+
+Consecuencia: la task figura en `complete/`, pero **en producción el gateway sigue sirviendo el contrato
+anterior**. El estado honesto de esa mitad es `code complete, rollout pendiente` hasta que `807fb76` se
+pushee, el workflow "Deploy Cloud Run" quede `success` y una revisión nueva tome el 100% del tráfico.
+
+No se pushea desde acá: el push queda a decisión del operador. Verificación de cierre —
+`gcloud run services list --project efeonce-group --format='table(metadata.name,status.latestReadyRevisionName)' | grep mcp`
+debe mostrar una revisión > `00024-8b8`.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

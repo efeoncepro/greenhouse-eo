@@ -1,5 +1,27 @@
 # TASK-1780 — El inventario de tools MCP es un manifiesto, no dos listas
 
+## Delta 2026-08-28 (segunda entrada del día) — el alcance NO-SEO es el punto ciego del guard
+
+Al documentar la superficie operable del gateway para un operador
+(`docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md` §Superficie operable) apareció una brecha que esta
+task debe cubrir y que hoy **nadie mide**: el guard de paridad es **SEO-only**.
+
+`src/mcp/greenhouse/server.ts` declara 41 tools. 26 son SEO (federadas, vigiladas por el guard de
+`TASK-1658`). Las **15 restantes no están federadas ni declaradas como exclusión**, y el guard no las
+mira, así que no aparecen como drift:
+
+`get_context`, `get_organization`, `list_organizations`, `get_platform_health`, `get_integration_readiness`,
+`list_capabilities`, `list_event_types`, `search_knowledge`, `get_knowledge_document`, `search_services`,
+`quote_price`, `get_webhook_subscription`, `list_webhook_subscriptions`, `get_webhook_delivery`,
+`list_webhook_deliveries`.
+
+**Por qué importa para esta task:** el manifiesto canónico no puede nacer SEO-only, o reproduce el mismo
+punto ciego con mejor tecnología. Cada tool interna debe resolver a *federada* o *excluida con razón* —
+incluidas las de otros dominios. Hoy un operador que conecta `mcp.efeonce.org` esperando el 360 de
+Greenhouse encuentra sólo SEO, y **nada falla ni se lo advierte**: no es un bug, es alcance no declarado,
+que es justo lo que un manifiesto existe para hacer visible.
+
+
 ## Delta 2026-08-28 (release a producción) — el espejo se volvió a editar a mano: de 21 a 27
 
 El deploy del gateway `mcp.efeonce.org` (revisión `efeonce-mcp-gateway-00024-8b8`), coordinado con
