@@ -29,15 +29,37 @@
   `scripts/growth/_sanity-task-1662-keyword-gap.ts` **22/22 contra PG real** (autoría, CHECKs,
   idempotencia, exclusión GSC con query medida real, outbox, retiro, orden neutral).
 
+**Rollout ejecutado 2026-08-28 (autorización plena del operador):**
+
+- `pnpm build` de producción **verde** (gate de cierre completo: test full + build).
+- Shape real de `domain_intersection` validado contra el **sandbox gratuito** ANTES de gastar:
+  el elemento viene directo (sin wrapper `serp_item`), con `rank_group`/`rank_absolute`/`url` —
+  el extractor tolerante lo cubre.
+- **Competidor real declarado**: Berel MX (`seot-berel-mx`) → `comex.com.mx`
+  (`seoc-1b4fab26-…`), `declared_by=user-efeonce-admin-julio-reyes`, `source=seed`,
+  `proposal_ref=audit:BEREL_SEO_DIAGNOSTIC_2026-08-25` (Authority 57 vs 39 — el único dominio
+  fuerte de la categoría MX).
+- **Dry-run**: USD 0,144 estimado (fórmula declarada), gate permitido.
+- **Primera corrida real**: `captured`, run `seocr-5a4e6783-…`, **697 filas** de cobertura
+  (500 content-gap al límite + 197 solapamiento), **USD 0,1076 real con Δ EXACTO en el ledger**
+  (org Berel, familia `labs`, consumer `seo`), **640 filas de mercado gratis**
+  (productor #4 a costo 0).
+- **Gap derivado con datos reales**: 357 content_gap · 54 ranks_worse · **269 excluidas por
+  impresiones GSC medidas** (el invariante ●/◑ operando en vivo) · 17 cliente-mejor · factores
+  con `sin_dato` honesto. Script: `scripts/growth/_rollout-task-1662-first-coverage.ts`.
+- **Flag ON declarativo** (`:-true` en `deploy.sh`), efectivo con el primer deploy del worker
+  post-release (la revisión activa no tiene el endpoint); **scheduler PAUSADO hasta ese deploy**
+  (despausarlo antes = 404 del Cloud Scheduler). Ledger de flags actualizado.
+
 **Bloqueado / pendiente:**
 
 - 🔴 **Slice 4 (emisión a la cola) BLOQUEADO por `TASK-1700` (`to-do`)** — por diseño de la
   propia cola, además: 1700 declara que su materializer CONSUME `readKeywordGap` y activa el
   origen `competitor_gap` cuando haya productor. El contrato de consumo quedó documentado como
   Delta en la spec de 1700 (`evidence_ref` = `seo:competitor_gap:<coverage_run_id>`).
-- **Rollout pendiente** (secuencia en el manual `operar-gap-competitivo-seo.md`): flag OFF en
-  todos los runtimes; primera corrida real con costo verificado en el ledger exige autorización
-  del operador (pasos 2–6 de la Production verification sequence).
+- **Post-release**: verificar el endpoint en la revisión activa del worker + despausar
+  `ops-seo-competitor-coverage` + medir el costo del segundo ciclo antes de declarar más
+  competidores. Federación del gateway (`efeonce-mcp`) se deploya en esa misma ventana.
 - Resolución de ownership con `TASK-1699`: el command de declaración lo aterrizó ESTA task;
   1699 conserva top-N + reader proponedor y consume `declareCompetitors` (Delta declarado allá).
 

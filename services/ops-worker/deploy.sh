@@ -858,13 +858,16 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_URL_VISIBILITY_ENABLED=${GROWTH_SEO_URL_VISIBIL
 # TASK-1662 — Cobertura de keywords de competidores declarados (keyword gap competitivo,
 # DataForSEO Labs `domain_intersection`, 2 llamadas por competidor por ciclo mensual).
 #
-# 🔴 Default OFF: prenderlo empieza a gastar (~USD 0,15 por competidor por ciclo con el row
-# limit default de 500). Este flag se lee SOLO acá (en Vercel es inerte) y este archivo es
-# su SoT declarativo — `--set-env-vars` es destructivo y lo borraría en el próximo deploy.
+# Este flag se lee SOLO acá (en Vercel es inerte) y este archivo es su SoT declarativo —
+# `--set-env-vars` es destructivo y lo borraría en el próximo deploy.
 # Es SUBORDINADO a `GROWTH_SEO_ENABLED`. Rollback (<5 min): `false` acá + `--update-env-vars`.
-# Antes de prender: dry-run + primera corrida sobre UN competidor de UNA org con costo
-# verificado en el ledger (secuencia de verificación de la task).
-GROWTH_SEO_COMPETITOR_GAP_ENABLED="${GROWTH_SEO_COMPETITOR_GAP_ENABLED:-false}"
+# **ON desde 2026-08-28** (autorización plena del operador; secuencia verificada ese día:
+# competidor real declarado con autoría —Berel MX → comex.com.mx, evidencia
+# BEREL_SEO_DIAGNOSTIC_2026-08-25— + dry-run USD 0,144 estimado + primera corrida real
+# USD 0,1076 con Δ EXACTO en el ledger, 697 filas de cobertura + 640 de mercado gratis).
+# Efectivo con el primer deploy del worker que incluya el endpoint (post-release); el
+# scheduler queda PAUSADO hasta entonces (ver abajo). Costo ~USD 0,11-0,15/competidor/ciclo.
+GROWTH_SEO_COMPETITOR_GAP_ENABLED="${GROWTH_SEO_COMPETITOR_GAP_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_COMPETITOR_GAP_ENABLED=${GROWTH_SEO_COMPETITOR_GAP_ENABLED}"
 
 # TASK-1777 — Drill-down nominal del perfil de enlaces (paso post-batch del snapshot semanal
@@ -1510,10 +1513,12 @@ echo "  -> ops-seo-url-visibility: 0 9 17 * * ACTIVO (visibilidad por sujeto-pá
 # Día 18: cadencia mensual en día propio para no apilar gasto con los jobs SEO de los
 # días 15/16/17 (mercado / foto de dominio / visibilidad por sujeto).
 #
-# 🔴 NACE PAUSADO y el flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED` nace en `false`: dos frenos
-# independientes (patrón TASK-1661/1775/1776). Antes de despausar: dry-run
-# (`{"dryRun": true}`), primera corrida real sobre UN competidor de UNA org con costo
-# verificado en el ledger, y autorización del operador. El payload vacío usa el default
+# 🔴 PAUSADO hasta el primer deploy del worker que incluya `/seo/competitor-coverage/
+# capture-batch` (post-release develop→main): despausarlo antes haría que Cloud Scheduler
+# golpee un 404 en la revisión vigente. La secuencia de verificación YA corrió el
+# 2026-08-28 con autorización plena (dry-run + primera corrida real USD 0,1076 verificada
+# en el ledger, un competidor de una org), así que al despausar sólo falta confirmar que
+# el endpoint responde en la revisión activa. El payload vacío usa el default
 # `maxCompetitors=1` (V1: un competidor a la vez).
 upsert_scheduler_job \
   "ops-seo-competitor-coverage" \

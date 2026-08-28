@@ -33,10 +33,15 @@ la de oportunidades.
 - **Declarar es un compromiso de gasto**: la captura de cobertura paga ~USD 0,15 por competidor por
   ciclo mensual (2 llamadas `domain_intersection`, row limit 500). Techo por target:
   `GROWTH_SEO_COMPETITORS_PER_TARGET` (default 5).
-- **Estado de rollout vigente (2026-08-28):** `code complete, rollout pendiente` — flag
-  `GROWTH_SEO_COMPETITOR_GAP_ENABLED` en `false` (SoT `services/ops-worker/deploy.sh`) y scheduler
-  `ops-seo-competitor-coverage` (`0 9 18 * *`) **PAUSADO**. Nada gasta hasta ejecutar la secuencia
-  de encendido de abajo.
+- **Estado de rollout vigente (2026-08-28, autorización plena del operador):** flag
+  `GROWTH_SEO_COMPETITOR_GAP_ENABLED` **ON declarativo** (`:-true` en `services/ops-worker/deploy.sh`),
+  efectivo con el primer deploy del worker post-release (la revisión activa no tiene el endpoint).
+  Scheduler `ops-seo-competitor-coverage` (`0 9 18 * *`) **PAUSADO hasta ese deploy** (despausarlo
+  antes haría que Cloud Scheduler golpee un 404). La secuencia de encendido YA corrió: competidor
+  real declarado (Berel MX → `comex.com.mx`, autoría del operador, evidencia
+  `BEREL_SEO_DIAGNOSTIC_2026-08-25`) + dry-run + **primera corrida real USD 0,1076 con Δ exacto en
+  el ledger** (697 filas de cobertura, 640 de mercado gratis, gap derivado 357/54/269-excluidas).
+  Script reusable: `scripts/growth/_rollout-task-1662-first-coverage.ts`.
 
 ## Paso a paso
 

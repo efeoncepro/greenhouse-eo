@@ -15,14 +15,22 @@ dura por GSC medido, `content_gap`/`ranks_worse`/`declaredTargets` separados, fa
 query medida real). Federación commiteada en `efeonce-mcp` local (3 tools; deploy DESPUÉS del próximo
 release develop→main). Migración `20260828113457119` APLICADA.
 
+**Rollout ejecutado el mismo día (autorización plena del operador):** `pnpm build` de producción
+verde (gate de cierre completo) · shape de `domain_intersection` validado contra el sandbox gratis
+ANTES de gastar (elemento directo, sin wrapper `serp_item`) · competidor real declarado — Berel MX →
+`comex.com.mx`, `declared_by=user-efeonce-admin-julio-reyes`, evidencia
+`BEREL_SEO_DIAGNOSTIC_2026-08-25` · dry-run USD 0,144 → **primera corrida real USD 0,1076 con Δ
+EXACTO en el ledger** (697 filas de cobertura + 640 de mercado gratis) · gap con datos reales:
+**357 content_gap / 54 ranks_worse / 269 excluidas por GSC medido** (el invariante ●/◑ en vivo) ·
+flag **ON declarativo** en `deploy.sh` (efectivo con el primer deploy del worker post-release;
+scheduler PAUSADO hasta entonces — antes sería un 404).
+
 **Riesgo/continuidad:** ownership de `seo_competitors` resuelto — el command lo aterrizó 1662 y
 `TASK-1699` (P0) consume `declareCompetitors` con `proposal_ref` (Deltas declarados en 1699/1700).
-**Próximo paso:** rollout con autorización del operador — secuencia completa en
-`docs/manual-de-uso/growth/operar-gap-competitivo-seo.md` (declarar competidor real → dry-run →
-flag ON multi-paso deploy.sh + en vivo → primera corrida con costo verificado en el ledger → medir
-antes de escalar → despausar scheduler). `pnpm build` de producción del gate de cierre queda pendiente
-de autorización (regla de memoria: no correrlo de rutina). La task queda `in-progress` hasta rollout +
-Slice 4.
+**Próximo paso (post-release develop→main):** verificar `/seo/competitor-coverage/capture-batch` en
+la revisión activa del worker → despausar `ops-seo-competitor-coverage` → medir el costo del segundo
+ciclo antes de declarar más competidores; deploy del gateway `efeonce-mcp` en la misma ventana. La
+task queda `in-progress` sólo por el Slice 4 (bloqueado por `TASK-1700`) y ese cierre operativo.
 
 ## 2026-08-28 — Higgsfield y Magnific: solicitudes de partnership para agencias enviadas
 
