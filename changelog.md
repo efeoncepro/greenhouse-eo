@@ -58,6 +58,24 @@
   Bets y otros orígenes, con una fila sólo después de verificar el Deal en HubSpot. Las licitaciones promovidas se
   sincronizan en ambos registros por `deal_id`; las oportunidades todavía en radar permanecen sólo en bid desk.
 
+## 2026-08-28 — Release a producción `e82c18579b05`: el contrato de discovery corregido, vivo
+
+- Paso a producción de **TASK-1694** y **TASK-1692** (PR #209, 30 archivos de código, **cero
+  migraciones**). Manifest `released` en un solo run del orquestador (`33208942436`, 12m51s), ambos
+  gates `production` aprobados sin stall, watchdog `ok` con `drift_count=0`.
+- **Primer release del ledger que pasa sin break-glass desde un batch de dos tasks.** La razón es
+  estructural: sin migraciones no hay dominio irreversible, así que el classifier dio `ship` limpio.
+- **Cero flags que prender.** El release no introduce ninguno, y los que gatean el dominio ya
+  estaban `true` en Production — verificado leyendo el VALOR, no la presencia.
+- 🔴 **Verificado con canary de contrato, no sólo con el manifest.** Producción respondió
+  `maxLinkBarrier aceptado; ignoredFilters=maxDifficulty` (TASK-1694 ejecutándose), y el lane
+  devolvió **400** a un consumer intentando escribir `promoted_to_tracking` o el retirado
+  `selected_for_target` (TASK-1692: el boundary de escritura vivo). Un manifest `released` prueba
+  despliegue; el canary prueba comportamiento.
+- Gateway MCP desplegado con el schema federado nuevo de `get_seo_keyword_discovery`.
+- Queda pendiente sólo la corrida de smoke de discovery con gasto de proveedor (~USD 0,013), no
+  autorizada. `TASK-1700` (P0) queda desbloqueada y con su prerequisito de runtime cumplido.
+
 ## 2026-08-28 — TASK-1692: el candidato de discovery recuerda qué se decidió sobre él
 
 - **El hecho lo escribe el primitive que lo produce, jamás el consumer.** De los cinco
@@ -788,30 +806,3 @@
   otros servicios/deliverables conservan su categoría y nivel real de productización.
 - El contrato queda `Proposed` y sin cambio de runtime. La forma física sobre `services`, Notion, HubSpot, Finance,
   equipos y Client Portal requiere cohortes reales, task y ADR antes de implementarse.
-
-## 2026-08-19 — El acceso al test ya tiene sesión opaca y reloj autoritativo
-
-- Cada credencial de evaluación tiene una versión explícita; las sesiones candidatas guardan solo un digest
-  opaco vinculado a esa versión, de modo que una recuperación invalida de inmediato los accesos anteriores.
-- El test distingue plazo para comenzar, plazo para responder y 30 minutos de gracia para revisar/enviar. Las
-  evaluaciones sin límite cierran a las 24 horas y ya no aparecen como “0 min”.
-- El navegador proyecta el reloj de base de datos con tiempo monotónico, por lo que cambiar el reloj local no
-  adelanta ni atrasa los límites. Durante la gracia se congelan respuestas, pero revisar y enviar siguen activos.
-- GET/start/save/submit y SELF-ID legacy mantienen decisión, consentimiento, captura y audit bajo una sola
-  transacción. El código fue auditado sin P0/P1/P2; sigue OFF y sin migración aplicada hasta completar el
-  fragment exchange, la cookie HttpOnly, Product API y los smokes reales.
-- La frontera browser ya está implementada localmente: elimina `#access` antes de React/red, intercambia por cookie
-  `__Host-` HttpOnly y usa rutas token-free con CSP/no-store/no-referrer. Maintenance y trailing slash no desvían el
-  bootstrap; un fence evita que dos pestañas muten assessments distintos.
-- El correo vigente no cambia al desplegar este código: el cutover vive en
-  `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`, default OFF. ON queda bloqueado por migración+índice, rutas live,
-  `click_tracking=false` de Resend, rate limit y smokes reales de href/cookie/browser.
-- El backend de recuperación ya tiene un único command para email o enlace manual, Product API sólo para sesiones
-  humanas y revelación one-time. Siempre rota el acceso del assessment existente; nunca crea otro test, reinicia el
-  reloj, cambia etapa, score o respuestas.
-- El guard antiabuso combina cuota por credential/sesión válida con techo IP confiable de Vercel. Tokens aleatorios
-  inválidos no crean cardinalidad durable; la purga diaria drena con readback/señal. Savepoints conservan el consumo
-  de cuota y revierten writes parciales si una acción falla.
-- Arquitectura, manuales, issue/tasks y skills de Talento/Arquitectura/Secret Hygiene quedaron sincronizados. El
-  runbook global de Resend fija orden de migraciones, índice concurrente, webhook firmado, reconciliación,
-  `click_tracking=false`, smokes y rollback. Todo sigue `code complete, rollout pendiente`.

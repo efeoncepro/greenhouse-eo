@@ -830,7 +830,9 @@ default. Revert = revert del PR + redeploy.
 
 ## Registro de cierre — 2026-08-28
 
-**Estado: `code complete, rollout pendiente`.** Los cinco slices están implementados, verificados
+**Estado: `complete` — EN PRODUCCIÓN desde el 2026-08-28** (release `e82c18579b05`, orchestrator run `33208942436`, manifest `released`). Verificado con canary de contrato contra producción: el lane devolvió `maxLinkBarrier aceptado; ignoredFilters=maxDifficulty`, o sea el runtime EJECUTA el contrato nuevo — no sólo está desplegado. Gateway MCP desplegado (`efeonce-mcp` run `33209983511`) con el schema actualizado. **Queda pendiente sólo la corrida de smoke con gasto de proveedor (~USD 0,013), que el operador no autorizó.**
+
+**Estado original al cerrar el código:** Los cinco slices están implementados, verificados
 contra PG real y documentados; falta la corrida real de smoke con gasto (no autorizada en esta
 sesión) y el deploy del gateway MCP.
 

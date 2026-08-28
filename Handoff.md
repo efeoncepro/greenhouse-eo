@@ -30,6 +30,51 @@ mezcla con Wherex, Ariba, Coupa u otros portales corporativos. Estado rápido de
 `docs/commercial/CRM_DEAL_REGISTER.md`. Ambos son índices fechados y siempre requieren readback live; una
 licitación promovida se sincroniza por `deal_id`, mientras el radar sin Deal permanece sólo en bid desk.
 
+## 2026-08-28 (2.º release del día) — TASK-1694 + TASK-1692 EN PRODUCCIÓN
+
+Release `e82c18579b05` (manifest `e82c18579b05-0ab096eb-628a-4d41-9b96-dc82064a21f7`, run
+`33208942436`, PR #209). **Pasó a la primera, sin break-glass, sin retry, `drift_count=0`.** Las dos
+tasks pasan de `code complete, rollout pendiente` a **operativamente completas**.
+
+**Por qué no hubo break-glass, y cómo repetirlo:** cero migraciones ⇒ ningún dominio irreversible ⇒
+`decision=ship` limpio. Es exactamente lo que aisló el par del 2026-08-09; con migraciones el
+break-glass es parte del plan, sin ellas no aparece.
+
+**Flags: cero.** La pregunta se derivó en vez de recordarse —
+`git diff origin/main..HEAD -- src/ services/ | grep '+.*_ENABLED'` vacío, y el VALOR (no la
+presencia) de `GROWTH_SEO_ENABLED` / `GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED` leído con
+`vercel env pull` = `true` en Production. Dos comandos en lugar de leer 72 filas del ledger.
+
+🔴 **El aprendizaje que vale para el próximo release de contrato:** el manifest `released` y Vercel
+`READY` prueban que el código está desplegado, **no que el contrato esté vivo**. Los canaries sí:
+
+- `keyword-discovery-filters` devolvió `maxLinkBarrier aceptado; ignoredFilters=maxDifficulty`
+  (TASK-1694 ejecutándose en producción);
+- dos POST directos al lane con `promoted_to_tracking` y `selected_for_target` devolvieron **400**
+  nombrando los kinds permitidos (TASK-1692: el boundary de escritura está vivo).
+
+El primero existía en el canary del gateway; el segundo hubo que fabricarlo. **Un release que cambia
+un CONTRATO sin canary de contrato está a medio verificar.**
+
+**Validación de la regla nueva de merge (`-s ours`, delta de la mañana):** V1 = un solo commit, el
+squash del release anterior → clasificación "sólo squashes de release" → `-s ours` → las tres
+verificaciones vacías, incluido el `--name-status` completo. Primera vez que el merge canónico no
+necesita auditoría posterior, porque la estrategia no puede colar nada.
+
+**Residual `ops-worker`:** refutado por la vía más barata — `git diff` **sin filtro** entre su SHA y
+el target devolvió **0 archivos** (árboles idénticos; ya había desplegado desde `develop`). No hizo
+falta el diff de las 28 rutas del gate.
+
+**Gateway MCP desplegado** (`efeonce-mcp` run `33209983511`): el schema federado de
+`get_seo_keyword_discovery` ya es el nuevo.
+
+**Único pendiente declarado:** la corrida de smoke de discovery con gasto de proveedor (~USD 0,013)
+de TASK-1694, que el operador no autorizó. No bloquea nada.
+
+**`TASK-1700` (P0, cola priorizada) queda desbloqueada Y con su prerequisito de runtime cumplido:**
+el contrato nuevo ya sirve en producción, así que su primer snapshot no puede congelar duplicados ni
+la barrera engañosa. Es el siguiente trabajo natural.
+
 ## 2026-08-28 — TASK-1692: ledger de decisiones de discovery — code complete, rollout pendiente
 
 Cerrada en `develop`. Cinco slices: append transaccional (`appendDiscoveryActionTx`), el bridge y
@@ -546,52 +591,3 @@ MCP + confirmar umbrales (`…MIN_BACKLINK_MOVEMENT=10` / `…MIN_REFDOMAIN_MOVE
 `new` manda sobre `present` y `lost` sólo si el dominio ya no está (el delta cuenta backlinks, no
 dominios); sin backfill histórico por diseño (la ventana del proveedor ya pasó). `TASK-1314` ya
 tiene el "qué enlaza a la pillar" (delta escrito en su spec).
-
-## 2026-08-27 — TASK-1776: la visibilidad por página quedó code complete, rollout pendiente
-
-**Estado: `code complete, rollout pendiente`; sin push.** Misma sesión que TASK-1775, mismo patrón:
-`seo_url_visibility_snapshots` (multi-productor, clave con `subject_kind` CHECK cerrado y SIN org;
-migración aplicada que ADEMÁS expandió el CHECK de `seo_keyword_market_data.source_endpoint` con
-`ranked_keywords`), resolver de sujeto DECLARADO (`resolveVisibilitySubject` — jamás inferir la
-clase), captura `captureUrlVisibility` (la foto sale del agregado `metrics` del proveedor, el
-`limit`/knob sólo acota el detalle `top_keywords`), colectores on-demand `relevant_pages`/`subdomains`,
-**tercer productor del mercado** (el `keyword_info` inline se escribe con el writer compartido a
-costo 0, filtrado por frescura), reader + lane ecosystem `/growth/seo/url-visibility` (modos subject
-y concentration) + tool MCP `get_seo_url_visibility`, señal `seo.url_visibility.stale_subjects`.
-37 tests del paquete + sanity SQL vivo contra PG (6 frentes) verdes.
-
-**Checkpoint del operador (gasta):** smoke live con los cuatro `subject_kind` (verificando que un
-`subfolder` devuelve sólo URLs bajo su ruta y que el enriquecimiento NO sube el `cost`), flag
-`GROWTH_SEO_URL_VISIBILITY_ENABLED` ON (sólo ops-worker) + despausar `ops-seo-url-visibility`
-(día 17), canary MCP staging + federación `efeonce-mcp`, y confirmar el `limit` default (100).
-Runbook: `docs/manual-de-uso/growth/operar-visibilidad-por-url-seo.md`.
-
-**No re-descubrir:** una URL como `target` del proveedor va CON esquema (sin él devuelve el dominio
-entero y lo cobra — gotcha 10 nuevo en la reference de Labs); la subcarpeta es host + filtro
-server-side `relative_url` (gratis, confirmado contra la doc); `page_intersection` quedó fuera por
-diseño (follow-up de TASK-1314). `TASK-1313` ya tiene su lado ◑ (delta escrito en su spec).
-
-## 2026-08-27 — TASK-1775: la foto de dominio quedó code complete, rollout pendiente
-
-**Estado: `code complete, rollout pendiente`; sin push.** Los 6 slices implementados sobre `develop`:
-tabla multi-productor `seo_domain_overview_snapshots` (clave sin org, append-only, migración aplicada
-y verificada por `information_schema`), colector mensual `captureDomainOverview` (target +
-competidores, frescura filtrada por `source_endpoint`, NULL-row para sujeto desconocido), backfill
-histórico resumible con tope duro USD (default 5, runner `--dry-run`/`--apply`), screening
-`estimateDomainTraffic`, reader `readDomainOverview` + lane ecosystem + tool MCP
-`get_seo_domain_overview`, y señal `seo.domain_overview.stale_subjects`. 49 tests focales verdes +
-sanity SQL contra PG real (gate TASK-893) verde.
-
-**Lo que falta para operarlo (checkpoint del operador — GASTA dinero real):** (1) smoke live contra
-DataForSEO con UN sujeto comparando `cost` vs estimado + re-corrida a USD 0; (2) flag
-`GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED` ON multi-runtime (deploy.sh + `--update-env-vars`, **sólo
-ops-worker**) + despausar `ops-seo-domain-overview` (nace PAUSADO, día 16); (3) canary de la tool MCP
-en staging + federación en `efeonce-mcp`; (4) confirmar el tope USD del primer `--apply` del backfill.
-Runbook completo: `docs/manual-de-uso/growth/operar-foto-de-dominio-seo.md`.
-
-**No re-descubrir:** el lane app NO se crea (el dominio es ecosystem-only, 14 readers precedentes);
-`etv` es tráfico estimado, NO dólares (la spec lo rotulaba mal — corregido en el DTO); la autoridad
-canónica de superficie sigue siendo `seo_backlink_snapshots.domain_rank` porque `domain_rank_overview`
-no devuelve authority score (desambiguación registrada en arch §4.2). Convivencia con la sesión
-paralela de TASK-1709: deltas de archivos compartidos viajaron cruzados y declarados en los commits
-de ambas.

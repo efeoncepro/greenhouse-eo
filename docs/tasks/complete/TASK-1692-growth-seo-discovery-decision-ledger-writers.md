@@ -727,7 +727,9 @@ cambia (lo resuelto deja de encabezar), y eso se cubre con el manual del Slice 5
 
 ## Registro de cierre — 2026-08-28
 
-**Estado: `code complete, rollout pendiente`.** Los cinco slices están implementados, verificados
+**Estado: `complete` — EN PRODUCCIÓN desde el 2026-08-28** (release `e82c18579b05`, orchestrator run `33208942436`, manifest `released`). Verificado con dos canaries de contrato contra el lane productivo: un consumer intentando escribir `promoted_to_tracking` recibe **400** con el mensaje que nombra los kinds permitidos (`dismissed, rejected, selected_for_grounded_query`), y el retirado `selected_for_target` también **400**. El boundary de escritura está vivo, no sólo desplegado.
+
+**Estado original al cerrar el código:** Los cinco slices están implementados, verificados
 contra PG real y documentados. Falta la verificación funcional en staging de los dos caminos
 (pasos 1–6 de `### Production verification sequence`) y la promoción a producción.
 
