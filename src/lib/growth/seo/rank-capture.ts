@@ -132,7 +132,7 @@ export const resolveSantiagoCaptureDate = (at?: Date): string => {
   return `${parts.year}-${month}-${day}`
 }
 
-const normalizeDomain = (raw: string): string => {
+export const normalizeDomain = (raw: string): string => {
   let value = raw.trim().toLowerCase()
 
   value = value.replace(/^[a-z][a-z0-9+.-]*:\/\//, '')
@@ -142,7 +142,7 @@ const normalizeDomain = (raw: string): string => {
   return value
 }
 
-const extractHost = (url: string): string | null => {
+export const extractHost = (url: string): string | null => {
   try {
     return normalizeDomain(new URL(url.startsWith('http') ? url : `https://${url}`).hostname)
   } catch {
@@ -150,7 +150,7 @@ const extractHost = (url: string): string | null => {
   }
 }
 
-const isOwnDomain = (candidate: string, rootDomain: string): boolean =>
+export const isOwnDomain = (candidate: string, rootDomain: string): boolean =>
   candidate === rootDomain || candidate.endsWith(`.${rootDomain}`)
 
 // Clave de combo sin colisiones (una keyword puede contener cualquier separador plano).
