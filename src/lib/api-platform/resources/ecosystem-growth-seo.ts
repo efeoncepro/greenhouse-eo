@@ -40,6 +40,10 @@ import { readGroundedQueryDraft, type ReadGroundedQueryDraftResult } from '@/lib
 import { type TenantEntitlementSubject } from '@/lib/entitlements/types'
 import type { SeoSearchIntent } from '@/lib/growth/seo/keyword-market-data'
 import { resolveSeoTargetForMarket, type SeoMarketTarget } from '@/lib/growth/seo/resolve-target'
+import {
+  readSeoProviderSpendByConsumer,
+  type SeoProviderSpendByConsumerResult
+} from '@/lib/growth/seo/provider-spend'
 import { readSeoPerformance } from '@/lib/growth/seo/performance/read-performance'
 import { readSeoPerformanceCatalog } from '@/lib/growth/seo/performance/read-performance-catalog'
 import { readRankEvolution } from '@/lib/growth/seo/rank-evolution-reader'
@@ -1599,4 +1603,60 @@ export const runEcosystemSeoProspectDiagnosticPayload = async ({
   })
 
   return { data: result, meta: { module: 'growth.seo' } }
+}
+
+export type EcosystemSeoProviderSpendPayload =
+  | ({ ok: true } & SeoProviderSpendByConsumerResult)
+  | { ok: false; errorCode: 'disabled'; status: null }
+
+/**
+ * TASK-1696 — GET /api/platform/ecosystem/growth/seo/provider-spend
+ *
+ * Gasto de proveedor del mes por organización, cortado por CONSUMIDOR (`seo` | `aeo`) y por BASE
+ * DE COSTO (facturado | estimado). Passthrough del reader canónico
+ * `readSeoProviderSpendByConsumer` — un primitive, muchos consumers: ninguna pantalla ni tool
+ * suma gasto con SQL propio.
+ *
+ * 🔴 SÓLO BINDINGS `internal`, y no es una restricción de permisos sino de NATURALEZA DEL DATO:
+ * esto es lo que a Efeonce le CUESTA servir a un cliente, no algo que el cliente haya consumido.
+ * Un binding org-scoped que leyera su propia fila estaría leyendo nuestra estructura de costos.
+ * El resto del lane resuelve la organización desde el binding cuando es org-scoped; acá esa
+ * misma resolución sería la fuga. Por eso se rechaza antes de tocar el dominio, con 404
+ * anti-oracle en vez de 403: un binding de cliente no debe aprender siquiera que el recurso
+ * existe.
+ */
+export const getEcosystemSeoProviderSpendPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<EcosystemSeoProviderSpendPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  if (context.binding.greenhouseScopeType !== 'internal' || context.binding.organizationId) {
+    throw new ApiPlatformError('SEO resource not found for the resolved scope.', {
+      statusCode: 404,
+      errorCode: 'not_found'
+    })
+  }
+
+  const url = new URL(request.url)
+  const organizationId = (url.searchParams.get('organizationId') ?? '').trim()
+
+  if (!organizationId) {
+    throw new ApiPlatformError('organizationId is required for internal bindings.', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
+  const result = await readSeoProviderSpendByConsumer(organizationId)
+
+  return {
+    data: { ok: true, ...result },
+    meta: { module: 'growth.seo', organizationId }
+  }
 }
