@@ -282,7 +282,7 @@ Delega en el lane ecosystem de Greenhouse (`/api/platform/ecosystem/growth/seo/*
 per-org `seo_v2`, el 404 anti-oracle y las degradaciones honestas. Los payloads se pasan tal cual (`data` del
 envelope del lane), así que un cliente MCP ve exactamente los mismos shapes que la UI y Nexa.
 
-Tools publicadas — **el inventario COMPLETO del MCP interno de Greenhouse (22 tools SEO) está federado**
+Tools publicadas — **el inventario COMPLETO del MCP interno de Greenhouse (27 tools SEO: 20 lecturas + 7 escrituras) está federado**
 (TASK-1658 cerró el drift de 8 tools que vivían adentro sin federar ni excluir, dejándolo en 21; TASK-1696 sumó
 `get_seo_provider_spend` como lectura 17). Las de **lectura** van bajo el
 **scope base** `efeonce.mcp.read`; las **cinco de escritura** (TASK-1308/1664/1666/1709) exigen el scope propio
@@ -319,7 +319,7 @@ excluida (la dirección que antes era invisible).
 | `prepare_seo_grounded_queries` | `POST .../growth/seo/grounded-queries` | `efeonce.mcp.seo.write` |
 | `run_seo_prospect_diagnostic` | `POST .../growth/seo/prospect-diagnostic` | `efeonce.mcp.seo.write` |
 
-> Estado de despliegue 2026-08-28 — **inventario interno (22) ≠ desplegado en el gateway productivo (21)**:
+> Estado de despliegue 2026-08-28 — **inventario interno (27: 20 lecturas + 7 escrituras, tras TASK-1662/1699) ≠ desplegado en el gateway productivo (21)**:
 > el rollout de TASK-1658 ya se ejecutó y la revisión `efeonce-mcp-gateway-00023-zt2` (2026-08-27) llevó
 > `tools/list` de 13 a 21, con los 4 commits pusheados a `main` de `efeonce-mcp`. Falta desplegar la tool 22,
 > `get_seo_provider_spend` (TASK-1696, commit `1a51461` en `main`, CI verde): el deploy del gateway es

@@ -77,6 +77,22 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > deploy del worker post-release) y el scheduler `ops-seo-competitor-coverage` permanece pausado
 > hasta ese deploy.
 >
+> **Actualización 2026-08-28 (2):** `TASK-1699` (top-N del SERP) quedó **code complete, rollout
+> pendiente** (`in-progress/`, en develop `fdfdedbe5`). Entregado: tabla `seo_serp_top_results`
+> (migración `20260828124352232`, append-only estricto, ranura `rank_absolute` jamás `rank_group`)
+> · parser hermano `parseSerpTopResults` con costo marginal CERO (test de no-regresión sobre
+> `buildSerpTask`) · cableado en el rank capture tras el flag dual-runtime
+> `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` (ON declarativo; tx atómica + fallback que jamás pierde la
+> medición pagada) · `readSerpCompetitorCandidates` (propose por recurrencia medida, umbrales
+> versionados 30d/3kw/5días; el execute es `declareCompetitors` de `TASK-1662`) + `readSerpTopResults`
+> · lanes sólo-internal 404 anti-oracle + tools MCP `get_seo_serp_top_results` /
+> `get_seo_competitor_candidates` federadas (inventario 27) · señal `seo.serp_top_results.coverage`.
+> Cero ALTER a `seo_competitors` (la autoría quedó en `1662`). Sanity 9/9 contra PG real. ⚠️ **El
+> día 1 de la serie = primer deploy del worker post-release: cada día sin release pierde el top-N de
+> ese día para siempre** — es el único trabajo del plan con costo de demora irrecuperable. Cierra la
+> brecha S2 de la auditoría 2026-08-15; S3 (estacionalidad, `TASK-1708`) y S4 (clustering propio)
+> ganan su sustrato disponible sin task abierta.
+>
 > ⚠️ Al cerrar una task, revisar quién la citaba como blocker. Un `Blocked by` obsoleto es fricción
 > inventada, y no hay gate que lo detecte.
 
@@ -249,7 +265,9 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1698` — [creada 2026-08-15, backend-data] Posicionamiento declarado (`●`) / observado (`◑`)
   para `message_alignment`. **P0.** Bloquea a `TASK-1672`.
 - `TASK-1699` — [creada 2026-08-15, backend-data] Persistir el top-N del SERP que ya se paga. **P0**,
-  único trabajo con costo de demora irrecuperable.
+  único trabajo con costo de demora irrecuperable. 🔄 **In-progress: code complete, rollout
+  pendiente (2026-08-28)** — el día 1 de la serie es el primer deploy del worker post-release; ver
+  Actualización 2026-08-28 (2).
 - `TASK-1700` — [creada 2026-08-15, backend-data] Cola priorizada como aggregate persistido con score
   versionado. **P0.** Llega **antes** que `TASK-1669`.
 - `TASK-1701` — [creada 2026-08-15, backend-data] `analyzeUrlContent`: hechos por URL, cero score.
@@ -889,7 +907,9 @@ abarata por cadencia y muestreo (`TASK-1704`).
 - `TASK-1697` — `growth/site-substrate` + barrel de dominio AEO + lint rule cross-domain. **P0.**
 - `TASK-1698` — posicionamiento declarado (`●`) / observado (`◑`) para `message_alignment`. **P0.**
 - `TASK-1699` — persistir el top-N del SERP que ya se paga. **P0.** *Único trabajo del plan con
-  costo de demora irrecuperable: el SERP de ayer sólo se recompra.*
+  costo de demora irrecuperable: el SERP de ayer sólo se recompra.* 🔄 **code complete, rollout
+  pendiente (2026-08-28)**: tabla + parser + cableado + propose de competidores + tools MCP
+  federadas ya en develop; la serie arranca con el primer deploy del worker post-release.
 - `TASK-1700` — cola priorizada como aggregate persistido con score versionado. **P0.**
 - `TASK-1701` — `analyzeUrlContent`: hechos por URL, cero score.
 - `TASK-1702` — señales deterministas de citabilidad + recomendación anclada a URL.

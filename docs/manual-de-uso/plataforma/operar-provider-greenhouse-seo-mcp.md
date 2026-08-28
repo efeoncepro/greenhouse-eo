@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso / runbook
 > **Version:** 1.4
 > **Creado:** 2026-08-06 por Claude (TASK-1647)
-> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1696: allowlist a 22 tools — 17 lectura + 5 escritura, con `get_seo_provider_spend`; producción sirve 21 hasta el deploy post-release)
+> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1662+1699: allowlist a 27 tools — 20 lectura + 7 escritura; producción sirve 21 hasta el deploy post-release)
 > **Endpoint canonico:** `https://mcp.efeonce.org/mcp`
 > **Documentacion funcional:** [Search Visibility 360 por MCP](../../documentation/growth/search-visibility-360-por-mcp.md)
 > **Runbook tecnico:** [Efeonce MCP Platform Runbook](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Greenhouse-SEO
@@ -13,7 +13,7 @@
 Este manual es para el operador que necesita **verificar, diagnosticar o apagar** el provider `greenhouse-seo`
 del gateway MCP de Efeonce — lo que un cliente MCP puede hacer contra `mcp.efeonce.org`.
 
-El allowlist federado tiene **22 tools** (fuente de verdad: el espejo `GREENHOUSE_SEO_TOOL_INVENTORY`
+El allowlist federado tiene **27 tools — 20 de lectura y 7 de escritura** (fuente de verdad: el espejo `GREENHOUSE_SEO_TOOL_INVENTORY`
 del guard de paridad `src/providers/greenhouse-seo-tool-parity.ts` del repo `efeonce-mcp` — desde
 TASK-1658 el guard es **bidireccional**: nombre + claves exactas del inputSchema interno + clase
 `writes` + paridad de schema + `annotations` obligatorias, con introspección runtime del server; el
@@ -45,7 +45,7 @@ reemplace por el manifiesto canónico de Greenhouse):
 | `prepare_seo_grounded_queries` ✍️ | **Escribe** un DRAFT AEO (no gasta proveedor, jamás aprueba/activa); con la identidad máquina compartida responde `aeo_forbidden` fail-closed hasta TASK-1631 (TASK-1666) |
 | `run_seo_prospect_diagnostic` ✍️ | **Escribe y GASTA por corrida**: diagnóstico único sobre un prospecto, con confirmación humana previa; flag `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` OFF = estado legítimo (TASK-1709; federada por TASK-1658) |
 
-⚠️ **Estado de despliegue (2026-08-28).** No confundir el **allowlist federado** (22) con lo que la
+⚠️ **Estado de despliegue (2026-08-28).** No confundir el **allowlist federado** (27, tras TASK-1662/1699) con lo que la
 **revisión productiva del gateway** sirve (21):
 
 - El rollout de TASK-1658 **ya se ejecutó**: la revisión `efeonce-mcp-gateway-00023-zt2`

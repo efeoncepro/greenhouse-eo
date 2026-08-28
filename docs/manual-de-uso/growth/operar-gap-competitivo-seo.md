@@ -27,9 +27,10 @@ la de oportunidades.
 
 - Módulo SEO activo (`GROWTH_SEO_ENABLED=true`) y org con assignment `seo_v2` vigente.
 - **Un competidor es un hecho declarado por un humano** (autor + fecha + procedencia quedan en la
-  fila). La propuesta puede venir de una máquina (top-N de TASK-1699 cuando exista, diagnóstico de
-  prospecto), pero la declaración no se automatiza: un competidor mal elegido invalida todo el
-  análisis río abajo.
+  fila). La propuesta puede venir de una máquina — el top-N de TASK-1699 (ya implementado; su
+  serie arranca con el primer deploy del worker post-release) o el diagnóstico de prospecto —,
+  pero la declaración no se automatiza: un competidor mal elegido invalida todo el análisis río
+  abajo.
 - **Declarar es un compromiso de gasto**: la captura de cobertura paga ~USD 0,15 por competidor por
   ciclo mensual (2 llamadas `domain_intersection`, row limit 500). Techo por target:
   `GROWTH_SEO_COMPETITORS_PER_TARGET` (default 5).

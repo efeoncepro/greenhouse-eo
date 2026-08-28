@@ -86,6 +86,8 @@ Menciones sin llamada (comentarios/contratos): `src/lib/growth/seo/{entitlement,
 
 ⚠️ **Delta 2026-08-14 — `labs/onpage` YA tienen consumer runtime productivo** (esta sección decía lo contrario hasta TASK-1303/1304), y `labs` ya tiene **DOS**: `src/lib/growth/seo/rank-history-seed.ts` (semilla histórica) y `src/lib/growth/seo/keyword-market-data.ts` (TASK-1661, mensual — §5c). `onpage` = `src/lib/growth/seo/site-audit/**`; `serp` lo consume `rank-capture.ts` (cron `ops-seo-rank-capture`, 05:00 CLT en ops-worker). `backlinks` estrenó su primer consumer productivo el 2026-08-27 (carril `prospect`, §5d); `domain` sigue sin consumer — y ojo: el perfil de enlaces que Greenhouse usa para keywords **NO** sale de la familia `backlinks`, sale del `avg_backlinks_info` que `labs` regala en la misma respuesta ya pagada (§5c).
 
+⚠️ **Delta 2026-08-28 — TASK-1699:** `rank-capture.ts` ganó un parser hermano (`parseSerpTopResults`, `src/lib/growth/seo/serp-top-results.ts`) que persiste el top-N COMPLETO del SERP ya pagado en `greenhouse_growth.seo_serp_top_results` a costo marginal cero (misma transacción, fallback que jamás pierde la medición de rank; ranura de clave `rank_absolute`, jamás `rank_group`); `readSerpCompetitorCandidates` propone competidores por recurrencia medida y el execute es `declareCompetitors` (TASK-1662) con confirmación humana. Detalle completo en el estado de runtime del SKILL.md.
+
 ## §5b El write que compromete gasto SIN llamar al proveedor (TASK-1308 · TASK-1659)
 
 `src/lib/growth/seo/track-keywords.ts` — `trackKeywords()` / `untrackKeywords()`. **No llama a DataForSEO ni escribe una sola fila del ledger**, y por eso es el consumer más peligroso del contrato de costo:

@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso
 > **Version:** 2.0
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1696: inventario a 22 tools SEO — 17 lectura + 5 escritura, con `get_seo_provider_spend` como lectura 17; las 22 federadas al gateway, cuya revisión productiva sirve 21 hasta el deploy post-release — estado verificado en §8)
+> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1662+1699: inventario a 27 tools SEO — 20 lectura + 7 escritura; las 27 federadas al gateway, cuya revisión productiva sirve 21 hasta el deploy post-release — estado verificado en §8)
 > **Modulo:** plataforma / MCP
 > **Ruta en portal:** `N/A` (server MCP local `stdio` o remoto HTTP)
 > **Documentacion relacionada:** [API Platform Ecosystem](../../documentation/plataforma/api-platform-ecosystem.md), [Platform Health API](../../documentation/plataforma/platform-health-api.md), [GREENHOUSE_MCP_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md)
@@ -202,7 +202,7 @@ Reglas que el agente debe respetar:
 
 ### 8. SEO / Search Visibility 360 (TASK-1645 · 1303 · 1304 · 1306 · 1307 · 1308 · 1661 · 1664 · 1666 · 1709 · 1775 · 1776 · 1777 · 1696)
 
-Hoy son **22 tools SEO: 17 de lectura y 5 de escritura**. Las de escritura son la excepción al
+Hoy son **27 tools SEO: 20 de lectura y 7 de escritura**. Las de escritura son la excepción al
 carácter read-only del resto de este MCP y están marcadas como tales.
 
 **Lectura (17):**
@@ -277,9 +277,10 @@ Reglas que el agente debe respetar:
 - **La intención de una keyword se declara, no se adivina** (TASK-1659). `track_seo_keywords` acepta `intent` opcional: `target` (compromiso acordado con el cliente — puede estar en la posición 60, y eso es la **distancia que falta**, no un fracaso) u `opportunity` (demanda medida que se está empujando). **Omítelo salvo que un humano lo haya declarado**: adivinarlo fabrica una clasificación que nadie hizo. Los dos **nunca se promedian** al reportar. Cambiar la intención de una keyword ya seguida devuelve `intent_changed` (no `already_tracked`: sí pasó algo), **no consume cupo** —cierra la membresía vigente y abre otra— y preserva desde cuándo es objetivo. `intentDeclaredBy` lleva la **autoría humana** cuando el agente actúa por encargo; el actor del write sigue siendo la máquina (`mcp:<consumer>`), que es la procedencia real del gasto, y una autoría sin intención se descarta. Las keywords seguidas antes del 2026-08-14 no tienen intención declarada: eso significa **"nadie la declaró"**, jamás "oportunidad".
 
 **Qué está federado al gateway público `mcp.efeonce.org`.** Desde TASK-1658 (2026-08-27) el
-inventario federado es **las 22 tools completas** (17 lecturas bajo `efeonce.mcp.read` — la 17.ª,
-`get_seo_provider_spend`, la sumó TASK-1696; las 5
-escrituras bajo `efeonce.mcp.seo.write`, scope NO cableado al cliente PKCE público — fail-closed
+inventario federado es **el completo — 27 tools al 2026-08-28** (20 lecturas bajo
+`efeonce.mcp.read` — `get_seo_provider_spend` la sumó TASK-1696, `get_seo_keyword_gap` TASK-1662 y
+`get_seo_serp_top_results`/`get_seo_competitor_candidates` TASK-1699; las 7 escrituras bajo
+`efeonce.mcp.seo.write`, scope NO cableado al cliente PKCE público — fail-closed
 hasta TASK-1631). El guard de paridad del gateway
 (`efeonce-mcp/src/providers/greenhouse-seo-tool-parity.ts`) es ahora **bidireccional**: espejo
 committeado `GREENHOUSE_SEO_TOOL_INVENTORY` (nombre + claves exactas del inputSchema interno +
@@ -292,8 +293,10 @@ canónico de tools de Greenhouse. Es el mismo lane y el mismo entitlement: el ga
 confundieron una vez: el **inventario interno** (lo que Greenhouse sirve) y lo **desplegado en el
 gateway productivo**.
 
-- **Inventario interno y allowlist federado: 22 tools.** Las 22 están en `main` de `efeonce-mcp`
-  (pusheado; `get_seo_provider_spend` entró en el commit `1a51461`, CI verde).
+- **Inventario interno y allowlist federado: 27 tools (20 lecturas + 7 escrituras).** Federación al
+  día en `efeonce-mcp`: `get_seo_provider_spend` (TASK-1696, commit `1a51461`, pusheado),
+  `declare/retire_seo_competitors` + `get_seo_keyword_gap` (TASK-1662, commit local `8215ab5`) y
+  `get_seo_serp_top_results` + `get_seo_competitor_candidates` (TASK-1699, commit local `92e7197`).
 - **Revisión productiva del gateway: 21 tools.** La revisión `efeonce-mcp-gateway-00023-zt2`
   (desplegada el 2026-08-27) llevó `tools/list` de 13 a 21 y cerró el rollout de TASK-1658.
 - **La tool 22 todavía NO está en producción.** El deploy del gateway es `workflow_dispatch`
