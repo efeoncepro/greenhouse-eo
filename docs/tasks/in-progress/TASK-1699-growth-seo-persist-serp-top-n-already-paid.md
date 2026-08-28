@@ -38,7 +38,7 @@ reader proponedor.
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Alto`
 - Effort: `Medio`

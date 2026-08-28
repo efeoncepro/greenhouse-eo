@@ -7778,6 +7778,24 @@ export interface GreenhouseGrowthSeoRankSnapshots {
   url: string | null;
 }
 
+export interface GreenhouseGrowthSeoSerpTopResults {
+  capture_date: Timestamp;
+  captured_at: Generated<Timestamp>;
+  device: string;
+  engine: string;
+  is_own_domain: Generated<boolean>;
+  item_type: string;
+  keyword: string;
+  rank_absolute: number;
+  rank_group: number | null;
+  result_domain: string | null;
+  result_title: string | null;
+  result_url: string | null;
+  seo_target_id: string;
+  serp_result_id: Generated<string>;
+  source_run_id: string | null;
+}
+
 export interface GreenhouseGrowthSeoSiteAuditFindings {
   audit_finding_id: Generated<string>;
   audit_run_id: string;
@@ -13053,6 +13071,7 @@ export interface DB {
   "greenhouse_growth.seo_prospect_diagnostics": GreenhouseGrowthSeoProspectDiagnostics;
   "greenhouse_growth.seo_provider_spend_daily": GreenhouseGrowthSeoProviderSpendDaily;
   "greenhouse_growth.seo_rank_snapshots": GreenhouseGrowthSeoRankSnapshots;
+  "greenhouse_growth.seo_serp_top_results": GreenhouseGrowthSeoSerpTopResults;
   "greenhouse_growth.seo_site_audit_findings": GreenhouseGrowthSeoSiteAuditFindings;
   "greenhouse_growth.seo_site_audit_runs": GreenhouseGrowthSeoSiteAuditRuns;
   "greenhouse_growth.seo_targets": GreenhouseGrowthSeoTargets;
