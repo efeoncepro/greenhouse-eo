@@ -263,6 +263,18 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
   a `EO-ORG-0007`): el margen por org del epic sigue medible porque prospección y servicio no se
   mezclan. Estrenó además el colector de competidores (`competitors_domain` + `backlinks/competitors`
   + `domain_intersection`) que `TASK-1662` consumirá.
+- `TASK-1784` — [creada 2026-08-27, backend-data] **Ruteo de selección en la superficie MCP.** Seis de
+  las 20 tools contestan la misma pregunta; el eval de selección va primero y puede cerrar la task.
+- `TASK-1785` — [creada 2026-08-27, backend-data] **La lente como campo del contrato, no como
+  instrucción.** El invariante ●/◑ opera ENTRE tools, donde ninguna puede defenderlo sola.
+- `TASK-1786` — [creada 2026-08-27, backend-data] **Consistencia internacional (hreflang).** Cinco
+  mercados en cartera y cero señal internacional en el audit. Se cosecha del crawl ya pagado.
+- `TASK-1787` — [creada 2026-08-27, backend-data] **Tráfico desde motores de IA.** Cierra la mitad de
+  abajo del embudo AEO: medimos la cita, no su efecto. GA4 ya está conectado.
+- `TASK-1788` — [creada 2026-08-27, backend-critical] **Menciones de marca sin enlace.** La señal que
+  pesa 3× más que los backlinks. Amplía el allowlist a `content_analysis`; coordinar con `TASK-1651`.
+- `TASK-1789` — [creada 2026-08-27, backend-data] **Content decay.** El §3 de la arquitectura lo
+  declara como capacidad y el runtime no lo tiene: cierra la brecha doc↔runtime con dato propio.
 - `TASK-1775` — [creada 2026-08-26, backend-data] **Foto de dominio + trayectoria competitiva.** El
   sujeto que el módulo no sabe describir: hoy los KPIs sólo cubren el recorte seguido. `labs`
   (`domain_rank_overview` mensual · `historical_rank_overview` una vez por sujeto, cuesta 10× ·
