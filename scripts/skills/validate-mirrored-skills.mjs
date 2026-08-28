@@ -134,6 +134,15 @@ const mirroredSkills = [
     claude: '.claude/skills/berel-content-production',
   },
   {
+    // LicitaLAB expone evidencia comercial y documental sobre licitaciones reales. Si Codex y Claude
+    // divergen en tools, estados RAG o límites read-only, uno puede declarar bases leídas cuando siguen
+    // indexando o tratar una primera página como historial completo. El bundle debe ser uno solo.
+    id: 'greenhouse-public-private-tenders',
+    mode: 'byte-identical',
+    codex: '.codex/skills/greenhouse-public-private-tenders',
+    claude: '.claude/skills/greenhouse-public-private-tenders',
+  },
+  {
     /*
      * Entra el 2026-08-25 tras reconciliarla a mano. Los dos bundles ya existian y nadie los
      * validaba: la unica divergencia era el frontmatter de `SKILL.md`, y era la que mas duele —

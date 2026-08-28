@@ -2,6 +2,23 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-28 — LicitaLAB MCP + radar Playwright documentados en skills Codex/Claude
+
+**Estado: `complete`, discovery read-only + primera promoción CRM verificada.** El MCP OAuth expone cinco tools
+read-only y el radar autenticado mantiene credencial/perfil/reporte ignorados bajo `.auth/` con modo `0600`; su
+canary paginado leyó 45 oportunidades. Las skills espejadas separan discovery web, evidencia MCP y promoción humana.
+La prueba aprobada creó Company `57870164778` y deal `64461187076` para `1098710-22-LP26`, en
+`default/qualifiedtobuy`, `Strategic Bets`, CLP 250.000.000; el readback probó Deal↔Company y
+`num_associated_deals=1`, sin contacto ficticio. `gh_commercial_party_id` sigue vacío y el bridge no admite aún
+`public_tender`; automatizar nuevas altas requiere la extensión gobernada. Cada write conserva búsqueda de
+duplicados, confirmación y readback.
+**Frontera corregida por el operador:** LicitaLAB ve licitaciones públicas solamente; toda fila mantiene
+`public_opportunity` y sólo se promueve con `origin='public_tender'`. Nunca se usa para discovery privado ni se
+mezcla con Wherex, Ariba, Coupa u otros portales corporativos. Estado rápido de bid, CRM y postulación:
+`docs/commercial/tenders/LICITATION_CRM_REGISTER.md`; la vista transversal de deals activos vive en
+`docs/commercial/CRM_DEAL_REGISTER.md`. Ambos son índices fechados y siempre requieren readback live; una
+licitación promovida se sincroniza por `deal_id`, mientras el radar sin Deal permanece sólo en bid desk.
+
 ## 2026-08-28 — TASK-1694: contrato de candidatos de discovery — code complete, rollout pendiente
 
 Cerrada en `develop`, sin push. Cinco slices + un fix propio: barrera de enlaces filtrable

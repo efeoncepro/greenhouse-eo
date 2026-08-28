@@ -7,7 +7,7 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-08-28 — MCP oficial de LicitaLAB documentado y gateado para Codex y Claude
+## 2026-08-28 — LicitaLAB: MCP oficial + radar Playwright autenticado y gateado
 
 - La skill espejada `greenhouse-public-private-tenders` incorpora el companion `licitalab-mcp.md` en
   [Codex](.codex/skills/greenhouse-public-private-tenders/licitalab-mcp.md) y
@@ -15,6 +15,35 @@
   de cinco tools read-only, recetas por oportunidad/proveedor/documentos, estados RAG, límites y canary verificado.
   El bundle entra a `pnpm skills:mirrors` para impedir que ambos agentes operen licitaciones reales con contratos
   distintos.
+- `pnpm licitalab:radar:setup` guarda la credencial local ignorada con modo `0600`; `pnpm licitalab:radar`
+  reutiliza un perfil Chrome aislado, pagina la vista autenticada y emite un reporte `efeonce.licitalab-radar.v1`
+  bajo `.auth/`. El canary leyó 45 oportunidades únicas atravesando la primera página. Discovery no postula ni
+  escribe CRM: los códigos pasan al MCP para análisis documental y cualquier promoción a HubSpot conserva
+  confirmación humana, asociación y readback.
+- Frontera canónica explícita: **LicitaLAB ve licitaciones públicas solamente**. Toda fila mantiene
+  `public_opportunity` y cualquier `Proposal` derivada usa `origin='public_tender'`; nunca se interpreta una
+  modalidad pública como `private_rfp` ni se mezcla este radar con Wherex, Ariba, Coupa u otras fuentes privadas.
+- El contrato descubierto de promoción a HubSpot quedó documentado en la skill de licitaciones y en
+  `hubspot-greenhouse-bridge`: upsert por ID + `gh_idempotency_key`, reutilización de Company, asociaciones
+  idempotentes sin contactos ficticios, URL directa, y separación de `fecha_de_cierre_de_licitacion` versus
+  `closedate`. La precedencia es cliente existente → Core; nueva cuenta por Licitación → Strategic Bets; Compra
+  Ágil nueva queda `policy_required`. El bridge actual todavía no transporta esos campos ni resuelve todas las
+  identidades/asociaciones; es contrato objetivo, no capacidad desplegada.
+- La etapa inicial quedó fijada por metadata live: una candidata aprobada entra a `Pipeline de ventas`
+  (`default`) en `Calificado para comprar` (`qualifiedtobuy`), nunca en `Cita programada`; las filas crudas del
+  radar permanecen fuera del CRM. La skill documenta el avance técnico→muestra opcional→precio→formalización→cierre
+  y excluye el pipeline de Shared Selling. El snapshot completo de 99 deals LicitaLAB mostró 95 perdidos, 3 ganados,
+  1 en `appointmentscheduled` y 0 intermedios, por lo que el histórico no se canonizó como workflow.
+- Primera promoción live aprobada y releída: la oportunidad `1098710-22-LP26` creó Company HubSpot `57870164778`
+  y deal `64461187076`, asociado en `default/qualifiedtobuy`, `Strategic Bets`, CLP 250.000.000, con deadline y
+  adjudicación separados. La Company terminó con `num_associated_deals=1`; no se inventó contacto.
+  `gh_commercial_party_id` permanece vacío y la automatización por bridge continúa pendiente.
+- Se creó `docs/commercial/tenders/LICITATION_CRM_REGISTER.md` como índice operativo compartido para Codex y
+  Claude, inicializado con las tres recomendadas del radar. Registra decisión, postulación, fechas, IDs/enlaces y
+  asociaciones sin desplazar las fuentes autoritativas; el histórico de 99 deals permanece sólo en HubSpot.
+- El patrón se extendió a `docs/commercial/CRM_DEAL_REGISTER.md`: vista transversal para negocios Core, Strategic
+  Bets y otros orígenes, con una fila sólo después de verificar el Deal en HubSpot. Las licitaciones promovidas se
+  sincronizan en ambos registros por `deal_id`; las oportunidades todavía en radar permanecen sólo en bid desk.
 
 ## 2026-08-28 — TASK-1694: en descubrimiento SEO, un candidato es una keyword y la dificultad cruda deja de decidir
 
