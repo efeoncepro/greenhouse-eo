@@ -27,6 +27,50 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-08-27 — Slice 1 EJECUTADO: la señal no está en OnPage, y eso cambia el diseño
+
+**El Slice 1 está hecho.** Su resultado no fue el esperado y modifica el diseño de la task, no sólo
+su costo. Queda como `to-do` porque los slices 2–4 siguen pendientes; lo que se cierra es la
+incógnita que bloqueaba decidirlos.
+
+**Qué se verificó, con evidencia:**
+
+1. **Nuestro `task_post` no guarda el HTML.** Manda exactamente cuatro parámetros —`target`,
+   `max_crawl_pages`, `validate_micromarkup: true`, `tag`— (`queue-audit.ts:177-182`). Sin
+   `store_raw_html: true`, el endpoint `raw_html` **no devuelve nada** para los crawls existentes.
+2. **`hreflang` no aparece en ningún endpoint documentado de la familia.** De los 22 de `on_page`,
+   `pages` devuelve `meta` con title/description/**canonical** y un objeto `checks`; `hreflang` no
+   está nombrado en ninguno, y la referencia del proveedor no lo menciona una sola vez.
+3. **Las lecturas post-crawl SÍ son gratis** — verbatim: *"Your account will not be charged for using
+   this function. You can get the results of the task within the next 30 days for free"*. El
+   principio de `TASK-1705` es válido; simplemente **no aplica a esta señal**, porque no está en el
+   payload.
+
+**Conclusión: la fuente es el sustrato propio, no OnPage.** Comparación de los dos caminos:
+
+| Vía | Costo proveedor | Latencia | Alcance |
+|---|---|---|---|
+| OnPage con `store_raw_html: true` | a verificar; sólo crawls **futuros** | un ciclo semanal | requiere re-crawlear |
+| **`@/lib/growth/site-substrate`** (`TASK-1697`, `complete`) | **USD 0** | segundos | inmediato |
+
+Gana el sustrato. Como efecto lateral, **la task deja de depender del ciclo del crawl** y puede correr
+on-demand, lo que la vuelve utilizable también en el carril de prospecto (`TASK-1709`).
+
+🔴 **El hallazgo que cambia el diseño: `hreflang` se audita por RETORNO, y eso cruza hosts.** La
+pregunta no es *"¿esta página declara sus alternas?"* sino *"la página MX declara la CL — ¿la CL
+declara la MX?"*. Y el sustrato, tras el endurecimiento de `TASK-1778`, **sólo permite la familia del
+sujeto y sus descendientes**; cualquier otro dominio registrable devuelve `blocked_redirect`.
+
+| Estructura del cliente | ¿Se puede verificar el retorno? |
+|---|---|
+| Subcarpetas (`marca.com/mx/`) | ✅ mismo host |
+| Subdominios (`mx.marca.com`) | ✅ descendiente |
+| **ccTLD** (`marca.mx` + `marca.cl`) | ❌ **bloqueado por la guarda** |
+
+Eso **no es un defecto**: es la guarda SSRF funcionando. La salida correcta es **un fetch por target,
+cada uno acotado a su propio host, componiendo el cruce en memoria** — nunca relajar la guarda ni
+pedirle al sustrato que persiga un dominio ajeno. Ver `Detailed Spec §3`.
+
 ## Summary
 
 Efeonce opera cinco mercados —`CL`, `MX`, `CO`, `PE`, `US`— y el site audit **no mira una sola señal
@@ -93,7 +137,8 @@ Reglas obligatorias:
 - `greenhouse_growth.seo_site_audit_runs` + `seo_site_audit_findings` (`TASK-1304`, vivo).
 - `src/lib/growth/seo/site-audit/{collect.ts,findings-map.ts,reader.ts}` — donde se materializan los hallazgos.
 - `greenhouse_growth.seo_targets` — la fuente de qué mercados atiende el cliente.
-- Familia `onpage`, ya en el allowlist. **Esta task NO lo amplía.**
+- **`@/lib/growth/site-substrate`** (`TASK-1697`, `complete`) — **la fuente real de la señal**, decidido en el `Delta 2026-08-27`. Trae guarda SSRF, obediencia de `robots.txt`, UA identificable y tope de bytes, todo de `TASK-1778`.
+- Familia `onpage`, ya en el allowlist. **Esta task NO lo amplía** — y tras el Slice 1, tampoco la usa como fuente.
 
 ### Blocks / Impacts
 
@@ -203,17 +248,22 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Inventario del payload (decide el costo de toda la task)
+### Slice 1 — ✅ EJECUTADO 2026-08-27 (ver `Delta 2026-08-27`)
 
-- Verificar **qué trae hoy el crawl OnPage** sobre `hreflang`: si viene en el payload vigente, el
-  costo marginal es USD 0 y el resto de la task es extracción pura.
-- Si **no** viene, declarar qué parámetro lo habilita y **cuánto cuesta**, y parar para decisión del
-  operador antes de activarlo. 🔴 Este slice puede cambiar el `Effort` de la task.
+- Verificado: la señal **no** está en el payload de OnPage y nuestro crawl no guarda `raw_html`.
+- Decisión derivada: **la fuente es `@/lib/growth/site-substrate`**, con costo de proveedor USD 0.
+- Restricción descubierta: la verificación de retorno cruza hosts, y la guarda del sustrato lo impide
+  para clientes con ccTLD. Resuelto con un fetch por target y composición en memoria (`Detailed Spec §3`).
 
-### Slice 2 — Extractor + tipos de hallazgo
+### Slice 2 — Lector por target + extractor puro
 
-- `extractHreflangFindings(crawlPayload, targetsOfOrg)`: puro, sin IO.
-- Tipos: retorno roto, self-reference faltante, `x-default` ausente, código inválido, conflicto con canonical.
+- **Lectura**: un fetch por `seo_target` activo de la organización, cada uno con el sustrato acotado a
+  **su propio host**. Se leen la home y —si existe— las URLs que el propio `hreflang` declara dentro
+  de ese host. Nunca se persigue un dominio ajeno.
+- **Extractor puro** `extractHreflangFindings(perTargetDocs, targetsOfOrg)`: sin IO, recibe lo ya
+  leído y compone el cruce **en memoria**.
+- Tipos: retorno roto, self-reference faltante, `x-default` ausente, código de idioma/región inválido,
+  conflicto entre `hreflang` y canonical.
 - Cruce con los `seo_targets` de la organización para saber qué variantes **deberían** declararse.
 
 ### Slice 3 — Materialización + severidad honesta
@@ -255,6 +305,25 @@ entrenamiento: una postura legítima no es un defecto técnico.
 El disparador no es "¿tiene hreflang?" sino **"¿tiene más de un `seo_target` activo y se declaran
 entre sí?"**.
 
+### 3. El cruce se compone en memoria, y la guarda no se toca
+
+`hreflang` es un contrato **bidireccional**: si `marca.mx/producto` declara `marca.cl/producto` como
+su alterna en es-CL, la página chilena debe declarar la mexicana de vuelta. Un retorno faltante es el
+defecto más común y el que Google penaliza ignorando ambas declaraciones.
+
+Verificarlo exige leer **las dos**. Y cuando el cliente usa ccTLD, esas dos viven en dominios
+registrables distintos, que es exactamente lo que la guarda del sustrato bloquea desde `TASK-1778`.
+
+**La salida NO es relajar la guarda.** Es reconocer que cada `seo_target` de la organización es un
+sujeto legítimo por separado: el target MX autoriza leer `marca.mx`, el target CL autoriza leer
+`marca.cl`. Se hace **un fetch por target, cada uno dentro de su propio host**, y el cruce —¿se
+declaran mutuamente?— se compone **en memoria**, igual que el boundary §1.1 resuelve el cruce
+SEO↔AEO.
+
+Consecuencia operativa: la organización que no tiene declarados sus targets por país **no puede ser
+auditada** en este eje, y eso es correcto — sin declarar qué variantes existen, no hay contra qué
+contrastar. El resultado honesto ahí es `insufficient_targets`, no "sin hallazgos".
+
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
@@ -268,7 +337,9 @@ entre sí?"**.
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
 | Se penaliza a un cliente mono-mercado por no tener `hreflang` | credibilidad | **high** | El disparador es tener >1 target activo, no la ausencia de la etiqueta; test explícito del caso | Cliente cuestionando un `critical` que no aplica |
-| Habilitar un parámetro nuevo del crawl multiplica el costo por página sin que nadie lo note | provider budget | medium | Slice 1 declara el costo antes de activarlo; sin decisión del operador no se prende | Alza en `seo_provider_spend_daily` familia `onpage` |
+| Alguien relaja la guarda del sustrato para poder cruzar ccTLDs y reabre la superficie SSRF de `ISSUE-164` | seguridad | **high** | Regla dura: un fetch por target dentro de su host, cruce en memoria. La guarda no se toca. Revisión de imports y de `resolveProbeUrl` en el PR | PR que modifica la contención de host del sustrato |
+| Una organización sin targets por país se audita igual y produce hallazgos sin sentido | credibilidad | medium | `insufficient_targets` como estado explícito; test del caso | Hallazgos de retorno roto en clientes de un solo país |
+| N fetches por organización golpean el sitio del cliente | cortesía / reputación | medium | Secuencial como el gatherer, UA identificable, `robots.txt` obedecido (ya lo hace el sustrato tras `TASK-1778`), tope de URLs por target | Quejas del cliente o bloqueo del edge |
 | Duplicar la extracción que `TASK-1705` ya hace sobre el mismo payload | mantenimiento | medium | Declarar dirección de reuso en Discovery; la que entre segunda consume a la primera | Dos extractores sobre el mismo crawl |
 | El vocabulario de `issue_type` se congela en la UI de 1671 antes que acá | UI / contrato | medium | Coordinar los tipos con 1671 antes de su cierre | Hallazgos que la UI no sabe renderizar |
 
@@ -339,5 +410,6 @@ entre sí?"**.
 
 ## Open Questions
 
-- ¿La señal viene en el crawl vigente? Lo decide el Slice 1 y cambia el esfuerzo de la task.
+- ~~¿La señal viene en el crawl vigente?~~ **Resuelto 2026-08-27: no.** La fuente es el sustrato propio (`Delta 2026-08-27`).
+- ¿Cuántas URLs por target se leen? La home basta para detectar el patrón, pero el retorno roto puede vivir en páginas internas. Propuesta: home + hasta N URLs declaradas por el propio `hreflang`, con N configurable.
 - ¿`issue_type` tiene CHECK cerrado hoy? Si sí, hace falta migración aditiva.
