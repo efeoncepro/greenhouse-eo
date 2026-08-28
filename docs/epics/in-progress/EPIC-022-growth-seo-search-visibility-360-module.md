@@ -237,12 +237,16 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > rastro. Orden interno: `1694 → 1691 → 1693`, porque las tres tocan el mismo camino de lectura y
 > `src/lib/copy/growth.ts`; en paralelo producirían tres encodings de la misma columna.
 
-- `TASK-1692` — [creada 2026-08-15, backend-data] **Writers del ledger de decisiones de discovery.**
-  De los 5 `action_kind` del enum sólo `dismissed` tiene writer, así que un tercio del modelo de
-  estados es inalcanzable y el guard del bridge promete una re-selección que nadie puede escribir. El
-  hecho lo escribe el **primitive** en su propia transacción, no cada consumer. **Bloquea a
-  `TASK-1700`**: su principio es el que la cola debe obedecer para no crear un segundo libro de
-  decisiones sobre los mismos hechos.
+- `TASK-1692` — [**`complete` 2026-08-28**, `code complete, rollout pendiente`, backend-data]
+  **Writers del ledger de decisiones de discovery.** El hecho lo escribe el **primitive** que lo
+  produce, dentro de su transacción: `createGroundedQueryDraft` deja `selected_for_grounded_query`
+  y `applyKeywordTracking` deja `promoted_to_tracking` en la MISMA transacción que abre la
+  membresía. Los dos lanes validan contra `SEO_DISCOVERY_CONSUMER_ACTION_KINDS`, así que un
+  consumer ya no puede "reportar" un outcome. `selected_for_target` quedó retirado del enum TS
+  (`CHECK` intacto) y hay un guard de cobertura que falla si un kind queda sin writer. Efecto
+  visible sin cambio de UI: el chip se mueve solo y el inbox deja de poner arriba lo ya resuelto.
+  Verificado contra PG real (11/11 + 12/12, transacciones que abortan). **Levanta el último bloqueo
+  de `TASK-1700`**, que queda `Blocked by: none`.
 - `TASK-1693` — [creada 2026-08-15, ui-ux] **Paginación por cursor + las fuentes de seed no
   cableadas.** El reader pagina y devuelve `nextCursor`; la page lo descarta. Y de las cinco fuentes
   que el primitive soporta sólo `manual` está cableada — la de Search Console, la de mejor oficio

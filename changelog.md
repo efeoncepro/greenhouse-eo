@@ -45,6 +45,40 @@
   Bets y otros orígenes, con una fila sólo después de verificar el Deal en HubSpot. Las licitaciones promovidas se
   sincronizan en ambos registros por `deal_id`; las oportunidades todavía en radar permanecen sólo en bid desk.
 
+## 2026-08-28 — TASK-1692: el candidato de discovery recuerda qué se decidió sobre él
+
+- **El hecho lo escribe el primitive que lo produce, jamás el consumer.** De los cinco
+  `action_kind` que el dominio declaraba, sólo `dismissed` tenía writer: preparar consultas AEO o
+  promover a seguimiento pasaban de verdad y no dejaban rastro. Ahora `createGroundedQueryDraft`
+  escribe `selected_for_grounded_query` y `applyKeywordTracking` escribe `promoted_to_tracking`
+  **en la misma transacción que abre la membresía**. Si el writer viviera en cada consumer,
+  bastaría con que se cayera la red entre las dos llamadas para dejar el compromiso de gasto hecho
+  y la decisión sin autor.
+- **Guard en runtime, no sólo en test:** los dos lanes validan contra
+  `SEO_DISCOVERY_CONSUMER_ACTION_KINDS`, así que `promoted_to_tracking` deja de ser escribible
+  desde afuera. `record_action` queda para lo que una persona decide sin que ningún command lo
+  produzca — descarte, rechazo y la **re-selección** de un descartado, que ahora existe y no
+  necesitó ni command nuevo ni migración: el ledger es append-only, así que re-seleccionar ES
+  escribir una decisión posterior que supersede al descarte.
+- **`selected_for_target` retirado del enum TS**, con el `CHECK` de la base intacto para que una
+  fila histórica siga siendo legible. No tenía writer y no podía tenerlo: la intención es atributo
+  de la MEMBRESÍA con autor y fecha, así que un candidato que no se sigue no puede tener intención
+  declarada.
+- **Efecto visible sin un solo cambio de UI:** el chip del candidato se mueve solo (deja de decir
+  "Nuevo" tras un draft AEO o una promoción) y el inbox deja de poner arriba lo ya resuelto.
+- **Los grados de atomicidad se declaran, no se disimulan.** Tracking es atómico. El bridge grounded
+  no puede serlo —el draft se escribe en otra conexión— así que expone `decisionLogged: false` +
+  aviso en vez de callarlo o descartar un draft que ya pagó una llamada LLM; repetir la acción
+  repara la fila sin crear un draft nuevo.
+- Sin migración, sin flag, sin capability. **Sin backfill a propósito**: inventar `actor` y
+  `created_at` sería fabricar autoría en un log de decisiones.
+- Verificado contra PG real en transacciones que abortan (11/11 + 12/12), incluido que con un
+  candidato inexistente **no queda membresía**. Tres falsos verdes destapados en el camino: el
+  check del trigger append-only pasaba sobre tabla vacía (es `FOR EACH ROW`), un mock devolvía la
+  fila del target para cualquier consulta, y el parser del guard nuevo devolvía lista vacía.
+- Estado: **`code complete, rollout pendiente`** — falta verificación funcional en staging.
+  Desbloquea `TASK-1700`, que queda `Blocked by: none`.
+
 ## 2026-08-28 — TASK-1694: en descubrimiento SEO, un candidato es una keyword y la dificultad cruda deja de decidir
 
 - **`maxDifficulty` se acepta pero ya no filtra**, y la respuesta lo declara en `ignoredFilters`
@@ -768,14 +802,3 @@
 - Arquitectura, manuales, issue/tasks y skills de Talento/Arquitectura/Secret Hygiene quedaron sincronizados. El
   runbook global de Resend fija orden de migraciones, índice concurrente, webhook firmado, reconciliación,
   `click_tracking=false`, smokes y rollback. Todo sigue `code complete, rollout pendiente`.
-
-## 2026-08-19 — El reenvío gobernado de tests ya tiene command seguro
-
-- La recuperación por email genera un acceso nuevo sin duplicar el test, conserva el plazo cuando la evaluación
-  ya comenzó y registra actor, motivo y resultado sin guardar el enlace secreto.
-- Si Resend acepta y el proceso cae antes de cerrar la operación, el sistema reconcilia el receipt desde evidencia
-  durable sin enviar otro correo ni invalidar nuevamente el enlace; Platform Health muestra el drift restante.
-- HTML y texto plano distinguen despacho de entrega, invalidan enlaces anteriores y, para tests en curso, piden
-  continuar de inmediato con el deadline expresado en hora de Chile.
-- El command está validado localmente, pero sigue inaccesible: el tipo de correo está OFF y faltan la sesión
-  HttpOnly, API autorizada, migraciones, índice y smokes antes de cualquier activación.

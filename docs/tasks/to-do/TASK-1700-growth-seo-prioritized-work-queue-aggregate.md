@@ -1,5 +1,32 @@
 # TASK-1700 — Growth SEO: la cola priorizada de trabajo es un aggregate persistido con score versionado
 
+## Delta 2026-08-28 (2) — DESBLOQUEADA: el último bloqueador cerró
+
+`TASK-1692` cerró (`code complete, rollout pendiente`), así que `Blocked by` pasa a `none`:
+`TASK-1699` ya estaba satisfecho en código desde el 2026-08-28 y era el único otro.
+
+Lo que la cola hereda y **no** debe reinventar:
+
+- 🔴 **El principio que su `recordSeoWorkQueueDecision` obedece ya está vigente:** el hecho lo
+  escribe el PRIMITIVE que lo produce, jamás el consumer. La frontera es nítida y la cola **no
+  inventa una tercera categoría**: `record_action` para lo que una persona decide sin que ningún
+  command lo produzca; el primitive para lo que un command produce. Si la cola escribiera su propio
+  log de las mismas decisiones, abriría el segundo libro sin transacción que los reconcilie — que
+  es exactamente lo que esta dependencia existía para evitar.
+- **Hay una variante transaccional lista:** `appendDiscoveryActionTx(client, input)` participa de la
+  transacción del caller. Un log de decisiones de la cola que deba ser atómico con su outcome usa
+  ese shape, no uno nuevo.
+- **La idempotencia se deriva del outcome DURABLE**, nunca de `actor`: la clave automática colapsa
+  dos decisiones distintas de la misma persona en una sola fila.
+- **Los grados de atomicidad se DECLARAN.** Cuando un outcome vive en otra conexión y no se puede
+  ser atómico, se dice en el contrato (`decisionLogged: false` + aviso), no se calla ni se resuelve
+  tumbando el outcome caro.
+
+⚠️ **Salvedad de rollout, vigente para las DOS dependencias:** ni `TASK-1694` ni `TASK-1692` se han
+promovido a producción. No tomes el primer snapshot contra un runtime que todavía sirva el contrato
+viejo — verifica la promoción antes de arrancar el Slice 1.
+
+
 ## Delta 2026-08-28 — el bloqueo duro de `TASK-1694` quedó levantado (con una salvedad)
 
 `TASK-1694` cerró como **`code complete, rollout pendiente`**. Lo que la cola necesitaba que
@@ -100,7 +127,7 @@ serie del top-N arranca con el primer deploy del worker post-release y los candi
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo`
-- Blocked by: `TASK-1692` · `TASK-1699` (sólo para el origen `competitor_gap`; los otros cuatro orígenes no la necesitan — satisfecho en código desde 2026-08-28, ver Delta)
+- Blocked by: `none` (último bloqueador cerrado el 2026-08-28; ver Deltas) (sólo para el origen `competitor_gap`; los otros cuatro orígenes no la necesitan — satisfecho en código desde 2026-08-28, ver Delta)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

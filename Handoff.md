@@ -19,6 +19,44 @@ mezcla con Wherex, Ariba, Coupa u otros portales corporativos. Estado rápido de
 `docs/commercial/CRM_DEAL_REGISTER.md`. Ambos son índices fechados y siempre requieren readback live; una
 licitación promovida se sincroniza por `deal_id`, mientras el radar sin Deal permanece sólo en bid desk.
 
+## 2026-08-28 — TASK-1692: ledger de decisiones de discovery — code complete, rollout pendiente
+
+Cerrada en `develop`. Cinco slices: append transaccional (`appendDiscoveryActionTx`), el bridge y
+el camino de tracking escribiendo su propio hecho, re-selección, guard de cobertura de writers y
+docs. Sin migración, sin flag, sin capability.
+
+**Tres cosas que un próximo turno necesita saber:**
+
+1. 🔴 **Un test que se rompe por hacer lo correcto es un test mal escrito.** El boundary test del
+   bridge decía "el bridge no ejecuta SQL de tablas"; escribir el ledger lo rompía. La salida
+   barata era relajar el regex. Se reescribió sobre el invariante REAL de §1.1 (nada de `grader_*`,
+   ningún JOIN cruzando motores, y el bridge no COMPONE candidatos con SQL propio). Si vuelve a
+   pasar con otro gate del dominio, ése es el criterio.
+2. **Tres falsos verdes destapados verificando, no leyendo:** el check del trigger append-only
+   pasaba sobre tabla vacía (es `FOR EACH ROW` — no dispara sin filas); el mock de
+   `track-keywords.test.ts` devolvía la fila del TARGET para cualquier consulta, así que el chequeo
+   de tenant pasaba siempre; y el parser del guard nuevo devolvía lista vacía porque se cortaba en
+   el `[]` de la anotación de tipo. Los tres habrían quedado verdes por la razón equivocada.
+3. **El ledger estaba VACÍO en producción** (0 filas, ni un `dismissed`) al momento del cambio. Por
+   eso retirar `selected_for_target` del enum no creó ninguna fila ilegible, y por eso el backfill
+   se descartó sin costo.
+
+**Pendientes de rollout (no cerrar como "listo" sin esto):**
+
+- Verificación funcional en staging de los dos caminos (grounded y tracking) + el lane ecosystem
+  con binding `internal`, y el caso `capacity_exceeded` confirmando que NO se escribió fila.
+- Promoción a producción; observar 7 días `seo_track_keywords_command` y
+  `seo_grounded_query_bridge_decision_log`.
+- Avisarle al operador de SEO que el orden del inbox cambia (lo resuelto deja de encabezar). Ya
+  está escrito en el manual.
+
+**`TASK-1700` (P0) queda `Blocked by: none`** — era su último bloqueador. Su Delta lleva la
+salvedad de no tomar el primer snapshot contra un runtime que todavía sirva el contrato viejo:
+ni 1694 ni 1692 se han promovido.
+
+**Follow-up `ui-ux` declarado:** el affordance visible de re-selección en el drawer. El camino
+server existe; el botón no. El comentario del drawer ya lo dice.
+
 ## 2026-08-28 — TASK-1694: contrato de candidatos de discovery — code complete, rollout pendiente
 
 Cerrada en `develop`, sin push. Cinco slices + un fix propio: barrera de enlaces filtrable
@@ -264,6 +302,7 @@ resolvers. El adapter de AI Mode migró al transporte canónico con `consumer: '
 
 **Dos defectos reales que la spec no tenía, encontrados ejercitando el SQL contra PG y no
 leyéndolo:**
+
 1. Con la clave única de 4 columnas, un dólar `estimated` colisionaba con la fila `invoiced` del
    mismo día y entraba por el `DO UPDATE`, que suma el monto pero **no toca `cost_basis`** — quedaba
    reetiquetado como facturado, sin error. La clave pasó a SEIS columnas con `NULLS NOT DISTINCT`
@@ -552,44 +591,8 @@ de ambas.
 
 **Desbloqueadas:** `TASK-1670` (site probes en el audit SEO), `TASK-1709` (diagnóstico de prospecto — su Slice 2b ya tiene de dónde consumir) y `TASK-1701`; `TASK-1713` (mitad B: rule universal + barrel AEO) sigue tras `TASK-1695`. **Post-push:** vigilar `growth.ai_visibility.probe_failure_rate` en steady (el refactor es shim-idéntico; el canario confirma). Follow-up declarado: retirar los shims reescribiendo los 7 consumers al barrel, tras una release asentada.
 
-## 2026-08-27 — Las tres capacidades de mercado que faltaban en SV360, y de dónde salió ISSUE-164
-
-**Estado: cuatro tasks creadas, `to-do`; sin runtime.** `TASK-1775` (foto de dominio + trayectoria:
-`domain_rank_overview` mensual · `historical_rank_overview` como backfill único porque cuesta 10× ·
-`bulk_traffic_estimation`), `TASK-1776` (visibilidad por URL/subdominio/subcarpeta: **una** capacidad
-con resolver de sujeto, no tres módulos — lo que Semrush vende como tres áreas es un endpoint con el
-`target` cambiado) y `TASK-1777` (detalle nominal de enlaces, con el drill-down condicionado al
-`new_lost_delta` que lleva meses persistido sin un solo lector). Ninguna amplía el allowlist de
-familias DataForSEO: los diez endpoints son `labs` y `backlinks`. `TASK-1776` nace como **tercer
-productor** de `seo_keyword_market_data` — el `keyword_info` viene inline y ya pagado en
-`ranked_keywords`.
-
-**El origen de `ISSUE-164`.** El barrido salió de preguntar si podíamos dejar de pagar Semrush. Al
-habilitar la evidencia de sitio sobre prospectos (`Delta 2026-08-26` de `TASK-1709`: la prohibición
-de fetch propio era por SSRF, no por política, y se reemplazó por delegación), la auditoría del
-fetcher destapó cuatro defectos y dos eran de seguridad. La premisa inicial del issue —"staging ON,
-prod OFF, no es incidente vivo"— **era falsa**: salió de leer el `FEATURE_FLAG_STATE_LEDGER`, cuyo
-snapshot se generaba con `vercel env ls`, estructuralmente ciego a los flags del ops-worker. La
-corrigió `greenhouse-eo-a4`; su propia corrección conservaba una segunda afirmación falsa (que el
-target era el dominio de un cliente cargado por un operador) y se cerró con la cadena verificada del
-intake público anónimo. **Lección portátil: medir el interruptor no es medir el alcance.**
-
-**Decisiones de oficio tomadas y registradas en `TASK-1778`:** se obedece `robots.txt` matcheando
-**nuestro** token con fallback a `*`, jamás los grupos de los bots auditados — matchearnos contra
-ellos nos dejaría fuera justo de los sitios cuyo bloqueo es el hallazgo más valioso. Y `TASK-1281`
-**no** sube de prioridad: Chromium reduce la frecuencia del falso negativo, no su clase; el defecto
-es que `res.ok` se lee como *"observé la página"* cuando sólo significa *"recibí bytes"*, y ese
-invariante se absorbió en `TASK-1778`.
-
-**Pendiente:** decisión del operador sobre la mitigación interina mientras el fix de `TASK-1778` no
-esté en producción con su flag ON.
-
 ## 2026-08-27 — TASK-1778 cerrada: el fetcher de probes quedó defendible Y desplegado
 
 **Estado: `complete`; ISSUE-164 `resolved`.** Cutover aplicado el mismo día del merge: `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED=true` en el ops-worker (revisión `ops-worker-00598-459`, 100% — worker ÚNICO staging+prod, o sea la cadena viva del intake público) + declarativo en `deploy.sh` + Vercel `staging`. La regla de saltos se extendió a subdominios DESCENDIENTES del sujeto con evidencia de cartera (`www.bancochile.cl → sitiospublicos.bancochile.cl`); cross-registrable (`berel.com.mx → berel.com`) sigue bloqueado, sin PSL. Verificación: 7 dominios vivos en strict (6 ok; bancochile ya fallaba con la red vieja — Imperva, caso `TASK-1281`) + corrida real `EO-GRUN-00048` (SKY, full, 5 motores) verde: 13 probes, cero `blocked_*` falsos, apex→www seguido y medido.
 
 **Residuales con dueño y fecha (ledger § Pendientes):** (1) revisión Sentry 2026-08-29 de `blocked_redirect`/`blocked_private_address` (48 h; volumen alto = guarda estricta, rollback <5 min con flag a false en deploy.sh + `--update-env-vars`); (2) env var en Vercel **Production** SOLO con el release que lleve el código a `main` (ISSUE-150) — hasta entonces el path inline prod (admin `light`) conserva la red vieja; el path público async ya está contenido. La mitigación interina que se le propuso al operador (apagar `PROBES`) quedó obsoleta: el fix real está vivo.
-
-## 2026-08-27 — TASK-1696 adopta la señal de presupuesto que faltaba
-
-**Estado: spec sincronizada; implementación pendiente.** La task ahora incluye `seo.provider.cost_over_budget`: nueve tasks la citaban como mitigación, pero el barrido verificó que no existe en código. Entra junto a la dimensión `consumer` para no sub-reportar el gasto del grader; README y registry ya reflejan las tres señales.

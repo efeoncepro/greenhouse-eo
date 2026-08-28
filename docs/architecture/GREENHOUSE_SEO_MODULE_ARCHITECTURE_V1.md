@@ -440,6 +440,71 @@ cablea al cliente público compartido"; el camino correcto es `TASK-1631`).
     representante y orden. **El caso de fusión no existe todavía en datos reales** (una sola
     corrida productiva, 10 candidatos de un solo método): el colapso es preventivo y llega antes
     del primer snapshot de `TASK-1700`, que es exactamente su razón de ser.
+
+  **Delta TASK-1692 (2026-08-28) — el ledger de decisiones lo escribe el primitive que produce el
+  hecho, jamás el consumer.** Sin migración, sin flag, sin capability nueva.
+
+  - 🔴 **La regla.** Si un command produce un outcome que el ledger debe recordar, la fila se
+    escribe DENTRO de ese command y de su transacción. Un consumer que encadena un `record_action`
+    para "reportar" lo que ya pasó es la forma de que el ledger mienta el día que la segunda
+    llamada falle: entre la llamada que produce el outcome y la que lo registra hay una red, y
+    cuando se cae queda el compromiso de gasto hecho y la decisión sin autor. Con tres consumers
+    (UI, Nexa, lane MCP) y dos kinds son seis lugares donde la disciplina puede fallar; el séptimo
+    es el consumer que se escriba el año que viene. Full API Parity deja de ser un checklist por
+    consumer y pasa a ser una propiedad estructural.
+  - **Quién escribe cada `action_kind`:**
+
+    | Kind | Writer | Transacción |
+    |---|---|---|
+    | `dismissed`, `rejected` | consumer, vía `record_action` — decisión HUMANA pura | propia |
+    | `selected_for_grounded_query` | `createGroundedQueryDraft` (+ re-selección humana explícita, `metadata.reason='reselected'`) | la del advisory lock del bridge |
+    | `promoted_to_tracking` | `applyKeywordTracking` | **la misma que abre la membresía** |
+
+    Los dos lanes validan contra `SEO_DISCOVERY_CONSUMER_ACTION_KINDS`, así que
+    `promoted_to_tracking` **no es escribible desde afuera**. El guard vive en runtime, no sólo en
+    un test.
+  - **`selected_for_target` quedó RETIRADO del enum TS**, con el `CHECK` de la base intacto (una
+    fila histórica debe seguir siendo legible). No tenía writer y no podía tenerlo: la intención
+    (`target|opportunity`) es un atributo de la MEMBRESÍA con autor y fecha (TASK-1659), así que un
+    candidato que no se sigue no puede tener intención declarada. "Declarar objetivo" ES
+    `trackKeywords` con `intent: 'target'`, y su hecho se registra como `promoted_to_tracking` con
+    `metadata.intent`. Conservarlo no era neutro: `record_action` aceptaba cualquier kind del enum,
+    o sea que quedaba una puerta para escribir —y pintar— un estado de negocio que ningún command
+    produjo.
+  - **Grados de atomicidad, declarados sin adornos.** Los dos caminos NO tienen la misma garantía:
+
+    | Camino | Garantía | Residuo |
+    |---|---|---|
+    | Tracking | **Atómica**: o hay membresía y fila, o no hay ninguna | ninguno |
+    | Grounded | El draft se escribe en OTRA conexión (`authorGraderPromptSetDraft`) | el draft puede existir sin la fila |
+
+    El residuo grounded se DECLARA (`decisionLogged: false` + `decisionLogNotice`), nunca se
+    resuelve en silencio ni tumba la respuesta: el draft ya existe y ya pagó una llamada LLM, así
+    que devolver error diría que no pasó nada. El append es idempotente y **el camino deduped
+    también escribe**, así que repetir la acción repara la fila sin crear un draft nuevo.
+  - **Procedencia de discovery en el camino de tracking:** `TrackKeywordsOptions.discoveryProvenance`
+    (opcional) ata keyword → candidato → corrida. Responde la pregunta que ningún otro store
+    contesta —*esta membresía nació de ESTE candidato, decidida por ESTA persona*— y **no** es un
+    segundo almacén de "esta keyword se está midiendo": eso lo sigue diciendo
+    `seo_keyword_set_members`, y `alreadyTracked` sigue derivando de ahí. Fila sólo para `tracked`,
+    `already_tracked` e `intent_changed`; **cero** para `capacity_exceeded` e `invalid` (no hubo
+    promoción). Una procedencia que no se puede probar falla CERRADA
+    (`invalid_discovery_provenance`, validada antes de abrir la transacción): una membresía
+    atribuida a un candidato inverificable sería atribución cross-tenant en un log de auditoría.
+  - **Supersede la decisión de TASK-1665 Slice 4** ("seguir/declarar NO escribe además una fila")
+    quitándole sus dos premisas: no es un segundo almacén del mismo hecho, y sí hay transacción —
+    que era justo la objeción. Esa decisión era correcta **para un writer que vive en la UI**.
+  - **Efecto visible sin cambio de UI:** el candidato pasa a mostrar su estado real tras cada
+    acción, y el inbox deja de poner arriba lo ya resuelto (antes un candidato promovido no dejaba
+    fila y encabezaba la lista como lo más pendiente que había).
+  - **Sin backfill, a propósito:** no se puede reconstruir con honestidad quién decidió qué antes de
+    que el writer existiera; inventar `actor` y `created_at` sería fabricar autoría en un log de
+    decisiones. Verificado: el ledger estaba **vacío** (0 filas) al momento del cambio.
+  - Verificación runtime contra PG real, en transacciones que abortan: append transaccional 11/11
+    (inserta, dedupea a la misma fila, anti-oracle, el trigger append-only rechaza UPDATE y DELETE)
+    y atomicidad del tracking 12/12 (membresía y fila en la misma tx; con candidato inexistente
+    **no queda membresía**). Scripts: `scripts/growth/_sanity-task-1692-decision-ledger.ts` y
+    `_sanity-task-1692-tracking-atomicity.ts`.
 - `setBacklinkTracking(targetId, competitors[], actor)`
 
 **Readers (shape + latency, muchos consumers):**

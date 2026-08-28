@@ -1,5 +1,32 @@
 # TASK-1660 — Growth SEO: superficie de keywords OBJETIVO y avance contra objetivo
 
+## Delta 2026-08-28 — el formato de procedencia que esta lente hereda (TASK-1692)
+
+`TASK-1692` agregó `TrackKeywordsOptions.discoveryProvenance` — `{ candidateId, runId }`, opcional
+— para atar una promoción al candidato de discovery del que nació. Cuando se declara, el command
+escribe una fila `promoted_to_tracking` en el ledger de decisiones, **dentro de la misma
+transacción** que abre la membresía, con `metadata` `{ outcome, intent?, keywordSetId, runId }`.
+
+Qué significa para la lente `Objetivos`:
+
+- **Si declaras objetivos desde un candidato de discovery**, pasa la procedencia y el hecho queda
+  registrado solo. **NUNCA** encadenes un `record_action` para reportarlo: el lane lo rechaza a
+  propósito (`promoted_to_tracking` no está en `SEO_DISCOVERY_CONSUMER_ACTION_KINDS`), porque el
+  hecho lo escribe el primitive que lo produce.
+- **Si la declaración NO nace de un candidato** —el caso natural de esta lente, que reclasifica
+  membresías vigentes— la procedencia se omite y el comportamiento es idéntico al de hoy. Lo que
+  esta task debe DECIDIR y escribir es si la reclasificación merece su propia procedencia (para
+  distinguir "promovida desde discovery" de "reclasificada desde Objetivos") o si declara
+  explícitamente que no la tiene. Lo que no puede hacer es inventar un segundo formato de metadata.
+- ⚠️ Una procedencia que no se puede probar falla **CERRADA** (`invalid_discovery_provenance`,
+  validada antes de abrir la transacción). Si esta lente promueve en lote, cada candidato declarado
+  tiene que ser verificable o el lote entero se detiene.
+
+Nota relacionada: `selected_for_target` quedó retirado del enum TS (no tenía writer y no podía
+tenerlo — la intención es atributo de la membresía). Si esta lente necesitara un estado de
+"preseleccionado como objetivo" ANTES de comprometer gasto, sería vocabulario nuevo con su propio
+writer y su migración del `CHECK`, no la resurrección del retirado.
+
 ## Delta 2026-08-28 — `clusterConflict` ya existe: la advertencia previa a declarar objetivos en lote
 
 Cerrado por `TASK-1694`. El reader canónico `readKeywordDiscovery` expone por candidato

@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-08-14 por Claude (TASK-1665)
-> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1694 — una keyword por fila, aviso de canibalizacion y el filtro de dificultad deja de decidir)
+> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1692 — el estado del candidato se mueve solo, la bandeja reordena lo ya decidido y un descartado se puede volver a elegir; delta previo TASK-1694 — una keyword por fila, aviso de canibalizacion y el filtro de dificultad deja de decidir)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §7, §9 y §10.4
 
 # Descubrir keywords — Expandir seeds y decidir por candidato
@@ -162,9 +162,35 @@ correcto. Si lo mandas y el conteo no baja, no es un error: es el contrato dicie
 El filtro que si decide es el de **barrera de enlaces**, y por defecto **deja fuera lo que no tiene
 dato medido** — pedirlo incluido es una opcion explicita, porque "Sin dato" no es "Baja".
 
+### El estado del candidato ahora se mueve solo (desde 2026-08-28)
+
+Antes, el chip cambiaba sólo al descartar. Preparar consultas AEO o promover a seguimiento pasaban
+de verdad, pero el candidato seguía diciendo `Nuevo`. Ya no: cada decisión queda registrada por el
+proceso que la produce, y el chip refleja lo que realmente pasó.
+
+Dos cosas que vas a notar sin que nada de la pantalla haya cambiado:
+
+- **La bandeja se reordenó.** Lo que ya decidiste baja; arriba queda lo que espera decisión. Si te
+  parece que "se perdieron" candidatos, no se perdieron: bajaron porque ya los resolviste.
+- **Un descartado se puede volver a elegir.** El historial sólo agrega, nunca borra: volver a
+  elegirlo escribe una decisión nueva que reemplaza al descarte, y el candidato vuelve a ser
+  elegible para preparar consultas AEO.
+
+### Qué NO se registra, y por qué
+
+Si intentas seguir una keyword y el target está en su techo, **no queda registro de promoción** —
+porque no hubo promoción. Anotar un intento fallido como si hubieras promovido sería justo la clase
+de dato que después hace que un reporte mienta.
+
+Sí queda registro cuando la keyword **ya estaba** en seguimiento: tomaste la decisión igual, aunque
+el resultado no mueva el conteo.
+
 ### Estados del candidato
 
-`Nuevo` · `Ya seguido` · `Marcado como objetivo` · `Descartado` · `Preparando AEO`.
+`Nuevo` · `Ya seguido` · `Descartado` · `Preparando AEO`.
+
+> `Marcado como objetivo` dejó de existir como estado propio: declarar objetivo **es** seguir la
+> keyword con esa intención, así que su estado es `Ya seguido` y la intención viaja con él.
 
 ### Estados de la corrida
 
