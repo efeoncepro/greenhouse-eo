@@ -7,6 +7,20 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-28 — TASK-1662: keyword gap competitivo (code complete, rollout pendiente)
+
+- El módulo SEO gana la fundación de su tercera pregunta ("¿qué me estoy perdiendo entero?"):
+  competidores DECLARADOS con autoría acoplada por CHECK (`declareCompetitors`/`retireCompetitors`,
+  techo por target, outbox `growth.seo.competitor.*`, 3 lanes + tools MCP federadas en local),
+  captura de cobertura vía `labs/domain_intersection` (flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED`
+  OFF + scheduler `ops-seo-competitor-coverage` pausado; run ledger anti fuga de re-compra;
+  mercado compartido productor #4 a costo 0) y `readKeywordGap` que DERIVA el gap al leer:
+  exclusión por GSC medido, contenido vs optimización vs objetivos declarados, factores con
+  `sin_dato` y **sin orden propio** (la cola de TASK-1700 es la autoridad de orden). Migración
+  `20260828113457119` aplicada; sanity 22/22 contra PG real. Slice 4 (emisión a la cola)
+  bloqueado por TASK-1700; rollout con autorización del operador
+  (`docs/manual-de-uso/growth/operar-gap-competitivo-seo.md`).
+
 ## 2026-08-28 — Outreach de partnership para agencias con Higgsfield y Magnific
 
 - Investigación vigente y formularios enterprise enviados a ambos providers para explorar un partnership de agencia
@@ -699,20 +713,3 @@
   Sin contacto, PDF crudo, ranking, decisiones, writes ni acceso B2B.
 - La UI operator-only quedó compactada y validada GVC 4,82/5; su último ajuste visual aún espera promoción
   ordinaria. TASK-1742/1718 conservan observación, rollback y firmas pendientes.
-
-## 2026-08-18 — Un dato de prueba de Hiring ya no puede hacerse pasar por un candidato real
-
-- **La procedencia ahora es un hecho declarado, no una adivinanza.** Cada persona y cada vacante dice
-  si representa algo del mundo real, y la postulación lo hereda de ambas. Antes la única forma de
-  distinguir un seed de un candidato era adivinar por el nombre, y esa adivinanza falla en las dos
-  direcciones: hay una respuesta REAL de un candidato que dice "pequeñas pruebas o pilotos" y que un
-  barrido por regex habría borrado como basura.
-- **Omitir la declaración deja el dato visible, nunca oculto.** Es deliberado: la suciedad es molesta
-  y evidente; perder un candidato real sería grave e invisible.
-- **Una vacante de prueba ya no se puede publicar.** Ocho llegaron a estar publicadas en el careers
-  real y que ningún candidato externo postulara fue suerte. La guarda bloqueó el día uno al smoke que
-  las creaba, que además nunca limpiaba lo que dejaba.
-- **La IA deja de poder calibrarse contra respuestas inventadas.** El gold set excluye datos sintéticos
-  sin interruptor para volver atrás: es evidencia de un gate de promoción, no una preferencia.
-- **El desk podrá dejar de contar fantasmas**, detrás de un flag que nace apagado y con aviso previo a
-  HR, porque 12 de 14 vacantes son sintéticas y sin contexto eso se lee como pérdida de datos.

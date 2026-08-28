@@ -1,5 +1,24 @@
 # TASK-1699 — Growth SEO: persistir el top-N del SERP que ya se paga
 
+## Delta 2026-08-28 — el command de declaración YA EXISTE (TASK-1662): consumirlo, no recrearlo
+
+`TASK-1662` aterrizó primero la mitad "declaración" de esta task:
+
+- `seo_competitors` ya NO es huérfana ni carece de autoría: la migración `20260828113457119`
+  agregó `declared_by/declared_at/declared_source` (CHECK acoplado, vocabulario canónico),
+  `proposal_ref` **OPACA** y `retired_by/retired_reason` (CHECK con `effective_to`).
+- Los commands gobernados existen: `declareCompetitors`/`retireCompetitors`
+  (`src/lib/growth/seo/competitors.ts`), con techo `GROWTH_SEO_COMPETITORS_PER_TARGET`,
+  outcome por ítem, outbox `growth.seo.competitor.{declared,retired}` y 3 lanes
+  (admin + ecosystem internal-only + MCP `declare/retire_seo_competitors`).
+
+**Lo que esta task conserva** es su núcleo irrecuperable: persistir el top-N ya pagado +
+el **reader de candidatos** por recurrencia medida. Su forma propose→confirm se completa
+llamando `declareCompetitors(..., { proposalRef: '<referencia opaca al top-N>' })` — el
+`proposal_ref` existe exactamente para eso. **NUNCA** crear un segundo command de
+declaración ni tocar las columnas de autoría: `competitor-discovery.ts` queda acotado al
+reader proponedor.
+
 ## Delta 2026-08-27
 
 - TASK-1696 ya aterrizó en `src/lib/growth/seo/rank-capture.ts`: la llamada al transporte declara

@@ -1360,3 +1360,15 @@ El screening (`estimateDomainTraffic`) **no emite**: es una corrida on-demand si
 | `growth.seo.url_visibility.snapshot_captured` | v1 | `seo_target` (`seot-{uuid}`) cuando la corrida es target-bound (batch mensual); `organization` (`organization_id`) para corridas on-demand sin target | command `captureUrlVisibility` (`src/lib/growth/seo/url-visibility/capture.ts`), tras persistir snapshots de la corrida (sólo si `captured > 0` o `noMarketData > 0`) | ninguno todavía — rastro de auditoría de una corrida que COMPROMETE GASTO |
 
 **Payload v1**: `{ organizationId, seoTargetId, locationCode, languageCode, subjects, captured, noMarketData, marketRowsWritten, costUsd, actor: 'ops_worker' }` — coordenadas y resumen, nunca las keywords: cualquier consumer futuro **re-lee PG**. `marketRowsWritten` registra el efecto lateral del tercer productor (el `keyword_info` inline escrito al mercado con costo 0). Los colectores de concentración (`relevant_pages`/`subdomains`) **no emiten**: on-demand sin downstream, gasto en el ledger por construcción. La constante vive en el dominio (`contracts.ts`) — seam §17.3.
+
+## Delta 2026-08-28 — TASK-1662: `growth.seo.competitor.declared` / `.retired` (competidores declarados)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `growth.seo.competitor.declared` | v1 | `seo_target` (`seot-{uuid}`) | command `declareCompetitors` (`src/lib/growth/seo/competitors.ts`), **dentro de la misma transacción** que inserta las declaraciones y sólo si el estado REALMENTE cambió (`inserted > 0`; el no-op idempotente no emite) | ninguno todavía — es **rastro de auditoría de un compromiso de gasto** (la captura de cobertura paga por cada competidor vigente en cada ciclo), no un disparador de proyección |
+| `growth.seo.competitor.retired` | v1 | `seo_target` (`seot-{uuid}`) | command `retireCompetitors` (mismo archivo), en la transacción que cierra las vigencias y sólo si cerró alguna (`closed > 0`) | ninguno — mismo rastro; el retiro corta el gasto del próximo ciclo |
+
+**Payload v1 `declared`**: `{ seoTargetId, organizationId, declaredCount, declaredDomains, activeCompetitorCount, proposalRef, source, actor }`.
+**Payload v1 `retired`**: `{ seoTargetId, organizationId, retiredCount, retiredDomains, activeCompetitorCount, reason, actor }`.
+
+Coordenadas y resumen; cualquier consumer futuro **re-lee PG** por `seoTargetId` (`seo_competitors` vigentes). `proposalRef` viaja OPACA (nunca FK): documenta si la declaración confirmó una propuesta de máquina (top-N TASK-1699) o fue directa. **NUNCA** un consumer de estos eventos dispara una captura de cobertura: el disparo del dominio SEO es Cloud Scheduler → ops-worker (mismo razonamiento que el delta de TASK-1664 arriba). Las constantes viven en el dominio (`src/lib/growth/seo/contracts.ts`) — seam de extracción §17.3.

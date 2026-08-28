@@ -1,5 +1,25 @@
 # TASK-1700 — Growth SEO: la cola priorizada de trabajo es un aggregate persistido con score versionado
 
+## Delta 2026-08-28 — el origen `competitor_gap` ya tiene contrato de productor (TASK-1662)
+
+`readKeywordGap` (`src/lib/growth/seo/keyword-gap-reader.ts`) existe y entrega exactamente lo
+que este aggregate necesita para el origen `competitor_gap`: hechos + factores con
+procedencia y fecha (`searchVolume` ◑, `cpcUsd`, `linkBarrier`, `serpFeatures` como lista,
+`attainablePositionBand` `link_barrier_v1`), en orden NEUTRAL y **sin score propio** — la
+combinación y los pesos siguen siendo de esta cola (`priority_score_version`). Detalles que
+esta task debe respetar al consumirlo:
+
+- `evidence_ref` opaca: `seo:competitor_gap:<coverage_run_id>` (el reader expone
+  `coverage.coverageRunId`); nunca FK/JOIN a las tablas de cobertura.
+- El reader YA excluye keywords con impresiones GSC (28d) — el invariante "sin demanda
+  medida no hay score" recibe del gap sólo candidatos banda 3 (o banda 2 si la cola decide
+  re-medir), jamás duplicados de `gsc_striking_distance`.
+- `declaredTargets` NO entra como hallazgo del gap: es el origen `declared_target`.
+- `coverage.state = 'no_coverage'` o `stale: true` ⇒ `origin_health_json.competitor_gap`
+  `degraded/down` con razón; el rollout de cobertura sigue gated (flag OFF, TASK-1662
+  `code complete, rollout pendiente`), así que el origen nace declarado y desactivado tal
+  como esta spec ya manda.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

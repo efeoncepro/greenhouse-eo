@@ -1,5 +1,46 @@
 # TASK-1662 — Growth SEO: keyword gap — qué rankea la competencia y el cliente no
 
+## Delta 2026-08-28 — Slices 1–3 + federación implementados; estado `code complete, rollout pendiente`; Slice 4 bloqueado por TASK-1700
+
+**Implementado en `develop` (local, sin push):**
+
+- **Slice 1** — migración `20260828113457119` (ALTER de autoría sobre `seo_competitors` +
+  `seo_competitor_coverage_runs` + `seo_competitor_keyword_coverage`, aplicada contra PG real) +
+  commands `declareCompetitors`/`retireCompetitors` (`competitors.ts`) con techo
+  `GROWTH_SEO_COMPETITORS_PER_TARGET` (default 5), outcome por ítem, `proposal_ref` opaca,
+  eventos `growth.seo.competitor.{declared,retired}` v1 y 3 lanes (admin + ecosystem
+  internal-only + MCP `declare/retire_seo_competitors`).
+- **Slice 2** — `competitor-coverage.ts`: `labs/google/domain_intersection` ×2 por competidor
+  (no-intersección + intersección, `include_serp_info`), gate + dry-run + frescura por run
+  ledger (un `failed` no consume la ranura; 0 filas = hecho), mercado compartido productor #4 a
+  costo 0, worker `/seo/competitor-coverage/capture-batch`, flag
+  `GROWTH_SEO_COMPETITOR_GAP_ENABLED` `:-false` + scheduler `ops-seo-competitor-coverage`
+  (día 18) PAUSADO + fila en el ledger de flags. V1: `maxCompetitors=1`.
+- **Slice 3** — `readKeywordGap` (`keyword-gap-reader.ts`): gap DERIVADO al leer; exclusión dura
+  por impresiones GSC 28d (declarada); `content_gap`/`ranks_worse`/`declaredTargets` separados;
+  factores con procedencia y `sin_dato` (barrera vía `deriveLinkBarrier`, SERP features como
+  lista, banda alcanzable `link_barrier_v1`); orden NEUTRAL alfabético con test anti-orden;
+  lanes de lectura (admin + ecosystem sólo-internal 404 anti-oracle + MCP
+  `get_seo_keyword_gap`) + señal `seo.competitor_coverage.stale`.
+- **Federación**: commit local en `efeonce-mcp` (espejo + provider + registerTool con
+  annotations + EXPECTED + canary extendido; typecheck + 67 tests + build verdes). Deploy del
+  gateway DESPUÉS del próximo release develop→main (lección TASK-1661/1658).
+- **Evidencia**: tests focales 36/36 + suites growth/mcp/reliability 1183 verdes; sanity
+  `scripts/growth/_sanity-task-1662-keyword-gap.ts` **22/22 contra PG real** (autoría, CHECKs,
+  idempotencia, exclusión GSC con query medida real, outbox, retiro, orden neutral).
+
+**Bloqueado / pendiente:**
+
+- 🔴 **Slice 4 (emisión a la cola) BLOQUEADO por `TASK-1700` (`to-do`)** — por diseño de la
+  propia cola, además: 1700 declara que su materializer CONSUME `readKeywordGap` y activa el
+  origen `competitor_gap` cuando haya productor. El contrato de consumo quedó documentado como
+  Delta en la spec de 1700 (`evidence_ref` = `seo:competitor_gap:<coverage_run_id>`).
+- **Rollout pendiente** (secuencia en el manual `operar-gap-competitivo-seo.md`): flag OFF en
+  todos los runtimes; primera corrida real con costo verificado en el ledger exige autorización
+  del operador (pasos 2–6 de la Production verification sequence).
+- Resolución de ownership con `TASK-1699`: el command de declaración lo aterrizó ESTA task;
+  1699 conserva top-N + reader proponedor y consume `declareCompetitors` (Delta declarado allá).
+
 ## Delta 2026-08-27
 
 - El transporte `postDataForSeoTask` ahora **exige** `consumer` en todas sus variantes: las llamadas
