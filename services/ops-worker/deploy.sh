@@ -855,6 +855,18 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED=${GROWTH_SEO_DOMAIN_OVE
 GROWTH_SEO_URL_VISIBILITY_ENABLED="${GROWTH_SEO_URL_VISIBILITY_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_URL_VISIBILITY_ENABLED=${GROWTH_SEO_URL_VISIBILITY_ENABLED}"
 
+# TASK-1662 — Cobertura de keywords de competidores declarados (keyword gap competitivo,
+# DataForSEO Labs `domain_intersection`, 2 llamadas por competidor por ciclo mensual).
+#
+# 🔴 Default OFF: prenderlo empieza a gastar (~USD 0,15 por competidor por ciclo con el row
+# limit default de 500). Este flag se lee SOLO acá (en Vercel es inerte) y este archivo es
+# su SoT declarativo — `--set-env-vars` es destructivo y lo borraría en el próximo deploy.
+# Es SUBORDINADO a `GROWTH_SEO_ENABLED`. Rollback (<5 min): `false` acá + `--update-env-vars`.
+# Antes de prender: dry-run + primera corrida sobre UN competidor de UNA org con costo
+# verificado en el ledger (secuencia de verificación de la task).
+GROWTH_SEO_COMPETITOR_GAP_ENABLED="${GROWTH_SEO_COMPETITOR_GAP_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},GROWTH_SEO_COMPETITOR_GAP_ENABLED=${GROWTH_SEO_COMPETITOR_GAP_ENABLED}"
+
 # TASK-1777 — Drill-down nominal del perfil de enlaces (paso post-batch del snapshot semanal
 # de TASK-1304; SIN scheduler nuevo — reusa `ops-seo-backlink-capture` 0 7 * * 1).
 #
@@ -1493,6 +1505,23 @@ upsert_scheduler_job \
   '{}' \
   "false"
 echo "  -> ops-seo-url-visibility: 0 9 17 * * ACTIVO (visibilidad por sujeto-página mensual, TASK-1776 — despausado 2026-08-27 tras smoke con los cuatro subject_kind + autorización del operador)"
+
+# TASK-1662 — cobertura mensual de keywords de competidores declarados (keyword gap).
+# Día 18: cadencia mensual en día propio para no apilar gasto con los jobs SEO de los
+# días 15/16/17 (mercado / foto de dominio / visibilidad por sujeto).
+#
+# 🔴 NACE PAUSADO y el flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED` nace en `false`: dos frenos
+# independientes (patrón TASK-1661/1775/1776). Antes de despausar: dry-run
+# (`{"dryRun": true}`), primera corrida real sobre UN competidor de UNA org con costo
+# verificado en el ledger, y autorización del operador. El payload vacío usa el default
+# `maxCompetitors=1` (V1: un competidor a la vez).
+upsert_scheduler_job \
+  "ops-seo-competitor-coverage" \
+  "0 9 18 * *" \
+  "/seo/competitor-coverage/capture-batch" \
+  '{}' \
+  "true"
+echo "  -> ops-seo-competitor-coverage: 0 9 18 * * PAUSADO (cobertura de competidores mensual, TASK-1662 — despausar sólo tras dry-run + primera corrida verificada + autorización)"
 
 # TASK-1664 — drain de corridas de keyword discovery (Labs Live, bajo demanda del operador).
 # Cada 10 minutos alcanza de sobra: el enqueue es humano/agente (no hay cadencia diaria en V1)

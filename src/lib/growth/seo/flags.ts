@@ -149,3 +149,22 @@ export const GROWTH_SEO_PROSPECT_DIAGNOSTIC_FLAG = 'GROWTH_SEO_PROSPECT_DIAGNOST
 /** Gate del diagnóstico de prospecto. Default OFF: prenderlo compromete gasto por corrida. */
 export const isSeoProspectDiagnosticEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
   isSeoModuleEnabled(env) && isTrue(env[GROWTH_SEO_PROSPECT_DIAGNOSTIC_FLAG])
+
+/**
+ * TASK-1662 — Cobertura de keywords de competidores (keyword gap competitivo,
+ * `labs/google/domain_intersection` por competidor declarado).
+ *
+ * ⚠️ **Se lee SOLO en el ops-worker** (la captura vive ahí; en Vercel es inerte). SoT
+ * declarativo: `services/ops-worker/deploy.sh`; efecto inmediato con `--update-env-vars`.
+ * El Cloud Scheduler `ops-seo-competitor-coverage` nace PAUSADO: dos frenos independientes.
+ * Es SUBORDINADO a `GROWTH_SEO_ENABLED`. Registrar cambios en el ledger de flags.
+ *
+ * 🔴 El universo de keywords de un competidor no tiene techo natural: además del flag, el
+ * gasto está acotado por el techo de competidores por target, el row limit por llamada y
+ * el gate `enforceSeoRunEntitlement` con dry-run previo (V1: un competidor por corrida).
+ */
+export const GROWTH_SEO_COMPETITOR_GAP_FLAG = 'GROWTH_SEO_COMPETITOR_GAP_ENABLED'
+
+/** Gate de la cobertura de competidores. Default OFF: prenderlo empieza a gastar. */
+export const isSeoCompetitorGapEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_SEO_COMPETITOR_GAP_FLAG])
