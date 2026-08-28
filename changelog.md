@@ -73,12 +73,15 @@
   `selected_for_target` (TASK-1692: el boundary de escritura vivo). Un manifest `released` prueba
   despliegue; el canary prueba comportamiento.
 - Gateway MCP desplegado con el schema federado nuevo de `get_seo_keyword_discovery`.
-- **Smoke con gasto ejecutado el mismo día** (USD 0,018 reales, 50 candidatos, `succeeded`): el
-  payload sin `filters` es aceptado por Labs — el riesgo de la matriz queda refutado con evidencia,
-  y `volumePolicy: "all"` quedó persistido en el snapshot de la corrida. La mezcla de volumen nulo
-  salió 0 de 50: el mercado elegido no era ralo, así que la afirmación sobre el long-tail emergente
-  sigue sin ejercitar y se declara como tal. `TASK-1700` (P0) queda desbloqueada y con su
-  prerequisito de runtime cumplido.
+- **Smoke con gasto ejecutado el mismo día** — 3 corridas, USD 0,0482, MX y CL, los dos endpoints
+  cuyo payload cambió. Las tres `succeeded`: el payload sin `filters` es aceptado por Labs (riesgo
+  de la matriz refutado con evidencia) y `volumePolicy: "all"` quedó persistido en el snapshot.
+- 🔴 **Y desmintió la justificación escrita de la propia task**: 102 candidatos, 2 endpoints, 2
+  mercados → CERO con volumen nulo o cero. Los índices de sugerencias e ideas del proveedor sólo
+  devuelven keywords con volumen medido, así que el filtro que se quitó era un **no-op** ahí; los
+  nulos aparecen sólo en `keyword_overview`, que nunca lo llevó. Quitarlo sigue siendo correcto
+  (elimina una asimetría no declarada), pero el beneficio prometido no tiene evidencia. `TASK-1700`
+  (P0) queda desbloqueada y con su prerequisito de runtime cumplido.
 
 ## 2026-08-28 — TASK-1692: el candidato de discovery recuerda qué se decidió sobre él
 

@@ -68,17 +68,26 @@ falta el diff de las 28 rutas del gate.
 **Gateway MCP desplegado** (`efeonce-mcp` run `33209983511`): el schema federado de
 `get_seo_keyword_discovery` ya es el nuevo.
 
-**Smoke con gasto EJECUTADO** (autorizado el mismo día, run `seokdr-7851e49c`): cerró `succeeded`,
-50 candidatos, **USD 0,018 reales** contra 0,066 de peor caso, 1 sola llamada al proveedor (el
-top-up no compró nada porque el store ya tenía el mercado), y `volumePolicy: "all"` persistido en
-`methods_json`. **Refuta con evidencia el riesgo de la matriz**: el payload sin `filters` NO es
-rechazado por Labs.
+**Smoke con gasto EJECUTADO — 3 corridas, USD 0,0482 total** (MX+CL, `keyword_suggestions` y
+`keyword_ideas`). Las tres `succeeded`. **Probó lo que importaba:** el payload sin `filters` es
+aceptado por los DOS endpoints que lo llevaban — el riesgo de la matriz queda refutado con
+evidencia — y `volumePolicy: "all"` quedó persistido en `methods_json`.
 
-⚠️ **Lo que el smoke NO probó:** la mezcla de volumen nulo salió **0 de 50**. Materiales de
-construcción en México no es un mercado ralo, así que la afirmación *"el filtro se comía el
-long-tail emergente"* sigue **sin ejercitar**. Quitar el filtro deja de IMPONER una exclusión; que
-aparezca long-tail depende del mercado. Un smoke en un mercado genuinamente ralo es la evidencia
-que falta para esa afirmación concreta (~USD 0,018 más). No bloquea nada.
+🔴 **Y desmintió la justificación que la propia task tenía escrita.** La spec afirmaba que en un
+mercado ralo el filtro *"se comía el long-tail emergente"*. Medido: **102 candidatos, 3 corridas, 2
+endpoints, 2 mercados → CERO con volumen nulo o cero**. El histórico del store lo corrobora por
+endpoint: `keyword_suggestions` 61 filas / 0 nulos; el único con nulos es `keyword_overview` (15 de
+62), que **nunca llevó el filtro**. O sea: los índices de sugerencias e ideas del proveedor sólo
+devuelven keywords con volumen medido, así que el `filters: search_volume > 0` era un **no-op** en
+esos dos endpoints.
+
+**Qué queda en pie:** quitarlo sigue siendo correcto —elimina una asimetría no declarada y deja de
+imponer una exclusión que el contrato no decía—, pero **el beneficio prometido no tiene evidencia**.
+La corrección está escrita en la task; el delta de arquitectura §7 conserva la afirmación vieja y
+convendría alinearlo cuando alguien toque ese doc.
+
+**Lección portátil:** una justificación plausible escrita en una spec no es un hecho. Ésta sobrevivió
+al diseño, a la implementación y a la review; sólo cayó al gastar 5 centavos en medirla.
 
 **`TASK-1700` (P0, cola priorizada) queda desbloqueada Y con su prerequisito de runtime cumplido:**
 el contrato nuevo ya sirve en producción, así que su primer snapshot no puede congelar duplicados ni

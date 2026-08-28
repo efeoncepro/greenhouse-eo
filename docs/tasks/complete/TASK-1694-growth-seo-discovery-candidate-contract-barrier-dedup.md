@@ -869,38 +869,59 @@ sesión) y el deploy del gateway MCP.
   refuerza que el follow-up vale, y su lugar natural sigue siendo la decisión en lote de
   `TASK-1660`.
 
-### Smoke con gasto real — 2026-08-28 (run `seokdr-7851e49c`)
+### Smoke con gasto real — 2026-08-28 (TRES corridas, USD 0,0482 en total)
 
-Corrida productiva contra Berel MX (`seot-berel-mx`, location `2484`, es), seed
-`impermeabilizante para techo`, método `keyword_suggestions`, con la política nueva.
+| # | Target / mercado | Método | Candidatos | Costo | vol > 0 | vol nulo o 0 |
+|---|---|---|---|---:|---:|---:|
+| 1 | `seot-berel-mx` · MX (2484) | `keyword_suggestions` | 50 | 0,0180 | 50 | **0** |
+| 2 | `seot-efeonce-own-brand` · CL (2152) | `keyword_suggestions` | 2 | 0,0122 | 2 | **0** |
+| 3 | `seot-efeonce-own-brand` · CL (2152) | `keyword_ideas` | 50 | 0,0180 | 50 | **0** |
 
-| | Smoke TASK-1664 (2026-08-14) | Smoke TASK-1694 (2026-08-28) |
-|---|---|---|
-| Candidatos | 10 | **50** |
-| Costo real | USD 0,0132 | **USD 0,0180** (peor caso estimado: 0,066) |
-| Costo por candidato | 0,00132 | **0,00036** (3,7× más barato) |
-| Llamadas al proveedor | 2 | **1** (el top-up de enriquecimiento no compró nada: el store ya tenía el mercado) |
-| `volumePolicy` en el snapshot | *(campo ausente)* | **`all`** |
-| Candidatos con volumen nulo o cero | 0 | **0** |
+Las tres cerraron `succeeded`, sin `provider_error`. Costo real total **USD 0,0482** (peor caso
+estimado: 0,198), atribuido a `labs`/`consumer=seo`/`invoiced` en el ledger.
 
-**Lo que el smoke SÍ probó:**
+**Lo que el smoke probó:**
 
-- 🔴 **El payload sin `filters` es aceptado por el endpoint Labs.** La corrida cerró `succeeded`
-  con 50 candidatos y `error_code` nulo. Refuta con evidencia el riesgo de la matriz *"Un payload
-  sin `filters` es rechazado por el endpoint Labs y la corrida cierra `failed`"*.
-- **El costo no se sale del rango**, y por candidato mejora: el setup fijo se amortiza sobre más
-  filas. El ledger de gasto atribuyó exactamente USD 0,018 a `labs`/`consumer=seo`/`invoiced`.
-- **`volumePolicy: "all"` queda persistido en `methods_json`** (Slice 4 de TASK-1692 verificado en
-  producción), y la corrida vieja muestra el campo AUSENTE — que es exactamente el caso que el
-  default histórico de lectura cubre.
+- 🔴 **El payload sin `filters` es aceptado por los DOS endpoints que lo llevaban**
+  (`keyword_suggestions` y `keyword_ideas`). Refuta con evidencia el riesgo de la matriz *"Un
+  payload sin `filters` es rechazado por el endpoint Labs y la corrida cierra `failed`"*.
+- **El costo no se mueve** y por candidato mejora frente al smoke de TASK-1664 (0,00036 vs 0,00132):
+  el setup fijo se amortiza sobre más filas.
+- **`volumePolicy: "all"` queda persistido** en `methods_json`, y las corridas anteriores muestran
+  el campo AUSENTE — el caso exacto que cubre el default histórico de lectura.
+- La corrida #2 confirma que el mercado ralo existe y se comporta como tal: **2 candidatos** contra
+  50 en México con el mismo método.
 
-**Lo que el smoke NO probó, y hay que decirlo:** la mezcla de volumen nulo salió **0 de 50**. Este
-seed en este mercado no produjo long-tail sin volumen estimado, así que la afirmación *"el filtro
-se comía el long-tail emergente"* **queda sin ejercitar**. Mercado equivocado para la prueba:
-materiales de construcción en México no es un mercado ralo. Quitar el filtro deja de IMPONER una
-exclusión; que aparezca long-tail depende del mercado, y este no lo tenía. Un smoke en un mercado
-genuinamente ralo sigue siendo la evidencia que falta para esa afirmación concreta — no bloquea
-nada, y cuesta otros ~USD 0,018.
+### 🔴 Corrección a la justificación de la política de inclusión (evidencia 2026-08-28)
+
+**La razón que esta task escribió para unificar hacia `all` no se sostiene con datos.** El
+`## Detailed Spec` afirmaba que *"en un mercado ralo el filtro gasta el `limit` descartando justo el
+long-tail emergente"*. Medido: **102 candidatos, tres corridas, dos endpoints, dos mercados — CERO
+con volumen nulo o cero.** Y el histórico del store lo corrobora por endpoint:
+
+| `source_endpoint` | filas | volumen NULL |
+|---|---:|---:|
+| `keyword_suggestions` | 61 | **0** |
+| `domain_intersection` | 640 | 0 |
+| `ranked_keywords` | 211 | 0 |
+| `keyword_overview` | 62 | **15** |
+
+**Lectura honesta:** los índices de sugerencias e ideas del proveedor sólo devuelven keywords que ya
+tienen volumen medido, así que el `filters: search_volume > 0` era un **no-op** para esos dos
+endpoints — filtraba una condición que ya era verdadera. Donde el volumen nulo SÍ aparece es en
+`keyword_overview` (15 de 62), que es el top-up de enriquecimiento y **nunca llevó el filtro**.
+
+**Qué queda en pie del cambio, y qué no:**
+
+- ✅ **Sigue siendo correcto** quitarlo: elimina una asimetría no declarada entre los cuatro
+  adapters y deja de IMPONER una exclusión que el contrato nunca decía. La política declarada y
+  persistida en `methods_json` es el valor real de Slice 4.
+- ❌ **No hay evidencia del beneficio prometido** (recuperar long-tail emergente). El mecanismo no
+  muerde en estos dos endpoints.
+- ⚠️ **Corolario para el estado "Sin dato de mercado"**: la spec decía que ese estado *"casi sólo
+  puede originarse en related/site"* y que con la política nueva pasaría a ser alcanzable desde los
+  cuatro métodos. Los datos dicen que sigue sin ser alcanzable desde suggestions/ideas — no por el
+  filtro, sino por lo que el índice del proveedor contiene.
 
 ### Pendientes de rollout
 
