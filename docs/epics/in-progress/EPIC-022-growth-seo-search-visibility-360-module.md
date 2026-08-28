@@ -68,6 +68,15 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > también queda `Blocked by: none`. Con eso el carril de objetivos ya no espera backend: sólo falta
 > su superficie.
 >
+> **Actualización 2026-08-28:** `TASK-1662` (keyword gap) quedó **implementada** (Slices 1–3 +
+> federación MCP) y sigue `in-progress` sólo por su Slice 4 (bloqueado por `TASK-1700`) y el cierre
+> operativo post-release. El rollout está verificado con competidor real (Berel MX → `comex.com.mx`):
+> primera corrida de cobertura por USD 0,1076 con Δ exacto en el ledger (697 filas + 640 de mercado
+> gratis) y gap real medido — 357 `content_gap` / 54 `ranks_worse` / 269 excluidas por GSC. El flag
+> `GROWTH_SEO_COMPETITOR_GAP_ENABLED` quedó ON declarativo en `deploy.sh` (efectivo con el primer
+> deploy del worker post-release) y el scheduler `ops-seo-competitor-coverage` permanece pausado
+> hasta ese deploy.
+>
 > ⚠️ Al cerrar una task, revisar quién la citaba como blocker. Un `Blocked by` obsoleto es fricción
 > inventada, y no hay gate que lo detecte.
 
@@ -87,7 +96,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > |---|---|---|
 > | ¿Qué empujo de lo que ya tengo? | GSC medido | **construida** (TASK-1308) |
 > | ¿Dónde quiere estar el cliente? | **declarado por humano** | `TASK-1659` (**complete 2026-08-14**, el eje ya existe en el command) + `TASK-1660` (superficie) |
-> | ¿Qué me pierdo entero? | competencia + Labs | `TASK-1661` + `TASK-1662` |
+> | ¿Qué me pierdo entero? | competencia + Labs | `TASK-1661` + `TASK-1662` (**implementada 2026-08-28**, Slice 4 pendiente) |
 >
 > La segunda es la que ancla comercialmente a las otras dos, porque es el compromiso con el cliente
 > y el material del QBR. Y **Search Console es estructuralmente ciego** a las dos últimas: sin top
@@ -99,7 +108,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1659` — [**complete 2026-08-14**, backend-data] modelo de **intención** en el set monitoreado: objetivo declarado vs oportunidad detectada, con autoría. `source` (TASK-1308) es procedencia, no intención. Append-only: cambiar la intención cierra y abre, nunca `UPDATE` — outcome propio `intent_changed`, que **no consume cupo** del techo. `intent` (`target` | `opportunity`) **sin default**: quien no declara escribe `NULL` y no existe un tercer valor "desconocido"; `intentDeclaredBy` separa a quien asumió el compromiso de quien ejecutó el INSERT. Migración `20260814221022082`. Parity en las 3 lanes (app · ecosystem · MCP `track_seo_keywords`) con vocabulario validado en cada frontera; **sin capability, scope ni flags nuevos**. **Desbloquea `1660`.**
 - `TASK-1660` — [planificada, ui-ux] lente **Objetivos** sobre `/admin/growth/seo/keywords` — extiende el **nodo S3** del master UI flow. Full API Parity al revés: `trackKeywords` **ya** acepta keywords que el cliente no rankea y no tiene botón, y desde `TASK-1659` acepta además la **intención declarada**. **`Blocked by: none`** desde el cierre de `TASK-1659` (2026-08-14).
 - `TASK-1661` — [**complete 2026-08-13**, backend-data] volumen y **barrera de enlaces** por keyword. Trae el dato de mercado desde DataForSEO Labs (`keyword_overview`) a la tabla append-only `seo_keyword_market_data`, con país, idioma y `captured_at` en la clave; `readKeywordOpportunities` deja de cablear `market: 'unavailable'` y la tabla de `TASK-1308` muestra las columnas **sin cambio de código en la UI**. Captura **mensual** (el proveedor refresca una vez al mes), acotada al set monitoreado, con dry-run de costo previo. Costo real medido: **USD ~0.02/org/mes**. Tool MCP `get_seo_keyword_market_data` + federación al gateway en el mismo cierre. **Desbloquea `1660`/`1662`/`1664`.**
-- `TASK-1662` — [planificada, backend-data] **keyword gap**: qué gana la competencia donde el cliente es invisible. La superficie va aparte. **`Blocked by: none`** desde el cierre de `TASK-1661` (2026-08-13). Escribe en la **misma** tabla de mercado — es multi-productor por diseño, nunca un segundo almacén.
+- `TASK-1662` — [**implementada 2026-08-28**, backend-data; `in-progress` sólo por Slice 4 —bloqueado por `TASK-1700`— y el cierre operativo post-release] **keyword gap**: qué gana la competencia donde el cliente es invisible. La superficie va aparte. Competidores **declarados con autoría** (`seo_competitors`, migración `20260828113457119`), commands `declareCompetitors`/`retireCompetitors` en 3 lanes + tools MCP `declare/retire_seo_competitors` y `get_seo_keyword_gap`, cobertura `domain_intersection` con run ledger y gap **derivado al leer** (`readKeywordGap`, sin orden propio). Rollout verificado con competidor real (Berel MX → `comex.com.mx`): primera corrida USD 0,1076, 697 filas + 640 de mercado gratis, gap 357 `content_gap` / 54 `ranks_worse` / 269 excluidas por GSC medido. Flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED` ON declarativo en `deploy.sh` (efectivo con el primer deploy del worker post-release; scheduler `ops-seo-competitor-coverage` pausado hasta entonces). Escribe en la **misma** tabla de mercado — es multi-productor por diseño, nunca un segundo almacén (productor #4).
 
 ### Carril de discovery y acción diaria (creado 2026-08-08)
 
@@ -262,7 +271,8 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
   adquisición queda como **línea propia** en el mismo ledger (`seo_provider_spend_daily`, atribuido
   a `EO-ORG-0007`): el margen por org del epic sigue medible porque prospección y servicio no se
   mezclan. Estrenó además el colector de competidores (`competitors_domain` + `backlinks/competitors`
-  + `domain_intersection`) que `TASK-1662` consumirá.
+  + `domain_intersection`) que `TASK-1662` consume desde su implementación (2026-08-28) como
+  propuesta de declaración (`proposal_ref`).
 - `TASK-1784` — [creada 2026-08-27, backend-data] **Ruteo de selección en la superficie MCP.** Seis de
   las 20 tools contestan la misma pregunta; el eval de selección va primero y puede cerrar la task.
 - `TASK-1785` — [creada 2026-08-27, backend-data] **La lente como campo del contrato, no como
