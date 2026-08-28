@@ -52,6 +52,12 @@ import { readSiteAuditReport } from '@/lib/growth/seo/site-audit/reader'
 import { trackKeywords, untrackKeywords } from '@/lib/growth/seo/track-keywords'
 import { declareCompetitors, retireCompetitors } from '@/lib/growth/seo/competitors'
 import { readKeywordGap, type KeywordGapResult } from '@/lib/growth/seo/keyword-gap-reader'
+import {
+  readSerpCompetitorCandidates,
+  readSerpTopResults,
+  type ReadSerpTopResultsResult,
+  type SerpCompetitorCandidatesResult
+} from '@/lib/growth/seo/competitor-discovery'
 import { isSeoKeywordIntent, SEO_KEYWORD_INTENTS } from '@/lib/growth/seo/contracts'
 import type {
   BacklinkProfileResult,
@@ -1316,6 +1322,116 @@ export const getEcosystemSeoKeywordGapPayload = async ({
   const result = await readKeywordGap(subject.seoTargetId, {
     ...(seoCompetitorId ? { seoCompetitorId } : {}),
     ...(Number.isFinite(rawLimit) && rawLimit > 0 ? { limit: rawLimit } : {})
+  })
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+/**
+ * ═══ TASK-1699 — top-N del SERP + candidatos a competidor en el lane ecosystem ═══
+ *
+ * 🔴 **Sólo bindings `internal` SIN organización, 404 anti-oracle** — el top-N del SERP de
+ * las keywords de un cliente es DATO COMPETITIVO (quién ranquea en su intención) y §7 de la
+ * auditoría prohíbe la comparativa competitiva client-facing. Mismo contrato que el gasto
+ * de proveedor y el keyword gap.
+ */
+
+const requireInternalSeoBinding = (context: ApiPlatformRequestContext, request: Request): string => {
+  if (context.binding.greenhouseScopeType !== 'internal' || context.binding.organizationId) {
+    throw new ApiPlatformError('SEO resource not found for the resolved scope.', {
+      statusCode: 404,
+      errorCode: 'not_found'
+    })
+  }
+
+  const url = new URL(request.url)
+  const organizationId = (url.searchParams.get('organizationId') ?? '').trim()
+
+  if (!organizationId) {
+    throw new ApiPlatformError('organizationId is required for internal bindings.', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
+  return organizationId
+}
+
+export const getEcosystemSeoSerpTopResultsPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<ReadSerpTopResultsResult | SeoTargetNotConfiguredPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  const organizationId = requireInternalSeoBinding(context, request)
+  const url = new URL(request.url)
+
+  const keyword = (url.searchParams.get('keyword') ?? '').trim()
+  const from = (url.searchParams.get('from') ?? '').trim()
+  const to = (url.searchParams.get('to') ?? '').trim()
+  const rawLimit = Number.parseInt(url.searchParams.get('limit') ?? '', 10)
+
+  const subject = await resolveSeoLaneSubject(context, request, organizationId)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const result = await readSerpTopResults(subject.seoTargetId, {
+    ...(keyword ? { keyword } : {}),
+    ...(from ? { from } : {}),
+    ...(to ? { to } : {}),
+    ...(Number.isFinite(rawLimit) && rawLimit > 0 ? { limit: rawLimit } : {})
+  })
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+export const getEcosystemSeoCompetitorCandidatesPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<SerpCompetitorCandidatesResult | SeoTargetNotConfiguredPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  const organizationId = requireInternalSeoBinding(context, request)
+  const url = new URL(request.url)
+
+  const rawWindow = Number.parseInt(url.searchParams.get('windowDays') ?? '', 10)
+  const rawMinKeywords = Number.parseInt(url.searchParams.get('minKeywords') ?? '', 10)
+  const rawMinDays = Number.parseInt(url.searchParams.get('minDays') ?? '', 10)
+
+  const subject = await resolveSeoLaneSubject(context, request, organizationId)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const result = await readSerpCompetitorCandidates(subject.seoTargetId, {
+    ...(Number.isFinite(rawWindow) && rawWindow > 0 ? { windowDays: rawWindow } : {}),
+    ...(Number.isFinite(rawMinKeywords) && rawMinKeywords > 0 ? { minKeywords: rawMinKeywords } : {}),
+    ...(Number.isFinite(rawMinDays) && rawMinDays > 0 ? { minDays: rawMinDays } : {})
   })
 
   return {

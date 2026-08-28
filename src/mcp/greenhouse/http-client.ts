@@ -402,6 +402,42 @@ export class GreenhouseApiPlatformClient {
     })
   }
 
+  /** TASK-1699 — serie del top-N del SERP ya pagado (lane sólo-internal, 404 anti-oracle). */
+  async getSeoSerpTopResults(input: {
+    organizationId: string
+    market?: string
+    keyword?: string
+    from?: string
+    to?: string
+    limit?: number
+  }) {
+    return this.request('/api/platform/ecosystem/growth/seo/serp-top-results', {
+      organizationId: input.organizationId,
+      market: input.market,
+      keyword: input.keyword,
+      from: input.from,
+      to: input.to,
+      limit: input.limit === undefined ? undefined : String(input.limit)
+    })
+  }
+
+  /** TASK-1699 — candidatos a competidor por recurrencia (el PROPOSE; el execute es declare). */
+  async getSeoCompetitorCandidates(input: {
+    organizationId: string
+    market?: string
+    windowDays?: number
+    minKeywords?: number
+    minDays?: number
+  }) {
+    return this.request('/api/platform/ecosystem/growth/seo/competitor-candidates', {
+      organizationId: input.organizationId,
+      market: input.market,
+      windowDays: input.windowDays === undefined ? undefined : String(input.windowDays),
+      minKeywords: input.minKeywords === undefined ? undefined : String(input.minKeywords),
+      minDays: input.minDays === undefined ? undefined : String(input.minDays)
+    })
+  }
+
   /** TASK-1662 — el reverso: cierra la vigencia del competidor y corta su gasto de cobertura. */
   async retireSeoCompetitors(input: { organizationId?: string; domains: string[]; reason?: string }) {
     return this.request(

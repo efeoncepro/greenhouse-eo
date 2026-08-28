@@ -193,6 +193,8 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'declareSeoCompetitors'
   | 'retireSeoCompetitors'
   | 'getSeoKeywordGap'
+  | 'getSeoSerpTopResults'
+  | 'getSeoCompetitorCandidates'
   | 'getSeoKeywordMarketData'
   | 'getSeoDomainOverview'
   | 'getSeoUrlVisibility'
@@ -972,6 +974,86 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         )}. Rows are alphabetical facts with per-factor provenance — this reader does NOT rank; prioritization belongs to the SEO work queue (${result.requestId}).`
       },
       () => client.getSeoKeywordGap(input)
+    )
+  },
+  /** TASK-1699 — serie del top-N del SERP ya pagado (dato competitivo, uso interno). */
+  async getSeoSerpTopResults(input: {
+    organizationId: string
+    market?: string
+    keyword?: string
+    from?: string
+    to?: string
+    limit?: number
+  }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          rows?: Array<{ captureDate?: string; isOwnDomain?: boolean }>
+          hasMore?: boolean
+        }
+
+        if (data.ok === false) {
+          return `SEO SERP top results unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const rows = Array.isArray(data.rows) ? data.rows : []
+        const dates = [...new Set(rows.map(row => row.captureDate).filter(Boolean))]
+        const own = rows.filter(row => row.isOwnDomain).length
+
+        return `SEO SERP top results: ${rows.length} row(s) across ${dates.length} capture day(s), ${own} own-domain row(s)${
+          data.hasMore ? ' (more beyond the limit — narrow with keyword/from/to)' : ''
+        }. Each row is a dated SERP slot (rank_absolute) with its item type and domain — competitive material for Efeonce internal use, never client-facing (${result.requestId}).`
+      },
+      () => client.getSeoSerpTopResults(input)
+    )
+  },
+  /**
+   * TASK-1699 — candidatos a competidor. El summary declara el loop: esto PROPONE con
+   * evidencia medida; declarar es del humano vía declare_seo_competitors.
+   */
+  async getSeoCompetitorCandidates(input: {
+    organizationId: string
+    market?: string
+    windowDays?: number
+    minKeywords?: number
+    minDays?: number
+  }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          windowDays?: number
+          candidates?: Array<{ domain?: string; keywordsCount?: number; daysCount?: number; alreadyDeclared?: boolean }>
+        }
+
+        if (data.ok === false) {
+          return `SEO competitor candidates unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const candidates = Array.isArray(data.candidates) ? data.candidates : []
+
+        if (candidates.length === 0) {
+          return `No competitor candidates cleared the recurrence thresholds in the ${String(
+            data.windowDays ?? '?'
+          )}-day window (the top-N series may still be accumulating — it needs ~5 capture days). This is a measured fact, not an error (${result.requestId}).`
+        }
+
+        const top = candidates
+          .slice(0, 5)
+          .map(
+            candidate =>
+              `${candidate.domain} (${candidate.keywordsCount} kw / ${candidate.daysCount} days${candidate.alreadyDeclared ? ', already declared' : ''})`
+          )
+          .join('; ')
+
+        return `SEO competitor candidates (measured recurrence, window ${String(data.windowDays ?? '?')}d): ${String(
+          candidates.length
+        )} candidate(s) — top: ${top}. These are PROPOSALS with evidence: to act, present them to the human and only after explicit confirmation call declare_seo_competitors passing each candidate's proposalRef verbatim — never declare on your own (${result.requestId}).`
+      },
+      () => client.getSeoCompetitorCandidates(input)
     )
   },
   /**
