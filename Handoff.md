@@ -2,6 +2,65 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-28 — Release develop→main `c983be7f18e6` + flip de flag + gateway MCP: COMPLETO
+
+**Estado: `complete`.** Paso a producción end-to-end del carril Growth/SEO (PR #208, 181 archivos,
+4 migraciones): TASK-1696 (dimensión de consumidor del ledger de gasto DataForSEO), TASK-1662
+(fundación del gap competitivo), TASK-1699 (top-N del SERP + descubrimiento de competidores),
+TASK-1652 (request AI Mode del grader).
+
+- **Release:** `release_id c983be7f18e6-92b1b327-a1c9-4e7a-85dc-6a5e300f4e32`, run `33178544139`,
+  manifest **`released`** en 11m41s. Los dos gates `production` aprobados con ~2 min de diferencia.
+  Break-glass usado por `db_migrations` con razón verificada: `pnpm pg:connect:status` devolvió
+  `No migrations to run!` ANTES del dispatch — el release reconcilia archivos con un estado ya
+  realizado, sin undo de schema ni backfill.
+- **Runtime:** watchdog `ok`, `drift_count=0`, `data_missing_count=0`. `commercial-cost-worker`,
+  `ico-batch-worker` y `hubspot-greenhouse-integration` en el target SHA; `ops-worker` en
+  `fdfdedbe5` como residual change-gated, verificado con las **28 rutas leídas del workflow** (diff
+  vacío) más el sanity sin `--` (22 archivos en el rango, o sea ambos SHA resuelven). No se
+  redesplegó. `/api/auth/health` 200.
+- **Flag:** `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED=true` en Vercel Production + redeploy
+  `greenhouse-aj0ng1mfw`. Precondición verificada antes del flip: la cadena de lectores está en
+  `origin/main` (`flags.ts`, `competitor-discovery.ts` ×3, `rank-capture.ts` ×2). **Verificado en el
+  runtime, no sólo la env var:** el canary contra `https://greenhouse.efeoncepro.com` devolvió
+  `serp-top-results read: {"ok":true,…,"rows":[]}` — `ok:true`, no `disabled`.
+- **Gateway MCP:** `efeonce-mcp` `8f1ae34 → 92e7197`, CI verde, deploy run `33180234265`, revisión
+  **`efeonce-mcp-gateway-00024-8b8`** Ready=True con 100% del tráfico e imagen taggeada al SHA
+  exacto. Front door: protected-resource `200`, `/mcp` sin token `401` (fail-closed). Inventario
+  **21 → 27 tools SEO** (20 lecturas + 7 escrituras), diferencia verificada contra el SHA de la
+  revisión anterior (`220e916929d9`): entran `get_seo_provider_spend`, `get_seo_keyword_gap`,
+  `declare_seo_competitors`, `retire_seo_competitors`, `get_seo_serp_top_results`,
+  `get_seo_competitor_candidates`. **Cero cambios en Entra** (los writes viajan en el scope
+  `efeonce.mcp.seo.write` existente y siguen fail-closed hasta TASK-1631). Canary de cierre verde
+  completo contra producción: 20 lecturas ✓, denies `404` anti-oracle, escrituras ejercitadas en su
+  puerta sin escribir ni gastar.
+
+**🔴 Hallazgo para el runbook — la regla de decisión del merge canónico está mal formulada.** El
+runbook dice `-s ours` si V1 (`git log origin/main --not HEAD`) está vacía y `-X ours` si no. Con
+squash-merge **V1 nunca está vacía en el estado estacionario**: siempre contiene el commit de squash
+del release anterior. La regla literal empuja a `-X ours` en todos los releases, y acá `-X ours`
+reprodujo la patología del delta 2026-08-23 **con la V2 vacía**: duplicó un bloque completo de
+`.claude/rules/growth-seo.md` y resucitó TASK-1775/1776/1777 en `in-progress/` teniéndolas develop
+en `complete/`. Sólo la V3 (`--name-status` completo) lo cazó. La pregunta correcta no es «¿V1 está
+vacía?» sino **«¿aporta `main` contenido propio?»**, que se responde con
+`git diff --diff-filter=A --name-only origin/develop origin/main` (vacío ⇒ `-s ours` es seguro y
+pierde nada). Candidato a corregir en el runbook, el playbook y las dos skills espejadas.
+
+**Coordinación:** el freeze de `develop` se acordó por mensaje con las 2 sesiones locales activas
+(`greenhouse-eo-87`, dueña de TASK-1662/1699, y `greenhouse-eo-92`), que confirmaron qué flags
+prender y cuáles no. Ambas terminaron antes del cierre, así que **el aviso de levantar el freeze
+quedó sólo acá**: `develop` está libre desde 2026-08-28 ~14:35Z. Sus 2 commits docs-only locales
+(`40aec5bbc`, `bb6eb8d11`) **entraron en este release** — no volver a pushearlos; `origin/develop`
+quedó en `245295d04` con el merge canónico encima.
+
+**Pendientes heredados (no bloquean este release):** (1) 2026-08-29 tras el cron de las 05:00 CLT,
+verificar ~20 filas/keyword + `provider_cost` idéntico al baseline + señal
+`seo.serp_top_results.coverage`; (2) ≈2026-09-02 (≥5 días de serie), revisar candidatos de
+`readSerpCompetitorCandidates` con el operador ANTES de declarar; (3) `ISSUE-164` dejó agendada para
+2026-08-29 la revisión de conteos `blocked_*` en Sentry de la guarda de red de TASK-1778;
+(4) el `PRODUCTION_RELEASE_TIMING_LEDGER.md` no tiene filas para los releases del 2026-08-18,
+08-19, 08-23 y 08-27 — deuda previa, no de este release.
+
 ## 2026-08-28 — TASK-1699: el top-N del SERP ya pagado — code complete, rollout pendiente
 
 **Estado: `code complete, rollout pendiente` — el día 1 de la serie es el día del primer deploy del
@@ -455,9 +514,3 @@ esté en producción con su flag ON.
 **Estado: `complete` local; sin runtime ni push.** Quedaron creadas y espejadas las skills de Salesforce CRM, Marketing Cloud Engagement y Marketing Cloud Next, con modos `operate`, `sell` y coexistencia donde aplica. El catálogo vive en [`docs/services/salesforce/README.md`](docs/services/salesforce/README.md) y el fundamento en [`SALESFORCE_PRACTICE_SKILL_FOUNDATION_2026-08-27.md`](docs/audits/commercial/SALESFORCE_PRACTICE_SKILL_FOUNDATION_2026-08-27.md).
 
 **Límite comercial vivo:** la aceptación histórica como Provisional Consulting Partner no prueba el estado actual, tier, certificaciones, SPPA ni Cloud Reseller. Antes de claims, cotización oficial, co-sell o reventa, hacer readback primario en Partner Community/contrato vigente. Ninguna skill autoriza mutaciones por inferencia.
-
-## 2026-08-27 — RevOps & CRM adopta posicionamiento provider-fit
-
-**Estado: `complete`; sin runtime ni push.** Efeonce vende **Revenue Operations & CRM**, con diagnóstico HubSpot-first, Salesforce-first o híbrido. Gartner se separa por mercado; los casos chilenos de Salesforce prueban presencia, no market share.
-
-**Pendiente:** las relaciones de partner declaradas por el CEO requieren readback primario antes de claims externos. Antes de mover inversión o certificaciones, medir 24 meses de pipeline, win/loss, margen, demanda y capacidad. Audit: [`CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md`](docs/audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md).

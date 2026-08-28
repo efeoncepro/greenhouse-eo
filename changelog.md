@@ -7,6 +7,29 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-28 — Release a producción `c983be7f18e6`: carril Growth/SEO vivo, flag prendido y gateway MCP a 27 tools
+
+- Paso a producción end-to-end del trabajo del día (PR #208, 181 archivos, 4 migraciones):
+  **TASK-1696** (dimensión de consumidor del ledger de gasto DataForSEO), **TASK-1662** (fundación
+  del gap competitivo), **TASK-1699** (top-N del SERP + descubrimiento de competidores por
+  recurrencia) y **TASK-1652** (request AI Mode del grader). Manifest `released`
+  (`c983be7f18e6-92b1b327-a1c9-4e7a-85dc-6a5e300f4e32`, run `33178544139`, 11m41s), watchdog `ok`
+  con `drift_count=0`. Break-glass por `db_migrations` con razón verificada: las 4 migraciones ya
+  figuraban aplicadas en la instancia única Cloud SQL antes del dispatch.
+- `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` quedó **ON en los dos runtimes**: ya estaba en el
+  `ops-worker` (escritura) y este release lo prendió en Vercel Production (lectura) con su redeploy
+  obligatorio. La verificación no fue "la env var existe" sino el canary contra producción
+  devolviendo `ok:true` en vez de `disabled`.
+- El gateway `mcp.efeonce.org` pasó de **21 a 27 tools SEO** (revisión
+  `efeonce-mcp-gateway-00024-8b8`): entran `get_seo_provider_spend`, `get_seo_keyword_gap`,
+  `declare_seo_competitors`, `retire_seo_competitors`, `get_seo_serp_top_results` y
+  `get_seo_competitor_candidates`, sin un solo cambio en Entra — los writes viajan en el scope
+  `efeonce.mcp.seo.write` existente y siguen fail-closed hasta TASK-1631.
+- Hallazgo de proceso: la regla del merge canónico del runbook (`-s ours` sólo si V1 está vacía)
+  está mal formulada para un flujo con squash-merge, donde V1 nunca está vacía. `-X ours` volvió a
+  duplicar contenido documental y a resucitar tasks en un lifecycle viejo **con la V2 vacía**; la
+  pregunta correcta es si `main` aporta archivos propios.
+
 ## 2026-08-28 — TASK-1699: el top-N del SERP ya pagado deja de tirarse (code complete, rollout pendiente)
 
 - El rank capture diario compra el SERP completo (`depth 20`) y descartaba ~19 de 20 filas. Ahora
@@ -697,22 +720,3 @@
   laboral.
 - Este slice está validado localmente pero todavía no opera en producción: la migración no se aplicará hasta
   que exista el command token-safe y los smokes PostgreSQL prueben ACL, concurrencia, rollback y purga.
-
-## 2026-08-19 — El tablero de Hiring dejó de mostrar gente y vacantes que no existen
-
-- **Lo que ve hoy quien abre el desk son procesos reales.** El tablero pasó de 24 vacantes y 79
-  postulaciones a **2 y 47**: la diferencia no se perdió ni se borró, era dato de prueba que hasta ayer
-  se contaba como si fuera un candidato o una búsqueda de verdad. Las dos vacantes vivas siguen ahí,
-  con todos sus postulantes, verificadas una por una antes y después.
-- **Menos filas no es pérdida de datos.** Si el tablero se ve más vacío que ayer, es porque por primera
-  vez muestra sólo lo que representa a una persona o una búsqueda del mundo real. Lo demás quedó
-  archivado y recuperable, no eliminado.
-- **La evaluación con IA ya no puede aprender de respuestas inventadas.** Había una respuesta de prueba
-  calificada con 90 puntos, lista para entrar al conjunto con que se calibra el sistema. No era un riesgo
-  a futuro: ya había pasado. Ahora queda excluida sin interruptor para volver atrás.
-- **Los conteos y métricas de contratación por fin cuentan personas.** Todo lo que se lee desde el
-  tablero y la reserva de talento parte del mismo criterio, así que dejaron de convivir dos verdades
-  sobre cuánta gente hay en un proceso.
-- **Lo que todavía no cambia**: nueve registros de prueba quedan archivados en vez de borrados, a la
-  espera de una decisión explícita. No aparecen en ninguna pantalla, así que borrarlos es prolijidad,
-  no necesidad.
