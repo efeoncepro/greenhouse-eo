@@ -35,7 +35,7 @@ necesita que exista antes de su primer snapshot.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -811,6 +811,63 @@ default. Revert = revert del PR + redeploy.
       una procedencia) para que no nazcan dos briefs de la misma intención.
 - [ ] La corrida real de smoke queda documentada con costo, candidatos y mezcla de resultados en
       el registro de cierre de la task.
+
+## Registro de cierre — 2026-08-28
+
+**Estado: `code complete, rollout pendiente`.** Los cinco slices están implementados, verificados
+contra PG real y documentados; falta la corrida real de smoke con gasto (no autorizada en esta
+sesión) y el deploy del gateway MCP.
+
+### Verificación runtime ejecutada (solo lectura, PG real vía proxy)
+
+| Paso | Resultado |
+|---|---|
+| `maxDifficulty=20` sobre la corrida productiva | 10 → **10 candidatos** (NO reduce) + `ignoredFilters` lo declara con `replacement: maxLinkBarrier` |
+| `maxLinkBarrier=medium` | 10 → **8** (excluye las 2 de barrera `high` que el filtro viejo dejaba pasar) |
+| `clusterConflict` | **`conflict` real**: el candidato `pintura` choca con la ya seguida `pinturas` (core `pintures`) en `seot-berel-mx`; 9 restantes `clear` |
+| Determinismo | Dos lecturas idénticas → mismo representante y mismo orden |
+| Default histórico de `volumePolicy` | La corrida pre-1694 se lee `positive_volume_only` para `keyword_suggestions` |
+| Gasto de proveedor por la señal de cluster | **Cero llamadas**: sólo dos lecturas del store de mercado |
+
+### Hallazgos de la data real
+
+- 🔴 **Defecto propio corregido gracias a la verificación runtime, no a los tests.** La primera
+  implementación de `clusterConflict` trataba `core_keyword IS NULL` como "no se sabe" y dejaba 8
+  de 10 candidatos en `unknown`, escondiendo colisiones reales. Medido sobre las 923 filas del
+  store: **527 nulos, 396 apuntando a otra keyword, CERO autorreferentes** — el proveedor no emite
+  el core cuando la keyword ya ES la canónica del clúster. El core efectivo pasó a ser
+  `core_keyword ?? la keyword misma` y el único estado ciego es no tener fila de mercado.
+- **764 de 923 filas del store tienen `keyword_difficulty = 0`** (83%): ISSUE-152 medido a escala,
+  y la evidencia más dura de que `maxDifficulty` no discriminaba nada en es-LATAM.
+- **334 de 923 filas no tienen perfil de enlaces** (36% → barrera `unknown`): por eso el default
+  `includeUnknownBarrier: false` es una decisión con consecuencia real, no un detalle.
+- **El caso de fusión todavía NO existe en datos reales.** Hay una sola corrida productiva (10
+  candidatos, un solo método), así que ninguna keyword tiene procedencia múltiple hoy. El colapso
+  es preventivo y llega antes del primer snapshot de `TASK-1700`, que es exactamente su razón de
+  ser — pero conviene decirlo en vez de reportar una verificación que no ocurrió.
+- **Cinco candidatos de la corrida comparten el core `pintura acrílica` ENTRE SÍ.** Es el caso que
+  la `## Open Questions` dejó fuera de alcance (conflicto intra-corrida); la evidencia real
+  refuerza que el follow-up vale, y su lugar natural sigue siendo la decisión en lote de
+  `TASK-1660`.
+
+### Pendientes de rollout
+
+1. **Corrida real de smoke con gasto** (~USD 0,013) en un mercado es-LATAM ralo con la política
+   `all`, comparando candidatos, filas compradas, costo y mezcla de `searchVolume = null` contra el
+   smoke de `TASK-1664`. Requiere autorización explícita del operador.
+2. **Deploy del gateway MCP** (`efeonce-mcp`): el commit local `807fb76` deja espejo de inventario,
+   schema, descripción y canary al día, con sus 67 tests verdes. **Sin push** por acuerdo del
+   operador; viaja con el próximo release del gateway.
+3. Promoción a producción por el release control plane + observación de
+   `seo-keyword-discovery-health` durante la primera corrida productiva.
+
+### Desviación declarada respecto del criterio de aceptación
+
+El criterio dice `unknown` (nunca `clear`) cuando "el set seguido no tiene filas de mercado". Se
+implementó una distinción más fina, sostenida por la data: **un set seguido VACÍO devuelve `clear`**
+—no hay nada contra qué canibalizar, y eso es un hecho positivo, no una ausencia de dato—, mientras
+que un set con keywords y sin fila de mercado sí degrada a `unknown`. El propósito del invariante
+("la ausencia de dato no se presenta como ausencia de conflicto") se conserva intacto.
 
 ## Follow-ups
 

@@ -7,6 +7,45 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-28 — MCP oficial de LicitaLAB documentado y gateado para Codex y Claude
+
+- La skill espejada `greenhouse-public-private-tenders` incorpora el companion `licitalab-mcp.md` con endpoint
+  OAuth, inventario live de cinco tools read-only, recetas por oportunidad/proveedor/documentos, estados RAG,
+  límites y canary verificado. El bundle entra a `pnpm skills:mirrors` para impedir que Codex y Claude operen
+  licitaciones reales con contratos distintos.
+
+## 2026-08-28 — TASK-1694: en descubrimiento SEO, un candidato es una keyword y la dificultad cruda deja de decidir
+
+- **`maxDifficulty` se acepta pero ya no filtra**, y la respuesta lo declara en `ignoredFilters`
+  con su reemplazo. El filtro canónico es `maxLinkBarrier` (`low|medium|high`) sobre la barrera
+  derivada por `deriveLinkBarrier`, con `includeUnknownBarrier` (default `false`): "Sin dato" no
+  es "Baja". Medido contra el store real: **764 de 923 filas tienen `keyword_difficulty = 0`**, así
+  que en es-LATAM el filtro viejo no discriminaba nada — sobre la corrida productiva,
+  `maxDifficulty=20` devolvía las 10 keywords, barrera Alta incluida.
+- **El reader colapsa por `normalizedKeyword`**: la misma keyword hallada por dos métodos es UNA
+  fila con `candidateIds[]` + `provenance[]`, y `totalCandidates` cuenta keywords distintas. Es
+  cambio de cardinalidad del contrato, no de la UI: aguas abajo la cola priorizada (TASK-1700) es
+  un aggregate append-only y habría congelado la misma decisión hasta cuatro veces, con cuatro
+  compromisos de gasto sobre una sola intención. Levanta su bloqueo duro.
+- **`clusterConflict`** advierte canibalización contra el set seguido del target (hasta 5 miembros
+  nombrados + total), derivado al leer y con **cero llamadas al proveedor**. Señal separada de
+  `alreadyTracked`, con `unknown` que nunca se lee como `clear`.
+- **Los cuatro adapters de expansión compran igual**: `keyword_suggestions` y `keyword_ideas` dejan
+  de mandar `filters` de `search_volume`. El filtro no abarataba la llamada (se paga por fila y el
+  `limit` ya la acota) — sólo cambiaba qué se compraba por el mismo precio, y en mercados ralos se
+  comía el long-tail. Cada corrida persiste su `volumePolicy`; las anteriores se leen con el
+  default histórico.
+- 🔴 **Un defecto propio lo destapó la verificación runtime, no los tests**: `core_keyword IS NULL`
+  se estaba leyendo como "no se sabe" y dejaba 8 de 10 candidatos en `unknown`, escondiendo
+  colisiones reales. El proveedor no emite el core cuando la keyword YA ES la canónica del clúster
+  (527 nulos, 396 apuntando a otra, **cero autorreferentes** en 923 filas), así que el core efectivo
+  es `core_keyword ?? la keyword misma`.
+- Federado en el mismo PR: route admin, lane ecosystem y tool MCP `get_seo_keyword_discovery`. El
+  gateway `efeonce-mcp` tiene su commit local (espejo de inventario, schema, descripción y canary,
+  67 tests verdes) **sin push**: viaja con su próximo release.
+- Estado: **`code complete, rollout pendiente`** — falta la corrida de smoke con gasto (~USD 0,013)
+  y el deploy del gateway.
+
 ## 2026-08-28 — Release a producción `c983be7f18e6`: carril Growth/SEO vivo, flag prendido y gateway MCP a 27 tools
 
 - Paso a producción end-to-end del trabajo del día (PR #208, 181 archivos, 4 migraciones):
@@ -720,17 +759,3 @@
   y requiere recuperación explícita en vez de afirmar que no salió o reenviarlo automáticamente.
 - El cambio está validado localmente por Arquitectura, Talento y Seguridad. Todavía no está activo: primero se
   instalará el índice concurrente con readback verde, sin pausar el resto del correo del sistema.
-
-## 2026-08-19 — La recuperación de acceso a tests ya tiene una base segura y auditable
-
-- Se definieron dos permisos distintos: reenviar por email y revelar un enlace temporal. Ninguno recupera ni
-  almacena el enlace anterior; cada acción futura rotará el acceso y quedará auditada sin nombre, correo,
-  teléfono, URL ni token.
-- La base bloquea recoveries sobre postulaciones cerradas, consentimiento retirado, tests terminados o timers
-  vencidos. Un test iniciado conserva exactamente su deadline, accommodations y gracia; una transacción larga
-  no puede confirmar después del vencimiento.
-- La evidencia nace automáticamente en la misma transacción y la retención distingue candidatos de personas
-  seleccionadas. El retiro de consentimiento Hiring no puede borrar registros que ya pasaron a retención
-  laboral.
-- Este slice está validado localmente pero todavía no opera en producción: la migración no se aplicará hasta
-  que exista el command token-safe y los smokes PostgreSQL prueben ACL, concurrencia, rollback y purga.

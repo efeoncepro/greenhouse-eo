@@ -10,6 +10,7 @@ import type {
 } from '@/lib/growth/seo/keyword-discovery/contracts'
 import {
   SEO_DISCOVERY_ACTION_KINDS,
+  SEO_DISCOVERY_LINK_BARRIER_FILTER_LEVELS,
   SEO_DISCOVERY_METHODS,
   SEO_DISCOVERY_RUN_STATUSES,
   SEO_DISCOVERY_SOURCE_KINDS
@@ -275,7 +276,11 @@ export async function GET(request: Request) {
       query: url.searchParams.get('query')?.trim() || undefined,
       intent: readEnumParam(url, 'intent', SEO_SEARCH_INTENTS),
       minSearchVolume: parseNumber(url.searchParams.get('minSearchVolume')),
+      // ⚠️ DEPRECADO: se sigue aceptando (no rompe a quien ya lo manda) pero el reader NO lo
+      // aplica y lo declara en `ignoredFilters`. El filtro canónico es `maxLinkBarrier`.
       maxDifficulty: parseNumber(url.searchParams.get('maxDifficulty')),
+      maxLinkBarrier: readEnumParam(url, 'maxLinkBarrier', SEO_DISCOVERY_LINK_BARRIER_FILTER_LEVELS),
+      includeUnknownBarrier: url.searchParams.get('includeUnknownBarrier') === 'true',
       excludeTracked: url.searchParams.get('excludeTracked') === 'true',
       limit: parseNumber(url.searchParams.get('limit')),
       cursor: url.searchParams.get('cursor')

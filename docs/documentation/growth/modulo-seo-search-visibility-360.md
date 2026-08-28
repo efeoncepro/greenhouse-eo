@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.13
+> **Version:** 1.14
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1699 + TASK-1662 + TASK-1696 vivos en producción con el release `c983be7f18e6`: el módulo ya guarda quién más aparece en tu SERP, compara contra un competidor declarado y anota quién consumió cada dólar del proveedor; delta previo 2026-08-14 por Claude (TASK-1661 + follow-ups: las columnas de mercado se llenan solas, la captura es mensual y acotada con simulacro de costo previo, "Dificultad" pasa a ser **Barrera de enlaces** en niveles con "Sin dato" como estado propio, todo dato de mercado viaja con su fecha, y cada respuesta declara el país que muestra — incluida la corrección del caso Berel (ISSUE-152/153); delta previo 2026-08-09 TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee))
+> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1694: en el descubrimiento, un candidato es una keyword —no una fila por método—, el filtro de dificultad del proveedor deja de decidir y aparece el aviso de canibalización; delta previo 2026-08-28 TASK-1699 + TASK-1662 + TASK-1696 vivos en producción con el release `c983be7f18e6`: el módulo ya guarda quién más aparece en tu SERP, compara contra un competidor declarado y anota quién consumió cada dólar del proveedor; delta previo 2026-08-14 por Claude (TASK-1661 + follow-ups: las columnas de mercado se llenan solas, la captura es mensual y acotada con simulacro de costo previo, "Dificultad" pasa a ser **Barrera de enlaces** en niveles con "Sin dato" como estado propio, todo dato de mercado viaja con su fecha, y cada respuesta declara el país que muestra — incluida la corrección del caso Berel (ISSUE-152/153); delta previo 2026-08-09 TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee))
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -691,6 +691,41 @@ el preview de costo y el gate de presupuesto.
 > Detalle técnico: [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 > §7 (primitives) y §8 (drain + costos) · runbook
 > [`operar-keyword-discovery-seo.md`](../../manual-de-uso/growth/operar-keyword-discovery-seo.md)
+
+#### Un candidato es una keyword, y el aviso de canibalización (TASK-1694, 2026-08-28)
+
+Tres correcciones al contrato que la pantalla se había esquivado por su cuenta pero que seguían
+vivas para quien consulta por API, Nexa o MCP:
+
+- **Una keyword hallada por dos métodos era dos filas.** Cada una con su estado y su botón de
+  decisión, sobre una sola oportunidad. Ahora es una sola fila que lleva adentro por dónde llegó, y
+  el total cuenta keywords distintas. Importa porque seguir una keyword compromete gasto todos los
+  días: dos filas de lo mismo eran dos compromisos sobre una sola intención — y la cola priorizada
+  de trabajo SEO, que viene después, **escribe lo que ve y no se puede corregir hacia atrás**.
+- **El filtro por dificultad del proveedor engañaba.** Esa cifra colapsa a cero en búsquedas en
+  español de LATAM (medido: 764 de 923 keywords del almacén marcan cero), así que pedir "sólo lo
+  fácil" devolvía casi todo, incluida barrera Alta. Se sigue aceptando para no romper a quien ya lo
+  usaba, pero **ya no filtra y la respuesta lo declara**, junto con cuál es el filtro correcto: la
+  barrera de enlaces, que ahora sí se puede filtrar y que por defecto deja fuera lo no medido.
+- **Nada advertía sobre canibalización.** Declarar objetivo "pintura para pisos" teniendo ya
+  seguida "pintura pisos" pasaba sin una palabra, y dos objetivos sobre la misma intención se
+  diluyen. Ahora el contrato avisa cuando el candidato pertenece al mismo grupo que algo que ya se
+  sigue, y nombra contra qué choca. Es un aviso, no un bloqueo, y distingue "no choca" de "no se
+  pudo saber" — un hueco de datos nunca se presenta como vía libre.
+
+Además, los cuatro métodos de expansión ahora **compran igual**: dos de ellos descartaban en el
+proveedor las keywords sin volumen estimado y dos no. Ese filtro no abarataba la llamada (se paga
+por fila devuelta y el tope de filas ya lo acota); sólo cambiaba qué se traía por el mismo precio, y
+en mercados de demanda rala se comía justo el long-tail emergente que el descubrimiento existe para
+encontrar. Cada corrida guarda con qué política compró, para que una corrida vieja siga siendo
+interpretable.
+
+Sin cambio en la pantalla todavía: la lente recibe menos filas y campos nuevos que aún no pinta
+(follow-up declarado).
+
+> Detalle técnico: [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
+> §7 → Delta TASK-1694 · manual
+> [`descubrir-keywords-seo.md`](../../manual-de-uso/growth/descubrir-keywords-seo.md)
 
 #### La lente `Descubrir`: la cara visible del descubrimiento (TASK-1665, 2026-08-14)
 

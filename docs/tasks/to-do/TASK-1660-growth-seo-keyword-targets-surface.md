@@ -1,5 +1,24 @@
 # TASK-1660 — Growth SEO: superficie de keywords OBJETIVO y avance contra objetivo
 
+## Delta 2026-08-28 — `clusterConflict` ya existe: la advertencia previa a declarar objetivos en lote
+
+Cerrado por `TASK-1694`. El reader canónico `readKeywordDiscovery` expone por candidato
+`clusterConflict: { status: 'conflict' | 'clear' | 'unknown'; coreKeyword; trackedMembers (≤5);
+trackedMemberCount }`, derivado al leer contra el set seguido del target y **sin gasto de
+proveedor**. Es señal SEPARADA de `alreadyTracked` y `unknown` nunca se lee como `clear`.
+
+Qué cambia para esta task: declarar objetivos en lote es exactamente donde la canibalización se
+materializa, y ahora hay con qué advertirla antes de confirmar cupo — no hay que derivarla acá.
+Agregar al `## Acceptance Criteria` de esta task: **la confirmación en lote muestra el conflicto de
+cluster y nombra contra qué keyword vigente choca cada objetivo propuesto; un `unknown` se presenta
+como "no se pudo determinar", jamás como vía libre.**
+
+⚠️ Dos cosas que `TASK-1694` NO resolvió y que caen naturalmente acá: (a) el conflicto **entre
+candidatos de la misma selección** (dos objetivos nuevos que comparten core entre sí) — evidencia
+real: en la corrida productiva de Berel MX **cinco candidatos comparten el core `pintura acrílica`
+entre ellos**; (b) resolver el conflicto (consolidar cerrando una membresía vía `untrackKeywords`)
+sigue siendo decisión humana explícita: detectar no es resolver.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

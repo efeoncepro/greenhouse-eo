@@ -247,13 +247,16 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
   cableadas.** El reader pagina y devuelve `nextCursor`; la page lo descarta. Y de las cinco fuentes
   que el primitive soporta sólo `manual` está cableada — la de Search Console, la de mejor oficio
   (demanda medida, resolución sin costo de proveedor), existe con copy escrito y sin consumidor.
-- `TASK-1694` — [creada 2026-08-15, backend-data] **Contrato de candidatos: barrera filtrable, una
-  fila por keyword, política de inclusión declarada.** La API mantiene `maxDifficulty` sobre la KD
-  cruda que `ISSUE-152` declaró engañosa y no expone filtro por barrera de enlaces; el dedupe por
-  método deja la misma keyword en dos filas con dos CTAs de gasto; y dos de los cuatro métodos
-  filtran el volumen cero en el proveedor y los otros dos no. **Bloqueo duro de `TASK-1700`** y
-  subida a P1: es la única defensa contra que la cola persista duplicados con la barrera engañosa en
-  filas append-only.
+- `TASK-1694` — [**`complete` 2026-08-28**, `code complete, rollout pendiente`, backend-data]
+  **Contrato de candidatos: barrera filtrable, una fila por keyword, política de inclusión
+  declarada.** `maxLinkBarrier`/`includeUnknownBarrier` entran al contrato y `maxDifficulty` se
+  acepta pero ya no decide (viaja declarado en `ignoredFilters`); el reader colapsa por
+  `normalizedKeyword` con `candidateIds[]`/`provenance[]`; `clusterConflict` advierte
+  canibalización contra el set seguido sin gastar; y los cuatro adapters compran con una sola
+  política declarada, persistida en `methods_json`. Levanta el **bloqueo duro de `TASK-1700`**.
+  Verificado contra PG real (764 de 923 filas del store marcan `keyword_difficulty = 0`, y el
+  filtro viejo no reducía el conjunto). Pendiente de rollout: corrida de smoke con gasto y deploy
+  del gateway MCP (commit local en `efeonce-mcp`).
 - `TASK-1695` — [creada 2026-08-15, backend-data] **Cobertura y registro del autor grounded.** El
   techo de 20 candidatos del bridge es aritméticamente incompatible con su propia regla de 12–16
   preguntas, y el system prompt base está en voseo rioplatense pidiendo salida es-CL — riesgo de

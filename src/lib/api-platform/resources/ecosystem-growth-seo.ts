@@ -21,6 +21,7 @@ import { isVisibilitySubjectKind } from '@/lib/growth/seo/url-visibility/resolve
 import {
   SEO_DISCOVERY_ACTION_KINDS,
   SEO_DISCOVERY_SOURCE_KINDS,
+  isDiscoveryLinkBarrierFilterLevel,
   type SeoDiscoveryActionKind,
   type SeoDiscoveryMethod,
   type SeoDiscoveryRunStatus,
@@ -1474,6 +1475,14 @@ export const getEcosystemSeoKeywordDiscoveryPayload = async ({
     return Number.isFinite(parsed) ? parsed : undefined
   }
 
+  // Vocabulario CERRADO: un valor fuera de él se ignora (mismo criterio que el app lane), jamás
+  // se pasa crudo al reader fingiendo un filtro que no existe.
+  const readDiscoveryLinkBarrier = (value: string | null) => {
+    const raw = value?.trim()
+
+    return raw && isDiscoveryLinkBarrierFilterLevel(raw) ? raw : undefined
+  }
+
   const result = await readKeywordDiscovery({
     organizationId: subject.organizationId,
     seoTargetId: subject.seoTargetId ?? undefined,
@@ -1483,7 +1492,11 @@ export const getEcosystemSeoKeywordDiscoveryPayload = async ({
     query: url.searchParams.get('query')?.trim() || undefined,
     intent: (url.searchParams.get('intent')?.trim() || undefined) as SeoSearchIntent | undefined,
     minSearchVolume: parseNumber(url.searchParams.get('minSearchVolume')),
+    // ⚠️ DEPRECADO (TASK-1694): aceptado, NO aplicado, declarado en `ignoredFilters` del
+    // payload — que viaja tal cual porque este lane es passthrough del primitive.
     maxDifficulty: parseNumber(url.searchParams.get('maxDifficulty')),
+    maxLinkBarrier: readDiscoveryLinkBarrier(url.searchParams.get('maxLinkBarrier')),
+    includeUnknownBarrier: url.searchParams.get('includeUnknownBarrier') === 'true',
     excludeTracked: url.searchParams.get('excludeTracked') === 'true',
     limit: parseNumber(url.searchParams.get('limit')),
     cursor: url.searchParams.get('cursor')

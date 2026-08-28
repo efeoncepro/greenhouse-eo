@@ -387,6 +387,59 @@ cablea al cliente público compartido"; el camino correcto es `TASK-1631`).
 - `queueSiteAudit(targetId, actor)` (async OnPage task)
 - `createGroundedQueryDraft(input)` / `readGroundedQueryDraft(input)` — **IMPLEMENTADOS (TASK-1666, 2026-08-14)** en `src/lib/growth/seo/grounded-query-{bridge,reader}.ts`: el puente gobernado candidatos de discovery → **DRAFT** de grounded queries AEO. Contratos duros: el bridge es un ADAPTER (lee candidatos SOLO por `readKeywordDiscovery` con el filtro `candidateIds`; cero SQL/JOIN/FK cross-motor — boundary §1.1); el brand context es el AUTORIZADO server-side (`grader_profiles` + brand intelligence, jamás del caller); doble capability (`growth.seo.observation.read` + `growth.ai_visibility.prompt_set.manage`); ≤20 candidates, sin duplicados, estados permitidos (`new`/`selected_for_grounded_query` — `dismissed` exige re-selección); `contextRef` = SHA-256 del JSON canónico exacto de la spec; refs OPACAS en `grounding_sources_json` (`seo.discovery.{run,candidate,context}:…`, jamás la keyword); **honestidad del grounding**: `grounded_llm` sólo si la autoría usó el contexto (cerebro versionado aparte `aeo-author.seo-grounded.v2` — v2 2026-08-14 post-auditoría AEO: cobertura obligatoria por seed verificada determinísticamente (`computeSeoSeedCoverage` → `seedCoverage`/`coverageNotice` en el resultado), sanitizer normaliza competidor literal a `{{competitor}}` y una marca literal fuerza `namesBrand=true`, pisos de distribución grounded (≥50% discovery + 4 fanOutTypes, degenerado → fallback honesto); `aeo-author.v1` queda byte-a-byte intacto sin contexto), fallback = `baseline_fallback` + aviso obligatorio + `groundingRef='baseline_not_candidate_specific'`; idempotencia por contexto + modo esperado con `pg_advisory_xact_lock` en conexión fijada (un baseline previo NO bloquea re-generar grounded); **el bridge SÓLO crea draft** — `approveGraderPromptSet` (AEO) sigue siendo la única vía a `active` y jamás se dispara un run. Parity en el mismo PR: route admin `POST/GET /api/admin/growth/seo/grounded-queries`, lane ecosystem `grounded-queries` (GET/POST, **sólo bindings `internal`**), MCP `get_seo_grounded_query_draft` + `prepare_seo_grounded_queries` (write bajo `efeonce.mcp.seo.write`; con la identidad máquina compartida el write queda **`aeo_forbidden` fail-closed hasta TASK-1631** — la capability humana de prompt sets no se fabrica para la máquina). Sanity live: `scripts/growth/_sanity-task-1666-grounded-query-bridge.ts` (16/16 con autoría real; eval humana de naturalidad incluida).
 - `queueKeywordDiscovery(input)` / `previewKeywordDiscovery(input)` / `recordKeywordDiscoveryAction(input)` — **IMPLEMENTADOS (TASK-1664, 2026-08-14)** en `src/lib/growth/seo/keyword-discovery/queue.ts`, con el reader `readKeywordDiscovery(input)` en `keyword-discovery/reader.ts` y el runner async (`runKeywordDiscovery`/`drainKeywordDiscoveryRuns`) en `keyword-discovery/runner.ts`. La corrida separa la SOLICITUD (run `pending` + outbox en una tx, seeds resueltas server-side desde `manual | gsc_queries | tracked_keywords | target_domain | mixed`, máx 10) de sus RESULTADOS (candidatos con SOLO procedencia — la métrica va al store de 1661) y de las DECISIONES (`seo_keyword_discovery_actions`, append-only, jamás trackea por sí sola). Preview con **fórmula** de costo, no sólo un número; `methods: []` es una corrida GSC-only válida con costo CERO (valida el pipeline sin gastar). El reader compone en memoria mercado ◑ (vía `readKeywordMarketData`, nunca SQL directo) + GSC ● (`measuredGsc`, lente SEPARADA) + `alreadyTracked` + última acción, con el orden por defecto de 7 llaves (acción pendiente → match de seed → core_keyword → volumen desc → dificultad asc → captured_at desc → id). Full API Parity en el mismo PR: route admin `POST/GET /api/admin/growth/seo/keyword-discovery` (capabilities `growth.seo.target.configure` para escribir / `observation.read` para leer), lane ecosystem `GET/POST /api/platform/ecosystem/growth/seo/keyword-discovery` (+`/actions`; write sólo bindings `internal`), MCP tools `get_seo_keyword_discovery` + `discover_seo_keywords` (write bajo `efeonce.mcp.seo.write`; su description exige preview + confirmación humana ANTES de encolar) y parity test `keyword-discovery-parity.test.ts`. Sanity PG real: `scripts/growth/_sanity-task-1664-keyword-discovery.ts` (27 checks, transacción abortada + smoke `--spend`).
+
+  **Delta TASK-1694 (2026-08-28) — el contrato de candidatos decide con la barrera correcta, una
+  fila por keyword y una política de inclusión declarada.** Sin migración, sin flag y sin
+  capability nueva: cambia el contrato de lectura y el payload de dos adapters.
+
+  - 🔴 **Un candidato es UNA KEYWORD NORMALIZADA, no una fila de procedencia.** `readKeywordDiscovery`
+    colapsa por `normalizedKeyword` (representante = menor `sourceRank`, desempate `candidateId`
+    asc) y expone `candidateIds[]` + `provenance[]`; `totalCandidates` cuenta keywords distintas y
+    `latestAction` es la más reciente entre todas las procedencias fusionadas. La keyword —no la
+    fila— es la unidad que se puntúa, la que recibe `evidence_ref` y la que un humano decide, **en
+    los cuatro consumers**. Es contrato del reader, no convención de la UI: ningún consumer aguas
+    abajo puede tratar una procedencia como candidato propio, porque en el aggregate append-only
+    de `TASK-1700` eso persiste la misma decisión hasta cuatro veces con cuatro compromisos de
+    gasto sobre una sola intención. La fila en base y el constraint de procedencia no se tocan.
+  - 🔴 **`maxDifficulty` se acepta, NO se aplica y se declara.** El contrato devuelve siempre
+    `ignoredFilters[]` (`[]` cuando no aplica) y el filtro canónico de dificultad es
+    `maxLinkBarrier` (`low|medium|high`, sobre el `linkBarrier` de `deriveLinkBarrier`) con
+    `includeUnknownBarrier` (default `false`). "Sin dato" —`unknown` o sin fila de mercado— nunca
+    satisface un filtro de barrera. Deprecar sin romper es deliberado: tres consumers vivos ya lo
+    mandan, y entre devolver de más declarándolo o devolver el subconjunto equivocado en silencio,
+    el contrato elige lo primero. Medido contra el store real: **764 de 923 filas tienen
+    `keyword_difficulty = 0`**, así que en es-LATAM el filtro no discriminaba nada.
+  - **`clusterConflict` es señal propia, separada de `alreadyTracked` y nunca derivada de ella:**
+    `conflict` cuando otra keyword vigente distinta del target comparte el core del candidato
+    (`trackedMembers` nombra hasta 5 + `trackedMemberCount`), `clear` cuando se pudo descartar,
+    `unknown` cuando no se pudo saber. Se deriva al leer con UNA lectura más de
+    `readKeywordMarketData` sobre el set seguido y **cero llamadas al proveedor**; no se persiste
+    (persistirla la congelaría y envejecería sin aviso). 🔴 **El core EFECTIVO es
+    `core_keyword ?? la keyword misma`**: `core_keyword` identifica la canónica del clúster, así
+    que el proveedor no lo emite cuando la keyword ya ES la canónica — 527 nulos, 396 apuntando a
+    otra y **cero autorreferentes** en las 923 filas del store. Leer el `NULL` como "no se sabe"
+    perdía la colisión más probable (el candidato variante contra la canónica ya seguida) y la
+    reportaba como `unknown`. El único estado ciego es **no tener fila de mercado**.
+  - **Una sola política de inclusión, declarada.** Los cuatro adapters de expansión compran con
+    `SEO_DISCOVERY_DEFAULT_VOLUME_POLICY = 'all'`: `keyword_suggestions` y `keyword_ideas` dejan
+    de mandar `filters: [['keyword_info.search_volume','>',0]]`. El proveedor cobra por fila
+    devuelta y `limit` ya acota las filas, así que el filtro **no bajaba el techo de costo** —
+    cambiaba qué filas se compraban por el mismo precio, y en un mercado ralo gastaba el `limit`
+    descartando el long-tail emergente. La corrida persiste `volumePolicy` por método en
+    `methods_json`; una corrida anterior sin el campo se lee con el default **histórico**
+    (`positive_volume_only` para suggestions/ideas, `all` para related/site) — el reader reproduce
+    la historia, no la reescribe.
+  - **Federación en el MISMO PR:** route admin, lane ecosystem y tool MCP `get_seo_keyword_discovery`
+    parsean `maxLinkBarrier`/`includeUnknownBarrier` con el vocabulario cerrado y hacen passthrough
+    de `ignoredFilters`; el gateway `efeonce-mcp` actualiza espejo de inventario, schema,
+    descripción y canary (commit local, deploy con el próximo release del gateway).
+  - Verificación runtime (sólo lectura, PG real, 2026-08-28): `maxDifficulty=20` NO reduce el
+    conjunto (10 → 10) y viaja declarado; `maxLinkBarrier=medium` deja 8 (excluye las 2 de barrera
+    Alta que el filtro viejo dejaba pasar); `clusterConflict` marca `pintura` contra la ya seguida
+    `pinturas` (mismo core) en `seot-berel-mx`; dos lecturas idénticas devuelven el mismo
+    representante y orden. **El caso de fusión no existe todavía en datos reales** (una sola
+    corrida productiva, 10 candidatos de un solo método): el colapso es preventivo y llega antes
+    del primer snapshot de `TASK-1700`, que es exactamente su razón de ser.
 - `setBacklinkTracking(targetId, competitors[], actor)`
 
 **Readers (shape + latency, muchos consumers):**

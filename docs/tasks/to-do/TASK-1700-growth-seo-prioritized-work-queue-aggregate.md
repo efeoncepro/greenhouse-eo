@@ -1,5 +1,25 @@
 # TASK-1700 — Growth SEO: la cola priorizada de trabajo es un aggregate persistido con score versionado
 
+## Delta 2026-08-28 — el bloqueo duro de `TASK-1694` quedó levantado (con una salvedad)
+
+`TASK-1694` cerró como **`code complete, rollout pendiente`**. Lo que la cola necesitaba que
+existiera antes de su primer snapshot ya existe en el contrato de lectura:
+
+- **La unidad puntuable es la keyword normalizada, no la fila de procedencia** — es contrato del
+  reader (`candidateIds[]` + `provenance[]`, `totalCandidates` cuenta keywords distintas), no
+  convención de la UI. Un `priority_score` por procedencia habría persistido la misma decisión hasta
+  cuatro veces, con cuatro compromisos de gasto sobre una sola intención, en una tabla append-only.
+- **La barrera de enlaces es filtrable y canónica** (`maxLinkBarrier` + `includeUnknownBarrier`);
+  `maxDifficulty` se acepta pero ya no decide y viaja declarado en `ignoredFilters`. Medido sobre el
+  store real: 764 de 923 filas marcan `keyword_difficulty = 0`, así que ordenar o filtrar la cola
+  por esa cifra en es-LATAM no discriminaba nada.
+- **`clusterConflict`** está disponible como factor/advertencia por candidato, derivado al leer y
+  sin gasto de proveedor.
+
+⚠️ **Salvedad antes del primer snapshot:** el contrato está corregido en código y verificado contra
+PG real, pero `TASK-1694` todavía no se promovió a producción. No tomes el primer snapshot contra un
+runtime que aún sirva el contrato viejo — verifica la promoción antes de arrancar el Slice 1.
+
 ## Delta 2026-08-28 (release a producción) — la cadena de productores del origen `competitor_gap` ya corre en runtime
 
 El release `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208, release_id
@@ -80,7 +100,7 @@ serie del top-N arranca con el primer deploy del worker post-release y los candi
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo`
-- Blocked by: `TASK-1694` (bloqueo DURO) · `TASK-1692` · `TASK-1699` (sólo para el origen `competitor_gap`; los otros cuatro orígenes no la necesitan — satisfecho en código desde 2026-08-28, ver Delta)
+- Blocked by: `TASK-1692` · `TASK-1699` (sólo para el origen `competitor_gap`; los otros cuatro orígenes no la necesitan — satisfecho en código desde 2026-08-28, ver Delta)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

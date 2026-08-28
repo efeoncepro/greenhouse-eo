@@ -1070,6 +1070,8 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     intent?: string
     minSearchVolume?: number
     maxDifficulty?: number
+    maxLinkBarrier?: 'low' | 'medium' | 'high'
+    includeUnknownBarrier?: boolean
     excludeTracked?: boolean
     limit?: number
     cursor?: string
@@ -1081,22 +1083,35 @@ export const createGreenhouseMcpHandlers = (client: Pick<
           errorCode?: string
           runs?: unknown[]
           run?: { runId?: string; status?: string } | null
-          candidates?: unknown[]
+          candidates?: Array<{ clusterConflict?: { status?: string } }>
           totalCandidates?: number
           marketAvailability?: string
           marketFreshness?: string | null
+          ignoredFilters?: Array<{ filter?: string; replacement?: string | null }>
         }
 
         if (data.ok === false) {
           return `SEO keyword discovery unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
         }
 
+        // Un filtro ignorado en silencio deja al agente creyendo que decidió con menos ruido del
+        // que recibió: se nombra en el summary, no sólo en el payload.
+        const ignored = (data.ignoredFilters ?? [])
+          .map(entry => `${String(entry.filter)} (use ${String(entry.replacement ?? 'nothing')} instead)`)
+          .join(', ')
+
         if (data.run) {
+          const conflicts = (data.candidates ?? []).filter(
+            candidate => candidate.clusterConflict?.status === 'conflict'
+          ).length
+
           return `SEO keyword discovery run ${String(data.run.runId ?? '?')} [${String(data.run.status ?? '?')}]: ${String(
             data.totalCandidates ?? 0
-          )} candidates (market data: ${String(data.marketAvailability ?? 'unavailable')}, as-of ${String(
-            data.marketFreshness ?? 'n/a'
-          )}). Volumes/difficulty are ESTIMATED market data (◑); measuredGsc is the client's own measured demand (●) — never merge them (${result.requestId}).`
+          )} candidates — one row per distinct keyword, provenance in candidateIds (market data: ${String(
+            data.marketAvailability ?? 'unavailable'
+          )}, as-of ${String(data.marketFreshness ?? 'n/a')})${
+            conflicts > 0 ? `; ${String(conflicts)} on this page collide with an already-tracked keyword (clusterConflict)` : ''
+          }${ignored ? `; IGNORED filters: ${ignored}` : ''}. Volumes/difficulty are ESTIMATED market data (◑); measuredGsc is the client's own measured demand (●) — never merge them (${result.requestId}).`
         }
 
         return `SEO keyword discovery: ${String((data.runs ?? []).length)} run(s) listed. Pass runId to inspect candidates (${result.requestId}).`

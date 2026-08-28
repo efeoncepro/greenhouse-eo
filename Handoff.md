@@ -2,6 +2,41 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-28 — TASK-1694: contrato de candidatos de discovery — code complete, rollout pendiente
+
+Cerrada en `develop`, sin push. Cinco slices + un fix propio: barrera de enlaces filtrable
+(`maxLinkBarrier`/`includeUnknownBarrier`) con `maxDifficulty` aceptado-pero-ignorado y declarado en
+`ignoredFilters`; colapso del reader por `normalizedKeyword` (`candidateIds[]`/`provenance[]`,
+`totalCandidates` cuenta keywords); `clusterConflict` contra el set seguido sin gasto de proveedor;
+política de inclusión única (`all`) en los cuatro adapters, persistida en `methods_json` con default
+histórico de lectura; federación en route admin + lane ecosystem + tool MCP.
+
+**Dos cosas que un próximo turno necesita saber:**
+
+1. 🔴 **`core_keyword IS NULL` significa "la keyword ES la canónica de su clúster", no "no se
+   sabe".** Verificado sobre las 923 filas del store: 527 nulos, 396 apuntando a otra, **cero
+   autorreferentes**. Mi primera implementación lo leyó como desconocido y dejó 8 de 10 candidatos
+   productivos en `unknown`, escondiendo una colisión real. El core efectivo es
+   `core_keyword ?? la keyword misma`; el único estado ciego es no tener fila de mercado. Lo destapó
+   la verificación contra PG real, no los tests — que pasaban.
+2. **El caso de fusión aún no existe en datos reales**: una sola corrida productiva, 10 candidatos
+   de un solo método. El colapso es preventivo y su razón de ser es llegar antes del primer snapshot
+   de `TASK-1700`, que es append-only.
+
+**Pendientes de rollout (no cerrar como "listo" sin esto):**
+
+- Corrida real de smoke con gasto (~USD 0,013) en un mercado es-LATAM ralo con la política `all`,
+  comparando candidatos/costo/mezcla de `searchVolume=null` contra el smoke de `TASK-1664`. Requiere
+  autorización del operador.
+- **Deploy del gateway MCP.** Hay un commit LOCAL SIN PUSH en `~/Documents/efeonce-mcp` (`807fb76`)
+  con espejo de inventario, schema, descripción y canary al día (67 tests verdes). Sin él, el guard
+  bidireccional de paridad de ese repo queda rojo en cuanto Greenhouse promueva.
+- Promoción por el release control plane + observar `seo-keyword-discovery-health`.
+
+**Follow-up con evidencia nueva:** cinco candidatos de la corrida real comparten el core
+`pintura acrílica` **entre sí** — es el conflicto intra-corrida que la task dejó fuera de alcance a
+propósito y que pertenece a la superficie de decisión en lote (`TASK-1660`, ya con su `## Delta`).
+
 ## 2026-08-28 — Release develop→main `c983be7f18e6` + flip de flag + gateway MCP: COMPLETO
 
 **Estado: `complete`.** Paso a producción end-to-end del carril Growth/SEO (PR #208, 181 archivos,
@@ -541,9 +576,3 @@ esté en producción con su flag ON.
 ## 2026-08-27 — TASK-1696 adopta la señal de presupuesto que faltaba
 
 **Estado: spec sincronizada; implementación pendiente.** La task ahora incluye `seo.provider.cost_over_budget`: nueve tasks la citaban como mitigación, pero el barrido verificó que no existe en código. Entra junto a la dimensión `consumer` para no sub-reportar el gasto del grader; README y registry ya reflejan las tres señales.
-
-## 2026-08-27 — Tres skills Salesforce cubren operación y venta consultiva
-
-**Estado: `complete` local; sin runtime ni push.** Quedaron creadas y espejadas las skills de Salesforce CRM, Marketing Cloud Engagement y Marketing Cloud Next, con modos `operate`, `sell` y coexistencia donde aplica. El catálogo vive en [`docs/services/salesforce/README.md`](docs/services/salesforce/README.md) y el fundamento en [`SALESFORCE_PRACTICE_SKILL_FOUNDATION_2026-08-27.md`](docs/audits/commercial/SALESFORCE_PRACTICE_SKILL_FOUNDATION_2026-08-27.md).
-
-**Límite comercial vivo:** la aceptación histórica como Provisional Consulting Partner no prueba el estado actual, tier, certificaciones, SPPA ni Cloud Reseller. Antes de claims, cotización oficial, co-sell o reventa, hacer readback primario en Partner Community/contrato vigente. Ninguna skill autoriza mutaciones por inferencia.
