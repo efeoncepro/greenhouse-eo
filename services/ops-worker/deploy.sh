@@ -870,6 +870,26 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_URL_VISIBILITY_ENABLED=${GROWTH_SEO_URL_VISIBIL
 GROWTH_SEO_COMPETITOR_GAP_ENABLED="${GROWTH_SEO_COMPETITOR_GAP_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_COMPETITOR_GAP_ENABLED=${GROWTH_SEO_COMPETITOR_GAP_ENABLED}"
 
+# TASK-1700 — Cola priorizada de trabajo SEO (materializador del aggregate append-only).
+#
+# 🔴 **OFF por defecto, y por una razón distinta a la de sus hermanos**: este flag NO
+# compromete gasto de proveedor (la cola lee tablas ya pagadas). Lo que compromete es la
+# AUTORIDAD DE ORDEN — con la cola encendida el operador ve un orden que manda otra cosa que
+# la que mandaba ayer, y aparecen filas de orígenes que antes no estaban en esa lista. Por eso
+# el flip se AVISA antes, aunque no cueste un centavo.
+#
+# ⚠️ DUAL-RUNTIME: acá gatea el MATERIALIZADOR (sin esto no se escribe ningún snapshot y los
+# lanes de Vercel servirían una cola permanentemente vacía sin poder explicar por qué); en
+# Vercel gatea el reader, los lanes, la tool MCP y el cutover del consumer. Prenderlo en un
+# solo runtime deja la capacidad coja de forma distinta en cada dirección.
+#
+# Este archivo es el SoT declarativo del lado worker (`--set-env-vars` es DESTRUCTIVO: aplicar
+# también en vivo con `--update-env-vars` para efecto inmediato, o el próximo deploy lo borra
+# en silencio). Es SUBORDINADO a `GROWTH_SEO_ENABLED`.
+# Rollback (<5 min): `false` acá + `--update-env-vars` + pausar el scheduler.
+GROWTH_SEO_WORK_QUEUE_ENABLED="${GROWTH_SEO_WORK_QUEUE_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},GROWTH_SEO_WORK_QUEUE_ENABLED=${GROWTH_SEO_WORK_QUEUE_ENABLED}"
+
 # TASK-1699 — Persistencia del top-N del SERP que el rank capture YA paga (costo marginal
 # CERO: cero llamadas nuevas, cero cambio de depth/flags). Gatea la ESCRITURA dentro del
 # batch diario `ops-seo-rank-capture` — sin scheduler nuevo.
@@ -1565,6 +1585,24 @@ upsert_scheduler_job \
   '{}' \
   "false"
 echo "  -> ops-seo-keyword-discovery-drain: */2 * * * * ACTIVO (keyword discovery, TASK-1664 — despausado 2026-08-14; cadencia bajada de */10 a */2 el 2026-08-28)"
+
+# TASK-1700 — Cola priorizada de trabajo SEO. Cadencia DIARIA a las 10:00, DESPUÉS de
+# `ops-seo-gsc-snapshot` (0 9): el plan del día se calcula cuando ya llegó la demanda medida
+# del día, no antes — con el orden invertido el plan de hoy se armaría con los datos de ayer.
+#
+# 🔴 NACE PAUSADO. Es el TERCER freno independiente, además del flag del worker y el de
+# Vercel: la cola cambia de dueño el orden que el operador ve en pantalla, así que se despausa
+# recién tras la corrida shadow verificada sobre un target y el aviso al operador de SEO.
+#
+# El cron NO manda `force`: si el snapshot vigente es reciente, reusarlo ES la respuesta
+# correcta — mismos insumos, cero writes.
+upsert_scheduler_job \
+  "ops-seo-work-queue-materialize" \
+  "0 10 * * *" \
+  "/seo/work-queue/materialize-batch" \
+  '{}' \
+  "true"
+echo "  -> ops-seo-work-queue-materialize: 0 10 * * * PAUSADO (cola priorizada, TASK-1700 — despausar sólo tras corrida shadow verificada + aviso al operador de SEO)"
 
 # Email deliverability monitor — TASK-775 Slice 2.
 #

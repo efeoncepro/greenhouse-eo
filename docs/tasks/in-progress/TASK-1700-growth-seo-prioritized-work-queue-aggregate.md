@@ -1,5 +1,49 @@
 # TASK-1700 — Growth SEO: la cola priorizada de trabajo es un aggregate persistido con score versionado
 
+## Delta 2026-08-28 (3) — dependencia DURA nueva: `TASK-1792` bloquea el cutover del Slice 7
+
+Al implementar el Slice 2 se midió la curva de CTR real de las dos organizaciones con serie y
+apareció un defecto vivo del reader legacy que **convierte el plan de rollback de esta task en una
+suposición**:
+
+`expectedCtrAt` (`keyword-opportunities-reader.ts`) hace `if (typeof measured === 'number') return
+measured`, así que **un `0` medido pasa el guard** y anula el fallback. Con la curva de
+`efeoncepro.com` (bucket 5 = **75 impresiones, 0 clics**) eso da `targetCtr = 0`, y entonces
+`max(0, 0 − ctr)` es idénticamente 0 para toda fila: el score queda CONSTANTE y el `.sort()` por ese
+campo es un **no-op**. La lente no ordena mal — no ordena. Es la doctrina ●/◑ violada en su centro:
+ausencia de evidencia tratada como evidencia de cero.
+
+**Por qué es dependencia y no nota:** los Slices 5 y 7 declaran el rollback como *"flag a `false` en
+Vercel + redeploy → la lente vuelve al reader legacy"*. Ese destino hoy no ordena, y falla **sin
+aviso**. Un rollback cuyo destino no está verificado no es un rollback.
+
+🔴 **Los Slices 1 y 2 de `TASK-1792` deben estar en `main` ANTES del cutover del consumer (Slice 7).**
+Los Slices 3 y 4 de esa task (unificar las dos curvas, recalibrar el `FALLBACK_CTR_CURVE`) no
+bloquean nada de acá.
+
+Un matiz acota el bloqueo, y **uno que parecía acotarlo no resiste la medición**:
+
+- ✅ El rollback **restaura el statu quo ante**: el peor caso es "vuelve a estar como antes de
+  TASK-1700", no "queda peor por culpa de TASK-1700".
+- ❌ **NO vale decir "hoy muerde en 1 de 2 orgs".** Esa cuenta es una muestra de dos, no una tasa,
+  y el disparador —bucket objetivo con ≥10 impresiones y **0 clics**— está **garantizado en todo
+  target recién onboardeado** y en todo sitio de bajo tráfico durante sus primeras semanas de serie.
+  Hay dos organizaciones porque el módulo es nuevo, no porque el defecto sea raro: **cada cliente
+  que entre nace en el estado de `efeoncepro.com`** y sale de él sólo cuando acumula clics
+  suficientes. El alcance honesto es *"todas las orgs nuevas, más las de bajo tráfico, hasta que
+  acumulen muestra"*.
+- ❌ **Tampoco vale decir que la lente de `berel.com` "está intacta".** Su curva es sana, pero de
+  sus 1.798 filas striking en 28 días **1.445 quedan en `gain = 0` (el 80 %)** con techo máximo 31:
+  discrimina sobre una quinta parte de lo que muestra. Curva sana ≠ lente intacta.
+
+  *(Las dos correcciones son medición de `greenhouse-eo-63`, 2026-08-28; la primera versión de este
+  Delta afirmaba ambas cosas y se pasaba de la evidencia.)*
+
+**Esta cola NO hereda el defecto** (`isCurveUsableAtPosition` exige impresiones **y** clics, así que
+un bucket sin clics nunca llega a ser un CTR esperado: cae a banda 2 con score `NULL`), y su umbral
+—≥1000 impresiones y ≥5 clics— es la referencia canónica que `TASK-1792` adopta.
+
+
 ## Delta 2026-08-28 (2) — DESBLOQUEADA: el último bloqueador cerró
 
 `TASK-1692` cerró (`code complete, rollout pendiente`), así que `Blocked by` pasa a `none`:
@@ -127,7 +171,7 @@ serie del top-N arranca con el primer deploy del worker post-release y los candi
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo`
-- Blocked by: `none` (último bloqueador cerrado el 2026-08-28; ver Deltas) (sólo para el origen `competitor_gap`; los otros cuatro orígenes no la necesitan — satisfecho en código desde 2026-08-28, ver Delta)
+- Blocked by: `TASK-1792` (Slices 1–2, **sólo para el Slice 7**; ver Delta 2026-08-28 (3)). Los Slices 1–6 no la necesitan. (sólo para el origen `competitor_gap`; los otros cuatro orígenes no la necesitan — satisfecho en código desde 2026-08-28, ver Delta)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -892,6 +936,10 @@ Tres razones, y las tres son de oficio, no de implementación:
 
 ### Slice ordering hard rule
 
+- 🔴 **`TASK-1792` Slices 1–2 en `main` ANTES del Slice 7.** El plan de rollback del cutover
+  aterriza en el reader legacy, y ese reader hoy no ordena cuando la curva de CTR de la org es
+  degenerada (ver Delta 2026-08-28 (3)). Si el cutover tiene que ocurrir antes, el rollback **no
+  puede** seguir siendo "vuelve al reader legacy": hay que declarar otra ruta verificada.
 - **`TASK-1694` cierra ANTES de Slice 3.** Es bloqueo duro y la razón es de irreversibilidad: el
   colector de discovery persiste lo que el contrato de candidatos le entregue, y un snapshot con la
   misma keyword cuatro veces ya no se corrige hacia adelante.
@@ -947,7 +995,7 @@ Tres razones, y las tres son de oficio, no de implementación:
 | Slice 4 — worker + scheduler | `gcloud scheduler jobs pause ops-seo-work-queue-materialize` + flag a `false` en la revisión activa del worker | <5 min | sí |
 | Slice 5 — reader + lanes | flag a `false` en Vercel + redeploy; las rutas devuelven el no-op prod-safe | <5 min | sí |
 | Slice 6 — decisión | revert PR + revocar el grant de `growth.seo.work_queue.decide`; el log escrito queda (append-only, sin efecto downstream) | <10 min | parcial (las decisiones escritas no se borran, por diseño) |
-| Slice 7 — cutover del consumer | flag a `false` en Vercel + redeploy → la lente vuelve al reader legacy | <5 min | sí |
+| Slice 7 — cutover del consumer | flag a `false` en Vercel + redeploy → la lente vuelve al reader legacy. 🔴 **Válido SÓLO con `TASK-1792` Slices 1–2 en `main`**: sin eso el destino del rollback no ordena para organizaciones con curva de CTR degenerada, y falla sin aviso | <5 min | sí, **condicionado** |
 
 ### Production verification sequence
 

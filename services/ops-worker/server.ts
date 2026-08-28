@@ -140,6 +140,7 @@ import { runDomainOverviewBatch } from '@/lib/growth/seo/domain-overview/capture
 import { runUrlVisibilityBatch } from '@/lib/growth/seo/url-visibility/capture'
 import { runCompetitorCoverageBatch } from '@/lib/growth/seo/competitor-coverage'
 import { drainKeywordDiscoveryRuns } from '@/lib/growth/seo/keyword-discovery/runner'
+import { runSeoWorkQueueMaterializeBatch } from '@/lib/growth/seo/work-queue/materialize-batch'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { drainAssessmentAiScoringRuns } from '@/lib/hiring/assessment/ai/scoring-run/execute'
 import { isHiringAssessmentAiRunEnqueueEnabled } from '@/lib/hiring/assessment/ai/scoring-run/config'
@@ -2309,6 +2310,62 @@ const handleSeoCompetitorCoverageCaptureBatch = async (req: IncomingMessage, res
   }
 }
 
+// ─── /seo/work-queue/materialize-batch ──────────────────────────────────────
+//
+// TASK-1700 — materializa la cola priorizada de trabajo de cada target elegible.
+//
+// 🔴 Este handler NO GASTA: la cola lee tablas ya pagadas (GSC, discovery, gap, cobertura).
+// Lo que produce es AUTORIDAD DE ORDEN — el snapshot es lo que después dice "la recomendación
+// #1 de la mañana", así que su corrida tiene que ser auditable, no barata.
+//
+// Vive acá y NUNCA en un cron de Vercel: los crons de Vercel sólo corren en deploys de
+// Production, y eso dejaría la cola invisible en staging — exactamente el modo de falla que
+// documentó el incidente del outbox (TASK-773).
+//
+// Doble gate: el módulo (`GROWTH_SEO_ENABLED`) y el flag propio
+// (`GROWTH_SEO_WORK_QUEUE_ENABLED`), que el batch verifica por dentro. Con cualquiera apagado
+// responde `skipped` sin tocar la base.
+const handleSeoWorkQueueMaterializeBatch = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  const maxTargets =
+    typeof body.maxTargets === 'number' && body.maxTargets > 0 ? Math.floor(body.maxTargets) : undefined
+
+  // `force` salta el piso de recomputación. El cron NO lo manda: si el snapshot vigente es
+  // reciente, reusarlo es la respuesta correcta y no hay nada que recalcular.
+  const force = body.force === true
+
+  console.log(`[ops-worker] POST /seo/work-queue/materialize-batch — maxTargets=${maxTargets ?? 'all'} force=${force}`)
+
+  try {
+    const summary = await runSeoWorkQueueMaterializeBatch({ maxTargets, force })
+
+    console.log(
+      `[ops-worker] /seo/work-queue/materialize-batch done — status=${summary.status} ` +
+      `eligible=${summary.eligible} materialized=${summary.materialized} reused=${summary.reused} ` +
+      `failed=${summary.failed}`
+    )
+
+    // Targets elegibles con fallas NO es éxito silencioso: el operador de ese Space abriría
+    // su plan del día sin plan y sin saber por qué.
+    if (summary.failed > 0) {
+      captureMessageWithDomain(
+        `[TASK-1700] la cola priorizada falló en ${summary.failed} target(s)`,
+        'growth',
+        { level: 'warning', tags: { source: 'ops_worker_seo_work_queue' } }
+      )
+    }
+
+    json(res, 200, { ok: true, ...summary })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown SEO work queue error'
+
+    console.error('[ops-worker] /seo/work-queue/materialize-batch failed:', message)
+    captureWithDomain(error, 'growth', { tags: { source: 'ops_worker_seo_work_queue' } })
+    json(res, 502, { error: message })
+  }
+}
+
 // ─── /seo/keyword-discovery/drain ───────────────────────────────────────────
 //
 // TASK-1664 — drena corridas de keyword discovery `pending` (DataForSEO Labs Live).
@@ -3176,6 +3233,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/seo/url-visibility/capture-batch') {
       await handleSeoUrlVisibilityCaptureBatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/seo/work-queue/materialize-batch') {
+      await handleSeoWorkQueueMaterializeBatch(req, res)
 
       return
     }
