@@ -36,12 +36,13 @@ post-deploy.
    nombre incluye el punto a propósito: las tools no-SEO son punteadas
    (`hiring.talent_pool.search`) y sin él el total excluye Globe y Hiring en silencio.
 
-2. **TASK-1777 sigue `rollout parcialmente verificado`.** El veredicto `skipped_no_movement` no pudo
-   observarse (ambos targets del smoke eran `first_time`, así que el predicado sólo podía dar
-   `drilled`). La re-corrida a USD 0 falsa la idempotencia por snapshot, que es una compuerta
-   distinta. Verificación en el ciclo natural del **lunes 2026-08-31** post 07:00 CLT
-   (`ops-seo-backlink-capture`); la consulta está en el task file. Exposición si el predicado
-   fallara: ~USD 0,18 por ciclo semanal.
+2. **TASK-1777 → `complete` (2026-08-27, decisión del operador); queda VIVO su follow-up F1.**
+   El veredicto `skipped_no_movement` no pudo observarse en el smoke (ambos targets eran
+   `first_time`) y el operador decidió cerrar con ese criterio diferido a follow-up con fecha:
+   **lunes 2026-08-31** post 07:00 CLT (`ops-seo-backlink-capture`), consulta lista en el Delta (3)
+   del task file. Si aparece `drilled` sin movimiento: ISSUE + flag OFF (<5 min) + fix de
+   `shouldDrillDownBacklinks`. Exposición si se ignora: ~USD 0,18 por ciclo semanal. Lifecycle,
+   carpeta, README y registry sincronizados; `task:lint` 0/0.
 3. **TASK-1775, TASK-1776 y TASK-1658 → `complete` (2026-08-27).** Lifecycle, carpeta, README y
    `TASK_ID_REGISTRY` sincronizados; `task:lint` 0/0 en las tres. Queda **un solo checkbox abierto en
    1775**, honestamente anotado por su autor: "un sujeto que el proveedor no conoce deja fila con
@@ -156,7 +157,7 @@ deploy, cambio de binding, generación live ni lectura que pruebe disponibilidad
 
 ## 2026-08-27 — TASK-1777: el detalle de enlaces quedó code complete, rollout pendiente
 
-**Estado: `code complete, rollout pendiente`; commits en develop, push a decisión del operador.**
+**Estado (delta posterior mismo día): `complete` por decisión del operador — rollout ejecutado con el release `cc73c74789ce`; sólo sobrevive el follow-up F1 (pendiente 2 arriba).** Entrada original:
 Cierra la tercera capacidad de la tríada anti-Semrush: el detalle NOMINAL detrás del snapshot
 semanal de enlaces. Tres tablas hijas del snapshot (jamás del target): `seo_backlink_drilldowns`
 (el VEREDICTO — decisión de ejecución: sin persistirlo no se distingue "no pasó nada" de "no

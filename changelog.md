@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-27 — TASK-1777 complete: la tríada anti-Semrush queda cerrada entera
+
+- El operador decidió cerrar TASK-1777 con su rollout ya ejecutado (flag ON, lane en producción,
+  `get_seo_backlink_detail` entre las 21 tools del gateway) y el único criterio no observado —
+  predicado de movimiento a USD 0 — convertido en follow-up F1 con fecha y dueño (lunes
+  2026-08-31, receta SQL en el Delta (3) del task file). Con esto 1775/1776/1777 + 1658 están
+  `complete`; gasto total del rollout de la tríada: USD 0.2958.
+
 ## 2026-08-27 — Gateway MCP desplegado y cierre de la tríada SEO (TASK-1658/1775/1776)
 
 - Federación en producción: revisión `efeonce-mcp-gateway-00023-zt2`, `tools/list` autenticado observado en **21 tools SEO** (antes 13), con las 8 recién federadas presentes. Canary del provider verde contra producción para Efeonce y Berel.
@@ -716,20 +724,3 @@
 - **Republicar una vacante viva ya no la saca del aire.** La barra editorial se exige al publicar por
   primera vez, no al volver a publicar: antes, pausar una vacante con postulantes en proceso la habría
   dejado en 404 hasta reescribir su contenido completo.
-
-## 2026-08-17 — TASK-1740: una vacante pública tiene contenido estructurado y schema honesto
-
-- **El contenido candidate-facing deja de vivir sólo en prosa parseada.** Un opening puede declarar
-  el bloque versionado `PublicOpeningContent` v1 (promesa, resultados, trabajo, essentials/learnables,
-  evidencia, modelo remoto, proceso, beneficios y compensación estructurada opcional). Se escribe por
-  el command canónico con validación estricta (422); su ausencia degrada al fallback legacy de prosa,
-  nunca a huecos. La allowlist pública sigue siendo la única puerta al navegador (anti-leak extendido).
-- **El schema de Google nace del mismo contenido visible y es fail-closed.** Canonical explícito en
-  toda leaf publicada; `JobPosting` JSON-LD detrás de `HIRING_PUBLIC_JOBPOSTING_SCHEMA_ENABLED`
-  (Vercel-only, nace OFF). Remoto exige países elegibles ISO reales
-  (`public_remote_eligible_countries` — `LATAM`/`Global` se rechazan como país); híbrido/presencial
-  exige ciudad+país; salario sólo desde compensación estructurada; nunca `directApply` ni
-  `validThrough`. Pausar/cerrar retira URL y schema (404). Hoy ninguna vacante viva emite schema
-  (ambas son remotas `LATAM` sin país declarado) — comportamiento correcto por diseño.
-- Estado: `code complete, rollout pendiente` (países por confirmar con People/Legal, flag
-  staging→Rich Results→prod). TASK-1741 (renderer editorial) queda desbloqueada con fixture.
