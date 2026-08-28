@@ -1,5 +1,13 @@
 # TASK-1655 — Growth SEO: Historical Data Platform (backfill GSC→BQ + split OLTP/OLAP + semilla rank)
 
+## Delta 2026-08-28 — el top-N del SERP ya tiene almacén propio (TASK-1699)
+
+`greenhouse_growth.seo_serp_top_results` (migración `20260828124352232`) persiste el SERP completo
+que el rank capture ya paga, append-only estricto, clave por ranura `rank_absolute`. La plataforma
+histórica NO abre un segundo almacén de este hecho: si necesita el top-N, lo consume de esa tabla
+(o de su futuro archivo BQ — la política de retención tiene disparador declarado: 5M filas o 500 ms
+en la query de recurrencia, con archivo dual-store como decisión probable, nunca borrado).
+
 ## Delta 2026-08-14 — la clave del módulo per-org es `seo_v2`, no `seo_v1`
 
 - **Corregidas las tres menciones a `seo_v1`** (Goal, Slice 2, Acceptance Criteria) → **`seo_v2`**.

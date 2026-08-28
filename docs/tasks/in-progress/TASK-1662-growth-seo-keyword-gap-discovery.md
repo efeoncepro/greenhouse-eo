@@ -1,5 +1,22 @@
 # TASK-1662 — Growth SEO: keyword gap — qué rankea la competencia y el cliente no
 
+## Delta 2026-08-28 (2) — TASK-1699 implementada: el competidor ya se DESCUBRE, no se pide
+
+`readSerpCompetitorCandidates` (`src/lib/growth/seo/competitor-discovery.ts`) existe: propone
+candidatos por recurrencia medida en el top-N del SERP ya pagado (umbrales versionados 30d/3kw/5días),
+cada uno con evidencia + `proposalRef` sugerido que el confirm humano pasa VERBATIM a
+`declareCompetitors`. El supuesto más frágil de esta task ("alguien ya sabe quién es el competidor")
+quedó cerrado: la propuesta sale de datos medidos; la declaración sigue siendo humana. La serie del
+top-N arranca con el primer deploy del worker post-release (≥5 días de captura antes de que el
+descubrimiento devuelva candidatos).
+
+Criterios exigibles agregados al `## Acceptance Criteria` de esta task:
+
+- [ ] La propuesta de candidatos usada en una declaración real registra su `proposalRef` de
+      `serp_top:v1:*` cuando el candidato vino del descubrimiento (verificable en la fila).
+- [ ] Ningún consumer re-implementa la recurrencia: UI futura, Nexa y MCP consumen
+      `readSerpCompetitorCandidates`.
+
 ## Delta 2026-08-28 — Slices 1–3 + federación implementados; estado `code complete, rollout pendiente`; Slice 4 bloqueado por TASK-1700
 
 **Implementado en `develop` (local, sin push):**

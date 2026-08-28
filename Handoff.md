@@ -2,6 +2,31 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-28 — TASK-1699: el top-N del SERP ya pagado — code complete, rollout pendiente
+
+**Estado: `code complete, rollout pendiente` — el día 1 de la serie es el día del primer deploy del
+worker post-release, y cada día sin release pierde el top-N de ese día PARA SIEMPRE** (el pre-check
+de idempotencia del rank capture impide re-capturar sin recomprar; es la única task del plan con
+costo de demora irrecuperable). Implementado: `seo_serp_top_results` append-only estricto con ranura
+`rank_absolute` (jamás `rank_group` — se repite entre bloques y `DO NOTHING` descartaría filas en
+silencio) · parser hermano `parseSerpTopResults` sobre la MISMA respuesta pagada (costo marginal
+CERO, probado con test de no-regresión EXACTA de `buildSerpTask`) · cableado tras flag dual-runtime
+`GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` (ON declarativo; tx atómica snapshot+top-N con fallback que
+jamás pierde la medición pagada) · descubrimiento de competidores por recurrencia
+(`readSerpCompetitorCandidates`, umbrales versionados 30d/3kw/5días, PROPONE con `proposalRef` — el
+execute es `declareCompetitors` de TASK-1662) · lanes sólo-internal 404 anti-oracle + tools MCP
+`get_seo_serp_top_results`/`get_seo_competitor_candidates` (inventario federado: **27 tools**,
+commit local `92e7197` en `efeonce-mcp`) · señal `seo.serp_top_results.coverage`. Sanity **9/9
+contra PG real** con rollback transaccional (cero residuo en tabla append-only). Recalibración
+clave: CERO ALTER a `seo_competitors` (la autoría ya era de 1662); la evidencia viaja compacta en
+`proposal_ref`.
+
+**Próximo paso (post-release, misma ventana que 1662):** deploy del worker → verificar flag en la
+revisión activa → corrida del cron con `provider_cost` IDÉNTICO al baseline (prueba del costo cero)
+→ re-run no-op → env var en Vercel → señal en verde → a ≥5 días, revisar candidatos de Berel con el
+operador ANTES de declarar. Docs/skills sincronizados post-1662 por 3 subagentes (dataforseo-operator
++ efeonce-mcp-platform con espejos verificados, rules, arch doc, épico).
+
 ## 2026-08-28 — TASK-1662: keyword gap competitivo — code complete, rollout pendiente
 
 **Estado: `code complete, rollout pendiente`; Slice 4 bloqueado por `TASK-1700` (`to-do`).** El módulo SEO
@@ -427,11 +452,3 @@ esté en producción con su flag ON.
 **Estado: `complete`; sin runtime ni push.** Efeonce vende **Revenue Operations & CRM**, con diagnóstico HubSpot-first, Salesforce-first o híbrido. Gartner se separa por mercado; los casos chilenos de Salesforce prueban presencia, no market share.
 
 **Pendiente:** las relaciones de partner declaradas por el CEO requieren readback primario antes de claims externos. Antes de mover inversión o certificaciones, medir 24 meses de pipeline, win/loss, margen, demanda y capacidad. Audit: [`CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md`](docs/audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md).
-
-## 2026-08-27 — Gobernanza de contexto: dos fallos históricos reconciliados localmente
-
-**Estado: `complete` local; sin push.** Los runs fallidos se reprodujeron por SHA y no compartían causa: `CLAUDE.md governance` de `72c18c4` (run `32989156138`) tenía 2 líneas históricas huérfanas; `Agent Context Governance` de `c0af0da` (run `32989424731`) rechazaba `project_context.md` con ~20.418/12.000 tokens.
-
-**Qué ya resolvía `HEAD`:** `c8ab1a68e` dejó `project_context.md` en ~11.852/12.000 tokens; el context gate actual quedó en 0 errores/0 warnings. **Fix mínimo de esta pasada:** `scripts/ci/claude-md-content-allowlist.txt` reconoce el retiro legítimo de las dos líneas de TeamBot detectadas por el audit. No se restauró el falso contrato `@todos`: `7ce2bd691` ya lo reemplazó en arquitectura, invariante Ops, runbook y skills espejadas; la otra línea conserva su intención en el helper `pnpm teams:announce`.
-
-**Evidencia local:** `pnpm claude-md check` 0 huérfanos; `pnpm docs:closure-check`; `pnpm qa:gates --changed --agent codex --docs`; `pnpm docs:context-check:strict`; `git diff --check`. No se tocó runtime, no se creó ADR y no se reejecutaron workflows remotos porque no hubo push.

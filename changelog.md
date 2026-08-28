@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-28 — TASK-1699: el top-N del SERP ya pagado deja de tirarse (code complete, rollout pendiente)
+
+- El rank capture diario compra el SERP completo (`depth 20`) y descartaba ~19 de 20 filas. Ahora
+  `seo_serp_top_results` (append-only estricto, ranura `rank_absolute`) las persiste con **costo
+  marginal CERO** (test de no-regresión sobre `buildSerpTask`), en la misma transacción que el
+  snapshot de rank y con fallback que jamás pierde la medición pagada. Encima: descubrimiento de
+  competidores por recurrencia medida (propose→confirm hacia `declareCompetitors` de TASK-1662),
+  lanes sólo-internal, 2 tools MCP federadas (inventario a 27) y señal de cobertura con pérdida
+  irrecuperable declarada. Flag dual-runtime ON declarativo; **la serie arranca con el primer deploy
+  del worker post-release — cada día sin release pierde el top-N de ese día para siempre**. Sanity
+  9/9 contra PG real con rollback sin residuo.
+
 ## 2026-08-28 — TASK-1662: keyword gap competitivo (code complete, rollout pendiente)
 
 - El módulo SEO gana la fundación de su tercera pregunta ("¿qué me estoy perdiendo entero?"):
@@ -703,13 +715,3 @@
 - **Lo que todavía no cambia**: nueve registros de prueba quedan archivados en vez de borrados, a la
   espera de una decisión explícita. No aparecen en ninguna pantalla, así que borrarlos es prolijidad,
   no necesidad.
-
-## 2026-08-18 — Evaluación provisional automática y CV por MCP interno
-
-- Los assessments elegibles de cualquier vacante generan ahora evaluación IA provisional en segundo plano para
-  operadores. No cambia el score efectivo y el postulante no recibe resultado, rationale ni estado de revisión.
-- El expediente auto-propone análisis con CV procesado + assessment puntuado; la confirmación sigue siendo humana.
-- Los agentes internos pueden leer el review packet exacto por MCP con CV minimizado/redactado y ligado a hash.
-  Sin contacto, PDF crudo, ranking, decisiones, writes ni acceso B2B.
-- La UI operator-only quedó compactada y validada GVC 4,82/5; su último ajuste visual aún espera promoción
-  ordinaria. TASK-1742/1718 conservan observación, rollback y firmas pendientes.
