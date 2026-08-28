@@ -55,12 +55,23 @@ hueco:
    estructural y **no se verificó contra la implementación**, porque `TASK-1662` sigue `in-progress`
    con su Slice 4 pendiente. Comprobarlo es parte del Slice 1.
 
-**Por qué corre el reloj: el daño se congela.** El orden por defecto del reader es volumen
-descendente. Si el `priority_score` de `TASK-1700` hereda esa señal, `chatgpt en linea` (480) queda
-**por encima** de un término genuinamente relevante con volumen 10 — y ese aggregate es
-**append-only**, así que el score entra escrito y no se corrige después. Es la misma clase de
-problema que `TASK-1694` existía para evitar (duplicados y barrera engañosa congelados en el primer
-snapshot), por otra puerta.
+**⚠️ Corrección 2026-08-27, de la dueña de `TASK-1700` (`greenhouse-eo-56`), verificada.** La v1 de
+esta sección argumentaba urgencia así: *"el orden por defecto es volumen descendente, así que
+`chatgpt en linea` (480) quedaría sobre un término relevante de volumen 10 en el `priority_score`, y
+como el aggregate es append-only el score entra escrito"*. **Eso es falso para ese consumidor.** El
+score de `TASK-1700` **no pondera el volumen estimado del proveedor** — `priority-score.ts:181` lo
+dice literal (*"Acá NO se mira el volumen estimado del proveedor"*) y el CHECK `basis_band_score` de
+su migración impide fabricar un score sin demanda medida: un candidato irrelevante **sin
+impresiones** cae a banda 3 con score `NULL` y no compite con nada. Tampoco había tomado su primer
+snapshot: existen el esquema vacío y la función de score, nada más.
+
+**El caso que sí queda vivo, y es el que justifica esta task:** una keyword **irrelevante CON
+impresiones reales**. Esa sí atraviesa el CHECK, sí entra a la cola y hoy nada declara que no tiene
+que ver con el negocio. El volumen del proveedor no es el vector; **la demanda medida sí**.
+
+Que la v1 de esta task argumentara con un mecanismo que no existe es, en sí, el mismo defecto que la
+task combate: una afirmación plausible que nadie contrastó contra la implementación. Queda escrita la
+corrección en vez de reescrita la historia.
 
 **La materia prima ya existe y nadie la usa.** El lado AEO tiene brand intelligence por perfil
 (`getActiveBrandIntelligence`, con `categoryLabel` y `businessModel`). Discovery no la toca: el único
@@ -120,9 +131,11 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- 🔴 **`TASK-1700`** — es el consumidor cuyo `priority_score` esta señal existe para proteger.
-  **Debería consumirla antes de tomar su primer snapshot**, porque el aggregate es append-only y un
-  score mal calculado queda escrito. Declarar el contrato entre ambas en Discovery.
+- 🔴 **`TASK-1700`** — consumidor, pero **NO por el score**. Corregido con su dueña el 2026-08-27: la
+  señal entra como **factor del item con su procedencia**, jamás como multiplicador del
+  `priority_score`. Razón dura: `evidence_ref` del aggregate es **opaca por contrato** (cero FK, cero
+  JOIN al motor que produciría la señal), así que puntuar con ella sería puntuar con algo que el
+  aggregate **no puede citar**. `TASK-1700` declara este acople en su propia spec.
 - **`TASK-1662`** — segundo productor; hereda la señal.
 - **`TASK-1667`/`1668`** (editorial work item, loop de QA) — consumidores aguas abajo.
 - **`TASK-1789`** (content decay) — **no se solapa**: opera sobre páginas propias del cliente, que son
@@ -322,7 +335,7 @@ derivación, y merece quedar registrada.
 | Alguien convierte la señal en filtro porque "es obvio" y se descarta long-tail en silencio | credibilidad | **high** | Prohibido en reglas duras y `Out of Scope`; el reader no expone un modo de descarte | Candidatos que desaparecen sin acción registrada |
 | `unknown` se colapsa a `clear` en un consumer | credibilidad | **high** | Vocabulario cerrado de tres valores; test que falla si un consumer los binariza | Conteos de `clear` sospechosamente altos |
 | Se implementa con JOIN a `grader_brand_intelligence` y se rompe §1.1 | arquitectura | medium | Regla dura + revisión de SQL en el PR; composición en memoria documentada | JOIN entre `seo_*` y `grader_*` |
-| `TASK-1700` toma su primer snapshot antes de consumir la señal y congela scores malos | data quality | medium | Delta explícito en 1700; coordinación declarada en el ordering | `priority_score` alto en candidatos ajenos al negocio |
+| La señal se cablea como entrada del `priority_score` y se puntúa con algo que el aggregate no puede citar | contrato / arquitectura | medium | Regla dura: factor del item con procedencia, nunca multiplicador; `evidence_ref` es opaca por contrato | PR que mete pertinencia dentro del cálculo del score |
 | La hipótesis de `TASK-1662` se escribe como hecho sin contrastarla | credibilidad | medium | Slice 1 la contrasta y la task declara el resultado, sea cual sea | Spec afirmando algo que la implementación no hace |
 | `categoryLabel` se trata como verdad y no como evidencia de un read por LLM | data quality | medium | Declarado en el contrato; la evidencia viaja con el veredicto | Veredicto sin evidencia adjunta |
 
@@ -346,7 +359,7 @@ comportamiento actual.
 2. Correr sobre la organización de Efeonce: las 50 keywords de ChatGPT deben salir `conflict` **con evidencia legible**.
 3. Correr sobre una organización sin brand intelligence: `unknown`, nunca `clear`.
 4. Correr sobre un cliente con cola larga legítima: verificar que **no** se marcan `conflict` en masa.
-5. Confirmar con `TASK-1700` que consume la señal antes de su primer snapshot.
+5. Confirmar con `TASK-1700` que la señal se consume como factor del item con su procedencia, y que no toca el `priority_score`.
 
 ### Out-of-band coordination required
 
@@ -368,7 +381,7 @@ comportamiento actual.
 - [ ] Las 50 keywords de ChatGPT de la corrida real salen `conflict` con evidencia legible.
 - [ ] Una organización sin brand intelligence devuelve `unknown` para todos sus candidatos.
 - [ ] Un cliente con cola larga legítima no se marca `conflict` en masa.
-- [ ] `TASK-1700` tiene delta declarando que consume la señal antes de su primer snapshot.
+- [ ] El acople con `TASK-1700` está declarado como **factor del item con procedencia**, nunca como entrada del `priority_score`.
 
 ## Verification
 
