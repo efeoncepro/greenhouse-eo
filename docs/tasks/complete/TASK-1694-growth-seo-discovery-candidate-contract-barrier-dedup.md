@@ -830,7 +830,8 @@ default. Revert = revert del PR + redeploy.
 
 ## Registro de cierre — 2026-08-28
 
-**Estado: `complete` — EN PRODUCCIÓN desde el 2026-08-28** (release `e82c18579b05`, orchestrator run `33208942436`, manifest `released`). Verificado con canary de contrato contra producción: el lane devolvió `maxLinkBarrier aceptado; ignoredFilters=maxDifficulty`, o sea el runtime EJECUTA el contrato nuevo — no sólo está desplegado. Gateway MCP desplegado (`efeonce-mcp` run `33209983511`) con el schema actualizado. **Queda pendiente sólo la corrida de smoke con gasto de proveedor (~USD 0,013), que el operador no autorizó.**
+**Estado: `complete` — EN PRODUCCIÓN desde el 2026-08-28** (release `e82c18579b05`, orchestrator run `33208942436`, manifest `released`). Verificado con canary de contrato contra producción: el lane devolvió `maxLinkBarrier aceptado; ignoredFilters=maxDifficulty`, o sea el runtime EJECUTA el contrato nuevo — no sólo está desplegado. Gateway MCP desplegado (`efeonce-mcp` run `33209983511`) con el schema actualizado. **Corrida de smoke con gasto EJECUTADA el 2026-08-28** (autorizada por el operador) — ver
+`### Smoke con gasto real` abajo.
 
 **Estado original al cerrar el código:** Los cinco slices están implementados, verificados
 contra PG real y documentados; falta la corrida real de smoke con gasto (no autorizada en esta
@@ -867,6 +868,39 @@ sesión) y el deploy del gateway MCP.
   la `## Open Questions` dejó fuera de alcance (conflicto intra-corrida); la evidencia real
   refuerza que el follow-up vale, y su lugar natural sigue siendo la decisión en lote de
   `TASK-1660`.
+
+### Smoke con gasto real — 2026-08-28 (run `seokdr-7851e49c`)
+
+Corrida productiva contra Berel MX (`seot-berel-mx`, location `2484`, es), seed
+`impermeabilizante para techo`, método `keyword_suggestions`, con la política nueva.
+
+| | Smoke TASK-1664 (2026-08-14) | Smoke TASK-1694 (2026-08-28) |
+|---|---|---|
+| Candidatos | 10 | **50** |
+| Costo real | USD 0,0132 | **USD 0,0180** (peor caso estimado: 0,066) |
+| Costo por candidato | 0,00132 | **0,00036** (3,7× más barato) |
+| Llamadas al proveedor | 2 | **1** (el top-up de enriquecimiento no compró nada: el store ya tenía el mercado) |
+| `volumePolicy` en el snapshot | *(campo ausente)* | **`all`** |
+| Candidatos con volumen nulo o cero | 0 | **0** |
+
+**Lo que el smoke SÍ probó:**
+
+- 🔴 **El payload sin `filters` es aceptado por el endpoint Labs.** La corrida cerró `succeeded`
+  con 50 candidatos y `error_code` nulo. Refuta con evidencia el riesgo de la matriz *"Un payload
+  sin `filters` es rechazado por el endpoint Labs y la corrida cierra `failed`"*.
+- **El costo no se sale del rango**, y por candidato mejora: el setup fijo se amortiza sobre más
+  filas. El ledger de gasto atribuyó exactamente USD 0,018 a `labs`/`consumer=seo`/`invoiced`.
+- **`volumePolicy: "all"` queda persistido en `methods_json`** (Slice 4 de TASK-1692 verificado en
+  producción), y la corrida vieja muestra el campo AUSENTE — que es exactamente el caso que el
+  default histórico de lectura cubre.
+
+**Lo que el smoke NO probó, y hay que decirlo:** la mezcla de volumen nulo salió **0 de 50**. Este
+seed en este mercado no produjo long-tail sin volumen estimado, así que la afirmación *"el filtro
+se comía el long-tail emergente"* **queda sin ejercitar**. Mercado equivocado para la prueba:
+materiales de construcción en México no es un mercado ralo. Quitar el filtro deja de IMPONER una
+exclusión; que aparezca long-tail depende del mercado, y este no lo tenía. Un smoke en un mercado
+genuinamente ralo sigue siendo la evidencia que falta para esa afirmación concreta — no bloquea
+nada, y cuesta otros ~USD 0,018.
 
 ### Pendientes de rollout
 

@@ -68,8 +68,17 @@ falta el diff de las 28 rutas del gate.
 **Gateway MCP desplegado** (`efeonce-mcp` run `33209983511`): el schema federado de
 `get_seo_keyword_discovery` ya es el nuevo.
 
-**Único pendiente declarado:** la corrida de smoke de discovery con gasto de proveedor (~USD 0,013)
-de TASK-1694, que el operador no autorizó. No bloquea nada.
+**Smoke con gasto EJECUTADO** (autorizado el mismo día, run `seokdr-7851e49c`): cerró `succeeded`,
+50 candidatos, **USD 0,018 reales** contra 0,066 de peor caso, 1 sola llamada al proveedor (el
+top-up no compró nada porque el store ya tenía el mercado), y `volumePolicy: "all"` persistido en
+`methods_json`. **Refuta con evidencia el riesgo de la matriz**: el payload sin `filters` NO es
+rechazado por Labs.
+
+⚠️ **Lo que el smoke NO probó:** la mezcla de volumen nulo salió **0 de 50**. Materiales de
+construcción en México no es un mercado ralo, así que la afirmación *"el filtro se comía el
+long-tail emergente"* sigue **sin ejercitar**. Quitar el filtro deja de IMPONER una exclusión; que
+aparezca long-tail depende del mercado. Un smoke en un mercado genuinamente ralo es la evidencia
+que falta para esa afirmación concreta (~USD 0,018 más). No bloquea nada.
 
 **`TASK-1700` (P0, cola priorizada) queda desbloqueada Y con su prerequisito de runtime cumplido:**
 el contrato nuevo ya sirve en producción, así que su primer snapshot no puede congelar duplicados ni
@@ -565,29 +574,3 @@ vigente y luego separar referencias, first/last frame, edición, extensión y ou
 rate, terms, rights ni promotion del modelo anterior. Exige cuota y endpoint live, costo medido, C2PA en bytes,
 canary facturable desde Producer, readback y rollback. Hasta entonces Omni 1.1 permanece `gated`: no hubo spend,
 deploy, cambio de binding, generación live ni lectura que pruebe disponibilidad en Globe.
-
-## 2026-08-27 — TASK-1777: el detalle de enlaces quedó code complete, rollout pendiente
-
-**Estado (delta posterior mismo día): `complete` por decisión del operador — rollout ejecutado con el release `cc73c74789ce`; sólo sobrevive el follow-up F1 (pendiente 2 arriba).** Entrada original:
-Cierra la tercera capacidad de la tríada anti-Semrush: el detalle NOMINAL detrás del snapshot
-semanal de enlaces. Tres tablas hijas del snapshot (jamás del target): `seo_backlink_drilldowns`
-(el VEREDICTO — decisión de ejecución: sin persistirlo no se distingue "no pasó nada" de "no
-sabemos qué pasó" ni se ancla el a-lo-sumo-una-vez), `seo_backlink_referring_domains` (movement
-`present|new|lost` con muestra accionable) y `seo_backlink_anchors`. El corazón es la CONDICIÓN DE
-DISPARO (`shouldDrillDownBacklinks`, predicado puro testeado antes que el código que gasta): el
-drill-down corre como paso post-batch del cron semanal EXISTENTE (sin scheduler nuevo), sólo donde
-el `new_lost_delta` ya persistido muestra movimiento; `partial` no dispara jamás. Sobre-optimización
-de anchors como métrica nueva separada de `toxic_share` (no se toca); reader de TRES estados;
-shape de `readBacklinkProfile` inmutable (test de regresión). 40 tests del paquete + señal
-`seo.backlink.detail_drilldown_failed` + sanity SQL vivo con transacción + ROLLBACK (cero residuo
-en la serie real; el CHECK de movement rechazó un cuarto valor en vivo).
-
-**Checkpoint del operador (gasta):** flag `GROWTH_SEO_BACKLINK_DETAIL_ENABLED` ON (sólo
-ops-worker) + smoke con un target CON movimiento y otro SIN (USD 0 verificado en ledger) + canary
-MCP + confirmar umbrales (`…MIN_BACKLINK_MOVEMENT=10` / `…MIN_REFDOMAIN_MOVEMENT=3` /
-`…ROW_LIMIT=100`). Runbook: `docs/manual-de-uso/growth/operar-perfil-de-enlaces-seo.md`.
-
-**No re-descubrir:** el gate bloqueado NO escribe veredicto (re-evaluable al renovarse el mes);
-`new` manda sobre `present` y `lost` sólo si el dominio ya no está (el delta cuenta backlinks, no
-dominios); sin backfill histórico por diseño (la ventana del proveedor ya pasó). `TASK-1314` ya
-tiene el "qué enlaza a la pillar" (delta escrito en su spec).

@@ -73,8 +73,12 @@
   `selected_for_target` (TASK-1692: el boundary de escritura vivo). Un manifest `released` prueba
   despliegue; el canary prueba comportamiento.
 - Gateway MCP desplegado con el schema federado nuevo de `get_seo_keyword_discovery`.
-- Queda pendiente sólo la corrida de smoke de discovery con gasto de proveedor (~USD 0,013), no
-  autorizada. `TASK-1700` (P0) queda desbloqueada y con su prerequisito de runtime cumplido.
+- **Smoke con gasto ejecutado el mismo día** (USD 0,018 reales, 50 candidatos, `succeeded`): el
+  payload sin `filters` es aceptado por Labs — el riesgo de la matriz queda refutado con evidencia,
+  y `volumePolicy: "all"` quedó persistido en el snapshot de la corrida. La mezcla de volumen nulo
+  salió 0 de 50: el mercado elegido no era ralo, así que la afirmación sobre el long-tail emergente
+  sigue sin ejercitar y se declara como tal. `TASK-1700` (P0) queda desbloqueada y con su
+  prerequisito de runtime cumplido.
 
 ## 2026-08-28 — TASK-1692: el candidato de discovery recuerda qué se decidió sobre él
 
