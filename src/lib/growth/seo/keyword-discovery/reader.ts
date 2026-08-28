@@ -75,6 +75,21 @@ export interface SeoDiscoveryCandidateProvenance {
   capturedAt: string
 }
 
+/**
+ * Conflicto de cluster: `conflict` cuando otra keyword VIGENTE del target comparte el
+ * `coreKeyword` del candidato; `clear` cuando se pudo descartar; `unknown` cuando no se pudo
+ * saber. Los tres estados son distinguibles a propósito — no saber si hay conflicto y saber que
+ * no lo hay son hechos distintos, y colapsarlos convertiría un hueco en una vía libre.
+ */
+export interface SeoDiscoveryClusterConflict {
+  status: 'conflict' | 'clear' | 'unknown'
+  coreKeyword: string | null
+  /** Hasta 5 nombres contra los que choca, para que el humano vea el choque sin adivinarlo. */
+  trackedMembers: string[]
+  /** Total real de miembros en conflicto (puede exceder los 5 nombrados). */
+  trackedMemberCount: number
+}
+
 export interface SeoDiscoveryCandidateView {
   /** Procedencia REPRESENTATIVA (menor `sourceRank`, desempate `candidateId` asc). */
   candidateId: string
@@ -113,6 +128,17 @@ export interface SeoDiscoveryCandidateView {
   /** Demanda MEDIDA del propio Space (●), como lente separada. */
   measuredGsc: { impressions: number; position: number | null; displayMarker: '●' } | null
   alreadyTracked: boolean
+  /**
+   * TASK-1694 — ¿el `coreKeyword` de este candidato ya lo cubre una keyword vigente del target?
+   *
+   * Señal SEPARADA de `alreadyTracked` y nunca derivada de él: responden preguntas distintas.
+   * `alreadyTracked` es identidad exacta ("esta misma keyword ya se sigue"); `clusterConflict`
+   * es intención ("otra keyword ya apunta a lo mismo"). Declarar objetivo sobre dos miembros del
+   * mismo cluster los diluye — la acción correcta es consolidar, no sumar una segunda apuesta
+   * con gasto recurrente propio. Es ADVERTENCIA, jamás bloqueo: nombra contra qué choca y deja
+   * juzgar al humano.
+   */
+  clusterConflict: SeoDiscoveryClusterConflict
   latestAction: { kind: SeoDiscoveryActionKind; actor: string; at: string } | null
   /** `true` si la keyword coincide exactamente con una seed de la corrida. */
   matchesSeed: boolean
@@ -379,6 +405,78 @@ export const readKeywordDiscovery = async (
 
   const trackedSet = new Set(trackedRows.map(row => normalizeMarketKeyword(row.keyword)))
 
+  // ── Conflicto de cluster (TASK-1694) ─────────────────────────────────────────────
+  //
+  // Se resuelve con UNA lectura más del store de mercado de TASK-1661 sobre el set seguido —
+  // acotado por el techo gobernado de keywords por target— y CERO llamadas al proveedor. Es una
+  // llamada separada de la de candidatos a propósito: fusionarlas contaminaría
+  // `marketAvailability`/`marketFreshness`, que declaran la frescura de lo que se está SIRVIENDO.
+  const trackedMarket =
+    trackedSet.size === 0
+      ? null
+      : await readKeywordMarketData({
+          keywords: [...trackedSet],
+          locationCode: runView.locationCode,
+          languageCode: runView.languageCode
+        })
+
+  /** `coreKeyword` → keywords vigentes del target que lo comparten. */
+  const trackedByCore = new Map<string, string[]>()
+  let unresolvedTrackedKeywords = 0
+
+  for (const tracked of trackedSet) {
+    const core = trackedMarket?.byKeyword.get(tracked)?.coreKeyword ?? null
+
+    if (!core) {
+      // Una keyword seguida sin fila de mercado (o sin core del proveedor) NO se puede descartar
+      // como fuente de conflicto — se cuenta para degradar honesto más abajo.
+      unresolvedTrackedKeywords += 1
+
+      continue
+    }
+
+    const members = trackedByCore.get(core)
+
+    if (members) members.push(tracked)
+    else trackedByCore.set(core, [tracked])
+  }
+
+  const MAX_NAMED_CLUSTER_MEMBERS = 5
+
+  const resolveClusterConflict = (
+    normalizedKeyword: string,
+    coreKeyword: string | null
+  ): SeoDiscoveryClusterConflict => {
+    // Sin nada seguido no hay contra qué canibalizar. Es un hecho POSITIVO —el set está vacío—,
+    // no una ausencia de dato, así que se afirma en vez de degradarse a `unknown`.
+    if (trackedSet.size === 0) {
+      return { status: 'clear', coreKeyword, trackedMembers: [], trackedMemberCount: 0 }
+    }
+
+    const members = (coreKeyword ? (trackedByCore.get(coreKeyword) ?? []) : []).filter(
+      tracked => tracked !== normalizedKeyword
+    )
+
+    // Encontrar un choque es un hecho positivo: vale aunque la cobertura del set sea parcial.
+    if (members.length > 0) {
+      return {
+        status: 'conflict',
+        coreKeyword,
+        trackedMembers: members.slice(0, MAX_NAMED_CLUSTER_MEMBERS),
+        trackedMemberCount: members.length
+      }
+    }
+
+    // No haberlo encontrado sólo vale si se pudo mirar TODO: sin el core del candidato, o con
+    // alguna keyword seguida sin dato de mercado, el conflicto no está descartado — está sin
+    // medir. `clear` ahí sería afirmar vía libre sobre un hueco.
+    if (!coreKeyword || unresolvedTrackedKeywords > 0) {
+      return { status: 'unknown', coreKeyword, trackedMembers: [], trackedMemberCount: 0 }
+    }
+
+    return { status: 'clear', coreKeyword, trackedMembers: [], trackedMemberCount: 0 }
+  }
+
   // Última acción por candidato (la decisión pendiente ordena primero).
   const candidateIds = candidateRows.map(row => row.candidate_id)
 
@@ -485,6 +583,7 @@ export const readKeywordDiscovery = async (
       linkBarrier: market.linkBarrierByKeyword.get(row.normalized_keyword) ?? null,
       measuredGsc: gsc ? { impressions: gsc.impressions, position: gsc.position, displayMarker: '●' } : null,
       alreadyTracked: trackedSet.has(row.normalized_keyword),
+      clusterConflict: resolveClusterConflict(row.normalized_keyword, datum?.coreKeyword ?? null),
       latestAction: action
         ? { kind: action.action_kind as SeoDiscoveryActionKind, actor: action.actor, at: action.created_at.toISOString() }
         : null,

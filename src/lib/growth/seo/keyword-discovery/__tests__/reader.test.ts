@@ -357,6 +357,181 @@ describe('readKeywordDiscovery — orden y filtros', () => {
     expect(result.candidates.map(candidate => candidate.candidateId)).toEqual(['seokdc-1'])
   })
 
+  describe('TASK-1694 — clusterConflict: la señal de canibalización contra el set seguido', () => {
+    /** El reader lee mercado DOS veces: candidatos primero, set seguido después. */
+    const marketByCall = (candidates: Map<string, unknown>, tracked: Map<string, unknown>) => {
+      marketMock.mockImplementation(async (input: { keywords: string[] }) => {
+        const isTrackedRead = input.keywords.some(keyword => tracked.has(keyword))
+        const source = isTrackedRead ? tracked : candidates
+
+        return {
+          market: source.size > 0 ? 'available' : 'unavailable',
+          byKeyword: source,
+          linkBarrierByKeyword: new Map(),
+          freshness: { freshKeywords: source.size, latestCaptureDate: '2026-08-13' }
+        }
+      })
+    }
+
+    it('mismo core que una keyword vigente DISTINTA → conflict, con los miembros nombrados', async () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'seokdc-1', keyword: 'pintura para pisos', normalized_keyword: 'pintura para pisos' })
+      ]
+      state.tracked = [{ keyword: 'pintura pisos' }]
+
+      marketByCall(
+        new Map([['pintura para pisos', datum('pintura para pisos', { coreKeyword: 'pintura piso' })]]),
+        new Map([['pintura pisos', datum('pintura pisos', { coreKeyword: 'pintura piso' })]])
+      )
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      const [candidate] = result.candidates
+
+      expect(candidate.clusterConflict).toEqual({
+        status: 'conflict',
+        coreKeyword: 'pintura piso',
+        trackedMembers: ['pintura pisos'],
+        trackedMemberCount: 1
+      })
+      // 🔴 Señales SEPARADAS: la keyword NO está seguida y aun así choca con el cluster.
+      expect(candidate.alreadyTracked).toBe(false)
+    })
+
+    it('cores distintos con el set completamente resuelto → clear', async () => {
+      state.runs = [runRow()]
+      state.candidates = [candidateRow({ candidate_id: 'seokdc-1', keyword: 'barniz', normalized_keyword: 'barniz' })]
+      state.tracked = [{ keyword: 'pintura pisos' }]
+
+      marketByCall(
+        new Map([['barniz', datum('barniz', { coreKeyword: 'barniz' })]]),
+        new Map([['pintura pisos', datum('pintura pisos', { coreKeyword: 'pintura piso' })]])
+      )
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].clusterConflict.status).toBe('clear')
+    })
+
+    it('🔴 set seguido sin fila de mercado → unknown, JAMÁS clear', async () => {
+      state.runs = [runRow()]
+      state.candidates = [candidateRow({ candidate_id: 'seokdc-1', keyword: 'barniz', normalized_keyword: 'barniz' })]
+      state.tracked = [{ keyword: 'pintura pisos' }]
+
+      // El set seguido no resolvió su core: el conflicto no está descartado, está sin medir.
+      marketByCall(new Map([['barniz', datum('barniz', { coreKeyword: 'barniz' })]]), new Map())
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].clusterConflict.status).toBe('unknown')
+    })
+
+    it('candidato sin coreKeyword → unknown aunque el set seguido esté resuelto', async () => {
+      state.runs = [runRow()]
+      state.candidates = [candidateRow({ candidate_id: 'seokdc-1', keyword: 'barniz', normalized_keyword: 'barniz' })]
+      state.tracked = [{ keyword: 'pintura pisos' }]
+
+      marketByCall(
+        new Map([['barniz', datum('barniz', { coreKeyword: null })]]),
+        new Map([['pintura pisos', datum('pintura pisos', { coreKeyword: 'pintura piso' })]])
+      )
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].clusterConflict).toMatchObject({ status: 'unknown', coreKeyword: null })
+    })
+
+    it('la propia keyword ya seguida no cuenta como conflicto consigo misma', async () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'seokdc-1', keyword: 'pintura pisos', normalized_keyword: 'pintura pisos' })
+      ]
+      state.tracked = [{ keyword: 'pintura pisos' }]
+
+      marketByCall(
+        new Map([['pintura pisos', datum('pintura pisos', { coreKeyword: 'pintura piso' })]]),
+        new Map([['pintura pisos', datum('pintura pisos', { coreKeyword: 'pintura piso' })]])
+      )
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      // Es identidad, no canibalización: eso ya lo dice `alreadyTracked`.
+      expect(result.candidates[0].alreadyTracked).toBe(true)
+      expect(result.candidates[0].clusterConflict.status).toBe('clear')
+    })
+
+    it('sin nada seguido el veredicto es clear (hecho positivo) y no consulta el set', async () => {
+      state.runs = [runRow()]
+      state.candidates = [candidateRow()]
+      state.tracked = []
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].clusterConflict.status).toBe('clear')
+      // Una sola lectura de mercado: la del set seguido no ocurre si no hay set.
+      expect(marketMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('el conflicto se resuelve sin gastar: cero llamadas al proveedor', async () => {
+      state.runs = [runRow()]
+      state.candidates = [candidateRow()]
+      state.tracked = [{ keyword: 'otra keyword' }]
+
+      await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      // Sólo el reader canónico del store de TASK-1661 (candidatos + set seguido). Nada más.
+      expect(marketMock).toHaveBeenCalledTimes(2)
+    })
+
+    it('trackedMembers nombra hasta 5 pero trackedMemberCount dice el total', async () => {
+      state.runs = [runRow()]
+      state.candidates = [candidateRow({ candidate_id: 'seokdc-1', keyword: 'nueva', normalized_keyword: 'nueva' })]
+
+      const trackedKeywords = ['t1', 't2', 't3', 't4', 't5', 't6', 't7']
+
+      state.tracked = trackedKeywords.map(keyword => ({ keyword }))
+
+      marketByCall(
+        new Map([['nueva', datum('nueva', { coreKeyword: 'core compartido' })]]),
+        new Map(trackedKeywords.map(keyword => [keyword, datum(keyword, { coreKeyword: 'core compartido' })]))
+      )
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].clusterConflict.trackedMembers).toHaveLength(5)
+      expect(result.candidates[0].clusterConflict.trackedMemberCount).toBe(7)
+    })
+  })
+
   describe('TASK-1694 — un candidato es una keyword, no una fila de procedencia', () => {
     const twoProvenances = () => {
       state.runs = [runRow()]
