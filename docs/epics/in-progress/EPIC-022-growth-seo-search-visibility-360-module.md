@@ -333,6 +333,11 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1791` — [creada 2026-08-27, backend-data] **Señal de pertinencia del candidato.** Dos
   productores de candidatos y ninguno declara pertinencia; un término ajeno pasa todos los checks.
   Señal con evidencia, nunca filtro. Composición en memoria: `grader_brand_intelligence` es `grader_*`.
+- `TASK-1792` — [creada 2026-08-28, backend-data] **La curva de CTR declara si es utilizable, o la
+  lente no ordena.** Un `0` medido pasa el guard de `expectedCtrAt` y anula el fallback: el score
+  colapsa y el `.sort()` es un no-op. Medido contra PG: Efeonce 24/24 filas en cero. El disparador
+  es cualquier org con ≥10 impresiones y 0 clics en el bucket objetivo — todo target nuevo. Adopta
+  el umbral de dos dimensiones que `TASK-1700` ya construyó y reduce las dos curvas a una.
 - `TASK-1784` — [creada 2026-08-27, backend-data] **Ruteo de selección en la superficie MCP.** Seis de
   las 20 tools contestan la misma pregunta; el eval de selección va primero y puede cerrar la task.
 - `TASK-1785` — [creada 2026-08-27, backend-data] **La lente como campo del contrato, no como

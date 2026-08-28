@@ -9,6 +9,28 @@ Contexto que ahora es un hecho del contrato y no un supuesto: el reader de disco
 filtros que ignora (`ignoredFilters`), filtra por barrera de enlaces (`maxLinkBarrier`, con
 `unknown` fuera por default) y cuenta candidatos por keyword normalizada.
 
+## Delta 2026-08-28 (2) — hereda dos strings que quedaron factualmente falsas
+
+`TASK-1792` corrige el defecto de la curva de CTR del reader que esta task también posee
+(`keyword-opportunities-reader.ts`). **Objetos distintos, archivos compartidos**: 1792 corrige la
+*estimación* y no toca copy ni la vista; esta task declara la *frescura* y sigue siendo su dueña.
+Serialización recomendada **1792 → 1691**, porque esta task necesita saber qué estados de curva
+existen para poder declararlos junto a `marketAsOf` y al borde de la lente `●`.
+
+Dos strings de `src/lib/copy/growth.ts` quedan **factualmente falsas** cuando la curva no es
+utilizable, y su corrección entra en el alcance de esta task porque el archivo es suyo:
+
+- `keywords.opportunities.noGainHint` — *"Esta keyword ya convierte mejor que el promedio de la
+  posición objetivo"*. Afirma una comparación que **no se hizo**: con la curva degenerada el valor
+  cero no significa "convierte mejor", significa "no hubo con qué comparar".
+- `keywords.opportunities.sortedByGain` — *"Ordenadas por ganancia estimada: lo de arriba es lo que
+  más rinde"*. Promete un orden que **no ocurre** cuando el criterio no discrimina.
+
+`TASK-1792` agrega al DTO `ctrCurveSource`, `curveSampleSize` y `orderedBy`; esta task los consume
+para que el copy diga la verdad en los dos estados en vez de afirmar el caso feliz. Queda abierto
+con 1792 si `estimatedClickGain` debe volverse `number | null` — es la forma que hace imposible el
+error, pero rompe el render en compilación y por eso se decide acá, no allá.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
