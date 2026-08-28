@@ -7491,11 +7491,61 @@ export interface GreenhouseGrowthSeoBacklinkSnapshots {
   toxic_share: Numeric | null;
 }
 
+export interface GreenhouseGrowthSeoCompetitorCoverageRuns {
+  capture_date: Timestamp;
+  captured_at: Generated<Timestamp>;
+  coverage_run_id: Generated<string>;
+  error_code: string | null;
+  language_code: string;
+  location_code: string;
+  provider_cost: Numeric | null;
+  rows_written: Generated<number>;
+  seo_competitor_id: string;
+  seo_target_id: string;
+  source_run_id: string | null;
+  status: string;
+}
+
+export interface GreenhouseGrowthSeoCompetitorKeywordCoverage {
+  capture_date: Timestamp;
+  captured_at: Generated<Timestamp>;
+  client_rank: number | null;
+  client_url: string | null;
+  competitor_rank: number;
+  competitor_url: string | null;
+  coverage_row_id: Generated<string>;
+  coverage_run_id: string;
+  keyword: string;
+  language_code: string;
+  location_code: string;
+  seo_competitor_id: string;
+  seo_target_id: string;
+  serp_item_types: Json | null;
+}
+
 export interface GreenhouseGrowthSeoCompetitors {
   competitor_domain: string;
   created_at: Generated<Timestamp>;
+  declared_at: Timestamp | null;
+  /**
+   * TASK-1662 — actor que DECLARÓ al dominio como competidor. Un competidor es una clasificación con autor, nunca una inferencia: un competidor mal elegido invalida todo el análisis río abajo.
+   */
+  declared_by: string | null;
+  /**
+   * TASK-1662 — procedencia del write (operator_ui|nexa|mcp|seed|backfill), mismo vocabulario que seo_keyword_set_members.source. Ortogonal a declared_by.
+   */
+  declared_source: string | null;
   effective_from: Generated<Timestamp>;
   effective_to: Timestamp | null;
+  /**
+   * TASK-1662 — referencia OPACA a la propuesta de máquina que originó la declaración (p.ej. top-N de TASK-1699). NULL = declaración directa sin propuesta. Nunca FK, nunca JOIN.
+   */
+  proposal_ref: string | null;
+  /**
+   * TASK-1662 — actor que retiró al competidor (cierra effective_to). Acoplado por CHECK: vigencia cerrada exige autor del retiro.
+   */
+  retired_by: string | null;
+  retired_reason: string | null;
   seo_competitor_id: Generated<string>;
   seo_target_id: string;
 }
@@ -12988,6 +13038,8 @@ export interface DB {
   "greenhouse_growth.seo_backlink_drilldowns": GreenhouseGrowthSeoBacklinkDrilldowns;
   "greenhouse_growth.seo_backlink_referring_domains": GreenhouseGrowthSeoBacklinkReferringDomains;
   "greenhouse_growth.seo_backlink_snapshots": GreenhouseGrowthSeoBacklinkSnapshots;
+  "greenhouse_growth.seo_competitor_coverage_runs": GreenhouseGrowthSeoCompetitorCoverageRuns;
+  "greenhouse_growth.seo_competitor_keyword_coverage": GreenhouseGrowthSeoCompetitorKeywordCoverage;
   "greenhouse_growth.seo_competitors": GreenhouseGrowthSeoCompetitors;
   "greenhouse_growth.seo_domain_overview_snapshots": GreenhouseGrowthSeoDomainOverviewSnapshots;
   "greenhouse_growth.seo_gsc_daily": GreenhouseGrowthSeoGscDaily;
