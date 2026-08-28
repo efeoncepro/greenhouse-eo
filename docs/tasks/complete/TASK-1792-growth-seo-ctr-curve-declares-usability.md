@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -297,12 +297,12 @@ mismo DTO, así que quien vaya segunda hereda el rebase — la serialización re
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
 - [ ] `N/A` — la task no crea tablas, así que no hay allowlist de destinos de escritura que tocar.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -515,21 +515,21 @@ real (el revert del PR ya la da, en menos de 5 minutos y sin migración inversa)
 
 ## Acceptance Criteria
 
-- [ ] `ctr-curve.ts` devuelve por bucket `{ ctr, impressions, clicks }` y **no** aplica `HAVING` en el SQL.
-- [ ] `isCurveUsableAtPosition` exige impresiones **y** clics; un bucket con 75/0 se declara no utilizable.
-- [ ] Existe un test que falla si `expectedCtrAtTarget` es `0` con la curva declarada utilizable.
-- [ ] Con la curva real de `efeoncepro.com`, el reader **no** devuelve `estimatedClickGain = 0` para
+- [x] `ctr-curve.ts` devuelve por bucket `{ ctr, impressions, clicks }` y **no** aplica `HAVING` en el SQL.
+- [x] `isCurveUsableAtPosition` exige impresiones **y** clics; un bucket con 75/0 se declara no utilizable.
+- [x] Existe un test que falla si `expectedCtrAtTarget` es `0` con la curva declarada utilizable.
+- [x] Con la curva real de `efeoncepro.com`, el reader **no** devuelve `estimatedClickGain = 0` para
       todas las filas: declara `ctrCurveSource: 'unusable'` y ordena por el criterio secundario.
-- [ ] Con la curva real de `berel.com`, el orden y los techos **no cambian** respecto del comportamiento actual.
-- [ ] El DTO expone `ctrCurveSource`, `curveSampleSize` y `orderedBy`, y los tres consumers los reciben.
-- [ ] `keyword-opportunities-reader.ts` ya no define un `readOrgCtrCurve` privado.
-- [ ] `MIN_IMPRESSIONS_FLOOR` conserva sólo su uso de umbral de impresiones, con el comentario que
+- [x] Con la curva real de `berel.com`, el orden y los techos **no cambian** respecto del comportamiento actual.
+- [x] El DTO expone `ctrCurveSource`, `curveSampleSize` y `orderedBy`, y los tres consumers los reciben.
+- [x] `keyword-opportunities-reader.ts` ya no define un `readOrgCtrCurve` privado.
+- [x] `MIN_IMPRESSIONS_FLOOR` conserva sólo su uso de umbral de impresiones, con el comentario que
       declara por qué no sirve como piso de validez de la curva.
-- [ ] La curva expuesta es monótona no creciente y no presenta saltos de orden de magnitud entre
+- [x] La curva expuesta es monótona no creciente y no presenta saltos de orden de magnitud entre
       buckets adyacentes.
-- [ ] El live test corre con credenciales y reporta `passed`, no `skipped`.
-- [ ] El delta de `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §556 corrige la descripción del fallback.
-- [ ] `TASK-1691` tiene su `## Delta` con las dos strings a corregir.
+- [x] El live test corre con credenciales y reporta `passed`, no `skipped`.
+- [x] El delta de `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §556 corrige la descripción del fallback.
+- [x] `TASK-1691` tiene su `## Delta` con las dos strings a corregir.
 
 ## Verification
 
@@ -540,14 +540,14 @@ real (el revert del PR ya la da, en menos de 5 minutos y sin migración inversa)
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado
-- [ ] `changelog.md` quedo actualizado
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `TASK-1700` quedo notificada del predicado compartido y del estado de su plan de rollback
-- [ ] `TASK-1708` actualizo su cita de las constantes de modulo de este reader
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado
+- [x] `changelog.md` quedo actualizado
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `TASK-1700` quedo notificada del predicado compartido y del estado de su plan de rollback
+- [x] `TASK-1708` actualizo su cita de las constantes de modulo de este reader
 
 ## Follow-ups
 
@@ -571,3 +571,93 @@ real (el revert del PR ya la da, en menos de 5 minutos y sin migración inversa)
 - ¿`estimatedClickGain` debe volverse `number | null` cuando la curva no es utilizable? Es la forma
   más honesta y hace imposible el error, pero rompe al consumidor visible en compilación. Requiere
   acuerdo con `TASK-1691`.
+
+<!-- ═══════════════════════════════════════════════════════════
+     CIERRE
+     ═══════════════════════════════════════════════════════════ -->
+
+## Closure Report — 2026-08-28
+
+**Estado: `complete` en código y verificado contra runtime real (lectura).** Sin flag, sin
+migración, sin escritura: el cutover fue el merge. Rollback = revert PR, <5 min por slice.
+
+### Qué se entregó
+
+| Slice | Commit | Qué cerró |
+|---|---|---|
+| 1 | `d4d731721` | `ctr-curve.ts`: SQL sin `HAVING`, curva con su muestra, `isCurveUsableAtPosition` de dos dimensiones, veredicto explícito |
+| 2+3 | `f8be78d83` | El reader consume el módulo, ordena honesto y declara el criterio; se retira la curva privada; `MIN_IMPRESSIONS_FLOOR` conserva sólo su uso legítimo |
+| 4 | `8943b2f5c` | Referencia recalibrada con procedencia, nivel estimado del propio sitio, curva única monótona |
+
+Slices 2 y 3 fueron un solo commit: separarlos dejaba la curva privada huérfana entre ambos, que
+es justo lo que la regla de orden de la task prohíbe.
+
+### Evidencia
+
+- `pnpm vitest run src/lib/growth/seo` — **663 passed** (61 archivos).
+- `pnpm test:live src/lib/growth/seo/ctr-curve` — **4 passed, NO skipped** (criterio explícito de
+  la task). Reporta el veredicto por bucket de cada org y cada ventana independiente (7d y 28d):
+
+  | Org | Ventana | Buckets | Nivel | p5 | CTR esperado |
+  |---|---|---|---|---|---|
+  | Efeonce | 7d | 74 | `reference` (1,000) | `unusable` | 0,01120 |
+  | Efeonce | 28d | 98 | `reference` (1,000) | `unusable` | 0,01120 |
+  | Berel | 7d | 116 | `org_level` (1,095) | `org_measured` | 0,01056 |
+  | Berel | 28d | 137 | `org_level` (1,048) | `org_measured` | 0,00984 |
+
+- `pnpm lint` limpio sobre el módulo · `pnpm typecheck` limpio.
+- **Los tres anti-asserts se verificaron EN ROJO**, no sólo en verde: reintroducir el guard de una
+  dimensión pone 3 tests a fallar; volver el `.sort()` a incondicional pone otros 3; bajar el piso
+  de un solo lado rompe la paridad nombrando la fixture y la posición exactas.
+
+### Dos hallazgos que la spec no anticipaba
+
+1. **La referencia calza con Berel dentro del 5%.** El nivel estimado de `berel.com` da **1,048**
+   (28d) y **1,095** (7d) contra la curva de referencia — y Berel **no es la fuente** de esa
+   referencia (viene de la medición no-marca de la skill `seo-aeo`, otro sitio). Es una tercera
+   medición independiente que sostiene la decisión de prestar la forma y estimar sólo el nivel.
+   Resuelve la Open Question del Slice 4 sin caer en ninguna de sus dos opciones: ni tabla pública
+   obsoleta, ni referencia de n=1 derivada de la plataforma.
+2. **Cuarto estado, no tres.** `org_level_reference_shape` no estaba en la spec; salió de la
+   evidencia. Sin él, «calibrado al nivel medido de este sitio» y «tabla prestada tal cual» se
+   leerían igual en el contrato, que es la clase exacta de colapso que esta task existe para
+   cerrar.
+
+### Lo que NO está verificado en runtime (declarado, no omitido)
+
+**Ninguna de las dos organizaciones reales ejercita hoy el camino `org_level_reference_shape`**:
+Berel mide en el bucket objetivo (gana `org_measured`) y Efeonce no tiene muestra ni para un nivel
+(2 clics en 28d). El camino está unit-tested y es correcto por construcción, pero **no observado en
+producción**. Se verá cuando exista una org con tráfico agregado suficiente y un bucket objetivo
+delgado — una forma común, sólo que hoy no presente.
+
+### Open Questions — resueltas
+
+- **¿La referencia del Slice 4 es pública o derivada de la plataforma?** Ninguna de las dos: se toma
+  la curva **medida sobre filas no-marca** que la skill `seo-aeo` documenta con as-of (2026-08), y
+  se declara `berel.com` como corroboración independiente. Evita a la vez la tabla pública obsoleta
+  y la referencia de n=1.
+- **¿`estimatedClickGain` debe ser `number | null`?** No en esta task (Out of Scope declarado). El
+  argumento además se debilitó: hoy el número siempre existe, es un techo honesto y viaja con su
+  procedencia, así que el `null` pasó de urgente a decisión de ergonomía del render — de `TASK-1691`.
+
+### Coordinación ejecutada
+
+- **`TASK-1700`** (`greenhouse-eo-56`): bloqueo **levantado** — Slices 1 y 2 en `develop`, su Slice 7
+  puede cutover y el destino de su rollback ahora ordena. Acordado con ella que el predicado NO se
+  importa cruzado (acoplaría el reader legacy a la config versionada del score: un bump de versión
+  del score le cambiaría el comportamiento al reader sin que nadie lo pida) sino que se sostiene con
+  el test de paridad. Suyo el matiz de comparar el **veredicto** y no las constantes.
+- **`TASK-1691`**: `## Delta 2026-08-28 (3)` con el contrato tal como quedó — cuatro estados, no
+  tres, más `targetPosition` y `expectedCtrAtTarget`, y la nota de que el ORDEN ya quedó corregido
+  del lado servidor aunque la etiqueta siga siendo suya.
+- **`TASK-1708`**: cita actualizada — el piso de curva salió del reader; `DEFAULT_TARGET_POSITION` y
+  el percentil siguen siendo constantes de módulo y su crítica sigue en pie.
+
+### Alcance, para que no se encoja al archivar
+
+El defecto **no era de un cliente**. El disparador es *cualquier organización cuyo bucket en la
+posición objetivo tenga ≥10 impresiones y 0 clics* — condición **garantizada** en todo target recién
+onboardeado. Y Berel, con curva sana, igual tenía **1.445 de 1.798 filas (80%) empatadas en cero**:
+su curva servía, su lente discriminaba sobre ~353 filas. "Le pasa a Efeonce" es leer una muestra de
+dos como si fuera una tasa.

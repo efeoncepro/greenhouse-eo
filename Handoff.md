@@ -2,6 +2,34 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-28 — `TASK-1792` complete: la curva de CTR declara su usabilidad
+
+**Estado: `complete` y verificado contra runtime real (lectura).** Sin flag, sin migración, sin escritura —
+el cutover fue el merge; rollback = revert PR. Commits en `develop`: `d4d731721` (módulo + predicado),
+`f8be78d83` (reader consume y ordena honesto, curva privada retirada), `8943b2f5c` (referencia recalibrada +
+nivel estimado + curva monótona). Contrato canónico y sus invariantes:
+[`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
+§`readKeywordOpportunities`. Este Handoff rota; ese doc no.
+
+**Lo que queda vivo para quien siga:**
+
+- **`org_level_reference_shape` está unit-tested y es correcto por construcción, pero NO observado en
+  producción.** Ninguna de las dos organizaciones con serie cae hoy en ese estado: Berel mide en el bucket
+  objetivo y Efeonce no tiene muestra ni para estimar un nivel (2 clics en 28d). En tres semanas alguien va a
+  leerlo como "probado" — no lo está. Se verá cuando exista una org con agregado suficiente y bucket objetivo
+  delgado.
+- **`TASK-1691` hereda el contrato y tiene su `## Delta 2026-08-28 (3)`** con la forma tal como quedó: cuatro
+  estados, no tres. El ORDEN que ve el usuario ya está corregido del lado servidor (la tabla re-ordena en
+  cliente y `Array.prototype.sort` es estable); lo que falta es que la etiqueta deje de prometer orden por
+  ganancia cuando `orderedBy === 'measured_demand'`.
+- **Follow-ups sin task creada** (no se reservaron IDs: el registry estaba contendido por tres sesiones):
+  filtro marca/no-marca de la curva (defecto independiente del tamaño de muestra, no se cura cuando el sitio
+  crezca); unificar el predicado con `work-queue/priority-score.ts` cuando `TASK-1700` cierre; revisar
+  `DEFAULT_TARGET_POSITION = 5` contra la doctrina de 8–10.
+- **Dato para calibrar:** el nivel estimado de `berel.com` contra la curva de referencia da **1,048** (28d) y
+  **1,095** (7d), y Berel no es la fuente de esa referencia. Es el control contra el cual medir si algún día
+  el filtro no-marca mueve algo real.
+
 ## 2026-08-28 — LicitaLAB MCP + radar Playwright documentados en skills Codex/Claude
 
 **Estado: `complete`, discovery read-only + ocho promociones CRM verificadas.** El MCP OAuth expone cinco tools
@@ -568,21 +596,3 @@ nominal real (Berel perdió `apps.apple.com`); `berel.com` = 773 kw ranqueadas /
 `db_migrations`: instancia única, las 10 ya aplicadas) y post-release federa las 5 tools nuevas en
 `efeonce-mcp` + flip de `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` en Vercel Production. La
 evidencia de costos de este bloque es el insumo para que mueva las tasks a `complete`.
-
-## 2026-08-27 — TASK-1652 COMPLETE: el provider AI Mode del grader deja de mentir "sin bloque AI"
-
-**Estado: `complete` en `develop`, local-first, SIN push (commits `bc2dd0f99` + `63d01db49` +
-`6b6c5d200`); la sesión de release `greenhouse-eo-c1` audita antes del pase.** Los 3 defectos de la
-spec cerrados + un 4.º que solo el smoke live destapó: Google envuelve TODAS las references de
-AI Mode en redirects propios (`domain: google.com`, `goto?url=<token opaco>`) — el dominio real se
-deriva ahora de `source` y lo no atribuible se descarta contado en
-`usage.dataforseo_citations_unattributable` (antes TODO el SoV de citabilidad se atribuía a
-google.com). Dimensionamiento: **60 observaciones históricas** eran falsos negativos (54 con el
-`40501` exacto de location ISO-2); **regrade DESCARTADO** — los tasks nunca se ejecutaron y
-skip/failed pesan igual río abajo. Smoke real PASS (task `20000` + `succeeded`, ~USD 0,008 total).
-Suite full verde (12.311); `pnpm build` prod queda al preflight del release (restricción de memoria
-del equipo). AIO producción sigue OFF (TASK-1341). Herencia declarada en TASK-1311 (las `url` de
-este provider son punteros al wrapper, no la página citada — su atribución URL-level debe
-dimensionarlo). (Aprendizaje de sesión: las cifras `$0.xxxx` de un SKILL.md se ven corrompidas en
-el RENDER de la Skill tool por sustitución posicional `$0` — verificar drift de skills en disco,
-nunca desde el cuerpo renderizado.)

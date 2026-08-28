@@ -424,6 +424,14 @@ aggregate que lo versiona, que es exactamente el defecto que la auditoría docum
 `keyword-opportunities-reader.ts` (constantes de módulo `DEFAULT_TARGET_POSITION = 5`, percentil
 0.75, piso de 10 impresiones — cambiar cualquiera mueve el ranking histórico sin dejar rastro).
 
+> **Actualización 2026-08-28 (`TASK-1792` cerró).** La cita sigue siendo válida para
+> `DEFAULT_TARGET_POSITION` y el percentil, pero el **piso de validez de la curva de CTR** ya no
+> vive como constante suelta del reader: se movió a `src/lib/growth/seo/ctr-curve.ts`, adoptado de
+> `work-queue/score-versions.ts` y sostenido por un test de paridad que compara el VEREDICTO del
+> predicado, no los números. `MIN_IMPRESSIONS_FLOOR = 10` conserva sólo su uso legítimo (umbral de
+> impresiones de la lente), con el comentario que declara por qué no sirve como piso de curva —
+> fundir esas dos preguntas fue la mitad del defecto original.
+
 ### Frontera con TASK-1655, dicha para que nadie las funda
 
 `TASK-1655` construye **nuestro** histórico: GSC + rank capture, mirror a BigQuery, backfill de 16

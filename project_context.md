@@ -100,13 +100,14 @@ Cobertura parcial o stale nunca se representa como cero. Los IDs mutables del ro
 El módulo Growth SEO (`growth.seo`, EPIC-022) autoriza todo run por un único chokepoint, `enforceSeoRunEntitlement`
 (`src/lib/growth/seo/entitlement.ts`), con entitlement per-org vía el módulo `seo_v2` de
 `greenhouse_client_portal.modules` — **única clave leída** desde TASK-1677
-(`SEO_MODULE_KEYS_READ = ['seo_v2']`); el expand/contract desde `seo_v1` ya está aplicado y
-volver a leer `seo_v1` sería reabrir una ventana cerrada. Contrato en
+(`SEO_MODULE_KEYS_READ = ['seo_v2']`); releer `seo_v1` sería reabrir una ventana ya cerrada
+por su expand/contract aplicado. Contrato en
 [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §9 (§17
 contrata el seam de extracción hacia Wave). Los reads del módulo son readers canónicos consumer-agnósticos —
 `readKeywordOpportunities` y `readSeoAeoGap` (este último cruza SEO↔AEO respetando el boundary de §1.1) —
 expuestos por el lane ecosystem `/api/platform/ecosystem/growth/seo/*` y sus MCP tools; **todo reader SEO
-nuevo expone su tool en el mismo PR**. Desde 2026-08-06 el camino está **vivo en producción y federado en
+nuevo expone su tool en el mismo PR**. Su curva de CTR vive en `src/lib/growth/seo/ctr-curve.ts`,
+**declara** su usabilidad y nunca colapsa un `0` medido con «sin muestra» (`TASK-1792`). Desde 2026-08-06 el camino está **vivo en producción y federado en
 `mcp.efeonce.org`** mediante el provider `greenhouse-seo`; el acceso per-org falla cerrado.
 El flag `GROWTH_SEO_ENABLED` es **multi-runtime** — Vercel (lane) + `ops-worker` (materializer GSC);
 prenderlo en uno solo deja el otro camino muerto. Su primera captura corre live

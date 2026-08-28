@@ -7,6 +7,34 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-28 — La curva de CTR declara si es utilizable, o la lente no ordena (`TASK-1792`)
+
+- `readKeywordOpportunities` ordenaba por un campo colapsado a cero. `expectedCtrAt` preguntaba «¿está el
+  bucket en el `Map`?» cuando la pregunta era «¿hay muestra para estimar un CTR?»: con un bucket presente y
+  sin clics (`efeoncepro.com`: 75 impresiones, 0 clics en la posición objetivo) el guard devolvía `0`, la
+  ganancia estimada colapsaba en **toda** la lente y el `.sort()` quedaba en no-op. La pantalla no ordenaba
+  mal: **no ordenaba**, y nada fallaba. Medido contra PG el 2026-08-28: Efeonce 24/24 filas en cero; Berel,
+  con curva sana, 1.445 de 1.798 (80%) empatadas. El disparador está garantizado en todo target recién
+  onboardeado, así que no es un defecto de un cliente.
+- Primitive nuevo [`src/lib/growth/seo/ctr-curve.ts`](src/lib/growth/seo/ctr-curve.ts): la curva se lee **sin
+  `HAVING`** (un filtro en el SQL borra el bucket y vuelve indistinguible «no vino» de «vino sin muestra»),
+  transporta su muestra por bucket y declara su usabilidad con un piso de **dos dimensiones** — impresiones
+  **y** clics, porque la precisión de un estimador de tasa la gobiernan los éxitos. El umbral `1000/5` se
+  **adopta** de `work-queue/score-versions.ts` y lo sostiene un test que compara el **veredicto** del
+  predicado sobre nueve curvas fixture, no las constantes.
+- El envelope de `KeywordOpportunitiesResult` gana `ctrCurveSource`, `curveSampleSize`, `orderedBy`,
+  `targetPosition` y `expectedCtrAtTarget`. Cuando el techo no discrimina —curva no utilizable, o ganancia
+  idéntica en todas las filas— la lente ordena por **demanda medida** (impresiones × cercanía a página 1) y
+  lo declara. Los tres consumers (page server, lane ecosystem, tool MCP) son passthrough y heredan la
+  procedencia sin lógica propia.
+- El `FALLBACK_CTR_CURVE` declaraba 6% en la posición objetivo contra ~1% medido en dos sitios independientes:
+  estaba calibrado para una SERP que ya no existe. Se reemplaza por **forma de referencia + nivel estimado del
+  propio sitio** (un parámetro medido en vez de veinte prestados), con la curva expuesta forzada monótona no
+  creciente — el híbrido anterior producía bucket 8 en `0,0000` junto a bucket 9 en `≈0,027`.
+- Verificación: 663 unitarios + `src/lib/growth/seo/ctr-curve.live.test.ts` contra PG real, **4 passed, no
+  `skipped`**. Cierra la costura que dejó pasar el defecto: los mocks ejercitaban el TS sin el SQL y el sanity
+  el SQL sin el TS. Levanta el bloqueo del cutover de `TASK-1700`.
+
 ## 2026-08-28 — LicitaLAB: MCP oficial + radar Playwright autenticado y gateado
 
 - La skill espejada `greenhouse-public-private-tenders` incorpora el companion `licitalab-mcp.md` en
@@ -796,20 +824,3 @@
   no llega.
 - Todo salió de auditorías independientes con skills de arquitectura, talento y seguridad, corridas
   ANTES de promover. Dos auditores encontraron el mismo P0 sin verse entre sí.
-
-## 2026-08-19 — Un guard que verificaba menos de lo que su propio Down borraba
-
-- **La migration de TASK-1746 tenía un hueco silencioso.** Su bloque anti pre-up-marker contaba
-  capabilities, triggers y columnas de sesión, pero no la tabla `hiring_assessment_public_request_bucket`
-  ni las cuatro funciones de acceso público — que el Down sí dropeaba. La migration creció en dos tandas y
-  el guard, que vive al final del Up, no se actualizó con la segunda. Un fallo en ese DDL habría quedado
-  registrado como aplicado, verde, y sólo habría aparecido a las 04:17 cuando el cron de retención llamara
-  una función inexistente. Corregido antes de aplicarla, así que no hizo falta forward-fix.
-- **Regla nueva en la spec de migraciones:** el guard del Up debe cubrir todo lo que el Down dropea, y una
-  migration editada en varias tandas necesita revisarlo en cada tanda. Es una comparación mecánica de dos
-  listas: los `DROP` del Down contra los contadores del guard.
-- **El ledger de flags afirmaba dos cosas falsas.** `HIRING_STAGE_TEST_ASSIGNMENT_ENABLED` figuraba ON en
-  una sección y OFF en otra; la revisión activa `ops-worker-00585-nv6` lo tiene en `true`, así que la
-  segunda era la equivocada. Y `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`, code-complete sin prender,
-  sólo estaba en el snapshot y no en `§ Pendientes de acción`, que es donde la regla del propio ledger lo
-  exige. Ambas corregidas contra runtime, no contra memoria.

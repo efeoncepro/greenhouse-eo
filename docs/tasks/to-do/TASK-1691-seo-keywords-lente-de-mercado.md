@@ -31,6 +31,42 @@ para que el copy diga la verdad en los dos estados en vez de afirmar el caso fel
 con 1792 si `estimatedClickGain` debe volverse `number | null` — es la forma que hace imposible el
 error, pero rompe el render en compilación y por eso se decide acá, no allá.
 
+## Delta 2026-08-28 (3) — `TASK-1792` cerró: el contrato que hereda esta task, tal como quedó
+
+Lo que efectivamente quedó en `KeywordOpportunitiesResult` (envelope, no por fila — es UN hecho de
+la lente, no un atributo de cada keyword). Difiere en dos puntos de lo anunciado en el Delta (2):
+
+| Campo | Tipo | Para qué sirve al copy |
+|---|---|---|
+| `ctrCurveSource` | `'org_measured' \| 'org_level_reference_shape' \| 'unusable' \| 'fallback'` | **CUATRO estados, no tres** |
+| `curveSampleSize` | `{ impressions, clicks } \| null` | el POR QUÉ: `null` = nunca vimos esa posición |
+| `orderedBy` | `'estimated_click_gain' \| 'measured_demand'` | si la promesa de orden es cierta |
+| `targetPosition` | `number` | contra qué posición se calculó el techo |
+| `expectedCtrAtTarget` | `number` | el CTR objetivo que multiplica cada techo |
+
+Los cuatro estados y qué puede afirmar el copy en cada uno:
+
+- `org_measured` — el techo salió de la medición del propio sitio EN esa posición. Es el único caso
+  donde `noGainHint` puede decir la verdad: ahí sí hubo con qué comparar.
+- `org_level_reference_shape` — **estado nuevo, no estaba en el Delta (2)**. El bucket objetivo no
+  alcanza, pero el nivel del sitio SÍ se pudo estimar de su agregado: la forma la presta una curva
+  de referencia y el nivel es medido. Un parámetro propio, la forma prestada.
+- `unusable` — vimos esa posición y la muestra no alcanza (`curveSampleSize` trae el par que lo
+  explica: p.ej. `{ impressions: 75, clicks: 0 }`).
+- `fallback` — nunca observamos esa posición y tampoco hubo muestra para un nivel.
+
+Dos cosas que cambian el trabajo de esta task respecto de lo anunciado:
+
+1. **`sortedByGain` ya no es sólo un problema de copy: el servidor lo arregló.** Cuando el criterio
+   no discrimina, el reader ordena por demanda medida (impresiones × cercanía a página 1) y lo dice
+   en `orderedBy`. Como la tabla re-ordena en cliente y `Array.prototype.sort` es estable, el orden
+   que ve el usuario YA está corregido. Lo que falta es que la etiqueta deje de prometer un orden
+   por ganancia cuando `orderedBy === 'measured_demand'`.
+2. **`estimatedClickGain` sigue siendo `number`, y ya no colapsa a 0.** La decisión de volverlo
+   `number | null` sigue abierta y es de esta task, pero el argumento cambió: hoy el número siempre
+   existe y es un techo honesto con procedencia declarada, así que el `null` deja de ser urgente y
+   pasa a ser una decisión de ergonomía del render.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
