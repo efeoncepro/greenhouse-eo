@@ -711,7 +711,7 @@ describe('readKeywordDiscovery — orden y filtros', () => {
       state.actions = [
         {
           candidate_id: 'seokdc-rel',
-          action_kind: 'selected_for_target',
+          action_kind: 'promoted_to_tracking',
           actor: 'user-2',
           created_at: new Date('2026-08-15T10:00:00Z')
         },
@@ -731,7 +731,7 @@ describe('readKeywordDiscovery — orden y filtros', () => {
 
       // La decisión se registró sobre la procedencia que NO quedó de representante y aun así
       // manda: el reader sigue siendo la autoridad de "esta keyword ya se decidió".
-      expect(result.candidates[0].latestAction).toMatchObject({ kind: 'selected_for_target', actor: 'user-2' })
+      expect(result.candidates[0].latestAction).toMatchObject({ kind: 'promoted_to_tracking', actor: 'user-2' })
     })
 
     it('el filtro sourceEndpoint deja la procedencia restringida a lo pedido', async () => {

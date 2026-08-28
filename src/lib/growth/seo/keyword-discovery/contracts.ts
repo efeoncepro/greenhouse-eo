@@ -95,20 +95,57 @@ export const SEO_DISCOVERY_RUN_STATUSES: readonly SeoDiscoveryRunStatus[] = [
   'cancelled'
 ]
 
-/** Acciones append-only sobre un candidato. Ninguna escribe tracking por sí sola. */
+/**
+ * Acciones append-only sobre un candidato. Ninguna escribe tracking por sí sola.
+ *
+ * 🔴 **Quién escribe cada kind (TASK-1692) — la frontera es qué produjo el hecho:**
+ * - `dismissed` y `rejected` → decisión HUMANA pura, vía `recordKeywordDiscoveryAction`
+ *   (el `record_action` público). Ningún command las produce; alguien simplemente decidió.
+ * - `selected_for_grounded_query` → lo escribe `createGroundedQueryDraft` dentro de su propia
+ *   transacción. También lo escribe una RE-SELECCIÓN humana explícita de un candidato
+ *   descartado, distinguible por `metadata.reason = 'reselected'`.
+ * - `promoted_to_tracking` → lo escribe el camino de tracking dentro de la MISMA transacción
+ *   que abre la membresía.
+ *
+ * **NUNCA un consumer (UI, Nexa, lane ecosystem) encadena un `record_action` para "reportar"
+ * el resultado de un command.** Entre la llamada que produce el outcome y la que lo registra
+ * hay una red: cuando se cae, queda el compromiso de gasto hecho y la decisión sin autor, y
+ * nada reconcilia las dos mitades. El writer vive donde nace el hecho.
+ *
+ * ⚠️ **`selected_for_target` se retiró de este vocabulario (TASK-1692).** No tenía writer, y no
+ * podía tenerlo: la intención (`target | opportunity`) es un atributo de la MEMBRESÍA, con autor
+ * y fecha (TASK-1659), así que un candidato que no se sigue no puede tener intención declarada.
+ * "Declarar objetivo" ES `trackKeywords` con `intent: 'target'`, y su hecho se registra como
+ * `promoted_to_tracking` con `metadata.intent`. Mantenerlo vivo no era neutro: `record_action`
+ * acepta cualquier kind del enum, así que quedaba una puerta para escribir —y pintar— un estado
+ * de negocio que ningún command produjo. El `CHECK` de la base CONSERVA el valor a propósito:
+ * una fila histórica tiene que seguir siendo legible.
+ */
 export type SeoDiscoveryActionKind =
   | 'dismissed'
-  | 'selected_for_target'
   | 'selected_for_grounded_query'
   | 'promoted_to_tracking'
   | 'rejected'
 
 export const SEO_DISCOVERY_ACTION_KINDS: readonly SeoDiscoveryActionKind[] = [
   'dismissed',
-  'selected_for_target',
   'selected_for_grounded_query',
   'promoted_to_tracking',
   'rejected'
+]
+
+/**
+ * Kinds que un consumer puede escribir por `record_action`: SOLO decisiones humanas puras.
+ *
+ * `promoted_to_tracking` no está porque nadie lo "decide" sin promover — lo produce el command
+ * de tracking. `selected_for_grounded_query` SÍ está, pero únicamente como re-selección
+ * explícita de un candidato descartado (`metadata.reason = 'reselected'`); el bridge escribe su
+ * propia fila con la metadata del draft real.
+ */
+export const SEO_DISCOVERY_CONSUMER_ACTION_KINDS: readonly SeoDiscoveryActionKind[] = [
+  'dismissed',
+  'rejected',
+  'selected_for_grounded_query'
 ]
 
 /**
