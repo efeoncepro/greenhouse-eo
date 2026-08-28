@@ -192,6 +192,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'untrackSeoKeywords'
   | 'declareSeoCompetitors'
   | 'retireSeoCompetitors'
+  | 'getSeoKeywordGap'
   | 'getSeoKeywordMarketData'
   | 'getSeoDomainOverview'
   | 'getSeoUrlVisibility'
@@ -914,6 +915,63 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         )}/${String(data.capacity ?? '?')} active competitors. Captured coverage history is preserved (${result.requestId}).`
       },
       () => client.retireSeoCompetitors(input)
+    )
+  },
+  /**
+   * TASK-1662 — lectura del gap competitivo DERIVADO. El summary declara la lente (◑) y
+   * que el reader no ordena: reportar el gap como ranking sería acuñar la prioridad que la
+   * cola (TASK-1700) todavía no computó.
+   */
+  async getSeoKeywordGap(input: { organizationId: string; market?: string; seoCompetitorId?: string; limit?: number }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          competitors?: Array<{
+            competitor?: { competitorDomain?: string }
+            coverage?: {
+              state?: string
+              stale?: boolean
+              contentGap?: unknown[]
+              ranksWorse?: unknown[]
+              declaredTargets?: unknown[]
+              excluded?: { measuredInGsc?: number; clientBetterOrEqual?: number }
+            }
+          }>
+        }
+
+        if (data.ok === false) {
+          return `SEO keyword gap unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const competitors = Array.isArray(data.competitors) ? data.competitors : []
+
+        if (competitors.length === 0) {
+          return `No declared competitors for this organization — declare one with declare_seo_competitors before reading the gap (${result.requestId}).`
+        }
+
+        const parts = competitors.map(entry => {
+          const domain = entry.competitor?.competitorDomain ?? '?'
+          const coverage = entry.coverage
+
+          if (!coverage || coverage.state !== 'available') {
+            return `${domain}: no coverage captured yet (needs a coverage run)`
+          }
+
+          const contentGap = coverage.contentGap?.length ?? 0
+          const ranksWorse = coverage.ranksWorse?.length ?? 0
+          const targets = coverage.declaredTargets?.length ?? 0
+          const measured = coverage.excluded?.measuredInGsc ?? 0
+
+          return `${domain}: ${contentGap} content gaps (client absent), ${ranksWorse} ranking worse, ${targets} already declared targets (commitments, NOT findings), ${measured} excluded because the client already has measured GSC impressions${coverage.stale ? ' [STALE coverage]' : ''}`
+        })
+
+        return `SEO competitor keyword gap (ESTIMATED provider lens, derived at read): ${parts.join(
+          '; '
+        )}. Rows are alphabetical facts with per-factor provenance — this reader does NOT rank; prioritization belongs to the SEO work queue (${result.requestId}).`
+      },
+      () => client.getSeoKeywordGap(input)
     )
   },
   /**

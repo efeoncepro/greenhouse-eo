@@ -550,6 +550,24 @@ export const createGreenhouseMcpServer = (
     async args => handlers.retireSeoCompetitors(args)
   )
 
+  // TASK-1662 — lectura del gap competitivo derivado.
+  server.registerTool(
+    'get_seo_keyword_gap',
+    {
+      title: 'Get SEO Keyword Gap',
+      description:
+        'Read the competitor keyword gap for an organization: keywords a DECLARED competitor ranks for, derived at read time from dated coverage inputs (ESTIMATED provider lens, ◑). The contract separates three things that must never be merged: content_gap (client absent from the provider SERP — new-content opportunity), ranks_worse (client ranks but below the competitor — optimization, already covered by the opportunities surface), and declaredTargets (keywords a human declared as client commitments — report them as commitments in progress with their declaration date, NEVER as new findings). Keywords with measured GSC impressions in the window are EXCLUDED by design (the measured lens wins; their count travels in excluded.measuredInGsc). Every row carries factors with provenance (estimated volume, cpcUsd, link barrier, SERP features, attainable position band) and a missing factor is declared sin_dato/null — never zero, never "low". 🔴 THIS READER DOES NOT RANK: rows come in neutral alphabetical order; do not present them as a priority list or coin a score — prioritization is owned by the SEO work queue. Coverage may be no_coverage (competitor declared but never captured) or stale — say so honestly. Optional seoCompetitorId narrows to one competitor; market (ISO-2 or location_code) for multi-market organizations.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1),
+        market: z.string().trim().min(1).optional(),
+        seoCompetitorId: z.string().trim().min(1).optional(),
+        limit: z.number().int().min(1).max(1000).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoKeywordGap(args)
+  )
+
   // TASK-1664 — keyword discovery: lectura de corridas/candidatos.
   server.registerTool(
     'get_seo_keyword_discovery',

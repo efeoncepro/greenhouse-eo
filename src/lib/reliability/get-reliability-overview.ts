@@ -208,6 +208,7 @@ import {
 import { getSeoMarketDataFreshnessSignal } from './queries/seo-market-data-freshness'
 import { getSeoDomainOverviewStalenessSignal } from './queries/seo-domain-overview-staleness'
 import { getSeoUrlVisibilityStalenessSignal } from './queries/seo-url-visibility-staleness'
+import { getSeoCompetitorCoverageStalenessSignal } from './queries/seo-competitor-coverage-staleness'
 import { getSeoBacklinkDrilldownFailuresSignal } from './queries/seo-backlink-drilldown-failures'
 import { getSeoRankCaptureLagSignal } from './queries/seo-rank-capture-lag'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
@@ -705,6 +706,7 @@ interface ReliabilityOverviewSources {
   seoMarketDataFreshness?: ReliabilitySignal | null
   seoDomainOverviewStaleness?: ReliabilitySignal | null
   seoUrlVisibilityStaleness?: ReliabilitySignal | null
+  seoCompetitorCoverageStaleness?: ReliabilitySignal | null
   seoBacklinkDrilldownFailures?: ReliabilitySignal | null
   seoAuditStuckTasks?: ReliabilitySignal | null
   seoKeywordDiscoveryStuckRuns?: ReliabilitySignal | null
@@ -1174,6 +1176,7 @@ export const buildReliabilityOverview = (
     ...(sources.seoMarketDataFreshness ? [sources.seoMarketDataFreshness] : []),
     ...(sources.seoDomainOverviewStaleness ? [sources.seoDomainOverviewStaleness] : []),
     ...(sources.seoUrlVisibilityStaleness ? [sources.seoUrlVisibilityStaleness] : []),
+    ...(sources.seoCompetitorCoverageStaleness ? [sources.seoCompetitorCoverageStaleness] : []),
     ...(sources.seoBacklinkDrilldownFailures ? [sources.seoBacklinkDrilldownFailures] : []),
     ...(sources.seoAuditStuckTasks ? [sources.seoAuditStuckTasks] : []),
     ...(sources.seoKeywordDiscoveryStuckRuns ? [sources.seoKeywordDiscoveryStuckRuns] : []),
@@ -1725,6 +1728,11 @@ export const getReliabilityOverview = async (
     preloadedSources.seoUrlVisibilityStaleness !== undefined
       ? preloadedSources.seoUrlVisibilityStaleness
       : await getSeoUrlVisibilityStalenessSignal().catch(() => null)
+
+  const seoCompetitorCoverageStaleness =
+    preloadedSources.seoCompetitorCoverageStaleness !== undefined
+      ? preloadedSources.seoCompetitorCoverageStaleness
+      : await getSeoCompetitorCoverageStalenessSignal().catch(() => null)
 
   const seoBacklinkDrilldownFailures =
     preloadedSources.seoBacklinkDrilldownFailures !== undefined
@@ -2857,6 +2865,7 @@ export const getReliabilityOverview = async (
     seoMarketDataFreshness,
     seoDomainOverviewStaleness,
     seoUrlVisibilityStaleness,
+    seoCompetitorCoverageStaleness,
     seoBacklinkDrilldownFailures,
     seoAuditStuckTasks,
     seoProspectCostOverrun,

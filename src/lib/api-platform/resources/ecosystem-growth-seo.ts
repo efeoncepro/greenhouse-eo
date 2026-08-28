@@ -51,6 +51,7 @@ import { readSeoOverviewKpis } from '@/lib/growth/seo/overview/read-overview-kpi
 import { readSiteAuditReport } from '@/lib/growth/seo/site-audit/reader'
 import { trackKeywords, untrackKeywords } from '@/lib/growth/seo/track-keywords'
 import { declareCompetitors, retireCompetitors } from '@/lib/growth/seo/competitors'
+import { readKeywordGap, type KeywordGapResult } from '@/lib/growth/seo/keyword-gap-reader'
 import { isSeoKeywordIntent, SEO_KEYWORD_INTENTS } from '@/lib/growth/seo/contracts'
 import type {
   BacklinkProfileResult,
@@ -1255,6 +1256,66 @@ export const retireEcosystemSeoCompetitorsPayload = async ({
 
   const result = await retireCompetitors(subject.seoTargetId, domains, `mcp:${context.consumer.publicId}`, {
     ...(reason ? { reason } : {})
+  })
+
+  return {
+    data: result,
+    meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
+  }
+}
+
+/**
+ * ═══ TASK-1662 — keyword gap competitivo en el lane ecosystem (lectura) ═══
+ *
+ * 🔴 **Sólo bindings `internal` SIN organización**, con 404 anti-oracle (mismo contrato que
+ * el gasto de proveedor): la comparativa competitiva NO se expone al cliente (auditoría §7)
+ * y el listado de competidores es información comercial sensible que no cruza el boundary
+ * de org. Un binding org-scoped no debe poder ni confirmar que el recurso existe.
+ */
+
+export const getEcosystemSeoKeywordGapPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<KeywordGapResult | SeoTargetNotConfiguredPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  if (context.binding.greenhouseScopeType !== 'internal' || context.binding.organizationId) {
+    throw new ApiPlatformError('SEO resource not found for the resolved scope.', {
+      statusCode: 404,
+      errorCode: 'not_found'
+    })
+  }
+
+  const url = new URL(request.url)
+  const organizationId = (url.searchParams.get('organizationId') ?? '').trim()
+
+  if (!organizationId) {
+    throw new ApiPlatformError('organizationId is required for internal bindings.', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
+  const seoCompetitorId = (url.searchParams.get('seoCompetitorId') ?? '').trim()
+  const rawLimit = Number.parseInt(url.searchParams.get('limit') ?? '', 10)
+
+  const subject = await resolveSeoLaneSubject(context, request, organizationId)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const result = await readKeywordGap(subject.seoTargetId, {
+    ...(seoCompetitorId ? { seoCompetitorId } : {}),
+    ...(Number.isFinite(rawLimit) && rawLimit > 0 ? { limit: rawLimit } : {})
   })
 
   return {

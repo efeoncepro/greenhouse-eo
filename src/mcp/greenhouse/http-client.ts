@@ -384,6 +384,24 @@ export class GreenhouseApiPlatformClient {
     )
   }
 
+  /**
+   * TASK-1662 — gap competitivo derivado (lectura; lane sólo-internal con 404 anti-oracle:
+   * la comparativa competitiva jamás se expone al cliente).
+   */
+  async getSeoKeywordGap(input: {
+    organizationId: string
+    market?: string
+    seoCompetitorId?: string
+    limit?: number
+  }) {
+    return this.request('/api/platform/ecosystem/growth/seo/keyword-gap', {
+      organizationId: input.organizationId,
+      market: input.market,
+      seoCompetitorId: input.seoCompetitorId,
+      limit: input.limit
+    })
+  }
+
   /** TASK-1662 — el reverso: cierra la vigencia del competidor y corta su gasto de cobertura. */
   async retireSeoCompetitors(input: { organizationId?: string; domains: string[]; reason?: string }) {
     return this.request(
