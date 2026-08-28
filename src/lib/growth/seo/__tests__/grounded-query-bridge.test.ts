@@ -25,7 +25,13 @@ const state = {
   existingVersions: [] as Array<Record<string, unknown>>,
   authorResult: null as Record<string, unknown> | null,
   authorCalls: [] as Array<Record<string, unknown>>,
-  sqlCalls: [] as string[]
+  sqlCalls: [] as string[],
+  /** TASK-1692 — llamadas al ledger con sus params, para verificar metadata e idempotencia. */
+  ledgerInserts: [] as unknown[][],
+  /** `false` simula que el candidato no pertenece a la org (append devuelve run_not_found). */
+  candidateVisible: true,
+  /** Simula un fallo DURO del append (conexión caída) para probar el residuo declarado. */
+  ledgerThrows: false
 }
 
 vi.mock('@/lib/growth/ai-visibility/store', () => ({
@@ -65,8 +71,21 @@ vi.mock('@/lib/growth/seo/keyword-discovery/reader', () => ({
 vi.mock('@/lib/postgres/client', () => ({
   withGreenhousePostgresTransaction: async (fn: (client: unknown) => Promise<unknown>) =>
     fn({
-      query: async (sql: string) => {
+      query: async (sql: string, params: unknown[] = []) => {
         state.sqlCalls.push(sql)
+
+        // Chequeo de tenant del append: el candidato existe y es de la org.
+        if (sql.includes('SELECT candidate_id') && sql.includes('seo_keyword_discovery_candidates')) {
+          return { rows: state.candidateVisible ? [{ candidate_id: params[0] }] : [], rowCount: 0 }
+        }
+
+        if (sql.includes('INSERT INTO greenhouse_growth.seo_keyword_discovery_actions')) {
+          if (state.ledgerThrows) throw new Error('connection terminated')
+
+          state.ledgerInserts.push(params)
+
+          return { rows: [{ action_id: `seokda-${state.ledgerInserts.length}` }], rowCount: 1 }
+        }
 
         return { rows: [], rowCount: 0 }
       }
@@ -81,6 +100,7 @@ import {
   computeSeoGroundingContextRef,
   createGroundedQueryDraft,
   GROUNDED_QUERY_COVERAGE_NOTICE,
+  GROUNDED_QUERY_DECISION_LOG_NOTICE,
   GROUNDED_QUERY_FALLBACK_NOTICE
 } from '../grounded-query-bridge'
 
@@ -161,6 +181,9 @@ beforeEach(() => {
   state.authorResult = { draft: draftRow(), authoringStatus: 'ok' }
   state.authorCalls = []
   state.sqlCalls = []
+  state.ledgerInserts = []
+  state.candidateVisible = true
+  state.ledgerThrows = false
   flags.seo = true
   flags.grader = true
   flags.authoring = true
@@ -491,12 +514,192 @@ describe('createGroundedQueryDraft — creación y honestidad', () => {
     expect(state.authorCalls).toHaveLength(0)
   })
 
-  it('el bridge JAMÁS llama approve ni ejecuta SQL sobre tablas seo_*/grader_*', async () => {
+  describe('TASK-1692 — el bridge deja su huella en el ledger de discovery', () => {
+    /** Lee el `metadata_json` (param 6) del INSERT al ledger. */
+    const metadataOf = (index = 0) => JSON.parse(String(state.ledgerInserts[index]?.[5] ?? '{}'))
+
+    /** Lee la `idempotency_key` (param 5). */
+    const keyOf = (index = 0) => String(state.ledgerInserts[index]?.[4] ?? '')
+
+    it('un draft grounded escribe una fila por candidato, con metadata opaca', async () => {
+      const result = await createGroundedQueryDraft(baseInput)
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.decisionLogged).toBe(true)
+      expect(result.decisionLogNotice).toBeNull()
+      expect(state.ledgerInserts).toHaveLength(1)
+
+      // Param 3 = action_kind.
+      expect(state.ledgerInserts[0][2]).toBe('selected_for_grounded_query')
+
+      expect(metadataOf()).toEqual({
+        groundingMode: 'grounded_llm',
+        deduped: false,
+        contextRef: expect.stringContaining('seo.discovery.context:'),
+        draftId: 'set-1',
+        runId: 'seokdr-1'
+      })
+    })
+
+    it('🔴 la metadata NO lleva la keyword cruda ni prosa del proveedor', async () => {
+      await createGroundedQueryDraft(baseInput)
+
+      const serialized = JSON.stringify(metadataOf())
+
+      // La keyword es dato NO confiable: viaja al authoring, jamás al log de decisiones.
+      expect(serialized).not.toContain('pintura')
+      expect(Object.keys(metadataOf()).sort()).toEqual([
+        'contextRef',
+        'deduped',
+        'draftId',
+        'groundingMode',
+        'runId'
+      ])
+    })
+
+    it('la clave de idempotencia sale del outcome DURABLE (draftId), no del actor', async () => {
+      await createGroundedQueryDraft(baseInput)
+
+      expect(keyOf()).toBe('grounded:set-1:seokdc-1')
+      // La clave automática `candidateId:kind:actor` colapsaría el mismo candidato en dos
+      // drafts distintos en UNA sola fila; ésta no.
+      expect(keyOf()).not.toContain('user-1')
+    })
+
+    it('el camino deduped también escribe: repara un append anterior fallido', async () => {
+      // Primer intento: el append falla duro y el draft queda sin fila.
+      state.ledgerThrows = true
+
+      const first = await createGroundedQueryDraft(baseInput)
+
+      expect(first.ok).toBe(true)
+
+      if (!first.ok) return
+
+      expect(first.decisionLogged).toBe(false)
+      expect(state.ledgerInserts).toHaveLength(0)
+
+      // Segundo intento sobre el MISMO contexto: dedupea el draft y esta vez sí registra.
+      // El `contextRef` se DERIVA con el mismo helper que usa el bridge, no se hardcodea:
+      // un literal convertiría el test en el snapshot de un candidato en vez del contrato.
+      const contextRef = computeSeoGroundingContextRef({
+        runId: 'seokdr-1',
+        seoTargetId: 'seot-1',
+        market: 'México',
+        locale: 'es-MX',
+        candidates: [
+          {
+            candidateId: 'seokdc-1',
+            normalizedKeyword: 'pintura para piso',
+            sourceEndpoint: 'keyword_suggestions',
+            coreKeyword: 'pintura para piso',
+            intent: 'commercial',
+            searchVolume: 1000,
+            keywordDifficulty: 10,
+            capturedAt: '2026-08-14T12:00:00.000Z'
+          }
+        ]
+      })
+
+      state.ledgerThrows = false
+      state.existingVersions = [draftRow({ groundingSources: ['category:Pinturas', contextRef] })]
+
+      const second = await createGroundedQueryDraft(baseInput)
+
+      expect(second.ok).toBe(true)
+
+      if (!second.ok) return
+
+      expect(second.deduped).toBe(true)
+      expect(second.decisionLogged).toBe(true)
+      expect(state.ledgerInserts).toHaveLength(1)
+      expect(metadataOf()).toMatchObject({ deduped: true })
+    })
+
+    it('🔴 si el append falla, el draft NO se descarta: se declara decisionLogged=false + aviso', async () => {
+      state.ledgerThrows = true
+
+      const result = await createGroundedQueryDraft(baseInput)
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      // El draft existe y ya pagó una llamada LLM: devolver error diría que no pasó nada.
+      expect(result.draft).toBeDefined()
+      expect(result.decisionLogged).toBe(false)
+      expect(result.decisionLogNotice).toBe(GROUNDED_QUERY_DECISION_LOG_NOTICE)
+    })
+
+    it('un candidato que el append no puede probar tampoco tumba el draft, pero se declara', async () => {
+      state.candidateVisible = false
+
+      const result = await createGroundedQueryDraft(baseInput)
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.decisionLogged).toBe(false)
+      expect(state.ledgerInserts).toHaveLength(0)
+    })
+
+    it('el fallback baseline registra su modo real, no el que se pretendía', async () => {
+      state.authorResult = {
+        draft: draftRow({ generationStrategy: 'template_baseline', systemPromptVersion: null }),
+        authoringStatus: 'disabled'
+      }
+
+      const result = await createGroundedQueryDraft(baseInput)
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(metadataOf()).toMatchObject({ groundingMode: 'baseline_fallback' })
+    })
+  })
+
+  it('🔴 boundary §1.1: el bridge JAMÁS toca tablas grader_* ni cruza los dos motores', async () => {
     await createGroundedQueryDraft(baseInput)
 
-    // El único SQL propio del bridge es el advisory lock (serialización); nada de tablas.
     for (const sql of state.sqlCalls) {
-      expect(sql).not.toMatch(/grader_|seo_keyword|INSERT|UPDATE|DELETE/i)
+      // El lado AEO se opera SOLO por sus commands (`authorGraderPromptSetDraft`,
+      // `approveGraderPromptSet`): un SQL a `grader_*` desde acá sería el bridge tomándose
+      // autoridad sobre el otro motor.
+      expect(sql).not.toMatch(/grader_/i)
+
+      // Y nunca un JOIN entre los dos motores: el cruce es en memoria por `organization_id`.
+      expect(sql).not.toMatch(/seo_[a-z_]+[\s\S]*grader_|grader_[a-z_]+[\s\S]*seo_/i)
+    }
+  })
+
+  it('🔴 el bridge no COMPONE candidatos con SQL propio: sólo `readKeywordDiscovery`', async () => {
+    await createGroundedQueryDraft(baseInput)
+
+    // TASK-1692 abrió una excepción ACOTADA a la regla "cero SQL de tablas": el bridge escribe
+    // su decisión en el ledger de discovery, del lado SEO, vía el primitive canónico
+    // `appendDiscoveryActionTx` (que trae consigo su chequeo de tenant sobre candidates).
+    // Lo que sigue prohibido es que el bridge LEA candidatos por su cuenta para componerlos:
+    // esa lectura es de `readKeywordDiscovery` y de nadie más.
+    const allowed = [
+      /pg_advisory_xact_lock/i,
+      /INSERT INTO greenhouse_growth\.seo_keyword_discovery_actions/i,
+      /FROM greenhouse_growth\.seo_keyword_discovery_actions/i,
+      // Chequeo de tenant del append: SELECT de UNA columna por id, no una composición.
+      /SELECT candidate_id\s+FROM greenhouse_growth\.seo_keyword_discovery_candidates/i
+    ]
+
+    for (const sql of state.sqlCalls) {
+      expect(allowed.some(pattern => pattern.test(sql))).toBe(true)
+    }
+
+    // Y en particular: nada que lea las columnas de composición del candidato.
+    for (const sql of state.sqlCalls) {
+      expect(sql).not.toMatch(/normalized_keyword|seed_keywords_json|source_endpoint/i)
     }
   })
 })
