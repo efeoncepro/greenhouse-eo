@@ -422,7 +422,7 @@ describe('readKeywordDiscovery — orden y filtros', () => {
       expect(result.candidates[0].clusterConflict.status).toBe('clear')
     })
 
-    it('🔴 set seguido sin fila de mercado → unknown, JAMÁS clear', async () => {
+    it('🔴 keyword SEGUIDA sin fila de mercado → unknown, JAMÁS clear (nunca preguntamos por ella)', async () => {
       state.runs = [runRow()]
       state.candidates = [candidateRow({ candidate_id: 'seokdc-1', keyword: 'barniz', normalized_keyword: 'barniz' })]
       state.tracked = [{ keyword: 'pintura pisos' }]
@@ -439,13 +439,13 @@ describe('readKeywordDiscovery — orden y filtros', () => {
       expect(result.candidates[0].clusterConflict.status).toBe('unknown')
     })
 
-    it('candidato sin coreKeyword → unknown aunque el set seguido esté resuelto', async () => {
+    it('🔴 candidato SIN fila de mercado → unknown: no se sabe a qué clúster pertenece', async () => {
       state.runs = [runRow()]
       state.candidates = [candidateRow({ candidate_id: 'seokdc-1', keyword: 'barniz', normalized_keyword: 'barniz' })]
       state.tracked = [{ keyword: 'pintura pisos' }]
 
       marketByCall(
-        new Map([['barniz', datum('barniz', { coreKeyword: null })]]),
+        new Map(),
         new Map([['pintura pisos', datum('pintura pisos', { coreKeyword: 'pintura piso' })]])
       )
 
@@ -456,6 +456,35 @@ describe('readKeywordDiscovery — orden y filtros', () => {
       if (!result.ok) return
 
       expect(result.candidates[0].clusterConflict).toMatchObject({ status: 'unknown', coreKeyword: null })
+    })
+
+    it('🔴 core NULL = la keyword ES su propia canónica: el candidato variante SÍ choca con ella', async () => {
+      // Medido contra el store real (923 filas): el proveedor NUNCA emite un core que apunte a
+      // la keyword misma — 527 nulos, 396 apuntando a otra, cero autorreferentes. Leer el NULL
+      // como "no se sabe" perdería la colisión MÁS probable: la del candidato variante contra
+      // la canónica que el target ya sigue.
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'seokdc-1', keyword: 'acrilicos pintura', normalized_keyword: 'acrilicos pintura' })
+      ]
+      state.tracked = [{ keyword: 'pintura acrilica' }]
+
+      marketByCall(
+        new Map([['acrilicos pintura', datum('acrilicos pintura', { coreKeyword: 'pintura acrilica' })]]),
+        // La seguida es la canónica del clúster: fila presente, `core_keyword` nulo.
+        new Map([['pintura acrilica', datum('pintura acrilica', { coreKeyword: null })]])
+      )
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].clusterConflict).toMatchObject({
+        status: 'conflict',
+        trackedMembers: ['pintura acrilica']
+      })
     })
 
     it('la propia keyword ya seguida no cuenta como conflicto consigo misma', async () => {

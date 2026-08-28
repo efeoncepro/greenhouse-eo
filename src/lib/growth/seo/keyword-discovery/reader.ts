@@ -436,21 +436,35 @@ export const readKeywordDiscovery = async (
           languageCode: runView.languageCode
         })
 
-  /** `coreKeyword` → keywords vigentes del target que lo comparten. */
+  /**
+   * Core EFECTIVO de una keyword: el `core_keyword` del proveedor, o la keyword misma cuando
+   * viene `NULL`.
+   *
+   * 🔴 `core_keyword` identifica la CANÓNICA del clúster de sinónimos, así que el proveedor no
+   * lo emite cuando la keyword YA ES la canónica: medido contra el store real (2026-08-28), de
+   * 923 filas hay 527 con `core` nulo, 396 apuntando a OTRA keyword y **cero** apuntando a sí
+   * mismas. Tratar el `NULL` como "no se sabe" perdería justo la colisión más probable —la de un
+   * candidato variante contra la canónica que el target ya sigue— y la reportaría como `unknown`.
+   */
+  const effectiveCore = (normalizedKeyword: string, coreKeyword: string | null) => coreKeyword ?? normalizedKeyword
+
+  /** Core efectivo → keywords vigentes del target que lo comparten. */
   const trackedByCore = new Map<string, string[]>()
   let unresolvedTrackedKeywords = 0
 
   for (const tracked of trackedSet) {
-    const core = trackedMarket?.byKeyword.get(tracked)?.coreKeyword ?? null
+    const datum = trackedMarket?.byKeyword.get(tracked) ?? null
 
-    if (!core) {
-      // Una keyword seguida sin fila de mercado (o sin core del proveedor) NO se puede descartar
-      // como fuente de conflicto — se cuenta para degradar honesto más abajo.
+    if (!datum) {
+      // SIN FILA de mercado es el único estado ciego: nunca preguntamos por esta keyword, así
+      // que podría ser la canónica del clúster del candidato y no hay cómo saberlo. Una fila CON
+      // `core` nulo no es ciega — es la afirmación de que la keyword es su propia canónica.
       unresolvedTrackedKeywords += 1
 
       continue
     }
 
+    const core = effectiveCore(tracked, datum.coreKeyword)
     const members = trackedByCore.get(core)
 
     if (members) members.push(tracked)
@@ -461,7 +475,8 @@ export const readKeywordDiscovery = async (
 
   const resolveClusterConflict = (
     normalizedKeyword: string,
-    coreKeyword: string | null
+    coreKeyword: string | null,
+    hasMarketRow: boolean
   ): SeoDiscoveryClusterConflict => {
     // Sin nada seguido no hay contra qué canibalizar. Es un hecho POSITIVO —el set está vacío—,
     // no una ausencia de dato, así que se afirma en vez de degradarse a `unknown`.
@@ -469,7 +484,9 @@ export const readKeywordDiscovery = async (
       return { status: 'clear', coreKeyword, trackedMembers: [], trackedMemberCount: 0 }
     }
 
-    const members = (coreKeyword ? (trackedByCore.get(coreKeyword) ?? []) : []).filter(
+    const core = effectiveCore(normalizedKeyword, coreKeyword)
+
+    const members = (hasMarketRow ? (trackedByCore.get(core) ?? []) : []).filter(
       tracked => tracked !== normalizedKeyword
     )
 
@@ -483,10 +500,10 @@ export const readKeywordDiscovery = async (
       }
     }
 
-    // No haberlo encontrado sólo vale si se pudo mirar TODO: sin el core del candidato, o con
-    // alguna keyword seguida sin dato de mercado, el conflicto no está descartado — está sin
-    // medir. `clear` ahí sería afirmar vía libre sobre un hueco.
-    if (!coreKeyword || unresolvedTrackedKeywords > 0) {
+    // No haberlo encontrado sólo vale si se pudo mirar TODO. Sin fila de mercado del candidato,
+    // o con alguna keyword seguida sin fila, el conflicto no está descartado — está sin medir, y
+    // `clear` ahí sería afirmar vía libre sobre un hueco.
+    if (!hasMarketRow || unresolvedTrackedKeywords > 0) {
       return { status: 'unknown', coreKeyword, trackedMembers: [], trackedMemberCount: 0 }
     }
 
@@ -599,7 +616,7 @@ export const readKeywordDiscovery = async (
       linkBarrier: market.linkBarrierByKeyword.get(row.normalized_keyword) ?? null,
       measuredGsc: gsc ? { impressions: gsc.impressions, position: gsc.position, displayMarker: '●' } : null,
       alreadyTracked: trackedSet.has(row.normalized_keyword),
-      clusterConflict: resolveClusterConflict(row.normalized_keyword, datum?.coreKeyword ?? null),
+      clusterConflict: resolveClusterConflict(row.normalized_keyword, datum?.coreKeyword ?? null, datum !== null),
       latestAction: action
         ? { kind: action.action_kind as SeoDiscoveryActionKind, actor: action.actor, at: action.created_at.toISOString() }
         : null,
