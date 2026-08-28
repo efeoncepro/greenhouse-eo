@@ -15,9 +15,11 @@ La primera capacidad activa fue `globe.producer.fleet.list`. Permite consultar l
 Globe para el workspace interno autorizado. El gateway no recrea catálogo, routing ni reglas de Globe.
 
 Desde el 6 de agosto de 2026 hay una **segunda capacidad federada**: Search Visibility 360 de Greenhouse. Partió
-con tres consultas de solo lectura y creció hasta cubrir, desde el 27 de agosto (TASK-1658), **el inventario SEO
-completo del MCP interno: 21 tools (16 lecturas + 5 escrituras gobernadas)** — la revisión productiva del gateway
-sirve 13 hasta el deploy posterior al próximo release de Greenhouse. Igual que con Globe, el gateway no recrea
+con tres consultas de solo lectura y creció hasta cubrir **el inventario SEO completo del MCP interno: 22 tools
+(17 lecturas + 5 escrituras gobernadas)** — TASK-1658 cerró el drift de federación dejándolo en 21 el 27 de
+agosto, y TASK-1696 sumó la lectura 17, `get_seo_provider_spend`. La revisión productiva del gateway
+(`efeonce-mcp-gateway-00023-zt2`, desplegada el 27 de agosto) sirve **21**: la tool 22 espera el deploy posterior
+al próximo release develop→main de Greenhouse, porque su lane todavía no está en producción. Igual que con Globe, el gateway no recrea
 lógica: transporta la pregunta y Greenhouse decide qué se puede ver. El inventario vigente y su estado de
 despliegue viven en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8; detalle
 funcional en [Search Visibility 360 por MCP](../growth/search-visibility-360-por-mcp.md).

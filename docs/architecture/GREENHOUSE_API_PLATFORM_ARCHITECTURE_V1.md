@@ -49,6 +49,51 @@ Runtime: capabilities y schema vivos desde el 2026-08-19; Application 360 es el 
 
 ---
 
+## Delta 2026-08-27 — el lane SEO que NO resuelve la organización desde el binding (TASK-1696)
+
+`GET /api/platform/ecosystem/growth/seo/provider-spend` publica el gasto de proveedor del mes por
+organización, cortado por **consumidor** (`seo` | `aeo`) y por **base de costo** (facturado |
+estimado). Ruta en `src/app/api/platform/ecosystem/growth/seo/provider-spend/route.ts`, handler en
+el mismo builder del lane (`src/lib/api-platform/resources/ecosystem-growth-seo.ts`), sobre
+`runEcosystemReadRoute`. Payload = passthrough del reader canónico
+`readSeoProviderSpendByConsumer`; cero lógica de dominio en el lane. Su tool de lectura es
+`get_seo_provider_spend`.
+
+🔴 **Es el único endpoint del lane SEO que RECHAZA los bindings org-scoped, y no es una restricción
+de permisos sino de naturaleza del dato.** El resto del lane resuelve la organización desde el
+binding cuando es org-scoped (delta TASK-1645, abajo); acá esa misma resolución **sería la fuga**:
+lo que este recurso devuelve es lo que a Efeonce le **cuesta** servir a un cliente, no algo que el
+cliente haya consumido. Un binding de cliente leyendo su propia fila estaría leyendo nuestra
+estructura de costos. Por eso exige `greenhouseScopeType === 'internal'` con `organizationId`
+explícito como query param, y rechaza **antes de tocar el dominio**.
+
+**Rechaza con `404 not_found`, nunca con 403.** Es deliberado y distinto del boundary de los
+commands del mismo lane (TASK-1308, que responde `403 scope_not_allowed`): allá el binding cliente
+puede leer sus oportunidades y sólo se le niega hacer crecer su propia factura, así que decirle "no
+puedes" no le enseña nada. Acá un 403 confirmaría que el recurso existe, y un binding de cliente no
+debe aprender siquiera eso. Un `internal` sin `organizationId` sí recibe `400 bad_request` — la
+diferencia entre "no te corresponde saberlo" y "te falta un parámetro".
+
+**El payload nunca colapsa `invoiced` con `estimated` en un total único.** Las filas viajan cortadas
+por `consumer` × `family` × `costBasis`, y los totales por consumidor llevan `invoicedUsd` y
+`estimatedUsd` en campos separados. Hoy todo el ledger es facturado, así que la separación se ve
+redundante — y es justo antes de que entre el primer dólar estimado cuando el contrato tiene que
+nacer separado: una cifra única que mezcle un dólar que se pagó con uno que se estimó no es un dato
+degradado, es un dato falso. Un consumer que sume las dos monedas para mostrar "el gasto" está
+rompiendo el contrato, no simplificándolo.
+
+Con el flag del módulo apagado el lane responde `{ ok: false, errorCode: 'disabled' }` como el resto
+del lane SEO, sin filtrar si la organización existe. Modelo de datos, invariantes del ledger y
+resolver de presupuesto: `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` (canónico); acá sólo vive lo que
+es contrato del lane.
+
+⚠️ **Orden de federación.** La tool quedó en `main` de `efeonce-mcp`, pero el deploy del gateway es
+`workflow_dispatch` manual y el lane que consume viaja en `develop`: disparar el deploy de
+`mcp.efeonce.org` **antes** del release que lleve este lane a `main` deja la tool respondiendo 404
+upstream con el guard de paridad en verde. El deploy del gateway va **después** del release.
+
+---
+
 ## Delta 2026-08-26 — el eje de desenlace de Hiring gana carril gobernado (TASK-1773)
 
 Tres rutas nuevas bajo `src/app/api/platform/app/hiring/applications/[applicationId]/`:

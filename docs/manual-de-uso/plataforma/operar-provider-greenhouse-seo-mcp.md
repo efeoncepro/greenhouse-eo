@@ -1,9 +1,9 @@
 # Operar el provider Greenhouse-SEO del MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-08-06 por Claude (TASK-1647)
-> **Ultima actualizacion:** 2026-08-27 por Claude (TASK-1658: allowlist a 21 tools — 16 lectura + 5 escritura; guard de paridad bidireccional; producción sigue en 13 hasta el deploy post-release)
+> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1696: allowlist a 22 tools — 17 lectura + 5 escritura, con `get_seo_provider_spend`; producción sirve 21 hasta el deploy post-release)
 > **Endpoint canonico:** `https://mcp.efeonce.org/mcp`
 > **Documentacion funcional:** [Search Visibility 360 por MCP](../../documentation/growth/search-visibility-360-por-mcp.md)
 > **Runbook tecnico:** [Efeonce MCP Platform Runbook](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Greenhouse-SEO
@@ -13,7 +13,7 @@
 Este manual es para el operador que necesita **verificar, diagnosticar o apagar** el provider `greenhouse-seo`
 del gateway MCP de Efeonce — lo que un cliente MCP puede hacer contra `mcp.efeonce.org`.
 
-El allowlist federado tiene **21 tools** (fuente de verdad: el espejo `GREENHOUSE_SEO_TOOL_INVENTORY`
+El allowlist federado tiene **22 tools** (fuente de verdad: el espejo `GREENHOUSE_SEO_TOOL_INVENTORY`
 del guard de paridad `src/providers/greenhouse-seo-tool-parity.ts` del repo `efeonce-mcp` — desde
 TASK-1658 el guard es **bidireccional**: nombre + claves exactas del inputSchema interno + clase
 `writes` + paridad de schema + `annotations` obligatorias, con introspección runtime del server; el
@@ -38,18 +38,27 @@ reemplace por el manifiesto canónico de Greenhouse):
 | `get_seo_url_visibility` | Visibilidad ◑ por dominio/subdominio/subcarpeta/URL declarada (TASK-1776; federada por TASK-1658) |
 | `get_seo_backlink_detail` | Detalle nominal del perfil de enlaces, tres estados honestos (TASK-1777; federada por TASK-1658) |
 | `get_seo_prospect_diagnostic` | Diagnóstico de prospecto ya corrido, todo ◑ con fecha (TASK-1709; federada por TASK-1658) |
+| `get_seo_provider_spend` | Gasto DataForSEO del mes por organización, cortado por **consumidor** (`seo` / `aeo`) y por **base de costo** (`invoiced` / `estimated`, declarando versión de la tabla de precios) — nunca un total único. 🔴 **solo bindings `internal`**: es lo que nos cuesta servir al cliente, no lo que el cliente consumió (TASK-1696) |
 | `track_seo_keywords` ✍️ | **Escribe**: mete keywords al ciclo diario y compromete gasto recurrente |
 | `untrack_seo_keywords` ✍️ | **Escribe**: el reverso, cierra la ventana sin borrar historia |
 | `discover_seo_keywords` ✍️ | **Escribe y GASTA por corrida** (Labs Live factura por llamada y por fila); preview + confirmación humana antes de encolar; async (TASK-1664) |
 | `prepare_seo_grounded_queries` ✍️ | **Escribe** un DRAFT AEO (no gasta proveedor, jamás aprueba/activa); con la identidad máquina compartida responde `aeo_forbidden` fail-closed hasta TASK-1631 (TASK-1666) |
 | `run_seo_prospect_diagnostic` ✍️ | **Escribe y GASTA por corrida**: diagnóstico único sobre un prospecto, con confirmación humana previa; flag `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` OFF = estado legítimo (TASK-1709; federada por TASK-1658) |
 
-⚠️ **Estado de despliegue (2026-08-27):** el gateway **en producción** todavía corre la revisión de
-**13 tools**; las 8 de TASK-1658 están commiteadas en `efeonce-mcp` (4 commits locales sin push; canary
-verde) y su deploy se despacha **junto al próximo release develop→main** de Greenhouse — antes
-responderían 404 upstream porque los lanes de TASK-1775/1776/1777/1709 no están en producción
-(lección TASK-1661). Verificación post-deploy: `tools/list` sube exactamente 13→21 + canary completo.
-Si un cliente externo no las ve antes de eso, es el estado esperado, no una falla.
+⚠️ **Estado de despliegue (2026-08-28).** No confundir el **allowlist federado** (22) con lo que la
+**revisión productiva del gateway** sirve (21):
+
+- El rollout de TASK-1658 **ya se ejecutó**: la revisión `efeonce-mcp-gateway-00023-zt2`
+  (2026-08-27) llevó `tools/list` de 13 a 21. Los 4 commits de TASK-1658 están pusheados a `main`.
+- Falta la tool 22, `get_seo_provider_spend` (commit `1a51461` en `main`, CI verde). El deploy del
+  gateway es `workflow_dispatch` **manual** y no se disparó con el push; además su lane
+  `/api/platform/ecosystem/growth/seo/provider-spend` está en `develop`, **no en `main`** de
+  Greenhouse.
+- Por lo tanto el deploy va **DESPUÉS** del release develop→main. Dispararlo antes deja la tool
+  respondiendo **404 upstream** (precedente literal de TASK-1661).
+
+Verificación post-deploy: `tools/list` sube exactamente 21→22 + canary completo. Si un cliente
+externo no ve `get_seo_provider_spend` antes de eso, es el estado esperado, no una falla.
 
 ⚠️ **Las cinco de escritura no comparten el scope de lectura.** Viven en `efeonce.mcp.seo.write`
 (la lista se DERIVA del inventario — `GREENHOUSE_SEO_WRITE_TOOLS` — y el gate HTTP de scopes en
@@ -221,7 +230,7 @@ respuesta real era `no_seo_data`, eso es un bug del consumidor, no del provider.
 
 **401 anónimo con `WWW-Authenticate`** no es una falla: es el comportamiento correcto del resource server.
 
-**403 `insufficient_scope`.** Depende de qué tool. Las **16 de lectura** viven en el scope base
+**403 `insufficient_scope`.** Depende de qué tool. Las **17 de lectura** viven en el scope base
 `efeonce.mcp.read` — no tienen scope de lectura propio. Las **5 de escritura** (`track_seo_keywords` /
 `untrack_seo_keywords` / `discover_seo_keywords` / `prepare_seo_grounded_queries` /
 `run_seo_prospect_diagnostic` — la lista la deriva el gate HTTP de `GREENHOUSE_SEO_WRITE_TOOLS`)

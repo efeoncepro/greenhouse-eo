@@ -294,12 +294,20 @@ chokepoint como lectura, SIN anti-oracle por diseño — visibilidad operativa).
 (mandato del operador): **todo reader SEO/E-E-A-T futuro expone su MCP tool en el MISMO PR**
 (criterio de aceptación en TASK-1303/1304/1311/1312/1313/1314/1317). La federación al gateway
 `mcp.efeonce.org` la abrió `TASK-1647` (adapter delgado del provider; canaries antes de discovery) y
-la completó `TASK-1658` (2026-08-27): las **21 tools SEO del MCP interno (16 lecturas + 5
-escrituras) están federadas** con guard de paridad **bidireccional** en el gateway (espejo
-`GREENHOUSE_SEO_TOOL_INVENTORY` + paridad de schema + `annotations` obligatorias; interino hasta que
-`TASK-1780` lo reemplace por el manifiesto canónico de Greenhouse). Estado de despliegue: code
-complete en `efeonce-mcp` local; la revisión productiva del gateway sirve 13 tools hasta el deploy
-post-release develop→main (`tools/list` 13→21).
+la completó `TASK-1658` (2026-08-27): las tools SEO del MCP interno están federadas con guard de
+paridad **bidireccional** en el gateway (espejo `GREENHOUSE_SEO_TOOL_INVENTORY` + paridad de schema
++ `annotations` obligatorias; interino hasta que `TASK-1780` lo reemplace por el manifiesto canónico
+de Greenhouse).
+
+⚠️ **El inventario interno y lo desplegado en el gateway son dos números distintos, y confundirlos
+es el error que este párrafo ya cometió una vez.** Inventario interno: **22 tools (17 lecturas + 5
+escrituras)** tras `TASK-1696`, que agregó `get_seo_provider_spend`. Desplegado en la revisión
+productiva del gateway: **21** — la revisión activa `efeonce-mcp-gateway-00023-zt2` (2026-08-27)
+llevó el deploy de `TASK-1658`, así que la cifra de 13 que este doc declaraba quedó vencida por un
+deploy entero. La 22.ª llega **después** del release `develop`→`main`: su lane
+`/api/platform/ecosystem/growth/seo/provider-spend` todavía no está en `main`, y desplegar el
+gateway antes la dejaría respondiendo 404 upstream con el guard de paridad en verde (precedente
+`TASK-1661`).
 
 **Delta 2026-08-07 (TASK-1308) — el lane SEO deja de ser sólo lectura.** `keywords/track` y
 `keywords/untrack` son sus **dos primeros commands**: van por `runEcosystemCommandRoute`, no por el

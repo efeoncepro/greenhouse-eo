@@ -6,7 +6,7 @@
 - Priority: `P2`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `En producción — 21 hijas complete, 7 crons activos`
+- Status real: `En producción — 27 hijas complete (conteo verificado 2026-08-28), 7 crons activos`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Julio Reyes`
@@ -210,8 +210,26 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > Detalle, evidencia y secuencia completa en el **Delta 2026-08-15** al final de este documento y en
 > `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md`.
 
-- `TASK-1696` — [creada 2026-08-15, backend-data] Ledger con dimensión de consumidor + gate USD
-  per-org del grader. **P0**, nace en shadow. Desbloquea todo lo que gaste.
+- `TASK-1696` — [creada 2026-08-15, **complete 2026-08-27**, backend-data] Ledger con dimensión de
+  consumidor + gate USD per-org del grader. **P0.** Desbloquea todo lo que gaste.
+  ✅ **Complete, `code complete, rollout pendiente`:** `seo_provider_spend_daily` ganó `consumer`
+  (`seo` | `aeo`), `cost_basis` (`invoiced` | `estimated`) y `price_table_version` acoplado por
+  CHECK, con clave única de **seis** columnas y `NULLS NOT DISTINCT` — **un solo ledger**, lo que se
+  separa es el resolver de presupuesto; el grader AEO dejó de comprarle a DataForSEO fuera del
+  ledger (`postDataForSeoTask` exige `consumer` y el adapter de AI Mode migró del wrapper congelado
+  al transporte canónico, con la organización derivada del perfil); nació `resolveAeoBudget`
+  (presupuesto en dólares per-org, las dos monedas separadas, restando la porción DataForSEO del
+  estimado para no contarla dos veces); entraron tres señales
+  —`growth.dataforseo.spend_ledger_drift`, `growth.ai_visibility.observation_yield` y
+  `seo.provider.cost_over_budget`, esta última citada como mitigación por **nueve** tasks sin existir
+  en código—; y el camino programático es el lane
+  `/api/platform/ecosystem/growth/seo/provider-spend` + la tool MCP `get_seo_provider_spend`.
+  🔴 **Rollout pendiente:** el gate **nace en shadow** —`GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED` y
+  `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED` **ambos OFF**, en los dos runtimes (Vercel +
+  `ops-worker`)—: calcula, registra y emite señal, pero no bloquea. El flip a enforce es decisión del
+  operador después de un ciclo mensual de medición, porque el camino público del lead magnet comparte
+  el motor del grader. La federación de la tool en `mcp.efeonce.org` va **después** del release que
+  lleve el lane a `main`, nunca antes.
 - `TASK-1697` — [creada 2026-08-15, backend-data] `growth/site-substrate` + lint rule cross-domain
   (mitad A). ✅ **Complete y desplegada (2026-08-27):** el sustrato vive en
   `src/lib/growth/site-substrate/` (barrel `@/lib/growth/site-substrate`: `createSiteFetcher`,
@@ -283,6 +301,10 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - [ ] Entitlements `growth.seo.*` per-org con las 4 puertas + coverage test; ningún acceso derivado por rol.
 - [ ] La pantalla estrella (evolución de URLs/keywords en el tiempo) entrega valor con datos reales de Berel, con honestidad medido (GSC) vs estimado (DataForSEO).
 - [ ] Gate de costo DataForSEO per-org operativo (quota cap + signal `seo.provider.cost_over_budget`).
+  *Parcial desde `TASK-1696` (2026-08-27): la señal ya existe y el gate de dólares per-org del grader
+  está implementado, pero **nace en shadow** —calcula, registra y emite, no bloquea— con sus dos
+  flags OFF. Este criterio **no cierra** hasta que el enforce esté prendido y verificado en los dos
+  runtimes (Vercel + `ops-worker`).*
 - [ ] Documentación triple (técnica/funcional/manual) del módulo + flag `GROWTH_SEO_ENABLED` en el Feature Flag Ledger.
 - [ ] El discovery diario permite expandir seeds y enriquecer candidates mediante corridas Live de
   DataForSEO Labs con preview de costo, límite por corrida, `ops-worker`, ledger atribuido a la org,
@@ -344,6 +366,14 @@ verificación → renovación** y servir al alcance comercial mid-market y enter
 | SEO architecture | `design_complete` | El bounded context, datos, providers, boundaries y secuencia están definidos. |
 | SEO runtime | `not_started_as_epic` | EPIC-022 sigue en diseño; TASK-1299 es el bloqueador fundacional. |
 | Search Visibility 360 | `validation_only` | La narrativa SEO+AEO está definida, pero no hay aún evidencia suficiente de repetibilidad, WTP, margen o renovación. |
+
+> **Nota 2026-08-27 (`TASK-1696`) sobre el ítem `margen`.** El **costo variable por organización**
+> —lo que cuesta servir a un cliente en gasto de proveedor— pasa a ser **computable**:
+> `seo_provider_spend_daily` distingue quién consumió (`seo` | `aeo`) y con qué base de costo
+> (facturado | estimado), y el reader canónico `readSeoProviderSpendByConsumer` lo entrega cortado
+> por ambos ejes sin colapsar las dos monedas en un total único. **Computable no es medido:** el
+> margen por cliente sigue sin construirse y la evidencia que este gate exige sigue pendiente. Lo que
+> cambió es que ya no falta el dato de costo del lado del proveedor.
 
 ### Gaps de producto-servicio que el programa debe cerrar
 
@@ -774,7 +804,10 @@ ese cliente.
    El dato existe cacheado en `brand_intelligence.whatTheBrandDoes`. → `TASK-1698`.
 2. **El grader le compra a DataForSEO fuera del ledger** declarado como fuente única, y su
    "presupuesto" cuenta corridas × USD 0,50 en vez de dólares: una org contratada puede gastar
-   USD 17,60/mes sin ningún gate. → `TASK-1696`.
+   USD 17,60/mes sin ningún gate. → `TASK-1696`. ✅ *Cerrado en código el 2026-08-27: el grader compra
+   dentro del ledger con `consumer='aeo'` y existe `resolveAeoBudget`, el presupuesto en dólares
+   per-org. **El gate todavía no bloquea** — nace en shadow con sus dos flags OFF; prenderlo es
+   rollout, no código.*
 3. **14 deep imports (7 rutas) `growth/seo` → `ai-visibility`** contra una regla declarada en §17.3 de la
    arquitectura del módulo, sin ninguna lint rule que lo vea. → `TASK-1697`.
 
@@ -827,7 +860,10 @@ abarata por cadencia y muestreo (`TASK-1704`).
 ### Carril nuevo — Instrumentación, sustrato y autoridad de orden (creado 2026-08-15)
 
 - `TASK-1696` — ledger con dimensión de consumidor + gate USD per-org del grader. **P0.** Nace en
-  shadow. Desbloquea todo lo que gaste.
+  shadow. Desbloquea todo lo que gaste. ✅ **complete 2026-08-27**, `code complete, rollout
+  pendiente`: la plomería está viva (dimensión de consumidor + base de costo en un solo ledger,
+  `resolveAeoBudget`, tres señales, lane + tool MCP) y el gate sigue **en shadow**, con sus dos flags
+  OFF en los dos runtimes.
 - `TASK-1697` — `growth/site-substrate` + barrel de dominio AEO + lint rule cross-domain. **P0.**
 - `TASK-1698` — posicionamiento declarado (`●`) / observado (`◑`) para `message_alignment`. **P0.**
 - `TASK-1699` — persistir el top-N del SERP que ya se paga. **P0.** *Único trabajo del plan con

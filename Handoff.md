@@ -2,6 +2,34 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-28 — TASK-1696: cierre documental del inventario MCP y dos gates ciegos con task
+
+**Hallazgo que corrige un dato vencido, no una omisión.** Cinco docs declaraban que la revisión
+productiva del gateway servía **13 tools** y que TASK-1658 seguía "sin push". Ambas cosas eran
+falsas: la revisión activa `efeonce-mcp-gateway-00023-zt2` (2026-08-27T23:19Z) ya llevaba ese
+deploy y sirve **21**. Los docs subestimaban producción por un deploy entero. Quedaron reescritos
+separando siempre **inventario interno (22 tras `get_seo_provider_spend`)** de **desplegado en el
+gateway (21)** — confundirlos es el error que ya habían cometido. La 22.ª llega después del release:
+su lane sigue en `develop`.
+
+**Dos gates que dan verde sin mirar quedaron con task, no con nota.** Los subagentes midieron y los
+dos son más grandes de lo que parecían:
+
+- **`TASK-1782`** — el auditor de flags no ve los leídos por constante (`env[FLAG]`). No es higiene
+  documental: ese conjunto ciego alimenta los dos chequeos de ISSUE-150, **los únicos que fallan
+  siempre**, no sólo con `--strict` (flag ON en Production sin código en `main`). Segundo eje que no
+  estaba en el radar: el detector asume sufijo `_ENABLED`, así que tampoco ve `..._ENFORCED`,
+  `*_DISABLED`, `MAINTENANCE_MODE` ni los `*_MODE`. Piso medido: 51 nombres invisibles, 3 sin fila
+  (dos gatean escrituras a GitHub del sitio público). El defecto ya estaba **admitido en prosa
+  dentro del propio ledger** y nadie lo cerró.
+- **`TASK-1783`** — `dataforseo-operator` no era la excepción: **77 skills fuera del manifiesto de
+  espejos y 32 ya divergen en el cuerpo** (payroll-auditor, production-release, legal-privacy entre
+  ellas). La asimetría `.claude/references/` vs `.codex/agents/` es estructural, así que el modo
+  "cuerpo-idéntico" debe exentar paths por namespace, nunca en global.
+
+**Continuidad:** el rollout de TASK-1696 sigue pendiente tal como quedó ayer (los dos flags OFF, el
+flip a enforce como decisión del operador, el deploy del gateway después del release).
+
 ## 2026-08-27 — TASK-1696: el gasto del grader entra al ledger; el gate de dinero nace en shadow
 
 **Estado: `code complete, rollout pendiente`** — el schema, la atribución y las tres señales están
@@ -386,13 +414,3 @@ esté en producción con su flag ON.
 **No re-descubrir:** la spec pedía copiar el patrón del Banco de Talento y **no calza** —no hay tabla de propuestas de decisión y `Migration: none`—, por eso el guard es un digest efímero. Y Nexa tiene autoridad más angosta que el portal a propósito: sólo cierra una postulación abierta, porque su contrato de acciones no puede cargar la huella del preview al execute.
 
 **Lo que queda visible y con nombre:** el manifiesto de parity declara **18 capabilities `hiring.*` sin carril**. Es el barrido que la propia task pedía en sus Follow-ups.
-
-## 2026-08-26 — TASK-1751: la rendición del assessment deja de perder respuestas
-
-**Estado: `complete`.** Sin push. `pnpm test` completo verde (12.062), `local:check` exit 0, los cuatro gates de UI en PASS, scorecard 4.54.
-
-**Lo que dejó la captura premium, y es el argumento a favor de correrla:** cuatro defectos que ningún test veía — contraste AA pre-existente de 2.43:1 en el contador, el placeholder haciendo de **nombre accesible** del textarea (anti-patrón de años), un ícono de «enviar» sobre un mensaje de «no puedes enviar», y la superficie sin declarar su recipe. Un quinto hallazgo era del gate, no del código: el stepper ya vive en un scroller contenido, así que se declaró la excepción en vez de romper el patrón. Seed ejecutado y limpiado, residuo verificado en cero.
-
-**No re-descubrir:** de los 4 defectos declarados **2 no existían** (el reloj ya era `sticky`; los avisos nunca fueron sólo `srOnly`), y la copy que el wireframe proponía —«puedes enviar lo que alcanzaste a guardar»— es **falsa**: el servidor exige la evaluación completa, así que con faltantes enviar es imposible y el CTA no se renderiza. Detalle en el `## Delta 2026-08-26` de la spec.
-
-**Riesgo residual:** el guardado preventivo nunca se ejercitó contra runtime real; su respaldo son tests unitarios más el test del borde `answer_deadline − ε` que esta task agregó porque no existía.
