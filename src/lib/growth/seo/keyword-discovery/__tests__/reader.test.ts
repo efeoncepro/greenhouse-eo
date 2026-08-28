@@ -561,6 +561,85 @@ describe('readKeywordDiscovery — orden y filtros', () => {
     })
   })
 
+  describe('TASK-1692 — lo ya decidido deja de encabezar el inbox', () => {
+    it('un candidato con decisión registrada baja; el que no la tiene sube', async () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'seokdc-decidido', keyword: 'decidido', normalized_keyword: 'decidido' }),
+        candidateRow({ candidate_id: 'seokdc-pendiente', keyword: 'pendiente', normalized_keyword: 'pendiente' })
+      ]
+      state.actions = [
+        {
+          candidate_id: 'seokdc-decidido',
+          action_kind: 'promoted_to_tracking',
+          actor: 'user-1',
+          created_at: new Date('2026-08-15T10:00:00Z')
+        }
+      ]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      // Antes de que existiera el writer, el promovido tenía `latestAction === null` y
+      // encabezaba la lista como lo más pendiente que había.
+      expect(result.candidates.map(candidate => candidate.candidateId)).toEqual([
+        'seokdc-pendiente',
+        'seokdc-decidido'
+      ])
+    })
+
+    it('un candidato enviado a un draft AEO muestra su estado real, no "Nuevo"', async () => {
+      state.runs = [runRow()]
+      state.candidates = [candidateRow({ candidate_id: 'seokdc-1' })]
+      state.actions = [
+        {
+          candidate_id: 'seokdc-1',
+          action_kind: 'selected_for_grounded_query',
+          actor: 'user-1',
+          created_at: new Date('2026-08-15T10:00:00Z')
+        }
+      ]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].latestAction).toMatchObject({ kind: 'selected_for_grounded_query' })
+    })
+
+    it('la re-selección supersede al descarte: manda la fila MÁS RECIENTE', async () => {
+      state.runs = [runRow()]
+      state.candidates = [candidateRow({ candidate_id: 'seokdc-1' })]
+      // El ledger es append-only: cambiar de opinión es una fila nueva, jamás un UPDATE.
+      // El reader resuelve con `DISTINCT ON ... ORDER BY created_at DESC`, así que la
+      // re-selección posterior es la que vale y el candidato vuelve a ser elegible.
+      state.actions = [
+        {
+          candidate_id: 'seokdc-1',
+          action_kind: 'selected_for_grounded_query',
+          actor: 'user-2',
+          created_at: new Date('2026-08-16T10:00:00Z')
+        }
+      ]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].latestAction).toMatchObject({
+        kind: 'selected_for_grounded_query',
+        actor: 'user-2'
+      })
+    })
+  })
+
   describe('TASK-1694 — la política de inclusión de la corrida es interpretable después', () => {
     it('una corrida NUEVA expone la política que registró su snapshot', async () => {
       state.runs = [

@@ -90,7 +90,8 @@ vi.mock('@/lib/postgres/client', () => ({
 import { GET as adminGet, POST as adminPost } from '@/app/api/admin/growth/seo/keyword-discovery/route'
 import {
   discoverEcosystemSeoKeywordsPayload,
-  getEcosystemSeoKeywordDiscoveryPayload
+  getEcosystemSeoKeywordDiscoveryPayload,
+  recordEcosystemSeoDiscoveryActionPayload
 } from '@/lib/api-platform/resources/ecosystem-growth-seo'
 import type { ApiPlatformRequestContext } from '@/lib/api-platform/core/context'
 import { createGreenhouseMcpHandlers } from '@/mcp/greenhouse/tools'
@@ -285,6 +286,80 @@ describe('lane ecosystem — passthrough del MISMO primitive', () => {
     ).rejects.toMatchObject({ statusCode: 403 })
 
     expect(queueMock).not.toHaveBeenCalled()
+  })
+})
+
+describe('TASK-1692 — el boundary de escritura del ledger es el MISMO en los dos lanes', () => {
+  it('🔴 un consumer NO puede escribir `promoted_to_tracking`: lo produce el command', async () => {
+    const appResponse = await adminPost(
+      new Request('http://localhost/api/admin/growth/seo/keyword-discovery', {
+        method: 'POST',
+        body: JSON.stringify({
+          intent: 'record_action',
+          organizationId: 'org-1',
+          candidateId: 'seokdc-1',
+          actionKind: 'promoted_to_tracking'
+        })
+      })
+    )
+
+    // Aceptarlo dejaría abierta la puerta a "reportar" desde afuera un outcome que ya pasó —
+    // y con eso vuelve la falla parcial: gasto comprometido, decisión sin autor.
+    expect(appResponse.status).toBe(400)
+    expect(actionMock).not.toHaveBeenCalled()
+
+    await expect(
+      recordEcosystemSeoDiscoveryActionPayload({
+        context: internalContext,
+        request: new Request('http://localhost/x'),
+        body: { candidateId: 'seokdc-1', actionKind: 'promoted_to_tracking' }
+      })
+    ).rejects.toThrow()
+
+    expect(actionMock).not.toHaveBeenCalled()
+  })
+
+  it('la decisión humana pura SÍ pasa por los dos lanes', async () => {
+    actionMock.mockResolvedValue({ ok: true, actionId: 'seokda-1', deduped: false })
+
+    const appResponse = await adminPost(
+      new Request('http://localhost/api/admin/growth/seo/keyword-discovery', {
+        method: 'POST',
+        body: JSON.stringify({
+          intent: 'record_action',
+          organizationId: 'org-1',
+          candidateId: 'seokdc-1',
+          actionKind: 'dismissed'
+        })
+      })
+    )
+
+    expect(appResponse.status).toBe(200)
+    expect(actionMock).toHaveBeenCalledWith(expect.objectContaining({ actionKind: 'dismissed' }))
+  })
+
+  it('la re-selección de un descartado es decisión humana y viaja por record_action', async () => {
+    actionMock.mockResolvedValue({ ok: true, actionId: 'seokda-2', deduped: false })
+
+    const response = await adminPost(
+      new Request('http://localhost/api/admin/growth/seo/keyword-discovery', {
+        method: 'POST',
+        body: JSON.stringify({
+          intent: 'record_action',
+          organizationId: 'org-1',
+          candidateId: 'seokdc-1',
+          actionKind: 'selected_for_grounded_query',
+          metadata: { reason: 'reselected' }
+        })
+      })
+    )
+
+    // El ledger es append-only: re-seleccionar ES escribir una decisión posterior que supersede
+    // al descarte. No hace falta un command nuevo ni una migración del CHECK.
+    expect(response.status).toBe(200)
+    expect(actionMock).toHaveBeenCalledWith(
+      expect.objectContaining({ actionKind: 'selected_for_grounded_query' })
+    )
   })
 })
 

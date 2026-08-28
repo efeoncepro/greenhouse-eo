@@ -657,6 +657,10 @@ export const readKeywordDiscovery = async (
 
   // Orden por defecto de la spec (8 llaves, desempate estable). No inventa un score único.
   candidates.sort((a, b) => {
+    // 🔴 "Pendiente primero" significa SIN DECISIÓN TOMADA, y desde TASK-1692 eso coincide con
+    // "sin fila": los tres kinds que faltaban ya tienen writer, así que un candidato promovido
+    // a tracking o enviado a un draft AEO deja rastro y baja. Antes ninguno lo dejaba y lo ya
+    // resuelto encabezaba el inbox como si fuera lo más pendiente que había.
     const pendingA = a.latestAction === null ? 0 : 1
     const pendingB = b.latestAction === null ? 0 : 1
 

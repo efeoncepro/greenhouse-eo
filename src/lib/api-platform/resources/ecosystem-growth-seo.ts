@@ -19,7 +19,7 @@ import {
 import { readBacklinkDetail, type BacklinkDetailResult } from '@/lib/growth/seo/backlinks/detail-reader'
 import { isVisibilitySubjectKind } from '@/lib/growth/seo/url-visibility/resolve-subject'
 import {
-  SEO_DISCOVERY_ACTION_KINDS,
+  SEO_DISCOVERY_CONSUMER_ACTION_KINDS,
   SEO_DISCOVERY_SOURCE_KINDS,
   isDiscoveryLinkBarrierFilterLevel,
   type SeoDiscoveryActionKind,
@@ -1678,11 +1678,13 @@ export const recordEcosystemSeoDiscoveryActionPayload = async ({
   const candidateId = typeof body?.candidateId === 'string' ? body.candidateId.trim() : ''
   const actionKind = typeof body?.actionKind === 'string' ? (body.actionKind as SeoDiscoveryActionKind) : null
 
-  if (!candidateId || !actionKind || !SEO_DISCOVERY_ACTION_KINDS.includes(actionKind)) {
-    throw new ApiPlatformError('A "candidateId" and a valid "actionKind" are required.', {
-      statusCode: 400,
-      errorCode: 'bad_request'
-    })
+  // 🔴 TASK-1692 — mismo boundary que el app lane: los kinds que produce un command no se
+  // aceptan desde afuera. El hecho lo escribe el primitive que lo produce, no quien lo reporta.
+  if (!candidateId || !actionKind || !SEO_DISCOVERY_CONSUMER_ACTION_KINDS.includes(actionKind)) {
+    throw new ApiPlatformError(
+      `A "candidateId" and an "actionKind" of: ${SEO_DISCOVERY_CONSUMER_ACTION_KINDS.join(', ')} are required.`,
+      { statusCode: 400, errorCode: 'bad_request' }
+    )
   }
 
   const subject = await resolveSeoLaneSubject(context, request, requestedOrganizationId)

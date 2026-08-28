@@ -9,7 +9,7 @@ import type {
   SeoDiscoverySourceKind
 } from '@/lib/growth/seo/keyword-discovery/contracts'
 import {
-  SEO_DISCOVERY_ACTION_KINDS,
+  SEO_DISCOVERY_CONSUMER_ACTION_KINDS,
   SEO_DISCOVERY_LINK_BARRIER_FILTER_LEVELS,
   SEO_DISCOVERY_METHODS,
   SEO_DISCOVERY_RUN_STATUSES,
@@ -136,9 +136,17 @@ export async function POST(request: Request) {
       const candidateId = asString(body.candidateId)
       const actionKind = asString(body.actionKind) as SeoDiscoveryActionKind
 
-      if (!candidateId || !SEO_DISCOVERY_ACTION_KINDS.includes(actionKind)) {
+      // 🔴 TASK-1692 — un consumer sólo puede registrar una decisión HUMANA pura. Los kinds
+      // que produce un command (`promoted_to_tracking`) los escribe el primitive dentro de su
+      // propia transacción; aceptarlos acá reabriría la puerta a "reportar" un outcome desde
+      // afuera, que es justo el bug que la task cierra.
+      if (!candidateId || !SEO_DISCOVERY_CONSUMER_ACTION_KINDS.includes(actionKind)) {
         return canonicalErrorResponse('seo_discovery_invalid_input', {
-          extra: { reason: 'missing_required_fields', required: ['candidateId', 'actionKind'] }
+          extra: {
+            reason: 'missing_required_fields',
+            required: ['candidateId', 'actionKind'],
+            allowedActionKinds: SEO_DISCOVERY_CONSUMER_ACTION_KINDS
+          }
         })
       }
 
