@@ -2,6 +2,66 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-27 — TASK-1696: el gasto del grader entra al ledger; el gate de dinero nace en shadow
+
+**Estado: `code complete, rollout pendiente`** — el schema, la atribución y las tres señales están
+vivos SIN flag (son aditivos y sólo hacen visible lo que ya ocurría); el gate de presupuesto
+per-org queda code-complete con sus dos flags en OFF.
+
+**Lo que cerró.** El grader AEO le compraba a DataForSEO fuera del ledger declarado como fuente
+única de presupuesto. Ahora `seo_provider_spend_daily` distingue **quién** consumió (`consumer`:
+`seo`|`aeo`) y **de qué tipo** es el dólar (`cost_basis` + `price_table_version`, acoplados por
+CHECK); el presupuesto SEO filtra `consumer='seo'` y el AEO es `resolveAeoBudget`. UN ledger, dos
+resolvers. El adapter de AI Mode migró al transporte canónico con `consumer: 'aeo'` +
+`organizationId` derivado del perfil.
+
+**Dos defectos reales que la spec no tenía, encontrados ejercitando el SQL contra PG y no
+leyéndolo:**
+1. Con la clave única de 4 columnas, un dólar `estimated` colisionaba con la fila `invoiced` del
+   mismo día y entraba por el `DO UPDATE`, que suma el monto pero **no toca `cost_basis`** — quedaba
+   reetiquetado como facturado, sin error. La clave pasó a SEIS columnas con `NULLS NOT DISTINCT`
+   (migración forward-fix `20260828020728716`).
+2. `estimateObservationCostUsd` devuelve, para `google_ai_overview`, el costo **real** de
+   DataForSEO. O sea que `grader_runs.estimated_cost_usd` ya contenía los dólares que el ledger
+   ahora también guarda: sumar los dos lados —lo que pedía el contrato de la spec— habría contado
+   ese gasto **dos veces**. `resolveAeoBudget` resta esa porción. Verificado: USD 7,2419 bruto −
+   USD 0,112 DataForSEO = USD 7,1299 de LLM.
+
+**Trampa de runtime que estaba a un commit de morder:** `postDataForSeoTask` LANZA si viene
+`organizationId` y el runtime no registró el contador de gasto, y sólo lo registraba el entrypoint
+del ops-worker — pero el grader **también corre inline en Vercel**
+(`/api/admin/growth/ai-visibility/runs`). El `catch` del adapter habría convertido ese throw en una
+observación `failed`: AI Mode muerto justo para los perfiles de cliente que la task existe para
+atribuir, sin que ningún test lo notara. El adapter registra el contador por import de efecto.
+
+**Desvío deliberado del plan de la spec:** la skill `dataforseo-operator` congela
+`postDataForSeoSerpLiveAdvanced` ("no agregar parámetros acá"). En vez de engordarlo con
+`organizationId` + `consumer`, se migró su único consumer productivo. El wrapper queda congelado,
+documentado como puerta que **no atribuye**, y con guard que rompe el build si alguien vuelve a
+comprar por ahí.
+
+**Pendiente de rollout, con dueño:** (1) prender `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED` en
+Vercel **y** en el ops-worker (`deploy.sh` + `--update-env-vars`, los dos pasos) y verificarlo en la
+**revisión activa** de Cloud Run; (2) observar un mes calendario de `wouldBlock` por tier; (3)
+llevarle al operador una propuesta de tope — **el flip a `ENFORCED` es decisión suya**. Los defaults
+(60/10/3 USD) nacen holgados a propósito: en shadow tienen que dejar pasar todo.
+
+**Verificación que NO se pudo hacer y por qué:** el criterio "una corrida real sobre un perfil CON
+organización deja fila `('aeo','serp','invoiced')`" no es observable del histórico — **cero** de las
+42 observaciones de AI Mode que compraron pertenecen a un run cuyo perfil tenga organización.
+Requiere provocar la corrida. La señal de drift ya lo refleja honesto: 7 observaciones de agosto
+compraron desde perfiles públicos (`warning`, ausencia legítima) y **0** de drift atribuible.
+
+**Segundo punto ciego, del mismo tipo:** `pnpm skills:mirrors` pasa **sin mirar**
+`dataforseo-operator` — no está en el manifiesto de `scripts/skills/validate-mirrored-skills.mjs`,
+y el validador sólo tiene modo `byte-identical` (esta skill no puede serlo: frontmatter distinto por
+contrato y `references/` sólo en `.claude/`). El espejo se verificó a mano esta vez. Admitirla exige
+un modo "cuerpo-idéntico" en el validador — decisión de alcance pendiente.
+
+**Punto ciego anotado, no cerrado:** `pnpm flags:audit` no ve estos flags — su regex busca
+`process.env.X_ENABLED` literal y todo `ai-visibility/flags.ts` los lee por constante (`env[FLAG]`),
+así que reporta "0 sin registrar" sin haberlos mirado. Se registraron a mano en el ledger.
+
 ## 2026-08-27 — Release a producción ejecutado: carril Growth SEO completo (sesión de coordinación)
 
 **Manifest `released`.** `main` = `cc73c74789ce9e667096d5316e9d991fd4a2186a`, release_id
@@ -327,17 +387,3 @@ esté en producción con su flag ON.
 **No re-descubrir:** de los 4 defectos declarados **2 no existían** (el reloj ya era `sticky`; los avisos nunca fueron sólo `srOnly`), y la copy que el wireframe proponía —«puedes enviar lo que alcanzaste a guardar»— es **falsa**: el servidor exige la evaluación completa, así que con faltantes enviar es imposible y el CTA no se renderiza. Detalle en el `## Delta 2026-08-26` de la spec.
 
 **Riesgo residual:** el guardado preventivo nunca se ejercitó contra runtime real; su respaldo son tests unitarios más el test del borde `answer_deadline − ε` que esta task agregó porque no existía.
-
-## 2026-08-26 — Hiring: auditoría de estado real y corrección de la contabilidad documental
-
-**Sólo documentación; runtime intacto.** Detalle completo, método y hechos verificados: [`auditoría fechada`](docs/audits/hiring/GREENHOUSE_HIRING_DOMAIN_STATE_AUDIT_2026-08-26.md).
-
-**El error que hay que no repetir.** `main` promueve por **squash**, así que los SHAs de `develop` no quedan como ancestros aunque el contenido esté desplegado. Leer `rev-list --count origin/main..origin/develop` como «trabajo sin desplegar» produjo un diagnóstico falso. Para saber si algo está en producción, comparar **blobs por ruta**, no contar commits. Último release: `709e15f66` (2026-08-23).
-
-**Estado real:** las 7 tasks `in-progress` no tienen código pendiente salvo dos fixes puntuales; lo que falta es evidencia y verificación. `TASK-1771` está en producción y sólo debe su verification sequence; `TASK-1719` sólo la evidencia del monitor de 7 días (ventana ya transcurrida); `TASK-1757`, una sola rotación real.
-
-**Corregido:** `.claude/rules/hiring.md` (auto-load, afirmaba en presente un `CHECK` aplicado el 08-23), el ledger de flags, ocho entradas de `docs/tasks/README.md`, seis `Status real`, la paridad de `Child Tasks` de `EPIC-011` y el alcance de `TASK-1751`, que perdió la mitad de su premisa.
-
-**Pendiente con dueño, por retorno:** (1) `TASK-1746` — `purge_assessment_access_recovery` con **cero callers**: la retención de 12 meses no se ejecuta; único hallazgo con filo legal. (2) `TASK-1718` — el fix H-10 sigue sin escribirse. (3) `TASK-1742` — re-verificar el canary tras los fixes del 08-19. (4) `HIRING_VACANCY_AI_ENABLED` — ON en Production hace 41 días **sin** el smoke de staging que era su precondición: decidir si se corre o se declara superado. (5) `TASK-1747` — re-auditar sus 8 hallazgos «abiertos»; es triage, no código.
-
-**Verificación.** `pnpm ops:lint --changed`: 6 tasks `errors=0 warnings=0`, warning de paridad de `EPIC-011` cerrado. `pnpm task:lint --task TASK-1751` verde. Sin gate de runtime: el cambio no toca runtime.

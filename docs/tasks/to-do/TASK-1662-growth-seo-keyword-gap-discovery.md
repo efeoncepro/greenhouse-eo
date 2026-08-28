@@ -2,6 +2,14 @@
 
 ## Delta 2026-08-27
 
+- El transporte `postDataForSeoTask` ahora **exige** `consumer` en todas sus variantes: las llamadas
+  de gap discovery nacen declarando `consumer: 'seo'` — cambiado por TASK-1696.
+- La señal de alerta de su tabla de riesgos («gasto fuera de patrón en `seo_provider_spend_daily`»)
+  gana un aliado real: `seo.provider.cost_over_budget` existe desde TASK-1696 y avisa al 80% del tope
+  del período, antes de que el gate empiece a rechazar corridas.
+
+## Delta 2026-08-27
+
 - **`TASK-1775` quedó `code complete` (rollout pendiente):** ya existen la tabla multi-productor
   `greenhouse_growth.seo_domain_overview_snapshots`, el writer `persistDomainOverviewSnapshots` y el
   reader `readDomainOverview` (`src/lib/growth/seo/domain-overview/**`). Cuando esta task quiera dar

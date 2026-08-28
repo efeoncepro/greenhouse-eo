@@ -7,6 +7,25 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-27 — TASK-1696: el ledger de gasto aprende quién gastó y de qué tipo es el dólar
+
+- `greenhouse_growth.seo_provider_spend_daily` gana `consumer` (`seo`|`aeo`), `cost_basis`
+  (`invoiced`|`estimated`) y `price_table_version` acoplado por CHECK. Clave única de seis columnas
+  con `NULLS NOT DISTINCT`. **Un solo ledger**: lo que se separa es el resolver de presupuesto.
+- El grader AEO deja de comprar fuera del ledger: `postDataForSeoTask` exige `consumer`, el adapter
+  de AI Mode migró del wrapper congelado al transporte canónico y `ProviderAdapterContext` lleva la
+  organización derivada del perfil, server-side.
+- `resolveAeoBudget` da presupuesto en dólares per-org al grader, con las dos monedas separadas y
+  restando la porción DataForSEO del estimado para no contarla dos veces. Gate **en shadow**: dos
+  flags, ambos OFF.
+- Tres señales nuevas en `/admin/operations`: `growth.dataforseo.spend_ledger_drift`,
+  `growth.ai_visibility.observation_yield` y `seo.provider.cost_over_budget` — esta última la
+  citaban nueve tasks como mitigación y no existía en código.
+- Documentación sincronizada: arquitectura (módulo SEO §1.1/§6/§9/§13.1, grader, control plane de
+  reliability), doc funcional + manual nuevos en `docs/{documentation,manual-de-uso}/growth/`, la
+  rule de auto-load `.claude/rules/growth-seo.md` y la skill `dataforseo-operator` con su espejo
+  Codex (cuerpo idéntico, verificado a mano: el validador de espejos NO cubre esta skill).
+
 ## 2026-08-27 — TASK-1777 complete: la tríada anti-Semrush queda cerrada entera
 
 - El operador decidió cerrar TASK-1777 con su rollout ya ejecutado (flag ON, lane en producción,
@@ -705,22 +724,3 @@
 - **Una señal que iba a mentir para siempre.** `evidence_coverage_gap` contaba TODAS las postulaciones, pero
   la evidencia sólo la escribe el intake público: cada postulación cargada a mano desde el desk (6 en 30 días)
   la habría dejado en `warning` de forma permanente, sobre la señal que justamente gatea este rollout.
-
-## 2026-08-18 — Careers público en producción: una vacante que se lee como una oferta, y que Google entiende
-
-- **Lo que ve ahora un candidato.** El detalle de una vacante dejó de ser un bloque de prosa con
-  requisitos: hoy abre con la promesa del rol y sigue con qué resultados se esperan, cómo es el trabajo
-  real, qué es imprescindible, qué es deseable y **qué puede aprender ahí** — separado a propósito, para
-  que nadie se autodescarte por algo que el rol enseña. Lee además cuánto dura el proceso y **en qué
-  plazo tendrá respuesta: 3 a 4 semanas**, avance o no. Y ve la vinculación sin letra chica: en Chile
-  contrato laboral local; fuera de Chile, vía internacional con pago directo de Efeonce, sobre 20 países
-  elegibles (toda Latinoamérica salvo Cuba, más Estados Unidos y España). Las dos vacantes vivas ya están
-  escritas así.
-- **Lo que ve Google.** Cada vacante publicada emite `JobPosting` estructurado, construido desde el mismo
-  contenido visible en la página — nunca desde datos que la persona no puede leer. El schema **pasó la
-  validación externa de `validator.schema.org` con 0 errores y 0 advertencias**. Una vacante remota sin
-  países declarados sigue sin emitir schema, a propósito: es preferible no aparecer a aparecerle a alguien
-  a quien no podemos contratar. Pausar o cerrar una vacante la retira del aire y del schema en el mismo acto.
-- **Republicar una vacante viva ya no la saca del aire.** La barra editorial se exige al publicar por
-  primera vez, no al volver a publicar: antes, pausar una vacante con postulantes en proceso la habría
-  dejado en 404 hasta reescribir su contenido completo.

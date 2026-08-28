@@ -1,5 +1,19 @@
 # TASK-1301 — Growth SEO: Capabilities + Per-Org Entitlement
 
+## Delta 2026-08-27 — la señal de presupuesto que esta task citaba no existía
+
+- Su §Reliability signals dice «el signal `seo.provider.cost_over_budget` lo materializa 1303» y §Blocks repite que TASK-1303 lo materializa.
+- **No existía en código cuando esta task cerró.** Barrido verificado:
+  `grep -rIn "cost_over_budget" src services migrations scripts` devolvía cero. La atribución entre
+  tasks era circular — cada una la daba por materializada por otra.
+- **La materializó TASK-1696** (`src/lib/reliability/queries/seo-provider-cost-over-budget.ts`,
+  visible en `/admin/operations` bajo el rollup `growth`): avisa `warning` al 80% del tope del
+  período y `error` al agotarlo, es decir **antes** de que el gate empiece a rechazar corridas con
+  `budget_exhausted`. Desde hoy la mitigación citada es real.
+- Matiz que evita sobredimensionarlo: el control **duro** sí existía —`enforceSeoRunEntitlement`
+  bloquea antes de gastar—; lo que faltaba era la detección temprana. La tabla de riesgos no se
+  reescribe: este delta es la corrección.
+
 ## Delta 2026-08-05 — DoD parity+MCP (mandato del operador)
 
 Directiva de sesión 2026-08-05: el módulo SEO nace **Full API Parity y usable por MCP**. Implicación dura

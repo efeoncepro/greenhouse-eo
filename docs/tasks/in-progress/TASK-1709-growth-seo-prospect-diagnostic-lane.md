@@ -1,5 +1,18 @@
 # TASK-1709 — Growth SEO: carril de diagnóstico de prospecto (sin contrato, sin acceso del cliente)
 
+## Delta 2026-08-27
+
+- El transporte y el writer del ledger ahora **exigen** `consumer`: toda llamada del carril de
+  prospecto declara `consumer: 'seo'` (es gasto del lado comprado, no del grader) — cambiado por
+  TASK-1696.
+- La decisión de atribuir el gasto de prospecto a la organización canónica de Efeonce sigue en pie y
+  no colisiona con la dimensión nueva: el ledger sigue siendo **una sola tabla**; lo que se separa es
+  el resolver de presupuesto. Con `consumer` en la clave, ese gasto de adquisición queda además
+  aislable del gasto de servicio.
+- El ledger ganó `cost_basis` (`invoiced` | `estimated`) y `price_table_version`, acopladas por
+  CHECK: una fila estimada no puede existir sin declarar con qué tabla de precios se estimó —
+  cambiado por TASK-1696.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

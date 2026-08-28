@@ -1,5 +1,20 @@
 # TASK-1270 — Growth AI Visibility: Recurring Share-of-Voice + Scheduled Re-Grade
 
+## Delta 2026-08-27
+
+- El grader ya tiene gate de dinero per-org: `resolveAeoBudget`
+  (`src/lib/growth/ai-visibility/budget.ts`) reporta facturado (ledger, `consumer='aeo'`) y estimado
+  (LLM propios) por separado — cerrado por TASK-1696. Al reactivar la cadencia el gasto pasa a ser
+  recurrente, así que ese gate deja de ser opcional para esta task.
+- Los dos flags del gate, `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED` y
+  `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED`, son **multi-runtime**: se leen en Vercel y en el
+  ops-worker, que es donde vive el re-grade. Ya quedaron declarativos en
+  `services/ops-worker/deploy.sh` (ambos default OFF) y con fila en el ledger de flags — cambiado
+  por TASK-1696. Prenderlos sólo en Vercel dejaría el re-grade recurrente sin gate, en silencio.
+- El gasto DataForSEO del grader entra ahora al ledger con `consumer='aeo'` cuando el perfil tiene
+  organización; cuando no la tiene queda contado como no atribuible en la señal
+  `growth.dataforseo.spend_ledger_drift`, nunca invisible — cambiado por TASK-1696.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

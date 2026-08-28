@@ -1,5 +1,16 @@
 # TASK-1701 — `analyzeUrlContent`: hechos de contenido por URL, cero score
 
+## Delta 2026-08-27
+
+- El bloqueante duro de la mitad `prose` está **code complete**: existe `resolveAeoBudget`
+  (`src/lib/growth/ai-visibility/budget.ts`) y el ledger distingue consumidor — cerrado por
+  TASK-1696. El gate sigue en **shadow**, así que la condición que esta task declaró (esperar a que
+  deje de ser shadow o declarar su propio techo duro) sigue vigente tal cual.
+- Cuando el gasto de tokens entre al ledger, entra a la **misma** tabla con `cost_basis='estimated'`
+  y su `price_table_version`; el CHECK acoplado exige ambos juntos — las columnas ya existen,
+  cambiado por TASK-1696.
+- La ruta declarada en §Depends on quedó stale: TASK-1696 ya no vive en `docs/tasks/to-do/`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -38,7 +49,7 @@ procedencia, no como ausencia de contenido.
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo|aeo`
-- Blocked by: `TASK-1696`, `TASK-1703` — `TASK-1697` cerró 2026-08-27 (el sustrato existe: consumir `@/lib/growth/site-substrate`, la lint rule bloquea el deep import a `probes/**`)
+- Blocked by: `TASK-1703`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

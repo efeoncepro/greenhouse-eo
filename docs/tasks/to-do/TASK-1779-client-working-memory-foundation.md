@@ -1,5 +1,14 @@
 # TASK-1779 — Memoria de trabajo del cliente (fundación transversal)
 
+## Delta 2026-08-27
+
+- La descripción del ledger quedó incompleta: `greenhouse_growth.seo_provider_spend_daily` ya no
+  registra sólo `organización × familia × día` — ganó `consumer` (`seo` | `aeo`), `cost_basis`
+  (`invoiced` | `estimated`) y `price_table_version`, y su clave única es de seis columnas
+  `NULLS NOT DISTINCT` — cambiado por TASK-1696.
+- El hueco que esta task nombra **sigue abierto**: el ledger ahora dice cuánto y quién consumió, pero
+  sigue sin decir **qué** se compró. La dimensión de consumidor no es memoria de trabajo.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

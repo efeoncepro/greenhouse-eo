@@ -1,5 +1,19 @@
 # TASK-1309 — Growth SEO: Site Audit UI
 
+## Delta 2026-08-27 — la señal de presupuesto que esta task citaba no existía
+
+- Su tabla de riesgos cita `seo.provider.cost_over_budget` como señal de alerta de «correr auditoría» sin gate de costo.
+- **No existía en código cuando esta task cerró.** Barrido verificado:
+  `grep -rIn "cost_over_budget" src services migrations scripts` devolvía cero. La atribución entre
+  tasks era circular — cada una la daba por materializada por otra.
+- **La materializó TASK-1696** (`src/lib/reliability/queries/seo-provider-cost-over-budget.ts`,
+  visible en `/admin/operations` bajo el rollup `growth`): avisa `warning` al 80% del tope del
+  período y `error` al agotarlo, es decir **antes** de que el gate empiece a rechazar corridas con
+  `budget_exhausted`. Desde hoy la mitigación citada es real.
+- Matiz que evita sobredimensionarlo: el control **duro** sí existía —`enforceSeoRunEntitlement`
+  bloquea antes de gastar—; lo que faltaba era la detección temprana. La tabla de riesgos no se
+  reescribe: este delta es la corrección.
+
 ## Delta 2026-08-08 (tarde) — desbloqueada: la suite completa quedó verde
 
 El bloqueo declarado abajo (2 rojos ajenos en `src/lib/admin/client-role-visibility.test.ts`) **ya no

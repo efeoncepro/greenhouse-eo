@@ -1,5 +1,17 @@
 # TASK-1717 — AEO Grader: superficie de consumidor (`llm_scraper`) como tercer eje, sin tocar el score
 
+## Delta 2026-08-27
+
+- El defecto §1.2 que esta task se propone no repetir **está cerrado**: el adapter de AI Mode migró
+  de `postDataForSeoSerpLiveAdvanced` a `postDataForSeoTask` y pasa `organizationId` derivado
+  server-side de `grader_profiles.organization_id`, con `consumer: 'aeo'` — cerrado por TASK-1696. El
+  transporte ya no permite olvidarlo: `consumer` es requerido por tipo en todas sus variantes.
+- El tope USD per-org «propio o de TASK-1696» dejó de ser una alternativa: `resolveAeoBudget`
+  (`src/lib/growth/ai-visibility/budget.ts`) existe, en shadow. La superficie nueva se cuelga de ese
+  resolver; no crea uno paralelo.
+- `ProviderAdapterContext` transporta ahora `organizationId: string | null`, derivado del perfil y
+  nunca del payload del run — cambiado por TASK-1696.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

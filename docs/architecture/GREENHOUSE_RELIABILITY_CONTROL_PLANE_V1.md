@@ -5,7 +5,52 @@
 > Versión: `1.15`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-08-19` por TASK-1739 (signal de deriva de la procedencia derivada) + registro retroactivo de las 2 signals de identidad del intake (TASK-1736)
+> Última actualización: `2026-08-27` por TASK-1696 (3 signals del gasto de proveedor DataForSEO bajo el módulo `growth`)
+
+## Módulo `growth` — el gasto de proveedor y su presupuesto (TASK-1696)
+
+Tres señales bajo el rollup `growth` (mismo módulo del registry; `dependencies` incorpora
+`greenhouse_growth.seo_provider_spend_daily` y `filesOwned` sus readers). Cubren el plano que hasta
+ahora el módulo no observaba: **el dinero**. Las tres degradan honestamente a `unknown` con
+`captureWithDomain(error, 'growth')` si su query falla — no poder evaluar el gasto no es evidencia de
+que esté sano.
+
+| `signalId` | `kind` | Qué mide | Steady |
+| --- | --- | --- | --- |
+| `growth.dataforseo.spend_ledger_drift` | `data_quality` | Observaciones de AI Mode del período que le pagaron al proveedor y **no** dejaron llamada contabilizada con `consumer='aeo'` en el ledger. Reader: [`growth-dataforseo-spend-ledger-drift.ts`](../../src/lib/reliability/queries/growth-dataforseo-spend-ledger-drift.ts) | **0** |
+| `growth.ai_visibility.observation_yield` | `data_quality` | Rendimiento `succeeded / total` de `provider_observations` en ventana móvil de 30 días, **cortado por proveedor**. Reader: [`growth-ai-visibility-observation-yield.ts`](../../src/lib/reliability/queries/growth-ai-visibility-observation-yield.ts) | — (umbrales de degradación) |
+| `seo.provider.cost_over_budget` | `cost_guard` | Organizaciones cuyo gasto **facturado** del mes se acerca al tope de su tier: `warning` al 80%, `error` al 100%. Reader: [`seo-provider-cost-over-budget.ts`](../../src/lib/reliability/queries/seo-provider-cost-over-budget.ts) | **0** |
+
+Notas de contrato, porque cada una tiene una decisión que no es obvia:
+
+- **`spend_ledger_drift` separa dos causas que no son lo mismo.** Un perfil **público sin
+  organización** es una ausencia legítima —el ledger tiene FK a `greenhouse_core.organizations` y
+  forzar una organización sintética sería peor que el hueco— y sale `warning`. Un perfil **con
+  organización** sin llamada contabilizada es un bug del camino de atribución (se le está gastando
+  plata a un cliente sin cargarla a su presupuesto) y sale `error`. Compara **conteo de llamadas, no
+  dólares**: el `cost` que devuelve DataForSEO es del **batch**, no de la tarea, así que comparar
+  montos sería aritmética sobre la unidad equivocada. Declarado en el docstring de la query para que
+  nadie la "corrija" mal.
+- **`observation_yield` corta por proveedor porque el agregado esconde el problema.** Un 68% global
+  se lee como aceptable mientras un proveedor concreto está en 29%. Un proveedor sin observaciones en
+  la ventana reporta **`unknown`, nunca 0%**: "no se intentó" no es "salió mal". Límite declarado:
+  mide sobre las observaciones que **existen**, así que no ve los pares `(prompt, proveedor)` que
+  nunca se intentaron.
+- **`cost_over_budget` es detección temprana, no control.** El control duro ya existía
+  (`enforceSeoRunEntitlement` bloquea antes de gastar); lo que faltaba era el aviso **antes** de que
+  el gate empiece a rechazar corridas con `budget_exhausted`. Sólo mira dólares **facturados**, que
+  son los únicos que el gate consume: mezclar los estimados inflaría el consumo con una cifra de otra
+  naturaleza. Nueve tasks (`1300`, `1301`, `1302`, `1303`, `1304`, `1308`, `1309`, `1651`, `1664`) la
+  citaban como mitigación construida del riesgo #1 del módulo sin que existiera, cada una
+  atribuyéndosela a otra.
+
+Ejercitadas contra PostgreSQL real al crearse (`scripts/growth/_sanity-task-1696-signals.ts`): las
+tres corren y ya dicen algo — el drift reportó 7 observaciones de agosto compradas desde perfiles
+públicos, con 0 de drift atribuible.
+
+Contrato: [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §6/§9/§13
++ [`GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`](GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md) §8.2.1/§15.1/§17.1.
+Task dueña: `TASK-1696` (EPIC-022).
 
 ## Delta 2026-08-19 — TASK-1739: signal de deriva de la procedencia derivada de una postulación
 

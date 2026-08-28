@@ -66,7 +66,7 @@ Los cupos por tier salen de env-knobs con defaults sanos:
 | `trial` | 1 | $2 |
 | `pilot` | 2 (override por org vía `metadata_json.seo_audit_runs_per_month`) | $10 |
 
-El presupuesto consumido sale de un **registro único de gasto** (`seo_provider_spend_daily`): cada llamada que se le paga al proveedor queda anotada ahí, atribuida a la organización que la pagó. No es un contador aparte ni una estimación — es el gasto real, y es la misma fuente para cualquier corrida del módulo (rankings, auditoría, enlaces o datos de mercado).
+El presupuesto consumido sale de un **registro único de gasto** (`seo_provider_spend_daily`): cada llamada que se le paga al proveedor queda anotada ahí, atribuida a la organización que la pagó. No es un contador aparte ni una estimación — es el gasto real, y es la misma fuente para cualquier corrida del módulo (rankings, auditoría, enlaces o datos de mercado). **Desde TASK-1696 ese registro distingue quién consumió cada dólar** (`seo` o `aeo`, el grader de IA) y de qué tipo es (facturado por el proveedor o estimado por nosotros): el presupuesto SEO suma **sólo** el consumidor `seo`, así que el gasto del grader ya no se le descuenta al cliente SEO. Detalle en [Gasto de proveedor y presupuesto](gasto-de-proveedor-y-presupuesto.md).
 
 > Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md §9](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) (entitlements) · chokepoint en [`src/lib/growth/seo/entitlement.ts`](../../../src/lib/growth/seo/entitlement.ts) · sanity live [`scripts/growth/_sanity-seo-entitlement.ts`](../../../scripts/growth/_sanity-seo-entitlement.ts).
 

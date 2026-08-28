@@ -1,5 +1,16 @@
 # TASK-1699 — Growth SEO: persistir el top-N del SERP que ya se paga
 
+## Delta 2026-08-27
+
+- TASK-1696 ya aterrizó en `src/lib/growth/seo/rank-capture.ts`: la llamada al transporte declara
+  ahora `consumer: 'seo'`. El conflicto de merge que esta task anticipa es real pero acotado —los
+  diffs siguen cayendo en zonas distintas del archivo (parser vs. llamada)— y el orden correcto es
+  rebasar sobre TASK-1696 antes de tocarlo.
+- El ledger `seo_provider_spend_daily` ganó `consumer`, `cost_basis` y `price_table_version`, y su
+  clave única pasó a seis columnas `NULLS NOT DISTINCT` — cambiado por TASK-1696. Persistir el top-N
+  que ya se paga no agrega llamadas, pero cualquier llamada nueva al transporte debe declarar
+  `consumer`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

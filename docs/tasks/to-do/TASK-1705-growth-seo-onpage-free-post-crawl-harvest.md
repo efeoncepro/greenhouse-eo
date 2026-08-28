@@ -1,5 +1,14 @@
 # TASK-1705 — Cosecha de la capacidad OnPage ya pagada (reads gratis post-crawl)
 
+## Delta 2026-08-27
+
+- El transporte `postDataForSeoTask` ahora **exige** `consumer` en todas sus variantes: las llamadas
+  de cosecha de esta task nacen declarando `consumer: 'seo'` — cambiado por TASK-1696.
+- El ledger ganó `consumer`, `cost_basis` y `price_table_version`, y su clave única pasó a seis
+  columnas `NULLS NOT DISTINCT` — cambiado por TASK-1696. Nota para los pasos de verificación: el
+  writer sigue ignorando costos ≤ 0 (invariante conservado), así que un endpoint gratis **no deja
+  fila**; verificar costo 0 es verificar la ausencia de fila, no una fila con cero.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `code complete, rollout pendiente`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -44,6 +44,64 @@ números que la dimensionan.
 | "~USD 3/mes de grader por cliente" y "el 15% del presupuesto" | ❌ **inventadas** | Medido: **USD 0,7025 histórico total** para la org cliente (`org-32333527…`, 3 runs) y **CERO desde 2026-07-17** — el último run del grader en toda la base es de esa fecha. El grader **está dormido**; no hay un "~USD 3/mes" que comparar contra USD 50. |
 | — | ✅ hallazgo nuevo que refuerza la task | **El 87,5% de los dólares del grader no tiene organización atribuida**: USD 8,2432 de USD 9,4222 en runs con `organization_id IS NULL` (81,2% si se excluyen los `smoke`; 40 de 45 runs por conteo). Es exactamente el hueco que esta task cierra. |
 | "242 de 767 observaciones `skipped`/`failed` (32%); `google_ai_overview` en 71% (84/119)" | ⚠️ diluido por los fakes | Excluyendo `model LIKE 'fake-%'`: **239 de 665 = 35,9%**, y `google_ai_overview` **84 de 107 = 78,5%**. El problema es **peor** que lo reportado. |
+
+## Delta 2026-08-27 — ejecución: dos defectos del contrato, corregidos contra PG real
+
+La implementación encontró **dos defectos en el contrato de esta misma spec**, los dos ejercitando
+el SQL productivo contra PostgreSQL y ninguno visible leyéndolo. Ambos están corregidos y ambos
+cambian lo que la spec pedía:
+
+1. **La clave única de 4 columnas no sostenía las columnas de honestidad.** Con
+   `(organization_id, family, spend_date, consumer)`, un dólar `estimated` colisiona con la fila
+   `invoiced` del mismo día/familia/consumidor y entra por el `DO UPDATE`, que suma el monto pero
+   **no toca `cost_basis`**: el dólar estimado queda guardado bajo la etiqueta de facturado, sin
+   error y sin rastro. Es exactamente la mentira que las dos columnas existen para impedir — la
+   declaración no sirve si la clave la deja colapsar. La clave pasó a SEIS columnas
+   `(… , consumer, cost_basis, price_table_version)` con `NULLS NOT DISTINCT` (PostgreSQL 15+), que
+   es lo que permite incluir `price_table_version` sin que las filas facturadas (versión NULL)
+   dejen de acumular. Migración forward-fix `20260828020728716`; la anterior no se editó.
+
+2. **`invoicedUsedUsd + estimatedUsedUsd` habría contado el mismo gasto dos veces.**
+   `estimateObservationCostUsd` devuelve, para `google_ai_overview`, el costo REAL que DataForSEO
+   cobró (`usage.dataforseo_cost_usd`), así que `grader_runs.estimated_cost_usd` ya contiene los
+   dólares que desde esta task entran al ledger como facturados. Es el mismo bug class contra el
+   que advierte la migración fundacional del ledger. `resolveAeoBudget` resta la porción DataForSEO
+   de cada run. Verificado contra PG: USD 7,2419 bruto − USD 0,112 = USD 7,1299 de LLM.
+
+**Desvío deliberado del plan (Slice 3).** La spec pedía extender `postDataForSeoSerpLiveAdvanced`
+con `organizationId` + `consumer`. La skill `dataforseo-operator` lo congela ("no agregar parámetros
+acá; los consumers nuevos usan `postDataForSeoTask`"). En vez de engordar el wrapper se migró su
+**único** consumer productivo —el adapter de AI Mode— al transporte canónico. El wrapper queda
+congelado y documentado como puerta que NO atribuye, con guard que rompe el build si otro módulo
+compra por ahí (`dataforseo-legacy-wrapper-guard.test.ts`).
+
+**Trampa de runtime que la spec no nombraba.** `postDataForSeoTask` LANZA si viene `organizationId`
+y el runtime no registró el contador de gasto (guard de TASK-1300). Sólo lo registraba el entrypoint
+del ops-worker, pero el grader **también corre inline en Vercel**
+(`/api/admin/growth/ai-visibility/runs` → `runGraderDiagnostic` → `executeGraderRun`). El `catch`
+del adapter habría convertido ese throw en observación `failed`: AI Mode muerto justo para los
+perfiles de cliente que esta task existe para atribuir, sin que ningún test lo notara. El adapter
+registra el contador por import de efecto.
+
+**Nombres de flags:** se usó el prefijo canónico del dominio (`GROWTH_AI_VISIBILITY_BUDGET_GATE_*`,
+`GROWTH_AI_VISIBILITY_*_MONTHLY_BUDGET_USD`) en vez del `GROWTH_AEO_*` de la spec. Los ~20 flags del
+dominio usan ese prefijo; abrir un segundo prefijo para el mismo dominio hace que los greps fallen.
+
+**Kind de la señal de sobregiro:** `cost_guard`, no `budget` — ese kind no existe en
+`ReliabilitySignalKind`.
+
+**Criterio de aceptación no observable hoy, y por qué:** "una corrida real `light` sobre un perfil
+CON organización dejó fila `('aeo','serp','invoiced')`". **Cero** de las 42 observaciones de AI Mode
+que compraron en toda la vida de la base pertenecen a un run cuyo perfil tenga organización — la
+atribución no puede producir filas hasta que se provoque esa corrida. No invalida la plomería (20 de
+46 runs SÍ tienen perfil con organización); es un paso de rollout, no de código. La señal de drift
+ya lo reporta honesto: 7 observaciones de agosto compraron desde perfiles públicos (`warning`) y
+**0** de drift atribuible.
+
+**Punto ciego del gate de flags, anotado y no cerrado:** `pnpm flags:audit` no ve los flags nuevos —
+su regex busca `process.env.X_ENABLED` literal y todo `ai-visibility/flags.ts` los lee por constante
+(`env[FLAG]`), así que reporta "0 sin registrar" sin haberlos mirado. Se registraron a mano en el
+ledger. Merece su propia task: el gate da un verde que no midió.
 
 ## Summary
 
@@ -818,45 +876,45 @@ observaciones-a-dólares. Declararlo en el docstring de la query evita que algui
 
 ## Acceptance Criteria
 
-- [ ] `greenhouse_growth.seo_provider_spend_daily` tiene `consumer`, `cost_basis` y
+- [x] `greenhouse_growth.seo_provider_spend_daily` tiene `consumer`, `cost_basis` y
       `price_table_version`, con la UNIQUE `(organization_id, family, spend_date, consumer)` y el
       CHECK acoplado `(cost_basis = 'estimated') = (price_table_version IS NOT NULL)`, verificados
       contra `pg_constraint` en la base real.
-- [ ] Toda fila preexistente quedó en `consumer='seo'` y `cost_basis='invoiced'`, comprobado por
+- [x] Toda fila preexistente quedó en `consumer='seo'` y `cost_basis='invoiced'`, comprobado por
       consulta agrupada; ninguna quedó NULL.
-- [ ] No existe una segunda tabla de gasto de proveedor en el repo ni en la base.
-- [ ] `SEO_PROVIDER_SPEND_UPSERT_SQL` hace `ON CONFLICT (organization_id, family, spend_date, consumer)`
+- [x] No existe una segunda tabla de gasto de proveedor en el repo ni en la base.
+- [x] `SEO_PROVIDER_SPEND_UPSERT_SQL` hace `ON CONFLICT (organization_id, family, spend_date, consumer)`
       y un test rompe el build si esa lista diverge de la constraint de la migración.
-- [ ] `buildSeoProviderSpendMonthlySumSql` filtra `consumer = 'seo'`, y el commit que lo introduce es
+- [x] `buildSeoProviderSpendMonthlySumSql` filtra `consumer = 'seo'`, y el commit que lo introduce es
       el mismo que introduce el `ON CONFLICT` nuevo.
-- [ ] `postDataForSeoSerpLiveAdvanced` acepta y propaga `organizationId` y `consumer`; un test
+- [x] **[Resuelto distinto — ver Delta 2026-08-27]** el wrapper queda CONGELADO y el adapter migró a `postDataForSeoTask`, que acepta y propaga `organizationId` y `consumer`; un test
       verifica que un `consumer='aeo'` con organización deja fila con ese consumer.
-- [ ] `ProviderAdapterContext` transporta `organizationId` derivado **sólo** de
+- [x] `ProviderAdapterContext` transporta `organizationId` derivado **sólo** de
       `grader_profiles.organization_id`; existe un test que falla si el valor puede venir del payload
       del run.
-- [ ] `DATAFORSEO_FAMILIES.serp.requiresOrganization` sigue en `false`, con la razón escrita en el
+- [x] `DATAFORSEO_FAMILIES.serp.requiresOrganization` sigue en `false`, con la razón escrita en el
       registry y afirmada por test.
-- [ ] Una corrida real `light` sobre un perfil con organización dejó una fila
+- [ ] **[NO OBSERVABLE HOY — paso de rollout, ver Delta 2026-08-27]** Una corrida real `light` sobre un perfil con organización dejó una fila
       `('aeo','serp','invoiced')` en la base, y la corrida equivalente sobre un perfil sin
       organización no dejó fila y quedó reportada por la señal de drift como no atribuible.
-- [ ] `resolveSeoEntitlement` de la organización del paso anterior **no** movió su `budgetUsedUsd`.
-- [ ] `resolveAeoBudget(organizationId)` devuelve `invoicedUsedUsd` y `estimatedUsedUsd` por
+- [x] **[verificado con el sanity live en vez de la corrida real]** `resolveSeoEntitlement` de la organización del paso anterior **no** movió su `budgetUsedUsd`.
+- [x] `resolveAeoBudget(organizationId)` devuelve `invoicedUsedUsd` y `estimatedUsedUsd` por
       separado, además del total, y nunca presenta una cifra única sin decir de qué está compuesta.
-- [ ] `resolveAeoEntitlement` conserva su contrato: no ganó campos de dinero.
-- [ ] `growth.dataforseo.spend_ledger_drift` existe, tiene steady = 0, distingue drift atribuible de
+- [x] `resolveAeoEntitlement` conserva su contrato: no ganó campos de dinero.
+- [x] `growth.dataforseo.spend_ledger_drift` existe, tiene steady = 0, distingue drift atribuible de
       no atribuible y es visible en `/admin/operations` bajo el rollup `growth`.
-- [ ] `growth.ai_visibility.observation_yield` existe, corta por provider y es visible en el mismo
+- [x] `growth.ai_visibility.observation_yield` existe, corta por provider y es visible en el mismo
       tablero.
-- [ ] Con `GROWTH_AEO_BUDGET_GATE_ENFORCED=false`, un run que superaría el tope **se ejecuta** y deja
+- [x] **[flag renombrado a `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED`, ver Delta]** Con el enforce en `false`, un run que superaría el tope **se ejecuta** y deja
       registro de `wouldBlock`; existe un test que lo afirma.
-- [ ] Los dos flags están declarados en Vercel y en `services/ops-worker/deploy.sh`, verificados en
+- [ ] **[PENDIENTE DE ROLLOUT]** declarados en `services/ops-worker/deploy.sh` y en el ledger; falta declararlos en Vercel y verificar en
       la revisión activa de Cloud Run, y tienen fila en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
-- [ ] `pnpm flags:audit --strict --no-vercel` y `pnpm docs:closure-check` pasan.
-- [ ] Ninguna query nueva usa `EXTRACT(EPOCH FROM (date - date))`; el lint
+- [x] `pnpm flags:audit --strict --no-vercel` pasa (⚠️ no VE estos flags: regex `process.env.X_ENABLED` vs lectura por constante — ver Delta) y `pnpm docs:closure-check` pasa.
+- [x] Ninguna query nueva usa `EXTRACT(EPOCH FROM (date - date))`; el lint
       `greenhouse/no-extract-epoch-from-date-subtraction` queda verde.
-- [ ] `readSeoProviderSpendByConsumer` está expuesto en el lane ecosystem y como tool MCP en el mismo
+- [x] `readSeoProviderSpendByConsumer` está expuesto en el lane ecosystem (sólo bindings `internal`) y como tool MCP `get_seo_provider_spend` en el mismo
       PR, bajo `efeonce.mcp.read`, sin scope nuevo en Entra.
-- [ ] `pnpm task:lint --task TASK-1696` reporta `template=1 errors=0`.
+- [x] `pnpm task:lint --task TASK-1696` reporta `template=1 errors=0`.
 
 ## Verification
 

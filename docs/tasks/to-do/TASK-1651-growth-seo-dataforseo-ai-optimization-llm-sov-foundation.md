@@ -1,5 +1,26 @@
 # TASK-1651 — Growth SEO: familia `ai_optimization` (DataForSEO) + fundación SoV de marca en LLMs per-org
 
+## Delta 2026-08-27
+
+- El ledger `seo_provider_spend_daily` ganó `consumer` (`seo`|`aeo`), `cost_basis`
+  (`invoiced`|`estimated`) y `price_table_version`, y su clave única pasó a seis columnas
+  `NULLS NOT DISTINCT` `(organization_id, family, spend_date, consumer, cost_basis,
+  price_table_version)` — cambiado por TASK-1696. La ampliación del CHECK de `family` que esta task
+  debe hacer en el mismo PR sigue igual, pero el `ON CONFLICT` con el que convive ya no es de tres
+  columnas.
+- El transporte `postDataForSeoTask` ahora **exige** `consumer` en todas sus variantes: toda llamada
+  de la familia `ai_optimization` nace declarando `consumer: 'aeo'` y se mide contra su propio
+  presupuesto (`resolveAeoBudget`, `src/lib/growth/ai-visibility/budget.ts`), nunca contra el SEO —
+  `buildSeoProviderSpendMonthlySumSql` filtra `consumer = 'seo'` — cambiado por TASK-1696.
+- El punto ciego §1.2 que esta task hereda quedó cerrado: `postDataForSeoSerpLiveAdvanced` está
+  congelado y el adapter de AI Mode migró a `postDataForSeoTask` pasando `organizationId` derivado
+  server-side de `grader_profiles.organization_id` — cerrado por TASK-1696.
+- La señal `seo.provider.cost_over_budget` que la tabla de riesgos cita como mitigación **no existía
+  en código** cuando se escribió esta task; la materializó TASK-1696
+  (`src/lib/reliability/queries/seo-provider-cost-over-budget.ts`, rollup `growth`): avisa `warning`
+  al 80% del tope del período y `error` al agotarlo, antes de que el gate empiece a rechazar
+  corridas con `budget_exhausted`.
+
 ## Delta 2026-08-15 — la task se parte en dos: `1651-A` sigue P1, `1651-B` baja a P3
 
 Fuente: `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` §1.2 (gasto
@@ -71,7 +92,7 @@ semanal fabrica una serie que parece viva y está muerta.
 - Status real: `Definida`
 - Rank: `TBD`
 - Domain: `growth`
-- Blocked by: `TASK-1696` (bloquea `1651-B`; `1651-A` no gasta y puede avanzar)
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -542,6 +563,9 @@ diseño que el plan debe respetar:
 
 - [ ] `TASK-1696` está operativa: existe techo en USD por organización para el carril, y la captura
       lo consulta antes de cada batch.
+- [ ] Toda llamada de la familia `ai_optimization` declara `consumer: 'aeo'` en el transporte y su
+      gasto se mide contra `resolveAeoBudget`, nunca contra el presupuesto SEO
+      (`buildSeoProviderSpendMonthlySumSql` filtra `consumer = 'seo'`) — contrato de TASK-1696.
 - [ ] Toda llamada de la familia pasa `organizationId` y deja fila en `seo_provider_spend_daily`;
       cero llamadas huérfanas del ledger (verificado cruzando conteos tras la primera corrida).
 - [ ] `fan_out_queries` y `brand_entities` quedan persistidos desde la primera corrida.
