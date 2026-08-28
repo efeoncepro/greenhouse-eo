@@ -1,5 +1,27 @@
 # TASK-1784 — MCP: ruteo de selección entre tools que se parecen, con eval que lo pruebe
 
+## Delta 2026-08-28 (release a producción) — las cifras de superficie quedaron stale (otra vez)
+
+El deploy del gateway `mcp.efeonce.org` (revisión `efeonce-mcp-gateway-00024-8b8`), coordinado con
+el release `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208, run `33178544139`,
+manifest `released`), federó 6 tools SEO nuevas: `get_seo_provider_spend`, `get_seo_keyword_gap`,
+`declare_seo_competitors`, `retire_seo_competitors`, `get_seo_serp_top_results` y
+`get_seo_competitor_candidates`.
+
+**Cifras a releer del código, no de este archivo:**
+
+- «20 tools SEO» (§Why This Task Exists y §Estado actual) → hoy el registry interno declara
+  **26 tools SEO** en `src/mcp/greenhouse/server.ts`.
+- «27 de 30 tools del gateway con annotations» → el gateway federa hoy **27 tools SEO**.
+- «Pasó de 16 a 20 tools SEO» → la progresión real es 16 → 20 → 21 → 26 en semanas. El argumento de
+  esta task («esto empeora solo porque la superficie crece») **se refuerza**, no se debilita.
+
+Dos de las tools nuevas entran directo al problema que esta task ataca:
+`get_seo_competitor_candidates` (propone competidores por recurrencia medida) y
+`get_seo_keyword_gap` (qué rankea la competencia y el cliente no) contestan preguntas vecinas y
+compiten por la misma intención con `get_seo_keyword_opportunities` y `discover_seo_keywords`.
+Deben entrar al conjunto que recibe bloque de ruteo y al fixture del eval.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

@@ -39,6 +39,7 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 
 import { isSeoModuleEnabled } from './flags'
+import { appendDiscoveryActionTx, type DiscoveryActionClient } from './keyword-discovery/queue'
 import { readKeywordDiscovery, type SeoDiscoveryCandidateView } from './keyword-discovery/reader'
 
 // ─── Contratos ──────────────────────────────────────────────────────────────────────
@@ -97,6 +98,23 @@ export type GroundedQueryDraftResult =
        */
       seedCoverage: SeoSeedCoverage | null
       coverageNotice: string | null
+      /**
+       * TASK-1692 — `false` cuando el draft se creó pero la decisión NO quedó registrada en el
+       * ledger de discovery.
+       *
+       * 🔴 Es un residuo REAL y declarado, no un descuido: `authorGraderPromptSetDraft` abre su
+       * propia transacción en OTRA conexión, así que cuando el append falla el draft ya existe.
+       * Descartar la respuesta sería mentir en la otra dirección —el draft está, y pagó una
+       * llamada LLM— y callar el hueco reintroduciría exactamente el bug que esta task cierra:
+       * un candidato dentro de un draft que la lente sigue mostrando como "Nuevo".
+       *
+       * La relación es reconstruible desde el `contextRef` que el draft guarda en
+       * `groundingSources`, y reintentar la misma operación repara la fila (el append es
+       * idempotente y el camino deduped también lo escribe).
+       */
+      decisionLogged: boolean
+      /** Presente sólo cuando `decisionLogged === false`. El consumer DEBE mostrarlo. */
+      decisionLogNotice: string | null
     }
   | { ok: false; errorCode: GroundedQueryErrorCode; status: number }
 
@@ -104,6 +122,15 @@ export type GroundedQueryDraftResult =
 export const GROUNDED_QUERY_FALLBACK_NOTICE =
   'Se creó un draft base para revisión. La autoría grounded no estaba disponible; las preguntas no se ' +
   'consideran específicas de estas keywords hasta que se vuelva a generar el draft con el authoring activo.'
+
+/**
+ * TASK-1692 — copy honesto cuando el draft existe pero su decisión no quedó registrada. El
+ * consumer no puede omitirlo: sin él, la lente mostraría el candidato como si nadie lo hubiera
+ * tocado.
+ */
+export const GROUNDED_QUERY_DECISION_LOG_NOTICE =
+  'El draft se creó, pero la decisión no quedó registrada en el historial del candidato. Vuelve a ' +
+  'ejecutar la acción para completarlo: no se creará un draft nuevo ni se volverá a gastar.'
 
 /** Copy de brecha de cobertura (v2): el review decide si regenerar o aprobar con el hueco a la vista. */
 export const GROUNDED_QUERY_COVERAGE_NOTICE =
@@ -165,6 +192,75 @@ const fail = (errorCode: GroundedQueryErrorCode, status: number): GroundedQueryD
   status
 })
 
+/**
+ * TASK-1692 — deja la huella `selected_for_grounded_query` por candidato, dentro de la
+ * transacción del advisory lock.
+ *
+ * Se llama TAMBIÉN en el camino deduped: el append es idempotente por `(candidateId, draftId)`,
+ * así que repetir no apila filas y sí REPARA el caso en que un intento anterior falló.
+ *
+ * Devuelve `false` si alguna fila no se pudo escribir. El caller lo declara en el resultado en
+ * vez de tirar el draft (que ya existe y ya pagó) o de callarlo.
+ */
+const appendGroundedDecisions = async (
+  client: DiscoveryActionClient,
+  input: {
+    organizationId: string
+    candidates: SeoDiscoveryCandidateView[]
+    actor: string
+    draftId: string
+    runId: string
+    groundingMode: 'grounded_llm' | 'baseline_fallback'
+    deduped: boolean
+    contextRef: string
+  }
+): Promise<boolean> => {
+  let allLogged = true
+
+  try {
+    for (const candidate of input.candidates) {
+      const result = await appendDiscoveryActionTx(client, {
+        organizationId: input.organizationId,
+        // El representante de la keyword colapsada (TASK-1694): la decisión es UNA por keyword,
+        // no una por procedencia — escribir N filas contaría una sola decisión N veces.
+        candidateId: candidate.candidateId,
+        actionKind: 'selected_for_grounded_query',
+        actor: input.actor,
+        // Derivada del outcome DURABLE: el mismo candidato en otro draft sí deja su fila; repetir
+        // sobre el mismo draft, no. La clave automática (`candidateId:kind:actor`) las colapsaría.
+        idempotencyKey: `grounded:${input.draftId}:${candidate.candidateId}`,
+        // Todo opaco o de enum cerrado: cero keyword cruda, cero PII, cero prosa del proveedor.
+        metadata: {
+          groundingMode: input.groundingMode,
+          deduped: input.deduped,
+          contextRef: input.contextRef,
+          draftId: input.draftId,
+          runId: input.runId
+        }
+      })
+
+      if (!result.ok) allLogged = false
+    }
+  } catch (error) {
+    // 🔴 Un throw acá NO puede tumbar la respuesta: el draft vive en otra conexión y ya existe.
+    // Dejar propagar el error lo convertiría en `draft_conflict` y le diría al operador que no
+    // pasó nada, cuando ya se pagó una llamada LLM. Se observa y se DECLARA con
+    // `decisionLogged: false`.
+    //
+    // La transacción del lock queda abortada por el error de PG, así que su COMMIT actúa como
+    // ROLLBACK: ninguna fila parcial del lote sobrevive — o se escriben todas, o ninguna. Por
+    // eso el batch entero reporta `false`, no sólo la fila que falló.
+    captureWithDomain(error, 'growth', {
+      tags: { source: 'seo_grounded_query_bridge_decision_log' },
+      extra: { draftId: input.draftId, runId: input.runId, candidateCount: input.candidates.length }
+    })
+
+    allLogged = false
+  }
+
+  return allLogged
+}
+
 export const createGroundedQueryDraft = async (
   input: CreateGroundedQueryDraftInput
 ): Promise<GroundedQueryDraftResult> => {
@@ -221,16 +317,31 @@ export const createGroundedQueryDraft = async (
     return fail('cross_tenant', 404)
   }
 
-  const byId = new Map(discovery.candidates.map(candidate => [candidate.candidateId, candidate]))
+  // 🔴 TASK-1694: el reader colapsa por keyword normalizada, así que un `candidateId` puede ser
+  // CUALQUIERA de las procedencias fusionadas — no sólo la representativa. Indexar sólo por
+  // `candidate.candidateId` dejaría sin resolver una selección legítima hecha sobre la fila que
+  // no quedó de representante.
+  const byId = new Map<string, SeoDiscoveryCandidateView>()
+
+  for (const candidate of discovery.candidates) {
+    for (const provenanceId of candidate.candidateIds) byId.set(provenanceId, candidate)
+  }
 
   // Todos los IDs pedidos deben existir en ESA corrida de ESA org; sin revelar cuál falló.
+  //
+  // Dos ids de la MISMA keyword son una sola intención: se colapsan acá igual que en el reader.
+  // Duplicar la keyword en el contexto le pediría al autor generar dos veces la misma pregunta.
   const selected: SeoDiscoveryCandidateView[] = []
+  const seenKeywords = new Set<string>()
 
   for (const candidateId of candidateIds) {
     const candidate = byId.get(candidateId)
 
     if (!candidate) return fail('candidate_not_found', 404)
 
+    if (seenKeywords.has(candidate.normalizedKeyword)) continue
+
+    seenKeywords.add(candidate.normalizedKeyword)
     selected.push(candidate)
   }
 
@@ -316,17 +427,32 @@ export const createGroundedQueryDraft = async (
           existingDraft.generationStrategy === 'llm' &&
           existingDraft.systemPromptVersion === AUTHOR_SEO_GROUNDED_SYSTEM_PROMPT_VERSION
 
+        const groundingMode = wasGrounded ? ('grounded_llm' as const) : ('baseline_fallback' as const)
+
+        const decisionLogged = await appendGroundedDecisions(client, {
+          organizationId: input.organizationId,
+          candidates: selected,
+          actor: input.createdBy,
+          draftId: existingDraft.setId,
+          runId: input.discoveryRunId,
+          groundingMode,
+          deduped: true,
+          contextRef
+        })
+
         return {
           ok: true as const,
           draft: existingDraft,
-          groundingMode: wasGrounded ? ('grounded_llm' as const) : ('baseline_fallback' as const),
+          groundingMode,
           sourceRefs: existingDraft.groundingSources.filter(source => source.startsWith('seo.discovery.')),
           candidateCount: selected.length,
           authoringStatus: wasGrounded ? ('ok' as const) : ('disabled' as const),
           deduped: true,
           fallbackNotice: wasGrounded ? null : GROUNDED_QUERY_FALLBACK_NOTICE,
           seedCoverage: null,
-          coverageNotice: null
+          coverageNotice: null,
+          decisionLogged,
+          decisionLogNotice: decisionLogged ? null : GROUNDED_QUERY_DECISION_LOG_NOTICE
         }
       }
 
@@ -352,10 +478,23 @@ export const createGroundedQueryDraft = async (
       // huella temática; una brecha se declara para el review, jamás se esconde.
       const seedCoverage = grounded ? computeSeoSeedCoverage(draft.prompts, seoContext) : null
 
+      const groundingMode = grounded ? ('grounded_llm' as const) : ('baseline_fallback' as const)
+
+      const decisionLogged = await appendGroundedDecisions(client, {
+        organizationId: input.organizationId,
+        candidates: selected,
+        actor: input.createdBy,
+        draftId: draft.setId,
+        runId: input.discoveryRunId,
+        groundingMode,
+        deduped: false,
+        contextRef
+      })
+
       return {
         ok: true as const,
         draft,
-        groundingMode: grounded ? ('grounded_llm' as const) : ('baseline_fallback' as const),
+        groundingMode,
         sourceRefs: draft.groundingSources.filter(source => source.startsWith('seo.discovery.')),
         candidateCount: selected.length,
         authoringStatus,
@@ -363,7 +502,9 @@ export const createGroundedQueryDraft = async (
         fallbackNotice: grounded ? null : GROUNDED_QUERY_FALLBACK_NOTICE,
         seedCoverage,
         coverageNotice:
-          seedCoverage && seedCoverage.uncoveredCandidateIds.length > 0 ? GROUNDED_QUERY_COVERAGE_NOTICE : null
+          seedCoverage && seedCoverage.uncoveredCandidateIds.length > 0 ? GROUNDED_QUERY_COVERAGE_NOTICE : null,
+        decisionLogged,
+        decisionLogNotice: decisionLogged ? null : GROUNDED_QUERY_DECISION_LOG_NOTICE
       }
     })
   } catch (error) {

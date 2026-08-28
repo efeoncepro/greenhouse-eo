@@ -107,7 +107,7 @@ vi.mock('../../resolve-target', () => ({
 }))
 
 import { estimateDiscoveryCost } from '../contracts'
-import { previewKeywordDiscovery, queueKeywordDiscovery, recordKeywordDiscoveryAction } from '../queue'
+import { appendDiscoveryActionTx, previewKeywordDiscovery, queueKeywordDiscovery, recordKeywordDiscoveryAction } from '../queue'
 
 const okGate = { allowed: true, tier: 'contracted', allowanceRemaining: 5, budgetRemainingUsd: 40, blockedReason: null }
 
@@ -253,6 +253,24 @@ describe('queueKeywordDiscovery — enqueue transaccional', () => {
     expect(client).toBeDefined()
   })
 
+  it('TASK-1694: el snapshot de la corrida registra la política de inclusión por método', async () => {
+    await queueKeywordDiscovery(baseInput)
+
+    const insert = state.calls.find(call =>
+      call.sql.includes('INSERT INTO greenhouse_growth.seo_keyword_discovery_runs')
+    )
+
+    const methodsJson = insert?.params.find(
+      param => typeof param === 'string' && param.includes('"method"')
+    ) as string
+
+    // Sin la política persistida, una corrida vieja deja de ser interpretable tras un cambio:
+    // nadie sabría si el long-tail sin volumen faltó porque no existía o porque no se compró.
+    expect(JSON.parse(methodsJson)).toEqual([
+      expect.objectContaining({ method: 'keyword_suggestions', volumePolicy: 'all' })
+    ])
+  })
+
   it('auditoría SEO: la key auto derivada cambia con el ciclo mensual (mismo intent, otro mes)', async () => {
     const autoKeyOf = () => {
       const insert = state.calls.find(
@@ -354,7 +372,7 @@ describe('recordKeywordDiscoveryAction — log append-only', () => {
     const first = await recordKeywordDiscoveryAction({
       organizationId: 'org-1',
       candidateId: 'seokdc-1',
-      actionKind: 'selected_for_target',
+      actionKind: 'dismissed',
       actor: 'user-1'
     })
 
@@ -365,11 +383,147 @@ describe('recordKeywordDiscoveryAction — log append-only', () => {
     const second = await recordKeywordDiscoveryAction({
       organizationId: 'org-1',
       candidateId: 'seokdc-1',
-      actionKind: 'selected_for_target',
+      actionKind: 'dismissed',
       actor: 'user-1'
     })
 
     expect(second).toEqual({ ok: true, actionId: 'seokda-existing', deduped: true })
+  })
+
+  describe('TASK-1692 — appendDiscoveryActionTx: el hecho lo escribe el primitive que lo produce', () => {
+    /** Cliente transaccional de juguete con el MISMO shape que un `PoolClient`. */
+    const txClient = () => ({
+      query: async <T extends Record<string, unknown>>(sql: string, params?: unknown[]) => ({
+        rows: (await routeSql(sql, params ?? [])) as T[]
+      })
+    })
+
+    it('escribe por el cliente del caller, jamás por el pool', async () => {
+      state.candidates = [{ candidate_id: 'seokdc-1' }]
+
+      const seen: string[] = []
+
+      const client = {
+        query: async <T extends Record<string, unknown>>(sql: string, params?: unknown[]) => {
+          seen.push(sql)
+
+          return { rows: (await routeSql(sql, params ?? [])) as T[] }
+        }
+      }
+
+      const result = await appendDiscoveryActionTx(client, {
+        organizationId: 'org-1',
+        candidateId: 'seokdc-1',
+        actionKind: 'promoted_to_tracking',
+        actor: 'user-1'
+      })
+
+      expect(result).toEqual({ ok: true, actionId: 'seokda-new', deduped: false })
+      // Si alguna query se hubiera ido por el pool, no estaría en `seen` — y quedaría FUERA de
+      // la transacción del caller, que es exactamente la falla parcial que la task cierra.
+      expect(seen.some(sql => sql.includes('INSERT INTO greenhouse_growth.seo_keyword_discovery_actions'))).toBe(true)
+      expect(seen.some(sql => sql.includes('FROM greenhouse_growth.seo_keyword_discovery_candidates'))).toBe(true)
+    })
+
+    it('🔴 candidato de otra org responde run_not_found también en el camino transaccional', async () => {
+      state.candidates = []
+
+      const result = await appendDiscoveryActionTx(txClient(), {
+        organizationId: 'org-AJENA',
+        candidateId: 'seokdc-1',
+        actionKind: 'promoted_to_tracking',
+        actor: 'user-1'
+      })
+
+      // Anti-oracle: no distingue "no existe" de "no es tuyo".
+      expect(result).toEqual({ ok: false, errorCode: 'run_not_found' })
+    })
+
+    it('es idempotente: la segunda vez resuelve la fila existente sin insertar', async () => {
+      state.candidates = [{ candidate_id: 'seokdc-1' }]
+      state.actionInsertReturns = false
+
+      const result = await appendDiscoveryActionTx(txClient(), {
+        organizationId: 'org-1',
+        candidateId: 'seokdc-1',
+        actionKind: 'promoted_to_tracking',
+        actor: 'user-1',
+        idempotencyKey: 'seokdc-1:kset-1:tracked'
+      })
+
+      expect(result).toEqual({ ok: true, actionId: 'seokda-existing', deduped: true })
+    })
+
+    it('una idempotencyKey explícita gana sobre la derivada automática', async () => {
+      state.candidates = [{ candidate_id: 'seokdc-1' }]
+
+      await appendDiscoveryActionTx(txClient(), {
+        organizationId: 'org-1',
+        candidateId: 'seokdc-1',
+        actionKind: 'promoted_to_tracking',
+        actor: 'user-1',
+        idempotencyKey: 'seokdc-1:kset-1:tracked'
+      })
+
+      const insert = state.calls.find(call =>
+        call.sql.includes('INSERT INTO greenhouse_growth.seo_keyword_discovery_actions')
+      )
+
+      // La clave automática (`candidateId:kind:actor`) es demasiado gruesa para hechos
+      // repetibles: colapsaría dos promociones distintas del mismo actor en UNA fila.
+      expect(insert?.params).toContain('seokdc-1:kset-1:tracked')
+    })
+
+    it('el append participa del rollback del caller: si la tx aborta, no queda fila', async () => {
+      state.candidates = [{ candidate_id: 'seokdc-1' }]
+
+      const applied: string[] = []
+      let rolledBack = false
+
+      const client = {
+        query: async <T extends Record<string, unknown>>(sql: string, params?: unknown[]) => {
+          applied.push(sql)
+
+          return { rows: (await routeSql(sql, params ?? [])) as T[] }
+        }
+      }
+
+      // El caller hace su trabajo, el append entra, y DESPUÉS algo revienta.
+      try {
+        await (async () => {
+          await appendDiscoveryActionTx(client, {
+            organizationId: 'org-1',
+            candidateId: 'seokdc-1',
+            actionKind: 'promoted_to_tracking',
+            actor: 'user-1'
+          })
+
+          throw new Error('el outcome del caller falló después del append')
+        })()
+      } catch {
+        rolledBack = true
+      }
+
+      expect(rolledBack).toBe(true)
+      // El append viajó por el cliente del caller, así que su ROLLBACK lo arrastra: no hay
+      // camino por el que la fila sobreviva a una transacción abortada.
+      expect(applied.some(sql => sql.includes('INSERT INTO greenhouse_growth.seo_keyword_discovery_actions'))).toBe(
+        true
+      )
+    })
+
+    it('recordKeywordDiscoveryAction sigue siendo el wrapper del pool con el MISMO contrato', async () => {
+      state.candidates = [{ candidate_id: 'seokdc-1' }]
+
+      const result = await recordKeywordDiscoveryAction({
+        organizationId: 'org-1',
+        candidateId: 'seokdc-1',
+        actionKind: 'dismissed',
+        actor: 'user-1'
+      })
+
+      expect(result).toEqual({ ok: true, actionId: 'seokda-new', deduped: false })
+    })
   })
 
   it('candidate_does_not_track: registrar una acción JAMÁS escribe seo_keyword_set_members', async () => {

@@ -9,6 +9,42 @@ Documento maestro del módulo SEO. Contrato técnico + de negocio del que deriva
 
 ---
 
+## Delta 2026-08-28 — el carril de competencia y contexto de SERP está VIVO en producción (release `c983be7f18e6`)
+
+El paso a producción `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208,
+`release_id` `c983be7f18e6-92b1b327-a1c9-4e7a-85dc-6a5e300f4e32`, manifiesto `released`, run
+`33178544139`) llevó a `main` el trabajo de `TASK-1696` (dimensión de consumidor del ledger),
+`TASK-1662` (gap competitivo) y `TASK-1699` (top-N del SERP). El estado se declara **por runtime**,
+porque decir «el flag está ON» sin nombrar en cuál de los 5 runtimes es exactamente el error que
+este documento existe para evitar.
+
+**Migraciones (4) — aplicadas en la instancia única Cloud SQL `greenhouse-pg-dev`** (verificado con
+`pnpm pg:connect:status` → `No migrations to run!`): `20260828015655472_task-1696-seo-provider-spend-consumer-dimension`
+· `20260828020728716_task-1696-seo-provider-spend-cost-basis-in-key`
+· `20260828113457119_task-1662-seo-competitor-gap-foundation`
+· `20260828124352232_task-1699-seo-serp-top-results`.
+
+| Flag | Runtime donde SE LEE | Estado real 2026-08-28 |
+|---|---|---|
+| `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` (TASK-1699) | **dual-runtime**: `ops-worker` (escritura del top-N dentro del rank capture) + Vercel (lectura de lanes) | **ON en los dos.** Worker desde antes del release (revisión `ops-worker-00610-kc8`); Vercel `Production` prendido **con** este release + redeploy obligatorio `greenhouse-aj0ng1mfw` |
+| `GROWTH_SEO_COMPETITOR_GAP_ENABLED` (TASK-1662) | **sólo `ops-worker`** — en Vercel es **inerte** | **ON y vivo** en el worker. Scheduler `ops-seo-competitor-coverage` **ENABLED** |
+| `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED` + `..._ENFORCED` (TASK-1696) | dual (Vercel + `ops-worker`) | **OFF por diseño, ambos.** No se prendieron con este release y no deben prenderse sin decisión explícita del operador tras un ciclo mensual de shadow |
+
+🔴 **Vercel congela las env vars al crear el build**: prender el flag no basta. Por eso el
+`vercel env add … production` (el nombre del entorno va en **minúscula**) viene acompañado del
+redeploy `greenhouse-aj0ng1mfw`, y la verificación es contra el **runtime**, nunca contra la env
+var: el canary del lane `serp-top-results` contra `https://greenhouse.efeoncepro.com` devolvió
+`serp-top-results read: {"ok":true,…,"rows":[]}` — `ok:true`, **no** `disabled`. El array vacío es
+lo esperado y no es un fallo: **el día 1 de la serie es el 2026-08-29** (cron `ops-seo-rank-capture`,
+05:00 CLT) y la serie **no es backfilleable**.
+
+Los 4 lanes internal-only nuevos responden `ok` contra producción, con `404` anti-oracle en el deny
+(`provider-spend` · `keyword-gap` · `serp-top-results` · `competitor-candidates`).
+
+**Primera corrida real de cobertura competitiva** (Berel MX, 1 competidor declarado
+`comex.com.mx`): **USD 0,1076**, con gap medido de **357 `content_gap` / 54 `ranks_worse` / 269
+excluidas** por tener impresiones medidas en GSC.
+
 ## Delta 2026-08-27 — tier `prospect`: el módulo aprende a hablarle a quien no firmó (TASK-1709)
 
 El SEO gana su carril de ADQUISICIÓN: `runProspectDiagnostic` corre un diagnóstico ÚNICO sobre
@@ -227,9 +263,9 @@ Se envuelven en una sola narrativa de producto: **Search Visibility 360** = los 
 
 - `seo_url_visibility_snapshots` — el hecho de **sujeto-página** (TASK-1776, migración `20260827194219636`; append-only). Lo que Semrush vende como `url_research`/`subdomain_research`/`subfolder_research` es en DataForSEO **UN endpoint** (`ranked_keywords`) con el `target` cambiado: por eso hay UNA tabla con `subject_kind` bajo **CHECK cerrado** (`domain|subdomain|subfolder|url`) y un **resolver de sujeto** (`url-visibility/resolve-subject.ts`) — la clase se **DECLARA, jamás se infiere**, y la normalización (esquema/www/trailing-slash/query fuera de la clave) va PRIMERO porque la clave única `(subject_kind, normalized_subject, location_code, language_code, capture_date)` — **sin organización**, mismo contrato multi-productor — depende de ella. Tres productores comparten `persistUrlVisibilitySnapshots`: la captura directa (`ranked_keywords`; cron `ops-seo-url-visibility` día 17, flag `GROWTH_SEO_URL_VISIBILITY_ENABLED` **sólo ops-worker**, sobre target + competidores), `relevant_pages` (cada página → fila `url`) y `subdomains` (cada subdominio → fila `subdomain`), ambos on-demand. La **foto sale del agregado `metrics` del proveedor** (cubre el set COMPLETO del sujeto, independiente del `limit`); el `limit` (knob `GROWTH_SEO_URL_VISIBILITY_ROW_LIMIT`, default 100) acota sólo el detalle `top_keywords` JSONB y es la **palanca de costo**. 🔴 Gotchas verificados contra la doc oficial (2026-08-27): una URL como `target` va **CON esquema** (sin él el proveedor devuelve el dominio entero y lo cobra); la subcarpeta no tiene target nativo — host + filtro server-side `ranked_serp_element.serp_item.relative_url` (gratis). 🔴 **Tercer productor del mercado**: el `keyword_data.keyword_info` viene inline **ya pagado** en cada fila y se escribe en `seo_keyword_market_data` vía `persistKeywordMarketData` con **costo 0** + pre-check `loadFreshMarketKeywords` (la migración expandió su CHECK de `source_endpoint` con `ranked_keywords`). Reader canónico `readUrlVisibility` + `readVisibilityConcentration`: lens `estimated` + `capturedAt`, `no_market_data` sin ceros, posición ◑ **jamás** promediada con la posición ● de GSC (una es la posición exacta en una SERP concreta; la otra, un promedio ponderado por impresiones).
 
-- `seo_competitors` (+ autoría TASK-1662, migración `20260828113457119`) · `seo_competitor_coverage_runs` · `seo_competitor_keyword_coverage` — el **gap competitivo** (TASK-1662). Un competidor es una **CLASIFICACIÓN CON AUTOR**, nunca una inferencia: `declared_by/at/source` acoplados por CHECK (vocabulario `operator_ui|nexa|mcp|seed|backfill`), `proposal_ref` **OPACA** cuando la declaración confirma una propuesta de máquina (top-N de TASK-1699, prospect de TASK-1709) — propone la máquina, declara el humano. Retirar cierra la vigencia (`clock_timestamp()`, jamás `NOW()`) con `retired_by` obligatorio (CHECK). Commands canónicos `declareCompetitors`/`retireCompetitors` (`competitors.ts`): **compromiso de gasto diferido** clase `trackKeywords` — techo `GROWTH_SEO_COMPETITORS_PER_TARGET` (default 5) contra conteo proyectado, outcome por ítem, reverso mismo PR, outbox `growth.seo.competitor.{declared,retired}` en la misma tx; el dominio del propio cliente es `invalid`. La **cobertura** (`competitor-coverage.ts`, flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED` **sólo ops-worker**, cron `ops-seo-competitor-coverage` día 18 nacido PAUSADO, V1 `maxCompetitors=1`) compra `labs/google/domain_intersection` ×2 (target1=COMPETIDOR, target2=cliente; `intersections:false` → cliente ausente, `:true` → ambos ranquean; `include_serp_info` para las SERP features; row limit knob `GROWTH_SEO_COMPETITOR_COVERAGE_ROW_LIMIT` default 500 ≈ USD 0,15/competidor/ciclo) y persiste **INSUMOS fechados**, con **run ledger** como veredicto + ancla de frescura (un `captured` con 0 filas de gap es un hecho, no un hueco re-comprable — invariante TASK-1661; un `failed` no consume la ranura del día) y el `keyword_data` inline al mercado compartido (**productor #4**, costo 0). 🔴 **El GAP NO SE PERSISTE: se deriva al leer** (`readKeywordGap`, `keyword-gap-reader.ts`) — persistirlo lo congela y envejece sin señal. El reader: **excluye** toda keyword con impresiones GSC en 28 días (● gana sobre ◑ también al ordenar, `excluded.measuredInGsc` declarado); separa `content_gap` (cliente ausente → contenido nuevo) de `ranks_worse` (optimización) de `declaredTargets` (compromiso TASK-1659 con fecha — jamás un "hallazgo"); expone factores con procedencia (`searchVolume`/`cpcUsd`/`linkBarrier` vía `deriveLinkBarrier` + `marketAsOf`; `serpFeatures` como LISTA + `aiOverviewPresent`; `attainablePositionBand` derivada SOLO de la barrera, mapa puro `link_barrier_v1`) con `sin_dato` explícito; y 🔴 **NO devuelve orden propio** — listas alfabéticas neutrales, techo declarado en `truncated`; la cola de TASK-1700 es la autoridad de orden y ancla su `evidence_ref` opaco en `seo:competitor_gap:<coverage_run_id>`. Lanes: admin (`/api/admin/growth/seo/{competitors,keyword-gap}`, `target.configure`/`observation.read`) · ecosystem (writes sólo bindings `internal`; el gap **sólo-internal con 404 anti-oracle** — la comparativa competitiva NUNCA es client-facing, auditoría §7) · MCP `declare_seo_competitors`/`retire_seo_competitors` (scope `efeonce.mcp.seo.write` existente) + `get_seo_keyword_gap`. Señal `seo.competitor_coverage.stale` (pre-rollout honesto). Sanity 22/22 contra PG real (`_sanity-task-1662-keyword-gap.ts`).
+- `seo_competitors` (+ autoría TASK-1662, migración `20260828113457119`) · `seo_competitor_coverage_runs` · `seo_competitor_keyword_coverage` — el **gap competitivo** (TASK-1662). Un competidor es una **CLASIFICACIÓN CON AUTOR**, nunca una inferencia: `declared_by/at/source` acoplados por CHECK (vocabulario `operator_ui|nexa|mcp|seed|backfill`), `proposal_ref` **OPACA** cuando la declaración confirma una propuesta de máquina (top-N de TASK-1699, prospect de TASK-1709) — propone la máquina, declara el humano. Retirar cierra la vigencia (`clock_timestamp()`, jamás `NOW()`) con `retired_by` obligatorio (CHECK). Commands canónicos `declareCompetitors`/`retireCompetitors` (`competitors.ts`): **compromiso de gasto diferido** clase `trackKeywords` — techo `GROWTH_SEO_COMPETITORS_PER_TARGET` (default 5) contra conteo proyectado, outcome por ítem, reverso mismo PR, outbox `growth.seo.competitor.{declared,retired}` en la misma tx; el dominio del propio cliente es `invalid`. La **cobertura** (`competitor-coverage.ts`, flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED` **sólo ops-worker** —en Vercel es inerte—, **ON y vivo desde el 2026-08-28**; cron `ops-seo-competitor-coverage` día 18, nacido PAUSADO y **ENABLED desde el 2026-08-28** (release `c983be7f18e6`), V1 `maxCompetitors=1`) compra `labs/google/domain_intersection` ×2 (target1=COMPETIDOR, target2=cliente; `intersections:false` → cliente ausente, `:true` → ambos ranquean; `include_serp_info` para las SERP features; row limit knob `GROWTH_SEO_COMPETITOR_COVERAGE_ROW_LIMIT` default 500 ≈ USD 0,15/competidor/ciclo) y persiste **INSUMOS fechados**, con **run ledger** como veredicto + ancla de frescura (un `captured` con 0 filas de gap es un hecho, no un hueco re-comprable — invariante TASK-1661; un `failed` no consume la ranura del día) y el `keyword_data` inline al mercado compartido (**productor #4**, costo 0). 🔴 **El GAP NO SE PERSISTE: se deriva al leer** (`readKeywordGap`, `keyword-gap-reader.ts`) — persistirlo lo congela y envejece sin señal. El reader: **excluye** toda keyword con impresiones GSC en 28 días (● gana sobre ◑ también al ordenar, `excluded.measuredInGsc` declarado); separa `content_gap` (cliente ausente → contenido nuevo) de `ranks_worse` (optimización) de `declaredTargets` (compromiso TASK-1659 con fecha — jamás un "hallazgo"); expone factores con procedencia (`searchVolume`/`cpcUsd`/`linkBarrier` vía `deriveLinkBarrier` + `marketAsOf`; `serpFeatures` como LISTA + `aiOverviewPresent`; `attainablePositionBand` derivada SOLO de la barrera, mapa puro `link_barrier_v1`) con `sin_dato` explícito; y 🔴 **NO devuelve orden propio** — listas alfabéticas neutrales, techo declarado en `truncated`; la cola de TASK-1700 es la autoridad de orden y ancla su `evidence_ref` opaco en `seo:competitor_gap:<coverage_run_id>`. Lanes: admin (`/api/admin/growth/seo/{competitors,keyword-gap}`, `target.configure`/`observation.read`) · ecosystem (writes sólo bindings `internal`; el gap **sólo-internal con 404 anti-oracle** — la comparativa competitiva NUNCA es client-facing, auditoría §7) · MCP `declare_seo_competitors`/`retire_seo_competitors` (scope `efeonce.mcp.seo.write` existente) + `get_seo_keyword_gap`. Señal `seo.competitor_coverage.stale`. Primera corrida real 2026-08-28 (Berel MX vs `comex.com.mx`): **USD 0,1076**, gap de 357 `content_gap` / 54 `ranks_worse` / 269 excluidas por GSC medido. Sanity 22/22 contra PG real (`_sanity-task-1662-keyword-gap.ts`).
 
-- `seo_serp_top_results` — el **top-N del SERP ya pagado** (TASK-1699, migración `20260828124352232`; append-only ESTRICTO: trigger anti UPDATE/DELETE y GRANTs sólo SELECT+INSERT — más estricta que sus hermanas). Cada corrida diaria de rank capture compra el SERP completo (`depth 20` × `load_async_ai_overview`) y `parseSerpRankObservation` descartaba ~19 de 20 filas; su hermano `parseSerpTopResults` (`serp-top-results.ts`) persiste TODAS con **costo marginal CERO** (test de no-regresión sobre `buildSerpTask`: mismos campos, mismo depth). 🔴 **La ranura es `rank_absolute`, NUNCA `rank_group`** (se repite entre bloques; con `DO NOTHING` la colisión descarta filas EN SILENCIO — se guardan ambas posiciones, la clave es la absoluta). UNIQUE `(seo_target_id, keyword, engine, device, capture_date, rank_absolute)`. La escritura viaja **en la misma transacción** que el snapshot de rank de esa keyword (no existe día con snapshot y sin contexto), con fallback observado que JAMÁS pierde la medición pagada si el writer del top-N falla. Flag `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` **dual-runtime** (ops-worker = escritura en el batch; Vercel = lectura de lanes) y — a diferencia de sus hermanos de gasto — ON y VIVO en el worker desde el 2026-08-28 (revisión `ops-worker-00610-kc8`; día 1 de la serie: 2026-08-29): **cada día apagado pierde para siempre el top-N de ese día** (~620 observaciones/día; no hay backfill posible). Readers: `readSerpTopResults` (serie con `hasMore` declarado) y `readSerpCompetitorCandidates` (`competitor-discovery.ts`): candidatos por recurrencia medida — umbrales VERSIONADOS (30d / 3 keywords / 5 días), excluye `is_own_domain` y todo `item_type` no orgánico, cada candidato con evidencia + `alreadyDeclared` + `proposalRef` sugerido. **Propone; NO declara**: el execute es `declareCompetitors` (TASK-1662) tras confirmación humana. Sin outbox NI proyección reactiva (declarado: la tabla ES el histórico; el descubrimiento se consulta a demanda). Lanes sólo-internal 404 anti-oracle (§7: dato competitivo, jamás client-facing) + tools MCP `get_seo_serp_top_results`/`get_seo_competitor_candidates`. Señal `seo.serp_top_results.coverage` (día con snapshot y sin top-N = pérdida irrecuperable). Retención: SIN política todavía, declarado — disparador explícito: 5M filas o 500 ms en la query de recurrencia (probable archivo a BQ, NUNCA borrar). Sanity 9/9 contra PG real con rollback transaccional (cero residuo).
+- `seo_serp_top_results` — el **top-N del SERP ya pagado** (TASK-1699, migración `20260828124352232`; append-only ESTRICTO: trigger anti UPDATE/DELETE y GRANTs sólo SELECT+INSERT — más estricta que sus hermanas). Cada corrida diaria de rank capture compra el SERP completo (`depth 20` × `load_async_ai_overview`) y `parseSerpRankObservation` descartaba ~19 de 20 filas; su hermano `parseSerpTopResults` (`serp-top-results.ts`) persiste TODAS con **costo marginal CERO** (test de no-regresión sobre `buildSerpTask`: mismos campos, mismo depth). 🔴 **La ranura es `rank_absolute`, NUNCA `rank_group`** (se repite entre bloques; con `DO NOTHING` la colisión descarta filas EN SILENCIO — se guardan ambas posiciones, la clave es la absoluta). UNIQUE `(seo_target_id, keyword, engine, device, capture_date, rank_absolute)`. La escritura viaja **en la misma transacción** que el snapshot de rank de esa keyword (no existe día con snapshot y sin contexto), con fallback observado que JAMÁS pierde la medición pagada si el writer del top-N falla. Flag `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` **dual-runtime** (ops-worker = escritura en el batch; Vercel = lectura de lanes) y — a diferencia de sus hermanos de gasto — ON y VIVO en **los dos** runtimes desde el 2026-08-28: worker (revisión `ops-worker-00610-kc8`, escritura) y Vercel `Production` con el release `c983be7f18e6` + redeploy `greenhouse-aj0ng1mfw` (lectura), verificado en el runtime con canary contra producción `ok:true` — no `disabled`; día 1 de la serie: 2026-08-29: **cada día apagado pierde para siempre el top-N de ese día** (~620 observaciones/día; no hay backfill posible). Readers: `readSerpTopResults` (serie con `hasMore` declarado) y `readSerpCompetitorCandidates` (`competitor-discovery.ts`): candidatos por recurrencia medida — umbrales VERSIONADOS (30d / 3 keywords / 5 días), excluye `is_own_domain` y todo `item_type` no orgánico, cada candidato con evidencia + `alreadyDeclared` + `proposalRef` sugerido. **Propone; NO declara**: el execute es `declareCompetitors` (TASK-1662) tras confirmación humana. Sin outbox NI proyección reactiva (declarado: la tabla ES el histórico; el descubrimiento se consulta a demanda). Lanes sólo-internal 404 anti-oracle (§7: dato competitivo, jamás client-facing) + tools MCP `get_seo_serp_top_results`/`get_seo_competitor_candidates`. Señal `seo.serp_top_results.coverage` (día con snapshot y sin top-N = pérdida irrecuperable). Retención: SIN política todavía, declarado — disparador explícito: 5M filas o 500 ms en la query de recurrencia (probable archivo a BQ, NUNCA borrar). Sanity 9/9 contra PG real con rollback transaccional (cero residuo).
 
 **Decisión temporal:** snapshots = event rows append-only keyed por `capture_date` (mediciones, no supersede). Config = membership append-only con `effective_from/to` (términos). Reads temporales: `ORDER BY capture_date DESC` sobre la ventana caliente; índice compuesto `(seo_target_id, keyword, capture_date DESC)`.
 
@@ -314,11 +350,13 @@ agregó `declare_seo_competitors` / `retire_seo_competitors` (writes) + `get_seo
 (reads), las 27 federadas en el código de `efeonce-mcp`. Desplegado en la revisión productiva del
 gateway: **21** — la revisión activa `efeonce-mcp-gateway-00023-zt2` (2026-08-27) llevó el deploy
 de `TASK-1658`, así que la cifra de 13 que este doc declaraba quedó vencida por un deploy entero.
-Las 6 restantes (`get_seo_provider_spend` + las tres de `TASK-1662` + las dos de `TASK-1699`)
-llegan **después** del release `develop`→`main`: sus lanes (`provider-spend`,
-`competitors/{declare,retire}`, `keyword-gap`, `serp-top-results`, `competitor-candidates`)
-todavía no están en `main`, y desplegar el gateway antes las dejaría respondiendo
-404 upstream con el guard de paridad en verde (precedente `TASK-1661`).
+El bloqueo que este párrafo declaraba —«sus lanes todavía no están en `main`»— **ya no aplica**:
+el release `c983be7f18e6` (2026-08-28) llevó los 6 lanes (`provider-spend`,
+`competitors/{declare,retire}`, `keyword-gap`, `serp-top-results`, `competitor-candidates`) a
+producción, y los 4 internal-only responden `ok` con `404` anti-oracle en el deny. Desplegar el
+gateway **antes** de ese release las habría dejado respondiendo 404 upstream con el guard de
+paridad en verde (precedente `TASK-1661`); el estado desplegado del gateway se rastrea en su propia
+doc (manual del MCP §8), no acá.
 
 **Delta 2026-08-07 (TASK-1308) — el lane SEO deja de ser sólo lectura.** `keywords/track` y
 `keywords/untrack` son sus **dos primeros commands**: van por `runEcosystemCommandRoute`, no por el
@@ -349,6 +387,124 @@ cablea al cliente público compartido"; el camino correcto es `TASK-1631`).
 - `queueSiteAudit(targetId, actor)` (async OnPage task)
 - `createGroundedQueryDraft(input)` / `readGroundedQueryDraft(input)` — **IMPLEMENTADOS (TASK-1666, 2026-08-14)** en `src/lib/growth/seo/grounded-query-{bridge,reader}.ts`: el puente gobernado candidatos de discovery → **DRAFT** de grounded queries AEO. Contratos duros: el bridge es un ADAPTER (lee candidatos SOLO por `readKeywordDiscovery` con el filtro `candidateIds`; cero SQL/JOIN/FK cross-motor — boundary §1.1); el brand context es el AUTORIZADO server-side (`grader_profiles` + brand intelligence, jamás del caller); doble capability (`growth.seo.observation.read` + `growth.ai_visibility.prompt_set.manage`); ≤20 candidates, sin duplicados, estados permitidos (`new`/`selected_for_grounded_query` — `dismissed` exige re-selección); `contextRef` = SHA-256 del JSON canónico exacto de la spec; refs OPACAS en `grounding_sources_json` (`seo.discovery.{run,candidate,context}:…`, jamás la keyword); **honestidad del grounding**: `grounded_llm` sólo si la autoría usó el contexto (cerebro versionado aparte `aeo-author.seo-grounded.v2` — v2 2026-08-14 post-auditoría AEO: cobertura obligatoria por seed verificada determinísticamente (`computeSeoSeedCoverage` → `seedCoverage`/`coverageNotice` en el resultado), sanitizer normaliza competidor literal a `{{competitor}}` y una marca literal fuerza `namesBrand=true`, pisos de distribución grounded (≥50% discovery + 4 fanOutTypes, degenerado → fallback honesto); `aeo-author.v1` queda byte-a-byte intacto sin contexto), fallback = `baseline_fallback` + aviso obligatorio + `groundingRef='baseline_not_candidate_specific'`; idempotencia por contexto + modo esperado con `pg_advisory_xact_lock` en conexión fijada (un baseline previo NO bloquea re-generar grounded); **el bridge SÓLO crea draft** — `approveGraderPromptSet` (AEO) sigue siendo la única vía a `active` y jamás se dispara un run. Parity en el mismo PR: route admin `POST/GET /api/admin/growth/seo/grounded-queries`, lane ecosystem `grounded-queries` (GET/POST, **sólo bindings `internal`**), MCP `get_seo_grounded_query_draft` + `prepare_seo_grounded_queries` (write bajo `efeonce.mcp.seo.write`; con la identidad máquina compartida el write queda **`aeo_forbidden` fail-closed hasta TASK-1631** — la capability humana de prompt sets no se fabrica para la máquina). Sanity live: `scripts/growth/_sanity-task-1666-grounded-query-bridge.ts` (16/16 con autoría real; eval humana de naturalidad incluida).
 - `queueKeywordDiscovery(input)` / `previewKeywordDiscovery(input)` / `recordKeywordDiscoveryAction(input)` — **IMPLEMENTADOS (TASK-1664, 2026-08-14)** en `src/lib/growth/seo/keyword-discovery/queue.ts`, con el reader `readKeywordDiscovery(input)` en `keyword-discovery/reader.ts` y el runner async (`runKeywordDiscovery`/`drainKeywordDiscoveryRuns`) en `keyword-discovery/runner.ts`. La corrida separa la SOLICITUD (run `pending` + outbox en una tx, seeds resueltas server-side desde `manual | gsc_queries | tracked_keywords | target_domain | mixed`, máx 10) de sus RESULTADOS (candidatos con SOLO procedencia — la métrica va al store de 1661) y de las DECISIONES (`seo_keyword_discovery_actions`, append-only, jamás trackea por sí sola). Preview con **fórmula** de costo, no sólo un número; `methods: []` es una corrida GSC-only válida con costo CERO (valida el pipeline sin gastar). El reader compone en memoria mercado ◑ (vía `readKeywordMarketData`, nunca SQL directo) + GSC ● (`measuredGsc`, lente SEPARADA) + `alreadyTracked` + última acción, con el orden por defecto de 7 llaves (acción pendiente → match de seed → core_keyword → volumen desc → dificultad asc → captured_at desc → id). Full API Parity en el mismo PR: route admin `POST/GET /api/admin/growth/seo/keyword-discovery` (capabilities `growth.seo.target.configure` para escribir / `observation.read` para leer), lane ecosystem `GET/POST /api/platform/ecosystem/growth/seo/keyword-discovery` (+`/actions`; write sólo bindings `internal`), MCP tools `get_seo_keyword_discovery` + `discover_seo_keywords` (write bajo `efeonce.mcp.seo.write`; su description exige preview + confirmación humana ANTES de encolar) y parity test `keyword-discovery-parity.test.ts`. Sanity PG real: `scripts/growth/_sanity-task-1664-keyword-discovery.ts` (27 checks, transacción abortada + smoke `--spend`).
+
+  **Delta TASK-1694 (2026-08-28) — el contrato de candidatos decide con la barrera correcta, una
+  fila por keyword y una política de inclusión declarada.** Sin migración, sin flag y sin
+  capability nueva: cambia el contrato de lectura y el payload de dos adapters.
+
+  - 🔴 **Un candidato es UNA KEYWORD NORMALIZADA, no una fila de procedencia.** `readKeywordDiscovery`
+    colapsa por `normalizedKeyword` (representante = menor `sourceRank`, desempate `candidateId`
+    asc) y expone `candidateIds[]` + `provenance[]`; `totalCandidates` cuenta keywords distintas y
+    `latestAction` es la más reciente entre todas las procedencias fusionadas. La keyword —no la
+    fila— es la unidad que se puntúa, la que recibe `evidence_ref` y la que un humano decide, **en
+    los cuatro consumers**. Es contrato del reader, no convención de la UI: ningún consumer aguas
+    abajo puede tratar una procedencia como candidato propio, porque en el aggregate append-only
+    de `TASK-1700` eso persiste la misma decisión hasta cuatro veces con cuatro compromisos de
+    gasto sobre una sola intención. La fila en base y el constraint de procedencia no se tocan.
+  - 🔴 **`maxDifficulty` se acepta, NO se aplica y se declara.** El contrato devuelve siempre
+    `ignoredFilters[]` (`[]` cuando no aplica) y el filtro canónico de dificultad es
+    `maxLinkBarrier` (`low|medium|high`, sobre el `linkBarrier` de `deriveLinkBarrier`) con
+    `includeUnknownBarrier` (default `false`). "Sin dato" —`unknown` o sin fila de mercado— nunca
+    satisface un filtro de barrera. Deprecar sin romper es deliberado: tres consumers vivos ya lo
+    mandan, y entre devolver de más declarándolo o devolver el subconjunto equivocado en silencio,
+    el contrato elige lo primero. Medido contra el store real: **764 de 923 filas tienen
+    `keyword_difficulty = 0`**, así que en es-LATAM el filtro no discriminaba nada.
+  - **`clusterConflict` es señal propia, separada de `alreadyTracked` y nunca derivada de ella:**
+    `conflict` cuando otra keyword vigente distinta del target comparte el core del candidato
+    (`trackedMembers` nombra hasta 5 + `trackedMemberCount`), `clear` cuando se pudo descartar,
+    `unknown` cuando no se pudo saber. Se deriva al leer con UNA lectura más de
+    `readKeywordMarketData` sobre el set seguido y **cero llamadas al proveedor**; no se persiste
+    (persistirla la congelaría y envejecería sin aviso). 🔴 **El core EFECTIVO es
+    `core_keyword ?? la keyword misma`**: `core_keyword` identifica la canónica del clúster, así
+    que el proveedor no lo emite cuando la keyword ya ES la canónica — 527 nulos, 396 apuntando a
+    otra y **cero autorreferentes** en las 923 filas del store. Leer el `NULL` como "no se sabe"
+    perdía la colisión más probable (el candidato variante contra la canónica ya seguida) y la
+    reportaba como `unknown`. El único estado ciego es **no tener fila de mercado**.
+  - **Una sola política de inclusión, declarada.** Los cuatro adapters de expansión compran con
+    `SEO_DISCOVERY_DEFAULT_VOLUME_POLICY = 'all'`: `keyword_suggestions` y `keyword_ideas` dejan
+    de mandar `filters: [['keyword_info.search_volume','>',0]]`. El proveedor cobra por fila
+    devuelta y `limit` ya acota las filas, así que el filtro **no bajaba el techo de costo** —
+    cambiaba qué filas se compraban por el mismo precio, y en un mercado ralo gastaba el `limit`
+    descartando el long-tail emergente. La corrida persiste `volumePolicy` por método en
+    `methods_json`; una corrida anterior sin el campo se lee con el default **histórico**
+    (`positive_volume_only` para suggestions/ideas, `all` para related/site) — el reader reproduce
+    la historia, no la reescribe.
+  - **Federación en el MISMO PR:** route admin, lane ecosystem y tool MCP `get_seo_keyword_discovery`
+    parsean `maxLinkBarrier`/`includeUnknownBarrier` con el vocabulario cerrado y hacen passthrough
+    de `ignoredFilters`; el gateway `efeonce-mcp` actualiza espejo de inventario, schema,
+    descripción y canary (commit local, deploy con el próximo release del gateway).
+  - Verificación runtime (sólo lectura, PG real, 2026-08-28): `maxDifficulty=20` NO reduce el
+    conjunto (10 → 10) y viaja declarado; `maxLinkBarrier=medium` deja 8 (excluye las 2 de barrera
+    Alta que el filtro viejo dejaba pasar); `clusterConflict` marca `pintura` contra la ya seguida
+    `pinturas` (mismo core) en `seot-berel-mx`; dos lecturas idénticas devuelven el mismo
+    representante y orden. **El caso de fusión no existe todavía en datos reales** (una sola
+    corrida productiva, 10 candidatos de un solo método): el colapso es preventivo y llega antes
+    del primer snapshot de `TASK-1700`, que es exactamente su razón de ser.
+
+  **Delta TASK-1692 (2026-08-28) — el ledger de decisiones lo escribe el primitive que produce el
+  hecho, jamás el consumer.** Sin migración, sin flag, sin capability nueva.
+
+  - 🔴 **La regla.** Si un command produce un outcome que el ledger debe recordar, la fila se
+    escribe DENTRO de ese command y de su transacción. Un consumer que encadena un `record_action`
+    para "reportar" lo que ya pasó es la forma de que el ledger mienta el día que la segunda
+    llamada falle: entre la llamada que produce el outcome y la que lo registra hay una red, y
+    cuando se cae queda el compromiso de gasto hecho y la decisión sin autor. Con tres consumers
+    (UI, Nexa, lane MCP) y dos kinds son seis lugares donde la disciplina puede fallar; el séptimo
+    es el consumer que se escriba el año que viene. Full API Parity deja de ser un checklist por
+    consumer y pasa a ser una propiedad estructural.
+  - **Quién escribe cada `action_kind`:**
+
+    | Kind | Writer | Transacción |
+    |---|---|---|
+    | `dismissed`, `rejected` | consumer, vía `record_action` — decisión HUMANA pura | propia |
+    | `selected_for_grounded_query` | `createGroundedQueryDraft` (+ re-selección humana explícita, `metadata.reason='reselected'`) | la del advisory lock del bridge |
+    | `promoted_to_tracking` | `applyKeywordTracking` | **la misma que abre la membresía** |
+
+    Los dos lanes validan contra `SEO_DISCOVERY_CONSUMER_ACTION_KINDS`, así que
+    `promoted_to_tracking` **no es escribible desde afuera**. El guard vive en runtime, no sólo en
+    un test.
+  - **`selected_for_target` quedó RETIRADO del enum TS**, con el `CHECK` de la base intacto (una
+    fila histórica debe seguir siendo legible). No tenía writer y no podía tenerlo: la intención
+    (`target|opportunity`) es un atributo de la MEMBRESÍA con autor y fecha (TASK-1659), así que un
+    candidato que no se sigue no puede tener intención declarada. "Declarar objetivo" ES
+    `trackKeywords` con `intent: 'target'`, y su hecho se registra como `promoted_to_tracking` con
+    `metadata.intent`. Conservarlo no era neutro: `record_action` aceptaba cualquier kind del enum,
+    o sea que quedaba una puerta para escribir —y pintar— un estado de negocio que ningún command
+    produjo.
+  - **Grados de atomicidad, declarados sin adornos.** Los dos caminos NO tienen la misma garantía:
+
+    | Camino | Garantía | Residuo |
+    |---|---|---|
+    | Tracking | **Atómica**: o hay membresía y fila, o no hay ninguna | ninguno |
+    | Grounded | El draft se escribe en OTRA conexión (`authorGraderPromptSetDraft`) | el draft puede existir sin la fila |
+
+    El residuo grounded se DECLARA (`decisionLogged: false` + `decisionLogNotice`), nunca se
+    resuelve en silencio ni tumba la respuesta: el draft ya existe y ya pagó una llamada LLM, así
+    que devolver error diría que no pasó nada. El append es idempotente y **el camino deduped
+    también escribe**, así que repetir la acción repara la fila sin crear un draft nuevo.
+  - **Procedencia de discovery en el camino de tracking:** `TrackKeywordsOptions.discoveryProvenance`
+    (opcional) ata keyword → candidato → corrida. Responde la pregunta que ningún otro store
+    contesta —*esta membresía nació de ESTE candidato, decidida por ESTA persona*— y **no** es un
+    segundo almacén de "esta keyword se está midiendo": eso lo sigue diciendo
+    `seo_keyword_set_members`, y `alreadyTracked` sigue derivando de ahí. Fila sólo para `tracked`,
+    `already_tracked` e `intent_changed`; **cero** para `capacity_exceeded` e `invalid` (no hubo
+    promoción). Una procedencia que no se puede probar falla CERRADA
+    (`invalid_discovery_provenance`, validada antes de abrir la transacción): una membresía
+    atribuida a un candidato inverificable sería atribución cross-tenant en un log de auditoría.
+  - **Supersede la decisión de TASK-1665 Slice 4** ("seguir/declarar NO escribe además una fila")
+    quitándole sus dos premisas: no es un segundo almacén del mismo hecho, y sí hay transacción —
+    que era justo la objeción. Esa decisión era correcta **para un writer que vive en la UI**.
+  - **Efecto visible sin cambio de UI:** el candidato pasa a mostrar su estado real tras cada
+    acción, y el inbox deja de poner arriba lo ya resuelto (antes un candidato promovido no dejaba
+    fila y encabezaba la lista como lo más pendiente que había).
+  - **Sin backfill, a propósito:** no se puede reconstruir con honestidad quién decidió qué antes de
+    que el writer existiera; inventar `actor` y `created_at` sería fabricar autoría en un log de
+    decisiones. Verificado: el ledger estaba **vacío** (0 filas) al momento del cambio.
+  - Verificación runtime contra PG real, en transacciones que abortan: append transaccional 11/11
+    (inserta, dedupea a la misma fila, anti-oracle, el trigger append-only rechaza UPDATE y DELETE)
+    y atomicidad del tracking 12/12 (membresía y fila en la misma tx; con candidato inexistente
+    **no queda membresía**). Scripts: `scripts/growth/_sanity-task-1692-decision-ledger.ts` y
+    `_sanity-task-1692-tracking-atomicity.ts`.
 - `setBacklinkTracking(targetId, competitors[], actor)`
 
 **Readers (shape + latency, muchos consumers):**
@@ -440,6 +596,13 @@ Cloud Scheduler + ops-worker (async-critical), nunca Vercel cron.
   - **Descubrir no es seguir:** ninguna pieza de discovery escribe `seo_keyword_set_members`; la promoción usa `trackKeywords` (command explícito posterior) y `recordKeywordDiscoveryAction` sólo deja el log append-only de la decisión.
   - **Flag `GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED`** (subordinado a `GROWTH_SEO_ENABLED`): lo leen **DOS runtimes** — Vercel (enqueue + lanes) y ops-worker (drain). Nació OFF con scheduler pausado (dos frenos, patrón TASK-1661); **ON desde 2026-08-14** en `deploy.sh` (`:-true`) + Vercel `Production`/`staging`, con el scheduler despausado, tras el smoke live + autorización del operador.
   - **Costo medido (smoke 2026-08-14, Berel MX):** 1 seed × `keyword_suggestions` × limit 10 = 1 llamada = **USD 0.0132** (estimado conservador 0.0612); mismo intent re-encolado = **USD 0** (idempotencia por `(organization_id, idempotency_key)` con hash del intent completo).
+
+- **Cobertura competitiva mensual (TASK-1662, VIVA desde 2026-08-28 — scheduler ACTIVO + flag ON, release `c983be7f18e6`):** Cloud Scheduler `ops-seo-competitor-coverage` (día 18, **ENABLED**) → cobertura por competidor DECLARADO (`competitor-coverage.ts`, V1 `maxCompetitors=1`) → `domain_intersection` ×2 + `keyword_data` inline al mercado compartido a costo 0.
+  - 🔴 **`GROWTH_SEO_COMPETITOR_GAP_ENABLED` vive SÓLO en el runtime del ops-worker; en Vercel es inerte.** Prenderlo o apagarlo en Vercel no cambia nada y da falsa sensación de control (mismo patrón que `GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED`). El único freno efectivo es el par flag-del-worker + pausa del scheduler.
+  - **Costo medido (primera corrida real, 2026-08-28, Berel MX vs `comex.com.mx`):** **USD 0,1076** con Δ exacto en el ledger (697 filas de cobertura + 640 de mercado gratis); gap derivado al leer = 357 `content_gap` / 54 `ranks_worse` / 269 excluidas por impresiones medidas en GSC.
+- **Top-N del SERP (TASK-1699, VIVO desde 2026-08-28 — flag ON en los DOS runtimes, release `c983be7f18e6`):** no tiene scheduler propio **por diseño** — viaja dentro del `ops-seo-rank-capture` (`0 5 * * *` CLT), en la misma transacción que el snapshot de rank, con costo marginal CERO.
+  - 🔴 **`GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` es dual-runtime y necesita LOS DOS**: `ops-worker` escribe el top-N (ON desde la revisión `ops-worker-00610-kc8`) y **Vercel** sirve la lectura de los lanes (ON en `Production` desde este release, con redeploy `greenhouse-aj0ng1mfw` — Vercel congela las env vars al crear el build). Prenderlo sólo en el worker deja los lanes respondiendo `disabled`; prenderlo sólo en Vercel pierde la serie, y **cada día apagado en el worker es pérdida irrecuperable**.
+  - **Día 1 de la serie: 2026-08-29.** Un lane que responde `{"ok":true,…,"rows":[]}` antes de esa fecha es el estado correcto, no una falla: `ok:true` ≠ `disabled`.
 
 **Reliability signals** (`/admin/operations`, subsistema Growth Health): `seo.rank.capture_lag` (steady=0), `seo.audit.stuck_tasks`, `seo.provider.cost_over_budget`, `seo.market_data.freshness` (TASK-1661; umbral tomado de la MISMA constante que el pre-check de gasto, para que señal y gasto no puedan divergir — sin dato es `warning`, no `error`: la ausencia de captura es un hecho esperable entre ciclos mensuales, no una falla del batch), `seo.keyword_discovery.stuck_runs` (TASK-1664; running >15 min o pending >2h con el drain activo = warning, steady=0) y `seo.keyword_discovery.provider_errors` (TASK-1664; runs failed/partial por proveedor en 24h, steady=0 — `no_results` es hecho y `budget_blocked` es el freno operando, no fallas).
 
@@ -565,7 +728,7 @@ fuentes distintas, y que hasta ahora sólo la primera existía como producto:
 |---|---|---|
 | ¿Qué empujo de lo que ya tengo? | GSC **medido** | construida (`TASK-1308`) |
 | ¿Dónde quiere estar el cliente? | **declarado por un humano** | `TASK-1659` (modelo) + `TASK-1660` (superficie) |
-| ¿Qué me pierdo entero? | competencia + Labs | `TASK-1661` (mercado) **`complete`, en producción 2026-08-14** + `TASK-1662` (gap) **implementada 2026-08-28, Slice 4 pendiente** + `TASK-1664` (discovery) |
+| ¿Qué me pierdo entero? | competencia + Labs | `TASK-1661` (mercado) **`complete`, en producción 2026-08-14** + `TASK-1662` (gap) **en producción 2026-08-28** (release `c983be7f18e6`; Slice 4 pendiente) + `TASK-1664` (discovery) |
 
 🔴 **Search Console es estructuralmente ciego a las dos últimas.** Si el cliente no está en el top
 ~100 no hay impresiones, así que esa búsqueda **no existe** en sus datos. No es una limitación del
@@ -881,7 +1044,7 @@ acuerde.
 |---|---|---|---|
 | TASK-1659 / 1660 | backend-data / ui-ux | Objetivo declarado por el cliente (modelo + superficie) — la pregunta "¿dónde quiere estar?" | pendiente |
 | TASK-1661 | backend-data | `seo_keyword_market_data` + capture/preview/reader + `deriveLinkBarrier` + lane + MCP + scheduler mensual | **`complete`, en producción 2026-08-14** (release `3754a17d3b1d`) |
-| TASK-1662 | backend-data | Keyword gap vs competidores (`domain_intersection`) — productor #4 de la tabla de mercado (autoría en `seo_competitors` + cobertura con run ledger + `readKeywordGap` derivado al leer + tools MCP) | **implementada 2026-08-28** (Slices 1–3 + federación MCP; `in-progress` sólo por Slice 4 —bloqueado por TASK-1700— y cierre operativo post-release; flag ON declarativo en `deploy.sh`, scheduler pausado hasta el primer deploy del worker) |
+| TASK-1662 | backend-data | Keyword gap vs competidores (`domain_intersection`) — productor #4 de la tabla de mercado (autoría en `seo_competitors` + cobertura con run ledger + `readKeywordGap` derivado al leer + tools MCP) | **en producción 2026-08-28** (release `c983be7f18e6`; Slices 1–3 + federación MCP; `in-progress` sólo por Slice 4 —bloqueado por TASK-1700—; flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED` ON y vivo **en el ops-worker** —inerte en Vercel— y scheduler `ops-seo-competitor-coverage` **ENABLED**) |
 | TASK-1664 | backend-data | Keyword discovery / seed expansion — tercer productor (aprovecha el `keyword_info` inline ya pagado) | **`complete`, encendido 2026-08-14** |
 | TASK-1665 | ui-ux | Lente `Descubrir` — la cara visible de 1664: conmutador de lentes, builder, banda de costo, estado de corrida, canvas de candidatos y drawer de decisión | **code complete**, evidencia GVC pendiente |
 | TASK-1666 | backend-data | Puente grounded SEO → AEO (`createGroundedQueryDraft`), consumido por el drawer de 1665 | **`complete` 2026-08-14** |

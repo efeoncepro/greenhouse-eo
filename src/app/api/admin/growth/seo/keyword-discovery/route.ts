@@ -9,7 +9,8 @@ import type {
   SeoDiscoverySourceKind
 } from '@/lib/growth/seo/keyword-discovery/contracts'
 import {
-  SEO_DISCOVERY_ACTION_KINDS,
+  SEO_DISCOVERY_CONSUMER_ACTION_KINDS,
+  SEO_DISCOVERY_LINK_BARRIER_FILTER_LEVELS,
   SEO_DISCOVERY_METHODS,
   SEO_DISCOVERY_RUN_STATUSES,
   SEO_DISCOVERY_SOURCE_KINDS
@@ -135,9 +136,17 @@ export async function POST(request: Request) {
       const candidateId = asString(body.candidateId)
       const actionKind = asString(body.actionKind) as SeoDiscoveryActionKind
 
-      if (!candidateId || !SEO_DISCOVERY_ACTION_KINDS.includes(actionKind)) {
+      // 🔴 TASK-1692 — un consumer sólo puede registrar una decisión HUMANA pura. Los kinds
+      // que produce un command (`promoted_to_tracking`) los escribe el primitive dentro de su
+      // propia transacción; aceptarlos acá reabriría la puerta a "reportar" un outcome desde
+      // afuera, que es justo el bug que la task cierra.
+      if (!candidateId || !SEO_DISCOVERY_CONSUMER_ACTION_KINDS.includes(actionKind)) {
         return canonicalErrorResponse('seo_discovery_invalid_input', {
-          extra: { reason: 'missing_required_fields', required: ['candidateId', 'actionKind'] }
+          extra: {
+            reason: 'missing_required_fields',
+            required: ['candidateId', 'actionKind'],
+            allowedActionKinds: SEO_DISCOVERY_CONSUMER_ACTION_KINDS
+          }
         })
       }
 
@@ -275,7 +284,11 @@ export async function GET(request: Request) {
       query: url.searchParams.get('query')?.trim() || undefined,
       intent: readEnumParam(url, 'intent', SEO_SEARCH_INTENTS),
       minSearchVolume: parseNumber(url.searchParams.get('minSearchVolume')),
+      // ⚠️ DEPRECADO: se sigue aceptando (no rompe a quien ya lo manda) pero el reader NO lo
+      // aplica y lo declara en `ignoredFilters`. El filtro canónico es `maxLinkBarrier`.
       maxDifficulty: parseNumber(url.searchParams.get('maxDifficulty')),
+      maxLinkBarrier: readEnumParam(url, 'maxLinkBarrier', SEO_DISCOVERY_LINK_BARRIER_FILTER_LEVELS),
+      includeUnknownBarrier: url.searchParams.get('includeUnknownBarrier') === 'true',
       excludeTracked: url.searchParams.get('excludeTracked') === 'true',
       limit: parseNumber(url.searchParams.get('limit')),
       cursor: url.searchParams.get('cursor')

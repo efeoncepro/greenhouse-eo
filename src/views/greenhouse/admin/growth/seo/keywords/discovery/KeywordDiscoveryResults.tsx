@@ -99,8 +99,8 @@ export const resolveState = (candidate: SeoDiscoveryCandidateView) => {
       return { label: copy.stateDismissed, tone: 'default' as const }
     case 'selected_for_grounded_query':
       return { label: copy.statePreparingAeo, tone: 'info' as const }
-    case 'selected_for_target':
-      return { label: copy.stateSelectedForTarget, tone: 'info' as const }
+    // `selected_for_target` se retiró del vocabulario (TASK-1692): nunca tuvo writer y su case
+    // era inalcanzable. Declarar objetivo ES promover a tracking con `intent: 'target'`.
     case 'promoted_to_tracking':
       return { label: copy.stateTracked, tone: 'info' as const }
     default:

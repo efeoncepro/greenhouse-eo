@@ -357,6 +357,680 @@ describe('readKeywordDiscovery — orden y filtros', () => {
     expect(result.candidates.map(candidate => candidate.candidateId)).toEqual(['seokdc-1'])
   })
 
+  describe('TASK-1694 — clusterConflict: la señal de canibalización contra el set seguido', () => {
+    /** El reader lee mercado DOS veces: candidatos primero, set seguido después. */
+    const marketByCall = (candidates: Map<string, unknown>, tracked: Map<string, unknown>) => {
+      marketMock.mockImplementation(async (input: { keywords: string[] }) => {
+        const isTrackedRead = input.keywords.some(keyword => tracked.has(keyword))
+        const source = isTrackedRead ? tracked : candidates
+
+        return {
+          market: source.size > 0 ? 'available' : 'unavailable',
+          byKeyword: source,
+          linkBarrierByKeyword: new Map(),
+          freshness: { freshKeywords: source.size, latestCaptureDate: '2026-08-13' }
+        }
+      })
+    }
+
+    it('mismo core que una keyword vigente DISTINTA → conflict, con los miembros nombrados', async () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'seokdc-1', keyword: 'pintura para pisos', normalized_keyword: 'pintura para pisos' })
+      ]
+      state.tracked = [{ keyword: 'pintura pisos' }]
+
+      marketByCall(
+        new Map([['pintura para pisos', datum('pintura para pisos', { coreKeyword: 'pintura piso' })]]),
+        new Map([['pintura pisos', datum('pintura pisos', { coreKeyword: 'pintura piso' })]])
+      )
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      const [candidate] = result.candidates
+
+      expect(candidate.clusterConflict).toEqual({
+        status: 'conflict',
+        coreKeyword: 'pintura piso',
+        trackedMembers: ['pintura pisos'],
+        trackedMemberCount: 1
+      })
+      // 🔴 Señales SEPARADAS: la keyword NO está seguida y aun así choca con el cluster.
+      expect(candidate.alreadyTracked).toBe(false)
+    })
+
+    it('cores distintos con el set completamente resuelto → clear', async () => {
+      state.runs = [runRow()]
+      state.candidates = [candidateRow({ candidate_id: 'seokdc-1', keyword: 'barniz', normalized_keyword: 'barniz' })]
+      state.tracked = [{ keyword: 'pintura pisos' }]
+
+      marketByCall(
+        new Map([['barniz', datum('barniz', { coreKeyword: 'barniz' })]]),
+        new Map([['pintura pisos', datum('pintura pisos', { coreKeyword: 'pintura piso' })]])
+      )
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].clusterConflict.status).toBe('clear')
+    })
+
+    it('🔴 keyword SEGUIDA sin fila de mercado → unknown, JAMÁS clear (nunca preguntamos por ella)', async () => {
+      state.runs = [runRow()]
+      state.candidates = [candidateRow({ candidate_id: 'seokdc-1', keyword: 'barniz', normalized_keyword: 'barniz' })]
+      state.tracked = [{ keyword: 'pintura pisos' }]
+
+      // El set seguido no resolvió su core: el conflicto no está descartado, está sin medir.
+      marketByCall(new Map([['barniz', datum('barniz', { coreKeyword: 'barniz' })]]), new Map())
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].clusterConflict.status).toBe('unknown')
+    })
+
+    it('🔴 candidato SIN fila de mercado → unknown: no se sabe a qué clúster pertenece', async () => {
+      state.runs = [runRow()]
+      state.candidates = [candidateRow({ candidate_id: 'seokdc-1', keyword: 'barniz', normalized_keyword: 'barniz' })]
+      state.tracked = [{ keyword: 'pintura pisos' }]
+
+      marketByCall(
+        new Map(),
+        new Map([['pintura pisos', datum('pintura pisos', { coreKeyword: 'pintura piso' })]])
+      )
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].clusterConflict).toMatchObject({ status: 'unknown', coreKeyword: null })
+    })
+
+    it('🔴 core NULL = la keyword ES su propia canónica: el candidato variante SÍ choca con ella', async () => {
+      // Medido contra el store real (923 filas): el proveedor NUNCA emite un core que apunte a
+      // la keyword misma — 527 nulos, 396 apuntando a otra, cero autorreferentes. Leer el NULL
+      // como "no se sabe" perdería la colisión MÁS probable: la del candidato variante contra
+      // la canónica que el target ya sigue.
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'seokdc-1', keyword: 'acrilicos pintura', normalized_keyword: 'acrilicos pintura' })
+      ]
+      state.tracked = [{ keyword: 'pintura acrilica' }]
+
+      marketByCall(
+        new Map([['acrilicos pintura', datum('acrilicos pintura', { coreKeyword: 'pintura acrilica' })]]),
+        // La seguida es la canónica del clúster: fila presente, `core_keyword` nulo.
+        new Map([['pintura acrilica', datum('pintura acrilica', { coreKeyword: null })]])
+      )
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].clusterConflict).toMatchObject({
+        status: 'conflict',
+        trackedMembers: ['pintura acrilica']
+      })
+    })
+
+    it('la propia keyword ya seguida no cuenta como conflicto consigo misma', async () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'seokdc-1', keyword: 'pintura pisos', normalized_keyword: 'pintura pisos' })
+      ]
+      state.tracked = [{ keyword: 'pintura pisos' }]
+
+      marketByCall(
+        new Map([['pintura pisos', datum('pintura pisos', { coreKeyword: 'pintura piso' })]]),
+        new Map([['pintura pisos', datum('pintura pisos', { coreKeyword: 'pintura piso' })]])
+      )
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      // Es identidad, no canibalización: eso ya lo dice `alreadyTracked`.
+      expect(result.candidates[0].alreadyTracked).toBe(true)
+      expect(result.candidates[0].clusterConflict.status).toBe('clear')
+    })
+
+    it('sin nada seguido el veredicto es clear (hecho positivo) y no consulta el set', async () => {
+      state.runs = [runRow()]
+      state.candidates = [candidateRow()]
+      state.tracked = []
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].clusterConflict.status).toBe('clear')
+      // Una sola lectura de mercado: la del set seguido no ocurre si no hay set.
+      expect(marketMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('el conflicto se resuelve sin gastar: cero llamadas al proveedor', async () => {
+      state.runs = [runRow()]
+      state.candidates = [candidateRow()]
+      state.tracked = [{ keyword: 'otra keyword' }]
+
+      await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      // Sólo el reader canónico del store de TASK-1661 (candidatos + set seguido). Nada más.
+      expect(marketMock).toHaveBeenCalledTimes(2)
+    })
+
+    it('trackedMembers nombra hasta 5 pero trackedMemberCount dice el total', async () => {
+      state.runs = [runRow()]
+      state.candidates = [candidateRow({ candidate_id: 'seokdc-1', keyword: 'nueva', normalized_keyword: 'nueva' })]
+
+      const trackedKeywords = ['t1', 't2', 't3', 't4', 't5', 't6', 't7']
+
+      state.tracked = trackedKeywords.map(keyword => ({ keyword }))
+
+      marketByCall(
+        new Map([['nueva', datum('nueva', { coreKeyword: 'core compartido' })]]),
+        new Map(trackedKeywords.map(keyword => [keyword, datum(keyword, { coreKeyword: 'core compartido' })]))
+      )
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].clusterConflict.trackedMembers).toHaveLength(5)
+      expect(result.candidates[0].clusterConflict.trackedMemberCount).toBe(7)
+    })
+  })
+
+  describe('TASK-1692 — lo ya decidido deja de encabezar el inbox', () => {
+    it('un candidato con decisión registrada baja; el que no la tiene sube', async () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'seokdc-decidido', keyword: 'decidido', normalized_keyword: 'decidido' }),
+        candidateRow({ candidate_id: 'seokdc-pendiente', keyword: 'pendiente', normalized_keyword: 'pendiente' })
+      ]
+      state.actions = [
+        {
+          candidate_id: 'seokdc-decidido',
+          action_kind: 'promoted_to_tracking',
+          actor: 'user-1',
+          created_at: new Date('2026-08-15T10:00:00Z')
+        }
+      ]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      // Antes de que existiera el writer, el promovido tenía `latestAction === null` y
+      // encabezaba la lista como lo más pendiente que había.
+      expect(result.candidates.map(candidate => candidate.candidateId)).toEqual([
+        'seokdc-pendiente',
+        'seokdc-decidido'
+      ])
+    })
+
+    it('un candidato enviado a un draft AEO muestra su estado real, no "Nuevo"', async () => {
+      state.runs = [runRow()]
+      state.candidates = [candidateRow({ candidate_id: 'seokdc-1' })]
+      state.actions = [
+        {
+          candidate_id: 'seokdc-1',
+          action_kind: 'selected_for_grounded_query',
+          actor: 'user-1',
+          created_at: new Date('2026-08-15T10:00:00Z')
+        }
+      ]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].latestAction).toMatchObject({ kind: 'selected_for_grounded_query' })
+    })
+
+    it('la re-selección supersede al descarte: manda la fila MÁS RECIENTE', async () => {
+      state.runs = [runRow()]
+      state.candidates = [candidateRow({ candidate_id: 'seokdc-1' })]
+      // El ledger es append-only: cambiar de opinión es una fila nueva, jamás un UPDATE.
+      // El reader resuelve con `DISTINCT ON ... ORDER BY created_at DESC`, así que la
+      // re-selección posterior es la que vale y el candidato vuelve a ser elegible.
+      state.actions = [
+        {
+          candidate_id: 'seokdc-1',
+          action_kind: 'selected_for_grounded_query',
+          actor: 'user-2',
+          created_at: new Date('2026-08-16T10:00:00Z')
+        }
+      ]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].latestAction).toMatchObject({
+        kind: 'selected_for_grounded_query',
+        actor: 'user-2'
+      })
+    })
+  })
+
+  describe('TASK-1694 — la política de inclusión de la corrida es interpretable después', () => {
+    it('una corrida NUEVA expone la política que registró su snapshot', async () => {
+      state.runs = [
+        runRow({
+          methods_json: [
+            { method: 'keyword_suggestions', resultsPerCall: 50, volumePolicy: 'all' },
+            { method: 'related_keywords', resultsPerCall: 50, volumePolicy: 'all' }
+          ]
+        })
+      ]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.runs[0].methods.map(spec => spec.volumePolicy)).toEqual(['all', 'all'])
+    })
+
+    it('🔴 una corrida ANTERIOR sin el campo se lee con el default HISTÓRICO por método', async () => {
+      state.runs = [
+        runRow({
+          methods_json: [
+            { method: 'keyword_suggestions', resultsPerCall: 50 },
+            { method: 'keyword_ideas', resultsPerCall: 50 },
+            { method: 'related_keywords', resultsPerCall: 50 },
+            { method: 'keywords_for_site', resultsPerCall: 50 }
+          ]
+        })
+      ]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      // El default de lectura REPRODUCE la historia, no la reescribe: sugerencias e ideas sí
+      // filtraban en el proveedor; relacionadas y dominio no.
+      expect(result.runs[0].methods.map(spec => spec.volumePolicy)).toEqual([
+        'positive_volume_only',
+        'positive_volume_only',
+        'all',
+        'all'
+      ])
+    })
+  })
+
+  describe('TASK-1694 — un candidato es una keyword, no una fila de procedencia', () => {
+    const twoProvenances = () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({
+          candidate_id: 'seokdc-rel',
+          normalized_keyword: 'pintura epoxica',
+          keyword: 'pintura epoxica',
+          source_endpoint: 'related_keywords',
+          source_rank: 7,
+          seed_keywords_json: ['pintura']
+        }),
+        candidateRow({
+          candidate_id: 'seokdc-sug',
+          normalized_keyword: 'pintura epoxica',
+          keyword: 'pintura epoxica',
+          source_endpoint: 'keyword_suggestions',
+          source_rank: 2,
+          seed_keywords_json: ['pintura industrial']
+        })
+      ]
+    }
+
+    it('la misma keyword hallada por dos métodos colapsa a UNA fila con las dos procedencias', async () => {
+      twoProvenances()
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates).toHaveLength(1)
+      expect(result.totalCandidates).toBe(1)
+
+      const [candidate] = result.candidates
+
+      expect(candidate.candidateIds).toEqual(['seokdc-sug', 'seokdc-rel'])
+      expect(candidate.provenance).toHaveLength(2)
+      // Representante = menor sourceRank; los escalares apuntan a él.
+      expect(candidate.candidateId).toBe('seokdc-sug')
+      expect(candidate.sourceEndpoint).toBe('keyword_suggestions')
+      expect(candidate.sourceRank).toBe(2)
+      // La procedencia viaja íntegra, con sus seeds propias por fila.
+      expect(candidate.provenance.map(entry => entry.sourceEndpoint)).toEqual([
+        'keyword_suggestions',
+        'related_keywords'
+      ])
+      expect(candidate.provenance[1].seedKeywords).toEqual(['pintura'])
+    })
+
+    it('con sourceRank empatado desempata el candidateId ascendente', async () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'seokdc-z', normalized_keyword: 'kw', keyword: 'kw', source_rank: 3 }),
+        candidateRow({
+          candidate_id: 'seokdc-a',
+          normalized_keyword: 'kw',
+          keyword: 'kw',
+          source_endpoint: 'related_keywords',
+          source_rank: 3
+        })
+      ]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].candidateId).toBe('seokdc-a')
+      expect(result.candidates[0].candidateIds).toEqual(['seokdc-a', 'seokdc-z'])
+    })
+
+    it('un sourceRank nulo nunca gana la representación frente a uno medido', async () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'seokdc-a', normalized_keyword: 'kw', keyword: 'kw', source_rank: null }),
+        candidateRow({
+          candidate_id: 'seokdc-z',
+          normalized_keyword: 'kw',
+          keyword: 'kw',
+          source_endpoint: 'related_keywords',
+          source_rank: 9
+        })
+      ]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].candidateId).toBe('seokdc-z')
+    })
+
+    it('latestAction es la MÁS RECIENTE entre todas las procedencias fusionadas', async () => {
+      twoProvenances()
+      state.actions = [
+        {
+          candidate_id: 'seokdc-rel',
+          action_kind: 'promoted_to_tracking',
+          actor: 'user-2',
+          created_at: new Date('2026-08-15T10:00:00Z')
+        },
+        {
+          candidate_id: 'seokdc-sug',
+          action_kind: 'dismissed',
+          actor: 'user-1',
+          created_at: new Date('2026-08-14T10:00:00Z')
+        }
+      ]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      // La decisión se registró sobre la procedencia que NO quedó de representante y aun así
+      // manda: el reader sigue siendo la autoridad de "esta keyword ya se decidió".
+      expect(result.candidates[0].latestAction).toMatchObject({ kind: 'promoted_to_tracking', actor: 'user-2' })
+    })
+
+    it('el filtro sourceEndpoint deja la procedencia restringida a lo pedido', async () => {
+      twoProvenances()
+      // El filtro es SQL-side: el mock devuelve sólo lo que ese endpoint produjo.
+      state.candidates = state.candidates.filter(row => row.source_endpoint === 'related_keywords')
+
+      const result = await readKeywordDiscovery({
+        organizationId: 'org-1',
+        runId: 'seokdr-1',
+        sourceEndpoint: 'related_keywords'
+      })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates[0].candidateIds).toEqual(['seokdc-rel'])
+    })
+
+    it('dos lecturas idénticas devuelven el mismo representante y el mismo orden', async () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'seokdc-b1', normalized_keyword: 'kw b', keyword: 'kw b', source_rank: 4 }),
+        candidateRow({ candidate_id: 'seokdc-a1', normalized_keyword: 'kw a', keyword: 'kw a', source_rank: 1 }),
+        candidateRow({
+          candidate_id: 'seokdc-a2',
+          normalized_keyword: 'kw a',
+          keyword: 'kw a',
+          source_endpoint: 'keyword_ideas',
+          source_rank: 6
+        })
+      ]
+
+      const first = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+      const second = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(first.ok && second.ok).toBe(true)
+
+      if (!first.ok || !second.ok) return
+
+      expect(first.candidates.map(candidate => candidate.candidateId)).toEqual(
+        second.candidates.map(candidate => candidate.candidateId)
+      )
+      expect(first.candidates.map(candidate => candidate.candidateIds)).toEqual(
+        second.candidates.map(candidate => candidate.candidateIds)
+      )
+    })
+
+    it('la unión de todas las páginas coincide con totalCandidates, sin repetidos ni faltantes', async () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'c1', normalized_keyword: 'kw 1', keyword: 'kw 1', source_rank: 1 }),
+        candidateRow({ candidate_id: 'c1b', normalized_keyword: 'kw 1', keyword: 'kw 1', source_rank: 5 }),
+        candidateRow({ candidate_id: 'c2', normalized_keyword: 'kw 2', keyword: 'kw 2', source_rank: 2 }),
+        candidateRow({ candidate_id: 'c3', normalized_keyword: 'kw 3', keyword: 'kw 3', source_rank: 3 })
+      ]
+
+      const page1 = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1', limit: 2 })
+
+      expect(page1.ok).toBe(true)
+
+      if (!page1.ok) return
+
+      expect(page1.totalCandidates).toBe(3)
+      expect(page1.nextCursor).toBe('2')
+
+      const page2 = await readKeywordDiscovery({
+        organizationId: 'org-1',
+        runId: 'seokdr-1',
+        limit: 2,
+        cursor: page1.nextCursor
+      })
+
+      expect(page2.ok).toBe(true)
+
+      if (!page2.ok) return
+
+      const union = [...page1.candidates, ...page2.candidates].map(candidate => candidate.normalizedKeyword)
+
+      expect(page2.nextCursor).toBeNull()
+      expect(new Set(union).size).toBe(3)
+      expect(union).toHaveLength(page1.totalCandidates)
+    })
+  })
+
+  describe('TASK-1694 — la barrera de enlaces decide; la dificultad cruda ya no', () => {
+    const threeBarriers = () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'seokdc-low', keyword: 'kw low', normalized_keyword: 'kw low' }),
+        candidateRow({ candidate_id: 'seokdc-high', keyword: 'kw high', normalized_keyword: 'kw high' }),
+        candidateRow({ candidate_id: 'seokdc-unknown', keyword: 'kw unknown', normalized_keyword: 'kw unknown' }),
+        candidateRow({ candidate_id: 'seokdc-nomarket', keyword: 'kw nomarket', normalized_keyword: 'kw nomarket' })
+      ]
+      marketMock.mockResolvedValue({
+        market: 'available',
+        byKeyword: new Map([
+          ['kw low', datum('kw low', { coreKeyword: null })],
+          ['kw high', datum('kw high', { coreKeyword: null })],
+          ['kw unknown', datum('kw unknown', { coreKeyword: null })]
+        ]),
+        linkBarrierByKeyword: new Map([
+          ['kw low', 'low'],
+          ['kw high', 'high'],
+          ['kw unknown', 'unknown']
+        ]),
+        freshness: { freshKeywords: 3, latestCaptureDate: '2026-08-13' }
+      })
+    }
+
+    it('maxLinkBarrier excluye la barrera Alta y deja pasar low/medium', async () => {
+      threeBarriers()
+
+      const result = await readKeywordDiscovery({
+        organizationId: 'org-1',
+        runId: 'seokdr-1',
+        maxLinkBarrier: 'medium'
+      })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates.map(candidate => candidate.candidateId)).toEqual(['seokdc-low'])
+    })
+
+    it('🔴 "Sin dato" no es "Baja": unknown y sin-fila-de-mercado quedan fuera por default', async () => {
+      threeBarriers()
+
+      const result = await readKeywordDiscovery({
+        organizationId: 'org-1',
+        runId: 'seokdr-1',
+        maxLinkBarrier: 'high'
+      })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      // 'high' es el techo MÁS permisivo del vocabulario y aun así no arrastra lo no medido.
+      expect(result.candidates.map(candidate => candidate.candidateId).sort()).toEqual(['seokdc-high', 'seokdc-low'])
+    })
+
+    it('includeUnknownBarrier explícito incorpora lo no medido (unknown y sin fila)', async () => {
+      threeBarriers()
+
+      const result = await readKeywordDiscovery({
+        organizationId: 'org-1',
+        runId: 'seokdr-1',
+        maxLinkBarrier: 'low',
+        includeUnknownBarrier: true
+      })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.candidates.map(candidate => candidate.candidateId).sort()).toEqual([
+        'seokdc-low',
+        'seokdc-nomarket',
+        'seokdc-unknown'
+      ])
+    })
+
+    it('maxDifficulty ya no reduce filas y viaja declarado en ignoredFilters', async () => {
+      state.runs = [runRow()]
+      state.candidates = [
+        candidateRow({ candidate_id: 'seokdc-facil', keyword: 'facil', normalized_keyword: 'facil' }),
+        candidateRow({ candidate_id: 'seokdc-dificil', keyword: 'dificil', normalized_keyword: 'dificil' })
+      ]
+      marketMock.mockResolvedValue({
+        market: 'available',
+        byKeyword: new Map([
+          ['facil', datum('facil', { keywordDifficulty: 5, coreKeyword: null })],
+          ['dificil', datum('dificil', { keywordDifficulty: 90, coreKeyword: null })]
+        ]),
+        linkBarrierByKeyword: new Map(),
+        freshness: { freshKeywords: 2, latestCaptureDate: '2026-08-13' }
+      })
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1', maxDifficulty: 20 })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      // Fail-safe: devuelve MÁS de lo pedido y lo dice, en vez del subconjunto equivocado en silencio.
+      expect(result.totalCandidates).toBe(2)
+      expect(result.ignoredFilters).toEqual([
+        { filter: 'maxDifficulty', reason: 'non_decisional_link_barrier_is_canonical', replacement: 'maxLinkBarrier' }
+      ])
+    })
+
+    it('sin maxDifficulty el contrato no anuncia filtros ignorados', async () => {
+      state.runs = [runRow()]
+      state.candidates = [candidateRow()]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', runId: 'seokdr-1' })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.ignoredFilters).toEqual([])
+    })
+
+    it('el historial de corridas (sin runId) también declara el filtro ignorado', async () => {
+      state.runs = [runRow()]
+
+      const result = await readKeywordDiscovery({ organizationId: 'org-1', maxDifficulty: 20 })
+
+      expect(result.ok).toBe(true)
+
+      if (!result.ok) return
+
+      expect(result.ignoredFilters).toHaveLength(1)
+    })
+  })
+
   it('pagina con limit + cursor y reporta el total', async () => {
     state.runs = [runRow()]
     state.candidates = [

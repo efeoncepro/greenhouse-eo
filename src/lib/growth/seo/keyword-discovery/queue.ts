@@ -23,6 +23,7 @@ import {
   DEFAULT_DISCOVERY_RESULTS_PER_CALL,
   MAX_DISCOVERY_SEEDS,
   MAX_GSC_SEED_WINDOW_DAYS,
+  SEO_DISCOVERY_DEFAULT_VOLUME_POLICY,
   SEO_DISCOVERY_METHODS,
   SEO_KEYWORD_DISCOVERY_AGGREGATE_TYPE,
   SEO_KEYWORD_DISCOVERY_REQUESTED_EVENT,
@@ -537,8 +538,15 @@ export const queueKeywordDiscovery = async (
     ...(methods.some(spec => spec.method === 'keywords_for_site') ? { targetDomain: target.rootDomain } : {})
   })
 
+  // TASK-1694: la política de inclusión viaja en el snapshot de la corrida. Sin ella, una
+  // corrida vieja deja de ser interpretable después de un cambio de política: nadie podría
+  // saber si el long-tail sin volumen faltó porque no existía o porque no se compró.
   const methodsJson = JSON.stringify(
-    methods.map(spec => ({ method: spec.method, resultsPerCall: spec.resultsPerCall }))
+    methods.map(spec => ({
+      method: spec.method,
+      resultsPerCall: spec.resultsPerCall,
+      volumePolicy: SEO_DISCOVERY_DEFAULT_VOLUME_POLICY
+    }))
   )
 
   return withGreenhousePostgresTransaction(async client => {
@@ -644,7 +652,49 @@ export type RecordKeywordDiscoveryActionResult =
   | { ok: true; actionId: string; deduped: boolean }
   | { ok: false; errorCode: SeoDiscoveryErrorCode; reason?: string }
 
-export const recordKeywordDiscoveryAction = async (
+/**
+ * Cliente mínimo del append al ledger. Deliberadamente NO es `PoolClient`: así la misma
+ * implementación sirve para la conexión del pool y para la transacción de otro command, sin
+ * atar este módulo al tipo de `pg`.
+ *
+ * `withTransaction` (`@/lib/db`) y `withGreenhousePostgresTransaction` (`@/lib/postgres/client`)
+ * son la MISMA función —la primera es un alias— así que hay un solo shape que satisfacer.
+ */
+export interface DiscoveryActionClient {
+  query: <T extends Record<string, unknown> = Record<string, unknown>>(
+    sql: string,
+    params?: unknown[]
+  ) => Promise<{ rows: T[] }>
+}
+
+/**
+ * Adapta el helper canónico del pool al shape transaccional.
+ *
+ * ⚠️ `runGreenhousePostgresQuery` devuelve un ARRAY pelado, no `{ rows }`. Envolverlo acá es lo
+ * que permite que el camino con pool y el transaccional compartan una sola implementación en vez
+ * de dos copias que divergen el día que alguien toque una.
+ */
+const pooledDiscoveryActionClient: DiscoveryActionClient = {
+  query: async <T extends Record<string, unknown> = Record<string, unknown>>(sql: string, params?: unknown[]) => ({
+    rows: await runGreenhousePostgresQuery<T>(sql, params)
+  })
+}
+
+/**
+ * Append al ledger de decisiones, participando de la transacción del caller.
+ *
+ * 🔴 **Existe para que el hecho lo escriba el primitive que lo produce.** Un command que produce
+ * un outcome (abrir una membresía, crear un draft) escribe su fila DENTRO de su propia
+ * transacción: o pasan las dos cosas, o no pasa ninguna. La alternativa —que cada consumer
+ * encadene un `record_action` después del éxito— deja el ledger a merced de que cada cliente se
+ * acuerde, y parte la verdad en dos el día que la segunda llamada falle.
+ *
+ * Es idempotente por `(organization_id, idempotency_key)`. Para hechos REPETIBLES la clave debe
+ * derivarse del outcome durable (id del draft, id del set), nunca de `candidateId:kind:actor`:
+ * esa clave automática colapsaría dos decisiones distintas del mismo actor en una sola fila.
+ */
+export const appendDiscoveryActionTx = async (
+  client: DiscoveryActionClient,
   input: RecordKeywordDiscoveryActionInput
 ): Promise<RecordKeywordDiscoveryActionResult> => {
   const actor = input.actor.trim()
@@ -653,7 +703,7 @@ export const recordKeywordDiscoveryAction = async (
 
   // Tenant boundary: el candidato debe pertenecer a la org del caller. Un ID ajeno responde
   // `run_not_found` (anti-oracle), sin distinguir "no existe" de "no es tuyo".
-  const candidates = await runGreenhousePostgresQuery<{ candidate_id: string }>(
+  const candidates = await client.query<{ candidate_id: string }>(
     `SELECT candidate_id
        FROM greenhouse_growth.seo_keyword_discovery_candidates
       WHERE candidate_id = $1
@@ -661,13 +711,13 @@ export const recordKeywordDiscoveryAction = async (
     [input.candidateId, input.organizationId]
   )
 
-  if (!candidates[0]) return { ok: false, errorCode: 'run_not_found' }
+  if (!candidates.rows[0]) return { ok: false, errorCode: 'run_not_found' }
 
   const idempotencyKey =
     input.idempotencyKey?.trim() ||
     `auto-${createHash('sha256').update(`${input.candidateId}:${input.actionKind}:${actor}`).digest('hex').slice(0, 40)}`
 
-  const inserted = await runGreenhousePostgresQuery<{ action_id: string }>(
+  const inserted = await client.query<{ action_id: string }>(
     `INSERT INTO greenhouse_growth.seo_keyword_discovery_actions
        (candidate_id, organization_id, action_kind, actor, idempotency_key, metadata_json)
      VALUES ($1, $2, $3, $4, $5, $6::jsonb)
@@ -683,11 +733,11 @@ export const recordKeywordDiscoveryAction = async (
     ]
   )
 
-  const actionId = inserted[0]?.action_id ?? null
+  const actionId = inserted.rows[0]?.action_id ?? null
 
   if (actionId) return { ok: true, actionId, deduped: false }
 
-  const existing = await runGreenhousePostgresQuery<{ action_id: string }>(
+  const existing = await client.query<{ action_id: string }>(
     `SELECT action_id
        FROM greenhouse_growth.seo_keyword_discovery_actions
       WHERE organization_id = $1
@@ -695,9 +745,18 @@ export const recordKeywordDiscoveryAction = async (
     [input.organizationId, idempotencyKey]
   )
 
-  const existingId = existing[0]?.action_id ?? null
+  const existingId = existing.rows[0]?.action_id ?? null
 
   if (!existingId) return { ok: false, errorCode: 'busy' }
 
   return { ok: true, actionId: existingId, deduped: true }
 }
+
+/**
+ * Wrapper no-transaccional: el `record_action` público que consumen la ruta app y el lane
+ * ecosystem para registrar una decisión HUMANA pura. Mismo contrato de siempre.
+ */
+export const recordKeywordDiscoveryAction = async (
+  input: RecordKeywordDiscoveryActionInput
+): Promise<RecordKeywordDiscoveryActionResult> =>
+  appendDiscoveryActionTx(pooledDiscoveryActionClient, input)

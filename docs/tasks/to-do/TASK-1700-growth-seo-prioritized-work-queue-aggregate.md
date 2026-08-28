@@ -1,5 +1,74 @@
 # TASK-1700 — Growth SEO: la cola priorizada de trabajo es un aggregate persistido con score versionado
 
+## Delta 2026-08-28 (2) — DESBLOQUEADA: el último bloqueador cerró
+
+`TASK-1692` cerró (`code complete, rollout pendiente`), así que `Blocked by` pasa a `none`:
+`TASK-1699` ya estaba satisfecho en código desde el 2026-08-28 y era el único otro.
+
+Lo que la cola hereda y **no** debe reinventar:
+
+- 🔴 **El principio que su `recordSeoWorkQueueDecision` obedece ya está vigente:** el hecho lo
+  escribe el PRIMITIVE que lo produce, jamás el consumer. La frontera es nítida y la cola **no
+  inventa una tercera categoría**: `record_action` para lo que una persona decide sin que ningún
+  command lo produzca; el primitive para lo que un command produce. Si la cola escribiera su propio
+  log de las mismas decisiones, abriría el segundo libro sin transacción que los reconcilie — que
+  es exactamente lo que esta dependencia existía para evitar.
+- **Hay una variante transaccional lista:** `appendDiscoveryActionTx(client, input)` participa de la
+  transacción del caller. Un log de decisiones de la cola que deba ser atómico con su outcome usa
+  ese shape, no uno nuevo.
+- **La idempotencia se deriva del outcome DURABLE**, nunca de `actor`: la clave automática colapsa
+  dos decisiones distintas de la misma persona en una sola fila.
+- **Los grados de atomicidad se DECLARAN.** Cuando un outcome vive en otra conexión y no se puede
+  ser atómico, se dice en el contrato (`decisionLogged: false` + aviso), no se calla ni se resuelve
+  tumbando el outcome caro.
+
+⚠️ **Salvedad de rollout, vigente para las DOS dependencias:** ni `TASK-1694` ni `TASK-1692` se han
+promovido a producción. No tomes el primer snapshot contra un runtime que todavía sirva el contrato
+viejo — verifica la promoción antes de arrancar el Slice 1.
+
+
+## Delta 2026-08-28 — el bloqueo duro de `TASK-1694` quedó levantado (con una salvedad)
+
+`TASK-1694` cerró como **`code complete, rollout pendiente`**. Lo que la cola necesitaba que
+existiera antes de su primer snapshot ya existe en el contrato de lectura:
+
+- **La unidad puntuable es la keyword normalizada, no la fila de procedencia** — es contrato del
+  reader (`candidateIds[]` + `provenance[]`, `totalCandidates` cuenta keywords distintas), no
+  convención de la UI. Un `priority_score` por procedencia habría persistido la misma decisión hasta
+  cuatro veces, con cuatro compromisos de gasto sobre una sola intención, en una tabla append-only.
+- **La barrera de enlaces es filtrable y canónica** (`maxLinkBarrier` + `includeUnknownBarrier`);
+  `maxDifficulty` se acepta pero ya no decide y viaja declarado en `ignoredFilters`. Medido sobre el
+  store real: 764 de 923 filas marcan `keyword_difficulty = 0`, así que ordenar o filtrar la cola
+  por esa cifra en es-LATAM no discriminaba nada.
+- **`clusterConflict`** está disponible como factor/advertencia por candidato, derivado al leer y
+  sin gasto de proveedor.
+
+⚠️ **Salvedad antes del primer snapshot:** el contrato está corregido en código y verificado contra
+PG real, pero `TASK-1694` todavía no se promovió a producción. No tomes el primer snapshot contra un
+runtime que aún sirva el contrato viejo — verifica la promoción antes de arrancar el Slice 1.
+
+## Delta 2026-08-28 (release a producción) — la cadena de productores del origen `competitor_gap` ya corre en runtime
+
+El release `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208, release_id
+`c983be7f18e6-92b1b327-a1c9-4e7a-85dc-6a5e300f4e32`, run `33178544139`, manifest `released`,
+watchdog `ok` / `drift_count=0`) invalida el supuesto de los dos Deltas anteriores de que la cadena
+está «en código pero no desplegada»:
+
+- Migraciones de `TASK-1662` y `TASK-1699` aplicadas en la instancia única de Cloud SQL
+  (`pnpm pg:connect:status` → `No migrations to run!`).
+- `GROWTH_SEO_COMPETITOR_GAP_ENABLED` y `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` ON en la revisión
+  activa del ops-worker `ops-worker-00610-kc8`; el segundo también en Vercel Production (lectura),
+  verificado con canary (`serp-top-results` → `ok:true`).
+- Scheduler `ops-seo-competitor-coverage` `ENABLED`.
+- `get_seo_keyword_gap`, `get_seo_serp_top_results` y `get_seo_competitor_candidates` federadas en
+  `mcp.efeonce.org` (revisión `efeonce-mcp-gateway-00024-8b8`, inventario 21 → 27 tools SEO).
+
+**Consecuencia para esta task:** el origen `competitor_gap` ya no nace desactivado «porque no hay
+productor desplegado» — el productor existe y corre. Sigue en pie, en cambio, la **maduración de la
+serie**: el día 1 del top-N es el **2026-08-29** (cron 05:00 CLT) y `readSerpCompetitorCandidates`
+necesita **≥5 días** de captura antes de proponer candidatos. El `Blocked by` no cambia:
+`TASK-1694` sigue siendo el bloqueo DURO.
+
 ## Delta 2026-08-28 — el origen `competitor_gap` ya tiene contrato de productor (TASK-1662)
 
 `readKeywordGap` (`src/lib/growth/seo/keyword-gap-reader.ts`) existe y entrega exactamente lo
@@ -58,7 +127,7 @@ serie del top-N arranca con el primer deploy del worker post-release y los candi
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo`
-- Blocked by: `TASK-1694` (bloqueo DURO) · `TASK-1692` · `TASK-1699` (sólo para el origen `competitor_gap`; los otros cuatro orígenes no la necesitan — satisfecho en código desde 2026-08-28, ver Delta)
+- Blocked by: `none` (último bloqueador cerrado el 2026-08-28; ver Deltas) (sólo para el origen `competitor_gap`; los otros cuatro orígenes no la necesitan — satisfecho en código desde 2026-08-28, ver Delta)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

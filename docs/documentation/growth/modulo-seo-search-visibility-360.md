@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.12
+> **Version:** 1.15
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-14 por Claude (TASK-1661 + follow-ups: las columnas de mercado se llenan solas, la captura es mensual y acotada con simulacro de costo previo, "Dificultad" pasa a ser **Barrera de enlaces** en niveles con "Sin dato" como estado propio, todo dato de mercado viaja con su fecha, y cada respuesta declara el país que muestra — incluida la corrección del caso Berel (ISSUE-152/153); delta previo 2026-08-09 TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee)
+> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1692: el candidato recuerda qué se decidió sobre él — el estado se mueve solo, lo resuelto deja de encabezar la bandeja y un descartado se puede volver a elegir; delta previo TASK-1694: en el descubrimiento, un candidato es una keyword —no una fila por método—, el filtro de dificultad del proveedor deja de decidir y aparece el aviso de canibalización; delta previo 2026-08-28 TASK-1699 + TASK-1662 + TASK-1696 vivos en producción con el release `c983be7f18e6`: el módulo ya guarda quién más aparece en tu SERP, compara contra un competidor declarado y anota quién consumió cada dólar del proveedor; delta previo 2026-08-14 por Claude (TASK-1661 + follow-ups: las columnas de mercado se llenan solas, la captura es mensual y acotada con simulacro de costo previo, "Dificultad" pasa a ser **Barrera de enlaces** en niveles con "Sin dato" como estado propio, todo dato de mercado viaja con su fecha, y cada respuesta declara el país que muestra — incluida la corrección del caso Berel (ISSUE-152/153); delta previo 2026-08-09 TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee))
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -268,9 +268,50 @@ Operación: [Operar el perfil de enlaces SEO](../../manual-de-uso/growth/operar-
 
 > Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md §4.2](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) (tablas hijas del snapshot + condición de disparo).
 
+## Quien mas aparece en tu SERP, y en que te gana (TASK-1699 + TASK-1662)
+
+Hasta ahora el módulo respondía "en qué posición estás". Desde el 2026-08-28 responde también
+**quién más está ahí** y **qué búsquedas gana un competidor donde tú no apareces**. Son dos piezas
+distintas, con una regla común: la máquina **propone**, la persona **declara**.
+
+**El contexto del SERP, gratis.** Cada mañana, al medir tus rankings, el sistema ya compraba la
+página completa de resultados y se quedaba sólo con tu línea. Ahora guarda las 20 posiciones de esa
+misma respuesta: **sin una sola llamada nueva y sin un peso extra de costo**. Con esa serie el
+sistema puede decir "este dominio apareció en 7 de tus keywords, 12 días de los últimos 30" y
+sugerirlo como posible competidor — pero **nunca lo declara solo**: un competidor es una decisión
+con nombre y fecha, tomada por una persona.
+
+> ⚠️ Esta serie **no se puede recuperar hacia atrás**. El resultado de búsqueda de ayer no se vuelve
+> a comprar. Cada día con la captura apagada es un día que no existe nunca más. El primer día de la
+> serie es el **2026-08-29**: antes de esa fecha las pantallas y lecturas responden correctamente
+> "sin datos todavía", que es distinto de "apagado".
+
+**El gap contra un competidor declarado.** Una vez al mes, para cada competidor que alguien declaró
+a mano, el sistema pregunta dos cosas: qué búsquedas gana ese competidor donde tu marca **no
+aparece** (eso es contenido que falta) y en cuáles aparecen los dos pero él está mejor (eso es
+optimización). El resultado se **calcula al momento de leerlo**, nunca se congela, y **descarta
+toda búsqueda donde ya tienes tráfico medido en Search Console**: si el dato medido existe, gana
+sobre la estimación.
+
+Primera corrida real (Grupo Berel México contra un competidor declarado): costó **USD 0,11** y
+devolvió **357 búsquedas de contenido faltante**, 54 donde el competidor rankea mejor y 269
+descartadas por tener tráfico medido propio.
+
+**Quién consumió cada dólar.** El registro de gasto del proveedor pasó a anotar, en cada fila, si el
+dólar lo gastó el motor SEO o el motor de IA, y si la cifra es una factura o una estimación. Es un
+único registro (una factura de proveedor es una sola); lo que se separó es **el presupuesto de cada
+motor**, para que el consumo de uno no bloquee al otro por sorpresa.
+
+**Estado (2026-08-28):** las tres capacidades están **vivas en producción**. La comparación
+competitiva es información interna de Efeonce y **no se muestra al cliente**. El tope de gasto en
+dólares del motor de IA quedó **en observación, sin bloquear**: mide y avisa, pero todavía no corta
+— prenderlo es una decisión del operador después de un mes de medición.
+
+> Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) (Delta 2026-08-28 + §4.2 + §8).
+
 ## Que NO existe todavia
 
-Lo siguiente aún no está construido (las series que ya se llenan: Search Console live; rankings live desde el 2026-08-06). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP live en producción desde el 2026-08-06** (TASK-1645, que partió con 3 tools read-only): hoy el MCP interno de Greenhouse sirve **22 tools SEO (17 lecturas + 5 escrituras)** — inventario vigente y estado de despliegue en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8 — **todas federadas al gateway público `mcp.efeonce.org`** (TASK-1647 abrió la federación; TASK-1658 la completó con guard de paridad bidireccional, dejándola en 21; TASK-1696 sumó `get_seo_provider_spend` como lectura 17). La revisión productiva del gateway sirve **21**: la tool 22 espera el deploy posterior al release develop→main que lleve su lane a producción. La lectura funcional completa de esa capacidad está en [Search Visibility 360 por MCP](search-visibility-360-por-mcp.md). Pendiente:
+Lo siguiente aún no está construido (las series que ya se llenan: Search Console live; rankings live desde el 2026-08-06). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP live en producción desde el 2026-08-06** (TASK-1645, que partió con 3 tools read-only): hoy el MCP interno de Greenhouse sirve **27 tools SEO (20 lecturas + 7 escrituras)** as-of 2026-08-28 (TASK-1647 abrió la federación al gateway público `mcp.efeonce.org`; TASK-1658 la completó con guard de paridad bidireccional; TASK-1696 sumó `get_seo_provider_spend`; TASK-1662 sumó `declare_seo_competitors` / `retire_seo_competitors` + `get_seo_keyword_gap`; TASK-1699 sumó `get_seo_serp_top_results` + `get_seo_competitor_candidates`). Sus lanes están en producción desde el release `c983be7f18e6` (2026-08-28). ⚠️ **El inventario interno y lo que sirve la revisión desplegada del gateway son dos números distintos**: el estado de despliegue vigente vive en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8, no acá. La lectura funcional completa de esa capacidad está en [Search Visibility 360 por MCP](search-visibility-360-por-mcp.md). Pendiente:
 
 | Falta | Task que lo trae |
 |---|---|
@@ -650,6 +691,78 @@ el preview de costo y el gate de presupuesto.
 > Detalle técnico: [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 > §7 (primitives) y §8 (drain + costos) · runbook
 > [`operar-keyword-discovery-seo.md`](../../manual-de-uso/growth/operar-keyword-discovery-seo.md)
+
+#### Un candidato es una keyword, y el aviso de canibalización (TASK-1694, 2026-08-28)
+
+Tres correcciones al contrato que la pantalla se había esquivado por su cuenta pero que seguían
+vivas para quien consulta por API, Nexa o MCP:
+
+- **Una keyword hallada por dos métodos era dos filas.** Cada una con su estado y su botón de
+  decisión, sobre una sola oportunidad. Ahora es una sola fila que lleva adentro por dónde llegó, y
+  el total cuenta keywords distintas. Importa porque seguir una keyword compromete gasto todos los
+  días: dos filas de lo mismo eran dos compromisos sobre una sola intención — y la cola priorizada
+  de trabajo SEO, que viene después, **escribe lo que ve y no se puede corregir hacia atrás**.
+- **El filtro por dificultad del proveedor engañaba.** Esa cifra colapsa a cero en búsquedas en
+  español de LATAM (medido: 764 de 923 keywords del almacén marcan cero), así que pedir "sólo lo
+  fácil" devolvía casi todo, incluida barrera Alta. Se sigue aceptando para no romper a quien ya lo
+  usaba, pero **ya no filtra y la respuesta lo declara**, junto con cuál es el filtro correcto: la
+  barrera de enlaces, que ahora sí se puede filtrar y que por defecto deja fuera lo no medido.
+- **Nada advertía sobre canibalización.** Declarar objetivo "pintura para pisos" teniendo ya
+  seguida "pintura pisos" pasaba sin una palabra, y dos objetivos sobre la misma intención se
+  diluyen. Ahora el contrato avisa cuando el candidato pertenece al mismo grupo que algo que ya se
+  sigue, y nombra contra qué choca. Es un aviso, no un bloqueo, y distingue "no choca" de "no se
+  pudo saber" — un hueco de datos nunca se presenta como vía libre.
+
+Además, los cuatro métodos de expansión ahora **compran igual**: dos de ellos descartaban en el
+proveedor las keywords sin volumen estimado y dos no. Ese filtro no abarataba la llamada (se paga
+por fila devuelta y el tope de filas ya lo acota); sólo cambiaba qué se traía por el mismo precio, y
+en mercados de demanda rala se comía justo el long-tail emergente que el descubrimiento existe para
+encontrar. Cada corrida guarda con qué política compró, para que una corrida vieja siga siendo
+interpretable.
+
+Sin cambio en la pantalla todavía: la lente recibe menos filas y campos nuevos que aún no pinta
+(follow-up declarado).
+
+> Detalle técnico: [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
+> §7 → Delta TASK-1694 · manual
+> [`descubrir-keywords-seo.md`](../../manual-de-uso/growth/descubrir-keywords-seo.md)
+
+#### El candidato ahora recuerda qué se decidió sobre él (TASK-1692, 2026-08-28)
+
+La lente tenía memoria a medias. De las cinco decisiones que el sistema sabía nombrar, **sólo se
+guardaba una**: descartar. Preparar consultas AEO o promover a seguimiento pasaban de verdad, pero
+no dejaban rastro. Tres consecuencias que el operador veía sin saber por qué:
+
+- **El chip mentía.** Tras enviar un candidato a un borrador AEO, seguía diciendo "Nuevo" — la
+  pantalla afirmaba que no había pasado nada sobre algo que acababa de entrar a un borrador.
+- **La bandeja estaba ordenada al revés.** Lo ya resuelto encabezaba la lista, porque "sin decisión
+  registrada" se leía como "lo más pendiente que hay".
+- **Descartar era una puerta de una sola dirección.** Un candidato descartado no tenía forma de
+  volver.
+
+Ahora la decisión la escribe **el mismo proceso que la produce**, no la pantalla que la reporta. La
+diferencia importa cuando algo falla: si la pantalla tuviera que avisar en una segunda llamada,
+bastaría con que se cayera la red para que quedara el compromiso de gasto hecho y la decisión sin
+autor. En el caso de seguimiento van **en la misma operación**: o queda la keyword en seguimiento y
+su decisión registrada, o no queda ninguna de las dos.
+
+Qué cambia para quien usa la lente, sin un solo cambio de pantalla:
+
+- El estado del candidato se mueve solo y refleja lo que realmente pasó.
+- Lo ya decidido baja en la lista; arriba queda lo que espera decisión.
+- Un candidato descartado se puede volver a elegir: el historial es de sólo-agregar, así que la
+  decisión nueva reemplaza a la anterior sin borrar nada.
+- Cada promoción queda atada a **de qué candidato y de qué corrida** salió — la trazabilidad que
+  antes no existía en ninguna parte.
+
+Lo que **no** cambió: el sistema que dice qué keywords se están midiendo sigue siendo el mismo de
+siempre. El historial responde otra pregunta —*quién decidió qué, sobre qué candidato, y cuándo*—
+y no reemplaza a nadie. Y no se inventó historia hacia atrás: reconstruir quién decidió antes de
+que existiera el registro habría sido fabricar autoría.
+
+> Detalle técnico: [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
+> §7 → Delta TASK-1692 · manual
+> [`descubrir-keywords-seo.md`](../../manual-de-uso/growth/descubrir-keywords-seo.md)
 
 #### La lente `Descubrir`: la cara visible del descubrimiento (TASK-1665, 2026-08-14)
 

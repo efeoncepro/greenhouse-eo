@@ -219,7 +219,7 @@ Excepción break-glass:
 
 El flujo de promoción por **squash-merge** hace que `main` (commits squash de releases previos) **no sea ancestro de `develop`**. Eso produce condiciones recurrentes que **NO son fallas reales** — reconocelas y aplica la mitigación en vez de perseguirlas:
 
-1. **El PR `develop→main` conflicta ("merge commit cannot be cleanly created").** Conflictos en docs (Handoff/changelog/README/registry) y a veces código, porque ambos lados editaron desde una merge-base vieja. **Resolución robusta:** en `develop`, `git merge origin/main -X ours --no-edit` (`develop` es autoritativo: contiene todo `main` por construcción, ya que los squash de `main` son DE commits de `develop`). Verifica `git log origin/main --not develop` vacío **y** `git diff HEAD@{1} HEAD -- src/ scripts/` sin cambios de código → push `develop` → el PR queda MERGEABLE. Bonus: **avanza la merge-base** y reduce la divergencia del próximo release. **NUNCA** cherry-pick a `main` (duplica SHAs).
+1. **El PR `develop→main` conflicta ("merge commit cannot be cleanly created").** Conflictos en docs (Handoff/changelog/README/registry) y a veces código, porque ambos lados editaron desde una merge-base vieja. **Resolución robusta:** en `develop`, `git merge origin/main -s ours --no-edit` (`develop` es autoritativo: contiene todo `main` por construcción, ya que los squash de `main` son DE commits de `develop`; `-s ours` deja el árbol de `develop` byte a byte y no produce conflictos). Push `develop` → el PR queda MERGEABLE. Bonus: **avanza la merge-base** y reduce la divergencia del próximo release. **NUNCA** cherry-pick a `main` (duplica SHAs). ⚠️ **Delta 2026-08-28:** la estrategia NO se elige contando `git log origin/main --not HEAD` — se elige **clasificando** sus commits (¿son todos squashes de release, o `main` aporta contenido propio?). El árbol de decisión completo, las cuatro verificaciones y los conflictos del camino excepcional `-X ours` están en §2.4 Paso A.
 
 2. **~~Preflight `release_batch_policy=requires_break_glass` como falso positivo.~~ RESUELTO 2026-08-08 (ISSUE-114).** El classifier usaba diff *three-dot* (`origin/main...target`, merge-base) y resucitaba archivos ya desplegados en un release previo como `cloud_release` irreversible. **Ya no**: `collectChangedFiles` usa **two-dot** y ambos consumidores del rango (archivos + commit bodies) lo resuelven por `buildReleaseDiffRange`, con guardrail anti-regresión en `checks/release-batch-policy.test.ts`. **Consecuencia operativa: si hoy ves `cloud_release` en el classifier, es REAL — no lo descartes como fantasma ni le pongas marker.** Verifícalo igual con `git diff origin/main..target -- <archivo>`; si devuelve líneas, el dominio está de verdad en el batch. Nota aparte: post-merge, con `target` = HEAD de `main`, el rango queda vacío y el batch-policy del orchestrator pasa siempre — **el gate sólo tiene dientes en la corrida local pre-merge**, que es donde se toma la decisión humana.
 
@@ -227,7 +227,7 @@ El flujo de promoción por **squash-merge** hace que `main` (commits squash de r
 
 4. **Pushes docs-only a `develop` justo antes del release cancelan el build de staging y bloquean el preflight (gotcha #7 de la skill; verificado 2026-08-06, release `fcee5ab9f7ce`).** El Ignored Build Step de Vercel (`scripts/ci/vercel-ignore-build.mjs`, gotcha #5 de la skill) cancela los builds docs-only de `develop`; el check `vercel_environments` del preflight exige que el deploy más reciente de **staging** esté `READY` y falla con "Production READY, pero staging deploy CANCELED" (severity `warning` pero **exit 1** → run del orquestador quemado: run `31104631142`). **Resolución verificada 2026-08-06 — producir la evidencia, no bypassear:** `vercel redeploy <url-del-deployment-cancelado> --scope efeonce-7670142f` (~6 min de build), esperar `READY` y re-dispatchar. Pre-empción: **secuenciar los pushes docs-only para DESPUÉS del release** y verificar que el último deploy de staging no esté `CANCELED` antes del dispatch.
 
-5. **El merge canónico `-X ours` puede colar contenido de `main` que `develop` corrigió DESPUÉS del último release (gotcha #8 de la skill; verificado 2026-08-06, release `fcee5ab9f7ce`).** `-X ours` solo decide los hunks en conflicto; los hunks de `main` que aplican limpio **entran** — y si `develop` había eliminado esa línea después del release anterior, el merge la resucita como regresión real. Caso real: `git merge origin/main -X ours` trajo a `develop` 1 línea de `src/lib/ai/dataforseo.ts` (`dataForSeoBreaker.recordFailure(family)` incondicional) que la auditoría de TASK-1300 había eliminado en `develop` después del release anterior — habría contado 4xx de caller y abierto el breaker. La verificación 2 del gotcha #1 (`git diff HEAD@{1} HEAD -- src/ scripts/ services/ migrations/` vacío) es exactamente la que lo detecta — por eso no se omite. **Resolución verificada 2026-08-06:** cuando la verificación 1 (`git log origin/main --not HEAD`) está vacía y la 2 muestra drift regresivo main→develop: `git reset --hard HEAD@{1}` y `git merge origin/main -s ours --no-edit` (estrategia `ours` COMPLETA: árbol de `develop` EXACTO, ancestría avanzada, PR MERGEABLE). Verificar que `git diff HEAD@{1} HEAD` salga **totalmente** vacío. Regla: `-s ours` solo es legítimo cuando la verificación 1 está vacía (`main` no tiene commits únicos); si no lo está, esos commits se perderían — ahí el merge se resuelve a mano.
+5. **El merge canónico `-X ours` puede colar contenido de `main` que `develop` corrigió DESPUÉS del último release (gotcha #8 de la skill; verificado 2026-08-06, release `fcee5ab9f7ce`).** `-X ours` solo decide los hunks en conflicto; los hunks de `main` que aplican limpio **entran** — y si `develop` había eliminado esa línea después del release anterior, el merge la resucita como regresión real. Caso real: `git merge origin/main -X ours` trajo a `develop` 1 línea de `src/lib/ai/dataforseo.ts` (`dataForSeoBreaker.recordFailure(family)` incondicional) que la auditoría de TASK-1300 había eliminado en `develop` después del release anterior — habría contado 4xx de caller y abierto el breaker. **Delta 2026-08-28 (release `c983be7f18e6`): éste dejó de ser un riesgo que se audita y pasó a ser un riesgo que se EVITA.** El default canónico es `-s ours`, que toma el árbol de `develop` completo y por lo tanto **no puede** colar nada de `main`; `-X ours` quedó como excepción documentada (§2.4 Paso A). Cuando la excepción se usa, la auditoría obligatoria es `git diff HEAD@{1} HEAD --name-status` **COMPLETO** — el par de verificaciones acotado a `src/ scripts/ services/ migrations/` es necesario pero **no suficiente**: salió vacío tanto el 2026-08-23 (duplicación de un manual + 8 tasks resucitadas) como el 2026-08-28 (bloque duplicado en `.claude/rules/growth-seo.md` + TASK-1775/1776/1777 resucitadas en `in-progress/`). **Regla: `-s ours` es legítimo cuando todo lo que `main` tiene de propio son squashes de release, o cuando su contenido propio ya fue reconciliado a `develop` por cherry-pick.** Si `main` tiene contenido propio que `develop` NO tiene, no se elige otra estrategia: se reconcilia por el camino canónico y recién ahí se mergea.
 
 6. 🔴 **`split_batch` y `requires_break_glass` NO se resuelven igual, y el marker sólo sirve para el primero** (verificado leyendo `batch-policy/classifier.ts`, release `2c87d71e2eca` del 2026-08-09). El gotcha #2 y el paso B de §2.4 hablan del marker `[release-coupled: …]`, y es fácil leerlos como "batch policy rojo ⇒ marker". No:
 
@@ -277,39 +277,82 @@ git status --short                    # árbol limpio; el checkout es compartido
 git fetch origin
 
 git switch develop
-git log origin/main --not HEAD --oneline    # V1 primero: ¿main tiene commits propios?
+git log origin/main --not HEAD --format='%h %s'   # V1: ¿QUÉ trae main que develop no tenga?
+```
 
-# V1 VACÍA (el caso normal) → `-s ours` es el DEFAULT: árbol de develop EXACTO.
+**La pregunta NO es "¿V1 está vacía?" sino "¿`main` aporta contenido PROPIO?" — y
+eso se responde CLASIFICANDO los commits de V1, no contándolos.**
+
+> 🔴 **Delta 2026-08-28 (release `c983be7f18e6`): la regla anterior — *"si V1 no trae commits (el
+> caso normal) → `-s ours`; si trae commits → `-X ours`"* — quedó falsificada empíricamente, y su
+> rama "normal" era INALCANZABLE.** Con squash-merge, V1 **nunca** llega sin commits en el estado
+> estacionario: cada release deja en `main` un commit de squash que no será ancestro de `develop` hasta que lo traiga el merge
+> canónico del release **siguiente**. Verificado ese día: los squashes de los 7 releases del
+> 2026-08-09 al 08-27 (`2c87d71e2eca`, `950f5bdb4`, `3754a17d3b1d`, `fa54670470c1`,
+> `30301816955f`, `709e15f6688e`, `cc73c74789ce`) son **todos** ancestros de `origin/develop` hoy,
+> y V1 al arrancar el release del 2026-08-28 era exactamente `{cc73c74789ce}` = el squash del
+> release anterior. O sea: la rama que el runbook llamaba "el caso normal" no ocurre nunca, y la
+> regla literal empujaba a `-X ours` en **todos** los releases — justo la estrategia peligrosa.
+> Costo real ese día: siguiendo la regla literal se usó `-X ours`, y el merge **duplicó un bloque
+> completo de `.claude/rules/growth-seo.md`** y **resucitó TASK-1775/1776/1777 en
+> `docs/tasks/in-progress/`** teniéndolas `develop` en `complete/` — con la verificación V2
+> (`git diff HEAD@{1} HEAD -- src/ scripts/ services/ migrations/`) **VACÍA**. Sólo la V3 completa
+> (`--name-status`) lo cazó. Es la misma clase de bug del delta 2026-08-23 y del gotcha #5 de §2.3
+> (2026-08-06), que además resucitó una línea de código de producción.
+
+**Clasificación de V1 — árbol de decisión canónico:**
+
+| Qué hay en V1 | Cómo se reconoce | Estrategia |
+|---|---|---|
+| **Sólo squashes de release** (el estado estacionario, y por lejos el caso más frecuente) | título `release: … (#NNN)` **y** el SHA es el `target_sha` de un manifest en estado `released` | **`-s ours`.** Su contenido salió de `develop` por construcción: el squash se hizo DE commits de `develop` |
+| **Algo más** (hotfix hecho en `main`, push directo, revert hecho en `main`) **cuyo contenido YA está en `develop`** | el camino canónico del hotfix exige cherry-pick de vuelta a `develop`; se comprueba diffeando las rutas de ese commit contra `origin/develop` | **`-s ours`** sigue siendo correcto |
+| **Algo más cuyo contenido NO está en `develop`** | ídem, pero el diff contra `origin/develop` devuelve líneas | 🛑 **PARAR.** Reconciliar ese contenido por su camino canónico (cherry-pick **a `develop`**) antes de mergear. Nunca "resolverlo" cambiando de estrategia de merge |
+
+```bash
+# 1. Clasificar V1 — no contarla
+git log origin/main --not HEAD --format='%h %s'
+#    ¿todos los títulos son `release: … (#NNN)`?  → estado estacionario
+
+# 2. Confirmar que cada SHA es de verdad un squash de release del ledger
+#    (target_sha de un manifest en estado `released`), no un push directo con
+#    título parecido:
+gh api repos/efeoncepro/greenhouse-eo/commits/<sha> --jq '.commit.message' | head -1
+
+# 3. Para CUALQUIER commit de V1 que no sea un squash de release, comprobar si su
+#    contenido ya llegó a develop por el camino canónico:
+git show --name-only --format= <sha>                       # rutas que tocó
+git diff <sha> origin/develop -- <rutas>                   # vacío ⇒ ya reconciliado
+
+# 4. Estado estacionario (o hotfix ya reconciliado) → DEFAULT canónico
 git merge origin/main -s ours --no-edit
-git diff HEAD@{1} HEAD --stat               # debe salir TOTALMENTE vacío
-
-# V1 NO vacía → recién ahí `-X ours`, y con auditoría completa del resultado.
-#   git merge origin/main -X ours --no-edit
+git diff HEAD@{1} HEAD --stat        # `-s ours` ⇒ TOTALMENTE vacío, siempre
 ```
 
 `develop` es autoritativo: contiene todo `main` por construcción, porque los
-squash de `main` son DE commits de `develop`. Con `main ⊆ develop` (V1 vacía),
-`-s ours` deja el árbol de `develop` byte a byte y no hay nada que auditar.
+squash de `main` son DE commits de `develop`. `-s ours` toma el árbol de
+`develop` **entero** y sólo agrega la ancestría de `main` — por eso el diff sale
+vacío y **no hay nada que auditar**.
 
-`-X ours` es la excepción, para cuando `main` sí tiene commits propios que
-conservar. Resuelve los conflictos de contenido a favor de `develop`
-**automáticamente**, pero **no** resuelve los conflictos `modify/delete`: esos
-quedan detenidos y hay que decidirlos a mano.
+**`-X ours` deja de ser el default de ninguna rama.** Queda como excepción
+documentada, para cuando un commit propio de `main` sí debe fusionarse hunk a
+hunk y no hay camino canónico disponible. Si se usa, la auditoría obligatoria es
+`git diff HEAD@{1} HEAD --name-status` **COMPLETO** — nunca las verificaciones
+parciales sobre `src/ scripts/ services/ migrations/`, que **demostradamente** no
+ven la duplicación documental (deltas 2026-08-23 y 2026-08-28).
 
-> 🔴 **Delta 2026-08-23 (release `709e15f6688e`): las dos verificaciones duras de más abajo NO
-> cubren la duplicación de contenido documental, y `-X ours` puede producirla.** Ambas salieron
-> vacías y el merge igual había (a) resucitado 8 archivos de tasks en su ubicación de lifecycle
-> vieja y (b) **duplicado un bloque de 10 líneas del manual de Hiring Desk que `develop` ya tenía**.
-> Causa: `-X ours` sólo decide los hunks EN CONFLICTO; un hunk de `main` que aplica limpio en otra
-> parte del archivo entra como adición silenciosa. Las verificaciones no lo ven porque miran
-> `src/ scripts/ services/ migrations/`. La que sí lo caza es
-> `git diff HEAD@{1} HEAD --name-status` **completo** — mirar TODO lo que el merge tocó, no sólo el
-> código. Por eso el orden de arriba invierte el default a `-s ours`.
+##### Conflictos: sólo existen en el camino excepcional `-X ours`
 
-**Caso real 2026-08-06 (modify/delete):** `TASK-1590` estaba **borrada** en
-`develop` (se había movido de `to-do/` a `in-progress/`) y **modificada** en
-`main`. Git no puede elegir solo. La resolución correcta conserva el estado de
-`develop` — borrar la copia que `main` quiere resucitar:
+**`-s ours` no produce conflictos NUNCA** — toma el árbol de `develop` completo,
+así que no hay hunks que decidir ni rutas que reconciliar. Todo lo que sigue
+aplica **sólo** si terminaste en el camino excepcional `-X ours`: ahí se
+resuelven los conflictos de **contenido** a favor de `develop` de forma
+automática, pero **no** los conflictos de **ruta**, que quedan detenidos y hay
+que decidirlos a mano. En los dos casos observados la regla es la misma:
+**`develop` manda; se borra la copia que `main` quiere resucitar.**
+
+**Caso `modify/delete` (2026-08-06, release `fcee5ab9f7ce`):** `TASK-1590` estaba
+**borrada** en `develop` (se había movido de `to-do/` a `in-progress/`) y
+**modificada** en `main`. Git no puede elegir solo.
 
 ```bash
 git status --short | grep '^DU\|^UD'          # listar los modify/delete
@@ -317,16 +360,40 @@ git rm docs/tasks/to-do/TASK-1590-*.md        # develop manda: la task ya migró
 git commit --no-edit
 ```
 
-**Verificación dura — las dos deben salir vacías antes de pushear:**
+**Caso `rename/rename` (2026-08-28, release `c983be7f18e6`):** `TASK-1658` estaba
+en `docs/tasks/complete/` en `develop` y en `docs/tasks/in-progress/` en `main`
+— el mismo archivo movido a dos destinos distintos. Git detiene el merge y puede
+dejar **las dos** copias en el árbol. **`develop` manda:** se conserva la de
+`complete/` y se borra la de `in-progress/`.
 
 ```bash
-git log origin/main --not HEAD --oneline                        # main ⊆ develop
-git diff HEAD@{1} HEAD -- src/ scripts/ services/ migrations/   # 0 código movido
+git status --short | grep '^AA\|^UU\|^AU\|^UA'    # las dos copias del rename/rename
+git rm docs/tasks/in-progress/TASK-1658-*.md      # develop manda: la task ya cerró
+git commit --no-edit
 ```
 
-La primera prueba que no dejaste nada de `main` fuera; la segunda prueba que el
-merge fue **documental**, no que `-X ours` te comió código de producción. Recién
-ahí:
+**Verificación dura — las cuatro antes de pushear:**
+
+```bash
+# V1 — clasificada, NO contada: lo único que puede quedar son squashes de release
+git log origin/main --not HEAD --format='%h %s'
+
+# V2 — 0 código movido de main a develop (necesaria, NO suficiente)
+git diff HEAD@{1} HEAD -- src/ scripts/ services/ migrations/
+
+# V3 — TODO lo que el merge tocó. La única que ve duplicación documental y tasks
+#      resucitadas. Con `-s ours` sale vacía por construcción.
+git diff HEAD@{1} HEAD --name-status
+
+# V4 — respaldo barato: archivos que existen SÓLO en main (cierra el caso del
+#      hotfix que agregó un archivo y nunca volvió a develop)
+git diff --diff-filter=A --name-only origin/develop origin/main
+```
+
+Con `-s ours`, V2 y V3 salen vacías **por construcción**: si alguna trae algo, no
+corriste `-s ours`. V4 debe salir vacía en los dos caminos — cualquier ruta que
+aparezca es contenido de `main` que `develop` nunca recibió, y eso se reconcilia
+con cherry-pick **a `develop`**, no mergeando. Recién ahí:
 
 ```bash
 git push origin develop     # → el PR develop→main queda MERGEABLE

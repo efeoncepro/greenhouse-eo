@@ -6,7 +6,7 @@
 - Priority: `P2`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `En producción — 27 hijas complete (conteo verificado 2026-08-28), 7 crons activos`
+- Status real: `En producción — 27 hijas complete (conteo verificado 2026-08-28), 8 crons activos (ops-seo-competitor-coverage ENABLED con el release c983be7f18e6)`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Julio Reyes`
@@ -73,12 +73,13 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > operativo post-release. El rollout está verificado con competidor real (Berel MX → `comex.com.mx`):
 > primera corrida de cobertura por USD 0,1076 con Δ exacto en el ledger (697 filas + 640 de mercado
 > gratis) y gap real medido — 357 `content_gap` / 54 `ranks_worse` / 269 excluidas por GSC. El flag
-> `GROWTH_SEO_COMPETITOR_GAP_ENABLED` quedó ON declarativo en `deploy.sh` (efectivo con el primer
-> deploy del worker post-release) y el scheduler `ops-seo-competitor-coverage` permanece pausado
-> hasta ese deploy.
+> `GROWTH_SEO_COMPETITOR_GAP_ENABLED` quedó ON declarativo en `deploy.sh` y **ON y vivo en el
+> `ops-worker` desde el 2026-08-28** —en Vercel el flag es **inerte**—, con el scheduler
+> `ops-seo-competitor-coverage` **ENABLED**. **Rollout cerrado con el release `c983be7f18e6`**
+> (ver Actualización 2026-08-28 (3)).
 >
-> **Actualización 2026-08-28 (2):** `TASK-1699` (top-N del SERP) quedó **code complete, rollout
-> pendiente** (`in-progress/`, en develop `fdfdedbe5`). Entregado: tabla `seo_serp_top_results`
+> **Actualización 2026-08-28 (2):** `TASK-1699` (top-N del SERP) quedó **VIVO en producción** con el
+> release `c983be7f18e6` (ver Actualización 2026-08-28 (3); llegó a develop en `fdfdedbe5`). Entregado: tabla `seo_serp_top_results`
 > (migración `20260828124352232`, append-only estricto, ranura `rank_absolute` jamás `rank_group`)
 > · parser hermano `parseSerpTopResults` con costo marginal CERO (test de no-regresión sobre
 > `buildSerpTask`) · cableado en el rank capture tras el flag dual-runtime
@@ -88,10 +89,38 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > · lanes sólo-internal 404 anti-oracle + tools MCP `get_seo_serp_top_results` /
 > `get_seo_competitor_candidates` federadas (inventario 27) · señal `seo.serp_top_results.coverage`.
 > Cero ALTER a `seo_competitors` (la autoría quedó en `1662`). Sanity 9/9 contra PG real. ⚠️ **El
-> día 1 de la serie = primer deploy del worker post-release: cada día sin release pierde el top-N de
-> ese día para siempre** — es el único trabajo del plan con costo de demora irrecuperable. Cierra la
+> día 1 de la serie es el 2026-08-29** (cron `ops-seo-rank-capture`, 05:00 CLT) y **cada día apagado
+> pierde el top-N de ese día para siempre** — es el único trabajo del plan con costo de demora
+> irrecuperable. Cierra la
 > brecha S2 de la auditoría 2026-08-15; S3 (estacionalidad, `TASK-1708`) y S4 (clustering propio)
 > ganan su sustrato disponible sin task abierta.
+>
+> **Actualización 2026-08-28 (3) — el carril del día quedó VIVO en producción.** Release
+> `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208, `release_id`
+> `c983be7f18e6-92b1b327-a1c9-4e7a-85dc-6a5e300f4e32`, manifiesto `released`, run `33178544139`).
+> Las **4 migraciones** del día quedaron aplicadas en la instancia única Cloud SQL
+> `greenhouse-pg-dev` (`pnpm pg:connect:status` → `No migrations to run!`): `20260828015655472` ·
+> `20260828020728716` (ambas TASK-1696) · `20260828113457119` (TASK-1662) · `20260828124352232`
+> (TASK-1699). Estado de flags **por runtime**, que es la única forma honesta de declararlo:
+>
+> - `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` (TASK-1699, **dual-runtime**): **ON en los dos** —
+>   `ops-worker` desde antes del release (revisión `ops-worker-00610-kc8`, escritura del top-N en el
+>   rank capture) y **Vercel `Production` prendido con este release** (lectura de los lanes) más el
+>   redeploy obligatorio `greenhouse-aj0ng1mfw`, porque Vercel congela las env vars al crear el
+>   build. Verificado **en el runtime**, no sólo la env var: el canary contra
+>   `https://greenhouse.efeoncepro.com` devolvió `serp-top-results read: {"ok":true,…,"rows":[]}` —
+>   `ok:true`, no `disabled`. El array vacío es lo esperado: **el día 1 de la serie es el
+>   2026-08-29** y la serie no es backfilleable.
+> - `GROWTH_SEO_COMPETITOR_GAP_ENABLED` (TASK-1662): **ON y vivo sólo en el `ops-worker`** (en Vercel
+>   es inerte), scheduler `ops-seo-competitor-coverage` **ENABLED**. Primera corrida real: USD 0,1076
+>   (Berel MX vs `comex.com.mx`), gap 357 `content_gap` / 54 `ranks_worse` / 269 excluidas por GSC
+>   medido.
+> - `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED` + `..._ENFORCED` (TASK-1696): **siguen default-OFF por
+>   diseño**. No se prendieron con este release y no deben prenderse sin decisión explícita del
+>   operador tras un ciclo mensual de shadow.
+>
+> Los 4 lanes internal-only nuevos responden `ok` contra producción, con `404` anti-oracle en el deny
+> (`provider-spend` · `keyword-gap` · `serp-top-results` · `competitor-candidates`).
 >
 > ⚠️ Al cerrar una task, revisar quién la citaba como blocker. Un `Blocked by` obsoleto es fricción
 > inventada, y no hay gate que lo detecte.
@@ -112,7 +141,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > |---|---|---|
 > | ¿Qué empujo de lo que ya tengo? | GSC medido | **construida** (TASK-1308) |
 > | ¿Dónde quiere estar el cliente? | **declarado por humano** | `TASK-1659` (**complete 2026-08-14**, el eje ya existe en el command) + `TASK-1660` (superficie) |
-> | ¿Qué me pierdo entero? | competencia + Labs | `TASK-1661` + `TASK-1662` (**implementada 2026-08-28**, Slice 4 pendiente) |
+> | ¿Qué me pierdo entero? | competencia + Labs | `TASK-1661` + `TASK-1662` (**en producción 2026-08-28**, release `c983be7f18e6`; Slice 4 pendiente) |
 >
 > La segunda es la que ancla comercialmente a las otras dos, porque es el compromiso con el cliente
 > y el material del QBR. Y **Search Console es estructuralmente ciego** a las dos últimas: sin top
@@ -124,7 +153,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1659` — [**complete 2026-08-14**, backend-data] modelo de **intención** en el set monitoreado: objetivo declarado vs oportunidad detectada, con autoría. `source` (TASK-1308) es procedencia, no intención. Append-only: cambiar la intención cierra y abre, nunca `UPDATE` — outcome propio `intent_changed`, que **no consume cupo** del techo. `intent` (`target` | `opportunity`) **sin default**: quien no declara escribe `NULL` y no existe un tercer valor "desconocido"; `intentDeclaredBy` separa a quien asumió el compromiso de quien ejecutó el INSERT. Migración `20260814221022082`. Parity en las 3 lanes (app · ecosystem · MCP `track_seo_keywords`) con vocabulario validado en cada frontera; **sin capability, scope ni flags nuevos**. **Desbloquea `1660`.**
 - `TASK-1660` — [planificada, ui-ux] lente **Objetivos** sobre `/admin/growth/seo/keywords` — extiende el **nodo S3** del master UI flow. Full API Parity al revés: `trackKeywords` **ya** acepta keywords que el cliente no rankea y no tiene botón, y desde `TASK-1659` acepta además la **intención declarada**. **`Blocked by: none`** desde el cierre de `TASK-1659` (2026-08-14).
 - `TASK-1661` — [**complete 2026-08-13**, backend-data] volumen y **barrera de enlaces** por keyword. Trae el dato de mercado desde DataForSEO Labs (`keyword_overview`) a la tabla append-only `seo_keyword_market_data`, con país, idioma y `captured_at` en la clave; `readKeywordOpportunities` deja de cablear `market: 'unavailable'` y la tabla de `TASK-1308` muestra las columnas **sin cambio de código en la UI**. Captura **mensual** (el proveedor refresca una vez al mes), acotada al set monitoreado, con dry-run de costo previo. Costo real medido: **USD ~0.02/org/mes**. Tool MCP `get_seo_keyword_market_data` + federación al gateway en el mismo cierre. **Desbloquea `1660`/`1662`/`1664`.**
-- `TASK-1662` — [**implementada 2026-08-28**, backend-data; `in-progress` sólo por Slice 4 —bloqueado por `TASK-1700`— y el cierre operativo post-release] **keyword gap**: qué gana la competencia donde el cliente es invisible. La superficie va aparte. Competidores **declarados con autoría** (`seo_competitors`, migración `20260828113457119`), commands `declareCompetitors`/`retireCompetitors` en 3 lanes + tools MCP `declare/retire_seo_competitors` y `get_seo_keyword_gap`, cobertura `domain_intersection` con run ledger y gap **derivado al leer** (`readKeywordGap`, sin orden propio). Rollout verificado con competidor real (Berel MX → `comex.com.mx`): primera corrida USD 0,1076, 697 filas + 640 de mercado gratis, gap 357 `content_gap` / 54 `ranks_worse` / 269 excluidas por GSC medido. Flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED` ON declarativo en `deploy.sh` (efectivo con el primer deploy del worker post-release; scheduler `ops-seo-competitor-coverage` pausado hasta entonces). Escribe en la **misma** tabla de mercado — es multi-productor por diseño, nunca un segundo almacén (productor #4).
+- `TASK-1662` — [**en producción 2026-08-28** (release `c983be7f18e6`), backend-data; `in-progress` sólo por Slice 4 —bloqueado por `TASK-1700`—] **keyword gap**: qué gana la competencia donde el cliente es invisible. La superficie va aparte. Competidores **declarados con autoría** (`seo_competitors`, migración `20260828113457119`), commands `declareCompetitors`/`retireCompetitors` en 3 lanes + tools MCP `declare/retire_seo_competitors` y `get_seo_keyword_gap`, cobertura `domain_intersection` con run ledger y gap **derivado al leer** (`readKeywordGap`, sin orden propio). Rollout verificado con competidor real (Berel MX → `comex.com.mx`): primera corrida USD 0,1076, 697 filas + 640 de mercado gratis, gap 357 `content_gap` / 54 `ranks_worse` / 269 excluidas por GSC medido. Flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED` ON declarativo en `deploy.sh` (efectivo con el primer deploy del worker post-release; scheduler `ops-seo-competitor-coverage` pausado hasta entonces). Escribe en la **misma** tabla de mercado — es multi-productor por diseño, nunca un segundo almacén (productor #4).
 
 ### Carril de discovery y acción diaria (creado 2026-08-08)
 
@@ -208,23 +237,30 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > rastro. Orden interno: `1694 → 1691 → 1693`, porque las tres tocan el mismo camino de lectura y
 > `src/lib/copy/growth.ts`; en paralelo producirían tres encodings de la misma columna.
 
-- `TASK-1692` — [creada 2026-08-15, backend-data] **Writers del ledger de decisiones de discovery.**
-  De los 5 `action_kind` del enum sólo `dismissed` tiene writer, así que un tercio del modelo de
-  estados es inalcanzable y el guard del bridge promete una re-selección que nadie puede escribir. El
-  hecho lo escribe el **primitive** en su propia transacción, no cada consumer. **Bloquea a
-  `TASK-1700`**: su principio es el que la cola debe obedecer para no crear un segundo libro de
-  decisiones sobre los mismos hechos.
+- `TASK-1692` — [**`complete` 2026-08-28**, `code complete, rollout pendiente`, backend-data]
+  **Writers del ledger de decisiones de discovery.** El hecho lo escribe el **primitive** que lo
+  produce, dentro de su transacción: `createGroundedQueryDraft` deja `selected_for_grounded_query`
+  y `applyKeywordTracking` deja `promoted_to_tracking` en la MISMA transacción que abre la
+  membresía. Los dos lanes validan contra `SEO_DISCOVERY_CONSUMER_ACTION_KINDS`, así que un
+  consumer ya no puede "reportar" un outcome. `selected_for_target` quedó retirado del enum TS
+  (`CHECK` intacto) y hay un guard de cobertura que falla si un kind queda sin writer. Efecto
+  visible sin cambio de UI: el chip se mueve solo y el inbox deja de poner arriba lo ya resuelto.
+  Verificado contra PG real (11/11 + 12/12, transacciones que abortan). **Levanta el último bloqueo
+  de `TASK-1700`**, que queda `Blocked by: none`.
 - `TASK-1693` — [creada 2026-08-15, ui-ux] **Paginación por cursor + las fuentes de seed no
   cableadas.** El reader pagina y devuelve `nextCursor`; la page lo descarta. Y de las cinco fuentes
   que el primitive soporta sólo `manual` está cableada — la de Search Console, la de mejor oficio
   (demanda medida, resolución sin costo de proveedor), existe con copy escrito y sin consumidor.
-- `TASK-1694` — [creada 2026-08-15, backend-data] **Contrato de candidatos: barrera filtrable, una
-  fila por keyword, política de inclusión declarada.** La API mantiene `maxDifficulty` sobre la KD
-  cruda que `ISSUE-152` declaró engañosa y no expone filtro por barrera de enlaces; el dedupe por
-  método deja la misma keyword en dos filas con dos CTAs de gasto; y dos de los cuatro métodos
-  filtran el volumen cero en el proveedor y los otros dos no. **Bloqueo duro de `TASK-1700`** y
-  subida a P1: es la única defensa contra que la cola persista duplicados con la barrera engañosa en
-  filas append-only.
+- `TASK-1694` — [**`complete` 2026-08-28**, `code complete, rollout pendiente`, backend-data]
+  **Contrato de candidatos: barrera filtrable, una fila por keyword, política de inclusión
+  declarada.** `maxLinkBarrier`/`includeUnknownBarrier` entran al contrato y `maxDifficulty` se
+  acepta pero ya no decide (viaja declarado en `ignoredFilters`); el reader colapsa por
+  `normalizedKeyword` con `candidateIds[]`/`provenance[]`; `clusterConflict` advierte
+  canibalización contra el set seguido sin gastar; y los cuatro adapters compran con una sola
+  política declarada, persistida en `methods_json`. Levanta el **bloqueo duro de `TASK-1700`**.
+  Verificado contra PG real (764 de 923 filas del store marcan `keyword_difficulty = 0`, y el
+  filtro viejo no reducía el conjunto). Pendiente de rollout: corrida de smoke con gasto y deploy
+  del gateway MCP (commit local en `efeonce-mcp`).
 - `TASK-1695` — [creada 2026-08-15, backend-data] **Cobertura y registro del autor grounded.** El
   techo de 20 candidatos del bridge es aritméticamente incompatible con su propia regla de 12–16
   preguntas, y el system prompt base está en voseo rioplatense pidiendo salida es-CL — riesgo de
@@ -249,12 +285,14 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
   `seo.provider.cost_over_budget`, esta última citada como mitigación por **nueve** tasks sin existir
   en código—; y el camino programático es el lane
   `/api/platform/ecosystem/growth/seo/provider-spend` + la tool MCP `get_seo_provider_spend`.
-  🔴 **Rollout pendiente:** el gate **nace en shadow** —`GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED` y
+  ✅ **Código en producción desde el release `c983be7f18e6` (2026-08-28)** — el lane
+  `provider-spend` responde `ok` con `404` anti-oracle en el deny. 🔴 **El gate sigue en shadow, y es
+  el estado deseado:** `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED` y
   `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED` **ambos OFF**, en los dos runtimes (Vercel +
-  `ops-worker`)—: calcula, registra y emite señal, pero no bloquea. El flip a enforce es decisión del
-  operador después de un ciclo mensual de medición, porque el camino público del lead magnet comparte
-  el motor del grader. La federación de la tool en `mcp.efeonce.org` va **después** del release que
-  lleve el lane a `main`, nunca antes.
+  `ops-worker`) — calcula, registra y emite señal, pero no bloquea; **no se prendieron con este
+  release**. El flip a enforce es decisión del operador después de un ciclo mensual de medición,
+  porque el camino público del lead magnet comparte el motor del grader. La federación de la tool en
+  `mcp.efeonce.org` ya no está bloqueada por `main`: su lane está en producción.
 - `TASK-1697` — [creada 2026-08-15, backend-data] `growth/site-substrate` + lint rule cross-domain
   (mitad A). ✅ **Complete y desplegada (2026-08-27):** el sustrato vive en
   `src/lib/growth/site-substrate/` (barrel `@/lib/growth/site-substrate`: `createSiteFetcher`,
@@ -265,9 +303,10 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1698` — [creada 2026-08-15, backend-data] Posicionamiento declarado (`●`) / observado (`◑`)
   para `message_alignment`. **P0.** Bloquea a `TASK-1672`.
 - `TASK-1699` — [creada 2026-08-15, backend-data] Persistir el top-N del SERP que ya se paga. **P0**,
-  único trabajo con costo de demora irrecuperable. 🔄 **In-progress: code complete, rollout
-  pendiente (2026-08-28)** — el día 1 de la serie es el primer deploy del worker post-release; ver
-  Actualización 2026-08-28 (2).
+  único trabajo con costo de demora irrecuperable. ✅ **VIVO en producción 2026-08-28** (release
+  `c983be7f18e6`): flag ON en los **dos** runtimes (`ops-worker` escribe, Vercel lee), canary del
+  lane `ok:true` contra producción, **día 1 de la serie 2026-08-29**; ver Actualización 2026-08-28
+  (2) y (3).
 - `TASK-1700` — [creada 2026-08-15, backend-data] Cola priorizada como aggregate persistido con score
   versionado. **P0.** Llega **antes** que `TASK-1669`.
 - `TASK-1701` — [creada 2026-08-15, backend-data] `analyzeUrlContent`: hechos por URL, cero score.
@@ -900,16 +939,19 @@ abarata por cadencia y muestreo (`TASK-1704`).
 ### Carril nuevo — Instrumentación, sustrato y autoridad de orden (creado 2026-08-15)
 
 - `TASK-1696` — ledger con dimensión de consumidor + gate USD per-org del grader. **P0.** Nace en
-  shadow. Desbloquea todo lo que gaste. ✅ **complete 2026-08-27**, `code complete, rollout
-  pendiente`: la plomería está viva (dimensión de consumidor + base de costo en un solo ledger,
-  `resolveAeoBudget`, tres señales, lane + tool MCP) y el gate sigue **en shadow**, con sus dos flags
-  OFF en los dos runtimes.
+  shadow. Desbloquea todo lo que gaste. ✅ **complete 2026-08-27, en producción 2026-08-28** (release
+  `c983be7f18e6`, migraciones `20260828015655472` + `20260828020728716` aplicadas): la plomería está
+  viva (dimensión de consumidor + base de costo en un solo ledger, `resolveAeoBudget`, tres señales,
+  lane + tool MCP) y el gate **sigue en shadow por diseño**, con sus dos flags OFF en los dos
+  runtimes (Vercel + `ops-worker`).
 - `TASK-1697` — `growth/site-substrate` + barrel de dominio AEO + lint rule cross-domain. **P0.**
 - `TASK-1698` — posicionamiento declarado (`●`) / observado (`◑`) para `message_alignment`. **P0.**
 - `TASK-1699` — persistir el top-N del SERP que ya se paga. **P0.** *Único trabajo del plan con
-  costo de demora irrecuperable: el SERP de ayer sólo se recompra.* 🔄 **code complete, rollout
-  pendiente (2026-08-28)**: tabla + parser + cableado + propose de competidores + tools MCP
-  federadas ya en develop; la serie arranca con el primer deploy del worker post-release.
+  costo de demora irrecuperable: el SERP de ayer no se recompra.* ✅ **VIVO en producción
+  2026-08-28** (release `c983be7f18e6`, migración `20260828124352232` aplicada): tabla + parser +
+  cableado + propose de competidores + tools MCP; flag ON en los dos runtimes (`ops-worker`
+  `ops-worker-00610-kc8` escribe, Vercel `Production` + redeploy `greenhouse-aj0ng1mfw` lee).
+  **Día 1 de la serie: 2026-08-29.**
 - `TASK-1700` — cola priorizada como aggregate persistido con score versionado. **P0.**
 - `TASK-1701` — `analyzeUrlContent`: hechos por URL, cero score.
 - `TASK-1702` — señales deterministas de citabilidad + recomendación anclada a URL.

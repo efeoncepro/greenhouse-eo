@@ -135,10 +135,14 @@ const KeywordDiscoveryCandidateDrawer = ({
    * 🔴 Un candidato DESCARTADO no ofrece «Preparar consultas».
    *
    * `createGroundedQueryDraft` sólo acepta candidatos con `latestAction` en `null` o
-   * `selected_for_grounded_query` — y hoy nadie escribe ese segundo valor, así que un descartado
-   * no tiene camino de vuelta. Ofrecer el botón sería prometer una acción que el command va a
+   * `selected_for_grounded_query`. Ofrecer el botón sería prometer una acción que el command va a
    * rechazar al confirmar, justo lo que esta lente resuelve server-side en todos los demás casos.
-   * Cuando exista re-selección explícita (TASK-1692), esta condición la incorpora.
+   *
+   * TASK-1692 abrió el camino de vuelta en el SERVER: re-seleccionar es escribir
+   * `selected_for_grounded_query` con `metadata.reason = 'reselected'` por `record_action`, y el
+   * ledger append-only hace que esa decisión posterior supersede al descarte. Lo que falta es el
+   * AFFORDANCE visible acá — sigue siendo un follow-up `ui-ux`, con su copy y su evidencia GVC.
+   * Hasta entonces esta condición se mantiene: el botón no se ofrece a un descartado.
    */
   const dismissed = candidate.latestAction?.kind === 'dismissed'
   const groundedAvailable = canExecute && groundedDisabledReason === null && !dismissed

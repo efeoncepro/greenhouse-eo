@@ -1,5 +1,18 @@
 # TASK-1667 — Growth SEO: SEO Editorial Work Item y handoff gobernado a Content Factory
 
+## Delta 2026-08-28 — un candidato es una KEYWORD, no una fila de procedencia
+
+Cerrado por `TASK-1694`. `readKeywordDiscovery` colapsa por `normalizedKeyword`: la misma keyword
+hallada por dos métodos es UNA fila con `candidateIds[]` + `provenance[]`, y `totalCandidates`
+cuenta keywords distintas.
+
+Qué cambia para esta task: el work item editorial nace de una decisión sobre un candidato, así que
+la unidad de la que nace un brief es la **keyword**, no la procedencia. Antes de este cierre, una
+keyword hallada por sugerencias y por relacionadas habría producido **dos briefs para la misma
+intención**. Al modelar el work item, la clave de identidad/idempotencia va sobre la keyword
+normalizada; si necesitas alcanzar las filas de procedencia (para registrar la acción, por ejemplo),
+están todas en `candidateIds`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

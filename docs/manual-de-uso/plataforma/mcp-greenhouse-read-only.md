@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso
 > **Version:** 2.0
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1662+1699: inventario a 27 tools SEO — 20 lectura + 7 escritura; las 27 federadas al gateway, cuya revisión productiva sirve 21 hasta el deploy post-release — estado verificado en §8)
+> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1662+1699 desplegadas: 27 tools SEO — 20 lectura + 7 escritura — federadas Y sirviendo en la revisión productiva `efeonce-mcp-gateway-00024-8b8`; estado verificado en §8)
 > **Modulo:** plataforma / MCP
 > **Ruta en portal:** `N/A` (server MCP local `stdio` o remoto HTTP)
 > **Documentacion relacionada:** [API Platform Ecosystem](../../documentation/plataforma/api-platform-ecosystem.md), [Platform Health API](../../documentation/plataforma/platform-health-api.md), [GREENHOUSE_MCP_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md)
@@ -289,25 +289,36 @@ obligatorias (`readOnlyHint: false` en toda tool que escriba o compre datos del 
 introspección runtime del server. El espejo es interino: `TASK-1780` lo reemplaza por el manifiesto
 canónico de tools de Greenhouse. Es el mismo lane y el mismo entitlement: el gateway solo transporta.
 
-⚠️ **Estado de despliegue (2026-08-28).** Hay que distinguir dos números que estos docs ya
-confundieron una vez: el **inventario interno** (lo que Greenhouse sirve) y lo **desplegado en el
-gateway productivo**.
+✅ **Estado de despliegue (2026-08-28): inventario interno = allowlist federado = desplegado, 27
+tools (20 lecturas + 7 escrituras).** Estos docs distinguían dos números que ya no divergen; el
+`rollout pendiente` que declaraban TASK-1658/1696/1662/1699 quedó cerrado.
 
-- **Inventario interno y allowlist federado: 27 tools (20 lecturas + 7 escrituras).** Federación al
-  día en `efeonce-mcp`: `get_seo_provider_spend` (TASK-1696, commit `1a51461`, pusheado),
-  `declare/retire_seo_competitors` + `get_seo_keyword_gap` (TASK-1662, commit local `8215ab5`) y
-  `get_seo_serp_top_results` + `get_seo_competitor_candidates` (TASK-1699, commit local `92e7197`).
-- **Revisión productiva del gateway: 21 tools.** La revisión `efeonce-mcp-gateway-00023-zt2`
-  (desplegada el 2026-08-27) llevó `tools/list` de 13 a 21 y cerró el rollout de TASK-1658.
-- **La tool 22 todavía NO está en producción.** El deploy del gateway es `workflow_dispatch`
-  manual: no se disparó con el push. Y su lane `/api/platform/ecosystem/growth/seo/provider-spend`
-  está en `develop`, **no en `main`** de Greenhouse.
+- **El deploy ya ocurrió.** `origin/main` de `efeonce-mcp` pasó de `8f1ae34` a `92e7197` (los dos
+  commits que estaban locales sin pushear: `8215ab5` de TASK-1662 y `92e7197` de TASK-1699), CI
+  verde, workflow "Deploy Cloud Run" run `33180234265` en `success` y sin compuerta de aprobación.
+- **Revisión activa: `efeonce-mcp-gateway-00024-8b8`** (`Ready=True`, 100% del tráfico, imagen
+  taggeada al SHA exacto `92e71971899c6468fc111f7614b89ea6602ac0aa`). Reemplaza a
+  `efeonce-mcp-gateway-00023-zt2`, que servía 21. La diferencia son exactamente 6 tools:
+  `get_seo_provider_spend`, `get_seo_keyword_gap`, `declare_seo_competitors`,
+  `retire_seo_competitors`, `get_seo_serp_top_results`, `get_seo_competitor_candidates`.
+- **Verificado en vivo, no inferido.** Front door: `GET
+  https://mcp.efeonce.org/.well-known/oauth-protected-resource` → 200; `POST
+  https://mcp.efeonce.org/mcp` sin token → 401 (fail-closed). Canary de cierre verde completo contra
+  **producción** (`scripts/greenhouse-seo-canary.mjs` con
+  `GREENHOUSE_ECOSYSTEM_API_URL=https://greenhouse.efeoncepro.com`, org Berel
+  `org-32333527-02a8-487b-819e-6f76a761777d`): las 20 lecturas ✓, todos los denies `404` anti-oracle ✓,
+  las 7 escrituras ejercitadas en su puerta sin escribir ni gastar ✓.
+- **Estar desplegada no vuelve usable una escritura.** Las dos nuevas
+  (`declare_seo_competitors` / `retire_seo_competitors`) viajan en el scope `efeonce.mcp.seo.write`
+  que ya existía — **cero cambios en Entra** — así que siguen live-but-fail-closed hasta TASK-1631,
+  igual que las demás escrituras: ese scope no está cableado al cliente PKCE público compartido, y
+  eso es deliberado.
+- **Un array vacío no es una falla.** Los 4 lanes internal-only nuevos respondieron ok contra
+  producción: `serp-top-results` con `rows: []` (el día 1 de la serie es 2026-08-29),
+  `competitor-candidates` con `candidates: []` (esperado con serie joven <5 días), `keyword-gap` con
+  1 competidor declarado, `provider-spend` ✓.
 
-Secuencia de rollout: 1) el release develop→main de Greenhouse lleva el lane a producción;
-2) recién entonces se despacha el deploy del gateway — dispararlo antes deja la tool respondiendo
-**404 upstream** en `mcp.efeonce.org` (precedente literal de TASK-1661); 3) verificación:
-`tools/list` sube 21→22 + canary. Si un cliente externo no ve `get_seo_provider_spend` antes de
-eso, es el estado esperado, no una falla. La federación sigue siendo por **allowlist explícito con
+La federación sigue siendo por **allowlist explícito con
 revisión humana por tool** (decisión TASK-1647: nunca auto-federación). Lectura funcional en
 [Search Visibility 360 por MCP](../../documentation/growth/search-visibility-360-por-mcp.md); operación en
 [Operar el provider Greenhouse-SEO del MCP](operar-provider-greenhouse-seo-mcp.md).

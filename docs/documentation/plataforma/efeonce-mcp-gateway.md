@@ -15,11 +15,10 @@ La primera capacidad activa fue `globe.producer.fleet.list`. Permite consultar l
 Globe para el workspace interno autorizado. El gateway no recrea catálogo, routing ni reglas de Globe.
 
 Desde el 6 de agosto de 2026 hay una **segunda capacidad federada**: Search Visibility 360 de Greenhouse. Partió
-con tres consultas de solo lectura y creció hasta cubrir **el inventario SEO completo del MCP interno: 22 tools
-(17 lecturas + 5 escrituras gobernadas)** — TASK-1658 cerró el drift de federación dejándolo en 21 el 27 de
-agosto, y TASK-1696 sumó la lectura 17, `get_seo_provider_spend`. La revisión productiva del gateway
-(`efeonce-mcp-gateway-00023-zt2`, desplegada el 27 de agosto) sirve **21**: la tool 22 espera el deploy posterior
-al próximo release develop→main de Greenhouse, porque su lane todavía no está en producción. Igual que con Globe, el gateway no recrea
+con tres consultas de solo lectura y creció hasta cubrir **el inventario SEO completo del MCP interno: 27 tools
+(20 lecturas + 7 escrituras gobernadas)**. Desde el 28 de agosto de 2026 esas 27 están **efectivamente
+desplegadas** en la revisión productiva del gateway (`efeonce-mcp-gateway-00024-8b8`), que reemplazó a la del 27
+de agosto (servía 21). Ya no queda ninguna tool esperando despliegue. Igual que con Globe, el gateway no recrea
 lógica: transporta la pregunta y Greenhouse decide qué se puede ver. El inventario vigente y su estado de
 despliegue viven en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8; detalle
 funcional en [Search Visibility 360 por MCP](../growth/search-visibility-360-por-mcp.md).
@@ -42,10 +41,14 @@ Disponible hoy:
 - `globe.capabilities.list` para discovery.
 - `globe.producer.fleet.list` para disponibilidad de rutas de Globe.
 - las tools SEO de Search Visibility 360 de Greenhouse: las lecturas (`get_seo_*`) bajo el permiso base de
-  conexión — no configuran mediciones, no disparan capturas ni gastan presupuesto de proveedor — y las cinco
+  conexión — no configuran mediciones, no disparan capturas ni gastan presupuesto de proveedor — y las siete
   escrituras gobernadas bajo un permiso de escritura propio (`efeonce.mcp.seo.write`) que NO está cableado al
-  cliente público: hoy responden fail-closed. Cada tool queda acotada por el módulo SEO asignado a la
-  organización. Inventario exacto en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8.
+  cliente público: hoy responden fail-closed. Estar desplegadas no las vuelve usables por cualquiera: una
+  escritura desplegada y fail-closed sigue sin poder ejecutarse hasta que el permiso se cablee. Cada tool queda
+  acotada por el módulo SEO asignado a la organización. Además hay cuatro lecturas competitivas
+  (`get_seo_provider_spend`, `get_seo_keyword_gap`, `get_seo_serp_top_results`, `get_seo_competitor_candidates`)
+  que sólo responden a conexiones internas de Efeonce: una conexión de cliente recibe un "no existe", nunca una
+  pista de que el dato está ahí. Inventario exacto en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8.
 
 No disponible:
 

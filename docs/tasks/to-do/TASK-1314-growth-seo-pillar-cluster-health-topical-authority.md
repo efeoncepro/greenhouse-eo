@@ -1,5 +1,20 @@
 # TASK-1314 — Growth SEO: Pillar-Cluster Health / Topical Authority
 
+## Delta 2026-08-28 (release a producción) — la Open Question 3 (cobertura / keyword gap) queda resuelta
+
+`readKeywordGap` (`src/lib/growth/seo/keyword-gap-reader.ts`, `TASK-1662`) existe y **corre en
+producción** desde el release `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208,
+run `33178544139`, manifest `released`): migración aplicada en la instancia única de Cloud SQL,
+`GROWTH_SEO_COMPETITOR_GAP_ENABLED` ON en la revisión activa del ops-worker `ops-worker-00610-kc8`,
+scheduler `ops-seo-competitor-coverage` `ENABLED`, y la tool `get_seo_keyword_gap` federada en
+`mcp.efeonce.org` (revisión `efeonce-mcp-gateway-00024-8b8`).
+
+**Consecuencia para la Open Question 3:** la señal de cobertura **no requiere un reader propio ni
+degradarse**. Se consume `readKeywordGap`, que ya entrega `content_gap` / `ranks_worse` separados,
+con exclusión dura por impresiones GSC 28d y factores con procedencia + `sin_dato` honesto. Esta
+task **NUNCA** llama `keyword_gap` de Labs por su cuenta ni re-deriva la recurrencia — cerrado por
+TASK-1662.
+
 ## Delta 2026-08-27
 
 - **`TASK-1777` quedó `code complete` (rollout pendiente):** el detalle de qué enlaza a una página

@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.0
+> **Version:** 1.2
 > **Creado:** 2026-08-14 por Claude (TASK-1665)
-> **Ultima actualizacion:** 2026-08-14 por Claude (TASK-1665 — lente `Descubrir` completa: builder, corrida, candidatos y decisiones)
+> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1692 — el estado del candidato se mueve solo, la bandeja reordena lo ya decidido y un descartado se puede volver a elegir; delta previo TASK-1694 — una keyword por fila, aviso de canibalizacion y el filtro de dificultad deja de decidir)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §7, §9 y §10.4
 
 # Descubrir keywords — Expandir seeds y decidir por candidato
@@ -123,9 +123,74 @@ la **diversidad de dominios que enlazan al top 10**, no del conteo de enlaces.
 enlaces. Y `Sin dato` es `Sin dato`, nunca `Baja` — presentar un hueco como barrera baja afirmaria
 una oportunidad que nadie midio.
 
+### Una keyword, una fila (desde 2026-08-28)
+
+Una misma keyword puede aparecer por dos caminos distintos: la encuentra Sugerencias y tambien
+Relacionadas. **Eso es una sola oportunidad, no dos.** Desde `TASK-1694` la ves una vez, con la
+lista de por donde llego guardada como procedencia, y el total de candidatos cuenta keywords
+distintas.
+
+Importa porque cada fila trae su propio boton de decision, y seguir una keyword compromete gasto
+todos los dias. Dos filas de lo mismo eran dos compromisos de gasto sobre una sola intencion.
+
+> Nota para quien consulte por API, Nexa o MCP: `totalCandidates` cuenta keywords, no procedencias.
+> Si comparas contra una lectura vieja el numero puede bajar sin que se haya perdido nada.
+
+### Aviso de canibalizacion
+
+Cuando el candidato pertenece al mismo grupo de sinonimos que una keyword que **ya sigues**, el
+contrato lo advierte y nombra contra cual choca. Dos objetivos sobre la misma intencion se diluyen
+entre si: lo correcto es consolidar, no sumar una segunda apuesta con su propio gasto recurrente.
+
+Es un **aviso, nunca un bloqueo** — decides tu. Y tiene tres respuestas posibles, que no significan
+lo mismo:
+
+| Respuesta | Que significa |
+|---|---|
+| `Choca` | Otra keyword que ya sigues apunta a la misma intencion. Se te nombra cual |
+| `Libre` | Se pudo revisar todo y no choca con nada de lo que sigues |
+| `Sin determinar` | **No se pudo saber.** Falta el dato de mercado de alguna keyword seguida |
+
+`Sin determinar` no es `Libre`. No saber si hay choque y saber que no lo hay son cosas distintas.
+
+### El filtro de dificultad cambio
+
+El filtro por el indice de dificultad del proveedor **ya no filtra nada**: se sigue aceptando para
+no romper a quien lo tenia guardado, pero la respuesta declara que lo ignoro y cual es el filtro
+correcto. Si lo mandas y el conteo no baja, no es un error: es el contrato diciendote la verdad.
+
+El filtro que si decide es el de **barrera de enlaces**, y por defecto **deja fuera lo que no tiene
+dato medido** — pedirlo incluido es una opcion explicita, porque "Sin dato" no es "Baja".
+
+### El estado del candidato ahora se mueve solo (desde 2026-08-28)
+
+Antes, el chip cambiaba sólo al descartar. Preparar consultas AEO o promover a seguimiento pasaban
+de verdad, pero el candidato seguía diciendo `Nuevo`. Ya no: cada decisión queda registrada por el
+proceso que la produce, y el chip refleja lo que realmente pasó.
+
+Dos cosas que vas a notar sin que nada de la pantalla haya cambiado:
+
+- **La bandeja se reordenó.** Lo que ya decidiste baja; arriba queda lo que espera decisión. Si te
+  parece que "se perdieron" candidatos, no se perdieron: bajaron porque ya los resolviste.
+- **Un descartado se puede volver a elegir.** El historial sólo agrega, nunca borra: volver a
+  elegirlo escribe una decisión nueva que reemplaza al descarte, y el candidato vuelve a ser
+  elegible para preparar consultas AEO.
+
+### Qué NO se registra, y por qué
+
+Si intentas seguir una keyword y el target está en su techo, **no queda registro de promoción** —
+porque no hubo promoción. Anotar un intento fallido como si hubieras promovido sería justo la clase
+de dato que después hace que un reporte mienta.
+
+Sí queda registro cuando la keyword **ya estaba** en seguimiento: tomaste la decisión igual, aunque
+el resultado no mueva el conteo.
+
 ### Estados del candidato
 
-`Nuevo` · `Ya seguido` · `Marcado como objetivo` · `Descartado` · `Preparando AEO`.
+`Nuevo` · `Ya seguido` · `Descartado` · `Preparando AEO`.
+
+> `Marcado como objetivo` dejó de existir como estado propio: declarar objetivo **es** seguir la
+> keyword con esa intención, así que su estado es `Ya seguido` y la intención viaja con él.
 
 ### Estados de la corrida
 

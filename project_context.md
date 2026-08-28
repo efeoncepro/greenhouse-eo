@@ -264,10 +264,11 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   `ops-worker` **se lee del array `WORKER_RUNTIME_PATHS` de `.github/workflows/ops-worker-deploy.yml`,
   nunca se transcribe** — la copia que arrastraban los docs tenía 7 entradas y omitía
   `src/lib/reliability`, `src/lib/hiring/talent-pool` y `src/lib/sync`, devolviendo «vacío» sin haber
-  mirado; (2) en el merge canónico `main → develop`, con `main ⊆ develop` el default es **`-s ours`**,
-  no `-X ours`: éste último sólo decide los hunks en conflicto y puede **duplicar contenido documental
-  en silencio**, algo que las dos verificaciones duras no ven porque miran sólo rutas de código. La
-  auditoría correcta de un `-X ours` es `git diff HEAD@{1} HEAD --name-status` completo.
+  mirado; (2) merge canónico `main → develop`: **`-s ours`** por default; `-X ours` es excepción
+  (duplica bitácora, resucita tasks y hasta código en silencio; auditoría `--name-status` COMPLETO).
+  **Delta 2026-08-28 (`c983be7f18e6`): la estrategia se decide CLASIFICANDO lo que `main` tiene de
+  más, no contándolo** — con squash-merge `git log origin/main --not HEAD` nunca viene vacío. Árbol
+  de decisión completo en el runbook §2.4 Paso A.
 - **Live tests (`*.live.test.ts`): `pnpm test:live`, nunca `source .env.local`.** Escriben sobre la ÚNICA
   instancia Cloud SQL de dev/staging/prod, así que corren serializados (proyecto `live` en `vitest.config.ts`)
   y su sujeto se deriva por `scope`, no de un pool compartido. Canon:
@@ -286,7 +287,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 ## Sources of truth por pregunta
 
 | Pregunta | Fuente primaria |
-|---|---|
+| --- | --- |
 | Qué hago ahora | `Handoff.md` + artefacto activo |
 | Qué existe y qué contrato gobierna | `docs/architecture/**`, ADRs y código/runtime |
 | Por qué se decidió | `docs/architecture/DECISIONS_INDEX.md` + ADR |
@@ -316,7 +317,8 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo se estructura y vende Media & Distribution, sus tres soluciones, Performance & Commerce, capacidades de delivery, Influencers/UGC y el rol de Reach | `docs/services/media-distribution/README.md` + `docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md` + `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md` + `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md` + `docs/audits/commercial/CREATOR_INFLUENCE_CONTENT_MARKET_RESEARCH_2026-07-29.md` + `docs/audits/commercial/CREATOR_INFLUENCE_PERFUME_ATHLETES_CHILE_SIMULATION_2026-07-29.md` |
 | Cómo se estructura y vende Revenue Operations & CRM, cómo elegir HubSpot-first, Salesforce-first o híbrido, y cómo usar benchmarks/brochures sin volverlos canon | `docs/audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md` + `docs/services/hubspot-as-a-service/README.md` + `docs/services/salesforce/README.md` + skills del provider; para Salesforce distinguir CRM core, Marketing Cloud Engagement y Marketing Cloud Next. Claims, certificaciones y reventa se leen del registry y requieren evidencia primaria antes de uso externo |
 | Cómo construir y cerrar una licitación client-facing con Artifact Composer, desde evidencia y narrativa hasta deck auditado y Proposal versionada | `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md` + `docs/commercial/tenders/PROPOSAL_STUDIO_CLOSURE_SCHEMA.md` + `docs/architecture/GREENHOUSE_AGENTIC_QUOTATION_ORCHESTRATION_DECISION_V1.md` + `docs/audits/commercial/EFEONCE_SERVICE_PRICING_LEARNINGS_AND_GUARDRAILS_2026-07-31.md` + expedientes aprobados + skills `greenhouse-public-private-tenders` y `deck-studio`; separar fuentes y gobernanza técnica/económica sin imponer artefactos físicos distintos, derivar todo precio del quote congelado, declarar IVA, pasar `pnpm tender:canonical-gate <slug>` y no emitir stubs/HOLD como oferta |
-| Cómo descubrir y calificar oportunidades privadas de Wherex antes de abrir un bid | `docs/manual-de-uso/comercial/revisar-licitaciones-wherex-con-chrome.md` + skill `greenhouse-public-private-tenders` → `wherex-radar-chrome-playwright.md`; `pnpm wherex:radar` usa un perfil Chrome aislado y credencial local `.auth/` con `0600`, revisa Nueva + Editando y lee ficha/adjuntos antes del fit. El dictamen también exige revisar descripción/comentarios generales y Centro de mensajes → Preguntas, aunque el reporte no los haya capturado; para una candidata autorizada, `--tender-id <ID> --archive-originals <carpeta>` archiva únicamente descargas nativas y nunca elude el visor protegido; las candidatas elegidas verifican/crean empresa, deal y asociación por MCP HubSpot mediante confirmaciones explícitas; no ejecuta acciones comerciales |
+| Cómo descubrir y calificar licitaciones públicas de LicitaLAB | skill espejo `greenhouse-public-private-tenders` → `licitalab-radar-playwright.md` + `licitalab-mcp.md`; LicitaLAB sólo ve contratación pública. El radar entrega códigos al MCP documental. La promoción manual usa MCP HubSpot con confirmación, búsqueda por ID exacto + llave de idempotencia cuando esté poblada, asociaciones y readback; `gh_deal_origin` queda vacío mientras su enum sólo admita `greenhouse_quote_builder`. El bridge pendiente afecta automatización, no cargas manuales. |
+| Cómo descubrir y calificar oportunidades privadas de Wherex | `docs/manual-de-uso/comercial/revisar-licitaciones-wherex-con-chrome.md` + `greenhouse-public-private-tenders` → `wherex-radar-chrome-playwright.md`; lectura protegida evidence-first, sin acciones comerciales |
 | Cómo funcionan partnerships/providers, licencias, co-selling y captura de valor en Efeonce | `docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md` (estado vigente) + `docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md` + `docs/audits/commercial/README.md` (evidencia fechada) + `efeonce-agency` |
 | Cómo se priorizan beachheads, ofertas de entrada, rutas de expansión, proof y cross-sell | `docs/strategy/EFEONCE_COMMERCIAL_FOCUS_AND_BEACHHEADS_V1.md` + `docs/context/13_icp-buyer-personas-jtbd.md` + `gtm-architect`/`efeonce-customer-model-operator` |
 | Contrato transversal de producto y crecimiento operator-first | `docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md` + `docs/context/03_ecosistema-producto.md` + `docs/context/10_experiencia-cliente.md` + `efeonce-business-model-operator`/`efeonce-customer-model-operator`/`research-benchmark-operator` |

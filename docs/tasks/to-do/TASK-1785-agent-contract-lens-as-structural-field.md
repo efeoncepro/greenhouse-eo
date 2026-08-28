@@ -1,5 +1,19 @@
 # TASK-1785 — La lente deja de ser una instrucción y pasa a ser un campo del contrato
 
+## Delta 2026-08-28 (release a producción) — la superficie creció: 20 → 26 tools SEO
+
+El release `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208, run `33178544139`,
+manifest `released`) y el deploy del gateway `mcp.efeonce.org` (revisión
+`efeonce-mcp-gateway-00024-8b8`) sumaron 6 tools SEO federadas. La cifra «20 tools SEO con
+`outputSchema` común» de §Estado actual quedó stale: el registry interno declara hoy **26 tools
+SEO** en `src/mcp/greenhouse/server.ts` y el gateway federa **27**.
+
+Dos de las nuevas emiten cifras que caen de lleno en el gap de esta task:
+`get_seo_serp_top_results` (posiciones medidas del SERP comprado, lente `measured`) y
+`get_seo_competitor_candidates` (recurrencia derivada de esa serie). Al aterrizar el campo `lens`,
+entran al alcance junto con `get_seo_keyword_gap`, cuyos factores ya declaran procedencia y
+`sin_dato` — precedente vecino del mismo invariante, aunque expresado con otro vocabulario.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

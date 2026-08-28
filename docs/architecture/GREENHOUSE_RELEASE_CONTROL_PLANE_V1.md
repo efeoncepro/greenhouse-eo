@@ -1098,6 +1098,47 @@ Tiempo objetivo: **<30 min** para bundled releases típicos.
 
 **Spec canónica**: `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` + `docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md` + `docs/operations/runbooks/production-release.md`. Last successful release: `25825280928` manifest `e02cb32e9c30-5acb894c-f164-486c-99c0-074d42aefbeb` (2026-05-13).
 
+### Merge canónico `develop ← main` invariants (delta 2026-08-28)
+
+El paso que precede a **todo** PR de release (`develop→main`) es traer `main` a `develop` para que el
+PR quede MERGEABLE. Es el único paso del control plane que hasta hoy no tenía contrato acá y se
+decidía leyendo prosa.
+
+🔴 **La estrategia se decide CLASIFICANDO lo que `main` tiene de más, nunca contándolo.** La regla
+anterior —«si `git log origin/main --not HEAD` no trae commits, `-s ours`; si trae, `-X ours`»—
+estaba factualmente invertida: **con squash-merge ese comando nunca viene vacío en el estado
+estacionario**, porque cada release deja en `main` un commit de squash que no será ancestro de
+`develop` hasta el merge canónico del release siguiente. Verificado el 2026-08-28 sobre los siete
+releases del 08-09 al 08-27: todos sus squashes son ancestros de `origin/develop`. La rama que la
+regla llamaba «el caso normal» era inalcanzable, y la formulación literal empujaba a `-X ours` en
+todos los releases.
+
+- **Sólo squashes de release** (SHA = `target_sha` de un manifest en estado `released`) ⇒ `-s ours`.
+  Su contenido salió de `develop` por construcción, así que descartarlos no pierde nada. El título
+  del commit **no es prueba**: la pertenencia se decide contra `release_manifests`.
+- **Cualquier otro commit** (hotfix, push directo, revert hecho en `main`) ⇒ si su contenido ya volvió
+  a `develop` por cherry-pick, `-s ours` sigue siendo correcto; si no volvió, **PARAR** y reconciliarlo
+  por su camino canónico. Nunca resolverlo cambiando de estrategia.
+- **NUNCA** usar `-X ours` como default. Sólo decide los hunks EN CONFLICTO: los de `main` que aplican
+  limpio entran como **adición silenciosa**. Costo medido en tres releases consecutivos —
+  `fcee5ab9f7ce` (2026-08-06) resucitó `dataForSeoBreaker.recordFailure` incondicional, **código de
+  producción**; `709e15f6688e` (08-23) resucitó 8 tasks y duplicó 10 líneas de un manual;
+  `c983be7f18e6` (08-28) duplicó un bloque de reglas y resucitó 3 tasks **con la verificación de
+  código vacía**. Si por excepción se usa, la auditoría obligatoria es
+  `git diff HEAD@{1} HEAD --name-status` **COMPLETO**; las verificaciones acotadas a
+  `src/ scripts/ services/ migrations/` demostradamente no lo ven.
+- **`-s ours` no produce conflictos nunca** (toma el árbol de `develop` entero), así que toda la guía
+  de `modify/delete` y `rename/rename` pertenece al camino excepcional.
+- **SIEMPRE** correr las cuatro verificaciones antes de pushear `develop`: V1 vacía tras el merge, el
+  `--name-status` COMPLETO vacío, el diff de código vacío, y
+  `git diff --diff-filter=A --name-only origin/develop origin/main` vacío (archivos que existen sólo
+  en `main`).
+
+Árbol de decisión operativo y comandos: `docs/operations/runbooks/production-release.md` §2.4 Paso A.
+El gate que convierte esta regla en un comando que se niega ante lo que no reconoce está especificado
+en `TASK-1790` — se registra porque esta misma regla ya se había corregido en prosa el 2026-08-23 y
+el 08-28 volvió a fallar.
+
 ### Production Release Orchestrator invariants (TASK-851)
 
 Workflow GitHub Actions canonico `production-release.yml` que coordina la promocion `develop → main` end-to-end consumiendo el CLI preflight (TASK-850), helpers manifest-store (TASK-848 V1.0), y los 4 worker workflows refactoreados a `workflow_call` con `expected_sha` input + post-deploy GIT_SHA verification.

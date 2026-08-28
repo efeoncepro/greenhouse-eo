@@ -612,7 +612,7 @@ export const createGreenhouseMcpServer = (
     {
       title: 'Get SEO Keyword Discovery',
       description:
-        'Read keyword-discovery runs and their candidates for an organization. Without runId it lists recent runs (with status: pending | running | succeeded | partial | no_results | failed | budget_blocked); with runId it returns the composed candidates. Candidate volumes/difficulty/intent are ESTIMATED market data from the provider (monthly refresh, ◑); measuredGsc carries the measured demand of the client itself (●) as a SEPARATE lens — never merge or average them, and never present competition (paid) as difficulty (organic). A candidate is a suggestion, NOT a tracked keyword: promoting one to tracking is a separate explicit command (track_seo_keywords) with its own recurring-spend disclosure. Accepts optional market (ISO-2 or location_code) for multi-market organizations. Filters: status, sourceEndpoint, query, intent, minSearchVolume, maxDifficulty, excludeTracked, limit (max 200), cursor.',
+        'Read keyword-discovery runs and their candidates for an organization. Without runId it lists recent runs (with status: pending | running | succeeded | partial | no_results | failed | budget_blocked); with runId it returns the composed candidates. A CANDIDATE IS ONE NORMALIZED KEYWORD, not one provenance row: when several methods found the same keyword it is ONE candidate whose candidateIds/provenance list every source, and totalCandidates counts distinct keywords — never treat a provenance entry as its own candidate, and never propose spending on the same keyword twice. clusterConflict warns about cannibalization: status=conflict means another keyword the target ALREADY tracks shares this candidate coreKeyword (trackedMembers names up to 5 of them), so the sound move is to consolidate rather than add a second bet on the same intent; it is SEPARATE from alreadyTracked (exact match) and status=unknown honestly means it could not be determined — never read it as clear. Candidate volumes/difficulty/intent are ESTIMATED market data from the provider (monthly refresh, ◑); measuredGsc carries the measured demand of the client itself (●) as a SEPARATE lens — never merge or average them, and never present competition (paid) as difficulty (organic). A candidate is a suggestion, NOT a tracked keyword: promoting one to tracking is a separate explicit command (track_seo_keywords) with its own recurring-spend disclosure. Accepts optional market (ISO-2 or location_code) for multi-market organizations. Filters: status, sourceEndpoint, query, intent, minSearchVolume, maxLinkBarrier, includeUnknownBarrier, excludeTracked, limit (max 200), cursor. To filter by difficulty use maxLinkBarrier — maxDifficulty is DEPRECATED and ignored, and any ignored filter is reported back in ignoredFilters.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional(),
         market: z.string().trim().min(1).optional(),
@@ -622,7 +622,25 @@ export const createGreenhouseMcpServer = (
         query: z.string().trim().min(1).optional(),
         intent: z.string().trim().min(1).optional(),
         minSearchVolume: z.number().int().min(0).optional(),
-        maxDifficulty: z.number().int().min(0).max(100).optional(),
+        maxDifficulty: z
+          .number()
+          .int()
+          .min(0)
+          .max(100)
+          .optional()
+          .describe(
+            'DEPRECATED — accepted but IGNORED, use maxLinkBarrier. The provider keyword_difficulty has a hard floor in its formula and collapses to 0 on es-LATAM SERPs, so filtering by it hands back high-barrier keywords to a caller who asked for easy ones. Sending it is never an error: the response declares it in ignoredFilters.'
+          ),
+        maxLinkBarrier: z
+          .enum(['low', 'medium', 'high'])
+          .optional()
+          .describe(
+            'Canonical difficulty filter: maximum LINK BARRIER, derived from the real backlink profile of the top-10 (referring-domain diversity + page rank). Candidates whose barrier was never measured do NOT pass unless includeUnknownBarrier is true — "no data" is not "low".'
+          ),
+        includeUnknownBarrier: z
+          .boolean()
+          .optional()
+          .describe('Include candidates with no measured link barrier when filtering by maxLinkBarrier. Default false.'),
         excludeTracked: z.boolean().optional().describe('Exclude candidates the target already tracks (actionable-only review).'),
         limit: z.number().int().min(1).max(200).optional(),
         cursor: z.string().trim().min(1).optional()

@@ -1,5 +1,17 @@
 # TASK-1704 — Cadencia y muestreo declarados: AIO no diario, N≥3 donde la calibración lo exige
 
+## Delta 2026-08-28 (release a producción) — el bloqueante TASK-1699 ya corre en el runtime real
+
+El release `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208, run `33178544139`,
+manifest `released`, watchdog `ok` / `drift_count=0`) desplegó `parseSerpTopResults` y su cableado
+en el rank capture: `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` está ON en la revisión activa del
+ops-worker `ops-worker-00610-kc8` (escritura) y en Vercel Production (lectura). La forma del writer
+que esta task debe respetar ya no es sólo código en `develop`: es lo que corre en el cron
+`ops-seo-rank-capture` todos los días.
+
+Lo único que queda madurando es la **serie**, no el código: el día 1 es el **2026-08-29** (cron
+05:00 CLT). `TASK-1699` sigue `in-progress` sólo por esa verificación, no por implementación.
+
 ## Delta 2026-08-28
 
 - El bloqueante `TASK-1699` quedó **code complete, rollout pendiente** (`in-progress/`, en develop

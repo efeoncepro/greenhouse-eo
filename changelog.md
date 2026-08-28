@@ -7,6 +7,160 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-28 — LicitaLAB: MCP oficial + radar Playwright autenticado y gateado
+
+- La skill espejada `greenhouse-public-private-tenders` incorpora el companion `licitalab-mcp.md` en
+  [Codex](.codex/skills/greenhouse-public-private-tenders/licitalab-mcp.md) y
+  [Claude](.claude/skills/greenhouse-public-private-tenders/licitalab-mcp.md), con endpoint OAuth, inventario live
+  de cinco tools read-only, recetas por oportunidad/proveedor/documentos, estados RAG, límites y canary verificado.
+  El bundle entra a `pnpm skills:mirrors` para impedir que ambos agentes operen licitaciones reales con contratos
+  distintos.
+- `pnpm licitalab:radar:setup` guarda la credencial local ignorada con modo `0600`; `pnpm licitalab:radar`
+  reutiliza un perfil Chrome aislado, pagina la vista autenticada y emite un reporte `efeonce.licitalab-radar.v1`
+  bajo `.auth/`. El canary leyó 45 oportunidades únicas atravesando la primera página. Discovery no postula ni
+  escribe CRM: los códigos pasan al MCP para análisis documental y cualquier promoción a HubSpot conserva
+  confirmación humana, asociación y readback.
+- Frontera canónica explícita: **LicitaLAB ve licitaciones públicas solamente**. Toda fila mantiene
+  `public_opportunity` y cualquier `Proposal` derivada usa `origin='public_tender'`; nunca se interpreta una
+  modalidad pública como `private_rfp` ni se mezcla este radar con Wherex, Ariba, Coupa u otras fuentes privadas.
+- El contrato descubierto de promoción a HubSpot quedó documentado en la skill de licitaciones y en
+  `hubspot-greenhouse-bridge`: upsert por ID + `gh_idempotency_key`, reutilización de Company, asociaciones
+  idempotentes sin contactos ficticios, URL directa, y separación de `fecha_de_cierre_de_licitacion` versus
+  `closedate`. La precedencia es cliente existente → Core; nueva cuenta por Licitación → Strategic Bets; Compra
+  Ágil nueva queda `policy_required`. El bridge actual todavía no transporta esos campos ni resuelve todas las
+  identidades/asociaciones; es contrato objetivo para automatización. La carga manual confirmada usa el MCP de
+  HubSpot como writer gobernado y no queda bloqueada por esa brecha.
+- La etapa inicial quedó fijada por metadata live: una candidata aprobada entra a `Pipeline de ventas`
+  (`default`) en `Calificado para comprar` (`qualifiedtobuy`), nunca en `Cita programada`; las filas crudas del
+  radar permanecen fuera del CRM. La skill documenta el avance técnico→muestra opcional→precio→formalización→cierre
+  y excluye el pipeline de Shared Selling. El snapshot completo de 99 deals LicitaLAB mostró 95 perdidos, 3 ganados,
+  1 en `appointmentscheduled` y 0 intermedios, por lo que el histórico no se canonizó como workflow.
+- Primera promoción live aprobada y releída: la oportunidad `1098710-22-LP26` creó Company HubSpot `57870164778`
+  y deal `64461187076`, asociado en `default/qualifiedtobuy`, `Strategic Bets`, CLP 250.000.000, con deadline y
+  adjudicación separados. La Company terminó con `num_associated_deals=1`; no se inventó contacto.
+  `gh_commercial_party_id` permanece vacío y la automatización por bridge continúa pendiente.
+- La promoción manual se amplió con ProChile (`deal 64482163516` ↔ Company `31209269815`) y Defensoría
+  (`deal 64471071912` ↔ Company nueva `57878590071`). ProChile quedó `Core Pipeline`/`existingbusiness` porque la
+  Company es cliente vigente; Defensoría quedó `Strategic Bets`/`newbusiness`. Ambas usan
+  `default/qualifiedtobuy`, conservan fechas separadas y tienen una sola coincidencia por `gh_idempotency_key`.
+  `gh_deal_origin` queda vacío: el enum live sólo admite `greenhouse_quote_builder` y nunca se etiqueta una
+  licitación con un origen falso.
+- El radar ampliado leyó 163 oportunidades y se promovieron otras cinco con Company y asociación verificadas:
+  UOH/web (`64466117716`), Beneficios Estudiantiles/medios (`64482321775`), Campaña VCM (`64466272830`),
+  Valparaíso/paid media (`64469214508`) y JUNJI/RFI ticketing (`64469523247`). Cada búsqueda por
+  `id_de_licitacion` devolvió una sola fila; no se asociaron contactos sin evidencia. Los cinco nuevos Deals no
+  recibieron `gh_idempotency_key` en la carga aprobada, por lo que esa propiedad queda como brecha explícita y no
+  como garantía supuesta.
+- Se creó `docs/commercial/tenders/LICITATION_CRM_REGISTER.md` como índice operativo compartido para Codex y
+  Claude, actualizado con diez oportunidades y ocho Deals verificados. Registra decisión, postulación, fechas, IDs/enlaces y
+  asociaciones sin desplazar las fuentes autoritativas; el histórico de 99 deals permanece sólo en HubSpot.
+- El patrón se extendió a `docs/commercial/CRM_DEAL_REGISTER.md`: vista transversal para negocios Core, Strategic
+  Bets y otros orígenes, con una fila sólo después de verificar el Deal en HubSpot. Las licitaciones promovidas se
+  sincronizan en ambos registros por `deal_id`; las oportunidades todavía en radar permanecen sólo en bid desk.
+
+## 2026-08-28 — TASK-1692: el candidato de discovery recuerda qué se decidió sobre él
+
+- **El hecho lo escribe el primitive que lo produce, jamás el consumer.** De los cinco
+  `action_kind` que el dominio declaraba, sólo `dismissed` tenía writer: preparar consultas AEO o
+  promover a seguimiento pasaban de verdad y no dejaban rastro. Ahora `createGroundedQueryDraft`
+  escribe `selected_for_grounded_query` y `applyKeywordTracking` escribe `promoted_to_tracking`
+  **en la misma transacción que abre la membresía**. Si el writer viviera en cada consumer,
+  bastaría con que se cayera la red entre las dos llamadas para dejar el compromiso de gasto hecho
+  y la decisión sin autor.
+- **Guard en runtime, no sólo en test:** los dos lanes validan contra
+  `SEO_DISCOVERY_CONSUMER_ACTION_KINDS`, así que `promoted_to_tracking` deja de ser escribible
+  desde afuera. `record_action` queda para lo que una persona decide sin que ningún command lo
+  produzca — descarte, rechazo y la **re-selección** de un descartado, que ahora existe y no
+  necesitó ni command nuevo ni migración: el ledger es append-only, así que re-seleccionar ES
+  escribir una decisión posterior que supersede al descarte.
+- **`selected_for_target` retirado del enum TS**, con el `CHECK` de la base intacto para que una
+  fila histórica siga siendo legible. No tenía writer y no podía tenerlo: la intención es atributo
+  de la MEMBRESÍA con autor y fecha, así que un candidato que no se sigue no puede tener intención
+  declarada.
+- **Efecto visible sin un solo cambio de UI:** el chip del candidato se mueve solo (deja de decir
+  "Nuevo" tras un draft AEO o una promoción) y el inbox deja de poner arriba lo ya resuelto.
+- **Los grados de atomicidad se declaran, no se disimulan.** Tracking es atómico. El bridge grounded
+  no puede serlo —el draft se escribe en otra conexión— así que expone `decisionLogged: false` +
+  aviso en vez de callarlo o descartar un draft que ya pagó una llamada LLM; repetir la acción
+  repara la fila sin crear un draft nuevo.
+- Sin migración, sin flag, sin capability. **Sin backfill a propósito**: inventar `actor` y
+  `created_at` sería fabricar autoría en un log de decisiones.
+- Verificado contra PG real en transacciones que abortan (11/11 + 12/12), incluido que con un
+  candidato inexistente **no queda membresía**. Tres falsos verdes destapados en el camino: el
+  check del trigger append-only pasaba sobre tabla vacía (es `FOR EACH ROW`), un mock devolvía la
+  fila del target para cualquier consulta, y el parser del guard nuevo devolvía lista vacía.
+- Estado: **`code complete, rollout pendiente`** — falta verificación funcional en staging.
+  Desbloquea `TASK-1700`, que queda `Blocked by: none`.
+
+## 2026-08-28 — TASK-1694: en descubrimiento SEO, un candidato es una keyword y la dificultad cruda deja de decidir
+
+- **`maxDifficulty` se acepta pero ya no filtra**, y la respuesta lo declara en `ignoredFilters`
+  con su reemplazo. El filtro canónico es `maxLinkBarrier` (`low|medium|high`) sobre la barrera
+  derivada por `deriveLinkBarrier`, con `includeUnknownBarrier` (default `false`): "Sin dato" no
+  es "Baja". Medido contra el store real: **764 de 923 filas tienen `keyword_difficulty = 0`**, así
+  que en es-LATAM el filtro viejo no discriminaba nada — sobre la corrida productiva,
+  `maxDifficulty=20` devolvía las 10 keywords, barrera Alta incluida.
+- **El reader colapsa por `normalizedKeyword`**: la misma keyword hallada por dos métodos es UNA
+  fila con `candidateIds[]` + `provenance[]`, y `totalCandidates` cuenta keywords distintas. Es
+  cambio de cardinalidad del contrato, no de la UI: aguas abajo la cola priorizada (TASK-1700) es
+  un aggregate append-only y habría congelado la misma decisión hasta cuatro veces, con cuatro
+  compromisos de gasto sobre una sola intención. Levanta su bloqueo duro.
+- **`clusterConflict`** advierte canibalización contra el set seguido del target (hasta 5 miembros
+  nombrados + total), derivado al leer y con **cero llamadas al proveedor**. Señal separada de
+  `alreadyTracked`, con `unknown` que nunca se lee como `clear`.
+- **Los cuatro adapters de expansión compran igual**: `keyword_suggestions` y `keyword_ideas` dejan
+  de mandar `filters` de `search_volume`. El filtro no abarataba la llamada (se paga por fila y el
+  `limit` ya la acota) — sólo cambiaba qué se compraba por el mismo precio, y en mercados ralos se
+  comía el long-tail. Cada corrida persiste su `volumePolicy`; las anteriores se leen con el
+  default histórico.
+- 🔴 **Un defecto propio lo destapó la verificación runtime, no los tests**: `core_keyword IS NULL`
+  se estaba leyendo como "no se sabe" y dejaba 8 de 10 candidatos en `unknown`, escondiendo
+  colisiones reales. El proveedor no emite el core cuando la keyword YA ES la canónica del clúster
+  (527 nulos, 396 apuntando a otra, **cero autorreferentes** en 923 filas), así que el core efectivo
+  es `core_keyword ?? la keyword misma`.
+- Federado en el mismo PR: route admin, lane ecosystem y tool MCP `get_seo_keyword_discovery`. El
+  gateway `efeonce-mcp` tiene su commit local (espejo de inventario, schema, descripción y canary,
+  67 tests verdes) **sin push**: viaja con su próximo release.
+- Estado: **`code complete, rollout pendiente`** — falta la corrida de smoke con gasto (~USD 0,013)
+  y el deploy del gateway.
+
+## 2026-08-28 — Release a producción `c983be7f18e6`: carril Growth/SEO vivo, flag prendido y gateway MCP a 27 tools
+
+- Paso a producción end-to-end del trabajo del día (PR #208, 181 archivos, 4 migraciones):
+  **TASK-1696** (dimensión de consumidor del ledger de gasto DataForSEO), **TASK-1662** (fundación
+  del gap competitivo), **TASK-1699** (top-N del SERP + descubrimiento de competidores por
+  recurrencia) y **TASK-1652** (request AI Mode del grader). Manifest `released`
+  (`c983be7f18e6-92b1b327-a1c9-4e7a-85dc-6a5e300f4e32`, run `33178544139`, 11m41s), watchdog `ok`
+  con `drift_count=0`. Break-glass por `db_migrations` con razón verificada: las 4 migraciones ya
+  figuraban aplicadas en la instancia única Cloud SQL antes del dispatch.
+- `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` quedó **ON en los dos runtimes**: ya estaba en el
+  `ops-worker` (escritura) y este release lo prendió en Vercel Production (lectura) con su redeploy
+  obligatorio. La verificación no fue "la env var existe" sino el canary contra producción
+  devolviendo `ok:true` en vez de `disabled`.
+- El gateway `mcp.efeonce.org` pasó de **21 a 27 tools SEO** (revisión
+  `efeonce-mcp-gateway-00024-8b8`): entran `get_seo_provider_spend`, `get_seo_keyword_gap`,
+  `declare_seo_competitors`, `retire_seo_competitors`, `get_seo_serp_top_results` y
+  `get_seo_competitor_candidates`, sin un solo cambio en Entra — los writes viajan en el scope
+  `efeonce.mcp.seo.write` existente y siguen fail-closed hasta TASK-1631.
+- **Corregida la regla del merge canónico en los 5 lugares que la prescribían** (runbook, playbook,
+  las dos skills espejadas de release y el manual del orchestrator, que contradecía al resto). Ya no
+  cuenta V1: la clasifica. Sólo squashes de release ⇒ `-s ours`; un hotfix cuyo contenido no volvió a
+  `develop` ⇒ parar y reconciliarlo. Cuarta verificación nueva (`--diff-filter=A`) y `-X ours`
+  degradado a excepción con auditoría completa obligatoria.
+- **`TASK-1790` registrada**: el merge canónico `develop←main` pasa de regla en prosa a gate ejecutable
+  (`pnpm release:merge-canonical`), que clasifica los commits divergentes contra `release_manifests` y se
+  detiene ante lo que no reconoce. Se registra porque la prosa ya se había corregido una vez y no alcanzó:
+  tres releases seguidos pisaron la misma clase de bug.
+- Barrido documental post-release: gateway MCP a 27 tools en skills/runbook/manuales, estado de flags
+  por runtime en arquitectura del módulo SEO + rules + skills `dataforseo-operator` + EPIC-022, y
+  deltas 2026-08-28 en 15 tasks con impacto cruzado. `TASK-1699` y `TASK-1662` quedan a propósito en
+  `in-progress`: la serie del top-N no arranca hasta el 2026-08-29 y el Slice 4 de 1662 sigue
+  bloqueado por `TASK-1700`.
+- Hallazgo de proceso: la regla del merge canónico del runbook (`-s ours` sólo si V1 está vacía)
+  está mal formulada para un flujo con squash-merge, donde V1 nunca está vacía. `-X ours` volvió a
+  duplicar contenido documental y a resucitar tasks en un lifecycle viejo **con la V2 vacía**; la
+  pregunta correcta es si `main` aporta archivos propios.
+
 ## 2026-08-28 — TASK-1699: el top-N del SERP ya pagado deja de tirarse (code complete, rollout pendiente)
 
 - El rank capture diario compra el SERP completo (`depth 20`) y descartaba ~19 de 20 filas. Ahora
@@ -661,58 +815,3 @@
 - Arquitectura, manuales, issue/tasks y skills de Talento/Arquitectura/Secret Hygiene quedaron sincronizados. El
   runbook global de Resend fija orden de migraciones, índice concurrente, webhook firmado, reconciliación,
   `click_tracking=false`, smokes y rollback. Todo sigue `code complete, rollout pendiente`.
-
-## 2026-08-19 — El reenvío gobernado de tests ya tiene command seguro
-
-- La recuperación por email genera un acceso nuevo sin duplicar el test, conserva el plazo cuando la evaluación
-  ya comenzó y registra actor, motivo y resultado sin guardar el enlace secreto.
-- Si Resend acepta y el proceso cae antes de cerrar la operación, el sistema reconcilia el receipt desde evidencia
-  durable sin enviar otro correo ni invalidar nuevamente el enlace; Platform Health muestra el drift restante.
-- HTML y texto plano distinguen despacho de entrega, invalidan enlaces anteriores y, para tests en curso, piden
-  continuar de inmediato con el deadline expresado en hora de Chile.
-- El command está validado localmente, pero sigue inaccesible: el tipo de correo está OFF y faltan la sesión
-  HttpOnly, API autorizada, migraciones, índice y smokes antes de cualquier activación.
-
-## 2026-08-19 — Los correos con enlaces de acceso ya no dependen de reintentos ciegos
-
-- Reset de contraseña, invitaciones, verificaciones, magic links, tests y acceso a Talent Pool comparten ahora
-  una protección global: el sistema guarda una intención redactada antes de emitir la credencial y nunca
-  persiste el enlace secreto para reconstruirlo después.
-- Dos workers concurrentes o un replay del mismo evento no pueden rotar dos veces el acceso. Si el proveedor
-  rechaza el correo se registra como fallo; si lo aceptó pero faltó confirmación local, se registra como incierto
-  y requiere recuperación explícita en vez de afirmar que no salió o reenviarlo automáticamente.
-- El cambio está validado localmente por Arquitectura, Talento y Seguridad. Todavía no está activo: primero se
-  instalará el índice concurrente con readback verde, sin pausar el resto del correo del sistema.
-
-## 2026-08-19 — La recuperación de acceso a tests ya tiene una base segura y auditable
-
-- Se definieron dos permisos distintos: reenviar por email y revelar un enlace temporal. Ninguno recupera ni
-  almacena el enlace anterior; cada acción futura rotará el acceso y quedará auditada sin nombre, correo,
-  teléfono, URL ni token.
-- La base bloquea recoveries sobre postulaciones cerradas, consentimiento retirado, tests terminados o timers
-  vencidos. Un test iniciado conserva exactamente su deadline, accommodations y gracia; una transacción larga
-  no puede confirmar después del vencimiento.
-- La evidencia nace automáticamente en la misma transacción y la retención distingue candidatos de personas
-  seleccionadas. El retiro de consentimiento Hiring no puede borrar registros que ya pasaron a retención
-  laboral.
-- Este slice está validado localmente pero todavía no opera en producción: la migración no se aplicará hasta
-  que exista el command token-safe y los smokes PostgreSQL prueben ACL, concurrencia, rollback y purga.
-
-## 2026-08-19 — El tablero de Hiring dejó de mostrar gente y vacantes que no existen
-
-- **Lo que ve hoy quien abre el desk son procesos reales.** El tablero pasó de 24 vacantes y 79
-  postulaciones a **2 y 47**: la diferencia no se perdió ni se borró, era dato de prueba que hasta ayer
-  se contaba como si fuera un candidato o una búsqueda de verdad. Las dos vacantes vivas siguen ahí,
-  con todos sus postulantes, verificadas una por una antes y después.
-- **Menos filas no es pérdida de datos.** Si el tablero se ve más vacío que ayer, es porque por primera
-  vez muestra sólo lo que representa a una persona o una búsqueda del mundo real. Lo demás quedó
-  archivado y recuperable, no eliminado.
-- **La evaluación con IA ya no puede aprender de respuestas inventadas.** Había una respuesta de prueba
-  calificada con 90 puntos, lista para entrar al conjunto con que se calibra el sistema. No era un riesgo
-  a futuro: ya había pasado. Ahora queda excluida sin interruptor para volver atrás.
-- **Los conteos y métricas de contratación por fin cuentan personas.** Todo lo que se lee desde el
-  tablero y la reserva de talento parte del mismo criterio, así que dejaron de convivir dos verdades
-  sobre cuánta gente hay en un proceso.
-- **Lo que todavía no cambia**: nueve registros de prueba quedan archivados en vez de borrados, a la
-  espera de una decisión explícita. No aparecen en ninguna pantalla, así que borrarlos es prolijidad,
-  no necesidad.

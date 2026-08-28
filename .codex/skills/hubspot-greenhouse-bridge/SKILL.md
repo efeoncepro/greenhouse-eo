@@ -1,6 +1,6 @@
 ---
 name: hubspot-greenhouse-bridge
-description: "Operate the HubSpot ↔ Greenhouse write bridge Cloud Run service (`services/hubspot_greenhouse_integration/`, Python 3.12 + Flask). Use when adding/modifying HTTP routes, webhook handlers, HubSpot custom properties, Secret Manager rotations, deploys via GitHub Actions WIF, or end-to-end smokes that cross HubSpot portal + Cloud Run + greenhouse-eo runtime. Post TASK-574 (2026-04-24) this lives in the monorepo; pre-2026-04-24 evidence may reference the sibling cesargrowth11/hubspot-bigquery."
+description: 'Operate the HubSpot ↔ Greenhouse write bridge Cloud Run service (`services/hubspot_greenhouse_integration/`, Python 3.12 + Flask) and its human-readable operational Deal register. Use when reviewing CRM deal state; adding/modifying HTTP routes, webhook handlers or HubSpot custom properties; rotating secrets; deploying via GitHub Actions WIF; or running end-to-end smokes across HubSpot + Cloud Run + Greenhouse. Post TASK-574 (2026-04-24) this lives in the monorepo; older evidence may reference cesargrowth11/hubspot-bigquery.'
 ---
 
 # HubSpot Greenhouse Bridge Ops
@@ -9,23 +9,41 @@ Operate the Cloud Run service that bridges HubSpot CRM writes/webhooks ↔ `gree
 
 ## System boundary (don't mix these up)
 
-| System | Lives in | Canonical authority |
-|---|---|---|
-| **HubSpot portal app** (v2025.2): OAuth scopes, webhook URL config, private app tokens | `cesargrowth11/hubspot-bigquery/hsproject.json` + `src/app/` (sibling, **NOT moved** by TASK-574) | HubSpot Developer Platform |
-| **HubSpot → BigQuery CRM sync** (Cloud Function `hubspot-bq-sync`, `main.py`) | `cesargrowth11/hubspot-bigquery/main.py` + `deploy.sh` (sibling, **NOT moved**) | GCP Cloud Function + BigQuery `hubspot_crm.*` |
-| **HubSpot write bridge + webhooks** (Cloud Run `hubspot-greenhouse-integration`, 23 routes) | `greenhouse-eo/services/hubspot_greenhouse_integration/` | **this skill** owns this system |
-| **Greenhouse runtime** (Next.js on Vercel) | `greenhouse-eo/src/**` | `src/lib/integrations/hubspot-greenhouse-service.ts` is the canonical client |
-| **Native meeting scheduler** (public config/availability/booking) | `greenhouse-eo/src/lib/growth/meetings/**` + `src/growth-meeting-renderer/**` | `greenhouse-growth-meetings`; HubSpot Scheduler is a server-side provider called from the Next.js runtime, **not** a route in this Cloud Run bridge |
-| **Secret Manager** (3 secrets) | GCP project `efeonce-group` | Runtime SA `greenhouse-portal@` reads at boot |
-| **Kortex HubSpot CMS / Content Hub operations** | `greenhouse-eo/docs/architecture/kortex/hubspot-cms/` + Kortex control plane | Kortex OAuth runtime + HubSpot Developer Platform; this skill only cross-links |
+| System                                                                                      | Lives in                                                                                          | Canonical authority                                                                                                                                 |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **HubSpot portal app** (v2025.2): OAuth scopes, webhook URL config, private app tokens      | `cesargrowth11/hubspot-bigquery/hsproject.json` + `src/app/` (sibling, **NOT moved** by TASK-574) | HubSpot Developer Platform                                                                                                                          |
+| **HubSpot → BigQuery CRM sync** (Cloud Function `hubspot-bq-sync`, `main.py`)               | `cesargrowth11/hubspot-bigquery/main.py` + `deploy.sh` (sibling, **NOT moved**)                   | GCP Cloud Function + BigQuery `hubspot_crm.*`                                                                                                       |
+| **HubSpot write bridge + webhooks** (Cloud Run `hubspot-greenhouse-integration`, 23 routes) | `greenhouse-eo/services/hubspot_greenhouse_integration/`                                          | **this skill** owns this system                                                                                                                     |
+| **Greenhouse runtime** (Next.js on Vercel)                                                  | `greenhouse-eo/src/**`                                                                            | `src/lib/integrations/hubspot-greenhouse-service.ts` is the canonical client                                                                        |
+| **Native meeting scheduler** (public config/availability/booking)                           | `greenhouse-eo/src/lib/growth/meetings/**` + `src/growth-meeting-renderer/**`                     | `greenhouse-growth-meetings`; HubSpot Scheduler is a server-side provider called from the Next.js runtime, **not** a route in this Cloud Run bridge |
+| **Secret Manager** (3 secrets)                                                              | GCP project `efeonce-group`                                                                       | Runtime SA `greenhouse-portal@` reads at boot                                                                                                       |
+| **Kortex HubSpot CMS / Content Hub operations**                                             | `greenhouse-eo/docs/architecture/kortex/hubspot-cms/` + Kortex control plane                      | Kortex OAuth runtime + HubSpot Developer Platform; this skill only cross-links                                                                      |
 
 Confusing ownership is the #1 bug source. Always ask: "which system above owns this change?" before touching code or config.
+
+## Registro operativo general de negocios
+
+Antes de responder en qué está un negocio, lee `docs/commercial/CRM_DEAL_REGISTER.md` para obtener el índice
+rápido y confirma el estado live en HubSpot. El archivo no reemplaza el CRM: resume Deal, Company, movimiento
+`Core`/`Strategic Bet`, pipeline, stage, owner, cierre y próximo paso después del readback.
+
+Reglas:
+
+1. Una fila requiere un Deal HubSpot verificado; leads o radares sin Deal permanecen en su registro de origen.
+2. Nunca crees una Company, Contact o asociación para completar el Markdown. Primero aplica el flujo gobernado
+   `propose → confirm → write → readback`; luego actualiza el registro con IDs observados.
+3. Toda mutación de Deal, Company, asociaciones, owner, amount, `closedate`, pipeline, stage, bucket o resultado
+   exige actualizar `docs/commercial/CRM_DEAL_REGISTER.md` después del readback.
+4. Para una licitación, actualiza además `docs/commercial/tenders/LICITATION_CRM_REGISTER.md` con el mismo
+   `deal_id`; este último conserva bid/no-bid, bases, plazo oficial y comprobante de postulación.
+5. Los negocios históricos no aparecen automáticamente: ausencia del registro no significa ausencia en HubSpot.
 
 ## Related but separate: Kortex HubSpot CMS / Content Hub
 
 Use `docs/architecture/kortex/hubspot-cms/` for Kortex-backed HubSpot Content Hub / CMS work: landing pages, CMS Pages API, templates, modules, CMS React, Developer Projects, and portal-specific access notes.
 
 Hard boundary:
+
 - Do **not** use or rotate `hubspot-access-token` for Kortex/ANAM CMS operations. That secret belongs to the Greenhouse HubSpot bridge/private app path.
 - Kortex portal-scoped OAuth is the runtime path for ANAM (`hubspot_portal_id=19893546`, active as of 2026-07-02).
 - HubSpot CLI asset work for ANAM needs a separate CLI account/auth profile, e.g. `hs account auth --account anam-19893546`; do not replace the existing Efeonce profile.
@@ -38,7 +56,7 @@ Hard boundary:
 
 1. Edit `services/hubspot_greenhouse_integration/app.py` (route decorator + handler).
 2. If the route is surface-visible, update `contract.py` (returned by `GET /contract`).
-3. If the route uses a new HubSpot response shape, update `models.py` (build_*_profile functions).
+3. If the route uses a new HubSpot response shape, update `models.py` (build\_\*\_profile functions).
 4. Add a test in `services/hubspot_greenhouse_integration/tests/test_app.py` (minimum: happy path + auth rejection if it's a write route).
 5. Update the TypeScript client in `src/lib/integrations/hubspot-greenhouse-service.ts` — same PR.
 6. CI runs pytest → deploys via `.github/workflows/hubspot-greenhouse-integration-deploy.yml` on merge.
@@ -48,6 +66,7 @@ Hard boundary:
 ### 2. Rotate a secret
 
 Three secrets:
+
 - `hubspot-access-token` (HubSpot private app token used for API v3 calls)
 - `greenhouse-integration-api-token` (Bearer token validated by mutation routes + used by service callback to Greenhouse)
 - `hubspot-app-client-secret` (HMAC key for `/webhooks/hubspot` signature validation)
@@ -84,11 +103,13 @@ python services/hubspot_greenhouse_integration/scripts/ensure_hubspot_company_pr
 (See `references/company_property_spec.example.json` for shape.)
 
 Decision tree:
+
 - If the field already exists as a HubSpot standard property (e.g. `industry`, `hubspot_owner_id`) → **do not** create a custom prop. Extend the mapping in `models.py` instead.
 - If the field exists on another HubSpot object (contact, deal) but needs to live on company → decide if you backfill to company or expose via join.
 - If genuinely new on company → run the script with a JSON spec.
 
 After adding the property, update:
+
 - `models.py::build_company_profile` to surface it.
 - `src/lib/integrations/hubspot-greenhouse-service.ts` to type it in the response shape.
 
@@ -97,6 +118,7 @@ After adding the property, update:
 **Automated (post-cutover):** push to `develop` with changes to `services/hubspot_greenhouse_integration/**` triggers staging deploy. Production deploy is owned by `production-release.yml` via `workflow_call`; `workflow_dispatch` is break-glass only. Workflow runs pytest → Cloud Build → Cloud Run deploy → smoke (`/health` + `/contract`).
 
 **Manual:**
+
 ```bash
 ENV=staging bash services/hubspot_greenhouse_integration/deploy.sh
 ENV=production bash services/hubspot_greenhouse_integration/deploy.sh
@@ -130,6 +152,67 @@ curl -H "Authorization: Bearer $GREENHOUSE_INTEGRATION_API_TOKEN" \
 # BigQuery verification of arrived webhook events (sibling scope)
 bq query 'SELECT count(*) FROM hubspot_crm.events WHERE DATE(receivedAt) = CURRENT_DATE()'
 ```
+
+## Public tender intake — discovered contract, not shipped
+
+For a deal sourced from LicitaLAB, first load `greenhouse-public-private-tenders` and its
+`licitalab-radar-playwright.md` companion. LicitaLAB is a public-tender source only. Treat the following as the
+target CRM contract discovered against portal `48713323` on 2026-08-28; re-read live properties and pipeline
+metadata before any write because portal configuration can drift.
+
+The deal projection uses these existing HubSpot properties:
+
+| Property                        | Meaning                                                                                     |
+| ------------------------------- | ------------------------------------------------------------------------------------------- |
+| `id_de_licitacion`              | Canonical public tender ID. Normalize case and surrounding whitespace for duplicate checks. |
+| `ficha_de_licitacion`           | Direct LicitaLAB opportunity URL used to return quickly to the application screen.          |
+| `fecha_de_cierre_de_licitacion` | Official submission deadline from the tender source.                                        |
+| `closedate`                     | Expected commercial resolution/close date. It is independent from the submission deadline.  |
+| `modalidad_de_venta`            | Public mechanism, normally `Licitación` or `Compra ágil`.                                   |
+| `dealtype`                      | `newbusiness` or `existingbusiness`.                                                        |
+| `pipeline_bucket`               | `Core Pipeline`, `Strategic Bets`, or `Opportunistic / Administrative`.                     |
+| `gh_idempotency_key`            | Stable retry key, for example `hubspot-public-tender:CL:<normalized-id>`.                   |
+
+Apply this identity and association sequence before creation:
+
+1. Search exact normalized `id_de_licitacion` and the stable `gh_idempotency_key`. If either resolves one deal,
+   update/reuse it; if they conflict or return more than one, stop for reconciliation.
+2. Resolve the buyer first in Greenhouse Organization/Party using its public tax identifier, then map/reuse the
+   HubSpot Company through `gh_commercial_party_id`. An exact legal name plus a specific institutional domain is
+   only a fallback. A generic shared domain such as `gob.cl` is not an identity key.
+3. Never create a duplicate Company merely to satisfy deal creation. Never fabricate a Contact. Associate a real
+   verified Contact when one exists; otherwise keep the deal associated to the Company and leave the contact gap
+   explicit.
+4. Ensure Deal↔Company, Deal↔Contact when applicable, and Contact↔Company associations idempotently. Read back the
+   deal properties and associations after the write.
+
+Classify Core versus Bet with customer relationship first, not the procurement mechanism alone:
+
+- existing customer / expansion / renewal → `dealtype=existingbusiness` and `pipeline_bucket=Core Pipeline`;
+- new-account public `Licitación` → `dealtype=newbusiness` and `pipeline_bucket=Strategic Bets`;
+- new-account `Compra ágil` → `policy_required` until the operator defines whether it is Strategic or
+  Opportunistic; do not infer it from historical records.
+
+For public tenders that pass human selection, GO, and basic admissibility, create the deal in `Pipeline de ventas`
+(`pipeline='default'`) at `Calificado para comprar` (`dealstage='qualifiedtobuy'`, live probability 25%). Do not use
+`appointmentscheduled` as the default because a tender does not imply a commercial meeting. Do not use the
+`HubSpot Shared Selling Pipeline`; it belongs to co-selling/deal registration. Advance tender deals as follows:
+`presentationscheduled` for the technical offer, optional `1356915244` only for a requested sample/pilot,
+`decisionmakerboughtin` for completed pricing and terms, `contractsent` after award while formalization is pending,
+then `closedwon` or `closedlost` from verified outcome evidence. Raw radar candidates remain outside HubSpot.
+
+Writes follow `propose → confirm → write → readback`. Discovery and ranking remain read-only. The current
+`POST /deals` bridge is insufficient for this flow: it accepts only `origin='greenhouse_quote_builder'`, expects an
+existing Company, supports at most one optional Contact, and does not carry the tender fields or ensure
+Contact↔Company. A governed implementation must extend `app.py`, `contract.py`, tests, and
+`src/lib/integrations/hubspot-greenhouse-service.ts` together; add Company/Contact resolution and all three
+association paths; and obtain the required ADR/external-API approval. Do not bypass the bridge with direct CRM
+writes.
+
+Historical snapshot, useful only as migration evidence: 99 LicitaLAB deals were found; 97 had a different tender
+deadline and commercial close date, 86 had no associated Contact, and their buckets were 94 Opportunistic, 4 Core,
+and 1 Strategic. Stage distribution was 95 `closedlost`, 3 `closedwon`, 1 `appointmentscheduled`, and 0 in every
+intermediate stage. These inconsistencies are why historical bucket and stage values are not policy.
 
 ## Known rules and gotchas
 

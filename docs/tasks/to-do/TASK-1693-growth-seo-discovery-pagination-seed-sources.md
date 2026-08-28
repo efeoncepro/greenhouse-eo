@@ -1,5 +1,16 @@
 # TASK-1693 — Growth SEO: paginación real y fuentes de seed cableadas en la lente Descubrir
 
+## Delta 2026-08-28 — desbloqueada: la cardinalidad ya es definitiva
+
+`TASK-1694` cerró (`code complete, rollout pendiente`), así que el `Blocked by` pasa a `none`. El
+motivo del bloqueo queda resuelto en el origen: `readKeywordDiscovery` cuenta y pagina sobre
+**keywords normalizadas**, no sobre filas de procedencia, y el colapso es determinista (representante
+= menor `sourceRank`, desempate `candidateId` asc). El paginador se construye contra esa cardinalidad
+—la definitiva— y el riesgo declarado en la matriz ("paginar sobre un universo que va a cambiar")
+deja de aplicar.
+
+Sigue vigente el otro riesgo de esa fila: paginar sobre una corrida VIVA. El colapso no lo resuelve.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -54,7 +65,7 @@ empezar y que el Slice 3 llega con la decisión ya tomada.
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo|ui`
-- Blocked by: `TASK-1694`
+- Blocked by: `none` (desbloqueada el 2026-08-28; ver el Delta de esta task)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

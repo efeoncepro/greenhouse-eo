@@ -78,16 +78,30 @@ export const buildKeywordDiscoveryActionRequest = (
   switch (kind) {
     // Seguir y declarar objetivo son EL MISMO command con intención distinta. Son dos labels
     // porque son dos decisiones de negocio, no dos mecánicas: `intent` viaja con autor y fecha.
+    // TASK-1692 — la procedencia viaja para que el command deje su huella; la lente NO escribe
+    // el ledger, sólo declara de qué candidato salió la decisión.
     case 'declareTarget':
       return {
         endpoint: TRACK_ENDPOINT,
-        body: { seoTargetId: context.seoTargetId, keywords: [context.keyword], intent: 'target' }
+        body: {
+          seoTargetId: context.seoTargetId,
+          keywords: [context.keyword],
+          intent: 'target',
+          discoveryCandidateId: context.candidateId,
+          discoveryRunId: context.runId
+        }
       }
 
     case 'followOpportunity':
       return {
         endpoint: TRACK_ENDPOINT,
-        body: { seoTargetId: context.seoTargetId, keywords: [context.keyword], intent: 'opportunity' }
+        body: {
+          seoTargetId: context.seoTargetId,
+          keywords: [context.keyword],
+          intent: 'opportunity',
+          discoveryCandidateId: context.candidateId,
+          discoveryRunId: context.runId
+        }
       }
 
     case 'prepareGrounded':

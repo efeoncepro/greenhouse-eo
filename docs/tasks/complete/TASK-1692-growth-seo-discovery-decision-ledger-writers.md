@@ -32,7 +32,7 @@ lo que un command produce. La cola no inventa una tercera categoría.
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -724,6 +724,70 @@ cambia (lo resuelto deja de encabezar), y eso se cubre con el manual del Slice 5
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
 - [ ] El comentario de `KeywordDiscoveryCandidateDrawer.tsx` que apunta a esta task quedó resuelto: o describe el estado nuevo, o su follow-up `ui-ux` quedó creado y referenciado.
+
+## Registro de cierre — 2026-08-28
+
+**Estado: `code complete, rollout pendiente`.** Los cinco slices están implementados, verificados
+contra PG real y documentados. Falta la verificación funcional en staging de los dos caminos
+(pasos 1–6 de `### Production verification sequence`) y la promoción a producción.
+
+### Decisiones que la spec dejó abiertas, resueltas
+
+| Pregunta | Resolución | Razón |
+|---|---|---|
+| ¿Re-selección con kind propio o reusando `selected_for_grounded_query`? | **Reusa**, con `metadata.reason='reselected'` | El guard ya lo contemplaba y el ledger append-only ES el mecanismo de supersede. `Migration posture: none` se conserva |
+| ¿El fallo del append grounded degrada o sólo se observa? | **Ninguna: se DECLARA** (`decisionLogged:false` + aviso) | El draft ya existe y ya pagó una llamada LLM — descartarlo mentiría en la otra dirección; callarlo reintroduce el bug que la task cierra |
+| ¿`already_tracked` merece fila? | **Sí** | El ledger registra decisiones, no efectos. Sin fila, promover un candidato ya seguido lo dejaría en "Nuevo" para siempre |
+| ¿`selected_for_target` se retira o se conserva? | **Se retira del enum TS**, `CHECK` intacto | No tenía writer y no podía tenerlo (la intención es atributo de la membresía, TASK-1659). Conservarlo dejaba una puerta para escribir y pintar un estado que ningún command produjo |
+
+### Contradicción de la spec, resuelta y declarada
+
+El **Goal** exigía "o tiene writer, o queda retirado del enum TS"; el **Out of Scope** prohibía
+tocar `resolveState`. Retirarlo del enum rompe el typecheck de su `case`, así que las dos no se
+podían cumplir. Se retiró y se borró el `case` (2 líneas). Con el ledger en 0 filas y sin writer,
+ese branch nunca renderizó ni podía renderizar: se cruza la letra del Out of Scope, no su espíritu
+("no rediseñar la UI"). El copy `stateSelectedForTarget` NO se tocó — eso sí es territorio de copy,
+y `TASK-1660` es su dueño natural si alguna vez necesita un estado de preselección.
+
+### Verificación runtime ejecutada (PG real, transacciones que abortan)
+
+| Sanity | Resultado |
+|---|---|
+| `_sanity-task-1692-decision-ledger.ts` | **11/11** — inserta, la fila es visible en la tx, `metadata_json` hace round-trip, repetir dedupea a la MISMA fila, org ajena → `run_not_found`, el trigger append-only rechaza UPDATE y DELETE, el ROLLBACK deja la base intacta |
+| `_sanity-task-1692-tracking-atomicity.ts` | **12/12** — membresía y fila del ledger conviven en la misma tx; la metadata no lleva la keyword cruda; con candidato inexistente **no queda membresía** (cero media verdad) |
+
+### Dos falsos verdes que la verificación destapó
+
+1. **El check del trigger append-only se delataba solo.** Sobre una tabla vacía, un `UPDATE`/`DELETE`
+   no dispara nada —el trigger es `FOR EACH ROW`— y "pasa" por no tocar filas. El sanity ahora
+   inserta una fila antes de intentar mutarla; si no, verificaría la ausencia de datos en vez de la
+   garantía.
+2. **El mock de `track-keywords.test.ts` devolvía la fila del TARGET para cualquier consulta**, así
+   que el chequeo de tenant de la procedencia pasaba siempre. Se ruteó por SQL.
+
+Y un tercero en el propio guard nuevo: su primer parser del enum devolvía lista vacía —se cortaba
+en el `[]` de la anotación de tipo, no en el del array— y habría pasado por vacuidad, el mismo modo
+de falla que el archivo existe para cerrar. Lleva guards anti-vacuidad explícitos.
+
+### Un test que se reescribió en vez de debilitarse
+
+El boundary test del bridge decía "el bridge no ejecuta SQL de tablas" y este cambio lo rompía **por
+hacer lo correcto**. La salida barata era relajar el regex. En vez de eso se reescribió sobre el
+invariante REAL de §1.1: nada de `grader_*`, ningún JOIN cruzando motores, y el bridge no COMPONE
+candidatos con SQL propio — puede escribir su decisión del lado SEO vía el primitive canónico, y
+nada más.
+
+### Pendientes de rollout
+
+1. Verificación funcional en staging: ejecutar "Preparar consultas" y "Seguir"/"Declarar objetivo"
+   sobre candidatos reales y confirmar por DB las filas + el chip movido; repetir por el lane
+   ecosystem con un binding `internal`; provocar `capacity_exceeded` y confirmar que **no** se
+   escribió fila.
+2. Promoción a producción por el release control plane; observar 7 días los `tags.source` de los
+   dos primitives tocados (`seo_track_keywords_command`,
+   `seo_grounded_query_bridge_decision_log`).
+3. Avisar al operador de SEO que el orden del inbox cambia (lo resuelto deja de encabezar). Ya está
+   escrito en el manual.
 
 ## Follow-ups
 

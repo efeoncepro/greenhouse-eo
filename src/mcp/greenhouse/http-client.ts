@@ -467,7 +467,10 @@ export class GreenhouseApiPlatformClient {
     query?: string
     intent?: string
     minSearchVolume?: number
+    /** ⚠️ DEPRECADO: viaja para no romper a quien ya lo manda; el reader lo declara ignorado. */
     maxDifficulty?: number
+    maxLinkBarrier?: 'low' | 'medium' | 'high'
+    includeUnknownBarrier?: boolean
     excludeTracked?: boolean
     limit?: number
     cursor?: string
@@ -482,6 +485,8 @@ export class GreenhouseApiPlatformClient {
       intent: input.intent,
       minSearchVolume: input.minSearchVolume,
       maxDifficulty: input.maxDifficulty,
+      maxLinkBarrier: input.maxLinkBarrier,
+      includeUnknownBarrier: input.includeUnknownBarrier ? 'true' : undefined,
       excludeTracked: input.excludeTracked ? 'true' : undefined,
       limit: input.limit,
       cursor: input.cursor

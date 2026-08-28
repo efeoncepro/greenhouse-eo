@@ -19,8 +19,9 @@ import {
 import { readBacklinkDetail, type BacklinkDetailResult } from '@/lib/growth/seo/backlinks/detail-reader'
 import { isVisibilitySubjectKind } from '@/lib/growth/seo/url-visibility/resolve-subject'
 import {
-  SEO_DISCOVERY_ACTION_KINDS,
+  SEO_DISCOVERY_CONSUMER_ACTION_KINDS,
   SEO_DISCOVERY_SOURCE_KINDS,
+  isDiscoveryLinkBarrierFilterLevel,
   type SeoDiscoveryActionKind,
   type SeoDiscoveryMethod,
   type SeoDiscoveryRunStatus,
@@ -1000,6 +1001,13 @@ export interface EcosystemSeoTrackKeywordsBody {
    * `actor` sigue siendo la máquina (procedencia real del write); esto es la autoría humana.
    */
   intentDeclaredBy?: unknown
+  /**
+   * TASK-1692 — de qué candidato de discovery nació la promoción. Opcional; si se declara, el
+   * primitive escribe la fila del ledger DENTRO de la misma transacción que abre la membresía.
+   * El consumer NUNCA escribe el ledger por su cuenta.
+   */
+  discoveryCandidateId?: unknown
+  discoveryRunId?: unknown
 }
 
 export const trackEcosystemSeoKeywordsPayload = async ({
@@ -1061,10 +1069,24 @@ export const trackEcosystemSeoKeywordsPayload = async ({
   // verdad sobre quién comprometió el gasto para poder auditarlo después.
   // `publicId` y no `consumerId`: la procedencia queda legible para quien audite el gasto
   // sin tener que resolver un id interno contra otra tabla.
+  // TASK-1692 — los DOS campos o ninguno: una procedencia a medias no identifica la decisión.
+  const discoveryCandidateId = typeof body?.discoveryCandidateId === 'string' ? body.discoveryCandidateId.trim() : ''
+  const discoveryRunId = typeof body?.discoveryRunId === 'string' ? body.discoveryRunId.trim() : ''
+
+  if (Boolean(discoveryCandidateId) !== Boolean(discoveryRunId)) {
+    throw new ApiPlatformError('"discoveryCandidateId" and "discoveryRunId" must be provided together.', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
+  }
+
   const result = await trackKeywords(subject.seoTargetId, keywords, `mcp:${context.consumer.publicId}`, {
     source: 'mcp',
     ...(intent ? { intent } : {}),
-    ...(intent && intentDeclaredBy ? { intentDeclaredBy } : {})
+    ...(intent && intentDeclaredBy ? { intentDeclaredBy } : {}),
+    ...(discoveryCandidateId && discoveryRunId
+      ? { discoveryProvenance: { candidateId: discoveryCandidateId, runId: discoveryRunId } }
+      : {})
   })
 
   return {
@@ -1474,6 +1496,14 @@ export const getEcosystemSeoKeywordDiscoveryPayload = async ({
     return Number.isFinite(parsed) ? parsed : undefined
   }
 
+  // Vocabulario CERRADO: un valor fuera de él se ignora (mismo criterio que el app lane), jamás
+  // se pasa crudo al reader fingiendo un filtro que no existe.
+  const readDiscoveryLinkBarrier = (value: string | null) => {
+    const raw = value?.trim()
+
+    return raw && isDiscoveryLinkBarrierFilterLevel(raw) ? raw : undefined
+  }
+
   const result = await readKeywordDiscovery({
     organizationId: subject.organizationId,
     seoTargetId: subject.seoTargetId ?? undefined,
@@ -1483,7 +1513,11 @@ export const getEcosystemSeoKeywordDiscoveryPayload = async ({
     query: url.searchParams.get('query')?.trim() || undefined,
     intent: (url.searchParams.get('intent')?.trim() || undefined) as SeoSearchIntent | undefined,
     minSearchVolume: parseNumber(url.searchParams.get('minSearchVolume')),
+    // ⚠️ DEPRECADO (TASK-1694): aceptado, NO aplicado, declarado en `ignoredFilters` del
+    // payload — que viaja tal cual porque este lane es passthrough del primitive.
     maxDifficulty: parseNumber(url.searchParams.get('maxDifficulty')),
+    maxLinkBarrier: readDiscoveryLinkBarrier(url.searchParams.get('maxLinkBarrier')),
+    includeUnknownBarrier: url.searchParams.get('includeUnknownBarrier') === 'true',
     excludeTracked: url.searchParams.get('excludeTracked') === 'true',
     limit: parseNumber(url.searchParams.get('limit')),
     cursor: url.searchParams.get('cursor')
@@ -1644,11 +1678,13 @@ export const recordEcosystemSeoDiscoveryActionPayload = async ({
   const candidateId = typeof body?.candidateId === 'string' ? body.candidateId.trim() : ''
   const actionKind = typeof body?.actionKind === 'string' ? (body.actionKind as SeoDiscoveryActionKind) : null
 
-  if (!candidateId || !actionKind || !SEO_DISCOVERY_ACTION_KINDS.includes(actionKind)) {
-    throw new ApiPlatformError('A "candidateId" and a valid "actionKind" are required.', {
-      statusCode: 400,
-      errorCode: 'bad_request'
-    })
+  // 🔴 TASK-1692 — mismo boundary que el app lane: los kinds que produce un command no se
+  // aceptan desde afuera. El hecho lo escribe el primitive que lo produce, no quien lo reporta.
+  if (!candidateId || !actionKind || !SEO_DISCOVERY_CONSUMER_ACTION_KINDS.includes(actionKind)) {
+    throw new ApiPlatformError(
+      `A "candidateId" and an "actionKind" of: ${SEO_DISCOVERY_CONSUMER_ACTION_KINDS.join(', ')} are required.`,
+      { statusCode: 400, errorCode: 'bad_request' }
+    )
   }
 
   const subject = await resolveSeoLaneSubject(context, request, requestedOrganizationId)

@@ -90,7 +90,8 @@ vi.mock('@/lib/postgres/client', () => ({
 import { GET as adminGet, POST as adminPost } from '@/app/api/admin/growth/seo/keyword-discovery/route'
 import {
   discoverEcosystemSeoKeywordsPayload,
-  getEcosystemSeoKeywordDiscoveryPayload
+  getEcosystemSeoKeywordDiscoveryPayload,
+  recordEcosystemSeoDiscoveryActionPayload
 } from '@/lib/api-platform/resources/ecosystem-growth-seo'
 import type { ApiPlatformRequestContext } from '@/lib/api-platform/core/context'
 import { createGreenhouseMcpHandlers } from '@/mcp/greenhouse/tools'
@@ -175,6 +176,71 @@ describe('app lane — el route delega en el primitive', () => {
     )
   })
 
+  it('TASK-1694: los DOS lanes parsean maxLinkBarrier/includeUnknownBarrier con el mismo vocabulario', async () => {
+    await adminGet(
+      new Request(
+        'http://localhost/api/admin/growth/seo/keyword-discovery?organizationId=org-1&runId=seokdr-1&maxLinkBarrier=medium&includeUnknownBarrier=true'
+      )
+    )
+
+    expect(readMock).toHaveBeenCalledWith(
+      expect.objectContaining({ maxLinkBarrier: 'medium', includeUnknownBarrier: true })
+    )
+
+    readMock.mockClear()
+
+    await getEcosystemSeoKeywordDiscoveryPayload({
+      context: internalContext,
+      request: new Request('http://localhost/x?organizationId=org-1&runId=seokdr-1&maxLinkBarrier=medium&includeUnknownBarrier=true')
+    })
+
+    expect(readMock).toHaveBeenCalledWith(
+      expect.objectContaining({ maxLinkBarrier: 'medium', includeUnknownBarrier: true })
+    )
+  })
+
+  it('TASK-1694: una barrera fuera del vocabulario se ignora en los dos lanes, jamás se pasa cruda', async () => {
+    await adminGet(
+      new Request(
+        'http://localhost/api/admin/growth/seo/keyword-discovery?organizationId=org-1&runId=seokdr-1&maxLinkBarrier=imposible'
+      )
+    )
+
+    expect(readMock).toHaveBeenCalledWith(expect.objectContaining({ maxLinkBarrier: undefined }))
+
+    readMock.mockClear()
+
+    await getEcosystemSeoKeywordDiscoveryPayload({
+      context: internalContext,
+      request: new Request('http://localhost/x?organizationId=org-1&runId=seokdr-1&maxLinkBarrier=imposible')
+    })
+
+    expect(readMock).toHaveBeenCalledWith(expect.objectContaining({ maxLinkBarrier: undefined }))
+  })
+
+  it('🔴 TASK-1694: maxDifficulty se sigue ACEPTANDO en los dos lanes — deprecado nunca es 4xx', async () => {
+    const appResponse = await adminGet(
+      new Request(
+        'http://localhost/api/admin/growth/seo/keyword-discovery?organizationId=org-1&runId=seokdr-1&maxDifficulty=20'
+      )
+    )
+
+    // Eliminarlo convertiría un parámetro aprendido en un error duro para un agente que ya lo
+    // usa; el reader lo ignora y lo declara, que es la forma fail-safe de equivocarse.
+    expect(appResponse.status).toBe(200)
+    expect(readMock).toHaveBeenCalledWith(expect.objectContaining({ maxDifficulty: 20 }))
+
+    readMock.mockClear()
+
+    const laneResult = await getEcosystemSeoKeywordDiscoveryPayload({
+      context: internalContext,
+      request: new Request('http://localhost/x?organizationId=org-1&runId=seokdr-1&maxDifficulty=20')
+    })
+
+    expect(laneResult.data).toBe(readOk)
+    expect(readMock).toHaveBeenCalledWith(expect.objectContaining({ maxDifficulty: 20 }))
+  })
+
   it('run ajeno → 404 anti-oracle canónico', async () => {
     readMock.mockResolvedValue({ ok: false, errorCode: 'run_not_found' })
 
@@ -220,6 +286,80 @@ describe('lane ecosystem — passthrough del MISMO primitive', () => {
     ).rejects.toMatchObject({ statusCode: 403 })
 
     expect(queueMock).not.toHaveBeenCalled()
+  })
+})
+
+describe('TASK-1692 — el boundary de escritura del ledger es el MISMO en los dos lanes', () => {
+  it('🔴 un consumer NO puede escribir `promoted_to_tracking`: lo produce el command', async () => {
+    const appResponse = await adminPost(
+      new Request('http://localhost/api/admin/growth/seo/keyword-discovery', {
+        method: 'POST',
+        body: JSON.stringify({
+          intent: 'record_action',
+          organizationId: 'org-1',
+          candidateId: 'seokdc-1',
+          actionKind: 'promoted_to_tracking'
+        })
+      })
+    )
+
+    // Aceptarlo dejaría abierta la puerta a "reportar" desde afuera un outcome que ya pasó —
+    // y con eso vuelve la falla parcial: gasto comprometido, decisión sin autor.
+    expect(appResponse.status).toBe(400)
+    expect(actionMock).not.toHaveBeenCalled()
+
+    await expect(
+      recordEcosystemSeoDiscoveryActionPayload({
+        context: internalContext,
+        request: new Request('http://localhost/x'),
+        body: { candidateId: 'seokdc-1', actionKind: 'promoted_to_tracking' }
+      })
+    ).rejects.toThrow()
+
+    expect(actionMock).not.toHaveBeenCalled()
+  })
+
+  it('la decisión humana pura SÍ pasa por los dos lanes', async () => {
+    actionMock.mockResolvedValue({ ok: true, actionId: 'seokda-1', deduped: false })
+
+    const appResponse = await adminPost(
+      new Request('http://localhost/api/admin/growth/seo/keyword-discovery', {
+        method: 'POST',
+        body: JSON.stringify({
+          intent: 'record_action',
+          organizationId: 'org-1',
+          candidateId: 'seokdc-1',
+          actionKind: 'dismissed'
+        })
+      })
+    )
+
+    expect(appResponse.status).toBe(200)
+    expect(actionMock).toHaveBeenCalledWith(expect.objectContaining({ actionKind: 'dismissed' }))
+  })
+
+  it('la re-selección de un descartado es decisión humana y viaja por record_action', async () => {
+    actionMock.mockResolvedValue({ ok: true, actionId: 'seokda-2', deduped: false })
+
+    const response = await adminPost(
+      new Request('http://localhost/api/admin/growth/seo/keyword-discovery', {
+        method: 'POST',
+        body: JSON.stringify({
+          intent: 'record_action',
+          organizationId: 'org-1',
+          candidateId: 'seokdc-1',
+          actionKind: 'selected_for_grounded_query',
+          metadata: { reason: 'reselected' }
+        })
+      })
+    )
+
+    // El ledger es append-only: re-seleccionar ES escribir una decisión posterior que supersede
+    // al descarte. No hace falta un command nuevo ni una migración del CHECK.
+    expect(response.status).toBe(200)
+    expect(actionMock).toHaveBeenCalledWith(
+      expect.objectContaining({ actionKind: 'selected_for_grounded_query' })
+    )
   })
 })
 

@@ -95,20 +95,57 @@ export const SEO_DISCOVERY_RUN_STATUSES: readonly SeoDiscoveryRunStatus[] = [
   'cancelled'
 ]
 
-/** Acciones append-only sobre un candidato. Ninguna escribe tracking por sí sola. */
+/**
+ * Acciones append-only sobre un candidato. Ninguna escribe tracking por sí sola.
+ *
+ * 🔴 **Quién escribe cada kind (TASK-1692) — la frontera es qué produjo el hecho:**
+ * - `dismissed` y `rejected` → decisión HUMANA pura, vía `recordKeywordDiscoveryAction`
+ *   (el `record_action` público). Ningún command las produce; alguien simplemente decidió.
+ * - `selected_for_grounded_query` → lo escribe `createGroundedQueryDraft` dentro de su propia
+ *   transacción. También lo escribe una RE-SELECCIÓN humana explícita de un candidato
+ *   descartado, distinguible por `metadata.reason = 'reselected'`.
+ * - `promoted_to_tracking` → lo escribe el camino de tracking dentro de la MISMA transacción
+ *   que abre la membresía.
+ *
+ * **NUNCA un consumer (UI, Nexa, lane ecosystem) encadena un `record_action` para "reportar"
+ * el resultado de un command.** Entre la llamada que produce el outcome y la que lo registra
+ * hay una red: cuando se cae, queda el compromiso de gasto hecho y la decisión sin autor, y
+ * nada reconcilia las dos mitades. El writer vive donde nace el hecho.
+ *
+ * ⚠️ **`selected_for_target` se retiró de este vocabulario (TASK-1692).** No tenía writer, y no
+ * podía tenerlo: la intención (`target | opportunity`) es un atributo de la MEMBRESÍA, con autor
+ * y fecha (TASK-1659), así que un candidato que no se sigue no puede tener intención declarada.
+ * "Declarar objetivo" ES `trackKeywords` con `intent: 'target'`, y su hecho se registra como
+ * `promoted_to_tracking` con `metadata.intent`. Mantenerlo vivo no era neutro: `record_action`
+ * acepta cualquier kind del enum, así que quedaba una puerta para escribir —y pintar— un estado
+ * de negocio que ningún command produjo. El `CHECK` de la base CONSERVA el valor a propósito:
+ * una fila histórica tiene que seguir siendo legible.
+ */
 export type SeoDiscoveryActionKind =
   | 'dismissed'
-  | 'selected_for_target'
   | 'selected_for_grounded_query'
   | 'promoted_to_tracking'
   | 'rejected'
 
 export const SEO_DISCOVERY_ACTION_KINDS: readonly SeoDiscoveryActionKind[] = [
   'dismissed',
-  'selected_for_target',
   'selected_for_grounded_query',
   'promoted_to_tracking',
   'rejected'
+]
+
+/**
+ * Kinds que un consumer puede escribir por `record_action`: SOLO decisiones humanas puras.
+ *
+ * `promoted_to_tracking` no está porque nadie lo "decide" sin promover — lo produce el command
+ * de tracking. `selected_for_grounded_query` SÍ está, pero únicamente como re-selección
+ * explícita de un candidato descartado (`metadata.reason = 'reselected'`); el bridge escribe su
+ * propia fila con la metadata del draft real.
+ */
+export const SEO_DISCOVERY_CONSUMER_ACTION_KINDS: readonly SeoDiscoveryActionKind[] = [
+  'dismissed',
+  'rejected',
+  'selected_for_grounded_query'
 ]
 
 /**
@@ -288,3 +325,92 @@ export const estimateDiscoveryCost = (input: {
       `peor caso — el top-up de enriquecimiento sólo compra lo que falte en el store de mercado`
   }
 }
+
+// ─── Barrera de enlaces como filtro decisional (TASK-1694) ──────────────────────────
+
+/**
+ * Vocabulario CERRADO del filtro de barrera de enlaces.
+ *
+ * `unknown` NO está: no es un nivel, es la AUSENCIA del dato. Un filtro que lo dejara pasar
+ * afirmaría una oportunidad que nadie midió — la doctrina del dominio es que "Sin dato" jamás
+ * se lee como "Baja" (ISSUE-152). Para incluir lo no medido el caller lo pide EXPLÍCITO con
+ * `includeUnknownBarrier`, y así queda dicho en su propia petición.
+ *
+ * El orden `low < medium < high` es el mismo de `LINK_BARRIER_SORT` en el reader; la
+ * derivación de los umbrales vive SOLO en `deriveLinkBarrier` (`keyword-market-data.ts`).
+ */
+export type SeoDiscoveryLinkBarrierFilterLevel = 'low' | 'medium' | 'high'
+
+export const SEO_DISCOVERY_LINK_BARRIER_FILTER_LEVELS: readonly SeoDiscoveryLinkBarrierFilterLevel[] = [
+  'low',
+  'medium',
+  'high'
+]
+
+/** Guard puro para validar un valor de borde (query param, body HTTP, argumento MCP). */
+export const isDiscoveryLinkBarrierFilterLevel = (value: unknown): value is SeoDiscoveryLinkBarrierFilterLevel =>
+  typeof value === 'string' && (SEO_DISCOVERY_LINK_BARRIER_FILTER_LEVELS as readonly string[]).includes(value)
+
+/**
+ * Filtros que el contrato ACEPTA pero ya NO aplica, declarados en la respuesta.
+ *
+ * Entre las dos formas de equivocarse —devolver de más y decirlo, o devolver el subconjunto
+ * equivocado en silencio— el contrato elige la primera: un caller que recibe más filas Y la
+ * razón puede corregir; uno que recibe menos filas creyendo que filtró, no.
+ */
+export interface SeoDiscoveryIgnoredFilter {
+  filter: string
+  reason: string
+  /** Filtro canónico que lo reemplaza, o `null` si no hay equivalente. */
+  replacement: string | null
+}
+
+/**
+ * `maxDifficulty` se acepta y no decide: `keyword_difficulty` tiene piso duro en su fórmula y
+ * colapsa a 0 en SERPs es-LATAM (ISSUE-152 — `pintura` marca KD 0 con 135.000 búsquedas/mes en
+ * MX), así que filtrar por ella entrega keywords de barrera Alta a quien creyó pedir lo fácil.
+ * Se declara en vez de eliminarse porque tres consumers vivos ya lo mandan.
+ */
+export const SEO_DISCOVERY_MAX_DIFFICULTY_IGNORED: SeoDiscoveryIgnoredFilter = {
+  filter: 'maxDifficulty',
+  reason: 'non_decisional_link_barrier_is_canonical',
+  replacement: 'maxLinkBarrier'
+}
+
+// ─── Política de inclusión del borde de adquisición (TASK-1694) ─────────────────────
+
+/**
+ * Qué filas COMPRA un método de expansión.
+ *
+ * - `all` — se compra lo que el endpoint devuelva, con `limit` como único techo.
+ * - `positive_volume_only` — el proveedor descarta server-side lo que no tiene volumen estimado.
+ *
+ * 🔴 Los cuatro adapters usan `all` desde TASK-1694, y no es una preferencia estética.
+ * DataForSEO cobra por fila devuelta y `limit` acota las filas devueltas, así que el filtro
+ * provider-side **no baja el techo de costo de la llamada**: cambia qué filas se compran por el
+ * mismo precio. En un mercado grueso da lo mismo; en uno ralo —el caso fuente de ISSUE-152— el
+ * filtro gasta el `limit` descartando justo el long-tail emergente que discovery existe para
+ * encontrar. Y contradecía, en el borde de adquisición, la doctrina "ausencia ≠ 0" que el resto
+ * del pipeline sostiene con tres estados explícitos. El equivalente honesto ya existe aguas
+ * abajo: `minSearchVolume` en el contrato de lectura, que el operador ve, elige y puede quitar.
+ */
+export type SeoDiscoveryVolumePolicy = 'all' | 'positive_volume_only'
+
+export const SEO_DISCOVERY_DEFAULT_VOLUME_POLICY: SeoDiscoveryVolumePolicy = 'all'
+
+/**
+ * Política con la que se compró ANTES de TASK-1694, por método.
+ *
+ * Una corrida vieja no registró su política en `methods_json`, así que leerla con el default
+ * nuevo reescribiría su historia: diría que compró long-tail sin volumen cuando el proveedor
+ * ya lo había descartado. El default de lectura REPRODUCE lo que pasó, no lo que pasaría hoy.
+ */
+export const SEO_DISCOVERY_HISTORICAL_VOLUME_POLICY: Record<SeoDiscoveryMethod, SeoDiscoveryVolumePolicy> = {
+  keyword_suggestions: 'positive_volume_only',
+  keyword_ideas: 'positive_volume_only',
+  related_keywords: 'all',
+  keywords_for_site: 'all'
+}
+
+export const isDiscoveryVolumePolicy = (value: unknown): value is SeoDiscoveryVolumePolicy =>
+  value === 'all' || value === 'positive_volume_only'

@@ -1,5 +1,27 @@
 # TASK-1665 — Growth SEO: workbench diario de keyword discovery
 
+## Delta 2026-08-28 — la decisión del Slice 4 quedó SUPERSEDED por TASK-1692
+
+El Slice 4 decidió: *"Seguir/declarar NO escribe además una fila de
+`recordKeywordDiscoveryAction('promoted_to_tracking')`: el `alreadyTracked` del reader ya deriva
+del set monitoreado, que es su SSOT. Escribirlo abriría un segundo almacén del mismo hecho y, sin
+transacción cruzada, una falla parcial dejaría los dos en desacuerdo."*
+
+Esa decisión era **correcta para un writer que vive en la UI**, y `TASK-1692` no la contradice: la
+supersede quitándole sus dos premisas.
+
+- **No es un segundo almacén del mismo hecho.** El SSOT de "esta keyword está siendo medida" sigue
+  siendo `seo_keyword_set_members`, y `alreadyTracked` sigue derivando de ahí. El ledger responde
+  otra pregunta que ningún otro store contesta: *esta membresía nació de ESTE candidato, de ESTA
+  corrida, decidida por ESTA persona*.
+- **Sí hay transacción.** Al mover el writer al primitive (`applyKeywordTracking`), la fila se
+  escribe dentro de la MISMA transacción que abre la membresía. La "falla parcial" que la decisión
+  original temía es exactamente lo que desaparece al mover el writer adentro.
+
+Consecuencia visible de este cierre, sin cambio de código de UI: el chip del candidato se mueve
+solo (deja de decir "Nuevo" tras un draft AEO o una promoción) y el inbox deja de poner arriba lo
+ya resuelto. Ambos eran efectos del hueco que esta task dejó declarado.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

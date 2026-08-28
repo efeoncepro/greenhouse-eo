@@ -11,6 +11,15 @@
  *
  * La ausencia de mercado no elimina la fila ni la convierte en cero: viaja como `null` +
  * `marketAvailability`.
+ *
+ * 🔴 **Cardinalidad (TASK-1694): un candidato es UNA KEYWORD NORMALIZADA, no una fila de
+ * procedencia.** La keyword es la unidad que se puntúa, la que recibe una `evidence_ref` y la
+ * que un humano decide; que dos métodos la hayan encontrado viaja como `provenance[]` +
+ * `candidateIds[]`, no como dos renglones. `totalCandidates` cuenta keywords distintas. Ningún
+ * consumer aguas abajo —la cola priorizada de TASK-1700, Nexa, MCP, el lane ecosystem— puede
+ * tratar una procedencia como candidato propio: en un aggregate append-only eso persistiría la
+ * misma decisión hasta cuatro veces, con cuatro scores y cuatro compromisos de gasto sobre una
+ * sola intención.
  */
 
 import 'server-only'
@@ -19,11 +28,17 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import {
   MAX_GSC_SEED_WINDOW_DAYS,
+  SEO_DISCOVERY_HISTORICAL_VOLUME_POLICY,
+  SEO_DISCOVERY_MAX_DIFFICULTY_IGNORED,
+  isDiscoveryVolumePolicy,
   type SeoDiscoveryActionKind,
   type SeoDiscoveryErrorCode,
+  type SeoDiscoveryIgnoredFilter,
+  type SeoDiscoveryLinkBarrierFilterLevel,
   type SeoDiscoveryMethod,
   type SeoDiscoveryRunStatus,
-  type SeoDiscoverySourceKind
+  type SeoDiscoverySourceKind,
+  type SeoDiscoveryVolumePolicy
 } from './contracts'
 import type { ResolvedDiscoverySeed } from './queue'
 import type { SeoLinkBarrierLevel } from '../contracts'
@@ -39,7 +54,12 @@ export interface SeoDiscoveryRunView {
   locationCode: string
   languageCode: string
   seeds: ResolvedDiscoverySeed[]
-  methods: Array<{ method: SeoDiscoveryMethod; resultsPerCall: number }>
+  /**
+   * Métodos con los que se compró, con la política de inclusión de ESA corrida (TASK-1694).
+   * Una corrida anterior sin el campo se lee con el default HISTÓRICO por método: el reader
+   * reproduce lo que pasó, no lo que pasaría hoy.
+   */
+  methods: Array<{ method: SeoDiscoveryMethod; resultsPerCall: number; volumePolicy: SeoDiscoveryVolumePolicy }>
   estimatedCostUsd: number
   actualCostUsd: number | null
   providerCalls: number
@@ -51,11 +71,48 @@ export interface SeoDiscoveryRunView {
   completedAt: string | null
 }
 
-export interface SeoDiscoveryCandidateView {
+/**
+ * UNA fila de procedencia: el hecho de que ESTE endpoint encontró la keyword en ESTA posición
+ * desde ESTAS seeds. Se conserva íntegra — el colapso es de presentación, no de datos.
+ */
+export interface SeoDiscoveryCandidateProvenance {
   candidateId: string
+  sourceEndpoint: SeoDiscoveryMethod
+  sourceRank: number | null
+  seedKeywords: string[]
+  capturedAt: string
+}
+
+/**
+ * Conflicto de cluster: `conflict` cuando otra keyword VIGENTE del target comparte el
+ * `coreKeyword` del candidato; `clear` cuando se pudo descartar; `unknown` cuando no se pudo
+ * saber. Los tres estados son distinguibles a propósito — no saber si hay conflicto y saber que
+ * no lo hay son hechos distintos, y colapsarlos convertiría un hueco en una vía libre.
+ */
+export interface SeoDiscoveryClusterConflict {
+  status: 'conflict' | 'clear' | 'unknown'
+  coreKeyword: string | null
+  /** Hasta 5 nombres contra los que choca, para que el humano vea el choque sin adivinarlo. */
+  trackedMembers: string[]
+  /** Total real de miembros en conflicto (puede exceder los 5 nombrados). */
+  trackedMemberCount: number
+}
+
+export interface SeoDiscoveryCandidateView {
+  /** Procedencia REPRESENTATIVA (menor `sourceRank`, desempate `candidateId` asc). */
+  candidateId: string
+  /**
+   * TODAS las filas de procedencia fusionadas, en orden determinista. Es lo que hace seguro el
+   * colapso: las acciones se siguen registrando por fila y el bridge AEO sigue seleccionando
+   * por id, así que un consumer debe poder alcanzar cada procedencia de la keyword que el
+   * operador decidió.
+   */
+  candidateIds: string[]
+  provenance: SeoDiscoveryCandidateProvenance[]
   runId: string
   keyword: string
   normalizedKeyword: string
+  /** Escalares de la procedencia REPRESENTATIVA; el conjunto completo vive en `provenance`. */
   sourceEndpoint: SeoDiscoveryMethod
   sourceRank: number | null
   seedKeywords: string[]
@@ -79,6 +136,17 @@ export interface SeoDiscoveryCandidateView {
   /** Demanda MEDIDA del propio Space (●), como lente separada. */
   measuredGsc: { impressions: number; position: number | null; displayMarker: '●' } | null
   alreadyTracked: boolean
+  /**
+   * TASK-1694 — ¿el `coreKeyword` de este candidato ya lo cubre una keyword vigente del target?
+   *
+   * Señal SEPARADA de `alreadyTracked` y nunca derivada de él: responden preguntas distintas.
+   * `alreadyTracked` es identidad exacta ("esta misma keyword ya se sigue"); `clusterConflict`
+   * es intención ("otra keyword ya apunta a lo mismo"). Declarar objetivo sobre dos miembros del
+   * mismo cluster los diluye — la acción correcta es consolidar, no sumar una segunda apuesta
+   * con gasto recurrente propio. Es ADVERTENCIA, jamás bloqueo: nombra contra qué choca y deja
+   * juzgar al humano.
+   */
+  clusterConflict: SeoDiscoveryClusterConflict
   latestAction: { kind: SeoDiscoveryActionKind; actor: string; at: string } | null
   /** `true` si la keyword coincide exactamente con una seed de la corrida. */
   matchesSeed: boolean
@@ -94,7 +162,26 @@ export interface ReadKeywordDiscoveryInput {
   query?: string
   intent?: SeoSearchIntent
   minSearchVolume?: number
+  /**
+   * ⚠️ DEPRECADO Y NO DECISIONAL (TASK-1694). Se acepta para no romper a los consumers que ya
+   * lo aprendieron, pero NO filtra: `keyword_difficulty` colapsa a 0 en SERPs es-LATAM
+   * (ISSUE-152), así que filtrar por él devuelve keywords de barrera Alta a quien creyó pedir
+   * lo fácil. Mandarlo aparece declarado en `ignoredFilters`. El filtro canónico de dificultad
+   * es {@link ReadKeywordDiscoveryInput.maxLinkBarrier}.
+   */
   maxDifficulty?: number
+  /**
+   * Barrera de enlaces MÁXIMA aceptada (`low < medium < high`), derivada por
+   * `deriveLinkBarrier` sobre el perfil real de enlaces del top-10 — la contrapartida canónica
+   * de `maxDifficulty`. Un valor fuera del vocabulario cerrado se ignora y se declara.
+   */
+  maxLinkBarrier?: SeoDiscoveryLinkBarrierFilterLevel
+  /**
+   * Incluye en el resultado de un filtro de barrera los candidatos SIN dato medido
+   * (`unknown`, o sin fila de mercado). Default `false`: "Sin dato" no es "Baja", y dejarlo
+   * pasar por omisión afirmaría una oportunidad que nadie midió.
+   */
+  includeUnknownBarrier?: boolean
   /**
    * TASK-1666 — selección explícita de candidatos (requiere `runId`). SQL-side y tenant-safe:
    * un ID ajeno simplemente no aparece — el caller decide si la ausencia es error.
@@ -113,6 +200,7 @@ export type ReadKeywordDiscoveryResult =
       /** Presente sólo cuando se pidió `runId`. */
       run: SeoDiscoveryRunView | null
       candidates: SeoDiscoveryCandidateView[]
+      /** Keywords normalizadas DISTINTAS (TASK-1694), no filas de procedencia. */
       totalCandidates: number
       nextCursor: string | null
       marketAvailability: 'available' | 'unavailable'
@@ -120,6 +208,12 @@ export type ReadKeywordDiscoveryResult =
       marketFreshness: string | null
       /** Disclosure fijo: seguir una keyword compromete gasto recurrente (rank capture diario). */
       trackingCostDisclosure: string
+      /**
+       * Filtros que el caller mandó y el contrato NO aplicó, con su razón y su reemplazo.
+       * Siempre presente (`[]` cuando no aplica): un filtro ignorado en silencio es peor que
+       * uno rechazado, porque el caller cree que decidió con menos ruido del que recibió.
+       */
+      ignoredFilters: SeoDiscoveryIgnoredFilter[]
     }
   | { ok: false; errorCode: SeoDiscoveryErrorCode }
 
@@ -164,9 +258,17 @@ const toRunView = (row: RunRow): SeoDiscoveryRunView => {
       ? (row.seed_inputs_json as { seeds?: ResolvedDiscoverySeed[] })
       : {}
 
-  const methods = Array.isArray(row.methods_json)
-    ? (row.methods_json as Array<{ method: SeoDiscoveryMethod; resultsPerCall: number }>)
+  const rawMethods = Array.isArray(row.methods_json)
+    ? (row.methods_json as Array<{ method: SeoDiscoveryMethod; resultsPerCall: number; volumePolicy?: unknown }>)
     : []
+
+  const methods = rawMethods.map(spec => ({
+    method: spec.method,
+    resultsPerCall: spec.resultsPerCall,
+    volumePolicy: isDiscoveryVolumePolicy(spec.volumePolicy)
+      ? spec.volumePolicy
+      : (SEO_DISCOVERY_HISTORICAL_VOLUME_POLICY[spec.method] ?? 'all')
+  }))
 
   return {
     runId: row.run_id,
@@ -196,6 +298,11 @@ export const readKeywordDiscovery = async (
 ): Promise<ReadKeywordDiscoveryResult> => {
   const limit = Math.min(MAX_DISCOVERY_READ_LIMIT, Math.max(1, Math.floor(input.limit ?? DEFAULT_DISCOVERY_READ_LIMIT)))
   const offset = input.cursor ? Math.max(0, Number.parseInt(input.cursor, 10) || 0) : 0
+
+  // Se declara sólo si el caller LO MANDÓ: anunciar un filtro ignorado que nadie pidió sería
+  // ruido, y la lista existe para que quien se equivocó pueda corregir.
+  const ignoredFilters: SeoDiscoveryIgnoredFilter[] =
+    typeof input.maxDifficulty === 'number' ? [SEO_DISCOVERY_MAX_DIFFICULTY_IGNORED] : []
 
   // Historial de corridas (tenant-safe SIEMPRE por org; target opcional).
   const runRows = await runGreenhousePostgresQuery<RunRow>(
@@ -231,7 +338,8 @@ export const readKeywordDiscovery = async (
       nextCursor: null,
       marketAvailability: 'unavailable',
       marketFreshness: null,
-      trackingCostDisclosure: TRACKING_COST_DISCLOSURE
+      trackingCostDisclosure: TRACKING_COST_DISCLOSURE,
+      ignoredFilters
     }
   }
 
@@ -313,6 +421,95 @@ export const readKeywordDiscovery = async (
 
   const trackedSet = new Set(trackedRows.map(row => normalizeMarketKeyword(row.keyword)))
 
+  // ── Conflicto de cluster (TASK-1694) ─────────────────────────────────────────────
+  //
+  // Se resuelve con UNA lectura más del store de mercado de TASK-1661 sobre el set seguido —
+  // acotado por el techo gobernado de keywords por target— y CERO llamadas al proveedor. Es una
+  // llamada separada de la de candidatos a propósito: fusionarlas contaminaría
+  // `marketAvailability`/`marketFreshness`, que declaran la frescura de lo que se está SIRVIENDO.
+  const trackedMarket =
+    trackedSet.size === 0
+      ? null
+      : await readKeywordMarketData({
+          keywords: [...trackedSet],
+          locationCode: runView.locationCode,
+          languageCode: runView.languageCode
+        })
+
+  /**
+   * Core EFECTIVO de una keyword: el `core_keyword` del proveedor, o la keyword misma cuando
+   * viene `NULL`.
+   *
+   * 🔴 `core_keyword` identifica la CANÓNICA del clúster de sinónimos, así que el proveedor no
+   * lo emite cuando la keyword YA ES la canónica: medido contra el store real (2026-08-28), de
+   * 923 filas hay 527 con `core` nulo, 396 apuntando a OTRA keyword y **cero** apuntando a sí
+   * mismas. Tratar el `NULL` como "no se sabe" perdería justo la colisión más probable —la de un
+   * candidato variante contra la canónica que el target ya sigue— y la reportaría como `unknown`.
+   */
+  const effectiveCore = (normalizedKeyword: string, coreKeyword: string | null) => coreKeyword ?? normalizedKeyword
+
+  /** Core efectivo → keywords vigentes del target que lo comparten. */
+  const trackedByCore = new Map<string, string[]>()
+  let unresolvedTrackedKeywords = 0
+
+  for (const tracked of trackedSet) {
+    const datum = trackedMarket?.byKeyword.get(tracked) ?? null
+
+    if (!datum) {
+      // SIN FILA de mercado es el único estado ciego: nunca preguntamos por esta keyword, así
+      // que podría ser la canónica del clúster del candidato y no hay cómo saberlo. Una fila CON
+      // `core` nulo no es ciega — es la afirmación de que la keyword es su propia canónica.
+      unresolvedTrackedKeywords += 1
+
+      continue
+    }
+
+    const core = effectiveCore(tracked, datum.coreKeyword)
+    const members = trackedByCore.get(core)
+
+    if (members) members.push(tracked)
+    else trackedByCore.set(core, [tracked])
+  }
+
+  const MAX_NAMED_CLUSTER_MEMBERS = 5
+
+  const resolveClusterConflict = (
+    normalizedKeyword: string,
+    coreKeyword: string | null,
+    hasMarketRow: boolean
+  ): SeoDiscoveryClusterConflict => {
+    // Sin nada seguido no hay contra qué canibalizar. Es un hecho POSITIVO —el set está vacío—,
+    // no una ausencia de dato, así que se afirma en vez de degradarse a `unknown`.
+    if (trackedSet.size === 0) {
+      return { status: 'clear', coreKeyword, trackedMembers: [], trackedMemberCount: 0 }
+    }
+
+    const core = effectiveCore(normalizedKeyword, coreKeyword)
+
+    const members = (hasMarketRow ? (trackedByCore.get(core) ?? []) : []).filter(
+      tracked => tracked !== normalizedKeyword
+    )
+
+    // Encontrar un choque es un hecho positivo: vale aunque la cobertura del set sea parcial.
+    if (members.length > 0) {
+      return {
+        status: 'conflict',
+        coreKeyword,
+        trackedMembers: members.slice(0, MAX_NAMED_CLUSTER_MEMBERS),
+        trackedMemberCount: members.length
+      }
+    }
+
+    // No haberlo encontrado sólo vale si se pudo mirar TODO. Sin fila de mercado del candidato,
+    // o con alguna keyword seguida sin fila, el conflicto no está descartado — está sin medir, y
+    // `clear` ahí sería afirmar vía libre sobre un hueco.
+    if (!hasMarketRow || unresolvedTrackedKeywords > 0) {
+      return { status: 'unknown', coreKeyword, trackedMembers: [], trackedMemberCount: 0 }
+    }
+
+    return { status: 'clear', coreKeyword, trackedMembers: [], trackedMemberCount: 0 }
+  }
+
   // Última acción por candidato (la decisión pendiente ordena primero).
   const candidateIds = candidateRows.map(row => row.candidate_id)
 
@@ -336,13 +533,68 @@ export const readKeywordDiscovery = async (
 
   const seedSet = new Set(runView.seeds.map(seed => seed.normalizedKeyword))
 
-  let candidates: SeoDiscoveryCandidateView[] = candidateRows.map(row => {
+  // ── Colapso por keyword normalizada (TASK-1694) ──────────────────────────────────
+  //
+  // 🔴 La unidad de DECISIÓN es la keyword, no la fila de procedencia. Que dos métodos la hayan
+  // encontrado es un hecho de cómo la conocimos, no dos oportunidades: servirla como dos
+  // renglones da dos estados, dos `latestAction` y dos CTA de gasto recurrente sobre una sola
+  // intención — y aguas abajo, en un aggregate append-only (TASK-1700), congela esa duplicación
+  // con dos scores y dos compromisos. La cardinalidad es contrato del reader, no convención de
+  // la UI. La procedencia se conserva íntegra en `provenance` y la fila en base no se toca.
+  const byNormalizedKeyword = new Map<string, typeof candidateRows>()
+
+  for (const row of candidateRows) {
+    const group = byNormalizedKeyword.get(row.normalized_keyword)
+
+    if (group) group.push(row)
+    else byNormalizedKeyword.set(row.normalized_keyword, [row])
+  }
+
+  // Orden total explícito: sin él la paginación por offset se vuelve inestable entre páginas
+  // (una keyword podría aparecer en dos, o en ninguna). `sourceRank` nulo va al final.
+  const provenanceOrder = (a: (typeof candidateRows)[number], b: (typeof candidateRows)[number]) => {
+    const rankA = a.source_rank ?? Number.POSITIVE_INFINITY
+    const rankB = b.source_rank ?? Number.POSITIVE_INFINITY
+
+    if (rankA !== rankB) return rankA - rankB
+
+    return a.candidate_id < b.candidate_id ? -1 : 1
+  }
+
+  let candidates: SeoDiscoveryCandidateView[] = [...byNormalizedKeyword.values()].map(group => {
+    const provenanceRows = [...group].sort(provenanceOrder)
+    const row = provenanceRows[0]
+
     const datum = market.byKeyword.get(row.normalized_keyword) ?? null
-    const action = actionByCandidate.get(row.candidate_id) ?? null
     const gsc = gscByKeyword.get(row.normalized_keyword) ?? null
+
+    // `latestAction` = la más reciente entre TODAS las filas fusionadas: el reader sigue siendo
+    // la autoridad de "esta keyword ya se decidió" aunque la acción se haya registrado sobre
+    // una sola de sus procedencias.
+    const action = provenanceRows
+      .map(candidate => actionByCandidate.get(candidate.candidate_id) ?? null)
+      .reduce<(typeof actionRows)[number] | null>((latest, current) => {
+        if (!current) return latest
+        if (!latest) return current
+
+        if (current.created_at.getTime() !== latest.created_at.getTime()) {
+          return current.created_at > latest.created_at ? current : latest
+        }
+
+        // Empate exacto de timestamp: desempate estable por id, jamás por orden de llegada.
+        return current.candidate_id < latest.candidate_id ? current : latest
+      }, null)
 
     return {
       candidateId: row.candidate_id,
+      candidateIds: provenanceRows.map(candidate => candidate.candidate_id),
+      provenance: provenanceRows.map(candidate => ({
+        candidateId: candidate.candidate_id,
+        sourceEndpoint: candidate.source_endpoint as SeoDiscoveryMethod,
+        sourceRank: candidate.source_rank,
+        seedKeywords: Array.isArray(candidate.seed_keywords_json) ? (candidate.seed_keywords_json as string[]) : [],
+        capturedAt: candidate.captured_at.toISOString()
+      })),
       runId: row.run_id,
       keyword: row.keyword,
       normalizedKeyword: row.normalized_keyword,
@@ -364,6 +616,7 @@ export const readKeywordDiscovery = async (
       linkBarrier: market.linkBarrierByKeyword.get(row.normalized_keyword) ?? null,
       measuredGsc: gsc ? { impressions: gsc.impressions, position: gsc.position, displayMarker: '●' } : null,
       alreadyTracked: trackedSet.has(row.normalized_keyword),
+      clusterConflict: resolveClusterConflict(row.normalized_keyword, datum?.coreKeyword ?? null, datum !== null),
       latestAction: action
         ? { kind: action.action_kind as SeoDiscoveryActionKind, actor: action.actor, at: action.created_at.toISOString() }
         : null,
@@ -381,10 +634,21 @@ export const readKeywordDiscovery = async (
     )
   }
 
-  if (typeof input.maxDifficulty === 'number') {
-    candidates = candidates.filter(
-      candidate => candidate.difficulty !== null && candidate.difficulty <= (input.maxDifficulty as number)
-    )
+  // ⚠️ `maxDifficulty` NO se aplica (TASK-1694): se acepta, se ignora y se declara en
+  // `ignoredFilters`. Filtrar por `keyword_difficulty` en es-LATAM entrega barrera Alta a quien
+  // pidió lo fácil (ISSUE-152). El filtro canónico es la barrera de enlaces.
+  if (input.maxLinkBarrier) {
+    const ceiling = LINK_BARRIER_SORT[input.maxLinkBarrier]
+
+    candidates = candidates.filter(candidate => {
+      // Sin fila de mercado (`null`) y con fila sin perfil de enlaces (`unknown`) son dos formas
+      // del MISMO hecho para esta decisión: nadie midió la barrera. Ninguna pasa por omisión.
+      if (candidate.linkBarrier === null || candidate.linkBarrier === 'unknown') {
+        return input.includeUnknownBarrier === true
+      }
+
+      return LINK_BARRIER_SORT[candidate.linkBarrier] <= ceiling
+    })
   }
 
   if (input.excludeTracked) {
@@ -393,6 +657,10 @@ export const readKeywordDiscovery = async (
 
   // Orden por defecto de la spec (8 llaves, desempate estable). No inventa un score único.
   candidates.sort((a, b) => {
+    // 🔴 "Pendiente primero" significa SIN DECISIÓN TOMADA, y desde TASK-1692 eso coincide con
+    // "sin fila": los tres kinds que faltaban ya tienen writer, así que un candidato promovido
+    // a tracking o enviado a un draft AEO deja rastro y baja. Antes ninguno lo dejaba y lo ya
+    // resuelto encabezaba el inbox como si fuera lo más pendiente que había.
     const pendingA = a.latestAction === null ? 0 : 1
     const pendingB = b.latestAction === null ? 0 : 1
 
@@ -446,6 +714,7 @@ export const readKeywordDiscovery = async (
     nextCursor,
     marketAvailability: market.market,
     marketFreshness: market.freshness.latestCaptureDate,
-    trackingCostDisclosure: TRACKING_COST_DISCLOSURE
+    trackingCostDisclosure: TRACKING_COST_DISCLOSURE,
+    ignoredFilters
   }
 }

@@ -1,5 +1,14 @@
 # TASK-1691 — Declarar la lente estimada y su fecha de captura en la tabla de oportunidades SEO
 
+## Delta 2026-08-28 — desbloqueada: `TASK-1694` cerró
+
+`TASK-1694` cerró como `code complete, rollout pendiente`, así que el `Blocked by` pasa a `none`.
+La serialización `1691 → 1693` se conserva como orden recomendado, no como bloqueo.
+
+Contexto que ahora es un hecho del contrato y no un supuesto: el reader de discovery declara los
+filtros que ignora (`ignoredFilters`), filtra por barrera de enlaces (`maxLinkBarrier`, con
+`unknown` fuera por default) y cuenta candidatos por keyword normalizada.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -60,7 +69,7 @@ Qué hereda de acá el resto del programa:
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ui`
-- Blocked by: `TASK-1694` (serialización `1694 → 1691 → 1693`; Delta 2026-08-15)
+- Blocked by: `none` (desbloqueada el 2026-08-28; el orden sugerido `1691 → 1693` se mantiene como recomendación)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

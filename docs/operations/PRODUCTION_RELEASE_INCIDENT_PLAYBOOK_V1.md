@@ -359,7 +359,7 @@ que es lo que este playbook debe enseñar:
 
 | Gotcha | Lo que se venía haciendo (reactivo) | Lo que se hizo (pre-emptivo) |
 |---|---|---|
-| #1 PR conflictivo | Descubrir el conflicto al crear el PR y pelearlo contra el reloj | `git merge origin/main -X ours --no-edit` en `develop` **antes** de crear el PR → PR MERGEABLE de entrada |
+| #1 PR conflictivo | Descubrir el conflicto al crear el PR y pelearlo contra el reloj | Merge canónico en `develop` **antes** de crear el PR → PR MERGEABLE de entrada. **La estrategia se decide clasificando lo que `main` tiene de propio, no contándolo** (delta 2026-08-28 abajo): estado estacionario ⇒ `git merge origin/main -s ours --no-edit` |
 | #2 batch policy | Aceptar `requires_break_glass` y pedir `bypass_preflight_reason` | Marker `[release-coupled: <razón>]` **abriendo una línea** del cuerpo del commit de squash → el check dejó de reportar `split_batch` (ver las dos correcciones de abajo: en su momento el `ship` no lo produjo el marker, y el marker nunca podía haber resuelto el `requires_break_glass` de un batch con 14 migraciones) |
 | #3 `playwright_smoke` ausente | Bypassear el check que no existe para el SHA de squash | `gh workflow run playwright.yml --ref main` y esperar verde (3m10s, run `31057847351`) → el check **existe de verdad** |
 
@@ -380,14 +380,59 @@ que es lo que este playbook debe enseñar:
 > sensibles independientes) y para **nada más**. Detalle en la nota bajo la tabla del
 > Paso 2.
 
-Detalle del #1 que conviene no perder: hubo un conflicto **modify/delete** real
-(`TASK-1590` borrada en `develop` porque migró a `in-progress/`, modificada en
-`main`). `-X ours` no resuelve modify/delete — hay que decidirlo a mano. Se
-resolvió conservando el estado de `develop` (`git rm` de la copia en `to-do/`) y
-se verificó con `git log origin/main --not HEAD` vacío **y**
-`git diff HEAD@{1} HEAD -- src/ scripts/ services/ migrations/` vacío. Esa
-segunda verificación es la que prueba que el merge fue documental y que `-X ours`
-no se comió código de producción.
+> 🔴 **Corrección sobre el #1 (2026-08-28, release `c983be7f18e6`): la regla de decisión del merge
+> canónico estaba mal formulada, y su "caso normal" era INALCANZABLE.** La regla decía: *"si
+> `git log origin/main --not HEAD` no trae commits → `-s ours`; si trae commits → `-X ours`"*. Con
+> squash-merge, **V1 nunca está vacía en el estado estacionario**: cada release deja en `main` un
+> commit de squash que no será ancestro de `develop` hasta que lo traiga el merge canónico del
+> release siguiente. Evidencia empírica de ese día: los squashes de los 7 releases del 2026-08-09
+> al 08-27 (`2c87d71e2eca`, `950f5bdb4`, `3754a17d3b1d`, `fa54670470c1`, `30301816955f`,
+> `709e15f6688e`, `cc73c74789ce`) son **todos** ancestros de `origin/develop` hoy, y V1 al arrancar
+> el release del 2026-08-28 era exactamente `{cc73c74789ce}` = el squash del release anterior. La
+> regla literal, entonces, empujaba a `-X ours` en **todos** los releases — la estrategia peligrosa.
+>
+> **La pregunta correcta no es "¿V1 está vacía?" sino "¿`main` aporta contenido PROPIO?", y se
+> responde CLASIFICANDO los commits de V1:**
+>
+> - **Sólo squashes de release** (título `release: … (#NNN)`, SHA = `target_sha` de un manifest
+>   `released`) → **`-s ours`**: su contenido salió de `develop` por construcción, porque el squash
+>   se hizo DE commits de `develop`. El árbol queda byte a byte igual al de `develop`.
+> - **Cualquier otra cosa** (hotfix hecho en `main`, push directo, revert en `main`) → primero
+>   verificar si ese contenido **ya está** en `develop` (el camino canónico del hotfix exige
+>   cherry-pick de vuelta). Si ya está, `-s ours` sigue siendo correcto. Si **no** está, 🛑 **PARAR**
+>   y reconciliarlo por su camino canónico antes de mergear — nunca "resolverlo" cambiando de
+>   estrategia de merge.
+> - **`-X ours` deja de ser el default de ninguna rama.** Queda como excepción documentada, y si se
+>   usa, la auditoría obligatoria es `git diff HEAD@{1} HEAD --name-status` **COMPLETO**.
+>
+> Costo real de seguir la regla vieja ese día: `-X ours` **duplicó un bloque completo de
+> `.claude/rules/growth-seo.md`** y **resucitó TASK-1775/1776/1777 en `docs/tasks/in-progress/`**
+> teniéndolas `develop` en `complete/` — **con la verificación acotada a
+> `src/ scripts/ services/ migrations/` VACÍA**. Sólo el `--name-status` completo lo cazó. Misma
+> clase de bug que el gotcha #8 (2026-08-06, línea de producción resucitada en
+> `src/lib/ai/dataforseo.ts`) y que el delta 2026-08-23. Detalle operativo y las cuatro
+> verificaciones: runbook §2.4 Paso A.
+
+Detalle del #1 que conviene no perder: **los conflictos sólo existen en el camino
+excepcional `-X ours`.** `-s ours` toma el árbol de `develop` entero, así que no
+produce conflictos nunca y no deja nada que auditar. Cuando la excepción se usa,
+`-X ours` resuelve los conflictos de **contenido** a favor de `develop`
+automáticamente, pero **no** los conflictos de **ruta** — y en los dos casos
+observados la regla es la misma: **`develop` manda; se borra la copia que `main`
+quiere resucitar**.
+
+- **`modify/delete` (2026-08-06):** `TASK-1590` borrada en `develop` porque migró
+  a `in-progress/`, modificada en `main`. Se resolvió con `git rm` de la copia en
+  `to-do/`.
+- **`rename/rename` (2026-08-28):** `TASK-1658` estaba en `docs/tasks/complete/`
+  en `develop` y en `docs/tasks/in-progress/` en `main` — el mismo archivo movido
+  a dos destinos distintos. Se resolvió con `git rm` de la copia en
+  `in-progress/`: `develop` manda, la task ya había cerrado.
+
+Y una verificación de respaldo barata que cierra el caso del hotfix que **agregó**
+un archivo en `main` y nunca volvió a `develop`:
+`git diff --diff-filter=A --name-only origin/develop origin/main` debe salir
+vacío.
 
 ### El principio general
 

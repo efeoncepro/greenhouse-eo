@@ -1,5 +1,33 @@
 # TASK-1696 — Growth: gasto de proveedor con dimensión de consumidor y gate de dinero per-org del grader
 
+## Delta 2026-08-28 (release a producción) — el código está en el runtime real; el gate de dinero sigue OFF por diseño
+
+El paso a producción `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208,
+release_id `c983be7f18e6-92b1b327-a1c9-4e7a-85dc-6a5e300f4e32`, run `33178544139`, manifest
+`released`, watchdog `ok` / `drift_count=0`) cerró los pasos 1–4 de la
+`### Production verification sequence`:
+
+- **Paso 1** — la migración de esta task está aplicada en la instancia única de Cloud SQL
+  (`pnpm pg:connect:status` → `No migrations to run!`): clave única de seis columnas
+  `NULLS NOT DISTINCT` con `consumer`, `cost_basis` y `price_table_version`.
+- **Pasos 2–4** — los Slices 2–3 viajan en la revisión activa del ops-worker
+  (`ops-worker-00610-kc8`) y en Vercel Production; el cron `ops-seo-rank-capture` corre contra ese
+  código. La dimensión `consumer='seo'` ya se acumula en el ledger productivo.
+- **Federación** — `get_seo_provider_spend` quedó federada en el gateway `mcp.efeonce.org`
+  (revisión `efeonce-mcp-gateway-00024-8b8`, inventario **21 → 27 tools SEO**), con canary de cierre
+  verde contra producción.
+
+**Lo que NO cambió, y no debía cambiar:** `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED` y
+`GROWTH_AI_VISIBILITY_BUDGET_GATE_ENFORCED` siguen **default-OFF en todos los runtimes, por
+diseño**. El release no los prendió y no correspondía prenderlos: el paso 8 exige prender el
+`_ENABLED` para el mes de observación, y el flip a `_ENFORCED` (paso 10) es una **decisión comercial
+del operador**, no un paso de esta task. Los pasos 5–7 (correr un grader `light` con y sin
+organización) siguen pendientes de que el grader se ejercite — está dormido desde 2026-07-17 y la
+superficie AIO en producción sigue gated por `TASK-1341`.
+
+`Status real` actualizado a `complete en runtime; observación del gate de presupuesto pendiente
+(flags OFF por diseño)`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -21,7 +49,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-022`
-- Status real: `code complete, rollout pendiente`
+- Status real: `complete en runtime (release c983be7f, 2026-08-28); observación del gate de presupuesto pendiente — flags OFF por diseño`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`

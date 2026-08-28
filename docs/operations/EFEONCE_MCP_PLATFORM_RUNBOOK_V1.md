@@ -282,10 +282,12 @@ Delega en el lane ecosystem de Greenhouse (`/api/platform/ecosystem/growth/seo/*
 per-org `seo_v2`, el 404 anti-oracle y las degradaciones honestas. Los payloads se pasan tal cual (`data` del
 envelope del lane), así que un cliente MCP ve exactamente los mismos shapes que la UI y Nexa.
 
-Tools publicadas — **el inventario COMPLETO del MCP interno de Greenhouse (27 tools SEO: 20 lecturas + 7 escrituras) está federado**
-(TASK-1658 cerró el drift de 8 tools que vivían adentro sin federar ni excluir, dejándolo en 21; TASK-1696 sumó
-`get_seo_provider_spend` como lectura 17). Las de **lectura** van bajo el
-**scope base** `efeonce.mcp.read`; las **cinco de escritura** (TASK-1308/1664/1666/1709) exigen el scope propio
+Tools publicadas — **el inventario COMPLETO del MCP interno de Greenhouse (27 tools SEO: 20 lecturas + 7 escrituras) está
+federado Y DESPLEGADO en producción desde el 2026-08-28** (TASK-1658 cerró el drift de 8 tools que vivían adentro sin
+federar ni excluir, dejándolo en 21; TASK-1696 sumó `get_seo_provider_spend`; TASK-1662 sumó `get_seo_keyword_gap` +
+el par declare/retire de competidores; TASK-1699 sumó `get_seo_serp_top_results` + `get_seo_competitor_candidates`).
+Las de **lectura** van bajo el
+**scope base** `efeonce.mcp.read`; las **siete de escritura** (TASK-1308/1664/1666/1709/1662) exigen el scope propio
 del dominio `efeonce.mcp.seo.write` — un token de lectura jamás debe poder comprometer gasto DataForSEO. La lista
 canónica y el guard bidireccional viven en `src/providers/greenhouse-seo-tool-parity.ts` del repo `efeonce-mcp`
 (allowlist explícito: revisión humana por tool en la frontera pública, NUNCA auto-federación). Desde TASK-1658 el
@@ -313,20 +315,41 @@ excluida (la dirección que antes era invisible).
 | `get_seo_url_visibility` | `GET .../growth/seo/url-visibility` | `efeonce.mcp.read` |
 | `get_seo_prospect_diagnostic` | `GET .../growth/seo/prospect-diagnostic` | `efeonce.mcp.read` |
 | `get_seo_provider_spend` | `GET .../growth/seo/provider-spend` | `efeonce.mcp.read` (bindings `internal` únicamente) |
+| `get_seo_keyword_gap` | `GET .../growth/seo/keyword-gap` | `efeonce.mcp.read` (bindings `internal` SIN organización únicamente) |
+| `get_seo_serp_top_results` | `GET .../growth/seo/serp-top-results` | `efeonce.mcp.read` (bindings `internal` SIN organización únicamente) |
+| `get_seo_competitor_candidates` | `GET .../growth/seo/competitor-candidates` | `efeonce.mcp.read` (bindings `internal` SIN organización únicamente) |
 | `track_seo_keywords` | `POST .../growth/seo/keywords/track` | `efeonce.mcp.seo.write` |
 | `untrack_seo_keywords` | `POST .../growth/seo/keywords/untrack` | `efeonce.mcp.seo.write` |
 | `discover_seo_keywords` | `POST .../growth/seo/keyword-discovery` | `efeonce.mcp.seo.write` |
 | `prepare_seo_grounded_queries` | `POST .../growth/seo/grounded-queries` | `efeonce.mcp.seo.write` |
 | `run_seo_prospect_diagnostic` | `POST .../growth/seo/prospect-diagnostic` | `efeonce.mcp.seo.write` |
+| `declare_seo_competitors` | `POST .../growth/seo/competitors/declare` | `efeonce.mcp.seo.write` |
+| `retire_seo_competitors` | `POST .../growth/seo/competitors/retire` | `efeonce.mcp.seo.write` |
 
-> Estado de despliegue 2026-08-28 — **inventario interno (27: 20 lecturas + 7 escrituras, tras TASK-1662/1699) ≠ desplegado en el gateway productivo (21)**:
-> el rollout de TASK-1658 ya se ejecutó y la revisión `efeonce-mcp-gateway-00023-zt2` (2026-08-27) llevó
-> `tools/list` de 13 a 21, con los 4 commits pusheados a `main` de `efeonce-mcp`. Falta desplegar la tool 22,
-> `get_seo_provider_spend` (TASK-1696, commit `1a51461` en `main`, CI verde): el deploy del gateway es
-> `workflow_dispatch` **manual** y no se disparó con el push, y su lane
-> `/api/platform/ecosystem/growth/seo/provider-spend` está en `develop`, **no en `main`** de Greenhouse. Su
-> deploy se despacha DESPUÉS del próximo release develop→main (antes daría 404 upstream — lección
-> TASK-1661); la verificación es `tools/list` 21→22 + el run completo del canary contra producción. `prepare_seo_grounded_queries` responde además
+> Estado de despliegue 2026-08-28 — **inventario interno = desplegado: 27 tools (20 lecturas + 7 escrituras)**.
+> El deploy ya ocurrió; el `rollout pendiente` que declaraban TASK-1658/1696/1662/1699 está cerrado. `origin/main`
+> de `efeonce-mcp` pasó de `8f1ae34` a `92e7197` (los dos commits que estaban locales sin pushear: `8215ab5` de
+> TASK-1662 y `92e7197` de TASK-1699), CI verde, workflow "Deploy Cloud Run" run `33180234265` en `success` y sin
+> compuerta de aprobación. La **revisión activa es `efeonce-mcp-gateway-00024-8b8`** (`Ready=True`, 100% del
+> tráfico, imagen `…/efeonce-mcp/gateway:92e71971899c6468fc111f7614b89ea6602ac0aa`, taggeada al SHA exacto), que
+> reemplaza a `efeonce-mcp-gateway-00023-zt2` (servía 21, construida desde `220e916929d9`). La diferencia son
+> exactamente 6 tools: `get_seo_provider_spend`, `get_seo_keyword_gap`, `declare_seo_competitors`,
+> `retire_seo_competitors`, `get_seo_serp_top_results`, `get_seo_competitor_candidates`.
+>
+> Verificación en vivo del front door: `GET https://mcp.efeonce.org/.well-known/oauth-protected-resource` → 200;
+> `POST https://mcp.efeonce.org/mcp` sin token → 401 (fail-closed). Canary de cierre verde completo contra
+> **producción** (`scripts/greenhouse-seo-canary.mjs` con
+> `GREENHOUSE_ECOSYSTEM_API_URL=https://greenhouse.efeoncepro.com`, org Berel
+> `org-32333527-02a8-487b-819e-6f76a761777d`): las 20 lecturas ✓, todos los denies `404` anti-oracle ✓, las 7
+> escrituras ejercitadas en su puerta sin escribir ni gastar ✓ (`✓ canary del provider Greenhouse-SEO completo`).
+> Los 4 lanes internal-only nuevos respondieron ok contra producción: `serp-top-results` `rows: []` (array vacío
+> esperado — el día 1 de la serie es 2026-08-29), `competitor-candidates` `candidates: []` (esperado con serie
+> joven <5 días), `keyword-gap` 1 competidor declarado, `provider-spend` ✓.
+>
+> **CERO cambios en Entra en este deploy**: las dos escrituras nuevas (`declare_seo_competitors` /
+> `retire_seo_competitors`) viajan en el scope `efeonce.mcp.seo.write` que ya existía, así que siguen
+> **live-but-fail-closed** hasta `TASK-1631` igual que las demás escrituras — el scope no está cableado al cliente
+> PKCE público compartido, y eso es deliberado. `prepare_seo_grounded_queries` responde además
 > `aeo_forbidden` fail-closed para la identidad máquina compartida hasta TASK-1631, y el par de
 > prospecto queda detrás de `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` (hoy OFF en todos los ambientes —
 > el canary trata esa respuesta honesta como estado, no como fallo).
@@ -639,3 +662,84 @@ y [`TASK-1631`](../tasks/to-do/TASK-1631-efeonce-customer-identity-mcp-federatio
 por invitación de organizaciones cliente ya existentes y explícitamente allowlisted en Account 360: un email o
 dominio no basta. Hasta la aceptación explícita del ADR y el plan de proveedor, no hay DNS productivo, secreto,
 binding ni acceso cliente que configurar.
+
+## Superficie operable por un cliente MCP — snapshot 2026-08-28
+
+Esta sección responde la pregunta del operador *"¿qué puedo hacer hoy con el MCP conectado?"*. Es un **snapshot
+fechado**, no un contrato: la fuente de verdad del inventario es `registerTool` en `efeonce-mcp/src/mcp.ts` para lo
+federado y `src/mcp/greenhouse/server.ts` para lo interno de Greenhouse.
+
+### Conectar un cliente (operador, Claude Code)
+
+El shim DCR (§2026-08-06) hace que baste el flujo estándar. Cualquier usuario Entra del tenant:
+
+```bash
+claude mcp add --transport http efeonce-mcp https://mcp.efeonce.org/mcp -s user
+claude mcp login efeonce-mcp
+claude mcp get efeonce-mcp   # debe decir ✔ Connected
+```
+
+Tres cosas que cuestan una sesión si no se saben:
+
+- **`claude mcp login` exige un TTY.** Ejecutado desde un agente por Bash aborta con *"stdin isn't a terminal"* y
+  sugiere `ssh -t`, lo que hace creer que el operador tiene que hacerlo a mano. No es así: basta un pty —
+  `nohup script -q /dev/null claude mcp login efeonce-mcp > /tmp/login.log 2>&1 &`. Abre el navegador, y si ya hay
+  sesión Entra el approve es automático; se lee el resultado del log. El agente nunca escribe credenciales.
+- **El scope del registro importa.** Con `-s local` el servidor sólo existe dentro de ese proyecto y `claude mcp login`
+  ejecutado desde otro directorio responde *"No MCP server named …"*. Para uso transversal, `-s user`.
+- **Los tokens OAuth se guardan por endpoint pero no sobreviven a un cambio de scope**: mover un servidor de `local`
+  a `user` con la MISMA URL obliga a re-autenticar.
+
+Las tools **no aparecen en la sesión que autenticó** — los MCP se cargan al iniciar sesión. `✔ Connected` en el health
+check es la evidencia válida; la ausencia de tools en esa sesión no es un fallo.
+
+### Inventario federado — 35 tools
+
+| Grupo | Nº | Tools |
+| --- | --- | --- |
+| Gateway | 1 | `efeonce.gateway.status` |
+| Globe | 3 | `globe.capabilities.list`, `globe.producer.fleet.list`, `globe.credits.funding.ensure` (write) |
+| Hiring | 4 | `hiring.talent_pool.search`, `hiring.talent_pool.profile.get`, `hiring.applications.review.list`, `hiring.application.review_packet.get` |
+| SEO / Search Visibility 360 | 27 | 20 reads + 7 writes (detalle en §Provider Greenhouse-SEO) |
+
+En la práctica el gateway es hoy **un operador de SEO con anexos de Hiring y Globe**. Los dos scopes de escritura
+(`efeonce.mcp.seo.write`, `efeonce.mcp.globe.credits.funding.ensure`) siguen **live-but-fail-closed**: registrados y
+verificables, sin token que los abra, hasta `TASK-1631`.
+
+### Cobertura de federación vs el MCP interno de Greenhouse
+
+`src/mcp/greenhouse/server.ts` declara **41 tools**; el gateway federa 35. El delta no es homogéneo:
+
+- **Dominio SEO: paridad completa.** Las 26 SEO internas están federadas, con el guard bidireccional de `TASK-1658`
+  vigilándolo y `GREENHOUSE_SEO_TOOL_EXCLUSIONS` vacío (ninguna exclusión declarada).
+- **15 tools NO-SEO fuera del alcance federado, y sin declarar**: `get_context`, `get_organization`,
+  `list_organizations`, `get_platform_health`, `get_integration_readiness`, `list_capabilities`, `list_event_types`,
+  `search_knowledge`, `get_knowledge_document`, `search_services`, `quote_price`, `get_webhook_subscription`,
+  `list_webhook_subscriptions`, `get_webhook_delivery`, `list_webhook_deliveries`.
+
+⚠️ **Esas 15 no están marcadas como drift ni como exclusión: el guard de paridad es SEO-only y no las mira.** No es
+un bug detectado — es **alcance no declarado**, que es peor de razonar porque nada falla. Un operador que conecta el
+MCP esperando "el 360 de Greenhouse" encuentra sólo SEO, y ningún gate se lo advierte. Declararlas (federar o excluir
+con razón) es trabajo de [`TASK-1780`](../tasks/to-do/TASK-1780-mcp-tool-inventory-canonical-manifest.md), que
+reemplaza el espejo committeado por el manifiesto canónico de Greenhouse como fuente del guard.
+
+### `get_seo_provider_spend` — federada sin tool interna, por diseño
+
+Está registrada en el gateway y **no** en `src/mcp/greenhouse/server.ts`, a diferencia de las otras 26 SEO. No es
+drift del espejo: consume el lane ecosystem directo. Documentado en el delta 2026-08-28 de `TASK-1780`. Por eso el
+conteo correcto es 26 internas / 27 federadas, y cualquier cifra que iguale ambos lados está mal.
+
+### Drift de rollout detectado 2026-08-28
+
+La revisión productiva es `efeonce-mcp-gateway-00024-8b8` (SHA `92e7197`). El repo `efeonce-mcp` tiene **un commit
+local sin push**: `807fb76` *"TASK-1694 — federa el contrato corregido de `get_seo_keyword_discovery`"*. En
+Greenhouse, `TASK-1694` ya está en `complete/`. Mientras `807fb76` no se pushee, el contrato corregido **no está en
+producción** y la task está `code complete, rollout pendiente` en su mitad de gateway.
+
+Verificar antes de asumir despliegue — la cuenta de commits no lo mide:
+
+```bash
+cd ~/Documents/efeonce-mcp && git rev-list --count origin/main..HEAD
+gcloud run services list --project efeonce-group \
+  --format='table(metadata.name,status.latestReadyRevisionName)' | grep mcp
+```
