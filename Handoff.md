@@ -59,10 +59,16 @@ excepción con auditoría `--name-status` completa obligatoria. Los conflictos `
 (TASK-1590) y `rename/rename` (TASK-1658, hoy) quedaron reencuadrados: sólo existen en el camino
 excepcional, porque `-s ours` no produce conflictos.
 
-**Follow-up recomendado, NO ejecutado:** el arreglo durable de esto no es prosa sino un gate —
-un `pnpm release:merge-canonical` que clasifique V1 contra `release_manifests`, elija la estrategia
-y se **niegue** ante un commit que no reconozca. Tres releases seguidos (2026-08-06, 08-23, 08-28)
-pisaron la misma clase de bug con la mitigación ya documentada. Queda como TASK por registrar.
+**Follow-up registrado: `TASK-1790`** (`to-do`, P1, backend-data/`reader`). El arreglo durable no es
+prosa sino un gate: `pnpm release:merge-canonical` clasifica los commits divergentes **contra
+`greenhouse_sync.release_manifests`** —el título no es prueba—, elige la estrategia, corre las cuatro
+verificaciones y **se detiene** ante un commit que no reconoce, en vez de adivinar. Extiende
+`readLastReleasedRelease` (`src/lib/release/preflight/last-released-reader.ts`) y jamás escribe en
+`release_manifests`. Barrido por dominio y superficie sobre las 849 tasks vivas, por símbolo: cero
+tasks poseen el merge canónico — es el único paso del release enteramente manual. `TASK-860` observa
+PRs pero no los mergea; `TASK-864`/`1681`/`1682` son del preflight, que corre después; `897`/`920`
+son post-dispatch. La razón de que sea un gate y no otro párrafo: la prosa **ya** se había corregido
+el 08-23 y el 08-28 volvió a ocurrir.
 
 **Barrido documental post-release (4 subagentes, particiones disjuntas).** Gateway MCP a 27 tools en
 skills/runbook/manuales/doc funcional; estado de flags por runtime en la arquitectura del módulo

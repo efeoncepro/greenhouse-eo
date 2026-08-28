@@ -30,6 +30,10 @@
   cuenta V1: la clasifica. Sólo squashes de release ⇒ `-s ours`; un hotfix cuyo contenido no volvió a
   `develop` ⇒ parar y reconciliarlo. Cuarta verificación nueva (`--diff-filter=A`) y `-X ours`
   degradado a excepción con auditoría completa obligatoria.
+- **`TASK-1790` registrada**: el merge canónico `develop←main` pasa de regla en prosa a gate ejecutable
+  (`pnpm release:merge-canonical`), que clasifica los commits divergentes contra `release_manifests` y se
+  detiene ante lo que no reconoce. Se registra porque la prosa ya se había corregido una vez y no alcanzó:
+  tres releases seguidos pisaron la misma clase de bug.
 - Barrido documental post-release: gateway MCP a 27 tools en skills/runbook/manuales, estado de flags
   por runtime en arquitectura del módulo SEO + rules + skills `dataforseo-operator` + EPIC-022, y
   deltas 2026-08-28 en 15 tasks con impacto cruzado. `TASK-1699` y `TASK-1662` quedan a propósito en
