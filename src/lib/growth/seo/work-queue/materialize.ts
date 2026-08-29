@@ -107,7 +107,21 @@ export const compareWorkQueueItems = (a: SeoWorkQueueItemInput, b: SeoWorkQueueI
     return b.tieBreakImpressions - a.tieBreakImpressions
   }
 
-  return a.normalizedKeyword.localeCompare(b.normalizedKeyword)
+  /*
+   * 🔴 Comparación por CODE POINTS, jamás `localeCompare`.
+   *
+   * El reader pagina con `normalized_keyword COLLATE "C"` (orden de bytes) y este comparador
+   * decide el `rank_in_snapshot`. Si los dos no ordenan IDÉNTICO, la paginación por keyset
+   * saltea filas sin que nada falle — medido contra PG real: recorría 631 de 635, y el orden
+   * servido divergía del persistido desde el primer elemento.
+   *
+   * `localeCompare` usa ICU y la base usa glibc `en_US.UTF8`, que ignora el espacio al
+   * comparar. No son la misma tabla y no hay forma de garantizar que coincidan; el orden de
+   * bytes sí es reproducible en los dos lados.
+   */
+  if (a.normalizedKeyword === b.normalizedKeyword) return 0
+
+  return a.normalizedKeyword < b.normalizedKeyword ? -1 : 1
 }
 
 /**

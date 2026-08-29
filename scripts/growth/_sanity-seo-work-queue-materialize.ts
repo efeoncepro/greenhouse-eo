@@ -20,6 +20,8 @@
 
 import { runGreenhousePostgresQuery } from '../../src/lib/postgres/client'
 import { materializeSeoWorkQueue } from '../../src/lib/growth/seo/work-queue/materialize'
+import { readSeoWorkQueue } from '../../src/lib/growth/seo/work-queue/reader'
+import { toClientWorkQueueDto } from '../../src/lib/growth/seo/work-queue/client-dto'
 
 const TARGET = process.argv[2] ?? 'seot-berel-mx'
 const ACTOR = 'sanity-task-1700'
@@ -151,6 +153,79 @@ const main = async () => {
 
   console.log('\nPor origen:', [...byOrigin].map(([k, v]) => `${k}=${v}`).join(' · '))
   console.log('Por banda: ', [...byBand].sort().map(([k, v]) => `banda${k}=${v}`).join(' · '))
+
+  // ── 5. El reader contra el SQL REAL (los mocks ejercitan el TS, nunca el SQL) ──
+  const ENV_ON = {
+    ...process.env,
+    GROWTH_SEO_ENABLED: 'true',
+    GROWTH_SEO_WORK_QUEUE_ENABLED: 'true'
+  } as NodeJS.ProcessEnv
+
+  console.log('\n── Reader contra PG real ──')
+
+  const page1 = await readSeoWorkQueue(TARGET, { env: ENV_ON, limit: 5 })
+
+  check('readSeoWorkQueue ok', page1.ok, page1.ok ? `items=${page1.items.length} staleness=${page1.staleness}` : page1.errorCode)
+
+  if (page1.ok) {
+    check('devuelve el snapshot vigente', page1.snapshot?.snapshotId === first.snapshotId)
+    check('declara los seis orígenes', page1.originHealth.length === 6, `n=${page1.originHealth.length}`)
+    check('declara la versión del score', page1.priorityScoreVersion !== null, page1.priorityScoreVersion ?? '')
+
+    // 🔴 El keyset con NULLs es la parte que sólo PG puede desmentir: la comparación de
+    // tuplas no ordena con NULL, y un borde de página mal escrito saltea filas EN SILENCIO.
+    // Se pagina la cola entera y se compara contra el orden persistido.
+    const walked: string[] = []
+    let cursor: string | null = null
+    let pages = 0
+
+    do {
+      const page: Awaited<ReturnType<typeof readSeoWorkQueue>> = await readSeoWorkQueue(TARGET, {
+        env: ENV_ON,
+        limit: 100,
+        cursor
+      })
+
+      if (!page.ok) break
+
+      walked.push(...page.items.map(i => `${i.scoreBand}:${i.keyword}`))
+      cursor = page.nextCursor
+      pages += 1
+    } while (cursor && pages < 50)
+
+    const persisted = items.map(row => `${row.score_band}:${row.normalized_keyword}`)
+
+    check(
+      'la paginación por keyset recorre la cola COMPLETA sin saltear ni repetir',
+      walked.length === persisted.length && new Set(walked).size === walked.length,
+      `recorridas=${walked.length} persistidas=${persisted.length} únicas=${new Set(walked).size} páginas=${pages}`
+    )
+
+    check(
+      'el orden paginado coincide EXACTO con el persistido',
+      walked.join('|') === persisted.join('|'),
+      walked.join('|') === persisted.join('|') ? '' : `primer desvío en índice ${walked.findIndex((v, i) => v !== persisted[i])}`
+    )
+
+    // Filtro por origen contra SQL real (array, no string con comas).
+    const filtered = await readSeoWorkQueue(TARGET, { env: ENV_ON, origins: ['consolidation'], limit: 200 })
+
+    check(
+      'el filtro por origen aplica de verdad',
+      filtered.ok && filtered.items.every(i => i.origin === 'consolidation') && filtered.items.length > 0,
+      filtered.ok ? `items=${filtered.items.length}` : filtered.errorCode
+    )
+
+    // DTO cliente sobre datos REALES: el test unitario usa un fixture; acá se comprueba que
+    // ningún campo del snapshot productivo se cuela.
+    const dto = toClientWorkQueueDto(page1)
+    const serialized = JSON.stringify(dto)
+
+    const leaked = ['evidenceRef', 'seo:', 'seowqi-', 'seowqs-', 'curveSample', 'basisReason', 'incremental-clicks-v1']
+      .filter(term => serialized.includes(term))
+
+    check('el DTO cliente no filtra nada sobre datos REALES', leaked.length === 0, leaked.join(', ') || 'limpio')
+  }
 
   console.log(`\n${pass} ok · ${fail} fallo(s)`)
   process.exitCode = fail > 0 ? 1 : 0

@@ -53,6 +53,8 @@ import { readSiteAuditReport } from '@/lib/growth/seo/site-audit/reader'
 import { trackKeywords, untrackKeywords } from '@/lib/growth/seo/track-keywords'
 import { declareCompetitors, retireCompetitors } from '@/lib/growth/seo/competitors'
 import { readKeywordGap, type KeywordGapResult } from '@/lib/growth/seo/keyword-gap-reader'
+import { WORK_QUEUE_ORIGINS, type SeoWorkQueueOrigin } from '@/lib/growth/seo/work-queue/contracts'
+import { readSeoWorkQueue, type ReadSeoWorkQueueResult } from '@/lib/growth/seo/work-queue/reader'
 import {
   readSerpCompetitorCandidates,
   readSerpTopResults,
@@ -2007,5 +2009,63 @@ export const getEcosystemSeoProviderSpendPayload = async ({
   return {
     data: { ok: true, ...result },
     meta: { module: 'growth.seo', organizationId }
+  }
+}
+
+/**
+ * TASK-1700 — la cola priorizada en el lane ecosystem.
+ *
+ * 🔴 **Sólo bindings `internal` sin organización, 404 anti-oracle.** La cola contiene la
+ * lente competitiva (`competitor_gap`) y el cruce con citabilidad IA, y §7 de la auditoría
+ * prohíbe la comparativa competitiva client-facing. El camino del cliente es el DTO redactado
+ * de su propia superficie, no este lane.
+ *
+ * Mismo payload que la ruta app y que la tool MCP interna: un primitive, tres consumers, cero
+ * lógica de orden duplicada.
+ */
+export const getEcosystemSeoWorkQueuePayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<ReadSeoWorkQueueResult | SeoTargetNotConfiguredPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled' }, meta: { module: 'growth.seo' } }
+  }
+
+  const organizationId = requireInternalSeoBinding(context, request)
+  const url = new URL(request.url)
+
+  const origins = url.searchParams
+    .getAll('origin')
+    .filter((value): value is SeoWorkQueueOrigin => (WORK_QUEUE_ORIGINS as readonly string[]).includes(value))
+
+  const rawLimit = Number.parseInt(url.searchParams.get('limit') ?? '', 10)
+  const cursor = url.searchParams.get('cursor')?.trim() || null
+
+  const subject = await resolveSeoLaneSubject(context, request, organizationId)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const result = await readSeoWorkQueue(subject.seoTargetId, {
+    ...(origins.length > 0 ? { origins } : {}),
+    ...(Number.isFinite(rawLimit) && rawLimit > 0 ? { limit: rawLimit } : {}),
+    cursor
+  })
+
+  return {
+    data: result,
+    meta: {
+      module: 'growth.seo',
+      tier: subject.tier,
+      organizationId: subject.organizationId,
+      servedMarket: subject.servedMarket
+    }
   }
 }

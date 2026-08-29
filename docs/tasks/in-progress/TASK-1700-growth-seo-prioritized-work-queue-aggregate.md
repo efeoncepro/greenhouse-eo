@@ -171,7 +171,7 @@ serie del top-N arranca con el primer deploy del worker post-release y los candi
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo`
-- Blocked by: `TASK-1792` (Slices 1–2, **sólo para el Slice 7**; ver Delta 2026-08-28 (3)). Los Slices 1–6 no la necesitan. (sólo para el origen `competitor_gap`; los otros cuatro orígenes no la necesitan — satisfecho en código desde 2026-08-28, ver Delta)
+- Blocked by: `none` (el bloqueo del Slice 7 se levantó el 2026-08-28; ver Delta 2026-08-28 (3)) (sólo para el origen `competitor_gap`; los otros cuatro orígenes no la necesitan — satisfecho en código desde 2026-08-28, ver Delta)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -936,10 +936,13 @@ Tres razones, y las tres son de oficio, no de implementación:
 
 ### Slice ordering hard rule
 
-- 🔴 **`TASK-1792` Slices 1–2 en `main` ANTES del Slice 7.** El plan de rollback del cutover
-  aterriza en el reader legacy, y ese reader hoy no ordena cuando la curva de CTR de la org es
-  degenerada (ver Delta 2026-08-28 (3)). Si el cutover tiene que ocurrir antes, el rollback **no
-  puede** seguir siendo "vuelve al reader legacy": hay que declarar otra ruta verificada.
+- ✅ **`TASK-1792` — LEVANTADO el 2026-08-28.** Cerró `complete` con sus 4 slices en develop
+  (`d4d731721` · `f8be78d83` · `8943b2f5c`), así que el destino del rollback del Slice 7 ya
+  ordena y **declara por qué**: con curva no utilizable devuelve `ctrCurveSource: 'unusable'` +
+  `orderedBy: 'measured_demand'` y ordena por impresiones × cercanía a página 1, en vez de
+  colapsar todo a `gain = 0` en silencio. Queda pendiente sólo la promoción a `main`, que va con
+  el release de esta task. Se conserva el registro del bloqueo porque explica por qué el Slice 7
+  se ordenó así y qué habría pasado sin eso.
 - **`TASK-1694` cierra ANTES de Slice 3.** Es bloqueo duro y la razón es de irreversibilidad: el
   colector de discovery persiste lo que el contrato de candidatos le entregue, y un snapshot con la
   misma keyword cuatro veces ya no se corrige hacia adelante.
@@ -995,7 +998,7 @@ Tres razones, y las tres son de oficio, no de implementación:
 | Slice 4 — worker + scheduler | `gcloud scheduler jobs pause ops-seo-work-queue-materialize` + flag a `false` en la revisión activa del worker | <5 min | sí |
 | Slice 5 — reader + lanes | flag a `false` en Vercel + redeploy; las rutas devuelven el no-op prod-safe | <5 min | sí |
 | Slice 6 — decisión | revert PR + revocar el grant de `growth.seo.work_queue.decide`; el log escrito queda (append-only, sin efecto downstream) | <10 min | parcial (las decisiones escritas no se borran, por diseño) |
-| Slice 7 — cutover del consumer | flag a `false` en Vercel + redeploy → la lente vuelve al reader legacy. 🔴 **Válido SÓLO con `TASK-1792` Slices 1–2 en `main`**: sin eso el destino del rollback no ordena para organizaciones con curva de CTR degenerada, y falla sin aviso | <5 min | sí, **condicionado** |
+| Slice 7 — cutover del consumer | flag a `false` en Vercel + redeploy → la lente vuelve al reader legacy, que desde `TASK-1792` (complete 2026-08-28) **ordena y declara su base** (`orderedBy: measured_demand` cuando la curva no es utilizable). El destino del rollback está verificado, no supuesto | <5 min | sí |
 
 ### Production verification sequence
 
