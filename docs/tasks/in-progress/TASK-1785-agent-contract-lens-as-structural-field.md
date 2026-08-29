@@ -22,7 +22,7 @@ entran al alcance junto con `get_seo_keyword_gap`, cuyos factores ya declaran pr
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
