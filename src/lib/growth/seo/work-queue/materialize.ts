@@ -48,17 +48,16 @@ import { collectDeclaredTargets } from './collectors/declared-target'
 import { collectDiscoveryCandidates } from './collectors/discovery-candidate'
 import { collectGscStrikingDistance } from './collectors/gsc-striking-distance'
 import { decisionKey, unhealthy, type SeoWorkQueueCollectorContext } from './collectors/context'
+import { deriveBrandToken } from './cannibalization'
 import { readOrgCtrCurve } from './priority-score'
 import {
   ACTIVE_PRIORITY_SCORE_VERSION,
   WORK_QUEUE_RUNTIME_CONFIG,
-  getPriorityScoreConfig
+  getPriorityScoreConfig,
+  type PriorityScoreVersion
 } from './score-versions'
 
-export type MaterializeSeoWorkQueueErrorCode =
-  | 'target_not_found'
-  | 'all_origins_failed'
-  | 'query_failed'
+export type MaterializeSeoWorkQueueErrorCode = 'target_not_found' | 'all_origins_failed' | 'query_failed'
 
 export type MaterializeSeoWorkQueueResult =
   | {
@@ -325,8 +324,10 @@ export const materializeSeoWorkQueue = async (
   try {
     // Tenant binding server-side: el target define la org y TODO lo demás usa ESE org.
     // Nunca uno del request — es el anti-oracle del dominio.
-    const targets = await runGreenhousePostgresQuery<{ organization_id: string }>(
-      `SELECT organization_id FROM greenhouse_growth.seo_targets WHERE seo_target_id = $1 AND status = 'active'`,
+    const targets = await runGreenhousePostgresQuery<{ organization_id: string; root_domain: string | null }>(
+      `SELECT organization_id, root_domain
+         FROM greenhouse_growth.seo_targets
+        WHERE seo_target_id = $1 AND status = 'active'`,
       [input.seoTargetId]
     )
 
@@ -338,18 +339,32 @@ export const materializeSeoWorkQueue = async (
 
     // Piso de recomputación: devuelve el snapshot vigente en vez de rehacer el trabajo.
     if (!input.force) {
+      // 🔴 El piso de recomputación filtra POR VERSIÓN, y no sólo por antigüedad.
+      //
+      // Sin ese filtro el piso trataba como "fresco" un snapshot calculado con OTRAS reglas:
+      // el bump a v2 habría quedado sin efecto hasta 60 minutos por target, sirviendo
+      // recomendaciones v1 mientras la config activa decía v2. Peor, el retorno afirmaba
+      // `priorityScoreVersion: version` —la ACTIVA— sobre una fila que no lo era: un campo
+      // que MIENTE, no un campo desactualizado. Era inerte mientras existió una sola versión
+      // publicada, que es exactamente cuando este tipo de defecto no se puede ver.
+      //
+      // La versión se devuelve desde LA FILA, no desde la constante activa. Con el filtro de
+      // arriba las dos coinciden hoy; leerla de la fila es lo que mantiene el campo honesto
+      // si alguien vuelve a relajar el filtro.
       const recent = await runGreenhousePostgresQuery<{
         snapshot_id: string
         item_count: number
         origin_health_json: SeoWorkQueueOriginHealth[]
+        priority_score_version: string
       }>(
-        `SELECT snapshot_id, item_count, origin_health_json
+        `SELECT snapshot_id, item_count, origin_health_json, priority_score_version
            FROM greenhouse_growth.seo_work_queue_snapshots
           WHERE seo_target_id = $1
             AND computed_at > NOW() - ($2::int * interval '1 minute')
+            AND priority_score_version = $3
           ORDER BY computed_at DESC
           LIMIT 1`,
-        [input.seoTargetId, WORK_QUEUE_RUNTIME_CONFIG.minRecomputeIntervalMinutes]
+        [input.seoTargetId, WORK_QUEUE_RUNTIME_CONFIG.minRecomputeIntervalMinutes, version]
       )
 
       const fresh = recent[0]
@@ -360,7 +375,7 @@ export const materializeSeoWorkQueue = async (
           snapshotId: fresh.snapshot_id,
           itemCount: Number(fresh.item_count),
           originHealth: fresh.origin_health_json ?? [],
-          priorityScoreVersion: version,
+          priorityScoreVersion: fresh.priority_score_version as PriorityScoreVersion,
           reused: true
         }
       }
@@ -376,6 +391,8 @@ export const materializeSeoWorkQueue = async (
       organizationId,
       curve,
       config,
+      // La versión decide si la marca existe como concepto; el target decide cuál es.
+      brandToken: config.brandDetection === 'root_domain_label' ? deriveBrandToken(targets[0]?.root_domain) : null,
       latestDecisions,
       env
     }

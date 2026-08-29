@@ -130,9 +130,7 @@ export const isCurveUsableAtPosition = (
 
   if (!bucket) return false
 
-  return (
-    bucket.impressions >= config.curveMinBucketImpressions && bucket.clicks >= config.curveMinBucketClicks
-  )
+  return bucket.impressions >= config.curveMinBucketImpressions && bucket.clicks >= config.curveMinBucketClicks
 }
 
 export interface PriorityScoreInput {
@@ -225,9 +223,39 @@ export const computePriorityScore = (
   // ── Banda 1: clics incrementales sobre demanda medida ────────────────────
   const expectedCtrAtTarget = sample!.ctr
 
+  // 🔴 Techo por posición: sólo tiene sentido si la posición objetivo es una MEJORA.
+  // Una query cuya posición ponderada ya es mejor o igual que la objetivo no puede ganar
+  // clics "llegando" ahí — ya está. Sin este guard, una posición 3 con CTR bajo la media de
+  // la 5 recibía un techo positivo, que es proponer un descenso como oportunidad.
+  const alreadyAtOrAboveTarget =
+    config.positionCeilingGuard && input.weightedPosition !== null && input.weightedPosition <= config.targetPosition
+
+  /**
+   * 🔴 El techo que SÍ existe para esa fila, y por qué NO entra al score.
+   *
+   * Una página en posición 3 que convierte al 1 % cuando la mediana de la posición 3 es 6 %
+   * tiene un techo real y medible: `impresiones × (mediana − actual)`. Poner ESE número en
+   * `priority_score` sería tentador y estaría mal: el score de banda 1 significa "clics que
+   * ganas SUBIENDO", y éste significa "clics que ganas escribiendo mejor el snippet". Dos
+   * unidades distintas en la misma columna vuelven el orden incomparable — justo el defecto
+   * de los cuatro criterios que este agregado existe para cerrar.
+   *
+   * Así que el número se ENTREGA como evidencia y el score se queda en 0: la fila cae al
+   * fondo de la banda 1 (no hay ranking que ganar) y el operador igual ve cuánto hay del
+   * otro lado. Convertirlo en orden propio exige su propia base y su propio verbo, y eso es
+   * una migración del vocabulario cerrado, no un ajuste de fórmula.
+   */
+  const ownBucket = input.weightedPosition === null ? null : Math.max(1, Math.round(input.weightedPosition))
+  const ownSample = ownBucket === null ? undefined : input.curve.get(ownBucket)
+
+  const snippetCeilingClicks =
+    alreadyAtOrAboveTarget && ownSample && ownBucket !== null && isCurveUsableAtPosition(input.curve, ownBucket, config)
+      ? Number((impressions * Math.max(0, ownSample.ctr - currentCtr)).toFixed(4))
+      : null
+
   // Nunca negativo: si la keyword ya convierte mejor que la media de la posición objetivo,
   // la ganancia es 0 — no un número que invite a "optimizar" lo que ya está mejor.
-  const incrementalClicks = impressions * Math.max(0, expectedCtrAtTarget - currentCtr)
+  const incrementalClicks = alreadyAtOrAboveTarget ? 0 : impressions * Math.max(0, expectedCtrAtTarget - currentCtr)
   const basis: SeoWorkQueueScoreBasis = 'measured_incremental_clicks'
 
   return {
@@ -240,8 +268,13 @@ export const computePriorityScore = (
       expectedCtrAtTarget,
       ctrCurveSource: 'org_measured',
       incrementalClicks: Number(incrementalClicks.toFixed(4)),
-      basisReason:
-        incrementalClicks > 0
+      snippetCeilingClicks,
+      basisReason: alreadyAtOrAboveTarget
+        ? `Ya está en posición ${input.weightedPosition?.toFixed(1)}, mejor o igual que la objetivo ${targetBucket}: no hay techo por posición que ganar.` +
+          (snippetCeilingClicks !== null && snippetCeilingClicks > 0
+            ? ` El techo está en el snippet: ${Math.round(snippetCeilingClicks)} clics si convirtiera como la mediana de su propia posición.`
+            : ' Tampoco hay techo por CTR: ya convierte como la mediana de su posición o mejor.')
+        : incrementalClicks > 0
           ? `Techo de ${Math.round(incrementalClicks)} clics adicionales si llega a la posición ${targetBucket}, con la curva medida del propio sitio.`
           : `Ya convierte por encima de la media de la posición ${targetBucket}: el techo por posición es 0. Si hay algo que ganar, está en el snippet, no en el ranking.`
     }

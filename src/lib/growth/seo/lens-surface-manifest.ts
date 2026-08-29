@@ -31,6 +31,20 @@ export type SeoSurfaceKind =
   /** Devuelve estado/configuración (entitlement, catálogos, salud): no son mediciones. */
   | 'state'
 
+/**
+ * Para una superficie `figures`: si su DTO YA emite `provenance`, o por qué todavía no.
+ *
+ * 🔴 Existe porque el censo tenía un hueco que sólo se vio al medirlo: declaraba 18 superficies
+ * como `figures` y el guard verificaba únicamente que estuvieran LISTADAS — no que las que emiten
+ * cifras declararan su lente. Ocho quedaron censadas como `figures` sin `provenance`, y nada falló.
+ * Era el defecto que esta task existe para impedir, cometido dentro de su propio mecanismo.
+ *
+ * `{ pending }` NO es una excepción cómoda: es una deuda con razón escrita que el test exige, igual
+ * que `GREENHOUSE_SEO_TOOL_EXCLUSIONS` exige razón para no federar. Lo que el guard prohíbe es el
+ * SILENCIO — una superficie que emite cifras y ni las declara ni explica por qué no.
+ */
+export type SeoSurfaceProvenanceState = 'emitted' | { readonly pending: string }
+
 export interface SeoLensSurface {
   /** Segmento de la ruta bajo `api/platform/ecosystem/growth/seo/`. `null` = sin ruta propia. */
   route: string | null
@@ -40,6 +54,8 @@ export interface SeoLensSurface {
   /** Por qué esta superficie es de esa clase. Obligatorio para `command`/`state`: sin razón
    *  escrita, "no emite cifras" es una afirmación que nadie revisó. */
   reason: string
+  /** Sólo para `figures`: `'emitted'` o la deuda declarada con su razón. */
+  provenance?: SeoSurfaceProvenanceState
 }
 
 export const SEO_LENS_SURFACES: readonly SeoLensSurface[] = [
@@ -48,66 +64,77 @@ export const SEO_LENS_SURFACES: readonly SeoLensSurface[] = [
     route: 'keyword-opportunities',
     tool: 'get_seo_keyword_opportunities',
     kind: 'figures',
+    provenance: 'emitted',
     reason: 'Striking distance medido (●) con enriquecimiento de mercado estimado (◑) en el mismo DTO.'
   },
   {
     route: 'keyword-market-data',
     tool: 'get_seo_keyword_market_data',
     kind: 'figures',
+    provenance: 'emitted',
     reason: 'Hecho de mercado por keyword: ◑ entero.'
   },
   {
     route: 'domain-overview',
     tool: 'get_seo_domain_overview',
     kind: 'figures',
+    provenance: 'emitted',
     reason: 'Foto de dominio del proveedor: ◑ entero.'
   },
   {
     route: 'url-visibility',
     tool: 'get_seo_url_visibility',
     kind: 'figures',
+    provenance: 'emitted',
     reason: 'Visibilidad por sujeto-página del proveedor: ◑ entero.'
   },
   {
     route: 'backlink-profile',
     tool: 'get_seo_backlink_profile',
     kind: 'figures',
+    provenance: 'emitted',
     reason: 'Serie del perfil de enlaces: ◑ entero.'
   },
   {
     route: 'backlink-detail',
     tool: 'get_seo_backlink_detail',
     kind: 'figures',
+    provenance: { pending: 'TASK-1785 cubrió el perfil de enlaces pero no su detalle nominal; misma lente (◑ dataforseo_backlinks) y mismo mapeo trivial. Deuda de alcance, no de diseño.' },
     reason: 'Detalle nominal de enlaces: ◑ entero.'
   },
   {
     route: 'rank-evolution',
     tool: 'get_seo_rank_evolution',
     kind: 'figures',
+    provenance: 'emitted',
     reason: 'Serie de posición del SERP comprado: ◑ (el `source` del DTO dice el store, no la lente).'
   },
   {
     route: 'performance',
     tool: 'get_seo_performance',
     kind: 'figures',
+    provenance: 'emitted',
     reason: 'MIXTO por construcción: chart ● o ◑ según (modo × métrica), summary siempre ●.'
   },
   {
     route: 'overview-kpis',
     tool: 'get_seo_overview_kpis',
     kind: 'figures',
+    provenance: 'emitted',
     reason: 'Agregado de Search Console: ● entero.'
   },
   {
     route: 'keyword-gap',
     tool: 'get_seo_keyword_gap',
     kind: 'figures',
+    provenance: 'emitted',
     reason: 'Gap competitivo del proveedor: ◑; lo medido EXCLUYE en vez de promediarse.'
   },
   {
     route: 'serp-top-results',
     tool: 'get_seo_serp_top_results',
     kind: 'figures',
+    provenance: { pending: 'Su reader vive en el lane, no en un reader de dominio con DTO tipado; agregar provenance exige mover la forma primero.' },
     reason:
       'Top-N del SERP comprado: ◑. Exacto NO es medido — ese query lo hicimos nosotros, y ' +
       'rotularlo `measured` lo volvería promediable con GSC.'
@@ -116,30 +143,43 @@ export const SEO_LENS_SURFACES: readonly SeoLensSurface[] = [
     route: 'competitor-candidates',
     tool: 'get_seo_competitor_candidates',
     kind: 'figures',
+    provenance: { pending: 'Deriva de la serie del SERP comprado (◑ dataforseo_serp); pendiente de que su DTO pase por un reader tipado.' },
     reason: 'Recurrencia derivada de la serie del SERP comprado: ◑.'
   },
   {
     route: 'work-queue',
     tool: 'get_seo_work_queue',
     kind: 'figures',
+    provenance: {
+      pending:
+        'Deuda de SECUENCIA, no de diseño: su reader y sus contracts están bajo edición activa del dueño ' +
+        'del aggregate (TASK-1700), y agregar procedencia exige tocar esos dos archivos exactos. Las lentes ' +
+        'YA están determinadas y quedan escritas acá para que quien la tome no las redescubra: el breakdown ' +
+        'es append-only, `mainPageShare` es ● medida (sale de `seo_gsc_daily`) y `snippetCeilingClicks` es ' +
+        '◑ estimada (deriva de la curva de CTR propia — insumos medidos, resultado estimado). Es el caso ' +
+        '◑ junto a ● en la misma fila, así que su `provenance` nace en LISTA, nunca con una lente única.'
+    },
     reason: 'Cola priorizada: techo estimado (◑) junto a impresiones medidas (●) en la MISMA fila.'
   },
   {
     route: 'keyword-discovery',
     tool: 'get_seo_keyword_discovery',
     kind: 'figures',
+    provenance: { pending: 'Ya declara su lente con un vocabulario propio (measurementKind + measuredGsc separado); migrarlo al canónico es unificación, no ausencia.' },
     reason: 'Candidatos con volumen ◑ del proveedor y `measuredGsc` ● como lente SEPARADA.'
   },
   {
     route: 'prospect-diagnostic',
     tool: 'get_seo_prospect_diagnostic',
     kind: 'figures',
+    provenance: { pending: 'Ya emite ProspectFact, que ES la forma canónica especializada; le falta el envoltorio provenance a nivel de resultado, no la lente por cifra.' },
     reason: 'Carril prospecto: ◑ entero por definición (no hay Search Console de un prospecto).'
   },
   {
     route: 'dual-lens-visibility',
     tool: 'get_seo_dual_lens_visibility',
     kind: 'figures',
+    provenance: 'emitted',
     reason:
       'Las DOS lentes de posición del mismo set de keywords, separadas y rotuladas. Es la ' +
       'única superficie del módulo cuyo contrato declara explícitamente que sus dos series NO ' +
@@ -149,6 +189,7 @@ export const SEO_LENS_SURFACES: readonly SeoLensSurface[] = [
     route: 'visibility-360',
     tool: 'get_seo_visibility_360',
     kind: 'figures',
+    provenance: { pending: 'Su eje AEO no pertenece a este vocabulario (boundary §1.1) y su eje SEO ya viaja separado en seoLens; el envoltorio exige decidir antes cómo se declara un eje ajeno.' },
     reason:
       'Cruce SEO×AEO. El eje SEO es ●; el eje AEO NO pertenece a este vocabulario de lentes ' +
       '(es el score del grader, con su propio contrato) y por eso viaja en `aeoLens`, separado ' +
@@ -158,6 +199,7 @@ export const SEO_LENS_SURFACES: readonly SeoLensSurface[] = [
     route: 'site-audit-report',
     tool: 'get_seo_site_audit_report',
     kind: 'figures',
+    provenance: { pending: 'Hallazgos de crawl (◑ dataforseo_onpage); su DTO es de conteos por severidad y hay que decidir si un conteo de findings es una cifra de mercado o un estado.' },
     reason: 'Hallazgos del crawl propio contratado al proveedor: ◑.'
   },
 

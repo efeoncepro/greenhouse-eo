@@ -25,6 +25,7 @@ import 'server-only'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { normalizeMarketKeyword } from '../../keyword-market-data'
+import { SEO_COMPETING_PAGE_CTE, evaluateCannibalization } from '../cannibalization'
 import { resolveImpressionsThreshold } from './gsc-striking-distance'
 import { buildEvidenceRef, type SeoWorkQueueCollectorResult, type SeoWorkQueueItemInput } from '../contracts'
 import { computePriorityScore } from '../priority-score'
@@ -38,6 +39,11 @@ const ORIGIN = 'consolidation' as const
  * planos le daría el mismo peso a un día de 2 impresiones que a uno de 500), y la página
  * "principal" es la de más impresiones — la candidata natural a absorber a las otras.
  *
+ * 🔴 El SQL trae CANDIDATAS (multi-página sobre el umbral), no canibalizadas. Quién lo está
+ * lo decide `evaluateCannibalization` en TS, y sólo ahí: tener el predicado partido entre
+ * este SQL y el TS del striking-distance es justo lo que dejaría que los dos se separaran en
+ * silencio.
+ *
  * Nota date-math (gate TASK-893): `capture_date` es DATE; sólo `CURRENT_DATE - $n::int`.
  *
  * Parámetros: `$1` organizationId · `$2` windowDays · `$3` impressionsFloor · `$4` limit.
@@ -46,35 +52,37 @@ export const SEO_WORK_QUEUE_CONSOLIDATION_SQL = `WITH per_query AS (
          SELECT query,
                 SUM(impressions)                                          AS impressions,
                 SUM(clicks)                                               AS clicks,
-                SUM(position * impressions) / NULLIF(SUM(impressions), 0) AS weighted_position,
-                COUNT(DISTINCT page)                                      AS competing_pages
+                SUM(position * impressions) / NULLIF(SUM(impressions), 0) AS weighted_position
            FROM greenhouse_growth.seo_gsc_daily
           WHERE organization_id = $1
             AND capture_date >= (CURRENT_DATE - $2::int)
           GROUP BY query
-         HAVING COUNT(DISTINCT page) > 1
-            AND SUM(impressions) >= $3::int
+         HAVING SUM(impressions) >= $3::int
        ),
+       ${SEO_COMPETING_PAGE_CTE},
        main_page AS (
-         SELECT DISTINCT ON (query) query, page
-           FROM greenhouse_growth.seo_gsc_daily
-          WHERE organization_id = $1
-            AND capture_date >= (CURRENT_DATE - $2::int)
-          GROUP BY query, page
-          ORDER BY query, SUM(impressions) DESC, MIN(position) ASC
+         SELECT DISTINCT ON (query) query, norm_page
+           FROM content_page
+          WHERE norm_page LIKE '%/%'
+            AND norm_page !~* '[.](pdf|jpe?g|png|webp|gif|svg|zip|docx?|xlsx?)$'
+          ORDER BY query, impressions DESC, norm_page ASC
        )
-       SELECT pq.query           AS keyword,
-              mp.page            AS page,
-              pq.weighted_position::text AS weighted_position,
-              pq.impressions::text       AS impressions,
-              pq.clicks::text            AS clicks,
-              pq.competing_pages::text   AS competing_pages,
+       SELECT pq.query                        AS keyword,
+              mp.norm_page                    AS page,
+              pq.weighted_position::text      AS weighted_position,
+              pq.impressions::text            AS impressions,
+              pq.clicks::text                 AS clicks,
+              c.competing_pages::text         AS competing_pages,
+              c.main_page_impressions::text   AS main_page_impressions,
+              c.total_page_impressions::text  AS total_page_impressions,
               -- Total REAL sobre el umbral, antes del LIMIT. Sin esto el recorte sólo puede
               -- declarar lo que alcanzó a ver, y una declaración parcial de un cap es tan
               -- engañosa como no declararlo: dice "quedaron 200 fuera" cuando quedaron miles.
-              COUNT(*) OVER ()::text     AS total_over_threshold
+              COUNT(*) OVER ()::text          AS total_over_threshold
          FROM per_query pq
+         JOIN competing c  ON c.query = pq.query
          JOIN main_page mp ON mp.query = pq.query
+        WHERE c.competing_pages > 1
         ORDER BY pq.impressions DESC
         LIMIT $4::int`
 
@@ -85,12 +93,12 @@ interface ConsolidationRow extends Record<string, unknown> {
   impressions: string
   clicks: string
   competing_pages: string
+  main_page_impressions: string
+  total_page_impressions: string
   total_over_threshold: string
 }
 
-export const collectConsolidation = async (
-  ctx: SeoWorkQueueCollectorContext
-): Promise<SeoWorkQueueCollectorResult> => {
+export const collectConsolidation = async (ctx: SeoWorkQueueCollectorContext): Promise<SeoWorkQueueCollectorResult> => {
   const { config } = ctx
 
   try {
@@ -109,6 +117,7 @@ export const collectConsolidation = async (
     ])
 
     const items: SeoWorkQueueItemInput[] = []
+    let notCannibalized = 0
 
     for (const row of rows) {
       const normalizedKeyword = normalizeMarketKeyword(row.keyword ?? '')
@@ -120,6 +129,27 @@ export const collectConsolidation = async (
       const clicks = Number(row.clicks)
       const weightedPosition = Number(row.weighted_position)
       const competingPages = Number(row.competing_pages)
+
+      // 🔴 El predicado ÚNICO. Multi-página NO es canibalización: `pinturas` tenía 41
+      // páginas con el 99,3 % de las impresiones en una sola, y v1 le proponía fusionar 41
+      // URLs al ítem #1 del sitio.
+      const verdict = evaluateCannibalization(
+        {
+          normalizedKeyword,
+          competingPages,
+          mainPageImpressions: Number(row.main_page_impressions),
+          // El denominador incluye TODAS las páginas (home y assets incluidos): la
+          // pregunta es si una sola se queda con la query, y la home puede ser esa.
+          totalImpressions: Number(row.total_page_impressions),
+          brandToken: ctx.brandToken
+        },
+        config
+      )
+
+      if (!verdict.cannibalized) {
+        notCannibalized += 1
+        continue
+      }
 
       const scored = computePriorityScore(
         {
@@ -145,7 +175,10 @@ export const collectConsolidation = async (
         breakdown: {
           ...scored.breakdown,
           competingPages,
-          basisReason: `${competingPages} páginas compiten por esta intención. ${scored.breakdown.basisReason}`
+          mainPageShare: verdict.mainPageShare,
+          basisReason:
+            `${competingPages} páginas compiten por esta intención y la principal sólo concentra ` +
+            `${Math.round((verdict.mainPageShare ?? 0) * 100)} % de las impresiones. ${scored.breakdown.basisReason}`
         },
         evidenceRef: buildEvidenceRef(ORIGIN, normalizedKeyword),
         sourceScoreVersion: null,
@@ -153,17 +186,20 @@ export const collectConsolidation = async (
       })
     }
 
-    const totalOverThreshold = Number(rows[0]?.total_over_threshold ?? items.length)
+    const totalCandidates = Number(rows[0]?.total_over_threshold ?? rows.length)
 
-    // El techo lo aplica el materializador; acá se declara CUÁNTAS quedaron realmente fuera,
-    // que es un número que sólo esta query conoce.
-    if (Number.isFinite(totalOverThreshold) && totalOverThreshold > items.length) {
+    // 🔴 Sólo se declara lo que se SABE. El `COUNT(*) OVER ()` cuenta CANDIDATAS
+    // (multi-página sobre el umbral), no canibalizadas: cuántas de las no evaluadas lo
+    // están es justamente lo que no se midió. Decir "quedaron N canibalizadas fuera" sería
+    // la misma clase de afirmación inflada que esta versión corrige.
+    if (Number.isFinite(totalCandidates) && totalCandidates > rows.length) {
       return {
         items,
         health: unhealthy(
           ORIGIN,
           'degraded',
-          `${totalOverThreshold} queries del sitio tienen más de una página compitiendo sobre el umbral de impresiones; este snapshot trae las de mayor demanda.`,
+          `Se evaluaron las ${rows.length} queries multi-página de mayor demanda de ${totalCandidates} sobre el umbral; ` +
+            `${items.length} resultaron canibalizadas y ${notCannibalized} no. Las de menor demanda no se evaluaron.`,
           items.length
         )
       }

@@ -40,6 +40,7 @@ import { type KeywordOpportunitiesResult, type KeywordOpportunity, type SeoKeywo
 import { type SeoProvenance, resolveSeoAsOf, seoProvenance } from './lens'
 import { readOrgCtrCurve, resolveExpectedCtrAtPosition } from './ctr-curve'
 import { normalizeMarketKeyword, readKeywordMarketData } from './keyword-market-data'
+import { SEO_COMPETING_PAGE_CTE } from './work-queue/cannibalization'
 
 const DEFAULT_WINDOW_DAYS = 28
 const DEFAULT_MIN_POSITION = 8
@@ -133,16 +134,32 @@ export const SEO_KEYWORD_OPPORTUNITIES_SQL = `WITH per_query AS (
             AND capture_date >= (CURRENT_DATE - $2::int)
           GROUP BY query, page
           ORDER BY query, SUM(impressions) DESC, MIN(position) ASC
-       )
+       ),
+       ${SEO_COMPETING_PAGE_CTE}
        SELECT pq.query AS keyword,
               bp.page,
               pq.weighted_position,
               pq.impressions,
               pq.clicks,
               pq.competing_pages,
+              -- TASK-1700 v2: columnas ADITIVAS. El consumidor legacy las ignora (mapea por
+              -- nombre a una interfaz tipada); las consume el colector gsc_striking_distance
+              -- para medir CONCENTRACION sobre las paginas que de verdad compiten, con la
+              -- MISMA definicion que usa el colector de consolidacion. Se AGREGAN en vez de
+              -- cambiar competing_pages ni impressions, porque este SQL lo comparten la
+              -- lente legacy y la cola: redefinir una columna existente moveria lo que ve el
+              -- operador en las orgs sin curva, sin que ninguna version lo registre.
+              c.competing_pages    AS content_competing_pages,
+              c.main_page_impressions,
+              c.total_page_impressions,
               pq.last_capture_date
          FROM per_query pq
          JOIN best_page bp ON bp.query = pq.query
+         -- LEFT por disciplina, no porque falten filas: el CTE competing agrega sobre TODAS
+         -- las paginas y el FILTER solo pone el conteo en 0, asi que hoy hay fila para
+         -- cada query con datos. El LEFT garantiza que si esa premisa cambia, la lente
+         -- legacy no pierda filas en silencio.
+         LEFT JOIN competing c ON c.query = pq.query
         WHERE pq.weighted_position >= $3::numeric
           AND pq.weighted_position <= $4::numeric
           AND pq.impressions >= $5::int

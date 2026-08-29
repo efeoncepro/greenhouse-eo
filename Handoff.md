@@ -2,6 +2,97 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-29 (5.º) — presupuesto comercial 2027 en dos bandas
+
+La revisión comercial separa dos cuotas que no se compensan: **Exit MRR USD 30.000–32.000** y **Spot bookings
+USD 90.000**, con compromiso `28.000 + 60.000` y stretch `34.000 + 120.000`. SKY/Berel sostienen expansión;
+Motogas presupuestó crecimiento cero; ANAM/Aguas permanecen como Spot warm/repeat y Managed Ops sólo como upside.
+
+Canon: `docs/commercial/SALES_GOALS_2026_Q4_2027.md`; presupuesto y control mensual:
+`docs/commercial/SALES_BUDGET_2027_V1.md`; método: `SALES_GOALS_OPERATING_MODEL_V1.md`; portafolio:
+`SERVICE_PORTFOLIO_REVENUE_ARCHITECTURE_V1.md`.
+
+**Estado:** `Proposed for approval · blocked_by_finance`. Antes de aprobación económica: remuneración sombra del
+fundador, fully loaded cost por oferta/cuenta, margen mínimo 45%/objetivo 50–60%, capacidad delegable y modelo mensual
+de revenue/caja. No hubo mutaciones en HubSpot, Finance runtime, Teams ni SharePoint.
+
+## 2026-08-29 (4.º) — `incremental-clicks-v2`: el detector de canibalización de la cola medía marca
+
+Auditando la implementación de `TASK-1700` con subagentes de SEO y arquitectura apareció el defecto
+de fondo, y era mío: `COUNT(DISTINCT page) > 1` no mide canibalización. Medido contra berel.com,
+28 días, piso 100 impresiones — no-marca **80,7 %** de share medio en la página principal, marca
+**34,2 %**. El predicado seleccionaba marca. `pinturas`, la query de mayor demanda del sitio: 41
+páginas, **99,3 %** en una, y la cola diciendo "fusiona 41 URLs" sobre el ítem #1.
+
+**Lo más grave no era el verbo.** El striking-distance excluía todo lo multi-página: **216 de 269**
+filas fuera de su ventana, y la lente del operador en **92** contra las **269** del reader legacy. Al
+validar el cutover medí la dirección que AGREGABA filas y nunca la que las QUITABA. Con el flag
+prendido hoy era alcanzable desde el portal; no puedo afirmar que nadie la vio.
+
+**v2** — predicado ÚNICO en `work-queue/cannibalization.ts` importado por los dos colectores (v1 lo
+tenía escrito dos veces): no-marca ∧ concentración de la principal ≤ 0,7 ∧ ≥2 páginas fusionables.
+Concentración sobre TODAS las páginas y conteo sólo sobre fusionables — mezclarlas invierte el
+veredicto, y lo destapó medir: al excluir la home también del denominador, `pinturas` cayó a 13,2 % y
+volvió a salir canibalizada. Marca con tolerancia a un tipeo (`bereñ` con 38 páginas, `verel`, `berol`,
+`berrl`, `betel`, `berem`, `bere` — 16 queries de marca entraban sin ella). Techo por posición anulado
+cuando ya se está en la objetivo o mejor, con el techo de CTR como **evidencia** (`snippetCeilingClicks`)
+y nunca como score: mezclar "clics por subir" con "clics por mejor snippet" en una columna reintroduce
+el orden incomparable que este agregado cerró.
+
+**Medido:** de 400 candidatas, v1 → 400, v2 → 11. Población real 29, de las cuales ~5 son sub-marcas
+propias (`kover` = 19 fichas de una línea). Lente del operador de vuelta en 261 vs 269 del legacy.
+
+**Dos defectos latentes que sólo existen con más de una versión:** el piso de recomputación reusaba
+snapshots de otra versión y devolvía la ACTIVA sobre ellos (campo que miente, bump sin efecto 60 min por
+target) — ahora filtra por versión, con gate; y la huella de parámetros no ve un cambio de fórmula — de
+ahí los **vectores dorados por versión**, que congelan la salida. La huella de v1 se movió una vez, al
+declarar explícitas dos reglas implícitas; no se dio por equivalente leyéndolo: se ejecutó la
+implementación anterior contra la nueva sobre seis casos, salidas idénticas campo por campo.
+
+**Verificado:** 12.620 tests verdes · typecheck 0 · las dos consultas nuevas ejercitadas contra
+PostgreSQL real (los unit tests mockean la base y no las ven) · gates de source comprobados EN ROJO
+antes de darlos por buenos.
+
+🔴 **Pendiente de rollout, NO hacer antes del deploy:** rematerializar con `force`. Los snapshots
+vigentes son v1 y `growth.seo.work_queue.score_version_drift` alerta **legítimamente** hasta que corra.
+Rematerializar antes del deploy escribiría snapshots v2 que el código en producción no conoce.
+
+**Límite declarado, no diferido en silencio:** las sub-marcas no se detectan desde el dominio y **NO**
+se cierran colgando el score de `grader_profiles.brand_name` — es captura de leads del grader público,
+mayoría sin `organization_id` y con filas de smoke, no un SSOT de marca por organización.
+
+## 2026-08-29 (3.º) — Release `88e1f652f1c2`: la ventana de re-pausa quedó cerrada
+
+**Manifest `released`** (run `33263788245`, un solo run, los dos gates aprobados sin stall). Watchdog
+`drift_count=0`. `main` y el runtime ahora coinciden: los dos schedulers del módulo SEO declarados
+`"false"` en el SoT y `ENABLED` en vivo. **Ningún deploy puede volver a pausarlos en silencio.**
+
+- `ops-seo-work-queue-materialize` — `ENABLED 0 10 * * *`
+- `ops-seo-competitor-coverage` — `ENABLED 0 9 18 * *`; ejercitado por el camino desatendido con
+  costo **USD 0** (`eligible: 0` porque el competidor del 28 está dentro de su ventana de frescura de
+  30 días; verificado en el SQL del colector, no inferido del summary).
+
+Residual del `ops-worker` en `c2e9e3a50a44`: change-gate legítimo en su caso más fuerte — el sanity
+**sin** `--` devuelve 0 archivos, o sea árboles idénticos, no sólo «rutas runtime sin cambios».
+
+**Corrección propagada:** la cola de `seot-efeonce-own-brand` es **55 banda 2 + 50 banda 3**, no
+«todas banda 2» como escribí. La lectura era de 8 filas y la reporté como total. Corregido en
+`deploy.sh`, arquitectura §18, ledger de flags y `rules/growth-seo.md`. La distinción importa: banda 3
+es «nadie llega todavía, el verbo honesto es medir», que es justo la banda creada para no fabricar un
+score.
+
+**Pendiente en otra sesión (ya resuelto por ella):** las 5 decisiones `dismissed` de un script de
+sanity que retiraban las mayores oportunidades de Berel se revirtieron con `deferred` que supersede
+—append-only, sin DELETE—, y la rematerialización devolvió `reused: true` por hash, probando que
+restauró el plan previo y no inventó uno nuevo.
+
+**Siguiente paso:** `TASK-1794`. Su Slice 2 cambia de diseño — en vez de darle `packages: read` a la
+App del watchdog (acoplaría al observador de releases con la emisión de credenciales de build), el
+camino es el `GITHUB_TOKEN` efímero de Actions pasado a Cloud Build por substitución, que **no deja
+secreto que custodiar**. Requiere dar acceso de lectura a `greenhouse-eo` en los tres paquetes
+`@efeoncepro/axis-*` (son de `axis-design-system`). Hallazgo lateral a corregir ahí mismo: el
+`.npmrc` que genera `deploy.sh` tiene 2 líneas y el del secreto tiene 3 (falta `@jsr`).
+
 ## 2026-08-29 (2.º) — La cola SEO quedó operativa, y el aprendizaje del release cambió al verificarlo
 
 **Estado: los dos schedulers del módulo despausados y documentados.** PR de release #211 en vuelo
@@ -504,85 +595,3 @@ Corolario de forma, ya escrito en la task: la señal entra como **factor del ite
 jamás como entrada del `priority_score`** — `evidence_ref` es opaca por contrato (cero FK, cero JOIN
 al motor que produciría la señal), así que puntuar con ella sería puntuar con algo que el aggregate no
 puede citar. Quien retome la task lee la versión corregida, no este resumen.
-
-## 2026-08-28 — Drain de keyword discovery: `*/10` → `*/2` (⚠️ con ventana de reversión abierta)
-
-Bajada de cadencia del scheduler `ops-seo-keyword-discovery-drain` (us-east4), autorizada por el
-operador. `Descubrir` es un workbench INTERACTIVO: con `*/10` la espera media era 5 min y el peor
-caso 10, cuando la corrida en sí tarda segundos. El `*/10` no compraba nada — el drain con cola
-vacía es no-op, así que correrlo 5× más seguido no gasta un centavo más. Es el mismo razonamiento
-por el que `ops-outbox-publish` ya usa `*/2`. Seguro a esta cadencia: el claim es un `UPDATE`
-condicional (`WHERE status='pending' … RETURNING`), así que un segundo worker matchea cero filas.
-
-**Aplicado en los DOS lugares**, como manda la regla de Cloud Run: `services/ops-worker/deploy.sh`
-(SoT) + `gcloud scheduler jobs update` para efecto inmediato (verificado: `*/2`, `ENABLED`).
-
-🔴 **VENTANA ABIERTA hasta el próximo release:** `origin/main` todavía declara `*/10`, y
-`upsert_scheduler_job` corre en cada deploy del worker. **Si el ops-worker se despliega desde `main`
-antes de que este cambio se promueva, el schedule vuelve a `*/10` en silencio** — el mismo bug class
-del ebook (rev `00470` → `00473`). No amerita un release propio (regla dura: si es demasiado trivial
-para un manifest, es demasiado trivial para `main`); lo cierra el próximo release regular. Si alguien
-ve `*/10` de vuelta, es esto y no un rollback deliberado.
-
-## 2026-08-28 (2.º release del día) — TASK-1694 + TASK-1692 EN PRODUCCIÓN
-
-Release `e82c18579b05` (manifest `e82c18579b05-0ab096eb-628a-4d41-9b96-dc82064a21f7`, run
-`33208942436`, PR #209). **Pasó a la primera, sin break-glass, sin retry, `drift_count=0`.** Las dos
-tasks pasan de `code complete, rollout pendiente` a **operativamente completas**.
-
-**Por qué no hubo break-glass, y cómo repetirlo:** cero migraciones ⇒ ningún dominio irreversible ⇒
-`decision=ship` limpio. Es exactamente lo que aisló el par del 2026-08-09; con migraciones el
-break-glass es parte del plan, sin ellas no aparece.
-
-**Flags: cero.** La pregunta se derivó en vez de recordarse —
-`git diff origin/main..HEAD -- src/ services/ | grep '+.*_ENABLED'` vacío, y el VALOR (no la
-presencia) de `GROWTH_SEO_ENABLED` / `GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED` leído con
-`vercel env pull` = `true` en Production. Dos comandos en lugar de leer 72 filas del ledger.
-
-🔴 **El aprendizaje que vale para el próximo release de contrato:** el manifest `released` y Vercel
-`READY` prueban que el código está desplegado, **no que el contrato esté vivo**. Los canaries sí:
-
-- `keyword-discovery-filters` devolvió `maxLinkBarrier aceptado; ignoredFilters=maxDifficulty`
-  (TASK-1694 ejecutándose en producción);
-- dos POST directos al lane con `promoted_to_tracking` y `selected_for_target` devolvieron **400**
-  nombrando los kinds permitidos (TASK-1692: el boundary de escritura está vivo).
-
-El primero existía en el canary del gateway; el segundo hubo que fabricarlo. **Un release que cambia
-un CONTRATO sin canary de contrato está a medio verificar.**
-
-**Validación de la regla nueva de merge (`-s ours`, delta de la mañana):** V1 = un solo commit, el
-squash del release anterior → clasificación "sólo squashes de release" → `-s ours` → las tres
-verificaciones vacías, incluido el `--name-status` completo. Primera vez que el merge canónico no
-necesita auditoría posterior, porque la estrategia no puede colar nada.
-
-**Residual `ops-worker`:** refutado por la vía más barata — `git diff` **sin filtro** entre su SHA y
-el target devolvió **0 archivos** (árboles idénticos; ya había desplegado desde `develop`). No hizo
-falta el diff de las 28 rutas del gate.
-
-**Gateway MCP desplegado** (`efeonce-mcp` run `33209983511`): el schema federado de
-`get_seo_keyword_discovery` ya es el nuevo.
-
-**Smoke con gasto EJECUTADO — 3 corridas, USD 0,0482 total** (MX+CL, `keyword_suggestions` y
-`keyword_ideas`). Las tres `succeeded`. **Probó lo que importaba:** el payload sin `filters` es
-aceptado por los DOS endpoints que lo llevaban — el riesgo de la matriz queda refutado con
-evidencia — y `volumePolicy: "all"` quedó persistido en `methods_json`.
-
-🔴 **Y desmintió la justificación que la propia task tenía escrita.** La spec afirmaba que en un
-mercado ralo el filtro *"se comía el long-tail emergente"*. Medido: **102 candidatos, 3 corridas, 2
-endpoints, 2 mercados → CERO con volumen nulo o cero**. El histórico del store lo corrobora por
-endpoint: `keyword_suggestions` 61 filas / 0 nulos; el único con nulos es `keyword_overview` (15 de
-62), que **nunca llevó el filtro**. O sea: los índices de sugerencias e ideas del proveedor sólo
-devuelven keywords con volumen medido, así que el `filters: search_volume > 0` era un **no-op** en
-esos dos endpoints.
-
-**Qué queda en pie:** quitarlo sigue siendo correcto —elimina una asimetría no declarada y deja de
-imponer una exclusión que el contrato no decía—, pero **el beneficio prometido no tiene evidencia**.
-La corrección está escrita en la task; el delta de arquitectura §7 conserva la afirmación vieja y
-convendría alinearlo cuando alguien toque ese doc.
-
-**Lección portátil:** una justificación plausible escrita en una spec no es un hecho. Ésta sobrevivió
-al diseño, a la implementación y a la review; sólo cayó al gastar 5 centavos en medirla.
-
-**`TASK-1700` (P0, cola priorizada) queda desbloqueada Y con su prerequisito de runtime cumplido:**
-el contrato nuevo ya sirve en producción, así que su primer snapshot no puede congelar duplicados ni
-la barrera engañosa. Es el siguiente trabajo natural.

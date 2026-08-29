@@ -1,5 +1,41 @@
 # TASK-1700 — Growth SEO: la cola priorizada de trabajo es un aggregate persistido con score versionado
 
+## Delta 2026-08-29 (2) — `incremental-clicks-v2`: el predicado de canibalización medía MARCA
+
+Auditando la propia implementación apareció el defecto de fondo: `COUNT(DISTINCT page) > 1` no mide
+canibalización. Medido contra berel.com (28 días, piso 100 impresiones), la población no-marca tiene
+**80,7 %** de share medio en su página principal y la de marca **34,2 %** — el predicado seleccionaba
+marca. `pinturas`, la query de mayor demanda del sitio, traía 41 páginas con el **99,3 %** en una, y la
+cola proponía fusionar 41 URLs sobre el ítem #1.
+
+**Lo más grave no era el verbo.** El striking-distance excluía todo lo multi-página: sacaba **216 de
+269** filas de su ventana, y la lente del operador quedaba en **92** contra las **269** del reader
+legacy. Al validar el cutover del Slice 7 se midió la dirección que AGREGABA filas ("metía 99 keywords
+nuevas") y nunca la que las QUITABA. Era alcanzable desde el portal con el flag prendido; no se puede
+afirmar que nadie la vio.
+
+**v2** (`work-queue/cannibalization.ts`, predicado único importado por los dos colectores):
+no-marca ∧ share de la principal ≤ 0,7 ∧ ≥2 páginas fusionables; concentración sobre TODAS las páginas
+y conteo sólo sobre fusionables (mezclarlas invierte el veredicto — `pinturas` caía a 13,2 %); marca por
+etiqueta del `root_domain` con tolerancia a un tipeo (16 queries de marca entraban sin ella); techo por
+posición anulado cuando ya se está en la objetivo o mejor, con el techo de CTR entregado como evidencia
+(`snippetCeilingClicks`) y jamás como score.
+
+**Medido:** de 400 candidatas, v1 → 400 canibalizadas, v2 → 11; población real del sitio 29, de las
+cuales ~5 son sub-marcas propias (`kover`, `beralkid`, `comasin`, `color pitaya`). Lente del operador de
+vuelta en 261 contra 269 del legacy.
+
+**Dos defectos latentes que sólo existen con más de una versión, corregidos acá:** el piso de
+recomputación no filtraba por versión y afirmaba la versión ACTIVA sobre snapshots de otra; y la huella
+de parámetros no ve un cambio de fórmula — de ahí los vectores dorados por versión.
+
+**Límite declarado:** las sub-marcas no se detectan desde el dominio y NO se cierran colgando el score
+de `grader_profiles.brand_name` (captura de leads del grader público, mayoría sin organización, con
+filas de smoke). Exige una fuente declarada con autor: versión nueva.
+
+**Pendiente de rollout:** rematerializar con `force` DESPUÉS del deploy — los snapshots vigentes son v1
+y la señal `growth.seo.work_queue.score_version_drift` alerta legítimamente hasta que corra.
+
 ## Delta 2026-08-29 (CIERRE) — el rollout que faltaba se ejecutó y se verificó; la task queda `complete`
 
 El único criterio abierto era operativo, no de código: *"la lente vigente lee `readSeoWorkQueue` en
