@@ -2,6 +2,93 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-29 (2.º) — La cola SEO quedó operativa, y el aprendizaje del release cambió al verificarlo
+
+**Estado: los dos schedulers del módulo despausados y documentados.** PR de release #211 en vuelo
+para llevar ambos al SoT de `main`.
+
+**`ops-seo-work-queue-materialize`: `ENABLED`, `0 10 * * *`.** Despausado tras corrida shadow con la
+MISMA identidad OIDC del scheduler: `succeeded`, `eligible=2`, `materialized=1`, `reused=1`,
+`failed=0`. Inspección fila por fila de `seot-efeonce-own-brand` (105 items): `staleness=fresh`, 5/6
+orígenes `ok`, `competitor_gap` `degraded` sin arrastrar a los demás, y **todas las filas en banda 2
+con `priority_score` NULL** — degradación honesta, no falla.
+
+**`ops-seo-competitor-coverage`: `ENABLED`, `0 9 18 * *`.** Su condición pendiente era confirmar el
+endpoint en la revisión activa: `dryRun` → HTTP 200, `providerCostUsd: 0`. Costo ~USD 0,11/mes.
+⚠️ Su primera corrida desatendida es el **18 de septiembre**; queda pendiente decidir si se ejercita
+antes por el camino desatendido.
+
+🔴 **VENTANA ABIERTA hasta que #211 mergee:** `origin/main` aún declara AMBOS schedulers `PAUSADO`, y
+`upsert_scheduler_job` hace `pause`/`resume` EXPLÍCITO en cada deploy. Un deploy desde el árbol de
+`main` los re-pausa **en silencio**. Hay UN solo `ops-worker` y UN solo juego de jobs compartidos.
+
+**🔴 CORRECCIÓN a lo que reporté antes, y es la lección que vale.** Escribí que la credencial AXIS
+venció «sin señal, sin alerta». **Falso.** El detector `axis-credential-expiry.yml` avisó el
+2026-08-25 (run `32856176785`) con tres días de anticipación y predijo el modo de falla exacto
+(*«GitHub Actions sigue verde y solo fallan los builds de worker»*). Falló el **ENRUTAMIENTO**: su
+único canal de salida era el color de su corrida, y ese color ya venía rojo desde el 08-04 y el 08-11
+por una causa ajena (bug de orden `setup-node`/`pnpm`). **Un gate cuyo único canal de salida es su
+propio color es un registro, no una alerta**, y **un detector con rojo crónico deja de ser un
+detector**. Playbook y skill corregidos. Consecuencia: el check de preflight pasa a ser el arreglo
+PRIORITARIO sobre anotar la expiración, porque pone la medición donde alguien está obligado a mirar.
+
+**Deuda documental encontrada y corregida:** la arquitectura afirmaba en **4 lugares** que
+`ops-seo-competitor-coverage` estaba `ENABLED` desde el 28 — falso en las cuatro (estaba `PAUSED`,
+`lastAttemptTime` vacío). El runbook de AXIS documentaba el `.npmrc` con 2 líneas cuando tiene 3
+(falta `@jsr`): seguirlo produce un secreto válido y muerto que falla con el mismo 401 que el vencido.
+
+**Tasks:** `TASK-1700` cerrada (`complete`). `TASK-1794` creada — el arreglo durable de la credencial,
+con el check de preflight como Slice 1 y los tokens de instalación de 1 h como Slice 2 (bloqueado por
+el permiso `packages` de la App, acción de owner de la organización). `TASK-1669` desbloqueada.
+
+**Siguiente paso:** mergear #211 para cerrar la ventana de re-pausa.
+
+## 2026-08-29 — Release `b7f74c95a2af` a producción: TASK-1785 + TASK-1700 + TASK-1792
+
+**Estado: `released`.** Orquestador `33258242470`, release_id
+`b7f74c95a2af-1c7bd2b3-4f50-4e94-b486-c6979e782a44`, un solo run sin retry. Watchdog
+`drift_count=0`. Los 4 workers Cloud Run `Ready=True`.
+
+**TASK-1785 quedó completa y en producción.** El invariante `●` medido / `◑` estimado dejó de ser
+prosa: `provenance` requerido en el `ok:true` de los readers (lo hace cumplir `tsc`), un guard que
+camina el DTO real y exige que **cada hoja numérica tenga exactamente un dueño**, y un censo de
+superficies medido contra el filesystem y `server.ts`. Tool `get_seo_dual_lens_visibility` federada
+al gateway (`efeonce-mcp` `f523960`), **sin campo combinado por contrato**. Triple documentación
+completa (técnica + funcional + manual) y skills actualizadas.
+
+**Flag `GROWTH_SEO_WORK_QUEUE_ENABLED` prendido en los DOS runtimes**, con autorización explícita del
+operador. Se prendió **por el SoT** (`deploy.sh` → `:-true` + Vercel antes del squash), no con
+`--update-env-vars`: eso evita que el próximo deploy lo borre en silencio Y **ordena el flip por
+construcción** — resolvió que `TASK-1792` (`ctr-curve.ts`) no estuviera aún en `main`, precondición
+que el ledger exigía. Verificado en la revisión activa `ops-worker-00613-qrh`.
+
+🔴 **PENDIENTE — despausar `ops-seo-work-queue-materialize`.** El flag habilita el materializador; NO
+lo agenda. El scheduler sigue PAUSADO y su contrato exige corrida shadow verificada + aviso al
+operador de SEO. **Hasta que se despause, la cola no se materializa y los lanes sirven vacío.**
+
+**Bloqueador dominante del release: una credencial, no el código.** El PAT `read:packages` de AXIS
+venció en silencio (creado 07-29, 30 días, muerto el 08-28) y tumbó 3 de los 4 workers; Vercel pasaba
+verde, que es lo que lo vuelve engañoso. ~2h de las ~4h05m se fueron ahí. Rotado por el operador
+(v2 del secreto, validada contra la API de GitHub antes de escribir). Documentado como anti-pattern
+#12 del playbook + sección en la skill de release.
+
+⚠️ **La versión 1 del secreto `axis-packages-read-token` sigue `enabled`** — no hace daño (los deploys
+usan `:latest`) pero conviene deshabilitarla como higiene.
+
+**Hallazgo lateral con impacto propio:** el audit de flags tenía un punto ciego que **anulaba su propio
+gate ISSUE-150** — sólo detectaba `process.env.FLAG` en notación de punto, y 91 callsites del repo leen
+por indirección. 39 de 43 «env vars muertas» eran falsos positivos y una clase entera de flags escapaba
+del gate que hace `exit 1`. Arreglado; destapó 3 flags sin registrar, ya registrados.
+
+**No validado, declarado:** el canary probó que `dual-lens-visibility` existe y **ejecuta** en
+producción (control negativo: ruta inexistente → HTML de Next; ruta nueva → envelope de API con error
+de dominio). **No** se ejercitó `ok:true` con las dos series reales: ninguna de las 120 organizaciones
+visibles al consumer del gateway tiene `seo_v2`.
+
+**Siguiente paso:** decidir el despause del scheduler de la cola; y evaluar el arreglo durable de la
+credencial AXIS (App de GitHub acuñando tokens de 1 h en vez de un PAT estático — hoy la App no tiene
+permiso `packages`).
+
 ## 2026-08-29 — TASK-1785 `complete`: la lente `●`/`◑` pasó de instrucción a mecanismo
 
 **Estado: code complete. Falta UN paso de rollout, declarado abajo.** Sin migración, sin flag, sin
@@ -499,77 +586,3 @@ al diseño, a la implementación y a la review; sólo cayó al gastar 5 centavos
 **`TASK-1700` (P0, cola priorizada) queda desbloqueada Y con su prerequisito de runtime cumplido:**
 el contrato nuevo ya sirve en producción, así que su primer snapshot no puede congelar duplicados ni
 la barrera engañosa. Es el siguiente trabajo natural.
-
-## 2026-08-28 — TASK-1692: ledger de decisiones de discovery — code complete, rollout pendiente
-
-Cerrada en `develop`. Cinco slices: append transaccional (`appendDiscoveryActionTx`), el bridge y
-el camino de tracking escribiendo su propio hecho, re-selección, guard de cobertura de writers y
-docs. Sin migración, sin flag, sin capability.
-
-**Tres cosas que un próximo turno necesita saber:**
-
-1. 🔴 **Un test que se rompe por hacer lo correcto es un test mal escrito.** El boundary test del
-   bridge decía "el bridge no ejecuta SQL de tablas"; escribir el ledger lo rompía. La salida
-   barata era relajar el regex. Se reescribió sobre el invariante REAL de §1.1 (nada de `grader_*`,
-   ningún JOIN cruzando motores, y el bridge no COMPONE candidatos con SQL propio). Si vuelve a
-   pasar con otro gate del dominio, ése es el criterio.
-2. **Tres falsos verdes destapados verificando, no leyendo:** el check del trigger append-only
-   pasaba sobre tabla vacía (es `FOR EACH ROW` — no dispara sin filas); el mock de
-   `track-keywords.test.ts` devolvía la fila del TARGET para cualquier consulta, así que el chequeo
-   de tenant pasaba siempre; y el parser del guard nuevo devolvía lista vacía porque se cortaba en
-   el `[]` de la anotación de tipo. Los tres habrían quedado verdes por la razón equivocada.
-3. **El ledger estaba VACÍO en producción** (0 filas, ni un `dismissed`) al momento del cambio. Por
-   eso retirar `selected_for_target` del enum no creó ninguna fila ilegible, y por eso el backfill
-   se descartó sin costo.
-
-**Pendientes de rollout (no cerrar como "listo" sin esto):**
-
-- Verificación funcional en staging de los dos caminos (grounded y tracking) + el lane ecosystem
-  con binding `internal`, y el caso `capacity_exceeded` confirmando que NO se escribió fila.
-- Promoción a producción; observar 7 días `seo_track_keywords_command` y
-  `seo_grounded_query_bridge_decision_log`.
-- Avisarle al operador de SEO que el orden del inbox cambia (lo resuelto deja de encabezar). Ya
-  está escrito en el manual.
-
-**`TASK-1700` (P0) queda `Blocked by: none`** — era su último bloqueador. Su Delta lleva la
-salvedad de no tomar el primer snapshot contra un runtime que todavía sirva el contrato viejo:
-ni 1694 ni 1692 se han promovido.
-
-**Follow-up `ui-ux` declarado:** el affordance visible de re-selección en el drawer. El camino
-server existe; el botón no. El comentario del drawer ya lo dice.
-
-## 2026-08-28 — TASK-1694: contrato de candidatos de discovery — code complete, rollout pendiente
-
-Cerrada en `develop`, sin push. Cinco slices + un fix propio: barrera de enlaces filtrable
-(`maxLinkBarrier`/`includeUnknownBarrier`) con `maxDifficulty` aceptado-pero-ignorado y declarado en
-`ignoredFilters`; colapso del reader por `normalizedKeyword` (`candidateIds[]`/`provenance[]`,
-`totalCandidates` cuenta keywords); `clusterConflict` contra el set seguido sin gasto de proveedor;
-política de inclusión única (`all`) en los cuatro adapters, persistida en `methods_json` con default
-histórico de lectura; federación en route admin + lane ecosystem + tool MCP.
-
-**Dos cosas que un próximo turno necesita saber:**
-
-1. 🔴 **`core_keyword IS NULL` significa "la keyword ES la canónica de su clúster", no "no se
-   sabe".** Verificado sobre las 923 filas del store: 527 nulos, 396 apuntando a otra, **cero
-   autorreferentes**. Mi primera implementación lo leyó como desconocido y dejó 8 de 10 candidatos
-   productivos en `unknown`, escondiendo una colisión real. El core efectivo es
-   `core_keyword ?? la keyword misma`; el único estado ciego es no tener fila de mercado. Lo destapó
-   la verificación contra PG real, no los tests — que pasaban.
-2. **El caso de fusión aún no existe en datos reales**: una sola corrida productiva, 10 candidatos
-   de un solo método. El colapso es preventivo y su razón de ser es llegar antes del primer snapshot
-   de `TASK-1700`, que es append-only.
-
-**Pendientes de rollout (no cerrar como "listo" sin esto):**
-
-- Corrida real de smoke con gasto (~USD 0,013) en un mercado es-LATAM ralo con la política `all`,
-  comparando candidatos/costo/mezcla de `searchVolume=null` contra el smoke de `TASK-1664`. Requiere
-  autorización del operador.
-- ~~**Deploy del gateway MCP.**~~ **CERRADO el mismo día.** Los dos commits de `~/Documents/efeonce-mcp`
-  (`807fb76` federación + `32baa9f` prettier) están **en `origin/main`** y desplegados (run
-  `33209983511`); el guard bidireccional de paridad de ese repo no quedó rojo. No queda nada que
-  empujar allá por esta task.
-- Promoción por el release control plane + observar `seo-keyword-discovery-health`.
-
-**Follow-up con evidencia nueva:** cinco candidatos de la corrida real comparten el core
-`pintura acrílica` **entre sí** — es el conflicto intra-corrida que la task dejó fuera de alcance a
-propósito y que pertenece a la superficie de decisión en lote (`TASK-1660`, ya con su `## Delta`).

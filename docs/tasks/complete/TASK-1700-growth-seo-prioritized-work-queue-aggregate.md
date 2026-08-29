@@ -1,5 +1,41 @@
 # TASK-1700 — Growth SEO: la cola priorizada de trabajo es un aggregate persistido con score versionado
 
+## Delta 2026-08-29 (CIERRE) — el rollout que faltaba se ejecutó y se verificó; la task queda `complete`
+
+El único criterio abierto era operativo, no de código: *"la lente vigente lee `readSeoWorkQueue` en
+producción"*. Los tres pasos que le faltaban están hechos y medidos:
+
+- **Promoción a `main`:** release `b7f74c95a2afcf66f2c2d82dbd4a5ad4f7617471`, manifest `released`,
+  run `33258242470`, watchdog `drift_count=0`. Viajó junto a `TASK-1785`, `TASK-1792` y `TASK-1598`.
+- **`GROWTH_SEO_WORK_QUEUE_ENABLED` ON en los DOS runtimes:** Vercel `Production` y `staging`, y
+  ops-worker por su SoT declarativo (`deploy.sh`), verificado en la **revisión activa**
+  `ops-worker-00613-qrh` — no en el archivo, que es justo la mitad que no prueba nada.
+- **Scheduler `ops-seo-work-queue-materialize` DESPAUSADO:** `ENABLED`, `0 10 * * *`
+  America/Santiago. Y el segundo freno del carril hermano también: `ops-seo-competitor-coverage`
+  `ENABLED`, `0 9 18 * *`, costo ~USD 0,11/mes.
+
+**Evidencia de la corrida, no sólo del interruptor.** Corrida shadow con la identidad OIDC del
+scheduler (no con credenciales de operador, que es lo que el scheduler realmente va a usar):
+`succeeded`, `eligible=2`, `materialized=1`, `reused=1`, `failed=0`. Inspección fila por fila del
+snapshot de `seot-efeonce-own-brand` — 105 items, `staleness=fresh`, 5 de 6 orígenes `ok`,
+`competitor_gap` `degraded` **sin arrastrar a los demás** (que es exactamente lo que el aislamiento
+por colector existe para probar), y todas las filas de banda 2 con `priority_score` NULL: la
+degradación honesta funcionando, no un fallo. `seot-berel-mx` devolvió `reused` con 640 items, o sea
+la idempotencia ejercitada contra el store real y no contra un mock.
+
+⚠️ **Ventana abierta que se cierra con el próximo release, declarada acá para que no se descubra por
+sorpresa:** `origin/main` todavía declara **ambos** schedulers `PAUSADO` en
+`services/ops-worker/deploy.sh`. `develop` ya tiene la declaración correcta (`ACTIVO`, con la razón
+y la fecha), pero mientras esa línea no esté en `main`, **un deploy del worker desde ese árbol los
+re-pausa en silencio** — es la misma bug class que esta task documentó en su propia matriz de
+riesgo (`--update-env-vars` sin declaración en el SoT dura hasta la siguiente revisión). El PR de
+release **#211** está en vuelo para cerrarla. Queda como follow-up con dueño, no como pendiente
+huérfano.
+
+Lo que sigue vivo después del cierre y **no** es alcance de esta task: el monitoreo de las tres
+señales durante 7 días post-prod (paso 9 de la secuencia de verificación) y la maduración de la
+serie del top-N para que `competitor_gap` deje de nacer `degraded`.
+
 ## Delta 2026-08-28 (4) — la costura `null → 0` del adapter quedó cerrada, y con eso cambió el contrato del Slice 7
 
 La capa documental se escribió a mitad de camino; esto registra lo que cambió **después** de esa
@@ -217,7 +253,7 @@ serie del top-N arranca con el primer deploy del worker post-release y los candi
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -230,7 +266,7 @@ serie del top-N arranca con el primer deploy del worker post-release y los candi
 - Motion: `none`
 - Backend impact: `migration|command|reader`
 - Epic: `EPIC-022`
-- Status real: `code complete, rollout pendiente` (7/7 slices en `develop`; flag OFF en los dos runtimes y scheduler PAUSADO — ver §Rollout Plan)
+- Status real: `Cerrada` (7/7 slices en producción desde el release `b7f74c95a2afcf66f2c2d82dbd4a5ad4f7617471`; flag ON en los dos runtimes y scheduler ACTIVO — ver Delta 2026-08-29)
 - Rank: `TBD`
 - Domain: `growth|seo`
 - Blocked by: `none` (el bloqueo del Slice 7 se levantó el 2026-08-28; ver Delta 2026-08-28 (3)) (sólo para el origen `competitor_gap`; los otros cuatro orígenes no la necesitan — satisfecho en código desde 2026-08-28, ver Delta)
@@ -1165,14 +1201,13 @@ Tres razones, y las tres son de oficio, no de implementación:
 - [x] `GROWTH_SEO_WORK_QUEUE_ENABLED` está declarado en `services/ops-worker/deploy.sh`, aplicado en
       la revisión activa del worker, presente en Vercel y con fila en
       `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
-- [ ] 🔴 **La lente de oportunidades vigente lee `readSeoWorkQueue` en producción** y el test de
+- [x] 🔴 **La lente de oportunidades vigente lee `readSeoWorkQueue` en producción** y el test de
       paridad de orden sobre `gsc_striking_distance` está verde.
-      → **Mitad cumplida, y la otra mitad es rollout, no código.** El cutover está
-      implementado detrás del flag y el gate de paridad está **VERDE contra PG real**
-      (33 keywords compartidas con techo idéntico y orden relativo idéntico). Lo que falta es
-      operativo: flag ON en los dos runtimes + despausar el scheduler + promoción a `main`.
-      Mientras eso no ocurra, el estado correcto de esta task es
-      `code complete, rollout pendiente`.
+      → **Cerrado el 2026-08-29.** El gate de paridad estaba VERDE contra PG real desde el
+      2026-08-28 (33 keywords compartidas con techo idéntico y orden relativo idéntico); lo que
+      faltaba era rollout y se ejecutó: promoción a `main` (`b7f74c95a2`), flag ON en los dos
+      runtimes (revisión activa `ops-worker-00613-qrh`) y scheduler `ENABLED`, con corrida shadow
+      verificada bajo la identidad OIDC del scheduler. Ver Delta 2026-08-29 (CIERRE).
 - [x] Las tres señales de reliability existen, están registradas en el módulo `growth` y se ven en
       `/admin/operations` con steady 0.
 - [x] Las tres capas documentales están cerradas: arquitectura, funcional y manual de uso.
@@ -1195,8 +1230,8 @@ Tres razones, y las tres son de oficio, no de implementación:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
 - [x] `docs/tasks/README.md` quedo sincronizado con el cierre
 - [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
@@ -1236,6 +1271,12 @@ por sorpresa:
 
 ## Follow-ups
 
+- 🔴 **Cerrar la ventana de la declaración de schedulers en `main`** (PR de release **#211**, en
+  vuelo al momento del cierre): `origin/main` declara `ops-seo-work-queue-materialize` y
+  `ops-seo-competitor-coverage` como `PAUSADO`, así que un deploy del worker desde ese árbol los
+  re-pausa sin aviso. `develop` ya trae la declaración correcta.
+- Monitoreo de las tres señales durante 7 días post-prod (paso 9 de la secuencia de verificación):
+  cualquier `stale_snapshot` o `score_version_drift` distinto de 0 es investigación, no ruido.
 - Task `ui-ux` para la superficie completa de la cola: bandas visibles, verbos, filtros por origen,
   estado `stale` y `originHealth` en pantalla, con wireframe/flow/motion propios.
 - Retirar `readKeywordOpportunities` como reader público una vez que ningún consumer lo llame directo

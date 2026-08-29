@@ -1566,13 +1566,24 @@ echo "  -> ops-seo-url-visibility: 0 9 17 * * ACTIVO (visibilidad por sujeto-pá
 # en el ledger, un competidor de una org), así que al despausar sólo falta confirmar que
 # el endpoint responde en la revisión activa. El payload vacío usa el default
 # `maxCompetitors=1` (V1: un competidor a la vez).
+# 🟢 DESPAUSADO 2026-08-29 con autorización explícita del operador. La condición que faltaba
+# —"confirmar que el endpoint responde en la revisión activa"— quedó verificada con la MISMA
+# identidad OIDC que usa Cloud Scheduler: `POST {"dryRun":true}` → HTTP 200,
+# `ok:true status:completed providerCostUsd:0`, shape válido y cero gasto.
+#
+# ⚠️ `eligible: 0` en las primeras corridas NO es un defecto: el competidor capturado el
+# 2026-08-28 está dentro de su ventana de frescura, así que no hay elegibles hasta que venza.
+# Leerlo como "el job no funciona" sería el error.
+#
+# Despausado en el SoT Y en vivo: `upsert_scheduler_job` hace `pause`/`resume` EXPLÍCITO en cada
+# deploy, así que un resume out-of-band se revierte solo en el próximo.
 upsert_scheduler_job \
   "ops-seo-competitor-coverage" \
   "0 9 18 * *" \
   "/seo/competitor-coverage/capture-batch" \
   '{}' \
-  "true"
-echo "  -> ops-seo-competitor-coverage: 0 9 18 * * PAUSADO (cobertura de competidores mensual, TASK-1662 — despausar sólo tras dry-run + primera corrida verificada + autorización)"
+  "false"
+echo "  -> ops-seo-competitor-coverage: 0 9 18 * * ACTIVO (cobertura de competidores mensual, TASK-1662 — despausado 2026-08-29 tras dry-run verificado en la revisión activa + autorización del operador)"
 
 # TASK-1664 — drain de corridas de keyword discovery (Labs Live, bajo demanda del operador).
 # Cada 10 minutos alcanza de sobra: el enqueue es humano/agente (no hay cadencia diaria en V1)
@@ -1608,13 +1619,33 @@ echo "  -> ops-seo-keyword-discovery-drain: */2 * * * * ACTIVO (keyword discover
 #
 # El cron NO manda `force`: si el snapshot vigente es reciente, reusarlo ES la respuesta
 # correcta — mismos insumos, cero writes.
+# 🟢 DESPAUSADO 2026-08-29 tras la corrida shadow verificada + autorización del operador.
+#
+# Evidencia de la shadow (invocación directa del endpoint con la MISMA identidad OIDC que usa
+# el scheduler, no una aproximación con curl anónimo): `status=succeeded`, `eligible=2`,
+# `materialized=1`, `reused=1`, `failed=0`. Inspección fila por fila del target
+# `seot-efeonce-own-brand` (105 items): `staleness=fresh`, 5 de 6 orígenes `ok` y
+# `competitor_gap` declarado `degraded` sin arrastrar a los demás, verbos coherentes con su
+# origen, y **todas las filas en banda 2 con `priority_score` NULL** — que es la degradación
+# honesta, no una falla: hay demanda medida pero la curva de CTR del sitio no es utilizable, y
+# la cola se NIEGA a fabricar un número. Leer ese `null` como 0 invertiría el significado.
+#
+# 🔴 Se despausa acá, en el SoT, y NO sólo con `gcloud scheduler jobs resume`:
+# `upsert_scheduler_job` ejecuta `pause`/`resume` EXPLÍCITO en cada deploy según este 5.º
+# argumento, así que un resume out-of-band lo revierte el próximo deploy — mismo modo de falla
+# que un `--update-env-vars` suelto sobre un flag.
+#
+# ⚠️ VENTANA CONOCIDA hasta la próxima promoción: `main` todavía declara `"true"`. Hay UN solo
+# `ops-worker` y UN solo juego de jobs de Cloud Scheduler (staging y producción los comparten),
+# así que un deploy que corra el árbol de `main` —release, rollback o dispatch break-glass—
+# vuelve a pausarlo en silencio. La próxima promoción cierra la ventana sola.
 upsert_scheduler_job \
   "ops-seo-work-queue-materialize" \
   "0 10 * * *" \
   "/seo/work-queue/materialize-batch" \
   '{}' \
-  "true"
-echo "  -> ops-seo-work-queue-materialize: 0 10 * * * PAUSADO (cola priorizada, TASK-1700 — despausar sólo tras corrida shadow verificada + aviso al operador de SEO)"
+  "false"
+echo "  -> ops-seo-work-queue-materialize: 0 10 * * * ACTIVO (cola priorizada, TASK-1700 — despausado 2026-08-29 tras corrida shadow verificada + autorización del operador)"
 
 # Email deliverability monitor — TASK-775 Slice 2.
 #

@@ -7,6 +7,41 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-29 — La cola SEO empieza a correr sola, y un detector que avisaba a tiempo no llegaba a nadie
+
+Los dos schedulers del módulo quedaron activos: `ops-seo-work-queue-materialize` (`0 10 * * *`, tras
+corrida shadow con la identidad OIDC real y revisión fila por fila) y `ops-seo-competitor-coverage`
+(`0 9 18 * *`, ~USD 0,11/mes). Ambos despausados en el **SoT y en vivo**, porque
+`upsert_scheduler_job` re-aplica `pause`/`resume` en cada deploy y un resume suelto se revierte solo.
+
+El hallazgo del día no fue técnico sino de enrutamiento: la credencial AXIS que bloqueó el release
+**sí tenía detector, y avisó tres días antes** con el modo de falla exacto. Nadie lo leyó porque su
+único canal de salida era el color de su corrida, y ese color ya venía rojo por un bug ajeno. Un gate
+cuyo único canal es su propio color es un registro, no una alerta; y un detector con rojo crónico
+deja de ser un detector. `TASK-1794` recoge el arreglo, con el check de preflight primero — poner la
+medición donde alguien esté obligado a mirar.
+
+De paso: la arquitectura afirmaba en cuatro lugares que un scheduler estaba activo cuando estaba
+pausado, y el runbook de AXIS documentaba el `.npmrc` con una línea de menos.
+
+## 2026-08-29 — La lente `●`/`◑` llega a producción con mecanismo, no con prosa
+
+Release `b7f74c95a2af` (`released`, watchdog `drift_count=0`). **TASK-1785**: los readers de
+`growth/seo` emiten `provenance` **requerido** —así que `tsc` nombra a cualquiera que no lo declare—,
+un guard camina el DTO real exigiendo que cada hoja numérica tenga exactamente un dueño, y un censo
+compara las superficies contra el filesystem en ambas direcciones. Tool
+`get_seo_dual_lens_visibility` federada al gateway: devuelve las dos series separadas y **sin campo
+combinado por contrato**.
+
+Viajaron también **TASK-1700** (cola priorizada, 3 migraciones ya aplicadas en la única instancia
+Cloud SQL) y **TASK-1792** (curva de CTR con sus 4 estados). `GROWTH_SEO_WORK_QUEUE_ENABLED` prendido
+en los dos runtimes por el SoT; el scheduler del materializador sigue PAUSADO a propósito.
+
+Dos hallazgos que no eran el objetivo y valen por separado: el PAT `read:packages` de AXIS llevaba
+14 h vencido tumbando 3 de los 4 workers **sin que nada avisara**, y el audit de flags tenía un punto
+ciego que **anulaba su propio gate ISSUE-150** (39 de 43 «env vars muertas» eran falsos positivos).
+Los dos quedaron documentados y el segundo, arreglado.
+
 ## 2026-08-29 — El contrato `●`/`◑` deja de depender de que alguien lea la descripción
 
 `TASK-1785`. Los readers de `growth/seo` emiten `provenance: SeoProvenance[]` en su `ok: true`:
@@ -58,6 +93,22 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - **Rollout pendiente:** flag OFF en los dos runtimes, scheduler pausado, sin promover a `main`.
 
 ## 2026-08-28 — Landing Agencia de influencers publicada (`TASK-1598`)
+
+- Se canonizó el estilo del brief como `Editorial Premium Brief`: una composición host candidate sobre
+  `diagnostic_premium`, con una sola superficie editorial, jerarquía Poppins/Geist, controles accesibles, submit azul
+  y decoración semántica. La frontera renderer/host quedó sincronizada en arquitectura, documentación funcional,
+  manuales, registry público y skills `.codex/.claude`; copiar los observadores/iconos page-scoped a otra landing
+  queda explícitamente prohibido hasta promover metadata browser-safe al renderer.
+
+- El submit del brief abandona el teal heredado y adopta azul Efeonce con texto blanco. El selector de mercado
+  reemplaza siglas por banderas SVG circulares para Chile, Colombia, México y Perú, visibles también tras elegir;
+  las centra ópticamente, elimina el blur y conserva un outline nítido. Región/otro mantienen iconos semánticos. El
+  gate live fija paleta, contraste, persistencia, teclado y responsive.
+
+- Los selects premium eliminan la doble señal visual que mezclaba un caret del renderer con otro pseudo-elemento
+  del host. Cada trigger conserva un solo indicador alineado al borde y las opciones mantienen iconos semánticos
+  sobre superficies tonales claras, sin bloques azules sólidos. El gate live fija ambos invariantes en
+  1536/1440/1414/890/390 y reduced motion.
 
 - El cierre responsive corrige la franja de divulgación IA que a 1414 px dejaba un bloque vacío: ahora es full-bleed
   y conserva la retícula. El form reemplaza sparkle por documento y fija una jerarquía medible Poppins/Geist sin
@@ -870,25 +921,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   período ausente porque parte desde las posiciones existentes.
 - Queda registrado que sacar `skipped` de `isSuccessOutcome` no habría corregido los 9.001 falsos éxitos, que los
   produce `no-op`, y que la state machine de `handler_health` no tiene ningún test que la cubra.
-
-## 2026-08-21 — GPT Image 2 gana transparencia end-to-end en código, con rollout aún gated
-
-- La nueva matriz oficial cubre GPT Image 2/1.5/1/1 Mini/`chatgpt-image-latest`, endpoints, tamaños flexibles,
-  edición/máscaras, streaming, precios, datos, provenance, deprecaciones y contradicciones entre páginas oficiales.
-- Se elimina el fallback falso Greenhouse GPT Image 2→1.5; el helper valida transparencia/formato, máscaras,
-  singularidad de salida y streaming no implementado antes de llamar al proveedor.
-- Globe incorpora `backgroundMode` de forma provider-neutral en shape, catálogo, request, fingerprint, manifest y
-  output; el driver comprueba alfa real y el Producer deriva selector/checkerboard desde constraints.
-- `greenhouse-ai-image-generator` y `greenhouse-globe-model-fleet` quedan alineadas entre Codex y Claude; el gate de
-  mirrors incorpora por primera vez el bundle completo de generación de imágenes, incluido `agents/openai.yaml`.
-- La ficha GPT Image 2 separa código local verificado de reader/canary históricos. La variante sigue gated hasta
-  deploy, canary billable, readback, GVC, promoción y rollback; WebP no se anuncia en la ruta PNG vigente.
-
-## 2026-08-20 — El gate de rutas de skills queda sin enlaces rotos
-
-- `validate-skill-routes --all` ahora reconoce las referencias canónicas de una misma skill alojadas en el runtime
-  hermano del repo, sin permitir que una instalación global o externa oculte archivos faltantes.
-- `resend-email-platform` incorpora sus tres referencias prometidas —dominios/tracking, webhooks/eventos y
-  envío/límites— en espejos byte-identical para Codex y Claude, verificadas contra fuentes oficiales actuales.
-- La guía de Resend separa el contrato documental vigente de la evidencia runtime que lo contradice: links con
-  secreto siguen fail-closed y requieren `click_tracking=false` más un canary del href recibido.

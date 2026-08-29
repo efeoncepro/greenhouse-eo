@@ -28,13 +28,16 @@ source control.
 - GCP Secret Manager secret `axis-packages-read-token` now lives in `efeonce-group` and is the
   production build source for Greenhouse and Globe. The two Cloud Build service accounts have
   secret-level `roles/secretmanager.secretAccessor` on that secret only.
-- The active credential is the operator-owned, short-lived `read:packages` PAT approved for this
-  migration; it expires on 2026-08-28. This is the accepted interim path, not a dedicated GitHub
-  machine account. Create that account before external/customer rollout and rotate the Secret
-  Manager version without changing the consumer contract.
-- The temporary migration PAT remains active for the current internal/production build path. The
-  legacy PAT used by the former Globe Cloud Build path was revoked after production verification;
-  do not confuse the two credentials.
+- ⚠️ **Superseded — la credencial de esta línea ya venció y provocó un incidente.** El PAT
+  `read:packages` del operador publicado como **versión 1** (creada 2026-07-29T23:47:59) expiró el
+  **2026-08-28** y dejó rotos los builds de Cloud Build. La credencial vigente es la **versión 2**
+  (2026-08-29T13:44:17); la versión 1 quedó `disabled`. Ver **Delta 2026-08-29** más abajo: es el
+  caso fuente y contiene el procedimiento de rotación.
+- Sigue siendo el camino interino aprobado —un PAT del operador, **no** una cuenta GitHub de
+  máquina—. Crear esa cuenta antes del rollout externo/cliente y rotar la versión de Secret Manager
+  sin cambiar el contrato del consumidor.
+- El PAT legacy que usaba el antiguo camino de Cloud Build de Globe fue revocado después de la
+  verificación productiva; no confundir las dos credenciales.
 - Local private-package installation for the TASK-1591 canary was verified with a temporary
   developer credential. CI/Cloud Build wiring is now implemented: GitHub Actions uses its scoped
   `GITHUB_TOKEN`, while Cloud Build reads `axis-packages-read-token` and mounts an ephemeral
@@ -53,6 +56,166 @@ source control.
   La evidencia del piloto pasa de **local** a **CI**.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
+
+## Delta 2026-08-29 — la credencial venció, bloqueó un release, y el detector SÍ había avisado
+
+Caso fuente del modo de falla que este runbook venía anunciando desde el 2026-07-29 ("el día que
+expire, todos los PR seguirán verdes y solo fallará un build de worker"). Ocurrió exactamente así.
+Lo que **no** se anticipó es la segunda mitad: el detector funcionó, midió bien y avisó a tiempo —
+y aun así nadie lo leyó.
+
+### Qué pasó
+
+- El secreto `projects/efeonce-group/secrets/axis-packages-read-token` **no guarda el token pelado**:
+  guarda un **`.npmrc` completo** de tres líneas que el Dockerfile monta en `/root/.npmrc`.
+
+  ```ini
+  @jsr:registry=https://npm.jsr.io/
+  @efeoncepro:registry=https://npm.pkg.github.com
+  //npm.pkg.github.com/:_authToken=<TOKEN>
+  ```
+
+- La **versión 1** (creada 2026-07-29T23:47:59) llevaba un PAT **clásico** de GitHub con scope
+  `read:packages` y la **expiración por defecto de 30 días** → venció el **2026-08-28**. Confirmado
+  después contra la UI de GitHub: el token decía *"Expired yesterday"*, y había un **segundo** token
+  AXIS ya vencido el **2026-08-27**.
+- **Síntoma:** `ERR_PNPM_FETCH_401` sobre `@efeoncepro/axis-tokens` en Cloud Build, durante
+  `pnpm install --frozen-lockfile`.
+- **Radio: 3 de los 4 workers del control plane** — `ops-worker`, `commercial-cost-worker` e
+  `ico-batch` montan ese `.npmrc` (también `artifact-worker`, que está fuera del control plane).
+  `hubspot-greenhouse-integration` **no** lo usa. **Vercel no se ve afectado**: su build pasó verde.
+  Eso es justo lo que vuelve engañoso mirar sólo el color del PR.
+- Llevaba **~14 h roto y 3 deploys consecutivos fallidos** antes de detectarse. Se descubrió porque
+  alguien estaba mirando un deploy.
+
+### 🔴 El detector no falló: falló el enrutamiento de su señal
+
+`.github/workflows/axis-credential-expiry.yml` **corrió, midió bien y avisó con la anticipación que
+tenía prometida**:
+
+```text
+run 32856176785 · 2026-08-25T13:54Z · conclusion: failure
+✖ El credencial AXIS expira el 2026-08-28 — quedan 3 días.
+  Rotar YA: al expirar, GitHub Actions sigue verde y solo fallan los builds de worker.
+```
+
+Tres días de aviso, con la fecha exacta y la instrucción correcta. El incidente ocurrió igual.
+
+**Por qué se perdió el aviso — y esto es lo replicable:** las dos corridas previas del mismo workflow
+también estaban en rojo, **por una causa ajena a la credencial**:
+
+| Run | Fecha | Conclusión | Causa |
+|---|---|---|---|
+| `30924196526` | 2026-08-04 | `failure` | `Unable to locate executable file: pnpm` (orden `setup-node`/pnpm) |
+| `31501087312` | 2026-08-11 | `failure` | idéntica |
+| `31700211413` | 2026-08-13 | `success` | corregida (`package-manager-cache: false`) |
+| `32144377290` | 2026-08-18 | `success` | credencial aún fuera de la ventana |
+| `32856176785` | 2026-08-25 | `failure` | **la alarma real: 3 días para vencer** |
+
+Para cuando llegó el rojo que importaba, **el rojo ya era el color habitual de ese workflow**. Un
+`failure` en un scheduled workflow no le llega a nadie por sí solo: no bloquea un PR, no abre un
+issue, no manda un mensaje. Es una alarma sonando en una sala vacía.
+
+**Regla:** un gate programado cuyo único canal de salida es el color de su propia corrida **no es una
+alerta, es un registro**. Y un gate que acumula rojos por causas de infraestructura pierde su
+capacidad de significar algo el día que se pone rojo de verdad. Un rojo ajeno al objeto medido debe
+arreglarse *rápido*, no tolerarse: cada día que se deja, degrada la señal que sí importa.
+
+### Resolución (2026-08-29)
+
+1. El **operador** generó un PAT nuevo y lo cargó como **versión 2** del secreto
+   (`createTime 2026-08-29T13:44:17`).
+2. Tras eso, los 3 workers desplegaron en `success`.
+3. La **versión 1 quedó `disabled`** el mismo día, por higiene. Estado verificado:
+
+   ```text
+   NAME  STATE     CREATED
+   2     enabled   2026-08-29T13:44:17
+   1     disabled  2026-07-29T23:47:59
+   ```
+
+### Cómo rotar — `scripts/secrets/rotate-axis-packages-token.sh`
+
+La rotación **es acción del OPERADOR, no del agente** (ver reglas duras). El helper existe para que
+esa acción sea de un solo paso y no se pueda arruinar en silencio.
+
+```bash
+# macOS — recomendado. El PAT va portapapeles → stdin → Secret Manager.
+# No se muestra en pantalla, no queda en el historial, no toca un archivo.
+pbpaste | ./scripts/secrets/rotate-axis-packages-token.sh
+
+# Cualquier plataforma, interactivo: pega el PAT, Enter, Ctrl-D.
+./scripts/secrets/rotate-axis-packages-token.sh
+```
+
+Lo que hace, y **por qué cada pieza está ahí**:
+
+- **Lee el PAT por `stdin` y sólo por `stdin`.** Nunca como argumento —quedaría en `ps` y en el
+  historial del shell—, nunca en un archivo temporal, nunca en un log.
+- **Valida el token contra la API de GitHub ANTES de escribir la versión**
+  (`GET /orgs/efeoncepro/packages?package_type=npm`). Un `.npmrc` malformado o un scope mal elegido
+  fallan con **el mismo 401** que el token vencido; sin esta validación, descubrirlo cuesta un ciclo
+  de build de ~4 min en vez de 2 segundos.
+- **Compone el `.npmrc` completo**, que es la forma que el consumidor espera. Cargar el token pelado
+  produce un secreto sintácticamente válido y funcionalmente muerto.
+
+Después de rotar, verificar el estado de versiones y desactivar la anterior:
+
+```bash
+gcloud secrets versions list axis-packages-read-token --project efeonce-group \
+  --format='table(name,state,createTime)'
+gcloud secrets versions disable <VERSION_ANTERIOR> \
+  --secret=axis-packages-read-token --project efeonce-group
+```
+
+### ⚠️ Reglas duras
+
+- **La rotación es acción del OPERADOR.** Crear un PAT y manipular su valor es una operación de
+  credencial: el agente **no la ejecuta**, aunque se lo pidan. Enuncia la regla y devuelve la acción.
+- **NUNCA sustituir la credencial acotada por una de scope amplio** —por ejemplo el token de una
+  sesión `gh`— para desbloquear un build. «Funciona», y deja en infraestructura productiva una
+  credencial que puede mucho más que `read:packages`. Cambia un incidente de 30 minutos por una
+  exposición permanente.
+- **Un token expuesto en una captura o en un chat queda comprometido**, sin importar cuán nuevo sea.
+  Se revoca y se genera otro. No hay versión de esto en que «total, es de sólo lectura».
+- **NUNCA promover con un deploy de worker en rojo.** Los workers se despliegan por `workflow_call`
+  dentro del orquestador, así que el release cierra `degraded` con `worker_revision_drift`; y si
+  alguno queda change-gated y se salta, **el código entra a `main` SIN su worker desplegado**, sin
+  error visible.
+- **Diagnóstico: antes de culpar al diff, mirar el HISTORIAL del workflow.**
+
+  ```bash
+  gh run list --workflow=<workflow>-deploy.yml --limit 12
+  ```
+
+  Si los commits previos también fallan, es entorno o credencial, no tu cambio.
+
+### Arreglo durable — PENDIENTE (no está hecho)
+
+Un PAT estático de 30 días es una bomba de tiempo con fecha conocida: rotarlo sólo mueve la fecha.
+
+**El arreglo real:** la App de GitHub del repo puede acuñar **tokens de instalación de 1 hora** bajo
+demanda desde su private key. Eso elimina el vencimiento silencioso en vez de posponerlo.
+
+**Hoy NO puede.** La App `greenhouse-release-watchdog` (`app_id=3665723`) tiene permisos
+`actions:read`, `deployments:read`, `metadata:read` — **sin `packages`**. Concederlo es acción de un
+**owner de la organización**, no de un agente ni del pipeline.
+
+**Mínimo intermedio mientras tanto**, en este orden de valor:
+
+1. **Un check de preflight que lo detecte ANTES de la promoción.** Es la corrección directa del
+   modo de falla real de este incidente: no faltó medición, faltó que la medición apareciera donde
+   alguien está obligado a mirar.
+2. **Anotar la expiración en el secreto** (etiqueta de la versión). Es para el humano que corre
+   `gcloud secrets versions list`; **no** es la fuente de verdad —el gate seguirá leyendo la
+   expiración real que reporta GitHub en el header `github-authentication-token-expiration`, porque
+   una fecha escrita a mano deriva y el header no.
+
+> Nota de mantenimiento para quien toque el gate: el workflow inyecta **el payload completo del
+> secreto** en `AXIS_PACKAGES_READ_TOKEN`, y ese payload es un `.npmrc` de tres líneas, no un token
+> pelado. Con la forma actual el gate reportó la fecha correcta el 2026-08-25 (evidencia arriba). Si
+> se cambia la forma del secreto o el modo de inyección, **volver a verificar que el gate sigue
+> midiendo** — un gate que se vuelve ciego sale `0` igual que uno sano.
 
 ## Delta 2026-07-30 — el release admite versionado independiente y es idempotente
 
@@ -179,6 +342,10 @@ manager and materialize this configuration only for the install step:
 For local development, use a developer-owned `~/.npmrc` or an ignored project-local
 file. Never add the resolved token to git, a deployment artifact or a log.
 
+⚠️ **El secreto de Secret Manager guarda este archivo YA RESUELTO, no el token.** Su contenido real
+son tres líneas —incluye `@jsr:registry`— y se monta tal cual. Ver **Delta 2026-08-29** para la forma
+exacta y el helper que la compone; cargar el token pelado produce un secreto válido y muerto.
+
 ## Vercel
 
 ⚠️ **This section does NOT apply to the AXIS Lab.** The Lab is a workspace member and resolves
@@ -258,6 +425,10 @@ rollout.
 GitHub Packages currently supports a classic PAT for this registry. The preferred
 operational model is a dedicated Efeonce machine account with `read:packages` only,
 short expiration and documented rotation owner. Do not send the token through chat.
+
+⚠️ Un PAT **clásico** creado sin tocar el selector de expiración toma el **default de 30 días**. Fue
+la causa directa del incidente del 2026-08-28. **Procedimiento de rotación, reglas duras y el arreglo
+durable pendiente: ver Delta 2026-08-29.** La rotación es acción del **operador**.
 
 ## Consumer integration sequence
 

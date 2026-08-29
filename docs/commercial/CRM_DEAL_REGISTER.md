@@ -12,12 +12,14 @@
 
 ## Relación con otros registros
 
-| Registro                                                                   | Qué contiene                                                                                | Regla                                             |
-| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| Este archivo                                                               | Vista transversal de deals activos y su siguiente movimiento comercial                      | Una fila por Deal HubSpot verificado              |
-| [`tenders/LICITATION_CRM_REGISTER.md`](tenders/LICITATION_CRM_REGISTER.md) | Radar, bid/no-bid, bases, admisibilidad, preguntas, postulación y resultado de licitaciones | Una oportunidad puede existir antes de tener Deal |
-| HubSpot                                                                    | Estado CRM, identidades, propiedades y asociaciones                                         | Fuente autoritativa                               |
-| Workspace/propuesta del negocio                                            | Investigación, propuesta, pricing, anexos y evidencia                                       | Fuente de artefactos                              |
+| Registro                                                                   | Qué contiene                                                                                | Regla                                                      |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Este archivo                                                               | Vista transversal de deals activos y su siguiente movimiento comercial                      | Una fila por Deal HubSpot verificado                       |
+| [`SALES_GOALS_2026_Q4_2027.md`](SALES_GOALS_2026_Q4_2027.md)               | Baseline, metas, escenarios y snapshot de forecast                                          | No sustituye el Deal ni reescribe la meta en cada readback |
+| [`SALES_GOALS_OPERATING_MODEL_V1.md`](SALES_GOALS_OPERATING_MODEL_V1.md)   | Definiciones, gates, categorías de forecast, moneda y cadencia                              | Contrato durable; no almacena estado live                  |
+| [`tenders/LICITATION_CRM_REGISTER.md`](tenders/LICITATION_CRM_REGISTER.md) | Radar, bid/no-bid, bases, admisibilidad, preguntas, postulación y resultado de licitaciones | Una oportunidad puede existir antes de tener Deal          |
+| HubSpot                                                                    | Estado CRM, identidades, propiedades y asociaciones                                         | Fuente autoritativa                                        |
+| Workspace/propuesta del negocio                                            | Investigación, propuesta, pricing, anexos y evidencia                                       | Fuente de artefactos                                       |
 
 Cuando una licitación ya tiene Deal, aparece en ambos archivos con el mismo `deal_id`. Este registro conserva el resumen comercial; el registro de licitaciones conserva el detalle del bid. Un cambio de Company, Deal, owner, stage, amount, `closedate`, bucket o resultado debe sincronizarse en ambos después del readback.
 
@@ -51,6 +53,16 @@ El mecanismo de compra no decide por sí solo el movimiento: primero se verifica
 | `Pausado`       | Sin avance autorizado; conserva motivo y fecha de revisión.            |
 
 Estos estados son una lectura operativa. No sustituyen `pipeline` ni `dealstage` de HubSpot.
+
+### Relación con metas y forecast
+
+- Este registro identifica el universo de negocios; no decide por sí solo qué oportunidad financia una meta.
+- El plan vigente clasifica sólo los candidatos relevantes como `commit | best_case | upside | excluded`.
+- La probabilidad de etapa de HubSpot es una señal mecánica. Una promoción a `commit` exige buyer, monto, modalidad,
+  proceso de decisión, próximo paso bilateral, fecha vigente, capacidad y economics según
+  [`SALES_GOALS_OPERATING_MODEL_V1.md`](SALES_GOALS_OPERATING_MODEL_V1.md).
+- MRR, On-Demand bookings, revenue reconocido, factura y caja permanecen separados.
+- `Core` puede alimentar forecast; `Strategic Bet` permanece como upside hasta pasar el gate completo.
 
 ## Negocios activos
 
@@ -88,7 +100,7 @@ Estos estados son una lectura operativa. No sustituyen `pipeline` ni `dealstage`
 
 ## Campos obligatorios por negocio
 
-`deal_id` · `company_id` · `nombre` · `origen` · `movimiento` · `monto y moneda` · `pipeline` · `dealstage` · `estado operativo` · `próximo paso` · `owner` · `closedate y zona horaria` · `bloqueo` · `última verificación` · `registro especializado`, cuando aplique.
+`deal_id` · `company_id` · `nombre` · `origen` · `movimiento` · `modalidad recurrente/on_demand/mixta/no_verificada` · `monto y moneda` · `pipeline` · `dealstage` · `estado operativo` · `próximo paso` · `owner` · `closedate y zona horaria` · `bloqueo` · `última verificación` · `registro especializado`, cuando aplique.
 
 No inventes Company, Contact, asociación, monto, owner ni fecha. Usa `No verificado` cuando falte readback.
 
@@ -100,5 +112,6 @@ No inventes Company, Contact, asociación, monto, owner ni fecha. Usa `No verifi
 4. Si el negocio pertenece a un dominio especializado, sincroniza también su registro: licitaciones, propuestas, partnership u otro.
 5. Tras un cambio de stage, monto, owner, close date, asociación o resultado, ejecuta un segundo readback después de las automatizaciones y actualiza este archivo sólo con ese estado final.
 6. Retira una fila de activos cuando esté `Ganado` o `Perdido` únicamente si existe un histórico explícito; mientras no exista, consérvala con su resultado.
+7. Si el cambio afecta una oportunidad incluida en el forecast, actualiza también el snapshot del plan vigente sin modificar silenciosamente la meta aprobada.
 
 No almacenes credenciales, cookies, tokens, datos personales no necesarios ni documentos sensibles en este registro.

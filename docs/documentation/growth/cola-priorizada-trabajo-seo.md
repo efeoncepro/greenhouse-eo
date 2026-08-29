@@ -1,10 +1,46 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-08-28 por Claude (TASK-1700)
-> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1700 — auditoria de drift contra el codigo final)
+> **Ultima actualizacion:** 2026-08-29 por Claude (paso a produccion + la cola queda operativa)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Cola priorizada de trabajo SEO
+
+## Estado: desde el 29 de agosto de 2026 la cola corre sola
+
+Hasta ayer la capacidad estaba **construida pero detenida**: el código ya vivía en producción y los
+tres interruptores que la habilitan seguían apagados a propósito. Hoy los tres están abiertos y la
+cola quedó **operativa**.
+
+Qué significa en concreto:
+
+- **Se arma sola una vez al día, a las 10:00 hora de Chile.** Nadie tiene que pedirla. Corre después
+  de que llegan los datos de Search Console del día, para que el plan de hoy se calcule con los datos
+  de hoy y no con los de ayer.
+- **Repetirla no duplica nada.** Si los insumos no cambiaron, la corrida devuelve la foto que ya
+  existía y no escribe nada nuevo. En la corrida de verificación de hoy, de los dos sitios elegibles
+  uno generó foto nueva y el otro reutilizó la vigente, tal como está diseñado.
+- **No compra nada.** La cola lee datos que otros procesos ya pagaron. Su costo de proveedor es cero:
+  lo que compromete es **el orden de trabajo**, no el presupuesto.
+
+Qué **no** significa:
+
+- **No significa que ya exista una pantalla propia de la cola**, ni que el cliente la vea. Sigue sin
+  haber superficie de cliente (ver más abajo). Hoy la usa el operador a través de la lente de
+  oportunidades, más los carriles internos.
+- **No significa que todos los sitios vayan a mostrar un número.** En la verificación de hoy, uno de
+  los sitios salió **entero en banda 2**: hay demanda medida, pero su propia curva de clics todavía no
+  tiene muestra suficiente, así que la cola no estima un techo. Eso es la regla funcionando, no una
+  falla — ver *Un vacío no es un cero*.
+- **No significa que un origen caído invalide la foto.** En esa misma verificación, cinco de los seis
+  orígenes respondieron bien y el sexto (gap competitivo) quedó declarado como degradado, sin afectar
+  el puntaje de los demás.
+
+> Detalle técnico: release `b7f74c95a2afcf66f2c2d82dbd4a5ad4f7617471` promovido a producción
+> (manifiesto `released`, orquestador run `33258242470`, sin drift, 4/4 workers sanos); flag
+> `GROWTH_SEO_WORK_QUEUE_ENABLED` en ON en los dos entornos de ejecución y agendador
+> `ops-seo-work-queue-materialize` habilitado (`0 10 * * *`, `America/Santiago`). Ver
+> [§18.0 de la arquitectura del módulo](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md).
 
 ## Qué problema resuelve
 
@@ -84,6 +120,14 @@ objetivo. Tomar ese 0 como "CTR esperado" da ganancia 0 para **toda** la lista, 
 error — un orden arbitrario detrás de números perfectamente creíbles. Con 75 impresiones y un CTR
 real cercano al 1%, observar cero clics es prácticamente una moneda al aire. Por eso la curva sólo
 se considera utilizable con al menos 1.000 impresiones y 5 clics en el bucket objetivo.
+
+Ese caso dejó de ser hipotético el 29 de agosto de 2026: en la primera verificación con la cola ya
+corriendo sola, uno de los dos sitios elegibles salió con sus **105 entradas en banda 2**, todas sin
+número. La lectura correcta de esa pantalla **no** es "este sitio tiene poco potencial" ni "todo esto
+es de prioridad baja". Es: *hay gente buscando y llegando, pero el sitio todavía no acumuló
+suficientes clics en la posición objetivo como para afirmar cuántos clics más daría subir*. La lista
+sigue ordenada, y lo hace por la señal medida que sí existe —las impresiones—, declarándolo. El
+trabajo siguiente es acumular esa medición, no descartar el sitio.
 
 ## Por qué nunca se ordena por volumen estimado
 
@@ -251,6 +295,11 @@ del sitio no utilizable), la cola **no sirve la lista**: la pantalla vuelve al o
 sabe decir honestamente que está ordenando por demanda medida. En la práctica es una condición **por
 cliente**, no por fila: la curva se evalúa a nivel del sitio, así que o todas las entradas tienen
 número o ninguna. La foto de la cola se guarda completa igual en los dos casos.
+
+Y ese repliegue ya está ocurriendo en vivo: el sitio que el 29 de agosto salió entero en banda 2
+cae hoy a la lista anterior, que ordena honestamente por demanda medida. La cola sí armó su foto
+completa para ese sitio — simplemente no manda esa pantalla mientras no pueda hacerlo sin inventar
+un número.
 
 La superficie propia de la cola —bandas visibles, verbos en pantalla, filtros por origen, estado de
 frescura y salud de orígenes a la vista— es una entrega de interfaz posterior. Todavía no existe.
