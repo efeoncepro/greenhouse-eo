@@ -46,6 +46,7 @@ import {
   type SeoKeywordOpportunityOrder
 } from '../contracts'
 import { normalizeMarketKeyword, readKeywordMarketData } from '../keyword-market-data'
+import { seoProvenance } from '../lens'
 import { readSeoWorkQueue } from './reader'
 import { getPriorityScoreConfig } from './score-versions'
 
@@ -203,7 +204,28 @@ export const readKeywordOpportunitiesFromWorkQueue = async (
           ? null
           : { impressions: reference.curveSampleImpressions, clicks: reference.curveSampleClicks ?? 0 },
       orderedBy,
-      opportunities
+      opportunities,
+      /**
+       * TASK-1785 — la lente NO cambia por servirse desde la cola.
+       *
+       * El adapter cambia la FUENTE DEL ORDEN, jamás la naturaleza de las cifras: el
+       * striking-distance sigue siendo demanda medida de Search Console y el enriquecimiento
+       * de mercado sigue siendo ◑ del proveedor. El as-of medido es el del snapshot que
+       * ordenó — no el de hoy: un snapshot es una foto fechada, y presentarla como fresca
+       * sería justo la clase de afirmación que esta procedencia existe para impedir.
+       */
+      provenance: [
+        seoProvenance({
+          section: 'opportunities[].{position,impressions,clicks,ctr,estimatedClickGain,competingPages}',
+          source: 'gsc',
+          capturedAt: queue.asOf
+        }),
+        seoProvenance({
+          section: 'opportunities[].{searchVolume,difficulty,linkBarrier}',
+          source: 'dataforseo_labs',
+          capturedAt: market?.freshness?.latestCaptureDate ?? null
+        })
+      ]
     }
   }
 }

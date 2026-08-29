@@ -17,6 +17,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import type { BacklinkProfilePoint, BacklinkProfileResult } from '../contracts'
 import { isSeoModuleEnabled } from '../flags'
+import { resolveSeoAsOf, seoProvenance } from '../lens'
 import { resolveSantiagoCaptureDate } from '../rank-capture'
 
 const DEFAULT_RANGE_DAYS = 365
@@ -91,6 +92,7 @@ export const readBacklinkProfile = async (
       return { ok: false, errorCode: 'no_data', status: null }
     }
 
+    const points = rows.map(toPoint)
     const to = resolveSantiagoCaptureDate()
     const fromDate = new Date(`${to}T00:00:00Z`)
 
@@ -101,7 +103,16 @@ export const readBacklinkProfile = async (
       seoTargetId,
       organizationId: target.organization_id,
       range: { from: fromDate.toISOString().slice(0, 10), to, days: rangeDays },
-      points: rows.map(toPoint)
+      points,
+      // TASK-1785 — el as-of sale de las filas que ya trajimos: cero SQL nuevo. `to` es el
+      // FIN DE LA VENTANA PEDIDA, no una captura, así que no sirve como as-of.
+      provenance: [
+        seoProvenance({
+          section: 'points[]',
+          source: 'dataforseo_backlinks',
+          capturedAt: resolveSeoAsOf(points.map(point => point.date))
+        })
+      ]
     }
   } catch (error) {
     captureWithDomain(error, 'growth', {

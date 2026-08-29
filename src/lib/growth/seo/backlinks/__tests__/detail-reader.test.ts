@@ -159,7 +159,19 @@ describe('readBacklinkProfile — regresión del shape (INMUTABLE por contrato d
     expect(result.ok).toBe(true)
     if (!result.ok) return
 
-    expect(Object.keys(result).sort()).toEqual(['ok', 'organizationId', 'points', 'range', 'seoTargetId'])
+    // TASK-1785 — `provenance` es la ÚNICA adición autorizada a este shape desde que
+    // TASK-1777 lo declaró inmutable, y entra por una spec que la declara aditiva. El guard
+    // NO se afloja: cualquier clave siguiente vuelve a romperlo, que es para lo que existe.
+    // ⚠️ La forma de cada PUNTO —lo que los consumers recorren y grafican— sigue intacta, y
+    // esa aserción de abajo es la que no admite excepción.
+    expect(Object.keys(result).sort()).toEqual([
+      'ok',
+      'organizationId',
+      'points',
+      'provenance',
+      'range',
+      'seoTargetId'
+    ])
     expect(Object.keys(result.points[0]).sort()).toEqual([
       'backlinksTotal',
       'date',

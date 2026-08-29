@@ -3,6 +3,7 @@ import 'server-only'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { isSeoModuleEnabled } from '../flags'
+import { type SeoProvenance, resolveSeoAsOf, seoProvenance } from '../lens'
 
 /**
  * TASK-1306 — KPIs norte + serie de visibilidad del cockpit Overview.
@@ -49,6 +50,12 @@ export interface SeoOverviewKpis {
   previous: SeoOverviewKpiTotals | null
   series: SeoOverviewSeriesPoint[]
   rangeDays: number
+  /**
+   * TASK-1785 — todo este DTO es Search Console (●). Es de los pocos readers del módulo con
+   * una sola lente de punta a punta, y declararlo igual es el punto: la uniformidad es lo
+   * que permite que el test de cobertura afirme algo sobre TODOS, no sólo sobre los mixtos.
+   */
+  provenance: SeoProvenance[]
 }
 
 interface TotalsRow extends Record<string, unknown> {
@@ -109,11 +116,18 @@ const buildTotals = (row: TotalsRow | undefined): SeoOverviewKpiTotals | null =>
 const hasAnyVolume = (totals: SeoOverviewKpiTotals | null): boolean =>
   totals !== null && (totals.impressions > 0 || totals.clicks > 0)
 
+const GSC_PROVENANCE = (capturedAt: string | null): SeoProvenance[] => [
+  seoProvenance({ section: '*', source: 'gsc', capturedAt })
+]
+
 const EMPTY_KPIS = (rangeDays: number): SeoOverviewKpis => ({
   current: { clicks: 0, impressions: 0, position: null, ctr: null },
   previous: null,
   series: [],
-  rangeDays
+  rangeDays,
+  // Sin ninguna captura no hay as-of que declarar. `null` es el estado honesto: no se rellena
+  // con hoy para que el campo "se vea completo".
+  provenance: GSC_PROVENANCE(null)
 })
 
 export const readSeoOverviewKpis = async (organizationId: string, rangeDays = 28): Promise<SeoOverviewKpis> => {
@@ -186,16 +200,21 @@ export const readSeoOverviewKpis = async (organizationId: string, rangeDays = 28
 
   const previous = buildTotals(previousRows[0])
 
+  const series = seriesRows.map(row => ({
+    date: row.capture_date,
+    clicks: toNumber(row.clicks),
+    impressions: toNumber(row.impressions),
+    position: toNullableNumber(row.weighted_position)
+  }))
+
   return {
     current: buildTotals(currentRows[0]) ?? { clicks: 0, impressions: 0, position: null, ctr: null },
     // Una ventana previa sin volumen NO es "cero tráfico": es "no hay con qué comparar".
     previous: hasAnyVolume(previous) ? previous : null,
-    series: seriesRows.map(row => ({
-      date: row.capture_date,
-      clicks: toNumber(row.clicks),
-      impressions: toNumber(row.impressions),
-      position: toNullableNumber(row.weighted_position)
-    })),
-    rangeDays
+    series,
+    rangeDays,
+    // El as-of es el último día MATERIALIZADO que entró a la serie, no `anchor` ni hoy: la
+    // captura corre con lag y anclar en hoy afirmaría una frescura que no tenemos.
+    provenance: GSC_PROVENANCE(resolveSeoAsOf(series.map(point => point.date)))
   }
 }

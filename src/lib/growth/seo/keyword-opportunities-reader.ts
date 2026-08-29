@@ -37,6 +37,7 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { type KeywordOpportunitiesResult, type KeywordOpportunity, type SeoKeywordOpportunityOrder } from './contracts'
+import { type SeoProvenance, resolveSeoAsOf, seoProvenance } from './lens'
 import { readOrgCtrCurve, resolveExpectedCtrAtPosition } from './ctr-curve'
 import { normalizeMarketKeyword, readKeywordMarketData } from './keyword-market-data'
 
@@ -83,6 +84,31 @@ const DEFAULT_LIMIT = 50
  * Parámetros: `$1` organizationId · `$2` windowDays · `$3` minPosition · `$4` maxPosition ·
  * `$5` impressionsThreshold · `$6` limit.
  */
+/**
+ * TASK-1785 — La procedencia de esta lente NO es uniforme, y por eso viaja partida.
+ *
+ * El striking-distance entero (posición, impresiones, clics, CTR y el techo derivado de
+ * ellos) es Search Console: demanda MEDIDA del propio sitio. Lo único estimado es el
+ * enriquecimiento de mercado del proveedor —volumen y dificultad—, y en es-LATAM es
+ * justamente donde peor mide (ISSUE-152). Colapsar las dos bajo un rótulo único es lo que
+ * permitiría que alguien ordenara por volumen estimado creyendo ordenar por demanda medida.
+ */
+const buildOpportunityProvenance = (input: {
+  gscCapturedAt: string | null
+  marketCapturedAt: string | null
+}): SeoProvenance[] => [
+  seoProvenance({
+    section: 'opportunities[].{position,impressions,clicks,ctr,estimatedClickGain,competingPages}',
+    source: 'gsc',
+    capturedAt: input.gscCapturedAt
+  }),
+  seoProvenance({
+    section: 'opportunities[].{searchVolume,difficulty,linkBarrier}',
+    source: 'dataforseo_labs',
+    capturedAt: input.marketCapturedAt
+  })
+]
+
 export const SEO_KEYWORD_OPPORTUNITIES_SQL = `WITH per_query AS (
          SELECT query,
                 SUM(impressions)                                            AS impressions,
@@ -90,7 +116,11 @@ export const SEO_KEYWORD_OPPORTUNITIES_SQL = `WITH per_query AS (
                 -- Ponderada por impresiones: promediar días planos daría el mismo peso
                 -- a un día de 2 impresiones que a uno de 500.
                 SUM(position * impressions) / NULLIF(SUM(impressions), 0)    AS weighted_position,
-                COUNT(DISTINCT page)                                         AS competing_pages
+                COUNT(DISTINCT page)                                         AS competing_pages,
+                -- TASK-1785: as-of de la lente medida. Es una agregacion MAS sobre el scan
+                -- que ya ocurre, no una consulta nueva. La ventana PEDIDA no sirve como
+                -- as-of: la captura corre con lag y afirmaria una frescura que no tenemos.
+                MAX(capture_date)::text                                       AS last_capture_date
            FROM greenhouse_growth.seo_gsc_daily
           WHERE organization_id = $1
             AND capture_date >= (CURRENT_DATE - $2::int)
@@ -109,7 +139,8 @@ export const SEO_KEYWORD_OPPORTUNITIES_SQL = `WITH per_query AS (
               pq.weighted_position,
               pq.impressions,
               pq.clicks,
-              pq.competing_pages
+              pq.competing_pages,
+              pq.last_capture_date
          FROM per_query pq
          JOIN best_page bp ON bp.query = pq.query
         WHERE pq.weighted_position >= $3::numeric
@@ -134,6 +165,8 @@ interface OpportunityRow extends Record<string, unknown> {
   impressions: string
   clicks: string
   competing_pages: string
+  /** TASK-1785 — último día materializado que entró a esta fila (as-of de la lente ●). */
+  last_capture_date: string | null
 }
 
 /**
@@ -322,7 +355,11 @@ export const readKeywordOpportunities = async (
       // de GSC — así que el reader entrega valor completo en ambos casos y sólo declara si el
       // enriquecimiento estimado (◑) está o no.
       market: marketData.market,
-      opportunities
+      opportunities,
+      provenance: buildOpportunityProvenance({
+        gscCapturedAt: resolveSeoAsOf(rows.map(row => row.last_capture_date)),
+        marketCapturedAt: marketData.freshness.latestCaptureDate
+      })
     }
   } catch (error) {
     captureWithDomain(error, 'growth', {

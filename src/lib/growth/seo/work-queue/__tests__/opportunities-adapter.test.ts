@@ -5,10 +5,16 @@ const state = { queue: null as unknown }
 vi.mock('../reader', () => ({ readSeoWorkQueue: vi.fn(async () => state.queue) }))
 vi.mock('../../keyword-market-data', () => ({
   normalizeMarketKeyword: (k: string) => k.toLowerCase(),
+  // TASK-1785 — el mock refleja la forma COMPLETA del reader. Le faltaba `freshness`, que sí
+  // es requerida en el DTO real, y `tsc` no lo veía porque el mock no está tipado: el hueco
+  // salió a la luz recién cuando el adapter leyó ese campo. Un mock incompleto no falla,
+  // simplemente deja de ejercitar lo que promete.
   readKeywordMarketData: vi.fn(async () => ({
     market: 'available',
     byKeyword: new Map(),
-    linkBarrierByKeyword: new Map()
+    linkBarrierByKeyword: new Map(),
+    freshness: { freshKeywords: 0, latestCaptureDate: null },
+    provenance: []
   }))
 }))
 

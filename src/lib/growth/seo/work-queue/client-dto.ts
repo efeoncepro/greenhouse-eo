@@ -22,6 +22,7 @@ import 'server-only'
  * sobre impresiones marcadas `● medido`, y el `asOf`.
  */
 
+import { SEO_LENS_MARKER } from '../lens'
 import {
   type SeoWorkQueueOrigin,
   type SeoWorkQueueScoreBand,
@@ -37,11 +38,18 @@ export interface ClientWorkQueueItemDto {
   origin: SeoWorkQueueOrigin
   /** Clics incrementales estimados. `null` cuando no se puede afirmar — jamás un 0 de relleno. */
   estimatedIncrementalClicks: number | null
-  /** Marcador de lente del score: es una estimación sobre demanda medida. */
-  estimatedMarker: '◑'
+  /**
+   * Marcador de lente del score: es una estimación sobre demanda medida.
+   *
+   * TASK-1785 — ⚠️ Esta fila es el caso donde las DOS lentes conviven: el techo estimado (◑)
+   * va al lado de las impresiones medidas (●), bajo un solo `asOf`. Por eso el rótulo vive
+   * POR CAMPO y no a nivel de fila — no había forma honesta de rotular la fila entera, y esa
+   * necesidad llegó sola a la forma que el resto del módulo adoptó después.
+   */
+  estimatedMarker: typeof SEO_LENS_MARKER.estimated
   /** Impresiones de Search Console: demanda MEDIDA del propio sitio del cliente. */
   measuredImpressions: number
-  measuredMarker: '●'
+  measuredMarker: typeof SEO_LENS_MARKER.measured
   /** Por qué está en esta banda, en lenguaje del cliente. Sin umbrales ni percentiles. */
   reason: string
 }
@@ -85,9 +93,12 @@ export const toClientWorkQueueDto = (result: ReadSeoWorkQueueResult): ClientWork
       scoreBand: item.scoreBand,
       origin: item.origin,
       estimatedIncrementalClicks: item.priorityScore === null ? null : Math.round(item.priorityScore),
-      estimatedMarker: '◑' as const,
+      // 🔴 Se deriva el VALOR, jamás se spreadea el módulo de lentes: el redactor es por
+      // construcción explícita para que un campo nuevo del tipo compartido NO cruce solo, y
+      // un spread invertiría esa dirección en silencio.
+      estimatedMarker: SEO_LENS_MARKER.estimated,
       measuredImpressions: item.breakdown.impressions,
-      measuredMarker: '●' as const,
+      measuredMarker: SEO_LENS_MARKER.measured,
       reason: clientReason(item.scoreBand, item.recommendedVerb)
     })),
     asOf: result.asOf,

@@ -21,6 +21,11 @@ export const SEO_CLIENT_MOCK_SURFACE: SeoClientSurfaceRead = {
     device: 'desktop',
     range: { from: '2026-07-09', to: '2026-08-07', days: 30 },
     source: 'postgres',
+    // TASK-1785 — el mock refleja el DTO real, procedencia incluida: si acá se pudiera
+    // omitir, el fixture dejaría de ejercitar el contrato que la pantalla consume.
+    provenance: [
+      { section: 'series[].points[].position', lens: 'estimated', source: 'dataforseo_serp', capturedAt: '2026-08-07' }
+    ],
     series: [
       {
         keyword: 'agencia de marketing',

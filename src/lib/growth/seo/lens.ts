@@ -78,14 +78,19 @@ export const SEO_LENSES: readonly SeoLens[] = ['measured', 'estimated']
  * El glifo de cada lente, con UN solo origen.
  *
  * Antes vivía como literal suelto en `work-queue/client-dto.ts` y como carácter crudo en las
- * vistas. Los consumers derivan el valor de acá; ⚠️ **jamás spreadean este módulo dentro de
+ * vistas.
+ *
+ * ⚠️ `as const satisfies` y NO una anotación `Record<SeoLens, string>`: la anotación ensancha
+ * los valores a `string`, y un consumer que declaraba `estimatedMarker: '◑'` habría pasado a
+ * declarar `string` sin que nada fallara. Centralizar no puede costar precisión de tipo.
+ * `satisfies` conserva los literales Y sigue exigiendo que estén las dos lentes. Los consumers derivan el valor de acá; ⚠️ **jamás spreadean este módulo dentro de
  * un DTO cliente** — el redactor de la cola es por construcción explícita justamente para que
  * un campo nuevo no cruce solo, y un spread invertiría esa dirección en silencio.
  */
-export const SEO_LENS_MARKER: Readonly<Record<SeoLens, string>> = {
+export const SEO_LENS_MARKER = {
   measured: '●',
   estimated: '◑'
-}
+} as const satisfies Record<SeoLens, string>
 
 // ─── Las fuentes (vocabulario cerrado) ───────────────────────────────────────
 

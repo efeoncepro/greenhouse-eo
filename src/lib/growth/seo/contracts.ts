@@ -12,6 +12,7 @@
 // import de la forma con especificadores y lo deja como external sin resolver — el gate
 // worker:runtime-deps-gate lo detecta como paquete fantasma `@/lib`.
 import type { SearchConsoleConnectionStatus } from '@/lib/growth/search-console'
+import type { SeoProvenance } from './lens'
 
 /** Códigos de degradación honesta compartidos por el dominio SEO. */
 export type SeoDegradationCode =
@@ -171,6 +172,15 @@ export type KeywordOpportunitiesResult =
       curveSampleSize: { impressions: number; clicks: number } | null
       orderedBy: SeoKeywordOpportunityOrder
       opportunities: KeywordOpportunity[]
+      /**
+       * TASK-1785 — de qué naturaleza es cada cifra de este DTO, por campo.
+       *
+       * Todo acá es Search Console (●): striking distance se calcula sobre demanda medida.
+       * El enriquecimiento de mercado (`searchVolume`, `keywordDifficulty`) es ◑ y viaja en
+       * su propia entrada — es la única parte estimada de un resultado que por lo demás es
+       * medido, y colapsar las dos bajo un rótulo único sería el defecto que esto cierra.
+       */
+      provenance: SeoProvenance[]
     }
   | { ok: false; errorCode: SeoDegradationCode | 'target_not_found'; status: SearchConsoleConnectionStatus | null }
 
@@ -546,6 +556,8 @@ export type BacklinkProfileResult =
       organizationId: string
       range: { from: string; to: string; days: number }
       points: BacklinkProfilePoint[]
+      /** TASK-1785 — perfil de enlaces: ◑ entero (DataForSEO Backlinks), nunca medido. */
+      provenance: SeoProvenance[]
     }
   | {
       ok: false
@@ -587,6 +599,14 @@ export type RankEvolutionResult =
       /** PG = ventana caliente (~180d); BigQuery = historia larga (rango mayor). */
       source: RankEvolutionSource
       series: RankEvolutionSeries[]
+      /**
+       * TASK-1785 — ⚠️ NO confundir con `source` de arriba: ése declara el STORE que sirvió
+       * la serie (`postgres` o `bigquery`), que es una decisión de almacenamiento y no dice
+       * nada de la naturaleza del dato. La lente es ◑ en los dos casos: el origen del dato
+       * es la SERP comprada, viva donde viva. Tener los dos campos juntos es deliberado —
+       * antes había uno solo llamado `source` y se leía como si respondiera ambas preguntas.
+       */
+      provenance: SeoProvenance[]
     }
   | {
       ok: false
@@ -730,6 +750,18 @@ export type SeoPerformanceResult =
        * omitirse en silencio: "pediste 4 y te muestro 2" tiene que ser visible.
        */
       itemsWithoutData: string[]
+      /**
+       * TASK-1785 — 🔴 ESTE es el DTO que probó que la lente no puede vivir a nivel de
+       * resultado. `source` (arriba) declara UNA fuente para todo, pero `summary` es SIEMPRE
+       * Search Console y `standings.clicks/impressions/ctr` también: con
+       * `source = 'dataforseo_estimated'`, este resultado lleva cifras MEDIDAS dentro de un
+       * envoltorio rotulado ESTIMADO. No era un bug de nadie — era la forma del contrato.
+       *
+       * `source` se conserva (es el rótulo del gráfico y hay consumers que lo leen), pero la
+       * verdad por campo está acá, y el test de cobertura exige que cada hoja numérica quede
+       * reclamada por exactamente una entrada.
+       */
+      provenance: SeoProvenance[]
     }
   | {
       ok: false

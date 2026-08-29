@@ -33,6 +33,7 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { type SeoLinkBarrierLevel } from './contracts'
+import { type SeoProvenance, seoProvenance } from './lens'
 import { enforceSeoRunEntitlement } from './entitlement'
 import { isSeoKeywordMarketDataEnabled, isSeoModuleEnabled } from './flags'
 
@@ -838,6 +839,12 @@ export interface ReadKeywordMarketDataResult {
    */
   linkBarrierByKeyword: Map<string, SeoLinkBarrierLevel>
   freshness: SeoMarketDataFreshness
+  /**
+   * TASK-1785 — el hecho de mercado es ◑ ENTERO, sin excepción: volumen, dificultad,
+   * competencia y la barrera derivada de ellos. Es el dato que en es-LATAM peor mide el
+   * proveedor (ISSUE-152), así que presentarlo sin lente le daría estatus de hecho medido.
+   */
+  provenance: SeoProvenance[]
 }
 
 /**
@@ -862,7 +869,9 @@ export const readKeywordMarketData = async (input: {
     market: 'unavailable',
     byKeyword: new Map(),
     linkBarrierByKeyword: new Map(),
-    freshness: { freshKeywords: 0, latestCaptureDate: null }
+    freshness: { freshKeywords: 0, latestCaptureDate: null },
+    // Sin ninguna captura no hay as-of. `null` es el estado, no un hueco que rellenar.
+    provenance: [seoProvenance({ section: '*', source: 'dataforseo_labs', capturedAt: null })]
   }
 
   if (normalized.length === 0) return empty
@@ -959,7 +968,8 @@ export const readKeywordMarketData = async (input: {
     market: 'available',
     byKeyword,
     linkBarrierByKeyword,
-    freshness: { freshKeywords, latestCaptureDate }
+    freshness: { freshKeywords, latestCaptureDate },
+    provenance: [seoProvenance({ section: '*', source: 'dataforseo_labs', capturedAt: latestCaptureDate })]
   }
 }
 
