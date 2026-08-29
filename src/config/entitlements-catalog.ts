@@ -2201,6 +2201,12 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // TASK-1709 — Diagnóstico de prospecto (tier `prospect`). El sujeto no tiene org:
   // la autorización es del ACTOR interno. `run` compromete gasto real (~USD 0,25/corrida)
   // → SOLO EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT; `read` además EFEONCE_OPERATIONS.
+  // TASK-1700 — decidir sobre una entrada de la cola priorizada (aceptar/diferir/descartar/
+  // hecho). VER Y DECIDIR SON DOS PERMISOS: `observation.read` abre la cola, ésta habilita
+  // retirarle trabajo al equipo. Es el punto de confirmación humana del loop
+  // propose → confirm → execute; el LLM propone y NUNCA escribe. Grant: set operador growth
+  // (mismo que target.configure — quien opera el servicio decide qué se trabaja).
+  { key: 'growth.seo.work_queue.decide', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
   { key: 'growth.seo.prospect_diagnostic.run', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
   { key: 'growth.seo.prospect_diagnostic.read', module: 'growth', actions: ['read'] as const, defaultScope: 'tenant' },
   // TASK-353 — Hiring / ATS domain foundation. 8 capabilities V1 del dominio de

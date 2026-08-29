@@ -427,6 +427,18 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: operatorSource
     })
 
+    // TASK-1700 — growth.seo.work_queue.decide: decidir sobre una entrada de la cola
+    // priorizada. Mismo set operador que `target.configure`: quien opera el servicio decide
+    // qué se trabaja. Deliberadamente SEPARADA de `observation.read` — un analista puede leer
+    // el plan completo sin poder retirarle trabajo al equipo.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.seo.work_queue.decide',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
     // TASK-1301 — growth.seo.entitlement.manage: espejo exacto de TASK-1286 (AEO) — el
     // set operador completo NO recibe esta mutación; sólo AM (`efeonce_account`) y admin
     // asignan/cambian/revocan el módulo `seo_v2` per-org.

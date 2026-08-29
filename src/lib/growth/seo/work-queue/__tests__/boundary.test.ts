@@ -86,3 +86,65 @@ describe('TASK-1700 — boundary del módulo de la cola', () => {
     expect(offenders.map(f => path.relative(process.cwd(), f))).toEqual([])
   })
 })
+
+/**
+ * TASK-1700 — 🔴 "La cola PROPONE, no ejecuta" convertido en hecho mecánico.
+ *
+ * Es la clase de invariante que se erosiona por conveniencia: alguien va a querer que
+ * aceptar una recomendación "haga la acción de una vez". Eso convertiría "acepté esta
+ * recomendación" y "comprometí gasto recurrente del proveedor" en el mismo click, sin que
+ * nadie declarara el segundo — el rank capture le paga al proveedor por cada keyword
+ * vigente, en cada ciclo, hasta que alguien la deje de seguir.
+ *
+ * El gate mira el árbol de imports del módulo, no la intención del autor.
+ */
+describe('TASK-1700 — la cola propone, NUNCA ejecuta', () => {
+  /** Commands de escritura de otros dominios que este módulo no puede alcanzar. */
+  const FORBIDDEN_WRITES = [
+    'trackKeywords',
+    'untrackKeywords',
+    'createGroundedQueryDraft',
+    'declareCompetitors',
+    'retireCompetitors',
+    'queueKeywordDiscovery',
+    'queueSiteAudit',
+    'captureRankSnapshot',
+    'runProspectDiagnostic'
+  ]
+
+  it('ningún archivo del módulo importa un command de escritura de otro dominio', () => {
+    const offenders: string[] = []
+
+    for (const file of sourceFiles) {
+      const content = readFileSync(file, 'utf8')
+
+      // Sólo las líneas de import: nombrar un command en un comentario para explicar por
+      // qué NO se llama es exactamente lo que este módulo hace, y no puede romper el gate.
+      const imports = content
+        .split('\n')
+        .filter(line => /^\s*import\b/.test(line) || /^\s+[A-Za-z]/.test(line))
+        .join('\n')
+
+      const importBlocks = content.match(/import\s+\{[^}]*\}\s+from\s+['"][^'"]+['"]/gs) ?? []
+
+      for (const command of FORBIDDEN_WRITES) {
+        if (importBlocks.some(block => new RegExp(`\\b${command}\\b`).test(block))) {
+          offenders.push(`${path.relative(process.cwd(), file)} → ${command}`)
+        }
+      }
+
+      void imports
+    }
+
+    expect(offenders).toEqual([])
+  })
+
+  it('el command de decisión no publica evento outbox (V1: no dispara nada downstream)', () => {
+    // Un evento sin consumer invita a que alguien le cuelgue la ejecución automática, que es
+    // justo lo que este command existe para no hacer.
+    const recordDecision = sourceFiles.find(file => file.endsWith('record-decision.ts'))
+
+    expect(recordDecision).toBeDefined()
+    expect(readFileSync(recordDecision!, 'utf8')).not.toContain('publishOutboxEvent(')
+  })
+})

@@ -22,6 +22,7 @@ import { runGreenhousePostgresQuery } from '../../src/lib/postgres/client'
 import { materializeSeoWorkQueue } from '../../src/lib/growth/seo/work-queue/materialize'
 import { readSeoWorkQueue } from '../../src/lib/growth/seo/work-queue/reader'
 import { toClientWorkQueueDto } from '../../src/lib/growth/seo/work-queue/client-dto'
+import { recordSeoWorkQueueDecision } from '../../src/lib/growth/seo/work-queue/record-decision'
 
 const TARGET = process.argv[2] ?? 'seot-berel-mx'
 const ACTOR = 'sanity-task-1700'
@@ -225,6 +226,84 @@ const main = async () => {
       .filter(term => serialized.includes(term))
 
     check('el DTO cliente no filtra nada sobre datos REALES', leaked.length === 0, leaked.join(', ') || 'limpio')
+  }
+
+  // ── 6. La decisión: anclada al SUJETO y sobreviviendo al siguiente snapshot ──
+  //
+  // Es el invariante que un test con mocks no puede probar: hace falta materializar DOS
+  // veces y comprobar que la decisión sigue resolviendo contra un item que ya no existe.
+  console.log('\n── recordSeoWorkQueueDecision contra PG real ──')
+
+  const target0 = items[0]
+
+  if (target0) {
+    const itemIdRow = await runGreenhousePostgresQuery<{ item_id: string }>(
+      `SELECT item_id FROM greenhouse_growth.seo_work_queue_items
+        WHERE snapshot_id = $1 AND rank_in_snapshot = $2`,
+      [first.snapshotId, target0.rank_in_snapshot]
+    )
+
+    const itemId = itemIdRow[0]?.item_id
+
+    const decided = await recordSeoWorkQueueDecision({
+      itemId: itemId ?? 'seowqi-inexistente',
+      decision: 'dismissed',
+      actor: ACTOR,
+      note: 'sanity TASK-1700',
+      env: ENV_ON
+    })
+
+    check('la decisión se registra', decided.ok, decided.ok ? decided.decisionId : decided.errorCode)
+
+    if (decided.ok) {
+      check(
+        'se ancla al SUJETO derivado del item, no a lo que mande el request',
+        decided.subject.normalizedKeyword === target0.normalized_keyword &&
+          decided.subject.origin === target0.origin,
+        `${decided.subject.origin}/${decided.subject.normalizedKeyword}`
+      )
+    }
+
+    // Anti-oracle: un item inexistente no revela nada.
+    const ghost = await recordSeoWorkQueueDecision({
+      itemId: 'seowqi-00000000-0000-0000-0000-000000000000',
+      decision: 'dismissed',
+      actor: ACTOR,
+      env: ENV_ON
+    })
+
+    check('un item inexistente devuelve item_not_found', !ghost.ok && ghost.errorCode === 'item_not_found')
+
+    // 🔴 El invariante de fondo: materializar de nuevo (forzado) regenera TODOS los items,
+    // así que el `item_id` de arriba deja de existir. La decisión tiene que seguir viva y
+    // seguir retirando el sujeto de la cola.
+    const second = await materializeSeoWorkQueue({ seoTargetId: TARGET, actor: ACTOR, force: true })
+
+    const stillResolves = await runGreenhousePostgresQuery<{ n: string }>(
+      `SELECT COUNT(*)::text AS n FROM greenhouse_growth.seo_work_queue_decisions
+        WHERE seo_target_id = $1 AND origin = $2 AND normalized_keyword = $3`,
+      [TARGET, target0.origin, target0.normalized_keyword]
+    )
+
+    check(
+      'la decisión SOBREVIVE al siguiente snapshot (anclada al sujeto, no al item_id)',
+      Number(stillResolves[0]?.n ?? 0) > 0,
+      `decisiones=${stillResolves[0]?.n}`
+    )
+
+    if (second.ok) {
+      const retired = await runGreenhousePostgresQuery<{ n: string }>(
+        `SELECT COUNT(*)::text AS n FROM greenhouse_growth.seo_work_queue_items
+          WHERE snapshot_id = $1 AND origin = $2 AND normalized_keyword = $3`,
+        [second.snapshotId, target0.origin, target0.normalized_keyword]
+      )
+
+      check(
+        'el sujeto descartado YA NO aparece en el snapshot siguiente',
+        retired[0]?.n === '0',
+        `apariciones=${retired[0]?.n}`
+      )
+    }
   }
 
   console.log(`\n${pass} ok · ${fail} fallo(s)`)
