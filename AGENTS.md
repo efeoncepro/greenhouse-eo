@@ -216,6 +216,13 @@ y [`GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`](docs/ui/GREENHOUSE_PREMIUM_U
   [`REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md`](docs/architecture/agent-invariants/REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md).
 - No ejecutar comandos destructivos ni cambiar de branch en el checkout compartido sin autorización.
 - Validar proporcionalmente: tests/lint/build/manual/runtime según riesgo y dominio.
+- **Una guarda de test que afirma la FORMA TEXTUAL del código no verifica nada.** Comparar el string de un
+  `ORDER BY`, contar ocurrencias de una ruta en un YAML o exigir una línea de `deploy.sh` falla en las dos
+  direcciones y las dos en silencio: verde con el defecto puesto (el `ORDER BY` afirmado consagraba TRES
+  llaves y el comparador tenía CUATRO — 54 de 55 items servidos fuera de su rank persistido, `cf8729771`) o
+  roja con la mejora puesta (`toHaveLength(3)` sobre una ruta se rompió cuando la cobertura pasó a un gate
+  real, `380a20fa3`). La guarda textual **señala al verificador real, no lo reemplaza**: cita el mecanismo en
+  el propio test. Canon: `GREENHOUSE_CANONICAL_PATTERNS_V1.md` §7 (tercera pregunta).
 - **Live tests (`*.live.test.ts`): `pnpm test:live`, NUNCA `set -a; source .env.local`.** Ese `source` exporta
   las ~85 variables del archivo al proceso y tumba tests unitarios de otros dominios que afirman DEFAULTS
   (secrets, cloud/billing, cloud/postgres, emails); `test:live` pasa **sólo acceso a base** y rechaza cualquier

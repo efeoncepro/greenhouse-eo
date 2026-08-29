@@ -159,6 +159,25 @@ TASK-931 optimiza el plano remoto: split CI, path filters, budgets y workflow/jo
 
 Este operating model optimiza el plano humano/agente: menos pushes innecesarios y mejor evidencia local antes de gastar compute remoto.
 
-## Delta YYYY-MM-DD
+## Delta 2026-08-29 — el push no termina hasta leer el veredicto
 
-N/A.
+Local-first mueve la iteracion barata al entorno local, pero no releva de leer CI cuando finalmente se
+empuja. El 2026-08-29 un agente empujo cuatro veces al hilo a `develop` sin abrir ningun resultado de
+`ci.yml`: dos runs quedaron en `failure` y nadie los miro; el rojo lo encontro una auditoria ajena horas
+despues, cuando reventó en CI Deep durante un release.
+
+Dos mecanismos vigentes de `ci.yml` hacen que la señal se vea intermitente en una rafaga, y ninguno es
+un bug: `cancel-in-progress` esta activo para `develop` (el veredicto es del ULTIMO push de la rafaga,
+no de cada commit) y `paths-ignore` deja sin run a los commits docs-only.
+
+Por eso la regla de la tabla de push policy —"push solo con validacion local y confirmacion humana"—
+se completa asi: despues de CADA push a `develop`, resolver el veredicto del SHA empujado.
+
+```bash
+gh run list --workflow=ci.yml --limit=100 --json headSha,conclusion \
+  -q ".[] | select(.headSha==\"$(git rev-parse HEAD)\") | .conclusion"
+```
+
+Vacio o `cancelled` significa **sin veredicto**, que no es lo mismo que verde. El cierre exige que el
+ultimo SHA de la rafaga salga `success`. Detalle completo del caso y sus reglas duras:
+`docs/operations/TASK_CLOSING_QUALITY_GATE_V1.md`.

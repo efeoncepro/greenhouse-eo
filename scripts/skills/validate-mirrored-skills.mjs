@@ -19,6 +19,18 @@ const repo = resolve(new URL('../..', import.meta.url).pathname)
 
 const mirroredSkills = [
   {
+    // La skill de release declara "Paridad obligatoria entre agentes" en su propio texto, y hasta
+    // 2026-08-29 NADA lo verificaba: no estaba en este allowlist. Una afirmación sin mecanismo es
+    // exactamente lo que un espejo divergente aprovecha — dos agentes promoviendo a producción con
+    // reglas distintas. Va en `shared-files` porque el lado Codex tiene un `agents/openai.yaml` que
+    // el lado Claude no consume; todo lo demás, `SKILL.md` incluido, debe ser idéntico.
+    id: 'greenhouse-production-release',
+    mode: 'shared-files',
+    agentLocal: ['agents/openai.yaml'],
+    codex: '.codex/skills/greenhouse-production-release',
+    claude: '.claude/skills/greenhouse-production-release',
+  },
+  {
     // Data Studio se opera por UI y cambia con frecuencia. Codex y Claude deben compartir el mismo
     // catálogo, límites de autorización y protocolo browser para no editar un reporte con dos reglas.
     id: 'google-data-studio',
@@ -206,7 +218,7 @@ const failures = []
 for (const manifest of mirroredSkills) {
   const { id, mode, codex, claude } = manifest
 
-  if (mode !== 'byte-identical') {
+  if (mode !== 'byte-identical' && mode !== 'shared-files') {
     failures.push(`${id}: unsupported mirror mode '${mode}'`)
     continue
   }
@@ -221,10 +233,24 @@ for (const manifest of mirroredSkills) {
     continue
   }
 
+  /*
+   * `shared-files` existe para skills cuyo bundle DIFIERE de forma legítima entre agentes
+   * (por ejemplo un `agents/openai.yaml` que sólo el lado Codex consume), pero cuyo contenido
+   * compartido igual tiene que ser idéntico.
+   *
+   * 🔴 La exención es NOMINAL, nunca por patrón: cada archivo agent-local se declara en
+   * `agentLocal`. Un archivo nuevo que diverja SIGUE fallando — que es el punto. Sin esto la
+   * única alternativa era dejar la skill fuera del validador, y ahí su "paridad obligatoria"
+   * queda siendo una afirmación en prosa que nada verifica.
+   */
+  const agentLocal = new Set(mode === 'shared-files' ? (manifest.agentLocal ?? []) : [])
+
   const paths = [...new Set([...codexFiles, ...claudeFiles])].sort()
 
   for (const path of paths) {
     if (!codexFiles.includes(path) || !claudeFiles.includes(path)) {
+      if (agentLocal.has(path)) continue
+
       failures.push(`${id}: ${path} exists in only one mirror`)
       continue
     }

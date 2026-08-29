@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-05-10 por TASK-849 V1.1
-> **Ultima actualizacion:** 2026-07-09
+> **Ultima actualizacion:** 2026-08-29
 > **Documentacion tecnica:** [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 > **Manual operativo:** [release-watchdog manual de uso](../../manual-de-uso/plataforma/release-watchdog.md)
 
@@ -150,9 +150,21 @@ NO confunde con:
    contra el `GIT_SHA` servido por Cloud Run. Si `ops-worker` no tuvo cambios en
    sus rutas runtime, el workflow puede saltar el rebuild (`deploy_needed=false`)
    y Cloud Run conserva un SHA anterior aunque el código servido sea equivalente
-   al target. El operador debe validar el diff runtime; si está vacío y el
+   al target. El operador debe validar el diff; si está vacío y el
    servicio está `Ready=True`, el hallazgo es residual de label y no requiere
    redeploy.
+
+   > **Delta 2026-08-29 — el diff que vale es el de ÁRBOL COMPLETO, no el de rutas.**
+   > Un skip prueba que las rutas **declaradas** en el workflow no cambiaron, no que
+   > el worker esté al día: si el worker empaqueta código de una ruta que la lista no
+   > menciona, el skip es falso y el worker queda sirviendo la imagen anterior con
+   > todo verde. Pasó en el release `64bdd105c737` (manifest `released`, watchdog
+   > `drift_count=0`, `ops-worker` sirviendo el código que ese release existía para
+   > corregir). El criterio correcto es `git diff --name-only <sha_servido> <sha_target>`
+   > **sin `--`**: vacío ⇒ árboles idénticos ⇒ skip legítimo (así se validó el skip de
+   > 44 s del release `e1718a359575`). La causa de fondo — la lista de rutas — la cierra
+   > el gate `pnpm worker:deploy-path-gate`, que deriva la cobertura del bundle real.
+   > Manual: [cobertura de rutas de deploy de los workers](../../manual-de-uso/plataforma/verificar-cobertura-de-deploy-de-workers.md).
 
 ## Roadmap futuro
 
