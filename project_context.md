@@ -121,11 +121,12 @@ compartido staging+prod**, así que una capacidad worker-only queda viva al merg
 control plane, y **no existe un flip "sólo staging"** (invariantes en
 [`OPS_RELIABILITY_AGENT_INVARIANTS.md`](docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md)).
 
-Berel se opera desde Notion con la skill espejo `berel-content-production`; la modalidad se decide por
-contenido público vivo —no por HTTP 200 ni por un `Enlace` planificado— y el cierre relee relaciones,
-conteos, fechas, estados y paridad tarea/subítem porque las automatizaciones pueden cambiar lo escrito. La
-paridad social se deposita en dos fases usando una sola cadena final; piezas históricas, sensibles, destinadas a
-consolidación o con soft-404 conservan un gate visible y no se programan hasta la validación dueña.
+Berel se opera desde Notion con `berel-content-production`: decide por contenido público vivo, relee relaciones y
+conteos al cerrar, y mantiene gates visibles para piezas históricas, sensibles, soft-404 o aún no validadas.
+
+Las landings WordPress/Ohio se enrutan por `efeonce-public-site-wordpress` y su `references/landing-registry.md`. La
+referencia Elementor + Growth + SEO/AEO es `TASK-1598`; después de cada resave ejecuta sus gates de fidelidad y SEO.
+`Index eligible` no significa `indexed`: lo segundo requiere Search Console.
 
 ### Lectura mínima obligatoria
 

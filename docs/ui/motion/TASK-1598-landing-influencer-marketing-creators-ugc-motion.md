@@ -2,7 +2,7 @@
 
 ## Meta
 
-- Status: `draft`
+- Status: `implemented`
 - Owner task: `TASK-1598`
 - Motion: `microinteraction` + `scroll`; una sección firma acotada.
 - Primitive: CSS/IntersectionObserver del sitio público; no wrappers del portal.

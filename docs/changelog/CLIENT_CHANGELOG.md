@@ -42,6 +42,29 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.08-stable.1
+
+**Canal:** Stable
+**Fecha:** 2026-08-28
+**Disponible para:** general
+**Módulos:** Sitio público / Influencer Marketing
+
+El reproductor principal conserva los tres videos y sus controles de reproducción/sonido, junto con las señales
+visuales de derechos y formatos del diseño aprobado. La experiencia se validó en escritorio, tablet y móvil.
+
+### Novedades
+
+- La nueva página pública `efeoncepro.com/servicios/agencia-de-influencers/` explica la oferta de influencer
+  marketing, creators y UGC de Efeonce, incluyendo selección, contenido, derechos, amplificación y medición.
+- Los visitantes pueden enviar un brief gobernado o abrir la agenda de discovery dentro de la experiencia Efeonce.
+- La página incorpora una presentación optimizada al compartirla en redes y metadatos de búsqueda alineados con la
+  oferta de agencia de influencers y UGC en Chile, Colombia, México y Perú.
+
+### Notas
+
+- Los videos de la página son visuales ilustrativos generados con IA y están identificados como tales; no representan
+  testimonios ni resultados de clientes.
+
 ## 2026.07-beta.2
 
 **Canal:** Beta

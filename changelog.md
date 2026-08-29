@@ -35,7 +35,25 @@
   badge de derechos, stack social, pulgar decorativo, selección por teclado de ofertas, CTA sticky y reveals. El gate
   nuevo `public-website:verify-influencer-landing-fidelity` ejerce esos contratos en 1536/1440/890/390 y reduced
   motion. Tras el segundo review, el hero mide el masthead Ohio y reserva 32 px adicionales: kicker, teléfono y
-  sticker ya no entran en el área visual del header en ningún breakpoint probado.
+  sticker ya no entran en el área visual del header en ningún breakpoint probado. Tras el tercer review se corrigió
+  la cascada `font: inherit` que dejaba los CTA en peso 400 y se consolidó un sistema AXIS con siete botones
+  primary/secondary/tonal, iconos sin discos de fondo, foco doble, targets ≥44 px y sticky `inert` al ocultarse. El
+  hero mantiene una sola acción sólida (`Agenda una reunión`); `Cuéntanos tu campaña` sigue como enlace secundario.
+  El intro de conversión se mantiene sticky a 32 px junto al formulario desde 761 px; en móvil se apila y vuelve a
+  flujo estático. El intro del FAQ es sticky sólo cuando caben sus dos columnas (>900 px); en 890/390 se apila y
+  queda estático para no cubrir el acordeón durante el scroll. El gate cubre estos contratos en 1536/1440/890/390.
+- Se corrigió la desaparición del brief: el loader estable de meetings sólo registraba
+  `<efeonce-meeting-scheduler>` y dejaba vacío `<greenhouse-form>`. La landing carga ahora el renderer canónico de
+  Growth Forms y conserva fallback host-owned. El gate live ya no acepta la mera etiqueta: exige custom element,
+  root, siete bloques de campo, CTA submit, altura útil y ausencia del fallback tras montar.
+- El brief se rediseñó como una sola superficie editorial premium: encabezado útil, duración, señales de confianza,
+  seis iconos semánticos sin discos, controles de 56 px con texto de 16 px, estados focus/autofill/error, consentimiento
+  tonal y submit full-width. El cambio es host/CSS page-scoped; no bifurca contrato, validación, Turnstile, destino ni
+  tracking. El scorecard visual live quedó en `4.68/5` y el gate cubre el contrato visual en 1536/1440/890/390.
+- El último review refinó el ritmo del form, reemplazó la URL cruda por `Consulta nuestra Política de privacidad` y
+  convirtió los selects en controles tonales con affordance propia. El acordeón de agenda se retiró: el Growth CTA
+  published `influencer-discovery-meeting` abre `open_meeting_scheduler` en diálogo nativo sobre el scheduler
+  `discovery`; el smoke live verificó teclado, 390 px, reduced motion y cero enlaces HubSpot sin crear una reserva.
 - Se publicó `https://efeoncepro.com/servicios/agencia-de-influencers/` como página Elementor `251627`, conservando
   el header/footer Ohio global y la dirección visual aprobada de Claude Design. El slug responde a intención comercial
   validada en CL, MX, CO y PE; la página sirve canonical, `index, follow`, schema visible y sitemap/lastmod.
@@ -45,6 +63,12 @@
 - Los seis clips únicos del diseño están activos y rotulados como visuales ilustrativos generados con IA, no casos ni
   resultados. QA live post-cache cubrió secuencia/interacciones, teclado, form, meeting, FAQ, schema, overflow,
   consola y performance de laboratorio; snapshots de página y menú dejan rollback acotado.
+- El hardening SEO/AEO final publicó title y description comerciales, canonical/robots/excerpt, Open Graph/Twitter con
+  imagen dedicada `1200×630` y un grafo sin entidades duplicadas: Yoast posee WebPage/Breadcrumb/WebSite/Organization;
+  la página completa Service con cinco ofertas y FAQPage con seis respuestas visibles. El gate live nuevo valida
+  metadata, imagen, schema, sitemap, menú y HTML inicial. La ruta queda publicada y elegible para indexación, sin
+  presentar ese estado como prueba de indexación en Google. Menú: `Soluciones → Servicios Destacados`, después de
+  `Redes Sociales`.
 
 ## 2026-08-28 — La curva de CTR declara si es utilizable, o la lente no ordena (`TASK-1792`)
 

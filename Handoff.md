@@ -53,7 +53,7 @@ propia canibalización antes de perseguir posiciones nuevas.
 
 ## 2026-08-28 — `TASK-1598` publicada: Agencia de influencers
 
-**Estado: `complete`, publicado e indexable.** La landing vive en
+**Estado: `complete`, publicada y elegible para indexación.** La landing vive en
 `https://efeoncepro.com/servicios/agencia-de-influencers/` (WordPress `251627`) como documento Elementor normal,
 con header/footer Ohio globales y sin el chrome del export Claude. Keyword/slug se validaron con DataForSEO en CL,
 MX, CO y PE; el readback sirve title/meta, canonical autorreferente, `index, follow`, sitemap/lastmod y menu item
@@ -65,22 +65,62 @@ play/pausa, sonido, progreso, badge de derechos, stack social, pulgar decorativo
 reveals. El hero reserva la altura real del masthead Ohio más 32 px y responde a resize; el gate durable
 `pnpm public-website:verify-influencer-landing-fidelity` pasó post-cache en 1536/1440/890/390 y reduced motion,
 con al menos 28 px medidos bajo el header, sin overflow ni errores de consola; capturas en
-`.captures/task1598-influencer-fidelity-2026-08-29T01-12-35-487Z/`.
+`.captures/task1598-influencer-fidelity-2026-08-29T02-03-15-736Z/`. El gate ahora exige que el Growth Form registre
+su custom element, monte siete bloques de campo y exponga submit; esto cerró la regresión donde el loader del meeting
+dejaba `<greenhouse-form>` vacío. El sistema corrige además la cascada que degradaba los
+CTA a peso 400: siete botones usan Geist 600, variantes primary/secondary/tonal, target ≥44 px, foco doble y
+hover/active con reduced-motion. Los iconos ya no tienen disco de fondo. En el hero sólo `Agenda una reunión`
+conserva fill; `Cuéntanos tu campaña` vuelve a ser enlace secundario transparente. El sticky oculto usa `inert`. El
+intro de conversión queda sticky a 32 px junto al formulario desde 761 px y vuelve a flujo estático apilado en móvil.
+El FAQ conserva sticky sólo cuando caben sus dos columnas (>900 px); a 890/390 se apila, queda estático y no se
+superpone al acordeón.
 
 - Growth Form publicado: `efeonce-creator-influence-brief`, key
   `d2c68012-2a6b-41d6-b3dd-4b8ccbff6ee3`, surface `fhsf-efeonce-creator-influence`; captura gobernada en
   Greenhouse, Turnstile invisible y consentimiento. HubSpot directo continúa deshabilitado por el gate general.
 - Meeting: surface canónica `fhsf-efeonce-lead-gen-web`, scheduler `discovery`; no expone proveedor ni URL directa.
-- Visual/risk: cuatro videos del source aprobados y rotulados como IA ilustrativa, no resultados/testimonios. QA live
-  post-cache: 1440/390/reduced-motion, teclado, form/meeting/FAQ/schema, cero consola/imágenes rotas/overflow real.
-- Hash Elementor: `ff1ca667589a5e40431413042d5872430e0fcc402c6e3a22440359eeaa223058`. Snapshot inmediato:
-  `_gh_backup_before_task1598_fidelity_repair_20260829T011226Z`. Snapshot de fidelidad anterior:
+- Visual/risk: seis videos del source aprobados y rotulados como IA ilustrativa, no resultados/testimonios. QA live
+  post-cache: 1536/1440/890/390/reduced-motion, teclado, form/meeting/FAQ/schema, cero
+  consola/imágenes rotas/overflow real.
+- El Growth Form usa ahora host visual editorial premium: header/trust chrome, seis iconos lineales sin discos,
+  controles de 56 px/16 px, focus/autofill/error reforzados, consentimiento tonal y submit full-width. El contrato,
+  campos, Turnstile, destino y telemetría siguen gobernados por Growth Forms. Scorecard `PASS 4.68/5` en
+  `docs/ui/reviews/TASK-1598-influencer-growth-form-premium-2026-08-28.md`; captura focal:
+  `.captures/task1598-form-premium-live-2026-08-29T0206Z/`.
+- Refinamiento final: privacidad usa el texto enlazado `Consulta nuestra Política de privacidad`; se eliminaron
+  ayudas redundantes que rompían el ritmo de las parejas de campos y los selects usan affordance propia tonal.
+  El acordeón de meeting fue retirado: CTA `influencer-discovery-meeting` / surface
+  `csur-b59e4e3b-220f-47e7-b930-c27a30dd61b9` abre `open_meeting_scheduler` en diálogo nativo sobre
+  `fhsf-efeonce-lead-gen-web` / `discovery`, sin enlace visible a HubSpot. QA final:
+  `.captures/task1598-influencer-fidelity-2026-08-29T02-22-01-382Z/`.
+- Hash Elementor post-fidelidad, previo al hardening SEO: `a0c446c66aad68ddba536d7094527279444e5bcf49d1bfc8af0000065371f68d`. Snapshot inmediato:
+  `_gh_backup_before_task1598_fidelity_repair_20260829T022153Z`. Snapshot CTA anterior:
+  `_gh_backup_before_task1598_fidelity_repair_20260829T022058Z`. Snapshot premium anterior:
+  `_gh_backup_before_task1598_fidelity_repair_20260829T020845Z`. Snapshot premium base anterior:
+  `_gh_backup_before_task1598_fidelity_repair_20260829T020255Z`. Snapshot de fidelidad anterior:
+  `_gh_backup_before_task1598_fidelity_repair_20260829T015320Z`; snapshot anterior:
+  `_gh_backup_before_task1598_fidelity_repair_20260829T014742Z`; snapshot anterior:
+  `_gh_backup_before_task1598_fidelity_repair_20260829T013649Z`; snapshot anterior:
+  `_gh_backup_before_task1598_fidelity_repair_20260829T012818Z`; snapshot anterior:
+  `_gh_backup_before_task1598_fidelity_repair_20260829T012433Z`; snapshot previo:
+  `_gh_backup_before_task1598_fidelity_repair_20260829T011226Z`; snapshot previo:
   `_gh_backup_before_task1598_fidelity_repair_20260829T010201Z`. Snapshots iniciales:
   `_gh_backup_before_task1598_20260829T001722Z`, `_gh_backup_before_task1598_render_fix_20260829T002005Z`,
   `_gh_backup_before_task1598_index_20260829T002549Z`; menu:
   `_gh_backup_before_task1598_menu_20260829T003200Z`.
 - No se creó un lead o booking ficticio. La primera interacción humana validará los recibos reales; no es un paso de
   rollout pendiente de la página.
+
+**Hardening SEO/AEO final 2026-08-29:** title `Agencia de influencers y UGC para marcas | Efeonce`, description de
+147 caracteres, canonical autorreferente, `index, follow`, excerpt y metadata social diferenciada. El attachment
+`251693` sirve una imagen OG/Twitter PNG `1200×630`. Yoast conserva `WebPage`, `BreadcrumbList`, `WebSite` y
+`Organization`; el bloque page-scoped añade sólo `Service` con cinco ofertas y `FAQPage` con seis respuestas visibles,
+sin duplicar breadcrumb o entidad. El menú queda en `Soluciones → Servicios Destacados`, inmediatamente después de
+`Redes Sociales`. `pnpm public-website:verify-influencer-seo-package` y el gate de fidelidad final pasaron live. Hash
+Elementor vigente: `580f4f604dd1e6ef911b397568fd9575f2117db01c6793d02dc98162bb4ac2f9`; rollback inmediato:
+`_gh_backup_before_task1598_seo_20260829T024347Z`. Auditoría:
+`docs/audits/public-site/2026-08-29-influencer-landing-seo-aeo-readback.md`. La indexación efectiva se comprobará en
+Search Console; no se infiere del estado `publish + index`.
 
 ## 2026-08-28 — `TASK-1792` complete: la curva de CTR declara su usabilidad
 

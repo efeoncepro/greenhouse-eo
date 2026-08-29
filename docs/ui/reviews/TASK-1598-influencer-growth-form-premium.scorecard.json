@@ -1,0 +1,94 @@
+{
+  "taskId": "TASK-1598",
+  "scenario": "influencer landing premium Growth Form and native meeting CTA",
+  "reviewedAt": "2026-08-28",
+  "reviewer": "Codex — live visual and interaction review at 1536, 1440, 890 and 390 px",
+  "uiRigor": "ui-standard",
+  "directionMode": "source-led",
+  "wireframe": "docs/ui/wireframes/TASK-1598-landing-influencer-marketing-creators-ugc.md",
+  "evidence": {
+    "desktop": ".captures/task1598-influencer-fidelity-2026-08-29T02-22-01-382Z/conversion-1440.png",
+    "tablet": ".captures/task1598-influencer-fidelity-2026-08-29T02-22-01-382Z/conversion-890.png",
+    "mobile": ".captures/task1598-influencer-fidelity-2026-08-29T02-22-01-382Z/conversion-390.png",
+    "captures": ".captures/task1598-influencer-fidelity-2026-08-29T02-22-01-382Z/",
+    "dossier": "docs/ui/reviews/TASK-1598-influencer-growth-form-premium-2026-08-28.md",
+    "functional": "Growth Form mounted with seven groups; empty-submit validation remained local; Growth CTA opened the native discovery scheduler dialog with zero HubSpot links and no booking."
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.8,
+      "rationale": "Eyebrow, title, context, trust, fields and full-width submit read in one clear sequence.",
+      "evidence": "desktop and tablet conversion captures"
+    },
+    "proportions": {
+      "score": 4.7,
+      "rationale": "The single 28 px paper balances the sticky editorial intro and reduces to 22 px on mobile.",
+      "evidence": "desktop, tablet and mobile conversion captures"
+    },
+    "rhythm": {
+      "score": 4.7,
+      "rationale": "Redundant paired-field helpers were removed; labels, 56 px controls and section breaks now keep a symmetric cadence.",
+      "evidence": "tablet conversion capture"
+    },
+    "density": {
+      "score": 4.4,
+      "rationale": "Seven governed groups remain intentionally long, but the open layout and concise help maintain scanability.",
+      "evidence": "mobile conversion capture",
+      "nextAction": "Any further shortening must be tested as a new governed Growth Form version; do not hide required operational fields with CSS or convert this host into a local wizard."
+    },
+    "depth": {
+      "score": 4.7,
+      "rationale": "One principal paper, restrained elevation and one justified legal sub-surface avoid nested-card noise.",
+      "evidence": "desktop conversion capture"
+    },
+    "surfaceEconomy": {
+      "score": 4.7,
+      "rationale": "The form uses one surface; the native meeting CTA is a separate governed alternative, not another local accordion.",
+      "evidence": "full conversion section"
+    },
+    "visualImpact": {
+      "score": 4.6,
+      "rationale": "A thin blue-to-green signature, restrained tint and spotlight meeting CTA create identity without spectacle.",
+      "evidence": "desktop conversion capture"
+    },
+    "typography": {
+      "score": 4.7,
+      "rationale": "Poppins is limited to the editorial heading; Geist carries controls at a legible 16 px minimum.",
+      "evidence": "computed live contract"
+    },
+    "color": {
+      "score": 4.7,
+      "rationale": "Neutral fields, blue functional states and supporting green accents preserve clear contrast and meaning.",
+      "evidence": "all conversion captures"
+    },
+    "iconography": {
+      "score": 4.8,
+      "rationale": "Six semantic line icons, trust symbols and select chevrons use one visual language without decorative disks.",
+      "evidence": "tablet conversion capture"
+    },
+    "responsive": {
+      "score": 4.7,
+      "rationale": "Pairs become one column, actions remain full-width where needed and every tested viewport has zero page overflow.",
+      "evidence": "1536, 1440, 890 and 390 px gate"
+    },
+    "motion": {
+      "score": 4.5,
+      "rationale": "Focus, hover and lift are causal; reduced motion reaches the same complete state.",
+      "evidence": "reduced-motion gate"
+    },
+    "fidelity": {
+      "score": 4.7,
+      "rationale": "The approved Claude Design composition and conversion hierarchy remain while governed form and meeting primitives replace local approximations.",
+      "evidence": "source-led wireframe and live captures"
+    },
+    "genericTemplateResistance": {
+      "score": 4.8,
+      "rationale": "Editorial chrome, creator-specific cues and the native meeting task surface avoid a generic contact-form treatment.",
+      "evidence": "desktop and mobile conversion captures"
+    }
+  },
+  "average": 4.68,
+  "floor": 4.4,
+  "threshold": "average >= 4.5; floor >= 4; hierarchy/surfaceEconomy/visualImpact/fidelity/genericTemplateResistance >= 4.5",
+  "verdict": "pass"
+}

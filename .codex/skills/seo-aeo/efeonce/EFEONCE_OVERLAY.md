@@ -96,6 +96,20 @@
 - **Cross-repo safety:** si el trabajo toca el repo del sitio público vs.
   greenhouse-eo, respetar las reglas de cross-repo action safety del `CLAUDE.md`.
 
+### Landing comercial WordPress + Yoast
+
+- Yoast posee `WebPage`, `WebSite`, `BreadcrumbList` y `Organization`; el JSON-LD page-scoped sólo completa tipos
+  ausentes como `Service` o `FAQPage` y referencia los mismos `@id`. Nunca dupliques el breadcrumb o la entidad.
+- Deriva `OfferCatalog` y FAQ de contenido visible, valida paridad exacta de conteo/texto y usa el anchor que existe en
+  el runtime, no uno supuesto.
+- Cada landing indexable usa un raster Open Graph/Twitter dedicado de `1200×630`, title social y description social;
+  verifica el HTML live porque una post meta puede no gobernar el presenter actual de Yoast.
+- Lee canonical, robots, sitemap, menú, HTML inicial y schema desde producción. Distingue siempre `index eligible` de
+  `indexed`; sólo Search Console demuestra lo segundo.
+- Para la implementación de referencia, ver
+  `efeonce-public-site-wordpress/references/landings/influencer-marketing.md` y
+  `docs/audits/public-site/2026-08-29-influencer-landing-seo-aeo-readback.md`.
+
 ## Producto que operacionaliza esta skill en Efeonce
 Greenhouse está construyendo el **AI Visibility Grader** (dominio `growth`,
 TASK-1226/1227) — el lead magnet + instrumento de medición que productiza este
