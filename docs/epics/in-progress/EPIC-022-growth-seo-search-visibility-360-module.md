@@ -129,6 +129,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1299` — schema `growth.seo` (targets, keyword_sets, competitors, snapshots append-only) — bloqueador fundacional.
 - `TASK-1300` — DataForSEO family registry (ampliar allowlist + breaker + cost por familia) — bloquea todo lo provider-facing.
 - `TASK-1301` — capabilities `growth.seo.*` + entitlement per-org + chokepoint `enforceSeoRunEntitlement`.
+- `TASK-1797` — política del umbral de impresiones del striking-distance: se declara relativa (`max(piso, p75)`) y el percentil cae sobre el piso en las dos orgs medidas. Detalle en el carril de instrumentación y autoridad de orden, más abajo.
 - `TASK-1302` — [planificada] GSC daily snapshot materializer + `readKeywordOpportunities` (quick win, reusa TASK-1282).
 - `TASK-1303` — [**complete 2026-08-06**, en producción] rank capture command + `readRankEvolution` + Cloud Scheduler + reactive BQ mirror. Release `fcee5ab9f7ce` (manifest released); scheduler `ops-seo-rank-capture` diario 05:00 CLT ACTIVO; serie día-1 de Berel con 31 keywords; señal `seo.rank.capture_lag` en Growth Health; 4.ª MCP tool `get_seo_rank_evolution` viva en el MCP interno de producción (federación al gateway = TASK-1653).
 - `TASK-1304` — [planificada] site audit (queue+poll OnPage) + backlink snapshot.
@@ -980,6 +981,7 @@ abarata por cadencia y muestreo (`TASK-1704`).
 - `TASK-1707` — rollout del re-grade recurrente multi-runtime.
 - `TASK-1708` — estacionalidad: la serie de 12 meses que ya viene en `keyword_info`.
 - `TASK-1709` — carril de diagnóstico de prospecto SEO. *100 diagnósticos ≈ USD 50.*
+- `TASK-1797` — el umbral de impresiones del striking-distance no discrimina: se declara relativo (`max(piso, p75)`) y el percentil cae sobre el piso en las dos orgs medidas (Berel p75=10, Efeonce p75=12, piso 10). Obliga a medir las tres etapas del embudo —1748 elegibles → 600 pedidos → 200 del cap— antes de mover la constante, porque el cap manda sobre el umbral y subirlo no cambiaría lo que el operador ve.
 
 ### Tasks congeladas, con disparador nombrado (ninguna se mata)
 
