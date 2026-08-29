@@ -174,6 +174,34 @@ Consecuencia: **una suite live entera puede no haber ejercitado nada y verse ver
 - No declares un live test como evidencia de verificación sin citar el conteo de tests que
   efectivamente corrieron.
 
+#### 🔴 La variante que acusa en falso: el skip del runner equivocado
+
+El mismo skip tiene un segundo filo, y apunta al lado contrario. Cuando **quien lee no es el autor
+sino un verificador**, un `skipped` no se lee como «esto no se ejercitó»: se lee como **«el autor
+declaró una evidencia que nunca corrió»**. Es una acusación, y el runner equivocado la fabrica solo.
+
+**Reproducido el 2026-08-28, mismo archivo, mismo minuto, misma máquina:**
+
+```bash
+npx vitest run src/lib/growth/seo/ctr-curve.live.test.ts   # → Tests 4 skipped
+pnpm test:live src/lib/growth/seo/ctr-curve                # → Tests 4 passed
+```
+
+`vitest run` directo **no exporta las credenciales**: `pnpm test:live` es justamente el runner que
+las inyecta (y sólo el prefijo `GREENHOUSE_POSTGRES_`, ver §1). Sin ellas el predicado de gating se
+evalúa falso y el archivo se salta — el test está perfecto, el criterio de aceptación del autor era
+cierto, y la lectura era la equivocada. Una sesión que revisaba el cierre de `TASK-1792` estuvo a
+punto de reportarle al operador que el «4 passed, no skipped» del autor era un verde falso.
+
+**Reglas, en los dos sentidos:**
+
+- **Antes de acusar a un live test de no haber corrido, verifica CON QUÉ runner se corrió.** Un
+  `skipped` de `vitest run` no dice nada sobre el test: dice que lo invocaste sin credenciales.
+- **Al declarar la evidencia, cita el comando además del conteo.** «4 passed» es refutable; `pnpm
+  test:live <path> → 4 passed` es reproducible. La diferencia importa cuando el lector es otro.
+- Corolario general del archivo: **un skip nunca es un hecho sobre el código — es un hecho sobre la
+  invocación.** Los dos errores de lectura (creerlo verde, creerlo mentira) salen de olvidar eso.
+
 ### 4.2 Proxy caído: los tests **pasan** y la suite igual sale **roja**
 
 Sin Cloud SQL Proxy arriba, quien no logra conectarse no es el test sino el **teardown**. La salida
