@@ -71,9 +71,7 @@ describe('TASK-1700 — boundary del módulo de la cola', () => {
   it('NINGÚN archivo importa @core, @menu ni @layouts (el materializador va al bundle del worker)', () => {
     // Un import de tema/UI acá revienta el arranque del ops-worker en silencio (bug class
     // documentada en los invariantes de Ops/Reliability).
-    const offenders = sourceFiles.filter(file =>
-      /from\s+['"]@(core|menu|layouts)\//.test(readFileSync(file, 'utf8'))
-    )
+    const offenders = sourceFiles.filter(file => /from\s+['"]@(core|menu|layouts)\//.test(readFileSync(file, 'utf8')))
 
     expect(offenders.map(f => path.relative(process.cwd(), f))).toEqual([])
   })
@@ -169,5 +167,34 @@ describe('TASK-1700 — la cola propone, NUNCA ejecuta', () => {
 
     expect(recordDecision).toBeDefined()
     expect(readFileSync(recordDecision!, 'utf8')).not.toContain('publishOutboxEvent(')
+  })
+})
+
+/**
+ * TASK-1700 v2 — El piso de recomputación NO puede reusar un snapshot de otra versión.
+ *
+ * Va acá y no en un test de comportamiento por la misma razón que el resto de este archivo:
+ * es una afirmación sobre lo que el código NO debe hacer, y el defecto que cierra fue
+ * INVISIBLE durante toda la vida de v1. Con una sola versión publicada, reusar "el snapshot
+ * más reciente dentro de la ventana" y reportar la versión ACTIVA daban siempre lo mismo.
+ * Al publicar v2 el mismo código pasó a devolver `priorityScoreVersion: 'incremental-clicks-v2'`
+ * apuntando a un snapshot v1 — un campo que miente, no uno desactualizado — y además dejaba
+ * el bump sin efecto hasta 60 minutos por target.
+ */
+describe('TASK-1700 v2 — piso de recomputación versionado', () => {
+  const source = readFileSync(path.join(MODULE_DIR, 'materialize.ts'), 'utf8')
+
+  it('el piso filtra por priority_score_version', () => {
+    expect(
+      source,
+      'el piso de recomputación dejó de filtrar por versión: un bump quedaría sin efecto y reusaría reglas viejas'
+    ).toContain('AND priority_score_version = $3')
+  })
+
+  it('la versión devuelta sale de la FILA, jamás de la constante activa', () => {
+    expect(
+      source,
+      'el retorno de `reused` volvió a afirmar la versión activa sobre una fila que puede no serlo'
+    ).toContain('priorityScoreVersion: fresh.priority_score_version')
   })
 })

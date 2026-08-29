@@ -30,6 +30,9 @@ import 'server-only'
 /** Alcance de las filas de GSC con que se deriva la curva de CTR por posición. */
 export type CtrCurveScope = 'all_rows' | 'non_brand'
 
+/** Cómo se decide si una query es de marca. `none` = la versión no distingue marca. */
+export type BrandDetection = 'none' | 'root_domain_label'
+
 export interface PriorityScoreConfig {
   version: string
   /** Ventana de la demanda medida, en días. 28 = 4 ciclos semanales completos. */
@@ -88,6 +91,44 @@ export interface PriorityScoreConfig {
    */
   curveMinBucketImpressions: number
   curveMinBucketClicks: number
+  /**
+   * 🔴 Share máximo de la página principal para llamar CANIBALIZADA a una query.
+   *
+   * v1 no tenía este número porque no medía concentración: preguntaba `COUNT(DISTINCT page)
+   * > 1`. Declararlo en v1 como `1` no cambia su comportamiento — con share ≤ 1 toda query
+   * multi-página califica, que es exactamente lo que v1 hacía — sino que ESCRIBE la regla
+   * que v1 aplicaba de forma implícita. Los vectores dorados de v1 lo prueban: son los
+   * mismos antes y después de agregar el campo.
+   *
+   * `0.7` en v2 sale de la distribución medida, no del gusto: en berel.com la población
+   * no-marca tiene un share medio de 80,7 %, así que 0,7 corta por debajo del sitio sano y
+   * deja pasar la dilución real (43 queries no-marca de 154).
+   */
+  cannibalizationMaxMainPageShare: number
+  /**
+   * De dónde sale "es query de marca". `none` = el concepto no existe en esa versión (v1).
+   * `root_domain_label` = la etiqueta del dominio del target, con sus límites declarados en
+   * `cannibalization.ts`. El tipo enumera a propósito: una versión que declare una detección
+   * que nadie implementó tiene que ROMPER EL BUILD, no clasificar en silencio.
+   */
+  brandDetection: BrandDetection
+  /**
+   * 🔴 ¿Se anula el techo por posición cuando la query YA está en `targetPosition` o mejor?
+   *
+   * v1 no lo hacía, y el efecto era un absurdo silencioso: una query en posición 3 con CTR
+   * bajo la media de la posición 5 recibía un techo positivo "si llega a la posición 5" —
+   * proponerle un DESCENSO como oportunidad. Medido: 39 de 395 ítems de banda 1 en el
+   * snapshot vigente de berel.com, con score máximo 5,71 (ruido de cola, no corrupción de
+   * cabeza — por eso se corrige sin urgencia pero se corrige).
+   *
+   * El techo de esas queries existe, pero es de CTR y no de posición: mejorar title, snippet
+   * y rich results sobre las impresiones que ya tienen. El score cae a 0 —fondo de banda 1,
+   * no fuera de la lente— y `basisReason` dice dónde está el techo real. NO se inventa un
+   * basis nuevo: el hecho distintivo (`weightedPosition` vs `targetPosition`) ya viaja
+   * persistido en el breakdown, y un basis nuevo costaría migrar un CHECK de vocabulario
+   * cerrado para no agregar información.
+   */
+  positionCeilingGuard: boolean
 }
 
 /**
@@ -104,14 +145,50 @@ export const PRIORITY_SCORE_CONFIGS = {
     minImpressionsFloor: 10,
     ctrCurveScope: 'all_rows',
     curveMinBucketImpressions: 1000,
-    curveMinBucketClicks: 5
+    curveMinBucketClicks: 5,
+    // Explícitos, NO nuevos: reproducen exactamente lo que v1 ya hacía (toda query
+    // multi-página canibalizada; marca no existía como concepto).
+    cannibalizationMaxMainPageShare: 1,
+    brandDetection: 'none',
+    positionCeilingGuard: false
+  },
+  /**
+   * v2 — corrige el VERBO, no el número. El score de una query no canibalizada no cambia;
+   * lo que cambia es a qué origen pertenece y qué acción se le propone al operador.
+   *
+   * Dos cambios, ambos medidos contra berel.com sobre 28 días:
+   *
+   * 1. Canibalización = concentración + no-marca, en vez de conteo de páginas. Ver
+   *    `cannibalization.ts` para la evidencia (el 80 % de lo que v1 marcaba era marca).
+   * 2. Techo por posición: una query cuya posición ponderada ya es mejor o igual que
+   *    `targetPosition` no recibe un techo positivo "si llega a la posición 5" — ya está
+   *    ahí. Ver `priority-score.ts`.
+   *
+   * NO cambia `ctrCurveScope`: sigue `all_rows`. Mover la curva a no-marca ahora que existe
+   * el primitive es posible y mueve TODOS los scores; shipearlo junto a lo de arriba haría
+   * inatribuible cualquier movimiento de ranking. Es v3.
+   */
+  'incremental-clicks-v2': {
+    version: 'incremental-clicks-v2',
+    windowDays: 28,
+    targetPosition: 5,
+    minPosition: 8,
+    maxPosition: 20,
+    impressionsPercentile: 0.75,
+    minImpressionsFloor: 10,
+    ctrCurveScope: 'all_rows',
+    curveMinBucketImpressions: 1000,
+    curveMinBucketClicks: 5,
+    cannibalizationMaxMainPageShare: 0.7,
+    brandDetection: 'root_domain_label',
+    positionCeilingGuard: true
   }
 } as const satisfies Record<string, PriorityScoreConfig>
 
 export type PriorityScoreVersion = keyof typeof PRIORITY_SCORE_CONFIGS
 
 /** La versión con la que se materializa HOY. Moverla es un cambio deliberado y auditable. */
-export const ACTIVE_PRIORITY_SCORE_VERSION: PriorityScoreVersion = 'incremental-clicks-v1'
+export const ACTIVE_PRIORITY_SCORE_VERSION: PriorityScoreVersion = 'incremental-clicks-v2'
 
 export const getPriorityScoreConfig = (
   version: PriorityScoreVersion = ACTIVE_PRIORITY_SCORE_VERSION

@@ -1823,6 +1823,75 @@ Esa evidencia es del **primitive invocado directo**. La del **camino agendado** 
 que usa Cloud Scheduler, `eligible=2 / materialized=1 / reused=1 / failed=0`, con el snapshot de 105
 items inspeccionado fila por fila— está en §18.0, y es la que autorizó despausar el job.
 
+### 18.18 Delta 2026-08-29 — `incremental-clicks-v2`: el predicado medía marca, no canibalización
+
+**El defecto.** v1 decidía canibalización con `COUNT(DISTINCT page) > 1`. Medido contra
+`berel.com`, 28 días, piso de 100 impresiones:
+
+| población | queries | share medio de la página principal | páginas |
+|---|---:|---:|---:|
+| no-marca | 154 | 80,7 % | 6,1 |
+| marca | 602 | 34,2 % | 17,6 |
+
+El predicado seleccionaba **marca**, donde el sitio ocupa legítimamente su propia SERP. El
+caso insignia es la query de mayor demanda del sitio: `pinturas`, 41 páginas, **99,3 %** de
+las impresiones concentradas en una sola. La cola le proponía al operador "fusiona 41 URLs"
+sobre su ítem #1.
+
+**El daño no era sólo el verbo.** El colector de striking-distance excluía todo lo
+multi-página, así que sacaba **216 de 269** filas de la ventana 8–20. Reconstruida la lente
+del adapter: el operador veía **92 keywords donde el reader legacy mostraba 269**. Al validar
+el cutover se verificó la dirección que AGREGABA filas ("metía 99 keywords nuevas") y nunca
+la que las QUITABA.
+
+**Lo que cambia en v2** (`work-queue/cannibalization.ts`, predicado ÚNICO importado por los
+dos colectores — v1 lo tenía escrito dos veces y el dedup por sujeto habría enmascarado la
+divergencia):
+
+1. **Canibalizada ⟺ no-marca ∧ share de la principal ≤ 0,7 ∧ ≥2 páginas fusionables.** El
+   umbral va sobre la PRINCIPAL, no sobre la segunda: con una principal al 50 % y cinco colas
+   al 10 %, un umbral sobre la segunda diría "sana" con la mitad del share disuelto.
+2. **Concentración y conteo son dos preguntas distintas.** El share se mide sobre TODAS las
+   páginas (la home no es fusionable pero puede ser la que gana); el conteo excluye home,
+   PDFs e imágenes, y colapsa variantes `http`/`https`/`www`/barra final — 1.074 de 1.421
+   URLs del sitio no estaban bajo el host canónico. Mezclarlas invierte el veredicto: al
+   excluir la home también del denominador, `pinturas` cayó a 13,2 % y volvió a salir
+   canibalizada.
+3. **Marca = etiqueta del `root_domain`, con tolerancia a un error de tipeo.** Los tipeos eran
+   el modo de falla dominante de la subcadena sola (`bereñ` con 38 páginas, `verel`, `berol`,
+   `berrl`, `betel`, `berem`, `bere`): 16 queries de marca entraban como canibalización.
+4. **Techo por posición anulado** cuando la posición ponderada ya es mejor o igual que la
+   objetivo. El techo real de esas filas es de CTR y viaja como **evidencia**
+   (`snippetCeilingClicks`), nunca como score: mezclar "clics por subir" con "clics por mejor
+   snippet" en una columna reintroduce el orden incomparable que este agregado cerró.
+
+**Efecto medido** (mismo target y ventana): de 400 candidatas multi-página, v1 llamaba
+canibalizadas **400** y v2 llama **11**; la población final del sitio son **29** queries, de
+las cuales ~5 son sub-marcas propias (`kover` = 19 fichas de una línea de producto,
+`beralkid`, `comasin`, `color pitaya`). La lente del operador vuelve a **261** contra las 269
+del legacy.
+
+**Límite declarado, no cerrado.** Las sub-marcas no se detectan desde el dominio. **NUNCA**
+se cierra colgando el score de `grader_profiles.brand_name`: es captura de leads del grader
+público —mayoría con `organization_id` nulo, con filas de smoke— no un SSOT de marca por
+organización. Requiere una fuente declarada con autor, y eso es una versión nueva.
+
+**Dos defectos latentes que v2 activó y se corrigieron con él:**
+
+- El **piso de recomputación** no filtraba por versión y devolvía `priorityScoreVersion` = la
+  ACTIVA sobre un snapshot que podía ser de otra: un campo que miente, y un bump sin efecto
+  hasta 60 minutos por target. Inerte mientras existió una sola versión publicada.
+- La **huella de parámetros no ve un cambio de fórmula**. De ahí los **vectores dorados por
+  versión**, que congelan la salida sobre entradas fijas. La huella de v1 se movió una vez, al
+  declarar explícitas dos reglas implícitas; se midió ejecutando la implementación anterior
+  contra la nueva sobre seis casos, con salidas idénticas.
+
+**Compatibilidad con la lente legacy.** `SEO_KEYWORD_OPPORTUNITIES_SQL` lo comparten la lente
+y el colector versionado, así que las columnas nuevas son **aditivas** con `LEFT JOIN`
+(`content_competing_pages`, `main_page_impressions`, `total_page_impressions`): redefinir
+`competing_pages` o `impressions` habría movido lo que ve el operador en las orgs sin curva
+sin que ninguna versión lo registrara.
+
 ### 18.17 Lo que la cola NO hace (prohibido, no diferido)
 
 - Unir orígenes por SQL o por VIEW.

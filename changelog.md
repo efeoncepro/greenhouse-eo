@@ -7,6 +7,39 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-29 — el detector de canibalización de la cola SEO detectaba marca, y de paso vaciaba media pantalla
+
+La cola priorizada decidía si una keyword era canibalización preguntando "¿aparece más de una página
+del sitio?". Medido contra berel.com sobre 28 días, eso no mide canibalización: la población no-marca
+tenía **80,7 %** de sus impresiones concentradas en su página principal y la de marca **34,2 %**. El
+predicado seleccionaba marca — donde el sitio ocupa legítimamente su propia SERP. El caso que lo
+retrata es la query de mayor demanda del sitio: `pinturas`, 41 páginas, **99,3 %** de las impresiones
+en una sola, y la cola proponiendo "fusiona 41 URLs" sobre el ítem #1.
+
+El daño mayor estaba en el otro lado. Como el colector de striking-distance excluía todo lo
+multi-página, sacaba **216 de 269** filas de su ventana: reconstruida la lente, el operador veía
+**92 keywords donde el reader anterior mostraba 269**. Al validar el cutover se verificó la dirección
+que agregaba filas y nunca la que las quitaba.
+
+`incremental-clicks-v2` corrige el predicado (no-marca ∧ concentración de la principal ≤ 70 % ∧ ≥2
+páginas fusionables), lo escribe en **un solo lugar** que los dos colectores importan —antes estaba
+escrito dos veces— y separa dos preguntas que parecían una: quién se queda con la query se mide sobre
+todas las páginas, home incluida; qué se puede fusionar excluye home, PDFs e imágenes. Mezclarlas
+invierte el veredicto, y lo destapó medir: al sacar la home también del denominador, `pinturas` cayó a
+13,2 % y volvió a salir canibalizada. La marca tolera un error de tipeo, que no era un lujo: `bereñ`
+con 38 páginas, `verel`, `berol`, `berrl`, `betel`, `berem`, `bere` — 16 queries de marca entraban
+como canibalización.
+
+De 400 candidatas, v1 llamaba canibalizadas 400 y v2 llama 11; la población real del sitio son 29.
+Quedan ~5 sub-marcas propias (`kover` son 19 fichas de una línea de producto) que no se detectan desde
+el dominio: es un límite declarado en la versión, no un pendiente silencioso, y cerrarlo exige una
+fuente de marca con autor.
+
+El bump destapó dos defectos latentes que sólo existen cuando hay más de una versión: el piso de
+recomputación reusaba snapshots de otra versión y devolvía la versión activa sobre ellos —un campo que
+miente—, y la huella congelada de parámetros no puede ver un cambio de fórmula. Lo primero ahora filtra
+por versión con su gate; lo segundo tiene vectores dorados que congelan la salida.
+
 ## 2026-08-29 — La cola SEO empieza a correr sola, y un detector que avisaba a tiempo no llegaba a nadie
 
 Los dos schedulers del módulo quedaron activos: `ops-seo-work-queue-materialize` (`0 10 * * *`, tras
@@ -904,20 +937,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   y el roundtrip SCIM debe actualizar la misma persona sin crear otro principal/member.
 - Azure no se modificó. El snapshot read-only no muestra capacidad libre de Microsoft 365 ni grupo de
   licenciamiento válido; ADR, licencia, app/consent, security group y canary siguen pendientes.
-
-## 2026-08-21 — La revisión de confiabilidad pasa de reportar síntomas a medir causas
-
-- `EPIC-041` reemplaza a `TASK-1432` y `TASK-1710`, dos umbrellas P0 que describían el mismo incidente con un mes
-  de diferencia, sin referenciarse y sin una sola task hija; el epic conserva un baseline de 16 hallazgos medidos
-  contra PostgreSQL y fechados, con la instrucción explícita de re-medir antes de actuar.
-- Siete hallazgos previos quedan reclasificados como mal calibrados o falsos positivos: los "4 leads de Growth" son
-  correos de prueba con runs no releasables, la "retención en drift" es un documento anulado que el reader no
-  filtra, el "rate MXN/CLP faltante" es una señal insatisfacible por diseño USD-pivot, y los "79,6 días" de
-  writeback son la edad del ítem atascado, no la frescura del tablero.
-- El bridge income→HubSpot se degrada de P0 a P3: su endpoint receptor `/invoices` nunca se escribió y 80 de 84
-  incomes vienen de Nubox, que estructuralmente no traerá anchors. Las cotizaciones sí llegan al CRM.
-- `TASK-1760` documenta que PPM y retenciones no se recalculan desde el 2026-06-20 porque **nunca se cableó un
-  disparador** — el IVA sí tiene projection reactiva y por eso está al día —, y que su señal de drift es ciega a un
-  período ausente porque parte desde las posiciones existentes.
-- Queda registrado que sacar `skipped` de `isSuccessOutcome` no habría corregido los 9.001 falsos éxitos, que los
-  produce `no-op`, y que la state machine de `handler_health` no tiene ningún test que la cubra.

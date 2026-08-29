@@ -27,8 +27,30 @@ import {
  * impedir: deja los snapshots viejos afirmando reglas que ya nadie puede reconstruir.
  */
 const FROZEN_FINGERPRINTS: Record<string, string> = {
+  /**
+   * ⚠️ Esta huella se movió UNA vez, al publicar v2 (2026-08-29), y por una razón que NO es
+   * "cambié un valor": v1 pasó a declarar EXPLÍCITAMENTE dos reglas que ya aplicaba de forma
+   * implícita — `cannibalizationMaxMainPageShare=1` (v1 llamaba canibalizada a toda query
+   * multi-página) y `positionCeilingGuard=false` (v1 no anulaba el techo por posición).
+   *
+   * No se aceptó porque "se lea equivalente": se MIDIÓ. Se ejecutó la implementación de
+   * `computePriorityScore` anterior al cambio contra la nueva sobre seis casos —incluido el
+   * caso donde el guard SÍ dispara bajo v2— y las salidas fueron idénticas campo por campo.
+   * Los vectores dorados (`golden-vectors.test.ts`) dejan esa medición viva: son la defensa
+   * real contra un cambio de FÓRMULA, que la huella de parámetros no puede ver.
+   *
+   * ⚠️ **Alcance exacto de esa equivalencia, porque es fácil sobre-declararla:** cubre la
+   * FÓRMULA del score, que es lo que la versión gobierna. NO cubre el SQL de los colectores,
+   * que no está versionado y cambió para las dos versiones: v2 cuenta páginas fusibles en vez
+   * de páginas crudas, así que una query "home + un producto" que bajo v1 entraba como
+   * candidata de consolidación hoy no entra. Los snapshots v1 ya persistidos no se tocan —son
+   * append-only— pero re-correr v1 hoy no reproduce su conjunto de candidatas de entonces, y
+   * eso tampoco era cierto antes: el insumo es una ventana móvil de 28 días.
+   */
   'incremental-clicks-v1':
-    'ctrCurveScope=all_rows|curveMinBucketClicks=5|curveMinBucketImpressions=1000|impressionsPercentile=0.75|maxPosition=20|minImpressionsFloor=10|minPosition=8|targetPosition=5|windowDays=28'
+    'brandDetection=none|cannibalizationMaxMainPageShare=1|ctrCurveScope=all_rows|curveMinBucketClicks=5|curveMinBucketImpressions=1000|impressionsPercentile=0.75|maxPosition=20|minImpressionsFloor=10|minPosition=8|positionCeilingGuard=false|targetPosition=5|windowDays=28',
+  'incremental-clicks-v2':
+    'brandDetection=root_domain_label|cannibalizationMaxMainPageShare=0.7|ctrCurveScope=all_rows|curveMinBucketClicks=5|curveMinBucketImpressions=1000|impressionsPercentile=0.75|maxPosition=20|minImpressionsFloor=10|minPosition=8|positionCeilingGuard=true|targetPosition=5|windowDays=28'
 }
 
 describe('TASK-1700 — registro de versiones del score', () => {

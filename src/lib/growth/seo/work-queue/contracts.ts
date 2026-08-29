@@ -123,6 +123,20 @@ export interface SeoWorkQueueScoreBreakdown {
    * redacción — la clase de acople que se rompe la primera vez que alguien mejora el texto.
    */
   competingPages?: number
+  /**
+   * TASK-1700 v2 — Share de impresiones de la página principal, cuando se pudo medir.
+   * Es el número que SOSTIENE el veredicto de canibalización: sin él, "N páginas compiten"
+   * es un conteo que no distingue 41 páginas peleándose una intención de 41 páginas donde
+   * una se queda con el 99,3 %.
+   */
+  mainPageShare?: number | null
+  /**
+   * TASK-1700 v2 — Techo de CTR de la fila: clics que ganaría si convirtiera como la mediana
+   * de SU PROPIA posición. Sólo viaja cuando el techo por posición es 0 (ya está en la
+   * objetivo o mejor). Es EVIDENCIA, no orden: no entra al `priority_score` porque no es
+   * comparable con "clics que ganas subiendo". Ver `priority-score.ts`.
+   */
+  snippetCeilingClicks?: number | null
 }
 
 /** Una entrada de trabajo, tal como se persiste. */

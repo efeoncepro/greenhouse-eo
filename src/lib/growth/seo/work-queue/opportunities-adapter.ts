@@ -154,8 +154,22 @@ export const readKeywordOpportunitiesFromWorkQueue = async (
       // volvería a abrir la puerta que ese guard cierra.
       estimatedClickGain: Math.round(item.priorityScore ?? Number.NaN),
       quickWin: breakdown.weightedPosition !== null && breakdown.weightedPosition <= 10,
+      // `cannibalized` desde el origen es fiel POR CONSTRUCCIÓN: `consolidation` existe
+      // exactamente para los sujetos que `evaluateCannibalization` marcó, y para ningún otro.
+      //
+      // 🔴 `competingPages` NO lo era. La derivación vieja —`origin === 'consolidation' ? 2
+      // : 1`— fabricaba un conteo: afirmaba "1 página" sobre toda query fuera de
+      // consolidación, y desde v2 una query con 41 páginas y el 99,3 % concentrado en una
+      // sale por striking-distance. Ese es justo el caso donde la afirmación era falsa y
+      // además visible en pantalla.
+      //
+      // ⚠️ El `?? 1` NO es inocuo y hay que decirlo: `declared_target`, `discovery_candidate`
+      // y `competitor_gap` nunca persisten `competingPages`, así que para ellos el 1 es un
+      // relleno, no un dato. Hoy no llega a esta lente —el recorte 8–20 más el filtro de
+      // score dejan pasar sólo los dos orígenes GSC, que sí lo persisten— pero el día que
+      // otro origen entre a la ventana, la pantalla afirmará "1 página" sin saberlo.
       cannibalized: item.origin === 'consolidation',
-      competingPages: breakdown.competingPages ?? (item.origin === 'consolidation' ? 2 : 1),
+      competingPages: breakdown.competingPages ?? 1,
       searchVolume: datum?.searchVolume ?? null,
       difficulty: datum?.keywordDifficulty ?? null,
       linkBarrier: market?.linkBarrierByKeyword.get(normalized) ?? 'unknown'

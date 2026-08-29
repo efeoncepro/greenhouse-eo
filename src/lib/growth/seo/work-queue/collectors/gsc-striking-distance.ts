@@ -7,17 +7,22 @@ import 'server-only'
  * vez de copiarlo, para que el test de paridad del Slice 7 no pueda quedar verde comparando
  * contra una versión vieja de la query.
  *
- * 🔴 Las keywords CANIBALIZADAS no salen por acá. Una query con más de una página en la
- * ventana no es una oportunidad de optimización sino de CONSOLIDACIÓN: dos URLs compitiendo
- * por la misma intención se diluyen, y empujar una tercera vez es la acción equivocada. Van
- * al colector `consolidation` con su propio verbo. El reader legacy las marcaba y las dejaba
+ * 🔴 Las keywords CANIBALIZADAS no salen por acá: van al colector `consolidation` con su
+ * propio verbo, porque no son una oportunidad de optimización sino dos URLs que fusionar, y
+ * empujar una tercera vez es la acción equivocada. El reader legacy las marcaba y las dejaba
  * en la misma lista, que es justo lo que hace que el operador tome la decisión errada.
+ *
+ * ⚠️ Quién está canibalizada lo decide `evaluateCannibalization`, IMPORTADO — nunca una
+ * copia de la regla acá. v1 preguntaba `competingPages > 1` en este mismo lugar y en el SQL
+ * del otro colector: dos escrituras de la misma regla que podían separarse sin que nada
+ * fallara, porque el dedup por sujeto habría elegido un origen y enmascarado el drift.
  */
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { normalizeMarketKeyword } from '../../keyword-market-data'
 import { SEO_KEYWORD_OPPORTUNITIES_SQL } from '../../keyword-opportunities-reader'
+import { evaluateCannibalization } from '../cannibalization'
 import { buildEvidenceRef, type SeoWorkQueueCollectorResult, type SeoWorkQueueItemInput } from '../contracts'
 import { computePriorityScore } from '../priority-score'
 import { WORK_QUEUE_RUNTIME_CONFIG } from '../score-versions'
@@ -31,7 +36,16 @@ interface OpportunityRow extends Record<string, unknown> {
   weighted_position: string
   impressions: string
   clicks: string
-  competing_pages: string
+  /**
+   * 🔴 `content_competing_pages`, NO `competing_pages`. La columna cruda cuenta home,
+   * assets y variantes `http`/`www` de la misma URL. Leerla acá le daba al predicado una
+   * definición DISTINTA de la que usa el colector de consolidación, y eso abría un hueco por
+   * el que un ítem desaparecía de la cola entera: una query con home + un producto salía
+   * canibalizada por acá (2 páginas crudas) y quedaba fuera de allá (1 sola fusionable).
+   */
+  content_competing_pages: string | null
+  main_page_impressions: string | null
+  total_page_impressions: string | null
 }
 
 /**
@@ -95,11 +109,6 @@ export const collectGscStrikingDistance = async (
     const items: SeoWorkQueueItemInput[] = []
 
     for (const row of rows) {
-      const competingPages = Number(row.competing_pages)
-
-      // Canibalizada → es del colector de consolidación, con otro verbo.
-      if (competingPages > 1) continue
-
       const normalizedKeyword = normalizeMarketKeyword(row.keyword ?? '')
 
       if (!normalizedKeyword) continue
@@ -108,6 +117,24 @@ export const collectGscStrikingDistance = async (
       const impressions = Number(row.impressions)
       const clicks = Number(row.clicks)
       const weightedPosition = Number(row.weighted_position)
+      const competingPages = Number(row.content_competing_pages ?? 0)
+
+      // 🔴 MISMO predicado que el colector de consolidación, importado y no reimplementado.
+      // v1 excluía por `competingPages > 1`, que mandaba a consolidación toda query de marca
+      // —el 80 % de la población— y le cambiaba el verbo a la de mayor demanda del sitio.
+      const verdict = evaluateCannibalization(
+        {
+          normalizedKeyword,
+          competingPages,
+          mainPageImpressions: Number(row.main_page_impressions ?? 0),
+          totalImpressions: Number(row.total_page_impressions ?? impressions),
+          brandToken: ctx.brandToken
+        },
+        config
+      )
+
+      // Canibalizada → es del colector de consolidación, con otro verbo.
+      if (verdict.cannibalized) continue
 
       const scored = computePriorityScore(
         {
@@ -127,7 +154,10 @@ export const collectGscStrikingDistance = async (
         scoreBasis: scored.basis,
         scoreBand: scored.band,
         priorityScore: scored.score,
-        breakdown: scored.breakdown,
+        // 🔴 `competingPages` viaja SIEMPRE, no sólo en consolidación. Sin esto el adapter
+        // tenía que derivarlo del origen —`origin === 'consolidation' ? 2 : 1`— y afirmaba
+        // "1 página" sobre una query con 41.
+        breakdown: { ...scored.breakdown, competingPages, mainPageShare: verdict.mainPageShare },
         // La keyword ES el sujeto en GSC: no hay id de fila que citar, y fabricar uno daría
         // una falsa sensación de trazabilidad hacia una tabla que no lo tiene.
         evidenceRef: buildEvidenceRef(ORIGIN, normalizedKeyword),

@@ -19,6 +19,12 @@ export interface SeoWorkQueueCollectorContext {
   curve: OrgCtrCurve
   config: PriorityScoreConfig
   /**
+   * Etiqueta de marca del target (`berel.com` → `berel`), o `null` si la versión no
+   * distingue marca o el dominio no da una etiqueta utilizable. La derivación y sus límites
+   * viven en `cannibalization.ts`; acá sólo viaja ya resuelta, UNA vez por corrida.
+   */
+  brandToken: string | null
+  /**
    * Última decisión por sujeto. La clave es `${origin}::${normalizedKeyword}` — el MISMO
    * anclaje que usa `seo_work_queue_decisions`, porque los items se regeneran en cada
    * snapshot y una clave por `item_id` moriría mañana.
@@ -51,11 +57,13 @@ export const isRetiredSubject = (
 }
 
 /** Salud `ok` con conteo. Azúcar para no repetir el literal en seis colectores. */
-export const healthy = (
-  origin: SeoWorkQueueOrigin,
-  itemCount: number,
-  asOf: string | null = null
-) => ({ origin, state: 'ok' as const, reason: null, asOf, itemCount })
+export const healthy = (origin: SeoWorkQueueOrigin, itemCount: number, asOf: string | null = null) => ({
+  origin,
+  state: 'ok' as const,
+  reason: null,
+  asOf,
+  itemCount
+})
 
 /** Salud degradada/caída. `reason` es OBLIGATORIA: "degradado" sin razón es un hueco mudo. */
 export const unhealthy = (
