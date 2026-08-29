@@ -2,6 +2,61 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-29 — Se ejercitó lo que estaba ON pero nunca había corrido solo, y se cerró la ventana de ISSUE-164
+
+**Estado: verificación operativa, sin cambios de código.** Motivo: tres capacidades SEO llevaban dos
+días con el flag ON en el `ops-worker` y **el scheduler nunca las había disparado** —
+`ops-seo-domain-overview` (día 16) y `ops-seo-url-visibility` (día 17) con `lastAttemptTime` **vacío**,
+próxima corrida agendada el 16-17 de septiembre. Habían sido ejercitadas a mano en el rollout del 27,
+pero nunca por el camino desatendido.
+
+**Corridas por el camino que usa el scheduler** (POST con body `{}`, sin argumentos):
+
+| | Estimado | Real | Extra |
+|---|---|---|---|
+| `domain-overview` | USD 0,01212 | **USD 0,01212** | clavado al preview |
+| `url-visibility` | USD 0,02400 | **USD 0,02400** | **15 filas de mercado gratis** |
+
+Verificado en PostgreSQL, no en la respuesta del API: 1 snapshot de cada capacidad con `capture_date`
+de hoy, 15 filas nuevas en `seo_keyword_market_data`, gasto en el ledger (`labs` USD 0,0872 del día).
+**Re-corrida de ambas: `captured=0 skipped=2 costUsd=0`** — el pre-check de frescura funciona.
+
+**Dos cosas que sólo se pudieron probar hoy y no el 27:** (a) la frescura se sostiene **cruzando el
+límite de día** (foto del 27 vigente el 29; el smoke del mismo día no podía demostrarlo); (b) el
+beneficio lateral de `TASK-1776` es real y medible en producción — `marketRowsWritten` en la salida
+del batch, que es lo que permitirá argumentar con datos si conviene bajarle frecuencia al cron de
+`TASK-1661`.
+
+**Sospecha investigada y descartada:** que el segundo cobro fuera una re-compra. No lo era — el sujeto
+capturado hoy fue el **segundo** de Berel, un competidor declarado después del smoke. La ventana es
+`(CURRENT_DATE - capture_date) < 30` y se comportó bien.
+
+**Ventana de `ISSUE-164` cerrada, midiendo el EFECTO en vez del log.** Sin `sentry-cli` ni token, se
+consultó `grader_probe_results`: `error_code LIKE 'blocked%'` desde el 2026-08-27 → **0**. La guarda de
+red no recorta cobertura. 🔴 Salvedad que va en el cierre: **la muestra es UNA corrida de grader** — es
+consistente con "la guarda es correcta", no prueba fuerte. La consulta canónica queda registrada en el
+issue y no depende de Sentry, así que la puede correr cualquiera.
+
+**Dato de cartera que el ejercicio dejó visible:** son **2 targets**, y `seot-efeonce-own-brand` se
+salta en ambas capturas (1 sujeto, sin competidores declarados). **Efeonce sigue sin medirse a sí
+misma** — el hueco de GSC per-org, ahora visible también por este lado.
+
+## 2026-08-29 — cartera LicitaLAB/Wherex y contrato CRM común
+
+**Estado: documentación y skills cerradas; no hubo mutaciones externas en este cierre.** El universo operativo
+documenta 30 oportunidades revisadas y 24 Deals verificados: 23 abiertos y uno `closedlost`. El readback live de
+HubSpot encontró además el RFI CRM Mineduc `1588-33-RFI26`, anterior al corte, por lo que existen 24 Deals de
+licitación abiertos en total; Ajinomoto ya no cuenta como activo.
+
+- Los ocho RFP Wherex promovidos siguen `newbusiness` y `default/qualifiedtobuy`, pero el segundo readback los
+  encontró en `Core Pipeline`; la política relación-primero indica `Strategic Bet` para cuentas nuevas. La deriva
+  queda registrada como riesgo de automatización sin corrección silenciosa.
+- CINTERMEX `CNX-239` queda `HOLD vencido / portal no verificado`; Grupo Reditos (`GRD-1496`, `GRD-1499`,
+  `GRD-1501`, `GRD-1502`) queda `No bid` por decisión del operador.
+- La skill espejada incorpora un contrato común LicitaLAB/Wherex: identidad e idempotencia, deadline distinto de
+  `closedate`, asociaciones reales, segundo readback, estados HOLD/NO-BID/Expirada y sincronización de ambos
+  registros. La cola fechada separa diez bids prioritarios, tres RFI livianos y diez oportunidades con gate previo.
+
 ## 2026-08-28 — `TASK-1700`: la cola priorizada de trabajo SEO — code complete, rollout pendiente
 
 **Estado: `code complete, rollout pendiente`.** Los 7 slices están en `develop`. El módulo SEO pasa de
@@ -117,10 +172,18 @@ superpone al acordeón.
 `Organization`; el bloque page-scoped añade sólo `Service` con cinco ofertas y `FAQPage` con seis respuestas visibles,
 sin duplicar breadcrumb o entidad. El menú queda en `Soluciones → Servicios Destacados`, inmediatamente después de
 `Redes Sociales`. `pnpm public-website:verify-influencer-seo-package` y el gate de fidelidad final pasaron live. Hash
-Elementor vigente: `580f4f604dd1e6ef911b397568fd9575f2117db01c6793d02dc98162bb4ac2f9`; rollback inmediato:
+Elementor posterior al hardening SEO, previo al refinamiento visual:
+`580f4f604dd1e6ef911b397568fd9575f2117db01c6793d02dc98162bb4ac2f9`; rollback inmediato:
 `_gh_backup_before_task1598_seo_20260829T024347Z`. Auditoría:
 `docs/audits/public-site/2026-08-29-influencer-landing-seo-aeo-readback.md`. La indexación efectiva se comprobará en
 Search Console; no se infiere del estado `publish + index`.
+
+**Refinamiento visual final 2026-08-29:** la franja bajo el hero es ahora un rail editorial de tres pruebas y cuatro
+marcas; `#mecanismo` usa un plano Midnight de cuatro capas; los destinos de assets incorporan seis iconos monocromos
+semánticos; `activationType` usa megáfono y el contador del objetivo queda a 8 px del textarea. Hash Elementor
+`1263574659f2d9cec139d3c8d11cf15a78bf8023b8894589ac1356395b1f6c57`; rollback
+`_gh_backup_before_task1598_visual_refinement_20260829T105059Z`. Gates live de fidelidad y SEO/AEO verdes; capturas
+`.captures/task1598-influencer-fidelity-2026-08-29T11-00-28-401Z/`. Sin lead ni booking de prueba.
 
 ## 2026-08-28 — `TASK-1792` complete: la curva de CTR declara su usabilidad
 
@@ -533,42 +596,3 @@ scheduler PAUSADO hasta entonces — antes sería un 404).
 la revisión activa del worker → despausar `ops-seo-competitor-coverage` → medir el costo del segundo
 ciclo antes de declarar más competidores; deploy del gateway `efeonce-mcp` en la misma ventana. La
 task queda `in-progress` sólo por el Slice 4 (bloqueado por `TASK-1700`) y ese cierre operativo.
-
-## 2026-08-28 — Higgsfield y Magnific: solicitudes de partnership para agencias enviadas
-
-**Estado: `Postulación enviada`; respuesta de Higgsfield y evaluación de Magnific pendientes.** Higgsfield confirmó la
-consulta B2B/studio por Enterprise Sales. Magnific respondió: Susana Lazcano, Enterprise BDR EMEA & LATAM, derivó la
-solicitud al canal oficial `ai-partnerships@magnific.com`. El outreach directo se envió el 2026-08-28 desde Outlook
-Web, con Susana en copia y la firma configurada `Julio`; readback del mensaje enviado observado a las 10:44 UTC.
-
-**Límite y continuidad:** la derivación y el outreach enviado no equivalen a aceptación, reseller, co-selling,
-certificación ni revenue share. Revisar las respuestas en Outlook y actualizar el registry antes de cualquier claim u
-oferta. Evidencia: [`HIGGSFIELD_MAGNIFIC_AGENCY_PARTNERSHIP_OUTREACH_2026-08-28.md`](docs/audits/commercial/HIGGSFIELD_MAGNIFIC_AGENCY_PARTNERSHIP_OUTREACH_2026-08-28.md).
-
-## 2026-08-28 — TASK-1696: cierre documental del inventario MCP y dos gates ciegos con task
-
-**Hallazgo que corrige un dato vencido, no una omisión.** Cinco docs declaraban que la revisión
-productiva del gateway servía **13 tools** y que TASK-1658 seguía "sin push". Ambas cosas eran
-falsas: la revisión activa `efeonce-mcp-gateway-00023-zt2` (2026-08-27T23:19Z) ya llevaba ese
-deploy y sirve **21**. Los docs subestimaban producción por un deploy entero. Quedaron reescritos
-separando siempre **inventario interno (22 tras `get_seo_provider_spend`)** de **desplegado en el
-gateway (21)** — confundirlos es el error que ya habían cometido. La 22.ª llega después del release:
-su lane sigue en `develop`.
-
-**Dos gates que dan verde sin mirar quedaron con task, no con nota.** Los subagentes midieron y los
-dos son más grandes de lo que parecían:
-
-- **`TASK-1782`** — el auditor de flags no ve los leídos por constante (`env[FLAG]`). No es higiene
-  documental: ese conjunto ciego alimenta los dos chequeos de ISSUE-150, **los únicos que fallan
-  siempre**, no sólo con `--strict` (flag ON en Production sin código en `main`). Segundo eje que no
-  estaba en el radar: el detector asume sufijo `_ENABLED`, así que tampoco ve `..._ENFORCED`,
-  `*_DISABLED`, `MAINTENANCE_MODE` ni los `*_MODE`. Piso medido: 51 nombres invisibles, 3 sin fila
-  (dos gatean escrituras a GitHub del sitio público). El defecto ya estaba **admitido en prosa
-  dentro del propio ledger** y nadie lo cerró.
-- **`TASK-1783`** — `dataforseo-operator` no era la excepción: **77 skills fuera del manifiesto de
-  espejos y 32 ya divergen en el cuerpo** (payroll-auditor, production-release, legal-privacy entre
-  ellas). La asimetría `.claude/references/` vs `.codex/agents/` es estructural, así que el modo
-  "cuerpo-idéntico" debe exentar paths por namespace, nunca en global.
-
-**Continuidad:** el rollout de TASK-1696 sigue pendiente tal como quedó ayer (los dos flags OFF, el
-flip a enforce como decisión del operador, el deploy del gateway después del release).

@@ -74,6 +74,36 @@ corrida real en staging (apex→www, http→https, sitio >4 MiB) con el flag ON 
 cobertura sobrevivió — los tests unitarios prueban la guarda, no la cobertura. El plan de cutover vive
 en `FEATURE_FLAG_STATE_LEDGER.md` § Pendientes.
 
+## Cierre del pendiente 2026-08-29 — la ventana de 48 h, medida por EFECTO
+
+El `Resolución 2026-08-27` dejó un pendiente acotado: *"revisión de conteos `blocked_*` en Sentry al
+2026-08-29 (48 h)"*. **Queda cerrado**, con una diferencia de método que conviene registrar.
+
+**No se contaron líneas de log: se midió el efecto.** El entorno de la sesión no tiene `sentry-cli`
+ni token, así que en lugar del conteo se consultó el resultado real de los probes —que es la pregunta
+de fondo: *¿la guarda está recortando cobertura sobre sitios reales?*—:
+
+```
+2026-08-27  succeeded    10
+2026-08-27  skipped       2   (no_headless — es el hueco de TASK-1281, esperado)
+2026-08-27  failed        1   (http_error — el sitio respondió mal, no lo bloqueó la guarda)
+
+error_code LIKE 'blocked%' desde 2026-08-27:   0
+```
+
+**Cero bloqueos. La guarda no está sobre-restringiendo.**
+
+🔴 **Salvedad que forma parte del cierre, no una nota al pie: la muestra es UNA corrida de grader.**
+Cero bloqueos sobre un run es *consistente* con "la guarda es correcta", no es prueba fuerte de ello.
+La ventana suponía 48 h de tráfico productivo y en la práctica casi no hubo tráfico. Declarar esto
+como validación estadística sería exactamente el error que este issue documenta: confundir ausencia
+de evidencia con evidencia de ausencia. El cierre es honesto en su alcance — **no hay señal de daño,
+y no hay volumen para afirmar más**.
+
+Consecuencia práctica: si el volumen del grader sube, vale re-mirar. La consulta canónica es
+`error_code LIKE 'blocked%'` sobre `greenhouse_growth.grader_probe_results`, que **no depende de
+Sentry** y por lo tanto la puede correr cualquiera.
+
 ## Resolución 2026-08-27 — cutover aplicado y verificado
 
 - **Fix live en la cadena de ataque real:** revisión `ops-worker-00598-459` (100% tráfico) con

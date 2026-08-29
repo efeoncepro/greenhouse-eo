@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-29 — Las capacidades SEO nuevas pasan de "prendidas" a "ejercitadas"
+
+`domain-overview` y `url-visibility` corrieron por el camino desatendido del scheduler (body `{}`),
+con costo real **clavado al preview** (USD 0,01212 y USD 0,024) y re-corrida a USD 0. Los schedulers
+tenían `lastAttemptTime` vacío y su próxima corrida agendada era el 16-17 de septiembre. La ventana de
+48 h de `ISSUE-164` quedó cerrada midiendo el efecto en `grader_probe_results` (`blocked%` = 0) en vez
+del conteo de Sentry, con la salvedad explícita de que la muestra es una sola corrida.
+
 ## 2026-08-28 — El módulo SEO tiene una sola cola de trabajo (`TASK-1700`)
 
 - `greenhouse_growth.seo_work_queue_{snapshots,items,decisions}`: aggregate append-only que pasa a ser la
@@ -29,6 +37,11 @@
 - **Rollout pendiente:** flag OFF en los dos runtimes, scheduler pausado, sin promover a `main`.
 
 ## 2026-08-28 — Landing Agencia de influencers publicada (`TASK-1598`)
+
+- El último refinamiento visual convierte la franja bajo el hero en un rail editorial responsive, añade profundidad
+  controlada a “Cinco capas”, usa iconos monocromos reales/semánticos en los destinos de assets y corrige el lenguaje
+  visual del form con megáfono y contador próximo al textarea. El gate de fidelidad ahora cubre estos contratos en
+  1536/1440/890/390 y reduced motion; el gate SEO/AEO volvió a pasar sin drift de metadata o schema.
 
 - Tras el review live del owner se corrigió una regresión de fidelidad que el smoke inicial no detectó: cargar assets
   no probaba la secuencia. El hero vuelve a rotar tres clips con progreso, play/pausa y sonido; también se restauraron
@@ -148,6 +161,14 @@
 - El patrón se extendió a `docs/commercial/CRM_DEAL_REGISTER.md`: vista transversal para negocios Core, Strategic
   Bets y otros orígenes, con una fila sólo después de verificar el Deal en HubSpot. Las licitaciones promovidas se
   sincronizan en ambos registros por `deal_id`; las oportunidades todavía en radar permanecen sólo en bid desk.
+- El segundo lote público y ocho RFP privados Wherex elevaron el registro a 30 oportunidades revisadas y 24 Deals
+  verificados. Al 2026-08-29 hay 23 Deals abiertos de esta admisión y uno `closedlost`; HubSpot suma además el RFI
+  CRM Mineduc anterior al corte, para 24 Deals de licitación abiertos en total. Ajinomoto ya está `closedlost`.
+- La skill espejada suma `crm-portfolio-operating-model.md`: promoción común con segundo readback posterior a
+  automatizaciones y cartera separada en diez bids prioritarios, tres RFI livianos y diez gates previos.
+- El readback live encontró los ocho Deals Wherex en `Core Pipeline` pese a que continúan `newbusiness`; se registra
+  la deriva frente a la política `Strategic Bet` sin corregirla silenciosamente. CINTERMEX queda `HOLD vencido /
+  portal no verificado` y los cuatro IDs de Grupo Reditos quedan `No bid` por decisión del operador.
 
 ## 2026-08-28 — El candidato de discovery no declara pertinencia (hueco documentado y levantado)
 
@@ -847,12 +868,3 @@
 - El aprendizaje de operación con Search Console queda generalizado: polaridad inversa de Average Position,
   protección contra ejes globales en combos, rangos parciales visibles, cohortes `new|rewrite`, fórmulas ponderadas y
   una narrativa cliente que separa resultado observado, inferencia e impacto de negocio demostrado.
-
-## 2026-08-20 — La tabla accesible del scorecard deja de inflar la página
-
-- La tabla `sr-only` de Hiring > Evaluación aplicaba su caja de 1 px directamente sobre `<table>`;
-  el layout tabular envolvía texto carácter por carácter y extendía el documento varios miles de píxeles.
-- El fallback se conserva dentro de un wrapper genérico 1×1 clipado y gana semántica completa:
-  `caption`, encabezados con `scope`, competencia, objetivo, puntaje y estado.
-- GVC ya no ignora ese nodo y reporta `layout_out_of_flow_vertical_runaway` cuando un elemento
-  `absolute|fixed` vuelve a extender anormalmente el layout vertical.
