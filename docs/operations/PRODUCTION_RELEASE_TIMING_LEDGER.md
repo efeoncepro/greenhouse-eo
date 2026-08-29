@@ -494,12 +494,32 @@ discovery_candidate        49  →   49
    cuánto cabe**, y el «168 → 200» es un piso, no la ganancia. Las 114 que
    «desaparecieron» se explican por ese cap, no por filtrado de más.
 
-   Medido para dimensionar la brecha: el predicado canónico
-   (`SEO_KEYWORD_OPPORTUNITIES_SQL`, ventana 8–20, umbral p75 con piso 10) da **1748**
-   queries elegibles para Berel; el colector pide `maxItemsPerOrigin * 3` = **600**,
-   filtra canibalización/decisiones y recorta a **200**. Tres etapas distintas, y quien
-   cite una por otra se equivoca por un orden de magnitud — a mí me pasó al medir 1748 y
-   compararlo contra un conteo post-filtro de otra sesión como si midieran lo mismo.
+   **La cola muestra 200 de 1748 elegibles, recortadas DOS veces, y sólo una se declara.**
+   Cadena medida para Berel (predicado canónico `SEO_KEYWORD_OPPORTUNITIES_SQL`):
+
+   ```
+   1748  califican en la ventana 8–20 sobre el umbral real
+    600  es lo único que el colector pide (maxItemsPerOrigin * 3), ORDER BY impressions DESC
+    200  sobrevive al cap por origen
+   ```
+
+   El truncamiento intermedio —el `LIMIT 600` del propio colector— corta ANTES que el cap
+   y **no se declara en `origin_health`**; el cap sí. Quien lea la cola ve el segundo recorte
+   y no el primero.
+
+   **Y el percentil no está discriminando.** El umbral es `max(minImpressionsFloor, p75)` y
+   para esta org el p75 crudo es **10**, exactamente igual al piso de 10; el p50 es **2**
+   sobre 18 677 queries (máximo 94 117). O sea que la razón declarada del umbral relativo
+   —«alta impresión es un percentil, no un número»— acá no separa nada. No afirmo si el piso
+   de 10 está bien calibrado para este sitio: es una pregunta de oficio SEO que no medí.
+
+   **Dos errores de reconciliación quedaron en el camino, uno por sesión.** Una sesión peer
+   aportó un conteo de 259 y lo retractó: salía de un umbral 100 hardcodeado en su sanity, no
+   del pipeline. Y yo, antes de eso, escribí en este mismo ledger que la brecha entre 1748 y
+   259 la producían el `LIMIT` y el filtro de canibalización — una reconciliación que sonaba
+   coherente, encajaba los dos números y era **falsa**: la diferencia era su parámetro. Dos
+   números medidos con parámetros distintos admiten casi siempre una explicación plausible;
+   plausible no es verificado.
 
 4. **Un testigo que no estaba en el «antes» no es testigo.** Predije que `pinturas`
    saldría `gsc_striking_distance` con `mainPageShare ≈ 0.996`. Salió `aeo_gap`/`optimize`,
