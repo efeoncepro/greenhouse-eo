@@ -141,6 +141,8 @@ Fuente: https://docs.dataforseo.com/v3/dataforseo_labs/filters/ (+ ejemplos por 
    "and",
    ["ranked_serp_element.serp_item.type", "<>", "paid"]]
   ```
+  ⚠️ Es un ejemplo de **sintaxis**, no una recomendación: el filtro de `search_volume` sobre
+  `keyword_suggestions`/`keyword_ideas` está medido como **no-op** (§ *Hallazgos medidos* abajo).
 - **Operadores por tipo**:
   - boolean: `=`, `<>`
   - numérico: `<`, `<=`, `>`, `>=`, `=`, `<>`, `in`, `not_in`
@@ -154,6 +156,43 @@ Fuente: https://docs.dataforseo.com/v3/dataforseo_labs/filters/ (+ ejemplos por 
   - `offset`: entero clásico — recomendado solo hasta ~10,000 resultados.
   - **`offset_token`** (keyword_ideas y endpoints de alto volumen): token opaco devuelto en cada response; se re-envía para obtener la página siguiente sin timeout en sets >10k. Ojo: con `offset_token`, "all other parameters except `limit` will not be taken into account" (los filtros viajan en el primer request).
 - Ejemplo real de ranked_keywords: `["ranked_serp_element.serp_item.rank_group","<=",10]`; `order_by: ["keyword_data.keyword_info.competition,desc"]`.
+
+---
+
+### Hallazgos medidos sobre los endpoints de expansión — as-of 2026-08-28
+
+> **Procedencia:** 3 corridas reales de discovery contra la API productiva, **102 candidatos**
+> en **2 mercados**, gasto total **USD 0,048**. No es lectura de la doc: es la respuesta del
+> proveedor.
+
+🔴 **Un filtro `keyword_info.search_volume > 0` sobre `keyword_suggestions` y `keyword_ideas`
+es un NO-OP.** En la muestra medida, **cero** candidatos devueltos por esos dos endpoints
+traían volumen nulo o cero: el filtro no descartó nada y sólo agregó una cláusula al payload.
+Contradice la creencia común —y la propia sugerencia de ejemplo del §4— de que ahí se limpia
+ruido de volumen. Donde los nulos **sí** aparecen es en `keyword_overview`: **15 de 62** filas
+con `search_volume` nulo en la misma corrida.
+
+Consecuencias, en orden:
+
+- ✅ **Si querías ahorrar, ese filtro no ahorra.** Labs cobra **por fila devuelta** y `limit` es
+  el techo de filas: un filtro provider-side **no baja el costo máximo de la llamada**, cambia
+  *qué* filas compras por el mismo precio. En un mercado ralo gasta el `limit` descartando
+  justo el long-tail emergente que la expansión existe para encontrar.
+- 🔴 **`null` y `0` no son lo mismo, y sólo `keyword_overview` te obliga a distinguirlos.**
+  `null` = el proveedor no tiene el dato; `0` = afirma demanda cero. Colapsarlos en el parser
+  es la clase de defecto que no falla: produce un número creíble. Modela tres estados (ausente ·
+  nulo · cero) desde el borde de adquisición.
+- 📏 **Verifica el no-op antes de asumirlo en otro endpoint.** El hallazgo es de estos dos; para
+  `related_keywords`, `keywords_for_site` o los de dominio, mide.
+
+🔴 **`keyword_ideas` resuelve una CATEGORÍA desde las seeds, no "más keywords como éstas".** Si
+una seed tiene una **entidad dominante**, el endpoint resuelve a ESA entidad y devuelve su
+categoría entera. Caso real medido: seeds de una **agencia B2B chilena** devolvieron **50
+keywords de consumidor sobre ChatGPT** — respuesta válida, `status_code 20000`, cobrada, y
+completamente fuera del dominio del cliente. Es el modo de falla propio del endpoint: no
+devuelve basura ni error, devuelve **otra categoría**. Antes de gastar en `keyword_ideas`,
+revisa que ninguna seed arrastre una entidad más fuerte que el tema; si el tema es genérico y la
+marca es fuerte, prefiere `keyword_suggestions` (contiene la seed, no la reinterpreta).
 
 ---
 

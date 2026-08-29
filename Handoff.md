@@ -29,6 +29,19 @@ nivel estimado + curva monótona). Contrato canónico y sus invariantes:
 - **Dato para calibrar:** el nivel estimado de `berel.com` contra la curva de referencia da **1,048** (28d) y
   **1,095** (7d), y Berel no es la fuente de esa referencia. Es el control contra el cual medir si algún día
   el filtro no-marca mueve algo real.
+- **Alcance, dicho con precisión:** no es «afecta a 1 de 2 organizaciones». Dos es el tamaño de la
+  muestra, no una tasa. El disparador —bucket objetivo presente y sin clics— está **garantizado en
+  todo target recién onboardeado**, así que cada cliente nuevo nace en ese estado hasta acumular
+  muestra. Quien lea el 24/24 de Efeonce como «un caso» va a subestimar el alcance.
+- **`TASK-1700` desbloqueada y con el desbloqueo aceptado del otro lado.** El Slice 7 (cutover del
+  consumer) tenía su rollback aterrizando en la lente rota: volver al reader legacy devolvía una
+  pantalla que no ordenaba. `TASK-1700` ya lleva su `## Delta 2026-08-28 (3)` declarando la
+  dependencia dura y su tabla de rollback dice ahora que el destino está **verificado, no supuesto**.
+  Nada queda pendiente de coordinar entre ambas.
+- **Crédito, para que quien siga sepa a quién preguntarle:** el hallazgo es de la sesión
+  `greenhouse-eo-56`; la investigación (arqueología del commit introductor, lectura de oficio SEO,
+  blast radius) es de esta sesión; la **implementación** de los cuatro slices es de `greenhouse-eo-75`.
+  Tres cabezas, un defecto: no atribuir el trabajo a una sola.
 
 ## 2026-08-28 — LicitaLAB MCP + radar Playwright documentados en skills Codex/Claude
 
@@ -58,7 +71,7 @@ mezcla con Wherex, Ariba, Coupa u otros portales corporativos. Estado rápido de
 `docs/commercial/CRM_DEAL_REGISTER.md`. Ambos son índices fechados y siempre requieren readback live; una
 licitación promovida se sincroniza por `deal_id`, mientras el radar sin Deal permanece sólo en bid desk.
 
-## 2026-08-28 — Hueco abierto SIN DUEÑO: el candidato de discovery no declara pertinencia
+## 2026-08-28 — El candidato de discovery no declara pertinencia — YA LEVANTADO como `TASK-1791`
 
 **Documentado en el repo, no sólo acá:** `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §7 → *"Hallazgo
 abierto (2026-08-28)"*, con la evidencia medida y el alcance recomendado. Este Handoff rota; ese doc
@@ -69,14 +82,25 @@ descubrir pagando otra vez.
 Resumen: el candidato no lleva señal de marca/categoría/relevancia (ni en la tabla ni en el DTO), así
 que 50 keywords de consumidor sobre ChatGPT pasaron todos los checks para un target que vende AEO
 B2B. 🔴 **El vector estructural es `TASK-1662`, no la expansión de seeds**: en el gap competitivo las
-seeds las elige el competidor, así que no hay operador a quien pedirle que elija mejor. Urge antes de
-`TASK-1700`: su score append-only heredaría el orden por volumen y congelaría lo irrelevante arriba.
+seeds las elige el competidor, así que no hay operador a quien pedirle que elija mejor.
 
-**Estado de la task:** SIN LEVANTAR y sin dueño. Tres sesiones lo escalamos a nuestros operadores a
-la vez, con riesgo real de duplicado. Regla acordada entre las tres: **la levanta quien reciba el
-"sí" primero y lo avisa por mensaje**. Siguiente ID libre `TASK-1791` (`greenhouse-eo-6c` tomó la
-1790). Alcance en el que las tres coincidimos: **señal con evidencia, no filtro** — un filtro duro
-descartaría long-tail legítimo en silencio.
+**Estado de la task (actualizado el mismo día): LEVANTADA.** Existe
+`docs/tasks/to-do/TASK-1791-growth-seo-candidate-relevance-signal.md` — `to-do`, P1, `EPIC-022`,
+`backend-data`, `Blocked by: none`, sin dueño asignado todavía. El riesgo de duplicado entre las tres
+sesiones que lo escalaron quedó cerrado: hay un solo ID. Alcance vigente: **señal con evidencia, no
+filtro** — un filtro duro descartaría long-tail legítimo en silencio.
+
+⚠️ **El argumento de urgencia que estaba escrito acá era falso y se corrigió en la propia task
+(`65372ea68`).** Decía que `TASK-1700` heredaría el orden por volumen y congelaría lo irrelevante
+arriba de su cola append-only. No ocurre: `work-queue/priority-score.ts` **no mira el volumen
+estimado del proveedor**, y el CHECK `basis_band_score` impide fabricar un score sin demanda medida —
+un candidato irrelevante **sin** impresiones cae a banda 3 con score `NULL` y no compite con nada. El
+caso vivo que sí sostiene la task es el otro: keyword irrelevante **con** impresiones reales, que
+atraviesa el CHECK y entra a la cola. El vector es la demanda medida, no el volumen del proveedor.
+Corolario de forma, ya escrito en la task: la señal entra como **factor del item con su procedencia,
+jamás como entrada del `priority_score`** — `evidence_ref` es opaca por contrato (cero FK, cero JOIN
+al motor que produciría la señal), así que puntuar con ella sería puntuar con algo que el aggregate no
+puede citar. Quien retome la task lee la versión corregida, no este resumen.
 
 ## 2026-08-28 — Drain de keyword discovery: `*/10` → `*/2` (⚠️ con ventana de reversión abierta)
 
@@ -224,9 +248,10 @@ histórico de lectura; federación en route admin + lane ecosystem + tool MCP.
 - Corrida real de smoke con gasto (~USD 0,013) en un mercado es-LATAM ralo con la política `all`,
   comparando candidatos/costo/mezcla de `searchVolume=null` contra el smoke de `TASK-1664`. Requiere
   autorización del operador.
-- **Deploy del gateway MCP.** Hay un commit LOCAL SIN PUSH en `~/Documents/efeonce-mcp` (`807fb76`)
-  con espejo de inventario, schema, descripción y canary al día (67 tests verdes). Sin él, el guard
-  bidireccional de paridad de ese repo queda rojo en cuanto Greenhouse promueva.
+- ~~**Deploy del gateway MCP.**~~ **CERRADO el mismo día.** Los dos commits de `~/Documents/efeonce-mcp`
+  (`807fb76` federación + `32baa9f` prettier) están **en `origin/main`** y desplegados (run
+  `33209983511`); el guard bidireccional de paridad de ese repo no quedó rojo. No queda nada que
+  empujar allá por esta task.
 - Promoción por el release control plane + observar `seo-keyword-discovery-health`.
 
 **Follow-up con evidencia nueva:** cinco candidatos de la corrida real comparten el core
@@ -553,46 +578,3 @@ post-deploy.
 5. **Watchdog en falso positivo (TASK-920).** Reporta DRIFT comparando contra un commit del 2026-07-30
    y su `recommended_action` propone redeployar un SHA viejo sobre workers correctos. **No obedecerlo.**
    La fuente autoritativa es `pnpm release:workers`.
-
-## 2026-08-27 — TASK-1658: federación SEO completa en el gateway + guard bidireccional (code complete, rollout pendiente)
-
-**La federación MCP que la tríada dejó pendiente ya está ESCRITA** (la entrada de abajo decía "la
-mueve la sesión de release" — la absorbió TASK-1658): 4 commits locales en `efeonce-mcp` main
-(`f1a2b44`…`093f970`, **sin push**). El drift real era 8 tools, no 3 (creció mientras la task
-esperaba): las 3 originales + domain-overview/url-visibility/backlink-detail (tríada) + el par
-prospect (1709). Todas federadas; `run_seo_prospect_diagnostic` = 4.º write bajo
-`efeonce.mcp.seo.write` fail-closed. El guard ahora es bidireccional (espejo de las 21 + paridad de
-schema + annotations, introspección runtime) y se probó ROJO contra el drift real antes de federar
-(29 findings nombrando cada tool). De paso cerró 9 divergencias de schema vivas: el `intent` de
-TASK-1659 en `track_seo_keywords` y el `market` ausente en 5 lecturas (una org multi-mercado era
-inoperable desde el front door).
-
-**Rollout pendiente (secuencia acordada con `greenhouse-eo-c1`):** 1) release develop→main lleva los
-lanes nuevos a prod; 2) push + deploy del gateway (antes = 404 upstream, lección TASK-1661); 3)
-`tools/list` sube 13→21 + canary completo contra prod (`scripts/greenhouse-seo-canary.mjs`, ya cubre
-las 21 sin gastar; flag-off del prospecto = estado legítimo). Evidencia pre-deploy: entitlement prod
-200 JSON con el consumer token real; los 5 lanes nuevos vivos en staging (401 `missing_token` del
-envelope). Riesgo conocido: el espejo del gateway puede quedar atrás hasta que `TASK-1780` lo
-reemplace por el manifiesto vivo (su caso de evidencia quedó stale — delta anotado allá).
-
-## 2026-08-27 — La tríada SEO quedó OPERANDO: smokes live verdes, flags ON, schedulers activos
-
-**Estado: 1775/1776/1777 con rollout ejecutado y verificado contra runtime; siguen `in-progress`
-sólo por la federación MCP post-release (la mueve la sesión de release `greenhouse-eo-c1`).**
-Autorización del operador en este hilo; gasto real total del rollout: **USD 0.30** (1777: 0.1818 ·
-1775: 0.0242 · 1776: 0.0366 + 0.0552). Todo flip declarativo en `deploy.sh` **y** aplicado con
-`--update-env-vars`, verificado en la revisión activa (`ops-worker-00603-ngj`).
-
-**Evidencia clave (detalle por task en sus files):** re-corridas a **USD 0** en las tres (frescura/
-veredicto contra proveedor real); subfolder `berel.com/productos` con **100/100 URLs bajo la ruta**;
-**210 filas de mercado gratis** escritas por el tercer productor; drill-down de enlaces con hallazgo
-nominal real (Berel perdió `apps.apple.com`); `berel.com` = 773 kw ranqueadas / ETV ~135k MX vs las
-31 seguidas — el argumento comercial de la capa entera. Los 3 lanes canarieados verdes en staging
-(binding `efeonce-mcp-gateway`) y las 3 señales en steady `ok`. Schedulers día 16 y 17 **ENABLED**;
-1777 viaja en el batch semanal (próximo ciclo natural lunes 2026-08-31 — ahí se observa el
-`skipped_no_movement` a USD 0 que el smoke no pudo producir por ser todo first_time).
-
-**Coordinación:** la sesión `greenhouse-eo-c1` corre el pase develop→main (con bypass documentado de
-`db_migrations`: instancia única, las 10 ya aplicadas) y post-release federa las 5 tools nuevas en
-`efeonce-mcp` + flip de `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` en Vercel Production. La
-evidencia de costos de este bloque es el insumo para que mueva las tasks a `complete`.

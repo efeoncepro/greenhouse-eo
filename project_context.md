@@ -104,23 +104,23 @@ El módulo Growth SEO (`growth.seo`, EPIC-022) autoriza todo run por un único c
 por su expand/contract aplicado. Contrato en
 [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §9 (§17
 contrata el seam de extracción hacia Wave). Los reads del módulo son readers canónicos consumer-agnósticos —
-`readKeywordOpportunities` y `readSeoAeoGap` (este último cruza SEO↔AEO respetando el boundary de §1.1) —
+`readKeywordOpportunities` y `readSeoAeoGap` (el segundo cruza SEO↔AEO respetando §1.1) —
 expuestos por el lane ecosystem `/api/platform/ecosystem/growth/seo/*` y sus MCP tools; **todo reader SEO
 nuevo expone su tool en el mismo PR**. Su curva de CTR vive en `src/lib/growth/seo/ctr-curve.ts`,
-**declara** su usabilidad y nunca colapsa un `0` medido con «sin muestra» (`TASK-1792`). Desde 2026-08-06 el camino está **vivo en producción y federado en
+**declara** su usabilidad y nunca colapsa un `0` medido con «sin muestra» (`TASK-1792`). En discovery un
+candidato **es una keyword normalizada, no una fila del proveedor**, y toda decisión sobre él la
+escribe —en su misma transacción— el primitive que produce el hecho (`TASK-1694`/`TASK-1692`).
+Desde 2026-08-06 el camino está **vivo en producción y federado en
 `mcp.efeonce.org`** mediante el provider `greenhouse-seo`; el acceso per-org falla cerrado.
 El flag `GROWTH_SEO_ENABLED` es **multi-runtime** — Vercel (lane) + `ops-worker` (materializer GSC);
-prenderlo en uno solo deja el otro camino muerto. Su primera captura corre live
-desde 2026-08-05: la serie propia de
-Google Search Console (`greenhouse_growth.seo_gsc_daily`) se materializa a diario en el **ops-worker** —
-**servicio Cloud Run único compartido staging+prod**, así que una capacidad worker-only queda viva al mergear a
-`develop`, sin release control plane, y **no existe un flip "sólo staging"** (invariantes en
+prenderlo en uno solo deja el otro camino muerto. La serie propia de Google Search Console
+(`greenhouse_growth.seo_gsc_daily`) corre live desde 2026-08-05 y se materializa a diario en el
+**ops-worker** — **servicio Cloud Run único compartido staging+prod**, así que una capacidad worker-only
+queda viva al mergear a `develop`, sin release control plane, y **no existe un flip "sólo staging"** (invariantes en
 [`OPS_RELIABILITY_AGENT_INVARIANTS.md`](docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md)).
-`TASK-1303` (rank capture + `readRankEvolution`) está **complete y en producción** (release `fcee5ab9f7ce`,
-manifest released): el scheduler `ops-seo-rank-capture` captura posiciones a diario (05:00 CLT) y la serie
-acumula desde 2026-08-06 (día-1: Berel, 31 keywords), con la señal `seo.rank.capture_lag` en Growth Health.
-`TASK-1653` (guard de paridad del gateway), `TASK-1307` (performance) y `TASK-1304` (site audit +
-backlinks) están **complete**.
+`TASK-1303` (rank capture + `readRankEvolution`) está **complete y en producción**: el scheduler
+`ops-seo-rank-capture` captura a diario (05:00 CLT), la serie acumula desde 2026-08-06 y la señal
+`seo.rank.capture_lag` vive en Growth Health.
 
 Berel se opera desde Notion con la skill espejo `berel-content-production`; la modalidad se decide por
 contenido público vivo —no por HTTP 200 ni por un `Enlace` planificado— y el cierre relee relaciones,

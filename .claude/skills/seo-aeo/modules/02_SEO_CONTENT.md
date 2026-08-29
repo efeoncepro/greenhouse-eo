@@ -322,6 +322,13 @@ varianza es cero, que preserva el orden de entrada y finge haber ordenado.
 🎯 **Cuando no hay muestra, presta la FORMA y estima el NIVEL** (`07_MEASUREMENT.md`): un
 nivel es 1 parámetro, una curva por posición son ~20.
 
+⚠️ **Este piso NO es el "piso mínimo absoluto de impresiones" de la tabla de parámetros de
+arriba.** Aquel responde *«¿es interpretable la posición media?»* y con ~10 impresiones ya
+cumple; éste responde *«¿es estimable el CTR?»* y pide dos órdenes de magnitud más. Son dos
+preguntas estadísticas distintas y **una constante no puede responder las dos**: reutilizar el
+piso de posición para decidir usabilidad de la curva es el error compuesto que produce el
+colapso de arriba. Si tu filtro tiene una sola constante de impresiones, tiene un bug latente.
+
 ### Canibalización: no se descarta, se separa
 
 Una query que rankea con **más de una página** no es una oportunidad de

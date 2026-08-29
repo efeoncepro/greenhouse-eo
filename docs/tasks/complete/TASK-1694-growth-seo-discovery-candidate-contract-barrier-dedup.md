@@ -1,6 +1,60 @@
 # TASK-1694 — Growth SEO: el contrato de candidatos de discovery decide con la barrera correcta, una fila por keyword y una política de inclusión declarada
 
-## Delta 2026-08-28 — la mitad de gateway quedó `rollout pendiente`
+## Delta 2026-08-28 (verificación) — el contrato está VIVO en producción, ejercitado contra el runtime
+
+No es lectura de docs ni inferencia desde el merge: se ejercitó el endpoint real en
+`https://greenhouse.efeoncepro.com` con sesión de agente (`user-agent-e2e-001`), en lectura.
+
+```
+GET /api/admin/growth/seo/keyword-discovery?organizationId=EO-ORG-0007&maxDifficulty=50&maxLinkBarrier=medium&limit=3
+→ HTTP 200
+  "ignoredFilters":[{"filter":"maxDifficulty",
+                     "reason":"non_decisional_link_barrier_is_canonical",
+                     "replacement":"maxLinkBarrier"}]
+```
+
+Las dos mitades del contrato quedan probadas en el runtime productivo: `maxLinkBarrier` es **aceptado**
+(200, sin error de validación) y `maxDifficulty` es **aceptado pero declarado ignorado**, con la razón y
+el reemplazo en la respuesta — que es exactamente la elección del contrato (devolver de más y decirlo,
+antes que devolver el subconjunto equivocado en silencio).
+
+Verificación cruzada previa contra staging (`develop`) con idéntico resultado. Y los cuatro archivos del
+contrato son **blob-idénticos** entre `HEAD` (develop) y `origin/main` —`reader.ts`, `contracts.ts`,
+`route.ts`, `track-keywords.ts`—, comparados por `git rev-parse <ref>:<ruta>`, **no** por conteo de
+commits: `main` promueve por squash y `rev-list --count` daría un falso «sin desplegar».
+
+## Delta 2026-08-28 (cierre) — la mitad de gateway QUEDÓ DESPLEGADA: rollout completo
+
+Supersede al Delta siguiente, que queda como historia. El criterio de cierre que ese Delta se fijó a
+sí mismo —«una revisión > `00024-8b8`»— está **cumplido**, y verificado contra el runtime, no contra
+documentación:
+
+- **Los dos commits están en el remoto.** `807fb76` (federa el contrato) y `32baa9f` (prettier) están
+  en `origin/main` de `efeoncepro/efeonce-mcp`:
+  `git rev-list --left-right --count origin/main...HEAD` = `0	0`, y
+  `git branch -r --contains 807fb76` → `origin/main`.
+- **El workflow desplegó ESE SHA.** `Deploy Cloud Run` run `33209983511`, `conclusion=success`,
+  `headSha=32baa9f3b22271cc9091e10a2e8ca700003423d9` (2026-08-28T20:50:57Z).
+- **La revisión nueva sirve el 100% del tráfico.** `efeonce-mcp-gateway-00025-njk` (región
+  **`southamerica-west1`**, no `us-east4`), creada 2026-08-28T20:52:44Z, con
+  `traffic: [{ latestRevision: true, percent: 100 }]`. `00025-njk` > `00024-8b8`.
+
+Lo que esa revisión sirve, según el diff de `807fb76`: `maxLinkBarrier` + `includeUnknownBarrier` en
+inventario, schema, tipos del provider y passthrough de query params; `maxDifficulty` **aceptado pero
+declarado como ignorado** en su `.describe()`; y la descripción de la tool declara la cardinalidad
+nueva (un candidato = una keyword normalizada, procedencia en `candidateIds`) y que `clusterConflict`
+`unknown` **no** se lee como `clear`.
+
+**Estado de la task: rollout completo en las dos mitades** (Greenhouse + gateway).
+
+⚠️ **Lo que NO se verificó, dicho como tal:** no se introspectó `tools/list` del gateway desplegado.
+El endpoint MCP exige OAuth y esta sesión es no-interactiva. La evidencia es la cadena
+`commit en origin/main → workflow success sobre ese SHA exacto → revisión creada 2 min después → 100%
+del tráfico`, **no** una lectura del schema realmente servido. El canary
+`scripts/greenhouse-seo-canary.mjs` del repo hermano tampoco cerraría ese hueco: ejercita el provider
+**local** desde `dist/`, no la revisión desplegada.
+
+## Delta 2026-08-28 (SUPERADO por el Delta de arriba) — la mitad de gateway quedó `rollout pendiente`
 
 Detectado al inventariar la superficie federada. La revisión productiva del gateway es
 `efeonce-mcp-gateway-00024-8b8` (SHA `92e7197`). El commit que federa el contrato corregido de

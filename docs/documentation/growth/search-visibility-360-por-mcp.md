@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-08-06 por Claude (TASK-1645 + TASK-1647)
-> **Ultima actualizacion:** 2026-08-14 por Claude (TASK-1664/1666: descubrir keywords + preparar grounded queries AEO — sección nueva y alcance de escrituras actualizado)
+> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1792: la consulta de oportunidades declara de dónde salió el techo de clics, con cuánta muestra y con qué criterio se ordenó; delta previo 2026-08-14 TASK-1664/1666: descubrir keywords + preparar grounded queries AEO — sección nueva y alcance de escrituras actualizado)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) · [EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md](../../architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md)
 > **Manual de uso:** [Operar el provider Greenhouse-SEO del MCP](../../manual-de-uso/plataforma/operar-provider-greenhouse-seo-mcp.md)
 
@@ -58,7 +58,18 @@ Cada oportunidad trae posición ponderada, impresiones, clics estimados que se g
 - **Quick win** — la que está lo bastante cerca como para moverla con poco trabajo.
 - **Canibalización** — la misma consulta traccionando más de una página del sitio. Esa pide un trabajo **distinto**: consolidar o redirigir páginas, no optimizar. No es una variante del mismo consejo.
 
-El puntaje se expresa en **clics incrementales estimados**, no en un número abstracto, y se calcula con la curva de comportamiento de esa misma marca — cuánta gente hace clic en *ese* sitio en cada posición — no con una tabla de industria.
+El puntaje se expresa en **clics incrementales estimados**, no en un número abstracto, y se calcula con la curva de comportamiento de esa misma marca — cuánta gente hace clic en *ese* sitio en cada posición.
+
+🔴 **Desde TASK-1792 la respuesta declara si esa curva alcanzaba** (2026-08-28). Un sitio recién conectado o de bajo tráfico no tiene historia suficiente en la posición objetivo, y antes eso se leía como "ahí no se gana nada": el puntaje daba cero en todas las filas y la lista dejaba de estar ordenada, sin que nada lo avisara. Ahora la respuesta trae cuatro campos que un asistente **está obligado a leer antes de afirmar nada** sobre el puntaje:
+
+- **`ctrCurveSource`** — de dónde salió el techo: `org_measured` (historia propia suficiente), `org_level_reference_shape` (curva de referencia ajustada al nivel medido de ese sitio), `unusable` (se observó la posición y la muestra no alcanza) o `fallback` (nunca se observó esa posición). Los tres últimos son números **prestados**: se pueden mostrar, pero no se presentan como medición del cliente.
+- **`curveSampleSize`** — con cuánta muestra (impresiones **y** clics). `null` significa que esa posición nunca se observó. Un cero de clics **nunca** se reporta como "convierte cero".
+- **`orderedBy`** — con qué criterio se ordenó la lista: `estimated_click_gain` o, cuando el techo no distingue entre filas, `measured_demand` (impresiones × cercanía a la primera plana, todo medido). Un asistente no debe describir la lista como "priorizada por ganancia" si este campo dice lo contrario.
+- **`targetPosition`** y **`expectedCtrAtTarget`** — contra qué posición se calculó el techo y con qué tasa de clic.
+
+Son campos del **conjunto**, no de cada keyword. Y el puntaje es un **techo, jamás un pronóstico**: dice cuánto se ganaría *si* la keyword llegara a esa posición y ahí convirtiera como la curva indica, no que vaya a llegar.
+
+⚠️ La descripción de la tool todavía **no** menciona estos campos, así que un asistente que sólo lea la descripción no sabrá que existen. Está en el payload; declararlo en la descripción es trabajo pendiente.
 
 ### 3. El cruce 360 (`get_seo_visibility_360`)
 

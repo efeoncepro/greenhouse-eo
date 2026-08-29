@@ -86,7 +86,7 @@
   Bets y otros orígenes, con una fila sólo después de verificar el Deal en HubSpot. Las licitaciones promovidas se
   sincronizan en ambos registros por `deal_id`; las oportunidades todavía en radar permanecen sólo en bid desk.
 
-## 2026-08-28 — Documentado un hueco abierto: el candidato de discovery no declara pertinencia
+## 2026-08-28 — El candidato de discovery no declara pertinencia (hueco documentado y levantado)
 
 - Auditando la salida del smoke apareció que el candidato **no transporta ninguna señal de marca,
   categoría ni relevancia** — ni en la tabla ni en el DTO. Consecuencia medida: 50 keywords de
@@ -95,10 +95,19 @@
 - 🔴 El vector estructural no es elegir mal la seed: es **`TASK-1662`**. En el gap competitivo los
   candidatos salen de dominios del competidor, así que **las seeds las elige él**, y sirve segmentos
   que el cliente no. Ahí no hay operador a quien educar.
-- Urge antes de `TASK-1700`: el orden por defecto pondera volumen, y su aggregate es append-only —
-  un score que herede esa señal congela lo irrelevante arriba.
-- **Sin task asignada.** Queda escrito en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §7 (no sólo en
-  una bitácora que rota) porque tres sesiones lo verificaron por separado el mismo día.
+- ⚠️ **La urgencia que se argumentó primero era falsa, y se corrigió el mismo día** (`65372ea68`).
+  Se afirmó que el orden por defecto pondera volumen y que la cola append-only de `TASK-1700`
+  congelaría lo irrelevante arriba. No ocurre: `work-queue/priority-score.ts` no mira el volumen
+  estimado del proveedor, y el CHECK `basis_band_score` impide fabricar un score sin demanda medida —
+  un candidato irrelevante **sin** impresiones cae a banda 3 con score `NULL` y no compite. El caso
+  que sí sostiene la task es el otro: keyword irrelevante **con** impresiones reales, que atraviesa
+  el CHECK y entra a la cola. El vector es la demanda medida, no el volumen del proveedor.
+- **Levantada como `TASK-1791`** (`to-do`, P1, `EPIC-022`, `backend-data`, `Blocked by: none`), sin
+  dueño asignado todavía. La señal entra como **factor del item con su procedencia, jamás como
+  entrada del `priority_score`**: `evidence_ref` es opaca por contrato (cero FK, cero JOIN al motor
+  que produciría la señal), así que puntuar con ella sería puntuar con algo que el aggregate no puede
+  citar. El hallazgo queda además en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §7 (no sólo en una
+  bitácora que rota) porque tres sesiones lo verificaron por separado el mismo día.
 
 ## 2026-08-28 — El drain de keyword discovery baja de 10 a 2 minutos
 

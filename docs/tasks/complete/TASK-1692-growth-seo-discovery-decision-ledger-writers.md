@@ -1,5 +1,31 @@
 # TASK-1692 — Growth SEO: el ledger de decisiones de discovery lo escribe el primitive
 
+## Delta 2026-08-28 (verificación) — la puerta está VIVA en producción, ejercitada contra el runtime
+
+El invariante central de esta task —**un consumer sólo registra decisiones humanas puras; los
+`action_kind` que produce un command los escribe el primitive dentro de su propia transacción**— se
+ejercitó contra el endpoint real en `https://greenhouse.efeoncepro.com`, con sesión de agente
+(`user-agent-e2e-001`):
+
+```
+POST /api/admin/growth/seo/keyword-discovery
+  {"intent":"record_action","organizationId":"EO-ORG-0007",
+   "candidateId":"probe-nonexistent-task1694","actionKind":"promoted_to_tracking"}
+→ HTTP 400
+  {"code":"seo_discovery_invalid_input", …,
+   "allowedActionKinds":["dismissed","rejected","selected_for_grounded_query"]}
+```
+
+`promoted_to_tracking` es **rechazado en el borde**, y la respuesta además enumera los tres kinds que un
+consumer sí puede escribir. El rechazo ocurre en validación, antes de tocar la base: la sonda usó un
+`candidateId` inexistente a propósito y no escribió nada. Verificación cruzada previa contra staging
+(`develop`) con idéntico resultado; `route.ts` y `track-keywords.ts` son blob-idénticos entre `HEAD` y
+`origin/main`.
+
+Con esto, la puerta que cierra el bug de "reportar un outcome desde afuera" queda probada en el runtime
+productivo, no sólo en tests.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

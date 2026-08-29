@@ -193,6 +193,25 @@ cuando el sitio genuinamente rinde por debajo, y eso el nivel sí lo captura.
 la explosión por sitelinks infla los buckets 1–2. Si tu pipeline todavía usa `all_rows`,
 decláralo — un sesgo no declarado se lee como medición limpia.
 
+🔴 **El sesgo de muestra chica no es ruido aleatorio: empuja SIEMPRE hacia abajo.** `k/n` es
+insesgado en el promedio, pero la observación típica no lo es: con `n` chico y `p` bajo la
+distribución tiene una masa enorme en cero y una cola larga a la derecha, así que la **mediana
+queda por debajo del CTR verdadero**. Operativamente: el error **no se cancela** mirando más
+buckets del mismo sitio ralo — todos tienden a subestimar y la curva sale deprimida de punta a
+punta. Y ahí está la trampa fina, porque **una curva deprimida por falta de muestra es
+indistinguible de un vertical genuinamente deprimido por AI Overviews**, que es exactamente el
+diagnóstico que la curva propia existía para entregar. Antes de decirle a un cliente "tu
+vertical tiene el CTR deprimido", verifica que cada bucket que sostiene esa frase pase el piso.
+
+⏳ **Y puede ser estructuralmente inalcanzable, no sólo estar mal calibrada.** A 75 impresiones
+por ventana de 28 días —el caso fuente— un bucket acumula ~2,7 impresiones/día: llegar a 1.000
+toma **del orden de un año**, y recién ahí un CTR real de ~1% habría producido los ~5 clics que
+el piso pide. **GSC retiene 16 meses** por el extremo viejo de la ventana, así que ampliar la
+ventana **no** es una salida indefinida: el dato viejo se cae por un lado mientras el nuevo
+entra por el otro. Para un sitio de bajo tráfico, "todavía no tenemos muestra" puede significar
+**nunca la vamos a tener** con esta fuente. La respuesta correcta no es esperar: es prestar la
+forma, declarar la procedencia, y decirlo.
+
 ### GSC → BigQuery (export masivo, caso Greenhouse)
 - El **bulk data export** de GSC a BigQuery elimina el muestreo y guarda
   histórico ilimitado. Greenhouse ya usa BigQuery (`efeonce-group`) → encaja.

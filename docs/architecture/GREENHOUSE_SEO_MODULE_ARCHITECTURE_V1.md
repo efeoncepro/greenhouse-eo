@@ -424,11 +424,21 @@ cablea al cliente público compartido"; el camino correcto es `TASK-1631`).
     `SEO_DISCOVERY_DEFAULT_VOLUME_POLICY = 'all'`: `keyword_suggestions` y `keyword_ideas` dejan
     de mandar `filters: [['keyword_info.search_volume','>',0]]`. El proveedor cobra por fila
     devuelta y `limit` ya acota las filas, así que el filtro **no bajaba el techo de costo** —
-    cambiaba qué filas se compraban por el mismo precio, y en un mercado ralo gastaba el `limit`
-    descartando el long-tail emergente. La corrida persiste `volumePolicy` por método en
-    `methods_json`; una corrida anterior sin el campo se lee con el default **histórico**
-    (`positive_volume_only` para suggestions/ideas, `all` para related/site) — el reader reproduce
-    la historia, no la reescribe.
+    cambiaba qué filas se compraban por el mismo precio. El valor del cambio es **cerrar la
+    asimetría no declarada** entre los cuatro adapters y dejar de IMPONER una exclusión que el
+    contrato nunca decía. 🔴 **Corrección con evidencia (smoke con gasto, 2026-08-28): el beneficio
+    que la spec prometía —"en un mercado ralo gastaba el `limit` descartando el long-tail
+    emergente"— NO se sostiene.** Medido: 3 corridas, 2 endpoints, 2 mercados (MX/CL), 102
+    candidatos, USD 0,0482 — **cero candidatos con volumen nulo o cero**; y el histórico del store
+    lo corrobora (`keyword_suggestions` 61 filas / 0 nulos). Los índices de sugerencias e ideas del
+    proveedor sólo devuelven keywords con volumen medido, así que ahí el filtro era un **no-op**:
+    filtraba una condición ya verdadera. Corolario: el estado "Sin dato de mercado" **sigue sin ser
+    alcanzable** desde suggestions/ideas —no por el filtro, sino por lo que contiene el índice— y
+    donde el volumen nulo SÍ aparece es en `keyword_overview` (15 de 62), que nunca llevó el filtro.
+    **NUNCA** citar el long-tail recuperado como beneficio de este cambio. La corrida persiste
+    `volumePolicy` por método en `methods_json`; una corrida anterior sin el campo se lee con el
+    default **histórico** (`positive_volume_only` para suggestions/ideas, `all` para related/site) —
+    el reader reproduce la historia, no la reescribe.
   - **Federación en el MISMO PR:** route admin, lane ecosystem y tool MCP `get_seo_keyword_discovery`
     parsean `maxLinkBarrier`/`includeUnknownBarrier` con el vocabulario cerrado y hacen passthrough
     de `ignoredFilters`; el gateway `efeonce-mcp` actualiza espejo de inventario, schema,
