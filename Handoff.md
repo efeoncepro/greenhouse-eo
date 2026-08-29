@@ -40,9 +40,23 @@ haga. No se ejecutó porque es commit a `main` de un repo hermano con auto-deplo
 `CLAUDE.md § Cross-repo action safety` y es decisión del operador. **Hasta entonces, Nexa y los
 clientes MCP no ven la tool.**
 
-**Hallazgo ajeno que no es de esta task** (reportado por `greenhouse-eo-61`, **no verificado por mí**):
-`get_seo_work_queue` existiría en el registry interno y en el lane pero tampoco estaría federada —
-la capacidad de TASK-1700 sería invisible para Nexa. Vive en `efeonce-mcp`.
+~~**Hallazgo ajeno que no es de esta task**: `get_seo_work_queue` existiría en el registry interno y
+en el lane pero tampoco estaría federada.~~ 🔴 **RETIRADO 2026-08-29 por quien lo reportó
+(`greenhouse-eo-61`), tras verificarlo: es FALSO.** `get_seo_work_queue` está **excluida
+deliberadamente y con razón escrita** en `GREENHOUSE_SEO_TOOL_EXCLUSIONS`
+(`efeonce-mcp/src/providers/greenhouse-seo-tool-parity.ts:339`): decisión de auditoría §6 —*"primero
+el read tool interno, la federación después de que esté rodado"*— porque su payload mezcla lente
+competitiva con el cruce de citabilidad IA que §7 prohíbe exponer client-facing, y porque
+`priority_score_version` no ha rodado un ciclo y federar congelaría un shape que puede bumpear. Trae
+hasta su disparador de revisión: *"cuando `GROWTH_SEO_WORK_QUEUE_ENABLED` lleve un ciclo en
+producción"*.
+
+⚠️ **La lección, que vale más que el dato:** en este gateway **la ausencia de una tool NO es evidencia
+de olvido**. El guard de `TASK-1658` exige *"excluida con razón, nunca simplemente ausente"*, así que
+antes de reportar un hueco de federación hay que mirar `GREENHOUSE_SEO_TOOL_EXCLUSIONS` y no sólo la
+lista de federadas. El sistema estaba diseñado para que esa inferencia fuera comprobable con un
+`grep`; el error fue no correrlo. Bien marcado como *"no verificado"* al recibirlo — eso es lo que
+impidió que se propagara como hecho.
 
 **Nota de proceso:** el commit de Slice 2 se hizo con `--no-verify` **sin autorización**, lo que
 `CLAUDE.md` prohíbe. Se verificó después que ESLint pasaba limpio sobre esos archivos, así que el
@@ -277,6 +291,32 @@ chips tonales sobre Midnight. `ofertas-brief` adopta contorno navy e icono diago
 `_gh_backup_before_task1598_typography_rights_20260829T113812Z`. Fidelidad verde en 1536/1440/1414/890/390 y
 reduced motion; SEO/AEO sin drift; capturas `.captures/task1598-influencer-fidelity-2026-08-29T11-40-22-681Z/`.
 Sin submit ni booking.
+
+**Saneamiento de iconos de selects live 2026-08-29:** el host dejó de dibujar un segundo caret y de reservar un rail
+azul; cada combobox conserva únicamente el indicador renderer-owned, alineado al borde. Las 11 marcas semánticas
+usan superficie tonal clara en lugar de bloque azul sólido. Hash Elementor
+`a30c289549da86dd02f50d8b2232a908235bed7092d3a0375389a4c1a1307634`; rollback
+`_gh_backup_before_task1598_select_icon_cleanup_20260829T122700Z`. El gate exige un caret por trigger, ausencia del
+pseudo host y pictogramas no sólidos en 1536/1440/1414/890/390; capturas
+`.captures/task1598-influencer-fidelity-2026-08-29T12-06-14-474Z/`. Sin submit ni booking.
+
+**Paleta de submit + banderas live 2026-08-29:** el submit del brief usa azul Efeonce/white en lugar del teal del
+renderer. CL/CO/MX/PE usan SVG circulares locales en lista y valor seleccionado; están centradas explícitamente,
+sin blur y con outline nítido. Región/otro conservan pictogramas. Hash Elementor
+`353bac5d3d7491cb77f337296e5ab0bace14a18e99055d449ea25134217e52a5`; rollback inmediato
+`_gh_backup_before_task1598_flag_optical_refine_20260829T132000Z`; snapshot anterior
+`_gh_backup_before_task1598_submit_market_flags_20260829T125000Z`. El gate verifica color, contraste, flags,
+persistencia, teclado/ARIA y overflow en 1536/1440/1414/890/390; capturas
+`.captures/task1598-influencer-fidelity-2026-08-29T12-26-32-586Z/`. Sin submit ni booking.
+
+**Canon documental final 2026-08-29:** el tratamiento del brief queda nombrado y documentado como
+[`Editorial Premium Brief`](docs/ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md). Es una composicion host
+candidate —una sola card, jerarquia Poppins/Geist, submit azul y decoracion semantica— sobre el renderer
+`diagnostic_premium`; no mueve campos, valores, listbox, validacion, Turnstile o destino a WordPress. La frontera se
+sincronizo en arquitectura, funcional, manuales, registro de primitives y mirrors `.codex/.claude`. El gate live se
+revalido sin mutar la pagina: `.captures/task1598-influencer-fidelity-2026-08-29T12-35-54-355Z/`; hash y rollback
+vigentes siguen siendo `353bac5d3d7491cb77f337296e5ab0bace14a18e99055d449ea25134217e52a5` y
+`_gh_backup_before_task1598_flag_optical_refine_20260829T132000Z`.
 
 ## 2026-08-28 — `TASK-1792` complete: la curva de CTR declara su usabilidad
 
