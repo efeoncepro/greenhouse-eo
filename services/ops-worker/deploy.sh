@@ -1626,7 +1626,7 @@ echo "  -> ops-seo-keyword-discovery-drain: */2 * * * * ACTIVO (keyword discover
 # `materialized=1`, `reused=1`, `failed=0`. Inspección fila por fila del target
 # `seot-efeonce-own-brand` (105 items): `staleness=fresh`, 5 de 6 orígenes `ok` y
 # `competitor_gap` declarado `degraded` sin arrastrar a los demás, verbos coherentes con su
-# origen, y **todas las filas en banda 2 con `priority_score` NULL** — que es la degradación
+# origen, y **55 en banda 2 y 50 en banda 3, 0 de 105 con `priority_score`** (medido sobre la página completa; una lectura previa de 8 filas se reportó como «todas banda 2» y era una vista parcial) — que es la degradación
 # honesta, no una falla: hay demanda medida pero la curva de CTR del sitio no es utilizable, y
 # la cola se NIEGA a fabricar un número. Leer ese `null` como 0 invertiría el significado.
 #

@@ -1302,8 +1302,8 @@ Scheduler** —no un `curl` aproximado, que probaría otra cosa que la que el cr
 El snapshot materializado (`seot-efeonce-own-brand`, **105 items**) se inspeccionó **fila por fila**
 sobre lo que sirve el lane ecosystem de producción: `staleness=fresh`; **5 de 6 orígenes `ok`** con
 `competitor_gap` declarado `degraded` **sin arrastrar el score de los demás** (§18 «un origen caído
-no baja el score de los otros»); verbos coherentes con su origen; y **todas las filas en banda 2 con
-`priority_score` NULL**. 🔴 **Eso último es la degradación honesta funcionando, no una falla**: hay
+no baja el score de los otros»); verbos coherentes con su origen; y **55 en banda 2 y 50 en banda 3, 0 de 105 con `priority_score`** (medido sobre la página completa; una
+lectura previa de 8 filas se reportó como «todas banda 2» y era una vista parcial). 🔴 **Eso último es la degradación honesta funcionando, no una falla**: hay
 demanda medida, la curva de CTR del sitio no es utilizable en la posición objetivo (§18.4 — el mismo
 `efeoncepro.com` de 75 impresiones / 0 clics en el bucket 5), y la cola **se niega a fabricar un
 techo**. Corolario operativo directo: mientras esa organización esté toda en banda 2, el adapter
