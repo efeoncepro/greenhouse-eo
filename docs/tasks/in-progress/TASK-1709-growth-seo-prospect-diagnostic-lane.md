@@ -1,5 +1,19 @@
 # TASK-1709 — Growth SEO: carril de diagnóstico de prospecto (sin contrato, sin acceso del cliente)
 
+## Delta 2026-08-29 — `ProspectFact` es ahora la especialización de un tipo COMPARTIDO (TASK-1785)
+
+`TASK-1785` generalizó al resto del contrato agéntico la forma que este carril definió primero.
+Cambio aplicado en `src/lib/growth/seo/prospect/contracts.ts`, **sin cambio semántico ni de CHECK**:
+
+- `ProspectLens = Extract<SeoLens, 'estimated'>` — se estrecha desde el vocabulario canónico en vez
+  de declarar su propio literal. Sigue admitiendo sólo `estimated`.
+- `ProspectFact extends SeoFigureShape<ProspectSource>` — la FORMA es la compartida; la lista de
+  fuentes sigue siendo la de este carril, espejo de su CHECK en base. Forzarla a `SeoFigureSource`
+  habría divorciado el tipo de su constraint.
+
+Si el vocabulario canónico se renombra, esto deja de compilar en vez de divergir en silencio — que
+era el riesgo real de tener dos definiciones de la misma palabra.
+
 ## Delta 2026-08-27
 
 - El transporte y el writer del ledger ahora **exigen** `consumer`: toda llamada del carril de

@@ -1,5 +1,26 @@
 # TASK-1691 — Declarar la lente estimada y su fecha de captura en la tabla de oportunidades SEO
 
+## Delta 2026-08-29 — el campo que esta task tenía que inferir YA EXISTE (TASK-1785)
+
+`TASK-1785` cerró el contrato agéntico: los readers del módulo emiten `provenance: SeoProvenance[]`
+con `lens` (`measured` | `estimated`), `source` y `capturedAt`. **Esta task ya no tiene que inferir
+la lente desde el origen del dato: la lee.**
+
+Lo que cambia concretamente para la superficie visible:
+
+- `readKeywordOpportunities` emite la procedencia **partida**: el striking-distance (posición,
+  impresiones, clics, CTR, techo) es `measured`; el enriquecimiento de mercado (`searchVolume`,
+  `difficulty`, `linkBarrier`) es `estimated`. La tabla puede rotular columna por columna sin
+  decidir nada por su cuenta.
+- El glifo sale de `SEO_LENS_MARKER` (`src/lib/growth/seo/lens.ts`), un solo origen. **NUNCA**
+  escribir `◑`/`●` literales en la vista: hoy están crudos en ~14 archivos y ése es el desorden que
+  1785 dejó de crear hacia adelante.
+- `capturedAt` viaja por sección: un volumen de mercado y una impresión medida **no comparten
+  as-of**, y presentarlos bajo una sola fecha sería el mismo defecto en versión visual.
+
+⚠️ Sigue siendo trabajo de esta task decidir **cómo se ve**: 1785 es el contrato, 1691 es la
+superficie humana. No comparten archivos.
+
 ## Delta 2026-08-28 (4) — la lente de mercado deja de ordenar y pasa a ENRIQUECER el ítem; y el cutover reintroduce `noGainHint`
 
 `TASK-1700` está en `develop` con sus siete slices (`962d22118` … `9020d6421`). El Slice 7 (`9020d6421`)

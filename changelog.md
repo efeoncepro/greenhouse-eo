@@ -7,6 +7,27 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-29 — El contrato `●`/`◑` deja de depender de que alguien lea la descripción
+
+`TASK-1785`. Los readers de `growth/seo` emiten `provenance: SeoProvenance[]` en su `ok: true`:
+**requerido**, así que `tsc` nombra a cualquier reader que no declare de qué naturaleza es lo que
+devuelve. En lista, porque hay DTO genuinamente mixtos — `SeoPerformanceResult` declaraba UNA fuente
+mientras su `summary` era siempre Search Console, o sea cifras medidas dentro de un envoltorio
+rotulado estimado.
+
+Dos guards nuevos: uno camina el DTO real y exige que **cada hoja numérica tenga exactamente un
+dueño** (detecta sin-dueño y con-dos-dueños); otro censa las superficies del lane y del MCP
+comparando contra el **filesystem**, en ambas direcciones. Sin ellos, el campo habría sido una
+promesa: nada obligaba a que las procedencias declaradas cubrieran lo que hay.
+
+Tool nueva `get_seo_dual_lens_visibility`: las dos series de posición separadas y rotuladas en una
+sola llamada, **sin campo combinado por contrato**. Existe para invertir un incentivo — presentar
+bien las dos lentes costaba dos llamadas y una decisión, presentarlas mal costaba una y ninguna.
+⚠️ **Falta federarla al gateway** (cross-repo): hasta entonces Nexa y los clientes MCP no la ven.
+
+Sin migración, sin flag, sin cambio de valor en ninguna cifra. `dataforseo_serp` quedó como lente
+`estimated` y no `measured`: exacto no es medido — esa consulta la hicimos nosotros.
+
 ## 2026-08-29 — Las capacidades SEO nuevas pasan de "prendidas" a "ejercitadas"
 
 `domain-overview` y `url-visibility` corrieron por el camino desatendido del scheduler (body `{}`),
@@ -38,10 +59,29 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 
 ## 2026-08-28 — Landing Agencia de influencers publicada (`TASK-1598`)
 
+- El cierre responsive corrige la franja de divulgación IA que a 1414 px dejaba un bloque vacío: ahora es full-bleed
+  y conserva la retícula. El form reemplaza sparkle por documento y fija una jerarquía medible Poppins/Geist sin
+  peso 650. Los assets mantienen duración, eliminan fechas ficticias y explican publicación, pauta o canales con
+  chips tonales; el CTA secundario de ofertas usa contorno navy e icono diagonal. Fidelidad live pasó en
+  1536/1440/1414/890/390 y reduced motion; SEO/AEO no tuvo drift.
+
+- El rail estático de cuatro logos se reemplazó por el widget compartido `greenhouse_social_trust` de la landing de
+  Redes Sociales. Conserva las tres señales regionales y añade el marquee monocromático canónico `logoMarquee.v2`
+  con 3×7 marcas, label/nombre accesible y reduced motion; el gate live cubre composición y overflow en cuatro
+  viewports. No se duplicó markup ni se creó otro widget.
+
 - El último refinamiento visual convierte la franja bajo el hero en un rail editorial responsive, añade profundidad
   controlada a “Cinco capas”, usa iconos monocromos reales/semánticos en los destinos de assets y corrige el lenguaje
   visual del form con megáfono y contador próximo al textarea. El gate de fidelidad ahora cubre estos contratos en
   1536/1440/890/390 y reduced motion; el gate SEO/AEO volvió a pasar sin drift de metadata o schema.
+
+- El CTA fijo se refinó como dock Midnight flotante y contenido, con safe-area y targets de 48 px. `Agenda una
+  reunión` conserva la única superficie sólida verde; `Cuéntanos tu campaña` usa contorno transparente e icono
+  diagonal. El gate live cubre geometría, clipping, superficie, jerarquía e icono en 1536/1440/890/390.
+
+- El brief publicó una v2 `diagnostic_premium`: los dos selects ya no abren el popup nativo, sino comboboxes
+  accesibles del renderer. La landing añade 11 marcas semánticas para mercado y activación sin duplicar estado ni
+  validación; el gate live abre ambas listas y prueba teclado, overlay, contraste y clipping en cuatro viewports.
 
 - Tras el review live del owner se corrigió una regresión de fidelidad que el smoke inicial no detectó: cargar assets
   no probaba la secuencia. El hero vuelve a rotar tres clips con progreso, play/pausa y sonido; también se restauraron
@@ -852,19 +892,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   envío/límites— en espejos byte-identical para Codex y Claude, verificadas contra fuentes oficiales actuales.
 - La guía de Resend separa el contrato documental vigente de la evidencia runtime que lo contradice: links con
   secreto siguen fail-closed y requieren `click_tracking=false` más un canary del href recibido.
-
-## 2026-08-20 — Skill compartida para diseñar y operar dashboards en Google Data Studio
-
-- La nueva skill `google-data-studio` queda invocable por Codex y Claude con bundles byte-identical y aliases para
-  el nombre histórico Looker Studio; separa el producto de Looker/LookML y consulta fuentes oficiales fechadas.
-- Cubre selección de gráficos, modelado, calculated fields, filtros, controles, parámetros, blends, responsive,
-  rendimiento, credenciales, sharing y embedding mediante referencias load-on-demand.
-- Su ejecución browser parte en `inspect`, distingue Browser/Playwright, Computer Use y Webwright, exige cambios
-  atómicos por el autosave y protege OAuth, credenciales, fuentes reutilizables, sharing y costos con gates explícitos.
-- La auditoría adversarial amplía el contrato con onboarding de Sheets/BigQuery, row-level security por email,
-  lifecycle `refresh fields|reconnect`, copias/rollback, draft/published, extracts, freshness, delivery/alertas, APIs
-  limitadas y una escalera de troubleshooting; también refuerza sesión autorizada y minimización de evidencia en
-  ambos runtimes.
-- El aprendizaje de operación con Search Console queda generalizado: polaridad inversa de Average Position,
-  protección contra ejes globales en combos, rangos parciales visibles, cohortes `new|rewrite`, fórmulas ponderadas y
-  una narrativa cliente que separa resultado observado, inferencia e impacto de negocio demostrado.

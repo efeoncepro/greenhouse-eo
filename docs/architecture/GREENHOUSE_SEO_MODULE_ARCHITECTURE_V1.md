@@ -293,6 +293,29 @@ Se envuelven en una sola narrativa de producto: **Search Visibility 360** = los 
 >
 > **Por qué está acá y no en el AEO.** Es el puente SEO↔AEO de la pantalla ancla: una **caída de CTR con posición estable** casi siempre se explica en la SERP, no en el sitio (señal 4 de §2, ahora medible en la misma serie). ⚠️ **NO cruza el boundary §1.1**: no hay JOIN, VIEW ni FK entre `seo_*` y `grader_*` — es una columna del snapshot SEO leída por el mismo reader que ya la capturaba.
 
+> **Delta 2026-08-29 (TASK-1785) — el contrato de honestidad dejó de ser una instrucción y pasó a ser un mecanismo.**
+>
+> Lo de arriba era correcto y estaba bien escrito. Su problema era **la capa**: la mezcla de lentes no ocurre DENTRO de una tool sino **ENTRE** dos, cuando alguien llama a las dos y redacta un párrafo. Esa composición no la ve ninguna tool, así que ninguna descripción podía defenderla — por bien escrita que estuviera.
+>
+> 🔴 **El diagnóstico real no era "falta el campo": era que el mismo hecho se decía en CINCO vocabularios paralelos**, y por eso ningún mecanismo podía verificarlo (no había un nombre común contra el cual comparar): `lens: 'estimated'` en tres readers · `SeoPerformanceSource = gsc_measured|dataforseo_estimated` · `measurementKind: 'estimated_market'` en 10 sitios del lane · `estimatedMarker`/`measuredMarker` en el DTO cliente de la cola · `ProspectLens`. Más los glifos ◑/● crudos en ~14 vistas, `src/lib/copy/growth.ts` y las descripciones de las tools. ⚠️ **El quinto no aparece grepeando `lens`** —sus campos no se llaman así—: el barrido que los halló a los cinco fue por **glifos e identificadores de rótulo**. Un grep angosto no es un inventario.
+>
+> **La lente vive a nivel de CIFRA, no de resultado, y hay dos pruebas vivas de signo opuesto:**
+> - `SeoPerformanceResult.source` declara UNA fuente para todo el DTO, pero su `summary` es SIEMPRE Search Console. Con `source = 'dataforseo_estimated'` viajaban cifras **medidas dentro de un envoltorio rotulado estimado**. No era el error de nadie: era la forma del contrato.
+> - `work-queue/client-dto.ts` **no** miente, y sólo porque abandonó el rótulo de resultado y lo puso por campo: el techo estimado (◑) convive con las impresiones medidas (●) en la **misma fila**. Llegó a la forma correcta por necesidad, no por diseño.
+>
+> **Qué existe ahora.** `src/lib/growth/seo/lens.ts` fija un vocabulario único: `SeoLens` binaria, fuentes en lista **cerrada** y `resolveSeoLens` total sobre ella. La lente se **deriva de la fuente** y **no se persiste**: es constante por tabla, así que una columna sólo podría divergir (alguien la escribe mal en un INSERT y aparecen filas GSC marcadas `estimated`). Los readers emiten `provenance: SeoProvenance[]` en su `ok: true`, en lista porque hay DTO genuinamente mixtos y rotularlos con una sola lente ERA el defecto.
+>
+> **El mecanismo son tres capas, no una afirmación:**
+> 1. **`tsc`** — `provenance` es requerido en el `ok: true`: un reader nuevo no compila sin declarar lente.
+> 2. **Cobertura de cifras** (`lens-coverage.ts`) — camina el DTO real y exige que **cada hoja numérica tenga exactamente un dueño**. Detecta las dos direcciones: sin dueño (el agujero) y con dos (ambigüedad, que no es redundancia). `notFigures` obliga a declarar qué números son parámetros y no mediciones.
+> 3. **Censo de superficies** (`lens-surface-manifest.ts`) — `tsc` cubre al reader, **no** a la superficie: el guard compara el censo contra el **filesystem** y contra `server.ts`, en ambas direcciones, y se mide **cuando corre**, no cuando alguien escribió el manifiesto (el checkout es compartido y una medición envejece en minutos).
+>
+> **🔴 `dataforseo_serp` es `estimated`, no `measured`.** Un Delta previo proponía lo contrario porque la posición del SERP comprado es *exacta*. **Exacto no es medido**: esa consulta la hicimos nosotros, desde una ubicación que elegimos, y ningún usuario la hizo. Rotularla `measured` la volvería promediable con GSC —la mezcla que todo esto existe para impedir— y rompería además la asimetría de `readKeywordGap`, que **excluye** las keywords con impresiones medidas precisamente porque la lente medida gana en vez de promediarse. Hay test de regresión.
+>
+> **Lectura compuesta.** `readDualLensVisibility` (+ tool `get_seo_dual_lens_visibility`) devuelve las dos series **separadas y rotuladas** en una llamada. Existe para invertir un incentivo: presentar bien las dos lentes costaba dos llamadas y una decisión, presentarlas mal costaba una y ninguna. 🔴 **No tiene campo combinado, y no es una omisión pendiente** — el shape no tiene dónde ponerlo y un test falla si aparece una clave que lo sugiera. Un índice único exigiría su propia ADR. **Convive** con `get_seo_visibility_360`, que cruza otra cosa (SEO×AEO, dos ejes ortogonales); ésta cruza medido×estimado dentro de SEO.
+>
+> **No hubo migración ni columna nueva, y ninguna cifra cambió de valor.**
+
 ---
 
 ## 6. DataForSEO governance
