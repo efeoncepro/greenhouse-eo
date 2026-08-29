@@ -99,6 +99,41 @@ describe('readDualLensVisibility', () => {
     expect(vi.mocked(readSeoPerformance).mock.calls[0][1]).toMatchObject({ pinnedLens: 'measured' })
   })
 
+  it('respeta el target que el caller ya resolvio, sin re-resolverlo', async () => {
+    // ISSUE-153: el lane resuelve el mercado con el selector `?market=`. Re-resolver aca
+    // descartaria esa eleccion y una org con dos mercados perderia la lente estimada pese a
+    // haber elegido bien.
+    const { resolveUnambiguousSeoTarget } = await import('../../resolve-target')
+
+    vi.mocked(resolveUnambiguousSeoTarget).mockClear()
+
+    const result = await readDualLensVisibility({
+      organizationId: 'org-1',
+      keywords: ['agencia'],
+      seoTargetId: 'seot-mx-elegido'
+    })
+
+    if (!result.ok) throw new Error('esperaba ok')
+
+    expect(result.seoTargetId).toBe('seot-mx-elegido')
+    expect(vi.mocked(resolveUnambiguousSeoTarget)).not.toHaveBeenCalled()
+  })
+
+  it('con el target explicito en null declara la lente estimada indisponible, sin adivinar', async () => {
+    const result = await readDualLensVisibility({
+      organizationId: 'org-1',
+      keywords: ['agencia'],
+      seoTargetId: null
+    })
+
+    if (!result.ok) throw new Error('esperaba ok')
+
+    expect(result.estimated.unavailable).toEqual({ reason: 'target_not_resolved' })
+    // Y la lente medida sigue sirviendose: que falte el mercado no invalida lo que GSC midio.
+    expect(result.measured.unavailable).toBeNull()
+    expect(result.measured.series).toHaveLength(1)
+  })
+
   it('sin keywords es un estado, no un error inventado', async () => {
     const result = await readDualLensVisibility({ organizationId: 'org-1', keywords: [] })
 

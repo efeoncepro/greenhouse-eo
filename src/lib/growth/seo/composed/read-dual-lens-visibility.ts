@@ -109,6 +109,16 @@ export const readDualLensVisibility = async (input: {
   organizationId: string
   keywords: string[]
   rangeDays?: number
+  /**
+   * Target YA resuelto por el caller. El lane ecosystem lo resuelve respetando el selector
+   * `?market=` (ISSUE-153), así que re-resolverlo acá **descartaría el mercado que el
+   * operador eligió**: en una org con dos mercados, un `?market=MX` correcto terminaría con
+   * la lente ◑ declarada indisponible por "ambigüedad" que el caller ya había resuelto.
+   *
+   * Sin este parámetro se resuelve internamente, y ahí sí sólo puede servir el caso
+   * inequívoco — que es la degradación honesta, no un país elegido al azar.
+   */
+  seoTargetId?: string | null
 }): Promise<ReadDualLensVisibilityResult> => {
   if (!isSeoModuleEnabled()) {
     return { ok: false, errorCode: 'disabled', status: null }
@@ -123,11 +133,13 @@ export const readDualLensVisibility = async (input: {
   const rangeDays = input.rangeDays ?? DEFAULT_RANGE_DAYS
 
   try {
-    // ISSUE-153: resolución canónica del target, nunca un LIMIT 1 inline. Con más de un
-    // mercado activo esto degrada a null y la lente ◑ se declara indisponible — jamás sirve
-    // el país que salga primero.
-    const target = await resolveUnambiguousSeoTarget(input.organizationId)
-    const seoTargetId = target.target?.seoTargetId ?? null
+    // ISSUE-153: si el caller ya resolvió el mercado, se respeta su elección; si no, se
+    // resuelve canónicamente y con más de un mercado activo degrada a null. Jamás un
+    // `LIMIT 1` inline, y jamás el país que salga primero.
+    const seoTargetId =
+      input.seoTargetId !== undefined
+        ? input.seoTargetId
+        : ((await resolveUnambiguousSeoTarget(input.organizationId)).target?.seoTargetId ?? null)
 
     const [performance, rankEvolution] = await Promise.all([
       readSeoPerformance(input.organizationId, {

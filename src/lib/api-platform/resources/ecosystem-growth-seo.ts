@@ -2111,6 +2111,10 @@ export const getEcosystemSeoDualLensVisibilityPayload = async ({
   const result = await readDualLensVisibility({
     organizationId: subject.organizationId,
     keywords,
+    // El target YA lo resolvió el lane respetando `?market=`. Pasarlo evita una segunda
+    // resolución que descartaría el mercado elegido por el operador (ISSUE-153) y ahorra
+    // una consulta que ya se hizo.
+    seoTargetId: subject.seoTargetId,
     ...(rangeDays ? { rangeDays } : {})
   })
 

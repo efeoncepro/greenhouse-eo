@@ -8,6 +8,15 @@
  * 🔴 La pregunta que responde NO es "¿hay un campo `provenance`?" sino "¿queda alguna cifra
  * sin dueño?". Es la diferencia entre medir la forma y medir la cobertura, y es exactamente
  * la distinción que este módulo ya pagó cara en otros invariantes.
+ *
+ * ⚠️ **Alcance conocido, declarado para que nadie lo lea como total.** El guard corre sobre
+ * FIXTURES tipados de cada reader, no sobre su salida real. La cadena que lo hace efectivo es
+ * indirecta: un campo numérico **requerido** nuevo rompe el fixture en `tsc`, alguien lo
+ * completa, y recién ahí el guard ve la hoja sin dueño. Por eso funciona para campos
+ * requeridos y **NO** para campos OPCIONALES: un `nuevoKpi?: number` no rompe el fixture y
+ * el guard no lo llega a ver. Mitigación mientras no exista un live test que ejercite los DTO
+ * reales contra PostgreSQL: **preferir campos requeridos** en los readers del módulo, y si un
+ * campo debe ser opcional, agregarlo al fixture a mano en el mismo PR.
  */
 
 import type { SeoProvenance } from './lens'
@@ -75,6 +84,15 @@ export interface LensCoverageReport {
   unclaimed: string[]
   /** Cifras reclamadas por MÁS de una entrada: ambigüedad, no redundancia. */
   ambiguous: string[]
+  /**
+   * Secciones que traen al menos una cifra pero declaran `capturedAt: null`.
+   *
+   * `null` es legítimo cuando la sección está VACÍA ("no hay nada que fechar"), y deja de
+   * serlo en cuanto hay un número: una cifra sin as-of se lee como vigente para siempre. La
+   * regla estaba escrita en `lens.ts` desde el primer commit y no tenía nada que la
+   * sostuviera — que es precisamente el defecto que este módulo persigue.
+   */
+  figuresWithoutAsOf: string[]
 }
 
 /**
@@ -96,13 +114,20 @@ export const reportLensCoverage = (input: {
 
   const unclaimed: string[] = []
   const ambiguous: string[] = []
+  const sectionsWithFigures = new Set<string>()
 
   for (const leaf of leaves) {
     const owners = input.provenance.filter(entry => sectionClaims(entry.section, leaf))
 
     if (owners.length === 0) unclaimed.push(leaf)
     else if (owners.length > 1) ambiguous.push(leaf)
+
+    for (const owner of owners) sectionsWithFigures.add(owner.section)
   }
 
-  return { unclaimed, ambiguous }
+  const figuresWithoutAsOf = input.provenance
+    .filter(entry => entry.capturedAt === null && sectionsWithFigures.has(entry.section))
+    .map(entry => entry.section)
+
+  return { unclaimed, ambiguous, figuresWithoutAsOf }
 }

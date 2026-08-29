@@ -82,7 +82,7 @@ describe('cobertura sobre DTO reales', () => {
 
     expect(
       reportLensCoverage({ dto, provenance: dto.provenance, notFigures: ['range.days'] })
-    ).toEqual({ unclaimed: [], ambiguous: [] })
+    ).toEqual({ unclaimed: [], ambiguous: [], figuresWithoutAsOf: [] })
   })
 
   it('🔴 performance: el DTO mixto queda cubierto SIN que una cifra tenga dos dueños', () => {
@@ -130,7 +130,7 @@ describe('cobertura sobre DTO reales', () => {
 
     const report = reportLensCoverage({ dto, provenance: dto.provenance, notFigures: ['range.days'] })
 
-    expect(report).toEqual({ unclaimed: [], ambiguous: [] })
+    expect(report).toEqual({ unclaimed: [], ambiguous: [], figuresWithoutAsOf: [] })
 
     // Y la prueba de que la partición dice algo: las dos lentes conviven en el mismo DTO.
     expect(new Set(dto.provenance.map(entry => entry.lens))).toEqual(new Set(['measured', 'estimated']))
@@ -147,6 +147,30 @@ describe('cobertura sobre DTO reales', () => {
     })
 
     expect(report.unclaimed).toEqual(['nuevoKpiSinLente'])
+  })
+
+  it('detecta una sección CON cifras que no declara as-of', () => {
+    // `capturedAt: null` es legítimo en una sección vacía y deja de serlo en cuanto hay un
+    // número: una cifra sin fecha se lee como vigente para siempre.
+    const report = reportLensCoverage({
+      dto: { points: [{ referringDomains: 10 }] },
+      provenance: [
+        { section: 'points[]', lens: 'estimated', source: 'dataforseo_backlinks', capturedAt: null }
+      ]
+    })
+
+    expect(report.figuresWithoutAsOf).toEqual(['points[]'])
+  })
+
+  it('una sección VACÍA puede declarar `capturedAt: null` sin ser un hallazgo', () => {
+    const report = reportLensCoverage({
+      dto: { points: [] },
+      provenance: [
+        { section: 'points[]', lens: 'estimated', source: 'dataforseo_backlinks', capturedAt: null }
+      ]
+    })
+
+    expect(report.figuresWithoutAsOf).toEqual([])
   })
 
   it('detecta la cifra con DOS dueños: ambigüedad, no redundancia', () => {
@@ -222,6 +246,6 @@ describe('cobertura sobre DTO reales', () => {
       ]
     })
 
-    expect(report).toEqual({ unclaimed: [], ambiguous: [] })
+    expect(report).toEqual({ unclaimed: [], ambiguous: [], figuresWithoutAsOf: [] })
   })
 })
