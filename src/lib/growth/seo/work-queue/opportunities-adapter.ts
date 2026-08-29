@@ -96,6 +96,38 @@ export const readKeywordOpportunitiesFromWorkQueue = async (
 
   const targets = inLensWindow.slice(0, options.limit ?? DEFAULT_LENS_LIMIT)
 
+  /*
+   * 🔴 LA COLA SIRVE ESTA LENTE **SÓLO SI PUEDE HACERLO SIN FABRICAR UN NÚMERO.**
+   *
+   * Los dos contratos usan la palabra "ganancia" con semánticas OPUESTAS en el mismo valor:
+   *
+   *   - En la cola, `priority_score = null` significa «me niego a estimar»: no hay curva
+   *     utilizable, y la banda 2 existe justamente para decirlo.
+   *   - En la lente, `estimatedClickGain` es `number` y **jamás** señala dato faltante — un
+   *     `0` ahí es una afirmación POSITIVA: «esta keyword ya convierte por encima de la media
+   *     de la posición objetivo». TASK-1792 eliminó ese cero-sentinel a propósito.
+   *
+   * Traducir `null → 0` en esta costura reintroduce, en el contrato, exactamente el defecto
+   * que 1792 cerró en el código: ausencia presentada como evidencia de cero. Y no sería
+   * marginal — con una curva no utilizable, TODA la lente de esa organización saldría
+   * empatada en un cero fabricado, bajo un envelope que dice `org_measured` porque se computa
+   * desde una sola fila de referencia.
+   *
+   * Por eso, si alguna fila que llegaría a la lente no tiene score, el adapter DEVUELVE NULL
+   * y el caller cae al reader legacy — que desde 1792 sabe ordenar honestamente ese caso
+   * (`orderedBy: 'measured_demand'`, sobre impresiones × cercanía a página 1, todo medido).
+   *
+   * En la práctica esto es una condición POR ORGANIZACIÓN, no por fila: la curva se evalúa a
+   * nivel de org en la posición objetivo, así que o todas las filas tienen score o ninguna
+   * lo tiene. Con curva sana (Berel) la cola sirve la lente; con curva no utilizable
+   * (efeoncepro) la sirve el legacy. La cola conserva su snapshot completo en los dos casos.
+   *
+   * Crédito del hallazgo: `greenhouse-eo-9b`, revisando la costura entre los dos contratos.
+   */
+  if (targets.some(item => item.priorityScore === null)) {
+    return null
+  }
+
   const market = await readKeywordMarketData({
     keywords: targets.map(item => item.keyword),
     // El mercado se resuelve dentro del reader canónico con el target; acá sólo se pasan
@@ -117,7 +149,9 @@ export const readKeywordOpportunitiesFromWorkQueue = async (
       clicks: breakdown.clicks,
       ctr: breakdown.currentCtr === null ? 0 : Number(breakdown.currentCtr.toFixed(6)),
       // El techo ya viene calculado y VERSIONADO desde el snapshot: acá no se recalcula nada.
-      estimatedClickGain: item.priorityScore === null ? 0 : Math.round(item.priorityScore),
+      // Sin `?? 0`: el guard de arriba garantiza que acá NO hay nulls. Un fallback silencioso
+      // volvería a abrir la puerta que ese guard cierra.
+      estimatedClickGain: Math.round(item.priorityScore ?? Number.NaN),
       quickWin: breakdown.weightedPosition !== null && breakdown.weightedPosition <= 10,
       cannibalized: item.origin === 'consolidation',
       competingPages: breakdown.competingPages ?? (item.origin === 'consolidation' ? 2 : 1),
@@ -143,13 +177,12 @@ export const readKeywordOpportunitiesFromWorkQueue = async (
         'unusable'
 
   /*
-   * `orderedBy` declara qué criterio ordenó DE VERDAD. Con al menos una fila en banda 1 el
-   * orden lo manda el techo estimado; sin ninguna, la cola ordenó por demanda medida y
-   * decirlo `estimated_click_gain` sería reportar un orden que no ocurrió.
+   * `orderedBy` declara qué criterio ordenó DE VERDAD. Acá es siempre `estimated_click_gain`
+   * y no por comodidad: el guard de arriba ya devolvió `null` para cualquier caso en que la
+   * cola no hubiera podido ordenar por techo. Cuando la cola sirve esta lente, ordenó por
+   * ganancia estimada — y cuando no pudo, no la sirve.
    */
-  const orderedBy: SeoKeywordOpportunityOrder = targets.some(item => item.scoreBand === 1)
-    ? 'estimated_click_gain'
-    : 'measured_demand'
+  const orderedBy: SeoKeywordOpportunityOrder = 'estimated_click_gain'
 
   return {
     servedFromWorkQueue: true,

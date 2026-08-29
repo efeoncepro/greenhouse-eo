@@ -1372,3 +1372,36 @@ El screening (`estimateDomainTraffic`) **no emite**: es una corrida on-demand si
 **Payload v1 `retired`**: `{ seoTargetId, organizationId, retiredCount, retiredDomains, activeCompetitorCount, reason, actor }`.
 
 Coordenadas y resumen; cualquier consumer futuro **re-lee PG** por `seoTargetId` (`seo_competitors` vigentes). `proposalRef` viaja OPACA (nunca FK): documenta si la declaración confirmó una propuesta de máquina (top-N TASK-1699) o fue directa. **NUNCA** un consumer de estos eventos dispara una captura de cobertura: el disparo del dominio SEO es Cloud Scheduler → ops-worker (mismo razonamiento que el delta de TASK-1664 arriba). Las constantes viven en el dominio (`src/lib/growth/seo/contracts.ts`) — seam de extracción §17.3.
+
+## Delta 2026-08-29 — TASK-1700: `growth.seo.work_queue.materialized` (cola priorizada de trabajo)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `growth.seo.work_queue.materialized` | v1 | `seo_target` (`seot-{uuid}`) | command `materializeSeoWorkQueue` (`src/lib/growth/seo/work-queue/materialize.ts:504`), **sólo cuando se escribió un snapshot nuevo** — la rama idempotente (`reused: true`, mismo `input_snapshot_hash`) NO emite, porque no pasó nada | **ninguno en V1** — rastro de que se produjo un plan del día, no un disparador |
+
+**Payload v1**: `{ seoTargetId, organizationId, snapshotId, priorityScoreVersion, itemCount, actor }`
+— coordenadas y resumen, **nunca los items**: cualquier consumer futuro **re-lee PG** por
+`snapshotId`. `priorityScoreVersion` viaja en el payload y no sólo en la tabla porque es lo que
+permite decir, seis meses después, con qué reglas se produjo ese plan sin volver a la fila.
+
+🔴 **Se publica DESPUÉS de la transacción, a diferencia del resto de los eventos SEO** (que se
+emiten in-tx). La razón declarada en el código: publicarlo adentro haría que un consumer reactivo
+pudiera leer un snapshot que todavía no commiteó. El tradeoff se declara y no se esconde — una caída
+entre el `COMMIT` y el publish deja el snapshot **sin** evento; es aceptable en V1 porque **no hay
+consumer** y el snapshot ya es la evidencia durable. El día que se le cuelgue una proyección o una
+notificación (brecha S7: hoy el módulo es 100% pull), el emisor debe reevaluar el punto de emisión,
+no el consumer compensar el hueco.
+
+🔴 **NUNCA un consumer de este evento ejecuta una recomendación de la cola.** La cola **propone**; el
+humano confirma en `recordSeoWorkQueueDecision` (que **no** publica evento, y eso también es
+deliberado: un evento sin consumer invita a que alguien le cuelgue la ejecución automática); el
+command canónico del dominio dueño ejecuta por su propio camino. Y **NUNCA** un consumer dispara una
+rematerialización: el disparo del dominio SEO es Cloud Scheduler → ops-worker
+(`ops-seo-work-queue-materialize`, `0 10 * * *`, hoy **PAUSADO**), igual que el resto de los batches
+del módulo.
+
+Las constantes (`SEO_WORK_QUEUE_AGGREGATE_TYPE`, `SEO_WORK_QUEUE_MATERIALIZED_EVENT`) viven en el
+dominio — `src/lib/growth/seo/work-queue/contracts.ts:169-170` — y **no** en el catálogo TS central:
+mismo seam de extracción a Wave (arquitectura SEO §17.3) que los eventos de TASK-1303/1308/1664/1662.
+
+Contrato completo del aggregate: [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §18.

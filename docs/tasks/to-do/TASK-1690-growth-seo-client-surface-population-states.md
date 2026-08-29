@@ -1,5 +1,58 @@
 # TASK-1690 — Growth SEO: la superficie cliente sirve a la población, no al tenant con historia
 
+## Delta 2026-08-28 — el DTO redactado del cliente ya existe: `toClientWorkQueueDto`
+
+`TASK-1700` está en `develop` (siete slices, `962d22118` … `9020d6421`). Esta task no la mencionaba, y sí
+la toca: la cola priorizada declara a la superficie cliente como uno de sus cuatro consumers, y la única
+diferencia entre lo que ve el operador y lo que ve el cliente es un redactor explícito —
+`toClientWorkQueueDto` (`src/lib/growth/seo/work-queue/client-dto.ts`), con test de no-fuga.
+
+**Qué NO cruza al cliente, y por qué** (es la lista que esta task hereda tal cual, no una que deba
+reinventar):
+
+- `keyword_difficulty` y el volumen estimado del proveedor — lente `◑` de un tercero que en es-LATAM mide
+  mal (`ISSUE-152`); mostrárselos al cliente les da estatus de hecho.
+- Costo de proveedor — es lo que a Efeonce le cuesta servir, no consumo del cliente.
+- `evidence_ref` cruda — expone ids internos de motores y su topología.
+- `score_breakdown_json` completo — lleva umbrales, percentiles y tamaños de muestra: eso es el método,
+  no el resultado.
+- La versión del score (`priority_score_version`) — dato de auditoría interna del snapshot.
+
+**Qué sí cruza:** `keyword`, `recommendedVerb`, `scoreBand`, `origin`, `estimatedIncrementalClicks` con
+marcador `◑`, `measuredImpressions` con marcador `●`, `reason` en lenguaje de cliente, `asOf`,
+`staleness` y `partialSources`.
+
+🔴 **El redactor se construye por CONSTRUCCIÓN EXPLÍCITA, nunca por omisión.** Si esta task agrega un
+campo al DTO cliente, el campo **no** llega solo: hay que agregarlo a mano. Ese es el default correcto y
+no se "arregla" con un spread con exclusiones — con un redactor por sustracción, cualquier campo nuevo
+del reader llega al cliente por defecto y la fuga es silenciosa.
+
+**Impacto directo sobre el Slice 4 (orden del destacado por "clics en juego").** Ese criterio ya existe
+calculado, versionado y persistido: es el `priority_score` de la banda 1 en `incremental-clicks-v1` —
+impresiones × `max(0, CTR esperado en la posición objetivo − CTR actual)`, con la curva de CTR derivada
+del propio sitio. 🔴 **`selectFeaturedRankSeries` no debe reimplementarlo.** Reimplementarlo produce
+exactamente el segundo criterio que `TASK-1700` existe para eliminar, y sin `priority_score_version` no
+deja rastro auditable. Mientras el flag esté OFF, un cálculo local es aceptable **como puente declarado**
+—con su nota en el decision log— y el cutover a `readSeoWorkQueue` queda como follow-up nombrado.
+
+**Dos ejes que no se colapsan.** `partialSources` del DTO cliente cuenta **orígenes de la cola** en estado
+degradado (`origin_health_json`); la cobertura del Slice 1 habla de **fuentes de datos** (Search Console
+vs seguimiento de posición). Son ejes distintos: un indicador único de "foto parcial" que los mezcle
+vuelve a poner una fuente hablando por otra, que es el bug class que esta task existe para cerrar.
+
+**Frescura:** la cola declara `asOf` + `staleness` (`fresh` | `stale` | `absent`). 🔴 `absent` significa
+"la cola nunca corrió para este target", **no** "no hay datos" y **no** "no hay trabajo". Si esta task
+suma un fixture con cola, tiene que cubrir `absent` y `stale`, no sólo el poblado — es el mismo argumento
+de población que la task entera hace.
+
+🔴 **`estimatedIncrementalClicks` es `number | null` a propósito**: `null` cuando no se puede afirmar
+(bandas 2 y 3), jamás un `0` de relleno. Es el mismo invariante que esta task ya declara para las fuentes
+ausentes, y aplica igual acá.
+
+**Realidad de rollout:** `GROWTH_SEO_WORK_QUEUE_ENABLED` está OFF en Vercel y en el ops-worker y el
+scheduler `ops-seo-work-queue-materialize` está pausado
+(`docs/operations/FEATURE_FLAG_STATE_LEDGER.md`). El DTO existe y todavía no lo sirve ninguna superficie.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

@@ -1,5 +1,42 @@
 # TASK-1668 — Growth SEO: QA editorial, publicación verificada, outcome e iteración
 
+## Delta 2026-08-28 — el loop de QA/outcome cuelga de un ítem de la cola, y cerrar el trabajo ahora tiene que ESCRIBIRSE
+
+`TASK-1700` está en `develop` (siete slices, `962d22118` … `9020d6421`). Esta task hereda la cola por vía
+de `TASK-1667` —no hace falta agregarla como dependencia directa— pero el loop cambia de forma en tres
+puntos concretos.
+
+**1. La lista propia desaparece: el sujeto vuelve a la cola solo, y el `done` hay que escribirlo.** La
+cola se recompone entera en cada snapshot desde sus seis colectores, así que un trabajo terminado
+**vuelve a proponerse mañana** salvo que alguien registre la decisión. `recordSeoWorkQueueDecision`
+(`src/lib/growth/seo/work-queue/record-decision.ts`) trata `dismissed` y `done` como **terminales**
+—retiran el sujeto de los snapshots siguientes (`isRetiredSubject`)— y deja `deferred`/`accepted`
+apareciendo a propósito ("después sin fecha no es nunca"). 🔴 Consecuencia dura: cuando esta task cierra
+un outcome, **el hecho debe llegar a la cola como `done`**; si no, el operador ve mañana, en la cabeza de
+su plan del día, el trabajo que acaba de terminar. El retiro se ancla a
+`(seo_target_id, origin, normalized_keyword)`, no al `item_id` —los items se regeneran en cada snapshot—
+y el `item_id`/`snapshot_id` viajan como evidencia de qué se estaba mirando.
+
+**2. `consolidate_requires_separate_task` deja de ser un callejón.** La consolidación ya tiene verbo
+propio (`consolidate` en el CHECK de `recommended_verb`) y origen propio (`consolidation`), que además
+encabeza `ORIGIN_ACTION_PRECEDENCE` como bloqueante. Un `next_action` de consolidación puede volver a la
+cola como sujeto con su acción correcta en vez de quedar esperando una task que nadie abre.
+
+**3. `insufficient_data` tiene hermano en la cola, y comparten el invariante.** Las bandas 2
+(`measured_without_curve`: hay demanda medida pero la curva propia no alcanza para afirmar un CTR
+esperado) y 3 (`no_measured_demand`) llegan con `priority_score = NULL` **a propósito** — decir "0 clics
+de ganancia" ahí sería fabricar una medición. Es el mismo invariante que esta task ya aplica al prohibir
+`AVG(position)` y al exigir `baseline_missing`. **Ningún `NULL` de la cola se rinde como `0`** al componer
+un outcome ni al comparar contra baseline.
+
+**Lo que NO se reconcilia.** La ventana de outcome cerrada en D-3 (Delta 2026-08-15) y el
+`expires_at`/`staleness` (`fresh` | `stale` | `absent`) del snapshot son ejes distintos: uno mide el borde
+móvil de Search Console, el otro la vejez del plan. Se declaran los dos, no se promedian ni se sustituyen.
+
+**Realidad de rollout:** `GROWTH_SEO_WORK_QUEUE_ENABLED` OFF en Vercel y en el ops-worker, scheduler
+`ops-seo-work-queue-materialize` pausado (`docs/operations/FEATURE_FLAG_STATE_LEDGER.md`). Hay contrato y
+todavía no hay snapshots.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

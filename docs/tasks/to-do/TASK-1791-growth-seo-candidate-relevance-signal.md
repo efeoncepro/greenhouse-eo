@@ -1,5 +1,29 @@
 # TASK-1791 — Growth SEO: señal de pertinencia del candidato (dos productores, ninguno la declara)
 
+## Delta 2026-08-28 — el score de la cola ya está publicado y versionado: la coordinación cambia de forma (no de dirección)
+
+`TASK-1700` está en `develop` (siete slices, `962d22118` … `9020d6421`). Tres precisiones sobre el acople
+que esta task declara, verificadas contra el código y no contra la spec:
+
+- **El acople sigue siendo exactamente el que la corrección del 2026-08-27 fijó, y ahora es estructural:**
+  `computePriorityScore` (`src/lib/growth/seo/work-queue/priority-score.ts`) **ni siquiera recibe** el
+  volumen estimado del proveedor en su entrada — el propio archivo lo dice: *"lo que no se puede pasar no
+  se puede usar por accidente"*. La señal de pertinencia entra como **factor del item con procedencia**,
+  nunca como entrada del `priority_score`. Su lugar natural es `score_breakdown_json` (donde ya viajan
+  `alsoSurfacedBy` y `competingPages`) y/o el colector
+  `src/lib/growth/seo/work-queue/collectors/discovery-candidate.ts`.
+- **La versión del score ya está publicada:** `incremental-clicks-v1` en
+  `src/lib/growth/seo/work-queue/score-versions.ts`, registro **append-only** con un test que congela su
+  huella. Cualquier cambio a un peso o umbral es `incremental-clicks-v2` + mover
+  `ACTIVE_PRIORITY_SCORE_VERSION`, jamás una edición de la vigente.
+- **La ventana "coordinar antes del primer snapshot" sigue abierta, pero ya no es gratis.**
+  `GROWTH_SEO_WORK_QUEUE_ENABLED` está OFF en los dos runtimes y el scheduler
+  `ops-seo-work-queue-materialize` está pausado (`docs/operations/FEATURE_FLAG_STATE_LEDGER.md`), así que
+  **todavía no existe ningún snapshot** — el temor de "después el score queda escrito" no se materializó.
+  Lo que sí cambió es el costo: el contrato ya está en `develop`, así que la coordinación pasa de
+  "influir en un diseño abierto" a "declarar un factor sobre un contrato existente", y hacerlo después
+  del flip sí escribiría snapshots sin la señal.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

@@ -7,6 +7,45 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-28 — El módulo SEO tiene una sola cola de trabajo (`TASK-1700`)
+
+- `greenhouse_growth.seo_work_queue_{snapshots,items,decisions}`: aggregate append-only que pasa a ser la
+  ÚNICA autoridad de orden del módulo. Antes había cuatro criterios no comparables y el operador abría
+  tres pantallas sin que ninguna dijera qué hacer primero.
+- El score deja de ser un índice compuesto y pasa a **clics incrementales sobre demanda MEDIDA**, con la
+  curva de CTR del propio sitio y su versión persistida en cada fila. Sin demanda medida no se fabrica un
+  score: la fila recibe `NULL`, cae a su banda y su verbo honesto es `measure` — y lo impone un CHECK de
+  la base, no el TypeScript.
+- La lente de oportunidades de `/admin/growth/seo/keywords` cambia de FUENTE del orden sin cambiar de
+  forma, detrás de `GROWTH_SEO_WORK_QUEUE_ENABLED` (OFF) con caída al reader legacy. Paridad verificada
+  contra PG real: techo idéntico y orden relativo idéntico sobre las keywords compartidas.
+- Materializador en Cloud Scheduler + ops-worker (nunca Vercel cron), tres señales de reliability nuevas
+  y la capability `growth.seo.work_queue.decide` — ver y decidir son dos permisos distintos.
+- Documentación en las tres capas (arquitectura §18, funcional y manual de uso), invariantes nuevos en
+  `.claude/rules/growth-seo.md`, y la skill `seo-aeo` (`modules/02_SEO_CONTENT.md`, espejada en `.codex/`)
+  gana la implementación de referencia del score más la advertencia comercial: la métrica es *table
+  stakes* y lo propio es la COMBINACIÓN curva-propia × cambio-de-posición, una afirmación NEGATIVA que
+  exige re-verificación a la fecha antes de cualquier uso comercial.
+- **Rollout pendiente:** flag OFF en los dos runtimes, scheduler pausado, sin promover a `main`.
+
+## 2026-08-28 — Landing Agencia de influencers publicada (`TASK-1598`)
+
+- Tras el review live del owner se corrigió una regresión de fidelidad que el smoke inicial no detectó: cargar assets
+  no probaba la secuencia. El hero vuelve a rotar tres clips con progreso, play/pausa y sonido; también se restauraron
+  badge de derechos, stack social, pulgar decorativo, selección por teclado de ofertas, CTA sticky y reveals. El gate
+  nuevo `public-website:verify-influencer-landing-fidelity` ejerce esos contratos en 1536/1440/890/390 y reduced
+  motion. Tras el segundo review, el hero mide el masthead Ohio y reserva 32 px adicionales: kicker, teléfono y
+  sticker ya no entran en el área visual del header en ningún breakpoint probado.
+- Se publicó `https://efeoncepro.com/servicios/agencia-de-influencers/` como página Elementor `251627`, conservando
+  el header/footer Ohio global y la dirección visual aprobada de Claude Design. El slug responde a intención comercial
+  validada en CL, MX, CO y PE; la página sirve canonical, `index, follow`, schema visible y sitemap/lastmod.
+- La conversión usa Growth Form gobernado `efeonce-creator-influence-brief` y el meeting canónico
+  `fhsf-efeonce-lead-gen-web` / `discovery`; no reconstruye destinos, scheduler, CRM ni tracking en WordPress. El
+  menu item nativo `Influencer Marketing` quedó bajo `Servicios Destacados`.
+- Los seis clips únicos del diseño están activos y rotulados como visuales ilustrativos generados con IA, no casos ni
+  resultados. QA live post-cache cubrió secuencia/interacciones, teclado, form, meeting, FAQ, schema, overflow,
+  consola y performance de laboratorio; snapshots de página y menú dejan rollback acotado.
+
 ## 2026-08-28 — La curva de CTR declara si es utilizable, o la lente no ordena (`TASK-1792`)
 
 - `readKeywordOpportunities` ordenaba por un campo colapsado a cero. `expectedCtrAt` preguntaba «¿está el
@@ -793,43 +832,3 @@
   `caption`, encabezados con `scope`, competencia, objetivo, puntaje y estado.
 - GVC ya no ignora ese nodo y reporta `layout_out_of_flow_vertical_runaway` cuando un elemento
   `absolute|fixed` vuelve a extender anormalmente el layout vertical.
-
-## 2026-08-19 — El lifecycle de correo quedó operativo, y la documentación decía que nada estaba aplicado
-
-- **La doc mentía en la dirección peligrosa.** Runbook, arquitectura de webhooks, ledger de flags e
-  `ISSUE-160` afirmaban "ninguna migración, ningún secreto, ningún webhook" cuando todo llevaba
-  horas aplicado. Seguir el runbook al pie habría creado un segundo webhook al mismo endpoint
-  —eventos duplicados que el dedupe por `svix-id` no detiene, porque son ids distintos— y una
-  segunda versión del secreto, rompiendo la verificación del webhook vivo.
-- **44 correos nunca llegaron** (23 `suppressed`, 21 `bounced`) — y todos van a dominios internos
-  de Efeonce. Cero externos: los 8 `hiring_assessment_assigned` fallidos son direcciones de
-  prueba/QA, no candidatas. El daño temido no ocurrió. `sent` nunca significó entregado, y ahora se
-  puede demostrar cuáles no lo fueron y a quién. Lo que sí queda a la vista es data sintética
-  circulando por el pipeline de correo productivo.
-- **Faltaba suscribir `email.suppressed`.** El bloqueo de reenvío consulta ese estado para no
-  mandar a ciegas a una dirección suprimida — y ese evento nunca iba a llegar. Falso negativo
-  silencioso en la puerta de recuperación.
-- **Los writers de credenciales corrían sin su backstop.** El índice único token-intent, que el
-  runbook exige aplicar ANTES de desplegar esos writers, no existía. Aplicado, junto al CONTRACT
-  de credencial, verificando una por una sus tres precondiciones de despliegue.
-- **`mail.efeoncepro.com` está bien por nuestro lado y Resend aún no lo confirma.** DKIM publicado
-  con valor idéntico byte a byte. Aprendizaje: re-disparar la verificación resetea los registros ya
-  verificados a `pending` — se espera, no se reintenta.
-
-## 2026-08-19 — El rollout de assessment iba a romper producción y a cortarle el test a los candidatos
-
-- **Una migración que no era aplicable en ningún orden.** El CHECK y el trigger de versión de
-  credencial rompían el writer que corre en `main`; el código nuevo rompía sin la migración.
-  Partida en expand/contract, con la fase contract FUERA de `migrations/` — porque el runner
-  aplica todas las pendientes en una transacción y un comentario de advertencia no detiene a un
-  runner.
-- **La sesión del candidato caducaba en el plazo para EMPEZAR, no en el de responder.** Quien
-  abría el enlace poco antes del límite y arrancaba perdía la sesión a mitad del test.
-- **Un enlace roto era invisible.** El bearer viaja en el fragmento, que nunca llega al servidor:
-  si un reescritor lo borra, el candidato queda fuera sin generar un solo request. Ahora hay un
-  hecho durable del canje y una señal que lo delata.
-- **El cap de recuperación castigaba al candidato por fallas nuestras**: contaba intentos fallidos
-  y compartía cuota con el enlace seguro, que es justamente el canal de rescate cuando el correo
-  no llega.
-- Todo salió de auditorías independientes con skills de arquitectura, talento y seguridad, corridas
-  ANTES de promover. Dos auditores encontraron el mismo P0 sin verse entre sí.

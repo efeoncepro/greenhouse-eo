@@ -329,6 +329,30 @@ preguntas estadísticas distintas y **una constante no puede responder las dos**
 piso de posición para decidir usabilidad de la curva es el error compuesto que produce el
 colapso de arriba. Si tu filtro tiene una sola constante de impresiones, tiene un bug latente.
 
+### Implementación de referencia (no lo reimplementes)
+
+Este score **ya está implementado y en runtime** en Greenhouse (`TASK-1700`): el aggregate
+`src/lib/growth/seo/work-queue/**` lo calcula en `priority-score.ts` con la curva derivada del
+propio sitio, y **los parámetros viven versionados** en `score-versions.ts`
+(`incremental-clicks-v1`: ventana 28 d, posición objetivo 5, rango 8–20, P75, piso de posición
+10, piso de curva 1.000 impresiones + 5 clics). Cambiar un peso, un umbral o la posición
+objetivo **obliga a una versión nueva** — es lo que permite responderle a un cliente *"¿por qué
+esto ya no es prioridad?"* con evidencia y no con una constante que alguien movió. Si vas a
+tocar el score en Greenhouse, carga `.claude/rules/growth-seo.md` antes: los tres estados de la
+base (`measured_incremental_clicks` / `measured_without_curve` / `no_measured_demand`) los impone
+un CHECK en la base de datos, no el TS.
+
+⚠️ **Advertencia comercial — esto es *table stakes*, no una ventaja.** Varias suites conectan
+Search Console y proyectan ganancia de clics (seoClarity comercializa *SEO Forecasting*;
+seoClarity y Sistrix **sí** derivan la curva del GSC del propio cliente). Lo que en el relevamiento
+no apareció es la **combinación exacta**: proyectar el alza de clics de un **CAMBIO DE POSICIÓN**
+usando la curva del propio GSC — las dos mitades existen en el mercado y no se juntan. 🔴 Eso es
+una afirmación **NEGATIVA** ("nadie más lo hace"), la clase más fácil de equivocar y la que ya
+costó caro dos veces: **exige re-verificación a la fecha antes de cualquier uso comercial**, y
+nunca se dice "curva propia" a secas ni "ninguna herramienta puede". Frases citables, evidencia y
+las hipótesis abiertas que pueden tumbarla: skill `seo-aeo-practice`,
+`references/BENCHMARK_SUITES_AEO_2026-08.md` → **F-12**, **S-01**, **S-09**, **H-01/H-02/H-17**.
+
 ### Canibalización: no se descarta, se separa
 
 Una query que rankea con **más de una página** no es una oportunidad de

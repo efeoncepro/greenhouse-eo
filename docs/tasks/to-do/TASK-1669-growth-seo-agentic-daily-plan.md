@@ -1,5 +1,72 @@
 # TASK-1669 — Growth SEO: agentes e IA para el plan diario gobernado
 
+## Delta 2026-08-28 — la cola existe en código: el `context-reader` nace como envoltorio y el ordenamiento ya no es una promesa
+
+`TASK-1700` entregó sus siete slices a `develop` (`962d22118` … `9020d6421`) con la migración
+`migrations/20260828224403660_task-1700-seo-work-queue.sql` (más `…_task-1700-work-queue-keyset-collation.sql`
+y `…_task-1700-work-queue-decide-capability.sql`). Lo que el Delta 2026-08-15 anticipó como contrato a
+firmar ya es código al que se puede apuntar, así que esta task deja de tener margen para engendrar un
+segundo ordenamiento — y gana objetos concretos contra los cuales escribirse.
+
+**Lo que el `context-reader.ts` envuelve, literalmente:**
+
+- `readSeoWorkQueue` (`src/lib/growth/seo/work-queue/reader.ts`). Trae orden canónico
+  `score_band ASC, priority_score DESC NULLS LAST, normalized_keyword COLLATE "C" ASC`, paginación por
+  keyset sobre un snapshot inmutable, y **binding de tenant server-side**: no acepta un `organizationId`
+  del request, el `seoTargetId` define la org. El adapter no vuelve a resolver tenant.
+- `staleness` es del CONTRATO, no de la UI: `fresh` | `stale` (pasó `expires_at`) | `absent` (nunca se
+  materializó). 🔴 `absent` **no es un error**: es un target elegible cuya cola todavía no corrió. El
+  plan diario tiene que rendir ese estado explícitamente y no colapsarlo en "no hay trabajo".
+
+**El "Priority ordering V1" retirado ya no es un hueco: es `PRIORITY_SCORE_CONFIGS`.** Vive en
+`src/lib/growth/seo/work-queue/score-versions.ts`, versión publicada `incremental-clicks-v1`
+(`windowDays 28`, `targetPosition 5`, ventana 8–20, percentil 0,75, piso 10 impresiones, pisos de curva
+1000/5). Es **append-only** y hay un test que congela su huella: mover un umbral obliga a una versión
+nueva y a mover `ACTIVE_PRIORITY_SCORE_VERSION`, jamás a editar la vigente. Esta task no puede cambiar el
+orden sin cambiar esa versión — y ahora eso lo impone un test, no una convención.
+
+**El contrato de reproducibilidad que esta task pedía ya está implementado, y se hereda en vez de
+inventarse:**
+
+- `input_snapshot_hash` — con `UNIQUE (organization_id, seo_target_id, priority_score_version,
+  input_snapshot_hash)`, o sea idempotencia de materialización.
+- `expires_at` — TTL de 26 h en `WORK_QUEUE_RUNTIME_CONFIG` (`snapshotTtlHours`), fuera del objeto
+  versionado a propósito porque no mueve el orden.
+- `staleness` derivado en el reader.
+
+Consecuencia dura para el `Plan freshness and stale handling` de esta task: el `expiresAt` y el
+`inputSnapshotHash` de cada recommendation **salen del snapshot que el plan leyó**, no de un cálculo
+propio. 🔴 **Un plan no puede declararse más fresco que el snapshot del que salió.**
+
+**Cuatro cosas que esta task debe hacer distinto:**
+
+1. `queue-order-parity.test.ts` ya tiene contra qué correr: se compara contra `readSeoWorkQueue`, no
+   contra una reimplementación del orden.
+2. **No escribir un ledger de feedback propio.** `recordSeoWorkQueueDecision`
+   (`src/lib/growth/seo/work-queue/record-decision.ts`) existe, es append-only y **no ejecuta nada**. El
+   feedback `accepted`/`dismissed` de esta task mapea ahí. Ojo con la semántica ya definida:
+   `dismissed` y `done` son **terminales** y retiran el sujeto de los snapshots siguientes
+   (`isRetiredSubject`); `deferred` y `accepted` siguen apareciendo. Un segundo libro de las mismas
+   decisiones es exactamente lo que la cola existe para evitar.
+3. **La deduplicación ya ocurrió, y el merger no la repite.** `dedupeBySubject` colapsa por keyword
+   normalizada con `ORIGIN_ACTION_PRECEDENCE` (`consolidation` → `gsc_striking_distance` →
+   `declared_target` → `aeo_gap` → `competitor_gap` → `discovery_candidate`), y los orígenes suprimidos
+   viajan en `score_breakdown_json.alsoSurfacedBy`. El policy merger deduplica por `action` dentro de lo
+   que la cola ya entregó; **no** re-deduplica por criterio propio ni descarta `alsoSurfacedBy`.
+4. **Bandas 2 y 3 llegan con `priorityScore = null` a propósito** (`measured_without_curve` y
+   `no_measured_demand`). El plan **NUNCA** las rinde como `0`: eso fabricaría una medición.
+
+**`Depends on` — verificado hoy, no hay que agregar nada.** `TASK-1700` ya está declarada tanto en
+`### Depends on` como en el campo `Blocked by` desde el Delta 2026-08-15. Lo que cambia es su naturaleza:
+deja de ser una dependencia de secuencia sobre una task no escrita y pasa a ser una dependencia de
+contrato sobre código en `develop`.
+
+**Realidad de rollout, para que el Discovery de esta task no se sorprenda:**
+`GROWTH_SEO_WORK_QUEUE_ENABLED` está **OFF en los dos runtimes** (Vercel y ops-worker) y el scheduler
+`ops-seo-work-queue-materialize` está **PAUSADO** — tres frenos independientes, ver
+`docs/operations/FEATURE_FLAG_STATE_LEDGER.md`. **Hay contrato y no hay snapshot todavía**: una consulta
+a `greenhouse_growth.seo_work_queue_items` devuelve cero filas y eso no es un defecto.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

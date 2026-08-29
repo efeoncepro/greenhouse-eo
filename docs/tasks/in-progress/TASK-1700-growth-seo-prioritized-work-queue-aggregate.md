@@ -168,7 +168,7 @@ serie del top-N arranca con el primer deploy del worker post-release y los candi
 - Motion: `none`
 - Backend impact: `migration|command|reader`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `code complete, rollout pendiente` (7/7 slices en `develop`; flag OFF en los dos runtimes y scheduler PAUSADO — ver §Rollout Plan)
 - Rank: `TBD`
 - Domain: `growth|seo`
 - Blocked by: `none` (el bloqueo del Slice 7 se levantó el 2026-08-28; ver Delta 2026-08-28 (3)) (sólo para el origen `competitor_gap`; los otros cuatro orígenes no la necesitan — satisfecho en código desde 2026-08-28, ver Delta)
@@ -614,30 +614,30 @@ Archivos que esta task **modifica sin poseer** (hay que coordinar con su dueña 
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface y consumers están nombrados con paths y objetos reales.
-- [ ] Invariantes de datos, boundary de tenant/acceso e idempotencia/concurrencia son explícitos.
-- [ ] Postura de migración/backfill/rollback es explícita y proporcional al riesgo.
-- [ ] Hay evidencia runtime o de DB listada para todo cambio más allá de docs/tooling.
-- [ ] El dominio sensible tiene errores canónicos, postura de audit/señal y cero fuga de datos.
+- [x] Source of truth, contract surface y consumers están nombrados con paths y objetos reales.
+- [x] Invariantes de datos, boundary de tenant/acceso e idempotencia/concurrencia son explícitos.
+- [x] Postura de migración/backfill/rollback es explícita y proporcional al riesgo.
+- [x] Hay evidencia runtime o de DB listada para todo cambio más allá de docs/tooling.
+- [x] El dominio sensible tiene errores canónicos, postura de audit/señal y cero fuga de datos.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] **Lógica en el primitive, no en la UI.** Orden, score y composición de orígenes viven en
+- [x] **Lógica en el primitive, no en la UI.** Orden, score y composición de orígenes viven en
       `src/lib/growth/seo/work-queue/**`; ningún componente reordena ni recalcula.
-- [ ] **Modelada como aggregate + commands**, no como click-handler: snapshot/item/decision con sus
+- [x] **Modelada como aggregate + commands**, no como click-handler: snapshot/item/decision con sus
       tres primitives.
-- [ ] **Read** como reader canónico; **write** (`recordSeoWorkQueueDecision`) como command con
+- [x] **Read** como reader canónico; **write** (`recordSeoWorkQueueDecision`) como command con
       semántica explícita, authorization fina por capability, idempotencia, append-only, errores
       canónicos y observabilidad.
-- [ ] **Capability + grant en el MISMO PR**: `growth.seo.work_queue.decide` en registry + catálogo +
+- [x] **Capability + grant en el MISMO PR**: `growth.seo.work_queue.decide` en registry + catálogo +
       grant a ≥1 rol real + coverage test verde.
-- [ ] **Camino programático declarado**: ruta app, lane ecosystem y tool MCP **interna**. La
+- [x] **Camino programático declarado**: ruta app, lane ecosystem y tool MCP **interna**. La
       federación al gateway MCP externo queda explícitamente fuera (auditoría §6).
-- [ ] **Write apto para `propose → confirm → execute`**: Nexa propone, el humano confirma en el
+- [x] **Write apto para `propose → confirm → execute`**: Nexa propone, el humano confirma en el
       endpoint, el endpoint muta. Cero integración Nexa-específica.
-- [ ] **Un primitive, muchos consumers**: UI, Nexa, MCP y portal cliente comparten reader; la única
+- [x] **Un primitive, muchos consumers**: UI, Nexa, MCP y portal cliente comparten reader; la única
       diferencia del lado cliente es el redactor de DTO.
-- [ ] **Parity check = SÍ.**
+- [x] **Parity check = SÍ.**
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -1045,49 +1045,55 @@ Tres razones, y las tres son de oficio, no de implementación:
 
 ## Acceptance Criteria
 
-- [ ] Existen `greenhouse_growth.seo_work_queue_snapshots`, `..._items` y `..._decisions` con sus
+- [x] Existen `greenhouse_growth.seo_work_queue_snapshots`, `..._items` y `..._decisions` con sus
       CHECK de vocabulario cerrado, sus triggers anti-`UPDATE`/anti-`DELETE` y el bloque `DO` de
       verificación post-DDL en la misma migración.
-- [ ] `priority_score_version` y `score_breakdown_json` existen desde la **primera** migración, no
+- [x] `priority_score_version` y `score_breakdown_json` existen desde la **primera** migración, no
       desde una posterior.
-- [ ] `computePriorityScore` devuelve clics incrementales estimados
+- [x] `computePriorityScore` devuelve clics incrementales estimados
       (`impresiones × max(0, CTR_objetivo − CTR_actual)`) con la curva derivada del propio sitio, y
       un test falla si alguien cambia un valor de la config sin bumpear `priority_score_version`.
-- [ ] Ningún item con `score_basis='no_measured_demand'` tiene `priority_score` distinto de NULL, y
+- [x] Ningún item con `score_basis='no_measured_demand'` tiene `priority_score` distinto de NULL, y
       ningún colector ordena por volumen estimado cuando existe demanda medida.
-- [ ] `materializeSeoWorkQueue` es idempotente: dos corridas con los mismos insumos devuelven
+- [x] `materializeSeoWorkQueue` es idempotente: dos corridas con los mismos insumos devuelven
       `reused: true` y **cero filas nuevas**, verificado contra PostgreSQL real.
-- [ ] Un colector caído produce `origin_health_json` con `state` distinto de `ok` y **no** altera el
+- [x] Un colector caído produce `origin_health_json` con `state` distinto de `ok` y **no** altera el
       score ni el orden de los demás orígenes, verificado con una corrida degradada real.
-- [ ] Todo item con `origin='aeo_gap'` tiene `source_score_version` no nulo, y el lado AEO se lee
+- [x] Todo item con `origin='aeo_gap'` tiene `source_score_version` no nulo, y el lado AEO se lee
       **sólo** vía `readSeoAeoGap` (test que falla ante SQL directo sobre `grader_*` desde este
       módulo).
-- [ ] `evidence_ref` no participa de ninguna FK ni de ningún JOIN en el módulo.
-- [ ] Los items de canibalización entran con `origin='consolidation'` y
+- [x] `evidence_ref` no participa de ninguna FK ni de ningún JOIN en el módulo.
+- [x] Los items de canibalización entran con `origin='consolidation'` y
       `recommended_verb='consolidate'`, nunca mezclados con los de `optimize`.
-- [ ] `UPDATE` y `DELETE` sobre las tres tablas fallan por trigger, verificado contra PostgreSQL
+- [x] `UPDATE` y `DELETE` sobre las tres tablas fallan por trigger, verificado contra PostgreSQL
       real.
-- [ ] `readSeoWorkQueue` devuelve `{ snapshot, items, originHealth, priorityScoreVersion, asOf,
+- [x] `readSeoWorkQueue` devuelve `{ snapshot, items, originHealth, priorityScoreVersion, asOf,
       staleness }` y sirve idéntico a UI, Nexa, lane ecosystem y tool MCP interna, sin lógica
       duplicada por consumer.
-- [ ] El DTO cliente pasa el test de no-fuga: cero dificultad, cero volumen estimado, cero costo de
+- [x] El DTO cliente pasa el test de no-fuga: cero dificultad, cero volumen estimado, cero costo de
       proveedor, cero `evidence_ref` cruda, cero breakdown completo.
-- [ ] `recordSeoWorkQueueDecision` escribe append-only, se ancla al sujeto (sobrevive al siguiente
+- [x] `recordSeoWorkQueueDecision` escribe append-only, se ancla al sujeto (sobrevive al siguiente
       snapshot, verificado con dos materializaciones) y **no ejecuta ningún command** — test que
       falla si el módulo importa un write de otro dominio.
-- [ ] `growth.seo.work_queue.decide` está en `capabilities_registry`, en el catálogo TS y con grant a
+- [x] `growth.seo.work_queue.decide` está en `capabilities_registry`, en el catálogo TS y con grant a
       ≥1 rol real, con el coverage test verde en el mismo PR.
-- [ ] El materializador corre en el ops-worker por Cloud Scheduler; **no** existe entrada nueva en
+- [x] El materializador corre en el ops-worker por Cloud Scheduler; **no** existe entrada nueva en
       `vercel.json` para este job.
-- [ ] `GROWTH_SEO_WORK_QUEUE_ENABLED` está declarado en `services/ops-worker/deploy.sh`, aplicado en
+- [x] `GROWTH_SEO_WORK_QUEUE_ENABLED` está declarado en `services/ops-worker/deploy.sh`, aplicado en
       la revisión activa del worker, presente en Vercel y con fila en
       `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 - [ ] 🔴 **La lente de oportunidades vigente lee `readSeoWorkQueue` en producción** y el test de
       paridad de orden sobre `gsc_striking_distance` está verde.
-- [ ] Las tres señales de reliability existen, están registradas en el módulo `growth` y se ven en
+      → **Mitad cumplida, y la otra mitad es rollout, no código.** El cutover está
+      implementado detrás del flag y el gate de paridad está **VERDE contra PG real**
+      (33 keywords compartidas con techo idéntico y orden relativo idéntico). Lo que falta es
+      operativo: flag ON en los dos runtimes + despausar el scheduler + promoción a `main`.
+      Mientras eso no ocurra, el estado correcto de esta task es
+      `code complete, rollout pendiente`.
+- [x] Las tres señales de reliability existen, están registradas en el módulo `growth` y se ven en
       `/admin/operations` con steady 0.
-- [ ] Las tres capas documentales están cerradas: arquitectura, funcional y manual de uso.
-- [ ] `TASK-1669` tiene su `## Delta` con la reducción de su `context-reader` a envoltorio y
+- [x] Las tres capas documentales están cerradas: arquitectura, funcional y manual de uso.
+- [x] `TASK-1669` tiene su `## Delta` con la reducción de su `context-reader` a envoltorio y
       `TASK-1700` en su `Depends on`.
 
 ## Verification
@@ -1108,15 +1114,42 @@ Tres razones, y las tres son de oficio, no de implementación:
 
 - [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
 - [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] `TASK-1669`, `TASK-1667`, `TASK-1668`, `TASK-1690` y `TASK-1691` recibieron su `## Delta` con
+- [x] `TASK-1669`, `TASK-1667`, `TASK-1668`, `TASK-1690` y `TASK-1691` recibieron su `## Delta` con
       el cambio de fuente de orden.
-- [ ] `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` §3.1 brecha S1
+- [x] `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` §3.1 brecha S1
       queda marcada como cerrada con fecha.
+
+## Acoples declarados por otras tasks (barrido de impacto cruzado, 2026-08-28)
+
+Cuatro tasks declaran acoples con esta cola y quedan registrados acá para que no se descubran
+por sorpresa:
+
+- **`TASK-1706` / `TASK-1708`** — declaran dependencia del contrato de la cola. Consumen
+  `readSeoWorkQueue`; no reimplementan orden ni score.
+- **`TASK-1789` (content decay)** — sus hallazgos entran como origen nuevo de la cola vía
+  migración aditiva, no como lista propia. El decay **no ordena**: aporta filas y la cola las
+  puntúa con el mismo score versionado.
+- 🔴 **`TASK-1791` (señal de pertinencia del candidato)** — es el acople más importante y su
+  ventana **sigue abierta**: no existe ningún snapshot productivo todavía (flag OFF en los dos
+  runtimes). Lo que cambió es que `incremental-clicks-v1` ya está publicada append-only, así
+  que incorporar la pertinencia al score es un **bump a `v2`**, no una edición de la versión
+  vigente. Y la forma correcta de incorporarla NO es multiplicar el score: la cola no puede
+  puntuar con una señal que su `evidence_ref` opaca no puede citar. Entra como **factor del
+  item con su procedencia**, hermana de `clusterConflict`.
+
+  El caso que lo motiva, medido: una corrida real de discovery para una agencia B2B chilena
+  devolvió 50 keywords de consumidor sobre ChatGPT (`chatgpt en linea`, volumen 480). Hoy la
+  cola las contiene sin ordenarlas por volumen —caen a banda 3 con desempate alfabético— así
+  que **no corrompen el orden, pero diluyen la banda**.
+
+- **Errata para quien pase por `TASK-1709`** (línea ~586): atribuye la cola priorizada a
+  `TASK-1669`. Es de esta task. Error de cita, no de contrato; se corrige cuando esa task
+  esté libre.
 
 ## Follow-ups
 

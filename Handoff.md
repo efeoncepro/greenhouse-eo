@@ -2,6 +2,86 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-28 — `TASK-1700`: la cola priorizada de trabajo SEO — code complete, rollout pendiente
+
+**Estado: `code complete, rollout pendiente`.** Los 7 slices están en `develop`. El módulo SEO pasa de
+CUATRO criterios de orden no comparables a una única autoridad: `greenhouse_growth.seo_work_queue_*`,
+append-only, con `priority_score_version` y `score_breakdown_json` desde la primera migración.
+
+**Lo que hay que saber para retomar:**
+
+1. 🔴 **Tres defectos que sólo vio la corrida real, ninguno los tests.** El mismo sujeto salía dos veces
+   con verbos contradictorios en la cabeza de la cola (`pinturas` #1 `consolidate` y #2 `optimize`); un
+   origen devolvía 0 items reportándose `state: 'ok'` (sin `runId`, `readKeywordDiscovery` entrega sólo
+   el historial de corridas); y el cap declaraba "quedaron 200 fuera" cuando eran 2.799. Lección
+   portátil: **un vacío creíble es el disfraz favorito de un origen roto**.
+
+2. 🔴 **Dos bug classes de SQL que este dominio ya pagó** y que la regla `.claude/rules/growth-seo.md`
+   ahora documenta: (a) un alias con el nombre de la columna (`priority_score::text AS priority_score`)
+   hace que PostgreSQL ordene por el nombre de SALIDA, o sea como TEXTO — la primera página del reader
+   empezaba en el rank 17; (b) ordenar en JS y paginar en SQL exige la MISMA collation — `en_US.UTF8`
+   ignora el espacio al comparar y `localeCompare` no, así que el keyset salteaba filas en silencio
+   (631 de 635). Las dos son invisibles con mocks: aparecen paginando datos reales de punta a punta.
+
+3. **La costura entre dos contratos que usan la misma palabra al revés.** `priority_score = null` en la
+   cola significa «me niego a estimar»; `estimatedClickGain = 0` en la lente significa «ya convierte por
+   encima de la media». Traducir uno al otro reintroducía en el contrato el cero-sentinel que
+   `TASK-1792` acababa de eliminar del código. Se resolvió con un principio, no con un mapeo: **la cola
+   sirve la lente sólo si puede hacerlo sin fabricar**; si no, cede al legacy. Hallazgo de
+   `greenhouse-eo-9b`, confirmado de forma independiente en el barrido cruzado.
+
+**Pendientes de rollout (no cerrar como "listo" sin esto):**
+
+- `GROWTH_SEO_WORK_QUEUE_ENABLED` está **OFF en los dos runtimes** y el scheduler
+  `ops-seo-work-queue-materialize` nace **PAUSADO** — tres frenos independientes. El flip se AVISA al
+  operador de SEO aunque no cueste un centavo: cambia de dueño el orden que ve en pantalla y aparecen
+  filas de orígenes que antes no estaban en esa lista.
+- Promoción a `main` con la migración (3 tablas + índice de keyset + capability).
+- La señal `growth.seo.work_queue.stale_snapshot` hoy reporta **ERROR legítimo**: `efeoncepro` nunca
+  materializó (sólo se corrió sobre `berel.com`). Su steady 0 se alcanza tras la primera corrida del
+  cron sobre todos los targets elegibles, no antes.
+
+**Evidencia real, no simulada:** 641 items sobre `berel.com`, idempotencia con cero filas nuevas,
+paginación 641/641 sin saltear, paridad de orden verificada contra el reader legacy sobre las 33
+keywords compartidas (techo idéntico, orden relativo idéntico), y el gate anti-ejecución comprobado
+**en rojo** inyectando un import prohibido. Suite completa: 12.548 tests verdes.
+
+**Dato de negocio que salió del camino:** `berel.com` tiene **4.352 de 19.080 queries (23%) con más de
+una página compitiendo**. No es un artefacto del predicado —con un piso de 10% de share siguen siendo
+3.825— así que la cabeza de su cola es legítimamente `consolidate`: su mayor oportunidad es arreglar su
+propia canibalización antes de perseguir posiciones nuevas.
+
+## 2026-08-28 — `TASK-1598` publicada: Agencia de influencers
+
+**Estado: `complete`, publicado e indexable.** La landing vive en
+`https://efeoncepro.com/servicios/agencia-de-influencers/` (WordPress `251627`) como documento Elementor normal,
+con header/footer Ohio globales y sin el chrome del export Claude. Keyword/slug se validaron con DataForSEO en CL,
+MX, CO y PE; el readback sirve title/meta, canonical autorreferente, `index, follow`, sitemap/lastmod y menu item
+`251638` bajo `Servicios Destacados`.
+
+**Remediación de fidelidad cerrada tras review live del owner.** La primera adaptación había cargado los videos pero
+eliminó la secuencia e interacciones del export aprobado. El runtime actual restaura los tres clips del hero,
+play/pausa, sonido, progreso, badge de derechos, stack social, pulgar decorativo, selección de ofertas, CTA sticky y
+reveals. El hero reserva la altura real del masthead Ohio más 32 px y responde a resize; el gate durable
+`pnpm public-website:verify-influencer-landing-fidelity` pasó post-cache en 1536/1440/890/390 y reduced motion,
+con al menos 28 px medidos bajo el header, sin overflow ni errores de consola; capturas en
+`.captures/task1598-influencer-fidelity-2026-08-29T01-12-35-487Z/`.
+
+- Growth Form publicado: `efeonce-creator-influence-brief`, key
+  `d2c68012-2a6b-41d6-b3dd-4b8ccbff6ee3`, surface `fhsf-efeonce-creator-influence`; captura gobernada en
+  Greenhouse, Turnstile invisible y consentimiento. HubSpot directo continúa deshabilitado por el gate general.
+- Meeting: surface canónica `fhsf-efeonce-lead-gen-web`, scheduler `discovery`; no expone proveedor ni URL directa.
+- Visual/risk: cuatro videos del source aprobados y rotulados como IA ilustrativa, no resultados/testimonios. QA live
+  post-cache: 1440/390/reduced-motion, teclado, form/meeting/FAQ/schema, cero consola/imágenes rotas/overflow real.
+- Hash Elementor: `ff1ca667589a5e40431413042d5872430e0fcc402c6e3a22440359eeaa223058`. Snapshot inmediato:
+  `_gh_backup_before_task1598_fidelity_repair_20260829T011226Z`. Snapshot de fidelidad anterior:
+  `_gh_backup_before_task1598_fidelity_repair_20260829T010201Z`. Snapshots iniciales:
+  `_gh_backup_before_task1598_20260829T001722Z`, `_gh_backup_before_task1598_render_fix_20260829T002005Z`,
+  `_gh_backup_before_task1598_index_20260829T002549Z`; menu:
+  `_gh_backup_before_task1598_menu_20260829T003200Z`.
+- No se creó un lead o booking ficticio. La primera interacción humana validará los recibos reales; no es un paso de
+  rollout pendiente de la página.
+
 ## 2026-08-28 — `TASK-1792` complete: la curva de CTR declara su usabilidad
 
 **Estado: `complete` y verificado contra runtime real (lectura).** Sin flag, sin migración, sin escritura —
@@ -452,129 +532,3 @@ dos son más grandes de lo que parecían:
 
 **Continuidad:** el rollout de TASK-1696 sigue pendiente tal como quedó ayer (los dos flags OFF, el
 flip a enforce como decisión del operador, el deploy del gateway después del release).
-
-## 2026-08-27 — TASK-1696: el gasto del grader entra al ledger; el gate de dinero nace en shadow
-
-**Estado: `code complete, rollout pendiente`** — el schema, la atribución y las tres señales están
-vivos SIN flag (son aditivos y sólo hacen visible lo que ya ocurría); el gate de presupuesto
-per-org queda code-complete con sus dos flags en OFF.
-
-**Lo que cerró.** El grader AEO le compraba a DataForSEO fuera del ledger declarado como fuente
-única de presupuesto. Ahora `seo_provider_spend_daily` distingue **quién** consumió (`consumer`:
-`seo`|`aeo`) y **de qué tipo** es el dólar (`cost_basis` + `price_table_version`, acoplados por
-CHECK); el presupuesto SEO filtra `consumer='seo'` y el AEO es `resolveAeoBudget`. UN ledger, dos
-resolvers. El adapter de AI Mode migró al transporte canónico con `consumer: 'aeo'` +
-`organizationId` derivado del perfil.
-
-**Dos defectos reales que la spec no tenía, encontrados ejercitando el SQL contra PG y no
-leyéndolo:**
-
-1. Con la clave única de 4 columnas, un dólar `estimated` colisionaba con la fila `invoiced` del
-   mismo día y entraba por el `DO UPDATE`, que suma el monto pero **no toca `cost_basis`** — quedaba
-   reetiquetado como facturado, sin error. La clave pasó a SEIS columnas con `NULLS NOT DISTINCT`
-   (migración forward-fix `20260828020728716`).
-2. `estimateObservationCostUsd` devuelve, para `google_ai_overview`, el costo **real** de
-   DataForSEO. O sea que `grader_runs.estimated_cost_usd` ya contenía los dólares que el ledger
-   ahora también guarda: sumar los dos lados —lo que pedía el contrato de la spec— habría contado
-   ese gasto **dos veces**. `resolveAeoBudget` resta esa porción. Verificado: USD 7,2419 bruto −
-   USD 0,112 DataForSEO = USD 7,1299 de LLM.
-
-**Trampa de runtime que estaba a un commit de morder:** `postDataForSeoTask` LANZA si viene
-`organizationId` y el runtime no registró el contador de gasto, y sólo lo registraba el entrypoint
-del ops-worker — pero el grader **también corre inline en Vercel**
-(`/api/admin/growth/ai-visibility/runs`). El `catch` del adapter habría convertido ese throw en una
-observación `failed`: AI Mode muerto justo para los perfiles de cliente que la task existe para
-atribuir, sin que ningún test lo notara. El adapter registra el contador por import de efecto.
-
-**Desvío deliberado del plan de la spec:** la skill `dataforseo-operator` congela
-`postDataForSeoSerpLiveAdvanced` ("no agregar parámetros acá"). En vez de engordarlo con
-`organizationId` + `consumer`, se migró su único consumer productivo. El wrapper queda congelado,
-documentado como puerta que **no atribuye**, y con guard que rompe el build si alguien vuelve a
-comprar por ahí.
-
-🔴 **Dependencia de ORDEN para federar la tool MCP (precedente TASK-1661, ya nos pasó una vez).**
-`get_seo_provider_spend` está en `main` de `efeonce-mcp` (commit `1a51461`), pero **el deploy del
-gateway es `workflow_dispatch` manual — el push NO desplegó nada**. Y el lane que la tool consume,
-`/api/platform/ecosystem/growth/seo/provider-spend`, **está en `develop`, NO en `main` de
-Greenhouse** (verificado con `git ls-tree -r origin/main`). Disparar `Deploy Cloud Run` del gateway
-ANTES del release dejaría la tool respondiendo **404 upstream** en `mcp.efeonce.org`: el guard de
-paridad quedaría verde y la tool rota. **El deploy del gateway va DESPUÉS del release que lleve el
-lane a `main`**, nunca antes.
-
-**Pendiente de rollout, con dueño:** (1) prender `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED` en
-Vercel **y** en el ops-worker (`deploy.sh` + `--update-env-vars`, los dos pasos) y verificarlo en la
-**revisión activa** de Cloud Run; (2) observar un mes calendario de `wouldBlock` por tier; (3)
-llevarle al operador una propuesta de tope — **el flip a `ENFORCED` es decisión suya**. Los defaults
-(60/10/3 USD) nacen holgados a propósito: en shadow tienen que dejar pasar todo.
-
-**Verificación que NO se pudo hacer y por qué:** el criterio "una corrida real sobre un perfil CON
-organización deja fila `('aeo','serp','invoiced')`" no es observable del histórico — **cero** de las
-42 observaciones de AI Mode que compraron pertenecen a un run cuyo perfil tenga organización.
-Requiere provocar la corrida. La señal de drift ya lo refleja honesto: 7 observaciones de agosto
-compraron desde perfiles públicos (`warning`, ausencia legítima) y **0** de drift atribuible.
-
-**Segundo punto ciego, del mismo tipo:** `pnpm skills:mirrors` pasa **sin mirar**
-`dataforseo-operator` — no está en el manifiesto de `scripts/skills/validate-mirrored-skills.mjs`,
-y el validador sólo tiene modo `byte-identical` (esta skill no puede serlo: frontmatter distinto por
-contrato y `references/` sólo en `.claude/`). El espejo se verificó a mano esta vez. Admitirla exige
-un modo "cuerpo-idéntico" en el validador — decisión de alcance pendiente.
-
-**Punto ciego anotado, no cerrado:** `pnpm flags:audit` no ve estos flags — su regex busca
-`process.env.X_ENABLED` literal y todo `ai-visibility/flags.ts` los lee por constante (`env[FLAG]`),
-así que reporta "0 sin registrar" sin haberlos mirado. Se registraron a mano en el ledger.
-
-## 2026-08-27 — Release a producción ejecutado: carril Growth SEO completo (sesión de coordinación)
-
-**Manifest `released`.** `main` = `cc73c74789ce9e667096d5316e9d991fd4a2186a`, release_id
-`cc73c74789ce-dbce65f2-303b-4528-bef3-f4edd022a880`, run `33123977671`, todos los jobs verdes
-(Azure con su `Skip Bicep deploy (no diff)` esperado, post-release health check verde). Producción
-responde 200 en `/api/auth/health` con los 3 providers `ready`.
-
-**Flags prendidos**: `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` (Vercel, sign-off comercial otorgado) y
-`GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (Vercel Production). Redeploy `greenhouse-if2u2c8ys`.
-`pnpm flags:audit --strict`: 0 flags ON sin lector en `main`, 0 con lector divergente.
-
-**Rollout de la tríada, verificado antes del pase**: los 3 flags ON en la revisión activa del
-ops-worker y los 3 schedulers `ENABLED`; smokes live por USD 0,2958 (total del día USD 1,0176,
-cruzado contra `seo_provider_spend_daily`). Se atajó un bug real: `deploy.sh` conservaba el 5.º arg
-de `upsert_scheduler_job` en `"true"`, así que el siguiente deploy habría **re-pausado los
-schedulers en silencio** (fallo silencioso versión scheduler); corregido en `7c1a44962` y verificado
-post-deploy.
-
-**PENDIENTES que quedan abiertos:**
-
-1. **Deploy del gateway MCP (TASK-1658) — CERRADO 2026-08-27.** Lo tomó la sesión de coordinación
-   porque su sesión dueña terminó antes de que el manifest cerrara. `pnpm check` verde (67/67) →
-   push `85b65cb`..`220e916` → `deploy.yml` run `33125750952` success → revisión
-   **`efeonce-mcp-gateway-00023-zt2`** `Ready` → `mcp.efeonce.org/health` 200.
-   **`tools/list` autenticado observado: 21 tools SEO** (antes 13), con las 8 recién federadas
-   presentes. Canary del provider contra producción verde para Efeonce y Berel.
-   **Hallazgo del cierre: el `oauth:canary` tenía un punto ciego de inventario.** Ejercitaba
-   `tools/call` sobre tools puntuales y nunca `tools/list`, así que una tool que quedara fuera del
-   server pasaba invisible mientras las probadas siguieran verdes — el mismo drift que el guard de
-   paridad detecta, pero del lado del runtime desplegado. Se le agregó la aserción de inventario
-   (`toolsTotal`/`seoToolsTotal`/`seoTools`), commit `4058a07` en `efeonce-mcp`. El charset del
-   nombre incluye el punto a propósito: las tools no-SEO son punteadas
-   (`hiring.talent_pool.search`) y sin él el total excluye Globe y Hiring en silencio.
-
-2. **TASK-1777 → `complete` (2026-08-27, decisión del operador); queda VIVO su follow-up F1.**
-   El veredicto `skipped_no_movement` no pudo observarse en el smoke (ambos targets eran
-   `first_time`) y el operador decidió cerrar con ese criterio diferido a follow-up con fecha:
-   **lunes 2026-08-31** post 07:00 CLT (`ops-seo-backlink-capture`), consulta lista en el Delta (3)
-   del task file. Si aparece `drilled` sin movimiento: ISSUE + flag OFF (<5 min) + fix de
-   `shouldDrillDownBacklinks`. Exposición si se ignora: ~USD 0,18 por ciclo semanal. Lifecycle,
-   carpeta, README y registry sincronizados; `task:lint` 0/0.
-3. **TASK-1775, TASK-1776 y TASK-1658 → `complete` (2026-08-27).** Lifecycle, carpeta, README y
-   `TASK_ID_REGISTRY` sincronizados; `task:lint` 0/0 en las tres. Queda **un solo checkbox abierto en
-   1775**, honestamente anotado por su autor: "un sujeto que el proveedor no conoce deja fila con
-   métricas NULL" está cubierto por unit test pero no observado en runtime (ambos sujetos del smoke
-   eran conocidos). Es residual declarado, no bloqueador oculto; se observa cuando entre un dominio
-   sin datos. El caso análogo SÍ se observó en 1776 (`no_market_data` honesto con fila NULL en un
-   subdominio). De paso se actualizó el delta de `TASK-1313`, que declaraba a 1776 como "rollout
-   pendiente".
-
-4. **Revisión Sentry del 2026-08-29** para `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (punto 1 de su
-   fila en el ledger): conteos `blocked_redirect`/`blocked_private_address`.
-5. **Watchdog en falso positivo (TASK-920).** Reporta DRIFT comparando contra un commit del 2026-07-30
-   y su `recommended_action` propone redeployar un SHA viejo sobre workers correctos. **No obedecerlo.**
-   La fuente autoritativa es `pnpm release:workers`.

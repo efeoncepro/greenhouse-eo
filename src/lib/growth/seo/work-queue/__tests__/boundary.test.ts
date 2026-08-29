@@ -78,12 +78,35 @@ describe('TASK-1700 — boundary del módulo de la cola', () => {
     expect(offenders.map(f => path.relative(process.cwd(), f))).toEqual([])
   })
 
-  it('el orden NUNCA se computa con el volumen estimado del proveedor', () => {
-    // El invariante ●/◑ aplicado al ORDEN. `searchVolume`/`search_volume` no tiene por qué
-    // aparecer en este módulo: la cola ordena por demanda medida o declara que no puede.
-    const offenders = sourceFiles.filter(file => /\bsearch_?[vV]olume\b/.test(readFileSync(file, 'utf8')))
+  /*
+   * El invariante real es "el ORDEN no se computa con volumen estimado", no "la palabra
+   * `searchVolume` no aparece". El adapter de la lente SÍ la transporta —es una columna que
+   * la pantalla muestra desde antes de esta task, y no servirla cambiaría la forma— pero no
+   * ordena nada: su trabajo es mapear.
+   *
+   * Por eso el gate se parte en dos asserts en vez de relajarse: quién puede NOMBRAR el
+   * volumen, y la prueba de que ese único archivo no ORDENA.
+   */
+  const ORDERING_FILES = sourceFiles.filter(file => !file.endsWith('opportunities-adapter.ts'))
+
+  it('ningún archivo que participa del ORDEN nombra el volumen estimado', () => {
+    const offenders = ORDERING_FILES.filter(file => /\bsearch_?[vV]olume\b/.test(readFileSync(file, 'utf8')))
 
     expect(offenders.map(f => path.relative(process.cwd(), f))).toEqual([])
+  })
+
+  it('el adapter transporta el volumen pero NO ordena (por eso puede nombrarlo)', () => {
+    // Si el adapter alguna vez ordena, la exención de arriba deja de ser válida y este
+    // assert es el que lo dice — antes de que alguien ordene por volumen sin darse cuenta.
+    const adapter = sourceFiles.find(file => file.endsWith('opportunities-adapter.ts'))
+
+    expect(adapter).toBeDefined()
+
+    const content = readFileSync(adapter!, 'utf8')
+
+    expect(content).not.toMatch(/\.sort\(/)
+    expect(content).not.toMatch(/localeCompare/)
+    expect(content).not.toMatch(/compareWorkQueueItems/)
   })
 })
 
