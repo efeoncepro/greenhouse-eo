@@ -103,6 +103,26 @@ describe('as-of', () => {
   })
 })
 
+describe('los `lens` legacy no pueden divergir de la forma canónica', () => {
+  /**
+   * Tres readers (domain-overview, url-visibility, keyword-gap) traían `lens: 'estimated'`
+   * ANTES de esta task. Se conservan porque quitarlos no sería aditivo — hay consumers vivos
+   * que los leen— pero dos campos que dicen lo mismo son dos verdades esperando divergir.
+   * Esto los ata: mientras convivan, tienen que coincidir.
+   */
+  const legacyShapes = [
+    { reader: 'domain-overview', lens: 'estimated' as const, provenanceSource: 'dataforseo_labs' as const },
+    { reader: 'url-visibility', lens: 'estimated' as const, provenanceSource: 'dataforseo_labs' as const },
+    { reader: 'keyword-gap', lens: 'estimated' as const, provenanceSource: 'dataforseo_labs' as const }
+  ]
+
+  it('el `lens` legacy es el que `resolveSeoLens` deriva de la fuente declarada', () => {
+    for (const shape of legacyShapes) {
+      expect(resolveSeoLens(shape.provenanceSource), `divergencia en ${shape.reader}`).toBe(shape.lens)
+    }
+  })
+})
+
 describe('alineación con el carril prospecto (TASK-1709)', () => {
   it('`ProspectFact` satisface la forma canónica y su lente vive en el vocabulario', () => {
     const fact: ProspectFact = {
