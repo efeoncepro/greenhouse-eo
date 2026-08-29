@@ -148,6 +148,51 @@ de los dos techos estás tocando.
 **techo**, bajo el supuesto de que el CTR observado en esa posición se repite; no dice
 que la página vaya a llegar ahí. Preséntalo como techo, jamás como forecast.
 
+### Cuando la curva propia no alcanza: presta la FORMA, estima el NIVEL
+
+**Segunda medición independiente (2026-08-28, otro sitio, otro vertical).** Curva de un
+e-commerce de pintura, ventana 28d, sobre `all_rows`:
+
+| Pos. | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| **CTR** | 4,72% | 3,15% | 2,50% | 1,37% | **0,98%** | 0,78% | 0,58% | 0,50% | 0,39% | 0,31% |
+
+🎯 **El hallazgo que cambia el método: lo que varía entre sitios es el NIVEL, no la FORMA.**
+Normalizando la posición 1 a 1,00, las tres curvas disponibles decaen casi igual:
+
+| Fuente | p1 | p2 | p3 | p4 | p5 |
+|---|---|---|---|---|---|
+| Tabla de industria clásica | 1,00 | 0,56 | 0,41 | 0,30 | 0,22 |
+| Sitio medido A (arriba, §anterior) | 1,00 | 0,72 | 0,54 | 0,32 | 0,26 |
+| Sitio medido B (pintura) | 1,00 | 0,67 | 0,53 | 0,29 | 0,21 |
+
+Lo que divergía era el nivel: posición 1 en **27%** (industria) contra **4,25%** y **4,72%**
+medidos. En la posición 5, **6% declarado contra ~1% medido — un factor 6**. Una tabla de
+industria de la era pre-AI-Overviews no está mal calibrada por poco: está calibrada para una
+SERP que ya no existe.
+
+**Método, cuando el sitio no tiene muestra para su propia curva:**
+
+1. Toma la **forma** de una curva de referencia **medida** (no de un benchmark de industria) y
+   declara su procedencia y su as-of.
+2. Estima el **nivel** del sitio con UN parámetro: el cociente entre sus clics reales y los que
+   la referencia predice para SU distribución de impresiones por posición.
+3. Fuerza la curva resultante **monótona no creciente**. Mezclar buckets medidos con prestados
+   produce repuntes que no describen nada — la posición 6 no convierte mejor que la 5 — y la
+   propia medición repunta en 10–12 por ruido de muestra chica.
+4. Si no hay muestra ni para el nivel (piso operativo: ~30 clics agregados), usa la referencia a
+   su nivel nativo **y decláralo**. Un techo prestado sirve para mostrarse con su procedencia;
+   **no sirve para decidir el orden del backlog.**
+
+✅ **Validación cruzada del método:** el nivel estimado del sitio B contra la curva del sitio A
+da **1,048** — la referencia le calza dentro del 5%, y B no es la fuente de A. Dos sitios de
+verticales distintos comparten forma y casi comparten nivel; lo que no se puede prestar es
+cuando el sitio genuinamente rinde por debajo, y eso el nivel sí lo captura.
+
+⚠️ **Calcula el nivel sobre filas NO-MARCA** por la misma razón que la curva (§arriba, punto 4):
+la explosión por sitelinks infla los buckets 1–2. Si tu pipeline todavía usa `all_rows`,
+decláralo — un sesgo no declarado se lee como medición limpia.
+
 ### GSC → BigQuery (export masivo, caso Greenhouse)
 - El **bulk data export** de GSC a BigQuery elimina el muestreo y guarda
   histórico ilimitado. Greenhouse ya usa BigQuery (`efeonce-group`) → encaja.

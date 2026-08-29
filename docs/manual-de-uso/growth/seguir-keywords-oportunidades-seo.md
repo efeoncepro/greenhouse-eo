@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-08-07 por Claude (TASK-1308)
-> **Ultima actualizacion:** 2026-08-14 por Claude (TASK-1661 — las columnas de mercado ya traen dato: Volumen y Barrera de enlaces)
+> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1792 — el techo de clics declara de donde salio, y la lista avisa cuando no ordena por ganancia)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §7 y §10.4
 
 # Oportunidades de Keywords — Leer el mapa y seguir keywords
@@ -38,8 +38,10 @@ de posicion. La pantalla vive en `Growth > SEO > Keywords` (`/admin/growth/seo/k
    pero si viajan en la URL, asi que el enlace se comparte ya filtrado.
 7. En la tabla, revisa la keyword, su pagina actual y la ganancia estimada. Si el Space tiene el
    enriquecimiento de mercado, veras ademas **Volumen** y **Barrera de enlaces** (ver "Las dos
-   lentes" mas abajo). Viene ordenada por ganancia estimada; puedes reordenar por cualquier
-   columna numerica y cambiar el tamaño de pagina (10 / 25 / 50; por defecto 25).
+   lentes" mas abajo). Viene ordenada por ganancia estimada **cuando ese criterio distingue entre
+   filas**, y por demanda medida cuando no (ver "Cuando el techo de clics no puede ordenar la
+   lista"); puedes reordenar por cualquier columna numerica y cambiar el tamaño de pagina
+   (10 / 25 / 50; por defecto 25).
 8. Pulsa **Seguir** en las que quieras medir a diario, o marca varias y usa **Seguir seleccionadas**.
 9. Para sacar una del ciclo, **Dejar de seguir**. Tienes unos segundos para **Deshacer**.
 10. **Exportar CSV** baja lo que estas viendo, con los filtros aplicados.
@@ -68,6 +70,42 @@ Reglas de lectura:
 - **La cifra tiene fecha.** Se captura por corrida y se refresca mensualmente; la pantalla todavia no
   imprime esa fecha. Si necesitas el "vigente al", mirala en
   [operar-datos-de-mercado-keywords.md](operar-datos-de-mercado-keywords.md).
+
+## Cuando el techo de clics no puede ordenar la lista
+
+La columna **Ganancia est.** responde "cuantos clics ganarias si esta keyword llegara a la
+posicion objetivo". Sale de la **curva de CTR de tu propio sitio**: cuanto convierte ESE sitio
+en cada posicion. Es mejor que una tabla de industria porque absorbe sola cuanto te esta
+deprimiendo el CTR la respuesta con IA en tu vertical.
+
+**Pero esa curva necesita historia.** Un sitio recien conectado, o de trafico bajo, no tiene
+suficientes clics en la posicion objetivo para que el numero signifique algo. Y ahi hay una
+trampa que ya nos costo: **cero clics no quiere decir "convierte cero", quiere decir "nadie
+midio lo suficiente"**. Con 75 impresiones y ningun clic, el CTR real puede ser cualquier cosa
+entre 0% y 4%.
+
+Que hace la plataforma cuando eso pasa:
+
+| Situacion | Que ves | Que puedes afirmar |
+|---|---|---|
+| Hay historia suficiente en la posicion objetivo | Techo calculado con tu propia curva | Es un techo **medido en tu sitio**. Ordena la lista |
+| No hay historia ahi, pero si en el sitio en general | Techo con curva de referencia **ajustada al nivel de tu sitio** | Es una aproximacion calibrada. **No ordena la lista** |
+| No hay historia suficiente en ninguna parte | Techo con curva de referencia prestada | Es una referencia externa. **No ordena la lista** |
+
+🔴 **Cuando el techo no puede ordenar, la lista se ordena por demanda medida** — impresiones
+reales × que tan cerca esta de la primera plana — y ambos factores salen de Search Console, sin
+nada estimado. Es un orden peor informado, pero **es un orden real**. Antes de esta correccion
+la lista se ordenaba por un campo que valia cero en todas las filas: no ordenaba mal,
+**no ordenaba**, y nada lo avisaba.
+
+⚠️ **El techo NUNCA es un pronostico**, ni siquiera cuando sale de tu propia curva. Dice
+"si llegaras a la posicion 5 y ahi convirtieras como converge tu sitio en la 5, ganarias N
+clics". No dice que vayas a llegar. Presentalo como techo al cliente, jamas como proyeccion.
+
+🎯 **Que hacer si tu sitio cae en los dos ultimos casos.** No es un error a reportar: es la
+lectura correcta de un sitio joven. Lo accionable es (a) usar el orden por demanda medida, que
+sigue siendo valido, y (b) saber que la curva mejora sola a medida que el sitio acumula serie —
+no hay nada que configurar.
 
 ## Que significan las señales
 

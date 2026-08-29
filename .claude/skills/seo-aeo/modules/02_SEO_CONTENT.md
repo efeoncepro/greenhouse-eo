@@ -293,6 +293,35 @@ deprimiendo el CTR los AI Overviews EN ESE sitio y ESE vertical**, sin tener que
 estimarlo ni discutirlo. Si hoy la posición 3 de ese sitio rinde la mitad que en
 una tabla vieja, el score ya lo refleja.
 
+⚠️ **Y tiene una precondición que casi nadie enuncia: la curva propia sólo sirve si
+hay MUESTRA.** Aplicar «usa tus datos» a un sitio de bajo tráfico produce el defecto
+opuesto al que evita — una curva propia **peor que la tabla prestada**, porque un
+bucket sin clics se lee como «CTR esperado 0» y el score entero colapsa sin que nada
+falle. Medido (caso fuente 2026-08-28): un sitio con 75 impresiones y **0 clics** en la
+posición objetivo producía ganancia 0 en **el 100% de sus filas**, y el orden del backlog
+dejaba de existir en silencio.
+
+📏 **El piso mira DOS dimensiones, y la que manda son los CLICS.** La precisión de un
+estimador de tasa la gobiernan los **éxitos**, no los ensayos: un bucket con 50.000
+impresiones y 3 clics tampoco tiene curva.
+
+| Impresiones con **0 clics** | CTR real compatible (regla de tres, `3/n`) |
+|---|---|
+| 10 | hasta **26%** |
+| 75 | hasta 4,0% |
+| 410 | hasta 0,73% |
+
+Con un CTR verdadero de ~1%, `P(0 clics | n=75) ≈ 47%` — observar cero es una moneda al
+aire. Con `n=1000` cae a ~0,004%. Piso operativo: **~1.000 impresiones y ≥5 clics** en el
+bucket que vas a usar (5 clics ⇒ error relativo ≈ 1/√5 ≈ 45%: **estimable, no preciso**).
+
+🔴 **`0` medido y «sin muestra suficiente» son estados DISTINTOS y jamás se colapsan.** Si
+el bucket no alcanza, dilo y ordena por otra cosa declarada — nunca por un campo cuya
+varianza es cero, que preserva el orden de entrada y finge haber ordenado.
+
+🎯 **Cuando no hay muestra, presta la FORMA y estima el NIVEL** (`07_MEASUREMENT.md`): un
+nivel es 1 parámetro, una curva por posición son ~20.
+
 ### Canibalización: no se descarta, se separa
 
 Una query que rankea con **más de una página** no es una oportunidad de
