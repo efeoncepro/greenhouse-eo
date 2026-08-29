@@ -7,6 +7,35 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-29 — el filtro que decide si un worker se despliega llevaba tiempo describiendo un bundle que ya no existía
+
+El release de `incremental-clicks-v2` cerró verde en todo: manifest `released`, Vercel READY,
+watchdog sin drift, tres de cuatro workers en el SHA. El `ops-worker` estaba sirviendo la versión
+**anterior** — o sea el predicado de canibalización que ese mismo release existía para corregir.
+Su job no falló: duró 46 segundos, se saltó el deploy solo y cerró `success`.
+
+La decisión de desplegar se tomaba contra `WORKER_RUNTIME_PATHS`, una lista de rutas mantenida a
+mano. Medido con el metafile de esbuild —el mismo bundle que arma el Dockerfile—, el `ops-worker`
+empaqueta **1449 archivos** y la lista cubría **24 prefijos**: **696 archivos invisibles**, entre
+ellos `src/lib/postgres`, casi todo `src/lib/finance` y todo `src/lib/growth/seo`. Como 1385 de los
+1449 vienen de `src/lib`, enumerar subdirectorios nunca iba a sostenerse.
+
+No era la primera vez. Los comentarios del propio workflow documentan **cinco** recurrencias
+(TASK-1210, 742, 1723, 1746, 1279) y cada una se cerró agregando una ruta más. La sexta habría sido
+`src/lib/growth/seo`.
+
+Ahora la declaración es la verdadera —gruesa a propósito, y sigue evitando el redeploy por cambios a
+`src/app/**`, `docs/**` o `tests/**`— y hay un gate, `pnpm worker:deploy-path-gate`, que la mantiene
+verdadera derivándola del árbol real del bundle en vez de la lista escrita. Corriéndolo aparecieron
+dos huecos más: `commercial-cost-worker` e `ico-batch` tampoco cubrían `services/_shared/sentry-init.ts`,
+que ambos bundlean.
+
+Con el worker ya en el SHA correcto, la cola se rematerializó **sin** `force`: el piso de recomputación
+filtra por versión, así que un snapshot v1 dejó de contar como reciente. En Berel MX `consolidation`
+cayó de 200 a 11 mientras `gsc_striking_distance` subía de 168 a 200 — reclasificación, no filtrado
+de más. Y el 200 de v1 era el tope de `maxItemsPerOrigin`, o sea que el número real estaba truncado:
+la mejora es mayor que la que muestra la resta.
+
 ## 2026-08-29 — el detector de canibalización de la cola SEO detectaba marca, y de paso vaciaba media pantalla
 
 La cola priorizada decidía si una keyword era canibalización preguntando "¿aparece más de una página
@@ -926,14 +955,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - El ADR Proposed conserva `TASK-1689` como pipeline individual, prohíbe batch SQL/email directo y sólo permite
   afirmar Banco de Talentos cuando el consentimiento futuro está vigente. `data_origin` no gatea comunicaciones.
 - Estado: documentación/diseño; no hay migraciones, código, flags ni emails nuevos activos.
-
-## 2026-08-21 — Hiring incorpora un plan gobernado para crear la cuenta Microsoft del nuevo colaborador
-
-- `TASK-1761`, anclada a `EPIC-011`, separa la cuenta Entra deshabilitada, su binding OID, la habilitación laboral
-  y el readiness M365; no trata selección, handoff ni `member.created` como permiso suficiente.
-- El ADR Proposed elige API-driven inbound provisioning con app dedicada, matching por ancla longitudinal y
-  reconciliación de logs; rechaza `POST /users`, email/UPN como identidad y grupo/licencia antes del OID binding.
-- Quedan documentados dos blockers P0 previos al canary: `accountEnabled=false` no puede apagar el principal `/my`
-  y el roundtrip SCIM debe actualizar la misma persona sin crear otro principal/member.
-- Azure no se modificó. El snapshot read-only no muestra capacidad libre de Microsoft 365 ni grupo de
-  licenciamiento válido; ADR, licencia, app/consent, security group y canary siguen pendientes.
