@@ -63,10 +63,17 @@ describe('ops-worker assessment public-session link cutover contract', () => {
   })
 
   it('treats Hiring notifications as worker inputs for push, latest-SHA and drift checks', () => {
+    // Contrato post-146070ffc: el push trigger y el drift check cubren hiring por la
+    // declaración GRUESA (`src/lib/**` / `src/lib`) — enumerar subdirectorios se rompió
+    // 5 veces y el gate `pnpm worker:deploy-path-gate` es ahora quien mantiene la
+    // cobertura verdadera contra el metafile de esbuild. La resolución de latest-SHA
+    // (workflow_dispatch) sigue nombrando las rutas explícitas: UNA aparición cada una.
     const workflow = deployWorkflow()
 
-    expect(workflow.match(/src\/lib\/hiring\/notifications/g)).toHaveLength(3)
-    expect(workflow.match(/src\/lib\/hiring\/assessment\/public-session/g)).toHaveLength(3)
+    expect(workflow).toContain("- 'src/lib/**'")
+    expect(workflow.match(/src\/lib\/hiring\/notifications/g)).toHaveLength(1)
+    expect(workflow.match(/src\/lib\/hiring\/assessment\/public-session/g)).toHaveLength(1)
+    expect(workflow).toContain('worker:deploy-path-gate')
   })
 })
 
@@ -84,9 +91,15 @@ describe('ops-worker Talent Pool projection contract', () => {
   })
 
   it('treats Talent Pool sources as worker runtime inputs for triggers, resolution and drift checks', () => {
+    // Ver el comentario del test de Hiring notifications: triggers y drift van por la
+    // declaración gruesa de `src/lib`; latest-SHA nombra la ruta explícita una vez.
     const workflow = deployWorkflow()
 
-    expect(workflow.match(/src\/lib\/hiring\/talent-pool/g)).toHaveLength(3)
+    expect(workflow.match(/src\/lib\/hiring\/talent-pool/g)).toHaveLength(1)
+
+    const driftBlock = workflow.slice(workflow.indexOf('WORKER_RUNTIME_PATHS=('))
+
+    expect(driftBlock).toContain('src/lib\n')
   })
 })
 
