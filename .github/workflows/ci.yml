@@ -166,6 +166,15 @@ jobs:
         # contextos Cloud Build/Docker y path triggers de los cuatro workers.
         run: pnpm worker:build-contract-gate && pnpm worker:build-contract-gate:test
 
+      - name: Worker deploy-path coverage gate
+        # Los filtros de deploy de los workers son listas de rutas mantenidas a mano y
+        # derivaron del bundle real: un cambio a una ruta no listada NO redespliega, el
+        # job cierra `success` y el worker sirve codigo viejo con el release en verde.
+        # Ocurrio 5 veces (TASK-1210/742/1723/1746/1279) y el release 64bdd105c dejo al
+        # ops-worker sirviendo v1 con el manifest en `released`. Este gate deriva la
+        # cobertura del metafile de esbuild (arbol real, transitivos incluidos).
+        run: pnpm worker:deploy-path-gate
+
       # NOTA (TASK-1160): los gates de CLAUDE.md (budget + rule-audit) viven en su
       # workflow dedicado `claude-md-governance.yml`, porque ESTE workflow ignora
       # `**/*.md` y `docs/**` en sus triggers — un PR que solo edita CLAUDE.md NO

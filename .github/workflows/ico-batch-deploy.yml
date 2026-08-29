@@ -22,11 +22,21 @@ on:
     paths:
       - '.github/workflows/ico-batch-deploy.yml'
       - 'services/ico-batch/**'
-      - 'src/lib/ico-engine/**'
-      - 'src/lib/finance/ai/**'
-      - 'src/lib/ai/**'
-      - 'src/lib/sync/event-catalog.ts'
-      - 'src/lib/sync/publish-event.ts'
+      # sentry-init compartido: entra al bundle, asi que un cambio ahi debe redesplegar.
+      - 'services/_shared/**'
+      # El worker bundlea casi todo `src/lib` (medido con el metafile de esbuild, el
+      # mismo bundle del Dockerfile). Enumerar subdirectorios se rompe en silencio:
+      # el cambio entra, el release cierra verde y el worker sirve codigo viejo.
+      # Declaracion gruesa a proposito; conserva la selectividad que importa
+      # (`src/app/**`, `docs/**`, `tests/**` no redespliegan).
+      # Gate que lo mantiene verdadero: `pnpm worker:deploy-path-gate`.
+      - 'src/lib/**'
+      - 'src/emails/**'
+      - 'src/types/**'
+      - 'src/config/**'
+      - 'src/components/**'
+      - 'src/i18n/**'
+      - 'src/@core/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - '.dockerignore'

@@ -28,63 +28,20 @@ on:
       - '.gcloudignore'
       - 'vendor/**'
       - 'tsconfig.json'
-      - 'src/lib/sync/**'
-      # TASK-1210 — ops-worker hosts /nubox/sync + /nubox/quotes-hot-sync which run
-      # upsertIncomeFromSale (income materialization). Sin este filter, cambios al
-      # Nubox sync NO triggerean redeploy y el worker queda con código stale (drift
-      # live 2026-06-22: el fix del native plane backfill quedó stranded).
-      - 'src/lib/nubox/**'
-      - 'src/lib/knowledge/**'
-      - 'src/lib/payroll/**'
-      - 'src/lib/finance/payroll-expense-reactive.ts'
-      - 'src/lib/finance/apply-payroll-reliquidation-delta.ts'
-      - 'src/lib/email/**'
-      - 'src/lib/integrations/**'
-      - 'src/lib/globe/**'
-      # TASK-1723 — the worker owns the incremental Talent Pool reconciler and
-      # bundles this projection/policy code. Omitting it leaves privacy fixes
-      # stranded even when services/ops-worker itself is unchanged.
-      - 'src/lib/hiring/talent-pool/**'
-      # TASK-1746 — assignment/recovery email link policy is evaluated by the
-      # reactive notifications sender in this worker, never by Vercel.
-      - 'src/lib/hiring/notifications/**'
-      - 'src/lib/hiring/assessment/public-session/**'
-      - 'src/lib/google-credentials.ts'
-      - 'src/lib/space-notion/**'
-      # TASK-742 — ops-worker hosts the auth-providers smoke lane and consumes
-      # the readiness/secrets stack, so changes here must trigger a redeploy.
-      - 'src/lib/auth/**'
-      - 'src/lib/auth-secrets.ts'
-      - 'src/lib/secrets/**'
-      # ops-worker hosts /reliability-ai-watch which invokes getReliabilityOverview
-      # + getReliabilityAiObserver → demo signal readers (TASK-910/913). Sin este
-      # filter, fixes a las queries demo (e.g. canonical schema corrections) NO
-      # triggerean redeploy y quedan en Sentry generando alertas hasta que otro
-      # push toque paths filtrados. Live discovery durante hotfix JAVASCRIPT-NEXTJS-67/68
-      # (2026-05-19) — canonical schema fix demo signals quedó stranded post-merge.
-      - 'src/lib/reliability/**'
-      - 'src/lib/notion-metrics/**'
-      # TASK-1234 — ops-worker hosts /growth/grader/drain (drainPendingGraderRuns +
-      # recoverStuckRunningRuns). Sin este filter, cambios al run-engine/store del
-      # grader NO triggerean redeploy y el worker queda con código stale.
-      - 'src/lib/growth/ai-visibility/**'
-      # TASK-1298 / release drift 2026-06-30 — ops-worker hosts /growth/forms/dispatch
-      # (dispatchPendingSubmissions importa src/lib/growth/forms/*: store/contracts/etc).
-      # Sin este filter, cambios al motor de Growth Forms NO redeployan el worker → TASK-1297
-      # quedó stranded en ops-worker (3/4 workers al target; ops-worker stale en 21aa7f97).
-      - 'src/lib/growth/forms/**'
-      # TASK-1391 — el dispatcher del artifact-worker vive en el dominio proposals
-      # (render-dispatch/render-jobs); sin este path el ops-worker queda stale en silencio.
-      - 'src/lib/commercial/tenders/proposals/**'
-      # TASK-1279 — el worker bundlea los reactive consumers del grader (lead-handoff,
-      # report-email, operator-send) que importan estos deps transitivos. Sin estos
-      # filters + sus entradas en WORKER_RUNTIME_PATHS, un cambio SOLO a estos paths
-      # (ej. crm-client del Lead HubSpot) triggerea el workflow pero el drift-check lo
-      # salta (git diff --quiet no ve diff en runtime paths) → worker queda stale.
-      - 'src/components/growth/ai-visibility/**'
-      - 'src/lib/hubspot/**'
+      # El worker bundlea 1385 de 1449 archivos desde `src/lib` (medido con el
+      # metafile de esbuild, el mismo bundle del Dockerfile). Enumerar subdirectorios
+      # es estructuralmente imposible de mantener: se rompio 5 veces (TASK-1210, 742,
+      # 1723, 1746, 1279) y cada arreglo agrego una ruta mas dejando la clase abierta.
+      # La declaracion honesta es gruesa. Conserva la selectividad que si importa:
+      # `src/app/**`, `docs/**` y `tests/**` NO redespliegan el worker.
+      # Gate que lo mantiene verdadero: `pnpm worker:deploy-path-gate`.
+      - 'src/lib/**'
       - 'src/emails/**'
-      - 'src/lib/observability/**'
+      - 'src/types/**'
+      - 'src/config/**'
+      - 'src/components/**'
+      - 'src/i18n/**'
+      - 'src/@core/**'
   workflow_dispatch:
     inputs:
       environment:
@@ -279,29 +236,13 @@ jobs:
             tsconfig.json
             services/ops-worker
             services/_shared
-            src/lib/sync
-            src/lib/nubox
-            src/lib/knowledge
-            src/lib/payroll
-            src/lib/finance/payroll-expense-reactive.ts
-            src/lib/finance/apply-payroll-reliquidation-delta.ts
-            src/lib/email
-            src/lib/integrations
-            src/lib/hiring/talent-pool
-            src/lib/hiring/notifications
-            src/lib/hiring/assessment/public-session
-            src/lib/space-notion
-            src/lib/auth
-            src/lib/auth-secrets.ts
-            src/lib/secrets
-            src/lib/reliability
-            src/lib/notion-metrics
-            src/lib/growth/ai-visibility
-            src/lib/growth/forms
-            src/components/growth/ai-visibility
-            src/lib/hubspot
+            src/lib
             src/emails
-            src/lib/observability
+            src/types
+            src/config
+            src/components
+            src/i18n
+            src/@core
           )
 
           CURRENT_REVISION="$(gcloud run services describe ops-worker \
