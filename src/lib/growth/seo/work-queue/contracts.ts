@@ -115,6 +115,14 @@ export interface SeoWorkQueueScoreBreakdown {
    * pérdida de información silenciosa.
    */
   alsoSurfacedBy?: Array<{ origin: SeoWorkQueueOrigin; verb: SeoWorkQueueVerb }>
+  /**
+   * Páginas del sitio compitiendo por esta intención. Sólo en `origin='consolidation'`.
+   *
+   * Se persiste como DATO y no se deja sólo dentro de `basisReason`: el consumer que
+   * renderiza la lente necesita el número, y parsearlo de una frase en prosa lo ataría a la
+   * redacción — la clase de acople que se rompe la primera vez que alguien mejora el texto.
+   */
+  competingPages?: number
 }
 
 /** Una entrada de trabajo, tal como se persiste. */

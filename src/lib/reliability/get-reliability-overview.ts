@@ -210,6 +210,11 @@ import { getSeoDomainOverviewStalenessSignal } from './queries/seo-domain-overvi
 import { getSeoUrlVisibilityStalenessSignal } from './queries/seo-url-visibility-staleness'
 import { getSeoCompetitorCoverageStalenessSignal } from './queries/seo-competitor-coverage-staleness'
 import { getSeoSerpTopResultsCoverageSignal } from './queries/seo-serp-top-results-coverage'
+import {
+  getGrowthSeoWorkQueueOriginDegradedSignal,
+  getGrowthSeoWorkQueueScoreVersionDriftSignal,
+  getGrowthSeoWorkQueueStaleSnapshotSignal
+} from './queries/growth-seo-work-queue-signals'
 import { getSeoBacklinkDrilldownFailuresSignal } from './queries/seo-backlink-drilldown-failures'
 import { getSeoRankCaptureLagSignal } from './queries/seo-rank-capture-lag'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
@@ -709,6 +714,9 @@ interface ReliabilityOverviewSources {
   seoUrlVisibilityStaleness?: ReliabilitySignal | null
   seoCompetitorCoverageStaleness?: ReliabilitySignal | null
   seoSerpTopResultsCoverage?: ReliabilitySignal | null
+  growthSeoWorkQueueStaleSnapshot?: ReliabilitySignal | null
+  growthSeoWorkQueueOriginDegraded?: ReliabilitySignal | null
+  growthSeoWorkQueueScoreVersionDrift?: ReliabilitySignal | null
   seoBacklinkDrilldownFailures?: ReliabilitySignal | null
   seoAuditStuckTasks?: ReliabilitySignal | null
   seoKeywordDiscoveryStuckRuns?: ReliabilitySignal | null
@@ -1180,6 +1188,9 @@ export const buildReliabilityOverview = (
     ...(sources.seoUrlVisibilityStaleness ? [sources.seoUrlVisibilityStaleness] : []),
     ...(sources.seoCompetitorCoverageStaleness ? [sources.seoCompetitorCoverageStaleness] : []),
     ...(sources.seoSerpTopResultsCoverage ? [sources.seoSerpTopResultsCoverage] : []),
+    ...(sources.growthSeoWorkQueueStaleSnapshot ? [sources.growthSeoWorkQueueStaleSnapshot] : []),
+    ...(sources.growthSeoWorkQueueOriginDegraded ? [sources.growthSeoWorkQueueOriginDegraded] : []),
+    ...(sources.growthSeoWorkQueueScoreVersionDrift ? [sources.growthSeoWorkQueueScoreVersionDrift] : []),
     ...(sources.seoBacklinkDrilldownFailures ? [sources.seoBacklinkDrilldownFailures] : []),
     ...(sources.seoAuditStuckTasks ? [sources.seoAuditStuckTasks] : []),
     ...(sources.seoKeywordDiscoveryStuckRuns ? [sources.seoKeywordDiscoveryStuckRuns] : []),
@@ -1741,6 +1752,23 @@ export const getReliabilityOverview = async (
     preloadedSources.seoSerpTopResultsCoverage !== undefined
       ? preloadedSources.seoSerpTopResultsCoverage
       : await getSeoSerpTopResultsCoverageSignal().catch(() => null)
+
+  // TASK-1700 — las tres de la cola priorizada. `.catch(() => null)` igual que sus hermanas:
+  // una señal que no se puede leer no puede tumbar el tablero entero de operaciones.
+  const growthSeoWorkQueueStaleSnapshot =
+    preloadedSources.growthSeoWorkQueueStaleSnapshot !== undefined
+      ? preloadedSources.growthSeoWorkQueueStaleSnapshot
+      : await getGrowthSeoWorkQueueStaleSnapshotSignal().catch(() => null)
+
+  const growthSeoWorkQueueOriginDegraded =
+    preloadedSources.growthSeoWorkQueueOriginDegraded !== undefined
+      ? preloadedSources.growthSeoWorkQueueOriginDegraded
+      : await getGrowthSeoWorkQueueOriginDegradedSignal().catch(() => null)
+
+  const growthSeoWorkQueueScoreVersionDrift =
+    preloadedSources.growthSeoWorkQueueScoreVersionDrift !== undefined
+      ? preloadedSources.growthSeoWorkQueueScoreVersionDrift
+      : await getGrowthSeoWorkQueueScoreVersionDriftSignal().catch(() => null)
 
   const seoBacklinkDrilldownFailures =
     preloadedSources.seoBacklinkDrilldownFailures !== undefined
@@ -2875,6 +2903,9 @@ export const getReliabilityOverview = async (
     seoUrlVisibilityStaleness,
     seoCompetitorCoverageStaleness,
     seoSerpTopResultsCoverage,
+    growthSeoWorkQueueStaleSnapshot,
+    growthSeoWorkQueueOriginDegraded,
+    growthSeoWorkQueueScoreVersionDrift,
     seoBacklinkDrilldownFailures,
     seoAuditStuckTasks,
     seoProspectCostOverrun,

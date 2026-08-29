@@ -23,6 +23,10 @@ import { materializeSeoWorkQueue } from '../../src/lib/growth/seo/work-queue/mat
 import { readSeoWorkQueue } from '../../src/lib/growth/seo/work-queue/reader'
 import { toClientWorkQueueDto } from '../../src/lib/growth/seo/work-queue/client-dto'
 import { recordSeoWorkQueueDecision } from '../../src/lib/growth/seo/work-queue/record-decision'
+import { readKeywordOpportunitiesFromWorkQueue } from '../../src/lib/growth/seo/work-queue/opportunities-adapter'
+import { readKeywordOpportunities } from '../../src/lib/growth/seo/keyword-opportunities-reader'
+import { isCurveUsableAtPosition, readOrgCtrCurve } from '../../src/lib/growth/seo/work-queue/priority-score'
+import { getPriorityScoreConfig } from '../../src/lib/growth/seo/work-queue/score-versions'
 
 const TARGET = process.argv[2] ?? 'seot-berel-mx'
 const ACTOR = 'sanity-task-1700'
@@ -304,6 +308,121 @@ const main = async () => {
         `apariciones=${retired[0]?.n}`
       )
     }
+  }
+
+  // ── 7. PARIDAD DE ORDEN: la cola vs el reader legacy ──────────────────────────────────
+  //
+  // 🔴 Condición dura del cutover. Si la cola reordena lo que el reader legacy ya ordenaba
+  // con criterio, el cambio de fuente sería un cambio de COMPORTAMIENTO no declarado — y se
+  // descubriría en producción, no acá.
+  //
+  // ⚠️ El gate DERIVA del dato qué es comparable, en vez de llevar una lista de targets:
+  // consulta `isCurveUsableAtPosition` —la MISMA función que usa el score— y sólo compara
+  // cuando la curva es utilizable. Un gate con la lista escrita a mano sería el test de
+  // regresión del snapshot con que se escribió, y fallaría el día que la curva de un cliente
+  // madure, o sea justo cuando alguien hace lo correcto.
+  console.log('\n── Paridad de orden: cola vs reader legacy ──')
+
+  const orgRow = await runGreenhousePostgresQuery<{ organization_id: string }>(
+    `SELECT organization_id FROM greenhouse_growth.seo_targets WHERE seo_target_id = $1`,
+    [TARGET]
+  )
+
+  const config = getPriorityScoreConfig()
+  const curve = await readOrgCtrCurve(orgRow[0]!.organization_id, config.windowDays)
+  const comparable = isCurveUsableAtPosition(curve, config.targetPosition, config)
+
+  console.log(`curva utilizable en posición ${config.targetPosition}: ${comparable ? 'SÍ' : 'NO'} → ${comparable ? 'se compara el orden' : 'divergencia DECLARADA (banda 2)'}`)
+
+  const legacy = await readKeywordOpportunities(TARGET, { windowDays: config.windowDays })
+  const fromQueue = await readKeywordOpportunitiesFromWorkQueue(TARGET, { windowDays: config.windowDays, env: ENV_ON })
+
+  check('el adapter sirve la lente desde la cola', fromQueue !== null && fromQueue.result.ok)
+
+  if (comparable && legacy.ok && fromQueue?.result.ok) {
+    /*
+     * 🔴 La paridad se mide sobre la INTERSECCIÓN, y no es una concesión: los dos lados no
+     * SELECCIONAN igual, aunque ordenen igual.
+     *
+     * El reader legacy trae las 50 keywords de MÁS IMPRESIONES (`ORDER BY impressions DESC
+     * LIMIT 50` en SQL) y recién entonces las reordena por ganancia estimada. La cola trae
+     * las 50 de MAYOR GANANCIA. Son dos conjuntos distintos por construcción, y una keyword
+     * con techo alto que quede 51.ª por impresiones nunca aparecía en la lente vieja.
+     *
+     * Exigir el mismo conjunto haría fallar el gate por una diferencia de SELECCIÓN que la
+     * cola mejora; lo que el cutover promete no cambiar es el CRITERIO DE ORDEN. Así que se
+     * comprueban dos cosas sobre las keywords que ambos sirven: que el techo calculado sea
+     * IDÉNTICO (mismo método) y que su orden relativo sea el MISMO (mismo criterio).
+     */
+    const legacyByKeyword = new Map(legacy.opportunities.map(o => [o.keyword, o]))
+    const shared = fromQueue.result.opportunities.filter(o => legacyByKeyword.has(o.keyword))
+
+    check('hay intersección suficiente para medir paridad', shared.length >= 10, `compartidas=${shared.length}`)
+
+    const gainMismatches = shared.filter(o => legacyByKeyword.get(o.keyword)!.estimatedClickGain !== o.estimatedClickGain)
+
+    check(
+      'el techo de cada keyword compartida es IDÉNTICO (mismo método de score)',
+      gainMismatches.length === 0,
+      gainMismatches.length === 0
+        ? `verificadas=${shared.length}`
+        : gainMismatches
+            .slice(0, 3)
+            .map(o => `${o.keyword}: legacy=${legacyByKeyword.get(o.keyword)!.estimatedClickGain} cola=${o.estimatedClickGain}`)
+            .join(' · ')
+    )
+
+    // Orden relativo: la subsecuencia compartida, en el orden de cada lado, debe coincidir.
+    const legacyOrder = legacy.opportunities.filter(o => shared.some(s2 => s2.keyword === o.keyword)).map(o => o.keyword)
+    const queueOrder = shared.map(o => o.keyword)
+
+    // Los empates de techo se comparan como GRUPO: con 75 items en 0 clics, el orden dentro
+    // de un empate es arbitrario en el legacy (sort inestable) y determinista en la cola, y
+    // eso no es una diferencia de criterio.
+    const groupBy = (keywords: string[]) => {
+      const groups: string[][] = []
+      let current: string[] = []
+      let lastGain: number | null = null
+
+      for (const keyword of keywords) {
+        const gain = legacyByKeyword.get(keyword)!.estimatedClickGain
+
+        if (lastGain !== null && gain !== lastGain) {
+          groups.push([...current].sort())
+          current = []
+        }
+
+        current.push(keyword)
+        lastGain = gain
+      }
+
+      if (current.length > 0) groups.push([...current].sort())
+
+      return groups.map(g => g.join(',')).join(' | ')
+    }
+
+    const sameRelativeOrder = groupBy(legacyOrder) === groupBy(queueOrder)
+
+    check(
+      'el ORDEN RELATIVO de las keywords compartidas es idéntico (mismo criterio)',
+      sameRelativeOrder,
+      sameRelativeOrder ? `compartidas=${shared.length}` : 'divergen fuera de empates'
+    )
+
+    check(
+      'ambas declaran el mismo criterio de orden',
+      legacy.orderedBy === fromQueue.result.orderedBy,
+      `legacy=${legacy.orderedBy} cola=${fromQueue.result.orderedBy}`
+    )
+
+    // La diferencia de SELECCIÓN se declara, no se esconde: es la mejora que el cutover trae.
+    const onlyInQueue = fromQueue.result.opportunities.filter(o => !legacyByKeyword.has(o.keyword))
+
+    console.log(
+      `selección: legacy=${legacy.opportunities.length} cola=${fromQueue.result.opportunities.length} ` +
+      `compartidas=${shared.length} · sólo en la cola=${onlyInQueue.length} ` +
+      `(techo alto que el legacy dejaba fuera por no estar entre las 50 de más impresiones)`
+    )
   }
 
   console.log(`\n${pass} ok · ${fail} fallo(s)`)

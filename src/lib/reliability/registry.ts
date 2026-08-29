@@ -610,13 +610,17 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'greenhouse_growth.grader_profiles',
       'greenhouse_growth.grader_runs',
       'greenhouse_growth.provider_observations',
-      'greenhouse_growth.seo_provider_spend_daily'
+      'greenhouse_growth.seo_provider_spend_daily',
+      'greenhouse_growth.seo_work_queue_snapshots',
+      'greenhouse_growth.seo_work_queue_items',
+      'greenhouse_growth.seo_work_queue_decisions'
     ],
     smokeTests: [],
     filesOwned: [
       'src/lib/growth/**',
       'src/lib/reliability/queries/growth-ai-visibility-*.ts',
       'src/lib/reliability/queries/growth-dataforseo-*.ts',
+      'src/lib/reliability/queries/growth-seo-work-queue-signals.ts',
       'src/lib/reliability/queries/growth-search-console-*.ts',
       'src/lib/reliability/queries/seo-provider-cost-over-budget.ts',
       'src/lib/reliability/queries/seo-rank-capture-lag.ts',

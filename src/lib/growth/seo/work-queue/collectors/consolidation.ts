@@ -144,6 +144,7 @@ export const collectConsolidation = async (
         priorityScore: scored.score,
         breakdown: {
           ...scored.breakdown,
+          competingPages,
           basisReason: `${competingPages} páginas compiten por esta intención. ${scored.breakdown.basisReason}`
         },
         evidenceRef: buildEvidenceRef(ORIGIN, normalizedKeyword),

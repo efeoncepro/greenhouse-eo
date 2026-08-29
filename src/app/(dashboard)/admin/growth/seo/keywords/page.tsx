@@ -6,12 +6,13 @@ import { can } from '@/lib/entitlements/runtime'
 import { isGraderEnabled } from '@/lib/growth/ai-visibility/flags'
 import { getGraderProfileForOrganization } from '@/lib/growth/ai-visibility/store'
 import { enforceSeoRunEntitlement } from '@/lib/growth/seo/entitlement'
-import { isSeoKeywordDiscoveryEnabled, isSeoModuleEnabled } from '@/lib/growth/seo/flags'
+import { isSeoKeywordDiscoveryEnabled, isSeoModuleEnabled, isSeoWorkQueueEnabled } from '@/lib/growth/seo/flags'
 import { GH_GROWTH_SEO_KEYWORDS } from '@/lib/copy/growth'
 import { readKeywordDiscovery } from '@/lib/growth/seo/keyword-discovery/reader'
 import type { SeoDiscoveryCandidateView, SeoDiscoveryRunView } from '@/lib/growth/seo/keyword-discovery/reader'
 import { resolveUnambiguousSeoTarget } from '@/lib/growth/seo/resolve-target'
 import { readKeywordOpportunities } from '@/lib/growth/seo/keyword-opportunities-reader'
+import { readKeywordOpportunitiesFromWorkQueue } from '@/lib/growth/seo/work-queue/opportunities-adapter'
 import { listSeoEligibleSpaces } from '@/lib/growth/seo/overview/list-seo-spaces'
 import { readSeoOverviewConnection } from '@/lib/growth/seo/overview/read-overview-connection'
 import { resolveTrackedKeywordCapacity } from '@/lib/growth/seo/track-keywords'
@@ -330,8 +331,25 @@ export default async function Page({ searchParams }: PageProps) {
   // Oportunidades y set vigente en paralelo: son independientes y secuenciarlos duplicaría
   // la latencia del primer paint. El set vigente es lo que decide si una fila dice "Seguir"
   // o "Siguiendo" — sin él la pantalla ofrecería seguir algo que ya se sigue.
+  /*
+   * ── TASK-1700 Slice 7 — el cutover de la fuente de ORDEN ────────────────────────────────
+   *
+   * 🔴 La lente cambia de FUENTE, no de FORMA: mismas columnas, mismo copy, misma
+   * interacción. Lo único que cambia es quién manda el orden — pasa de un score no versionado
+   * calculado al vuelo a un snapshot inmutable con su `priority_score_version` persistida, que
+   * es lo que hace auditable "la recomendación #1 de la mañana" a las 3 de la tarde.
+   *
+   * La rama de fallback NO es código muerto duplicado: con el flag apagado, con la cola caída
+   * o mientras el primer snapshot todavía no existe, la lente sigue sirviendo el reader
+   * legacy. Servir una lente vacía sería peor que no cambiar nada — "no hay oportunidades" y
+   * "la cola aún no corrió" son afirmaciones distintas.
+   */
+  const workQueueLens = isSeoWorkQueueEnabled()
+    ? await readKeywordOpportunitiesFromWorkQueue(target.seo_target_id, { windowDays })
+    : null
+
   const [opportunities, tracked] = await Promise.all([
-    readKeywordOpportunities(target.seo_target_id, { windowDays }),
+    workQueueLens?.result ?? readKeywordOpportunities(target.seo_target_id, { windowDays }),
     runGreenhousePostgresQuery<{ keyword: string }>(
       `SELECT DISTINCT m.keyword
          FROM greenhouse_growth.seo_keyword_set_members m
