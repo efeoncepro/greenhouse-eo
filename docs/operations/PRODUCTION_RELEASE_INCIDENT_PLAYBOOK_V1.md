@@ -333,6 +333,61 @@ acompaña al cambio; **no** verifica techos de contexto.
 → `docs:closure-check` → `docs:context-rotate --apply` si hace falta → `docs:context-check:strict`
 → commit. Fuente canónica del contrato: `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`.
 
+### 12. Tratar una credencial de build como parte del código, y enterarse de que venció durante el release
+
+**Caso real (2026-08-29, release TASK-1785/1700).** El PR estaba verde en 12 de 13 checks; el único
+rojo era `Deploy ops-worker to Cloud Run`, con `ERR_PNPM_FETCH_401` al instalar
+`@efeoncepro/axis-tokens`. La causa no era el commit: **el PAT de `read:packages` guardado en
+`axis-packages-read-token` había vencido**. Una sola versión del secreto, creada el **2026-07-29** —
+un PAT clásico con expiración por defecto de 30 días vence el 2026-08-28, y la ventana del quiebre
+coincide exactamente: último deploy verde `22c71b51` a las 22:39 del 28, primer fallo `87c93d88` a
+las 02:25 del 29.
+
+**Radio real: 3 de los 4 workers del control plane** (`ops-worker`, `commercial-cost-worker`,
+`ico-batch`) montan el mismo `.npmrc` desde ese secreto. `hubspot-greenhouse-integration` no lo usa,
+y **Vercel tampoco** — su build pasó verde, que es justo lo que vuelve el diagnóstico engañoso si
+sólo se mira el color del PR.
+
+**Por qué es un anti-pattern y no mala suerte: venció en silencio.** No hubo señal, ni alerta, ni
+check de preflight. Se descubrió porque alguien estaba mirando un deploy — tres commits después de
+que empezara a fallar, ~14 h de ventana. El secreto no tiene anotación de expiración ni nada que la
+vigile: es una **afirmación de disponibilidad que ningún mecanismo sostiene**, exactamente la clase
+de defecto que el resto de este playbook persigue en otros dominios.
+
+**Reglas:**
+
+- **NUNCA promover con un deploy de worker en rojo asumiendo que el orquestador lo resolverá.** Los
+  workers se despliegan por `workflow_call` dentro del orquestador: si fallan ahí, el release cierra
+  `degraded` con `worker_revision_drift`. Y hay un modo peor: si alguno queda *change-gated* y se
+  salta, el release entra a `main` con el código nuevo y **sin** el worker desplegado — media
+  promoción, sin error visible.
+- **Al diagnosticar un deploy de worker rojo, mirar PRIMERO el historial del workflow.** Si los
+  commits anteriores también fallan, la causa es de entorno o credencial, no del cambio en curso.
+  `gh run list --workflow=<w>-deploy.yml --limit 12` responde en un segundo y evita depurar un diff
+  inocente.
+- **Un 401 en `pnpm install` de un paquete privado es SIEMPRE credencial, nunca código.** El log de
+  Cloud Build lo dice literal (`An authorization header was used: Bearer ghp_[hidden]`).
+- 🔴 **La rotación es una acción del OPERADOR, no del agente.** Crear un PAT y manipular su valor es
+  una operación de credencial: el agente no la ejecuta aunque se lo pidan. El camino canónico está en
+  la sección AXIS de la skill de release — sesión de navegador ya autenticada, y el valor va **directo
+  a Secret Manager por stdin**, nunca por argumento de comando, archivo, variable de CI, captura o
+  chat. Helper: `scripts/secrets/rotate-axis-packages-token.sh` (lee por stdin, valida el token contra
+  la API de GitHub **antes** de escribir la versión, y compone el `.npmrc` completo — el secreto no es
+  el token pelado, y un `.npmrc` malformado falla con el mismo 401 que el vencido).
+- ⚠️ **NUNCA sustituir la credencial acotada por una de scope amplio para desbloquear.** Un token de
+  sesión con permisos generales «funciona» y deja en infraestructura productiva una credencial que
+  puede mucho más que `read:packages`. Eso no es desbloquear: es cambiar un incidente de 30 minutos
+  por una exposición permanente.
+
+**El arreglo durable, que es el que cierra la clase:** un PAT estático de 30 días es una bomba de
+tiempo con fecha conocida. La App de GitHub del repo puede acuñar **tokens de instalación de una
+hora** bajo demanda desde su private key, y eso elimina el vencimiento silencioso en vez de
+posponerlo. Hoy no puede: `greenhouse-release-watchdog` (`app_id=3665723`) tiene `actions:read`,
+`deployments:read` y `metadata:read`, **sin `packages`**. Concederlo es una acción de owner de la org;
+acuñar en tiempo de build es trabajo de deploy. Mientras tanto, el mínimo es **anotar la expiración
+en el secreto y agregarle un check de preflight**, para que el próximo vencimiento se detecte antes
+de la promoción y no durante.
+
 ---
 
 ## Caso positivo 2026-08-06 — el release que no generó incidente

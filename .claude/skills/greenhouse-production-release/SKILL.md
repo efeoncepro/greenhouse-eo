@@ -528,6 +528,65 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
       investigar permisos de GitHub, el environment `production` o los reviewers configurados — es el
       mismo diagnóstico erróneo que el #15 provoca con Vercel.
 
+### Credencial de paquete privado vencida — el bloqueador que no está en el código
+
+**Antes de diagnosticar un deploy de worker rojo, mirar el HISTORIAL del workflow, no el diff.**
+`gh run list --workflow=<worker>-deploy.yml --limit 12` responde en un segundo. Si los commits
+anteriores también fallan, la causa es de entorno o credencial y el diff en curso es inocente.
+
+🔴 **Un `ERR_PNPM_FETCH_401` sobre `@efeoncepro/axis-*` es SIEMPRE la credencial, nunca el código.**
+El secreto `axis-packages-read-token` guarda un `.npmrc` completo (no el token pelado) con un PAT de
+`read:packages`. Un PAT clásico vence a los 30 días **en silencio**: sin señal, sin alerta, sin check
+de preflight. Caso fuente 2026-08-29: creado el 07-29, venció el 08-28, y se descubrió porque un
+agente estaba mirando un deploy — tres commits y ~14 h después de empezar a fallar.
+
+**Radio: 3 de los 4 workers del control plane** (`ops-worker`, `commercial-cost-worker`, `ico-batch`;
+`hubspot-greenhouse-integration` no lo usa) **y Vercel NO se ve afectado** — su build pasa verde, que
+es justo lo que vuelve engañoso mirar sólo el color del PR.
+
+- **NUNCA promover con un deploy de worker en rojo** esperando que el orquestador lo resuelva: los
+  workers se despliegan por `workflow_call` dentro del run, así que el release cierra `degraded` con
+  `worker_revision_drift`. Peor: si alguno queda *change-gated* y se salta, el código entra a `main`
+  **sin** su worker desplegado — media promoción, sin error visible.
+- 🔴 **La rotación es del OPERADOR, no del agente.** Crear un PAT y manipular su valor es una
+  operación de credencial: el agente **no la ejecuta aunque se lo pidan**; enuncia la regla y la
+  devuelve. Helper seguro: `scripts/secrets/rotate-axis-packages-token.sh` — lee por **stdin**
+  (nunca argumento, archivo ni log), **valida el token contra la API de GitHub antes de escribir** y
+  compone el `.npmrc` completo (uno malformado falla con el mismo 401 que el vencido, y cuesta otro
+  build de ~4 min descubrirlo).
+- ⚠️ **NUNCA sustituir la credencial acotada por una de scope amplio para desbloquear** (p. ej. el
+  token de la sesión `gh`). «Funciona» y deja en infraestructura productiva una credencial que puede
+  mucho más que `read:packages`: cambia un incidente de 30 minutos por una exposición permanente.
+- **Arreglo durable** (cierra la clase, no el caso): que la App de GitHub acuñe tokens de instalación
+  de 1 h bajo demanda en vez de un PAT estático. Hoy no puede — `greenhouse-release-watchdog`
+  (`app_id=3665723`) tiene `actions:read`/`deployments:read`/`metadata:read`, **sin `packages`**.
+  Mínimo intermedio: anotar la expiración en el secreto + check de preflight que la detecte **antes**
+  de la promoción.
+
+### El audit de flags tenía un punto ciego que anulaba su propio gate
+
+**Verificado 2026-08-29 prendiendo `GROWTH_SEO_WORK_QUEUE_ENABLED`.** `scripts/ci/feature-flags-audit.mjs`
+sólo detectaba `process.env.FLAG` en **notación de punto**, y **91 callsites de este repo leen por
+indirección** (`env[FLAG_CONST]` con `const FLAG_CONST = 'FLAG'` es el patrón de todo
+`src/lib/growth/seo/flags.ts`). Esos flags nunca entraban a `codeFlags`, con dos consecuencias:
+
+- se reportaban como «env var muerta en Vercel» teniendo lector real — **39 de 43 eran falsos positivos**;
+- 🔴 **escapaban enteros del gate ISSUE-150**, que hace `exit 1` SIEMPRE cuando un flag está prendido
+  en Production sin su código en `main`. El gate existía y el mecanismo lo hacía cumplir; una clase
+  entera de flags pasaba por al lado **sin que nada fallara**.
+
+Arreglado anclando en el **literal** y no en la forma de acceso (un flag leído por indirección tiene
+que nombrarse como string en alguna parte, o no habría cómo indexar `process.env`). Destapó 3 flags
+que llevaban tiempo sin registrar. **NUNCA angostar ese escaneo a una sola forma de acceso:**
+sobre-incluir cuesta registrar un flag de más; sub-incluir cuesta un flag fail-closed vivo sobre
+código que producción no tiene.
+
+**Corolario de orden, aprovechable en todo release:** prender un flag en el **SoT** del worker
+(`services/<w>/deploy.sh`) en vez de con `--update-env-vars` no sólo evita que el próximo deploy lo
+borre en silencio — **también ordena el flip por construcción**: el flag se activa exactamente cuando
+su código se despliega, nunca antes. Eso resolvió una precondición real ese día (`TASK-1792` no estaba
+en `main`; viajaba en la misma promoción).
+
 ## What The Orchestrator Owns
 
 `production-release.yml` owns the production release lifecycle:
