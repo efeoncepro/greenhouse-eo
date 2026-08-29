@@ -37,9 +37,23 @@ red no recorta cobertura. 🔴 Salvedad que va en el cierre: **la muestra es UNA
 consistente con "la guarda es correcta", no prueba fuerte. La consulta canónica queda registrada en el
 issue y no depende de Sentry, así que la puede correr cualquiera.
 
-**Dato de cartera que el ejercicio dejó visible:** son **2 targets**, y `seot-efeonce-own-brand` se
-salta en ambas capturas (1 sujeto, sin competidores declarados). **Efeonce sigue sin medirse a sí
-misma** — el hueco de GSC per-org, ahora visible también por este lado.
+**Dato de cartera:** son **2 targets**. `seot-efeonce-own-brand` se saltó en ambas capturas.
+
+🔴 **Corrección del mismo día, sobre una afirmación mía en la v1 de esta entrada.** Escribí que ese
+skip mostraba que *"Efeonce sigue sin medirse a sí misma — el hueco de GSC per-org"*. **Es falso en
+las dos mitades**, verificado contra PostgreSQL:
+
+- **GSC per-org de Efeonce está CONECTADA y activa**: `sc-domain:efeoncepro.com`, scope read-only,
+  `status=active`, con **1.573 filas** en `seo_gsc_daily` hasta el 2026-08-26. (Berel: 180.239.)
+- **Efeonce SÍ tiene foto de dominio**: snapshot de `efeoncepro.com` del 2026-08-27.
+
+El skip no era falta de dato: era **frescura**. La foto del 27 seguía vigente dentro de la ventana de
+30 días, así que el batch la saltó correctamente. Lo que capturó hoy fue el **segundo** sujeto de
+Berel: `comex.com.mx`, un competidor real declarado después del smoke.
+
+Leí `skipped` como "no se pudo medir" cuando significaba "no hacía falta medir". Es el mismo defecto
+del que se corrigió dos veces hoy en el hilo cross-sesión: **observación correcta, causa inventada**.
+Queda escrito acá en vez de reescrita la entrada.
 
 ## 2026-08-29 — cartera LicitaLAB/Wherex y contrato CRM común
 
@@ -184,6 +198,12 @@ semánticos; `activationType` usa megáfono y el contador del objetivo queda a 8
 `1263574659f2d9cec139d3c8d11cf15a78bf8023b8894589ac1356395b1f6c57`; rollback
 `_gh_backup_before_task1598_visual_refinement_20260829T105059Z`. Gates live de fidelidad y SEO/AEO verdes; capturas
 `.captures/task1598-influencer-fidelity-2026-08-29T11-00-28-401Z/`. Sin lead ni booking de prueba.
+
+**Dock premium live 2026-08-29:** `#sticky-cta` es ahora un dock Midnight flotante/contenido con safe-area; reunión
+permanece como único CTA sólido verde y brief usa contorno blanco transparente con `arrow-up-right`. Hash Elementor
+`f89834a27c2727e4a680b5c50241b2b43baed5e6b0bc66d33b61eb09eda40df2`; rollback
+`_gh_backup_before_task1598_sticky_dock_20260829T110607Z`. Fidelidad verde en 1536/1440/890/390 y reduced motion,
+SEO/AEO sin drift; capturas `.captures/task1598-influencer-fidelity-2026-08-29T11-08-21-257Z/`. Sin lead ni booking.
 
 ## 2026-08-28 — `TASK-1792` complete: la curva de CTR declara su usabilidad
 
@@ -566,33 +586,3 @@ sesión hermana greenhouse-eo-6c (freeze de develop aceptado; le pedí prender
 deploy del gateway `efeonce-mcp` (6 tools) + push de los commits docs-only locales; (4) ≈2026-09-02
 (≥5 días de serie): revisar candidatos de `readSerpCompetitorCandidates` con el operador ANTES de
 declarar. Docs/skills sincronizados post-1662 y post-1699 por 6 subagentes con espejos verificados.
-
-## 2026-08-28 — TASK-1662: keyword gap competitivo — code complete, rollout pendiente
-
-**Estado: `code complete, rollout pendiente`; Slice 4 bloqueado por `TASK-1700` (`to-do`).** El módulo SEO
-gana su tercera pregunta: competidores DECLARADOS con autoría (`declareCompetitors`/`retireCompetitors`,
-techo default 5, outbox, 3 lanes), cobertura vía `labs/domain_intersection` ×2 (flag
-`GROWTH_SEO_COMPETITOR_GAP_ENABLED` **OFF**, scheduler `ops-seo-competitor-coverage` día 18 **PAUSADO**,
-V1 un competidor por corrida, ~USD 0,15/ciclo) y `readKeywordGap` que DERIVA el gap al leer: exclusión
-dura por GSC medido, `content_gap`/`ranks_worse`/`declaredTargets` separados, factores con `sin_dato`,
-**sin orden propio** (la cola de `TASK-1700` es la autoridad de orden; `evidence_ref` opaca
-`seo:competitor_gap:<coverage_run_id>`). Sanity **22/22 contra PG real** (exclusión GSC probada con
-query medida real). Federación commiteada en `efeonce-mcp` local (3 tools; deploy DESPUÉS del próximo
-release develop→main). Migración `20260828113457119` APLICADA.
-
-**Rollout ejecutado el mismo día (autorización plena del operador):** `pnpm build` de producción
-verde (gate de cierre completo) · shape de `domain_intersection` validado contra el sandbox gratis
-ANTES de gastar (elemento directo, sin wrapper `serp_item`) · competidor real declarado — Berel MX →
-`comex.com.mx`, `declared_by=user-efeonce-admin-julio-reyes`, evidencia
-`BEREL_SEO_DIAGNOSTIC_2026-08-25` · dry-run USD 0,144 → **primera corrida real USD 0,1076 con Δ
-EXACTO en el ledger** (697 filas de cobertura + 640 de mercado gratis) · gap con datos reales:
-**357 content_gap / 54 ranks_worse / 269 excluidas por GSC medido** (el invariante ●/◑ en vivo) ·
-flag **ON declarativo** en `deploy.sh` (efectivo con el primer deploy del worker post-release;
-scheduler PAUSADO hasta entonces — antes sería un 404).
-
-**Riesgo/continuidad:** ownership de `seo_competitors` resuelto — el command lo aterrizó 1662 y
-`TASK-1699` (P0) consume `declareCompetitors` con `proposal_ref` (Deltas declarados en 1699/1700).
-**Próximo paso (post-release develop→main):** verificar `/seo/competitor-coverage/capture-batch` en
-la revisión activa del worker → despausar `ops-seo-competitor-coverage` → medir el costo del segundo
-ciclo antes de declarar más competidores; deploy del gateway `efeonce-mcp` en la misma ventana. La
-task queda `in-progress` sólo por el Slice 4 (bloqueado por `TASK-1700`) y ese cierre operativo.
