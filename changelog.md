@@ -20,9 +20,11 @@ del deploy del worker contaba ocurrencias de string en el YAML — el proxy text
 que 146070ffc había reemplazado por cobertura de metafile. La misma clase que el string-match del
 ORDER BY del reader, con signo opuesto: aquél pasaba verde con banda 2 rota; éste se puso rojo con
 la cobertura mejorada. Una guarda textual debe señalar al verificador real, no reemplazarlo. Y la
-parte que no era del pipeline: develop estuvo rojo dos veces con ese test sin que nadie lo abriera,
-y el run del commit culpable fue cancelado por `cancel-in-progress` — en ráfagas, el veredicto es
-del último push, no de cada commit. El skip de 44 s del ops-worker esta vez fue legítimo (árboles
+parte que no era del pipeline: la racha completa fue de **5 corridas rojas/canceladas en ~70
+minutos** — el run del commit culpable cancelado por `cancel-in-progress` (nunca juzgado), dos
+rojos de una sesión y uno del push del merge canónico de otra, sin que nadie abriera ninguno — en
+ráfagas el veredicto es del último push, y una alarma sostenida se normaliza hasta volverse
+invisible. El skip de 44 s del ops-worker esta vez fue legítimo (árboles
 idénticos, diff completo vacío): mismo síntoma que el incidente anterior, causa opuesta — los
 distingue el diff, no el cronómetro.
 

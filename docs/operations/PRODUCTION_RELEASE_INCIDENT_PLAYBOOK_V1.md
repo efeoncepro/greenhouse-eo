@@ -1,9 +1,9 @@
 # Production Release Incident Playbook V1
 
 > **Tipo de documento:** Playbook operativo canónico
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-05-12 por Claude Opus 4.7 (post incidente TASK-870)
-> **Ultima actualizacion:** 2026-08-09 por Claude Opus 5 (dos releases el mismo día: `2c87d71e2eca` + `ee0d568b8614`)
+> **Ultima actualizacion:** 2026-08-29 por Claude Fable 5 (release `e1718a359575`, 4.º del día: Deep rojo por drift test↔contrato + el rojo-no-leído en `develop`)
 > **Audience:** Cualquier agente AI (Claude, Codex, Cursor) y operadores humanos que enfrenten un `Production Release Orchestrator` fallando
 
 ---
@@ -418,6 +418,98 @@ posponerlo. Hoy no puede: `greenhouse-release-watchdog` (`app_id=3665723`) tiene
 acuñar en tiempo de build es trabajo de deploy. Mientras tanto, el mínimo es **anotar la expiración
 en el secreto y agregarle un check de preflight**, para que el próximo vencimiento se detecte antes
 de la promoción y no durante.
+
+### 13. Leer el skip de un change-gate como prueba de que el runtime no cambió
+
+**Caso real (2026-08-29, release `64bdd105c737`).** Toda la cadena de evidencia cerró VERDE —manifest
+`released`, Vercel `READY`, watchdog `drift_count=0`, 3 de los 4 workers en el target— y el
+`ops-worker` estaba sirviendo `8adf8c2d3`: código anterior al release, justo el que ese release
+existía para corregir. El job del worker **no falló**: duró 46 s, el step `Deploy ops-worker` quedó
+`skipped` y el job cerró `success`. Es la "media promoción sin error visible" que el anti-pattern #12
+nombra como riesgo, materializada.
+
+```
+ops-worker serves 8adf8c2d3e0c...; worker runtime paths are unchanged
+since EXPECTED_SHA=64bdd105c737...; skipping build/deploy.
+```
+
+**Causa raíz.** El change-gate decidía contra `WORKER_RUNTIME_PATHS`, una lista mantenida a mano que
+había dejado de describir el artefacto. Medido con el metafile de esbuild: el worker bundlea **1449
+archivos**, la lista cubría **24 prefijos**, **696 archivos invisibles** — entre ellos
+`src/lib/postgres`, casi todo `src/lib/finance` y todo `src/lib/growth/seo`. El propio workflow
+documentaba **cinco** recurrencias previas (TASK-1210, 742, 1723, 1746, 1279), cada una cerrada
+agregando una ruta más: el caso se arreglaba y la clase quedaba abierta para el siguiente dominio.
+
+**Reglas:**
+
+- 🔴 **Un skip del change-gate NO prueba que el diff runtime sea vacío: prueba que las rutas
+  DECLARADAS no cambiaron.** Son la misma cosa sólo mientras la lista describa el bundle, y eso es
+  precisamente lo que nadie verifica al leer el log.
+- 🔴 **La verificación que distingue el no-op legítimo del falso es el diff de ÁRBOL COMPLETO, sin
+  `--`:** `git diff --name-only <SHA_DESPLEGADO> <SHA_TARGET>`. Vacío ⇒ los árboles son idénticos ⇒
+  el skip es legítimo, sin depender de ninguna lista (caso verificado: release `e1718a359575` contra
+  `380a20fa3`, skip de 44 s correcto). Con archivos ⇒ el skip habla de la lista, no del runtime:
+  investigar antes de cerrar. Un diff acotado con `--` a las rutas del gate **hereda el mismo punto
+  ciego que se quiere descartar**.
+- **Un job de deploy de 40-60 s que cierra `success` es un skip, no un deploy.** Leer el `conclusion`
+  del step, no el del job.
+- **NUNCA cierres una recurrencia de esta clase agregando una ruta más.** El mecanismo canónico es
+  `pnpm worker:deploy-path-gate` (commit `146070ffc`), que deriva la cobertura del bundle real
+  —replica el `esbuild --bundle` del Dockerfile y lee `metafile.inputs`, transitivos incluidos— y
+  rompe CI si un archivo del artefacto no cae bajo ningún prefijo declarado. Es el gemelo de
+  `worker-runtime-deps-gate.mjs` para las rutas del repo.
+- **Recuperación:** deploy break-glass autorizado por el operador (`workflow_dispatch` de
+  `ops-worker-deploy.yml` con `environment=production`), y después el gate. El deploy sin el gate deja
+  la clase abierta.
+- ⚠️ **Cuidado con "optimizar" la señal que lo detecta.** El ledger de tiempos registra una
+  optimización **RETIRADA** que proponía que el watchdog dejara de contar este skip como error:
+  habría silenciado exactamente la única señal que hace visible el caso falso.
+
+### 14. CI Deep rojo sobre el squash fresco por un test que codifica la forma vieja de un contrato
+
+**Caso real (2026-08-29, release `e1718a359575` — 4.º del día; PR #213 + forward-fix PR #214, run
+orquestador `33279083461`, manifest `released` 22:49Z, un solo run, ambos gates production aprobados
+sin stall).** `CI Deep Verification` se puso ROJO sobre el primer squash (`dade7ce5f`) por
+`services/ops-worker/deploy-contract.test.ts`: **2 de 16 tests fallando determinísticamente**. Los
+tests exigían el contrato VIEJO del workflow del worker —
+`expect(workflow.match(/ruta/g)).toHaveLength(3)`, 3 apariciones por ruta (push trigger + latest-SHA
++ drift check) — pero el commit `146070ffc` había rediseñado `ops-worker-deploy.yml` a cobertura
+GRUESA derivada del metafile de esbuild (`src/lib/**` en push y drift; rutas explícitas sólo 1 vez en
+latest-SHA; el gate del anti-pattern #13). El conteo cayó a 1 y el test rompió — **con la cobertura
+MEJORADA**.
+
+**Diagnóstico correcto — leer el conteo de tests y clasificar en tres, no en dos:**
+
+- `0 failed` + `Errors: N` en el resumen de vitest → flake/unhandled rejection (gotcha #13 de la
+  skill; `gh run rerun --failed` sobre el mismo SHA).
+- N fallidos determinísticos + el comportamiento nuevo NO es el diseñado → **regresión de runtime**:
+  el batch no sale.
+- N fallidos determinísticos + el comportamiento nuevo ES el diseñado y el test afirma la forma
+  vieja → **drift test↔contrato**: el fix es el TEST alineado al contrato nuevo, **jamás revertir el
+  comportamiento** para calmar al test.
+
+**El camino: forward-fix por el camino canónico.** Fix en `develop` → merge `-s ours` → PR #214 →
+squash nuevo `e1718a35` → re-evidencia → dispatch. El squash rojo `dade7ce5f` quedó **sin manifest A
+PROPÓSITO** (un Deep rojo no se dispatcha), y el SHA siguiente lo supersede con todo su contenido —
+ése es el manejo correcto de la regla "todo commit de `main` lleva manifest" cuando el commit nace
+con evidencia roja: el manifest lo lleva el SHA que sí se promueve.
+
+**Segunda capa del mismo desvío: el rojo que nadie leyó en `develop`** (medido por una sesión peer
+contra sí misma). `develop` estuvo ROJO DOS VECES con ese mismo test (commits `53e240d79` y
+`3e8149eaa`, run ejemplo `33274733930`) sin que nadie abriera el resultado, y el run del commit
+CULPABLE (`146070ffc`) fue **CANCELADO** por `cancel-in-progress: true` de `ci.yml` en `develop` —
+nunca fue juzgado. Lecciones estructurales:
+
+- **En una ráfaga de pushes, el veredicto de CI es del ÚLTIMO push, no de cada commit** — el commit
+  intermedio que rompe aparece atribuido al siguiente.
+- **`paths-ignore` deja los commits docs-only sin run**, volviendo la señal intermitente en ráfagas
+  mixtas.
+- **Un rojo que nadie mira es funcionalmente igual a no tener el test** — la MISMA clase que el caso
+  de la credencial AXIS (anti-pattern #12: detector que avisó 3 días antes en un canal que nadie
+  mira).
+
+**Regla operativa nueva para el pre-release:** "confirmar `develop` verde" significa mirar el run del
+HEAD actual **Y** los rojos/cancelados recientes de la ráfaga, no sólo el color del último run.
 
 ---
 

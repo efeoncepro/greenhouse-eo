@@ -3,7 +3,7 @@
 > **Audience:** EFEONCE_ADMIN + DEVOPS_OPERATOR
 > **Spec canónico:** [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 > **Source task:** TASK-848 V1 (parcial; V1.1 follow-ups en TASK-850..855)
-> **Last updated:** 2026-08-06
+> **Last updated:** 2026-08-29
 > **Timing ledger:** [PRODUCTION_RELEASE_TIMING_LEDGER.md](../PRODUCTION_RELEASE_TIMING_LEDGER.md)
 
 Este runbook es el contrato operativo para promover `develop` → `main` y para ejecutar rollback de emergencia.
@@ -555,7 +555,7 @@ Reason: el concurrency fix Opcion A (TASK-848 Slice 3) cancela pending nuevos cu
 | 4 | Smoke flows críticos | Browser real: login, `/finance/cash-out`, `/agency/operations`, `/admin/operations` |
 | 5 | Reliability signals OK | `/admin/operations` subsystem `Platform Release` debe estar OK |
 | 6 | **Flags pendientes de prender** | Revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` → **§ Pendientes de acción**: ¿hay flags `*_ENABLED` code-complete cuyo flip estaba gated a este release? Si sí, `vercel env add <FLAG>=true Production` (+ ops-worker si aplica) + redeploy + smoke del flujo + actualizar la fila del ledger. **El deploy del código NO prende los flags** (default OFF); olvidarlo deja la feature invisible en prod (deuda cognitiva). |
-| 7 | Watchdog sin drift real | `GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json` debe quedar `aggregateSeverity: ok`; workers esperados: `ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`. Excepcion V1: si solo `ops-worker` reporta drift pero el diff runtime Cloud Run SHA → target es vacio y `deploy_needed=false`, documentar residual de label y no redeployar. Desde el fix de `6f7e246ea` el watchdog ya devuelve `drift_count=0` y explica el residual change-gated en su `detail` — ver §4.1.1. |
+| 7 | Watchdog sin drift real | `GITHUB_RELEASE_OBSERVER_TOKEN="$(gh auth token)" pnpm release:watchdog --json` debe quedar `aggregateSeverity: ok`; workers esperados: `ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`. Excepcion V1: si solo `ops-worker` reporta drift pero el **diff de árbol completo** (`git diff --name-only <cloud_run_sha> <target_sha>`, sin `--`) es vacio y `deploy_needed=false`, documentar residual de label y no redeployar; con el diff acotado a las rutas del gate esta excepcion NO se puede conceder (§4.1.1). Desde el fix de `6f7e246ea` el watchdog ya devuelve `drift_count=0` y explica el residual change-gated en su `detail` — ver §4.1.1. |
 | 8 | Timing ledger actualizado | Agregar/actualizar fila en `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` con agente, fecha, release ID, run ID, SHA, **tiempo agente E2E** (principal), subtiempos técnicos, desglose por fase, bloqueo principal y aprendizaje. |
 
 ### 4.1. Leccion TASK-1328: skip esperado vs drift real
@@ -565,7 +565,7 @@ No cerrar un release por intuicion de logs. Hay tres casos distintos:
 | Caso | Interpretacion | Cierre permitido |
 |---|---|---|
 | Azure job dice `no_infra_diff` / `no diff` | Skip esperado: el workflow hizo health/gating y no aplico Bicep porque no habia cambios infra. | Si el job termina `success` y no hay health failure. |
-| Worker job dice que no redeploya por runtime-equivalente | Skip esperado solo si el diff de rutas runtime entre el SHA servido y el `target_sha` es vacío. Caso tipico: `ops-worker` change-gated. | Si `Ready=True`, el diff runtime es vacío y queda documentado como residual de label, aunque el watchdog V1 siga marcando drift. |
+| Worker job dice que no redeploya por runtime-equivalente | Skip esperado **solo si el diff de ÁRBOL COMPLETO** (`git diff --name-only <SHA_servido> <target_sha>`, sin `--`) es vacío. El diff acotado a las rutas del gate NO basta: hereda el punto ciego de la lista (§4.1.1). Caso tipico: `ops-worker` change-gated. | Si `Ready=True`, el diff de árbol completo es vacío y queda documentado como residual de label. |
 | Watchdog reporta `worker_revision_drift` con `drift_count > 0` | Drift confirmado: existe un SHA comparable y no coincide. | No; recuperar drift y re-ejecutar watchdog. |
 | Watchdog reporta `data_missing` con `drift_count = 0` | Evidencia insuficiente: puede ser `gcloud` ausente/expirado o una consulta Cloud Run fallida. No prueba drift. | No cerrar aun; restaurar autenticacion o usar logs/evidencia autenticada, sin redeploy automatico. |
 
@@ -604,7 +604,7 @@ Interpretacion:
 
 - `data_missing` con `drift_count=0` es un warning de observabilidad, no drift. Si la sesion local de `gcloud` esta ausente o expirada, reautenticar o consultar los logs del job del orquestador antes de decidir. No redeployar para corregir una falta de evidencia.
 - `ico-batch-worker` con deploy job ejecutado, health OK, `Ready=True` y watchdog synced = NO fue skippeado.
-- `ops-worker` con workflow que salta deploy por diff runtime y `GIT_SHA` viejo puede ser cierre valido si la comparacion de rutas runtime demuestra que el servicio servido es equivalente al target. No forzar redeploy solo para alinear el label.
+- `ops-worker` con workflow que salta deploy por diff runtime y `GIT_SHA` viejo puede ser cierre valido **solo si el diff de árbol completo entre el SHA servido y el target es vacío** (§4.1.1). No forzar redeploy solo para alinear el label — pero tampoco cerrar con el diff acotado a las rutas del gate, que fue el error del release `64bdd105c737`.
 - La recuperacion canonica para drift real es rerun del orquestador para el mismo `target_sha`; si el orquestador esta bloqueado, usar workflow individual como break-glass aprobado. Direct `gcloud run deploy` local es ultimo recurso break-glass y debe quedar documentado con target SHA, revision, verificacion y watchdog final.
 
 ### 4.1.1. Excepcion conocida: `ops-worker` change-gated
@@ -615,9 +615,9 @@ comparar el SHA servido por Cloud Run contra el target del release solo en las
 rutas runtime del worker:
 
 > ⚠️ **La lista de rutas NO se copia de este doc: se lee del workflow.** El gate real vive en
-> el array `WORKER_RUNTIME_PATHS` de `.github/workflows/ops-worker-deploy.yml` (hoy ~28 entradas,
-> entre ellas `src/lib/reliability`, `src/lib/hiring/talent-pool`, `src/lib/hiring/notifications`,
-> `src/lib/hiring/assessment/public-session`, `src/lib/sync`, `src/lib/growth/forms`). Este runbook
+> el array `WORKER_RUNTIME_PATHS` de `.github/workflows/ops-worker-deploy.yml` (hoy 12 prefijos
+> amplios —`src/lib` completo, `src/emails`, `src/config`, `src/@core`, `services/ops-worker`, …—
+> tras el fix del 2026-08-29; antes eran ~28 entradas finas). Este runbook
 > arrastró durante meses una lista de 7 entradas que **no existe en ningún gate** — `src/lib/ops` y
 > `scripts/ops-worker` ni siquiera figuran en el array real. Un diff con la lista corta devuelve
 > «vacío» sin haber mirado las rutas que sí importan, y ese vacío se lee como «no hay drift».
@@ -636,9 +636,37 @@ PATHS=$(sed -n '/WORKER_RUNTIME_PATHS=(/,/^          )/p' \
 git diff --name-only <cloud_run_git_sha> <release_target_sha> -- $PATHS
 ```
 
-**Sanity obligatorio antes de concluir «vacío»:** correr el mismo `git diff` sin el `--` para
-confirmar que los dos SHA existen y que el rango sí contiene cambios. Un `git diff` que devuelve
-vacío porque el SHA no resolvió se ve idéntico a uno que devuelve vacío porque no hay drift.
+🔴 **El diff de ÁRBOL COMPLETO es la verificación que MANDA, no un sanity (release `64bdd105c737`,
+2026-08-29).** Un skip del change-gate **NO** prueba que el diff runtime sea vacío: prueba que **las
+rutas DECLARADAS** no cambiaron. El diff acotado con `--` hereda el punto ciego de la lista, así que
+no puede refutarlo. Corre siempre, primero, el diff sin `--`:
+
+```bash
+git diff --name-only <cloud_run_git_sha> <release_target_sha>   # vacío ⇒ árboles idénticos ⇒ skip legítimo
+```
+
+- **Vacío** ⇒ el no-op es legítimo sin depender de ninguna lista, y de paso confirma que los dos SHA
+  resolvieron (un diff vacío por SHA inválido se ve idéntico a uno vacío por falta de drift). Caso
+  verificado: release `e1718a359575` contra `380a20fa3`, skip de 44 s correcto — el `push:develop` ya
+  había desplegado `380a20fa3`, cuyo árbol es IDÉNTICO al del squash target (el merge `-s ours` no
+  cambia el árbol y el squash preserva el contenido).
+- **NO vacío** ⇒ revisa si algún archivo del diff entra al bundle del worker. Si entra, el servicio
+  está sirviendo código viejo: deploy break-glass autorizado por el operador (`workflow_dispatch` de
+  `ops-worker-deploy.yml` con `environment=production`).
+
+En el release `64bdd105c737` el job duró 46 s, el step `Deploy ops-worker` quedó `skipped`, el job
+cerró `success` y el servicio siguió en `8adf8c2d3` — el código que ese release existía para
+corregir — con manifest `released`, Vercel `READY` y watchdog `drift_count=0`. La lista cubría 24
+prefijos de los 1449 archivos que el worker bundlea: 696 invisibles. Desde el commit `146070ffc` el
+gate `pnpm worker:deploy-path-gate` deriva esa cobertura del bundle real (metafile de esbuild) y
+rompe CI si un archivo del artefacto no cae bajo ningún prefijo declarado; **NUNCA** cierres una
+recurrencia agregando otra ruta a mano. Detalle: playbook de incidentes, anti-pattern #13.
+
+**Mismo síntoma, causas opuestas (los dos releases del 2026-08-29):** un job `Deploy ops-worker` de
+~44-46 s con el step Deploy en `skipped` fue drift real en `64bdd105c737` (46 s, worker sirviendo
+código viejo) y no-op legítimo en `e1718a359575` (44 s, árboles idénticos, el gate nuevo de
+`146070ffc` funcionando como se diseñó). El discriminador es el diff de árboles COMPLETO además del
+de rutas — **nunca la duración del job**.
 
 Si el comando no devuelve archivos, el workflow summary indica
 `deploy_needed=false`, Cloud Run esta `Ready=True` y el resto del release esta
@@ -711,6 +739,32 @@ Hard rules:
 - No reintroducir production deploy por `push:main` en workers.
 - No usar `skip_tests=true` salvo break-glass aprobado y documentado en `Handoff.md`.
 - No tocar rutas, payloads, webhooks ni secretos del bridge si el problema es solo revision drift.
+
+### 4.3. Canary de contrato por el lane ecosystem (verificado 2026-08-29, release `e1718a359575`)
+
+Cuando el release cambia el **contrato** de una API servida por el lane
+`api/platform/ecosystem/*`, el smoke genérico no lo prueba: hay que ejercitar la superficie real de
+producción con el token de consumer del gateway. Receta exacta:
+
+```bash
+# 1) Token del consumer — NUNCA imprimirlo
+TOKEN=$(gcloud secrets versions access latest \
+  --secret=efeonce-mcp-gateway-greenhouse-token --project=efeonce-group)
+
+# 2) Request por el lane ecosystem
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://greenhouse.efeoncepro.com/api/platform/ecosystem/growth/seo/<recurso>?externalScopeType=other&externalScopeId=efeonce-mcp-gateway&organizationId=<org>&limit=N"
+```
+
+- Los params `externalScopeType`/`externalScopeId` salen del **binding activo del consumer** en
+  `greenhouse_core.sister_platform_bindings` (para `efeonce-mcp-gateway`: type `other`, id
+  `efeonce-mcp-gateway`, scope interno). Sin ellos el lane responde `400 missing_external_scope_type`.
+- **El assert debe ser algo que SOLO el contrato nuevo puede producir.** En este release: el campo
+  `provenance` (con fuentes `gsc` + `own_ctr_model`) y el rank monotónico 1..N con banda 2 poblada.
+  La paginación completa por cursor (Berel: 6 páginas, 501/501, secuencia == persistida) da además
+  "cuenta y secuencia" contra la superficie real.
+- Interpretación de errores: un `400` de dominio con auth válida prueba que la ruta **EXISTE y
+  ejecuta**; un `401` probaría problema de token.
 
 ## 5. Rollback automatizado (Vercel + Cloud Run)
 

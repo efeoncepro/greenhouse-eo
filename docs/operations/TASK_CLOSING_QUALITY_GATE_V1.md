@@ -107,3 +107,82 @@ buscar los live tests que construyen ese payload (`grep -rl "<comando>" --includ
 actualizarlos en el MISMO PR. Y al cerrar una task de dominio, correr al menos una vez la suite con las
 credenciales cargadas —`set -a && . ./.env.local && set +a && pnpm vitest run src/lib/<dominio>`— porque
 `pnpm test` a secas los salta y su verde no dice nada sobre ellos.
+
+### Bug class — el gate de cierre tiene una mitad DESPUÉS del push: leer el veredicto (2026-08-29)
+
+Este documento ya exige `pnpm test` completo + `pnpm build` **antes** de cerrar. El caso del 2026-08-29
+mostró que eso es solo la mitad del gate: un agente rompió `services/ops-worker/deploy-contract.test.ts`
+al rediseñar el filtro de rutas de deploy del ops-worker, cerró el trabajo corriendo **solo tests focales
+del dominio que tocaba**, y después empujó a `develop` tres veces más **sin abrir el resultado de CI**.
+El rojo lo encontró una auditoría ajena horas más tarde, cuando reventó en CI Deep durante un release.
+
+No fue un hueco de cobertura del pipeline. El proyecto `unit` de `vitest.config.ts` incluye
+`services/**/*.test.ts`, así que **`pnpm test` completo lo habría atrapado en local**. Es exactamente
+la clase para la que existe la regla full-suite de este doc — "contratos cross-module que tu módulo
+focal no toca" — con el agravante de no leer el veredicto después de empujar.
+
+Corrida medida con `gh run list` sobre `ci.yml`:
+
+| commit | veredicto CI | por qué |
+|---|---|---|
+| `146070ffc` | `cancelled` | el push siguiente lo canceló (`cancel-in-progress`) |
+| `53e240d79` | `failure` | ROJO — nadie lo abrió |
+| `3e8149eaa` | `failure` | ROJO otra vez — nadie lo abrió |
+| `e3562c208` | (sin run) | docs-only: cae en `paths-ignore` de `ci.yml` |
+| `8cafe6b90` | `failure` ×2 | merge `main`→`develop` de otra sesión: MISMO test |
+| `dade7ce5f` | `failure` | primer squash a `main`: acá lo atrapó CI Deep, ~70 min después |
+| `380a20fa3` | `success` | forward-fix del test; recién acá vuelve el verde |
+
+🔴 **La señal estuvo roja 5 corridas y ~70 minutos, no dos.** Los dos primeros rojos son del
+agente que rompió el test; la racha siguió por un merge de OTRA sesión y sólo se detuvo cuando
+reventó en CI Deep durante un release. Eso importa para calibrar el reflejo: no fue una alerta
+puntual que se pasó por alto, fue una alarma sostenida que atravesó varias sesiones sin que
+nadie la abriera. Cuanto más larga es la racha, más se normaliza — que es exactamente cómo el
+detector de expiración de la credencial AXIS se volvió invisible esa misma semana.
+
+Falla verbatim del run `33274733930`:
+
+```text
+unit  services/ops-worker/deploy-contract.test.ts  (16 tests | 2 failed)
+```
+
+**Costo medido del escape:** el rojo viajó hasta el release siguiente — CI Deep rojo sobre el primer
+squash de la promoción develop→main y ~40 min de ciclo forward-fix (diagnóstico → fix → merge
+canónico → PR #214 → re-evidencia). El lado release del mismo caso — incluida la resolución de la
+guarda: el test del workflow ahora exige que el YAML referencie `worker:deploy-path-gate`, el
+verificador real de la cobertura — está registrado en
+`docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` (fila 2026-08-29, 4.º release del día).
+
+**Los dos mecanismos que hacen la señal intermitente, y ninguno es un bug:**
+
+1. `.github/workflows/ci.yml` declara `cancel-in-progress` verdadero para `develop` (bloque
+   `concurrency`). Es correcto —evita quemar runners con commits superseded—, pero implica que
+   **el veredicto de CI es del ÚLTIMO push de la ráfaga, no de cada commit**. Si el que rompe es un
+   commit intermedio, nunca se juzga y su rojo aparece atribuido al siguiente.
+2. `ci.yml` usa `paths-ignore` (`**/*.md`, `docs/**`, `.claude/**`, `.codex/**`, `.agents/**`), así que
+   un commit docs-only no genera run. También correcto, pero combinado con lo anterior hace que en una
+   ráfaga mixta la señal se vea a saltos: un `cancelled`, un hueco sin run, y el rojo colgando del
+   commit equivocado.
+
+🔴 **Un rojo que nadie mira es funcionalmente igual a no tener el test.** Esa misma semana, el detector
+de expiración de la credencial AXIS avisó tres días antes y fue invisible por la misma razón: su único
+canal era el color de su propio run, que ya estaba rojo por otra causa.
+
+**Reglas duras:**
+
+- **NUNCA** cerrar una task corriendo solo la suite focal del dominio tocado. `services/**` está dentro
+  de `pnpm test`; los tests que rompes pueden vivir en un directorio que ni abriste.
+- **SIEMPRE** después de CADA push, resolver el veredicto del SHA que acabas de empujar:
+
+  ```bash
+  gh run list --workflow=ci.yml --limit=100 --json headSha,conclusion \
+    -q ".[] | select(.headSha==\"$(git rev-parse HEAD)\") | .conclusion"
+  ```
+
+- Si sale vacío o `cancelled`, **no hay veredicto** — que no es lo mismo que verde. Vacío puede ser
+  docs-only (legítimo, `paths-ignore`) o un run que aún no arrancó; `cancelled` significa que otro push
+  lo superseded. En ambos casos el juicio queda pendiente hasta que el último SHA de la ráfaga salga
+  `success`.
+- **NUNCA** empujar en ráfaga a `develop` y darte por cerrado sin que el **último** SHA tenga
+  `conclusion=success`. Con `cancel-in-progress` activo, ese último run es el único que juzga el árbol
+  que quedó.

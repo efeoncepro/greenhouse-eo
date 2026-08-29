@@ -11,11 +11,14 @@ solo run del orquestador, ambos gates `production` aprobados sin stall, 11m16s).
 **El desvío del release:** CI Deep se puso rojo sobre el primer squash (`dade7ce5f`, quedó SIN
 manifest a propósito — Deep rojo no se dispatcha) por `services/ops-worker/deploy-contract.test.ts`:
 sus tests exigían el contrato VIEJO del workflow (3 apariciones por ruta) que `146070ffc` rediseñó a
-cobertura por metafile. Forward-fix por el camino canónico (≈40 min). **Y la historia completa la
-midió eo-64 en su contra:** develop estuvo ROJO dos veces con ese mismo test (`53e240d79`,
-`3e8149eaa`) sin que nadie abriera el resultado, y el run del commit culpable (`146070ffc`) fue
-CANCELADO por `cancel-in-progress` — nunca juzgado. En ráfagas, el veredicto de CI es del ÚLTIMO
-push; un rojo que nadie mira = no tener el test (la clase del caso AXIS).
+cobertura por metafile. Forward-fix por el camino canónico (≈40 min). **Y la historia completa,
+medida en dos pasadas (la segunda corrigió a la primera por CORTA):** la racha fue de **5 corridas
+rojas/canceladas en ~70 minutos** sin que nadie abriera una — `146070ffc` CANCELADO por
+`cancel-in-progress` (el commit culpable nunca fue juzgado), `53e240d79` y `3e8149eaa` rojos
+(eo-64), `8cafe6b90` rojo ×2 (**mi propio push del merge canónico — tampoco lo miré**) y
+`dade7ce5f`, donde recién lo atrapó Deep. En ráfagas, el veredicto de CI es del ÚLTIMO push; una
+alarma sostenida se normaliza — que es literalmente cómo el detector de la credencial AXIS se
+volvió invisible.
 
 **El skip del `ops-worker` (44 s) fue LEGÍTIMO esta vez — y es la prueba de que el gate nuevo
 funciona.** Mismo síntoma que el incidente del 3.er release, causa opuesta: el `push:develop` ya
