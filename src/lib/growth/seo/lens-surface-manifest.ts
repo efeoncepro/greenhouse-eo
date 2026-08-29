@@ -150,15 +150,11 @@ export const SEO_LENS_SURFACES: readonly SeoLensSurface[] = [
     route: 'work-queue',
     tool: 'get_seo_work_queue',
     kind: 'figures',
-    provenance: {
-      pending:
-        'Deuda de SECUENCIA, no de diseño: su reader y sus contracts están bajo edición activa del dueño ' +
-        'del aggregate (TASK-1700), y agregar procedencia exige tocar esos dos archivos exactos. Las lentes ' +
-        'YA están determinadas y quedan escritas acá para que quien la tome no las redescubra: el breakdown ' +
-        'es append-only, `mainPageShare` es ● medida (sale de `seo_gsc_daily`) y `snippetCeilingClicks` es ' +
-        '◑ estimada (deriva de la curva de CTR propia — insumos medidos, resultado estimado). Es el caso ' +
-        '◑ junto a ● en la misma fila, así que su `provenance` nace en LISTA, nunca con una lente única.'
-    },
+    // Deuda quemada 2026-08-29 junto con el fix del orden servido (su condición de salida):
+    // el DTO emite `provenance` en LISTA — ● gsc para lo observado, ◑ `own_ctr_model` para
+    // el score y sus derivados (insumos medidos, resultado estimado) — con cobertura hoja
+    // por hoja en `work-queue/__tests__/provenance-coverage.test.ts`.
+    provenance: 'emitted',
     reason: 'Cola priorizada: techo estimado (◑) junto a impresiones medidas (●) en la MISMA fila.'
   },
   {

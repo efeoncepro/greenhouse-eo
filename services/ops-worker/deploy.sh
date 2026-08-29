@@ -1635,10 +1635,12 @@ echo "  -> ops-seo-keyword-discovery-drain: */2 * * * * ACTIVO (keyword discover
 # argumento, así que un resume out-of-band lo revierte el próximo deploy — mismo modo de falla
 # que un `--update-env-vars` suelto sobre un flag.
 #
-# ⚠️ VENTANA CONOCIDA hasta la próxima promoción: `main` todavía declara `"true"`. Hay UN solo
-# `ops-worker` y UN solo juego de jobs de Cloud Scheduler (staging y producción los comparten),
-# así que un deploy que corra el árbol de `main` —release, rollback o dispatch break-glass—
-# vuelve a pausarlo en silencio. La próxima promoción cierra la ventana sola.
+# VENTANA CERRADA 2026-08-29 (release 64bdd105c): `main` y `develop` declaran ambos `"false"`,
+# verificado leyendo el 5.º argumento en las DOS ramas, no el comentario. Un deploy desde
+# cualquiera de las dos lo deja ACTIVO. Se conserva la nota porque el mecanismo sigue vigente:
+# hay UN solo `ops-worker` y UN solo juego de jobs de Cloud Scheduler (staging y producción los
+# comparten), así que si alguna vez las ramas divergen en este argumento, el deploy que corra el
+# árbol equivocado pausa el job en silencio. La verdad es este argumento, nunca el comentario.
 upsert_scheduler_job \
   "ops-seo-work-queue-materialize" \
   "0 10 * * *" \

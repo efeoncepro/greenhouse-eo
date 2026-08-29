@@ -1538,19 +1538,35 @@ aparece sigue siendo de varios motores, y suprimir sin dejar rastro convertiría
 pérdida silenciosa de información. Un origen que nadie agregó a la precedencia va **al final**: el
 default seguro es «no desplaza a nadie».
 
-### 18.8 🔴 El orden canónico, y las dos formas en que se rompió
+### 18.8 🔴 El orden canónico, y las TRES formas en que se rompió
 
-```sql
-ORDER BY score_band ASC,
-         priority_score DESC NULLS LAST,
-         normalized_keyword COLLATE "C" ASC
-```
+**El orden canónico vive en UN solo lugar: el comparador del materializador**
+(`compareWorkQueueItems`, `materialize.ts` — banda ASC, score DESC dentro de banda 1,
+impresiones DESC dentro de banda 2, keyword por code units como desempate final). Ese
+comparador fija el `rank_in_snapshot` persistido, y **el reader sirve y pagina ESE rank**
+(`ORDER BY rank_in_snapshot ASC`, keyset `rank > cursor`, `reader.ts`), con unicidad
+estructural por el índice `seo_work_queue_items_rank_unique_idx`
+(`migrations/20260829213303021_task-1700-work-queue-rank-unique.sql`). El orden servido
+coincide con el persistido **por construcción** — no por una paridad JS↔SQL que alguien
+tenga que mantener sincronizada.
 
-El mismo orden lo aplican el comparador en JS (`compareWorkQueueItems`, `materialize.ts:97`, que
-decide el `rank_in_snapshot` persistido), el índice `seo_work_queue_items_keyset_idx`
-(`migrations/20260829000423538_task-1700-work-queue-keyset-collation.sql`) y el keyset del reader
-(`reader.ts:242`). Los tres tienen que ordenar **idéntico**; los dos defectos siguientes aparecieron
-ejercitando una corrida real de punta a punta, **no en los tests**, y ambos son silenciosos.
+No siempre fue así: la primera versión del reader **reconstruía** el orden en SQL
+(`ORDER BY score_band, priority_score DESC NULLS LAST, normalized_keyword COLLATE "C"`) y esa
+reconstrucción se rompió de TRES formas, todas silenciosas, todas medidas contra una corrida
+real y **ninguna visible en tests con mocks**. Se documentan porque son bug classes del
+oficio, no de este dominio:
+
+**(c) 🔴 La llave invisible — la que enterró a la reconstrucción.** El comparador desempata
+la banda 2 por `tieBreakImpressions` DESC, un valor que **no es columna** de
+`seo_work_queue_items`: el SQL no podía reproducirlo *ni en principio*. Como en banda 2 el
+`priority_score` es `NULL` para todos, el ORDER BY reconstruido colapsaba a orden alfabético
+y contradecía el rank persistido — medido en producción: **54 de 55** items de banda 2 de
+`seot-efeonce-own-brand` servidos fuera de su rank (auditoría independiente 2026-08-29,
+confirmada por dos sesiones peer). El test de paridad comparaba el **string** del SQL contra
+"las tres llaves" — consagraba un modelo que el comparador no seguía, y pasaba verde con el
+defecto puesto. La organización que peor mide (curva no utilizable ⇒ todo banda 2/3) era la
+que peor se ordenaba. Servir el rank persistido cierra la **clase**: cualquier llave futura
+del comparador queda reflejada en lo servido automáticamente.
 
 **(a) `COLLATE "C"` no es decorativo.** La base corre con `en_US.UTF8`, que **ignora el espacio** al
 comparar: para PostgreSQL `berelex` < `berel green` (compara `berelgreen`, y `e` < `g`), mientras
@@ -1573,10 +1589,13 @@ scores de un solo dígito o todos `NULL` el bug es invisible. Por eso el alias e
 `priority_score_text` (`reader.ts:221`). **NUNCA aliasear una columna numérica con su propio nombre
 tras castearla a texto en una query que ordena por ella.**
 
-La comparación del cursor se escribe **expandida** y no como tupla `(a,b,c) > (x,y,z)` porque
-`priority_score` es `NULL` en las bandas 2 y 3, y la comparación de tuplas con `NULL` no ordena:
-devolvería filas al azar en el borde de página. El cursor viaja en base64url para que ningún consumer
-lo construya a mano.
+Con el keyset por `rank_in_snapshot` esas dos disciplinas quedan retiradas del reader: el
+cursor es un entero (base64url, opaco — ningún consumer lo construye a mano; uno del formato
+viejo o corrupto decodifica a `null` y reinicia desde la primera página, jamás saltea), no hay
+`NULL` en la llave, y no hay collation que sincronizar. El índice viejo
+`seo_work_queue_items_keyset_idx` (`…work-queue-keyset-collation.sql`) quedó huérfano del
+reader nuevo; su retiro es **contract y va después del release** — hasta la promoción, el
+reader desplegado en producción sigue usando el ORDER BY reconstruido y ese índice.
 
 La paginación es **estable por construcción**: el universo no crece bajo el cursor porque el snapshot
 es inmutable — recomputar es una fila nueva. Eso resuelve de raíz el problema declarado en

@@ -80,9 +80,13 @@ export interface MaterializeSeoWorkQueueInput {
 }
 
 /**
- * ORDEN CANÓNICO. Es el mismo del índice de lectura y el que se persiste en
- * `rank_in_snapshot`, para que "la recomendación #1 de la mañana" sea un hecho consultable y
- * no un recálculo que puede dar distinto a las 3 pm.
+ * ORDEN CANÓNICO. Este comparador es la ÚNICA autoridad de orden de la cola: fija el
+ * `rank_in_snapshot` que se persiste, y el reader sirve y pagina ESE rank — no reconstruye
+ * el orden en SQL. Así "la recomendación #1 de la mañana" es un hecho consultable y no un
+ * recálculo que puede dar distinto a las 3 pm, y cualquier llave nueva de este comparador
+ * queda reflejada en lo servido por construcción (el desempate de banda 2 por impresiones
+ * no es columna de la tabla: un ORDER BY reconstruido no podía verlo, y en producción sirvió
+ * 54 de 55 items de banda 2 fuera de su rank hasta el fix del 2026-08-29).
  *
  * 🔴 Dentro de la banda 3 el desempate es ALFABÉTICO, jamás por volumen estimado. Ordenar
  * ahí por volumen del proveedor reintroduciría por la puerta de atrás justo lo que el
@@ -107,16 +111,14 @@ export const compareWorkQueueItems = (a: SeoWorkQueueItemInput, b: SeoWorkQueueI
   }
 
   /*
-   * 🔴 Comparación por CODE POINTS, jamás `localeCompare`.
+   * 🔴 Comparación por CODE UNITS (`<` de JS), jamás `localeCompare`.
    *
-   * El reader pagina con `normalized_keyword COLLATE "C"` (orden de bytes) y este comparador
-   * decide el `rank_in_snapshot`. Si los dos no ordenan IDÉNTICO, la paginación por keyset
-   * saltea filas sin que nada falle — medido contra PG real: recorría 631 de 635, y el orden
-   * servido divergía del persistido desde el primer elemento.
-   *
-   * `localeCompare` usa ICU y la base usa glibc `en_US.UTF8`, que ignora el espacio al
-   * comparar. No son la misma tabla y no hay forma de garantizar que coincidan; el orden de
-   * bytes sí es reproducible en los dos lados.
+   * `localeCompare` usa ICU (glibc `en_US.UTF8` ignora el espacio al comparar) y NO es
+   * determinista entre entornos. La comparación cruda de JS sí lo es, y desde que el reader
+   * sirve `rank_in_snapshot` persistido ya no existe una paridad JS↔SQL que mantener: este
+   * comparador es la única autoridad y basta con que sea determinista. (La historia completa
+   * — la paginación que salteaba 631 de 635 filas cuando reader y comparador ordenaban con
+   * collations distintas — vive en el docstring del reader.)
    */
   if (a.normalizedKeyword === b.normalizedKeyword) return 0
 

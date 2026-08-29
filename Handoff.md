@@ -2,19 +2,105 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-## 2026-08-29 (5.º) — presupuesto comercial 2027 en dos bandas
+## 2026-08-29 (7.º) — auditoría independiente de la cola: el orden servido contradecía el rank persistido en banda 2 (fix aplicado + deuda de procedencia quemada)
+
+Auditoría independiente de TASK-1700/1785 pedida por el operador tras 3 releases con dolor.
+**Veredicto:** el núcleo de v2 estaba bien (predicado único ✅, piso por versión ✅, adapter sin
+`null→0` ✅, schedulers/flags/deploy.sh de main verificados en vivo ✅, snapshots vigentes v2 ✅) —
+pero apareció un defecto real que ningún test veía: **54 de 55 items de banda 2** de
+`seot-efeonce-own-brand` servidos fuera de su `rank_in_snapshot` (Berel 0/501 — invisible donde
+domina banda 1). Reproducido de forma independiente por las dos sesiones peer antes de aceptarse.
+
+Causa: el comparador desempata banda 2 por `tieBreakImpressions` DESC — **no es columna** — y el
+reader reconstruía el orden en SQL con tres llaves; con score NULL en toda la banda colapsaba a
+alfabético. El test de paridad comparaba el **string** del SQL: guarda que afirma, no que verifica.
+
+**Fix (asignado a esta sesión por el operador; las peers quedaron fuera por contexto saturado):**
+el reader sirve y pagina `rank_in_snapshot ASC` (keyset `rank > cursor`; cursor viejo reinicia
+página 1, jamás saltea). Comparador = única autoridad de orden; coincidencia servido↔persistido
+**por construcción**. UNIQUE index nuevo `seo_work_queue_items_rank_unique_idx` (migración
+`20260829213303021`, **aplicada**; ranks verificados contiguos 1..N en los 12 snapshots).
+**Re-medido live paginando de punta a punta:** efeonce 105/105 y Berel 501/501 con **0**
+discrepancias de secuencia; bandas 1 y 3 sin regresión (estaban en 0 y siguen).
+
+En el mismo tren se **quemó la deuda de procedencia de `work-queue`** (su condición de salida era
+este fix): DTO emite `provenance` en lista, fuente nueva `own_ctr_model` (◑, «insumos medidos,
+resultado estimado») para score/techo/CTR esperado, censo en `emitted`, cobertura hoja por hoja en
+`provenance-coverage.test.ts`. Quedan 7 deudas declaradas en el censo.
+
+Docs: Delta (3) en TASK-1700 + Delta en TASK-1785, §18.8 de la arquitectura SEO reescrito (el
+orden canónico vive en el comparador; el reader lo LEE), `SQL_DATE_MATH_AGENT_INVARIANTS`
+§"Orden y paginación" ahora con TRES bug classes + protocolo "dataset que exhibe cada estado",
+`.claude/rules/growth-seo.md` actualizado.
+
+**Pendiente con dueño:** retirar `seo_work_queue_items_keyset_idx` (huérfano del reader nuevo) en
+migración aditiva **DESPUÉS** del release que promueva este fix — el reader desplegado hoy en
+producción todavía lo usa. Verificación post-promoción: repetir la paginación live de punta a punta
+contra `seot-efeonce-own-brand` (debe seguir 0 discrepancias con el código promovido).
+
+## 2026-08-29 (6.º) — el release cerró verde con el worker sirviendo código viejo
+
+Tercer paso a producción del día (`64bdd105c737`, orquestador `33272258036`). Manifest `released`,
+Vercel READY, watchdog sin drift — y el `ops-worker` en `8adf8c2d3`, o sea `incremental-clicks-v1`.
+El change-gate se saltó el deploy y el job cerró `success` en 46 s.
+
+Causa raíz cerrada, no parchada: la decisión se tomaba contra una lista de rutas a mano que cubría
+24 prefijos de los 1449 archivos que el worker bundlea. Nuevo gate `pnpm worker:deploy-path-gate`
+(en CI, junto a `worker:runtime-deps-gate`) deriva la cobertura del metafile de esbuild. Commits
+`146070ffc` y `53e240d79` en develop.
+
+Deploy break-glass del `ops-worker` autorizado por el operador → `ops-worker-00617-mtc`,
+`GIT_SHA=64bdd105c737`, flag ON, `Ready=True`. Los cuatro workers verificados.
+
+**Revisión vigente al cierre: `ops-worker-00618-lz2`, `GIT_SHA=53e240d79c31` — NO el SHA del
+release.** Lo causó el push del propio fix del comentario de `deploy.sh`: `services/ops-worker/**`
+es disparador, así que movió al worker fuera del SHA promovido. Verificado por CONTENIDO, que es
+lo que decide: el único archivo del bundle que difiere vs `64bdd105c` es `deploy.sh` y **sólo en
+comentarios**; `cannibalization.ts` tiene blob `6ceb87e4…` idéntico a `origin/main` y el código que
+corre declara `incremental-clicks-v2`. La ancestría NO sirve como prueba acá —`main` promueve por
+squash, así que `merge-base --is-ancestor 64bdd105c 53e240d79` falla aunque el contenido sea el
+mismo—; una sesión peer la usó y concluía de más.
+
+🔴 **El manifest es incompleto para el worker.** Dice que producción está en `64bdd105c`, y hay UN
+solo `ops-worker` compartido entre staging y producción que hoy corre código de develop no promovido
+por el control plane. Hoy es benigno (delta = comentarios), pero quien lea sólo el manifest concluye
+algo falso sobre qué código materializa la cola. La promoción de `146070ffc`/`53e240d79`/`d7b5e1ed2`
+cierra las dos cosas: alinea el worker y activa el gate de cobertura para releases futuros.
+
+Rematerialización hecha **sin** `force` (`materialized=2, reused=0`), lo que además probó
+empíricamente que el piso filtrado por versión funciona como red de seguridad. Berel MX:
+`consolidation` 200→11 con `gsc_striking_distance` 168→200.
+
+**Pendiente:** `146070ffc` y `53e240d79` están en develop y NO en `main`. El gate de cobertura sólo
+protege releases futuros una vez promovido. Hasta entonces, un release que corra el árbol de `main`
+vuelve a usar la lista vieja — el mismo modo de falla de hoy.
+
+**Retirada** la optimización del ledger que proponía dejar de contar el skip change-gated del
+`ops-worker` como error en el watchdog: silenciaría justo la señal que habría atrapado esto.
+
+## 2026-08-29 (5.º) — plan comercial, presupuesto y generación de pipeline 2027
 
 La revisión comercial separa dos cuotas que no se compensan: **Exit MRR USD 30.000–32.000** y **Spot bookings
 USD 90.000**, con compromiso `28.000 + 60.000` y stretch `34.000 + 120.000`. SKY/Berel sostienen expansión;
 Motogas presupuestó crecimiento cero; ANAM/Aguas permanecen como Spot warm/repeat y Managed Ops sólo como upside.
+El funnel central modela 15 cierres desde 100–115 primeras reuniones held, 50–56 oportunidades calificadas y
+32–38 propuestas. Outbound queda como piloto de 90 días: Apollo tiene créditos, pero al corte no tenía sequences ni
+actividad histórica utilizable; sus 593 reuniones agendadas sin reuniones held no forman baseline de conversión.
+La revisión de stack adopta un `Agentic Revenue Pod`: no se contrata AE/SDR full-time ahora; Julio protege 10–12 horas
+de venta y cubre temporalmente 4–6 horas de Commercial Systems Operations, o se activa apoyo fractional por SLA,
+volumen o pérdida de foco. HubSpot opera warm/inbound; Apollo, cold net-new; los rails no comparten contactos activos.
 
-Canon: `docs/commercial/SALES_GOALS_2026_Q4_2027.md`; presupuesto y control mensual:
-`docs/commercial/SALES_BUDGET_2027_V1.md`; método: `SALES_GOALS_OPERATING_MODEL_V1.md`; portafolio:
+Canon: `docs/commercial/SALES_GOALS_2026_Q4_2027.md`; plan comercial, presupuesto y control mensual:
+`docs/commercial/COMMERCIAL_PLAN_AND_SALES_BUDGET_2027_V1.md`; generación de pipeline y outbound:
+`docs/commercial/PIPELINE_GENERATION_AND_OUTBOUND_PLAN_2027_V1.md`; operating model agentic:
+`docs/commercial/AGENTIC_REVENUE_OPERATING_MODEL_V1.md`; método: `SALES_GOALS_OPERATING_MODEL_V1.md`; portafolio:
 `SERVICE_PORTFOLIO_REVENUE_ARCHITECTURE_V1.md`.
 
 **Estado:** `Proposed for approval · blocked_by_finance`. Antes de aprobación económica: remuneración sombra del
 fundador, fully loaded cost por oferta/cuenta, margen mínimo 45%/objetivo 50–60%, capacidad delegable y modelo mensual
-de revenue/caja. No hubo mutaciones en HubSpot, Finance runtime, Teams ni SharePoint.
+de revenue/caja. Antes de escalar outbound: owner de Commercial Systems Operations, dos mailboxes gobernados, entregabilidad,
+mapping/dedupe/suppression Apollo–HubSpot y gates del piloto. No hubo mutaciones en Apollo, HubSpot, Finance runtime,
+Teams ni SharePoint.
 
 ## 2026-08-29 (4.º) — `incremental-clicks-v2`: el detector de canibalización de la cola medía marca
 
@@ -495,103 +581,3 @@ sincronizo en arquitectura, funcional, manuales, registro de primitives y mirror
 revalido sin mutar la pagina: `.captures/task1598-influencer-fidelity-2026-08-29T12-35-54-355Z/`; hash y rollback
 vigentes siguen siendo `353bac5d3d7491cb77f337296e5ab0bace14a18e99055d449ea25134217e52a5` y
 `_gh_backup_before_task1598_flag_optical_refine_20260829T132000Z`.
-
-## 2026-08-28 — `TASK-1792` complete: la curva de CTR declara su usabilidad
-
-**Estado: `complete` y verificado contra runtime real (lectura).** Sin flag, sin migración, sin escritura —
-el cutover fue el merge; rollback = revert PR. Commits en `develop`: `d4d731721` (módulo + predicado),
-`f8be78d83` (reader consume y ordena honesto, curva privada retirada), `8943b2f5c` (referencia recalibrada +
-nivel estimado + curva monótona). Contrato canónico y sus invariantes:
-[`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
-§`readKeywordOpportunities`. Este Handoff rota; ese doc no.
-
-**Lo que queda vivo para quien siga:**
-
-- **`org_level_reference_shape` está unit-tested y es correcto por construcción, pero NO observado en
-  producción.** Ninguna de las dos organizaciones con serie cae hoy en ese estado: Berel mide en el bucket
-  objetivo y Efeonce no tiene muestra ni para estimar un nivel (2 clics en 28d). En tres semanas alguien va a
-  leerlo como "probado" — no lo está. Se verá cuando exista una org con agregado suficiente y bucket objetivo
-  delgado.
-- **`TASK-1691` hereda el contrato y tiene su `## Delta 2026-08-28 (3)`** con la forma tal como quedó: cuatro
-  estados, no tres. El ORDEN que ve el usuario ya está corregido del lado servidor (la tabla re-ordena en
-  cliente y `Array.prototype.sort` es estable); lo que falta es que la etiqueta deje de prometer orden por
-  ganancia cuando `orderedBy === 'measured_demand'`.
-- **Follow-ups sin task creada** (no se reservaron IDs: el registry estaba contendido por tres sesiones):
-  filtro marca/no-marca de la curva (defecto independiente del tamaño de muestra, no se cura cuando el sitio
-  crezca); unificar el predicado con `work-queue/priority-score.ts` cuando `TASK-1700` cierre; revisar
-  `DEFAULT_TARGET_POSITION = 5` contra la doctrina de 8–10.
-- **Dato para calibrar:** el nivel estimado de `berel.com` contra la curva de referencia da **1,048** (28d) y
-  **1,095** (7d), y Berel no es la fuente de esa referencia. Es el control contra el cual medir si algún día
-  el filtro no-marca mueve algo real.
-- **Alcance, dicho con precisión:** no es «afecta a 1 de 2 organizaciones». Dos es el tamaño de la
-  muestra, no una tasa. El disparador —bucket objetivo presente y sin clics— está **garantizado en
-  todo target recién onboardeado**, así que cada cliente nuevo nace en ese estado hasta acumular
-  muestra. Quien lea el 24/24 de Efeonce como «un caso» va a subestimar el alcance.
-- **`TASK-1700` desbloqueada y con el desbloqueo aceptado del otro lado.** El Slice 7 (cutover del
-  consumer) tenía su rollback aterrizando en la lente rota: volver al reader legacy devolvía una
-  pantalla que no ordenaba. `TASK-1700` ya lleva su `## Delta 2026-08-28 (3)` declarando la
-  dependencia dura y su tabla de rollback dice ahora que el destino está **verificado, no supuesto**.
-  Nada queda pendiente de coordinar entre ambas.
-- **Crédito, para que quien siga sepa a quién preguntarle:** el hallazgo es de la sesión
-  `greenhouse-eo-56`; la investigación (arqueología del commit introductor, lectura de oficio SEO,
-  blast radius) es de esta sesión; la **implementación** de los cuatro slices es de `greenhouse-eo-75`.
-  Tres cabezas, un defecto: no atribuir el trabajo a una sola.
-
-## 2026-08-28 — LicitaLAB MCP + radar Playwright documentados en skills Codex/Claude
-
-**Estado: `complete`, discovery read-only + ocho promociones CRM verificadas.** El MCP OAuth expone cinco tools
-read-only y el radar autenticado mantiene credencial/perfil/reporte ignorados bajo `.auth/` con modo `0600`; su
-canary paginado leyó 45 oportunidades y el barrido ampliado posterior leyó 163. Las skills espejadas separan discovery web, evidencia MCP y promoción humana.
-La prueba aprobada creó Company `57870164778` y deal `64461187076` para `1098710-22-LP26`, en
-`default/qualifiedtobuy`, `Strategic Bets`, CLP 250.000.000; el readback probó Deal↔Company y
-`num_associated_deals=1`, sin contacto ficticio. La misma carga manual gobernada por MCP promovió después ProChile
-como deal `64482163516` asociado a Company existente `31209269815` y Defensoría como deal `64471071912` asociado a
-la Company separada `57878590071`; las búsquedas por `gh_idempotency_key` devolvieron una fila por licitación.
-ProChile es cliente vigente (`hs_current_customer=yes`), por eso quedó `Core Pipeline`/`existingbusiness`; Defensoría
-quedó `Strategic Bets`/`newbusiness`. `gh_deal_origin` permanece vacío en las tres porque su enum sólo admite
-`greenhouse_quote_builder`: nunca escribir un origen falso. El bridge no admite aún `public_tender`; esa brecha
-bloquea automatización, no cargas manuales MCP con confirmación, asociación y readback.
-Una promoción posterior creó cinco Deals adicionales, todos con búsqueda exacta por ID y asociación releída:
-UOH `64466117716` ↔ `57899319173`, Beneficios Estudiantiles `64482321775` ↔ Ministerio de Educación
-`46499468091`, Campaña VCM `64466272830` ↔ Ministerio de la Mujer `31163122599`, marketing Valparaíso
-`64469214508` ↔ `32039105348` y RFI JUNJI `64469523247` ↔ `57892355617`. UOH y JUNJI quedaron
-`Strategic Bets`/`newbusiness`; las tres cuentas existentes quedaron `Core Pipeline`/`existingbusiness`. No se
-asociaron contactos no confirmados. Brecha honesta: estos cinco Deals tienen un único `id_de_licitacion`, pero
-`gh_idempotency_key` no fue poblado en la carga aprobada; completar esa propiedad requiere un write posterior.
-**Frontera corregida por el operador:** LicitaLAB ve licitaciones públicas solamente; toda fila mantiene
-`public_opportunity` y sólo se promueve con `origin='public_tender'`. Nunca se usa para discovery privado ni se
-mezcla con Wherex, Ariba, Coupa u otros portales corporativos. Estado rápido de bid, CRM y postulación:
-`docs/commercial/tenders/LICITATION_CRM_REGISTER.md`; la vista transversal de deals activos vive en
-`docs/commercial/CRM_DEAL_REGISTER.md`. Ambos son índices fechados y siempre requieren readback live; una
-licitación promovida se sincroniza por `deal_id`, mientras el radar sin Deal permanece sólo en bid desk.
-
-## 2026-08-28 — El candidato de discovery no declara pertinencia — YA LEVANTADO como `TASK-1791`
-
-**Documentado en el repo, no sólo acá:** `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §7 → *"Hallazgo
-abierto (2026-08-28)"*, con la evidencia medida y el alcance recomendado. Este Handoff rota; ese doc
-no. Tres sesiones (`greenhouse-eo-63`, `-fa`, `-6c`) lo verificaron de forma independiente el mismo
-día por caminos distintos — si el registro viviera sólo en una bitácora, la cuarta lo vuelve a
-descubrir pagando otra vez.
-
-Resumen: el candidato no lleva señal de marca/categoría/relevancia (ni en la tabla ni en el DTO), así
-que 50 keywords de consumidor sobre ChatGPT pasaron todos los checks para un target que vende AEO
-B2B. 🔴 **El vector estructural es `TASK-1662`, no la expansión de seeds**: en el gap competitivo las
-seeds las elige el competidor, así que no hay operador a quien pedirle que elija mejor.
-
-**Estado de la task (actualizado el mismo día): LEVANTADA.** Existe
-`docs/tasks/to-do/TASK-1791-growth-seo-candidate-relevance-signal.md` — `to-do`, P1, `EPIC-022`,
-`backend-data`, `Blocked by: none`, sin dueño asignado todavía. El riesgo de duplicado entre las tres
-sesiones que lo escalaron quedó cerrado: hay un solo ID. Alcance vigente: **señal con evidencia, no
-filtro** — un filtro duro descartaría long-tail legítimo en silencio.
-
-⚠️ **El argumento de urgencia que estaba escrito acá era falso y se corrigió en la propia task
-(`65372ea68`).** Decía que `TASK-1700` heredaría el orden por volumen y congelaría lo irrelevante
-arriba de su cola append-only. No ocurre: `work-queue/priority-score.ts` **no mira el volumen
-estimado del proveedor**, y el CHECK `basis_band_score` impide fabricar un score sin demanda medida —
-un candidato irrelevante **sin** impresiones cae a banda 3 con score `NULL` y no compite con nada. El
-caso vivo que sí sostiene la task es el otro: keyword irrelevante **con** impresiones reales, que
-atraviesa el CHECK y entra a la cola. El vector es la demanda medida, no el volumen del proveedor.
-Corolario de forma, ya escrito en la task: la señal entra como **factor del item con su procedencia,
-jamás como entrada del `priority_score`** — `evidence_ref` es opaca por contrato (cero FK, cero JOIN
-al motor que produciría la señal), así que puntuar con ella sería puntuar con algo que el aggregate no
-puede citar. Quien retome la task lee la versión corregida, no este resumen.

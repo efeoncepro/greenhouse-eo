@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { toClientWorkQueueDto } from '../client-dto'
-import type { ReadSeoWorkQueueResult } from '../reader'
+import { buildWorkQueueProvenance, type ReadSeoWorkQueueResult } from '../reader'
 
 const result: ReadSeoWorkQueueResult = {
   ok: true,
@@ -51,7 +51,11 @@ const result: ReadSeoWorkQueueResult = {
   priorityScoreVersion: 'incremental-clicks-v1',
   asOf: '2026-08-28T10:00:00.000Z',
   staleness: 'fresh',
-  nextCursor: null
+  nextCursor: null,
+  // TASK-1785 — presente en el fixture para que el test de no-fuga de abajo pruebe que el
+  // redactor NO lo arrastra al DTO cliente: la procedencia del operador nombra secciones
+  // internas del breakdown y el cliente ya recibe sus lentes por campo (markers del redactor).
+  provenance: buildWorkQueueProvenance('2026-08-28T10:00:00.000Z')
 }
 
 /**

@@ -232,7 +232,7 @@ una keyword seguida; el comentario del `UPDATE` conserva el porqué in situ).
 
 ---
 
-### Orden y paginación: dos bug classes que ningún mock ve (TASK-1700, medido 2026-08-28)
+### Orden y paginación: tres bug classes que ningún mock ve (TASK-1700, medido 2026-08-28/29)
 
 Tercera familia del mismo gate. Allá el error era de **tipo** (`date - date` no da interval), después
 de **momento** (`NOW()` no avanza dentro de la transacción); acá es de **orden**: el SQL corre sin
@@ -341,9 +341,31 @@ OR (score_band = $band
   fuente había **75 items empatados** en `priority_score = 0.0000`, así que la discrepancia de
   collation no era un caso de borde, era el orden de media cola.
 
+#### 3. La llave invisible: si el rank vive en JS y usa un valor que NO es columna, el SQL no puede reproducirlo NI EN PRINCIPIO
+
+**Mecanismo (medido en producción, 2026-08-29).** El comparador JS del caso fuente desempataba una
+banda por `tieBreakImpressions` DESC — un valor de trabajo del materializador que **no se persiste
+como columna**. El `ORDER BY` reconstruido tenía "las tres llaves" correctas… y le faltaba la
+cuarta, que no podía tener: en esa banda el score era `NULL` para todos, el orden colapsaba al
+desempate alfabético, y el reader sirvió **54 de 55** items fuera de su rank persistido. El test de
+paridad comparaba el **STRING** del SQL contra las tres llaves: consagraba un modelo que el
+comparador no seguía y pasaba verde con el defecto puesto — una guarda que afirma, no que verifica.
+
+🔴 **La resolución canónica NO es agregar la columna que falta: es dejar de reconstruir.** Cuando el
+orden lo asigna JS y se persiste como rank (`rank_in_snapshot`), **el reader sirve y pagina ESE
+rank** (`ORDER BY rank ASC`, keyset `rank > $cursor`): entero único (con UNIQUE index que lo hace
+estructural), sin `NULL`, sin collation que sincronizar — y el orden servido coincide con el
+persistido **por construcción**, para cualquier llave futura del comparador. Las disciplinas #1 y
+#2 siguen vigentes **para los casos donde no hay rank persistido y reconstruir es inevitable**; si
+lo hay, reconstruir es elegir mantener una paridad que puede romperse en silencio.
+
+- **NUNCA** reconstruir en SQL un orden que JS ya asignó y persistió como rank. Se sirve el rank.
+- **NUNCA** aceptar como paridad un assert que compara el STRING del SQL contra una constante: eso
+  congela la forma, no la semántica. La paridad se prueba ejecutando (protocolo de abajo).
+
 #### Cómo se detectan (la parte que no se puede saltar)
 
-Ninguna de las dos la ve un test con mocks, y la #1 tampoco la ve un test con datos sintéticos de
+Ninguna de las tres la ve un test con mocks, y la #1 tampoco la ve un test con datos sintéticos de
 rango corto. **La única detección es paginar una corrida REAL de punta a punta y comparar el orden
 servido contra el orden persistido**:
 
@@ -351,16 +373,22 @@ servido contra el orden persistido**:
 2. Recorrer **todas** las páginas siguiendo el cursor hasta agotarlo, acumulando las filas servidas.
 3. Afirmar **dos** cosas, no una: (a) la cuenta acumulada == la cuenta persistida —lo que atrapa el
    salteo silencioso—, y (b) la secuencia servida == la secuencia persistida por rank —lo que atrapa
-   el alias homónimo—. Una sola de las dos deja pasar la otra.
+   el alias homónimo y la llave invisible—. Una sola de las dos deja pasar la otra.
+4. 🔴 **Correrlo sobre el dataset que EXHIBE cada estado, no sobre el más grande.** La #3 era
+   invisible en el snapshot de 501 filas (todo banda 1, donde el score sí ordena) y total en el de
+   105 (todo banda 2/3). Un verde sobre el dataset equivocado no prueba nada: elegir el dataset es
+   parte del protocolo.
 
-Un `LIMIT 10` de la primera página se ve perfecto en los dos bugs. Es el recorrido completo el que
+Un `LIMIT 10` de la primera página se ve perfecto en los tres bugs. Es el recorrido completo el que
 habla.
 
-**Caso fuente**: `TASK-1700` (2026-08-28) —
-`src/lib/growth/seo/work-queue/reader.ts` (docstring + el `ORDER BY`/cursor),
-`src/lib/growth/seo/work-queue/materialize.ts` (el comparador por code points) y
-`migrations/20260829000423538_task-1700-work-queue-keyset-collation.sql` (el índice con la
-collation). El detalle del dominio vive en `.claude/rules/growth-seo.md`.
+**Caso fuente**: `TASK-1700` (2026-08-28, #3 encontrada y cerrada 2026-08-29) —
+`src/lib/growth/seo/work-queue/reader.ts` (docstring + keyset por rank),
+`src/lib/growth/seo/work-queue/materialize.ts` (el comparador, única autoridad de orden),
+`migrations/20260829213303021_task-1700-work-queue-rank-unique.sql` (unicidad estructural del rank)
+y `migrations/20260829000423538_task-1700-work-queue-keyset-collation.sql` (el índice del keyset
+reconstruido, huérfano tras el fix; retiro post-release). El detalle del dominio vive en
+`.claude/rules/growth-seo.md`.
 
 ---
 

@@ -7,30 +7,35 @@ import 'server-only'
  * cliente). La única diferencia del lado cliente es el REDACTOR de DTO — cero lógica de orden
  * o de score duplicada por consumer.
  *
- * ═══ Paginación estable por construcción ═══
+ * ═══ Paginación estable por construcción: `rank_in_snapshot` ═══
  *
- * El keyset va sobre `(score_band, priority_score, normalized_keyword COLLATE "C")` DENTRO de
- * un snapshot inmutable.
+ * El reader sirve y pagina por `rank_in_snapshot ASC` DENTRO de un snapshot inmutable. Es un
+ * entero único por snapshot, sin NULL, persistido por el materializador con su orden canónico
+ * (`compareWorkQueueItems`) — así el orden servido coincide con el persistido **por
+ * construcción**, no por una paridad JS↔SQL que alguien tenga que mantener sincronizada.
+ * El universo no crece bajo el cursor mientras se pagina (TASK-1693): recomputar es una fila
+ * nueva, jamás un `UPDATE`.
  *
- * 🔴 El `COLLATE "C"` NO es decorativo. La base corre con `en_US.UTF8`, que **ignora el
- * espacio** al comparar (`berelex` < `berel green`, porque compara `berelgreen`), mientras
- * `localeCompare` de JS los ordena al revés. El materializador ordena en JS y este reader
- * pagina en SQL: con collations distintas la paginación **saltea filas en silencio** —
- * medido contra PG real, recorría 631 de 635. `COLLATE "C"` es orden de bytes, que JS
- * reproduce exactamente con una comparación de code points. Eso resuelve de raíz el problema declarado en `TASK-1693`: el universo no crece
- * bajo el cursor mientras se pagina, porque el snapshot no cambia — recomputar es una fila
- * nueva, jamás un `UPDATE`. `normalized_keyword` como desempate final es lo que lo vuelve
- * determinista incluso con scores empatados.
+ * 🔴 Por qué NO se reconstruye el orden con `(band, score, keyword)` en SQL — tres bugs
+ * reales de la primera versión de este reader, todos medidos contra PG:
  *
- * ═══ 🔴 El alias del score no puede llamarse como la columna ═══
+ * 1. **Collation.** La base compara con `en_US.UTF8` (ignora el espacio: `berelex` <
+ *    `berel green`) y JS con otra tabla — la paginación salteaba filas en silencio
+ *    (recorría 631 de 635). Se parchó con `COLLATE "C"` + code points en JS.
+ * 2. **Alias homónimo.** `priority_score::text AS priority_score` hacía que el `ORDER BY`
+ *    ordenara TEXTO (`'8.8612'` antes que `'72.1405'`) — PostgreSQL resuelve el `ORDER BY`
+ *    contra los nombres de SALIDA primero. Por eso el alias sigue siendo
+ *    `priority_score_text`.
+ * 3. **La cuarta llave invisible.** El comparador del materializador desempata la banda 2
+ *    por `tieBreakImpressions` DESC — un valor que NO es columna de la tabla, así que el
+ *    SQL no podía reproducirlo ni en principio: 54 de 55 items de banda 2 se servían fuera
+ *    de su rank (medido en producción, snapshot de `seot-efeonce-own-brand`), y el test que
+ *    comparaba el STRING del SQL contra "las tres llaves" consagraba un modelo que el
+ *    comparador no seguía.
  *
- * `priority_score::text AS priority_score` parece inofensivo y **rompe el orden completo**:
- * PostgreSQL resuelve el `ORDER BY` contra los nombres de SALIDA antes que contra los de la
- * tabla, así que el `ORDER BY priority_score DESC` pasaba a ordenar el TEXTO — `'8.8612'`
- * antes que `'72.1405'`, porque `'8' > '7'`. La cola servía un orden que no era el
- * persistido, y ningún test lo veía: con scores de un solo dígito o todos NULL el bug es
- * invisible. Lo destapó paginar una corrida real de punta a punta. Por eso el alias es
- * `priority_score_text`.
+ * Servir el rank persistido cierra la clase entera: cualquier llave futura del comparador
+ * queda automáticamente reflejada en lo servido, porque el reader ya no reconstruye el
+ * orden — lo lee.
  *
  * ═══ Frescura ═══
  *
@@ -44,6 +49,7 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { isSeoModuleEnabled, isSeoWorkQueueEnabled } from '../flags'
+import { seoProvenance, type SeoProvenance } from '../lens'
 import {
   type SeoWorkQueueOrigin,
   type SeoWorkQueueOriginHealth,
@@ -91,8 +97,67 @@ export type ReadSeoWorkQueueResult =
       asOf: string | null
       staleness: SeoWorkQueueStaleness
       nextCursor: string | null
+      /**
+       * TASK-1785 — la lente ●/◑ de cada cifra del DTO, como campo y no como prosa. Es el
+       * caso «◑ junto a ● en la MISMA fila»: impresiones medidas de GSC conviven con un
+       * techo estimado por el modelo de CTR propio, así que la procedencia nace en LISTA
+       * (jamás una lente única por resultado) y su cobertura la afirma
+       * `__tests__/provenance-coverage.test.ts` hoja por hoja.
+       */
+      provenance: SeoProvenance[]
     }
   | { ok: false; errorCode: 'disabled' | 'target_not_found' | 'query_failed' }
+
+/**
+ * Números del DTO que NO son mediciones — ordinales, códigos de banda, parámetros de cálculo
+ * y conteos. Declararlos es parte del contrato de TASK-1785: «esto es un parámetro, no una
+ * cifra» es una afirmación que alguien hace a propósito, no una omisión.
+ */
+export const WORK_QUEUE_NOT_FIGURES: readonly string[] = [
+  'snapshot.windowDays',
+  'snapshot.itemCount',
+  'items[].rank',
+  'items[].scoreBand',
+  'items[].breakdown.targetPosition',
+  'items[].breakdown.windowDays',
+  'originHealth[].itemCount'
+]
+
+/**
+ * La procedencia del DTO de la cola, derivada — nunca declarada a mano en cada consumer.
+ *
+ * Dos entradas porque son DOS naturalezas en la misma fila:
+ * - Lo OBSERVADO sale de `seo_gsc_daily` (●): impresiones, clics, CTR actual, posición
+ *   ponderada, la muestra de la curva, páginas compitiendo y el share de la principal.
+ * - Lo MODELADO sale del modelo de CTR propio (◑): el score en clics incrementales, el CTR
+ *   esperado en la posición objetivo y el techo de snippet. Insumos medidos, resultado
+ *   estimado — rotularlo ● porque «los números vienen de GSC» es exactamente el error que
+ *   el vocabulario `own_ctr_model` existe para impedir.
+ *
+ * `capturedAt` es el `computedAt` del snapshot: la cola es un plan materializado y su as-of
+ * honesto es el de la materialización, no el de cada insumo (que el breakdown no transporta).
+ */
+export const buildWorkQueueProvenance = (computedAt: string | null): SeoProvenance[] =>
+  computedAt === null
+    ? []
+    : [
+        seoProvenance({
+          section:
+            'items[].breakdown.{impressions,clicks,currentCtr,weightedPosition,curveSampleImpressions,curveSampleClicks,competingPages,mainPageShare}',
+          source: 'gsc',
+          capturedAt: computedAt
+        }),
+        seoProvenance({
+          section: 'items[].{priorityScore}',
+          source: 'own_ctr_model',
+          capturedAt: computedAt
+        }),
+        seoProvenance({
+          section: 'items[].breakdown.{expectedCtrAtTarget,incrementalClicks,snippetCeilingClicks}',
+          source: 'own_ctr_model',
+          capturedAt: computedAt
+        })
+      ]
 
 export interface ReadSeoWorkQueueOptions {
   origins?: readonly SeoWorkQueueOrigin[]
@@ -105,29 +170,27 @@ const MAX_LIMIT = 200
 const DEFAULT_LIMIT = 50
 
 /**
- * Cursor opaco del keyset: `band|score|keyword`. Se codifica en base64url para que ningún
- * consumer lo construya a mano — un cursor fabricado saltearía filas en silencio.
+ * Cursor opaco del keyset: el `rank_in_snapshot` del último item servido. Se codifica en
+ * base64url para que ningún consumer lo construya a mano — un cursor fabricado saltearía
+ * filas en silencio.
+ *
+ * Un cursor del formato viejo (`band|score|keyword`) o corrupto decodifica a `null` y la
+ * lectura arranca desde la primera página: los cursors son efímeros por diseño (viven lo
+ * que vive una sesión de paginado sobre un snapshot inmutable), así que reiniciar es el
+ * comportamiento honesto, no un fallo.
  */
 const encodeCursor = (item: SeoWorkQueueItemView): string =>
-  Buffer.from(
-    `${item.scoreBand}|${item.priorityScore ?? ''}|${item.keyword}`,
-    'utf8'
-  ).toString('base64url')
+  Buffer.from(`r${item.rank}`, 'utf8').toString('base64url')
 
-const decodeCursor = (
-  cursor: string
-): { band: number; score: number | null; keyword: string } | null => {
+const decodeCursor = (cursor: string): { rank: number } | null => {
   try {
-    const [rawBand, rawScore, ...rest] = Buffer.from(cursor, 'base64url').toString('utf8').split('|')
-    const band = Number(rawBand)
+    const decoded = Buffer.from(cursor, 'base64url').toString('utf8')
 
-    if (!Number.isInteger(band) || rest.length === 0) return null
+    if (!decoded.startsWith('r')) return null
 
-    return {
-      band,
-      score: rawScore === '' || rawScore === undefined ? null : Number(rawScore),
-      keyword: rest.join('|')
-    }
+    const rank = Number(decoded.slice(1))
+
+    return Number.isInteger(rank) && rank >= 0 ? { rank } : null
   } catch {
     return null
   }
@@ -196,7 +259,8 @@ export const readSeoWorkQueue = async (
         priorityScoreVersion: null,
         asOf: null,
         staleness: 'absent',
-        nextCursor: null
+        nextCursor: null,
+        provenance: []
       }
     }
 
@@ -204,51 +268,27 @@ export const readSeoWorkQueue = async (
     const origins = options.origins && options.origins.length > 0 ? [...options.origins] : null
 
     /*
-     * Keyset sobre el orden canónico. El `NULLS LAST` del score y el desempate por keyword
-     * tienen que ser IDÉNTICOS a los del índice y a los del materializador: si divergen, la
-     * paginación saltea filas sin que nada falle.
-     *
-     * La comparación del cursor se escribe expandida y no como tupla `(a,b,c) > (x,y,z)`
-     * porque `priority_score` es NULL en las bandas 2 y 3, y la comparación de tuplas con
-     * NULL no ordena — devolvería filas al azar en el borde de página.
+     * Keyset sobre `rank_in_snapshot`: entero único por snapshot, sin NULL, persistido por
+     * el materializador con el orden canónico completo (incluido el desempate de banda 2
+     * por impresiones, que NO es columna y por eso un ORDER BY reconstruido no puede
+     * reproducirlo — ver el docstring del módulo). El filtro por `origins` no rompe el
+     * keyset: filtrar un orden total lo deja total.
      */
     const rows = await runGreenhousePostgresQuery<ItemRow>(
       `SELECT item_id, rank_in_snapshot, origin, normalized_keyword, target_url, recommended_verb,
               score_basis, score_band,
-              -- El alias NO puede llamarse priority_score: PostgreSQL resuelve el ORDER BY
-              -- contra los nombres de SALIDA primero, así que un alias homonimo ordena la
-              -- cola como TEXTO ('8.8612' antes que '72.1405'). Ver el docstring de arriba.
+              -- El alias NO puede llamarse priority_score: PostgreSQL resuelve un ORDER BY
+              -- contra los nombres de SALIDA primero, así que un alias homonimo ordenaria
+              -- como TEXTO ('8.8612' antes que '72.1405') si alguien reintroduce esa llave.
               priority_score::text AS priority_score_text,
               score_breakdown_json, evidence_ref, source_score_version
          FROM greenhouse_growth.seo_work_queue_items
         WHERE snapshot_id = $1
           AND ($2::text[] IS NULL OR origin = ANY($2::text[]))
-          AND (
-            $3::int IS NULL
-            OR score_band > $3::int
-            OR (
-              score_band = $3::int
-              AND (
-                ($4::numeric IS NOT NULL AND priority_score IS NOT NULL AND priority_score < $4::numeric)
-                OR ($4::numeric IS NOT NULL AND priority_score IS NULL)
-                OR (
-                  (($4::numeric IS NULL AND priority_score IS NULL)
-                    OR ($4::numeric IS NOT NULL AND priority_score = $4::numeric))
-                  AND normalized_keyword COLLATE "C" > ($5::text COLLATE "C")
-                )
-              )
-            )
-          )
-        ORDER BY score_band ASC, priority_score DESC NULLS LAST, normalized_keyword COLLATE "C" ASC
-        LIMIT $6::int`,
-      [
-        snapshot.snapshot_id,
-        origins,
-        cursor?.band ?? null,
-        cursor?.score ?? null,
-        cursor?.keyword ?? '',
-        limit + 1
-      ]
+          AND ($3::int IS NULL OR rank_in_snapshot > $3::int)
+        ORDER BY rank_in_snapshot ASC
+        LIMIT $4::int`,
+      [snapshot.snapshot_id, origins, cursor?.rank ?? null, limit + 1]
     )
 
     const hasMore = rows.length > limit
@@ -289,7 +329,8 @@ export const readSeoWorkQueue = async (
       priorityScoreVersion: snapshot.priority_score_version,
       asOf: computedAt,
       staleness: new Date(expiresAt).getTime() < Date.now() ? 'stale' : 'fresh',
-      nextCursor: hasMore && items.length > 0 ? encodeCursor(items[items.length - 1]!) : null
+      nextCursor: hasMore && items.length > 0 ? encodeCursor(items[items.length - 1]!) : null,
+      provenance: buildWorkQueueProvenance(computedAt)
     }
   } catch (error) {
     captureWithDomain(error, 'growth', {

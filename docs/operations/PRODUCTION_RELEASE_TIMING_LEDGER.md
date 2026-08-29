@@ -350,6 +350,8 @@ Evidencia operativa:
 
 | 2026-08-28 (2.º del día) | Claude (Opus 5) | `e82c18579b05-0ab096eb-628a-4d41-9b96-dc82064a21f7` | `33208942436` (un solo run, sin retry, sin gate colgado) | `e82c18579b05810e8956c498aff921384c702981` | develop→main PR #209: correcciones de contrato del keyword discovery — **TASK-1694** (la barrera de enlaces decide y `maxDifficulty` se declara ignorado; un candidato es una keyword normalizada con procedencia múltiple; `clusterConflict`; política de inclusión única) y **TASK-1692** (el ledger de decisiones lo escribe el primitive que produce el hecho, en su transacción; `selected_for_target` retirado). **30 archivos de código, CERO migraciones, CERO flags nuevos.** | **~1h10m** E2E (ancla `19:51:54Z` → cierre documental `~21:02Z`). Desglose abajo | 12m51s (`20:36:18Z`→`20:49:09Z`) | 10m12s (`20:38:47Z`→`20:48:59Z`), estado `released` | Vercel Production READY + post-release health dentro del run; **dos canaries de contrato contra producción**, verdes | **Ninguno. Pasó a la primera y SIN break-glass** — el primero del ledger con `decision=ship` limpio desde un batch de dos tasks. La razón es estructural y replicable: **cero migraciones ⇒ ningún dominio irreversible ⇒ ningún `requires_break_glass`**, exactamente lo que aisló el par del 2026-08-09. El único costo fue esperar CI (~17 min). | (1) 🔴 **La regla nueva de `-s ours` (delta 2026-08-28 de la mañana) funcionó a la primera y en su caso canónico**: V1 = exactamente un commit, el squash del release anterior (`c983be7f1`, PR #208) → clasificación "sólo squashes de release" → `-s ours` → **las dos verificaciones vacías Y el `--name-status` completo vacío**. Es la primera vez que el merge canónico no requiere auditoría posterior porque la estrategia no puede colar nada. La corrección del mismo día se validó en el release siguiente. (2) **La pregunta "¿qué flags prendo?" tiene una respuesta que se DERIVA, no se recuerda**: `git diff origin/main..HEAD -- src/ services/ | grep '+.*_ENABLED'` vacío + leer el VALOR (no la presencia) de los flags que gatean el dominio con `vercel env pull`. Ambos ya `true` ⇒ cero flips. Dos comandos convierten una sección de 72 filas del ledger en un dato. (3) 🔴 **El canary del contrato es lo único que distingue "desplegado" de "vivo"**: el canary del gateway devolvió `maxLinkBarrier aceptado; ignoredFilters=maxDifficulty` — eso prueba que producción ejecuta el contrato nuevo, cosa que ni el manifest `released` ni Vercel READY prueban. Para el boundary de escritura de TASK-1692 hubo que fabricar el canary con dos POST directos al lane (400 + el mensaje nombrando los kinds permitidos). **Un release de cambio de CONTRATO sin canary de contrato está a medio verificar.** (4) El residual `ops-worker` no requirió ni el diff de las 28 rutas: `git diff` **sin filtro** entre su SHA y el target devolvió **0 archivos** — árboles idénticos, porque el worker ya había desplegado desde `develop`. Es la refutación más barata posible del falso drift y conviene intentarla primero. |
 | 2026-08-29 | Claude (Opus 5) | `b7f74c95a2af-1c7bd2b3-4f50-4e94-b486-c6979e782a44` | `33258242470` (un solo run, sin retry) | `b7f74c95a2afcf66f2c2d82dbd4a5ad4f7617471` | develop→main PR #210: **TASK-1785** (la lente `●`/`◑` deja de ser prosa y gana mecanismo: `provenance` requerido que hace cumplir `tsc`, guard de cobertura de hojas numéricas, censo de superficies) + **TASK-1700** (cola priorizada, 3 migraciones, capability `growth.seo.work_queue.decide`) + **TASK-1792** (curva de CTR, 4 estados) + TASK-1598 (landing influencer). `released`. Watchdog `drift_count=0`. Canary de contrato con **control negativo** (ruta inexistente → HTML de Next; ruta nueva → envelope de API con error de dominio) = la ruta existe Y ejecuta. Flag `GROWTH_SEO_WORK_QUEUE_ENABLED` prendido en los DOS runtimes **por el SoT**, verificado en la revisión activa `ops-worker-00613-qrh`. | **Bloqueador dominante: credencial, no código.** El PAT `read:packages` de AXIS venció en silencio (creado 07-29, 30 días, muerto el 08-28) y tumbó 3 de los 4 workers; Vercel pasaba verde, que es lo que lo vuelve engañoso. ~2h de las ~4h05m se fueron ahí, casi todas esperando la rotación (acción del operador). Aprendizajes: (1) mirar el HISTORIAL del workflow antes que el diff — 3 commits previos ya fallaban; (2) el audit de flags tenía un punto ciego que **anulaba su propio gate ISSUE-150** (sólo veía `process.env.FLAG` en notación de punto, y 91 callsites leen por indirección) — arreglado; (3) prender el flag en el SoT del worker no sólo evita que el próximo deploy lo borre: **ordena el flip por construcción**, y eso resolvió que `TASK-1792` no estuviera aún en `main`; (4) mis propios monitores dieron DOS falsos verdes (uno leyó «no checks reported» como verde; otro dedupeaba gates por `environment.id` y los dos gates `production` comparten id, así que se saltó el segundo en silencio) — el operador lo detectó antes que yo. |
+| 2026-08-29 (3.º del día) | Claude (Opus 5) | manifest `released` sobre `64bdd105c737` | `33272258036` (orquestador, sin retry) + `33274180074` (deploy break-glass del `ops-worker`) | `64bdd105c737c232253b8f44f814d38067e74269` | develop→main PR #212: **`incremental-clicks-v2`** — el predicado de canibalización de v1 medía marca, no canibalización. | **~2h05m** E2E (dispatch `19:58:49Z` → cierre `~21:05Z`). Orquestador 12m07s (`19:58:49Z`→`20:10:56Z`); deploy break-glass 11m37s (`20:42:25Z`→`20:54:02Z`); rematerialización + verificación ~10m. | **El release cerró VERDE con el `ops-worker` sirviendo código anterior a v2, y ninguna evidencia lo vio.** Manifest `released`, Vercel READY, 3 de 4 workers en el target, watchdog sin drift. El job del `ops-worker` duró 46 s, se saltó el deploy solo y cerró `success`. | Ver nota extendida abajo. |
+
 | 2026-08-29 (2.º del día) | Claude (Opus 5) | `88e1f652f1c2-79f2562e-1e74-4eb2-8e28-b933415c1331` | `33263788245` (un solo run, sin retry, los DOS gates aprobados sin stall) | `88e1f652f1c28629ec913b142b98293ab2a63c7b` | develop→main: **cierra la ventana de re-pausa** que dejó abierta el release anterior. `main` declaraba PAUSADOS los dos schedulers del módulo SEO mientras el runtime los tenía ENABLED, y `upsert_scheduler_job` ejecuta `pause`/`resume` EXPLÍCITO en cada deploy — con UN solo `ops-worker` y UN solo juego de jobs compartidos, cualquier deploy del árbol de `main` los re-pausaba **en silencio**. Ahora `main` y el runtime dicen lo mismo. Incluye la capa funcional + manual de TASK-1785, los aprendizajes del release anterior, TASK-1700 cerrada y TASK-1794 creada. | **Sin bloqueadores: el batch chico salió limpio.** Verificado al cierre: manifest `released`, watchdog `drift_count=0` / `data_missing=0` / 4 workers, Azure `skipped` (no-op esperado), y el residual del `ops-worker` es el caso más fuerte de change-gate legítimo — el sanity SIN `--` devuelve **0 archivos**, o sea árboles idénticos, no «no cambiaron las rutas runtime». Aprendizajes: (1) el segundo gate `production` lo detectó el monitor corregido, tras haberlo perdido en el release anterior por deduplicar gates por `environment.id` —los dos comparten id—; (2) tres veces en la jornada reporté una **vista parcial como total** (`head -8`, `limit=6`, un grep angosto), y las tres me corrigió otra sesión: el corte no es medir mejor sino **decir con qué medí**; (3) afirmé que la credencial venció «sin señal» y era falso — el detector avisó 3 días antes y falló el **enrutamiento**, lo que reordenó `TASK-1794` para poner el check de preflight primero. |
 
 ### Desglose 2026-08-29 (release `b7f74c95a2af`)
@@ -424,6 +426,113 @@ total agente E2E:
 
 Si una fase se solapa con otra, marcarla como solapada; no esconderla.
 
+### Nota extendida — 3.er release del 2026-08-29 (`64bdd105c737`)
+
+**El fallo.** El orquestador cerró `success`, el manifest transicionó a `released`,
+Vercel quedó READY y el watchdog no reportó drift. El `ops-worker` estaba sirviendo
+`8adf8c2d3` — `incremental-clicks-v1`, o sea el predicado de canibalización que este
+mismo release existía para corregir. Ninguna pieza de la cadena de evidencia lo vio.
+
+El job del worker no falló: duró 46 s y se saltó el deploy solo, con este log textual:
+
+```
+ops-worker serves 8adf8c2d3e0c...; worker runtime paths are unchanged
+since EXPECTED_SHA=64bdd105c737...; skipping build/deploy.
+```
+
+**La causa no es la ruta faltante.** Es que la decisión se tomaba contra
+`WORKER_RUNTIME_PATHS`, una lista mantenida a mano que derivó del artefacto real.
+Medido con el metafile de esbuild —el mismo bundle del Dockerfile—: el `ops-worker`
+empaqueta **1449 archivos**, la lista cubría **24 prefijos**, y **696 archivos quedaban
+invisibles**, incluidos `src/lib/postgres`, casi todo `src/lib/finance` y **todo**
+`src/lib/growth/seo`. 1385 de los 1449 vienen de `src/lib`: enumerar subdirectorios era
+estructuralmente insostenible.
+
+Los comentarios del propio workflow documentan **cinco recurrencias previas**
+(TASK-1210, 742, 1723, 1746, 1279) y cada una se cerró agregando una ruta más.
+Agregar `src/lib/growth/seo` habría sido la sexta.
+
+**El arreglo.** (1) La declaración pasa a ser la verdadera —gruesa a propósito,
+conservando la selectividad que sí importa: `src/app/**`, `docs/**` y `tests/**` no
+redespliegan. (2) `pnpm worker:deploy-path-gate` deriva la cobertura de
+`metafile.inputs`, o sea del árbol real con transitivos incluidos —justo lo que
+TASK-1279 mostró que se escapa a la revisión a ojo—. Es el gemelo de
+`worker-runtime-deps-gate` para rutas del repo. Corriéndolo aparecieron dos huecos más:
+`commercial-cost-worker` e `ico-batch` tampoco cubrían `services/_shared/sentry-init.ts`,
+que ambos bundlean.
+
+**Verificación del efecto, Berel MX (v1 `01:13` → v2 `20:56`):**
+
+```
+consolidation             200  →   11
+gsc_striking_distance     168  →  200
+aeo_gap                    23  →   41
+competitor_gap            200  →  200
+discovery_candidate        49  →   49
+```
+
+`consolidation` no cayó sola: `gsc_striking_distance` subió. Rastreadas las 200 de v1:
+65 a striking distance, 15 a aeo_gap, 6 siguen consolidation, 114 salieron de la cola.
+
+**Aprendizajes.**
+
+1. **`GIT_SHA` del worker es PRECONDICIÓN de una rematerialización, no verificación
+   posterior.** El materializador corre dentro del `ops-worker`; un `force` contra una
+   revisión vieja escribe snapshots v1, y el síntoma —«el snapshot dice v1»— apunta al
+   materializador cuando la causa es el deploy. Lo aportó una sesión peer; yo lo tenía
+   como post-check.
+
+2. **La corrida SIN `force` es mejor prueba que el `force`.** El piso de recomputación
+   filtra por `priority_score_version` = la activa, así que un snapshot v1 ya no cuenta
+   como reciente. Verificado empíricamente: `force=false` → `materialized=2, reused=0`.
+   Hace el trabajo Y prueba la red de seguridad; el `force` sólo lo primero.
+
+3. **Los dos números principales son topes, no cuentas — y hay que leerlos así.**
+   `maxItemsPerOrigin` es 200. v1 tenía `consolidation` clavado exactamente en 200
+   (saturado y truncado: el real era ≥200) y v2 dejó `gsc_striking_distance` también
+   exactamente en 200. O sea que **la cola vigente no dice cuánto trabajo hay, dice
+   cuánto cabe**, y el «168 → 200» es un piso, no la ganancia. Las 114 que
+   «desaparecieron» se explican por ese cap, no por filtrado de más.
+
+   **La cola muestra 200 de 1748 elegibles, recortadas DOS veces, y sólo una se declara.**
+   Cadena medida para Berel (predicado canónico `SEO_KEYWORD_OPPORTUNITIES_SQL`):
+
+   ```
+   1748  califican en la ventana 8–20 sobre el umbral real
+    600  es lo único que el colector pide (maxItemsPerOrigin * 3), ORDER BY impressions DESC
+    200  sobrevive al cap por origen
+   ```
+
+   El truncamiento intermedio —el `LIMIT 600` del propio colector— corta ANTES que el cap
+   y **no se declara en `origin_health`**; el cap sí. Quien lea la cola ve el segundo recorte
+   y no el primero.
+
+   **Y el percentil no está discriminando.** El umbral es `max(minImpressionsFloor, p75)` y
+   para esta org el p75 crudo es **10**, exactamente igual al piso de 10; el p50 es **2**
+   sobre 18 677 queries (máximo 94 117). O sea que la razón declarada del umbral relativo
+   —«alta impresión es un percentil, no un número»— acá no separa nada. No afirmo si el piso
+   de 10 está bien calibrado para este sitio: es una pregunta de oficio SEO que no medí.
+
+   **Dos errores de reconciliación quedaron en el camino, uno por sesión.** Una sesión peer
+   aportó un conteo de 259 y lo retractó: salía de un umbral 100 hardcodeado en su sanity, no
+   del pipeline. Y yo, antes de eso, escribí en este mismo ledger que la brecha entre 1748 y
+   259 la producían el `LIMIT` y el filtro de canibalización — una reconciliación que sonaba
+   coherente, encajaba los dos números y era **falsa**: la diferencia era su parámetro. Dos
+   números medidos con parámetros distintos admiten casi siempre una explicación plausible;
+   plausible no es verificado.
+
+4. **Un testigo que no estaba en el «antes» no es testigo.** Predije que `pinturas`
+   saldría `gsc_striking_distance` con `mainPageShare ≈ 0.996`. Salió `aeo_gap`/`optimize`,
+   y `mainPageShare` ni existe en ese breakdown. Peor: `pinturas` **no estaba en el
+   snapshot v1**, así que nunca pudo ser evidencia del arreglo. Un caso testigo hay que
+   verificarlo presente en el estado previo ANTES de colgarle una predicción.
+
+5. **Gotcha de zsh que corrompió dos mediciones en silencio.** `$var:` seguido de una
+   ruta se interpreta como el modificador `:s` de sustitución y **se come parte del
+   path sin error**: `git show "$ref:src/lib/..."` resolvió a `origin/mainr/...`. Produjo
+   un falso negativo que casi reporto como «`develop` está detrás de `main`». Lo desmintió
+   comparar por hash de blob. Usar refs literales, o verificar por hash y no por grep.
+
 ## Optimizaciones a evaluar
 
 - Automatizar captura de `run_id`, `release_id`, `runtime_green_at` y duraciones
@@ -432,5 +541,14 @@ Si una fase se solapa con otra, marcarla como solapada; no esconderla.
   exista una interfaz agente formal.
 - Reducir falsos positivos humanos separando en el dashboard: `runtime green`,
   `manifest closed`, `watchdog residual`, `docs closed`.
-- Modelar explicitamente el caso `ops-worker` change-gated en el watchdog para
-  que no sume error cuando el diff runtime es vacio.
+- ~~Modelar explicitamente el caso `ops-worker` change-gated en el watchdog para
+  que no sume error cuando el diff runtime es vacio.~~ **RETIRADA 2026-08-29.**
+  Esta optimizacion proponia silenciar exactamente la senal que habria atrapado el
+  3.er release del dia: el skip change-gated NO prueba que el diff runtime sea vacio,
+  prueba que las rutas DECLARADAS no cambiaron — y la lista declaraba 24 prefijos de
+  los 1449 archivos que el worker bundlea. Un `success` en 46 s con el worker sirviendo
+  codigo viejo se veria idéntico a un no-op legitimo. Lo que sí distingue los dos casos
+  es el sanity SIN `--` (arboles identicos ⇒ 0 archivos), que es la verificacion que el
+  2.º release del dia uso bien. El gate `pnpm worker:deploy-path-gate` cierra la causa
+  raiz; el watchdog debe seguir contando el residual como algo que se mira, no que se
+  suprime.

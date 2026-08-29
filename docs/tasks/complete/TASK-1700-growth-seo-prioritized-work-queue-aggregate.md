@@ -1,5 +1,47 @@
 # TASK-1700 — Growth SEO: la cola priorizada de trabajo es un aggregate persistido con score versionado
 
+## Delta 2026-08-29 (3) — auditoría independiente post-release: el orden SERVIDO contradecía el rank PERSISTIDO en banda 2
+
+Auditoría independiente sobre el snapshot vigente de producción (v2, post-release `64bdd105c737`),
+reproducida por dos sesiones peer antes de aceptarse: **54 de 55 items de banda 2** de
+`seot-efeonce-own-brand` se servían fuera de su `rank_in_snapshot` (Berel 0/501 — invisible donde
+domina banda 1; bandas 1 y 3 en cero en ambos targets).
+
+**Causa: la CUARTA llave invisible.** `compareWorkQueueItems` desempata la banda 2 por
+`tieBreakImpressions` DESC — un valor que **no es columna** de `seo_work_queue_items` — y el reader
+reconstruía el orden en SQL con "las tres llaves"; con el score `NULL` en toda la banda 2 colapsaba
+a orden alfabético. El SQL no podía reproducir el rank **ni en principio**, y el test de paridad
+comparaba el **string** del SQL contra una constante: consagraba un modelo de tres llaves que el
+comparador no seguía y pasaba verde con el defecto puesto. La org que peor mide (curva no
+utilizable ⇒ 100 % banda 2/3 — o sea toda org recién onboardeada) era la que peor se ordenaba.
+
+**Fix — dejar de reconstruir:** el reader sirve y pagina `rank_in_snapshot ASC` (keyset
+`rank > cursor`, cursor entero opaco; uno del formato viejo reinicia desde la primera página).
+El comparador queda como ÚNICA autoridad de orden y el orden servido coincide con el persistido
+**por construcción** — cualquier llave futura queda reflejada sola. Con eso mueren también la
+disciplina `COLLATE "C"` del lado del reader, el cursor expandido con NULLs y el nit de code
+units vs code points. Unicidad del rank hecha ESTRUCTURAL:
+`migrations/20260829213303021_task-1700-work-queue-rank-unique.sql` (UNIQUE index, aplicada;
+verificado antes: ranks contiguos 1..N en los 12 snapshots existentes). El test de paridad por
+string se reemplazó por asserts del contrato nuevo + regresión de cursor viejo.
+
+**Medido tras el fix, paginando la corrida real de punta a punta (páginas de 17) y comparando
+cuenta Y secuencia contra lo persistido:** efeonce **105/105, 0 discrepancias** (antes 54);
+Berel **501/501, 0** (sin regresión); bandas 1 y 3 en 0 en ambos. Protocolo actualizado en
+`SQL_DATE_MATH_AGENT_INVARIANTS.md` §"Orden y paginación" (ahora TRES bug classes): correr la
+detección **sobre el dataset que exhibe cada estado** — el verde de Berel no probaba nada.
+
+**Quema de la deuda de procedencia (TASK-1785), cuya condición de salida era este fix:** el DTO del
+reader emite `provenance` en lista — ● `gsc` para lo observado, ◑ **`own_ctr_model`** (fuente nueva
+del vocabulario: insumos medidos, resultado estimado) para `priorityScore`,
+`expectedCtrAtTarget` y `snippetCeilingClicks` — con cobertura hoja por hoja en
+`work-queue/__tests__/provenance-coverage.test.ts` y el censo en `emitted`.
+
+**Follow-up con dueño (contract post-release):** el índice
+`seo_work_queue_items_keyset_idx` (migración `20260829000423538`) quedó huérfano del reader nuevo,
+pero el reader desplegado en producción lo usa hasta la próxima promoción — retirarlo en migración
+aditiva DESPUÉS del release que promueva este fix, no antes.
+
 ## Delta 2026-08-29 (2) — `incremental-clicks-v2`: el predicado de canibalización medía MARCA
 
 Auditando la propia implementación apareció el defecto de fondo: `COUNT(DISTINCT page) > 1` no mide
