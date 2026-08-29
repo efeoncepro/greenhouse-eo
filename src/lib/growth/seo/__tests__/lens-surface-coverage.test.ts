@@ -95,6 +95,38 @@ describe('censo de superficies SEO (TASK-1785)', () => {
     expect(tools).toContain('get_seo_visibility_360')
   })
 
+  it('🔴 toda superficie `figures` declara si emite procedencia o por qué todavía no', () => {
+    // El hueco que este assert cierra existió de verdad: el censo declaraba 18 superficies como
+    // `figures` y el guard sólo verificaba que estuvieran LISTADAS. Ocho quedaron sin `provenance`
+    // y nada falló — el defecto que esta task existe para impedir, dentro de su propio mecanismo.
+    //
+    // Lo que se prohíbe NO es la deuda: es el SILENCIO. Una superficie que emite cifras tiene que
+    // decir «las declaro» o «todavía no, y por esto».
+    const mudas = SEO_LENS_SURFACES.filter(s => s.kind === 'figures' && s.provenance === undefined)
+
+    expect(
+      mudas.map(s => s.route ?? s.tool),
+      'Superficies que emiten cifras sin declarar procedencia ni deuda. Declara ' +
+        "`provenance: 'emitted'` si su DTO ya la lleva, o `{ pending: '<por qué todavía no>' }`."
+    ).toEqual([])
+  })
+
+  it('una deuda de procedencia se declara con razón, nunca con una cadena vacía', () => {
+    const flojas = SEO_LENS_SURFACES.filter(
+      s => typeof s.provenance === 'object' && s.provenance.pending.trim().length < 40
+    )
+
+    expect(flojas.map(s => s.route ?? s.tool)).toEqual([])
+  })
+
+  it('ninguna superficie `command` o `state` declara procedencia (sería contradictorio)', () => {
+    // Si emite cifras, su `kind` es `figures`. Declarar procedencia sobre algo que dijimos que no
+    // emite cifras significa que uno de los dos campos miente.
+    const contradictorias = SEO_LENS_SURFACES.filter(s => s.kind !== 'figures' && s.provenance !== undefined)
+
+    expect(contradictorias.map(s => s.route ?? s.tool)).toEqual([])
+  })
+
   it('toda superficie declara una razón: "no emite cifras" no puede ser un silencio', () => {
     const withoutReason = SEO_LENS_SURFACES.filter(surface => surface.reason.trim().length < 20)
 
