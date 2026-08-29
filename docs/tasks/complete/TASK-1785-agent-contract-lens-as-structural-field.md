@@ -1,5 +1,27 @@
 # TASK-1785 — La lente deja de ser una instrucción y pasa a ser un campo del contrato
 
+## Delta 2026-08-29 — la deuda de `work-queue` quedó QUEMADA, y trajo una fuente nueva al vocabulario
+
+El censo corregido (`88955459a` + `3e8149eaa`) dejaba 10 de 18 superficies `figures` emitiendo
+procedencia y 8 como deuda declarada. La de `work-queue` tenía condición de salida explícita —el fix
+del orden servido de la cola (Delta 2026-08-29 (3) de `TASK-1700`)— y se quemó junto con él:
+
+- El DTO de `readSeoWorkQueue` emite `provenance` en LISTA: ● `gsc` para lo observado
+  (impresiones, clics, CTR actual, posición ponderada, muestra de la curva, `competingPages`,
+  `mainPageShare`) y ◑ para lo modelado (`priorityScore`, `expectedCtrAtTarget`,
+  `snippetCeilingClicks`). Es el caso «◑ junto a ● en la MISMA fila» que este contrato existe
+  para expresar.
+- **Fuente nueva en el vocabulario cerrado: `own_ctr_model` (◑).** El caso difícil «insumos
+  medidos, resultado estimado»: esos números salen de multiplicar impresiones ● por un CTR que
+  produjo nuestro modelo, no un usuario. Rotularlos `gsc` los volvería ● y promediables con lo
+  medido. GSC sigue siendo la ÚNICA fuente ● (el assert existente lo sigue afirmando).
+- Cobertura hoja por hoja en `work-queue/__tests__/provenance-coverage.test.ts` (fixture tipado
+  con los opcionales poblados a mano, por la limitación declarada del caminador) y el censo de
+  `lens-surface-manifest.ts` en `provenance: 'emitted'`.
+
+Quedan **7** deudas declaradas con razón; su quema sigue teniendo dueños por razón escrita, no por
+estado.
+
 ## Delta 2026-08-28 (release a producción) — la superficie creció: 20 → 26 tools SEO
 
 El release `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208, run `33178544139`,

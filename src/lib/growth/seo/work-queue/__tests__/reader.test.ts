@@ -111,9 +111,13 @@ describe('TASK-1700 — readSeoWorkQueue', () => {
     expect(r.ok && r.items[0]!.priorityScore).toBeNull()
   })
 
-  it('el ORDER BY del reader es idéntico al orden canónico del materializador', async () => {
-    // Si divergen, la paginación saltea filas sin que nada falle. El assert mira el SQL
-    // porque es la única forma de comprobar que las TRES llaves y el NULLS LAST siguen ahí.
+  it('el reader sirve el rank PERSISTIDO — no reconstruye el orden en SQL', async () => {
+    // 🔴 El predecesor de este test comparaba el STRING del SQL contra "las tres llaves"
+    // (band, score, keyword) y consagraba un modelo que el comparador no seguía: el
+    // desempate de banda 2 por impresiones NO es columna, así que un ORDER BY reconstruido
+    // no podía verlo — en producción sirvió 54 de 55 items de banda 2 fuera de su rank.
+    // El contrato es servir `rank_in_snapshot`: cualquier llave del comparador queda
+    // reflejada por construcción, y una reconstrucción del orden en SQL es regresión.
     state.snapshots = [snapshotRow()]
     state.items = [itemRow()]
 
@@ -121,16 +125,52 @@ describe('TASK-1700 — readSeoWorkQueue', () => {
 
     const itemsQuery = state.queries.find(q => q.sql.includes('seo_work_queue_items'))
 
-    expect(itemsQuery?.sql).toContain(
-      'ORDER BY score_band ASC, priority_score DESC NULLS LAST, normalized_keyword COLLATE "C" ASC'
-    )
+    expect(itemsQuery?.sql).toContain('ORDER BY rank_in_snapshot ASC')
+    expect(itemsQuery?.sql).not.toContain('ORDER BY score_band')
+    expect(itemsQuery?.sql).not.toContain('normalized_keyword COLLATE')
 
-    // 🔴 El alias del score NO puede llamarse `priority_score`: PostgreSQL resuelve el
-    // ORDER BY contra los nombres de SALIDA primero, así que un alias homónimo ordena la
-    // cola como TEXTO ('8.8612' antes que '72.1405'). Lo destapó una corrida real — con
-    // scores de un dígito o todos NULL el bug es invisible.
+    // 🔴 El alias del score NO puede llamarse `priority_score`: PostgreSQL resuelve un
+    // ORDER BY contra los nombres de SALIDA primero — si alguien reintroduce esa llave con
+    // un alias homónimo, ordena TEXTO ('8.8612' antes que '72.1405').
     expect(itemsQuery?.sql).toContain('AS priority_score_text')
     expect(itemsQuery?.sql).not.toContain('AS priority_score,')
+  })
+
+  it('el cursor transporta el rank del último item servido y el keyset lo usa', async () => {
+    state.snapshots = [snapshotRow()]
+    // limit 1 + lookahead: la página sirve el rank 5 y el cursor debe apuntar a 5, no a 9.
+    state.items = [itemRow({ rank_in_snapshot: 5 }), itemRow({ rank_in_snapshot: 9, normalized_keyword: 'z' })]
+
+    const page1 = await readSeoWorkQueue('seot-1', { env: ENV_ON, limit: 1 })
+
+    expect(page1.ok && page1.items[0]!.rank).toBe(5)
+    expect(page1.ok && page1.nextCursor).toBeTruthy()
+
+    state.items = [itemRow({ rank_in_snapshot: 9, normalized_keyword: 'z' })]
+
+    await readSeoWorkQueue('seot-1', {
+      env: ENV_ON,
+      cursor: page1.ok ? page1.nextCursor : null
+    })
+
+    const secondQuery = state.queries.filter(q => q.sql.includes('seo_work_queue_items')).at(-1)
+
+    expect(secondQuery?.params[2]).toBe(5)
+  })
+
+  it('un cursor del formato viejo (band|score|keyword) reinicia desde la primera página', async () => {
+    state.snapshots = [snapshotRow()]
+    state.items = [itemRow()]
+
+    const legacyCursor = Buffer.from('1|70.3322|pinturas', 'utf8').toString('base64url')
+    const r = await readSeoWorkQueue('seot-1', { env: ENV_ON, cursor: legacyCursor })
+
+    expect(r.ok).toBe(true)
+
+    const itemsQuery = state.queries.filter(q => q.sql.includes('seo_work_queue_items')).at(-1)
+
+    // Cursor ilegible ⇒ keyset nulo ⇒ primera página. Jamás un salto silencioso de filas.
+    expect(itemsQuery?.params[2]).toBeNull()
   })
 
   it('pagina con cursor opaco y lo devuelve sólo cuando hay más', async () => {

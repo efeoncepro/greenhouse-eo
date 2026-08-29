@@ -2,6 +2,42 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-29 (7.º) — auditoría independiente de la cola: el orden servido contradecía el rank persistido en banda 2 (fix aplicado + deuda de procedencia quemada)
+
+Auditoría independiente de TASK-1700/1785 pedida por el operador tras 3 releases con dolor.
+**Veredicto:** el núcleo de v2 estaba bien (predicado único ✅, piso por versión ✅, adapter sin
+`null→0` ✅, schedulers/flags/deploy.sh de main verificados en vivo ✅, snapshots vigentes v2 ✅) —
+pero apareció un defecto real que ningún test veía: **54 de 55 items de banda 2** de
+`seot-efeonce-own-brand` servidos fuera de su `rank_in_snapshot` (Berel 0/501 — invisible donde
+domina banda 1). Reproducido de forma independiente por las dos sesiones peer antes de aceptarse.
+
+Causa: el comparador desempata banda 2 por `tieBreakImpressions` DESC — **no es columna** — y el
+reader reconstruía el orden en SQL con tres llaves; con score NULL en toda la banda colapsaba a
+alfabético. El test de paridad comparaba el **string** del SQL: guarda que afirma, no que verifica.
+
+**Fix (asignado a esta sesión por el operador; las peers quedaron fuera por contexto saturado):**
+el reader sirve y pagina `rank_in_snapshot ASC` (keyset `rank > cursor`; cursor viejo reinicia
+página 1, jamás saltea). Comparador = única autoridad de orden; coincidencia servido↔persistido
+**por construcción**. UNIQUE index nuevo `seo_work_queue_items_rank_unique_idx` (migración
+`20260829213303021`, **aplicada**; ranks verificados contiguos 1..N en los 12 snapshots).
+**Re-medido live paginando de punta a punta:** efeonce 105/105 y Berel 501/501 con **0**
+discrepancias de secuencia; bandas 1 y 3 sin regresión (estaban en 0 y siguen).
+
+En el mismo tren se **quemó la deuda de procedencia de `work-queue`** (su condición de salida era
+este fix): DTO emite `provenance` en lista, fuente nueva `own_ctr_model` (◑, «insumos medidos,
+resultado estimado») para score/techo/CTR esperado, censo en `emitted`, cobertura hoja por hoja en
+`provenance-coverage.test.ts`. Quedan 7 deudas declaradas en el censo.
+
+Docs: Delta (3) en TASK-1700 + Delta en TASK-1785, §18.8 de la arquitectura SEO reescrito (el
+orden canónico vive en el comparador; el reader lo LEE), `SQL_DATE_MATH_AGENT_INVARIANTS`
+§"Orden y paginación" ahora con TRES bug classes + protocolo "dataset que exhibe cada estado",
+`.claude/rules/growth-seo.md` actualizado.
+
+**Pendiente con dueño:** retirar `seo_work_queue_items_keyset_idx` (huérfano del reader nuevo) en
+migración aditiva **DESPUÉS** del release que promueva este fix — el reader desplegado hoy en
+producción todavía lo usa. Verificación post-promoción: repetir la paginación live de punta a punta
+contra `seot-efeonce-own-brand` (debe seguir 0 discrepancias con el código promovido).
+
 ## 2026-08-29 (6.º) — el release cerró verde con el worker sirviendo código viejo
 
 Tercer paso a producción del día (`64bdd105c737`, orquestador `33272258036`). Manifest `released`,
@@ -545,44 +581,3 @@ sincronizo en arquitectura, funcional, manuales, registro de primitives y mirror
 revalido sin mutar la pagina: `.captures/task1598-influencer-fidelity-2026-08-29T12-35-54-355Z/`; hash y rollback
 vigentes siguen siendo `353bac5d3d7491cb77f337296e5ab0bace14a18e99055d449ea25134217e52a5` y
 `_gh_backup_before_task1598_flag_optical_refine_20260829T132000Z`.
-
-## 2026-08-28 — `TASK-1792` complete: la curva de CTR declara su usabilidad
-
-**Estado: `complete` y verificado contra runtime real (lectura).** Sin flag, sin migración, sin escritura —
-el cutover fue el merge; rollback = revert PR. Commits en `develop`: `d4d731721` (módulo + predicado),
-`f8be78d83` (reader consume y ordena honesto, curva privada retirada), `8943b2f5c` (referencia recalibrada +
-nivel estimado + curva monótona). Contrato canónico y sus invariantes:
-[`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
-§`readKeywordOpportunities`. Este Handoff rota; ese doc no.
-
-**Lo que queda vivo para quien siga:**
-
-- **`org_level_reference_shape` está unit-tested y es correcto por construcción, pero NO observado en
-  producción.** Ninguna de las dos organizaciones con serie cae hoy en ese estado: Berel mide en el bucket
-  objetivo y Efeonce no tiene muestra ni para estimar un nivel (2 clics en 28d). En tres semanas alguien va a
-  leerlo como "probado" — no lo está. Se verá cuando exista una org con agregado suficiente y bucket objetivo
-  delgado.
-- **`TASK-1691` hereda el contrato y tiene su `## Delta 2026-08-28 (3)`** con la forma tal como quedó: cuatro
-  estados, no tres. El ORDEN que ve el usuario ya está corregido del lado servidor (la tabla re-ordena en
-  cliente y `Array.prototype.sort` es estable); lo que falta es que la etiqueta deje de prometer orden por
-  ganancia cuando `orderedBy === 'measured_demand'`.
-- **Follow-ups sin task creada** (no se reservaron IDs: el registry estaba contendido por tres sesiones):
-  filtro marca/no-marca de la curva (defecto independiente del tamaño de muestra, no se cura cuando el sitio
-  crezca); unificar el predicado con `work-queue/priority-score.ts` cuando `TASK-1700` cierre; revisar
-  `DEFAULT_TARGET_POSITION = 5` contra la doctrina de 8–10.
-- **Dato para calibrar:** el nivel estimado de `berel.com` contra la curva de referencia da **1,048** (28d) y
-  **1,095** (7d), y Berel no es la fuente de esa referencia. Es el control contra el cual medir si algún día
-  el filtro no-marca mueve algo real.
-- **Alcance, dicho con precisión:** no es «afecta a 1 de 2 organizaciones». Dos es el tamaño de la
-  muestra, no una tasa. El disparador —bucket objetivo presente y sin clics— está **garantizado en
-  todo target recién onboardeado**, así que cada cliente nuevo nace en ese estado hasta acumular
-  muestra. Quien lea el 24/24 de Efeonce como «un caso» va a subestimar el alcance.
-- **`TASK-1700` desbloqueada y con el desbloqueo aceptado del otro lado.** El Slice 7 (cutover del
-  consumer) tenía su rollback aterrizando en la lente rota: volver al reader legacy devolvía una
-  pantalla que no ordenaba. `TASK-1700` ya lleva su `## Delta 2026-08-28 (3)` declarando la
-  dependencia dura y su tabla de rollback dice ahora que el destino está **verificado, no supuesto**.
-  Nada queda pendiente de coordinar entre ambas.
-- **Crédito, para que quien siga sepa a quién preguntarle:** el hallazgo es de la sesión
-  `greenhouse-eo-56`; la investigación (arqueología del commit introductor, lectura de oficio SEO,
-  blast radius) es de esta sesión; la **implementación** de los cuatro slices es de `greenhouse-eo-75`.
-  Tres cabezas, un defecto: no atribuir el trabajo a una sola.

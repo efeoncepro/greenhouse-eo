@@ -109,7 +109,17 @@ export const SEO_FIGURE_SOURCES = [
   'dataforseo_serp',
   'dataforseo_backlinks',
   'dataforseo_onpage',
-  'dataforseo_domain_analytics'
+  'dataforseo_domain_analytics',
+  /**
+   * El modelo de CTR derivado del propio sitio (curva de `ctr-curve.ts` / config versionada
+   * de la cola). Es el caso difícil del contrato — **insumos medidos, resultado estimado**:
+   * `priority_score`, `expectedCtrAtTarget` o `snippetCeilingClicks` salen de multiplicar
+   * impresiones ● por un CTR que NINGÚN usuario produjo en esa posición — lo produjo nuestro
+   * modelo. Rotularlos `gsc` los volvería ● y promediables con lo medido, que es exactamente
+   * la mezcla que este archivo impide. Quien mira "de dónde salen los números" los rotularía
+   * ● — por eso la fuente existe como vocabulario y no como criterio de cada autor.
+   */
+  'own_ctr_model'
 ] as const
 
 export type SeoFigureSource = (typeof SEO_FIGURE_SOURCES)[number]
@@ -130,7 +140,8 @@ const SOURCE_LENS: Readonly<Record<SeoFigureSource, SeoLens>> = {
   dataforseo_serp: 'estimated',
   dataforseo_backlinks: 'estimated',
   dataforseo_onpage: 'estimated',
-  dataforseo_domain_analytics: 'estimated'
+  dataforseo_domain_analytics: 'estimated',
+  own_ctr_model: 'estimated'
 }
 
 export const resolveSeoLens = (source: SeoFigureSource): SeoLens => SOURCE_LENS[source]
