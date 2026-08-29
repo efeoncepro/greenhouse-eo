@@ -422,6 +422,16 @@ export class GreenhouseApiPlatformClient {
    * TASK-1700 — la cola priorizada de trabajo (lane sólo-internal, 404 anti-oracle: lleva
    * lente competitiva y el cruce con citabilidad IA).
    */
+  /** TASK-1785 — las dos lentes de posición, separadas. Sin campo combinado, por contrato. */
+  async getSeoDualLensVisibility(input: { organizationId?: string; market?: string; keywords: string[]; rangeDays?: number }) {
+    return this.request('/api/platform/ecosystem/growth/seo/dual-lens-visibility', {
+      organizationId: input.organizationId,
+      market: input.market,
+      keywords: input.keywords.join(','),
+      rangeDays: input.rangeDays
+    })
+  }
+
   async getSeoWorkQueue(input: {
     organizationId: string
     market?: string

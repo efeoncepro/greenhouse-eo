@@ -354,6 +354,25 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getSeoVisibility360(args)
   )
 
+  // TASK-1785 — la lectura compuesta. CONVIVE con get_seo_visibility_360: aquella cruza SEO×AEO
+  // (dos ejes ortogonales de motores distintos), ésta cruza medido×estimado DENTRO de SEO.
+  server.registerTool(
+    'get_seo_dual_lens_visibility',
+    {
+      title: 'Get SEO Dual-Lens Visibility',
+      description:
+        'Return BOTH position series for the same set of keywords, SEPARATED and labelled: the MEASURED one from Google Search Console and the ESTIMATED one from the purchased SERP. Use this instead of calling get_seo_performance and get_seo_rank_evolution separately whenever you are about to describe "where this client ranks" — it exists precisely so that presenting both lenses correctly is cheaper than merging them by mistake. 🔴 THE TWO SERIES ARE NOT COMPARABLE POINT TO POINT AND MUST NEVER BE AVERAGED, SUMMED, INTERPOLATED OR MERGED INTO A SINGLE NUMBER. They do not share a referent: the measured series is an impressions-weighted average over REAL users of this domain, while the estimated one is an exact position for a synthetic query issued by us from a location we chose. A number produced by combining them has no referent at all and would be presented with the confidence of a measurement — which is worse than having no number. There is deliberately NO combined field in the response, and that is not an omission to be filled in. Report them side by side, each with its own lens, source and capturedAt as-of date, and note that each lens declares its OWN window (range) because they can differ — the purchased series often starts later than the measured history. keywordsWithoutData names the requested keywords with no data in that lens: name them instead of dropping them silently. A lens can come back unavailable with a reason (for example target_not_resolved when the organization has several active markets and none was selected): that is a STATE, never a zero, and it does not invalidate the other lens. position=null means no measurement that day — a gap, never a zero, because position zero does not exist.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(1).optional(),
+        keywords: z.array(z.string().trim().min(1)).min(1).max(25),
+        rangeDays: z.number().int().positive().max(365).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoDualLensVisibility(args)
+  )
+
   server.registerTool(
     'get_seo_entitlement',
     {

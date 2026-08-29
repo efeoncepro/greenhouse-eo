@@ -83,6 +83,7 @@ import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { runProspectDiagnostic, type RunProspectDiagnosticResult } from '@/lib/growth/seo/prospect/command'
 import { listProspectDiagnostics, readProspectDiagnostic } from '@/lib/growth/seo/prospect/reader'
 import type { ProspectDiagnostic } from '@/lib/growth/seo/prospect/contracts'
+import { readDualLensVisibility } from '@/lib/growth/seo/composed/read-dual-lens-visibility'
 
 /**
  * TASK-1645 — Lane ecosystem del módulo SEO (downstream de API Platform, consumido por
@@ -2057,6 +2058,60 @@ export const getEcosystemSeoWorkQueuePayload = async ({
     ...(origins.length > 0 ? { origins } : {}),
     ...(Number.isFinite(rawLimit) && rawLimit > 0 ? { limit: rawLimit } : {}),
     cursor
+  })
+
+  return {
+    data: result,
+    meta: {
+      module: 'growth.seo',
+      tier: subject.tier,
+      organizationId: subject.organizationId,
+      servedMarket: subject.servedMarket
+    }
+  }
+}
+
+/**
+ * GET /api/platform/ecosystem/growth/seo/dual-lens-visibility — TASK-1785.
+ *
+ * Las DOS series de posición de un mismo set de keywords, separadas y rotuladas: la medida
+ * (Search Console, ●) y la estimada (SERP comprado, ◑).
+ *
+ * 🔴 Existe para invertir un incentivo, no para agregar una lectura. Hasta ahora presentar
+ * bien las dos lentes costaba dos llamadas y una decisión; presentarlas mal costaba una
+ * llamada y ninguna. Ninguna descripción de tool compensa esa asimetría — un contrato sí.
+ *
+ * El payload NO tiene ningún campo combinado, y no es una omisión pendiente: las dos
+ * magnitudes no comparten referente y fusionarlas produciría un número sin significado
+ * presentado como medición.
+ */
+export const getEcosystemSeoDualLensVisibilityPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<unknown>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request)
+  const url = new URL(request.url)
+
+  const keywords = (url.searchParams.get('keywords') ?? '')
+    .split(',')
+    .map(value => value.trim())
+    .filter(Boolean)
+    .slice(0, 25)
+
+  const rawRange = Number.parseInt(url.searchParams.get('rangeDays') ?? '', 10)
+  const rangeDays = Number.isFinite(rawRange) && rawRange > 0 ? Math.min(rawRange, 365) : undefined
+
+  const result = await readDualLensVisibility({
+    organizationId: subject.organizationId,
+    keywords,
+    ...(rangeDays ? { rangeDays } : {})
   })
 
   return {

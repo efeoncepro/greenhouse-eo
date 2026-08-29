@@ -194,6 +194,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'retireSeoCompetitors'
   | 'getSeoKeywordGap'
   | 'getSeoWorkQueue'
+  | 'getSeoDualLensVisibility'
   | 'getSeoSerpTopResults'
   | 'getSeoCompetitorCandidates'
   | 'getSeoKeywordMarketData'
@@ -925,6 +926,48 @@ export const createGreenhouseMcpHandlers = (client: Pick<
    * que el reader no ordena: reportar el gap como ranking sería acuñar la prioridad que la
    * cola (TASK-1700) todavía no computó.
    */
+  /**
+   * TASK-1785 — el summary REPITE que las dos series no son comparables punto a punto.
+   *
+   * No es redundancia con la descripción de la tool: el agente que compone un párrafo tiene
+   * el summary a la vista y la descripción en su contexto de hace rato. La advertencia vale
+   * donde se toma la decisión.
+   */
+  async getSeoDualLensVisibility(input: {
+    organizationId?: string
+    market?: string
+    keywords: string[]
+    rangeDays?: number
+  }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          measured?: { provenance?: { capturedAt?: string | null }; series?: unknown[]; unavailable?: unknown }
+          estimated?: { provenance?: { capturedAt?: string | null }; series?: unknown[]; unavailable?: unknown }
+        }
+
+        if (data.ok === false) {
+          return `Dual-lens visibility unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const measuredCount = Array.isArray(data.measured?.series) ? data.measured.series.length : 0
+        const estimatedCount = Array.isArray(data.estimated?.series) ? data.estimated.series.length : 0
+
+        return (
+          `Two SEPARATE position series: ${measuredCount} MEASURED (Search Console, as-of ` +
+          `${String(data.measured?.provenance?.capturedAt ?? 'unknown')}) and ${estimatedCount} ESTIMATED ` +
+          `(purchased SERP, as-of ${String(data.estimated?.provenance?.capturedAt ?? 'unknown')}). ` +
+          'They are NOT comparable point to point and MUST NOT be averaged, summed or merged into a ' +
+          'single figure: one is a real-user weighted average for this domain, the other is an exact ' +
+          'position for a synthetic query we issued. Report them side by side, each with its lens and ' +
+          `as-of. An unavailable lens is a state, never a zero (${result.requestId}).`
+        )
+      },
+      () => client.getSeoDualLensVisibility(input)
+    )
+  },
   async getSeoKeywordGap(input: { organizationId: string; market?: string; seoCompetitorId?: string; limit?: number }) {
     return callReadTool(
       result => {

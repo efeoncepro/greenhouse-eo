@@ -137,6 +137,15 @@ export const SEO_LENS_SURFACES: readonly SeoLensSurface[] = [
     reason: 'Carril prospecto: ◑ entero por definición (no hay Search Console de un prospecto).'
   },
   {
+    route: 'dual-lens-visibility',
+    tool: 'get_seo_dual_lens_visibility',
+    kind: 'figures',
+    reason:
+      'Las DOS lentes de posición del mismo set de keywords, separadas y rotuladas. Es la ' +
+      'única superficie del módulo cuyo contrato declara explícitamente que sus dos series NO ' +
+      'son comparables punto a punto, y por diseño no tiene campo combinado.'
+  },
+  {
     route: 'visibility-360',
     tool: 'get_seo_visibility_360',
     kind: 'figures',
