@@ -386,8 +386,9 @@ habla.
 `src/lib/growth/seo/work-queue/reader.ts` (docstring + keyset por rank),
 `src/lib/growth/seo/work-queue/materialize.ts` (el comparador, única autoridad de orden),
 `migrations/20260829213303021_task-1700-work-queue-rank-unique.sql` (unicidad estructural del rank)
-y `migrations/20260829000423538_task-1700-work-queue-keyset-collation.sql` (el índice del keyset
-reconstruido, huérfano tras el fix; retiro post-release). El detalle del dominio vive en
+y `migrations/20260829225504734_task-1700-retire-orphan-keyset-index.sql` (retiro del índice del
+keyset reconstruido, ejecutado DESPUÉS del release `e1718a359575` que promovió el fix — la
+secuencia contract-después-del-release en acción). El detalle del dominio vive en
 `.claude/rules/growth-seo.md`.
 
 ---

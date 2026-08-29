@@ -2,6 +2,38 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-29 (8.º) — Release `e1718a359575`: el fix de banda 2 y el gate del worker están en producción, verificados por canary
+
+**Manifest `released`** (`e1718a359575-5f3d0c7e-859e-45ef-bd64-00c6bec606ea`, run `33279083461`, un
+solo run del orquestador, ambos gates `production` aprobados sin stall, 11m16s). Watchdog `ok` /
+`drift_count=0` / `data_missing=0`. PR #213 + forward-fix PR #214.
+
+**El desvío del release:** CI Deep se puso rojo sobre el primer squash (`dade7ce5f`, quedó SIN
+manifest a propósito — Deep rojo no se dispatcha) por `services/ops-worker/deploy-contract.test.ts`:
+sus tests exigían el contrato VIEJO del workflow (3 apariciones por ruta) que `146070ffc` rediseñó a
+cobertura por metafile. Forward-fix por el camino canónico (≈40 min). **Y la historia completa la
+midió eo-64 en su contra:** develop estuvo ROJO dos veces con ese mismo test (`53e240d79`,
+`3e8149eaa`) sin que nadie abriera el resultado, y el run del commit culpable (`146070ffc`) fue
+CANCELADO por `cancel-in-progress` — nunca juzgado. En ráfagas, el veredicto de CI es del ÚLTIMO
+push; un rojo que nadie mira = no tener el test (la clase del caso AXIS).
+
+**El skip del `ops-worker` (44 s) fue LEGÍTIMO esta vez — y es la prueba de que el gate nuevo
+funciona.** Mismo síntoma que el incidente del 3.er release, causa opuesta: el `push:develop` ya
+había desplegado `380a20fa3`, cuyo árbol es IDÉNTICO al del squash (diff completo vacío, no sólo el
+de rutas). 3/4 workers en el target; residual de label documentado y clasificado por el watchdog.
+
+**Canary de contrato VERDE contra producción** (lane ecosystem, token de consumer del gateway),
+afirmando lo que sólo el contrato nuevo produce: `provenance` con `gsc` + `own_ctr_model` (lentes
+● y ◑ en el mismo DTO) y **rank monotónico 1..N con banda 2 poblada** (efeonce 105 items, 55 de
+banda 2 — antes 54/55 fuera de orden). Paginación completa de Berel por producción: 6 páginas,
+**501/501, secuencia == persistida**. Schedulers siguen `ENABLED` (el skip no ejecutó deploy.sh).
+
+**Post-release ejecutado:** índice keyset huérfano RETIRADO (migración `20260829225504734`,
+aplicada con guard doble: viejo ausente + nuevo presente) — contract-después-del-release cumplido.
+Sin flags gated a este release (ledger revisado: los pendientes tienen bloqueadores ajenos).
+
+Timing ledger actualizado (E2E ~1h15m; bloqueador dominante: el ciclo del forward-fix).
+
 ## 2026-08-29 (7.º) — auditoría independiente de la cola: el orden servido contradecía el rank persistido en banda 2 (fix aplicado + deuda de procedencia quemada)
 
 Auditoría independiente de TASK-1700/1785 pedida por el operador tras 3 releases con dolor.
@@ -445,139 +477,3 @@ keywords compartidas (techo idéntico, orden relativo idéntico), y el gate anti
 una página compitiendo**. No es un artefacto del predicado —con un piso de 10% de share siguen siendo
 3.825— así que la cabeza de su cola es legítimamente `consolidate`: su mayor oportunidad es arreglar su
 propia canibalización antes de perseguir posiciones nuevas.
-
-## 2026-08-28 — `TASK-1598` publicada: Agencia de influencers
-
-**Estado: `complete`, publicada y elegible para indexación.** La landing vive en
-`https://efeoncepro.com/servicios/agencia-de-influencers/` (WordPress `251627`) como documento Elementor normal,
-con header/footer Ohio globales y sin el chrome del export Claude. Keyword/slug se validaron con DataForSEO en CL,
-MX, CO y PE; el readback sirve title/meta, canonical autorreferente, `index, follow`, sitemap/lastmod y menu item
-`251638` bajo `Servicios Destacados`.
-
-**Remediación de fidelidad cerrada tras review live del owner.** La primera adaptación había cargado los videos pero
-eliminó la secuencia e interacciones del export aprobado. El runtime actual restaura los tres clips del hero,
-play/pausa, sonido, progreso, badge de derechos, stack social, pulgar decorativo, selección de ofertas, CTA sticky y
-reveals. El hero reserva la altura real del masthead Ohio más 32 px y responde a resize; el gate durable
-`pnpm public-website:verify-influencer-landing-fidelity` pasó post-cache en 1536/1440/890/390 y reduced motion,
-con al menos 28 px medidos bajo el header, sin overflow ni errores de consola; capturas en
-`.captures/task1598-influencer-fidelity-2026-08-29T02-03-15-736Z/`. El gate ahora exige que el Growth Form registre
-su custom element, monte siete bloques de campo y exponga submit; esto cerró la regresión donde el loader del meeting
-dejaba `<greenhouse-form>` vacío. El sistema corrige además la cascada que degradaba los
-CTA a peso 400: siete botones usan Geist 600, variantes primary/secondary/tonal, target ≥44 px, foco doble y
-hover/active con reduced-motion. Los iconos ya no tienen disco de fondo. En el hero sólo `Agenda una reunión`
-conserva fill; `Cuéntanos tu campaña` vuelve a ser enlace secundario transparente. El sticky oculto usa `inert`. El
-intro de conversión queda sticky a 32 px junto al formulario desde 761 px y vuelve a flujo estático apilado en móvil.
-El FAQ conserva sticky sólo cuando caben sus dos columnas (>900 px); a 890/390 se apila, queda estático y no se
-superpone al acordeón.
-
-- Growth Form publicado: `efeonce-creator-influence-brief`, key
-  `d2c68012-2a6b-41d6-b3dd-4b8ccbff6ee3`, surface `fhsf-efeonce-creator-influence`; captura gobernada en
-  Greenhouse, Turnstile invisible y consentimiento. HubSpot directo continúa deshabilitado por el gate general.
-- Meeting: surface canónica `fhsf-efeonce-lead-gen-web`, scheduler `discovery`; no expone proveedor ni URL directa.
-- Visual/risk: seis videos del source aprobados y rotulados como IA ilustrativa, no resultados/testimonios. QA live
-  post-cache: 1536/1440/890/390/reduced-motion, teclado, form/meeting/FAQ/schema, cero
-  consola/imágenes rotas/overflow real.
-- El Growth Form usa ahora host visual editorial premium: header/trust chrome, seis iconos lineales sin discos,
-  controles de 56 px/16 px, focus/autofill/error reforzados, consentimiento tonal y submit full-width. El contrato,
-  campos, Turnstile, destino y telemetría siguen gobernados por Growth Forms. Scorecard `PASS 4.68/5` en
-  `docs/ui/reviews/TASK-1598-influencer-growth-form-premium-2026-08-28.md`; captura focal:
-  `.captures/task1598-form-premium-live-2026-08-29T0206Z/`.
-- Refinamiento final: privacidad usa el texto enlazado `Consulta nuestra Política de privacidad`; se eliminaron
-  ayudas redundantes que rompían el ritmo de las parejas de campos y los selects usan affordance propia tonal.
-  El acordeón de meeting fue retirado: CTA `influencer-discovery-meeting` / surface
-  `csur-b59e4e3b-220f-47e7-b930-c27a30dd61b9` abre `open_meeting_scheduler` en diálogo nativo sobre
-  `fhsf-efeonce-lead-gen-web` / `discovery`, sin enlace visible a HubSpot. QA final:
-  `.captures/task1598-influencer-fidelity-2026-08-29T02-22-01-382Z/`.
-- Hash Elementor post-fidelidad, previo al hardening SEO: `a0c446c66aad68ddba536d7094527279444e5bcf49d1bfc8af0000065371f68d`. Snapshot inmediato:
-  `_gh_backup_before_task1598_fidelity_repair_20260829T022153Z`. Snapshot CTA anterior:
-  `_gh_backup_before_task1598_fidelity_repair_20260829T022058Z`. Snapshot premium anterior:
-  `_gh_backup_before_task1598_fidelity_repair_20260829T020845Z`. Snapshot premium base anterior:
-  `_gh_backup_before_task1598_fidelity_repair_20260829T020255Z`. Snapshot de fidelidad anterior:
-  `_gh_backup_before_task1598_fidelity_repair_20260829T015320Z`; snapshot anterior:
-  `_gh_backup_before_task1598_fidelity_repair_20260829T014742Z`; snapshot anterior:
-  `_gh_backup_before_task1598_fidelity_repair_20260829T013649Z`; snapshot anterior:
-  `_gh_backup_before_task1598_fidelity_repair_20260829T012818Z`; snapshot anterior:
-  `_gh_backup_before_task1598_fidelity_repair_20260829T012433Z`; snapshot previo:
-  `_gh_backup_before_task1598_fidelity_repair_20260829T011226Z`; snapshot previo:
-  `_gh_backup_before_task1598_fidelity_repair_20260829T010201Z`. Snapshots iniciales:
-  `_gh_backup_before_task1598_20260829T001722Z`, `_gh_backup_before_task1598_render_fix_20260829T002005Z`,
-  `_gh_backup_before_task1598_index_20260829T002549Z`; menu:
-  `_gh_backup_before_task1598_menu_20260829T003200Z`.
-- No se creó un lead o booking ficticio. La primera interacción humana validará los recibos reales; no es un paso de
-  rollout pendiente de la página.
-
-**Hardening SEO/AEO final 2026-08-29:** title `Agencia de influencers y UGC para marcas | Efeonce`, description de
-147 caracteres, canonical autorreferente, `index, follow`, excerpt y metadata social diferenciada. El attachment
-`251693` sirve una imagen OG/Twitter PNG `1200×630`. Yoast conserva `WebPage`, `BreadcrumbList`, `WebSite` y
-`Organization`; el bloque page-scoped añade sólo `Service` con cinco ofertas y `FAQPage` con seis respuestas visibles,
-sin duplicar breadcrumb o entidad. El menú queda en `Soluciones → Servicios Destacados`, inmediatamente después de
-`Redes Sociales`. `pnpm public-website:verify-influencer-seo-package` y el gate de fidelidad final pasaron live. Hash
-Elementor posterior al hardening SEO, previo al refinamiento visual:
-`580f4f604dd1e6ef911b397568fd9575f2117db01c6793d02dc98162bb4ac2f9`; rollback inmediato:
-`_gh_backup_before_task1598_seo_20260829T024347Z`. Auditoría:
-`docs/audits/public-site/2026-08-29-influencer-landing-seo-aeo-readback.md`. La indexación efectiva se comprobará en
-Search Console; no se infiere del estado `publish + index`.
-
-**Refinamiento visual final 2026-08-29:** la franja bajo el hero es ahora un rail editorial de tres pruebas y cuatro
-marcas; `#mecanismo` usa un plano Midnight de cuatro capas; los destinos de assets incorporan seis iconos monocromos
-semánticos; `activationType` usa megáfono y el contador del objetivo queda a 8 px del textarea. Hash Elementor
-`1263574659f2d9cec139d3c8d11cf15a78bf8023b8894589ac1356395b1f6c57`; rollback
-`_gh_backup_before_task1598_visual_refinement_20260829T105059Z`. Gates live de fidelidad y SEO/AEO verdes; capturas
-`.captures/task1598-influencer-fidelity-2026-08-29T11-00-28-401Z/`. Sin lead ni booking de prueba.
-
-**Dock premium live 2026-08-29:** `#sticky-cta` es ahora un dock Midnight flotante/contenido con safe-area; reunión
-permanece como único CTA sólido verde y brief usa contorno blanco transparente con `arrow-up-right`. Hash Elementor
-`f89834a27c2727e4a680b5c50241b2b43baed5e6b0bc66d33b61eb09eda40df2`; rollback
-`_gh_backup_before_task1598_sticky_dock_20260829T110607Z`. Fidelidad verde en 1536/1440/890/390 y reduced motion,
-SEO/AEO sin drift; capturas `.captures/task1598-influencer-fidelity-2026-08-29T11-08-21-257Z/`. Sin lead ni booking.
-
-**Selects premium live 2026-08-29:** Growth Form v2 `fver-9c4f447b-a233-46db-b3f3-42c6fce5f9d2` usa
-`diagnostic_premium`; v1 quedó deprecada con campos, Turnstile, policies y destino preservados. Mercado y activación
-son comboboxes renderer-owned con 11 marcas semánticas page-scoped. Hash Elementor
-`f4ff2abf522d7cf1ff1c787f805ae4e11793a4d6527aeed4bf89b51bbfa56ebc`; snapshots
-`_gh_backup_before_task1598_premium_select_icons_20260829T111651Z` y
-`_gh_backup_before_task1598_premium_submit_width_20260829T111903Z`. Fidelidad/SEO verdes; capturas
-`.captures/task1598-influencer-fidelity-2026-08-29T11-19-13-501Z/`. Sin submit ni booking.
-
-**Trust marquee compartido live 2026-08-29:** el rail estático de cuatro logos fue reemplazado por el widget
-canónico `greenhouse_social_trust` de `/servicios/redes-sociales/`; las tres señales regionales permanecen arriba.
-El módulo entrega `logoMarquee.v2`, 3×7 logos monocromáticos y label/nombre accesible. Hash Elementor
-`f8181a2f7dbdd28a462d30874f21d234592e95dc32de07bb41b9c1f677b88c5a`; rollback
-`_gh_backup_before_task1598_social_trust_marquee_20260829T112706Z` +
-`_gh_backup_before_task1598_social_trust_shell_20260829T112922Z`. Fidelidad verde en 1536/1440/890/390 y reduced
-motion, SEO/AEO sin drift; capturas `.captures/task1598-influencer-fidelity-2026-08-29T11-29-33-710Z/`.
-
-**Cierre responsive/tipográfico live 2026-08-29:** la divulgación IA es full-bleed y ya no deja un bloque vacío a
-1414 px. El brief usa documento, Poppins 700 sólo en título y Geist 600/400 por función; desaparece el peso 650.
-`#firma` conserva duraciones pero sustituye fechas ficticias por contexto estable de publicación/pauta/canales, con
-chips tonales sobre Midnight. `ofertas-brief` adopta contorno navy e icono diagonal. Hash Elementor
-`64a567e36e212e19d0f447c2de8ab40fabcfcdfcb5c98b42dffd5e39058701f2`; rollback
-`_gh_backup_before_task1598_typography_rights_20260829T113812Z`. Fidelidad verde en 1536/1440/1414/890/390 y
-reduced motion; SEO/AEO sin drift; capturas `.captures/task1598-influencer-fidelity-2026-08-29T11-40-22-681Z/`.
-Sin submit ni booking.
-
-**Saneamiento de iconos de selects live 2026-08-29:** el host dejó de dibujar un segundo caret y de reservar un rail
-azul; cada combobox conserva únicamente el indicador renderer-owned, alineado al borde. Las 11 marcas semánticas
-usan superficie tonal clara en lugar de bloque azul sólido. Hash Elementor
-`a30c289549da86dd02f50d8b2232a908235bed7092d3a0375389a4c1a1307634`; rollback
-`_gh_backup_before_task1598_select_icon_cleanup_20260829T122700Z`. El gate exige un caret por trigger, ausencia del
-pseudo host y pictogramas no sólidos en 1536/1440/1414/890/390; capturas
-`.captures/task1598-influencer-fidelity-2026-08-29T12-06-14-474Z/`. Sin submit ni booking.
-
-**Paleta de submit + banderas live 2026-08-29:** el submit del brief usa azul Efeonce/white en lugar del teal del
-renderer. CL/CO/MX/PE usan SVG circulares locales en lista y valor seleccionado; están centradas explícitamente,
-sin blur y con outline nítido. Región/otro conservan pictogramas. Hash Elementor
-`353bac5d3d7491cb77f337296e5ab0bace14a18e99055d449ea25134217e52a5`; rollback inmediato
-`_gh_backup_before_task1598_flag_optical_refine_20260829T132000Z`; snapshot anterior
-`_gh_backup_before_task1598_submit_market_flags_20260829T125000Z`. El gate verifica color, contraste, flags,
-persistencia, teclado/ARIA y overflow en 1536/1440/1414/890/390; capturas
-`.captures/task1598-influencer-fidelity-2026-08-29T12-26-32-586Z/`. Sin submit ni booking.
-
-**Canon documental final 2026-08-29:** el tratamiento del brief queda nombrado y documentado como
-[`Editorial Premium Brief`](docs/ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md). Es una composicion host
-candidate —una sola card, jerarquia Poppins/Geist, submit azul y decoracion semantica— sobre el renderer
-`diagnostic_premium`; no mueve campos, valores, listbox, validacion, Turnstile o destino a WordPress. La frontera se
-sincronizo en arquitectura, funcional, manuales, registro de primitives y mirrors `.codex/.claude`. El gate live se
-revalido sin mutar la pagina: `.captures/task1598-influencer-fidelity-2026-08-29T12-35-54-355Z/`; hash y rollback
-vigentes siguen siendo `353bac5d3d7491cb77f337296e5ab0bace14a18e99055d449ea25134217e52a5` y
-`_gh_backup_before_task1598_flag_optical_refine_20260829T132000Z`.

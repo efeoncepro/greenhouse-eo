@@ -1593,9 +1593,11 @@ Con el keyset por `rank_in_snapshot` esas dos disciplinas quedan retiradas del r
 cursor es un entero (base64url, opaco — ningún consumer lo construye a mano; uno del formato
 viejo o corrupto decodifica a `null` y reinicia desde la primera página, jamás saltea), no hay
 `NULL` en la llave, y no hay collation que sincronizar. El índice viejo
-`seo_work_queue_items_keyset_idx` (`…work-queue-keyset-collation.sql`) quedó huérfano del
-reader nuevo; su retiro es **contract y va después del release** — hasta la promoción, el
-reader desplegado en producción sigue usando el ORDER BY reconstruido y ese índice.
+`seo_work_queue_items_keyset_idx` quedó huérfano del reader nuevo y fue **retirado después del
+release** que promovió el fix (`e1718a359575`, 2026-08-29) — migración `20260829225504734`, con
+guard doble (viejo ausente + `seo_work_queue_items_rank_unique_idx` presente). Secuencia
+contract-después-del-release cumplida: hasta la promoción, el reader desplegado seguía usando el
+ORDER BY reconstruido y ese índice.
 
 La paginación es **estable por construcción**: el universo no crece bajo el cursor porque el snapshot
 es inmutable — recomputar es una fila nueva. Eso resuelve de raíz el problema declarado en

@@ -37,10 +37,12 @@ del vocabulario: insumos medidos, resultado estimado) para `priorityScore`,
 `expectedCtrAtTarget` y `snippetCeilingClicks` — con cobertura hoja por hoja en
 `work-queue/__tests__/provenance-coverage.test.ts` y el censo en `emitted`.
 
-**Follow-up con dueño (contract post-release):** el índice
-`seo_work_queue_items_keyset_idx` (migración `20260829000423538`) quedó huérfano del reader nuevo,
-pero el reader desplegado en producción lo usa hasta la próxima promoción — retirarlo en migración
-aditiva DESPUÉS del release que promueva este fix, no antes.
+**Rollout CERRADO (release `e1718a359575`, manifest `released` 2026-08-29 22:49Z, run
+`33279083461`):** canary de contrato verde contra el lane de producción — `provenance` presente
+(`gsc` + `own_ctr_model`) y rank monotónico 1..N con banda 2 poblada (efeonce 105/105; antes 54/55
+fuera de orden); Berel paginada entera por producción: 6 páginas, 501/501, secuencia == persistida.
+El índice keyset huérfano quedó RETIRADO después del release (migración `20260829225504734`, guard
+doble: viejo ausente + `seo_work_queue_items_rank_unique_idx` presente).
 
 ## Delta 2026-08-29 (2) — `incremental-clicks-v2`: el predicado de canibalización medía MARCA
 

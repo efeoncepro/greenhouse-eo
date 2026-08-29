@@ -7,6 +7,25 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-29 — release `e1718a359575`: dos guardas textuales fallaron el mismo día con signos opuestos
+
+El 4.º paso a producción del día promovió el fix de banda 2, el gate de cobertura del worker y la
+quema de la deuda de procedencia. Manifest `released` en un solo run del orquestador; canary de
+contrato verde por el lane de producción (provenance + rank monotónico — sólo el código nuevo lo
+produce) y Berel paginada entera: 501/501, secuencia == persistida. El índice keyset huérfano se
+retiró después del release (migración `20260829225504734`), como el contrato manda.
+
+El desvío enseñó el patrón del día: CI Deep rojo sobre el primer squash porque el test del contrato
+del deploy del worker contaba ocurrencias de string en el YAML — el proxy textual de un mecanismo
+que 146070ffc había reemplazado por cobertura de metafile. La misma clase que el string-match del
+ORDER BY del reader, con signo opuesto: aquél pasaba verde con banda 2 rota; éste se puso rojo con
+la cobertura mejorada. Una guarda textual debe señalar al verificador real, no reemplazarlo. Y la
+parte que no era del pipeline: develop estuvo rojo dos veces con ese test sin que nadie lo abriera,
+y el run del commit culpable fue cancelado por `cancel-in-progress` — en ráfagas, el veredicto es
+del último push, no de cada commit. El skip de 44 s del ops-worker esta vez fue legítimo (árboles
+idénticos, diff completo vacío): mismo síntoma que el incidente anterior, causa opuesta — los
+distingue el diff, no el cronómetro.
+
 ## 2026-08-29 — la cuarta llave invisible: el orden servido de la cola contradecía el rank persistido en banda 2
 
 Auditoría independiente post-release sobre el snapshot vigente: 54 de 55 items de banda 2 de
@@ -953,16 +972,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - Lo que no cambió: una prueba ya asignada sigue sin reintentarse (para eso está cancelar), y un bloqueo del
   carril automático —al mover de etapa— todavía no se destraba solo; hay que asignar a mano.
 - Sin migración ni flags. Verificado contra PostgreSQL real, no sólo con tests.
-
-## 2026-08-21 — El correo de selección celebra sin adelantar la incorporación
-
-- El asunto identifica nombre y vacante; el título visible evita duplicar el saludo y el cuerpo explica la
-  secuencia real: selección, carta oferta, aceptación y firma del contrato.
-- Las tres primeras rutas fueron rechazadas por resultar tecnológicas, genéricas o demasiado abstractas. Diseño +
-  Talent convergen en una V4 concreta: icono 3D de sobre abierto, tarjeta sin texto, check de confirmación y un único
-  destello naranja. El PNG transparente pesa 63.972 bytes y su URL respondió `200 image/png`.
-- HTML y texto plano conservan la misma verdad; la variante de rechazo no carga el hero. Código completo con
-  captura local revisada. La decisión, la carta oferta y el contrato reciben negritas visibles sobre frases
-  completas; las dos variantes de decisión firman `Equipo de Talento · Efeonce`, sin atribuir el mensaje a una
-  persona inexistente.
-  Rollout del template pendiente y ningún correo real enviado.
