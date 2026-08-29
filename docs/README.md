@@ -30,6 +30,15 @@ Indice maestro de la documentacion no operativa del repo.
 - La estrategia define la tesis de compañía, categoría, modelo ASaaS, portafolio, vehículos de capital y gates
   de fundraising; no autoriza por sí sola emisiones, deuda, spinouts, transferencias de IP ni compromisos legales.
 
+### Commercial
+
+- [Índice y contrato de documentación comercial](commercial/README.md)
+- [Sales Goals Operating Model V1](commercial/SALES_GOALS_OPERATING_MODEL_V1.md)
+- [Sales Goals Q4 2026 y marco 2027](commercial/SALES_GOALS_2026_Q4_2027.md)
+- [CRM Deal Register](commercial/CRM_DEAL_REGISTER.md)
+- Esta categoría conserva metas, forecast e índices de oportunidades. HubSpot sigue siendo la autoridad de los
+  Deals y Finance conserva facturación, revenue, cobro, costos y margen.
+
 ### Services
 
 - [Catálogo de servicios Efeonce](services/README.md)
