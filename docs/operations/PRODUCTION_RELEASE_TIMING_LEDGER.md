@@ -487,10 +487,19 @@ discovery_candidate        49  →   49
    como reciente. Verificado empíricamente: `force=false` → `materialized=2, reused=0`.
    Hace el trabajo Y prueba la red de seguridad; el `force` sólo lo primero.
 
-3. **El «200 → 11» subestima el arreglo.** `maxItemsPerOrigin` es 200 y v1 tenía
-   `consolidation` clavado en el tope: saturado y truncado, o sea el número real era
-   ≥200. Las 114 que «desaparecieron» se explican por el mismo cap —`gsc_striking_distance`
-   quedó también en 200— y no por filtrado de más.
+3. **Los dos números principales son topes, no cuentas — y hay que leerlos así.**
+   `maxItemsPerOrigin` es 200. v1 tenía `consolidation` clavado exactamente en 200
+   (saturado y truncado: el real era ≥200) y v2 dejó `gsc_striking_distance` también
+   exactamente en 200. O sea que **la cola vigente no dice cuánto trabajo hay, dice
+   cuánto cabe**, y el «168 → 200» es un piso, no la ganancia. Las 114 que
+   «desaparecieron» se explican por ese cap, no por filtrado de más.
+
+   Medido para dimensionar la brecha: el predicado canónico
+   (`SEO_KEYWORD_OPPORTUNITIES_SQL`, ventana 8–20, umbral p75 con piso 10) da **1748**
+   queries elegibles para Berel; el colector pide `maxItemsPerOrigin * 3` = **600**,
+   filtra canibalización/decisiones y recorta a **200**. Tres etapas distintas, y quien
+   cite una por otra se equivoca por un orden de magnitud — a mí me pasó al medir 1748 y
+   compararlo contra un conteo post-filtro de otra sesión como si midieran lo mismo.
 
 4. **Un testigo que no estaba en el «antes» no es testigo.** Predije que `pinturas`
    saldría `gsc_striking_distance` con `mainPageShare ≈ 0.996`. Salió `aeo_gap`/`optimize`,
