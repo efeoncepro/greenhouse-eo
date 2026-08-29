@@ -235,8 +235,13 @@ describe('TASK-1700 — la salud entra al hash', () => {
     // harían que cada corrida fuera "distinta" y la idempotencia quedaría decorativa.
     const a = item({ normalizedKeyword: 'uno' })
 
-    const wordingA = [{ origin: 'aeo_gap' as const, state: 'degraded' as const, reason: 'texto A', asOf: '2026-01-01', itemCount: 2 }]
-    const wordingB = [{ origin: 'aeo_gap' as const, state: 'degraded' as const, reason: 'texto B', asOf: '2026-02-02', itemCount: 2 }]
+    const wordingA = [
+      { origin: 'aeo_gap' as const, state: 'degraded' as const, reason: 'texto A', asOf: '2026-01-01', itemCount: 2 }
+    ]
+
+    const wordingB = [
+      { origin: 'aeo_gap' as const, state: 'degraded' as const, reason: 'texto B', asOf: '2026-02-02', itemCount: 2 }
+    ]
 
     expect(computeInputSnapshotHash('v1', [a], wordingA)).toBe(computeInputSnapshotHash('v1', [a], wordingB))
   })
