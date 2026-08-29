@@ -152,8 +152,13 @@ export const SEO_LENS_SURFACES: readonly SeoLensSurface[] = [
     kind: 'figures',
     provenance: {
       pending:
-        'Deuda de SECUENCIA, no de diseño: su reader y sus contracts están bajo edición activa del dueño ' +
-        'del aggregate (TASK-1700), y agregar procedencia exige tocar esos dos archivos exactos. Las lentes ' +
+        'Deuda de SECUENCIA, no de diseño. CONDICIÓN DE SALIDA EXPLÍCITA: se cierra cuando aterrice el fix ' +
+        'del orden servido de la cola — el reader ordena por `priority_score DESC NULLS LAST` y en banda 2 ' +
+        'ese campo es NULL para TODOS, así que colapsa a orden alfabético y contradice el `rank_in_snapshot` ' +
+        '(medido en producción: 54 de 55 items de banda 2). Ese fix reescribe el ORDER BY y el DTO del ' +
+        'reader, que son los dos archivos exactos que esta deuda necesita tocar; hacerlo antes es colisión ' +
+        'garantizada. NO volver a redactar esta razón como un ESTADO ("está bajo edición activa"): esa forma ' +
+        'ya caducó en silencio una vez y dejó la exención viva sin dueño. Las lentes ' +
         'YA están determinadas y quedan escritas acá para que quien la tome no las redescubra: el breakdown ' +
         'es append-only, `mainPageShare` es ● medida (sale de `seo_gsc_daily`) y `snippetCeilingClicks` es ' +
         '◑ estimada (deriva de la curva de CTR propia — insumos medidos, resultado estimado). Es el caso ' +
