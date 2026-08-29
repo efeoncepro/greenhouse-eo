@@ -333,7 +333,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1791` — [creada 2026-08-27, backend-data] **Señal de pertinencia del candidato.** Dos
   productores de candidatos y ninguno declara pertinencia; un término ajeno pasa todos los checks.
   Señal con evidencia, nunca filtro. Composición en memoria: `grader_brand_intelligence` es `grader_*`.
-- `TASK-1792` — [creada 2026-08-28, backend-data] **La curva de CTR declara si es utilizable, o la
+- `TASK-1792` — [✅ complete 2026-08-28, backend-data] **La curva de CTR declara si es utilizable, o la
   lente no ordena.** Un `0` medido pasa el guard de `expectedCtrAt` y anula el fallback: el score
   colapsa y el `.sort()` es un no-op. Medido contra PG: Efeonce 24/24 filas en cero. El disparador
   es cualquier org con ≥10 impresiones y 0 clics en el bucket objetivo — todo target nuevo. Adopta
@@ -941,6 +941,16 @@ abarata por cadencia y muestreo (`TASK-1704`).
   **Prohibido ordenar por volumen estimado cuando
   existe demanda medida**: es el invariante ●/◑ aplicado al ORDENAMIENTO, no sólo a la
   visualización.
+
+  ⚠️ *Precisado 2026-08-28 (`TASK-1792`): el diferenciador (a) es cierto **cuando el sitio tiene
+  muestra en la posición objetivo**, y sólo ahí. Medido: de las dos organizaciones con serie, una
+  la tenía y la otra no (75 impresiones y 0 clics en el bucket objetivo). Afirmarlo sin la
+  precondición es la misma clase de promesa que la corrección de 2026-08-15 retiró. Lo que SÍ es
+  defendible sin asterisco, y es más fuerte: cuando la curva propia no alcanza se **estima el nivel
+  del sitio con su propio agregado y se presta sólo la forma** —un parámetro medido en vez de veinte
+  prestados— y el contrato **declara** en cuál de los cuatro estados está cada lectura, de modo que
+  nadie puede citar un techo sin saber de dónde salió. Validación del método: el nivel de `berel.com`
+  contra una curva de referencia que no lo incluye da **1,048**.*
 - **La cola llega antes que `TASK-1669`.** Es el modo de falla #1: dos ordenamientos que discrepan y
   un operador que ve un #1 en la pantalla y otro en el plan del día.
 

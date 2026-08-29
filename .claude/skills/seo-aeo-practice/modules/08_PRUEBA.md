@@ -131,6 +131,12 @@ Por qué vende:
   **son sus impresiones, medidas por Google.**
 - ✅ **Sale en clics, no en puntos de un índice.** El score es *clics incrementales estimados* — unidad que el
   CFO entiende y que después **se verifica en la casa del cliente**, no en nuestro dashboard *(regla 7)*.
+  🔴 **Y acá está la precondición que casi nadie enuncia:** ese número sale de **la curva de CTR del propio
+  sitio**, así que **sólo existe si el bucket de la posición objetivo tiene impresiones suficientes en ESE
+  sitio.** En un sitio joven, el bucket puede traer **75 impresiones y cero clics** — y ese cero no dice
+  *"convierte cero"*, dice *"nadie midió lo suficiente"*. **Sin muestra no se muestra el techo: se muestra el
+  ORDEN** *(impresiones reales × cercanía a página 1)*, que sigue siendo demanda medida. → SKILL.md regla
+  dura **10**.
 - 🎯 **Separa dos trabajos que el mercado vende revueltos:** empujar una query que está en posición 8–10 **no
   es** consolidar una query canibalizada. Mostrar esa distinción **prueba método sin prometer nada.**
 
@@ -148,6 +154,9 @@ consolida con ~48h de retraso. **Nunca muestres "ayer"** — es un cero que no e
 1. 🔴 **NUNCA inventes un caso.** Ni "ilustrativo", ni "de mercado", ni redondeado.
 2. 🔴 **NUNCA prometas revenue por citación en IA.** **No existe el modelo.**
 3. 🔴 **NUNCA prometas rankings.**
+   - 🔴 **Y su hermano:** **NUNCA muestres un techo de clics sin declarar si el sitio tiene muestra para su
+     propia curva de CTR.** Es el mismo defecto — un número preciso que el cliente va a citar y que nadie
+     observó *(SKILL.md regla dura **10**)*.
 4. ✅ **SIEMPRE lleva el puente**: +35% orgánico / +91% paid, **medido en la casa del cliente**.
 5. ✅ **SIEMPRE declara el denominador** de cualquier número que uses.
 6. 🎯 **SIEMPRE enseña la lista de lo que te niegas a prometer.** **Es más persuasiva que la otra.**

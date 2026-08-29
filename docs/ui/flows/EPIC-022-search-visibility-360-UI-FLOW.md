@@ -476,7 +476,7 @@ no` de `TASK-1665`.
   tamaño = clics incrementales, color + forma = acción. El punto 1 del delta anterior tenía razón en la
   **decisión** aunque su premisa expiró: el mercado estimado **es columna y filtro, nunca eje**. Los
   ejes medidos son correctos con o sin él.
-- **El orden de la tabla sigue saliendo de la ganancia estimada** (dato medido). El volumen de mercado
+- **El orden de la tabla sigue saliendo de la ganancia estimada** (dato medido) **sólo cuando la curva de CTR del sitio mide en la posición objetivo. Cuando no, el servidor ordena por demanda medida y lo declara en `orderedBy`; la superficie NUNCA debe prometer un orden por ganancia sin leer ese campo (TASK-1792)**. El volumen de mercado
   dimensiona y explica; no prioriza.
 - **● y ◑ no se promedian ni se sustituyen jamás**, y toda cifra estimada viaja con su as-of.
 

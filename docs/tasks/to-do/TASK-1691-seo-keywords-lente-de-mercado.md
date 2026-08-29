@@ -62,7 +62,20 @@ Dos cosas que cambian el trabajo de esta task respecto de lo anunciado:
    en `orderedBy`. Como la tabla re-ordena en cliente y `Array.prototype.sort` es estable, el orden
    que ve el usuario YA está corregido. Lo que falta es que la etiqueta deje de prometer un orden
    por ganancia cuando `orderedBy === 'measured_demand'`.
-2. **`estimatedClickGain` sigue siendo `number`, y ya no colapsa a 0.** La decisión de volverlo
+3. **Dos strings MÁS, que el barrido de drift destapó después del Delta (2)** y que no estaban
+   anotadas — mismo archivo, misma familia:
+   - `src/lib/copy/growth.ts:2234` (`colGainHint`) — *"Clics adicionales por mes si llegaras a la
+     posición objetivo, **según la curva de CTR de tu propio sitio**"*. Es el tooltip de la columna,
+     o sea lo que el operador le muestra al cliente, y es falso en **3 de los 4 estados**: sólo
+     `org_measured` sale de la curva propia.
+   - `src/views/greenhouse/admin/growth/seo/keywords/KeywordOpportunityTable.tsx:118` — el comentario
+     *"Default: la mayor ganancia estimada arriba"* congela junto al `sort` de la vista un supuesto
+     que el servidor ya no siempre cumple.
+   Y el mecanismo del problema, para que la corrección no sea sólo de texto:
+   `KeywordOpportunityTable.tsx:326` pinta `sortedByGain` **incondicional**, sin leer `orderedBy`.
+   Mientras eso siga así, la etiqueta miente por construcción — no por redacción.
+
+4. **`estimatedClickGain` sigue siendo `number`, y ya no colapsa a 0.** La decisión de volverlo
    `number | null` sigue abierta y es de esta task, pero el argumento cambió: hoy el número siempre
    existe y es un techo honesto con procedencia declarada, así que el `null` deja de ser urgente y
    pasa a ser una decisión de ergonomía del render.

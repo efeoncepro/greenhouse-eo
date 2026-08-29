@@ -141,7 +141,7 @@ no hay nada que configurar.
 | **Barrera "Baja"** | ⚠️ **No significa "facil".** Significa que ahi **se compite con contenido y autoridad de dominio, no con enlaces**: es una oportunidad para un dominio fuerte. Leerlo como "trivial" es el error clasico |
 | **"Sin dato"** en Volumen o Barrera | Esa keyword **no se consulto** al proveedor, o el proveedor **no la tiene**. Es un hueco: no es un cero y **no es "Baja"** — presentar un hueco como barrera baja afirma una oportunidad que nadie midio |
 | "+N clics/mes est." | Clics adicionales si llegara a la posicion objetivo. Es un **techo, no un pronostico**. Sale de la curva de CTR **del propio sitio** cuando hay historia suficiente en esa posicion; si no, de una curva de referencia ajustada al nivel del sitio. La pantalla **todavia no dice cual de los dos** — ver "Cuando el techo de clics no puede ordenar la lista" |
-| "Sin ganancia estimada" | No es falta de dato: esa keyword ya convierte mejor que el promedio de la posicion objetivo |
+| "Sin ganancia estimada" | **Depende del estado de la curva** (ver la seccion de arriba). Si la curva de tu sitio SI mide en la posicion objetivo, significa que esa keyword ya convierte mejor que ese promedio. Si NO mide, significa que **no hubo con que comparar** — y ahi el cero no es un hallazgo, es un hueco. Nunca lo presentes como "ya esta bien" sin mirar de donde salio el techo |
 | "X de 200 keywords seguidas" | El cupo del set monitoreado. Cada keyword vigente se cobra en cada ciclo diario |
 | **Dejar de seguir** | Ya esta en el set. Pulsalo para sacarla del ciclo diario y liberar cupo |
 | **Paginas** | Cuantas paginas tuyas aparecen para esa busqueda. Mas de una = compiten entre si, y ese numero decide la urgencia de consolidar |

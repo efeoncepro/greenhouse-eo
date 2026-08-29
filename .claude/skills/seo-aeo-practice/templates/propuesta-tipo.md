@@ -86,7 +86,14 @@ EXPANSIÓN (opcional)                                       ← +mercado · +mar
 | ✅ **Cobertura de superficie** | 🔴 Tráfico garantizado |
 | ✅ **Salud técnica** *(CWV, schema, indexación)* | 🔴 **Revenue atribuido a IA** |
 | ✅ **Velocidad de publicación** | |
-| ⚠️ Clics orgánicos *(se proyecta, no se garantiza)* | |
+| ⚠️ Clics orgánicos *(se proyecta, no se garantiza — **y sólo si su sitio tiene muestra para su propia curva de CTR**)* | 🔴 Un **techo de clics** sobre un sitio sin muestra *(regla dura **10**)* |
+
+🔴 **Si el sitio del cliente todavía no tiene muestra en los buckets del top-10** *(pasa en sitios jóvenes y
+en marcas con poca superficie ranqueada)*, **no se pone un techo de clics en la propuesta.** Se pone el
+**orden** — *"estas son sus oportunidades ordenadas por impresiones reales y por cercanía a página 1"* — y se
+declara en una línea: *"la proyección en clics se habilita cuando su propia serie de Search Console acumule
+suficientes impresiones en esas posiciones; mejora sola con el tiempo, no hay nada que configurar"*.
+🎯 **Decirlo tú antes de que lo pregunte el comité es exactamente el gesto de §0.**
 
 🎯 **Y el puente:** *"Las marcas citadas reciben +35% de clics orgánicos y +91% de pagados.
 **Y eso se mide en TU GA4 y TU cuenta de Ads. No en un dashboard mío.**"*
@@ -124,3 +131,5 @@ EXPANSIÓN (opcional)                                       ← +mercado · +mar
 - [ ] 🔴 **¿Pasé por el cotizador y el margen es ≥ 45%?**
 - [ ] 🔴 **¿Ningún plan está dominado? ¿Ningún precio unitario por artículo?**
 - [ ] 🔴 **¿Cero casos inventados?**
+- [ ] 🔴 **¿Todo techo de clics que aparece tiene muestra detrás en la curva de CTR del cliente?** *(Si no: va
+      el orden, no el número — regla dura **10**.)*
