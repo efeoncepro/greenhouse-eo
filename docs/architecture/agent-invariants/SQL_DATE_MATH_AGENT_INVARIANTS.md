@@ -1,4 +1,4 @@
-# SQL / Date-math — invariantes operativos para agentes
+# SQL embebido en TS — invariantes operativos para agentes
 
 > **Companion de `CLAUDE.md` (router de dominios, TASK-1160).**
 > Extraído inline → load-on-demand el 2026-07-10 durante el release de TASK-1362:
@@ -7,8 +7,21 @@
 > (1.648 tokens, 125 líneas de runbook inline) y es justo la clase de contenido que el router manda
 > a su spec. Contenido **verbatim**, sin pérdida (validado por `claude-md audit --strict`).
 >
-> **Cargar este doc al escribir CUALQUIER query SQL embebida en TS** (signal readers, reliability
-> queries, materializers, audit scripts), o al tocar date-math en SQL.
+> **Cargar este doc al escribir CUALQUIER query SQL embebida en TS** (readers, commands,
+> materializers, signal/reliability queries, audit scripts, paginación), en **cualquier dominio**.
+>
+> ⚠️ **El nombre del archivo dice `SQL_DATE_MATH`, pero el alcance es TODO el SQL embebido.**
+> Nació con la date-math de `TASK-893` y fue creciendo con cada familia que comparte la misma raíz —
+> `NOW()` vs `clock_timestamp()` (`TASK-1308`), aislamiento de sanity scripts (`TASK-1300`), orden y
+> paginación (`TASK-1700`). El archivo **conserva su nombre a propósito**: lo citan una docena de
+> tasks, el `agent-context-router.json`, skills y el changelog, y renombrarlo rompería esos punteros
+> sin agregar una sola regla. Lo que se corrige es el encabezado, para que el nombre no siga
+> mintiendo sobre lo que contiene.
+>
+> **La raíz común de todo lo que vive acá:** son defectos del **SQL**, y los tests con mocks
+> ejercitan el **TypeScript**. Un mock del cliente `pg` acepta cualquier string SQL y devuelve las
+> filas que le pidan, así que da todos estos bugs por buenos, en verde. La única detección es
+> ejercitar la query contra PostgreSQL real antes de mergear.
 
 ### SQL Signal Reader Schema Validation Gate (TASK-893 hotfix #3, desde 2026-05-16)
 
@@ -137,6 +150,30 @@ FROM greenhouse_finance.account_balances;
 
 ---
 
+> **Movido verbatim desde `CLAUDE.md` el 2026-08-28 (TASK-1700 follow-up).** Es la MISMA familia que
+> el gate de arriba —SQL que revienta contra PG real y que los mocks dan por bueno—, y vivía inline en
+> el router mientras sus hermanas ya estaban acá. Su traslado liberó el presupuesto que hacía falta
+> para que el pointer de `CLAUDE.md` nombrara las bug classes nuevas.
+
+### SQL embebido — type alignment + live testing (ISSUE-071, 2026-05-08)
+
+Cualquier query SQL embebido en TS que use **uniones de tipos** (COALESCE de subqueries, CASE WHEN, NULL coalescing entre tipos heterogéneos) debe **ejercitarse contra PG real ANTES de mergear**, no solo via mocks Vitest.
+
+**Bug class** (ISSUE-071): el CTE `subject_admin` del relationship resolver de TASK-611 hacía `SELECT 1 AS is_admin` (integer) pero el `COALESCE((SELECT is_admin FROM subject_admin), FALSE)` combinaba con boolean. PG rechaza con `COALESCE types integer and boolean cannot be matched`. El catch silencioso convertía el throw a `degradedMode=true` y el banner "Workspace en modo degradado" se mostraba al usuario. Bug latente desde el merge de TASK-611, descubierto solo cuando un usuario real ejerció el path post TASK-613 V1.1.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** mergear queries con CTEs + COALESCE/CASE/NULL handling sin un live test contra PG (vía `pg:connect` proxy + `pnpm tsx`, o `*.live.test.ts`).
+- **NUNCA** confiar SOLO en unit tests con mocks para validar type alignment SQL. Los mocks ejercitan la lógica TS, NO el SQL crudo.
+- **SIEMPRE** que `COALESCE((SELECT ... FROM cte), default)`, verificar que el tipo del SELECT del CTE matchee el tipo del `default`. PG hace casting implícito entre tipos numéricos (INT → NUMERIC) pero NO entre INT y BOOL ni entre TEXT y NUMERIC.
+- **SIEMPRE** que un read path tenga catch + degraded mode honesto (correcto desde safety perspective), confirmar que `captureWithDomain` está emitiendo a Sentry — sino el bug class queda completamente oculto al equipo y aparece solo cuando un usuario real reporta el síntoma.
+
+**Defense-in-depth recomendado**: cuando una query nueva emerja, agregar un script temporal `scripts/<dominio>/_sanity-<query-name>.ts` (gitignored o committed según necesidad) que la ejecute contra el proxy local con datos reales. Después del primer ejercicio exitoso el script es opcional pero útil como debugging aid futuro.
+
+**Spec canónica**: `docs/issues/resolved/ISSUE-071-workspace-relationship-resolver-coalesce-type-mismatch.md`.
+
+---
+
 ### `NOW()` vs `clock_timestamp()` al cerrar una ventana append-only (TASK-1308, medido 2026-08-07)
 
 Caso hermano del anterior: **mismo patrón** (SQL que los mocks de TS no ejercitan, descubierto sólo
@@ -192,6 +229,138 @@ command que compone alta y baja, o cualquier recovery. Es decir: aparece justo c
 
 **Caso fuente**: `untrackKeywords` en `src/lib/growth/seo/track-keywords.ts` (cierra la membresía de
 una keyword seguida; el comentario del `UPDATE` conserva el porqué in situ).
+
+---
+
+### Orden y paginación: dos bug classes que ningún mock ve (TASK-1700, medido 2026-08-28)
+
+Tercera familia del mismo gate. Allá el error era de **tipo** (`date - date` no da interval), después
+de **momento** (`NOW()` no avanza dentro de la transacción); acá es de **orden**: el SQL corre sin
+lanzar nada y devuelve las filas equivocadas, o menos filas de las que hay. **No las mira ningún lint
+de tipos, ningún `typecheck` y ningún test con mocks** — un mock del cliente `pg` acepta cualquier
+string SQL y devuelve las filas que le pidan, así que ejercita el TypeScript y jamás el SQL. Sólo
+aparecen paginando datos reales de punta a punta.
+
+Las dos se pagaron en `src/lib/growth/seo/work-queue/**`, pero **no son de ese dominio**: muerden a
+cualquiera que ordene o pagine, en finanzas, payroll, delivery o donde sea.
+
+#### 1. Un alias con el nombre de su propia columna rompe el `ORDER BY`
+
+```sql
+-- ✗ PROHIBIDO — el alias se llama igual que la columna que ordena
+SELECT priority_score::text AS priority_score, …
+  FROM greenhouse_growth.seo_work_queue_items
+ ORDER BY priority_score DESC;   -- ordena el TEXTO, no el número
+
+-- ✓ CANÓNICO — el alias no colisiona con el nombre de la columna
+SELECT priority_score::text AS priority_score_text, …
+ ORDER BY priority_score DESC;   -- ordena la columna NUMERIC de la tabla
+```
+
+**Mecanismo (esto es lo que hay que entender, no la regla).** PostgreSQL resuelve una expresión de
+`ORDER BY` que sea un **nombre suelto** contra los nombres de **SALIDA** del `SELECT` *antes* que
+contra las columnas de la tabla — es el comportamiento del estándar SQL para `ORDER BY`, y es lo
+contrario de `WHERE`/`GROUP BY`, que resuelven contra la tabla. Así que `AS priority_score` **secuestra**
+el nombre: el `ORDER BY priority_score` deja de ver la columna `numeric` y pasa a ordenar el `text`
+aliaseado. Y el orden de texto no es el orden numérico: `'8.8612'` va **antes** que `'72.1405'` porque
+compara carácter a carácter y `'8' > '7'`.
+
+🔴 **Por qué se cuela.** No hay error, no hay warning, el `EXPLAIN` se ve sano y el reader responde
+`200`. Síntoma **medido**: la cola servía su primera página empezando en el **rank 17**, con un orden
+que no era el persistido en `rank_in_snapshot`, desde el índice 0. Y es **invisible** con datos de
+juguete: con scores de un solo dígito el orden textual coincide con el numérico, y con la columna
+toda en `NULL` no hay nada que desordenar. Sólo aparece con rango amplio, que es justo lo que hay en
+producción.
+
+- **NUNCA** aliasear una expresión con el nombre de la columna por la que ordenas. Si necesitas
+  castear/derivar para el DTO, el alias lleva sufijo (`…_text`, `…_display`) y el `ORDER BY` se queda
+  con el nombre crudo de la tabla.
+- **NUNCA** "arreglarlo" poniendo `ORDER BY 3` (ordinal) o repitiendo la expresión casteada: lo
+  primero se rompe solo al insertar una columna, lo segundo ordena texto igual.
+- **SIEMPRE** dejar el porqué junto al alias en el SQL. La línea `priority_score::text AS
+  priority_score_text` se lee como una manía si no dice qué pasó la vez que se llamó igual.
+
+#### 2. Ordenar en JS y paginar en SQL exige la MISMA collation
+
+**Mecanismo.** La base corre con collation `en_US.UTF8`, que al comparar **ignora el espacio**: para
+PostgreSQL `berelex` < `berel green`, porque compara `berelgreen` y `e` < `g`. `String.prototype.localeCompare`
+los ordena **al revés**. Cuando el **rank lo asigna JS** (el materializador) y la **paginación por
+keyset la resuelve SQL** (el reader), los dos lados tienen que producir el mismo orden total o el
+cursor apunta a un lugar del universo que el otro lado no reconoce: la paginación **saltea filas en
+silencio**. Medido contra PG real: recorría **631 de 635**. No falla nada — simplemente faltan cuatro.
+
+🔴 **La solución NO es "arreglar el lado JS".** `en_US.UTF8` sale de **glibc** y `localeCompare` de
+**ICU**: son dos tablas distintas, mantenidas por gente distinta, y su coincidencia no se puede
+demostrar — a lo sumo se puede no encontrar el contraejemplo hoy. Se fuerzan **ambos** lados a orden
+de **BYTES**, que sí es reproducible:
+
+```sql
+-- SQL: orden de bytes explícito, en el ORDER BY y en la comparación del cursor
+ ORDER BY score_band ASC, priority_score DESC NULLS LAST, normalized_keyword COLLATE "C" ASC
+```
+
+```ts
+// JS: code points, jamás localeCompare
+if (a.normalizedKeyword === b.normalizedKeyword) return 0
+return a.normalizedKeyword < b.normalizedKeyword ? -1 : 1
+```
+
+**Corolario 1 — el índice también lleva la collation.** Un `ORDER BY … COLLATE "C"` **no puede usar**
+un índice construido con la collation por defecto: son órdenes distintos. El índice de keyset se
+declara con la misma collation que la query, o el plan se cae a un sort completo del snapshot:
+
+```sql
+CREATE INDEX … ON … (snapshot_id, score_band, priority_score DESC NULLS LAST,
+                     (normalized_keyword COLLATE "C"));
+```
+
+**Corolario 2 — con `NULL` en la clave, el cursor NO se escribe como tupla.** La forma compacta
+`(a,b,c) > (x,y,z)` es tentadora y **no ordena** en cuanto uno de los términos puede ser `NULL`: la
+comparación devuelve `NULL`, la fila no pasa el `WHERE`, y el borde de página entrega filas al azar.
+Se escribe **expandida**, banda por banda, declarando explícitamente dónde caen los `NULL` (el
+`ORDER BY` usa `NULLS LAST`, así que el cursor tiene que decir que un `NULL` va *después* de
+cualquier score):
+
+```sql
+   score_band > $band
+OR (score_band = $band
+    AND ( ($score IS NOT NULL AND priority_score IS NOT NULL AND priority_score < $score)
+       OR ($score IS NOT NULL AND priority_score IS NULL)
+       OR ( (($score IS NULL AND priority_score IS NULL) OR priority_score = $score)
+            AND normalized_keyword COLLATE "C" > ($kw::text COLLATE "C") ) ))
+```
+
+- **NUNCA** repartir el orden entre dos runtimes con collations distintas. Si JS asigna el rank y SQL
+  pagina, los dos van a orden de bytes (`COLLATE "C"` + comparación de code points).
+- **NUNCA** usar `localeCompare` para un orden que después se pagina en SQL. Tampoco `.sort()` pelado:
+  su orden es de unidades UTF-16, que **no** coincide con code points fuera del BMP.
+- **NUNCA** declarar un índice de keyset sin la collation que usa la query. Un `COLLATE "C"` en el
+  `ORDER BY` con índice por defecto compila, corre y ordena bien — pero ordena la tabla entera.
+- **NUNCA** escribir la comparación del cursor como tupla cuando alguna clave admite `NULL`.
+- **SIEMPRE** que el desempate sea una `text`, asumir que carga todo el peso del orden: en la corrida
+  fuente había **75 items empatados** en `priority_score = 0.0000`, así que la discrepancia de
+  collation no era un caso de borde, era el orden de media cola.
+
+#### Cómo se detectan (la parte que no se puede saltar)
+
+Ninguna de las dos la ve un test con mocks, y la #1 tampoco la ve un test con datos sintéticos de
+rango corto. **La única detección es paginar una corrida REAL de punta a punta y comparar el orden
+servido contra el orden persistido**:
+
+1. Materializar (o tomar) un snapshot real, con rango amplio de valores y empates de verdad.
+2. Recorrer **todas** las páginas siguiendo el cursor hasta agotarlo, acumulando las filas servidas.
+3. Afirmar **dos** cosas, no una: (a) la cuenta acumulada == la cuenta persistida —lo que atrapa el
+   salteo silencioso—, y (b) la secuencia servida == la secuencia persistida por rank —lo que atrapa
+   el alias homónimo—. Una sola de las dos deja pasar la otra.
+
+Un `LIMIT 10` de la primera página se ve perfecto en los dos bugs. Es el recorrido completo el que
+habla.
+
+**Caso fuente**: `TASK-1700` (2026-08-28) —
+`src/lib/growth/seo/work-queue/reader.ts` (docstring + el `ORDER BY`/cursor),
+`src/lib/growth/seo/work-queue/materialize.ts` (el comparador por code points) y
+`migrations/20260829000423538_task-1700-work-queue-keyset-collation.sql` (el índice con la
+collation). El detalle del dominio vive en `.claude/rules/growth-seo.md`.
 
 ---
 

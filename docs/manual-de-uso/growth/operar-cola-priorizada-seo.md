@@ -1,9 +1,9 @@
 # Operar la cola priorizada de trabajo SEO (TASK-1700)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-28 por Claude (TASK-1700)
-> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1700)
+> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1700 — auditoria de drift contra el codigo final)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) · [Documentación funcional](../../documentation/growth/cola-priorizada-trabajo-seo.md)
 
 ## Para qué sirve
@@ -20,6 +20,17 @@ no cambió de forma — mismas columnas, mismo copy —, sólo cambió quién ma
 todavía una pantalla propia de la cola** (bandas visibles, verbos, filtros por origen): eso es una
 entrega de interfaz posterior. Mientras tanto, la cola se opera por API y por el worker.
 
+🔴 **La cola manda esa lente sólo si puede hacerlo sin fabricar un número.** En la lente,
+`estimatedClickGain` es siempre un número y un `0` significa *"ya convierte por encima de la media de
+la posición objetivo"* — una afirmación positiva, no un vacío. En la cola, un score vacío significa
+*"me niego a estimar"*. Por eso el adapter **no traduce**: si alguna entrada que llegaría a la lente
+no tiene techo, devuelve `null` y la pantalla vuelve al reader legacy, que sabe declarar ese caso
+(`orderedBy: 'measured_demand'`). Es condición **por organización**, no por fila: la curva se evalúa a
+nivel del sitio en la posición objetivo, así que o todas las entradas tienen techo o ninguna. La foto
+de la cola se guarda completa en los dos casos. Consecuencia operativa que hay que tener presente
+antes de diagnosticar: **con el flag ON, una organización con curva no utilizable sigue viendo el
+orden anterior, y eso es lo correcto, no una falla.**
+
 ## Antes de empezar
 
 - Módulo SEO activo (`GROWTH_SEO_ENABLED=true`) y organización con assignment `seo_v2` vigente. Sin
@@ -27,7 +38,9 @@ entrega de interfaz posterior. Mientras tanto, la cola se opera por API y por el
 - **Permisos: ver y decidir son dos cosas distintas.**
   - `growth.seo.observation.read` → leer la cola.
   - `growth.seo.work_queue.decide` → decidir sobre una entrada.
-  - `growth.seo.report.read_client` (scope `own`) → la vista recortada del cliente.
+  - `growth.seo.report.read_client` (scope `own`) → es la puerta del cliente al módulo SEO.
+    ⚠️ **Todavía no abre ninguna vista de la cola**: el redactor cliente existe, pero no hay
+    superficie que lo consuma. Hoy la cola la ven sólo el operador y los carriles internos.
   - Están separadas a propósito: un analista puede leer el plan completo sin poder retirarle trabajo
     al equipo.
 - **Estado de rollout vigente (2026-08-28):** flag `GROWTH_SEO_WORK_QUEUE_ENABLED` **OFF en los dos
@@ -71,8 +84,11 @@ curl -s -X POST "$WORKER_URL/seo/work-queue/materialize-batch" \
   -d '{"maxTargets": 1, "force": true}'
 ```
 
-Devuelve, por target: `snapshotId`, `itemCount`, `reused` y el estado de cada uno de los seis
-orígenes.
+Devuelve un resumen del batch (`status`, `eligible`, `materialized`, `reused`, `failed`) y, **por
+target**, un `outcome` con `seoTargetId`, `organizationId`, `status`
+(`materialized` · `reused` · `failed`), `snapshotId`, `itemCount` y `degradedOrigins` — que lista
+**sólo los orígenes que NO quedaron en `ok`**, no el estado de los seis. El detalle completo de la
+salud de los seis orígenes (con su `reason` y su `asOf`) se lee del snapshot, por el paso 5.
 
 ### 3. Inspeccionar la primera foto fila por fila
 
@@ -95,8 +111,10 @@ curl -s -X POST "$WORKER_URL/seo/work-queue/materialize-batch" \
   -H 'Content-Type: application/json' -d '{"maxTargets": 1}'
 ```
 
-Tiene que devolver **`reused: true` y cero filas nuevas**. Si escribe una foto nueva con los mismos
-insumos, la idempotencia está rota y hay que parar el rollout ahí.
+Tiene que devolver el target con **`status: "reused"`** (y el contador `reused` del batch en 1,
+`materialized` en 0), con **cero filas nuevas** y el mismo `snapshotId` de la corrida anterior. Si
+escribe una foto nueva con los mismos insumos, la idempotencia está rota y hay que parar el rollout
+ahí.
 
 La materialización manual además tiene un piso de **60 minutos** entre corridas: dentro de esa
 ventana devuelve la foto vigente en vez de recomputar (`force: true` lo salta, y es sólo para el
@@ -248,6 +266,12 @@ devaluaría la señal que la versión pretende dar.
   `items: []` con orígenes en `degraded`/`down` = la foto es parcial y le falta trabajo.
 - **La segunda corrida escribe filas nuevas.** La idempotencia se rompió: hay un insumo que cambia
   entre corridas sin que nadie lo haya cambiado. No sigas el rollout hasta entenderlo.
+- **Prendí el flag y la lente no cambió de orden.** Antes de sospechar del flag, mira la banda de esa
+  organización: si su curva no es utilizable en la posición objetivo, sus entradas no tienen techo, el
+  adapter devuelve `null` a propósito y la pantalla sigue con el reader legacy. **Es la conducta
+  correcta**, no un cutover a medias — la alternativa sería fabricar un `0` que la lente leería como
+  "ya convierte mejor que el promedio". Se resuelve solo cuando el sitio acumula muestra. Verifícalo
+  leyendo la cola (paso 5): si todo sale en banda 2, es esto.
 - **La lista está en un orden raro después del cutover.** Compara contra el orden del reader legacy:
   hay un test de paridad para el origen `gsc_striking_distance` justamente porque el cutover tiene
   que ser un cambio de **fuente** y no de **comportamiento**.
@@ -262,7 +286,8 @@ devaluaría la señal que la versión pretende dar.
 ## Rollback
 
 Flag a `false` en Vercel + redeploy → la lente vuelve al reader legacy en menos de 5 minutos, sin
-migración inversa. Los datos quedan (append-only, sin efecto fuera de sí mismos). Para detener
+migración inversa. (Es el mismo destino al que ya cae sola cuando el adapter devuelve `null`: la rama
+de fallback está ejercitada, no es código muerto que se estrena el día del rollback.) Los datos quedan (append-only, sin efecto fuera de sí mismos). Para detener
 también la escritura: pausar el scheduler y poner el flag en `false` en la revisión activa del
 worker.
 

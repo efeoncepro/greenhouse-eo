@@ -1257,7 +1257,11 @@ Fuente: directiva del operador 2026-08-05 + `EPIC-037` + `docs/operations/MODULA
 ## 18. La cola priorizada de trabajo — el aggregate que manda el orden (TASK-1700)
 
 **Estado 2026-08-29:** código en `develop` (`962d22118` · `0165e0e75` · `a712ebccb` · `dc2db094d` ·
-`aaeec2e9b` · `0ef8c5776` · `9020d6421`), migraciones aplicadas en la instancia única de Cloud SQL,
+`aaeec2e9b` · `0ef8c5776` · `9020d6421` · `8b0673d9e` — el último trae, además de la capa documental,
+el cierre de la costura `null → 0` del adapter y el gate del volumen estimado partido en dos asserts),
+tres migraciones aplicadas en la instancia única de Cloud SQL (`…_task-1700-seo-work-queue.sql`,
+`…_task-1700-work-queue-keyset-collation.sql`, `…_task-1700-work-queue-decide-capability.sql`),
+`pnpm typecheck` en 0 errores y build de producción verde,
 **flag `GROWTH_SEO_WORK_QUEUE_ENABLED` OFF en los dos runtimes y scheduler PAUSADO**.
 
 ### 18.1 Por qué es un aggregate persistido y no un reader en vivo
@@ -1415,6 +1419,11 @@ un «optimizar» le pide más contenido a un problema causado por tener contenid
 striking-distance **excluye** `competing_pages > 1` y las manda al de consolidación
 (`collectors/gsc-striking-distance.ts:101`); el reader legacy las marcaba y las dejaba en la misma
 lista, que es justo lo que hace que el operador tome la decisión errada (brecha S8 de la auditoría).
+
+**`competingPages` se persiste como DATO en el breakdown** (`contracts.ts:125`,
+`collectors/consolidation.ts:147`), no sólo dentro de la prosa de `basisReason`: el consumer que
+renderiza la lente necesita el número, y parsearlo de una frase lo ataría a la redacción — la clase
+de acople que se rompe la primera vez que alguien mejora el texto.
 
 ### 18.6 🔴 `evidence_ref` es OPACA: cero FK, cero JOIN
 
@@ -1603,15 +1612,21 @@ score ni composición de orígenes.**
 se materializó). `absent` **no es un error** — es un target elegible cuya cola todavía no corrió;
 devolver `ok: false` haría que la UI mostrara una falla donde hay un estado legítimo.
 
-**El DTO cliente se construye por CONSTRUCCIÓN EXPLÍCITA, nunca por omisión** (`client-dto.ts`). La
+**El DTO cliente se construye por CONSTRUCCIÓN EXPLÍCITA, nunca por omisión** (`client-dto.ts`).
+⚠️ **`toClientWorkQueueDto` todavía no tiene caller**: el redactor está construido y probado, pero
+ninguna superficie cliente lo consume aún (la del portal es parte de la task `ui-ux` posterior). Lo
+que sigue describe qué recortará, no algo que un cliente ya esté viendo — el DTO existiendo no hace
+alcanzable la vista. La
 diferencia importa: con un redactor por sustracción (`delete`/`omit`/spread con exclusiones),
 cualquier campo nuevo del reader llega al cliente por defecto y la fuga es silenciosa. No cruzan
 dificultad ni volumen estimado (lente `◑` de un tercero que en es-LATAM mide mal — mostrárselos al
 cliente les da estatus de hecho), costo de proveedor (es lo que a Efeonce le **cuesta** servir, no
 consumo del cliente), `evidence_ref` cruda (expone ids y topología de motores) ni el
 `score_breakdown_json` completo (umbrales, percentiles y tamaños de muestra son el **método**, no el
-resultado). Sí cruzan keyword, verbo, banda, la estimación marcada `◑` sobre impresiones marcadas
-`●`, y el `asOf`. La razón del cliente se redacta aparte: `basisReason` habla de percentiles y
+resultado). Sí cruzan keyword, verbo, banda, `origin` (la ETIQUETA del motor, no su `evidence_ref`:
+lo que se retiene es el id y el registro, no de qué familia de señal salió), la estimación marcada
+`◑` —`number | null`, jamás un `0` de relleno— sobre impresiones marcadas `●`, el `asOf`, la
+`staleness` y `partialSources` (cuántas fuentes están parciales, sin el detalle por origen). La razón del cliente se redacta aparte: `basisReason` habla de percentiles y
 nombres de origen — es la explicación para quien opera el motor, no para quien recibe el servicio.
 
 ### 18.12 🔴 La decisión se ancla al sujeto y NO ejecuta nada
@@ -1674,12 +1689,44 @@ Dos recortes que el gate de paridad destapó y que valen como regla:
 
 El enriquecimiento de mercado (volumen, dificultad) que la lente muestra se pide al **mismo** reader
 canónico que ya usaba (`readKeywordMarketData`): la cola no transporta esos campos a propósito
-(invariante `●`/`◑`), y no es una fuente nueva.
+(invariante `●`/`◑`), y no es una fuente nueva. Ése es también el motivo por el que el gate de
+boundary del volumen estimado se escribe con **dos** asserts y no relajándose: el adapter puede
+NOMBRAR el volumen porque lo transporta, y un segundo assert prueba que no ordena (`.sort(` ·
+`localeCompare` · `compareWorkQueueItems`). El invariante es sobre el ORDEN, no sobre la palabra.
 
-Con el flag OFF la página sigue usando `readKeywordOpportunities`
-(`admin/growth/seo/keywords/page.tsx:347-352`). El destino de ese rollback quedó **verificado y no
-supuesto** desde `TASK-1792`: con curva no utilizable devuelve `ctrCurveSource: 'unusable'` +
-`orderedBy: 'measured_demand'` en vez de colapsar todo a `gain = 0` en silencio.
+#### 🔴 La cola sirve la lente sólo si puede hacerlo sin fabricar un número
+
+Los dos contratos usan «ganancia» con semánticas **opuestas** en el mismo valor: en la cola
+`priority_score = null` significa «me niego a estimar» (banda 2 existe para decirlo), y en la lente
+`estimatedClickGain` es `number` y un `0` es una afirmación POSITIVA — «esta keyword ya convierte por
+encima de la media de la posición objetivo» —, el cero-sentinel que `TASK-1792` eliminó a propósito.
+Traducir `null → 0` en esa costura reintroduce, dentro del contrato, el defecto que 1792 cerró en el
+código: con curva no utilizable, TODA la lente de esa organización habría salido empatada en un cero
+fabricado, bajo un envelope que dice `org_measured` porque se computa desde una sola fila de
+referencia.
+
+Por eso el adapter **no traduce mejor: se niega a traducir.** Si alguna fila que llegaría a la lente
+no tiene `priority_score`, `readKeywordOpportunitiesFromWorkQueue` devuelve `null` y el caller cae al
+reader legacy. Dos consecuencias de contrato:
+
+- **`orderedBy` es SIEMPRE `estimated_click_gain`** cuando la cola sirve la lente. No hay rama
+  `measured_demand` por el camino de la cola, porque ese caso simplemente no se sirve desde acá.
+- **Es condición por ORGANIZACIÓN, no por fila.** La curva se evalúa a nivel de org en la posición
+  objetivo, así que o todas las filas tienen score o ninguna lo tiene: con curva sana (`berel.com`)
+  la lente viene de la cola; con curva no utilizable (`efeoncepro.com`) la sirve el legacy. La cola
+  conserva su snapshot completo en los dos casos — el aggregate no se degrada, sólo deja de mandar
+  esta lente.
+
+🔴 **NUNCA reintroduzcas un mapeo `null → 0` acá, ni un `?? 0` de fallback en `estimatedClickGain`.**
+Cuando dos contratos usan la misma palabra con semánticas inversas, la traducción no se arregla
+eligiendo mejor el valor: se arregla no traduciendo.
+
+Por lo tanto la página cae al reader legacy (`admin/growth/seo/keywords/page.tsx:347-352`) por **dos**
+caminos, no uno: con el flag OFF, y con el flag ON cuando el adapter devuelve `null` (cola apagada,
+caída, sin snapshot todavía, o sin techo para alguna fila). El destino de ese fallback quedó
+**verificado y no supuesto** desde `TASK-1792`: con curva no utilizable devuelve
+`ctrCurveSource: 'unusable'` + `orderedBy: 'measured_demand'` en vez de colapsar todo a `gain = 0` en
+silencio.
 
 ### 18.15 Señales de reliability
 

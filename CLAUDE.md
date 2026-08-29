@@ -1077,23 +1077,6 @@ DROP TABLE IF EXISTS schema.table;
 
 **Defense in depth (CI gate activo)**: `pnpm migration-marker-gate` corre blocking en `ci.yml` + self-tests del parser.
 
-### SQL embebido — type alignment + live testing (ISSUE-071, 2026-05-08)
-
-Cualquier query SQL embebido en TS que use **uniones de tipos** (COALESCE de subqueries, CASE WHEN, NULL coalescing entre tipos heterogéneos) debe **ejercitarse contra PG real ANTES de mergear**, no solo via mocks Vitest.
-
-**Bug class** (ISSUE-071): el CTE `subject_admin` del relationship resolver de TASK-611 hacía `SELECT 1 AS is_admin` (integer) pero el `COALESCE((SELECT is_admin FROM subject_admin), FALSE)` combinaba con boolean. PG rechaza con `COALESCE types integer and boolean cannot be matched`. El catch silencioso convertía el throw a `degradedMode=true` y el banner "Workspace en modo degradado" se mostraba al usuario. Bug latente desde el merge de TASK-611, descubierto solo cuando un usuario real ejerció el path post TASK-613 V1.1.
-
-**⚠️ Reglas duras**:
-
-- **NUNCA** mergear queries con CTEs + COALESCE/CASE/NULL handling sin un live test contra PG (vía `pg:connect` proxy + `pnpm tsx`, o `*.live.test.ts`).
-- **NUNCA** confiar SOLO en unit tests con mocks para validar type alignment SQL. Los mocks ejercitan la lógica TS, NO el SQL crudo.
-- **SIEMPRE** que `COALESCE((SELECT ... FROM cte), default)`, verificar que el tipo del SELECT del CTE matchee el tipo del `default`. PG hace casting implícito entre tipos numéricos (INT → NUMERIC) pero NO entre INT y BOOL ni entre TEXT y NUMERIC.
-- **SIEMPRE** que un read path tenga catch + degraded mode honesto (correcto desde safety perspective), confirmar que `captureWithDomain` está emitiendo a Sentry — sino el bug class queda completamente oculto al equipo y aparece solo cuando un usuario real reporta el síntoma.
-
-**Defense-in-depth recomendado**: cuando una query nueva emerja, agregar un script temporal `scripts/<dominio>/_sanity-<query-name>.ts` (gitignored o committed según necesidad) que la ejecute contra el proxy local con datos reales. Después del primer ejercicio exitoso el script es opcional pero útil como debugging aid futuro.
-
-**Spec canónica**: `docs/issues/resolved/ISSUE-071-workspace-relationship-resolver-coalesce-type-mismatch.md`.
-
 ### Finance — invariantes ledger/bank/payments (TASK-700, 701, 703b, 709, 720, 721, 722, 765)
 
 Los invariantes operativos de Finance ledger/bank — internal account number allocator, payment order ↔ bank settlement (atómico), payment provider catalog + category rules, bank ↔ reconciliation synergy, evidence canonical uploader, bank KPI aggregation policy-driven, OTB cascade-supersede + sign convention, labor allocation consolidada (anti double-counting) — viven en **`docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` → §`Invariantes operativos para agentes — Finance ledger/bank/payments`** (+ las specs de cada TASK). **INVOCAR la skill MANDATORIA `greenhouse-finance-accounting-operator` ANTES de tocar `src/lib/finance/**`, `greenhouse_finance.*` o cualquier flujo ledger/costos/fiscal/tesorería/P&L.**
@@ -1179,11 +1162,13 @@ Los invariantes operativos de Knowledge + Nexa — knowledge platform foundation
 
 **Reglas duras load-bearing (resumen — detalle en la spec):** **NUNCA** Nexa queryea `greenhouse_knowledge.knowledge_chunks` directo ni mete el corpus al prompt (lint `no-direct-knowledge-chunk-query`; consumir el contrato `knowledge-search.v1` / readers). **NUNCA** Nexa responde un dato de conocimiento sin citar ni inventa cuando `confidence=none`. **NUNCA** el LLM ejecuta un write — el loop es propose→confirm→execute (la acción gobernada muta sólo en el endpoint de confirmación humana). **NUNCA** retrieval agéntico retorna `agent_excluded`/`quarantined`/`restricted`. **NUNCA** instanciar un SDK LLM dentro de un dominio (Gemini/Anthropic via cliente canónico de `src/lib/ai/`); el secreto se resuelve server-side. **NUNCA** registrar un archivo Nexa nuevo sin agregarlo al `manifest.json` (doc gate).
 
-### SQL embebido / date-math — invariantes (TASK-893)
+### SQL embebido en TS — invariantes cross-dominio (ISSUE-071 · TASK-893 · 1308 · 1700)
 
 Los invariantes del SQL Signal Reader Schema Validation Gate (4 capas: lint rule `greenhouse/no-extract-epoch-from-date-subtraction`, smoke pre-merge contra PG real, protocolo de verificación de schema, patrones canónicos de "días entre fechas") viven en **`docs/architecture/agent-invariants/SQL_DATE_MATH_AGENT_INVARIANTS.md`**. **Cargar ese doc al escribir cualquier query SQL embebida en TS.**
 
 **Reglas duras (resumen):** **NUNCA** confiar en `db.d.ts` (Kysely codegen) como source of truth de tipos PG — infiere DATE como `Timestamp` TS. **NUNCA** `EXTRACT(EPOCH FROM (X - Y))` cuando X o Y es DATE (`date - date = integer`; revienta en runtime): usar `(X - Y)::int` para días, o castear ambos lados a `::timestamptz`. **NUNCA** mergear un reader/query nuevo sin ejercitarlo al menos una vez contra PG real vía proxy (los mocks Vitest ejercitan el TS, NO el SQL). **NUNCA** fixear un solo callsite cuando el bug class emerge por Sentry: audit global + fix sistemático + lint rule + doc.
+
+🔴 **Dos bug classes de ORDEN que no son de ningún dominio** (TASK-1700, medidas 2026-08-28; muerden a cualquiera que ordene o pagine, en finanzas, payroll o delivery igual que en growth). **NUNCA** aliasear una expresión con el nombre de la columna que ordenas (`priority_score::text AS priority_score`): el `ORDER BY` resuelve los nombres de **SALIDA** antes que los de la tabla, así que el alias lo secuestra y ordena el TEXTO — `'8.8612'` antes que `'72.1405'`; servía la primera página desde el **rank 17**, sin lanzar nada, e **invisible** con scores de un dígito o todos NULL. **NUNCA** repartir un orden entre JS y SQL con collations distintas: la base es `en_US.UTF8`, que ignora el espacio (`berelex` < `berel green`), y `localeCompare` los ordena al revés — la paginación por keyset **saltea filas en silencio** (medido: 631 de 635). Se fuerzan ambos lados a **BYTES** (`COLLATE "C"` + code points), incluido el índice del keyset; y con `NULL` en la clave, la comparación del cursor se escribe **expandida**, jamás como tupla `(a,b,c) > (x,y,z)`. **SIEMPRE** detectarlas paginando una corrida REAL de punta a punta y comparando cuenta Y secuencia contra lo persistido: ningún test con mocks las ve.
 
 ### Payroll/Workforce — participation/exit/leave/reconciliation/offboarding invariants (TASK-890, 891, 892, 893, 895)
 

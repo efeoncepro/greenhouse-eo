@@ -49,6 +49,43 @@ Runtime: capabilities y schema vivos desde el 2026-08-19; Application 360 es el 
 
 ---
 
+## Delta 2026-08-28 — la cola priorizada de trabajo entra al lane SEO, `internal`-only (TASK-1700)
+
+`GET /api/platform/ecosystem/growth/seo/work-queue` publica la cola priorizada del target: el snapshot
+vigente con sus items ordenados, `originHealth`, `priorityScoreVersion`, `asOf` y `staleness`. Acepta
+`origin` (repetible, del vocabulario cerrado), `limit` y `cursor` — la paginación es keyset **sobre un
+snapshot inmutable**, así que el universo no crece bajo el cursor. Ruta en
+`src/app/api/platform/ecosystem/growth/seo/work-queue/route.ts`, handler en el builder del lane
+(`src/lib/api-platform/resources/ecosystem-growth-seo.ts`), sobre `runEcosystemReadRoute`. Payload =
+passthrough del reader canónico `readSeoWorkQueue`; cero lógica de orden en el lane.
+
+🔴 **Sólo bindings `internal` sin organización, con `404 not_found` anti-oracle** — el mismo boundary
+que `provider-spend`, y por la misma clase de razón: no es una restricción de permisos sino de
+naturaleza del dato. La cola compone la lente competitiva (`origin='competitor_gap'`) y el cruce con
+citabilidad IA del lado AEO, y §7 de la auditoría 2026-08-15 **prohíbe la comparativa competitiva
+client-facing**. El camino del cliente no es este lane con otro scope: es el **DTO redactado** de su
+propia superficie, que sale del mismo reader por `toClientWorkQueueDto` y no lleva dificultad, volumen
+estimado, costo de proveedor, `evidence_ref` cruda ni el breakdown completo. Un `internal` sin
+`organizationId` recibe `400 bad_request`: la diferencia entre "no te corresponde saberlo" y "te falta
+un parámetro".
+
+**Mismo payload que la ruta app `GET /api/admin/growth/seo/work-queue` y que la tool MCP interna
+`get_seo_work_queue`** — un primitive (`readSeoWorkQueue`), tres consumers, **cero lógica de orden
+duplicada**. El orden, el score y la composición de orígenes viven en
+`src/lib/growth/seo/work-queue/**`; ningún consumer reordena ni recompone.
+
+**La federación al gateway externo `mcp.efeonce.org` está explícitamente FUERA de alcance**
+(auditoría §6), no pendiente por olvido: primero el read tool interno. Semántica del aggregate,
+vocabularios cerrados, bandas de score y política de versionado en
+[`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §18 (canónico);
+acá sólo vive lo que es contrato del lane. Estado: code complete en `develop`, flag
+`GROWTH_SEO_WORK_QUEUE_ENABLED` **OFF en los dos runtimes**. Con el flag apagado, un binding `internal`
+recibe el payload `{ ok: false, errorCode: 'disabled' }` que devuelve el propio reader —no un 404, que
+es lo que ve un binding que no debía llegar acá—: el orden de las dos puertas importa y no se puede
+invertir.
+
+---
+
 ## Delta 2026-08-27 — el lane SEO que NO resuelve la organización desde el binding (TASK-1696)
 
 `GET /api/platform/ecosystem/growth/seo/provider-spend` publica el gasto de proveedor del mes por

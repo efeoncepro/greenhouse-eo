@@ -357,3 +357,12 @@ Si emerge un **10º patrón** genuinamente transversal (se repite ≥3 dominios)
 acá con la misma estructura (cuándo / forma canónica / reglas duras / fuente) y
 registrarlo en `DECISIONS_INDEX.md`. Si es específico de un dominio, vive en su spec,
 no acá.
+
+**Lo que NO va acá: las bug classes.** Este catálogo describe **formas que seguir**, no
+**trampas que evitar**. Un defecto recurrente de SQL embebido —tipos que no alinean, `NOW()`
+que no avanza, un alias que secuestra el `ORDER BY`, dos collations que no ordenan igual—
+no es un patrón canónico: es un anti-patrón con mecanismo, y su hogar cross-dominio es
+`agent-invariants/SQL_DATE_MATH_AGENT_INVARIANTS.md` (cuyo alcance es TODO el SQL embebido
+en TS, no sólo date-math, pese al nombre del archivo). Un anti-patrón asciende a patrón acá
+sólo cuando el repo consolida una **forma canónica** para resolverlo (un helper, una VIEW, un
+primitive) y esa forma se repite en ≥3 dominios.

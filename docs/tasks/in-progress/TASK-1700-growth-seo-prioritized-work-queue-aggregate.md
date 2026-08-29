@@ -1,5 +1,67 @@
 # TASK-1700 — Growth SEO: la cola priorizada de trabajo es un aggregate persistido con score versionado
 
+## Delta 2026-08-28 (4) — la costura `null → 0` del adapter quedó cerrada, y con eso cambió el contrato del Slice 7
+
+La capa documental se escribió a mitad de camino; esto registra lo que cambió **después** de esa
+pasada y que deja partes de esta spec desactualizadas. Auditado afirmación por afirmación contra el
+código de `develop`.
+
+🔴 **El adapter dejó de traducir `null → 0`.** Los dos contratos usan «ganancia» con semánticas
+opuestas en el mismo valor: en la cola `priority_score = null` significa *«me niego a estimar»* (la
+banda 2 existe para decirlo), y en la lente `estimatedClickGain` es `number` y un `0` es una
+afirmación POSITIVA — *«ya convierte por encima de la media de la posición objetivo»* —, el
+cero-sentinel que `TASK-1792` acababa de eliminar. Traducirlo reintroducía en el CONTRATO el defecto
+que 1792 cerró en el código: con curva no utilizable, toda la lente de esa organización habría salido
+empatada en un cero fabricado, bajo un envelope que dice `org_measured`.
+
+El arreglo es un principio, no un mapeo mejor: **la cola sirve la lente sólo si puede hacerlo sin
+fabricar un número.** Si alguna fila que llegaría a la lente carece de techo,
+`readKeywordOpportunitiesFromWorkQueue` devuelve `null` y el caller cae al reader legacy. Consecuencias
+de contrato:
+
+- **Es condición por ORGANIZACIÓN, no por fila.** La curva se evalúa a nivel de org en la posición
+  objetivo: o todas las filas tienen score o ninguna. Con curva sana (`berel.com`) la lente viene de la
+  cola; con curva no utilizable (`efeoncepro.com`) la sirve el legacy. El snapshot se conserva completo
+  en los dos casos.
+- **`orderedBy` en el adapter es SIEMPRE `estimated_click_gain`.** Ya no existe rama `measured_demand`
+  por el camino de la cola, porque ese caso no se sirve desde acá.
+- **La página cae al legacy por DOS caminos, no uno** (flag OFF, y adapter `null`), así que la rama de
+  fallback del rollback está ejercitada en vez de estrenarse el día del rollback.
+- 🔴 **NUNCA** reintroducir un `null → 0` en esa costura ni un `?? 0` de fallback en
+  `estimatedClickGain`. Cuando dos contratos usan la misma palabra con semánticas inversas, la
+  traducción no se arregla eligiendo mejor el valor: se arregla no traduciendo.
+
+Lo demás que cambió después de la pasada documental:
+
+- **El gate del volumen estimado se partió en DOS asserts** (`__tests__/boundary.test.ts`) en vez de
+  relajarse. El invariante real es *«el ORDEN no se computa con volumen estimado»*, no *«la palabra no
+  aparece»*: el adapter SÍ lo transporta —es una columna que la pantalla muestra desde antes de esta
+  task— así que un assert dice quién puede NOMBRARLO y el otro prueba que ese archivo **no ordena**
+  (`.sort(` · `localeCompare` · `compareWorkQueueItems`). ⚠️ Queda desactualizada cualquier cita de la
+  forma *«rompe el build si el string `search_volume` aparece en el módulo»*.
+- **`competingPages` se agregó a `SeoWorkQueueScoreBreakdown`** (`contracts.ts:125`), persistido como
+  DATO por el colector de consolidación: el consumer que renderiza la lente necesita el número y
+  parsearlo de `basisReason` lo ataría a la prosa.
+- **Dos migraciones nuevas** además de la del esquema:
+  `20260829000423538_task-1700-work-queue-keyset-collation.sql` (índice keyset con `COLLATE "C"`) y
+  `20260829002943854_task-1700-work-queue-decide-capability.sql` (seed de
+  `growth.seo.work_queue.decide` en `capabilities_registry`, con su guard anti pre-up-marker).
+- **Gates de cierre verdes:** `pnpm typecheck` en 0 errores en todo el repo y build de producción
+  `BUILD_EXIT=0`.
+
+⚠️ **Drift adicional que destapó esta auditoría y que no venía de los cambios de arriba:** la capa
+documental hablaba de *«los cuatro consumers: UI operador, Nexa, lane ecosystem/MCP, portal cliente»*
+y de *«la vista recortada del cliente»* en presente. Verificado contra el código: **Nexa y el portal
+cliente NO consumen la cola** —no hay tool de Nexa ni ruta cliente, y `toClientWorkQueueDto` no tiene
+ningún caller—. Los cuatro consumers reales son la ruta app, el recurso del lane ecosystem (que
+también sirve la tool MCP interna), y el server component de la lente vía el adapter. La parity está
+cumplida en el **contrato** (el redactor existe y esas superficies no escribirán orden ni score
+cuando aterricen), pero **el DTO existiendo no hace alcanzable la vista**: corregido en la
+arquitectura §18.11, en el funcional, en el manual y en `.claude/rules/growth-seo.md`.
+
+⚠️ El bloque `## Detailed Spec → Orden canónico` de más abajo se corrigió en este mismo Delta para
+incluir `COLLATE "C"`: sin él, la spec describía exactamente la paginación que salteaba filas.
+
 ## Delta 2026-08-28 (3) — dependencia DURA nueva: `TASK-1792` bloquea el cutover del Slice 7
 
 Al implementar el Slice 2 se midió la curva de CTR real de las dos organizaciones con serie y
@@ -549,10 +611,17 @@ Archivos que esta task **modifica sin poseer** (hay que coordinar con su dueña 
 
 ### Migration, backfill and rollout
 
-- Migration posture: `additive` — tres tablas nuevas, tres triggers append-only, índices, GRANTs. Sin
-  ALTER sobre tablas existentes. Marker `-- Up Migration` al inicio y bloque `DO $$ ... RAISE
-  EXCEPTION` que aborta si las tres tablas, el índice único de idempotencia y los CHECK de
-  `origin` / `score_basis` no quedaron creados (anti pre-up-marker bug, CLAUDE.md).
+- Migration posture: `additive` — **tres migraciones**, todas aditivas y sin ALTER sobre tablas
+  existentes, cada una con marker `-- Up Migration` al inicio y su bloque `DO $$ ... RAISE EXCEPTION`
+  anti pre-up-marker (CLAUDE.md):
+  1. `20260828224403660_task-1700-seo-work-queue.sql` — tres tablas nuevas, tres triggers append-only,
+     índices, GRANTs; el guard aborta si faltan las tablas, el índice único de idempotencia o los
+     CHECK de `origin` / `score_basis`.
+  2. `20260829000423538_task-1700-work-queue-keyset-collation.sql` — índice keyset con `COLLATE "C"`,
+     para que el orden de SQL y el de JS sean el mismo (ver §Orden canónico).
+  3. `20260829002943854_task-1700-work-queue-decide-capability.sql` — seed de
+     `growth.seo.work_queue.decide` en `capabilities_registry`, en paridad con el catálogo TS y el
+     grant de `runtime.ts`.
 - Default state: `flag OFF`. `GROWTH_SEO_WORK_QUEUE_ENABLED` default `false` en los **dos** runtimes
   (Vercel y ops-worker) y Cloud Scheduler `ops-seo-work-queue-materialize` **nace PAUSADO** — dos
   frenos independientes, mismo patrón que TASK-1661/1664. Subordinado a `GROWTH_SEO_ENABLED`.
@@ -635,8 +704,12 @@ Archivos que esta task **modifica sin poseer** (hay que coordinar con su dueña 
       federación al gateway MCP externo queda explícitamente fuera (auditoría §6).
 - [x] **Write apto para `propose → confirm → execute`**: Nexa propone, el humano confirma en el
       endpoint, el endpoint muta. Cero integración Nexa-específica.
-- [x] **Un primitive, muchos consumers**: UI, Nexa, MCP y portal cliente comparten reader; la única
-      diferencia del lado cliente es el redactor de DTO.
+- [x] **Un primitive, muchos consumers**: los cuatro consumers reales (ruta app, recurso del lane
+      ecosystem, tool MCP interna y el server component de la lente) comparten `readSeoWorkQueue` sin
+      lógica de orden duplicada. ⚠️ **Nexa y el portal cliente todavía NO consumen la cola** — no hay
+      tool de Nexa ni ruta cliente y `toClientWorkQueueDto` no tiene caller. La parity está cumplida
+      en el CONTRATO (esas superficies no escribirán orden ni score, sólo consumen; el redactor ya
+      existe), no como superficie alcanzable: no citarlo como si el cliente ya viera la cola.
 - [x] **Parity check = SÍ.**
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -763,7 +836,9 @@ Archivos que esta task **modifica sin poseer** (hay que coordinar con su dueña 
   con la misma config. Si difiere, el cutover no es un cambio de fuente: es un cambio de
   comportamiento no declarado.
 - Rama de fallback detrás del flag: con `GROWTH_SEO_WORK_QUEUE_ENABLED=false` la página sigue usando
-  el reader legacy, sin código muerto duplicado en la vista.
+  el reader legacy, sin código muerto duplicado en la vista. 🔴 **Y por un segundo camino** (ver Delta
+  2026-08-28 (4)): con el flag ON, si el adapter no puede servir la lente sin fabricar un número
+  —alguna fila sin techo— devuelve `null` y el caller cae al mismo reader legacy.
 - Las tres señales de reliability + su registro en el módulo `growth`.
 - Documentación triple: sección nueva en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` (contrato,
   invariantes, vocabularios, política de versionado), funcional en
@@ -891,8 +966,15 @@ CREATE TABLE greenhouse_growth.seo_work_queue_decisions (
 ```
 ORDER BY score_band ASC,
          priority_score DESC NULLS LAST,
-         normalized_keyword ASC
+         normalized_keyword COLLATE "C" ASC
 ```
+
+🔴 **`COLLATE "C"` no es decorativo** (corregido en el Delta 2026-08-28 (4); la primera versión de esta
+spec decía `normalized_keyword ASC` a secas). La base corre `en_US.UTF8`, que **ignora el espacio** al
+comparar —`berelex` < `berel green`— mientras `localeCompare` de JS los ordena al revés: el
+materializador ordena en JS y el reader pagina por keyset en SQL, así que con órdenes distintas la
+paginación **saltea filas en silencio** (medido: 631 de 635). La solución es orden de **bytes en ambos
+lados** porque su igualdad es demostrable, no aproximada.
 
 `normalized_keyword` como desempate final es lo que hace la paginación por keyset determinista. El
 `rank_in_snapshot` se persiste con ese mismo orden para que "la recomendación #1 de la mañana" sea
@@ -1068,8 +1150,9 @@ Tres razones, y las tres son de oficio, no de implementación:
 - [x] `UPDATE` y `DELETE` sobre las tres tablas fallan por trigger, verificado contra PostgreSQL
       real.
 - [x] `readSeoWorkQueue` devuelve `{ snapshot, items, originHealth, priorityScoreVersion, asOf,
-      staleness }` y sirve idéntico a UI, Nexa, lane ecosystem y tool MCP interna, sin lógica
-      duplicada por consumer.
+      staleness, nextCursor }` y sirve idéntico a la ruta app, al recurso del lane ecosystem, a la
+      tool MCP interna y al server component de la lente, sin lógica duplicada por consumer. (Nexa y
+      el portal cliente todavía no lo consumen: ver §Capability DoD.)
 - [x] El DTO cliente pasa el test de no-fuga: cero dificultad, cero volumen estimado, cero costo de
       proveedor, cero `evidence_ref` cruda, cero breakdown completo.
 - [x] `recordSeoWorkQueueDecision` escribe append-only, se ancla al sujeto (sobrevive al siguiente

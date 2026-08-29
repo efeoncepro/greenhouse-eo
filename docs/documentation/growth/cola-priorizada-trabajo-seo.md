@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-28 por Claude (TASK-1700)
-> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1700)
+> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1700 — auditoria de drift contra el codigo final)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Cola priorizada de trabajo SEO
@@ -160,8 +160,11 @@ histórico completo de qué se recomendó y cuándo queda disponible.
 De ahí salen dos propiedades más:
 
 - **Cada entrada guarda su desglose.** Impresiones, clics, CTR actual, posición ponderada, posición
-  objetivo, CTR esperado, tamaño de la muestra de la curva y ventana. Eso permite contestar "¿por qué
-  esto ya no es prioridad?" seis meses después sin recomputar nada.
+  objetivo, CTR esperado, tamaño de la muestra de la curva, ventana, cuántas páginas del sitio
+  compiten por la intención (en las entradas de consolidación) y qué otros motores señalaron el mismo
+  término. Eso permite contestar "¿por qué esto ya no es prioridad?" seis meses después sin recomputar
+  nada. Los números se guardan **como dato**, no dentro de la frase explicativa: quien los necesite no
+  tiene que parsear una prosa que mañana alguien mejora.
 - **Cada foto guarda con qué versión de score se calculó.** Cambiar un peso, un umbral o la posición
   objetivo obliga a publicar una versión nueva. Antes, esos parámetros vivían como constantes sueltas
   y cambiar cualquiera reescribía el ranking histórico en silencio.
@@ -203,8 +206,13 @@ nuevo, y vale la más reciente.
 
 ## Qué ve el cliente y qué ve el operador
 
-Los dos leen exactamente la misma lista, con el mismo orden. La única diferencia es un redactor que
-recorta el lado cliente.
+⚠️ **Todavía no hay pantalla de cliente para la cola.** El redactor que recorta el lado cliente ya
+está construido y probado, pero ninguna superficie lo usa aún: hoy la cola sólo la ven el operador y
+los carriles programáticos internos. Esta sección describe **qué recortará** ese redactor cuando la
+superficie cliente aterrice — es el contrato, no algo que un cliente ya esté viendo.
+
+Cuando exista, los dos leerán exactamente la misma lista, con el mismo orden. La única diferencia
+será ese redactor.
 
 | Dato | Operador | Cliente |
 |---|---|---|
@@ -216,7 +224,8 @@ recorta el lado cliente.
 | Dificultad de la keyword | sí | **no** |
 | Volumen estimado del proveedor | sí | **no** |
 | Costo de proveedor | sí | **no** |
-| Procedencia interna (de qué motor y qué registro salió) | sí | **no** |
+| Origen (etiqueta del motor que la señaló) | sí | sí |
+| Procedencia interna cruda (de qué registro exacto salió: ids y topología) | sí | **no** |
 | Desglose completo del método (umbrales, percentiles, tamaños de muestra) | sí | **no** |
 
 Los tres primeros recortes son la lente ◑ de un tercero y lo que a Efeonce le cuesta servir; los dos
@@ -233,6 +242,15 @@ no en el del motor.
 Hoy la cola **manda el orden de la lente de oportunidades vigente** en `Growth > SEO > Keywords`. La
 pantalla no cambió de forma: mismas columnas, mismo copy, misma interacción. Lo único que cambió es
 quién manda el orden — pasó de un score calculado al vuelo a una foto inmutable con versión.
+
+🔴 **Con una condición, y es la misma regla de arriba:** la cola manda esa lente **sólo si puede
+hacerlo sin fabricar un número**. La lista antigua muestra "clics adicionales estimados" como un
+número siempre presente, donde un **0 significa "ya convierte mejor que el promedio"** — una
+afirmación positiva, no un vacío. Si alguna entrada que llegaría a esa lista no tiene número (curva
+del sitio no utilizable), la cola **no sirve la lista**: la pantalla vuelve al orden anterior, que
+sabe decir honestamente que está ordenando por demanda medida. En la práctica es una condición **por
+cliente**, no por fila: la curva se evalúa a nivel del sitio, así que o todas las entradas tienen
+número o ninguna. La foto de la cola se guarda completa igual en los dos casos.
 
 La superficie propia de la cola —bandas visibles, verbos en pantalla, filtros por origen, estado de
 frescura y salud de orígenes a la vista— es una entrega de interfaz posterior. Todavía no existe.
