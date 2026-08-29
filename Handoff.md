@@ -2,6 +2,52 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-29 — Release `b7f74c95a2af` a producción: TASK-1785 + TASK-1700 + TASK-1792
+
+**Estado: `released`.** Orquestador `33258242470`, release_id
+`b7f74c95a2af-1c7bd2b3-4f50-4e94-b486-c6979e782a44`, un solo run sin retry. Watchdog
+`drift_count=0`. Los 4 workers Cloud Run `Ready=True`.
+
+**TASK-1785 quedó completa y en producción.** El invariante `●` medido / `◑` estimado dejó de ser
+prosa: `provenance` requerido en el `ok:true` de los readers (lo hace cumplir `tsc`), un guard que
+camina el DTO real y exige que **cada hoja numérica tenga exactamente un dueño**, y un censo de
+superficies medido contra el filesystem y `server.ts`. Tool `get_seo_dual_lens_visibility` federada
+al gateway (`efeonce-mcp` `f523960`), **sin campo combinado por contrato**. Triple documentación
+completa (técnica + funcional + manual) y skills actualizadas.
+
+**Flag `GROWTH_SEO_WORK_QUEUE_ENABLED` prendido en los DOS runtimes**, con autorización explícita del
+operador. Se prendió **por el SoT** (`deploy.sh` → `:-true` + Vercel antes del squash), no con
+`--update-env-vars`: eso evita que el próximo deploy lo borre en silencio Y **ordena el flip por
+construcción** — resolvió que `TASK-1792` (`ctr-curve.ts`) no estuviera aún en `main`, precondición
+que el ledger exigía. Verificado en la revisión activa `ops-worker-00613-qrh`.
+
+🔴 **PENDIENTE — despausar `ops-seo-work-queue-materialize`.** El flag habilita el materializador; NO
+lo agenda. El scheduler sigue PAUSADO y su contrato exige corrida shadow verificada + aviso al
+operador de SEO. **Hasta que se despause, la cola no se materializa y los lanes sirven vacío.**
+
+**Bloqueador dominante del release: una credencial, no el código.** El PAT `read:packages` de AXIS
+venció en silencio (creado 07-29, 30 días, muerto el 08-28) y tumbó 3 de los 4 workers; Vercel pasaba
+verde, que es lo que lo vuelve engañoso. ~2h de las ~4h05m se fueron ahí. Rotado por el operador
+(v2 del secreto, validada contra la API de GitHub antes de escribir). Documentado como anti-pattern
+#12 del playbook + sección en la skill de release.
+
+⚠️ **La versión 1 del secreto `axis-packages-read-token` sigue `enabled`** — no hace daño (los deploys
+usan `:latest`) pero conviene deshabilitarla como higiene.
+
+**Hallazgo lateral con impacto propio:** el audit de flags tenía un punto ciego que **anulaba su propio
+gate ISSUE-150** — sólo detectaba `process.env.FLAG` en notación de punto, y 91 callsites del repo leen
+por indirección. 39 de 43 «env vars muertas» eran falsos positivos y una clase entera de flags escapaba
+del gate que hace `exit 1`. Arreglado; destapó 3 flags sin registrar, ya registrados.
+
+**No validado, declarado:** el canary probó que `dual-lens-visibility` existe y **ejecuta** en
+producción (control negativo: ruta inexistente → HTML de Next; ruta nueva → envelope de API con error
+de dominio). **No** se ejercitó `ok:true` con las dos series reales: ninguna de las 120 organizaciones
+visibles al consumer del gateway tiene `seo_v2`.
+
+**Siguiente paso:** decidir el despause del scheduler de la cola; y evaluar el arreglo durable de la
+credencial AXIS (App de GitHub acuñando tokens de 1 h en vez de un PAT estático — hoy la App no tiene
+permiso `packages`).
+
 ## 2026-08-29 — TASK-1785 `complete`: la lente `●`/`◑` pasó de instrucción a mecanismo
 
 **Estado: code complete. Falta UN paso de rollout, declarado abajo.** Sin migración, sin flag, sin
@@ -537,39 +583,3 @@ ni 1694 ni 1692 se han promovido.
 
 **Follow-up `ui-ux` declarado:** el affordance visible de re-selección en el drawer. El camino
 server existe; el botón no. El comentario del drawer ya lo dice.
-
-## 2026-08-28 — TASK-1694: contrato de candidatos de discovery — code complete, rollout pendiente
-
-Cerrada en `develop`, sin push. Cinco slices + un fix propio: barrera de enlaces filtrable
-(`maxLinkBarrier`/`includeUnknownBarrier`) con `maxDifficulty` aceptado-pero-ignorado y declarado en
-`ignoredFilters`; colapso del reader por `normalizedKeyword` (`candidateIds[]`/`provenance[]`,
-`totalCandidates` cuenta keywords); `clusterConflict` contra el set seguido sin gasto de proveedor;
-política de inclusión única (`all`) en los cuatro adapters, persistida en `methods_json` con default
-histórico de lectura; federación en route admin + lane ecosystem + tool MCP.
-
-**Dos cosas que un próximo turno necesita saber:**
-
-1. 🔴 **`core_keyword IS NULL` significa "la keyword ES la canónica de su clúster", no "no se
-   sabe".** Verificado sobre las 923 filas del store: 527 nulos, 396 apuntando a otra, **cero
-   autorreferentes**. Mi primera implementación lo leyó como desconocido y dejó 8 de 10 candidatos
-   productivos en `unknown`, escondiendo una colisión real. El core efectivo es
-   `core_keyword ?? la keyword misma`; el único estado ciego es no tener fila de mercado. Lo destapó
-   la verificación contra PG real, no los tests — que pasaban.
-2. **El caso de fusión aún no existe en datos reales**: una sola corrida productiva, 10 candidatos
-   de un solo método. El colapso es preventivo y su razón de ser es llegar antes del primer snapshot
-   de `TASK-1700`, que es append-only.
-
-**Pendientes de rollout (no cerrar como "listo" sin esto):**
-
-- Corrida real de smoke con gasto (~USD 0,013) en un mercado es-LATAM ralo con la política `all`,
-  comparando candidatos/costo/mezcla de `searchVolume=null` contra el smoke de `TASK-1664`. Requiere
-  autorización del operador.
-- ~~**Deploy del gateway MCP.**~~ **CERRADO el mismo día.** Los dos commits de `~/Documents/efeonce-mcp`
-  (`807fb76` federación + `32baa9f` prettier) están **en `origin/main`** y desplegados (run
-  `33209983511`); el guard bidireccional de paridad de ese repo no quedó rojo. No queda nada que
-  empujar allá por esta task.
-- Promoción por el release control plane + observar `seo-keyword-discovery-health`.
-
-**Follow-up con evidencia nueva:** cinco candidatos de la corrida real comparten el core
-`pintura acrílica` **entre sí** — es el conflicto intra-corrida que la task dejó fuera de alcance a
-propósito y que pertenece a la superficie de decisión en lote (`TASK-1660`, ya con su `## Delta`).
