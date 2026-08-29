@@ -887,7 +887,19 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_COMPETITOR_GAP_ENABLED=${GROWTH_SEO_COMPETITOR_
 # también en vivo con `--update-env-vars` para efecto inmediato, o el próximo deploy lo borra
 # en silencio). Es SUBORDINADO a `GROWTH_SEO_ENABLED`.
 # Rollback (<5 min): `false` acá + `--update-env-vars` + pausar el scheduler.
-GROWTH_SEO_WORK_QUEUE_ENABLED="${GROWTH_SEO_WORK_QUEUE_ENABLED:-false}"
+#
+# 🟢 ON desde 2026-08-29 (release develop→main, autorización explícita del operador: "prendelo,
+# este producto está en desarrollo ahora mismo"). Se prende ACÁ, en el SoT declarativo, y NO con
+# un `gcloud run services update --update-env-vars` suelto: `--set-env-vars` es DESTRUCTIVO y el
+# próximo deploy del worker habría borrado la var en silencio — el modo de falla exacto del caso
+# `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` (revisión 00470 prendida, 00473 la borró, el consumer
+# registró `skip: flag OFF` y el ledger siguió diciendo ON). Prendido en el SoT, el flag sobrevive
+# a cualquier deploy por construcción.
+#
+# ⚠️ El scheduler `ops-seo-work-queue-materialize` sigue PAUSADO: prender el flag habilita el
+# materializador, no lo agenda. Despausarlo es una decisión aparte y exige la corrida shadow
+# verificada que este mismo bloque pide.
+GROWTH_SEO_WORK_QUEUE_ENABLED="${GROWTH_SEO_WORK_QUEUE_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_WORK_QUEUE_ENABLED=${GROWTH_SEO_WORK_QUEUE_ENABLED}"
 
 # TASK-1699 — Persistencia del top-N del SERP que el rank capture YA paga (costo marginal

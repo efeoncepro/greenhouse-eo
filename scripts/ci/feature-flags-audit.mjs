@@ -30,6 +30,29 @@ const CODE_EXT = new Set(['.ts', '.tsx', '.mjs', '.js', '.cjs'])
 const LEDGER_PATH = 'docs/operations/FEATURE_FLAG_STATE_LEDGER.md'
 const VERCEL_SCOPE = 'efeonce-7670142f'
 const FLAG_RE = /process\.env\.((?:NEXT_PUBLIC_)?[A-Z0-9_]+_ENABLED)\b/g
+
+/**
+ * Referencia al flag como STRING LITERAL — `process.env['FLAG']`, `env[FLAG_CONST]` con
+ * `const FLAG_CONST = 'FLAG'`, o cualquier otra indirección.
+ *
+ * 🔴 Por qué hace falta, y por qué el ancla es el literal y no la forma de acceso: un flag
+ * leído por indirección **tiene** que nombrarse como string en alguna parte, o no habría cómo
+ * indexar `process.env`. El literal es el invariante; la sintaxis de acceso, no.
+ *
+ * Sin esto, `FLAG_RE` sólo veía la notación de punto y **91 callsites de este repo** usaban la
+ * indirección (`env[GROWTH_SEO_WORK_QUEUE_FLAG]` es el patrón de todo `src/lib/growth/seo/flags.ts`).
+ * Esos flags quedaban invisibles para el escaneo, con dos consecuencias que no son cosméticas:
+ * se reportaban como «env var muerta en Vercel» teniendo lector real, y —lo grave— **escapaban
+ * enteros del gate ISSUE-150**, que hace `exit 1` SIEMPRE cuando un flag está prendido en
+ * Production sin su código en `main`. El gate existía, el mecanismo lo hacía cumplir, y una
+ * clase entera de flags pasaba por al lado sin que nada fallara. Encontrado el 2026-08-29
+ * prendiendo `GROWTH_SEO_WORK_QUEUE_ENABLED`: el audit lo clasificó como env var muerta.
+ *
+ * Sobre-incluir acá es MUY preferible a sub-incluir: el costo de un falso positivo es registrar
+ * un flag de más en el ledger; el de un falso negativo es un flag fail-closed vivo en producción
+ * sobre código que producción no tiene (ISSUE-150: 5 CV de candidatos en cuarentena 89 minutos).
+ */
+const FLAG_REF_RE = /['"`]((?:NEXT_PUBLIC_)?[A-Z0-9_]+_ENABLED)['"`]/g
 const FLAG_NAME_RE = /^(?:NEXT_PUBLIC_)?[A-Z0-9_]+_ENABLED$/
 
 const argv = process.argv.slice(2)
@@ -74,17 +97,21 @@ const walk = dir => {
         continue
       }
 
-      let m
+      const relative = full.startsWith(ROOT) ? full.slice(ROOT.length + 1) : full
 
-      FLAG_RE.lastIndex = 0
+      // Las DOS formas de nombrar un flag: acceso por punto e indirección por literal.
+      // Se recorren ambas sobre el mismo archivo; `Set` deduplica el solapamiento.
+      for (const re of [FLAG_RE, FLAG_REF_RE]) {
+        let m
 
-      while ((m = FLAG_RE.exec(text)) !== null) {
-        codeFlags.add(m[1])
+        re.lastIndex = 0
 
-        const relative = full.startsWith(ROOT) ? full.slice(ROOT.length + 1) : full
+        while ((m = re.exec(text)) !== null) {
+          codeFlags.add(m[1])
 
-        if (!flagReaders.has(m[1])) flagReaders.set(m[1], new Set())
-        flagReaders.get(m[1]).add(relative)
+          if (!flagReaders.has(m[1])) flagReaders.set(m[1], new Set())
+          flagReaders.get(m[1]).add(relative)
+        }
       }
     }
   }
