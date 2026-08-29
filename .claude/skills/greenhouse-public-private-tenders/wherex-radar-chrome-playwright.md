@@ -59,8 +59,9 @@ confirmación humana final.
 
 No afirmes que una licitación no tiene fit sólo por el título o la vista de listado. Lee ficha y adjuntos
 pertinentes, y cita qué campo o documento sostiene la conclusión. Clasifica como `priorizar evaluación`,
-`condicionada`, `no-bid` o `sin evidencia suficiente`. Un fit alto aún no es GO: valida admisibilidad,
-capacidad de entrega y margen sobre loaded cost.
+`condicionada`, `HOLD`, `no-bid` o `sin evidencia suficiente`. `HOLD` es temporal y exige owner, siguiente gate y
+deadline; `no-bid` es terminal para el proceso vigente. Un fit alto aún no es GO: valida admisibilidad, capacidad
+de entrega y margen sobre loaded cost.
 
 ### Descripción y preguntas: evidencia obligatoria
 
@@ -144,11 +145,11 @@ cada original de forma individual; no declares que `Descargar todos` terminó s�
 ### 2. HubSpot: empresa, deal y asociación
 
 Usa el MCP de HubSpot para el CRM; no deduzcas que un deal existe por una carpeta, por una ficha Wherex o por un
-nombre parecido.
+nombre parecido. Aplica además el contrato común de `crm-portfolio-operating-model.md`.
 
 1. Llama primero a `hubspot_get_user_details` y confirma acceso de lectura y escritura para `COMPANY` y `DEAL`.
 2. Busca empresas y deals por comprador, título y código de licitación; después consulta las asociaciones del deal
-con la empresa. Distingue un deal histórico/cerrado de la oportunidad vigente y no dupliques una asociación válida.
+   con la empresa. Distingue un deal histórico/cerrado de la oportunidad vigente y no dupliques una asociación válida.
 3. Consulta las propiedades y opciones reales antes de proponer un alta: HubSpot, no la memoria ni un documento,
    gobierna pipelines, etapas y valores permitidos.
 4. Antes de todo write, muestra la tabla exacta de cambios y obtén confirmación explícita del operador. Para una
@@ -157,15 +158,19 @@ con la empresa. Distingue un deal histórico/cerrado de la oportunidad vigente y
    obligatoria: una asociación no se aprueba contra un nombre ambiguo.
 5. Crea sólo las propiedades necesarias y usa el owner/pipeline/stage vigentes. Para una licitación privada nueva,
    la clasificación comercial debe quedar trazable, sin inventar propiedades que no existan.
-6. Relee el deal y busca la empresa asociada por ID. Reporta creado/verificado o el error real; no afirmes que el
-   vínculo existe sólo porque el create respondió sin error.
+6. Relee el deal y busca la empresa asociada por ID. Repite el readback después de que hayan podido correr
+   automatizaciones nativas. Reporta creado/verificado o el error real; no afirmes que el vínculo existe sólo
+   porque el create respondió sin error. Si `pipeline_bucket`, `dealtype` o asociaciones derivan, refleja live,
+   identifica la automatización y no corrijas silenciosamente.
+7. Actualiza `docs/commercial/tenders/LICITATION_CRM_REGISTER.md` y, si existe Deal,
+   `docs/commercial/CRM_DEAL_REGISTER.md` con el mismo `deal_id` y el estado del último readback.
 
 El MCP exige confirmación aun si el operador había autorizado en general crear los registros. Nunca actualices un
 deal o empresa existente para "hacerlo coincidir" sin mostrar el cambio puntual y recibir esa aprobación.
 
 ### 3. Entrega al operador
 
-La entrega debe separar: (a) candidatas priorizadas/condicionadas/no-bid con evidencia, (b) archivos originales
+La entrega debe separar: (a) candidatas priorizadas/condicionadas/HOLD/no-bid con evidencia, (b) archivos originales
 archivados y los que no existían o quedaron bloqueados, y (c) estado CRM de cada candidata (empresa, deal,
 asociación y verificación). La lectura de un brief se resume con alcance, problema, requisitos, metas, calendario,
 riesgos y siguiente gate; no reproduzcas el documento completo ni información confidencial innecesaria.

@@ -12,19 +12,19 @@
 
 ## Estado real del dominio (2026-07-12, post TASK-1393 Slices 0-4) — no asumas de más
 
-| Pieza | Estado |
-|---|---|
-| **Artifact Composer** (selector · validate · slot-fill · dispatch de resolvers · geometría · render hermético · output targets) | ✅ shipped, **`src/lib/artifact-composer/**`** — primitive domain-free package-shaped; frontera mecánica (allowlist test + eslint); **cero Next-isms** (sin `server-only`/shim) |
-| **Catálogo `deck-axis`** (28 plantillas + registry + contratos + 18 resolvers + validadores semánticos + timeline/agenda hooks + molde compilado + assets) | ✅ **`src/lib/artifact-composer/catalogs/deck-axis/`** — 28/28 componibles (2026-07-14: +`TeamGalleryFull`, +2 en la sesión previa); **cero HEX de marca** (todo sale de `deck-tokens.css`); recipes de gradiente como dato; fuentes locales del pack |
-| **Brand pack `axis`** (snapshot Figma PPT + ledger 78 bases + roles + font pack OFL + guard WCAG advisory) | ✅ `src/lib/artifact-composer/brand-packs/axis/` — compilado por `pnpm composer:brand-pack`; ⚠️ **71 altas `figma.status=proposed`** pendientes de validación del operador en `Sistema Axis - PPT` |
-| **Gate estético**: baseline 51 frames (28 sintéticos + deck SKY 23) + `pnpm composer:visual-gate` a **0 píxeles** + `BASELINE_DELTAS.md` dos-vías | ✅ `scripts/frontend/baselines/artifact-composer/**` — corre en cada cambio del dominio |
-| `ResolvedCompositionManifest` (input + hashes de catálogo/contratos/brand pack/fuentes + validadores) | ✅ **se emite junto al PDF/PNG** (`<artifactId>.manifest.json`); es lo único que TASK-1391 debe aceptar |
-| CLI `pnpm deck:compose <plan.json> [--out dir]` (outDir default `.captures/tender-deck`) | ✅ shipped — **ya NO es el único consumer** (ver renderer productivo abajo); no depende de ningún flag: es el camino local y el modo degradado; **nunca cierra una Proposal por sí solo** |
-| State machine (12 estados, 3 gates humanos) | ✅ **PERSISTIDA** (TASK-1392): matriz en `proposal_state_matrix` + trigger de enforcement + historial append-only; TS ↔ DB con test de paridad. Terminales `won`/`lost` |
-| Aggregate `Proposal` · API routes · migración · capabilities · entitlement per-ORG · outbox | ✅ **existen** (TASK-1392): `greenhouse_commercial.proposal*`, `/api/commercial/proposals/**`, `commercial.proposal.{read,manage,gate,render}`, módulo `proposal_studio_v1`, 9 eventos `commercial.proposal.*` |
-| UI · Nexa/MCP surface | ❌ **no existen** (F5) |
-| Los 3 nodos de juicio (orquestador · chapter-authors · verifier) | 🟡 el nodo **chapter-author** existe (TASK-1415, `proposals/authoring/**`, flag OFF); orquestador y verifier no |
-| **Renderer productivo**: Cloud Run **Job** `artifact-worker` + cola con prioridad + asset store + 2 signals | ✅ **TASK-1391 `complete`** — **staging E2E verificado en Cloud Run** (15 láminas 25,2 s / 3,16 MB · bench 25 láminas 32,3 s / 5,56 MB). **Producción explícitamente gateada** (release control plane + sign-off). Spec: **`GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md`** |
+| Pieza                                                                                                                                                      | Estado                                                                                                                                                                                                                                                                   |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Artifact Composer** (selector · validate · slot-fill · dispatch de resolvers · geometría · render hermético · output targets)                            | ✅ shipped, **`src/lib/artifact-composer/**`** — primitive domain-free package-shaped; frontera mecánica (allowlist test + eslint); **cero Next-isms** (sin `server-only`/shim)                                                                                          |
+| **Catálogo `deck-axis`** (28 plantillas + registry + contratos + 18 resolvers + validadores semánticos + timeline/agenda hooks + molde compilado + assets) | ✅ **`src/lib/artifact-composer/catalogs/deck-axis/`** — 28/28 componibles (2026-07-14: +`TeamGalleryFull`, +2 en la sesión previa); **cero HEX de marca** (todo sale de `deck-tokens.css`); recipes de gradiente como dato; fuentes locales del pack                    |
+| **Brand pack `axis`** (snapshot Figma PPT + ledger 78 bases + roles + font pack OFL + guard WCAG advisory)                                                 | ✅ `src/lib/artifact-composer/brand-packs/axis/` — compilado por `pnpm composer:brand-pack`; ⚠️ **71 altas `figma.status=proposed`** pendientes de validación del operador en `Sistema Axis - PPT`                                                                       |
+| **Gate estético**: baseline 51 frames (28 sintéticos + deck SKY 23) + `pnpm composer:visual-gate` a **0 píxeles** + `BASELINE_DELTAS.md` dos-vías          | ✅ `scripts/frontend/baselines/artifact-composer/**` — corre en cada cambio del dominio                                                                                                                                                                                  |
+| `ResolvedCompositionManifest` (input + hashes de catálogo/contratos/brand pack/fuentes + validadores)                                                      | ✅ **se emite junto al PDF/PNG** (`<artifactId>.manifest.json`); es lo único que TASK-1391 debe aceptar                                                                                                                                                                  |
+| CLI `pnpm deck:compose <plan.json> [--out dir]` (outDir default `.captures/tender-deck`)                                                                   | ✅ shipped — **ya NO es el único consumer** (ver renderer productivo abajo); no depende de ningún flag: es el camino local y el modo degradado; **nunca cierra una Proposal por sí solo**                                                                                |
+| State machine (12 estados, 3 gates humanos)                                                                                                                | ✅ **PERSISTIDA** (TASK-1392): matriz en `proposal_state_matrix` + trigger de enforcement + historial append-only; TS ↔ DB con test de paridad. Terminales `won`/`lost`                                                                                                 |
+| Aggregate `Proposal` · API routes · migración · capabilities · entitlement per-ORG · outbox                                                                | ✅ **existen** (TASK-1392): `greenhouse_commercial.proposal*`, `/api/commercial/proposals/**`, `commercial.proposal.{read,manage,gate,render}`, módulo `proposal_studio_v1`, 9 eventos `commercial.proposal.*`                                                           |
+| UI · Nexa/MCP surface                                                                                                                                      | ❌ **no existen** (F5)                                                                                                                                                                                                                                                   |
+| Los 3 nodos de juicio (orquestador · chapter-authors · verifier)                                                                                           | 🟡 el nodo **chapter-author** existe (TASK-1415, `proposals/authoring/**`, flag OFF); orquestador y verifier no                                                                                                                                                          |
+| **Renderer productivo**: Cloud Run **Job** `artifact-worker` + cola con prioridad + asset store + 2 signals                                                | ✅ **TASK-1391 `complete`** — **staging E2E verificado en Cloud Run** (15 láminas 25,2 s / 3,16 MB · bench 25 láminas 32,3 s / 5,56 MB). **Producción explícitamente gateada** (release control plane + sign-off). Spec: **`GREENHOUSE_ARTIFACT_RENDER_PIPELINE_V1.md`** |
 
 ⚠️ **NUNCA** corras el render pesado (Chromium) en **Vercel** ni en el **`ops-worker`** — bloquearía el
 publisher del outbox. Va en el Cloud Run **Job** dedicado **`artifact-worker`** (**NO** `tender-worker`:
@@ -36,8 +36,8 @@ deployable nuevo no se crea por conveniencia.
 desde el enqueue → `manifest_drift` y **no se publica**. Gates fail-closed **al encolar** (audience por
 referencia · accesibilidad · deadline vencido · validadores) y **en el worker** (geometría · missing_asset ·
 font_fallback · blank_slide · peso · páginas). **El PDF NO es PDF/UA**: si el RFP exige accesibilidad, el
-render se rechaza al encolar (`accessibility_unsupported`) — *mejor no ofertar que entregar un artefacto
-inadmisible*.
+render se rechaza al encolar (`accessibility_unsupported`) — _mejor no ofertar que entregar un artefacto
+inadmisible_.
 
 ## Gate de cierre — taller ≠ Proposal gobernada
 
@@ -84,7 +84,7 @@ Capacidades nuevas del motor/catálogo (nacidas iterando la oferta SKY; TODAS do
    (un deck reordenado se contradice solo). Render standalone sin plan → el hook no pinta, jamás inventa.
 4. **`TeamGalleryFull`** (contentType `team-gallery`): roster de **FOTOS REALES** del squad vía resolver
    `squad-person` — allowlist **cerrada** (`andres, daniela, humberly, julio, luis, maria-fernanda,
-   melkin, valentina` → `assets/squad/squad-<nombre>.png`); nombre desconocido →
+melkin, valentina` → `assets/squad/squad-<nombre>.png`); nombre desconocido →
    `UnknownResolverValueError`, una cara IA no puede entrar ni por error. El binding foto↔nombre↔rol
    **lo confirma el operador humano, nunca lo asume un agente**. Persona nueva = foto real (recorte con
    alpha) + entrada en la allowlist + enum del contrato. Desambiguación: roles con glifo → `TeamSplit`;
@@ -138,12 +138,12 @@ el logo, viewBox con espacio en blanco que lo achica, logo diseñado en blanco q
 **El motor NO es del dominio comercial.** Se extrae como primitive de plataforma y las superficies pasan a
 ser **catálogos (= DATO)**. El aggregate deja de llamarse `Tender`.
 
-| Antes | Ahora |
-|---|---|
-| `src/lib/commercial/tenders/deck/**` | **`src/lib/artifact-composer/**`** (domain-free) |
-| "el deck" | **catálogo** `deck-axis` (16:9 → PDF) · **catálogo** `social-carousel` (4:5 → PNG set) |
-| aggregate `Tender` | aggregate **`Proposal`** · `origin ∈ {public_tender, private_rfp, direct_sales}` |
-| AXIS horneado en las plantillas | **brand pack como INPUT** (AXIS = el brand pack **de Efeonce**) |
+| Antes                                | Ahora                                                                                  |
+| ------------------------------------ | -------------------------------------------------------------------------------------- |
+| `src/lib/commercial/tenders/deck/**` | **`src/lib/artifact-composer/**`\*\* (domain-free)                                     |
+| "el deck"                            | **catálogo** `deck-axis` (16:9 → PDF) · **catálogo** `social-carousel` (4:5 → PNG set) |
+| aggregate `Tender`                   | aggregate **`Proposal`** · `origin ∈ {public_tender, private_rfp, direct_sales}`       |
+| AXIS horneado en las plantillas      | **brand pack como INPUT** (AXIS = el brand pack **de Efeonce**)                        |
 
 - **NUNCA** el Composer importa de un dominio. **NUNCA** lo copies para una superficie nueva — **un
   catálogo, no un fork**. Si agregar el catálogo te obliga a tocar el motor, el motor está mal.
@@ -264,12 +264,12 @@ Cada `tender_asset` nace **`internal`** o **`client_facing`**. **Sólo un entreg
 aprobado puede empaquetarse.** En una licitación esto no es una regla de permisos: lo interno contiene
 **tu estructura de costos y tu piso de negociación**.
 
-| Artefacto | `audience` | Por qué |
-|---|---|---|
-| Oferta técnica · económica · deck · anexos | `client_facing` | Es lo que evalúa el comité |
-| **Squad blueprint** | **`internal`** | Lleva el **loaded cost** por rol |
-| **Diagnóstico interno** (lente técnica del Be X) | **`internal`** | Al cliente va sólo la lente **medida** |
-| Scoring bid/no-bid · walk-away · margen | **`internal`** | Revela tu piso de negociación |
+| Artefacto                                        | `audience`      | Por qué                                |
+| ------------------------------------------------ | --------------- | -------------------------------------- |
+| Oferta técnica · económica · deck · anexos       | `client_facing` | Es lo que evalúa el comité             |
+| **Squad blueprint**                              | **`internal`**  | Lleva el **loaded cost** por rol       |
+| **Diagnóstico interno** (lente técnica del Be X) | **`internal`**  | Al cliente va sólo la lente **medida** |
+| Scoring bid/no-bid · walk-away · margen          | **`internal`**  | Revela tu piso de negociación          |
 
 - **NUNCA** promuevas `internal → client_facing` por default ni "porque parece útil". Es una decisión
   humana explícita, auditada.
@@ -315,7 +315,7 @@ command canónico y cruza la MISMA puerta que las rutas.
 - **EL SCOPE SALE DE LA SESIÓN, NUNCA DEL MODELO.** Ninguna acción recibe `ownerOrgId`: se deriva del
   entitlement (`resolveProposalStudioOwnerOrg`) y el cliente entra **por nombre**, resuelto fail-closed
   (`resolveClientOrganizationByName`: cero → no inventa; varias → pregunta). **NUNCA** agregues un id de
-  organización a un `inputSchema` de agente — dejar que el LLM *proponga* un UUID es una superficie de
+  organización a un `inputSchema` de agente — dejar que el LLM _proponga_ un UUID es una superficie de
   ataque (nombrar la org de otro y confiar en que el gate la atrape). Los únicos ids que un agente pasa
   son los que el sistema acabó de emitir (`proposalId`, `assetId`, `evidenceId`).
 - **UN PREVIEW QUE PROMETE LO QUE VA A FALLAR ES UNA MENTIRA.** Los gates de admisibilidad del render
@@ -401,10 +401,17 @@ command canónico y cruza la MISMA puerta que las rutas.
     no un caso borde. Es justamente lo que decidió el ADR.
 - **El dominio tenders NO escribe** payroll, finance ni HR. Consume `loaded cost` para el pricing; no lo
   calcula ni lo muta.
+- **Un alta CRM no prueba estado estable.** Tras crear o actualizar una licitación, relee Deal, Company y
+  asociaciones; repite el readback después de las automatizaciones nativas. Si `pipeline_bucket`, `dealtype` o
+  asociaciones derivan, el registro refleja HubSpot live y deja la automatización como riesgo con owner. Nunca
+  conserves como vigente el valor solicitado ni lo corrijas silenciosamente.
+- **Una cartera no es una lista plana de Deals.** Separa top bids, RFI livianos y gate/HOLD/NO-BID usando deadline,
+  admisibilidad, fit, valor esperado, esfuerzo, capacidad, bloqueos y margen. `HOLD` es temporal; `NO-BID` y
+  `Expirada` son resultados reconciliables del proceso vigente.
 
 ## Aprendizajes ISSUE-121 — el primer deploy del artifact-worker (2026-07-12)
 
-Cinco bugs invisibles en local, todos de la clase *"la nube difiere de la máquina del autor"*.
+Cinco bugs invisibles en local, todos de la clase _"la nube difiere de la máquina del autor"_.
 Los invariantes que dejaron:
 
 - **NUNCA** declarar "listo" un deployable nuevo sin ejecutarlo en su runtime real; **SIEMPRE**

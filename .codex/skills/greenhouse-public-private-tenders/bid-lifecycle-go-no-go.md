@@ -6,15 +6,15 @@ El ciclo de una oportunidad, del ruido del portal a un GO defendible. Aplica a p
 
 Alinea con el modelo del módulo RESEARCH-007. Cada estado tiene una pregunta y una salida.
 
-| Estado | Pregunta | Salida |
-|---|---|---|
-| **1. Discovered** | ¿Existe la oportunidad y la capturamos? | Registro con fuente + fecha + raw payload/adjuntos |
-| **2. Screened** | ¿Es siquiera de nuestro rubro? | Fit binario preliminar (keyword/rubro/BU) + señales |
-| **3. Triage** | ¿Vale la pena mirarla en serio hoy? | Prioridad por decision band + owner asignado |
-| **4. Evaluate** | ¿Podemos y conviene ganarla? | **Bid/No-Bid** con score explicable + margen |
-| **5. Plan Bid** | ¿Cómo la ganamos? | Capture plan: mensajes, precio, equipo, garantías, plazos, anexos |
-| **6. Submit (externo)** | ¿Presentamos? | Paquete presentado en el portal (acción humana) + comprobante |
-| **7. Reconcile** | ¿Qué pasó y qué aprendimos? | Resultado (adjudicada/desierta/perdida) + win/loss + recalibración |
+| Estado                  | Pregunta                                | Salida                                                             |
+| ----------------------- | --------------------------------------- | ------------------------------------------------------------------ |
+| **1. Discovered**       | ¿Existe la oportunidad y la capturamos? | Registro con fuente + fecha + raw payload/adjuntos                 |
+| **2. Screened**         | ¿Es siquiera de nuestro rubro?          | Fit binario preliminar (keyword/rubro/BU) + señales                |
+| **3. Triage**           | ¿Vale la pena mirarla en serio hoy?     | Prioridad por decision band + owner asignado                       |
+| **4. Evaluate**         | ¿Podemos y conviene ganarla?            | **Bid/No-Bid** con score explicable + margen                       |
+| **5. Plan Bid**         | ¿Cómo la ganamos?                       | Capture plan: mensajes, precio, equipo, garantías, plazos, anexos  |
+| **6. Submit (externo)** | ¿Presentamos?                           | Paquete presentado en el portal (acción humana) + comprobante      |
+| **7. Reconcile**        | ¿Qué pasó y qué aprendimos?             | Resultado (adjudicada/desierta/perdida) + win/loss + recalibración |
 
 **Human-in-control:** el paso 6 lo ejecuta una persona. La skill/agente prepara; no envía.
 
@@ -32,18 +32,18 @@ El listado de un portal trae miles de filas resumidas. El screening barato usa *
 
 Nada de score opaco. Combina reglas deterministas con señales auditables. Cada score guarda: valor, versión de scoring, señales positivas, señales negativas, campos/documentos que lo sustentan, fecha.
 
-| Componente | Pregunta |
-|---|---|
-| **Fit de servicio** | ¿Pide algo que Efeonce vende? (audiovisual, web, CRM, campañas, analytics…) |
-| **Fit de business line** | ¿Hay una BU naturalmente responsable? (Globe, Wave, Reach, CRM…) |
-| **Calidad del match** | ¿El match está en nombre, descripción, items o bases? (bases > nombre) |
-| **Plazo** | ¿Hay tiempo real para preparar oferta? (cierre en 3 días vs 18) |
-| **Monto estimado** | ¿Justifica el esfuerzo comercial? (umbral por BU) |
-| **Comprador** | ¿Historial, relación, rubro atractivo? (organismo recurrente, ministerio) |
-| **Complejidad documental** | ¿Muchos anexos/requisitos pesados? (garantías, certificaciones) |
-| **Riesgo de fit** | ¿Parece commodity, obra civil, hardware, scope fuera de agencia? |
-| **Capacidad interna** | ¿Hay equipo y ventanas disponibles? (delivery/capacity) |
-| **Estrategia** | ¿Abre cuenta, caso público, relación futura? (first logo, sector prioritario) |
+| Componente                 | Pregunta                                                                      |
+| -------------------------- | ----------------------------------------------------------------------------- |
+| **Fit de servicio**        | ¿Pide algo que Efeonce vende? (audiovisual, web, CRM, campañas, analytics…)   |
+| **Fit de business line**   | ¿Hay una BU naturalmente responsable? (Globe, Wave, Reach, CRM…)              |
+| **Calidad del match**      | ¿El match está en nombre, descripción, items o bases? (bases > nombre)        |
+| **Plazo**                  | ¿Hay tiempo real para preparar oferta? (cierre en 3 días vs 18)               |
+| **Monto estimado**         | ¿Justifica el esfuerzo comercial? (umbral por BU)                             |
+| **Comprador**              | ¿Historial, relación, rubro atractivo? (organismo recurrente, ministerio)     |
+| **Complejidad documental** | ¿Muchos anexos/requisitos pesados? (garantías, certificaciones)               |
+| **Riesgo de fit**          | ¿Parece commodity, obra civil, hardware, scope fuera de agencia?              |
+| **Capacidad interna**      | ¿Hay equipo y ventanas disponibles? (delivery/capacity)                       |
+| **Estrategia**             | ¿Abre cuenta, caso público, relación futura? (first logo, sector prioritario) |
 
 Ejemplo de score explicable:
 
@@ -82,6 +82,13 @@ Solo si las tres pasan, y el fit-score/estrategia lo respalda, es **GO**.
 - No perseguir volumen: **fit before volume**. Mejor 5 bids fuertes que 40 tibios.
 - **Commercial before finance**: primero ¿la queremos y podemos ganarla?, después el detalle financiero fino.
 - No declarar bandas/umbrales como definitivos: recalíbralos con win/loss real.
+
+## De score individual a cartera operable
+
+Cuando hay varias oportunidades, no ordenes únicamente por score, fecha o monto. Usa
+`crm-portfolio-operating-model.md`: cruza tiempo restante, admisibilidad, fit, valor esperado, esfuerzo de
+preparación, capacidad, bloqueos y margen. La salida separa **top bids**, **RFI livianos** y
+**gate/HOLD/NO-BID**. Un Deal creado no significa que exista una propuesta en producción.
 
 ## Plan Bid → Capture plan
 
