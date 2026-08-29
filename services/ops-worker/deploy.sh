@@ -870,6 +870,38 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_URL_VISIBILITY_ENABLED=${GROWTH_SEO_URL_VISIBIL
 GROWTH_SEO_COMPETITOR_GAP_ENABLED="${GROWTH_SEO_COMPETITOR_GAP_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_COMPETITOR_GAP_ENABLED=${GROWTH_SEO_COMPETITOR_GAP_ENABLED}"
 
+# TASK-1700 — Cola priorizada de trabajo SEO (materializador del aggregate append-only).
+#
+# 🔴 **OFF por defecto, y por una razón distinta a la de sus hermanos**: este flag NO
+# compromete gasto de proveedor (la cola lee tablas ya pagadas). Lo que compromete es la
+# AUTORIDAD DE ORDEN — con la cola encendida el operador ve un orden que manda otra cosa que
+# la que mandaba ayer, y aparecen filas de orígenes que antes no estaban en esa lista. Por eso
+# el flip se AVISA antes, aunque no cueste un centavo.
+#
+# ⚠️ DUAL-RUNTIME: acá gatea el MATERIALIZADOR (sin esto no se escribe ningún snapshot y los
+# lanes de Vercel servirían una cola permanentemente vacía sin poder explicar por qué); en
+# Vercel gatea el reader, los lanes, la tool MCP y el cutover del consumer. Prenderlo en un
+# solo runtime deja la capacidad coja de forma distinta en cada dirección.
+#
+# Este archivo es el SoT declarativo del lado worker (`--set-env-vars` es DESTRUCTIVO: aplicar
+# también en vivo con `--update-env-vars` para efecto inmediato, o el próximo deploy lo borra
+# en silencio). Es SUBORDINADO a `GROWTH_SEO_ENABLED`.
+# Rollback (<5 min): `false` acá + `--update-env-vars` + pausar el scheduler.
+#
+# 🟢 ON desde 2026-08-29 (release develop→main, autorización explícita del operador: "prendelo,
+# este producto está en desarrollo ahora mismo"). Se prende ACÁ, en el SoT declarativo, y NO con
+# un `gcloud run services update --update-env-vars` suelto: `--set-env-vars` es DESTRUCTIVO y el
+# próximo deploy del worker habría borrado la var en silencio — el modo de falla exacto del caso
+# `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` (revisión 00470 prendida, 00473 la borró, el consumer
+# registró `skip: flag OFF` y el ledger siguió diciendo ON). Prendido en el SoT, el flag sobrevive
+# a cualquier deploy por construcción.
+#
+# ⚠️ El scheduler `ops-seo-work-queue-materialize` sigue PAUSADO: prender el flag habilita el
+# materializador, no lo agenda. Despausarlo es una decisión aparte y exige la corrida shadow
+# verificada que este mismo bloque pide.
+GROWTH_SEO_WORK_QUEUE_ENABLED="${GROWTH_SEO_WORK_QUEUE_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},GROWTH_SEO_WORK_QUEUE_ENABLED=${GROWTH_SEO_WORK_QUEUE_ENABLED}"
+
 # TASK-1699 — Persistencia del top-N del SERP que el rank capture YA paga (costo marginal
 # CERO: cero llamadas nuevas, cero cambio de depth/flags). Gatea la ESCRITURA dentro del
 # batch diario `ops-seo-rank-capture` — sin scheduler nuevo.
@@ -1550,13 +1582,39 @@ echo "  -> ops-seo-competitor-coverage: 0 9 18 * * PAUSADO (cobertura de competi
 # 2026-08-14 tras el smoke live verificado + autorización del operador. El drain con cola
 # vacía es no-op (cero llamadas, cero costo): el gasto sólo ocurre cuando alguien encola una
 # corrida, que ya pasó preview + gate de entitlement.
+#
+# Cadencia */2 (bajada de */10 el 2026-08-28, autorización del operador): `Descubrir` es un
+# workbench INTERACTIVO — el operador encola y espera mirando "En cola". Con */10 la espera media
+# era 5 min y el peor caso 10, cuando la corrida en sí tarda segundos (1 llamada al proveedor). El
+# */10 no compraba nada: el drain con cola vacía es no-op, así que correrlo 5× más seguido no gasta
+# ni un centavo más — es el mismo razonamiento por el que `ops-outbox-publish` ya usa */2.
+# Seguro a esta cadencia porque el claim es un UPDATE condicional (`WHERE status='pending'`
+# ... RETURNING): un segundo worker matchea cero filas y responde `busy` sin tocar al proveedor.
 upsert_scheduler_job \
   "ops-seo-keyword-discovery-drain" \
-  "*/10 * * * *" \
+  "*/2 * * * *" \
   "/seo/keyword-discovery/drain" \
   '{}' \
   "false"
-echo "  -> ops-seo-keyword-discovery-drain: */10 * * * * ACTIVO (keyword discovery, TASK-1664 — despausado 2026-08-14 tras smoke live + autorización del operador)"
+echo "  -> ops-seo-keyword-discovery-drain: */2 * * * * ACTIVO (keyword discovery, TASK-1664 — despausado 2026-08-14; cadencia bajada de */10 a */2 el 2026-08-28)"
+
+# TASK-1700 — Cola priorizada de trabajo SEO. Cadencia DIARIA a las 10:00, DESPUÉS de
+# `ops-seo-gsc-snapshot` (0 9): el plan del día se calcula cuando ya llegó la demanda medida
+# del día, no antes — con el orden invertido el plan de hoy se armaría con los datos de ayer.
+#
+# 🔴 NACE PAUSADO. Es el TERCER freno independiente, además del flag del worker y el de
+# Vercel: la cola cambia de dueño el orden que el operador ve en pantalla, así que se despausa
+# recién tras la corrida shadow verificada sobre un target y el aviso al operador de SEO.
+#
+# El cron NO manda `force`: si el snapshot vigente es reciente, reusarlo ES la respuesta
+# correcta — mismos insumos, cero writes.
+upsert_scheduler_job \
+  "ops-seo-work-queue-materialize" \
+  "0 10 * * *" \
+  "/seo/work-queue/materialize-batch" \
+  '{}' \
+  "true"
+echo "  -> ops-seo-work-queue-materialize: 0 10 * * * PAUSADO (cola priorizada, TASK-1700 — despausar sólo tras corrida shadow verificada + aviso al operador de SEO)"
 
 # Email deliverability monitor — TASK-775 Slice 2.
 #

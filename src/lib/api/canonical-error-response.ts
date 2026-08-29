@@ -160,6 +160,8 @@ export type CanonicalErrorCode =
   | 'seo_prospect_invalid_input'
   | 'seo_prospect_cost_blocked'
   | 'seo_prospect_diagnostic_not_found'
+  | 'seo_work_queue_invalid_input'
+  | 'seo_work_queue_item_not_found'
   // Proposal Studio F0 (TASK-1392).
   | 'proposal_not_found'
   | 'proposal_invalid_input'
@@ -717,6 +719,20 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     actionable: false
   },
   // TASK-1709 — diagnóstico de prospecto: dominio o mercado fuera del vocabulario del carril.
+  // TASK-1700 — cola priorizada: input inválido (falta el sitio, decisión fuera del
+  // vocabulario cerrado). Corregir la solicitud sí resuelve.
+  seo_work_queue_invalid_input: {
+    status: 400,
+    message: 'Revisa la solicitud: falta el sitio o la decisión no es una de las permitidas.',
+    actionable: true
+  },
+  // Anti-oracle: un item de otra organización "no existe" para este caller. Y un item de un
+  // snapshot viejo tampoco: los snapshots se regeneran, así que reintentar no lo trae de vuelta.
+  seo_work_queue_item_not_found: {
+    status: 404,
+    message: 'Esa entrada de la cola ya no existe. Vuelve a cargar el plan y decide sobre la versión vigente.',
+    actionable: false
+  },
   seo_prospect_invalid_input: {
     status: 400,
     message: 'Revisa la solicitud: el dominio no es válido o el mercado no está habilitado para diagnósticos.',

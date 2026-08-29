@@ -97,35 +97,36 @@ sin segundo ledger y Globe Producer muestra un self-view read-only de effective/
 Cobertura parcial o stale nunca se representa como cero. Los IDs mutables del rollout viven en `Handoff.md` y
 `GLOBE_RUNTIME_HANDOFF.md`, no en este contrato durable.
 
-El módulo Growth SEO (`growth.seo`, EPIC-022) autoriza todo run por un único chokepoint, `enforceSeoRunEntitlement`
-(`src/lib/growth/seo/entitlement.ts`), con entitlement per-org vía el módulo `seo_v2` de
-`greenhouse_client_portal.modules` — **única clave leída** desde TASK-1677
-(`SEO_MODULE_KEYS_READ = ['seo_v2']`); el expand/contract desde `seo_v1` ya está aplicado y
-volver a leer `seo_v1` sería reabrir una ventana cerrada. Contrato en
+El módulo Growth SEO (`growth.seo`, EPIC-022) autoriza todo run por un único chokepoint,
+`enforceSeoRunEntitlement` (`src/lib/growth/seo/entitlement.ts`), con entitlement per-org vía el módulo `seo_v2`
+de `greenhouse_client_portal.modules` — **única clave leída** (`SEO_MODULE_KEYS_READ`); releer `seo_v1`
+reabriría una ventana ya cerrada por su expand/contract (TASK-1677). Contrato en
 [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §9 (§17
-contrata el seam de extracción hacia Wave). Los reads del módulo son readers canónicos consumer-agnósticos —
-`readKeywordOpportunities` y `readSeoAeoGap` (este último cruza SEO↔AEO respetando el boundary de §1.1) —
-expuestos por el lane ecosystem `/api/platform/ecosystem/growth/seo/*` y sus MCP tools; **todo reader SEO
-nuevo expone su tool en el mismo PR**. Desde 2026-08-06 el camino está **vivo en producción y federado en
-`mcp.efeonce.org`** mediante el provider `greenhouse-seo`; el acceso per-org falla cerrado.
-El flag `GROWTH_SEO_ENABLED` es **multi-runtime** — Vercel (lane) + `ops-worker` (materializer GSC);
-prenderlo en uno solo deja el otro camino muerto. Su primera captura corre live
-desde 2026-08-05: la serie propia de
-Google Search Console (`greenhouse_growth.seo_gsc_daily`) se materializa a diario en el **ops-worker** —
-**servicio Cloud Run único compartido staging+prod**, así que una capacidad worker-only queda viva al mergear a
-`develop`, sin release control plane, y **no existe un flip "sólo staging"** (invariantes en
+seam de extracción hacia Wave; §18 la cola). Sus reads son readers canónicos consumer-agnósticos
+—`readSeoAeoGap` cruza SEO↔AEO respetando §1.1— expuestos por el lane ecosystem
+`/api/platform/ecosystem/growth/seo/*` y sus MCP tools; **todo reader SEO nuevo expone su tool en el mismo PR**.
+El **orden de trabajo** tiene UNA autoridad (`TASK-1700`): el aggregate append-only
+`greenhouse_growth.seo_work_queue_*` con `priority_score` versionado en columna, servido por
+`readSeoWorkQueue` / `materializeSeoWorkQueue` (idempotente, ops-worker) / `recordSeoWorkQueueDecision`
+(append-only, propone y **no ejecuta**); ningún consumer reordena ni recompone orígenes, y **sin demanda medida
+no hay score** (`priority_score` NULL en su propia banda, jamás volumen estimado). La curva de CTR vive en
+`src/lib/growth/seo/ctr-curve.ts`, **declara** su usabilidad y nunca colapsa un `0` medido con «sin muestra»
+(`TASK-1792`). En discovery un candidato **es una keyword normalizada, no una fila del proveedor**, y toda
+decisión sobre él la escribe —en su misma transacción— el primitive que produce el hecho
+(`TASK-1694`/`TASK-1692`). Está **vivo en producción y federado en `mcp.efeonce.org`** (provider
+`greenhouse-seo`), con acceso per-org fail-closed. El flag `GROWTH_SEO_ENABLED` es **multi-runtime** — Vercel
+(lane) + `ops-worker`; prenderlo en uno solo deja el otro camino muerto. La serie
+`greenhouse_growth.seo_gsc_daily` se materializa a diario en el **ops-worker** — **servicio Cloud Run único
+compartido staging+prod**, así que una capacidad worker-only queda viva al mergear a `develop`, sin release
+control plane, y **no existe un flip "sólo staging"** (invariantes en
 [`OPS_RELIABILITY_AGENT_INVARIANTS.md`](docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md)).
-`TASK-1303` (rank capture + `readRankEvolution`) está **complete y en producción** (release `fcee5ab9f7ce`,
-manifest released): el scheduler `ops-seo-rank-capture` captura posiciones a diario (05:00 CLT) y la serie
-acumula desde 2026-08-06 (día-1: Berel, 31 keywords), con la señal `seo.rank.capture_lag` en Growth Health.
-`TASK-1653` (guard de paridad del gateway), `TASK-1307` (performance) y `TASK-1304` (site audit +
-backlinks) están **complete**.
 
-Berel se opera desde Notion con la skill espejo `berel-content-production`; la modalidad se decide por
-contenido público vivo —no por HTTP 200 ni por un `Enlace` planificado— y el cierre relee relaciones,
-conteos, fechas, estados y paridad tarea/subítem porque las automatizaciones pueden cambiar lo escrito. La
-paridad social se deposita en dos fases usando una sola cadena final; piezas históricas, sensibles, destinadas a
-consolidación o con soft-404 conservan un gate visible y no se programan hasta la validación dueña.
+Berel se opera desde Notion con `berel-content-production`: decide por contenido público vivo, relee relaciones y
+conteos al cerrar, y mantiene gates visibles para piezas históricas, sensibles, soft-404 o aún no validadas.
+
+Las landings WordPress/Ohio se enrutan por `efeonce-public-site-wordpress` y su `references/landing-registry.md`. La
+referencia Elementor + Growth + SEO/AEO es `TASK-1598`; después de cada resave ejecuta sus gates de fidelidad y SEO.
+`Index eligible` no significa `indexed`: lo segundo requiere Search Console.
 
 ### Lectura mínima obligatoria
 

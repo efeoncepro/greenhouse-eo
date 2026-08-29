@@ -189,3 +189,33 @@ export const GROWTH_SEO_SERP_TOP_RESULTS_FLAG = 'GROWTH_SEO_SERP_TOP_RESULTS_ENA
 /** Gate de la persistencia del top-N. No gasta: gatea escritura ya pagada y lectura. */
 export const isSeoSerpTopResultsEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
   isTrue(env[GROWTH_SEO_SERP_TOP_RESULTS_FLAG])
+
+/**
+ * TASK-1700 — Cola priorizada de trabajo SEO (materializador + reader + lanes).
+ *
+ * ⚠️ **Lo leen DOS runtimes, y prenderlo en uno solo deja la capacidad coja de forma
+ * distinta en cada dirección:**
+ *   1. **ops-worker** (`services/ops-worker/deploy.sh`, SoT declarativo cuyos
+ *      `--set-env-vars` son DESTRUCTIVOS) — gatea el materializador. Sin él NO SE ESCRIBE
+ *      NINGÚN SNAPSHOT, así que los lanes de Vercel servirían una cola permanentemente
+ *      vacía sin poder explicar por qué. Aplicarlo también en vivo con `--update-env-vars`
+ *      para efecto inmediato; sólo lo primero lo borra el próximo deploy, en silencio.
+ *   2. **Vercel** — gatea el reader, la ruta app, el lane ecosystem, la tool MCP interna y
+ *      el cutover del consumer. Sin él el worker acumula snapshots que nadie lee.
+ *
+ * **Tercer freno independiente:** el Cloud Scheduler `ops-seo-work-queue-materialize` nace
+ * PAUSADO; su estado se declara en el 5.º argumento de `upsert_scheduler_job` y se re-aplica
+ * en CADA deploy.
+ *
+ * 🔴 A diferencia de sus hermanos del módulo, **este flag NO compromete gasto de proveedor**:
+ * la cola lee tablas ya pagadas. Lo que sí compromete es la AUTORIDAD DE ORDEN — con el flag
+ * ON el operador ve un orden que manda otra cosa, así que el flip se avisa antes.
+ *
+ * Es SUBORDINADO a `GROWTH_SEO_ENABLED`. Registrar en
+ * docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
+ */
+export const GROWTH_SEO_WORK_QUEUE_FLAG = 'GROWTH_SEO_WORK_QUEUE_ENABLED'
+
+/** Gate de la cola priorizada. Default OFF. No gasta: gatea orden y lectura. */
+export const isSeoWorkQueueEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_SEO_WORK_QUEUE_FLAG])

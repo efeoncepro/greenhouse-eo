@@ -251,7 +251,7 @@ export const createGreenhouseMcpServer = (
     {
       title: 'Get SEO Keyword Opportunities',
       description:
-        'List measured striking-distance SEO keyword opportunities for an organization (Google Search Console data: weighted position, impressions, estimated click gain, quick wins, cannibalization). Requires the organization to have the SEO module (seo_v2) assigned. TASK-1661: searchVolume and difficulty are OPTIONAL enrichment from the DataForSEO Labs monthly snapshot — an ESTIMATE of the wider market, not measured demand for this site. A null value means it was never queried; NEVER report it as zero, and never rank by it as if it were measured. The market field says whether that enrichment is available at all. When data.ok is false, report the errorCode (disabled, target_not_configured, no_data) honestly instead of inventing results.',
+        'List measured striking-distance SEO keyword opportunities for an organization (Google Search Console data: weighted position, impressions, estimated click gain, quick wins, cannibalization). Requires the organization to have the SEO module (seo_v2) assigned. TASK-1661: searchVolume and difficulty are OPTIONAL enrichment from the DataForSEO Labs monthly snapshot — an ESTIMATE of the wider market, not measured demand for this site. A null value means it was never queried; NEVER report it as zero, and never rank by it as if it were measured. The market field says whether that enrichment is available at all. TASK-1792: every response also declares HOW the estimated click gain was produced and WHAT actually ordered the list, and you must report both — the number alone is not interpretable. ctrCurveSource has four states: org_measured (the CTR curve came from this site\'s own Search Console data at the target position), org_level_reference_shape (the site had enough data to estimate its overall CTR LEVEL but not the per-position curve, so the reference SHAPE was scaled to that level — correct by construction but NOT yet observed in production), unusable (that position WAS observed but its sample is too thin to estimate a CTR from it — e.g. 75 impressions and 0 clicks — so the reference curve was borrowed), and fallback (that position was NEVER observed at all, and the reference curve was borrowed). Those last two are distinct facts, not synonyms: a measured 0 is not the same as no measurement, and curveSampleSize is null only in fallback. IMPORTANT: a gain is still computed and returned in all four states — it is NEVER collapsed to 0 to signal missing data. In the three non-org_measured states the number is a borrowed approximation you must present as such, never as this site\'s own measurement. curveSampleSize carries the impressions and clicks behind that verdict. orderedBy declares the criterion that actually sorted the rows: estimated_click_gain when the ceiling discriminates, or measured_demand (impressions x proximity to page 1, all measured) when it does not — a field with zero variance cannot order anything, and presenting a measured_demand list as if it were ranked by projected gain misreports what the user is looking at. The gain is a CEILING under the assumption that the CTR observed at that position repeats; it is not a forecast that the page will reach that position. When data.ok is false, report the errorCode (disabled, target_not_configured, no_data) honestly instead of inventing results.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional(),
         market: z.string().trim().min(2).max(12).optional(),
@@ -352,6 +352,25 @@ export const createGreenhouseMcpServer = (
       outputSchema: greenhouseMcpToolOutputSchema
     },
     async args => handlers.getSeoVisibility360(args)
+  )
+
+  // TASK-1785 — la lectura compuesta. CONVIVE con get_seo_visibility_360: aquella cruza SEO×AEO
+  // (dos ejes ortogonales de motores distintos), ésta cruza medido×estimado DENTRO de SEO.
+  server.registerTool(
+    'get_seo_dual_lens_visibility',
+    {
+      title: 'Get SEO Dual-Lens Visibility',
+      description:
+        'Return BOTH position series for the same set of keywords, SEPARATED and labelled: the MEASURED one from Google Search Console and the ESTIMATED one from the purchased SERP. Use this instead of calling get_seo_performance and get_seo_rank_evolution separately whenever you are about to describe "where this client ranks" — it exists precisely so that presenting both lenses correctly is cheaper than merging them by mistake. 🔴 THE TWO SERIES ARE NOT COMPARABLE POINT TO POINT AND MUST NEVER BE AVERAGED, SUMMED, INTERPOLATED OR MERGED INTO A SINGLE NUMBER. They do not share a referent: the measured series is an impressions-weighted average over REAL users of this domain, while the estimated one is an exact position for a synthetic query issued by us from a location we chose. A number produced by combining them has no referent at all and would be presented with the confidence of a measurement — which is worse than having no number. There is deliberately NO combined field in the response, and that is not an omission to be filled in. Report them side by side, each with its own lens, source and capturedAt as-of date, and note that each lens declares its OWN window (range) because they can differ — the purchased series often starts later than the measured history. keywordsWithoutData names the requested keywords with no data in that lens: name them instead of dropping them silently. A lens can come back unavailable with a reason (for example target_not_resolved when the organization has several active markets and none was selected): that is a STATE, never a zero, and it does not invalidate the other lens. position=null means no measurement that day — a gap, never a zero, because position zero does not exist.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1).optional(),
+        market: z.string().trim().min(1).optional(),
+        keywords: z.array(z.string().trim().min(1)).min(1).max(25),
+        rangeDays: z.number().int().positive().max(365).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoDualLensVisibility(args)
   )
 
   server.registerTool(
@@ -566,6 +585,25 @@ export const createGreenhouseMcpServer = (
       outputSchema: greenhouseMcpToolOutputSchema
     },
     async args => handlers.getSeoKeywordGap(args)
+  )
+
+  // TASK-1700 — la cola priorizada de trabajo: la ÚNICA autoridad de orden del módulo.
+  server.registerTool(
+    'get_seo_work_queue',
+    {
+      title: 'Get SEO Work Queue',
+      description:
+        'Read the prioritized SEO work queue for an organization: the SINGLE source of ordering for the module, served from an immutable append-only snapshot. Each item carries an origin (gsc_striking_distance, discovery_candidate, declared_target, aeo_gap, competitor_gap, consolidation), a recommended verb (optimize, create, consolidate, measure) and a score BAND. 🔴 The score is estimated INCREMENTAL CLICKS over MEASURED demand — Search Console impressions × the gap between the CTR expected at the target position and the current CTR, using a CTR curve derived from the client\'s own site. It is a CEILING, never a forecast: it assumes the CTR observed at that position repeats, it does NOT say the page will get there. 🔴 THE BANDS ARE NOT COMPARABLE BY NUMBER AND NEVER AVERAGE: band 1 has measured demand and a usable curve (priorityScore in clicks); band 2 has measured demand but the site\'s own CTR curve lacks the sample to estimate a target CTR (priorityScore NULL, ordered by impressions); band 3 has NO measured demand at all (priorityScore NULL, verb "measure", ordered alphabetically). A null priorityScore is NOT zero — it means the queue refuses to fabricate a number, and reporting it as 0 inverts the meaning. Estimated provider search volume is NEVER used to order anything. Always report staleness (fresh | stale | absent) and originHealth: a degraded or down origin means work is MISSING from the list, not that there is none. Filter with origin (repeatable) and paginate with cursor — the keyset is stable because the snapshot is immutable. Internal Efeonce use only.',
+      inputSchema: {
+        organizationId: z.string().trim().min(1),
+        market: z.string().trim().min(1).optional(),
+        origin: z.array(z.string().trim().min(1)).optional(),
+        limit: z.number().int().min(1).max(200).optional(),
+        cursor: z.string().trim().min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getSeoWorkQueue(args)
   )
 
   // TASK-1699 — el top-N del SERP ya pagado + descubrimiento de competidores (lecturas).

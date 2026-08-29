@@ -299,8 +299,22 @@ estado**:
 4. **Un flag gatea una operación, no una familia.** Si un mismo flag apaga la operación
    riesgosa y la inofensiva, la segunda queda rehén: el trabajo se completa y no hay
    transición para cerrarlo.
+5. **Un estimador declara si puede estimar; no devuelve un número plausible cuando no
+   puede.** Es la variante más peligrosa del patrón porque **no tiene superficie donde
+   verse**: el colapso no produce una etiqueta ambigua sino un **escalar bien tipado, en
+   rango y verosímil**, que pasa el CHECK de la base, el typecheck, el lint y los tests. La
+   forma canónica es que el primitive devuelva el valor **junto a su procedencia y su
+   muestra**, y que el consumidor no pueda leer uno sin los otros. Corolario que se olvida:
+   **si el criterio de orden colapsa a varianza cero, el `.sort()` no ordena mal — no
+   ordena**, preserva el orden de entrada y finge. Ordenar por el criterio secundario es
+   correcto; hacerlo sin declararlo es el mismo colapso.
 
-**Reglas duras:** **NUNCA** dos estados con comportamiento distinto bajo la misma etiqueta
+**Reglas duras:** **NUNCA** modelar «no hay dato» como la ausencia de una clave en una
+estructura cuando el caso real es «la clave está y la muestra no alcanza» — ausencia
+sintáctica ≠ ausencia de señal, y un guard de una sola dimensión no puede distinguirlas;
+**NUNCA** una misma constante respondiendo dos preguntas estadísticas distintas sin que el
+código lo declare; **NUNCA** ordenar por un campo cuya varianza es cero sin decir cuál
+ordenó; **NUNCA** dos estados con comportamiento distinto bajo la misma etiqueta
 visible sin declarar cuál ramifica; **NUNCA** un mensaje de error que cubra causas con
 acciones de recuperación distintas; **NUNCA** descartar el código de error de un proveedor
 externo antes de persistirlo; **NUNCA** un flag que gatee simultáneamente una mutación
@@ -324,6 +338,17 @@ minutos); y `HIRING_ASSESSMENT_AI_RUN_CONFIRM_ENABLED` gatea a la vez la confirm
 lote —apagada por riesgo real en TASK-1742— y el cierre del run, dejando runs con todos sus
 ítems confirmados sin ninguna transición disponible.
 
+**Fuente de la forma 5 (`TASK-1792`, 2026-08-28):** `expectedCtrAt` del reader de oportunidades
+SEO preguntaba «¿está el bucket en el `Map`?» cuando la pregunta era «¿hay muestra para estimar
+un CTR?». Con un bucket **presente y sin clics** el guard devolvía `0`, la ganancia estimada
+colapsaba en toda la lente y el `.sort()` quedaba en no-op: la pantalla no ordenaba mal, **no
+ordenaba**. Sobrevivió 23 días porque no había nada que fallara — el número era válido. Y el
+segundo error compuesto es del mismo patrón: `MIN_IMPRESSIONS_FLOOR = 10` estaba dimensionado
+para «¿es interpretable la posición media?» y se reutilizó para «¿es estimable el CTR?», que
+necesita ~1.000; nada en el código marcaba que la misma constante respondía dos cosas. Cerrado
+con un primitive que transporta la muestra, declara su usabilidad y nombra el criterio de orden
+(`src/lib/growth/seo/ctr-curve.ts`).
+
 ---
 
 ## Cómo extender este catálogo
@@ -332,3 +357,12 @@ Si emerge un **10º patrón** genuinamente transversal (se repite ≥3 dominios)
 acá con la misma estructura (cuándo / forma canónica / reglas duras / fuente) y
 registrarlo en `DECISIONS_INDEX.md`. Si es específico de un dominio, vive en su spec,
 no acá.
+
+**Lo que NO va acá: las bug classes.** Este catálogo describe **formas que seguir**, no
+**trampas que evitar**. Un defecto recurrente de SQL embebido —tipos que no alinean, `NOW()`
+que no avanza, un alias que secuestra el `ORDER BY`, dos collations que no ordenan igual—
+no es un patrón canónico: es un anti-patrón con mecanismo, y su hogar cross-dominio es
+`agent-invariants/SQL_DATE_MATH_AGENT_INVARIANTS.md` (cuyo alcance es TODO el SQL embebido
+en TS, no sólo date-math, pese al nombre del archivo). Un anti-patrón asciende a patrón acá
+sólo cuando el repo consolida una **forma canónica** para resolverlo (un helper, una VIEW, un
+primitive) y esa forma se repite en ≥3 dominios.

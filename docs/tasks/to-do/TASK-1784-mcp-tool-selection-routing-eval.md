@@ -1,5 +1,26 @@
 # TASK-1784 — MCP: ruteo de selección entre tools que se parecen, con eval que lo pruebe
 
+## Delta 2026-08-29 — `MCP_TOOL_SURFACE_INVARIANTS.md` ya existe (TASK-1785)
+
+El companion que esta task declara como compartido fue **creado** por `TASK-1785`:
+`docs/architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md`. Aporta tu sección sobre él en
+vez de crearlo.
+
+Dos cosas de ahí que le sirven directo al eval de selección:
+
+- 🔴 **Contar tools con un patrón de prefijos de verbo (`get_|run_|track_`) se come
+  `declare_seo_competitors` y `retire_seo_competitors`**, y con una clase de caracteres sin dígitos
+  se come `get_seo_visibility_360`. Las dos fallan **en silencio** y dan un total corto. Si el
+  baseline del eval se mide sobre un inventario mal enumerado, el número de partida es falso.
+- ⚠️ **El registry interno y el gateway NO son el mismo conjunto, y está bien**: el gateway federa
+  contra rutas HTTP del lane, no contra nombres del MCP interno. Anclar el censo en la ruta.
+
+Además, `get_seo_dual_lens_visibility` (TASK-1785) es una tool NUEVA que **convive** con
+`get_seo_visibility_360` y con `get_seo_performance` sin reemplazarlas — o sea, entra al conjunto de
+tools parecidas que esta task tiene que rutear. Su criterio de elección está declarado en su
+descripción: se usa cuando la pregunta es *"dónde rankea este cliente"* y hay que presentar las dos
+lentes sin mezclarlas.
+
 ## Delta 2026-08-28 (release a producción) — las cifras de superficie quedaron stale (otra vez)
 
 El deploy del gateway `mcp.efeonce.org` (revisión `efeonce-mcp-gateway-00024-8b8`), coordinado con

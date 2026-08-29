@@ -7,7 +7,14 @@ import type {
 
 type FetchLike = typeof fetch
 
-type QueryValue = string | number | boolean | null | undefined
+/**
+ * TASK-1700 — se admite `readonly string[]` para filtros REPETIBLES (`?origin=a&origin=b`).
+ *
+ * Un array no se puede serializar con `String(value)`: daría `"a,b"`, que el lado servidor
+ * lee con `getAll()` como UN valor con coma adentro y filtra por un origen inexistente — sin
+ * error, devolviendo cero filas.
+ */
+type QueryValue = string | number | boolean | null | undefined | readonly string[]
 
 type QueryParams = Record<string, QueryValue>
 
@@ -55,6 +62,15 @@ const tryParseJson = async (response: Response) => {
 const appendQueryParams = (url: URL, query: QueryParams) => {
   for (const [key, value] of Object.entries(query)) {
     if (value === undefined || value === null || value === '') {
+      continue
+    }
+
+    // Los repetibles usan `append` (un par por elemento); los escalares conservan `set`.
+    if (Array.isArray(value)) {
+      for (const entry of value) {
+        if (entry !== undefined && entry !== null && entry !== '') url.searchParams.append(key, String(entry))
+      }
+
       continue
     }
 
@@ -399,6 +415,36 @@ export class GreenhouseApiPlatformClient {
       market: input.market,
       seoCompetitorId: input.seoCompetitorId,
       limit: input.limit
+    })
+  }
+
+  /**
+   * TASK-1700 — la cola priorizada de trabajo (lane sólo-internal, 404 anti-oracle: lleva
+   * lente competitiva y el cruce con citabilidad IA).
+   */
+  /** TASK-1785 — las dos lentes de posición, separadas. Sin campo combinado, por contrato. */
+  async getSeoDualLensVisibility(input: { organizationId?: string; market?: string; keywords: string[]; rangeDays?: number }) {
+    return this.request('/api/platform/ecosystem/growth/seo/dual-lens-visibility', {
+      organizationId: input.organizationId,
+      market: input.market,
+      keywords: input.keywords.join(','),
+      rangeDays: input.rangeDays
+    })
+  }
+
+  async getSeoWorkQueue(input: {
+    organizationId: string
+    market?: string
+    origin?: string[]
+    limit?: number
+    cursor?: string
+  }) {
+    return this.request('/api/platform/ecosystem/growth/seo/work-queue', {
+      organizationId: input.organizationId,
+      market: input.market,
+      origin: input.origin,
+      limit: input.limit,
+      cursor: input.cursor
     })
   }
 

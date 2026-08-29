@@ -243,6 +243,8 @@
     "public-website:export-live-code": "tsx scripts/public-website/export-live-code-baseline.ts",
     "public-website:runtime-status": "tsx scripts/public-website/runtime-status.ts",
     "public-website:ssh-check": "tsx scripts/public-website/ssh-check.ts",
+    "public-website:verify-influencer-landing-fidelity": "tsx scripts/public-website/verify-influencer-landing-fidelity.ts",
+    "public-website:verify-influencer-seo-package": "tsx scripts/public-website/verify-influencer-seo-package.ts",
     "public-website:verify-aeo-renderer-real-composition-preview": "pnpm renderer:build && tsx scripts/public-website/verify-aeo-renderer-real-composition-preview.ts",
     "public-website:verify-aeo-renderer-interaction-preview": "pnpm renderer:build && tsx scripts/public-website/verify-aeo-renderer-interaction-preview.ts",
     "public-website:verify-aeo-renderer-ohio-fixture": "pnpm renderer:build && tsx scripts/public-website/verify-aeo-renderer-ohio-fixture.ts",

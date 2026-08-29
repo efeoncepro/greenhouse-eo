@@ -74,6 +74,7 @@ If rollback, watchdog, Azure, Vercel, or HubSpot is involved, also read:
 - Never infer that Azure or a worker "skipped" from the workflow name alone. Read the job summary/logs and verify Cloud Run `Ready=True` + `GIT_SHA` or watchdog OK. Azure `no_infra_diff` can be an expected no-op; worker revision drift is never a clean release closure.
 - For a release that adds or changes a reactive `ops-worker` consumer, Vercel `READY` proves only the Next.js deployment. Verify the migration/feature gate, the worker's active revision or justified change-gate equivalence, and the relevant delivery/readback independently. A deployed email consumer is not evidence that a real recipient delivery occurred. Release `0fe2420ed894` / orchestrator run `31915501771` is the recorded example: manifest `released`, Vercel and runtime/watchdog green, and `hiring_assessment_submitted_internal` enabled; real candidate delivery was not exercised.
 - Talent Pool activation (2026-08-16) is the companion example: orchestrator `31953851353` reached `released`; Vercel flags and redeploy (`dpl_CTxG3tx66S159tazMSyNiGSmqzHJ`) plus the `ops-worker-00563-ghv` self-service flag were verified, health returned HTTP 200 and the watchdog was `ok`/`drift_count=0`. The release proves runtime readiness, not delivery to a real candidate: no candidate email was sent during the flag flip, so a controlled delivery smoke remains separate evidence. The MCP Hiring provider stayed read-only; candidate CV review remains independently gated by `TASK-1718`.
+- **A release that changes a CONTRACT is only half-verified without a contract canary.** A contract change is: a newly required parameter, a changed unique-key shape, a changed response/DTO shape, a new required header or credential branch, or a new/renamed entry in a federated tool inventory. Neither manifest `released`, nor Vercel `READY`, nor a green watchdog proves that production *executes* the new contract — they prove the artifact was deployed. The canary must hit the real production surface and assert something **only the new contract can produce**, then be recorded in the release evidence next to the SHA/digests. The two rules above (reactive `ops-worker` consumer; "the env var exists is not the consumer working") are instances of this class, not separate exceptions. Recorded example: release `c983be7f18e6` (2026-08-28) closed green on manifest, Vercel and watchdog, and what actually distinguished "the env var is set in Vercel" from "the runtime reads it" was a production canary on the `serp-top-results` lane answering `ok:true` instead of `disabled`; the previous release used the same pattern with two write-boundary canaries against production. If a contract change ships without a canary, close the release as `degraded` or document the missing evidence — do not report it as verified.
 - Never rediscover common release conditions as if they were new incidents. Approvals, CI/smoke warnings on fresh squash commits, worker latency, Azure `no_infra_diff`, `ops-worker` change-gated no-op, and final transition runner queue are documented in the runbooks. If the user asks to measure timings, record phase durations while following the playbook.
 - Never close a production release without updating `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md`. The primary KPI is **agent end-to-end elapsed**, not manifest/workflow elapsed. Start the timer at the first release-related action, including reading, reviewing and analyzing. Required fields: agent name, date, release ID, orchestrator run ID, target SHA, agent E2E elapsed, phase breakdown, workflow elapsed, manifest elapsed, runtime-green elapsed, main blocker and learning.
 - **Never `git push` to `main` (including hotfixes, doc-only commits, or fixes "that don't affect workers") without immediately starting the bounded readiness watch and dispatching `production-release.yml` for `target_sha=<HEAD del push>` as soon as CI, CI Deep and Vercel production for that exact SHA are green.** Every commit on `main` MUST be tracked by a release manifest. The Vercel auto-deploy on `push:main` is NOT a release — only the manifest in `greenhouse_sync.release_manifests` reflects what production is supposed to be. Do not do unrelated work during this wait or leave the SHA untracked.
@@ -212,7 +213,14 @@ pnpm release:workers --expected-sha=<target_sha>
     El deploy del código no activa nada por sí solo. Si un flag requería su migración en prod, confirmar que entró por este release antes de prenderlo. **Apagar/rollback también es multi-runtime.** Caso fuente 2026-07-09: `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` vive sólo en el `ops-worker`; el runbook sólo enseñaba `vercel env add` y prenderlo ahí habría dejado el email muerto con la success card prometiéndoselo al usuario.
 11. **Registrar tiempos del release.** Actualizar `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` con agente, fecha, release ID, run ID, target SHA, agent E2E elapsed como KPI principal, desglose de fases, workflow elapsed, manifest elapsed, runtime-green elapsed, blocker principal y aprendizaje.
 
-12. **Canary y rollback AXIS.** Mantener los canaries de navegador opt-in y deterministas: usar la
+12. **Canary de contrato (siempre) y rollback.** Si el diff del release cambia un contrato
+    (parámetro requerido nuevo, forma de clave única, shape de respuesta/DTO, header o rama de
+    credencial nueva, inventario de tools federado), ejercita ese contrato contra **producción**
+    y guarda el resultado como evidencia: el manifest y Vercel `READY` prueban despliegue, no
+    ejecución. El canary tiene que afirmar algo que **sólo el contrato nuevo puede producir**
+    (un lane que responde `ok:true` en vez de `disabled`; un boundary de escritura que rechaza
+    una llamada sin atribución; el inventario federado devolviendo el conteo nuevo). Para AXIS,
+    además: mantener los canaries de navegador opt-in y deterministas — usar la
     dependencia `playwright-core` y lanzar Chromium con `channel: 'chrome'`; no descargar browsers ni
     depender de una ruta local del equipo del autor. El canary debe ejercitar la superficie real del
     consumidor, guardar evidencia de assertions/URL/console/network relevante y fallar con un diagnóstico
@@ -519,6 +527,65 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
     - **Si un agente reporta "no pude aprobar el gate", verifica primero el clasificador** antes de
       investigar permisos de GitHub, el environment `production` o los reviewers configurados — es el
       mismo diagnóstico erróneo que el #15 provoca con Vercel.
+
+### Credencial de paquete privado vencida — el bloqueador que no está en el código
+
+**Antes de diagnosticar un deploy de worker rojo, mirar el HISTORIAL del workflow, no el diff.**
+`gh run list --workflow=<worker>-deploy.yml --limit 12` responde en un segundo. Si los commits
+anteriores también fallan, la causa es de entorno o credencial y el diff en curso es inocente.
+
+🔴 **Un `ERR_PNPM_FETCH_401` sobre `@efeoncepro/axis-*` es SIEMPRE la credencial, nunca el código.**
+El secreto `axis-packages-read-token` guarda un `.npmrc` completo (no el token pelado) con un PAT de
+`read:packages`. Un PAT clásico vence a los 30 días **en silencio**: sin señal, sin alerta, sin check
+de preflight. Caso fuente 2026-08-29: creado el 07-29, venció el 08-28, y se descubrió porque un
+agente estaba mirando un deploy — tres commits y ~14 h después de empezar a fallar.
+
+**Radio: 3 de los 4 workers del control plane** (`ops-worker`, `commercial-cost-worker`, `ico-batch`;
+`hubspot-greenhouse-integration` no lo usa) **y Vercel NO se ve afectado** — su build pasa verde, que
+es justo lo que vuelve engañoso mirar sólo el color del PR.
+
+- **NUNCA promover con un deploy de worker en rojo** esperando que el orquestador lo resuelva: los
+  workers se despliegan por `workflow_call` dentro del run, así que el release cierra `degraded` con
+  `worker_revision_drift`. Peor: si alguno queda *change-gated* y se salta, el código entra a `main`
+  **sin** su worker desplegado — media promoción, sin error visible.
+- 🔴 **La rotación es del OPERADOR, no del agente.** Crear un PAT y manipular su valor es una
+  operación de credencial: el agente **no la ejecuta aunque se lo pidan**; enuncia la regla y la
+  devuelve. Helper seguro: `scripts/secrets/rotate-axis-packages-token.sh` — lee por **stdin**
+  (nunca argumento, archivo ni log), **valida el token contra la API de GitHub antes de escribir** y
+  compone el `.npmrc` completo (uno malformado falla con el mismo 401 que el vencido, y cuesta otro
+  build de ~4 min descubrirlo).
+- ⚠️ **NUNCA sustituir la credencial acotada por una de scope amplio para desbloquear** (p. ej. el
+  token de la sesión `gh`). «Funciona» y deja en infraestructura productiva una credencial que puede
+  mucho más que `read:packages`: cambia un incidente de 30 minutos por una exposición permanente.
+- **Arreglo durable** (cierra la clase, no el caso): que la App de GitHub acuñe tokens de instalación
+  de 1 h bajo demanda en vez de un PAT estático. Hoy no puede — `greenhouse-release-watchdog`
+  (`app_id=3665723`) tiene `actions:read`/`deployments:read`/`metadata:read`, **sin `packages`**.
+  Mínimo intermedio: anotar la expiración en el secreto + check de preflight que la detecte **antes**
+  de la promoción.
+
+### El audit de flags tenía un punto ciego que anulaba su propio gate
+
+**Verificado 2026-08-29 prendiendo `GROWTH_SEO_WORK_QUEUE_ENABLED`.** `scripts/ci/feature-flags-audit.mjs`
+sólo detectaba `process.env.FLAG` en **notación de punto**, y **91 callsites de este repo leen por
+indirección** (`env[FLAG_CONST]` con `const FLAG_CONST = 'FLAG'` es el patrón de todo
+`src/lib/growth/seo/flags.ts`). Esos flags nunca entraban a `codeFlags`, con dos consecuencias:
+
+- se reportaban como «env var muerta en Vercel» teniendo lector real — **39 de 43 eran falsos positivos**;
+- 🔴 **escapaban enteros del gate ISSUE-150**, que hace `exit 1` SIEMPRE cuando un flag está prendido
+  en Production sin su código en `main`. El gate existía y el mecanismo lo hacía cumplir; una clase
+  entera de flags pasaba por al lado **sin que nada fallara**.
+
+Arreglado anclando en el **literal** y no en la forma de acceso (un flag leído por indirección tiene
+que nombrarse como string en alguna parte, o no habría cómo indexar `process.env`). Destapó 3 flags
+que llevaban tiempo sin registrar. **NUNCA angostar ese escaneo a una sola forma de acceso:**
+sobre-incluir cuesta registrar un flag de más; sub-incluir cuesta un flag fail-closed vivo sobre
+código que producción no tiene.
+
+**Corolario de orden, aprovechable en todo release:** prender un flag en el **SoT** del worker
+(`services/<w>/deploy.sh`) en vez de con `--update-env-vars` no sólo evita que el próximo deploy lo
+borre en silencio — **también ordena el flip por construcción**: el flag se activa exactamente cuando
+su código se despliega, nunca antes. Eso resolvió una precondición real ese día (`TASK-1792` no estaba
+en `main`; viajaba en la misma promoción).
 
 ## What The Orchestrator Owns
 

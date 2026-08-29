@@ -21,6 +21,11 @@ export const SEO_CLIENT_MOCK_SURFACE: SeoClientSurfaceRead = {
     device: 'desktop',
     range: { from: '2026-07-09', to: '2026-08-07', days: 30 },
     source: 'postgres',
+    // TASK-1785 — el mock refleja el DTO real, procedencia incluida: si acá se pudiera
+    // omitir, el fixture dejaría de ejercitar el contrato que la pantalla consume.
+    provenance: [
+      { section: 'series[].points[].position', lens: 'estimated', source: 'dataforseo_serp', capturedAt: '2026-08-07' }
+    ],
     series: [
       {
         keyword: 'agencia de marketing',
@@ -82,7 +87,10 @@ export const SEO_CLIENT_MOCK_SURFACE: SeoClientSurfaceRead = {
       latestRunId: 'run-task-1310-visual-qa',
       latestRunAt: '2026-08-07T12:00:00.000Z',
       overallScore: 42,
-      cited: false
+      cited: false,
+      // TASK-1700 — el contrato la exige: la cola persiste esta versión como
+      // `source_score_version` y sin ella no puede escribir un item de `aeo_gap`.
+      scoreVersion: 'grader-score-v1'
     },
     domainQuadrant: 'riesgo',
     quadrants: [

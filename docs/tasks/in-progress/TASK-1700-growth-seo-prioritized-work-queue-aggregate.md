@@ -1,5 +1,111 @@
 # TASK-1700 — Growth SEO: la cola priorizada de trabajo es un aggregate persistido con score versionado
 
+## Delta 2026-08-28 (4) — la costura `null → 0` del adapter quedó cerrada, y con eso cambió el contrato del Slice 7
+
+La capa documental se escribió a mitad de camino; esto registra lo que cambió **después** de esa
+pasada y que deja partes de esta spec desactualizadas. Auditado afirmación por afirmación contra el
+código de `develop`.
+
+🔴 **El adapter dejó de traducir `null → 0`.** Los dos contratos usan «ganancia» con semánticas
+opuestas en el mismo valor: en la cola `priority_score = null` significa *«me niego a estimar»* (la
+banda 2 existe para decirlo), y en la lente `estimatedClickGain` es `number` y un `0` es una
+afirmación POSITIVA — *«ya convierte por encima de la media de la posición objetivo»* —, el
+cero-sentinel que `TASK-1792` acababa de eliminar. Traducirlo reintroducía en el CONTRATO el defecto
+que 1792 cerró en el código: con curva no utilizable, toda la lente de esa organización habría salido
+empatada en un cero fabricado, bajo un envelope que dice `org_measured`.
+
+El arreglo es un principio, no un mapeo mejor: **la cola sirve la lente sólo si puede hacerlo sin
+fabricar un número.** Si alguna fila que llegaría a la lente carece de techo,
+`readKeywordOpportunitiesFromWorkQueue` devuelve `null` y el caller cae al reader legacy. Consecuencias
+de contrato:
+
+- **Es condición por ORGANIZACIÓN, no por fila.** La curva se evalúa a nivel de org en la posición
+  objetivo: o todas las filas tienen score o ninguna. Con curva sana (`berel.com`) la lente viene de la
+  cola; con curva no utilizable (`efeoncepro.com`) la sirve el legacy. El snapshot se conserva completo
+  en los dos casos.
+- **`orderedBy` en el adapter es SIEMPRE `estimated_click_gain`.** Ya no existe rama `measured_demand`
+  por el camino de la cola, porque ese caso no se sirve desde acá.
+- **La página cae al legacy por DOS caminos, no uno** (flag OFF, y adapter `null`), así que la rama de
+  fallback del rollback está ejercitada en vez de estrenarse el día del rollback.
+- 🔴 **NUNCA** reintroducir un `null → 0` en esa costura ni un `?? 0` de fallback en
+  `estimatedClickGain`. Cuando dos contratos usan la misma palabra con semánticas inversas, la
+  traducción no se arregla eligiendo mejor el valor: se arregla no traduciendo.
+
+Lo demás que cambió después de la pasada documental:
+
+- **El gate del volumen estimado se partió en DOS asserts** (`__tests__/boundary.test.ts`) en vez de
+  relajarse. El invariante real es *«el ORDEN no se computa con volumen estimado»*, no *«la palabra no
+  aparece»*: el adapter SÍ lo transporta —es una columna que la pantalla muestra desde antes de esta
+  task— así que un assert dice quién puede NOMBRARLO y el otro prueba que ese archivo **no ordena**
+  (`.sort(` · `localeCompare` · `compareWorkQueueItems`). ⚠️ Queda desactualizada cualquier cita de la
+  forma *«rompe el build si el string `search_volume` aparece en el módulo»*.
+- **`competingPages` se agregó a `SeoWorkQueueScoreBreakdown`** (`contracts.ts:125`), persistido como
+  DATO por el colector de consolidación: el consumer que renderiza la lente necesita el número y
+  parsearlo de `basisReason` lo ataría a la prosa.
+- **Dos migraciones nuevas** además de la del esquema:
+  `20260829000423538_task-1700-work-queue-keyset-collation.sql` (índice keyset con `COLLATE "C"`) y
+  `20260829002943854_task-1700-work-queue-decide-capability.sql` (seed de
+  `growth.seo.work_queue.decide` en `capabilities_registry`, con su guard anti pre-up-marker).
+- **Gates de cierre verdes:** `pnpm typecheck` en 0 errores en todo el repo y build de producción
+  `BUILD_EXIT=0`.
+
+⚠️ **Drift adicional que destapó esta auditoría y que no venía de los cambios de arriba:** la capa
+documental hablaba de *«los cuatro consumers: UI operador, Nexa, lane ecosystem/MCP, portal cliente»*
+y de *«la vista recortada del cliente»* en presente. Verificado contra el código: **Nexa y el portal
+cliente NO consumen la cola** —no hay tool de Nexa ni ruta cliente, y `toClientWorkQueueDto` no tiene
+ningún caller—. Los cuatro consumers reales son la ruta app, el recurso del lane ecosystem (que
+también sirve la tool MCP interna), y el server component de la lente vía el adapter. La parity está
+cumplida en el **contrato** (el redactor existe y esas superficies no escribirán orden ni score
+cuando aterricen), pero **el DTO existiendo no hace alcanzable la vista**: corregido en la
+arquitectura §18.11, en el funcional, en el manual y en `.claude/rules/growth-seo.md`.
+
+⚠️ El bloque `## Detailed Spec → Orden canónico` de más abajo se corrigió en este mismo Delta para
+incluir `COLLATE "C"`: sin él, la spec describía exactamente la paginación que salteaba filas.
+
+## Delta 2026-08-28 (3) — dependencia DURA nueva: `TASK-1792` bloquea el cutover del Slice 7
+
+Al implementar el Slice 2 se midió la curva de CTR real de las dos organizaciones con serie y
+apareció un defecto vivo del reader legacy que **convierte el plan de rollback de esta task en una
+suposición**:
+
+`expectedCtrAt` (`keyword-opportunities-reader.ts`) hace `if (typeof measured === 'number') return
+measured`, así que **un `0` medido pasa el guard** y anula el fallback. Con la curva de
+`efeoncepro.com` (bucket 5 = **75 impresiones, 0 clics**) eso da `targetCtr = 0`, y entonces
+`max(0, 0 − ctr)` es idénticamente 0 para toda fila: el score queda CONSTANTE y el `.sort()` por ese
+campo es un **no-op**. La lente no ordena mal — no ordena. Es la doctrina ●/◑ violada en su centro:
+ausencia de evidencia tratada como evidencia de cero.
+
+**Por qué es dependencia y no nota:** los Slices 5 y 7 declaran el rollback como *"flag a `false` en
+Vercel + redeploy → la lente vuelve al reader legacy"*. Ese destino hoy no ordena, y falla **sin
+aviso**. Un rollback cuyo destino no está verificado no es un rollback.
+
+🔴 **Los Slices 1 y 2 de `TASK-1792` deben estar en `main` ANTES del cutover del consumer (Slice 7).**
+Los Slices 3 y 4 de esa task (unificar las dos curvas, recalibrar el `FALLBACK_CTR_CURVE`) no
+bloquean nada de acá.
+
+Un matiz acota el bloqueo, y **uno que parecía acotarlo no resiste la medición**:
+
+- ✅ El rollback **restaura el statu quo ante**: el peor caso es "vuelve a estar como antes de
+  TASK-1700", no "queda peor por culpa de TASK-1700".
+- ❌ **NO vale decir "hoy muerde en 1 de 2 orgs".** Esa cuenta es una muestra de dos, no una tasa,
+  y el disparador —bucket objetivo con ≥10 impresiones y **0 clics**— está **garantizado en todo
+  target recién onboardeado** y en todo sitio de bajo tráfico durante sus primeras semanas de serie.
+  Hay dos organizaciones porque el módulo es nuevo, no porque el defecto sea raro: **cada cliente
+  que entre nace en el estado de `efeoncepro.com`** y sale de él sólo cuando acumula clics
+  suficientes. El alcance honesto es *"todas las orgs nuevas, más las de bajo tráfico, hasta que
+  acumulen muestra"*.
+- ❌ **Tampoco vale decir que la lente de `berel.com` "está intacta".** Su curva es sana, pero de
+  sus 1.798 filas striking en 28 días **1.445 quedan en `gain = 0` (el 80 %)** con techo máximo 31:
+  discrimina sobre una quinta parte de lo que muestra. Curva sana ≠ lente intacta.
+
+  *(Las dos correcciones son medición de `greenhouse-eo-63`, 2026-08-28; la primera versión de este
+  Delta afirmaba ambas cosas y se pasaba de la evidencia.)*
+
+**Esta cola NO hereda el defecto** (`isCurveUsableAtPosition` exige impresiones **y** clics, así que
+un bucket sin clics nunca llega a ser un CTR esperado: cae a banda 2 con score `NULL`), y su umbral
+—≥1000 impresiones y ≥5 clics— es la referencia canónica que `TASK-1792` adopta.
+
+
 ## Delta 2026-08-28 (2) — DESBLOQUEADA: el último bloqueador cerró
 
 `TASK-1692` cerró (`code complete, rollout pendiente`), así que `Blocked by` pasa a `none`:
@@ -111,7 +217,7 @@ serie del top-N arranca con el primer deploy del worker post-release y los candi
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -124,10 +230,10 @@ serie del top-N arranca con el primer deploy del worker post-release y los candi
 - Motion: `none`
 - Backend impact: `migration|command|reader`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `code complete, rollout pendiente` (7/7 slices en `develop`; flag OFF en los dos runtimes y scheduler PAUSADO — ver §Rollout Plan)
 - Rank: `TBD`
 - Domain: `growth|seo`
-- Blocked by: `none` (último bloqueador cerrado el 2026-08-28; ver Deltas) (sólo para el origen `competitor_gap`; los otros cuatro orígenes no la necesitan — satisfecho en código desde 2026-08-28, ver Delta)
+- Blocked by: `none` (el bloqueo del Slice 7 se levantó el 2026-08-28; ver Delta 2026-08-28 (3)) (sólo para el origen `competitor_gap`; los otros cuatro orígenes no la necesitan — satisfecho en código desde 2026-08-28, ver Delta)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -505,10 +611,17 @@ Archivos que esta task **modifica sin poseer** (hay que coordinar con su dueña 
 
 ### Migration, backfill and rollout
 
-- Migration posture: `additive` — tres tablas nuevas, tres triggers append-only, índices, GRANTs. Sin
-  ALTER sobre tablas existentes. Marker `-- Up Migration` al inicio y bloque `DO $$ ... RAISE
-  EXCEPTION` que aborta si las tres tablas, el índice único de idempotencia y los CHECK de
-  `origin` / `score_basis` no quedaron creados (anti pre-up-marker bug, CLAUDE.md).
+- Migration posture: `additive` — **tres migraciones**, todas aditivas y sin ALTER sobre tablas
+  existentes, cada una con marker `-- Up Migration` al inicio y su bloque `DO $$ ... RAISE EXCEPTION`
+  anti pre-up-marker (CLAUDE.md):
+  1. `20260828224403660_task-1700-seo-work-queue.sql` — tres tablas nuevas, tres triggers append-only,
+     índices, GRANTs; el guard aborta si faltan las tablas, el índice único de idempotencia o los
+     CHECK de `origin` / `score_basis`.
+  2. `20260829000423538_task-1700-work-queue-keyset-collation.sql` — índice keyset con `COLLATE "C"`,
+     para que el orden de SQL y el de JS sean el mismo (ver §Orden canónico).
+  3. `20260829002943854_task-1700-work-queue-decide-capability.sql` — seed de
+     `growth.seo.work_queue.decide` en `capabilities_registry`, en paridad con el catálogo TS y el
+     grant de `runtime.ts`.
 - Default state: `flag OFF`. `GROWTH_SEO_WORK_QUEUE_ENABLED` default `false` en los **dos** runtimes
   (Vercel y ops-worker) y Cloud Scheduler `ops-seo-work-queue-materialize` **nace PAUSADO** — dos
   frenos independientes, mismo patrón que TASK-1661/1664. Subordinado a `GROWTH_SEO_ENABLED`.
@@ -570,30 +683,34 @@ Archivos que esta task **modifica sin poseer** (hay que coordinar con su dueña 
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface y consumers están nombrados con paths y objetos reales.
-- [ ] Invariantes de datos, boundary de tenant/acceso e idempotencia/concurrencia son explícitos.
-- [ ] Postura de migración/backfill/rollback es explícita y proporcional al riesgo.
-- [ ] Hay evidencia runtime o de DB listada para todo cambio más allá de docs/tooling.
-- [ ] El dominio sensible tiene errores canónicos, postura de audit/señal y cero fuga de datos.
+- [x] Source of truth, contract surface y consumers están nombrados con paths y objetos reales.
+- [x] Invariantes de datos, boundary de tenant/acceso e idempotencia/concurrencia son explícitos.
+- [x] Postura de migración/backfill/rollback es explícita y proporcional al riesgo.
+- [x] Hay evidencia runtime o de DB listada para todo cambio más allá de docs/tooling.
+- [x] El dominio sensible tiene errores canónicos, postura de audit/señal y cero fuga de datos.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] **Lógica en el primitive, no en la UI.** Orden, score y composición de orígenes viven en
+- [x] **Lógica en el primitive, no en la UI.** Orden, score y composición de orígenes viven en
       `src/lib/growth/seo/work-queue/**`; ningún componente reordena ni recalcula.
-- [ ] **Modelada como aggregate + commands**, no como click-handler: snapshot/item/decision con sus
+- [x] **Modelada como aggregate + commands**, no como click-handler: snapshot/item/decision con sus
       tres primitives.
-- [ ] **Read** como reader canónico; **write** (`recordSeoWorkQueueDecision`) como command con
+- [x] **Read** como reader canónico; **write** (`recordSeoWorkQueueDecision`) como command con
       semántica explícita, authorization fina por capability, idempotencia, append-only, errores
       canónicos y observabilidad.
-- [ ] **Capability + grant en el MISMO PR**: `growth.seo.work_queue.decide` en registry + catálogo +
+- [x] **Capability + grant en el MISMO PR**: `growth.seo.work_queue.decide` en registry + catálogo +
       grant a ≥1 rol real + coverage test verde.
-- [ ] **Camino programático declarado**: ruta app, lane ecosystem y tool MCP **interna**. La
+- [x] **Camino programático declarado**: ruta app, lane ecosystem y tool MCP **interna**. La
       federación al gateway MCP externo queda explícitamente fuera (auditoría §6).
-- [ ] **Write apto para `propose → confirm → execute`**: Nexa propone, el humano confirma en el
+- [x] **Write apto para `propose → confirm → execute`**: Nexa propone, el humano confirma en el
       endpoint, el endpoint muta. Cero integración Nexa-específica.
-- [ ] **Un primitive, muchos consumers**: UI, Nexa, MCP y portal cliente comparten reader; la única
-      diferencia del lado cliente es el redactor de DTO.
-- [ ] **Parity check = SÍ.**
+- [x] **Un primitive, muchos consumers**: los cuatro consumers reales (ruta app, recurso del lane
+      ecosystem, tool MCP interna y el server component de la lente) comparten `readSeoWorkQueue` sin
+      lógica de orden duplicada. ⚠️ **Nexa y el portal cliente todavía NO consumen la cola** — no hay
+      tool de Nexa ni ruta cliente y `toClientWorkQueueDto` no tiene caller. La parity está cumplida
+      en el CONTRATO (esas superficies no escribirán orden ni score, sólo consumen; el redactor ya
+      existe), no como superficie alcanzable: no citarlo como si el cliente ya viera la cola.
+- [x] **Parity check = SÍ.**
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -719,7 +836,9 @@ Archivos que esta task **modifica sin poseer** (hay que coordinar con su dueña 
   con la misma config. Si difiere, el cutover no es un cambio de fuente: es un cambio de
   comportamiento no declarado.
 - Rama de fallback detrás del flag: con `GROWTH_SEO_WORK_QUEUE_ENABLED=false` la página sigue usando
-  el reader legacy, sin código muerto duplicado en la vista.
+  el reader legacy, sin código muerto duplicado en la vista. 🔴 **Y por un segundo camino** (ver Delta
+  2026-08-28 (4)): con el flag ON, si el adapter no puede servir la lente sin fabricar un número
+  —alguna fila sin techo— devuelve `null` y el caller cae al mismo reader legacy.
 - Las tres señales de reliability + su registro en el módulo `growth`.
 - Documentación triple: sección nueva en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` (contrato,
   invariantes, vocabularios, política de versionado), funcional en
@@ -847,8 +966,15 @@ CREATE TABLE greenhouse_growth.seo_work_queue_decisions (
 ```
 ORDER BY score_band ASC,
          priority_score DESC NULLS LAST,
-         normalized_keyword ASC
+         normalized_keyword COLLATE "C" ASC
 ```
+
+🔴 **`COLLATE "C"` no es decorativo** (corregido en el Delta 2026-08-28 (4); la primera versión de esta
+spec decía `normalized_keyword ASC` a secas). La base corre `en_US.UTF8`, que **ignora el espacio** al
+comparar —`berelex` < `berel green`— mientras `localeCompare` de JS los ordena al revés: el
+materializador ordena en JS y el reader pagina por keyset en SQL, así que con órdenes distintas la
+paginación **saltea filas en silencio** (medido: 631 de 635). La solución es orden de **bytes en ambos
+lados** porque su igualdad es demostrable, no aproximada.
 
 `normalized_keyword` como desempate final es lo que hace la paginación por keyset determinista. El
 `rank_in_snapshot` se persiste con ese mismo orden para que "la recomendación #1 de la mañana" sea
@@ -892,6 +1018,13 @@ Tres razones, y las tres son de oficio, no de implementación:
 
 ### Slice ordering hard rule
 
+- ✅ **`TASK-1792` — LEVANTADO el 2026-08-28.** Cerró `complete` con sus 4 slices en develop
+  (`d4d731721` · `f8be78d83` · `8943b2f5c`), así que el destino del rollback del Slice 7 ya
+  ordena y **declara por qué**: con curva no utilizable devuelve `ctrCurveSource: 'unusable'` +
+  `orderedBy: 'measured_demand'` y ordena por impresiones × cercanía a página 1, en vez de
+  colapsar todo a `gain = 0` en silencio. Queda pendiente sólo la promoción a `main`, que va con
+  el release de esta task. Se conserva el registro del bloqueo porque explica por qué el Slice 7
+  se ordenó así y qué habría pasado sin eso.
 - **`TASK-1694` cierra ANTES de Slice 3.** Es bloqueo duro y la razón es de irreversibilidad: el
   colector de discovery persiste lo que el contrato de candidatos le entregue, y un snapshot con la
   misma keyword cuatro veces ya no se corrige hacia adelante.
@@ -947,7 +1080,7 @@ Tres razones, y las tres son de oficio, no de implementación:
 | Slice 4 — worker + scheduler | `gcloud scheduler jobs pause ops-seo-work-queue-materialize` + flag a `false` en la revisión activa del worker | <5 min | sí |
 | Slice 5 — reader + lanes | flag a `false` en Vercel + redeploy; las rutas devuelven el no-op prod-safe | <5 min | sí |
 | Slice 6 — decisión | revert PR + revocar el grant de `growth.seo.work_queue.decide`; el log escrito queda (append-only, sin efecto downstream) | <10 min | parcial (las decisiones escritas no se borran, por diseño) |
-| Slice 7 — cutover del consumer | flag a `false` en Vercel + redeploy → la lente vuelve al reader legacy | <5 min | sí |
+| Slice 7 — cutover del consumer | flag a `false` en Vercel + redeploy → la lente vuelve al reader legacy, que desde `TASK-1792` (complete 2026-08-28) **ordena y declara su base** (`orderedBy: measured_demand` cuando la curva no es utilizable). El destino del rollback está verificado, no supuesto | <5 min | sí |
 
 ### Production verification sequence
 
@@ -994,49 +1127,56 @@ Tres razones, y las tres son de oficio, no de implementación:
 
 ## Acceptance Criteria
 
-- [ ] Existen `greenhouse_growth.seo_work_queue_snapshots`, `..._items` y `..._decisions` con sus
+- [x] Existen `greenhouse_growth.seo_work_queue_snapshots`, `..._items` y `..._decisions` con sus
       CHECK de vocabulario cerrado, sus triggers anti-`UPDATE`/anti-`DELETE` y el bloque `DO` de
       verificación post-DDL en la misma migración.
-- [ ] `priority_score_version` y `score_breakdown_json` existen desde la **primera** migración, no
+- [x] `priority_score_version` y `score_breakdown_json` existen desde la **primera** migración, no
       desde una posterior.
-- [ ] `computePriorityScore` devuelve clics incrementales estimados
+- [x] `computePriorityScore` devuelve clics incrementales estimados
       (`impresiones × max(0, CTR_objetivo − CTR_actual)`) con la curva derivada del propio sitio, y
       un test falla si alguien cambia un valor de la config sin bumpear `priority_score_version`.
-- [ ] Ningún item con `score_basis='no_measured_demand'` tiene `priority_score` distinto de NULL, y
+- [x] Ningún item con `score_basis='no_measured_demand'` tiene `priority_score` distinto de NULL, y
       ningún colector ordena por volumen estimado cuando existe demanda medida.
-- [ ] `materializeSeoWorkQueue` es idempotente: dos corridas con los mismos insumos devuelven
+- [x] `materializeSeoWorkQueue` es idempotente: dos corridas con los mismos insumos devuelven
       `reused: true` y **cero filas nuevas**, verificado contra PostgreSQL real.
-- [ ] Un colector caído produce `origin_health_json` con `state` distinto de `ok` y **no** altera el
+- [x] Un colector caído produce `origin_health_json` con `state` distinto de `ok` y **no** altera el
       score ni el orden de los demás orígenes, verificado con una corrida degradada real.
-- [ ] Todo item con `origin='aeo_gap'` tiene `source_score_version` no nulo, y el lado AEO se lee
+- [x] Todo item con `origin='aeo_gap'` tiene `source_score_version` no nulo, y el lado AEO se lee
       **sólo** vía `readSeoAeoGap` (test que falla ante SQL directo sobre `grader_*` desde este
       módulo).
-- [ ] `evidence_ref` no participa de ninguna FK ni de ningún JOIN en el módulo.
-- [ ] Los items de canibalización entran con `origin='consolidation'` y
+- [x] `evidence_ref` no participa de ninguna FK ni de ningún JOIN en el módulo.
+- [x] Los items de canibalización entran con `origin='consolidation'` y
       `recommended_verb='consolidate'`, nunca mezclados con los de `optimize`.
-- [ ] `UPDATE` y `DELETE` sobre las tres tablas fallan por trigger, verificado contra PostgreSQL
+- [x] `UPDATE` y `DELETE` sobre las tres tablas fallan por trigger, verificado contra PostgreSQL
       real.
-- [ ] `readSeoWorkQueue` devuelve `{ snapshot, items, originHealth, priorityScoreVersion, asOf,
-      staleness }` y sirve idéntico a UI, Nexa, lane ecosystem y tool MCP interna, sin lógica
-      duplicada por consumer.
-- [ ] El DTO cliente pasa el test de no-fuga: cero dificultad, cero volumen estimado, cero costo de
+- [x] `readSeoWorkQueue` devuelve `{ snapshot, items, originHealth, priorityScoreVersion, asOf,
+      staleness, nextCursor }` y sirve idéntico a la ruta app, al recurso del lane ecosystem, a la
+      tool MCP interna y al server component de la lente, sin lógica duplicada por consumer. (Nexa y
+      el portal cliente todavía no lo consumen: ver §Capability DoD.)
+- [x] El DTO cliente pasa el test de no-fuga: cero dificultad, cero volumen estimado, cero costo de
       proveedor, cero `evidence_ref` cruda, cero breakdown completo.
-- [ ] `recordSeoWorkQueueDecision` escribe append-only, se ancla al sujeto (sobrevive al siguiente
+- [x] `recordSeoWorkQueueDecision` escribe append-only, se ancla al sujeto (sobrevive al siguiente
       snapshot, verificado con dos materializaciones) y **no ejecuta ningún command** — test que
       falla si el módulo importa un write de otro dominio.
-- [ ] `growth.seo.work_queue.decide` está en `capabilities_registry`, en el catálogo TS y con grant a
+- [x] `growth.seo.work_queue.decide` está en `capabilities_registry`, en el catálogo TS y con grant a
       ≥1 rol real, con el coverage test verde en el mismo PR.
-- [ ] El materializador corre en el ops-worker por Cloud Scheduler; **no** existe entrada nueva en
+- [x] El materializador corre en el ops-worker por Cloud Scheduler; **no** existe entrada nueva en
       `vercel.json` para este job.
-- [ ] `GROWTH_SEO_WORK_QUEUE_ENABLED` está declarado en `services/ops-worker/deploy.sh`, aplicado en
+- [x] `GROWTH_SEO_WORK_QUEUE_ENABLED` está declarado en `services/ops-worker/deploy.sh`, aplicado en
       la revisión activa del worker, presente en Vercel y con fila en
       `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 - [ ] 🔴 **La lente de oportunidades vigente lee `readSeoWorkQueue` en producción** y el test de
       paridad de orden sobre `gsc_striking_distance` está verde.
-- [ ] Las tres señales de reliability existen, están registradas en el módulo `growth` y se ven en
+      → **Mitad cumplida, y la otra mitad es rollout, no código.** El cutover está
+      implementado detrás del flag y el gate de paridad está **VERDE contra PG real**
+      (33 keywords compartidas con techo idéntico y orden relativo idéntico). Lo que falta es
+      operativo: flag ON en los dos runtimes + despausar el scheduler + promoción a `main`.
+      Mientras eso no ocurra, el estado correcto de esta task es
+      `code complete, rollout pendiente`.
+- [x] Las tres señales de reliability existen, están registradas en el módulo `growth` y se ven en
       `/admin/operations` con steady 0.
-- [ ] Las tres capas documentales están cerradas: arquitectura, funcional y manual de uso.
-- [ ] `TASK-1669` tiene su `## Delta` con la reducción de su `context-reader` a envoltorio y
+- [x] Las tres capas documentales están cerradas: arquitectura, funcional y manual de uso.
+- [x] `TASK-1669` tiene su `## Delta` con la reducción de su `context-reader` a envoltorio y
       `TASK-1700` en su `Depends on`.
 
 ## Verification
@@ -1057,15 +1197,42 @@ Tres razones, y las tres son de oficio, no de implementación:
 
 - [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
 - [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] `TASK-1669`, `TASK-1667`, `TASK-1668`, `TASK-1690` y `TASK-1691` recibieron su `## Delta` con
+- [x] `TASK-1669`, `TASK-1667`, `TASK-1668`, `TASK-1690` y `TASK-1691` recibieron su `## Delta` con
       el cambio de fuente de orden.
-- [ ] `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` §3.1 brecha S1
+- [x] `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md` §3.1 brecha S1
       queda marcada como cerrada con fecha.
+
+## Acoples declarados por otras tasks (barrido de impacto cruzado, 2026-08-28)
+
+Cuatro tasks declaran acoples con esta cola y quedan registrados acá para que no se descubran
+por sorpresa:
+
+- **`TASK-1706` / `TASK-1708`** — declaran dependencia del contrato de la cola. Consumen
+  `readSeoWorkQueue`; no reimplementan orden ni score.
+- **`TASK-1789` (content decay)** — sus hallazgos entran como origen nuevo de la cola vía
+  migración aditiva, no como lista propia. El decay **no ordena**: aporta filas y la cola las
+  puntúa con el mismo score versionado.
+- 🔴 **`TASK-1791` (señal de pertinencia del candidato)** — es el acople más importante y su
+  ventana **sigue abierta**: no existe ningún snapshot productivo todavía (flag OFF en los dos
+  runtimes). Lo que cambió es que `incremental-clicks-v1` ya está publicada append-only, así
+  que incorporar la pertinencia al score es un **bump a `v2`**, no una edición de la versión
+  vigente. Y la forma correcta de incorporarla NO es multiplicar el score: la cola no puede
+  puntuar con una señal que su `evidence_ref` opaca no puede citar. Entra como **factor del
+  item con su procedencia**, hermana de `clusterConflict`.
+
+  El caso que lo motiva, medido: una corrida real de discovery para una agencia B2B chilena
+  devolvió 50 keywords de consumidor sobre ChatGPT (`chatgpt en linea`, volumen 480). Hoy la
+  cola las contiene sin ordenarlas por volumen —caen a banda 3 con desempate alfabético— así
+  que **no corrompen el orden, pero diluyen la banda**.
+
+- **Errata para quien pase por `TASK-1709`** (línea ~586): atribuye la cola priorizada a
+  `TASK-1669`. Es de esta task. Error de cita, no de contrato; se corrige cuando esa task
+  esté libre.
 
 ## Follow-ups
 

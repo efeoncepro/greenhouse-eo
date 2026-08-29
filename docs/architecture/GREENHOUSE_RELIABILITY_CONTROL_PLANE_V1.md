@@ -2,10 +2,67 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.15`
+> Versión: `1.16`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-08-27` por TASK-1696 (3 signals del gasto de proveedor DataForSEO bajo el módulo `growth`)
+> Última actualización: `2026-08-29` por TASK-1700 (3 signals de la cola priorizada de trabajo SEO bajo el módulo `growth`)
+
+## Delta 2026-08-29 — TASK-1700: 3 signals de la cola priorizada de trabajo SEO
+
+Tres señales nuevas bajo el rollup `growth` (`kind='data_quality'`, **steady = 0 las tres**), con sus
+tablas en `dependencies` del módulo y su reader en `filesOwned`
+(`src/lib/reliability/queries/growth-seo-work-queue-signals.ts`). Cubren un plano que **ninguna señal
+SEO existente cubría**: las de hoy vigilan el pipeline de **CAPTURA** (¿llegaron los datos?), y éstas
+vigilan si el operador está mirando un **PLAN** válido. Las tres degradan a `unknown` con
+`captureWithDomain(error, 'growth')` — no poder leer una señal es indistinguible de una que nunca se
+cableó, así que el error se reporta **antes** de devolver.
+
+| `signalId` | `kind` | Qué mide | Steady |
+| --- | --- | --- | --- |
+| `growth.seo.work_queue.stale_snapshot` | `data_quality` | Targets **elegibles** cuyo plan vigente pasó su `expires_at` — o que **nunca** materializaron uno | **0** |
+| `growth.seo.work_queue.origin_degraded` | `data_quality` | Orígenes en `degraded`/`down` dentro del `origin_health_json` del snapshot **vigente** de cada target | **0** |
+| `growth.seo.work_queue.score_version_drift` | `data_quality` | Snapshots vigentes calculados con una `priority_score_version` distinta de la activa | **0** |
+
+Cada una tiene una decisión que no es obvia:
+
+- 🔴 **`stale_snapshot`: el denominador son los targets ELEGIBLES, no los que ya tienen snapshot.**
+  Contar sólo sobre los que ya tienen cola haría invisible el caso peor —un target elegible que
+  **nunca** materializó—, que es exactamente lo que produce el flag prendido en un solo runtime: ese
+  modo de falla no deja un snapshot viejo, deja **ninguno**. Por eso la elegibilidad se resuelve
+  contra `module_assignments` (`seo_v2` vigente, `status IN ('active','pilot')`) con `LEFT JOIN` al
+  último snapshot, y por eso las severidades están invertidas respecto de la intuición:
+  `never_materialized > 0` es **`error`** (bug class documentada del ledger de flags) y
+  `stale > 0` es **`warning`** (un cron perdido). Con TTL de 26 h sobre cadencia diaria, una corrida
+  perdida vence **antes** de que llegue la siguiente — el vencimiento es la forma en que se nota.
+- 🔴 **`origin_degraded` es la señal que impide que un plan parcial se lea como completo.** Un origen
+  caído **no** produce filas vacías ni ceros: sus filas simplemente **no existen**, así que la
+  pantalla se ve perfectamente normal y el operador trabaja sobre una lista a la que le falta
+  trabajo. `down` es `error` (un motor que falló); `degraded` es `warning` (suele ser una capacidad
+  que esa organización no tiene encendida — discovery apagado, cero competidores declarados). Esa
+  distinción es del contrato de los colectores, no del lector: un módulo apagado a propósito no debe
+  alertar como una falla.
+- 🔴 **`score_version_drift` recibe la versión activa POR PARÁMETRO y no la hardcodea en el SQL.**
+  Hardcodearla dejaría la señal verde por comparar contra sí misma después de un bump. Su complemento
+  en CI es el test de huella congelada de `score-versions.ts` (`fingerprintPriorityScoreConfig`), que
+  detecta el cambio de peso **sin** bump; esta señal cubre el otro lado: una versión nueva desplegada
+  cuyos snapshots todavía no se rematerializaron, o sea planes vigentes que dicen una cosa y una
+  config que dice otra. Es `warning`, no `error`: comparar recomendaciones de dos versiones distintas
+  es un problema de interpretación, no una falla del pipeline.
+
+Las tres leen el snapshot **vigente** por target con `DISTINCT ON (seo_target_id) … ORDER BY
+computed_at DESC`, sobre tablas que son append-only por trigger **y** por GRANT — el aggregate no
+tiene fila «actual» mutable, así que «vigente» es siempre una derivación de lectura.
+
+⚠️ **Steady 0 hoy es trivialmente cierto**: `GROWTH_SEO_WORK_QUEUE_ENABLED` está **OFF en los dos
+runtimes** y el scheduler `ops-seo-work-queue-materialize` **PAUSADO**, así que no hay targets con
+snapshot. La primera lectura no trivial de `stale_snapshot` llega con el flip, y su primer valor
+esperado **no es 0**: hasta que la primera corrida cubra todos los targets elegibles,
+`never_materialized` contará los que faltan. Cualquier valor distinto de 0 después de un ciclo
+completo es investigación, no ruido.
+
+Contrato: [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §18
+(§18.9 `origin_health_json`, §18.4 versionado del score, §18.10 los tres frenos del carril async).
+Task dueña: `TASK-1700` (EPIC-022).
 
 ## Módulo `growth` — el gasto de proveedor y su presupuesto (TASK-1696)
 

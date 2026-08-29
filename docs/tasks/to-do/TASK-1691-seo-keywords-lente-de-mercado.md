@@ -1,5 +1,111 @@
 # TASK-1691 — Declarar la lente estimada y su fecha de captura en la tabla de oportunidades SEO
 
+## Delta 2026-08-29 — el campo que esta task tenía que inferir YA EXISTE (TASK-1785)
+
+`TASK-1785` cerró el contrato agéntico: los readers del módulo emiten `provenance: SeoProvenance[]`
+con `lens` (`measured` | `estimated`), `source` y `capturedAt`. **Esta task ya no tiene que inferir
+la lente desde el origen del dato: la lee.**
+
+Lo que cambia concretamente para la superficie visible:
+
+- `readKeywordOpportunities` emite la procedencia **partida**: el striking-distance (posición,
+  impresiones, clics, CTR, techo) es `measured`; el enriquecimiento de mercado (`searchVolume`,
+  `difficulty`, `linkBarrier`) es `estimated`. La tabla puede rotular columna por columna sin
+  decidir nada por su cuenta.
+- El glifo sale de `SEO_LENS_MARKER` (`src/lib/growth/seo/lens.ts`), un solo origen. **NUNCA**
+  escribir `◑`/`●` literales en la vista: hoy están crudos en ~14 archivos y ése es el desorden que
+  1785 dejó de crear hacia adelante.
+- `capturedAt` viaja por sección: un volumen de mercado y una impresión medida **no comparten
+  as-of**, y presentarlos bajo una sola fecha sería el mismo defecto en versión visual.
+
+⚠️ Sigue siendo trabajo de esta task decidir **cómo se ve**: 1785 es el contrato, 1691 es la
+superficie humana. No comparten archivos.
+
+## Delta 2026-08-28 (4) — la lente de mercado deja de ordenar y pasa a ENRIQUECER el ítem; y el cutover reintroduce `noGainHint`
+
+`TASK-1700` está en `develop` con sus siete slices (`962d22118` … `9020d6421`). El Slice 7 (`9020d6421`)
+reapunta esta misma lente: `src/app/(dashboard)/admin/growth/seo/keywords/page.tsx` llama
+`readKeywordOpportunitiesFromWorkQueue` (`src/lib/growth/seo/work-queue/opportunities-adapter.ts`) cuando
+`GROWTH_SEO_WORK_QUEUE_ENABLED` está ON, y cae al `readKeywordOpportunities` legacy cuando el flag está
+OFF, no hay snapshot todavía o la cola falla. **El flag está OFF en los dos runtimes**
+(`docs/operations/FEATURE_FLAG_STATE_LEDGER.md`), así que todo lo que sigue es **latente**: hay que
+resolverlo antes del flip, no después.
+
+**La lente de mercado ya está modelada como enriquecimiento, y el argumento quedó firme.** La cola **no
+transporta volumen ni dificultad a propósito** —es el invariante `●` medido / `◑` estimado aplicado al
+ORDEN, no sólo a la visualización— y el adapter los pide al mismo reader canónico que esta lente ya usaba
+(`readKeywordMarketData`), por las keywords ya seleccionadas y con el mismo marcado. Consecuencia para
+esta task: **Volumen y Barrera de enlaces nunca vuelven a ser criterio de orden**; `TASK-1700` lo prohíbe
+en su `Architecture Alignment` ("PROHIBIDO ordenar por volumen estimado en cualquier parte del módulo
+cuando existe demanda medida"). Declarar la lente y su fecha —lo que esta task hace— sigue igual de
+necesario; lo que desaparece es cualquier ruta legítima para que ese número mande el orden.
+
+### 🔴 Supuesto invertido: la cola NO hereda el encoding de frescura de esta task — llegó primero con el suyo
+
+El Delta 2026-08-15 dice: *"Este es el encoding canónico de frescura del módulo, y es el que la cola
+priorizada (`TASK-1700`) va a reusar. No se inventa un segundo."* **La secuencia se dio al revés.** La
+cola ya está en `develop` y trae su propio vocabulario en el contrato del reader: `asOf` (el `computed_at`
+del snapshot) y `staleness` = `fresh` | `stale` (pasó `expires_at`) | `absent` (nunca se materializó), y
+el cliente los recibe redactados en `toClientWorkQueueDto`.
+
+La regla de fondo no cambia —**un solo encoding**— pero la dirección sí: **esta task tiene que alinearse
+con `asOf`/`staleness`**, no al revés. Si el copy que se escriba acá inventa un tercer vocabulario, el
+módulo estrena en dos pantallas hermanas justo las dos formas de leer lo mismo que ese Delta existía para
+evitar.
+
+Y las fechas siguen siendo **tres hechos distintos que no se reconcilian**: `marketAsOf` (lente `◑`, ciclo
+mensual del proveedor), el borde derecho de la lente `●` (lag de ingesta de Search Console) y el `asOf`
+del snapshot (cuándo se compuso el plan). Tres lentes, tres relojes, ninguna hereda la frescura de otra.
+
+### 🔴 Dos hallazgos del cutover que caen dentro de los archivos que esta task posee
+
+**(1) `ctrCurveSource` pierde dos de sus cuatro estados por el camino de la cola.** El Delta (3) enumera
+cuatro (`org_measured` | `org_level_reference_shape` | `unusable` | `fallback`). El adapter
+(`opportunities-adapter.ts`) mapea el breakdown persistido a **dos**: `org_measured`, o `unusable` para
+todo lo demás — el vocabulario de la cola (`org_measured` | `unusable` | `not_applicable`) no tiene
+equivalentes para los otros dos. O sea: el copy de cuatro estados que esta task escribe **sólo es
+ejercitable por el camino legacy**. Hay que decidir qué dice cada string cuando la lente viene de la cola
+y sólo existen dos estados, en vez de asumir que el vocabulario de `TASK-1792` sobrevive el cutover.
+
+**(2) `estimatedClickGain` colapsaba a `0` por el camino de la cola — CORREGIDO el 2026-08-28, y la
+consecuencia para esta task cambia de signo.**
+
+El defecto era real y la cadena era corta: `priority_score` es `NULL` **por diseño** en banda 2
+(`measured_without_curve`: hay demanda medida pero la curva propia no alcanza para afirmar un CTR
+esperado); el adapter lo aplanaba con `item.priorityScore === null ? 0 : …`; y
+`KeywordOpportunityTable.tsx:620` ramifica con `row.estimatedClickGain > 0` para pintar en el `else` el
+tooltip `copy.table.noGainHint` — *"Esta keyword ya convierte mejor que el promedio de la posición
+objetivo"*, que es exactamente la comparación que **no se hizo**. Y como la usabilidad de la curva se
+evalúa **una vez por posición objetivo**, no era un borde: caían TODAS las filas.
+
+🔴 **El arreglo NO fue traducir mejor el `null`, sino no servir la lente cuando hay que fabricar.**
+`readKeywordOpportunitiesFromWorkQueue` devuelve `null` si alguna fila que llegaría a la lente carece de
+techo, y el caller cae al reader legacy — que desde `TASK-1792` ordena ese caso honestamente
+(`orderedBy: 'measured_demand'`, sobre impresiones × cercanía a página 1, todo medido). En la práctica es
+una condición **por organización**: con curva sana la lente viene de la cola; con curva no utilizable, del
+legacy. La cola conserva su snapshot completo en los dos casos.
+
+**Qué significa para esta task, que es lo que cambia:**
+
+- El punto 4 del Delta (3) —*"`estimatedClickGain` sigue siendo `number` y ya no colapsa a 0"*— **vuelve a
+  ser cierto**, también por el camino de la cola. `noGainHint` no puede mentir: si el techo no se pudo
+  calcular, la lente no la sirve la cola.
+- **El copy de los cuatro estados de `ctrCurveSource` sigue siendo ejercitable**, y por la misma razón: el
+  escenario que sólo tenía dos estados es justo el que ahora atiende el legacy. El punto (1) de este Delta
+  queda acotado — no hay que reescribir el vocabulario para un cutover que no ocurre en ese caso.
+- **La decisión `estimatedClickGain: number | null` deja de ser urgente, pero NO queda cerrada.** Hoy la
+  imposibilidad se sostiene con un guard en la costura; el tipo sigue sin poder expresar la ausencia, así
+  que el día que alguien quiera servir bandas 2/3 en esta lente —que es lo natural cuando aterrice la
+  superficie propia de la cola— el problema vuelve. Sigue siendo la forma que lo haría imposible por
+  construcción, y sigue siendo decisión conjunta con `TASK-1792`.
+
+*(Hallazgo original de `greenhouse-eo-9b` sobre la costura entre los dos contratos, confirmado de forma
+independiente en el barrido de impacto cruzado de `TASK-1700`. El defecto no era de ninguna de las dos
+tasks: era del vocabulario compartido — `estimatedClickGain` y `priority_score` usan el mismo valor con
+significados inversos.)*
+
+**Lo que NO cambia:** el alcance sigue siendo `ui-lite`, aditivo, sin migración y sin flag propio.
+
 ## Delta 2026-08-28 — desbloqueada: `TASK-1694` cerró
 
 `TASK-1694` cerró como `code complete, rollout pendiente`, así que el `Blocked by` pasa a `none`.
@@ -8,6 +114,77 @@ La serialización `1691 → 1693` se conserva como orden recomendado, no como bl
 Contexto que ahora es un hecho del contrato y no un supuesto: el reader de discovery declara los
 filtros que ignora (`ignoredFilters`), filtra por barrera de enlaces (`maxLinkBarrier`, con
 `unknown` fuera por default) y cuenta candidatos por keyword normalizada.
+
+## Delta 2026-08-28 (2) — hereda dos strings que quedaron factualmente falsas
+
+`TASK-1792` corrige el defecto de la curva de CTR del reader que esta task también posee
+(`keyword-opportunities-reader.ts`). **Objetos distintos, archivos compartidos**: 1792 corrige la
+*estimación* y no toca copy ni la vista; esta task declara la *frescura* y sigue siendo su dueña.
+Serialización recomendada **1792 → 1691**, porque esta task necesita saber qué estados de curva
+existen para poder declararlos junto a `marketAsOf` y al borde de la lente `●`.
+
+Dos strings de `src/lib/copy/growth.ts` quedan **factualmente falsas** cuando la curva no es
+utilizable, y su corrección entra en el alcance de esta task porque el archivo es suyo:
+
+- `keywords.opportunities.noGainHint` — *"Esta keyword ya convierte mejor que el promedio de la
+  posición objetivo"*. Afirma una comparación que **no se hizo**: con la curva degenerada el valor
+  cero no significa "convierte mejor", significa "no hubo con qué comparar".
+- `keywords.opportunities.sortedByGain` — *"Ordenadas por ganancia estimada: lo de arriba es lo que
+  más rinde"*. Promete un orden que **no ocurre** cuando el criterio no discrimina.
+
+`TASK-1792` agrega al DTO `ctrCurveSource`, `curveSampleSize` y `orderedBy`; esta task los consume
+para que el copy diga la verdad en los dos estados en vez de afirmar el caso feliz. Queda abierto
+con 1792 si `estimatedClickGain` debe volverse `number | null` — es la forma que hace imposible el
+error, pero rompe el render en compilación y por eso se decide acá, no allá.
+
+## Delta 2026-08-28 (3) — `TASK-1792` cerró: el contrato que hereda esta task, tal como quedó
+
+Lo que efectivamente quedó en `KeywordOpportunitiesResult` (envelope, no por fila — es UN hecho de
+la lente, no un atributo de cada keyword). Difiere en dos puntos de lo anunciado en el Delta (2):
+
+| Campo | Tipo | Para qué sirve al copy |
+|---|---|---|
+| `ctrCurveSource` | `'org_measured' \| 'org_level_reference_shape' \| 'unusable' \| 'fallback'` | **CUATRO estados, no tres** |
+| `curveSampleSize` | `{ impressions, clicks } \| null` | el POR QUÉ: `null` = nunca vimos esa posición |
+| `orderedBy` | `'estimated_click_gain' \| 'measured_demand'` | si la promesa de orden es cierta |
+| `targetPosition` | `number` | contra qué posición se calculó el techo |
+| `expectedCtrAtTarget` | `number` | el CTR objetivo que multiplica cada techo |
+
+Los cuatro estados y qué puede afirmar el copy en cada uno:
+
+- `org_measured` — el techo salió de la medición del propio sitio EN esa posición. Es el único caso
+  donde `noGainHint` puede decir la verdad: ahí sí hubo con qué comparar.
+- `org_level_reference_shape` — **estado nuevo, no estaba en el Delta (2)**. El bucket objetivo no
+  alcanza, pero el nivel del sitio SÍ se pudo estimar de su agregado: la forma la presta una curva
+  de referencia y el nivel es medido. Un parámetro propio, la forma prestada.
+- `unusable` — vimos esa posición y la muestra no alcanza (`curveSampleSize` trae el par que lo
+  explica: p.ej. `{ impressions: 75, clicks: 0 }`).
+- `fallback` — nunca observamos esa posición y tampoco hubo muestra para un nivel.
+
+Dos cosas que cambian el trabajo de esta task respecto de lo anunciado:
+
+1. **`sortedByGain` ya no es sólo un problema de copy: el servidor lo arregló.** Cuando el criterio
+   no discrimina, el reader ordena por demanda medida (impresiones × cercanía a página 1) y lo dice
+   en `orderedBy`. Como la tabla re-ordena en cliente y `Array.prototype.sort` es estable, el orden
+   que ve el usuario YA está corregido. Lo que falta es que la etiqueta deje de prometer un orden
+   por ganancia cuando `orderedBy === 'measured_demand'`.
+3. **Dos strings MÁS, que el barrido de drift destapó después del Delta (2)** y que no estaban
+   anotadas — mismo archivo, misma familia:
+   - `src/lib/copy/growth.ts:2234` (`colGainHint`) — *"Clics adicionales por mes si llegaras a la
+     posición objetivo, **según la curva de CTR de tu propio sitio**"*. Es el tooltip de la columna,
+     o sea lo que el operador le muestra al cliente, y es falso en **3 de los 4 estados**: sólo
+     `org_measured` sale de la curva propia.
+   - `src/views/greenhouse/admin/growth/seo/keywords/KeywordOpportunityTable.tsx:118` — el comentario
+     *"Default: la mayor ganancia estimada arriba"* congela junto al `sort` de la vista un supuesto
+     que el servidor ya no siempre cumple.
+   Y el mecanismo del problema, para que la corrección no sea sólo de texto:
+   `KeywordOpportunityTable.tsx:326` pinta `sortedByGain` **incondicional**, sin leer `orderedBy`.
+   Mientras eso siga así, la etiqueta miente por construcción — no por redacción.
+
+4. **`estimatedClickGain` sigue siendo `number`, y ya no colapsa a 0.** La decisión de volverlo
+   `number | null` sigue abierta y es de esta task, pero el argumento cambió: hoy el número siempre
+   existe y es un techo honesto con procedencia declarada, así que el `null` deja de ser urgente y
+   pasa a ser una decisión de ergonomía del render.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE

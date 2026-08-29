@@ -157,6 +157,15 @@ Vive en `src/components/greenhouse/primitives/nexa-<x>/` + barrel + resolver `ki
 - **NUNCA** romper los invariantes del runtime del chat (markdown memo, tool-once, no smooth-scroll, `cleanNexaAnswer`, `toPlainExcerpt`).
 - **NUNCA** anexar "Fuentes:" como texto ni mostrar `##` crudo (en respuesta o excerpt). Las fuentes viven en el panel.
 - **NUNCA** pintar `Auditar`/estado falso cuando la verdad es "no sé" — `degraded`/`error`/gap honestos.
+
+**Componer cifras de dos herramientas (TASK-1785)**
+- 🔴 **NUNCA promediar, sumar ni comparar punto a punto una cifra `measured` (●) con una `estimated` (◑).** No comparten referente: `measured` es Search Console —promedio ponderado sobre usuarios REALES del dominio—, `estimated` es una posición exacta de una consulta **sintética que emitimos nosotros**, desde una ubicación que elegimos. El número combinado no corresponde a ninguna realidad medible y se presenta con la confianza de una medición, que es lo que lo vuelve peligroso.
+- ⚠️ **Este defecto es TUYO por construcción, no de las tools.** La mezcla no ocurre DENTRO de una herramienta: ocurre **entre dos**, cuando Nexa llama a las dos y redacta un párrafo. Ninguna descripción de tool ve esa composición, así que ninguna puede defenderla — el único punto donde la regla se puede romper es el que Nexa ocupa.
+- **SIEMPRE** leer `provenance` antes que la cifra: trae `lens`, `source` y `capturedAt` **por campo**, no por resultado. Un DTO puede ser mixto (`SeoPerformanceResult` tiene `summary` siempre ● aunque su chart sea ◑), así que **NUNCA** inferir la lente del nombre de la tool ni del resultado completo.
+- **SIEMPRE** citar el as-of. Una cifra sin fecha se lee como vigente para siempre.
+- **NUNCA** leer `null` como `0`. `null` = no se midió; `0` = se midió y era cero. Y `unavailable: { reason }` en una lente es un ESTADO con causa, nunca un cero, y no invalida la otra lente.
+- **PREFERIR `get_seo_dual_lens_visibility`** cuando la pregunta sea "¿dónde rankea este cliente?": devuelve las dos series ya separadas y rotuladas en una llamada. Existe para que componer bien cueste MENOS que componer mal — antes presentarlas bien costaba dos llamadas y una decisión, y mal costaba una y ninguna. **No tiene campo combinado y no es una omisión**: si necesitas un índice único, es una decisión de producto con su propia ADR.
+- Canon: `docs/architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` + `src/lib/growth/seo/lens.ts`.
 - **NUNCA** duplicar el live region (lo lleva la identidad Nexa).
 - **NUNCA** hardcodear HEX/px/fontFamily/ms — tokens AXIS + SoT + motion tokens.
 

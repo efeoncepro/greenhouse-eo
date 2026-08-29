@@ -9,6 +9,9 @@ Use this skill as the control-plane router for Efeonce MCP. The gateway is a neu
 OAuth validation, discovery, routing, redaction and operational isolation. Products own business logic, data,
 entitlements, providers and their canonical readers/commands.
 
+🔴 **La ausencia de una tool en el gateway NO es evidencia de olvido — búscala en las exclusiones antes de reportar un hueco.**
+El guard de paridad (`efeonce-mcp/src/providers/greenhouse-seo-tool-parity.ts`, `TASK-1653`/`TASK-1658`) es **bidireccional** y su regla es explícita: *«si una tool interna NO debe federarse, va en `EXCLUSIONS` con razón — nunca simplemente ausente»*. Así que "está en el registry interno y no en el gateway" tiene **dos** explicaciones —olvido de federación, o exclusión deliberada— y el sistema está construido para que las distingas con un `grep` a `GREENHOUSE_SEO_TOOL_EXCLUSIONS`. Caso fuente (2026-08-29): se reportó `get_seo_work_queue` como hueco de federación; estaba excluida a propósito, con razón sustantiva (§7 prohíbe exponer su cruce de citabilidad client-facing, y su `priority_score_version` no ha rodado un ciclo) y hasta con disparador de revisión declarado. ⚠️ El inventario del guard es un **espejo committeado**, no una fuente viva: el CI del repo hermano no puede leer `greenhouse-eo`, así que actualizar el espejo es el **paso 1** del protocolo de federación, no el último (`TASK-1780` lo reemplaza por un manifiesto canónico).
+
 ## First reads
 
 Read, in order:

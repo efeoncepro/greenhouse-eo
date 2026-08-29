@@ -7,6 +7,150 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-29 — El contrato `●`/`◑` deja de depender de que alguien lea la descripción
+
+`TASK-1785`. Los readers de `growth/seo` emiten `provenance: SeoProvenance[]` en su `ok: true`:
+**requerido**, así que `tsc` nombra a cualquier reader que no declare de qué naturaleza es lo que
+devuelve. En lista, porque hay DTO genuinamente mixtos — `SeoPerformanceResult` declaraba UNA fuente
+mientras su `summary` era siempre Search Console, o sea cifras medidas dentro de un envoltorio
+rotulado estimado.
+
+Dos guards nuevos: uno camina el DTO real y exige que **cada hoja numérica tenga exactamente un
+dueño** (detecta sin-dueño y con-dos-dueños); otro censa las superficies del lane y del MCP
+comparando contra el **filesystem**, en ambas direcciones. Sin ellos, el campo habría sido una
+promesa: nada obligaba a que las procedencias declaradas cubrieran lo que hay.
+
+Tool nueva `get_seo_dual_lens_visibility`: las dos series de posición separadas y rotuladas en una
+sola llamada, **sin campo combinado por contrato**. Existe para invertir un incentivo — presentar
+bien las dos lentes costaba dos llamadas y una decisión, presentarlas mal costaba una y ninguna.
+⚠️ **Falta federarla al gateway** (cross-repo): hasta entonces Nexa y los clientes MCP no la ven.
+
+Sin migración, sin flag, sin cambio de valor en ninguna cifra. `dataforseo_serp` quedó como lente
+`estimated` y no `measured`: exacto no es medido — esa consulta la hicimos nosotros.
+
+## 2026-08-29 — Las capacidades SEO nuevas pasan de "prendidas" a "ejercitadas"
+
+`domain-overview` y `url-visibility` corrieron por el camino desatendido del scheduler (body `{}`),
+con costo real **clavado al preview** (USD 0,01212 y USD 0,024) y re-corrida a USD 0. Los schedulers
+tenían `lastAttemptTime` vacío y su próxima corrida agendada era el 16-17 de septiembre. La ventana de
+48 h de `ISSUE-164` quedó cerrada midiendo el efecto en `grader_probe_results` (`blocked%` = 0) en vez
+del conteo de Sentry, con la salvedad explícita de que la muestra es una sola corrida.
+
+## 2026-08-28 — El módulo SEO tiene una sola cola de trabajo (`TASK-1700`)
+
+- `greenhouse_growth.seo_work_queue_{snapshots,items,decisions}`: aggregate append-only que pasa a ser la
+  ÚNICA autoridad de orden del módulo. Antes había cuatro criterios no comparables y el operador abría
+  tres pantallas sin que ninguna dijera qué hacer primero.
+- El score deja de ser un índice compuesto y pasa a **clics incrementales sobre demanda MEDIDA**, con la
+  curva de CTR del propio sitio y su versión persistida en cada fila. Sin demanda medida no se fabrica un
+  score: la fila recibe `NULL`, cae a su banda y su verbo honesto es `measure` — y lo impone un CHECK de
+  la base, no el TypeScript.
+- La lente de oportunidades de `/admin/growth/seo/keywords` cambia de FUENTE del orden sin cambiar de
+  forma, detrás de `GROWTH_SEO_WORK_QUEUE_ENABLED` (OFF) con caída al reader legacy. Paridad verificada
+  contra PG real: techo idéntico y orden relativo idéntico sobre las keywords compartidas.
+- Materializador en Cloud Scheduler + ops-worker (nunca Vercel cron), tres señales de reliability nuevas
+  y la capability `growth.seo.work_queue.decide` — ver y decidir son dos permisos distintos.
+- Documentación en las tres capas (arquitectura §18, funcional y manual de uso), invariantes nuevos en
+  `.claude/rules/growth-seo.md`, y la skill `seo-aeo` (`modules/02_SEO_CONTENT.md`, espejada en `.codex/`)
+  gana la implementación de referencia del score más la advertencia comercial: la métrica es *table
+  stakes* y lo propio es la COMBINACIÓN curva-propia × cambio-de-posición, una afirmación NEGATIVA que
+  exige re-verificación a la fecha antes de cualquier uso comercial.
+- **Rollout pendiente:** flag OFF en los dos runtimes, scheduler pausado, sin promover a `main`.
+
+## 2026-08-28 — Landing Agencia de influencers publicada (`TASK-1598`)
+
+- El cierre responsive corrige la franja de divulgación IA que a 1414 px dejaba un bloque vacío: ahora es full-bleed
+  y conserva la retícula. El form reemplaza sparkle por documento y fija una jerarquía medible Poppins/Geist sin
+  peso 650. Los assets mantienen duración, eliminan fechas ficticias y explican publicación, pauta o canales con
+  chips tonales; el CTA secundario de ofertas usa contorno navy e icono diagonal. Fidelidad live pasó en
+  1536/1440/1414/890/390 y reduced motion; SEO/AEO no tuvo drift.
+
+- El rail estático de cuatro logos se reemplazó por el widget compartido `greenhouse_social_trust` de la landing de
+  Redes Sociales. Conserva las tres señales regionales y añade el marquee monocromático canónico `logoMarquee.v2`
+  con 3×7 marcas, label/nombre accesible y reduced motion; el gate live cubre composición y overflow en cuatro
+  viewports. No se duplicó markup ni se creó otro widget.
+
+- El último refinamiento visual convierte la franja bajo el hero en un rail editorial responsive, añade profundidad
+  controlada a “Cinco capas”, usa iconos monocromos reales/semánticos en los destinos de assets y corrige el lenguaje
+  visual del form con megáfono y contador próximo al textarea. El gate de fidelidad ahora cubre estos contratos en
+  1536/1440/890/390 y reduced motion; el gate SEO/AEO volvió a pasar sin drift de metadata o schema.
+
+- El CTA fijo se refinó como dock Midnight flotante y contenido, con safe-area y targets de 48 px. `Agenda una
+  reunión` conserva la única superficie sólida verde; `Cuéntanos tu campaña` usa contorno transparente e icono
+  diagonal. El gate live cubre geometría, clipping, superficie, jerarquía e icono en 1536/1440/890/390.
+
+- El brief publicó una v2 `diagnostic_premium`: los dos selects ya no abren el popup nativo, sino comboboxes
+  accesibles del renderer. La landing añade 11 marcas semánticas para mercado y activación sin duplicar estado ni
+  validación; el gate live abre ambas listas y prueba teclado, overlay, contraste y clipping en cuatro viewports.
+
+- Tras el review live del owner se corrigió una regresión de fidelidad que el smoke inicial no detectó: cargar assets
+  no probaba la secuencia. El hero vuelve a rotar tres clips con progreso, play/pausa y sonido; también se restauraron
+  badge de derechos, stack social, pulgar decorativo, selección por teclado de ofertas, CTA sticky y reveals. El gate
+  nuevo `public-website:verify-influencer-landing-fidelity` ejerce esos contratos en 1536/1440/890/390 y reduced
+  motion. Tras el segundo review, el hero mide el masthead Ohio y reserva 32 px adicionales: kicker, teléfono y
+  sticker ya no entran en el área visual del header en ningún breakpoint probado. Tras el tercer review se corrigió
+  la cascada `font: inherit` que dejaba los CTA en peso 400 y se consolidó un sistema AXIS con siete botones
+  primary/secondary/tonal, iconos sin discos de fondo, foco doble, targets ≥44 px y sticky `inert` al ocultarse. El
+  hero mantiene una sola acción sólida (`Agenda una reunión`); `Cuéntanos tu campaña` sigue como enlace secundario.
+  El intro de conversión se mantiene sticky a 32 px junto al formulario desde 761 px; en móvil se apila y vuelve a
+  flujo estático. El intro del FAQ es sticky sólo cuando caben sus dos columnas (>900 px); en 890/390 se apila y
+  queda estático para no cubrir el acordeón durante el scroll. El gate cubre estos contratos en 1536/1440/890/390.
+- Se corrigió la desaparición del brief: el loader estable de meetings sólo registraba
+  `<efeonce-meeting-scheduler>` y dejaba vacío `<greenhouse-form>`. La landing carga ahora el renderer canónico de
+  Growth Forms y conserva fallback host-owned. El gate live ya no acepta la mera etiqueta: exige custom element,
+  root, siete bloques de campo, CTA submit, altura útil y ausencia del fallback tras montar.
+- El brief se rediseñó como una sola superficie editorial premium: encabezado útil, duración, señales de confianza,
+  seis iconos semánticos sin discos, controles de 56 px con texto de 16 px, estados focus/autofill/error, consentimiento
+  tonal y submit full-width. El cambio es host/CSS page-scoped; no bifurca contrato, validación, Turnstile, destino ni
+  tracking. El scorecard visual live quedó en `4.68/5` y el gate cubre el contrato visual en 1536/1440/890/390.
+- El último review refinó el ritmo del form, reemplazó la URL cruda por `Consulta nuestra Política de privacidad` y
+  convirtió los selects en controles tonales con affordance propia. El acordeón de agenda se retiró: el Growth CTA
+  published `influencer-discovery-meeting` abre `open_meeting_scheduler` en diálogo nativo sobre el scheduler
+  `discovery`; el smoke live verificó teclado, 390 px, reduced motion y cero enlaces HubSpot sin crear una reserva.
+- Se publicó `https://efeoncepro.com/servicios/agencia-de-influencers/` como página Elementor `251627`, conservando
+  el header/footer Ohio global y la dirección visual aprobada de Claude Design. El slug responde a intención comercial
+  validada en CL, MX, CO y PE; la página sirve canonical, `index, follow`, schema visible y sitemap/lastmod.
+- La conversión usa Growth Form gobernado `efeonce-creator-influence-brief` y el meeting canónico
+  `fhsf-efeonce-lead-gen-web` / `discovery`; no reconstruye destinos, scheduler, CRM ni tracking en WordPress. El
+  menu item nativo `Influencer Marketing` quedó bajo `Servicios Destacados`.
+- Los seis clips únicos del diseño están activos y rotulados como visuales ilustrativos generados con IA, no casos ni
+  resultados. QA live post-cache cubrió secuencia/interacciones, teclado, form, meeting, FAQ, schema, overflow,
+  consola y performance de laboratorio; snapshots de página y menú dejan rollback acotado.
+- El hardening SEO/AEO final publicó title y description comerciales, canonical/robots/excerpt, Open Graph/Twitter con
+  imagen dedicada `1200×630` y un grafo sin entidades duplicadas: Yoast posee WebPage/Breadcrumb/WebSite/Organization;
+  la página completa Service con cinco ofertas y FAQPage con seis respuestas visibles. El gate live nuevo valida
+  metadata, imagen, schema, sitemap, menú y HTML inicial. La ruta queda publicada y elegible para indexación, sin
+  presentar ese estado como prueba de indexación en Google. Menú: `Soluciones → Servicios Destacados`, después de
+  `Redes Sociales`.
+
+## 2026-08-28 — La curva de CTR declara si es utilizable, o la lente no ordena (`TASK-1792`)
+
+- `readKeywordOpportunities` ordenaba por un campo colapsado a cero. `expectedCtrAt` preguntaba «¿está el
+  bucket en el `Map`?» cuando la pregunta era «¿hay muestra para estimar un CTR?»: con un bucket presente y
+  sin clics (`efeoncepro.com`: 75 impresiones, 0 clics en la posición objetivo) el guard devolvía `0`, la
+  ganancia estimada colapsaba en **toda** la lente y el `.sort()` quedaba en no-op. La pantalla no ordenaba
+  mal: **no ordenaba**, y nada fallaba. Medido contra PG el 2026-08-28: Efeonce 24/24 filas en cero; Berel,
+  con curva sana, 1.445 de 1.798 (80%) empatadas. El disparador está garantizado en todo target recién
+  onboardeado, así que no es un defecto de un cliente.
+- Primitive nuevo [`src/lib/growth/seo/ctr-curve.ts`](src/lib/growth/seo/ctr-curve.ts): la curva se lee **sin
+  `HAVING`** (un filtro en el SQL borra el bucket y vuelve indistinguible «no vino» de «vino sin muestra»),
+  transporta su muestra por bucket y declara su usabilidad con un piso de **dos dimensiones** — impresiones
+  **y** clics, porque la precisión de un estimador de tasa la gobiernan los éxitos. El umbral `1000/5` se
+  **adopta** de `work-queue/score-versions.ts` y lo sostiene un test que compara el **veredicto** del
+  predicado sobre nueve curvas fixture, no las constantes.
+- El envelope de `KeywordOpportunitiesResult` gana `ctrCurveSource`, `curveSampleSize`, `orderedBy`,
+  `targetPosition` y `expectedCtrAtTarget`. Cuando el techo no discrimina —curva no utilizable, o ganancia
+  idéntica en todas las filas— la lente ordena por **demanda medida** (impresiones × cercanía a página 1) y
+  lo declara. Los tres consumers (page server, lane ecosystem, tool MCP) son passthrough y heredan la
+  procedencia sin lógica propia.
+- El `FALLBACK_CTR_CURVE` declaraba 6% en la posición objetivo contra ~1% medido en dos sitios independientes:
+  estaba calibrado para una SERP que ya no existe. Se reemplaza por **forma de referencia + nivel estimado del
+  propio sitio** (un parámetro medido en vez de veinte prestados), con la curva expuesta forzada monótona no
+  creciente — el híbrido anterior producía bucket 8 en `0,0000` junto a bucket 9 en `≈0,027`.
+- Verificación: 663 unitarios + `src/lib/growth/seo/ctr-curve.live.test.ts` contra PG real, **4 passed, no
+  `skipped`**. Cierra la costura que dejó pasar el defecto: los mocks ejercitaban el TS sin el SQL y el sanity
+  el SQL sin el TS. Levanta el bloqueo del cutover de `TASK-1700`.
+
 ## 2026-08-28 — LicitaLAB: MCP oficial + radar Playwright autenticado y gateado
 
 - La skill espejada `greenhouse-public-private-tenders` incorpora el companion `licitalab-mcp.md` en
@@ -57,6 +201,76 @@
 - El patrón se extendió a `docs/commercial/CRM_DEAL_REGISTER.md`: vista transversal para negocios Core, Strategic
   Bets y otros orígenes, con una fila sólo después de verificar el Deal en HubSpot. Las licitaciones promovidas se
   sincronizan en ambos registros por `deal_id`; las oportunidades todavía en radar permanecen sólo en bid desk.
+- El segundo lote público y ocho RFP privados Wherex elevaron el registro a 30 oportunidades revisadas y 24 Deals
+  verificados. Al 2026-08-29 hay 23 Deals abiertos de esta admisión y uno `closedlost`; HubSpot suma además el RFI
+  CRM Mineduc anterior al corte, para 24 Deals de licitación abiertos en total. Ajinomoto ya está `closedlost`.
+- La skill espejada suma `crm-portfolio-operating-model.md`: promoción común con segundo readback posterior a
+  automatizaciones y cartera separada en diez bids prioritarios, tres RFI livianos y diez gates previos.
+- El readback live encontró los ocho Deals Wherex en `Core Pipeline` pese a que continúan `newbusiness`; se registra
+  la deriva frente a la política `Strategic Bet` sin corregirla silenciosamente. CINTERMEX queda `HOLD vencido /
+  portal no verificado` y los cuatro IDs de Grupo Reditos quedan `No bid` por decisión del operador.
+
+## 2026-08-28 — El candidato de discovery no declara pertinencia (hueco documentado y levantado)
+
+- Auditando la salida del smoke apareció que el candidato **no transporta ninguna señal de marca,
+  categoría ni relevancia** — ni en la tabla ni en el DTO. Consecuencia medida: 50 keywords de
+  consumidor sobre ChatGPT (`chatgpt en linea`, `chatgpt rojo`) pasaron **todos** los checks para un
+  target que vende servicios AEO B2B.
+- 🔴 El vector estructural no es elegir mal la seed: es **`TASK-1662`**. En el gap competitivo los
+  candidatos salen de dominios del competidor, así que **las seeds las elige él**, y sirve segmentos
+  que el cliente no. Ahí no hay operador a quien educar.
+- ⚠️ **La urgencia que se argumentó primero era falsa, y se corrigió el mismo día** (`65372ea68`).
+  Se afirmó que el orden por defecto pondera volumen y que la cola append-only de `TASK-1700`
+  congelaría lo irrelevante arriba. No ocurre: `work-queue/priority-score.ts` no mira el volumen
+  estimado del proveedor, y el CHECK `basis_band_score` impide fabricar un score sin demanda medida —
+  un candidato irrelevante **sin** impresiones cae a banda 3 con score `NULL` y no compite. El caso
+  que sí sostiene la task es el otro: keyword irrelevante **con** impresiones reales, que atraviesa
+  el CHECK y entra a la cola. El vector es la demanda medida, no el volumen del proveedor.
+- **Levantada como `TASK-1791`** (`to-do`, P1, `EPIC-022`, `backend-data`, `Blocked by: none`), sin
+  dueño asignado todavía. La señal entra como **factor del item con su procedencia, jamás como
+  entrada del `priority_score`**: `evidence_ref` es opaca por contrato (cero FK, cero JOIN al motor
+  que produciría la señal), así que puntuar con ella sería puntuar con algo que el aggregate no puede
+  citar. El hallazgo queda además en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §7 (no sólo en una
+  bitácora que rota) porque tres sesiones lo verificaron por separado el mismo día.
+
+## 2026-08-28 — El drain de keyword discovery baja de 10 a 2 minutos
+
+- `ops-seo-keyword-discovery-drain` pasa de `*/10` a `*/2`. `Descubrir` es un workbench
+  interactivo: el operador encolaba y esperaba **5 minutos de media, 10 en el peor caso**, cuando la
+  corrida en sí tarda segundos. El `*/10` no compraba nada — el drain con cola vacía es no-op, así
+  que correrlo 5× más seguido **no gasta un centavo más**. Es la cadencia que `ops-outbox-publish`
+  ya usaba por el mismo motivo.
+- Seguro a esta cadencia: el claim de la corrida es un `UPDATE` condicional
+  (`WHERE status='pending' … RETURNING`), así que un segundo worker matchea cero filas y responde
+  `busy` sin tocar al proveedor.
+- Aplicado en los dos lugares (SoT `services/ops-worker/deploy.sh` + `gcloud scheduler jobs update`).
+  ⚠️ `main` todavía declara `*/10`: hasta el próximo release, un deploy del worker desde `main`
+  revertiría el schedule en silencio. Documentado en el Handoff.
+
+## 2026-08-28 — Release a producción `e82c18579b05`: el contrato de discovery corregido, vivo
+
+- Paso a producción de **TASK-1694** y **TASK-1692** (PR #209, 30 archivos de código, **cero
+  migraciones**). Manifest `released` en un solo run del orquestador (`33208942436`, 12m51s), ambos
+  gates `production` aprobados sin stall, watchdog `ok` con `drift_count=0`.
+- **Primer release del ledger que pasa sin break-glass desde un batch de dos tasks.** La razón es
+  estructural: sin migraciones no hay dominio irreversible, así que el classifier dio `ship` limpio.
+- **Cero flags que prender.** El release no introduce ninguno, y los que gatean el dominio ya
+  estaban `true` en Production — verificado leyendo el VALOR, no la presencia.
+- 🔴 **Verificado con canary de contrato, no sólo con el manifest.** Producción respondió
+  `maxLinkBarrier aceptado; ignoredFilters=maxDifficulty` (TASK-1694 ejecutándose), y el lane
+  devolvió **400** a un consumer intentando escribir `promoted_to_tracking` o el retirado
+  `selected_for_target` (TASK-1692: el boundary de escritura vivo). Un manifest `released` prueba
+  despliegue; el canary prueba comportamiento.
+- Gateway MCP desplegado con el schema federado nuevo de `get_seo_keyword_discovery`.
+- **Smoke con gasto ejecutado el mismo día** — 3 corridas, USD 0,0482, MX y CL, los dos endpoints
+  cuyo payload cambió. Las tres `succeeded`: el payload sin `filters` es aceptado por Labs (riesgo
+  de la matriz refutado con evidencia) y `volumePolicy: "all"` quedó persistido en el snapshot.
+- 🔴 **Y desmintió la justificación escrita de la propia task**: 102 candidatos, 2 endpoints, 2
+  mercados → CERO con volumen nulo o cero. Los índices de sugerencias e ideas del proveedor sólo
+  devuelven keywords con volumen medido, así que el filtro que se quitó era un **no-op** ahí; los
+  nulos aparecen sólo en `keyword_overview`, que nunca lo llevó. Quitarlo sigue siendo correcto
+  (elimina una asimetría no declarada), pero el beneficio prometido no tiene evidencia. `TASK-1700`
+  (P0) queda desbloqueada y con su prerequisito de runtime cumplido.
 
 ## 2026-08-28 — TASK-1692: el candidato de discovery recuerda qué se decidió sobre él
 
@@ -678,140 +892,3 @@
   envío/límites— en espejos byte-identical para Codex y Claude, verificadas contra fuentes oficiales actuales.
 - La guía de Resend separa el contrato documental vigente de la evidencia runtime que lo contradice: links con
   secreto siguen fail-closed y requieren `click_tracking=false` más un canary del href recibido.
-
-## 2026-08-20 — Skill compartida para diseñar y operar dashboards en Google Data Studio
-
-- La nueva skill `google-data-studio` queda invocable por Codex y Claude con bundles byte-identical y aliases para
-  el nombre histórico Looker Studio; separa el producto de Looker/LookML y consulta fuentes oficiales fechadas.
-- Cubre selección de gráficos, modelado, calculated fields, filtros, controles, parámetros, blends, responsive,
-  rendimiento, credenciales, sharing y embedding mediante referencias load-on-demand.
-- Su ejecución browser parte en `inspect`, distingue Browser/Playwright, Computer Use y Webwright, exige cambios
-  atómicos por el autosave y protege OAuth, credenciales, fuentes reutilizables, sharing y costos con gates explícitos.
-- La auditoría adversarial amplía el contrato con onboarding de Sheets/BigQuery, row-level security por email,
-  lifecycle `refresh fields|reconnect`, copias/rollback, draft/published, extracts, freshness, delivery/alertas, APIs
-  limitadas y una escalera de troubleshooting; también refuerza sesión autorizada y minimización de evidencia en
-  ambos runtimes.
-- El aprendizaje de operación con Search Console queda generalizado: polaridad inversa de Average Position,
-  protección contra ejes globales en combos, rangos parciales visibles, cohortes `new|rewrite`, fórmulas ponderadas y
-  una narrativa cliente que separa resultado observado, inferencia e impacto de negocio demostrado.
-
-## 2026-08-20 — La tabla accesible del scorecard deja de inflar la página
-
-- La tabla `sr-only` de Hiring > Evaluación aplicaba su caja de 1 px directamente sobre `<table>`;
-  el layout tabular envolvía texto carácter por carácter y extendía el documento varios miles de píxeles.
-- El fallback se conserva dentro de un wrapper genérico 1×1 clipado y gana semántica completa:
-  `caption`, encabezados con `scope`, competencia, objetivo, puntaje y estado.
-- GVC ya no ignora ese nodo y reporta `layout_out_of_flow_vertical_runaway` cuando un elemento
-  `absolute|fixed` vuelve a extender anormalmente el layout vertical.
-
-## 2026-08-19 — El lifecycle de correo quedó operativo, y la documentación decía que nada estaba aplicado
-
-- **La doc mentía en la dirección peligrosa.** Runbook, arquitectura de webhooks, ledger de flags e
-  `ISSUE-160` afirmaban "ninguna migración, ningún secreto, ningún webhook" cuando todo llevaba
-  horas aplicado. Seguir el runbook al pie habría creado un segundo webhook al mismo endpoint
-  —eventos duplicados que el dedupe por `svix-id` no detiene, porque son ids distintos— y una
-  segunda versión del secreto, rompiendo la verificación del webhook vivo.
-- **44 correos nunca llegaron** (23 `suppressed`, 21 `bounced`) — y todos van a dominios internos
-  de Efeonce. Cero externos: los 8 `hiring_assessment_assigned` fallidos son direcciones de
-  prueba/QA, no candidatas. El daño temido no ocurrió. `sent` nunca significó entregado, y ahora se
-  puede demostrar cuáles no lo fueron y a quién. Lo que sí queda a la vista es data sintética
-  circulando por el pipeline de correo productivo.
-- **Faltaba suscribir `email.suppressed`.** El bloqueo de reenvío consulta ese estado para no
-  mandar a ciegas a una dirección suprimida — y ese evento nunca iba a llegar. Falso negativo
-  silencioso en la puerta de recuperación.
-- **Los writers de credenciales corrían sin su backstop.** El índice único token-intent, que el
-  runbook exige aplicar ANTES de desplegar esos writers, no existía. Aplicado, junto al CONTRACT
-  de credencial, verificando una por una sus tres precondiciones de despliegue.
-- **`mail.efeoncepro.com` está bien por nuestro lado y Resend aún no lo confirma.** DKIM publicado
-  con valor idéntico byte a byte. Aprendizaje: re-disparar la verificación resetea los registros ya
-  verificados a `pending` — se espera, no se reintenta.
-
-## 2026-08-19 — El rollout de assessment iba a romper producción y a cortarle el test a los candidatos
-
-- **Una migración que no era aplicable en ningún orden.** El CHECK y el trigger de versión de
-  credencial rompían el writer que corre en `main`; el código nuevo rompía sin la migración.
-  Partida en expand/contract, con la fase contract FUERA de `migrations/` — porque el runner
-  aplica todas las pendientes en una transacción y un comentario de advertencia no detiene a un
-  runner.
-- **La sesión del candidato caducaba en el plazo para EMPEZAR, no en el de responder.** Quien
-  abría el enlace poco antes del límite y arrancaba perdía la sesión a mitad del test.
-- **Un enlace roto era invisible.** El bearer viaja en el fragmento, que nunca llega al servidor:
-  si un reescritor lo borra, el candidato queda fuera sin generar un solo request. Ahora hay un
-  hecho durable del canje y una señal que lo delata.
-- **El cap de recuperación castigaba al candidato por fallas nuestras**: contaba intentos fallidos
-  y compartía cuota con el enlace seguro, que es justamente el canal de rescate cuando el correo
-  no llega.
-- Todo salió de auditorías independientes con skills de arquitectura, talento y seguridad, corridas
-  ANTES de promover. Dos auditores encontraron el mismo P0 sin verse entre sí.
-
-## 2026-08-19 — Un guard que verificaba menos de lo que su propio Down borraba
-
-- **La migration de TASK-1746 tenía un hueco silencioso.** Su bloque anti pre-up-marker contaba
-  capabilities, triggers y columnas de sesión, pero no la tabla `hiring_assessment_public_request_bucket`
-  ni las cuatro funciones de acceso público — que el Down sí dropeaba. La migration creció en dos tandas y
-  el guard, que vive al final del Up, no se actualizó con la segunda. Un fallo en ese DDL habría quedado
-  registrado como aplicado, verde, y sólo habría aparecido a las 04:17 cuando el cron de retención llamara
-  una función inexistente. Corregido antes de aplicarla, así que no hizo falta forward-fix.
-- **Regla nueva en la spec de migraciones:** el guard del Up debe cubrir todo lo que el Down dropea, y una
-  migration editada en varias tandas necesita revisarlo en cada tanda. Es una comparación mecánica de dos
-  listas: los `DROP` del Down contra los contadores del guard.
-- **El ledger de flags afirmaba dos cosas falsas.** `HIRING_STAGE_TEST_ASSIGNMENT_ENABLED` figuraba ON en
-  una sección y OFF en otra; la revisión activa `ops-worker-00585-nv6` lo tiene en `true`, así que la
-  segunda era la equivocada. Y `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`, code-complete sin prender,
-  sólo estaba en el snapshot y no en `§ Pendientes de acción`, que es donde la regla del propio ledger lo
-  exige. Ambas corregidas contra runtime, no contra memoria.
-
-## 2026-08-19 — Un patrón nuevo en el catálogo, y una señal que nadie había registrado
-
-- **Octavo patrón canónico: "hecho declarado al nacer + copia derivada donde se filtra + obligación de
-  propagar".** Cruzó el umbral de tres dominios que el propio catálogo exige (Hiring, Knowledge y
-  Finance), y su valor no es describir lo que ya hacíamos: es forzar una decisión explícita. O te
-  obligas a propagar en la misma transacción y con señal de divergencia —y entonces los readers pueden
-  confiar en la copia—, o no te obligas y los readers críticos leen la raíz. Lo prohibido es el tercer
-  camino: filtrar por una copia que nadie se comprometió a mantener.
-- **Once señales del módulo Hiring estaban vivas en runtime pero sin documentar** en el control plane;
-  ahora hay inventario con la task dueña de cada una. Ocho siguen sin delta propio: deuda documental
-  declarada, no ausencia en producción.
-- **Cinco punteros quedaron rotos** al mover TASK-1739 a `complete/`, uno de ellos dentro de una señal
-  de reliability que corre en producción. Corregidos.
-
-## 2026-08-19 — On-Going y On-Demand ya comparten una ontología sin confundir engagement con proyecto
-
-- Se formalizó `Organization → Engagement → Project/Campaign → Task`: la organización y su Space conservan la
-  relación y memoria; el engagement gobierna contrato, capacidad, economics y cierre; proyectos/campañas siguen
-  siendo contenedores de tareas para ejecutar trabajo del cliente.
-- Un engagement On-Going puede producir múltiples proyectos/campañas y uno On-Demand puede contener uno o varios;
-  On-Demand describe un compromiso acotado, no un proyecto pequeño ni un retainer corto.
-- La venta se activa hacia Delivery mediante una Ficha de Activación que referencia quote/SOW/contrato, y crea sólo
-  la diferencia sobre el workspace durable. La Gantt es opcional y se deriva de Projects/Tasks.
-- `Product Service` no se usa como sinónimo de todo lo vendido: campaña audiovisual, plan de medios, brandbook y
-  otros servicios/deliverables conservan su categoría y nivel real de productización.
-- El contrato queda `Proposed` y sin cambio de runtime. La forma física sobre `services`, Notion, HubSpot, Finance,
-  equipos y Client Portal requiere cohortes reales, task y ADR antes de implementarse.
-
-## 2026-08-19 — El acceso al test ya tiene sesión opaca y reloj autoritativo
-
-- Cada credencial de evaluación tiene una versión explícita; las sesiones candidatas guardan solo un digest
-  opaco vinculado a esa versión, de modo que una recuperación invalida de inmediato los accesos anteriores.
-- El test distingue plazo para comenzar, plazo para responder y 30 minutos de gracia para revisar/enviar. Las
-  evaluaciones sin límite cierran a las 24 horas y ya no aparecen como “0 min”.
-- El navegador proyecta el reloj de base de datos con tiempo monotónico, por lo que cambiar el reloj local no
-  adelanta ni atrasa los límites. Durante la gracia se congelan respuestas, pero revisar y enviar siguen activos.
-- GET/start/save/submit y SELF-ID legacy mantienen decisión, consentimiento, captura y audit bajo una sola
-  transacción. El código fue auditado sin P0/P1/P2; sigue OFF y sin migración aplicada hasta completar el
-  fragment exchange, la cookie HttpOnly, Product API y los smokes reales.
-- La frontera browser ya está implementada localmente: elimina `#access` antes de React/red, intercambia por cookie
-  `__Host-` HttpOnly y usa rutas token-free con CSP/no-store/no-referrer. Maintenance y trailing slash no desvían el
-  bootstrap; un fence evita que dos pestañas muten assessments distintos.
-- El correo vigente no cambia al desplegar este código: el cutover vive en
-  `HIRING_ASSESSMENT_PUBLIC_SESSION_LINKS_ENABLED`, default OFF. ON queda bloqueado por migración+índice, rutas live,
-  `click_tracking=false` de Resend, rate limit y smokes reales de href/cookie/browser.
-- El backend de recuperación ya tiene un único command para email o enlace manual, Product API sólo para sesiones
-  humanas y revelación one-time. Siempre rota el acceso del assessment existente; nunca crea otro test, reinicia el
-  reloj, cambia etapa, score o respuestas.
-- El guard antiabuso combina cuota por credential/sesión válida con techo IP confiable de Vercel. Tokens aleatorios
-  inválidos no crean cardinalidad durable; la purga diaria drena con readback/señal. Savepoints conservan el consumo
-  de cuota y revierten writes parciales si una acción falla.
-- Arquitectura, manuales, issue/tasks y skills de Talento/Arquitectura/Secret Hygiene quedaron sincronizados. El
-  runbook global de Resend fija orden de migraciones, índice concurrente, webhook firmado, reconciliación,
-  `click_tracking=false`, smokes y rollback. Todo sigue `code complete, rollout pendiente`.

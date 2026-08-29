@@ -53,6 +53,8 @@ import { readSiteAuditReport } from '@/lib/growth/seo/site-audit/reader'
 import { trackKeywords, untrackKeywords } from '@/lib/growth/seo/track-keywords'
 import { declareCompetitors, retireCompetitors } from '@/lib/growth/seo/competitors'
 import { readKeywordGap, type KeywordGapResult } from '@/lib/growth/seo/keyword-gap-reader'
+import { WORK_QUEUE_ORIGINS, type SeoWorkQueueOrigin } from '@/lib/growth/seo/work-queue/contracts'
+import { readSeoWorkQueue, type ReadSeoWorkQueueResult } from '@/lib/growth/seo/work-queue/reader'
 import {
   readSerpCompetitorCandidates,
   readSerpTopResults,
@@ -81,6 +83,7 @@ import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { runProspectDiagnostic, type RunProspectDiagnosticResult } from '@/lib/growth/seo/prospect/command'
 import { listProspectDiagnostics, readProspectDiagnostic } from '@/lib/growth/seo/prospect/reader'
 import type { ProspectDiagnostic } from '@/lib/growth/seo/prospect/contracts'
+import { readDualLensVisibility } from '@/lib/growth/seo/composed/read-dual-lens-visibility'
 
 /**
  * TASK-1645 — Lane ecosystem del módulo SEO (downstream de API Platform, consumido por
@@ -2007,5 +2010,121 @@ export const getEcosystemSeoProviderSpendPayload = async ({
   return {
     data: { ok: true, ...result },
     meta: { module: 'growth.seo', organizationId }
+  }
+}
+
+/**
+ * TASK-1700 — la cola priorizada en el lane ecosystem.
+ *
+ * 🔴 **Sólo bindings `internal` sin organización, 404 anti-oracle.** La cola contiene la
+ * lente competitiva (`competitor_gap`) y el cruce con citabilidad IA, y §7 de la auditoría
+ * prohíbe la comparativa competitiva client-facing. El camino del cliente es el DTO redactado
+ * de su propia superficie, no este lane.
+ *
+ * Mismo payload que la ruta app y que la tool MCP interna: un primitive, tres consumers, cero
+ * lógica de orden duplicada.
+ */
+export const getEcosystemSeoWorkQueuePayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<ReadSeoWorkQueueResult | SeoTargetNotConfiguredPayload>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled' }, meta: { module: 'growth.seo' } }
+  }
+
+  const organizationId = requireInternalSeoBinding(context, request)
+  const url = new URL(request.url)
+
+  const origins = url.searchParams
+    .getAll('origin')
+    .filter((value): value is SeoWorkQueueOrigin => (WORK_QUEUE_ORIGINS as readonly string[]).includes(value))
+
+  const rawLimit = Number.parseInt(url.searchParams.get('limit') ?? '', 10)
+  const cursor = url.searchParams.get('cursor')?.trim() || null
+
+  const subject = await resolveSeoLaneSubject(context, request, organizationId)
+
+  if (!subject.seoTargetId) {
+    return {
+      data: { ok: false, errorCode: 'target_not_configured', organizationId: subject.organizationId },
+      meta: { module: 'growth.seo', tier: subject.tier }
+    }
+  }
+
+  const result = await readSeoWorkQueue(subject.seoTargetId, {
+    ...(origins.length > 0 ? { origins } : {}),
+    ...(Number.isFinite(rawLimit) && rawLimit > 0 ? { limit: rawLimit } : {}),
+    cursor
+  })
+
+  return {
+    data: result,
+    meta: {
+      module: 'growth.seo',
+      tier: subject.tier,
+      organizationId: subject.organizationId,
+      servedMarket: subject.servedMarket
+    }
+  }
+}
+
+/**
+ * GET /api/platform/ecosystem/growth/seo/dual-lens-visibility — TASK-1785.
+ *
+ * Las DOS series de posición de un mismo set de keywords, separadas y rotuladas: la medida
+ * (Search Console, ●) y la estimada (SERP comprado, ◑).
+ *
+ * 🔴 Existe para invertir un incentivo, no para agregar una lectura. Hasta ahora presentar
+ * bien las dos lentes costaba dos llamadas y una decisión; presentarlas mal costaba una
+ * llamada y ninguna. Ninguna descripción de tool compensa esa asimetría — un contrato sí.
+ *
+ * El payload NO tiene ningún campo combinado, y no es una omisión pendiente: las dos
+ * magnitudes no comparten referente y fusionarlas produciría un número sin significado
+ * presentado como medición.
+ */
+export const getEcosystemSeoDualLensVisibilityPayload = async ({
+  context,
+  request
+}: {
+  context: ApiPlatformRequestContext
+  request: Request
+}): Promise<ApiPlatformSuccessResult<unknown>> => {
+  if (!isSeoModuleEnabled()) {
+    return { data: { ok: false, errorCode: 'disabled', status: null }, meta: { module: 'growth.seo' } }
+  }
+
+  const subject = await resolveSeoLaneSubject(context, request)
+  const url = new URL(request.url)
+
+  const keywords = (url.searchParams.get('keywords') ?? '')
+    .split(',')
+    .map(value => value.trim())
+    .filter(Boolean)
+    .slice(0, 25)
+
+  const rawRange = Number.parseInt(url.searchParams.get('rangeDays') ?? '', 10)
+  const rangeDays = Number.isFinite(rawRange) && rawRange > 0 ? Math.min(rawRange, 365) : undefined
+
+  const result = await readDualLensVisibility({
+    organizationId: subject.organizationId,
+    keywords,
+    // El target YA lo resolvió el lane respetando `?market=`. Pasarlo evita una segunda
+    // resolución que descartaría el mercado elegido por el operador (ISSUE-153) y ahorra
+    // una consulta que ya se hizo.
+    seoTargetId: subject.seoTargetId,
+    ...(rangeDays ? { rangeDays } : {})
+  })
+
+  return {
+    data: result,
+    meta: {
+      module: 'growth.seo',
+      tier: subject.tier,
+      organizationId: subject.organizationId,
+      servedMarket: subject.servedMarket
+    }
   }
 }

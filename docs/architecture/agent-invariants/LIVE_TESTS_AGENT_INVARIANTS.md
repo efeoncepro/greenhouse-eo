@@ -153,9 +153,10 @@ La corrección no es limpiar después: es no tocar a nadie real.
 
 ---
 
-## 4. Los dos modos de falla que hay que saber reconocer
+## 4. Los tres modos de falla que hay que saber reconocer
 
-Estos dos no se parecen a lo que son. Reconocerlos vale más que cualquier otra parte de este doc.
+Ninguno de los tres se parece a lo que es: el primero miente en verde, el segundo miente en rojo y
+el tercero **no emite síntoma alguno**. Reconocerlos vale más que cualquier otra parte de este doc.
 
 ### 4.1 `skipped` se ve exactamente igual que verde
 
@@ -173,6 +174,34 @@ Consecuencia: **una suite live entera puede no haber ejercitado nada y verse ver
 - No declares un live test como evidencia de verificación sin citar el conteo de tests que
   efectivamente corrieron.
 
+#### 🔴 La variante que acusa en falso: el skip del runner equivocado
+
+El mismo skip tiene un segundo filo, y apunta al lado contrario. Cuando **quien lee no es el autor
+sino un verificador**, un `skipped` no se lee como «esto no se ejercitó»: se lee como **«el autor
+declaró una evidencia que nunca corrió»**. Es una acusación, y el runner equivocado la fabrica solo.
+
+**Reproducido el 2026-08-28, mismo archivo, mismo minuto, misma máquina:**
+
+```bash
+npx vitest run src/lib/growth/seo/ctr-curve.live.test.ts   # → Tests 4 skipped
+pnpm test:live src/lib/growth/seo/ctr-curve                # → Tests 4 passed
+```
+
+`vitest run` directo **no exporta las credenciales**: `pnpm test:live` es justamente el runner que
+las inyecta (y sólo el prefijo `GREENHOUSE_POSTGRES_`, ver §1). Sin ellas el predicado de gating se
+evalúa falso y el archivo se salta — el test está perfecto, el criterio de aceptación del autor era
+cierto, y la lectura era la equivocada. Una sesión que revisaba el cierre de `TASK-1792` estuvo a
+punto de reportarle al operador que el «4 passed, no skipped» del autor era un verde falso.
+
+**Reglas, en los dos sentidos:**
+
+- **Antes de acusar a un live test de no haber corrido, verifica CON QUÉ runner se corrió.** Un
+  `skipped` de `vitest run` no dice nada sobre el test: dice que lo invocaste sin credenciales.
+- **Al declarar la evidencia, cita el comando además del conteo.** «4 passed» es refutable; `pnpm
+  test:live <path> → 4 passed` es reproducible. La diferencia importa cuando el lector es otro.
+- Corolario general del archivo: **un skip nunca es un hecho sobre el código — es un hecho sobre la
+  invocación.** Los dos errores de lectura (creerlo verde, creerlo mentira) salen de olvidar eso.
+
 ### 4.2 Proxy caído: los tests **pasan** y la suite igual sale **roja**
 
 Sin Cloud SQL Proxy arriba, quien no logra conectarse no es el test sino el **teardown**. La salida
@@ -188,6 +217,81 @@ cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev" --port 15432
 
 **Regla:** ante un rojo en la suite live, verifica el proxy **antes** de leer el nombre del test que
 figura como fallado.
+
+### 4.3 La verificación partida entre dos suites que no se solapan
+
+Los dos anteriores tienen síntoma: uno miente en verde, el otro miente en rojo. **Este no tiene
+ninguno.** Todas las suites pasan, todas dicen la verdad sobre lo que ejercitan, y el defecto vive en
+el espacio que ninguna cubre.
+
+**Caso fuente — `TASK-1792`, 23 días.** En
+`src/lib/growth/seo/keyword-opportunities-reader.ts`, el resolver del CTR esperado hacía
+`if (typeof measured === 'number') return measured` sobre el `Map` de la curva de CTR. Un **`0`
+medido** —bucket con impresiones y cero clics— pasaba el guard, se devolvía como «CTR esperado», la
+ganancia estimada colapsaba a 0 en **todas** las filas y el `.sort()` por ese campo quedaba en
+no-op. La pantalla no ordenaba mal: **no ordenaba.** Nada falló porque el número existía, era del
+tipo correcto y estaba en rango.
+
+Las dos mitades de la verificación, y por dónde pasó el defecto entre ellas:
+
+- **Los tests unitarios ejercitan el TS sin el SQL.** En
+  `src/lib/growth/seo/__tests__/keyword-opportunities-reader.test.ts` el mock de
+  `runGreenhousePostgresQuery` devolvía siempre una curva con CTR **positivo** en el bucket
+  objetivo. El caso de curva vacía sí se ejercitaba, pero sin un solo assert sobre el campo roto.
+- **El sanity ejercita el SQL sin el TS.** `scripts/growth/_sanity-seo-keyword-opportunities.ts`
+  importa **sólo** la constante `SEO_KEYWORD_OPPORTUNITIES_SQL`, y lo hace por una razón buena y
+  documentada en su propio encabezado: `seo_gsc_daily` es append-only (trigger anti-DELETE), así que
+  el sanity siembra dentro de una transacción que aborta con `ROLLBACK`, y el reader usa el **pool**,
+  que no vería esa transacción. La decisión es correcta. El efecto colateral es que el sanity nunca
+  ejercitó `readOrgCtrCurve` ni el resolver del CTR esperado.
+
+⚠️ **Esto no es «falta cobertura».** Ambas suites estaban bien diseñadas y sus razones eran
+correctas; nadie fue descuidado y ninguna de las dos, leída sola, tiene un defecto que señalar. El
+hueco es una propiedad **emergente del par**: los mocks cubren el TS sin el SQL, el sanity cubre el
+SQL sin el TS, y el defecto cae en la costura. Auditar cada suite por separado —que es como se
+auditan— no lo encuentra nunca.
+
+Agravante de suerte que conviene registrar: la única organización con serie en ese momento tenía un
+CTR sano en el bucket objetivo (~0,98%), así que aun mirando el número a ojo, ahí se veía bien. La
+evidencia de cierre de la task original era **genuina** (375 keywords contra PG real) — simplemente
+no medía el campo roto.
+
+#### 🔴 La pregunta que hoy no hace nadie por defecto
+
+**Cuando un sanity ejercita SÓLO el SQL exportado por una razón legítima, alguien tiene que
+preguntarse explícitamente qué lógica TS queda entonces sin ejercitar contra datos reales** — y
+cerrar ese resto con un `*.live.test.ts` que recorra el camino completo, o declarar por escrito por
+qué no hace falta. La razón que justifica el recorte del sanity **no** justifica el hueco que deja:
+son dos decisiones distintas y sólo la primera se toma hoy.
+
+Corolario para quien revisa: **nunca aceptes «hay tests unitarios y hay sanity contra PG» como
+cobertura del camino.** Pregunta por el campo concreto que el cambio toca y por cuál de las dos
+suites lo evalúa **sobre datos reales**. Si la respuesta es «ninguna, pero las dos pasan», ese es el
+hueco.
+
+#### 🎯 Cómo se detecta el síntoma antes del incidente
+
+La señal es estructural y se ve leyendo imports, sin correr nada:
+
+- **Un sanity que importa una constante SQL en vez de llamar al reader.** Ese `import { …_SQL }` es
+  exactamente la marca. Todo lo que el reader hace *alrededor* de esa consulta —forma del helper de
+  PG, nombres de columna, guards, agregaciones, umbrales— queda fuera del alcance del sanity.
+- **Un guard que pregunta por la forma del dato cuando la pregunta real es semántica**
+  (`typeof x === 'number'`, `x != null`, `x.length > 0`) sobre un valor que los mocks siempre
+  entregan «sano». El valor válido-pero-degenerado —`0`, `[]`, `''`— es justo el que ningún mock
+  escribe y ningún SQL suelto evalúa.
+
+**Cómo se cerró.** Con `src/lib/growth/seo/ctr-curve.live.test.ts`, que ejercita el camino completo
+lectura → veredicto contra PG real: descubre sus sujetos desde la base
+(`SELECT DISTINCT organization_id`) en vez de hardcodearlos, tiene un assert que caza el modo de
+falla que los mocks no ven (`expect(curve.size).toBeGreaterThan(0)` con el mensaje «la curva llegó
+vacía: revisa nombres de columna y la forma del helper de PG» — si el helper deja de devolver array
+pelado o cambia un nombre de columna, todo lo demás degradaría a fallback en silencio), **reporta**
+por consola el veredicto por sujeto y ventana en vez de sólo pasar, y verifica el invariante contra
+lo que la base contiene hoy, no contra una fixture escrita a mano. Corrido con
+`pnpm test:live src/lib/growth/seo/ctr-curve` → **4 passed**, ninguno skipped (§4.1).
+
+---
 
 ---
 
@@ -217,5 +321,14 @@ también aislados.
 - [ ] Todo dato que cree declara su procedencia sintética en el INSERT, no después.
 - [ ] No hereda precondiciones del entorno: las garantiza en `beforeEach`.
 - [ ] Si el flujo emite outbox, el test lo retira antes de terminar.
+- [ ] **Ejercita el CAMINO, no una constante.** Llama al reader/command exportado —no al SQL suelto—
+      para que el helper de PG, los nombres de columna, los guards y los umbrales queden dentro del
+      alcance. Si el sanity del módulo importa sólo la constante SQL por una razón legítima, este
+      archivo es quien cubre el resto (§4.3).
+- [ ] **Reporta su veredicto, no sólo pasa.** Un `console.log` por sujeto y ventana con los valores
+      que el módulo produjo: así un umbral que deja sin dato a un cliente sano se ve **antes** de
+      mergear, y no cuando alguien reporta la pantalla.
+- [ ] Al menos un assert caza el valor **válido-pero-degenerado** (`0`, `[]`, curva vacía) con
+      mensaje que traiga la causa, no sólo el caso ausente.
 - [ ] Verificado con `pnpm test:live <path>` y **leyendo el conteo de `passed`**, no la ausencia de
       rojo.

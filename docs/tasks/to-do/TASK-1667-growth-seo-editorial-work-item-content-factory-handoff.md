@@ -1,5 +1,54 @@
 # TASK-1667 — Growth SEO: SEO Editorial Work Item y handoff gobernado a Content Factory
 
+## Delta 2026-08-28 (2) — el ítem de la cola ya existe: el work item cuelga de él, y el ancla durable NO es el `item_id`
+
+`TASK-1700` está en `develop` (siete slices, `962d22118` … `9020d6421`, migración
+`migrations/20260828224403660_task-1700-seo-work-queue.sql`). La dependencia que el Delta 2026-08-15
+agregó deja de ser una promesa y pasa a tener objetos con nombre, que es lo que esta task necesitaba
+para modelar la procedencia sin inventar una identidad paralela.
+
+**Los dos objetos, y por qué son dos:**
+
+- **Contexto de la decisión:** `greenhouse_growth.seo_work_queue_items.item_id` (+ `snapshot_id`). Es la
+  evidencia de QUÉ estaba mirando el operador cuando decidió: su banda, su verbo, su
+  `score_breakdown_json`, su `rank_in_snapshot`.
+- **Ancla durable del sujeto:** `(seo_target_id, origin, normalized_keyword)`. 🔴 **El `item_id` no
+  sirve como ancla.** Los items se regeneran en cada snapshot —recomputar es una fila nueva, jamás un
+  `UPDATE`— así que un `source_refs_json` que apunte sólo al `item_id` queda huérfano al día siguiente.
+  El work item guarda **los dos**: el par de evidencia y el sujeto.
+
+**El `source_context_hash` deja de ser el hash de una evidencia suelta, literalmente.** El snapshot trae
+`input_snapshot_hash`, `priority_score_version`, `computed_at` y `expires_at`. Para que el hash sea "el
+de una posición defendible" —la frase del Delta 2026-08-15— tiene que **incluir esos tres**: sin
+`priority_score_version` no se puede contestar "¿por qué esto era prioridad ese día?" seis meses
+después, que es justo lo que la cola existe para poder contestar.
+
+**Confirma la corrección (a), y la frontera con `work_kind` se vuelve urgente.** `consolidate` ya no es
+sólo un argumento: la cola tiene el verbo `consolidate` en el CHECK de `recommended_verb`, un origen
+`consolidation` propio, y ese origen encabeza `ORIGIN_ACTION_PRECEDENCE` como **bloqueante** —"empujar
+una keyword canibalizada es la acción equivocada: primero se fusiona, después se optimiza". Un work item
+que reciba un ítem con `recommendedVerb: 'consolidate'` y lo mapee a `work_kind='fix'` contradice un
+orden que la cola ya calculó y persistió. La reconciliación `decision_kind` ↔ `work_kind` que este Delta
+declaró abierta hay que cerrarla antes del Slice 1, no después.
+
+**Un campo nuevo que el brief no puede tirar: `alsoSurfacedBy`.** La cola compone el plan del día con
+**un sujeto = una fila = una decisión** (`dedupeBySubject` por keyword normalizada), y los orígenes
+suprimidos por precedencia viajan dentro de `score_breakdown_json.alsoSurfacedBy` con su verbo. Eso es
+procedencia del brief —"esta keyword también la señaló el gap AEO"— y va a `source_refs_json`. Descartarla
+convierte la deduplicación de la cola en una pérdida de información silenciosa del lado editorial.
+
+🔴 **La frontera de ejecución, dicha con los nombres reales.** `recordSeoWorkQueueDecision` **no ejecuta
+nada**: un `accepted` en la cola **no** crea un work item. `createSeoEditorialWorkItem` sigue siendo el
+command dueño y el loop es `propose → confirm → execute` con el execute de este lado. Y cuidado con la
+semántica del retiro: `dismissed` y `done` retiran el sujeto de los snapshots siguientes, pero por
+`(origin, normalized_keyword)` (`isRetiredSubject`). Si el work item nace de otro origen del mismo
+sujeto, el retiro **no lo cubre** y la cola lo puede volver a proponer mañana bajo ese otro origen.
+
+**Realidad de rollout:** `GROWTH_SEO_WORK_QUEUE_ENABLED` está OFF en Vercel y en el ops-worker, y el
+scheduler `ops-seo-work-queue-materialize` está pausado (`docs/operations/FEATURE_FLAG_STATE_LEDGER.md`).
+Hay contrato, todavía no hay snapshots: el Discovery de esta task modela contra el contrato, no espera
+encontrar filas.
+
 ## Delta 2026-08-28 — un candidato es una KEYWORD, no una fila de procedencia
 
 Cerrado por `TASK-1694`. `readKeywordDiscovery` colapsa por `normalizedKeyword`: la misma keyword

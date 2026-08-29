@@ -9,8 +9,18 @@ manifest `released`) y el deploy del gateway `mcp.efeonce.org` (revisión
 SEO** en `src/mcp/greenhouse/server.ts` y el gateway federa **27**.
 
 Dos de las nuevas emiten cifras que caen de lleno en el gap de esta task:
-`get_seo_serp_top_results` (posiciones medidas del SERP comprado, lente `measured`) y
-`get_seo_competitor_candidates` (recurrencia derivada de esa serie). Al aterrizar el campo `lens`,
+`get_seo_serp_top_results` y `get_seo_competitor_candidates` (recurrencia derivada de esa serie).
+
+> **Corrección 2026-08-29 (durante la implementación).** Este párrafo asignaba a
+> `get_seo_serp_top_results` la lente `measured`, con el argumento de que la posición del SERP
+> comprado es *exacta*. **Se implementó como `estimated`**, y la corrección es load-bearing:
+> **exacto no es medido**. Esa consulta la hicimos nosotros, desde una ubicación que elegimos, y
+> ningún usuario la hizo; `§5` de la arquitectura reserva `●` para Search Console precisamente por
+> eso. Rotularla `measured` la habría vuelto promediable con GSC —la mezcla exacta que esta task
+> existe para impedir— y habría roto además la asimetría de `readKeywordGap`, que **excluye** las
+> keywords con impresiones medidas porque la lente medida gana en vez de promediarse. Hay test de
+> regresión (`lens-contract.test.ts`). El párrafo original no venía de la autoría de la task sino de
+> un Delta posterior sobre el release `c983be7f18e6`. Al aterrizar el campo `lens`,
 entran al alcance junto con `get_seo_keyword_gap`, cuyos factores ya declaran procedencia y
 `sin_dato` — precedente vecino del mismo invariante, aunque expresado con otro vocabulario.
 
@@ -22,7 +32,7 @@ entran al alcance junto con `get_seo_keyword_gap`, cuyos factores ya declaran pr
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`

@@ -1,10 +1,10 @@
 # Creator Influence & Content Landing — SEO/AEO Brief V1
 
-> **Estado:** `Draft for validation`
+> **Estado:** `Validated and live`
 > **Owner:** SEO/AEO + Public Site + Media & Distribution
 > **Task:** TASK-1598
 > **Mercados:** Chile, Colombia, México y Perú
-> **Actualizado:** 2026-07-29
+> **Actualizado:** 2026-08-28
 
 Este brief es el contrato de descubrimiento, estructura y medición para la landing. No fija volumen, dificultad,
 posición ni promesa de tráfico hasta ejecutar keyword research y revisar las SERP de cada mercado.
@@ -16,8 +16,23 @@ activación con creators, UGC, derechos y distribución. No debe competir con un
 marketing”. La página debe responder preguntas de compra y enlazar a contenido editorial sólo cuando exista una pieza
 que agregue información real.
 
-Working slug: `/servicios/influencer-marketing/`. Es una hipótesis; se valida contra `/servicios/redes-sociales/`,
-demanda por país y arquitectura del hub `/servicios` antes de canonicalizar.
+Live slug: `/servicios/agencia-de-influencers/`. Se eligió por intención comercial explícita, diferenciación frente
+a la query informacional `influencer marketing`, ausencia de colisión en WordPress y consistencia con la arquitectura
+del hub `/servicios`.
+
+### Validación 2026-08-28
+
+DataForSEO confirmó el siguiente volumen mensual observado; es evidencia de selección de keyword, no promesa de
+tráfico, ranking ni conversión:
+
+| Keyword                  |  CL |  MX |  CO |  PE | Intent dominante          |
+| ------------------------ | --: | --: | --: | --: | ------------------------- |
+| `agencia de influencers` | 170 | 170 |  50 |  50 | Comercial / contratación  |
+| `influencer marketing`   | 110 | 480 | 210 | 140 | Informacional / categoría |
+
+La revisión SERP mostró oferta de agencias para la primera y resultados más educativos/definitorios para la segunda.
+No existía una URL Efeonce que compitiera por el slug seleccionado. La landing conserva preguntas informacionales como
+soporte a la decisión, pero su H1, title, CTA y schema responden a contratación de agencia.
 
 ## 2. Keyword e intent research requerido
 
@@ -37,13 +52,13 @@ Ejecutar en bases `cl`, `co`, `mx` y `pe`:
 
 ### Clasificación
 
-| Intent | Ejemplos de preguntas | Destino |
-|---|---|---|
-| Comercial | “¿Qué agencia puede gestionar influencers en México?” | Landing |
-| Comparativa | “¿Influencer marketing o UGC para mi campaña?” | Bloque/FAQ y posible guía |
-| Operacional | “¿Qué derechos necesito para usar contenido de un creator en ads?” | Rights pack/guía enlazada |
-| Informacional | “¿Qué es UGC?” | Think o artículo cluster, no cargar la landing |
-| Local | “agencia de influencers Chile/Colombia/México/Perú” | Landing sólo si hay demanda y contenido local real |
+| Intent        | Ejemplos de preguntas                                              | Destino                                            |
+| ------------- | ------------------------------------------------------------------ | -------------------------------------------------- |
+| Comercial     | “¿Qué agencia puede gestionar influencers en México?”              | Landing                                            |
+| Comparativa   | “¿Influencer marketing o UGC para mi campaña?”                     | Bloque/FAQ y posible guía                          |
+| Operacional   | “¿Qué derechos necesito para usar contenido de un creator en ads?” | Rights pack/guía enlazada                          |
+| Informacional | “¿Qué es UGC?”                                                     | Think o artículo cluster, no cargar la landing     |
+| Local         | “agencia de influencers Chile/Colombia/México/Perú”                | Landing sólo si hay demanda y contenido local real |
 
 No crear páginas por país con sustitución de tokens. Una versión local requiere keyword research, proof, ejemplos,
 entidad y capacidad de delivery propia.
@@ -113,17 +128,37 @@ señales de descubrimiento, no revenue.
 
 ## 8. RICE inicial
 
-| Movimiento | Reach | Impact | Confidence | Effort | Prioridad |
-|---|---:|---:|---:|---:|---:|
-| Keyword/SERP por 4 mercados + canibalización | 4 | 3 | 0.8 | 1 | Alta |
-| Answer map + copy visible | 4 | 2 | 0.8 | 2 | Alta |
-| Entity/schema/internal links | 4 | 2 | 0.8 | 1 | Alta |
-| AEO prompt baseline posterior | 2 | 2 | 0.5 | 1 | Posterior |
-| Cluster editorial Think | 2 | 2 | 0.5 | 3 | Posterior |
-| Local pages por país | 1 | 2 | 0.5 | 4 | No iniciar |
+| Movimiento                                   | Reach | Impact | Confidence | Effort |  Prioridad |
+| -------------------------------------------- | ----: | -----: | ---------: | -----: | ---------: |
+| Keyword/SERP por 4 mercados + canibalización |     4 |      3 |        0.8 |      1 |       Alta |
+| Answer map + copy visible                    |     4 |      2 |        0.8 |      2 |       Alta |
+| Entity/schema/internal links                 |     4 |      2 |        0.8 |      1 |       Alta |
+| AEO prompt baseline posterior                |     2 |      2 |        0.5 |      1 |  Posterior |
+| Cluster editorial Think                      |     2 |      2 |        0.5 |      3 |  Posterior |
+| Local pages por país                         |     1 |      2 |        0.5 |      4 | No iniciar |
 
 ## 9. Criterio de promoción
 
 Promover a indexable sólo cuando keyword/slug, HTML indexable, entidad, schema, enlaces, proof, form, tracking y QA
 técnico estén aprobados. El primer objetivo no es “rankear”: es generar descubrimiento cualificado y una página que los
 motores puedan recuperar y describir correctamente.
+
+**Gate aplicado 2026-08-28:** WordPress `251627` responde `200`; title/meta/canonical/robots están servidos, la URL
+aparece en el sitemap con `lastmod`, el menu item nativo `251638` aporta enlace interno, el schema visible es válido y
+el runtime pasó QA 1440/390/reduced-motion/keyboard. La página quedó `publish + index`.
+
+## 10. Readback SEO/AEO final · 2026-08-29
+
+La página quedó publicada y elegible para indexación con title
+`Agencia de influencers y UGC para marcas | Efeonce`, meta description de 147 caracteres, canonical autorreferente,
+`index, follow`, excerpt comercial y una imagen Open Graph/Twitter dedicada de `1200×630` (attachment `251693`). La
+indexación efectiva se verificará posteriormente en Search Console; `publish + index` no se presenta como prueba de
+que el buscador ya la haya indexado.
+
+Yoast posee `WebPage`, `BreadcrumbList`, `WebSite` y `Organization`. El JSON-LD page-scoped sólo completa `Service`
+—con provider referido al `@id` canónico, cuatro mercados y cinco ofertas visibles— y `FAQPage` con las seis respuestas
+visibles bajo `#preguntas`. El grafo final tiene un solo breadcrumb y ninguna entidad Organization duplicada.
+
+La ubicación de menú aprobada es `Soluciones → Servicios Destacados → Influencer Marketing`, inmediatamente después de
+`Redes Sociales`; el item `251638` ya implementa esa decisión. Readback completo, metadata, imagen, schema, gates y
+rollback: `docs/audits/public-site/2026-08-29-influencer-landing-seo-aeo-readback.md`.

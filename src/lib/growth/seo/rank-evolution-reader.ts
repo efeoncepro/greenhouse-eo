@@ -24,6 +24,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import type { RankEvolutionPoint, RankEvolutionResult, RankEvolutionSeries, SeoRankDevice } from './contracts'
 import { isSeoModuleEnabled } from './flags'
+import { resolveSeoAsOf, seoProvenance } from './lens'
 import { resolveSantiagoCaptureDate } from './rank-capture'
 import { SEO_RANK_HISTORY_DATASET, SEO_RANK_HISTORY_TABLE } from './rank-history-bq-mirror'
 
@@ -215,6 +216,7 @@ export const readRankEvolution = async (
       return { ok: false, errorCode: 'no_data', status: null }
     }
 
+    const series = groupSeries(rows)
     const to = resolveSantiagoCaptureDate()
     const from = shiftIsoDate(to, -(rangeDays - 1))
 
@@ -226,7 +228,16 @@ export const readRankEvolution = async (
       device,
       range: { from, to, days: rangeDays },
       source,
-      series: groupSeries(rows)
+      series,
+      // TASK-1785 — ⚠️ `source` de arriba dice el STORE (postgres|bigquery); esto dice la
+      // NATURALEZA. Son preguntas distintas y antes sólo se respondía la primera.
+      provenance: [
+        seoProvenance({
+          section: 'series[].points[].position',
+          source: 'dataforseo_serp',
+          capturedAt: resolveSeoAsOf(series.flatMap(entry => entry.points.map(point => point.date)))
+        })
+      ]
     }
   } catch (error) {
     captureWithDomain(error, 'growth', {

@@ -17,6 +17,7 @@
  * `collect.ts` / `store.ts` / `command.ts`.
  */
 
+import type { SeoFigureShape, SeoLens } from '../lens'
 import {
   BACKLINKS_RESULT_ROW_USD,
   BACKLINKS_TASK_SETUP_USD,
@@ -182,16 +183,26 @@ export const isProspectFactKind = (value: unknown): value is ProspectFactKind =>
 /**
  * La lente de este carril admite UN solo valor. El tipo lo fija, el CHECK en DB lo
  * respalda, y el test de contrato falla si alguien agrega otro.
+ *
+ * TASK-1785 — se estrecha desde el vocabulario CANÓNICO del módulo (`SeoLens`) en vez de
+ * declarar su propio literal. No cambia nada de este carril: sigue admitiendo sólo
+ * `estimated`. Lo que cambia es que ya no hay dos definiciones de la misma palabra — si
+ * mañana el vocabulario canónico se renombra, esto deja de compilar en vez de divergir en
+ * silencio.
  */
-export type ProspectLens = 'estimated'
+export type ProspectLens = Extract<SeoLens, 'estimated'>
 
-export interface ProspectFact {
+/**
+ * TASK-1709 llegó primero a la forma canónica de una cifra con procedencia; TASK-1785 la
+ * generalizó al resto del contrato como `SeoFigureShape`. Este `extends` es lo que impide
+ * que las dos vuelvan a divergir: la fuente conserva el vocabulario cerrado de ESTE carril
+ * (espejo del CHECK en base), y la forma es la compartida.
+ */
+export interface ProspectFact extends SeoFigureShape<ProspectSource> {
   kind: ProspectFactKind
   /** `null` = "no lo medimos" — JAMÁS `0` (degradación honesta, invariante del grader). */
   magnitude: number | null
   lens: ProspectLens
-  capturedAt: string
-  source: ProspectSource
   /** Detalle no-numérico del hecho (listas, estados, muestras). */
   detail: Record<string, unknown>
 }

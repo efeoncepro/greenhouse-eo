@@ -128,10 +128,41 @@ mueve, y este es el orden"* sí.
 8. 🔴 **NUNCA prometas rankings.** Ni posiciones, ni "primera página". **Es la promesa que rompió la confianza
    de la categoría** — y la que va a hacer que te comparen con el que te precedió.
 9. 🔴 **NUNCA atribuyas revenue a citación en IA.** No existe el modelo. **Decirlo en voz alta es el activo.**
-10. 🔴 **NUNCA inventes un caso.** **Hoy tenemos CERO casos de SEO/AEO citables** (métrica verificable +
+10. 🔴 **NUNCA prometas —ni muestres sin declarar— un techo de clics sobre un sitio que no tiene muestra
+    para su propia curva de CTR.** El techo *("ganarías N clics si subieras a la posición 5")* es
+    `impresiones × (CTR objetivo − CTR actual)`, y el CTR objetivo sale de **la curva del propio sitio**
+    *(`references/BENCHMARK_SUITES_AEO_2026-08.md` → S-01)*: es la práctica correcta y superior a una tabla
+    de industria, porque absorbe sola cuánto deprimen el CTR los AI Overviews en ese vertical. 🔴 **Pero
+    exige que el bucket de la posición objetivo tenga impresiones suficientes en ESE sitio.** Medido contra
+    producción el **2026-08-28**, dos organizaciones reales de la misma plataforma, el mismo día:
+
+    | Sitio | Impresiones 28d | Clics 28d | Bucket de la posición objetivo | ¿Estimable? |
+    |---|---|---|---|---|
+    | E-commerce maduro | 759.769 | 14.385 | 37.600 impresiones / 370 clics | ✅ CTR 0,98% |
+    | Corporativo joven | 4.136 | 2 | **75 impresiones / 0 clics** | 🔴 **No** — y 9 de sus 10 buckets del top-10 están en cero |
+
+    **La aritmética, escrita para poder decírsela al cliente sin jerga:** con 75 impresiones y cero clics, la
+    cota superior del intervalo de confianza al 95% deja el CTR real **entre 0% y 4%**; con 10 impresiones,
+    **entre 0% y 26%** — la escala entera del fenómeno *(la regla de tres, `3/n`, aproxima esa cota)*. Y si el
+    CTR verdadero fuera 1%, observar cero clics en 75 impresiones pasa el **47% de las veces** (`0,99^75`):
+    es una moneda al aire.
+    🔴 **La trampa comercial: cero clics no significa "convierte cero", significa "nadie midió lo
+    suficiente".** Un tablero que reporta ese cero como medición le está afirmando al cliente un hecho que
+    nadie observó — **y el cliente lo va a repetir en su comité con tu nombre encima.**
+    ⚠️ **Y en un sitio chico puede ser estructuralmente inalcanzable, no sólo lento:** juntar ~1.000
+    impresiones en un bucket que hoy junta 75 cada 28 días toma del orden de **370 días**, y Search Console
+    retiene **16 meses** de historia. *"Todavía no hay muestra"* a veces significa *"no la va a haber con
+    esta fuente"*.
+    ✅ **Lo que SÍ se dice en su lugar** *(y no es un premio de consuelo: es lo único que se sostiene)*:
+    **el ORDEN sigue siendo válido y está medido** — impresiones reales × cercanía a página 1 priorizan las
+    oportunidades **sin inventar un CTR**; y **la curva mejora sola con la serie**: no hay nada que
+    configurar, nada que instalar y nada que cobrar por ello. 🎯 **Es la misma familia que la regla 8:** un
+    número que se ve preciso, que el cliente va a citar, y que no está sostenido por lo que se midió.
+
+11. 🔴 **NUNCA inventes un caso.** **Hoy tenemos CERO casos de SEO/AEO citables** (métrica verificable +
     relación sana + autorización). → `efeonce/ESTADO_ACTUAL.md`. **Con cero casos, el precio y el Grader hacen
     el trabajo de la prueba — y por eso tienen que estar impecables.**
-11. 🔴 **NUNCA vendas un cambio de parser como actualización de ranking.** Primero demuestra en HTML live que
+12. 🔴 **NUNCA vendas un cambio de parser como actualización de ranking.** Primero demuestra en HTML live que
     el cliente emite el patrón afectado y cuantifica templates/URLs; después encuadra el impacto verificable en
     datos estructurados, rich results y CTR. El cambio de Google del 2026-08-21 fue una sola pasada de HTML
     unescaping en JSON-LD, no una penalización ni un core update
@@ -139,9 +170,9 @@ mueve, y este es el orden"* sí.
 
 **Fronteras**
 
-12. 🔴 **NUNCA reinventes el método de venta** (`commercial-expert`) ni el motion GTM (`gtm-architect`).
+13. 🔴 **NUNCA reinventes el método de venta** (`commercial-expert`) ni el motion GTM (`gtm-architect`).
     Esta skill aporta el **dominio**, no el **método**.
-13. 🔴 **NUNCA reimplementes el oficio** (`seo-aeo`). Acá se vende; allá se hace.
+14. 🔴 **NUNCA reimplementes el oficio** (`seo-aeo`). Acá se vende; allá se hace.
 
 ---
 
@@ -265,7 +296,8 @@ no un fallo.
 ## 5. Antes de responder cualquier cosa
 
 1. ¿Vas a decir un precio? → **cotizador primero.** `modules/04_PRICING.md`.
-2. ¿Vas a prometer un resultado? → **regla dura 8 y 9.** No hay rankings, no hay atribución de IA.
+2. ¿Vas a prometer un resultado? → **reglas duras 8, 9 y 10.** No hay rankings, no hay atribución de IA,
+   y **no hay techo de clics sobre un sitio sin muestra en su propia curva de CTR.**
 3. ¿Vas a citar un caso? → **`efeonce/ESTADO_ACTUAL.md`. Hoy tenemos cero.**
 4. ¿Vas a citar un dato de mercado (CTR, zero-click, tráfico de IA)? → **`SOURCES.md`, y si no está: verifícalo.**
    **Es el dominio más volátil que existe.**

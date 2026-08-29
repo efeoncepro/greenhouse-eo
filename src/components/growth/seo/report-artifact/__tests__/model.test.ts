@@ -11,6 +11,9 @@ const rankEvolution: SeoRankEvolutionReady = {
   device: 'desktop',
   range: { from: '2026-05-01', to: '2026-05-30', days: 30 },
   source: 'postgres',
+  provenance: [
+    { section: 'series[].points[].position', lens: 'estimated', source: 'dataforseo_serp', capturedAt: '2026-05-30' }
+  ],
   series: [
     {
       keyword: 'software de marketing',
@@ -48,7 +51,8 @@ const gap: SeoAeoGapReady = {
     latestRunId: 'run-demo',
     latestRunAt: '2026-05-30T12:00:00.000Z',
     overallScore: 42,
-    cited: false
+    cited: false,
+    scoreVersion: 'grader-score-v1'
   },
   quadrants: [
     { keyword: 'software de marketing', rankPosition: 8, aeoScore: 42, quadrant: 'riesgo' },

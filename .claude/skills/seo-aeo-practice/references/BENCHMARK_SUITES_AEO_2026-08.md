@@ -40,7 +40,7 @@
 | Te preguntan si medimos "ChatGPT" | § 10, **F-04** |
 | 🔴 Vas a citar cobertura LATAM o "medimos desde Chile/México" | **§ 8 completa**, después **F-09, F-11** |
 | El prospecto evalúa Conductor, BrightEdge o seoClarity | § 4.8 |
-| Vas a hablar de la curva de CTR propia | **F-12 antes que S-01**, y **S-09** para la versión precisa |
+| Vas a hablar de la curva de CTR propia | **F-12 antes que S-01**, y **S-09** para la versión precisa. 🔴 **Y antes de prometer un número de clics: SKILL.md regla dura 10 — sin muestra no hay proyección** |
 | Vas a prometer robustez, estabilidad o reproducibilidad | 🔴 **§ 6 y después § 9** |
 | Vas a citar una cifra de mercado que viste en un blog | **§ 11** — hay fabricaciones demostradas |
 | El cliente tiene el sitio detrás de Cloudflare | 🔦 **§ 3.13 — cambia el default el 2026-09-15** |
@@ -281,6 +281,11 @@ Medimos la **API de OpenAI con búsqueda web**, que **no es** el producto de con
 **S-01 — La curva de CTR.**
 > *"La proyección de clics se calcula con la curva de CTR observada en la propia serie de Search Console de su dominio, no con una tabla de CTR de industria. Eso incorpora automáticamente cuánto están deprimiendo el CTR los AI Overviews en su sitio y su vertical."*
 Verificable (`readOrgCtrCurve`). 🔴 **Sin adjetivos de exclusividad — F-12.**
+🔴 **Precondición antes de decirla frente a un cliente:** la frase promete una **proyección**, y la proyección
+sólo existe si el bucket de la posición objetivo tiene **muestra en la serie de ese dominio**. Si no la tiene
+*(sitios jóvenes: bucket con decenas de impresiones y cero clics)*, se dice **S-01 sin la palabra
+"proyección"** — la curva se usa para **ordenar** oportunidades por demanda medida, no para poner un número de
+clics. **Vale igual para S-09.** → SKILL.md **regla dura 10**.
 
 **S-02 — Trazabilidad del score.**
 > *"Cada corrida guarda la versión del set de prompts, el conjunto de motores consultados, la versión de la política de proveedores y la versión del score. Un puntaje publicado se puede explicar y recomputar: si cambió, sabemos si cambió por los pesos, por los prompts o por el mix de motores."*

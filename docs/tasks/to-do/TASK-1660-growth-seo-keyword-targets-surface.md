@@ -1,5 +1,40 @@
 # TASK-1660 — Growth SEO: superficie de keywords OBJETIVO y avance contra objetivo
 
+## Delta 2026-08-28 — el score que esta lente iba a reusar YA existe: se consume, no se recalcula (y no rescata al objetivo sin demanda medida)
+
+`TASK-1700` está en `develop` (siete slices, `962d22118` … `9020d6421`). Dos consecuencias para esta
+task, y la segunda corrige un supuesto del Delta 2026-08-15.
+
+**1. "Clics en juego" dejó de ser un criterio a implementar: es un dato persistido.** El
+`priority_score` de la banda 1 en la versión `incremental-clicks-v1` es exactamente eso — impresiones ×
+`max(0, CTR esperado en la posición objetivo − CTR actual)`, con la curva de CTR derivada del propio
+sitio— y viaja con su `priority_score_version` y su `score_breakdown_json`. 🔴 **La serie destacada lo
+CONSUME de `readSeoWorkQueue`; no lo recalcula en `select-featured-series.ts`.** Recalcularlo es
+literalmente fabricar el segundo criterio que el Delta 2026-08-15 declaró prohibido, y encima sin dejar
+rastro de versión. La coexistencia que esta task declara sigue intacta: el orden de la tabla de Objetivos
+es avance contra compromiso; el score sólo decide **qué mostrar**.
+
+**2. 🔴 Supuesto que queda parcialmente falso: ordenar por clics en juego NO rescata al objetivo
+declarado en la posición 60.** Sólo lo rescata si ese objetivo **tiene demanda medida**. En la cola, un
+objetivo declarado sin impresiones de Search Console en la ventana cae a banda 3
+(`no_measured_demand`), con `priority_score = NULL` y verbo `measure`
+(`src/lib/growth/seo/work-queue/collectors/declared-target.ts`) — y está **prohibido** puntuarlo con el
+volumen estimado del proveedor, que es justamente lo único que quedaría disponible. O sea: el criterio
+nuevo no lo sube en el ranking; lo **nombra honestamente** como "primero hay que medirlo". El caso que el
+Delta 2026-08-15 quería rescatar —el objetivo en la 60 que nadie puede destacar— sigue necesitando un
+criterio propio de esta lente (avance contra compromiso), y eso es coherente con su invariante de no ser
+una cola de urgencia.
+
+**El sujeto ya es compartido y verificable.** `declared_target` es un **origen** real de la cola, tercero
+en `ORIGIN_ACTION_PRECEDENCE` (detrás de `consolidation` y `gsc_striking_distance`). Cuando la misma
+keyword aparece en los dos lados, la cola la resuelve con un verbo y deja los orígenes suprimidos en
+`score_breakdown_json.alsoSurfacedBy`. Esta lente no compite con eso: responde otra pregunta sobre el
+mismo sujeto.
+
+**Realidad de rollout:** `GROWTH_SEO_WORK_QUEUE_ENABLED` OFF en Vercel y en el ops-worker, scheduler
+`ops-seo-work-queue-materialize` pausado (`docs/operations/FEATURE_FLAG_STATE_LEDGER.md`). Hay contrato,
+todavía no hay snapshots.
+
 ## Delta 2026-08-28 — el formato de procedencia que esta lente hereda (TASK-1692)
 
 `TASK-1692` agregó `TrackKeywordsOptions.discoveryProvenance` — `{ candidateId, runId }`, opcional

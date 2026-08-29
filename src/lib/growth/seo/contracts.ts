@@ -12,6 +12,7 @@
 // import de la forma con especificadores y lo deja como external sin resolver — el gate
 // worker:runtime-deps-gate lo detecta como paquete fantasma `@/lib`.
 import type { SearchConsoleConnectionStatus } from '@/lib/growth/search-console'
+import type { SeoProvenance } from './lens'
 
 /** Códigos de degradación honesta compartidos por el dominio SEO. */
 export type SeoDegradationCode =
@@ -58,6 +59,37 @@ export interface SearchConsoleActiveOrg {
  * el reader entrega valor completo igual y el mercado sólo enriquece.
  */
 export type SeoMarketAvailability = 'available' | 'unavailable'
+
+/**
+ * TASK-1792 — Procedencia del CTR esperado con que se computó `estimatedClickGain`.
+ *
+ * 🔴 **Tres estados, NUNCA dos.** `unusable` y `fallback` producen el mismo número prestado
+ * de la curva pública, pero son hechos distintos y el contrato los separa: en `unusable`
+ * **vimos** esa posición y la muestra no alcanza para afirmar un CTR; en `fallback` **nunca
+ * la observamos**. Colapsarlos reintroduciría en el contrato la misma confusión de ausencia
+ * que produjo el defecto (`0` medido leído como «CTR esperado 0»).
+ *
+ * Sólo `org_measured` significa que el techo salió de la medición del propio sitio EN ESA
+ * POSICIÓN. `org_level_reference_shape` es el estado intermedio que cierra el salto entre
+ * «curva propia» y «tabla prestada»: la forma la presta la referencia y el NIVEL se estima del
+ * agregado del propio sitio — un parámetro medido en vez de veinte prestados. `unusable` y
+ * `fallback` son la referencia a su nivel nativo, porque no hubo muestra ni para un parámetro.
+ *
+ * Ningún consumidor —pantalla, lane ecosystem o tool MCP— puede leer el techo sin saber de
+ * dónde salió.
+ */
+export type SeoCtrCurveSource = 'org_measured' | 'org_level_reference_shape' | 'unusable' | 'fallback'
+
+/**
+ * TASK-1792 — Criterio con el que la lente devuelve ordenadas las oportunidades.
+ *
+ * 🔴 **Ordenar por un campo que no discrimina es no ordenar.** Cuando la curva propia no es
+ * utilizable en la posición objetivo —o cuando la ganancia estimada resulta idéntica en todas
+ * las filas— el techo deja de ser un criterio y la lente ordena por `measured_demand`
+ * (impresiones × cercanía a página 1, **todo medido**) y lo DECLARA acá. La alternativa
+ * —ordenar igual y callarlo— es la que dejó la pantalla sin orden sin que nadie lo notara.
+ */
+export type SeoKeywordOpportunityOrder = 'estimated_click_gain' | 'measured_demand'
 
 export interface KeywordOpportunity {
   keyword: string
@@ -114,7 +146,41 @@ export type KeywordOpportunitiesResult =
       /** Umbral de impresiones efectivamente aplicado (percentil resuelto sobre los datos). */
       impressionsThreshold: number
       market: SeoMarketAvailability
+      /**
+       * TASK-1792 — Posición a la que se aspira llegar; define el CTR objetivo del score.
+       *
+       * Viaja en el contrato porque los tres consumers usan hoy el default y ninguno lo pasa:
+       * sin declararlo, un techo se lee sin saber contra qué posición se calculó.
+       */
+      targetPosition: number
+      /**
+       * CTR esperado en `targetPosition`, el que multiplica el techo de cada fila.
+       *
+       * 🔴 Cuando `ctrCurveSource` es `org_measured` este valor **no puede ser 0**: el piso de
+       * muestra lo hace imposible, y el módulo degrada a `unusable` antes que emitirlo.
+       */
+      expectedCtrAtTarget: number
+      ctrCurveSource: SeoCtrCurveSource
+      /**
+       * Muestra del bucket objetivo de la curva propia. `null` SÓLO cuando nunca observamos esa
+       * posición.
+       *
+       * Las dos dimensiones viajan juntas a propósito: un escalar volvería a sugerir que las
+       * impresiones bastan para juzgar la muestra, que es exactamente el error de origen — la
+       * precisión de un estimador de tasa la gobiernan los **éxitos**, no los ensayos.
+       */
+      curveSampleSize: { impressions: number; clicks: number } | null
+      orderedBy: SeoKeywordOpportunityOrder
       opportunities: KeywordOpportunity[]
+      /**
+       * TASK-1785 — de qué naturaleza es cada cifra de este DTO, por campo.
+       *
+       * Todo acá es Search Console (●): striking distance se calcula sobre demanda medida.
+       * El enriquecimiento de mercado (`searchVolume`, `keywordDifficulty`) es ◑ y viaja en
+       * su propia entrada — es la única parte estimada de un resultado que por lo demás es
+       * medido, y colapsar las dos bajo un rótulo único sería el defecto que esto cierra.
+       */
+      provenance: SeoProvenance[]
     }
   | { ok: false; errorCode: SeoDegradationCode | 'target_not_found'; status: SearchConsoleConnectionStatus | null }
 
@@ -169,6 +235,15 @@ export interface SeoAeoGapLenses {
     overallScore: number
     /** `overallScore >= umbral de citabilidad` (documentado en el clasificador). */
     cited: boolean
+    /**
+     * TASK-1700 — `grader_scores.score_version` del score que se leyó.
+     *
+     * Aditivo y obligatorio para el consumidor de la cola: un item con `origin='aeo_gap'`
+     * no puede persistirse sin él (CHECK `seo_work_queue_items_aeo_requires_source_version`).
+     * Sin esta versión, una recalibración del grader movería filas de la cola sin que nadie
+     * pueda decir por qué — el mismo agujero que `priority_score_version` cierra del lado SEO.
+     */
+    scoreVersion: string
   }
 }
 
@@ -481,6 +556,8 @@ export type BacklinkProfileResult =
       organizationId: string
       range: { from: string; to: string; days: number }
       points: BacklinkProfilePoint[]
+      /** TASK-1785 — perfil de enlaces: ◑ entero (DataForSEO Backlinks), nunca medido. */
+      provenance: SeoProvenance[]
     }
   | {
       ok: false
@@ -522,6 +599,14 @@ export type RankEvolutionResult =
       /** PG = ventana caliente (~180d); BigQuery = historia larga (rango mayor). */
       source: RankEvolutionSource
       series: RankEvolutionSeries[]
+      /**
+       * TASK-1785 — ⚠️ NO confundir con `source` de arriba: ése declara el STORE que sirvió
+       * la serie (`postgres` o `bigquery`), que es una decisión de almacenamiento y no dice
+       * nada de la naturaleza del dato. La lente es ◑ en los dos casos: el origen del dato
+       * es la SERP comprada, viva donde viva. Tener los dos campos juntos es deliberado —
+       * antes había uno solo llamado `source` y se leía como si respondiera ambas preguntas.
+       */
+      provenance: SeoProvenance[]
     }
   | {
       ok: false
@@ -665,6 +750,18 @@ export type SeoPerformanceResult =
        * omitirse en silencio: "pediste 4 y te muestro 2" tiene que ser visible.
        */
       itemsWithoutData: string[]
+      /**
+       * TASK-1785 — 🔴 ESTE es el DTO que probó que la lente no puede vivir a nivel de
+       * resultado. `source` (arriba) declara UNA fuente para todo, pero `summary` es SIEMPRE
+       * Search Console y `standings.clicks/impressions/ctr` también: con
+       * `source = 'dataforseo_estimated'`, este resultado lleva cifras MEDIDAS dentro de un
+       * envoltorio rotulado ESTIMADO. No era un bug de nadie — era la forma del contrato.
+       *
+       * `source` se conserva (es el rótulo del gráfico y hay consumers que lo leen), pero la
+       * verdad por campo está acá, y el test de cobertura exige que cada hoja numérica quede
+       * reclamada por exactamente una entrada.
+       */
+      provenance: SeoProvenance[]
     }
   | {
       ok: false

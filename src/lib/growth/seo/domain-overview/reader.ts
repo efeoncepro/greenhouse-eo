@@ -18,6 +18,7 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+import { type SeoProvenance, seoProvenance } from '../lens'
 import {
   normalizeOverviewDomain,
   type SeoDomainOverviewSourceEndpoint,
@@ -45,10 +46,18 @@ export type ReadDomainOverviewResult =
   | {
       ok: true
       subject: string
-      /** ◑ — SIEMPRE 'estimated'; nunca 'measured'. */
+      /**
+       * ◑ — SIEMPRE 'estimated'; nunca 'measured'.
+       *
+       * TASK-1785 — campo LEGACY: se conserva porque hay consumers vivos que lo leen, y
+       * quitarlo no sería aditivo. La forma canónica es `provenance`, y un test afirma que
+       * los dos concuerdan para que no puedan divergir.
+       */
       lens: 'estimated'
       /** `YYYY-MM-DD` de la captura que respalda la foto. */
       capturedAt: string
+      /** TASK-1785 — la forma canónica; `lens`/`capturedAt` de arriba son su proyección. */
+      provenance: SeoProvenance[]
       source: SeoDomainOverviewSourceEndpoint
       locationCode: string
       languageCode: string
@@ -202,6 +211,9 @@ export const readDomainOverview = async (input: {
     subject: normalized,
     lens: 'estimated',
     capturedAt: toIsoDate(photo.capture_date),
+    provenance: [
+      seoProvenance({ section: '*', source: 'dataforseo_labs', capturedAt: toIsoDate(photo.capture_date) })
+    ],
     source: photo.source_endpoint,
     locationCode: input.locationCode,
     languageCode: input.languageCode,

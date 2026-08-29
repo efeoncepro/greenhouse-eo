@@ -22,6 +22,7 @@ import type {
   SeoRankDevice
 } from '../contracts'
 import { isSeoModuleEnabled } from '../flags'
+import { type SeoProvenance, resolveSeoAsOf, seoProvenance } from '../lens'
 import { readRankEvolution } from '../rank-evolution-reader'
 
 /**
@@ -79,6 +80,19 @@ export interface ReadSeoPerformanceOptions {
   rangeDays?: number
   device?: SeoRankDevice
   engine?: string
+  /**
+   * TASK-1785 — fija la lente de la serie en vez de derivarla de (modo × métrica).
+   *
+   * 🔴 **Sólo admite `'measured'`, y el tipo lo cierra a propósito.** Pedir `'estimated'`
+   * para clics/impresiones/CTR sería pedir que el proveedor afirme algo que sólo Search
+   * Console mide: una opción que puede mentir no debería existir. Para posición, `estimated`
+   * ya es el default, así que el valor no haría falta ni ahí.
+   *
+   * Existe para la lectura DUAL (`readDualLensVisibility`), que necesita la serie de posición
+   * MEDIDA sin el fallback entre fuentes — ese fallback elige una lente, y la lectura dual
+   * necesita las dos.
+   */
+  pinnedLens?: 'measured'
 }
 
 /**
@@ -393,6 +407,29 @@ const totalsFromDaily = (days: SeoPerformanceDailyTotal[]): SeoPerformanceTotals
 const markSparse = (points: SeoPerformancePoint[], rangeDays: number): boolean =>
   points.filter(point => point.value !== null).length < Math.ceil(rangeDays * SPARSE_COVERAGE_RATIO)
 
+/**
+ * La procedencia de un DTO genuinamente mixto, declarada por sección en vez de colapsada.
+ *
+ * ⚠️ `standings[].position` sigue a la serie porque sale de la misma fuente que el chart;
+ * el resto de la fila es Search Console siempre. Dos entradas para una sola fila es
+ * exactamente lo que el rótulo único no podía expresar.
+ */
+const buildPerformanceProvenance = (input: {
+  seriesSource: SeoPerformanceSource
+  seriesCapturedAt: string | null
+  gscCapturedAt: string | null
+}): SeoProvenance[] => {
+  const chartSource = input.seriesSource === 'dataforseo_estimated' ? 'dataforseo_serp' : 'gsc'
+  const chartCapturedAt = input.seriesSource === 'dataforseo_estimated' ? input.seriesCapturedAt : input.gscCapturedAt
+
+  return [
+    seoProvenance({ section: 'series[].points[].value', source: chartSource, capturedAt: chartCapturedAt }),
+    seoProvenance({ section: 'standings[].{position,positionDelta30d,trend}', source: chartSource, capturedAt: chartCapturedAt }),
+    seoProvenance({ section: 'standings[].{clicks,impressions,ctr}', source: 'gsc', capturedAt: input.gscCapturedAt }),
+    seoProvenance({ section: 'summary', source: 'gsc', capturedAt: input.gscCapturedAt })
+  ]
+}
+
 export const readSeoPerformance = async (
   organizationId: string,
   options: ReadSeoPerformanceOptions
@@ -414,7 +451,7 @@ export const readSeoPerformance = async (
     return { ok: false, errorCode: 'no_items', status: null }
   }
 
-  const source = resolveSeoPerformanceSource(mode, metric)
+  const source = options.pinnedLens === 'measured' ? 'gsc_measured' : resolveSeoPerformanceSource(mode, metric)
 
   try {
     // Ancla en el último día MATERIALIZADO, no en CURRENT_DATE: la captura corre con lag,
@@ -617,7 +654,25 @@ export const readSeoPerformance = async (
       series,
       standings,
       summary,
-      itemsWithoutData
+      itemsWithoutData,
+      /**
+       * TASK-1785 — 🔴 Acá se parte, y ésta es la razón de ser de la task.
+       *
+       * `source` (arriba) declara UNA fuente para todo el resultado. Es verdad del CHART y
+       * nada más. Con `effectiveSource = 'dataforseo_estimated'`:
+       *   - `series[]` es ◑ — la serie exacta del proveedor;
+       *   - `summary` es ● — SIEMPRE Search Console, el comentario del propio contrato lo
+       *     dice ("sea cual sea la métrica");
+       *   - `standings` es MIXTO en la MISMA fila: `position` sigue al chart, mientras
+       *     `clicks`/`impressions`/`ctr` sólo existen en GSC.
+       * O sea: cifras medidas viajando dentro de un envoltorio rotulado estimado. No era el
+       * error de nadie — era la forma del contrato, y es lo que se corrige acá.
+       */
+      provenance: buildPerformanceProvenance({
+        seriesSource: effectiveSource,
+        seriesCapturedAt: resolveSeoAsOf(series.flatMap(entry => entry.points.map(point => point.date))),
+        gscCapturedAt: resolveSeoAsOf(summary.series.map(day => day.date))
+      })
     }
   } catch (error) {
     captureWithDomain(error, 'growth', {

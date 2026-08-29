@@ -33,6 +33,7 @@
 | **B5** | **"En 3 meses ves resultados"** | Mentira. **Firmar eso es firmar el churn del mes 9** |
 | **B6** | 🔴 **Inventar un caso** *(o "ilustrativo", o redondeado)* | 🩸 **Hoy tenemos CERO citables.** Inventar uno es la única forma de destruir la práctica de un golpe |
 | **B7** | **Citar un CTR plano sin preguntar la industria** | Salud −70%, e-commerce −30%. **Un número mal citado te cuesta la credibilidad de todo lo demás** |
+| **B8** | 🔴 **Mostrar un "techo de clics" sobre un sitio sin muestra en su propia curva de CTR** | **Hermano de B1: se ve preciso, el cliente lo cita en su comité, y nadie lo midió.** Con 75 impresiones y cero clics en el bucket objetivo, el CTR real está entre 0% y 4%; con 10, entre 0% y 26%. **Cero clics no es "convierte cero": es "nadie midió lo suficiente"** → SKILL.md regla dura **10** |
 
 ---
 

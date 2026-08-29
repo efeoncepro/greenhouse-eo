@@ -50,6 +50,8 @@
 | **Contrato de expectativas** | Lo que se firma en el **mes 0** sobre qué se mueve y cuándo. **Evita el churn del mes 9** |
 | **Caso citable** | Métrica verificable **+** relación sana **+** autorización. 🔴 **Hoy: CERO** |
 | **Baseline** | La foto del punto de partida *(GA4 + GSC + Grader)*. 🔴 **Sin baseline no hay caso, nunca** |
+| **Curva de CTR propia** | Cuánto convierte **ese** sitio en cada posición, leída de su propio Search Console *(no una tabla de industria)*. **Absorbe sola cuánto deprimen el CTR los AI Overviews en su vertical** |
+| 🔴 **Techo de clics** | `impresiones × (CTR objetivo − CTR actual)`. **Techo, NUNCA pronóstico** — y sólo existe si el bucket de la posición objetivo tiene muestra en la curva propia *(regla dura **10**)*. **Sin muestra se entrega el ORDEN, no el número** |
 
 ---
 

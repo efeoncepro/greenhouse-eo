@@ -1,5 +1,22 @@
 # TASK-1313 — Growth SEO: Unified Page/Cluster Visibility 360 Read
 
+## Delta 2026-08-29 — la unión por URL hereda la lente como campo (TASK-1785)
+
+Esta task une por URL datos que vienen de las DOS lentes, así que es el caso donde el defecto que
+`TASK-1785` cerró habría dolido más: una fila con la posición medida de Search Console al lado de
+métricas del proveedor, bajo un solo rótulo.
+
+Lo que ya no hay que resolver acá:
+
+- Los readers que esta unión consume (`performance`, `url-visibility`, `keyword-opportunities`)
+  emiten `provenance: SeoProvenance[]` por sección. La unión **hereda** la procedencia en vez de
+  reconstruirla.
+- 🔴 Y hereda la prohibición: **NUNCA** fusionar las dos posiciones en un valor único de la fila
+  unificada. Si la vista necesita "una posición por URL", son DOS columnas rotuladas, no una. El
+  precedente ya está implementado en `readDualLensVisibility`, que no tiene campo combinado por
+  diseño y tiene test que lo impide.
+- El as-of viaja por sección: las dos lentes de una misma URL **no comparten fecha de captura**.
+
 ## Delta 2026-08-27
 
 - **El lado ◑ de mercado por URL YA TIENE FUENTE** — `TASK-1776` quedó **`complete`** (rollout ejecutado 2026-08-27:

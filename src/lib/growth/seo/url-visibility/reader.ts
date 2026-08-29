@@ -13,6 +13,7 @@ import 'server-only'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import type { SeoDomainPositionDistribution } from '../domain-overview/persist'
+import { type SeoProvenance, seoProvenance } from '../lens'
 import { normalizeOverviewDomain } from '../domain-overview/persist'
 import type { SeoUrlVisibilitySourceEndpoint, SeoUrlVisibilityTopKeyword } from './persist'
 import { resolveVisibilitySubject, type VisibilitySubjectKind } from './resolve-subject'
@@ -34,9 +35,16 @@ export type ReadUrlVisibilityResult =
       ok: true
       subject: string
       kind: VisibilitySubjectKind
-      /** ◑ — SIEMPRE 'estimated'; nunca 'measured'. */
+      /**
+       * ◑ — SIEMPRE 'estimated'; nunca 'measured'.
+       *
+       * TASK-1785 — campo LEGACY conservado por back-compat; la forma canónica es
+       * `provenance`, y un test afirma que concuerdan.
+       */
       lens: 'estimated'
       capturedAt: string
+      /** TASK-1785 — la forma canónica; `lens`/`capturedAt` de arriba son su proyección. */
+      provenance: SeoProvenance[]
       source: SeoUrlVisibilitySourceEndpoint
       locationCode: string
       languageCode: string
@@ -207,6 +215,9 @@ export const readUrlVisibility = async (input: {
     kind: resolution.subject.kind,
     lens: 'estimated',
     capturedAt: toIsoDate(photo.capture_date),
+    provenance: [
+      seoProvenance({ section: '*', source: 'dataforseo_labs', capturedAt: toIsoDate(photo.capture_date) })
+    ],
     source: photo.source_endpoint,
     locationCode: input.locationCode,
     languageCode: input.languageCode,

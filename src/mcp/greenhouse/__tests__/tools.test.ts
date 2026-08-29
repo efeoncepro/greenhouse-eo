@@ -47,6 +47,7 @@ describe('createGreenhouseMcpHandlers', () => {
       declareSeoCompetitors: vi.fn(),
       retireSeoCompetitors: vi.fn(),
       getSeoKeywordGap: vi.fn(),
+      getSeoWorkQueue: vi.fn(),
       getSeoSerpTopResults: vi.fn(),
       getSeoCompetitorCandidates: vi.fn(),
       getSeoKeywordMarketData: vi.fn(),
@@ -58,7 +59,8 @@ describe('createGreenhouseMcpHandlers', () => {
       getSeoGroundedQueryDraft: vi.fn(),
       prepareSeoGroundedQueries: vi.fn(),
       getSeoProspectDiagnostic: vi.fn(),
-      runSeoProspectDiagnostic: vi.fn()
+      runSeoProspectDiagnostic: vi.fn(),
+      getSeoDualLensVisibility: vi.fn()
     })
 
     const result = await handlers.getContext()
@@ -151,6 +153,7 @@ describe('createGreenhouseMcpHandlers', () => {
       declareSeoCompetitors: vi.fn(),
       retireSeoCompetitors: vi.fn(),
       getSeoKeywordGap: vi.fn(),
+      getSeoWorkQueue: vi.fn(),
       getSeoSerpTopResults: vi.fn(),
       getSeoCompetitorCandidates: vi.fn(),
       getSeoKeywordMarketData: vi.fn(),
@@ -162,7 +165,8 @@ describe('createGreenhouseMcpHandlers', () => {
       getSeoGroundedQueryDraft: vi.fn(),
       prepareSeoGroundedQueries: vi.fn(),
       getSeoProspectDiagnostic: vi.fn(),
-      runSeoProspectDiagnostic: vi.fn()
+      runSeoProspectDiagnostic: vi.fn(),
+      getSeoDualLensVisibility: vi.fn()
     })
 
     const forbiddenResult = await handlers.getOrganization({ id: 'org-1' })

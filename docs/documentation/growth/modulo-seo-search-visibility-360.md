@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.15
+> **Version:** 1.16
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1692: el candidato recuerda qué se decidió sobre él — el estado se mueve solo, lo resuelto deja de encabezar la bandeja y un descartado se puede volver a elegir; delta previo TASK-1694: en el descubrimiento, un candidato es una keyword —no una fila por método—, el filtro de dificultad del proveedor deja de decidir y aparece el aviso de canibalización; delta previo 2026-08-28 TASK-1699 + TASK-1662 + TASK-1696 vivos en producción con el release `c983be7f18e6`: el módulo ya guarda quién más aparece en tu SERP, compara contra un competidor declarado y anota quién consumió cada dólar del proveedor; delta previo 2026-08-14 por Claude (TASK-1661 + follow-ups: las columnas de mercado se llenan solas, la captura es mensual y acotada con simulacro de costo previo, "Dificultad" pasa a ser **Barrera de enlaces** en niveles con "Sin dato" como estado propio, todo dato de mercado viaja con su fecha, y cada respuesta declara el país que muestra — incluida la corrección del caso Berel (ISSUE-152/153); delta previo 2026-08-09 TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee))
+> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1792: el techo de clics de una oportunidad declara de dónde salió, y cuando la curva del sitio no alcanza la lista se ordena por demanda medida en vez de fingir un orden por ganancia; delta previo TASK-1692: el candidato recuerda qué se decidió sobre él — el estado se mueve solo, lo resuelto deja de encabezar la bandeja y un descartado se puede volver a elegir; delta previo TASK-1694: en el descubrimiento, un candidato es una keyword —no una fila por método—, el filtro de dificultad del proveedor deja de decidir y aparece el aviso de canibalización; delta previo 2026-08-28 TASK-1699 + TASK-1662 + TASK-1696 vivos en producción con el release `c983be7f18e6`: el módulo ya guarda quién más aparece en tu SERP, compara contra un competidor declarado y anota quién consumió cada dólar del proveedor; delta previo 2026-08-14 por Claude (TASK-1661 + follow-ups: las columnas de mercado se llenan solas, la captura es mensual y acotada con simulacro de costo previo, "Dificultad" pasa a ser **Barrera de enlaces** en niveles con "Sin dato" como estado propio, todo dato de mercado viaja con su fecha, y cada respuesta declara el país que muestra — incluida la corrección del caso Berel (ISSUE-152/153); delta previo 2026-08-09 TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee))
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -88,6 +88,8 @@ TASK-1302 convierte esa consulta en vivo en una **serie propia de Greenhouse**: 
 **Qué se puede leer con esa serie.** Sobre estos datos vive el primer reader del módulo: las **oportunidades de "distancia corta"** (striking distance) — las consultas donde la marca ya aparece pero un poco más abajo de donde convierte. Dos cosas lo hacen distinto de una lista genérica:
 
 - **El score se expresa en clics incrementales estimados**, no en un puntaje abstracto. Y se calcula con la **curva de CTR de la propia organización** — cuánto suele hacer clic la gente en *ese* sitio en cada posición — no con una tabla de industria. Eso importa porque los AI Overviews de Google están cambiando cuánto tráfico deja cada posición, y ese efecto real ya está adentro del número.
+- **El techo de clics dice de dónde salió, y a veces dice que no puede ordenar.** El "cuántos clics ganarías" se calcula con la curva de CTR **del propio sitio**: cuánto convierte ese sitio en cada posición. Pero esa curva necesita historia suficiente para significar algo, y un sitio recién conectado no la tiene. Cuando no la tiene, la plataforma **no inventa un número creíble**: usa una curva de referencia declarada como préstamo, avisa que el techo no es una medición propia, y **ordena la lista por demanda medida** (cuánta gente busca esa consulta y qué tan cerca está de la primera plana) en vez de fingir un orden por ganancia. Antes de esta corrección, un sitio sin historia recibía ceros en toda la lista y la pantalla simplemente **no ordenaba**, sin avisar. Los cuatro estados que puede declarar la curva, a quién le pasaba y qué queda pendiente de pintar en pantalla están en el delta **TASK-1792**, dentro de la sección "Oportunidades de keywords" más abajo — este bullet es el resumen, ese delta es la fuente.
+
 - **Las oportunidades marcadas como "canibalizadas"** (la misma consulta traccionando más de una página del sitio) piden una acción **distinta**: consolidar — unificar o redirigir esas páginas — no optimizarlas. No es una variante del mismo consejo; es otro trabajo.
 
 **Estado live (2026-08-05):** la serie está corriendo con datos reales. Primera marca capturada: `sc-domain:berel.com`, con 26.192 filas guardadas cubriendo 4 días y 375 consultas identificadas en distancia corta.
@@ -416,7 +418,7 @@ ganaria cada una si subiera.
 | Mapa de oportunidad | Cada burbuja es una keyword. Mas a la izquierda, mas cerca de la primera plana. Mas arriba, mas gente la busca. Mas grande, mas clics ganarias. Se puede plegar: la primera vez se quiere el mapa, la decima ya se sabe que se busca y se quiere la lista. |
 | Zona sombreada "Primera plana" | Las posiciones 8 a 10. Marca un **hecho posicional, no una accion**: dentro caen tambien keywords canibalizadas, que se consolidan. |
 | Forma y color | La accion recomendada, que no es la misma para todas (ver abajo). La forma existe para que la lectura sobreviva al daltonismo y al monocromo; la misma etiqueta va en texto en la tabla. |
-| Tabla | Los valores exactos de cada keyword, la pagina que rankea hoy (abrible) y la columna **Seguimiento**. Ordenada por ganancia estimada, reordenable por columna y paginada de a 25. |
+| Tabla | Los valores exactos de cada keyword, la pagina que rankea hoy (abrible) y la columna **Seguimiento**. Ordenada por ganancia estimada **cuando ese criterio discrimina**, y por demanda medida cuando no (delta TASK-1792 más abajo). Reordenable por columna y paginada de a 25. |
 
 **Tres acciones, no tres severidades.** El modulo no clasifica las keywords por "que tan buenas son"
 sino por **que hay que hacer con ellas**, porque son trabajos distintos:
@@ -523,6 +525,70 @@ seleccion **no se renderizan** — un analista lee el mapa completo sin poder ha
 > `src/views/greenhouse/admin/growth/seo/keywords/`. Mismos commands para la UI, el lane `app`,
 > el lane `ecosystem` y las tools MCP `track_seo_keywords` / `untrack_seo_keywords` (estas ultimas
 > fail-closed hasta que el scope `efeonce.mcp.seo.write` quede cableado a un cliente).
+
+#### El techo de clics dice de dónde salió, y la lente declara cómo ordenó (TASK-1792, 2026-08-28)
+
+La columna **"+N clics/mes est."** se calcula multiplicando las impresiones de la keyword por cuánto
+sube su tasa de clic al llegar a la posición objetivo. Ese "cuánto sube" salía de una curva del
+**propio sitio**: cuánta gente le hace clic a *este* cliente en cada posición.
+
+**El defecto.** Si el sitio nunca había recibido un clic en la posición objetivo, el sistema leía ese
+cero como "en esa posición no se gana nada", y no como "todavía no lo hemos medido". Consecuencia:
+**la ganancia estimada daba cero para todas las keywords a la vez**, y ordenar por una columna donde
+todo vale lo mismo no ordena nada. La pantalla no ordenaba mal: no ordenaba. Y nada fallaba — el
+número existía, era válido y se veía razonable.
+
+**A quién le pasaba.** No es "el caso de un cliente chico". El disparador es **cualquier organización
+cuya posición objetivo tenga al menos 10 impresiones y ningún clic**, condición **garantizada en todo
+sitio recién incorporado** y en todo sitio de bajo tráfico en sus primeras semanas de serie. Y el
+efecto no era binario: Berel, con curva sana, tenía igual **1.445 de sus 1.798 filas empatadas en
+cero** — su orden discriminaba sobre unas 353 filas, no sobre el conjunto.
+
+**Qué cambia.** La curva ahora **viaja con la muestra que la sostiene** —impresiones **y** clics— y
+**declara** si sirve para esa posición, en vez de que cada consumidor lo adivine por la presencia de
+un dato. Cuatro respuestas posibles, y las cuatro se distinguen:
+
+| Lo que declara la lente | Qué significa |
+|---|---|
+| **Medido en este sitio** | Hay suficiente historia propia en esa posición. El techo sale de la conducta real de este cliente |
+| **Forma prestada, nivel de este sitio** | No hay historia suficiente en esa posición, pero sí en el sitio completo. Se presta la **forma** de una curva de referencia y se la ajusta al nivel medido de este cliente |
+| **Vimos la posición y no alcanza** | La posición existe en la serie, pero la muestra es demasiado chica para estimar nada. El número es prestado y lo dice |
+| **Nunca observamos esa posición** | No hay ni una impresión ahí. El número es prestado y lo dice |
+
+Un "0 medido" y un "no hay muestra" dejan de ser lo mismo. Es la misma doctrina que el módulo aplica
+en todo lo demás —**ausencia de dato nunca se presenta como un cero**— aplicada al centro del cálculo.
+
+**El orden es honesto o dice que no lo es.** Cuando el techo no puede decidir —porque la curva no es
+utilizable, o porque la ganancia salió idéntica en todas las filas— la lente **ordena por demanda
+medida** (impresiones y cercanía a la primera plana, todo de Search Console) y **declara** que ese
+fue el criterio. Antes ordenaba igual y se callaba, que es exactamente por qué nadie lo notó.
+
+**La curva de referencia también estaba mal calibrada.** La tabla pública que se usaba cuando no
+había datos propios prometía un 27% de clics en la posición 1; los dos sitios realmente medidos dan
+4,7% y 4,3% — un orden de magnitud menos. En la posición objetivo eso significaba **techos inflados
+unas 6 veces** para toda organización que cayera al respaldo. Ahora la referencia son CTR **medidos
+sobre búsquedas que no son de marca**, con su fecha, y de ella se presta la **forma** del decaimiento
+(que las tres fuentes disponibles comparten) mientras el **nivel** se estima del propio sitio cuando
+hay con qué. La curva expuesta además nunca sube al bajar de posición: antes podía dar 0,00% en la
+posición 8 y 2,7% en la 9, un salto que ninguna búsqueda real tiene.
+
+**Lo que todavía no se ve en pantalla.** El veredicto y la muestra ya viajan en la respuesta del
+módulo —lo ven quien consulta por API, Nexa o MCP— pero **la pantalla no los pinta**: sigue diciendo
+"+N clics/mes est." sin declarar de dónde salió el número. El **orden** sí quedó corregido del lado
+del servidor, así que la lista ya no finge estar ordenada. Declarar el techo como techo en la
+superficie es follow-up de la task dueña del render.
+
+**Dos límites declarados, no escondidos:**
+
+- La curva se calcula **incluyendo las búsquedas de marca**, que inflan las primeras posiciones. El
+  oficio pide calcularla sin marca. Es un defecto **independiente** —no se cura cuando el sitio
+  crezca— y tiene follow-up propio.
+- El camino "forma prestada, nivel de este sitio" está probado pero **no observado todavía en
+  producción**: ninguna de las dos organizaciones reales lo ejercita hoy.
+
+> Detalle técnico: [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
+> §7 → `readKeywordOpportunities` · código `src/lib/growth/seo/ctr-curve.ts` · manual
+> [`seguir-keywords-oportunidades-seo.md`](../../manual-de-uso/growth/seguir-keywords-oportunidades-seo.md)
 
 ### El país deja de estar implícito: cada respuesta declara qué mercado muestra (2026-08-13)
 
@@ -715,10 +781,22 @@ vivas para quien consulta por API, Nexa o MCP:
 
 Además, los cuatro métodos de expansión ahora **compran igual**: dos de ellos descartaban en el
 proveedor las keywords sin volumen estimado y dos no. Ese filtro no abarataba la llamada (se paga
-por fila devuelta y el tope de filas ya lo acota); sólo cambiaba qué se traía por el mismo precio, y
-en mercados de demanda rala se comía justo el long-tail emergente que el descubrimiento existe para
-encontrar. Cada corrida guarda con qué política compró, para que una corrida vieja siga siendo
-interpretable.
+por fila devuelta y el tope de filas ya lo acota); sólo cambiaba qué se traía por el mismo precio.
+Lo que se corrige es esa **asimetría no declarada**: cuatro métodos comprando con dos criterios
+distintos, sin que nadie lo dijera en ninguna parte. Cada corrida guarda con qué política compró,
+para que una corrida vieja siga siendo interpretable.
+
+> ⚠️ **Corrección honesta del beneficio (medido el 2026-08-28).** El argumento original para quitar
+> el filtro era que en mercados de demanda rala se comía el long-tail emergente. **Una corrida real
+> con gasto lo refutó:** tres corridas, dos endpoints, dos mercados (México y Chile), 102
+> candidatos, USD 0,048 de proveedor — **cero candidatos con volumen nulo o cero**. Los índices de
+> sugerencias e ideas del proveedor sólo devuelven keywords que ya tienen volumen medido, así que
+> ahí el filtro descartaba una condición que ya era verdadera: era un **no-op**. Quitarlo sigue
+> siendo correcto —cierra la asimetría y deja de imponer una exclusión que el contrato nunca
+> declaró— pero **el long-tail recuperado no tiene evidencia**. La capacidad se describe por lo que
+> hace, no por el beneficio prometido. Corolario: el estado "Sin dato de mercado" **sigue sin ser
+> alcanzable** desde sugerencias e ideas, no por el filtro sino por lo que el índice del proveedor
+> contiene.
 
 Sin cambio en la pantalla todavía: la lente recibe menos filas y campos nuevos que aún no pinta
 (follow-up declarado).

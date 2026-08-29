@@ -148,6 +148,70 @@ de los dos techos estás tocando.
 **techo**, bajo el supuesto de que el CTR observado en esa posición se repite; no dice
 que la página vaya a llegar ahí. Preséntalo como techo, jamás como forecast.
 
+### Cuando la curva propia no alcanza: presta la FORMA, estima el NIVEL
+
+**Segunda medición independiente (2026-08-28, otro sitio, otro vertical).** Curva de un
+e-commerce de pintura, ventana 28d, sobre `all_rows`:
+
+| Pos. | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| **CTR** | 4,72% | 3,15% | 2,50% | 1,37% | **0,98%** | 0,78% | 0,58% | 0,50% | 0,39% | 0,31% |
+
+🎯 **El hallazgo que cambia el método: lo que varía entre sitios es el NIVEL, no la FORMA.**
+Normalizando la posición 1 a 1,00, las tres curvas disponibles decaen casi igual:
+
+| Fuente | p1 | p2 | p3 | p4 | p5 |
+|---|---|---|---|---|---|
+| Tabla de industria clásica | 1,00 | 0,56 | 0,41 | 0,30 | 0,22 |
+| Sitio medido A (arriba, §anterior) | 1,00 | 0,72 | 0,54 | 0,32 | 0,26 |
+| Sitio medido B (pintura) | 1,00 | 0,67 | 0,53 | 0,29 | 0,21 |
+
+Lo que divergía era el nivel: posición 1 en **27%** (industria) contra **4,25%** y **4,72%**
+medidos. En la posición 5, **6% declarado contra ~1% medido — un factor 6**. Una tabla de
+industria de la era pre-AI-Overviews no está mal calibrada por poco: está calibrada para una
+SERP que ya no existe.
+
+**Método, cuando el sitio no tiene muestra para su propia curva:**
+
+1. Toma la **forma** de una curva de referencia **medida** (no de un benchmark de industria) y
+   declara su procedencia y su as-of.
+2. Estima el **nivel** del sitio con UN parámetro: el cociente entre sus clics reales y los que
+   la referencia predice para SU distribución de impresiones por posición.
+3. Fuerza la curva resultante **monótona no creciente**. Mezclar buckets medidos con prestados
+   produce repuntes que no describen nada — la posición 6 no convierte mejor que la 5 — y la
+   propia medición repunta en 10–12 por ruido de muestra chica.
+4. Si no hay muestra ni para el nivel (piso operativo: ~30 clics agregados), usa la referencia a
+   su nivel nativo **y decláralo**. Un techo prestado sirve para mostrarse con su procedencia;
+   **no sirve para decidir el orden del backlog.**
+
+✅ **Validación cruzada del método:** el nivel estimado del sitio B contra la curva del sitio A
+da **1,048** — la referencia le calza dentro del 5%, y B no es la fuente de A. Dos sitios de
+verticales distintos comparten forma y casi comparten nivel; lo que no se puede prestar es
+cuando el sitio genuinamente rinde por debajo, y eso el nivel sí lo captura.
+
+⚠️ **Calcula el nivel sobre filas NO-MARCA** por la misma razón que la curva (§arriba, punto 4):
+la explosión por sitelinks infla los buckets 1–2. Si tu pipeline todavía usa `all_rows`,
+decláralo — un sesgo no declarado se lee como medición limpia.
+
+🔴 **El sesgo de muestra chica no es ruido aleatorio: empuja SIEMPRE hacia abajo.** `k/n` es
+insesgado en el promedio, pero la observación típica no lo es: con `n` chico y `p` bajo la
+distribución tiene una masa enorme en cero y una cola larga a la derecha, así que la **mediana
+queda por debajo del CTR verdadero**. Operativamente: el error **no se cancela** mirando más
+buckets del mismo sitio ralo — todos tienden a subestimar y la curva sale deprimida de punta a
+punta. Y ahí está la trampa fina, porque **una curva deprimida por falta de muestra es
+indistinguible de un vertical genuinamente deprimido por AI Overviews**, que es exactamente el
+diagnóstico que la curva propia existía para entregar. Antes de decirle a un cliente "tu
+vertical tiene el CTR deprimido", verifica que cada bucket que sostiene esa frase pase el piso.
+
+⏳ **Y puede ser estructuralmente inalcanzable, no sólo estar mal calibrada.** A 75 impresiones
+por ventana de 28 días —el caso fuente— un bucket acumula ~2,7 impresiones/día: llegar a 1.000
+toma **del orden de un año**, y recién ahí un CTR real de ~1% habría producido los ~5 clics que
+el piso pide. **GSC retiene 16 meses** por el extremo viejo de la ventana, así que ampliar la
+ventana **no** es una salida indefinida: el dato viejo se cae por un lado mientras el nuevo
+entra por el otro. Para un sitio de bajo tráfico, "todavía no tenemos muestra" puede significar
+**nunca la vamos a tener** con esta fuente. La respuesta correcta no es esperar: es prestar la
+forma, declarar la procedencia, y decirlo.
+
 ### GSC → BigQuery (export masivo, caso Greenhouse)
 - El **bulk data export** de GSC a BigQuery elimina el muestreo y guarda
   histórico ilimitado. Greenhouse ya usa BigQuery (`efeonce-group`) → encaja.

@@ -1,6 +1,60 @@
 # TASK-1694 — Growth SEO: el contrato de candidatos de discovery decide con la barrera correcta, una fila por keyword y una política de inclusión declarada
 
-## Delta 2026-08-28 — la mitad de gateway quedó `rollout pendiente`
+## Delta 2026-08-28 (verificación) — el contrato está VIVO en producción, ejercitado contra el runtime
+
+No es lectura de docs ni inferencia desde el merge: se ejercitó el endpoint real en
+`https://greenhouse.efeoncepro.com` con sesión de agente (`user-agent-e2e-001`), en lectura.
+
+```
+GET /api/admin/growth/seo/keyword-discovery?organizationId=EO-ORG-0007&maxDifficulty=50&maxLinkBarrier=medium&limit=3
+→ HTTP 200
+  "ignoredFilters":[{"filter":"maxDifficulty",
+                     "reason":"non_decisional_link_barrier_is_canonical",
+                     "replacement":"maxLinkBarrier"}]
+```
+
+Las dos mitades del contrato quedan probadas en el runtime productivo: `maxLinkBarrier` es **aceptado**
+(200, sin error de validación) y `maxDifficulty` es **aceptado pero declarado ignorado**, con la razón y
+el reemplazo en la respuesta — que es exactamente la elección del contrato (devolver de más y decirlo,
+antes que devolver el subconjunto equivocado en silencio).
+
+Verificación cruzada previa contra staging (`develop`) con idéntico resultado. Y los cuatro archivos del
+contrato son **blob-idénticos** entre `HEAD` (develop) y `origin/main` —`reader.ts`, `contracts.ts`,
+`route.ts`, `track-keywords.ts`—, comparados por `git rev-parse <ref>:<ruta>`, **no** por conteo de
+commits: `main` promueve por squash y `rev-list --count` daría un falso «sin desplegar».
+
+## Delta 2026-08-28 (cierre) — la mitad de gateway QUEDÓ DESPLEGADA: rollout completo
+
+Supersede al Delta siguiente, que queda como historia. El criterio de cierre que ese Delta se fijó a
+sí mismo —«una revisión > `00024-8b8`»— está **cumplido**, y verificado contra el runtime, no contra
+documentación:
+
+- **Los dos commits están en el remoto.** `807fb76` (federa el contrato) y `32baa9f` (prettier) están
+  en `origin/main` de `efeoncepro/efeonce-mcp`:
+  `git rev-list --left-right --count origin/main...HEAD` = `0	0`, y
+  `git branch -r --contains 807fb76` → `origin/main`.
+- **El workflow desplegó ESE SHA.** `Deploy Cloud Run` run `33209983511`, `conclusion=success`,
+  `headSha=32baa9f3b22271cc9091e10a2e8ca700003423d9` (2026-08-28T20:50:57Z).
+- **La revisión nueva sirve el 100% del tráfico.** `efeonce-mcp-gateway-00025-njk` (región
+  **`southamerica-west1`**, no `us-east4`), creada 2026-08-28T20:52:44Z, con
+  `traffic: [{ latestRevision: true, percent: 100 }]`. `00025-njk` > `00024-8b8`.
+
+Lo que esa revisión sirve, según el diff de `807fb76`: `maxLinkBarrier` + `includeUnknownBarrier` en
+inventario, schema, tipos del provider y passthrough de query params; `maxDifficulty` **aceptado pero
+declarado como ignorado** en su `.describe()`; y la descripción de la tool declara la cardinalidad
+nueva (un candidato = una keyword normalizada, procedencia en `candidateIds`) y que `clusterConflict`
+`unknown` **no** se lee como `clear`.
+
+**Estado de la task: rollout completo en las dos mitades** (Greenhouse + gateway).
+
+⚠️ **Lo que NO se verificó, dicho como tal:** no se introspectó `tools/list` del gateway desplegado.
+El endpoint MCP exige OAuth y esta sesión es no-interactiva. La evidencia es la cadena
+`commit en origin/main → workflow success sobre ese SHA exacto → revisión creada 2 min después → 100%
+del tráfico`, **no** una lectura del schema realmente servido. El canary
+`scripts/greenhouse-seo-canary.mjs` del repo hermano tampoco cerraría ese hueco: ejercita el provider
+**local** desde `dist/`, no la revisión desplegada.
+
+## Delta 2026-08-28 (SUPERADO por el Delta de arriba) — la mitad de gateway quedó `rollout pendiente`
 
 Detectado al inventariar la superficie federada. La revisión productiva del gateway es
 `efeonce-mcp-gateway-00024-8b8` (SHA `92e7197`). El commit que federa el contrato corregido de
@@ -830,7 +884,10 @@ default. Revert = revert del PR + redeploy.
 
 ## Registro de cierre — 2026-08-28
 
-**Estado: `code complete, rollout pendiente`.** Los cinco slices están implementados, verificados
+**Estado: `complete` — EN PRODUCCIÓN desde el 2026-08-28** (release `e82c18579b05`, orchestrator run `33208942436`, manifest `released`). Verificado con canary de contrato contra producción: el lane devolvió `maxLinkBarrier aceptado; ignoredFilters=maxDifficulty`, o sea el runtime EJECUTA el contrato nuevo — no sólo está desplegado. Gateway MCP desplegado (`efeonce-mcp` run `33209983511`) con el schema actualizado. **Corrida de smoke con gasto EJECUTADA el 2026-08-28** (autorizada por el operador) — ver
+`### Smoke con gasto real` abajo.
+
+**Estado original al cerrar el código:** Los cinco slices están implementados, verificados
 contra PG real y documentados; falta la corrida real de smoke con gasto (no autorizada en esta
 sesión) y el deploy del gateway MCP.
 
@@ -865,6 +922,73 @@ sesión) y el deploy del gateway MCP.
   la `## Open Questions` dejó fuera de alcance (conflicto intra-corrida); la evidencia real
   refuerza que el follow-up vale, y su lugar natural sigue siendo la decisión en lote de
   `TASK-1660`.
+
+### Smoke con gasto real — 2026-08-28 (TRES corridas, USD 0,0482 en total)
+
+| # | Target / mercado | Método | Candidatos | Costo | vol > 0 | vol nulo o 0 |
+|---|---|---|---|---:|---:|---:|
+| 1 | `seot-berel-mx` · MX (2484) | `keyword_suggestions` | 50 | 0,0180 | 50 | **0** |
+| 2 | `seot-efeonce-own-brand` · CL (2152) | `keyword_suggestions` | 2 | 0,0122 | 2 | **0** |
+| 3 | `seot-efeonce-own-brand` · CL (2152) | `keyword_ideas` | 50 | 0,0180 | 50 | **0** |
+
+Las tres cerraron `succeeded`, sin `provider_error`. Costo real total **USD 0,0482** (peor caso
+estimado: 0,198), atribuido a `labs`/`consumer=seo`/`invoiced` en el ledger.
+
+**Lo que el smoke probó:**
+
+- 🔴 **El payload sin `filters` es aceptado por los DOS endpoints que lo llevaban**
+  (`keyword_suggestions` y `keyword_ideas`). Refuta con evidencia el riesgo de la matriz *"Un
+  payload sin `filters` es rechazado por el endpoint Labs y la corrida cierra `failed`"*.
+- **El costo no se mueve** y por candidato mejora frente al smoke de TASK-1664 (0,00036 vs 0,00132):
+  el setup fijo se amortiza sobre más filas.
+- **`volumePolicy: "all"` queda persistido** en `methods_json`, y las corridas anteriores muestran
+  el campo AUSENTE — el caso exacto que cubre el default histórico de lectura.
+- La corrida #2 confirma que el mercado ralo existe y se comporta como tal: **2 candidatos** contra
+  50 en México con el mismo método.
+
+### 🔴 Corrección a la justificación de la política de inclusión (evidencia 2026-08-28)
+
+**La razón que esta task escribió para unificar hacia `all` no se sostiene con datos.** El
+`## Detailed Spec` afirmaba que *"en un mercado ralo el filtro gasta el `limit` descartando justo el
+long-tail emergente"*. Medido: **102 candidatos, tres corridas, dos endpoints, dos mercados — CERO
+con volumen nulo o cero.** Y el histórico del store lo corrobora por endpoint:
+
+| `source_endpoint` | filas | volumen NULL |
+|---|---:|---:|
+| `keyword_suggestions` | 61 | **0** |
+| `domain_intersection` | 640 | 0 |
+| `ranked_keywords` | 211 | 0 |
+| `keyword_overview` | 62 | **15** |
+
+**Lectura honesta:** los índices de sugerencias e ideas del proveedor sólo devuelven keywords que ya
+tienen volumen medido, así que el `filters: search_volume > 0` era un **no-op** para esos dos
+endpoints — filtraba una condición que ya era verdadera. Donde el volumen nulo SÍ aparece es en
+`keyword_overview` (15 de 62), que es el top-up de enriquecimiento y **nunca llevó el filtro**.
+
+**Qué queda en pie del cambio, y qué no:**
+
+- ✅ **Sigue siendo correcto** quitarlo: elimina una asimetría no declarada entre los cuatro
+  adapters y deja de IMPONER una exclusión que el contrato nunca decía. La política declarada y
+  persistida en `methods_json` es el valor real de Slice 4.
+- ❌ **No hay evidencia del beneficio prometido** (recuperar long-tail emergente). El mecanismo no
+  muerde en estos dos endpoints.
+- ⚠️ **Corolario para el estado "Sin dato de mercado"**: la spec decía que ese estado *"casi sólo
+  puede originarse en related/site"* y que con la política nueva pasaría a ser alcanzable desde los
+  cuatro métodos. Los datos dicen que sigue sin ser alcanzable desde suggestions/ideas — no por el
+  filtro, sino por lo que el índice del proveedor contiene.
+
+### Hallazgo lateral del smoke — sin dueño (2026-08-28)
+
+Auditando la salida de las tres corridas apareció un hueco que **no es de esta task** y que quedó
+documentado en el lugar canónico para que no se redescubra:
+`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §7 → *"Hallazgo abierto (2026-08-28) — el candidato NO
+transporta ninguna señal de pertinencia"*.
+
+Resumen: el candidato no lleva señal de marca/categoría/relevancia, así que 50 keywords de consumidor
+sobre ChatGPT pasaron todos los checks para un target que vende AEO B2B. El vector estructural es
+`TASK-1662` (en el gap competitivo las seeds las elige el competidor, no el operador), y urge antes
+de `TASK-1700` porque su score append-only heredaría el orden por volumen. Sin task asignada al
+cierre de ésta; tres sesiones lo verificaron de forma independiente el mismo día.
 
 ### Pendientes de rollout
 

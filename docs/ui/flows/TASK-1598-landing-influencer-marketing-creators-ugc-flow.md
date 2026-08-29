@@ -2,9 +2,9 @@
 
 ## Meta
 
-- Status: `draft`
+- Status: `implemented`
 - Owner task: `TASK-1598`
-- Surface: `/servicios/influencer-marketing` (working slug)
+- Surface: `/servicios/agencia-de-influencers/`
 - Flow type: `multi-surface`: landing → brief form o meeting scheduler.
 
 ## Flow map

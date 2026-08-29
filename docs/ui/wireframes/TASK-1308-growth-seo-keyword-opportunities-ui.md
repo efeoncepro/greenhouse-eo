@@ -79,7 +79,7 @@
 >
 > **Qué NO cambia — y por eso este delta no reescribe el wireframe:** el scatter sigue con encoding
 > **medido** (X = posición ponderada, Y = impresiones log, tamaño = clics incrementales, color+forma =
-> acción), el orden de la tabla sigue saliendo de la ganancia estimada, y el mercado sigue siendo
+> acción), el orden de la tabla sigue saliendo de la ganancia estimada **cuando la curva de CTR del sitio mide en la posición objetivo; si no, del criterio declarado en `orderedBy` (TASK-1792)**, y el mercado sigue siendo
 > **columna + filtro, nunca eje**. La decisión de fondo de 2026-08-07 era correcta con o sin dato:
 > lo único que expiró fue su premisa de ausencia.
 >

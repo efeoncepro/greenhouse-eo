@@ -293,6 +293,66 @@ deprimiendo el CTR los AI Overviews EN ESE sitio y ESE vertical**, sin tener que
 estimarlo ni discutirlo. Si hoy la posición 3 de ese sitio rinde la mitad que en
 una tabla vieja, el score ya lo refleja.
 
+⚠️ **Y tiene una precondición que casi nadie enuncia: la curva propia sólo sirve si
+hay MUESTRA.** Aplicar «usa tus datos» a un sitio de bajo tráfico produce el defecto
+opuesto al que evita — una curva propia **peor que la tabla prestada**, porque un
+bucket sin clics se lee como «CTR esperado 0» y el score entero colapsa sin que nada
+falle. Medido (caso fuente 2026-08-28): un sitio con 75 impresiones y **0 clics** en la
+posición objetivo producía ganancia 0 en **el 100% de sus filas**, y el orden del backlog
+dejaba de existir en silencio.
+
+📏 **El piso mira DOS dimensiones, y la que manda son los CLICS.** La precisión de un
+estimador de tasa la gobiernan los **éxitos**, no los ensayos: un bucket con 50.000
+impresiones y 3 clics tampoco tiene curva.
+
+| Impresiones con **0 clics** | CTR real compatible (regla de tres, `3/n`) |
+|---|---|
+| 10 | hasta **26%** |
+| 75 | hasta 4,0% |
+| 410 | hasta 0,73% |
+
+Con un CTR verdadero de ~1%, `P(0 clics | n=75) ≈ 47%` — observar cero es una moneda al
+aire. Con `n=1000` cae a ~0,004%. Piso operativo: **~1.000 impresiones y ≥5 clics** en el
+bucket que vas a usar (5 clics ⇒ error relativo ≈ 1/√5 ≈ 45%: **estimable, no preciso**).
+
+🔴 **`0` medido y «sin muestra suficiente» son estados DISTINTOS y jamás se colapsan.** Si
+el bucket no alcanza, dilo y ordena por otra cosa declarada — nunca por un campo cuya
+varianza es cero, que preserva el orden de entrada y finge haber ordenado.
+
+🎯 **Cuando no hay muestra, presta la FORMA y estima el NIVEL** (`07_MEASUREMENT.md`): un
+nivel es 1 parámetro, una curva por posición son ~20.
+
+⚠️ **Este piso NO es el "piso mínimo absoluto de impresiones" de la tabla de parámetros de
+arriba.** Aquel responde *«¿es interpretable la posición media?»* y con ~10 impresiones ya
+cumple; éste responde *«¿es estimable el CTR?»* y pide dos órdenes de magnitud más. Son dos
+preguntas estadísticas distintas y **una constante no puede responder las dos**: reutilizar el
+piso de posición para decidir usabilidad de la curva es el error compuesto que produce el
+colapso de arriba. Si tu filtro tiene una sola constante de impresiones, tiene un bug latente.
+
+### Implementación de referencia (no lo reimplementes)
+
+Este score **ya está implementado y en runtime** en Greenhouse (`TASK-1700`): el aggregate
+`src/lib/growth/seo/work-queue/**` lo calcula en `priority-score.ts` con la curva derivada del
+propio sitio, y **los parámetros viven versionados** en `score-versions.ts`
+(`incremental-clicks-v1`: ventana 28 d, posición objetivo 5, rango 8–20, P75, piso de posición
+10, piso de curva 1.000 impresiones + 5 clics). Cambiar un peso, un umbral o la posición
+objetivo **obliga a una versión nueva** — es lo que permite responderle a un cliente *"¿por qué
+esto ya no es prioridad?"* con evidencia y no con una constante que alguien movió. Si vas a
+tocar el score en Greenhouse, carga `.claude/rules/growth-seo.md` antes: los tres estados de la
+base (`measured_incremental_clicks` / `measured_without_curve` / `no_measured_demand`) los impone
+un CHECK en la base de datos, no el TS.
+
+⚠️ **Advertencia comercial — esto es *table stakes*, no una ventaja.** Varias suites conectan
+Search Console y proyectan ganancia de clics (seoClarity comercializa *SEO Forecasting*;
+seoClarity y Sistrix **sí** derivan la curva del GSC del propio cliente). Lo que en el relevamiento
+no apareció es la **combinación exacta**: proyectar el alza de clics de un **CAMBIO DE POSICIÓN**
+usando la curva del propio GSC — las dos mitades existen en el mercado y no se juntan. 🔴 Eso es
+una afirmación **NEGATIVA** ("nadie más lo hace"), la clase más fácil de equivocar y la que ya
+costó caro dos veces: **exige re-verificación a la fecha antes de cualquier uso comercial**, y
+nunca se dice "curva propia" a secas ni "ninguna herramienta puede". Frases citables, evidencia y
+las hipótesis abiertas que pueden tumbarla: skill `seo-aeo-practice`,
+`references/BENCHMARK_SUITES_AEO_2026-08.md` → **F-12**, **S-01**, **S-09**, **H-01/H-02/H-17**.
+
 ### Canibalización: no se descarta, se separa
 
 Una query que rankea con **más de una página** no es una oportunidad de

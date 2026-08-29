@@ -44,6 +44,7 @@ import { type SeoCompetitorSummary, type SeoKeywordIntent, type SeoLinkBarrierLe
 import { resolveSeoEntitlement } from './entitlement'
 import { isSeoModuleEnabled } from './flags'
 import { deriveLinkBarrier } from './keyword-market-data'
+import { type SeoProvenance, resolveSeoAsOf, seoProvenance } from './lens'
 
 /** Ventana GSC para la exclusión por demanda medida — misma ventana que el gap SEO↔AEO. */
 export const KEYWORD_GAP_GSC_WINDOW_DAYS = 28
@@ -117,6 +118,16 @@ export interface DeclaredTargetRow {
   clientRank: number | null
 }
 
+/**
+ * TASK-1785 — as-of del conjunto: la captura MÁS RECIENTE entre los competidores que
+ * efectivamente tienen cobertura. Un competidor `no_coverage` no aporta fecha (no hay nada
+ * que fechar) y tampoco puede bajar el as-of de los demás.
+ */
+const resolveGapCapturedAt = (coverages: CompetitorGapCoverage[]): string | null =>
+  resolveSeoAsOf(
+    coverages.map(entry => (entry.coverage.state === 'available' ? entry.coverage.captureDate : null))
+  )
+
 export interface CompetitorGapCoverage {
   competitor: SeoCompetitorSummary
   coverage:
@@ -147,8 +158,17 @@ export type KeywordGapResult =
       ok: true
       seoTargetId: string
       organizationId: string
-      /** Todo lo de acá es lente ◑ estimada del proveedor; lo medido (●) sólo EXCLUYE. */
+      /**
+       * Todo lo de acá es lente ◑ estimada del proveedor; lo medido (●) sólo EXCLUYE.
+       *
+       * TASK-1785 — campo LEGACY conservado por back-compat; la forma canónica es
+       * `provenance`, y un test afirma que concuerdan. ⚠️ La asimetría de este reader —lo
+       * medido EXCLUYE en vez de promediarse— es el precedente vivo del invariante: si el
+       * SERP comprado se rotulara `measured`, esta exclusión dejaría de tener sentido.
+       */
       lens: 'estimated'
+      /** TASK-1785 — la forma canónica; `lens` de arriba es su proyección. */
+      provenance: SeoProvenance[]
       gscWindowDays: number
       competitors: CompetitorGapCoverage[]
     }
@@ -237,6 +257,7 @@ export const readKeywordGap = async (
         seoTargetId,
         organizationId: target.organization_id,
         lens: 'estimated',
+        provenance: [seoProvenance({ section: 'competitors[]', source: 'dataforseo_labs', capturedAt: null })],
         gscWindowDays: KEYWORD_GAP_GSC_WINDOW_DAYS,
         competitors: []
       }
@@ -456,6 +477,15 @@ export const readKeywordGap = async (
       seoTargetId,
       organizationId: target.organization_id,
       lens: 'estimated',
+      // El as-of es la cobertura más reciente entre los competidores leídos. Una cobertura
+      // `no_coverage`/`stale` ya viaja declarada por competidor; esto fecha el conjunto.
+      provenance: [
+        seoProvenance({
+          section: 'competitors[]',
+          source: 'dataforseo_labs',
+          capturedAt: resolveGapCapturedAt(result)
+        })
+      ],
       gscWindowDays: KEYWORD_GAP_GSC_WINDOW_DAYS,
       competitors: result
     }

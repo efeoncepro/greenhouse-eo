@@ -66,6 +66,8 @@ interface AeoLensRow extends Record<string, unknown> {
   run_id: string
   finished_at: string | null
   overall_score: string | null
+  /** TASK-1700 — versión del score del grader; la cola la persiste como `source_score_version`. */
+  score_version: string | null
 }
 
 export const readSeoAeoGap = async (
@@ -152,7 +154,7 @@ export const readSeoAeoGap = async (
     // filtro `p.organization_id = $1` excluye a los prospectos correctamente: el 360 es
     // por-org, y un perfil sin org no pertenece a ninguna.
     const aeoRows = await runGreenhousePostgresQuery<AeoLensRow>(
-      `SELECT lr.run_id, lr.finished_at, ls.overall_score::text AS overall_score
+      `SELECT lr.run_id, lr.finished_at, ls.overall_score::text AS overall_score, ls.score_version
          FROM (
            SELECT r.run_id, r.finished_at
              FROM greenhouse_growth.grader_runs r
@@ -163,7 +165,7 @@ export const readSeoAeoGap = async (
             LIMIT 1
          ) lr
          JOIN LATERAL (
-           SELECT s.overall_score
+           SELECT s.overall_score, s.score_version
              FROM greenhouse_growth.grader_scores s
             WHERE s.run_id = lr.run_id
               AND s.overall_score IS NOT NULL
@@ -175,7 +177,10 @@ export const readSeoAeoGap = async (
 
     const aeoRow = aeoRows[0]
 
-    if (!aeoRow || aeoRow.overall_score === null) {
+    // `score_version` es NOT NULL en el esquema (TASK-1227), pero se exige acá igual: sin
+    // ella la cola no puede persistir el item (CHECK en DB), y degradar honestamente ahora es
+    // mejor que fabricar una versión o reventar aguas abajo.
+    if (!aeoRow || aeoRow.overall_score === null || !aeoRow.score_version) {
       return { ok: false, errorCode: 'no_aeo_data', status: null }
     }
 
@@ -213,7 +218,8 @@ export const readSeoAeoGap = async (
         latestRunId: aeoRow.run_id,
         latestRunAt: aeoRow.finished_at ? new Date(aeoRow.finished_at).toISOString() : null,
         overallScore,
-        cited: overallScore >= thresholds.aeoCitedMinScore
+        cited: overallScore >= thresholds.aeoCitedMinScore,
+        scoreVersion: aeoRow.score_version
       },
       quadrants,
       domainQuadrant: classifyQuadrant(bestPosition, overallScore, thresholds)

@@ -307,7 +307,7 @@ modelo por defecto sí cabe.
 
 | # | Brecha | Tamaño |
 |---|---|---|
-| S1 | **No existe una cola priorizada única.** ~~discovery ordena por `captured_at DESC`~~ 🔴 **REFUTADO 2026-08-15:** discovery tiene un sort compuesto de 8 llaves (`reader.ts:395-434`, mergeado en `522460b17` el 2026-08-14, **un día antes de esta auditoría**) donde `capturedAt` es el 7.º desempate. **La brecha es real y el argumento correcto es más fuerte:** hay *cuatro* criterios de orden, cada uno bien pensado y **ninguno comparable con los otros** — nadie puede decir cuál de los cuatro #1 va primero. Y `TASK-1669` se prohíbe resolverlo, dejando el modelo huérfano. | L |
+| S1 | ✅ **CERRADA 2026-08-28** por `docs/tasks/in-progress/TASK-1700-growth-seo-prioritized-work-queue-aggregate.md` — `greenhouse_growth.seo_work_queue_{snapshots,items,decisions}` append-only con `priority_score_version` en columna, seis orígenes con vocabulario cerrado, un contrato único (`readSeoWorkQueue` / `materializeSeoWorkQueue` / `recordSeoWorkQueueDecision`) para los cuatro consumers, y la lente de oportunidades ya reapuntada a la cola con test de paridad (Slice 7). Los siete slices están en `develop`; el flip de `GROWTH_SEO_WORK_QUEUE_ENABLED` sigue pendiente en ambos runtimes, así que la brecha está **cerrada en contrato, pendiente de rollout**. Texto original abajo. ⟶ **No existe una cola priorizada única.** ~~discovery ordena por `captured_at DESC`~~ 🔴 **REFUTADO 2026-08-15:** discovery tiene un sort compuesto de 8 llaves (`reader.ts:395-434`, mergeado en `522460b17` el 2026-08-14, **un día antes de esta auditoría**) donde `capturedAt` es el 7.º desempate. **La brecha es real y el argumento correcto es más fuerte:** hay *cuatro* criterios de orden, cada uno bien pensado y **ninguno comparable con los otros** — nadie puede decir cuál de los cuatro #1 va primero. Y `TASK-1669` se prohíbe resolverlo, dejando el modelo huérfano. | L |
 | S2 | **El SERP completo se paga y se tira.** Costo marginal cero para persistir el top-N; **costo de oportunidad diario** porque no se recupera hacia atrás sin volver a comprarlo. Es sustrato de S3 y S4. | M |
 | S3 | **Estacionalidad.** La serie de 12 meses viene dentro del `keyword_info` que ya se compra; se guarda como escalar plano. Sin ella, "¿qué escribo en agosto para el pico de noviembre?" no se puede responder. | S |
 | S4 | **Clustering propio.** `coreKeyword` **no agrupa nada** (cero `GROUP BY`), pero *corregido:* no es dato inerte — tiene 4 consumidores (llave #4 del orden de discovery, contexto del LLM autor, `coverageTokens` de la verificación determinista de TASK-1666, y UI). Una task que lo trate como campo muerto **rompe el orden del inbox y la cobertura de seeds**. Discovery devuelve 500 candidatos sin decir cuántas páginas son: el módulo fabrica la canibalización que la otra pantalla detecta. | M |
@@ -530,6 +530,11 @@ the missing piece"*. Tres consumidores = umbral de patrón canónico.
 | Entitlement / gate de gasto | **No compartir el resolver. Sí la FORMA** | **Alto y silencioso**: el análisis de contenido dentro de AEO gastaría fuera de `seo_provider_spend_daily` |
 
 ### 5.2 La cola priorizada: aggregate persistido, no reader en vivo
+
+> ✅ **CONSTRUIDA 2026-08-28** — `TASK-1700`, siete slices en `develop`. Tal como se recomendó acá:
+> append-only, materializada por job en ops-worker vía Cloud Scheduler (nunca Vercel cron), con
+> `priority_score_version` + `score_breakdown_json` en columna desde el primer slice. Pendiente el flip
+> de `GROWTH_SEO_WORK_QUEUE_ENABLED` (OFF en ambos runtimes, scheduler pausado).
 
 **Veredicto:** `greenhouse_growth.seo_work_queue_{snapshots,items}` append-only, materializado por
 job en ops-worker, con score versionado en columna.

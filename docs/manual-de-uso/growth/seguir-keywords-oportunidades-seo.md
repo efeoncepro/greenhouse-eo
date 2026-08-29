@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-08-07 por Claude (TASK-1308)
-> **Ultima actualizacion:** 2026-08-14 por Claude (TASK-1661 — las columnas de mercado ya traen dato: Volumen y Barrera de enlaces)
+> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1792 — el techo de clics declara de donde salio, y la lista avisa cuando no ordena por ganancia)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §7 y §10.4
 
 # Oportunidades de Keywords — Leer el mapa y seguir keywords
@@ -38,8 +38,10 @@ de posicion. La pantalla vive en `Growth > SEO > Keywords` (`/admin/growth/seo/k
    pero si viajan en la URL, asi que el enlace se comparte ya filtrado.
 7. En la tabla, revisa la keyword, su pagina actual y la ganancia estimada. Si el Space tiene el
    enriquecimiento de mercado, veras ademas **Volumen** y **Barrera de enlaces** (ver "Las dos
-   lentes" mas abajo). Viene ordenada por ganancia estimada; puedes reordenar por cualquier
-   columna numerica y cambiar el tamaño de pagina (10 / 25 / 50; por defecto 25).
+   lentes" mas abajo). Viene ordenada por ganancia estimada **cuando ese criterio distingue entre
+   filas**, y por demanda medida cuando no (ver "Cuando el techo de clics no puede ordenar la
+   lista"); puedes reordenar por cualquier columna numerica y cambiar el tamaño de pagina
+   (10 / 25 / 50; por defecto 25).
 8. Pulsa **Seguir** en las que quieras medir a diario, o marca varias y usa **Seguir seleccionadas**.
 9. Para sacar una del ciclo, **Dejar de seguir**. Tienes unos segundos para **Deshacer**.
 10. **Exportar CSV** baja lo que estas viendo, con los filtros aplicados.
@@ -60,14 +62,69 @@ Reglas de lectura:
 
 - **No las promedies ni las mezcles en una sola conclusion.** "Tiene 2.400 de volumen" y "te ve 300
   veces al mes" son dos hechos distintos y ambos son ciertos.
-- **El volumen estimado no prioriza esta pantalla.** El orden sigue saliendo de la ganancia estimada,
-  que se calcula con datos medidos. El volumen ayuda a *explicar* y a dimensionar, no a rankear.
+- **El volumen estimado no prioriza esta pantalla.** El orden sale siempre de datos medidos: de la
+  ganancia estimada cuando el techo puede distinguir entre filas, y de la demanda medida cuando no.
+  El volumen ayuda a *explicar* y a dimensionar, no a rankear.
 - **Las dos columnas de mercado aparecen solo si el Space tiene el enriquecimiento habilitado.** Si
   no lo tiene, no se renderizan y la pantalla lo declara una vez al pie del mapa. Es a proposito:
   una columna que no puede traer dato no gana su ancho.
 - **La cifra tiene fecha.** Se captura por corrida y se refresca mensualmente; la pantalla todavia no
   imprime esa fecha. Si necesitas el "vigente al", mirala en
   [operar-datos-de-mercado-keywords.md](operar-datos-de-mercado-keywords.md).
+
+## Cuando el techo de clics no puede ordenar la lista
+
+La columna **Ganancia est.** responde "cuantos clics ganarias si esta keyword llegara a la
+posicion objetivo". Sale de la **curva de CTR de tu propio sitio**: cuanto convierte ESE sitio
+en cada posicion. Es mejor que una tabla de industria porque absorbe sola cuanto te esta
+deprimiendo el CTR la respuesta con IA en tu vertical.
+
+**Pero esa curva necesita historia.** Un sitio recien conectado, o de trafico bajo, no tiene
+suficientes clics en la posicion objetivo para que el numero signifique algo. Y ahi hay una
+trampa que ya nos costo: **cero clics no quiere decir "convierte cero", quiere decir "nadie
+midio lo suficiente"**. Con 75 impresiones y ningun clic, el CTR real puede ser cualquier cosa
+entre 0% y 4%.
+
+Que hace la plataforma cuando eso pasa:
+
+| Situacion | Que numero recibes | Que puedes afirmar |
+|---|---|---|
+| Hay historia suficiente en la posicion objetivo | Techo calculado con tu propia curva | Es un techo **medido en tu sitio**. Ordena la lista |
+| No hay historia ahi, pero si en el sitio en general | Techo con curva de referencia **ajustada al nivel de tu sitio** | Es una aproximacion calibrada. **No ordena la lista** |
+| No hay historia suficiente en ninguna parte | Techo con curva de referencia prestada | Es una referencia externa. **No ordena la lista** |
+
+⚠️ El segundo caso —**curva de referencia ajustada al nivel de tu sitio**— esta probado y es
+correcto por construccion, pero **todavia no se ha visto ocurrir en produccion**: de las dos
+organizaciones con serie real, una mide en la posicion objetivo y la otra no tiene muestra ni para
+estimar un nivel. Si te toca, es la primera vez; verificalo antes de explicarselo a un cliente.
+
+⚠️ **La pantalla todavia no te dice en cual de las tres estas.** El veredicto y el tamaño de la
+muestra ya viajan en la respuesta del modulo, pero la tabla sigue mostrando "+N clics/mes est." sin
+declarar su procedencia; pintarlo en pantalla es trabajo pendiente de la task dueña del render. Lo
+que **si** quedo corregido es el **orden**: la lista ya no finge estar ordenada por ganancia cuando
+ese criterio no distingue nada.
+
+Mientras tanto, para saber en cual estas sin adivinar: consulta la misma lente por el carril
+programatico —`GET /api/platform/ecosystem/growth/seo/keyword-opportunities`, o la consulta
+`get_seo_keyword_opportunities` desde un asistente— y mira tres campos de la respuesta:
+`ctrCurveSource` (de donde salio el techo), `curveSampleSize` (con cuanta muestra) y `orderedBy`
+(con que criterio se ordeno). Son los mismos datos que la pantalla mostrara cuando el render se
+actualice.
+
+🔴 **Cuando el techo no puede ordenar, la lista se ordena por demanda medida** — impresiones
+reales × que tan cerca esta de la primera plana — y ambos factores salen de Search Console, sin
+nada estimado. Es un orden peor informado, pero **es un orden real**. Antes de esta correccion
+la lista se ordenaba por un campo que valia cero en todas las filas: no ordenaba mal,
+**no ordenaba**, y nada lo avisaba.
+
+⚠️ **El techo NUNCA es un pronostico**, ni siquiera cuando sale de tu propia curva. Dice
+"si llegaras a la posicion 5 y ahi convirtieras como convierte tu sitio en la 5, ganarias N
+clics". No dice que vayas a llegar. Presentalo como techo al cliente, jamas como proyeccion.
+
+🎯 **Que hacer si tu sitio cae en los dos ultimos casos.** No es un error a reportar: es la
+lectura correcta de un sitio joven. Lo accionable es (a) usar el orden por demanda medida, que
+sigue siendo valido, y (b) saber que la curva mejora sola a medida que el sitio acumula serie —
+no hay nada que configurar.
 
 ## Que significan las señales
 
@@ -83,8 +140,8 @@ Reglas de lectura:
 | **Barrera de enlaces** | Que tan atrincherado con backlinks esta el top 10 de esa busqueda. Se muestra en niveles — **Baja / Media / Alta** — nunca como numero |
 | **Barrera "Baja"** | ⚠️ **No significa "facil".** Significa que ahi **se compite con contenido y autoridad de dominio, no con enlaces**: es una oportunidad para un dominio fuerte. Leerlo como "trivial" es el error clasico |
 | **"Sin dato"** en Volumen o Barrera | Esa keyword **no se consulto** al proveedor, o el proveedor **no la tiene**. Es un hueco: no es un cero y **no es "Baja"** — presentar un hueco como barrera baja afirma una oportunidad que nadie midio |
-| "+N clics/mes est." | Clics adicionales si llegara a la posicion objetivo, segun la curva de CTR **del propio sitio** |
-| "Sin ganancia estimada" | No es falta de dato: esa keyword ya convierte mejor que el promedio de la posicion objetivo |
+| "+N clics/mes est." | Clics adicionales si llegara a la posicion objetivo. Es un **techo, no un pronostico**. Sale de la curva de CTR **del propio sitio** cuando hay historia suficiente en esa posicion; si no, de una curva de referencia ajustada al nivel del sitio. La pantalla **todavia no dice cual de los dos** — ver "Cuando el techo de clics no puede ordenar la lista" |
+| "Sin ganancia estimada" | **Depende del estado de la curva** (ver la seccion de arriba). Si la curva de tu sitio SI mide en la posicion objetivo, significa que esa keyword ya convierte mejor que ese promedio. Si NO mide, significa que **no hubo con que comparar** — y ahi el cero no es un hallazgo, es un hueco. Nunca lo presentes como "ya esta bien" sin mirar de donde salio el techo |
 | "X de 200 keywords seguidas" | El cupo del set monitoreado. Cada keyword vigente se cobra en cada ciclo diario |
 | **Dejar de seguir** | Ya esta en el set. Pulsalo para sacarla del ciclo diario y liberar cupo |
 | **Paginas** | Cuantas paginas tuyas aparecen para esa busqueda. Mas de una = compiten entre si, y ese numero decide la urgencia de consolidar |
@@ -162,6 +219,8 @@ Tres cosas que conviene saber:
 | El boton "Seguir" esta deshabilitado en todas | El set llego a su tope | Pulsa **Dejar de seguir** en alguna que ya no necesites medir; el cupo se libera al instante |
 | "No se pudo seguir: el set llego a su tope" | El techo se evaluo al momento del clic | Lo mismo. El rechazo es explicito a proposito |
 | La keyword seguida no aparece en Rendimiento | La primera medicion aun no corrio | El cron de captura corre a las 05:00 CLT. Vuelve al dia siguiente |
+| La lista **no parece ordenada por ganancia**: las de arriba no son las de mayor "+N clics/mes est." | El techo de clics no distingue entre filas —el sitio no tiene historia suficiente en la posicion objetivo, o todas las keywords ya convierten mejor que ella— asi que la lente ordeno por **demanda medida** | **No es un bug ni hay nada que configurar.** Es la lectura correcta de un sitio joven o de un conjunto parejo, y el orden por demanda medida sigue siendo valido. Confirma cual fue el criterio en el campo `orderedBy` del carril programatico. La curva mejora sola al acumular serie: ver "Cuando el techo de clics no puede ordenar la lista" |
+| Todas las keywords muestran una ganancia estimada muy parecida | Mismo caso: el techo salio de una curva de referencia, no de la historia del propio sitio | Igual que arriba. **No presentes esa cifra al cliente como pronostico** — es un techo prestado, y decirlo protege la conversacion |
 
 ## Operar el techo del set
 
@@ -177,6 +236,13 @@ keyword agregada. Subirlo requiere revisar el budget del tier de la organizacion
 - Reader: `src/lib/growth/seo/keyword-opportunities-reader.ts` (striking-distance medido; devuelve
   `market: 'available' | 'unavailable'`, que es lo que decide si las dos columnas de mercado se
   renderizan)
+- Curva de CTR y veredicto de usabilidad: `src/lib/growth/seo/ctr-curve.ts` (TASK-1792). La
+  respuesta de la lente transporta `ctrCurveSource` (`org_measured` · `org_level_reference_shape` ·
+  `unusable` · `fallback`), `curveSampleSize` (`{impressions, clicks}`, o `null` si esa posicion
+  nunca se observo), `targetPosition`, `expectedCtrAtTarget` y `orderedBy`
+  (`estimated_click_gain` · `measured_demand`). Son campos del **conjunto**, no de cada keyword.
+  ⚠️ La curva se calcula hoy **incluyendo busquedas de marca**, que inflan las primeras posiciones:
+  es un sesgo declarado con follow-up propio, no un dato limpio
 - Lente estimada: `src/lib/growth/seo/keyword-market-data.ts` (volumen, `capturedAt` y
   `deriveLinkBarrier` — el nivel de barrera se deriva del perfil de enlaces REAL del top-10
   (diversidad de dominios referentes + page rank), **no** del `keyword_difficulty` crudo del

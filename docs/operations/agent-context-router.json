@@ -61,7 +61,7 @@
     },
     {
       "id": "postgres-data",
-      "triggers": ["PostgreSQL", "migration", "SQL", "reader", "date math"],
+      "triggers": ["PostgreSQL", "migration", "SQL", "reader", "date math", "ORDER BY", "paginación", "keyset", "collation", "cursor"],
       "skills": ["software-architect-2026"],
       "sources": [
         "docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md",

@@ -1,5 +1,41 @@
 # TASK-1662 — Growth SEO: keyword gap — qué rankea la competencia y el cliente no
 
+## Delta 2026-08-28 (Slice 4 desbloqueado) — la cola ya PULLEA el gap: el Slice 4 no es código de esta task
+
+`TASK-1700` está en `develop` con sus siete slices (`962d22118` … `9020d6421`), así que el bloqueo
+declarado tres veces en esta task —*"Slice 4 (emisión a la cola de trabajo) BLOQUEADO por `TASK-1700`
+(`to-do`)"*— queda **levantado**. Y con una inversión de dirección que cambia lo que hay que construir:
+
+🔴 **El Slice 4 estaba planteado como emisión (`push`) y quedó implementado como lectura (`pull`).** El
+colector `src/lib/growth/seo/work-queue/collectors/competitor-gap.ts` consume `readKeywordGap` desde el
+lado de la cola. No hay writer que escribir acá, ni archivo nuevo en los `Files owned` de esta task: el
+gap sigue entregando **hechos y factores con procedencia y sin score propio**, tal como el Delta
+2026-08-15 exigía, y la cola los recoge. El Slice 4 se re-encuadra: de **construir** a **verificar el
+acople y hacer rollout**.
+
+Lo que el colector ya decidió y esta task debe conocer antes de tocarlo:
+
+- `evidence_ref` opaca `seo:competitor_gap:<coverage_run_id>` (desde `coverage.coverageRunId`) — nunca FK
+  ni JOIN a las tablas de cobertura.
+- **Sólo entra `content_gap`.** `ranks_worse` es optimización que la superficie de oportunidades ya cubre
+  con demanda medida, y `declaredTargets` son compromisos en curso (origen `declared_target`), no
+  hallazgos: reportarlos sería vender de vuelta algo que el cliente ya declaró.
+- La salud del origen sale del **estado de cobertura que el reader declara**, no de una constante: sin
+  competidores declarados → `degraded`; `no_coverage` → `degraded`; `stale` → `degraded` con la fecha;
+  cobertura fresca → `ok`. El colector documenta explícitamente que cablear un `down: 'no_producer'` fijo
+  habría sido "documentar una mentira".
+- Precedencia 5.ª en `ORIGIN_ACTION_PRECEDENCE`, por debajo de `consolidation`, `gsc_striking_distance`,
+  `declared_target` y `aeo_gap`. La cola ordena; esta task no.
+- Como `readKeywordGap` ya excluye keywords con impresiones GSC en la ventana, de acá salen candidatos
+  **sin demanda medida** —banda 3, verbo `measure`— y jamás duplicados del striking-distance. Esa
+  exclusión es del reader dueño y **no se replica** dentro del colector.
+
+**Lo que sigue abierto no es código sino rollout:** el flag de cobertura de esta task y
+`GROWTH_SEO_WORK_QUEUE_ENABLED` (OFF en los dos runtimes, scheduler `ops-seo-work-queue-materialize`
+pausado — `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`). Verificar en Discovery que los estados de
+salud del colector coinciden con lo que `readKeywordGap` devuelve de verdad antes de re-escribir el
+alcance del Slice 4.
+
 ## Delta 2026-08-28 (release a producción) — Slices 1–3 en runtime real; sigue abierta por el Slice 4
 
 El paso a producción `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208,

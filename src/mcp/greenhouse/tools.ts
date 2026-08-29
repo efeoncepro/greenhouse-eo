@@ -193,6 +193,8 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'declareSeoCompetitors'
   | 'retireSeoCompetitors'
   | 'getSeoKeywordGap'
+  | 'getSeoWorkQueue'
+  | 'getSeoDualLensVisibility'
   | 'getSeoSerpTopResults'
   | 'getSeoCompetitorCandidates'
   | 'getSeoKeywordMarketData'
@@ -924,6 +926,48 @@ export const createGreenhouseMcpHandlers = (client: Pick<
    * que el reader no ordena: reportar el gap como ranking sería acuñar la prioridad que la
    * cola (TASK-1700) todavía no computó.
    */
+  /**
+   * TASK-1785 — el summary REPITE que las dos series no son comparables punto a punto.
+   *
+   * No es redundancia con la descripción de la tool: el agente que compone un párrafo tiene
+   * el summary a la vista y la descripción en su contexto de hace rato. La advertencia vale
+   * donde se toma la decisión.
+   */
+  async getSeoDualLensVisibility(input: {
+    organizationId?: string
+    market?: string
+    keywords: string[]
+    rangeDays?: number
+  }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          measured?: { provenance?: { capturedAt?: string | null }; series?: unknown[]; unavailable?: unknown }
+          estimated?: { provenance?: { capturedAt?: string | null }; series?: unknown[]; unavailable?: unknown }
+        }
+
+        if (data.ok === false) {
+          return `Dual-lens visibility unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        const measuredCount = Array.isArray(data.measured?.series) ? data.measured.series.length : 0
+        const estimatedCount = Array.isArray(data.estimated?.series) ? data.estimated.series.length : 0
+
+        return (
+          `Two SEPARATE position series: ${measuredCount} MEASURED (Search Console, as-of ` +
+          `${String(data.measured?.provenance?.capturedAt ?? 'unknown')}) and ${estimatedCount} ESTIMATED ` +
+          `(purchased SERP, as-of ${String(data.estimated?.provenance?.capturedAt ?? 'unknown')}). ` +
+          'They are NOT comparable point to point and MUST NOT be averaged, summed or merged into a ' +
+          'single figure: one is a real-user weighted average for this domain, the other is an exact ' +
+          'position for a synthetic query we issued. Report them side by side, each with its lens and ' +
+          `as-of. An unavailable lens is a state, never a zero (${result.requestId}).`
+        )
+      },
+      () => client.getSeoDualLensVisibility(input)
+    )
+  },
   async getSeoKeywordGap(input: { organizationId: string; market?: string; seoCompetitorId?: string; limit?: number }) {
     return callReadTool(
       result => {
@@ -974,6 +1018,62 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         )}. Rows are alphabetical facts with per-factor provenance — this reader does NOT rank; prioritization belongs to the SEO work queue (${result.requestId}).`
       },
       () => client.getSeoKeywordGap(input)
+    )
+  },
+  /**
+   * TASK-1700 — la cola priorizada: la ÚNICA autoridad de orden del módulo.
+   *
+   * El summary insiste en dos cosas porque son las que un agente rompe primero: que las
+   * bandas NO se comparan entre sí por su número, y que un `priorityScore` nulo no es cero.
+   */
+  async getSeoWorkQueue(input: {
+    organizationId: string
+    market?: string
+    origin?: string[]
+    limit?: number
+    cursor?: string
+  }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          ok?: boolean
+          errorCode?: string
+          staleness?: string
+          asOf?: string | null
+          priorityScoreVersion?: string | null
+          snapshot?: { itemCount?: number } | null
+          items?: Array<{ scoreBand?: number; recommendedVerb?: string; keyword?: string; priorityScore?: number | null }>
+          originHealth?: Array<{ origin?: string; state?: string; reason?: string | null }>
+        }
+
+        if (data.ok === false) {
+          return `SEO work queue unavailable (${String(data.errorCode ?? 'unknown')}) (${result.requestId}).`
+        }
+
+        if (data.staleness === 'absent') {
+          return `No work queue snapshot exists for this organization yet — the materializer has not run (${result.requestId}).`
+        }
+
+        const items = Array.isArray(data.items) ? data.items : []
+        const bands = new Map<number, number>()
+
+        for (const item of items) bands.set(item.scoreBand ?? 0, (bands.get(item.scoreBand ?? 0) ?? 0) + 1)
+
+        const degraded = (data.originHealth ?? []).filter(entry => entry.state !== 'ok')
+        const top = items[0]
+
+        return (
+          `SEO work queue (${data.staleness === 'stale' ? '⚠️ STALE — the plan expired, say so' : 'fresh'}, ` +
+          `as of ${String(data.asOf ?? 'unknown')}, score version ${String(data.priorityScoreVersion ?? 'unknown')}): ` +
+          `${items.length} of ${String(data.snapshot?.itemCount ?? items.length)} items in this page. ` +
+          `By band: ${[...bands].sort().map(([band, count]) => `band ${band}=${count}`).join(', ')}. ` +
+          (top ? `#1 is "${String(top.keyword)}" (${String(top.recommendedVerb)}, ${top.priorityScore === null ? 'no score' : `${String(top.priorityScore)} estimated incremental clicks`}). ` : '') +
+          (degraded.length > 0
+            ? `⚠️ ${degraded.length} origin(s) degraded — the plan is PARTIAL: ${degraded.map(entry => `${String(entry.origin)} (${String(entry.state)}: ${String(entry.reason ?? 'no reason')})`).join('; ')}. Report this; a degraded origin means work is MISSING from the list, not that there is none. ` : '') +
+          `(${result.requestId}).`
+        )
+      },
+      () => client.getSeoWorkQueue(input)
     )
   },
   /** TASK-1699 — serie del top-N del SERP ya pagado (dato competitivo, uso interno). */

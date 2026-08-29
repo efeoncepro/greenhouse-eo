@@ -293,6 +293,29 @@ Se envuelven en una sola narrativa de producto: **Search Visibility 360** = los 
 >
 > **Por qué está acá y no en el AEO.** Es el puente SEO↔AEO de la pantalla ancla: una **caída de CTR con posición estable** casi siempre se explica en la SERP, no en el sitio (señal 4 de §2, ahora medible en la misma serie). ⚠️ **NO cruza el boundary §1.1**: no hay JOIN, VIEW ni FK entre `seo_*` y `grader_*` — es una columna del snapshot SEO leída por el mismo reader que ya la capturaba.
 
+> **Delta 2026-08-29 (TASK-1785) — el contrato de honestidad dejó de ser una instrucción y pasó a ser un mecanismo.**
+>
+> Lo de arriba era correcto y estaba bien escrito. Su problema era **la capa**: la mezcla de lentes no ocurre DENTRO de una tool sino **ENTRE** dos, cuando alguien llama a las dos y redacta un párrafo. Esa composición no la ve ninguna tool, así que ninguna descripción podía defenderla — por bien escrita que estuviera.
+>
+> 🔴 **El diagnóstico real no era "falta el campo": era que el mismo hecho se decía en CINCO vocabularios paralelos**, y por eso ningún mecanismo podía verificarlo (no había un nombre común contra el cual comparar): `lens: 'estimated'` en tres readers · `SeoPerformanceSource = gsc_measured|dataforseo_estimated` · `measurementKind: 'estimated_market'` en 10 sitios del lane · `estimatedMarker`/`measuredMarker` en el DTO cliente de la cola · `ProspectLens`. Más los glifos ◑/● crudos en ~14 vistas, `src/lib/copy/growth.ts` y las descripciones de las tools. ⚠️ **El quinto no aparece grepeando `lens`** —sus campos no se llaman así—: el barrido que los halló a los cinco fue por **glifos e identificadores de rótulo**. Un grep angosto no es un inventario.
+>
+> **La lente vive a nivel de CIFRA, no de resultado, y hay dos pruebas vivas de signo opuesto:**
+> - `SeoPerformanceResult.source` declara UNA fuente para todo el DTO, pero su `summary` es SIEMPRE Search Console. Con `source = 'dataforseo_estimated'` viajaban cifras **medidas dentro de un envoltorio rotulado estimado**. No era el error de nadie: era la forma del contrato.
+> - `work-queue/client-dto.ts` **no** miente, y sólo porque abandonó el rótulo de resultado y lo puso por campo: el techo estimado (◑) convive con las impresiones medidas (●) en la **misma fila**. Llegó a la forma correcta por necesidad, no por diseño.
+>
+> **Qué existe ahora.** `src/lib/growth/seo/lens.ts` fija un vocabulario único: `SeoLens` binaria, fuentes en lista **cerrada** y `resolveSeoLens` total sobre ella. La lente se **deriva de la fuente** y **no se persiste**: es constante por tabla, así que una columna sólo podría divergir (alguien la escribe mal en un INSERT y aparecen filas GSC marcadas `estimated`). Los readers emiten `provenance: SeoProvenance[]` en su `ok: true`, en lista porque hay DTO genuinamente mixtos y rotularlos con una sola lente ERA el defecto.
+>
+> **El mecanismo son tres capas, no una afirmación:**
+> 1. **`tsc`** — `provenance` es requerido en el `ok: true`: un reader nuevo no compila sin declarar lente.
+> 2. **Cobertura de cifras** (`lens-coverage.ts`) — camina el DTO real y exige que **cada hoja numérica tenga exactamente un dueño**. Detecta las dos direcciones: sin dueño (el agujero) y con dos (ambigüedad, que no es redundancia). `notFigures` obliga a declarar qué números son parámetros y no mediciones.
+> 3. **Censo de superficies** (`lens-surface-manifest.ts`) — `tsc` cubre al reader, **no** a la superficie: el guard compara el censo contra el **filesystem** y contra `server.ts`, en ambas direcciones, y se mide **cuando corre**, no cuando alguien escribió el manifiesto (el checkout es compartido y una medición envejece en minutos).
+>
+> **🔴 `dataforseo_serp` es `estimated`, no `measured`.** Un Delta previo proponía lo contrario porque la posición del SERP comprado es *exacta*. **Exacto no es medido**: esa consulta la hicimos nosotros, desde una ubicación que elegimos, y ningún usuario la hizo. Rotularla `measured` la volvería promediable con GSC —la mezcla que todo esto existe para impedir— y rompería además la asimetría de `readKeywordGap`, que **excluye** las keywords con impresiones medidas precisamente porque la lente medida gana en vez de promediarse. Hay test de regresión.
+>
+> **Lectura compuesta.** `readDualLensVisibility` (+ tool `get_seo_dual_lens_visibility`) devuelve las dos series **separadas y rotuladas** en una llamada. Existe para invertir un incentivo: presentar bien las dos lentes costaba dos llamadas y una decisión, presentarlas mal costaba una y ninguna. 🔴 **No tiene campo combinado, y no es una omisión pendiente** — el shape no tiene dónde ponerlo y un test falla si aparece una clave que lo sugiera. Un índice único exigiría su propia ADR. **Convive** con `get_seo_visibility_360`, que cruza otra cosa (SEO×AEO, dos ejes ortogonales); ésta cruza medido×estimado dentro de SEO.
+>
+> **No hubo migración ni columna nueva, y ninguna cifra cambió de valor.**
+
 ---
 
 ## 6. DataForSEO governance
@@ -424,11 +447,21 @@ cablea al cliente público compartido"; el camino correcto es `TASK-1631`).
     `SEO_DISCOVERY_DEFAULT_VOLUME_POLICY = 'all'`: `keyword_suggestions` y `keyword_ideas` dejan
     de mandar `filters: [['keyword_info.search_volume','>',0]]`. El proveedor cobra por fila
     devuelta y `limit` ya acota las filas, así que el filtro **no bajaba el techo de costo** —
-    cambiaba qué filas se compraban por el mismo precio, y en un mercado ralo gastaba el `limit`
-    descartando el long-tail emergente. La corrida persiste `volumePolicy` por método en
-    `methods_json`; una corrida anterior sin el campo se lee con el default **histórico**
-    (`positive_volume_only` para suggestions/ideas, `all` para related/site) — el reader reproduce
-    la historia, no la reescribe.
+    cambiaba qué filas se compraban por el mismo precio. El valor del cambio es **cerrar la
+    asimetría no declarada** entre los cuatro adapters y dejar de IMPONER una exclusión que el
+    contrato nunca decía. 🔴 **Corrección con evidencia (smoke con gasto, 2026-08-28): el beneficio
+    que la spec prometía —"en un mercado ralo gastaba el `limit` descartando el long-tail
+    emergente"— NO se sostiene.** Medido: 3 corridas, 2 endpoints, 2 mercados (MX/CL), 102
+    candidatos, USD 0,0482 — **cero candidatos con volumen nulo o cero**; y el histórico del store
+    lo corrobora (`keyword_suggestions` 61 filas / 0 nulos). Los índices de sugerencias e ideas del
+    proveedor sólo devuelven keywords con volumen medido, así que ahí el filtro era un **no-op**:
+    filtraba una condición ya verdadera. Corolario: el estado "Sin dato de mercado" **sigue sin ser
+    alcanzable** desde suggestions/ideas —no por el filtro, sino por lo que contiene el índice— y
+    donde el volumen nulo SÍ aparece es en `keyword_overview` (15 de 62), que nunca llevó el filtro.
+    **NUNCA** citar el long-tail recuperado como beneficio de este cambio. La corrida persiste
+    `volumePolicy` por método en `methods_json`; una corrida anterior sin el campo se lee con el
+    default **histórico** (`positive_volume_only` para suggestions/ideas, `all` para related/site) —
+    el reader reproduce la historia, no la reescribe.
   - **Federación en el MISMO PR:** route admin, lane ecosystem y tool MCP `get_seo_keyword_discovery`
     parsean `maxLinkBarrier`/`includeUnknownBarrier` con el vocabulario cerrado y hacen passthrough
     de `ignoredFilters`; el gateway `efeonce-mcp` actualiza espejo de inventario, schema,
@@ -440,6 +473,44 @@ cablea al cliente público compartido"; el camino correcto es `TASK-1631`).
     representante y orden. **El caso de fusión no existe todavía en datos reales** (una sola
     corrida productiva, 10 candidatos de un solo método): el colapso es preventivo y llega antes
     del primer snapshot de `TASK-1700`, que es exactamente su razón de ser.
+
+  **Hallazgo abierto (2026-08-28) — el candidato NO transporta ninguna señal de pertinencia, y hay
+  DOS productores que la necesitan.** Sin dueño todavía; documentado acá para que no se
+  redescubra. Verificado de forma independiente por tres sesiones el mismo día.
+
+  - **El hecho.** `greenhouse_growth.seo_keyword_discovery_candidates` tiene ocho columnas de
+    sustancia (`keyword`, `normalized_keyword`, `seed_keywords_json`, `source_endpoint`,
+    `source_rank`, `captured_at`, `market_source`, `raw_payload_hash`) y **ninguna de marca,
+    categoría ni relevancia**; el DTO tampoco. Un candidato completamente ajeno al negocio pasa
+    TODOS los checks del módulo: tiene volumen, intención, `core_keyword` y barrera de enlaces.
+  - **Evidencia medida.** Corrida real `seokdr-82396674` (`keyword_ideas`, Chile, target
+    `seot-efeonce-own-brand` — agencia B2B que vende AEO): 50 candidatos de consumidor sobre
+    ChatGPT como producto (`chatgpt en linea` vol 480, `dueño de chatgpt` 90, `chatgpt rojo` 10,
+    `compartir suscripciones chatgpt`). Cero relación con el negocio, cero checks en rojo. Causa:
+    `keyword_ideas` resuelve una CATEGORÍA desde las seeds y **no exige que la contengan**, así que
+    una seed con entidad dominante resuelve a esa entidad. Contraste del mismo día: la corrida
+    `seokdr-7851e49c` (`keyword_suggestions`, seed = categoría de producto sin marca) devolvió una
+    escalera de long-tail comercial impecable.
+  - 🔴 **El vector estructural NO es la expansión de seeds: es `TASK-1662`.** En el gap competitivo
+    los candidatos salen de `domain_intersection` sobre dominios del competidor, y **nadie eligió
+    esas seeds — las eligió el competidor**, que sirve segmentos y mercados que el cliente no. En
+    la expansión, una seed mala es error de uso y se corrige educando al operador; en el gap **no
+    hay a quién pedirle que elija mejor**. Eso mueve la defensa de "validar la seed" a "el
+    candidato debe transportar una señal de pertinencia", que es otro problema y otro tamaño.
+  - **Por qué urge antes de `TASK-1700`.** El orden por defecto del reader pondera volumen
+    descendente. Un `priority_score` que herede esa señal pone `chatgpt en linea` (480) por encima
+    de un término pertinente con volumen 10 — y la cola es un aggregate **append-only**, así que
+    ese score queda escrito y no se corrige hacia adelante. Misma clase de problema que TASK-1694
+    cerró (duplicados y barrera engañosa congelados en el primer snapshot), por otra puerta.
+  - **Materia prima disponible, sin consumir.** `getActiveBrandIntelligence`
+    (`ai-visibility/brand-intelligence/store.ts`) expone `categoryLabel` y `businessModel` por
+    perfil. El único archivo de `growth/seo/**` que la toca es `grounded-query-bridge.ts` — el
+    puente AEO, no discovery. ⚠️ Consumirla desde discovery exige respetar el boundary §1.1: cruce
+    en memoria por `organization_id`, jamás JOIN/VIEW/FK entre `seo_*` y `grader_*`.
+  - **Alcance recomendado: SEÑAL, no filtro.** Hermana de `clusterConflict` — advertencia con
+    evidencia, tres estados, y `unknown` que jamás se lee como `clear`. Un filtro duro en discovery
+    descartaría long-tail legítimo **en silencio**, y ese error es invisible; la advertencia deja la
+    decisión donde corresponde. Quien ordena (`TASK-1700`) o promueve a tracking la consume.
 
   **Delta TASK-1692 (2026-08-28) — el ledger de decisiones lo escribe el primitive que produce el
   hecho, jamás el consumer.** Sin migración, sin flag, sin capability nueva.
@@ -515,7 +586,15 @@ cablea al cliente público compartido"; el camino correcto es `TASK-1631`).
 - `readKeywordOpportunities(targetId)` → **striking-distance** sobre la serie GSC (TASK-1302, implementado). Método fijado con la skill `seo-aeo`:
   - **Posición 8–20** ponderada por impresiones: `SUM(position × impressions) / SUM(impressions)` sobre una ventana de **28 días** (4 ciclos semanales completos). `AVG(position)` entre días es incorrecto — GSC ya entrega su `position` ponderada dentro del período, así que promediar días planos daría el mismo peso a un día de 2 impresiones que a uno de 500.
   - **"Alta impresión" es un percentil de la propia organización** (default P75), no un número absoluto: un sitio de 100 impresiones/día y uno de 1M no comparten umbral. Con piso estadístico (bajo ~10 impresiones la posición media no es interpretable).
-  - **Score = clics incrementales estimados**: `impresiones × max(0, CTR_objetivo − CTR_actual)`. Las impresiones de GSC **ya son demanda medida** — y de la propia SERP, mejor que un volumen estimado por un tercero. La curva de CTR por posición se **deriva de los datos de la propia org**, de modo que absorbe sola el efecto de los AI Overviews en ese sitio; hay una curva pública de fallback sólo para posiciones sin datos propios.
+  - **Score = clics incrementales estimados**: `impresiones × max(0, CTR_objetivo − CTR_actual)`. Las impresiones de GSC **ya son demanda medida** — y de la propia SERP, mejor que un volumen estimado por un tercero. La curva de CTR por posición se **deriva de los datos de la propia org**, de modo que absorbe sola el efecto de los AI Overviews en ese sitio. 🔴 **La curva DECLARA si es utilizable, y el consumidor nunca lo infiere de la presencia de una clave (TASK-1792, corrige la frase anterior "hay una curva pública de fallback sólo para posiciones sin datos propios" — era falsa: el fallback era inalcanzable para un bucket presente con CTR cero).** El primitive es `src/lib/growth/seo/ctr-curve.ts` y sus contratos duros son:
+    - **La usabilidad de un bucket exige impresiones Y clics, jamás impresiones solas.** La precisión de un estimador de tasa la gobiernan los **éxitos**: un bucket con 50.000 impresiones y 3 clics tampoco tiene curva, y uno con 10 impresiones y 0 clics es compatible con cualquier CTR entre 0% y 26%. Piso `1000/5`, **adoptado** de `work-queue/score-versions.ts` (no propuesto acá) y sostenido por un test que compara el **veredicto** del predicado sobre curvas fixture, no las constantes — comparar números quedaría verde si una versión del score agregara una tercera condición.
+    - 🔴 **`MIN_IMPRESSIONS_FLOOR = 10` del reader NO es ese piso, y jamás vuelve a serlo.** Responde «¿es interpretable la posición media?» (uso legítimo, mismo en `gap/read-seo-aeo-gap.ts`), no «¿es estimable el CTR?». Una constante respondiendo dos preguntas estadísticas distintas fue la mitad del defecto.
+    - **Un `0` medido y "sin muestra suficiente" son estados distintos y jamás se colapsan.** El contrato transporta `ctrCurveSource` (`org_measured` · `org_level_reference_shape` · `unusable` · `fallback`), `curveSampleSize` (`{impressions, clicks}` o `null` cuando nunca se observó esa posición), `targetPosition`, `expectedCtrAtTarget` y `orderedBy` en el **envelope** del resultado — un hecho de la lente, no un atributo por keyword. Los tres consumers (page server, lane ecosystem, tool MCP) son passthrough y heredan la procedencia sin lógica propia.
+    - 🔴 **Si el criterio primario no discrimina, la lente ordena por el secundario y lo DICE.** Un `.sort()` sobre un campo de varianza cero preserva el orden de entrada y finge haber ordenado; el criterio declarado es `measured_demand` (impresiones × cercanía a página 1, todo medido).
+    - **La curva de referencia se presta en FORMA, no en nivel.** Sus valores son los CTR medidos sobre filas no-marca documentados en la skill `seo-aeo` (`modules/07_MEASUREMENT.md`, as-of 2026-08), no una tabla de industria: normalizadas a la posición 1, la pública, la de `berel.com` y la de la skill decaen igual, pero el nivel de la pública (27% en posición 1) está un orden de magnitud por encima de los dos sitios medidos (4,72% y 4,25%). El **nivel** se estima del agregado del propio sitio (un parámetro) cuando hay muestra; la **forma** se presta. La curva expuesta se fuerza **monótona no creciente** — el híbrido anterior producía bucket 8 en `0,0000` y bucket 9 en `≈0,027`.
+    - ⚠️ **La curva se calcula sobre filas `all_rows`, con marca incluida.** El oficio pide no-marca (la explosión por sitelinks infla los buckets 1–2); es un defecto INDEPENDIENTE del tamaño de muestra —no se cura cuando el sitio crezca— y tiene follow-up propio. Declarado para que ningún consumidor lea la curva creyéndola libre de ese sesgo.
+    - 🔴 **`ctrCurveSource` es DOS tipos distintos con un valor en común, y la palabra `unusable` NO significa lo mismo en los dos.** En la lente (`contracts.ts`) es `org_measured | org_level_reference_shape | unusable | fallback`, y en `unusable` **sí se computa y se devuelve una ganancia** (prestada de la referencia): `estimatedClickGain` es `number` y **nunca** colapsa a `0` para señalar dato faltante — ese cero fabricado ERA el defecto. En la cola (`work-queue/contracts.ts`) es `org_measured | unusable | not_applicable`, y en `unusable` el `priority_score` es legítimamente **`NULL`** (banda 2), porque su contrato SÍ admite la ausencia. Mismo nombre de campo, mismo string, consecuencias opuestas. **NUNCA documentes ni razones sobre uno leyendo el otro**: pasó el 2026-08-28 —la description de la tool MCP afirmaba *"so no gain could be computed"* proyectando la semántica de la cola sobre la lente— y produjo, dentro del contrato, la misma confusión de ausencia que el código ya había cerrado. Al cruzar entre ambos, el puente es `work-queue/opportunities-adapter.ts`, y la costura peligrosa **era** la conversión `null → number`: convertir un `score: null` en `0` reintroducía el sentinel exacto que la lente prohíbe, y un consumidor no podía distinguir esa fila de una que genuinamente no tiene techo. 🔴 **Cerrado el 2026-08-28 (TASK-1700) y la forma del arreglo es la lección:** el adapter **no traduce** — si alguna fila que llegaría a la lente carece de techo, devuelve `null` y el caller cae al reader legacy, que sabe ordenar ese caso (`orderedBy: 'measured_demand'`). O sea que la cola sirve la lente **sólo si puede hacerlo sin fabricar un número**. En la práctica es una condición por ORGANIZACIÓN, no por fila: la curva se evalúa a nivel de org en la posición objetivo, así que o todas las filas tienen score o ninguna lo tiene. **NUNCA reintroduzcas un mapeo `null → 0` en esa costura**: cuando dos contratos usan la misma palabra con semánticas inversas, la traducción no se arregla eligiendo mejor el valor — se arregla no traduciendo.
+    - Verificación: `src/lib/growth/seo/ctr-curve.live.test.ts` contra PG real (`pnpm test:live`) — cierra la costura que dejó pasar el defecto, donde los mocks ejercitaban el TS sin el SQL y el sanity el SQL sin el TS.
   - **Canibalización se marca, no se descarta** (`cannibalized` + `competingPages`): una query con >1 página es una oportunidad de **consolidación**, no de optimización.
   - Volumen/dificultad de DataForSEO Labs es **enriquecimiento**, no el corazón. **IMPLEMENTADO (TASK-1661, en producción desde el release `3754a17d3b1d`, 2026-08-14):** `market` **ya no está cableado a `'unavailable'`** — pasa a `'available'` cuando hay al menos una captura para las keywords de esa lectura, y cada `KeywordOpportunity` viaja además con `linkBarrier` (`low | medium | high | unknown`) **ya derivada server-side**, para que ninguna vista invente su propio umbral. El striking-distance sigue siendo demanda **medida** de GSC y no depende del enriquecimiento: con `market: 'unavailable'` el reader entrega igual la lista completa, con `linkBarrier: 'unknown'` por fila.
 - `readKeywordMarketData({ keywords, locationCode, languageCode })` → **IMPLEMENTADO (TASK-1661, en producción desde el release `3754a17d3b1d`, 2026-08-14)** en `src/lib/growth/seo/keyword-market-data.ts`. Reader canónico del dato de mercado (lente ◑ **estimada**, ciclo de refresh **mensual** del proveedor). Consumers: `readKeywordOpportunities`, lane `/api/platform/ecosystem/growth/seo/keyword-market-data`, MCP tool `get_seo_keyword_market_data` **federada al gateway `mcp.efeonce.org`** y los carriles de `TASK-1664`/`TASK-1662` (ambos ya implementados). Los otros tres primitives del mismo archivo cierran el ciclo y **ninguno es sustituible por SQL ad-hoc**: `captureKeywordMarketData(targetId, actor)` (el único que **gasta**), `previewKeywordMarketDataCapture(...)` (**dry-run obligatorio antes de gastar**: reporta fórmula, keywords elegibles y costo estimado sin llamar al proveedor) y `deriveLinkBarrier({ avgReferringDomains, avgPageRank })` (derivación **pura**, probable sin base de datos porque es una regla de producto, no una consulta). Contratos duros:
@@ -589,7 +668,7 @@ Cloud Scheduler + ops-worker (async-critical), nunca Vercel cron.
   - **Gate de costo:** pre-check de **frescura** (no de existencia) ANTES del proveedor + `enforceSeoRunEntitlement` con el estimado del batch + spend fence cada 10 llamadas + `previewKeywordMarketDataCapture` como **dry-run obligatorio** que reporta fórmula y costo sin gastar. El ledger lo escribe el **transporte**, y el costo del batch se atribuye a **una** fila (§7).
   - **Costo medido (2026-08-13):** 31 keywords de Berel = 1 llamada = **USD 0.0157**; una segunda corrida dentro del mismo ciclo mensual cuesta **USD 0**.
 
-- **Keyword discovery (TASK-1664, LIVE desde 2026-08-14 — flag ON en ambos runtimes + scheduler ACTIVO, autorización del operador tras smoke live):** Cloud Scheduler `ops-seo-keyword-discovery-drain` (`*/10 * * * *`, declarativo en `deploy.sh`, **ACTIVO**) → `POST /seo/keyword-discovery/drain` en ops-worker → `drainKeywordDiscoveryRuns` → claim atómico `pending → running` por corrida (UPDATE condicional: el segundo worker matchea cero filas y responde `busy` sin gasto). **Sin enqueue automático**: el drain con cola vacía es no-op y el gasto sólo ocurre cuando un operador/agente encola una corrida que ya pasó preview + gate.
+- **Keyword discovery (TASK-1664, LIVE desde 2026-08-14 — flag ON en ambos runtimes + scheduler ACTIVO, autorización del operador tras smoke live):** Cloud Scheduler `ops-seo-keyword-discovery-drain` (**`*/2 * * * *`** desde el 2026-08-28 — bajado de `*/10` porque la lente es interactiva y el drain con cola vacía es no-op, así que la cadencia no cuesta; declarativo en `deploy.sh`, **ACTIVO**) → `POST /seo/keyword-discovery/drain` en ops-worker → `drainKeywordDiscoveryRuns` → claim atómico `pending → running` por corrida (UPDATE condicional: el segundo worker matchea cero filas y responde `busy` sin gasto). **Sin enqueue automático**: el drain con cola vacía es no-op y el gasto sólo ocurre cuando un operador/agente encola una corrida que ya pasó preview + gate.
   - 🔴 **El outbox NO es cola de trabajo en este dominio.** `growth.seo.keyword_discovery.requested` (emitido en la MISMA transacción del enqueue) y `...completed` son trazabilidad/mirror; el despacho real es SIEMPRE Cloud Scheduler → drain, igual que el resto de los batches SEO.
   - **El enqueue vive en Vercel** (`queueKeywordDiscovery`: resuelve seeds server-side, calcula costo conservador con fórmula, consulta `enforceSeoRunEntitlement` y deja run `pending` + outbox en una transacción — NUNCA llama al proveedor); **la ejecución vive en el worker** (`runKeywordDiscovery`: gate de nuevo antes de la primera llamada, fence cada 10 llamadas cobradas, hasta 30 llamadas por corrida). Las llamadas Live corren FUERA de transacción; el cierre (candidatos + estado + outbox) es UNA transacción.
   - 🔴 **El candidato guarda SOLO procedencia** (run, seed, endpoint, `source_rank`, `captured_at`); la métrica de mercado es el hecho de TASK-1661 y el `keyword_info` inline **ya pagado** de las respuestas de discovery se persiste en `seo_keyword_market_data` vía el writer canónico `persistKeywordMarketData` (único writer del store, compartido por 1661/1664/1662). `keyword_overview` es **top-up** sólo del faltante/vencido (pre-check `loadFreshMarketKeywords`, hasta 200 keywords en ≤2 llamadas de 100). Medido en el smoke: los 10 candidatos del run quedaron frescos por el inline y el top-up costó **cero llamadas**.
@@ -1195,3 +1274,521 @@ runbook de extracción, no deuda oculta.
   domain-package` + nota Wave. La extracción física NO se autoriza desde una task de feature.
 
 Fuente: directiva del operador 2026-08-05 + `EPIC-037` + `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`.
+
+---
+
+## 18. La cola priorizada de trabajo — el aggregate que manda el orden (TASK-1700)
+
+**Estado 2026-08-29:** código en `develop` (`962d22118` · `0165e0e75` · `a712ebccb` · `dc2db094d` ·
+`aaeec2e9b` · `0ef8c5776` · `9020d6421` · `8b0673d9e` — el último trae, además de la capa documental,
+el cierre de la costura `null → 0` del adapter y el gate del volumen estimado partido en dos asserts),
+tres migraciones aplicadas en la instancia única de Cloud SQL (`…_task-1700-seo-work-queue.sql`,
+`…_task-1700-work-queue-keyset-collation.sql`, `…_task-1700-work-queue-decide-capability.sql`),
+`pnpm typecheck` en 0 errores y build de producción verde,
+**flag `GROWTH_SEO_WORK_QUEUE_ENABLED` OFF en los dos runtimes y scheduler PAUSADO**.
+
+### 18.1 Por qué es un aggregate persistido y no un reader en vivo
+
+El módulo tenía **cuatro listas con cuatro criterios de orden no comparables entre sí** — la lente de
+oportunidades con un score no versionado, el gap SEO↔AEO por cuadrante, discovery con su sort
+compuesto de 8 llaves (`keyword-discovery/reader.ts`), y el gap competitivo sin orden propio. Cada
+una ordena bien según su lógica y **nadie puede decir cuál de los cuatro #1 va primero**. Ése era el
+problema, no que alguna ordenara mal.
+
+Tres razones por las que la respuesta es un aggregate append-only y no una VIEW ni un reader que
+recompone al vuelo:
+
+1. **Un origen no se puede unir por SQL.** `readSeoAeoGap` son dos queries unidas **en memoria por
+   diseño** — motores aislados con providers, cadencias y breakers distintos — y su propio archivo
+   declara que unirlas por SQL «es la violación más cara posible acá». Una VIEW queda descartada de
+   entrada (boundary §1.1).
+2. **Reproducibilidad.** Un reader que reordena en cada llamada hace que «la recomendación #1 de la
+   mañana» sea inauditable a las 3 pm: el operador no puede demostrar qué vio cuando decidió, y el
+   cliente tampoco.
+3. **El score existía sin versionar.** `DEFAULT_TARGET_POSITION = 5`,
+   `DEFAULT_IMPRESSIONS_PERCENTILE = 0.75` y `MIN_IMPRESSIONS_FLOOR = 10` eran constantes de módulo
+   en `keyword-opportunities-reader.ts`: cambiar cualquiera movía el ranking histórico completo sin
+   dejar rastro.
+
+### 18.2 Las tres tablas (append-only con DOS capas independientes)
+
+`migrations/20260828224403660_task-1700-seo-work-queue.sql`, aditiva, sin `ALTER` sobre nada
+existente:
+
+| Tabla | Qué es | Clave / restricción load-bearing |
+|---|---|---|
+| `greenhouse_growth.seo_work_queue_snapshots` | una corrida del materializador | `UNIQUE (organization_id, seo_target_id, priority_score_version, input_snapshot_hash)` = idempotencia sin lock aplicativo; `CHECK (expires_at > computed_at)` |
+| `greenhouse_growth.seo_work_queue_items` | una fila puntuable del snapshot | `seo_work_queue_items_basis_band_score`; `seo_work_queue_items_aeo_requires_source_version`; `UNIQUE (snapshot_id, origin, normalized_keyword)` |
+| `greenhouse_growth.seo_work_queue_decisions` | decisión humana sobre un **sujeto** | anclada a `(seo_target_id, origin, normalized_keyword)`; `item_id`/`snapshot_id` como evidencia, jamás como clave |
+
+🔴 **Append-only ESTRICTO, en dos capas que no dependen una de la otra:** trigger
+`greenhouse_growth.block_seo_row_mutation()` (reusado de TASK-1299) `BEFORE UPDATE OR DELETE` en las
+tres tablas, **y** GRANTs de `SELECT, INSERT` a `greenhouse_runtime`/`greenhouse_app` — sin `UPDATE`
+ni `DELETE`. Aunque alguien dropee el trigger, el rol de runtime sigue sin poder mutar una fila.
+Recomputar es un snapshot NUEVO; **«marcar el item como hecho» es una fila en `..._decisions`**,
+nunca una mutación del item.
+
+La migración cierra con el bloque `DO $$ … RAISE EXCEPTION` anti pre-up-marker (ISSUE-068) que aborta
+si faltan las 3 tablas, los 3 constraints load-bearing, los 3 triggers o el CHECK de vocabulario
+cerrado de `origin`.
+
+### 18.3 🔴 Sin demanda medida no hay score
+
+Es el invariante `●` medido / `◑` estimado aplicado al **ORDENAMIENTO**, y vive en el esquema, no en
+el código. El CHECK `seo_work_queue_items_basis_band_score`
+(`migrations/20260828224403660_…:114`) ata **tres cosas a la vez** — base, banda y nulidad del score:
+
+| `score_basis` | Banda | `priority_score` | Qué significa | Desempate dentro de la banda |
+|---|---|---|---|---|
+| `measured_incremental_clicks` | 1 | **NOT NULL** (clics) | hay impresiones de GSC **y** la curva propia es utilizable en la posición objetivo | el score |
+| `measured_without_curve` | 2 | **NULL** | hay demanda medida, pero la curva no alcanza para afirmar un CTR esperado | impresiones (demanda **medida**) |
+| `no_measured_demand` | 3 | **NULL** | nadie llegó por esa keyword en la ventana; verbo `measure` | 🔴 **alfabético** |
+
+🔴 **Está PROHIBIDO puntuar la banda 3 con el volumen estimado del proveedor.** No es purismo: en
+SERPs es-LATAM el volumen del proveedor es la peor señal disponible (`ISSUE-152` — `pintura`,
+135.000 búsquedas/mes en MX, daba KD 0), así que ordenar por él sería ordenar por la peor lente
+teniendo la mejor al lado. El volumen **ni siquiera está disponible** en `PriorityScoreInput`
+(`priority-score.ts:138`), a propósito: lo que no se puede pasar no se puede usar por accidente. Y
+decir «0 clics de ganancia» en la banda 2 sería fabricar una medición, no reportar una.
+
+🔴 **La base del score depende de la EVIDENCIA, no del origen.** Una keyword con impresiones reales
+se puntúa venga de donde venga — un candidato de discovery **puede** tener demanda medida
+(`readKeywordDiscovery` compone `measuredGsc` y su orden por defecto premia justo ese caso) — y una
+sin impresiones no recibe score aunque el proveedor le estime volumen. Atarlo al origen habría sido
+una regla que se rompe sola.
+
+### 18.4 El score: clics incrementales sobre la curva del propio sitio
+
+`computePriorityScore` (`priority-score.ts:159`) es una función **pura** — la curva y los insumos
+entran como argumentos, así que el test ejercita la fórmula y no un mock de base de datos:
+
+```
+priority_score = impresiones_GSC × max(0, CTR_esperado_en_posición_objetivo − CTR_actual)
+```
+
+El `max(0, …)` no es defensivo: si la keyword ya convierte mejor que la media de la posición
+objetivo, la ganancia por ranking es 0 y el `basisReason` lo dice — «si hay algo que ganar, está en
+el snippet, no en el ranking».
+
+⚠️ **Es un TECHO, no un pronóstico.** Supone que el CTR observado en esa posición se repite; **no**
+dice que la página vaya a llegar ahí. Y **no es ventaja competitiva por sí solo**: seoClarity y
+Sistrix también derivan la curva del GSC del propio cliente. Lo propio es la **combinación** —curva
+del propio GSC aplicada a un **cambio de posición**— y que el mismo score ordene varios orígenes,
+incluido el gap AEO. No usar «ninguna herramienta puede» en material comercial sin reverificar a la
+fecha.
+
+#### 🔴 El piso de muestra de la curva, y su aritmética
+
+`isCurveUsableAtPosition` (`priority-score.ts:124`) es la fuente **única** del piso: lo consumen el
+score, el materializador y el gate de paridad. Un bucket es utilizable sólo con **≥1000 impresiones
+Y ≥5 clics**, y los dos números tienen razón, no costumbre:
+
+- **`curveMinBucketImpressions = 1000`.** Con un CTR verdadero de ~1% —el orden de magnitud real en
+  verticales deprimidos por AI Overviews; el bucket 5 del target de Berel da 37.600 impresiones /
+  370 clics = **0,98%**— `P(0 clics | n=75) ≈ 47%`: observar cero es una moneda al aire. Con n=1000
+  esa probabilidad cae a **~0,004%**, y recién ahí un cero observado significa algo.
+- **`curveMinBucketClicks = 5`.** El error relativo de un conteo es ≈ `1/√k`: con 5 clics, **~45%**.
+  Estimable, no preciso — el piso más laxo que todavía sostiene un ORDEN.
+
+**NUNCA cites uno de estos umbrales sin su razonamiento.** El caso que los motiva, medido contra PG
+el 2026-08-28: `efeoncepro.com` tiene **75 impresiones y 0 clics** en el bucket 5. Tomar ese 0 como
+«CTR esperado» produce ganancia 0 para TODA la lente y un orden arbitrario, **sin lanzar ningún
+error** — es el defecto que `TASK-1792` cerró del lado del reader legacy y que esta cola no hereda,
+porque el piso exige impresiones **y** clics: un bucket sin clics nunca llega a ser un CTR esperado,
+cae a banda 2 con score `NULL`.
+
+#### La versión del score es un objeto, no constantes sueltas
+
+`PRIORITY_SCORE_CONFIGS` (`score-versions.ts:96`) es **APPEND-ONLY**: se agregan versiones, nunca se
+editan. `incremental-clicks-v1` lleva **toda** la config que mueve el orden — `windowDays: 28`,
+`targetPosition: 5`, `minPosition: 8`, `maxPosition: 20`, `impressionsPercentile: 0.75`,
+`minImpressionsFloor: 10`, `ctrCurveScope: 'all_rows'`, y los dos pisos de muestra.
+
+🔴 **Cambiar un peso, un umbral, la posición objetivo o la forma de derivar la curva OBLIGA a versión
+nueva.** El test congela la huella (`fingerprintPriorityScoreConfig`, `score-versions.ts:127`) y
+falla nombrando qué hacer; la señal `growth.seo.work_queue.score_version_drift` cubre el otro lado en
+runtime.
+
+**Dos objetos y no uno, porque las dimensiones son ortogonales.** `WORK_QUEUE_RUNTIME_CONFIG`
+(`score-versions.ts:139`: `snapshotTtlHours: 26`, `minRecomputeIntervalMinutes: 60`,
+`maxItemsPerOrigin: 200`) queda **fuera de la huella**: son knobs operativos que no reordenan nada, y
+exigir un bump por tocarlos castigaría el ajuste operativo y devaluaría la señal que la versión
+pretende dar.
+
+`ctrCurveScope` enumera `all_rows | non_brand` a propósito aunque v1 sólo implemente el primero: una
+versión futura que declare `non_brand` sin implementarlo tiene que **romper el build**, no servir una
+curva equivocada en silencio. (Con dimensiones `[query, page]` una sola búsqueda con varias páginas
+del sitio genera una fila por página; en marca la inflación es grande, en no-marca fue 1,0x–1,1x. La
+posición objetivo de v1 es la 5, donde el efecto es despreciable — pasar a `non_brand` es
+`incremental-clicks-v2`.)
+
+### 18.5 Vocabularios cerrados: ampliar es una migración, no un string en TS
+
+Los tres son CHECK en DB y su espejo TS vive en `work-queue/contracts.ts`. **El esquema es la
+autoridad; si divergen, gana PostgreSQL.**
+
+- **6 `origin`** (`contracts.ts:17`): `gsc_striking_distance` · `discovery_candidate` ·
+  `declared_target` · `aeo_gap` · `competitor_gap` · `consolidation`.
+- **4 `recommended_verb`** (`contracts.ts:33`): `optimize` · `create` · `consolidate` · `measure`.
+- **4 `decision`** (`contracts.ts:157`): `accepted` · `deferred` · `dismissed` · `done`.
+
+🔴 **Los orígenes NUNCA se promedian.** Un objetivo declarado en posición 60 es **distancia por
+recorrer**, no urgencia; mezclarlo con un striking-distance de posición 9 en un promedio produce un
+número que no significa nada. Cada origen aporta filas con su propia base y su propia banda.
+
+🔴 **La canibalización entra como `origin='consolidation'` con `recommended_verb='consolidate'`,
+jamás como `optimize`.** No es una keyword que empujar: son dos URLs que fusionar. Ordenarla junto a
+un «optimizar» le pide más contenido a un problema causado por tener contenido de más. El colector de
+striking-distance **excluye** `competing_pages > 1` y las manda al de consolidación
+(`collectors/gsc-striking-distance.ts:101`); el reader legacy las marcaba y las dejaba en la misma
+lista, que es justo lo que hace que el operador tome la decisión errada (brecha S8 de la auditoría).
+
+**`competingPages` se persiste como DATO en el breakdown** (`contracts.ts:125`,
+`collectors/consolidation.ts:147`), no sólo dentro de la prosa de `basisReason`: el consumer que
+renderiza la lente necesita el número, y parsearlo de una frase lo ataría a la redacción — la clase
+de acople que se rompe la primera vez que alguien mejora el texto.
+
+### 18.6 🔴 `evidence_ref` es OPACA: cero FK, cero JOIN
+
+`TEXT`, formato `<motor>:<entidad>:<id>`, prefijos en `EVIDENCE_REF_PREFIX` (`contracts.ts:173`). No
+participa de ninguna FK ni de ningún JOIN en el módulo: el consumer que tenga permiso la resuelve con
+el reader del motor dueño. **Es lo que sostiene el boundary §1.1** — cero acople `seo_*` ↔ `grader_*`
+— y lo que permite que el aggregate viaje entero en la extracción a Wave (§17.3) sin arrastrar
+esquemas ajenos.
+
+**El lado AEO se lee ÚNICAMENTE vía `readSeoAeoGap`** (`collectors/aeo-gap.ts`): ni una línea de SQL
+contra `grader_*`, y un test de boundary lo fija. El CHECK
+`seo_work_queue_items_aeo_requires_source_version` obliga a que todo item `origin='aeo_gap'` registre
+el `source_score_version` del motor de origen — el reader lo expone como `aeoLens.scoreVersion`. Sin
+él, una recalibración del grader movería filas de la cola sin que nadie pueda decir por qué: el mismo
+agujero que `priority_score_version` cierra del lado SEO.
+
+Sólo entran los cuadrantes `riesgo` (rankeas y no te citan → `optimize`) e `invisible` (no hay nada
+que citar → `create`). `dominante` no es trabajo, y `oportunidad` ya es territorio del
+striking-distance; meter los cuatro convertiría la cola en un espejo de la matriz en vez de una lista
+de trabajo.
+
+### 18.7 Deduplicación por SUJETO, con precedencia de ACCIÓN
+
+La primera corrida real sobre `berel.com` dejó `pinturas` en el puesto **#1 como `consolidate` y en
+el #2 como `optimize`, con el mismo score**: el mismo sujeto, dos verbos contradictorios pegados, y
+la cabeza de la cola a mitad de duplicados. Los dos hechos eran ciertos, pero una cola que dice dos
+cosas sobre la misma keyword falla justo la pregunta que existe para contestar.
+
+`dedupeBySubject` (`materialize.ts:176`) colapsa por **keyword normalizada** (no por
+`(origin, keyword)` — la `UNIQUE` de la tabla permite lo segundo a propósito, porque el esquema no
+debe impedir que dos motores hablen del mismo término; el **plan del día** se compone con lo
+primero). El ganador se elige con `ORIGIN_ACTION_PRECEDENCE` (`materialize.ts:152`), y el orden es de
+**DEPENDENCIA entre acciones**, no de importancia:
+
+1. `consolidation` — **es bloqueante**: empujar una keyword canibalizada es la acción equivocada;
+   primero se fusiona, después se optimiza.
+2. `gsc_striking_distance` — demanda medida y a un empujón.
+3. `declared_target` — compromiso humano vigente.
+4. `aeo_gap` — citabilidad sobre contenido que ya existe y ya rankea.
+5. `competitor_gap` — lente estimada del proveedor.
+6. `discovery_candidate` — estimado y todavía sin decidir.
+
+🔴 **La BANDA manda por encima de la precedencia**: deduplicar nunca puede enterrar un sujeto en una
+banda peor de la que le corresponde por evidencia. Y esto **no es promediar orígenes** (sigue
+prohibido; ningún score se mezcla): es elegir QUÉ ACCIÓN se recomienda. Los orígenes suprimidos
+viajan en `breakdown.alsoSurfacedBy` — un sujeto es UNA decisión, pero la evidencia de por qué
+aparece sigue siendo de varios motores, y suprimir sin dejar rastro convertiría la deduplicación en
+pérdida silenciosa de información. Un origen que nadie agregó a la precedencia va **al final**: el
+default seguro es «no desplaza a nadie».
+
+### 18.8 🔴 El orden canónico, y las dos formas en que se rompió
+
+```sql
+ORDER BY score_band ASC,
+         priority_score DESC NULLS LAST,
+         normalized_keyword COLLATE "C" ASC
+```
+
+El mismo orden lo aplican el comparador en JS (`compareWorkQueueItems`, `materialize.ts:97`, que
+decide el `rank_in_snapshot` persistido), el índice `seo_work_queue_items_keyset_idx`
+(`migrations/20260829000423538_task-1700-work-queue-keyset-collation.sql`) y el keyset del reader
+(`reader.ts:242`). Los tres tienen que ordenar **idéntico**; los dos defectos siguientes aparecieron
+ejercitando una corrida real de punta a punta, **no en los tests**, y ambos son silenciosos.
+
+**(a) `COLLATE "C"` no es decorativo.** La base corre con `en_US.UTF8`, que **ignora el espacio** al
+comparar: para PostgreSQL `berelex` < `berel green` (compara `berelgreen`, y `e` < `g`), mientras
+`String.prototype.localeCompare` los ordena al revés. Con 75 items empatados en
+`priority_score = 0.0000`, el desempate por keyword carga todo el peso del orden. Resultado medido:
+la paginación por keyset recorría **631 de 635 filas — salteaba 4 en silencio** — y el orden servido
+divergía del persistido desde el índice 0. Se arregla con orden de **bytes** y no «arreglando el lado
+JS» porque `en_US.UTF8` viene de glibc y `localeCompare` de ICU: no son la misma tabla y no hay forma
+de garantizar que coincidan. `COLLATE "C"` sí lo reproduce JS exactamente con una comparación de code
+points, y esa igualdad es demostrable en vez de aproximada. Es un **desempate**, no el orden
+principal, y `normalized_keyword` ya viene NFKC + minúsculas de `normalizeMarketKeyword`, así que el
+caso feo de `COLLATE "C"` (mayúsculas antes que minúsculas) no aplica.
+
+**(b) 🔴 El alias del score NO puede llamarse como la columna — bug class del módulo.**
+`priority_score::text AS priority_score` parece inofensivo y **rompe el orden completo**: PostgreSQL
+resuelve el `ORDER BY` contra los nombres de **SALIDA** antes que contra los de la tabla, así que el
+`ORDER BY priority_score DESC` pasaba a ordenar el **TEXTO** — `'8.8612'` antes que `'72.1405'`,
+porque `'8' > '7'`. La cola servía un orden que no era el persistido y ningún test lo veía: con
+scores de un solo dígito o todos `NULL` el bug es invisible. Por eso el alias es
+`priority_score_text` (`reader.ts:221`). **NUNCA aliasear una columna numérica con su propio nombre
+tras castearla a texto en una query que ordena por ella.**
+
+La comparación del cursor se escribe **expandida** y no como tupla `(a,b,c) > (x,y,z)` porque
+`priority_score` es `NULL` en las bandas 2 y 3, y la comparación de tuplas con `NULL` no ordena:
+devolvería filas al azar en el borde de página. El cursor viaja en base64url para que ningún consumer
+lo construya a mano.
+
+La paginación es **estable por construcción**: el universo no crece bajo el cursor porque el snapshot
+es inmutable — recomputar es una fila nueva. Eso resuelve de raíz el problema declarado en
+`TASK-1693`.
+
+### 18.9 El materializador: aislamiento, idempotencia y una sola transacción
+
+`materializeSeoWorkQueue` (`materialize.ts:318`). Cuatro decisiones que definen el archivo:
+
+- **Composición EN MEMORIA, cero SQL cross-motor.** Cada colector produce sus filas por separado y el
+  materializador las compone.
+- **Aislamiento de fallas: `Promise.allSettled`, jamás `Promise.all`** (`materialize.ts:384`). Con
+  `all`, un rechazo tumbaría el plan completo del día por un motor ajeno. Un colector que **lanza**
+  en vez de degradar es un bug del colector: se contiene, se reporta con `captureWithDomain(…,
+  'growth', …)` y el resto del plan sigue en pie.
+- **Idempotencia por `input_snapshot_hash`** (`computeInputSnapshotHash`, `materialize.ts:224`). El
+  hash se computa sobre lo que **decide el contenido** —versión del score + `(origin, keyword,
+  basis, score)` de cada item + la salud por `(origin, state, itemCount)`— y **NO** sobre `reason`,
+  `asOf` ni el reloj. La salud entra porque dos snapshots con los mismos items pero distinta salud no
+  son el mismo hecho: si un origen se cae y sus filas ya venían vacías, el plan es idéntico pero la
+  evidencia sobre su COMPLETITUD cambió, y reusar ahí serviría una declaración de honestidad vencida.
+  `reason` y `asOf` quedan fuera porque son redacción y relojes que se mueven solos —
+  `marketFreshness` y `latestRunAt` harían que cada corrida fuera «distinta» y la idempotencia
+  quedaría decorativa, igual que si se incluyera la hora.
+- **Una sola `withTransaction`**: snapshot + items entran juntos o no entra nada. No existe un
+  snapshot a medio poblar que alguien pueda leer como «el plan de hoy».
+
+🔴 **`origin_health_json` declara SIEMPRE los seis orígenes** (`materialize.ts:416`), aporten filas o
+no: la ausencia de un origen en el reporte es indistinguible de un origen sano y vacío, y esa
+ambigüedad es exactamente lo que el campo existe para eliminar. Un origen caído **no baja el score de
+los demás** — sus filas simplemente no existen en ese snapshot: **cero ceros fantasma, cero relleno**.
+`reason` es obligatoria cuando el estado no es `ok`: «degradado» sin razón es un hueco que el
+operador no puede juzgar.
+
+🔴 **Si TODOS los orígenes caen no se escribe snapshot** (`materialize.ts:424`): se devuelve
+`{ ok: false, errorCode: 'all_origins_failed' }`. Un plan del día vacío es indistinguible de «no hay
+trabajo», y eso sería una afirmación falsa.
+
+El techo por origen (`maxItemsPerOrigin`) trunca por el **mismo orden canónico** y **declara el
+recorte** en la salud del origen: un cap necesita un orden para decidir qué descarta, y ese orden es
+una afirmación de prioridad encubierta; un cap silencioso se lee como «esto es todo lo que hay».
+
+**Tenant binding server-side:** todo entra por `seoTargetId` y el `organization_id` se resuelve desde
+el target (`materialize.ts:328`), nunca desde el request — anti-oracle del dominio. El lado AEO se
+lee con **ese mismo** `organization_id`.
+
+### 18.10 Carril async: Cloud Scheduler, nunca Vercel cron
+
+`ops-seo-work-queue-materialize` (`0 10 * * *` CLT) → `POST /seo/work-queue/materialize-batch` en el
+ops-worker (`services/ops-worker/server.ts:3240`) → `runSeoWorkQueueMaterializeBatch`
+(`work-queue/materialize-batch.ts`, resiliencia por fila: un target que falla no cae al batch;
+elegibilidad = assignment `seo_v2` vigente, el mismo predicado que el resto de los batches SEO).
+
+**Es path async crítico.** Los crons de Vercel sólo corren en deploys de Production, así que la cola
+quedaría invisible en staging. La cadencia va **después** de `ops-seo-gsc-snapshot` (`0 9`): el plan
+del día se calcula cuando ya llegó la demanda medida del día — con el orden invertido, el plan de hoy
+se armaría con los datos de ayer. El cron **no manda `force`**: si el snapshot vigente es reciente,
+reusarlo ES la respuesta correcta.
+
+⚠️ El módulo entra al bundle del ops-worker, así que su árbol de imports **NUNCA** puede tocar
+`@core/theme/*`, `@menu` ni `@layouts` — un import de tema revienta el arranque del worker en silencio.
+`boundary.test.ts` lo verifica sobre el código.
+
+**Tres frenos independientes:**
+
+1. `GROWTH_SEO_WORK_QUEUE_ENABLED` en el **ops-worker** (`deploy.sh` declarativo, `:-false`) — gatea
+   el materializador; sin él no se escribe ningún snapshot.
+2. El mismo flag en **Vercel** — gatea reader, ruta app, lane ecosystem, tool MCP y el cutover del
+   consumer; sin él el worker acumularía snapshots que nadie lee.
+3. El scheduler **nace PAUSADO** (5.º argumento de `upsert_scheduler_job`, `deploy.sh:1599`).
+
+El flag es subordinado a `GROWTH_SEO_ENABLED` (`flags.ts:217`) y tiene su fila en
+`docs/operations/FEATURE_FLAG_STATE_LEDGER.md`. 🔴 **La cola no compromete gasto de proveedor** —lee
+tablas ya pagadas—, pero sí compromete la **AUTORIDAD DE ORDEN**: el operador ve un orden que manda
+otra cosa y aparecen filas de orígenes nuevos, así que el flip **se avisa antes** aunque cueste cero.
+
+### 18.11 Contrato: un primitive, cuatro consumers
+
+```ts
+readSeoWorkQueue(seoTargetId, { origins?, limit?, cursor? })
+  → { snapshot, items, originHealth, priorityScoreVersion, asOf, staleness, nextCursor }
+
+materializeSeoWorkQueue({ seoTargetId, actor, force? })   // idempotente por inputSnapshotHash
+  → { ok, snapshotId, itemCount, originHealth, priorityScoreVersion, reused }
+
+recordSeoWorkQueueDecision({ itemId, decision, actor, note? })  // append-only, NO ejecuta nada
+  → { ok, decisionId, subject }
+```
+
+Consumers: ruta app `GET /api/admin/growth/seo/work-queue` (`growth.seo.observation.read`), lane
+ecosystem `GET /api/platform/ecosystem/growth/seo/work-queue` (anti-oracle por `seo_v2`), tool MCP
+**interna** `get_seo_work_queue` (`src/mcp/greenhouse/server.ts:573`; **sin** federación al gateway
+externo en V1) y el server component de `/admin/growth/seo/keywords`. **Ninguno reimplementa orden,
+score ni composición de orígenes.**
+
+`staleness` es del **contrato**, no de la UI: `fresh` | `stale` (pasó `expires_at`) | `absent` (nunca
+se materializó). `absent` **no es un error** — es un target elegible cuya cola todavía no corrió;
+devolver `ok: false` haría que la UI mostrara una falla donde hay un estado legítimo.
+
+**El DTO cliente se construye por CONSTRUCCIÓN EXPLÍCITA, nunca por omisión** (`client-dto.ts`).
+⚠️ **`toClientWorkQueueDto` todavía no tiene caller**: el redactor está construido y probado, pero
+ninguna superficie cliente lo consume aún (la del portal es parte de la task `ui-ux` posterior). Lo
+que sigue describe qué recortará, no algo que un cliente ya esté viendo — el DTO existiendo no hace
+alcanzable la vista. La
+diferencia importa: con un redactor por sustracción (`delete`/`omit`/spread con exclusiones),
+cualquier campo nuevo del reader llega al cliente por defecto y la fuga es silenciosa. No cruzan
+dificultad ni volumen estimado (lente `◑` de un tercero que en es-LATAM mide mal — mostrárselos al
+cliente les da estatus de hecho), costo de proveedor (es lo que a Efeonce le **cuesta** servir, no
+consumo del cliente), `evidence_ref` cruda (expone ids y topología de motores) ni el
+`score_breakdown_json` completo (umbrales, percentiles y tamaños de muestra son el **método**, no el
+resultado). Sí cruzan keyword, verbo, banda, `origin` (la ETIQUETA del motor, no su `evidence_ref`:
+lo que se retiene es el id y el registro, no de qué familia de señal salió), la estimación marcada
+`◑` —`number | null`, jamás un `0` de relleno— sobre impresiones marcadas `●`, el `asOf`, la
+`staleness` y `partialSources` (cuántas fuentes están parciales, sin el detalle por origen). La razón del cliente se redacta aparte: `basisReason` habla de percentiles y
+nombres de origen — es la explicación para quien opera el motor, no para quien recibe el servicio.
+
+### 18.12 🔴 La decisión se ancla al sujeto y NO ejecuta nada
+
+`recordSeoWorkQueueDecision` (`record-decision.ts:53`) es el punto de **confirmación humana** del loop
+`propose → confirm → execute`. **No llama a `trackKeywords`, no llama a `createGroundedQueryDraft`, no
+llama a ningún write de otro dominio**, y hay un test de boundary que falla si alguien importa uno. La
+razón no es purismo: encadenar la ejecución acá haría que «acepté esta recomendación» y «comprometí
+gasto recurrente del proveedor» fueran el mismo click, sin que nadie declarara el segundo.
+
+El ancla es `(seo_target_id, origin, normalized_keyword)`; `item_id` y `snapshot_id` se guardan como
+**evidencia de qué estaba mirando el operador cuando decidió**, no como clave — los items se
+regeneran en cada snapshot y una decisión atada al `item_id` moriría mañana. El sujeto y el tenant se
+derivan del `itemId` server-side: aceptar `origin`/`keyword` del request permitiría decidir sobre un
+sujeto que nunca estuvo en pantalla.
+
+`dismissed` y `done` son **terminales** y retiran el sujeto de los snapshots siguientes
+(`collectors/context.ts:41`): reproponerlos convierte la cola en ruido y le enseña al operador que
+decidir no sirve de nada. `deferred` y `accepted` **siguen apareciendo a propósito** — «después» sin
+fecha no es «nunca», y algo aceptado sigue siendo trabajo vivo hasta que alguien lo marque hecho.
+
+**No publica evento outbox en V1, y es decisión y no olvido**: la decisión no dispara nada downstream
+por diseño, y un evento sin consumer invita a que alguien le cuelgue la ejecución automática.
+
+Capability propia `growth.seo.work_queue.decide` (registry + catálogo TS + grant al set operador
+growth en `src/lib/entitlements/runtime.ts:436`, los tres en el mismo PR con el coverage test verde).
+🔴 **Ver y decidir son dos permisos**: `growth.seo.observation.read` abre la cola, ésta habilita
+aceptar/diferir/descartar/marcar hecho. Un analista puede leer el plan completo sin poder retirarle
+trabajo al equipo.
+
+### 18.13 El evento
+
+`growth.seo.work_queue.materialized` v1, aggregate `seo_target`, publicado **después** de la
+transacción a propósito: publicarlo adentro haría que un consumer reactivo pudiera leer un snapshot
+que todavía no commiteó. Sin consumer en V1. Detalle de payload: `GREENHOUSE_EVENT_CATALOG_V1.md`
+§Delta 2026-08-29.
+
+### 18.14 El cutover del consumer (Slice 7)
+
+🔴 **La cola no cierra sin un consumer real obedeciéndola.** Construir la autoridad y que nadie la
+obedezca es el mismo fracaso que dos ordenamientos, con más código — y era el modo de falla más
+probable del plan (auditoría §5.5).
+
+`readKeywordOpportunitiesFromWorkQueue` (`work-queue/opportunities-adapter.ts:66`) sirve
+`KeywordOpportunitiesResult` **con la misma forma**: mismas columnas, mismo copy, misma interacción.
+Lo único que cambia es **quién manda el orden**. La superficie completa de la cola (bandas visibles,
+verbos, filtros por origen, `originHealth` en pantalla) es una task `ui-ux` posterior; por eso
+`TASK-1700` declara `UI impact: none`.
+
+Dos recortes que el gate de paridad destapó y que valen como regla:
+
+- **Recompone `gsc_striking_distance` + `consolidation`.** Si sólo se sirviera el primero, el
+  operador perdería las filas canibalizadas que la lente legacy sí mostraba (marcadas
+  `cannibalized: true`), y eso ya no sería un cambio de fuente.
+- **Recorta a la ventana de posición 8–20 de la lente.** El colector de consolidación cubre todas las
+  posiciones a propósito, pero sin este recorte el cutover metía 99 keywords nuevas y subía los techos
+  de cabecera: una **mejora**, sí, pero un cambio de comportamiento que la task no autorizó y que el
+  operador descubriría un lunes sin aviso. El aggregate conserva la foto completa —es su trabajo— y
+  esas filas salen en la task `ui-ux`.
+
+El enriquecimiento de mercado (volumen, dificultad) que la lente muestra se pide al **mismo** reader
+canónico que ya usaba (`readKeywordMarketData`): la cola no transporta esos campos a propósito
+(invariante `●`/`◑`), y no es una fuente nueva. Ése es también el motivo por el que el gate de
+boundary del volumen estimado se escribe con **dos** asserts y no relajándose: el adapter puede
+NOMBRAR el volumen porque lo transporta, y un segundo assert prueba que no ordena (`.sort(` ·
+`localeCompare` · `compareWorkQueueItems`). El invariante es sobre el ORDEN, no sobre la palabra.
+
+#### 🔴 La cola sirve la lente sólo si puede hacerlo sin fabricar un número
+
+Los dos contratos usan «ganancia» con semánticas **opuestas** en el mismo valor: en la cola
+`priority_score = null` significa «me niego a estimar» (banda 2 existe para decirlo), y en la lente
+`estimatedClickGain` es `number` y un `0` es una afirmación POSITIVA — «esta keyword ya convierte por
+encima de la media de la posición objetivo» —, el cero-sentinel que `TASK-1792` eliminó a propósito.
+Traducir `null → 0` en esa costura reintroduce, dentro del contrato, el defecto que 1792 cerró en el
+código: con curva no utilizable, TODA la lente de esa organización habría salido empatada en un cero
+fabricado, bajo un envelope que dice `org_measured` porque se computa desde una sola fila de
+referencia.
+
+Por eso el adapter **no traduce mejor: se niega a traducir.** Si alguna fila que llegaría a la lente
+no tiene `priority_score`, `readKeywordOpportunitiesFromWorkQueue` devuelve `null` y el caller cae al
+reader legacy. Dos consecuencias de contrato:
+
+- **`orderedBy` es SIEMPRE `estimated_click_gain`** cuando la cola sirve la lente. No hay rama
+  `measured_demand` por el camino de la cola, porque ese caso simplemente no se sirve desde acá.
+- **Es condición por ORGANIZACIÓN, no por fila.** La curva se evalúa a nivel de org en la posición
+  objetivo, así que o todas las filas tienen score o ninguna lo tiene: con curva sana (`berel.com`)
+  la lente viene de la cola; con curva no utilizable (`efeoncepro.com`) la sirve el legacy. La cola
+  conserva su snapshot completo en los dos casos — el aggregate no se degrada, sólo deja de mandar
+  esta lente.
+
+🔴 **NUNCA reintroduzcas un mapeo `null → 0` acá, ni un `?? 0` de fallback en `estimatedClickGain`.**
+Cuando dos contratos usan la misma palabra con semánticas inversas, la traducción no se arregla
+eligiendo mejor el valor: se arregla no traduciendo.
+
+Por lo tanto la página cae al reader legacy (`admin/growth/seo/keywords/page.tsx:347-352`) por **dos**
+caminos, no uno: con el flag OFF, y con el flag ON cuando el adapter devuelve `null` (cola apagada,
+caída, sin snapshot todavía, o sin techo para alguna fila). El destino de ese fallback quedó
+**verificado y no supuesto** desde `TASK-1792`: con curva no utilizable devuelve
+`ctrCurveSource: 'unusable'` + `orderedBy: 'measured_demand'` en vez de colapsar todo a `gain = 0` en
+silencio.
+
+### 18.15 Señales de reliability
+
+Tres, todas `steady = 0`, bajo el módulo `growth` del registry
+(`src/lib/reliability/queries/growth-seo-work-queue-signals.ts`). Vigilan algo que ninguna señal SEO
+existente vigila: las de hoy miran el pipeline de **captura** (¿llegaron los datos?), y éstas miran
+si el operador está mirando un **plan** válido. Detalle en
+`GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` §Delta 2026-08-29.
+
+### 18.16 Evidencia de la primera corrida real (`seot-berel-mx`, 2026-08-28/29)
+
+- **641 items**: banda 1 = **390**, banda 3 = **245** (de las cuales **200 de `competitor_gap`**).
+- **Idempotencia verificada**: segunda corrida inmediata → `reused: true` con **cero filas nuevas**.
+- **Paginación 641/641** sin saltear una sola fila, tras el fix de `COLLATE "C"` (antes: 631/635).
+- **Paridad de orden verificada** sobre las 33 keywords compartidas con la lente legacy, con techo
+  idéntico.
+- Contexto del sitio: Berel tiene **4.352 de 19.080 queries (23%) con más de una página** — la
+  canibalización no es un caso de borde, es un cuarto del inventario.
+- Curva de Berel, bucket 5: **37.600 impresiones / 370 clics (0,98%)** → utilizable. `efeoncepro.com`,
+  mismo bucket: **75 / 0** → no utilizable, y por eso su lente cae a banda 2 en vez de fabricar ceros.
+
+### 18.17 Lo que la cola NO hace (prohibido, no diferido)
+
+- Unir orígenes por SQL o por VIEW.
+- Promediar orígenes o fusionar scores SEO y AEO en un «Search Visibility Score» único: la
+  ortogonalidad es lo que se vende.
+- Ejecutar recomendaciones.
+- Cualquier `UPDATE` sobre el aggregate, incluido «marcar el item como hecho».
+- Federar `get_seo_work_queue` al gateway MCP externo (primero el read tool interno rodado).
+- Backfill de snapshots históricos: un snapshot fabricado afirmaría que alguien recomendó algo que
+  nadie recomendó.
+
+**Orígenes nuevos entran como migración aditiva** —estacionalidad, clustering propio, features de
+SERP, citabilidad de contenido, linking interno— con su CHECK ampliado y su entrada en
+`ORIGIN_ACTION_PRECEDENCE`, nunca como un string nuevo en TS.
+
+⚠️ **Límite declarado: medido ≠ pertinente.** Hoy nada declara si un candidato tiene que ver con el
+negocio (`TASK-1791`), así que una keyword ajena con impresiones reales entra a banda 1
+legítimamente. Cuando esa señal exista entra como **factor** del item con su procedencia, jamás como
+multiplicador del score.
+
+Task dueña: `TASK-1700` (EPIC-022, cierra la brecha S1 de la auditoría 2026-08-15).
