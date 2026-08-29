@@ -16,6 +16,21 @@ Causa raíz cerrada, no parchada: la decisión se tomaba contra una lista de rut
 Deploy break-glass del `ops-worker` autorizado por el operador → `ops-worker-00617-mtc`,
 `GIT_SHA=64bdd105c737`, flag ON, `Ready=True`. Los cuatro workers verificados.
 
+**Revisión vigente al cierre: `ops-worker-00618-lz2`, `GIT_SHA=53e240d79c31` — NO el SHA del
+release.** Lo causó el push del propio fix del comentario de `deploy.sh`: `services/ops-worker/**`
+es disparador, así que movió al worker fuera del SHA promovido. Verificado por CONTENIDO, que es
+lo que decide: el único archivo del bundle que difiere vs `64bdd105c` es `deploy.sh` y **sólo en
+comentarios**; `cannibalization.ts` tiene blob `6ceb87e4…` idéntico a `origin/main` y el código que
+corre declara `incremental-clicks-v2`. La ancestría NO sirve como prueba acá —`main` promueve por
+squash, así que `merge-base --is-ancestor 64bdd105c 53e240d79` falla aunque el contenido sea el
+mismo—; una sesión peer la usó y concluía de más.
+
+🔴 **El manifest es incompleto para el worker.** Dice que producción está en `64bdd105c`, y hay UN
+solo `ops-worker` compartido entre staging y producción que hoy corre código de develop no promovido
+por el control plane. Hoy es benigno (delta = comentarios), pero quien lea sólo el manifest concluye
+algo falso sobre qué código materializa la cola. La promoción de `146070ffc`/`53e240d79`/`d7b5e1ed2`
+cierra las dos cosas: alinea el worker y activa el gate de cobertura para releases futuros.
+
 Rematerialización hecha **sin** `force` (`materialized=2, reused=0`), lo que además probó
 empíricamente que el piso filtrado por versión funciona como red de seguridad. Berel MX:
 `consolidation` 200→11 con `gsc_striking_distance` 168→200.
