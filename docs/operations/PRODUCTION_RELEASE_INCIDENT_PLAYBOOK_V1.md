@@ -348,11 +348,42 @@ las 02:25 del 29.
 y **Vercel tampoco** — su build pasó verde, que es justo lo que vuelve el diagnóstico engañoso si
 sólo se mira el color del PR.
 
-**Por qué es un anti-pattern y no mala suerte: venció en silencio.** No hubo señal, ni alerta, ni
-check de preflight. Se descubrió porque alguien estaba mirando un deploy — tres commits después de
-que empezara a fallar, ~14 h de ventana. El secreto no tiene anotación de expiración ni nada que la
-vigile: es una **afirmación de disponibilidad que ningún mecanismo sostiene**, exactamente la clase
-de defecto que el resto de este playbook persigue en otros dominios.
+**🔴 CORRECCIÓN (misma jornada, y es la lección que vale): SÍ HABÍA SEÑAL. Falló el ENRUTAMIENTO, no la detección.**
+
+Este bloque afirmaba «sin señal, sin alerta, sin check de preflight». Es **falso**, y la inferencia
+fue mía: de «nadie se enteró» deduje «nadie avisó». El detector `axis-credential-expiry.yml` corrió
+el **2026-08-25** (run `32856176785`) y dijo, con tres días de anticipación:
+
+```
+✖ El credencial AXIS expira el 2026-08-28 — quedan 3 días.
+  Rotar YA: al expirar, GitHub Actions sigue verde y solo fallan los builds de worker.
+```
+
+Incluso **predijo el modo de falla exacto** que después ocurrió. Nadie lo leyó porque su único canal
+de salida era el color de su propia corrida — y ese color ya venía rojo: las dos ejecuciones previas
+(2026-08-04 run `30924196526`, 2026-08-11 run `31501087312`) fallaron por una causa **ajena**
+(`Unable to locate executable file: pnpm`, el bug de orden `setup-node`/`pnpm` corregido el 08-12).
+Cuando el rojo es el color habitual de un workflow, el rojo que importa es indistinguible del ruido.
+
+**Las reglas que salen de esto, y son distintas de las que salen de «no había señal»:**
+
+- 🔴 **Un gate programado cuyo único canal de salida es el color de su propia corrida es un REGISTRO,
+  no una alerta.** Si nadie está obligado a mirarlo en un momento específico, su hallazgo no viaja.
+  Detectar y notificar son dos problemas, y resolver el primero no resuelve el segundo.
+- 🔴 **Un workflow que tolera rojos ajenos degrada la señal que sí importa.** Dos fallos consecutivos
+  por un bug de infraestructura normalizaron el rojo, y el tercero —el que avisaba de una credencial
+  a punto de vencer— llegó con el mismo color que los dos anteriores. **NUNCA dejes un detector en
+  rojo crónico por una causa ajena:** o se arregla, o el detector deja de ser un detector.
+- **Por eso el «mínimo intermedio» se reordena:** el **check de preflight** deja de ser el consuelo y
+  pasa a ser el arreglo prioritario, porque pone la medición **donde alguien está obligado a mirar**
+  (la promoción se detiene) en vez de en un log que nadie abre. El arreglo durable (App de GitHub
+  acuñando tokens de 1 h) sigue siendo el que cierra la clase.
+
+**Por qué es un anti-pattern y no mala suerte.** La detección existía y funcionó (ver la corrección
+de arriba); lo que no existía era un camino desde el hallazgo hasta alguien obligado a actuar. Se
+descubrió porque alguien estaba mirando un deploy — tres commits después de que empezara a fallar,
+~14 h de ventana. El secreto tampoco tiene anotación de expiración en Secret Manager, así que el
+único registro de su fecha vivía dentro del propio detector.
 
 **Reglas:**
 

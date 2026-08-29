@@ -1,5 +1,18 @@
 # TASK-1669 — Growth SEO: agentes e IA para el plan diario gobernado
 
+## Delta 2026-08-29 — el bloqueo de secuencia quedó levantado: la cola priorizada está en producción
+
+`TASK-1700` cerró `complete` con el release `b7f74c95a2afcf66f2c2d82dbd4a5ad4f7617471`: flag ON en los
+dos runtimes (revisión activa del ops-worker `ops-worker-00613-qrh`) y scheduler
+`ops-seo-work-queue-materialize` `ENABLED` (`0 10 * * *` America/Santiago), con corrida real
+verificada fila por fila. Sale del `Blocked by`; quedan `TASK-1667` y `TASK-1668`.
+
+🔴 **El bloqueo se levanta, la obligación no.** La razón por la que esta task lo declaraba sigue en
+pie palabra por palabra: si el plan diario reintroduce su propio ordenamiento, nacen **dos
+ordenamientos que se contradicen** y el operador ve dos "#1" distintos. El `context-reader` de esta
+task consume `readSeoWorkQueue` como envoltorio; no ordena, no puntúa y no reimplementa el score
+versionado. Ahora eso es verificable contra un runtime vivo, no contra una promesa de contrato.
+
 ## Delta 2026-08-28 — la cola existe en código: el `context-reader` nace como envoltorio y el ordenamiento ya no es una promesa
 
 `TASK-1700` entregó sus siete slices a `develop` (`962d22118` … `9020d6421`) con la migración
@@ -161,7 +174,7 @@ declara en `origin_health_json` y **no baja el score de los demás**; recomputar
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo|ai|nexa|data`
-- Blocked by: `TASK-1667`, `TASK-1668`, `TASK-1700` (la cola priorizada — **bloqueo de secuencia**: sin ella nacen dos ordenamientos que discrepan; su Slice ordering ya lo exigía en prosa y el campo no lo declaraba)
+- Blocked by: `TASK-1667`, `TASK-1668` (la cola priorizada quedó `complete` el 2026-08-29 y corre en producción, así que su bloqueo de secuencia está levantado; ver Delta 2026-08-29)
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

@@ -27,7 +27,7 @@ este documento existe para evitar.
 | Flag | Runtime donde SE LEE | Estado real 2026-08-28 |
 |---|---|---|
 | `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` (TASK-1699) | **dual-runtime**: `ops-worker` (escritura del top-N dentro del rank capture) + Vercel (lectura de lanes) | **ON en los dos.** Worker desde antes del release (revisión `ops-worker-00610-kc8`); Vercel `Production` prendido **con** este release + redeploy obligatorio `greenhouse-aj0ng1mfw` |
-| `GROWTH_SEO_COMPETITOR_GAP_ENABLED` (TASK-1662) | **sólo `ops-worker`** — en Vercel es **inerte** | **ON y vivo** en el worker. Scheduler `ops-seo-competitor-coverage` **ENABLED** |
+| `GROWTH_SEO_COMPETITOR_GAP_ENABLED` (TASK-1662) | **sólo `ops-worker`** — en Vercel es **inerte** | **ON y vivo** en el worker. Scheduler `ops-seo-competitor-coverage` **ENABLED desde 2026-08-29** (⚠️ esta fila decía «ENABLED» desde el 28 y era FALSO: estaba `PAUSED` con `lastAttemptTime` vacío) |
 | `GROWTH_AI_VISIBILITY_BUDGET_GATE_ENABLED` + `..._ENFORCED` (TASK-1696) | dual (Vercel + `ops-worker`) | **OFF por diseño, ambos.** No se prendieron con este release y no deben prenderse sin decisión explícita del operador tras un ciclo mensual de shadow |
 
 🔴 **Vercel congela las env vars al crear el build**: prender el flag no basta. Por eso el
@@ -263,7 +263,7 @@ Se envuelven en una sola narrativa de producto: **Search Visibility 360** = los 
 
 - `seo_url_visibility_snapshots` — el hecho de **sujeto-página** (TASK-1776, migración `20260827194219636`; append-only). Lo que Semrush vende como `url_research`/`subdomain_research`/`subfolder_research` es en DataForSEO **UN endpoint** (`ranked_keywords`) con el `target` cambiado: por eso hay UNA tabla con `subject_kind` bajo **CHECK cerrado** (`domain|subdomain|subfolder|url`) y un **resolver de sujeto** (`url-visibility/resolve-subject.ts`) — la clase se **DECLARA, jamás se infiere**, y la normalización (esquema/www/trailing-slash/query fuera de la clave) va PRIMERO porque la clave única `(subject_kind, normalized_subject, location_code, language_code, capture_date)` — **sin organización**, mismo contrato multi-productor — depende de ella. Tres productores comparten `persistUrlVisibilitySnapshots`: la captura directa (`ranked_keywords`; cron `ops-seo-url-visibility` día 17, flag `GROWTH_SEO_URL_VISIBILITY_ENABLED` **sólo ops-worker**, sobre target + competidores), `relevant_pages` (cada página → fila `url`) y `subdomains` (cada subdominio → fila `subdomain`), ambos on-demand. La **foto sale del agregado `metrics` del proveedor** (cubre el set COMPLETO del sujeto, independiente del `limit`); el `limit` (knob `GROWTH_SEO_URL_VISIBILITY_ROW_LIMIT`, default 100) acota sólo el detalle `top_keywords` JSONB y es la **palanca de costo**. 🔴 Gotchas verificados contra la doc oficial (2026-08-27): una URL como `target` va **CON esquema** (sin él el proveedor devuelve el dominio entero y lo cobra); la subcarpeta no tiene target nativo — host + filtro server-side `ranked_serp_element.serp_item.relative_url` (gratis). 🔴 **Tercer productor del mercado**: el `keyword_data.keyword_info` viene inline **ya pagado** en cada fila y se escribe en `seo_keyword_market_data` vía `persistKeywordMarketData` con **costo 0** + pre-check `loadFreshMarketKeywords` (la migración expandió su CHECK de `source_endpoint` con `ranked_keywords`). Reader canónico `readUrlVisibility` + `readVisibilityConcentration`: lens `estimated` + `capturedAt`, `no_market_data` sin ceros, posición ◑ **jamás** promediada con la posición ● de GSC (una es la posición exacta en una SERP concreta; la otra, un promedio ponderado por impresiones).
 
-- `seo_competitors` (+ autoría TASK-1662, migración `20260828113457119`) · `seo_competitor_coverage_runs` · `seo_competitor_keyword_coverage` — el **gap competitivo** (TASK-1662). Un competidor es una **CLASIFICACIÓN CON AUTOR**, nunca una inferencia: `declared_by/at/source` acoplados por CHECK (vocabulario `operator_ui|nexa|mcp|seed|backfill`), `proposal_ref` **OPACA** cuando la declaración confirma una propuesta de máquina (top-N de TASK-1699, prospect de TASK-1709) — propone la máquina, declara el humano. Retirar cierra la vigencia (`clock_timestamp()`, jamás `NOW()`) con `retired_by` obligatorio (CHECK). Commands canónicos `declareCompetitors`/`retireCompetitors` (`competitors.ts`): **compromiso de gasto diferido** clase `trackKeywords` — techo `GROWTH_SEO_COMPETITORS_PER_TARGET` (default 5) contra conteo proyectado, outcome por ítem, reverso mismo PR, outbox `growth.seo.competitor.{declared,retired}` en la misma tx; el dominio del propio cliente es `invalid`. La **cobertura** (`competitor-coverage.ts`, flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED` **sólo ops-worker** —en Vercel es inerte—, **ON y vivo desde el 2026-08-28**; cron `ops-seo-competitor-coverage` día 18, nacido PAUSADO y **ENABLED desde el 2026-08-28** (release `c983be7f18e6`), V1 `maxCompetitors=1`) compra `labs/google/domain_intersection` ×2 (target1=COMPETIDOR, target2=cliente; `intersections:false` → cliente ausente, `:true` → ambos ranquean; `include_serp_info` para las SERP features; row limit knob `GROWTH_SEO_COMPETITOR_COVERAGE_ROW_LIMIT` default 500 ≈ USD 0,15/competidor/ciclo) y persiste **INSUMOS fechados**, con **run ledger** como veredicto + ancla de frescura (un `captured` con 0 filas de gap es un hecho, no un hueco re-comprable — invariante TASK-1661; un `failed` no consume la ranura del día) y el `keyword_data` inline al mercado compartido (**productor #4**, costo 0). 🔴 **El GAP NO SE PERSISTE: se deriva al leer** (`readKeywordGap`, `keyword-gap-reader.ts`) — persistirlo lo congela y envejece sin señal. El reader: **excluye** toda keyword con impresiones GSC en 28 días (● gana sobre ◑ también al ordenar, `excluded.measuredInGsc` declarado); separa `content_gap` (cliente ausente → contenido nuevo) de `ranks_worse` (optimización) de `declaredTargets` (compromiso TASK-1659 con fecha — jamás un "hallazgo"); expone factores con procedencia (`searchVolume`/`cpcUsd`/`linkBarrier` vía `deriveLinkBarrier` + `marketAsOf`; `serpFeatures` como LISTA + `aiOverviewPresent`; `attainablePositionBand` derivada SOLO de la barrera, mapa puro `link_barrier_v1`) con `sin_dato` explícito; y 🔴 **NO devuelve orden propio** — listas alfabéticas neutrales, techo declarado en `truncated`; la cola de TASK-1700 es la autoridad de orden y ancla su `evidence_ref` opaco en `seo:competitor_gap:<coverage_run_id>`. Lanes: admin (`/api/admin/growth/seo/{competitors,keyword-gap}`, `target.configure`/`observation.read`) · ecosystem (writes sólo bindings `internal`; el gap **sólo-internal con 404 anti-oracle** — la comparativa competitiva NUNCA es client-facing, auditoría §7) · MCP `declare_seo_competitors`/`retire_seo_competitors` (scope `efeonce.mcp.seo.write` existente) + `get_seo_keyword_gap`. Señal `seo.competitor_coverage.stale`. Primera corrida real 2026-08-28 (Berel MX vs `comex.com.mx`): **USD 0,1076**, gap de 357 `content_gap` / 54 `ranks_worse` / 269 excluidas por GSC medido. Sanity 22/22 contra PG real (`_sanity-task-1662-keyword-gap.ts`).
+- `seo_competitors` (+ autoría TASK-1662, migración `20260828113457119`) · `seo_competitor_coverage_runs` · `seo_competitor_keyword_coverage` — el **gap competitivo** (TASK-1662). Un competidor es una **CLASIFICACIÓN CON AUTOR**, nunca una inferencia: `declared_by/at/source` acoplados por CHECK (vocabulario `operator_ui|nexa|mcp|seed|backfill`), `proposal_ref` **OPACA** cuando la declaración confirma una propuesta de máquina (top-N de TASK-1699, prospect de TASK-1709) — propone la máquina, declara el humano. Retirar cierra la vigencia (`clock_timestamp()`, jamás `NOW()`) con `retired_by` obligatorio (CHECK). Commands canónicos `declareCompetitors`/`retireCompetitors` (`competitors.ts`): **compromiso de gasto diferido** clase `trackKeywords` — techo `GROWTH_SEO_COMPETITORS_PER_TARGET` (default 5) contra conteo proyectado, outcome por ítem, reverso mismo PR, outbox `growth.seo.competitor.{declared,retired}` en la misma tx; el dominio del propio cliente es `invalid`. La **cobertura** (`competitor-coverage.ts`, flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED` **sólo ops-worker** —en Vercel es inerte—, **ON y vivo desde el 2026-08-28**; cron `ops-seo-competitor-coverage` día 18, nacido PAUSADO y **ENABLED desde el 2026-08-29** (⚠️ corregido: se afirmó «desde el 28» y era FALSO — la verdad live era `PAUSED` con `lastAttemptTime` VACÍO, nunca había corrido; se despausó el 29 tras verificar el `dryRun` contra la revisión activa), V1 `maxCompetitors=1`) compra `labs/google/domain_intersection` ×2 (target1=COMPETIDOR, target2=cliente; `intersections:false` → cliente ausente, `:true` → ambos ranquean; `include_serp_info` para las SERP features; row limit knob `GROWTH_SEO_COMPETITOR_COVERAGE_ROW_LIMIT` default 500 ≈ USD 0,15/competidor/ciclo) y persiste **INSUMOS fechados**, con **run ledger** como veredicto + ancla de frescura (un `captured` con 0 filas de gap es un hecho, no un hueco re-comprable — invariante TASK-1661; un `failed` no consume la ranura del día) y el `keyword_data` inline al mercado compartido (**productor #4**, costo 0). 🔴 **El GAP NO SE PERSISTE: se deriva al leer** (`readKeywordGap`, `keyword-gap-reader.ts`) — persistirlo lo congela y envejece sin señal. El reader: **excluye** toda keyword con impresiones GSC en 28 días (● gana sobre ◑ también al ordenar, `excluded.measuredInGsc` declarado); separa `content_gap` (cliente ausente → contenido nuevo) de `ranks_worse` (optimización) de `declaredTargets` (compromiso TASK-1659 con fecha — jamás un "hallazgo"); expone factores con procedencia (`searchVolume`/`cpcUsd`/`linkBarrier` vía `deriveLinkBarrier` + `marketAsOf`; `serpFeatures` como LISTA + `aiOverviewPresent`; `attainablePositionBand` derivada SOLO de la barrera, mapa puro `link_barrier_v1`) con `sin_dato` explícito; y 🔴 **NO devuelve orden propio** — listas alfabéticas neutrales, techo declarado en `truncated`; la cola de TASK-1700 es la autoridad de orden y ancla su `evidence_ref` opaco en `seo:competitor_gap:<coverage_run_id>`. Lanes: admin (`/api/admin/growth/seo/{competitors,keyword-gap}`, `target.configure`/`observation.read`) · ecosystem (writes sólo bindings `internal`; el gap **sólo-internal con 404 anti-oracle** — la comparativa competitiva NUNCA es client-facing, auditoría §7) · MCP `declare_seo_competitors`/`retire_seo_competitors` (scope `efeonce.mcp.seo.write` existente) + `get_seo_keyword_gap`. Señal `seo.competitor_coverage.stale`. Primera corrida real 2026-08-28 (Berel MX vs `comex.com.mx`): **USD 0,1076**, gap de 357 `content_gap` / 54 `ranks_worse` / 269 excluidas por GSC medido. Sanity 22/22 contra PG real (`_sanity-task-1662-keyword-gap.ts`).
 
 - `seo_serp_top_results` — el **top-N del SERP ya pagado** (TASK-1699, migración `20260828124352232`; append-only ESTRICTO: trigger anti UPDATE/DELETE y GRANTs sólo SELECT+INSERT — más estricta que sus hermanas). Cada corrida diaria de rank capture compra el SERP completo (`depth 20` × `load_async_ai_overview`) y `parseSerpRankObservation` descartaba ~19 de 20 filas; su hermano `parseSerpTopResults` (`serp-top-results.ts`) persiste TODAS con **costo marginal CERO** (test de no-regresión sobre `buildSerpTask`: mismos campos, mismo depth). 🔴 **La ranura es `rank_absolute`, NUNCA `rank_group`** (se repite entre bloques; con `DO NOTHING` la colisión descarta filas EN SILENCIO — se guardan ambas posiciones, la clave es la absoluta). UNIQUE `(seo_target_id, keyword, engine, device, capture_date, rank_absolute)`. La escritura viaja **en la misma transacción** que el snapshot de rank de esa keyword (no existe día con snapshot y sin contexto), con fallback observado que JAMÁS pierde la medición pagada si el writer del top-N falla. Flag `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` **dual-runtime** (ops-worker = escritura en el batch; Vercel = lectura de lanes) y — a diferencia de sus hermanos de gasto — ON y VIVO en **los dos** runtimes desde el 2026-08-28: worker (revisión `ops-worker-00610-kc8`, escritura) y Vercel `Production` con el release `c983be7f18e6` + redeploy `greenhouse-aj0ng1mfw` (lectura), verificado en el runtime con canary contra producción `ok:true` — no `disabled`; día 1 de la serie: 2026-08-29: **cada día apagado pierde para siempre el top-N de ese día** (~620 observaciones/día; no hay backfill posible). Readers: `readSerpTopResults` (serie con `hasMore` declarado) y `readSerpCompetitorCandidates` (`competitor-discovery.ts`): candidatos por recurrencia medida — umbrales VERSIONADOS (30d / 3 keywords / 5 días), excluye `is_own_domain` y todo `item_type` no orgánico, cada candidato con evidencia + `alreadyDeclared` + `proposalRef` sugerido. **Propone; NO declara**: el execute es `declareCompetitors` (TASK-1662) tras confirmación humana. Sin outbox NI proyección reactiva (declarado: la tabla ES el histórico; el descubrimiento se consulta a demanda). Lanes sólo-internal 404 anti-oracle (§7: dato competitivo, jamás client-facing) + tools MCP `get_seo_serp_top_results`/`get_seo_competitor_candidates`. Señal `seo.serp_top_results.coverage` (día con snapshot y sin top-N = pérdida irrecuperable). Retención: SIN política todavía, declarado — disparador explícito: 5M filas o 500 ms en la query de recurrencia (probable archivo a BQ, NUNCA borrar). Sanity 9/9 contra PG real con rollback transaccional (cero residuo).
 
@@ -676,7 +676,7 @@ Cloud Scheduler + ops-worker (async-critical), nunca Vercel cron.
   - **Flag `GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED`** (subordinado a `GROWTH_SEO_ENABLED`): lo leen **DOS runtimes** — Vercel (enqueue + lanes) y ops-worker (drain). Nació OFF con scheduler pausado (dos frenos, patrón TASK-1661); **ON desde 2026-08-14** en `deploy.sh` (`:-true`) + Vercel `Production`/`staging`, con el scheduler despausado, tras el smoke live + autorización del operador.
   - **Costo medido (smoke 2026-08-14, Berel MX):** 1 seed × `keyword_suggestions` × limit 10 = 1 llamada = **USD 0.0132** (estimado conservador 0.0612); mismo intent re-encolado = **USD 0** (idempotencia por `(organization_id, idempotency_key)` con hash del intent completo).
 
-- **Cobertura competitiva mensual (TASK-1662, VIVA desde 2026-08-28 — scheduler ACTIVO + flag ON, release `c983be7f18e6`):** Cloud Scheduler `ops-seo-competitor-coverage` (día 18, **ENABLED**) → cobertura por competidor DECLARADO (`competitor-coverage.ts`, V1 `maxCompetitors=1`) → `domain_intersection` ×2 + `keyword_data` inline al mercado compartido a costo 0.
+- **Cobertura competitiva mensual (TASK-1662 — flag ON en el worker desde 2026-08-28; scheduler ACTIVO desde 2026-08-29):** Cloud Scheduler `ops-seo-competitor-coverage` (día 18, **ENABLED**; ⚠️ estuvo `PAUSED` hasta el 29 pese a que este doc lo declaraba activo desde el 28 — flag ON ≠ scheduler activo) → cobertura por competidor DECLARADO (`competitor-coverage.ts`, V1 `maxCompetitors=1`) → `domain_intersection` ×2 + `keyword_data` inline al mercado compartido a costo 0.
   - 🔴 **`GROWTH_SEO_COMPETITOR_GAP_ENABLED` vive SÓLO en el runtime del ops-worker; en Vercel es inerte.** Prenderlo o apagarlo en Vercel no cambia nada y da falsa sensación de control (mismo patrón que `GROWTH_SEO_KEYWORD_MARKET_DATA_ENABLED`). El único freno efectivo es el par flag-del-worker + pausa del scheduler.
   - **Costo medido (primera corrida real, 2026-08-28, Berel MX vs `comex.com.mx`):** **USD 0,1076** con Δ exacto en el ledger (697 filas de cobertura + 640 de mercado gratis); gap derivado al leer = 357 `content_gap` / 54 `ranks_worse` / 269 excluidas por impresiones medidas en GSC.
 - **Top-N del SERP (TASK-1699, VIVO desde 2026-08-28 — flag ON en los DOS runtimes, release `c983be7f18e6`):** no tiene scheduler propio **por diseño** — viaja dentro del `ops-seo-rank-capture` (`0 5 * * *` CLT), en la misma transacción que el snapshot de rank, con costo marginal CERO.
@@ -1123,7 +1123,7 @@ acuerde.
 |---|---|---|---|
 | TASK-1659 / 1660 | backend-data / ui-ux | Objetivo declarado por el cliente (modelo + superficie) — la pregunta "¿dónde quiere estar?" | pendiente |
 | TASK-1661 | backend-data | `seo_keyword_market_data` + capture/preview/reader + `deriveLinkBarrier` + lane + MCP + scheduler mensual | **`complete`, en producción 2026-08-14** (release `3754a17d3b1d`) |
-| TASK-1662 | backend-data | Keyword gap vs competidores (`domain_intersection`) — productor #4 de la tabla de mercado (autoría en `seo_competitors` + cobertura con run ledger + `readKeywordGap` derivado al leer + tools MCP) | **en producción 2026-08-28** (release `c983be7f18e6`; Slices 1–3 + federación MCP; `in-progress` sólo por Slice 4 —bloqueado por TASK-1700—; flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED` ON y vivo **en el ops-worker** —inerte en Vercel— y scheduler `ops-seo-competitor-coverage` **ENABLED**) |
+| TASK-1662 | backend-data | Keyword gap vs competidores (`domain_intersection`) — productor #4 de la tabla de mercado (autoría en `seo_competitors` + cobertura con run ledger + `readKeywordGap` derivado al leer + tools MCP) | **en producción 2026-08-28** (release `c983be7f18e6`; Slices 1–3 + federación MCP; `in-progress` sólo por Slice 4 —bloqueado por TASK-1700—; flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED` ON y vivo **en el ops-worker** —inerte en Vercel— y scheduler `ops-seo-competitor-coverage` **ENABLED desde 2026-08-29**, no desde el 28 como se afirmó: hasta ese día estuvo `PAUSED` sin haber corrido nunca) |
 | TASK-1664 | backend-data | Keyword discovery / seed expansion — tercer productor (aprovecha el `keyword_info` inline ya pagado) | **`complete`, encendido 2026-08-14** |
 | TASK-1665 | ui-ux | Lente `Descubrir` — la cara visible de 1664: conmutador de lentes, builder, banda de costo, estado de corrida, canvas de candidatos y drawer de decisión | **code complete**, evidencia GVC pendiente |
 | TASK-1666 | backend-data | Puente grounded SEO → AEO (`createGroundedQueryDraft`), consumido por el drawer de 1665 | **`complete` 2026-08-14** |
@@ -1279,13 +1279,54 @@ Fuente: directiva del operador 2026-08-05 + `EPIC-037` + `docs/operations/MODULA
 
 ## 18. La cola priorizada de trabajo — el aggregate que manda el orden (TASK-1700)
 
-**Estado 2026-08-29:** código en `develop` (`962d22118` · `0165e0e75` · `a712ebccb` · `dc2db094d` ·
-`aaeec2e9b` · `0ef8c5776` · `9020d6421` · `8b0673d9e` — el último trae, además de la capa documental,
-el cierre de la costura `null → 0` del adapter y el gate del volumen estimado partido en dos asserts),
-tres migraciones aplicadas en la instancia única de Cloud SQL (`…_task-1700-seo-work-queue.sql`,
-`…_task-1700-work-queue-keyset-collation.sql`, `…_task-1700-work-queue-decide-capability.sql`),
-`pnpm typecheck` en 0 errores y build de producción verde,
-**flag `GROWTH_SEO_WORK_QUEUE_ENABLED` OFF en los dos runtimes y scheduler PAUSADO**.
+### 18.0 Delta 2026-08-29 — la cola pasó de «desplegada y frenada» a OPERATIVA
+
+El paso a producción `develop→main` `b7f74c95a2afcf66f2c2d82dbd4a5ad4f7617471` (manifiesto
+`released`, orquestador run `33258242470`, watchdog con `drift_count=0`, 4/4 workers Cloud Run
+`Ready=True`) llevó a `main` `TASK-1785`, `TASK-1700`, `TASK-1792` y `TASK-1598`. Con ese release
+**los tres frenos de §18.10 quedaron sueltos** — la sección conserva por qué existían, esta declara
+que ya no están puestos y con qué evidencia:
+
+| Freno (§18.10) | Estado real 2026-08-29 | Cómo se verificó |
+|---|---|---|
+| `GROWTH_SEO_WORK_QUEUE_ENABLED` en **Vercel** (reader, ruta app, lane ecosystem, tool MCP, cutover del adapter) | **ON** en `production` **y** en `staging` | env var por entorno; Vercel congela las env vars al crear el build, así que el estado que vale es el del deployment servido |
+| El mismo flag en el **`ops-worker`** (materializador) | **ON** por el SoT declarativo `services/ops-worker/deploy.sh` (`:-true`) | verificado en la **revisión activa** `ops-worker-00613-qrh`, no sólo en el script |
+| Scheduler `ops-seo-work-queue-materialize` | **ENABLED**, `0 10 * * *`, `America/Santiago` | `gcloud scheduler jobs describe` sobre el job live. Antes de hoy estaba `PAUSED` con `lastAttemptTime` **vacío**: nunca había corrido una sola vez |
+
+**La corrida shadow que autorizó despausar** se invocó con la **misma identidad OIDC que usa Cloud
+Scheduler** —no un `curl` aproximado, que probaría otra cosa que la que el cron va a ejecutar—:
+`status=succeeded`, `eligible=2`, `materialized=1`, `reused=1`, `failed=0`. El `reused=1` es
+`seot-berel-mx` devolviendo su snapshot vigente con **cero writes**, que es la idempotencia por
+`input_snapshot_hash` (§18.2) comportándose como debe, no un salto.
+
+El snapshot materializado (`seot-efeonce-own-brand`, **105 items**) se inspeccionó **fila por fila**
+sobre lo que sirve el lane ecosystem de producción: `staleness=fresh`; **5 de 6 orígenes `ok`** con
+`competitor_gap` declarado `degraded` **sin arrastrar el score de los demás** (§18 «un origen caído
+no baja el score de los otros»); verbos coherentes con su origen; y **todas las filas en banda 2 con
+`priority_score` NULL**. 🔴 **Eso último es la degradación honesta funcionando, no una falla**: hay
+demanda medida, la curva de CTR del sitio no es utilizable en la posición objetivo (§18.4 — el mismo
+`efeoncepro.com` de 75 impresiones / 0 clics en el bucket 5), y la cola **se niega a fabricar un
+techo**. Corolario operativo directo: mientras esa organización esté toda en banda 2, el adapter
+`opportunities-adapter.ts` **no sirve** la lente desde la cola y cae al reader legacy — que desde
+`TASK-1792` ordena eso honestamente por `measured_demand`. Es la condición por ORGANIZACIÓN descrita
+en §18, observada en vivo.
+
+⚠️ **Ventana conocida hasta la próxima promoción: los schedulers se pueden RE-PAUSAR solos.**
+`origin/main` todavía declara **ambos** jobs (`ops-seo-work-queue-materialize` y
+`ops-seo-competitor-coverage`) como pausados —`"true"` en el 5.º argumento de
+`upsert_scheduler_job`— y ese argumento no es un default de creación: `upsert_scheduler_job` ejecuta
+un `pause`/`resume` **explícito en cada deploy**. Hay **un solo `ops-worker` y un solo juego de jobs
+de Cloud Scheduler compartidos entre staging y producción**, así que cualquier deploy que corra el
+árbol de `main` —release, rollback o break-glass— los vuelve a pausar **en silencio, sin error y sin
+señal propia**: lo único que se vería después es `growth.seo.work_queue.stale_snapshot` levantando
+26 h más tarde. El PR de release en vuelo (**#211**) cierra la ventana. Hasta que ese PR llegue a
+`main`, **verdad live = `gcloud scheduler jobs describe`**, jamás esta sección.
+
+**Estado del código:** `962d22118` · `0165e0e75` · `a712ebccb` · `dc2db094d` · `aaeec2e9b` ·
+`0ef8c5776` · `9020d6421` · `8b0673d9e` (el último trae, además de la capa documental, el cierre de
+la costura `null → 0` del adapter y el gate del volumen estimado partido en dos asserts), tres
+migraciones aplicadas en la instancia única de Cloud SQL (`…_task-1700-seo-work-queue.sql`,
+`…_task-1700-work-queue-keyset-collation.sql`, `…_task-1700-work-queue-decide-capability.sql`).
 
 ### 18.1 Por qué es un aggregate persistido y no un reader en vivo
 
@@ -1599,13 +1640,20 @@ reusarlo ES la respuesta correcta.
 `@core/theme/*`, `@menu` ni `@layouts` — un import de tema revienta el arranque del worker en silencio.
 `boundary.test.ts` lo verifica sobre el código.
 
-**Tres frenos independientes:**
+**Tres frenos independientes — nacieron puestos, y desde el 2026-08-29 están SUELTOS** (evidencia y
+verificación en §18.0). Se conserva el diseño porque explica qué hay que volver a poner si alguna vez
+se apaga la cola, y porque el freno 3 se puede volver a poner solo (ventana de re-pausa, §18.0):
 
-1. `GROWTH_SEO_WORK_QUEUE_ENABLED` en el **ops-worker** (`deploy.sh` declarativo, `:-false`) — gatea
-   el materializador; sin él no se escribe ningún snapshot.
-2. El mismo flag en **Vercel** — gatea reader, ruta app, lane ecosystem, tool MCP y el cutover del
-   consumer; sin él el worker acumularía snapshots que nadie lee.
-3. El scheduler **nace PAUSADO** (5.º argumento de `upsert_scheduler_job`, `deploy.sh:1599`).
+1. `GROWTH_SEO_WORK_QUEUE_ENABLED` en el **ops-worker** (`deploy.sh` declarativo; nació `:-false`,
+   hoy `:-true`, revisión activa `ops-worker-00613-qrh`) — gatea el materializador; sin él no se
+   escribe ningún snapshot.
+2. El mismo flag en **Vercel** (`production` + `staging`, hoy ON) — gatea reader, ruta app, lane
+   ecosystem, tool MCP y el cutover del consumer; sin él el worker acumularía snapshots que nadie lee.
+3. El scheduler **nació PAUSADO** (5.º argumento de `upsert_scheduler_job`, `deploy.sh:1599`) y hoy
+   está **ENABLED** (`0 10 * * *`, `America/Santiago`). ⚠️ Ese argumento se re-aplica como `pause`/
+   `resume` **explícito en cada deploy**: mientras `main` lo declare pausado, cualquier deploy que
+   corra ese árbol lo vuelve a pausar sin error visible. Verdad live = `gcloud scheduler jobs
+   describe`, nunca esta línea.
 
 El flag es subordinado a `GROWTH_SEO_ENABLED` (`flags.ts:217`) y tiene su fila en
 `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`. 🔴 **La cola no compromete gasto de proveedor** —lee
@@ -1770,6 +1818,10 @@ si el operador está mirando un **plan** válido. Detalle en
   canibalización no es un caso de borde, es un cuarto del inventario.
 - Curva de Berel, bucket 5: **37.600 impresiones / 370 clics (0,98%)** → utilizable. `efeoncepro.com`,
   mismo bucket: **75 / 0** → no utilizable, y por eso su lente cae a banda 2 en vez de fabricar ceros.
+
+Esa evidencia es del **primitive invocado directo**. La del **camino agendado** —misma identidad OIDC
+que usa Cloud Scheduler, `eligible=2 / materialized=1 / reused=1 / failed=0`, con el snapshot de 105
+items inspeccionado fila por fila— está en §18.0, y es la que autorizó despausar el job.
 
 ### 18.17 Lo que la cola NO hace (prohibido, no diferido)
 

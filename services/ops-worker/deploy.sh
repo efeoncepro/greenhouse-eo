@@ -1566,13 +1566,24 @@ echo "  -> ops-seo-url-visibility: 0 9 17 * * ACTIVO (visibilidad por sujeto-pá
 # en el ledger, un competidor de una org), así que al despausar sólo falta confirmar que
 # el endpoint responde en la revisión activa. El payload vacío usa el default
 # `maxCompetitors=1` (V1: un competidor a la vez).
+# 🟢 DESPAUSADO 2026-08-29 con autorización explícita del operador. La condición que faltaba
+# —"confirmar que el endpoint responde en la revisión activa"— quedó verificada con la MISMA
+# identidad OIDC que usa Cloud Scheduler: `POST {"dryRun":true}` → HTTP 200,
+# `ok:true status:completed providerCostUsd:0`, shape válido y cero gasto.
+#
+# ⚠️ `eligible: 0` en las primeras corridas NO es un defecto: el competidor capturado el
+# 2026-08-28 está dentro de su ventana de frescura, así que no hay elegibles hasta que venza.
+# Leerlo como "el job no funciona" sería el error.
+#
+# Despausado en el SoT Y en vivo: `upsert_scheduler_job` hace `pause`/`resume` EXPLÍCITO en cada
+# deploy, así que un resume out-of-band se revierte solo en el próximo.
 upsert_scheduler_job \
   "ops-seo-competitor-coverage" \
   "0 9 18 * *" \
   "/seo/competitor-coverage/capture-batch" \
   '{}' \
-  "true"
-echo "  -> ops-seo-competitor-coverage: 0 9 18 * * PAUSADO (cobertura de competidores mensual, TASK-1662 — despausar sólo tras dry-run + primera corrida verificada + autorización)"
+  "false"
+echo "  -> ops-seo-competitor-coverage: 0 9 18 * * ACTIVO (cobertura de competidores mensual, TASK-1662 — despausado 2026-08-29 tras dry-run verificado en la revisión activa + autorización del operador)"
 
 # TASK-1664 — drain de corridas de keyword discovery (Labs Live, bajo demanda del operador).
 # Cada 10 minutos alcanza de sobra: el enqueue es humano/agente (no hay cadencia diaria en V1)

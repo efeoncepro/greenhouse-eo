@@ -7,6 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-29 — La cola SEO empieza a correr sola, y un detector que avisaba a tiempo no llegaba a nadie
+
+Los dos schedulers del módulo quedaron activos: `ops-seo-work-queue-materialize` (`0 10 * * *`, tras
+corrida shadow con la identidad OIDC real y revisión fila por fila) y `ops-seo-competitor-coverage`
+(`0 9 18 * *`, ~USD 0,11/mes). Ambos despausados en el **SoT y en vivo**, porque
+`upsert_scheduler_job` re-aplica `pause`/`resume` en cada deploy y un resume suelto se revierte solo.
+
+El hallazgo del día no fue técnico sino de enrutamiento: la credencial AXIS que bloqueó el release
+**sí tenía detector, y avisó tres días antes** con el modo de falla exacto. Nadie lo leyó porque su
+único canal de salida era el color de su corrida, y ese color ya venía rojo por un bug ajeno. Un gate
+cuyo único canal es su propio color es un registro, no una alerta; y un detector con rojo crónico
+deja de ser un detector. `TASK-1794` recoge el arreglo, con el check de preflight primero — poner la
+medición donde alguien esté obligado a mirar.
+
+De paso: la arquitectura afirmaba en cuatro lugares que un scheduler estaba activo cuando estaba
+pausado, y el runbook de AXIS documentaba el `.npmrc` con una línea de menos.
+
 ## 2026-08-29 — La lente `●`/`◑` llega a producción con mecanismo, no con prosa
 
 Release `b7f74c95a2af` (`released`, watchdog `drift_count=0`). **TASK-1785**: los readers de
@@ -904,16 +921,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   período ausente porque parte desde las posiciones existentes.
 - Queda registrado que sacar `skipped` de `isSuccessOutcome` no habría corregido los 9.001 falsos éxitos, que los
   produce `no-op`, y que la state machine de `handler_health` no tiene ningún test que la cubra.
-
-## 2026-08-21 — GPT Image 2 gana transparencia end-to-end en código, con rollout aún gated
-
-- La nueva matriz oficial cubre GPT Image 2/1.5/1/1 Mini/`chatgpt-image-latest`, endpoints, tamaños flexibles,
-  edición/máscaras, streaming, precios, datos, provenance, deprecaciones y contradicciones entre páginas oficiales.
-- Se elimina el fallback falso Greenhouse GPT Image 2→1.5; el helper valida transparencia/formato, máscaras,
-  singularidad de salida y streaming no implementado antes de llamar al proveedor.
-- Globe incorpora `backgroundMode` de forma provider-neutral en shape, catálogo, request, fingerprint, manifest y
-  output; el driver comprueba alfa real y el Producer deriva selector/checkerboard desde constraints.
-- `greenhouse-ai-image-generator` y `greenhouse-globe-model-fleet` quedan alineadas entre Codex y Claude; el gate de
-  mirrors incorpora por primera vez el bundle completo de generación de imágenes, incluido `agents/openai.yaml`.
-- La ficha GPT Image 2 separa código local verificado de reader/canary históricos. La variante sigue gated hasta
-  deploy, canary billable, readback, GVC, promoción y rollback; WebP no se anuncia en la ruta PNG vigente.

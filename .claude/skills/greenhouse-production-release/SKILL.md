@@ -536,9 +536,21 @@ anteriores también fallan, la causa es de entorno o credencial y el diff en cur
 
 🔴 **Un `ERR_PNPM_FETCH_401` sobre `@efeoncepro/axis-*` es SIEMPRE la credencial, nunca el código.**
 El secreto `axis-packages-read-token` guarda un `.npmrc` completo (no el token pelado) con un PAT de
-`read:packages`. Un PAT clásico vence a los 30 días **en silencio**: sin señal, sin alerta, sin check
-de preflight. Caso fuente 2026-08-29: creado el 07-29, venció el 08-28, y se descubrió porque un
-agente estaba mirando un deploy — tres commits y ~14 h después de empezar a fallar.
+`read:packages`. Un PAT clásico vence a los 30 días. Caso fuente 2026-08-29: creado el 07-29, venció
+el 08-28, y se descubrió porque un agente estaba mirando un deploy — tres commits y ~14 h después de
+empezar a fallar.
+
+🔴 **Y la lección NO es «no había señal»: SÍ la había, y falló el ENRUTAMIENTO.** El detector
+`axis-credential-expiry.yml` corrió el 2026-08-25 (run `32856176785`) y avisó con tres días de
+anticipación —*«expira el 2026-08-28 — quedan 3 días. Rotar YA: al expirar, GitHub Actions sigue
+verde y solo fallan los builds de worker»*—, prediciendo incluso el modo de falla exacto. Nadie lo
+leyó porque su único canal de salida era el color de su corrida, y ese color **ya venía rojo**: las
+dos ejecuciones previas (08-04, 08-11) fallaban por una causa ajena (`Unable to locate executable
+file: pnpm`). Reglas: **un gate programado cuyo único canal de salida es el color de su propia
+corrida es un REGISTRO, no una alerta**; y **un detector con rojo crónico por causa ajena deja de ser
+un detector** — cuando el rojo es el color habitual, el rojo que importa es indistinguible del ruido.
+Por eso, ante una medición que debe accionarse, ponla **donde alguien esté obligado a mirar** (un
+check de preflight que detiene la promoción), no en un log que nadie abre.
 
 **Radio: 3 de los 4 workers del control plane** (`ops-worker`, `commercial-cost-worker`, `ico-batch`;
 `hubspot-greenhouse-integration` no lo usa) **y Vercel NO se ve afectado** — su build pasa verde, que
@@ -560,8 +572,9 @@ es justo lo que vuelve engañoso mirar sólo el color del PR.
 - **Arreglo durable** (cierra la clase, no el caso): que la App de GitHub acuñe tokens de instalación
   de 1 h bajo demanda en vez de un PAT estático. Hoy no puede — `greenhouse-release-watchdog`
   (`app_id=3665723`) tiene `actions:read`/`deployments:read`/`metadata:read`, **sin `packages`**.
-  Mínimo intermedio: anotar la expiración en el secreto + check de preflight que la detecte **antes**
-  de la promoción.
+  Mínimo intermedio, y con el orden corregido tras el hallazgo del enrutamiento: **primero el check
+  de preflight** que detenga la promoción (pone la medición donde alguien está obligado a mirar),
+  después la anotación de expiración en el secreto.
 
 ### El audit de flags tenía un punto ciego que anulaba su propio gate
 

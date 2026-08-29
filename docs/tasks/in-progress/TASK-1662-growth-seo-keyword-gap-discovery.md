@@ -1,5 +1,28 @@
 # TASK-1662 — Growth SEO: keyword gap — qué rankea la competencia y el cliente no
 
+## Delta 2026-08-29 — la cola que consume este gap ya corre en producción: el Slice 4 pasa de "esperar" a "medir"
+
+`TASK-1700` quedó **`complete`** con el release `b7f74c95a2afcf66f2c2d82dbd4a5ad4f7617471`: flag ON
+en los dos runtimes (revisión activa `ops-worker-00613-qrh`) y scheduler
+`ops-seo-work-queue-materialize` `ENABLED` (`0 10 * * *`). El Slice 4 de esta task —re-encuadrado en
+el Delta anterior de **construir** a **verificar el acople**— ya tiene contra qué verificarse.
+
+Lo que la primera corrida real muestra sobre este origen, y que acota lo que "verde" significa acá:
+en el snapshot de `seot-efeonce-own-brand` (105 items) `competitor_gap` salió **`degraded`** y los
+otros cinco orígenes `ok`, sin contaminarse — el aislamiento por colector funcionando. Ese
+`degraded` **no es un fallo del acople**: la serie del top-N arrancó el 2026-08-29 y
+`readSerpCompetitorCandidates` necesita **≥5 días** de captura antes de proponer candidatos. El
+criterio de cierre del Slice 4 es que el origen pase a `ok` **por maduración de la serie**, no por
+relajar el umbral.
+
+También quedó `ENABLED` el scheduler propio de esta task, `ops-seo-competitor-coverage`
+(`0 9 18 * *`, ~USD 0,11/mes), tras dry-run verificado y autorización del operador.
+
+⚠️ Comparte con `TASK-1700` la **misma ventana abierta**: `origin/main` todavía declara ambos
+schedulers `PAUSADO` en `services/ops-worker/deploy.sh`, así que un deploy del worker desde ese árbol
+los re-pausa en silencio. `develop` ya trae la declaración correcta; el PR de release **#211** la
+promueve.
+
 ## Delta 2026-08-28 (Slice 4 desbloqueado) — la cola ya PULLEA el gap: el Slice 4 no es código de esta task
 
 `TASK-1700` está en `develop` con sus siete slices (`962d22118` … `9020d6421`), así que el bloqueo
