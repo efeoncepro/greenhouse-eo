@@ -27,10 +27,17 @@ Batch independently reversible writes. Separate schema creation, backfill, autom
 | RevOps | lifecycle, properties, pipelines, associations, ownership, SLAs |
 | Data quality | duplicates, required fields, normalization, backfills, monitoring |
 | Automation | workflows, routing, notifications, tasks, exception handling |
-| Customer service | help desk, inbox, tickets, knowledge, Customer Agent, handoff |
-| Content/CMS | landing, forms, chat entry, consent, tracking, attribution |
+| Marketing, Content & AEO | Marketing Studio/campaigns, segments, content, AEO, forms, consent, attribution |
+| Sales & AI Pipeline | Sales Workspace, leads/targets, sequences, forecast, coaching, eligible sales agents |
+| Revenue Lifecycle | catalog, quote, Contract, change/renewal, billing/revenue integration and controls |
+| Service, Success & Delivery | help desk, tickets, knowledge, Customer Agent, CS Workspace, health, Projects/Services |
+| Agentic Operations | readiness, Agent Hub/Builder, agents/workflows, tools, evaluation, cost, handoff, observability |
 | Reporting | baseline, funnel/service metrics, dashboards, definitions |
 | Managed operation | backlog, release cadence, QA, incident/recovery, QBR |
+
+The default pre-sale evaluation is limited and free. Use a paid blueprint only when it delivers an independent
+inventory, target design, roadmap and risk artifact. Never convert a product surface or CRM object into a service
+workstream without an owned outcome and acceptance contract.
 
 ## Data-quality operating contract
 

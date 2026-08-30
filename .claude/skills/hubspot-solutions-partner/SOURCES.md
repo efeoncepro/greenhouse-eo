@@ -4,7 +4,8 @@
 > materialmente solo en 2026**, y el producto se renombró en tres lugares. Todo dato numérico se cita
 > con marca y `as-of`. Si vas a decir un número frente a un cliente, sale de acá o no sale.
 
-**As-of de este ledger: 2026-07-16.** Refresh obligatorio: **antes de UNBOUND (16-18 sep 2026)** y
+**As-of de producto de este ledger: 2026-08-30.** Pricing y programa conservan verificaciones fechadas por
+sección. Refresh obligatorio: **antes de UNBOUND (16-18 sep 2026)** y
 **antes del 15 de enero de 2027** (suben los umbrales de tier).
 
 ---
@@ -85,7 +86,7 @@ Fuentes verificadas 2026-08-27: [Gartner B2B Marketing Automation 2025](https://
 | **Marketing Studio**: workspace AI para brief, estrategia, assets y colaboración; KB lo marca beta | [Producto](https://www.hubspot.com/products/marketing/studio) · [KB](https://knowledge.hubspot.com/campaigns/create-campaigns-using-marketing-studio) | Wedge de campaign chaos; no SLA mientras beta |
 | **Sales Workspace** actualizado concentra companies, leads, deals, tareas, agenda y acciones sugeridas | [KB — Updated Sales Workspace](https://knowledge.hubspot.com/sales-workspace/manage-sales-activities-in-the-updated-sales-workspace) | Wedge de productividad/priorización comercial |
 | **Customer Success Workspace** configura customers, projects, revenue, workspaces por equipo y health scores | [KB — Customer Success Workspace](https://knowledge.hubspot.com/customer-success/set-up-and-manage-the-customer-success-workspace) | Wedge de churn, renewals y expansión |
-| **Breeze Studio** sigue beta; custom assistants migraron/read-only y el catálogo de agentes cambia | [KB — Breeze Studio](https://knowledge.hubspot.com/ai/use-assistants-and-agents-in-breeze-studio) | Vender capability y gobierno; no continuidad garantizada de betas |
+| **Agent Hub** sigue beta y centraliza agentes prebuilt/custom y agentic workflows | [KB — Agent Hub](https://knowledge.hubspot.com/ai/understand-agent-hub) | Vender readiness, caso de uso y gobierno; no roster ni continuidad garantizada de beta |
 | **Agent CLI** beta pública: bulk/scheduled/background; MCP/conectores para conversación human-in-loop | [Developer changelog — Agent CLI](https://developers.hubspot.com/changelog/hubspot-agent-cli-available-in-public-beta) | Elegir rail por workflow; `--dry-run` obligatorio para writes |
 | Partners ganan en upmarket, agentic acceleration, marketing reimagined y especialización | [State of Ecosystems 2026](https://www.hubspot.com/state-of-ecosystems) | Prioridad de práctica y posicionamiento LATAM especializado |
 | HubSpot propone paquetes de servicios Loop/IA para partners | [Guide to Services for Loop Marketing](https://www.hubspot.com/hubfs/Agency/GTM%20-%20Product%20Resources%20%28Justin%29/Fall%20Spotlight/Guide%20to%20Services%20for%20Loop%20Marketing%20%281%29.pdf) | Validación de packaging; rangos orientativos, no price book Efeonce |
@@ -196,10 +197,11 @@ Cita utilizable (Jon Dick, CCO): *"Outcome-based pricing removes that risk. You 
 ✅ [KB — Set up the customer agent](https://knowledge.hubspot.com/customer-agent/set-up-the-customer-agent) (act. 2026-07-02; comparación de training/content sources)
 ✅ [Legal — Product & Services Catalog / HubSpot Credits Rate Sheet](https://legal.hubspot.com/hubspot-product-and-services-catalog) (verif. 2026-07-17)
 
-### Breeze ✅ — solo TRES agentes en GA
-GA: **Customer Agent · Prospecting Agent · Data Agent**. El KB clasifica el resto como **"Mostly Beta"**
-(ABM Landing Page, Blog Research, Closing, Company Research, Cross-sell/Upsell, Customer Health, Deal Loss,
-RFP, Sales-to-Marketing Feedback). **No firmes SLA sobre beta.**
+### Agent Hub, agentes y workflows ✅/⚠️ — as-of 2026-08-30
+Agent Hub está marcado **beta** y reúne agentes preconstruidos, custom y agentic workflows. No existe un número
+estable que deba memorizarse o publicarse como promesa comercial. **No firmes SLA sobre beta.** Para cada capacidad,
+verifica release state, portal/tier, seat, créditos, permisos y readback.
+✅ [KB — Understand Agent Hub](https://knowledge.hubspot.com/ai/understand-agent-hub) (act. 2026-08-21)
 ⚠️ **"Breeze Intelligence" está desapareciendo** como nombre: ya no figura en el KB canónico (may-2026), y
 terceros dicen que el enrichment estándar pasó a ser gratis con Core Seats. **No lo afirmes sin confirmar.**
 🔴 ✅ **Custom Assistants: sunset.** 19-jun-2026 cuentas nuevas no pueden crearlos; **13-jul-2026 pasan a
@@ -211,9 +213,22 @@ se le rompió algo. Y es también un argumento de riesgo de plataforma que un co
 Cita para deck (Duncan Lennox, CPTO): *"Context is much more complex. If data is what happened,
 context is why."* — el posicionamiento anti-commodity frente a Salesforce/Adobe.
 Lanzamientos: **HubSpot AEO** · Breeze Assistant para Loop Marketing · Prospecting Agent expandido ·
-**Smart Deal Progression (GA)** · Customer Agent con canal email y multi-brand.
+**Smart Deal Progression** *(verificar beta/elegibilidad en el portal)* · Customer Agent con canal email y multi-brand.
 Dato de HubSpot para el pitch AEO: **tráfico orgánico −27% YoY · tráfico de referencia IA ×3.**
 ✅ [company-news — Spring 2026 Spotlight](https://www.hubspot.com/company-news/spring-2026-spotlight)
+
+### Customer Platform, Revenue, Customer Success y objetos — as-of 2026-08-30
+- **Seis Hubs:** Marketing, Sales, Service, Content, Data y Revenue, conectados a Smart CRM.
+- **Revenue Hub:** quote-to-revenue con Contracts como fuente de revenue comprometido; change/renewal quotes y
+  billing/payments dependen de seat, territorio y beta. No prometer migración universal de subscriptions.
+- **Customer Success Workspace:** Service Hub; configura Customers, Projects y Revenue, con health scores.
+- **Projects y Services:** objetos CRM, no Hubs ni sustitutos universales de PSA/ERP.
+✅ [Customer Platform](https://www.hubspot.com/products/customer-platform) ·
+[Revenue Hub](https://www.hubspot.com/products/revenue) ·
+[Contracts](https://knowledge.hubspot.com/contracts/create-contracts) ·
+[Customer Success Workspace](https://knowledge.hubspot.com/customer-success/set-up-and-manage-the-customer-success-workspace) ·
+[Projects API](https://developers.hubspot.com/docs/api-reference/latest/crm/objects/projects/guide) ·
+[Services API](https://developers.hubspot.com/docs/api-reference/latest/crm/objects/services/guide)
 
 ### 🎯 **"Agentic Customer Platform"** — HubSpot **soltó la etiqueta "CRM"** ✅
 Posicionamiento oficial 2026. Objetivo declarado a inversionistas (2026-05-07): ser

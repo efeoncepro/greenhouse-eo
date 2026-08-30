@@ -20,7 +20,9 @@ HubSpot's `Deployment > Workflows and bots` surface is a **selective conversatio
 - A rule-based chatbot runs a deterministic pre-flow—questions, branches, property capture, ticket creation or meeting routing—and uses `Send to Customer Agent` when its path should continue with the agent.
 - Channel deployment is the separate option for sending all incoming conversations from a connected channel to the Customer Agent. Prefer workflows/bots when assignment must vary by client tier, issue type, intent or another governed criterion.
 - Customer Agent **actions** are a different layer: they call approved apps or APIs to retrieve data or perform a task.
-- Workflow **Run Agent** is also different: it invokes a Breeze Studio agent as an automation step and exposes its output to later workflow actions or branches.
+- A workflow action that runs an agent is also different: it invokes an eligible agent managed through Agent
+  Hub/Agent Builder as an automation step and can expose output to later actions or branches. Verify the action's
+  current name, beta state and portal eligibility before designing around it.
 
 Before activation, document a routing matrix with entry source, positive criteria, exclusions, required captured context, Customer Agent path, human fallback, unavailable-hours behavior, owner, credit implication and expected resolution. Require approval for workflow/chatflow activation, then test at least one positive assignment, one negative/excluded path, one human fallback and one unavailable path. A saved or enabled definition is not proof that the conversation reached the intended owner.
 

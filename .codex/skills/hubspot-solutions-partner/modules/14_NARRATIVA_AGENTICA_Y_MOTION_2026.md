@@ -1,6 +1,6 @@
 # 14 · Narrativa agéntica y motion comercial 2026
 
-> **Verificado al 2026-07-16.** Cargar este módulo cuando la pregunta sea cómo posicionar, prospectar,
+> **Verificado al 2026-08-30.** Cargar este módulo cuando la pregunta sea cómo posicionar, prospectar,
 > demostrar o empaquetar HubSpot en la etapa Agentic Customer Platform. Para implementación y gobierno
 > técnico de agentes, cargar además `13_AGENTES.md`. Para cualquier cifra o vigencia, abrir `../SOURCES.md`.
 
@@ -48,7 +48,7 @@ por sí solo por qué se ganó un deal, cuándo escalar un ticket o qué excepci
 | **Sales Workspace** | Experiencia actualizada aplicable a todas las cuentas desde 2026-04-27 | Companies, leads, deals, tareas, agenda, preparación y follow-up | Reps atrapados en admin, poca priorización, pipeline sin siguiente acción |
 | **Customer Success Workspace** | Service Hub Pro/Enterprise | Cuentas, proyectos, revenue, renovaciones, health scores y vistas por equipo | CSMs con cartera grande, churn reactivo, expansión sin sistema |
 | **Help Desk + Customer Agent** | Capacidad comercial principal | Intake, routing, resolución, handoff y medición | Soporte saturado, tiempos altos, preguntas repetitivas |
-| **Breeze Studio** | **Beta**; catálogo y migraciones siguen cambiando | Personalizar agentes, instrucciones, herramientas y knowledge vaults | Agent readiness y customización gobernada, sin SLA sobre beta |
+| **Agent Hub / Agent Builder** | **Agent Hub beta**; elegibilidad y catálogo cambian | Administrar agentes prebuilt/custom, workflows, instrucciones, tools y context | Readiness, gobierno, piloto y Managed Agentic Operations; sin SLA sobre beta |
 | **Agent CLI** | **Beta pública** desde 2026-06-23 | Operaciones repetitivas, masivas, programadas y de background | RevOps/CRM Ops operado con agentes, con OAuth, `--dry-run` y auditoría |
 
 **No confundir Marketing Studio con Campaigns o Journey Automation:** Studio construye y coordina; Campaigns
@@ -103,7 +103,7 @@ quién financia o cómo sumar al sponsor, tratarlo como usuario/influenciador y 
 | Customer Success Workspace | Director de CS, CX, Service Ops | COO, Chief Customer Officer |
 | Help Desk + Customer Agent | Support/CX Manager, Service Ops, Automation Lead | COO, CTO/CIO |
 | Growth Context / CRM / integraciones | RevOps Manager, CRM Manager, Business Systems, Transformación Digital | COO, CIO/CTO |
-| Breeze Studio / Agent CLI | AI Lead, Automation Lead, CRM Ops, Digital Transformation | CIO/CTO, COO |
+| Agent Hub / Agent Builder / Agent CLI | AI Lead, Automation Lead, CRM Ops, Digital Transformation | CIO/CTO, COO |
 
 En LATAM buscar además equivalentes como **gerente, subgerente o jefe** de CRM, marketing, comercial,
 experiencia de clientes, automatización, operaciones comerciales o transformación digital. El título importa
@@ -182,7 +182,8 @@ de prometer elegibilidad; los bonus points expiran después de la recalibración
 - **Alta confianza:** dirección estratégica, arquitectura, estados de producto y reglas publicadas en fuentes HubSpot.
 - **Media confianza:** métricas de outcomes publicadas por HubSpot; son first-party del vendor y no garantías.
 - **Baja/no utilizable:** inferir ROI propio, prometer que una beta permanecerá o trasladar benchmarks sin línea base.
-- No firmar SLA sobre Marketing Studio, Breeze Studio, Agent CLI ni agentes especializados mientras sigan beta.
+- No firmar SLA sobre Agent Hub, Agent Builder, Agent CLI ni un agente/workflow mientras su superficie aplicable
+  siga beta o no tenga elegibilidad y readback verificados.
 - No presentar “full API parity” como realidad completa: es la **dirección anunciada**; verificar cada capability.
 - No decir que HubSpot reemplaza todo el stack: la tesis oficial también es ecosistema abierto y sistemas conectados.
 

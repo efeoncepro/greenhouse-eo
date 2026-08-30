@@ -117,6 +117,17 @@ en otra marca.
 GTM define el segmento, el posicionamiento y la motion; las skills dueñas ejecutan el canal, el diagnóstico, la
 propuesta y la entrega. No se crea un quinto motor comercial por cada provider o product brand.
 
+### Operating model agentic
+
+La motion se opera mediante un `Agentic Revenue Pod`: HubSpot gobierna expansión, warm, inbound y CRM; Apollo opera
+cold net-new; Greenhouse, Codex y Claude orquestan research, QA, propuestas y memoria; Julio conserva discovery,
+negociación y cierre. La función humana `Commercial Systems Operator` gobierna approvals, excepciones,
+deliverability, triage y data quality. El contrato completo, los rails excluyentes y los triggers de staffing viven en
+[`AGENTIC_REVENUE_OPERATING_MODEL_V1.md`](../commercial/AGENTIC_REVENUE_OPERATING_MODEL_V1.md).
+
+Disponibilidad tecnológica no equivale a motion validada: Prospecting Agent, Customer Agent, Data Agent, Apollo o un
+agente propio entran por cohortes separadas y sólo escalan contra pipeline contribution, costo, calidad y SLA.
+
 ## 6. Proof system
 
 Cada beachhead necesita una cartera mínima de evidencia antes de pasar a `Commercially approved`:

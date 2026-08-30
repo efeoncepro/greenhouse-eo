@@ -2,6 +2,33 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-30 — oferta HubSpot V2 y task de landing inmersiva documentadas; landing sigue pendiente
+
+La investigación actual de producto y el benchmark de 11 partners quedaron consolidados en un audit fechado y en
+el canon `docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md`. La práctica usa seis familias por
+outcome, modos de entrega transversales y overlays sectoriales; la evaluación inicial es sin costo y el blueprint
+pagado exige entregable autónomo. Customer Agent ya no es categoría raíz; Agent Hub/Builder, Revenue Hub/Contracts,
+Customer Success, Projects/Services, Marketing Studio y AEO quedaron ubicados en la taxonomía correcta.
+
+Se actualizaron PDR-006/007/013, el spec y las skills HubSpot en `.codex`/`.claude`, fuentes, glosarios, templates y
+router. `TASK-1352` fue **reemplazada por completo** —no reconciliada mediante deltas— para impedir que un ejecutor
+reproduzca el resultado rechazado de Claude Design. La task exige research y contratos de copywriting, SEO/AEO y CRO
+antes del diseño, más un gate humano `ACCEPT FIRST FOLD` antes de implementar el resto. La dirección durable es
+**Sistema vivo de crecimiento**. El wireframe, flow y motion gobiernan un atlas conectado de
+seis resultados, tres lentes sectoriales, una conversión primaria y una experiencia inmersiva basada en color y
+causalidad — sin copiar el trade dress de HubSpot, modificar badges/logos ni depender de video, particles, robots o
+scroll hijacking. La paleta exacta debe salir de assets oficiales/autorizados vigentes y convertirse en tokens
+page-scoped; first-fold, no-JS, reduced motion, performance, marca y GVC premium son gates binarios.
+
+Los cuatro docs UI de TASK-1352 fueron también **reemplazados integralmente** el 2026-08-30. Ya no fijan una gran
+idea antes del research ni separan agentes como oferta dominante: dirección, wireframe, flow y motion usan las seis
+familias exactas, `COPY_SLOT` gobernado, pasajes SEO/AEO servidos, una única conversión, estados/fallas completos,
+tokens de motion exactos y score premium `average >= 4.5` con todas las dimensiones `>= 4`.
+
+**No se modificó ni publicó la landing viva**: `TASK-1352` sigue `to-do` y `UI ready: no`. Debe producir dossiers
+VoC/CRO y SEO/AEO, claim/proof ledger, copy deck nuevo y reverificar producto, tier, assets, prueba, formulario y
+disponibilidad del portal antes de implementar.
+
 ## 2026-08-30 — TASK-1693 `complete`: lo que la lente `Descubrir` ya tenía construido y no llegaba al operador
 
 Tres capacidades pagadas y sin superficie, cerradas en cuatro slices sobre `develop` (sin push):
@@ -547,52 +574,3 @@ licitación abiertos en total; Ajinomoto ya no cuenta como activo.
 - La skill espejada incorpora un contrato común LicitaLAB/Wherex: identidad e idempotencia, deadline distinto de
   `closedate`, asociaciones reales, segundo readback, estados HOLD/NO-BID/Expirada y sincronización de ambos
   registros. La cola fechada separa diez bids prioritarios, tres RFI livianos y diez oportunidades con gate previo.
-
-## 2026-08-28 — `TASK-1700`: la cola priorizada de trabajo SEO — code complete, rollout pendiente
-
-**Estado: `code complete, rollout pendiente`.** Los 7 slices están en `develop`. El módulo SEO pasa de
-CUATRO criterios de orden no comparables a una única autoridad: `greenhouse_growth.seo_work_queue_*`,
-append-only, con `priority_score_version` y `score_breakdown_json` desde la primera migración.
-
-**Lo que hay que saber para retomar:**
-
-1. 🔴 **Tres defectos que sólo vio la corrida real, ninguno los tests.** El mismo sujeto salía dos veces
-   con verbos contradictorios en la cabeza de la cola (`pinturas` #1 `consolidate` y #2 `optimize`); un
-   origen devolvía 0 items reportándose `state: 'ok'` (sin `runId`, `readKeywordDiscovery` entrega sólo
-   el historial de corridas); y el cap declaraba "quedaron 200 fuera" cuando eran 2.799. Lección
-   portátil: **un vacío creíble es el disfraz favorito de un origen roto**.
-
-2. 🔴 **Dos bug classes de SQL que este dominio ya pagó** y que la regla `.claude/rules/growth-seo.md`
-   ahora documenta: (a) un alias con el nombre de la columna (`priority_score::text AS priority_score`)
-   hace que PostgreSQL ordene por el nombre de SALIDA, o sea como TEXTO — la primera página del reader
-   empezaba en el rank 17; (b) ordenar en JS y paginar en SQL exige la MISMA collation — `en_US.UTF8`
-   ignora el espacio al comparar y `localeCompare` no, así que el keyset salteaba filas en silencio
-   (631 de 635). Las dos son invisibles con mocks: aparecen paginando datos reales de punta a punta.
-
-3. **La costura entre dos contratos que usan la misma palabra al revés.** `priority_score = null` en la
-   cola significa «me niego a estimar»; `estimatedClickGain = 0` en la lente significa «ya convierte por
-   encima de la media». Traducir uno al otro reintroducía en el contrato el cero-sentinel que
-   `TASK-1792` acababa de eliminar del código. Se resolvió con un principio, no con un mapeo: **la cola
-   sirve la lente sólo si puede hacerlo sin fabricar**; si no, cede al legacy. Hallazgo de
-   `greenhouse-eo-9b`, confirmado de forma independiente en el barrido cruzado.
-
-**Pendientes de rollout (no cerrar como "listo" sin esto):**
-
-- `GROWTH_SEO_WORK_QUEUE_ENABLED` está **OFF en los dos runtimes** y el scheduler
-  `ops-seo-work-queue-materialize` nace **PAUSADO** — tres frenos independientes. El flip se AVISA al
-  operador de SEO aunque no cueste un centavo: cambia de dueño el orden que ve en pantalla y aparecen
-  filas de orígenes que antes no estaban en esa lista.
-- Promoción a `main` con la migración (3 tablas + índice de keyset + capability).
-- La señal `growth.seo.work_queue.stale_snapshot` hoy reporta **ERROR legítimo**: `efeoncepro` nunca
-  materializó (sólo se corrió sobre `berel.com`). Su steady 0 se alcanza tras la primera corrida del
-  cron sobre todos los targets elegibles, no antes.
-
-**Evidencia real, no simulada:** 641 items sobre `berel.com`, idempotencia con cero filas nuevas,
-paginación 641/641 sin saltear, paridad de orden verificada contra el reader legacy sobre las 33
-keywords compartidas (techo idéntico, orden relativo idéntico), y el gate anti-ejecución comprobado
-**en rojo** inyectando un import prohibido. Suite completa: 12.548 tests verdes.
-
-**Dato de negocio que salió del camino:** `berel.com` tiene **4.352 de 19.080 queries (23%) con más de
-una página compitiendo**. No es un artefacto del predicado —con un piso de 10% de share siguen siendo
-3.825— así que la cabeza de su cola es legítimamente `consolidate`: su mayor oportunidad es arreglar su
-propia canibalización antes de perseguir posiciones nuevas.

@@ -17,13 +17,17 @@
 
 ## La estructura
 
+Antes de componerla, declara familia(s) de outcome, modo de entrega, overlay sectorial, licencia/terceros separados
+de honorarios, incluidos, exclusiones, acceptance evidence y post-go-live. Customer Agent, Contracts, Projects o un
+agente específico son componentes del scope, no el nombre automático de toda la propuesta.
+
 ```
 1 · LO QUE ENCONTRAMOS        El diagnóstico. Con SUS datos, no con los nuestros.
                               (El grader. El audit del portal. Los números que ellos nos dieron.)
 
 2 · LO QUE ESO LES CUESTA     El status quo, cuantificado. No el producto — el costo de no hacer nada.
 
-3 · LO QUE PROPONEMOS         Las cuatro capas. Por fases. Con una victoria visible a los 30 días.
+3 · LO QUE PROPONEMOS         Outcome + modo de entrega. Por fases. Con primer valor verificable.
 
 4 · LO QUE NO INCLUYE         🔴 Los límites de HubSpot, POR ESCRITO.
                               Esto no es defensivo: es lo que los salva del churn en el mes ocho.

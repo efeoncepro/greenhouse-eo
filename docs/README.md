@@ -34,7 +34,8 @@ Indice maestro de la documentacion no operativa del repo.
 
 - [Índice y contrato de documentación comercial](commercial/README.md)
 - [Sales Goals Operating Model V1](commercial/SALES_GOALS_OPERATING_MODEL_V1.md)
-- [Sales Goals Q4 2026 y marco 2027](commercial/SALES_GOALS_2026_Q4_2027.md)
+- [Sales Goals Q4 2026 y metas trimestrales 2027](commercial/SALES_GOALS_2026_Q4_2027.md)
+- [Service Portfolio & Revenue Architecture V1](commercial/SERVICE_PORTFOLIO_REVENUE_ARCHITECTURE_V1.md)
 - [CRM Deal Register](commercial/CRM_DEAL_REGISTER.md)
 - Esta categoría conserva metas, forecast e índices de oportunidades. HubSpot sigue siendo la autoridad de los
   Deals y Finance conserva facturación, revenue, cobro, costos y margen.

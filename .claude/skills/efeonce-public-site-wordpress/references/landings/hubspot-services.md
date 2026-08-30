@@ -6,6 +6,18 @@
 - WordPress `page_id`: `244079`
 - Status: publish
 
+## Content authority for the pending rebuild
+
+- Current live identity above remains authoritative until `TASK-1352` executes and verifies the 301.
+- Positioning: `docs/public-site/decisions/PDR-006-landing-hubspot-agentic-platform-posicionamiento.md`.
+- Content spec: `docs/public-site/HUBSPOT_HUB_LANDINGS_SPEC.md`.
+- Offer taxonomy: `docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md`.
+- Product evidence: `.codex/skills/hubspot-solutions-partner/SOURCES.md`, refreshed at publication.
+
+Do not reintroduce a fixed agent roster, “seven Hubs,” or Customer Agent as the root service. Use six Hubs connected
+to Smart CRM and route copy through the six outcome families; Agent Hub, AEO, workspaces and CRM objects are
+transversal capabilities.
+
 ## Ohio Headline Guardrail
 
 Ohio page headline uses `page_header_title_background_type=featured`.

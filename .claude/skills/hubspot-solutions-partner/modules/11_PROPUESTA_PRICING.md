@@ -4,6 +4,20 @@
 > **`commercial-expert`**. El **deck** es de **`deck-studio`**. El **contrato** es de
 > **`legal-privacy-ip-operator`**. Este módulo aporta lo que solo aplica a HubSpot.
 
+## Arquitectura de propuesta vigente
+
+Toda propuesta nombra por separado:
+
+1. familia(s) de outcome de `HUBSPOT_OFFER_ARCHITECTURE_V2`;
+2. modo de entrega: blueprint, implementación/migración, sprint, Managed HubSpot Operations o Managed Agentic Operations;
+3. licencia/seat/créditos de HubSpot versus honorarios, terceros e integraciones de Efeonce;
+4. incluido, exclusión, dependencia, evidencia de aceptación y post-go-live;
+5. overlay sectorial y anti-fit, si corresponde.
+
+La evaluación inicial de fit/cotización no se cobra. Un audit o blueprint sí puede cobrarse cuando su entregable
+es autónomo. No publiques precio de una familia sin capacidad, alcance y economics validados; transparencia de scope
+y duración es obligatoria aunque el precio final requiera cotización.
+
 ---
 
 ## 1. La estructura de la oferta — las cuatro capas, siempre

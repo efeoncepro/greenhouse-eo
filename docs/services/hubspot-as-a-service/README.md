@@ -19,35 +19,54 @@ híbrida HubSpot Marketing Hub + Salesforce CRM exige source of truth, lifecycle
 deduplicación y sync explícitos. Canon de posicionamiento:
 [`CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md`](../../audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md).
 
-El recorrido de oferta es:
+La arquitectura vigente se define en
+[`HUBSPOT_OFFER_ARCHITECTURE_V2.md`](HUBSPOT_OFFER_ARCHITECTURE_V2.md). Separa tres ejes que no deben colapsarse:
 
-1. **RevOps & CRM Diagnostic / Discovery & Assessment** — entender outcomes, procesos, stack, datos, riesgos, quick wins y fit de provider sin presuponer HubSpot.
-2. **CRM & HubSpot Architecture** — diseñar modelo de datos, lifecycle, pipelines, integraciones, gobierno y medición.
-3. **HubSpot Implementation** — implementar por fases y workstreams aprobados, con migración, automatización,
-   integraciones, documentación y enablement.
-4. **Data, Automation & Lifecycle** — mejorar calidad, captura, routing, workflows, scoring, reporting y adopción.
-5. **Managed CRM Operations** — operar, medir, mantener y optimizar el sistema con cadencia y backlog gobernado.
-6. **Customer Agent / AI Operations** — servicio especializado para conocimiento, agentes, handoff, QA y gobierno.
+1. **Familia de solución:** Marketing, Content & AEO; Sales & AI Pipeline; Revenue Lifecycle; Service, Customer
+   Success & Delivery; Data, Integration & CRM Intelligence; Agent Hub & Agentic Operations.
+2. **Modo de entrega:** evaluación inicial sin costo; blueprint/auditoría pagada opcional; implementación o
+   migración; sprint de optimización; Managed HubSpot Operations; Managed Agentic Operations.
+3. **Overlay sectorial:** workflow, modelo de datos, integraciones, compliance, evidencia y anti-fit propios de una
+   industria.
 
-Estas son etapas y composiciones comerciales, no seis promesas obligatorias ni un bundle cerrado. Los dos servicios
-canónicos de abajo son los contratos documentados hoy; los demás funcionan como ofertas, workstreams o escalones de
-entrada dentro de ellos.
+La evaluación inicial sin costo es la puerta normal para determinar fit y preparar la cotización. Solo se cobra un
+blueprint o audit cuando produce un artefacto técnico autónomo que conserva valor si Efeonce no ejecuta el proyecto.
+
+Smart CRM es la base compartida; los seis Hubs, Agent Hub, workspaces, agentes, objetos y extensibilidad son
+superficies que se componen. **Un Hub, un workspace, un agente o un objeto CRM no equivale automáticamente a un
+servicio comercial.**
 
 La secuencia se adopta del brochure principal revisado, pero el material comercial es sólo insumo histórico. La
 auditoría [`HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`](../../audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md) registra
 qué se absorbió y qué claims, precios, nombres o capacidades no deben reutilizarse sin verificación.
 
-## Servicios canónicos
+## Familias canónicas
 
-| Servicio                                                                                                  | Clave estable                    | Resultado principal                                                                          | Evidencia ANAM                                                                   |
-| --------------------------------------------------------------------------------------------------------- | -------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| [Customer Agent gestionado](hubspot-customer-agent-managed-service.md)                                    | `hubspot.customer-agent-managed` | Atención conversacional documentada, gobernada y transferible a humanos.                     | Configuración, 23 fuentes, catálogo técnico, QA, handoff y canal.                |
-| [Arquitectura RevOps, automatización y paneles](hubspot-revops-architecture-automation-and-dashboards.md) | `hubspot.revops-managed`         | CRM observable y operable con modelo de datos, calidad, automatización y medición gobernada. | Growth, Data Quality, Service piloto, workflow y paneles Retención/Fidelización. |
+| Familia | Clave estable | Resultado principal |
+| --- | --- | --- |
+| Marketing, Content & AEO | `hubspot.solution.marketing-content-aeo` | Demanda y visibilidad conectadas a conversión y revenue. |
+| Sales & AI Pipeline | `hubspot.solution.sales-ai-pipeline` | Pipeline visible, priorizado y ejecutable. |
+| Revenue Lifecycle | `hubspot.solution.revenue-lifecycle` | Quote-to-revenue, contratos, renovación y expansión gobernados. |
+| Service, Customer Success & Delivery | `hubspot.solution.service-success-delivery` | Atención, adopción, salud, entrega y retención operables. |
+| Data, Integration & CRM Intelligence | `hubspot.solution.data-integration-intelligence` | Contexto confiable, integrado y medible para equipos y agentes. |
+| Agent Hub & Agentic Operations | `hubspot.solution.agentic-operations` | Agentes y workflows agentic gobernados, evaluados y optimizados. |
 
-Ambos son servicios, no tareas aisladas. Pueden contratarse como workstreams separados o como un programa
-HubSpot as a Service coordinado. Customer Agent depende de conocimiento, gobierno y handoff; RevOps depende de
-identidad, modelo de datos y disciplina de captura. Cuando se combinan, comparten discovery, control de cambios,
-QA, reporting y cadencia de Managed Ops sin mezclar sus criterios de aceptación.
+Los contratos existentes siguen siendo evidencia y subtipos reutilizables:
+
+- [Customer Agent gestionado](hubspot-customer-agent-managed-service.md) pertenece a Service/Customer Success y a
+  Agentic Operations; ya no define la categoría completa de agentes.
+- [Arquitectura RevOps, automatización y paneles](hubspot-revops-architecture-automation-and-dashboards.md)
+  pertenece a Data/Integration/CRM Intelligence y puede componer Sales, Service o Revenue.
+
+Projects y Services son objetos CRM; Contracts forma parte de Revenue Hub. Su aparición en una solución depende del
+workflow y del source of truth del cliente, no de una obligación de usar cada novedad de la plataforma.
+
+## Especialización sectorial
+
+La primera ola prioriza **servicios profesionales/B2B, SaaS/tecnología y manufactura/distribución**. Las fichas
+sectoriales viven en [`sectors/`](sectors/) y deben pasar sus gates de evidencia antes de transformarse en claims o
+landings. Educación, salud, finanzas, real estate/construcción, retail/ecommerce y nonprofit permanecen en
+incubación hasta contar con patrón, owner y prueba suficientes.
 
 ## Artefacto reusable
 
@@ -74,6 +93,8 @@ artefacto versionado usa `orange` por su contraste con la portada clara.
 
 ## Fuentes transversales
 
+- [Arquitectura de oferta V2](HUBSPOT_OFFER_ARCHITECTURE_V2.md)
+- [Benchmark de mercado 2026-08-30](../../audits/commercial/HUBSPOT_SERVICES_MARKET_BENCHMARK_2026-08-30.md)
 - [Canon técnico HubSpot as a Service](../../architecture/kortex/hubspot-as-a-service/README.md)
 - [Documentación funcional ANAM](../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md)
 - [Manual operativo ANAM](../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md)

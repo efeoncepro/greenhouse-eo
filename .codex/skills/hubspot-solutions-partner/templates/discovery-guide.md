@@ -5,6 +5,16 @@
 
 ---
 
+## Entrada y clasificación
+
+- [ ] La evaluación inicial es sin costo y está limitada a fit/no-fit, problema, riesgos y siguiente scope.
+- [ ] Si se propone un blueprint pagado, su inventario, target design, roadmap y criterios de aceptación tienen
+  valor independiente de la implementación.
+- [ ] Familia de outcome: Marketing/Content/AEO · Sales/AI Pipeline · Revenue Lifecycle · Service/Success/Delivery ·
+  Data/Integration/Intelligence · Agent Hub/Agentic Operations.
+- [ ] Modo de entrega: blueprint · implementation/migration · sprint · managed operation.
+- [ ] Overlay sectorial, source of truth y anti-fit documentados.
+
 ## 🔴 Las tres que no puedes saltarte
 
 | # | Pregunta | Qué decide |

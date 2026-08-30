@@ -14,6 +14,10 @@
 > [PDR-003](PDR-003-layering-ecosistema-digital-efeonce.md), [PDR-007](PDR-007-hubspot-portal-grader-lead-magnet.md).
 > **Evidencia:** skill `hubspot-solutions-partner` → `SOURCES.md` (✅ primaria / ⚠️ secundaria / ❌ no publicada)
 > + `efeonce/ESTADO_ACTUAL.md` (portal Partner + CRM 48713323, as-of 2026-07-13).
+> **Refresh 2026-08-30:** se adopta
+> [`HUBSPOT_OFFER_ARCHITECTURE_V2.md`](../../services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md):
+> seis familias por outcome, modos de entrega transversales y overlays sectoriales. Se retiran el roster fijo de
+> agentes y Customer Agent como categoría raíz.
 
 ---
 
@@ -78,17 +82,17 @@ capas de CRM Solutions). **NUNCA se estrecha a un Hub.** Una landing que termina
 en IA **es una landing de AEO con logo de HubSpot**, y deja fuera a la mayoría de los compradores: al CRO que
 no sabe cuánto pipeline tiene no le importa ChatGPT; al RevOps con datos sucios, tampoco.
 
-### El mapa de entrada: **dolor → Hub** (es la región que hace que esto sea una landing de HubSpot)
+### El mapa de entrada: **dolor → solución**
 
 | Lo que le duele *(su lenguaje, no el nuestro)* | Quién lo siente | Qué resuelve | Ticket de referencia ✅ |
 |---|---|---|---|
 | *"No sé cuánto pipeline tengo. Mi CRM es un Excel y la memoria de tres personas."* | CRO / VP Ventas | **Sales Hub + Smart CRM** | USD 90/asiento (Pro) → 10 asientos = **90 pts sourced** |
 | *"Marketing y ventas miran números distintos y nadie sabe cuál es verdad."* | CMO + CRO | **Marketing + Sales** | Marketing Pro USD 800/mo = **80 pts** |
 | *"Nadie me encuentra — ni en Google ni cuando le preguntan a ChatGPT."* | CMO | **Marketing + Content** *(HubSpot AEO viene adentro — §4)* | Marketing Pro + Content |
-| *"Mi postventa es invisible: se me van clientes y me entero tarde."* | COO / Customer Success | **Service Hub** *(+ Customer Agent, USD 0,50/resolución)* | USD 90/asiento (Pro) |
+| *"Mi postventa es invisible: se me van clientes y me entero tarde."* | COO / Customer Success | **Service, Customer Success & Delivery** — atención, health, Projects/Services, renovación y Customer Agent cuando aplica | Verificar seats/créditos |
 | *"Mis datos están sucios y repartidos en cinco sistemas."* | RevOps / IT | **Data Hub** *(ex-Operations Hub)* | USD 720/mo (Pro) = **72 pts** |
-| *"Cotizo en Word y pierdo margen en descuentos que nadie aprueba."* | CFO / CRO | **Revenue Hub** *(ex-Commerce — CPQ, contratos, e-signature)* | desde USD 95/mo |
-| *"El directorio pidió IA y nadie sabe qué significa."* | CEO | **Breeze** — ⚠️ **y la respuesta honesta: solo 3 agentes en GA** | outcome-based |
+| *"Cotizo en Word y pierdo margen en descuentos que nadie aprueba."* | CFO / CRO | **Revenue Lifecycle** — producto, quote, Contract, cambios/renovaciones, billing y revenue | Verificar seat, territorio y beta |
+| *"El directorio pidió IA y nadie sabe qué significa."* | CEO | **Agent Hub & Agentic Operations** — readiness, agentes prebuilt/custom, workflows, gobierno y evaluación | Verificar por capacidad |
 
 **Siete dolores, siete puertas, una plataforma.** Cada uno es un deal por sí solo. **No todo pasa por Marketing.**
 
@@ -98,7 +102,7 @@ no sabe cuánto pipeline tiene no le importa ChatGPT; al RevOps con datos sucios
 
 ---
 
-## 3. Las dos puertas de diagnóstico — **la prueba gratis**
+## 3. La evaluación inicial sin costo y sus puertas
 
 Son **dos de las entradas**, no el eje. Su rol es materializar *"te muestro antes de cobrarte"*.
 
@@ -108,9 +112,12 @@ Son **dos de las entradas**, no el eje. Su rol es materializar *"te muestro ante
 | **Su dolor es de demanda** | **AI Visibility Grader** *(propio — `src/lib/growth/ai-visibility/**`, EPIC-021)* | *"No apareces cuando tu comprador le pregunta a ChatGPT"* | **Marketing + Content** |
 | **Cualquier otro de los siete dolores** | **La reunión** — y en la reunión, **lo primero es decirle si HubSpot NO le sirve** (§ descalificación) | — | El Hub que corresponda |
 
-**Las dos son gratis, las dos entregan evidencia, y ninguna revende una feature de HubSpot.**
+**Las dos son gratis, las dos entregan evidencia acotada, y ninguna revende una feature de HubSpot.**
 Y para los dolores que ningún grader cubre, **la postura se sostiene igual**: la descalificación honesta ES la
 evidencia. *"Te digo en la primera reunión si esto no te sirve"* vale tanto como un diagnóstico.
+
+Un blueprint o audit técnico profundo se cotiza aparte solo si entrega inventario, arquitectura, roadmap y riesgos
+reutilizables aunque Efeonce no ejecute. La evaluación gratuita no regala esa consultoría.
 
 > ⚠️ **Mientras el Portal Grader (EPIC-024 Fase 1) no esté live**, esa puerta usa el `<greenhouse-form>` interino
 > con fallback honesto. **La estructura se construye desde ya** — no se rediseña después.
@@ -121,7 +128,8 @@ evidencia. *"Te digo en la primera reunión si esto no te sirve"* vale tanto com
 
 Son **productos distintos, de dueños distintos**. Confundirlos rompe tres cosas a la vez.
 
-- **HubSpot AEO** = feature **de HubSpot**. **USD 50/mo standalone; incluida en Marketing Hub Pro/Enterprise** ✅.
+- **HubSpot AEO** = solución oficial de HubSpot, standalone o embebida en Marketing Hub según packaging vigente;
+  no es un core Hub ni toda la práctica de marketing. Precio y elegibilidad se reverifican al publicar.
   🔴 **Venderla es la venta más pequeña posible: una parte de un módulo.** No paga ni la reunión.
 - **AI Visibility Grader** = **de Efeonce**. Su trabajo **no** es vender una feature ajena: es **probar que el
   motor de demanda del cliente está roto**.
@@ -203,7 +211,7 @@ tercero — pero prueba que **existe**, no que **opere a escala**).
 | ~~"Leader en Forrester Wave"~~ | ❌ **No verificable para 2026** (la landing de HubSpot que lo promociona cita el Wave de **2024**) |
 | ~~"ISO 27001"~~ | 🔴 **HubSpot NO la reclama para sí** — su página dice que la tienen sus **proveedores cloud (AWS)**. ✅ Correcto: **SOC 2 Type II + SOC 3** |
 | ~~"Datacenters regionales"~~ como feature | ⚠️ **NO hay datacenter en LATAM.** Es un **descalificador**, no una ventaja |
-| ~~"Flota de agentes de IA"~~ | 🔴 Solo **TRES** Breeze Agents están en **GA** (Customer, Prospecting, Data). El resto es **beta** |
+| ~~"Flota de agentes de IA"~~ | 🔴 No se promete roster fijo. Agent Hub continúa beta al corte 2026-08-30; cada agente/workflow exige estado, elegibilidad, créditos, permisos y readback propios. |
 | **Casos** | Regla positiva: **métrica verificable + relación vigente o cerrada en buenos términos + autorización**. Si falta una → **anonimizado o no se usa**. **SSilva: resultado real, SOLO anonimizado** ("una inmobiliaria del Cono Sur"), **nunca con nombre ni testimonio firmado**. **Berel no como prueba de co-selling** (cierre directo, sin PDM) |
 | **Nomenclatura 2026** | **Revenue Hub** (ex-Commerce) · **Data Hub** (ex-Operations) · **UNBOUND** (ex-INBOUND). Usar el nombre viejo delata desactualización |
 
@@ -233,7 +241,7 @@ y lista **28 servicios**. Arreglarlo no cuesta dinero. *(Fuera del alcance de es
 
 - **Lidera la masterbrand Efeonce.** Kortex/Greenhouse/Verk se nombran como el **software que sostiene el
   servicio**, no como productos que el cliente compra aparte.
-- **Oferta de dos escalones:** CTA primario **"Agenda una reunión"** (HubSpot Meetings + UTM); CTA secundario =
+- **Oferta de entrada:** CTA primario **"Agenda una reunión"** (HubSpot Meetings + UTM); CTA secundario =
   **la puerta de diagnóstico que corresponda** (§2) — `<greenhouse-form>` gobernado + Turnstile, portal 48713323,
   HubSpot delivery `disabled` hasta cutover. **Fallback honesto** (`/contacto`/mailto) si el embed no carga.
 - **Alcance pan-hispano.** Copy **es-LATAM neutro**, tuteo, sin voseo ni chilenismos. `hreflang`-ready para una
@@ -241,11 +249,13 @@ y lista **28 servicios**. Arreglarlo no cuesta dinero. *(Fuera del alcance de es
 
 ---
 
-## 10. Diferenciación frente a partners de la región
+## 10. Diferenciación frente al mercado
 
-El comprador compara contra **InboundCycle** (Elite), **Cebra** (Elite, 500+ implementaciones), **Revenue Hub
-Latam** (Platinum, RevOps con metodología), **Loymark**. El eje dominante de esa categoría es **metodología
-RevOps** o **velocidad**. Y **Efeonce es Gold, no Elite** — no puede ganar ahí.
+El benchmark de 11 partners regionales y best-in-class está documentado en
+[`HUBSPOT_SERVICES_MARKET_BENCHMARK_2026-08-30.md`](../../audits/commercial/HUBSPOT_SERVICES_MARKET_BENCHMARK_2026-08-30.md).
+La mediana ofrece conversación gratuita, implementación/migración y lenguaje general de RevOps/IA. El top quartile
+suma audit pagado opcional, scope/exclusiones claros, managed operations, agentes con gobierno, verticales basadas
+en workflow y prueba oficial. Efeonce no afirma que nadie más hace estas cosas; demuestra su mecanismo.
 
 **No compite en el eje de ellos. Compite en uno que ninguno usa: el riesgo.**
 
@@ -253,7 +263,7 @@ RevOps** o **velocidad**. Y **Efeonce es Gold, no Elite** — no puede ganar ah�
 |---|---|---|
 | Qué prometen | Que HubSpot va a funcionar | **Que te vamos a mostrar si te sirve, gratis, antes de cobrarte** |
 | Prueba pre-venta | Casos y logos | **Un diagnóstico de TU marca / TU portal** |
-| Honestidad sobre límites | Ninguna | **Te decimos cuándo HubSpot NO es para ti** |
+| Honestidad sobre límites | Variable | **Publicamos anti-fit y alternativa con evidencia** |
 | Costo de entrada | El onboarding obligatorio de HubSpot | **Se lo borramos del contrato** (−USD 3.000) |
 | Riesgo de quedar atrapado | Configuración a mano, en la cabeza del consultor | **Versionado, trazable, reversible** |
 
@@ -284,8 +294,8 @@ el miedo a elegir mal se combate **quitando riesgo**, no prometiendo más.
   **pelea contra JOLT** (software propietario = miedo a quedar atrapado).
 - **Liderar con "Somos HubSpot Solutions Partner"** — commodity: lo dice todo partner. *(Y el tier Gold no gana
   contra Elite.)*
-- **Liderar con el catálogo de agentes Breeze** — es la historia de HubSpot, no de Efeonce; **solo 3 en GA**;
-  el pricing cambia cada trimestre.
+- **Liderar con un catálogo fijo de agentes** — es una foto perecedera del vendor; lo vendible es readiness,
+  contexto, implementación, herramientas, gobierno, evaluación y operación.
 - **Vender HubSpot AEO como producto** — USD 50/mo: **la venta más pequeña posible**. Es el wedge de HubSpot,
   no el negocio de Efeonce (§3, §4).
 - **Spoke nueva `/servicios/hubspot` + 301** — sin upside de demanda; riesgo SEO; fragmenta equity.

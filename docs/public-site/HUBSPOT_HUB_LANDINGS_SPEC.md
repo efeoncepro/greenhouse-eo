@@ -6,7 +6,8 @@
 > **Arquitectura:** [PDR-013](decisions/PDR-013-hub-hubspot-pillar-cluster-arquitectura.md) ·
 > **Posicionamiento:** [PDR-006](decisions/PDR-006-landing-hubspot-agentic-platform-posicionamiento.md) ·
 > **Dominio:** skill `hubspot-solutions-partner` (`SOURCES.md` = qué se puede afirmar).
-> **As-of:** 2026-08-27. La posición Gartner fue actualizada contra *CRM Sales Platforms* 2026.
+> **As-of:** 2026-08-30. Producto y oferta alineados con
+> [`HUBSPOT_OFFER_ARCHITECTURE_V2.md`](../services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md).
 
 ---
 
@@ -27,7 +28,7 @@ pueden hablar ahí (son parte interesada) — **pero el vacío ya lo llenaron ve
 |---|---|---|---|
 | **Cuándo NO usar HubSpot** | ✅ jamás lo escribirán | ✅ **vacío real** | 🎯 **La más fuerte** |
 | **Precios de verdad** | ✅ no publican sus trampas | ✅ nadie lo hace en español | Fuerte **+ la única con demanda** |
-| **Agentes: cuáles funcionan** | ✅ no dirán que solo 3 en GA | ✅ vacío (es nuevo) | Fuerte |
+| **Agentes: fit, costo y gobierno por caso** | El roster cambia por release/portal | ✅ vacío (es nuevo) | Fuerte |
 | **HubSpot vs Salesforce** | ✅ son parte interesada | 🔴 **el vacío está LLENO** *(ES 70/mes · MX 20/mes · **20,8M resultados**)* | **La más débil — sobrevive como asset de venta, no por citabilidad** |
 
 🔴 **Consecuencia:** antes de decidir que una página *"llena un vacío"*, **medirlo**. Si ya hay veinte millones
@@ -38,11 +39,12 @@ de resultados, no hay vacío: hay **saturación** — y entonces la pieza necesi
 |---|---|---|
 | *"¿Qué hace Service Hub?"* | ✅ **Mejor que tú** | ❌ **NO** |
 | *"¿Cuánto cuesta HubSpot **de verdad**?"* | 🔴 **No** — no van a publicar que los créditos no se suman entre Hubs | ✅ **SÍ** |
-| *"¿Qué agentes **funcionan de verdad**?"* | 🔴 **Jamás** — no van a decir que solo 3 están en GA | ✅ **SÍ** |
+| *"¿Qué agentes y workflows están listos para mi caso, qué cuestan y cómo se gobiernan?"* | La respuesta cambia por release/portal | ✅ **SÍ, con inventario fechado** |
 | *"¿**Cuándo NO** usar HubSpot?"* | 🔴 **Nunca.** Es imposible que lo escriban | ✅ **SÍ — la más citable de todas** |
 | *"¿HubSpot **o** Salesforce?"* | 🔴 Son parte interesada | ✅ **SÍ** |
 
-**Los siete Hubs viven en el mapa del pillar. No necesitan página propia.**
+**Los seis Hubs conectados a Smart CRM viven como primitives del mapa del pillar.** Agent Hub, AEO, workspaces y
+objetos aparecen donde habilitan el outcome; no son Hubs adicionales ni necesitan páginas de feature.
 *(Si el canal necesita un asset de Service Hub para un deal, es un **deck o un one-pager** — no una landing.)*
 
 ---
@@ -53,7 +55,8 @@ de resultados, no hay vacío: hay **saturación** — y entonces la pieza necesi
 2. **Cada página dice cuándo HubSpot NO sirve** para ese caso. No es un gesto: es lo que gana a RevOps.
 3. 🔴 **Claims prohibidos:** *"Líder en CRM según Gartner"* (es **Challenger** en el MQ de CRM Sales Platforms
    2026; avanzó desde Niche Player en SFA 2025) · Forrester
-   Wave · **ISO 27001** de HubSpot · residencia de datos en LATAM · *"flota de agentes"* (**solo 3 en GA**).
+   Wave · **ISO 27001** de HubSpot · residencia de datos en LATAM · *"flota de agentes"*. No se publica un roster
+   fijo: cada capacidad requiere release state, portal/tier, seat, créditos, permisos y readback.
    ✅ Sí: *"Leader en B2B Marketing Automation (Gartner, 5.º año)"* · **SOC 2 Type II + SOC 3**.
 4. 🔴 **Nomenclatura 2026:** **Revenue Hub** (ex-Commerce) · **Data Hub** (ex-Operations) · **UNBOUND**
    (ex-INBOUND). Y **HubSpot ya no se llama CRM**: se autodenomina **Agentic Customer Platform**.
@@ -72,11 +75,11 @@ de resultados, no hay vacío: hay **saturación** — y entonces la pieza necesi
 |---|---|
 | **H1** | **"Antes de venderte HubSpot, te mostramos si te sirve."** |
 | **Para quién** | Los 7 perfiles. **Es la página que decide.** |
-| **Su trabajo** | Reencuadrar la categoría · mostrar **el mapa de dolores** (donde viven los 7 Hubs) · repartir a los clusters |
-| **CTA** | Reunión · diagnóstico |
+| **Su trabajo** | Reencuadrar la categoría · mostrar **el mapa de dolores y soluciones** · repartir a familias, industrias y recursos |
+| **CTA** | Reunión · evaluación inicial sin costo |
 
 **Las 13 regiones** (detalle en `docs/ui/wireframes/TASK-1352-*`):
-hero · stakes · 🎯 **el mapa dolor→Hub** · la prueba gratis · **cuándo NO es para ti** · **el waiver** ·
+hero · stakes · 🎯 **el mapa dolor→solución** · evaluación inicial sin costo · **cuándo NO es para ti** · **el waiver** ·
 las 4 capas · cómo sin romperte nada (Kortex) · prueba · puente · FAQ · CTA.
 
 **Los stakes, ahora literales:** HubSpot **soltó la etiqueta "CRM"**. Se autodenomina **Agentic Customer
@@ -92,10 +95,10 @@ llena. Ahí entra Efeonce.**
 | *"No sé cuánto pipeline tengo."* | **Sales Hub + Smart CRM** | CRO |
 | *"Marketing y ventas miran números distintos."* | **Marketing + Sales** | CMO + CRO |
 | *"Nadie me encuentra, ni en Google ni en ChatGPT."* | **Marketing + Content** *(AEO viene adentro)* | CMO |
-| *"Mi postventa es invisible."* | **Service Hub** *(+ Customer Agent)* | COO / CS |
+| *"Mi postventa es invisible."* | **Service, Customer Success & Delivery** *(Customer Agent, health, Projects/Services cuando aplican)* | COO / CS |
 | *"Mis datos están en cinco sistemas."* | **Data Hub** | RevOps / IT |
-| *"Cotizo en Word y pierdo margen."* | **Revenue Hub** *(CPQ)* | CFO |
-| *"El directorio pidió IA."* | **Breeze** *(y la verdad: solo 3 en GA)* | CEO |
+| *"Cotizo en Word y pierdo margen."* | **Revenue Lifecycle** *(quote, Contract, cambio/renovación, billing/revenue)* | CFO |
+| *"El directorio pidió IA."* | **Agent Hub & Agentic Operations** *(readiness, agentes, workflows, gobierno y evaluación)* | CEO |
 
 **No dice:** precios detallados *(→ `/precios/`)* · el catálogo de agentes *(→ `/agentes/`)*.
 
@@ -161,28 +164,28 @@ puerta anónima. **Meter una licencia de vendor dentro del engine cost-plus cont
 
 ---
 
-## 🤖 3 · `/servicios/hubspot/agentes/` — **la que más te diferencia**
+## 🤖 3 · `/servicios/hubspot/agentes/` — **Agent Hub y Agentic Operations**
 
 | | |
 |---|---|
-| **H1** | **"Los agentes de IA de HubSpot: cuáles funcionan de verdad."** |
+| **H1** | **"Agentes de HubSpot: cuáles sirven para tu caso y cómo gobernarlos."** |
 | **Para quién** | El CEO al que el directorio le pidió "IA" · el COO con el servicio desbordado |
 | **Su trabajo** | Ser **el único contenido honesto del mercado** sobre agentes. Y mostrar el caso |
-| **Por qué la citan** | 🔴 **HubSpot jamás va a decir que solo tres están en GA** |
+| **Por qué la citan** | Compara readiness, estado, costo, autonomía, handoff y operación en un inventario fechado |
 | **CTA** | *"Te decimos si un agente te sirve"* → reunión |
 
 **Secciones:**
 
-1. 🎯 **La verdad primero** — **Customer · Prospecting · Data** están en GA. **Los otros nueve, en beta.**
-   **Nadie más publica esto. Es el contenido más citable del hub.**
-2. **Cuánto cuestan de verdad** — outcome-based: **pagas cuando funciona**. USD 0,50 por conversación
+1. 🎯 **La verdad primero** — Agent Hub está beta al corte; no existe un roster fijo publicable. Cada agente o
+   workflow muestra job, release/elegibilidad, contexto, tools/permisos, autonomía/handoff, consumo y evaluación.
+2. **Cuánto cuestan de verdad** — donde exista outcome-based: **pagas cuando funciona**. USD 0,50 por conversación
    **resuelta** *(definición de HubSpot: el agente resolvió y **no hubo escalamiento humano en 72 horas**)*.
 3. 🎯 **El caso** — **ANAM · Customer Agent en producción.** El equipo de atención redujo su carga
    **un 56% en promedio** *(76% en el mejor mes)*.
    🔴 **Lidera con el 56%.** *"Hasta 76%"* suena a cherry-picking y descuenta todo lo demás.
    ⚠️ **Requiere autorización de ANAM.** Sin ella → anonimizado.
-4. **Lo que implementamos de verdad** — la base de conocimiento *(sin datos limpios no hay outcome)* · el
-   **gobierno** *(qué decide solo y qué escala a un humano)* · el tono y la marca · **el modelado de costo**.
+4. **Lo que implementamos de verdad** — readiness, datos/knowledge/context, agente prebuilt o custom, tools,
+   **gobierno**, human handoff, evaluación, observabilidad y **modelado de costo**.
 5. 🎯 **Y operamos tu HubSpot *con* agentes** — HubSpot publicó la **Agent CLI** (junio 2026) para que agentes
    de IA operen el CRM **sin humano en el loop**. **Nosotros ya trabajamos así.** No es roadmap: es cómo operamos.
 6. 🔴 **El gobierno es el producto** — *"El agente propone. Un humano confirma. Recién ahí se ejecuta. Y todo

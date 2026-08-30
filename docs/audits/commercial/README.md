@@ -4,6 +4,7 @@ Auditorias tecnicas y operativas del dominio Commercial de Greenhouse.
 
 ## Auditorias
 
+- [HubSpot Services Market Benchmark 2026-08-30](HUBSPOT_SERVICES_MARKET_BENCHMARK_2026-08-30.md) — producto 2026, peer set de 11 partners, patrones de mediana/top quartile y decisiones para oferta, agentes, Revenue Hub y sectores.
 - [Salesforce Practice Skill Foundation 2026-08-27](SALESFORCE_PRACTICE_SKILL_FOUNDATION_2026-08-27.md) — funda tres skills para operar y vender CRM, Marketing Cloud Engagement y Marketing Cloud Next, con claims y reventa fail-closed hasta readback.
 - [CRM Platform Positioning — Gartner + señal enterprise Chile 2026-08-27](CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md) — separa B2B Marketing Automation, CRM Sales y Multichannel Marketing Hubs; traduce la señal chilena a carriles HubSpot-first, Salesforce-first e híbrido gobernado.
 - [Creative Services Market Benchmark 2026-07-30](CREATIVE_SERVICES_MARKET_BENCHMARK_2026-07-30.md) — benchmark global, digital/productized, Chile/LatAm y fuentes de compradores; base de la nueva arquitectura Creative Operations.

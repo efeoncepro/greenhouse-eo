@@ -6,6 +6,12 @@
 > `operator-champions` y usa Greenhouse para traducir adopción operativa en assurance ejecutivo, renovación y
 > expansión. Ver [`Efeonce Operator-First Product & Growth Contract V1`](../strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md).
 
+> **Operación comercial 2027:** el plan, funnel y staffing vigentes viven en
+> [`Plan Comercial y Presupuesto de Ventas 2027`](../commercial/COMMERCIAL_PLAN_AND_SALES_BUDGET_2027_V1.md),
+> [`Plan de Generación de Pipeline`](../commercial/PIPELINE_GENERATION_AND_OUTBOUND_PLAN_2027_V1.md) y
+> [`Agentic Revenue Operating Model`](../commercial/AGENTIC_REVENUE_OPERATING_MODEL_V1.md). Esos artefactos
+> superseden ratios, volúmenes y targets históricos de este context pack cuando difieran.
+
 El contenido participa en ese motion como `Content-to-Capability Loop`: Glitch detecta señales, blog construye
 autoridad canónica, YouTube demuestra el mecanismo, los servicios transfieren criterio y los productos convierten
 ese aprendizaje en capacidad. Canon: [`Efeonce Content-to-Capability Loop V1`](../strategy/EFEONCE_CONTENT_TO_CAPABILITY_LOOP_V1.md).
@@ -128,6 +134,13 @@ Validado por datos del CRM: win rate ~50% en cuentas existentes vs. 2–3% en ne
 | **Cold Strategic** | Outbound filtrado (máx 2–3/sem, scorecard 4+/6). | Surround Discovery Audit o CRM audit como gancho. |
 | **ABM Lite** | Lista corta ICP por triggers. | Verk como fábrica de contenido. |
 | **CRM Reactivation** | Reactivar closed-lost. | **Demo de producto como evidencia de evolución ("ya no somos quienes éramos").** |
+
+---
+
+La ejecución usa dos rails excluyentes: HubSpot para expansión, warm e inbound; Apollo para cold net-new. Un
+`Agentic Revenue Pod` conecta ambos con Greenhouse, Codex y Claude bajo aprobación humana. La disponibilidad de un
+agente no prueba conversión ni autoriza envíos; el operating model canónico y sus triggers de staffing viven en
+[`AGENTIC_REVENUE_OPERATING_MODEL_V1.md`](../commercial/AGENTIC_REVENUE_OPERATING_MODEL_V1.md).
 
 ---
 

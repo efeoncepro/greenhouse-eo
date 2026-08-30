@@ -8,7 +8,8 @@ description: >-
   Agent CLI, Customer Agent, Prospecting Agent, Data Agent, agentes, gobierno e incentivos. Usar ante HubSpot,
   Solutions Partner, vender o implementar
   HubSpot, tier points, comisión/revenue share, Best Partner Wins, Marketing Studio, Sales Workspace,
-  Customer Success Workspace, Breeze Studio, Agent CLI, Angela O'Dowd, Duncan Lennox, Yamini Rangan,
+  Customer Success Workspace, Agent Hub, Agent Builder, Revenue Hub, Contracts, Projects, Services,
+  Agent CLI, Angela O'Dowd, Duncan Lennox, Yamini Rangan,
   Dharmesh Shah, PDM, Simón Suárez o portal 48713323. Aporta dominio; el método de venta es de
   commercial-expert, el motion de gtm-architect y la operación del portal de hubspot-ops.
 type: skill
@@ -29,8 +30,10 @@ propia vive en `docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MO
 ## Taxonomía comercial vigente
 
 La práctica se presenta como **Efeonce → RevOps & CRM → Kortex (cuando aplica) → HubSpot (plataforma/provider)**.
-La venta debe poder recorrer diagnóstico, arquitectura, implementación, data/automation/lifecycle, managed operations
-y Customer Agent / AI Operations sin convertir cada etapa en un bundle obligatorio. El brochure es input histórico,
+La venta se organiza por las seis familias de resultado, modos de entrega y overlays sectoriales de
+[`HUBSPOT_OFFER_ARCHITECTURE_V2.md`](../../../docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md).
+La evaluación inicial de fit/cotización es normalmente gratuita; un blueprint se cobra solo cuando deja un
+artefacto autónomo. Customer Agent es un caso de uso, no una familia raíz. El brochure es input histórico,
 no canon: usa [`docs/services/hubspot-as-a-service/README.md`](../../../docs/services/hubspot-as-a-service/README.md) y
 la auditoría [`HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`](../../../docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md)
 para separar capacidades reutilizables de claims, precios y disponibilidad que necesitan verificación vigente.
@@ -115,8 +118,9 @@ retainer de Managed CRM Ops.
 5. **NUNCA** omitas el **onboarding fee obligatorio** (Marketing Ent = **USD 7.000**; Pro = USD 3.000; Sales/Service
    Ent = USD 3.500 / Pro = USD 1.500). El fee del bundle **Customer Platform no está publicado** — pídelo por escrito.
 6. **NUNCA** cotices contactos de marketing adicionales de memoria: las fuentes públicas discrepan 10×.
-7. **NUNCA** prometas "flota de agentes de IA". Solo **tres** Breeze Agents están en GA
-   (Customer, Prospecting, Data). El resto está en beta. No firmes SLA sobre beta.
+7. **NUNCA** prometas un roster fijo ni una "flota de agentes" por una lista de marketing. Agent Hub coordina
+   agentes preconstruidos, custom y agentic workflows, y al corte 2026-08-30 permanece beta. Verifica por capacidad:
+   estado, portal/tier, seat, créditos, permisos y readback. No firmes SLA sobre beta.
 
 **Calificación**
 8. **NUNCA** vendas sin descalificar. Los cinco descalificadores documentados: **10 custom objects**,
@@ -175,7 +179,8 @@ rehacerla, no memorizarla. Por eso la calculadora vive en `templates/tier-calcul
 | Discovery, dimensionar sin sub-cotizar, **descalificar** | `modules/10_DISCOVERY_SCOPING.md` |
 | Armar la oferta, el arbitraje del onboarding fee, negociar **con** HubSpot, objeciones | `modules/11_PROPUESTA_PRICING.md` |
 | La implementación como argumento de venta y como negocio | `modules/12_IMPLEMENTACION.md` |
-| 🎯 **Agentes** — implementar los 3 GA · operar con la **Agent CLI** · construir **Agent Tools** · el gobierno · **el caso ANAM** | `modules/13_AGENTES.md` |
+| 🎯 **Agent Hub y Agentic Operations** — readiness, agentes prebuilt/custom, tools, gobierno, evaluación, operación y caso ANAM | `modules/13_AGENTES.md` |
+| Soluciones por industria: workflows, datos, integraciones, compliance, anti-fit y prueba | `modules/15_SOLUCIONES_POR_INDUSTRIA.md` |
 | **Prospecting Agent / agente de prospección** — entrenamiento/grounding, disponibilidad, plays/perfiles, señales, sourcing, outreach, créditos, guardrails, piloto, KPIs y gobierno | `references/prospecting-agent.md` + `SOURCES.md` |
 | **Cómo se vende HubSpot ahora** — narrativa ejecutiva · Growth Context · workspaces · motion por outcome · Champion-led prospecting · multithreading · incentivos H2 2026 | `modules/14_NARRATIVA_AGENTICA_Y_MOTION_2026.md` |
 | **El estado real de Efeonce hoy y el plan de rescate** | `efeonce/ESTADO_ACTUAL.md` · `efeonce/PLAN_RESCATE_6M.md` |

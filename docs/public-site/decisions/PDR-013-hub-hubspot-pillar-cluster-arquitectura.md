@@ -53,14 +53,15 @@ equity — y medido por citación en LLM y uso en el canal, NO por tráfico org�
 > ## Efeonce solo se cita donde HubSpot **no puede o no quiere hablar**.
 
 **NO hay una página por Hub.** Una página que explica *"qué hace Service Hub"* **compite con hubspot.com en su
-propia cancha y pierde** — ningún LLM la va a citar teniendo la oficial. Los **7 Hubs viven en el mapa del
-pillar**. Si el canal necesita un asset de Service Hub para un deal, **es un deck, no una landing.**
+propia cancha y pierde** — ningún LLM la va a citar teniendo la oficial. Los **seis Hubs conectados a Smart CRM**
+viven como primitives en el mapa de soluciones; Agent Hub, AEO, workspaces y objetos aparecen donde habilitan el
+outcome, no como Hubs adicionales. Si el canal necesita un asset de Service Hub, **es un deck, no una landing.**
 
 | La pregunta | ¿La responde hubspot.com? | ¿Vale una página? |
 |---|---|---|
 | *"¿Qué hace Service Hub?"* | ✅ **Mejor que tú** | ❌ **NO** |
 | *"¿Cuánto cuesta HubSpot **de verdad**?"* | 🔴 No — no publican sus trampas | ✅ **SÍ** |
-| *"¿Qué agentes **funcionan de verdad**?"* | 🔴 Jamás — no dirán que solo 3 están en GA | ✅ **SÍ** |
+| *"¿Qué agentes y workflows están listos para mi caso, qué cuestan y cómo se gobiernan?"* | La respuesta cambia por release y portal | ✅ **SÍ, con inventario fechado** |
 | *"¿**Cuándo NO** usar HubSpot?"* | 🔴 **Nunca.** Es imposible que lo escriban | ✅ **SÍ — la más citable** |
 | *"¿HubSpot **o** Salesforce?"* | 🔴 Son parte interesada | ✅ **SÍ** |
 
@@ -112,13 +113,21 @@ hispano) — la conclusión de PDR-006 se sostiene.
 no quiere hablar** (§2). Por eso:
 
 - ❌ **Una página por Hub NO se justifica.** *"¿Qué hace Service Hub?"* lo responde hubspot.com **mejor que tú**.
-  Los 7 Hubs viven en **el mapa del pillar**, con la profundidad suficiente para decidir.
+  Los seis Hubs, Smart CRM y las capabilities transversales viven en **el mapa del pillar**, con profundidad suficiente para decidir.
 - ✅ **Los 4 clusters SÍ**, porque cada uno ocupa un espacio que hubspot.com **no puede ocupar**: el costo real
   y sus trampas · qué agentes funcionan de verdad · **cuándo NO usar HubSpot** · la comparación contra
   Salesforce, donde los dos vendors son parte interesada.
 
 **Y para el canal:** si Simón necesita un asset de Service Hub para un deal, **es un deck o un one-pager** —
 no una landing pública. Herramienta distinta, trabajo distinto.
+
+### Páginas sectoriales: solo cuando aportan perspectiva propia
+
+La prohibición de páginas por Hub no impide páginas sectoriales. Una página sectorial se justifica únicamente si
+aporta trigger/JTBD, workflow, buying group, modelo de datos, integraciones, compliance, evidencia y anti-fit propios.
+La primera ola candidata es servicios profesionales/B2B y SaaS/tecnología; manufactura/distribución queda
+condicionada a un patrón ERP-CRM y prueba. Canon:
+[`HUBSPOT_OFFER_ARCHITECTURE_V2.md`](../../services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md).
 
 ---
 
@@ -194,7 +203,7 @@ qué implementamos → **cuándo NO te sirve** → el caso → CTA.
   keyword fantasma (`contratar hubspot` ≈ 0).
 - **Clusters como jugada de SEO por Hub** — `hubspot sales hub` = **10 búsquedas/mes**. Plata quemada.
   Existen por **AEO + enablement de canal**, no por ranking.
-- **Una sola landing que cubra los 7 Hubs a fondo** — se vuelve inmanejable y **no se cita para nada**
+- **Una sola landing que cubra cada Hub y feature a fondo** — se vuelve inmanejable y **no se cita para nada**
   (los LLMs recuperan contenido específico, no páginas enciclopédicas).
 - **Vender HubSpot AEO como producto** — USD 50/mo: la venta más pequeña posible. Es el **wedge de HubSpot**,
   no el negocio de Efeonce.

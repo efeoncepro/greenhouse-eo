@@ -7,6 +7,29 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-30 — HubSpot as a Service y su futura landing adoptan arquitectura moderna e inmersiva
+
+La práctica dejó de reducirse a RevOps + Customer Agent y ahora se gobierna mediante seis familias: Marketing,
+Content & AEO; Sales & AI Pipeline; Revenue Lifecycle; Service, Customer Success & Delivery; Data, Integration &
+CRM Intelligence; y Agent Hub & Agentic Operations. La evaluación inicial para fit/cotización es sin costo; un
+blueprint pagado requiere un artefacto autónomo. Customer Agent queda como caso de uso, mientras Contracts,
+Projects y Services se clasifican correctamente como objetos/capabilities dentro de sus workflows.
+
+El benchmark de 11 partners, la oferta V2, tres fichas sectoriales, el pillar público, las skills HubSpot espejadas y
+el router de agentes quedaron reconciliados. `TASK-1352` fue **reemplazada integralmente**, sin conservar deltas,
+copy, claims ni composición del resultado rechazado de Claude Design. La nueva task impone research-first,
+copywriting completo, SEO/AEO por intención y motor, CRO medible, proof ledger y un gate humano del primer fold antes
+de la implementación total. Su dirección visual durable es **Sistema vivo de crecimiento**: atlas de seis resultados, tres lentes
+sectoriales, color HubSpot usado como señal dentro de Efeonce masterbrand, motion causal/interrumpible, frontera
+gratis-vs-blueprint y GVC premium. Los activos exactos de marca deben venir del Partner Brandfolder/guía vigente;
+no se autoriza copiar la UI/trade dress, modificar logos, inventar HEX ni usar inmersión ornamental que perjudique
+accesibilidad o CWV. No hubo cambio de runtime ni publicación web; la task permanece `to-do` y `UI ready: no`.
+
+Dirección visual, wireframe, flow y motion de TASK-1352 se reautoraron desde cero contra la task nueva. Eliminan la
+gran idea prefijada, normalizan las seis familias canónicas, subordinan agentes/capabilities a outcomes, incorporan
+copy slots research-dependent, restricciones SEO/AEO en HTML, flujo de conversión y no-fit, fallas honestas,
+transformación desktop/tablet/mobile y un motion system causal con tokens exactos, reduced-motion y budgets CWV.
+
 ## 2026-08-30 — Growth SEO · la lente `Descubrir` entrega lo que ya tenía construido (TASK-1693)
 
 **Qué cambia para quien opera el módulo SEO.** Tres capacidades que estaban construidas y pagadas
@@ -964,19 +987,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   `page_for_posts`, y que el futuro corte debe conservar una sola canónica `/blog/`, sus metas Ohio y rollback.
 - La skill del sitio público ahora registra la landing, sus parámetros, guards y secuencia de adaptación. No se
   modificó WordPress, Kinsta, formularios ni caché.
-
-## 2026-08-22 — Cerrar una postulación ahora obliga a decir cómo terminó
-
-- El proceso de una persona ya no se cierra arrastrando su tarjeta a «Cerrado». Cerrar es **decidir**, y la
-  decisión pide el desenlace. Ese camino silencioso, además de no avisarle a nadie, **congelaba el borrado de los
-  documentos de esa persona en todas sus postulaciones** — una obligación legal bloqueada sin que se notara.
-- Aparecen dos desenlaces que faltaban. **«Sin selección»** para quien llegó al final y no quedó: antes había que
-  marcarla como descarte, un juicio que nadie emitió, que la sacaba del Banco de Talento y que distorsionaba el
-  análisis de equidad de su cohorte. Y **«Sin respuesta»** para quien deja de responder: antes había que
-  inventarle un retiro que no declaró o un juicio que no hubo.
-- «Sin selección» **exige decir por qué**: el cupo lo tomó otra persona, se cerró la búsqueda o se canceló el
-  proceso. Es una lista cerrada, no texto libre, porque el embudo de equidad y el correo cambian según cuál sea.
-- **Una pausa deja de ser un cierre.** «Dejar en espera» desaparece: para pausar, la tarjeta se queda en la
-  columna «Decisión». Su proceso no terminó, así que no tiene desenlace.
-- Ningún desenlace nuevo manda correo todavía. Es deliberado: preferible no escribir a mandarle un correo de
-  rechazo a quien nadie rechazó. El correo de «Sin selección» llega con su propia entrega.

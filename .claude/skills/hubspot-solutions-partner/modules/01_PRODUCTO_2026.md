@@ -1,4 +1,4 @@
-# 01 · El producto que vendes hoy — as-of 2026-07-13
+# 01 · El producto que vendes hoy — as-of 2026-08-30
 
 > Todo con marca ✅/⚠️/❌ en `SOURCES.md`. **Refresh obligatorio antes de UNBOUND (16-18 sep 2026).**
 
@@ -17,19 +17,25 @@
 
 ## 1. El portafolio ✅
 
+**Topología vigente:** Smart CRM es el fundamento; los seis Hubs son Marketing, Sales, Service, Content, Data y
+Revenue. Los workspaces y features viven sobre ellos; Projects, Services y Contracts son objetos CRM; Agent Hub
+coordina agentes preconstruidos, custom y agentic workflows. AEO y Agent Hub no son Hubs adicionales.
+
 | Producto | Qué hace | Por qué te importa comercialmente |
 |---|---|---|
 | **Smart CRM** | Sistema de registro base | Se vende standalone (USD 20/USD 50/USD 75 por seat) |
 | **Marketing Hub** | Demand gen, automation, campañas, email, **AEO** | 🎯 **Tu punta de lanza B2B.** HubSpot es Leader del Gartner MQ de B2B Marketing Automation 2025 por 5.º año; no extrapolar a CRM Sales o multicanal B2C |
-| **Sales Hub** | Pipeline, secuencias, forecasting, **Smart Deal Progression (GA)** | Aterriza después del marketing, no antes |
-| **Service Hub** | Help desk, SLAs, KB, **Customer Agent** | Expansión natural post-implementación |
+| **Sales Hub** | Sales Workspace, pipeline, secuencias, forecasting y progresión inteligente de deals | Aterriza donde el job comercial lo exige; verificar betas por portal |
+| **Service Hub** | Help Desk, SLAs, KB, Customer Agent y Customer Success Workspace | Atención reactiva + adopción, salud, renovación y expansión |
 | **Content Hub** | CMS, blog, landings, memberships, multisite | |
 | **Data Hub** | Data sync, calidad, dedup, **Data Studio**, warehouse connectors (**Enterprise only**) | El argumento para IT/arquitectura |
-| **Revenue Hub** | **CPQ**, quotes, contratos, subscription billing, invoicing, pagos | 🆕 HubSpot se metió de frente en el terreno de CPQ de Salesforce |
+| **Revenue Hub** | Catálogo, **CPQ**, quotes, Contracts, amendments/renewals, billing, invoices, payments y orders | Quote-to-revenue; validar beta, seat, territorio, SII/ERP y Finance/Legal |
 | **HubSpot AEO** | 🆕 Visibilidad de marca en ChatGPT/Gemini/Perplexity | 🎯 **La cuña** → `modules/07_CUNA_AEO.md` |
 | **Breeze** | Capa de IA transversal | Ver § 3 — y el cuidado con los betas |
+| **Agent Hub / Agent Builder** | Inventario, configuración y monitoreo de agentes y agentic workflows; construcción de agentes custom | Agent Hub está beta al corte; no prometer roster ni SLA general |
+| **Projects / Services / Contracts** | Objetos CRM para trabajo, ofertas entregadas y revenue comprometido | No son Hubs ni sustitutos universales de PSA/ERP/billing |
 
-**Bundle: Customer Platform** ✅ — Marketing + Sales + Service + Content + Data.
+**Customer Platform** ✅ — seis Hubs conectados a Smart CRM: Marketing + Sales + Service + Content + Data + Revenue.
 Pro **USD 1.300/mo** (6 seats) · Enterprise **desde USD 4.700/mo** (8 seats).
 
 **Ningún Hub se agregó ni se retiró en 2026.** Hubo renames, expansión (Commerce→Revenue con CPQ) y el
@@ -77,15 +83,14 @@ Core (pagado, USD 45-USD 75) · Sales · Service · **Revenue** (requerido para 
 
 ---
 
-## 3. Breeze — y por qué NO vendes "agentes de IA"
+## 3. Agent Hub, agentes y features de IA
 
-### 🔴 Solo TRES agentes están en GA ✅
-**GA con pricing público:** Customer Agent · Prospecting Agent · Data Agent.
-**El KB clasifica el resto como "Mostly Beta"**: ABM Landing Page, Blog Research, Closing, Company Research,
-Cross-sell/Upsell, Customer Health, Deal Loss, RFP, Sales-to-Marketing Feedback.
+No memorices un roster. Para cada agente o workflow registra: nombre/caso de uso, estado de release, portal/tier,
+seat, créditos, permisos, knowledge/context, herramientas, autonomía, handoff, evaluación y readback. Agent Hub está
+marcado **beta** al corte 2026-08-30 y reúne agentes preconstruidos, custom y agentic workflows.
 
-> **No firmes SLA sobre una cola de betas.** Si un cliente firma seis cifras esperando una flota de agentes
-> autónomos, tienes un problema de expectativas **contractual**, no comercial.
+> **No firmes SLA sobre beta ni sobre una categoría genérica de agentes.** Si un cliente firma seis cifras
+> esperando una flota autónoma, tienes un problema contractual, no comercial.
 
 ### Lo que sí puedes vender con confianza — el outcome-based pricing ✅
 Anunciado 2026-04-02, efectivo **2026-04-14**:
