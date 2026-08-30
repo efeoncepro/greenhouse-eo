@@ -1126,6 +1126,7 @@ acuerde.
 | TASK-1662 | backend-data | Keyword gap vs competidores (`domain_intersection`) — productor #4 de la tabla de mercado (autoría en `seo_competitors` + cobertura con run ledger + `readKeywordGap` derivado al leer + tools MCP) | **`complete` 2026-08-29 — operativo en producción**. Slices 1–3 desde el release `c983be7f18e6`; **Slice 4 (acople con la cola de TASK-1700) verificado con datos reales**: en el snapshot vigente de `seot-berel-mx` el origen `competitor_gap` sale `ok` con **200 items**, `evidence_ref` opaca única, cero FK/JOIN, 200/200 en banda 3 + verbo `measure` y **solape 0** con `gsc_striking_distance`. Flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED` ON en la revisión activa `ops-worker-00621-bx7` (**ops-worker únicamente** —inerte en Vercel—) y scheduler `ops-seo-competitor-coverage` `ENABLED` **también en `origin/main`** desde el release `e1718a359575` (antes sólo en `develop`: un deploy del árbol de `main` lo re-pausaba en silencio) |
 | TASK-1664 | backend-data | Keyword discovery / seed expansion — tercer productor (aprovecha el `keyword_info` inline ya pagado) | **`complete`, encendido 2026-08-14** |
 | TASK-1665 | ui-ux | Lente `Descubrir` — la cara visible de 1664: conmutador de lentes, builder, banda de costo, estado de corrida, canvas de candidatos y drawer de decisión | **code complete**, evidencia GVC pendiente |
+| TASK-1693 | ui-ux | Lo que 1664/1665 construyeron y no llegaba al operador: **paginación por cursor** (el reader la servía y la page descartaba `nextCursor`), **selector de fuente de seed** (`resolveSeeds` cubre cinco y el workbench mandaba `'manual'` fijo) y **filtros del canvas server-side** (`keyword-discovery-query.ts` existía sin un solo importador) | **code complete**; `ui:visual-gate` PASS, `ui:quality` BLOCK declarado (`visualImpact` 4.2: el techo lo fija el canvas de 1665, fuera de alcance) |
 | TASK-1666 | backend-data | Puente grounded SEO → AEO (`createGroundedQueryDraft`), consumido por el drawer de 1665 | **`complete` 2026-08-14** |
 
 **Delta 2026-08-14 (`TASK-1665`) — la lente `Descubrir` no es una ruta nueva.** Vive dentro de
@@ -1602,6 +1603,15 @@ ORDER BY reconstruido y ese índice.
 La paginación es **estable por construcción**: el universo no crece bajo el cursor porque el snapshot
 es inmutable — recomputar es una fila nueva. Eso resuelve de raíz el problema declarado en
 `TASK-1693`.
+
+**Delta 2026-08-30 (`TASK-1693`) — cómo lo resolvió la lente `Descubrir`, que NO tiene snapshot
+inmutable.** Ahí el universo sí puede crecer bajo el cursor mientras el drain materializa, y el
+cursor es un offset serializado sobre un orden compuesto en memoria (`reader.ts:300`). La lente lo
+cierra por otro camino: la afordancia de página siguiente **no se renderiza** mientras la corrida
+esté `pending`/`running` —ausente, no deshabilitada— y las páginas acumuladas se deduplican por
+`candidateId` contra lo ya visible. Los filtros viajan también en el `GET` de la página siguiente:
+sin ellos el server paginaría sobre el universo completo mientras la primera página vino del
+filtrado, y las filas nuevas no pertenecerían a la lista que el operador mira.
 
 ### 18.9 El materializador: aislamiento, idempotencia y una sola transacción
 

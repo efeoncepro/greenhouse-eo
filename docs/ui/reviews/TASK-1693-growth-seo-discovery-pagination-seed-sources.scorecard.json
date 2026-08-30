@@ -1,0 +1,94 @@
+{
+  "task": "TASK-1693",
+  "surface": "admin.growth.seo.keywords.discovery",
+  "verdict": "conditional-pass-local",
+  "reviewedAt": "2026-08-30",
+  "reviewer": "claude-opus-5 (frames mirados: desktop 1440 01-default/04-results/05-seed-sources/06-filters + mobile 390 01-default/06-filters del capture premium local)",
+  "evidence": {
+    "desktop": ".captures/2026-08-30T07-54-38_growth-seo-keyword-discovery/01-desktop/frames/06-filters.png",
+    "mobile": ".captures/2026-08-30T07-54-38_growth-seo-keyword-discovery/02-mobile/frames/01-default.png",
+    "dossier": ".captures/2026-08-30T07-54-38_growth-seo-keyword-discovery/review-dossier.md"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.5,
+      "rationale": "La distancia entre la acción que GASTA y la que sólo LEE es la jerarquía que esta task tenía que proteger, y se sostiene en el frame: «Descubrir keywords» es el único contained, dentro de la banda de costo y pegado a la cifra; los filtros son campos y «Limpiar filtros» un text button. La afordancia de paginación es outlined por contrato. Un h1 de superficie domina el chrome; el conteo honesto («50 candidatos») encabeza el canvas antes de la primera fila.",
+      "evidence": "01-desktop/frames/05-seed-sources.png"
+    },
+    "proportions": {
+      "score": 4.4,
+      "rationale": "Builder en dos columnas 3:2 (seeds vs. controles) sin comprimir; la barra de filtros usa grid auto-fit minmax(180px) y los cinco campos entran en una fila a 1440px. Corregido en loop: la primera versión usaba Stack con alignItems flex-end y el helper de «Barrera máxima» empujaba ese campo, dejando las etiquetas en tres líneas base distintas.",
+      "evidence": "01-desktop/frames/06-filters.png",
+      "nextAction": "Sin acción pendiente: corregido en loop dentro de esta misma task (Stack flex-end → grid)."
+    },
+    "rhythm": {
+      "score": 4.4,
+      "rationale": "Escala 4n constante: spacing 6 entre regiones (builder → estado → canvas), 4 entre bloques del builder y del filtro, 5 entre la barra de filtros y la tabla. La segunda fila de filtros (interruptores + salida) queda separada de los campos en vez de mezclada, que es como se leía antes.",
+      "evidence": "01-desktop/frames/06-filters.png",
+      "nextAction": "Sin acción pendiente."
+    },
+    "density": {
+      "score": 4.3,
+      "rationale": "Tabla de nueve columnas con 50 filas que respira: seed trace bajo cada keyword, volumen con ◑ y su fecha, barrera en niveles, presencia con ● medido o «Sin medición propia» explícito. A 390px todo apila y el selector de fuente cae en 2×2 sin truncar «Consultas medidas», la etiqueta más larga.",
+      "evidence": "01-desktop/frames/04-results.png",
+      "nextAction": "Sin acción pendiente; la densidad la fija la tabla de TASK-1665."
+    },
+    "depth": {
+      "score": 4.3,
+      "rationale": "Elevación contenida y sin card-on-card: la recipe va con plane='none' precisamente porque el cuerpo ya define sus superficies (builder, estado, canvas). Los filtros viven DENTRO de la card del canvas, no flotando sobre el lienzo gris. El drawer de 390px es la única superficie flotante nueva y usa el primitive de MUI.",
+      "evidence": "02-mobile/frames/01-default.png",
+      "nextAction": "Sin acción pendiente."
+    },
+    "surfaceEconomy": {
+      "score": 4.6,
+      "rationale": "Cero superficies nuevas: las tres afordancias entran en cards que ya existían y los filtros viven DENTRO de la card del canvas, no flotando sobre el lienzo gris. First fold a 1440px = builder + banda de costo, dos contained. Ninguna card es wrapper decorativo y ninguna repite el rol de otra. Al releerlo como superficie y no como delta, es de lo más fuerte de la pantalla.",
+      "evidence": "01-desktop/frames/01-default.png",
+      "nextAction": "Sin acción pendiente."
+    },
+    "visualImpact": {
+      "score": 4.2,
+      "rationale": "El momento dominante sigue siendo la banda de costo con su CTA — correcto, porque es la decisión que cuesta dinero. Los controles nuevos son deliberadamente sobrios: un selector de fuente llamativo competiría con la cifra de gasto. Es la nota más baja del set y es una elección, no una omisión.",
+      "evidence": "01-desktop/frames/05-seed-sources.png",
+      "nextAction": "El techo de impacto lo fija el canvas de TASK-1665, que esta task declara explícitamente fuera de alcance («no se rediseña el canvas ni el drawer»). Subirlo pide una task de superficie con dirección visual propia: la tabla de nueve columnas podría ganar una codificación visual del volumen y la barrera en vez de texto. NO se hace acá."
+    },
+    "typography": {
+      "score": 4.5,
+      "rationale": "Geist por variantes del tema en todo lo nuevo; cero fontSize inline y cero fontFamily literal (ui:code-lint PASS). Labels de grupo en body2 weight 500, ayudas en caption text.secondary, conteos con tabular-nums heredado del canvas.",
+      "evidence": "01-desktop/frames/06-filters.png"
+    },
+    "color": {
+      "score": 4.5,
+      "rationale": "Sin paleta semáforo como sistema visual: el azul primario marca selección y acción, y error.main aparece SÓLO en el motivo de bloqueo de una fuente sin insumo. Cero HEX literal (ui:code-lint PASS). La barrera de enlaces se comunica por etiqueta en niveles («Baja»), nunca por color solo — que es justo lo que el estándar prohíbe.",
+      "evidence": "01-desktop/frames/04-results.png",
+      "nextAction": "Sin acción pendiente."
+    },
+    "iconography": {
+      "score": 4.3,
+      "rationale": "Los estados vacíos usan iconos Tabler del set del portal (tabler-radar-2 sin corrida, tabler-filter-off con filtros sin coincidencia). Las afordancias nuevas no introducen iconografía propia — un icono en «Ver N candidatos más» habría competido con el CTA de gasto.",
+      "evidence": "01-desktop/frames/04-results.png",
+      "nextAction": "Iconografía deliberadamente mínima: un icono en «Ver N candidatos más» competiría con el CTA que gasta. Si una task futura sube el impacto del canvas, revisar ahí si la procedencia y la barrera merecen glifo propio."
+    },
+    "responsive": {
+      "score": 4.5,
+      "rationale": "Verificado en los dos viewports del capture: a 390px el selector cae en 2×2 sin truncar, los filtros colapsan al botón «Filtros» que abre drawer, y la afordancia de paginación vive una sola vez fuera de tabla y card list, así que existe en ambas presentaciones sin duplicar el control. Sin scroll horizontal de página en 1440 ni en 390.",
+      "evidence": "02-mobile/frames/06-filters.png"
+    },
+    "motion": {
+      "score": 4.2,
+      "rationale": "Esta task no introduce motion propio más allá de la aparición de filas nuevas; se respeta el contrato de TASK-1665 y el capture corre con reducedMotionCheck. Sin stagger sobre una lista que crece: sería ruido en la superficie donde se compara.",
+      "evidence": "01-desktop/frames/04-results.png",
+      "nextAction": "Esta task no introduce motion propio por contrato; hereda el de TASK-1665. La entrada de filas paginadas podría ganar una transición tokenizada cuando exista una corrida de más de una página con la que verla — hoy no la hay."
+    },
+    "fidelity": {
+      "score": 4.5,
+      "rationale": "Implementado desde el contrato, no freehand: selector de fuente según §B. Fuentes del wireframe de TASK-1665, filtros según §Filtros con sus query params exactos, paginación según el Design Decision Log de esta task. Una desviación declarada con razón: la barra de filtros reemplaza el rail lateral porque a 1440px conviviría con nueve columnas y el sidecar de 460px.",
+      "evidence": "01-desktop/frames/06-filters.png"
+    },
+    "genericTemplateResistance": {
+      "score": 4.5,
+      "rationale": "El vocabulario es de este dominio y de ningún otro: ◑/● de dos lentes, «Barrera de enlaces» en vez de «Dificultad», procedencia por endpoint, seed trace bajo cada keyword y cupo del período junto al CTA. Y el selector de fuente dejó de ser un toggle group genérico: cada fuente declara CUÁNTAS seeds aportaría («Consultas medidas · 10»), que es la pregunta que decide entre dos fuentes que resuelven gratis pero cuya expansión cuesta distinto. Ningún template trae eso.",
+      "evidence": "01-desktop/frames/04-results.png"
+    }
+  },
+  "notes": "🔴 **`pnpm ui:quality` BLOQUEA y se reporta como tal: las notas NO se inflaron.** Obtenido honestamente: average 4.41, piso 4.2. El gate del repo exige average 4.5 y piso 4.5 en jerarquía, economía de superficies, impacto visual, fidelidad y resistencia genérica (la task había declarado 4.2 en su contrato; manda el gate, que es el mecanismo, no la prosa). La dimensión que no llega es `visualImpact`, y la razón es estructural: el techo de impacto lo fija el canvas de TASK-1665, que ESTA task declara fuera de alcance en sus No-goals UX («no se rediseña el canvas ni el drawer»). Subir ese número exige una task de superficie con dirección visual propia. Cerrar el gate inflando la nota habría sido exactamente el fraude que el gate existe para impedir.\n\nDos loops reales de corrección visual, ambos disparados por mirar el frame y no por el lint:\n1. La barra de filtros salió con las etiquetas en tres líneas base distintas (Stack + alignItems flex-end, empujado por el helper de «Barrera máxima»). Rehecha con grid auto-fit.\n2. El conteo por fuente se agregó con `opacity: 0.75` y axe lo marcó `color-contrast` SERIOUS en los seis frames (3.14:1 contra 4.5 exigido). De-enfatizar texto bajándole opacidad es exactamente cómo se rompe el contraste sin darse cuenta. Retirada.\n\nDeuda conocida NO atribuible a esta task: a 390px la fila de tabs hermanas del portal recorta el último tab no activo — es scroll de tabs del shell y el tab ACTIVO se ve completo, así que no es la condición de parada del estándar.\n\nLa afordancia de paginación no aparece en los frames porque la corrida mayor del Space tiene exactamente 50 candidatos = el tamaño de página, así que nextCursor es null y el control correctamente no se renderiza. Su transporte quedó verificado contra el dev server con datos reales (limit=10 → nextCursor 10 → segunda página con candidatos distintos) y su UI por seis tests unitarios. Forzar una corrida mayor habría significado gastar con el proveedor sólo para una captura."
+}

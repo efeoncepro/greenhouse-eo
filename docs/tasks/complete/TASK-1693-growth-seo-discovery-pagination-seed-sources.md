@@ -80,7 +80,7 @@ empezar y que el Slice 3 llega con la decisión ya tomada.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -93,7 +93,7 @@ empezar y que el Slice 3 llega con la decisión ya tomada.
 - Motion: `docs/ui/motion/TASK-1665-growth-seo-keyword-discovery-workbench-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-022`
-- Status real: `En implementacion`
+- Status real: `Code complete; ui:quality BLOCK declarado`
 - Rank: `TBD`
 - Domain: `growth|seo|ui`
 - Blocked by: `none` (desbloqueada el 2026-08-28; ver el Delta de esta task)
@@ -684,45 +684,64 @@ en el proveedor.
 
 ## Acceptance Criteria
 
-- [ ] La page pasa `limit` explícito al reader y propaga `nextCursor` al workbench.
-- [ ] Con una corrida de más de una página, el operador llega al último candidato sin recargar la
+- [x] La page pasa `limit` explícito al reader y propaga `nextCursor` al workbench.
+      — `DEFAULT_DISCOVERY_READ_LIMIT` exportado como SSOT: server y cliente piden el mismo tamaño
+- [x] Con una corrida de más de una página, el operador llega al último candidato sin recargar la
       página y sin que salga ningún `POST` del navegador.
-- [ ] Las filas acumuladas no se duplican ni se reordenan al cargar una página nueva.
-- [ ] La afordancia de página siguiente desaparece cuando `nextCursor` es `null`.
-- [ ] La afordancia de página siguiente no se ofrece mientras la corrida está `pending` o `running`.
-- [ ] El aviso `truncatedNotice` ya no promete una paginación futura (se retiró o se reescribió).
-- [ ] El builder renderiza el selector de fuente con el copy existente y el workbench envía la fuente
+      — verificado contra el dev server con datos reales: `limit=10` → `nextCursor 10` → segunda página con candidatos distintos → `nextCursor 20`; el test afirma `GET` y **cero `POST`**
+- [x] Las filas acumuladas no se duplican ni se reordenan al cargar una página nueva.
+      — dedup por `candidateId` contra lo ya visible, con test del caso «el cursor devolvió el mismo dos veces»
+- [x] La afordancia de página siguiente desaparece cuando `nextCursor` es `null`.
+- [x] La afordancia de página siguiente no se ofrece mientras la corrida está `pending` o `running`.
+      — ausente, no deshabilitada
+- [x] El aviso `truncatedNotice` ya no promete una paginación futura (se retiró o se reescribió).
+      — reescrito: ahora explica el orden y que recorrer no vuelve a gastar
+- [x] El builder renderiza el selector de fuente con el copy existente y el workbench envía la fuente
       elegida en vez de `'manual'` fijo.
+      — y cada fuente declara cuántas seeds aportaría
 - [ ] Una corrida encolada con `gsc_queries` persiste `sourceKind = 'gsc_queries'` y sus seeds salen
       de `seo_gsc_daily`, verificado contra la corrida real.
-- [ ] Una fuente sin insumo se muestra no disponible con su copy y no se puede enviar; ninguna
+      🔴 **NO EJERCITADO** — encolar una corrida GASTA con el proveedor y no se autorizó gasto para esta task. El camino está cubierto por test (`seedSource` correcto en el body) y el primitive ya persistía `sourceKind` desde TASK-1664. Queda como verificación de rollout
+- [x] Una fuente sin insumo se muestra no disponible con su copy y no se puede enviar; ninguna
       fuente degrada a `manual` en silencio.
-- [ ] Con `target_domain` la UI restringe los métodos a `keywords_for_site` antes de enviar.
-- [ ] La banda de costo muestra una estimación en los modos que no usan seeds manuales.
-- [ ] Los rechazos tipados del primitive se muestran con prosa es-CL canónica, sin string crudo en
+      — con test del invariante «bloquea, no degrada»
+- [x] Con `target_domain` la UI restringe los métodos a `keywords_for_site` antes de enviar.
+- [x] La banda de costo muestra una estimación en los modos que no usan seeds manuales.
+      — el estimador devolvía `null` sin seeds escritas y habría quedado mudo justo en los modos nuevos
+- [x] Los rechazos tipados del primitive se muestran con prosa es-CL canónica, sin string crudo en
       inglés.
-- [ ] `keyword-discovery-query.ts` quedó **cableado** (la decisión heredada del Delta 2026-08-15; no
+      — y las fuentes sin insumo se bloquean ANTES del envío, así que el rechazo no llega
+- [x] `keyword-discovery-query.ts` quedó **cableado** (la decisión heredada del Delta 2026-08-15; no
       se retira) y sus filtros se aplican server-side, incluido `maxLinkBarrier`.
-- [ ] `maxDifficulty` no se ofrece como filtro visible; si llega por URL, la superficie declara que
+      — verificado en vivo: `query=zzznoexiste` → 0, `lamina` → 2, `maxLinkBarrier=low` → 19 de 50
+- [x] `maxDifficulty` no se ofrece como filtro visible; si llega por URL, la superficie declara que
       el contrato lo ignoró en vez de pintarlo como aplicado.
-- [ ] El conteo visible y la afordancia de paginación cuentan sobre el universo **filtrado** y sobre
+      — no se traduce al reader ni aunque llegue por URL; `ignoredFilters` vacío en la corrida verificada
+- [x] El conteo visible y la afordancia de paginación cuentan sobre el universo **filtrado** y sobre
       keywords distintas (cardinalidad de `TASK-1694`), no sobre procedencias ni sobre el total crudo.
-- [ ] `TASK-1694` está `complete` antes de tomar esta task, y la declaración de la lente `◑` de
+      — verificado: con `?q=lamina` el encabezado titula «2 candidatos», no 50
+- [x] `TASK-1694` está `complete` antes de tomar esta task, y la declaración de la lente `◑` de
       `TASK-1691` ya está en la superficie: esta lente la reusa, no la redefine.
-- [ ] Ninguna clave de `GH_GROWTH_SEO_KEYWORDS.discovery` quedó sin consumidor, y existe un test o
+      — 1694 cerrada y su contrato verificado en el reader; la lente `◑` ya estaba en la superficie (por eso se retiró la serialización con 1691)
+- [x] Ninguna clave de `GH_GROWTH_SEO_KEYWORDS.discovery` quedó sin consumidor, y existe un test o
       gate que lo sostiene.
-- [ ] Ninguna capability, entitlement, ruta, reader, command ni migración nueva fue creada.
-- [ ] Se declaró `Execution profile: ui-ux` y `UI impact: interaction` según el alcance real.
-- [ ] `UI ready` permanece `no` hasta que el wireframe y el `## UI/UX Contract` tengan implementation
+      — 10 retiradas con su razón + gate `keyword-discovery-copy-consumers.test.ts` que descubre las claves recorriendo el objeto real
+- [x] Ninguna capability, entitlement, ruta, reader, command ni migración nueva fue creada.
+- [x] Se declaró `Execution profile: ui-ux` y `UI impact: interaction` según el alcance real.
+- [x] `UI ready` permanece `no` hasta que el wireframe y el `## UI/UX Contract` tengan implementation
       mapping, GVC scenario plan y design decision log de esta superficie; si pasa a `yes`, pasa
       `pnpm task:lint --task TASK-1693`.
-- [ ] Se declaró `Wireframe`, `Flow` y `Motion` apuntando a archivos existentes.
-- [ ] El copy visible reusable vive en `src/lib/copy/growth.ts`; cero literales nuevos en JSX.
-- [ ] Los estados loading, error, empty, degradado, permiso parcial y mobile quedan cubiertos.
-- [ ] Motion y microinteracciones tienen fallback de `prefers-reduced-motion`.
+      — pasó a `yes` con wireframe y flow PROPIOS de esta task; `ui:readiness-check` 0/0 y `design-contract:lint` PASS
+- [x] Se declaró `Wireframe`, `Flow` y `Motion` apuntando a archivos existentes.
+- [x] El copy visible reusable vive en `src/lib/copy/growth.ts`; cero literales nuevos en JSX.
+- [x] Los estados loading, error, empty, degradado, permiso parcial y mobile quedan cubiertos.
+      — incluido el empty FILTRADO, que antes diría «no hay candidatos» siendo falso
+- [x] Motion y microinteracciones tienen fallback de `prefers-reduced-motion`.
+      — el capture corre con `reducedMotionCheck`; esta task no introduce motion propio
 - [ ] GVC desktop 1440 + mobile 390 capturado, mirado y con scorecard registrado sobre el umbral
       declarado.
-- [ ] Sin scroll horizontal de página en desktop ni en 390px.
+      🔴 capturado y **mirado** (dos loops de corrección salieron de mirarlo), scorecard registrado — pero `pnpm ui:quality` **BLOQUEA**: average 4.41 y `visualImpact` 4.2 contra el 4.5 del gate. Las notas NO se inflaron; el techo de impacto lo fija el canvas de TASK-1665, fuera de alcance
+- [x] Sin scroll horizontal de página en desktop ni en 390px.
 
 ## Verification
 
@@ -739,21 +758,37 @@ en el proveedor.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+      — verde en los dos viewports del capture
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] Se actualizó el `## Delta` de TASK-1665 marcando cerrados los puntos 9 (conteo/paginación) y la
+- [x] Se actualizó el `## Delta` de TASK-1665 marcando cerrados los puntos 9 (conteo/paginación) y la
       derivación de las fuentes de seed.
-- [ ] Se revisó TASK-1660, TASK-1691 y TASK-1694 por impacto cruzado sobre la misma superficie.
-- [ ] La documentación funcional y el manual de uso de la lente describen la paginación y las fuentes
-      de seed, con GSC recomendado cuando hay demanda medida.
+- [x] Se revisó TASK-1660, TASK-1691 y TASK-1694 por impacto cruzado sobre la misma superficie —
+      1660 reusa el conmutador de lentes y **no se tocó**; 1691 dejó de ser precondición (Delta
+      2026-08-29) y sigue vigente para la tabla de oportunidades; 1694 aportó el vocabulario del
+      filtro de barrera que esta task consume.
+- [x] La documentación funcional y el manual de uso de la lente describen la paginación y las fuentes
+      de seed, con GSC recomendado cuando hay demanda medida — manual v1.3.
 
 ## Follow-ups
 
+- 🔴 **`pnpm ui:quality` queda en `BLOCK`** (average 4.41, `visualImpact` 4.2 contra el 4.5 del gate).
+  No se cierra inflando notas: el techo de impacto lo fija el canvas de `TASK-1665`, que esta task
+  declara fuera de alcance en sus No-goals UX. Subirlo pide una task de superficie con dirección
+  visual propia — la tabla de nueve columnas podría codificar visualmente volumen y barrera en vez de
+  texto. **Esa task no existe todavía.**
+- **Verificación de rollout pendiente:** encolar una corrida real con `seedSource='gsc_queries'` y
+  confirmar que persiste `sourceKind='gsc_queries'` con seeds de `seo_gsc_daily`. **Gasta con el
+  proveedor**, así que necesita autorización del operador; el camino está cubierto por test y el
+  primitive persiste `sourceKind` desde `TASK-1664`.
+- La afordancia de paginación no se pudo ver en un frame porque la corrida mayor del Space tiene
+  exactamente 50 candidatos = el tamaño de página. Se verá sola cuando exista una corrida mayor; su
+  transporte ya quedó verificado contra datos reales.
 - Si el Slice 3 concluye en cablear los filtros, evaluar si `state` merece un filtro server-side
   propio en el reader (hoy no existe) — sería una task `backend-data` aparte.
 - Coordinar con TASK-1694: cuando el filtro por barrera de enlaces exista en la API, la afordancia de

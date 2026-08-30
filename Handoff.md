@@ -2,6 +2,47 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-30 — TASK-1693 `complete`: lo que la lente `Descubrir` ya tenía construido y no llegaba al operador
+
+Tres capacidades pagadas y sin superficie, cerradas en cuatro slices sobre `develop` (sin push):
+**paginación por cursor** (el reader la servía y la page descartaba `nextCursor`), **las cuatro
+fuentes de seed** (`resolveSeeds` cubre cinco y el workbench mandaba `'manual'` fijo) y **los filtros
+del canvas** (`keyword-discovery-query.ts` existía sin un solo importador).
+
+**El Slice 0 no estaba en el plan y fue necesario.** El readiness gate bloqueó: los docs de diseño
+declarados eran los de `TASK-1665` —substantivos, pero pre-esquema— y **la paginación no estaba
+diseñada en ninguna parte**. Se autoraron wireframe + flow PROPIOS de 1693, de alcance parcial, en vez
+de reescribir el contrato de una task cerrada para satisfacer un esquema posterior.
+
+**Se retiró una serialización que la spec declaraba obligatoria (`1691 → 1693`)** tras verificar que
+la colisión que la justificaba ya no existe: la lente `Descubrir` ya pinta `◑` + `capturedAt` +
+«Barrera de enlaces», así que el encoding que 1691 propaga es el que esta superficie **ya tiene**;
+archivos owned disjuntos y bloques de copy distintos.
+
+**Tres defectos propios, cada uno atrapado por un instrumento distinto — y ninguno por el lint:**
+1. La skill de UX writing mató un `aria-label` que yo había propuesto: no contenía el texto visible,
+   lo que rompe *label in name* (WCAG 2.5.3) y deja el botón inalcanzable por control de voz.
+2. Un test destapó que mi propio wireframe afirmaba que la superficie tenía UNA live region. Tiene
+   **dos** desde 1665. Se corrigió el contrato en vez de dejar la afirmación.
+3. **Mirar el frame** destapó la barra de filtros con las etiquetas en tres líneas base distintas, y
+   **axe** marcó `color-contrast` SERIOUS (3.14:1) en los seis frames por un `opacity: 0.75` que yo
+   había puesto para de-enfatizar un conteo. De-enfatizar texto bajándole opacidad es exactamente
+   cómo se rompe el contraste sin darse cuenta.
+
+**Verificado contra el dev server con sesión de agente, no sólo con mocks:** paginación real
+(`limit=10` → `nextCursor 10` → 2.ª página con candidatos distintos), filtros server-side
+(`query=zzznoexiste` → 0, `lamina` → 2, `maxLinkBarrier=low` → 19 de 50) y la superficie con
+`?q=lamina` titulando «2 candidatos» — el conteo sigue al universo filtrado, no a lo que bajó.
+
+🔴 **`pnpm ui:quality` queda en `BLOCK` y se reporta así: las notas NO se inflaron.** Average 4.41 y
+`visualImpact` 4.2 contra el 4.5 del gate. La razón es estructural: el techo de impacto lo fija el
+canvas de `TASK-1665`, que esta task declara fuera de alcance en sus No-goals UX. Cerrarlo subiendo
+la nota habría sido el fraude que el gate existe para impedir. `ui:visual-gate` PASS.
+
+**Pendiente con dueño:** encolar una corrida real con `seedSource='gsc_queries'` para confirmar que
+persiste `sourceKind` con seeds de `seo_gsc_daily` — **gasta con el proveedor** y necesita
+autorización. Y una task de superficie si se quiere levantar el `visualImpact` del canvas.
+
 ## 2026-08-29 (10.º) — TASK-1699: día 1 verificado y costo marginal CERO comprobado; dos criterios de la spec estaban mal enunciados
 
 El cron del 29-ago escribió el día 1 de la serie del top-N (766 filas, `seot-berel-mx`, 31 keywords) y

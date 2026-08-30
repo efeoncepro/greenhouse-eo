@@ -127,6 +127,21 @@ const SOURCE_HELPER: Record<SeoDiscoverySourceKind, (copy: DiscoveryCopy) => str
   mixed: copy => copy.builder.sourceManualHelper
 }
 
+/**
+ * Cuántas seeds aportaría cada fuente HOY. `null` = no aplica o no se pudo preguntar, y entonces
+ * la etiqueta va sin número en vez de mostrar un `0` que se leería como «no hay».
+ */
+const SOURCE_AVAILABLE_COUNT: Record<
+  SeoDiscoverySourceKind,
+  (availability: SeoDiscoverySeedSourceAvailability | null) => number | null
+> = {
+  gsc_queries: availability => availability?.gscQueries ?? null,
+  tracked_keywords: availability => availability?.trackedKeywords ?? null,
+  manual: () => null,
+  target_domain: () => null,
+  mixed: () => null
+}
+
 const SEED_SOURCE_OPTIONS: readonly SeoDiscoverySourceKind[] = [
   'gsc_queries',
   'tracked_keywords',
@@ -482,11 +497,37 @@ const KeywordDiscoveryBuilder = ({
                 size='small'
                 sx={selectionGroupSx}
               >
-                {SEED_SOURCE_OPTIONS.map(option => (
-                  <ToggleButton key={option} value={option} title={SOURCE_HELPER[option](copy)}>
-                    {SOURCE_LABEL[option](copy)}
-                  </ToggleButton>
-                ))}
+                {SEED_SOURCE_OPTIONS.map(option => {
+                  /*
+                   * El conteo de insumo viaja en la propia etiqueta.
+                   *
+                   * Sin él, elegir entre «Consultas medidas» y «Keywords seguidas» es a ciegas: las
+                   * dos resuelven sin costo, pero una puede aportar 12 seeds y la otra 2, y eso
+                   * cambia cuánto va a costar la EXPANSIÓN — que es lo que sí se paga. El dato ya
+                   * está resuelto server-side por los mismos resolvers del encolado, así que
+                   * mostrarlo no cuesta una lectura más.
+                   */
+                  const available = SOURCE_AVAILABLE_COUNT[option](seedSourceAvailability)
+
+                  return (
+                    <ToggleButton key={option} value={option} title={SOURCE_HELPER[option](copy)}>
+                      {SOURCE_LABEL[option](copy)}
+                      {available === null ? null : (
+                        /*
+                         * ⚠️ SIN `opacity` para de-enfatizar.
+                         *
+                         * La primera versión usaba `opacity: 0.75` y axe la marcó `color-contrast`
+                         * serious en los seis frames: 3.14:1 contra el 4.5 exigido. Bajarle opacidad
+                         * a un texto es exactamente cómo se rompe el contraste sin darse cuenta —
+                         * el color heredado ya distingue al conteo por su posición y el separador.
+                         */
+                        <Box component='span' sx={{ marginInlineStart: 2, fontVariantNumeric: 'tabular-nums' }}>
+                          · {available}
+                        </Box>
+                      )}
+                    </ToggleButton>
+                  )
+                })}
               </ToggleButtonGroup>
 
               {/* La ayuda de la fuente ELEGIDA, siempre visible: es donde se dice si resolver

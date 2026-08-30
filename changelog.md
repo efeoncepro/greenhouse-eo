@@ -7,6 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-30 — Growth SEO · la lente `Descubrir` entrega lo que ya tenía construido (TASK-1693)
+
+**Qué cambia para quien opera el módulo SEO.** Tres capacidades que estaban construidas y pagadas
+pero no llegaban a la pantalla:
+
+- **Se puede recorrer la corrida completa.** Una corrida materializa hasta 500 candidatos y la
+  pantalla servía 50 sin salida. Ahora hay «Ver N candidatos más» al pie. Recorrer **no cuesta**: lee
+  lo ya comprado, no llama al proveedor y por eso se ve distinto del botón que sí gasta.
+- **Se elige de dónde salen las seeds.** Cuatro fuentes, con Search Console a la cabeza — seeds con
+  demanda medida y resolución sin costo de proveedor. Cada una declara cuántas seeds aportaría. Una
+  fuente sin insumo se bloquea con su razón y **nunca** cae en silencio a «seeds escritas».
+- **Se puede filtrar el canvas**, y el filtro se aplica en el servidor: el conteo del encabezado
+  sigue al universo filtrado, no a la página que bajó. No hay filtro por «dificultad» a propósito;
+  el control correcto es «Barrera máxima», derivada del perfil real de enlaces.
+
+Manual actualizado: `docs/manual-de-uso/growth/descubrir-keywords-seo.md` v1.3.
+
 ## 2026-08-29 — release `e1718a359575`: dos guardas textuales fallaron el mismo día con signos opuestos
 
 El 4.º paso a producción del día promovió el fix de banda 2, el gate de cobertura del worker y la
@@ -963,14 +980,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   columna «Decisión». Su proceso no terminó, así que no tiene desenlace.
 - Ningún desenlace nuevo manda correo todavía. Es deliberado: preferible no escribir a mandarle un correo de
   rechazo a quien nadie rechazó. El correo de «Sin selección» llega con su propia entrega.
-
-## 2026-08-22 — Un test bloqueado ya no deja a esa persona sin segunda oportunidad
-
-- Corregir la causa de un bloqueo —registrar el correo, activar la plantilla, habilitar la política— y volver a
-  proponer ahora **sí asigna la prueba**. Antes el intento bloqueado ocupaba el cupo de esa persona de forma
-  permanente y no había forma de destrabarlo desde el portal.
-- El intento bloqueado no se borra: queda como intento 1 y el nuevo entra como intento 2, así que el historial
-  sigue diciendo qué pasó y en qué orden.
-- Lo que no cambió: una prueba ya asignada sigue sin reintentarse (para eso está cancelar), y un bloqueo del
-  carril automático —al mover de etapa— todavía no se destraba solo; hay que asignar a mano.
-- Sin migración ni flags. Verificado contra PostgreSQL real, no sólo con tests.

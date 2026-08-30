@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-08-14 por Claude (TASK-1665)
-> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1692 — el estado del candidato se mueve solo, la bandeja reordena lo ya decidido y un descartado se puede volver a elegir; delta previo TASK-1694 — una keyword por fila, aviso de canibalizacion y el filtro de dificultad deja de decidir)
+> **Ultima actualizacion:** 2026-08-30 por Claude (TASK-1693 — se puede recorrer la corrida completa, elegir de donde salen las seeds y filtrar el canvas; deltas previos: TASK-1692 el estado del candidato se mueve solo y TASK-1694 una keyword por fila con el filtro de dificultad ya sin decidir)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §7, §9 y §10.4
 
 # Descubrir keywords — Expandir seeds y decidir por candidato
@@ -251,6 +251,60 @@ Hay dos resultados posibles y la diferencia importa:
 - **Borrador base** — el modelo no estaba disponible y salio de la plantilla. La pantalla te lo dice
   con esas palabras: `sin el modelo`. **Revisalo con mas atencion**, porque no esta pegado a la
   marca.
+
+## Elegir de donde salen las seeds
+
+Antes de lanzar una corrida decides **la fuente**: de donde salen las palabras que se van a expandir.
+Son cuatro y no dan lo mismo.
+
+| Fuente | De donde sale | Cuesta resolverla | Cuando conviene |
+|---|---|---|---|
+| **Consultas medidas** | Tu Search Console, ultimos 28 dias, por impresiones | No | **La mejor por defecto cuando tienes datos.** Parte de busquedas que gente real ya hizo hacia tu sitio, no de intuicion |
+| **Keywords seguidas** | Los terminos que ya monitoreas | No | Para profundizar alrededor de lo que ya decidiste perseguir. No crea seguimiento nuevo |
+| **Seeds escritas** | El texto que escribes tu | No | Cuando exploras un territorio nuevo del que todavia no tienes datos |
+| **Dominio propio** | El dominio del sitio, sin seeds | Si (es el metodo) | Para una foto amplia. Obliga el metodo `keywords_for_site` |
+
+Cada fuente muestra **cuantas seeds aportaria** al lado de su nombre («Consultas medidas · 10»). Ese
+numero decide mas de lo que parece: resolver las seeds es gratis en las tres primeras, pero **la
+expansion se paga por seed**, asi que una fuente con 10 seeds cuesta mas que una con 2.
+
+🔴 **Una fuente sin insumo no se puede usar, y te lo dice.** Si tu Space no tiene consultas medidas en
+los 28 dias, «Consultas medidas» queda bloqueada con su razon y el boton no deja enviar. **Nunca**
+cae en silencio a «Seeds escritas»: si eso pasara, leerias los resultados de una pregunta creyendo
+que corriste la tuya.
+
+⚠️ **Que las seeds sean medidas no vuelve medidos los resultados.** El proveedor devuelve
+estimaciones (`◑`) igual. La lente de la seed no se contagia al candidato.
+
+## Recorrer la corrida completa
+
+Una corrida puede materializar hasta 500 candidatos y la pantalla te sirve **50 por vez**, empezando
+por los de mayor prioridad segun el orden gobernado. Cuando quedan mas, al pie de la tabla aparece
+**«Ver N candidatos mas»**.
+
+- **Recorrer no cuesta.** Ese boton lee lo que ya se compro: no lanza una corrida, no llama al
+  proveedor y no toca tu presupuesto. Por eso se ve distinto del boton azul «Descubrir keywords»,
+  que si gasta.
+- **Lo que ya leiste se queda.** Las filas nuevas se agregan al final; nada se reordena ni desaparece.
+- **Si la corrida todavia esta corriendo, el boton no aparece.** No es un error: mientras el worker
+  sigue materializando, la lista crece y paginar te haria saltar o repetir filas sin avisarte.
+  Espera a que termine.
+
+## Filtrar el canvas
+
+Sobre la tabla tienes buscador, procedencia, intencion, **barrera maxima** y volumen minimo, mas dos
+interruptores («Solo no seguidas» e «Incluir sin dato de barrera»). A 390px se agrupan en el boton
+**Filtros (N)**, que muestra cuantos tienes activos.
+
+- Los filtros **se aplican en el servidor**, no sobre lo que alcanzaste a bajar. Por eso el conteo del
+  encabezado sigue al universo filtrado: si dice «2 candidatos», son 2 en toda la corrida, no 2 en la
+  pagina que estas mirando.
+- Los filtros **viajan en la URL**: puedes compartir el enlace con los filtros puestos.
+- 🔴 **No existe filtro por «dificultad».** Se retiro a proposito: la cifra del proveedor colapsa a 0
+  en SERPs en espanol y filtrar por ella te devuelve keywords de barrera Alta creyendo que pediste lo
+  facil. El control correcto es **Barrera maxima**, derivada del perfil real de enlaces del top-10.
+- «Sin dato» no es «Baja». Si filtras por barrera, lo no medido queda fuera salvo que marques
+  explicitamente «Incluir sin dato de barrera».
 
 ## Que no hacer
 

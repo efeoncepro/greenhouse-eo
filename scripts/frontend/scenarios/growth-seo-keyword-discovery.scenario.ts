@@ -14,9 +14,19 @@ import type { CaptureScenario } from '../lib/scenario'
 /** Grupo Berel — el Space con módulo SEO contratado y sitio configurado en dev/staging. */
 const BEREL_SPACE_ID = 'org-32333527-02a8-487b-819e-6f76a761777d'
 
+/** Corrida `succeeded` de 50 candidatos del 2026-08-28 — la mayor materializada del Space. */
+const BEREL_DISCOVERY_RUN = 'seokdr-7851e49c-3414-4038-b8bd-9e1f052593cd'
+
 export const scenario: CaptureScenario = {
   name: 'growth-seo-keyword-discovery',
-  route: `/admin/growth/seo/keywords?space=${BEREL_SPACE_ID}&view=discovery`,
+  /**
+   * TASK-1693 — se ancla la corrida ya materializada del Space.
+   *
+   * Sin `discoveryRun` la lente cae en la última corrida, que puede ser la de 10 candidatos y
+   * dejaría sin capturar los filtros y el conteo honesto. El escenario NO dispara una corrida
+   * (gasta): captura sobre lo ya comprado.
+   */
+  route: `/admin/growth/seo/keywords?space=${BEREL_SPACE_ID}&view=discovery&discoveryRun=${BEREL_DISCOVERY_RUN}`,
   viewport: { width: 1440, height: 900 },
   qualityProfile: 'premium',
   viewports: [
@@ -47,6 +57,14 @@ export const scenario: CaptureScenario = {
       failOnViolations: true,
       reducedMotionCheck: true,
       probes: [
+        {
+          // TASK-1693 — el anillo de foco del selector de fuente se HEREDA de `selectionGroupSx`;
+          // esta sonda verifica que la herencia ocurrió y no quedó un grupo sin señal de teclado.
+          name: 'discovery-source-focus',
+          startSelector: '[data-capture="seo-keyword-discovery-builder"] button',
+          keys: ['Tab'],
+          requireVisibleFocusRing: true
+        },
         {
           name: 'discovery-seeds-focus',
           startSelector: '[data-capture="seo-keyword-discovery-builder"] textarea',
@@ -82,6 +100,14 @@ export const scenario: CaptureScenario = {
       kind: 'visible',
       selector: '[data-capture="seo-keywords-lens-tabs"]',
       reason: 'la lente activa debe ser legible; un tab recortado a 390px es condición de parada'
+    },
+
+    // ── TASK-1693 ────────────────────────────────────────────────────────────────────────
+    {
+      kind: 'visible',
+      selector: '[data-capture="seo-keyword-discovery-filters"]',
+      reason:
+        'los filtros son la mitad del canvas de decisión: sin ellos el operador sólo puede mirar el orden que le dieron'
     }
   ],
   steps: [
@@ -102,7 +128,21 @@ export const scenario: CaptureScenario = {
       kind: 'mark',
       label: 'results',
       clipSelector: '[data-capture="seo-keyword-discovery-results"]',
-      note: 'estado honesto de "todavía no hay corrida", no una tabla vacía'
+      note: 'canvas con la corrida materializada y su conteo honesto'
+    },
+
+    // ── TASK-1693 — fuentes de seed y filtros ────────────────────────────────────────────
+    {
+      kind: 'mark',
+      label: 'seed-sources',
+      clipSelector: '[data-capture="seo-keyword-discovery-builder"]',
+      note: 'selector de fuente: las cuatro con su ayuda visible, y la elegida marcada'
+    },
+    {
+      kind: 'mark',
+      label: 'filters',
+      clipSelector: '[data-capture="seo-keyword-discovery-filters"]',
+      note: 'barra de filtros en desktop; a 390px es el botón Filtros (N) que abre drawer'
     },
 
     // ── Slice 4 — drawer de candidato ────────────────────────────────────────────────────
