@@ -39,6 +39,10 @@ archivos owned disjuntos y bloques de copy distintos.
 canvas de `TASK-1665`, que esta task declara fuera de alcance en sus No-goals UX. Cerrarlo subiendo
 la nota habría sido el fraude que el gate existe para impedir. `ui:visual-gate` PASS.
 
+**Gate de cierre completo:** `pnpm test` COMPLETO verde (12 638 pasados) y **`pnpm build` de
+producción VERDE** (corrido con autorización del operador: 28,6 s de compilación, 23/23 páginas
+estáticas, cero errores). 
+
 **Pendiente con dueño:** encolar una corrida real con `seedSource='gsc_queries'` para confirmar que
 persiste `sourceKind` con seeds de `seo_gsc_daily` — **gasta con el proveedor** y necesita
 autorización. Y una task de superficie si se quiere levantar el `visualImpact` del canvas.

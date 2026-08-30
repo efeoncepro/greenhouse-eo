@@ -749,6 +749,10 @@ en el proveedor.
 - `pnpm vitest run src/views/greenhouse/admin/growth/seo/keywords src/lib/growth/seo/keyword-discovery`
 - `pnpm test` (full suite, gate de cierre)
 - `pnpm build` (producción, gate de cierre — pedir autorización al operador antes de correrlo)
+  **Corrido con autorización el 2026-08-30: VERDE.** Compiló en 28,6 s, 23/23 páginas estáticas
+  generadas, cero errores de tipo o de boundary. `/admin/growth/seo/keywords` y
+  `/api/admin/growth/seo/keyword-discovery` figuran en la tabla de rutas como dinámicas (`ƒ`),
+  que es lo esperado: la lente consume sesión y la ruta es un handler.
 - `pnpm fe:capture growth-seo-keyword-discovery` + `pnpm fe:capture:review growth-seo-keyword-discovery`
 - `pnpm ui:code-lint`, `pnpm design:lint`, `pnpm ui:quality`
 - `pnpm task:lint --task TASK-1693` y `pnpm ops:lint --changed`
