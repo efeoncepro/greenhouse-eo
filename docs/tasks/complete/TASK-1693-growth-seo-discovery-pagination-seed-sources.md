@@ -699,9 +699,9 @@ en el proveedor.
 - [x] El builder renderiza el selector de fuente con el copy existente y el workbench envía la fuente
       elegida en vez de `'manual'` fijo.
       — y cada fuente declara cuántas seeds aportaría
-- [ ] Una corrida encolada con `gsc_queries` persiste `sourceKind = 'gsc_queries'` y sus seeds salen
+- [x] Una corrida encolada con `gsc_queries` persiste `sourceKind = 'gsc_queries'` y sus seeds salen
       de `seo_gsc_daily`, verificado contra la corrida real.
-      🔴 **NO EJERCITADO** — encolar una corrida GASTA con el proveedor y no se autorizó gasto para esta task. El camino está cubierto por test (`seedSource` correcto en el body) y el primitive ya persistía `sourceKind` desde TASK-1664. Queda como verificación de rollout
+      **EJERCITADO 2026-08-30 con autorización del operador** (`scripts/growth/_rollout-task-1693-gsc-seed-source.ts --spend`): corrida `seokdr-761a9689-…`, `source_kind='gsc_queries'`, **10/10 seeds con `origin='gsc_queries'`** (berel 91 734 impresiones, pinturas berel 53 418 — salen de `seo_gsc_daily`, no del textarea), `status='succeeded'`, **334 candidatos**, **USD 0,2999 reales** contra 0,348 estimados
 - [x] Una fuente sin insumo se muestra no disponible con su copy y no se puede enviar; ninguna
       fuente degrada a `manual` en silencio.
       — con test del invariante «bloquea, no degrada»
@@ -786,13 +786,10 @@ en el proveedor.
   declara fuera de alcance en sus No-goals UX. Subirlo pide una task de superficie con dirección
   visual propia — la tabla de nueve columnas podría codificar visualmente volumen y barrera en vez de
   texto. **Esa task no existe todavía.**
-- **Verificación de rollout pendiente:** encolar una corrida real con `seedSource='gsc_queries'` y
-  confirmar que persiste `sourceKind='gsc_queries'` con seeds de `seo_gsc_daily`. **Gasta con el
-  proveedor**, así que necesita autorización del operador; el camino está cubierto por test y el
-  primitive persiste `sourceKind` desde `TASK-1664`.
-- La afordancia de paginación no se pudo ver en un frame porque la corrida mayor del Space tiene
-  exactamente 50 candidatos = el tamaño de página. Se verá sola cuando exista una corrida mayor; su
-  transporte ya quedó verificado contra datos reales.
+- ~~Verificación de rollout de `gsc_queries`~~ — **CERRADA 2026-08-30**: corrida real
+  `seokdr-761a9689-…` con `source_kind='gsc_queries'`, 10/10 seeds desde `seo_gsc_daily`, 334
+  candidatos, USD 0,2999 reales contra 0,348 estimados. De paso dejó la primera corrida
+  multi-página del Space, con la que la afordancia de paginación quedó capturada en un frame propio.
 - Si el Slice 3 concluye en cablear los filtros, evaluar si `state` merece un filtro server-side
   propio en el reader (hoy no existe) — sería una task `backend-data` aparte.
 - Coordinar con TASK-1694: cuando el filtro por barrera de enlaces exista en la API, la afordancia de

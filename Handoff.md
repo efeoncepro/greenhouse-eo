@@ -43,9 +43,20 @@ la nota habría sido el fraude que el gate existe para impedir. `ui:visual-gate`
 producción VERDE** (corrido con autorización del operador: 28,6 s de compilación, 23/23 páginas
 estáticas, cero errores). 
 
-**Pendiente con dueño:** encolar una corrida real con `seedSource='gsc_queries'` para confirmar que
-persiste `sourceKind` con seeds de `seo_gsc_daily` — **gasta con el proveedor** y necesita
-autorización. Y una task de superficie si se quiere levantar el `visualImpact` del canvas.
+**Rollout ejecutado el 2026-08-30 con autorización del operador (USD 0,348 estimados):** corrida real
+`seokdr-761a9689-…` con `seedSource='gsc_queries'` sobre Berel — `source_kind` persistido, **10/10
+seeds con `origin='gsc_queries'`** (berel 91 734 impresiones, pinturas berel 53 418: salen de
+`seo_gsc_daily`, no del textarea), `succeeded`, **334 candidatos**, **USD 0,2999 reales**. Con eso
+cierra el único AC que había quedado sin ejercitar. Y de yapa dejó la **primera corrida multi-página
+del Space**, así que la afordancia de paginación —que hasta entonces no se podía ver porque la
+corrida mayor tenía exactamente 50 candidatos = el tamaño de página— quedó capturada en un frame
+propio, con el encabezado titulando «50 de 284» (284 = keywords distintas tras el colapso de
+cardinalidad de TASK-1694, no las 334 filas de procedencia).
+
+**12 commits promovidos a `origin/develop`** (7 de esta task, 3 de TASK-1662/1699, 2 ajenos).
+
+**Pendiente con dueño:** una task de superficie si se quiere levantar el `visualImpact` del canvas —
+es la única razón por la que `ui:quality` sigue en `BLOCK`, y no se cierra inflando la nota.
 
 ## 2026-08-29 (10.º) — TASK-1699: día 1 verificado y costo marginal CERO comprobado; dos criterios de la spec estaban mal enunciados
 

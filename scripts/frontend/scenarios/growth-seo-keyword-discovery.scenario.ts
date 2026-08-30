@@ -14,8 +14,10 @@ import type { CaptureScenario } from '../lib/scenario'
 /** Grupo Berel — el Space con módulo SEO contratado y sitio configurado en dev/staging. */
 const BEREL_SPACE_ID = 'org-32333527-02a8-487b-819e-6f76a761777d'
 
-/** Corrida `succeeded` de 50 candidatos del 2026-08-28 — la mayor materializada del Space. */
-const BEREL_DISCOVERY_RUN = 'seokdr-7851e49c-3414-4038-b8bd-9e1f052593cd'
+/** Corrida `succeeded` de **334 candidatos** con `source_kind='gsc_queries'` (TASK-1693, 2026-08-30).
+ * Reemplaza a la de 50: con 50 = el tamaño de página, `nextCursor` era null y la afordancia de
+ * paginación no se podía ver en ningún frame. */
+const BEREL_DISCOVERY_RUN = 'seokdr-761a9689-fbb1-4af3-8744-940a5d3e9190'
 
 export const scenario: CaptureScenario = {
   name: 'growth-seo-keyword-discovery',
@@ -137,6 +139,14 @@ export const scenario: CaptureScenario = {
       label: 'seed-sources',
       clipSelector: '[data-capture="seo-keyword-discovery-builder"]',
       note: 'selector de fuente: las cuatro con su ayuda visible, y la elegida marcada'
+    },
+    {
+      // TASK-1693 — frame dedicado a la afordancia. Sin `clipSelector` propio queda perdida al pie
+      // de una tabla de cientos de filas y no sirve como evidencia de que existe.
+      kind: 'mark',
+      label: 'pagination',
+      clipSelector: '[data-capture="seo-keyword-discovery-pagination"]',
+      note: 'acción secundaria (outlined) que dice el tamaño real de la página siguiente'
     },
     {
       kind: 'mark',
