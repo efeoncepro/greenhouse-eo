@@ -782,10 +782,11 @@ en el proveedor.
 ## Follow-ups
 
 - 🔴 **`pnpm ui:quality` queda en `BLOCK`** (average 4.41, `visualImpact` 4.2 contra el 4.5 del gate).
-  No se cierra inflando notas: el techo de impacto lo fija el canvas de `TASK-1665`, que esta task
-  declara fuera de alcance en sus No-goals UX. Subirlo pide una task de superficie con dirección
-  visual propia — la tabla de nueve columnas podría codificar visualmente volumen y barrera en vez de
-  texto. **Esa task no existe todavía.**
+  No se cerró inflando notas: el techo de impacto lo fija el canvas de `TASK-1665`, que esta task
+  declara fuera de alcance en sus No-goals UX. **Ya tiene dueño: `TASK-1798`** (`to-do`, creada
+  2026-08-30) — le da al canvas una dirección visual propia para que volumen y barrera se lean de un
+  vistazo en vez de como texto plano, sin bajar la densidad de 50 filas ni tocar la jerarquía de
+  gasto. El bloqueo no era un defecto de esta task: era trabajo que nunca tuvo dueño.
 - ~~Verificación de rollout de `gsc_queries`~~ — **CERRADA 2026-08-30**: corrida real
   `seokdr-761a9689-…` con `source_kind='gsc_queries'`, 10/10 seeds desde `seo_gsc_daily`, 334
   candidatos, USD 0,2999 reales contra 0,348 estimados. De paso dejó la primera corrida
