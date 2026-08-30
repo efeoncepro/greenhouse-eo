@@ -87,6 +87,7 @@ const baseProps = (overrides: Partial<KeywordDiscoveryWorkbenchProps> = {}): Key
   totalCandidates: 4,
   nextCursor: '2',
   pageSize: 2,
+  seedSourceAvailability: { gscQueries: 12, trackedKeywords: 4 },
   ...overrides
 })
 

@@ -8,6 +8,8 @@ import { getGraderProfileForOrganization } from '@/lib/growth/ai-visibility/stor
 import { enforceSeoRunEntitlement } from '@/lib/growth/seo/entitlement'
 import { isSeoKeywordDiscoveryEnabled, isSeoModuleEnabled, isSeoWorkQueueEnabled } from '@/lib/growth/seo/flags'
 import { GH_GROWTH_SEO_KEYWORDS } from '@/lib/copy/growth'
+import { readSeedSourceAvailability } from '@/lib/growth/seo/keyword-discovery/queue'
+import type { SeoDiscoverySeedSourceAvailability } from '@/lib/growth/seo/keyword-discovery/queue'
 import { DEFAULT_DISCOVERY_READ_LIMIT, readKeywordDiscovery } from '@/lib/growth/seo/keyword-discovery/reader'
 import type { SeoDiscoveryCandidateView, SeoDiscoveryRunView } from '@/lib/growth/seo/keyword-discovery/reader'
 import { resolveUnambiguousSeoTarget } from '@/lib/growth/seo/resolve-target'
@@ -218,6 +220,23 @@ export default async function Page({ searchParams }: PageProps) {
      */
     let discoveryBudgetRemainingUsd: number | null = null
 
+    /*
+     * TASK-1693 — disponibilidad de fuentes de seed, resuelta SERVER-SIDE.
+     *
+     * Se pregunta a los mismos resolvers que usará el encolado (`readSeedSourceAvailability`),
+     * así que «disponible» significa exactamente «el command encontraría seeds». Descubrirlo con
+     * el rebote llegaría DESPUÉS de que el operador confirmó, y para entonces ya eligió una
+     * fuente que no podía servirle.
+     *
+     * Sólo se pregunta si además hay permiso de encolar: sin él el selector no se renderiza y las
+     * dos lecturas serían gasto de render puro.
+     */
+    let seedSourceAvailability: SeoDiscoverySeedSourceAvailability | null = null
+
+    if (selectedSpace && market && discoveryEnabled && canTrackKeywords) {
+      seedSourceAvailability = await readSeedSourceAvailability(selectedSpace.organizationId, market.seoTargetId)
+    }
+
     if (selectedSpace && market && discoveryEnabled && canTrackKeywords) {
       const gate = await enforceSeoRunEntitlement(selectedSpace.organizationId, { consumesAuditAllowance: false })
 
@@ -261,6 +280,7 @@ export default async function Page({ searchParams }: PageProps) {
         totalCandidates={discoveryTotal}
         nextCursor={discoveryNextCursor}
         pageSize={DEFAULT_DISCOVERY_READ_LIMIT}
+        seedSourceAvailability={seedSourceAvailability}
       />
     )
   }

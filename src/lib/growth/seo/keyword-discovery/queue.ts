@@ -277,6 +277,35 @@ const resolveTrackedSeeds = async (seoTargetId: string, limit: number): Promise<
   return seeds
 }
 
+/**
+ * ¿Qué fuentes de seed tienen insumo HOY para este sujeto? (TASK-1693)
+ *
+ * 🔴 Llama a los **mismos resolvers** que usará el encolado, no a una consulta paralela. Si la
+ * disponibilidad se calculara con su propio SQL, sería una segunda respuesta a la misma pregunta:
+ * la UI diría «hay consultas medidas» y `resolveSeeds` devolvería `no_gsc_queries` con el
+ * operador ya habiendo confirmado. Cuesta dos lecturas acotadas en el render de la page, y esa
+ * es la razón por la que se paga.
+ *
+ * `manual` y `target_domain` no aparecen acá: la primera depende del textarea (estado del
+ * cliente) y la segunda del dominio canónico del target, que existe siempre que haya sitio.
+ */
+export interface SeoDiscoverySeedSourceAvailability {
+  gscQueries: number
+  trackedKeywords: number
+}
+
+export const readSeedSourceAvailability = async (
+  organizationId: string,
+  seoTargetId: string
+): Promise<SeoDiscoverySeedSourceAvailability> => {
+  const [gscSeeds, trackedSeeds] = await Promise.all([
+    resolveGscSeeds(organizationId, MAX_DISCOVERY_SEEDS),
+    resolveTrackedSeeds(seoTargetId, MAX_DISCOVERY_SEEDS)
+  ])
+
+  return { gscQueries: gscSeeds.length, trackedKeywords: trackedSeeds.length }
+}
+
 const resolveSeeds = async (
   input: QueueKeywordDiscoveryInput,
   target: ResolvedDiscoveryTarget

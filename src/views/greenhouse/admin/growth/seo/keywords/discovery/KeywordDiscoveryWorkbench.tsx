@@ -17,7 +17,12 @@ import SurfaceRecipe from '@/components/greenhouse/primitives/surface-system/Sur
 import { isCanonicalApiError, throwIfNotOk } from '@/lib/api/parse-error-response'
 import { GH_GROWTH_SEO_KEYWORDS } from '@/lib/copy/growth'
 import { isDiscoveryRunStale } from '@/lib/growth/seo/keyword-discovery/contracts'
-import type { SeoDiscoveryMethod, SeoDiscoveryRunStatus } from '@/lib/growth/seo/keyword-discovery/contracts'
+import type {
+  SeoDiscoveryMethod,
+  SeoDiscoveryRunStatus,
+  SeoDiscoverySourceKind
+} from '@/lib/growth/seo/keyword-discovery/contracts'
+import type { SeoDiscoverySeedSourceAvailability } from '@/lib/growth/seo/keyword-discovery/queue'
 import type { SeoDiscoveryCandidateView, SeoDiscoveryRunView } from '@/lib/growth/seo/keyword-discovery/reader'
 
 import KeywordsSurfaceHeader from '../KeywordsSurfaceHeader'
@@ -83,6 +88,8 @@ export interface KeywordDiscoveryWorkbenchProps {
   nextCursor: string | null
   /** Tamaño de página con el que el server pidió la primera; el cliente usa el mismo. */
   pageSize: number
+  /** Insumo real de cada fuente de seed, resuelto server-side; `null` = no se pudo preguntar. */
+  seedSourceAvailability: SeoDiscoverySeedSourceAvailability | null
 }
 
 const KeywordDiscoveryWorkbench = ({
@@ -99,7 +106,8 @@ const KeywordDiscoveryWorkbench = ({
   candidates,
   totalCandidates,
   nextCursor,
-  pageSize
+  pageSize,
+  seedSourceAvailability
 }: KeywordDiscoveryWorkbenchProps) => {
   const copy = GH_GROWTH_SEO_KEYWORDS.discovery
   const router = useRouter()
@@ -243,10 +251,12 @@ const KeywordDiscoveryWorkbench = ({
   )
 
   const handleSubmit = async ({
+    seedSource,
     seeds,
     methods,
     resultsPerCall
   }: {
+    seedSource: SeoDiscoverySourceKind
     seeds: string[]
     methods: SeoDiscoveryMethod[]
     resultsPerCall: number
@@ -263,7 +273,9 @@ const KeywordDiscoveryWorkbench = ({
           intent: 'queue',
           organizationId,
           seoTargetId,
-          seedSource: 'manual',
+          // TASK-1693 — la fuente ELEGIDA, no un literal. Hasta acá el workbench mandaba
+          // `'manual'` fijo y las otras cuatro que `resolveSeeds` cubre eran inalcanzables.
+          seedSource,
           manualSeeds: seeds,
           methods: methods.map(method => ({ method, resultsPerCall }))
         })
@@ -438,6 +450,7 @@ const KeywordDiscoveryWorkbench = ({
             canExecute={canExecute}
             disabledReason={disabledReason}
             budgetRemainingUsd={budgetRemainingUsd}
+            seedSourceAvailability={seedSourceAvailability}
             onSubmit={handleSubmit}
           />
         </CardContent>
