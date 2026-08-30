@@ -305,6 +305,26 @@ export default [
       // inline. Modo warn (76 archivos legacy); promover a 'error' tras el
       // sweep. Scopeado a Typography → cero falsos positivos de íconos.
       'greenhouse/no-fontsize-inline-typography': 'warn',
+
+      /*
+       * TASK-1693 follow-up — `opacity` literal < 1 sobre texto rompe el contraste en silencio.
+       *
+       * Modo `warn`, por DOS razones y ninguna es comodidad:
+       *
+       * 1. **Hay legacy real: 26 ocurrencias en `src/` al introducirla**, y muestreadas son el
+       *    mismo anti-patrón, no falsos positivos (`opacity: 0.75` sobre `common.white` en
+       *    `NexaGreetingsCard`, `0.82` en `NotAuthorized`, `0.68` en un caption de `PreviewStage`).
+       *    Mismo patrón que `no-untokenized-copy` y `no-fontsize-inline-typography`: `warn` hasta
+       *    el barrido, después `error`.
+       * 2. **La regla marca una PRÁCTICA, no un ratio medido.** `opacity: 0.9` sobre texto ya
+       *    oscuro puede seguir pasando 4.5:1. Quien mide el contraste real es axe en el gate de
+       *    accesibilidad del GVC; esta regla adelanta la señal al momento de escribir y ofrece la
+       *    alternativa canónica (`color: 'text.secondary'`). Poner en `error` algo que no mide el
+       *    ratio bloquearía casos legítimos.
+       *
+       * Caso fuente: 3.14:1, axe `color-contrast` serious en los 6 frames, con el lint verde.
+       */
+      'greenhouse/no-opacity-on-text': 'warn',
       // Figma Implementation Contract — color HEX hardcodeado prohibido en UI
       // de producto; mapear a theme.palette.*/theme.axis.*/var(--mui-palette-*).
       // TASK-1048: promovida a 'error' con baseline 0 (sweep + tokens success-ink/
