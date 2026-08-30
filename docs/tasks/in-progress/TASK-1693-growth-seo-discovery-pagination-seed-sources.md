@@ -1,5 +1,36 @@
 # TASK-1693 — Growth SEO: paginación real y fuentes de seed cableadas en la lente Descubrir
 
+## Delta 2026-08-29 — recalibración pre-ejecución: la serialización `1691 → 1693` ya no aplica, y el `UI ready` sube a `yes`
+
+Verificado contra el código antes de empezar, no contra la prosa:
+
+🔴 **La serialización obligatoria `1694 → 1691 → 1693` se retira para el par `1691 → 1693`.** El motivo
+escrito el 2026-08-15 era evitar *"tres encodings distintos de la misma columna"* sobre el mismo camino
+de lectura y el mismo bloque de copy. Esa colisión **ya está resuelta, y en la dirección que el Delta
+pedía**: `KeywordDiscoveryResults.tsx` ya pinta `◑` con `volumeUnit`, ya deriva la fecha con
+`formatCapturedAt(candidate.providerLastUpdatedAt ?? candidate.capturedAt)` y ya usa `linkBarrier` con
+la columna nombrada «Barrera de enlaces» (ISSUE-152). O sea: **la lente `Descubrir` ya tiene el encoding
+que `TASK-1691` viene a llevarle a la tabla de OPORTUNIDADES**, que es la que quedó atrás. Además los
+`Files owned` son disjuntos —1691 posee `KeywordOpportunityTable.tsx` + `keyword-opportunities-reader.ts`
++ `contracts.ts`; ésta posee `KeywordDiscovery*` + `keyword-discovery-query.ts`— y el único archivo común,
+`src/lib/copy/growth.ts`, se toca en **bloques distintos** (`GH_GROWTH_SEO_PERFORMANCE.source` allá,
+`GH_GROWTH_SEO_KEYWORDS.discovery` acá). Esta task hereda el encoding vigente; no inventa uno paralelo.
+`TASK-1691` sigue siendo necesaria y sigue cerrando `ISSUE-154` — sólo deja de ser precondición.
+
+**`TASK-1694` ya no es bloqueo**: el `### Depends on` todavía la declaraba `to-do` con «bloqueo duro».
+Cerró el 2026-08-28 y su contrato está en el reader — `maxLinkBarrier`, `includeUnknownBarrier` e
+`ignoredFilters` verificados en `keyword-discovery/reader.ts`. El Slice 3 arranca con su vocabulario
+disponible, tal como el Delta anterior anticipaba.
+
+**`UI ready: no` → `yes`**: `Implementation mapping`, `GVC scenario plan` y `Design decision log` están
+completos, `pnpm task:lint --task TASK-1693` sale `errors=0 warnings=0`, y los tres docs de diseño de
+`TASK-1665` existen y no son stubs (342 / 316 / 189 líneas). Cubren el **selector de fuente**
+(wireframe §B. Fuentes, con tabla de costo y copy obligatorio) y los **filtros del canvas**
+(§Filtros, con los query params exactos que `keyword-discovery-query.ts` ya parsea). La única
+afordancia nueva sin wireframe es la **paginación**, y su patrón está resuelto en el
+`### Design decision log` de esta task con las tres alternativas descartadas y su razón; se agrega al
+wireframe de `TASK-1665` en el Slice 4, que es donde vive el contrato vivo de esa superficie.
+
 ## Delta 2026-08-28 — desbloqueada: la cardinalidad ya es definitiva
 
 `TASK-1694` cerró (`code complete, rollout pendiente`), así que el `Blocked by` pasa a `none`. El
@@ -49,20 +80,20 @@ empezar y que el Slice 3 llega con la decisión ya tomada.
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `interaction`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1665-growth-seo-keyword-discovery-workbench.md`
 - Flow: `docs/ui/flows/TASK-1665-growth-seo-keyword-discovery-workbench-flow.md`
 - Motion: `docs/ui/motion/TASK-1665-growth-seo-keyword-discovery-workbench-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `En implementacion`
 - Rank: `TBD`
 - Domain: `growth|seo|ui`
 - Blocked by: `none` (desbloqueada el 2026-08-28; ver el Delta de esta task)
@@ -168,11 +199,10 @@ Reglas obligatorias:
 
 ### Depends on
 
-- 🔴 `TASK-1694` (`to-do`, **bloqueo duro**) — corrige la cardinalidad del candidato (una fila por
-  keyword normalizada, no por procedencia) y agrega `maxLinkBarrier`, `includeUnknownBarrier` e
-  `ignoredFilters` al contrato de lectura. La paginación cuenta sobre ese universo y los filtros del
-  canvas se cablean contra ese vocabulario. Orden obligatorio del trío que comparte camino de
-  lectura y bloque de copy: **`1694 → 1691 → 1693`**.
+- `TASK-1694` (**cerrada 2026-08-28; ya no bloquea**) — corrigió la cardinalidad del candidato (una
+  fila por keyword normalizada, no por procedencia) y agregó `maxLinkBarrier`, `includeUnknownBarrier`
+  e `ignoredFilters` al contrato de lectura, los tres verificados en `keyword-discovery/reader.ts`. La
+  paginación cuenta sobre ese universo y los filtros del canvas se cablean contra ese vocabulario.
 - `TASK-1664` (complete) — primitive `queueKeywordDiscovery` + `resolveSeeds` con los cinco
   `SeoDiscoverySourceKind`; nada de lo que esta task cablea requiere tocarlo.
 - `TASK-1665` (complete) — lente base: workbench, builder, run status, canvas, drawer, conmutador de
@@ -186,13 +216,14 @@ Reglas obligatorias:
 
 - `TASK-1660` (`Objetivos`) — reusa el conmutador de lentes de esta superficie; cualquier cambio al
   helper de navegación entre lentes se coordina con esa task.
-- `TASK-1691` — declara la lente `◑` estimada y su fecha de captura sobre las mismas columnas de
-  mercado y el mismo bloque de copy. **Va antes que ésta** (`1694 → 1691 → 1693`): su encoding de
-  frescura es el que esta lente hereda, no uno paralelo.
+- `TASK-1691` — declara la lente `◑` estimada y su fecha de captura sobre la tabla de
+  **oportunidades**. **Ya NO va antes que ésta** (ver el Delta 2026-08-29): la lente `Descubrir` ya
+  pinta `◑` + `capturedAt` + «Barrera de enlaces», así que el encoding que 1691 propaga es el que esta
+  superficie ya tiene. Archivos owned disjuntos y bloques de copy distintos; las dos pueden avanzar
+  sin pisarse.
 - `TASK-1692` — writers de los action kinds faltantes; comparte el drawer y el canvas de candidatos.
-- `TASK-1694` — **bloquea a ésta** (ver `### Depends on`). Aterriza primero, así que el módulo
-  `keyword-discovery-query.ts` gana su consumer legítimo y la decisión del Slice 3 queda cerrada en
-  «cablear». Ya no hay nada que verificar antes de decidir.
+- `TASK-1694` — **cerrada**; aterrizó primero, así que el módulo `keyword-discovery-query.ts` tiene
+  su consumer legítimo y la decisión del Slice 3 quedó cerrada en «cablear».
 
 ### Files owned
 
@@ -411,9 +442,9 @@ Reglas obligatorias:
   (el universo llega a 500) y multiplica el trabajo de la primera pintada.
 - Reuse / extend / new primitive: `reuse` — la afordancia se arma con primitives existentes; si se
   demostrara que no alcanza, se declara antes de crear una nueva.
-- Open risks: TASK-1694 aterriza **antes** (bloqueo duro declarado en el Delta 2026-08-15), así que
-  la afordancia nace contando sobre el universo filtrado y sobre keywords distintas — no sobre el
-  total crudo ni sobre procedencias. Ya no es coordinación opcional: es la línea base.
+- Open risks: TASK-1694 **ya aterrizó**, así que la afordancia nace contando sobre el universo
+  filtrado y sobre keywords distintas — no sobre el total crudo ni sobre procedencias. Es la línea
+  base verificada, no una coordinación pendiente.
 
 ### Visual verification
 
