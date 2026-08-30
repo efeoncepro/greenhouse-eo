@@ -2426,7 +2426,6 @@ export const GH_GROWTH_SEO_KEYWORDS = {
     disabledReason: {
       flag: 'El descubrimiento todavía no está habilitado para esta organización.',
       permission: 'Puedes revisar las corridas, pero no iniciar una nueva. Pídele acceso a Growth.',
-      noSeeds: 'Agrega al menos una seed para estimar el costo.',
       noMethods: 'Elige al menos un método de expansión.',
       noTarget: 'Este Space todavía no tiene un sitio configurado.',
       budget: 'El cupo del período no alcanza para esta corrida.'
@@ -2441,7 +2440,6 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       queuedAnnounce: 'La corrida quedó en cola.',
       runningTitle: 'Investigando seeds',
       runningDetail: 'Procesando la corrida.',
-      runningDetailStage: 'Procesando {stage}.',
       runningAnnounce: 'La corrida está procesando.',
       runningIndicatorAria: 'La corrida sigue en curso',
       succeededTitle: 'Corrida completada',
@@ -2461,14 +2459,9 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       providerErrorTitle: 'No pudimos completar la corrida',
       providerErrorDetail: 'El proveedor no respondió. Puedes iniciar una corrida nueva.',
       providerErrorAnnounce: 'No pudimos completar la corrida.',
-      staleTitle: 'Datos anteriores',
       staleDetail: 'Capturados el {date}. Inicia una corrida nueva para actualizarlos.',
       retry: 'Nueva corrida',
       refresh: 'Actualizar estado',
-      viewResults: 'Ver candidatos',
-      methodDone: '{method} ✓',
-      methodFailed: '{method} — no terminó',
-      methodSkipped: '{method} — sin ejecutar'
     },
 
     empty: {
@@ -2574,10 +2567,43 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       stateTracked: 'Ya seguido',
       stateDismissed: 'Descartado',
       statePreparingAeo: 'Preparando AEO',
-      stateSelectedForTarget: 'Marcado como objetivo',
 
       seedTrace: 'Seed: {seed}',
       emptyFiltered: 'Ningún candidato coincide con los filtros.',
+
+      /*
+       * TASK-1693 Slice 3 — filtros del canvas, aplicados SERVER-SIDE.
+       *
+       * Filtrar en cliente sobre una página mentiría sobre el universo: diría «3 candidatos»
+       * mirando 50 filas cuando el universo filtrado tiene 40 repartidos en páginas que nadie
+       * trajo. El conteo sigue a los filtros sobre el TOTAL, no sobre lo que alcanzó a bajar.
+       */
+      /*
+       * ⚠️ Barrido TASK-1693 Slice 3 — se retiraron 10 claves sin consumidor de esta lente:
+       * `disabledReason.noSeeds` (lo reemplazó `builder.seedsErrorEmpty`, más específico),
+       * `results.stateSelectedForTarget` (el estado `selected_for_target` se retiró del
+       * vocabulario en TASK-1692 y nunca tuvo writer), `run.{staleTitle, viewResults,
+       * runningDetailStage, methodDone, methodFailed, methodSkipped}` (la banda de estado no
+       * renderiza métodos ni CTA, y expandirla es de otra task) y `actions.capacityNotice`.
+       * Un contrato sin consumer no es una feature pendiente: es una afirmación falsa sobre lo
+       * que la pantalla hace. El gate `keyword-discovery-copy-consumers.test.ts` impide que el
+       * bloque vuelva a acumularlas.
+       */
+      filtersLabel: 'Filtros',
+      filtersOpen: 'Filtros ({count})',
+      filtersOpenNone: 'Filtros',
+      filterSearch: 'Buscar keyword',
+      filterSource: 'Procedencia',
+      filterIntent: 'Intención',
+      filterStateUntracked: 'Sólo no seguidas',
+      filterBarrier: 'Barrera máxima',
+      filterBarrierHelper: 'Deja fuera lo que exige más enlaces de los que el sitio puede conseguir.',
+      filterIncludeUnknownBarrier: 'Incluir sin dato de barrera',
+      filterMinVolume: 'Volumen mínimo',
+      filterAll: 'Todas',
+      clearFilters: 'Limpiar filtros',
+      filtersClose: 'Aplicar',
+
 
       colActions: 'Detalle',
       openDetail: 'Detalles',
@@ -2671,7 +2697,6 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       confirmTitle: 'Confirma la decisión',
       pendingLabel: 'Procesando…',
 
-      capacityNotice: 'Cupo del seguimiento: {used} de {capacity} términos.',
 
       /**
        * 🔴 El feedback es POR keyword, jamás un «Listo» agregado.

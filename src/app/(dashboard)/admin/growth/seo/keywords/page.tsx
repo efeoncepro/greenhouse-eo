@@ -8,6 +8,7 @@ import { getGraderProfileForOrganization } from '@/lib/growth/ai-visibility/stor
 import { enforceSeoRunEntitlement } from '@/lib/growth/seo/entitlement'
 import { isSeoKeywordDiscoveryEnabled, isSeoModuleEnabled, isSeoWorkQueueEnabled } from '@/lib/growth/seo/flags'
 import { GH_GROWTH_SEO_KEYWORDS } from '@/lib/copy/growth'
+import { parseKeywordDiscoveryQuery } from '@/views/greenhouse/admin/growth/seo/keywords/discovery/keyword-discovery-query'
 import { readSeedSourceAvailability } from '@/lib/growth/seo/keyword-discovery/queue'
 import type { SeoDiscoverySeedSourceAvailability } from '@/lib/growth/seo/keyword-discovery/queue'
 import { DEFAULT_DISCOVERY_READ_LIMIT, readKeywordDiscovery } from '@/lib/growth/seo/keyword-discovery/reader'
@@ -64,7 +65,16 @@ interface PageProps {
     action?: string
     position?: string
     view?: string
+    // ── Estado de la lente `Descubrir` en la URL (TASK-1693) ────────────────────────────
+    // Allowlist explícita, igual que el resto: lo que no está acá no existe para la lente.
     discoveryRun?: string
+    source?: string
+    intent?: string
+    state?: string
+    status?: string
+    minVolume?: string
+    maxLinkBarrier?: string
+    includeUnknownBarrier?: string
   }>
 }
 
@@ -154,6 +164,22 @@ export default async function Page({ searchParams }: PageProps) {
     // corridas (no candidatos), así que primero se resuelve CUÁL corrida mirar —la del enlace
     // compartido o la última— y recién entonces se piden sus candidatos. Pedir todo de una haría
     // que un deep-link a una corrida vieja trajera la nueva.
+    const discoveryQuery = parseKeywordDiscoveryQuery(params as Record<string, string | string[] | undefined>)
+
+    /*
+     * 🔴 `maxDifficulty` NO se traduce, ni siquiera si llega por URL: el reader lo declara no-op
+     * y lo reporta en `ignoredFilters`. El filtro canónico es `maxLinkBarrier`.
+     */
+    const discoveryFilterInput = {
+      query: discoveryQuery.q || undefined,
+      sourceEndpoint: discoveryQuery.source === 'all' ? undefined : discoveryQuery.source,
+      intent: discoveryQuery.intent === 'all' ? undefined : discoveryQuery.intent,
+      minSearchVolume: discoveryQuery.minVolume ?? undefined,
+      maxLinkBarrier: discoveryQuery.maxLinkBarrier === 'all' ? undefined : discoveryQuery.maxLinkBarrier,
+      includeUnknownBarrier: discoveryQuery.includeUnknownBarrier || undefined,
+      excludeTracked: discoveryQuery.state === 'untracked' || undefined
+    }
+
     let discoveryRun: SeoDiscoveryRunView | null = null
     let discoveryCandidates: SeoDiscoveryCandidateView[] = []
     let discoveryTotal = 0
@@ -161,6 +187,15 @@ export default async function Page({ searchParams }: PageProps) {
 
     if (selectedSpace && market) {
       const requestedRunId = (params.discoveryRun ?? '').trim() || undefined
+
+      /*
+       * TASK-1693 Slice 3 — los filtros del canvas viajan por URL y se aplican SERVER-SIDE.
+       *
+       * Filtrar en cliente sobre un cursor paginado mentiría sobre el universo filtrado: diría
+       * «3 candidatos» mirando 50 filas cuando hay 40 repartidos en páginas que nadie trajo. El
+       * allowlist de `parseKeywordDiscoveryQuery` decide qué existe para esta lente; un valor
+       * inválido cae al default y jamás rompe la página.
+       */
 
       /*
        * TASK-1693 — el `limit` se pasa EXPLÍCITO, no se hereda del default del reader.
@@ -174,7 +209,8 @@ export default async function Page({ searchParams }: PageProps) {
         organizationId: selectedSpace.organizationId,
         seoTargetId: market.seoTargetId,
         runId: requestedRunId,
-        limit: DEFAULT_DISCOVERY_READ_LIMIT
+        limit: DEFAULT_DISCOVERY_READ_LIMIT,
+        ...discoveryFilterInput
       })
 
       if (runs.ok) {
@@ -190,7 +226,8 @@ export default async function Page({ searchParams }: PageProps) {
             organizationId: selectedSpace.organizationId,
             seoTargetId: market.seoTargetId,
             runId: discoveryRun.runId,
-            limit: DEFAULT_DISCOVERY_READ_LIMIT
+            limit: DEFAULT_DISCOVERY_READ_LIMIT,
+            ...discoveryFilterInput
           })
 
           if (withCandidates.ok) {
@@ -281,6 +318,7 @@ export default async function Page({ searchParams }: PageProps) {
         nextCursor={discoveryNextCursor}
         pageSize={DEFAULT_DISCOVERY_READ_LIMIT}
         seedSourceAvailability={seedSourceAvailability}
+        discoveryQuery={discoveryQuery}
       />
     )
   }

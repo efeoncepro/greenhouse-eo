@@ -28,8 +28,14 @@ import type { SeoDiscoveryCandidateView, SeoDiscoveryRunView } from '@/lib/growt
 import KeywordsSurfaceHeader from '../KeywordsSurfaceHeader'
 import KeywordDiscoveryBuilder from './KeywordDiscoveryBuilder'
 import KeywordDiscoveryCandidateDrawer from './KeywordDiscoveryCandidateDrawer'
+import KeywordDiscoveryFilters from './KeywordDiscoveryFilters'
 import KeywordDiscoveryResults, { DISCOVERY_DRAWER_ID, resolveState } from './KeywordDiscoveryResults'
 import KeywordDiscoveryRunStatus from './KeywordDiscoveryRunStatus'
+import {
+  countActiveKeywordDiscoveryFilters,
+  serializeKeywordDiscoveryQuery,
+  type KeywordDiscoveryQuery
+} from './keyword-discovery-query'
 import {
   DISCOVERY_ENDPOINT,
   buildKeywordDiscoveryActionRequest,
@@ -90,6 +96,8 @@ export interface KeywordDiscoveryWorkbenchProps {
   pageSize: number
   /** Insumo real de cada fuente de seed, resuelto server-side; `null` = no se pudo preguntar. */
   seedSourceAvailability: SeoDiscoverySeedSourceAvailability | null
+  /** Estado de filtros ya parseado por el server; la UI lo edita y lo devuelve a la URL. */
+  discoveryQuery: KeywordDiscoveryQuery
 }
 
 const KeywordDiscoveryWorkbench = ({
@@ -107,7 +115,8 @@ const KeywordDiscoveryWorkbench = ({
   totalCandidates,
   nextCursor,
   pageSize,
-  seedSourceAvailability
+  seedSourceAvailability,
+  discoveryQuery
 }: KeywordDiscoveryWorkbenchProps) => {
   const copy = GH_GROWTH_SEO_KEYWORDS.discovery
   const router = useRouter()
@@ -182,6 +191,39 @@ const KeywordDiscoveryWorkbench = ({
   const runSettled = runStatusIsSettled(run?.status ?? null)
   const canLoadMore = Boolean(activeCursor) && runSettled && Boolean(organizationId) && Boolean(runId)
 
+  /**
+   * Un filtro cambia la URL y el server vuelve a proyectar.
+   *
+   * 🔴 `router.replace` y no estado local: filtrar en cliente sobre una página mentiría sobre el
+   * universo filtrado. Además la URL queda compartible con los filtros puestos, que es lo que un
+   * operador hace cuando le pasa un hallazgo a alguien.
+   */
+  const applyFilters = (next: Partial<KeywordDiscoveryQuery>) => {
+    const merged = { ...discoveryQuery, ...next }
+
+    // Cambiar un filtro cambia el universo: el cursor viejo apunta a un offset de otra lista.
+    setExtraPages([])
+    setClientCursor(null)
+
+    router.replace(
+      `${window.location.pathname}?${serializeKeywordDiscoveryQuery(merged, { space: selectedSpaceId })}`,
+      { scroll: false }
+    )
+  }
+
+  const hasActiveFilters = countActiveKeywordDiscoveryFilters(discoveryQuery) > 0
+
+  const clearFilters = () =>
+    applyFilters({
+      q: '',
+      source: 'all',
+      intent: 'all',
+      state: 'all',
+      minVolume: null,
+      maxLinkBarrier: 'all',
+      includeUnknownBarrier: false
+    })
+
   const handleLoadMore = async () => {
     if (!organizationId || !runId || !activeCursor || pagingState === 'loading') return
 
@@ -195,6 +237,20 @@ const KeywordDiscoveryWorkbench = ({
       url.searchParams.set('runId', runId)
       url.searchParams.set('cursor', activeCursor)
       url.searchParams.set('limit', String(pageSize))
+
+      /*
+       * 🔴 Los filtros viajan también en la página siguiente. Sin ellos el server pagina sobre el
+       * universo COMPLETO mientras la primera página vino del filtrado: las filas nuevas no
+       * pertenecerían a la lista que el operador está mirando, y el offset apuntaría a otra
+       * cosa. Es el modo de falla más silencioso de todo este slice.
+       */
+      if (discoveryQuery.q) url.searchParams.set('query', discoveryQuery.q)
+      if (discoveryQuery.source !== 'all') url.searchParams.set('sourceEndpoint', discoveryQuery.source)
+      if (discoveryQuery.intent !== 'all') url.searchParams.set('intent', discoveryQuery.intent)
+      if (discoveryQuery.minVolume !== null) url.searchParams.set('minSearchVolume', String(discoveryQuery.minVolume))
+      if (discoveryQuery.maxLinkBarrier !== 'all') url.searchParams.set('maxLinkBarrier', discoveryQuery.maxLinkBarrier)
+      if (discoveryQuery.includeUnknownBarrier) url.searchParams.set('includeUnknownBarrier', 'true')
+      if (discoveryQuery.state === 'untracked') url.searchParams.set('excludeTracked', 'true')
 
       const response = await fetch(url.toString(), { method: 'GET' })
 
@@ -470,6 +526,15 @@ const KeywordDiscoveryWorkbench = ({
           vacía, que se leería como "buscamos y no encontramos nada". */}
       <Card data-capture={visibleCandidates.length > 0 ? undefined : 'seo-keyword-discovery-results'}>
         <CardContent>
+          {/* Los filtros viven DENTRO de la superficie del canvas, no flotando sobre el lienzo
+              gris: son parte de la pregunta que la tabla responde. Se muestran sólo cuando hay
+              una corrida — sin candidatos no hay nada que filtrar y el estado del run manda. */}
+          {run ? (
+            <Box sx={{ marginBlockEnd: 5 }}>
+              <KeywordDiscoveryFilters query={discoveryQuery} onChange={applyFilters} onClear={clearFilters} />
+            </Box>
+          ) : null}
+
           {visibleCandidates.length > 0 ? (
             <KeywordDiscoveryResults
               candidates={visibleCandidates}
@@ -481,6 +546,10 @@ const KeywordDiscoveryWorkbench = ({
               loadMoreState={pagingState}
               onLoadMore={handleLoadMore}
             />
+          ) : hasActiveFilters ? (
+            /* Con filtros puestos, «no hay candidatos» sería falso: los hay, ninguno coincide.
+               Decir lo primero mandaría al operador a encolar una corrida que ya tiene. */
+            <EmptyState icon='tabler-filter-off' title={copy.results.emptyFiltered} description={copy.results.clearFilters} />
           ) : (
             <EmptyState
               icon='tabler-radar-2'

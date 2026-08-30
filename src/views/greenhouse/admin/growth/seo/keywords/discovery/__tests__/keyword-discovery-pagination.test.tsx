@@ -8,6 +8,7 @@ import { renderWithTheme } from '@/test/render'
 import type { SeoDiscoveryRunStatus } from '@/lib/growth/seo/keyword-discovery/contracts'
 import type { SeoDiscoveryRunView } from '@/lib/growth/seo/keyword-discovery/reader'
 
+import { parseKeywordDiscoveryQuery } from '../keyword-discovery-query'
 import KeywordDiscoveryWorkbench from '../KeywordDiscoveryWorkbench'
 import type { KeywordDiscoveryWorkbenchProps } from '../KeywordDiscoveryWorkbench'
 
@@ -88,6 +89,7 @@ const baseProps = (overrides: Partial<KeywordDiscoveryWorkbenchProps> = {}): Key
   nextCursor: '2',
   pageSize: 2,
   seedSourceAvailability: { gscQueries: 12, trackedKeywords: 4 },
+  discoveryQuery: parseKeywordDiscoveryQuery(new URLSearchParams()),
   ...overrides
 })
 
