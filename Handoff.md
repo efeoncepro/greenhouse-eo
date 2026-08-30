@@ -2,6 +2,34 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-29 (10.º) — TASK-1699: día 1 verificado y costo marginal CERO comprobado; dos criterios de la spec estaban mal enunciados
+
+El cron del 29-ago escribió el día 1 de la serie del top-N (766 filas, `seot-berel-mx`, 31 keywords) y
+con eso los **Pasos 5 y 6** quedan cerrados. Verificación reproducible y sin gasto:
+`scripts/growth/_verify-task-1699-day-one.ts` → **4/4**.
+
+🔴 **La promesa central de la task quedó comprobada con el ledger, no con un argumento:** el día 1 costó
+**USD 0,1225 con 31 llamadas**, *idéntico* a los días 26, 27 y 28 (0,1225 / 31 cada uno), que son
+anteriores a la serie. Persistir ~19 de cada 20 filas que antes se botaban no agregó un centavo.
+
+**Dos de los tres criterios del Paso 5 estaban mal enunciados**, porque la spec se escribió antes de ver
+un SERP real. Se afinaron contra los datos, no se relajaron: (1) «~20 filas por keyword» hay que contarlas
+sobre `item_type='organic'` —el writer persiste todos los item_types a propósito, así que el total por
+keyword da 19–28 y no dice nada del top-N—; (2) «exactamente una fila `is_own_domain`» es **falso** como
+invariante: un dominio aparece varias veces en un SERP real (subdominios, múltiples orgánicos,
+`local_pack`), y en la keyword diagnóstica `site:berel.com` aparece en las 20. El invariante verdadero,
+que es el que el snapshot mide, es que el **`rank_group` mínimo entre las filas propias orgánicas** iguale
+`seo_rank_snapshots.position` — 21/21 coinciden, 0 discrepan. Mi primera pasada reportó 4 fallas; dos eran
+bugs de mi propio script de verificación y dos eran estas aserciones ingenuas.
+
+**Por qué NO cierra todavía:** `seo.serp_top_results.coverage` está en `warning` (2 de 3 día-target sin
+top-N) y **es correcto que lo esté** — esos dos días son el 27 y 28, anteriores al deploy, historia que por
+diseño no es backfilleable. Con ventana de 3 días converge sola a `steady=0` el **31-ago**. No se toca el
+umbral: la señal está diciendo la verdad sobre una pérdida real. Y el Paso 9 (revisar candidatos de
+competidor contigo antes de declarar) necesita ≥5 días de serie → ≈**2026-09-02**.
+
+Estado honesto: **`día 1 verificado; señal converge el 31-ago; candidatos ≈2-sep`**.
+
 ## 2026-08-29 (9.º) — TASK-1662 `complete`: el Slice 4 estaba verde en producción y el criterio de cierre documentado era falso
 
 El acople del gap competitivo con la cola priorizada **ya funcionaba** y nadie lo había medido. En el

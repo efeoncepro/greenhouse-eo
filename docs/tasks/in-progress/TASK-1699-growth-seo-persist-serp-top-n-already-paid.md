@@ -1,5 +1,47 @@
 # TASK-1699 — Growth SEO: persistir el top-N del SERP que ya se paga
 
+## Delta 2026-08-29 — DÍA 1 VERIFICADO (Pasos 5 y 6 cerrados); y los tres criterios se afinaron contra los datos reales
+
+El cron del 2026-08-29 escribió el día 1: **766 filas** sobre `seot-berel-mx`, 31 keywords. Los
+Pasos 5 y 6 quedan **cerrados con evidencia medida**, reproducible con
+`scripts/growth/_verify-task-1699-day-one.ts` (**4/4 verde**, no gasta — sólo lee):
+
+- **(a) ~20 filas por keyword** — 31 keywords, **15–20 orgánicas** cada una, promedio **17,06**.
+- **(b) el mejor orgánico propio == el snapshot** — 21 comparadas, **21 coinciden, 0 discrepan**.
+- **(c) 🔴 costo marginal CERO, que es la promesa central de la task** — el día 1 costó
+  **USD 0,1225 con 31 llamadas**, *idéntico* a los tres días previos a la serie (26, 27 y 28-ago:
+  0,1225 / 31 cada uno). Persistir el top-N no agregó ni un centavo.
+- **(Paso 6) no-op de la re-corrida** — **cero ranuras duplicadas** en toda la tabla; el
+  `ON CONFLICT ON CONSTRAINT seo_serp_top_results_slot_unique DO NOTHING` sostiene la idempotencia.
+
+🔴 **Dos de los tres criterios del Paso 5 estaban mal enunciados en la spec, que se escribió antes de
+ver un SERP real. Se afinaron contra los datos, no se relajaron:**
+
+1. **«~20 filas por keyword» hay que contarlas sobre `item_type='organic'`.** El writer persiste
+   TODOS los item_types **a propósito** (Open Question resuelta en el Delta de implementación): el
+   día 1 trae `organic` 529 · `popular_products` 68 · `images` 50 · `related_searches` 42 ·
+   `people_also_ask` 30 · `local_pack` 24 · `ai_overview` 10 · `video` 9 · `short_videos` 3 ·
+   `paid` 1. Contar el total por keyword da 19–28 y no dice nada del top-N.
+2. **«exactamente una fila `is_own_domain = true`» es FALSO como invariante.** Un dominio aparece
+   varias veces en un SERP real: subdominios (`bc.`, `vibe.`, `reciboproveedores.`), múltiples
+   orgánicos, `local_pack`. En la keyword diagnóstica `site:berel.com` aparece en **las 20**. El
+   invariante verdadero —y el que el snapshot mide— es que el **`rank_group` MÍNIMO entre las filas
+   propias orgánicas** iguale `seo_rank_snapshots.position`: en `site:berel.com` el mínimo es 1 sobre
+   `reciboproveedores.berel.com`, y el snapshot dice exactamente `position=1` con esa URL.
+
+**Paso 8 — la señal NO está verde todavía, y es correcto que no lo esté.**
+`seo.serp_top_results.coverage` reporta `warning`: *"2 de 3 día(s)-target con captura de rank y sin
+top-N"*. Esos dos días son el **27 y el 28 de agosto**, anteriores al deploy — historia que por diseño
+**no es backfilleable** (*"el contexto de esos días no se recupera"*). Con ventana de 3 días
+(`SEO_SERP_TOP_RESULTS_COVERAGE_WINDOW_DAYS = 3`), la señal converge sola a `steady=0` el
+**2026-08-31**, cuando la ventana contenga sólo días post-rollout. 🔴 **No se toca el umbral para
+ponerla verde**: está diciendo la verdad sobre una pérdida real e irrecuperable.
+
+**Paso 9** sigue esperando la maduración: la serie lleva **1 de los 5 días** que exige
+`readSerpCompetitorCandidates`, así que la revisión de candidatos con el operador es ≈**2026-09-02**.
+
+Estado honesto: **`día 1 verificado; señal converge el 31-ago; candidatos ≈2-sep`**.
+
 ## Delta 2026-08-28 (release a producción) — el rollout dejó de estar bloqueado; queda la verificación del día 1
 
 El paso a producción `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208,
