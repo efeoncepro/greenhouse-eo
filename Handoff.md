@@ -2,6 +2,38 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-29 (9.º) — TASK-1662 `complete`: el Slice 4 estaba verde en producción y el criterio de cierre documentado era falso
+
+El acople del gap competitivo con la cola priorizada **ya funcionaba** y nadie lo había medido. En el
+snapshot vigente de `seot-berel-mx` (501 items, `incremental-clicks-v2`) el origen `competitor_gap`
+sale `state: ok`, **200 items**, `asOf 2026-08-28`. Verificado fila por fila contra PG: `evidence_ref`
+opaca única (`seo:competitor_gap:seocr-5a4e6783-…`), **cero FK/JOIN** hacia las tablas de cobertura,
+200/200 en banda 3 con verbo `measure`, ranks 257–496 (5.ª precedencia) y **solape 0** con
+`gsc_striking_distance` — la exclusión GSC operando en vivo, no sólo en test.
+
+🔴 **Lo que corrigió esta sesión no es código sino una afirmación falsa en tres documentos.** El Delta
+del día anterior declaraba que el `degraded` de `seot-efeonce-own-brand` se resolvería *"por maduración
+de la serie del top-N"*. El `origin_health_json` real dice otra cosa: *"No hay competidores declarados
+para este sitio"*. Y ese sujeto **no tiene serie top-N en absoluto** (0 días capturados; la única viva
+es la de Berel, con 1 día). Aunque madurara, el descubrimiento **propone** y declarar es humano por
+diseño. Ese `degraded` es el colector diciendo la verdad, y **no madura solo** — un criterio de cierre
+basado en esperar habría esperado para siempre.
+
+**Ventana cerrada, también contra la creencia documentada:** `origin/main:services/ops-worker/deploy.sh`
+ya declara `"false"` (ENABLED) para `ops-seo-competitor-coverage` **y** `ops-seo-work-queue-materialize`
+— lo promovió el release `e1718a359575` (PR #213). El ledger de flags todavía declaraba la ventana
+abierta en tres lugares; retirada la fila de § Pendientes de acción y corregidas las dos filas de flags.
+
+Rollout verificado en vivo (no en el ledger): revisión activa `ops-worker-00621-bx7` con ambos flags
+`true`, los dos schedulers `ENABLED`, migraciones al día. Gates: `vitest src/lib/growth/seo` 764/764,
+sanity `_sanity-task-1662-keyword-gap.ts` **22/22 contra PG real**, `flags:audit --strict` sin flags
+sin registrar.
+
+**Pendiente con dueño (Follow-ups, no bloqueantes):** medir el costo del **segundo** ciclo de cobertura
+antes de subir `GROWTH_SEO_COMPETITORS_PER_TARGET` — el cron es mensual (día 18) y el 18-sep cae en
+ventana de frescura, así que el próximo gasto real es ~octubre; y **ejercitar el `proposalRef` de
+descubrimiento** con la primera declaración nacida de una propuesta (la serie necesita ≥5 días y lleva 1).
+
 ## 2026-08-29 (8.º) — Release `e1718a359575`: el fix de banda 2 y el gate del worker están en producción, verificados por canary
 
 **Manifest `released`** (`e1718a359575-5f3d0c7e-859e-45ef-bd64-00c6bec606ea`, run `33279083461`, un

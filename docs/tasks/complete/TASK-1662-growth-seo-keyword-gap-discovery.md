@@ -1,5 +1,56 @@
 # TASK-1662 — Growth SEO: keyword gap — qué rankea la competencia y el cliente no
 
+## Delta 2026-08-29 (2) — Slice 4 VERIFICADO en producción: el acople entrega 200 items; y el criterio de cierre del Delta anterior era FALSO
+
+El Slice 4 se cierra con evidencia medida, no con espera. En el snapshot vigente de **`seot-berel-mx`**
+(`computed_at 2026-08-29T20:56:55Z`, 501 items, `incremental-clicks-v2`) el origen `competitor_gap`
+sale **`state: "ok"`, `itemCount: 200`, `asOf: "2026-08-28"`**. La cadena completa —competidor
+declarado → corrida de cobertura → `readKeywordGap` → colector → filas en la cola— está entregando
+trabajo real en producción. Lo verificado fila por fila contra PG:
+
+- **`evidence_ref` opaca y única**: los 200 items traen
+  `seo:competitor_gap:seocr-5a4e6783-a5f0-4ada-bc83-b26f32e1f6f4` (un solo ref, el `coverage_run_id`
+  de la primera corrida real). **Cero FK y cero JOIN**: dentro de `work-queue/` las tablas de
+  cobertura no aparecen ni una vez fuera de un comentario.
+- **Banda y verbo por construcción**: 200/200 en **banda 3** con verbo **`measure`**, exactamente lo
+  que el colector documenta — de acá salen candidatos sin demanda medida, nunca duplicados.
+- **La exclusión GSC opera en vivo**: el solape entre `competitor_gap` y `gsc_striking_distance` en
+  ese snapshot es de **0 filas**.
+- **Ranks 257–496**: por debajo de los cuatro orígenes de mayor precedencia. La cola ordena; esta
+  task no.
+
+🔴 **El criterio de cierre que fijó el Delta anterior era falso, y conviene decir por qué para que no
+se repita.** Decía que el `degraded` de `seot-efeonce-own-brand` se resolvería *"por maduración de la
+serie del top-N"*. El `origin_health_json` real de ese snapshot dice otra cosa:
+`"No hay competidores declarados para este sitio: la comparativa está disponible y nadie la activó."`
+Son dos hechos distintos y ninguno madura solo:
+
+1. `seot-efeonce-own-brand` **no tiene serie top-N en absoluto** (0 días capturados; la única serie
+   viva es la de `seot-berel-mx`, con 1 día desde el 2026-08-29). La maduración no estaba en curso
+   para ese sujeto.
+2. Aunque la serie madurara, `readSerpCompetitorCandidates` **propone**; declarar sigue siendo humano
+   por diseño —está en el `## Out of Scope` de esta misma task—. Ningún origen pasa a `ok` por el
+   paso del tiempo: pasa a `ok` cuando alguien declara un competidor y la cobertura corre.
+
+Ese `degraded` es entonces **el colector diciendo la verdad** ("capacidad disponible, nadie la usó"),
+no una falla pendiente de resolver. Es exactamente la salud que la task pidió: derivada del estado de
+cobertura que el reader declara, jamás de una constante.
+
+⚠️ **La ventana declarada en el Delta anterior está CERRADA.** `origin/main:services/ops-worker/deploy.sh`
+ya declara `"false"` (o sea ENABLED) en el 5.º argumento de `upsert_scheduler_job` para
+`ops-seo-competitor-coverage` **y** `ops-seo-work-queue-materialize`: lo promovió el release
+`e1718a359575` (PR #213). Un deploy que corra el árbol de `main` ya no los re-pausa. Fila de
+pendientes del ledger de flags retirada en este mismo cierre.
+
+**Rollout, verificado en vivo (no en el ledger):** revisión activa **`ops-worker-00621-bx7`** con
+`GROWTH_SEO_COMPETITOR_GAP_ENABLED=true` y `GROWTH_SEO_WORK_QUEUE_ENABLED=true`; ambos schedulers
+`ENABLED`. Migraciones al día (`No migrations to run!`).
+
+**Lo único que queda es de operación, no de esta task** (movido a `## Follow-ups`): medir el costo del
+**segundo** ciclo de cobertura antes de subir `GROWTH_SEO_COMPETITORS_PER_TARGET`. El cron es mensual
+(día 18) y el 18-sep cae dentro de la ventana de frescura, así que el próximo gasto real es ~octubre.
+El techo protege el gasto mientras tanto y subir el número es decisión del operador.
+
 ## Delta 2026-08-29 — la cola que consume este gap ya corre en producción: el Slice 4 pasa de "esperar" a "medir"
 
 `TASK-1700` quedó **`complete`** con el release `b7f74c95a2afcf66f2c2d82dbd4a5ad4f7617471`: flag ON
@@ -200,7 +251,7 @@ Criterios exigibles agregados al `## Acceptance Criteria` de esta task:
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -213,7 +264,7 @@ Criterios exigibles agregados al `## Acceptance Criteria` de esta task:
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `Operativo en produccion`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -653,26 +704,50 @@ Ninguna en Entra: la escritura usa el scope de dominio ya existente. Sí en `ops
 
 ## Acceptance Criteria
 
-- [ ] Un competidor es un hecho declarado con autor y fecha; no se infiere. La **propuesta** puede
-      venir de `TASK-1699`, y la fila registra si vino de propuesta o de escritura directa
-- [ ] Existe techo de competidores por sitio
-- [ ] El gap se **deriva al leer**; no se persiste como verdad
-- [ ] El reader separa "el cliente no aparece" de "el cliente aparece peor"
-- [ ] 🔴 **El reader NO devuelve orden propio.** Devuelve hechos + factores con procedencia y fecha;
-      un test falla si el resultado viene ordenado por un score acuñado en esta task
-- [ ] 🔴 Una keyword con impresiones en el GSC del cliente **no aparece como gap**, con test:
-      la lente medida (●) gana sobre la estimada (◑) también al ordenar
-- [ ] Cada fila trae volumen ◑, `cpc_usd`, **barrera de enlaces** (`deriveLinkBarrier()`), factor AIO
-      y posición alcanzable estimada; un factor ausente se declara `sin_dato`, nunca 0 ni "baja"
-- [ ] Las **SERP features** viajan en el contrato (PAA, video, local pack, shopping, AIO), no
-      colapsadas a un booleano
-- [ ] Los hallazgos se emiten a la cola como `origin='competitor_gap'` con `evidence_ref` **opaca**;
-      cero FK y cero JOIN entre el gap y las tablas de la cola
-- [ ] Ninguna llamada al proveedor ocurre sin `enforceSeoRunEntitlement`
-- [ ] El dry-run reporta conteo y costo antes de gastar
-- [ ] El flag nace OFF, está en `ops-worker/deploy.sh` y tiene fila en el ledger
-- [ ] Los competidores de una org **nunca** son visibles desde otra, con test de aislamiento
-- [ ] Commands y reader tienen sus 3 lanes en el mismo PR, sin scope nuevo en Entra
+- [x] Un competidor es un hecho declarado con autor y fecha; no se infiere. La **propuesta** puede
+      venir de `TASK-1699`, y la fila registra si vino de propuesta o de escritura directa —
+      CHECK de autoría en el schema; sanity 22/22 verifica `declared_by/at/source` + `proposal_ref`
+- [x] Existe techo de competidores por sitio — `GROWTH_SEO_COMPETITORS_PER_TARGET` (default 5),
+      evaluado contra el conteo proyectado en `declareCompetitors`
+- [x] El gap se **deriva al leer**; no se persiste como verdad — `readKeywordGap`, cero tabla de gap
+- [x] El reader separa "el cliente no aparece" de "el cliente aparece peor" — `contentGap` /
+      `ranksWorse` / `declaredTargets` separados; corrida real: 357 / 54 / — sobre Berel MX
+- [x] 🔴 **El reader NO devuelve orden propio.** Devuelve hechos + factores con procedencia y fecha;
+      un test falla si el resultado viene ordenado por un score acuñado en esta task — orden
+      alfabético neutral con test anti-orden; sanity «orden NEUTRAL alfabético» verde
+- [x] 🔴 Una keyword con impresiones en el GSC del cliente **no aparece como gap**, con test:
+      la lente medida (●) gana sobre la estimada (◑) también al ordenar — 269 excluidas en la corrida
+      real; sanity con query medida real; **en vivo: solape `competitor_gap` ∩ `gsc_striking_distance`
+      = 0 filas** en el snapshot vigente de Berel
+- [x] Cada fila trae volumen ◑, `cpc_usd`, **barrera de enlaces** (`deriveLinkBarrier()`), factor AIO
+      y posición alcanzable estimada; un factor ausente se declara `sin_dato`, nunca 0 ni "baja" —
+      sanity verifica `sin_dato` en mercado ausente y `null` (jamás lista vacía) sin `serp_info`
+- [x] Las **SERP features** viajan en el contrato (PAA, video, local pack, shopping, AIO), no
+      colapsadas a un booleano — lista + `aiOverviewPresent` derivado; sanity `["organic","ai_overview"]`
+- [x] Los hallazgos se emiten a la cola como `origin='competitor_gap'` con `evidence_ref` **opaca**;
+      cero FK y cero JOIN entre el gap y las tablas de la cola — **verificado en producción**: 200
+      items con `seo:competitor_gap:seocr-5a4e6783-…` (1 solo ref); las tablas de cobertura no
+      aparecen en `work-queue/` fuera de un comentario
+- [x] Ninguna llamada al proveedor ocurre sin `enforceSeoRunEntitlement`
+- [x] El dry-run reporta conteo y costo antes de gastar — USD 0,144 estimado vs **USD 0,1076 real**
+      con Δ exacto en el ledger de gasto
+- [x] El flag nace OFF, está en `ops-worker/deploy.sh` y tiene fila en el ledger — nació `:-false`;
+      hoy `:-true` en el SoT y verificado en la revisión activa `ops-worker-00621-bx7`
+- [x] Los competidores de una org **nunca** son visibles desde otra, con test de aislamiento
+- [x] Commands y reader tienen sus 3 lanes en el mismo PR, sin scope nuevo en Entra — admin +
+      ecosystem (gap sólo-internal con 404 anti-oracle) + MCP; federación en el gateway (rev
+      `efeonce-mcp-gateway-00024-8b8`, 21 → 27 tools)
+- [ ] La propuesta de candidatos usada en una declaración real registra su `proposalRef` de
+      `serp_top:v1:*` cuando el candidato vino del descubrimiento (verificable en la fila) —
+      **condicional y AÚN NO EJERCITADO, con razón medida**: la única declaración real
+      (`comex.com.mx`) vino de una auditoría humana (`proposal_ref=audit:BEREL_SEO_DIAGNOSTIC_2026-08-25`),
+      no del descubrimiento. La serie del top-N lleva **1 de los 5 días** que exige
+      `readSerpCompetitorCandidates`, así que todavía no hay candidato que confirmar. El mecanismo
+      (paso VERBATIM del `proposalRef` al confirm) existe y está cubierto por tests de TASK-1699;
+      queda como Follow-up ejercitarlo con la primera declaración nacida de una propuesta
+- [x] Ningún consumer re-implementa la recurrencia: UI futura, Nexa y MCP consumen
+      `readSerpCompetitorCandidates` — la recurrencia vive sólo en `competitor-discovery.ts`; el
+      único consumer (`/api/admin/growth/seo/competitor-candidates`) va por el reader
 
 ## Verification
 
@@ -683,13 +758,18 @@ Ninguna en Entra: la escritura usa el scope de dominio ya existente. Sí en `ops
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` quedó sincronizado con el cierre
-- [ ] `Handoff.md` quedó actualizado
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` quedó sincronizado con el cierre
+- [x] `Handoff.md` quedó actualizado
 
 ## Follow-ups
 
+- **Medir el costo del segundo ciclo de cobertura** antes de subir `GROWTH_SEO_COMPETITORS_PER_TARGET`.
+  El cron es mensual (día 18) y el 18-sep cae en ventana de frescura, así que el próximo gasto real es
+  ~octubre. Decisión del operador; el techo protege el gasto mientras tanto.
+- **Ejercitar el `proposalRef` de descubrimiento** con la primera declaración nacida de una propuesta
+  de `readSerpCompetitorCandidates` (la serie del top-N necesita ≥5 días; lleva 1 al 2026-08-29).
 - Superficie de keyword gap, con wireframe y flow propios.
 - Varios competidores por sitio, con el costo por competidor ya medido.
 - Alimentar el plan de contenidos de `TASK-1314` con el gap priorizado **por la cola**.

@@ -1,9 +1,9 @@
 # Operar el keyword gap competitivo (TASK-1662)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-28 por Claude (TASK-1662)
-> **Ultima actualizacion:** 2026-08-28 por Claude
+> **Ultima actualizacion:** 2026-08-29 por Claude (TASK-1662 Slice 4 — cómo se lee la salud del origen en la cola)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §3 y §4.2
 
 ## Para qué sirve
@@ -125,6 +125,36 @@ procedencia; un factor ausente dice `sin_dato`/`null`, nunca 0 ni "baja".
   reverso existe (`retire`), pero la cobertura ya comprada no se devuelve.
 - **No persistir el gap** en una tabla nueva: se deriva al leer; congelarlo envejece sin señal.
 
+## Cómo llega el gap a la cola de trabajo (y cómo leer su salud)
+
+El gap no se consulta suelto para decidir el trabajo: la **cola priorizada** lo recoge como el origen
+`competitor_gap` y lo ordena junto a los otros cinco. Tú no emites nada — la cola **lee** el gap en su
+corrida diaria (`ops-seo-work-queue-materialize`, 10:00). Lo que ves en el snapshot:
+
+- Los ítems del gap salen **siempre en banda 3 con verbo `measure`**, y eso es correcto, no un
+  defecto: el reader ya excluyó toda keyword con impresiones medidas en el GSC, así que de acá salen
+  candidatos **sin demanda medida todavía**. Nunca duplican al striking-distance.
+- Cada ítem trae un `evidence_ref` **opaco** con la forma `seo:competitor_gap:<coverage_run_id>`: es
+  el ancla a la corrida de cobertura que lo originó. Sirve para rastrear, no para cruzar tablas.
+- El origen aparece **por debajo** de `consolidation`, `gsc_striking_distance`, `declared_target` y
+  `aeo_gap` en el orden de la cola. Es deliberado: la lente estimada cede ante la medida.
+
+**La salud del origen en `origin_health_json` dice exactamente qué falta:**
+
+| Estado | Qué significa | Qué hacer |
+|---|---|---|
+| `ok` | Hay competidor declarado y cobertura fresca; el `asOf` es la fecha de captura | Nada |
+| `degraded` — «No hay competidores declarados para este sitio» | La capacidad está disponible y nadie la activó para ese sujeto | **Declarar un competidor** (paso a paso de arriba). No se resuelve solo |
+| `degraded` — «declarado y nunca capturado» | El competidor existe pero la cobertura no ha corrido | Esperar el ciclo mensual (día 18) o disparar la corrida |
+| `degraded` — «cobertura del AAAA-MM-DD (vencida)` | La captura pasó la ventana de frescura | Dejar correr el ciclo mensual |
+| `down` | El reader falló (`query_failed`) | Revisar la señal `seo.competitor_coverage.stale` y los logs del worker |
+
+🔴 **Un `degraded` de este origen NO baja el score de los demás** y **no madura solo con el tiempo.**
+Ese es el error de lectura más fácil de cometer acá: el descubrimiento de candidatos (`TASK-1699`)
+propone dominios cuando la serie del top-N acumula ≥5 días, pero **declarar sigue siendo una decisión
+humana**. Un sujeto sin competidor declarado se queda en `degraded` indefinidamente, y eso es el
+colector diciendo la verdad —"capacidad disponible, nadie la usó"—, no una falla esperando resolverse.
+
 ## Problemas comunes
 
 - **`capacity_exceeded` al declarar** → retirar un competidor o subir el techo por env var (decisión
@@ -140,4 +170,5 @@ procedencia; un factor ausente dice `sin_dato`/`null`, nunca 0 ni "baja".
 
 - Commands/reader: `src/lib/growth/seo/{competitors,competitor-coverage,keyword-gap-reader}.ts`
 - Sanity live: `scripts/growth/_sanity-task-1662-keyword-gap.ts` (22 checks contra PG real)
-- Spec: `docs/tasks/in-progress/TASK-1662-growth-seo-keyword-gap-discovery.md`
+- Spec: `docs/tasks/complete/TASK-1662-growth-seo-keyword-gap-discovery.md`
+- Cola que consume el gap: `docs/manual-de-uso/growth/operar-cola-priorizada-seo.md` (`TASK-1700`)
