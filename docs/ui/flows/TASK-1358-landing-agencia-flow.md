@@ -1,4 +1,11 @@
-# TASK-1358 — Landing "Agencia" (`/agencia`) Flow Contract
+# TASK-1358 — Flow histórico de Agencia (no ejecutable)
+
+> **Supersedido para implementación, 2026-08-30.** La Home vive en `/`, la agenda enlaza
+> `/agenda/` y el CTA móvil conserva `#agenda`; no se montó un scheduler en esta Home.
+> El botón de video abre el showreel en dialog, no un formulario.
+> Recorrido vigente: [funcional](../../documentation/public-site/agency-elementor-preview.md);
+> estados y límites: [contrato técnico](../../architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md).
+> El contenido inferior es el plan anterior preservado, no una orden de construir `/agencia/`.
 
 ## Meta
 

@@ -7,6 +7,42 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-30 — TASK-1358: Home modular Elementor promovida con respaldo
+
+Por instrucción posterior del operador, la página `251731` ya sirve `/`: menu Home y SEO/canonical/index
+actualizados, diseño/copy/header/footer intactos; antigua Home `2791` conservada noindex. Snapshot
+`_gh_home_cutover_20260830_162109`. Se aplicaron después los seis comentarios visuales: contraste corregido,
+10 piezas recuperadas, isotipo HubSpot de Simple Icons, Logo Marquee compartido y agenda horizontal sin
+formulario, enlazada al calendario vigente. QA 1280/890/390; copy/claims/editor UI siguen pendientes.
+[Evidencia](docs/audits/public-site/2026-08-30-home-visual-review.md).
+Segunda revisión: contraste de Ecosistema, CTA teal editable, FAQ con CTA integrado y layout tablet
+sin sticky, e isotipo correcto también en Respaldo oficial. Sin reescribir documento ni header/footer.
+Tercera revisión: hover nativo Ohio sin cubrir el CTA, FAQ sin mail, cierre de tabla moderado, sprocket CRM,
+halos sin cortes e isotipo hero proporcional. Cambios de contenido guardados vía Elementor; QA responsive/hover PASS.
+Cuarta revisión: HubSpot CRM teal con hover blanco; isotipos oficiales negativos de Greenhouse/Globe mediante
+Media nativo. Tres comentarios publicados y comprobados en 390/890/1280; copys y header/footer sin cambios.
+Quinta revisión: Kortex/Wave oficiales, Verk retirado y aviso oculto; logos reales del hero con microinteracción
+original restaurada, y bucle de trabajos con cobertura por viewport. Snapshot `190751`; 415 campos/7 repeaters.
+Rótulos narrativos: «El costo de trabajar por separado» y «Un equipo. Una misma dirección.» sustituyen notas
+del wireframe en dos controles Elementor; snapshot `192130`, resto del contenido y estilo intactos.
+Servicios enlaza cuatro landings verificadas mediante URL nativa por fila; ocho tarjetas siguen estáticas.
+Snapshot `192809`; reparación del default URL, pruebas de renderer y navegación real documentadas en audit.
+Casos se convierte en CTA navy compacto → `/portafolio/`, cinco campos nativos; tarjetas/cifras retiradas.
+Snapshot `194253`, backup runtime `194241`; 415 campos/6 repeaters; hover, móvil y clic verificados.
+Hero «Mira cómo operamos» abre showreel YouTube en dialog navy responsive; URL nativa, carga sólo al clic,
+destrucción del player al cerrar, alternativa YouTube. Snapshot `195821`, backup `195756`; 414 campos.
+Reproducción live, cierre X/exterior, foco de retorno y reduced motion verificados; teclado del iframe no certificado.
+
+Consolidación documental con tres subagentes: contrato técnico, funcional, manual y skills espejadas;
+task/índices/contexto reconciliados con PDR-010 y la Home actual. Plan y handoff previos preservados como
+historia, no instrucciones vigentes. Readback independiente 17 widgets/414 campos raíz/6 repeaters,
+tests PHP/lifecycle/geometría PASS; QA del editor, teclado del player y claims globales siguen abiertos.
+Sin cambios live en esta consolidación. [Audit](docs/audits/public-site/2026-08-30-home-documentation-consolidation.md).
+
+Checkpoint de construcción anterior a la promoción:
+
+Se auditó el ZIP y se portó el cuerpo de Claude Design a `https://efeoncepro.com/home-claude-design-preview/` (`251731`, noindex), preservando el header/footer Ohio y Home `2791`. Tras la corrección solicitada por el operador, usa 17 widgets semánticos Elementor con controles editables y siete repeaters, **cero widgets HTML**. Assets condicionales y ciclo de vida idempotente; adaptación móvil del motor sin superposiciones. Tests PHP/JS y frontend 1440/390, reduced motion, filtros/FAQ/modal/foco pasan. Editor visual save/reload pendiente de login; media de 12 slots, copy/claims, captación y cutover siguen pendientes. [Contrato y manuales](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md).
+
 ## 2026-08-30 — HubSpot as a Service y su futura landing adoptan arquitectura moderna e inmersiva
 
 La práctica dejó de reducirse a RevOps + Customer Agent y ahora se gobierna mediante seis familias: Marketing,
@@ -977,13 +1013,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - El **Banco de Talento** dejó de mostrar personas de prueba **por su procedencia declarada**. Antes tampoco
   aparecían, pero por casualidad: bastaba con que su estado en el ciclo de vida cambiara para que reaparecieran.
 - Nada de esto está en producción todavía: el cambio de las 32 filas ya escritas espera al despliegue.
-
-## 2026-08-22 — Demo 35 queda documentada antes de tocar la home del blog
-
-- La página candidata se revalidó read-only: siete raíces, 113 nodos y 15 widgets de posts; cuatro ya están
-  vacíos porque apuntan a attachments y otros dos pierden un slot. La estructura no falla por Elementor: falla el
-  contenido fijo si se borra antes de recablear cada bloque.
-- El contrato operativo deja explícito que Demo 35 debe seguir como página Elementor normal, nunca como
-  `page_for_posts`, y que el futuro corte debe conservar una sola canónica `/blog/`, sus metas Ohio y rollback.
-- La skill del sitio público ahora registra la landing, sus parámetros, guards y secuencia de adaptación. No se
-  modificó WordPress, Kinsta, formularios ni caché.

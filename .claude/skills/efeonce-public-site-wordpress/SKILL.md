@@ -48,12 +48,14 @@ Read the minimal set:
 | Post-publication sitemap, GSC observation, indexing request or Platform Properties | `references/agentic-blogpost-end-to-end.md` + `.codex/skills/seo-aeo/references/google-search-console-api-indexing.md` |
 | Direct SVG infographics, `<picture>`, Media Library, ALT/long description, featured/OG raster | `references/content-factory-gutenberg.md` + `.codex/skills/seo-aeo/references/editorial-image-seo.md` |
 | Custom Elementor widget/plugin work | `references/custom-elementor-widgets.md` |
+| Claude Design → modular Elementor, Home, brand marks, rails, linked cards, or video dialog | `references/source-led-elementor-patterns.md` + the landing reference; add mutation/custom-widget references when writing |
 | Historical layout incident or older public page | `references/layout-incidents.md` |
 | Runtime discovery, bridge inspection, repo binding, Kinsta/WP inventory | `references/runtime-and-discovery.md` |
 | Demo 35 / future blog home | `references/landing-workflow.md` + `references/elementor-mutation.md` + `references/landings/demo35-blog-magazine.md` |
 | AEO `/aeo-2/` | `references/landings/aeo.md` |
 | Agencia Creativa `/agencia-creativa/` | `references/landings/agencia-creativa.md` |
 | HubSpot services `/servicios-contratar-hubspot/` | `references/landings/hubspot-services.md` |
+| Home `/` (former Claude Design preview) | `references/landings/home-claude-design-preview.md`; verify current CMS identity/hash before writes |
 
 If several domains apply, load the smallest union. Do not preload every reference.
 

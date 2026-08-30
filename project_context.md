@@ -124,9 +124,9 @@ control plane, y **no existe un flip "sólo staging"** (invariantes en
 Berel se opera desde Notion con `berel-content-production`: decide por contenido público vivo, relee relaciones y
 conteos al cerrar, y mantiene gates visibles para piezas históricas, sensibles, soft-404 o aún no validadas.
 
-Las landings WordPress/Ohio se enrutan por `efeonce-public-site-wordpress` y su `references/landing-registry.md`. La
-referencia Elementor + Growth + SEO/AEO es `TASK-1598`; después de cada resave ejecuta sus gates de fidelidad y SEO.
-`Index eligible` no significa `indexed`: lo segundo requiere Search Console.
+WordPress/Ohio: skill `efeonce-public-site-wordpress` y su `references/landing-registry.md`.
+Home modular: [contrato Elementor](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md).
+Growth/SEO: gates de `TASK-1598` tras resave. `Index eligible` no prueba indexación en Search Console.
 
 ### Lectura mínima obligatoria
 

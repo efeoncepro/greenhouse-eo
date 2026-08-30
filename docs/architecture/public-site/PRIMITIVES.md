@@ -50,6 +50,7 @@ Do not copy private Greenhouse primitives directly into WordPress. Use their des
 
 | Primitive | Status | Kind | Runtime owner | Public surfaces | Contract / docs | Verification |
 | --- | --- | --- | --- | --- | --- | --- |
+| `AgencyLandingModules` | `candidate/widget` (deployed) | `semantic-widget` | `eo-elementor-widgets`, 17 `greenhouse_agency_*` widgets, 414 root fields and six repeaters at the 2026-08-30 checkpoint | Home `/` (`251731`, index eligible); previous Home `2791` retained noindex | [Technical contract](AGENCY_ELEMENTOR_MODULES_V1.md); `agencyModule.v1`; shared proof, continuous work rails, optional service links, compact Cases CTA, native showreel dialog | PHP/Elementor registration + JS lifecycle + Browser 1280/890/390 evidence in [audit](../../audits/public-site/2026-08-30-home-visual-review.md); in-editor save/reload and complete cross-origin-player keyboard traversal pending |
 | `ComparisonTable` | `canonical/widget` | `semantic-widget` | `eo-elementor-widgets`, widget `greenhouse_comparison_table`; PHP class under `includes/widgets/`; CSS/JS under plugin assets | `/agencia-creativa/` | Functional doc `docs/documentation/public-site/comparison-table-widget.md`; manual `docs/manual-de-uso/public-site/comparison-table-widget.md`; manifest governance family `comparisonTable.v1` | Table semantics, responsive card mode, scoped assets, `theme_schema()` parity, visual desktop/mobile evidence |
 | `GrowthFormEmbed` | `canonical/host-adapter` | `host-adapter` | Elementor widget `greenhouse_growth_form` + `<greenhouse-form>` renderer from Greenhouse Growth Forms | AEO `/aeo-2/` conversion and future public lead magnets | `docs/architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md`; `docs/architecture/growth-public-forms-runtime-contract.md`; `docs/documentation/growth/motor-formularios-publicos.md` | `pnpm public-website:verify-aeo-live-contract` for AEO; proportional API/render/overflow/form gates for new forms |
 | `GrowthFormEditorialBriefHost` | `candidate/landing-pattern` | `landing-pattern` | Elementor page-scoped host + canonical `GrowthFormEmbed`; renderer remains Growth Forms | `/servicios/agencia-de-influencers/` | `docs/ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md`; `docs/tasks/complete/TASK-1598-landing-influencer-marketing-creators-ugc.md` | One paper surface; renderer-owned controls/state; desktop/390/open-select/focus/reduced-motion/overflow and empty-submit negative proof |
@@ -57,14 +58,14 @@ Do not copy private Greenhouse primitives directly into WordPress. Use their des
 | `NativeMeetingSchedulerHost` | `canonical/host-adapter` | `host-adapter` | Greenhouse bundles `<efeonce-meeting-scheduler>` + Growth CTA `open_meeting_scheduler`; Elementor owns host placement only | Isolated pilot `/agenda/` (`251583`, `noindex`); Contacto/RRSS not promoted | Architecture `docs/architecture/GREENHOUSE_GROWTH_MEETINGS_SCHEDULER_ARCHITECTURE_V1.md`; functional contract `docs/documentation/growth/scheduler-reuniones-nativo.md`; manual `docs/manual-de-uso/growth/configurar-cta-scheduler-nativo.md` | HubSpot is an invisible server-side provider. Recovery is native through month navigation/`Reintentar`; rollback uses flags, binding or version/backups. Live 2026-07-21: August 31-day grid preserved with zero slots, zero HubSpot links/copy and zero overflow. |
 | `CreativeLandingModule` | `candidate/widget` | `semantic-widget` | `eo-elementor-widgets` v0.11.0, widget `greenhouse_creative_landing_module`; PHP `class-eo-creative-landing-module-widget.php`; CSS/JS `creative-landing.*` | Candidate `/agencia-creativa-v2/` (`postId=251279`, `noindex` until cutover) | PDR `docs/public-site/decisions/PDR-004-landing-agencia-creativa-posicionamiento.md`; task `docs/tasks/to-do/TASK-1350-landing-agencia-creativa.md`; motion contract `docs/ui/motion/TASK-1350-landing-agencia-creativa-motion.md`; landing refs in both public-site skills | 14 Elementor widget instances, no HTML widget, native Ohio header/footer, source HTML fidelity, FAQ schema, desktop/mobile/reduced-motion Playwright, source colors/keyframes/hover computed-style audit, `scrollWidth == clientWidth` |
 | `Glitch` | `canonical/block` | `semantic-widget` | Plugin `efeonce-editorial-blocks` (runtime repo `wp-content/plugins/efeonce-editorial-blocks/`), block `efeoncepro/glitch-drop`, build-less, dynamic `render.php`; **deployed + active on efeoncepro.com (WP 7.0)** | Weekly blog series `Glitch de la semana` on `efeoncepro.com/blog` | Functional/technical contract `docs/documentation/public-site/glitch-drop-gutenberg-block.md` (§Implementation as-built); activation runbook `docs/manual-de-uso/public-site/glitch-editorial-block.md`; authoring rules `docs/documentation/public-site/gutenberg-post-authoring-recipes.md` | Live-verified 2026-07-04 via governed WP-CLI: registered, `parse_blocks` recognized (no invalid block), `do_blocks` renders `aside` (aria-label, no `blockquote`), UTF-8 OK, private test post rolled back. Static: php -l, block.json schema, node --check, render harness 10/10. Residual (non-blocking): in-editor UI save/reload + in-Ohio browser capture desktop/390 with CSS applied |
-| `LogoMarquee` | `canonical/widget` | `semantic-widget` | `eo-elementor-widgets`, widget `greenhouse_logo_marquee`; CSS `assets/css/logo-marquee.css` | AEO `/aeo-2/` why proof strip | AEO doc `docs/documentation/public-site/aeo-landing-elementor.md`; landing skill refs | 7 unique logos, 3 identical sets, fades, loop `translate(-33.333%)`, reduced-motion static state, visual phase checks |
-| `BrandProofAvatarGroup` | `canonical/pattern` | `landing-pattern` | Current implementation inside `greenhouse_logo_marquee` meta markup + `assets/css/logo-marquee.css` selectors `.gh-aeo-brand-proof*`; About dark-context skin in `ohio-child/assets/css/global-fixes.css` | AEO `/aeo-2/` under `Marcas que ya confían en nosotros`; About `/about-us-efeonce/` hero proof strip `abproof` | This registry + AEO/About docs. Current visible contract: Berel/Sky/Bresler discs in color, count disc `+90` frosted behind Bresler, DM Sans `::after`, countries `Chile · Colombia · México · Perú`; dark hero variants must adapt logo contrast, not reuse the light treatment blindly | `pnpm public-website:verify-aeo-why-proof-meta`; desktop/mobile visual review; no visible `marcas`/`4 países`; no page/proof overflow; About live Playwright capture |
+| `LogoMarquee` | `canonical/widget` | `semantic-widget` | `eo-elementor-widgets`, widget `greenhouse_logo_marquee`; CSS `assets/css/logo-marquee.css` | AEO proof strip; Redes Sociales trust; Home trust via shared renderer | AEO doc `docs/documentation/public-site/aeo-landing-elementor.md`; [Home contract](AGENCY_ELEMENTOR_MODULES_V1.md); landing skill refs | Seven-logo strip, identical sets, fades, reduced-motion static state and phase checks; Home delegates rather than maintaining another logo list renderer |
+| `BrandProofAvatarGroup` | `canonical/pattern` | `landing-pattern` | `greenhouse_logo_marquee` shared `proofOnly` renderer (`brandProof.v1`, `.gh-brand-proof*`); legacy `.gh-aeo-brand-proof*` remains for AEO/About | Home hero; AEO `/aeo-2/`; About `/about-us-efeonce/` hero `abproof` | Contract below; Home native Media repeater, density/variant/a11y controls; AEO/About legacy contracts unchanged | AEO gate `public-website:verify-aeo-why-proof-meta`; Home [audit](../../audits/public-site/2026-08-30-home-visual-review.md) includes original hover restoration, reduced motion, overflow and untouched legacy consumers |
 
 ## `BrandProofAvatarGroup` Contract
 
 This pattern covers compact social proof rows that combine known client/brand discs with a small aggregate count and market list.
 
-Current contract:
+Legacy AEO/About visual contract (not a blanket copy rule for every consumer):
 
 - Root proof row remains visually secondary: subtle translucent pill, low shadow, restrained border.
 - Brand discs overlap like a team avatar group. The next disc visually covers the previous one; the count disc sits behind the last brand disc, not detached to the right.
@@ -77,14 +78,42 @@ Current contract:
   contrast skin: light/ice logo treatment and a frosted pill. Do not paste the
   light-background visual treatment unchanged onto dark heroes.
 
-Graduation path:
+Shared opt-in contract (2026-08-30):
 
-- This pattern is now reused outside AEO (`/about-us-efeonce/` hero). Extract it
-  into either:
-  - a dedicated Elementor widget `greenhouse_brand_proof_group`; or
-  - a governed option inside `greenhouse_logo_marquee` when it remains tightly coupled to a marquee.
-- Extraction must expose controls or manifest fields for `brands[]`, `countLabel`, `countAccessibleLabel`, `markets[]`, density, and visual variant.
-- Keep the same a11y/responsive/reduced-motion checks and add the new widget to this registry.
+- Governed opt-in `EO_Logo_Marquee_Widget::render_marquee(['proofOnly'=>true,...])` delegates
+  `render_brand_proof()`. Marker `brandProof.v1`, scoped `.gh-brand-proof*`, same plugin/CSS owner.
+- Manifest fields: `brands[]` (name/image.url), `countLabel`, `countAccessibleLabel`, `markets[]`,
+  `density` (compact/default), `variant` (light/dark). Home hero exposes a native Media repeater plus
+  density/variant/accessibility controls; its existing count and geography copy are preserved separately.
+- Home `/` is the first opt-in consumer. AEO/About retain their legacy `.gh-aeo-brand-proof*` markup;
+  this extraction does not migrate or alter those pages. Non-opt-in marquee output is unchanged.
+- Home preserves its original 6 px elevation/1.08 scale/halo microinteraction with semantic selectors;
+  reduced motion disables transform and transition. Discs are non-actionable images, not fake buttons.
+- Rollout/rollback and responsive evidence: [Home visual audit](../../audits/public-site/2026-08-30-home-visual-review.md).
+
+## Agency patterns available for reuse
+
+These are owned by `AgencyLandingModules`; they are not independent widgets or an alternative UI platform.
+Reuse/extend them through the existing schemas and renderers before adding page-local HTML:
+
+- **Compact destination CTA:** Cases reuses Agenda's navy card/teal action through a scoped modifier.
+  One semantic link, editable destination, <=760 px stacked layout. Reusing a visual class requires
+  scoping tests and selectors by section so a Cases link is not mistaken for the Agenda action.
+- **Optional service-card destination:** native URL repeater field, empty means non-linked article.
+  A single heading anchor provides the stretched hit target; preserve external/nofollow and focus states.
+  Native URL defaults are arrays, not strings; test against actual Elementor control registration.
+- **Click-to-load showreel:** native `<dialog>` in Experience, one instance/page; validated YouTube URL,
+  no iframe in initial/editor render, stop/remove on close/unmount, X44×44, fallback link, reduced motion.
+  Browser modality does not by itself certify keyboard traversal inside a cross-origin iframe.
+- **Continuous artwork rails:** exact measured cycle including gap, enough inert duplicate sets to cover
+  viewport plus period, ResizeObserver rebuild and image preparation; zero clones in editor/reduced motion.
+  This algorithm belongs to artwork rails, not the separate LogoMarquee implementation.
+- **Color-inheriting brand mark:** Media SVG used as alpha mask with instance-scoped ID and `currentColor`;
+  CRM HubSpot follows teal/white states without approximation by CSS filters or replacing the official mark.
+
+The [Agency contract](AGENCY_ELEMENTOR_MODULES_V1.md) owns selectors, schema, implementation paths and
+verification. Its source-led visual decisions do not authorize global theme changes, invented proof or
+copying private Greenhouse components into WordPress.
 
 ## Promotion Checklist
 

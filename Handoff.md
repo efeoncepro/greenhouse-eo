@@ -2,6 +2,28 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-30 — TASK-1358: Home Elementor consolidada; cierre editorial y QA pendientes
+
+Home `251731` publicada en raíz, antigua `2791` conservada noindex; header/footer Ohio intactos.
+Readback independiente: 17 widgets semánticos, cero HTML, 414 campos raíz y seis repeaters;
+hash `30bab640e2dae49b9f6b13582c6dd426c018c4fda2419c0f199634cdc659605c`.
+Las revisiones visuales, assets oficiales, microinteracción de logos, enlaces de Servicios,
+CTA Casos y showreel están publicados. No restaurar formulario demo, Verk ni placeholders.
+[Contrato vigente](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md);
+[historia/evidencia visual](docs/audits/public-site/2026-08-30-home-visual-review.md).
+
+Tres subagentes consolidaron arquitectura, funcional/manual y skills espejadas; root reconcilió task,
+índices y contexto. [Audit independiente](docs/audits/public-site/2026-08-30-home-documentation-consolidation.md):
+contrato WP-CLI, PHP, lifecycle y geometría PASS; hashes de archivos del video coinciden con manifest.
+Snapshot de contenido registrado `_gh_home_video_20260830_195821`; backup `195756`.
+No se revalidó retención del tar ni se ensayó rollback. Consolidación documental sin mutar producción.
+
+**Siguiente paso:** ejecutor con sesión WordPress prueba guardar/recargar Elementor y teclado completo
+dentro/fuera de YouTube. Operador revisa copy/claims/SEO globales; CTA abierto no prueba booking ni tracking.
+TASK-1358 permanece `to-do`/`UI ready: no`, con runtime `Avanzada`; no complete, commit ni push.
+El checkpoint anterior se [preservó](docs/operations/agent-context-history/handoff/2026-08-30-home-before-consolidation.md),
+pero ya no gobierna decisiones ni pendientes actuales.
+
 ## 2026-08-30 — oferta HubSpot V2 y task de landing inmersiva documentadas; landing sigue pendiente
 
 La investigación actual de producto y el benchmark de 11 partners quedaron consolidados en un audit fechado y en

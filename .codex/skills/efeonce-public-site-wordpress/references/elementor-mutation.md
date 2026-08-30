@@ -36,9 +36,18 @@ Capture:
 - any landing-specific widget hashes;
 - relevant Yoast/schema/meta if the change can affect SEO.
 
+For a guarded production writer, also check the ownership marker, current `page_on_front`,
+expected status and full document hash before snapshot/save. Register the affected widgets before
+validating their control keys: Elementor can initialize registration lazily. Refuse unknown controls
+or source drift before writing. Keep a durable snapshot option and exact runtime-file manifest;
+an old `/tmp` backup path is recovery evidence, not a guarantee that the archive still exists.
+
 ## After Save
 
 - Re-check the protected metas and hashes.
+- Compare decoded intended/readback trees and unchanged sibling widgets, page settings and protected
+  reference-page hashes. If Elementor drops a protected meta such as `_thumbnail_id`, restore its
+  captured value before reporting success and verify again. Do not restore unrelated concurrent edits.
 - Read `_elementor_data` back as decoded JSON and inspect the intended widget or
   semantic value. Raw string searches can fail because WordPress/Elementor may
   persist URLs as escaped `\/`; normalize only for diagnostics or traverse the
@@ -51,6 +60,8 @@ Capture:
   unrelated metas instead.
 - Do not treat missing `wp-content/uploads/elementor/css/post-<id>.css` immediately after save as failure. Elementor may delete generated CSS/cache; render the public page to regenerate.
 - Purge Kinsta cache after live mutation.
+- Invalidate Elementor element/files caches as applicable as well as Kinsta; new plugin templates may
+  otherwise coexist with stale rendered elements. Check the actual public bundle/render after reload.
 - Verify in browser at desktop and mobile 390px.
 
 ## Structural Rules
@@ -98,4 +109,7 @@ Visual guardrails:
 - Elementor post CSS can load after plugin or child-theme CSS. For typography/rhythm fixes, verify computed styles in the browser at desktop and mobile, especially `letter-spacing` on nested spans.
 - Absolute Ohio header elements such as inactive wide submenus can create false horizontal `scrollWidth` during visual captures. Identify off-screen offenders before blaming the section under test; scope any guard to the page and preserve hover/focus behavior.
 - Marquee/logo bugs are often composition bugs, not keyframe bugs: check set width versus viewport, number of duplicated sets, `translate()` fraction, animation duration, effective item widths, visible asset pixels, internal whitespace in the files, mask/fades, and empty wrappers.
+- Ohio `links-underline` can paint a `currentColor` background gradient over a filled CTA only after
+  sustained hover. Check computed `background-image` and the completed transition, not just the first
+  hover frame; use Ohio's native `-undash` exclusion on the affected link rather than patching all links.
 - Do not globally patch `#masthead`, footer, sidebar, or hero layers to hide a section seam.

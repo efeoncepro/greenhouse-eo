@@ -28,6 +28,9 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
 
 ## Índice
 
+- **[Home vigente — Elementor](../architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md)** — portada
+  `251731`, promovida desde Claude Design; contrato técnico de módulos, edición y evidencia. La antigua
+  Home `2791` es respaldo noindex. Implementación publicada no equivale a aprobación global de copy/claims.
 - **[PRODUCT_ROADMAP.md](PRODUCT_ROADMAP.md)** — roadmap del sitio público
   (now / next / later) con enlaces a los EPICs y PDRs que lo sostienen.
 - **[decisions/](decisions/)** — Product Decision Records (PDR). Log de
