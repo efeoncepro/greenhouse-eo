@@ -88,8 +88,8 @@ empezar y que el Slice 3 llega con la decisión ya tomada.
 - Execution profile: `ui-ux`
 - UI impact: `interaction`
 - UI ready: `yes`
-- Wireframe: `docs/ui/wireframes/TASK-1665-growth-seo-keyword-discovery-workbench.md`
-- Flow: `docs/ui/flows/TASK-1665-growth-seo-keyword-discovery-workbench-flow.md`
+- Wireframe: `docs/ui/wireframes/TASK-1693-growth-seo-discovery-pagination-seed-sources.md`
+- Flow: `docs/ui/flows/TASK-1693-growth-seo-discovery-pagination-seed-sources-flow.md`
 - Motion: `docs/ui/motion/TASK-1665-growth-seo-keyword-discovery-workbench-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-022`
@@ -411,7 +411,7 @@ Reglas obligatorias:
   el existente; no se crea uno paralelo).
 - Route: `/admin/growth/seo/keywords?view=discovery`
 - Viewports: desktop 1440 + mobile 390.
-- Quality profile: `premium`
+- Quality profile: premium
 - Required steps: abrir la lente con una corrida de más de una página; capturar el canvas; activar
   la afordancia de página siguiente; capturar con las filas acumuladas; abrir el selector de fuente
   y capturar la banda de costo con una fuente medida seleccionada.
