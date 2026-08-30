@@ -766,8 +766,17 @@ Ninguna en Entra: la escritura usa el scope de dominio ya existente. Sí en `ops
 ## Follow-ups
 
 - **Medir el costo del segundo ciclo de cobertura** antes de subir `GROWTH_SEO_COMPETITORS_PER_TARGET`.
-  El cron es mensual (día 18) y el 18-sep cae en ventana de frescura, así que el próximo gasto real es
-  ~octubre. Decisión del operador; el techo protege el gasto mientras tanto.
+  **Verificado el 2026-08-29 y decidido: no se fuerza.** El dry-run sobre `comex.com.mx` devolvió
+  `fresh: true` / `estimatedCostUsd 0.144` / `gateAllowed: true`, y `captureCompetitorCoverage` chequea
+  `hasFreshCoverageRun` de forma **incondicional** — no hay `force` ni en el command ni en el endpoint
+  del worker (sólo `dryRun` y `maxCompetitors`). O sea: **el 18-sep el scheduler correrá y saldrá
+  `skipped_fresh` a costo cero** (la captura del 28-ago vence el 27-sep); el primer ciclo que compra de
+  verdad es el **18-oct**. Que ese día no aparezca gasto NO es una falla. El costo por ciclo ya está
+  medido de todos modos: **USD 0,1076 reales** vs 0,144 estimados, misma fórmula y `rowLimit`.
+  🔴 Forzarlo exigiría re-pagar por data idéntica debilitando la guarda que existe justo para impedir la
+  doble compra — descartado por el operador. Lo que el follow-up necesita de verdad (**costo marginal de
+  un competidor adicional**) se mide declarando un segundo competidor, sin tocar ninguna guarda; qué
+  dominio es decisión humana y sigue abierta.
 - **Ejercitar el `proposalRef` de descubrimiento** con la primera declaración nacida de una propuesta
   de `readSerpCompetitorCandidates` (la serie del top-N necesita ≥5 días; lleva 1 al 2026-08-29).
 - Superficie de keyword gap, con wireframe y flow propios.
