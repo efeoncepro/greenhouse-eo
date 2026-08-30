@@ -70,13 +70,23 @@ const FiltersBody = ({ query, onChange, onClear }: KeywordDiscoveryFiltersProps)
   const copy = GH_GROWTH_SEO_KEYWORDS.discovery.results
 
   return (
-    <Stack
-      spacing={3}
-      direction={{ xs: 'column', md: 'row' }}
-      alignItems={{ xs: 'stretch', md: 'flex-end' }}
-      flexWrap='wrap'
-      useFlexGap
-    >
+    /*
+     * Grilla y no un `Stack` en fila con `alignItems='flex-end'`.
+     *
+     * Con flex-end, el helper de «Barrera máxima» empujaba ese campo hacia arriba y las cuatro
+     * etiquetas quedaban en tres líneas base distintas — una barra de filtros desalineada se lee
+     * como pantalla sin terminar, justo encima del canvas donde se decide el gasto. La grilla da
+     * a cada campo la misma altura de fila y las etiquetas alinean por construcción.
+     */
+    <Stack spacing={4}>
+      <Box
+        sx={{
+          display: 'grid',
+          gap: 4,
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(auto-fit, minmax(180px, 1fr))' },
+          alignItems: 'start'
+        }}
+      >
       <CustomTextField
         label={copy.filterSearch}
         value={query.q}
@@ -145,7 +155,18 @@ const FiltersBody = ({ query, onChange, onClear }: KeywordDiscoveryFiltersProps)
         sx={{ minInlineSize: { md: 140 } }}
       />
 
-      <Stack spacing={2}>
+      </Box>
+
+      {/* Segunda fila: los dos interruptores y la salida. Separarlos de los campos evita que
+          «Limpiar filtros» quede alineado con un checkbox deshabilitado, que se leía como si
+          fueran el mismo control. */}
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={4}
+        alignItems={{ xs: 'flex-start', sm: 'center' }}
+        flexWrap='wrap'
+        useFlexGap
+      >
         <FormControlLabel
           control={
             <Checkbox
@@ -167,11 +188,11 @@ const FiltersBody = ({ query, onChange, onClear }: KeywordDiscoveryFiltersProps)
           }
           label={copy.filterIncludeUnknownBarrier}
         />
-      </Stack>
 
-      <Button variant='text' onClick={onClear}>
-        {copy.clearFilters}
-      </Button>
+        <Button variant='text' onClick={onClear} sx={{ marginInlineStart: { sm: 'auto' } }}>
+          {copy.clearFilters}
+        </Button>
+      </Stack>
     </Stack>
   )
 }
