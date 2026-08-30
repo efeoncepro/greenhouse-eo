@@ -2493,15 +2493,30 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       count: '{count} candidatos',
 
       /*
-       * ⚠️ El conteo afirma el universo; la tabla sirve una página. Cuando no coinciden hay que
-       * DECIRLO: «Candidatos (312)» sobre 50 filas, sin aviso, es mentira por omisión justo en el
-       * canvas donde se decide. El orden gobernado del reader pone primero lo que más importa,
-       * así que la página servida es la buena — pero no es todo, y eso se nombra.
-       * La paginación real (consumir `nextCursor`) es de TASK-1693.
+       * ⚠️ El conteo afirma el universo; la tabla sirve las páginas que se han recorrido. Cuando
+       * no coinciden hay que DECIRLO: «Candidatos (312)» sobre 50 filas, sin aviso, es mentira por
+       * omisión justo en el canvas donde se decide.
+       *
+       * TASK-1693: el aviso ya NO promete paginación futura —la promesa se cumplió—. Ahora explica
+       * las dos cosas que el operador necesita saber para seguir recorriendo: por qué estos primero
+       * (el orden gobernado del reader) y que recorrer NO vuelve a gastar. En una superficie donde
+       * la otra acción cuesta dinero, esa segunda mitad no es un detalle.
        */
       countTruncated: '{shown} de {count} candidatos',
       truncatedNotice:
-        'Se muestran los {shown} candidatos de mayor prioridad de {count}. El resto queda en la corrida y se podrá recorrer cuando la lente tenga paginación.',
+        'Primero se muestran los candidatos de mayor prioridad. Puedes recorrer el resto sin volver a gastar.',
+
+      /*
+       * Verbo de RECORRER, no de buscar: no dispara una corrida y el copy no puede sugerirlo.
+       * «Ver» y no «Cargar» porque «cargar» es voz del sistema, y porque el botón convive con
+       * «Descubrir», que sí gasta — dos verbos que no se puedan confundir.
+       *
+       * ⚠️ SIN `aria-label` propio a propósito: el texto visible ya lleva el conteo, así que es su
+       * nombre accesible. Un `aria-label` distinto rompería «label in name» (WCAG 2.5.3) y dejaría
+       * el botón inalcanzable por control de voz.
+       */
+      loadMore: 'Ver {count} candidatos más',
+      loadMoreError: 'No pudimos cargar más candidatos. Los que ya ves siguen disponibles.',
 
       colKeyword: 'Keyword',
       colSource: 'Procedencia',

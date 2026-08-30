@@ -17,7 +17,7 @@ import SurfaceRecipe from '@/components/greenhouse/primitives/surface-system/Sur
 import { isCanonicalApiError, throwIfNotOk } from '@/lib/api/parse-error-response'
 import { GH_GROWTH_SEO_KEYWORDS } from '@/lib/copy/growth'
 import { isDiscoveryRunStale } from '@/lib/growth/seo/keyword-discovery/contracts'
-import type { SeoDiscoveryMethod } from '@/lib/growth/seo/keyword-discovery/contracts'
+import type { SeoDiscoveryMethod, SeoDiscoveryRunStatus } from '@/lib/growth/seo/keyword-discovery/contracts'
 import type { SeoDiscoveryCandidateView, SeoDiscoveryRunView } from '@/lib/growth/seo/keyword-discovery/reader'
 
 import KeywordsSurfaceHeader from '../KeywordsSurfaceHeader'
@@ -54,6 +54,16 @@ import {
  * mentiría sobre una factura que crece todos los días.
  */
 
+/**
+ * ¿La corrida terminó de materializar candidatos?
+ *
+ * Sólo sobre una corrida asentada tiene sentido paginar: el cursor es un offset y en
+ * `pending`/`running` la lista sigue creciendo. `partial` SÍ es asentada — terminó, aunque
+ * incompleta, y lo que materializó no se mueve más.
+ */
+const runStatusIsSettled = (status: SeoDiscoveryRunStatus | null): boolean =>
+  status !== null && status !== 'pending' && status !== 'running'
+
 export interface KeywordDiscoveryWorkbenchProps {
   organizationId: string | null
   seoTargetId: string | null
@@ -69,6 +79,10 @@ export interface KeywordDiscoveryWorkbenchProps {
   run: SeoDiscoveryRunView | null
   candidates: SeoDiscoveryCandidateView[]
   totalCandidates: number
+  /** Cursor de la página siguiente que devolvió el reader; `null` = no queda nada por recorrer. */
+  nextCursor: string | null
+  /** Tamaño de página con el que el server pidió la primera; el cliente usa el mismo. */
+  pageSize: number
 }
 
 const KeywordDiscoveryWorkbench = ({
@@ -83,7 +97,9 @@ const KeywordDiscoveryWorkbench = ({
   groundedDisabledReason,
   run,
   candidates,
-  totalCandidates
+  totalCandidates,
+  nextCursor,
+  pageSize
 }: KeywordDiscoveryWorkbenchProps) => {
   const copy = GH_GROWTH_SEO_KEYWORDS.discovery
   const router = useRouter()
@@ -113,9 +129,104 @@ const KeywordDiscoveryWorkbench = ({
    */
   const [pendingAction, setPendingAction] = useState<KeywordDiscoveryActionKind | null>(null)
 
+  /**
+   * ── TASK-1693 — páginas acumuladas ────────────────────────────────────────────────────
+   *
+   * Sólo vive acá lo que el server NO trajo: la primera página llega por props y las siguientes
+   * se acumulan en `extraPages`. Copiar también la primera al estado la congelaría — tras un
+   * `router.refresh()` (track, encolado, polling) las props se reproyectan y el estado local
+   * seguiría mostrando la foto vieja, que es el mismo defecto que el drawer evita guardando el
+   * id y no el objeto.
+   *
+   * El cursor vivo es el del server mientras nadie paginó, y el último que devolvió la ruta
+   * después. **Nunca se compone a mano**: es un offset serializado sobre un orden en memoria del
+   * reader, y fabricarlo acá acoplaría la vista a un detalle que el reader puede cambiar.
+   */
+  const [extraPages, setExtraPages] = useState<SeoDiscoveryCandidateView[]>([])
+  const [clientCursor, setClientCursor] = useState<string | null>(null)
+  const [pagingState, setPagingState] = useState<GreenhouseAsyncActionState>('idle')
+
+  const runId = run?.runId ?? null
+
+  /*
+   * Cambió la corrida o el server reproyectó: lo acumulado deja de pertenecer a esta lista y se
+   * descarta. Sin esto, encolar una corrida nueva dejaría pegadas abajo las páginas de la
+   * anterior, mezcladas y sin ninguna señal de que son de otra pregunta.
+   */
+  useEffect(() => {
+    setExtraPages([])
+    setClientCursor(null)
+    setPagingState('idle')
+  }, [runId, candidates])
+
+  const visibleCandidates = useMemo(() => [...candidates, ...extraPages], [candidates, extraPages])
+
+  const activeCursor = extraPages.length > 0 ? clientCursor : nextCursor
+
+  /*
+   * 🔴 Sobre una corrida VIVA no se pagina.
+   *
+   * El universo crece bajo los pies —el drain sigue materializando— y el polling de 20 s
+   * reproyecta la primera página cada rato. Paginar ahí devuelve filas duplicadas o saltadas sin
+   * que nadie lo note, porque el cursor es un offset sobre una lista que cambió de largo. La
+   * afordancia no se deshabilita: no se renderiza.
+   */
+  const runSettled = runStatusIsSettled(run?.status ?? null)
+  const canLoadMore = Boolean(activeCursor) && runSettled && Boolean(organizationId) && Boolean(runId)
+
+  const handleLoadMore = async () => {
+    if (!organizationId || !runId || !activeCursor || pagingState === 'loading') return
+
+    setPagingState('loading')
+    setFeedback(null)
+
+    try {
+      const url = new URL(DISCOVERY_ENDPOINT, window.location.origin)
+
+      url.searchParams.set('organizationId', organizationId)
+      url.searchParams.set('runId', runId)
+      url.searchParams.set('cursor', activeCursor)
+      url.searchParams.set('limit', String(pageSize))
+
+      const response = await fetch(url.toString(), { method: 'GET' })
+
+      await throwIfNotOk(response, copy.results.loadMoreError)
+
+      const payload = (await response.json()) as {
+        candidates?: SeoDiscoveryCandidateView[]
+        nextCursor?: string | null
+      }
+
+      const incoming = payload.candidates ?? []
+
+      /*
+       * Dedup por `candidateId` contra lo YA visible. El cursor es un offset: si entre dos
+       * páginas algo cambió el largo de la lista, el mismo candidato puede volver. Repetirlo en
+       * un canvas de comparación es peor que perderlo — el operador lo contaría dos veces.
+       */
+      setExtraPages(current => {
+        const seen = new Set([...candidates, ...current].map(candidate => candidate.candidateId))
+
+        return [...current, ...incoming.filter(candidate => !seen.has(candidate.candidateId))]
+      })
+
+      setClientCursor(payload.nextCursor ?? null)
+      setPagingState('success')
+    } catch (error) {
+      const canonical = isCanonicalApiError(error) ? error : null
+
+      setFeedback({
+        severity: 'error',
+        message: canonical?.message ?? copy.results.loadMoreError,
+        tracked: false
+      })
+      setPagingState('error')
+    }
+  }
+
   const selectedCandidate = useMemo(
-    () => candidates.find(candidate => candidate.candidateId === selectedCandidateId) ?? null,
-    [candidates, selectedCandidateId]
+    () => visibleCandidates.find(candidate => candidate.candidateId === selectedCandidateId) ?? null,
+    [visibleCandidates, selectedCandidateId]
   )
 
   // El trigger que abrió el drawer: `AdaptiveSidecarLayout` le devuelve el foco al cerrar, para
@@ -344,14 +455,18 @@ const KeywordDiscoveryWorkbench = ({
 
       {/* Sin corrida se dice la verdad —todavía no hay ninguna— en vez de mostrar una tabla
           vacía, que se leería como "buscamos y no encontramos nada". */}
-      <Card data-capture={candidates.length > 0 ? undefined : 'seo-keyword-discovery-results'}>
+      <Card data-capture={visibleCandidates.length > 0 ? undefined : 'seo-keyword-discovery-results'}>
         <CardContent>
-          {candidates.length > 0 ? (
+          {visibleCandidates.length > 0 ? (
             <KeywordDiscoveryResults
-              candidates={candidates}
+              candidates={visibleCandidates}
               totalCandidates={totalCandidates}
               openCandidateId={selectedCandidate?.candidateId ?? null}
               onOpenCandidate={handleOpenCandidate}
+              canLoadMore={canLoadMore}
+              nextPageSize={Math.min(pageSize, Math.max(0, totalCandidates - visibleCandidates.length))}
+              loadMoreState={pagingState}
+              onLoadMore={handleLoadMore}
             />
           ) : (
             <EmptyState

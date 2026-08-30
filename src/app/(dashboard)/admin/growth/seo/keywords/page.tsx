@@ -8,7 +8,7 @@ import { getGraderProfileForOrganization } from '@/lib/growth/ai-visibility/stor
 import { enforceSeoRunEntitlement } from '@/lib/growth/seo/entitlement'
 import { isSeoKeywordDiscoveryEnabled, isSeoModuleEnabled, isSeoWorkQueueEnabled } from '@/lib/growth/seo/flags'
 import { GH_GROWTH_SEO_KEYWORDS } from '@/lib/copy/growth'
-import { readKeywordDiscovery } from '@/lib/growth/seo/keyword-discovery/reader'
+import { DEFAULT_DISCOVERY_READ_LIMIT, readKeywordDiscovery } from '@/lib/growth/seo/keyword-discovery/reader'
 import type { SeoDiscoveryCandidateView, SeoDiscoveryRunView } from '@/lib/growth/seo/keyword-discovery/reader'
 import { resolveUnambiguousSeoTarget } from '@/lib/growth/seo/resolve-target'
 import { readKeywordOpportunities } from '@/lib/growth/seo/keyword-opportunities-reader'
@@ -155,14 +155,24 @@ export default async function Page({ searchParams }: PageProps) {
     let discoveryRun: SeoDiscoveryRunView | null = null
     let discoveryCandidates: SeoDiscoveryCandidateView[] = []
     let discoveryTotal = 0
+    let discoveryNextCursor: string | null = null
 
     if (selectedSpace && market) {
       const requestedRunId = (params.discoveryRun ?? '').trim() || undefined
 
+      /*
+       * TASK-1693 — el `limit` se pasa EXPLÍCITO, no se hereda del default del reader.
+       *
+       * El cliente pide las páginas siguientes con ese mismo tamaño para que el conteo que
+       * anuncia el botón («Ver 50 candidatos más») coincida con lo que efectivamente llega. Si el
+       * server usara el default implícito y el cliente otro número, el botón prometería una cifra
+       * y entregaría otra — sobre un canvas donde el operador está contando lo que revisó.
+       */
       const runs = await readKeywordDiscovery({
         organizationId: selectedSpace.organizationId,
         seoTargetId: market.seoTargetId,
-        runId: requestedRunId
+        runId: requestedRunId,
+        limit: DEFAULT_DISCOVERY_READ_LIMIT
       })
 
       if (runs.ok) {
@@ -172,16 +182,19 @@ export default async function Page({ searchParams }: PageProps) {
         if (runs.candidates.length > 0 || requestedRunId) {
           discoveryCandidates = runs.candidates
           discoveryTotal = runs.totalCandidates
+          discoveryNextCursor = runs.nextCursor
         } else if (discoveryRun) {
           const withCandidates = await readKeywordDiscovery({
             organizationId: selectedSpace.organizationId,
             seoTargetId: market.seoTargetId,
-            runId: discoveryRun.runId
+            runId: discoveryRun.runId,
+            limit: DEFAULT_DISCOVERY_READ_LIMIT
           })
 
           if (withCandidates.ok) {
             discoveryCandidates = withCandidates.candidates
             discoveryTotal = withCandidates.totalCandidates
+            discoveryNextCursor = withCandidates.nextCursor
           }
         }
       }
@@ -246,6 +259,8 @@ export default async function Page({ searchParams }: PageProps) {
         run={discoveryRun}
         candidates={discoveryCandidates}
         totalCandidates={discoveryTotal}
+        nextCursor={discoveryNextCursor}
+        pageSize={DEFAULT_DISCOVERY_READ_LIMIT}
       />
     )
   }

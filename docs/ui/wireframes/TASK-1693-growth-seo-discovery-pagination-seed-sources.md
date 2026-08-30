@@ -168,8 +168,13 @@ Regla transversal heredada: **ningún estado ofrece una acción que no puede ten
 
 ## Accessibility Contract
 
-- Se **reusa** la live region `role='status' aria-live='polite'` del workbench. **NUNCA** se monta una
-  segunda: dos regiones vivas compiten y el lector anuncia una sola de forma impredecible.
+- Se **reusa** la live region `role='status' aria-live='polite'` del workbench para el resultado de
+  la paginación. **NUNCA** se monta una nueva.
+  ⚠️ **Corregido contra el runtime (2026-08-29):** la superficie ya tiene **DOS** regiones vivas
+  heredadas de TASK-1665 —la banda de costo del builder, que anuncia la estimación mientras el
+  operador escribe, y la de feedback del workbench, que anuncia el resultado de una acción—. Anuncian
+  cosas distintas en momentos distintos, así que no se tocan acá; pero la afirmación «hay una sola»
+  era falsa y queda corregida. Lo que esta task garantiza es que **no agrega una tercera**.
 - Tras cargar una página el foco **no salta** al inicio de la tabla ni a la primera fila nueva: queda
   en la afordancia, que es donde estaba. El resultado se anuncia por la live region.
 - El botón declara `aria-label` con el conteo (`loadMoreAria`), porque «Cargar 50 más» fuera de

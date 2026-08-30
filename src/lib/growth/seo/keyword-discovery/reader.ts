@@ -220,7 +220,15 @@ export type ReadKeywordDiscoveryResult =
 /** Techo server-side de candidatos por página (la spec fija 200). */
 export const MAX_DISCOVERY_READ_LIMIT = 200
 
-const DEFAULT_DISCOVERY_READ_LIMIT = 50
+/**
+ * Tamaño de página por defecto del reader y **SSOT del tamaño que la UI pagina**.
+ *
+ * TASK-1693 lo exporta a propósito: la page lo pasa explícito y el cliente pide las páginas
+ * siguientes con el MISMO número, así que el conteo que anuncia el botón coincide con lo que
+ * llega. Con un literal repetido en la vista, subir este default aquí dejaría el botón
+ * prometiendo una cifra vieja, en silencio.
+ */
+export const DEFAULT_DISCOVERY_READ_LIMIT = 50
 
 const RUNS_LIST_LIMIT = 20
 
