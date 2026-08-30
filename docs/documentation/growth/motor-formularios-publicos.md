@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-06-25 por Claude (TASK-1229)
-> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — Growth vive como seccion del dominio Comercial en el menu)
+> **Ultima actualizacion:** 2026-08-29 por Codex (TASK-1598 — Editorial Premium Brief)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md)
 
 # Motor de Formularios Publicos de Growth
@@ -35,7 +35,7 @@ La idea clave: **cualquier** formulario que nazca del motor hereda robustez por 
 ## Estado de rollout
 
 - **Staging (`develop`): VIVO** desde 2026-06-25. Los tres flags estan ON: el API publico (`GROWTH_FORMS_PUBLIC_API_ENABLED`), el dispatcher de entrega (`GROWTH_FORMS_DISPATCH_ENABLED`) y el adapter HubSpot real (`GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED`). Verificado: el endpoint publico responde el render contract y una submission real llego a un HubSpot test form (200).
-- **Produccion: ACTIVO de forma acotada para AEO `/aeo-2/` y Think `/brand-visibility`.** AEO usa el form `efeonce-aeo-diagnostic` para HubSpot. Think usa el form `fdef-ai-visibility-grader` con `successBehavior.kind="tokenized_report"`: el submit gobernado persiste la submission y el renderer entrega al host un `status_url`; un consumer reactivo de dominio crea el grader run y el status devuelve el token cuando el reporte esta listo. La verdad live de los flags es `vercel env ls` + el servicio Cloud Run `ops-worker`; el estado humano vive en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+- **Produccion: ACTIVO de forma acotada para AEO `/aeo-2/`, Think `/brand-visibility` e Influencer `/servicios/agencia-de-influencers/`.** AEO usa `efeonce-aeo-diagnostic`; Think usa `fdef-ai-visibility-grader` con `successBehavior.kind="tokenized_report"`; Influencer usa `efeonce-creator-influence-brief` y acepta submissions gobernadas, aunque su entrega directa a HubSpot permanece deshabilitada por el gate vigente. En Think, el submit persiste la submission y el renderer entrega al host un `status_url`; un consumer reactivo crea el grader run y el status devuelve el token cuando el reporte esta listo. La verdad live de flags y dispatch es `vercel env ls` + Cloud Run `ops-worker`; el ledger es estado humano, no evidencia runtime.
 
 ## Primer form productivo publico — AEO `/aeo-2/`
 
@@ -127,9 +127,21 @@ La UI consume readers/APIs del motor (`src/lib/growth/forms/**`, `/api/admin/gro
 
 Primeros forms reales observados: **AI Visibility Grader** (`fdef-ai-visibility-grader`) como anchor interno del motor, y **AEO Diagnostic** (`fdef-efeonce-aeo-diagnostic`) como primer submit productivo publico en WordPress. El AEO prueba el motor publico + HubSpot destination + CORS + Turnstile + renderer `<greenhouse-form>` live con variante `diagnostic_premium`.
 
+## Presentacion editorial premium para briefs comerciales
+
+El brief de Influencer (`efeonce-creator-influence-brief`) es el primer consumer productivo de la composicion
+**Editorial Premium Brief**. El visitante ve una sola card editorial, jerarquia clara, iconos semanticos, selects
+accesibles, consentimiento legible y un submit azul coherente con Efeonce; la reunion permanece como alternativa
+separada. El contrato visual reusable vive en
+[GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md](../../ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md).
+
+La piel no duplica la logica: el host aporta chrome, marca y layout; Growth Forms conserva campos, valores,
+seleccion, validacion, consentimiento, Turnstile, destino y success. Si los iconos por opcion se reutilizan en otra
+landing, deben pasar al contrato browser-safe del renderer, no copiarse como CSS o JavaScript por etiqueta.
+
 ## Que NO hace (todavia)
 
-- En **produccion** el motor ya esta activo de forma acotada para AEO `/aeo-2/`; no generalizarlo a cualquier embed sin revisar flags, host surface, CORS, Turnstile y smoke.
+- En **produccion** el motor ya atiende AEO, Think e Influencer de forma acotada; no generalizarlo a cualquier embed sin revisar flags, host surface, CORS, Turnstile, destino y smoke.
 - El cockpit no es un drag-and-drop builder; authoring avanzado queda para un follow-up si patrones repetidos lo justifican.
 - El renderer esta live en AEO desde TASK-1298 y desde TASK-1294 emite `captchaToken` para Turnstile invisible cuando el render contract declara `security.captcha`. Para usarlo en otro sitio real productivo se requiere host surface autorizado, site key publico en el contract y smoke proporcional WordPress/dataLayer. No agrega flags nuevos (reusa `GROWTH_FORMS_PUBLIC_API_ENABLED`).
 

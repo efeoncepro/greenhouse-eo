@@ -13,8 +13,10 @@
 2. Lee problema, mecanismo, oferta, derechos y prueba.
 3. Elige `Agenda una reunión` o `Cuéntanos tu campaña`.
 4. Meeting abre surface gobernada; el brief hace scroll/focus al form inline.
-5. Submit produce success/error gobernado; reunión produce evento server-confirmed.
-6. Commercial recibe una oportunidad calificada; el sistema conserva fuente y consentimiento.
+5. En el brief, mercado y activacion abren comboboxes renderer-owned: un solo caret, teclado/ARIA, opcion marcada y
+   persistencia de bandera/icono tras elegir.
+6. Submit azul produce success/error gobernado; reunión produce evento server-confirmed.
+7. Commercial recibe una oportunidad calificada; el sistema conserva fuente y consentimiento.
 
 ## State and recovery
 
@@ -36,5 +38,6 @@
 
 ## GVC
 
-Capturar click de ambos CTAs, focus del form, error de submit, success card, meeting surface, FAQ y reduced motion en
-1440/390, sin scroll horizontal ni errores de consola.
+Capturar click de ambos CTAs, dock, focus del form, apertura/seleccion de ambos comboboxes, persistencia de iconos,
+error de submit, success card, meeting surface, FAQ y reduced motion en 1536/1440/1414/890/390, sin scroll horizontal
+ni errores de consola.

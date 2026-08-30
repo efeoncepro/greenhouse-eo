@@ -1,7 +1,7 @@
 # Public Site — Playbook de landings Ohio + Elementor
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-06-14 por Codex
 > **Dominio:** Public Site
 > **Inventario relacionado:** [Inventario Ohio + Elementor](../../documentation/public-site/wordpress-ohio-elementor-widget-inventory.md)
@@ -94,10 +94,22 @@ Usar este checklist para evitar parches de CSS cuando Elementor/Ohio ya tienen l
 | CTA | `ohio_button`, `ohio_call_to_action`, `ohio_banner` |
 | FAQ | `ohio_accordion`, `ohio_tabs` |
 | Pricing | `ohio_pricing_table`, `ohio_pricing_list` |
-| Formulario | `hubspot-form` para CRM; `ohio_contact_form` solo si el flujo es CF7 |
-| Agenda | `hubspot-meeting` |
+| Formulario | `greenhouse_growth_form` para captura gobernada; HubSpot puede ser destino invisible. `hubspot-form` sólo para superficies legacy explícitas. |
+| Agenda | Scheduler nativo de Growth Meetings; conservar `hubspot-meeting` sólo donde el registro lo marque legacy. |
 | Contenido dinamico | `ohio_recent_posts`, `ohio_recent_projects` |
 | Galeria/casos visuales | `ohio_gallery`, `ohio_compare`, `ohio_carousel` |
+
+### Pattern: Growth Form Editorial Premium Brief host
+
+Para briefs comerciales de alta intencion, reutiliza
+[Editorial Premium Brief](../../ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md). La receta combina el adapter
+`greenhouse_growth_form` y `diagnostic_premium` con una sola card editorial del host. Elementor puede aportar
+header, trust rail, layout y tokens de marca; no puede duplicar campos, valores, listbox, validacion, consentimiento,
+Turnstile, submit o destino. El primer consumer es `/servicios/agencia-de-influencers/`.
+
+Trátalo como candidato hasta que una segunda landing lo reutilice o vuelva a romperse por CSS. En ese momento,
+promueve el host a adapter/widget versionado y los iconos por opcion a metadata browser-safe del renderer; no
+copies observadores, selectores por label ni CSS page-scoped.
 
 ## Como editar sin hardcodear
 

@@ -170,6 +170,18 @@ Reglas de contrato:
   superior sea el elemento bajo el punto de prueba (`elementFromPoint`), que no haya overflow
   horizontal y que reduced-motion siga degradando honestamente.
 
+### Editorial Premium Brief host composition (TASK-1598)
+
+The Influencer brief establishes the approved **Editorial Premium Brief** public-site composition. Its canonical
+visual contract is [GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md](../ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md).
+It is not a new renderer variant: `diagnostic_premium` continues to own controls, values, listbox state, keyboard,
+ARIA, validation, submit, Turnstile and success. The host owns one exterior paper surface, editorial header, trust
+rail, responsive placement and surface-scoped semantic tokens.
+
+The market/activation pictograms on the first surface are page-scoped decoration. They must not be copied to a
+second landing through label matching, `MutationObserver` or parallel value state. Reuse is the graduation trigger
+for browser-safe semantic option metadata in the form/render contract and renderer.
+
 No responsabilidad de la capa:
 
 - identidad, version, fields, validacion, condiciones, copy, Turnstile, submit,

@@ -13,6 +13,7 @@
 - Wireframe: `docs/ui/wireframes/TASK-1598-landing-influencer-marketing-creators-ugc.md`
 - Flow: `docs/ui/flows/TASK-1598-landing-influencer-marketing-creators-ugc-flow.md`
 - Motion: `docs/ui/motion/TASK-1598-landing-influencer-marketing-creators-ugc-motion.md`
+- Form style: `docs/ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md`
 - Backend impact: `none` (reuso de Growth Forms, Growth CTA y Meetings)
 - Epic: `EPIC-019`
 - Domain: `public-site|growth|media-distribution`
@@ -267,9 +268,118 @@ repetir la auditoría completa desktop/tablet/mobile/reduced-motion.
 - `pnpm public-website:verify-influencer-seo-package` pasó contra producción; el gate de fidelidad volvió a pasar en
   1536/1440/890/390 y reduced motion después del resave Elementor. La página está publicada y elegible para indexación;
   no se afirma indexación efectiva sin Search Console.
-- Hash Elementor final: `580f4f604dd1e6ef911b397568fd9575f2117db01c6793d02dc98162bb4ac2f9`.
+- Hash Elementor posterior al hardening SEO, previo al refinamiento visual:
+  `580f4f604dd1e6ef911b397568fd9575f2117db01c6793d02dc98162bb4ac2f9`.
   Rollback: `_gh_backup_before_task1598_seo_20260829T024347Z`. Auditoría:
   `docs/audits/public-site/2026-08-29-influencer-landing-seo-aeo-readback.md`.
+
+## Visual refinement evidence · 2026-08-29
+
+- El benchmark live contra `/servicios/redes-sociales/` y `/servicios/desarrollo-web/` confirmó una dirección
+  editorial continua: se extendieron las superficies existentes y se rechazó sumar cards decorativas o un runtime
+  paralelo.
+- La banda bajo el hero organiza tres pruebas en un rail de confianza y normaliza cuatro marcas; en 760 px o menos se
+  apila con divisores. `#mecanismo` usa un fondo Midnight de cuatro capas con retícula y anillos de baja intensidad.
+- Los destinos de assets usan seis iconos monocromos: Instagram, dos TikTok, Meta, ecommerce y email. El campo de
+  activación reemplazó el sparkle por un megáfono; la ayuda y el contador del objetivo quedan en la misma fila, 8 px
+  bajo el textarea.
+- Hash Elementor final: `1263574659f2d9cec139d3c8d11cf15a78bf8023b8894589ac1356395b1f6c57`. Rollback:
+  `_gh_backup_before_task1598_visual_refinement_20260829T105059Z`.
+- El gate live extendido pasó en 1536/1440/890/390 y reduced motion, incluyendo geometría responsive del rail, cuatro
+  capas del mecanismo, set exacto de iconos, ausencia de discos, icono semántico y proximidad del contador. Capturas:
+  `.captures/task1598-influencer-fidelity-2026-08-29T11-00-28-401Z/`. El gate SEO/AEO volvió a pasar sin drift de
+  metadata, schema, menú o sitemap. No se creó lead ni reserva.
+
+## Sticky conversion dock · 2026-08-29
+
+- El CTA fijo dejó de ser una franja azul de ancho completo: es un dock Midnight contenido de máximo 1120 px, con
+  borde, acento superior, sombra controlada, safe-area y radio 22/18 px. En móvil reduce el chrome para conservar
+  área útil sin perder targets de 48 px.
+- Se mantiene una sola acción sólida: `Agenda una reunión` conserva fill verde. `Cuéntanos tu campaña` es secundaria,
+  transparente con contorno blanco e icono `arrow-up-right`; no se reintrodujeron círculos detrás de iconos.
+- Hash Elementor final: `f89834a27c2727e4a680b5c50241b2b43baed5e6b0bc66d33b61eb09eda40df2`. Rollback inmediato:
+  `_gh_backup_before_task1598_sticky_dock_20260829T110607Z`.
+- Fidelidad live verde en 1536/1440/890/390 y reduced motion, incluida geometría del dock, clipping, safe-area,
+  contraste de jerarquía, icono, form, scheduler, FAQ y overflow. Capturas:
+  `.captures/task1598-influencer-fidelity-2026-08-29T11-08-21-257Z/`. SEO/AEO continuó verde; no se envió brief ni
+  se creó reserva.
+
+## Premium semantic selects · 2026-08-29
+
+- El Growth Form publicó v2 `fver-9c4f447b-a233-46db-b3f3-42c6fce5f9d2` con
+  `style_variant=diagnostic_premium`; v1 `fver-a0325d8e-c2c9-479c-9c25-b1c89d47186e` quedó deprecada. El helper
+  idempotente `growth:forms:activate-influencer-premium-selects` clonó y preservó campos, copy, validación,
+  Turnstile, consentimiento, políticas y un destino.
+- Los dos selects usan el combobox/listbox accesible del renderer. El host no duplica estado ni selección: sólo
+  aporta 11 marcas semánticas page-scoped —CL/CO/MX/PE, región/ubicación y creator/UGC/partnership/pauta/estrategia—.
+- El gate abre ambos listbox en 1536/1440/890/390, exige 6+5 opciones, `aria-expanded`, overlay, teclado, targets
+  ≥46 px, texto oscuro seleccionado, marcas visibles y ausencia de overflow. Capturas:
+  `.captures/task1598-influencer-fidelity-2026-08-29T11-19-13-501Z/`.
+- Hash Elementor final: `f4ff2abf522d7cf1ff1c787f805ae4e11793a4d6527aeed4bf89b51bbfa56ebc`. Rollback visual:
+  `_gh_backup_before_task1598_premium_select_icons_20260829T111651Z` y
+  `_gh_backup_before_task1598_premium_submit_width_20260829T111903Z`; rollback del contrato: republicar v1 y
+  deprecar v2. SEO/AEO pasó sin drift; no se creó lead ni reserva.
+
+## Shared social trust marquee · 2026-08-29
+
+- El rail estático de cuatro logos se retiró del HTML page-scoped. Las tres señales de operación regional se
+  preservaron y, como sibling Elementor independiente, se reutilizó el widget canónico `greenhouse_social_trust`
+  desde la landing `/servicios/redes-sociales/`; no se copió su markup ni se creó otro primitive.
+- El módulo sirve `logoMarquee.v2`, label `Marcas que confían`, nombre accesible `Marcas que confían en Efeonce` y
+  tres sets equivalentes de siete marcas monocromáticas. El shell reutiliza `gh-im-elementor-shell` para no heredar
+  padding/overflow del contenedor Elementor.
+- Hash Elementor final: `f8181a2f7dbdd28a462d30874f21d234592e95dc32de07bb41b9c1f677b88c5a`. Rollback:
+  `_gh_backup_before_task1598_social_trust_marquee_20260829T112706Z` y
+  `_gh_backup_before_task1598_social_trust_shell_20260829T112922Z`.
+- Fidelidad live verde en 1536/1440/890/390 y reduced motion; el gate exige un solo módulo, 3×7 logos equivalentes,
+  label/schema/nombre accesible, monocromía y cero overflow. Capturas:
+  `.captures/task1598-influencer-fidelity-2026-08-29T11-29-33-710Z/`. SEO/AEO continuó verde; no se envió brief ni
+  se creó reserva.
+
+## Typography, rights and responsive closure · 2026-08-29
+
+- La divulgación IA posterior al FAQ dejó de heredar el máximo de 1240 px: usa fondo full-bleed con contenido
+  alineado a la retícula. El gate prueba sus bordes exactos y ausencia de overflow en 1536/1440/1414/890/390.
+- El header del brief reemplazó sparkle por documento. Su jerarquía canónica es overline Geist 600/12 px, título
+  Poppins 700/1.2, explicación y trust Geist 400, labels/submit Geist 600, ayudas/contador Geist 400 e inputs ≥16 px;
+  se retiró el peso no canónico 650.
+- `#firma` conserva ventanas `12 meses`, `90 días` y `6 meses`, pero elimina fechas futuras artificiales. Las acompaña
+  con condiciones estables y verificables en la propia narrativa: `Publicación del creator`, `Pauta autorizada` y
+  `Canales de la marca`. Kicker y chips usan superficie blanca al 8% sobre Midnight; el verde queda sólo en el icono.
+- `ofertas-brief` adopta el lenguaje secundario del dock sobre blanco: superficie blanca, contorno navy, sombra leve
+  e icono `arrow-up-right`; no compite con la reunión primaria.
+- Hash Elementor final: `64a567e36e212e19d0f447c2de8ab40fabcfcdfcb5c98b42dffd5e39058701f2`. Rollback:
+  `_gh_backup_before_task1598_typography_rights_20260829T113812Z`. Fidelidad live y SEO/AEO verdes; capturas:
+  `.captures/task1598-influencer-fidelity-2026-08-29T11-40-22-681Z/`. No se envió brief ni se creó reserva.
+
+## Premium select icon cleanup · 2026-08-29
+
+- Se eliminó el pseudo-elemento del host que dibujaba un segundo caret sobre cada combobox. El trigger conserva
+  únicamente `.ghf-select-icon`, propiedad del renderer, y el padding lo alinea a 19 px del borde sin rail inset.
+- Las 11 marcas de mercado/activación preservan su semántica, pero sustituyen el bloque azul sólido por una
+  superficie tonal al 10% con pictograma navy. Campos, opciones, validación, teclado, Turnstile y telemetría no
+  cambiaron.
+- El gate ahora exige dos triggers con exactamente un caret, ausencia de `ghf-field::after`, posición al borde y
+  fondos de opción no sólidos. Pasó live en 1536/1440/1414/890/390 y reduced motion; capturas:
+  `.captures/task1598-influencer-fidelity-2026-08-29T12-06-14-474Z/`.
+- Hash Elementor final: `a30c289549da86dd02f50d8b2232a908235bed7092d3a0375389a4c1a1307634`. Rollback:
+  `_gh_backup_before_task1598_select_icon_cleanup_20260829T122700Z`. No se envió brief ni se creó reserva.
+
+## Submit palette + country flags · 2026-08-29
+
+- El submit del Growth Form deja el teal heredado por el renderer y usa el azul Efeonce `primary` con texto blanco,
+  borde `primary-dark`, hover/focus/disabled coherentes y ancho completo. Se conserva como acción del brief, sin
+  competir con el CTA de reunión verde de la landing.
+- Chile, Colombia, México y Perú sustituyen siglas por SVG circulares de `circle-flags`; las banderas aparecen en
+  las opciones y persisten junto al valor seleccionado. Su centrado vertical es explícito, usan outline nítido sin
+  sombra difusa y tamaños ópticos de 28 px en lista y 26 px en el trigger. Regional y Otro mercado mantienen
+  globo/ubicación.
+- El gate fija color/contraste del submit, las cuatro banderas, persistencia del valor, un caret, teclado/ARIA y
+  overflow en 1536/1440/1414/890/390 y reduced motion. Evidencia:
+  `.captures/task1598-influencer-fidelity-2026-08-29T12-26-32-586Z/`.
+- Hash Elementor final: `353bac5d3d7491cb77f337296e5ab0bace14a18e99055d449ea25134217e52a5`. Rollback inmediato:
+  `_gh_backup_before_task1598_flag_optical_refine_20260829T132000Z`; snapshot anterior:
+  `_gh_backup_before_task1598_submit_market_flags_20260829T125000Z`. No se envió brief ni se creó reserva.
 
 ## Out of scope
 

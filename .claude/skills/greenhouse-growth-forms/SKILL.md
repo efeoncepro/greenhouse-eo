@@ -275,6 +275,15 @@ CTA motion and field-level copy in the contract.
 - AEO is live on this premium renderer. Do not restore the temporary bridge unless explicitly
   rolling back from the Elementor backup.
 
+### Editorial Premium Brief host composition (TASK-1598)
+
+For high-intent public campaign briefs, the approved reference combines the governed
+`diagnostic_premium` renderer with an editorial host card. Read
+`references/EDITORIAL_PREMIUM_BRIEF_STYLE.md` before reproducing the treatment. It defines the
+renderer/host boundary, hierarchy, semantic icons, country flags, responsive behavior and live
+evidence requirements. This is a host composition recipe, not a new form `styleVariant`: never copy
+its page-scoped CSS as form behavior or create a parallel select/value store.
+
 ---
 
 ## Success Card (thank-you card) + AEO grader-on-submit → **companion**
@@ -521,6 +530,7 @@ pnpm release:watchdog --json                                      # worker GIT_S
 ## Reference docs
 
 - **Companion — Success Card + AEO grader-on-submit: `references/SUCCESS_CARD_AND_GRADER_ON_SUBMIT.md`**
+- **Editorial Premium Brief host recipe: `references/EDITORIAL_PREMIUM_BRIEF_STYLE.md`**
 - Architecture: `docs/architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md`
 - Runtime contract: `docs/architecture/growth-public-forms-runtime-contract.md`
 - Functional: `docs/documentation/growth/motor-formularios-publicos.md`

@@ -1,7 +1,7 @@
 # Incrustar un formulario de Growth en un sitio (WordPress / Astro)
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.5 — 2026-07-07 (Codex, SEO Growth Form overlay/sticky learnings)
+> **Version:** 1.6 — 2026-08-29 (Codex, TASK-1598 Editorial Premium Brief)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Arquitectura:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md) §19 + §Delta TASK-1231
 
@@ -27,7 +27,8 @@ consentimiento y destino del lead viven en Greenhouse.
 > `form-key` desde TASK-1298. El cutover fue gobernado con backup Elementor,
 > `Document::save()`, Kinsta purge, `heroans` guard y `pnpm public-website:verify-aeo-live-contract`.
 > La variante visual `diagnostic_premium` es reusable para otros formularios que necesiten
-> el mismo nivel de pulido (dropdowns premium, CTA teal, focus/ARIA y microcopy de diagnostico);
+> el mismo nivel de pulido (dropdowns premium, focus/ARIA y microcopy gobernado). El CTA consume el color
+> primario semantico de cada superficie; no es teal por definicion. En Influencer es Core Blue.
 > AEO solo agrega guards extra por ser una landing publica critica.
 
 ## Vista previa interna (antes de tocar un sitio)
@@ -82,6 +83,24 @@ Esta capa existe para que Ohio no vuelva a imponer estilos globales de
 `input/select/button` sobre el renderer. No mueve logica a WordPress: no define campos,
 validacion, destinos, mapping HubSpot, Turnstile ni microcopy contractual. El renderer y
 el render contract siguen siendo la fuente de verdad.
+
+### Aplicar Editorial Premium Brief
+
+Para un brief comercial de alta intencion, usa la composicion
+[Editorial Premium Brief](../../ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md):
+
+1. Incrusta con `appearance="bare"`, `color-scheme="light"`, `form-key` y `surface` estables.
+2. Usa una sola card exterior; no anides otra card alrededor del renderer.
+3. Reserva Poppins 700 para el titulo editorial y Geist 600/400 para la interfaz y lectura.
+4. Mapea el submit al primary de la superficie; Influencer usa azul, no teal.
+5. Deja caret, valor seleccionado, listbox, teclado, ARIA y validacion en el renderer.
+6. Usa iconos lineales semanticos sin discos. Las banderas requieren SVG crisp, centrado optico y alternativa de
+   texto; nunca comuniques el mercado solo por bandera.
+7. Verifica desktop, 390 px, dropdown abierto, focus/error, reduced motion, cero overflow y que un submit vacio no
+   haga POST ni cree lead.
+
+No copies decoradores page-scoped, observadores o selectores por label desde otra landing. Si iconos por opcion se
+repiten, promuevelos a metadata browser-safe del contrato y al renderer.
 
 Regla operativa:
 

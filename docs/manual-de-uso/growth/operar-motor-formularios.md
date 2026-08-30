@@ -1,7 +1,7 @@
 # Operar el Motor de Formularios de Growth
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.4 — 2026-08-10 (Claude, TASK-1388 — Growth vive como seccion del dominio Comercial)
+> **Version:** 1.5 — 2026-08-29 (Codex, TASK-1598 premium selects)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Estado de flags (SoT humano):** [docs/operations/FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md)
 
@@ -32,7 +32,11 @@ El motor depende de tres flags independientes. Para que funcione punta a punta l
 
 **Verdad live:** `vercel env ls` (flag Vercel) + `gcloud run services describe ops-worker --region=us-east4` (flags worker). El ledger es el estado humano, no la verdad.
 
-**Estado actual:** staging (`develop`) = los 3 ON (2026-06-25). Produccion = ON de forma acotada para `efeonce-aeo-diagnostic` en `/aeo-2/`; AEO v8 (`fver-38d38bbc-6a32-4e2c-bbd7-c0f0fc728c63`) publica `style_variant=diagnostic_premium`, `security.captcha`, CTA/copy de referencia, campo visible `Nombre completo` con `namePolicy.split_full_name`, y se embebe en WordPress por `form-key=b120566a-dd1a-43c8-956a-4e0121e805b8`.
+**Estado documentado:** staging (`develop`) = los 3 ON (2026-06-25). En produccion, el public API/renderer atiende
+AEO, Think e Influencer; la entrega efectiva depende de flags y destinos por form. AEO v16
+(`fver-bfc40c59-8d95-4d38-8ae5-0da7dc4ab468`) publica `style_variant=diagnostic_premium`,
+`security.captcha`, CTA/copy de referencia, `Nombre completo` con `namePolicy.split_full_name`, y se embebe por
+`form-key=b120566a-dd1a-43c8-956a-4e0121e805b8`. Antes de operar, relee flags live; este párrafo no los sustituye.
 
 ## Prender en un environment
 
@@ -96,6 +100,23 @@ muestra slug/form_id/surface antes de mutar, preserva fields/validación/Turnsti
 dry-run por defecto. Ejemplo (AEO): `scripts/growth/activate-aeo-render-copy-contract.ts` —
 `npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/activate-aeo-render-copy-contract.ts`
 (dry-run) y `--apply` para publicar. El `form_key` real de un form: `SELECT slug, form_key FROM greenhouse_growth.form_definition`.
+
+## Activar variante premium del brief de Influencer
+
+El helper acotado resuelve la version por el slug estable `efeonce-creator-influence-brief`, verifica e imprime el
+`form_key` esperado antes de aplicar, clona la version publicada y preserva fields, validacion,
+Turnstile, consentimiento, policies y destinos. Dry-run es el default:
+
+```bash
+pnpm growth:forms:activate-influencer-premium-selects
+pnpm growth:forms:activate-influencer-premium-selects -- --apply
+```
+
+El resultado esperado es `style_variant=diagnostic_premium` para `market` y `activationType`. El comando no
+aplica la piel WordPress **Editorial Premium Brief**: esa composicion se opera en el host y está documentada en
+[GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md](../../ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md).
+Para rollback, vuelve a publicar v1 y depreca v2; no edites una version publicada en sitio. Despues del cambio,
+verifica render contract, desktop/390, ambos dropdowns, teclado/ARIA, Turnstile fail-closed y cero submission vacia.
 
 ## Activar variante premium AEO
 

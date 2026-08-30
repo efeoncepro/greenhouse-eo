@@ -60,8 +60,32 @@ const inspectBaseContract = async (page: Page) =>
     const premiumConsent = growthForm?.querySelector('.ghf-field:has([data-ghf-consent])') as HTMLElement | null
     const premiumSelect = growthForm?.querySelector('.ghf-select') as HTMLElement | null
     const premiumSelectField = premiumSelect?.closest('.ghf-field') as HTMLElement | null
+    const premiumComboboxes = Array.from(growthForm?.querySelectorAll('[role="combobox"].ghf-select-trigger') ?? [])
     const privacyLink = growthForm?.querySelector('a[href*="politica-de-privacidad"]') as HTMLAnchorElement | null
     const meetingCta = document.querySelector('greenhouse-cta') as HTMLElement | null
+    const trustFacts = document.querySelector('.gh-im-trust-facts') as HTMLElement | null
+    const socialTrust = document.querySelector('[data-gh-social-module="trust"]') as HTMLElement | null
+    const socialTrustMarquee = socialTrust?.querySelector('.gh-logo-marquee') as HTMLElement | null
+    const socialTrustSets = Array.from(socialTrust?.querySelectorAll('.gh-logo-marquee-set') ?? [])
+    const mechanism = document.querySelector('#mecanismo') as HTMLElement | null
+    const channelIcons = Array.from(document.querySelectorAll('.gh-im-channel i')) as HTMLElement[]
+    const activationField = growthForm?.querySelector('.ghf-field:has([name="activationType"])') as HTMLElement | null
+    const activationLabel = activationField?.querySelector('.ghf-label') as HTMLElement | null
+    const objectiveField = growthForm?.querySelector('.ghf-field:has([name="objective"])') as HTMLElement | null
+    const objectiveTextarea = objectiveField?.querySelector('.ghf-textarea') as HTMLElement | null
+    const objectiveHelp = objectiveField?.querySelector('.ghf-help') as HTMLElement | null
+    const objectiveCounter = objectiveField?.querySelector('.ghf-counter') as HTMLElement | null
+    const disclosure = document.querySelector('.gh-im-proof-note') as HTMLElement | null
+    const formHeadIcon = premiumFormCard?.querySelector('.gh-im-form-head__icon') as HTMLElement | null
+    const formHeadLabel = premiumFormCard?.querySelector('.gh-im-form-head .gh-im-card-label') as HTMLElement | null
+    const formHeadTitle = premiumFormCard?.querySelector('.gh-im-form-head h3') as HTMLElement | null
+    const formHeadBody = premiumFormCard?.querySelector('.gh-im-form-head p') as HTMLElement | null
+    const formTrust = premiumFormCard?.querySelector('.gh-im-form-trust') as HTMLElement | null
+    const formHelp = growthForm?.querySelector('.ghf-help') as HTMLElement | null
+    const rightsKicker = document.querySelector('.gh-im-rights-kicker') as HTMLElement | null
+    const rightsDurations = Array.from(document.querySelectorAll('.gh-im-rights-duration')) as HTMLElement[]
+    const rightsContexts = Array.from(document.querySelectorAll('.gh-im-rights-context')) as HTMLElement[]
+    const offersBrief = document.querySelector('[data-gh-cta="ofertas-brief"]') as HTMLElement | null
 
     return {
       hero: hero
@@ -177,11 +201,28 @@ const inspectBaseContract = async (page: Page) =>
         inputBackground: premiumInput ? getComputedStyle(premiumInput).backgroundColor : null,
         submitHeight: premiumSubmit?.getBoundingClientRect().height ?? 0,
         submitWidth: premiumSubmit?.getBoundingClientRect().width ?? 0,
+        submitBackground: premiumSubmit ? getComputedStyle(premiumSubmit).backgroundColor : null,
+        submitColor: premiumSubmit ? getComputedStyle(premiumSubmit).color : null,
+        submitBorderColor: premiumSubmit ? getComputedStyle(premiumSubmit).borderColor : null,
         formWidth: growthForm?.getBoundingClientRect().width ?? 0,
         consentBackground: premiumConsent ? getComputedStyle(premiumConsent).backgroundColor : null,
         labelIcon: premiumLabel ? getComputedStyle(premiumLabel, '::before').backgroundImage : 'none',
         selectAppearance: premiumSelect ? getComputedStyle(premiumSelect).appearance : null,
         selectIndicator: premiumSelectField ? getComputedStyle(premiumSelectField, '::after').content : 'none',
+        selectCarets: premiumComboboxes.map(combobox => {
+          const trigger = combobox as HTMLElement
+          const icon = trigger.querySelector(':scope > .ghf-select-icon') as HTMLElement | null
+
+          return {
+            count: trigger.querySelectorAll(':scope > .ghf-select-icon').length,
+            rightGap: icon
+              ? Math.round(trigger.getBoundingClientRect().right - icon.getBoundingClientRect().right)
+              : null
+          }
+        }),
+        styleVariant: growthForm?.querySelector('.ghf-root')?.getAttribute('data-ghf-style-variant') ?? null,
+        comboboxes: premiumComboboxes.length,
+        nativeSelects: growthForm?.querySelectorAll('select.ghf-select').length ?? 0,
         privacyText: privacyLink?.textContent?.trim() ?? null
       },
       meetingCta: {
@@ -190,6 +231,104 @@ const inspectBaseContract = async (page: Page) =>
         slug: meetingCta?.getAttribute('cta') ?? null,
         surface: meetingCta?.getAttribute('surface') ?? null,
         action: meetingCta?.querySelector('.ghc-primary')?.textContent?.trim() ?? null
+      },
+      refinement: {
+        disclosure: disclosure
+          ? {
+              left: disclosure.getBoundingClientRect().left,
+              right: disclosure.getBoundingClientRect().right,
+              width: disclosure.getBoundingClientRect().width,
+              background: getComputedStyle(disclosure).backgroundColor
+            }
+          : null,
+        formTypography: {
+          iconClass: formHeadIcon?.className ?? null,
+          iconBackground: formHeadIcon ? getComputedStyle(formHeadIcon).backgroundColor : null,
+          overline: formHeadLabel
+            ? {
+                family: getComputedStyle(formHeadLabel).fontFamily,
+                size: Number.parseFloat(getComputedStyle(formHeadLabel).fontSize),
+                weight: Number(getComputedStyle(formHeadLabel).fontWeight),
+                lineHeight: Number.parseFloat(getComputedStyle(formHeadLabel).lineHeight)
+              }
+            : null,
+          title: formHeadTitle
+            ? {
+                family: getComputedStyle(formHeadTitle).fontFamily,
+                size: Number.parseFloat(getComputedStyle(formHeadTitle).fontSize),
+                weight: Number(getComputedStyle(formHeadTitle).fontWeight),
+                lineHeight: Number.parseFloat(getComputedStyle(formHeadTitle).lineHeight)
+              }
+            : null,
+          body: formHeadBody
+            ? {
+                family: getComputedStyle(formHeadBody).fontFamily,
+                size: Number.parseFloat(getComputedStyle(formHeadBody).fontSize),
+                weight: Number(getComputedStyle(formHeadBody).fontWeight),
+                lineHeight: Number.parseFloat(getComputedStyle(formHeadBody).lineHeight)
+              }
+            : null,
+          trust: formTrust
+            ? {
+                family: getComputedStyle(formTrust).fontFamily,
+                size: Number.parseFloat(getComputedStyle(formTrust).fontSize),
+                weight: Number(getComputedStyle(formTrust).fontWeight),
+                lineHeight: Number.parseFloat(getComputedStyle(formTrust).lineHeight)
+              }
+            : null,
+          labelWeight: premiumLabel ? Number(getComputedStyle(premiumLabel).fontWeight) : null,
+          helpWeight: formHelp ? Number(getComputedStyle(formHelp).fontWeight) : null,
+          submitWeight: premiumSubmit ? Number(getComputedStyle(premiumSubmit).fontWeight) : null
+        },
+        rightsSemantics: {
+          kickerText: rightsKicker?.textContent?.trim() ?? null,
+          kickerBackground: rightsKicker ? getComputedStyle(rightsKicker).backgroundColor : null,
+          durationTexts: rightsDurations.map(node => node.textContent?.trim()),
+          durationBackgrounds: rightsDurations.map(node => getComputedStyle(node).backgroundColor),
+          contextTexts: rightsContexts.map(node => node.textContent?.trim()),
+          contextBackgrounds: rightsContexts.map(node => getComputedStyle(node).backgroundColor),
+          expiringCopy: document.body.textContent?.match(/vence\s+\d{1,2}\s+[a-z]{3}\s+20\d{2}/gi) ?? []
+        },
+        offersBrief: offersBrief
+          ? {
+              iconClass: offersBrief.querySelector('i')?.className ?? null,
+              background: getComputedStyle(offersBrief).backgroundColor,
+              borderWidth: getComputedStyle(offersBrief).borderWidth,
+              color: getComputedStyle(offersBrief).color
+            }
+          : null,
+        trustFacts: trustFacts?.children.length ?? 0,
+        trustColumns: trustFacts ? getComputedStyle(trustFacts).gridTemplateColumns.split(' ').length : 0,
+        socialTrust: {
+          modules: document.querySelectorAll('[data-gh-social-module="trust"]').length,
+          label: socialTrust?.querySelector('.ghs-trust-label')?.textContent?.trim() ?? null,
+          ariaLabel: socialTrustMarquee?.getAttribute('aria-label') ?? null,
+          schema: socialTrustMarquee?.dataset.ghSchema ?? null,
+          sets: socialTrustSets.length,
+          logosPerSet: socialTrustSets.map(set => set.querySelectorAll('img').length),
+          monochrome: socialTrustSets.length
+            ? Array.from(socialTrustSets[0].querySelectorAll('img')).every(
+                logo => getComputedStyle(logo).filter !== 'none'
+              )
+            : false
+        },
+        mechanismLayers: mechanism ? getComputedStyle(mechanism).backgroundImage.split('gradient(').length - 1 : 0,
+        mechanismColor: mechanism ? getComputedStyle(mechanism).backgroundColor : null,
+        channelIcons: channelIcons.map(icon => ({
+          className: icon.className,
+          background: getComputedStyle(icon).backgroundColor,
+          width: icon.getBoundingClientRect().width,
+          height: icon.getBoundingClientRect().height
+        })),
+        activationIcon: activationLabel ? getComputedStyle(activationLabel, '::before').backgroundImage : 'none',
+        objective: {
+          textareaBottom: objectiveTextarea?.getBoundingClientRect().bottom ?? null,
+          helpTop: objectiveHelp?.getBoundingClientRect().top ?? null,
+          counterTop: objectiveCounter?.getBoundingClientRect().top ?? null,
+          counterRight: objectiveCounter?.getBoundingClientRect().right ?? null,
+          fieldRight: objectiveField?.getBoundingClientRect().right ?? null,
+          counterBackground: objectiveCounter ? getComputedStyle(objectiveCounter).backgroundColor : null
+        }
       },
       unresolved:
         document.documentElement.innerHTML.includes('{{') || Boolean(document.querySelector('x-import,sc-if')),
@@ -284,10 +423,17 @@ const verifyCommon = (contract: Awaited<ReturnType<typeof inspectBaseContract>>,
       contract.premiumForm.inputBackground === 'rgb(245, 247, 248)' &&
       contract.premiumForm.submitHeight >= 56 &&
       contract.premiumForm.submitWidth >= contract.premiumForm.formWidth - 2 &&
+      contract.premiumForm.submitBackground === 'rgb(3, 117, 219)' &&
+      contract.premiumForm.submitColor === 'rgb(255, 255, 255)' &&
+      contract.premiumForm.submitBorderColor === 'rgb(0, 88, 168)' &&
       contract.premiumForm.consentBackground === 'rgb(245, 247, 248)' &&
       contract.premiumForm.labelIcon !== 'none' &&
-      contract.premiumForm.selectAppearance === 'none' &&
-      contract.premiumForm.selectIndicator !== 'none' &&
+      contract.premiumForm.selectIndicator === 'none' &&
+      contract.premiumForm.selectCarets.length === 2 &&
+      contract.premiumForm.selectCarets.every(caret => caret.count === 1 && caret.rightGap !== null && caret.rightGap <= 20) &&
+      contract.premiumForm.styleVariant === 'diagnostic_premium' &&
+      contract.premiumForm.comboboxes === 2 &&
+      contract.premiumForm.nativeSelects === 0 &&
       contract.premiumForm.privacyText === 'Consulta nuestra Política de privacidad',
     `${width}px: premium Growth Form visual contract failed ${JSON.stringify(contract.premiumForm)}`
   )
@@ -304,8 +450,114 @@ const verifyCommon = (contract: Awaited<ReturnType<typeof inspectBaseContract>>,
     `${width}px: horizontal overflow (${contract.widths.client}/${contract.widths.scroll})`
   )
   assert(contract.proofVideos === 3, `${width}px: expected three proof videos`)
+  assert(contract.refinement.trustFacts === 3, `${width}px: confidence rail must contain three proof groups`)
+  assert(
+    contract.refinement.disclosure &&
+      Math.abs(contract.refinement.disclosure.left) <= 1 &&
+      Math.abs(contract.refinement.disclosure.right - width) <= 1 &&
+      Math.abs(contract.refinement.disclosure.width - width) <= 1 &&
+      contract.refinement.disclosure.background === 'rgb(0, 64, 112)',
+    `${width}px: disclosure strip is not a continuous full-bleed band ${JSON.stringify(contract.refinement.disclosure)}`
+  )
+  const formTypography = contract.refinement.formTypography
+
+  assert(
+    formTypography.iconClass?.includes('ti-clipboard-text') &&
+      !formTypography.iconClass.includes('ti-sparkles') &&
+      formTypography.iconBackground !== 'rgba(0, 0, 0, 0)' &&
+      formTypography.overline?.family.includes('Geist') &&
+      formTypography.overline.size === 12 &&
+      formTypography.overline.weight === 600 &&
+      formTypography.title?.family.includes('Poppins') &&
+      formTypography.title.weight === 700 &&
+      formTypography.title.lineHeight / formTypography.title.size >= 1.19 &&
+      formTypography.body?.family.includes('Geist') &&
+      formTypography.body.weight === 400 &&
+      formTypography.body.lineHeight / formTypography.body.size >= 1.5 &&
+      formTypography.trust?.family.includes('Geist') &&
+      formTypography.trust.weight === 400 &&
+      formTypography.labelWeight === 600 &&
+      formTypography.helpWeight === 400 &&
+      formTypography.submitWeight === 600,
+    `${width}px: form typography hierarchy is not canonical ${JSON.stringify(formTypography)}`
+  )
+  const rightsSemantics = contract.refinement.rightsSemantics
+
+  assert(
+    rightsSemantics.kickerText === 'Derechos trazables' &&
+      rightsSemantics.kickerBackground === 'rgba(255, 255, 255, 0.08)' &&
+      rightsSemantics.durationTexts.join('|') === '12 meses|90 días|6 meses' &&
+      rightsSemantics.contextTexts.join('|') ===
+        'Publicación del creator|Pauta autorizada|Canales de la marca' &&
+      rightsSemantics.durationBackgrounds.every(background => background === 'rgba(255, 255, 255, 0.08)') &&
+      rightsSemantics.contextBackgrounds.every(background => background === 'rgba(255, 255, 255, 0.08)') &&
+      rightsSemantics.expiringCopy.length === 0,
+    `${width}px: rights chips lost stable semantic copy or tonal treatment ${JSON.stringify(rightsSemantics)}`
+  )
+  assert(
+    contract.refinement.offersBrief?.iconClass?.includes('ti-arrow-up-right') &&
+      contract.refinement.offersBrief.background === 'rgb(255, 255, 255)' &&
+      contract.refinement.offersBrief.borderWidth !== '0px' &&
+      contract.refinement.offersBrief.color === 'rgb(0, 64, 112)',
+    `${width}px: offers brief CTA lost its outlined secondary hierarchy ${JSON.stringify(contract.refinement.offersBrief)}`
+  )
+  assert(
+    contract.refinement.socialTrust.modules === 1 &&
+      contract.refinement.socialTrust.label === 'Marcas que confían' &&
+      contract.refinement.socialTrust.ariaLabel === 'Marcas que confían en Efeonce' &&
+      contract.refinement.socialTrust.schema === 'logoMarquee.v2' &&
+      contract.refinement.socialTrust.sets >= 2 &&
+      contract.refinement.socialTrust.logosPerSet.length === contract.refinement.socialTrust.sets &&
+      contract.refinement.socialTrust.logosPerSet.every(
+        count => count === contract.refinement.socialTrust.logosPerSet[0] && count >= 7
+      ) &&
+      contract.refinement.socialTrust.monochrome,
+    `${width}px: canonical social trust marquee contract failed ${JSON.stringify(contract.refinement.socialTrust)}`
+  )
+  assert(
+    contract.refinement.mechanismLayers >= 4 && contract.refinement.mechanismColor !== 'rgba(0, 0, 0, 0)',
+    `${width}px: mechanism section lost its layered navy visual plane ${JSON.stringify({ layers: contract.refinement.mechanismLayers, color: contract.refinement.mechanismColor })}`
+  )
+  const channelIconClasses = contract.refinement.channelIcons.map(icon => icon.className).join(' ')
+
+  assert(
+    contract.refinement.channelIcons.length === 6 &&
+      channelIconClasses.includes('ti-brand-instagram') &&
+      channelIconClasses.match(/ti-brand-tiktok/g)?.length === 2 &&
+      channelIconClasses.includes('ti-brand-meta') &&
+      channelIconClasses.includes('ti-shopping-bag') &&
+      channelIconClasses.includes('ti-mail'),
+    `${width}px: semantic channel icon set is incomplete`
+  )
+  assert(
+    contract.refinement.channelIcons.every(
+      icon => icon.background === 'rgba(0, 0, 0, 0)' && icon.width <= 20 && icon.height <= 20
+    ),
+    `${width}px: channel icons must remain compact and monochrome without discs`
+  )
+  assert(
+    contract.refinement.activationIcon.includes('M18 8a3 3 0 0 1 0 6') &&
+      !contract.refinement.activationIcon.includes('M12 3l1.2'),
+    `${width}px: activation field must use the semantic campaign icon ${contract.refinement.activationIcon}`
+  )
+  const objective = contract.refinement.objective
+
+  assert(
+    objective.textareaBottom !== null &&
+      objective.helpTop !== null &&
+      objective.counterTop !== null &&
+      objective.counterRight !== null &&
+      objective.fieldRight !== null &&
+      objective.helpTop - objective.textareaBottom >= 0 &&
+      objective.helpTop - objective.textareaBottom <= 16 &&
+      Math.abs(objective.counterTop - objective.helpTop) <= 4 &&
+      objective.fieldRight - objective.counterRight <= 1 &&
+      objective.counterBackground !== 'rgba(0, 0, 0, 0)',
+    `${width}px: objective helper and counter lost their textarea proximity ${JSON.stringify(objective)}`
+  )
 
   if (width > 760) {
+    assert(contract.refinement.trustColumns === 3, `${width}px: confidence rail must use three editorial columns`)
     assert(contract.conversion.introPosition === 'sticky', `${width}px: conversion intro is not sticky`)
     assert(
       contract.conversion.introLeft !== null &&
@@ -314,6 +566,7 @@ const verifyCommon = (contract: Awaited<ReturnType<typeof inspectBaseContract>>,
       `${width}px: conversion columns collapsed unexpectedly`
     )
   } else {
+    assert(contract.refinement.trustColumns === 1, `${width}px: confidence rail must stack on mobile`)
     assert(contract.conversion.introPosition === 'static', `${width}px: mobile conversion intro must not be sticky`)
     assert(
       contract.conversion.introTop !== null &&
@@ -413,11 +666,81 @@ const verifyInteractions = async (page: Page, width: number) => {
   assert(offerState.hint?.includes('UGC content'), `${width}px: selected-offer hint did not update`)
 
   await page.evaluate(() => window.scrollTo(0, 900))
-  await page.waitForTimeout(350)
+  await page.waitForTimeout(650)
   assert(
     (await page.locator('#sticky-cta').getAttribute('data-visible')) === 'true',
     `${width}px: sticky CTA did not appear`
   )
+
+  const dockContract = await page.locator('#sticky-cta').evaluate(node => {
+    const dock = node as HTMLElement
+    const rect = dock.getBoundingClientRect()
+    const copy = dock.querySelector('.gh-im-sticky__copy') as HTMLElement | null
+    const primary = dock.querySelector('[data-gh-cta="sticky-meeting"]') as HTMLElement | null
+    const secondary = dock.querySelector('[data-gh-cta="sticky-brief"]') as HTMLElement | null
+    const icon = secondary?.querySelector('.ti-arrow-up-right') as HTMLElement | null
+    const style = getComputedStyle(dock)
+    const primaryStyle = primary ? getComputedStyle(primary) : null
+    const secondaryStyle = secondary ? getComputedStyle(secondary) : null
+
+    return {
+      position: style.position,
+      viewportHeight: window.innerHeight,
+      rect: { left: rect.left, right: rect.right, bottom: rect.bottom, width: rect.width },
+      radius: Number.parseFloat(style.borderRadius),
+      borderWidth: style.borderWidth,
+      background: style.backgroundColor,
+      copy: copy?.textContent?.replace(/\s+/g, ' ').trim() ?? null,
+      primary: primary
+        ? {
+            height: primary.getBoundingClientRect().height,
+            background: primaryStyle?.backgroundColor ?? null
+          }
+        : null,
+      secondary: secondary
+        ? {
+            height: secondary.getBoundingClientRect().height,
+            background: secondaryStyle?.backgroundColor ?? null,
+            borderWidth: secondaryStyle?.borderWidth ?? null,
+            icon: icon?.className ?? null
+          }
+        : null
+    }
+  })
+
+  assert(dockContract.position === 'fixed', `${width}px: premium dock is not fixed`)
+  assert(
+    dockContract.rect.left >= 10 &&
+      dockContract.rect.right <= width - 10 &&
+      dockContract.rect.bottom <= dockContract.viewportHeight - 8,
+    `${width}px: premium dock is clipped ${JSON.stringify(dockContract.rect)}`
+  )
+  assert(
+    dockContract.rect.width <= Math.min(width - (width <= 600 ? 24 : 32), 1121) &&
+      dockContract.radius >= 18 &&
+      dockContract.borderWidth !== '0px' &&
+      dockContract.background !== 'rgb(19, 117, 193)',
+    `${width}px: premium dock surface contract failed ${JSON.stringify(dockContract)}`
+  )
+  assert(
+    dockContract.copy?.includes('Siguiente paso') && dockContract.copy.includes('Activa creators con derechos claros'),
+    `${width}px: premium dock copy hierarchy is missing`
+  )
+  assert(
+    dockContract.primary?.height &&
+      dockContract.primary.height >= 48 &&
+      dockContract.primary.background !== 'rgba(0, 0, 0, 0)',
+    `${width}px: dock primary CTA lost its solid hierarchy`
+  )
+  assert(
+      dockContract.secondary?.height &&
+      dockContract.secondary.height >= 48 &&
+      dockContract.secondary.background?.endsWith(', 0)') &&
+      dockContract.secondary.borderWidth !== '0px' &&
+      dockContract.secondary.icon?.includes('ti-arrow-up-right'),
+    `${width}px: dock secondary outline/icon hierarchy failed ${JSON.stringify(dockContract.secondary)}`
+  )
+  await page.screenshot({ path: resolve(outputDirectory, `dock-${width}.png`) })
 
   await page.locator('[data-gh-action="meeting"]').first().click()
   await page.waitForTimeout(500)
@@ -444,6 +767,91 @@ const verifyInteractions = async (page: Page, width: number) => {
     `${width}px: Growth CTA did not open the canonical native scheduler`
   )
   await page.locator('dialog.ghc-meeting-surface[open] .ghc-meeting-close').click()
+
+  await page.locator('#conversion').scrollIntoViewIfNeeded()
+  await page.waitForTimeout(300)
+  const comboboxes = page.locator('greenhouse-form [role="combobox"].ghf-select-trigger')
+
+  assert((await comboboxes.count()) === 2, `${width}px: expected two renderer-owned premium comboboxes`)
+
+  for (const [index, expectedOptions] of [6, 5].entries()) {
+    const trigger = comboboxes.nth(index)
+
+    await trigger.click()
+    const list = page.locator('greenhouse-form .ghf-select-list:not([hidden])')
+
+    await list.waitFor({ state: 'visible', timeout: 3_000 })
+
+    const selectContract = await list.evaluate(node => {
+      const listbox = node as HTMLElement
+      const options = Array.from(listbox.querySelectorAll<HTMLElement>('[role="option"]'))
+      const first = options[0]
+      const firstRect = first?.getBoundingClientRect()
+      const topNode = firstRect ? document.elementFromPoint(firstRect.left + 8, firstRect.top + firstRect.height / 2) : null
+
+      return {
+        expanded: listbox.previousElementSibling?.getAttribute('aria-expanded') ?? null,
+        fieldOpen: listbox.closest('.ghf-field')?.getAttribute('data-overlay-open') ?? null,
+        optionCount: options.length,
+        optionHeights: options.map(option => option.getBoundingClientRect().height),
+        iconMarks: options.map(option => {
+          const label = option.querySelector('.ghf-select-option-label') as HTMLElement | null
+          const pseudo = label ? getComputedStyle(label, '::before') : null
+
+          return {
+            content: pseudo?.content ?? 'none',
+            backgroundImage: pseudo?.backgroundImage ?? 'none',
+            backgroundColor: pseudo?.backgroundColor ?? 'rgba(0, 0, 0, 0)'
+          }
+        }),
+        topOptionOwnsPoint: Boolean(first && topNode && first.contains(topNode)),
+        selectedColor: getComputedStyle(listbox.querySelector('[aria-selected="true"]') ?? first).color
+      }
+    })
+
+    assert(
+      selectContract.expanded === 'true' &&
+        selectContract.fieldOpen === 'true' &&
+        selectContract.optionCount === expectedOptions &&
+        selectContract.optionHeights.every(height => height >= 46) &&
+        selectContract.iconMarks.every(
+          mark =>
+            ((mark.content !== 'none' && mark.content !== 'normal' && mark.content !== '\"\"') ||
+              mark.backgroundImage !== 'none') &&
+            mark.backgroundColor !== 'rgb(3, 117, 219)'
+        ) &&
+        selectContract.topOptionOwnsPoint &&
+        selectContract.selectedColor !== 'rgb(255, 255, 255)',
+      `${width}px: premium semantic option list failed ${JSON.stringify(selectContract)}`
+    )
+    await page.screenshot({ path: resolve(outputDirectory, `select-${index === 0 ? 'market' : 'activation'}-${width}.png`) })
+    await trigger.press('ArrowDown')
+    await trigger.press('Enter')
+    assert((await trigger.getAttribute('aria-expanded')) === 'false', `${width}px: combobox keyboard selection did not close`)
+
+    if (index === 0) {
+      const selectedMarketFlag = await trigger.evaluate(node => {
+        const value = node.querySelector('.ghf-select-value') as HTMLElement | null
+        const pseudo = value ? getComputedStyle(value, '::before') : null
+
+        return {
+          code: node.getAttribute('data-gh-market-icon'),
+          backgroundImage: pseudo?.backgroundImage ?? 'none',
+          borderRadius: pseudo?.borderRadius ?? '0px',
+          size: Number.parseFloat(pseudo?.width ?? '0')
+        }
+      })
+
+      assert(
+        ['cl', 'co', 'mx', 'pe'].includes(selectedMarketFlag.code ?? '') &&
+          selectedMarketFlag.backgroundImage !== 'none' &&
+          selectedMarketFlag.borderRadius === '50%' &&
+          selectedMarketFlag.size >= 24 &&
+          selectContract.iconMarks.slice(0, 4).every(mark => mark.backgroundImage !== 'none'),
+        `${width}px: country flags are not preserved in options and selected value ${JSON.stringify(selectedMarketFlag)}`
+      )
+    }
+  }
 }
 
 const createContext = async (
@@ -475,12 +883,29 @@ const verifyViewport = async (width: number, height: number) => {
 
     verifyCommon(contract, width)
     await page.locator('#hero').screenshot({ path: resolve(outputDirectory, `hero-${width}.png`) })
+    await page.locator('.gh-im-trust-band').screenshot({ path: resolve(outputDirectory, `trust-${width}.png`) })
+    await page
+      .locator('[data-gh-social-module="trust"]')
+      .screenshot({ path: resolve(outputDirectory, `trust-marquee-${width}.png`) })
     await page.locator('#ofertas').scrollIntoViewIfNeeded()
     await page.waitForTimeout(450)
     await page.locator('#ofertas').screenshot({ path: resolve(outputDirectory, `offers-${width}.png`) })
     await page.locator('#preguntas').scrollIntoViewIfNeeded()
     await page.waitForTimeout(300)
     await page.locator('#preguntas').screenshot({ path: resolve(outputDirectory, `faq-${width}.png`) })
+    await page.locator('#mecanismo').scrollIntoViewIfNeeded()
+    await page.waitForTimeout(300)
+    await page.locator('#mecanismo').screenshot({ path: resolve(outputDirectory, `mechanism-${width}.png`) })
+    await page.locator('#firma').scrollIntoViewIfNeeded()
+    const proofReveals = page.locator('#firma [data-reveal]')
+
+    for (let index = 0; index < (await proofReveals.count()); index += 1) {
+      await proofReveals.nth(index).scrollIntoViewIfNeeded()
+      await page.waitForTimeout(80)
+    }
+
+    await page.waitForTimeout(300)
+    await page.locator('#firma').screenshot({ path: resolve(outputDirectory, `rights-${width}.png`) })
 
     const faqOverlap = await page.evaluate(() => {
       const intro = document.querySelector('.gh-im-faq__intro')?.getBoundingClientRect()
@@ -546,6 +971,7 @@ const main = async () => {
 
   for (const [width, height] of [
     [1536, 911],
+    [1414, 909],
     [1440, 1000],
     [890, 911],
     [390, 844]
