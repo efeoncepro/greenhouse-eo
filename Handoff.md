@@ -96,11 +96,14 @@ Cierre Git acotado autorizado, sin push ni despliegue general Greenhouse. TASK-1
 sus dossiers adicionales no forman parte de este pedido de publicación. La aprobación del export
 supera las instrucciones de rechazo de diseños anteriores para este artefacto específico.
 
-## 2026-08-30 — TASK-1358: Home Elementor consolidada; cierre editorial y QA pendientes
+## 2026-08-31 — TASK-1358: Home editorial aplicada; QA residual pendiente
 
 Home `251731` publicada en raíz, antigua `2791` conservada noindex; header/footer Ohio intactos.
-Readback independiente: 17 widgets semánticos, cero HTML, 414 campos raíz y seis repeaters;
-hash actual SEO/HTTPS `747470a5f5083b8a5d851433e10618f5c3b714889d6205c64e36a1da242091b1`.
+Readback remoto del cierre editorial: 17 widgets, cero HTML, 407 campos raíz y seis repeaters;
+hash `9aa8c770c0907edc5ad70f4489cccedb56cc03d0a7802e01eef0e2beee832562`.
+[Ocho revisiones y cierre con subagente](docs/audits/public-site/2026-08-31-home-editorial-closure.md):
+copy anotado, comparación cualitativa, FAQ jerárquica y Con + logo publicados; doce archivos iguales
+local/remoto. Docs/skills consolidados sin incluir runtime hermano ni WIP SEO previo en el commit.
 Las revisiones visuales, assets oficiales, microinteracción de logos, enlaces de Servicios,
 CTA Casos y showreel están publicados. No restaurar formulario demo, Verk ni placeholders.
 [Contrato vigente](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md);
@@ -113,7 +116,7 @@ Video: snapshot `_gh_home_video_20260830_195821`, backup `195756` (retención/ro
 SEO/HTTPS publicado: [audit](docs/audits/public-site/2026-08-30-home-seo-aeo.md), snapshot `_gh_home_seo_20260830_204702`; verificador público PASS.
 
 **Siguiente paso:** usar sesión Chrome WordPress observada para probar guardar/recargar Elementor y teclado
-del video; revisar claims/footer/entidad global y medir GSC/CWV. CTA abierto no prueba booking ni tracking.
+del video; certificar flechas en tabla y revisar atenuación de Servicios, claims/footer/entidad global y medir GSC/CWV. CTA abierto no prueba booking ni tracking.
 TASK-1358 sigue `to-do`/`UI ready: no`, runtime `Avanzada`; commit previo `1282feed4`, SEO aún sin commit/push.
 Skills SEO/WordPress espejadas con método Home/landing; consolidación documental sin nuevas escrituras live.
 El checkpoint anterior se [preservó](docs/operations/agent-context-history/handoff/2026-08-30-home-before-consolidation.md),

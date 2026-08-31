@@ -42,6 +42,10 @@ and `references/landings/content-marketing.md`.
 
 ## Native editorial revisions
 
+- For Home-specific message, comparison evidence, FAQ emphasis and copy persistence, load
+  `references/home-editorial-maintenance.md`. Preserve the distinction between generic craft and
+  approved page-instance values.
+
 - Keep approved page-instance overrides separate from source defaults. A copy pass uses registered
   controls and a guarded `Document::save()` patch; it does not rebuild the source export. For a
   source-keyed lookup such as Content Ops, preserve control keys, original types and `sourceValue`.

@@ -29,7 +29,7 @@
 
 La Home pública ya sirve el diseño de Claude Design adaptado a widgets semánticos Elementor.
 Esta task conserva su ubicación administrativa `to-do` y `UI ready: no` porque no está cerrada:
-faltan revisión editorial/SEO y QA del editor y del teclado del video. `Status real: Avanzada`
+faltan claims residuales/SEO global y QA del editor y del teclado del video. `Status real: Avanzada`
 describe el runtime publicado, no una implementación futura.
 
 No construir una URL `/agencia/` separada ni restaurar el carril HTML o formulario demo.
@@ -90,7 +90,16 @@ Home pública, derivación hacia landings y portafolio; no cambia el portal priv
 
 ## Current Repo State
 
-### Already exists
+### Checkpoint editorial vigente · 2026-08-31
+
+Las ocho rondas solicitadas están publicadas: hero, copy de secciones anotadas, comparación
+cualitativa, jerarquía FAQ y encabezado Con + logo. Readback remoto nuevo: 17 widgets, cero HTML,
+407 controles raíz y seis repeaters; SHA `9aa8c770c0907edc5ad70f4489cccedb56cc03d0a7802e01eef0e2beee832562`.
+Doce archivos del runtime coinciden local/remoto. [Cierre editorial](../../audits/public-site/2026-08-31-home-editorial-closure.md).
+Docs y skills se consolidan con subagente; runtime hermano y SEO previo quedan fuera del commit.
+Se conserva `to-do`/`UI ready: no`: faltan QA del editor/video y revisión de claims residuales.
+
+### Already exists — checkpoint anterior
 
 Readback independiente del 2026-08-30:
 Home `251731`, publicada/canonical raíz, 17 contenedores + 17 widgets semánticos, cero HTML,
@@ -104,8 +113,9 @@ Inventario y evidencia detallados, sin duplicar los contratos:
 
 ### Gap
 
-- Copy/claims globales: tabla comparativa, métricas ilustrativas y posicionamiento requieren revisión.
-  Rótulos narrativos y cierre moderado aprobados no validan todo el contenido.
+- Copy/claims globales: comparación y métricas ilustrativas ya revisadas dentro del alcance anotado.
+  Quedan claims residuales del hero/otras superficies y disponibilidad de productos sin certificar.
+- Tabla móvil: flechas sin certificar; Servicios: verificar precedencia de opacidad inline al filtrar.
 - Guardar/recargar desde la interfaz Elementor no está certificado; registro server-side sí verificado.
 - Teclado dentro del iframe YouTube y recorrido completo de foco no certificados.
 - Index eligible no prueba indexación en Search Console; no certificar SEO/CRO o booking/GTM end-to-end.
@@ -245,7 +255,7 @@ Cuando haya evidencia suficiente, mover lifecycle y sincronizar índices en el m
 
 1. Verificar sesión WordPress y ejecutar save/reload real sin alterar contenido comercial.
 2. Completar prueba de teclado entrando y saliendo del player en navegador real.
-3. Revisar claims, tabla y SEO con fuentes; scope separado para header/footer si se autoriza.
+3. Revisar claims residuales y SEO global con fuentes; scope separado para header/footer si se autoriza.
 
 ## Open Questions
 

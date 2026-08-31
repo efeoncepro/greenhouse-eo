@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-31 — Home: cierre editorial y mantenimiento nativo
+
+Ocho revisiones publicadas: hero desafiante, beneficios concretos, comparación cualitativa, FAQ
+con jerarquía tipográfica y encabezado Con + logo. Readback 17 widgets/407 campos/seis repeaters;
+doce archivos coinciden local/remoto. Subagente concilió planes, snapshots y evidencia.
+Contratos técnico/funcional/manual y skills WordPress/copywriting espejadas actualizados;
+commit documental, sin runtime hermano ni WIP SEO previo. QA residual y TASK-1358 siguen abiertos.
+[Cierre y límites](docs/audits/public-site/2026-08-31-home-editorial-closure.md).
+
 ## 2026-08-31 — TASK-1780: el inventario de tools MCP pasa a ser un manifiesto
 
 `src/mcp/greenhouse/tool-manifest.ts` es la fuente única del catálogo de tools MCP. `server.ts`
@@ -1032,20 +1041,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - **Todavía no está en producción.** El código está completo y verificado contra la base real; falta el
   release. Y de paso quedó abierto `ISSUE-162`: la señal de salud vive en amarillo por diez postulaciones de
   prueba archivadas, no por un defecto real.
-
-## 2026-08-23 — Las trece etapas del pipeline quedaron en seis, y las que sobran ya no son etapas
-
-- El recorrido de una postulación se describía con trece etapas, y cinco de ellas no decían _dónde está_ la
-  persona sino _cómo terminó_: «seleccionado», «rechazado», «retirado». Dos preguntas distintas contestadas
-  con el mismo campo. Ahora el recorrido tiene seis etapas y el desenlace vive en su propio eje.
-- Otras dos, «calificado» y «revisión de cliente», se habían absorbido en «Evaluación» pero seguían existiendo
-  por debajo: era el origen del bug que dejó quince vacantes con su política de pruebas bien configurada y
-  ninguna disparando.
-- El contract que retira los siete literales de la base **está escrito y revisado, y todavía no aplicado**:
-  espera autorización. Hasta entonces el candado de seis vive en la aplicación y la base sigue aceptando trece.
-- Un detalle que parecía poda y era corrección: el mapa de «etapas posteriores al gatillo» listaba «revisión de
-  cliente» como posterior a «Evaluación», cuando el colapso la había metido **dentro**. Mandaba a revisión
-  humana postulaciones que la reconciliación automática sí sabe recuperar.
-- Y una deuda que se declara en vez de esconderse: el monitor de equidad medía su cubo terminal en una etapa
-  que dejó de existir. En vez de devolver cero —que en una métrica de equidad se lee como «no hay impacto
-  adverso»— ahora falla ruidoso, y no se prende hasta que se le apunte al eje correcto.

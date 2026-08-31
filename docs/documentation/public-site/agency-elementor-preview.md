@@ -5,6 +5,24 @@ mediante las revisiones del operador, con header y footer Ohio del sitio. La pá
 promovida desde la preview el 2026-08-30; la anterior `2791` conserva su diseño en `/home-2/`, con noindex.
 La ruta de este documento conserva el nombre histórico `preview`, pero describe la portada vigente.
 
+## Criterio editorial vigente
+
+La Home se dirige a equipos de empresas medianas y grandes, con un tono desafiante y concreto.
+El hero dice «Tu marketing debería mover tu negocio. No solo tu calendario.»; Problema explica
+el costo de coordinar proveedores y reportes. El reencuadre propone un aliado para el equipo.
+
+La comparación describe qué implica cada modelo de trabajo, sin puntajes inventados. Su columna
+propia muestra «Con» junto al logo Efeonce. Greenhouse se presenta como seguimiento de proyectos
+y métricas; los ejemplos visuales no son resultados certificados ni datos en vivo.
+
+Las seis FAQ se mantienen para resolver dudas de contratación. Cada respuesta separa una idea
+principal en negrita, explicación y aclaración opcional. Agenda pregunta «¿Qué necesita lograr tu
+marketing?» y ofrece una conversación inicial, sin prometer un diagnóstico completo en 30 minutos.
+
+Las ocho revisiones están aplicadas; persisten revisión de claims fuera de ese alcance, prueba del
+editor, teclado del video y flechas de la tabla móvil. [Cierre y evidencia](../../audits/public-site/2026-08-31-home-editorial-closure.md).
+Esta consolidación versiona docs/skills; no incluye el runtime hermano ni certifica conversiones.
+
 ## Cómo se edita
 
 Hay 16 módulos visuales independientes y un módulo transversal de experiencia. Textos, enlaces,
@@ -48,11 +66,12 @@ teclado y Escape dentro del iframe no está certificada.
 
 La Home está publicada, con canonical raíz y habilitada para indexación; eso no demuestra indexación
 efectiva en buscadores. Los ajustes narrativos puntuales eliminan notas del wireframe y reducen una
-afirmación maximalista, pero **la revisión global de copy, claims y SEO/CRO sigue pendiente**. Ni la
-publicación ni las cifras del diseño constituyen por sí solas validación comercial de esos claims.
+afirmación maximalista. **Siguen pendientes claims residuales fuera de las secciones revisadas,
+SEO global del sitio, CRO y medición GSC/CWV**. Ni la publicación ni las cifras del diseño constituyen
+por sí solas validación comercial de esos claims.
 
 El registro de widgets, contenido persistido y frontend están verificados en los checkpoints del audit.
-La prueba de editar/guardar/recargar desde la interfaz Elementor sigue pendiente de acceso autenticado.
+La prueba de editar/guardar/recargar desde la interfaz Elementor sigue pendiente; este cierre documental no certifica ese flujo del editor.
 
 [Contrato técnico](../../architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md) ·
 [Manual de edición](../../manual-de-uso/public-site/agency-elementor-preview.md) ·

@@ -125,6 +125,7 @@ Berel se opera desde Notion con `berel-content-production`: decide por contenido
 conteos al cerrar, y mantiene gates visibles para piezas históricas, sensibles, soft-404 o aún no validadas.
 
 WordPress/Ohio: skill `efeonce-public-site-wordpress` y su `references/landing-registry.md`.
+Mantenimiento editorial Home: [guía nativa y criterios de evidencia](.codex/skills/efeonce-public-site-wordpress/references/home-editorial-maintenance.md).
 Elementor modular: [Home](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md) · [HubSpot](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md).
 Growth/SEO: gates de `TASK-1598` tras resave. `Index eligible` no prueba indexación en Search Console.
 

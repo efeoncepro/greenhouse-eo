@@ -15,12 +15,15 @@ la referencia del menú y sólo título/metas SEO/thumbnail modificados por el c
 Elementor: ambos hashes quedaron intactos. Si fuese necesaria recuperación de contenido, usar Document::save.
 Regenerar indexables Yoast afectados, purgar cache y verificar raíz y URLs anteriores.
 
-El checkpoint de implementación más reciente es el showreel del 2026-08-30: 17 módulos, cero HTML,
-414 campos raíz y seis repeaters; hash del documento
-`30bab640e2dae49b9f6b13582c6dd426c018c4fda2419c0f199634cdc659605c`.
+El checkpoint más reciente es el copy de Problema del 2026-08-31: 17 módulos, cero HTML,
+407 campos raíz y seis repeaters; hash del documento
+`9aa8c770c0907edc5ad70f4489cccedb56cc03d0a7802e01eef0e2beee832562`.
+La revisión editorial abarca hero, Problema/Reencuadre, capacidades, servicios, integraciones,
+seguimiento, productos, método, comparación, FAQ y Agenda. El [cierre editorial](../../audits/public-site/2026-08-31-home-editorial-closure.md)
+indexa las ocho revisiones, sus snapshots y límites; no sustituye el readback antes de mutar.
 Es una referencia de drift fechada, no autorización para escribir ni sustituto de leer el runtime actual.
 Evidencia por revisión, snapshots y límites: [audit visual](../../audits/public-site/2026-08-30-home-visual-review.md).
-**Pendientes:** copy/claims y prueba de edición/guardado desde la interfaz Elementor.
+**Pendientes:** claims residuales, teclado del video y prueba de edición/guardado desde la interfaz Elementor.
 El cutover solicitado está completo; no implica completar el rework de TASK-1358 ni su `UI ready`.
 
 ## Alcance y decisión de implementación
@@ -31,8 +34,10 @@ Es una extensión del carril de [primitives públicas](PRIMITIVES.md), no otra p
 El respaldo `2791`, el header/footer Ohio y las demás landings quedan fuera de las revisiones del cuerpo.
 La navegación sólo cambió en el cutover explícito ya descrito; no debe reescribirse por un ajuste visual.
 
-El contenido editable vive en `_elementor_data`; las composiciones, estilos e interacciones viven versionados
+El contenido editable vive en `_elementor_data`; las composiciones, estilos e interacciones viven
 en `/Users/jreye/Documents/efeonce-public-site-runtime/wp-content/plugins/eo-elementor-widgets`.
+La publicación del runtime y su versionado son estados separados: este cierre documental no incluye
+el checkout hermano, que conserva archivos sin seguimiento y WIP previo.
 No hay campos para pegar HTML, CSS ni JavaScript. Elementor permite mover/duplicar módulos; no editar
 cada átomo de sus diagramas como un widget independiente. Nuevas composiciones exigen extender el renderer.
 
@@ -47,10 +52,21 @@ monolítico anterior quedó reemplazado. No se modifica un contrato compartido d
 - Clases: `includes/widgets/class-eo-agency-landing-{base,widgets}.php`; 17 nombres `greenhouse_agency_*`.
 - Módulos: hero, trust, problem, reframe, motor, work, servicios, stack, proof_engine, ecosystem,
   method, cases, social_proof, comparison, faq, agenda y experience.
-- Schemas: `includes/agency/schemas/*.json`; plantillas versionadas en `includes/agency/templates/*.html`.
-- Controles registrados: 414 campos de contenido raíz más seis colecciones repetibles. Tipos nativos
+- Schemas: `includes/agency/schemas/*.json`; plantillas en `includes/agency/templates/*.html`.
+- Controles registrados: 407 campos de contenido raíz más seis colecciones repetibles. Tipos nativos
   TEXT/TEXTAREA, URL, MEDIA, NUMBER y SELECT; controles de color, padding responsive, ancla y motion.
 - Repeaters: logos de clientes del hero, dos bandas de trabajos, servicios, fases y preguntas frecuentes.
+- Hero añade `hero_eyebrow` opcional y `headline_emphasis` (`last` por defecto, `middle` para el
+  segundo fragmento). Defaults conservan el render anterior; el badge vacío se oculta y sólo un
+  subrayado queda visible. Ambos valores son controles nativos, no HTML editable. El SVG usa escalado
+  de stroke coherente con su viewBox/dash; no reinstalar `non-scaling-stroke` sin revisar el dibujo completo.
+- Comparación: 55 controles, 24 celdas cualitativas; encabezado `Con` + logo con alt `Efeonce`.
+  Caption y región con foco mantienen semántica de tabla; scroll interno bajo 760 px.
+- FAQ: cada fila conserva `f003_texto` y suma `answer_lead`/`answer_note`, renderizados como strong/p.
+  Geist/body-lg 16 px, line-height 1.6, máximo 66ch; pesos 700/400/600 y separación de 12 px.
+  Campos opcionales vacíos no reservan espacio; no se alteró el renderer compartido.
+- Problema: etiquetas hover vacías ocultas con prioridad scoped sobre display inline; iconos móviles
+  de 24 px y gap 6 px evitan colisiones. No se cambia el comportamiento de otros diagramas.
 - Casos ahora es un CTA compacto: `eyebrow`, `title`, `description`, `button_label` y `cases_url`.
   Reutiliza tarjeta/botón Agenda con modificador scoped; conserva ancla `casos` y URL de portafolio editable.
   Grid texto/acción, apilado <=760 px; hover sólo flecha 3 px y color, reducido sin transform.
@@ -85,7 +101,7 @@ monolítico anterior quedó reemplazado. No se modifica un contrato compartido d
 - Full-width Ohio se resuelve con `--clb-container-side-gutter:var(--clb-grid-gutter)` en el contenedor,
   no con cálculos de margen en JavaScript.
 - Reframe/proof/ecosystem/agenda exponen `heading_color` → `--agency-heading-color` para evitar que Ohio imponga
-  texto oscuro. Agenda tiene dos columnas >760 px y una columna en móvil; conserva el texto izquierdo original.
+  texto oscuro. Agenda tiene dos columnas >760 px y una columna en móvil; mantiene el copy de reunión introductoria aprobado.
 - HubSpot usa Media `hubspot_logo`, SVG de Simple Icons 16.21.0, servido localmente por HTTPS.
   El código fuente oficial y los diez adjuntos reutilizados están identificados en el audit visual.
 - `hubspot_logo` existe tanto en Stack como en Social Proof. Agenda usa teal con tinta navy y controles
@@ -122,9 +138,12 @@ El port fue source-led: leer HTML, CSS, JavaScript, assets y estados interactivo
 descomponerlo. Las capturas son evidencia visual, no la fuente editable. Las revisiones posteriores del
 operador prevalecen sobre la reproducción literal del export; no regenerar placeholders ni notas de wireframe.
 
-- «El costo de trabajar por separado» y «Un equipo. Una misma dirección.» sustituyen las etiquetas internas
-  de Problema/Reencuadre. El cierre maximalista de Comparación se moderó. Son ajustes locales: no aprueban
-  globalmente posicionamiento, cifras, partners ni claims del resto de la página.
+- Hero: «Tu marketing debería mover tu negocio. No solo tu calendario.»; énfasis en «mover tu negocio.».
+- Problema: «Cuando todo va por separado, tu equipo paga el costo.»; reencuadre final:
+  «Tu equipo necesita un aliado. No otro proveedor que coordinar.».
+- Comparación cualitativa de alcances/responsabilidades, métricas de ejemplo identificadas y productos
+  descritos por utilidad. FAQ resuelve seis dudas de contratación; Agenda no promete un diagnóstico completo.
+  Estos textos sustituyen los originales del export, sin aprobar claims globales ni disponibilidad comercial.
 - Trabajos reutiliza diez adjuntos de Media de la Home anterior en dos filas de cinco; Trust reutiliza
   siete logos de Redes Sociales. La procedencia exacta y los IDs están en el audit; el nombre histórico
   del archivo no sustituye la marca visible, su ALT ni la inspección de los píxeles.
@@ -150,7 +169,7 @@ Fuente: `/Users/jreye/Documents/agencia/Landing - Agencia/Landing Agencia.dc.htm
 `scripts/public-website/compile-agency-elementor-source.cjs` fue el compilador de importación inicial;
 depende del export y de `.captures/task-1358-claude-source-audit/rendered-body.html`. No es dependencia
 runtime ni debe ejecutarse sobre una versión evolucionada sin revisar el diff: puede regenerar defaults.
-El mantenimiento normal ocurre sobre schemas/plantillas versionadas y settings de Elementor.
+El mantenimiento normal ocurre sobre schemas/plantillas del plugin y settings de Elementor.
 
 Verificación: `php tests/agency-modules.test.php` en runtime; `node scripts/public-website/agency-elementor-lifecycle.test.cjs`
 en Greenhouse; `verify-agency-elementor-contract.php` por WP-CLI para el checkpoint desplegado.
@@ -174,7 +193,8 @@ No desplegar todo el checkout runtime: contiene WIP ajeno de Creative/Social.
 Los snapshots iniciales (`_gh_backup_before_agency_elementor_20260830T160012Z` y
 `_gh_backup_before_agency_media_20260830T160527Z`) son históricos, no el rollback del último cambio.
 Para revertir una revisión, resolver su pareja snapshot/manifest en el audit. Última pareja documentada:
-`_gh_home_video_20260830_195821` y `/tmp/eo-agency-before-20260830-195756.tar` (cuatro archivos).
+`_gh_home_problem_copy_20260831_205851` y `/tmp/eo-agency-before-20260831-210027.tar`,
+con ajuste CSS posterior respaldado en `210101.tar`; detalle en el audit de Problema.
 Los tar remotos son temporales, no almacenamiento durable. Ante rollback, guardar primero el estado actual,
 restaurar el documento deseado por `Document::save()` y sólo después retirar/restaurar widgets que ya no use.
 Restaurar archivos exactos según manifest, nunca todo el plugin ni rutas con glob; purgar y verificar Home/preview.
@@ -182,17 +202,19 @@ Restaurar archivos exactos según manifest, nunca todo el plugin ni rutas con gl
 ## Evidencia y límites
 
 El audit conserva los checkpoints del 2026-08-30 y distingue cada alcance: contrato PHP/Elementor real,
-ciclo de vida JavaScript y navegador no son equivalentes. El último contrato real informó 17 contenedores,
-17 widgets, cero HTML, 414 campos y seis repeaters. Browser registró reproducción real del showreel,
+ciclo de vida JavaScript y navegador no son equivalentes. El contrato real del cierre editorial informó 17 contenedores,
+17 widgets, cero HTML, 407 campos y seis repeaters. Browser había registrado reproducción real del showreel,
 close/unmount sin player, retorno del foco, 1280/890/390 sin overflow y reduced motion sin animación del modal.
 PHP/JS cubren controles, escaping, URL válidas/inválidas, reorder/removal y montaje/reemplazo/desmontaje.
 Los frames en `.captures/agency-home-video/` complementan los de cada revisión anterior; las capturas
 emuladas pueden escalarse dentro del canvas del host, por lo que deben acompañarse de geometría DOM.
 No presentar una captura antigua del modal placeholder como evidencia del reproductor actual.
-**Pendiente:** prueba de edición + guardado + recarga desde la interfaz Elementor; el navegador está en login.
+**Pendiente:** prueba de edición + guardado + recarga desde la interfaz Elementor; no se afirma un bloqueo de login.
 Registro de controles y render probe del servidor NO equivalen a esa prueba de editor.
 
-La página es la Home `publish + index`; no hay revisión final de copy/claims ni certificación del editor UI.
+La página es la Home `publish + index`; la revisión de las secciones anotadas está aplicada, sin certificar
+claims residuales ni el editor UI. Comparación: gesto y foco verificados, flechas no certificadas;
+atenuación de Servicios requiere revisar precedencia de opacidad inline.
 Las dos filas contienen cinco imágenes cada una, sin placeholders. El CTA abre el calendario vigente;
 la verificación no creó reservas. El estado de TASK-1358 y sus aceptaciones pendientes viven en su task,
 no se derivan de tener un frontend publicado.

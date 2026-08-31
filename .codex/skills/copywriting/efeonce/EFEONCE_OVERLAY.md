@@ -64,3 +64,10 @@ habla; luego aplica la voz correcta, ubica el copy en su runtime y respeta las s
 - **`greenhouse-ux-content-accessibility`** — variante repo-local (Codex) para review UX+a11y.
 - `growth-marketing-cro` / `digital-marketing` / `seo-aeo` / `efeonce-agency` / `greenhouse-email`
   — ver `COPYWRITING_BOUNDARY.md`.
+
+## Home pública de Efeonce
+
+Para sus revisiones editoriales, cargar `efeonce-public-site-wordpress/references/home-editorial-maintenance.md`
+y el contrato de Home. Resume las decisiones de esta superficie sobre audiencia, comparaciones con
+evidencia, utilidad de software y FAQ. No sustituye la doctrina de voz ni amplía claims comerciales.
+El copy vive en controles Elementor y plantillas escapadas del runtime WordPress, no en `src/lib/copy`.

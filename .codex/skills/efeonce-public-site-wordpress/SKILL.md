@@ -38,6 +38,7 @@ Read the minimal set:
 | --- | --- |
 | Any public landing visual/content work | `references/landing-workflow.md` + `references/landing-registry.md` + the landing file under `references/landings/` |
 | New or unregistered landing | `references/landing-workflow.md` + `references/landing-registry.md` |
+| Home copy, comparison, FAQ emphasis or final editorial review | `references/home-editorial-maintenance.md` + `references/landings/home-claude-design-preview.md`; compose with `copywriting` and the typography skill |
 | Elementor mutation / page-scoped CSS | `references/elementor-mutation.md` |
 | Native Ohio navigation, menu label/link or hierarchy | `references/native-navigation.md` + the destination landing reference |
 | Growth Forms or public form embed | `references/growth-forms-wordpress.md` |
