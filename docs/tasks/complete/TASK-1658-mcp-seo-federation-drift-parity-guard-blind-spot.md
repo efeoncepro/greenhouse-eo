@@ -473,5 +473,10 @@ proveedor, viaja sin `readOnlyHint: false`.
 ## Follow-ups
 
 - Generalizar el guard corregido a los demás providers del gateway, si el patrón resulta.
-- Evaluar si el inventario de tools debería publicarse como recurso del propio MCP de Greenhouse,
-  para que el guard consuma una fuente viva en vez de una lista espejo.
+- ✅ **Adoptado por `TASK-1780` (2026-08-31).** El espejo `GREENHOUSE_SEO_TOOL_INVENTORY` dejó de
+  escribirse a mano: se **deriva** del manifiesto canónico `src/mcp/greenhouse/tool-manifest.ts`, que
+  llega al gateway como artefacto generado con `manifestHash` verificado al cargar. La forma elegida
+  NO fue publicarlo como recurso del MCP: un gate de merge no debe depender de un deployment vivo,
+  así que viaja como archivo generado, no como URL. El Slice 4 (paridad de schema) y el Slice 5
+  (annotations) de esta task siguen intactos: ahora consumen el manifiesto en vez de la copia, y sus
+  `inputKeys` salen de introspección, nunca de transcripción.

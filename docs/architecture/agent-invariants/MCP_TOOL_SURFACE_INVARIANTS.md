@@ -10,6 +10,23 @@ tool; o al cambiar la forma de un DTO que cruza el lane ecosystem.
 
 ---
 
+## 0. Qué tools existen: el manifiesto, y sólo el manifiesto (`TASK-1780`)
+
+`src/mcp/greenhouse/tool-manifest.ts` es la fuente del inventario de tools MCP de Greenhouse.
+`server.ts` registra **recorriéndolo** —definir una tool sin entrada rompe la construcción del
+servidor— y el `name` y las `instructions` que el cliente MCP lee se **derivan** de él.
+
+Dos banderas **ortogonales** por entrada: `writes` (muta estado de Greenhouse) y
+`spendsProviderBudget` (compromete gasto real, al instante o de forma recurrente). **NUNCA**
+fusionarlas en un `readOnly`: hoy todo lo que gasta también escribe, pero comprar datos sin mutar
+nada propio sigue siendo un efecto secundario que el cliente necesita conocer. **NUNCA** describir
+como lectura algo que compromete gasto.
+
+**NUNCA** agregar un campo de federación al manifiesto: Greenhouse declara qué EXISTE, el gateway
+decide qué CRUZA con revisión humana por tool.
+
+---
+
 ## 1. La superficie agéntica es un CONTRATO, no una descripción
 
 Una tool MCP no es un endpoint con documentación: es un contrato que un agente compone con otros.
@@ -96,6 +113,17 @@ capacidad puede estar federada sin existir como `registerTool` interno (caso ver
 `get_seo_provider_spend`). Al censar, anclar en la **ruta**, que es lo único que las dos superficies
 comparten.
 
+🔴 **Desde `TASK-1780` ese caso se DECLARA, no se deduce.** Vive en
+`GREENHOUSE_GATEWAY_NATIVE_TOOLS` con su razón escrita, y el guard lo reporta si falta —una ausencia
+sin declarar volvía a ser indistinguible de un olvido, que es el defecto que el guard existe para
+cerrar—. Una declaración que dejó de aplicar también es finding: una excepción vencida se lee como
+cobertura y no cubre nada.
+
+✅ **Y contar dejó de ser un problema de patrón.** El inventario interno es
+`src/mcp/greenhouse/tool-manifest.ts`: el servidor **registra recorriéndolo**, así que la cifra sale
+del manifiesto o de `tools/list`, nunca de una regex sobre el fuente. Las dos formas de contar que
+mintieron siguen cubiertas por regresión, pero ya no son el camino.
+
 ---
 
 ## 5. Federar es parte de "listo"
@@ -103,6 +131,13 @@ comparten.
 Una tool interna que no se federa **ni se excluye con razón escrita** es drift. El guard bidireccional
 del gateway (`efeonce-mcp/src/providers/greenhouse-seo-tool-parity.ts`) lo pone rojo; el protocolo
 completo vive en `efeonce-mcp/AGENTS.md`.
+
+⚠️ **El paso 1 del protocolo ya no se escribe en el gateway** (`TASK-1780`). El inventario del guard se
+**deriva** del manifiesto de Greenhouse: acá se agrega la entrada y se corre
+`pnpm mcp:manifest:generate`; allá, `pnpm greenhouse:manifest:sync`. El artefacto viaja con
+`manifestHash` y se verifica al cargar, así que editarlo a mano —la costumbre del espejo, medida dos
+veces en dos semanas— lanza en vez de pasar en silencio. **NUNCA** editar
+`greenhouse-tool-manifest.generated.ts` ni `tool-manifest.generated.json`: son artefactos.
 
 ⚠️ **La federación es CROSS-REPO y no se hace sola.** Antes de commitear en el repo del gateway
 aplican las reglas de `CLAUDE.md § Cross-repo action safety`: relevancia operacional, estado del

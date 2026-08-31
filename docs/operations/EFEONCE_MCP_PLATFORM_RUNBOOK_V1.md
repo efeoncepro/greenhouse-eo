@@ -717,17 +717,23 @@ verificables, sin token que los abra, hasta `TASK-1631`.
   `search_knowledge`, `get_knowledge_document`, `search_services`, `quote_price`, `get_webhook_subscription`,
   `list_webhook_subscriptions`, `get_webhook_delivery`, `list_webhook_deliveries`.
 
-⚠️ **Esas 15 no están marcadas como drift ni como exclusión: el guard de paridad es SEO-only y no las mira.** No es
-un bug detectado — es **alcance no declarado**, que es peor de razonar porque nada falla. Un operador que conecta el
-MCP esperando "el 360 de Greenhouse" encuentra sólo SEO, y ningún gate se lo advierte. Declararlas (federar o excluir
-con razón) es trabajo de [`TASK-1780`](../tasks/to-do/TASK-1780-mcp-tool-inventory-canonical-manifest.md), que
-reemplaza el espejo committeado por el manifiesto canónico de Greenhouse como fuente del guard.
+⚠️ **Esas 15 siguen fuera del alcance federado, pero ya no son invisibles.** Desde
+[`TASK-1780`](../tasks/complete/TASK-1780-mcp-tool-inventory-canonical-manifest.md) **existen declaradas**: el
+manifiesto canónico `src/mcp/greenhouse/tool-manifest.ts` censa las 43 tools con su dominio, y el artefacto generado
+que consume el guard viaja con todas. Lo que sigue siendo SEO-only es el **allowlist de federación** del gateway, que
+es una decisión de frontera con revisión humana por tool y no cambia con esta task. La diferencia práctica: un
+operador que conecta el MCP esperando "el 360 de Greenhouse" y encuentra sólo SEO ahora puede leer el alcance real en
+un archivo, en vez de deducirlo de una ausencia.
 
 ### `get_seo_provider_spend` — federada sin tool interna, por diseño
 
-Está registrada en el gateway y **no** en `src/mcp/greenhouse/server.ts`, a diferencia de las otras 26 SEO. No es
-drift del espejo: consume el lane ecosystem directo. Documentado en el delta 2026-08-28 de `TASK-1780`. Por eso el
-conteo correcto es 26 internas / 27 federadas, y cualquier cifra que iguale ambos lados está mal.
+Está registrada en el gateway y **no** en `src/mcp/greenhouse/server.ts`, a diferencia de las otras SEO. No es
+drift: consume el lane ecosystem directo. Cualquier cifra que iguale ambos lados está mal.
+
+✅ **Desde `TASK-1780` el caso está DECLARADO, no deducido**: vive en `GREENHOUSE_GATEWAY_NATIVE_TOOLS` con su razón
+escrita, y el guard lo reporta nombrándolo si alguien lo quita. Evidencia de que el mecanismo funciona: corriendo el
+guard contra el estado real sin esa declaración, emite exactamente un finding —
+`expected_unknown_tool → get_seo_provider_spend`. Antes, esa misma ausencia era estructuralmente invisible.
 
 ### Drift de rollout detectado 2026-08-28
 

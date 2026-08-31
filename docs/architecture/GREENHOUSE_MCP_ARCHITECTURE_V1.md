@@ -657,3 +657,35 @@ Reglas nuevas:
 - `TASK-659` sigue siendo la dueña de OAuth, hosted auth multiusuario, refresh/revocation y user-delegated scopes
 - si falta `GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN`, el endpoint remoto queda deshabilitado
 - el body máximo del gateway remoto se controla con `GREENHOUSE_MCP_REMOTE_MAX_BODY_BYTES` para evitar payloads no acotados
+
+## 22. Delta 2026-08-31 — El inventario de tools es un manifiesto (TASK-1780)
+
+Hasta acá el catálogo de tools existía dos veces: los `registerTool` de `src/mcp/greenhouse/server.ts`
+y una copia a mano en el repo del gateway. Ninguna estaba declarada dueña, y el resultado medible fue
+que el espejo se editó a mano dos veces en dos semanas mientras el servidor se anunciaba
+`greenhouse-read-only` registrando **siete** tools que escriben, cuatro de ellas comprometiendo gasto
+del proveedor.
+
+**Fuente única.** `src/mcp/greenhouse/tool-manifest.ts` declara las 43 tools con dos banderas
+**ortogonales** —`writes` y `spendsProviderBudget`—. Fusionarlas en un solo `readOnly` es el error que
+este delta cierra: hoy todo lo que gasta también escribe, pero una tool futura podría comprar datos sin
+mutar estado propio y el cliente MCP necesita saberlo igual.
+
+**Consumidores.** (1) `server.ts` registra **recorriendo el manifiesto**: una tool definida sin entrada,
+o una entrada sin definición, hace fallar la construcción del servidor nombrándola. (2) El `name` y las
+`instructions` se **derivan** del manifiesto, así que el cartel no puede volver a contradecir lo que el
+servidor hace. (3) El guard de paridad del gateway, vía artefacto generado.
+
+**Cómo viaja al gateway.** `pnpm mcp:manifest:generate` emite
+`src/mcp/greenhouse/tool-manifest.generated.json` —manifiesto ⨝ `inputKeys` obtenidos por
+**introspección** del servidor real, más `manifestHash`—; el gateway lo trae con
+`pnpm greenhouse:manifest:sync`. Es una copia, pero **generada**: el hash se verifica en los dos lados y
+`pnpm mcp:manifest:check` (gate en `ci.yml`) falla si el artefacto committeado difiere del registro vivo.
+La restricción que decidió la forma: el CI del gateway **no debe depender de un deployment vivo** para un
+gate de merge, lo que descartó publicar el inventario por HTTP.
+
+**Frontera intacta.** El manifiesto **no tiene campo de federación**: Greenhouse declara qué EXISTE, el
+gateway sigue decidiendo qué CRUZA con revisión humana por tool. Y como el gateway federa resolviendo
+contra rutas HTTP del lane, una capacidad puede estar federada **sin existir** como tool interna: ese caso
+se declara (`GREENHOUSE_GATEWAY_NATIVE_TOOLS`), nunca queda ausente en silencio. Caso vivo:
+`get_seo_provider_spend`.
