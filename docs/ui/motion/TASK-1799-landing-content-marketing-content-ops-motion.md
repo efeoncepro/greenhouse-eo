@@ -8,6 +8,19 @@
 - Scope: page-scoped; no cambios globales al theme
 - Reduced-motion equivalence: mandatory
 
+## Estado de implementación — 2026-08-31
+
+El export aprobado usa palabra dinámica en hero (2400 ms), reveals y stage de siete capítulos.
+Click de capítulo suspende la sincronización con scroll durante el movimiento programático;
+los tabs admiten flechas/Home/End. Editor, motion apagada y reduced motion detienen enhancements.
+JS-off mantiene SSR y siete capítulos. Fuente actual: mount habilita pin con ancho ≥940 y alto ≥740;
+resize sólo reevalúa ancho ≥940. Esa diferencia es un riesgo pendiente, no un contrato intencional
+ni una corrección desplegada. El inventario/timings inferior sigue siendo planificación;
+el detalle real vive en el cliente compilado y en la evidencia pública.
+
+[Implementación canónica](../../architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md) ·
+[Auditoría y pendientes](../../audits/public-site/2026-08-31-content-marketing-publication.md).
+
 ## Intent
 
 La motion explica tres relaciones: una idea conserva identidad mientras cambia de formato; una decisión

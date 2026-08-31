@@ -464,6 +464,26 @@ export class FormRenderer {
     const shell = el(this.doc, 'div', { class: 'ghf-progress-shell' })
     const currentLabel = steps[this.currentStep]?.label?.trim()
 
+    if (this.contract.styleVariant === 'content_marketing') {
+      const heading = el(this.doc, 'div', { class: 'ghf-content-step-heading' })
+
+      heading.appendChild(el(this.doc, 'span', { class: 'ghf-content-step-title' }, currentLabel ?? ''))
+      const hint = this.contract.copy?.[`step.${steps[this.currentStep]?.key}.help`]
+
+      if (hint) heading.appendChild(el(this.doc, 'span', { class: 'ghf-content-step-hint' }, hint))
+      shell.appendChild(heading)
+      const progress = el(this.doc, 'div', { class: 'ghf-content-step-progress' })
+
+      progress.appendChild(el(this.doc, 'span', { class: 'ghf-progress', 'aria-live': 'polite', tabindex: '-1' }, this.copy.stepProgress(this.currentStep + 1, steps.length)))
+      const dots = el(this.doc, 'span', { class: 'ghf-content-step-dots', 'aria-hidden': 'true' })
+
+      steps.forEach((_, index) => dots.appendChild(el(this.doc, 'span', { 'data-state': index < this.currentStep ? 'done' : index === this.currentStep ? 'current' : 'upcoming' })))
+      progress.appendChild(dots)
+      shell.appendChild(progress)
+
+return shell
+    }
+
     if (this.contract.styleVariant === 'hubspot_pillar') {
       const heading = el(this.doc, 'div', { class: 'ghf-pillar-step-heading' })
 
@@ -782,8 +802,13 @@ export class FormRenderer {
         }
 
         for (const opt of field.options ?? []) {
-          select.appendChild(el(this.doc, 'option', { value: opt.value }, opt.label ?? opt.value))
+          const option = el(this.doc, 'option', { value: opt.value }, opt.label ?? opt.value)
+
+          option.selected = Array.isArray(current) ? current.includes(opt.value) : current === opt.value
+          select.appendChild(option)
         }
+
+        if (field.type === 'select' && typeof current === 'string') select.value = current
 
         select.addEventListener('change', () => {
           this.values[field.key] =

@@ -365,15 +365,13 @@ Primer bloque operativo asignado:
   "Feed + viewer sobre el payload cliente" y "Resilient Feed and Viewer" son la misma superficie con dos nombres.
 - **Reserva vigente actualizada: siguiente ID libre `TASK-1567`.** `TASK-1566` entregó el **comando gobernado de fondeo de crédito de Globe** (`credits.month.fund.propose` / `.confirm`) bajo **ADR-015**: superficie Greenhouse, autoridad Globe, lane `sister-platform`, atribución del confirmante y mutación económica transaccional. El segundo humano es policy por workspace, OFF en el interno; OAuth PKCE/confirmación agente continúan en TASK-1629 y KMS/identidades disjuntas/retiro HMAC en TASK-1584/1585. La superficie y los readers quedan en TASK-1483/1586 (`EPIC-028`; creada 2026-07-26). Esta línea supersede las reservas históricas inferiores.
 - **Reserva histórica: `TASK-1566` era el siguiente ID libre hasta 2026-07-26.** `TASK-1564` (composer de Globe sobre el payload cliente, con la regla de reconciliacion prototipo-vs-vanilla de cinco clases) y `TASK-1565` (motion del payload cliente: las 7 animaciones ausentes + el gate de reduced-motion) son de `EPIC-028`, creadas 2026-07-25. `TASK-1562` (hidratación de la proyección del share: `modelLabel`/`reviewStatus`/`comments` que `resolveForShare` descarta hoy en silencio) y `TASK-1563` (menciones en comentarios de revisión) son de `EPIC-028`, creadas 2026-07-25. `TASK-1556`…`TASK-1561` completan el programa de ADR-014 (client application de Globe): Slice 0 foundation, CDN path-scoped, share board, feed+viewer, retiro del legacy y hardening del gate de diseño (`EPIC-028`; creadas 2026-07-25). `TASK-1553` corresponde a Globe Extensible Multi-Model Provider Catalog + Route-Based Model Resolution (`EPIC-028`; creada 2026-07-24; foundation del selector UI TASK-1552). Esta línea supersede las reservas históricas inferiores.
-- `TASK-1799` 📋 to-do — **Landing Content Marketing: del pedido de piezas a una operación visible.**
-  Posiciona Efeonce como partner estratégico y operativo para el Marketing Manager que busca y audita
-  proveedores, con el CMO como aprobador. La experiencia inmersiva «Sistema de Contenidos Vivo» muestra
-  una idea pasando por research, estrategia, producción, revisión, atomización, CMS, distribución y
-  aprendizaje; usa Content Hub y Frame.io como evidencia, explicita tres modos de colaboración y deja
-  Blogging como módulo salvo demanda/intención separada verificada. P1 / Alto / Alto. ui-ux/motion,
-  UI ready yes. Backend none por reuso de Growth Forms/CTA/Meetings. Domain
-  public-site|content|growth|seo. Epic EPIC-019. Spec:
-  `to-do/TASK-1799-landing-content-marketing-content-ops-partner.md`.
+- `TASK-1799` 🔄 in-progress — **Content Marketing / Content Ops publicada** en `242603` con trece
+  widgets Elementor, diseño aprobado, chrome Ohio, formulario y SEO/Service. Menú **Soluciones →
+  Crecimiento Multicanal → Content Marketing**. Verificaciones públicas 1440/1280/890/390 y 78 tests
+  del renderer PASS. Sigue abierta por contraste, resize en ventanas bajas, conversión/GA4, editor
+  completo y CWV/research; no tratar la landing como no implementada.
+  `in-progress/TASK-1799-landing-content-marketing-content-ops-partner.md`.
+
 - **Reserva superada: decía siguiente ID libre `TASK-1800`, y `TASK-1800` ya está tomada** (gate de accesibilidad en CI). ⚠️ **Esta línea y la de la sección de arriba se contradecían**: había DOS «Reserva vigente actualizada» en secciones distintas de este mismo README, y un agente que leyera sólo una reservaba un ID ya usado — pasó el 2026-08-30 con `TASK-1799`. **La reserva vigente es UNA y vive arriba**; ésta queda como histórico. `TASK-1799` toma la landing de
   Content Marketing + Content Ops. El barrido por superficie descartó colisión con las landings de
   Inbound, SEO, AEO, Redes Sociales, Influencer y Agencia Creativa; el runtime público sí comparte

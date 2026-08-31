@@ -70,6 +70,7 @@ Sin un epic, el trabajo tenderia a partir con un script o endpoint aislado que p
 | `TASK-TBD` | `5` | `planned` | Attribution and reporting: HubSpot campaign/form/meeting linkage, landing performance snapshot and Pulse/Account 360 hooks. |
 | `TASK-TBD` | `6` | `planned` | Nexa advisory layer: draft copy/SEO suggestions and opportunity detection after deterministic publishing is stable. |
 | `TASK-1326` | `4` | `to-do` | **Control plane Astro multi-repo**: generaliza el binding + GitHub Control Plane de public-site Astro de single-repo (hoy pineado a `efeonce-web`) a un registro multi-repo, para gobernar `efeonce-think` desde Greenhouse. *(Reconciliada 2026-08-05: declaraba `Epic: EPIC-020`, pero es control plane del sitio público, no AEO.)* |
+| `TASK-1799` | `4` | `in-progress / landing publicada` | Content Marketing / Content Ops: trece widgets Elementor desde diseño aprobado, Growth Forms, Yoast/Service y menú. Pendientes de QA ampliado en su [task](../../tasks/in-progress/TASK-1799-landing-content-marketing-content-ops-partner.md); no implica cierre del control plane completo. |
 
 ## Existing Related Work
 

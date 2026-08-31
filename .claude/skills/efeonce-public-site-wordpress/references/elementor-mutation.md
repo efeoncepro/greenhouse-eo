@@ -44,6 +44,10 @@ an old `/tmp` backup path is recovery evidence, not a guarantee that the archive
 
 ## After Save
 
+- Treat save, metadata updates, index rebuilding, cache invalidation and verification as separate stages.
+  A nonzero script exit after a write is not a rollback. Read the document and metas before retrying,
+  identify which stages completed, and finish only the missing work with fresh guards. In particular,
+  do not rerun an initial publication writer whose expected hash describes the replaced page.
 - Re-check the protected metas and hashes.
 - Compare decoded intended/readback trees and unchanged sibling widgets, page settings and protected
   reference-page hashes. If Elementor drops a protected meta such as `_thumbnail_id`, restore its
@@ -54,6 +58,10 @@ an old `/tmp` backup path is recovery evidence, not a guarantee that the archive
   decoded tree. A failed raw-string assertion after `Document::save()` does not
   prove the write failed. Inspect semantic readback and the live DOM before
   retrying, or a retry can duplicate the mutation.
+- Compare normalized metadata semantics when the owning plugin normalizes storage. Content Ops exposed
+  Yoast storing a requested robots-nofollow `0` as an empty value; verify the effective public robots
+  directives and headers as well as storage before declaring failure. This does not justify ignoring
+  arbitrary mismatches. SEO ownership/gates: `../seo-aeo/references/home-landing-metadata-schema.md`.
 - Expect `Document::save()` to synchronize `post_content` on some documents.
   Snapshot it, but do not require its pre-save hash to remain unchanged unless
   the current document contract proves it should. Protect semantic content and
@@ -91,8 +99,9 @@ Useful Ohio controls to check before CSS:
 
 Visual guardrails:
 
-- Blue brand should dominate; green/teal is an accent, not a new base theme.
-- Keep runtime typography: Inter body, DM Sans headings/buttons.
+- For legacy native-Ohio compositions, preserve the existing blue base/green-teal accents and Inter
+  body/DM Sans headings. For an explicitly approved source-led landing, use its documented tokens and
+  typography inside the owned modules; do not silently restyle the approved export or shared chrome.
 - Fix hover/active states in widget controls first.
 - Motion must be subtle, enterprise-grade, and reduced-motion aware.
 

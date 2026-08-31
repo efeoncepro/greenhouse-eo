@@ -1,13 +1,38 @@
 # Operar el Motor de Formularios de Growth
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.5 — 2026-08-29 (Codex, TASK-1598 premium selects)
+> **Version:** 1.6 — 2026-08-31 (Codex, TASK-1799 Content Marketing)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Estado de flags (SoT humano):** [docs/operations/FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md)
 
 ## Para que sirve
 
 Operar (prender, verificar, revertir) el motor de formularios publicos de Growth y su entrega a HubSpot. La operación humana diaria vive en **Comercial → Growth → Forms** (`/admin/growth/forms`, zona Operación del menú lateral); las APIs siguen siendo el contrato gobernado para automatización, Nexa, MCP, scripts y verificación.
+
+## Mantener el formulario de Content Marketing
+
+El registro de identidad, versión y límites del rollout está en el
+[contrato runtime](../../architecture/growth-public-forms-runtime-contract.md#content-marketing-presentación-host-y-distribución-del-renderer).
+Para revisar o modificar su configuración:
+
+1. Lee el form publicado `efeonce-content-marketing` y su surface; verifica que el origen del embed
+   siga permitido. No infieras el estado actual desde la versión anotada en la documentación.
+2. Revisa `scripts/growth/publish-content-marketing-form.ts`. Sin `--apply` no publica; cuando ya hay
+   versión publicada y no se pasa `--revise`, devuelve su identidad. Conserva la política
+   `greenhouse_only` salvo autorización y diseño de un destino independiente.
+3. Para una revisión autorizada, ejecuta el lifecycle del script con `--apply --revise` usando el
+   cargador canónico de entorno. Crea draft → review → publish; no edites una versión publicada
+   in-place ni cargues `.env.local` mediante `source`.
+4. Relee el `GET /api/public/growth/forms/18b228e9-106a-402e-a6f2-a8c5469e73d7?surfaceId=fhsf-efeonce-content-marketing`:
+   verifica campos, `styleVariant`, pasos, ayudas `step.<key>.help`, consentimiento y captcha.
+5. Si cambia el renderer, compila y verifica el consumer correspondiente antes de su despliegue
+   autorizado. Un bundle actualizado en WordPress no actualiza `renderer-latest.js` global.
+6. Prueba en el host real: envío vacío bloqueado, avance, modo prellenado, regreso con valores intactos
+   y ausencia de reinicios del formulario al interactuar con la landing. Los datos de prueba no deben
+   entrar en capturas, telemetry ni docs.
+7. Separa ese smoke sin envío de un envío controlado aceptado, su ledger y la observación GA4.
+   El rollout del 2026-08-31 no realizó estos últimos; la fila de
+   [TRACKING-PLAN.md](../../reference/measurement-gtm-ga4/TRACKING-PLAN.md) sigue pendiente.
 
 ## Usar el cockpit visual
 

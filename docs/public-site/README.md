@@ -28,6 +28,12 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
 
 ## Índice
 
+- **[Content Marketing vigente — Elementor](../architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md)** —
+  página `242603`, `/servicio-marketing-de-contenidos/`, trece módulos del diseño aprobado y captura
+  Growth Forms. [Funcionamiento](../documentation/public-site/content-marketing.md),
+  [edición y verificación](../manual-de-uso/public-site/content-marketing.md) y
+  [evidencia del corte de publicación](../audits/public-site/2026-08-31-content-marketing-publication.md).
+
 - **[HubSpot vigente — Elementor](../architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md)** — página
   `244079` en `/servicios-contratar-hubspot/`, once widgets nativos y Growth Forms. Diseño aprobado con
   identidad visual y copy revisado en siete módulos; [última evidencia pública del 2026-08-31](../audits/public-site/2026-08-31-hubspot-industry-method-copy.md).

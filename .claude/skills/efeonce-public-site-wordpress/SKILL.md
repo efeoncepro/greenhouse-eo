@@ -39,6 +39,7 @@ Read the minimal set:
 | Any public landing visual/content work | `references/landing-workflow.md` + `references/landing-registry.md` + the landing file under `references/landings/` |
 | New or unregistered landing | `references/landing-workflow.md` + `references/landing-registry.md` |
 | Elementor mutation / page-scoped CSS | `references/elementor-mutation.md` |
+| Native Ohio navigation, menu label/link or hierarchy | `references/native-navigation.md` + the destination landing reference |
 | Growth Forms or public form embed | `references/growth-forms-wordpress.md` |
 | Measurement/tagging (GTM containers, dataLayer, GA4 events on the site) | `docs/reference/measurement-gtm-ga4/` (start with `04-greenhouse-gh-event-convention.md`; live container `GTM-NGHPGRLZ`) |
 | AI Content Factory, Gutenberg posts, draft/private clones | `references/content-factory-gutenberg.md` |
@@ -56,6 +57,7 @@ Read the minimal set:
 | Agencia Creativa `/agencia-creativa/` | `references/landings/agencia-creativa.md` |
 | HubSpot services `/servicios-contratar-hubspot/` | `references/landings/hubspot-services.md` |
 | Home `/` (former Claude Design preview) | `references/landings/home-claude-design-preview.md`; verify current CMS identity/hash before writes |
+| Content Marketing / Content Ops `/servicio-marketing-de-contenidos/` | `references/landings/content-marketing.md` + `references/source-led-elementor-patterns.md` |
 
 If several domains apply, load the smallest union. Do not preload every reference.
 

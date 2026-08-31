@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,13 +21,23 @@
 - Motion: `docs/ui/motion/TASK-1799-landing-content-marketing-content-ops-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-019`
-- Status real: `Diseno`
+- Status real: `En progreso`
 - Rank: `TBD`
 - Domain: `public-site|content|growth|seo`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; runtime público main; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Publicación verificada — 2026-08-31
+
+Por instrucción explícita del operador se publicó su export Claude Design aprobado: trece widgets
+Elementor, header/footer nativos, Growth Forms y SEO. URL y page ID preservados.
+[Auditoría y límites](../../audits/public-site/2026-08-31-content-marketing-publication.md) ·
+[Arquitectura](../../architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md).
+La landing está operativa. La task conserva `in-progress` por contraste del diseño aprobado,
+smoke de conversión/GA4, editor visual completo y research/CWV del alcance ampliado original.
+No confundir esos pendientes con una landing sin publicar; no repetir el cutover inicial.
 
 ## Summary
 
@@ -126,7 +136,14 @@ Revisar y respetar:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-1799-landing-content-marketing-content-ops-partner.md`
+Entrega implementada: trece widgets `greenhouse_content_*`, schemas/templates y assets en
+`efeonce-public-site-runtime/wp-content/plugins/eo-elementor-widgets`; scripts `*content-marketing*`
+de compilación/publicación/verificación y `publish-content-marketing-form.ts` en Greenhouse.
+El renderer compartido incluye la variante `content_marketing` y restauración de select nativo.
+[Mapa y límites de ownership](../../architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md).
+La lista siguiente conserva artefactos de planificación; no prescribe rehacer el diseño aprobado.
+
+- `docs/tasks/in-progress/TASK-1799-landing-content-marketing-content-ops-partner.md`
 - `docs/ui/visual-directions/TASK-1799-landing-content-marketing-content-ops.md`
 - `docs/ui/wireframes/TASK-1799-landing-content-marketing-content-ops.md`
 - `docs/ui/flows/TASK-1799-landing-content-marketing-content-ops-flow.md`
@@ -138,6 +155,9 @@ Revisar y respetar:
 - Escenario GVC público `TASK-1799` y su evidencia/review dossier, con ruta exacta a resolver en Slice 1.
 
 ## Current Repo State
+
+Esta sección conserva el diagnóstico de intake anterior a la publicación. Para estado actual,
+fuente aprobada y límites de QA, usar «Publicación verificada» y la auditoría.
 
 ### Already exists
 
@@ -151,7 +171,7 @@ Revisar y respetar:
 - Evidencia operativa de Content Hub, revisión de assets y publicación en CMS que puede convertirse
   en prueba sólo cuando esté aprobada, redactada y libre de PII/datos de cliente no autorizados.
 
-### Gap
+### Gap al iniciar — histórico
 
 - Posicionamiento live centrado en entregables, no en partnership ni Content Operations.
 - Metadata actual desalineada con el servicio.
@@ -297,6 +317,10 @@ backlinks, SERP, canonical, redirect y paridad de medición.
   solape con landings hermanas y claims de capacidad no aprobados.
 
 ### Visual verification
+
+Evidencia ejecutada: `scripts/public-website/verify-content-marketing-landing.cjs` y
+`.captures/content-marketing/`, bajo modo WordPress/Playwright del contrato GVC. No existe evidencia
+para declarar el scorecard premium siguiente aprobado; sigue como objetivo de cierre ampliado.
 
 - GVC scenario: `content-marketing-landing`.
 - Viewports: desktop 1440 + mobile 390px.
@@ -509,22 +533,26 @@ resolver canonical, claims, evidencia y first fold. No se publica desde la fase 
 
 ## Acceptance Criteria
 
-- [ ] El posicionamiento vende partnership estratégico + operación visible, no una bolsa de piezas.
-- [ ] El first fold identifica servicio, audiencia, resultado y CTA sin depender de animación.
+Las casillas marcadas se sostienen en el HTML/publicación y checks referidos en la auditoría.
+Los criterios compuestos permanecen abiertos si falta alguna prueba (p. ej. negative path
+probado, pero aceptación/restore/entrega completa aún no). Diseño aprobado no equivale a WCAG AA.
+
+- [x] El posicionamiento vende partnership estratégico + operación visible, no una bolsa de piezas.
+- [x] El first fold identifica servicio, audiencia, resultado y CTA sin depender de animación.
 - [ ] La experiencia «una idea se multiplica» es memorable, causal y comprensible en desktop, 390px,
       teclado, sin JS y reduced motion.
-- [ ] El operador puede auditar flujo, artefactos, responsabilidades, revisiones y modo de trabajo.
-- [ ] Existe una sección explícita para armar el business case ante el CMO.
-- [ ] Content Hub y Frame.io se presentan como evidencia de proceso; ninguna marca implica partnership.
-- [ ] Los tres modos declaran quién publica/distribuye y admiten que el cliente puede recibir assets + copy.
-- [ ] Blog & Editorial Operations permanece como módulo salvo research que justifique un satellite separado.
+- [x] El operador puede auditar flujo, artefactos, responsabilidades, revisiones y modo de trabajo.
+- [x] Existe una sección explícita para armar el business case ante el CMO.
+- [x] Content Hub y Frame.io se presentan como evidencia de proceso; ninguna marca implica partnership.
+- [x] Los tres modos declaran quién publica/distribuye y admiten que el cliente puede recibir assets + copy.
+- [x] Blog & Editorial Operations permanece como módulo salvo research que justifique un satellite separado.
 - [ ] SEO/AEO research regional, keyword map y decisión de slug/canonical quedan documentados con fuente/fecha.
-- [ ] Content Marketing, Inbound y los spokes hermanos tienen fronteras y enlaces sin copy duplicado.
+- [x] Content Marketing, Inbound y los spokes hermanos tienen fronteras y enlaces sin copy duplicado.
 - [ ] Sólo hay claims, screenshots, marcas, cifras y casos aprobados; cero PII o evidencia simulada no rotulada.
 - [ ] Formulario/scheduler reutiliza el carril canónico, con negative path, focus restore y readback.
-- [ ] HTML inicial contiene H1, propuesta, secciones críticas y respuestas; schema refleja contenido visible.
+- [x] HTML inicial contiene H1, propuesta, secciones críticas y respuestas; schema refleja contenido visible.
 - [ ] GVC premium desktop 1440 + mobile 390px + reduced motion + keyboard + full page revisado.
-- [ ] `documentElement.scrollWidth <= clientWidth` en 1440 y 390px.
+- [x] `documentElement.scrollWidth <= clientWidth` en 1440 y 390px.
 - [ ] Scorecard PASS: average ≥4.5, ninguna dimensión <4 y dimensiones críticas ≥4.5.
 - [ ] Performance/CWV no sufre una regresión material respecto de la baseline acordada; sin scroll hijack,
       autoplay audible ni dependencia WebGL pesada.
@@ -546,11 +574,11 @@ resolver canonical, claims, evidencia y first fold. No se publica desde la fase 
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedó sincronizado con el cierre
-- [ ] `Handoff.md` quedó actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedó actualizado si cambió comportamiento, estructura o protocolo visible
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedó sincronizado con el cierre
+- [x] `Handoff.md` quedó actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedó actualizado si cambió comportamiento, estructura o protocolo visible
 - [ ] se ejecutó chequeo de impacto cruzado sobre otras tasks afectadas
 
 ## Follow-ups
@@ -561,12 +589,14 @@ resolver canonical, claims, evidencia y first fold. No se publica desde la fase 
   segundo consumer o cuando su a11y/motion/responsive justifique ownership de widget.
 - Si la ruta migra, abrir seguimiento SEO de redirects/indexación sólo cuando exceda el ciclo de esta task.
 
-## Open Questions
+## Open Questions y decisiones resueltas
 
-- ¿La canonical debe permanecer en `/servicio-marketing-de-contenidos/` o migrar a
-  `/servicios/content-marketing/`? Resolver con evidencia, no por preferencia.
-- ¿Qué capturas/casos de Content Hub y Frame.io tienen autorización pública y qué debe recrearse como
-  demo conceptual rotulada?
-- ¿Cuál es el nombre público del tercer modo: «Content Engine», «Equipo extendido» o «Enablement»?
-  Validar con operadores; no resolverlo durante el maquetado.
-- ¿Qué CMS pueden nombrarse públicamente como capacidad verificada? Confirmar especialmente `Modyo`.
+- **Resuelto para esta entrega:** se conserva `/servicio-marketing-de-contenidos/` y `page_id=242603`.
+  Una migración futura requiere evidencia propia de GSC/backlinks/SERP; no está autorizada por estética.
+- **Resuelto por export aprobado:** tercer modo **Content Engine** y demo conceptual «Aro 7» rotulada.
+  No se presenta como campaña real ni autoriza mostrar datos de clientes.
+- **Pendiente del alcance original:** keyword map/regiones, CWV y ampliación verificable de claims de CMS.
+- **Pendiente QA:** solicitud aceptada + ledger/GA4, editor visual completo y contraste del diseño.
+- **Hallazgo de revisión documental:** mount del stage exige ancho 940 y alto 740 px, pero resize sólo
+  comprueba ancho. No se corrigió ni desplegó un cambio por esta revisión; verificar ventanas bajas
+  antes del cierre premium.

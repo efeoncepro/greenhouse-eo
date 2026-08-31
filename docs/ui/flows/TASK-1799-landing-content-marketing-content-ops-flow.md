@@ -8,6 +8,17 @@
 - Entry points: búsqueda orgánica, navegación de Servicios, referrals, links desde spokes/editorial
 - Exit points: captura/reunión, spoke relevante, regreso posterior o salida informada
 
+## Estado de implementación — 2026-08-31
+
+Flujo publicado: navegación **Soluciones → Crecimiento Multicanal → Content Marketing**, CTA por
+ancla al formulario Growth Forms de dos pasos (identidad/contexto). El modo se precompleta sólo antes
+de empezar a escribir y el host conserva el estado al actualizar la landing. No hay scheduler inline:
+la agenda es una navegación de fallback. Success/booking en el diagrama son estados de contrato,
+no prueba de envío de solicitud ni reserva de reunión durante la validación.
+
+[Implementación canónica](../../architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md) ·
+[Auditoría y pendientes](../../audits/public-site/2026-08-31-content-marketing-publication.md).
+
 ## Flow map
 
 ```text

@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional
 > **Version:** 1.1
 > **Creado:** 2026-06-14 por Codex
-> **Ultima actualizacion:** 2026-08-22 por Codex
+> **Ultima actualizacion:** 2026-08-31 por Codex (inventario focal Content Marketing)
 > **Dominio:** Public Site
 > **Sitio:** `https://efeoncepro.com`
 > **Runtime revalidado para Demo 35 (2026-08-22):** WordPress `7.1`, Kinsta, theme `ohio-child` `1.0.0` sobre Ohio `3.7.0`, Elementor `4.2.3`, Elementor Pro `4.2.2`, Ohio Extra `3.7.0`. Los conteos agregados de este inventario siguen siendo el snapshot del 2026-06-14.
@@ -61,6 +61,18 @@ usados, 15 instancias de `ohio_recent_posts` y dependencias Ohio externas al
 [`2026-08-22-demo35-elementor-runtime-contract.md`](../../audits/public-site/2026-08-22-demo35-elementor-runtime-contract.md).
 No extrapolar sus versiones runtime a los conteos agregados sin repetir el
 discovery global.
+
+## Extensión focal: Content Marketing / Content Ops
+
+El corte de publicación 2026-08-31 añade trece widgets semánticos `greenhouse_content_*` de
+`eo-elementor-widgets` en la página `242603`. Usan controles nativos de texto, textarea, URL y media;
+los iconos son texto Tabler, con motion y padding responsive. La captura es un host de Growth Forms,
+no un formulario nuevo dentro de Elementor. [Contrato, módulos y límites](../../architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md) ·
+[Manual de edición](../../manual-de-uso/public-site/content-marketing.md).
+
+Este inventario focal no actualiza los conteos globales de 2026-06-14 ni certifica el roundtrip completo
+del editor. Consulta la [evidencia de publicación](../../audits/public-site/2026-08-31-content-marketing-publication.md)
+para las pruebas de registro, readback y navegador y los pendientes de contraste/conversión.
 
 ## Fundaciones visuales: color, tipografia y motion
 

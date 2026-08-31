@@ -1,7 +1,7 @@
 # Incrustar un formulario de Growth en un sitio (WordPress / Astro)
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.6 — 2026-08-29 (Codex, TASK-1598 Editorial Premium Brief)
+> **Version:** 1.7 — 2026-08-31 (Codex, TASK-1799 Content Marketing)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Arquitectura:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md) §19 + §Delta TASK-1231
 
@@ -63,6 +63,25 @@ multi-paso) y estados (cargando / error / no disponible) desde fixtures.
 
 > El widget solo emite `<greenhouse-form …>` y carga el bundle pineado de Greenhouse.
 > Nunca cambia campos ni destinos.
+
+### Host interactivo y presentación Content Marketing
+
+El módulo `greenhouse_content_conversion` incrusta el mismo `<greenhouse-form>` por `form-key` y
+`surface`, con `appearance="bare"` y `color-scheme="light"`. La variante `content_marketing` y sus
+ayudas de paso se publican en Growth Forms, no se escriben como campos HTML de Elementor.
+Su [contrato runtime](../../architecture/growth-public-forms-runtime-contract.md#content-marketing-presentación-host-y-distribución-del-renderer)
+identifica el consumer y el bundle fijado; no sustituyas otros bundles del sitio por éste como parte
+de una edición de landing.
+
+Cuando el host tiene tabs o un patcher de DOM, trata el contenedor del formulario como **opaco**:
+conserva el nodo y deja que el renderer controle sus descendientes. Verifica que actualizar el host
+no remonte el custom element ni borre lo escrito. `initial-values` sirve para un prefill público
+(por ejemplo, el modo seleccionado); no es un canal para PII ni debe cambiarse tras iniciar la edición.
+Comprueba un select nativo al entrar al paso y al volver: su valor visual debe coincidir con el estado.
+
+El bundle del consumer debe compilarse desde el renderer canónico; no copies su lógica dentro del
+widget. Registra URL/hash, controla la caché y evita dos registros del mismo custom element. Montaje,
+validación vacía y paso siguiente no prueban captura aceptada, entrega ni medición GA4.
 
 ### Capa compartida Ohio para Growth Forms
 

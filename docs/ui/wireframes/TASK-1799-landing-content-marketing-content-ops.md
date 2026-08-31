@@ -10,6 +10,17 @@
 - Primary conversion: conversación cualificada sobre la operación de contenidos
 - UI rigor: `ui-standard`
 
+## Estado de implementación — 2026-08-31
+
+Este wireframe conserva la planificación previa. El export Claude Design aprobado prevalece sobre
+sus dibujos: hero centrado con palabra dinámica y trece módulos Elementor `hero`, `proof`, `problem`,
+`system`, `atomization`, `hub`, `review`, `editorial`, `modes`, `ecosystem`, `business`, `faq`, `conversion`.
+La raíz implementada es `.gh-content-module`, con `[data-content-module]` y markers `[data-capture]`.
+No renombrar selectors ni volver a la composición preliminar para hacer coincidir el dibujo histórico.
+
+[Implementación canónica](../../architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md) ·
+[Auditoría y pendientes](../../audits/public-site/2026-08-31-content-marketing-publication.md).
+
 ## Brief
 
 La landing hace visible un partnership de Content Marketing. El visitante debe pasar de «necesito

@@ -4,6 +4,8 @@ Load for Claude Design ports and later visual iterations of modular public pages
 lessons, not a live-state ledger. Architecture: `docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md`;
 primitive ownership: `docs/architecture/public-site/PRIMITIVES.md`. Dated Home evidence, hashes and rollback
 belong in `references/landings/home-claude-design-preview.md` and the linked audit.
+Content Ops compiler/host evidence: `docs/architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md`
+and `references/landings/content-marketing.md`.
 
 ## Source fidelity without losing editability
 
@@ -21,10 +23,42 @@ belong in `references/landings/home-claude-design-preview.md` and the linked aud
    timers/frames and remove active overlays/playback. Editor/reduced-motion mode shows content without
    waiting for a reveal, does not clone rails, and does not contact video providers.
 
+## Compiling design exports with custom directives
+
+- Inspect the parsed tree before treating an export as ordinary HTML. A standards-oriented parser can
+  relocate unknown wrappers such as `sc-for` inside a table; XML parsing can instead absorb content after
+  HTML void tags such as `<br>`. Content Ops uses Cheerio's htmlparser2 path with `xmlMode:false` to retain
+  its directive structure and HTML semantics. This is an artifact-specific adapter, not a universal
+  parser default. Compare row/cell content and text after void tags with the approved source.
+- Compile trusted, approved source expressions locally into PHP initial markup, native control schemas
+  and a bounded client enhancement. Do not ship the design interpreter or evaluate arbitrary editor text.
+  Check all interactive states when collecting editable copy/media/links, not only the initial render.
+- Keep server markup and client patches structurally compatible. Adjacent text nodes may be coalesced
+  by the browser; verify real hydration rather than relying on generated string equality.
+- Treat an embedded renderer's host as opaque. Preserve its actual DOM node across parent updates,
+  including during initial hydration; skipping child reconciliation alone is insufficient if the host
+  itself can be replaced. Test that typed fields, validation and step state survive neighboring controls.
+  Growth Forms owns the field contract; use `references/growth-forms-wordpress.md` for its gates.
+
+## Pinned narrative navigation
+
+- A chapter click must select its destination directly and keep it selected during programmatic scroll.
+  Temporarily suppress scroll-to-state synchronization for that travel; after release, ordinary user
+  scrolling must resume chapter selection. Test a distant tab through the complete transition, not just
+  its immediate `aria-selected` value. Preserve the approved pin duration and background behavior.
+- Derive document scroll targets from document coordinates (`getBoundingClientRect().top + scrollY`),
+  accounting for the actual header and stage geometry; `offsetTop` is relative to its offset parent.
+- Gate pinning by usable viewport height as well as width. Mobile, short viewports, reduced motion and
+  JavaScript-off must retain readable chapters in normal flow; do not turn the fallback into blank space.
+
 ## Composition and Ohio integration
 
 - Native scheme markers govern Ohio chrome. Scope content contrast to the module and expose a heading
   color for dark sections; do not recolor nested accent spans or global H2s to repair one heading.
+- Ohio full-width gutter compensation can win against a lower-specificity page rule even when both use
+  `!important`. Inspect computed position and the winning selector in the real theme, then target only
+  the affected page's owned Elementor containers. Keep inner content gutters and native chrome intact;
+  clipping horizontal overflow alone does not correct a shifted section or certify responsive layout.
 - Test filled CTA normal, sustained hover, focus and reduced motion. Ohio's `-undash` opts a link out of
   `links-underline`; changing only `background-color` does not remove its animated background image.
 - A glow should fade to transparent within its own box. A tall clipped circular gradient can look like

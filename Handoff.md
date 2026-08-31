@@ -2,6 +2,20 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-31 — Content Marketing publicado desde diseño aprobado
+
+Menú verificado: **Soluciones → Crecimiento Multicanal → Content Marketing**, item `242917`, sin duplicados ni cambio de orden.
+
+Landing `242603` publicada con trece widgets Elementor y chrome Ohio intacto. Formulario canónico, SEO y
+verificación pública 1440/1280/890/390; 78 tests del renderer PASS. No se enviaron leads ni correos.
+[Auditoría, snapshots y pendientes](docs/audits/public-site/2026-08-31-content-marketing-publication.md).
+TASK-1799 sigue in-progress por contraste del diseño, smoke de conversión/GA4, editor completo y CWV/research.
+Runtime versionado en `73493a8`; cierre local de Greenhouse asociado, sin push. No repetir el cutover inicial.
+Revisión documental con tres subagentes: docs triples, índices, inventario, skills espejadas y task/UI
+reconciliados. Menú conserva secuencia visible; no se afirma igualdad de valores raw `menu_order`.
+Hallazgo confirmado: resize a 1440×651 activa pin aunque mount bajo 740 px no lo hace; pendiente de
+TASK-1799, sin cambio de código en este pase. Evidencia y comandos en la auditoría enlazada.
+
 ## 2026-08-30 — Landing HubSpot aprobada: publicada como once widgets Elementor
 
 Por nueva instrucción explícita del operador se implementó y publicó su ZIP Claude Design aprobado,
@@ -573,19 +587,3 @@ impidió que se propagara como hecho.
 bypass no ocultó nada, pero queda registrado.
 
 **Siguiente paso:** decidir la federación al gateway.
-
-## 2026-08-29 — cartera LicitaLAB/Wherex y contrato CRM común
-
-**Estado: documentación y skills cerradas; no hubo mutaciones externas en este cierre.** El universo operativo
-documenta 30 oportunidades revisadas y 24 Deals verificados: 23 abiertos y uno `closedlost`. El readback live de
-HubSpot encontró además el RFI CRM Mineduc `1588-33-RFI26`, anterior al corte, por lo que existen 24 Deals de
-licitación abiertos en total; Ajinomoto ya no cuenta como activo.
-
-- Los ocho RFP Wherex promovidos siguen `newbusiness` y `default/qualifiedtobuy`, pero el segundo readback los
-  encontró en `Core Pipeline`; la política relación-primero indica `Strategic Bet` para cuentas nuevas. La deriva
-  queda registrada como riesgo de automatización sin corrección silenciosa.
-- CINTERMEX `CNX-239` queda `HOLD vencido / portal no verificado`; Grupo Reditos (`GRD-1496`, `GRD-1499`,
-  `GRD-1501`, `GRD-1502`) queda `No bid` por decisión del operador.
-- La skill espejada incorpora un contrato común LicitaLAB/Wherex: identidad e idempotencia, deadline distinto de
-  `closedate`, asociaciones reales, segundo readback, estados HOLD/NO-BID/Expirada y sincronización de ambos
-  registros. La cola fechada separa diez bids prioritarios, tres RFI livianos y diez oportunidades con gate previo.

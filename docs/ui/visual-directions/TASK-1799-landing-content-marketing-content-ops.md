@@ -9,6 +9,16 @@
 - Status: selected direction; implementation not authorized by this document
 - Thesis: **una idea se transforma en un sistema visible**
 
+## Estado de implementación — 2026-08-31
+
+El operador aprobó posteriormente el export Claude Design `Content Ops.zip` y autorizó su publicación.
+La dirección de este documento es antecedente; la forma exacta implementada pertenece al export SHA256
+`27187938992c412cc4119432e0e5c3ec4d20a82ab6be0d572cf2d67d36b39f6d`.
+No reconstruir el wireframe preliminar por encima del diseño aprobado ni inferir certificación premium.
+
+[Implementación canónica](../../architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md) ·
+[Auditoría y pendientes](../../audits/public-site/2026-08-31-content-marketing-publication.md).
+
 ## Decision
 
 Seleccionar **Sistema de Contenidos Vivo — «La idea que se multiplica»**. La experiencia sigue una

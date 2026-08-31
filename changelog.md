@@ -7,6 +7,21 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-31 — Content Marketing: diseño aprobado publicado en Elementor
+
+Versionado local del runtime: `73493a8`; cambios Greenhouse acompañados en este cierre, sin push.
+
+Revisión documental delegada: arquitectura/funcional/manual, skills WordPress/Growth Forms e índices
+sincronizados con la entrega. Contratos UI distinguen plan de export publicado; task conserva sus
+pendientes. Se precisan rollback, empaquetado, orden visible del menú y riesgo del pin tras resize.
+Sin cambio de código ni nueva publicación durante esta revisión.
+
+Menú verificado: **Soluciones → Crecimiento Multicanal → Content Marketing**, item `242917`, sin duplicados ni cambio de orden.
+
+Trece widgets editables conservan composición, assets e interacciones de Content Ops; header/footer Ohio
+nativos. Captura canónica de dos pasos, select preseleccionado corregido, Yoast/meta/social/Service y URL
+original preservada. [QA y límites](docs/audits/public-site/2026-08-31-content-marketing-publication.md).
+
 ## 2026-08-30 — Landing HubSpot: export aprobado publicado en Elementor
 
 2026-08-31: etiqueta del enlace de menú cambiada a «Servicios HubSpot» por pedido del operador; URL y jerarquía conservadas.
@@ -1019,20 +1034,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - La lección que ordena esa cadena, y que ya costó un incidente: **«cero filas» no es «nadie lo escribe»**. Lo
   que decide si un valor es alcanzable es el contrato de la superficie desplegada, nunca el contenido de la
   tabla.
-
-## 2026-08-22 — Mover a «Evaluación» ya no guarda una etapa distinta de la que muestra
-
-- El tablero mostraba seis columnas sobre trece etapas del dominio, y tres de ellas se veían todas como
-  «Evaluación». Soltar una tarjeta ahí guardaba `qualified`, mientras la automatización de pruebas vigilaba
-  `shortlisted`: **quince vacantes tenían su política bien configurada y ninguna disparaba**, sin que en pantalla
-  se viera nada raro. Dos candidatas reales cruzaron esa columna el 2026-08-19 y no recibieron su prueba.
-- Ahora hay una etapa por columna. `qualified` y `client_review` se absorbieron en `shortlisted`, y el carril del
-  tablero declara **una sola** etapa: la que lo titula es la que se escribe, así que ese error dejó de poder
-  cometerse. Siete postulaciones reales se movieron con el cambio y quedan visibles en la cola de reconciliación
-  de su vacante para que una persona decida si corresponde asignarles la prueba.
-- El desk leído en inglés mostraba las seis columnas en castellano: heredaba los nombres del diccionario es-CL sin
-  sobreescribirlos. Ya no.
-- **«Preselección» en el correo al candidato y «Evaluación» en el tablero se conservan distintos a propósito.**
-  Hacia afuera el registro es más suave, y decirle «Evaluación» chocaría con el correo del test, que ya dice
-  «tienes una evaluación pendiente». Queda escrito con su razón para que nadie lo lea como error.
-- Nada de esto está en producción todavía: allí mover a «Evaluación» sigue guardando la etapa vieja.

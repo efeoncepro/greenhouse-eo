@@ -1722,6 +1722,28 @@ export const ensureStylesInjected = (doc: Document = document): void => {
   const style = doc.createElement('style')
 
   style.id = RENDERER_STYLE_ID
-  style.textContent = RENDERER_CSS + PILLAR_CSS
+  style.textContent = RENDERER_CSS + PILLAR_CSS + CONTENT_MARKETING_CSS
   doc.head.appendChild(style)
 }
+
+/** Approved Content Ops form: the portable renderer owns layout, the host supplies only theme tokens. */
+const CONTENT_MARKETING_CSS = `
+[data-ghf-style-variant="content_marketing"] .ghf-form{gap:0}
+[data-ghf-style-variant="content_marketing"] .ghf-progress-shell{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:0;padding:16px clamp(20px,2.6vw,30px);border:0;border-bottom:1px solid var(--ghf-border);border-radius:0;background:var(--ghf-step-bg,var(--ghf-field-bg));box-shadow:none}
+[data-ghf-style-variant="content_marketing"] .ghf-content-step-heading{display:grid;gap:2px}
+[data-ghf-style-variant="content_marketing"] .ghf-content-step-title{font-family:var(--ghf-heading-font,var(--ghf-font));font-weight:700;font-size:1.05rem;line-height:1.2;color:var(--ghf-fg)}
+[data-ghf-style-variant="content_marketing"] .ghf-content-step-hint{font-size:.75rem;color:var(--ghf-muted)}
+[data-ghf-style-variant="content_marketing"] .ghf-content-step-progress{margin-left:auto;display:flex;align-items:center;gap:8px}
+[data-ghf-style-variant="content_marketing"] .ghf-progress{margin:0;font-size:.75rem;font-weight:600;letter-spacing:normal;text-transform:none;color:var(--ghf-muted)}
+[data-ghf-style-variant="content_marketing"] .ghf-content-step-dots{display:flex;gap:5px}
+[data-ghf-style-variant="content_marketing"] .ghf-content-step-dots>span{display:block;width:8px;height:8px;border-radius:9999px;background:var(--ghf-border-strong)}
+[data-ghf-style-variant="content_marketing"] .ghf-content-step-dots>[data-state="current"]{width:20px;background:var(--ghf-accent)}
+[data-ghf-style-variant="content_marketing"] .ghf-content-step-dots>[data-state="done"]{background:var(--ghf-accent)}
+[data-ghf-style-variant="content_marketing"] .ghf-fields{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;padding:clamp(20px,2.6vw,30px)}
+[data-ghf-style-variant="content_marketing"] .ghf-actions{display:flex;gap:12px;margin:0;padding:0 clamp(20px,2.6vw,30px) clamp(20px,2.6vw,30px)}
+[data-ghf-style-variant="content_marketing"] .ghf-actions .ghf-btn{flex:1;min-height:46px!important;font-size:.875rem!important}
+[data-ghf-style-variant="content_marketing"] .ghf-actions .ghf-btn--ghost{flex:0 0 auto}
+[data-ghf-style-variant="content_marketing"] .ghf-consent{padding:0 clamp(20px,2.6vw,30px) 20px}
+[data-ghf-style-variant="content_marketing"] .ghf-intake-summary{display:none}
+[data-ghf-style-variant="content_marketing"] [data-ghf-error-summary]{margin:16px clamp(20px,2.6vw,30px)}
+`
