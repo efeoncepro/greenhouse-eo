@@ -5,6 +5,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { GreenhouseApiPlatformClient } from './http-client'
 import { resolveGreenhouseMcpConfig } from './config'
 import { createGreenhouseMcpHandlers, greenhouseMcpToolOutputSchema } from './tools'
+import { computeGreenhouseMcpToolCoverage, GREENHOUSE_MCP_TOOL_MANIFEST } from './tool-manifest'
 import type { GreenhouseMcpConfig } from './types'
 
 export const createGreenhouseMcpServer = (
@@ -25,7 +26,32 @@ export const createGreenhouseMcpServer = (
   const client = new GreenhouseApiPlatformClient(config, deps?.fetch)
   const handlers = createGreenhouseMcpHandlers(client)
 
-  server.registerTool(
+  /**
+   * TASK-1780 — Las definiciones se RECOGEN acá y se registran recorriendo el manifiesto.
+   *
+   * El colector conserva la firma exacta de `registerTool`, así que cada definición de abajo
+   * sigue type-checkeada igual que antes (el handler contra su propio inputSchema). Lo único que
+   * cambia es CUÁNDO se registra: después, en el orden del manifiesto, y sólo si el manifiesto la
+   * declara. Registrar una tool sin entrada —o declarar una entrada sin definición— hace fallar la
+   * construcción del servidor, que es lo que convierte el inventario en fuente y no en comentario.
+   */
+  const collected = new Map<string, () => void>()
+
+  const collector: Pick<McpServer, 'registerTool'> = {
+    registerTool: ((name: string, ...rest: unknown[]) => {
+      if (collected.has(name)) {
+        throw new Error(`Greenhouse MCP: la tool "${name}" se define dos veces en server.ts.`)
+      }
+
+      collected.set(name, () => {
+        ;(server.registerTool as (...args: unknown[]) => unknown)(name, ...rest)
+      })
+
+      return undefined
+    }) as unknown as McpServer['registerTool']
+  }
+
+  collector.registerTool(
     'get_context',
     {
       title: 'Get Context',
@@ -36,7 +62,7 @@ export const createGreenhouseMcpServer = (
     async () => handlers.getContext()
   )
 
-  server.registerTool(
+  collector.registerTool(
     'list_organizations',
     {
       title: 'List Organizations',
@@ -53,7 +79,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.listOrganizations(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'get_organization',
     {
       title: 'Get Organization',
@@ -66,7 +92,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getOrganization(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'list_capabilities',
     {
       title: 'List Capabilities',
@@ -81,7 +107,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.listCapabilities(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'get_integration_readiness',
     {
       title: 'Get Integration Readiness',
@@ -94,7 +120,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getIntegrationReadiness(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'get_platform_health',
     {
       title: 'Get Platform Health',
@@ -106,7 +132,7 @@ export const createGreenhouseMcpServer = (
     async () => handlers.getPlatformHealth()
   )
 
-  server.registerTool(
+  collector.registerTool(
     'list_event_types',
     {
       title: 'List Event Types',
@@ -121,7 +147,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.listEventTypes(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'list_webhook_subscriptions',
     {
       title: 'List Webhook Subscriptions',
@@ -136,7 +162,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.listWebhookSubscriptions(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'get_webhook_subscription',
     {
       title: 'Get Webhook Subscription',
@@ -149,7 +175,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getWebhookSubscription(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'list_webhook_deliveries',
     {
       title: 'List Webhook Deliveries',
@@ -165,7 +191,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.listWebhookDeliveries(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'get_webhook_delivery',
     {
       title: 'Get Webhook Delivery',
@@ -180,7 +206,7 @@ export const createGreenhouseMcpServer = (
 
   // TASK-1086 — Knowledge (read-only). El reader agéntico ya filtra a `agent_allowed`
   // interno y excluye sensibles/cuarentena; si confidence='none' el agente NO debe inventar.
-  server.registerTool(
+  collector.registerTool(
     'search_knowledge',
     {
       title: 'Search Knowledge',
@@ -195,7 +221,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.searchKnowledge(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'get_knowledge_document',
     {
       title: 'Get Knowledge Document',
@@ -212,7 +238,7 @@ export const createGreenhouseMcpServer = (
   // TASK-1211 — Cotizador (read-only, consultar-first). Resolver de servicios +
   // simulación de precio. El estimate es referencial, NO vinculante; el cost
   // stack/margen no cruza a un scope cliente (redacción server-side en el lane).
-  server.registerTool(
+  collector.registerTool(
     'search_services',
     {
       title: 'Search Services',
@@ -227,7 +253,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.searchServices(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'quote_price',
     {
       title: 'Quote Price',
@@ -246,7 +272,7 @@ export const createGreenhouseMcpServer = (
   // Los tres tools delegan en el lane ecosystem: entitlement per-org `seo_v2` +
   // anti-oracle + resolución de org por binding se aplican SERVER-SIDE. Para bindings
   // internos, `organizationId` es requerido; para bindings org-scoped se omite.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_keyword_opportunities',
     {
       title: 'Get SEO Keyword Opportunities',
@@ -265,7 +291,7 @@ export const createGreenhouseMcpServer = (
   // TASK-1661 — lente ◑ ESTIMADA de mercado (Labs), complementaria a la demanda MEDIDA ● de
   // GSC. La description es parte del contrato: le dice al agente que un dato ausente NO es cero
   // y que la cifra siempre viaja con su as-of.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_keyword_market_data',
     {
       title: 'Get SEO Keyword Market Data',
@@ -283,7 +309,7 @@ export const createGreenhouseMcpServer = (
 
   // TASK-1775 — foto de dominio ◑: la pregunta que abre toda reunión de SEO ("¿cómo estamos
   // contra ellos?" / "¿venimos subiendo o bajando?"), del target O de un competidor.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_domain_overview',
     {
       title: 'Get SEO Domain Overview',
@@ -302,7 +328,7 @@ export const createGreenhouseMcpServer = (
 
   // TASK-1776 — el sujeto PÁGINA: qué ranquea una URL/subcarpeta/subdominio (propio o de un
   // competidor) y qué páginas concentran el tráfico de un host.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_url_visibility',
     {
       title: 'Get SEO URL Visibility',
@@ -323,7 +349,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1777 — el detalle que hace accionable el snapshot de enlaces: nombres, no conteos.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_backlink_detail',
     {
       title: 'Get SEO Backlink Detail',
@@ -339,7 +365,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getSeoBacklinkDetail(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'get_seo_visibility_360',
     {
       title: 'Get Search Visibility 360',
@@ -356,7 +382,7 @@ export const createGreenhouseMcpServer = (
 
   // TASK-1785 — la lectura compuesta. CONVIVE con get_seo_visibility_360: aquella cruza SEO×AEO
   // (dos ejes ortogonales de motores distintos), ésta cruza medido×estimado DENTRO de SEO.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_dual_lens_visibility',
     {
       title: 'Get SEO Dual-Lens Visibility',
@@ -373,7 +399,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getSeoDualLensVisibility(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'get_seo_entitlement',
     {
       title: 'Get SEO Entitlement',
@@ -388,7 +414,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1303 — rank evolution: la película de posiciones en el tiempo (pantalla ancla).
-  server.registerTool(
+  collector.registerTool(
     'get_seo_rank_evolution',
     {
       title: 'Get SEO Rank Evolution',
@@ -408,7 +434,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1307 — rendimiento en el tiempo de un SET elegido (la pantalla ancla, por MCP).
-  server.registerTool(
+  collector.registerTool(
     'get_seo_performance',
     {
       title: 'Get SEO Performance Over Time',
@@ -430,7 +456,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1307 — catálogo de ítems elegibles (qué se le puede pedir a get_seo_performance).
-  server.registerTool(
+  collector.registerTool(
     'get_seo_performance_catalog',
     {
       title: 'Get SEO Performance Catalog',
@@ -449,7 +475,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1306 — KPIs norte del cockpit Overview (la foto medida del período).
-  server.registerTool(
+  collector.registerTool(
     'get_seo_overview_kpis',
     {
       title: 'Get SEO Overview KPIs',
@@ -466,7 +492,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1304 — site audit report: salud técnica del sitio (OnPage async queue+poll).
-  server.registerTool(
+  collector.registerTool(
     'get_seo_site_audit_report',
     {
       title: 'Get SEO Site Audit Report',
@@ -483,7 +509,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1304 — backlink profile: la serie semanal del perfil de enlaces.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_backlink_profile',
     {
       title: 'Get SEO Backlink Profile',
@@ -502,7 +528,7 @@ export const createGreenhouseMcpServer = (
   // TASK-1308 — el PRIMER tool SEO que ESCRIBE. Los 9 anteriores son lecturas; éste
   // compromete gasto recurrente del proveedor, así que el lane lo acepta sólo desde
   // bindings de scope `internal` y el command aplica techo + entitlement + idempotencia.
-  server.registerTool(
+  collector.registerTool(
     'track_seo_keywords',
     {
       title: 'Track SEO Keywords',
@@ -520,7 +546,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1308 — el reverso del write: lo que hace reversible el compromiso de gasto.
-  server.registerTool(
+  collector.registerTool(
     'untrack_seo_keywords',
     {
       title: 'Untrack SEO Keywords',
@@ -536,7 +562,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1662 — competidores declarados: el gap competitivo parte de acá.
-  server.registerTool(
+  collector.registerTool(
     'declare_seo_competitors',
     {
       title: 'Declare SEO Competitors',
@@ -553,7 +579,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1662 — el reverso del write: lo que hace reversible el gasto de cobertura.
-  server.registerTool(
+  collector.registerTool(
     'retire_seo_competitors',
     {
       title: 'Retire SEO Competitors',
@@ -570,7 +596,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1662 — lectura del gap competitivo derivado.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_keyword_gap',
     {
       title: 'Get SEO Keyword Gap',
@@ -588,7 +614,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1700 — la cola priorizada de trabajo: la ÚNICA autoridad de orden del módulo.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_work_queue',
     {
       title: 'Get SEO Work Queue',
@@ -607,7 +633,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1699 — el top-N del SERP ya pagado + descubrimiento de competidores (lecturas).
-  server.registerTool(
+  collector.registerTool(
     'get_seo_serp_top_results',
     {
       title: 'Get SEO SERP Top Results',
@@ -626,7 +652,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getSeoSerpTopResults(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'get_seo_competitor_candidates',
     {
       title: 'Get SEO Competitor Candidates',
@@ -645,7 +671,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1664 — keyword discovery: lectura de corridas/candidatos.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_keyword_discovery',
     {
       title: 'Get SEO Keyword Discovery',
@@ -689,7 +715,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1664 — el write de discovery: encolar una corrida que GASTA presupuesto DataForSEO.
-  server.registerTool(
+  collector.registerTool(
     'discover_seo_keywords',
     {
       title: 'Discover SEO Keywords',
@@ -714,7 +740,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1666 — lectura del draft grounded (prompts AEO con provenance SEO).
-  server.registerTool(
+  collector.registerTool(
     'get_seo_grounded_query_draft',
     {
       title: 'Get SEO Grounded Query Draft',
@@ -732,7 +758,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1666 — el write del puente SEO → AEO: crea un DRAFT, jamás activa ni ejecuta.
-  server.registerTool(
+  collector.registerTool(
     'prepare_seo_grounded_queries',
     {
       title: 'Prepare SEO Grounded Queries',
@@ -752,7 +778,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1709 — diagnóstico de prospecto (lectura + disparo). Sólo bindings `internal`.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_prospect_diagnostic',
     {
       title: 'Get SEO Prospect Diagnostic',
@@ -768,7 +794,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getSeoProspectDiagnostic(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'run_seo_prospect_diagnostic',
     {
       title: 'Run SEO Prospect Diagnostic',
@@ -783,6 +809,21 @@ export const createGreenhouseMcpServer = (
     },
     async args => handlers.runSeoProspectDiagnostic(args)
   )
+
+  // ── El registro: una pasada por el manifiesto, en su orden ────────────────
+  const coverage = computeGreenhouseMcpToolCoverage({
+    manifest: GREENHOUSE_MCP_TOOL_MANIFEST,
+    definedNames: [...collected.keys()]
+  })
+
+  if (coverage.length > 0) {
+    throw new Error(coverage.map(finding => finding.message).join(' '))
+  }
+
+  for (const entry of GREENHOUSE_MCP_TOOL_MANIFEST) {
+    // `coverage` ya garantizó que existe: si no, el servidor no llegó hasta acá.
+    collected.get(entry.name)?.()
+  }
 
   // Resource addressable: el mismo documento read-only por URI estable.
   server.registerResource(
