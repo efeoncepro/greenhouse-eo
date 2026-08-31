@@ -5,22 +5,24 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { GreenhouseApiPlatformClient } from './http-client'
 import { resolveGreenhouseMcpConfig } from './config'
 import { createGreenhouseMcpHandlers, greenhouseMcpToolOutputSchema } from './tools'
-import { computeGreenhouseMcpToolCoverage, GREENHOUSE_MCP_TOOL_MANIFEST } from './tool-manifest'
+import {
+  buildGreenhouseMcpServerIdentity,
+  computeGreenhouseMcpToolCoverage,
+  GREENHOUSE_MCP_TOOL_MANIFEST
+} from './tool-manifest'
 import type { GreenhouseMcpConfig } from './types'
 
 export const createGreenhouseMcpServer = (
   config: GreenhouseMcpConfig,
   deps?: { fetch?: typeof fetch }
 ) => {
+  // TASK-1780 — El cartel se DERIVA del inventario: no se puede volver a anunciar read-only
+  // mientras se registran escrituras.
+  const identity = buildGreenhouseMcpServerIdentity()
+
   const server = new McpServer(
-    {
-      name: 'greenhouse-read-only',
-      version: '1.0.0'
-    },
-    {
-      instructions:
-        'Greenhouse MCP V1 is read-only. It is downstream of api/platform/ecosystem/*, uses a fixed external scope from server configuration, preserves Greenhouse request IDs, and must not be used for writes, SQL access, or tenancy inference from free text.'
-    }
+    { name: identity.name, version: identity.version },
+    { instructions: identity.instructions }
   )
 
   const client = new GreenhouseApiPlatformClient(config, deps?.fetch)

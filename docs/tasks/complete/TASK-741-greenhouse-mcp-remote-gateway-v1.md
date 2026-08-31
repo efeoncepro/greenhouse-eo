@@ -80,7 +80,7 @@ Reglas obligatorias:
 - `docs/tasks/to-do/TASK-659-mcp-oauth-hosted-auth-model.md`
 - `docs/api/GREENHOUSE_API_PLATFORM_V1.md`
 - `docs/documentation/plataforma/api-platform-ecosystem.md`
-- `docs/manual-de-uso/plataforma/mcp-greenhouse-read-only.md`
+- `docs/manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md`
 - `project_context.md`
 - `Handoff.md`
 
@@ -115,7 +115,7 @@ Reglas obligatorias:
 - `src/app/api/mcp/greenhouse/route.test.ts`
 - `docs/architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md`
 - `docs/documentation/plataforma/api-platform-ecosystem.md`
-- `docs/manual-de-uso/plataforma/mcp-greenhouse-read-only.md`
+- `docs/manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md`
 - `project_context.md`
 - `Handoff.md`
 - `changelog.md`

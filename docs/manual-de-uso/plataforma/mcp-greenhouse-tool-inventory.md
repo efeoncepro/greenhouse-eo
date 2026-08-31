@@ -1,16 +1,20 @@
-# MCP Greenhouse Read-Only
+# MCP Greenhouse — Inventario de Tools
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 2.0
+> **Version:** 3.0
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1662+1699 desplegadas: 27 tools SEO — 20 lectura + 7 escritura — federadas Y sirviendo en la revisión productiva `efeonce-mcp-gateway-00024-8b8`; estado verificado en §8)
+> **Ultima actualizacion:** 2026-08-31 por Claude (TASK-1780: el archivo dejó de llamarse read-only porque el servidor no lo es; las cifras de superficie se leen del manifiesto, no de este texto)
 > **Modulo:** plataforma / MCP
 > **Ruta en portal:** `N/A` (server MCP local `stdio` o remoto HTTP)
 > **Documentacion relacionada:** [API Platform Ecosystem](../../documentation/plataforma/api-platform-ecosystem.md), [Platform Health API](../../documentation/plataforma/platform-health-api.md), [GREENHOUSE_MCP_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md)
 
 ## Para que sirve
 
-Este MCP permite que un agente o cliente compatible consulte Greenhouse de forma segura y read-only, usando contratos estables de `api/platform/ecosystem/*`.
+Este MCP permite que un agente o cliente compatible opere Greenhouse de forma gobernada, usando contratos estables de `api/platform/ecosystem/*`.
+
+🔴 **No es read-only, y este archivo se llamaba así.** La mayoría de sus tools lee, pero **siete escriben** y **cuatro comprometen gasto real con el proveedor**, parte de él recurrente. Ese es exactamente el motivo por el que ni el nombre del archivo ni las cifras de abajo se escriben a mano nunca más: el inventario canónico vive en `src/mcp/greenhouse/tool-manifest.ts`, el servidor **registra recorriéndolo**, y el cartel que el cliente MCP lee (`instructions`) se **deriva** de él (`TASK-1780`).
+
+**Cómo contar sin equivocarse** (los dos patrones que ya mintieron acá): no enumeres por prefijo de verbo —`get_|run_|track_` se come `declare_seo_competitors` y `retire_seo_competitors`— ni con una clase de caracteres sin dígitos —`[a-z_]*seo[a-z_]*` se come `get_seo_visibility_360`—. La cifra sale del manifiesto o de `tools/list`, jamás de una lista en un doc.
 
 No entra por SQL directo, no inventa tenancy y no necesita leer rutas internas del portal.
 
@@ -26,7 +30,7 @@ Hoy sirve para:
 
 ## Modalidades disponibles
 
-Greenhouse expone el mismo MCP read-only de dos formas:
+Greenhouse expone el mismo MCP de dos formas:
 
 - Local `stdio`: para clientes que pueden levantar un proceso local, usando `pnpm mcp:greenhouse`.
 - Remoto HTTP: para clientes que necesitan una URL estable, usando `POST /api/mcp/greenhouse`.
@@ -202,10 +206,16 @@ Reglas que el agente debe respetar:
 
 ### 8. SEO / Search Visibility 360 (TASK-1645 · 1303 · 1304 · 1306 · 1307 · 1308 · 1661 · 1664 · 1666 · 1709 · 1775 · 1776 · 1777 · 1696)
 
-Hoy son **27 tools SEO: 20 de lectura y 7 de escritura**. Las de escritura son la excepción al
-carácter read-only del resto de este MCP y están marcadas como tales.
+**Medido 2026-08-31 contra `src/mcp/greenhouse/tool-manifest.ts`: 28 tools SEO en el MCP interno —
+21 de lectura y 7 de escritura**, cuatro de ellas comprometiendo gasto del proveedor. La lista de
+abajo es ilustrativa y puede envejecer; la cifra vigente sale del manifiesto o de `tools/list`.
 
-**Lectura (17):**
+⚠️ **El conjunto federado en el gateway NO es el mismo, y está bien.** El gateway federa resolviendo
+contra rutas HTTP del lane, no contra nombres del MCP interno: `get_seo_work_queue` existe adentro y
+está **excluida con razón**, y `get_seo_provider_spend` está federada **sin existir como tool
+interna**. Una ausencia en un lado nunca es, por sí sola, evidencia de olvido.
+
+**Lectura (algunas de las 21):**
 
 - `get_seo_entitlement`
 - `get_seo_keyword_opportunities`
@@ -269,9 +279,9 @@ Reglas que el agente debe respetar:
 - **Los dos ejes del 360 nunca se promedian**: rankeo y citabilidad son verdades ortogonales de motores distintos.
 - **En `get_seo_rank_evolution`, `position: null` en una fecha significa que el dominio no rankeó ese día.** Es una medición válida, no un error ni un hueco a rellenar. Y esa serie (DataForSEO) **nunca se promedia** con la serie de GSC — son fuentes distintas.
 - **Medido ● y estimado ◑ nunca se promedian ni se sustituyen.** El volumen de mercado de `get_seo_keyword_market_data` es una estimación del mercado; las impresiones de `get_seo_keyword_opportunities` son la demanda medida de ESE sitio. Son dos hechos distintos y ambos ciertos.
-- **Las 17 tools de lectura son read-only**: no disparan capturas ni gastan presupuesto de proveedor.
+- **Las 21 tools de lectura son read-only**: no disparan capturas ni gastan presupuesto de proveedor. Las 7 de escritura sí, y cuatro de ellas gastan dinero — gastar es efecto secundario, nunca lectura.
 - **`get_seo_provider_spend` es interno-only, y eso NO es una limitación temporal.** Lo que devuelve es lo que a Efeonce le **cuesta** servir a esa organización, no lo que la organización consumió: un binding org-scoped leyendo su propia fila estaría leyendo nuestra estructura de costos. Por eso un binding tenant-scoped recibe `404` (anti-oracle), igual que si el recurso no existiera.
-- **El par track/untrack compromete gasto recurrente.** `track_seo_keywords` factura cada keyword al proveedor en **cada ciclo diario** hasta que alguien la saque, así que la lista exacta se propone al humano y se confirma **antes** de llamarla — nunca especulativamente. Ambas son idempotentes y devuelven un **outcome por keyword** (`tracked` / `already_tracked` / `intent_changed` / `capacity_exceeded` / `invalid`, y `untracked` / `not_tracked` / `invalid`): reportar `data.ok` sin leer ese arreglo describe un cambio que puede no haber ocurrido. El lane acepta las 5 tools de escritura **solo desde bindings de scope `internal`**.
+- **El par track/untrack compromete gasto recurrente.** `track_seo_keywords` factura cada keyword al proveedor en **cada ciclo diario** hasta que alguien la saque, así que la lista exacta se propone al humano y se confirma **antes** de llamarla — nunca especulativamente. Ambas son idempotentes y devuelven un **outcome por keyword** (`tracked` / `already_tracked` / `intent_changed` / `capacity_exceeded` / `invalid`, y `untracked` / `not_tracked` / `invalid`): reportar `data.ok` sin leer ese arreglo describe un cambio que puede no haber ocurrido. El lane acepta las 7 tools de escritura **solo desde bindings de scope `internal`**.
 - **`discover_seo_keywords` gasta al encolar, no al seguir.** Cada corrida paga a DataForSEO por llamada y por fila devuelta: primero `preview: true`, se muestra la fórmula de costo estimado al humano y se confirma ANTES de encolar — nunca especulativamente. La corrida es **async** (el 202 solo significa "encolada durable"): los candidatos se consultan después con `get_seo_keyword_discovery` + `runId`, y declarar resultados recién encolada la corrida describe datos que aún no existen. Es idempotente **dentro del ciclo mensual del proveedor** (mismo intent = misma corrida sin gastar de nuevo; un mes nuevo permite corrida fresca). Encolar **jamás auto-trackea**.
 - **`prepare_seo_grounded_queries` escribe un draft, nunca activa.** Se propone al humano la selección exacta de candidatos (≤20) y se confirma antes de llamar. El resultado declara `groundingMode` honesto, y desde la auditoría 2026-08-14 también la **cobertura por seed** (`seedCoverage`): si algún candidato quedó sin huella temática, viaja `coverageNotice` y se reporta al revisor — la etiqueta grounded se verifica, no se asume. Con la identidad máquina compartida el upstream responde `aeo_forbidden` fail-closed hasta TASK-1631.
 - **La intención de una keyword se declara, no se adivina** (TASK-1659). `track_seo_keywords` acepta `intent` opcional: `target` (compromiso acordado con el cliente — puede estar en la posición 60, y eso es la **distancia que falta**, no un fracaso) u `opportunity` (demanda medida que se está empujando). **Omítelo salvo que un humano lo haya declarado**: adivinarlo fabrica una clasificación que nadie hizo. Los dos **nunca se promedian** al reportar. Cambiar la intención de una keyword ya seguida devuelve `intent_changed` (no `already_tracked`: sí pasó algo), **no consume cupo** —cierra la membresía vigente y abre otra— y preserva desde cuándo es objetivo. `intentDeclaredBy` lleva la **autoría humana** cuando el agente actúa por encargo; el actor del write sigue siendo la máquina (`mcp:<consumer>`), que es la procedencia real del gasto, y una autoría sin intención se descarta. Las keywords seguidas antes del 2026-08-14 no tienen intención declarada: eso significa **"nadie la declaró"**, jamás "oportunidad".
@@ -330,7 +340,7 @@ Este MCP no hace lo siguiente:
 - no crea subscriptions
 - no actualiza subscriptions
 - no reintenta deliveries
-- no hace writes **salvo** las cinco excepciones gobernadas del §8 (`track_seo_keywords` / `untrack_seo_keywords`, TASK-1308; `discover_seo_keywords`, TASK-1664; `prepare_seo_grounded_queries`, TASK-1666; `run_seo_prospect_diagnostic`, TASK-1709), que exigen binding `internal`, entitlement y sus disclosures propios (techo de capacidad e idempotencia en track/untrack; preview + confirmación de costo en discover; draft-nunca-activa en prepare; confirmación humana + tope duro por diagnóstico en run_prospect); fuera de esas cinco, este MCP no escribe nada
+- no hace writes **salvo** las **siete** excepciones gobernadas del §8 (`track_seo_keywords` / `untrack_seo_keywords`, TASK-1308; `declare_seo_competitors` / `retire_seo_competitors`, TASK-1662; `discover_seo_keywords`, TASK-1664; `prepare_seo_grounded_queries`, TASK-1666; `run_seo_prospect_diagnostic`, TASK-1709), que exigen binding `internal`, entitlement y sus disclosures propios (techo de capacidad e idempotencia en track/untrack y en declare/retire; preview + confirmación de costo en discover; draft-nunca-activa en prepare; confirmación humana + tope duro por diagnóstico en run_prospect); fuera de esas siete, este MCP no escribe nada. La cifra no se mantiene a mano: sale del manifiesto y el propio servidor la anuncia en sus `instructions`
 - no consulta rutas legacy como source primaria
 - no expone OAuth hosted/multiusuario
 - no expone ICO por MCP todavía

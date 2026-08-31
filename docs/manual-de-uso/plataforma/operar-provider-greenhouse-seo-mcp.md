@@ -347,4 +347,4 @@ gateway, no el módulo SEO.
 - Lane de Greenhouse: [`src/lib/api-platform/resources/ecosystem-growth-seo.ts`](../../../src/lib/api-platform/resources/ecosystem-growth-seo.ts)
 - Adaptador del gateway: repo hermano `efeonce-mcp`, `src/providers/greenhouse-seo.ts`
 - Gateway completo: [Operar Efeonce MCP Gateway](operar-efeonce-mcp-gateway.md)
-- Mismas tools por el MCP interno: [MCP Greenhouse Read-Only](mcp-greenhouse-read-only.md) §8
+- Mismas tools por el MCP interno: [MCP Greenhouse Read-Only](mcp-greenhouse-tool-inventory.md) §8

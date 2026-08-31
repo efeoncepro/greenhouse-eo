@@ -6,7 +6,7 @@ El "push held" del Delta de implementación quedó **obsoleto**: los commits `c7
 
 - **CLAUDE.md** — invariante dedicado "Knowledge MCP / ecosystem lane invariants (TASK-1086)" (default-DENY scope `internal`, anti-oracle 404, read-only/no-invención, `isDocumentAgenticallyVisible` local en sync con el `WHERE` agéntico, cero subject-builder paralelo).
 - **Deltas de arquitectura** — ya presentes y verificados: `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1` Delta 2026-06-12 (lane ecosystem de Knowledge) + `GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1` Delta 2026-06-12 (Consumo MCP).
-- **Manual de uso** — `docs/manual-de-uso/plataforma/mcp-greenhouse-read-only.md` sección "7. Conocimiento (Knowledge)": 2 tools + resource + reglas (no-invención, scope internal, read-only) + referencia técnica.
+- **Manual de uso** — `docs/manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md` sección "7. Conocimiento (Knowledge)": 2 tools + resource + reglas (no-invención, scope internal, read-only) + referencia técnica.
 - **Doc funcional** — `docs/documentation/plataforma/knowledge-platform.md` ya cubre MCP (contrato compartido, dos preguntas separadas, feedback).
 - **README + TASK_ID_REGISTRY** — flip `to-do`/`in-progress` → `complete`; path a `complete/`.
 - **Verificación de cierre**: 17 tests focales (ecosystem builder + MCP knowledge/tools) verdes en el WT actual; código sin cambios desde el commit verificado (tsc=0, lint=0, 29 tests + smoke live PG en el Delta de implementación).

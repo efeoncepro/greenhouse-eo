@@ -20,7 +20,7 @@ con tres consultas de solo lectura y creció hasta cubrir **el inventario SEO co
 desplegadas** en la revisión productiva del gateway (`efeonce-mcp-gateway-00024-8b8`), que reemplazó a la del 27
 de agosto (servía 21). Ya no queda ninguna tool esperando despliegue. Igual que con Globe, el gateway no recrea
 lógica: transporta la pregunta y Greenhouse decide qué se puede ver. El inventario vigente y su estado de
-despliegue viven en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8; detalle
+despliegue viven en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md) §8; detalle
 funcional en [Search Visibility 360 por MCP](../growth/search-visibility-360-por-mcp.md).
 
 ## Cómo se comporta
@@ -48,7 +48,7 @@ Disponible hoy:
   acotada por el módulo SEO asignado a la organización. Además hay cuatro lecturas competitivas
   (`get_seo_provider_spend`, `get_seo_keyword_gap`, `get_seo_serp_top_results`, `get_seo_competitor_candidates`)
   que sólo responden a conexiones internas de Efeonce: una conexión de cliente recibe un "no existe", nunca una
-  pista de que el dato está ahí. Inventario exacto en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8.
+  pista de que el dato está ahí. Inventario exacto en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md) §8.
 
 No disponible:
 

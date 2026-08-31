@@ -431,6 +431,49 @@ export const computeGreenhouseMcpToolCoverage = (input: {
   return findings
 }
 
+/**
+ * El cartel del servidor, DERIVADO del inventario.
+ *
+ * 🔴 Existe porque escribirlo a mano ya falló: el servidor se anunciaba `greenhouse-read-only` con
+ * instructions que decían *"must not be used for writes"* mientras registraba siete tools que
+ * escriben, cuatro de ellas comprometiendo gasto del proveedor. Las `instructions` de un servidor
+ * MCP son contrato hacia el cliente; mientras se escriban a mano, vuelven a desalinearse.
+ *
+ * Se conservan las afirmaciones que sí son ciertas y que ninguna cifra puede derivar: que el
+ * servidor está downstream del lane, que el scope externo es fijo y viene de configuración, que
+ * preserva los request IDs de Greenhouse, y que no hace acceso SQL ni infiere tenancy desde texto
+ * libre.
+ */
+export const buildGreenhouseMcpServerIdentity = (
+  manifest: readonly GreenhouseMcpToolManifestEntry[] = GREENHOUSE_MCP_TOOL_MANIFEST
+): { name: string; version: string; instructions: string } => {
+  const writers = manifest.filter(entry => entry.writes).map(entry => entry.name)
+  const spenders = manifest.filter(entry => entry.spendsProviderBudget).map(entry => entry.name)
+  const readOnly = manifest.filter(greenhouseMcpToolIsReadOnly)
+
+  const surface =
+    writers.length === 0
+      ? `Greenhouse MCP exposes ${manifest.length} tools, all of them read-only.`
+      : `Greenhouse MCP exposes ${manifest.length} tools: ${readOnly.length} read-only and ` +
+        `${writers.length} that WRITE (${writers.join(', ')}).`
+
+  const spend =
+    spenders.length === 0
+      ? ''
+      : ` ${spenders.length} of them COMMIT PROVIDER BUDGET, some of it recurring ` +
+        `(${spenders.join(', ')}): propose the exact call to a human and get confirmation before ` +
+        'calling them. Spending money is a side effect, never a read.'
+
+  return {
+    name: writers.length === 0 ? 'greenhouse-read-only' : 'greenhouse',
+    version: '1.0.0',
+    instructions:
+      `${surface}${spend} It is downstream of api/platform/ecosystem/*, uses a fixed external ` +
+      'scope from server configuration, preserves Greenhouse request IDs, and must not be used ' +
+      'for SQL access or tenancy inference from free text.'
+  }
+}
+
 /** Índice por nombre. El registro del servidor y el generador del artefacto lo consumen. */
 export const GREENHOUSE_MCP_TOOL_MANIFEST_BY_NAME: ReadonlyMap<string, GreenhouseMcpToolManifestEntry> =
   new Map(GREENHOUSE_MCP_TOOL_MANIFEST.map(entry => [entry.name, entry]))

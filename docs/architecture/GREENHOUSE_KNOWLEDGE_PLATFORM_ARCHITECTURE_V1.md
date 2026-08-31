@@ -823,7 +823,7 @@ Mapeado a documentación existente (la ingesta real es TASK-1082; algunos requie
 | 9 | Reliability Control Plane: leer `/admin/operations` | manual | `documentation/plataforma/reliability-control-plane.md` | platform | efeonce_admin | agent_allowed |
 | 10 | Degradación honesta: cómo leer estados degradados | policy | `documentation/plataforma/reliability-control-plane.md` (deriva) | platform | efeonce_admin | agent_allowed |
 | 11 | Alta de cliente (onboarding) | how_to | `manual-de-uso/agency/alta-de-cliente.md` | commercial | efeonce_account | agent_allowed |
-| 12 | MCP Greenhouse read-only: cómo usarlo | manual | `manual-de-uso/plataforma/mcp-greenhouse-read-only.md` | platform | efeonce_admin | agent_allowed |
+| 12 | MCP Greenhouse read-only: cómo usarlo | manual | `manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md` | platform | efeonce_admin | agent_allowed |
 | 13 | Períodos de nómina: cómo funcionan | manual | `manual-de-uso/hr/periodos-de-nomina.md` | payroll | hr_payroll | agent_allowed (¹) |
 | 14 | Política interna de secretos y acceso sensible | policy | `CLAUDE.md` §Secret Manager Hygiene (deriva, `sensitivity=restricted`) | security | efeonce_admin | **agent_excluded** (²) |
 

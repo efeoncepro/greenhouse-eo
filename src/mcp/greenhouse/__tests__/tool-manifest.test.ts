@@ -16,6 +16,7 @@ import { describe, expect, it } from 'vitest'
 import { SEO_LENS_SURFACES } from '@/lib/growth/seo/lens-surface-manifest'
 import { createGreenhouseMcpServer } from '../server'
 import {
+  buildGreenhouseMcpServerIdentity,
   computeGreenhouseMcpToolCoverage,
   GREENHOUSE_MCP_TOOL_MANIFEST,
   greenhouseMcpToolIsReadOnly
@@ -146,5 +147,50 @@ describe('el manifiesto no es una tercera lista', () => {
     expect(names).toContain('declare_seo_competitors')
     expect(names).toContain('retire_seo_competitors')
     expect(names).toContain('get_seo_visibility_360')
+  })
+})
+
+describe('el cartel del servidor se deriva del inventario (Slice 2)', () => {
+  it('no puede anunciarse read-only mientras registre escrituras', () => {
+    const identity = buildGreenhouseMcpServerIdentity()
+
+    expect(identity.name).toBe('greenhouse')
+    expect(identity.instructions).not.toContain('all of them read-only')
+    expect(identity.instructions).toContain('7 that WRITE')
+  })
+
+  it('nombra cada escritura y cada compromiso de gasto, sin que nadie las escriba a mano', () => {
+    const instructions = buildGreenhouseMcpServerIdentity().instructions
+
+    for (const entry of GREENHOUSE_MCP_TOOL_MANIFEST.filter(tool => !greenhouseMcpToolIsReadOnly(tool))) {
+      expect(instructions).toContain(entry.name)
+    }
+
+    expect(instructions).toContain('COMMIT PROVIDER BUDGET')
+  })
+
+  it('un inventario sin escrituras SÍ se anuncia read-only: la derivación es real, no un literal', () => {
+    const identity = buildGreenhouseMcpServerIdentity([
+      {
+        name: 'get_seo_real_tool',
+        domain: 'seo',
+        writes: false,
+        spendsProviderBudget: false,
+        purpose: 'sintética'
+      }
+    ])
+
+    expect(identity.name).toBe('greenhouse-read-only')
+    expect(identity.instructions).toContain('all of them read-only')
+    expect(identity.instructions).not.toContain('COMMIT PROVIDER BUDGET')
+  })
+
+  it('conserva las afirmaciones verdaderas que ninguna cifra puede derivar', () => {
+    const instructions = buildGreenhouseMcpServerIdentity().instructions
+
+    expect(instructions).toContain('downstream of api/platform/ecosystem/*')
+    expect(instructions).toContain('fixed external scope from server configuration')
+    expect(instructions).toContain('preserves Greenhouse request IDs')
+    expect(instructions).toContain('tenancy inference from free text')
   })
 })

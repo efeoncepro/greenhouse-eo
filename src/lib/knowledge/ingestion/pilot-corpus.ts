@@ -183,8 +183,12 @@ const PILOT_CORPUS_BASE: readonly PilotCorpusEntry[] = [
     sourceFiles: ['docs/manual-de-uso/agency/alta-de-cliente.md']
   },
   {
+    // ⚠️ El `slug` es la IDENTIDAD del documento en el corpus (`getKnowledgeDocumentBySlug` hace
+    // upsert por él). El manual se renombró en TASK-1780 —el servidor no es read-only— pero
+    // cambiar el slug crearía un documento nuevo y dejaría huérfano el vigente, así que se
+    // conserva a propósito: sólo cambian el título y la ruta del fuente.
     slug: 'mcp-greenhouse-read-only',
-    title: 'MCP Greenhouse read-only: cómo usarlo',
+    title: 'MCP Greenhouse: inventario de tools y cómo usarlo',
     documentType: 'manual',
     ownerDomain: 'platform',
     approverRole: 'efeonce_admin',
@@ -193,7 +197,7 @@ const PILOT_CORPUS_BASE: readonly PilotCorpusEntry[] = [
     agenticPolicy: 'agent_allowed',
     docLayer: 'manual',
     humanUrl: humanUrl('mcp-greenhouse-read-only'),
-    sourceFiles: ['docs/manual-de-uso/plataforma/mcp-greenhouse-read-only.md']
+    sourceFiles: ['docs/manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md']
   },
   {
     slug: 'periodos-de-nomina',
