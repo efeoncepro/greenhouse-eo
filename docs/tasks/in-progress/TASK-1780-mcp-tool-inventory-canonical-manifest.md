@@ -1,5 +1,49 @@
 # TASK-1780 — El inventario de tools MCP es un manifiesto, no dos listas
 
+## Delta 2026-08-31 — baseline medido al tomarla: el criterio de cierre de Slice 3 estaba muerto
+
+Medido contra el código, no contra este archivo:
+
+| Cifra | Lo que decía la spec | Medido 2026-08-31 |
+|---|---|---|
+| `registerTool` en `server.ts` | 29 | **43** (28 SEO + 15 no-SEO) |
+| Inventario espejo del gateway | 13 | **29** entradas |
+| Tools federadas (`EXPECTED_*`) | — | **28** |
+| Exclusiones con razón | vacío | **1** (`get_seo_work_queue`) |
+| Tools que escriben | «cuatro» | **7** |
+
+🔴 **El criterio 🔴 de Acceptance Criteria era infalsificable.** Exigía que el guardia, corrido hoy,
+detectara `get_seo_overview_kpis`, `get_seo_performance` y `get_seo_performance_catalog` como no
+federadas. **Las tres están federadas** desde `TASK-1658`, y hoy **no existe ninguna** tool SEO sin
+federar ni excluir: el único no-federado es `get_seo_work_queue`, excluido con razón sustantiva. Un
+criterio que no puede fallar no prueba nada. Se reemplaza por los dos casos que sí existen: la
+regresión sintética del guard y el drift vivo de abajo.
+
+🔴 **Drift vivo, inverso al que la spec perseguía: `get_seo_provider_spend`.** Está en el inventario
+espejo y federada, pero **no existe como `registerTool` en Greenhouse** — el gateway la resuelve
+contra la ruta HTTP del lane. El espejo se declara «espejo committeado de `server.ts`» y esa entrada
+es falsa. `MCP_TOOL_SURFACE_INVARIANTS.md` §4 ya lo documenta como caso verificado. El manifiesto
+debe admitir la clase **federada sin contraparte interna**, o Slice 3 rompe el CI del gateway.
+
+⚠️ **`GREENHOUSE_SEO_WRITE_TOOLS` no es sólo un test: gatea el 403 en runtime**
+(`efeonce-mcp/src/app.ts:72`). Se deriva del `writes` del inventario, que hoy significa «escribe **o**
+gasta». Al partir la bandera en dos, el set derivado debe ser `writes || spendsProviderBudget`.
+Verificado que ambas definiciones dan **el mismo conjunto de 7** (todo lo que gasta también escribe),
+así que el cambio es sin efecto de comportamiento — pero un error acá abre una tool de escritura sin
+desafío de scope, en silencio.
+
+⚠️ **Riesgo de tercera lista, medido:** `src/lib/growth/seo/lens-surface-manifest.ts` (`TASK-1785`) ya
+censa 30 superficies SEO con su tool. El manifiesto no puede ignorarlo: el cruce bidireccional
+manifiesto ↔ censo de lente es obligatorio en Slice 1.
+
+**Transporte cross-repo (Open Question 🔴) — decidido: (b) artefacto generado y committeado.** La
+restricción que la propia task nombra —el CI del gateway no debe depender de un deployment vivo para
+un gate de merge— descarta (a) como fuente primaria, y «la superficie HTTP remota» está fuera de
+alcance, así que no se abre ruta nueva. El riesgo de (b) («una copia sin verificación reintroduce el
+espejo») se cierra porque el artefacto **no se escribe a mano**: se genera introspectando el server
+real, lleva hash de contenido, y un gate en Greenhouse falla si el committeado difiere del registro
+vivo. Una edición a mano rompe el hash.
+
 ## Delta 2026-08-28 (segunda entrada del día) — el alcance NO-SEO es el punto ciego del guard
 
 Al documentar la superficie operable del gateway para un operador
@@ -61,7 +105,7 @@ La «Evidencia de cierre» del Slice 3 sigue debiendo usar el caso sintético de
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -74,7 +118,7 @@ La «Evidencia de cierre» del Slice 3 sigue debiendo usar el caso sintético de
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `En ejecucion — Slice 0 (recalibracion) en curso`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -194,11 +238,11 @@ Reglas obligatorias:
 
 ### Already exists
 
-- `src/mcp/greenhouse/server.ts` — 29 `registerTool`, 16 SEO, 4 con descripción `THIS WRITES`.
+- `src/mcp/greenhouse/server.ts` — **43** `registerTool` (28 SEO + 15 no-SEO), 7 que escriben (medido 2026-08-31; toda cifra se relee del código, nunca de esta spec).
 - `src/mcp/greenhouse/tools.ts` — las definiciones y el envelope de salida compartido.
 - `~/Documents/efeonce-mcp/src/providers/greenhouse-seo-tool-parity.ts` —
-  `EXPECTED_GREENHOUSE_SEO_TOOLS` con 13 entradas y `GREENHOUSE_SEO_TOOL_EXCLUSIONS` **vacío**,
-  contradiciendo su propio comentario de cabecera.
+  inventario espejo de **29** entradas, `EXPECTED_GREENHOUSE_SEO_TOOLS` con **28** y
+  `GREENHOUSE_SEO_TOOL_EXCLUSIONS` con **1** (`get_seo_work_queue`, con razón sustantiva).
 - `~/Documents/efeonce-mcp/test/greenhouse-seo-tool-parity.test.ts` — el guardia, que compara nombres
   por regex contra el texto de su propio `src/mcp.ts`.
 
@@ -207,6 +251,8 @@ Reglas obligatorias:
 - No existe fuente única: dos listas, ninguna declarada dueña.
 - El guardia compara en una sola dirección y no puede detectar una ausencia.
 - Las `instructions` y el `name` del servidor se escriben a mano y ya divergieron.
+- El censo del guard es SEO-only: las 15 tools no-SEO no están federadas ni declaradas como exclusión.
+- Una entrada del espejo (`get_seo_provider_spend`) afirma espejar `server.ts` y no existe ahí.
 - El manual se contradice a sí mismo y su nombre de archivo afirma read-only.
 
 ## Modular Placement Contract
@@ -382,10 +428,13 @@ toca Entra, ni Cloud Run, ni secretos.
 - [ ] Registrar una tool sin entrada en el manifiesto rompe el build.
 - [ ] Cada entrada declara `writes` y `spendsProviderBudget` como banderas separadas.
 - [ ] El manifiesto NO tiene campo de federación: qué cruza al público sigue siendo autoridad del gateway.
-- [ ] El `name` y las `instructions` se construyen desde el manifiesto y declaran las cuatro escrituras y el gasto.
+- [ ] El `name` y las `instructions` se construyen desde el manifiesto y declaran las **siete** escrituras y las cuatro que gastan presupuesto del proveedor.
 - [ ] Las instructions conservan las afirmaciones verdaderas: downstream del lane, scope externo fijo, request id preservados, sin inferencia de tenancy.
 - [ ] El guardia del gateway compara contra el manifiesto y ya no contra una lista espejo.
-- [ ] 🔴 Corrido hoy, el guardia **detecta las tres tools que no están federadas ni excluidas**. Sin esa detección la task no está hecha.
+- [ ] 🔴 El poder de detección del guardia queda **ejercitado**, no afirmado: (a) la regresión sintética se pone roja nombrando la tool cuando una entrada del manifiesto no está ni federada ni excluida; (b) corrido contra el estado real, nombra `get_seo_provider_spend` como federada sin contraparte interna, o la declara con su clase. Sin una de las dos, la task no está hecha. (El criterio original —«detecta las tres tools invisibles»— murió cuando `TASK-1658` las federó: ver Delta 2026-08-31.)
+- [ ] El manifiesto cubre las **43** tools registradas, no sólo las SEO: las 15 no-SEO dejan de ser un punto ciego del censo.
+- [ ] El cruce manifiesto ↔ `SEO_LENS_SURFACES` (`TASK-1785`) falla en las dos direcciones, para que el manifiesto no nazca como tercera lista.
+- [ ] `GREENHOUSE_SEO_WRITE_TOOLS` derivado (`writes || spendsProviderBudget`) es **exactamente** el conjunto de 7 de hoy: el gate de scope del gateway no cambia de comportamiento.
 - [ ] El allowlist del gateway sobrevive con su razón por entrada, y la revisión humana por tool se conserva.
 - [ ] El manual ya no se contradice entre sus líneas 205 y 290, y su nombre no afirma read-only.
 - [ ] Ninguna tool cambió de nombre, schema, comportamiento ni estado de federación.
