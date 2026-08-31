@@ -73,7 +73,7 @@ provenance, rutas visibles, revisión humana, memoria y resultados aprobados— 
 
 ### Ambición de escala y diferenciador defendible
 
-La ambición de Efeonce es **LATAM-first, no LATAM-limited**: construir una agencia grande y reconocida en toda Latinoamérica desde el inicio, preparada para servir después a EEUU hispano, mercados en inglés y otros mercados internacionales. La presencia LATAM es una ventaja operativa/cultural y una prueba de ejecución multi-país; **no es el techo de la categoría**.
+La ambición de Efeonce es **LATAM-first, no LATAM-limited**: construir una agencia grande y reconocida en toda Latinoamérica desde el inicio, con operación ya iniciada en Estados Unidos y proyección hacia otros mercados internacionales (cobertura vigente: `01_quienes-somos.md`). La presencia LATAM es una ventaja operativa/cultural y una prueba de ejecución multi-país; **no es el techo de la categoría**.
 
 El diferenciador defendible no es decir "co-creamos", "somos partner" ni "somos agencia con IA". Eso ya es lenguaje commodity. El diferenciador es **convertir la co-creación en software, método, datos y memoria acumulada**:
 
@@ -161,6 +161,8 @@ Las 4 capas verbales (en secuencia natural de conversación):
 - **Categoría comercial:** Integrated Growth Partner con plataforma y ecosistema de producto propio. **No** "agencia de marketing digital" como identidad estratégica (aunque puede ser keyword de captura).
 - **Promesa central:** crecimiento orquestado — creatividad, medios y tecnología como un solo sistema con visibilidad total.
 - **Enemigo:** la fragmentación. Una agencia hace la marca, otra los ads, otra el sitio, otra el CRM, y nadie conecta nada.
+> La cobertura operativa actual incluye Estados Unidos; ver `01_quienes-somos.md`. La cifra histórica de empresas en cuatro países que sigue no debe convertirse en una cifra de clientes en cinco países sin evidencia propia, ni reutilizarse como lista de cobertura actual.
+
 - **Proof points:** metodología propietaria (sistema estratégico + operativo) · 120+ empresas en 4 países · 80% de renovación · HubSpot Solutions Partner · visibilidad en tiempo real (dashboards vivos, no informes) · **tres plataformas de software propietario (Greenhouse, Kortex, Verk) — modelo ASaaS único en LATAM.**
 
 > ⚠️ Coherencia de proof points: el corpus usa "120+ empresas" y "80% de renovación" (marca-agencia) y también "10+ años" (ecosistema). El GTM cita "win rate ~50%". Mantén consistencia y no infles cifras; ante duda, usa las del documento de autoridad correspondiente.

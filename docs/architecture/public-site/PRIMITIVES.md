@@ -66,7 +66,14 @@ Do not copy private Greenhouse primitives directly into WordPress. Use their des
 
 This pattern covers compact social proof rows that combine known client/brand discs with a small aggregate count and market list.
 
-Legacy AEO/About visual contract (not a blanket copy rule for every consumer):
+Current operating-market copy comes from `EFEONCE_OPERATING_MARKETS` in `src/config/efeonce-brand.ts`:
+Chile · Estados Unidos · Colombia · México · Perú (operator confirmed 2026-08-31). This is operating
+coverage, not evidence that each historical client count applies to all five markets. Keep the client
+claim separate from the market list and its accessible label. WordPress rollout/readback remains pending;
+see `docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md`.
+
+Legacy AEO/About visual contract below records the previous four-market rendering (not a current coverage
+rule or a blanket copy rule for every consumer):
 
 - Root proof row remains visually secondary: subtle translucent pill, low shadow, restrained border.
 - Brand discs overlap like a team avatar group. The next disc visually covers the previous one; the count disc sits behind the last brand disc, not detached to the right.

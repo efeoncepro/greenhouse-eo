@@ -6,7 +6,9 @@
 
 La razón de existir: una marca no debería coordinar 3–5 proveedores inconexos para estrategia, creatividad, medios, tecnología y medición. Efeonce elimina esa fragmentación. **Un solo interlocutor (Director de Cuenta), varias líneas coordinadas y sin pérdida de contexto entre equipos.**
 
-Operación legal: Efeonce Group SpA. Presencia: **Chile, Colombia, México, Perú.** +10 años ejecutando en LATAM.
+Operación legal: Efeonce Group SpA. Operamos en **Chile, Estados Unidos, Colombia, México y Perú**. Estados Unidos ya es un mercado operativo, confirmado por el operador el 2026-08-31; no es sólo expansión futura. Lista reusable: `EFEONCE_OPERATING_MARKETS` en `src/config/efeonce-brand.ts`. La cobertura comercial no implica oficina ni entidad legal en cada país. +10 años ejecutando en LATAM.
+
+**Datos institucionales de contacto:** dirección de referencia **Dr. Manuel Barros Borgoño 71, oficina 1105, Providencia, Chile**; teléfono Chile **+56 9 3732 3064**; teléfono Estados Unidos **+1 (239) 235-2073**; correo comercial **sales@efeoncepro.com**. Verificados en el contrato `contactDetails` de `src/lib/artifact-composer/catalogs/deck-axis/back-cover-full.slots.json` y su HTML. La dirección coincide con `EFEONCE_LEGAL_ADDRESS_FALLBACK`; los documentos legales siguen resolviendo la entidad operativa mediante el reader canónico. Las Bellotas 199 es una referencia pública desactualizada y no debe reutilizarse. No inferir WhatsApp, horarios, atención presencial ni oficina estadounidense a partir de estos datos.
 
 > Para un agente de Greenhouse: "quiénes somos" se traduce en producto como **multi-tenant + multi-unidad + multi-país + multi-moneda**. El portal modela una agencia que corre como sistema, no como silos.
 

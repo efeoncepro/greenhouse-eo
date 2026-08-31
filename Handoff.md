@@ -2,6 +2,15 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-31 — Contacto y cobertura institucional: fuentes corregidas, rollout pendiente
+
+El brief de reconstrucción de `/contacto/` quedó en `docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md` con
+formulario por motivo, reclamos/sugerencias, Meetings y routing. La dirección y teléfonos se verificaron contra
+la contraportada canónica: Dr. Manuel Barros Borgoño 71, oficina 1105; +56 9 3732 3064; +1 (239) 235-2073.
+Estados Unidos ya forma parte de la cobertura operativa junto a Chile, Colombia, México y Perú; fuentes de
+contexto, posicionamiento, primitives y skills espejadas fueron conciliadas sin ampliar métricas históricas.
+`TASK-1801` quedó registrada en `to-do` con visual direction, wireframe, flow y motion; task lint `template=1`, `legacy=0`, 0/0. No hubo mutación WordPress: la página pública todavía requiere implementación, rollout y readback.
+
 ## 2026-08-31 — TASK-1780: el inventario de tools MCP dejó de ser dos listas (Slice 3 pendiente de tu decisión)
 
 `src/mcp/greenhouse/tool-manifest.ts` es ahora la fuente del inventario: `server.ts` **registra

@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-31 — Cobertura Efeonce incorpora Estados Unidos y Contacto corrige su fuente institucional
+
+La cobertura vigente queda en Chile, Estados Unidos, Colombia, México y Perú, sin inferir oficina ni entidad
+legal por mercado. Contexto de negocio, posicionamiento público, primitives y skills espejadas apuntan al
+mismo estado. El brief de Contacto usa la dirección y los dos teléfonos de la contraportada canónica y marca
+como desactualizados Las Bellotas, el teléfono público anterior y las listas de cuatro mercados. `TASK-1801` quedó registrada con contratos visual/flow/motion, routing, privacidad, Meetings y rollout; esta edición no publicó WordPress ni amplió métricas históricas de clientes.
+[Brief y límites](docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md).
+
 ## 2026-08-31 — Home: cierre editorial y mantenimiento nativo
 
 Ocho revisiones publicadas: hero desafiante, beneficios concretos, comparación cualitativa, FAQ
@@ -1003,41 +1011,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   `/admin/operations`.
 - Un gate de CI rechaza que alguien vuelva a escribir la lista a mano, y una señal de confiabilidad detecta en
   runtime lo que el gate no alcanza a ver.
-
-## 2026-08-23 — Los footers aprobados dejaron de depender de la imaginación del siguiente agente
-
-- El mockup aprobado ahora es el punto de partida obligatorio para implementar footers: conserva jerarquía,
-  espaciado, contraste, wordmark Efeonce, identidad legal, iconos sociales y reglas responsive.
-- Los cinco perfiles visuales no borran la semántica: representan siete propósitos, y suscripción opcional no se
-  confunde con marketing aunque compartan anatomía.
-- La skill de email ya no infiere baja desde `broadcast`: unsubscribe y RRSS dependen de propósito y consentimiento.
-- La revisión final endureció tipografía, jerarquía semántica, listas, tabla de policy, targets, foco y contraste en
-  los cinco perfiles; los diez estados desktop/mobile quedaron sin overflow y GVC no registró errores runtime.
-- Cada cohorte deberá probar Outlook Desktop Windows, Outlook Web, Gmail, un cliente WebKit e imágenes bloqueadas.
-  El mockup sigue siendo diseño aprobado, no evidencia de envío, deploy o runtime.
-
-## 2026-08-23 — Cuando el sistema intentaba mandar la prueba solo y se trababa, esa persona quedaba en un limbo que nadie veía
-
-- Si la prueba la asignaba una persona y se bloqueaba, corregir la causa y volver a proponer alcanzaba. Si la
-  iba a mandar el sistema solo, el intento quedaba registrado **reservando el lugar de esa persona en esa
-  vacante** — a propósito, para que un error de configuración no le mande tres veces la misma prueba a alguien.
-  Pero ese lugar reservado no tenía forma de liberarse, y mientras siguiera ahí la postulación **desaparecía de
-  las listas de recuperación**: no porque estuviera resuelta, sino porque el sistema ya había anotado que lo
-  intentó.
-- Lo grave no era que fuera irreversible: era que **las tres superficies que debían delatarlo callaban a la
-  vez**. La cola la excluía, la señal del panel era su espejo exacto, y la métrica que sí la contaba no movía
-  la alarma y además caducaba a las 24 horas. A las 24 h el caso salía hasta de la evidencia mientras la
-  persona seguía trabada.
-- Ahora esas postulaciones aparecen en una lista propia y quien gobierna la prueba de la vacante puede liberar
-  el lugar. Con dos condiciones que la plataforma verifica sola: **sólo se libera si hoy la prueba SÍ se
-  mandaría** —liberar con la causa viva vuelve a bloquear en el acto y gasta uno de los tres intentos de
-  recuperación de esa persona— y **tres recuperaciones por persona y vacante**, tras las cuales el caso pide
-  revisión humana.
-- Liberar **no manda ningún correo**, no borra el motivo del bloqueo y no devuelve cupo al tope de envíos de la
-  vacante: ese tope cuenta correos que ya salieron, y liberar no des-envía nada.
-- El panel distingue dos cosas que no son lo mismo: la que ya se puede destrabar **alarma**, y la que sigue
-  bloqueada por una causa vigente **no** — avisar de algo que nadie puede arreglar todavía es la forma más
-  rápida de que el equipo deje de mirar el tablero.
-- **Todavía no está en producción.** El código está completo y verificado contra la base real; falta el
-  release. Y de paso quedó abierto `ISSUE-162`: la señal de salud vive en amarillo por diez postulaciones de
-  prueba archivadas, no por un defecto real.

@@ -28,6 +28,10 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
 
 ## Índice
 
+- **[Contacto — brief aprobado y datos institucionales](CONTACT_PAGE_REBUILD_BRIEF_V1.md)** — reconstrucción
+  con motivos condicionales, reuniones, dirección y teléfonos verificados en las contraportadas; Estados Unidos
+  incluido como mercado operativo. `TASK-1801` registrada; implementación, publicación y validación de consumidores pendientes.
+
 - **[Content Marketing vigente — Elementor](../architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md)** —
   página `242603`, `/servicio-marketing-de-contenidos/`, trece módulos del diseño aprobado y captura
   Growth Forms. [Funcionamiento](../documentation/public-site/content-marketing.md),

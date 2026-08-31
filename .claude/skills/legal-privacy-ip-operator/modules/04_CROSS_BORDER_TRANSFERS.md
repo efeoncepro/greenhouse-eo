@@ -2,7 +2,7 @@
 
 > **⚠️ No es asesoría legal.** Orienta y cita; valida con abogado. Este módulo es transversal: casi todo tratamiento moderno **cruza fronteras** (CRM/martech en la nube, clientes en varios países, equipo distribuido).
 
-Efeonce opera en 4 países + abre EEUU, y sus clientes Globe son internacionales. Los datos **se mueven** (HubSpot, Google, Notion, nubes en EEUU). Esto dispara dos temas: **quién es qué** (controller/processor) y **cómo se legitima la transferencia**.
+Efeonce opera en Chile, Estados Unidos, Colombia, México y Perú (cobertura: `docs/context/01_quienes-somos.md`), y sus clientes Globe son internacionales. Los datos **se mueven** (HubSpot, Google, Notion, nubes en EEUU). Esto dispara dos temas: **quién es qué** (controller/processor) y **cómo se legitima la transferencia**.
 
 ## Controller vs Processor (la distinción que define el contrato)
 

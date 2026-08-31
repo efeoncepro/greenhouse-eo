@@ -31,6 +31,15 @@ La tesis de diferenciacion:
 
 LATAM es punto de partida y prueba de ejecucion multi-pais, no techo de la marca. La narrativa publica debe ser **LATAM-first, global-ready**.
 
+## Precisión de cobertura — 2026-08-31
+
+El operador confirma que Efeonce ya opera en Estados Unidos. La cobertura vigente es Chile, Estados Unidos,
+Colombia, México y Perú, gobernada por `docs/context/01_quienes-somos.md` y el export existente
+`EFEONCE_OPERATING_MARKETS` de `src/config/efeonce-brand.ts`. Esto precisa el estado comercial, sin cambiar
+la tesis LATAM-first ni acreditar oficina, entidad legal o cumplimiento local en Estados Unidos.
+Las métricas históricas de clientes y casos mantienen su alcance original; no se amplían por inferencia.
+La actualización documental no equivale a publicación de los consumidores WordPress.
+
 ## Aplicacion al Home
 
 La Home es la superficie donde este posicionamiento se prueba primero. Debe responder en el primer recorrido:

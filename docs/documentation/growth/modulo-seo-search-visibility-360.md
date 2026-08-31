@@ -592,7 +592,7 @@ superficie es follow-up de la task dueña del render.
 
 ### El país deja de estar implícito: cada respuesta declara qué mercado muestra (2026-08-13)
 
-Efeonce opera en Chile, México, Colombia y Perú, y **el volumen de una keyword en Chile no es el de
+Efeonce opera en Chile, Estados Unidos, Colombia, México y Perú (ver `docs/context/01_quienes-somos.md`), y **el volumen de una keyword en Chile no es el de
 México**. Hasta ahora eso era un supuesto silencioso: si una organización tenía más de un mercado
 configurado, el sistema mostraba uno **sin decir cuál**.
 
