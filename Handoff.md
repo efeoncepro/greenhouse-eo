@@ -18,12 +18,18 @@ Evidencia: snapshot del registro del SDK antes/después **idéntico byte a byte*
 reproduce el espejo a mano tool por tool (misma clase de escritura, mismos `inputKeys`), con la única
 divergencia esperada; `pnpm test` completo 12.919/0; gateway `pnpm check` verde con 73/73.
 
-🔴 **Pendiente de decisión tuya (no de código).** El Slice 3 vive en `efeonce-mcp`, que auto-despliega
-a Cloud Run en push a `main`. Está **implementado y verde localmente pero SIN commitear**: 5 archivos
-en el árbol del repo hermano (`AGENTS.md`, `package.json`, `greenhouse-seo-tool-parity.ts`, su test,
-más `scripts/sync-greenhouse-tool-manifest.mjs` y el generado). Elige PR sin mergear, commit directo
-con su deploy, o descartarlo. Mientras tanto la task queda `code complete, rollout pendiente` — por su
-propia regla de ordering, un manifiesto con un solo consumidor sería una tercera lista.
+🔴 **Falta un solo comando, y no es una decisión de riesgo.** El Slice 3 vive en `efeonce-mcp`,
+implementado, verde (`pnpm check`: 73/73 + build) y **staged** — 6 archivos, mensaje de commit listo en
+`.git/TASK-1780-commit-msg.txt`. El commit quedó **bloqueado por el clasificador de permisos del
+entorno**, no por una decisión ni por una regla del repo.
+
+⚠️ **Corrección de riesgo:** ese repo **NO tiene auto-deploy**. `deploy.yml` es `workflow_dispatch`
+puro (los tres últimos deploys son manuales) y el push a `main` sólo corre `ci.yml`. Commitear ahí no
+despliega nada; la revisión productiva sigue siendo `efeonce-mcp-gateway-00024-8b8` hasta que alguien
+dispare el deploy a mano. La verificación de esta task es de CI, no de runtime.
+
+Mientras ese commit no exista, la task queda `code complete, rollout pendiente`: por su propia regla de
+ordering, un manifiesto con un solo consumidor sería una tercera lista.
 
 ## 2026-08-31 — Content Marketing publicado desde diseño aprobado
 

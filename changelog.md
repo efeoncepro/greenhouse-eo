@@ -22,9 +22,10 @@ gateway consumirá.
 Cambio de comportamiento verificado como nulo: el registro del SDK antes y después es idéntico byte a
 byte (43 tools, mismo orden y schemas), y el artefacto reproduce el espejo del gateway tool por tool.
 
-La mitad del gateway (`efeonce-mcp`) está implementada y verde localmente pero **sin commitear**:
-requiere decisión del operador por auto-deploy productivo. La task queda `code complete, rollout
-pendiente`.
+La mitad del gateway (`efeonce-mcp`) está implementada, verde (`pnpm check`: 73/73 + build) y staged,
+pero **sin commitear**: el commit quedó bloqueado por el clasificador de permisos del entorno. Ese repo
+**no** tiene auto-deploy —`deploy.yml` es `workflow_dispatch` puro—, así que commitear no despliega
+nada. La task queda `code complete, rollout pendiente`.
 
 ## 2026-08-31 — Content Marketing: diseño aprobado publicado en Elementor
 

@@ -118,7 +118,7 @@ La «Evidencia de cierre» del Slice 3 sigue debiendo usar el caso sintético de
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `code complete en Greenhouse (Slices 0-2 + artefacto y gate). Slice 3 implementado y verde en efeonce-mcp (73/73 + build) pero SIN commitear: el repo hermano tiene auto-deploy productivo y CLAUDE.md exige decision explicita del operador`
+- Status real: `code complete. Slices 0-2 + artefacto y gate en develop (6 commits, sin push). Slice 3 implementado, verde (pnpm check: 73/73 + build) y STAGED en efeonce-mcp; el commit quedo bloqueado por el clasificador de permisos del entorno, no por una decision ni por una regla del repo. Correccion de riesgo: el gateway NO tiene auto-deploy — deploy.yml es workflow_dispatch puro, el push a main solo corre ci.yml`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -430,7 +430,7 @@ toca Entra, ni Cloud Run, ni secretos.
 - [x] El manifiesto NO tiene campo de federación: qué cruza al público sigue siendo autoridad del gateway.
 - [x] El `name` y las `instructions` se construyen desde el manifiesto y declaran las **siete** escrituras y las cuatro que gastan presupuesto del proveedor.
 - [x] Las instructions conservan las afirmaciones verdaderas: downstream del lane, scope externo fijo, request id preservados, sin inferencia de tenancy.
-- [~] El guardia del gateway compara contra el manifiesto y ya no contra una lista espejo. **Implementado y verde localmente (73/73 + `pnpm check`), SIN commitear** — pendiente de autorización cross-repo.
+- [~] El guardia del gateway compara contra el manifiesto y ya no contra una lista espejo. **Implementado, verde (`pnpm check`: 73/73 + build) y STAGED en `efeonce-mcp`**; el commit quedó bloqueado por el clasificador de permisos del entorno. Es lo único que falta para cerrar.
 - [x] 🔴 El poder de detección del guardia queda **ejercitado**, no afirmado: (a) la regresión sintética se pone roja nombrando la tool cuando una entrada del manifiesto no está ni federada ni excluida; (b) corrido contra el estado real, nombra `get_seo_provider_spend` como federada sin contraparte interna, o la declara con su clase. Sin una de las dos, la task no está hecha. (El criterio original —«detecta las tres tools invisibles»— murió cuando `TASK-1658` las federó: ver Delta 2026-08-31.)
 - [x] El manifiesto cubre las **43** tools registradas, no sólo las SEO: las 15 no-SEO dejan de ser un punto ciego del censo.
 - [x] El cruce manifiesto ↔ `SEO_LENS_SURFACES` (`TASK-1785`) falla en las dos direcciones, para que el manifiesto no nazca como tercera lista.
